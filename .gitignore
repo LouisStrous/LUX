@@ -1,2 +1,8 @@
 *.o
 *~
+*.info
+*.info-*
+*.tgz
+*.deps
+autom4te*
+*.log

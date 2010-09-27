@@ -116,6 +116,8 @@ void randomu(int seed, void *output, int number, int modulo)
  if (seed)
    random_init(seed);
  if (modulo) {			/* integers */
+   if (modulo < 0)
+     modulo = -modulo;
    ip = (int *) output;
    for (j = 0; j < number; j++)
      *ip++ = (int) (random_one()*modulo);
@@ -506,7 +508,11 @@ int ana_random(int narg, int ps[])
 	case ANA_SCALAR:
 	  if (ndim == MAX_DIMS)
 	    return anaerror("Too many dimensions", 0);
+          if (!symbolIsScalar(ps[i]))
+            return cerror(NEED_SCAL, ps[i]);
 	  dims[ndim++] = int_arg(ps[i]);
+          if (dims[ndim - 1] <= 0)
+            return cerror(ILL_DIM, ps[i]);
 	  break;
 	default:
 	  return cerror(ILL_CLASS, ps[i]);
@@ -518,6 +524,8 @@ int ana_random(int narg, int ps[])
   switch (internalMode) {
     case 1:			/* /UNIFORM */
       if (narg > 1 && ps[1]) {	/* PERIOD specified, so get LONGs */
+        if (!symbolIsScalar(ps[1]))
+          return cerror(NEED_SCAL, ps[1]);
 	period = int_arg(ps[1]);
 	result = array_scratch(ANA_LONG, ndim, dims);
 	if (result == ANA_ERROR)

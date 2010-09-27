@@ -1101,7 +1101,7 @@ internalRoutine function[] = {
     "1ONEDIM:2VNORMALIZE:4CNORMALIZE:8SINGLE" },
   { "PTOC",	1, 5, ana_polar_to_cartesian, 0 }, /* fun4.c */
   { "QUANTILE",	2, 3, ana_quantile, 0 }, /* strous2.c */
-  { "RANDOM",	1, MAX_DIMS, ana_random, /* fun4.c */
+  { "RANDOM",	1, MAX_DIMS, ana_random, /* random.c */
     "%2%SEED:PERIOD:1UNIFORM:2NORMAL:3SAMPLE:4SHUFFLE:5BITS" },
   { "RANDOMB",	3, MAX_DIMS, ana_randomb, "%2%SEED:1LONG" }, /* random.c */
   { "RANDOMD",  3, MAX_DIMS, ana_randomd, "%1%SEED" }, /* random.c */

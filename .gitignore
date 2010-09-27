@@ -6,3 +6,10 @@
 *.deps
 autom4te*
 *.log
+Makefile
+anap
+config.h
+config.status
+configure.notes
+configure.scan
+config.h.in.base

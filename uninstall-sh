@@ -1,0 +1,21 @@
+#! /bin/sh
+# This script was generated automatically by autoconf
+# to remove the ANA files from their installation locations.
+echo Removing /usr/local/libexec//ana
+rm -f /usr/local/libexec//ana
+echo Removing /usr/local/bin/hosttype
+rm -f /usr/local/bin/hosttype
+echo Removing /usr/local/share/ana/fonts "(directory)"
+rm -rf /usr/local/share/ana/fonts
+echo Removing /usr/local/share/ana/ana.texinfo
+rm -f /usr/local/share/ana/ana.texinfo
+echo Removing /usr/local/bin/ana
+rm -f /usr/local/bin/ana
+echo We now remove those affected directories that are empty, and all
+echo of their empty parent directories.
+echo Checking /usr/local/libexec/
+rmdir -p /usr/local/libexec/
+echo Checking /usr/local/bin
+rmdir -p /usr/local/bin
+echo Checking /usr/local/share/ana
+rmdir -p /usr/local/share/ana

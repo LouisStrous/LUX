@@ -1,0 +1,18 @@
+#!/bin/sh
+# This script reads a patch level number from file ana-patch-level.h
+# increments the number by one, and updates file ana-patch-level.h,
+# which defines macro PATCH to return the patch level number, and
+# which is used in site.c.  If file ana-patch-level initially does not
+# exist or is empty, then the initial patch level is assumed to be
+# zero.
+# (c) Louis Strous 1996
+if test -r ana-patch-level.h ; then
+  PATCH=`sed -e "s/#define PATCH//g" < ana-patch-level.h`
+  PATCH=`echo $PATCH | sed -e 's/\"//g'`
+fi
+PATCH=${PATCH:=0}
+PATCH=`expr $PATCH + 1`
+echo \"$PATCH\" > ana-patch-level
+echo "#define PATCH \"$PATCH\"" > ana-patch-level.h
+echo Patch Level $PATCH
+

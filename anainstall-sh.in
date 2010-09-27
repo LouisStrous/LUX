@@ -1,0 +1,81 @@
+#! /bin/sh
+# This script was generated automatically by $0
+# to install the compiled and constructed ANA files in appropriate
+# final locations.  This script is called by "install-sh".
+# Author: Louis Strous   21 August 2000
+#
+TARGET=`./hosttype`
+if test x$TARGET = x; then
+  cat <<EOF
+WARNING - I could not determine the type of operating system/computer
+(i.e., the platform) that you are using, so the installation script
+will not work exactly as planned!  The installation script (run by
+"make install") is supposed to install the executable in a
+platform-dependent subdirectory, but now it will use a
+platform-independent location instead.
+EOF
+else
+  echo Host type identification: ${TARGET}
+fi
+
+# Following the GNU Coding Standards
+# (http://www.gnu.org/prep/standards.html#SEC49), we install the
+# platform-dependent ANA executables as
+# ${exec_prefix}/libexec/${TARGET}/${EXEC}, the generic "ana" shell
+# script as ${exec_prefix}/bin/${EXEC}, the "hosttype" script as
+# ${exec_prefix}/bin/hosttype, the font files in
+# ${prefix}/share/ana/fonts, and the ana.texinfo help file in
+# ${prefix}/share/ana/ana.texinfo.
+
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+EXEC=@EXEC@
+
+#
+# First we make sure all necessary directories exist
+if test -d ${exec_prefix}/libexec/${TARGET}; then
+  x=1 # directory already exists
+else
+  echo Creating directory ${exec_prefix}/libexec/${TARGET}
+  mkdir -p ${exec_prefix}/libexec/${TARGET}
+fi
+
+if test -d ${exec_prefix}/bin; then
+  x=1 # directory already exists
+else
+  echo Creating directory ${exec_prefix}/bin
+  mkdir -p ${exec_prefix}/bin
+fi
+
+if test -d ${prefix}/share/ana; then
+  x=1 # directory already exists
+else
+  echo Creating directory ${prefix}/share/ana
+  mkdir -p ${prefix}/share/ana
+fi
+
+# Now we copy all the relevant files to their targets
+
+echo Copying executable to ${exec_prefix}/libexec/${TARGET}/${EXEC}
+cp ${EXEC} ${exec_prefix}/libexec/${TARGET}
+
+echo Copying \"hosttype\" to ${exec_prefix}/bin/hosttype
+cp hosttype ${exec_prefix}/bin/hosttype
+
+echo Copying font files to ${prefix}/share/ana/fonts
+cp -r fonts ${prefix}/share/ana/fonts
+
+echo Copying \"ana.texinfo\" to ${prefix}/share/ana/ana.texinfo
+cp ana.texinfo ${prefix}/share/ana/ana.texinfo
+
+echo Copying \"ana.sh\" to ${exec_prefix}/bin/${EXEC}
+cp ana.sh ${exec_prefix}/bin/${EXEC}
+chmod a+x ${exec_prefix}/bin/${EXEC}
+
+if test -r ${HOME}/.anaenv; then
+  echo Leaving existing ${HOME}/.anaenv alone.
+else
+  echo Copying .anaenv to ${HOME}/.anaenv
+  cp .anaenv ${HOME}
+fi
+

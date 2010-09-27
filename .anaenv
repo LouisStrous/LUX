@@ -1,0 +1,9 @@
+#! /bin/bash
+# This script was generated automatically by autoconf
+# to set environment variables for the ANA program.
+ANADIR=/usr/local/share/ana
+ANA_PATH=.:~/ana # example specification of standard *.ana directories
+ANADRIVE0=/dev/rmt/0 # example specification for ANA tape unit 0
+export ANADIR
+export ANA_PATH
+export ANADRIVE0

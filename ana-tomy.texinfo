@@ -1,0 +1,79 @@
+\input texinfo @c -*-texinfo-*-
+@c %**start of header
+@setfilename ana-tomy.info
+@settitle ANA-tomy
+@setchapternewpage odd
+@headings on
+@c %**end of header
+@c the above must appear at the start of a Texinfo file
+
+@paragraphindent 0
+
+@ifinfo
+@node Top, Functionality, (dir), (dir)
+@comment  node-name,  next,  previous,  up
+@top ANA-tomy
+
+This text documents some internals of the ANA data processing language
+and program.  This edition is for ANA version 3.
+
+@copyright{} 2009 Louis Strous
+
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+@end ifinfo
+
+@tex
+\centerline{ANA-tomy}
+\centerline{The Internals of}
+\centerline{the ANA Image Processing Package}
+\vskip 1ex
+\centerline{Louis H. Strous}
+\centerline{\today}
+\parindent 0pt
+@end tex
+
+
+@menu
+* Functionality::               
+* Concept Index::               
+@end menu
+
+@node Functionality, Concept Index, Top, Top
+@comment  node-name,  next,  previous,  up
+@chapter Functionality
+
+@menu
+* axis.c::                      
+@end menu
+
+@node axis.c,  , Functionality, Functionality
+@comment  node-name,  next,  previous,  up
+@section axis.c
+
+File @file{axis.c} provides functionality to walk through a
+multi-dimensional array.
+
+@deftypefn int standardLoop @
+(int @var{data}, int @var{axisSym}, int @var{mode}, int @var{outType}, @
+loopInfo *@var{src}, pointer *@var{srcptr}, int *@var{output}, @
+loopInfo *@var{trgt}, pointer *@var{trgtptr})
+
+
+
+
+@end deftypefn
+
+@c --------------------------------------
+@node Concept Index,  , Functionality, Top
+@comment  node-name,  next,  previous,  up
+@unnumbered Concept Index
+
+@printindex cp
+
+@c --------------------------------------
+
+@contents
+@bye

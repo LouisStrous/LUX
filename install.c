@@ -1069,7 +1069,7 @@ internalRoutine function[] = {
   { "MAXDIR",	2, 3, ana_max_dir, 0 },	/* topology.c */
   { "MAXFILTER", 1, 3, ana_maxfilter, 0 }, /* strous2.c */
   { "MAXLOC",	1, 2, ana_maxloc, "1KEEPDIMS" }, /* fun3.c */
-  { "MEAN", 	1, 4, ana_mean, "::POWER:WEIGHTS:1DOUBLE:2KEEPDIMS" }, /* fun1.c */
+  { "MEAN", 	1, 4, ana_mean, "::POWER:WEIGHTS:1DOUBLE:2KEEPDIMS:4FLOAT" }, /* fun1.c */
   { "MEDFILTER", 1, 4, ana_medfilter, "%1%" }, /* strous2.c */
   { "MEDIAN",	1, 3, ana_median, "%1%" }, /* strous2.c */
   { "MEMORY",	0, 0, ana_memory, 0 }, /* memck.c */
@@ -1201,7 +1201,7 @@ internalRoutine function[] = {
 #if DEVELOP
   { "TEST",	2, 3, ana_test, 0 }, /* execute.c */
 #endif
-  { "TOTAL", 	1, 4, ana_total, "::POWER:WEIGHTS:1DOUBLE:2KEEPDIMS" }, /* fun1.c */
+  { "TOTAL", 	1, 4, ana_total, "::POWER:WEIGHTS:1DOUBLE:2KEEPDIMS:4FLOAT" }, /* fun1.c */
   { "TRACE_DECODER", 3, 3, ana_trace_decoder, 0 }, /* trace_decoder_ana.c */
   { "TREND",	1, 2, ana_trend, "*" }, /* fun2.c */
   { "TRI_NAME_FROM_TAI", 1, 1, ana_tri_name_from_tai, 0 }, /* ephem.c */

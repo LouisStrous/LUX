@@ -1,1 +1,1 @@
-#define PATCH "686"
+#define PATCH "693"

@@ -18740,7 +18740,7 @@ See also: @ref{MAX}, @ref{!LASTMAX}, @ref{!LASTMAXLOC}
 @subsection MEAN
 
 @code{MEAN(@var{x} [, @var{mode}, POWER=@var{power},
-WEIGHTS=@var{weights}, /DOUBLE, /KEEPDIMS])}
+WEIGHTS=@var{weights}, /FLOAT, /DOUBLE, /KEEPDIMS])}
 
 By default, returns the arithmetic average of numerical array
 @code{@var{x}}: the sum divided by the number of summed values.
@@ -18778,11 +18778,12 @@ kept real even if @code{@var{x}} is complex).
 Complex numbers are supported.
 
 The data type of the result is at least as great as the data type of
-@code{@var{x}}, and not less than @code{FLOAT}.  If @code{/DOUBLE} is
-specified, then the result is of type @code{DOUBLE} (or @code{CDOUBLE}
-if @code{@var{x}} is complex).
+@code{@var{x}}, and not less than @code{LONG}.  If @code{/FLOAT} is
+specified, then the result is at least of type @code{FLOAT}.  If
+@code{/DOUBLE} is specified, then the result is of type @code{DOUBLE}
+(or @code{CDOUBLE} if @code{@var{x}} is complex).
 
-Examples, with @code{X = [[[6, 4, 3]],[[8, 2, 4]]]} and @code{C = [2, 2,
+Examples, with @code{X = [[[6.0, 4, 3]],[[8, 2, 4]]]} and @code{C = [2.0, 2,
 2, 2, 1, 1]}:
 
 To print the average along the first dimension (dimension 0, rows) of
@@ -23013,7 +23014,7 @@ equal to @code{@var{list}(@var{index},*)}.
 @subsection TOTAL
 
 @code{TOTAL(@var{x} [, @var{mode}, POWER=@var{power},
-WEIGHTS=@var{weights}, /DOUBLE, /KEEPDIMS])}
+WEIGHTS=@var{weights}, /FLOAT, /DOUBLE, /KEEPDIMS])}
 
 By default, returns the sum of numerical array @code{@var{x}}.  The
 arguments, keywords, and type and dimensions of the result are exactly

@@ -3075,7 +3075,7 @@ int index_total(int narg, int ps[], int mean)
 }
 /*-----------------------------------------------------------------------*/
 int total(int narg, int ps[], int mean)
-/* TOTAL(x, [ mode, POWER=p, WEIGHTS=w, /KEEPDIMS, /DOUBLE]) */
+/* TOTAL(x, [ mode, POWER=p, WEIGHTS=w, /KEEPDIMS, /FLOAT, /DOUBLE]) */
 
 /* TOTAL(array) sums all elements of <array> and returns a ANA_SCALAR. */
 /* TOTAL(array, axis) sums all elements along dimension <axis> (if this */
@@ -3086,10 +3086,11 @@ int total(int narg, int ps[], int mean)
 /* TOTAL(array, index) collects each element of <array> at index <index> */
 /*   in the result, if <index> is an ANA_ARRAY with the same number of
      elements as <array>.  */
-/* The result is at least ANA_FLOAT.   LS 14jan96 */
+/* The result is at least ANA_LONG.   LS 14jan96 */
 /* TOTAL(array [, axis], POWER=p) returns the total of the <p>th */
 /*   (integer) power of <array>.  LS 22jul98 */
 /* Fixed erroneous cast to (float) in (double) summations.  LS 11jul2000 */
+/* Allow ANA_LONG output.  LS 27oct2010 */
 {
   int	result, done, p, psign, pp, outtype, type, nbase, i, haveWeights, n;
   byte	*present;
@@ -3132,12 +3133,24 @@ int total(int narg, int ps[], int mean)
 #endif
   type = array_type(ps[0]);
   
-  if (isComplexType(type))
-    outtype = ((internalMode & 1)
-	       || type == ANA_CDOUBLE)? ANA_CDOUBLE: ANA_CFLOAT;
-  else
-    outtype = ((internalMode & 1)
-	       || type == ANA_DOUBLE)? ANA_DOUBLE: ANA_FLOAT;
+  outtype = type;
+  switch (internalMode & 5) {
+    case 0:
+      if (outtype < ANA_LONG)
+        outtype = ANA_LONG;
+      break;
+    case 1:                       /* /DOUBLE */
+    case 5:                       /* /DOUBLE, /FLOAT */
+      if (isComplexType(type))
+        outtype = ANA_CDOUBLE;
+      else if (outtype < ANA_DOUBLE)
+        outtype = ANA_DOUBLE;
+      break;
+    case 4:                       /* /FLOAT */
+      if (outtype < ANA_FLOAT)
+        outtype = ANA_FLOAT;
+      break;
+  }
 #if DEBUG_VOCAL
   debugout1("output type: %s", typeName(outtype));
 #endif
@@ -3227,6 +3240,46 @@ int total(int narg, int ps[], int mean)
       debugout("Weighted regular summation");
 #endif
       switch (outtype) {
+	case ANA_LONG:
+	  switch (type) {
+	    case ANA_BYTE:
+	      do {
+		sum.l = 0.0;
+		w.l = 0.0;
+		do {
+		  sum.l += *src.b * *weights.b;
+		  w.l += *weights.b;
+		} while ((done = advanceLoops(&srcinfo, &winfo))
+			 < srcinfo.naxes);
+		*trgt.l++ = mean? (w.l? sum.l/w.l: 0): sum.l;
+	      } while (done < srcinfo.rndim);
+	      break;
+	    case ANA_WORD:
+	      do {
+		sum.l = 0.0;
+		w.l = 0.0;
+		do {
+		  sum.l += *src.w * *weights.w;
+		  w.l += *weights.w;
+		} while ((done = advanceLoops(&srcinfo, &winfo))
+			 < srcinfo.naxes);
+		*trgt.l++ = mean? (w.l? sum.l/w.l: 0): sum.l;
+	      } while (done < srcinfo.rndim);
+	      break;
+	    case ANA_LONG:
+	      do {
+		sum.l = 0.0;
+		w.l = 0.0;
+		do {
+		  sum.l += *src.l * *weights.l;
+		  w.l += *weights.l;
+		} while ((done = advanceLoops(&srcinfo, &winfo))
+			 < srcinfo.naxes);
+		*trgt.l++ = mean? (w.l? sum.l/w.l: 0): sum.l;
+	      } while (done < srcinfo.rndim);
+	      break;
+	  } /* end of switch (type) */
+	  break;
 	case ANA_FLOAT:
 	  switch (type) {
 	    case ANA_BYTE:
@@ -3428,6 +3481,37 @@ int total(int narg, int ps[], int mean)
       debugout("Regular unweighted summing");
 #endif
       switch (outtype) {
+	case ANA_LONG:
+	  switch (type) {
+	    case ANA_BYTE:
+	      do {
+		sum.l = 0.0;
+		do
+		  sum.l += *src.b;
+		while ((done = advanceLoop(&srcinfo)) < srcinfo.naxes);
+		*trgt.l++ = mean? sum.l/n: sum.l;
+	      } while (done < srcinfo.rndim);
+	      break;
+	    case ANA_WORD:
+	      do {
+		sum.l = 0.0;
+		do
+		  sum.l += *src.w;
+		while ((done = advanceLoop(&srcinfo)) < srcinfo.naxes);
+		*trgt.l++ = mean? sum.l/n: sum.l;
+	      } while (done < srcinfo.rndim);
+	      break;
+	    case ANA_LONG:
+	      do {
+		sum.l = 0.0;
+		do
+		  sum.l += *src.l;
+		while ((done = advanceLoop(&srcinfo)) < srcinfo.naxes);
+		*trgt.l++ = mean? sum.l/n: sum.l;
+	      } while (done < srcinfo.rndim);
+	      break;
+	  } /* end of switch (type) */
+	  break;
 	case ANA_FLOAT:
 	  switch (type) {
 	    case ANA_BYTE:
@@ -3592,6 +3676,82 @@ int total(int narg, int ps[], int mean)
       debugout("weighted power summation");
 #endif
       switch (outtype) {
+	case ANA_LONG:
+	  switch (type) {
+	    case ANA_BYTE:
+	      do {
+		sum.l = w.l = 0.0;
+		do {
+		  temp.l = *src.b; /* data value */
+		  value.l = 1.0;
+		  for (i = 0; i < nbase; i++) {
+		    if (present[i])
+		      value.l *= temp.l;
+		    temp.l *= temp.l;
+		  }
+		  /* we now have the data value to the given unsigned power */
+		  /* add in the exponent sign and the weight */
+		  if (psign == -1) /* negative exponent: must divide */
+		    value.l = value.l? *weights.b/value.l: 0.0;
+		  else
+		    value.l *= *weights.b;
+		  sum.l += value.l;
+		  w.l += *weights.b;
+		} while ((done = advanceLoops(&srcinfo, &winfo))
+			 < srcinfo.naxes);
+		*trgt.l++ = mean? (w.l? sum.l/w.l: 0.0): sum.l;
+	      } while (done < srcinfo.rndim);
+	      break;
+	    case ANA_WORD:
+	      do {
+		sum.l = w.l = 0.0;
+		do {
+		  temp.l = *src.w; /* data value */
+		  value.l = 1.0;
+		  for (i = 0; i < nbase; i++) {
+		    if (present[i])
+		      value.l *= temp.l;
+		    temp.l *= temp.l;
+		  }
+		  /* we now have the data value to the given unsigned power */
+		  /* add in the exponent sign and the weight */
+		  if (psign == -1) /* negative exponent: must divide */
+		    value.l = value.l? *weights.w/value.l: 0.0;
+		  else
+		    value.l *= *weights.w;
+		  sum.l += value.l;
+		  w.l += *weights.w;
+		} while ((done = advanceLoops(&srcinfo, &winfo))
+			 < srcinfo.naxes);
+		*trgt.l++ = mean? (w.l? sum.l/w.l: 0.0): sum.l;
+	      } while (done < srcinfo.rndim);
+	      break;
+	    case ANA_LONG:
+	      do {
+		sum.l = w.l = 0.0;
+		do {
+		  temp.l = *src.l; /* data value */
+		  value.l = 1.0;
+		  for (i = 0; i < nbase; i++) {
+		    if (present[i])
+		      value.l *= temp.l;
+		    temp.l *= temp.l;
+		  }
+		  /* we now have the data value to the given unsigned power */
+		  /* add in the exponent sign and the weight */
+		  if (psign == -1) /* negative exponent: must divide */
+		    value.l = value.l? *weights.l/value.l: 0.0;
+		  else
+		    value.l *= *weights.l;
+		  sum.l += value.l;
+		  w.l += *weights.l;
+		} while ((done = advanceLoops(&srcinfo, &winfo))
+			 < srcinfo.naxes);
+		*trgt.l++ = mean? (w.l? sum.l/w.l: 0.0): sum.l;
+	      } while (done < srcinfo.rndim);
+	      break;
+	  } /* end of switch (type) */
+	  break;
 	case ANA_FLOAT:
 	  switch (type) {
 	    case ANA_BYTE:
@@ -3982,6 +4142,70 @@ int total(int narg, int ps[], int mean)
       debugout("unweighted power summation");
 #endif
       switch (outtype) {
+	case ANA_LONG:
+	  switch (type) {
+	    case ANA_BYTE:
+	      do {
+		sum.l = 0.0;
+		do {
+		  temp.l = *src.b; /* data value */
+		  value.l = 1.0;
+		  for (i = 0; i < nbase; i++) {
+		    if (present[i])
+		      value.l *= temp.l;
+		    temp.l *= temp.l;
+		  }
+		  /* we now have the data value to the given unsigned power */
+		  /* add in the exponent sign and the weight */
+		  if (psign == -1) /* negative exponent: must divide */
+		    value.l = value.l? 1.0/value.l: 0.0;
+		  sum.l += value.l;
+		} while ((done = advanceLoop(&srcinfo)) < srcinfo.naxes);
+		*trgt.l++ = mean? sum.l/n: sum.l;
+	      } while (done < srcinfo.rndim);
+	      break;
+	    case ANA_WORD:
+	      do {
+		sum.l = 0.0;
+		do {
+		  temp.l = *src.w; /* data value */
+		  value.l = 1.0;
+		  for (i = 0; i < nbase; i++) {
+		    if (present[i])
+		      value.l *= temp.l;
+		    temp.l *= temp.l;
+		  }
+		  /* we now have the data value to the given unsigned power */
+		  /* add in the exponent sign and the weight */
+		  if (psign == -1) /* negative exponent: must divide */
+		    value.l = value.l? 1.0/value.l: 0.0;
+		  sum.l += value.l;
+		} while ((done = advanceLoop(&srcinfo)) < srcinfo.naxes);
+		*trgt.l++ = mean? sum.l/n: sum.l;
+	      } while (done < srcinfo.rndim);
+	      break;
+	    case ANA_LONG:
+	      do {
+		sum.l = 0.0;
+		do {
+		  temp.l = *src.l; /* data value */
+		  value.l = 1.0;
+		  for (i = 0; i < nbase; i++) {
+		    if (present[i])
+		      value.l *= temp.l;
+		    temp.l *= temp.l;
+		  }
+		  /* we now have the data value to the given unsigned power */
+		  /* add in the exponent sign and the weight */
+		  if (psign == -1) /* negative exponent: must divide */
+		    value.l = value.l? 1.0/value.l: 0.0;
+		  sum.l += value.l;
+		} while ((done = advanceLoop(&srcinfo)) < srcinfo.naxes);
+		*trgt.l++ = mean? sum.l/n: sum.l;
+	      } while (done < srcinfo.rndim);
+	      break;
+	  } /* end of switch (type) */
+	  break;
 	case ANA_FLOAT:
 	  switch (type) {
 	    case ANA_BYTE:

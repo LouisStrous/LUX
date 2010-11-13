@@ -2051,15 +2051,27 @@ int ana_switch(int narg, int ps[])
 /* switches identity of two symbols.  We cannot just swap the names
    because then the connection between a particular name and a
    particular symbol number is broken.  We must swap the values instead.
-   LS 9nov98 */
+   LS 9nov98 9oct2010*/
 {
- int	sym1, sym2, tempcontext, tempexec, templine;
- word	temp;
- symTableEntry	tempSymbol; 
+ int	sym1, sym2;
+ symTableEntry	temp1, temp2;
 
  sym1 = ps[0];
  sym2 = ps[1];
-
+ temp1 = sym[sym1];
+ temp2 = sym[sym2];
+ sym[sym2] = temp1;
+ sym[sym1] = temp2;
+ sym[sym1].xx = temp1.xx;
+ sym[sym2].xx = temp2.xx;
+ sym[sym1].line = temp1.line;
+ sym[sym2].line = temp2.line;
+ sym[sym1].context = temp1.context;
+ sym[sym2].context = temp2.context;
+ sym[sym1].exec = temp1.exec;
+ sym[sym2].exec = temp2.exec;
+ 
+#ifdef DONTIGNORE
  temp = sym[sym2].xx;		/* hash value for the name */
  tempcontext = sym[sym2].context; /* the context */
  tempexec = sym[sym2].exec;	/* the execution count */
@@ -2070,7 +2082,6 @@ int ana_switch(int narg, int ps[])
  sym[sym2].context = tempcontext;
  sym[sym2].line = templine;
  sym[sym2].exec = tempexec;
-
  temp = sym[sym1].xx;
  tempcontext = sym[sym1].context;
  templine = sym[sym1].line;
@@ -2080,6 +2091,7 @@ int ana_switch(int narg, int ps[])
  sym[sym1].context = tempcontext;
  sym[sym1].line = templine;
  sym[sym1].exec = tempexec;
+#endif
  return 1;
 } 
 /*-----------------------------------------------------*/

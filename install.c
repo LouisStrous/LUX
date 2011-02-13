@@ -817,7 +817,7 @@ internalRoutine function[] = {
   { "ASTORE",	2, MAX_ARG, ana_astore_f, 0 }, /* files.c */
   { "ASTRF",	1, 2, ana_astrf, "1FROMEQUATORIAL:2FROMECLIPTICAL:4FROMGALACTIC:8TOEQUATORIAL:16TOECLIPTICAL:32TOGALACTIC:64JULIAN:128BESSELIAN" }, /* astron.c */
   { "ASTRON",	2, 6, ana_astropos, /* astron.c */
-    "|2304|:::OBSERVER:EQUINOX:ELEMENTS:1ECLIPTICAL:2EQUATORIAL:3HORIZONTAL:4ELONGATION:8XYZ:32DATE:64TDT:128ERROR:256ABBERATION:512GEOMETRIC:1024QELEMENTS:2048FK5:4096TRUNCVSOP:8192CONJSPREAD:16384PLANETOCENTRIC:32768KEEPDIMENSIONS" },
+    "|2304|:::OBSERVER:EQUINOX:ELEMENTS:1ECLIPTICAL:2EQUATORIAL:3HORIZONTAL:4ELONGATION:8XYZ:32DATE:64TDT:128ERROR:256ABBERATION:512GEOMETRIC:1024QELEMENTS:2048FK5:4096TRUNCVSOP:8192CONJSPREAD:16384PLANETOCENTRIC:32768KEEPDIMENSIONS:65536VOCAL" },
   { "ATAN",	1, 1, ana_atan, "*" }, /* fun1.c */
   { "ATAN2",	2, 2, ana_atan2, "*" }, /* fun1.c */
   { "ATANH",	1, 1, ana_atanh, "*" }, /* fun1.c */
@@ -893,7 +893,7 @@ internalRoutine function[] = {
   { "COMPRESS",	2, 3, ana_compress, 0 }, /* fun4.c */
   { "CONCAT",	1, MAX_ARG, ana_concat, "1SLOPPY" }, /* subsc.c */
   { "CONJUGATE", 1, 1, ana_conjugate, "*" }, /* fun1.c */
-  { "CONSTELLATION", 1, 2, ana_constellation, "1JULIAN:2BESSELIAN" }, /* astron.c */
+  { "CONSTELLATION", 1, 2, ana_constellation, "1JULIAN:2BESSELIAN:4VOCAL" }, /* astron.c */
   { "CONSTELLATIONNAME", 1, 1, ana_constellationname, 0 }, /* astron.c */
   { "CONVERT",	2, 2, ana_convertsym, "*" }, /* symbols.c */
   { "COS",	1, 1, ana_cos, "*" }, /* fun1.c */

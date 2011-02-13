@@ -392,7 +392,7 @@ int Sprintf_sexagesimal(char *str, double value, int precision, int width,
 			   number is 2 characters long */
       n += 3;
     } else {		/* the last one: print as float */
-      t = width - n - 4;	/* any width left? */
+      t = width - n - 3;	/* any width left? */
       if (t < 0)
 	t = 0;
       /* we use %0# so we always get a decimal point; that way we can

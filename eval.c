@@ -132,7 +132,7 @@ void ana_bin_pow(void)
 	  while (nRepeat--) {
 	    if (*lp.w) {
 	      mod1.f = log(fabs((double) *lp.w));
-	      arg1.f = (*lp.w >= 0.0)? 0.0: PI;
+	      arg1.f = (*lp.w >= 0.0)? 0.0: M_PI;
 	      mod2.f = exp(rp.cf->real*mod1.f - rp.cf->imaginary*arg1.f);
 	      arg2.f = mod1.f*rp.cf->imaginary + rp.cf->real*arg1.f;
 	      tp.cf->real = mod2.f*cos(arg2.f);
@@ -148,7 +148,7 @@ void ana_bin_pow(void)
 	  while (nRepeat--) {
 	    if (*lp.w) {
 	      mod1.d = log(fabs((double) *lp.w));
-	      arg1.d = (*lp.w >= 0.0)? 0.0: PI;
+	      arg1.d = (*lp.w >= 0.0)? 0.0: M_PI;
 	      mod2.d = exp(rp.cd->real*mod1.d - rp.cd->imaginary*arg1.d);
 	      arg2.d = mod1.d*rp.cd->imaginary + rp.cd->real*arg1.d;
 	      tp.cd->real = mod2.d*cos(arg2.d);
@@ -190,7 +190,7 @@ void ana_bin_pow(void)
 	  while (nRepeat--) {
 	    if (*lp.l) {
 	      mod1.f = log(fabs((double) *lp.l));
-	      arg1.f = (*lp.l >= 0.0)? 0.0: PI;
+	      arg1.f = (*lp.l >= 0.0)? 0.0: M_PI;
 	      mod2.f = exp(rp.cf->real*mod1.f - rp.cf->imaginary*arg1.f);
 	      arg2.f = mod1.f*rp.cf->imaginary + rp.cf->real*arg1.f;
 	      tp.cf->real = mod2.f*cos(arg2.f);
@@ -206,7 +206,7 @@ void ana_bin_pow(void)
 	  while (nRepeat--) {
 	    if (*lp.l) {
 	      mod1.d = log(fabs((double) *lp.l));
-	      arg1.d = (*lp.l >= 0.0)? 0.0: PI;
+	      arg1.d = (*lp.l >= 0.0)? 0.0: M_PI;
 	      mod2.d = exp(rp.cd->real*mod1.d - rp.cd->imaginary*arg1.d);
 	      arg2.d = mod1.d*rp.cd->imaginary + rp.cd->real*arg1.d;
 	      tp.cd->real = mod2.d*cos(arg2.d);
@@ -248,7 +248,7 @@ void ana_bin_pow(void)
 	  while (nRepeat--) {
 	    if (*lp.f) {
 	      mod1.f = log(fabs((double) *lp.f));
-	      arg1.f = (*lp.f >= 0.0)? 0.0: PI;
+	      arg1.f = (*lp.f >= 0.0)? 0.0: M_PI;
 	      mod2.f = exp(rp.cf->real*mod1.f - rp.cf->imaginary*arg1.f);
 	      arg2.f = mod1.f*rp.cf->imaginary + rp.cf->real*arg1.f;
 	      tp.cf->real = mod2.f*cos(arg2.f);
@@ -264,7 +264,7 @@ void ana_bin_pow(void)
 	  while (nRepeat--) {
 	    if (*lp.f) {
 	      mod1.d = log(fabs((double) *lp.f));
-	      arg1.d = (*lp.f >= 0.0)? 0.0: PI;
+	      arg1.d = (*lp.f >= 0.0)? 0.0: M_PI;
 	      mod2.d = exp(rp.cd->real*mod1.d - rp.cd->imaginary*arg1.d);
 	      arg2.d = mod1.d*rp.cd->imaginary + rp.cd->real*arg1.d;
 	      tp.cd->real = mod2.d*cos(arg2.d);
@@ -306,7 +306,7 @@ void ana_bin_pow(void)
 	  while (nRepeat--) {
 	    if (*lp.d) {
 	      mod1.d = log(fabs((double) *lp.d));
-	      arg1.d = (*lp.d > 0.0)? 0.0: PI;
+	      arg1.d = (*lp.d > 0.0)? 0.0: M_PI;
 	      mod2.d = exp(rp.cf->real*mod1.d - rp.cf->imaginary*arg1.d);
 	      arg2.d = mod1.d*rp.cf->imaginary + rp.cf->real*arg1.d;
 	      tp.cd->real = mod2.d*cos(arg2.d);
@@ -322,7 +322,7 @@ void ana_bin_pow(void)
 	  while (nRepeat--) {
 	    if (*lp.d) {
 	      mod1.d = log(fabs((double) *lp.d));
-	      arg1.d = (*lp.d >= 0.0)? 0.0: PI;
+	      arg1.d = (*lp.d >= 0.0)? 0.0: M_PI;
 	      mod2.d = exp(rp.cd->real*mod1.d - rp.cd->imaginary*arg1.d);
 	      arg2.d = mod1.d*rp.cd->imaginary + rp.cd->real*arg1.d;
 	      tp.cd->real = mod2.d*cos(arg2.d);
@@ -709,7 +709,7 @@ void ana_pow_as(void)
 	  while (nRepeat--) {
 	    if (*lp.w) {
 	      mod1.f = log(fabs((double) *lp.w));
-	      arg1.f = (*lp.w >= 0.0)? 0.0: PI;
+	      arg1.f = (*lp.w >= 0.0)? 0.0: M_PI;
 	      mod2.f = exp(re.f*mod1.f - im.f*arg1.f);
 	      arg2.f = im.f*mod1.f + re.f*arg1.f;
 	      tp.cf->real = mod2.f*cos(arg2.f);
@@ -726,7 +726,7 @@ void ana_pow_as(void)
 	  while (nRepeat--) {
 	    if (*lp.w) {
 	      mod1.d = log(fabs((double) *lp.w));
-	      arg1.d = (*lp.w >= 0.0)? 0.0: PI;
+	      arg1.d = (*lp.w >= 0.0)? 0.0: M_PI;
 	      mod2.d = exp(re.d*mod1.d - im.d*arg1.d);
 	      arg2.d = im.d*mod1.d + re.d*arg1.d;
 	      tp.cd->real = mod2.d*cos(arg2.d);
@@ -774,7 +774,7 @@ void ana_pow_as(void)
 	  while (nRepeat--) {
 	    if (*lp.l) {
 	      mod1.f = log(fabs((double) *lp.l));
-	      arg1.f = (*lp.l >= 0.0)? 0.0: PI;
+	      arg1.f = (*lp.l >= 0.0)? 0.0: M_PI;
 	      mod2.f = exp(re.f*mod1.f - im.f*arg1.f);
 	      arg2.f = im.f*mod1.f + re.f*arg1.f;
 	      tp.cf->real = mod2.f*cos(arg2.f);
@@ -791,7 +791,7 @@ void ana_pow_as(void)
 	  while (nRepeat--) {
 	    if (*lp.l) {
 	      mod1.d = log(fabs((double) *lp.l));
-	      arg1.d = (*lp.l >= 0.0)? 0.0: PI;
+	      arg1.d = (*lp.l >= 0.0)? 0.0: M_PI;
 	      mod2.d = exp(re.d*mod1.d - im.d*arg1.d);
 	      arg2.d = im.d*mod1.d + re.d*arg1.d;
 	      tp.cd->real = mod2.d*cos(arg2.d);
@@ -839,7 +839,7 @@ void ana_pow_as(void)
 	  while (nRepeat--) {
 	    if (*lp.f) {
 	      mod1.f = log(fabs((double) *lp.f));
-	      arg1.f = (*lp.f >= 0.0)? 0.0: PI;
+	      arg1.f = (*lp.f >= 0.0)? 0.0: M_PI;
 	      mod2.f = exp(re.f*mod1.f - im.f*arg1.f);
 	      arg2.f = im.f*mod1.f + re.f*arg1.f;
 	      tp.cf->real = mod2.f*cos(arg2.f);
@@ -856,7 +856,7 @@ void ana_pow_as(void)
 	  while (nRepeat--) {
 	    if (*lp.f) {
 	      mod1.d = log(fabs((double) *lp.f));
-	      arg1.d = (*lp.f >= 0.0)? 0.0: PI;
+	      arg1.d = (*lp.f >= 0.0)? 0.0: M_PI;
 	      mod2.d = exp(re.d*mod1.d - im.d*arg1.d);
 	      arg2.d = im.d*mod1.d + re.d*arg1.d;
 	      tp.cd->real = mod2.d*cos(arg2.d);
@@ -904,7 +904,7 @@ void ana_pow_as(void)
 	  while (nRepeat--) {
 	    if (*lp.d) {
 	      mod1.d = log(fabs((double) *lp.d));
-	      arg1.d = (*lp.d >= 0.0)? 0.0: PI;
+	      arg1.d = (*lp.d >= 0.0)? 0.0: M_PI;
 	      mod2.d = exp(re.d*mod1.d - im.d*arg1.d);
 	      arg2.d = im.d*mod1.d + re.d*arg1.d;
 	      tp.cd->real = mod2.d*cos(arg2.d);
@@ -921,7 +921,7 @@ void ana_pow_as(void)
 	  while (nRepeat--) {
 	    if (*lp.d) {
 	      mod1.d = log(fabs((double) *lp.d));
-	      arg1.d = (*lp.d >= 0.0)? 0.0: PI;
+	      arg1.d = (*lp.d >= 0.0)? 0.0: M_PI;
 	      mod2.d = exp(re.d*mod1.d - im.d*arg1.d);
 	      arg2.d = im.d*mod1.d + re.d*arg1.d;
 	      tp.cd->real = mod2.d*cos(arg2.d);
@@ -1305,7 +1305,7 @@ void ana_pow_sa(void)
 	case ANA_CFLOAT:
 	  if (*lp.w) {
 	    mod1.f = log(fabs((double) *lp.w));
-	    arg1.f = (*lp.w > 0.0)? 0.0: PI;
+	    arg1.f = (*lp.w > 0.0)? 0.0: M_PI;
 	    while (nRepeat--) {
 	      re.f = rp.cf->real;
 	      im.f = rp.cf++->imaginary;
@@ -1322,7 +1322,7 @@ void ana_pow_sa(void)
 	case ANA_CDOUBLE:
 	  if (*lp.w) {
 	    mod1.d = log(fabs((double) *lp.w));
-	    arg1.d = (*lp.w >= 0.0)? 0.0: PI;
+	    arg1.d = (*lp.w >= 0.0)? 0.0: M_PI;
 	    while (nRepeat--) {
 	      re.d = rp.cd->real;
 	      im.d = rp.cd++->imaginary;
@@ -1370,7 +1370,7 @@ void ana_pow_sa(void)
 	case ANA_CFLOAT:
 	  if (*lp.l) {
 	    mod1.f = log(fabs((double) *lp.l));
-	    arg1.f = (*lp.l > 0.0)? 0.0: PI;
+	    arg1.f = (*lp.l > 0.0)? 0.0: M_PI;
 	    while (nRepeat--) {
 	      re.f = rp.cf->real;
 	      im.f = rp.cf++->imaginary;
@@ -1387,7 +1387,7 @@ void ana_pow_sa(void)
 	case ANA_CDOUBLE:
 	  if (*lp.l) {
 	    mod1.d = log(fabs((double) *lp.l));
-	    arg1.f = (*lp.l > 0.0)? 0.0: PI;
+	    arg1.f = (*lp.l > 0.0)? 0.0: M_PI;
 	    while (nRepeat--) {
 	      re.d = rp.cd->real;
 	      im.d = rp.cd++->imaginary;
@@ -1435,7 +1435,7 @@ void ana_pow_sa(void)
 	case ANA_CFLOAT:
 	  if (*lp.f) {
 	    mod1.f = log(fabs((double) *lp.f));
-	    arg1.f = (*lp.f > 0.0)? 0.0: PI;
+	    arg1.f = (*lp.f > 0.0)? 0.0: M_PI;
 	    while (nRepeat--) {
 	      re.f = rp.cf->real;
 	      im.f = rp.cf++->imaginary;
@@ -1452,7 +1452,7 @@ void ana_pow_sa(void)
 	case ANA_CDOUBLE:
 	  if (*lp.f) {
 	    mod1.d = log(fabs((double) *lp.f));
-	    arg1.d = (*lp.f > 0.0)? 0.0: PI;
+	    arg1.d = (*lp.f > 0.0)? 0.0: M_PI;
 	    while (nRepeat--) {
 	      re.d = rp.cd->real;
 	      im.d = rp.cd++->imaginary;
@@ -1500,7 +1500,7 @@ void ana_pow_sa(void)
 	case ANA_CFLOAT:
 	  if (*lp.d) {
 	    mod1.d = log(fabs((double) *lp.d));
-	    arg1.d = (*lp.d > 0.0)? 0.0: PI;
+	    arg1.d = (*lp.d > 0.0)? 0.0: M_PI;
 	    while (nRepeat--) {
 	      re.d = rp.cf->real;
 	      im.d = rp.cf++->imaginary;
@@ -1517,7 +1517,7 @@ void ana_pow_sa(void)
 	case ANA_CDOUBLE:
 	  if (*lp.d) {
 	    mod1.d = log(fabs((double) *lp.d));
-	    arg1.d = (*lp.d >= 0.0)? 0.0: PI;
+	    arg1.d = (*lp.d >= 0.0)? 0.0: M_PI;
 	    while (nRepeat--) {
 	      re.d = rp.cd->real;
 	      im.d = rp.cd++->imaginary;

@@ -1599,15 +1599,15 @@ int ana_arg(int narg, int ps[])
 	  break;
 	case ANA_WORD:
 	  while (n--)
-	    *trgt.f++ = (*value.w++ >= 0)? 0.0: PI;
+	    *trgt.f++ = (*value.w++ >= 0)? 0.0: M_PI;
 	  break;
 	case ANA_LONG:
 	  while (n--)
-	    *trgt.f++ = (*value.l++ >= 0)? 0.0: PI;
+	    *trgt.f++ = (*value.l++ >= 0)? 0.0: M_PI;
 	  break;
 	case ANA_FLOAT:
 	  while (n--)
-	    *trgt.f++ = (*value.f++ >= 0)? 0.0: PI;
+	    *trgt.f++ = (*value.f++ >= 0)? 0.0: M_PI;
 	  break;
 	case ANA_CFLOAT:
 	  while (n--) {
@@ -1625,19 +1625,19 @@ int ana_arg(int narg, int ps[])
 	  break;
 	case ANA_WORD:
 	  while (n--)
-	    *trgt.d++ = (*value.w++ >= 0)? 0.0: PI;
+	    *trgt.d++ = (*value.w++ >= 0)? 0.0: M_PI;
 	  break;
 	case ANA_LONG:
 	  while (n--)
-	    *trgt.d++ = (*value.l++ >= 0)? 0.0: PI;
+	    *trgt.d++ = (*value.l++ >= 0)? 0.0: M_PI;
 	  break;
 	case ANA_FLOAT:
 	  while (n--)
-	    *trgt.d++ = (*value.f++ >= 0)? 0.0: PI;
+	    *trgt.d++ = (*value.f++ >= 0)? 0.0: M_PI;
 	  break;
 	case ANA_DOUBLE:
 	  while (n--)
-	    *trgt.d++ = (*value.d++ >= 0)? 0.0: PI;
+	    *trgt.d++ = (*value.d++ >= 0)? 0.0: M_PI;
 	  break;
 	case ANA_CDOUBLE:
 	  while (n--) {
@@ -1936,7 +1936,7 @@ int fftshift(int narg, int ps[], int subroutine)
       case ANA_FLOAT:
 	if (*dist.f) {
 	  /* now calculate the phase factors */
-	  v.f = 2*PI*(*dist.f)/n;
+	  v.f = 2*M_PI*(*dist.f)/n;
 	  for (j = 1; j <= n/2; j++) {
 	    sines.f[j - 1] = sin(v.f*j);
 	    cosines.f[j - 1] = cos(v.f*j);
@@ -1978,7 +1978,7 @@ int fftshift(int narg, int ps[], int subroutine)
       case ANA_DOUBLE:
 	if (*dist.d) {
 	  /* now calculate the phase factors */
-	  v.d = 2*PI*(*dist.d)/n;
+	  v.d = 2*M_PI*(*dist.d)/n;
 	  for (j = 1; j <= n/2; j++) {
 	    sines.d[j - 1] = sin(v.d*j);
 	    cosines.d[j - 1] = cos(v.d*j);

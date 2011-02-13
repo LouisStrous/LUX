@@ -172,7 +172,6 @@ double JDE(double, int);
 
 #define J2000	(2451545.0)
 #define B1950   (2433282.4235)
-#define TWOPI   (2*PI)
 
 #define ecos	0.9174369451	/* cos(ecliptic2000) */
 #define esin	0.3978812030	/* sin(ecliptic2000) */

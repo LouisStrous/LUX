@@ -62,7 +62,7 @@ void solar_physical(double jd, int select)
       break;
     case 2: case 4:		/* solar L */
       solar_stuff = fmod(atan2(-sin(l - k)*cos(i), -cos(l - k)) - theta,
-			 2*PI)*RAD;
+			 2*M_PI)*RAD;
       if (solar_stuff < 0)
 	solar_stuff += 360;
       if (select == 4) {	/* add full Carrington rotations */

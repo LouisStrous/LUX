@@ -1547,7 +1547,7 @@ int ana_dir_smooth2(int narg, int ps[])
       } /* end of while (count--) */
     } while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
   } else {			/* gaussian smoothing */
-    norm = 1.0/sqrt(PI);
+    norm = 0.5*M_2_SQRTPI;
     do {
       count = twosided + 1;
       /* we work up to the desired smoothing width by measuring the path
@@ -1585,7 +1585,7 @@ int ana_dir_smooth2(int narg, int ps[])
 	s1 = 4*s0;
 
 	if (normalize)
-	  norm = s0? (1.0/sqrt(PI))/s0: (1.0/sqrt(PI));
+	  norm = s0? (0.5*M_2_SQRTPI)/s0: (0.5*M_2_SQRTPI);
 	
 	while (s < s1) {
 	  c = traverseElement(x1, y1, vx, vy, &x2, &y2);
@@ -2118,7 +2118,7 @@ void spherical_harmonics(double x, int lmax, double *values)
   p = values;
   z = sqrt(1 - x*x);
   /* first we calculate y_l^l for all <l> */
-  v1 = *p = 1.0/sqrt(4*PI);	/* P_0^0 */
+  v1 = *p = 0.25*M_2_SQRTPI;	/* P_0^0 */
   p += 2;
   /*    l 0 1 1 2 2 2 3 3 3 3 4 4 4 4 4 */
   /*    m 0 0 1 0 1 2 0 1 2 3 0 1 2 3 4 */

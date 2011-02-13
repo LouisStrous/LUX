@@ -5889,17 +5889,17 @@ double voigt(double a, double v)
     avs = av * av;
     avsd = a * a - v * v;
     avss = a * a + v * v;
-    vph = v * 4*PI;
-    aph = a * 4*PI;
+    vph = v * 4*M_PI;
+    aph = a * 4*M_PI;
     c1 = exp(-aph) - cos(vph);
     d1 = sin(vph);
     ab = cos(2*av)*c1 - sin(2*av)*d1;
     if (ab) al = ab/(c1*c1 + d1*d1); else al = 0;
-    if (a <= 2*PI)
+    if (a <= 2*M_PI)
     { ef = aph - avsd;
       if (ef > 100.) ef = 100;
       p2 = 2*exp(-ef)*al;
-      if (a == 2*PI) p2 /= 2; }
+      if (a == 2*M_PI) p2 /= 2; }
     else p2 = 0;
     anhs = 0;
     for (n = 1; n < 100; n++)
@@ -5908,7 +5908,7 @@ double voigt(double a, double v)
       sumb = exp(-anhs)*(avss + anhs)/(aa*aa + 4*avs);
       sum += sumb;
       if (sumb < 1e-6) break; }
-    return a/(2*PI*avss) + a/PI*sum + p2;
+    return a/(2*M_PI*avss) + a/M_PI*sum + p2;
 }
 /*------------------------------------------------------------------------- */
 double loggamma(double x)
@@ -5935,7 +5935,7 @@ double loggamma(double x)
   y = x + 4.5;
   y = (x - 0.5)*log(y) - y + log(z) + 0.918938533204672742;
   if (flip)
-    y = 1.14472988584940017 - y - log(fabs(sin(x*PI)));
+    y = 1.14472988584940017 - y - log(fabs(sin(x*M_PI)));
   return y;
 }
 /*------------------------------------------------------------------------- */
@@ -5961,7 +5961,7 @@ double gamma(double x)
   y = x + 4.5;
   y = (x - 0.5)*log(y) - y + log(z) + 0.918938533204672742;
   if (flip)
-    y = 1.14472988584940017 - y - log(fabs(sin(x*PI)));
+    y = 1.14472988584940017 - y - log(fabs(sin(x*M_PI)));
   y = exp(y);
   if (flip && ((int) x) % 2 == 1)
     y = -y;

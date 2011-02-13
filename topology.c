@@ -459,7 +459,7 @@ int ana_segment(int narg, int ps[])
     return segment_general(narg, ps); /* general routine */
 }
 /*------------------------------------------------------------------------- */
-#define DEG22_5	(PI/8)
+#define DEG22_5	(M_PI/8)
 int ana_segment_dir(int narg, int ps[])
 /* y = SEGMENTDIR(<im>, <phi> [,<sign>])
    segmentates image <im> only one-dimensionally in the direction <phi>

@@ -291,14 +291,11 @@ enum binaryOps {
 /* PLOT_INFTY cannot be as large as FLT_MAX or internal errors in SYMPLOT */
 /* occur  - LS 21mar94 */
 
-#ifndef PI
-#define PI    3.14159265358979323846264338327950288419716939937511
-#endif
 #ifndef TWOPI
-#define TWOPI	(2*PI)
+#define TWOPI	(2*M_PI)
 #endif
-#define DEG	(PI/180)
-#define RAD	(180/PI)
+#define DEG	(M_PI/180)
+#define RAD	(180*M_1_PI)
 
 /* coordinate systems */
 #define ANA_DEP	0		/* ANA_DVI or ANA_DEV, depending on */

@@ -4203,8 +4203,8 @@ void symbolInitialization(void)
  l_fix("#NUM_WINDOWS",  MAXWINDOWS - 1);
  l_fix("#NUM_PIXMAPS",  MAXPIXMAPS - 1);
 #endif
- d_fix("#PI",		PI);
- d_fix("#2PI",		2*PI);
+ d_fix("#PI",		M_PI);
+ d_fix("#2PI",		2*M_PI);
  f_fix("#E",		2.718281828);
  f_fix("#C",		2.997929E10);
  f_fix("#G",		6.668E-8);

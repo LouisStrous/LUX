@@ -10,15 +10,13 @@
 int	getAstronError = 0;
 int	fullVSOP = 1;
 
-void gatherTruncVSOP(double T, struct planetIndex *index, double *terms, 
+void gatherVSOP(double T, struct planetIndex *index, double *terms, 
                      double *value, double *error2)
 /* calculates one coordinate of one object, as indicated by <index>,
    at time <T> in Julian centuries since J2000.0, using the VSOP87
-   theory of Bretagnon & Francou (1988), truncated as given by Meeus.
-   The heliocentric longitude, latitude, (in radians) or radius (in
-   AU) relative to the dynamical ecliptic and equinox of the date is
-   returned in <*value>.  The associated estimated variance is
-   returned in <*error2>. */
+   theory of Bretagnon & Francou (1988).  The heliocentric longitude,
+   latitude, (in radians) or radius (in AU) is returned in <*value>.
+   The associated estimated variance is returned in <*error2>. */
 {
   double	*ptr;
   int	nTerm, i;
@@ -59,7 +57,7 @@ void LBRfromVSOPD(double T, int object, double *pos)
 {
   struct planetIndex *indices;
 
-  indices = fullVSOP? planetIndicesVSOPD: truncPlanetIndicesVSOPD;
+  indices = fullVSOP? planetIndices: planetIndicesTrunc;
   switch (object) {
     case 0:			/* Sun */
       pos[0] = pos[1] = pos[2] = 0.0;
@@ -68,17 +66,17 @@ void LBRfromVSOPD(double T, int object, double *pos)
       break;
     default:			/* other planets */
 				/* heliocentric ecliptic longitude (rad) */
-      gatherTruncVSOP(T, &indices[6*3*(object - 1)], planetTermsD, &pos[0],
+      gatherVSOP(T, &indices[6*3*(object - 1)], planetTermsD, &pos[0],
 		      getAstronError? &pos[3]: NULL);
       pos[0] = fmod(pos[0], TWOPI);
       if (pos[0] < 0)
 	pos[0] += TWOPI;
 				/* heliocentric ecliptic latitude (rad) */
-      gatherTruncVSOP(T, &indices[6*3*(object - 1) + 6], planetTermsD, 
+      gatherVSOP(T, &indices[6*3*(object - 1) + 6], planetTermsD, 
                       &pos[1], getAstronError? &pos[4]: NULL);
 				/* heliocentric distance (AU) */
-      gatherTruncVSOP(T, &indices[6*3*(object - 1) + 12], &pos[2], 
-                      planetTermsD, getAstronError? &pos[5]: NULL);
+      gatherVSOP(T, &indices[6*3*(object - 1) + 12], planetTermsD, 
+                 &pos[2], getAstronError? &pos[5]: NULL);
       if (getAstronError)
 	pos[6] = pos[7] = pos[8] = 0.0;
       break;

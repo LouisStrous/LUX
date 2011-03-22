@@ -5217,7 +5217,7 @@ int translateEscapes(char *p)
 	i = strtol(p + 1, NULL, 8);
 	*p2 = c;
 	*p = i;
-	memcpy(p + 1, p2, strlen(p2) + 1);
+	memmove(p + 1, p2, strlen(p2) + 1);
       }
     }
     p++;

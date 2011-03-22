@@ -6,9 +6,11 @@
 #endif
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 #include <float.h>
 #include <limits.h>             /* for LONG_MAX */
+#include <time.h>               /* for difftime */
 #include "action.h"
 static char rcsid[] __attribute__ ((unused)) =
 "$Id: fit.c,v 4.0 2001/02/07 20:37:00 strous Exp $";
@@ -80,17 +82,17 @@ double powerfunc(double *par, int nPar, double *x, double *y, double *w, int nDa
 /*-----------------------------------------------------------------------*/
 int ana_generalfit(int narg, int ps[])
 /* FIT([X,]Y,START,STEP[,LOWBOUND,HIGHBOUND][,WEIGHTS][,QTHRESH,PTHRESH,
-   ITHRESH,DTHRESH][,FAC,NITER,NSAME][,ERR][,FIT][,/VOCAL,/DOWN,
+   ITHRESH,DTHRESH][,FAC,NITER,NSAME][,ERR][,FIT][,TTHRESH][,/VOCAL,/DOWN,
    /PCHI][/GAUSSIANS,/POWERFUNC]) */
 /* This routine is intended to enable the user to fit iteratively */
 /* to any profile specification. */
-/* IN DEVELOPMENT  LS 24oct95 */
+/* LS 24oct95 */
 {
   int   ySym, xSym, nPoints, n, nPar, nIter, iThresh, nSame, size,
     iq, i, j, iter, same, fitSym, fitTemp, xTemp, nn, wSym;
   double *yp, *xp, *start, *step, qThresh, *pThresh, fac, *lowbound, *hibound,
-	dir, dThresh, qLast, mu, *meanShift, *weights;
         *err, *par, qBest1, qBest2, *parBest1, *parBest2, *ran, qual, temp,
+    dir, dThresh, qLast, mu, *meanShift, *weights, tThresh;
   char  vocal, onebyone;
   void  randomn(int seed, double *output, int number, char hasUniform);
   double (*fitProfiles[2])(double *, int, double *, double *, double *, int) =
@@ -100,6 +102,7 @@ int ana_generalfit(int narg, int ps[])
   word  fitPar, fitArg[4];
   int   ana_indgen(int, int []), eval(int);
   void  zap(int);
+  time_t starttime, now;
   
   /* check input variables */
   if (narg >= 15 && (iq = ps[15])) { /* FIT */
@@ -282,6 +285,10 @@ int ana_generalfit(int narg, int ps[])
       return cerror(ALLOC_ERR, 0);
   }
 
+  if (narg >= 17 && ps[16])    /* TTHRESH: threshold on CPU time */
+    tThresh = double_arg(ps[16]);
+  else
+    tThresh = 3600;
 
   vocal = (internalMode & 1)? 1: 0; /* /VOCAL */
   if (internalMode & 4)         /* /DOWN */
@@ -333,6 +340,9 @@ int ana_generalfit(int narg, int ps[])
     symbol_memory(fitTemp) = (weights? 4: 3)*sizeof(word);
     usr_func_number(fitTemp) = fitSym;
   }
+
+  if (tThresh)
+    starttime = time(0);
 
   /* get initial fit quality */
   if (fitSym) {
@@ -453,11 +463,16 @@ int ana_generalfit(int narg, int ps[])
           n++;
     }
     mu = fabs(qLast - qBest2);
+    /* NOTE: difftime() doesn't work correctly in glibc-2.12.2; it
+       often seems to return its first argument, rather than the
+       difference between its arguments. So, subtract time_t values
+       instead. */
   } while (qBest2 >= qThresh
            && (mu >= dThresh*fabs(qBest2) || !mu)
            && n < nPar
            && iter < iThresh
-	   && same <= nSame); 
+           && same <= nSame
+           && (!tThresh || time(NULL) - starttime < tThresh));
   temp = (1 << nSame);
   for (j = 0; j < nPar; j++)
     err[j] /= temp;
@@ -476,6 +491,8 @@ int ana_generalfit(int narg, int ps[])
         err[i] = 0;             /* so we have no error estimate */
         continue;               /* and can start with the next one */
       }
+      if (vocal)
+        printf("%3d/%1d error estimate = ", i, nPar);
       /* we define the "error" in a parameter as the average distance */
       /* of that parameter from its "best" value at which the fit quality */
       /* has doubled.  We find the parameter values at which the double */
@@ -487,7 +504,7 @@ int ana_generalfit(int narg, int ps[])
       /* going from the best value to lower values, and then the resulting */
       /* error estimate for the parameter is the average of the distances */
       /* going up and going down. */
-      h = step[i];		/* first estimate: the step size */
+      h = fabs(step[i]);        /* first estimate: the step size */
       do {
         par[i] = parBest2[i] + h; /* best parameter value + error estimate */
         /* calculate the quality */
@@ -611,6 +628,8 @@ int ana_generalfit(int narg, int ps[])
       } while (fabs(qual) > 1e-4);
       err[i] = 0.5*(err[i] + h)/sqrt(2*qBest2);
       par[i] = parBest2[i];     /* restore */
+      if (vocal)
+        printf("%g\n", err[i]);
     } /* end of for (i = 0; i < nPar; i++) */
   } else
     free(err);

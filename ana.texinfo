@@ -16559,8 +16559,8 @@ See also: @ref{LOCAL_MIN}, @ref{FIND_MIN}, @ref{FIND_MINLOC}
 LOWBOUND=@var{lowbound}, HIGHBOUND=@var{highbound},
 WEIGHTS=@var{weights}] [, QTHRESH=@var{qthresh}, PTHRESH=@var{pthresh},
 ITHRESH=@var{ithresh}, DTHRESH=@var{dthresh}, FAC=@var{fac},
-NITER=@var{niter}, NSAME=@var{nsame}] [, ERR=@var{err}, FIT=@var{fit}]
-[, /VOCAL, /DOWN, /PCHI, /GAUSSIANS, /POWERFUNC])}
+NITER=@var{niter}, NSAME=@var{nsame}] [, ERR=@var{err}, FIT=@var{fit},
+TTHRESH=@var{tthresh}] [, /VOCAL, /DOWN, /PCHI, /GAUSSIANS, /POWERFUNC])}
 
 Iterative non-linear fit to Gaussians, power functions, and user-defined
 functions.  The selected function is evaluated at positions
@@ -16625,9 +16625,10 @@ array must have one element per fitted parameter.
 @end table
 
 The stop criterion on the iterations depend on @code{@var{qthresh}},
-@code{@var{pthresh}}, @code{@var{ithresh}}, @code{@var{dthresh}}, and
-@code{@var{nsame}}, and parameter change depends on @code{@var{fac}}.
-Estimated errors on the parameters are returned in @code{@var{err}}.
+@code{@var{pthresh}}, @code{@var{ithresh}}, @code{@var{dthresh}},
+@code{@var{tthresh}}, and @code{@var{nsame}}, and parameter change
+depends on @code{@var{fac}}.  Estimated errors on the parameters are
+returned in @code{@var{err}}.
 
 @table @var
 @item qthresh
@@ -16645,7 +16646,13 @@ iteration is ceased.  @code{@var{ithresh}} defaults to 1000.
 contains a threshold on the relative change in the fit quality since the
 last iteration.  If the relative change is less than
 @code{@var{dthresh}}, then iteration is ceased.  @code{@var{dthresh}}
-defaults to 0. 
+defaults to 0.
+@item tthresh
+contains the maximum number of seconds that the fit process may take.
+If at the end of an iteration it is more than @code{@var{tthresh}}
+seconds later than when the fit process began, then iteration is
+ceased.  If this variable is equal to 0, then no time threshold is
+applied.  It defaults to 3600, i.e., one hour.
 @item nsame
 If the best-so-far parameters do not change during @code{@var{nsame}}
 iteration cycles, then iterations are ceased.  @code{@var{nsame}}

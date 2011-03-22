@@ -34,23 +34,17 @@ double random_one(void)
   return gsl_rng_uniform(rng);
 }
 /*------------------------------------------------------------------------- */
-int random_distributed(int modulus, float *distr)
-/* returns a random number between 0 and <modulus - 1> drawn according */
-/* to the distribution function <distr>, which must have at least */
-/* <modulus> elements, with distr[0] > 0 and distr[modulus - 1] == 1, */
-/* and no element smaller than the previous one.  LS 25aug2000 */
+int locate_value(double value, double *values, int nElem)
 {
-  float	r;
   int	ilo, ihi, imid;
 
-  r = random_one();
   ilo = 0;
-  ihi = modulus - 1;
+  ihi = nElem - 1;
   while (ilo <= ihi) {
     imid = (ilo + ihi)/2;
-    if (r < distr[imid])
+    if (value < values[imid])
       ihi = imid - 1;
-    else if (r > distr[imid])
+    else if (value > values[imid])
       ilo = imid + 1;
     else {
       ilo = imid;
@@ -58,8 +52,20 @@ int random_distributed(int modulus, float *distr)
       break;
     }
   }
-  /* now distr[ihi] < r <= distr[ilo] */
-  return ilo;
+  return ihi;
+}
+
+int random_distributed(int modulus, double *distr)
+/* returns a random number between 0 and <modulus - 1> drawn according */
+/* to the distribution function <distr>, which must have at least */
+/* <modulus> elements, with distr[0] == 0 and distr[modulus - 1] <= 1, */
+/* and no element smaller than the previous one.  LS 25aug2000 */
+{
+  double r;
+  int	ilo, ihi, imid;
+
+  r = random_one();
+  return locate_value(r, distr, modulus);
 }
 /*------------------------------------------------------------------------- */
 byte random_bit(void)
@@ -272,7 +278,7 @@ int ana_randomd(int narg, int ps[])
 /* <distr(*-1)> must be equal to one.  LS 25aug2000 */
 {
   int	result, dims[MAX_DIMS], *pd, n, j, modulus, seed;
-  float	*distr;
+  double	*distr;
 
   if (*ps) {			/* seed */
     seed = int_arg(ps[0]);
@@ -281,7 +287,7 @@ int ana_randomd(int narg, int ps[])
 
   if (!symbolIsNumericalArray(ps[1])) /* distr */
     return cerror(NEED_ARR, ps[1]);
-  result = ana_float(1, ps + 1); /* ensure FLOAT */
+  result = ana_double(1, ps + 1); /* ensure DOUBLE */
   distr = array_data(result);
   modulus = array_size(result);
   if (distr[0] < 0.0 || distr[modulus - 1] != 1.0)

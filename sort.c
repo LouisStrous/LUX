@@ -584,6 +584,41 @@ void indexxr_f(int n, float ra[], int indx[])
   }
 }
 /*------------------------------------------------------------------------- */
+void indexxr_d(int n, double ra[], int indx[])
+{
+  int	l,j,ir,i,indxt;
+  double q;
+  
+  for (i = 0; i < n; i++)
+    indx[i] = i;
+  l = (n/2);
+  ir = n-1;
+  for (;;) {
+    if (l > 0)
+      q=ra[(indxt = indx[--l])];
+    else {
+      q = ra[(indxt = indx[ir])];
+      indx[ir] = indx[0];
+      if (--ir == 0) {
+	indx[0] = indxt;
+	return;
+      }
+    }
+    i = l;
+    j = l + l + 1;
+    while (j <= ir) {
+      if (j < ir && ra[indx[j]] > ra[indx[j+1]])
+	j++;
+      if (q > ra[indx[j]]) {
+	indx[i] = indx[j];
+	j += (i = j) + 1;
+      } else
+	j = ir + 1;
+    }
+    indx[i] = indxt;
+  }
+}
+/*------------------------------------------------------------------------- */
 #undef ALN2I
 #undef TINY
 

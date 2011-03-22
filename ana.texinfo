@@ -19580,11 +19580,11 @@ See also: @ref{Incidental Colors}, @ref{!PDEV}, @ref{PDEV}, @ref{XOPEN},
 @node PIT, PIXELSTO8BIT, PENCOLOR, Internal Routines
 @subsection PIT
 
-@code{PIT(@var{x} [, @var{y}, @var{n}])}
+@code{PIT([@var{x},] @var{y} [, @var{n}])}
 
 Returns the coefficients of @code{@var{n}}th-degree polynomial fit of
 @code{@var{y}} to @code{@var{x}}.  @code{@var{n}} defaults to 0,
-@code{@var{x}} to @code{INDGEN(@var{y})}.
+@code{@var{x}} to @code{INDGEN(@var{y}/NUM_ELEM(@var{y}))}.
 
 @c -------------------------------------
 @node PIXELSTO8BIT, PLOT, PIT, Internal Routines

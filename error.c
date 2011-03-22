@@ -262,7 +262,7 @@ char *verrorMessage(char *message, int symbol, va_list ap)
   sprintf(curScrat, ": ");
   curScrat += strlen(curScrat);
   if (symbol)
-    symbolIdent(symbol, I_LINE | I_TRUNCATE);
+    symbolIdent(symbol, I_LINE | I_TRUNCATE | I_LENGTH);
   else
     sprintf(curScrat, "%d", curLineNumber);
 
@@ -295,6 +295,13 @@ int anaerror(char *message, int symbol, ...)
   puts(verrorMessage(message, symbol, ap));
   va_end(ap);
   errorSym = symbol;
+  if (errorPtr) {
+    while (errorPtr-- > curScrat)
+      putchar('-');
+    putchar('^');
+    putchar('\n');
+    errorPtr = NULL;
+  }
   return ANA_ERROR;
 }
 /*-------------------------------------------------------------------*/
@@ -309,7 +316,7 @@ int cerror(int message, int symbol, ...)
       errorSym = 0;
       return ANA_ERROR;
     }
-    puts(symbolIdent(symbol, I_FILELEVEL | I_LINE | I_TRUNCATE));
+    puts(symbolIdent(symbol, I_FILELEVEL | I_LINE | I_TRUNCATE | I_LENGTH));
     if (errorPtr) {
       while (errorPtr-- > curScrat)
 	putchar('-');
@@ -326,6 +333,13 @@ int cerror(int message, int symbol, ...)
     puts(verrorMessage(errorMessages[message], symbol, ap));
     va_end(ap);
     errorSym = symbol;
+    if (errorPtr) {
+      while (errorPtr-- > curScrat)
+	putchar('-');
+      putchar('^');
+      putchar('\n');
+      errorPtr = NULL;
+    }
   }
   return ANA_ERROR;
 }

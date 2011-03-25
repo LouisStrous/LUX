@@ -45,19 +45,20 @@ void gatherVSOP(double T, struct planetIndex *index, double *terms,
     *error2 = 4* *error2;
 }
 /*--------------------------------------------------------------------------*/
-void LBRfromVSOPD(double T, int object, double *pos)
-/* returns the heliocentric longitude, latitude, and distance referred
- to the mean dynamical ecliptic and equinox of the date using the
- VSOP87D theory (as described in Meeus: Astronomical Algorithms).
- pos[0] -> L, pos[1] -> B, pos[2] -> R, pos[3] -> var[L]; if
- getAstronError is unequal to zero, then also pos[4] -> var[B], pos[5]
- -> var[R], pos[6] -> cov[L,B], pos[7] -> cov[L,R], pos[8] ->
- cov[B,R].  The covariances are assumed equal to zero (for want of a
- regular estimate). */
+void XYZfromVSOPA(double T, int object, double *pos)
+/* returns the heliocentric cartesian coordinates referred to the mean
+ dynamical ecliptic and equinox of J2000.0 using the VSOP87A theory
+ (as described in Meeus: Astronomical Algorithms).  pos[0] -> X,
+ pos[1] -> Y, pos[2] -> Z; if getAstronError is unequal to zero, then
+ also pos[3] -> var[X], pos[4] -> var[Y], pos[5] -> var[Z], pos[6] ->
+ cov[X,Y], pos[7] -> cov[X,Z], pos[8] -> cov[Y,Z].  The covariances
+ are assumed equal to zero (for want of a regular estimate). */
 {
   struct planetIndex *indices;
 
-  indices = fullVSOP? planetIndices: planetIndicesTrunc;
+  /* TODO: implement "Trunc" based on user-selected accuracy
+    indices = fullVSOP? planetIndices: planetIndicesTrunc; */
+  indices = planetIndices;
   switch (object) {
     case 0:			/* Sun */
       pos[0] = pos[1] = pos[2] = 0.0;
@@ -65,17 +66,14 @@ void LBRfromVSOPD(double T, int object, double *pos)
 	pos[3] = pos[4] = pos[5] = pos[6] = pos[7] = pos[8] = 0.0;
       break;
     default:			/* other planets */
-				/* heliocentric ecliptic longitude (rad) */
-      gatherVSOP(T, &indices[6*3*(object - 1)], planetTermsD, &pos[0],
+				/* heliocentric ecliptic X (AU) */
+      gatherVSOP(T, &indices[6*3*(object - 1)], planetTerms, &pos[0],
 		      getAstronError? &pos[3]: NULL);
-      pos[0] = fmod(pos[0], TWOPI);
-      if (pos[0] < 0)
-	pos[0] += TWOPI;
-				/* heliocentric ecliptic latitude (rad) */
-      gatherVSOP(T, &indices[6*3*(object - 1) + 6], planetTermsD, 
+				/* heliocentric ecliptic Y (AU) */
+      gatherVSOP(T, &indices[6*3*(object - 1) + 6], planetTerms, 
                       &pos[1], getAstronError? &pos[4]: NULL);
-				/* heliocentric distance (AU) */
-      gatherVSOP(T, &indices[6*3*(object - 1) + 12], planetTermsD, 
+				/* heliocentric ecliptic Z (AU) */
+      gatherVSOP(T, &indices[6*3*(object - 1) + 12], planetTerms, 
                  &pos[2], getAstronError? &pos[5]: NULL);
       if (getAstronError)
 	pos[6] = pos[7] = pos[8] = 0.0;

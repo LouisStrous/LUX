@@ -19,7 +19,7 @@ while (<DATA>) {
 }
 close DATA;
 
-my $desired = 4;                # VSOP D
+my $desired = 1;                # VSOP A
 $, = ', ';
 
 my %terms;                     # @{$terms{planet}{degree}{coordinate}}
@@ -46,7 +46,7 @@ print <<EOD;
 /*
   6*3*8 elements:
   6 powers of time (0..5)
-  3 coordinates (L, B, R)
+  3 coordinates (L, B, R or X, Y, Z)
   8 planets (Mercury .. Neptune)
  */
 
@@ -73,36 +73,6 @@ foreach my $p (1, 2, 3, 4, 5, 6, 7, 8) {
 print <<EOD;
 };
 
-struct planetIndex
-planetIndicesTrunc[6*3*8] = {
-EOD
-
-my $limit = 1e-6;
-$nterms = 0;
-$i = 0;
-foreach my $p (1, 2, 3, 4, 5, 6, 7, 8) {
-  foreach my $c (1, 2, 3) {
-    foreach my $d (0, 1, 2, 3, 4, 5) {
-      my $n = 0;
-      my @terms;
-      @terms = @{$terms{$p}{$c}{$d}} if exists $terms{$p}{$c} and exists $terms{$p}{$c}{$d};
-      $n = @terms/3;
-      my $small = 0;
-      for ($small = 0; $small < $n; $small++) {
-        last if abs($terms[3*$small]) < $limit;
-      }
-      print ' ' if $i % 4 == 0;
-      print " { $nterms, $small },";
-      $nterms += $n;
-      print "\n" if $i % 4 == 3;
-      $i++;
-    }
-  }
-}
-
-print <<EOD;
-};
-
 /*
   3*$nterms
   3 coefficients (amplitude, phase at time zero, phase rate)
@@ -113,10 +83,11 @@ double planetTerms[3*$nterms] = {
 EOD
 
 $i = 0;
-foreach my $p (sort keys %terms) {
-  foreach my $c (sort keys %{$terms{$p}}) {
-    foreach my $d (sort keys %{$terms{$p}{$c}}) {
-      my @terms = @{$terms{$p}{$c}{$d}};
+foreach my $p (1, 2, 3, 4, 5, 6, 7, 8) {
+  foreach my $c (1, 2, 3) {
+    foreach my $d (0, 1, 2, 3, 4, 5) {
+      my @terms = (exists $terms{$p}{$c} and exists $terms{$p}{$c}{$d})?
+        @{$terms{$p}{$c}{$d}}: ();
       foreach my $term (@terms) {
         print "$term, ";
         print "\n" if $i % 18 == 17;
@@ -129,3 +100,4 @@ print <<EOD;
 
 };
 EOD
+print STDERR "$i = 3*" . ($i/3) . " terms.\n";

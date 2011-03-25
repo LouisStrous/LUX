@@ -2373,3 +2373,27 @@ int ana_hamming(int narg, int ps[]) {
   }
   return result;
 }
+/*--------------------------------------------------------------------*/
+double vhypot(int n, double arg1, double arg2, ...)
+{
+  double arg = hypot(arg1, arg2);
+  if (n < 3)
+    return arg;
+  va_list ap;
+  va_start(ap, arg2);
+  n -= 2;
+  while (n--)
+    arg = hypot(arg, va_arg(ap, double));
+  va_end(ap);
+  return arg;
+}
+/*--------------------------------------------------------------------*/
+double hypota(int n, double *x)
+{
+  if (n < 1)
+    return 0.0;
+  double arg = *x++;
+  while (--n)
+    arg = hypot(arg, *x++);
+  return arg;
+}

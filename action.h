@@ -99,7 +99,7 @@ double	double_arg(int), cspline_value(double, csplineInfo *),
 	find_cspline_value(double, double, double, csplineInfo *),
 	cspline_derivative(double, csplineInfo *),
   cspline_second_derivative(double, csplineInfo *), famod(double,double),
-  fasmod(double,double);
+  fasmod(double,double), vhypot(int, double, double, ...), hypota(int, double *);
 int iamod(int,int), iasmod(int,int);
 FILE	*openPathFile(char *, int);
 

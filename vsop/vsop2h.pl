@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 open DATA, '<', '/home/strous/src/ana/vsop.h' or die "Cannot open vsop.h";
-my $accept = 0;
+my $accept = 0;                 # VSOP87A
 my @data;
 while (<DATA>) {
   chomp;
@@ -14,7 +14,7 @@ while (<DATA>) {
     pop @values if $values[$#values] =~ /^\s*$/; # remove final element
     push @data, @values;
   } else {
-    $accept = 1 if /planetTermsD/;
+    $accept = 1 if /planetTerms/;
   }
 }
 close DATA;
@@ -43,6 +43,8 @@ while (<>) {
 }
 
 print <<EOD;
+#include "vsop.h"
+
 /*
   6*3*8 elements:
   6 powers of time (0..5)
@@ -50,7 +52,7 @@ print <<EOD;
   8 planets (Mercury .. Neptune)
  */
 
-struct planetIndex { short int index; short int nTerms; }
+struct planetIndex { short unsigned int index; short unsigned int nTerms; }
 planetIndices[6*3*8] = {
 EOD
 
@@ -101,3 +103,6 @@ print <<EOD;
 };
 EOD
 print STDERR "$i = 3*" . ($i/3) . " terms.\n";
+
+print STDERR "NOTE: put the following in vsop.h:\n";
+print STDERR "#define NUMBEROFPLANETTERMS ($nterms)\n";

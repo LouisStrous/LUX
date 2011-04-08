@@ -34,19 +34,6 @@ calculator.o: anaparser.h calculator.c
 .c.o:
 	$(CC) $(CPPFLAGS) $(CFLAGS) -DHAVE_CONFIG_H -c $<
 
-configure: configure.ac
-	autoconf
-config.h.in: stamp-h.in
-stamp-h.in: configure.ac acconfig.h
-	autoheader
-	echo timestamp > stamp-h.in
-config.h: stamp-h
-stamp-h: config.h.in config.status
-	./config.status
-Makefile: Makefile.in config.status
-	./config.status
-config.status: configure
-	./config.status --recheck
 site:
 	rm -f site.o
 	$(CC) $(CPPFLAGS) $(CFLAGS) -DHAVE_CONFIG_H -c site.c

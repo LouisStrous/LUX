@@ -4,6 +4,7 @@
 *.info-*
 *.tgz
 *.deps
+*.a
 autom4te*
 *.log
 Makefile

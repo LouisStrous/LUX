@@ -2457,34 +2457,6 @@ int ana_siderealtime(int narg, int ps[])
   return result;
 }
 /*--------------------------------------------------------------------------*/
-void XYZ_VSOPtoFK5(double T, double *pos)
-/* transforms VSOP cartesian coordinates (J2000.0) to FK5 */
-{
-  /* TODO: find correct formulas */
-  /*
-    This code transforms from VSOP ecliptic coordinates J2000.0
-    to FK5 equatorial coordinates J2000.0
-  double newpos[3];
-
-  newpos[0] = pos[0] + 0.000000440360*pos[1] - 0.000000190919*pos[2];
-  newpos[1] = -0.000000479966*pos[0] + 0.917482137087*pos[1] - 0.397776982902*pos[2];
-  newpos[2] = 0.397776982902*pos[1] + 0.917482137087*pos[2];
-  memcpy(pos, newpos, 3*sizeof(*pos));
-  */
-}
-/*--------------------------------------------------------------------------*/
-void VSOPtoFK5(double T, double *pos)
-/* transforms from VSOP polar coordinates to FK5 polar coordinates */
-{
-  double	ll, cll, sll;
-  
-  ll = pos[0] - 0.024382*(1 + 0.000222);
-  cll = cos(ll);
-  sll = sin(ll);
-  pos[0] += -4.3793e-7 + 1.8985e-7*(cll + sll)*tan(pos[1]);
-  pos[1] += 1.8985e-7*(cll - sll);
-}
-/*--------------------------------------------------------------------------*/
 #define EQUINOX_OF_DATE	DBL_MAX
 
 int readExtra(char *file, char mode)
@@ -3042,14 +3014,6 @@ void heliocentricXYZr(double JDE, int object, double equinox, double *pos,
       printXYZtoLBR(pos);
     }
     *r = hypota(3, pos);        /* heliocentric distance */
-    if (internalMode & S_FK5) {
-      XYZ_VSOPtoFK5(T*0.1, pos);	/* to FK5 system (J2000.0)*/
-      if (vocal) {
-        printf("ASTRON: FK5 (%d) ecliptic heliocentric coordinates, equinox/ecliptic of J2000.0:\n", object);
-        printXYZtoLBR(pos);
-      }
-    } else if (vocal)
-      puts("ASTRON: no transformation to FK5 system");
     XYZ_eclipticPrecession(pos, J2000, equinox);
     if (vocal) {
       printf("ASTRON: (%d) ecliptic heliocentric coordinates for equinox:\n", object);
@@ -3124,8 +3088,6 @@ void heliocentricXYZr(double JDE, int object, double equinox, double *pos,
       LBRtoXYZ(pos, XYZmoon, getErrors);
 
       XYZfromVSOPA(T, 3, pos);	/* position of Earth */
-      if (internalMode & S_FK5)
-	XYZ_VSOPtoFK5(10*T, pos);	/* to FK5 system (J2000.0) */
       XYZ_eclipticPrecession(pos, JDE, equinox);
       pos[0] += XYZmoon[0];
       pos[1] += XYZmoon[1];

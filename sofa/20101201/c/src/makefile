@@ -49,15 +49,18 @@
 
 # Specify the installation home directory.
 
-INSTALL_DIR = $(HOME)
+#INSTALL_DIR = $(HOME)
+INSTALL_DIR = ../../../..
 
 # Specify the installation directory for the library.
 
-SOFA_LIB_DIR = $(INSTALL_DIR)/lib/
+#SOFA_LIB_DIR = $(INSTALL_DIR)/lib/
+SOFA_LIB_DIR = $(INSTALL_DIR)
 
 # Specify the installation directory for the include files.
 
-SOFA_INC_DIR = $(INSTALL_DIR)/include/
+#SOFA_INC_DIR = $(INSTALL_DIR)/include/
+SOFA_INC_DIR = $(INSTALL_DIR)
 
 # This software is compilable only by ANSI C compilers - give the name
 # of your preferred C compiler (CCOMPC) and compilation flags (CFLAGF

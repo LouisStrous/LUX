@@ -742,6 +742,528 @@ int index_sdev(int narg, int ps[], int sq)
   return result;
 }
 /*------------------------------------------------------------------------- */
+int ana_covariance(int narg, int ps[])
+/* f(<x> , <y> [, <mode>, WEIGHTS=<weights>, /SAMPLE, /POPULATION, /KEEPDIMS, */
+/*         /DOUBLE]) */
+/* Returns the covariance of <x> and <y>, which must be */
+/* numerical arrays with the same dimentions.  By default, returns the */
+/* sample covariance. */
+/* <mode>: if it is a scalar, then returns a result for each run along the */
+/*    dimension indicated by <mode>.  If it is an array with the same number */
+/*    of elements as <x>, then each element of <mode> identifies the integer */
+/*    class that the corresponding element of <x> belongs to, and a result */
+/*    is returned for each class. */
+/* <weights>: the weight of each element of <x>.  This parameter must be a */
+/*    numerical array with the same dimensions as <x>.  If <weights> is */
+/*    specified, then /SAMPLE is ignored. */
+/* /SAMPLE: return the sample covariance. */
+/* /POPULATION: return the population covariance. */
+/* /KEEPDIMS: if this keyword is specified, then the dimension(s) along */
+/*    which the calculations of the deviations or variances are performed */
+/*    are set to 1 in the result.  If this keyword is not specified, then */
+/*    any dimensions equal to 1 in the result are omitted, and if only a */
+/*    single value is returned then this is returned as a scalar. */
+/* /DOUBLE: by default, the result is DOUBLE only if <x> is DOUBLE or */
+/*    CDOUBLE, and the result is FLOAT otherwise.  If this keyword is set, */
+/*    then the result is always DOUBLE. */
+/* LS 2011-04-15 */
+{
+  int	result, n, i, done, n2, save[MAX_DIMS], outtype, haveWeights;
+  pointer	xsrc, ysrc, trgt, xsrc0, ysrc0, trgt0, weight, weight0;
+  double	xmean, ymean, xtemp, ytemp, cov, nn;
+  doubleComplex	xcmean, ycmean;
+  loopInfo	xsrcinfo, ysrcinfo, trgtinfo, winfo;
+  extern scalar	lastsdev, lastmean;
+  extern int	lastsdev_sym, lastmean_sym;
+  
+  /* return values by class? */
+#ifdef IMPLEMENT_LATER
+  if (narg > 2 && ps[2] && symbolIsNumericalArray(ps[2])
+      && symbolIsNumericalArray(ps[0])
+      && symbolIsNumericalArray(ps[1])
+      && array_size(ps[0]) == array_size(ps[1])
+      && array_size(ps[0]) == array_size(ps[2]))
+    return index_covariance(narg, ps);
+#endif
+
+  if (internalMode & 4) 	/* /DOUBLE */
+    outtype = ANA_DOUBLE;
+  else if (isComplexType(symbol_type(ps[0])))
+      outtype = (symbol_type(ps[0]) == ANA_CFLOAT)? ANA_FLOAT: ANA_DOUBLE;
+    else
+      outtype = (symbol_type(ps[0]) == ANA_DOUBLE)? ANA_DOUBLE: ANA_FLOAT;
+
+  if (isComplexType(symbol_type(ps[1]))) {
+    if (!isComplexType(outtype)
+        || symbol_type(ps[1]) > outtype)
+      outtype = symbol_type(ps[1]);
+  } else if (symbol_type(ps[1]) > outtype)
+    outtype = symbol_type(ps[1]);
+
+  if (!symbolIsNumericalArray(ps[0]))
+    return cerror(NEED_NUM_ARR, ps[0]);
+  if (!symbolIsNumericalArray(ps[1]))
+    return cerror(NEED_NUM_ARR, ps[1]);
+  if (array_size(ps[0]) != array_size(ps[1])
+      || array_num_dims(ps[0]) != array_num_dims(ps[1]))
+    return cerror(INCMP_ARG, ps[1]);
+  for (i = 0; i < array_num_dims(ps[0]); i++)
+    if (array_dims(ps[1])[i] != array_dims(ps[0])[i])
+      return cerror(INCMP_DIMS, ps[1]);
+  
+  if (narg > 3 && ps[3]) {	/* have <weights> */
+    if (!symbolIsNumericalArray(ps[3])	/* but it's not a numerical array */
+	|| array_size(ps[3]) != array_size(ps[0])) /* or has wrong size */
+      return cerror(INCMP_ARG, ps[3]);
+    for (i = 0; i < array_num_dims(ps[3]) - 1; i++) /* check the dimensions */
+      if (array_dims(ps[3])[i] != array_dims(ps[0])[i])
+	return cerror(INCMP_DIMS, ps[3]);
+    haveWeights = 1;
+  } else
+    haveWeights = 0;
+    
+  /* set up for traversing the data, and create an output symbol, too */
+  if (standardLoop(ps[0], (narg > 2 && ps[2])? ps[2]: 0,
+		   SL_COMPRESSALL /* omit all axis dimensions from result */
+		   | (haveWeights? 0: SL_ALLAXES)
+		   | SL_EXACT | SL_SRCUPGRADE
+		   | SL_EACHCOORD /* need all coordinates */
+		   | SL_UNIQUEAXES /* no duplicate axes allowed */
+		   | SL_AXESBLOCK /* treat axes as a block */
+		   | ((internalMode & 2)? SL_ONEDIMS: 0), /* omit -> 1 */
+                   outtype, &xsrcinfo, &xsrc, &result, &trgtinfo, &trgt) < 0)
+    return ANA_ERROR;
+  
+  if (standardLoop(ps[1], (narg > 2 && ps[2])? ps[2]: 0,
+		   SL_COMPRESSALL /* omit all axis dimensions from result */
+		   | (haveWeights? 0: SL_ALLAXES)
+		   | SL_SRCUPGRADE
+		   | SL_EACHCOORD /* need all coordinates */
+		   | SL_UNIQUEAXES /* no duplicate axes allowed */
+		   | SL_AXESBLOCK /* treat axes as a block */
+		   | ((internalMode & 2)? SL_ONEDIMS: 0), /* omit -> 1 */
+                   outtype, &ysrcinfo, &ysrc, NULL, NULL, NULL) < 0)
+    return ANA_ERROR;
+
+  /* set up for traversing the weights, too */
+  if (haveWeights) {
+    /* we make sure that <weights> has the same data type as <x> -- except */
+    /* that <weights> is never complex */
+    haveWeights = ana_converts[realType(outtype)](1, &ps[3]);
+    if (standardLoop(haveWeights, ps[2],
+		     (ps[2]? 0: SL_ALLAXES) | SL_EACHCOORD | SL_AXESBLOCK,
+		     0, &winfo, &weight, NULL, NULL, NULL) < 0)
+      return ANA_ERROR;
+  }
+		      
+  if (!xsrcinfo.naxes) {
+    xsrcinfo.naxes++;
+    ysrcinfo.naxes++;
+    if (haveWeights)
+      winfo.naxes++;
+  }
+
+  trgt0 = trgt;
+
+  /* we make two passes: one to get the average, and then one to calculate */
+  /* the standard deviation; this way we limit truncation and roundoff */
+  /* errors */
+  if (haveWeights) {
+    switch (symbol_type(ps[0])) {
+      case ANA_BYTE:
+	do {
+	  xmean = 0.0;
+          ymean = 0.0;
+	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(int));
+	  xsrc0 = xsrc;
+          ysrc0 = ysrc;
+	  weight0 = weight;
+	  nn = 0;
+	  do {
+	    xmean += (double) *xsrc.b * *weight.b;
+            ymean += (double) *ysrc.b * *weight.b;
+	    nn += (double) *weight.b;
+	  }
+	  while (advanceLoops(&xsrcinfo, &winfo),
+                 advanceLoop(&ysrcinfo) < xsrcinfo.naxes);
+	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(int));
+	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(int));
+	  xsrc = xsrc0;
+          ysrc = ysrc0;
+	  weight = weight0;
+	  xmean /= (nn? nn: 1);
+          ymean /= (nn? nn: 1);
+	  cov = 0.0;
+	  do {
+	    xtemp = ((double) *xsrc.b - xmean);
+            ytemp = ((double) *ysrc.b - ymean);
+	    cov += xtemp*ytemp* *weight.b;
+	  } while ((done = advanceLoops(&xsrcinfo, &winfo),
+                    advanceLoop(&ysrcinfo)) < xsrcinfo.naxes);
+	  if (!nn)
+	    nn = 1;
+	  cov /= nn;
+	  switch (outtype) {
+	    case ANA_FLOAT:
+	      *trgt.f++ = (float) cov;
+	      break;
+	    case ANA_DOUBLE:
+	      *trgt.d++ = cov;
+	      break;
+	  }
+	} while (done < xsrcinfo.rndim);
+	break;
+      case ANA_WORD:
+	do {
+	  xmean = 0.0;
+          ymean = 0.0;
+	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(int));
+	  xsrc0 = xsrc;
+          ysrc0 = ysrc;
+	  weight0 = weight;
+	  nn = 0;
+	  do {
+	    xmean += (double) *xsrc.w * *weight.w;
+            ymean += (double) *ysrc.w * *weight.w;
+	    nn += (double) *weight.w;
+	  }
+	  while (advanceLoops(&xsrcinfo, &winfo),
+                 advanceLoop(&ysrcinfo) < xsrcinfo.naxes);
+	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(int));
+	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(int));
+	  xsrc = xsrc0;
+          ysrc = ysrc0;
+	  weight = weight0;
+	  xmean /= (nn? nn: 1);
+          ymean /= (nn? nn: 1);
+	  cov = 0.0;
+	  do {
+	    xtemp = ((double) *xsrc.w - xmean);
+            ytemp = ((double) *ysrc.w - ymean);
+	    cov += xtemp*ytemp* *weight.w;
+	  } while ((done = advanceLoops(&xsrcinfo, &winfo),
+                    advanceLoop(&ysrcinfo)) < xsrcinfo.naxes);
+	  if (!nn)
+	    nn = 1;
+	  cov /= nn;
+	  switch (outtype) {
+	    case ANA_FLOAT:
+	      *trgt.f++ = (float) cov;
+	      break;
+	    case ANA_DOUBLE:
+	      *trgt.d++ = cov;
+	      break;
+	  }
+	} while (done < xsrcinfo.rndim);
+	break;
+      case ANA_LONG:
+	do {
+	  xmean = 0.0;
+          ymean = 0.0;
+	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(int));
+	  xsrc0 = xsrc;
+          ysrc0 = ysrc;
+	  weight0 = weight;
+	  nn = 0;
+	  do {
+	    xmean += (double) *xsrc.l * *weight.l;
+            ymean += (double) *ysrc.l * *weight.l;
+	    nn += (double) *weight.l;
+	  }
+	  while (advanceLoops(&xsrcinfo, &winfo),
+                 advanceLoop(&ysrcinfo) < xsrcinfo.naxes);
+	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(int));
+	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(int));
+	  xsrc = xsrc0;
+          ysrc = ysrc0;
+	  weight = weight0;
+	  xmean /= (nn? nn: 1);
+          ymean /= (nn? nn: 1);
+	  cov = 0.0;
+	  do {
+	    xtemp = ((double) *xsrc.l - xmean);
+            ytemp = ((double) *ysrc.l - ymean);
+	    cov += xtemp*ytemp* *weight.l;
+	  } while ((done = advanceLoops(&xsrcinfo, &winfo),
+                    advanceLoop(&ysrcinfo)) < xsrcinfo.naxes);
+	  if (!nn)
+	    nn = 1;
+	  cov /= nn;
+	  switch (outtype) {
+	    case ANA_FLOAT:
+	      *trgt.f++ = (float) cov;
+	      break;
+	    case ANA_DOUBLE:
+	      *trgt.d++ = cov;
+	      break;
+	  }
+	} while (done < xsrcinfo.rndim);
+	
+	break;
+      case ANA_FLOAT:
+	do {
+	  xmean = 0.0;
+          ymean = 0.0;
+	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(int));
+	  xsrc0 = xsrc;
+          ysrc0 = ysrc;
+	  weight0 = weight;
+	  nn = 0;
+	  do {
+	    xmean += (double) *xsrc.f * *weight.f;
+            ymean += (double) *ysrc.f * *weight.f;
+	    nn += (double) *weight.f;
+	  }
+	  while (advanceLoops(&xsrcinfo, &winfo),
+                 advanceLoop(&ysrcinfo) < xsrcinfo.naxes);
+	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(int));
+	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(int));
+	  xsrc = xsrc0;
+          ysrc = ysrc0;
+	  weight = weight0;
+	  xmean /= (nn? nn: 1);
+          ymean /= (nn? nn: 1);
+	  cov = 0.0;
+	  do {
+	    xtemp = ((double) *xsrc.f - xmean);
+            ytemp = ((double) *ysrc.f - ymean);
+	    cov += xtemp*ytemp* *weight.f;
+	  } while ((done = advanceLoops(&xsrcinfo, &winfo),
+                    advanceLoop(&ysrcinfo)) < xsrcinfo.naxes);
+	  if (!nn)
+	    nn = 1;
+	  cov /= nn;
+	  switch (outtype) {
+	    case ANA_FLOAT:
+	      *trgt.f++ = (float) cov;
+	      break;
+	    case ANA_DOUBLE:
+	      *trgt.d++ = cov;
+	      break;
+	  }
+	} while (done < xsrcinfo.rndim);
+	
+	break;
+      case ANA_DOUBLE:
+	do {
+	  xmean = 0.0;
+          ymean = 0.0;
+	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(int));
+	  xsrc0 = xsrc;
+          ysrc0 = ysrc;
+	  weight0 = weight;
+	  nn = 0;
+	  do {
+	    xmean += (double) *xsrc.d * *weight.d;
+            ymean += (double) *ysrc.d * *weight.d;
+	    nn += (double) *weight.d;
+	  }
+	  while (advanceLoops(&xsrcinfo, &winfo),
+                 advanceLoop(&ysrcinfo) < xsrcinfo.naxes);
+	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(int));
+	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(int));
+	  xsrc = xsrc0;
+          ysrc = ysrc0;
+	  weight = weight0;
+	  xmean /= (nn? nn: 1);
+          ymean /= (nn? nn: 1);
+	  cov = 0.0;
+	  do {
+	    xtemp = ((double) *xsrc.d - xmean);
+            ytemp = ((double) *ysrc.d - ymean);
+	    cov += xtemp*ytemp* *weight.d;
+	  } while ((done = advanceLoops(&xsrcinfo, &winfo),
+                    advanceLoop(&ysrcinfo)) < xsrcinfo.naxes);
+	  if (!nn)
+	    nn = 1;
+	  cov /= nn;
+          *trgt.d++ = cov;
+	} while (done < xsrcinfo.rndim);
+	break;
+    }
+    zapTemp(haveWeights);	/* delete if it is a temp */
+  } else {
+    n = 1;			/* initialize number of values per sdev */
+    for (i = 0; i < xsrcinfo.naxes; i++)
+      n *= xsrcinfo.rdims[i];
+    n2 = (internalMode & 1)? n: n - 1; /* sample or population sdev */
+    if (!n2)
+      return anaerror("Single values have no sample standard deviation", ps[0]);
+
+    switch (symbol_type(ps[0])) {
+      case ANA_BYTE:
+	do {
+	  xmean = 0.0;
+          ymean = 0.0;
+	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(int));
+	  xsrc0 = xsrc;
+          ysrc0 = ysrc;
+	  do {
+	    xmean += (double) *xsrc.b;
+            ymean += (double) *ysrc.b;
+	  } while (advanceLoops(&xsrcinfo, &ysrcinfo) < xsrcinfo.naxes);
+	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(int));
+	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(int));
+	  xsrc = xsrc0;
+          ysrc = ysrc0;
+	  xmean /= n;
+          ymean /= n;
+	  cov = 0.0;
+	  do {
+	    xtemp = ((double) *xsrc.b - xmean);
+            ytemp = ((double) *ysrc.b - ymean);
+	    cov += xtemp*ytemp;
+	  } while ((done = advanceLoops(&xsrcinfo, &ysrcinfo)) < xsrcinfo.naxes);
+	  switch (outtype) {
+	    case ANA_FLOAT:
+	      *trgt.f++ = (float) (cov/n2);
+	      break;
+	    case ANA_DOUBLE:
+	      *trgt.d++ = (cov/n2);
+	      break;
+	  }
+	} while (done < xsrcinfo.rndim);
+	break;
+      case ANA_WORD:
+	do {
+	  xmean = 0.0;
+          ymean = 0.0;
+	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(int));
+	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(int));
+	  xsrc0 = xsrc;
+          ysrc0 = ysrc;
+	  do {
+	    xmean += (double) *xsrc.w;
+            ymean += (double) *ysrc.w;
+	  } while (advanceLoops(&xsrcinfo, &ysrcinfo) < xsrcinfo.naxes);
+	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(int));
+	  xsrc = xsrc0;
+          ysrc = ysrc0;
+	  xmean /= n;
+          ymean /= n;
+	  cov = 0.0;
+	  do {
+	    xtemp = ((double) *xsrc.w - xmean);
+            ytemp = ((double) *ysrc.w - ymean);
+	    cov += xtemp*ytemp;
+	  } while ((done = advanceLoops(&xsrcinfo, &ysrcinfo)) < xsrcinfo.naxes);
+	  switch (outtype) {
+	    case ANA_FLOAT:
+	      *trgt.f++ = (float) (cov/n2);
+	      break;
+	    case ANA_DOUBLE:
+	      *trgt.d++ = (cov/n2);
+	      break;
+	  }
+	} while (done < xsrcinfo.rndim);
+        break;
+      case ANA_LONG:
+	do {
+	  xmean = 0.0;
+          ymean = 0.0;
+	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(int));
+	  xsrc0 = xsrc;
+          ysrc0 = ysrc;
+	  do {
+	    xmean += (double) *xsrc.l;
+            ymean += (double) *ysrc.l;
+	  } while (advanceLoops(&xsrcinfo, &ysrcinfo) < xsrcinfo.naxes);
+	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(int));
+	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(int));
+	  xsrc = xsrc0;
+          ysrc = ysrc0;
+	  xmean /= n;
+          ymean /= n;
+	  cov = 0.0;
+	  do {
+	    xtemp = ((double) *xsrc.l - xmean);
+            ytemp = ((double) *ysrc.l - ymean);
+	    cov += xtemp*ytemp;
+	  } while ((done = advanceLoops(&xsrcinfo, &ysrcinfo)) < xsrcinfo.naxes);
+	  switch (outtype) {
+	    case ANA_FLOAT:
+	      *trgt.f++ = (float) (cov/n2);
+	      break;
+	    case ANA_DOUBLE:
+	      *trgt.d++ = (cov/n2);
+	      break;
+	  }
+	} while (done < xsrcinfo.rndim);
+        break;
+      case ANA_FLOAT:
+	do {
+	  xmean = 0.0;
+          ymean = 0.0;
+	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(int));
+	  xsrc0 = xsrc;
+          ysrc0 = ysrc;
+	  do {
+	    xmean += (double) *xsrc.f;
+            ymean += (double) *ysrc.f;
+	  } while (advanceLoops(&xsrcinfo, &ysrcinfo) < xsrcinfo.naxes);
+	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(int));
+	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(int));
+	  xsrc = xsrc0;
+          ysrc = ysrc0;
+	  xmean /= n;
+          ymean /= n;
+	  cov = 0.0;
+	  do {
+	    xtemp = ((double) *xsrc.f - xmean);
+            ytemp = ((double) *ysrc.f - ymean);
+	    cov += xtemp*ytemp;
+	  } while ((done = advanceLoops(&xsrcinfo, &ysrcinfo)) < xsrcinfo.naxes);
+	  switch (outtype) {
+	    case ANA_FLOAT:
+	      *trgt.f++ = (float) (cov/n2);
+	      break;
+	    case ANA_DOUBLE:
+	      *trgt.d++ = (cov/n2);
+	      break;
+	  }
+	} while (done < xsrcinfo.rndim);
+        break;
+      case ANA_DOUBLE:
+	do {
+	  xmean = 0.0;
+          ymean = 0.0;
+	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(int));
+	  xsrc0 = xsrc;
+          ysrc0 = ysrc;
+	  do {
+	    xmean += (double) *xsrc.d;
+            ymean += (double) *ysrc.d;
+	  } while (advanceLoops(&xsrcinfo, &ysrcinfo) < xsrcinfo.naxes);
+	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(int));
+	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(int));
+	  xsrc = xsrc0;
+          ysrc = ysrc0;
+	  xmean /= n;
+          ymean /= n;
+	  cov = 0.0;
+	  do {
+	    xtemp = ((double) *xsrc.d - xmean);
+            ytemp = ((double) *ysrc.d - ymean);
+	    cov += xtemp*ytemp;
+	  } while ((done = advanceLoops(&xsrcinfo, &ysrcinfo)) < xsrcinfo.naxes);
+          *trgt.d++ = (cov/n2);
+	} while (done < xsrcinfo.rndim);
+        break;
+    }
+  }
+  
+  switch (outtype) {
+  case ANA_FLOAT:
+    lastmean.f = xmean;
+    break;
+  case ANA_DOUBLE:
+    lastmean.d = xmean;
+    break;
+  }
+  scalar_type(lastmean_sym) = scalar_type(lastsdev_sym) = outtype;
+  return result;
+}
+/*------------------------------------------------------------------------- */
 int sdev(int narg, int ps[], int sq)
 /* f(<x> [, <mode>, WEIGHTS=<weights>, /SAMPLE, /POPULATION, /KEEPDIMS, */
 /*         /DOUBLE]) */

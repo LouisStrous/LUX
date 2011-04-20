@@ -734,7 +734,7 @@ extern int ana_abs(), ana_acos(), ana_arestore_f(), ana_arg(),
   ana_cartesian_to_polar(), ana_polar_to_cartesian(), ana_roll(),
   ana_siderealtime(), ana_asinh(),
   ana_acosh(), ana_atanh(), ana_astrf(), ana_antilaplace2d(),
-  ana_cspline_find();
+  ana_cspline_find(), ana_covariance();
 
 #if HAVE_REGEX_H
 extern int ana_getdirectories(), ana_getfiles(), ana_getfiles_r(),
@@ -898,6 +898,8 @@ internalRoutine function[] = {
   { "CONVERT",	2, 2, ana_convertsym, "*" }, /* symbols.c */
   { "COS",	1, 1, ana_cos, "*" }, /* fun1.c */
   { "COSH",	1, 1, ana_cosh, "*" }, /* fun1.c */
+  { "COVARIANCE", 2, 4, ana_covariance,
+    ":::WEIGHTS:*0SAMPLE:1POPULATION:2KEEPDIMS:4DOUBLE" }, /* fun2.c */
   { "CROSSCORR", 2, 3, ana_crosscorr, 0 }, /* fun2.c */
   { "CRUNCH",	3, 3, ana_crunch_f, 0 }, /* crunch.c */
   { "CSPLINE",	0, 5, ana_cubic_spline, /* fun3.c */

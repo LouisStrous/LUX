@@ -7,7 +7,6 @@
 *.a
 autom4te*
 *.log
-Makefile
 ana
 anap
 test_XYZ_eclipticPrecession

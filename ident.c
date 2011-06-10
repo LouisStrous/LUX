@@ -5,10 +5,6 @@
 #include <math.h>
 #include <stdlib.h>
 #include "action.h"
-#include "astron.h"		/* CAL_xx used in Sprintf_general */
-
-static char rcsid[] __attribute__ ((unused)) =
-"$Id:";
 
 extern char	*curScrat, *binOpSign[];
 char	*fmt_integer, *fmt_float, *fmt_string, *fmt_complex, *fmt_time;
@@ -194,10 +190,10 @@ int fmt_entry(formatInfo *fmi)
     case 'e': case 'E': case 'f': case 'g': case 'G':
       type = FMT_FLOAT;
       break;
-    case 'j': case 'J':
+    case 'J':
       type = FMT_DATE;
       break;
-    case 't': case 'T':
+    case 'T':
       type = FMT_TIME;
       break;
     case 's': case 'S':
@@ -346,88 +342,6 @@ char *fmttok(char *format)
   return fmi->start;
 }
 /*---------------------------------------------------------------------*/
-int Sprintf_sexagesimal(char *str, double value, int precision, int width,
-			formatInfo *fmi)
-/* prints the <value> in sexagesimal way to <str>, with the indicated */
-/* <precision> (number of sexagesimal "digits") and <width> (minimum */
-/* number of characters), and guided by the format modifiers <fmi>. */
-/* NOTE: the value is *rounded* to the nearest sexagesimal equivalent; */
-/* it is not *truncated*. */
-/* LS 2003jul12 */
-{
-  int sign, n, h, sec, t, precision0;
-  char *str0, *p;
-  double d;
-
-  precision0 = precision;
-
-  sign = (value < 0)? -1: 1;	/* sign */
-  d = fabs(value);		/* magnitude */
-  if (*fmi->spec_char == 'T')
-    d /= 15;			/* transform from degrees to hours */
-  str0 = str;
-
-  h = (int) d;
-  d = 60*(d - h);
-  /* we must take the specified width and justification into account.
-     we do this by first printing the number without any regards to
-     padding, and then checking if we need to move it any. */
-  n = 0;			/* we count the length of the number string */
-  if (sign >= 0) {		/* nonnegative */
-    if (fmi->flags & FMT_ALWAYS_SIGN)
-      sprintf(str, "%+2d:%n", h, &n);
-    else if (fmi->flags & FMT_POSITIVE_BLANK)
-      sprintf(str, "% 2d:%n", h, &n);
-    else
-      sprintf(str, "%2d:%n", h, &n);
-  } else			/* negative */
-    sprintf(str, "%2d:%n", -h, &n);
-  str += n;
-  while (--precision) {	/* do the rest of them */
-    if (precision > 1) {	/* not yet the last one */
-      h = (int) d;		/* next value to display */
-      d = 60*(d - h);	/* remainder */
-      sprintf(str, "%02d:", h);
-      str += 3;		/* h is less than 60, so the formatted
-			   number is 2 characters long */
-      n += 3;
-    } else {		/* the last one: print as float */
-      t = width - n - 3;	/* any width left? */
-      if (t < 0)
-	t = 0;
-      /* we use %0# so we always get a decimal point; that way we can
-	 make sure that we always have at least two digits before the
-	 decimal point */
-      sprintf(str, "%0#*.*f %n", t + 3, t, d, &h);
-      p = str;
-      while (*p != '.')
-	p++;
-      if (p[-2] == '6') {	/* was rounded up to 60 */
-	double dv;
-	int i;
-
-	dv = 0.49;
-	for (i = 0; i < t; i++)
-	  dv /= 10;
-	for (i = 0; i < precision0 - 1; i++)
-	  dv /= 60;
-	return Sprintf_sexagesimal(str0, value + dv*sign, precision0,
-				   width, fmi);
-      }
-      n += h;
-      str += h;
-      if (str[-2] == '.') {	/* last one is a decimal point */
-	str[-2] = ' ';	/* blank the decimal point */
-	if (n > width) {	/* we can remove the extra whitespace */
-	  n--;
-	  *--str = '\0';
-	}
-      }
-    }
-  }
-  return n;
-}
-/*---------------------------------------------------------------------*/
 int Sprintf_general(char *str, char *format, va_list ap)
 /* prints the first argument into a string at <str> under guidance of
    the format specification in <format>.
@@ -509,150 +423,6 @@ int Sprintf_general(char *str, char *format, va_list ap)
 	*str++ = ' ';
     }
     str += strlen(str);
-    break;
-  case 't': case 'T':	/* time/angle */
-    if (precision < 2)
-      precision = 2;
-    d = va_arg(ap, double);	/* argument */
-    str += Sprintf_sexagesimal(str, d, precision, width, fmi);
-    break;
-  case 'j': case 'J':		/* date */
-    /* %.1j -> day only */
-    /* %.2j -> month & day */
-    /* %.3j -> year, month & day */
-    {
-      int year, month, iday;
-      double day;
-      void JDtoDate(double, int *, int *, double *, int);
-      char *months[] = {
-	"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
-	"Sep", "Oct", "Nov", "Dec"
-      };
-
-      JDtoDate(va_arg(ap, double), &year, &month, &day, CAL_COMMON);
-      iday = (int) day;
-      switch (precision) {
-      case 1:			/* day of month only */
-	sprintf(str, "%*d", width, iday);
-	break;
-      case 2:			/* month and day */
-	if (fmi->flags & FMT_ALTERNATIVE) {
-	  n = width - 3;
-	  if (n < 1)
-	    n = 1;
-	  sprintf(str, "%*s-%02d", n, months[month - 1], iday);
-	} else {
-	  n = width - 5;
-	  if (n < 0)
-	    n = 0;
-	  sprintf(str, "%*s%02d-%02d", n, "", month, iday);
-	}
-	break;
-      case 3: case -1: case 0:	/* year, month, and day */
-	if (fmi->flags & FMT_ALTERNATIVE) {
-	  n = width - 7;
-	  if (n < 1)
-	    n = 1;
-	  sprintf(str, "%*d-%s-%02d", n, year, months[month - 1], iday);
-	} else {
-	  n = width - 6;
-	  if (n < 1)
-	    n = 1;
-	  sprintf(str, "%*d-%02d-%02d", n, year, month, iday);
-	}
-	break;
-      default:
-	if (*fmi->spec_char == 'J') {
-	  int hour, minute;
-	  double second;
-
-	  second = 86400*(day - iday);
-	  hour = second/3600;
-	  second = fmod(second, 3600);
-	  minute = second/60;
-	  second = fmod(second, 60);
-
-	  switch (precision) {
-	  case 4:		/* year, month, day, and hour */
-	    if (fmi->flags & FMT_ALTERNATIVE) {
-	      n = width - 10;
-	      if (n < 1)
-		n = 1;
-	      sprintf(str, "%*d-%s-%02dT%02d", n, year, months[month - 1],
-		      iday, hour);
-	    } else {
-	      n = width - 9;
-	      if (n < 1)
-		n = 1;
-	      sprintf(str, "%*d-%02d-%02dT%02d", n, year, month, iday, hour);
-	    }
-	    break;
-	  case 5:		/* year, month, day, hour, and minute */
-	    if (fmi->flags & FMT_ALTERNATIVE) {
-	      n = width - 13;
-	      if (n < 1)
-		n = 1;
-	      sprintf(str, "%*d-%s-%02dT%02d:%02d", n, year, months[month - 1],
-		      iday, hour, minute);
-	    } else {
-	      n = width - 12;
-	      if (n < 1)
-		n = 1;
-	      sprintf(str, "%*d-%02d-%02dT%02d:%02d", n, year, month, iday,
-		      hour, minute);
-	    }
-	    break;
-	  case 6:		/* year, month, day, hour, minute, second */
-	    if (fmi->flags & FMT_ALTERNATIVE) {
-	      n = width - 16;
-	      if (n < 1)
-		n = 1;
-	      sprintf(str, "%*d-%s-%02dT%02d:%02d:%02d", n, year,
-		      months[month - 1], iday, hour, minute, (int) second);
-	    } else {
-	      n = width - 15;
-	      if (n < 1)
-		n = 1;
-	      sprintf(str, "%*d-%02d-%02dT%02d:%02d:%02d", n, year, month,
-		      iday, hour, minute, (int) second);
-	    }
-	    break;
-	  default:
-	    if (fmi->flags & FMT_ALTERNATIVE) {
-	      n = width - 10 - precision;
-	      if (n < 1)
-		n = 1;
-	      sprintf(str, "%*d-%s-%02dT%02d:%02d:%02.*f", n, year,
-		      months[month - 1], iday, hour, minute, precision - 6,
-		      second);
-	    } else {
-	      n = width - 9 - precision;
-	      if (n < 1)
-		n = 1;
-	      sprintf(str, "%*d-%02d-%02dT%02d:%02d:%02.*f", n, year, month,
-		      iday, hour, minute, precision - 6, second);
-	    }
-	    break;
-	  }
-	} else {
-	  if (fmi->flags & FMT_ALTERNATIVE) {
-	    n = width - 5 - precision;
-	    if (n < 1)
-	      n = 1;
-	    sprintf(str, "%*d-%s-%02.*f", n, year, months[month - 1],
-		    precision - 3, day);
-	  } else {
-	    n = width - 4 - precision;
-	    if (n < 1)
-	      n = 1;
-	    sprintf(str, "%*d-%02d-%02.*f", n, year, month, precision - 3,
-		    day);
-	  }
-	}
-	break;
-      }
-      n = strlen(str);
-    }
     break;
   }
   va_end(ap);

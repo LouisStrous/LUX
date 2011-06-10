@@ -11,9 +11,9 @@ idl.o trace_decoder_ana.o gifread_ana.o gifwrite_ana.o astron.o		\
 terminal.o regex.o vsop.o precession.o \
 jpeg.o tape.o dummyterm.o projection.o \
 xport.o zoom.o menu.o color.o random.o Bytestack.o poisson.o \
-printf_extensions.o
+printf_extensions.o calendar.o
 
-CC=gcc
+CC=gcc -Wall
 LIBS=-lm -lc -ljpeg -lX11 -lgsl
 EXEC=ana
 MORELIBS=

@@ -1667,56 +1667,42 @@ less than the precision; otherwise, fixed-point (@code{%f}) notation is
 used.  On input, @code{%g} and @code{%G} work like @code{%e}.  By
 default, a trailing decimal point and trailing zeros after the decimal
 point are not printed.
-@item j
-refers to a date argument.  On output, the value (a @code{FLOAT} or
-@code{DOUBLE}) is interpreted as a Julian Day Number and converted to
-the corresponding date in the common Western calendar; @ref{CALENDAR}
-for more information about calendar transformations.  The specified
-precision determines which components of the date are shown: @code{%.1j}
-provides just the day of the month, @code{%.2j} the month number and day
-number, @code{%.3j} the year, month, and day numbers.  For positive
-precisions greater than 3, the day number is printed with a number of
-digits after the decimal point that is equal to the precision minus
-three.  If the month is shown, then the @code{#} alternate format
-specifier selects printing the month as a three-letter abbreviation
-rather than as a number.
 @item J
-refers to a date argument.  On output, the value (a @code{FLOAT} or
-@code{DOUBLE}) is interpreted as a Julian Day Number and converted to
-the corresponding date and time in the common Western calendar;
-@ref{CALENDAR} for more information about calendar transformations.
-The specified precision determines which components of the date are
-shown.  For precisions of three or less, @code{J} is the same as
-@code{j}.  @code{%.1J} provides just the day of the month, @code{%.2J}
-the month number and day number, @code{%.3J} the year, month, and day
-numbers, @code{%.4J} the date and also the hour, @code{%.5J} the date
-and also the hour and minute, and @code{%.6J} the date and also the
-hour, minute, and second.  For positive precisions greater than 6, the
-seconds are printed with a number of digits after the decimal point
-that is equal to the precision minus six.  If the month is shown, then
-the @code{#} alternate format specifier selects printing the month as
-a three-letter abbreviation rather than as a number.  @code{%.6J}
-yields a date and time in ISO 8601 format, similar to
-@code{2000-12-30T03:04:05}.
+refers to a date and time argument.  On output, the value (a
+@code{FLOAT} or @code{DOUBLE}) is interpreted as a Julian Day Number
+and converted to the corresponding date in the common Western
+calendar; @ref{CALENDAR} for more information about calendar
+transformations.  The specified precision determines how many
+components of the date and time are shown, starting from the year:
+@code{%.1J} provides just the year, @code{%.2J} the year and the
+month, @code{%.3J} the year, month, and day, @code{%.4J} through
+@code{%.6J} add the hour, minute, and second, and greater precisions
+add further sexagesimal divisions of seconds.  If a width is specified
+that is greater than is needed for minimal output, and if left
+alignment is selected, then the last displayed component is shown with
+further digits after the decimal marker until the specified width has
+been filled.  @code{%.6J} yields a date and time in ISO 8601 format,
+similar to @code{2000-12-30T03:04:05}.
 @item s, S
 refer to a @code{STRING} argument.  On output, both formats are
 equivalent.  On input, the @code{%s} format does not accept whitespace
 (i.e., reads one whitespace-delimited word), and the @code{%S} format
 does accept whitespace except for newlines.
-@item t, T
-a time string of the form @code{' hh:mm:ss...'}.  The field width
-indicates the minimum width of the string and the precision the number
-of sexagesimal elements.  The precision defaults to 2 (i.e., hh:mm) and
+@item T
+refers to a floating point (@code{FLOAT}, @code{DOUBLE}) argument.  On
+output, it is printed with the fractional part in sexagesimal
+notation, similar to @code{1234:45:56}.  The field width indicates the
+minimum width of the string and the precision the number of
+sexagesimal elements.  The precision defaults to 2 (i.e., hh:mm) and
 cannot be less than 2.  All elements are printed as 2-digit integers,
 except the last one, which is printed as a floating-point number.  The
-string is lengthened (if necessary to attain the minimum field width) by
-printing the last element with more digits after the decimal point.  The
-first element is preceded by a whitespace or a sign (depending on the
-sign of the argument and the presence of the @code{+} modifier).  The
-@code{%t} format assumes that the argument is measured in (decimal)
-hours.  The @code{%T} type divides the argument by 15 before transforming
-from decimal to sexagesimal notation: it equates 360 degrees with 24
-hours.
+string is lengthened (if necessary to attain the minimum field width)
+by printing the last element with more digits after the decimal point.
+The first element is preceded by a whitespace or a sign (depending on
+the sign of the argument and the presence of the @code{+} modifier).
+The @code{#} modifier (e.g., @code{%#T}) divides the argument by 15
+before transforming from decimal to sexagesimal notation: it equates
+360 degrees with 24 hours.
 @item z
 a complex (@code{CFLOAT}, @code{CDOUBLE}) number, shown as two
 floating-point numbers (using a @code{%g} format, or a @code{%f} if the

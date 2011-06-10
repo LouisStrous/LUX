@@ -771,9 +771,8 @@ int ana_covariance(int narg, int ps[])
   int	result, n, i, done, n2, save[MAX_DIMS], outtype, haveWeights;
   pointer	xsrc, ysrc, trgt, xsrc0, ysrc0, trgt0, weight, weight0;
   double	xmean, ymean, xtemp, ytemp, cov, nn;
-  doubleComplex	xcmean, ycmean;
   loopInfo	xsrcinfo, ysrcinfo, trgtinfo, winfo;
-  extern scalar	lastsdev, lastmean;
+  extern scalar	lastmean;
   extern int	lastsdev_sym, lastmean_sym;
   
   /* return values by class? */
@@ -4131,7 +4130,6 @@ int ana_poly(int narg, int ps[])
   int result, ndata, ncoeff, datasym, coeffsym, i;
   byte outtype;
   pointer data, tgt, coeff;
-  scalar t;
 
   if (!symbolIsNumerical(ps[0])
       || !isNumericalType(symbol_type(ps[0])))

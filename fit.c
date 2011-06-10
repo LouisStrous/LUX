@@ -16,6 +16,7 @@ static char rcsid[] __attribute__ ((unused)) =
 "$Id: fit.c,v 4.0 2001/02/07 20:37:00 strous Exp $";
 
 char    PoissonChiSq;           /* flag: Poisson chi-square fitting? */
+unsigned int random_bits(void);
 
 /*-----------------------------------------------------------------------*/
 double gaussians(double *par, int nPar, double *x, double *y, double *w, int nData)
@@ -102,7 +103,7 @@ int ana_generalfit(int narg, int ps[])
   word  fitPar, fitArg[4];
   int   ana_indgen(int, int []), eval(int);
   void  zap(int);
-  time_t starttime, now;
+  time_t starttime;
   
   /* check input variables */
   if (narg >= 15 && (iq = ps[15])) { /* FIT */
@@ -839,7 +840,7 @@ int ana_geneticfit(int narg, int ps[])
         [,/ELITE,/BYTE,/WORD,/LONG,/FLOAT,/DOUBLE]) */
 {
   int   fitSym, iq, nPoints, nPopulation, nPar, fitTemp, i, j, size, result,
-    *rtoi, *itor, pair, k, w, generation, i1, i2, icross, imutate, ibit,
+    *rtoi, pair, k, w, generation, i1, i2, icross, imutate, ibit,
     iter = 0, vocal, typesize, nGeneration;
   uscalar p;
   word  *par, fitPar, xSym, ySym, fitArg[4], wSym;
@@ -859,6 +860,7 @@ int ana_geneticfit(int narg, int ps[])
     0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01,
   };
   int *crossoversites, *mutationsites;
+  void indexxr_d(int, double *, int *);
  
   iq = ps[3];                   /* fit */
   if (!symbolIsString(iq))

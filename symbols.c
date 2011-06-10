@@ -852,6 +852,8 @@ int ana_convert(int narg, int ps[], int totype, int isFunc)
   scalar	value;
   extern char	*fmt_integer, *fmt_float, *fmt_complex;
   void	read_a_number(char **, scalar *, int *);
+  char *fmttok(char *);
+  int Sprintf_tok(char *, ...);
 
   while (narg--) {
     iq = *ps++;
@@ -3063,7 +3065,7 @@ void read_a_number_fp(FILE *fp, scalar *value, int *type)
 /* Fixed reading of numbers with exponents.  LS 11jul2000 */
 {
   int	base = 10, kind, sign, ch;
-  char	*p, *numstart, c, ce, *p2;
+  char	*p, *numstart, *p2;
 
   *type = ANA_LONG;		/* default */
   /* skip non-digits, non-signs */
@@ -3393,6 +3395,7 @@ int nextchar(FILE *fp) {
   /* data input buffer is used, with all command line editing except */
   /* history buffer stuff enabled.  This can be used as an alternative */
   /* for fgetc(). LS 29mar2001 */
+  int getNewLine(char *, char *, char);
 
   if (fp == stdin) {
     if (!keyboard.ptr) {

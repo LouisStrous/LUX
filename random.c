@@ -62,7 +62,6 @@ int random_distributed(int modulus, double *distr)
 /* and no element smaller than the previous one.  LS 25aug2000 */
 {
   double r;
-  int	ilo, ihi, imid;
 
   r = random_one();
   return locate_value(r, distr, modulus);

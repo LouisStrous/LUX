@@ -1997,6 +1997,7 @@ int area2_general(int narg, int ps[])
   stackend = stack0 + nStack;
 
   ndim = srcinfo.rndim;
+  dims = srcinfo.dims;
 
   ptr1 = ptr0;
   do {				/* still more to do */

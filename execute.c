@@ -964,6 +964,7 @@ int usr_routine(int symbol)
  symTableEntry	*oldpars;
  extern int	returnSym, defined(int, int);
  extern char	evalScalPtr;
+ void pushExecutionLevel(int, int), popExecutionLevel(void);
  
  executeLevel++;
  fileLevel++;
@@ -1907,6 +1908,7 @@ int execute(int symbol)
   int	showstats(int, int []), getNewLine(char *, char *, char),
     ana_restart(int, int []), showError(int), insert(int, int []),
     nextFreeStackEntry(void);
+  void showExecutionLevel(int);
 
   curSymbol = symbol;		/* put in global so we know where an */
 				/* exception (interrupt) occurred, if any */

@@ -2100,6 +2100,7 @@ int read_ascii(int narg, int ps[], FILE *fp, int flag)
   char	*p;
   scalar	value;
   pointer	pp;
+  void read_a_number_fp(FILE *, scalar *, int *);
 
   index_cnt = 0;		/* keep track of the number of read elements */
   for (i = 0; i < narg; i++) {	/* loop over all arguments */
@@ -2374,7 +2375,7 @@ int read_formatted_ascii(int narg, int ps[], void *ptr, int showerrors,
  */
 {
   char	*fmt, *scr, *p, c;
-  int	type, n, string2, pr, i, len, nout = 0;
+  int	type, string2, pr, i, len, nout = 0;
   double	d, k, f, d2;
   pointer	trgt;
   void	**ptr2;
@@ -3050,8 +3051,6 @@ int ck_synch_hd(FILE *fin, fzHead *fh, int *wwflag)
    <stdio.h>: fread(), perror(), printf(), fclose()
  */
 {
-  int	i;
-
   if (fread(fh, 1, 256, fin) != 256)
     perror("fzread in header");
   if (fh->synch_pattern != SYNCH_OK) {
@@ -3137,8 +3136,8 @@ int ana_fzinspect(int narg, int ps[])		/* fzinspect subroutine */
    <sys/stat.h>: stat()
  */
 {
-  int	n, wwflag=0, *q1, i;
-  char	*p, *name;
+  int	wwflag=0, *q1, i;
+  char	*name;
   fzHead	*fh;
   FILE	*fin;
   struct stat statbuf;
@@ -3194,8 +3193,8 @@ int fzhead(int narg, int ps[], int flag) /* fzhead subroutine */
    <stdio.h>: FILE, fopen(), perror(), printf(), fclose()
  */
 {
- int	n, wwflag;
- char	*name, *p;
+ int	wwflag;
+ char	*name;
  fzHead	*fh;
  FILE	*fin;
 
@@ -3430,7 +3429,7 @@ int fzwrite(int narg, int ps[], int flag) /* fzwrite subroutine */
  */
 {
   int	iq, n, nd, j, type, mq, i, sz;
-  char	*name, *p, *q, safe, *safename;
+  char	*name, *p, safe, *safename;
   fzHead	*fh;
   pointer q1, q2;
   FILE	*fout;
@@ -3613,7 +3612,7 @@ int fcwrite(int narg, int ps[], int flag)/* fcwrite subroutine */
  */
 {
  int	iq, n, nd, j, type, i, mq, nx, ny, limit, sz;
- char	*name, *p, *q;
+ char	*name, *p;
  fzHead	*fh;
  pointer q1, q2;
  union { int i;  byte b[4];} lmap;
@@ -4660,8 +4659,7 @@ int ana_findfile(int narg, int ps[])
    in POSIX (e.g., linux).  Under POSIX, basic behavior results if
    REG_EXTENDED is *not* selected, so we can define REG_BASIC to be
    equal to zero if it is not already defined.  LS 21sep98 */
-static int	match_flag = 0, recursive_flag = 0, nfiles = 0, max,
-  get_type_flag;
+static int	nfiles = 0, max;
 static char	**p;
 #if HAVE_REGEX_H
 static regex_t	re;
@@ -5611,10 +5609,10 @@ int fits_read_compressed(int mode, int datasym, FILE *fp, int headersym,
  */
 {
   int	ncbytes, type, ndim, dims[MAX_DIMS], i, nblock, ok, slice, nx, ny,
-    type0, n;
+    type0;
   float	bscale = 0.0, bzero = 0.0, blank = FLT_MAX, min, max;
-  char	*block, usescrat, *curblock, runlength, strip = '\0';
-  pointer	p, q;
+  char	*block, usescrat, *curblock, runlength;
+  pointer	p;
 
   /* header structure:
 

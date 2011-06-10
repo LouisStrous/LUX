@@ -903,6 +903,7 @@ int ana_subsc_func(int narg, int ps[])
   listElem	*le;
   FILE	*fp = NULL;
   int	ana_subsc_subgrid(int, int []);
+  int ana_endian(int, int []);
 
   nsym = ps[--narg];
   /* now nsym is the source (subscripted) symbol and narg is the number
@@ -2417,7 +2418,6 @@ int ana_concat(int narg, int ps[])
   int	nd, j, i, dim[MAX_DIMS], nundef = 0;
   int	iq, nsym, mq, toptype = ANA_BYTE, topnd = 0, sflag = 0, n, nq;
   scalar	temp;
-  loopInfo	info;
 
   if (narg <= 0)
     return cerror(WRNG_N_ARG, 0);

@@ -62,7 +62,7 @@
 static char rcsid[] __attribute__ ((unused)) =
  "$Id: astron.c,v 4.0 2001/02/07 20:36:57 strous Exp $";
 
-#define extractbits(value, base, bits) ((value >> base) & ((1 << bits) - 1))
+#define extractbits(value, base, bits) (((value) >> (base)) & ((1 << (bits)) - 1))
 
 #define S_ECLIPTICAL	1
 #define S_EQUATORIAL	2
@@ -331,7 +331,6 @@ double JulianDate(int year, int month, double day, int calendar)
    the same time base as its arguments (TAI, UTC, TT, or something else
    altogether) */
 {
-  int	i;
   double	hebrewToJulian(int, int, double);
 
   switch (calendar) {
@@ -415,7 +414,10 @@ void JDtoDate(double JD, int *year, int *month, double *day, int calendar)
       *day = d + JD + 0.5 - jd;
       break;
     case CAL_HEBREW:
-      JDtoHebrew(JD, year, month, day);
+      {
+        int JDtoHebrew(double, int *, int *, double *);
+        JDtoHebrew(JD, year, month, day);
+      }
       break;
     case CAL_ISLAMIC:
       l = jd - 1948440 + 10632;
@@ -577,7 +579,7 @@ void findTextDate(char *text, int *year, int *month, double *day, int *cal,
 /* deduced calendar is returned in <*cal>, and the year, month number, */
 /* and day are returned in <*year>, <*month>, and <*day>, respectively. */
 {
-  int	i, j, nnum = 0, ntext = 0, c, kind;
+  int	i, j, nnum = 0, ntext = 0, c;
   char	*daystring = NULL, *monthstring = NULL, *yearstring = NULL, *text0;
 
   /* first we seek the starts of the day, month, and year.  We assume that */
@@ -894,7 +896,7 @@ int ana_calendar(int narg, int ps[])
      /*                /TOMAYAN /TOLONGCOUNT /TOUTC /TOTAI /TOTT */
 {
   int	n, *dims, ndim, nRepeat, type, i, iq, cal, newDims[MAX_DIMS],
-    num_newDims, year, month, nd, d, t, v, m, t1, t2, time, sec, min, hour,
+    num_newDims, year, month, nd, d, t, v, m, sec, min, hour,
     fromcalendar, tocalendar, fromtime, totime, output, fromorder, toorder;
   char	isFree = 0, *line, **monthNames;
   pointer	data;
@@ -1032,7 +1034,7 @@ int ana_calendar(int narg, int ps[])
       }
       break;
     default:
-      return error("Cannot parse text-based dates in this calendar", *ps);
+      return anaerror("Cannot parse text-based dates in this calendar", *ps);
     }
     cal = CAL_JD;
   } else switch (cal) {		/* from calendar */
@@ -2005,7 +2007,6 @@ int constellation(double alpha, double delta)
    equinox of B1875.0.  LS 2004may03
  */
 {
-  int nb = sizeof(constellation_boundaries)/sizeof(struct constellation_struct);
   int i;
   struct constellation_struct *cb = constellation_boundaries;
 
@@ -2406,7 +2407,7 @@ int ana_siderealtime(int narg, int ps[])
 /* julian dates, in hours */
 /* LS 31mar2002 */
 {
-  double *jd, *out, d;
+  double *jd, *out;
   int n, iq, result;
   double dPsi, cdPsi, sdPsi, dEps, epsilon;
 
@@ -3001,6 +3002,7 @@ void heliocentricXYZr(double JDE, int object, double equinox, double *pos,
 {
   double	T, standardEquinox;
   int	i;
+  void XYZfromVSOPA(double, int, double *, double, int);
 
   T = (JDE - J2000)/365250;	/* Julian millennia since J2000.0 */
   switch (object) {
@@ -3023,13 +3025,12 @@ void heliocentricXYZr(double JDE, int object, double equinox, double *pos,
   case 10:			/* the Moon */
     {
       double lmoon, elon, msun, mmoon, nodedist, a1, a2, a3, suml, sumr,
-	sumb, E[5], lambda, beta, delta, XYZmoon[3], Tc;
+	sumb, E[5], XYZmoon[3], Tc;
       struct moonlrTerm *mlrt;
       struct moonbTerm *mbt;
       int i;
 
-      /* Tc = T*10 + 4.069459e-10; /* convert from julian millennia to */
-      Tc = T*10; /* convert from julian millennia to */
+      Tc = T*10 + 4.069459e-10; /* convert from julian millennia to */
       /* julian centuries and take out light-time correction which is */
       /* implicitly included in the used lunar ephemeris (assumed */
       /* equivalent to 385000.56 km) */
@@ -3087,7 +3088,7 @@ void heliocentricXYZr(double JDE, int object, double equinox, double *pos,
       printLBRtoXYZ(pos);
       LBRtoXYZ(pos, XYZmoon, getErrors);
 
-      XYZfromVSOPA(T, 3, pos);	/* position of Earth */
+      XYZfromVSOPA(T, 3, pos, tolerance, getErrors); /* position of Earth */
       XYZ_eclipticPrecession(pos, JDE, equinox);
       pos[0] += XYZmoon[0];
       pos[1] += XYZmoon[1];

@@ -15107,7 +15107,7 @@ int evalListPtr(int symbol)
 int evalStructPtr(int symbol)
 /* evaluates <symbol> as a STRUCT_PTR */
 {
-  int	target, result, n, i, nout, one = 1, outdims[MAX_DIMS], outndim = 0,
+  int	target, result, n, i, one = 1, outdims[MAX_DIMS], outndim = 0,
     *dims, ndim, nms, i1, i2, j, k, nelem, *p, ne, type, total_ndim;
   structElem	*se;
   structPtr	*spe;

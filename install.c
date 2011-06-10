@@ -5084,10 +5084,8 @@ int ana_struct(int narg, int ps[])
 */
 {
   int	result, size, nstruct, dims[MAX_DIMS], ndim, n, i, offset;
-  word	*arg;
-  listElem	*le;
   pointer	data;
-  structElem	*se, *se0;
+  structElem	*se;
   
   if (structSize(ps[0], &nstruct, &size) == ANA_ERROR) /* check
 							  specification */
@@ -5513,7 +5511,7 @@ compileInfo *nextFreeCompileInfo(void)
     if (!c_info) {
       puts("pushCompileLevel:");
 	cerror(ALLOC_ERR, 0);
-      return;
+      return NULL;
     }
   }
   return &c_info[cur_c_info++];

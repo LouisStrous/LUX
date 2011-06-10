@@ -36,7 +36,7 @@ int read_jpeg6b(int narg, int ps[], int isFunc)
   struct jpeg_decompress_struct	cinfo;
   struct my_error_mgr		jerr;
   FILE	*infile;
-  int	result, dims[3], i, stride, n;
+  int	dims[3], i, stride, n;
   JSAMPROW	row_pointer[1];	/* pointer to a single row */
   JSAMPLE	*image;
 
@@ -166,7 +166,7 @@ int ana_read_jpeg6b_f(int narg, int ps[])
 int write_jpeg6b(int narg, int ps[], int isFunc)
 /* JWRITE,<x>,<file>[,<header>,<quality>] */
 {
-  int	nx, ny, i, nd, quality, stride;
+  int	nx, ny, nd, quality, stride;
   struct jpeg_compress_struct	cinfo;
   struct my_error_mgr		jerr;
   FILE	*outfile;

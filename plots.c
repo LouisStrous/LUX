@@ -479,6 +479,8 @@ int plotxy(float xx[], float yy[], float ex[], float ey[], int n, int dx,
 		   int irf, int f, float wb, float wt, float plim_min,
 		   float plim_max, float *start, float *step, float *end,
 		   float *stepdvi);
+  int ana_erase(int, int []);
+  int oplotx(float [], float [], float [], float [], int, int, int);
 
   iylog = ipltyp % 2;
   ixlog = (ipltyp/2) % 2;
@@ -1196,7 +1198,7 @@ void setupticks(float *min, float *max, int ndlab, int fstep, int ilog,
 /* *min: INPUT: least value in data; OUTPUT: least plot data limit */
 /* *max: INPUT: greatest value in data; OUTPUT: greatest plot data limit */
 /* ndlab: INPUT: number of minor divisions per major division */
-/* fstep: INPUT: free step size (0 = automatic, 1 = take from <step>)
+/* fstep: INPUT: free step size (0 = automatic, 1 = take from <step>) */
 /* ilog: INPUT: flags logarithmic scale */
 /* irf: INPUT: plot limit rounding (1 = yes, 0 = no) */
 /* f: INPUT: free lower limit; if == 0, then lower limit is non-positive */
@@ -1212,7 +1214,6 @@ void setupticks(float *min, float *max, int ndlab, int fstep, int ilog,
 /* if <ilog> is set, then it is assumed that *min, *max > 0 */
 {
   float	xq, stepvalue;
-  int	ilg;
 
   if (ilog) {			/* logarithmic scale */
     /* we assume that *min > 0 */
@@ -1322,7 +1323,7 @@ int tkplot(float x, float y, int lineStyle, int symStyle)
   static char	penState;
   static float	s;
   float	dx, dy, s0, sd, xc, yc, xx[2], yy[2];
-  int	result, ix, iy, drawn;
+  int	result, ix, iy;
   int	symplot(float, float, int, int), 
   	postvec(float, float, int);
 #ifdef X11

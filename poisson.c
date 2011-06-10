@@ -236,7 +236,7 @@ int gauss_seidel_2d2o(pointer b, pointer x, scalar sx, scalar sy, int type,
   return 0;
 }
 
-int restrict2(pointer b, pointer x, int type, int nx, int ny, scalar sx, 
+void restrict2(pointer b, pointer x, int type, int nx, int ny, scalar sx, 
 	      scalar sy, int do_residual, pointer tgt)
 {
   int i, j, nx2, ny2;
@@ -404,18 +404,18 @@ int restrict2(pointer b, pointer x, int type, int nx, int ny, scalar sx,
   }
 }
 
-int restrict_residual(pointer b, pointer x, int type, int nx, int ny,
+void restrict_residual(pointer b, pointer x, int type, int nx, int ny,
 		      scalar sx, scalar sy, pointer tgt)
 {
-  return restrict2(b, x, type, nx, ny, sx, sy, 1, tgt);
+  restrict2(b, x, type, nx, ny, sx, sy, 1, tgt);
 }
 
-int restrict(pointer x, int type, int nx, int ny, pointer tgt)
+void restrict(pointer x, int type, int nx, int ny, pointer tgt)
 {
   scalar dummy;
 
   dummy.d = 0;
-  return restrict2(x, x, type, nx, ny, dummy, dummy, 0, tgt);
+  restrict2(x, x, type, nx, ny, dummy, dummy, 0, tgt);
 }
 
 int ana_antilaplace2d(int narg, int ps[])

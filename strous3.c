@@ -421,7 +421,7 @@ int ana_cspline_find(int narg, int ps[])
    index <index(i)> and run up to but not including index <index(i+1)>. */
 /* LS 2009-08-09 */
 {
-  int	result, iq, pos, nLev, lev, ySym, vSym, i, step, *index, j;
+  int	result, iq, nLev, lev, ySym, vSym, i, step, *index, j;
   pointer	src, level;
   csplineInfo	cspl;
   loopInfo	srcinfo;
@@ -576,7 +576,6 @@ int ana_cspline_find(int narg, int ps[])
     
     n = Bytestack_bytes(b, 0)/csize; /* number of found data points */
     if (n > 0) {
-      int k;
       Bytestack_index bi;
       union {
 	struct c *c; 
@@ -1719,6 +1718,7 @@ int ana_trajectory(int narg, int ps[])
     ngrid, type, dv;
   float	x1, y1, x2, y2, vx, vy, s, s0, ds, dslimit, s1;
   pointer	gx, gy, vx0, vy0, ox, oy;
+  int ana_convert(int, int [], int, int);
 
   /* we treat all arguments. */
   if (!symbolIsRealArray(ps[0]))/* <gx> must be a real array */
@@ -2201,7 +2201,7 @@ int ana_enhanceimage(int narg, int ps[])
   means to enhance only from the low end.  LS 2006jun15 */
 {
   pointer src, tgt;
-  int ndim, *dims, nhist, *hist, nelem, i, j, result;
+  int ndim, *dims, nhist, *hist, nelem, i, result;
   float target, part;
   float a, b;
   float *m;
@@ -2209,10 +2209,10 @@ int ana_enhanceimage(int narg, int ps[])
   if (!symbolIsNumericalArray(ps[0]))
     return cerror(NEED_NUM_ARR, ps[0]);
   if (symbol_type(ps[0]) != ANA_BYTE)
-    return error("Need BYTE array", ps[0]);
+    return anaerror("Need BYTE array", ps[0]);
   numerical(ps[0], &dims, &ndim, &nelem, &src);
   if (ndim < 2)
-    return error("Need 2 or more dimensions", ps[0]);
+    return anaerror("Need 2 or more dimensions", ps[0]);
   part = (narg > 1 && ps[1])? float_arg(ps[1]): 1;
   target = (narg > 2 && ps[2])? float_arg(ps[2]): 100.0/256;
 
@@ -2277,7 +2277,7 @@ int ana_hamming(int narg, int ps[]) {
   pointer src, src2, tgt;
 
   if (!symbolIsNumerical(ps[0]))
-    return error("Need a numerical argument", ps[0]);
+    return anaerror("Need a numerical argument", ps[0]);
   if (!symbolIsInteger(ps[0]))
     return cerror(NEED_INT_ARG, ps[0]);
   numerical(ps[0], &dims, &ndim, &nelem, &src);
@@ -2285,11 +2285,11 @@ int ana_hamming(int narg, int ps[]) {
 
   if (narg >= 2) {
     if (!symbolIsNumerical(ps[1]))
-      return error("Need a numerical argument", ps[1]);
+      return anaerror("Need a numerical argument", ps[1]);
     if (!symbolIsInteger(ps[1]))
       return cerror(NEED_INT_ARG, ps[1]);
     if (symbol_type(ps[1]) != type)
-      return error("Data type is different from previous argument", ps[1]);
+      return anaerror("Data type is different from previous argument", ps[1]);
     numerical(ps[1], NULL, NULL, &nelem2, &src2);
     if (nelem2 != nelem && nelem2 != 1)
       return cerror(INCMP_ARG, ps[1]);

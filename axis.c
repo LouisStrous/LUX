@@ -443,7 +443,7 @@ int standardLoop(int data, int axisSym, int mode, int outType,
 
   if (axisSym > 0) {		/* <axisSym> is a regular symbol */
     if (!symbolIsNumerical(axisSym))
-      return error("Need a numerical argument", axisSym); /* <axisSym> was not numerical */
+      return anaerror("Need a numerical argument", axisSym); /* <axisSym> was not numerical */
     i = ana_long(1, &axisSym);	/* get a LONG copy */
     numerical(i, NULL, NULL, &nAxes, &axes); /* get info */
   } else {

@@ -124,7 +124,7 @@ int ana_cluster(int narg, int ps[])
   void	random_unique(int seed, int *output, int number, int modulo);
   int	iq, nClusters, nVectorDim, nVectors, i, j, *index, size, dataIndex;
   float	*data, *dataPoint, n1, n2, f;
-  double	s, t, s2, dMin2, d, *center, *center2, *group1, *group2,
+  double	s, t, dMin2, d, *center, *center2, *group1, *group2,
 	*dgv, *pdgv, *centroid, *fp, **findex, *firstCenter, *scrap,
 	*rmsptr;
   int	nSample, *clusterSize, k, n, l, k2, m, dims[2], k0,
@@ -134,7 +134,7 @@ int ana_cluster(int narg, int ps[])
 	useIndex, iterate, *changed, *changedOld, vocal, ordered,
 	gotPhantom, recluster, quick, record, curChanged;
   byte	indexType;
-  pointer	clusterNumber, clusterNumber2;
+  pointer	clusterNumber;
   FILE	*file;
   int	nDistCal = 0, allDistCal = 0;
 

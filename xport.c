@@ -540,7 +540,7 @@ int ck_events(void)         /* checks events for focus and size changes */
      default:
        /* we must put these events back into the queue or else */
        /* exposure and map events for widgets &c may not be serviced! */
-       /* XPutBackEvent(display, &report); /* LS 1apr99 */
+       /* XPutBackEvent(display, &report); LS 1apr99 */
        wq = 0;
        break;
      }
@@ -610,7 +610,6 @@ int ana_xcreat(int wid, unsigned int height, unsigned int width, int xpos,
  XSetWindowAttributes    attributes;
  Cursor cursor;
  int     mapid;
- XWindowAttributes	wat;
 
  /* start execution here */
  if (setup_x() < 0)
@@ -3637,6 +3636,8 @@ int ana_xtvread(int narg, int ps[])
  Drawable        *src;
  int	ana_zerof(int, int *);
  extern int	bits_per_pixel;
+ int ana_colorstogrey(int, int []);
+ int ana_delete(int, int []);
 
  /* the input arguments are all scalars */
  ck_events();

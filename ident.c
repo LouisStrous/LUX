@@ -350,7 +350,7 @@ int Sprintf_general(char *str, char *format, va_list ap)
 /* Sprintf does not attempt to write into <format>. */
 {
   static formatInfo	ownfmi, *fmi;
-  int	precision, width, n, sign, h, t;
+  int	precision, width, n;
   double	d, d2;
   char	*p;
   static char	tmp[20];

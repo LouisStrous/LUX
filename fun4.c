@@ -2037,7 +2037,7 @@ int ana_oldcompress(int narg, int ps[]) /* compress function */
 	q1.f +=  nxx * cy; }
       break;
     case ANA_DOUBLE:
-      fac = 1.0 / ( (double) cx * (double) cy );
+      dfac = 1.0 / ( (double) cx * (double) cy );
       while (ny--)
       {	base.d = q1.d;  iq = nx;
 	while (iq--)
@@ -2122,7 +2122,7 @@ int ana_index(int narg, int ps[])
  /* the index is returned as a long array of the same size */
  /* uses heap sort only */
 {
-  int	iq, type, result_sym, j, i, k, nd, n, nloop, step1, step2, nloop2;
+  int	iq, type, result_sym, nd, n, nloop, step1, step2, nloop2;
   pointer	p, q;
   /* SGI cc does not accept combination of (int, byte *) and (int, word *) */
   /* functions in one array of function pointers, not even if the function */
@@ -2131,6 +2131,7 @@ int ana_index(int narg, int ps[])
   static void	(*indexFunc[])(int, void *, int []) = {
     indexx_b, indexx_w, indexx_l, indexx_f, indexx_d, indexx_s
   };
+  void invertPermutation(int *, int);
 
   iq = ps[0];
   if (symbol_class(iq) != ANA_ARRAY)
@@ -3094,7 +3095,7 @@ void interpolate(void *srcv, int type, float xsrc, float ysrc, int nsx,
 {
   pointer	src, trgt;
   int	ix, iy, i;
-  float	dx, dy, px1, px2, px3, px4, py1, py2, py3, py4, bx, by, ax, ay;
+  float	px1, px2, px3, px4, py1, py2, py3, py4, bx, by, ax, ay;
 
   src.v = srcv;
   trgt.v = trgtv;
@@ -3179,7 +3180,7 @@ void interpolate(void *srcv, int type, float xsrc, float ysrc, int nsx,
 int ana_regridls(int narg, int ps[])
 /* REGRIDLS(<data>,<gx>,<gy>,<nx>,<ny>) */
 {
-  int	type, i, nx, ny, result, dims[2], ngx, ngy, gx, gy, s, t, nsx, nsy,
+  int	type, nx, ny, result, dims[2], ngx, ngy, gx, gy, s, t, nsx, nsy,
     step;
   float	xsrc, ysrc, *gridx, *gridy, sx, sy, tx, ty, stx, sty, xsrc0, ysrc0;
   pointer	src, trgt;
@@ -3306,7 +3307,7 @@ int bigger235(int x)
     6144, 6250, 6400, 6480
   }, n = sizeof(table)/sizeof(int);
   int	ilo, ihi, imid;
-  int	fac = 1, m, fac2, x2;
+  int	fac = 1, fac2, x2;
 
   if (x < 1)
     return 1;
@@ -3468,8 +3469,8 @@ int ana_cartesian_to_polar(int narg, int ps[])
 int ana_polar_to_cartesian(int narg, int ps[])
 /* y = PTOC(x [, nx, ny, x0, y0]) */
 {
-  int	nx, ny, result, dims[2], rmax, n, type, step, ix, iy;
-  float	x0, y0, x, y, daz, dx, dy, az, r;
+  int	nx, ny, result, dims[2], type, step, ix, iy;
+  float	x0, y0, daz, dx, dy, az, r;
   pointer	src, trgt;
   int	single_fft(pointer src, int n, int type, int backwards);
 

@@ -1,10 +1,9 @@
-
-/* A Bison parser, made by GNU Bison 2.4.1.  */
+/* A Bison parser, made by GNU Bison 2.4.3.  */
 
 /* Skeleton implementation for Bison's Yacc-like parsers in C
    
-      Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
-   Free Software Foundation, Inc.
+      Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
+   2009, 2010 Free Software Foundation, Inc.
    
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -46,7 +45,7 @@
 #define YYBISON 1
 
 /* Bison version.  */
-#define YYBISON_VERSION "2.4.1"
+#define YYBISON_VERSION "2.4.3"
 
 /* Skeleton name.  */
 #define YYSKELETON_NAME "yacc.c"
@@ -122,7 +121,7 @@ int	yyerror(char *), yylex(YYSTYPE *);
 
 
 /* Line 189 of yacc.c  */
-#line 126 "anaparser.c.tab.c"
+#line 125 "anaparser.c.tab.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -218,7 +217,7 @@ typedef int YYSTYPE;
 
 
 /* Line 264 of yacc.c  */
-#line 222 "anaparser.c.tab.c"
+#line 221 "anaparser.c.tab.c"
 
 #ifdef short
 # undef short
@@ -268,7 +267,7 @@ typedef short int yytype_int16;
 #define YYSIZE_MAXIMUM ((YYSIZE_T) -1)
 
 #ifndef YY_
-# if YYENABLE_NLS
+# if defined YYENABLE_NLS && YYENABLE_NLS
 #  if ENABLE_NLS
 #   include <libintl.h> /* INFRINGES ON USER NAME SPACE */
 #   define YY_(msgid) dgettext ("bison-runtime", msgid)
@@ -1190,9 +1189,18 @@ static const yytype_uint8 yystos[] =
 
 /* Like YYERROR except do call yyerror.  This remains here temporarily
    to ease the transition to the new meaning of YYERROR, for GCC.
-   Once GCC version 2 has supplanted version 1, this can go.  */
+   Once GCC version 2 has supplanted version 1, this can go.  However,
+   YYFAIL appears to be in use.  Nevertheless, it is formally deprecated
+   in Bison 2.4.2's NEWS entry, where a plan to phase it out is
+   discussed.  */
 
 #define YYFAIL		goto yyerrlab
+#if defined YYFAIL
+  /* This is here to suppress warnings from the GCC cpp's
+     -Wunused-macros.  Normally we don't worry about that warning, but
+     some users do, and we want to make it easy for users to remove
+     YYFAIL uses, which will produce warnings from Bison 2.5.  */
+#endif
 
 #define YYRECOVERING()  (!!yyerrstatus)
 
@@ -1249,7 +1257,7 @@ while (YYID (0))
    we won't break user code: when these are the locations we know.  */
 
 #ifndef YY_LOCATION_PRINT
-# if YYLTYPE_IS_TRIVIAL
+# if defined YYLTYPE_IS_TRIVIAL && YYLTYPE_IS_TRIVIAL
 #  define YY_LOCATION_PRINT(File, Loc)			\
      fprintf (File, "%d.%d-%d.%d",			\
 	      (Loc).first_line, (Loc).first_column,	\
@@ -1987,7 +1995,7 @@ yyreduce:
     {
         case 2:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 109 "anaparser.c"
     {			/* a statement or a newline */
   if (compileOnly && (yyvsp[(1) - (1)]))	/* if we're just compiling (and not
@@ -2003,7 +2011,7 @@ yyreduce:
 
   case 3:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 120 "anaparser.c"
     {		/* next member in a set of statements and
 				   newlines */
@@ -2016,7 +2024,7 @@ yyreduce:
 
   case 4:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 131 "anaparser.c"
     {			/* $1 > 0 indicates succesful execution.
 				   $1 < 0 indicates an error or a premature
@@ -2044,7 +2052,7 @@ yyreduce:
 
   case 5:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 153 "anaparser.c"
     {	/* a newline; newlines are only passeed to the parser by
 		   yylex() if disableNewline is equal to 0 */
@@ -2057,7 +2065,7 @@ yyreduce:
 
   case 11:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 168 "anaparser.c"
     {		/* a RETURN statement */
   (yyval) = newSymbol(ANA_EVB, EVB_RETURN, (yyvsp[(2) - (2)]));
@@ -2066,14 +2074,14 @@ yyreduce:
 
   case 12:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 171 "anaparser.c"
     { disableNewline++; ;}
     break;
 
   case 13:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 171 "anaparser.c"
     {
   /* a statement block */
@@ -2091,21 +2099,21 @@ yyreduce:
 
   case 14:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 183 "anaparser.c"
     { (yyval) = LOOP_BREAK; ;}
     break;
 
   case 15:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 184 "anaparser.c"
     { (yyval) = LOOP_CONTINUE; ;}
     break;
 
   case 16:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 185 "anaparser.c"
     {			/* a @file statement */
   (yyval) = newSymbol(ANA_EVB, EVB_FILE, (yyvsp[(1) - (1)]), FILE_INCLUDE);
@@ -2114,7 +2122,7 @@ yyreduce:
 
   case 17:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 188 "anaparser.c"
     {			/* a @@file statement */
   (yyval) = newSymbol(ANA_EVB, EVB_FILE, (yyvsp[(1) - (1)]), FILE_REPORT);
@@ -2123,28 +2131,28 @@ yyreduce:
 
   case 18:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 191 "anaparser.c"
     { (yyval) = LOOP_RETALL; ;}
     break;
 
   case 19:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 192 "anaparser.c"
     { (yyval) = newBlockSymbol((yyvsp[(3) - (3)])); ;}
     break;
 
   case 20:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 193 "anaparser.c"
     { (yyval) = newBlockSymbol((yyvsp[(2) - (2)])); ;}
     break;
 
   case 21:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 194 "anaparser.c"
     {			/* some error */
   puts("Illegal statement");	/* generate message */
@@ -2155,28 +2163,28 @@ yyreduce:
 
   case 22:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 199 "anaparser.c"
     { YYABORT; ;}
     break;
 
   case 23:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 203 "anaparser.c"
     { (yyval) = 0; ;}
     break;
 
   case 24:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 204 "anaparser.c"
     { (yyval) = (yyvsp[(2) - (2)]); ;}
     break;
 
   case 29:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 216 "anaparser.c"
     {		/* simple assignment */
   (yyval) = newSymbol(ANA_EVB, EVB_REPLACE, (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]));
@@ -2185,7 +2193,7 @@ yyreduce:
 
   case 30:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 219 "anaparser.c"
     {		/* an operator-assignment (e.g. X += 2) */
   if (symbol_class((yyvsp[(1) - (3)])) == ANA_EXTRACT)
@@ -2199,28 +2207,28 @@ yyreduce:
 
   case 31:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 230 "anaparser.c"
     { startList((yyvsp[(1) - (1)])); ;}
     break;
 
   case 32:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 231 "anaparser.c"
     { pushList((yyvsp[(2) - (2)])); ;}
     break;
 
   case 33:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 236 "anaparser.c"
     { pushList(ANA_RANGE);  (yyval) = 1; ;}
     break;
 
   case 34:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 237 "anaparser.c"
     {
   if ((setup & 1024) == 0)
@@ -2233,21 +2241,21 @@ yyreduce:
 
   case 35:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 244 "anaparser.c"
     { pushList(ANA_LIST);  (yyval) = 1; ;}
     break;
 
   case 36:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 245 "anaparser.c"
     { pushList(ANA_RANGE);  (yyval) = (yyvsp[(1) - (4)]) + 1; ;}
     break;
 
   case 37:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 246 "anaparser.c"
     {
   if ((setup & 1024) == 0)
@@ -2260,14 +2268,14 @@ yyreduce:
 
   case 38:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 253 "anaparser.c"
     { pushList(ANA_LIST);  (yyval) = (yyvsp[(1) - (2)]) + 1; ;}
     break;
 
   case 39:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 258 "anaparser.c"
     {
   pushList((yyvsp[(2) - (2)]));			/* the number of element extraction lists */
@@ -2278,14 +2286,14 @@ yyreduce:
 
   case 40:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 263 "anaparser.c"
     { (yyval) = findVar((yyvsp[(1) - (1)]), curContext); ;}
     break;
 
   case 43:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 274 "anaparser.c"
     {
     pushList(ANA_NEW_LIST);	/* the stack contents is now:
@@ -2297,7 +2305,7 @@ yyreduce:
 
   case 45:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 285 "anaparser.c"
     {
     pushList((yyvsp[(1) - (3)]));
@@ -2307,7 +2315,7 @@ yyreduce:
 
   case 46:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 289 "anaparser.c"
     {
     pushList(-1);
@@ -2317,7 +2325,7 @@ yyreduce:
 
   case 48:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 297 "anaparser.c"
     {				/* a string */
   (yyval) = newSymbol(ANA_FIXED_STRING, (yyvsp[(1) - (1)]));
@@ -2326,7 +2334,7 @@ yyreduce:
 
   case 50:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 301 "anaparser.c"
     {			/* a function call without any arguments */
   startList(0);			/* no arguments */
@@ -2337,7 +2345,7 @@ yyreduce:
 
   case 51:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 306 "anaparser.c"
     {	/* expressions may be subscripted */
   pushList((yyvsp[(2) - (2)]));			/* the number of element extraction lists */
@@ -2348,7 +2356,7 @@ yyreduce:
 
   case 52:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 311 "anaparser.c"
     {		/* a variable or function/routine pointer */
   (yyval) = newSymbol(ANA_POINTER, (yyvsp[(2) - (2)]));
@@ -2357,7 +2365,7 @@ yyreduce:
 
   case 53:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 314 "anaparser.c"
     {		/* a range expression */
   (yyval) = (yyvsp[(2) - (3)]);
@@ -2366,7 +2374,7 @@ yyreduce:
 
   case 54:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 317 "anaparser.c"
     {
   if ((setup & 1024) == 0)
@@ -2378,7 +2386,7 @@ yyreduce:
 
   case 55:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 323 "anaparser.c"
     {		/* a structure */
   (yyval) = newSymbol(ANA_PRE_LIST);
@@ -2387,7 +2395,7 @@ yyreduce:
 
   case 56:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 326 "anaparser.c"
     {
   if ((setup & 1024) == 0)
@@ -2399,7 +2407,7 @@ yyreduce:
 
   case 57:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 332 "anaparser.c"
     {			/* an empty list */
   pushList(ANA_NEW_LIST);
@@ -2409,7 +2417,7 @@ yyreduce:
 
   case 58:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 336 "anaparser.c"
     {
   (yyval) = (yyvsp[(2) - (3)]);
@@ -2418,7 +2426,7 @@ yyreduce:
 
   case 59:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 339 "anaparser.c"
     {
   if ((setup & 1024) == 0)
@@ -2430,7 +2438,7 @@ yyreduce:
 
   case 60:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 345 "anaparser.c"
     {		/* concatenation */
   (yyval) = newSymbol(ANA_INT_FUNC, ANA_CONCAT_FUN);
@@ -2439,7 +2447,7 @@ yyreduce:
 
   case 61:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 348 "anaparser.c"
     {
   if ((setup & 1024) == 0)
@@ -2451,7 +2459,7 @@ yyreduce:
 
   case 62:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 357 "anaparser.c"
     {
   (yyval) = newSymbol(ANA_BIN_OP, ANA_ADD, (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]));
@@ -2460,7 +2468,7 @@ yyreduce:
 
   case 63:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 360 "anaparser.c"
     {
   (yyval) = newSymbol(ANA_BIN_OP, ANA_SUB, (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]));
@@ -2469,7 +2477,7 @@ yyreduce:
 
   case 64:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 363 "anaparser.c"
     {
   (yyval) = newSymbol(ANA_BIN_OP, ANA_MUL, (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]));
@@ -2478,7 +2486,7 @@ yyreduce:
 
   case 65:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 366 "anaparser.c"
     {
   (yyval) = newSymbol(ANA_BIN_OP, ANA_DIV, (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]));
@@ -2487,7 +2495,7 @@ yyreduce:
 
   case 66:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 369 "anaparser.c"
     {
   (yyval) = newSymbol(ANA_BIN_OP, ANA_IDIV, (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]));
@@ -2496,7 +2504,7 @@ yyreduce:
 
   case 67:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 372 "anaparser.c"
     {
   (yyval) = newSymbol(ANA_BIN_OP, ANA_MOD, (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]));
@@ -2505,7 +2513,7 @@ yyreduce:
 
   case 68:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 375 "anaparser.c"
     {
   (yyval) = newSymbol(ANA_BIN_OP, ANA_SMOD, (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]));
@@ -2514,7 +2522,7 @@ yyreduce:
 
   case 69:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 378 "anaparser.c"
     {
   (yyval) = newSymbol(ANA_BIN_OP, ANA_POW, (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]));
@@ -2523,7 +2531,7 @@ yyreduce:
 
   case 70:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 381 "anaparser.c"
     {
   (yyval) = newSymbol(ANA_BIN_OP, ANA_MAX, (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]));
@@ -2532,7 +2540,7 @@ yyreduce:
 
   case 71:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 384 "anaparser.c"
     {
   (yyval) = newSymbol(ANA_BIN_OP, ANA_MIN, (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]));
@@ -2541,7 +2549,7 @@ yyreduce:
 
   case 72:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 387 "anaparser.c"
     {
   (yyval) = newSymbol(ANA_BIN_OP, ANA_EQ, (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]));
@@ -2550,7 +2558,7 @@ yyreduce:
 
   case 73:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 390 "anaparser.c"
     {
   (yyval) = newSymbol(ANA_BIN_OP, ANA_NE, (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]));
@@ -2559,7 +2567,7 @@ yyreduce:
 
   case 74:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 393 "anaparser.c"
     {
   (yyval) = newSymbol(ANA_BIN_OP, ANA_GE, (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]));
@@ -2568,7 +2576,7 @@ yyreduce:
 
   case 75:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 396 "anaparser.c"
     {
   (yyval) = newSymbol(ANA_BIN_OP, ANA_GT, (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]));
@@ -2577,7 +2585,7 @@ yyreduce:
 
   case 76:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 399 "anaparser.c"
     {
   (yyval) = newSymbol(ANA_BIN_OP, ANA_LT, (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]));
@@ -2586,7 +2594,7 @@ yyreduce:
 
   case 77:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 402 "anaparser.c"
     {
   (yyval) = newSymbol(ANA_BIN_OP, ANA_LE, (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]));
@@ -2595,7 +2603,7 @@ yyreduce:
 
   case 78:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 405 "anaparser.c"
     {
   (yyval) = newSymbol(ANA_BIN_OP, ANA_AND, (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]));
@@ -2604,7 +2612,7 @@ yyreduce:
 
   case 79:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 408 "anaparser.c"
     {
   (yyval) = newSymbol(ANA_BIN_OP, ANA_OR, (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]));
@@ -2613,7 +2621,7 @@ yyreduce:
 
   case 80:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 411 "anaparser.c"
     {
   (yyval) = newSymbol(ANA_BIN_OP, ANA_XOR, (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]));
@@ -2622,7 +2630,7 @@ yyreduce:
 
   case 81:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 414 "anaparser.c"
     {		/* testing & for AND */
   (yyval) = newSymbol(ANA_BIN_OP, ANA_AND, (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]));
@@ -2631,7 +2639,7 @@ yyreduce:
 
   case 82:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 417 "anaparser.c"
     {		/* testing | for OR */
   (yyval) = newSymbol(ANA_BIN_OP, ANA_OR, (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]));
@@ -2640,7 +2648,7 @@ yyreduce:
 
   case 83:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 420 "anaparser.c"
     {		/* conditional and */
   (yyval) = newSymbol(ANA_IF_OP, ANA_ANDIF, (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]));
@@ -2649,7 +2657,7 @@ yyreduce:
 
   case 84:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 423 "anaparser.c"
     {		/* conditional or */
   (yyval) = newSymbol(ANA_IF_OP, ANA_ORIF, (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]));
@@ -2658,7 +2666,7 @@ yyreduce:
 
   case 85:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 426 "anaparser.c"
     {		/* matrix multiplication */
   startList((yyvsp[(1) - (3)]));
@@ -2669,7 +2677,7 @@ yyreduce:
 
   case 86:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 431 "anaparser.c"
     {
   startList((yyvsp[(2) - (2)]));
@@ -2679,7 +2687,7 @@ yyreduce:
 
   case 87:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 435 "anaparser.c"
     {
   (yyval) = (yyvsp[(2) - (2)]);
@@ -2688,21 +2696,21 @@ yyreduce:
 
   case 88:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 441 "anaparser.c"
     { startList((yyvsp[(1) - (1)])); ;}
     break;
 
   case 89:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 442 "anaparser.c"
     { pushList((yyvsp[(3) - (3)])); ;}
     break;
 
   case 90:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 452 "anaparser.c"
     {
   (yyval) = newSymbol(ANA_PRE_RANGE, (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]));
@@ -2711,7 +2719,7 @@ yyreduce:
 
   case 91:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 455 "anaparser.c"
     {
   (yyval) = newSymbol(ANA_PRE_RANGE, (yyvsp[(1) - (5)]), -(yyvsp[(5) - (5)]));
@@ -2720,7 +2728,7 @@ yyreduce:
 
   case 92:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 458 "anaparser.c"
     {
   (yyval) = newSymbol(ANA_PRE_RANGE, (yyvsp[(1) - (3)]), -ANA_ONE);
@@ -2729,7 +2737,7 @@ yyreduce:
 
   case 93:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 461 "anaparser.c"
     {
   (yyval) = newSymbol(ANA_PRE_RANGE, -(yyvsp[(3) - (5)]), (yyvsp[(5) - (5)]));
@@ -2738,7 +2746,7 @@ yyreduce:
 
   case 94:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 464 "anaparser.c"
     {
   (yyval) = newSymbol(ANA_PRE_RANGE, -(yyvsp[(3) - (7)]), -(yyvsp[(7) - (7)]));
@@ -2747,7 +2755,7 @@ yyreduce:
 
   case 95:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 467 "anaparser.c"
     {
   (yyval) = newSymbol(ANA_PRE_RANGE, -(yyvsp[(3) - (5)]), -ANA_ONE);
@@ -2756,7 +2764,7 @@ yyreduce:
 
   case 96:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 470 "anaparser.c"
     {
   (yyval) = newSymbol(ANA_PRE_RANGE, -(yyvsp[(3) - (3)]), ANA_ZERO);
@@ -2765,7 +2773,7 @@ yyreduce:
 
   case 97:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 473 "anaparser.c"
     {
   (yyval) = newSymbol(ANA_PRE_RANGE, -ANA_ONE, ANA_ZERO);
@@ -2774,7 +2782,7 @@ yyreduce:
 
   case 99:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 486 "anaparser.c"
     {
   sym[(yyvsp[(1) - (3)])].spec.evb.args[2] = 1;
@@ -2784,7 +2792,7 @@ yyreduce:
 
   case 100:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 491 "anaparser.c"
     {
   sym[(yyvsp[(1) - (4)])].spec.evb.args[3] = (yyvsp[(4) - (4)]);
@@ -2794,7 +2802,7 @@ yyreduce:
 
   case 101:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 496 "anaparser.c"
     {
   (yyval) = newSymbol(ANA_PRE_RANGE, ANA_ZERO, -ANA_ONE);
@@ -2804,7 +2812,7 @@ yyreduce:
 
   case 102:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 501 "anaparser.c"
     {
   (yyval) = newSymbol(ANA_PRE_RANGE, ANA_ZERO, -ANA_ONE);
@@ -2814,7 +2822,7 @@ yyreduce:
 
   case 103:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 506 "anaparser.c"
     {
   (yyval) = newSymbol(ANA_PRE_RANGE, (yyvsp[(1) - (4)]), ANA_ZERO);
@@ -2824,7 +2832,7 @@ yyreduce:
 
   case 104:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 511 "anaparser.c"
     {
   (yyval) = newSymbol(ANA_PRE_RANGE, (yyvsp[(1) - (3)]), ANA_ZERO);
@@ -2834,7 +2842,7 @@ yyreduce:
 
   case 108:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 528 "anaparser.c"
     {
   startList((yyvsp[(1) - (1)]));
@@ -2843,7 +2851,7 @@ yyreduce:
 
   case 109:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 532 "anaparser.c"
     {
   pushList((yyvsp[(3) - (3)]));
@@ -2852,7 +2860,7 @@ yyreduce:
 
   case 110:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 539 "anaparser.c"
     {
   (yyval) = ANA_ADD;
@@ -2861,7 +2869,7 @@ yyreduce:
 
   case 111:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 543 "anaparser.c"
     {
   (yyval) = ANA_SUB;
@@ -2870,7 +2878,7 @@ yyreduce:
 
   case 112:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 547 "anaparser.c"
     {
   (yyval) = ANA_MUL;
@@ -2879,7 +2887,7 @@ yyreduce:
 
   case 113:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 551 "anaparser.c"
     {
   (yyval) = ANA_DIV;
@@ -2888,7 +2896,7 @@ yyreduce:
 
   case 114:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 558 "anaparser.c"
     {
   (yyval) = newSubrSymbol((yyvsp[(1) - (2)]));
@@ -2897,7 +2905,7 @@ yyreduce:
 
   case 116:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 566 "anaparser.c"
     {
   pushList(ANA_NEW_LIST);
@@ -2906,7 +2914,7 @@ yyreduce:
 
   case 117:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 573 "anaparser.c"
     {
   startList((yyvsp[(1) - (1)]));
@@ -2915,7 +2923,7 @@ yyreduce:
 
   case 118:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 577 "anaparser.c"
     {
   pushList((yyvsp[(3) - (3)]));
@@ -2924,7 +2932,7 @@ yyreduce:
 
   case 120:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 590 "anaparser.c"
     {
   (yyval) = newSymbol(ANA_KEYWORD, (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]));
@@ -2933,7 +2941,7 @@ yyreduce:
 
   case 121:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 594 "anaparser.c"
     {
   (yyval) = newSymbol(ANA_KEYWORD, (yyvsp[(2) - (2)]), ANA_ONE);
@@ -2942,7 +2950,7 @@ yyreduce:
 
   case 124:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 608 "anaparser.c"
     {
   disableNewline++;
@@ -2951,7 +2959,7 @@ yyreduce:
 
   case 125:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 610 "anaparser.c"
     {
   (yyval) = newSymbol(ANA_SUBROUTINE, (yyvsp[(3) - (4)]));
@@ -2960,7 +2968,7 @@ yyreduce:
 
   case 126:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 612 "anaparser.c"
     {
   (yyval) = newSymbol(ANA_SUBROUTINE, -(yyvsp[(5) - (7)]) - 1);
@@ -2971,7 +2979,7 @@ yyreduce:
 
   case 127:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 618 "anaparser.c"
     {
   disableNewline++;
@@ -2980,7 +2988,7 @@ yyreduce:
 
   case 128:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 620 "anaparser.c"
     {
   (yyval) = newSymbol(ANA_FUNCTION, (yyvsp[(3) - (4)]));
@@ -2989,7 +2997,7 @@ yyreduce:
 
   case 129:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 622 "anaparser.c"
     {
   (yyval) = newSymbol(ANA_FUNCTION, -(yyvsp[(5) - (7)]) - 1);
@@ -3000,7 +3008,7 @@ yyreduce:
 
   case 130:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 628 "anaparser.c"
     {
   disableNewline++;
@@ -3009,7 +3017,7 @@ yyreduce:
 
   case 131:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 630 "anaparser.c"
     {
   (yyval) = newSymbol(ANA_BLOCKROUTINE, (yyvsp[(3) - (3)]));
@@ -3018,7 +3026,7 @@ yyreduce:
 
   case 132:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 632 "anaparser.c"
     {
   (yyval) = newSymbol(ANA_BLOCKROUTINE, -(yyvsp[(4) - (6)]) - 1);
@@ -3029,7 +3037,7 @@ yyreduce:
 
   case 140:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 655 "anaparser.c"
     {
   pushList(ANA_EXTEND);
@@ -3038,7 +3046,7 @@ yyreduce:
 
   case 141:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 663 "anaparser.c"
     {
   pushList(ANA_NEW_LIST);
@@ -3047,7 +3055,7 @@ yyreduce:
 
   case 143:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 672 "anaparser.c"
     {
   startList((yyvsp[(1) - (1)]));
@@ -3056,7 +3064,7 @@ yyreduce:
 
   case 144:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 676 "anaparser.c"
     {
   pushList((yyvsp[(3) - (3)]));
@@ -3065,7 +3073,7 @@ yyreduce:
 
   case 145:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 683 "anaparser.c"
     {
   startList((yyvsp[(1) - (1)]));
@@ -3075,7 +3083,7 @@ yyreduce:
 
   case 146:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 688 "anaparser.c"
     {
   pushList((yyvsp[(2) - (2)]));
@@ -3086,7 +3094,7 @@ yyreduce:
 
   case 147:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 698 "anaparser.c"
     {			/* empty list */
   pushList(ANA_NEW_LIST);
@@ -3095,7 +3103,7 @@ yyreduce:
 
   case 150:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 709 "anaparser.c"
     {
   disableNewline++;
@@ -3104,7 +3112,7 @@ yyreduce:
 
   case 151:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 711 "anaparser.c"
     {
   disableNewline--;
@@ -3113,7 +3121,7 @@ yyreduce:
 
   case 152:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 713 "anaparser.c"
     {
   (yyval) = newSymbol(ANA_EVB, EVB_IF, (yyvsp[(3) - (7)]), (yyvsp[(6) - (7)]), (yyvsp[(7) - (7)]));
@@ -3122,7 +3130,7 @@ yyreduce:
 
   case 153:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 717 "anaparser.c"
     {
   disableNewline++;
@@ -3131,7 +3139,7 @@ yyreduce:
 
   case 154:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 719 "anaparser.c"
     {
   pushList((yyvsp[(4) - (5)]));
@@ -3142,7 +3150,7 @@ yyreduce:
 
   case 155:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 725 "anaparser.c"
     {
   disableNewline++;
@@ -3151,7 +3159,7 @@ yyreduce:
 
   case 156:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 727 "anaparser.c"
     {
   pushList((yyvsp[(5) - (6)]));
@@ -3164,7 +3172,7 @@ yyreduce:
 
   case 159:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 744 "anaparser.c"
     {
   (yyval) = 0;
@@ -3173,7 +3181,7 @@ yyreduce:
 
   case 160:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 748 "anaparser.c"
     {
   (yyval) = (yyvsp[(2) - (2)]);
@@ -3182,7 +3190,7 @@ yyreduce:
 
   case 161:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 755 "anaparser.c"
     {
   (yyval) = 0;
@@ -3191,7 +3199,7 @@ yyreduce:
 
   case 162:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 759 "anaparser.c"
     {
   disableNewline++;
@@ -3200,7 +3208,7 @@ yyreduce:
 
   case 163:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 761 "anaparser.c"
     {
   (yyval) = (yyvsp[(3) - (3)]);
@@ -3210,7 +3218,7 @@ yyreduce:
 
   case 164:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 766 "anaparser.c"
     {
   disableNewline++;
@@ -3219,7 +3227,7 @@ yyreduce:
 
   case 165:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 768 "anaparser.c"
     {		/* Dick's case else */
   (yyval) = (yyvsp[(3) - (4)]);
@@ -3229,7 +3237,7 @@ yyreduce:
 
   case 166:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 776 "anaparser.c"
     {
   startList((yyvsp[(1) - (3)]));
@@ -3239,7 +3247,7 @@ yyreduce:
 
   case 167:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 781 "anaparser.c"
     {
   pushList((yyvsp[(2) - (4)]));
@@ -3249,7 +3257,7 @@ yyreduce:
 
   case 168:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 789 "anaparser.c"
     {
   disableNewline++;
@@ -3258,7 +3266,7 @@ yyreduce:
 
   case 169:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 791 "anaparser.c"
     {
   disableNewline--;
@@ -3267,7 +3275,7 @@ yyreduce:
 
   case 170:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 793 "anaparser.c"
     {
   (yyval) = findVar((yyvsp[(3) - (11)]), curContext);
@@ -3277,7 +3285,7 @@ yyreduce:
 
   case 171:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 798 "anaparser.c"
     {
   disableNewline++;
@@ -3286,7 +3294,7 @@ yyreduce:
 
   case 172:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 800 "anaparser.c"
     {
   disableNewline--;
@@ -3295,7 +3303,7 @@ yyreduce:
 
   case 173:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 802 "anaparser.c"
     {
   (yyval) = newSymbol(ANA_EVB, EVB_REPEAT, (yyvsp[(3) - (6)]), (yyvsp[(6) - (6)]));
@@ -3304,7 +3312,7 @@ yyreduce:
 
   case 174:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 806 "anaparser.c"
     {
   disableNewline++;
@@ -3313,7 +3321,7 @@ yyreduce:
 
   case 175:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 808 "anaparser.c"
     {
   disableNewline--;
@@ -3322,7 +3330,7 @@ yyreduce:
 
   case 176:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 810 "anaparser.c"
     {
   (yyval) = newSymbol(ANA_EVB, EVB_DO_WHILE, (yyvsp[(3) - (6)]), (yyvsp[(6) - (6)]));
@@ -3331,7 +3339,7 @@ yyreduce:
 
   case 177:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 814 "anaparser.c"
     {
   disableNewline++;
@@ -3340,7 +3348,7 @@ yyreduce:
 
   case 178:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 816 "anaparser.c"
     {
   disableNewline--;
@@ -3349,7 +3357,7 @@ yyreduce:
 
   case 179:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 818 "anaparser.c"
     {
   (yyval) = newSymbol(ANA_EVB, EVB_WHILE_DO, (yyvsp[(3) - (6)]), (yyvsp[(6) - (6)]));
@@ -3358,7 +3366,7 @@ yyreduce:
 
   case 180:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 825 "anaparser.c"
     {
   (yyval) = ANA_ONE;
@@ -3367,7 +3375,7 @@ yyreduce:
 
   case 181:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 829 "anaparser.c"
     {
   (yyval) = (yyvsp[(2) - (2)]);
@@ -3376,8 +3384,8 @@ yyreduce:
 
 
 
-/* Line 1455 of yacc.c  */
-#line 3381 "anaparser.c.tab.c"
+/* Line 1464 of yacc.c  */
+#line 3389 "anaparser.c.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -3588,7 +3596,7 @@ yyreturn:
 
 
 
-/* Line 1675 of yacc.c  */
+/* Line 1684 of yacc.c  */
 #line 841 "anaparser.c"
 
 
@@ -3948,7 +3956,6 @@ int yylex(YYSTYPE *lvalp)
  char	*p, c, *prompt, *p2;
  int	i;
  static int	len = 0;
- extern FILE	*recordFile;	/* file to which requested I/O is copied */
  extern char	recording, *currentInputFile;
  extern int	curLineNumber;	/* current line number */
  int	getNewLine(char *buffer, char *prompt, char historyFlag),
@@ -4310,7 +4317,7 @@ int main(int argc, char *argv[])
      /* main program */
 {
   int	site(int, int []), readHistory(void);
-  char	*p, *p2;
+  char	*p;
   extern int	nSymbolStack;
   extern void	getTerminalSize(void);
   void	pegParse(void), inHistory(char *), getTermCaps(void);

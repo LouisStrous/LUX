@@ -1353,7 +1353,7 @@ int anadecrunchrun(byte *x, short array[], int r9, int nx, int ny)
 {
   short iq;
   int r0,r1,r2,r4,nb,mask,nrun,n,nc;
-  int j,in,i,k,ix,iy;
+  int j,in,i,k,iy;
   unsigned char xq;
   union { int i; short w; unsigned char b[4]; } y;
   /* begin execution */
@@ -1442,7 +1442,7 @@ int anadecrunchrun(byte *x, short array[], int r9, int nx, int ny)
 					    if ((xq&128) != 0) r0+=8; }}}}}}} break; } else { r0=r0+8; 
 					    /* add 8 bits for each all zero byte */
 					    if (r0 > 32) { printf("DECRUNCH -- bad bit sequence, cannot continue\n");
-					    printf("i = %d, r1 = %d, ix= %d, iy = %d\n",i,r1,ix,iy);
+					    printf("i = %d, r1 = %d, iy = %d\n",i,r1,iy);
 					    return -1; }       }       }       }
 	  r1=r1+r0;       /* update pointer */
 	  /* r0 even or odd determines sign of difference */
@@ -1495,7 +1495,7 @@ int anadecrunchrun8(byte x[], byte array[], int r9, int nx, int ny)
 {
   byte iq;
   int r0,r1,r2,r4,nb,mask,nrun,n,nc;
-  int j,in,i,k,ix,iy;
+  int j,in,i,k,iy;
   unsigned char xq;
   union { int i; short w; unsigned char b[4]; } y;
   /* begin execution */
@@ -1596,7 +1596,7 @@ int anadecrunchrun8(byte x[], byte array[], int r9, int nx, int ny)
 	      r0=r0+8; 
 	      /* add 8 bits for each all zero byte */
 	      if (r0 > 32) { printf("DECRUNCH -- bad bit sequence, cannot continue\n");
-	      printf("i = %d, r1 = %d, ix= %d, iy = %d\n",i,r1,ix,iy);
+	      printf("i = %d, r1 = %d, iy = %d\n",i,r1,iy);
 	      return -1; }       }       }       }
 	  r1=r1+r0;       /* update pointer */
 	  /* r0 even or odd determines sign of difference */

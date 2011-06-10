@@ -119,6 +119,7 @@ int ana_distr_f(int narg, int ps[])
 	minmax(int *, int, int);
   pointer arg1, arg2, res;
   int	ana_zero(int, int []);
+  int convertWidePointer(wideScalar *, int, int);
 
   iq = ps[0];
   if (symbol_class(iq) != ANA_ARRAY)
@@ -140,8 +141,8 @@ int ana_distr_f(int narg, int ps[])
   /* always need the range */
   minmax(arg1.l, n, type);
   /* get long (int) versions of min and max */
-  convertWidePointer(&lastmin, type, ANA_LONG);
-  convertWidePointer(&lastmax, type, ANA_LONG);
+  convertPointer(&lastmin, type, ANA_LONG);
+  convertPointer(&lastmax, type, ANA_LONG);
   /* create an array for results */
   histmin = lastmin.l;
   histmax = lastmax.l;
@@ -378,14 +379,12 @@ int ana_readarr(int narg, int ps[])
 /* reads array elements until they are exhausted and returns read elements */
 /* in an array.  Louis Strous 24may92 */
 {
- extern char	batch;
  extern FILE	*inputStream;
  FILE	*tp, *is;
  char	*p, *pt, lastchar, token[32], line[BUFSIZE];
  int	arrs=0, i, iq, maxtype = ANA_LONG, *iptr, 
 	getNewLine(char *, char *, char), redef_array(int, int, int, int *);
  float	*fptr;
- extern char *currentChar, tLine[];
 
  iq = ps[0];						/* target */
  tp = Tmpfile();					/* temporary storage */

@@ -576,7 +576,7 @@ char *
 Bytestack_unescapify(Bytestack b, Bytestack_index bi)
 {
   char *p, *q, *r;
-  size_t n, i, c, ccur;
+  size_t c, ccur;
 
   if (!b)
     b = default_Bytestack();

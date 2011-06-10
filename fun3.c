@@ -709,6 +709,12 @@ int single_fft(pointer src, int n, int type, int backwards)
   int	mq;
   static int	nsave = 0;
   static pointer	temp;
+  int rffti(int *, float *);
+  int rfftb(int *, float *, float *);
+  int rfftf(int *, float *, float *);
+  int rfftid(int *, double *);
+  int rfftbd(int *, double *, double *);
+  int rfftfd(int *, double *, double *);
 
   if (!n) {			/* cleanup */
     free(temp.v);
@@ -2478,6 +2484,7 @@ int ana_hist(int narg, int ps[]) /* histogram function */
   array	*h;
   pointer q1, q2;
   int	ana_zero(int, int []);
+  void convertWidePointer(wideScalar *, int, int);
 
   if (narg == 2)
     return ana_hist_dense(narg, ps);
@@ -2503,8 +2510,8 @@ int ana_hist(int narg, int ps[]) /* histogram function */
   /* always need the range */
   minmax( q1.l, n, type);
   /* get long (int) versions of min and max */
-  convertWidePointer(&lastmin, type, ANA_LONG);
-  convertWidePointer(&lastmax, type, ANA_LONG);
+  convertPointer(&lastmin, type, ANA_LONG);
+  convertPointer(&lastmax, type, ANA_LONG);
   /* create a long array for results */
   histmin = lastmin.l;
   histmax = lastmax.l;
@@ -4235,7 +4242,7 @@ int cubic_spline_tables(void *xx, int xType, int xStep,
    the data is assumed to be periodic; otherwise it is not. */
 /* LS 9may98; redone using GSL 2009sep27 */
 {
-  int	n, i;
+  int	n;
   pointer xin, yin;
   double *x, *y;
 
@@ -5014,7 +5021,7 @@ int ana_fade_init(int narg, int ps[])
 {
   byte	*p1, *p2;
   word	*q1, *q2;
-  int	n1, n2, n, nd, i, iq;
+  int	n, iq;
 
   iq = ps[0];
   if (!symbolIsNumericalArray(iq) || array_num_dims(iq) != 2)

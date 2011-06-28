@@ -61,6 +61,3 @@ configure.notes
 
 test_XYZ_eclipticPrecession: vsop.o test_XYZ_eclipticPrecession.o precession.o
 	$(CC) $(CFLAGS) $(LDFLAGS) $(LIBS) $^ -o $@
-
-foo3: printf_extensions.o foo3.o calendar.o
-	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@

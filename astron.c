@@ -2981,12 +2981,16 @@ void printXYZtoLBR(double *pos) {
          lbr[0], lbr[1], lbr[2]);
   printf("lon = %.10g, lat = %.10g deg\n",
          lbr[0]*RAD, lbr[1]*RAD);
+  printf("lon = %-#13.2T hms, lat = %-12.2T dms\n",
+          lbr[0]*RAD, lbr[1]*RAD);
 }
 /*--------------------------------------------------------------------------*/
 void printLBRtoXYZ(double *pos) {
   printf("lon = %.10g, lat = %.10g rad, r = %.10g AU\n",
          pos[0], pos[1], pos[2]);
   printf("lon = %.10g, lat = %.10g deg\n",
+         pos[0]*RAD, pos[1]*RAD);
+  printf("lon = %-#13.2T hms, lat = %-12.2T dms\n",
          pos[0]*RAD, pos[1]*RAD);
   double xyz[3];
   LBRtoXYZ(pos, xyz, 0);
@@ -3779,10 +3783,8 @@ int ana_astropos(int narg, int ps[])
     epsilon = obliquity(jd0, &dEps); /* obliquity of the ecliptic corrected */
 				    /* for nutation */
     if (vocal) {
-      printf("ASTRON: obliquity of ecliptic corrected for nutation: %.10g rad\n",
-             epsilon);
-      printf("ASTRON: obliquity of ecliptic corrected for nutation: %.10g deg\n",
-             epsilon*RAD);
+      printf("ASTRON: obliquity of ecliptic corrected for nutation:\n %1$.10g rad = %2$.10g deg = %2$-13.2T\n",
+             epsilon, epsilon*RAD);
     }
     ceps = cos(epsilon);
     seps = sin(epsilon);
@@ -3790,8 +3792,7 @@ int ana_astropos(int narg, int ps[])
 				/* at longitude zero (corrected for */
 				/* nutation), at UT time, in radians */
     if (vocal) {
-      printf("ASTRON: apparent sidereal time (0 longitude, nutation) = %.10g rad\n", Tsid);
-      printf("ASTRON: apparent sidereal time (0 longitude, nutation) = %.10g deg\n", Tsid*RAD);
+      printf("ASTRON: apparent sidereal time (0 longitude, nutation):\n %1$.10g rad = %2$.10g deg = %2$-#13.2T\n", Tsid, Tsid*RAD);
     }
     if (internalMode & S_DATE)
       equinox = jd;
@@ -3940,35 +3941,25 @@ int ana_astropos(int narg, int ps[])
 	memcpy(pos2, pos, (getErrors? 9: 3)*sizeof(double));
         if (vocal) {
           puts("ASTRON: ecliptic planetocentric coordinates:");
-          printf("lon = %.10g rad, lat = %.10g rad, r = %.10g AU\n",
-                 pos2[0], pos2[1], pos2[2]);        
-          printf("lon = %.10g, lat = %.10g deg\n",
-                 pos2[0]*RAD, pos2[1]*RAD);
+          printLBRtoXYZ(pos2);
         }
 	if (latitude != S_PLANETOCENTRIC /* topocentric -> parallax */
 	    || coordSystem == S_EQUATORIAL || coordSystem == S_HORIZONTAL) {
 	  ectoeq(pos2, ceps, seps, 1, getErrors); /* to equatorial coordinates */
           if (vocal) {
             puts("ASTRON: equatorial planetocentric coordinates:");
-            printf("lon = %.10g rad, lat = %.10g rad, r = %.10g AU\n",
-                   pos2[0], pos2[1], pos2[2]);        
-            printf("lon = %.10g, lat = %.10g deg\n",
-                   pos2[0]*RAD, pos2[1]*RAD);
+            printLBRtoXYZ(pos2);
           }
 	  if (latitude != S_PLANETOCENTRIC) {
 	    /* we need to take parallax into account */
 	    pos2[0] = Tsid - longitude - pos2[0]; /* RA to local hour angle */
             if (vocal) {
-              printf("ASTRON: local hour angle = %.10g rad\n", pos2[0]);
-              printf("ASTRON: local hour angle = %.10g deg\n", pos2[0]*RAD);
+              printf("ASTRON: local hour angle:\n %1$.10g rad = %2$.10g deg = %2-#13.2T\n", pos2[0], pos2[0]*RAD);
             }
 	    parallax(pos2, r0, rcp, rsp, getErrors);
             if (vocal) {
               puts("ASTRON: equatorial topocentric coordinates (parallax):");
-              printf("lon = %.10g rad, lat = %.10g rad, r = %.10g AU\n",
-                     pos2[0], pos2[1], pos2[2]);        
-              printf("lon = %.10g, lat = %.10g deg\n",
-                     pos2[0]*RAD, pos2[1]*RAD);
+              printLBRtoXYZ(pos2);
             }
 	    if (coordSystem == S_ECLIPTICAL || coordSystem == S_EQUATORIAL)
 	      pos2[0] = Tsid - longitude - pos2[0]; /* back to RA */
@@ -3983,10 +3974,7 @@ int ana_astropos(int narg, int ps[])
 	    eqtohor(pos2, clat, slat, 1, getErrors);
             if (vocal) {
               puts("ASTRON: horizontal coordinates:");
-              printf("az = %.10g rad, el = %.10g rad, r = %.10g AU\n",
-                     pos2[0], pos2[1], pos2[2]);  
-              printf("az = %.10g, el = %.10g deg\n",
-                     pos2[0]*RAD, pos2[1]*RAD);
+              printLBRtoXYZ(pos2);
             }
           }
 	}
@@ -3997,8 +3985,7 @@ int ana_astropos(int narg, int ps[])
 	  memcpy(pos2, pos, (getErrors? 9: 3)*sizeof(double));
           if (vocal) {
             puts("ASTRON: back to cartesian coordinates:");
-            printf("X = %.10g, Y = %.10g, Z = %.10g AU\n",
-                   pos2[0], pos2[1], pos2[2]);  
+            printXYZtoLBR(pos2);
           }
 	}
       }
@@ -4054,10 +4041,6 @@ int ana_astropos(int narg, int ps[])
       }
   } else if ((internalMode & S_XYZ) == 0)
     for (i = 0; i < nJD*nObjects; i++) {
-      if (vocal) {
-        printf("ASTRON: %.10g rad => %.10g deg\n", f[0], f[0]*RAD);
-        printf("ASTRON: %.10g rad => %.10g deg\n", f[1], f[1]*RAD);
-      }
       f[0] *= RAD;
       f[1] *= RAD;
       f += 3;

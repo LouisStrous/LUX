@@ -14590,7 +14590,7 @@ int evalArrayBinOp(void)
 /* the operands and non-1 in the other.  The smaller operand is repeated */
 /* as needed to service all elements of the larger operand. */
 {
-  int	result, i, i0, nRepeats[MAX_DIMS], action[MAX_DIMS], nAction = 0,
+  int	result, i, nRepeats[MAX_DIMS], action[MAX_DIMS], nAction = 0,
     tally[MAX_DIMS], nCumulR[MAX_DIMS], nCumulL[MAX_DIMS], ndim,
     bigOne;
   extern int	pipeSym, pipeExec;
@@ -14624,7 +14624,7 @@ int evalArrayBinOp(void)
   nRepeat = 1;			/* default number of loops */
   lp.l = array_data(lhs);	/* lhs data */
   rp.l = array_data(rhs);	/* rhs data */
-  for (i0 = i = 0; i < ndim; i++) {
+  for (i = 0; i < ndim; i++) {
     if ((array_dims(rhs)[i] == 1) ^ (array_dims(lhs)[i] == 1)) {
       /* one is 1 and the other is not: implicit dimension */
       if (nRepeat > 1) {	/* already had some ordinary dimensions */
@@ -15111,7 +15111,6 @@ int evalStructPtr(int symbol)
     *dims, ndim, nms, i1, i2, j, k, nelem, *p, ne, type, total_ndim;
   structElem	*se;
   structPtr	*spe;
-  pointer	trgt;
   
   target = struct_ptr_target(symbol); /* target is assumed to be a STRUCT */
   se = struct_elements(target);
@@ -15215,25 +15214,18 @@ int evalStructPtr(int symbol)
     case ANA_TEMP_STRING:	/* a string or string array */
       if (outndim > 1) {	/* a string array */
 	result = array_scratch(type, outndim - 1, outdims + 1);
-	trgt.sp = array_data(result);
       } else {
 	result = string_scratch(0);
-	trgt.sp = &string_value(result);
       }
       break;
     default:			/* everything else */
       if (outndim) { 		/* an array */
 	result = array_scratch(type, outndim, outdims);
-	trgt.v = array_data(result);
       } else {			/* a scalar */
 	result = scalar_scratch(type);
-	trgt.v = &scalar_value(result).b;
       }
       break;
   } /* end of switch (type) */
-
-  
-
 
   return result;
 

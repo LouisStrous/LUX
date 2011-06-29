@@ -769,7 +769,7 @@ int ana_covariance(int narg, int ps[])
 /* LS 2011-04-15 */
 {
   int	result, n, i, done, n2, save[MAX_DIMS], outtype, haveWeights;
-  pointer	xsrc, ysrc, trgt, xsrc0, ysrc0, trgt0, weight, weight0;
+  pointer	xsrc, ysrc, trgt, xsrc0, ysrc0, weight, weight0;
   double	xmean, ymean, xtemp, ytemp, cov, nn;
   loopInfo	xsrcinfo, ysrcinfo, trgtinfo, winfo;
   extern scalar	lastmean;
@@ -861,8 +861,6 @@ int ana_covariance(int narg, int ps[])
     if (haveWeights)
       winfo.naxes++;
   }
-
-  trgt0 = trgt;
 
   /* we make two passes: one to get the average, and then one to calculate */
   /* the standard deviation; this way we limit truncation and roundoff */
@@ -4000,7 +3998,7 @@ int ana_trend(int narg, int ps[]) /*trend function */
   register double	*a;
   double	*fbase, *cfbase;
   pointer qxbase,qybase,qzbase;
-  int	npow, symx, symy, nd, nxq, outer, outerx;
+  int	npow, symx, symy, nd, nxq, outer;
   int	toptype, result_sym;
   int	cana_poly(double *cfbase, pointer *qxbase, int nxq, int npow,
 		  pointer *qzbase, int toptype);
@@ -4025,7 +4023,6 @@ int ana_trend(int narg, int ps[]) /*trend function */
   outer = array_size(symy)/nxq;
 						/* make a fake x array */
   symx = setxpit(toptype, nxq);
-  outerx = 1;
 				/* check type and upgrade as necessary */
   switch (toptype)
   { case ANA_FLOAT:

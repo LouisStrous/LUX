@@ -1479,7 +1479,7 @@ int ana_pencolor(int narg, int ps[])
   int	iq, nx, xflag, n, nred, ngreen, nblue;
   unsigned int	ired, igreen, iblue;
   static float	red, green, blue;
-  char	*pc;
+  char	*pc = NULL;
   float	*pf;
 #ifdef X11
   int	getXcolor(char *colorname, XColor *color, int alloc);
@@ -1732,10 +1732,9 @@ int sform(float xb, float xt)
 {
  /* set default form */
   int	ie, il;
-  float	xq, xc, xd;
+  float	xq, xc;
 
   xc = MAX(ABS(xb), ABS(xt));	
-  xd = MIN(ABS(xb), ABS(xt));
   sprintf(form, "%s", "%8.1e");	/*default*/
   if (xc >= 1.e6 || xc < 1.e-5)
     return 1;
@@ -1799,7 +1798,7 @@ int symplot(float x, float y, int symStyle, int lineStyle)
      0.00216, 0.00318, 0.00411, 0.00495, 0.00566, 0.00624, 0.00666, 0.00691, 
      .007 };
   static float	xp, yp;
-  int	nsym = 8, ns, nsm, ia, ib, ysize, icept, i, iq;
+  int	nsym = 8, ns, nsm, ia, ib, icept, i, iq;
   float	tol = 1.e-5, delx, xq, yq, zq, xq2, yq2, slope, x2, y2, sq, pr;
   float	x1, y1;
   char	thing[2];
@@ -1857,7 +1856,7 @@ int symplot(float x, float y, int symStyle, int lineStyle)
 	   }
          }
 	 else				/* a polygon symbol, more work */
-	 { ysize = symsize*symratio;
+	 { 
 	   ia = is[nsm - 1];
 	   ib = is[ns - 1] - 1;
 		 /* we assume that this is a connected series of lines */  
@@ -1952,7 +1951,7 @@ int symplot(float x, float y, int symStyle, int lineStyle)
   }
 					 /* draw the symbol if in range */
   if (nsm <= nsym) 
-  { ysize = symsize*symratio; 
+  { 
     ia = is[nsm - 1] - 1; 
     ib = is[ns - 1] - 1;
     for (i = ia; i < ib; i++)

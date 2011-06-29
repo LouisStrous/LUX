@@ -307,7 +307,7 @@ int ana_show(int narg, int ps[])
 void symdumpswitch(int nsym, int mode)
 {
   char	*s, *typeName(int), *save;
-  int	nd, j, *ip;
+  int	j, *ip;
   int	evalListPtr(int);
   
   if (symbol_class(nsym) == ANA_TRANSFER || symbol_class(nsym) == ANA_POINTER) {
@@ -359,7 +359,6 @@ void symdumpswitch(int nsym, int mode)
       printw(")\n");
       return;
     case ANA_ASSOC:			/* assoc */
-      nd = assoc_num_dims(nsym);
       s = typeName((int) assoc_type(nsym));
       printwf("lun = %d, offset = %d, ", assoc_lun(nsym),
 	      assoc_has_offset(nsym)? assoc_offset(nsym): 0);

@@ -3298,7 +3298,7 @@ int ana_xcopy(int narg, int ps[])
  /* needs lots of checking which isn't implemented yet */
  /* also just assumes 512x512 for testing */
  {
- int     id1, id2, ixs, iys, ixd, iyd, w, h, ws, wf, hs, hf;
+ int     id1, id2, ixs, iys, ixd, iyd, w, h, ws, hs;
  Drawable        *src, *dest;
  GC      *cgc;
 
@@ -3312,10 +3312,8 @@ int ana_xcopy(int narg, int ps[])
 	 ws = wdmap[-id1];  hs = htmap[-id1]; }
 	 else { src = &(win[id1]);
 	 ws = wd[id1];  hs = ht[id1]; }  
- if (id2 < 0 ) { dest = &(maps[-id2]); cgc = &gcmap[-id2];
-	 wf = wdmap[-id2];  hf = htmap[-id2]; }
-	 else { dest = &(win[id2]); cgc = &gc[id2];
-	 wf = wd[id2];  hf = ht[id2]; }
+ if (id2 < 0 ) { dest = &(maps[-id2]); cgc = &gcmap[-id2]; }
+	 else { dest = &(win[id2]); cgc = &gc[id2]; }
  w = ws; h = hs;
  if (narg > 2) ixs = int_arg( ps[2] );	/* source x1 */
  if (narg > 3) iys = int_arg( ps[3] );	/* source y1 */
@@ -3732,14 +3730,13 @@ int xquery(int narg, int ps[])
 /* note time and position of mouse */
 {
   int	wid;
-  Bool	status;
   Window	qroot, qchild;
 
   wid = narg? int_arg(ps[0]): last_wid;
   if (!win[wid] && ana_xport(1, &wid) == ANA_ERROR)
     return ANA_ERROR;
-  status = XQueryPointer(display, win[wid], &qroot, &qchild, &root_x,
-			 &root_y, &xcoord, &ycoord, &kb);
+  XQueryPointer(display, win[wid], &qroot, &qchild, &root_x,
+                &root_y, &xcoord, &ycoord, &kb);
   /* Note:  status seems to always be True, even if the pointer isn't
      actually in the proper window.  Fix our own: */
   if (xcoord >= 0 && ycoord >= 0 && xcoord < wd[wid] && ycoord < ht[wid])
@@ -3882,7 +3879,6 @@ int ana_xanimate(int narg, int ps[])
 int ana_xzoom(int narg, int ps[])
 /* ZOOM,image [,x,y,window] */
 {
-  Bool	status;
   XEvent	event;
   int	wid, i, type, nx, ny;
   pointer	ptr;
@@ -3906,8 +3902,8 @@ int ana_xzoom(int narg, int ps[])
 			   PointerMotionMask | ButtonPressMask, &event));
   
   while (1) {			/* loop */
-    status = XWindowEvent(display, win[wid],
-			  PointerMotionMask | ButtonPressMask, &event);
+    XWindowEvent(display, win[wid],
+                 PointerMotionMask | ButtonPressMask, &event);
     switch (event.type) {
     case MotionNotify:
       /* remove all pointer motion events - we only want the last one */

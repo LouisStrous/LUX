@@ -89,7 +89,7 @@ int ana_zoom(int narg, int ps[])
     axes[2] = {0, 1}, follow = 0, play = 0, loop, offset, mousepos = 1;
   int	minmax(int *data, int nelem, int type);
   float	x1, x2, y1, y2, dx, dy, z, colorRange = 1.0;
-  pointer	data, image, theprofile, bitmapdata1, bitmap1, bitmapdata2,
+  pointer	data, image, bitmapdata1, bitmap1, bitmapdata2,
     bitmap2;
   char	**zoomText,
     *text[] = { "Zoom            ",
@@ -199,7 +199,6 @@ int ana_zoom(int narg, int ps[])
   internalMode = TV_CENTER;
 
   stride = ana_type_size[type];
-  theprofile.b = NULL;
   image.b = malloc(nx*ny*stride);
   bitmap1.b = bitmapdata1.v? malloc(nx*ny): NULL;
   bitmap2.b = bitmapdata2.v? malloc(nx*ny): NULL;

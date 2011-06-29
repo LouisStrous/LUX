@@ -1295,7 +1295,7 @@ void undefine(int symbol)
 /* free up memory allocated for <symbol> and make it undefined */
 {
   void	zap(int), updateIndices(void);
-  char	hasMem = 0, **key, *temp;
+  char	hasMem = 0;
   int	n, k, oldZapContext, i;
   word	*ptr;
   pointer	p2;
@@ -1317,7 +1317,6 @@ void undefine(int symbol)
       break;
     case ANA_SCAL_PTR:
       if (symbol_type(symbol) == ANA_TEMP_STRING) {
-	temp = scal_ptr_pointer(symbol).s;
 	free(scal_ptr_pointer(symbol).s);
       }
       break;
@@ -1400,7 +1399,6 @@ void undefine(int symbol)
       zapContext = symbol;
       ptr = routine_parameters(symbol);
       n = routine_num_parameters(symbol);
-      key = routine_parameter_names(symbol);
       while (n--)
 	zap(*ptr++);
       n = routine_num_statements(symbol);
@@ -2975,7 +2973,6 @@ int newSubrSymbol(int index)
   an error is generated. */
 {
  int	n, i;
- char	*name;
  extern char	reportBody;
  extern int	findBody;
 
@@ -3005,7 +3002,6 @@ int newSubrSymbol(int index)
    }
  }
  /* no subroutine pointer */
- name = symbolStack[index];
  n = lookForSubr(index);	/* already defined user-defined routine? */
  if (n < 0) {			/* none found */
    if ((n = findInternalSym(index, 1)) >= 0) { /* internal routine */

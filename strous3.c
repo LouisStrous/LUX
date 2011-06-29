@@ -625,85 +625,6 @@ int ana_cspline_find(int narg, int ps[])
   return result;
 }
 /*--------------------------------------------------------------------------*/
-int ana_rtotal(int narg, int ps[])
-/* RTOTAL( <data>, <axes>, <center>) returns the total as a function of
- distance in the dimensions given by <axes> to a center given by
- the coordinates <center>.  LS 20may98 */
-{
-  int	result, dims[MAX_DIMS], axis[MAX_DIMS], i, j, n;
-  float	r, d, center[MAX_DIMS];
-  pointer	src, trgt, centers;
-  loopInfo	srcinfo;
-
-  if (standardLoop(ps[0], ps[1], SL_UPGRADE | SL_EACHCOORD | SL_AXESBLOCK,
-		   ANA_BYTE, &srcinfo, &src, NULL, NULL, NULL) < 0)
-    return ANA_ERROR;
-
-  if (numerical(ps[2], NULL, NULL, &n, NULL) < 0)
-    return ANA_ERROR;
-  if (n != srcinfo.ndim)
-    return cerror(INCMP_ARG, ps[2]);
-  result = ana_float(1, ps + 2);
-  numerical(result, NULL, NULL, NULL, &centers); /* FLOAT center coordinates */
-
-  /* get a list of the desired axes & center coordinates in ascending order */
-  zerobytes(axis, srcinfo.ndim*sizeof(int));
-  zerobytes(dims, srcinfo.ndim*sizeof(int));
-  for (i = 0; i < srcinfo.ndim; i++) {
-    axis[srcinfo.axes[i]] = 1;
-    center[srcinfo.axes[i]] = centers.f[i];
-  }
-
-  /* copy those dimensions that are not in <axes> to the output dimensions */
-  j = 1;
-  for (i = 0; i < srcinfo.ndim; i++)
-    if (!axis[i])
-      dims[j++] = srcinfo.dims[i];
-
-  /* now make the list of axes and center coordinates in order */
-  j = 0;
-  for (i = 0; j < srcinfo.naxes; i++)
-    if (axis[i]) {
-      axis[j] = i;
-      center[j] = center[i];
-    }
-
-  /* determine the size of the result */
-  zerobytes(dims, srcinfo.ndim*sizeof(int));
-  r = 0.0;
-  for (i = 0; i < srcinfo.naxes; i++) {
-    d = (center[i] > srcinfo.dims[i] - center[i])?
-      center[i]: srcinfo.dims[i] - center[i];
-    r += d*d;
-  }
-  n = ((int) sqrt(r)) + 1;
-  dims[0] = n;
-
-  /* now create the result */
-  result = array_scratch(symbol_type(ps[0]), srcinfo.ndim - srcinfo.naxes + 1,
-			 dims);
-  trgt.b = array_data(result);
-
-  /* reorder the axes for the loop */
-  /* NOT YET FINISHED */
-
-  /* and calculate the results */
-  switch (symbol_type(ps[0])) {
-    case ANA_FLOAT:
-      do {
-	r = 0.0;
-	for (i = 0; i < srcinfo.naxes; i++) {
-	  d = srcinfo.coords[i] - center[i];
-	  r += d*d;
-	}
-	r = sqrt(r);		/* distance to center */
-	
-      } while (1);
-  }
-  return result;
-  /* NOT YET FINISHED! */
-}
-/*--------------------------------------------------------------------------*/
 #ifdef WORDS_BIGENDIAN
 #define SYNCH_OK	0xaaaa5555
 #define SYNCH_REVERSE	0x5555aaaa
@@ -1379,7 +1300,7 @@ int ana_dir_smooth2(int narg, int ps[])
 {
   int	iq, nx, ny, ix, iy, c, index, rindex, count, twosided, normalize,
     gaussian, iq0, di, straight;
-  float	x1, y1, x2, y2, *vx0, *vy0, value, vx, vy, s, s0, ds, dslimit,
+  float	x1, y1, x2, y2, *vx0, *vy0, vx, vy, s, s0, ds, dslimit,
     weight, ws, s1, norm;
   pointer	src, trgt, src0;
   loopInfo	srcinfo, trgtinfo;
@@ -1440,7 +1361,6 @@ int ana_dir_smooth2(int narg, int ps[])
 	 small.  We use an exponential decay scale of 2 steps and
 	 a limit value of 0.2. */
       dslimit = 1.0;		/* current weighted average of step sizes */
-      value = 0.0;
       while (count--) {
 	rindex = 0;		/* index relative to current start location */
 	ix = srcinfo.coords[0];	/* x pixel coordinate */
@@ -1562,7 +1482,6 @@ int ana_dir_smooth2(int narg, int ps[])
 	 small.  We use an exponential decay scale of 2 steps and
 	 a limit value of 0.2. */
       dslimit = 1.0;		/* current weighted average of step sizes */
-      value = 0.0;
       ws = 0.0;
       while (count--) {
 	rindex = 0;		/* index relative to current start location */

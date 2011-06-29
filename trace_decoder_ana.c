@@ -910,14 +910,12 @@ int trace_scan(x, limit)
 	if (nx == 1024 && GapCount > 1) {
 	 for (i=0;i<(GapCount-1);i++) {
 	  short *source;
-	  int	mode, istart, iroll_before, iroll_after, icq;
-	  int	i1,i2,i3,i4,iq,j1,j2;
+	  int	mode, istart, icq;
+	  int	i1,i2,i3,i4,iq,j1;
 	  float	s1, s2;
 	  short	v1,v2,v3,v4;
 	  istart = gapblock[i];
 	  /* printf("initial istart = %d, istart*64 = %d\n", istart, istart*64); */
-	  iroll_before = gaprollover[i];
-	  iroll_after  = gaprollover[i+1];
 	  iq = (istart%64);
 	  if (iq != 0) istart = (iq+1)*64;  /* next higher if not on boundary */
 	  source = dct + istart*64;	/* a 4096 boundary in pixels */
@@ -966,14 +964,14 @@ int trace_scan(x, limit)
 	  if (mode) {
 	   /* the mode = 1 case, here we want s2 > s1 or we need a change */
 	   if (s2 < s1) {
-	    if (i1 == 0) { j1 = 1;  j2 = -1;}
-	    else if (i2 == 0) { j2 = 1;  j1 = -1;}
+	    if (i1 == 0) { j1 = 1;}
+	    else if (i2 == 0) { j1 = -1;}
 	    else {	/* normal case, consider merit of two possibilities */
 	    dismerit1 = ABS((float) i1 + 1.0 - gap_rollf[i])+
 	    	ABS((float) i2 - 1.0 - gap_rollf[i+1]);
 	    dismerit2 = ABS((float) i1 - 1.0 - gap_rollf[i])+
 	    	ABS((float) i2 + 1.0 - gap_rollf[i+1]);
-		if (dismerit1 < dismerit2) { j1 = 1; j2 = -1; } else { j1 = -1; j2 = 1; }
+		if (dismerit1 < dismerit2) { j1 = 1; } else { j1 = -1; }
 	   }
 	    /* printf("re-align, j1 = %d\n", j1); */
 	   /* remember that gaprollover is now the accumulated rollover, so only change
@@ -984,14 +982,14 @@ int trace_scan(x, limit)
 	  } else {
 	   /* the mode = 0 case, here we want s1 > s2 or we need a change */
 	   if (s1 < s2) {
-	    if (i1 == 0) { j1 = 1;  j2 = -1;}
-	    else if (i2 == 0) { j2 = 1;  j1 = -1;}
+	    if (i1 == 0) { j1 = 1;}
+	    else if (i2 == 0) { j1 = -1;}
 	    else {	/* normal case, consider merit of two possibilities */
 	    dismerit1 = ABS((float) i1 + 1.0 - gap_rollf[i])+
 	    	ABS((float) i2 - 1.0 - gap_rollf[i+1]);
 	    dismerit2 = ABS((float) i1 - 1.0 - gap_rollf[i])+
 	    	ABS((float) i2 + 1.0 - gap_rollf[i+1]);
-		if (dismerit1 < dismerit2) { j1 = 1; j2 = -1; } else { j1 = -1; j2 = 1; }
+		if (dismerit1 < dismerit2) { j1 = 1; } else { j1 = -1; }
 	   }
 	    /* printf("re-align, j1 = %d\n", j1); */
 	   gaprollover[i] += j1;

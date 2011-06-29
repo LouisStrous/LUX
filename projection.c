@@ -910,6 +910,7 @@ int comparePtrs(const void *ptr1, const void *ptr2)
   return 0;
 }
 /*---------------------------------------------------------------------*/
+#if 0
 int scanPolygon(int *x1, int *x2, int *y, char code)
 /* scans through an integer-coordinate polygon, depending on <code>. */
 /* the polygon is assumed non-self-intersecting! */
@@ -1053,6 +1054,7 @@ int ana_inPolygon(int narg, int ps[])
   scanPolygon(&nx, x, y, POLY_INIT);
   return 1;
 }
+#endif
 /*---------------------------------------------------------------------*/
 int tkhide(float x, float y, float z, int mode)
 {
@@ -1104,9 +1106,7 @@ int hiddenLine(float x, float y, int mode)
   static drawnArea	*area = NULL; /* pointer to drawn areas */
   static int	nDrawnFree,	/* number of areas for which memory is
 				   currently allocated and available */
-    nDrawn,			/* number of areas currently being drawn */
-    drawCur;			/* the index of the currently active area */
-  static float	xcur, ycur;
+    nDrawn;			/* number of areas currently being drawn */
   int	i;
 
   if (mode & (HL_NEW_CANVAS | HL_NEW_AREA)) {
@@ -1146,18 +1146,12 @@ int hiddenLine(float x, float y, int mode)
     if (!area[nDrawn].top || !area[nDrawn].bottom)
       return cerror(ALLOC_ERR, 0);
     area[nDrawn].nTopFree = area[nDrawn].nBottomFree = HL_SEGMENT_BLOCK;
-    drawCur = nDrawn;
     nDrawn++;
     nDrawnFree--;
   } /* end of if (mode & (HL_NEW | HL_NEW_AREA)) */
 
-  if (mode & HL_MOVE) {		/* move only */
-    xcur = x;
-    ycur = y;
-  } /* end of if (mode & HL_MOVE) */
   return ANA_OK;
 }
-/*---------------------------------------------------------------------*/
 /*---------------------------------------------------------------------*/
 int ana_projectmap(int narg, int ps[])
 /* PROJECTIMAGE(map, h [, HDIST=delta, ANGLE=angle, MAG=mag, XMAP=xmap, */

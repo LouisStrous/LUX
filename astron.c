@@ -2906,7 +2906,7 @@ void extraElementsHeliocentric(double JDE, double *equinox, double *f,
   double m;
 
   if (haveExtraElements & 4) {	/* new */
-    double i, node, peri, absmag, ci, si, cn, sn,
+    double i, node, peri, ci, si, cn, sn,
       ff, g, p, qq;
     int ii;
 
@@ -2916,7 +2916,6 @@ void extraElementsHeliocentric(double JDE, double *equinox, double *f,
     i = extraElements[4]*DEG;
     node = extraElements[5]*DEG;
     peri = extraElements[6]*DEG;
-    absmag = extraElements[8];
     v_factor = (e == 1)? 0: sqrt(fabs((1 + e)/(1 - e)));
     switch (haveExtraElements & 3) {
       case 2:			/* /QELEMENTS */
@@ -3254,7 +3253,7 @@ void XYZtoLBR(double *pos, double *pos2, int getErrors)
 void ectoeq(double *pos, double ceps, double seps, char forward, int getErrors)
 /* transforms from ecliptical to equatorial coordinates or vice versa */
 { 
-  double	alpha, delta, sl, cl, sb, cb, d[6], ca, sa, cd, sd;
+  double	alpha, delta, sl, cl, sb, cb, d[6], ca, sa, cd;
 
   sl = sin(pos[0]);
   cl = cos(pos[0]);
@@ -3272,7 +3271,6 @@ void ectoeq(double *pos, double ceps, double seps, char forward, int getErrors)
   { ca = cos(pos[0]);
     sa = sin(pos[0]);
     cd = cos(pos[1]);
-    sd = sin(pos[1]);
     der[0] = (ceps*cl*ca + sl*sa)*ca; /* da/dl */
     der[1] = cb*cl*seps/cd;	/* dd/dl */
     der[2] = 0.0;		/* dr/dl */
@@ -3600,7 +3598,7 @@ int ana_astropos(int narg, int ps[])
      /* 8 - Neptune, 9 - Pluto, 10 - Moon. */
 {
   char	tdt, *string;
-  int	iq, nJD, nJDdims, *JDdims, *object, nObjects, object0, dims[MAX_DIMS],
+  int	iq, nJD, *object, nObjects, object0, dims[MAX_DIMS],
     nDims, i, j, n, result, coordSystem, count, vocal, getErrors;
   double	*JD, *f, *f0, jd0, djd, djd0, r, r0, dPsi,
     dEps, epsilon, ceps, seps, longitude, latitude, height = 0.0, rsp,
@@ -3623,15 +3621,11 @@ int ana_astropos(int narg, int ps[])
       iq = ana_double(1, &iq);
       JD = &scalar_value(iq).d;
       nJD = 1;
-      nJDdims = 1;
-      JDdims = &nJD;
       break;
     case ANA_ARRAY:
       iq = ana_double(1, &iq);
       JD = (double *) array_data(iq);
       nJD = array_size(iq);
-      nJDdims = array_num_dims(iq);
-      JDdims = array_dims(iq);
       break;
     default:
       return cerror(ILL_CLASS, *ps);

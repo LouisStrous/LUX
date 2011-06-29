@@ -3065,7 +3065,7 @@ void read_a_number_fp(FILE *fp, scalar *value, int *type)
 /* Fixed reading of numbers with exponents.  LS 11jul2000 */
 {
   int	base = 10, kind, sign, ch;
-  char	*p, *numstart, *p2;
+  char	*p, *numstart;
 
   *type = ANA_LONG;		/* default */
   /* skip non-digits, non-signs */
@@ -3185,7 +3185,6 @@ void read_a_number_fp(FILE *fp, scalar *value, int *type)
 	while (isdigit((int) p[-1]));
       }
       kind = toupper(p[-1]);
-      p2 = NULL;
       *type = ANA_FLOAT;	/* default */
       if (kind == 'D' || kind == 'E') {
 	if (kind == 'D') {

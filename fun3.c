@@ -2192,7 +2192,7 @@ int ana_power(int narg, int ps[])
 int ana_scb(int narg, int ps[])	/* scb routine */		
 /* backwards sine-cosine style FFT --  scb, x, s, c */
 {
-  int	iq, nd, outer, nx, n, mq, dim[8], type, j, jq, nd2, outer2, nx2;
+  int	iq, nd, outer, nx, n, mq, dim[8], type, j, jq, outer2, nx2;
   pointer	q1,q2,q3;
   int	ezffti(int *n, float *wsave), ezfftid(int *n, double *wsave),
     ezfftb(int *n, float *r, float *azero, float *a, float *b, float *wsave),
@@ -2219,7 +2219,6 @@ int ana_scb(int narg, int ps[])	/* scb routine */
   outer = array_size(iq)/nx;
   memcpy(dim + 1, array_dims(iq) + 1, (nd - 1)*sizeof(int));
   q3.l = array_data(jq);
-  nd2 = array_num_dims(jq);
   nx2 = array_dims(jq)[0];
   outer2 = array_size(jq)/nx2;
 
@@ -3761,7 +3760,7 @@ int ana_scale(int narg, int ps[])
 /* add keyword /FULLRANGE: scale between 0 and the greatest color */
 /* cell index.  LS 30jul96 23mar99 */
 {
-  int	iq, type, result_sym, nd, n, oldScalemin, oldScalemax;
+  int	iq, type, result_sym, n, oldScalemin, oldScalemax;
   scalar	min, max;
   register	pointer q1, q2;
   double	sd, qd;
@@ -3778,7 +3777,6 @@ int ana_scale(int narg, int ps[])
     return cerror(NEED_ARR, iq);
   type = array_type(iq);
   q1.l = array_data(iq);
-  nd = array_num_dims(iq);
   n = array_size(iq);
   result_sym = array_clone(iq, colorIndexType);
   q2.l = array_data(result_sym);
@@ -3858,7 +3856,7 @@ int ana_scalerange(int narg, int ps[])
    is specified, then !ZOOMLOW and !ZOOMHIGH are taken for <lowvalue>
    and <hivalue>, respectively.  LS 16oct98 */
 {
-  int	iq, type, result_sym, nd, n, oldScalemin, oldScalemax;
+  int	iq, type, result_sym, n, oldScalemin, oldScalemax;
   scalar	min, max;
   register	pointer q1, q2;
   double	sd, qd, logrey, higrey;
@@ -3883,7 +3881,6 @@ int ana_scalerange(int narg, int ps[])
     higrey = 1.0;
   type = array_type(iq);
   q1.l = array_data(iq);
-  nd = array_num_dims(iq);
   n = array_size(iq);
   result_sym = array_clone(iq, colorIndexType);
   q2.l = array_data(result_sym);

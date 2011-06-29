@@ -892,15 +892,13 @@ void getmin(float *p, float *x0, float *y0)
 /*------------------------------------------------------------------------- */
 int getmin2(float *p, float *x0, float *y0)
 {
-  float	a, b, c, d, e, f, det;
+  float	a, b, c, d, e, det;
 
   a = (p[0] - 2*p[1] + p[2] + p[3] - 2*p[4] + p[5] + p[6] - 2*p[7] + p[8])/6;
   b = (p[0] + p[1] + p[2] - 2*(p[3] + p[4] + p[5]) + p[6] + p[7] + p[8])/6;
   c = (p[0] - p[2] - p[6] + p[8])/4;
   d = (-p[0] + p[2] - p[3] + p[5] - p[6] + p[8])/6;
   e = (-p[0] - p[1] - p[2] + p[6] + p[7] + p[8])/6;
-  f = (-p[0] + 2*p[1] - p[2] + 2*p[3] + 5*p[4] + 2*p[5] - p[6]
-       + 2*p[7] - p[8])/9;
   det = c*c - 4*a*b;
   det = det? 1.0/det: 0.0;
   *x0 = (2*b*d - c*e)*det;
@@ -913,7 +911,7 @@ int expandImage(int iq, float sx, float sy, int smt) /* expand function */
 {
   int	n, m, ns, ms, dim[2], j, i, inc, nc, result_sym, oldi, type, ns2;
   float	zc1, zc2, z00, z01, z10, z11, xq;
-  float	stepx, stepy, yrun, xrun, xbase, q, p, fn, fm;
+  float	stepx, stepy, yrun, xrun, xbase, q, p, fn;
   array	*h;
   pointer base, jbase, out, jout, nlast;
 				/* first argument must be a 2-D array */
@@ -930,7 +928,6 @@ int expandImage(int iq, float sx, float sy, int smt) /* expand function */
   else
     m = 1;
   fn = (float) n;
-  fm = (float) m;
 					/* get the magnification(s) */
 				/* make sure they're positive  LS 1jul94 */
   if (sx < 0)
@@ -2122,7 +2119,7 @@ int ana_index(int narg, int ps[])
  /* the index is returned as a long array of the same size */
  /* uses heap sort only */
 {
-  int	iq, type, result_sym, nd, n, nloop, step1, step2, nloop2;
+  int	iq, type, result_sym, n, nloop, step1, step2, nloop2;
   pointer	p, q;
   /* SGI cc does not accept combination of (int, byte *) and (int, word *) */
   /* functions in one array of function pointers, not even if the function */
@@ -2140,7 +2137,6 @@ int ana_index(int narg, int ps[])
   if (type >= ANA_CFLOAT)
     return cerror(ILL_TYPE, iq, typeName(type));
   q.l = (int *) array_data(iq);
-  nd = array_num_dims(iq);
   n = array_size(iq);
   if (n <= 1)			/* nothing to sort */
     return ANA_ZERO;
@@ -2183,7 +2179,7 @@ int zoomer2(byte *ain, int n, int m, int *symout, int *nx2, int *ny2,
 /* creates a symbol $zoom_temp to allow re-use of memory for some calls */
 /* RAS */
 {
- int	ns, ms, dim[2], j, i, inc, ns4, result_sym, leftover;
+ int	ns, ms, dim[2], j, i, ns4, result_sym, leftover;
  byte	*pin, *pout, *poutbase, tmp;
  int	*p1, *p2, k;
 #ifdef __alpha
@@ -2205,7 +2201,6 @@ int zoomer2(byte *ain, int n, int m, int *symout, int *nx2, int *ny2,
  ns = ns + leftover;		/* thus ns is 0 mod 4 */
  *nx2 = ns;			/* return output width */
  *ny2 = ms;			/* return output height */
- inc = ns - 1;
  dim[0] = ns;
  dim[1] = ms;
  /* depending on the state of sym_flag, we create a temporary symbol
@@ -2304,7 +2299,7 @@ int zoomer3(byte *ain, int n, int m, int *symout, int *nx2, int *ny2,
  /* creates a symbol $zoom_temp to allow re-use of memory for some calls */
 /* RAS */
 {
-  int	ns, ms, dim[2], j, i, inc, ns4, result_sym, leftover;
+  int	ns, ms, dim[2], j, i, ns4, result_sym, leftover;
   byte	*pin, *pout, *poutbase, tmp;
   int	*p1, *p2, *p3, nst2, tmpint, k, nsd2;
 
@@ -2319,7 +2314,6 @@ int zoomer3(byte *ain, int n, int m, int *symout, int *nx2, int *ny2,
   dim[0] = ns;
   dim[1] = ms;
   nst2 = 2*ns;
-  inc = ns -1;
   /* depending on the state of sym_flag, we create a temporary symbol
      or use $zoom_temp, the latter is for tvplanezoom */
   if (sym_flag) {
@@ -2450,7 +2444,7 @@ int zoomer8(byte *ain, int n, int m, int *symout, int *nx2, int *ny2,
 /* RAS */
 {
   int	ns, ms, dim[2], j, i, result_sym;
-  byte	*pin, *pout, *poutbase;
+  byte	*pin, *poutbase;
   union	{ byte	bb[4];   int  ii; } tmp;
   int	*p1, *p2, delta;
 
@@ -2474,7 +2468,7 @@ int zoomer8(byte *ain, int n, int m, int *symout, int *nx2, int *ny2,
       return ANA_ERROR;
   }
   *symout = result_sym;
-  pout = poutbase = array_data(result_sym);
+  poutbase = array_data(result_sym);
   p1 = (int *) poutbase;
   delta = 2*(n - 1);
   
@@ -2519,7 +2513,7 @@ int zoomer16(byte *ain, int n, int m, int *symout, int *nx2, int *ny2,
 /* RAS */
 {
   int	ns, ms, dim[2], j, i, result_sym;
-  byte	*pin, *pout, *poutbase;
+  byte	*pin, *poutbase;
   union	{ byte	bb[4];   int  ii; } tmp;
   int	*p1, *p2, delta;
 
@@ -2543,7 +2537,7 @@ int zoomer16(byte *ain, int n, int m, int *symout, int *nx2, int *ny2,
       return ANA_ERROR;
   }
   *symout = result_sym;
-  pout = poutbase = array_data(result_sym);
+  poutbase = array_data(result_sym);
   p1 = (int *) poutbase;
   delta = 4*(n - 1);
 
@@ -2643,7 +2637,7 @@ int compress2(byte *ain, int n, int m, int *symout, int *nx2, int *ny2,
 /* creates a symbol $zoom_temp to allow re-use of memory for some calls */
 /* RAS */
 {
-  int	ns, ms, dim[2], inc, result_sym;
+  int	ns, ms, dim[2], result_sym;
   byte	*pin, *pout, *poutbase, *p1, *p2;
   int	nx, ny, xq, nskip;
 
@@ -2653,7 +2647,6 @@ int compress2(byte *ain, int n, int m, int *symout, int *nx2, int *ny2,
   ms = m/2;
   *nx2 = ns;
   *ny2 = ms;
-  inc = ns - 1;
   dim[0] = ns;
   dim[1] = ms;
   /* depending on the state of sym_flag, we create a temporary symbol
@@ -2697,7 +2690,7 @@ int compress4(byte *ain, int n, int m, int *symout, int *nx2, int *ny2,
 /* creates a symbol $zoom_temp to allow re-use of memory for some calls */
 /* RAS */
 {
- int	ns, ms, dim[2], inc, result_sym;
+ int	ns, ms, dim[2], result_sym;
  byte	*pin, *pout, *poutbase, *p1, *p2, *p3, *p4;
  int	nx, ny, xq, nskip;
 
@@ -2707,7 +2700,6 @@ int compress4(byte *ain, int n, int m, int *symout, int *nx2, int *ny2,
  ms = m/4;
  *nx2 = ns;
  *ny2 = ms;
- inc = ns - 1;
  dim[0] = ns;
  dim[1] = ms;
  /* depending on the state of sym_flag, we create a temporary symbol

@@ -1926,7 +1926,7 @@ int string_sub(int narg, int ps[])
  LS 19aug98 */
 {
   /* this is a subset of cases for arrays since strings are 1-D */
-  int	iq, n, result_sym, nd, ns, nsym, i;
+  int	iq, n, result_sym, ns, nsym, i;
   char	*p, *q;
   pointer p2;
 
@@ -1962,7 +1962,6 @@ int string_sub(int narg, int ps[])
       /* a string is created with length = # elements in array */
       iq = ana_long(1, &iq);	/* get a long version */
       p2.l = (int *) array_data(iq);
-      nd = array_num_dims(iq);
       ns = array_size(iq);
       result_sym = string_scratch(ns);
       q = string_value(result_sym);
@@ -2833,7 +2832,7 @@ int ana_subsc_subgrid(int narg, int ps[])
    LS 19aug98 */
 {
   byte	class, type;
-  int	ndim, *dims, nelem, i, subsc[MAX_DIMS], nSubsc, iq, j, mid,
+  int	ndim, *dims, i, subsc[MAX_DIMS], nSubsc, iq, j, mid,
     stride[MAX_DIMS], index, tally[MAX_DIMS], step[2][MAX_DIMS];
   float	*coord[MAX_DIMS], d[MAX_DIMS];
   scalar	value, cvalue;
@@ -2850,7 +2849,6 @@ int ana_subsc_subgrid(int narg, int ps[])
       src.l = array_data(ps[narg]);
       ndim = array_num_dims(ps[narg]);
       dims = array_dims(ps[narg]);
-      nelem = array_size(ps[narg]);
       break;
   }
 

@@ -1311,7 +1311,7 @@ int OLDinsert(int nsym)
 {
  extern int	trace, step;
  int	target, source, nArg, nSubsc, *indexPtr, subArg[MAX_DIMS],
-	nTarget, nTargetDims, nSourceDims, stringTarget, *dims, nSource, i,
+	nTarget, nTargetDims, stringTarget, *dims, nSource, i,
 	size, offset, j, subscArray, stringSource, stride;
  pointer	src, trgt;
  int	ana_assoc_output(int, int, int, int),
@@ -1449,13 +1449,12 @@ int OLDinsert(int nsym)
  switch (symbol_class(source))
  { case ANA_SCALAR:
      src.b = &scalar_value(source).b;  nSource = 1;
-     nSourceDims = 1;  break;
+     break;
    case ANA_ARRAY:
      nSource = array_size(source);  src.b = (byte *) array_data(source);
-     nSourceDims = array_num_dims(source);  break;
+     break;
    case ANA_STRING:
      src.s = string_value(source);
-     nSourceDims = 1;
 	/* for insertion in string array, count number of strings, not size */
      nSource = (stringTarget == ANA_ARRAY)? 1: string_size(source);
      break;

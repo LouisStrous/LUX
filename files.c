@@ -548,7 +548,7 @@ int input_format_check(char *format, char **next, char **widths, int *datatype,
    <stdlib.h>: strtol()
  */
 {
-  int	big, explicit, width;
+  int	big, explicit;
   char	*p, *p2;
 
   /* skip initial whitespace: not all compilers handle it the same way */
@@ -580,7 +580,7 @@ int input_format_check(char *format, char **next, char **widths, int *datatype,
   *number = 0;			/* count elements per format */
   *widths = format;
   while (1) {
-    width = strtol(format, &format, 10); /* format width - if any */
+    strtol(format, &format, 10); /* format width - if any */
     (*number)++;
     if (*format == '-')		/* format set */
       format++;
@@ -2310,7 +2310,7 @@ int gscanf(void **source, char *format, void *arg, int isString)
 {
   static char	*aformat = NULL;
   static int	nformat = 0;
-  int	ok, i;
+  int	i;
 
   i = strlen(format) + 2;
   if (i > nformat) {
@@ -2331,17 +2331,17 @@ int gscanf(void **source, char *format, void *arg, int isString)
     if (!*((char **) source) || !**((char **) source)) /* empty string */
       return 0;
     if (arg) 			/* want to keep the argument */
-      ok = sscanf(*((char **) source), aformat, arg, &i);
+      sscanf(*((char **) source), aformat, arg, &i);
     else
-      ok = sscanf(*((char **) source), aformat, &i);
+      sscanf(*((char **) source), aformat, &i);
     *(char **) source += i;	/* advance string pointer */
   } else {			/* reading from a file */
     if (feof(*((FILE **) source)))
       return 0;
     if (arg) 
-      ok = fscanf(*((FILE **) source), aformat, arg, &i);
+      fscanf(*((FILE **) source), aformat, arg, &i);
     else
-      ok = fscanf(*((FILE **) source), aformat, &i);
+      fscanf(*((FILE **) source), aformat, &i);
   }
   /* if arg == NULL, then we read zero items, so ok is always zero. */
   /* in that case we can only detect success from the value of i, which */
@@ -3256,7 +3256,9 @@ int fzread(int narg, int ps[], int flag) /* fzread subroutine */
     int     tsize, nblocks, bsize;
     byte    slice_size, type; } ch;
  
+#if WORDS_BIGENDIAN
   union { int i;  byte b[4];} lmap;
+#endif
 
 	 /* first arg is the variable to load, second is name of file */
   if (symbol_class(ps[1]) != ANA_STRING)
@@ -3314,10 +3316,8 @@ int fzread(int narg, int ps[], int flag) /* fzread subroutine */
     endian(&ch.tsize, sizeof(int), ANA_LONG);
     endian(&ch.nblocks, sizeof(int), ANA_LONG);
     endian(&ch.bsize, sizeof(int), ANA_LONG);
-#endif
     for (i = 0; i < 4; i++)
       lmap.b[i] = fh->cbytes[i];
-#if WORDS_BIGENDIAN
     endian(&lmap.i, sizeof(int), ANA_LONG);
 #endif
     mq = ch.tsize - 14;
@@ -5223,7 +5223,7 @@ int ana_hex(int narg, int ps[])
   register int	nelem;
   register union types_ptr p1;
   register int	j;
-  int i,k,iq,jq,nd,flag=0;
+  int i,k,iq,jq,flag=0;
   char	*ptr;
 
   fp = stdout;
@@ -5253,7 +5253,6 @@ int ana_hex(int narg, int ps[])
 	if ( sym[iq].spec.array.bstore < 3) fprintf(fp, "%.1s",ptr); else
 	  fprintf(fp, "%s",ptr); flag=1; break;
       case ANA_ARRAY:		/*array case */
-    nd = array_num_dims(iq);
     nelem = array_size(iq);
     ptr = array_data(iq);
     jq = sym[iq].type;
@@ -5720,9 +5719,9 @@ int fits_read_compressed(int mode, int datasym, FILE *fp, int headersym,
   for (i = 7 + ndim; i < 36; i++)
     if (!strncmp(curblock + 80*i, "END      ", 9))
       break;
-    else sscanf(block + i*80, "BSCALE  =%f", &bscale)
-	   || sscanf(block + i*80, "BZERO   =%f", &bzero)
-	   || sscanf(block + i*80, "BLANK   =%f", &blank);
+    else (void) (sscanf(block + i*80, "BSCALE  =%f", &bscale)
+                 || sscanf(block + i*80, "BZERO   =%f", &bzero)
+                 || sscanf(block + i*80, "BLANK   =%f", &blank));
   
   while (i == 36) {
     nblock++;
@@ -5754,9 +5753,9 @@ int fits_read_compressed(int mode, int datasym, FILE *fp, int headersym,
     for (i = 0; i < 36; i++)
       if (!strncmp(curblock + 80*i, "END      ", 9))
 	break;
-      else sscanf(block + i*80, "BSCALE  =%f", &bscale)
-	     || sscanf(block + i*80, "BZERO   =%f", &bzero)
-	     || sscanf(block + i*80, "BLANK   =%f", &blank);
+      else (void) (sscanf(block + i*80, "BSCALE  =%f", &bscale)
+                   || sscanf(block + i*80, "BZERO   =%f", &bzero)
+                   || sscanf(block + i*80, "BLANK   =%f", &blank));
   } /* end of while (i == 36) */
 
   if (!usescrat)
@@ -5927,7 +5926,7 @@ int fits_read(int mode, int dsym, int namsym, int hsym, int offsetsym,
   int	bitpix, type, nlines, end_flag = 0, nhblks, lc, iq, id, new_sym;
   int	maxdim, i, rsym = 1, nbsize, ext_flag=0, data_offset, npreamble;
   int	fits_type, ndim_var, *dim_var, n_ext_rows, nrow_bytes, m;
-  int	xtension_found = 0, xdata_offset, tfields, gcount, row_bytes,
+  int	xtension_found = 0, tfields, gcount, row_bytes,
     dim[MAX_DIMS], type0;
   int	ext_stuff_malloc_flag = 0;
   float	bscale = 0.0, bzero = 0.0, blank = FLT_MAX, min, max;
@@ -6322,7 +6321,6 @@ int fits_read(int mode, int dsym, int namsym, int hsym, int offsetsym,
     
     /* check out */
     /* printf("nhblks = %d, maxdim = %d\n", nhblks, maxdim); */
-    xdata_offset = ext_flag + nhblks * 2880;
     /* for (i=0;i<maxdim;i++) printf("extension: dim%d = %d\n", i, dim[i]); */
     /* compute size of data array */
     nbsize = ana_type_size[type];
@@ -6962,7 +6960,7 @@ int ana_filewrite(int narg, int ps[])
    <stdio.h>: FILE, fseek(), perror(), fwrite(), printf()
  */
 {
-  int	iq, lun, type, j, start, num, nd, typesize;
+  int	iq, lun, type, j, start, num, typesize;
   char	*p;
   FILE	*fp;
 
@@ -6990,7 +6988,6 @@ int ana_filewrite(int narg, int ps[])
     case ANA_ARRAY:		/*array case */
       p = (char *) array_data(iq);
       typesize = num = ana_type_size[type];
-      nd = array_num_dims(iq);
       num = array_size(iq);
       break;
     default:

@@ -1211,7 +1211,7 @@ int area_general(int narg, int ps[], int isFunction)
  LS 17jun98, 5sep98 */
 {
   int	iq, *dims, ndim, nelem, nSeed, nNumber, nDirection, *seed, *number,
-    i, ndo, *rcoord, *offset, j, nStack, **stack, **stack0, areaNumber,
+    i, *rcoord, *offset, j, nStack, **stack, **stack0, areaNumber,
     direction, *edge;
   int	*ptr0, *ptr, *ptrend, **stackend, *ptr1, onEdge, ix, ix2, *ptr2;
   pointer	src;
@@ -1257,7 +1257,6 @@ int area_general(int narg, int ps[], int isFunction)
 
   nelem = array_size(ps[0]);	/* number of elements in array */
   if (nSeed) {
-    ndo = nSeed;		/* number of positions to treat */
     for (i = 0; i < nSeed; i++)
       if (seed[i] < 0 || seed[i] >= nelem) { /* check if in range */
 	free(offset);
@@ -1266,8 +1265,6 @@ int area_general(int narg, int ps[], int isFunction)
 		     seed[i], i);
       }
   } else
-    ndo = nelem;		/* treat all elements */
-  
   /* treat all elements that are on an edge: if they are equal to 1, then
      set them to EDGE */
   for (i = 0; i < 2*srcinfo.ndim; i++) {
@@ -1898,7 +1895,7 @@ int area2_general(int narg, int ps[])
  LS 17jun98, 5sep98 */
 {
   int	iq, *dims, ndim, nelem, nSeed, nNumber, nDirection, *seed, *number,
-    i, ndo, *rcoord, *offset, j, nStack, **stack, **stack0, areaNumber,
+    i, *rcoord, *offset, j, nStack, **stack, **stack0, areaNumber,
     direction, stride, maximum, type, *edge;
   int	*ptr0, *ptr, *ptrend, **stackend, *ptr1, onEdge, ix, ix2, *ptr2;
   pointer	src, dataptr0, dataptr, dataptr2;
@@ -1935,13 +1932,11 @@ int area2_general(int narg, int ps[])
 
   nelem = array_size(ps[0]);
   if (nSeed) {
-    ndo = nSeed;		/* number of positions to treat */
     for (i = 0; i < nSeed; i++)
       if (seed[i] < 0 || seed[i] >= nelem) /* check if in range */
 	return anaerror("Seed position %1d (index %1d) outside of the data",
 		     ps[2], seed[i], i);
-  } else
-    ndo = nelem;		/* treat all elements */
+  }
 
   number = NULL;		/* default: no <number> */
   if (narg > 3 && ps[3]) {	/* have <number> */
@@ -2524,7 +2519,7 @@ int ana_basin2(int narg, int ps[])
 {
   int	result, mode, n, i, j, k, *offsets, *rcoords, edge = 0,
     mini, loc[3], nel, label = 0, sign, maxi = 0;
-  pointer	src, trgt, src0, trgt0;
+  pointer	src, trgt, trgt0;
   scalar	min[3], max[3];
   extern struct boundsStruct	bounds;
   loopInfo	srcinfo, trgtinfo;
@@ -2542,7 +2537,6 @@ int ana_basin2(int narg, int ps[])
 		   &srcinfo, &src, &result, &trgtinfo, &trgt) < 0)
     return ANA_ERROR;
   trgt0 = trgt;
-  src0 = src;
   nel = array_size(ps[0]);
   
   if (narg > 1 && ps[1]) {	/* SIGN */

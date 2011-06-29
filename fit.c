@@ -486,7 +486,7 @@ int ana_generalfit(int narg, int ps[])
       for (j = 0; j < nPar; j++)
         err[j] = 0;             /* so all errors are zero */
     } else for (i = 0; i < nPar; i++) {/* check all parameters */
-      double    h, h0, hmax, hmin, qmin, qmax;
+      double    h, h0, hmax, hmin, qmax;
 
       if (!step[i]) {           /* this parameter was kept fixed, */
         err[i] = 0;             /* so we have no error estimate */
@@ -530,7 +530,6 @@ int ana_generalfit(int narg, int ps[])
       /* now get ready for bisecting */
       hmax = h;                 /* set the initial bisection bounds */
       hmin = 0;
-      qmin = -1;                /* minimum error/minimum error - 2 */
       /* calculate the error offset at the upper bound */
       par[i] = parBest2[i] + hmax;/* current upper bound */
       if (fitSym) {
@@ -561,7 +560,6 @@ int ana_generalfit(int narg, int ps[])
           qmax = qual;
         } else {
           hmin = h;
-          qmin = qual;
         }
       } while (fabs(qual) > 1e-4);
       err[i] = h;
@@ -593,7 +591,6 @@ int ana_generalfit(int narg, int ps[])
       /* now get ready for bisecting */
       hmax = h;                 /* set the initial bisection bounds */
       hmin = 0;
-      qmin = -1;                /* minimum error/minimum error - 2 */
       /* calculate the error offset at the upper bound */
       par[i] = parBest2[i] - hmax;/* current lower bound */
       if (fitSym) {
@@ -624,7 +621,6 @@ int ana_generalfit(int narg, int ps[])
           qmax = qual;
         } else {
           hmin = h;
-          qmin = qual;
         }
       } while (fabs(qual) > 1e-4);
       err[i] = 0.5*(err[i] + h)/sqrt(2*qBest2);
@@ -840,7 +836,7 @@ int ana_geneticfit(int narg, int ps[])
         [,/ELITE,/BYTE,/WORD,/LONG,/FLOAT,/DOUBLE]) */
 {
   int   fitSym, iq, nPoints, nPopulation, nPar, fitTemp, i, j, size, result,
-    *rtoi, pair, k, w, generation, i1, i2, icross, imutate, ibit,
+    *rtoi, pair, k, w, generation, i1, i2, ibit,
     iter = 0, vocal, typesize, nGeneration;
   uscalar p;
   word  *par, fitPar, xSym, ySym, fitArg[4], wSym;
@@ -1077,8 +1073,6 @@ int ana_geneticfit(int narg, int ps[])
      after <mutatemark> pairs */
   crossmark = pcross? random_one()/pcross: LONG_MAX; /* bytes */
   mutatemark = pmutate? random_one()/pmutate: LONG_MAX; /* bits */
-  icross = random_one()*crossmark;
-  imutate = random_one()*mutatemark;
 
   byte *child1 = malloc(size);
   byte *child2 = malloc(size);

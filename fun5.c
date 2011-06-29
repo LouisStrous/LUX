@@ -104,6 +104,7 @@ int ana_subshiftc(int narg, int ps[]) /* LCT for a cell, sym version */
   return ANA_OK;
 }
 /*------------------------------------------------------------------------- */
+#if 0
 int ana_fluxcell(int narg, int ps[]) /* optical flux for a cell  */
      /* wants 3 arrays, first 2 are the subimages and third is mask */
      /* returns the shift */
@@ -168,6 +169,7 @@ void fluxcell(double *xa, double *xb, double *msk, int nx, int ny)
     x2++;
   }
 }
+#endif
  /*------------------------------------------------------------------------- */
 double mert(double sx, double sy)
  {
@@ -280,17 +282,16 @@ void  subshift(x, r, nx, ny)
  double	*r, *x;
  int     nx, ny;
  {
- int     nxs, nys;
+ int     nxs;
  double  sum, cs0, cs1, cs2, cs3, t2, t1, t0, t3;
  double  parts[5][5], xx[3][3], xdx[3][2], xdy[2][3], xmmpp[2][2], xppmm[2][2]; 
  double  partsdx[5][3], partsdy[3][5], partsppmm[3][3], partsmmpp[3][3];
  double  cmm,c0m,cpm,cm0,c00,cp0,cmp,c0p,cpp,sumxx;
  double	 qbest, qcur, outside, qd;
  int     i, j, nxm2, nym2, ii, jj, mflag;
- double	*rp, *rp2, *row, *rp3, *rowq, *qp;
+ double	*rp, *rp2, *row, *rowq, *qp;
 
  nxs = nx;
- nys = ny;
  nxm2 = nx - 2;
  nym2 = ny - 2;
   
@@ -542,7 +543,6 @@ void  subshift(x, r, nx, ny)
  while (j--) {
  rp = row;
  rp2 = rp + 1;
- rp3 = rp +2;
  qp = rowq;
  row += nxs;	rowq += nxs;
  i = nxm2;
@@ -565,7 +565,6 @@ void  subshift(x, r, nx, ny)
  while (j--) {
  rp = row;
  rp2 = rp + 1;
- rp3 = rp +2;
  qp = rowq;
  row += nxs;	rowq += nxs;
  i = nxm2;
@@ -587,7 +586,6 @@ void  subshift(x, r, nx, ny)
  while (j--) {
  rp = row;
  rp2 = rp + 1;
- rp3 = rp +2;
  qp = rowq;
  row += nxs;	rowq += nxs;
  i = nxm2;
@@ -814,14 +812,13 @@ double  subshiftc(xa, xb, nx, ny)
  double	*xa, *xb;
  int     nx, ny;
  {
- int     nxs, nys;
+ int     nxs;
  double  t2, t1, t4, t3, d1, d2, d3, d4, sxz, syz;
  double	 x0, x1, x2, x3, y0, y1, y2, y3;
  int     i, j, n, stride;
  double	*xpa1, *xpa2, *xpb1, *xpb2;
 
  nxs = nx;
- nys = ny;
  stride = nxs - nx;
  a1=a2=a3=a4=a5=a6=a7=a8=a9=a10=0.0; 
  xpa1 = xa;
@@ -905,14 +902,13 @@ double  subshiftc_apod(xa, xb, gg, nx, ny)
  double	*xa, *xb, *gg;
  int     nx, ny;
  {
- int     nxs, nys;
+ int     nxs;
  double  t2, t1, t4, t3, d1, d2, d3, d4, sxz, syz;
  double	 x0, x1, x2, x3, y0, y1, y2, y3, gapod;
  int     i, j, n, stride;
  double	*xpa1, *xpa2, *xpb1, *xpb2, xq;
 
  nxs = nx;
- nys = ny;
  stride = nxs - nx;
  a1=a2=a3=a4=a5=a6=a7=a8=a9=a10=0.0; 
  xpa1 = xa;

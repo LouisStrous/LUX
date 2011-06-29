@@ -1000,7 +1000,7 @@ int ana_differ(int narg, int ps[])
   LS 24nov92 */
 {
   pointer	src, trgt, order;
-  int	result, nOrder, loop, o, ww, stride, offset1, offset2, offset3,
+  int	result, nOrder, loop, o, ww, stride, offset1, offset3,
     w1, one = 1, iq, n, type, i, old, circular;
   loopInfo	srcinfo, trgtinfo;
 
@@ -1070,7 +1070,6 @@ int ana_differ(int narg, int ps[])
       ww = srcinfo.rdims[0];
     stride = srcinfo.step[0];
     offset1 = -ww*stride;
-    offset2 = srcinfo.step[0]*ww;
     offset3 = offset1 + srcinfo.rdims[0]*stride;
     w1 = (internalMode & 1)? ww/2: ww;
     switch (symbol_type(iq)) {
@@ -2145,7 +2144,7 @@ int ana_table(int narg, int ps[])
  int	symx, symy, symf, topType, nTable, nOut, nRepeat, ix, n1,
 	symr, i, nsymx, nsymy, nsymf, nLoop, n2;
  array	*hx, *hy, *hf, *hMax, *hr;
- pointer	x, y, xf, r, ox, oy, of, nx, ny, nf;
+ pointer	x, y, xf, r, ox, oy, of, nx, ny;
  scalar	grad;
  int	ana_table2d(int, int []);
 
@@ -2225,7 +2224,6 @@ int ana_table(int narg, int ps[])
  of.l = LPTR(hf);
  nx.b = ox.b + sym[symx].spec.array.bstore - sizeof(array);
  ny.b = oy.b + sym[symy].spec.array.bstore - sizeof(array);
- nf.b = of.b + sym[symf].spec.array.bstore - sizeof(array);
  r.l = LPTR(hr);
 	/* now the real work */
 	/* Search strategy:  hope that the next xnew value is near

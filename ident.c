@@ -350,7 +350,7 @@ int Sprintf_general(char *str, char *format, va_list ap)
 /* Sprintf does not attempt to write into <format>. */
 {
   static formatInfo	ownfmi, *fmi;
-  int	precision, width, n;
+  int	width, n;
   double	d, d2;
   char	*p;
   static char	tmp[20];
@@ -363,7 +363,6 @@ int Sprintf_general(char *str, char *format, va_list ap)
     fmi = &theFormat;
 
   width = fmi->width;
-  precision = fmi->precision;
 
   if (fmi->type == FMT_ERROR)	/* some error */
     return ANA_ERROR;

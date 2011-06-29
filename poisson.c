@@ -422,7 +422,6 @@ int ana_antilaplace2d(int narg, int ps[])
 {
   int img, result = ANA_ERROR, nx, ny, type, nx2, ny2, nlevel, i, nelem;
   pointer src, tgt;
-  scalar sx, sy;
   Pyramid pyramid;
 
   img = ps[0];
@@ -482,7 +481,6 @@ int ana_antilaplace2d(int narg, int ps[])
       if (ny2 > 1)
 	ny2 /= 2;
     }
-    sx.f = sy.f = 1;
     break;
   case ANA_DOUBLE:
     tgt.d = pyramid->data.d;
@@ -497,7 +495,6 @@ int ana_antilaplace2d(int narg, int ps[])
       if (ny2 > 1)
 	ny2 /= 2;
     }
-    sx.d = sy.d = 1;
     break;
   }
 

@@ -616,7 +616,7 @@ int plotxy(float xx[], float yy[], float ex[], float ey[], int n, int dx,
     /* the label */
     if (fabs(x) < 0.001*stepx)
       x = 0.0;			/* so we don't get 0 with roundoff error */
-    Sprintf(curScrat, ixlog? "%1g": plotxfmt, ixlog? pow(10,x): x);
+    sprintf(curScrat, ixlog? "%1g": plotxfmt, ixlog? pow(10,x): x);
     callig(curScrat, 0, 0, fsized, 0, ifont, 0);
     f = wxb + (x - xmin)*stepxdvi - 0.5*callig_xb;
     if (f > xlabel) {		/* if there is room */
@@ -674,7 +674,7 @@ int plotxy(float xx[], float yy[], float ex[], float ey[], int n, int dx,
     /* the label */
     if (fabs(y) < 0.001*stepy)
       y = 0.0;			/* so we don't get 0 with roundoff error */
-    Sprintf(curScrat, iylog? "%1g": plotyfmt, iylog? pow(10,y): y);
+    sprintf(curScrat, iylog? "%1g": plotyfmt, iylog? pow(10,y): y);
     callig(curScrat, 0, 0, fsized, 0, ifont, 0);
     if (callig_xb > xlabel)
       xlabel = callig_xb;
@@ -802,7 +802,7 @@ int clipToWindow(float *xo, float *yo, float x[2], float y[2], float **w)
 {
   float	dx, dy, *xx, *yy, savex, savey;
   int	c1, c2;
-  int	result;
+  int	result = NONE_IN;
   static char	action[9][9] = 
   { { 0, 0, 0, 0, 1, 2, 0, 2, 2 }, 
     { 0, 0, 0, 2, 1, 2, 2, 2, 2 }, 

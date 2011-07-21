@@ -2480,8 +2480,8 @@ int copyEvalSym(int source)
 }
 /*-------------------------------------------------------------------------*/
 int (*ana_converts[10])(int, int []) = {
-  ana_byte, ana_word, ana_long, ana_float, ana_double, NULL,
-  NULL, NULL, ana_cfloat, ana_cdouble
+  ana_byte, ana_word, ana_long, ana_float, ana_double, ana_string,
+  ana_string, ana_string, ana_cfloat, ana_cdouble
 };
 int getNumerical(int iq, int minType, int *n, pointer *src, char mode,
 		 int *result, pointer *trgt)

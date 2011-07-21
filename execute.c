@@ -18,8 +18,9 @@ static char rcsid[] __attribute__ ((unused)) =
 extern int	nFixed, traceMode;
 
 int	nArg, currentEVB = 0, suppressMsg = 0;
+unsigned int internalMode;
 int	nExecuted = 0, executeLevel = 0, fileLevel = 0,
-	internalMode, returnSym, noTrace = 0, curRoutineNum = 0;
+	returnSym, noTrace = 0, curRoutineNum = 0;
 char	preserveKey;
 
 char	*currentRoutineName = NULL;
@@ -566,8 +567,8 @@ int matchKey(word index, char **keys, int *var)
 /* always nonnegative).  *var returns the same, except in the ZEROKEY case, */
 /* in which *var receives the index to the parameter list. */
 {
- char	*key, *theKey, modeKey;
- int	n, l, indx, theMode;
+  char	*key, *theKey, modeKey, negate;
+  unsigned int	n, l, indx, theMode;
 
  if (symbol_class(index) != ANA_STRING)
    return anaerror("Non-string keyword??", index);
@@ -577,7 +578,12 @@ int matchKey(word index, char **keys, int *var)
    for (n = indx = 0; *keys; n++) {
      preserveKey = 0;
      modeKey = 0;
+     negate = 0;
      theKey = *keys++;
+     if (*theKey == '~') {      /* unset bits corresponding to mode */
+       negate = 1;
+       theKey++;
+     }
      if (isdigit((byte) *theKey)) {
        modeKey = 1;
        theMode = strtol(theKey, &theKey, 10);
@@ -588,7 +594,10 @@ int matchKey(word index, char **keys, int *var)
      }
      if (!strncmp(key, theKey, l)) {
        if (modeKey) {
-	 internalMode |= theMode;
+         if (negate)
+           internalMode &= ~theMode;
+         else
+           internalMode |= theMode;
 	 *var = ORKEY;
 	 return *var;
        }
@@ -598,7 +607,10 @@ int matchKey(word index, char **keys, int *var)
      else if (l > 2 && !strncmp(key + 2, theKey, l - 2)
 	      && !strncmp(key, "NO", 2)) {
        if (modeKey) {
-	 internalMode &= ~theMode;
+         if (negate)
+           internalMode |= theMode;
+         else
+           internalMode &= ~theMode;
 	 *var = ORKEY;
 	 return *var;
        }

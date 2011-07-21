@@ -2525,13 +2525,8 @@ int read_formatted_ascii(int narg, int ps[], void *ptr, int showerrors,
 		sprintf(scr, "%%%1d%s", theFormat.width, theFormat.start);
 	      else
 		strcpy(scr, theFormat.start);
-	    } else {
-	      if (theFormat.width > 0)
-		sprintf(scr, (*theFormat.spec_char == 's')? "%%%1d[^ \n]":
-			"%%%1d[^\n]", theFormat.width);
-	      else
-		strcpy(scr, (*theFormat.spec_char == 's')? "%[^ \n]":
-		       "%[^\n]");
+	    } else {            /* %s or %S */
+              strcpy(scr, theFormat.start);
 	    }
 	    p = scr + strlen(scr) + 1; /* beyond specification */
 	    if (!(len = gscanf(&ptr, scr, p, isString))) /* read */

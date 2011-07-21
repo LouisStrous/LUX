@@ -51,7 +51,7 @@ install:
 uninstall:
 	./uninstall-sh
 clean:
-	rm -f *.o $(EXEC)
+	rm -f *.o
 distclean:
 	rm -f *.o $(EXEC) config.cache config.log Makefile
 

@@ -682,7 +682,7 @@ extern int ana_abs(), ana_acos(), ana_arestore_f(), ana_arg(),
   ana_eval(), ana_exp(), ana_expand(), ana_expm1(),
   ana_extract_bits_f(), ana_extreme_general(), ana_f_ratio(),
   ana_fcwrite_f(), ana_fft_f(), ana_fftshift_f(), ana_fileptr_f(),
-  ana_filesize(), ana_filetype_name(), ana_find(), ana_findfile(),
+  ana_filesize(), ana_filetype_name(), ana_find(), ana_find2(), ana_findfile(),
   ana_find_max(), ana_find_maxloc(), ana_find_min(),
   ana_find_minloc(), ana_fitskey(), ana_fits_header_f(),
   ana_fits_read_f(), ana_fits_xread_f(), ana_float(), ana_floor(),
@@ -904,7 +904,7 @@ internalRoutine function[] = {
   { "CRUNCH",	3, 3, ana_crunch_f, 0 }, /* crunch.c */
   { "CSPLINE",	0, 5, ana_cubic_spline, /* fun3.c */
     "1KEEP:2PERIODIC:4GETDERIVATIVE" },
-  { "CSPLINE_FIND", 1, 4, ana_cspline_find, "::AXIS:INDEX" }, /* strous3.c */
+  { "CSPLINE_FIND", 2, 4, ana_cspline_find, ":::AXIS:INDEX" }, /* strous3.c */
   { "CTOP",	1, 3, ana_cartesian_to_polar, 0 }, /* fun4.c */
   { "DATE_FROM_TAI", 1, 2, ana_date_from_tai, 0 }, /* ephem.c */
   { "DBLARR",	1, MAX_DIMS, dblarr, 0 }, /* symbols.c */
@@ -954,7 +954,7 @@ internalRoutine function[] = {
   { "FILETYPENAME", 1, 1, ana_filetype_name, 0 }, /* install.c */
   { "FIND",	2, 4, ana_find,	/* strous.c */
     "0EXACT:1INDEX_GE:2VALUE_GE:4FIRST" },
-  { "CSPLINE_FIND", 2, 4, ana_cspline_find, ":::AXIS:INDEX" }, /* strous3.c */
+  { "FIND2",    2, 2, ana_find2, "0EXACT" },    /* strous.c */
   { "FINDFILE",	2, 2, ana_findfile, 0 }, /* files.c */
   { "FIND_MAX",	1, 3, ana_find_max, /* strous2.c */
     "::DIAGONAL:1DEGREE:2SUBGRID" },
@@ -3946,7 +3946,6 @@ int ana_symbol_memory()
 int ana_trace(int narg, int ps[])
 /* activates/deactivates trace facility */
 {
-  extern int	internalMode;
   extern float	CPUtime;
 
   if (narg > 0)

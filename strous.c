@@ -565,6 +565,100 @@ int ana_find(int narg, int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
+int ana_find2(int narg, int ps[])
+/* FIND2(array, key) */
+{
+  int *data_dims, data_dim_count, data_count, keys_count, result, type;
+  pointer data, keys, target;
+  int i, j;
+
+  if (numerical_or_string(ps[0], &data_dims, &data_dim_count, &data_count, &data) < 0)
+    return ANA_ERROR;
+  if (numerical_or_string(ps[1], NULL, NULL, &keys_count, &keys) < 0)
+    return ANA_ERROR;
+  if (symbol_type(ps[1]) != symbol_type(ps[0])) {
+    if (symbol_type(ps[1]) > symbol_type(ps[0])) {
+      int iq = ana_converts[symbol_type(ps[1])](1, &ps[0]);
+      numerical_or_string(iq, NULL, NULL, NULL, &data);
+      type = symbol_type(ps[1]);
+    } else {
+      int iq = ana_converts[symbol_type(ps[0])](1, &ps[1]);
+      numerical_or_string(iq, NULL, NULL, NULL, &keys);
+      type = symbol_type(ps[0]);
+    }
+  }
+  switch (symbol_class(ps[1])) {
+  case ANA_SCALAR: case ANA_STRING:
+    result = scalar_scratch(ANA_LONG);
+    target.b = &scalar_value(result).b;
+    break;
+  case ANA_ARRAY:
+    result = array_clone(ps[1], ANA_LONG);
+    target.v = array_data(result);
+  default:
+    return cerror(ILL_CLASS, ps[1]);
+  }
+  switch (type) {
+  case ANA_BYTE:
+    for (i = 0; i < keys_count; i++) {
+      for (j = 0; j < data_count; j++)
+        if (*keys.b == data.b[j])
+          break;
+      *target.l++ = (j == data_count? -1: j);
+      keys.b++;
+    }
+    break;
+  case ANA_WORD:
+    for (i = 0; i < keys_count; i++) {
+      for (j = 0; j < data_count; j++)
+        if (*keys.w == data.w[j])
+          break;
+      *target.w++ = (j == data_count? -1: j);
+      keys.w++;
+    }
+    break;
+  case ANA_LONG:
+    for (i = 0; i < keys_count; i++) {
+      for (j = 0; j < data_count; j++)
+        if (*keys.l == data.l[j])
+          break;
+      *target.l++ = (j == data_count? -1: j);
+      keys.l++;
+    }
+    break;
+  case ANA_FLOAT:
+    for (i = 0; i < keys_count; i++) {
+      for (j = 0; j < data_count; j++)
+        if (*keys.f == data.f[j])
+          break;
+      *target.l++ = (j == data_count? -1: j);
+      keys.f++;
+    }
+    break;
+  case ANA_DOUBLE:
+    for (i = 0; i < keys_count; i++) {
+      for (j = 0; j < data_count; j++)
+        if (*keys.d == data.d[j])
+          break;
+      *target.l++ = (j == data_count? -1: j);
+      keys.d++;
+    }
+    break;
+  case ANA_STRING_ARRAY:
+    for (i = 0; i < keys_count; i++) {
+      for (j = 0; j < data_count; j++)
+        if (!strcmp(*keys.sp, data.sp[j]))
+          break;
+      *target.l++ = (j == data_count? -1: j);
+      keys.sp++;
+    }
+    break;
+  default:
+    return anaerror("Illegal type in arguments to FIND2 function", 0);
+  }
+  return result;
+}
+/*------------------------------------------------------------------------- */
 #include <errno.h>
 int ana_help(int narg, int ps[])
 /* HELP,'topic' */

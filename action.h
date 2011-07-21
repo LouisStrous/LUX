@@ -6,7 +6,7 @@
 extern char		expname[], line[], *curScrat, *currentRoutineName;
 extern word		listStack[],  curContext;
 extern int		scrat[], ana_file_open[], errorSym,
-			internalMode, MSBfirst, suppressMsg;
+			MSBfirst, suppressMsg;
 extern int	ana_type_size[];
 
 extern FILE		*inputStream, *ana_file[];
@@ -15,7 +15,8 @@ extern hashTableEntry	*varHashTable[], *subrHashTable[], *funcHashTable[],
 extern symTableEntry	sym[];
 extern internalRoutine	subroutine[], function[];
 extern int		nSubroutine, nFunction, curLineNumber, compileLevel,
-			internalMode, ignoreInput, curSymbol, axisTally[];
+			ignoreInput, curSymbol, axisTally[];
+extern unsigned int     internalMode;
 extern struct boundsStruct	bounds;
 extern int	(*ana_converts[10])(int, int []);
 

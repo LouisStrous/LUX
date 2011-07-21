@@ -77,8 +77,8 @@ void LBRfromVSOPD(double T, int object, double *pos)
       gatherTruncVSOP(T, &indices[6*3*(object - 1) + 6], planetTermsD, 
                       &pos[1], getAstronError? &pos[4]: NULL);
 				/* heliocentric distance (AU) */
-      gatherTruncVSOP(T, &indices[6*3*(object - 1) + 12], &pos[2], 
-                      planetTermsD, getAstronError? &pos[5]: NULL);
+      gatherTruncVSOP(T, &indices[6*3*(object - 1) + 12], planetTermsD,
+                      &pos[2], getAstronError? &pos[5]: NULL);
       if (getAstronError)
 	pos[6] = pos[7] = pos[8] = 0.0;
       break;

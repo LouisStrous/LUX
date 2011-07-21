@@ -206,8 +206,8 @@ static char	haveExtraElements;
 extern int getAstronError;
 extern int fullVSOP;
 
-void LBRtoXYZ(double *pos, double *pos2, int getErrors),
-  XYZtoLBR(double *, double *, int getErrors),
+void LBRtoXYZ(double *pos, double *pos2),
+  XYZtoLBR(double *, double *),
   XYZ_eclipticPrecession(double *pos, double equinox1, double equinox2);
 
 int idiv(int x, int y)
@@ -2823,7 +2823,7 @@ double interpolate_angle(double a1, double a2, double f)
 }
 /*--------------------------------------------------------------------------*/
 int extraHeliocentric(double JDE, int object, double *equinox,
-                      double *f, double *r, int getErrors)
+                      double *f, double *r)
 /* For <JDE>, return the polar coordinates of <object> in <f>, and the
  equinox for which it was specified in <equinox>. */
 {
@@ -2893,13 +2893,11 @@ int extraHeliocentric(double JDE, int object, double *equinox,
       * sin((qq->zangle*d2 + qq[1].zangle*d1) + m);
   }
   *equinox = pp->equinox;
-  if (getErrors)			/* no errors known */
-    f[3] = f[4] = f[5] = f[6] = f[7] = f[8] = 0.0;
   return 1;
 }
 /*--------------------------------------------------------------------------*/
-void extraElementsHeliocentric(double JDE, double *equinox, double *f,
-			       double *r, int getErrors)
+void extraElementsHeliocentric(double JDE, double *equinox, double *f, 
+                               double *r)
 {
   static double	xfac, yfac, zfac, xangle, yangle, zangle, epoch, m0, n,
 	v_factor, e, a, q, theequinox;
@@ -2932,7 +2930,7 @@ void extraElementsHeliocentric(double JDE, double *equinox, double *f,
       case 1:			/* default */
 	if (e == 1) {
 	  anaerror("Parabolic orbits have an infinite semimajor axis", 0);
-	  for (ii = 0; ii < (getErrors? 9: 3); ii++)
+	  for (ii = 0; ii < 3; ii++)
 	    f[ii] = 0.0;
 	  *r = 0.0;
 	  return;
@@ -2967,15 +2965,13 @@ void extraElementsHeliocentric(double JDE, double *equinox, double *f,
   f[0] = *r*xfac*sin(xangle + m);
   f[1] = *r*yfac*sin(yangle + m);
   f[2] = *r*zfac*sin(zangle + m);
-  if (getErrors)			/* no errors known */
-    f[3] = f[4] = f[5] = f[6] = f[7] = f[8] = 0.0;
 }
 /*--------------------------------------------------------------------------*/
 void printXYZtoLBR(double *pos) {
   printf("X = %.10g, Y = %.10g, Z = %.10g AU\n",
          pos[0], pos[1], pos[2]);
   double lbr[3];
-  XYZtoLBR(pos, lbr, 0);
+  XYZtoLBR(pos, lbr);
   printf("lon = %.10g, lat = %.10g rad, r = %.10g AU\n",
          lbr[0], lbr[1], lbr[2]);
   printf("lon = %.10g, lat = %.10g deg\n",
@@ -2992,26 +2988,26 @@ void printLBRtoXYZ(double *pos) {
   printf("lon = %-#13.2T hms, lat = %-12.2T dms\n",
          pos[0]*RAD, pos[1]*RAD);
   double xyz[3];
-  LBRtoXYZ(pos, xyz, 0);
+  LBRtoXYZ(pos, xyz);
   printf("X = %.10g, Y = %.10g, Z = %.10g AU\n",
          pos[0], pos[1], pos[2]);
 }
 /*--------------------------------------------------------------------------*/
 void heliocentricXYZr(double JDE, int object, double equinox, double *pos,
-		      double *r, double tolerance, int vocal, int getErrors)
+		      double *r, double tolerance, int vocal)
      /* returns in <f> the cartesian heliocentric eclipic coordinates of
 	object <object> for the desired <equinox> at <JDE>, and in
 	<r> the heliocentric distance */
 {
   double	T, standardEquinox;
   int	i;
-  void XYZfromVSOPA(double, int, double *, double, int);
+  void XYZfromVSOPA(double, int, double *, double);
 
   T = (JDE - J2000)/365250;	/* Julian millennia since J2000.0 */
   switch (object) {
   case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7:
   case 8:
-    XYZfromVSOPA(T, object, pos, tolerance, getErrors);
+    XYZfromVSOPA(T, object, pos, tolerance);
     /* heliocentric cartesian coordinates referred to the mean
        dynamical ecliptic and equinox of J2000.0 */
     if (vocal) {
@@ -3089,14 +3085,14 @@ void heliocentricXYZr(double JDE, int object, double equinox, double *pos,
       eclipticPrecession(pos, JDE, equinox);
       printf("ASTRON: lunar ecliptic geocentric coordinates for equinox:\n");
       printLBRtoXYZ(pos);
-      LBRtoXYZ(pos, XYZmoon, getErrors);
+      LBRtoXYZ(pos, XYZmoon);
 
-      XYZfromVSOPA(T, 3, pos, tolerance, getErrors); /* position of Earth */
+      XYZfromVSOPA(T, 3, pos, tolerance); /* position of Earth */
       XYZ_eclipticPrecession(pos, JDE, equinox);
       pos[0] += XYZmoon[0];
       pos[1] += XYZmoon[1];
       pos[2] += XYZmoon[2];
-      *r = sqrt(pos[0]*pos[0] + pos[1]*pos[1] + pos[2]*pos[2]);
+      *r = hypota(3, pos);
       if (vocal) {
         printf("ASTRON: lunar ecliptic heliocentric coordinates for equinox:\n");
         printXYZtoLBR(pos);
@@ -3106,26 +3102,26 @@ void heliocentricXYZr(double JDE, int object, double equinox, double *pos,
   case -1:			/* ELEMENTS object - if defined */
     if (!haveExtraElements) {
       anaerror("Illegal object number %1d", 0, object);
-      for (i = 0; i < (getErrors? 9: 3); i++)
+      for (i = 0; i < 3; i++)
 	pos[i] = 0.0;
       *r = 0.0;
       return;
     }
-    extraElementsHeliocentric(JDE, &standardEquinox, pos, r, getErrors);
+    extraElementsHeliocentric(JDE, &standardEquinox, pos, r);
     if (standardEquinox == EQUINOX_OF_DATE)
       standardEquinox = JDE;
     if (fabs(standardEquinox - equinox) > 1) { /* precession */
 	/* currently circuitous -> inefficient */
-      double f[9];
-      XYZtoLBR(pos, f, getErrors);
+      double f[3];
+      XYZtoLBR(pos, f);
       eclipticPrecession(f, standardEquinox, equinox);
-      LBRtoXYZ(f, pos, getErrors);
+      LBRtoXYZ(f, pos);
     }
     break;
   default:
-    if (extraHeliocentric(JDE, object, &standardEquinox, pos, r, getErrors)
+    if (extraHeliocentric(JDE, object, &standardEquinox, pos, r)
 	== ANA_ERROR) {		/* cartesian */
-      for (i = 0; i < (getErrors? 9: 3); i++)
+      for (i = 0; i < 3; i++)
 	pos[i] = 0.0;
       *r = 0.0;
       return;
@@ -3134,16 +3130,15 @@ void heliocentricXYZr(double JDE, int object, double equinox, double *pos,
       standardEquinox = JDE;
     if (fabs(standardEquinox - equinox) > 1) { /* precession */
       /* currently circuitous -> inefficient */
-      double f[9];
-      XYZtoLBR(pos, f, getErrors);
+      double f[3];
+      XYZtoLBR(pos, f);
       eclipticPrecession(f, standardEquinox, equinox);
-      LBRtoXYZ(f, pos, getErrors);
+      LBRtoXYZ(f, pos);
     }
     break;
   }
 }
 /*--------------------------------------------------------------------------*/
-static double der[9];
 void propagateError(double *der, double *var, double *var2)
 /* takes the covariances in <var> and calculates the transformed covariances */
 /* according to the partial derivatives in <der>, and stores the results */
@@ -3188,7 +3183,7 @@ void propagateError(double *der, double *var, double *var2)
 		der[4]*der[8]*var[5]));	/* d11 d22 cov_x[12]) */
 }
 /*--------------------------------------------------------------------------*/
-void LBRtoXYZ(double *pos, double *pos2, int getErrors)
+void LBRtoXYZ(double *pos, double *pos2)
      /* calculates cartesian coordinates XYZ from polar coordinates LBR.
       pos must be unequal to pos2. */
 {
@@ -3202,21 +3197,9 @@ void LBRtoXYZ(double *pos, double *pos2, int getErrors)
   pos2[0] = pos[2]*cb*cl;	/* X */
   pos2[1] = pos[2]*cb*sl;	/* Y */
   pos2[2] = pos[2]*sb;		/* Z */
-  if (getErrors)
-  { /* calculate vX vY vZ from vL vB vR */
-    der[0] = -pos[2]*cb*sl;	/* dX/dL */
-    der[1] = pos[2]*cb*cl;	/* dY/dL */
-    der[2] = 0.0;		/* dZ/dL */
-    der[3] = -pos[2]*sb*cl;	/* dX/dB */
-    der[4] = -pos[2]*sb*sl;	/* dY/dB */
-    der[5] = pos[2]*cb;		/* dZ/dB */
-    der[6] = cb*cl;		/* dX/dR */
-    der[7] = cb*sl;		/* dY/dR */
-    der[8] = sb;		/* dZ/dR */
-    propagateError(der, pos + 3, pos2 + 3); }
 }
 /*--------------------------------------------------------------------------*/
-void XYZtoLBR(double *pos, double *pos2, int getErrors)
+void XYZtoLBR(double *pos, double *pos2)
 /* transform from cartesian to polar coordinates.  pos must be unequal to
  pos2 */
 {
@@ -3229,31 +3212,12 @@ void XYZtoLBR(double *pos, double *pos2, int getErrors)
   if (pos2[0] < 0)
     pos2[0] += TWOPI;
   pos2[1] = r? asin(pos[2]/pos2[2]): 0.0;	/* B */
-  if (getErrors) {		/* covariances */
-    if (h) {
-      der[0] = -pos[1]/(h*h);	/* dL/dX */
-      der[3] = pos[0]/(h*h);	/* dL/dY */
-      if (r) {
-	der[1] = -pos[0]*pos[2]/(h*r*r); /* dB/dX */
-	der[4] = -pos[1]*pos[2]/(h*r*r); /* dB/dY */
-      } else
-	der[1] = der[4] = 0.0;
-    } else der[0] = der[1] = der[3] = der[4] = 0.0;
-    if (r) {
-      der[2] = pos[0]/r;	/* dR/dX */
-      der[5] = pos[1]/r;	/* dR/dY */
-      der[7] = h/(r*r);		/* dB/dZ */
-      der[8] = pos[2]/r;	/* dR/dZ */
-    } else der[2] = der[5] = der[7] = der[8] = 0.0;
-    der[6] = 0.0;		/* dL/dZ */
-    propagateError(der, pos + 3, pos2 + 3);
-  }
 }
 /*--------------------------------------------------------------------------*/
-void ectoeq(double *pos, double ceps, double seps, char forward, int getErrors)
+void ectoeq(double *pos, double ceps, double seps, char forward)
 /* transforms from ecliptical to equatorial coordinates or vice versa */
 { 
-  double	alpha, delta, sl, cl, sb, cb, d[6], ca, sa, cd;
+  double	alpha, delta, sl, cl, sb, cb;
 
   sl = sin(pos[0]);
   cl = cos(pos[0]);
@@ -3267,19 +3231,6 @@ void ectoeq(double *pos, double ceps, double seps, char forward, int getErrors)
   delta = asin(sb*ceps + cb*seps*sl);
   pos[0] = alpha;
   pos[1] = delta;
-  if (getErrors)
-  { ca = cos(pos[0]);
-    sa = sin(pos[0]);
-    cd = cos(pos[1]);
-    der[0] = (ceps*cl*ca + sl*sa)*ca; /* da/dl */
-    der[1] = cb*cl*seps/cd;	/* dd/dl */
-    der[2] = 0.0;		/* dr/dl */
-    der[3] = -seps*ca*ca/(cl*cb*cb); /* da/db */
-    der[4] = (cb*ceps - sb*seps*sl)/cd;	/* dd/db */
-    der[5] = der[6] = der[7] = 0.0; /* dr/db, da/dr, dd/dr */
-    der[8] = 1.0;		/* dr/dr */
-    propagateError(der, pos + 3, d);
-    memcpy(pos + 3, d, 6*sizeof(double)); }
 }
 /*--------------------------------------------------------------------------*/
 void galtoeq(double *pos, double equinox, char forward)
@@ -3385,7 +3336,7 @@ int ana_astrf(int narg, int ps[], int forward) {
       }
       switch (from) {
       case 2:			/* ecliptical */
-	ectoeq(pos, ceps, seps, 1, 0);
+	ectoeq(pos, ceps, seps, 1);
 	break;
       case 3:			/* galactic */
 	galtoeq(pos, equinox, 1);
@@ -3393,7 +3344,7 @@ int ana_astrf(int narg, int ps[], int forward) {
       }
       switch (to) {
       case 2:			/* ecliptical */
-	ectoeq(pos, ceps, seps, 0, 0);
+	ectoeq(pos, ceps, seps, 0);
 	break;
       case 3:
 	galtoeq(pos, equinox, 0);
@@ -3427,7 +3378,7 @@ int ana_astrf(int narg, int ps[], int forward) {
       }
       switch (from) {
       case 2:			/* ecliptical */
-	ectoeq(pos, ceps, seps, 1, 0);
+	ectoeq(pos, ceps, seps, 1);
 	break;
       case 3:			/* galactic */
 	galtoeq(pos, equinox, 1);
@@ -3435,7 +3386,7 @@ int ana_astrf(int narg, int ps[], int forward) {
       }
       switch (to) {
       case 2:			/* ecliptical */
-	ectoeq(pos, ceps, seps, 0, 0);
+	ectoeq(pos, ceps, seps, 0);
 	break;
       case 3:
 	galtoeq(pos, equinox, 0);
@@ -3452,13 +3403,13 @@ int ana_astrf(int narg, int ps[], int forward) {
 }
 /*--------------------------------------------------------------------------*/
 #define s_parallax (4.263451e-5)
-void parallax(double *pos, double r0, double rcp, double rsp, int getErrors)
+void parallax(double *pos, double r0, double rcp, double rsp)
 /* corrects equatorial planetocentric coordinates for parallax, i.e. */
 /* transforms to equatorial topocentric coordinates.  Tsid is the */
 /* local sidereal time, r0 is the apparent planetocentric distance, */
 /* rcp and rsp indicate the topocentric coordinates of the observer */
 {
-  double	r, cd, ch, sd, sh, u, d1, d2, A, B, C, q;
+  double	r, cd, ch, sd, sh, u, A, B, C, q;
 
   r = s_parallax/r0;	/* sine of equatorial horizontal parallax */
   cd = cos(pos[1]);		/* declination */
@@ -3474,22 +3425,6 @@ void parallax(double *pos, double r0, double rcp, double rsp, int getErrors)
   if (pos[0] < 0)
     pos[0] += TWOPI;	/* apparent hour angle */
   pos[1] = asin(C/q);	/* apparent declination */
-  if (getErrors)
-  { u = sqrt(u);
-    d1 = r*u*u;
-    d2 = u*r*q;
-    der[0] = cd*(r*cd - ch*rcp*s_parallax)/d1; /* da'/da */
-    der[1] = -A*C*rcp*s_parallax/d2; /* dd'/da */
-    der[2] = 0.0;		/* dr'/da */
-    der[3] = sd*sh*rcp*s_parallax/d1; /* da'/dd */
-				/* dd'/dd */
-    der[4] = (r*q*q*cd + C*s_parallax*(rsp*cd - rcp*sd*ch))/d2;
-    der[5] = 0.0;		/* dr'/dd */
-    der[6] = cd*sh*rcp*s_parallax/d1; /* da'/dr */
-				/* dd'/dr */
-    der[7] = s_parallax*(rsp - C*(B*rcp + C*rsp))/(r*r*u);
-    der[8] = 1.0;		/* dr'/dr */
-    propagateError(der, pos + 3, pos + 3); }
 }
 /*--------------------------------------------------------------------------*/
 void refract(double *pos, double height)
@@ -3509,10 +3444,10 @@ void refract(double *pos, double height)
     pos[1] = h*DEG/60;
 }
 /*--------------------------------------------------------------------------*/
-void eqtohor(double *pos, double cphi, double sphi, char forward, int getErrors)
+void eqtohor(double *pos, double cphi, double sphi, char forward)
 /* transforms from equatorial to horizontal coordinates, or vice versa */
 {
-  double	A, h, sH, cH, sd, cd, sa, ca, ch;
+  double	A, h, sH, cH, sd, cd;
 
   sH = sin(pos[0]);
   cH = cos(pos[0]);
@@ -3526,20 +3461,6 @@ void eqtohor(double *pos, double cphi, double sphi, char forward, int getErrors)
   h = asin(sphi*sd + cphi*cd*cH);
   pos[0] = A;
   pos[1] = h;
-  if (getErrors)
-  { sa = sin(pos[0]);
-    ca = cos(pos[0]);
-    ch = cos(pos[1]);
-    der[0] = sa*ca*sH/cH + sa*sa*sphi; /* dA/dH */
-    der[1] = -cd*cphi*sH/ch;	/* dh/dH */
-    der[2] = 0.0;		/* dr/dH */
-    der[3] = cphi*sa*sa/(sH*cd*cd); /* dA/dd */
-    der[4] = (-cH*cphi*sd + cd*sphi)/ch; /* dh/dd */
-    der[5] = 0.0;		/* dr/dd; */
-    der[6] = 0.0;		/* dA/dr */
-    der[7] = 0.0;		/* dh/dr */
-    der[8] = 1.0;		/* dr/dr */
-    propagateError(der, pos + 3, pos + 3); }
 }
 /*--------------------------------------------------------------------------*/
 #define FLAT	0.99664719
@@ -3599,7 +3520,7 @@ int ana_astropos(int narg, int ps[])
 {
   char	tdt, *string;
   int	iq, nJD, *object, nObjects, object0, dims[MAX_DIMS],
-    nDims, i, j, n, result, coordSystem, count, vocal, getErrors;
+    nDims, i, j, result, coordSystem, vocal;
   double	*JD, *f, *f0, jd0, djd, djd0, r, r0, dPsi,
     dEps, epsilon, ceps, seps, longitude, latitude, height = 0.0, rsp,
     rcp, clat, slat, Tsid, equinox, robject, robject0, jd, cdPsi, sdPsi;
@@ -3726,8 +3647,7 @@ int ana_astropos(int narg, int ps[])
   } else haveExtraElements = 0;		/* none */
 
   				/* create result array */
-  getErrors = (internalMode & S_ERROR)? 1: 0;
-  dims[0] = getErrors? 6: 3;	/* include error bars if requested */
+  dims[0] = 3;
   nDims = 1;
   if ((nObjects > 1 || internalMode & S_KEEPDIMS)
       && (internalMode & S_CONJSPREAD) == 0)
@@ -3889,9 +3809,6 @@ int ana_astropos(int narg, int ps[])
       } else if (vocal) {
         puts("ASTRON: no correction for abberation");
       }
-      if (getErrors)
-	for (n = 3; n < 9; n++) /* update covariance matrix */
-	  pos[n] = r*(pos2[n] + pos3[n]); /* covariances add */
 
       /* now have (in pos[]) the planetocentric ecliptic cartesian */
       /* coordinates referred to the desired equinox, FK5 */
@@ -3900,8 +3817,6 @@ int ana_astropos(int narg, int ps[])
       pos2[0] = pos[0]*cdPsi - pos[1]*sdPsi;
       pos2[1] = pos[0]*sdPsi + pos[1]*cdPsi;
       pos2[2] = pos[2];
-      if (getErrors)
-	memcpy(pos2 + 3, pos + 3, 6*sizeof(double));
       if (vocal) {
         puts("ASTRON: ecliptic planetocentric coordinates corrected for nutation:");
         printXYZtoLBR(pos2);
@@ -4008,32 +3923,13 @@ int ana_astropos(int narg, int ps[])
       XYZtoLBR(mean, pos, getErrors);
       memcpy(f, pos, 2*sizeof(double));
       f[2] = w;
-      if (getErrors)
-	f[3] = f[4] = f[5] = 0;
-      f += dims[0];
+      f += 3;
     }
   } /* end of for all dates */
 
   /* turn variances into standard deviations and radians into degrees */
   f = f0;
-  if (getErrors) {
-    if (internalMode & S_XYZ)	/* XYZ */
-      for (i = 0; i < nJD*nObjects; i++) {
-	f[3] = sqrt(f[3]);
-	f[4] = sqrt(f[4]);
-	f[5] = sqrt(f[5]);
-	f += 6;
-      }
-    else
-      for (i = 0; i < nJD*nObjects; i++) {
-	f[0] *= RAD;
-	f[1] *= RAD;
-	f[3] = sqrt(f[3])*RAD;
-	f[4] = sqrt(f[4])*RAD;
-	f[5] = sqrt(f[5]);
-	f += 6;
-      }
-  } else if ((internalMode & S_XYZ) == 0)
+  if ((internalMode & S_XYZ) == 0)
     for (i = 0; i < nJD*nObjects; i++) {
       f[0] *= RAD;
       f[1] *= RAD;

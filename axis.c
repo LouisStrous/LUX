@@ -455,6 +455,65 @@ int standardLoop(int data, int axisSym, int mode, int outType,
 
 }
 /*-----------------------------------------------------------------------*/
+/* Like standardLoop but prefixes one dimension to the target, of the
+   indicated size <newdim>.  The target pointer advances along the
+   indicated (old) dimension, and the source pointer along the
+   indicated dimension.  The user must advance the target pointer through
+   the new dimension. LS 2011-07-22 */
+int standardLoopAddDim(int data, int axisSym, int mode, int outType,
+                       int newdim,
+                       loopInfo *src, pointer *srcptr, int *output,
+                       loopInfo *trgt, pointer *trgtptr)
+{
+  int i, nAxes;
+  pointer axes;
+
+  if (newdim < 2)
+    return anaerror("Illegal extra dimension requested in standardLoopAddDim",
+                    data);
+  if (axisSym > 0) {		/* <axisSym> is a regular symbol */
+    if (!symbolIsNumerical(axisSym))
+      return error("Need a numerical argument", axisSym); /* <axisSym> was not numerical */
+    i = ana_long(1, &axisSym);	/* get a LONG copy */
+    numerical(i, NULL, NULL, &nAxes, &axes); /* get info */
+  } else {
+    nAxes = 0;
+    axes.l = NULL;
+  }
+  int result = standardLoop0(data, nAxes, axes.l, mode, outType,
+                             src, srcptr, NULL, NULL, NULL);
+  if (result < 0)
+    return result;
+  if (src->ndim >= MAX_DIMS)
+    return cerror(ILL_DIM, data);
+  if (output) {
+    /* create output symbol */
+    loopInfo t;
+    int i;
+
+    memcpy(t.dims + 1, src->dims, src->ndim*sizeof(*src->dims));
+    t.dims[0] = newdim;
+    t.ndim = src->ndim + 1;
+    if (((mode & SL_UPGRADE)
+	 && outType < src->type)
+	|| (mode & SL_KEEPTYPE))
+      t.type = src->type;	/* output type equal to source type */
+    else
+      t.type = outType;         /* take specified output type */
+    t.mode = src->mode | SL_EACHROW;
+    memcpy(t.axes + 1, src->axes, src->naxes*sizeof(*src->axes));
+    t.axes[0] = 0;              /* new axis first */
+    t.naxes = src->naxes + 1;
+    for (i = 1; i < t.naxes; i++)
+      t.axes[i]++;              /* adjust for inserted axis */
+    *output = dimensionLoopResult(&t, trgt, t.type, trgtptr);
+    if (*output == ANA_ERROR)
+      /* but didn't get one */
+      return ANA_ERROR;
+  }
+  return ANA_OK;
+}
+/*-----------------------------------------------------------------------*/
 int standardLoop0(int data, int nAxes, int *axes, int mode, int outType,
 		 loopInfo *src, pointer *srcptr, int *output, 
 		 loopInfo *trgt, pointer *trgtptr)

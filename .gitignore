@@ -11,3 +11,7 @@ config.status
 configure.notes
 configure.scan
 config.h.in.base
+libsofa_c.a
+sofa.h
+sofam.h
+

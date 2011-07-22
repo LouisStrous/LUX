@@ -19,7 +19,7 @@ MORELIBS=
 LDFLAGS= $(MORELIBS)
 MOREINCLDIRS=.
 
-ana: $(OBS)
+ana: $(OBS) libsofa_c.a sofa.h sofam.h
 	./updatelevel
 	rm -f site.o
 	$(CC) $(CPPFLAGS) $(CFLAGS) -DHAVE_CONFIG_H -c site.c
@@ -33,6 +33,9 @@ calculator.o: anaparser.h calculator.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) -DHAVE_CONFIG_H -c -o calculator.o calculator.c.tab.c
 .c.o:
 	$(CC) $(CPPFLAGS) $(CFLAGS) -DHAVE_CONFIG_H -c $<
+
+libsofa_c.a sofa.h sofam.h:
+	$(MAKE) -C sofa/20101201/c/src && $(MAKE) -C sofa/20101201/c/src test
 
 site:
 	rm -f site.o

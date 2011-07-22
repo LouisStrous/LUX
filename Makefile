@@ -8,12 +8,12 @@ install.o memck.o plots.o post.o rawio.o sort.o strous.o strous2.o	\
 strous3.o subsc.o symbols.o tense.o orientation.o rcsversion.o		\
 output.o axis.o coord.o cluster.o ephem2.o paerror.o	\
 idl.o trace_decoder_ana.o gifread_ana.o gifwrite_ana.o astron.o		\
-terminal.o regex.o vsop.o\
+terminal.o regex.o vsop.o anasofa.o \
 jpeg.o tape.o dummyterm.o projection.o \
-xport.o zoom.o menu.o color.o random.o Bytestack.o poisson.o
+xport.o zoom.o menu.o color.o random.o Bytestack.o poisson.o \
 
 CC=gcc
-LIBS=-lm -lc -ljpeg -lX11 -lgsl
+LIBS=-lm -lc -ljpeg -lX11 -lgsl libsofa_c.a
 EXEC=ana
 MORELIBS=
 LDFLAGS= $(MORELIBS)

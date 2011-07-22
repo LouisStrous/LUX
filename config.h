@@ -47,6 +47,8 @@
 /* Define equal to (1.0/0.0) if you can divide 1.0 by 0.0 */
 #define INFTY (1.0/0.0)
 
+#define SOFA 1
+
 /* variable attributes are gcc specific.  LS 9mar99 */
 #ifndef __GNUC__
 #define __attribute__(x)

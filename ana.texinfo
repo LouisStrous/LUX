@@ -8684,6 +8684,7 @@ See also: @ref{Installing ANA}
 * jpeg::                        
 * motif::                       
 * regex_h::                     
+* sofa::                        
 * tape::                        
 * x11::                         
 @end menu
@@ -8751,7 +8752,7 @@ unless you specify the @code{--without-motif} option to
 See also: @ref{Installing ANA}, @ref{x11}
 
 @c ------------------------------------------------------------------
-@node regex_h, tape, motif, Packages
+@node regex_h, sofa, motif, Packages
 @comment  node-name,  next,  previous,  up
 @subsection @code{[REGEX_H]}
 
@@ -8760,7 +8761,15 @@ regular expressions.  It is included automatically if that capability is
 detected on your system.
 
 @c ------------------------------------------------------------------
-@node tape, x11, regex_h, Packages
+@node sofa, tape, regex_h, Packages
+@comment  node-name,  next,  previous,  up
+@subsection @code{[SOFA]}
+
+The @code{[SOFA]} package contains ANA bindings for routines from the
+SOFA (``Standards of Fundamental Astronomy'') software library.
+
+@c ------------------------------------------------------------------
+@node tape, x11, sofa, Packages
 @comment  node-name,  next,  previous,  up
 @subsection @code{[TAPE]}
 
@@ -17719,7 +17728,7 @@ See also: @ref{HISTR}, @ref{DISTR}, @ref{!HISTMIN}, @ref{!HISTMAX},
 
 [3.2.7]
 @c -------------------------------------
-@node HISTR, IBETA, HIST, Internal Routines
+@node HISTR, IAUCAL2JD, HIST, Internal Routines
 @subsection HISTR
 
 @code{HISTR(@var{x} [, /FIRST, /SILENT])}
@@ -17741,7 +17750,49 @@ See also: @ref{HIST}
 
 [3.2.7]
 @c -------------------------------------
-@node IBETA, IDLREAD, HISTR, Internal Routines
+@node IAUCAL2JD, IAUCAL2JD, HISTR, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUCAL2JD
+
+@code{IAUCAL2JD(@var{date})}
+
+[SOFA] Returns the Julian Day numbers corresponding to the specified
+Gregorian calendar dates @code{@var{date}}, which must have a multiple
+of 3 elements in its first dimension (for year, month, day).  The
+result is of type @code{DOUBLE} and has the same dimensions as
+@code{@var{date}} except that the first dimension is missing.
+Unexpected results may be given if illegal year, month, or day numbers
+are specified.  Dates before -4799-01-01 are rejected.
+
+@c -------------------------------------
+@node IAUBI00
+@comment  node-name,  next,  previous,  up
+
+@code{IAUBI00()}
+
+[SOFA] Returns the frame bias components of the IAU 2000
+precession-nutation models (part of MHB2000 with additions), in a
+3-element @code{DOUBLE} array.  The elements are: (0) the longitude
+correction, (1) the obliquity correction, (2) the ICRS RA of the
+J2000.0 mean equinox.
+
+@c -------------------------------------
+@node IAUCAL2JD, IBETA, IAUCAL2JD, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUCAL2JD
+
+@code{IAUJD2CAL(@var{jd})}
+
+[SOFA] Returns the Gregorian calendar dates corresponding to the
+specified Julian day numbers @code{@var{jd}}.  The result is of type
+@code{DOUBLE} and has the same dimensions as @code{@var{jd}} but with
+one extra dimension of size 3 prefixed, for the year, month, and day,
+respectively.  Unexpected results may be given if illegal Julian day
+day numbers are specified.  Julian day numbers before -68569.5 or
+after 1e9 are considered illegal.
+
+@c -------------------------------------
+@node IBETA, IDLREAD, IAUCAL2JD, Internal Routines
 @subsection IBETA
 
 @code{IBETA(@var{x}, @var{a}, @var{b} [, /COMPLEMENT])}

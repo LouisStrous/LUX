@@ -788,7 +788,7 @@ extern int ana_read_jpeg6b_f(), ana_write_jpeg6b_f();
 extern int	vargsmooth(), ana_test();
 
 #if SOFA
-extern int ana_iauCal2jd();
+extern int ana_iauBi00(), ana_iauCal2jd(), ana_iauJd2cal();
 #endif
 
 internalRoutine function[] = {
@@ -1020,7 +1020,9 @@ internalRoutine function[] = {
   { "HISTR",	1, 1, ana_histr, /* fun3.c */
     "1FIRST:2IGNORELIMIT:4INCREASELIMIT:8SILENT" },
 #if SOFA
+  { "IAUBI00",   0, 0, ana_iauBi00, 0 },
   { "IAUCAL2JD", 1, 1, ana_iauCal2jd, 0 },
+  { "IAUJD2CAL", 1, 1, ana_iauJd2cal, 0 },
 #endif
   { "IBETA",	3, 3, ana_incomplete_beta, "*1COMPLEMENT:2LOG" }, /* fun1.c */
   { "IDLREAD",	2, 2, ana_idlread_f, 0 }, /* strous3.c */

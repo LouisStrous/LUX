@@ -322,8 +322,10 @@ yyparse 1722,74744
 #define YYPOPSTACK(1787,76180
 #  undef YYSTACK_RELOCATE1869,78538
 
-anasofa.c,25
-int ana_iauCal2jd(9,302
+anasofa.c,79
+int ana_iauBi00(12,465
+int ana_iauCal2jd(31,1170
+int ana_iauJd2cal(107,3858
 
 anaterm.c,23
 void getTermCaps(2,57
@@ -474,25 +476,27 @@ void geocentricCoords(3603,115901
 double meanDistance(3613,116279
 int ana_astropos(3621,116515
 
-axis.c,533
+axis.c,600
 static char rcsid[rcsid32,1233
 void setupDimensionLoop(48,2019
 int advanceLoop(133,5436
 int advanceLoops(163,6512
 void rearrangeDimensionLoop(195,7615
-int dimensionLoopResult(347,13109
-int standardLoop(437,16549
-int standardLoopAddDim(462,17491
-int standardLoop0(509,19108
-#undef DEBUG_VOCAL678,25340
-int nextLoop(680,25435
-int nextLoops(690,25772
-void subdataLoop(702,26182
-void rearrangeEdgeLoop(725,27035
-int prepareDiagonals(800,29872
-int moveLoop(966,35534
-void returnLoop(1012,37362
-int numerical(1025,37836
+int dimensionLoopResult1(347,13109
+int dimensionLoopResult(440,16717
+int standardLoop(446,16983
+int standardLoopAddDim(472,18013
+int standardLoop0(526,19917
+#undef DEBUG_VOCAL695,26149
+int standardLoop1(697,26244
+int nextLoop(912,35752
+int nextLoops(922,36089
+void subdataLoop(934,36499
+void rearrangeEdgeLoop(957,37352
+int prepareDiagonals(1032,40189
+int moveLoop(1198,45851
+void returnLoop(1244,47679
+int numerical(1257,48153
 
 binop.c,98
 #define ORDINARY	6,69
@@ -2437,141 +2441,141 @@ static char	installing 68,2669
 #define MAX_ARG	182,7798
 internalRoutine	subroutine[subroutine256,11552
 int	nSubroutine 665,33010
-internalRoutine function[function794,39481
-int	nFunction 1297,66714
-void undefine(1299,66841
-void zap(1544,74129
-void cleanUp(1633,76583
-void cleanUpRoutine(1674,78024
-void updateIndices(1734,79981
-int nextFreeStackEntry(1746,80416
-int nextFreeNamedVariable(1761,80876
-int nextFreeTempVariable(1781,81642
-int nextFreeTempExecutable(1798,82209
-int nextFreeExecutable(1814,82782
-int nextFreeUndefined(1835,83520
-void pushList(1848,83857
-word popList(1859,84193
-int moveList(1867,84456
-void swapList(1878,84857
-int stackListLength(1888,85139
-void dupList(1904,85546
-void unlinkString(1915,85792
-void freeString(1927,86181
-int installStruct(1935,86448
-int copyElement(1953,87162
-int findTarget(1967,87666
-int newSymbol(2043,90424
-int hash(2758,112135
-int findInternalName(2766,112302
-static compileInfo	*c_info c_info2787,112888
-int	cur_c_info 2788,112923
-compileInfo	*curCompileInfo;curCompileInfo2789,112957
-int nextCompileLevel(2791,112987
-static int	compileCount 2875,115718
-int compile(2876,115747
-int ana_compile(2917,116943
-int newBlockSymbol(2933,117300
-int newSubrSymbol(2973,118596
-int lookForName(3031,120822
-int findSym(3058,121842
-char *symName(symName3077,122394
-char *symbolName(symbolName3099,123021
-int suppressEvalRoutine(3125,123722
-#define	IGNORE_SIG	3138,124112
-#define ASK_SIG	3139,124133
-#define SIG_BREAK	3140,124152
-void exception(3141,124172
-char *typeName(typeName3231,126557
-char *className(className3250,127086
-  static struct classInfo 3253,127151
-    byte number;3254,127179
-    byte number; char *name;name3254,127179
-int ana_classname(3322,129393
-int ana_typeName(3337,129843
-char *evbName(evbName3352,130308
-char *filetypeName(filetypeName3370,130941
-int ana_filetype_name(3384,131458
-void fixedValue(3395,131737
-int installSysFunc(3448,133212
-int installPointer(3462,133602
-int convertRange(3477,134009
-void convertPointer(3539,136391
-void convertWidePointer(3626,138347
-void convertScalar(3814,142359
-int ana_symbol_memory(3921,144522
-int ana_trace(3955,145644
-#define b_fix(4001,146926
-#define l_fix(4002,147003
-#define f_fix(4003,147080
-#define d_fix(4004,147158
-#define s_fix(4005,147237
-#define cf_fix(4006,147317
-#define cd_fix(4007,147398
-#define l_ptr(4008,147479
-#define f_ptr(4009,147544
-#define d_ptr(4010,147610
-#define s_ptr(4011,147677
-#define fnc_p(4012,147749
-char	*defaultRedirect defaultRedirect4014,147805
-int range_warn_flag 4016,147848
-float	contour_dash_lev,4026,148377
-float	contour_dash_lev, contour_tick_fac 4026,148377
-scalar	lastmin,4027,148431
-scalar	lastmin, lastmax,4027,148431
-scalar	lastmin, lastmax, lastmean,4027,148431
-scalar	lastmin, lastmax, lastmean, lastsdev;4027,148431
-char	*firstbreak;firstbreak4071,149981
-enumElem	classesStruct[classesStruct4073,150019
-enumElem	typesStruct[typesStruct4096,150647
-enumElem	eventStruct[eventStruct4108,150928
-enumElem	coordSysStruct[coordSysStruct4119,151185
-enumElem	filetypeStruct[filetypeStruct4130,151347
-struct boundsStruct	bounds 4149,151877
-int	ANA_MATMUL_FUN;4154,152010
-#define	FORMATSIZE	4156,152031
-void symbolInitialization(4157,152055
- union { byte b[b4170,152368
- union { byte b[2]; word w;4170,152368
-int matchInternalName(4565,163154
-void zerobytes(4588,163795
-char *strcasestr(strcasestr4597,164003
-int strncasecmp_p(4618,164721
-int strcasecmp_p(4635,165236
-int	nBreakpoint 4650,165695
-breakpointInfo	breakpoint[breakpoint4651,165716
-int ana_breakpoint(4652,165757
-word	watchVars[watchVars4763,169323
-int	nWatchVars 4764,169351
-int ana_watch(4765,169371
-int ana_symbol_number(4809,170543
-void mark(4819,170817
-void pegMark(4827,171055
-void pegParse(4835,171285
-void zapParseTemps(4843,171517
-void removeParseMarker(4855,171849
-void unMark(4863,172104
-void zapMarked(4875,172318
-void checkTemps(4883,172504
-int ana_restart(4907,173210
-int strccmp(4918,173480
-int structSize(4926,173750
-int makeStruct(4982,175343
-int ana_struct(5077,178448
-int ana_buffering(5155,180953
-int translateEscapes(5191,181936
-int installString(5235,183411
-#undef malloc5268,184335
-void installKeys(5269,184349
-int findName(5350,187054
-int ana_verify(5402,188645
-compileInfo *nextFreeCompileInfo(nextFreeCompileInfo5513,191597
-void releaseCompileInfo(5527,191973
-static executionLevelInfo	*e_info;e_info5535,192152
-static int	n_e_info 5536,192187
-void pushExecutionLevel(5537,192228
-void popExecutionLevel(5554,192793
-void showExecutionLevel(5559,192911
+internalRoutine function[function794,39513
+int	nFunction 1299,66830
+void undefine(1301,66957
+void zap(1546,74245
+void cleanUp(1635,76699
+void cleanUpRoutine(1676,78140
+void updateIndices(1736,80097
+int nextFreeStackEntry(1748,80532
+int nextFreeNamedVariable(1763,80992
+int nextFreeTempVariable(1783,81758
+int nextFreeTempExecutable(1800,82325
+int nextFreeExecutable(1816,82898
+int nextFreeUndefined(1837,83636
+void pushList(1850,83973
+word popList(1861,84309
+int moveList(1869,84572
+void swapList(1880,84973
+int stackListLength(1890,85255
+void dupList(1906,85662
+void unlinkString(1917,85908
+void freeString(1929,86297
+int installStruct(1937,86564
+int copyElement(1955,87278
+int findTarget(1969,87782
+int newSymbol(2045,90540
+int hash(2760,112251
+int findInternalName(2768,112418
+static compileInfo	*c_info c_info2789,113004
+int	cur_c_info 2790,113039
+compileInfo	*curCompileInfo;curCompileInfo2791,113073
+int nextCompileLevel(2793,113103
+static int	compileCount 2877,115834
+int compile(2878,115863
+int ana_compile(2919,117059
+int newBlockSymbol(2935,117416
+int newSubrSymbol(2975,118712
+int lookForName(3033,120938
+int findSym(3060,121958
+char *symName(symName3079,122510
+char *symbolName(symbolName3101,123137
+int suppressEvalRoutine(3127,123838
+#define	IGNORE_SIG	3140,124228
+#define ASK_SIG	3141,124249
+#define SIG_BREAK	3142,124268
+void exception(3143,124288
+char *typeName(typeName3233,126673
+char *className(className3252,127202
+  static struct classInfo 3255,127267
+    byte number;3256,127295
+    byte number; char *name;name3256,127295
+int ana_classname(3324,129509
+int ana_typeName(3339,129959
+char *evbName(evbName3354,130424
+char *filetypeName(filetypeName3372,131057
+int ana_filetype_name(3386,131574
+void fixedValue(3397,131853
+int installSysFunc(3450,133328
+int installPointer(3464,133718
+int convertRange(3479,134125
+void convertPointer(3541,136507
+void convertWidePointer(3628,138463
+void convertScalar(3816,142475
+int ana_symbol_memory(3923,144638
+int ana_trace(3957,145760
+#define b_fix(4003,147042
+#define l_fix(4004,147119
+#define f_fix(4005,147196
+#define d_fix(4006,147274
+#define s_fix(4007,147353
+#define cf_fix(4008,147433
+#define cd_fix(4009,147514
+#define l_ptr(4010,147595
+#define f_ptr(4011,147660
+#define d_ptr(4012,147726
+#define s_ptr(4013,147793
+#define fnc_p(4014,147865
+char	*defaultRedirect defaultRedirect4016,147921
+int range_warn_flag 4018,147964
+float	contour_dash_lev,4028,148493
+float	contour_dash_lev, contour_tick_fac 4028,148493
+scalar	lastmin,4029,148547
+scalar	lastmin, lastmax,4029,148547
+scalar	lastmin, lastmax, lastmean,4029,148547
+scalar	lastmin, lastmax, lastmean, lastsdev;4029,148547
+char	*firstbreak;firstbreak4073,150097
+enumElem	classesStruct[classesStruct4075,150135
+enumElem	typesStruct[typesStruct4098,150763
+enumElem	eventStruct[eventStruct4110,151044
+enumElem	coordSysStruct[coordSysStruct4121,151301
+enumElem	filetypeStruct[filetypeStruct4132,151463
+struct boundsStruct	bounds 4151,151993
+int	ANA_MATMUL_FUN;4156,152126
+#define	FORMATSIZE	4158,152147
+void symbolInitialization(4159,152171
+ union { byte b[b4172,152484
+ union { byte b[2]; word w;4172,152484
+int matchInternalName(4567,163270
+void zerobytes(4590,163911
+char *strcasestr(strcasestr4599,164119
+int strncasecmp_p(4620,164837
+int strcasecmp_p(4637,165352
+int	nBreakpoint 4652,165811
+breakpointInfo	breakpoint[breakpoint4653,165832
+int ana_breakpoint(4654,165873
+word	watchVars[watchVars4765,169439
+int	nWatchVars 4766,169467
+int ana_watch(4767,169487
+int ana_symbol_number(4811,170659
+void mark(4821,170933
+void pegMark(4829,171171
+void pegParse(4837,171401
+void zapParseTemps(4845,171633
+void removeParseMarker(4857,171965
+void unMark(4865,172220
+void zapMarked(4877,172434
+void checkTemps(4885,172620
+int ana_restart(4909,173326
+int strccmp(4920,173596
+int structSize(4928,173866
+int makeStruct(4984,175459
+int ana_struct(5079,178564
+int ana_buffering(5157,181069
+int translateEscapes(5193,182052
+int installString(5237,183527
+#undef malloc5270,184451
+void installKeys(5271,184465
+int findName(5352,187170
+int ana_verify(5404,188761
+compileInfo *nextFreeCompileInfo(nextFreeCompileInfo5515,191713
+void releaseCompileInfo(5529,192089
+static executionLevelInfo	*e_info;e_info5537,192268
+static int	n_e_info 5538,192303
+void pushExecutionLevel(5539,192344
+void popExecutionLevel(5556,192909
+void showExecutionLevel(5561,193027
 
 jpeg.c,355
 struct my_error_mgr 12,451

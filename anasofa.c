@@ -32,69 +32,67 @@ int ana_iauCal2jd(int narg, int ps[])
 {
   loopInfo srcinfo, tgtinfo;
   pointer src, tgt;
-  int result, i;
+  int target, i;
   double djm0, djm;
+  int less[1] = { 3 };
 
-  if (standardLoop(ps[0], ANA_ZERO, 
-                   SL_EXACT     /* exactly the output type */
-                   | SL_COMPRESS /* omit selected axis from result */
-                   | SL_AXISCOORD /* only indicated axis coords */
-                   | SL_EACHROW,  /* user advances along indicates axis */
-                   ANA_DOUBLE, &srcinfo, &src, &result, &tgtinfo, &tgt) < 0)
+  if (standardLoopX(ps[0], ANA_ZERO,
+                    SL_EACHROW      /* we handle advancing along axis 0 */
+                    | SL_AXISCOORD, /* only indicated source axis coords */
+                    &srcinfo, &src,
+                    0, NULL,    /* no extra dimensions */
+                    1, less,    /* reduce one dimension */
+                    ANA_DOUBLE,
+                    SL_AXISCOORD, /* only indicated target axis coords */
+                    &target, &tgtinfo, &tgt) < 0)
     return ANA_ERROR;
-  if (srcinfo.rdims[0] % 3 != 0)
-    return anaerror("Need multiple of 3 elements in 1st dimension!", ps[0]);
   /* iauCal2jd(int iy, int im, int id, double *djm0, double *djm) */
   switch (symbol_type(ps[0])) {
   case ANA_BYTE:
     do {
-      for (i = 0; i < srcinfo.rdims[0]; i += 3) {
-        iauCal2jd(src.b[0], src.b[1], src.b[2], &djm0, &djm);
-        src.b += 3;
-        *tgt.d++ = djm0 + djm;
-      }
-    } while (advanceLoops(&srcinfo, &tgtinfo) < srcinfo.rndim);
+      iauCal2jd(src.b[0], src.b[1], src.b[2], &djm0, &djm);
+      src.b += 3;
+      *tgt.d = djm0 + djm;
+    } while (advanceLoop(&tgtinfo), advanceLoop(&srcinfo) < srcinfo.rndim);
     break;
   case ANA_WORD:
     do {
-      for (i = 0; i < srcinfo.rdims[0]; i += 3) {
-        iauCal2jd(src.w[0], src.w[1], src.w[2], &djm0, &djm);
-        src.w += 3;
-        *tgt.d++ = djm0 + djm;
-      }
-    } while (advanceLoops(&srcinfo, &tgtinfo) < srcinfo.rndim);
+      iauCal2jd(src.w[0], src.w[1], src.w[2], &djm0, &djm);
+      src.w += 3;
+      *tgt.d = djm0 + djm;
+    } while (advanceLoop(&tgtinfo), advanceLoop(&srcinfo) < srcinfo.rndim);
     break;
   case ANA_LONG:
     do {
-      for (i = 0; i < srcinfo.rdims[0]; i += 3) {
-        iauCal2jd(src.l[0], src.l[1], src.l[2], &djm0, &djm);
-        src.l += 3;
-        *tgt.d++ = djm0 + djm;
-      }
-    } while (advanceLoops(&srcinfo, &tgtinfo) < srcinfo.rndim);
+      iauCal2jd(src.l[0], src.l[1], src.l[2], &djm0, &djm);
+      src.l += 3;
+      *tgt.d = djm0 + djm;
+    } while (advanceLoop(&tgtinfo), advanceLoop(&srcinfo) < srcinfo.rndim);
     break;
   case ANA_FLOAT:
     do {
-      for (i = 0; i < srcinfo.rdims[0]; i += 3) {
-        iauCal2jd(src.f[0], src.f[1], src.f[2], &djm0, &djm);
-        src.f += 3;
-        *tgt.d++ = djm0 + djm;
-      }
-    } while (advanceLoops(&srcinfo, &tgtinfo) < srcinfo.rndim);
+      int day = floor(src.f[2]);
+      double daypart = src.f[2] - day;
+      iauCal2jd((int) src.f[0], (int) src.f[1], day, &djm0, &djm);
+      src.f += 3;
+      *tgt.d = djm0 + djm + daypart;
+    } while (advanceLoop(&tgtinfo), advanceLoop(&srcinfo) < srcinfo.rndim);
     break;
   case ANA_DOUBLE:
     do {
-      for (i = 0; i < srcinfo.rdims[0]; i += 3) {
-        iauCal2jd(src.d[0], src.d[1], src.d[2], &djm0, &djm);
-        src.d += 3;
-        *tgt.d++ = djm0 + djm;
-      }
-    } while (advanceLoops(&srcinfo, &tgtinfo) < srcinfo.rndim);
+      int day = floor(src.d[2]);
+      double daypart = src.d[2] - day;
+      iauCal2jd((int) src.d[0], (int) src.d[1], day, &djm0, &djm);
+      src.d += 3;
+      *tgt.d = djm0 + djm + daypart;
+    } while (advanceLoop(&tgtinfo), advanceLoop(&srcinfo) < srcinfo.rndim);
     break;
   default:
     return cerror(ILL_TYPE, ps[0]);
   }
-  return result;
+  if (!loopIsAtStart(&tgtinfo))
+    return anaerror("Source loop is finished but target loop is not!", ps[0]);
+  return target;
 }
 /*-----------------------------------------------------------------------*/
 /* IAUJD2CAL(<jd>) returns the Gregorian calendar dates corresponding
@@ -108,14 +106,18 @@ int ana_iauJd2cal(int narg, int ps[])
 {
   loopInfo srcinfo, tgtinfo;
   pointer src, tgt;
-  int result;
+  int result, more[1] = { 3 };
   double djm0, djm;
 
-  if (standardLoopAddDim(ps[0], ANA_ZERO, 
-                         SL_EXACT     /* exactly the output type */
-                         | SL_AXISCOORD, /* only indicated axis coords */
-                         ANA_DOUBLE, 3, &srcinfo, &src,
-                         &result, &tgtinfo, &tgt) < 0)
+  if (standardLoopX(ps[0], ANA_ZERO, 
+                    SL_AXISCOORD, /* only indicated axis coords */
+                    &srcinfo, &src,
+                    1, more,    /* one extra dimension */
+                    0, NULL,    /* no reduced dimensions */
+                    ANA_DOUBLE,
+                    SL_EACHROW, /* we handle the new dimension ourselves */
+                    &result,
+                    &tgtinfo, &tgt) < 0)
     return ANA_ERROR;
   
   /* iauJd2cal(double dj1, double dj2, int *iy, int *im, int *id, double *fd) */
@@ -128,7 +130,7 @@ int ana_iauJd2cal(int narg, int ps[])
       *tgt.d++ = y;
       *tgt.d++ = m;
       *tgt.d++ = d + fd;
-    } while (advanceLoops(&srcinfo, &tgtinfo) < srcinfo.rndim);
+    } while (advanceLoop(&tgtinfo), advanceLoop(&srcinfo) < srcinfo.rndim);
     break;
   case ANA_WORD:
     do {
@@ -138,7 +140,7 @@ int ana_iauJd2cal(int narg, int ps[])
       *tgt.d++ = y;
       *tgt.d++ = m;
       *tgt.d++ = d + fd;
-    } while (advanceLoops(&srcinfo, &tgtinfo) < srcinfo.rndim);
+    } while (advanceLoop(&tgtinfo), advanceLoop(&srcinfo) < srcinfo.rndim);
     break;
   case ANA_LONG:
     do {
@@ -148,7 +150,7 @@ int ana_iauJd2cal(int narg, int ps[])
       *tgt.d++ = y;
       *tgt.d++ = m;
       *tgt.d++ = d + fd;
-    } while (advanceLoops(&srcinfo, &tgtinfo) < srcinfo.rndim);
+    } while (advanceLoop(&tgtinfo), advanceLoop(&srcinfo) < srcinfo.rndim);
     break;
   case ANA_FLOAT:
     do {
@@ -158,7 +160,7 @@ int ana_iauJd2cal(int narg, int ps[])
       *tgt.d++ = y;
       *tgt.d++ = m;
       *tgt.d++ = d + fd;
-    } while (advanceLoops(&srcinfo, &tgtinfo) < srcinfo.rndim);
+    } while (advanceLoop(&tgtinfo), advanceLoop(&srcinfo) < srcinfo.rndim);
     break;
   case ANA_DOUBLE:
     do {
@@ -168,10 +170,12 @@ int ana_iauJd2cal(int narg, int ps[])
       *tgt.d++ = y;
       *tgt.d++ = m;
       *tgt.d++ = d + fd;
-    } while (advanceLoops(&srcinfo, &tgtinfo) < srcinfo.rndim);
+    } while (advanceLoop(&tgtinfo), advanceLoop(&srcinfo) < srcinfo.rndim);
     break;
   default:
     return cerror(ILL_ARG, ps[0]);
   }
+  if (!loopIsAtStart(&tgtinfo))
+    return anaerror("Source loop is finished but target loop is not!", ps[0]);
   return result;
 }

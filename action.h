@@ -56,12 +56,12 @@ int	standardLoop(int, int, int, int, loopInfo *, pointer *, int *,
   standardLoop0(int, int, int *, int, int, loopInfo *, pointer *, int *,
 	       loopInfo *, pointer *), advanceLoop(loopInfo *),
   advanceLoops(loopInfo *, loopInfo *), nextLoop(loopInfo *),
-  dimensionLoopResult(loopInfo *, loopInfo *, int, pointer *),
   nextLoops(loopInfo *, loopInfo *),
   prepareDiagonals(int, loopInfo *, int, int **, int **, int **, int **),
   moveLoop(loopInfo *, int, int),
-  standardLoopAddDim(int, int, int, int, int, loopInfo *, pointer *,
-                     int *, loopInfo *, pointer *);
+  standardLoopX(int, int, int, loopInfo *, pointer *, int, int const *,
+                int, int const *, int, int, int *, loopInfo *, pointer *),
+  loopIsAtStart(loopInfo const *);
 
 void	subdataLoop(int *, loopInfo *), addVerify(char *, char),
   *seekFacts(int symbol, int type, int flag),

@@ -41,7 +41,7 @@ int standardLoop(int data, int axisSym, int mode, int outType,
 int advanceLoop(loopInfo *info), ana_convert(int, int [], int, int),
   advanceLoops(loopInfo *info1, loopInfo *info2);
 int nextLoop(loopInfo *info), nextLoops(loopInfo *info1, loopInfo *info2);
-int dimensionLoopResult(loopInfo *sinfo, loopInfo *tinfo, int type,
+int dimensionLoopResult(loopInfo const *sinfo, loopInfo *tinfo, int type,
 			pointer *tptr);
 
 /*-------------------------------------------------------------------------*/
@@ -93,7 +93,8 @@ void setupDimensionLoop(loopInfo *info, int ndim, int dims[], int type,
      must fit in a signed long int.  If it does not, then we emit a warning.
      LS 2dec98 */
   if (size > LONG_MAX)
-    printf("WARNING - array size (%lu elements) may be too great\nfor this operation!  Serious errors may occur!\n", size);
+    printf("WARNING - array size (%lu elements) may be too great\n"
+           "for this operation!  Serious errors may occur!\n", size);
   info->nelem = size;
   /* the list of dimensions along which should be looped */
   if (axes)
@@ -159,6 +160,18 @@ int advanceLoop(loopInfo *info)
   }
   return done;
 }  
+/*-----------------------------------------------------------------------*/
+int loopIsAtStart(loopInfo const *info)
+/* returns 1 if all coordinates are equal to 0, and 0 otherwise.
+   Can be used to test if the loop is back at the start again -- i.e.,
+   has completed.  See also advanceLoop(). */
+{
+  int state = 1, i;
+
+  for (i = 0; i < info->rndim; i++)
+    state &= (info->coords[i] == 0);
+  return state;
+}
 /*-----------------------------------------------------------------------*/
 int advanceLoops(loopInfo *info1, loopInfo *info2)
 /* advance two loops.  The dimensional structure of info1 and info2
@@ -344,11 +357,39 @@ void rearrangeDimensionLoop(loopInfo *info)
   info->data->v = info->data0;	/* initialize pointer */
 }
 /*-----------------------------------------------------------------------*/
-int dimensionLoopResult(loopInfo *sinfo, loopInfo *tinfo, int type,
-			pointer *tptr)
+void omitRedundantDimensions(int *ndim, int *dims, int *naxes, int *axes)
+{
+  /* if we get rid of dimension <d>, then all axis numbers greater
+     than or equal to <d> must be decremented by one */
+  int newAxisNr[MAX_DIMS];
+  int omitted = 0, i;
+
+  for (i = 0; i < *ndim; i++) {
+    newAxisNr[i] = i - omitted;
+    if (dims[i] == 1)
+      omitted++;
+  }
+  if (omitted) {
+    for (i = 0; i < *naxes; i++)
+      axes[i] = newAxisNr[axes[i]];
+    for (i = 0; i < *ndim - omitted; i++)
+      dims[i] = dims[newAxisNr[i]];
+    *ndim -= omitted;
+    *naxes -= omitted;
+    /* TODO: some of axes[i] may have gotten equal. Handle.
+       TODO: some of axes[i] may refer to now-omitted
+       dimensions.  Handle. */
+  }
+}
+/*-----------------------------------------------------------------------*/
+int dimensionLoopResult1(loopInfo const *sinfo,
+                         int tmode, int ttype,
+                         int nMore, int const * more,
+                         int nLess, int const * less,
+                         loopInfo *tinfo, pointer *tptr)
 /* create an appropriate result symbol
    <sinfo>: contains information about the loops through the source
-   <sinfo->mode>: specifies desired result
+   <tmode>: specifies desired result
      SL_ONEDIMS:   set omitted dimensions to 1 in the output.  If this
         option is not selected, then omitted dimensions are really
 	not present in the output.  If due to such omissions no dimensions
@@ -362,31 +403,79 @@ int dimensionLoopResult(loopInfo *sinfo, loopInfo *tinfo, int type,
    <tptr>: a pointer to a pointer to the target data
  */
 {
-  int	output, n, i, ndim, dims[MAX_DIMS], naxes, axes[MAX_DIMS], j, mode;
+  int	target, n, i, ndim, dims[MAX_DIMS], naxes, axes[MAX_DIMS], j;
   pointer	ptr;
 
-  mode = sinfo->mode;
   ndim = sinfo->ndim;		/* default */
-  memcpy(dims, sinfo->dims, ndim*sizeof(int));
+  memcpy(dims, sinfo->dims, ndim*sizeof(*dims));
   naxes = sinfo->naxes;
-  memcpy(axes, sinfo->axes, naxes*sizeof(int));
+  memcpy(axes, sinfo->axes, naxes*sizeof(*axes));
+  /* it is assumed that 0 <= axes[i] < ndim for i = 0..naxes-1 */
 
-  switch (mode & (SL_SAMEDIMS | SL_COMPRESS | SL_COMPRESSALL)) {
-    case SL_SAMEDIMS:		/* output has same dimensions as source */
-      break;			/* nothing to do */
+  if (less) {
+    if (nLess < 1 || nLess > naxes)
+      return anaerror("Illegal number %d of dimensions to reduce:"
+                      " expected 1..%d", -1, nLess, naxes);
+    for (i = 0; i < nLess; i++) {
+      if (less[i] < 1)
+        return anaerror("Illegal reduction factor %d for axis %d",
+                        -1, less[i], i);
+      if (dims[axes[i]] % less[i])
+        return anaerror("Reduction factor %d is not a divisor of dimension"
+                        " %d size %d", -1, less[i], axes[i], dims[axes[i]]);
+      dims[axes[i]] /= less[i];
+    }
+    for ( ; i < naxes; i++) {
+      if (dims[axes[i]] % less[nLess - 1])
+        return anaerror("Reduction factor %d is not a divisor of dimension"
+                        " %d size %d", -1, less[nLess - 1], axes[i],
+                        dims[axes[i]]);
+      dims[axes[i]] /= less[nLess - 1];
+    }
+    if (!(tmode & SL_ONEDIMS))  /* remove dimensions equal to 1 */
+      omitRedundantDimensions(&ndim, dims, &naxes, axes);
+  }
+  if (more) {
+    if (nMore < 1)
+      return anaerror("Illegal number %d of dimensions to add", -1, nMore);
+    if (nMore + ndim > MAX_DIMS)
+      return anaerror("Requested total number of dimensions %d "
+                    "exceeds allowed maximum %d", -1, nMore + ndim, MAX_DIMS);
+    if (nMore + naxes > MAX_DIMS)
+      return anaerror("Total number of axes %d after growing "
+                    "exceeds allowed maximum %d", nMore + naxes, MAX_DIMS);
+    for (i = 0; i < nMore; i++)
+      if (more[i] < 1)
+        return anaerror("Illegal size %d requested for new dimension %d", -1,
+                      more[i], i);
+    memmove(dims + nMore, dims, ndim*sizeof(*dims));
+    memcpy(dims, more, nMore*sizeof(*dims));
+    ndim += nMore;
+    for (i = 0; i < naxes; i++) /* adjust axes for new dimensions */
+      axes[i] += nMore;
+    memmove(axes + nMore, axes, naxes*sizeof(*axes));
+    for (i = 0; i < nMore; i++)
+      axes[i] = i;
+    naxes += nMore;
+    if (!(tmode & SL_ONEDIMS))  /* remove dimensions equal to 1 */
+      omitRedundantDimensions(&ndim, dims, &naxes, axes);
+  }
+
+  if (!less && !more) {
+    switch (tmode & (SL_COMPRESS | SL_COMPRESSALL)) {
     case SL_COMPRESS:		/* output has same dimensions as source,
-				 except that first selected axis dimension
-				 is omitted -- or set to 1 */
+                                   except that first selected axis dimension
+                                   is omitted -- or set to 1 */
     case SL_COMPRESSALL:	/* output has same dimensions as source,
-				 except that all selected axis dimensions
-				 are omitted -- or set to 1 */
-      if ((mode & (SL_SAMEDIMS | SL_COMPRESS | SL_COMPRESSALL)) == SL_COMPRESS)
+                                   except that all selected axis dimensions
+                                   are omitted -- or set to 1 */
+      if ((tmode & (SL_COMPRESS | SL_COMPRESSALL)) == SL_COMPRESS)
 	n = 1;			/* omit one axis only */
       else
 	n = sinfo->naxes;	/* omit all axes */
       
       if (sinfo->axes) {	/* have specific axes */
-        if (mode & SL_ONEDIMS)  /* replace by dimension of 1 */
+        if (tmode & SL_ONEDIMS)  /* replace by dimension of 1 */
 	  for (i = 0; i < n; i++)
 	    dims[sinfo->axes[i]] = 1;
 	else {			/* really omit */
@@ -411,18 +500,19 @@ int dimensionLoopResult(loopInfo *sinfo, loopInfo *tinfo, int type,
 	naxes = 0;
       memcpy(axes, axes + n, naxes*sizeof(int));
       break;
+    }
   }
 
   /* create the output symbol */
   if (ndim) {		/* get an array */
-    output = array_scratch(type, ndim, dims);
-    ptr.l = (int *) array_data(output);
+    target = array_scratch(ttype, ndim, dims);
+    ptr.l = (int *) array_data(target);
   } else {			/* get a scalar */
-    output = scalar_scratch(type);
-    if (isComplexType(type))
-      ptr.cf = complex_scalar_data(output).cf;
+    target = scalar_scratch(ttype);
+    if (isComplexType(ttype))
+      ptr.cf = complex_scalar_data(target).cf;
     else
-      ptr.l = &scalar_value(output).l;
+      ptr.l = &scalar_value(target).l;
   }
 
   *tptr = ptr;			/* store pointer to output data */
@@ -430,8 +520,15 @@ int dimensionLoopResult(loopInfo *sinfo, loopInfo *tinfo, int type,
    element of tinfo. */
 
   /* fill loop structure for output symbol */
-  setupDimensionLoop(tinfo, ndim, dims, type, naxes, axes, tptr, mode); 
-  return output;
+  setupDimensionLoop(tinfo, ndim, dims, ttype, naxes, axes, tptr, tmode);
+  return target;
+}
+/*-----------------------------------------------------------------------*/
+int dimensionLoopResult(loopInfo const *sinfo, loopInfo *tinfo,
+                         int ttype, pointer *tptr)
+{
+  return dimensionLoopResult1(sinfo, sinfo->mode, ttype,
+                              0, NULL, 0, NULL, tinfo, tptr);
 }
 /*-----------------------------------------------------------------------*/
 int standardLoop(int data, int axisSym, int mode, int outType,
@@ -455,22 +552,19 @@ int standardLoop(int data, int axisSym, int mode, int outType,
 
 }
 /*-----------------------------------------------------------------------*/
-/* Like standardLoop but prefixes one dimension to the target, of the
-   indicated size <newdim>.  The target pointer advances along the
-   indicated (old) dimension, and the source pointer along the
-   indicated dimension.  The user must advance the target pointer through
-   the new dimension. LS 2011-07-22 */
-int standardLoopAddDim(int data, int axisSym, int mode, int outType,
-                       int newdim,
-                       loopInfo *src, pointer *srcptr, int *output,
-                       loopInfo *trgt, pointer *trgtptr)
+/* Like standardLoop but can produce a target like the source
+   but with adjusted dimensions. LS 2011-07-22 */
+int standardLoopX(int source, int axisSym, int srcMode,
+                  loopInfo *srcinf, pointer *srcptr,
+                  int nMore, int const * more,
+                  int nLess, int const * less,
+                  int tgtType, int tgtMode,
+                  int *target,
+                  loopInfo *tgtinf, pointer *tgtptr)
 {
   int i, nAxes;
   pointer axes;
 
-  if (newdim < 2)
-    return anaerror("Illegal extra dimension requested in standardLoopAddDim",
-                    data);
   if (axisSym > 0) {		/* <axisSym> is a regular symbol */
     if (!symbolIsNumerical(axisSym))
       return error("Need a numerical argument", axisSym); /* <axisSym> was not numerical */
@@ -480,38 +574,10 @@ int standardLoopAddDim(int data, int axisSym, int mode, int outType,
     nAxes = 0;
     axes.l = NULL;
   }
-  int result = standardLoop0(data, nAxes, axes.l, mode, outType,
-                             src, srcptr, NULL, NULL, NULL);
-  if (result < 0)
-    return result;
-  if (src->ndim >= MAX_DIMS)
-    return cerror(ILL_DIM, data);
-  if (output) {
-    /* create output symbol */
-    loopInfo t;
-    int i;
-
-    memcpy(t.dims + 1, src->dims, src->ndim*sizeof(*src->dims));
-    t.dims[0] = newdim;
-    t.ndim = src->ndim + 1;
-    if (((mode & SL_UPGRADE)
-	 && outType < src->type)
-	|| (mode & SL_KEEPTYPE))
-      t.type = src->type;	/* output type equal to source type */
-    else
-      t.type = outType;         /* take specified output type */
-    t.mode = src->mode | SL_EACHROW;
-    memcpy(t.axes + 1, src->axes, src->naxes*sizeof(*src->axes));
-    t.axes[0] = 0;              /* new axis first */
-    t.naxes = src->naxes + 1;
-    for (i = 1; i < t.naxes; i++)
-      t.axes[i]++;              /* adjust for inserted axis */
-    *output = dimensionLoopResult(&t, trgt, t.type, trgtptr);
-    if (*output == ANA_ERROR)
-      /* but didn't get one */
-      return ANA_ERROR;
-  }
-  return ANA_OK;
+  int result = standardLoop1(source, nAxes, axes.l, srcMode,
+                             srcinf, srcptr, nMore, more, nLess, less,
+                             tgtType, tgtMode, target, tgtinf, tgtptr);
+  return result;
 }
 /*-----------------------------------------------------------------------*/
 int standardLoop0(int data, int nAxes, int *axes, int mode, int outType,
@@ -684,6 +750,223 @@ int standardLoop0(int data, int nAxes, int *axes, int mode, int outType,
   return ANA_OK;
 }
 #undef DEBUG_VOCAL
+/*-----------------------------------------------------------------------*/
+int standardLoop1(int source,
+                  int nAxes, int * axes,
+                  int srcMode,
+                  loopInfo *srcinf, pointer *srcptr,
+                  int nMore, int * more,
+                  int nLess, int * less,
+                  int tgtType, int tgtMode,
+                  int *target, 
+                  loopInfo *tgtinf, pointer *tgtptr)
+/* initiates a standard array loop.  advanceLoop() runs through the loop.
+   <source> (in): source data symbol, must be numerical
+   <nAxes> (in): the number of axes to treat
+   <axes> (in): a pointer to the list of axes to treat
+   <srcMode> (in): flags that indicate desired action for source
+   <srcinf> (out): loop info for source
+   <srcptr> (out): pointer to the data in source
+   <nMore> (in): the number of axes (out of <axes>) of which to
+     increase the size
+   <more> (in): a pointer to the list of axis size factors
+   <nLess> (in): the number of axes (out of <axes>) of which to
+     decrease the size
+   <less> (in): a pointer to the list of axis size divisors
+   <tgtType> (in): desired data type for newly created target data symbol
+   <tgtmode> (in): flags that indicate desired action for target
+   <target> (out): created target data symbol
+   <tgtinf> (out): returns loop info for target
+   <trgtptr> (out): pointer to the data in target
+
+   if <target> is NULL, then no target-related output variables are
+   filled in.  If any of the output variables are NULL, then those
+   variables are not filled in.
+
+   If <axes> is NULL, then <nAxes> is ignored.  If <axes> is not NULL,
+   then it must point to an array of <nAxes> numbers indicating the
+   axes (dimensions) of interest.  If any of those axes are negative
+   or greater than or equal to the number of dimensions in <source>,
+   then an error is declared.  If <nAxes> is less than 1, then an
+   error is declared.  Further restrictions on the axis values may be
+   specified through <srcMode>.
+
+   By default, <target> gets the same dimensions as <source>.  This
+   can be changed through <more>, <nMore>, <less>, <nLess>, and
+   <tgtMode>.  <nMore> and <more> specify how many dimensions to add,
+   and of what size.
+
+   If <more> is NULL, then <nMore> is ignored.  If <more> is not NULL,
+   then it must point to an array of <nMore> numbers indicating the
+   sizes of the new dimensions to be added to <target>.  If any of
+   those sizes are less than 1, then an error is declared.  If <nMore>
+   is less than 1, then an error is declared.  The extra dimensions
+   are prefixed to the existing ones, in the indicated order.
+
+   If <less> is NULL, then <nLess> is ignored.  If <less> is not NULL,
+   then it must point to an array of <nLess> numbers indicating by
+   which factors the sizes of the indicated axes should be reduced.
+   The "indicated axes" are those from <axes>.  If <nLess> is greater
+   than the number of indicated axes, then an error is declared.  If
+   <nLess> is less than 1, then an error is declared.  If <nLess> is
+   greater than 0 but less than the number of indicated axes, then the
+   last element of <less> is implicitly repeated as needed.  If the
+   size of one of the corresponding axes of <source> is not a multiple
+   of the corresponding number from <more>, then an error is
+   declared.  If after reduction the size of the dimension is equal to
+   1, then that dimension may be omitted from the result, depending on
+   the value of <tgtMode>.
+
+   If the final number of dimensions in <target> (taking into account
+   <more> and <less> and <tgtMode>) would exceed MAX_DIMS, then an
+   error is declared.
+    
+   <srcMode> flags:
+
+   about the axes:
+   SL_ALLAXES: same as specifying all dimensions of <data> in ascending order
+           in <axes>; the values of <axes> and <nAxes> are ignored.
+   SL_TAKEONED: take the <data> as one-dimensional; the values of <axes>
+           and <nAxes> are ignored
+
+   about specified axes:
+   SL_NEGONED:  if the user supplies a single axis and that axis is negative,
+           then <data> is treated as if it were one-dimensional (yet
+	   containing all of its data elements)
+   SL_ONEAXIS:  only a single axis is allowed
+   SL_UNIQUEAXES: all specified axes must be unique (no duplicates)
+
+   about the input <data>:
+   SL_SRCUPGRADE: use a copy of <data> which is upgraded to <tgtType> if
+           necessary
+
+   about the desired axis order and coordinate availability:
+   SL_EACHCOORD: the currently selected axis goes first; the remaining
+           axes come later, in their original order; the user gets
+	   access to all coordinates (DEFAULT)
+   SL_AXISCOORD: the currently selected axis goes first; the user gets access
+	    only to the coordinate along the indicated axis; remaining axes
+	    come later, lumped together as much as possible for faster
+	    execution
+   SL_AXESBLOCK: all specified axes go first in the specified order;
+	    the remaining axes come later, in their original order; the user
+	    gets access to all coordinates.  Implies SL_UNIQUEAXES.
+
+   about the coordinate treatment:
+   SL_EACHROW: the data is advanced one row at a time; the user must
+	    take care of advancing the data pointer to the beginning of
+	    the next row   
+   SL_EACHBLOCK: like SL_EACHROW, but all selected axes together are
+	    considered to be a "row".  Implies SL_AXESBLOCK.
+
+   <tgtMode> flags:
+
+   about the output symbol:
+   SL_EXACT: must get exactly the data type indicated by <tgtType> (DEFAULT)
+   SL_UPGRADE: must get the data type of <source> or <tgtType>, whichever is
+           greater
+   SL_KEEPTYPE: gets the same type as <source>
+
+   SL_ONEDIMS: omitted dimensions are not really removed but rather set to 1
+
+   SL_COMPRESS: gets the same dimensions as <data>, except that
+           the currently selected axis is omitted.  If no dimensions
+           are left, then a scalar is returned.  Ignored unless <less>
+           is NULL.
+   SL_COMPRESSALL: gets the same dimensions as <data>, except that all
+           selected axes are omitted.  If no dimensions are left, then
+           a scalar is returned.  Ignored unless <less> is NULL.
+
+   about the desired axis order and coordinate availability:
+   SL_EACHCOORD: the currently selected axis goes first; the remaining
+           axes come later, in their original order; the user gets
+	   access to all coordinates (DEFAULT)
+   SL_AXISCOORD: the currently selected axis goes first; the user gets access
+	    only to the coordinate along the indicated axis; remaining axes
+	    come later, lumped together as much as possible for faster
+	    execution
+   SL_AXESBLOCK: all specified axes go first in the specified order;
+	    the remaining axes come later, in their original order; the user
+	    gets access to all coordinates.  Implies SL_UNIQUEAXES.
+
+   about the coordinate treatment:
+   SL_EACHROW: the data is advanced one row at a time; the user must
+	    take care of advancing the data pointer to the beginning of
+	    the next row   
+   SL_EACHBLOCK: like SL_EACHROW, but all selected axes together are
+	    considered to be a "row".  Implies SL_AXESBLOCK.
+  */
+{
+  int *dims;
+  int ndim, i, temp[MAX_DIMS];
+
+  /* check if <source> is of proper class, and get some info about it */
+  if (numerical(source, &dims, &ndim, NULL, srcptr) == ANA_ERROR)
+    return ANA_ERROR;		/* some error */
+  
+  if (srcMode & SL_TAKEONED)	/* take data as 1D */
+    nAxes = 0;			/* treat as 1D */
+  else if (srcMode & SL_ALLAXES) { /* select all axes */
+    nAxes = ndim;
+    axes = NULL;		/* treat as if all axes were specified */
+  } else if ((srcMode & SL_NEGONED)	/* negative-axis treatment */
+	     && nAxes == 1		/* one axis specified */
+	     && *axes < 0)	/* and it is negative */
+    nAxes = 0;
+  
+  if ((srcMode & SL_ONEAXIS)	/* only one axis allowed */
+      && nAxes > 1)		/* and more than one selected */
+    return anaerror("Only one axis allowed", -1);
+
+  /* check the specified axes for legality */
+  if (nAxes && axes) {
+    for (i = 0; i < nAxes; i++) /* check all specified axes */
+      if (axes[i] < 0		/* axis is negative */
+	  || axes[i] >= ndim)	/* or too great */
+	return anaerror("Illegal axis %1d", -1, axes[i]);
+    if (srcMode & SL_UNIQUEAXES) { /* no axis must occur more than once */
+      zerobytes(temp, ndim*sizeof(int));
+      for (i = 0; i < nAxes; i++)
+	if (temp[axes[i]]++)
+	  return anaerror("Axis %1d illegally specified more than once",
+			  -1, axes[i]);
+    }
+  }
+  
+  /* The input is of legal classes and types. */
+    
+  if ((srcMode & SL_SRCUPGRADE)	/* upgrade source if necessary */
+      && (symbol_type(source) < tgtType))	{ /* source needs upgrading */
+    source = ana_convert(1, &source, tgtType, 1); /* upgrade */
+    numerical(source, NULL, NULL, NULL, srcptr);
+  }
+
+  setupDimensionLoop(srcinf, ndim, dims, symbol_type(source), nAxes,
+		     axes, srcptr, srcMode);
+
+  if (target) {			/* user wants an output symbol */
+    if (((tgtMode & SL_UPGRADE)
+	 && tgtType < srcinf->type)
+	|| (tgtMode & SL_KEEPTYPE))
+      tgtinf->type = srcinf->type; /* output type equal to source type */
+    else
+      tgtinf->type = tgtType;	/* take specified output type */
+        
+    *target = dimensionLoopResult1(srcinf, tgtMode, tgtinf->type, 
+                                   nMore, more, nLess, less, tgtinf,
+                                   tgtptr);
+    if (*target == ANA_ERROR)
+      /* but didn't get one */
+      return ANA_ERROR;
+  }
+  
+  if (srcMode & SL_TAKEONED) { /* mimic 1D array */
+    srcinf->dims[0] = srcinf->rdims[0] = srcinf->nelem;
+    srcinf->ndim = srcinf->rndim = 1;
+  }
+
+  return ANA_OK;
+}
 /*-----------------------------------------------------------------------*/
 int nextLoop(loopInfo *info)
 /* rearranges dimensions for a next loop through the array; returns 1

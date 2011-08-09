@@ -694,7 +694,7 @@ extern int ana_abs(), ana_acos(), ana_arestore_f(), ana_arg(),
   ana_imaginary(), ana_incomplete_beta(), ana_incomplete_gamma(),
   ana_index(), ana_indgen(), ana_inpolygon(), intarr(), intfarr(),
   ana_isarray(), ana_isnan(), ana_isscalar(), ana_isstring(),
-  ana_istring(), ana_j0(), ana_j1(), ana_jd(), ana_jn(),
+  ana_istring(), ana_j0(), ana_j1(), ana_jd(), ana_jn(), ana_cjd(),
   ana_ksmooth(), ana_laplace2d(), ana_lmap(), ana_local_maxf(),
   ana_local_maxloc(),
   ana_local_minf(), ana_local_minloc(), ana_log(), ana_log10(),
@@ -805,6 +805,7 @@ internalRoutine function[] = {
   { "%J_READKEYNE", 0, 0, ana_readkeyne, 0 }, /* strous.c */
   { "%K_SYSTIME", 0, 0, ana_systime, 0 }, /* fun1.c */
   { "%L_JD",	0, 0, ana_jd, 0 }, /* fun1.c */
+  { "%M_CJD",   0, 0, ana_cjd, 0 },                /* fun1.c */
   { "ABS",	1, 1, ana_abs, "*" }, /* fun1.c */
   { "ACOS",	1, 1, ana_acos, "*" }, /* fun1.c */
   { "ACOSH",	1, 1, ana_acosh, "*" }, /* fun1.c */
@@ -869,7 +870,8 @@ internalRoutine function[] = {
   { "BYTE",	1, 1, ana_byte, "*" }, /* symbols.c */
   { "BYTFARR",	3, MAX_DIMS + 1, bytfarr, "%1%OFFSET:1READONLY:2SWAP" }, /* filemap.c */
  { "CALENDAR",	1, 1, ana_calendar, /* astron.c */
-   "1FROMCOMMON:2FROMGREGORIAN:3FROMISLAMIC:4FROMJULIAN:5FROMJD:6FROMHEBREW:8FROMLONGCOUNT:9FROMEGYPTIAN:10FROMLUNAR:16TOCOMMON:32TOGREGORIAN:48TOISLAMIC:64TOJULIAN:80TOJD:96TOHEBREW:112TOMAYAN:128TOLONGCOUNT:144TOEGYPTIAN:160TOLUNAR:176TOLATIN:256TOTEXT:512TOISOTEXT:0FROMUTC:1024FROMTAI:2048FROMTT:0TOUTC:4096TOTAI:8192TOTT:0FROMYMD:16384FROMDMY:0TOYMD:32768TODMY" },
+   "1FROMCOMMON:2FROMGREGORIAN:3FROMISLAMIC:4FROMJULIAN:5FROMHEBREW:6FROMEGYPTIAN:7FROMJD:8FROMCJD:9FROMLUNAR:10FROMMAYAN:11FROMLONGCOUNT:12FROMLATIN:16TOCOMMON:32TOGREGORIAN:48TOISLAMIC:64TOJULIAN:80TOHEBREW:96TOEGYPTIAN:112TOJD:128TOCJD:144TOLUNAR:160TOMAYAN:176TOLONGCOUNT:192TOLATIN:256TOTEXT:512TOISOTEXT:0FROMUTC:1024FROMTAI:2048FROMTT:0TOUTC:4096TOTAI:8192TOTT:0FROMYMD:16384FROMDMY:0TOYMD:32768TODMY" },
+  /* "1FROMCOMMON:2FROMGREGORIAN:3FROMISLAMIC:4FROMJULIAN:5FROMJD:6FROMHEBREW:8FROMLONGCOUNT:9FROMEGYPTIAN:10FROMLUNAR:16TOCOMMON:32TOGREGORIAN:48TOISLAMIC:64TOJULIAN:80TOJD:96TOHEBREW:112TOMAYAN:128TOLONGCOUNT:144TOEGYPTIAN:160TOLUNAR:176TOLATIN:256TOTEXT:512TOISOTEXT:0FROMUTC:1024FROMTAI:2048FROMTT:0TOUTC:4096TOTAI:8192TOTT:0FROMYMD:16384FROMDMY:0TOYMD:32768TODMY" */
   { "CBRT",	1, 1, ana_cbrt, "*" }, /* fun1.c */
   { "CDBLARR",	1, MAX_ARG, cdblarr, 0 }, /* symbols.c */
   { "CDBLFARR", 3, MAX_DIMS + 1, cdblfarr, "%1%OFFSET:1READONLY:2SWAP" }, /* filemap.c */
@@ -4317,6 +4319,7 @@ void symbolInitialization(void)
  f_ptr("!BXT",		&postXTop);
  f_ptr("!BYB",		&postYBot);
  f_ptr("!BYT",		&postYTop);
+ fnc_p("!CJD",		12);
  l_ptr("!COL",		&uTermCol);
 #if X11
  l_ptr("!COLORMAX",	&colormax);

@@ -233,7 +233,7 @@ int ana_date(void)
 }
 /*------------------------------------------------------------------------- */
 int ana_jd(void)
-/* returns current Julian Date in double precision */
+/* returns current Julian Day (relative to UTC) in double precision */
 {
   time_t	t;
   double	jd;
@@ -252,6 +252,23 @@ int ana_jd(void)
   jd = (double) t/86400.0 + 2440587.5;
   result = scalar_scratch(ANA_DOUBLE);
   scalar_value(result).d = jd;
+  return result;
+}
+/*------------------------------------------------------------------------- */
+int ana_cjd(void)
+/* returns current Chronological Julian Day, relative to the current
+   time zone */
+{
+  time_t t;
+  double cjd;
+  int result;
+  struct tm *bd;
+
+  t = time(NULL);
+  bd = localtime(&t);
+  cjd = (double) (t + bd->tm_gmtoff)/86400.0 + 2440588.0;
+  result = scalar_scratch(ANA_DOUBLE);
+  scalar_value(result).d = cjd;
   return result;
 }
 /*------------------------------------------------------------------------- */

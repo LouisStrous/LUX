@@ -529,7 +529,7 @@ int Sprintf_general(char *str, char *format, va_list ap)
 	"Sep", "Oct", "Nov", "Dec"
       };
 
-      JDtoDate(va_arg(ap, double), &year, &month, &day, CAL_COMMON);
+      CJDtoDate(va_arg(ap, double), &year, &month, &day, CAL_COMMON);
       iday = (int) day;
       switch (precision) {
       case 1:			/* day of month only */

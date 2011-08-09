@@ -412,7 +412,7 @@ int dimensionLoopResult1(loopInfo const *sinfo,
   memcpy(axes, sinfo->axes, naxes*sizeof(*axes));
   /* it is assumed that 0 <= axes[i] < ndim for i = 0..naxes-1 */
 
-  if (less) {
+  if (nLess && less) {
     if (nLess < 1 || nLess > naxes)
       return anaerror("Illegal number %d of dimensions to reduce:"
                       " expected 1..%d", -1, nLess, naxes);
@@ -435,7 +435,7 @@ int dimensionLoopResult1(loopInfo const *sinfo,
     if (!(tmode & SL_ONEDIMS))  /* remove dimensions equal to 1 */
       omitRedundantDimensions(&ndim, dims, &naxes, axes);
   }
-  if (more) {
+  if (nMore && more) {
     if (nMore < 1)
       return anaerror("Illegal number %d of dimensions to add", -1, nMore);
     if (nMore + ndim > MAX_DIMS)
@@ -796,26 +796,28 @@ int standardLoop1(int source,
    <tgtMode>.  <nMore> and <more> specify how many dimensions to add,
    and of what size.
 
-   If <more> is NULL, then <nMore> is ignored.  If <more> is not NULL,
-   then it must point to an array of <nMore> numbers indicating the
-   sizes of the new dimensions to be added to <target>.  If any of
-   those sizes are less than 1, then an error is declared.  If <nMore>
-   is less than 1, then an error is declared.  The extra dimensions
-   are prefixed to the existing ones, in the indicated order.
+   If <more> is NULL, then <nMore> is ignored.  If <nMore> is zero,
+   then <more> is ignored.  If <more> is not NULL, then it must point
+   to an array of <nMore> numbers indicating the sizes of the new
+   dimensions to be added to <target>.  If any of those sizes are less
+   than 1, then an error is declared.  If <nMore> is less than 1, then
+   an error is declared.  The extra dimensions are prefixed to the
+   existing ones, in the indicated order.
 
-   If <less> is NULL, then <nLess> is ignored.  If <less> is not NULL,
-   then it must point to an array of <nLess> numbers indicating by
-   which factors the sizes of the indicated axes should be reduced.
-   The "indicated axes" are those from <axes>.  If <nLess> is greater
-   than the number of indicated axes, then an error is declared.  If
-   <nLess> is less than 1, then an error is declared.  If <nLess> is
-   greater than 0 but less than the number of indicated axes, then the
-   last element of <less> is implicitly repeated as needed.  If the
-   size of one of the corresponding axes of <source> is not a multiple
-   of the corresponding number from <more>, then an error is
-   declared.  If after reduction the size of the dimension is equal to
-   1, then that dimension may be omitted from the result, depending on
-   the value of <tgtMode>.
+   If <less> is NULL, then <nLess> is ignored.  If <nLess> is zero,
+   then <less> is ignored.  If <less> is not NULL, then it must point
+   to an array of <nLess> numbers indicating by which factors the
+   sizes of the indicated axes should be reduced.  The "indicated
+   axes" are those from <axes>.  If <nLess> is greater than the number
+   of indicated axes, then an error is declared.  If <nLess> is less
+   than 1, then an error is declared.  If <nLess> is greater than 0
+   but less than the number of indicated axes, then the last element
+   of <less> is implicitly repeated as needed.  If the size of one of
+   the corresponding axes of <source> is not a multiple of the
+   corresponding number from <more>, then an error is declared.  If
+   after reduction the size of the dimension is equal to 1, then that
+   dimension may be omitted from the result, depending on the value of
+   <tgtMode>.
 
    If the final number of dimensions in <target> (taking into account
    <more> and <less> and <tgtMode>) would exceed MAX_DIMS, then an

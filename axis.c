@@ -901,7 +901,7 @@ int standardLoop1(int source,
   int ndim, i, temp[MAX_DIMS];
 
   /* check if <source> is of proper class, and get some info about it */
-  if (numerical(source, &dims, &ndim, NULL, srcptr) == ANA_ERROR)
+  if (numerical_or_string(source, &dims, &ndim, NULL, srcptr) == ANA_ERROR)
     return ANA_ERROR;		/* some error */
   
   if (srcMode & SL_TAKEONED)	/* take data as 1D */
@@ -938,7 +938,7 @@ int standardLoop1(int source,
   if ((srcMode & SL_SRCUPGRADE)	/* upgrade source if necessary */
       && (symbol_type(source) < tgtType))	{ /* source needs upgrading */
     source = ana_convert(1, &source, tgtType, 1); /* upgrade */
-    numerical(source, NULL, NULL, NULL, srcptr);
+    numerical_or_string(source, NULL, NULL, NULL, srcptr);
   }
 
   setupDimensionLoop(srcinf, ndim, dims, symbol_type(source), nAxes,

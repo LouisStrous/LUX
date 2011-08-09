@@ -1362,3 +1362,62 @@ int numerical(int data, int **dims, int *nDim, int *size, pointer *src)
   return 1;
 }
 /*---------------------------------------------------------------------*/
+int numerical_or_string(int data, int **dims, int *nDim, int *size, pointer *src)
+/* checks that <data> is of numerical or string type and returns dimensional */
+/* information in <*dims>, <*nDim>, and <*size> (if these are non-zero), */
+/* and a pointer to the data in <*src>.  If <*dims> is non-null, then
+   the user must have made sure it points at properly reserved memory
+   space. LS 21apr97, 2011-08-11 */
+{
+  static int	one = 1;
+
+  switch (symbol_class(data)) {
+  default:
+    return cerror(ILL_CLASS, data);
+  case ANA_SCAL_PTR:
+    data = dereferenceScalPointer(data);
+    /* fall-thru */
+  case ANA_SCALAR:
+    if (dims) 
+      *dims = &one;
+    if (nDim)
+      *nDim = 1;
+    if (size)
+      *size = 1;
+    if (src)
+      (*src).l = &scalar_value(data).l;
+    break;
+  case ANA_CSCALAR:
+    if (dims)
+      *dims = &one;
+    if (nDim)
+      *nDim = 1;
+    if (size)
+      *size = 1;
+    if (src)
+      (*src).cf = complex_scalar_data(data).cf;
+    break;
+  case ANA_ARRAY: case ANA_CARRAY:
+    if (dims)
+      *dims = array_dims(data);
+    if (nDim)
+      *nDim = array_num_dims(data);
+    if (size)
+      *size = array_size(data);
+    if (src)
+      (*src).l = array_data(data);
+    break;
+  case ANA_LSTRING: case ANA_STRING:
+    if (dims)
+      *dims = &one;
+    if (nDim)
+      *nDim = 1;
+    if (size)
+      *size = 1;
+    if (src)
+      (*src).sp = &string_value(data);
+    break;
+  }
+  return 1;
+}
+/*--------------------------------------------------------------------*/

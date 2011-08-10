@@ -681,13 +681,15 @@ void CJDNtoMayan(int CJDN, int *trecena, int *venteina,
                  int *haab_day, int *haab_month,
                  int *year_trecena, int *year_venteina)
 {
+  int y, doy;
+
   *trecena = remfloor(CJDN + 5, 13) + 1;
   *venteina = remfloor(CJDN + 16, 20) + 1;
-  int d = remfloor(CJDN + 65, 365);
-  *haab_day = remfloor(d, 20);
-  *haab_month = d/20 + 1;
-  *year_trecena = remfloor(CJDN + 5 - d, 13) + 1;
-  *year_venteina = remfloor(CJDN + 16 - d, 20) + 1;
+  quotfloor(CJDN + 65, 365, &y, &doy);
+  *haab_day = remfloor(doy, 20);
+  *haab_month = doy/20 + 1;
+  *year_trecena = remfloor(y + 5, 13) + 1;
+  *year_venteina = remfloor(5*y + 11, 20) + 1;
 }
 /*--------------------------------------------------------------------------*/
 void CJDNtoMayanA(int const *CJDN, int *date)
@@ -696,7 +698,79 @@ void CJDNtoMayanA(int const *CJDN, int *date)
               &date[5]);
 }
 /*--------------------------------------------------------------------------*/
-/* TODO: MayantoCJDN */
+int MayantoCJDN(int trecena, int venteina, int haab_day, int haab_month,
+                int year_trecena, int year_venteina, int CJDN_upper)
+{
+  int do_tzolkin = (trecena && venteina);
+  int do_haab = (haab_month != 0);
+  int do_year = (year_trecena && year_venteina);
+  int haab, tzolkin, year, haab_year;
+
+  if (do_tzolkin) {
+    trecena = iamod(trecena - 6, 13);
+    venteina = iamod(venteina - 17, 20);
+    tzolkin = iamod(40*trecena - 39*venteina, 260);
+  }
+  if (do_haab)
+    haab = iamod((haab_month - 4)*20 + haab_day - 5, 365);
+  if (do_year) {
+    if ((year_venteina - 12) % 5)
+      return 0;                 /* impossible year venteina */
+    year_trecena = iamod(year_trecena - 6, 13);
+    year_venteina = iamod(divfloor(year_venteina - 12, 5), 4);
+    year = iamod(40*year_trecena + 13*year_venteina, 52);
+    haab_year = 365*year - 65;
+    /* CJDN = haab_year + 18980*year + haab */
+    /* CJDN_firstofyear = haab_year (mod 18980) */
+    /* CJDN_lastofyear = haab_year + 364 (mod 18980) */
+  }
+  switch (do_tzolkin + (do_haab << 1) + (do_year << 2)) {
+  case 0:
+    return 0;
+  case 1:                       /* tzolkin */
+    return CJDN_upper - iamod(CJDN_upper - tzolkin, 260);
+  case 2:                       /* haab */
+    return CJDN_upper - iamod(CJDN_upper - haab, 365);
+  case 3:                       /* tzolkin & haab */
+    {
+      int tzolkin_haab = iamod(365*tzolkin - 364*haab, 18980);
+      return CJDN_upper - iamod(CJDN_upper - tzolkin_haab, 18980);
+    }
+  case 4:                       /* year */
+    return CJDN_upper - iamod(CJDN_upper - haab_year, 18980);
+  case 5:                       /* tzolkin & year */
+    {
+      int CJDN_tzolkin = CJDN_upper - iamod(CJDN_upper - tzolkin, 260);
+      int CJDN_haab_year = CJDN_upper - iamod(CJDN_upper - haab_year, 18980);
+      /* now CJDN_tzolkin is the last matching tzolkin on/before
+         CJDN_upper, and CJDN_haab_year is the last matching beginning of
+         the haab year on/before CJDN_upper, but CJDN_tzolkin may
+         still be before CJDN_haab_year */
+      return CJDN_tzolkin + (18980-260)*divfloor(CJDN_tzolkin - CJDN_haab_year, 260);
+    }
+  case 6:                       /* haab & year */
+    {
+      int CJDN_haab = CJDN_upper - iamod(CJDN_upper - haab, 365);
+      int CJDN_haab_year = CJDN_upper - iamod(CJDN_upper - haab_year, 18980);
+      return CJDN_haab + (18980-365)*divfloor(CJDN_haab - CJDN_haab_year, 365);
+    }
+  case 7:                       /* tzolkin & haab & year */
+    {
+      int CJDN_tzolkin = CJDN_upper - iamod(CJDN_upper - tzolkin, 260);
+      int CJDN_haab_year = CJDN_upper - iamod(CJDN_upper - haab_year, 18980);
+      int CJDN = CJDN_tzolkin + (18980-260)*divfloor(CJDN_tzolkin - CJDN_haab_year, 260);
+      int CJDN_haab = CJDN_upper - iamod(CJDN_upper - haab, 365);
+      return CJDN == CJDN_haab? CJDN: 0;
+    }
+    break;
+  }
+}
+/*--------------------------------------------------------------------------*/
+void MayantoCJDNA(int const *date, int *CJDN)
+{
+  *CJDN = MayantoCJDN(date[0], date[1], date[2], date[3], date[4], date[5],
+                      date[6]);
+}
 /*--------------------------------------------------------------------------*/
 static char const *Mayan_venteina_names[] = {
   "Imix'", "Ik'", "Ak'b'al", "K'an", "Chikchan", "Kimi", "Manik'", "Lamat",

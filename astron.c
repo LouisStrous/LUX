@@ -797,10 +797,6 @@ int ana_calendar(int narg, int ps[])
   totime = extractbits(internalMode, CAL_TIME_BASE + CAL_TIME_BITS,
 		       CAL_TIME_BITS);
 
-  if (fromcalendar > CAL_LONGCOUNT || tocalendar > CAL_LONGCOUNT
-      || fromcalendar == CAL_MAYAN)
-    return anaerror("Calendar transformation not supported yet", *ps);
-
   if (fromcalendar == CAL_DEFAULT) {
     if (symbolIsArray(ps[0])) {
       if (symbolIsStringArray(ps[0])
@@ -829,7 +825,8 @@ int ana_calendar(int narg, int ps[])
     return *ps;
 
   static struct {
-    int elements_per_date;
+    int to_elements_per_date;   /* translating to calendar date */
+    int from_elements_per_date; /* translating from calendar date */
     void (*CJDNtoCal)(int const *CJDN, int *date);
     void (*CJDtoCal)(double const *CJD, double *date);
     void (*CaltoCJDN)(int const *date, int *CJDN);
@@ -838,18 +835,18 @@ int ana_calendar(int narg, int ps[])
     void (*CJDtoCalS)(double const *CJD, char **date);
     void (*CalStoCJD)(char * const *date, double *CJD);
   } cal_data[] = {
-    { 0, NULL,             NULL,            NULL,             NULL,            NULL,              NULL,             NULL },
-    { 3, CJDNtoCommonA,    CJDtoCommonA,    CommontoCJDNA,    CommontoCJDA,    CJDNtoCommonSA,    CJDtoCommonSA,    CommonStoCJDA },
-    { 3, CJDNtoGregorianA, CJDtoGregorianA, GregoriantoCJDNA, GregoriantoCJDA, CJDNtoGregorianSA, CJDtoGregorianSA, GregorianStoCJDA },
-    { 3, CJDNtoIslamicA,   CJDtoIslamicA,   IslamictoCJDNA,   IslamictoCJDA,   CJDNtoIslamicSA,   CJDtoIslamicSA,   IslamicStoCJDA },
-    { 3, CJDNtoJulianA,    CJDtoJulianA,    JuliantoCJDNA,    JuliantoCJDA,    CJDNtoJulianSA,    CJDtoJulianSA,    JulianStoCJDA },
-    { 3, CJDNtoHebrewA,    CJDtoHebrewA,    HebrewtoCJDNA,    HebrewtoCJDA,    CJDNtoHebrewSA,    CJDtoHebrewSA,    HebrewStoCJDA },
-    { 3, CJDNtoEgyptianA,  CJDtoEgyptianA,  EgyptiantoCJDNA,  EgyptiantoCJDA,  CJDNtoEgyptianSA,  CJDtoEgyptianSA,  EgyptianStoCJDA },
-    { 1, NULL,             CJDtoJDA,        NULL,             JDtoCJDA,        NULL,              NULL,             NULL },
-    { 1, CJDNtoCJDNA,      CJDtoCJDA,       CJDNtoCJDNA,      CJDtoCJDA,       NULL,              NULL,             NULL },
-    { 1, NULL,             CJDtoLunarA,     NULL,             LunartoCJDA,     NULL,              NULL,             NULL },
-    { 6, CJDNtoMayanA,     NULL,            NULL,             NULL,            CJDNtoMayanSA,     NULL,             NULL },
-    { 5, CJDNtoLongCountA, NULL,            LongCounttoCJDNA, NULL,            CJDNtoLongCountSA, NULL,             NULL },
+    { 0, 0, NULL,             NULL,            NULL,             NULL,            NULL,              NULL,             NULL },
+    { 3, 3, CJDNtoCommonA,    CJDtoCommonA,    CommontoCJDNA,    CommontoCJDA,    CJDNtoCommonSA,    CJDtoCommonSA,    CommonStoCJDA },
+    { 3, 3, CJDNtoGregorianA, CJDtoGregorianA, GregoriantoCJDNA, GregoriantoCJDA, CJDNtoGregorianSA, CJDtoGregorianSA, GregorianStoCJDA },
+    { 3, 3, CJDNtoIslamicA,   CJDtoIslamicA,   IslamictoCJDNA,   IslamictoCJDA,   CJDNtoIslamicSA,   CJDtoIslamicSA,   IslamicStoCJDA },
+    { 3, 3, CJDNtoJulianA,    CJDtoJulianA,    JuliantoCJDNA,    JuliantoCJDA,    CJDNtoJulianSA,    CJDtoJulianSA,    JulianStoCJDA },
+    { 3, 3, CJDNtoHebrewA,    CJDtoHebrewA,    HebrewtoCJDNA,    HebrewtoCJDA,    CJDNtoHebrewSA,    CJDtoHebrewSA,    HebrewStoCJDA },
+    { 3, 3, CJDNtoEgyptianA,  CJDtoEgyptianA,  EgyptiantoCJDNA,  EgyptiantoCJDA,  CJDNtoEgyptianSA,  CJDtoEgyptianSA,  EgyptianStoCJDA },
+    { 1, 1, NULL,             CJDtoJDA,        NULL,             JDtoCJDA,        NULL,              NULL,             NULL },
+    { 1, 1, CJDNtoCJDNA,      CJDtoCJDA,       CJDNtoCJDNA,      CJDtoCJDA,       NULL,              NULL,             NULL },
+    { 1, 1, NULL,             CJDtoLunarA,     NULL,             LunartoCJDA,     NULL,              NULL,             NULL },
+    { 6, 7, CJDNtoMayanA,     NULL,            MayantoCJDNA,     NULL,            CJDNtoMayanSA,     NULL,             NULL },
+    { 5, 5, CJDNtoLongCountA, NULL,            LongCounttoCJDNA, NULL,            CJDNtoLongCountSA, NULL,             NULL },
   };
 
   /* 
@@ -872,7 +869,7 @@ int ana_calendar(int narg, int ps[])
     inputtype = ANA_DOUBLE;
   }
 
-  input_elem_per_date = cal_data[fromcalendar].elements_per_date;
+  input_elem_per_date = cal_data[fromcalendar].from_elements_per_date;
 
   switch (input_elem_per_date) {
   case 1:
@@ -905,7 +902,7 @@ int ana_calendar(int narg, int ps[])
       outputtype = internaltype;
   } else
     outputtype = ANA_STRING_ARRAY;
-  output_elem_per_date = cal_data[tocalendar].elements_per_date;
+  output_elem_per_date = cal_data[tocalendar].to_elements_per_date;
   if (outputtype == ANA_STRING_ARRAY)
     output_elem_per_date = 1;
   
@@ -1002,7 +999,7 @@ int ana_calendar(int narg, int ps[])
     case ANA_DOUBLE:            /* translate to CJD */
       switch (inputtype) {
       case ANA_LONG:
-        assert(cal_data[fromcalendar].elements_per_date == 1);
+        assert(cal_data[fromcalendar].to_elements_per_date == 1);
         temp.d = (double) *src.l;
         CaltoCJD(&temp.d, &timestamp.d);
         src.l += input_elem_per_date;
@@ -1031,7 +1028,7 @@ int ana_calendar(int narg, int ps[])
         tgt.l += output_elem_per_date;
         break;
       case ANA_DOUBLE:
-        assert(cal_data[tocalendar].elements_per_date == 1);
+        assert(cal_data[tocalendar].to_elements_per_date == 1);
         temp.d = (double) timestamp.l;
         CJDtoCal(&temp.d, tgt.d);
         tgt.d += output_elem_per_date;

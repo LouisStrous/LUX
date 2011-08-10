@@ -932,6 +932,67 @@ void CJDNtoMayanA(int const *CJDN, int *date);
   */
 void CJDNtoMayanSA(int const *CJDN, char **date);
 
+/** Translates a Mayan calendar date to a corresponding Chronological
+    Julian Day Number on or before a specified Chronological Julian
+    Day Number.
+
+    \param[in] trecena the trecena number of the Mayan calendar date.
+    If it is 0, then \p trecena and \p venteina are ignored.
+
+    \param[in] venteina the venteina number of the Mayan calendar
+    date.  If it is 0, then \p trecena and \p venteina are ignored.
+
+    \param[in] haab_day the haab day number of the Mayan calendar
+    date.
+
+    \param[in] haab_month the haab month number of the Mayan calendar
+    date.  If it is 0, then \p haab_day and \p haab_month are ignored.
+
+    \param[in] year_trecena the trecena number that identifies the
+    Mayan year.  If it is 0, then \p year_trecena and \p year_venteina
+    are ignored.
+
+    \param[in] year_venteina the venteina number that identifies the
+    Mayan year.  If it is 0, then \p year_trecena and \p year_venteina
+    are ignored.
+
+    \param[in] CJDN_upper the upper limit to the Chronological Julian
+    Day Number that may be returned.
+
+    \return the greatest Chronological Julian Day Number not exceeding
+    \p CJDN_upper that has the specified Mayan calendar date, or 0 if
+    an impossible Mayan calendar date is specified.
+ */
+int MayantoCJDN(int trecena, int venteina, int haab_day, int haab_month,
+                int year_trecena, int year_venteina, int CJDN_upper);
+
+
+/** Translates a Mayan calendar date to a corresponding Chronological
+    Julian Day Number on or before a specified Chronological Julian
+    Day Number.
+
+    \param[in] *date a pointer to the Mayan calendar date components.
+    Must have at least 7 elements!  The elements of \p date are: (1)
+    the trecena number of the Mayan calendar date.  If it is 0, then
+    the trecena and venteina numbers are ignored. (2) the venteina
+    number of the Mayan calendar date.  If it is 0, then the trecena
+    and venteina numbers are ignored. (3) the haab day number of the
+    Mayan calendar date. (4) the haab month number of the Mayan
+    calendar date.  If it is 0, then the haab day and haab month
+    numbers are ignored. (5) the trecena number that identifies the
+    Mayan year.  If it is 0, then the_trecena and_venteina numbers
+    that identify the year are ignored. (6) the venteina number that
+    identifies the Mayan year.  If it is 0, then the trecena and
+    venteina numbers that identify the year are ignored. (7) the upper
+    limit to the Chronological Julian Day Number that may be returned.
+
+    \param[out] CJDN a pointer to the greatest Chronological Julian
+    Day Number not exceeding the specified upper limit that has the
+    specified Mayan calendar date components, or 0 if an impossible
+    Mayan calendar date is specified.
+ */
+void MayantoCJDNA(int const *date, int *CJDN);
+
 /** Translates a Chronological Julian Day Number to a Maya Long Count.
 
     \param[in] CJDN the Chronological Julian Day Number to translate

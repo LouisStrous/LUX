@@ -2394,9 +2394,9 @@ int ana_strpbrk(int narg, int ps[])
   int  mq, off;
   int    result_sym;
 
-  if (!symbolIsString(ps[0]))
+  if (!symbolIsStringScalar(ps[0]))
     return cerror(NEED_STR, ps[0]);
-  if (!symbolIsString(ps[1]))
+  if (!symbolIsStringScalar(ps[1]))
     return cerror(NEED_STR, ps[1]);
   p1 = string_value(ps[0]);
   p2 = string_value(ps[1]);

@@ -48,9 +48,36 @@
 
     The Egyptian calendar is according to the era of Seleukos, with
     the epoch corresponding to 26 February -747 on the Julian
-    calendar.  */
+    calendar.  
+    
+    The function names are built up as follows:
+    \li \c CJDNtoCal = from CJDN to calendar date
+    \li \c CJDtoCal = from CJD to calendar date
+    \li \c CaltoCJDN = from calendar date to CJDN
+    \li \c CaltoCJD = from calendar date to CJD
+    \li \c -S- = to/from a calendar date in text format
+    \li \c -A = with all arguments pointers to arrays
 
-/** Translates a Chronological Julian Day Number to a Gregorian
+*/
+
+/** Returns the current Chronological Julian Day value based on the
+    system's time zone.
+
+    \return the current Chronological Julian Day value
+ */
+double CJD_now(void);
+
+/** Returns the current Chronological Julian Day Number based on the
+    system's time zone.
+
+    \return the current Chronological Julian Day Number
+*/
+int CJDN_now(void);
+
+/* GREGORIAN CALENDAR */
+
+/**    
+    Translates a Chronological Julian Day Number to a Gregorian
     calendar date.
 
     \param[in] CJDN the Chronological Julian Day Number to translate
@@ -58,7 +85,7 @@
     \param[out] month pointer to the corresponding month.  Must not be NULL!
     \param[out] day pointer to the corresponding day.  Must not be NULL!
  */
-void CJDNtoGregorian(int CJDN, int *year, int *month, int *day);
+void   CJDNtoGregorian(int CJDN, int *year, int *month, int *day);
 
 /** Translates a Chronological Julian Day Number to a Gregorian
     calendar date.
@@ -68,7 +95,21 @@ void CJDNtoGregorian(int CJDN, int *year, int *month, int *day);
     \param[out] date a pointer to the corresponding calendar date.
     Must have at least 3 elements (year, month, date).
  */
-void CJDNtoGregorianA(int const *CJDN, int *date);
+void   CJDNtoGregorianA(int const *CJDN, int *date);
+
+/** Translates a Chronological Julian Day Number to Gregorian
+    calendar date text, consisting of the day number, the full month
+    name (in English), and the year number, separated by single
+    whitespaces.
+
+    \param[in] CJDN the Chronological Julian Day number to translate.
+
+    \return a pointer to a character array containing the
+    corresponding calendar date text.  The character array is
+    allocated by the routine; free after use.
+
+  */
+char * CJDNtoGregorianS(int CJDN);
 
 /** Translates a Chronological Julian Day Number to Gregorian
     calendar date text, consisting of the day number, the full month
@@ -83,9 +124,9 @@ void CJDNtoGregorianA(int const *CJDN, int *date);
     allocated by the routine; free after use.
 
   */
-void CJDNtoGregorianSA(int const *CJDN, char **date);
+void   CJDNtoGregorianSA(int const *CJDN, char **date);
 
-/** Translates a Chronological Julian Day to a Gregorian calendar
+/** Translates a Chronological Julian Day to a Gregorian
     date.
 
     \param[in] CJD the Chronological Julian Day to translate
@@ -93,7 +134,7 @@ void CJDNtoGregorianSA(int const *CJDN, char **date);
     \param[out] month pointer to the corresponding month.  Must not be NULL!
     \param[out] day pointer to the corresponding day.  Must not be NULL!
  */
-void CJDtoGregorian(double CJD, int *year, int *month, double *day);
+void   CJDtoGregorian(double CJD, int *year, int *month, double *day);
 
 /** Translates a Chronological Julian Day to a Gregorian calendar date.
 
@@ -103,7 +144,20 @@ void CJDtoGregorian(double CJD, int *year, int *month, double *day);
     \param[out] date a pointer to the corresponding calendar date.
     Must have at least 3 elements (year, month, day).
  */
-void CJDtoGregorianA(double const *CJD, double *date);
+void   CJDtoGregorianA(double const *CJD, double *date);
+
+/** Translates a Chronological Julian Day to Gregorian calendar
+    date text, consisting of the (fractional) day number, the full
+    month name (in English), and the year number, separated by single
+    whitespaces.
+
+    \param[in] CJD the Chronological Julian Day to translate.
+
+    \return a pointer to a character array containing the
+    corresponding calendar date text.  The character array is
+    allocated by the routine; free after use.
+  */
+char * CJDtoGregorianS(double CJD);
 
 /** Translates a Chronological Julian Day to Gregorian calendar
     date text, consisting of the (fractional) day number, the full
@@ -116,19 +170,17 @@ void CJDtoGregorianA(double const *CJD, double *date);
     \param[out] date a pointer to a character array containing the
     corresponding calendar date text.  The character array is
     allocated by the routine; free after use.
-
   */
-void CJDtoGregorianSA(double const *CJD, char **date);
+void   CJDtoGregorianSA(double const *CJD, char **date);
 
-/** Translates a Gregorian calendar date to a Chronological Julian Day
-    in text format.
+/** Translates a Gregorian calendar date to a Chronological Julian Day Number.
 
     \param[in] year the year
     \param[in] month the month
     \param[in] day the day
     \return the corresponding Chronological Julian Day Number
  */
-int GregoriantoCJDN(int year, int month, int day);
+int    GregoriantoCJDN(int year, int month, int day);
 
 /** Translates a Gregorian calendar date to a Chronological Julian Day
     Number.
@@ -139,7 +191,35 @@ int GregoriantoCJDN(int year, int month, int day);
     \param[out] CJDN a pointer to the corresponding Chronological
     Julian Day Number.  Must not be NULL.
  */
-void GregoriantoCJDNA(int const *date, int *CJDN);
+void   GregoriantoCJDNA(int const *date, int *CJDN);
+
+/** Translates a Gregorian calendar date in text form to a
+    Chronological Julian Day Number.
+
+    \param[in] date a pointer to the text containing the calendar
+    date.  Must not be NULL!  The date text must consist of a day
+    number, a full month name (in English), and a year number,
+    separated by whitespace.  The month name is matched without
+    regard to case distinctions or non-alphanumerical characters.
+
+    \return the corresponding Chronological Julian Day Number, or 0 if
+    no legal date was recognized in the input.
+ */
+int    GregorianStoCJDN(char const *date);
+
+/** Translates a Gregorian calendar date in text form to a
+    Chronological Julian Day Number.
+
+    \param[in] date a pointer to a pointer to the calendar date text.
+    Must not be NULL!  The date text must consist of a day number, a
+    full month name (in English), and a year number, separated by
+    whitespace.  The month name is matched without regard to case
+    distinctions or non-alphanumerical characters.
+
+    \return the corresponding Chronological Julian Day Number, or 0 if
+    no legal date was recognized in the input.
+ */
+void   GregorianStoCJDNA(char * const *date, int *CJDN);
 
 /** Translates a Gregorian calendar date to a Chronological Julian Day.
 
@@ -158,45 +238,77 @@ double GregoriantoCJD(int year, int month, double day);
     \param[out] CJD a pointer to the corresponding Chronological
     Julian Day.  Must not be NULL!
  */
-void GregoriantoCJDA(double const *date, double *CJD);
+void   GregoriantoCJDA(double const *date, double *CJD);
 
-/** Translates a Gregorian calendar date to a Chronological Julian
-    Day.
+/** Translates a Gregorian calendar date in text form to a
+    Chronological Julian Day.
+
+    \param[in] date a pointer to the text containing the calendar
+    date.  Must not be NULL!  The date text must consist of a day
+    number, a full month name (in English), and a year number,
+    separated by whitespace.  The month name is matched without
+    regard to case distinctions or non-alphanumerical characters.
+
+    \return the corresponding Chronological Julian Day, or 0 if no
+    legal date was recognized in the input.
+ */
+double GregorianStoCJD(char const *date);
+
+/** Translates a Gregorian calendar date in text form to a
+    Chronological Julian Day.
 
     \param[in] date a pointer to a pointer to the calendar date text.
-    Must not be NULL!  The date text must consist of a (possibly
-    fractional) day number, a full month name (in English), and a year
-    number, separated by whitespace.
+    Must not be NULL!  The date text must consist of a day number, a
+    full month name (in English), and a year number, separated by
+    whitespace.  The month name is matched without regard to case
+    distinctions or non-alphanumerical characters.
 
-    \param[out] CJD a pointer to the corresponding Chronological
-    Julian Day.  Must not be NULL!
+    \return the corresponding Chronological Julian Day, or 0 if no
+    legal date was recognized in the input.
  */
-void GregorianStoCJDA(char * const *date, double *CJD);
+void   GregorianStoCJDA(char * const *date, double *CJD);
 
-/** Translates a Chronological Julian Day Number to a Julian calendar
-    date.
+/* JULIAN CALENDAR */
+
+/**    
+    Translates a Chronological Julian Day Number to a Julian
+    calendar date.
 
     \param[in] CJDN the Chronological Julian Day Number to translate
     \param[out] year pointer to the corresponding year.  Must not be NULL!
     \param[out] month pointer to the corresponding month.  Must not be NULL!
     \param[out] day pointer to the corresponding day.  Must not be NULL!
  */
-void CJDNtoJulian(int CJDN, int *year, int *month, int *day);
+void   CJDNtoJulian(int CJDN, int *year, int *month, int *day);
 
-/** Translates a Chronological Julian Day Number to a Julian calendar
-    date.
+/** Translates a Chronological Julian Day Number to a Julian
+    calendar date.
 
     \param[in] CJDN a pointer to the Chronological Julian Day Number to
     translate.  Must not be NULL!
-
     \param[out] date a pointer to the corresponding calendar date.
-    Must have at least 3 elements (year, month, day).
+    Must have at least 3 elements (year, month, date).
  */
-void CJDNtoJulianA(int const *CJDN, int *date);
+void   CJDNtoJulianA(int const *CJDN, int *date);
 
-/** Translates a Chronological Julian Day Number to Julian calendar
-    date text, consisting of the day number, the full month name (in
-    English), and the year number, separated by single whitespaces.
+/** Translates a Chronological Julian Day Number to Julian
+    calendar date text, consisting of the day number, the full month
+    name (in English), and the year number, separated by single
+    whitespaces.
+
+    \param[in] CJDN the Chronological Julian Day number to translate.
+
+    \return a pointer to a character array containing the
+    corresponding calendar date text.  The character array is
+    allocated by the routine; free after use.
+
+  */
+char * CJDNtoJulianS(int CJDN);
+
+/** Translates a Chronological Julian Day Number to Julian
+    calendar date text, consisting of the day number, the full month
+    name (in English), and the year number, separated by single
+    whitespaces.
 
     \param[in] CJDN a pointer to the Chronological Julian Day number
     to translate.  Must not be NULL!
@@ -206,16 +318,17 @@ void CJDNtoJulianA(int const *CJDN, int *date);
     allocated by the routine; free after use.
 
   */
-void CJDNtoJulianSA(int const *CJDN, char **date);
+void   CJDNtoJulianSA(int const *CJDN, char **date);
 
-/** Translates a Chronological Julian Day to a Julian calendar date.
+/** Translates a Chronological Julian Day to a Julian
+    date.
 
     \param[in] CJD the Chronological Julian Day to translate
     \param[out] year pointer to the corresponding year.  Must not be NULL!
     \param[out] month pointer to the corresponding month.  Must not be NULL!
     \param[out] day pointer to the corresponding day.  Must not be NULL!
  */
-void CJDtoJulian(double CJD, int *year, int *month, double *day);
+void   CJDtoJulian(double CJD, int *year, int *month, double *day);
 
 /** Translates a Chronological Julian Day to a Julian calendar date.
 
@@ -223,13 +336,27 @@ void CJDtoJulian(double CJD, int *year, int *month, double *day);
     translate.  Must not be NULL!
 
     \param[out] date a pointer to the corresponding calendar date.
-    Must have at least 3 elements.
+    Must have at least 3 elements (year, month, day).
  */
-void CJDtoJulianA(double const *CJD, double *date);
+void   CJDtoJulianA(double const *CJD, double *date);
 
-/** Translates a Chronological Julian Day to Julian calendar date
-    text, consisting of the day number, the full month name (in
-    English), and the year number, separated by single whitespaces.
+/** Translates a Chronological Julian Day to Julian calendar
+    date text, consisting of the (fractional) day number, the full
+    month name (in English), and the year number, separated by single
+    whitespaces.
+
+    \param[in] CJD the Chronological Julian Day to translate.
+
+    \return a pointer to a character array containing the
+    corresponding calendar date text.  The character array is
+    allocated by the routine; free after use.
+  */
+char * CJDtoJulianS(double CJD);
+
+/** Translates a Chronological Julian Day to Gregorian calendar
+    date text, consisting of the (fractional) day number, the full
+    month name (in English), and the year number, separated by single
+    whitespaces.
 
     \param[in] CJD a pointer to the Chronological Julian Day to
     translate.  Must not be NULL!
@@ -237,84 +364,145 @@ void CJDtoJulianA(double const *CJD, double *date);
     \param[out] date a pointer to a character array containing the
     corresponding calendar date text.  The character array is
     allocated by the routine; free after use.
-*/
-void CJDtoJulianSA(double const *CJD, char **date);
+  */
+void   CJDtoJulianSA(double const *CJD, char **date);
 
-/** Translates a Julian calendar date to a Chronological Julian Day
-    Number.
+/** Translates a Julian calendar date to a Chronological Julian Day Number.
 
     \param[in] year the year
     \param[in] month the month
     \param[in] day the day
     \return the corresponding Chronological Julian Day Number
  */
-int JuliantoCJDN(int year, int month, int day);
+int    JuliantoCJDN(int year, int month, int day);
 
 /** Translates a Julian calendar date to a Chronological Julian Day
     Number.
 
-    \param[in] date a pointer to the calendar date to translate.  Must
-    have at least 3 elements (year, month, day).
+    \param[in] date a pointer to the calendar date.  Must have at least 3
+    elements (year, month, day).
 
-    \param[out] date a pointer to the corresponding Chronological
-    Julian Day Number.  Must not be NULL!
+    \param[out] CJDN a pointer to the corresponding Chronological
+    Julian Day Number.  Must not be NULL.
  */
-void JuliantoCJDNA(int const *date, int *CJDN);
+void   JuliantoCJDNA(int const *date, int *CJDN);
 
-/** Translates a Julian calendar date to a Julian Day.
+/** Translates a Julian calendar date in text form to a
+    Chronological Julian Day Number.
+
+    \param[in] date a pointer to the text containing the calendar
+    date.  Must not be NULL!  The date text must consist of a day
+    number, a full month name (in English), and a year number,
+    separated by whitespace.  The month name is matched without
+    regard to case distinctions or non-alphanumerical characters.
+
+    \return the corresponding Chronological Julian Day Number, or 0 if
+    no legal date was recognized in the input.
+ */
+int    JulianStoCJDN(char const *date);
+
+/** Translates a Julian calendar date in text form to a
+    Chronological Julian Day Number.
+
+    \param[in] date a pointer to a pointer to the calendar date text.
+    Must not be NULL!  The date text must consist of a day number, a
+    full month name (in English), and a year number, separated by
+    whitespace.  The month name is matched without regard to case
+    distinctions or non-alphanumerical characters.
+
+    \return the corresponding Chronological Julian Day Number, or 0 if
+    no legal date was recognized in the input.
+ */
+void   JulianStoCJDNA(char * const *date, int *CJDN);
+
+/** Translates a Julian calendar date to a Chronological Julian Day.
 
     \param[in] year the year
     \param[in] month the month
     \param[in] day the day
-    \return the corresponding Julian Day
+    \return the corresponding Chronological Julian Day
  */
 double JuliantoCJD(int year, int month, double day);
 
 /** Translates a Julian calendar date to a Chronological Julian Day.
 
-    \param[in] date a pointer to the calendar date to translate.  Must
-    have at least 3 elements.
+    \param[in] date a pointer to the calendar date.  Must have at least 3
+    elements (year, month, day).
 
     \param[out] CJD a pointer to the corresponding Chronological
     Julian Day.  Must not be NULL!
  */
-void JuliantoCJDA(double const *date, double *CJD);
+void   JuliantoCJDA(double const *date, double *CJD);
 
-/** Translates a Julian calendar date to a Chronological Julian
-    Day.  The opposite of \ref CJDtoJulianSA.
+/** Translates a Julian calendar date in text form to a
+    Chronological Julian Day.
+
+    \param[in] date a pointer to the text containing the calendar
+    date.  Must not be NULL!  The date text must consist of a day
+    number, a full month name (in English), and a year number,
+    separated by whitespace.  The month name is matched without
+    regard to case distinctions or non-alphanumerical characters.
+
+    \return the corresponding Chronological Julian Day, or 0 if no
+    legal date was recognized in the input.
+ */
+double JulianStoCJD(char const *date);
+
+/** Translates a Julian calendar date in text form to a
+    Chronological Julian Day.
 
     \param[in] date a pointer to a pointer to the calendar date text.
-    Must not be NULL!
+    Must not be NULL!  The date text must consist of a day number, a
+    full month name (in English), and a year number, separated by
+    whitespace.  The month name is matched without regard to case
+    distinctions or non-alphanumerical characters.
 
-    \param[out] CJD a pointer to the corresponding Chronological
-    Julian Day.  Must not be NULL!
+    \return the corresponding Chronological Julian Day, or 0 if no
+    legal date was recognized in the input.
  */
-void JulianStoCJDA(char * const *date, double *CJD);
+void   JulianStoCJDA(char * const *date, double *CJD);
 
-/** Translates a Chronological Julian Day Number to a Common calendar
-    date.
+/* COMMON CALENDAR */
+
+/**    
+    Translates a Chronological Julian Day Number to a Common
+    calendar date.
 
     \param[in] CJDN the Chronological Julian Day Number to translate
     \param[out] year pointer to the corresponding year.  Must not be NULL!
     \param[out] month pointer to the corresponding month.  Must not be NULL!
     \param[out] day pointer to the corresponding day.  Must not be NULL!
  */
-void CJDNtoCommon(int CJDN, int *year, int *month, int *day);
+void   CJDNtoCommon(int CJDN, int *year, int *month, int *day);
 
-/** Translates a Chronological Julian Day Number to a Common calendar
-    date.
+/** Translates a Chronological Julian Day Number to a Common
+    calendar date.
 
     \param[in] CJDN a pointer to the Chronological Julian Day Number to
     translate.  Must not be NULL!
-
     \param[out] date a pointer to the corresponding calendar date.
-    Must have at least 3 elements (year, month, day).
+    Must have at least 3 elements (year, month, date).
  */
-void CJDNtoCommonA(int const *CJDN, int *date);
+void   CJDNtoCommonA(int const *CJDN, int *date);
 
-/** Translates a Chronological Julian Day Number to Common calendar
-    date text, consisting of the day number, the full month name (in
-    English), and the year number, separated by single whitespaces.
+/** Translates a Chronological Julian Day Number to Common
+    calendar date text, consisting of the day number, the full month
+    name (in English), and the year number, separated by single
+    whitespaces.
+
+    \param[in] CJDN the Chronological Julian Day number to translate.
+
+    \return a pointer to a character array containing the
+    corresponding calendar date text.  The character array is
+    allocated by the routine; free after use.
+
+  */
+char * CJDNtoCommonS(int CJDN);
+
+/** Translates a Chronological Julian Day Number to Common
+    calendar date text, consisting of the day number, the full month
+    name (in English), and the year number, separated by single
+    whitespaces.
 
     \param[in] CJDN a pointer to the Chronological Julian Day number
     to translate.  Must not be NULL!
@@ -324,30 +512,45 @@ void CJDNtoCommonA(int const *CJDN, int *date);
     allocated by the routine; free after use.
 
   */
-void CJDNtoCommonSA(int const *CJDN, char **date);
+void   CJDNtoCommonSA(int const *CJDN, char **date);
 
-/** Translates a Chronological Julian Day to a Common calendar date.
+/** Translates a Chronological Julian Day to a Common
+    date.
 
     \param[in] CJD the Chronological Julian Day to translate
     \param[out] year pointer to the corresponding year.  Must not be NULL!
     \param[out] month pointer to the corresponding month.  Must not be NULL!
     \param[out] day pointer to the corresponding day.  Must not be NULL!
  */
-void CJDtoCommon(double CJD, int *year, int *month, double *day);
+void   CJDtoCommon(double CJD, int *year, int *month, double *day);
 
 /** Translates a Chronological Julian Day to a Common calendar date.
 
     \param[in] CJD a pointer to the Chronological Julian Day to
     translate.  Must not be NULL!
 
-    \param[out] date a pointer to the corresponding date.  Must
-    have at least 3 elements (year, month, day).
+    \param[out] date a pointer to the corresponding calendar date.
+    Must have at least 3 elements (year, month, day).
  */
-void CJDtoCommonA(double const *CJD, double *date);
+void   CJDtoCommonA(double const *CJD, double *date);
 
-/** Translates a Chronological Julian Day to Common calendar date
-    text, consisting of the day number, the full month name (in
-    English), and the year number, separated by single whitespaces.
+/** Translates a Chronological Julian Day to Common calendar
+    date text, consisting of the (fractional) day number, the full
+    month name (in English), and the year number, separated by single
+    whitespaces.
+
+    \param[in] CJD the Chronological Julian Day to translate.
+
+    \return a pointer to a character array containing the
+    corresponding calendar date text.  The character array is
+    allocated by the routine; free after use.
+  */
+char * CJDtoCommonS(double CJD);
+
+/** Translates a Chronological Julian Day to Gregorian calendar
+    date text, consisting of the (fractional) day number, the full
+    month name (in English), and the year number, separated by single
+    whitespaces.
 
     \param[in] CJD a pointer to the Chronological Julian Day to
     translate.  Must not be NULL!
@@ -355,18 +558,17 @@ void CJDtoCommonA(double const *CJD, double *date);
     \param[out] date a pointer to a character array containing the
     corresponding calendar date text.  The character array is
     allocated by the routine; free after use.
-*/
-void CJDtoCommonSA(double const *CJD, char **date);
+  */
+void   CJDtoCommonSA(double const *CJD, char **date);
 
-/** Translates a Common calendar date to a Chronological Julian Day
-    Number.
+/** Translates a Common calendar date to a Chronological Julian Day Number.
 
     \param[in] year the year
     \param[in] month the month
     \param[in] day the day
     \return the corresponding Chronological Julian Day Number
  */
-int CommontoCJDN(int year, int month, int day);
+int    CommontoCJDN(int year, int month, int day);
 
 /** Translates a Common calendar date to a Chronological Julian Day
     Number.
@@ -375,9 +577,37 @@ int CommontoCJDN(int year, int month, int day);
     elements (year, month, day).
 
     \param[out] CJDN a pointer to the corresponding Chronological
-    Julian Day Number.  Must not be NULL!
+    Julian Day Number.  Must not be NULL.
  */
-void CommontoCJDNA(int const *date, int *CJDN);
+void   CommontoCJDNA(int const *date, int *CJDN);
+
+/** Translates a Common calendar date in text form to a
+    Chronological Julian Day Number.
+
+    \param[in] date a pointer to the text containing the calendar
+    date.  Must not be NULL!  The date text must consist of a day
+    number, a full month name (in English), and a year number,
+    separated by whitespace.  The month name is matched without
+    regard to case distinctions or non-alphanumerical characters.
+
+    \return the corresponding Chronological Julian Day Number, or 0 if
+    no legal date was recognized in the input.
+ */
+int    CommonStoCJDN(char const *date);
+
+/** Translates a Common calendar date in text form to a
+    Chronological Julian Day Number.
+
+    \param[in] date a pointer to a pointer to the calendar date text.
+    Must not be NULL!  The date text must consist of a day number, a
+    full month name (in English), and a year number, separated by
+    whitespace.  The month name is matched without regard to case
+    distinctions or non-alphanumerical characters.
+
+    \return the corresponding Chronological Julian Day Number, or 0 if
+    no legal date was recognized in the input.
+ */
+void   CommonStoCJDNA(char * const *date, int *CJDN);
 
 /** Translates a Common calendar date to a Chronological Julian Day.
 
@@ -390,51 +620,83 @@ double CommontoCJD(int year, int month, double day);
 
 /** Translates a Common calendar date to a Chronological Julian Day.
 
-    \param[in] date a pointer to the calendar date to translate.  Must
-    have at least 3 elements (year, month, day).
+    \param[in] date a pointer to the calendar date.  Must have at least 3
+    elements (year, month, day).
 
     \param[out] CJD a pointer to the corresponding Chronological
     Julian Day.  Must not be NULL!
  */
-void CommontoCJDA(double const *date, double *CJD);
+void   CommontoCJDA(double const *date, double *CJD);
 
-/** Translates Common calendar date text to a Chronological Julian
-    Day.
+/** Translates a Common calendar date in text form to a
+    Chronological Julian Day.
+
+    \param[in] date a pointer to the text containing the calendar
+    date.  Must not be NULL!  The date text must consist of a day
+    number, a full month name (in English), and a year number,
+    separated by whitespace.  The month name is matched without
+    regard to case distinctions or non-alphanumerical characters.
+
+    \return the corresponding Chronological Julian Day, or 0 if no
+    legal date was recognized in the input.
+ */
+double CommonStoCJD(char const *date);
+
+/** Translates a Common calendar date in text form to a
+    Chronological Julian Day.
 
     \param[in] date a pointer to a pointer to the calendar date text.
-    Must not be NULL!  The date text must consist of a (possibly
-    fractional) day number, a full month name, and a year number,
-    separated by whitespace.
+    Must not be NULL!  The date text must consist of a day number, a
+    full month name (in English), and a year number, separated by
+    whitespace.  The month name is matched without regard to case
+    distinctions or non-alphanumerical characters.
 
-    \param[out] CJD a pointer to the corresponding Chronological
-    Julian Day.  Must not be NULL!
+    \return the corresponding Chronological Julian Day, or 0 if no
+    legal date was recognized in the input.
  */
-void CommonStoCJDA(char * const *date, double *CJDN);
+void   CommonStoCJDA(char * const *date, double *CJD);
 
-/** Translates a Chronological Julian Day Number to a Hebrew calendar
-    date.
+/* HEBREW CALENDAR */
+
+/**    
+    Translates a Chronological Julian Day Number to a Hebrew
+    calendar date.
 
     \param[in] CJDN the Chronological Julian Day Number to translate
     \param[out] year pointer to the corresponding year.  Must not be NULL!
     \param[out] month pointer to the corresponding month.  Must not be NULL!
     \param[out] day pointer to the corresponding day.  Must not be NULL!
  */
-void CJDNtoHebrew(int CJDN, int *year, int *month, int *day);
+void   CJDNtoHebrew(int CJDN, int *year, int *month, int *day);
 
-/** Translates a Chronological Julian Day Number to a Hebrew calendar
-    date.
+/** Translates a Chronological Julian Day Number to a Hebrew
+    calendar date.
 
     \param[in] CJDN a pointer to the Chronological Julian Day Number to
     translate.  Must not be NULL!
-
     \param[out] date a pointer to the corresponding calendar date.
-    Must have at least 3 elements.
+    Must have at least 3 elements (year, month, date).
  */
-void CJDNtoHebrewA(int const *CJDN, int *date);
+void   CJDNtoHebrewA(int const *CJDN, int *date);
 
-/** Translates a Chronological Julian Day Number to Hebrew calendar
-    date text, consisting of the day number, the full month name (in
-    English), and the year number, separated by single whitespaces.
+/** Translates a Chronological Julian Day Number to Hebrew
+    calendar date text, consisting of the day number, the full month
+    name (in English), and the year number, separated by single
+    whitespaces.
+
+    \param[in] CJDN the Chronological Julian Day number to translate.
+
+    \return a pointer to a character array containing the
+    corresponding calendar date text.  The character array is
+    allocated by the routine; free after use.
+
+  */
+char * CJDNtoHebrewS(int CJDN);
+
+/** Translates a Chronological Julian Day Number to Hebrew
+    calendar date text, consisting of the day number, the full month
+    name (in English), and the year number, separated by single
+    whitespaces.
 
     \param[in] CJDN a pointer to the Chronological Julian Day number
     to translate.  Must not be NULL!
@@ -444,16 +706,17 @@ void CJDNtoHebrewA(int const *CJDN, int *date);
     allocated by the routine; free after use.
 
   */
-void CJDNtoHebrewSA(int const *CJDN, char **date);
+void   CJDNtoHebrewSA(int const *CJDN, char **date);
 
-/** Translates a Chronological Julian Day to a Hebrew calendar date.
+/** Translates a Chronological Julian Day to a Hebrew
+    date.
 
     \param[in] CJD the Chronological Julian Day to translate
     \param[out] year pointer to the corresponding year.  Must not be NULL!
     \param[out] month pointer to the corresponding month.  Must not be NULL!
     \param[out] day pointer to the corresponding day.  Must not be NULL!
  */
-void CJDtoHebrew(double CJD, int *year, int *month, double *day);
+void   CJDtoHebrew(double CJD, int *year, int *month, double *day);
 
 /** Translates a Chronological Julian Day to a Hebrew calendar date.
 
@@ -461,13 +724,26 @@ void CJDtoHebrew(double CJD, int *year, int *month, double *day);
     translate.  Must not be NULL!
 
     \param[out] date a pointer to the corresponding calendar date.
-    Must have at least 3 elements.
+    Must have at least 3 elements (year, month, day).
  */
-void CJDtoHebrewA(double const *CJD, double *date);
+void   CJDtoHebrewA(double const *CJD, double *date);
 
-/** Translates a Chronological Julian Day to Hebrew calendar date
-    text, consisting of the (fractional) day number, the full month
-    name (in English), and the year number, separated by single
+/** Translates a Chronological Julian Day to Hebrew calendar
+    date text, consisting of the (fractional) day number, the full
+    month name (in English), and the year number, separated by single
+    whitespaces.
+
+    \param[in] CJD the Chronological Julian Day to translate.
+
+    \return a pointer to a character array containing the
+    corresponding calendar date text.  The character array is
+    allocated by the routine; free after use.
+  */
+char * CJDtoHebrewS(double CJD);
+
+/** Translates a Chronological Julian Day to Gregorian calendar
+    date text, consisting of the (fractional) day number, the full
+    month name (in English), and the year number, separated by single
     whitespaces.
 
     \param[in] CJD a pointer to the Chronological Julian Day to
@@ -476,30 +752,56 @@ void CJDtoHebrewA(double const *CJD, double *date);
     \param[out] date a pointer to a character array containing the
     corresponding calendar date text.  The character array is
     allocated by the routine; free after use.
-
   */
-void CJDtoHebrewSA(double const *CJD, char **date);
+void   CJDtoHebrewSA(double const *CJD, char **date);
 
-/** Translates a Hebrew calendar date to a Chronological Julian Day
-    Number.
+/** Translates a Hebrew calendar date to a Chronological Julian Day Number.
 
     \param[in] year the year
     \param[in] month the month
     \param[in] day the day
     \return the corresponding Chronological Julian Day Number
  */
-int HebrewtoCJDN(int year, int month, int day);
+int    HebrewtoCJDN(int year, int month, int day);
 
 /** Translates a Hebrew calendar date to a Chronological Julian Day
     Number.
 
-    \param[in] date a pointer to the calendar date to translate.  Must
-    have at least 3 elements (year, month, day).
+    \param[in] date a pointer to the calendar date.  Must have at least 3
+    elements (year, month, day).
 
     \param[out] CJDN a pointer to the corresponding Chronological
     Julian Day Number.  Must not be NULL.
  */
-void HebrewtoCJDNA(int const *date, int *CJDN);
+void   HebrewtoCJDNA(int const *date, int *CJDN);
+
+/** Translates a Hebrew calendar date in text form to a
+    Chronological Julian Day Number.
+
+    \param[in] date a pointer to the text containing the calendar
+    date.  Must not be NULL!  The date text must consist of a day
+    number, a full month name (in English), and a year number,
+    separated by whitespace.  The month name is matched without
+    regard to case distinctions or non-alphanumerical characters.
+
+    \return the corresponding Chronological Julian Day Number, or 0 if
+    no legal date was recognized in the input.
+ */
+int    HebrewStoCJDN(char const *date);
+
+/** Translates a Hebrew calendar date in text form to a
+    Chronological Julian Day Number.
+
+    \param[in] date a pointer to a pointer to the calendar date text.
+    Must not be NULL!  The date text must consist of a day number, a
+    full month name (in English), and a year number, separated by
+    whitespace.  The month name is matched without regard to case
+    distinctions or non-alphanumerical characters.
+
+    \return the corresponding Chronological Julian Day Number, or 0 if
+    no legal date was recognized in the input.
+ */
+void   HebrewStoCJDNA(char * const *date, int *CJDN);
 
 /** Translates a Hebrew calendar date to a Chronological Julian Day.
 
@@ -512,27 +814,46 @@ double HebrewtoCJD(int year, int month, double day);
 
 /** Translates a Hebrew calendar date to a Chronological Julian Day.
 
-    \param[in] date a pointer to the calendar date to translate.  Must
-    have at least 3 elements (year, month, day).
+    \param[in] date a pointer to the calendar date.  Must have at least 3
+    elements (year, month, day).
 
     \param[out] CJD a pointer to the corresponding Chronological
     Julian Day.  Must not be NULL!
  */
-void HebrewtoCJDA(double const *date, double *CJD);
+void   HebrewtoCJDA(double const *date, double *CJD);
 
-/** Translates a Hebrew calendar date to a Chronological Julian Day.
+/** Translates a Hebrew calendar date in text form to a
+    Chronological Julian Day.
+
+    \param[in] date a pointer to the text containing the calendar
+    date.  Must not be NULL!  The date text must consist of a day
+    number, a full month name (in English), and a year number,
+    separated by whitespace.  The month name is matched without
+    regard to case distinctions or non-alphanumerical characters.
+
+    \return the corresponding Chronological Julian Day, or 0 if no
+    legal date was recognized in the input.
+ */
+double HebrewStoCJD(char const *date);
+
+/** Translates a Hebrew calendar date in text form to a
+    Chronological Julian Day.
 
     \param[in] date a pointer to a pointer to the calendar date text.
-    Must not be NULL!  The date text must consist of a (possibly
-    fractional) day number, a full month name (in English), and a year
-    number, separated by whitespace.
+    Must not be NULL!  The date text must consist of a day number, a
+    full month name (in English), and a year number, separated by
+    whitespace.  The month name is matched without regard to case
+    distinctions or non-alphanumerical characters.
 
-    \param[out] CJD a pointer to the corresponding Chronological
-    Julian Day.  Must not be NULL!
+    \return the corresponding Chronological Julian Day, or 0 if no
+    legal date was recognized in the input.
  */
-void HebrewStoCJDA(char * const *date, double *CJD);
+void   HebrewStoCJDA(char * const *date, double *CJD);
 
-/** Translates a Chronological Julian Day Number to an Islamic
+/* ISLAMIC CALENDAR */
+
+/**    
+    Translates a Chronological Julian Day Number to a Islamic
     calendar date.
 
     \param[in] CJDN the Chronological Julian Day Number to translate
@@ -540,22 +861,36 @@ void HebrewStoCJDA(char * const *date, double *CJD);
     \param[out] month pointer to the corresponding month.  Must not be NULL!
     \param[out] day pointer to the corresponding day.  Must not be NULL!
  */
-void CJDNtoIslamic(int CJDN, int *year, int *month, int *day);
+void   CJDNtoIslamic(int CJDN, int *year, int *month, int *day);
 
-/** Translates a Chronological Julian Day Number to an Islamic
+/** Translates a Chronological Julian Day Number to a Islamic
     calendar date.
 
     \param[in] CJDN a pointer to the Chronological Julian Day Number to
     translate.  Must not be NULL!
-
     \param[out] date a pointer to the corresponding calendar date.
-    Must have at least 3 elements (year, month, day).
+    Must have at least 3 elements (year, month, date).
  */
-void CJDNtoIslamicA(int const *CJDN, int *date);
+void   CJDNtoIslamicA(int const *CJDN, int *date);
 
-/** Translates a Chronological Julian Day Number to Islamic calendar
-    date text, consisting of the day number, the full month name (in
-    English), and the year number, separated by single whitespaces.
+/** Translates a Chronological Julian Day Number to Islamic
+    calendar date text, consisting of the day number, the full month
+    name (in English), and the year number, separated by single
+    whitespaces.
+
+    \param[in] CJDN the Chronological Julian Day number to translate.
+
+    \return a pointer to a character array containing the
+    corresponding calendar date text.  The character array is
+    allocated by the routine; free after use.
+
+  */
+char * CJDNtoIslamicS(int CJDN);
+
+/** Translates a Chronological Julian Day Number to Islamic
+    calendar date text, consisting of the day number, the full month
+    name (in English), and the year number, separated by single
+    whitespaces.
 
     \param[in] CJDN a pointer to the Chronological Julian Day number
     to translate.  Must not be NULL!
@@ -565,18 +900,19 @@ void CJDNtoIslamicA(int const *CJDN, int *date);
     allocated by the routine; free after use.
 
   */
-void CJDNtoIslamicSA(int const *CJDN, char **date);
+void   CJDNtoIslamicSA(int const *CJDN, char **date);
 
-/** Translates a Julian Day to an Islamic calendar date.
+/** Translates a Chronological Julian Day to a Islamic
+    date.
 
-    \param[in] JD the Julian Day to translate
+    \param[in] CJD the Chronological Julian Day to translate
     \param[out] year pointer to the corresponding year.  Must not be NULL!
     \param[out] month pointer to the corresponding month.  Must not be NULL!
     \param[out] day pointer to the corresponding day.  Must not be NULL!
  */
-void CJDtoIslamic(double CJD, int *year, int *month, double *day);
+void   CJDtoIslamic(double CJD, int *year, int *month, double *day);
 
-/** Translates a Chronological Julian Day to an Islamic calendar date.
+/** Translates a Chronological Julian Day to a Islamic calendar date.
 
     \param[in] CJD a pointer to the Chronological Julian Day to
     translate.  Must not be NULL!
@@ -584,11 +920,24 @@ void CJDtoIslamic(double CJD, int *year, int *month, double *day);
     \param[out] date a pointer to the corresponding calendar date.
     Must have at least 3 elements (year, month, day).
  */
-void CJDtoIslamicA(double const *CJD, double *date);
+void   CJDtoIslamicA(double const *CJD, double *date);
 
-/** Translates a Chronological Julian Day to Islamic calendar date
-    text, consisting of the (fractional) day number, the full month
-    name (in English), and the year number, separated by single
+/** Translates a Chronological Julian Day to Islamic calendar
+    date text, consisting of the (fractional) day number, the full
+    month name (in English), and the year number, separated by single
+    whitespaces.
+
+    \param[in] CJD the Chronological Julian Day to translate.
+
+    \return a pointer to a character array containing the
+    corresponding calendar date text.  The character array is
+    allocated by the routine; free after use.
+  */
+char * CJDtoIslamicS(double CJD);
+
+/** Translates a Chronological Julian Day to Gregorian calendar
+    date text, consisting of the (fractional) day number, the full
+    month name (in English), and the year number, separated by single
     whitespaces.
 
     \param[in] CJD a pointer to the Chronological Julian Day to
@@ -597,32 +946,58 @@ void CJDtoIslamicA(double const *CJD, double *date);
     \param[out] date a pointer to a character array containing the
     corresponding calendar date text.  The character array is
     allocated by the routine; free after use.
-
   */
-void CJDtoIslamicSA(double const *CJD, char **date);
+void   CJDtoIslamicSA(double const *CJD, char **date);
 
-/** Translates an Islamic calendar date to a Chronological Julian Day
-    Number.
+/** Translates a Islamic calendar date to a Chronological Julian Day Number.
 
     \param[in] year the year
     \param[in] month the month
     \param[in] day the day
     \return the corresponding Chronological Julian Day Number
  */
-int IslamictoCJDN(int year, int month, int day);
+int    IslamictoCJDN(int year, int month, int day);
 
-/** Translates an Islamic calendar date to a Chronological Julian Day
+/** Translates a Islamic calendar date to a Chronological Julian Day
     Number.
 
-    \param[in] date a pointer to the calendar date to translate.  Must
-    have at least 3 elements (year, month, day).
+    \param[in] date a pointer to the calendar date.  Must have at least 3
+    elements (year, month, day).
 
-    \param[out] CJDN a pointer to the corresponding Chronological Julian
-    Day Number.  Must not be NULL!
+    \param[out] CJDN a pointer to the corresponding Chronological
+    Julian Day Number.  Must not be NULL.
  */
-void IslamictoCJDNA(int const *date, int *CJDN);
+void   IslamictoCJDNA(int const *date, int *CJDN);
 
-/** Translates an Islamic calendar date to a Chronological Julian Day.
+/** Translates a Islamic calendar date in text form to a
+    Chronological Julian Day Number.
+
+    \param[in] date a pointer to the text containing the calendar
+    date.  Must not be NULL!  The date text must consist of a day
+    number, a full month name (in English), and a year number,
+    separated by whitespace.  The month name is matched without
+    regard to case distinctions or non-alphanumerical characters.
+
+    \return the corresponding Chronological Julian Day Number, or 0 if
+    no legal date was recognized in the input.
+ */
+int    IslamicStoCJDN(char const *date);
+
+/** Translates a Islamic calendar date in text form to a
+    Chronological Julian Day Number.
+
+    \param[in] date a pointer to a pointer to the calendar date text.
+    Must not be NULL!  The date text must consist of a day number, a
+    full month name (in English), and a year number, separated by
+    whitespace.  The month name is matched without regard to case
+    distinctions or non-alphanumerical characters.
+
+    \return the corresponding Chronological Julian Day Number, or 0 if
+    no legal date was recognized in the input.
+ */
+void   IslamicStoCJDNA(char * const *date, int *CJDN);
+
+/** Translates a Islamic calendar date to a Chronological Julian Day.
 
     \param[in] year the year
     \param[in] month the month
@@ -631,29 +1006,48 @@ void IslamictoCJDNA(int const *date, int *CJDN);
  */
 double IslamictoCJD(int year, int month, double day);
 
-/** Translates an Islamic calendar date to a Chronological Julian Day.
+/** Translates a Islamic calendar date to a Chronological Julian Day.
 
-    \param[in] date a pointer to the calendar date to translate.  Must
-    have at least 3 elements (year, month, day).
+    \param[in] date a pointer to the calendar date.  Must have at least 3
+    elements (year, month, day).
 
     \param[out] CJD a pointer to the corresponding Chronological
     Julian Day.  Must not be NULL!
  */
-void IslamictoCJDA(double const *date, double *CJD);
+void   IslamictoCJDA(double const *date, double *CJD);
 
-/** Translates an Islamic calendar date to a Chronological Julian Day.
+/** Translates a Islamic calendar date in text form to a
+    Chronological Julian Day.
+
+    \param[in] date a pointer to the text containing the calendar
+    date.  Must not be NULL!  The date text must consist of a day
+    number, a full month name (in English), and a year number,
+    separated by whitespace.  The month name is matched without
+    regard to case distinctions or non-alphanumerical characters.
+
+    \return the corresponding Chronological Julian Day, or 0 if no
+    legal date was recognized in the input.
+ */
+double IslamicStoCJD(char const *date);
+
+/** Translates a Islamic calendar date in text form to a
+    Chronological Julian Day.
 
     \param[in] date a pointer to a pointer to the calendar date text.
-    Must not be NULL!  The date text must consist of a (possibly
-    fractional) day number, a full month name (in English), and a year
-    number, separated by whitespace.
+    Must not be NULL!  The date text must consist of a day number, a
+    full month name (in English), and a year number, separated by
+    whitespace.  The month name is matched without regard to case
+    distinctions or non-alphanumerical characters.
 
-    \param[out] CJD a pointer to the corresponding Chronological
-    Julian Day.  Must not be NULL!
+    \return the corresponding Chronological Julian Day, or 0 if no
+    legal date was recognized in the input.
  */
-void IslamicStoCJDA(char * const *date, double *CJD);
+void   IslamicStoCJDA(char * const *date, double *CJD);
 
-/** Translates a Chronological Julian Day Number to an Egyptian
+/* EGYPTIAN CALENDAR */
+
+/**    
+    Translates a Chronological Julian Day Number to a Egyptian
     calendar date.
 
     \param[in] CJDN the Chronological Julian Day Number to translate
@@ -661,22 +1055,36 @@ void IslamicStoCJDA(char * const *date, double *CJD);
     \param[out] month pointer to the corresponding month.  Must not be NULL!
     \param[out] day pointer to the corresponding day.  Must not be NULL!
  */
-void CJDNtoEgyptian(int CJDN, int *year, int *month, int *day);
+void   CJDNtoEgyptian(int CJDN, int *year, int *month, int *day);
 
-/** Translates a Chronological Julian Day Number to an Egyptian
+/** Translates a Chronological Julian Day Number to a Egyptian
     calendar date.
 
     \param[in] CJDN a pointer to the Chronological Julian Day Number to
     translate.  Must not be NULL!
-
     \param[out] date a pointer to the corresponding calendar date.
-    Must have at least 3 elements (year, month, day).
+    Must have at least 3 elements (year, month, date).
  */
-void CJDNtoEgyptianA(int const *CJDN, int *date);
+void   CJDNtoEgyptianA(int const *CJDN, int *date);
 
-/** Translates a Chronological Julian Day Number to Egyptian calendar
-    date text, consisting of the day number, the full month name (in
-    English), and the year number, separated by single whitespaces.
+/** Translates a Chronological Julian Day Number to Egyptian
+    calendar date text, consisting of the day number, the full month
+    name (in English), and the year number, separated by single
+    whitespaces.
+
+    \param[in] CJDN the Chronological Julian Day number to translate.
+
+    \return a pointer to a character array containing the
+    corresponding calendar date text.  The character array is
+    allocated by the routine; free after use.
+
+  */
+char * CJDNtoEgyptianS(int CJDN);
+
+/** Translates a Chronological Julian Day Number to Egyptian
+    calendar date text, consisting of the day number, the full month
+    name (in English), and the year number, separated by single
+    whitespaces.
 
     \param[in] CJDN a pointer to the Chronological Julian Day number
     to translate.  Must not be NULL!
@@ -686,9 +1094,9 @@ void CJDNtoEgyptianA(int const *CJDN, int *date);
     allocated by the routine; free after use.
 
   */
-void CJDNtoEgyptianSA(int const *CJDN, char **date);
+void   CJDNtoEgyptianSA(int const *CJDN, char **date);
 
-/** Translates a Chronological Julian Day to an Egyptian calendar
+/** Translates a Chronological Julian Day to a Egyptian
     date.
 
     \param[in] CJD the Chronological Julian Day to translate
@@ -696,9 +1104,9 @@ void CJDNtoEgyptianSA(int const *CJDN, char **date);
     \param[out] month pointer to the corresponding month.  Must not be NULL!
     \param[out] day pointer to the corresponding day.  Must not be NULL!
  */
-void CJDtoEgyptian(double CJD, int *year, int *month, double *day);
+void   CJDtoEgyptian(double CJD, int *year, int *month, double *day);
 
-/** Translates a Chronological Julian Day to an Egyptian calendar date.
+/** Translates a Chronological Julian Day to a Egyptian calendar date.
 
     \param[in] CJD a pointer to the Chronological Julian Day to
     translate.  Must not be NULL!
@@ -706,11 +1114,24 @@ void CJDtoEgyptian(double CJD, int *year, int *month, double *day);
     \param[out] date a pointer to the corresponding calendar date.
     Must have at least 3 elements (year, month, day).
  */
-void CJDtoEgyptianA(double const *CJD, double *date);
+void   CJDtoEgyptianA(double const *CJD, double *date);
 
-/** Translates a Chronological Julian Day to Egyptian calendar date
-    text, consisting of the (fractional) day number, the full month
-    name (in English), and the year number, separated by single
+/** Translates a Chronological Julian Day to Egyptian calendar
+    date text, consisting of the (fractional) day number, the full
+    month name (in English), and the year number, separated by single
+    whitespaces.
+
+    \param[in] CJD the Chronological Julian Day to translate.
+
+    \return a pointer to a character array containing the
+    corresponding calendar date text.  The character array is
+    allocated by the routine; free after use.
+  */
+char * CJDtoEgyptianS(double CJD);
+
+/** Translates a Chronological Julian Day to Gregorian calendar
+    date text, consisting of the (fractional) day number, the full
+    month name (in English), and the year number, separated by single
     whitespaces.
 
     \param[in] CJD a pointer to the Chronological Julian Day to
@@ -719,63 +1140,105 @@ void CJDtoEgyptianA(double const *CJD, double *date);
     \param[out] date a pointer to a character array containing the
     corresponding calendar date text.  The character array is
     allocated by the routine; free after use.
-
   */
-void CJDtoEgyptianSA(double const *CJD, char **date);
+void   CJDtoEgyptianSA(double const *CJD, char **date);
 
-/** Translates an Egyptian calendar date to a Chronological Julian Day
-    Number.
+/** Translates a Egyptian calendar date to a Chronological Julian Day Number.
 
     \param[in] year the year
     \param[in] month the month
     \param[in] day the day
     \return the corresponding Chronological Julian Day Number
  */
-int EgyptiantoCJDN(int year, int month, int day);
+int    EgyptiantoCJDN(int year, int month, int day);
 
-/** Translates an Egyptian calendar date to a Chronological Julian Day
+/** Translates a Egyptian calendar date to a Chronological Julian Day
     Number.
 
-    \param[in] date a pointer to the calendar date to translate.  Must
-    have at least 3 elements (year, month, day).
+    \param[in] date a pointer to the calendar date.  Must have at least 3
+    elements (year, month, day).
 
     \param[out] CJDN a pointer to the corresponding Chronological
-    Julian Day Number.  Must not be NULL!
+    Julian Day Number.  Must not be NULL.
  */
-void EgyptiantoCJDNA(int const *date, int *CJDN);
+void   EgyptiantoCJDNA(int const *date, int *CJDN);
 
-/** Translates an Egyptian calendar date to a Julian Day.
+/** Translates a Egyptian calendar date in text form to a
+    Chronological Julian Day Number.
+
+    \param[in] date a pointer to the text containing the calendar
+    date.  Must not be NULL!  The date text must consist of a day
+    number, a full month name (in English), and a year number,
+    separated by whitespace.  The month name is matched without
+    regard to case distinctions or non-alphanumerical characters.
+
+    \return the corresponding Chronological Julian Day Number, or 0 if
+    no legal date was recognized in the input.
+ */
+int    EgyptianStoCJDN(char const *date);
+
+/** Translates a Egyptian calendar date in text form to a
+    Chronological Julian Day Number.
+
+    \param[in] date a pointer to a pointer to the calendar date text.
+    Must not be NULL!  The date text must consist of a day number, a
+    full month name (in English), and a year number, separated by
+    whitespace.  The month name is matched without regard to case
+    distinctions or non-alphanumerical characters.
+
+    \return the corresponding Chronological Julian Day Number, or 0 if
+    no legal date was recognized in the input.
+ */
+void   EgyptianStoCJDNA(char * const *date, int *CJDN);
+
+/** Translates a Egyptian calendar date to a Chronological Julian Day.
 
     \param[in] year the year
     \param[in] month the month
     \param[in] day the day
-    \return the corresponding Julian Day
+    \return the corresponding Chronological Julian Day
  */
 double EgyptiantoCJD(int year, int month, double day);
 
-/** Translates an Egyptian calendar date to a Chronological Julian
-    Day.
+/** Translates a Egyptian calendar date to a Chronological Julian Day.
 
-    \param[in] day a pointer to the calendar date to translate.  Must have
-    at least 3 elements (year, month, day).
+    \param[in] date a pointer to the calendar date.  Must have at least 3
+    elements (year, month, day).
 
     \param[out] CJD a pointer to the corresponding Chronological
     Julian Day.  Must not be NULL!
  */
-void EgyptiantoCJDA(double const *date, double *CJD);
+void   EgyptiantoCJDA(double const *date, double *CJD);
 
-/** Translates an Egyptian calendar date to a Chronological Julian
-    Day.
+/** Translates a Egyptian calendar date in text form to a
+    Chronological Julian Day.
+
+    \param[in] date a pointer to the text containing the calendar
+    date.  Must not be NULL!  The date text must consist of a day
+    number, a full month name (in English), and a year number,
+    separated by whitespace.  The month name is matched without
+    regard to case distinctions or non-alphanumerical characters.
+
+    \return the corresponding Chronological Julian Day, or 0 if no
+    legal date was recognized in the input.
+ */
+double EgyptianStoCJD(char const *date);
+
+/** Translates a Egyptian calendar date in text form to a
+    Chronological Julian Day.
 
     \param[in] date a pointer to a pointer to the calendar date text.
-    Must not be NULL!  The date text must consist of a (possibly
-    fractional) day number, a full month name (in English), and a year
-    number, separated by whitespace.
+    Must not be NULL!  The date text must consist of a day number, a
+    full month name (in English), and a year number, separated by
+    whitespace.  The month name is matched without regard to case
+    distinctions or non-alphanumerical characters.
 
-    \param[out] CJD a pointer to the corresponding Chronological
-    Julian Day.  Must not be NULL!
+    \return the corresponding Chronological Julian Day, or 0 if no
+    legal date was recognized in the input.
  */
-void EgyptianStoCJDA(char * const *date, double *CJD);
+void   EgyptianStoCJDA(char * const *date, double *CJD);
+
+/* JULIAN DAY */
 
 /** Translates Julian Day to Chronological Julian Day.
 
@@ -837,6 +1300,8 @@ void CJDNtoCJDNA(int const *in, int *out);
  */
 void CJDtoCJDA(double const *in, double *out);
 
+/* LUNAR CALENDAR */
+
 /** Translates a Chronological Julian Day to a (fractional) count of
     lunar months.
 
@@ -873,6 +1338,8 @@ double LunartoCJD(double lunar);
     Julian Day.  Must not be NULL!
  */ 
 void LunartoCJDA(double const *lunar, double *CJD);
+
+/* MAYAN TZOLKIN/HAAB CALENDAR */
 
 /** Translates a Chronological Julian Day Number into a Mayan
     tzolkin/haab calendar date (from Tikal).
@@ -922,6 +1389,22 @@ void CJDNtoMayanA(int const *CJDN, int *date);
     whitespaces, and with the first-day-of-the-year part enclosed in
     parentheses.
 
+    \param[in] CJDN the Chronological Julian Day Number to translate.
+
+    \return a pointer to a character array containing the
+    corresponding calendar date text.  The character array is
+    allocated by the routine; free after use.
+  */
+char *CJDNtoMayanS(int CJDN);
+
+/** Translates a Chronological Julian Day Number to Mayan calendar
+    date text, consisting of the trecena number, the full venteina
+    name, the haab day number, the full haab month name, the trecena
+    number of the first day of the haab year, and the full venteina
+    name of the first day of the haab year, all separated by single
+    whitespaces, and with the first-day-of-the-year part enclosed in
+    parentheses.
+
     \param[in] CJDN a pointer to the Chronological Julian Day number
     to translate.  Must not be NULL!
 
@@ -931,6 +1414,78 @@ void CJDNtoMayanA(int const *CJDN, int *date);
 
   */
 void CJDNtoMayanSA(int const *CJDN, char **date);
+
+/** Translates a Chronological Julian Day into a Mayan tzolkin/haab
+    calendar date (from Tikal).
+
+    \param[in] CJD the Chronological Julian Day to translate
+
+    \param[out] trecena a pointer to the trecena day count (between
+    1 and 13, inclusive).  Must not be NULL!
+
+    \param[out] venteina a pointer to the venteina day count (between
+    1 and 20, inclusive).  Must not be NULL!
+
+    \param[out] haab_day a pointer to the haab day of the month
+    (between 0 and 19, inclusive).  Must not be NULL!
+
+    \param[out] haab_month a pointer to the haab month number (between
+    1 and 18, inclusive).  Must not be NULL!
+
+    \param[out] year_trecena a pointer to the trecena day count of the
+    first day of the haab year.  Must not be NULL!
+
+    \param[out] year_venteina a pointer to the venteina day count of
+    the first day of the haab year.  Must not be NULL!
+ */
+void CJDtoMayan(double CJD, int *trecena, int *venteina,
+                double *haab_day, int *haab_month,
+                int *year_trecena, int *year_venteina);
+
+/** Translates a Chronological Julian Day into a Mayan tzolkin/haab
+    calendar date (from Tikal).
+
+    \param[in] CJD a pointer to the Chronological Julian Day Number
+    to translate.  Must not be NULL!
+
+    \param[out] date a pointer to the corresponding Mayan date.  Must
+    have at least 6 elements (trecena, venteina, haab day, haab month,
+    trecena of first day of haab year, venteina of first day of haab
+    year)!
+ */
+void CJDtoMayanA(double const *CJD, double *date);
+
+/** Translates a Chronological Julian Day to Mayan calendar date text,
+    consisting of the trecena number, the full venteina name, the haab
+    day number, the full haab month name, the trecena number of the
+    first day of the haab year, and the full venteina name of the
+    first day of the haab year, all separated by single whitespaces,
+    and with the first-day-of-the-year part enclosed in parentheses.
+
+    \param[in] CJD the Chronological Julian Day to translate.
+
+    \return a pointer to a character array containing the
+    corresponding calendar date text.  The character array is
+    allocated by the routine; free after use.
+  */
+char *CJDtoMayanS(double CJD);
+
+/** Translates a Chronological Julian Day to Mayan calendar date text,
+    consisting of the trecena number, the full venteina name, the haab
+    day number, the full haab month name, the trecena number of the
+    first day of the haab year, and the full venteina name of the
+    first day of the haab year, all separated by single whitespaces,
+    and with the first-day-of-the-year part enclosed in parentheses.
+
+    \param[in] CJD a pointer to the Chronological Julian Day to
+    translate.  Must not be NULL!
+
+    \param[out] date a pointer to a character array containing the
+    corresponding calendar date text.  The character array is
+    allocated by the routine; free after use.
+
+  */
+void CJDtoMayanSA(double const *CJD, char **date);
 
 /** Translates a Mayan calendar date to a corresponding Chronological
     Julian Day Number on or before a specified Chronological Julian
@@ -966,7 +1521,6 @@ void CJDNtoMayanSA(int const *CJDN, char **date);
 int MayantoCJDN(int trecena, int venteina, int haab_day, int haab_month,
                 int year_trecena, int year_venteina, int CJDN_upper);
 
-
 /** Translates a Mayan calendar date to a corresponding Chronological
     Julian Day Number on or before a specified Chronological Julian
     Day Number.
@@ -993,32 +1547,221 @@ int MayantoCJDN(int trecena, int venteina, int haab_day, int haab_month,
  */
 void MayantoCJDNA(int const *date, int *CJDN);
 
-/** Translates a Chronological Julian Day Number to a Maya Long Count.
+/** Translates a Mayan tzolkin/haab calendar date in text form to a
+    Chronological Julian Day Number.
 
-    \param[in] CJDN the Chronological Julian Day Number to translate
+    \param[in] date a pointer to the calendar date text.  Must not be
+    NULL!  The date text must consist of the integer trecena number,
+    the full venteina name, the integer haab day number, the full haab
+    month name, the integer trecena number of the first day of the
+    haab year, the full venteina name of the first day of the haab
+    year, and an integer Chronological Julian Day Number that limits
+    the resulting CJDN.  The returned CJDN is the greatest one that
+    matches the tzolkin/haab dates and that is not greater than the
+    limiting CJDN.  The venteina and haab month names are matched
+    without regard to case distinctions or non-alphanumerical
+    characters.  All but one of the components (tzolkin - haab -
+    first-day-of-the-year tzolkin - limiting CJDN) may be omitted.
+    The order of the tzolkin and haab components is free, but the
+    order within the components (e.g., haab day and haab month) must
+    be as stated before, and the first-day-of-the-year tzolkin always
+    comes after the regular tzolkin.  If the limiting CJDN is omitted,
+    then today's CJDN is used for it.
 
-    \param[out] longcount pointer to the corresponding Long Count,
-    which must have at least 6 elements (from least significant to
-    most significant).  The first 5 elements are restricted to ranges
-    from 0 through, respectively, 20 [kin], 18 [uinal], 20 [tun], 20
-    [katun], and 13 [baktun].  The 6th element [may] is not
-    restricted.
+    \return the corresponding Chronological Julian Day Number, or 0 if
+    no legal date was recognized in the input.
  */
-void CJDNtoLongCount(int CJDN, int *longcount);
+int MayanStoCJDN(char const *date);
+
+/** Translates a Mayan tzolkin/haab calendar date in text form to a
+    Chronological Julian Day Number.
+
+    \param[in] date a pointer to a pointer to the calendar date text.
+    Must not be NULL!  The date text must consist of the trecena
+    number, the full venteina name, the haab day number, the full haab
+    month name, the trecena number of the first day of the haab year,
+    the full venteina name of the first day of the haab year, and a
+    Chronological Julian Day Number that limits the resulting CJDN.
+    The returned CJDN is the greatest one that matches the
+    tzolkin/haab dates and that is not greater than the limiting CJDN.
+    The venteina and haab month names are matched without regard to
+    case distinctions or non-alphanumerical characters.  All but one
+    of the components (tzolkin - haab - first-day-of-the-year tzolkin
+    - limiting CJDN) may be omitted.  The order of the tzolkin and
+    haab components is free, but the order within the components
+    (e.g., haab day and haab month) must be as stated before, and the
+    first-day-of-the-year tzolkin always comes after the regular
+    tzolkin.  If the limiting CJDN is omitted, then today's CJDN is
+    used for it.
+
+    \param[out] CJDN a pointer to the corresponding Chronological
+    Julian Day Number.  It is set to 0 if no legal date was recognized
+    in the input.
+ */
+void MayanStoCJDNA(char * const *date, int *CJDN);
+
+/** Translates a Mayan calendar date to a corresponding Chronological
+    Julian Day on or before a specified Chronological Julian Day
+    Number.
+
+    \param[in] trecena the trecena number of the Mayan calendar date.
+    If it is 0, then \p trecena and \p venteina are ignored.
+
+    \param[in] venteina the venteina number of the Mayan calendar
+    date.  If it is 0, then \p trecena and \p venteina are ignored.
+
+    \param[in] haab_day the fractional haab day number of the Mayan
+    calendar date.
+
+    \param[in] haab_month the haab month number of the Mayan calendar
+    date.  If it is 0, then \p haab_day and \p haab_month are ignored.
+
+    \param[in] year_trecena the trecena number that identifies the
+    Mayan year.  If it is 0, then \p year_trecena and \p year_venteina
+    are ignored.
+
+    \param[in] year_venteina the venteina number that identifies the
+    Mayan year.  If it is 0, then \p year_trecena and \p year_venteina
+    are ignored.
+
+    \param[in] CJDN_upper the upper limit to the Chronological Julian
+    Day Number that may be returned.
+
+    \return the greatest Chronological Julian Day not exceeding \p
+    CJDN_upper that has the specified Mayan calendar date, or 0 if an
+    impossible Mayan calendar date is specified.
+ */
+double MayantoCJD(int trecena, int venteina, double haab_day, int haab_month,
+                  int year_trecena, int year_venteina, int CJDN_upper);
+
+/** Translates a Mayan calendar date to a corresponding Chronological
+    Julian Day on or before a specified Chronological Julian Day
+    Number.
+
+    \param[in] *date a pointer to the Mayan calendar date components.
+    Must have at least 7 elements!  The elements of \p date are: (1)
+    the trecena number of the Mayan calendar date.  If it is 0, then
+    the trecena and venteina numbers are ignored. (2) the venteina
+    number of the Mayan calendar date.  If it is 0, then the trecena
+    and venteina numbers are ignored. (3) the haab day number of the
+    Mayan calendar date. (4) the haab month number of the Mayan
+    calendar date.  If it is 0, then the haab day and haab month
+    numbers are ignored. (5) the trecena number that identifies the
+    Mayan year.  If it is 0, then the_trecena and_venteina numbers
+    that identify the year are ignored. (6) the venteina number that
+    identifies the Mayan year.  If it is 0, then the trecena and
+    venteina numbers that identify the year are ignored. (7) the upper
+    limit to the Chronological Julian Day Number that may be returned.
+    The fractional part of the haab day number is taken into account;
+    fractional parts of the other components are ignored.
+
+    \param[out] CJD a pointer to the greatest Chronological Julian Day
+    not exceeding the specified upper limit that has the specified
+    Mayan calendar date components, or 0 if an impossible Mayan
+    calendar date is specified.
+ */
+void MayantoCJDA(double const *date, double *CJD);
+
+/** Translates a Mayan tzolkin/haab calendar date in text form to a
+    Chronological Julian Day.
+
+    \param[in] date a pointer to the calendar date text.  Must not be
+    NULL!  The date text must consist of the fractional trecena
+    number, the full venteina name, the fractional haab day number,
+    the full haab month name, the integer trecena number of the first
+    day of the haab year, the full venteina name of the first day of
+    the haab year, and a fractional Chronological Julian Day that
+    limits the resulting CJD.  The returned CJD is the greatest one
+    that matches the tzolkin/haab dates and that is not greater than
+    the limiting CJD.  The venteina and haab month names are matched
+    without regard to case distinctions or non-alphanumerical
+    characters.  All but one of the components (tzolkin - haab -
+    first-day-of-the-year tzolkin - limiting CJD) may be omitted.  The
+    order of the tzolkin and haab components is free, but the order
+    within the components (e.g., haab day and haab month) must be as
+    stated before, and the first-day-of-the-year tzolkin always comes
+    after the regular tzolkin.  If the limiting CJD is omitted, then
+    today's CJD is used for it.
+
+    \return the corresponding Chronological Julian Day, or 0 if no
+    legal date was recognized in the input.
+ */
+double MayanStoCJD(char const *date);
+
+/** Translates a Mayan tzolkin/haab calendar date in text form to a
+    Chronological Julian Day.
+
+    \param[in] date a pointer to a pointer to the calendar date text.
+    Must not be NULL!  The date text must consist of the trecena
+    number, the full venteina name, the haab day number, the full haab
+    month name, the trecena number of the first day of the haab year,
+    the full venteina name of the first day of the haab year, and a
+    Chronological Julian Day that limits the resulting CJD.  The
+    returned CJD is the greatest one that matches the tzolkin/haab
+    dates and that is not greater than the limiting CJD.  The venteina
+    and haab month names are matched without regard to case
+    distinctions or non-alphanumerical characters.  All but one of the
+    components (tzolkin - haab - first-day-of-the-year tzolkin -
+    limiting CJD) may be omitted.  The order of the tzolkin and haab
+    components is free, but the order within the components (e.g.,
+    haab day and haab month) must be as stated before, and the
+    first-day-of-the-year tzolkin always comes after the regular
+    tzolkin.  If the limiting CJD is omitted, then today's CJD is used
+    for it.
+
+    \param[out] CJD a pointer to the corresponding Chronological
+    Julian Day.  It is set to 0 if no legal date was recognized in the
+    input.
+ */
+void MayanStoCJDA(char * const *date, double *CJD);
+
+/* MAYAN LONG COUNT CALENDAR */
 
 /** Translates a Chronological Julian Day Number to a Maya Long Count.
 
     \param[in] CJDN pointer to the Chronological Julian Day Number to
     translate.  Must not be NULL!
 
-    \param[out] longcount pointer to the corresponding Long Count,
-    which must have at least 6 elements (from least significant to
-    most significant).  The first 5 elements are restricted to ranges
-    from 0 through, respectively, 20 [kin], 18 [uinal], 20 [tun], 20
-    [katun], and 13 [baktun].  The 6th element [may] is not
-    restricted.
+    \param[out] baktun the corresponding number of baktun.
+
+    \param[out] katun the corresponding number of katun, in the range
+    from 0 through 19.
+
+    \param[out] tun the corresponding number of tun, in the range from
+    0 through 19.
+
+    \param[out] uinal the corresponding number of uinal, in the range
+    from 0 through 17.
+
+    \param[out] kin the corresponding number of kin, in the range from
+    0 through 19.
  */
-void CJDNtoLongCountA(int const *CJDN, int *longcount);
+void CJDNtoLongCount(int CJDN, int *baktun, int *katun, int *tun,
+                     int *uinal, int *kin);
+
+/** Translates a Chronological Julian Day Number to a Maya Long Count.
+
+    \param[in] CJDN the Chronological Julian Day Number to translate
+
+    \param[out] date pointer to the corresponding Long Count,
+    which must have at least 5 elements (from most significant to
+    least significant).  The first element [baktun] is not restricted.
+    The last 4 elements are restricted to ranges from 0 through,
+    respectively, 19 [katun], 19 [tun], 17 [uinal], and 19 [kin].
+ */
+void CJDNtoLongCountA(int const *CJDN, int *date);
+
+/** Translates a Chronological Julian Day Number to Mayan Long Count
+    calendar date text, consisting of the five numbers in decreasing
+    order of significance, separated by periods.
+
+    \param[in] CJDN the Chronological Julian Day number to translate.
+
+    \return a pointer to a character array containing the
+    corresponding calendar date text.  The character array is
+    allocated by the routine; free after use.
+  */
+char *CJDNtoLongCountS(int CJDN);
 
 /** Translates a Chronological Julian Day Number to Mayan Long Count
     calendar date text, consisting of the five numbers in decreasing
@@ -1030,29 +1773,171 @@ void CJDNtoLongCountA(int const *CJDN, int *longcount);
     \param[out] date a pointer to a character array containing the
     corresponding calendar date text.  The character array is
     allocated by the routine; free after use.
-
   */
-void CJDNtoLongCountSA(int const *CJDN, char **longcount);
+void CJDNtoLongCountSA(int const *CJDN, char **date);
+
+/** Translates a Chronological Julian Day to a Maya Long Count.
+
+    \param[in] CJD pointer to the Chronological Julian Day to
+    translate.  Must not be NULL!
+
+    \param[out] baktun the corresponding number of baktun.
+
+    \param[out] katun the corresponding number of katun, in the range
+    from 0 through 19.
+
+    \param[out] tun the corresponding number of tun, in the range from
+    0 through 19.
+
+    \param[out] uinal the corresponding number of uinal, in the range
+    from 0 through 17.
+
+    \param[out] kin the corresponding number of kin, in the range from
+    0 through 19.
+ */
+void CJDtoLongCount(double CJD, int *baktun, int *katun, int *tun, int *uinal,
+                    double *kin);
+
+/** Translates a Chronological Julian Day to a Maya Long Count.
+
+    \param[in] CJD the Chronological Julian Day to translate.
+
+    \param[out] date a pointer to the corresponding Long Count
+    numbers, in decreasing order of significance.  Must have at least
+    5 elements!
+ */
+void CJDtoLongCountA(double const *CJD, double *date);
+
+/** Translates a Chronological Julian Day to Mayan Long Count calendar
+    date text, consisting of the five numbers in decreasing order of
+    significance, separated by periods.  The fractional part of the
+    Chronological Julian Day is discarded by rounding down to the
+    nearest integer.
+
+    \param[in] CJD the Chronological Julian Day to translate.
+
+    \return a pointer to a character array containing the
+    corresponding calendar date text.  The character array is
+    allocated by the routine; free after use.
+  */
+char *CJDtoLongCountS(double CJD);
+
+/** Translates a Chronological Julian Day to Mayan Long Count calendar
+    date text, consisting of the five numbers in decreasing order of
+    significance, separated by periods.  The fractional part of the
+    Chronological Julian Day is discarded by rounding down to the
+    nearest integer.
+
+    \param[in] CJD a pointer to the Chronological Julian Day to
+    translate.  Must not be NULL!
+
+    \param[out] date a pointer to a character array containing the
+    corresponding calendar date text.  The character array is
+    allocated by the routine; free after use.
+  */
+void CJDtoLongCountSA(double const *CJD, char **date);
 
 /** Translates a Maya Long Count to a Chronological Julian Day Number.
 
-    \param[in] longcount a pointer to the Maya Long Count, which must
-    have at least 6 elements (from least significant to most
-    significant).
+    \param[in] baktun the baktun number.
+
+    \param[in] katun the katun number.
+
+    \param[in] tun the tun number.
+
+    \param[in] uinal the uinal number.
+
+    \param[in] kin the kin number.
 
     \return the corresponding Chronological Julian Day Number.
  */
-int LongCounttoCJDN(int const *longcount);
+int LongCounttoCJDN(int baktun, int katun, int tun, int uinal, int kin);
 
 /** Translates a Maya Long Count to a Chronological Julian Day Number.
 
-    \param[in] longcount a pointer to the Maya Long Count, which must
-    have at least 6 elements (from least significant to most
+    \param[in] date a pointer to the Maya Long Count, which must
+    have at least 5 elements (from most significant to least
     significant).
 
     \param[out] CJDN a pointer to the corresponding Chronological
     Julian Day Number.  Must not be NULL!
  */
-void LongCounttoCJDNA(int const *longcount, int *CJDN);
+void LongCounttoCJDNA(int const *date, int *CJDN);
+
+/** Translates a Maya Long Count text to a Chronological Julian Day
+    Number.
+
+    \param[in] date the Long Count text, which must mention up to 5
+    Long Count numbers in decreasing order of significance, separated
+    by non-numerical characters.
+
+    \return the corresponding Chronological Julian Day Number, or 0 if
+    no legal Long Count was recognized.
+  */
+int LongCountStoCJDN(char const *date);
+
+/** Translates a Maya Long Count text to a Chronological Julian Day
+    Number.
+
+    \param[in] date the Long Count text, which must mention up to 5
+    Long Count numbers in decreasing order of significance, separated
+    by non-numerical characters.
+
+    \param[out] CJDN a pointer to the corresponding Chronological
+    Julian Day Number.  If no legal Long Count was recognized, then 0
+    is returned.
+  */
+void LongCountStoCJDNA(char * const *date, int *CJDN);
+
+/** Translates a Maya Long Count to a Chronological Julian Day.
+
+    \param[in] baktun the baktun number.
+
+    \param[in] katun the katun number.
+
+    \param[in] tun the tun number.
+
+    \param[in] uinal the uinal number.
+
+    \param[in] kin the kin number.
+
+    \return the corresponding Chronological Julian Day.
+ */
+double LongCounttoCJD(int baktun, int katun, int tun, int uinal, double kin);
+
+/** Translates a Maya Long Count to a Chronological Julian Day.
+
+    \param[in] date a pointer to the Maya Long Count, which must have
+    5 elements (from most significant to least significant).
+
+    \param[out] CJD a pointer to the corresponding Chronological
+    Julian Day.  Must not be NULL!
+ */
+void LongCounttoCJDA(double const *date, double *CJD);
+
+/** Translates a Maya Long Count text to a Chronological Julian Day.
+
+    \param[in] date the Long Count text, which must mention up to 5
+    Long Count numbers in decreasing order of significance, separated
+    by non-numerical characters.  NOTE: only integer numbers are
+    recognized.
+
+    \return the corresponding Chronological Julian Day, or 0 if no
+    legal Long Count was recognized.
+  */
+double LongCountStoCJD(char const *date);
+
+/** Translates a Maya Long Count text to a Chronological Julian Day.
+
+    \param[in] date the Long Count text, which must mention up to 5
+    Long Count numbers in decreasing order of significance, separated
+    by non-numerical characters.  NOTE: only integer numbers are
+    recognized.
+
+    \param[out] CJD a pointer to the corresponding Chronological
+    Julian Day.  If no legal Long Count was recognized, then 0 is
+    returned.
+  */
+void LongCountStoCJDA(char * const *date, double *CJD);
 
 #endif

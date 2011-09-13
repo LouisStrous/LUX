@@ -18,8 +18,9 @@ enum Calendar { CAL_DEFAULT,             /* 0 */
 #define CAL_OUTPUT_BITS	2
 enum Calendar_outputtype {
   CAL_NUMERIC,                  /* 0 */
-  CAL_TEXT,                     /* 1 */
-  CAL_ISOTEXT                   /* 2 */
+  CAL_LONG,                     /* 1 */
+  CAL_DOUBLE,                   /* 2 */
+  CAL_TEXT,                     /* 3 */
 };
 
 #define CAL_TIME_BASE	10

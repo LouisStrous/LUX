@@ -244,7 +244,7 @@ int ana_spawn(int narg, int ps[])		/* execute a shell command */
   char *p;
   int	result;
 
-  if (!symbolIsString(ps[0]))
+  if (!symbolIsStringScalar(ps[0]))
     return cerror(NEED_STR, *ps);
   p = string_value(ps[0]);
   result = system(p);
@@ -263,7 +263,7 @@ int ana_spawn_f(int narg, int ps[])		/* execute a shell command */
   char *p;
   int	result;
 
-  if (!symbolIsString(ps[0]))
+  if (!symbolIsStringScalar(ps[0]))
     return cerror(NEED_STR, *ps);
   p = string_value(ps[0]);
   result = scalar_scratch(ANA_LONG);
@@ -3018,7 +3018,7 @@ FILE *fopenr_sym(int nsym)	/* internal utility */
 {
   FILE *fopen(),*fin;
 
-  if (!symbolIsString(nsym)) {
+  if (!symbolIsStringScalar(nsym)) {
     cerror(NEED_STR, nsym); 
     return NULL;
   }
@@ -3489,7 +3489,7 @@ int fzwrite(int narg, int ps[], int flag) /* fzwrite subroutine */
     /* NOTE: the first 256 bytes of the first 512-byte block are used */
     /* for other stuff, so only 256 bytes of header text can be */
     /* stored in the first block, and 512 bytes in all subsequent blocks */
-    if (symbolIsString(ps[2]))  /* the header is a string */
+    if (symbolIsStringScalar(ps[2]))  /* the header is a string */
       mq = symbol_memory(ps[2]) - 1; /* don't count final \0 */
     else {
       q2.sp = array_data(ps[2]);
@@ -3505,7 +3505,7 @@ int fzwrite(int narg, int ps[], int flag) /* fzwrite subroutine */
     j = fwrite(fh, 1, 256, fout); /* write the first block until the start */
     if (j != 256)
       goto fzwrite_1;
-    if (symbolIsString(ps[2])) { /* the header is a string */
+    if (symbolIsStringScalar(ps[2])) { /* the header is a string */
       p = string_value(ps[2]);
       if (fwrite(p, 1, mq, fout) != mq) /* write the header */
 	goto fzwrite_1;
@@ -3716,7 +3716,7 @@ int fcwrite(int narg, int ps[], int flag)/* fcwrite subroutine */
    /* NOTE: the first 256 bytes of the first 512-byte block are used */
    /* for other stuff, so only 256 bytes of header text can be */
    /* stored in the first block, and 512 bytes in all subsequent blocks */
-   if (symbolIsString(ps[2]))  /* the header is a string */
+   if (symbolIsStringScalar(ps[2]))  /* the header is a string */
      mq = symbol_memory(ps[2]) - 1; /* don't count final \0 */
    else {
      q2.sp = array_data(ps[2]);
@@ -3732,7 +3732,7 @@ int fcwrite(int narg, int ps[], int flag)/* fcwrite subroutine */
    j = fwrite(fh, 1, 256, fout); /* write the first block until the start */
    if (j != 256)
      goto fcwrite_1;
-   if (symbolIsString(ps[2])) { /* the header is a string */
+   if (symbolIsStringScalar(ps[2])) { /* the header is a string */
      p = string_value(ps[2]);
      j = fwrite(p, 1, mq, fout); /* write the header */
      if (j != mq)
@@ -4619,7 +4619,7 @@ int ana_findfile(int narg, int ps[])
   int	ns, result_sym;
 
   /* first argment is a string with the start path */
-  if (!symbolIsString(ps[0]))
+  if (!symbolIsStringScalar(ps[0]))
     return cerror(NEED_STR, ps[0]);
   startpath = string_value(ps[0]);
 
@@ -4627,7 +4627,7 @@ int ana_findfile(int narg, int ps[])
     startpath = current_dir;
 
   /* second is the file name */
-  if (!symbolIsString(ps[1]))
+  if (!symbolIsStringScalar(ps[1]))
     return cerror(NEED_STR, ps[1]);
   fname = string_value(ps[1]);
 
@@ -4964,7 +4964,7 @@ int ana_identify_file(int narg, int ps[])
   FILE	*fp;
   int	type, result;
 
-  if (!symbolIsString(ps[0]))
+  if (!symbolIsStringScalar(ps[0]))
     return cerror(NEED_STR, ps[0]);
   name = string_value(ps[0]);
   fp = fopen(expand_name(name, NULL), "r");
@@ -5511,7 +5511,7 @@ int ana_fits_read_general(int narg, int ps[], int func)/* read fits files */
   }
   if (narg >= 6) {
     mode = mode + 64; 
-    if (!symbolIsString(ps[5]))
+    if (!symbolIsStringScalar(ps[5]))
       return func? ANA_ZERO: cerror(NEED_STR, ps[5]);
     preamble = string_value(ps[5]);
   }
@@ -5552,7 +5552,7 @@ int ana_fits_header_f(int narg, int ps[])/* read fits header */
   }
   if (narg >= 4) {
     mode = mode + 64; 
-    if (!symbolIsString(ps[3]))
+    if (!symbolIsStringScalar(ps[3]))
       return cerror(NEED_STR, ps[3]);
     preamble = string_value(ps[3]);
   }
@@ -5581,7 +5581,7 @@ int ana_fits_xread_f(int narg, int ps[])/* read fits extension and headers */
  }
  if (narg >= 6) {
    mode = mode + 64; 
-   if (!symbolIsString(ps[5]))
+   if (!symbolIsStringScalar(ps[5]))
      return cerror(NEED_STR, ps[5]);
    preamble = string_value(ps[5]);
  }
@@ -6613,7 +6613,7 @@ int ana_fits_write_general(int narg, int ps[], int func)
 
   if (!symbolIsNumericalArray(ps[0]) || symbolIsComplexArray(ps[0]))
     return func? ANA_ZERO: cerror(ILL_CLASS, ps[0]);
-  if (!symbolIsString(ps[1]))
+  if (!symbolIsStringScalar(ps[1]))
     return func? ANA_ZERO: cerror(ILL_CLASS, ps[1]);
 
   /* the data */
@@ -6627,7 +6627,7 @@ int ana_fits_write_general(int narg, int ps[], int func)
       header.sp = array_data(ps[2]);
       headertype = ANA_STRING_ARRAY;
       nheader = array_size(ps[2]);
-    } else if (symbolIsString(ps[2])) {
+    } else if (symbolIsStringScalar(ps[2])) {
       header.s = string_value(ps[2]);
       headertype = ANA_TEMP_STRING;
     } else return func? ANA_ZERO: cerror(ILL_CLASS, ps[2]);

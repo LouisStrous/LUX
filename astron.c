@@ -777,6 +777,7 @@ int gcd(int a, int b)
 int ana_calendar(int narg, int ps[])
 {
   int result, input_elem_per_date, output_elem_per_date, iq;
+  int *dims, ndim;
   loopInfo tgtinfo, srcinfo;
   pointer src, tgt;
   enum Calendar_order fromorder, toorder;
@@ -784,6 +785,31 @@ int ana_calendar(int narg, int ps[])
   enum Calendar_timescale fromtime, totime;
   enum Symboltype inputtype, internaltype, outputtype;
   enum Calendar_outputtype outputkind;
+  static struct {
+    int to_elements_per_date;   /* translating to calendar date */
+    int from_elements_per_date; /* translating from calendar date */
+    void (*CJDNtoCal)(int const *CJDN, int *date);
+    void (*CJDtoCal)(double const *CJD, double *date);
+    void (*CaltoCJDN)(int const *date, int *CJDN);
+    void (*CaltoCJD)(double const *date, double *CJD);
+    void (*CJDNtoCalS)(int const *CJDN, char **date);
+    void (*CJDtoCalS)(double const *CJD, char **date);
+    void (*CalStoCJDN)(char * const *date, int *CJDN);
+    void (*CalStoCJD)(char * const *date, double *CJD);
+  } cal_data[] = {
+    { 0, 0, NULL,             NULL,            NULL,             NULL,            NULL,              NULL,             NULL,              NULL },
+    { 3, 3, CJDNtoCommonA,    CJDtoCommonA,    CommontoCJDNA,    CommontoCJDA,    CJDNtoCommonSA,    CJDtoCommonSA,    CommonStoCJDNA,    CommonStoCJDA },
+    { 3, 3, CJDNtoGregorianA, CJDtoGregorianA, GregoriantoCJDNA, GregoriantoCJDA, CJDNtoGregorianSA, CJDtoGregorianSA, GregorianStoCJDNA, GregorianStoCJDA },
+    { 3, 3, CJDNtoIslamicA,   CJDtoIslamicA,   IslamictoCJDNA,   IslamictoCJDA,   CJDNtoIslamicSA,   CJDtoIslamicSA,   IslamicStoCJDNA,   IslamicStoCJDA },
+    { 3, 3, CJDNtoJulianA,    CJDtoJulianA,    JuliantoCJDNA,    JuliantoCJDA,    CJDNtoJulianSA,    CJDtoJulianSA,    JulianStoCJDNA,    JulianStoCJDA },
+    { 3, 3, CJDNtoHebrewA,    CJDtoHebrewA,    HebrewtoCJDNA,    HebrewtoCJDA,    CJDNtoHebrewSA,    CJDtoHebrewSA,    HebrewStoCJDNA,    HebrewStoCJDA },
+    { 3, 3, CJDNtoEgyptianA,  CJDtoEgyptianA,  EgyptiantoCJDNA,  EgyptiantoCJDA,  CJDNtoEgyptianSA,  CJDtoEgyptianSA,  EgyptianStoCJDNA,  EgyptianStoCJDA },
+    { 1, 1, NULL,             CJDtoJDA,        NULL,             JDtoCJDA,        NULL,              NULL,             NULL,              NULL },
+    { 1, 1, CJDNtoCJDNA,      CJDtoCJDA,       CJDNtoCJDNA,      CJDtoCJDA,       NULL,              NULL,             NULL,              NULL },
+    { 1, 1, NULL,             CJDtoLunarA,     NULL,             LunartoCJDA,     NULL,              NULL,             NULL,              NULL },
+    { 6, 7, CJDNtoMayanA,     CJDtoMayanA,     MayantoCJDNA,     MayantoCJDA,     CJDNtoMayanSA,     CJDtoMayanSA,     MayanStoCJDNA,     MayanStoCJDA },
+    { 5, 5, CJDNtoLongCountA, CJDtoLongCountA, LongCounttoCJDNA, LongCounttoCJDA, CJDNtoLongCountSA, CJDtoLongCountSA, LongCountStoCJDNA, LongCountStoCJDA },
+  };
 
   fromcalendar = extractbits(internalMode, CAL_CALENDAR_BASE,
 			     CAL_CALENDAR_BITS);
@@ -797,121 +823,66 @@ int ana_calendar(int narg, int ps[])
   totime = extractbits(internalMode, CAL_TIME_BASE + CAL_TIME_BITS,
 		       CAL_TIME_BITS);
 
-  if (fromcalendar == CAL_DEFAULT) {
-    if (symbolIsArray(ps[0])) {
-      if (symbolIsStringArray(ps[0])
-          || array_dims(ps[0])[0] == 3)
-        fromcalendar = CAL_COMMON;
-      else
-        fromcalendar = CAL_CJD;
-    } else if (symbolIsString(ps[0]))
+  numerical_or_string(ps[0], &dims, &ndim, NULL, NULL);
+
+  /* If no specific "from" calendar is specified, then assume the Common
+     calendar if the input is a string or string array, or if the input
+     has 3 elements in its first dimension.  Otherwise, assume CJD. */
+  if (fromcalendar == CAL_DEFAULT) { 
+    if (symbolIsString(ps[0])
+        || dims[0] == 3)
       fromcalendar = CAL_COMMON;
     else
       fromcalendar = CAL_CJD;
   }
 
+  void (*CaltoCJDN)(int const *date, int *CJDN)
+    = cal_data[fromcalendar].CaltoCJDN;
+  void (*CaltoCJD)(double const *date, double *CJDN)
+    = cal_data[fromcalendar].CaltoCJD;
+  void (*CalStoCJDN)(char * const *date, int *CJDN)
+    = cal_data[fromcalendar].CalStoCJDN;
+  void (*CalStoCJD)(char * const *date, double *CJD)
+    = cal_data[fromcalendar].CalStoCJD;
+
+  iq = ps[0];
+  {
+    enum Symboltype type;
+
+    /* if the input type is integer, then promote to LONG.  If the
+       input type is floating point, then promote to DOUBLE. */
+    type = symbol_type(iq);
+    if (isIntegerType(type))
+      inputtype = ANA_LONG;
+    else if (isFloatType(type))
+      inputtype = ANA_DOUBLE;
+    else                        /* must be text type */
+      inputtype = ANA_STRING_ARRAY;
+  }
+
+  /* number of input elements expected per calendar date */
+  input_elem_per_date = cal_data[fromcalendar].from_elements_per_date;
+  if (isStringType(inputtype))
+    input_elem_per_date = 1; /* strings have all elements of a date in a single string */
+
+  if (dims[0] % input_elem_per_date)
+    return anaerror("Incompatible first dimension: expected a multiple "
+                    "of %d but found %d", ps[0], input_elem_per_date,
+                    dims[0]);
+  
+  /* If no specific "to" calendar is specified, then assume the Common
+     calendar if the (effective) "from" calendar is a
+     one-element-per-date calendar, and otherwise CJD */
   if (tocalendar == CAL_DEFAULT) {
-    switch (fromcalendar) {
-    case CAL_JD: case CAL_CJD:
+    if (input_elem_per_date == 1)
       tocalendar = CAL_COMMON;
-      break;
-    default:
+    else
       tocalendar = CAL_CJD;
-      break;
-    }
   }
 
   if (fromcalendar == tocalendar) /* no conversion */
     return *ps;
 
-  static struct {
-    int to_elements_per_date;   /* translating to calendar date */
-    int from_elements_per_date; /* translating from calendar date */
-    void (*CJDNtoCal)(int const *CJDN, int *date);
-    void (*CJDtoCal)(double const *CJD, double *date);
-    void (*CaltoCJDN)(int const *date, int *CJDN);
-    void (*CaltoCJD)(double const *date, double *CJD);
-    void (*CJDNtoCalS)(int const *CJDN, char **date);
-    void (*CJDtoCalS)(double const *CJD, char **date);
-    void (*CalStoCJD)(char * const *date, double *CJD);
-  } cal_data[] = {
-    { 0, 0, NULL,             NULL,            NULL,             NULL,            NULL,              NULL,             NULL },
-    { 3, 3, CJDNtoCommonA,    CJDtoCommonA,    CommontoCJDNA,    CommontoCJDA,    CJDNtoCommonSA,    CJDtoCommonSA,    CommonStoCJDA },
-    { 3, 3, CJDNtoGregorianA, CJDtoGregorianA, GregoriantoCJDNA, GregoriantoCJDA, CJDNtoGregorianSA, CJDtoGregorianSA, GregorianStoCJDA },
-    { 3, 3, CJDNtoIslamicA,   CJDtoIslamicA,   IslamictoCJDNA,   IslamictoCJDA,   CJDNtoIslamicSA,   CJDtoIslamicSA,   IslamicStoCJDA },
-    { 3, 3, CJDNtoJulianA,    CJDtoJulianA,    JuliantoCJDNA,    JuliantoCJDA,    CJDNtoJulianSA,    CJDtoJulianSA,    JulianStoCJDA },
-    { 3, 3, CJDNtoHebrewA,    CJDtoHebrewA,    HebrewtoCJDNA,    HebrewtoCJDA,    CJDNtoHebrewSA,    CJDtoHebrewSA,    HebrewStoCJDA },
-    { 3, 3, CJDNtoEgyptianA,  CJDtoEgyptianA,  EgyptiantoCJDNA,  EgyptiantoCJDA,  CJDNtoEgyptianSA,  CJDtoEgyptianSA,  EgyptianStoCJDA },
-    { 1, 1, NULL,             CJDtoJDA,        NULL,             JDtoCJDA,        NULL,              NULL,             NULL },
-    { 1, 1, CJDNtoCJDNA,      CJDtoCJDA,       CJDNtoCJDNA,      CJDtoCJDA,       NULL,              NULL,             NULL },
-    { 1, 1, NULL,             CJDtoLunarA,     NULL,             LunartoCJDA,     NULL,              NULL,             NULL },
-    { 6, 7, CJDNtoMayanA,     NULL,            MayantoCJDNA,     NULL,            CJDNtoMayanSA,     NULL,             NULL },
-    { 5, 5, CJDNtoLongCountA, NULL,            LongCounttoCJDNA, NULL,            CJDNtoLongCountSA, NULL,             NULL },
-  };
-
-  /* 
-     internal date type:
-     3 elements per date & LONG => LONG
-     3 elements per date & DOUBLE => DOUBLE
-     3 elements per date & STRING => DOUBLE
-     1 element per date & LONG & CAL_CJD => LONG
-     1 element per date & LONG & CAL_JD => DOUBLE
-     1 element per date & DOUBLE => DOUBLE
-     1 element per date & STRING => DOUBLE
-   */
-  iq = ps[0];
-  inputtype = symbol_type(iq);
-  if (inputtype < ANA_LONG) {
-    iq = ana_long(1, &iq);
-    inputtype = ANA_LONG;
-  } else if (inputtype == ANA_FLOAT) {
-    iq = ana_double(1, &iq);
-    inputtype = ANA_DOUBLE;
-  }
-
-  input_elem_per_date = cal_data[fromcalendar].from_elements_per_date;
-
-  switch (input_elem_per_date) {
-  case 1:
-    if (inputtype == ANA_LONG && fromcalendar == CAL_CJD)
-      internaltype = ANA_LONG;
-    else
-      internaltype = ANA_DOUBLE;
-    break;
-  default:
-    if (inputtype == ANA_LONG)
-      internaltype = ANA_LONG;
-    else
-      internaltype = ANA_DOUBLE;
-    break;
-  }
-  if (isStringType(inputtype))
-    input_elem_per_date = 1;
-
-  /* 
-     output type:
-     non-numerical => STRING
-     numerical => same as internal type
-   */
-  if (outputkind == CAL_NUMERIC) {
-    if (!cal_data[tocalendar].CJDNtoCal)
-      outputtype = ANA_DOUBLE;
-    else if (!cal_data[tocalendar].CJDtoCal)
-      outputtype = ANA_LONG;
-    else
-      outputtype = internaltype;
-  } else
-    outputtype = ANA_STRING_ARRAY;
-  output_elem_per_date = cal_data[tocalendar].to_elements_per_date;
-  if (outputtype == ANA_STRING_ARRAY)
-    output_elem_per_date = 1;
-  
-  void (*CaltoCJDN)(int const *date, int *CJDN)
-    = cal_data[fromcalendar].CaltoCJDN;
-  void (*CaltoCJD)(double const *date, double *CJDN)
-    = cal_data[fromcalendar].CaltoCJD;
-  void (*CalStoCJD)(char * const *date, double *CJD)
-    = cal_data[fromcalendar].CalStoCJD;
   void (*CJDNtoCal)(int const *CJDN, int *date)
     = cal_data[tocalendar].CJDNtoCal;
   void (*CJDtoCal)(double const *CJD, double *date)
@@ -924,18 +895,84 @@ int ana_calendar(int narg, int ps[])
   assert(CaltoCJDN || CaltoCJD);
   assert(CJDNtoCal || CJDtoCal);
 
+  /* number of output elements per calendar date */
+  output_elem_per_date = cal_data[tocalendar].to_elements_per_date;
+
+  /* if the (promoted) input type is LONG, then the internal type is
+     LONG if CaltoCJDN is not NULL, or DOUBLE if CaltoCJDN is NULL.
+     If CaltoCJDN is NULL and the number of input elements per date
+     is not equal to 1, then work with a DOUBLE copy of the input
+     symbol. */
+  if (inputtype == ANA_LONG) {
+    if (CaltoCJDN)
+      internaltype = ANA_LONG;
+    else {
+      internaltype = ANA_DOUBLE;
+      if (input_elem_per_date != 1) {
+        iq = ana_double(1, &iq);
+        inputtype = ANA_DOUBLE;
+      }
+    }
+  }
+
+  /* if the (promoted) input type is DOUBLE, then the internal type
+     is DOUBLE if CaltoCJD is not NULL, or LONG if CaltoCJD is NULL.
+     If CaltoCJD is NULL and the number of input elements per date
+     is not equal to 1, then work with a LONG ("floor") copy of the
+     input symbol. */
+  
+  else if (inputtype == ANA_DOUBLE) {
+    if (CaltoCJD)
+      internaltype = ANA_DOUBLE;
+    else {
+      internaltype = ANA_LONG;
+      if (input_elem_per_date != 1) {
+        iq = ana_floor(1, &iq);
+        inputtype = ANA_LONG;
+      }
+    }
+  }
+
+  /* if the input type is a string type, then the internal type
+     depends on the output kind. */
+  else {
+    if (outputkind == CAL_DOUBLE)
+      internaltype = ANA_DOUBLE;
+    else
+      internaltype = ANA_LONG;
+    input_elem_per_date = 1; /* all input elements in a single text value */
+  }
+  
+  /* for numeric output, the output type is DOUBLE if CJDNtoCal is
+     NULL (i.e., a conversion routine to LONG is not available), or
+     LONG if CJDtoCal is NULL (i.e., a conversion routine to DOUBLE is
+     not available), or else is equal to the internal type.  For
+     non-numerical (i.e., text) output, then output type indicates
+     text.
+  */
+  if (outputkind == CAL_TEXT) {
+    outputtype = ANA_STRING_ARRAY;
+    output_elem_per_date = 1;   /* all date components in a single text value */
+  } else if (outputkind == CAL_LONG || internaltype == ANA_LONG)
+    outputtype = CaltoCJDN? ANA_LONG: ANA_DOUBLE;
+  else if (outputkind == CAL_DOUBLE || internaltype == ANA_DOUBLE)
+    outputtype = CaltoCJD? ANA_DOUBLE: ANA_LONG;
+  else                          /* should not happen */
+    outputtype == internaltype;
+
   {
     int more[1], less[1], nMore, nLess, m, l, q;
 
+    /* does the output need more elements than the input? */
     nMore = nLess = 0;
-    if (output_elem_per_date != input_elem_per_date) {
-      if (output_elem_per_date > 1) {
-        nMore = 1;
+    if (output_elem_per_date != input_elem_per_date) { /* yes, different */
+      if (output_elem_per_date > 1) { /* output needs more elements */
+        nMore = 1;                    /* prefix one dimension */
         more[0] = output_elem_per_date;
       }
-      if (input_elem_per_date > 1) {
+      if (input_elem_per_date > 1) { /* output needs fewer elements */
         nLess = 1;
-        less[0] = input_elem_per_date;
+        less[0] = input_elem_per_date; /* reduce 1st dimension */
       }
     }
     
@@ -953,25 +990,41 @@ int ana_calendar(int narg, int ps[])
       return ANA_ERROR;
   }
 
-  switch (inputtype) {
-  case ANA_STRING_ARRAY:
-    if (!CalStoCJD)
-      return anaerror("Translating from STRING is not supported for this calendar", ps[0]);
-    break;
-  }
+  if (srcinfo.rdims[0] != input_elem_per_date) {
+    /* we have a multiple of the expected number of input elements per
+       date, but the first dimension must be exactly equal to the
+       expected number else the standard loop ignores the excess
+       elements.  We shift the excess to the second dimension. */
+    int dims[MAX_DIMS];
 
-  switch (outputtype) {
-  case ANA_LONG:
-    if (!CJDNtoCal)
-      return anaerror("Translating from CJDN is not supported for this calendar",
-                      ps[0]);
-    break;
-  case ANA_DOUBLE:
-    if (!CJDtoCal)
-      return anaerror("Translating from CJD is not supported for this calendar",
-                      ps[0]);
-    break;
-  case ANA_STRING_ARRAY:
+    assert(srcinfo.dims[0] % input_elem_per_date == 0);
+    memcpy(dims, srcinfo.dims, srcinfo.ndim*sizeof(*dims));
+    if (srcinfo.ndim == 1) {    /* there is only one dimension */
+      dims[1] = 1;              /* add a 2nd dimension */
+      srcinfo.ndim = 2;
+    }
+    int d = srcinfo.dims[0]/input_elem_per_date;
+    dims[1] *= d;
+    dims[0] /= d;
+    setupDimensionLoop(&srcinfo, srcinfo.ndim, dims, srcinfo.type,
+                       srcinfo.naxes, srcinfo.axes, srcinfo.data,
+                       srcinfo.mode);
+  }    
+
+  /* complain if the desired type of translation is not available.  We
+     don't need to check for numerical types, because we demand that
+     at least one of the translations (to LONG/DOUBLE) is available,
+     and are prepared to handle the case where only one is
+     available. */
+  if (inputtype == ANA_STRING_ARRAY && !CalStoCJD)
+    return anaerror("Translating from STRING is not supported for this calendar", ps[0]);
+
+  /* complain if the desired type of translation is not available.  We
+     don't need to check for numerical types, because we demand that
+     at least one of the translations (from LONG/DOUBLE) is available,
+     and are prepared to handle the case where only one is
+     available. */
+  if (outputtype == ANA_STRING_ARRAY)
     switch (internaltype) {
     case ANA_LONG:
       if (!CJDNtoCalS)
@@ -982,26 +1035,33 @@ int ana_calendar(int narg, int ps[])
         return anaerror("Translating CJD to STRING is not supported for this calendar", ps[0]);
       break;
     }
-    break;
-  }
 
+  /* now loop over all dates to translate */
   do {
     scalar timestamp, temp;
 
     /* translate input to CJD or CJDN */
     switch (internaltype) {
     case ANA_LONG:              /* translate to CJDN */
-      /* internaltype cannot be less than inputtype */
-      assert(inputtype == ANA_LONG);
-      CaltoCJDN(src.l, &timestamp.l);
-      src.l += input_elem_per_date;
+      switch (inputtype) {
+      case ANA_LONG:
+        CaltoCJDN(src.l, &timestamp.l);
+        src.l += input_elem_per_date;
+        break;
+      case ANA_DOUBLE: /* only cases with one element per date reach here */
+        assert(input_elem_per_date == 1);
+        temp.l = (int) floor(*src.d); /* translate from DOUBLE to LONG */
+        CaltoCJDN(&temp.l, &timestamp.l); /* use LONG translation */
+        src.d += input_elem_per_date;
+        break;
+      }
       break;
     case ANA_DOUBLE:            /* translate to CJD */
       switch (inputtype) {
-      case ANA_LONG:
-        assert(cal_data[fromcalendar].to_elements_per_date == 1);
-        temp.d = (double) *src.l;
-        CaltoCJD(&temp.d, &timestamp.d);
+      case ANA_LONG: /* only cases with one element per date reach here */
+        assert(input_elem_per_date == 1);
+        temp.d = (double) *src.l; /* translate from LONG to DOUBLE */
+        CaltoCJD(&temp.d, &timestamp.d); /* use DOUBLE translation */
         src.l += input_elem_per_date;
         break;
       case ANA_DOUBLE:
@@ -1020,6 +1080,7 @@ int ana_calendar(int narg, int ps[])
       return cerror(ILL_TYPE, ps[0]);
     }
 
+    /* translate CJD or CJDN to output */
     switch (internaltype) {
     case ANA_LONG:
       switch (outputtype) {
@@ -1027,10 +1088,10 @@ int ana_calendar(int narg, int ps[])
         CJDNtoCal(&timestamp.l, tgt.l);
         tgt.l += output_elem_per_date;
         break;
-      case ANA_DOUBLE:
-        assert(cal_data[tocalendar].to_elements_per_date == 1);
-        temp.d = (double) timestamp.l;
-        CJDtoCal(&temp.d, tgt.d);
+      case ANA_DOUBLE: /* only cases with one element per date reach here */
+        assert(output_elem_per_date == 1);
+        temp.d = (double) timestamp.l; /* translate from LONG to DOUBLE */
+        CJDtoCal(&temp.d, tgt.d);      /* use DOUBLE translation */
         tgt.d += output_elem_per_date;
         break;
       case ANA_STRING_ARRAY:
@@ -1042,8 +1103,8 @@ int ana_calendar(int narg, int ps[])
     case ANA_DOUBLE:
       switch (outputtype) {
       case ANA_LONG:
-        temp.l = (int) floor(timestamp.d);
-        CJDNtoCal(&temp.l, tgt.l);
+        temp.l = (int) floor(timestamp.d); /* translate from DOUBLE to LONG */
+        CJDNtoCal(&temp.l, tgt.l);         /* use LONG translation */
         tgt.l += output_elem_per_date;
         break;
       case ANA_DOUBLE:
@@ -1434,7 +1495,7 @@ int ana_calendar_OLD(int narg, int ps[])
       else
         CJDNtoDate(JD.l[i], &year, &month, &iday, CAL_COMMON);
       switch (output) {
-      case CAL_ISOTEXT:
+      case 999 /* CAL_ISOTEXT */:
         if (outtype == ANA_DOUBLE) {
           sec = (day - (int) day)*86400;
           min = sec/60;
@@ -1750,7 +1811,7 @@ int ana_calendar_OLD(int narg, int ps[])
     } else
       CJDNtoDate(JD.l[i], &year, &month, &iday, tocalendar);
     switch (output) {
-    case CAL_ISOTEXT:
+    case 999 /* CAL_ISOTEXT */:
       if (outtype == ANA_DOUBLE) {
         sec = (day - (int) day)*86400;
         min = sec/60;

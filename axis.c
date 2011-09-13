@@ -29,11 +29,15 @@
 #include <string.h>
 #include <limits.h>
 #include "action.h"
+#include <obstack.h>
+#define obstack_chunk_alloc malloc
+#define obstack_chunk_free free
 static char rcsid[] __attribute__ ((unused)) =
 "$Id: axis.c,v 4.0 2001/02/07 20:36:57 strous Exp $";
 
-void setupDimensionLoop(loopInfo *info, int ndim, int dims[], int type,
-		       int naxes, int axes[], pointer *data, int mode);
+void setupDimensionLoop(loopInfo *info, int ndim, int dims[], 
+                        enum Symboltype type, int naxes, int axes[],
+                        pointer *data, int mode);
 void rearrangeDimensionLoop(loopInfo *info);
 int standardLoop(int data, int axisSym, int mode, int outType,
 		 loopInfo *src, pointer *srcptr, int *output, loopInfo *trgt,
@@ -45,8 +49,9 @@ int dimensionLoopResult(loopInfo const *sinfo, loopInfo *tinfo, int type,
 			pointer *tptr);
 
 /*-------------------------------------------------------------------------*/
-void setupDimensionLoop(loopInfo *info, int ndim, int dims[], int type,
-		       int naxes, int axes[], pointer *data, int mode)
+void setupDimensionLoop(loopInfo *info, int ndim, int dims[], 
+                        enum Symboltype type, int naxes, int axes[],
+                        pointer *data, int mode)
 /* fills the loopInfo structure <info> with information
  suitable for looping through a dimensional structure, and returns a
  pointer to the loopInfo structure.
@@ -383,7 +388,7 @@ void omitRedundantDimensions(int *ndim, int *dims, int *naxes, int *axes)
 }
 /*-----------------------------------------------------------------------*/
 int dimensionLoopResult1(loopInfo const *sinfo,
-                         int tmode, int ttype,
+                         int tmode, enum Symboltype ttype,
                          int nMore, int const * more,
                          int nLess, int const * less,
                          loopInfo *tinfo, pointer *tptr)
@@ -508,11 +513,21 @@ int dimensionLoopResult1(loopInfo const *sinfo,
     target = array_scratch(ttype, ndim, dims);
     ptr.l = (int *) array_data(target);
   } else {			/* get a scalar */
-    target = scalar_scratch(ttype);
-    if (isComplexType(ttype))
-      ptr.cf = complex_scalar_data(target).cf;
-    else
-      ptr.l = &scalar_value(target).l;
+    if (isStringType(ttype)) {
+      target = string_scratch(0);
+      /* we must produce a NULL pointer, because that's what happens
+         for string arrays, too, and the interface doesn't know
+         whether we're dealing with a string array or a string. */
+      free(string_value(target));
+      string_value(target) = NULL;
+      ptr.sp = &string_value(target);
+    } else {
+      target = scalar_scratch(ttype);
+      if (isComplexType(ttype))
+        ptr.cf = complex_scalar_data(target).cf;
+      else
+        ptr.l = &scalar_value(target).l;
+    }
   }
 
   *tptr = ptr;			/* store pointer to output data */
@@ -558,7 +573,7 @@ int standardLoopX(int source, int axisSym, int srcMode,
                   loopInfo *srcinf, pointer *srcptr,
                   int nMore, int const * more,
                   int nLess, int const * less,
-                  int tgtType, int tgtMode,
+                  enum Symboltype tgtType, int tgtMode,
                   int *target,
                   loopInfo *tgtinf, pointer *tgtptr)
 {
@@ -757,7 +772,7 @@ int standardLoop1(int source,
                   loopInfo *srcinf, pointer *srcptr,
                   int nMore, int * more,
                   int nLess, int * less,
-                  int tgtType, int tgtMode,
+                  enum Symboltype tgtType, int tgtMode,
                   int *target, 
                   loopInfo *tgtinf, pointer *tgtptr)
 /* initiates a standard array loop.  advanceLoop() runs through the loop.
@@ -1423,3 +1438,186 @@ int numerical_or_string(int data, int **dims, int *nDim, int *size, pointer *src
   return 1;
 }
 /*--------------------------------------------------------------------*/
+/*
+   <params-spec> = <param-spec>[;<param-spec>]*
+   <param-spec> = {'i'|'o'|'r'}[<type-spec>][<dims-spec>]
+   <type-spec> = {['≥']{'B'|'W'|'L'|'F'|'D'}}|'S'
+   <dims-spec> = <dim-spec>[[,]<dim-spec>]*
+   <dim-spec> = [{'+'NUMBER|'-'|'-'NUMBER|'='|'='NUMBER}]*
+
+   Some of the characteristics of a parameter may depend on those of a
+   reference parameter.  That reference parameter is the very first
+   parameter.
+
+   param-spec:
+   i = input parameter.
+
+   o = output parameter.  An error is declared if this is not a named
+   parameter.
+
+   r = return value.  There can be at most one of these in the
+   params-spec (for functions only).
+
+   TODO: how to indicate optional parameters?
+
+   type-spec:
+
+   ≥ = type should be at least equal to the indicated type.  For input
+   parameters, a copy is created with the indicated minimum type if
+   the input parameter does not meet the condition, and further
+   processing is based on that copy.  For output parameters, the type
+   is equal to that of the reference parameter, unless that type is
+   smaller than the specified minimum type, in which case the output
+   parameter gets the specified minimum type.
+
+   B W L F D S : type = BYTE, WORD, LONG, FLOAT, DOUBLE, STRING
+
+   dim-spec:
+
+   NUMBER = the current dimension has the specified size.  For input
+   parameters, an error is declared if the dimension does not have the
+   specified size.
+
+   +NUMBER = for output or return parameters, a new dimension with the
+   specified size is inserted here
+
+   = = for output or return parameters, the current dimension is taken
+   from the reference parameter
+
+   =NUMBER = for output or return parameters, the current dimension is
+   taken from the reference parameter, and must be equal to the
+   specified number.  An error is declared if the reference
+   parameter's dimension does not have the indicated size
+
+   - = the corresponding dimension from the reference parameter is
+     skipped
+
+   There must be at least one non-numeric character between adjacent
+   dimensions.  If no '+' or '=' is needed before a dimension, then a
+   ',' can be used to separate it from the preceding dimension
+
+   IAUBI00  : rD3
+   IAUBP00  : i≥L;oD+3+3;oD+3+3;oD+3+3
+   IAUBP06  : i≥L;oD+3+3;oD+3+3;oD+3+3
+   IAUBPN2XY: i3,3*;o--;o--
+   IAUC2I00A: i≥L;rD+3+3
+   IAUC2I00B: i≥L;rD+3+3
+   IAUC2I06A: i≥L;rD+3+3
+   IAUC2IBPN: i≥L;i≥D+3+3;rD+3+3
+
+  */
+/*--------------------------------------------------------------------*/
+struct dims_spec {
+  enum dim_spec_type { DS_ADD, DS_REMOVE, DS_EXACT } dim_spec_type;
+  size_t size;
+};
+
+struct param_spec {
+  enum param_spec_type { PS_INPUT, PS_OUTPUT, PS_RETURN } logical_type;
+  enum type_spec_limit_type { PS_EXACT, PS_LOWER_LIMIT } data_type_limit;
+  enum Symboltype data_type;
+  size_t num_dims_spec;
+  struct dims_spec *dims_spec;
+};
+
+int standard_args(int narg, int ps[], char const *fmt)
+{
+  char const *p;
+  size_t n_param_spec, i;
+  struct param_spec *param_spec, *p_spec;
+
+  /* how many param-specs are there? */
+  if (!fmt || !*fmt)
+    return anaerror("Illegal standard arguments specification: %s", 0,
+                    fmt? "<empty>": "<NULL>");
+  p = fmt;
+  n_param_spec = 1;
+  while (p = strchr(p, ';'))
+    n_param_spec++;
+  
+  /* create & fill internal representation */
+  p_spec = param_spec = malloc(n_param_spec*sizeof(*param_spec));
+  if (!param_spec)
+    return cerror(ALLOC_ERR, 0);
+  
+  p = fmt;
+  for (i = 0; i < n_param_spec; i++) {
+    /* required parameter kind specification */
+    switch (*p) {
+    case 'i':
+      p_spec->logical_type = PS_INPUT;
+      break;
+    case 'o':
+      p_spec->logical_type = PS_OUTPUT;
+      break;
+    case 'r':
+      p_spec->logical_type = PS_RETURN;
+      break;
+    default:
+      free(param_spec);
+      return anaerror("Illegal standard arguments specification: %s", 0,
+                      fmt? "<empty>": "<NULL>");
+    }
+    p++;
+    
+    /* optional data type limit specification */
+    switch (*p) {
+    case '>':
+      p_spec->data_type_limit = PS_LOWER_LIMIT;
+      p++;
+      break;
+    default:
+      p_spec->data_type_limit = PS_EXACT;
+      break;
+    }
+
+    /* optional data type specification */
+    switch (*p) {
+    case 'B':
+      p_spec->data_type = ANA_BYTE;
+      p++;
+      break;
+    case 'W':
+      p_spec->data_type = ANA_WORD;
+      p++;
+      break;
+    case 'L':
+      p_spec->data_type = ANA_LONG;
+      p++;
+      break;
+    case 'F':
+      p_spec->data_type = ANA_FLOAT;
+      p++;
+      break;
+    case 'D':
+      p_spec->data_type = ANA_DOUBLE;
+      p++;
+      break;
+    case 'S':
+      p_spec->data_type = ANA_TEMP_STRING;
+      p++;
+      break;
+    default:
+      p_spec->data_type = ANA_NO_SYMBOLTYPE;
+      break;
+    }
+
+    /* optional dims-specs */
+    struct obstack o;
+    while (*p && *p != ';') {
+      obstack_init(&o);
+      switch (*p) {
+      case '+':
+      case '-':
+      case '=':
+      default:
+        if (!isdigit(*p)) {
+          obstack_free(&o, NULL);
+          free(param_spec);
+          return anaerror("Illegal standard arguments specification: %s", 0,
+                          fmt? "<empty>": "<NULL>");
+        }
+      }
+    }
+  }
+}

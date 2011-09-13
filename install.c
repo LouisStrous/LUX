@@ -179,6 +179,10 @@ int	ana_restart(int, int []);
 int	ana_zeroifnotdefined(), ana_compile_file();	/* browser */
 #endif
 
+#if SOFA
+int ana_iauBp00(), ana_iauBp06(), ana_iauBpn2xy();
+#endif
+
 #define MAX_ARG	100
 
 /* Each routine's entry in subroutine[] and function[] has the following 
@@ -369,6 +373,11 @@ internalRoutine	subroutine[] = {
   { "HELP",	0, 1, ana_help,	/* strous.c */
     "|30|1EXACT:2ROUTINE:4TREE:8SUBROUTINE:16FUNCTION:32LIST::PAGE" },
   { "HEX",	1, MAX_ARG, ana_hex, 0 }, /* files.c */
+#if SOFA
+  { "IAUBP00",   4, 4, ana_iauBp00, 0 }, /* anasofa.c */
+  { "IAUBP06",   4, 4, ana_iauBp06, 0 }, /* anasofa.c */
+  { "IAUBPN2XY", 3, 3, ana_iauBpn2xy, 0 }, /* anasofa.c */
+#endif
   { "IDLRESTORE", 1, 1, ana_idlrestore, 0 }, /* idl.c */
   { "INFO",	0, 0, site, /* site.c */
     "1TABLE:2TIME:4PLATFORM:8PACKAGES:16WARRANTY:32COPY:64BUGS:128KEYS:255ALL" },
@@ -788,7 +797,9 @@ extern int ana_read_jpeg6b_f(), ana_write_jpeg6b_f();
 extern int	vargsmooth(), ana_test();
 
 #if SOFA
-extern int ana_iauBi00(), ana_iauCal2jd(), ana_iauJd2cal();
+extern int ana_iauBi00(), ana_iauC2i00a(), ana_iauC2i00b(), ana_iauC2i06a(),
+  ana_iauCal2jd(), ana_iauJd2cal(), ana_iauC2ibpn(), ana_iauC2ixy(),
+  ana_iauC2ixys(), ana_iauC2s();
 #endif
 
 internalRoutine function[] = {
@@ -870,7 +881,7 @@ internalRoutine function[] = {
   { "BYTE",	1, 1, ana_byte, "*" }, /* symbols.c */
   { "BYTFARR",	3, MAX_DIMS + 1, bytfarr, "%1%OFFSET:1READONLY:2SWAP" }, /* filemap.c */
  { "CALENDAR",	1, 1, ana_calendar, /* astron.c */
-   "1FROMCOMMON:2FROMGREGORIAN:3FROMISLAMIC:4FROMJULIAN:5FROMHEBREW:6FROMEGYPTIAN:7FROMJD:8FROMCJD:9FROMLUNAR:10FROMMAYAN:11FROMLONGCOUNT:12FROMLATIN:16TOCOMMON:32TOGREGORIAN:48TOISLAMIC:64TOJULIAN:80TOHEBREW:96TOEGYPTIAN:112TOJD:128TOCJD:144TOLUNAR:160TOMAYAN:176TOLONGCOUNT:192TOLATIN:256TOTEXT:512TOISOTEXT:0FROMUTC:1024FROMTAI:2048FROMTT:0TOUTC:4096TOTAI:8192TOTT:0FROMYMD:16384FROMDMY:0TOYMD:32768TODMY" },
+   "1FROMCOMMON:2FROMGREGORIAN:3FROMISLAMIC:4FROMJULIAN:5FROMHEBREW:6FROMEGYPTIAN:7FROMJD:8FROMCJD:9FROMLUNAR:10FROMMAYAN:11FROMLONGCOUNT:12FROMLATIN:16TOCOMMON:32TOGREGORIAN:48TOISLAMIC:64TOJULIAN:80TOHEBREW:96TOEGYPTIAN:112TOJD:128TOCJD:144TOLUNAR:160TOMAYAN:176TOLONGCOUNT:192TOLATIN:0TONUMERIC:256TOLONG:512TODOUBLE:768TOTEXT:0FROMUTC:1024FROMTAI:2048FROMTT:0TOUTC:4096TOTAI:8192TOTT:0FROMYMD:16384FROMDMY:0TOYMD:32768TODMY" },
   /* "1FROMCOMMON:2FROMGREGORIAN:3FROMISLAMIC:4FROMJULIAN:5FROMJD:6FROMHEBREW:8FROMLONGCOUNT:9FROMEGYPTIAN:10FROMLUNAR:16TOCOMMON:32TOGREGORIAN:48TOISLAMIC:64TOJULIAN:80TOJD:96TOHEBREW:112TOMAYAN:128TOLONGCOUNT:144TOEGYPTIAN:160TOLUNAR:176TOLATIN:256TOTEXT:512TOISOTEXT:0FROMUTC:1024FROMTAI:2048FROMTT:0TOUTC:4096TOTAI:8192TOTT:0FROMYMD:16384FROMDMY:0TOYMD:32768TODMY" */
   { "CBRT",	1, 1, ana_cbrt, "*" }, /* fun1.c */
   { "CDBLARR",	1, MAX_ARG, cdblarr, 0 }, /* symbols.c */
@@ -1023,6 +1034,13 @@ internalRoutine function[] = {
     "1FIRST:2IGNORELIMIT:4INCREASELIMIT:8SILENT" },
 #if SOFA
   { "IAUBI00",   0, 0, ana_iauBi00, 0 },
+  { "IAUC2I00A", 1, 1, ana_iauC2i00a, 0 },
+  { "IAUC2I00B", 1, 1, ana_iauC2i00b, 0 },
+  { "IAUC2I06A", 1, 1, ana_iauC2i06a, 0 },
+  { "IAUC2IBPN", 2, 2, ana_iauC2ibpn, 0 },
+  { "IAUC2IXY",  3, 3, ana_iauC2ixy, 0 },
+  { "IAUC2IXYS", 3, 3, ana_iauC2ixys, 0 },
+  { "IAUC2S",    1, 1, ana_iauC2s, 0 },
   { "IAUCAL2JD", 1, 1, ana_iauCal2jd, 0 },
   { "IAUJD2CAL", 1, 1, ana_iauJd2cal, 0 },
 #endif
@@ -2767,25 +2785,32 @@ int hash(char *string)
  return i % HASHSIZE;
 }
 /*----------------------------------------------------------------*/
+int ircmp(const void *a, const void *b)
+{
+  internalRoutine *ra, *rb;
+  
+  ra = *(internalRoutine **) a;
+  rb = *(internalRoutine **) b;
+  return strcmp(ra->name, rb->name);
+}
+/*----------------------------------------------------------------*/
 int findInternalName(char *name, int isSubroutine)
 /* searches for name in the appropriate subroutine
   or function table.  if found, returns
   index, else returns -1 */
 {
- int	hi, lo = 0, mid, s;
- internalRoutine	*table;
+  internalRoutine	*table, *found;
+  size_t n;
 
- if (isSubroutine)
- { table = subroutine;  hi = nSubroutine - 1; }
- else
- { table = function;  hi = nFunction - 1; }
- while (lo <= hi)
- { mid = (lo + hi)/2;
-   if ((s = strcmp(name, table[mid].name)) < 0)
-     hi = mid - 1;
-   else if (s > 0)  lo = mid + 1;
-   else return mid; }
- return -1;
+  if (isSubroutine) {
+    table = subroutine;
+    n = nSubroutine;
+  } else {
+    table = function;
+    n = nFunction;
+  }
+  found = bsearch(name, table, n, sizeof(internalRoutine), ircmp);
+  return found? found - table: -1;
 }
 /*----------------------------------------------------------------*/
 static compileInfo	*c_info = NULL;

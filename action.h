@@ -61,7 +61,8 @@ int	standardLoop(int, int, int, int, loopInfo *, pointer *, int *,
   prepareDiagonals(int, loopInfo *, int, int **, int **, int **, int **),
   moveLoop(loopInfo *, int, int),
   standardLoopX(int, int, int, loopInfo *, pointer *, int, int const *,
-                int, int const *, int, int, int *, loopInfo *, pointer *),
+                int, int const *, enum Symboltype, int, int *, loopInfo *,
+                pointer *),
   loopIsAtStart(loopInfo const *);
 
 void	subdataLoop(int *, loopInfo *), addVerify(char *, char),
@@ -92,8 +93,9 @@ void	clearToPopTempVariable(int), pushTempVariable(int), printw(char *),
 
 const csplineInfo empty_cubic_spline(void);
 
-void	setupDimensionLoop(loopInfo *, int, int [], int, int, int [],
-			   pointer *, int),
+void setupDimensionLoop(loopInfo *info, int ndim, int dims[], 
+                        enum Symboltype type, int naxes, int axes[],
+                        pointer *data, int mode),
   rearrangeDimensionLoop(loopInfo *), endian(void *, int, int),
   rearrangeEdgeLoop(loopInfo *, loopInfo *, int);
 

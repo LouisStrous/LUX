@@ -70,7 +70,7 @@ int ana_gifread(int narg, int ps[])       /* gifread subroutine */
  struct GIFScreen gh;
  
  		/* first arg is the variable to load, second is name of file */
- if (!symbolIsString(ps[1]))
+ if (!symbolIsStringScalar(ps[1]))
    return cerror(NEED_STR, ps[1]);
  name = expand_name(string_value(ps[1]), NULL);
  /* try to open the file */

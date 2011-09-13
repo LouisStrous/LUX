@@ -14,6 +14,7 @@
 #include <ctype.h>
 #include "install.h"
 #include "action.h"
+#include "calendar.h"
 static char rcsid[] __attribute__ ((unused)) =
 "$Id: fun1.c,v 4.0 2001/02/07 20:37:00 strous Exp $";
 
@@ -259,16 +260,11 @@ int ana_cjd(void)
 /* returns current Chronological Julian Day, relative to the current
    time zone */
 {
-  time_t t;
-  double cjd;
   int result;
-  struct tm *bd;
+  double CJD;
 
-  t = time(NULL);
-  bd = localtime(&t);
-  cjd = (double) (t + bd->tm_gmtoff)/86400.0 + 2440588.0;
   result = scalar_scratch(ANA_DOUBLE);
-  scalar_value(result).d = cjd;
+  scalar_value(result).d = CJD_now();
   return result;
 }
 /*------------------------------------------------------------------------- */

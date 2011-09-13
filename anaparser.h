@@ -78,7 +78,8 @@ enum Symboltype {
   ANA_LSTRING,			/* 6: literal strings */
   ANA_STRING_ARRAY,		/* 7: string arrays */
   ANA_CFLOAT,			/* 8: 8-byte complex floats */
-  ANA_CDOUBLE			/* 9: 16-byte complex floats */
+  ANA_CDOUBLE,			/* 9: 16-byte complex floats */
+  ANA_NO_SYMBOLTYPE,
 };
 
 	/* ANA_EVB classes */

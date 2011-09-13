@@ -861,7 +861,7 @@ int ana_geneticfit(int narg, int ps[])
   int *crossoversites, *mutationsites;
  
   iq = ps[3];                   /* fit */
-  if (!symbolIsString(iq))
+  if (!symbolIsStringScalar(iq))
     return cerror(NEED_STR, ps[3]);
   fitSym = stringpointer(string_value(iq), SP_USER_FUNC);
   if (fitSym < 0)

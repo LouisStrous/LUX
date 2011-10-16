@@ -19,6 +19,7 @@
 #include <string.h> /* for index(41) strlen(17) memcpy(12) strcpy(4) strcmp(4) ... */
 #include <time.h> /* for CLK_TCK(1) clock(1) time(1) */
 #include <unistd.h> /* for pipe(2) execl(1) sbrk(1) */
+#include <obstack.h>
 /* clock() on mips-sgi-irix64-6.2 is in unistd.h rather than in ANSI time.h */
 
 #include "editorcharclass.h"
@@ -31,11 +32,12 @@ extern symTableEntry	sym[];
 extern hashTableEntry	*varHashTable[], *subrHashTable[], *funcHashTable[],
 			*blockHashTable[];
 extern word		listStack[];
-extern internalRoutine	subroutine[], function[];
 extern int		keepEVB;
 extern char		*currentChar, line[];
 extern FILE		*inputStream, *outputStream;
 extern int		nExecuted;
+/* extern internalRoutine	subroutine[], function[]; */
+internalRoutine *subroutine, *function;
 
 int	anaerror(char *, int, ...), lookForName(char *, hashTableEntry *[], int),
 	newSymbol(int, ...), ana_setup(), rawIo(void), cookedIo(void);
@@ -179,10 +181,6 @@ int	ana_restart(int, int []);
 int	ana_zeroifnotdefined(), ana_compile_file();	/* browser */
 #endif
 
-#if SOFA
-int ana_iauBp00(), ana_iauBp06(), ana_iauBpn2xy();
-#endif
-
 #define MAX_ARG	100
 
 /* Each routine's entry in subroutine[] and function[] has the following 
@@ -257,7 +255,7 @@ int ana_iauBp00(), ana_iauBp06(), ana_iauBpn2xy();
   "%1%SPECIAL" -> FOO,3,2 yields (none),3,2
                   FOO,3,SPECIAL=1 yields 1,3 */
 
-internalRoutine	subroutine[] = {
+internalRoutine	subroutine_table[] = {
   { "%INSERT",	3, MAX_ARG, insert, /* execute.c */
     "1INNER:2OUTER:4ONEDIM:8SKIPSPACE:16ZERO:32ALL:64SEPARATE" },
   { "AREA",	1, 4, ana_area, ":SEED:NUMBERS:DIAGONAL" }, /* topology.c */
@@ -373,11 +371,6 @@ internalRoutine	subroutine[] = {
   { "HELP",	0, 1, ana_help,	/* strous.c */
     "|30|1EXACT:2ROUTINE:4TREE:8SUBROUTINE:16FUNCTION:32LIST::PAGE" },
   { "HEX",	1, MAX_ARG, ana_hex, 0 }, /* files.c */
-#if SOFA
-  { "IAUBP00",   4, 4, ana_iauBp00, 0 }, /* anasofa.c */
-  { "IAUBP06",   4, 4, ana_iauBp06, 0 }, /* anasofa.c */
-  { "IAUBPN2XY", 3, 3, ana_iauBpn2xy, 0 }, /* anasofa.c */
-#endif
   { "IDLRESTORE", 1, 1, ana_idlrestore, 0 }, /* idl.c */
   { "INFO",	0, 0, site, /* site.c */
     "1TABLE:2TIME:4PLATFORM:8PACKAGES:16WARRANTY:32COPY:64BUGS:128KEYS:255ALL" },
@@ -671,7 +664,7 @@ internalRoutine	subroutine[] = {
   { "ZOOM",	1, 3, ana_zoom, "1OLDCONTRAST" }, /* zoom.c */
 #endif
 };
-int	nSubroutine = sizeof(subroutine)/sizeof(internalRoutine);
+int nSubroutine = sizeof(subroutine_table)/sizeof(internalRoutine);
 
 extern int ana_abs(), ana_acos(), ana_arestore_f(), ana_arg(),
   ana_array(), ana_asin(), ana_assoc(), ana_astore_f(), ana_atan(),
@@ -743,7 +736,7 @@ extern int ana_abs(), ana_acos(), ana_arestore_f(), ana_arg(),
   ana_cartesian_to_polar(), ana_polar_to_cartesian(), ana_roll(),
   ana_siderealtime(), ana_asinh(),
   ana_acosh(), ana_atanh(), ana_astrf(), ana_antilaplace2d(),
-  ana_cspline_find();
+  ana_cspline_find(), ana_hypot();
 
 #if HAVE_REGEX_H
 extern int ana_getdirectories(), ana_getfiles(), ana_getfiles_r(),
@@ -796,16 +789,9 @@ extern int ana_read_jpeg6b_f(), ana_write_jpeg6b_f();
 
 extern int	vargsmooth(), ana_test();
 
-#if SOFA
-extern int ana_iauBi00(), ana_iauC2i00a(), ana_iauC2i00b(), ana_iauC2i06a(),
-  ana_iauCal2jd(), ana_iauJd2cal(), ana_iauC2ibpn(), ana_iauC2ixy(),
-  ana_iauC2ixys(), ana_iauC2s();
-#endif
-
-internalRoutine function[] = {
+internalRoutine function_table[] = {
   { "%A_UNARY_NEGATIVE", 1, 1, ana_neg_func, "*" },	/* fun1.c */
-  { "%B_SUBSCRIPT", 1, MAX_ARG, ana_subsc_func, /* subsc.c */
-    "1INNER:2OUTER:4ZERO:8SUBGRID:16KEEPDIMS:32ALL:64SEPARATE" },
+  { "%B_SUBSCRIPT", 1, MAX_ARG, ana_subsc_func, /* subsc.c */ "1INNER:2OUTER:4ZERO:8SUBGRID:16KEEPDIMS:32ALL:64SEPARATE" },
   { "%C_CPUTIME", 0, 0, ana_cputime, 0 }, /* fun1.c */
   { "%D_POWER",	2, 2, ana_pow, "*" }, /* fun1.c */
   { "%E_CONCAT", 1, MAX_ARG, ana_concat, "1SLOPPY" }, /* subsc.c */
@@ -832,14 +818,12 @@ internalRoutine function[] = {
   { "ASSOC",	2, 3, ana_assoc, "::OFFSET" }, /* symbols.c */
   { "ASTORE",	2, MAX_ARG, ana_astore_f, 0 }, /* files.c */
   { "ASTRF",	1, 2, ana_astrf, "1FROMEQUATORIAL:2FROMECLIPTICAL:4FROMGALACTIC:8TOEQUATORIAL:16TOECLIPTICAL:32TOGALACTIC:64JULIAN:128BESSELIAN" }, /* astron.c */
-  { "ASTRON",	2, 6, ana_astropos, /* astron.c */
-    "|2304|:::OBSERVER:EQUINOX:ELEMENTS:1ECLIPTICAL:2EQUATORIAL:3HORIZONTAL:4ELONGATION:8XYZ:32DATE:64TDT:128ERROR:256ABBERATION:512GEOMETRIC:1024QELEMENTS:2048FK5:4096TRUNCVSOP:8192CONJSPREAD:16384PLANETOCENTRIC:32768KEEPDIMENSIONS:65536VOCAL" },
+  { "ASTRON",	2, 6, ana_astropos, /* astron.c */ "|2304|:::OBSERVER:EQUINOX:ELEMENTS:1ECLIPTICAL:2EQUATORIAL:3HORIZONTAL:4ELONGATION:8XYZ:32DATE:64TDT:128ERROR:256ABBERATION:512GEOMETRIC:1024QELEMENTS:2048FK5:4096TRUNCVSOP:8192CONJSPREAD:16384PLANETOCENTRIC:32768KEEPDIMENSIONS:65536VOCAL" },
   { "ATAN",	1, 1, ana_atan, "*" }, /* fun1.c */
   { "ATAN2",	2, 2, ana_atan2, "*" }, /* fun1.c */
   { "ATANH",	1, 1, ana_atanh, "*" }, /* fun1.c */
   { "ATOL",	1, 2, ana_strtol, 0 }, /* fun3.c */
-  { "BASIN",	1, 2, ana_basin2, /* strous.c */
-    "*1NUMBER:2SINK:4DIFFERENCE" },
+  { "BASIN",	1, 2, ana_basin2, /* strous.c */ "*1NUMBER:2SINK:4DIFFERENCE" },
 #if DEVELOP
   { "BESSEL_I0",  1, 1, ana_bessel_i0, "*1DEFLATE" }, /* fun1.c */
   { "BESSEL_I1",  1, 1, ana_bessel_i1, "*" }, /* fun1.c */
@@ -880,9 +864,7 @@ internalRoutine function[] = {
   { "BYTARR",	1, MAX_DIMS, bytarr, 0 }, /* symbols.c */
   { "BYTE",	1, 1, ana_byte, "*" }, /* symbols.c */
   { "BYTFARR",	3, MAX_DIMS + 1, bytfarr, "%1%OFFSET:1READONLY:2SWAP" }, /* filemap.c */
- { "CALENDAR",	1, 1, ana_calendar, /* astron.c */
-   "1FROMCOMMON:2FROMGREGORIAN:3FROMISLAMIC:4FROMJULIAN:5FROMHEBREW:6FROMEGYPTIAN:7FROMJD:8FROMCJD:9FROMLUNAR:10FROMMAYAN:11FROMLONGCOUNT:12FROMLATIN:16TOCOMMON:32TOGREGORIAN:48TOISLAMIC:64TOJULIAN:80TOHEBREW:96TOEGYPTIAN:112TOJD:128TOCJD:144TOLUNAR:160TOMAYAN:176TOLONGCOUNT:192TOLATIN:0TONUMERIC:256TOLONG:512TODOUBLE:768TOTEXT:0FROMUTC:1024FROMTAI:2048FROMTT:0TOUTC:4096TOTAI:8192TOTT:0FROMYMD:16384FROMDMY:0TOYMD:32768TODMY" },
-  /* "1FROMCOMMON:2FROMGREGORIAN:3FROMISLAMIC:4FROMJULIAN:5FROMJD:6FROMHEBREW:8FROMLONGCOUNT:9FROMEGYPTIAN:10FROMLUNAR:16TOCOMMON:32TOGREGORIAN:48TOISLAMIC:64TOJULIAN:80TOJD:96TOHEBREW:112TOMAYAN:128TOLONGCOUNT:144TOEGYPTIAN:160TOLUNAR:176TOLATIN:256TOTEXT:512TOISOTEXT:0FROMUTC:1024FROMTAI:2048FROMTT:0TOUTC:4096TOTAI:8192TOTT:0FROMYMD:16384FROMDMY:0TOYMD:32768TODMY" */
+  { "CALENDAR",	1, 1, ana_calendar, /* astron.c */ "1FROMCOMMON:2FROMGREGORIAN:3FROMISLAMIC:4FROMJULIAN:5FROMHEBREW:6FROMEGYPTIAN:7FROMJD:8FROMCJD:9FROMLUNAR:10FROMMAYAN:11FROMLONGCOUNT:12FROMLATIN:16TOCOMMON:32TOGREGORIAN:48TOISLAMIC:64TOJULIAN:80TOHEBREW:96TOEGYPTIAN:112TOJD:128TOCJD:144TOLUNAR:160TOMAYAN:176TOLONGCOUNT:192TOLATIN:0TONUMERIC:256TOLONG:512TODOUBLE:768TOTEXT:0FROMUTC:1024FROMTAI:2048FROMTT:0TOUTC:4096TOTAI:8192TOTT:0FROMYMD:16384FROMDMY:0TOYMD:32768TODMY" },
   { "CBRT",	1, 1, ana_cbrt, "*" }, /* fun1.c */
   { "CDBLARR",	1, MAX_ARG, cdblarr, 0 }, /* symbols.c */
   { "CDBLFARR", 3, MAX_DIMS + 1, cdblfarr, "%1%OFFSET:1READONLY:2SWAP" }, /* filemap.c */
@@ -917,14 +899,12 @@ internalRoutine function[] = {
   { "COSH",	1, 1, ana_cosh, "*" }, /* fun1.c */
   { "CROSSCORR", 2, 3, ana_crosscorr, 0 }, /* fun2.c */
   { "CRUNCH",	3, 3, ana_crunch_f, 0 }, /* crunch.c */
-  { "CSPLINE",	0, 5, ana_cubic_spline, /* fun3.c */
-    "1KEEP:2PERIODIC:4GETDERIVATIVE" },
+  { "CSPLINE",	0, 5, ana_cubic_spline, /* fun3.c */ "1KEEP:2PERIODIC:4GETDERIVATIVE" },
   { "CSPLINE_FIND", 1, 4, ana_cspline_find, "::AXIS:INDEX" }, /* strous3.c */
   { "CTOP",	1, 3, ana_cartesian_to_polar, 0 }, /* fun4.c */
   { "DATE_FROM_TAI", 1, 2, ana_date_from_tai, 0 }, /* ephem.c */
   { "DBLARR",	1, MAX_DIMS, dblarr, 0 }, /* symbols.c */
-  { "DBLFARR",	3, MAX_DIMS + 1, dblfarr, /* filemap.c */
-    "%1%OFFSET:1READONLY:2SWAP" },
+  { "DBLFARR",	3, MAX_DIMS + 1, dblfarr, /* filemap.c */ "%1%OFFSET:1READONLY:2SWAP" },
   { "DEFINED",	1, 1, ana_defined, "+1TARGET" }, /* fun1.c */
   { "DESPIKE",  1, 6, ana_despike, ":FRAC:LEVEL:NITER:SPIKES:RMS" }, /* fun6.c */
   { "DETREND",	1, 2, ana_detrend, "*" }, /* fun2.c */
@@ -932,13 +912,11 @@ internalRoutine function[] = {
   { "DILATE",	1, 1, ana_dilate, 0 }, /* fun5.c */
   { "DIMEN",	1, 2, ana_dimen, 0 }, /* subsc.c */
   { "DISTARR",	1, 3, ana_distarr, 0 }, /* strous2.c */
-  { "DISTR",	2, 2, ana_distr_f, /* strous.c */
-    "2IGNORELIMIT:4INCREASELIMIT" },
+  { "DISTR",	2, 2, ana_distr_f, /* strous.c */ "2IGNORELIMIT:4INCREASELIMIT" },
   { "DMAP",	1, 1, ana_dmap, 0 }, /* subsc.c */
   { "DOUB",	1, 1, ana_double, "*" }, /* symbols.c */
   { "DOUBLE",	1, 1, ana_double, "*" }, /* symbols.c */
-  { "DSMOOTH",	3, 3, ana_dir_smooth,
-    "0TWOSIDED:0BOXCAR:1ONESIDED:2GAUSSIAN:4TOTAL:8STRAIGHT" }, /* strous3.c */
+  { "DSMOOTH",	3, 3, ana_dir_smooth, "0TWOSIDED:0BOXCAR:1ONESIDED:2GAUSSIAN:4TOTAL:8STRAIGHT" }, /* strous3.c */
   { "DSUM",	1, 4, ana_total, "|1|::POWER:WEIGHTS:2KEEPDIMS" }, /* fun1.c */
   { "EASTERDATE", 1, 1, ana_EasterDate, 0 }, /* astron.c */
   { "ENHANCEIMAGE", 1, 3, ana_enhanceimage, ":PART:TARGET:1SYMMETRIC" }, /* strous3.c */
@@ -946,8 +924,7 @@ internalRoutine function[] = {
   { "ERF",	1, 1, ana_erf, "*" }, /* fun1.c */
   { "ERFC",	1, 1, ana_erfc, "*" }, /* fun1.c */
   { "ERODE",	1, 1, ana_erode, "1ZEROEDGE" }, /* fun5.c */
-  { "ESEGMENT",	1, 4, ana_extreme_general, /* topology.c */
-    ":SIGN:DIAGONAL:THRESHOLD" },
+  { "ESEGMENT",	1, 4, ana_extreme_general, /* topology.c */ ":SIGN:DIAGONAL:THRESHOLD" },
   { "ESMOOTH",	1, 3, ana_esmooth, 0 }, /* fun2.c */
   { "EVAL",	1, 2, ana_eval, "1ALLNUMBER" }, /* fun3.c */
 #if X11
@@ -967,20 +944,13 @@ internalRoutine function[] = {
   { "FILESIZE",	1, 1, ana_filesize, 0 }, /* files.c */
   { "FILETYPE",	1, 1, ana_identify_file, 0 }, /* files.c */
   { "FILETYPENAME", 1, 1, ana_filetype_name, 0 }, /* install.c */
-  { "FIND",	2, 4, ana_find,	/* strous.c */
-    "0EXACT:1INDEX_GE:2VALUE_GE:4FIRST" },
-  { "CSPLINE_FIND", 2, 4, ana_cspline_find, ":::AXIS:INDEX" }, /* strous3.c */
+  { "FIND",	2, 4, ana_find,	/* strous.c */ "0EXACT:1INDEX_GE:2VALUE_GE:4FIRST" },
   { "FINDFILE",	2, 2, ana_findfile, 0 }, /* files.c */
-  { "FIND_MAX",	1, 3, ana_find_max, /* strous2.c */
-    "::DIAGONAL:1DEGREE:2SUBGRID" },
-  { "FIND_MAXLOC", 1, 3, ana_find_maxloc, /* strous2.c */
-    "::DIAGONAL:1DEGREE:2SUBGRID:4COORDS:8OLD" },
-  { "FIND_MIN",	1, 3, ana_find_min, /* strous2.c */
-    "::DIAGONAL:1DEGREE:2SUBGRID" },
-  { "FIND_MINLOC", 1, 3, ana_find_minloc, /* strous2.c */
-    "::DIAGONAL:1DEGREE:2SUBGRID:4COORDS" },
-  { "FIT",	3, 17, ana_generalfit, /* fit.c */
-  "|4|::START:STEP:LOWBOUND:HIGHBOUND:WEIGHTS:QTHRESH:PTHRESH:ITHRESH:DTHRESH:FAC:NITER:NSAME:ERR:FIT:TTHRESH:1VOCAL:4DOWN:8PCHI:16GAUSSIANS:32POWERFUNC:64ONEBYONE" },
+  { "FIND_MAX",	1, 3, ana_find_max, /* strous2.c */ "::DIAGONAL:1DEGREE:2SUBGRID" },
+  { "FIND_MAXLOC", 1, 3, ana_find_maxloc, /* strous2.c */ "::DIAGONAL:1DEGREE:2SUBGRID:4COORDS:8OLD" },
+  { "FIND_MIN",	1, 3, ana_find_min, /* strous2.c */ "::DIAGONAL:1DEGREE:2SUBGRID" },
+  { "FIND_MINLOC", 1, 3, ana_find_minloc, /* strous2.c */ "::DIAGONAL:1DEGREE:2SUBGRID:4COORDS" },
+  { "FIT",	3, 17, ana_generalfit, /* fit.c */ "|4|::START:STEP:LOWBOUND:HIGHBOUND:WEIGHTS:QTHRESH:PTHRESH:ITHRESH:DTHRESH:FAC:NITER:NSAME:ERR:FIT:TTHRESH:1VOCAL:4DOWN:8PCHI:16GAUSSIANS:32POWERFUNC:64ONEBYONE" },
 #if DEVELOP
   { "FIT2",	4, 11, ana_geneticfit, "X:Y:NPAR:FIT:WEIGHTS:MU:GENERATIONS:POPULATION:PCROSS:PMUTATE:VOCAL:1ELITE:2BYTE:4WORD:6LONG:8FLOAT:10DOUBLE" }, /* fit.c */
 #endif
@@ -992,8 +962,7 @@ internalRoutine function[] = {
   { "FLOAT",	1, 1, ana_float, "*" }, /* symbols.c */
   { "FLOOR",	1, 1, ana_floor, "*" }, /* symbols.c */
   { "FLTARR",	1, MAX_DIMS, fltarr, 0 }, /* symbols.c */
-  { "FLTFARR",	3, MAX_DIMS + 1, fltfarr, /* filemap.c */
-    "%1%OFFSET:1READONLY:2SWAP" },
+  { "FLTFARR",	3, MAX_DIMS + 1, fltfarr, /* filemap.c */ "%1%OFFSET:1READONLY:2SWAP" },
   { "FMAP",	1, 1, ana_fmap, 0 }, /* subsc.c */
   { "FRATIO",	3, 3, ana_f_ratio, "*1COMPLEMENT:2LOG" }, /* fun1.c */
   { "FREADF",	2, MAX_ARG, ana_freadf_f, "|1|1EOF" }, /* files.c */
@@ -1032,18 +1001,7 @@ internalRoutine function[] = {
     "1FIRST:2IGNORELIMIT:4INCREASELIMIT:8SILENT" },
   { "HISTR",	1, 1, ana_histr, /* fun3.c */
     "1FIRST:2IGNORELIMIT:4INCREASELIMIT:8SILENT" },
-#if SOFA
-  { "IAUBI00",   0, 0, ana_iauBi00, 0 },
-  { "IAUC2I00A", 1, 1, ana_iauC2i00a, 0 },
-  { "IAUC2I00B", 1, 1, ana_iauC2i00b, 0 },
-  { "IAUC2I06A", 1, 1, ana_iauC2i06a, 0 },
-  { "IAUC2IBPN", 2, 2, ana_iauC2ibpn, 0 },
-  { "IAUC2IXY",  3, 3, ana_iauC2ixy, 0 },
-  { "IAUC2IXYS", 3, 3, ana_iauC2ixys, 0 },
-  { "IAUC2S",    1, 1, ana_iauC2s, 0 },
-  { "IAUCAL2JD", 1, 1, ana_iauCal2jd, 0 },
-  { "IAUJD2CAL", 1, 1, ana_iauJd2cal, 0 },
-#endif
+  { "HYPOT",	2, 2, ana_hypot, 0 }, /* fun1.c */
   { "IBETA",	3, 3, ana_incomplete_beta, "*1COMPLEMENT:2LOG" }, /* fun1.c */
   { "IDLREAD",	2, 2, ana_idlread_f, 0 }, /* strous3.c */
   { "IGAMMA",	2, 2, ana_incomplete_gamma, "*1COMPLEMENT:2LOG" }, /* fun1.c */
@@ -1316,7 +1274,7 @@ internalRoutine function[] = {
   { "ZERONANS",	1, 2, ana_zapnan_f, "*%1%VALUE" }, /* fun1.c */
   { "ZINV",	1, 1, ana_zinv, "*" }, /* strous.c */
 };
-int	nFunction = sizeof(function)/sizeof(internalRoutine);
+int nFunction = sizeof(function_table)/sizeof(internalRoutine);
 /*----------------------------------------------------------------*/
 void undefine(int symbol)
 /* free up memory allocated for <symbol> and make it undefined */
@@ -2789,8 +2747,8 @@ int ircmp(const void *a, const void *b)
 {
   internalRoutine *ra, *rb;
   
-  ra = *(internalRoutine **) a;
-  rb = *(internalRoutine **) b;
+  ra = (internalRoutine *) a;
+  rb = (internalRoutine *) b;
   return strcmp(ra->name, rb->name);
 }
 /*----------------------------------------------------------------*/
@@ -2799,7 +2757,7 @@ int findInternalName(char *name, int isSubroutine)
   or function table.  if found, returns
   index, else returns -1 */
 {
-  internalRoutine	*table, *found;
+  internalRoutine	*table, *found, key;
   size_t n;
 
   if (isSubroutine) {
@@ -2809,7 +2767,8 @@ int findInternalName(char *name, int isSubroutine)
     table = function;
     n = nFunction;
   }
-  found = bsearch(name, table, n, sizeof(internalRoutine), ircmp);
+  key.name = name;
+  found = bsearch(&key, table, n, sizeof(*table), ircmp);
   return found? found - table: -1;
 }
 /*----------------------------------------------------------------*/
@@ -4182,6 +4141,8 @@ struct boundsStruct	bounds = {
 
 int	ANA_MATMUL_FUN;
 
+internalRoutine *subroutine, *function;
+
 #define	FORMATSIZE	1024
 void symbolInitialization(void)
 {
@@ -4210,10 +4171,49 @@ void symbolInitialization(void)
      || signal(SIGCONT, exception) == SIG_ERR
      || signal(SIGTRAP, exception) == SIG_ERR)
    anaerror("Could not install exception handlers", 0);
- for (i = 0; i < nSubroutine; i++)
+
+ extern struct obstack *registered_subroutines;
+ int registered_subroutines_size
+   = registered_subroutines? obstack_object_size(registered_subroutines): 0;
+ subroutine = malloc(registered_subroutines_size
+                     + nSubroutine*sizeof(internalRoutine));
+ if (registered_subroutines)
+   memcpy(subroutine, obstack_finish(registered_subroutines), 
+          registered_subroutines_size);
+ memcpy((char *) subroutine + registered_subroutines_size,
+        subroutine_table, nSubroutine*sizeof(internalRoutine));
+ nSubroutine += registered_subroutines_size/sizeof(internalRoutine);
+ if (registered_subroutines)
+   obstack_free(registered_subroutines, NULL);
+
+ extern struct obstack *registered_functions;
+ int registered_functions_size
+   = registered_functions? obstack_object_size(registered_functions): 0;
+ function = malloc(registered_functions_size
+                     + nFunction*sizeof(internalRoutine));
+ if (registered_functions)
+   memcpy(function, obstack_finish(registered_functions), 
+          registered_functions_size);
+ memcpy((char *) function + registered_functions_size,
+        function_table, nFunction*sizeof(internalRoutine));
+ nFunction += registered_functions_size/sizeof(internalRoutine);
+ if (registered_functions)
+   obstack_free(registered_functions, NULL);
+
+ qsort(subroutine, nSubroutine, sizeof(internalRoutine), ircmp);
+ qsort(function, nFunction, sizeof(internalRoutine), ircmp);
+ for (i = 0; i < nSubroutine; i++) {
+   if (i && !strcmp(subroutine[i].name, subroutine[i - 1].name))
+     anaerror("Internal subroutine name %s is used for multiple routines!",
+              0, subroutine[i].name);
    installKeys(&subroutine[i].keys);
- for (i = 0; i < nFunction; i++)
+ }
+ for (i = 0; i < nFunction; i++) {
+   if (i && !strcmp(function[i].name, function[i - 1].name))
+     anaerror("Internal function name %s is used for multiple routines!",
+              0, function[i].name);
    installKeys(&function[i].keys);
+ }
  ANA_MATMUL_FUN = findInternalName("MATMUL", 0);
  inputStream = stdin;
  outputStream = stdout;

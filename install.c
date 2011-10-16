@@ -736,7 +736,7 @@ extern int ana_abs(), ana_acos(), ana_arestore_f(), ana_arg(),
   ana_cartesian_to_polar(), ana_polar_to_cartesian(), ana_roll(),
   ana_siderealtime(), ana_asinh(),
   ana_acosh(), ana_atanh(), ana_astrf(), ana_antilaplace2d(),
-  ana_cspline_find(), ana_hypot();
+  ana_cspline_find();
 
 #if HAVE_REGEX_H
 extern int ana_getdirectories(), ana_getfiles(), ana_getfiles_r(),
@@ -1001,7 +1001,6 @@ internalRoutine function_table[] = {
     "1FIRST:2IGNORELIMIT:4INCREASELIMIT:8SILENT" },
   { "HISTR",	1, 1, ana_histr, /* fun3.c */
     "1FIRST:2IGNORELIMIT:4INCREASELIMIT:8SILENT" },
-  { "HYPOT",	2, 2, ana_hypot, 0 }, /* fun1.c */
   { "IBETA",	3, 3, ana_incomplete_beta, "*1COMPLEMENT:2LOG" }, /* fun1.c */
   { "IDLREAD",	2, 2, ana_idlread_f, 0 }, /* strous3.c */
   { "IGAMMA",	2, 2, ana_incomplete_gamma, "*1COMPLEMENT:2LOG" }, /* fun1.c */

@@ -9,7 +9,7 @@ strous3.o subsc.o symbols.o tense.o orientation.o rcsversion.o		\
 output.o axis.o coord.o cluster.o ephem2.o paerror.o	\
 idl.o trace_decoder_ana.o gifread_ana.o gifwrite_ana.o astron.o		\
 terminal.o regex.o vsop.o anasofa.o intmath.o calendar.o \
-jpeg.o tape.o dummyterm.o projection.o \
+jpeg.o tape.o dummyterm.o projection.o bindings.o \
 xport.o zoom.o menu.o color.o random.o Bytestack.o poisson.o \
 
 CC=gcc

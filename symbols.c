@@ -313,6 +313,17 @@ int array_clone(int symbol, int type)
  return n; 
 }
 /*-----------------------------------------------------*/
+int numerical_clone(int iq, enum Symboltype type) {
+  switch (symbol_class(iq)) {
+  case ANA_ARRAY:
+    return array_clone(iq, type);
+  case ANA_SCALAR:
+    return scalar_scratch(type);
+  default:
+    return anaerror("Need numerical argument", iq);
+  }
+}
+/*-----------------------------------------------------*/
 int dereferenceScalPointer(int nsym)
 /* returns an ordinary ANA_SCALAR for a ANA_SCAL_PTR.  NOTE: assumes that
  <nsym> is a SCAL_PTR!  LS 31jul98 */

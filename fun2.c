@@ -832,6 +832,19 @@ int sdev(int narg, int ps[], int sq)
 
   trgt0 = trgt;
 
+  /* Knuth (the Art of Computer Programming, Volume 2: Seminumerical
+     Algorithms) gives the following algorithm for calculating the
+     standard deviation with just one pass through the data and the
+     least round-off error and guaranteed nonnegative variance:
+
+     M₁ = x₁
+     S₁ = 0
+     M_k = M_{k-1} + (x_k - M_{k-1})/k
+     S_k = S_{k-1} + (x_k - M_{k-1})(x_k - M_k)
+     σ = √(S_k/(n - 1))
+
+     TODO: Extend this algorithm to weighted data */
+
   /* we make two passes: one to get the average, and then one to calculate */
   /* the standard deviation; this way we limit truncation and roundoff */
   /* errors */

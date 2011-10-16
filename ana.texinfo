@@ -53,6 +53,1308 @@ preserved on all copies.
 * History::                     The history of ANA.
 * Reference Manual::            Alphabetical list of ANA routines/functions.
 * Concept Index::               Alphabetical list of concepts.
+
+@detailmenu
+ --- The Detailed Node Listing ---
+
+Starting and Stopping ANA.
+
+* Command Line Arguments::      What you can add to the "ana" command
+* Batch Mode::                  How to run ANA unattached to any terminal
+
+Input/Output
+
+* Terminal Type::               How ANA figures what kind of terminal you use
+* Command Input::               Typing commands at the keyboard
+* Data I/O Routines::           Getting data in or out of ANA
+* Formatted Input/Output::      I/O according to specific formats
+* Escape Codes::                How to specify non-printable characters
+
+Terminal Type
+
+* Terminfo::                    How to use the terminfo database
+* Termcap::                     How to use the termcap database
+* Dummyterm::                   How to use the dummyterm method
+
+Command Line Input
+
+* Prompts::                     Text at the start of command lines
+* Cursor Movement::             Moving the cursor across the command line
+* Text Deletion::               Deleting part of the command line
+* Transposition::               Transposing text on the command line
+* Text Retrieval::              Retrieving text from the history buffer
+* Find & Replace::              Substituting text in the command line
+* Word Completion::             Completing partial names
+* Insert/Overwrite::            Toggling insert/overwrite mode
+* Help Mode::                   Getting an on-line key code overview
+* Key Code Overview::           Alphabetical list of key codes
+
+Data Input/Output Routines
+
+* Keyboard/Screen I/O::         Data from keyboard / to screen
+* Disk File I/O::               Data from/to disk files
+* ANA Disk File Formats::       Disk file formats specific to ANA
+* Byte Order::                  The order in which data bytes are stored
+* Tape File I/O::               Data from/to tape files
+
+ANA Disk File Formats
+
+* ANA FZ File Format::          
+* ANA FITS File Format::        
+* ANA ASTORE File Format::      
+
+Formatted Input/Output
+
+* Format Specifiers::           
+* Format Modifiers::            
+* Format Field Width::          
+* Format Precision::            
+* Format Grouping::             
+* Long output lines::           
+* In-Line Print Formats::       
+* Output Data Formats::         
+* Input Data Formats::          
+
+Input Data Formats
+
+* Input Format Types::          Specifying data types for input
+* Input Format Examples::       Some examples of input formats
+
+Expressions
+
+* Variables::                   Variables in ANA
+* Data Classes::                Classes of data available in ANA
+* Operators::                   Basic arithmetic and more
+* Function Call::               How to use functions
+* Precedence::                  Order of precedence
+
+Variables
+
+* Local Variables::             Variables that are local to a routine
+* Global Variables::            Variables that are accessible everywhere
+* Reserved Keywords::           Words that you cannot use as variable names
+
+Data Classes
+
+* Undefined::                   Variables without a value
+* Scalars::                     A single number
+* Strings::                     A string of text
+* Arrays::                      A group of similar values
+* File Arrays::                 Assigning an array structure to a disk file
+* Associated Variables::        Assigning a record structure to a disk file
+* Ranges::                      A range
+* Compact Lists::               A group of dissimilar values
+* Compact Pointer Lists::       A group of pointers to variables
+* Lists::                       A group of dissimilar values
+* Structures::                  
+* Pointers::                    A pointer to another variable
+
+Scalars
+
+* Numerical Data Types::        How to enter specific numerical values
+* Integer Numbers::             How to enter integer values
+* Floating-Point Numbers::      How to enter fractional values
+* Complex Numbers::             How to enter complex values
+
+Arrays
+
+* Specifying Arrays::           How to enter array values
+* Combining Arrays::            How to combine arrays into bigger ones
+* Referencing Arrays::          How to refer to array elements
+
+Operators
+
+* Unary Minus::                 How to add a minus sign to a value
+* Unary Plus::                  How to add a plus sign to a value
+* Binary Arithmetic::           Standard arithmetic on two values
+* Binary Logic::                Logical operations on two values
+* Binary Conditionals::         Logical operations with conditional evaluation
+* Binary Relationals::          Determining relations between values
+* Binary Bounding::             Restricting values to specific ranges
+* Structure/List Element::      How to select elements from structures
+* Concatenation::               How to combine elements
+* Subscripts::                  How to select elements from arrays
+
+Subscripts
+
+* Coordinate Subscripts::       Specifying elements by coordinates
+* Index Subscripts::            Specifying elements by array index
+* Range Subscripts::            Specifying elements by ranges
+* Lists of Subscripts::         Specifying arbitrary numbers of arguments
+* Multiple Subscripts::         Specifying elements in multiple dimensions
+* Fractional Subscripts::       Specifying fractional coordinates
+* Expression Subscripts::       Applying subscripts to expressions is OK
+
+Function Call
+
+* Arguments::                   Arguments to subroutines and functions
+* Recursion::                   ANA allows recursion of routines
+
+Arguments to Functions and Subroutines
+
+* Argument Specification::      How to specify arguments
+* Empty Arguments::             How unspecified arguments are handled
+
+Statements
+
+* Assignment::                  Assignment statements
+* IF Statement::                Select based on a condition
+* CASE Statement::              Select based on a value
+* NCASE Statement::             Select based on conditions
+* FOR Statement::               Repeat a fixed number of times
+* REPEAT Statement::            Repeat until a final condition is met
+* WHILE-DO Statement::          Repeat while an initial condition is met
+* DO-WHILE Statement::          Repeat while a final condition is met
+* Block Statement::             Treat a group of statements as one
+* Block Routine Definition::    Name a group of statements
+* Block Routine Execution::     How to execute a named group of statements
+* Subroutine Definition::       Define a subroutine
+* Subroutine Call::             How to use a subroutine
+* Extended Parameter Lists::    Arbitrary numbers of arguments
+* Function Definition::         Define a function
+* Jumps::                       Forced jumps to other statements
+* File Inclusion::              Reading commands from a file
+* Ignoring Input::              How to make ANA ignore input
+* Line Breaks::                 How ANA treats line breaks
+
+Assignment
+
+* Straight Assignment::         Assignment to a whole variable
+* Insertion::                   Assignment to some elements of a variable
+* Operand-Assignment::          Modification of a variable
+
+Insertion
+
+* Subscript Insertion::         Inserting through subscripts
+* Structure Insertion::         Inserting through structure tags
+
+Jumps
+
+* BREAK Statement::             Exit from the current loop
+* CONTINUE Statement::          Jump to the start of the current loop
+* RETURN Statement::            Return from a function or subroutine
+* RETALL Statement::            Return to the main execution level
+* EXIT/QUIT Statement::         Quit ANA
+
+Graphics
+
+* Screen Coordinates::          Coordinate systems for screen positions
+* Colors::                      Colors
+* Image Display::               Displaying images
+* Plots and Graphs::            Displaying plots and graphs
+* Widgets::                     Displaying and using widgets
+
+Colors
+
+* Color Ramp::                  For image display
+* Incidental Colors::           For line drawings and such
+
+Widgets
+
+* Building Widgets::            
+* Managing Widgets::            
+
+Building Widgets
+
+* Button Widgets::              
+
+Debugging
+
+* Error Messages::              What you see if something goes wrong
+* Variable Inspection::         How to check the values of variables
+* System Inspection::           How to check the condition of ANA's innards
+* Tracing::                     How to trace execution of your commands
+* Stepping::                    How to step through execution
+* Help Routines::               How to find information about routines
+* Diagnostic Output::           How to record input/output to a file
+
+Error Messages
+
+* Parser Errors::               Parser errors
+* Execution Errors::            Execution errors
+
+Routine Groups
+
+* Array Manipulation::          How to manipulate arrays
+* Astronomy and Calendars::     Finding dates and positions of planets
+* Binary Operators::            Standard operations
+* Color::                       Routines dealing with color
+* Complex Routines::            Routines dealing with complex numbers
+* Data Compression::            How to compress data
+* Data Conversion::             How to convert data to a different type
+* Data Creation::               How to create data
+* Debug Routines::              How to find mistakes in your code
+* Events::                      How to capture mouse and keyboard events
+* Information::                 How to obtain information about various things
+* Data Input/Output::           Getting data in or out of ANA
+* Math Routines::               Various mathematical routines
+* Menus::                       How to use ANA menus
+* Plots::                       How to create plots
+* Postscript::                  How to send graphics to a Postscript file
+* Running::                     How to run or affect ANA
+* Stack::                       How to use the user stack of variables
+* String Routines::             Routines dealing with text
+* System::                      System information
+* Topology::                    Routines dealing with topology
+* Windows::                     Routines dealing with graphical screen output
+* Multi-Dim Routines::          Routines that treat arbitrary dimensions
+
+Array Creation and Manipulation
+
+* Array Creation::              How to create arrays
+* Array Data Compression::      How to compress arrays
+
+Array Creation
+
+* Default Arrays::              Arrays with default values
+* File Array Creation::         Arrays that address disk files
+* Random Arrays::               Arrays of random numbers
+
+Astronomy and Calendars
+
+* Astronomical Coordinate Calculations::  
+
+Data Compression
+
+* Data-Compressed I/O::         Input/output of compressed data
+
+Data Conversion
+
+* Data Mapping::                How to map data to different types
+* String Conversion::           How to convert to or from text strings
+* Number Conversion::           How to convert numbers to different types
+
+Data Creation
+
+* Array Creation::                 How to create arrays
+
+Data Input/Output
+
+* Disk I/O::                    Input/output with disk files
+* User I/O::                    Input/output with the user
+* Tape I/O::                    Input/output with tape files
+
+Disk I/O
+
+* Opening/Closing Files::       How to open or close a file
+* Uncompressed Disk Output::    Uncompressed output to a disk file
+* Uncompressed Disk Input::     Uncompressed input from a disk file
+
+Math Routines
+
+* Bessel Functions::            Various Bessel functions
+* Complex Functions::           Functions that accept complex values
+* Exponential/Logarithmic Functions::  Various exponents and logarithms
+* Spectral Functions::          Spectral transforms
+* Filters::                     Routines that modify values
+* Fitting::                     Routines that fit curves to data
+* Hyperbolic Functions::        Various hyperbolic functions
+* Interpolation::               Routines that interpolate
+* Matrix Math::                 Routines that deal with matrices
+* Seek::                        Routines that find values
+* Smoothing::                   Routines that smooth
+* Sorting::                     Routines that sort values
+* Statistical Functions::       Various statistical distributions
+* Trigonometry::                Trigonometric functions
+
+Installing ANA
+
+* Configure::                   How to configure for compiling ANA
+* Makefile::                    What is in the Makefile
+
+Reference Manual
+
+* Packages::                    Routines/variables of varying availability
+* Read-Only Globals::           Global variables that the user cannot modify
+* Read-Write Global Vars::      Global variables that the user can modify
+* Status Funcs::                Global variables that query the system
+* Internal Routines::           Routines that are built in to ANA
+
+Packages
+
+* debug::                       
+* develop::                     
+* jpeg::                        
+* motif::                       
+* regex_h::                     
+* sofa::                        
+* tape::                        
+* x11::                         
+
+Read-Only Global Variables
+
+* #0::                          Zero
+* #1::                          One
+* #2PI::                        Two pi
+* #42::                         The answer to Life, Universe, and Everything
+* #C::                          Speed of light (cgs)
+* #CLASS::                      ANA classes structure
+* #COL::                        Number of columns on the terminal
+* #COORDSYS::                   ANA coordinate systems structure
+* #DEG::                        Degrees to radians
+* #D.R::                        Degrees to radians
+* #E::                          Base of natural logarithm
+* #EC::                         Electron charge (cgs)
+* #EVENT::                      ANA events structure
+* #FILETYPE::                   Data file types
+* #G::                          Gravitational constant (cgs)
+* #H::                          Planck constant (cgs)
+* #HB::                         Planck constant divided by pi (cgs)
+* #I::                          Imaginary unit
+* #INFTY::                      Infinity
+* #K::                          Boltzmann constant (cgs)
+* #M::                          Electron mass (cgs)
+* #MAX_ARGS::                   Maximum number of arguments
+* #MAX_BYTE::                   Greatest value possible in a BYTE
+* #MAX_DIMS::                   Maximum allowed number of array dimensions
+* #MAX_DOUBLE::                 Greatest value possible in a DOUBLE
+* #MAX_FLOAT::                  Greatest value possible in a FLOAT
+* #MAX_LONG::                   Greatest value possible in a LONG
+* #MAX_PIXMAP::                 Greatest pixmap number
+* #MAX_WINDOW::                 Greatest window number
+* #MAX_WORD::                   Greatest value possible in an INT
+* #MIN_DOUBLE::                 Smallest nonzero value possible in a DOUBLE
+* #MIN_FLOAT::                  Smallest nonzero value possible in a FLOAT
+* #MIN_LONG::                   Most negative value possible in a LONG
+* #MIN_WORD::                   Most negative value possible in an INT
+* #MINUS1::                     Minus one
+* #MSBFIRST::                   Byte order
+* #PI::                         Pi
+* #P3D::                        Projection matrix
+* #R::                          Gas constant (cgs)
+* #R.D::                        Radians to degrees
+* #RAD::                        Radians to degrees
+* #ROW::                        Number of lines on the terminal
+* #STACK::                      User stack
+* #TYPE::                       ANA data types
+* #TYPESIZE::                   Sizes of data types
+* #ZERO::                       System zero (don't use)
+
+Read-Write Global Variables
+
+* !AUTOCON::                    Automatic contour level selection
+* !BADMATCH::                   Number of bad matched in GRIDMATCH
+* !BB_UPDATE::                  Update plot bounding box
+* !BC::                         
+* !BUTTON::                     Pointer button state
+* !BXB::                        Bounding box lower x
+* !BXT::                        Bounding box upper x
+* !BYB::                        Bounding box lower y
+* !BYT::                        Bounding box upper y
+* !COL::                        Number of columns on the terminal
+* !CONTOUR_BORDER::             
+* !CONTOUR_BOX::                Draw a small box at origin of contour plot
+* !CONTOUR_DASH_LEV::           
+* !CONTOUR_MODE::               
+* !CONTOUR_NLEV::               Number of counter levels
+* !CONTOUR_STYLE::              
+* !CONTOUR_TICKS::              
+* !CONTOUR_TICK_FAC::           
+* !CONTOUR_TICK_PEN::           
+* !CRATIO::                     Plot symbol aspect ratio
+* !CRUNCH_BITS::                Number of bits in last CRUNCH
+* !CRUNCH_BPP::                 Number of bits per element in last CRUNCH
+* !CRUNCH_SLICE::               CRUNCH tweak parameter
+* !DASHSIZE::                   Relative size of plot dashes
+* !DLABX::                      Plot x axis divisions
+* !DLABY::                      Plot y axis divisions
+* !DOT::                        
+* !DOTS::                       
+* !ERASE::                      Automatic window erase on PLOT
+* !ERRNO::                      Last system error number
+* !ERROR_EXTRA::                
+* !EVENTSOURCE::                Source window of event
+* !EVENTTYPE::                  Type of event
+* !FFTDP::                      Double precision FFTs
+* !FONT::                       Default font number
+* !FORMAT_C::                   Output format for complex numbers
+* !FORMAT_F::                   Output format for floating-point numbers
+* !FORMAT_I::                   Output format for integer numbers
+* !FORMAT_S::                   Output format for strings
+* !FSIZE::                      Default font size 
+* !FSTEPX::                     Free data increment per major x tick mark
+* !FSTEPY::                     Free data increment per major y tick mark
+* !FSTEPZ::                     Free data increment per major z tick mark
+* !FZ::                         Free lower y plot bound
+* !FZX::                        Free lower x plot bound
+* !FZZ::                        Free lower z plot bound
+* !HEIGHT::                     Last window height
+* !HISTMIN::                    Last histogram minimum ordinate
+* !HISTMAX::                    Last histogram maximum ordinate
+* !IBLANK::                     
+* !IORDER::                     TV coordinate swap order
+* !ITMAX::                      
+* !IX::                         Last selected DEV x coordinate in window
+* !IY::                         Last selected DEV y coordinate in window
+* !KB::                         
+* !KEYCODE::                    Code of pressed physical key
+* !KEYSTATE::                   State of modifier keys
+* !KEYSYM::                     Character code of pressed key
+* !LABX::                       Labels on plot x axis
+* !LABY::                       Labels on plot y axis
+* !LANDSCAPE::                  Landscape mode for PostScript file
+* !LASTMAX::                    Last maximum value
+* !LASTMAXLOC::                 Last maximum location
+* !LASTMEAN::                   Last mean value
+* !LASTMIN::                    Last minimum value
+* !LASTMINLOC::                 Last minimum location
+* !LASTSDEV::                   Last standard deviation
+* !LAST_MENU::                  Last selected menu entry
+* !MAXHISTSIZE::                Histogram upper size limit
+* !MAXREGRIDSIZE::              REGRID upper size limit
+* !MENU_ITEM::                  Last selected menu item
+* !MERITC::                     Last merit value of displacement determination
+* !MOTIF::                      MOTIF available
+* !MXB::                        Last plot x lower data value
+* !MXT::                        Last plot x upper data value
+* !MYB::                        Last plot y lower data value
+* !MYT::                        Last plot y upper data value
+* !MZB::                        Last plot z lower data value
+* !MZT::                        Last plot z upper data value
+* !NARG::                       Arguments to current user-defined routine
+* !NOEVENTFLUSH::               Do not flush events at start of XLOOP
+* !PDEV::                       Plot device
+* !PEN::                        Plot pen width
+* !PLTYP::                      Plot style (linear/logarithmic)
+* !PLXERRB::                    Plot x error bar height
+* !PLYERRB::                    Plot y error bar width
+* !PS_FILE::                    PostScript output file
+* !RANGE_WARN_FLAG::            
+* !READ_COUNT::                 
+* !REDIM_WARN_FLAG::            
+* !ROOT_X::                     Last root window x
+* !ROOT_Y::                     Last root window y
+* !ROW::                        Number of lines on the terminal
+* !RX::                         Round plot x axis range
+* !RY::                         Round plot y axis range
+* !SCALEMAX::                   Image scale maximum
+* !SCALEMIN::                   Image scale minimum
+* !SCREEN_HEIGHT::              Screen height
+* !SCREEN_WIDTH::               Screen width
+* !SORT_FLAG::                  Select SORT algorithm
+* !STARTX::                     Data value of first major x tick mark
+* !STARTY::                     Data value of first major y tick mark
+* !STEPX::                      Data increment per major x tick mark
+* !STEPY::                      Data increment per major y tick mark
+* !STRETCHMARK::                
+* !STRETCH_CLIP::               
+* !SYMRATIO::                   Plot symbol aspect ratio
+* !SYMSIZE::                    Relative symbol size
+* !TAPEMESSAGES::               
+* !TICKX::                      Plot x tick mark size
+* !TICKXR::                     Plot x secondary tick mark relative size
+* !TICKY::                      Plot y tick mark size
+* !TICKYR::                     Plot y secondary tick mark relative size
+* !TVIX::                       Left edge coordinate of last image
+* !TVIXB::                      Right edge coordinate of last image
+* !TVIY::                       Bottom edge coordinate of last image
+* !TVIYB::                      Top edge coordinate of last image
+* !TVSCALE::                    Current magnification factor
+* !TVSMT::                      Select SMOOTH algorithm
+* !VDEV::                       Video device
+* !WIDTH::                      Current window width
+* !WINDOW::                     Current window number
+* !WXB::                        Plot window DEV lower x
+* !WXT::                        Plot window DEV upper x
+* !WYB::                        Plot window DEV lower y
+* !WYT::                        Plot window DEV upper y
+* !WZB::                        Plot window DEV lower z
+* !WZT::                        Plot window DEV upper z
+* !XB::                         
+* !XC::                         Calligraphy current x
+* !XERRORS::                    
+* !XF::                         Last selected x coordinate in window
+* !XMENU::                      
+* !XROOT::                      Last selected x coordinate in root window
+* !XT::                         
+* !XTIME::                      
+* !YB::                         
+* !YC::                         Calligraphy current y
+* !YF::                         Last selected y coordinate in window
+* !YMENU::                      
+* !YROOT::                      Last selected y coordinate in root window
+* !YT::                         
+* !YYDEBUG::                    Select parser debugging
+* !ZOOMFRAME::                  Current ZOOM frame
+* !ZOOMHIGH::                   Upper limit of ZOOM contrast
+* !ZOOMLOW::                    Lower limit of ZOOM contrast
+* !ZOOMMAG::                    Last used magnification factor in ZOOM
+* !ZOOMX::                      Last used center x coordinate in ZOOM
+* !ZOOMY::                      Last used center y coordinate in ZOOM
+
+Status Functions
+
+* !CPUTIME::                    CPU time used so far
+* !CTIME::                      Time and date string
+* !DATE::                       Date string
+* !JD::                         Current Julian Date
+* !READKEY::                    Read key press and echo
+* !READKEYNE::                  Read key press but don't echo
+* !SYSTIME::                    Current time in seconds
+* !TIME::                       Time string
+
+Internal Functions and Subroutines
+
+* ABS::                         Absolute value
+* ACOS::                        Arc cosine
+* ACOSH::                       Inverse hyperbolic cosine
+* ALOG::                        Natural logarithm
+* ALOG10::                      Decimal logarithm
+* AND::                         Logical AND
+* ANDIF::                       Conditional logical AND
+* AREA::                        Disjoint area labeling
+* AREA2::                       Connected area labeling
+* AREACONNECT::                 Determine area connections
+* ARESTORE::                    Restore complete variables from disk
+* ARG::                         Complex argument
+* ARRAY::                       Create an array of arbitrary type
+* ARRAY_STATISTICS::            Main statistics of an array
+* ASIN::                        Arc sine
+* ASINH::                       Inverse hyperbolic sine
+* ASSOC::                       Create an associated variable
+* ASTORE::                      Store complete variables on disk
+* ASTRF::                       Astronomical coordinate transformations
+* ASTRON::                      Calculate planetary positions
+* ATAN::                        Arc tangent (mod 180 degrees)
+* ATAN2::                       Arc tangent (mod 360 degrees)
+* ATANH::                       Inverse hyperbolic tangent
+* ATOL::                        Read an integer value from a string
+* ATOMIZE::                     Show internal structure of a variable
+* BASIN::                       Full-coverage image segmentation
+* BATCH::                       Run in batch mode
+* BESSEL_I0::                   Bessel I_0 function
+* BESSEL_I1::                   Bessel I_1 function
+* BESSEL_J0::                   Bessel J_0 function
+* BESSEL_J1::                   Bessel J_1 function
+* BESSEL_JN::                   Bessel J_n function
+* BESSEL_K0::                   Bessel K_0 function
+* BESSEL_K1::                   Bessel K_1 function
+* BESSEL_KN::                   Bessel K_n function
+* BESSEL_Y0::                   Bessel Y_0 function
+* BESSEL_Y1::                   Bessel Y_1 function
+* BESSEL_YN::                   Bessel Y_n function
+* BETA::                        Beta function
+* BI0::                         Bessel I_0 function
+* BI1::                         Bessel I_1 function
+* BISECT::                      Calculates bisectors
+* BJ0::                         Bessel J_0 function
+* BJ1::                         Bessel J_1 function
+* BJN::                         Bessel J_n function
+* BK0::                         Bessel K_0 function
+* BK1::                         Bessel K_1 function
+* BKN::                         Bessel K_n function
+* BMAP::                        Convert to @code{BYTE} byte by byte
+* BREAKPOINT::                  Manipulate breakpoints
+* BSMOOTH::                     Binary smoothing
+* BUFFERING::                   Input/output buffering modes
+* BY0::                         Bessel Y_0 function
+* BY1::                         Bessel Y_1 function
+* BYN::                         Bessel Y_n function
+* BYTARR::                      Create a @code{BYTE} array
+* BYTE::                        Convert to @code{BYTE} value by value
+* BYTFARR::                     Create a @code{BYTE} file array
+* C::                           Calligraphy
+* CALCULATOR::                  Calculator mode
+* CALENDAR::                    Calendar conversions
+* CALLIG::                      Calligraphy
+* CBRT::                        Cube root
+* CDBLARR::                     Create a @code{CDOUBLE} array
+* CDBLFARR::                    Create a @code{CDOUBLE} file array
+* CDMAP::                       Convert to @code{CDOUBLE} byte by byte
+* CDOUBLE::                     Convert to @code{CDOUBLE} value by value
+* CEIL::                        Convert to @code{LONG} by rounding up
+* CFLOAT::                      Convert to @code{CFLOAT} value by value
+* CFLTARR::                     Create a @code{CFLOAT} array
+* CFLTFARR::                    Create a @code{CFLOAT} file array
+* CFMAP::                       Convert to @code{CFLOAT} byte by byte
+* CHDIR::                       Change directory
+* CHECKLIST::                   debugging]
+* CHECKMENU::                   Check for menu selection
+* CHECKWINDOW::                 Check for window selection
+* CHI2::                        Chi-square function.
+* CLASSNAME::                   Name of data class
+* CLOSE::                       Close disk file
+* CLUSTER::                     Cluster analysis
+* COLORCOMPONENTS::             Derive RGB values
+* COLORPIXEL::                  
+* COLORSTOGREY::                Get greyscale values
+* COMPILE::                     Compile a string as ANA code
+* COMPILE_FILE::                
+* COMPLEX::                     Convert to a complex data type
+* COMPRESS::                    Reduce the number of elements of an array
+* CONCAT::                      Concatenate scalars and/or arrays
+* CONJUGATE::                   Complex conjugate
+* CONSTELLATION::               Determine the astronomical constellation
+* CONSTELLATIONNAME::           Provide constellation names
+* CONTOUR::                     Contour plot
+* CONVERT::                     Convert to specified data type 
+* COORDTRF::                    Plot/windoe coordinate conversions
+* COS::                         Cosine
+* COSH::                        Hyperbolic cosine
+* CROSSCORR::                   Cross-correlation coefficient
+* CRUNCH::                      Data compression
+* CRUNCHRUN::                   
+* CSPLINE::                     Interpolation using cubic splines
+* CSPLINE_EXTR::                Find extremes on cubic splines
+* CSPLINE_FIND::                
+* CTOP::                        Transform from Cartesian to polar coordinates
+* D::                           Dump information about an expression
+* DATE_FROM_TAI::               Date string from a TAI time
+* DBLARR::                      Create a @code{DOUBLE} array
+* DBLFARR::                     Create a @code{DOUBLE} file array
+* DECOMP::                      LU matrix decomposition
+* DECRUNCH::                    Data decompression
+* DEFAULT::                     Specify a default value for a variable
+* DEFINED::                     Does the variable have a defined value?
+* DELETE::                      Delete a variable's data value
+* DESPIKE::                     Treat bad pixels (spikes) in an image
+* DETREND::                     Remove a polynomial fit
+* DIAGNOSTIC::                  Write diagnostic output to a file
+* DIFFER::                      Running difference
+* DILATE::                      Binary image dilation operator
+* DILATEDIR::                   
+* DIMEN::                       Return a dimension of an array
+* DISABLENEWLINE::              Tell ANA to ignore newlines
+* DISTARR::                     Distance array
+* DISTR::                       Distribute data to array elements
+* DMAP::                        Convert to @code{DOUBLE} byte by byte
+* DOUB::                        Convert to @code{DOUBLE} value by value
+* DOUBLE::                      Convert to @code{DOUBLE} value by value
+* DSMOOTH::                     Directional smoothing
+* DSOLVE::                      Solve a set of linear equations
+* DSUM::                        Sum as @code{DOUBLE}
+* DUMP::                        Dump information about an expression
+* DUMP_LUN::                    Dump information about open files
+* DUMP_STACK::                  Dump information about the data stack
+* EASTERDATE::                  Calculate the date of Easter
+* ECHO::                        Echo code to be compiled
+* ENABLENEWLINE::               Tell ANA to resume interpreting newlines
+* ENDIAN::                      Convert between little-endian and big-endian
+* ENHANCEIMAGE::                Enhance the intensities of an image
+* EQ::                          Equal-to
+* EQUIVALENCE::                 Determine equivalence classes
+* ERASE::                       Erase the window contents
+* ERF::                         Error function
+* ERFC::                        Complementary error function
+* ERODE::                       Binary image erosion operator
+* ERODEDIR::                    
+* ERROR::                       User-defined error with message
+* ESEGMENT::                    Extreme-based data segmentation
+* ESMOOTH::                     Asymmetrical exponential smoothing
+* EVAL::                        Evaluate a string as ANA code
+* EVENTNAME::                   Name of an event
+* EXECUTE::                     Execute a string as ANA code
+* EXIT::                        Exit ANA
+* EXP::                         Exponential function
+* EXPAND::                      Increase the size of an image
+* EXPM1::                       Exponential of one less than the argument
+* F0H::                         Retrieve the header from an FZ file
+* F0HEAD::                      Retrieve the header from an FZ file
+* F0R::                         Retrieve data from an FZ file
+* F0READ::                      Retrieve data from an FZ file
+* F0W::                         Write data to an FZ file
+* F0WRITE::                     Write data to an FZ file
+* FADE::                        Fade between two images
+* FADE_INIT::                   Initialize a fade between two images
+* FCRUNWRITE::                  Write compressed data to an FZ file
+* FCRW::                        Write compressed data to an FZ file
+* FCW::                         Write compressed data to an FZ file
+* FCWRITE::                     Write compressed data to an FZ file
+* FFT::                         Discrete Fast Fourier Transform
+* FFTSHIFT::                    Shifts data using Fourier interpolation
+* FILEPTR::                     Manipulate a file pointer
+* FILEREAD::                    Unformatted reading from a file
+* FILESIZE::                    Size of a file
+* FILETOFZ::                    Transform a file to an FZ file
+* FILETYPE::                    Finds the type of the file
+* FILETYPENAME::                Returns the name of the file type
+* FILEWRITE::                   Unformatted writing to a file
+* FIND::                        Find the first occurrence of particular values
+* FINDFILE::                    Find a particular file
+* FIND_MAX::                    Find the values of local maxima
+* FIND_MAXLOC::                 Find the locations of local maxima
+* FIND_MIN::                    Find the values of local minima
+* FIND_MINLOC::                 Find the locations of local minima
+* FIT::                         Fit arbitrary function to data
+* FIT2::                        Fit arbitrary function to data
+* FIT3DCUBE::                   Ensure complete 3D plot fits on screen
+* FITS_HEADER::                 Read the header of a FITS file
+* FITS_KEY::                    Get a value from a FITS file header
+* FITS_READ::                   Read a FITS file
+* FITS_WRITE::                  Write a FITS file
+* FITS_XREAD::                  Read a FITS file
+* FIX::                         Convert to @code{LONG} by truncating
+* FLOAT::                       Convert to @code{FLOAT} value by value
+* FLOOR::                       Convert to @code{LONG} by rounding down
+* FLTARR::                      Create a @code{FLOAT} array
+* FLTFARR::                     Create a @code{FLOAT} file array
+* FMAP::                        Convert to @code{FLOAT} byte by byte
+* FORMAT_SET::                  Manipulate the formats for ASCII output
+* FPRINT::                      Print to screen
+* FPRINTF::                     Write to file in ASCII format
+* FRATIO::                      F variance ratio function
+* FREAD::                       Read from keyboard
+* FREADF::                      Read from file in ASCII format
+* FREADS::                      Read from string
+* FSTRING::                     Convert to @code{STRING}
+* FSUM::                        Sum as @code{FLOAT}
+* FZARR::                       Create a file array appropriate for an FZ file
+* FZH::                         Retrieve the header from an FZ file
+* FZHEAD::                      Retrieve the header from an FZ file
+* FZINSPECT::                   Return information on an FZ file
+* FZR::                         Retrieve data from an FZ file
+* FZREAD::                      Retrieve data from an FZ file
+* FZW::                         Write data to an FZ file
+* FZWRITE::                     Write data to an FZ file
+* GAMMA::                       Gamma function
+* GE::                          Greater-than-or-equal-to
+* GETDIRECTORIES::              Gets a list of subdirectories  
+* GETDIRECTS::                  Gets a list of subdirectories
+* GETENV::                      Get the value of an environment variable
+* GETFILES::                    Gets a list of files in a directory
+* GETFILES_R::                  Gets a list of files in/below a directory
+* GETMATCHEDFILES::             Gets files matching a regexp in a directory
+* GETMATCHEDFILES_R::           Gets files matching a regexp in/below a directory
+* GETMIN9::                     Minimum of a fit to 3 by 3 data values
+* GET_LUN::                     Gets an available logical unit
+* GIFREAD::                     Read a GIF file
+* GIFWRITE::                    Write a GIF file
+* GRIDMATCH::                   Determine displacements between two images
+* GSMOOTH::                     Gaussian smoothing
+* GT::                          Greater-than
+* HAIRS::                       User-selected position
+* HELP::                        Help
+* HEX::                         
+* HILBERT::                     Hilbert transform
+* HIST::                        Histogram
+* HISTR::                       Normalized histogram
+* IAUBI00::                     
+* IAUBP00::                     
+* IAUBP06::                     
+* IAUBPN2XY::                   
+* IAUC2I00A::                   
+* IAUC2I00B::                   
+* IAUC2I06A::                   
+* IAUC2IBPN::                   
+* IAUC2IXY::                    
+* IAUC2IXYS::                   
+* IAUC2S::                      
+* IAUC2T00A::                   
+* IAUC2T00B::                   
+* IAUC2T06A::                   
+* IAUC2TCIO::                   
+* IAUC2TEQX::                   
+* IAUC2TPE::                    
+* IAUC2TXY::                    
+* IAUCAL2JD::                   
+* IAUDAT::                      
+* IAUDTDB::                     
+* IAUEE00::                     
+* IAUEE00A::                    
+* IAUEE00B::                    
+* IAUEECT00::                   
+* IAUEFORM::                    
+* IAUEO06A::                    
+* IAUEORS::                     
+* IAUEPB::                      
+* IAUEPB2JD::                   
+* IAUEPJ::                      
+* IAUEPJ2JD::                   
+* IAUEPV00::                    
+* IAUEQEQ94::                   
+* IAUERA00::                    
+* IAUFAD03::                    
+* IAUFAE03::                    
+* IAUFAF03::                    
+* IAUFAJU03::                   
+* IAUFAL03::                    
+* IAUFALP03::                   
+* IAUFAMA03::                   
+* IAUFAME03::                   
+* IAUFANE03::                   
+* IAUFAOM03::                   
+* IAUFAPA03::                   
+* IAUFASA03::                   
+* IAUFAUR03::                   
+* IAUFAVE03::                   
+* IAUJD2CAL::                   
+* IBETA::                       Incomplete beta function
+* IDLREAD::                     Read one variable from an IDL Save file
+* IDLRESTORE::                  Read all variables from an IDL Save file
+* IGAMMA::                      Incomplete gamma function
+* IGNORE::                      Ignore ANA code up to matching RESUME
+* IMAGINARY::                   Imaginary part of a complex argument
+* INDEX::                       Determine ascending order of data
+* INDGEN::                      Fill array with data coordinate
+* INFO::                        Information about ANA
+* INPOLYGON::                   Determine if points are inside a polygon
+* INSERT::                      Insert data into an array
+* INT::                         Convert to @code{WORD} value by value
+* INTARR::                      Create a @code{WORD} array
+* INTFARR::                     Create a @code{WORD} file array
+* ISARRAY::                     Is the argument an array?
+* ISNAN::                       Is the argument not a number?
+* ISSCALAR::                    Is the argument a scalar?
+* ISSTRING::                    Is the argument a string?
+* IST::                         Convert to @code{STRING}
+* ISTRING::                     Convert to @code{STRING}
+* JPEGREAD::                    Read from a JPEG file
+* JPEGWRITE::                   Write as a JPEG file
+* KSMOOTH::                     
+* LE::                          Less-than-or-equal-to
+* LEGENDRE::                    Associated Legendre polynomials
+* LIMITS::                      Manipulate plot coordinate ranges
+* LIST::                        List the definition of a user-defined routine
+* LLSQ::                        
+* LMAP::                        Convert to @code{LONG} byte by byte
+* LOCAL_MAX::                   The value of a local maximum
+* LOCAL_MAXLOC::                The location of a local maximum
+* LOCAL_MIN::                   The value of a local minimum
+* LOCAL_MINLOC::                The location of a local minimum
+* LOG::                         Natural logarithm
+* LOG10::                       Decimal logarithm
+* LOG1P::                       Natural logarithm of one plus the argument
+* LONARR::                      Create a @code{LONG} array
+* LONFARR::                     Create a @code{LONG} file array
+* LONG::                        Convert to @code{LONG} value by value
+* LOWCASE::                     Convert letters to lower case
+* LOWER::                       Convert letters to lower case
+* LSMOOTH::                     Directional spreading
+* LSQ::                         Least-squares fit
+* LT::                          Less-than
+* MATCH::                       Match source values to target values
+* MATMUL::                      Matrix multiplication
+* MAX::                         Maximum
+* MAXDIR::                      
+* MAXFILTER::                   Running maximum
+* MAXLOC::                      Location of maximum
+* MEAN::                        Mean value
+* MEDFILTER::                   Running median
+* MEDIAN::                      Median valuey
+* MEMORY::                      Memory use
+* MENU::                        Create or select a menu
+* MENUHIDE::                    Hide a menu
+* MENUITEM::                    Change a menu item
+* MENUPOP::                     Pop (raise) a menu
+* MENUREAD::                    Read a value through a menu item
+* MENUZAP::                     Zap (destroy) a menu
+* MIN::                         Minimum
+* MINFILTER::                   Running minimum
+* MINLOC::                      Location of minimum
+* MOD::                         Modulus
+* MULTISIEVE::                  Determine locations of particular values
+* NAME::                        
+* NCCHI2::                      Non-central chi-square function
+* NE::                          Not equal to
+* NEWALLOCS::                   Reports on recent memory allocation
+* NOECHO::                      Do not echo code to be compiled
+* NOOP::                        No operation
+* NOT::                         Logical NOT
+* NUM_DIM::                     Number of dimensions
+* NUM_ELEM::                    Number of elements
+* ONE::                         Fill with ones
+* OPENR::                       Open a file for reading only
+* OPENU::                       Open a file for updating (reading/writing)
+* OPENW::                       Open a file for writing only
+* OPLOT::                       Add data to a plot
+* OR::                          Logical OR
+* ORDFILTER::                   Running ordinal
+* ORIENTATION::                 Determine local orientation
+* ORIF::                        Conditional logical OR
+* PDEV::                        Set/show plot device
+* PEEK::                        Investigate memory locations
+* PEN::                         Set pen width
+* PENCOLOR::                    Set pen color
+* PIT::                         Polynomial fit
+* PIXELSTO8BIT::                Convert pixel values to 8-bit values
+* PLOT::                        Plot
+* PLOT3D::                      Three-dimensional plot
+* POINTER::                     Convert to a pointer
+* POLATE::                      Linear interpolation
+* POLY::                        Polynomial evaluation
+* POP::                         Pop from the stack
+* POSTIMAGE::                   Write an image to a Postscript file
+* POSTRAW::                     Write a string to a Postscript file
+* POSTREL::                     Finish and close a Postscript file
+* POSTRELEASE::                 Finish and close a Postscript file
+* POWER::                       Power spectrum
+* PRECESS::                     Correct astronomical coordinates for precession
+* PRINT::                       Print to the screen
+* PRINTF::                      Write to a file in ASCII format
+* PROJECT::                     Project 3D coordinates to screen coordinates
+* PROJECTION::                  Manipulate 3D projection
+* PROJECTMAP::                  Returns a projected version of a flat map
+* PSUM::                        Sum weighted with powers of the coordinates
+* PTOC::                        Transform from polar to Cartesian coordinates
+* PUSH::                        Push unto the stack
+* QUANTILE::                    Quantiles
+* QUIT::                        Quit ANA
+* RANDOM::                      Pseudo-random numbers
+* RANDOMB::                     Pseudo-random bits
+* RANDOMD::                     Pseudo-random numbers user-distributed
+* RANDOME::                     Pseudo-random numbers exponentially distributed
+* RANDOMN::                     Pseudo-random numbers normally distributed
+* RANDOMU::                     Pseudo-random numbers uniformly distributed
+* READ::                        Read a value from the keyboard
+* READARR::                     Read values from the keyboard into an array
+* READF::                       Read values from a file in ASCII format
+* READORBITS::                  Read orbital da
+* READU::                       Read values from a file in machine format
+* READ_JPEG::                   Read from a JPEG-compressed file
+* REAL::                        Real part of a complex argument
+* RECORD::                      Record user input and/or ANA output
+* REDIM::                       Modify the dimensions of an array
+* REGEX::                       Match a regular expression to text
+* REGRID::                      Interpolate on a warped grid (nearest neighbor)
+* REGRID3::                     Interpolate on a warped grid (bicubic)
+* REGRID3NS::                   Interpolate on a warped grid (bicubic)
+* REORDER::                     
+* REPLACE::                     Replace some values with others
+* RESTART::                     Restart ANA
+* RESTORE::                     Retrieve data from an FZ file
+* RESUME::                      Negate one previous IGNORE
+* RETURN::                      Return from a subroutine or function
+* REVERSE::                     Reverse the order of data in an array
+* REWIND::                      Rewind a tape
+* REWINDF::                     Move a file pointer to the file start
+* RFIX::                        Convert to @code{LONG} by rounding
+* ROLL::                        Rearrange dimensions
+* ROOT3::                       Solve a cubic equation
+* RUNCUM::                      Running sum over a fixed width
+* RUNPROD::                     Running product from the beginning
+* RUNSUM::                      Running sum from the beginning
+* S::                           Show information about variables
+* SC::                          Sine-cosine transform
+* SCALE::                       Convert to @code{BYTE} suitable for display
+* SCALERANGE::                  Convert to @code{BYTE} suitable for display
+* SCANF::                       Read from file in ASCII format
+* SCB::                         Inverse sine-cosine transform
+* SCCOMPLEX::                   
+* SDEV::                        Standard deviation
+* SEGMENT::                     Curvature-based image segmentation
+* SEGMENTDIR::                  Curvature-based linear image segmentation
+* SET::                         Set properties of the ANA session
+* SETBACKGROUND::               Set the background color
+* SETBG::                       Set the background color
+* SETENV::                      Set an environment variable
+* SETFG::                       Set the foreground color
+* SETFOREGROUND::               Set the foreground color
+* SGN::                         The signum function: the sign of data
+* SHIFT::                       Circular integer shift of an array
+* SHIFT3::                      Bicubic interpolation shift of an array
+* SHOW::                        Show information about variables
+* SHOWORBITS::                  Show information on read orbital data
+* SHOWSTATS::                   Show information about the ANA session
+* SHOW_FILES::                  Show info on all open files
+* SHOW_FUNC::                   Show information about an ANA function
+* SHOW_SUBR::                   Show information about an ANA subroutine
+* SHOW_TEMPS::                  Show information about temporary variables
+* SHOW_VISUALS::                Show available color display schemes
+* SIDEREALTIME::                The mean sidereal time
+* SIEVE::                       Select elements according to a condition
+* SIN::                         Sine
+* SINH::                        Hyperbolic sine
+* SKIPC::                       Skip characters in a string
+* SKIPF::                       Skip files on a tape
+* SKIPR::                       Skip records on a tape
+* SMAP::                        Convert to @code{STRING} byte by byte
+* SMOD::                        Signed modulus
+* SMOOTH::                      Boxcar smoothing
+* SOLAR_B::                     Solar B angle
+* SOLAR_L::                     Solar L angle
+* SOLAR_P::                     Solar P angle
+* SOLAR_R::                     Apparent solar radius
+* SORT::                        Sort into ascending order
+* SPAWN::                       Send a command to the operating system
+* SPRINTF::                     Convert to @code{STRING}
+* SQRT::                        Square root
+* SSCANF::                      Read from string
+* STEP::                        Step through ANA code
+* STORE::                       Write data to an FZ file
+* STR::                         Convert to @code{STRING}
+* STRARR::                      Create a @code{STRING} array
+* STRCOUNT::                    Count the occurrence of a substring
+* STRETCH::                     Warp an image
+* STRING::                      Convert to @code{STRING}
+* STRLEN::                      Length of a string
+* STRLOC::                      Locate a substring
+* STRPBRK::                     Locate a substring
+* STRPOS::                      Locate a substring
+* STRR::                        Substitute a substring
+* STRREPLACE::                  Substitute a substring
+* STRSKP::                      Skip a substring
+* STRSUB::                      Return a substring
+* STRTOK::                      Find and return a token from a string
+* STRTOL::                      Read a number from a string
+* STRTRIM::                     Skip whitespace
+* STRUCT::                      
+* STUDENT::                     Student's t distribution
+* SUBSHIFT::                    Calculate a subpixel shift
+* SUBSHIFTC::                   Calculate a subpixel shift
+* SUN_B::                       Solar B angle
+* SUN_D::                       Solar distance
+* SUN_P::                       Solar P angle
+* SUN_R::                       Solar radius
+* SWAB::                        Swap bytes in pairs
+* SWAPB::                       Swap bytes in pairs
+* SWAPHALF::                    Swap array halfs
+* SWITCH::                      Switch identity of two variables
+* SYMBOL::                      Return the symbol with the given name
+* SYMCLASS::                    Data class of a symbol
+* SYMDTYPE::                    Data type of a numerical or string variable
+* SYMMEM::                      Memory use of a symbol
+* SYMNUM::                      Symbol number of a named symbol
+* T::                           Print to screen
+* TABLE::                       Linear interpolation in a table
+* TAI_FROM_DATE::               Conversion between UTC and TAI
+* TAN::                         Tangent
+* TANH::                        Hyperbolic tangent
+* TAPEBUFIN::                   Read from tape
+* TAPEBUFOUT::                  Write to tape
+* TAPE_STATUS::                 Tape status
+* TAPRD::                       Read from tape
+* TAPWRT::                      Write to tape
+* TEMPORARY::                   Temporary copy
+* TENSE::                       Interpolate using splines under tension
+* TENSE_CURVE::                 Interpolate using splines under tension
+* TENSE_LOOP::                  Interpolate using splines under tension
+* TERMINAL::                    Specify terminal capabilities
+* THREECOLORS::                 Install the "three-colors" color table
+* TOLOOKUP::                    Condense using a lookup table
+* TOTAL::                       Return the total of parts of an array
+* TRACE::                       Trace execution of ANA code
+* TRACE_DECODER::               
+* TRAJECTORY::                  Calculate particle trajectories
+* TREND::                       Determine polynomial trend in data
+* TRI_NAME_FROM_TAI::           
+* TV::                          Display an image
+* TV3::                         Display an image and two bitmaps
+* TVLAB::                       Display a label
+* TVLCT::                       Load a color table
+* TVMAP::                       Display an array
+* TVPLANE::                     
+* TVRAW::                       Display an array without color mapping
+* TVREAD::                      Read an image into an array
+* TY::                          Print to screen
+* TYPE::                        Print to screen
+* TYPENAME::                    Name of a data type
+* ULIB::                        User library
+* UNLOAD::                      Unload a tape
+* UPCASE::                      Convert a string to upper case
+* UPPER::                       Convert a string to upper case
+* VARIANCE::                    Variance
+* VARNAME::                     Return the name of a variable
+* VERIFY::                      
+* VOIGT::                       Voigt function
+* WAIT::                        Wait
+* WAIT_FOR_MENU::               Wait for a menu selection
+* WAIT_FOR_TAPE::               Wait for completion of a tape command
+* WATCH::                       Watchpoint for a variable
+* WEOF::                        Write an end-of-file to tape
+* WHERE::                       Return symbol that a memory address is in
+* WINDOW::                      Select a window
+* WMAP::                        Convert to @code{WORD} byte by byte
+* WORD::                        Convert to @code{WORD} value by value
+* WRITEU::                      Write unformatted to a disk file
+* WRITE_JPEG::                  
+* XANIMATE::                    Animate a set of images
+* XCLOSE::                      Close the X connection
+* XCOPY::                       Copy a part of an image
+* XCURSOR::                     Select a pointer type
+* XDELETE::                     Delete a window
+* XDRAWARC::                    
+* XDRAWLINE::                   
+* XEVENT::                      Show information about pending X events
+* XEXIST::                      
+* XFLUSH::                      Flush the X event queue
+* XFONT::                       Select a font for display
+* XINVERTARC::                  
+* XINVERTLINE::                 
+* XLABEL::                      Display a label
+* XLABELWIDTH::                 Determine the width of a display label
+* XLOOP::                       X event loop
+* XMADDFILETOLIST::             
+* XMALIGNMENT::                 
+* XMARMCOLOR::                  
+* XMARROW::                     Arrow widget
+* XMATTACH::                    Specify attachment of widgets
+* XMATTACH_RELATIVE::           Specify attachment of widgets
+* XMBACKGROUNDCOLOR::           Set a widget's background color
+* XMBOARD::                     Bulletin board widget
+* XMBORDERCOLOR::               Set a widget's border color
+* XMBORDERWIDTH::               Set a widget's border width
+* XMBOTTOMSHADOWCOLOR::         Set a widget's bottom shadow color
+* XMBUTTON::                    Button widget
+* XMCHECKBOX::                  Check box widget
+* XMCOLUMNS::                   Column widget
+* XMCOMMAND::                   Command widget
+* XMDESTROY::                   Destroy a widget
+* XMDIALOG_BOARD::              
+* XMDIALOG_FORM::               
+* XMDRAWINGAREA::               
+* XMDRAWINGLINK::               
+* XMFILEGETLIST::               
+* XMFILESELECT::                
+* XMFONT::                      Sets a widget's font
+* XMFOREGROUNDCOLOR::           Sets a widget's foreground color
+* XMFORM::                      Form widget
+* XMFRAME::                     Frame widget
+* XMGETOPTIONSELECTION::        
+* XMGETPIXMAP::                 
+* XMGETWIDGETADDRESS::          
+* XMGETWIDGETPOSITION::         
+* XMGETWIDGETSIZE::             
+* XMHSCALE::                    
+* XMHSCROLLBAR::                
+* XMLABEL::                     Label widget
+* XMLIST::                      
+* XMLISTADDITEM::               
+* XMLISTCOUNT::                 
+* XMLISTDELETEALL::             
+* XMLISTDELETEITEM::            
+* XMLISTFROMFILE::              
+* XMLISTFUNC::                  
+* XMLISTSELECT::                
+* XMLISTSUBR::                  
+* XMMENUBAR::                   Menu bar widget
+* XMMESSAGE::                   Message widget
+* XMOPTIONMENU::                
+* XMPIXMAPBUTTON::              
+* XMPIXMAPOPTIONMENU::          
+* XMPOSITION::                  Set a widget's position and size
+* XMPROMPT::                    Prompt widget
+* XMPULLDOWNMENU::              Pull-down menu widget
+* XMQUERY::                     
+* XMRADIOBOX::                  Radio box widget
+* XMRAISE::                     
+* XMRESIZEPOLICY::              
+* XMROWS::                      Row widget
+* XMSCALEGETVALUE::             
+* XMSCALERESETLIMITS::          
+* XMSCALESETVALUE::             
+* XMSCROLLBARSETVALUES::        
+* XMSCROLLEDWINDOW::            
+* XMSCROLLEDWINDOWAPP::         
+* XMSELECTCOLOR::               
+* XMSENSITIVE::                 
+* XMSEPARATOR::                 Separator widget
+* XMSETCOLORS::                 
+* XMSETDIRECTORY::              
+* XMSETLABEL::                  
+* XMSETMARGINS::                
+* XMSETMNEMONIC::               
+* XMSETMODAL::                  
+* XMSETOPTIONSELECTION::        
+* XMSETPIXMAP::                 
+* XMSETTITLE::                  
+* XMSET_TEXT_OUTPUT::           
+* XMSIZE::                      
+* XMTEXT::                      
+* XMTEXTAPPEND::                
+* XMTEXTBOX::                   
+* XMTEXTERASE::                 
+* XMTEXTFIELD::                 
+* XMTEXTFIELDARRAY::            
+* XMTEXTFIELDGETSTRING::        
+* XMTEXTFIELDSETEDITABLE::      
+* XMTEXTFIELDSETMAXLENGTH::     
+* XMTEXTFIELDSETSTRING::        
+* XMTEXTFROMFILE::              
+* XMTEXTGETINSERTPOSITION::     
+* XMTEXTGETLASTPOSITION::       
+* XMTEXTGETSELECTION::          
+* XMTEXTGETSTRING::             
+* XMTEXTREPLACE::               
+* XMTEXTSETEDITABLE::           
+* XMTEXTSETPOSITION::           
+* XMTEXTSETROWCOLUMNSIZE::      
+* XMTEXTSETSTRING::             
+* XMTOGGLEGETSTATE::            
+* XMTOGGLESETSTATE::            
+* XMTOPLEVEL_BOARD::            Top level bulletin board widget
+* XMTOPLEVEL_FORM::             Top level form widget
+* XMTOPSHADOWCOLOR::            Set a widget's top shadow color
+* XMVSCALE::                    
+* XMVSCROLLBAR::                
+* XOPEN::                       Open the X connection
+* XOR::                         Exclusive or
+* XPLACE::                      User-selected position
+* XPORT::                       Create or rescale a window
+* XPURGE::                      Purge the X event queue
+* XQUERY::                      Determine the status of the pointer
+* XREGISTER::                   Register event types for capture
+* XSETACTION::                  Select copy type
+* XTLOOP::                      
+* XTMANAGE::                    
+* XTPARENT::                    
+* XTPOPDOWN::                   
+* XTPOPUP::                     
+* XTUNMANAGE::                  
+* XTV::                         Display an image
+* XTVREAD::                     Read an image into an array
+* XTWINDOW::                    
+* XWIN::                        Create or rescale a window
+* XWINDOW::                     Create or rescale a window
+* XYMOV::                       Draw a line
+* ZAP::                         Completely remove a variable
+* ZERO::                        Zero a variable
+* ZEROIFNOTDEFINED::            
+* ZERONANS::                    Remove NaN values
+* ZINV::                        Zero-protected inverse
+* ZOOM::                        Image inspection using the pointer
+* Square Brackets::             Concatenation into an array             
+* Curly Braces::                Concatenation into a list
+
+CALENDAR
+
+* General Calendar Details::    
+* Common Calendar::             
+* Julian Calendar::             
+* Gregorian Calendar::          
+* Islamic Calendar::            
+* Hebrew Calendar::             
+* Julian Day Numbers::          
+* Egyptian Calendar::           
+* Mayan Tikal Calendar::        
+* Mayan Long Count::            
+* Lunar Calendar::              
+* Latin Calendar::              
+* Time Scales::                 
+
+CTOP
+
+* CTOP Details::                
+
+FFT
+
+* FFT Details::                 
+
+HILBERT
+
+* HILBERT Details::             
+
+ORIENTATION
+
+* ORIENTATION details::         
+
+PLOT
+
+* Plot Styles::                 
+* PLOT Globals::                
+
+REGRID
+
+* REGRID Details::              
+
+SC
+
+* SC Details::                  
+
+SCB
+
+* SCB Details::                 
+
+@end detailmenu
 @end menu
 
 @c ------------------------------------------------------------------
@@ -6577,6 +7879,55 @@ To transform a date to TAI seconds.
 See also: @ref{CALENDAR}
 
 @c ------------------------------------------------------------------
+@menu
+* Astronomical Coordinate Calculations::  
+@end menu
+
+@node Astronomical Coordinate Calculations,  , Astronomy and Calendars, Astronomy and Calendars
+@comment  node-name,  next,  previous,  up
+@subsection Astronomical Coordinate Calculations
+
+The frame bias matrix @code{@var{rb}} transforms vectors from Geocentric
+Celestial Reference System to the J2000.0 mean equator and equinox by
+applying frame bias.  It does not depend on the date.
+
+The precession matrix @code{@var{rp}} transforms vectors from the J2000.0
+mean equator and equinox to the mean equator and equinox of the date
+by applying precession.
+
+The bias-precession matrix @code{@var{rbp}} transforms vectors from
+Geocentric Celestial Reference System to the mean equator and equinox
+of the date by applying frame bias and then precession.
+@code{@var{rbp} = @var{rp} # @var{rb}}
+
+The bias-precession-nutation matrix @code{@var{rbpn}}...
+
+The Celestial Intermediate Pole coordinates @code{@var{x}},
+@code{@var{y}} are components of the Celestial Intermediate Pole unit
+vector in the Geocentric Celestial Reference System.
+
+The Celestial Intermediate Origin locator @code{@var{s}} positions the
+Celestial Intermediate Origin on the equator of the Celestial
+Intermediate Pole.
+
+Given celestial coordinates @code{@var{crs}} (in the Geocentric
+Celestial Reference System), the
+celestial-to-intermediate-frame-of-date matrix @code{@var{rc2i}}, the
+polar motion matrix @code{@var{rpom}}, and Earth Rotation Angle
+@code{@var{era}}, the terrestrial coordinates @code{@var{trs}} (in the
+International Terrestrial Reference System) are found through
+
+@code{@var{trs} = @var{rpom} # R_3(@var{era}) # @var{rc2i} # @var{crs}}
+
+The celestial-to-terrestrial matrix @code{@var{rc2t}} translates
+coordinate from the Geocentric Celestial Reference System to the
+International Terrestrial Reference System:
+
+@code{@var{trs} = @var{rc2t} # @var{crs}}
+
+@code{@var{rc2t} = @var{rpom} # R_3(@var{era}) # @var{rc2i}}
+
+@c ------------------------------------------------------------------
 @node Binary Operators, Color, Astronomy and Calendars, Routine Groups
 @comment  node-name,  next,  previous,  up
 @section Binary Operators
@@ -6716,7 +8067,6 @@ information.
 @c ------------------------------------------------------------------
 @menu
 * Data-Compressed I/O::         Input/output of compressed data
-* Array Data Compression::      How to compress arrays
 @end menu
 
 @node Data-Compressed I/O,  , Data Compression, Data Compression
@@ -6860,7 +8210,7 @@ To convert the letters in a string to upper case.
 @end table
 
 @c ------------------------------------------------------------------
-@node Number Conversion
+@node Number Conversion,  , String Conversion, Data Conversion
 @comment  node-name,  next,  previous,  up
 @subsection Number Conversion
 
@@ -7144,8 +8494,6 @@ Sets a file pointer to the beginning of the file.
 * Opening/Closing Files::       How to open or close a file
 * Uncompressed Disk Output::    Uncompressed output to a disk file
 * Uncompressed Disk Input::     Uncompressed input from a disk file
-* Data-Compressed I/O::         Compressed input/output with a disk file
-* File Array Creation::         Addressing disk files as arrays
 @end menu
 
 @node Opening/Closing Files, Uncompressed Disk Output, Disk I/O, Disk I/O
@@ -9361,9 +10709,7 @@ functions.
 * !IORDER::                     TV coordinate swap order
 * !ITMAX::                      
 * !IX::                         Last selected DEV x coordinate in window
-* !IXHIGH::                     Maximum DEV x coordinate in last window
 * !IY::                         Last selected DEV y coordinate in window
-* !IYHIGH::                     Maximum DEV y coordinate
 * !KB::                         
 * !KEYCODE::                    Code of pressed physical key
 * !KEYSTATE::                   State of modifier keys
@@ -9462,7 +10808,7 @@ functions.
 @end menu
 
 @c ---------------------------------------
-@node !AUTOCON, !BADMATCH, , Read-Write Global Vars
+@node !AUTOCON, !BADMATCH, Read-Write Global Vars, Read-Write Global Vars
 @subsection !AUTOCON
 
 A @code{LONG} variable that determines how countour levels are
@@ -11386,6 +12732,56 @@ arguments.
 * HILBERT::                     Hilbert transform
 * HIST::                        Histogram
 * HISTR::                       Normalized histogram
+* IAUBI00::                     
+* IAUBP00::                     
+* IAUBP06::                     
+* IAUBPN2XY::                   
+* IAUC2I00A::                   
+* IAUC2I00B::                   
+* IAUC2I06A::                   
+* IAUC2IBPN::                   
+* IAUC2IXY::                    
+* IAUC2IXYS::                   
+* IAUC2S::                      
+* IAUC2T00A::                   
+* IAUC2T00B::                   
+* IAUC2T06A::                   
+* IAUC2TCIO::                   
+* IAUC2TEQX::                   
+* IAUC2TPE::                    
+* IAUC2TXY::                    
+* IAUCAL2JD::                   
+* IAUDAT::                      
+* IAUDTDB::                     
+* IAUEE00::                     
+* IAUEE00A::                    
+* IAUEE00B::                    
+* IAUEECT00::                   
+* IAUEFORM::                    
+* IAUEO06A::                    
+* IAUEORS::                     
+* IAUEPB::                      
+* IAUEPB2JD::                   
+* IAUEPJ::                      
+* IAUEPJ2JD::                   
+* IAUEPV00::                    
+* IAUEQEQ94::                   
+* IAUERA00::                    
+* IAUFAD03::                    
+* IAUFAE03::                    
+* IAUFAF03::                    
+* IAUFAJU03::                   
+* IAUFAL03::                    
+* IAUFALP03::                   
+* IAUFAMA03::                   
+* IAUFAME03::                   
+* IAUFANE03::                   
+* IAUFAOM03::                   
+* IAUFAPA03::                   
+* IAUFASA03::                   
+* IAUFAUR03::                   
+* IAUFAVE03::                   
+* IAUJD2CAL::                   
 * IBETA::                       Incomplete beta function
 * IDLREAD::                     Read one variable from an IDL Save file
 * IDLRESTORE::                  Read all variables from an IDL Save file
@@ -13831,31 +15227,31 @@ The classic-style commands are:
   font change to the specified font.  The fonts are: @code{1}-@code{4}:
   roman sans serif, @code{5}: roman bold sans serif, @code{6}: roman
   bold, @code{7}: greek, @code{8}: italic, @code{9}: symbols.
-@item A, a  
+@item A a  
   move up, but keep same size.
-@item E, e  
+@item E e  
   move up, scale size by factor 0.7.  (exponent)
-@item I, i  
+@item I i  
   move down, scale size by factor 0.7. (index)
-@item B, b  
+@item B b  
   move down, keep same size
-@item N, n  
+@item N n  
   negate combined action of previous @code{A}, @code{E}, @code{I}, and
   @code{B}. 
 @item $ > < 
   draw $, >, or <
-@item S, s  
+@item S s  
   save current position
-@item R, r  
+@item R r  
   restore saved position
-@item X, x  
+@item X x  
   restore entry font
-@item C, c  
+@item C c  
   change size to number that follows
 @item * .   
   draw a star or a bullet
 @end table
-@item x, y
+@item x y
 The target coordinates of the lower left-hand point of the text, in the
 coordinate system determined by the specified keyword.  By default, the
 coordinates are taken to be in pixels (@code{DEV}) when they are larger
@@ -14530,7 +15926,7 @@ The image of which a contour plot is desired.
 The data value levels at which contours are to be drawn (if an array),
 or the desired number of contour levels (if a scalar).  Defaults to
 @code{!CONTOUR_NLEV}. 
-@item xmin, xmax, ymin, ymax
+@item xmin xmax ymin ymax
 The coordinate limits of the part of @code{@var{image}} that is to be shown.
 @item style
 The line style used in drawing the contours.  Defaults to
@@ -16610,7 +18006,7 @@ The fit parameters that are tried depend on @code{@var{start}},
 @code{@var{step}}, @code{@var{lowbound}}, and @code{@var{hibound}}.
 
 @table @var
-@item x, y
+@item x y
 The data points to be fitted to.
 @item niter
 In each iteration cycle, @code{@var{niter}} different parameter sets are
@@ -17538,10 +18934,10 @@ Determines and returns displacement of one image compared to another.
 is image under investigation.
 @item image0
 is the reference image.
-@item grid_x, grid_y
+@item grid_x grid_y
 are the coordinates of the grid of (centers of) subimages for which
 displacements are returned. 
-@item window_x, window_y
+@item window_x window_y
 are the dimensions of the subimages.
 @item gausswidth
 is the width of the gaussian window applied to the subimages to reduces
@@ -17681,7 +19077,7 @@ See also: @ref{FFT}, @ref{SC}, @ref{SCB}
 [2.12.304]
 
 @menu
-* HILBERT Details::                 
+* HILBERT Details::             
 @end menu
 @c -------------------------------------
 @node HILBERT Details,  , HILBERT, HILBERT
@@ -17728,7 +19124,7 @@ See also: @ref{HISTR}, @ref{DISTR}, @ref{!HISTMIN}, @ref{!HISTMAX},
 
 [3.2.7]
 @c -------------------------------------
-@node HISTR, IAUCAL2JD, HIST, Internal Routines
+@node HISTR, IAUBI00, HIST, Internal Routines
 @subsection HISTR
 
 @code{HISTR(@var{x} [, /FIRST, /SILENT])}
@@ -17750,25 +19146,7 @@ See also: @ref{HIST}
 
 [3.2.7]
 @c -------------------------------------
-@node IAUCAL2JD, IAUCAL2JD, HISTR, Internal Routines
-@comment  node-name,  next,  previous,  up
-@subsection IAUCAL2JD
-
-@code{IAUCAL2JD(@var{date})}
-
-[SOFA] Returns the Chronological Julian Day Numbers corresponding to
-the specified Gregorian calendar dates @code{@var{date}}, which must
-have a multiple of 3 elements in its first dimension (for year, month,
-day).  The result has the same type as @code{@var{date}} but is not
-less than @code{LONG}, and has the same dimensions as
-@code{@var{date}} except that the first dimension is missing.
-Unexpected results may be given if illegal year, month, or day numbers
-are specified.  Dates before -4799-01-01 yield zero.  Dates after
-1465073-02-28 yield nonzero but erroneous results (at least on systems
-with 32-bit ints).
-
-@c -------------------------------------
-@node IAUBI00, IAUCAL2JD, IAUCAL2JD, Internal Routines
+@node IAUBI00, IAUBP00, HISTR, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUBI00
 
@@ -17777,13 +19155,645 @@ with 32-bit ints).
 [SOFA] Returns the frame bias components of the IAU 2000
 precession-nutation models (part of MHB2000 with additions), in a
 3-element @code{DOUBLE} array.  The elements are: (0) the longitude
-correction, (1) the obliquity correction, (2) the ICRS RA of the
-J2000.0 mean equinox.
+correction in radians, (1) the obliquity correction in radians, (2)
+the ICRS right ascension of the J2000.0 mean equinox in radians.
+
+The frame bias corrections in longitude and obliquity define a J2000.0
+mean pole in Geocentric Celestial Reference System coordinates,
+consistent with the rest of the IAU 2000A precession-nutation model.
+The right ascension correction is not part of the IAU 2000A model but
+is due to Chapront et al. (2002) Astron. Astrophys., 387, 700.
+
+See also: @ref{IAUBP00}, @ref{IAUBP06}
 
 @c -------------------------------------
-@node IAUCAL2JD, IBETA, IAUBI00, Internal Routines
+@node IAUBP00, IAUBP06, IAUBI00, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUBP00
+
+@code{IAUBP00, @var{jdtt}, @var{rb}, @var{rp}, @var{rbp}}
+
+[SOFA] Returns the frame bias and precession for TT Julian Dates
+@code{@var{jdtt}} according to the IAU 2000 precession-nutation model.
+@code{@var{rb}} receives the frame bias matrix, @code{@var{rp}} the
+precession matrix, and @code{@var{rbp}} the bias-precession matrix.
+
+@code{@var{jdtt}} may be a numerical scalar or array.
+
+@code{@var{rb}} has dimensions 3, 3.  @code{@var{rp}} and
+@code{@var{rbp}} have dimensions 3, 3, prefixed to those from
+@code{@var{jdtt}}.
+
+See also: @ref{IAUBI00}, @ref{IAUBP06}, @ref{Astronomical Coordinate Calculations}
+
+@c -------------------------------------
+@node IAUBP06, IAUBPN2XY, IAUBP00, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUBP06
+
+@code{IAUBP06, @var{jdtt}, @var{rb}, @var{rp}, @var{rbp}}
+
+[SOFA] Returns the frame bias and precession for TT Julian Dates
+@code{@var{jd}} according to the IAU 2006 precession-nutation model.
+@code{@var{rb}} receives the frame bias matrix, @code{@var{rp}} the
+precession matrix, and @code{@var{rbp}} the bias-precession matrix.
+
+@code{@var{jdtt}} may be a numerical scalar or array.
+
+@code{@var{rb}} has dimensions 3, 3.  @code{@var{rp}} and
+@code{@var{rbp}} have dimensions 3, 3, prefixed to those from
+@code{@var{jdtt}}.
+
+See also: @ref{IAUBI00}, @ref{IAUBP00}, @ref{Astronomical Coordinate Calculations}
+
+@c -------------------------------------
+@node IAUBPN2XY, IAUC2I00A, IAUBP06, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUBPN2XY
+
+@code{IAUBPN2XY, @var{rbpn}, @var{x}, @var{y}}
+
+[SOFA] Extracts the dimensionless @code{@var{x}} and @code{@var{y}}
+coordinates of the Celestial Intermediate Pole from the
+bias-precession-nutation matrix @code{@var{rbpn}}.
+
+@c -------------------------------------
+@node IAUC2I00A, IAUC2I00B, IAUBPN2XY, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUC2I00A
+
+@code{IAUC2I00A(@var{jdtt})}
+
+[SOFA] Returns the celestial-to-intermediate matrix for TT Julian
+Dates @code{@var{jdtt}} according to the IAU 2000A precession-nutation
+model.  @code{@var{jdtt}} may be a numerical scalar or array.  The
+return value has dimensions 3, 3 prefixed to the dimensions from
+@code{@var{jdtt}}.
+
+@code{IAUC2I00B} returns slightly less accurate results (about 1 mas)
+but faster.
+
+See also: @ref{IAUC2I00B}, @ref{IAUC2I06A}, @ref{Astronomical Coordinate Calculations}
+
+@c -------------------------------------
+@node IAUC2I00B, IAUC2I06A, IAUC2I00A, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUC2I00B
+
+@code{IAUC2I00B(@var{jdtt})}
+
+[SOFA] Returns the celestial-to-intermediate matrix for TT Julian
+Dates @code{@var{jdtt}} according to the IAU 2000B precession-nutation
+model.  @code{@var{jdtt}} may be a numerical scalar or array.
+
+The return value has dimensions 3, 3 prefixed to the dimensions from
+@code{@var{jdtt}}.
+
+@code{IAUC2I00A} returns slightly more accurate results but takes more
+time to calculate them.
+
+See also: @ref{IAUC2I00A}, @ref{IAUC2I06A}, @ref{IAUC2IBPN}, @ref{Astronomical Coordinate Calculations}
+
+@c -------------------------------------
+@node IAUC2I06A, IAUC2IBPN, IAUC2I00B, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUC2I06A
+
+@code{IAUC2I06A(@var{jdtt})}
+
+[SOFA] Returns the celestial-to-intermediate matrix for TT Julian
+Dates @code{@var{jdtt}} according to the IAU 2006 precession model and
+the IAU 2000A nutation model.  @code{@var{jdtt}} may be a numerical
+scalar or array.
+
+The return value has dimensions 3, 3 prefixed to the dimensions from
+@code{@var{jdtt}}.
+
+See also: @ref{IAUC2I00A}, @ref{IAUC2I00B}, @ref{IAUC2IBPN}, @ref{Astronomical Coordinate Calculations}
+
+@c -------------------------------------
+@node IAUC2IBPN, IAUC2IXY, IAUC2I06A, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUC2IBPN
+
+@code{IAUC2IBPN(@var{jdtt}, @var{rbpn})}
+
+[SOFA] Forms the celestial-to-intermediate matrix for TT Julian Dates
+@code{@var{jd}}, given the bias-precession-nutation matrix
+@code{@var{rbpn}} for those same dates.  @code{@var{jdtt}} may be a
+numerical scalar or array.
+
+See also @ref{IAUC2I00A}, @ref{IAUC2I00B}, @ref{IAUC2I06A}, @ref{Astronomical Coordinate Calculations}
+
+@c -------------------------------------
+@node IAUC2IXY, IAUC2IXYS, IAUC2IBPN, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUC2IXY
+
+@code{IAUC2IXY(@var{jdtt}, @var{x}, @var{y})}
+
+[SOFA] Returns the celestial-to-intermediate-frame-of-date matrix for
+TT Julian Dates @code{@var{jdtt}} and Celestial Intermediate Pole
+coordinates @code{@var{x}} and @code{@var{y}} (components of the unit
+vector in the Geocentric Celestial Reference System), for IAU 2000
+models.  @code{@var{jdtt}} may be a numerical scalar or array.
+
+See also: @ref{IAUC2IXYS}, @ref{Astronomical Coordinate Calculations}
+
+@c -------------------------------------
+@node IAUC2IXYS, IAUC2S, IAUC2IXY, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUC2IXYS
+
+@code{IAUC2IXYS(@var{x}, @var{y}, @var{s})}
+
+[SOFA] Returns the celestial-to-intermediate-frame-of-date matrix for
+Celestial Intermediate Pole coordinates @code{@var{x}} and
+@code{@var{y}} (components of the unit vector in the Geocentric
+Celestial Reference System) and Celestial Intermediate Origin locator
+@code{@var{s}} (in radians), which positions the Celestial
+Intermediate Origin on the equator of the Celestial Intermediate Pole.
+
+See also: @ref{IAUC2IXY}, @ref{Astronomical Coordinate Calculations}
+
+@c -------------------------------------
+@node IAUC2S, IAUC2T00A, IAUC2IXYS, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUC2S
+
+@code{IAUC2S(@var{coords})}
+
+[SOFA] Returns spherical angular coordinates (longitude and latitude,
+in radians) corresponding to the given cartesian coordinates
+@code{@var{coords}} (x, y, z).
+
+@c -------------------------------------
+@node IAUC2T00A, IAUC2T00B, IAUC2S, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUC2T00A
+
+@code{IAUC2T00A(@var{jdtt}, @var{x}, @var{y})}
+
+[SOFA] Returns the celestial-to-terrestrial matrix for TT Julian Dates
+@code{@var{jdtt}} given polar coordinates @code{@var{x}},
+@code{@var{y}}, using the IAU 2000A nutation model.
+
+@code{@var{x}, @var{y}} are the coordinates (in radians) of the
+Celestial Intermediate Pole with respect to the International
+Terrestrial Reference System measured along the meridians to 0 and 90
+degrees west, respectively.
+
+See also: @ref{Astronomical Coordinate Calculations}
+
+@c -------------------------------------
+@node IAUC2T00B, IAUC2T06A, IAUC2T00A, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUC2T00B
+
+@code{IAUC2T00B(@var{jdtt}, @var{x}, @var{y})}
+
+[SOFA] Returns the celestial-to-terrestrial matrix for TT Julian Dates
+@code{@var{jdtt}} given polar coordinates @code{@var{x}},
+@code{@var{y}}, using the IAU 2000B nutation model.
+
+See also: @ref{Astronomical Coordinate Calculations}
+
+@c -------------------------------------
+@node IAUC2T06A, IAUC2TCIO, IAUC2T00B, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUC2T06A
+
+@code{IAUC2T00A(@var{jdtt}, @var{x}, @var{y})}
+
+[SOFA] Returns the celestial-to-terrestrial matrix for TT Julian Dates
+@code{@var{jd}} given polar coordinates @code{@var{x}},
+@code{@var{y}}, using the IAU 2006 precession and IAU 2000 A nutation
+models.
+
+See also: @ref{Astronomical Coordinate Calculations}
+
+@c -------------------------------------
+@node IAUC2TCIO, IAUC2TEQX, IAUC2T06A, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUC2TCIO
+
+@code{IAUC2TCIO(@var{rc2i}, @var{era}, @var{rpom})}
+
+[SOFA] Returns the celestial-to-terrestrial matrix based on the
+celestial-to-intermediate matrix @code{@var{rc2i}}, the Earth rotation
+angle @code{@var{era}} and the polar motion matrix @code{@var{rpom}}.
+
+@c -------------------------------------
+@node IAUC2TEQX, IAUC2TPE, IAUC2TCIO, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUC2TEQX
+
+@code{IAUC2TEQX(@var{rbpn}, @var{gst}, @var{rpom})}
+
+[SOFA] Returns the celestial-to-terrestrial matrix based on the
+celestial-to-true matrix @code{@var{rbpn}}, the Greenwich Apparent
+Sidereal Time angle @code{@var{gst}} and the polar motion matrix
+@code{@var{rpom}}.
+
+@c -------------------------------------
+@node IAUC2TPE, IAUC2TXY, IAUC2TEQX, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUC2TPE
+
+@code{IAUC2TPE(@var{jd}, @var{dpsi}, @var{deps}, @var{xp}, @var{yp})}
+
+[SOFA] Returns the celestial-to-terrestrial matrix given the Julian
+Date @code{@var{jd}}, the nutation @code{@var{dpsi}, @var{deps}}, and
+the polar coordinates @code{@var{xp}, @var{yp}}.
+
+@c -------------------------------------
+@node IAUC2TXY, IAUCAL2JD, IAUC2TPE, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUC2TXY
+
+@code{IAUC2TXY(@var{jd}, @var{x}, @var{y}, @var{xp}, @var{yp})}
+
+[SOFA] Returns the celestial-to-terrestrial matrix given the Julian
+Date @code{@var{jd}}, the CIP coordinates @code{@var{x}, @var{y}}, and
+the polar coordinates @code{@var{xp}, @var{yp}}.
+
+@c -------------------------------------
+@node IAUCAL2JD, IAUDAT, IAUC2TXY, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUCAL2JD
+
+@code{IAUCAL2JD(@var{date})}
+
+[SOFA] Returns the Chronological Julian Day Numbers corresponding to
+the specified Gregorian calendar dates @code{@var{date}}, which must
+have 3 elements in its first dimension (for year, month, day).  The
+result has the same type as @code{@var{date}} but is not less than
+@code{LONG}, and has the same dimensions as @code{@var{date}} except
+that the first dimension is missing.  Unexpected results may be given
+if illegal year, month, or day numbers are specified.  Dates before
+-4799-01-01 yield zero.  Dates after 1465073-02-28 yield nonzero but
+erroneous results (at least on systems with 32-bit ints).
+
+@c -------------------------------------
+@node IAUDAT, IAUDTDB, IAUCAL2JD, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUDAT
+
+@code{IAUDAT(@var{date})}
+
+[SOFA] Returns the time difference delta(AT) = TAI - UTC in seconds
+for the given UTC @code{@var{date}} (which must have common-calendar
+year, month, day in its first dimension).
+
+@c -------------------------------------
+@node IAUDTDB, IAUEE00, IAUDAT, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUDTDB
+
+@code{IAUDTDB(@var{jd}, @var{elong}, @var{u}, @var{v})}
+
+[SOFA] Returns an approximation of TDB-TT in seconds, the difference
+between barycentric dynamical time and terrestrial time, for an
+observer on the Earth. @code{@var{jd}} is the Julian Date in TDB or
+TT, @code{@var{elong}} is the east longitude in radians,
+@code{@var{u}} is the distance in km from the Earth spin axis, and
+@code{@var{v}} is the distance in km north of the equatorial plane.
+
+@c -------------------------------------
+@node IAUEE00, IAUEE00A, IAUDTDB, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUEE00
+
+@code{IAUEE00(@var{jd}, @var{epsa}, @var{dpsi})}
+
+[SOFA] Returns the equation of the equinoxes (IAU 2000) given the
+nutation in longitude @code{@var{epsa}} and the mean obliquity
+@code{@var{dpsi}}.
+
+@c -------------------------------------
+@node IAUEE00A, IAUEE00B, IAUEE00, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUEE00A
+
+@code{IAUEE00A(@var{jd})}
+
+[SOFA] Returns the equation of the equinoxes compatible with IAU 2000
+resolutions.
+
+@c -------------------------------------
+@node IAUEE00B, IAUEECT00, IAUEE00A, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUEE00B
+
+@code{IAUEE00B(@var{jd})}
+
+[SOFA] Returns the equation of the equinoxes compatible with IAU 2000
+resolutions but using the truncated nutation model IAU 2000B.
+
+@c -------------------------------------
+@node IAUEECT00, IAUEFORM, IAUEE00B, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUEECT00
+
+@code{IAUEECT00(@var{jd})}
+
+[SOFA] Returns the equation of the equinoxes complementary term,
+consistent with IAU 2000 resolutions.
+
+@c -------------------------------------
+@node IAUEFORM, IAUEO06A, IAUEECT00, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUEFORM
+
+@code{IAUEFORM(@var{ellid})}
+
+[SOFA] Returns the equatorial radius (in meters) and flattening of the
+Earth reference ellipsoid identified by @code{@var{ellid}}: 1 = WGS84,
+2 = GRS80, 3 = WGS72.  Unsupported ellipsoid identifiers yield radius
+and flattening equal to 0. 
+
+@c -------------------------------------
+@node IAUEO06A, IAUEORS, IAUEFORM, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUEO06A
+
+@code{IAUEO06A(@var{jd})}
+
+[SOFA] Returns the equation of the origins, using the IAU 2006
+precession and IAU 2000A nutation models.
+
+@c -------------------------------------
+@node IAUEORS, IAUEPB, IAUEO06A, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUEORS
+
+@code{IAUEORS(@var{rnpb}, @var{s})}
+
+[SOFA] Returns the equation of the origins, given the classical
+nutation-precession-bias matrix @code{@var{rnpb}} and CIO locator
+@code{@var{s}}.
+
+@c -------------------------------------
+@node IAUEPB, IAUEPB2JD, IAUEORS, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUEPB
+
+@code{IAUEPB(@var{jd})}
+
+[SOFA] Returns the Besselian epoch corresponding to Julian Date
+@code{@var{jd}}.
+
+@c -------------------------------------
+@node IAUEPB2JD, IAUEPJ, IAUEPB, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUEPB2JD
+
+@code{IAUEPB2JD(@var{bepoch})}
+
+[SOFA] Returns the Julian Date corresponding to Besselian epoch
+@code{@var{bepoch}} (e.g., 1957.3).
+
+@c -------------------------------------
+@node IAUEPJ, IAUEPJ2JD, IAUEPB2JD, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUEPJ
+
+@code{IAUEPJ(@var{jd})}
+
+[SOFA] Returns the Julian epoch corresponding to Julian Date
+@code{@var{jd}}.
+
+@c -------------------------------------
+@node IAUEPJ2JD, IAUEPV00, IAUEPJ, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUEPJ2JD
+
+@code{IAUEPJ2JD(@var{jepoch})}
+
+[SOFA] Returns the Julian Date corresponding to Julian epoch
+@code{@var{jepoch}} (e.g., 1957.3).
+
+@c -------------------------------------
+@node IAUEPV00, IAUEQEQ94, IAUEPJ2JD, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUEPV00
+
+@code{IAUEPV00, @var{jd}, @var{pvh}, @var{pvb}}
+
+[SOFA] Returns the Earth position and velocity for the specified
+Julian Dates @code{@var{jd}}, in the heliocentric (@code{@var{pvh}})
+and barycentric (@code{@var{pvb}}) coordinate systems, with respect to
+the Barycentric Celestial Reference System.  @code{@var{pvh}(0,*)} =
+heliocentric position (AU), @code{@var{pvh}(1,*)} = heliocentric
+velocity (AU/d), @code{@var{pvb}(0,*)} = barycentric position (AU),
+@code{@var{pvb}(1,*)} = barycentric velocity (AU/d).
+
+@c -------------------------------------
+@node IAUEQEQ94, IAUERA00, IAUEPV00, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUEQEQ94
+
+@code{IAUEQEQ94(@var{jd})}
+
+[SOFA] Returns the equation of the equinoxes for the given Julian Date
+@code{@var{jd}}, according to the IAU 1994 model.
+
+@c -------------------------------------
+@node IAUERA00, IAUFAD03, IAUEQEQ94, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUERA00
+
+@code{IAUERA00(@var{jd})}
+
+[SOFA] Returns the Earth rotation angle for the given Julian Date
+@code{@var{jd}}, according to the IAU 2000 model.
+
+@c -------------------------------------
+@node IAUFAD03, IAUFAE03, IAUERA00, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUFAD03
+
+@code{IAUFAD03(@var{jd})}
+
+[SOFA] Returns the mean elongation of the Moon from the Sun, a
+fundamental argument according to the IERS conventions of 2003, as a
+function of the number @code{@var{t}} of Julian centuries since
+J2000.0 TDB.  It makes no practical difference if @code{@var{t}} is
+measured since J2000.0 TT instead.
+
+@c -------------------------------------
+@node IAUFAE03, IAUFAF03, IAUFAD03, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUFAE03
+
+@code{IAUFAE03(@var{jd})}
+
+[SOFA] Returns the mean longitude of the Earth, a fundamental argument
+according to the IERS conventions of 2003, as a function of the number
+@code{@var{t}} of Julian centuries since J2000.0 TDB.  It makes no
+practical difference if @code{@var{t}} is measured since J2000.0 TT
+instead.
+
+@c -------------------------------------
+@node IAUFAF03, IAUFAJU03, IAUFAE03, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUFAF03
+
+@code{IAUFAF03(@var{jd})}
+
+[SOFA] Returns the mean longitude of the Moon minus the mean longitude
+of the ascending node, a fundamental argument according to the IERS
+conventions of 2003, as a function of the number @code{@var{t}} of
+Julian centuries since J2000.0 TDB.  It makes no practical difference
+if @code{@var{t}} is measured since J2000.0 TT instead.
+
+@c -------------------------------------
+@node IAUFAJU03, IAUFAL03, IAUFAF03, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUFAJU03
+
+@code{IAUFAJU03(@var{jd})}
+
+[SOFA] Returns the mean longitude of Jupiter, a fundamental argument
+according to the IERS conventions of 2003, as a function of the number
+@code{@var{t}} of Julian centuries since J2000.0 TDB.  It makes no
+practical difference if @code{@var{t}} is measured since J2000.0 TT
+instead.
+
+@c -------------------------------------
+@node IAUFAL03, IAUFALP03, IAUFAJU03, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUFAL03
+
+@code{IAUFAL03(@var{jd})}
+
+[SOFA] Returns the mean anomaly of the Moon, a fundamental argument
+according to the IERS conventions of 2003, as a function of the number
+@code{@var{t}} of Julian centuries since J2000.0 TDB.  It makes no
+practical difference if @code{@var{t}} is measured since J2000.0 TT
+instead.
+
+@c -------------------------------------
+@node IAUFALP03, IAUFAMA03, IAUFAL03, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUFALP03
+
+@code{IAUFALP03(@var{jd})}
+
+[SOFA] Returns the mean anomaly of the Sun, a fundamental argument
+according to the IERS conventions of 2003, as a function of the number
+@code{@var{t}} of Julian centuries since J2000.0 TDB.  It makes no
+practical difference if @code{@var{t}} is measured since J2000.0 TT
+instead.
+
+@c -------------------------------------
+@node IAUFAMA03, IAUFAME03, IAUFALP03, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUFAMA03
+
+@code{IAUFAMA03(@var{jd})}
+
+[SOFA] Returns the mean longitude of Mars, a fundamental argument
+according to the IERS conventions of 2003, as a function of the number
+@code{@var{t}} of Julian centuries since J2000.0 TDB.  It makes no
+practical difference if @code{@var{t}} is measured since J2000.0 TT
+instead.
+
+@c -------------------------------------
+@node IAUFAME03, IAUFANE03, IAUFAMA03, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUFAME03
+
+@code{IAUFAME03(@var{jd})}
+
+[SOFA] Returns the mean longitude of Mercury, a fundamental argument
+according to the IERS conventions of 2003, as a function of the number
+@code{@var{t}} of Julian centuries since J2000.0 TDB.  It makes no
+practical difference if @code{@var{t}} is measured since J2000.0 TT
+instead.
+
+@c -------------------------------------
+@node IAUFANE03, IAUFAOM03, IAUFAME03, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUFANE03
+
+@code{IAUFANE03(@var{jd})}
+
+[SOFA] Returns the mean longitude of Neptune, a fundamental argument
+according to the IERS conventions of 2003, as a function of the number
+@code{@var{t}} of Julian centuries since J2000.0 TDB.  It makes no
+practical difference if @code{@var{t}} is measured since J2000.0 TT
+instead.
+
+@c -------------------------------------
+@node IAUFAOM03, IAUFAPA03, IAUFANE03, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUFAOM03
+
+@code{IAUFAOM03(@var{jd})}
+
+[SOFA] Returns the mean longitude of the Moon's ascending node, a
+fundamental argument according to the IERS conventions of 2003, as a
+function of the number @code{@var{t}} of Julian centuries since
+J2000.0 TDB.  It makes no practical difference if @code{@var{t}} is
+measured since J2000.0 TT instead.
+
+@c -------------------------------------
+@node IAUFAPA03, IAUFASA03, IAUFAOM03, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUFAPA03
+
+@code{IAUFAPA03(@var{jd})}
+
+[SOFA] Returns the general accumulated precession in longitude, a
+fundamental argument according to the IERS conventions of 2003, as a
+function of the number @code{@var{t}} of Julian centuries since
+J2000.0 TDB.  It makes no practical difference if @code{@var{t}} is
+measured since J2000.0 TT instead.
+
+@c -------------------------------------
+@node IAUFASA03, IAUFAUR03, IAUFAPA03, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUFASA03
+
+@code{IAUFASA03(@var{jd})}
+
+[SOFA] Returns the mean longitude of Saturn, a fundamental argument
+according to the IERS conventions of 2003, as a function of the number
+@code{@var{t}} of Julian centuries since J2000.0 TDB.  It makes no
+practical difference if @code{@var{t}} is measured since J2000.0 TT
+instead.
+
+@c -------------------------------------
+@node IAUFAUR03, IAUFAVE03, IAUFASA03, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUFAUR03
+
+@code{IAUFAUR03(@var{jd})}
+
+[SOFA] Returns the mean longitude of Uranus, a fundamental argument
+according to the IERS conventions of 2003, as a function of the number
+@code{@var{t}} of Julian centuries since J2000.0 TDB.  It makes no
+practical difference if @code{@var{t}} is measured since J2000.0 TT
+instead.
+
+@c -------------------------------------
+@node IAUFAVE03, IAUJD2CAL, IAUFAUR03, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUFAVE03
+
+@code{IAUFAVE03(@var{jd})}
+
+[SOFA] Returns the mean longitude of Venus, a fundamental argument
+according to the IERS conventions of 2003, as a function of the number
+@code{@var{t}} of Julian centuries since J2000.0 TDB.  It makes no
+practical difference if @code{@var{t}} is measured since J2000.0 TT
+instead.
+
+@c -------------------------------------
+@node IAUJD2CAL, IBETA, IAUFAVE03, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUJD2CAL
 
 @code{IAUJD2CAL(@var{jd})}
 
@@ -17799,7 +19809,7 @@ after 1e9 yield zeros for the year, month, and day.  CJDNs between
 on systems with 32-bit ints.
 
 @c -------------------------------------
-@node IBETA, IDLREAD, IAUCAL2JD, Internal Routines
+@node IBETA, IDLREAD, IAUJD2CAL, Internal Routines
 @subsection IBETA
 
 @code{IBETA(@var{x}, @var{a}, @var{b} [, /COMPLEMENT])}
@@ -19684,13 +21694,13 @@ YFMT=@var{yfmt}] [, /DEV, /DVI, /IMG, /PLT, /RIM, /RPL]
 Produces a plot of @code{@var{ydata}} versus @code{@var{xdata}}.
 
 @table @var
-@item xdata, ydata
+@item xdata ydata
 The x and y coordinates of the data points; they must be arrays.  If
 @code{@var{xdata}} is not specified, then
 @code{INDGEN(@code{@var{ydata}})} is assumed.  If @code{@var{x}} and
 @code{@var{y}} have unequal numbers of elements, then the smallest
 number between the two is used, and excess elements are ignored.
-@item xerrors, yerrors
+@item xerrors yerrors
 If @code{@var{xerrors}} is specified, then horizontal error bars are
 drawn on all points that have non-zero errors.  Likewise,
 @code{@var{yerrors}} yields vertical error bars.  These arguments must
@@ -19708,12 +21718,12 @@ points are indicated.  See below.
 @item line
 The number of the line style with which the data points are connected.
 See below.
-@item xbarsize, ybarsize
+@item xbarsize ybarsize
 Specify the vertical size of horizontal error bars and the horizontal
 size of vertical error bars, respectively.  The values are copied into
 @code{!PLXERRB} and @code{!PLYERRB} and remain in effect until they are
 changed again.
-@item xtitle, ytitle
+@item xtitle ytitle
 The labels for the x and y axes (strings).  All strings that
 @code{CALLIG} accepts are legal.
 @item title
@@ -19724,7 +21734,7 @@ The indices of the data points at which the plotted curve is broken,
 i.e. no connecting line is drawn to the next data point.
 @item dashsize
 scales the size of the dashes in non-solid lines.
-@item xfmt, yfmt
+@item xfmt yfmt
 specifies the output format for the labels along the horizontal and
 vertical axes, respectively (@ref{Formatted Input/Output}).  These
 formats default to @code{%1g}. 
@@ -20765,10 +22775,10 @@ Uses nearest-neighbor interpolation.
 @table @var
 @item x
 the two-dimensional image to be remapped.
-@item xgrid, ygrid
+@item xgrid ygrid
 the remapping cell grid: the coordinates of the corners of the remapped
 image in the coordinate system of the old image.  Must be 2D arrays.
-@item sx, sy
+@item sx sy
 The interpolation grid dimensions within each grid cell.  Must be scalars.
 @end table
 
@@ -20884,10 +22894,10 @@ image.  Uses bicubic interpolation.
 @table @var
 @item x
 the two-dimensional image to be remapped.
-@item xgrid, ygrid
+@item xgrid ygrid
 the remapping grid: the coordinates of the corners of the remapped image
 in the coordinate system of the old image.  Must be 2D arrays.
-@item dx, dy
+@item dx dy
 the scaling factor of the grid cells.  Must be scalars.
 @end table
 
@@ -20918,10 +22928,10 @@ to the original image.  Uses bicubic interpolation.
 @table @var
 @item x
 the two-dimensional image to be remapped.
-@item xgrid, ygrid
+@item xgrid ygrid
 the coordinates of the corners of the remapped image in the coordinate
 system of the old image.  Must be 2D arrays.
-@item dx, dy
+@item dx dy
 the dimensions of the resulting image.  Must be scalars.
 @end table
 
@@ -21218,7 +23228,7 @@ See also: @ref{POWER}, @ref{FFT}, @ref{HILBERT}
 [2.12.301]
 
 @menu
-* SC Details::                 
+* SC Details::                  
 @end menu
 @c -------------------------------------
 @node SC Details,  , SC, SC

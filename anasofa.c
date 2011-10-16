@@ -4,109 +4,47 @@
 
 /* This file provides ANA bindings for SOFA routines */
 
-/* NOT INCLUDED:
+/* NOT INCLUDED, because suitable ANA equivalents are already available:
 
-   iauA2af - decompose radians into degrees, arcminutes, arcseconds, fraction
-   iauA2tf - decompose radians into hours, minutes, seconds, fraction
-   iauAf2a - convert degrees, arcminutes, arcseconds to radians
-   iauAnp  - normalize angle into the range 0 <= a < 2pi
-   iauAnpm - normalize angle into the range -pi <= a < +pi
+   iauA2af   - decompose radians into degrees, arcminutes, arcseconds, fraction
+   iauA2tf   - decompose radians into hours, minutes, seconds, fraction
+   iauAf2a   - convert degrees, arcminutes, arcseconds to radians
+   iauAnp    - normalize angle into the range 0 <= a < 2pi
+   iauAnpm   - normalize angle into the range -pi <= a < +pi
+   iauCp     - copy a p-vector
+   iauCpv    - copy a position/velocity vector
+   iauCr     - copy an r-matrix
+   iauD2dtf  - decompose a (UTC) JD into a Gregorian date
+   iauD2tf   - decompose days to hours, minutes, seconds, fraction
+   iauDtf2d  - compose a (UTC) JD from a Gregorian date
+   iauJdcalf - Julian Date to formatted Gregorian Calendar
+   iauP2pv   - extend a p-vector to a pv-vector by appending zero velocity
+   iauPmp    - subtract two p-vectors
+   iauPpp    - add two p-vectors
+   iauPpsp   - add a p-vector and a scaled p-vector
+   iauPv2p   - discard velocity component of a pv-vector
+   iauPvmpv  - subtract two pv-vectors
+   iauPvppv  - add two pv-vectors
+   iauPvu    - update a pv-vector
+   iauPvup   - update a pv-vector, discarding the velocity component
+   iauRxp    - multiply a p-vector by an r-matrix
+   iauRxr    - multiply two r-matrices
+   iauS2xpv  - multiply a pv-vector by two scalars
+   iauSxp    - multiply a p-vector by a scalar
+   iauSxpv   - multiply a pv-matrix by a scalar
+   iauTf2a   - convert hours, minutes, seconds to radians
+   iauTf2d   - convert hours, minutes, seconds to days
+   iauZp     - zero a p-vector
+   iauZpv    - zero a pv-vector
+   iauZr     - initialize an r-matrix to the null matrix
  */
 
-/*-----------------------------------------------------------------------*/
 /* IAUBI00() returns the frame bias components of the IAU 2000
    precession-nutation models (part of MHB2000 with additions), in a
    3-element DOUBLE array.  The elements are: (0) the longitude
    correction, (1) the obliquity correction, (2) the ICRS RA of the
    J2000.0 mean equinox. */
-int ana_iauBi00(int narg, int ps[])
-{
-  /* iauBi00(double *dpsibi, double *depsbi, double *dra) */
-  int result;
-  int dim = 3;
-  double *tgt;
-
-  result = array_scratch(ANA_DOUBLE, 1, &dim);
-  tgt = array_data(result);
-  iauBi00(&tgt[0], &tgt[1], &tgt[2]);
-  return result;
-}
-/*-----------------------------------------------------------------------*/
-int ana_iauJD_333(int narg, int ps[], void (*f)(double, double, double (*)[3], double (*)[3], double (*)[3]))
-{
-  int nelem, dorb, dorp, dorbp, iq;
-  pointer jd;
-  double *rbtgt, *rptgt, *rbptgt;
-  double rb[3][3], rp[3][3], rbp[3][3];
-
-  iq = ps[0];
-  if (symbol_type(iq) < ANA_FLOAT)
-    iq = ana_float(1, &iq);
-  if (numerical(iq, NULL, NULL, &nelem, &jd) < 0)
-    return ANA_ERROR;
-  dorb = (narg > 1 && ps[1]);
-  dorp = (narg > 2 && ps[2]);
-  dorbp = (narg > 3 && ps[3]);
-  if (!dorb && !dorp && !dorbp)
-    return anaerror("Nothing to do", ps[0]);
-  {
-    int extradims[2] = { 3, 3 };
-
-    if (dorb) {
-      if (redef_array_extra_dims(ps[1], ps[0], ANA_DOUBLE, 2, extradims) != ANA_OK)
-        return ANA_ERROR;
-      rbtgt = array_data(ps[1]);
-    }
-    if (dorp) {
-      if (redef_array_extra_dims(ps[2], ps[0], ANA_DOUBLE, 2, extradims) != ANA_OK)
-        return ANA_ERROR;
-      rptgt = array_data(ps[2]);
-    }
-    if (dorbp) {
-      if (redef_array_extra_dims(ps[3], ps[0], ANA_DOUBLE, 2, extradims) != ANA_OK)
-        return ANA_ERROR;
-      rbptgt = array_data(ps[3]);
-    }
-  }
-  /* f(double date1, double date2, double rb[3][3], double rbp[3][3]) */ 
-  switch (symbol_type(iq)) {
-  case ANA_FLOAT:
-    while (nelem--) {
-      f((double) *jd.f++, 0.0, rb, rp, rbp);
-      if (dorb) {
-        memcpy(rbtgt, rb, 9*sizeof(*rb));
-        rbtgt += 9;
-      }
-      if (dorp) {
-        memcpy(rptgt, rp, 9*sizeof(*rp));
-        rptgt += 9;
-      }
-      if (dorbp) {
-        memcpy(rbptgt, rbp, 9*sizeof(*rbp));
-        rbptgt += 9;
-      }
-    }
-    break;
-  case ANA_DOUBLE:
-    while (nelem--) {
-      f(*jd.d++, 0.0, rb, rp, rbp);
-      if (dorb) {
-        memcpy(rbtgt, rb, 9*sizeof(*rbtgt));
-        rbtgt += 9;
-      }
-      if (dorp) {
-        memcpy(rptgt, rp, 9*sizeof(*rptgt));
-        rptgt += 9;
-      }
-      if (dorbp) {
-        memcpy(rbptgt, rbp, 9*sizeof(*rbptgt));
-        rbptgt += 9;
-      }
-    }
-    break;
-  }
-  return ANA_OK;
-}
+BIND(iauBi00, oddd_combine, f, IAUBI00, 0, 0, NULL)
 /*-----------------------------------------------------------------------*/
 /* IAUBP00, jd, rb, rp, rbp
 
@@ -114,10 +52,7 @@ int ana_iauJD_333(int narg, int ps[], void (*f)(double, double, double (*)[3], d
    Julian Dates for which results are desired.  <rb> receives the
    frame bias maxtrix, <rp> the precession matrix, and <rbp> the
    bias-precession matrix. */
-int ana_iauBp00(int narg, int ps[])
-{
-  return ana_iauJD_333(narg, ps, iauBp00);
-}
+BIND(iauBp00, id0oC33c33c33, s, IAUBP00, 4, 4, NULL)
 /*-----------------------------------------------------------------------*/
 /* IAUBP06, jd, rb, rp, rbp
 
@@ -125,229 +60,51 @@ int ana_iauBp00(int narg, int ps[])
    Julian Dates for which results are desired.  <rb> receives the
    frame bias matrix, <rp> the precession matrix, and <rbp> the
    bias-precession matrix.  */
-int ana_iauBp06(int narg, int ps[])
-{
-  return ana_iauJD_333(narg, ps, iauBp06);
-}
+BIND(iauBp06, id0oC33c33c33, s, IAUBP06, 4, 4, NULL)
 /*-----------------------------------------------------------------------*/
 /* IAUBPN2XY, rbpn, x, y
 
    extracts the x,y coordinates of the Celestial Intermediate Pole
    from the bias-precesion-nutation matrix. */
-int ana_iauBpn2xy(int narg, int ps[])
-{
-  int ndim, *dims, n, iq;
-  pointer rbpn, x, y;
-  double (*r)[3];
-
-  iq = ana_double(1, &ps[0]);
-  if (numerical(iq, &dims, &ndim, NULL, &rbpn) < 0)
-    return ANA_ERROR;
-  if (ndim < 2 || dims[0] != 3 || dims[1] != 3)
-    return anaerror("The first two dimensions should have size 3", ps[0]);
-  if (redef_array(ps[1], ANA_DOUBLE, ndim - 2, &dims[2]) != ANA_OK)
-    return ANA_ERROR;
-  numerical(ps[1], NULL, NULL, &n, &x);
-  if (redef_array(ps[2], ANA_DOUBLE, ndim - 2, &dims[2]) != ANA_OK)
-    return ANA_ERROR;
-  numerical(ps[2], NULL, NULL, NULL, &y);
-  r = (double (*)[3]) rbpn.d;
-  while (n--) {
-    iauBpn2xy(r, x.d, y.d);
-    r += 3;
-    x.d++;
-    y.d++;
-  }
-  return ANA_OK;
-}
-/*-----------------------------------------------------------------------*/
-int ana_iauC2i(int narg, int ps[], void (*f)(double, double, double (*)[3]))
-{
-  int iq, nelem, *dims, ndim, tgtdims[MAX_DIMS];
-  pointer jd, tgt;
-
-  iq = ana_double(1, &ps[0]);
-  if (numerical(iq, &dims, &ndim, &nelem, &jd) < 0)
-    return ANA_ERROR;
-  if (ndim + 2 > MAX_DIMS)
-    return cerror(N_DIMS_OVR, 0);
-  tgtdims[0] = tgtdims[1] = 3;
-  memcpy(tgtdims + 2, dims, ndim*sizeof(*dims));
-  ndim += 2;
-  iq = array_scratch(ANA_DOUBLE, ndim, tgtdims);
-  tgt.d = array_data(iq);
-  while (nelem--) {
-    double rc2i[3][3];
-
-    f(*jd.d++, 0.0, rc2i);
-    memcpy(tgt.d, rc2i, 9*sizeof(double));
-    tgt.d += 9;
-  }
-  return iq;
-}
+BIND(iauBpn2xy, ic33odd, s, IAUBPN2XY, 3, 3, NULL)
 /*-----------------------------------------------------------------------*/
 /* IAUC2I00A(jd)
 
  Returns the celestial-to-intermedia matrix for the Julian Dates <jd>
  using the IAU 2000A precession-nutation model. */
-int ana_iauC2i00a(int narg, int ps[])
-{
-  return ana_iauC2i(narg, ps, iauC2i00a);
-}
+BIND(iauC2i00a, id0oc33, f, IAUC2I00A, 1, 1, NULL)
 /*-----------------------------------------------------------------------*/
 /* IAUC2I00B(jd)
 
  Returns the celestial-to-intermedia matrix for the Julian Dates <jd>
  using the IAU 2000B precession-nutation model. */
-int ana_iauC2i00b(int narg, int ps[])
-{
-  return ana_iauC2i(narg, ps, iauC2i00b);
-}
+BIND(iauC2i00b, id0oc33, f, IAUC2I00B, 1, 1, NULL)
 /*-----------------------------------------------------------------------*/
 /* IAUC2I06A(jd)
 
  Returns the celestial-to-intermedia matrix for the Julian Dates <jd>
  using the IAU 2006 precession model and IAU 2000A nutation model. */
-int ana_iauC2i06a(int narg, int ps[])
-{
-  return ana_iauC2i(narg, ps, iauC2i06a);
-}
+BIND(iauC2i06a, id0oc33, f, IAUC2I06A, 1, 1, NULL)
 /*-----------------------------------------------------------------------*/
 /* rc2i = IAUC2IBPN(jd, rbpn)
 
    Forms the celestial-to-intermediate matrix <rc2i> for Julian Dates
    <jd>, given the bias-precession-nutation matrix <rbpn>. */
-int ana_iauC2ibpn(int narg, int ps[])
-{
-  int iq, *jddims, jdndim, *rbpndims, rbpnndim, nelem, rbpnstep, result;
-  pointer jd, rbpn, tgt;
-
-  iq = ps[0];
-  if (symbol_type(iq) < ANA_FLOAT)
-    iq = ana_float(1, &iq);
-  if (numerical(iq, &jddims, &jdndim, &nelem, &jd) < 0)
-    return ANA_ERROR;
-  if (narg > 1 && ps[1]) {
-    iq = ana_double(1, &ps[1]);
-    if (iq == ANA_ERROR)
-      return ANA_ERROR;
-    if (numerical(ps[1], &rbpndims, &rbpnndim, NULL, &rbpn) < 0)
-      return ANA_ERROR;
-    if (rbpnndim < 2 || rbpndims[0] != 3 || rbpndims[1] != 3)
-      return anaerror("1st and 2nd dimensions should be equal to 3", ps[1]);
-    int n = array_size(ps[1])/9;
-    if (n != nelem && n != 1)
-      return cerror(INCMP_DIMS, ps[1]);
-    rbpnstep = (n == 1? 0: 9);
-  } else
-    return anaerror("Not supported yet", 0);
-  {
-    int tgtdims[MAX_DIMS] = { 3, 3 };
-
-    memcpy(tgtdims + 2, jddims, jdndim*sizeof(int));
-    result = array_scratch(ANA_DOUBLE, jdndim + 2, tgtdims);
-    tgt.d = array_data(result);
-  }
-   
-  double (*r)[3] = (double (*)[3]) rbpn.d;
-  double (*rc2i)[3] = (double (*)[3]) tgt.d;
-
-  switch (symbol_type(iq)) {
-  case ANA_FLOAT:
-    while (nelem--) {
-      iauC2ibpn((double) *jd.f++, 0.0, r, rc2i);
-      rc2i += 3;
-      if (r)
-        r += 3;
-    }
-    break;
-  case ANA_DOUBLE:
-    while (nelem--) {
-      iauC2ibpn(*jd.d++, 0.0, r, rc2i);
-      rc2i += 3;
-      if (r)
-        r += 3;
-    }
-    break;
-  }
-  return result;
-}
+BIND(iauC2ibpn, id0c33oc33, f, IAUC2IBPN, 2, 2, NULL)
 /*-----------------------------------------------------------------------*/
 /* IAUC2IXY(jd, x, y)
 
    returns the celestial-to-intermediate-frame-of-date matrix for
    Julian Date <jd> and CIP x, y coordinates.
  */
-int ana_iauC2ixy(int narg, int ps[])
-{
-  int nelem, n, result, iq, *jddims, jdndim;
-  pointer jd, x, y;
-  double (*tgt)[3];
-
-  iq = ana_double(1, &ps[0]);
-  if (iq < 0)
-    return ANA_ERROR;
-  if (numerical(iq, &jddims, &jdndim, &nelem, &jd) < 0)
-    return ANA_ERROR;
-  iq = ana_double(1, &ps[1]);
-  if (numerical(iq, NULL, NULL, &n, &x) < 0)
-    return ANA_ERROR;
-  if (n != nelem)
-    return cerror(INCMP_ARG, ps[1]);
-  iq = ana_double(2, &ps[2]);
-  if (numerical(iq, NULL, NULL, &n, &y) < 0)
-    return ANA_ERROR;
-  if (n != nelem)
-    return cerror(INCMP_ARG, ps[2]);
-  {
-    int dims[MAX_DIMS] = { 3, 3 };
-
-    memcpy(dims + 2, jddims, jdndim*sizeof(int));
-    result = array_scratch(ANA_DOUBLE, 2 + jdndim, dims);
-    tgt = (double (*)[3]) array_data(result);
-  }
-  while (nelem--) {
-    iauC2ixy(*jd.d++, 0.0, *x.d++, *y.d++, tgt);
-    tgt += 3;
-  }
-  return result;
-}
+BIND(iauC2ixy, id0ddoc33, f, IAUC2IXY, 3, 3, NULL)
 /*-----------------------------------------------------------------------*/
 /* rc2i = IAUC2IXYS(x, y, s) 
 
    returns the celestial-to-intermediate-frame-of-date matrix given
    the CIP x, y and the CIO locator s.
  */
-int ana_iauC2ixys(int narg, int ps[])
-{
-  int iq, *dims, ndim, nelem, nelem2, tgtdims[MAX_DIMS] = { 3, 3 };
-  pointer x, y, s;
-  double (*rc2i)[3];
-
-  iq = ana_double(1, &ps[0]);
-  if (numerical(iq, &dims, &ndim, &nelem, &x) < 0)
-    return ANA_ERROR;
-  if (ndim > MAX_DIMS - 2)
-    return cerror(N_DIMS_OVR, ps[0]);
-  iq = ana_double(1, &ps[1]);
-  if (numerical(iq, NULL, NULL, &nelem2, &y) < 0)
-    return ANA_ERROR;
-  if (nelem2 != nelem)
-    return cerror(INCMP_ARG, ps[1]);
-  iq = ana_double(1, &ps[2]);
-  if (numerical(iq, NULL, NULL, &nelem2, &s) < 0)
-    return ANA_ERROR;
-  if (nelem2 != nelem)
-    return cerror(INCMP_ARG, ps[2]);
-  memcpy(tgtdims + 2, dims, ndim*sizeof(*dims));
-  iq = array_scratch(ANA_DOUBLE, ndim + 2, tgtdims);
-  rc2i = array_data(iq);
-  while (nelem--) {
-    iauC2ixys(*x.d++, *y.d++, *s.d++, rc2i);
-    rc2i += 3;
-  }
-  return iq;
-}
+BIND(iauC2ixys, idddoc33, f, IAUC2IXYS, 3, 3, NULL)
 /*-----------------------------------------------------------------------*/
 /* angles = IAUC2S(p)
 
@@ -355,125 +112,88 @@ int ana_iauC2ixys(int narg, int ps[])
    <angles(0,/all)> = longitude angle (radians)
    <angles(1,/all)> = latitude angle (radians)
    */
-int ana_iauC2s(int narg, int ps[]) {
-  loopInfo srcinfo, tgtinfo;
-  pointer src, tgt;
-  int target;
-  int more[1] = { 2 };
-
-  if (standardLoopX(ps[0], ANA_ZERO,
-                    SL_EACHROW
-                    | SL_AXISCOORD,
-                    &srcinfo, &src,
-                    1, more,    /* one extra dimension */
-                    0, NULL,    /* no removed dimensions */
-                    ANA_DOUBLE,
-                    SL_EXACT | SL_EACHROW
-                    | SL_AXISCOORD,
-                    &target, &tgtinfo, &tgt) < 0)
-    return ANA_ERROR;
-  if (srcinfo.rdims[0] != 3)
-    return anaerror("Need 3 elements in first dimension", ps[0]);
-  do {
-    iauC2s(src.d, tgt.d, tgt.d + 1);
-    src.d += 3;
-    tgt.d += 2;
-  } while (advanceLoop(&tgtinfo), advanceLoop(&srcinfo) < srcinfo.rndim);
-  return target;
-}
+BIND(iauC2s, ib3ob2, f, IAUC2S, 1, 1, NULL)
 /*-----------------------------------------------------------------------*/
 /* rc2t = IAUC2T00A(jd, x, y)
 
    Return the celestial-to-terrestrial matrix for <jd> given the polar
    coordinates <x>, <y>, using the IAU2000A nutation model
 */
-int ana_iauC2t00a(int narg, int ps[])
-{
-  loopInfo jdinfo, tgtinfo;
-  pointer jd, tgt, x, y;
-  int target, iq, nelem;
-  int more[2] = { 3, 3 };
-  double (*rc2t)[3];
+BIND(iauC2t00a, id000ddoc33, f, IAUC2T00A, 3, 3, NULL)
+/*-----------------------------------------------------------------------*/
+/* rc2t = IAUC2T00B(jd, x, y)
 
-  if (standardLoopX(ps[0], ANA_ZERO,
-                    SL_AXISCOORD,
-                    &jdinfo, &jd,
-                    2, more,
-                    0, NULL,
-                    ANA_DOUBLE,
-                    SL_EXACT | SL_EACHROW | SL_AXISCOORD,
-                    &target, &tgtinfo, &tgt) < 0)
-    return ANA_ERROR;
-  iq = ana_double(1, &ps[1]);
-  if (numerical(iq, NULL, NULL, &nelem, &x) < 0)
-    return ANA_ERROR;
-  if (nelem != jdinfo.nelem)
-    return cerror(INCMP_ARG, ps[1]);
-  iq = ana_double(1, &ps[2]);
-  if (numerical(iq, NULL, NULL, &nelem, &y) < 0)
-    return ANA_ERROR;
-  if (nelem != jdinfo.nelem)
-    return cerror(INCMP_ARG, ps[2]);
-  do {
-    rc2t = (double (*)[3]) tgt.d;
-    iauC2t00a(*jd.d, 0.0, 0.0, 0.0, *x.d++, *y.d++, rc2t);
-  } while (advanceLoop(&tgtinfo), advanceLoop(&jdinfo) < jdinfo.rndim);
-  return target;
-}
+   Return the celestial-to-terrestrial matrix for <jd> given the polar
+   coordinates <x>, <y>, using the IAU2000B nutation model
+*/
+BIND(iauC2t00b, id000ddoc33, f, IAUC2T00B, 3, 3, NULL)
+/*-----------------------------------------------------------------------*/
+/* rc2t = IAUC2T06A(jd, x, y)
+
+   Return the celestial-to-terrestrial matrix for <jd> given the polar
+   coordinates <x>, <y>, using the IAU 2006 precession and IAU 2000A
+   nutation models */
+BIND(iauC2t06a, id000ddoc33, f, IAUC2T06A, 3, 3, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUC2TCIO(rc2i, era, rpom)
+
+   Returns the celestial-to-terrestrial matrix based on the CIO-based
+   components (the celestial-to-intermediate matrix <rc2i>, the Earth
+   Rotation Angle <era>, and the polar motion matrix <rpom>) */
+BIND(iauC2tcio, ic33dc33oc33, f, IAUC2TCIO, 3, 3, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUC2TEQX(rbpn, gst, rpom)
+
+   Returns the celestial-to-terrestrial matrix based on the
+   celestial-to-true matrix <rbpn>, the Greenwich Apparent Sidereal
+   Time <gst>, and the polar motion matrix <rpom>) */
+BIND(iauC2teqx, ic33dc33oc33, f, IAUC2TEQX, 3, 3, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUC2TPE(jd, dpsi, deps, xp, yp)
+
+   Returns the celestial-to-terrestrial matrix given the Julian Date
+   <jd>, the nutation <dpsi>, <deps>, and the polar coordinates <xp>,
+   <yp> */
+BIND(iauC2tpe, id000ddddoc33, f, IAUC2TPE, 5, 5, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUC2TXY(jd, x, y, xp, yp)
+
+   Returns the celestial-to-terrestrial matrix given the Julian Date
+   <jd>, the CIP coordinates <x>, <y>, and the polar motion <xp>,
+   <yp> */
+BIND(iauC2txy, id000ddddoc33, f, IAUC2TXY, 5, 5, NULL)
 /*-----------------------------------------------------------------------*/
 /* IAUCAL2JD(<caldates>)
 
-   returns the Chronological Julian Day Numbers corresponding to the
-   specified Gregorian calendar dates <caldates>, which must have a
-   multiple of 3 elements in its first dimension (year, month, day).
-   Unexpected results may be given if illegal year, month, or day
-   numbers are specified.  Dates before -4799-01-01 or after
-   1465073-02-28 are rejected. */
+   returns the Julian Dates corresponding to the specified Gregorian
+   calendar dates <caldates>, which must have 3 elements in its first
+   dimension (year, month, day).  Unexpected results may be given if
+   illegal year, month, or day numbers are specified.  Dates before
+   -4799-01-01 or after 1465073-02-28 are rejected. */
 int ana_iauCal2jd(int narg, int ps[])
 {
   loopInfo srcinfo, tgtinfo;
   pointer src, tgt;
-  int target, i;
   double djm0, djm;
-  int less[1] = { 3 };
+  pointer *ptrs;
+  loopInfo *infos;
+  int iq;
 
-  if (standardLoopX(ps[0], ANA_ZERO,
-                    SL_EACHROW      /* we handle advancing along axis 0 */
-                    | SL_AXISCOORD, /* only indicated source axis coords */
-                    &srcinfo, &src,
-                    0, NULL,    /* no extra dimensions */
-                    1, less,    /* reduce one dimension */
-                    ANA_LONG,
-                    SL_UPGRADE | /* upgrade target type if source type > LONG */
-                    SL_AXISCOORD, /* only indicated target axis coords */
-                    &target, &tgtinfo, &tgt) < 0)
+  if ((iq = standard_args(narg, ps, "i>L3*;r>L-3*", &ptrs, &infos)) < 0)
     return ANA_ERROR;
+  src = ptrs[0];
+  tgt = ptrs[1];
+  srcinfo = infos[0];
+  tgtinfo = infos[1];
+
   /* iauCal2jd(int iy, int im, int id, double *djm0, double *djm) */
-  switch (symbol_type(ps[0])) {
-  case ANA_BYTE:
-    do {
-      if (iauCal2jd(src.b[0], src.b[1], src.b[2], &djm0, &djm))
-        *tgt.l = 0;
-      else
-        *tgt.l = 2400001 + djm;
-      src.b += 3;
-    } while (advanceLoop(&tgtinfo), advanceLoop(&srcinfo) < srcinfo.rndim);
-    break;
-  case ANA_WORD:
-    do {
-      if (iauCal2jd(src.w[0], src.w[1], src.w[2], &djm0, &djm))
-        *tgt.l = 0;
-      else
-        *tgt.l = 2400001 + djm;
-      src.w += 3;
-    } while (advanceLoop(&tgtinfo), advanceLoop(&srcinfo) < srcinfo.rndim);
-    break;
+  switch (infos[0].type) {
   case ANA_LONG:
     do {
       if (iauCal2jd(src.l[0], src.l[1], src.l[2], &djm0, &djm))
         *tgt.l = 0;
       else
-        *tgt.l = 2400001 + djm;
+        *tgt.l = 2400000.5 + djm;
       src.l += 3;
     } while (advanceLoop(&tgtinfo), advanceLoop(&srcinfo) < srcinfo.rndim);
     break;
@@ -484,7 +204,7 @@ int ana_iauCal2jd(int narg, int ps[])
       if (iauCal2jd((int) src.f[0], (int) src.f[1], day, &djm0, &djm))
         *tgt.f = 0;
       else
-        *tgt.f = 2400001 + djm + daypart;
+        *tgt.f = 2400000.5 + djm + daypart;
       src.f += 3;
     } while (advanceLoop(&tgtinfo), advanceLoop(&srcinfo) < srcinfo.rndim);
     break;
@@ -495,127 +215,1028 @@ int ana_iauCal2jd(int narg, int ps[])
       if (iauCal2jd((int) src.d[0], (int) src.d[1], day, &djm0, &djm))
         *tgt.d = 0;
       else
-        *tgt.d = 2400001 + djm + daypart;
+        *tgt.d = 2400000.5 + djm + daypart;
       src.d += 3;
     } while (advanceLoop(&tgtinfo), advanceLoop(&srcinfo) < srcinfo.rndim);
     break;
   default:
     return cerror(ILL_TYPE, ps[0]);
   }
-  if (!loopIsAtStart(&tgtinfo))
-    return anaerror("Source loop is finished but target loop is not!", ps[0]);
-  return target;
+  return iq;
 }
+REGISTER(iauCal2jd, f, IAUCAL2JD, 1, 1, NULL);
 /*-----------------------------------------------------------------------*/
-/* IAUJD2CAL(<jd>) returns the Gregorian calendar dates corresponding
-   to the specified Chronological Julian Day Numbers <jd>.  The return
-   value has the same dimensions as <jd> but with one extra dimension
-   of size 3 prefixed, for the year, month, and day, respectively.
-   Zeros are returned for input CJDN outside of the supported range.
-   Julian day numbers before -68569.5 or after 1e9 are considered
-   illegal -- actually, CJDNs greater than 536802342 yield erroneous
-   results, but the SOFA routine does not indicate problems until the
-   CJDN exceeds 1e9. */
-int ana_iauJd2cal(int narg, int ps[])
+/* IAUDAT(date) returns delta(AT) = TAI - UTC for the given UTC date
+   ([year, month, day]) */
+int ana_iauDat(int narg, int ps[])
 {
-  loopInfo srcinfo, tgtinfo;
-  pointer src, tgt;
-  int result, more[1] = { 3 };
-  double djm0, djm;
+  pointer *ptrs;
+  loopInfo *infos;
+  int iq;
 
-  if (standardLoopX(ps[0], ANA_ZERO, 
-                    SL_AXISCOORD, /* only indicated axis coords */
-                    &srcinfo, &src,
-                    1, more,    /* one extra dimension */
-                    0, NULL,    /* no reduced dimensions */
-                    ANA_LONG,
-                    SL_UPGRADE |
-                    SL_EACHROW, /* we handle the new dimension ourselves */
-                    &result,
-                    &tgtinfo, &tgt) < 0)
+  if ((iq = standard_args(narg, ps, "i>L3*;rD-3*", &ptrs, &infos)) < 0)
     return ANA_ERROR;
-  
-  /* iauJd2cal(double dj1, double dj2, int *iy, int *im, int *id, double *fd) */
-  switch (symbol_type(ps[0])) {
-  case ANA_BYTE:
-    do {
-      int y, m, d;
-      double fd;
-      if (iauJd2cal(src.b[0], -0.5, &y, &m, &d, &fd)) {
-        *tgt.l++ = 0;
-        *tgt.l++ = 0;
-        *tgt.l++ = 0;
-      } else {
-        *tgt.l++ = y;
-        *tgt.l++ = m;
-        *tgt.l++ = d + fd;
-      }
-    } while (advanceLoop(&tgtinfo), advanceLoop(&srcinfo) < srcinfo.rndim);
-    break;
-  case ANA_WORD:
-    do {
-      int y, m, d;
-      double fd;
-      if (iauJd2cal(src.w[0], -0.5, &y, &m, &d, &fd)) {
-        *tgt.l++ = 0;
-        *tgt.l++ = 0;
-        *tgt.l++ = 0;
-      } else {
-        *tgt.l++ = y;
-        *tgt.l++ = m;
-        *tgt.l++ = d + fd;
-      }
-    } while (advanceLoop(&tgtinfo), advanceLoop(&srcinfo) < srcinfo.rndim);
-    break;
+  switch (infos[0].type) {
   case ANA_LONG:
-    do {
-      int y, m, d;
-      double fd;
-      if (iauJd2cal(src.l[0], -0.5, &y, &m, &d, &fd)) {
-        *tgt.l++ = 0;
-        *tgt.l++ = 0;
-        *tgt.l++ = 0;
-      } else {
-        *tgt.l++ = y;
-        *tgt.l++ = m;
-        *tgt.l++ = d + fd;
-      }
-    } while (advanceLoop(&tgtinfo), advanceLoop(&srcinfo) < srcinfo.rndim);
+    while (infos[1].nelem--) {
+      iauDat(ptrs[0].l[0], ptrs[0].l[1], ptrs[0].l[2], 0.0, ptrs[1].d++);
+      ptrs[0].l += 3;
+    }
     break;
   case ANA_FLOAT:
-    do {
-      int y, m, d;
-      double fd;
-      if (iauJd2cal(src.f[0], -0.5, &y, &m, &d, &fd)) {
-        *tgt.f++ = 0;
-        *tgt.f++ = 0;
-        *tgt.f++ = 0;
-      } else {
-        *tgt.f++ = y;
-        *tgt.f++ = m;
-        *tgt.f++ = d + fd;
-      }
-    } while (advanceLoop(&tgtinfo), advanceLoop(&srcinfo) < srcinfo.rndim);
+    while (infos[1].nelem--) {
+      int d = (int) floor(ptrs[0].f[2]);
+      double f = ptrs[0].f[2] - d;
+      iauDat((int) ptrs[0].f[0], (int) ptrs[0].f[1], d, f, ptrs[1].d++);
+      ptrs[0].f += 3;
+    }
     break;
   case ANA_DOUBLE:
-    do {
-      int y, m, d;
-      double fd;
-      if (iauJd2cal(src.d[0], -0.5, &y, &m, &d, &fd)) {
-        *tgt.d++ = 0;
-        *tgt.d++ = 0;
-        *tgt.d++ = 0;
-      } else {
-        *tgt.d++ = y;
-        *tgt.d++ = m;
-        *tgt.d++ = d + fd;
-      }
-    } while (advanceLoop(&tgtinfo), advanceLoop(&srcinfo) < srcinfo.rndim);
+    while (infos[1].nelem--) {
+      int d = (int) floor(ptrs[0].d[2]);
+      double f = ptrs[0].d[2] - d;
+      iauDat((int) ptrs[0].d[0], (int) ptrs[0].d[1], d, f, ptrs[1].d++);
+      ptrs[0].d += 3;
+    }
     break;
-  default:
-    return cerror(ILL_ARG, ps[0]);
   }
-  if (!loopIsAtStart(&tgtinfo))
-    return anaerror("Source loop is finished but target loop is not!", ps[0]);
-  return result;
+  return iq;
 }
+REGISTER(iauDat, f, IAUDAT, 1, 1, NULL);
+/*-----------------------------------------------------------------------*/
+/* IAUDTDB(jd, elong, u, v)
+
+   Returns an approximation of TDB-TT in seconds, the difference
+   between barycentric dynamical time and terrestrial time, for an
+   observer on the Earth. <jd> is the Julian Date in TDB or TT,
+   <elong> is the east longitude in radians, <u> is the distance in km
+   from the Earth spin axis, and <v> is the distance in km north of
+   the equatorial plane. */
+BIND(iauDtdb, id00DDDrd, f, IAUDTDB, 4, 4, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUEE00(<jd>, <epsa>, <dpsi>)
+
+   Returns the equation of the equinoxes (IAU 2000) given the nutation
+   in longitude <epsa> and the mean obliquity <dpsi> */
+BIND(iauEe00, id0ddrd, f, IAUEE00, 3, 3, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUEE00A(<jd>)
+
+   Returns the equation of the equinoxes, compatible with IAU 2000
+   resolutions */
+BIND(iauEe00a, iddrd, f, IAUEE00A, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUEE00B(<jd>)
+
+   Returns the equation of the equinoxes, compatible with IAU 2000
+   resolutions but using the truncated nutation model IAU 2000B */
+BIND(iauEe00b, iddrd, f, IAUEE00B, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUEE06A(<jd>)
+
+   Returns the equation of the equinoxes, compatible with IAU 2000
+   resolutions and the IAU 2006/200A precession-nutation */
+BIND(iauEe06a, iddrd, f, IAUEE06A, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUEECT00(<jd>)
+
+   Returns the equation of the equinoxes complementary term,
+   consistent with IAU 2000 resolutions. */
+BIND(iauEect00, iddrd, f, IAUEECT00, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUEFORM(<ellid>)
+
+   Returns the equatorial radius (in meters) and the flattening of the
+   Earth reference ellipsoid with the given ellipsoid identifier
+   <ellid>: 1 = WGS84, 2 = GRS80, 3 = WGS72.  If an unsupported
+   <ellid> is specified, then zero radius and flattening are
+   returned. */
+BIND(iauEform, ilob2rl, s, IAUEFORM, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUEO06A(<jd>)
+
+   Returns the equation of the origins, using IAU 2006 precession and
+   IAU 2000A nutation. */
+BIND(iauEo06a, iddrd, f, IAUEO06A, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUEORS(<rnpb>, <s>) 
+
+   Returns the equation of the origins, given the classical NPB matrix
+   <rnpb> and the CIO locator <s> */
+BIND(iauEors, ic33drd, f, IAUEORS, 2, 2, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUEPB(<jd>)
+
+   Returns the Besselian epoch corresponding to Julian Date <jd>. */
+BIND(iauEpb, iddrd, f, IAUEPB, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUEPB2JD(<bepoch>)
+
+   Returns the Julian Date corresponding to Besselian epoch <bepoch>
+   (e.g., 1957.3). */
+int ana_iauEpb2jd(int narg, int ps[])
+{
+  pointer *ptrs;
+  loopInfo *infos;
+  int iq;
+
+  if ((iq = standard_args(narg, ps, "i>D*;rD*", &ptrs, &infos)) < 0)
+    return ANA_ERROR;
+  while (infos[0].nelem--) {
+    double djm0, djm;
+    
+    iauEpb2jd(*ptrs[0].d++, &djm0, &djm);
+    *ptrs[1].d++ = djm0 + djm;
+  }
+  return iq;
+}
+REGISTER(iauEpb2jd, f, IAUEPB2JD, 1, 1, NULL);
+/*-----------------------------------------------------------------------*/
+/* IAUEPJ(<jd>)
+
+   Returns the Julian epoch corresponding to Julian Date <jd>. */
+BIND(iauEpj, iddrd, f, IAUEPJ, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUEPJ2JD(<bepoch>)
+
+   Returns the Julian Date corresponding to Julian epoch <bepoch>
+   (e.g., 1957.3). */
+int ana_iauEpj2jd(int narg, int ps[])
+{
+  pointer *ptrs;
+  loopInfo *infos;
+  int iq;
+
+  if ((iq = standard_args(narg, ps, "i>D*;rD*", &ptrs, &infos)) < 0)
+    return ANA_ERROR;
+  while (infos[0].nelem--) {
+    double djm0, djm;
+    
+    iauEpj2jd(*ptrs[0].d++, &djm0, &djm);
+    *ptrs[1].d++ = djm0 + djm;
+  }
+  return iq;
+}
+REGISTER(iauEpj2jd, f, IAUEPJ2JD, 1, 1, NULL);
+/*-----------------------------------------------------------------------*/
+/* IAUEPV00, jd, pvh, pvb
+
+   Returns the Earth position and velocity, heliocentric (pvh) and
+   barycentric (pvb), with respect to the Barycentric Celestial
+   Reference System.  pvh(0,*) = heliocentric position (AU), pvh(1,*)
+   = heliocentric velocity (AU/d), pvb(0,*) = barycentric position
+   (AU), pvb(1,*) = barycentric velocity (AU/d) */
+BIND(iauEpv00, id0c23c23rl, s, IAUEPV00, 3, 3, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUEQEQ94(<jd>)
+
+   Returns the equation of the equinoxes according to the IAU 1994 model.
+ */
+BIND(iauEqeq94, iddrd, f, IAUEQEQ94, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUERA00(<jd>)
+
+   Returns the Earth rotation angle according to the IAU 2000 model.
+*/
+BIND(iauEra00, iddrd, f, IAUERA00, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUFAD03(<t>)
+
+   Returns the mean elongation of the Moon from the Sun, a fundamental
+   argument according to the IERS conventions of 2003, as a function
+   of the number <t> of Julian centuries since J2000.0 TDB.  It makes
+   no practical difference if <t> is measured since J2000.0 TT
+   instead. */
+BIND(iauFad03, idrd, f, IAUFAD03, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUFAE03(<t>)
+
+   Returns the mean longitude of the Earth, a fundamental argument
+   according to the IERS conventions of 2003, as a function of the
+   number <t> of Julian centuries since J2000.0 TDB.  It makes no
+   practical difference if <t> is measured since J2000.0 TT
+   instead. */
+BIND(iauFae03, idrd, f, IAUFAE03, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUFAF03(<t>)
+
+   Returns the mean longitude of the Moon minus the mean longitude of
+   the ascending node, a fundamental argument according to the IERS
+   conventions of 2003, as a function of the number <t> of Julian
+   centuries since J2000.0 TDB.  It makes no practical difference if
+   <t> is measured since J2000.0 TT instead. */
+BIND(iauFaf03, idrd, f, IAUFAF03, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUFAJU03(<t>)
+
+   Returns the mean longitude of Jupiter, a fundamental argument
+   according to the IERS conventions of 2003, as a function of the
+   number <t> of Julian centuries since J2000.0 TDB.  It makes no
+   practical difference if <t> is measured since J2000.0 TT
+   instead. */
+BIND(iauFaju03, idrd, f, IAUFAJU03, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUFAL03(<t>)
+
+   Returns the mean anomaly of the Moon, a fundamental argument
+   according to the IERS conventions of 2003, as a function of the
+   number <t> of Julian centuries since J2000.0 TDB.  It makes no
+   practical difference if <t> is measured since J2000.0 TT
+   instead. */
+BIND(iauFal03, idrd, f, IAUFAL03, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUFALP03(<t>)
+
+   Returns the mean anomaly of the Sun, a fundamental argument
+   according to the IERS conventions of 2003, as a function of the
+   number <t> of Julian centuries since J2000.0 TDB.  It makes no
+   practical difference if <t> is measured since J2000.0 TT
+   instead. */
+BIND(iauFalp03, idrd, f, IAUFALP03, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUFAMA03(<t>)
+
+   Returns the mean longitude of Mars, a fundamental argument
+   according to the IERS conventions of 2003, as a function of the
+   number <t> of Julian centuries since J2000.0 TDB.  It makes no
+   practical difference if <t> is measured since J2000.0 TT
+   instead. */
+BIND(iauFama03, idrd, f, IAUFAMA03, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUFAME03(<t>)
+
+   Returns the mean longitude of Mercury, a fundamental argument
+   according to the IERS conventions of 2003, as a function of the
+   number <t> of Julian centuries since J2000.0 TDB.  It makes no
+   practical difference if <t> is measured since J2000.0 TT
+   instead. */
+BIND(iauFame03, idrd, f, IAUFAME03, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUFANE03(<t>)
+
+   Returns the mean longitude of Neptune, a fundamental argument
+   according to the IERS conventions of 2003, as a function of the
+   number <t> of Julian centuries since J2000.0 TDB.  It makes no
+   practical difference if <t> is measured since J2000.0 TT
+   instead. */
+BIND(iauFane03, idrd, f, IAUFANE03, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUFAOM03(<t>)
+
+   Returns the mean longitude of the Moon's ascending node, a
+   fundamental argument according to the IERS conventions of 2003, as
+   a function of the number <t> of Julian centuries since J2000.0 TDB.
+   It makes no practical difference if <t> is measured since J2000.0
+   TT instead. */
+BIND(iauFaom03, idrd, f, IAUFAOM03, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUFAPA03(<t>)
+
+   Returns the general accumulated precession in longitude, a
+   fundamental argument according to the IERS conventions of 2003, as
+   a function of the number <t> of Julian centuries since J2000.0 TDB.
+   It makes no practical difference if <t> is measured since J2000.0
+   TT instead. */
+BIND(iauFapa03, idrd, f, IAUFAPA03, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUFASA03(<t>)
+
+   Returns the mean longitude of Saturn, a fundamental argument
+   according to the IERS conventions of 2003, as a function of the
+   number <t> of Julian centuries since J2000.0 TDB.  It makes no
+   practical difference if <t> is measured since J2000.0 TT
+   instead. */
+BIND(iauFasa03, idrd, f, IAUFASA03, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUFAUR03(<t>)
+
+   Returns the mean longitude of Uranus, a fundamental argument
+   according to the IERS conventions of 2003, as a function of the
+   number <t> of Julian centuries since J2000.0 TDB.  It makes no
+   practical difference if <t> is measured since J2000.0 TT
+   instead. */
+BIND(iauFaur03, idrd, f, IAUFAUR03, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUFAVE03(<t>)
+
+   Returns the mean longitude of Venus, a fundamental argument
+   according to the IERS conventions of 2003, as a function of the
+   number <t> of Julian centuries since J2000.0 TDB.  It makes no
+   practical difference if <t> is measured since J2000.0 TT
+   instead. */
+BIND(iauFave03, idrd, f, IAUFAVE03, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUFK52H, <ra5>, <dec5>, <dra5>, <ddec5>, <px5>, <rv5>, <rah>,
+   <dech>, <drah>, <ddech>, <pxh>, <rvh>
+
+   Transforms FK5 (J2000.0) star data into the Hipparcos system.  The
+   FK5 data is: right ascension <ra5>, declination <dec5>, proper
+   motion in right ascension <dra5>, proper motion in declination
+   <ddec5>, parallax <px5>, radial velocity <rv5>.  The Hipparcos data
+   is: right ascension <rah>, declination <dech>, proper motion in
+   right ascension <drah>, proper motion in declination <ddech>,
+   parallax <pxh>, radial velocity <rvh>. */
+BIND(iauFk52h, iddddddodddddd, s, IAUFK52H, 12, 12, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUFK5HIP, <r5h>, <s5h>
+
+   Returns the FK5-to-Hipparcos rotation <r5h> and spin <s5h> */
+BIND(iauFk5hip, oC33B3, s, IAUFK5HIP, 2, 2, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUFK5HZ, <ra5>, <dec5>, <jd>, <rah>, <dech>
+
+   Transforms an FK5 (J2000.0) star position (right ascension <ra5>,
+   declination <dec5>) determined at Julian Date <jd> into the system
+   of the Hipparcos catalog, assuming zero Hipparcos proper motion.
+   The returned coordinates in the Hipparcos system are right
+   ascension <rah>, declination <dech> */
+BIND(iauFk5hz, iddd0odd, s, IAUFK5HZ, 5, 5, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUFW2M(<gamma_bar>, <phi_bar>, <psi>, <eps>)
+
+   Forms a rotation matrix given the Fukushima-Williams angles
+   <gamma_bar>, <phi_bar>, <psi>, and <eps> */
+BIND(iauFw2m, iddddoc33, f, IAUFW2M, 4, 4, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUFW2XY, <gamma_bar>, <phi_bar>, <psi>, <eps>, <x>, <y> 
+
+   Returns CIP <x>, <y>, given the Fukushima-Williams
+   bias-precession-nutation angles <gamma_bar>, <phi_bar>, <psi>,
+   <eps>. */
+BIND(iauFw2xy, iddddodd, s, IAUFW2XY, 6, 6, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUGC2GD(<xyz>, <ellid>)
+ 
+   Returns geodetic coordinates (elongation, phi, height)
+   corresponding to geocentric coordinates <xyz> using the specified
+   reference ellipsoid <ellid> */
+BIND(iauGc2gd, iLb3od3rl, f, IAUGC2GD, 2, 2, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUGC2GDE(<xyz>, <a>, <f>)
+
+   Returns geodetic coordinates (elongation, phi, height)
+   corresponding to geocentric coordinates <xyz> using the reference
+   ellipsoid with equatorial radius <a> and flattening <f> */
+BIND(iauGc2gde, ib3DDod3rl, f, IAUGC2GDE, 3, 3, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUGD2GC(<eph>, <ellid>)
+
+   Returns geocentric coordinates (x, y, z) corresponding to geodetic
+   coordinates <eph> (elongation, phi, height) for the specified
+   reference ellipsoid <ellid> */
+BIND(iauGd2gc, iLd3ob3rl, f, IAUGD2GC, 2, 2, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUGD2GCE(<eph>, <a>, <f>)
+
+   Returns geocentric coordinates (x, y, z) corresponding to geodetic
+   coordinates <eph> (elongation, phi, height) for the reference
+   ellipsoid with equatorial radius <a> and flattening <f> */
+BIND(iauGd2gce, id3DDob3rl, f, IAUGD2GCE, 3, 3, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUGMST06(<jdut>, <jdtt>)
+
+   Returns Greenwich mean sidereal time according to a model that is
+   consistent with IAU 2006 precession.  <jdut> is the Julian Date
+   (UT1).  <jdtt> is the Julian Date (TT) of the same instant. <jdut>
+   is needed to predict the Earth rotation, and TT to predict the
+   effects of precession.  If <jdtt> is set equal to <jdut> then
+   errors of order 100 microarcseconds result. */
+BIND(iauGmst06, iddddrd_mod, f, IAUGMST06, 2, 2, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUGMST82(<jd>)
+ 
+   Returns Greenwich mean sidereal time for the given UT1 Julian Date
+   <jd>, according to the IAU 1982 model */
+BIND(iauGmst82, id0rd, f, IAUGMST82, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUGST00A(<jdut>, <jdtt>)
+
+   Returns Greenwich apparent sidereal time consisten with IAU 2000
+   resolutions.  <jdut> is the Julian Date (UT1).  <jdtt> is the
+   Julian Date (TT) of the same instant. <jdut> is needed to predict
+   the Earth rotation, and TT to predict the effects of precession.
+   If <jdtt> is set equal to <jdut> then errors of order 100
+   microarcseconds result. */
+BIND(iauGst00a, iddddrd_mod, f, IAUGST00A, 2, 2, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUGST00B(<jdut>, <jdtt>)
+
+   Returns Greenwich apparent sidereal time consistent with IAU 2000
+   resolutions but using the truncated nutation model IAU 2000B.
+   <jdut> is the Julian Date (UT1).  <jdtt> is the Julian Date (TT) of
+   the same instant. <jdut> is needed to predict the Earth rotation,
+   and TT to predict the effects of precession.  If <jdtt> is set
+   equal to <jdut> then errors of order 100 microarcseconds result. */
+BIND(iauGst00b, id0rd, f, IAUGST00B, 2, 2, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUGST06(<jdut>, <jdtt>, <rnpb>)
+
+   Returns Greenwich apparent sidereal time consistent with IAU 2006
+   resolutions, given the nutation-precession-bias matrix
+   <rnpb>. <jdtt> is the Julian Date (TT) of the same instant. <jdut>
+   is needed to predict the Earth rotation, and TT to predict the
+   effects of precession.  If <jdtt> is set equal to <jdut> then
+   errors of order 100 microarcseconds result. */
+BIND(iauGst06, iddddc33rd_mod, f, IAUGST06, 3, 3, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUGST06A(<jdut>, <jdtt>)
+
+   Returns Greenwich apparent sidereal time consistent with IAU 2000
+   and IAU 2006 resolutions.  <jdut> is the Julian Date (UT1).  <jdtt>
+   is the Julian Date (TT) of the same instant. <jdut> is needed to
+   predict the Earth rotation, and TT to predict the effects of
+   precession.  If <jdtt> is set equal to <jdut> then errors of order
+   100 microarcseconds result. */
+BIND(iauGst06a, iddddrd_mod, f, IAUGST06A, 2, 2, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUGST94(<jd>)
+ 
+   Returns Greenwich apparent sidereal time for the given UT1 Julian
+   Date <jd>, consistent with IAU 1982/94 resolutions */
+BIND(iauGst94, id0rd, f, IAUGST94, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUH2FK5, <rah>, <dech>, <drah>, <ddech>, <pxh>, <rvh>, <ra5>,
+   <dec5>, <dra5>, <ddec5>, <px5>, <rv5>
+
+   Transforms Hipparcos star data into the FK5 (J2000.0) system.  The
+   Hipparcos data is: right ascension <rah>, declination <dech>,
+   proper motion in right ascension <drah>, proper motion in
+   declination <ddech>, parallax <pxh>, radial velocity <rvh>.  The
+   FK5 data is: right ascension <ra5>, declination <dec5>, proper
+   motion in right ascension <dra5>, proper motion in declination
+   <ddec5>, parallax <px5>, radial velocity <rv5>. */
+BIND(iauH2fk5, iddddddodddddd, s, IAUH2FK5, 12, 12, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUHFK5Z, <rah>, <dech>, <jd>, <ra5>, <dec5>
+
+   Transforms a Hipparcos star position (right ascension <rah>,
+   declination <dech>) determined at Julian Date <jd> into the FK5
+   (J2000.0) system, assuming zero Hipparcos proper motion.  The
+   returned coordinates in the FK5 system are right ascension <ra5>,
+   declination <dec5> */
+BIND(iauHfk5z, iddd0odddd, s, IAUHFK5Z, 5, 5, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUIR()
+
+   Returns an identity r-matrix */
+BIND(iauIr, oC33, f, IAUIR, 0, 0, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUJD2CAL(<jd>) returns the Gregorian calendar dates corresponding
+   to the specified Julian Dates <jd>.  The return value has the same
+   dimensions as <jd> but with one extra dimension of size 3 prefixed,
+   for the year, month, and day, respectively.  Zeros are returned for
+   input JD outside of the supported range.  Julian day numbers before
+   -68569.5 or after 1e9 are considered illegal -- actually, JDs
+   greater than 536802342 yield erroneous results, but the SOFA
+   routine does not indicate problems until the JD exceeds 1e9. */
+BIND(iauJd2cal, id0ollldrl_cal, f, IAUJD2CAL, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUNUM00A(<jd>)
+
+   Returns the matrix for nutation for a given Julian Date <jd>,
+   according to the IAU 2000A model. */
+BIND(iauNum00a, id0oc33, f, IAUNUM00A, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUNUM00B(<jd>)
+
+   Returns the matrix for nutation for a given Julian Date <jd>,
+   according to the IAU 2000B model. */
+BIND(iauNum00b, id0oc33, f, IAUNUM00B, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUNUM06A(<jd>)
+
+   Returns the matrix for nutation for a given Julian Date <jd>,
+   according to the IAU 2006/2000A model. */
+BIND(iauNum06a, id0oc33, f, IAUNUM06A, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUNUMAT(<epsa>, <dpsi>, <deps>)
+
+   Returns the matrix of nutation based on the mean obliquity of the
+   date <epsa> and the nutation components <dpsi> and <deps>. */
+BIND(iauNumat, iDDoC33, f, IAUNUMAT, 3, 3, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUNUT00A, <jd>, <dpsi>, <deps>
+
+   Returns the nutation for Julian Date <jd> according to the IAU
+   2000A model (MHB2000 luni-solar and planetary nutation with fre
+   core nutation omitted).  <dpsi> and <deps> are the returned
+   nutation components (luni-solar + planetary) */
+BIND(iauNut00a, id0odd, s, IAUNUT00A, 3, 3, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUNUT00B, <jd>, <dpsi>, <deps>
+
+   Returns the nutation for Julian Date <jd> according to the IAU
+   2000B model.  <dpsi> and <deps> are the returned nutation
+   components (luni-solar + planetary) */
+BIND(iauNut00b, id0odd, s, IAUNUT00B, 3, 3, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUNUT06A, <jd>, <dpsi>, <deps>
+
+   Returns the nutation for Julian Date <jd> according to the IAU
+   2000A model, with adjustments to match the IAU 2006 precession.
+   <dpsi> and <deps> are the returned nutation components (luni-solar
+   + planetary) */
+BIND(iauNut06a, id0odd, s, IAUNUT06A, 3, 3, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUNUT80, <jd>, <dpsi>, <deps>
+
+   Returns the nutation for Julian Date <jd> according to the IAU 1980
+   model.  <dpsi> and <deps> are the returned nutation components
+   (luni-solar + planetary) */
+BIND(iauNut80, id0odd, s, IAUNUT80, 3, 3, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUNUTM80(<jd>)
+
+   Returns the nutation matrix for Julian Date <jd>, according to the
+   IAU 1980 model.
+ */
+BIND(iauNutm80, id0oc33, f, IAUNUTM80, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUOBL06(<jd>)
+
+   Returns the mean obliquity of the ecliptic according to the IAU
+   2006 precession model.
+ */
+BIND(iauObl06, id0rd, f, IAUOBL06, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUOBL80(<jd>)
+
+   Returns the mean obliquity of the ecliptic according to the IAU
+   1980 model. */
+BIND(iauObl80, id0rd, f, IAUOBL80, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUP06E, <jd>, <eps0>, <psia>, <oma>, <bpa>, <bqa>, <pia>, <bpia>,
+   <epsa>, <chia>, <za>, <zetaa>, <thetaa>, <pa>, <gam>, <phi>, <psi>
+
+   Returns IAU 2006 equinox-based precession angles for Julian Date
+   <jd>.  The returned precession angles are: epsilon_0, psi_A,
+   omega_A, P_A, Q_A, pi_A, Pi_A, obliquity epsilon_A, chi_A, z_A,
+   zeta_A, theta_A, p_A, F-W angle gamma_J2000, F-W angle phi_J2000,
+   F-W angle psi_J2000.
+ */
+BIND(iauP06e, id0odddddddddddddddd, s, IAUP06E, 17, 17, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUP2S(<p>)
+
+   Returns the spherical polar coordinates (theta, phi, r)
+   corresponding to the p-vector <p> */
+BIND(iauP2s, ib3od3, f, IAUP25, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUPAP(<ref>, <tgt>)
+
+   Returns the position angle of p-vector <tgt> from p-vector <ref>
+*/
+BIND(iauPap, ib3b3rd, f, IAUPAP, 2, 2, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUPAS(<al>, <ap>, <bl>, <bp>)
+
+   Returns the position angle of B with respect to A.  <al> =
+   longitude of point A in radians, <ap> = latitude of point A in
+   radians, <bl> = longitude of point B in radians, <bp> = latitude of
+   point B in radians
+*/
+BIND(iauPas, iddddrd, f, IAUPAS, 4, 4, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUPB06, <jd>, <bzeta>, <bz>, <btheta>
+
+   Returns three Euler angles which implement general precesion from
+   epoch J2000.0, using the IAU 2006 model, for Julian Date <jd>.
+   Frame bias (the offset between ICRS and J2000.0) is included. */
+BIND(iauPb06, id0oddd, s, IAUPB06, 4, 4, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUPDP(<a>, <b>)
+
+   Returns the inner product of the two p-vectors <a> and <b> */
+BIND(iauPdp, ib3b3rd, f, IAUPDP, 2, 2, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUPFW06, <jd>, <gamb>, <phib>, <psib>, <epsa>
+
+   Returns the IAU 2006 precession angles in Fukushima-Williams
+   4-angle formulation. */
+BIND(iauPfw06, id0odddd, s, IAUPFW06, 5, 5, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUPLAN94(<jd>, <planet>)
+
+   Returns the approximate heliocentric position and velocity at
+   Julian Date <jd> of major planet <planet> (1 = Mercury, 2 = Venus,
+   3 = EMB, 4 = Mars, ..., 8 = Neptune) 
+*/
+BIND(iauPlan94, id0Loc23rl, f, IAUPLAN94, 2, 2, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUPM(<p>)
+
+   Returns the modulus of the p-vector <p>
+*/
+BIND(iauPm, id3rd, f, IAUPM, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUPMAT00(<jd>)
+
+   Returns the precession matrix (including frame bias) from GCRS to a
+   specified Julian Date <jd> according to the IAU 2000 model.
+*/
+BIND(iauPmat00, id0oc33, f, IAUPMAT00, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUPMAT06(<jd>)
+
+   Returns the precession matrix (including frame bias) from GCRS to a
+   specified Julian Date <jd> according to the IAU 2006 model.
+*/
+BIND(iauPmat06, id0oc33, f, IAUPMAT06, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUPMAT76(<jd>)
+
+   Returns the precession matrix from J2000.0 to a specified Julian
+   Date <jd> according to the IAU 1976 model. */
+BIND(iauPmat76, id0oc33, f, IAUPMAT76, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUPN, <p>, <r>, <u>
+
+   Converts p-vector <p> into a modulus <r> and unit vector <u> */
+BIND(iauPn, ib3odb3, s, IAUPN, 3, 3, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUPN00, <jd>, <dpsi>, <deps>, <epsa>, <rb>, <rp>, <rbp>, <rn>, <rbpn>
+
+   Returns precession-nutation according to the IAU 2000 model for the
+   specified Julian Date <jd> and nutation <dpsi>, <deps>.  The output
+   parameters are the mean obliquity <epsa>, the frame bias matrix
+   <rb>, the precession matrix <rp>, the bias-precession matrix <rbp>,
+   the nutation matrix <rn>, and the GCRS-to-true matrix <rbpn>. */
+BIND(iauPn00, id0ddodc33c33c33c33c33, s, IAUPN00, 9, 9, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUPN00A, <jd>, <dpsi>, <deps>, <epsa>, <rb>, <rp>, <rbp>, <rn>, <rbpn>
+
+   Returns precession-nutation according to the IAU 200A model for the
+   specified Julian Date <jd> and nutation <dpsi>, <deps>.  The output
+   parameters are the mean obliquity <epsa>, the frame bias matrix
+   <rb>, the precession matrix <rp>, the bias-precession matrix <rbp>,
+   the nutation matrix <rn>, and the GCRS-to-true matrix <rbpn>. */
+BIND(iauPn00a, id0ddodc33c33c33c33c33, s, IAUPN00A, 9, 9, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUPN00B, <jd>, <dpsi>, <deps>, <epsa>, <rb>, <rp>, <rbp>, <rn>, <rbpn>
+
+   Returns precession-nutation according to the IAU 200A model for the
+   specified Julian Date <jd> and nutation <dpsi>, <deps>.  The output
+   parameters are the mean obliquity <epsa>, the frame bias matrix
+   <rb>, the precession matrix <rp>, the bias-precession matrix <rbp>,
+   the nutation matrix <rn>, and the GCRS-to-true matrix <rbpn>. */
+BIND(iauPn00b, id0ddodc33c33c33c33c33, s, IAUPN00B, 9, 9, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUPN06, <jd>, <dpsi>, <deps>, <epsa>, <rb>, <rp>, <rbp>, <rn>, <rbpn>
+
+   Returns precession-nutation according to the IAU 2006 model for the
+   specified Julian Date <jd> and nutation <dpsi>, <deps>.  The output
+   parameters are the mean obliquity <epsa>, the frame bias matrix
+   <rb>, the precession matrix <rp>, the bias-precession matrix <rbp>,
+   the nutation matrix <rn>, and the GCRS-to-true matrix <rbpn>. */
+BIND(iauPn06, id0ddodc33c33c33c33c33, s, IAUPN06, 9, 9, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUPN06A, <jd>, <dpsi>, <deps>, <epsa>, <rb>, <rp>, <rbp>, <rn>, <rbpn>
+
+   Returns precession-nutation according to the IAU 2006/2000A models
+   for the specified Julian Date <jd> and nutation <dpsi>, <deps>.
+   The output parameters are the mean obliquity <epsa>, the frame bias
+   matrix <rb>, the precession matrix <rp>, the bias-precession matrix
+   <rbp>, the nutation matrix <rn>, and the GCRS-to-true matrix
+   <rbpn>. */
+BIND(iauPn06a, id0ddodc33c33c33c33c33, s, IAUPN06A, 9, 9, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUPNM00A(<jd>)
+
+   Returns the matrix of precession-nutation (including frame bias)
+   for Julian Date <jd>, equinox-based, IAU 2000A model. */
+BIND(iauPnm00a, id0oc33, f, IAUPNM00A, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUPNM00B(<jd>)
+
+   Returns the matrix of precession-nutation (including frame bias)
+   for Julian Date <jd>, equinox-based, IAU 2000B model. */
+BIND(iauPnm00b, id0oc33, f, IAUPNM00B, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUPNM06A(<jd>)
+
+   Returns the matrix of precession-nutation (including frame bias)
+   for Julian Date <jd>, equinox-based, IAU 2006 precession and IAU
+   2000A nutation models. */
+BIND(iauPnm06a, id0oc33, f, IAUPNM06A, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUPNM80(<jd>)
+
+   Returns the matrix of precession-nutation (including frame bias)
+   for Julian Date <jd>, equinox-based, IAU 1976 precession and IAU
+   1980 nutation models. */
+BIND(iauPnm80, id0oc33, f, IAUPNM80, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUPOM00(<xp>, <yp>, <sp>)
+
+   Returns the matrix of polar motion, IAU 2000, given the coordinates
+   <xp>, <yp> of the pole and TIO locator <sp>. */
+BIND(iauPom00, idddoc33, f, IAUPOM00, 3, 3, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUPR00, <jd>, <dpsipr>, <depspr>
+
+   Returns the precession-rate part of the IAU 2000
+   precession-nutation models (part of MHB2000). */
+BIND(iauPr00, id0odd, s, IAUPR00, 3, 3, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUPREC76, <jd1>, <jd2>, <zeta>, <z>, <theta>
+
+   Returns the three Euler angles <zeta>, <z>, <theta> which implement
+   general precession between epochs (Julian Dates) <jd1> and <jd2>,
+   using the IAU 1976 model (as for the FK5 catalog).  <zeta> is the
+   1st rotation angle in radians clockwise around the z axis, <z> the
+   3rd rotation angle in radians clockwise around the z axis, and
+   <theta> the 2nd rotation angle in radians counterclockwise around
+   the y axis. */
+BIND(iauPrec76, id0d0oddd, s, IAUPREC76, 5, 5, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUPV2S, <pv>, <theta>, <phi>, <r>, <td>, <pd>, <rd>
+
+   Converts position/velocity vector <pv> from Cartesian to spherical
+   coordinates.  <theta> = longitude angle, <phi> = latitude angle,
+   <r> = radial distance, <td> = rate of change of theta, <pd> = rate
+   of change of <phi>, <rd> = rate of change of <r> */
+BIND(iauPv2s, ic23odddddd, s, IAUPV25, 7, 7, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUPVDPV(<a>, <b>)
+
+   Returns the inner product of pv-vectors <a> and <b> */
+BIND(iauPvdpv, ic23c23ob2, f, IAUPVDPV, 2, 2, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUPVM, <pv>, <r>, <s>
+
+   Returns the modulus of pv-vector <pv>.  <r> is the modulus of the
+   position component, and <s> is the modulus of the velocity
+   component. */
+BIND(iauPvm, ic23odd, s, IAUPVM, 3, 3, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUPVSTAR, <pv>, <ra>, <dec>, <pmr>, <pmd>, <px>, <rv>
+
+   Converts position-velocity matrix <pv> to catalog coordinates right
+   ascension <ra> (rad), declination <dec> (rad), right ascension
+   proper motion <pmr> in rad/a, declination proper motion <pmd>
+   (rad/a), parallax <px> (arcsec), and radial velocity <rv> (km/s
+   receding) */
+BIND(iauPvstar, ic23oddddddrl, s, IAUPVSTAR, 7, 7, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUPVXPV(<a>, <b>)
+
+   Returns the outer product of two pv-vectors <a> and <b> */
+BIND(iauPvxpv, ic23c23oc23, f, IAUPVXPV, 2, 2, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUPXP(<a>, <b>)
+
+   Returns the outer product of two p-vectors <a> and <b> */
+BIND(iauPxp, ib3b3ob3, f, IAUPXP, 2, 2, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAURM2V(<r>)
+
+   Returns the rotation vector corresponding to rotation matrix <r>.
+   The rotation vector has the same direction as the Euler axis of
+   matrix <r> and has its magnitude equal to the rotation angle in
+   radians of the rotation matrix. */
+BIND(iauRm2v, ic33ob3, f, IAURM2V, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAURV2M(<w>)
+
+   Returns the rotation matrix corresponding to rotation vector <w>.
+   The rotation matrix Euler axis gets the direction of <w>, and the
+   rotation matrix gets a rotation angle equal to the modulus of
+   <w>. */
+BIND(iauRv2m, ib3oc33, f, IAURV2M, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAURX, <phi>, <r>
+
+   Rotates r-matrix <r> about the x axis over angle <phi> */
+BIND(iauRx, idc33, s, IAURX, 2, 2, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAURXPV(<r>, <pv>)
+
+   Returns the matrix product of r-matrix <r> and pv-vector <pv> */
+BIND(iauRxpv, ic33c23oc23, f, IAURXPV, 2, 2, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAURY, <phi>, <r>
+
+   Rotates r-matrix <r> about the y axis over angle <phi> */
+BIND(iauRy, idc33, s, IAURY, 2, 2, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAURZ, <phi>, <r>
+
+   Rotates r-matrix <r> about the z axis over angle <phi> */
+BIND(iauRz, idc33, s, IAURZ, 2, 2, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUS00(<jd>, <x>, <y>)
+
+   Returns the CIO locator for the specified Julian Date <jd> given
+   the CIP's <x> and <y> coordinates, using IAU 2000A
+   precession-nutation */
+BIND(iauS00, id0ddrd, f, IAUS00, 3, 3, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUS00A(<jd>)
+
+   Returns the CIO locator for the specified Julian Date <jd>, using
+   IAU 2000A precession-nutation */
+BIND(iauS00a, id0rd, f, IAUS00A, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUS00B(<jd>)
+
+   Returns the CIO locator for the specified Julian Date <jd>, using
+   IAU 2000B precession-nutation */
+BIND(iauS00b, id0rd, f, IAUS00B, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUS06(<jd>, <x>, <y>)
+
+   Returns the CIO locator for the specified Julian Date <jd> given
+   the CIP's <x> and <y> coordinates, using IAU 2006/2000A
+   precession-nutation */
+BIND(iauS06, id0ddrd, f, IAUS06, 3, 3, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUS06A(<jd>)
+
+   Returns the CIO locator for the specified Julian Date <jd>, using
+   IAU 2006 precession and IAU 2000A nutation */
+BIND(iauS06a, id0rd, f, IAUS06A, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUS2C(<theta>, <phi>)
+
+   Returns the cartesian coordinates (direction cosines) corresponding
+   to spherical coordinates longitude <theta> and latitude <phi> */
+BIND(iauS2c, iddob3, f, IAUS2C, 2, 2, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUS2P(<theta>, <phi>, <r>)
+
+   Converts spherical polar coordinates longitude <theta>, latitude
+   <phi>, radial distance <r> to a p-vector */
+BIND(iauS2p, idddob3, f, IAUS2P, 3, 3, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUS2PV(<theta>, <phi>, <r>, <td>, <pd>, <rd>)
+
+   Returns the pv-vector that corresponds to the spherical coordinates
+   longitude <theta>, latitude <phi>, radial distance <r>, rate of
+   change of theta <td>, rate of change of phi <pd>, rate of change of
+   r <rd> */
+BIND(iauS2pv, iddddddoc23, f, IAUS2PV, 6, 6, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUSEPP(<a>, <b>)
+
+   Returns the angular separation between two p-vectors <a> and <b> */
+BIND(iauSepp, ib3b3rd, f, IAUSEPP, 2, 2, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUSEPS(<lon1>, <lat1>, <lon2>, <lat2>)
+
+   Returns the angular separation between the direction with longitude
+   <lon1>, latitude <lat1> and the direction with longitude <lon2>,
+   latitude <lat2> */
+BIND(iauSeps, iddddrd, f, IAUSEPS, 4, 4, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUSP00(<jd>)
+
+   Returns the TIO locator s' for Julian Date <jd>, positioning the
+   Terrestrial Intermediate Origin on the equator of the Celestial
+   Intermediate Pole */
+BIND(iauSp00, id0rd, f, IAUSP00, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUSTARPM, <ra1>, <dec1>, <pmr1>, <pmd1>, <px1>, <rv1>, <jd1>,
+   <jd2>, <ra2>, <dec2>, <pmr2>, <pmd2>, <px2>, <rv2>
+
+   Updates star catalog data for space motion. <ra> = right ascension,
+   <dec> = declination, <pmr> = right ascension proper motion, <pmd> =
+   declination proper motion, <px> = parallax, <rv> = radial velocity;
+   *1 = before, *2 = after */
+BIND(iauStarpm, iddddddd0d0oddddddrl, s, IAUSTARPM, 14, 14, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUSTARPV(<ra>, <dec>, <pmr>, <pmd>, <px>, <rv>)
+
+   Converts star catalog coordinates to a position-velocity matrix */
+BIND(iauStarpv, iddddddoc23rl, f, IAUSTARPV, 6, 6, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUTAITT(<jdtai>)
+
+   Translates Julian Date <jdtai> from TAI to TT */
+BIND(iauTaitt, id0oddrl_jd, f, IAUTAITT, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUTAIUT1(<jdtai>, <dta>)
+
+   Translates Julian Date <jdtai> from TAI to UT1, given <dta> = UT1 -
+   TAi in seconds */
+BIND(iauTaiut1, id0doddrl_jd, f, IAUTAIUT1, 2, 2, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUTAIUTC(<jdtai>)
+
+   Translates Julian Date <jdtai> from TAI to UTC */
+BIND(iauTaiutc, id0oddrl_jd, f, IAUTAIUTC, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUTCBTDB(<jdtcb>)
+
+   Translates Julian Date <jdtcb> from TCB to TDB */
+BIND(iauTcbtdb, id0oddrl_jd, f, IAUTCBTDB, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUTCGTT(<jdtcg>)
+
+   Translates Julian Date <jdtcg> from TCG to TT */
+BIND(iauTcgtt, id0oddrl_jd, f, IAUTCGTT, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUTDBTCB(<jdtdb>)
+
+   Translates Julian Date <jdtdb> from TDB to TCB */
+BIND(iauTdbtcb, id0oddrl_jd, f, IAUTDBTCB, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUTDBTT(<jdtdb>, <dtr>)
+
+   Translates Julian Date <jdtbd> from TDB to TT, given <dtr> = TDB -
+   TT in seconds  */
+BIND(iauTdbtt, id0doddrl_jd, f, IAUTDBTT, 2, 2, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUTR(<r>)
+
+   Transposes r-matrix <r> */
+BIND(iauTr, ic33oc33, f, IAUTR, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUTRXP(<r>, <p>)
+
+   Multiply p-vector <p> by the transpose of r-matrix <r> */
+BIND(iauTrxp, ic33b3ob3, f, IAUTRXP, 2, 2, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUTRXPV(<r>, <pv>)
+
+   Multiply pv-vector <pv> by the transpose of r-matrix <r> */
+BIND(iauTrxpv, ic33c23oc23, f, IAUTRXPV, 2, 2, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUTTTAI(<jdtt>)
+
+   Transforms Julian Date <jdtt> from TT to TAI */
+BIND(iauTttai, id0oddrl_jd, f, IAUTTTAI, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUTTTCG(<jdtt>)
+
+   Transforms Julian Date <jdtt> from TT to TCG */
+BIND(iauTttcg, id0oddrl_jd, f, IAUTTTCG, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUTTTDB(<jdtt>, <dt>)
+
+   Transforms Julian Date <jdtt> from TT to TDB, given <dt> = TDB -
+   TT in seconds */
+BIND(iauTttdb, id0doddrl_jd, f, IAUTTTDB, 2, 2, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUTTUT1(<jdtt>, <dt>)
+
+   Transforms Julian Date <jdtt> from TT to UT1, given <dt> = TT - UT1
+   in seconds */
+BIND(iauTtut1, id0doddrl_jd, f, IAUTTUT1, 2, 2, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUUT1TAI(<jdut>, <dt>)
+
+   Transforms Julian Date <jdut> from UT1 to TAI, given <dt> = UT1 -
+   TAI in seconds */
+BIND(iauUt1tai, id0doddrl_jd, f, IAUUT1TAI, 2, 2, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUUT1TT(<jdut>, <dt>)
+
+   Transforms Julian Date <jdut> from UT1 to TT, given <dt> = UT1 -
+   TT in seconds */
+BIND(iauUt1tt, id0doddrl_jd, f, IAUUT1TT, 2, 2, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUUT1UTC(<jdut>, <dt>)
+
+   Transforms Julian Date <jdut> from UT1 to UTC, given <dt> = UT1 -
+   UTC in seconds */
+BIND(iauUt1utc, id0doddrl_jd, f, IAUUT1UTC, 2, 2, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUUTCTAI(<jdut>)
+
+   Transforms Julian Date <jdut> from UTC to TAI */
+BIND(iauUtctai, id0oddrl_jd, f, IAUUTCTAI, 1, 1, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUUTCUT1(<jdut>, <dt>)
+
+   Transforms Julian Date <jdut> from UTC to UT1, given <dt> = UT1 -
+   UTC in seconds */
+BIND(iauUtcut1, id0doddrl_jd, f, IAUUTCUT1, 2, 2, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUXY06, <jd>, <x>, <y>
+
+   Returns the Celestial Intermediate Pole <x>, <y> coordinates for
+   the given Julian Date <jd>, based on IAU 2006 precession and IAU
+   2000A nutation. */
+BIND(iauXy06, id0odd, s, IAUXY06, 3, 3, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUXYS00A, <jd>, <x>, <y>, <s>
+
+   Returns the Celestial Intermediate Pole <x>, <y> coordinates and
+   the CIO locator <s> for Julian Date <jd>, based on the IAU 2000A
+   precession-nutation model */
+BIND(iauXys00a, id0oddd, s, IAUXYS00A, 4, 4, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUXYS00B, <jd>, <x>, <y>, <s>
+
+   Returns the Celestial Intermediate Pole <x>, <y> coordinates and
+   the CIO locator <s> for Julian Date <jd>, based on the IAU 2000B
+   precession-nutation model */
+BIND(iauXys00b, id0oddd, s, IAUXYS00B, 4, 4, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAUXYS06A, <jd>, <x>, <y>, <s>
+
+   Returns the Celestial Intermediate Pole <x>, <y> coordinates and
+   the CIO locator <s> for Julian Date <jd>, based on the IAU 2006
+   precession and IAU 2000A nutation models */
+BIND(iauXys06a, id0oddd, s, IAUXYS06A, 4, 4, NULL)
+/*-----------------------------------------------------------------------*/

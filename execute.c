@@ -697,9 +697,11 @@ int internal_routine(int symbol, internalRoutine *routine)
 
 		/* legal number of arguments? */
  if (nArg - nKeys > routine[routineNum].maxArg)
-   return anaerror("Illegal number of arguments to %s %s",
-		symbol, isSubroutine? "subroutine": "function",
-		routine[routineNum].name);
+   return anaerror("Too many arguments to %s %s: found %d,"
+                   " cannot accept more than %d",
+                   symbol, isSubroutine? "subroutine": "function",
+                   routine[routineNum].name, nArg - nKeys,
+                   routine[routineNum].maxArg);
 
  /* treat the arguments */
  if (nKeys? maxArg: (nArg + ordinary)) {/* arguments possible */
@@ -883,9 +885,11 @@ int internal_routine(int symbol, internalRoutine *routine)
  if (maxArg < routine[routineNum].minArg
      || maxArg > routine[routineNum].maxArg) {
    free(evalArgs);
-   return anaerror("Illegal number of arguments to %s %s",
-		symbol, isSubroutine? "subroutine": "function",
-		routine[routineNum].name);
+   return anaerror("Illegal number of arguments to %s %s:"
+                   "found %d, accept between %d and %d",
+                   symbol, isSubroutine? "subroutine": "function",
+                   routine[routineNum].name, maxArg,
+                   routine[routineNum].minArg, routine[routineNum].maxArg);
  }
 
  /* suppress unused (class 0) arguments if requested.  Remove any such */

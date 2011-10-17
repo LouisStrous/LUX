@@ -19,7 +19,7 @@ MORELIBS=
 LDFLAGS= $(MORELIBS)
 MOREINCLDIRS=.
 
-ana: $(OBS) libsofa_c.a sofa.h sofam.h
+ana: sofam.h $(OBS) libsofa_c.a sofa.h
 	./updatelevel
 	rm -f site.o
 	$(CC) $(CPPFLAGS) $(CFLAGS) -DHAVE_CONFIG_H -c site.c

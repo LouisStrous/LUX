@@ -1274,6 +1274,79 @@ int ana_variance(int narg, int ps[])
   return sdev(narg, ps, 0);
 }
 /*------------------------------------------------------------------------- */
+/*
+Algorithm for calculating the standard deviation with very little
+roundoff error, with one pass through the data, and with guaranteed
+non-negative variance.
+
+Knuth, The Art of Computer Programming, Volume 2: Seminumerical
+Algorithms, gives the following algorithm for unweighted data:
+
+M₁ = x₁
+S₁ = 0
+M_k = M_{k-1} + (x_k - M_{k-1})/k
+S_k = S_{k-1} + (x_k - M_{k-1})*(x_k - M_k)
+s = √(S_k/(k - 1))
+
+Example: x₁ = 2, x₂ = 1, x₃ = 1
+M₁ = 2, S₁ = 0
+M₂ = 2 + (1 - 2)/2 = 3/2
+S₂ = 0 + (1 - 2)*(1 - 3/2) = 1/2
+M₃ = 3/2 + (1 - 3/2)/3 = 4/3
+S₃ = 1/2 + (1 - 3/2)*(1 - 4/3) = 2/3
+s = √(2/3/(3 - 1)) = ⅓√3
+
+I find the following extension to weighted data:
+
+M₁ = x₁
+W₁ = w₁
+S₁ = 0
+W_k = W_{k-1} + w_k
+M_k = M_{k-1} + (x_k - M_{k-1})/W_k
+S_k = S_{k-1} + (x_k - M_{k-1})*(x_k - M_k)*w_k
+s = √(S_k/(W_k - 1))
+
+Example: x₁ = 2, x₂ = 1, x₃ = 1, w₁ = w₂ = w₃ = 1
+M₁ = 2, S₁ = 0, W₁ = 1, X₁ = 1
+W₂ = 1 + 1 = 2
+M₂ = 2 + (1 - 2)/2 = 3/2
+S₂ = 0 + (1 - 2)*(1 - 3/2)*1 = 1/2
+W₃ = 2 + 1 = 3
+M₃ = 3/2 + (1 - 3/2)/3 = 4/3
+S₃ = 1/2 + (1 - 3/2)*(1 - 4/3)*1 = 2/3
+s = √(2/3/(3 - 1)) = √(1/3) = ⅓√3
+
+Example: x₁ = 2, x₂ = 1, w₁ = 1, w₂ = 2
+M₁ = 2, S₁ = 0, W₁ = 1
+W₂ = 1 + 2 = 3
+M₂ = 2 + (1 - 2)/3 = 4/3
+S₂ = 0 + (1 - 2)*(1 - 4/3)*2 = 2/3
+s = √(2/3/(3 - 1)) = √(1/3) = ⅓√3
+ */
+void spread_d(int count, double *data, double *weight, double *spread, double *sumweight)
+{
+  double M, W, S;
+
+  if (count <= 1)
+    return 0.0;
+  M = *data++;
+  W = *weight++;
+  S = 0.0;
+  while (--count) {
+    W += *weight;
+    double Mold = M;
+    if (W)
+      M += (*data - Mold)/W;
+    S += (*data - Mold)*(*data - M)**weight;
+  }
+  if (mean)
+    *mean = M;
+  if (variance)
+    *variance = S;
+  if (sumweight)
+    *sumweight = W;
+}
+/*------------------------------------------------------------------------- */
 int ana_swab(int narg, int ps[])
 /*swap bytes in an array or even an scalar */
 /*this is a subroutine and swaps the input symbol (not a copy) */

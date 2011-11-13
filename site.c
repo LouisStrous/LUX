@@ -9,13 +9,8 @@
 #include <ctype.h>
 #include "editor.h"		/* for BUFSIZE */
 #include "dmalloc.h"
-#include "ana-patch-level.h"
 static char rcsid[] __attribute__ ((unused)) =
  "$Id: site.c,v 4.0 2001/02/07 20:37:04 strous Exp $";
-
-#ifndef PATCH
-#define PATCH "?"
-#endif
 
 extern int	internalMode;
 void	printw(char *), printwf(char *, ...);
@@ -56,7 +51,7 @@ int site(int narg, int ps[])
     memcpy(ANAversion, p, p2 - p);
     ANAversion[p2 - p] = '\0';
     printw(ANAversion);
-    printw("." PATCH " for " PLATFORM " ***\n");
+    printw(" " BRANCH "/" TAG " for " PLATFORM " ***\n");
     printw("Type \"HELP\" for assistance.\n");
 #if DEBUG
     printw("Warning: This version of ANA was compiled with the DEBUG option - This may make the program very slow!\n");

@@ -19,10 +19,18 @@ MORELIBS=
 LDFLAGS= $(MORELIBS)
 MOREINCLDIRS=.
 
+BRANCH = $(subst refs/heads/,,$(shell git symbolic-ref HEAD 2>/dev/null))
+ifeq ($(BRANCH),)
+BRANCH = "(unnamed branch)"
+endif
+TAG = $(shell git describe --exact-match HEAD 2>/dev/null)
+ifeq ($(TAG),)
+TAG = $(shell git rev-parse HEAD)
+endif
+
 ana: sofam.h $(OBS) libsofa_c.a sofa.h
-	./updatelevel
 	rm -f site.o
-	$(CC) $(CPPFLAGS) $(CFLAGS) -DHAVE_CONFIG_H -c site.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -DHAVE_CONFIG_H -DBRANCH=\"$(BRANCH)\" -DTAG=\"$(TAG)\" -c site.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $(OBS) site.o $(LIBS) -o $(EXEC)
 anaparser.c.tab.c anaparser.c.tab.h: anaparser.c
 	bison --defines=anaparser.c.tab.h --output-file=anaparser.c.tab.c anaparser.c

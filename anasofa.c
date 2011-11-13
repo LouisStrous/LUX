@@ -112,28 +112,32 @@ BIND(iauC2ixys, idddoc33, f, IAUC2IXYS, 3, 3, NULL)
    <angles(0,/all)> = longitude angle (radians)
    <angles(1,/all)> = latitude angle (radians)
    */
-BIND(iauC2s, ib3ob2, f, IAUC2S, 1, 1, NULL)
+BIND(iauC2s, ib3rb2, f, IAUC2S, 1, 1, NULL)
 /*-----------------------------------------------------------------------*/
-/* rc2t = IAUC2T00A(jd, x, y)
+/* rc2t = IAUC2T00A(jdtt, jdut, x, y)
 
-   Return the celestial-to-terrestrial matrix for <jd> given the polar
-   coordinates <x>, <y>, using the IAU2000A nutation model
-*/
-BIND(iauC2t00a, id000ddoc33, f, IAUC2T00A, 3, 3, NULL)
+   Return the celestial-to-terrestrial matrix given <jdtt>, <jdut>,
+   and the polar coordinates <x>, <y>, using the IAU2000A nutation
+   model.  <jdtt> and <jdut> should express the same instants in time,
+   in the TT and UT1 timescales, respectively */
+BIND(iauC2t00a, id0d0ddoc33_mod, f, IAUC2T00A, 4, 4, NULL)
 /*-----------------------------------------------------------------------*/
-/* rc2t = IAUC2T00B(jd, x, y)
+/* rc2t = IAUC2T00B(jdtt, jdut, x, y)
 
-   Return the celestial-to-terrestrial matrix for <jd> given the polar
-   coordinates <x>, <y>, using the IAU2000B nutation model
-*/
-BIND(iauC2t00b, id000ddoc33, f, IAUC2T00B, 3, 3, NULL)
+   Return the celestial-to-terrestrial matrix given <jdtt>, <jdut>,
+   and the polar coordinates <x>, <y>, using the IAU2000B nutation
+   model.  <jdtt> and <jdut> should express the same instants in time,
+   in the TT and UT1 timescales, respectively */
+BIND(iauC2t00b, id0d0ddoc33_mod, f, IAUC2T00B, 4, 4, NULL)
 /*-----------------------------------------------------------------------*/
 /* rc2t = IAUC2T06A(jd, x, y)
 
-   Return the celestial-to-terrestrial matrix for <jd> given the polar
-   coordinates <x>, <y>, using the IAU 2006 precession and IAU 2000A
-   nutation models */
-BIND(iauC2t06a, id000ddoc33, f, IAUC2T06A, 3, 3, NULL)
+   Return the celestial-to-terrestrial matrix given <jdtt>, <jdut>,
+   and the polar coordinates <x>, <y>, using the IAU 2006 precession
+   model and the IAU 2000A nutation model.  <jdtt> and <jdut> should
+   express the same instants in time, in the TT and UT1 timescales,
+   respectively */
+BIND(iauC2t06a, id0d0ddoc33_mod, f, IAUC2T06A, 4, 4, NULL)
 /*-----------------------------------------------------------------------*/
 /* IAUC2TCIO(rc2i, era, rpom)
 
@@ -234,35 +238,69 @@ int ana_iauDat(int narg, int ps[])
   loopInfo *infos;
   int iq;
 
-  if ((iq = standard_args(narg, ps, "i>L3*;rD-3*", &ptrs, &infos)) < 0)
-    return ANA_ERROR;
-  switch (infos[0].type) {
-  case ANA_LONG:
-    while (infos[1].nelem--) {
-      iauDat(ptrs[0].l[0], ptrs[0].l[1], ptrs[0].l[2], 0.0, ptrs[1].d++);
-      ptrs[0].l += 3;
+  if (internalMode & 1) {       /* /VALID */
+    time_t t;
+    int jdlo, jdhi, y, m, d, shi, slo;
+    double f, dt;
+
+    /* determine the last date of validity of the current implementation */
+
+    jdlo = 2441318;         /* 1972-01-01 */
+    t = time(NULL);
+    jdhi = (double) t/86400.0 + 2440587.5 + 10000;
+    iauJd2cal(jdlo, 0.0, &y, &m, &d, &f);
+    slo = iauDat(y, m, d, f, &dt);
+    iauJd2cal(jdhi, 0.0, &y, &m, &d, &f);
+    shi = iauDat(y, m, d, f, &dt);
+    do {
+      int jd, s;
+      jd = (jdhi + jdlo)/2;
+      iauJd2cal(jd, 0.0, &y, &m, &d, &f);
+      s = iauDat(y, m, d, f, &dt);
+      if (s) {
+        jdhi = jd;
+        shi = s;
+      } else {
+        jdlo = jd;
+        slo = s;
+      }
+    } while (jdhi - jdlo > 1);
+    iq = scalar_scratch(ANA_LONG);
+    scalar_value(iq).l = jdlo;
+    return iq;
+  } else {
+    if (narg < 2)
+      return anaerror("Need 1 argument", ps[0]);
+    if ((iq = standard_args(narg, ps, "i>L3*;rD-3*", &ptrs, &infos)) < 0)
+      return ANA_ERROR;
+    switch (infos[0].type) {
+    case ANA_LONG:
+      while (infos[1].nelem--) {
+        iauDat(ptrs[0].l[0], ptrs[0].l[1], ptrs[0].l[2], 0.0, ptrs[1].d++);
+        ptrs[0].l += 3;
+      }
+      break;
+    case ANA_FLOAT:
+      while (infos[1].nelem--) {
+        int d = (int) floor(ptrs[0].f[2]);
+        double f = ptrs[0].f[2] - d;
+        iauDat((int) ptrs[0].f[0], (int) ptrs[0].f[1], d, f, ptrs[1].d++);
+        ptrs[0].f += 3;
+      }
+      break;
+    case ANA_DOUBLE:
+      while (infos[1].nelem--) {
+        int d = (int) floor(ptrs[0].d[2]);
+        double f = ptrs[0].d[2] - d;
+        iauDat((int) ptrs[0].d[0], (int) ptrs[0].d[1], d, f, ptrs[1].d++);
+        ptrs[0].d += 3;
+      }
+      break;
     }
-    break;
-  case ANA_FLOAT:
-    while (infos[1].nelem--) {
-      int d = (int) floor(ptrs[0].f[2]);
-      double f = ptrs[0].f[2] - d;
-      iauDat((int) ptrs[0].f[0], (int) ptrs[0].f[1], d, f, ptrs[1].d++);
-      ptrs[0].f += 3;
-    }
-    break;
-  case ANA_DOUBLE:
-    while (infos[1].nelem--) {
-      int d = (int) floor(ptrs[0].d[2]);
-      double f = ptrs[0].d[2] - d;
-      iauDat((int) ptrs[0].d[0], (int) ptrs[0].d[1], d, f, ptrs[1].d++);
-      ptrs[0].d += 3;
-    }
-    break;
   }
   return iq;
 }
-REGISTER(iauDat, f, IAUDAT, 1, 1, NULL);
+REGISTER(iauDat, f, IAUDAT, 0, 1, "1VALID");
 /*-----------------------------------------------------------------------*/
 /* IAUDTDB(jd, elong, u, v)
 

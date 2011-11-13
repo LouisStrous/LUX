@@ -53,7 +53,7 @@
 int ana_iLb3od3rl_f_(int narg, int ps[], int (*f)(int, double *, double *, double *, double *));
 int ana_iLd3ob3rl_f_(int narg, int ps[], int (*f)(int, double, double, double, double *));
 int ana_ib3DDod3rl_f_(int narg, int ps[], int (*f)(double, double, double *, double *, double *, double *));
-int ana_ib3ob2_f_(int narg, int ps[], void (*f)(double *, double *, double *));
+int ana_ib3rb2_f_(int narg, int ps[], void (*f)(double *, double *, double *));
 int ana_ib3oc33_f_(int narg, int ps[], void (*f)(double [3], double [3][3]));
 int ana_ib3od3_f_(int narg, int ps[], void (*f)(double *, double *, double *, double *));
 int ana_ib3odb3_s_(int narg, int ps[], void (*f)(double *, double *, double *));
@@ -68,7 +68,7 @@ int ana_ic33ob3_f_(int narg, int ps[], void (*f)(double [3][3], double [3]));
 int ana_ic33oc33_f_(int narg, int ps[], void (*f)(double [3][3], double [3][3]));
 int ana_ic33odd_s_(int narg, int ps[], void (*f)(double (*)[3], double *, double *));
 int ana_id000ddddoc33_f_(int narg, int ps[], void (*f)(double, double, double, double, double, double, double, double, double (*)[3]));
-int ana_id000ddoc33_f_(int narg, int ps[], void (*f)(double, double, double, double, double, double, double (*)[3]));
+int ana_id0d0ddoc33_mod_f_(int narg, int ps[], void (*f)(double, double, double, double, double, double, double (*)[3]));
 int ana_id00DDDrd_f_(int narg, int ps[], double (*f)(double, double, double, double, double, double));
 int ana_id0Loc23rl_f_(int narg, int ps[], int (*f)(double, double, int, double (*)[3]));
 int ana_id0c23c23rl_s_(int narg, int ps[], int (*f)(double, double, double (*)[3], double (*)[3]));
@@ -121,7 +121,9 @@ void register_ana_ ## func ## _ ## fs (void) { \
 
 #define BIND(func, type, fs, name, minarg, maxarg, fsspec)      \
 int ana_ ## func(int narg, int ps[]) { \
- return ana_ ## type ## _ ## fs ## _(narg, ps, func); \
+ int result = ana_ ## type ## _ ## fs ## _(narg, ps, func); \
+ if (result < 0) anaerror("Error in " #name, 0); \
+ return result; \
 } \
 REGISTER(func, fs, name, minarg, maxarg, fsspec)
 

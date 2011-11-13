@@ -1517,9 +1517,9 @@ int numerical_or_string(int data, int **dims, int *nDim, int *size, pointer *src
   */
 /*--------------------------------------------------------------------*/
 struct dims_spec {
-  enum dim_spec_type { DS_ACCEPT = 0, DS_ADD = 1, DS_REMOVE = 2, 
-                       DS_ADD_REMOVE = 3, /* = DS_ADD | DS_REMOVE */
-                       DS_COPY_REF = 4, DS_EXACT = 8 } type;
+  enum dim_spec_type { DS_NONE = 0, DS_ACCEPT = (1<<0), DS_ADD = (1<<1),
+                       DS_REMOVE = (1<<2), DS_ADD_REMOVE = (DS_ADD | DS_REMOVE),
+                       DS_COPY_REF = (1<<3), DS_EXACT = (1<<4) } type;
   size_t size_add;
   size_t size_remove;
 };
@@ -1563,6 +1563,7 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
   size_t i, prev_ods_num_elem;
   int return_param_index = -1;
   int param_index;
+  char const *fmt0 = fmt;
 
   if (!fmt || !*fmt)
     return NULL;
@@ -1573,9 +1574,7 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
   prev_ods_num_elem = 0;
   while (*fmt) {
     struct param_spec p_spec;
-    p_spec.num_dims_spec = 0;
-    p_spec.dims_spec = NULL;
-    p_spec.ref_par = 0;
+    memset(&p_spec, '\0', sizeof(p_spec));
     
     while (*fmt && *fmt != ';') { /* every parameter specification */
       /* required parameter kind specification */
@@ -1660,9 +1659,6 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
 
       /* optional dims-specs */
       struct dims_spec d_spec;
-      d_spec.type = 0;
-      d_spec.size_add = 0;
-      d_spec.size_remove = 0;
       if (*fmt == '[') {       /* reference parameter specification */
         fmt++;
         if (*fmt++ == '-')
@@ -1686,6 +1682,7 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
         }
       }
       while (*fmt && *fmt != '*' && *fmt != ';') { /* all dims */
+        memset(&d_spec, '\0', sizeof(d_spec));
         while (*fmt && *fmt != ',' && *fmt != '*' && *fmt != ';') { /* every dim */
           int type = 0;
           size_t size = 0;
@@ -1715,16 +1712,39 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
             fmt = p;
           }
           switch (type) {
-          default:
-            d_spec.size_add = size;
+          case DS_ADD:
+            if (d_spec.type == DS_NONE || d_spec.type == DS_REMOVE) {
+              d_spec.size_add = size;
+              d_spec.type |= type;
+            } else {
+              anaerror("Illegal combination of multiple types for dimension; parameter specification #%d: %s", 0, param_index + 1, fmt0);
+              errno = EINVAL;
+              goto error;
+            }
             break;
           case DS_REMOVE:
-            d_spec.size_remove = size;
+            if (d_spec.type == DS_NONE || d_spec.type == DS_ADD) {
+              d_spec.size_remove = size;
+              d_spec.type |= type;
+            } else {
+              anaerror("Illegal combination of multiple types for dimension; parameter specification #%d: %s", 0, param_index + 1, fmt0);
+              errno = EINVAL;
+              goto error;
+            }
+            break;
+          default:
+            if (d_spec.type == DS_NONE) {
+              d_spec.size_add = size;
+              d_spec.type = type;
+            } else {
+              anaerror("Illegal combination of multiple types for dimension; parameter specification #%d: %s", 0, param_index + 1, fmt0);
+              errno = EINVAL;
+              goto error;
+            }
             break;
           }
-          d_spec.type |= type;
-          obstack_grow(&ods, &d_spec, sizeof(d_spec));
         } /* end of while (*fmt && *fmt != ',' && *fmt != ';') */
+        obstack_grow(&ods, &d_spec, sizeof(d_spec));
         if (*fmt == ',')
           fmt++;
       } /* end of while (*fmt && *fmt != '*' && *fmt != ';') */
@@ -1887,7 +1907,7 @@ int standard_args(int narg, int ps[], char const *fmt, pointer **ptrs,
     int ref_param = pspec->ref_par;
     if (ref_param < 0)
       ref_param = (param_ix? param_ix - 1: 0);
-    if (ref_param != prev_ref_param) {
+    if (n && ref_param != prev_ref_param) {
       /* get reference parameter's information */
       /* if the reference parameter is an output parameter, then
          we must get the information from its *final* value */
@@ -1950,12 +1970,14 @@ int standard_args(int narg, int ps[], char const *fmt, pointer **ptrs,
         case DS_REMOVE: case DS_ADD_REMOVE:
           switch (pspec->logical_type) {
           case PS_INPUT:
-            if (in_dims[in_dims_ix] != dims_spec[pspec_dims_ix].size_remove) {
-              returnSym = anaerror("Expected size %d for dimension %d "
-                                   "but found %d", ps[param_ix],
-                                   dims_spec[pspec_dims_ix].size_remove,
-                                   in_dims_ix, in_dims[in_dims_ix]);
-              goto error;
+            {
+              int d = dims_spec[pspec_dims_ix].size_remove;
+              if (d && in_dims[in_dims_ix] != d) {
+                returnSym = anaerror("Expected size %d for dimension %d "
+                                     "but found %d", ps[param_ix],
+                                     d, in_dims_ix, in_dims[in_dims_ix]);
+                goto error;
+              }
             }
             break;
           case PS_OUTPUT: case PS_RETURN:

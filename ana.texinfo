@@ -7927,6 +7927,23 @@ International Terrestrial Reference System:
 
 @code{@var{rc2t} = @var{rpom} # R_3(@var{era}) # @var{rc2i}}
 
+Given celestial coordinates @code{@var{crs}} (in the Geocentric
+Celestial Reference System), the celestial-to-true matrix
+@code{@var{rbpn}}, the polar motion matrix @code{@var{rpom}}, and
+Greenwich apparent Sidereal Time @code{@var{gst}}, the terrestrial
+coordinates @code{@var{trs}} (in the International Terrestrial
+Reference System) are found through
+
+@code{@var{trs} = @var{rpom} # R_3(@var{gst}) # @var{rbpn} # @var{crs}}
+
+The celestial-to-terrestrial matrix @code{@var{rc2t}} translates
+coordinate from the Geocentric Celestial Reference System to the
+International Terrestrial Reference System:
+
+@code{@var{trs} = @var{rc2t} # @var{crs}}
+
+@code{@var{rc2t} = @var{rpom} # R_3(@var{gst}) # @var{rbpn}}
+
 @c ------------------------------------------------------------------
 @node Binary Operators, Color, Astronomy and Calendars, Routine Groups
 @comment  node-name,  next,  previous,  up
@@ -19177,6 +19194,8 @@ See also: @ref{IAUBP00}, @ref{IAUBP06}
 @code{@var{jdtt}} according to the IAU 2000 precession-nutation model.
 @code{@var{rb}} receives the frame bias matrix, @code{@var{rp}} the
 precession matrix, and @code{@var{rbp}} the bias-precession matrix.
+@code{@var{rp}} and @code{@var{rbp}} have the same dimensions as
+@code{@var{jdtt}} but with two dimensions equal to 3 prefixed.
 
 @code{@var{jdtt}} may be a numerical scalar or array.
 
@@ -19214,7 +19233,7 @@ See also: @ref{IAUBI00}, @ref{IAUBP00}, @ref{Astronomical Coordinate Calculation
 @code{IAUBPN2XY, @var{rbpn}, @var{x}, @var{y}}
 
 [SOFA] Extracts the dimensionless @code{@var{x}} and @code{@var{y}}
-coordinates of the Celestial Intermediate Pole from the
+coordinates of the Celestial Intermediate Pole unit vector from the
 bias-precession-nutation matrix @code{@var{rbpn}}.
 
 @c -------------------------------------
@@ -19281,7 +19300,10 @@ See also: @ref{IAUC2I00A}, @ref{IAUC2I00B}, @ref{IAUC2IBPN}, @ref{Astronomical C
 [SOFA] Forms the celestial-to-intermediate matrix for TT Julian Dates
 @code{@var{jd}}, given the bias-precession-nutation matrix
 @code{@var{rbpn}} for those same dates.  @code{@var{jdtt}} may be a
-numerical scalar or array.
+numerical scalar or array.  The dimensions of @code{@var{rbpn}} must
+be equal to those of @code{@var{jdtt}} but with two dimensions equal
+to 3 prefixed.  The returned array has the same dimensions as
+@code{@var{rbpn}}.
 
 See also @ref{IAUC2I00A}, @ref{IAUC2I00B}, @ref{IAUC2I06A}, @ref{Astronomical Coordinate Calculations}
 
@@ -19296,7 +19318,10 @@ See also @ref{IAUC2I00A}, @ref{IAUC2I00B}, @ref{IAUC2I06A}, @ref{Astronomical Co
 TT Julian Dates @code{@var{jdtt}} and Celestial Intermediate Pole
 coordinates @code{@var{x}} and @code{@var{y}} (components of the unit
 vector in the Geocentric Celestial Reference System), for IAU 2000
-models.  @code{@var{jdtt}} may be a numerical scalar or array.
+models.  @code{@var{jdtt}} may be a numerical scalar or array.  The
+dimensions of @code{@var{rbpn}} must be equal to those of
+@code{@var{jdtt}} but with two dimensions equal to 3 prefixed.  The
+returned array has the same dimensions as @code{@var{rbpn}}.
 
 See also: @ref{IAUC2IXYS}, @ref{Astronomical Coordinate Calculations}
 
@@ -19312,7 +19337,10 @@ Celestial Intermediate Pole coordinates @code{@var{x}} and
 @code{@var{y}} (components of the unit vector in the Geocentric
 Celestial Reference System) and Celestial Intermediate Origin locator
 @code{@var{s}} (in radians), which positions the Celestial
-Intermediate Origin on the equator of the Celestial Intermediate Pole.
+Intermediate Origin on the equator of the Celestial Intermediate
+Pole.  The three arguments must all have the same dimensions.  The
+returned array has those same dimensions, too, but with two dimensions
+equal to 3 prefixed.
 
 See also: @ref{IAUC2IXY}, @ref{Astronomical Coordinate Calculations}
 
@@ -19325,52 +19353,89 @@ See also: @ref{IAUC2IXY}, @ref{Astronomical Coordinate Calculations}
 
 [SOFA] Returns spherical angular coordinates (longitude and latitude,
 in radians) corresponding to the given cartesian coordinates
-@code{@var{coords}} (x, y, z).
+@code{@var{coords}} (x, y, z).  The first dimension of
+@code{@var{coords}} must be equal to 3.  The returned array has the
+same dimensions as @code{@var{coords}}, except that the first
+dimension is 2 instead of 3.
 
 @c -------------------------------------
 @node IAUC2T00A, IAUC2T00B, IAUC2S, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUC2T00A
 
-@code{IAUC2T00A(@var{jdtt}, @var{x}, @var{y})}
+@code{IAUC2T00A(@var{jdtt}, @var{jdut}, @var{x}, @var{y})}
 
-[SOFA] Returns the celestial-to-terrestrial matrix for TT Julian Dates
-@code{@var{jdtt}} given polar coordinates @code{@var{x}},
-@code{@var{y}}, using the IAU 2000A nutation model.
+[SOFA] Returns the celestial-to-terrestrial matrix, given TT Julian
+Date @code{@var{jdtt}}, UT1 Julian Date @code{@var{jdut}}, and polar
+coordinates @code{@var{x}}, @code{@var{y}}, using the IAU 2000A
+nutation model.
 
-@code{@var{x}, @var{y}} are the coordinates (in radians) of the
-Celestial Intermediate Pole with respect to the International
-Terrestrial Reference System measured along the meridians to 0 and 90
-degrees west, respectively.
+@code{@var{jdtt}} and @code{@var{jdut}} should express the same
+instants of time: the first one in the TT timescale, and the second
+one in the UT1 timescale.  @code{@var{x}, @var{y}} are the coordinates
+(in radians) of the Celestial Intermediate Pole with respect to the
+International Terrestrial Reference System measured along the
+meridians to 0 and 90 degrees west, respectively, for those same
+instants.  All four arguments must have the same dimensions.
 
-See also: @ref{Astronomical Coordinate Calculations}
+The result gets the same dimensions as all of the parameters, with two
+dimensions equal to 3 prefixed.
+
+@code{IAUC2T00B} yields slightly less accurate results, but faster.
+
+See also: @ref{IAUC2T00B}, @ref{IAUC2T06A}, @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUC2T00B, IAUC2T06A, IAUC2T00A, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUC2T00B
 
-@code{IAUC2T00B(@var{jdtt}, @var{x}, @var{y})}
+@code{IAUC2T00B(@var{jdtt}, @var{jdut}, @var{x}, @var{y})}
 
-[SOFA] Returns the celestial-to-terrestrial matrix for TT Julian Dates
-@code{@var{jdtt}} given polar coordinates @code{@var{x}},
-@code{@var{y}}, using the IAU 2000B nutation model.
+[SOFA] Returns the celestial-to-terrestrial matrix, given TT Julian
+Date @code{@var{jdtt}}, UT1 Julian Date @code{@var{jdut}}, and polar
+coordinates @code{@var{x}}, @code{@var{y}}, using the IAU 2000B
+nutation model.
 
-See also: @ref{Astronomical Coordinate Calculations}
+@code{@var{jdtt}} and @code{@var{jdut}} should express the same
+instants of time: the first one in the TT timescale, and the second
+one in the UT1 timescale.  @code{@var{x}, @var{y}} are the coordinates
+(in radians) of the Celestial Intermediate Pole with respect to the
+International Terrestrial Reference System measured along the
+meridians to 0 and 90 degrees west, respectively, for those same
+instants.  All four arguments must have the same dimensions.
+
+The result gets the same dimensions as all of the parameters, with two
+dimensions equal to 3 prefixed.
+
+@code{IAUC2T00A} yields slightly more accurate results, but slower.
+
+See also: @ref{IAUC2T00A}, @ref{IAUC2T06A}, @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUC2T06A, IAUC2TCIO, IAUC2T00B, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUC2T06A
 
-@code{IAUC2T00A(@var{jdtt}, @var{x}, @var{y})}
+@code{IAUC2T06A(@var{jdtt}, @var{jdut}, @var{x}, @var{y})}
 
-[SOFA] Returns the celestial-to-terrestrial matrix for TT Julian Dates
-@code{@var{jd}} given polar coordinates @code{@var{x}},
-@code{@var{y}}, using the IAU 2006 precession and IAU 2000 A nutation
-models.
+[SOFA] Returns the celestial-to-terrestrial matrix, given TT Julian
+Date @code{@var{jdtt}}, UT1 Julian Date @code{@var{jdut}}, and polar
+coordinates @code{@var{x}}, @code{@var{y}}, using the IAU 2006
+precession model and IAU 2000A nutation model.
 
-See also: @ref{Astronomical Coordinate Calculations}
+@code{@var{jdtt}} and @code{@var{jdut}} should express the same
+instants of time: the first one in the TT timescale, and the second
+one in the UT1 timescale.  @code{@var{x}, @var{y}} are the coordinates
+(in radians) of the Celestial Intermediate Pole with respect to the
+International Terrestrial Reference System measured along the
+meridians to 0 and 90 degrees west, respectively, for those same
+instants.  All four arguments must have the same dimensions.
+
+The result gets the same dimensions as all of the parameters, with two
+dimensions equal to 3 prefixed.
+
+See also: @ref{IAUC2T00A}, @ref{IAUC2T00B}, @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUC2TCIO, IAUC2TEQX, IAUC2T06A, Internal Routines
@@ -19381,7 +19446,14 @@ See also: @ref{Astronomical Coordinate Calculations}
 
 [SOFA] Returns the celestial-to-terrestrial matrix based on the
 celestial-to-intermediate matrix @code{@var{rc2i}}, the Earth rotation
-angle @code{@var{era}} and the polar motion matrix @code{@var{rpom}}.
+angle @code{@var{era}} (in radians) and the polar motion matrix
+@code{@var{rpom}}.  The first two dimensions of @code{@var{rc2i}} and
+@code{@var{rpom}} must be equal to 3.  The remaining dimensions of
+@code{@var{rc2i}} and @code{@var{rpom}} must be equal to the
+dimensions of @code{@var{era}}.  The result has the same dimensions as
+@code{@var{rc2i}}.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUC2TEQX, IAUC2TPE, IAUC2TCIO, Internal Routines
@@ -19392,30 +19464,44 @@ angle @code{@var{era}} and the polar motion matrix @code{@var{rpom}}.
 
 [SOFA] Returns the celestial-to-terrestrial matrix based on the
 celestial-to-true matrix @code{@var{rbpn}}, the Greenwich Apparent
-Sidereal Time angle @code{@var{gst}} and the polar motion matrix
-@code{@var{rpom}}.
+Sidereal Time angle @code{@var{gst}} (in radians) and the polar motion
+matrix @code{@var{rpom}}.  The first two dimensions of
+@code{@var{rbpn}} and @code{@var{rpom}} must be equal to 3.  The
+remaining dimensions of @code{@var{rbpn}} and @code{@var{rpom}} must
+be equal to the dimensions of @code{@var{gst}}.  The result has the
+same dimensions as @code{@var{rbpn}}.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUC2TPE, IAUC2TXY, IAUC2TEQX, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUC2TPE
 
-@code{IAUC2TPE(@var{jd}, @var{dpsi}, @var{deps}, @var{xp}, @var{yp})}
+@code{IAUC2TPE(@var{jdtt}, @var{dpsi}, @var{deps}, @var{xp}, @var{yp})}
 
-[SOFA] Returns the celestial-to-terrestrial matrix given the Julian
+[SOFA] Returns the celestial-to-terrestrial matrix given the TT Julian
 Date @code{@var{jd}}, the nutation @code{@var{dpsi}, @var{deps}}, and
-the polar coordinates @code{@var{xp}, @var{yp}}.
+the polar coordinates @code{@var{xp}, @var{yp}}.  All of the arguments
+must have the same dimensions.  The result has those same dimensions,
+but with two dimensions equal to 3 prefixed.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUC2TXY, IAUCAL2JD, IAUC2TPE, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUC2TXY
 
-@code{IAUC2TXY(@var{jd}, @var{x}, @var{y}, @var{xp}, @var{yp})}
+@code{IAUC2TXY(@var{jdtt}, @var{x}, @var{y}, @var{xp}, @var{yp})}
 
-[SOFA] Returns the celestial-to-terrestrial matrix given the Julian
+[SOFA] Returns the celestial-to-terrestrial matrix given the TT Julian
 Date @code{@var{jd}}, the CIP coordinates @code{@var{x}, @var{y}}, and
-the polar coordinates @code{@var{xp}, @var{yp}}.
+the polar coordinates @code{@var{xp}, @var{yp}}.  All of the arguments
+must have the same dimensions.  The result has those same dimensions,
+but with two dimensions equal to 3 prefixed.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUCAL2JD, IAUDAT, IAUC2TXY, Internal Routines
@@ -19425,14 +19511,17 @@ the polar coordinates @code{@var{xp}, @var{yp}}.
 @code{IAUCAL2JD(@var{date})}
 
 [SOFA] Returns the Chronological Julian Day Numbers corresponding to
-the specified Gregorian calendar dates @code{@var{date}}, which must
-have 3 elements in its first dimension (for year, month, day).  The
-result has the same type as @code{@var{date}} but is not less than
-@code{LONG}, and has the same dimensions as @code{@var{date}} except
-that the first dimension is missing.  Unexpected results may be given
-if illegal year, month, or day numbers are specified.  Dates before
--4799-01-01 yield zero.  Dates after 1465073-02-28 yield nonzero but
-erroneous results (at least on systems with 32-bit ints).
+the specified Gregorian calendar dates @code{@var{date}}.
+@code{@var{date}} must have 3 elements in its first dimension (for
+year, month, day).  The result has the same type as @code{@var{date}}
+but is not less than @code{LONG}, and has the same dimensions as
+@code{@var{date}} except that the first dimension is missing.
+Unexpected results may be given if illegal year, month, or day numbers
+are specified.  Dates before -4799-01-01 yield zero.  Dates after
+1465073-02-28 yield nonzero but erroneous results (at least on systems
+with 32-bit ints).
+
+See also: @ref{CALENDAR}
 
 @c -------------------------------------
 @node IAUDAT, IAUDTDB, IAUCAL2JD, Internal Routines
@@ -19441,9 +19530,22 @@ erroneous results (at least on systems with 32-bit ints).
 
 @code{IAUDAT(@var{date})}
 
-[SOFA] Returns the time difference delta(AT) = TAI - UTC in seconds
-for the given UTC @code{@var{date}} (which must have common-calendar
-year, month, day in its first dimension).
+[SOFA] Returns the time difference ∆(AT) = TAI - UTC in seconds for
+the given UTC @code{@var{date}} (which must have common-calendar year,
+month, day in its first dimension).
+
+The specified day fraction, if any, is used only for dates before the
+introduction of leap seconds at the end of 1971.
+
+The returned time difference is for 00:00:00 at the beginning of the
+calendar day.
+
+Zero is returned for dates before 1960-01-01, when UTC began, and for
+any case for which a valid result is not available.
+
+The appropriate time difference for future dates is unpredictable, so
+the current function cannot guarantee accurate results beyond the last
+date at which its implementation was last updated.
 
 @c -------------------------------------
 @node IAUDTDB, IAUEE00, IAUDAT, Internal Routines

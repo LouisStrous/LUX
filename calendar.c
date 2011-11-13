@@ -426,11 +426,11 @@ void CJDNtoGregorian(int CJDN, int *year, int *month, int *day)
   y2 = y3 - y2;
   int x2 = divfloor(y2*100 + 99, 36525);
   int y1 = y2 - divfloor(36525*x2, 100);
-  int x1 = divfloor(5*y1 + 1, 153);
-  int c0 = divfloor(x1 + 3, 12);
+  int x1 = divfloor(5*y1 + 2, 153);
+  int c0 = divfloor(x1 + 2, 12);
   *year = 100*x3 + x2 + c0;
   *month = x1 - 12*c0 + 3;
-  *day = y1 - divfloor(153**month - 3, 5);
+  *day = y1 - divfloor(153*x1 - 3, 5);
 }
 /*--------------------------------------------------------------------------*/
 void CJDNtoGregorianA(int const *CJDN, int *date)
@@ -543,7 +543,7 @@ void CJDNtoJulian(int CJDN, int *year, int *month, int *day)
   int x2 = divlinefloor(y2, 4, 3, 1461);
   int z2 = y2 - divlinefloor(x2, 1461, 0, 4);
   int x1 = divfloor(5*z2 + 2, 153);
-  int c0 = divfloor(x1 + 3, 12);
+  int c0 = divfloor(x1 + 2, 12);
   *year = x2 + c0;
   *month = x1 - 12*c0 + 3;
   *day = z2 - divfloor(153*x1 - 3, 5);

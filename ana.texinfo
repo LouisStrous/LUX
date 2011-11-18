@@ -313,6 +313,7 @@ Array Creation
 Astronomy and Calendars
 
 * Astronomical Coordinate Calculations::  
+* Astronomical Time Scales::    
 
 Data Compression
 
@@ -485,7 +486,9 @@ Read-Write Global Variables
 * !IORDER::                     TV coordinate swap order
 * !ITMAX::                      
 * !IX::                         Last selected DEV x coordinate in window
+* !IXHIGH::                     
 * !IY::                         Last selected DEV y coordinate in window
+* !IYHIGH::                     
 * !KB::                         
 * !KEYCODE::                    Code of pressed physical key
 * !KEYSTATE::                   State of modifier keys
@@ -852,6 +855,7 @@ Internal Functions and Subroutines
 * IAUEE00::                     
 * IAUEE00A::                    
 * IAUEE00B::                    
+* IAUEE06A::                    
 * IAUEECT00::                   
 * IAUEFORM::                    
 * IAUEO06A::                    
@@ -877,7 +881,109 @@ Internal Functions and Subroutines
 * IAUFASA03::                   
 * IAUFAUR03::                   
 * IAUFAVE03::                   
+* IAUFK52H::                    
+* IAUFK5HIP::                   
+* IAUFK5HZ::                    
+* IAUFW2M::                     
+* IAUFW2XY::                    
+* IAUGC2GD::                    
+* IAUGC2GDE::                   
+* IAUGD2GC::                    
+* IAUGD2GCE::                   
+* IAUGMST06::                   
+* IAUGMST82::                   
+* IAUGST00A::                   
+* IAUGST00B::                   
+* IAUGST06::                    
+* IAUGST94::                    
+* IAUH2FK5::                    
+* IAUHFK5Z::                    
+* IAUIR::                       
 * IAUJD2CAL::                   
+* IAUNUM00A::                   
+* IAUNUM00B::                   
+* IAUNUM06A::                   
+* IAUNUMAT::                    
+* IAUNUT00A::                   
+* IAUNUT00B::                   
+* IAUNUT06A::                   
+* IAUNUT80::                    
+* IAUNUTM80::                   
+* IAUOBL06::                    
+* IAUOBL80::                    
+* IAUP06E::                     
+* IAUP2S::                      
+* IAUPAP::                      
+* IAUPAS::                      
+* IAUPB06::                     
+* IAUPDP::                      
+* IAUPFW06::                    
+* IAUPLAN94::                   
+* IAUPM::                       
+* IAUPMAT00::                   
+* IAUPMAT06::                   
+* IAUPMAT76::                   
+* IAUPN::                       
+* IAUPN00::                     
+* IAUPN00A::                    
+* IAUPN00B::                    
+* IAUPN06::                     
+* IAUPN06A::                    
+* IAUPNM00A::                   
+* IAUPNM00B::                   
+* IAUPNM06A::                   
+* IAUPNM80::                    
+* IAUPOM00::                    
+* IAUPR00::                     
+* IAUPREC76::                   
+* IAUPV2S::                     
+* IAUPVDPV::                    
+* IAUPVM::                      
+* IAUPVSTAR::                   
+* IAUPVXPV::                    
+* IAUPXP::                      
+* IAURM2V::                     
+* IAURV2M::                     
+* IAURX::                       
+* IAURXPV::                     
+* IAURY::                       
+* IAURZ::                       
+* IAUS00::                      
+* IAUS00A::                     
+* IAUS00B::                     
+* IAUS06::                      
+* IAUS06A::                     
+* IAUS2C::                      
+* IAUS2P::                      
+* IAUS2PV::                     
+* IAUSEPP::                     
+* IAUSEPS::                     
+* IAUSP00::                     
+* IAUSTARPM::                   
+* IAUSTARPV::                   
+* IAUTAITT::                    
+* IAUTAIUT1::                   
+* IAUTAIUTC::                   
+* IAUTCBTDB::                   
+* IAUTCGTT::                    
+* IAUTDBTCB::                   
+* IAUTDBTT::                    
+* IAUTR::                       
+* IAUTRXP::                     
+* IAUTRXPV::                    
+* IAUTTTAI::                    
+* IAUTTTCG::                    
+* IAUTTTDB::                    
+* IAUTTUT1::                    
+* IAUUT1TAI::                   
+* IAUUT1TT::                    
+* IAUUT1UTC::                   
+* IAUUTCTAI::                   
+* IAUUTCUT1::                   
+* IAUXY06::                     
+* IAUXYS00A::                   
+* IAUXYS00B::                   
+* IAUXYS06A::                   
 * IBETA::                       Incomplete beta function
 * IDLREAD::                     Read one variable from an IDL Save file
 * IDLRESTORE::                  Read all variables from an IDL Save file
@@ -7881,9 +7987,10 @@ See also: @ref{CALENDAR}
 @c ------------------------------------------------------------------
 @menu
 * Astronomical Coordinate Calculations::  
+* Astronomical Time Scales::    
 @end menu
 
-@node Astronomical Coordinate Calculations,  , Astronomy and Calendars, Astronomy and Calendars
+@node Astronomical Coordinate Calculations, Astronomical Time Scales, Astronomy and Calendars, Astronomy and Calendars
 @comment  node-name,  next,  previous,  up
 @subsection Astronomical Coordinate Calculations
 
@@ -7943,6 +8050,44 @@ International Terrestrial Reference System:
 @code{@var{trs} = @var{rc2t} # @var{crs}}
 
 @code{@var{rc2t} = @var{rpom} # R_3(@var{gst}) # @var{rbpn}}
+
+@c ------------------------------------------------------------------
+@node Astronomical Time Scales,  , Astronomical Coordinate Calculations, Astronomy and Calendars
+@comment  node-name,  next,  previous,  up
+@subsection Astronomical Time Scales
+
+Various time scales used in astronomy are related as follows:
+
+@table @bullet
+@item TAI
+physically realized
+@item offset; observed, nominally +32.184 seconds
+@item TT
+terrestrial time
+@item rate adjustment (L_G)
+part of the definition of TT
+@item TCG
+time scale for the Geocentric Coordinate Reference System (GCRS)
+@item semi-periodic terms
+These terms depend on the masses and positions of the bodies in the
+Solar System.  There is an annual term of approximately 1.66 ms, plus
+planetary terms of up to about 20 μs, plus lunar and diurnal terms of
+up to about 2 μs.  Included in @code{IAUDTDB}.
+@item rate adjustment (L_C)
+function of solar-system ephemeris
+@item TCB
+time scale for BCRS
+@item rate adjustment (-L_B)
+part of the definition of TDB
+@item TDB
+TCB scaled to track TT.  Depends on solar-system ephemeris.  The
+relationship is currently fixed, but might need to be adjusted in the
+future to the order of 1 ns per century.
+@item semi-periodic terms
+Included in @code{IAUDTDB}.
+@item TT
+terrestrial time
+@end table
 
 @c ------------------------------------------------------------------
 @node Binary Operators, Color, Astronomy and Calendars, Routine Groups
@@ -10726,7 +10871,9 @@ functions.
 * !IORDER::                     TV coordinate swap order
 * !ITMAX::                      
 * !IX::                         Last selected DEV x coordinate in window
+* !IXHIGH::                     
 * !IY::                         Last selected DEV y coordinate in window
+* !IYHIGH::                     
 * !KB::                         
 * !KEYCODE::                    Code of pressed physical key
 * !KEYSTATE::                   State of modifier keys
@@ -12773,6 +12920,7 @@ arguments.
 * IAUEE00::                     
 * IAUEE00A::                    
 * IAUEE00B::                    
+* IAUEE06A::                    
 * IAUEECT00::                   
 * IAUEFORM::                    
 * IAUEO06A::                    
@@ -12798,7 +12946,109 @@ arguments.
 * IAUFASA03::                   
 * IAUFAUR03::                   
 * IAUFAVE03::                   
+* IAUFK52H::                    
+* IAUFK5HIP::                   
+* IAUFK5HZ::                    
+* IAUFW2M::                     
+* IAUFW2XY::                    
+* IAUGC2GD::                    
+* IAUGC2GDE::                   
+* IAUGD2GC::                    
+* IAUGD2GCE::                   
+* IAUGMST06::                   
+* IAUGMST82::                   
+* IAUGST00A::                   
+* IAUGST00B::                   
+* IAUGST06::                    
+* IAUGST94::                    
+* IAUH2FK5::                    
+* IAUHFK5Z::                    
+* IAUIR::                       
 * IAUJD2CAL::                   
+* IAUNUM00A::                   
+* IAUNUM00B::                   
+* IAUNUM06A::                   
+* IAUNUMAT::                    
+* IAUNUT00A::                   
+* IAUNUT00B::                   
+* IAUNUT06A::                   
+* IAUNUT80::                    
+* IAUNUTM80::                   
+* IAUOBL06::                    
+* IAUOBL80::                    
+* IAUP06E::                     
+* IAUP2S::                      
+* IAUPAP::                      
+* IAUPAS::                      
+* IAUPB06::                     
+* IAUPDP::                      
+* IAUPFW06::                    
+* IAUPLAN94::                   
+* IAUPM::                       
+* IAUPMAT00::                   
+* IAUPMAT06::                   
+* IAUPMAT76::                   
+* IAUPN::                       
+* IAUPN00::                     
+* IAUPN00A::                    
+* IAUPN00B::                    
+* IAUPN06::                     
+* IAUPN06A::                    
+* IAUPNM00A::                   
+* IAUPNM00B::                   
+* IAUPNM06A::                   
+* IAUPNM80::                    
+* IAUPOM00::                    
+* IAUPR00::                     
+* IAUPREC76::                   
+* IAUPV2S::                     
+* IAUPVDPV::                    
+* IAUPVM::                      
+* IAUPVSTAR::                   
+* IAUPVXPV::                    
+* IAUPXP::                      
+* IAURM2V::                     
+* IAURV2M::                     
+* IAURX::                       
+* IAURXPV::                     
+* IAURY::                       
+* IAURZ::                       
+* IAUS00::                      
+* IAUS00A::                     
+* IAUS00B::                     
+* IAUS06::                      
+* IAUS06A::                     
+* IAUS2C::                      
+* IAUS2P::                      
+* IAUS2PV::                     
+* IAUSEPP::                     
+* IAUSEPS::                     
+* IAUSP00::                     
+* IAUSTARPM::                   
+* IAUSTARPV::                   
+* IAUTAITT::                    
+* IAUTAIUT1::                   
+* IAUTAIUTC::                   
+* IAUTCBTDB::                   
+* IAUTCGTT::                    
+* IAUTDBTCB::                   
+* IAUTDBTT::                    
+* IAUTR::                       
+* IAUTRXP::                     
+* IAUTRXPV::                    
+* IAUTTTAI::                    
+* IAUTTTCG::                    
+* IAUTTTDB::                    
+* IAUTTUT1::                    
+* IAUUT1TAI::                   
+* IAUUT1TT::                    
+* IAUUT1UTC::                   
+* IAUUTCTAI::                   
+* IAUUTCUT1::                   
+* IAUXY06::                     
+* IAUXYS00A::                   
+* IAUXYS00B::                   
+* IAUXYS06A::                   
 * IBETA::                       Incomplete beta function
 * IDLREAD::                     Read one variable from an IDL Save file
 * IDLRESTORE::                  Read all variables from an IDL Save file
@@ -19528,11 +19778,12 @@ See also: @ref{CALENDAR}
 @comment  node-name,  next,  previous,  up
 @subsection IAUDAT
 
-@code{IAUDAT(@var{date})}
+@code{IAUDAT([@var{date}] [, /VALID])}
 
-[SOFA] Returns the time difference ∆(AT) = TAI - UTC in seconds for
-the given UTC @code{@var{date}} (which must have common-calendar year,
-month, day in its first dimension).
+[SOFA] If @code{/VALID} is not specified, then returns the time
+difference ∆(AT) = TAI - UTC in seconds for the given UTC
+@code{@var{date}}, which must have common-calendar year, month, day in
+its first dimension but can have more dimensions.
 
 The specified day fraction, if any, is used only for dates before the
 introduction of leap seconds at the end of 1971.
@@ -19547,60 +19798,127 @@ The appropriate time difference for future dates is unpredictable, so
 the current function cannot guarantee accurate results beyond the last
 date at which its implementation was last updated.
 
+@code{IAUDAT(/VALID)} returns the greatest Julian Date for which this
+function claims to provide trustworthy results.
+
+See also: @ref{Astronomical Coordinate Calculations}
+
 @c -------------------------------------
 @node IAUDTDB, IAUEE00, IAUDAT, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUDTDB
 
-@code{IAUDTDB(@var{jd}, @var{elong}, @var{u}, @var{v})}
+@code{IAUDTDB(@var{jdtt}, @var{ut}, @var{elong}, @var{u}, @var{v})}
 
 [SOFA] Returns an approximation of TDB-TT in seconds, the difference
 between barycentric dynamical time and terrestrial time, for an
-observer on the Earth. @code{@var{jd}} is the Julian Date in TDB or
-TT, @code{@var{elong}} is the east longitude in radians,
+observer on the Earth. @code{@var{jdtt}} is the Julian Date in TDB or
+TT, @code{@var{ut}} is the Universal Time measured in fractions of a
+day, @code{@var{elong}} is the east longitude in radians,
 @code{@var{u}} is the distance in km from the Earth spin axis, and
 @code{@var{v}} is the distance in km north of the equatorial plane.
+@code{@var{jdtt}} and @code{@var{ut}} should have the same
+dimensions.  The remaining parameters must be @code{SCALAR}s or
+@code{ARRAY}s with exactly one element.
+
+This function is merely a model; numerical integration of solar-system
+ephemeris is the definitive method for predicting the relationship
+between TCG and TCB, and hence between TT and TDB.  The absolute
+accuracy of the SOFA routine underlying the present ANA function is
+better than 3 ns during the interval 1950-2050.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUEE00, IAUEE00A, IAUDTDB, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUEE00
 
-@code{IAUEE00(@var{jd}, @var{epsa}, @var{dpsi})}
+@code{IAUEE00(@var{jdtt}, @var{epsa}, @var{dpsi})}
 
-[SOFA] Returns the equation of the equinoxes (IAU 2000) given the
-nutation in longitude @code{@var{epsa}} and the mean obliquity
-@code{@var{dpsi}}.
+[SOFA] Returns the equation of the equinoxes (IAU 2000) given the TT
+Julian Date @code{@var{jdtt}}, the mean obliquity @code{@var{epsa}}
+(radians, mean of date), and the nutation in longitude
+@code{@var{epsa}} (in radians).  All three parameters must have the
+same dimensions.  The returned value has those same dimensions, too,
+and is measured in radians.
+
+Greenwich apparent sidereal time (GAST) is equal to Greenwish mean
+sidereal time (GMST) plus the equation of the equinoxes.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUEE00A, IAUEE00B, IAUEE00, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUEE00A
 
-@code{IAUEE00A(@var{jd})}
+@code{IAUEE00A(@var{jdtt})}
 
 [SOFA] Returns the equation of the equinoxes compatible with IAU 2000
-resolutions.
+resolutions, for the specified TT Julian Date @code{@var{jdtt}}.  The
+returned value has the same dimensions as the parameter and is
+measured in radians.
+
+Greenwich apparent sidereal time (GAST) is equal to Greenwish mean
+sidereal time (GMST) plus the equation of the equinoxes.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
-@node IAUEE00B, IAUEECT00, IAUEE00A, Internal Routines
+@node IAUEE00B, IAUEE06A, IAUEE00A, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUEE00B
 
-@code{IAUEE00B(@var{jd})}
+@code{IAUEE00B(@var{jdtt})}
 
 [SOFA] Returns the equation of the equinoxes compatible with IAU 2000
-resolutions but using the truncated nutation model IAU 2000B.
+resolutions but using the truncated nutation model IAU 2000B, for the
+specified TT Julian Date @code{@var{jdtt}}.  The returned value has
+the same dimensions as the parameter and is measured in radians.
+
+Greenwich apparent sidereal time (GAST) is equal to Greenwish mean
+sidereal time (GMST) plus the equation of the equinoxes.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
-@node IAUEECT00, IAUEFORM, IAUEE00B, Internal Routines
+@node IAUEE06A, IAUEECT00, IAUEE00B, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUEE06A
+
+@code{IAUEE06A(@var{jdtt})}
+
+[SOFA] Returns the equation of the equinoxes compatible with IAU 2000
+resolutions and IAU 2006/2000A precession-nutation, for the specified
+TT Julian Date @code{@var{jdtt}}.  The returned value has the same
+dimensions as the parameter and is measured in radians.
+
+Greenwich apparent sidereal time (GAST) is equal to Greenwish mean
+sidereal time (GMST) plus the equation of the equinoxes.
+
+See also: @ref{Astronomical Coordinate Calculations}
+
+@c -------------------------------------
+@node IAUEECT00, IAUEFORM, IAUEE06A, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUEECT00
 
-@code{IAUEECT00(@var{jd})}
+@code{IAUEECT00(@var{jdtt})}
 
-[SOFA] Returns the equation of the equinoxes complementary term,
-consistent with IAU 2000 resolutions.
+[SOFA] Returns the equation of the equinoxes complementary terms,
+consistent with IAU 2000 resolutions, for the specified TT Julian Date
+@code{@var{jdtt}}.  The result has the same dimensions as the
+parameter and is measured in radians.
+
+The Greenwich apparent sidereal time (GAST) is equal to the Greenwich
+mean standard time (GMST) plus the equation of the equinoxes, and that
+equation of the equinoxes is equal to dpsi*cos(eps) plus the
+complementary terms, where dpsi is the nutation in longitude and eps
+is the obliquity of date.  The complementary terms are needed to make
+UT1 more regular.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUEFORM, IAUEO06A, IAUEECT00, Internal Routines
@@ -19610,19 +19928,30 @@ consistent with IAU 2000 resolutions.
 @code{IAUEFORM(@var{ellid})}
 
 [SOFA] Returns the equatorial radius (in meters) and flattening of the
-Earth reference ellipsoid identified by @code{@var{ellid}}: 1 = WGS84,
-2 = GRS80, 3 = WGS72.  Unsupported ellipsoid identifiers yield radius
-and flattening equal to 0. 
+Earth reference ellipsoid identified by @code{@var{ellid}}, which must
+be a @code{SCALAR} or single-element @code{ARRAY}: 1 = WGS84, 2 =
+GRS80, 3 = WGS72.  Unsupported ellipsoid identifiers yield radius and
+flattening equal to 0.
 
 @c -------------------------------------
 @node IAUEO06A, IAUEORS, IAUEFORM, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUEO06A
 
-@code{IAUEO06A(@var{jd})}
+@code{IAUEO06A(@var{jdtt})}
 
-[SOFA] Returns the equation of the origins, using the IAU 2006
-precession and IAU 2000A nutation models.
+[SOFA] Returns the equation of the origins measured in radians, using
+the IAU 2006 precession and IAU 2000A nutation models, for the given
+TT Julian Dates @code{@var{jdtt}}.  The returned value has the same
+dimensions as the parameter.
+
+The equation of the origins is the distance between the true equinox
+and the celestial intermediate origin, or, equivalently, between the
+Earth rotation angle and Greenwich apparent sidereal time.  It is
+equal to the precession in right ascension since J2000.0 plus the
+equation of the equinoxes including the small correction terms.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUEORS, IAUEPB, IAUEO06A, Internal Routines
@@ -19631,9 +19960,20 @@ precession and IAU 2000A nutation models.
 
 @code{IAUEORS(@var{rnpb}, @var{s})}
 
-[SOFA] Returns the equation of the origins, given the classical
-nutation-precession-bias matrix @code{@var{rnpb}} and CIO locator
-@code{@var{s}}.
+[SOFA] Returns the equation of the origins measured in radians, given
+the classical nutation-precession-bias matrix @code{@var{rnpb}} and
+CIO locator @code{@var{s}}.  @code{@var{rnpb}} must have its first two
+dimensions equal to 3.  @code{@var{s}} has the same dimensions as
+@code{@var{rnpb}} except that it lacks those first two dimensions
+equal to 3.
+
+The equation of the origins is the distance between the true equinox
+and the celestial intermediate origin, or, equivalently, between the
+Earth rotation angle and Greenwich apparent sidereal time.  It is
+equal to the precession in right ascension since J2000.0 plus the
+equation of the equinoxes including the small correction terms.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUEPB, IAUEPB2JD, IAUEORS, Internal Routines
@@ -19642,7 +19982,8 @@ nutation-precession-bias matrix @code{@var{rnpb}} and CIO locator
 
 @code{IAUEPB(@var{jd})}
 
-[SOFA] Returns the Besselian epoch corresponding to Julian Date
+[SOFA] Returns the Besselian epoch (year) corresponding to Julian Date
+@code{@var{jd}}.  The result has the same dimensions as
 @code{@var{jd}}.
 
 @c -------------------------------------
@@ -19653,7 +19994,8 @@ nutation-precession-bias matrix @code{@var{rnpb}} and CIO locator
 @code{IAUEPB2JD(@var{bepoch})}
 
 [SOFA] Returns the Julian Date corresponding to Besselian epoch
-@code{@var{bepoch}} (e.g., 1957.3).
+@code{@var{bepoch}} (e.g., 1957.3).  The result has the same
+dimensions as @code{@var{bepoch}}.
 
 @c -------------------------------------
 @node IAUEPJ, IAUEPJ2JD, IAUEPB2JD, Internal Routines
@@ -19662,7 +20004,8 @@ nutation-precession-bias matrix @code{@var{rnpb}} and CIO locator
 
 @code{IAUEPJ(@var{jd})}
 
-[SOFA] Returns the Julian epoch corresponding to Julian Date
+[SOFA] Returns the Julian epoch (year) corresponding to Julian Date
+@code{@var{jd}}.  The result has the same dimensions as
 @code{@var{jd}}.
 
 @c -------------------------------------
@@ -19673,227 +20016,509 @@ nutation-precession-bias matrix @code{@var{rnpb}} and CIO locator
 @code{IAUEPJ2JD(@var{jepoch})}
 
 [SOFA] Returns the Julian Date corresponding to Julian epoch
-@code{@var{jepoch}} (e.g., 1957.3).
+@code{@var{jepoch}} (e.g., 1957.3).  The result has the same
+dimensions as @code{@var{jepoch}}
 
 @c -------------------------------------
 @node IAUEPV00, IAUEQEQ94, IAUEPJ2JD, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUEPV00
 
-@code{IAUEPV00, @var{jd}, @var{pvh}, @var{pvb}}
+@code{IAUEPV00, @var{jdtdb}, @var{pvh}, @var{pvb}}
 
-[SOFA] Returns the Earth position and velocity for the specified
-Julian Dates @code{@var{jd}}, in the heliocentric (@code{@var{pvh}})
-and barycentric (@code{@var{pvb}}) coordinate systems, with respect to
-the Barycentric Celestial Reference System.  @code{@var{pvh}(0,*)} =
+[SOFA] Returns the Earth position and velocity for the specified TDB
+Julian Dates @code{@var{jdtdb}} (for most applications, TT can also be
+used instead of TDB), in the heliocentric (@code{@var{pvh}}) and
+barycentric (@code{@var{pvb}}) coordinate systems, with respect to the
+Barycentric Celestial Reference System.  @code{@var{pvh}(0,*)} =
 heliocentric position (AU), @code{@var{pvh}(1,*)} = heliocentric
 velocity (AU/d), @code{@var{pvb}(0,*)} = barycentric position (AU),
-@code{@var{pvb}(1,*)} = barycentric velocity (AU/d).
+@code{@var{pvb}(1,*)} = barycentric velocity (AU/d).  @code{@var{pvh}}
+and @code{@var{pvb}} have the same dimensions as @code{@var{jdtdb}}
+but with an extra dimension equal to 2 prefixed.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUEQEQ94, IAUERA00, IAUEPV00, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUEQEQ94
 
-@code{IAUEQEQ94(@var{jd})}
+@code{IAUEQEQ94(@var{jdtdb})}
 
-[SOFA] Returns the equation of the equinoxes for the given Julian Date
-@code{@var{jd}}, according to the IAU 1994 model.
+[SOFA] Returns the equation of the equinoxes for the given TDB Julian
+Date @code{@var{jdtdb}}, according to the IAU 1994 model.  The result
+has the same dimensions as @code{@var{jdtdb}}.
+
+Greenwich apparent sidereal time (GAST) is equal to Greenwish mean
+sidereal time (GMST) plus the equation of the equinoxes.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUERA00, IAUFAD03, IAUEQEQ94, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUERA00
 
-@code{IAUERA00(@var{jd})}
+@code{IAUERA00(@var{jdut1})}
 
-[SOFA] Returns the Earth rotation angle for the given Julian Date
-@code{@var{jd}}, according to the IAU 2000 model.
+[SOFA] Returns the Earth rotation angle for the given UT1 Julian Date
+@code{@var{jdut1}}, according to the IAU 2000 model.  The result has
+the same dimensions as @code{@var{jdut1}}.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUFAD03, IAUFAE03, IAUERA00, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUFAD03
 
-@code{IAUFAD03(@var{jd})}
+@code{IAUFAD03(@var{tc})}
 
-[SOFA] Returns the mean elongation of the Moon from the Sun, a
-fundamental argument according to the IERS conventions of 2003, as a
-function of the number @code{@var{t}} of Julian centuries since
-J2000.0 TDB.  It makes no practical difference if @code{@var{t}} is
-measured since J2000.0 TT instead.
+[SOFA] Returns the mean elongation of the Moon from the Sun in
+radians, a fundamental argument according to the IERS conventions of
+2003, as a function of the number @code{@var{tc}} of Julian centuries
+since J2000.0 TDB.  It makes no practical difference if
+@code{@var{tc}} is measured since J2000.0 TT instead.  The result has
+the same dimensions as @code{@var{tc}}.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUFAE03, IAUFAF03, IAUFAD03, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUFAE03
 
-@code{IAUFAE03(@var{jd})}
+@code{IAUFAE03(@var{tc})}
 
-[SOFA] Returns the mean longitude of the Earth, a fundamental argument
-according to the IERS conventions of 2003, as a function of the number
-@code{@var{t}} of Julian centuries since J2000.0 TDB.  It makes no
-practical difference if @code{@var{t}} is measured since J2000.0 TT
-instead.
+[SOFA] Returns the mean longitude of the Earth in radians, a
+fundamental argument according to the IERS conventions of 2003, as a
+function of the number @code{@var{tc}} of Julian centuries since
+J2000.0 TDB.  It makes no practical difference if @code{@var{tc}} is
+measured since J2000.0 TT instead.  The result has the same dimensions
+as @code{@var{tc}}.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUFAF03, IAUFAJU03, IAUFAE03, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUFAF03
 
-@code{IAUFAF03(@var{jd})}
+@code{IAUFAF03(@var{tc})}
 
 [SOFA] Returns the mean longitude of the Moon minus the mean longitude
-of the ascending node, a fundamental argument according to the IERS
-conventions of 2003, as a function of the number @code{@var{t}} of
-Julian centuries since J2000.0 TDB.  It makes no practical difference
-if @code{@var{t}} is measured since J2000.0 TT instead.
+of the ascending node in radians, a fundamental argument according to
+the IERS conventions of 2003, as a function of the number
+@code{@var{tc}} of Julian centuries since J2000.0 TDB.  It makes no
+practical difference if @code{@var{tc}} is measured since J2000.0 TT
+instead.  The result has the same dimensions as @code{@var{tc}}.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUFAJU03, IAUFAL03, IAUFAF03, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUFAJU03
 
-@code{IAUFAJU03(@var{jd})}
+@code{IAUFAJU03(@var{tc})}
 
-[SOFA] Returns the mean longitude of Jupiter, a fundamental argument
-according to the IERS conventions of 2003, as a function of the number
-@code{@var{t}} of Julian centuries since J2000.0 TDB.  It makes no
-practical difference if @code{@var{t}} is measured since J2000.0 TT
-instead.
+[SOFA] Returns the mean longitude of Jupiter in radians, a fundamental
+argument according to the IERS conventions of 2003, as a function of
+the number @code{@var{tc}} of Julian centuries since J2000.0 TDB.  It
+makes no practical difference if @code{@var{tc}} is measured since
+J2000.0 TT instead.  The result has the same dimensions as
+@code{@var{tc}}.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUFAL03, IAUFALP03, IAUFAJU03, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUFAL03
 
-@code{IAUFAL03(@var{jd})}
+@code{IAUFAL03(@var{tc})}
 
-[SOFA] Returns the mean anomaly of the Moon, a fundamental argument
-according to the IERS conventions of 2003, as a function of the number
-@code{@var{t}} of Julian centuries since J2000.0 TDB.  It makes no
-practical difference if @code{@var{t}} is measured since J2000.0 TT
-instead.
+[SOFA] Returns the mean anomaly of the Moon in radians, a fundamental
+argument according to the IERS conventions of 2003, as a function of
+the number @code{@var{tc}} of Julian centuries since J2000.0 TDB.  It
+makes no practical difference if @code{@var{tc}} is measured since
+J2000.0 TT instead.  The result has the same dimensions as
+@code{@var{tc}}.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUFALP03, IAUFAMA03, IAUFAL03, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUFALP03
 
-@code{IAUFALP03(@var{jd})}
+@code{IAUFALP03(@var{tc})}
 
-[SOFA] Returns the mean anomaly of the Sun, a fundamental argument
-according to the IERS conventions of 2003, as a function of the number
-@code{@var{t}} of Julian centuries since J2000.0 TDB.  It makes no
-practical difference if @code{@var{t}} is measured since J2000.0 TT
-instead.
+[SOFA] Returns the mean anomaly of the Sun in radians, a fundamental
+argument according to the IERS conventions of 2003, as a function of
+the number @code{@var{tc}} of Julian centuries since J2000.0 TDB.  It
+makes no practical difference if @code{@var{tc}} is measured since
+J2000.0 TT instead.  The result has the same dimensions as
+@code{@var{tc}}.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUFAMA03, IAUFAME03, IAUFALP03, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUFAMA03
 
-@code{IAUFAMA03(@var{jd})}
+@code{IAUFAMA03(@var{tc})}
 
-[SOFA] Returns the mean longitude of Mars, a fundamental argument
-according to the IERS conventions of 2003, as a function of the number
-@code{@var{t}} of Julian centuries since J2000.0 TDB.  It makes no
-practical difference if @code{@var{t}} is measured since J2000.0 TT
-instead.
+[SOFA] Returns the mean longitude of Mars in radians, a fundamental
+argument according to the IERS conventions of 2003, as a function of
+the number @code{@var{tc}} of Julian centuries since J2000.0 TDB.  It
+makes no practical difference if @code{@var{tc}} is measured since
+J2000.0 TT instead.  The result has the same dimensions as
+@code{@var{tc}}.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUFAME03, IAUFANE03, IAUFAMA03, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUFAME03
 
-@code{IAUFAME03(@var{jd})}
+@code{IAUFAME03(@var{tc})}
 
-[SOFA] Returns the mean longitude of Mercury, a fundamental argument
-according to the IERS conventions of 2003, as a function of the number
-@code{@var{t}} of Julian centuries since J2000.0 TDB.  It makes no
-practical difference if @code{@var{t}} is measured since J2000.0 TT
-instead.
+[SOFA] Returns the mean longitude of Mercury in radians, a fundamental
+argument according to the IERS conventions of 2003, as a function of
+the number @code{@var{tc}} of Julian centuries since J2000.0 TDB.  It
+makes no practical difference if @code{@var{tc}} is measured since
+J2000.0 TT instead.  The result has the same dimensions as
+@code{@var{tc}}.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUFANE03, IAUFAOM03, IAUFAME03, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUFANE03
 
-@code{IAUFANE03(@var{jd})}
+@code{IAUFANE03(@var{tc})}
 
-[SOFA] Returns the mean longitude of Neptune, a fundamental argument
-according to the IERS conventions of 2003, as a function of the number
-@code{@var{t}} of Julian centuries since J2000.0 TDB.  It makes no
-practical difference if @code{@var{t}} is measured since J2000.0 TT
-instead.
+[SOFA] Returns the mean longitude of Neptune in radians, a fundamental
+argument according to the IERS conventions of 2003, as a function of
+the number @code{@var{tc}} of Julian centuries since J2000.0 TDB.  It
+makes no practical difference if @code{@var{tc}} is measured since
+J2000.0 TT instead.  The result has the same dimensions as
+@code{@var{tc}}.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUFAOM03, IAUFAPA03, IAUFANE03, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUFAOM03
 
-@code{IAUFAOM03(@var{jd})}
+@code{IAUFAOM03(@var{tc})}
 
-[SOFA] Returns the mean longitude of the Moon's ascending node, a
-fundamental argument according to the IERS conventions of 2003, as a
-function of the number @code{@var{t}} of Julian centuries since
-J2000.0 TDB.  It makes no practical difference if @code{@var{t}} is
-measured since J2000.0 TT instead.
+[SOFA] Returns the mean longitude of the Moon's ascending node in
+radians, a fundamental argument according to the IERS conventions of
+2003, as a function of the number @code{@var{tc}} of Julian centuries
+since J2000.0 TDB.  It makes no practical difference if
+@code{@var{tc}} is measured since J2000.0 TT instead.  The result has
+the same dimensions as @code{@var{tc}}.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUFAPA03, IAUFASA03, IAUFAOM03, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUFAPA03
 
-@code{IAUFAPA03(@var{jd})}
+@code{IAUFAPA03(@var{tc})}
 
-[SOFA] Returns the general accumulated precession in longitude, a
-fundamental argument according to the IERS conventions of 2003, as a
-function of the number @code{@var{t}} of Julian centuries since
-J2000.0 TDB.  It makes no practical difference if @code{@var{t}} is
-measured since J2000.0 TT instead.
+[SOFA] Returns the general accumulated precession in longitude in
+radians, a fundamental argument according to the IERS conventions of
+2003, as a function of the number @code{@var{tc}} of Julian centuries
+since J2000.0 TDB.  It makes no practical difference if
+@code{@var{tc}} is measured since J2000.0 TT instead.  The result has
+the same dimensions as @code{@var{tc}}.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUFASA03, IAUFAUR03, IAUFAPA03, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUFASA03
 
-@code{IAUFASA03(@var{jd})}
+@code{IAUFASA03(@var{tc})}
 
-[SOFA] Returns the mean longitude of Saturn, a fundamental argument
-according to the IERS conventions of 2003, as a function of the number
-@code{@var{t}} of Julian centuries since J2000.0 TDB.  It makes no
-practical difference if @code{@var{t}} is measured since J2000.0 TT
-instead.
+[SOFA] Returns the mean longitude of Saturn in radians, a fundamental
+argument according to the IERS conventions of 2003, as a function of
+the number @code{@var{tc}} of Julian centuries since J2000.0 TDB.  It
+makes no practical difference if @code{@var{tc}} is measured since
+J2000.0 TT instead.  The result has the same dimensions as
+@code{@var{tc}}.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUFAUR03, IAUFAVE03, IAUFASA03, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUFAUR03
 
-@code{IAUFAUR03(@var{jd})}
+@code{IAUFAUR03(@var{tc})}
 
-[SOFA] Returns the mean longitude of Uranus, a fundamental argument
-according to the IERS conventions of 2003, as a function of the number
-@code{@var{t}} of Julian centuries since J2000.0 TDB.  It makes no
-practical difference if @code{@var{t}} is measured since J2000.0 TT
-instead.
+[SOFA] Returns the mean longitude of Uranus in radians, a fundamental
+argument according to the IERS conventions of 2003, as a function of
+the number @code{@var{tc}} of Julian centuries since J2000.0 TDB.  It
+makes no practical difference if @code{@var{tc}} is measured since
+J2000.0 TT instead.  The result has the same dimensions as
+@code{@var{tc}}.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
-@node IAUFAVE03, IAUJD2CAL, IAUFAUR03, Internal Routines
+@node IAUFAVE03, IAUFK52H, IAUFAUR03, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUFAVE03
 
-@code{IAUFAVE03(@var{jd})}
+@code{IAUFAVE03(@var{tc})}
 
-[SOFA] Returns the mean longitude of Venus, a fundamental argument
-according to the IERS conventions of 2003, as a function of the number
-@code{@var{t}} of Julian centuries since J2000.0 TDB.  It makes no
-practical difference if @code{@var{t}} is measured since J2000.0 TT
-instead.
+[SOFA] Returns the mean longitude of Venus in radians, a fundamental
+argument according to the IERS conventions of 2003, as a function of
+the number @code{@var{tc}} of Julian centuries since J2000.0 TDB.  It
+makes no practical difference if @code{@var{tc}} is measured since
+J2000.0 TT instead.  The result has the same dimensions as
+@code{@var{tc}}.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
-@node IAUJD2CAL, IBETA, IAUFAVE03, Internal Routines
+@node IAUFK52H, IAUFK5HIP, IAUFAVE03, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUFK52H
+
+@code{IAUFK52H, @var{ra5}, @var{dec5}, @var{dra5}, @var{ddec5},
+@var{px5}, @var{rv5}, @var{rah}, @var{dech}, @var{drah}, @var{ddech},
+@var{pxh}, @var{rvh}}
+
+[SOFA] Transforms FK5 (J2000.0) star data into the Hipparcos system.
+The input FK5 data is: right ascension @code{@var{ra5}} (radians),
+declination @code{@var{dec5}} (radians), proper motion in right
+ascension @code{@var{dra5}} (dRA/dt, radians per Julian year), proper
+motion in declination @code{@var{ddec5}} (ddec/dt, radians per Julian
+year), parallax @code{@var{px5}} (arcseconds), radial velocity
+@code{@var{rv5}} (km/s, positive receding).  The output Hipparcos data
+is: right ascension @code{@var{rah}}, declination @code{@var{dech}},
+proper motion in right ascension @code{@var{drah}}, proper motion in
+declination @code{@var{ddech}}, parallax @code{@var{pxh}}, radial
+velocity @code{@var{rvh}} -- with the same units as for the FK5
+coordinates.
+
+See also: @ref{Astronomical Coordinate Calculations}
+
+@c -------------------------------------
+@node IAUFK5HIP, IAUFK5HZ, IAUFK52H, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUFK5HIP
+
+/* IAUFK5HIP, <r5h>, <s5h>
+
+   Returns the FK5-to-Hipparcos rotation <r5h> and spin <s5h> */
+
+@c -------------------------------------
+@node IAUFK5HZ, IAUFW2M, IAUFK5HIP, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUFK5HZ
+
+/* IAUFK5HZ, <ra5>, <dec5>, <jd>, <rah>, <dech>
+
+   Transforms an FK5 (J2000.0) star position (right ascension <ra5>,
+   declination <dec5>) determined at Julian Date <jd> into the system
+   of the Hipparcos catalog, assuming zero Hipparcos proper motion.
+   The returned coordinates in the Hipparcos system are right
+   ascension <rah>, declination <dech> */
+
+@c -------------------------------------
+@node IAUFW2M, IAUFW2XY, IAUFK5HZ, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUFW2M
+
+/* IAUFW2M(<gamma_bar>, <phi_bar>, <psi>, <eps>)
+
+   Forms a rotation matrix given the Fukushima-Williams angles
+   <gamma_bar>, <phi_bar>, <psi>, and <eps> */
+
+@c -------------------------------------
+@node IAUFW2XY, IAUGC2GD, IAUFW2M, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUFW2XY
+
+/* IAUFW2XY, <gamma_bar>, <phi_bar>, <psi>, <eps>, <x>, <y> 
+
+   Returns CIP <x>, <y>, given the Fukushima-Williams
+   bias-precession-nutation angles <gamma_bar>, <phi_bar>, <psi>,
+   <eps>. */
+
+@c -------------------------------------
+@node IAUGC2GD, IAUGC2GDE, IAUFW2XY, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUGC2GD
+
+/* IAUGC2GD(<xyz>, <ellid>)
+ 
+   Returns geodetic coordinates (elongation, phi, height)
+   corresponding to geocentric coordinates <xyz> using the specified
+   reference ellipsoid <ellid> */
+
+@c -------------------------------------
+@node IAUGC2GDE, IAUGD2GC, IAUGC2GD, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUGC2GDE
+
+/* IAUGC2GDE(<xyz>, <a>, <f>)
+
+   Returns geodetic coordinates (elongation, phi, height)
+   corresponding to geocentric coordinates <xyz> using the reference
+   ellipsoid with equatorial radius <a> and flattening <f> */
+
+@c -------------------------------------
+@node IAUGD2GC, IAUGD2GCE, IAUGC2GDE, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUGD2GC
+
+/* IAUGD2GC(<eph>, <ellid>)
+
+   Returns geocentric coordinates (x, y, z) corresponding to geodetic
+   coordinates <eph> (elongation, phi, height) for the specified
+   reference ellipsoid <ellid> */
+
+@c -------------------------------------
+@node IAUGD2GCE, IAUGMST06, IAUGD2GC, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUGD2GCE
+
+/* IAUGD2GCE(<eph>, <a>, <f>)
+
+   Returns geocentric coordinates (x, y, z) corresponding to geodetic
+   coordinates <eph> (elongation, phi, height) for the reference
+   ellipsoid with equatorial radius <a> and flattening <f> */
+
+@c -------------------------------------
+@node IAUGMST06, IAUGMST82, IAUGD2GCE, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUGMST06
+
+/* IAUGMST06(<jdut>, <jdtt>)
+
+   Returns Greenwich mean sidereal time according to a model that is
+   consistent with IAU 2006 precession.  <jdut> is the Julian Date
+   (UT1).  <jdtt> is the Julian Date (TT) of the same instant. <jdut>
+   is needed to predict the Earth rotation, and TT to predict the
+   effects of precession.  If <jdtt> is set equal to <jdut> then
+   errors of order 100 microarcseconds result. */
+
+@c -------------------------------------
+@node IAUGMST82, IAUGST00A, IAUGMST06, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUGMST82
+
+/* IAUGMST82(<jd>)
+ 
+   Returns Greenwich mean sidereal time for the given UT1 Julian Date
+   <jd>, according to the IAU 1982 model */
+
+@c -------------------------------------
+@node IAUGST00A, IAUGST00B, IAUGMST82, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUGST00A
+
+/* IAUGST00A(<jdut>, <jdtt>)
+
+   Returns Greenwich apparent sidereal time consisten with IAU 2000
+   resolutions.  <jdut> is the Julian Date (UT1).  <jdtt> is the
+   Julian Date (TT) of the same instant. <jdut> is needed to predict
+   the Earth rotation, and TT to predict the effects of precession.
+   If <jdtt> is set equal to <jdut> then errors of order 100
+   microarcseconds result. */
+
+@c -------------------------------------
+@node IAUGST00B, IAUGST06, IAUGST00A, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUGST00B
+
+/* IAUGST00B(<jdut>, <jdtt>)
+
+   Returns Greenwich apparent sidereal time consistent with IAU 2000
+   resolutions but using the truncated nutation model IAU 2000B.
+   <jdut> is the Julian Date (UT1).  <jdtt> is the Julian Date (TT) of
+   the same instant. <jdut> is needed to predict the Earth rotation,
+   and TT to predict the effects of precession.  If <jdtt> is set
+   equal to <jdut> then errors of order 100 microarcseconds result. */
+
+@c -------------------------------------
+@node IAUGST06, IAUGST94, IAUGST00B, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUGST06
+
+/* IAUGST06(<jdut>, <jdtt>, <rnpb>)
+
+   Returns Greenwich apparent sidereal time consistent with IAU 2006
+   resolutions, given the nutation-precession-bias matrix
+   <rnpb>. <jdtt> is the Julian Date (TT) of the same instant. <jdut>
+   is needed to predict the Earth rotation, and TT to predict the
+   effects of precession.  If <jdtt> is set equal to <jdut> then
+   errors of order 100 microarcseconds result. */
+
+@c -------------------------------------
+@node IAUGST94, IAUH2FK5, IAUGST06, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUGST94
+
+/* IAUGST94(<jd>)
+ 
+   Returns Greenwich apparent sidereal time for the given UT1 Julian
+   Date <jd>, consistent with IAU 1982/94 resolutions */
+
+@c -------------------------------------
+@node IAUH2FK5, IAUHFK5Z, IAUGST94, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUH2FK5
+
+/* IAUH2FK5, <rah>, <dech>, <drah>, <ddech>, <pxh>, <rvh>, <ra5>,
+   <dec5>, <dra5>, <ddec5>, <px5>, <rv5>
+
+   Transforms Hipparcos star data into the FK5 (J2000.0) system.  The
+   Hipparcos data is: right ascension <rah>, declination <dech>,
+   proper motion in right ascension <drah>, proper motion in
+   declination <ddech>, parallax <pxh>, radial velocity <rvh>.  The
+   FK5 data is: right ascension <ra5>, declination <dec5>, proper
+   motion in right ascension <dra5>, proper motion in declination
+   <ddec5>, parallax <px5>, radial velocity <rv5>. */
+
+@c -------------------------------------
+@node IAUHFK5Z, IAUIR, IAUH2FK5, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUHFK5Z
+
+/* IAUHFK5Z, <rah>, <dech>, <jd>, <ra5>, <dec5>
+
+   Transforms a Hipparcos star position (right ascension <rah>,
+   declination <dech>) determined at Julian Date <jd> into the FK5
+   (J2000.0) system, assuming zero Hipparcos proper motion.  The
+   returned coordinates in the FK5 system are right ascension <ra5>,
+   declination <dec5> */
+
+@c -------------------------------------
+@node IAUIR, IAUJD2CAL, IAUHFK5Z, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUIR
+
+/* IAUIR()
+
+   Returns an identity r-matrix */
+
+@c -------------------------------------
+@node IAUJD2CAL, IAUNUM00A, IAUIR, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUJD2CAL
 
@@ -19911,7 +20536,891 @@ after 1e9 yield zeros for the year, month, and day.  CJDNs between
 on systems with 32-bit ints.
 
 @c -------------------------------------
-@node IBETA, IDLREAD, IAUJD2CAL, Internal Routines
+@node IAUNUM00A, IAUNUM00B, IAUJD2CAL, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUNUM00A
+
+/* IAUNUM00A(<jd>)
+
+   Returns the matrix for nutation for a given Julian Date <jd>,
+   according to the IAU 2000A model. */
+
+@c -------------------------------------
+@node IAUNUM00B, IAUNUM06A, IAUNUM00A, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUNUM00B
+
+/* IAUNUM00B(<jd>)
+
+   Returns the matrix for nutation for a given Julian Date <jd>,
+   according to the IAU 2000B model. */
+
+@c -------------------------------------
+@node IAUNUM06A, IAUNUMAT, IAUNUM00B, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUNUM06A
+
+/* IAUNUM06A(<jd>)
+
+   Returns the matrix for nutation for a given Julian Date <jd>,
+   according to the IAU 2006/2000A model. */
+
+@c -------------------------------------
+@node IAUNUMAT, IAUNUT00A, IAUNUM06A, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUNUMAT
+
+/* IAUNUMAT(<epsa>, <dpsi>, <deps>)
+
+   Returns the matrix of nutation based on the mean obliquity of the
+   date <epsa> and the nutation components <dpsi> and <deps>. */
+
+@c -------------------------------------
+@node IAUNUT00A, IAUNUT00B, IAUNUMAT, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUNUT00A
+
+/* IAUNUT00A, <jd>, <dpsi>, <deps>
+
+   Returns the nutation for Julian Date <jd> according to the IAU
+   2000A model (MHB2000 luni-solar and planetary nutation with fre
+   core nutation omitted).  <dpsi> and <deps> are the returned
+   nutation components (luni-solar + planetary) */
+
+@c -------------------------------------
+@node IAUNUT00B, IAUNUT06A, IAUNUT00A, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUNUT00B
+
+/* IAUNUT00B, <jd>, <dpsi>, <deps>
+
+   Returns the nutation for Julian Date <jd> according to the IAU
+   2000B model.  <dpsi> and <deps> are the returned nutation
+   components (luni-solar + planetary) */
+
+@c -------------------------------------
+@node IAUNUT06A, IAUNUT80, IAUNUT00B, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUNUT06A
+
+/* IAUNUT06A, <jd>, <dpsi>, <deps>
+
+   Returns the nutation for Julian Date <jd> according to the IAU
+   2000A model, with adjustments to match the IAU 2006 precession.
+   <dpsi> and <deps> are the returned nutation components (luni-solar
+   + planetary) */
+
+@c -------------------------------------
+@node IAUNUT80, IAUNUTM80, IAUNUT06A, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUNUT80
+
+/* IAUNUT80, <jd>, <dpsi>, <deps>
+
+   Returns the nutation for Julian Date <jd> according to the IAU 1980
+   model.  <dpsi> and <deps> are the returned nutation components
+   (luni-solar + planetary) */
+
+@c -------------------------------------
+@node IAUNUTM80, IAUOBL06, IAUNUT80, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUNUTM80
+
+/* IAUNUTM80(<jd>)
+
+   Returns the nutation matrix for Julian Date <jd>, according to the
+   IAU 1980 model.
+ */
+
+@c -------------------------------------
+@node IAUOBL06, IAUOBL80, IAUNUTM80, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUOBL06
+
+/* IAUOBL06(<jd>)
+
+   Returns the mean obliquity of the ecliptic according to the IAU
+   2006 precession model.
+ */
+
+@c -------------------------------------
+@node IAUOBL80, IAUP06E, IAUOBL06, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUOBL80
+
+/* IAUOBL80(<jd>)
+
+   Returns the mean obliquity of the ecliptic according to the IAU
+   1980 model. */
+
+@c -------------------------------------
+@node IAUP06E, IAUP2S, IAUOBL80, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUP06E
+
+/* IAUP06E, <jd>, <eps0>, <psia>, <oma>, <bpa>, <bqa>, <pia>, <bpia>,
+   <epsa>, <chia>, <za>, <zetaa>, <thetaa>, <pa>, <gam>, <phi>, <psi>
+
+   Returns IAU 2006 equinox-based precession angles for Julian Date
+   <jd>.  The returned precession angles are: epsilon_0, psi_A,
+   omega_A, P_A, Q_A, pi_A, Pi_A, obliquity epsilon_A, chi_A, z_A,
+   zeta_A, theta_A, p_A, F-W angle gamma_J2000, F-W angle phi_J2000,
+   F-W angle psi_J2000.
+ */
+
+@c -------------------------------------
+@node IAUP2S, IAUPAP, IAUP06E, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUP2S
+
+/* IAUP2S(<p>)
+
+   Returns the spherical polar coordinates (theta, phi, r)
+   corresponding to the p-vector <p> */
+
+@c -------------------------------------
+@node IAUPAP, IAUPAS, IAUP2S, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUPAP
+
+/* IAUPAP(<ref>, <tgt>)
+
+   Returns the position angle of p-vector <tgt> from p-vector <ref>
+*/
+
+@c -------------------------------------
+@node IAUPAS, IAUPB06, IAUPAP, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUPAS
+
+/* IAUPAS(<al>, <ap>, <bl>, <bp>)
+
+   Returns the position angle of B with respect to A.  <al> =
+   longitude of point A in radians, <ap> = latitude of point A in
+   radians, <bl> = longitude of point B in radians, <bp> = latitude of
+   point B in radians
+*/
+
+@c -------------------------------------
+@node IAUPB06, IAUPDP, IAUPAS, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUPB06
+
+/* IAUPB06, <jd>, <bzeta>, <bz>, <btheta>
+
+   Returns three Euler angles which implement general precesion from
+   epoch J2000.0, using the IAU 2006 model, for Julian Date <jd>.
+   Frame bias (the offset between ICRS and J2000.0) is included. */
+
+@c -------------------------------------
+@node IAUPDP, IAUPFW06, IAUPB06, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUPDP
+
+/* IAUPDP(<a>, <b>)
+
+   Returns the inner product of the two p-vectors <a> and <b> */
+
+@c -------------------------------------
+@node IAUPFW06, IAUPLAN94, IAUPDP, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUPFW06
+
+/* IAUPFW06, <jd>, <gamb>, <phib>, <psib>, <epsa>
+
+   Returns the IAU 2006 precession angles in Fukushima-Williams
+   4-angle formulation. */
+
+@c -------------------------------------
+@node IAUPLAN94, IAUPM, IAUPFW06, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUPLAN94
+
+/* IAUPLAN94(<jd>, <planet>)
+
+   Returns the approximate heliocentric position and velocity at
+   Julian Date <jd> of major planet <planet> (1 = Mercury, 2 = Venus,
+   3 = EMB, 4 = Mars, ..., 8 = Neptune) 
+*/
+
+@c -------------------------------------
+@node IAUPM, IAUPMAT00, IAUPLAN94, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUPM
+
+/* IAUPM(<p>)
+
+   Returns the modulus of the p-vector <p>
+*/
+
+@c -------------------------------------
+@node IAUPMAT00, IAUPMAT06, IAUPM, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUPMAT00
+
+/* IAUPMAT00(<jd>)
+
+   Returns the precession matrix (including frame bias) from GCRS to a
+   specified Julian Date <jd> according to the IAU 2000 model.
+*/
+
+@c -------------------------------------
+@node IAUPMAT06, IAUPMAT76, IAUPMAT00, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUPMAT06
+
+/* IAUPMAT06(<jd>)
+
+   Returns the precession matrix (including frame bias) from GCRS to a
+   specified Julian Date <jd> according to the IAU 2006 model.
+*/
+
+@c -------------------------------------
+@node IAUPMAT76, IAUPN, IAUPMAT06, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUPMAT76
+
+/* IAUPMAT76(<jd>)
+
+   Returns the precession matrix from J2000.0 to a specified Julian
+   Date <jd> according to the IAU 1976 model. */
+
+@c -------------------------------------
+@node IAUPN, IAUPN00, IAUPMAT76, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUPN
+
+/* IAUPN, <p>, <r>, <u>
+
+   Converts p-vector <p> into a modulus <r> and unit vector <u> */
+
+@c -------------------------------------
+@node IAUPN00, IAUPN00A, IAUPN, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUPN00
+
+/* IAUPN00, <jd>, <dpsi>, <deps>, <epsa>, <rb>, <rp>, <rbp>, <rn>, <rbpn>
+
+   Returns precession-nutation according to the IAU 2000 model for the
+   specified Julian Date <jd> and nutation <dpsi>, <deps>.  The output
+   parameters are the mean obliquity <epsa>, the frame bias matrix
+   <rb>, the precession matrix <rp>, the bias-precession matrix <rbp>,
+   the nutation matrix <rn>, and the GCRS-to-true matrix <rbpn>. */
+
+@c -------------------------------------
+@node IAUPN00A, IAUPN00B, IAUPN00, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUPN00A
+
+/* IAUPN00A, <jd>, <dpsi>, <deps>, <epsa>, <rb>, <rp>, <rbp>, <rn>, <rbpn>
+
+   Returns precession-nutation according to the IAU 200A model for the
+   specified Julian Date <jd> and nutation <dpsi>, <deps>.  The output
+   parameters are the mean obliquity <epsa>, the frame bias matrix
+   <rb>, the precession matrix <rp>, the bias-precession matrix <rbp>,
+   the nutation matrix <rn>, and the GCRS-to-true matrix <rbpn>. */
+
+@c -------------------------------------
+@node IAUPN00B, IAUPN06, IAUPN00A, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUPN00B
+
+/* IAUPN00B, <jd>, <dpsi>, <deps>, <epsa>, <rb>, <rp>, <rbp>, <rn>, <rbpn>
+
+   Returns precession-nutation according to the IAU 200A model for the
+   specified Julian Date <jd> and nutation <dpsi>, <deps>.  The output
+   parameters are the mean obliquity <epsa>, the frame bias matrix
+   <rb>, the precession matrix <rp>, the bias-precession matrix <rbp>,
+   the nutation matrix <rn>, and the GCRS-to-true matrix <rbpn>. */
+
+@c -------------------------------------
+@node IAUPN06, IAUPN06A, IAUPN00B, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUPN06
+
+/* IAUPN06, <jd>, <dpsi>, <deps>, <epsa>, <rb>, <rp>, <rbp>, <rn>, <rbpn>
+
+   Returns precession-nutation according to the IAU 2006 model for the
+   specified Julian Date <jd> and nutation <dpsi>, <deps>.  The output
+   parameters are the mean obliquity <epsa>, the frame bias matrix
+   <rb>, the precession matrix <rp>, the bias-precession matrix <rbp>,
+   the nutation matrix <rn>, and the GCRS-to-true matrix <rbpn>. */
+
+@c -------------------------------------
+@node IAUPN06A, IAUPNM00A, IAUPN06, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUPN06A
+
+/* IAUPN06A, <jd>, <dpsi>, <deps>, <epsa>, <rb>, <rp>, <rbp>, <rn>, <rbpn>
+
+   Returns precession-nutation according to the IAU 2006/2000A models
+   for the specified Julian Date <jd> and nutation <dpsi>, <deps>.
+   The output parameters are the mean obliquity <epsa>, the frame bias
+   matrix <rb>, the precession matrix <rp>, the bias-precession matrix
+   <rbp>, the nutation matrix <rn>, and the GCRS-to-true matrix
+   <rbpn>. */
+
+@c -------------------------------------
+@node IAUPNM00A, IAUPNM00B, IAUPN06A, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUPNM00A
+
+/* IAUPNM00A(<jd>)
+
+   Returns the matrix of precession-nutation (including frame bias)
+   for Julian Date <jd>, equinox-based, IAU 2000A model. */
+
+@c -------------------------------------
+@node IAUPNM00B, IAUPNM06A, IAUPNM00A, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUPNM00B
+
+/* IAUPNM00B(<jd>)
+
+   Returns the matrix of precession-nutation (including frame bias)
+   for Julian Date <jd>, equinox-based, IAU 2000B model. */
+
+@c -------------------------------------
+@node IAUPNM06A, IAUPNM80, IAUPNM00B, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUPNM06A
+
+/* IAUPNM06A(<jd>)
+
+   Returns the matrix of precession-nutation (including frame bias)
+   for Julian Date <jd>, equinox-based, IAU 2006 precession and IAU
+   2000A nutation models. */
+
+@c -------------------------------------
+@node IAUPNM80, IAUPOM00, IAUPNM06A, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUPNM80
+
+/* IAUPNM80(<jd>)
+
+   Returns the matrix of precession-nutation (including frame bias)
+   for Julian Date <jd>, equinox-based, IAU 1976 precession and IAU
+   1980 nutation models. */
+
+@c -------------------------------------
+@node IAUPOM00, IAUPR00, IAUPNM80, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUPOM00
+
+/* IAUPOM00(<xp>, <yp>, <sp>)
+
+   Returns the matrix of polar motion, IAU 2000, given the coordinates
+   <xp>, <yp> of the pole and TIO locator <sp>. */
+
+@c -------------------------------------
+@node IAUPR00, IAUPREC76, IAUPOM00, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUPR00
+
+/* IAUPR00, <jd>, <dpsipr>, <depspr>
+
+   Returns the precession-rate part of the IAU 2000
+   precession-nutation models (part of MHB2000). */
+
+@c -------------------------------------
+@node IAUPREC76, IAUPV2S, IAUPR00, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUPREC76
+
+/* IAUPREC76, <jd1>, <jd2>, <zeta>, <z>, <theta>
+
+   Returns the three Euler angles <zeta>, <z>, <theta> which implement
+   general precession between epochs (Julian Dates) <jd1> and <jd2>,
+   using the IAU 1976 model (as for the FK5 catalog).  <zeta> is the
+   1st rotation angle in radians clockwise around the z axis, <z> the
+   3rd rotation angle in radians clockwise around the z axis, and
+   <theta> the 2nd rotation angle in radians counterclockwise around
+   the y axis. */
+
+@c -------------------------------------
+@node IAUPV2S, IAUPVDPV, IAUPREC76, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUPV2S
+
+/* IAUPV2S, <pv>, <theta>, <phi>, <r>, <td>, <pd>, <rd>
+
+   Converts position/velocity vector <pv> from Cartesian to spherical
+   coordinates.  <theta> = longitude angle, <phi> = latitude angle,
+   <r> = radial distance, <td> = rate of change of theta, <pd> = rate
+   of change of <phi>, <rd> = rate of change of <r> */
+@c -------------------------------------
+@node IAUPVDPV, IAUPVM, IAUPV2S, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUPVDPV
+
+/* IAUPVDPV(<a>, <b>)
+
+   Returns the inner product of pv-vectors <a> and <b> */
+
+@c -------------------------------------
+@node IAUPVM, IAUPVSTAR, IAUPVDPV, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUPVM
+
+/* IAUPVM, <pv>, <r>, <s>
+
+   Returns the modulus of pv-vector <pv>.  <r> is the modulus of the
+   position component, and <s> is the modulus of the velocity
+   component. */
+
+@c -------------------------------------
+@node IAUPVSTAR, IAUPVXPV, IAUPVM, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUPVSTAR
+
+/* IAUPVSTAR, <pv>, <ra>, <dec>, <pmr>, <pmd>, <px>, <rv>
+
+   Converts position-velocity matrix <pv> to catalog coordinates right
+   ascension <ra> (rad), declination <dec> (rad), right ascension
+   proper motion <pmr> in rad/a, declination proper motion <pmd>
+   (rad/a), parallax <px> (arcsec), and radial velocity <rv> (km/s
+   receding) */
+
+@c -------------------------------------
+@node IAUPVXPV, IAUPXP, IAUPVSTAR, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUPVXPV
+
+/* IAUPVXPV(<a>, <b>)
+
+   Returns the outer product of two pv-vectors <a> and <b> */
+
+@c -------------------------------------
+@node IAUPXP, IAURM2V, IAUPVXPV, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUPXP
+
+/* IAUPXP(<a>, <b>)
+
+   Returns the outer product of two p-vectors <a> and <b> */
+
+@c -------------------------------------
+@node IAURM2V, IAURV2M, IAUPXP, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAURM2V
+
+/* IAURM2V(<r>)
+
+   Returns the rotation vector corresponding to rotation matrix <r>.
+   The rotation vector has the same direction as the Euler axis of
+   matrix <r> and has its magnitude equal to the rotation angle in
+   radians of the rotation matrix. */
+
+@c -------------------------------------
+@node IAURV2M, IAURX, IAURM2V, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAURV2M
+
+/* IAURV2M(<w>)
+
+   Returns the rotation matrix corresponding to rotation vector <w>.
+   The rotation matrix Euler axis gets the direction of <w>, and the
+   rotation matrix gets a rotation angle equal to the modulus of
+   <w>. */
+
+@c -------------------------------------
+@node IAURX, IAURXPV, IAURV2M, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAURX
+
+/* IAURX, <phi>, <r>
+
+   Rotates r-matrix <r> about the x axis over angle <phi> */
+
+@c -------------------------------------
+@node IAURXPV, IAURY, IAURX, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAURXPV
+
+/* IAURXPV(<r>, <pv>)
+
+   Returns the matrix product of r-matrix <r> and pv-vector <pv> */
+
+@c -------------------------------------
+@node IAURY, IAURZ, IAURXPV, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAURY
+
+/* IAURY, <phi>, <r>
+
+   Rotates r-matrix <r> about the y axis over angle <phi> */
+
+@c -------------------------------------
+@node IAURZ, IAUS00, IAURY, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAURZ
+
+/* IAURZ, <phi>, <r>
+
+   Rotates r-matrix <r> about the z axis over angle <phi> */
+
+@c -------------------------------------
+@node IAUS00, IAUS00A, IAURZ, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUS00
+
+/* IAUS00(<jd>, <x>, <y>)
+
+   Returns the CIO locator for the specified Julian Date <jd> given
+   the CIP's <x> and <y> coordinates, using IAU 2000A
+   precession-nutation */
+
+@c -------------------------------------
+@node IAUS00A, IAUS00B, IAUS00, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUS00A
+
+/* IAUS00A(<jd>)
+
+   Returns the CIO locator for the specified Julian Date <jd>, using
+   IAU 2000A precession-nutation */
+
+@c -------------------------------------
+@node IAUS00B, IAUS06, IAUS00A, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUS00B
+
+/* IAUS00B(<jd>)
+
+   Returns the CIO locator for the specified Julian Date <jd>, using
+   IAU 2000B precession-nutation */
+
+@c -------------------------------------
+@node IAUS06, IAUS06A, IAUS00B, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUS06
+
+/* IAUS06(<jd>, <x>, <y>)
+
+   Returns the CIO locator for the specified Julian Date <jd> given
+   the CIP's <x> and <y> coordinates, using IAU 2006/2000A
+   precession-nutation */
+
+@c -------------------------------------
+@node IAUS06A, IAUS2C, IAUS06, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUS06A
+
+/* IAUS06A(<jd>)
+
+   Returns the CIO locator for the specified Julian Date <jd>, using
+   IAU 2006 precession and IAU 2000A nutation */
+
+@c -------------------------------------
+@node IAUS2C, IAUS2P, IAUS06A, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUS2C
+
+/* IAUS2C(<theta>, <phi>)
+
+   Returns the cartesian coordinates (direction cosines) corresponding
+   to spherical coordinates longitude <theta> and latitude <phi> */
+
+@c -------------------------------------
+@node IAUS2P, IAUS2PV, IAUS2C, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUS2P
+
+/* IAUS2P(<theta>, <phi>, <r>)
+
+   Converts spherical polar coordinates longitude <theta>, latitude
+   <phi>, radial distance <r> to a p-vector */
+
+@c -------------------------------------
+@node IAUS2PV, IAUSEPP, IAUS2P, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUS2PV
+
+/* IAUS2PV(<theta>, <phi>, <r>, <td>, <pd>, <rd>)
+
+   Returns the pv-vector that corresponds to the spherical coordinates
+   longitude <theta>, latitude <phi>, radial distance <r>, rate of
+   change of theta <td>, rate of change of phi <pd>, rate of change of
+   r <rd> */
+
+@c -------------------------------------
+@node IAUSEPP, IAUSEPS, IAUS2PV, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUSEPP
+
+/* IAUSEPP(<a>, <b>)
+
+   Returns the angular separation between two p-vectors <a> and <b> */
+
+@c -------------------------------------
+@node IAUSEPS, IAUSP00, IAUSEPP, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUSEPS
+
+/* IAUSEPS(<lon1>, <lat1>, <lon2>, <lat2>)
+
+   Returns the angular separation between the direction with longitude
+   <lon1>, latitude <lat1> and the direction with longitude <lon2>,
+   latitude <lat2> */
+
+@c -------------------------------------
+@node IAUSP00, IAUSTARPM, IAUSEPS, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUSP00
+
+/* IAUSP00(<jd>)
+
+   Returns the TIO locator s' for Julian Date <jd>, positioning the
+   Terrestrial Intermediate Origin on the equator of the Celestial
+   Intermediate Pole */
+
+@c -------------------------------------
+@node IAUSTARPM, IAUSTARPV, IAUSP00, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUSTARPM
+
+/* IAUSTARPM, <ra1>, <dec1>, <pmr1>, <pmd1>, <px1>, <rv1>, <jd1>,
+   <jd2>, <ra2>, <dec2>, <pmr2>, <pmd2>, <px2>, <rv2>
+
+   Updates star catalog data for space motion. <ra> = right ascension,
+   <dec> = declination, <pmr> = right ascension proper motion, <pmd> =
+   declination proper motion, <px> = parallax, <rv> = radial velocity;
+   *1 = before, *2 = after */
+
+@c -------------------------------------
+@node IAUSTARPV, IAUTAITT, IAUSTARPM, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUSTARPV
+
+/* IAUSTARPV(<ra>, <dec>, <pmr>, <pmd>, <px>, <rv>)
+
+   Converts star catalog coordinates to a position-velocity matrix */
+
+@c -------------------------------------
+@node IAUTAITT, IAUTAIUT1, IAUSTARPV, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUTAITT
+
+/* IAUTAITT(<jdtai>)
+
+   Translates Julian Date <jdtai> from TAI to TT */
+
+@c -------------------------------------
+@node IAUTAIUT1, IAUTAIUTC, IAUTAITT, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUTAIUT1
+
+/* IAUTAIUT1(<jdtai>, <dta>)
+
+   Translates Julian Date <jdtai> from TAI to UT1, given <dta> = UT1 -
+   TAi in seconds */
+
+@c -------------------------------------
+@node IAUTAIUTC, IAUTCBTDB, IAUTAIUT1, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUTAIUTC
+
+/* IAUTAIUTC(<jdtai>)
+
+   Translates Julian Date <jdtai> from TAI to UTC */
+
+@c -------------------------------------
+@node IAUTCBTDB, IAUTCGTT, IAUTAIUTC, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUTCBTDB
+
+/* IAUTCBTDB(<jdtcb>)
+
+   Translates Julian Date <jdtcb> from TCB to TDB */
+
+@c -------------------------------------
+@node IAUTCGTT, IAUTDBTCB, IAUTCBTDB, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUTCGTT
+
+/* IAUTCGTT(<jdtcg>)
+
+   Translates Julian Date <jdtcg> from TCG to TT */
+
+@c -------------------------------------
+@node IAUTDBTCB, IAUTDBTT, IAUTCGTT, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUTDBTCB
+
+/* IAUTDBTCB(<jdtdb>)
+
+   Translates Julian Date <jdtdb> from TDB to TCB */
+
+@c -------------------------------------
+@node IAUTDBTT, IAUTR, IAUTDBTCB, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUTDBTT
+
+/* IAUTDBTT(<jdtdb>, <dtr>)
+
+   Translates Julian Date <jdtbd> from TDB to TT, given <dtr> = TDB -
+   TT in seconds  */
+
+@c -------------------------------------
+@node IAUTR, IAUTRXP, IAUTDBTT, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUTR
+
+/* IAUTR(<r>)
+
+   Transposes r-matrix <r> */
+
+@c -------------------------------------
+@node IAUTRXP, IAUTRXPV, IAUTR, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUTRXP
+
+/* IAUTRXP(<r>, <p>)
+
+   Multiply p-vector <p> by the transpose of r-matrix <r> */
+
+@c -------------------------------------
+@node IAUTRXPV, IAUTTTAI, IAUTRXP, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUTRXPV
+
+/* IAUTRXPV(<r>, <pv>)
+
+   Multiply pv-vector <pv> by the transpose of r-matrix <r> */
+
+@c -------------------------------------
+@node IAUTTTAI, IAUTTTCG, IAUTRXPV, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUTTTAI
+
+/* IAUTTTAI(<jdtt>)
+
+   Transforms Julian Date <jdtt> from TT to TAI */
+
+@c -------------------------------------
+@node IAUTTTCG, IAUTTTDB, IAUTTTAI, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUTTTCG
+
+/* IAUTTTCG(<jdtt>)
+
+   Transforms Julian Date <jdtt> from TT to TCG */
+
+@c -------------------------------------
+@node IAUTTTDB, IAUTTUT1, IAUTTTCG, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUTTTDB
+
+/* IAUTTTDB(<jdtt>, <dt>)
+
+   Transforms Julian Date <jdtt> from TT to TDB, given <dt> = TDB -
+   TT in seconds */
+
+@c -------------------------------------
+@node IAUTTUT1, IAUUT1TAI, IAUTTTDB, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUTTUT1
+
+/* IAUTTUT1(<jdtt>, <dt>)
+
+   Transforms Julian Date <jdtt> from TT to UT1, given <dt> = TT - UT1
+   in seconds */
+
+@c -------------------------------------
+@node IAUUT1TAI, IAUUT1TT, IAUTTUT1, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUUT1TAI
+
+/* IAUUT1TAI(<jdut>, <dt>)
+
+   Transforms Julian Date <jdut> from UT1 to TAI, given <dt> = UT1 -
+   TAI in seconds */
+
+@c -------------------------------------
+@node IAUUT1TT, IAUUT1UTC, IAUUT1TAI, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUUT1TT
+
+/* IAUUT1TT(<jdut>, <dt>)
+
+   Transforms Julian Date <jdut> from UT1 to TT, given <dt> = UT1 -
+   TT in seconds */
+
+@c -------------------------------------
+@node IAUUT1UTC, IAUUTCTAI, IAUUT1TT, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUUT1UTC
+
+/* IAUUT1UTC(<jdut>, <dt>)
+
+   Transforms Julian Date <jdut> from UT1 to UTC, given <dt> = UT1 -
+   UTC in seconds */
+
+@c -------------------------------------
+@node IAUUTCTAI, IAUUTCUT1, IAUUT1UTC, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUUTCTAI
+
+/* IAUUTCTAI(<jdut>)
+
+   Transforms Julian Date <jdut> from UTC to TAI */
+
+@c -------------------------------------
+@node IAUUTCUT1, IAUXY06, IAUUTCTAI, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUUTCUT1
+
+/* IAUUTCUT1(<jdut>, <dt>)
+
+   Transforms Julian Date <jdut> from UTC to UT1, given <dt> = UT1 -
+   UTC in seconds */
+
+@c -------------------------------------
+@node IAUXY06, IAUXYS00A, IAUUTCUT1, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUXY06
+
+/* IAUXY06, <jd>, <x>, <y>
+
+   Returns the Celestial Intermediate Pole <x>, <y> coordinates for
+   the given Julian Date <jd>, based on IAU 2006 precession and IAU
+   2000A nutation. */
+
+@c -------------------------------------
+@node IAUXYS00A, IAUXYS00B, IAUXY06, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUXYS00A
+
+/* IAUXYS00A, <jd>, <x>, <y>, <s>
+
+   Returns the Celestial Intermediate Pole <x>, <y> coordinates and
+   the CIO locator <s> for Julian Date <jd>, based on the IAU 2000A
+   precession-nutation model */
+
+@c -------------------------------------
+@node IAUXYS00B, IAUXYS06A, IAUXYS00A, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUXYS00B
+
+/* IAUXYS00B, <jd>, <x>, <y>, <s>
+
+   Returns the Celestial Intermediate Pole <x>, <y> coordinates and
+   the CIO locator <s> for Julian Date <jd>, based on the IAU 2000B
+   precession-nutation model */
+
+@c -------------------------------------
+@node IAUXYS06A, IBETA, IAUXYS00B, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUXYS06A
+
+/* IAUXYS06A, <jd>, <x>, <y>, <s>
+
+   Returns the Celestial Intermediate Pole <x>, <y> coordinates and
+   the CIO locator <s> for Julian Date <jd>, based on the IAU 2006
+   precession and IAU 2000A nutation models */
+
+@c -------------------------------------
+@node IBETA, IDLREAD, IAUXYS06A, Internal Routines
 @subsection IBETA
 
 @code{IBETA(@var{x}, @var{a}, @var{b} [, /COMPLEMENT])}

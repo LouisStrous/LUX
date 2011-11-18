@@ -69,7 +69,7 @@ int ana_ic33oc33_f_(int narg, int ps[], void (*f)(double [3][3], double [3][3]))
 int ana_ic33odd_s_(int narg, int ps[], void (*f)(double (*)[3], double *, double *));
 int ana_id000ddddoc33_f_(int narg, int ps[], void (*f)(double, double, double, double, double, double, double, double, double (*)[3]));
 int ana_id0d0ddoc33_mod_f_(int narg, int ps[], void (*f)(double, double, double, double, double, double, double (*)[3]));
-int ana_id00DDDrd_f_(int narg, int ps[], double (*f)(double, double, double, double, double, double));
+int ana_idd0DDDrd_f_(int narg, int ps[], double (*f)(double, double, double, double, double, double));
 int ana_id0Loc23rl_f_(int narg, int ps[], int (*f)(double, double, int, double (*)[3]));
 int ana_id0c23c23rl_s_(int narg, int ps[], int (*f)(double, double, double (*)[3], double (*)[3]));
 int ana_id0c33oc33_f_(int narg, int ps[], void (*f)(double, double, double (*)[3], double (*)[3]));
@@ -103,7 +103,7 @@ int ana_idddoc33_f_(int narg, int ps[], void (*f)(double, double, double, double
 int ana_iddob3_f_(int narg, int ps[], void (*f)(double, double, double [3]));
 int ana_iddrd_f_(int narg, int ps[], double (*f)(double, double));
 int ana_idrd_f_(int narg, int ps[], double (*f)(double));
-int ana_ilob2rl_s_(int narg, int ps[], int (*f)(int, double *, double *));
+int ana_ilob2rl_f_(int narg, int ps[], int (*f)(int, double *, double *));
 int ana_oC33_f_(int narg, int ps[], void (*f)(double (*)[3]));
 int ana_oC33B3_s_(int narg, int ps[], void (*f)(double (*)[3], double *));
 int ana_oddd_combine_f_(int narg, int ps[], void (*f)(double *, double *, double *));

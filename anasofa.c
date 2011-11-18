@@ -269,8 +269,8 @@ int ana_iauDat(int narg, int ps[])
     scalar_value(iq).l = jdlo;
     return iq;
   } else {
-    if (narg < 2)
-      return anaerror("Need 1 argument", ps[0]);
+    if (narg < 1)
+      return anaerror("Need 1 argument", 0);
     if ((iq = standard_args(narg, ps, "i>L3*;rD-3*", &ptrs, &infos)) < 0)
       return ANA_ERROR;
     switch (infos[0].type) {
@@ -302,7 +302,7 @@ int ana_iauDat(int narg, int ps[])
 }
 REGISTER(iauDat, f, IAUDAT, 0, 1, "1VALID");
 /*-----------------------------------------------------------------------*/
-/* IAUDTDB(jd, elong, u, v)
+/* IAUDTDB(jdtt, ut, elong, u, v)
 
    Returns an approximation of TDB-TT in seconds, the difference
    between barycentric dynamical time and terrestrial time, for an
@@ -310,7 +310,7 @@ REGISTER(iauDat, f, IAUDAT, 0, 1, "1VALID");
    <elong> is the east longitude in radians, <u> is the distance in km
    from the Earth spin axis, and <v> is the distance in km north of
    the equatorial plane. */
-BIND(iauDtdb, id00DDDrd, f, IAUDTDB, 4, 4, NULL)
+BIND(iauDtdb, idd0DDDrd, f, IAUDTDB, 5, 5, NULL)
 /*-----------------------------------------------------------------------*/
 /* IAUEE00(<jd>, <epsa>, <dpsi>)
 
@@ -349,7 +349,7 @@ BIND(iauEect00, iddrd, f, IAUEECT00, 1, 1, NULL)
    <ellid>: 1 = WGS84, 2 = GRS80, 3 = WGS72.  If an unsupported
    <ellid> is specified, then zero radius and flattening are
    returned. */
-BIND(iauEform, ilob2rl, s, IAUEFORM, 1, 1, NULL)
+BIND(iauEform, ilob2rl, f, IAUEFORM, 1, 1, NULL)
 /*-----------------------------------------------------------------------*/
 /* IAUEO06A(<jd>)
 

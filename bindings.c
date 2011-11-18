@@ -360,7 +360,7 @@ int ana_ic33drd_f_(int narg, int ps[], double (*f)(double (*)[3], double))
   loopInfo *infos;
   int iq;
 
-  if ((iq = standard_args(narg, ps, "i>D3,3*;i>D-3,-3*;rD-3,-3*", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "i>D3,3*;i>D-,-*;rD-,-*", &ptrs, &infos)) < 0)
     return ANA_ERROR;
   double (*rnpb)[3] = (double (*)[3]) ptrs[1].d;
   while (infos[1].nelem--) {
@@ -464,30 +464,30 @@ int ana_id0d0ddoc33_mod_f_(int narg, int ps[], void (*f)(double, double, double,
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int ana_id00DDDrd_f_(int narg, int ps[], double (*f)(double, double, double, double, double, double))
+int ana_idd0DDDrd_f_(int narg, int ps[], double (*f)(double, double, double, double, double, double))
 {
   pointer *ptrs;
   loopInfo *infos;
   int iq;
 
-  if ((iq = standard_args(narg, ps, "i>L*;i>D1;i>D1;i>D1;r>D*", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "i>L*;i>D*;i>D1;i>D1;i>D1;r>D*", &ptrs, &infos)) < 0)
     return ANA_ERROR;
 
   switch (infos[0].type) {
   case ANA_LONG:
     while (infos[0].nelem--)
-      *ptrs[4].d++ = f((double) *ptrs[0].l++, 0.0, 0.0, *ptrs[1].d,
-                       *ptrs[2].d, *ptrs[3].d);
+      *ptrs[5].d++ = f((double) *ptrs[0].l++, 0.0, *ptrs[1].d, *ptrs[2].d,
+                       *ptrs[3].d, *ptrs[4].d);
     break;
   case ANA_FLOAT:
     while (infos[0].nelem--)
-      *ptrs[4].d++ = f((double) *ptrs[0].f++, 0.0, 0.0, *ptrs[1].d,
-                       *ptrs[2].d, *ptrs[3].d);
+      *ptrs[5].d++ = f((double) *ptrs[0].f++, 0.0, *ptrs[1].d, *ptrs[2].d,
+                       *ptrs[3].d, *ptrs[4].d);
     break;
   case ANA_DOUBLE:
     while (infos[0].nelem--)
-      *ptrs[4].d++ = f(*ptrs[0].d++, 0.0, 0.0, *ptrs[1].d, *ptrs[2].d,
-                       *ptrs[3].d);
+      *ptrs[5].d++ = f(*ptrs[0].d++, 0.0, *ptrs[1].d, *ptrs[2].d, 
+                       *ptrs[3].d, *ptrs[4].d);
     break;
   }
   return iq;  
@@ -499,7 +499,7 @@ int ana_id0Loc23rl_f_(int narg, int ps[], int (*f)(double, double, int, double (
   loopInfo *infos;
   int iq;
 
-  if ((iq = standard_args(narg, ps, "i>D*;iL1;rD+2+3*", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "i>D*;iL1;rD+2,+3*", &ptrs, &infos)) < 0)
     return ANA_ERROR;
 
   while (infos[0].nelem--) {
@@ -515,7 +515,7 @@ int ana_id0c23c23rl_s_(int narg, int ps[], int (*f)(double, double, double (*)[3
   loopInfo *infos;
   int iq;
 
-  if ((iq = standard_args(narg, ps, "i>L*;oD+2+3*;oD+2+3*", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "i>L*;oD+2,+3*;oD+2,+3*", &ptrs, &infos)) < 0)
     return ANA_ERROR;
   double (*pvh)[3] = (double (*)[3]) ptrs[1].d;
   double (*pvb)[3] = (double (*)[3]) ptrs[2].d;
@@ -531,15 +531,15 @@ int ana_id0c23c23rl_s_(int narg, int ps[], int (*f)(double, double, double (*)[3
   case ANA_FLOAT:
     while (infos[0].nelem--) {
       f((double) *ptrs[0].f++, 0.0, pvh, pvb);
-      pvh += 3;
-      pvb += 3;
+      pvh += 2;
+      pvb += 2;
     }
     break;
   case ANA_DOUBLE:
     while (infos[0].nelem--) {
       f(*ptrs[0].d++, 0.0, pvh, pvb);
-      pvh += 3;
-      pvb += 3;
+      pvh += 2;
+      pvb += 2;
     }
     break;
   }
@@ -973,7 +973,7 @@ int ana_iddddddoc23rl_f_(int narg, int ps[], int (*f)(double, double, double, do
   loopInfo *infos;
   int iq;
 
-  if ((iq = standard_args(narg, ps, "i>D*;i>D*;i>D*;i>D*;i>D*;i>D*;oD+2+3*", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "i>D*;i>D*;i>D*;i>D*;i>D*;i>D*;oD+2,+3*", &ptrs, &infos)) < 0)
     return ANA_ERROR;
   while (infos[0].nelem--) {
     f(*ptrs[0].d++, *ptrs[1].d++, *ptrs[2].d++, *ptrs[3].d++, *ptrs[4].d++,
@@ -989,7 +989,7 @@ int ana_iddddddoc23_f_(int narg, int ps[], void (*f)(double, double, double, dou
   loopInfo *infos;
   int iq;
 
-  if ((iq = standard_args(narg, ps, "i>D*;i>D*;i>D*;i>D*;i>D*;i>D*;oD+2+3*", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "i>D*;i>D*;i>D*;i>D*;i>D*;i>D*;oD+2,+3*", &ptrs, &infos)) < 0)
     return ANA_ERROR;
   while (infos[0].nelem--) {
     f(*ptrs[0].d++, *ptrs[1].d++, *ptrs[2].d++, *ptrs[3].d++, *ptrs[4].d++,
@@ -1165,7 +1165,7 @@ int ana_idrd_f_(int narg, int ps[], double (*f)(double))
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int ana_ilob2rl_s_(int narg, int ps[], int (*f)(int, double *, double *))
+int ana_ilob2rl_f_(int narg, int ps[], int (*f)(int, double *, double *))
 {
   pointer *ptrs;
   loopInfo *infos;

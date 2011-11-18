@@ -1847,12 +1847,12 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
 int standard_args(int narg, int ps[], char const *fmt, pointer **ptrs,
                   loopInfo **infos)
 {
-  int returnSym, *dims0, dims[MAX_DIMS], prev_ref_param, *final;
+  int returnSym, *ref_dims, tgt_dims[MAX_DIMS], prev_ref_param, *final;
   struct param_spec *pspec;
   struct param_spec_list *psl;
   struct dims_spec *dims_spec;
   struct obstack o;
-  size_t param_ix, num_dims0, num_dims;
+  size_t param_ix, num_ref_dims;
   loopInfo li;
   pointer p;
   enum Symboltype type;
@@ -1866,18 +1866,19 @@ int standard_args(int narg, int ps[], char const *fmt, pointer **ptrs,
       *infos = NULL;
     return anaerror("Illegal standard arguments specification %s", 0, fmt);
   }
-  size_t n = psl->num_param_specs - (psl->return_param_index >= 0);
+  size_t num_in_out_params = psl->num_param_specs
+    - (psl->return_param_index >= 0);
   /* determine mininum and maximum required number of arguments */
   size_t nmin;
-  for (nmin = n; nmin > 0; nmin--)
+  for (nmin = num_in_out_params; nmin > 0; nmin--)
     if (!psl->param_specs[nmin - 1].is_optional)
       break;
-  if (narg < nmin || narg > n) {
+  if (narg < nmin || narg > num_in_out_params) {
     if (ptrs)
       *ptrs = NULL;
     if (infos)
       *infos = NULL;
-    return anaerror("Standard arguments specification asks for between %d and %d input/output arguments but %d are specified (%s)", 0, nmin, n, narg, fmt);
+    return anaerror("Standard arguments specification asks for between %d and %d input/output arguments but %d are specified (%s)", 0, nmin, num_in_out_params, narg, fmt);
   }
   if (ptrs)
     *ptrs = malloc(psl->num_param_specs*sizeof(pointer));
@@ -1890,30 +1891,30 @@ int standard_args(int narg, int ps[], char const *fmt, pointer **ptrs,
   prev_ref_param = -1; /* < 0 indicates no reference parameter set yet */
   for (param_ix = 0; param_ix < psl->num_param_specs; param_ix++) {
     size_t pspec_dims_ix; /* parameter dimension specification index */
-    size_t dims_ix;       /* target dimension index */
+    size_t tgt_dims_ix;   /* target dimension index */
     size_t ref_dims_ix;   /* reference dimension index */
-    size_t in_dims_ix;    /* input dimension index */
-    int *in_dims;         /* dimensions of input parameter */
-    size_t in_ndim;      /* number of dimensions of input parameter */
-    int iq;
+    size_t src_dims_ix;   /* input dimension index */
+    int *src_dims;        /* dimensions of input parameter */
+    size_t num_src_dims;      /* number of dimensions of input parameter */
+    int iq, d;
 
     pspec = &psl->param_specs[param_ix];
     dims_spec = pspec->dims_spec;
-    if (param_ix == n || param_ix >= narg || !ps[param_ix] ||
-        numerical(ps[param_ix], &in_dims, &in_ndim, NULL, NULL) < 0) {
-      in_dims = NULL;
-      in_ndim = 0;
+    if (param_ix == num_in_out_params || param_ix >= narg || !ps[param_ix] ||
+        numerical(ps[param_ix], &src_dims, &num_src_dims, NULL, NULL) < 0) {
+      src_dims = NULL;
+      num_src_dims = 0;
     }
     int ref_param = pspec->ref_par;
     if (ref_param < 0)
       ref_param = (param_ix? param_ix - 1: 0);
-    if (n && ref_param != prev_ref_param) {
+    if (num_in_out_params && ref_param != prev_ref_param) {
       /* get reference parameter's information */
       /* if the reference parameter is an output parameter, then
          we must get the information from its *final* value */
       switch (psl->param_specs[ref_param].logical_type) {
       case PS_INPUT:
-        if (numerical(ps[ref_param], &dims0, &num_dims0, NULL, NULL) < 0) {
+        if (numerical(ps[ref_param], &ref_dims, &num_ref_dims, NULL, NULL) < 0) {
           returnSym = anaerror("Reference parameter %d must be an array",
                                ps[param_ix], ref_param + 1);
           goto error;
@@ -1926,7 +1927,7 @@ int standard_args(int narg, int ps[], char const *fmt, pointer **ptrs,
                                ref_param + 1, param_ix + 1);
           goto error;
         }
-        if (numerical(final[ref_param], &dims0, &num_dims0, NULL, NULL)
+        if (numerical(final[ref_param], &ref_dims, &num_ref_dims, NULL, NULL)
             < 0) {
           returnSym = anaerror("Reference parameter %d must be an array",
                                final[param_ix], ref_param + 1);
@@ -1936,66 +1937,88 @@ int standard_args(int narg, int ps[], char const *fmt, pointer **ptrs,
       }
       prev_ref_param = ref_param;
     } else if (!param_ix) {
-      dims0 = NULL;
-      num_dims0 = 0;
+      ref_dims = NULL;
+      num_ref_dims = 0;
     }
-    if (!pspec->is_optional || param_ix == n
+    if (!pspec->is_optional || param_ix == num_in_out_params
         || (param_ix < narg && ps[param_ix])) {
-      for (pspec_dims_ix = 0, dims_ix = 0, in_dims_ix = 0;
+      for (pspec_dims_ix = 0, tgt_dims_ix = 0, src_dims_ix = 0, ref_dims_ix = 0;
            pspec_dims_ix < pspec->num_dims_spec; pspec_dims_ix++) {
         switch (dims_spec[pspec_dims_ix].type) {
-        case DS_EXACT:
+        case DS_EXACT: /* an input parameter must have the exact
+                          specified dimension */
           if (pspec->logical_type == PS_INPUT
-              && in_dims[in_dims_ix]
+              && src_dims[src_dims_ix]
               != dims_spec[pspec_dims_ix].size_add) {
             returnSym = anaerror("Expected size %d for dimension %d "
                                  "but found %d", ps[param_ix],
                                  dims_spec[pspec_dims_ix].size_add,
-                                 in_dims_ix, in_dims[in_dims_ix]);
+                                 src_dims_ix, src_dims[src_dims_ix]);
             goto error;
           }
-          dims[dims_ix++] = dims_spec[pspec_dims_ix].size_add;
-          in_dims_ix++;
+          /* the target gets the exact specified dimension */
+          tgt_dims[tgt_dims_ix++] = dims_spec[pspec_dims_ix].size_add;
+          src_dims_ix++;
+          ref_dims_ix++;
           break;
         case DS_COPY_REF:       /* copy from reference */
-          if (in_dims_ix >= num_dims0) {
-            returnSym = anaerror("Requested copying dimension %d from the reference parameter which has only %d dimensions", ps[param_ix], in_dims_ix, num_dims0);
+          if (src_dims_ix >= num_ref_dims) {
+            returnSym = anaerror("Requested copying dimension %d from the reference parameter which has only %d dimensions", ps[param_ix], src_dims_ix, num_ref_dims);
             goto error;
           }
-          dims[dims_ix++] = dims0[in_dims_ix++];
+          tgt_dims[tgt_dims_ix++] = ref_dims[src_dims_ix++];
+          ref_dims_ix++;
           break;
         case DS_ADD:            /* assume PS_OUTPUT */
-          dims[dims_ix++] = dims_spec[pspec_dims_ix].size_add;
+          d = dims_spec[pspec_dims_ix].size_add;
+          switch (pspec->logical_type) {
+          case PS_INPUT:
+            if (src_dims[src_dims_ix] != d) {
+              returnSym = anaerror("Expected size %d for dimension %d "
+                                   "but found %d", ps[param_ix],
+                                   d, src_dims_ix, src_dims[src_dims_ix]);
+              goto error;
+            }
+            src_dims_ix++;
+            tgt_dims[tgt_dims_ix++] = d;
+            break;
+          case PS_OUTPUT: case PS_RETURN:
+            tgt_dims[tgt_dims_ix++] = d;
+            break;
+          }
           break;
         case DS_REMOVE: case DS_ADD_REMOVE:
           switch (pspec->logical_type) {
           case PS_INPUT:
             {
               int d = dims_spec[pspec_dims_ix].size_remove;
-              if (d && in_dims[in_dims_ix] != d) {
+              if (d && ref_dims[ref_dims_ix] != d) {
                 returnSym = anaerror("Expected size %d for dimension %d "
                                      "but found %d", ps[param_ix],
-                                     d, in_dims_ix, in_dims[in_dims_ix]);
+                                     d, ref_dims_ix, ref_dims[ref_dims_ix]);
                 goto error;
               }
             }
             break;
           case PS_OUTPUT: case PS_RETURN:
-            if (dims0[in_dims_ix] != dims_spec[pspec_dims_ix].size_remove) {
-              returnSym = anaerror("Expected size %d for dimension %d "
-                                   "but found %d", ps[param_ix],
-                                   dims_spec[pspec_dims_ix].size_remove,
-                                   in_dims_ix, dims0[in_dims_ix]);
-              goto error;
+            {
+              int d = dims_spec[pspec_dims_ix].size_remove;
+              if (d && ref_dims[ref_dims_ix] != d) {
+                returnSym = anaerror("Expected size %d for dimension %d "
+                                     "but found %d", ps[param_ix],
+                                     d, ref_dims_ix, ref_dims[ref_dims_ix]);
+                goto error;
+              }
             }
             if (dims_spec[pspec_dims_ix].type == DS_ADD_REMOVE)
-              dims[dims_ix++] = dims_spec[pspec_dims_ix].size_add;
+              tgt_dims[tgt_dims_ix++] = dims_spec[pspec_dims_ix].size_add;
             break;
           }
-          in_dims_ix++;
+          ref_dims_ix++;
           break;
         case DS_ACCEPT:         /* copy from input */
-          dims[dims_ix++] = in_dims[in_dims_ix++];
+          tgt_dims[tgt_dims_ix++] = src_dims[src_dims_ix++];
+          ref_dims_ix++;
           break;
         default:
           returnSym = anaerror("Dimension specification type %d "
@@ -2007,31 +2030,25 @@ int standard_args(int narg, int ps[], char const *fmt, pointer **ptrs,
       }
       switch (pspec->logical_type) {
       case PS_INPUT:
-        if (dims_ix < in_ndim) {
+        if (ref_dims_ix < num_ref_dims) {
           if (pspec->remaining_dims_equal_to_reference) {
-            if (dims0) {
-              if (in_ndim - dims_ix != num_dims0 - in_dims_ix) {
+            if (ref_dims) {
+              if (num_src_dims - src_dims_ix != num_ref_dims - ref_dims_ix) {
                 returnSym = anaerror("Expected %d dimensions but found %d "
                                      "in reference parameter %d", ps[param_ix],
-                                     num_dims0 - in_dims_ix + in_ndim,
-                                     num_dims0, ref_param + 1);
+                                     num_ref_dims - ref_dims_ix + src_dims_ix,
+                                     num_src_dims, ref_param + 1);
                 goto error;
               }
               int i, j;
-              for (i = in_dims_ix, j = dims_ix; i < in_ndim; i++, j++)
-                if (dims0[i] != in_dims[j]) {
+              for (i = ref_dims_ix, j = src_dims_ix; i < num_ref_dims; i++, j++)
+                if (ref_dims[i] != src_dims[j]) {
                   returnSym = anaerror("Expected dimension %d equal to %d "
                                        "but found %d", ps[param_ix], i + 1,
-                                       dims0[i], in_dims[j]);
+                                       ref_dims[i], src_dims[j]);
                   goto error;
                 }
             }
-          } else {
-            /* there are fewer dim specs than there are dimensions,
-               and no permission for that */
-            returnSym = anaerror("Expected %d dimensions but found %d",
-                                 ps[param_ix], pspec->num_dims_spec, dims_ix);
-            goto error;
           }
         }
         iq = ps[param_ix];
@@ -2044,23 +2061,25 @@ int standard_args(int narg, int ps[], char const *fmt, pointer **ptrs,
         iq = ana_convert(1, &iq, type, 1);
         break;
       case PS_OUTPUT: case PS_RETURN:
-        if (in_dims_ix < num_dims0) {
+        if (ref_dims_ix < num_ref_dims) {
           if (pspec->remaining_dims_equal_to_reference) {
             /* append remaining dimensions from reference parameter*/
-            size_t e = num_dims0 - in_dims_ix;
-            memcpy(dims + dims_ix, dims0 + in_dims_ix, e*sizeof(int));
-            dims_ix += e;
-            in_dims_ix += e;
+            size_t e = num_ref_dims - ref_dims_ix;
+            memcpy(tgt_dims + tgt_dims_ix, ref_dims + ref_dims_ix, e*sizeof(int));
+            tgt_dims_ix += e;
+            src_dims_ix += e;
+            ref_dims_ix += e;
           } else {
             returnSym = anaerror("Expected %d dimensions but found %d in "
                                  "parameter specification",
-                                 param_ix < n? ps[param_ix]: 0,
-                                 num_dims0, in_dims_ix);
+                                 param_ix < num_in_out_params? ps[param_ix]: 0,
+                                 num_ref_dims, ref_dims_ix);
             goto error;
           }
         }
-        if (param_ix == n)      /* a return parameter */
-          iq = returnSym = array_scratch(pspec->data_type, dims_ix, dims);
+        if (param_ix == num_in_out_params)      /* a return parameter */
+          iq = returnSym = array_scratch(pspec->data_type, tgt_dims_ix,
+                                         tgt_dims);
         else {
           iq = ps[param_ix];
           type = symbol_type(iq);
@@ -2070,7 +2089,7 @@ int standard_args(int narg, int ps[], char const *fmt, pointer **ptrs,
                   || (pspec->data_type_limit == PS_EXACT
                       && type != pspec->data_type)))
             type = pspec->data_type;
-          redef_array(iq, type, dims_ix, dims);
+          redef_array(iq, type, tgt_dims_ix, tgt_dims);
         }
         break;
       }

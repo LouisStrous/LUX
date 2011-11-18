@@ -852,11 +852,13 @@ int ana_calendar(int narg, int ps[])
     /* if the input type is integer, then promote to LONG.  If the
        input type is floating point, then promote to DOUBLE. */
     type = symbol_type(iq);
-    if (isIntegerType(type))
+    if (isIntegerType(type)) {
+      iq = ana_long(1, &iq);
       inputtype = ANA_LONG;
-    else if (isFloatType(type))
+    } else if (isFloatType(type)) {
+      iq = ana_double(1, &iq);
       inputtype = ANA_DOUBLE;
-    else                        /* must be text type */
+    } else                        /* must be text type */
       inputtype = ANA_STRING_ARRAY;
   }
 

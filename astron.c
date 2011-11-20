@@ -3431,14 +3431,16 @@ void heliocentricXYZr(double JDE, int object, double equinox, double *f,
       }
       if (fabs(JDE - equinox) > 1) {
 	eclipticPrecession(pos, JDE, equinox);
-        printf("ASTRON: lunar ecliptic geocentric coordinates for equinox:\n");
-        printf("lon = %.10g, lat = %.10g rad, r = %.10g AU\n",
-               pos[0], pos[1], pos[2]);
-        printf("lon = %.10g, lat = %.10g deg\n",
-               pos[0]*RAD, pos[1]*RAD);
-        double xyz[3];
-        LBRtoXYZ(pos, xyz);
-        printf("X = %.10g, Y = %.10g, Z = %.10g\n", xyz[0], xyz[1], xyz[2]);
+        if (vocal) {
+          printf("ASTRON: lunar ecliptic geocentric coordinates for equinox:\n");
+          printf("lon = %.10g, lat = %.10g rad, r = %.10g AU\n",
+                 pos[0], pos[1], pos[2]);
+          printf("lon = %.10g, lat = %.10g deg\n",
+                 pos[0]*RAD, pos[1]*RAD);
+          double xyz[3];
+          LBRtoXYZ(pos, xyz);
+          printf("X = %.10g, Y = %.10g, Z = %.10g\n", xyz[0], xyz[1], xyz[2]);
+        }
       }
       LBRtoXYZ(pos, XYZmoon);
       LBRfromVSOPD(T, 3, pos);	/* position of Earth */

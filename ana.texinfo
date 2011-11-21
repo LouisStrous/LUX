@@ -21193,56 +21193,80 @@ See also: @ref{Astronomical Coordinate Calculations}
 @comment  node-name,  next,  previous,  up
 @subsection IAUPN06A
 
-@code{IAUPN06A, @var{jd}, @var{dpsi}, @var{deps}, @var{epsa}, @var{rb}, @var{rp}, @var{rbp}, @var{rn}, @var{rbpn}}
+@code{IAUPN06A, @var{jdtt}, @var{dpsi}, @var{deps}, @var{epsa},
+@var{rb}, @var{rp}, @var{rbp}, @var{rn}, @var{rbpn}}
 
-   Returns precession-nutation according to the IAU 2006/2000A models
-   for the specified Julian Date @code{@var{jd}} and nutation @code{@var{dpsi}}, @code{@var{deps}}.
-   The output parameters are the mean obliquity @code{@var{epsa}}, the frame bias
-   matrix @code{@var{rb}}, the precession matrix @code{@var{rp}}, the bias-precession matrix
-   @code{@var{rbp}}, the nutation matrix @code{@var{rn}}, and the GCRS-to-true matrix
-   @code{@var{rbpn}}. 
+[SOFA] Returns precession-nutation according to the IAU 2006/2000A
+models for the specified TT Julian Date @code{@var{jdtt}}. The output
+parameters are the nutation in longitude in radians @code{@var{dpsi}},
+the nutation in obliquity in radians @code{@var{deps}}, the mean
+obliquity @code{@var{epsa}}, the frame bias matrix @code{@var{rb}},
+the precession matrix @code{@var{rp}}, the bias-precession matrix
+@code{@var{rbp}}, the nutation matrix @code{@var{rn}}, and the
+GCRS-to-true matrix @code{@var{rbpn}}.  @code{@var{dpsi}},
+@code{@var{deps}}, and @code{@var{epsa}} get the same dimensions as
+@code{@var{jdtt}}.  The remaining output variables get those same
+dimensions plus two extra dimensions equal to 3 prefixed.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUPNM00A, IAUPNM00B, IAUPN06A, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUPNM00A
 
-@code{IAUPNM00A(@var{jd})}
+@code{IAUPNM00A(@var{jdtt})}
 
-   Returns the matrix of precession-nutation (including frame bias)
-   for Julian Date @code{@var{jd}}, equinox-based, IAU 2000A model. 
+[SOFA] Returns the matrix of precession-nutation (including frame
+bias) for TT Julian Date @code{@var{jdtt}}, equinox-based, IAU 2000A
+model.  The result has the same dimensions as @code{@var{jdtt}} but
+with two dimensions equal to 3 prefixed.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUPNM00B, IAUPNM06A, IAUPNM00A, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUPNM00B
 
-@code{IAUPNM00B(@var{jd})}
+@code{IAUPNM00B(@var{jdtt})}
 
-   Returns the matrix of precession-nutation (including frame bias)
-   for Julian Date @code{@var{jd}}, equinox-based, IAU 2000B model. 
+[SOFA] Returns the matrix of precession-nutation (including frame
+bias) for TT Julian Date @code{@var{jdtt}}, equinox-based, IAU 2000B
+model.  The result has the same dimensions as @code{@var{jdtt}} but
+with two dimensions equal to 3 prefixed.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUPNM06A, IAUPNM80, IAUPNM00B, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUPNM06A
 
-@code{IAUPNM06A(@var{jd})}
+@code{IAUPNM06A(@var{jdtt})}
 
-   Returns the matrix of precession-nutation (including frame bias)
-   for Julian Date @code{@var{jd}}, equinox-based, IAU 2006 precession and IAU
-   2000A nutation models. 
+[SOFA] Returns the matrix of precession-nutation (including frame
+bias) for TT Julian Date @code{@var{jdtt}}, equinox-based, IAU 2006
+precession and IAU 2000A nutation models.  The result has the same
+dimensions as @code{@var{jdtt}} but with two dimensions equal to 3
+prefixed.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUPNM80, IAUPOM00, IAUPNM06A, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUPNM80
 
-@code{IAUPNM80(@var{jd})}
+@code{IAUPNM80(@var{jdtdb})}
 
-   Returns the matrix of precession-nutation (including frame bias)
-   for Julian Date @code{@var{jd}}, equinox-based, IAU 1976 precession and IAU
-   1980 nutation models. 
+[SOFA] Returns the matrix of precession-nutation (including frame
+bias) for Julian Date @code{@var{jdtdb}}, equinox-based, IAU 1976
+precession and IAU 1980 nutation models.  The result has the same
+dimensions as @code{@var{jdtt}} but with two dimensions equal to 3
+prefixed.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUPOM00, IAUPR00, IAUPNM80, Internal Routines

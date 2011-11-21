@@ -20730,105 +20730,158 @@ See also: @ref{Astronomical Coordinate Calculations}
 @code{IAUNUMAT(@var{epsa}, @var{dpsi}, @var{deps})}
 
 [SOFA] Returns the matrix of nutation based on the mean obliquity of
-the date @code{@var{epsa}} (radians) and the nutation components
-in longitude @code{@var{dpsi}} and obliquity @code{@var{deps}} in
-radians, with respect to the equinox and ecliptic of date.  The mean
+the date @code{@var{epsa}} (radians) and the nutation components in
+longitude @code{@var{dpsi}} and obliquity @code{@var{deps}} (in
+radians), with respect to the equinox and ecliptic of date.  The mean
 obliquity @code{@var{epsa}} must be consistent with the
 precession-nutation models from which @code{@var{dpsi}} and
-@code{@var{deps}} were obtained.
+@code{@var{deps}} were obtained.  The three arguments must have the
+same dimensions.  The result has those same dimensions with two extra
+dimensions equal to 3 prefixed.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUNUT00A, IAUNUT00B, IAUNUMAT, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUNUT00A
 
-@code{IAUNUT00A, @var{jd}, @var{dpsi}, @var{deps}}
+@code{IAUNUT00A, @var{jdtt}, @var{dpsi}, @var{deps}}
 
-   Returns the nutation for Julian Date @code{@var{jd}} according to the IAU
-   2000A model (MHB2000 luni-solar and planetary nutation with fre
-   core nutation omitted).  @code{@var{dpsi}} and @code{@var{deps}} are the returned
-   nutation components (luni-solar + planetary) 
+[SOFA] Returns the nutation for TT Julian Date @code{@var{jdtt}}
+according to the IAU 2000A model (MHB2000 luni-solar and planetary
+nutation with fre core nutation omitted).  @code{@var{dpsi}} and
+@code{@var{deps}} are the returned nutation components (luni-solar +
+planetary) in radians with respect to the equinox and ecliptic of
+date.  The J2000.0 obliquity is assumed to be the Lieske et al. (1977)
+value of 84381.448 arcsec.  The output parameters get the same
+dimensions as @code{@var{jdtt}}.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUNUT00B, IAUNUT06A, IAUNUT00A, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUNUT00B
 
-@code{IAUNUT00B, @var{jd}, @var{dpsi}, @var{deps}}
+@code{IAUNUT00B, @var{jdtt}, @var{dpsi}, @var{deps}}
 
-   Returns the nutation for Julian Date @code{@var{jd}} according to the IAU
-   2000B model.  @code{@var{dpsi}} and @code{@var{deps}} are the returned nutation
-   components (luni-solar + planetary) 
+[SOFA] Returns the nutation for TT Julian Date @code{@var{jdtt}}
+according to the IAU 2000B model.  @code{@var{dpsi}} and
+@code{@var{deps}} are the returned nutation components (luni-solar +
+planetary) in radians with respect to the equinox and ecliptic of
+date.  The J2000.0 obliquity is assumed to be the Lieske et al. (1977)
+value of 84381.448 arcsec.  The errors that result from using this
+function with the IAU 2006 value of 84381.406 arcsec can be neglected.
+The output parameters get the same dimensions as @code{@var{jdtt}}.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUNUT06A, IAUNUT80, IAUNUT00B, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUNUT06A
 
-@code{IAUNUT06A, @var{jd}, @var{dpsi}, @var{deps}}
+@code{IAUNUT06A, @var{jdtt}, @var{dpsi}, @var{deps}}
 
-   Returns the nutation for Julian Date @code{@var{jd}} according to the IAU
-   2000A model, with adjustments to match the IAU 2006 precession.
-   @code{@var{dpsi}} and @code{@var{deps}} are the returned nutation components (luni-solar
-   + planetary) 
+[SOFA] Returns the nutation for TT Julian Date @code{@var{jdtt}}
+according to the IAU 2000A model, with adjustments to match the IAU
+2006 precession.  @code{@var{dpsi}} and @code{@var{deps}} are the
+returned nutation components (luni-solar + planetary) in radians with
+respect to the equinox and ecliptic of date.  The output parameters
+get the same dimensions as @code{@var{jdtt}}.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUNUT80, IAUNUTM80, IAUNUT06A, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUNUT80
 
-@code{IAUNUT80, @var{jd}, @var{dpsi}, @var{deps}}
+@code{IAUNUT80, @var{jdtt}, @var{dpsi}, @var{deps}}
 
-   Returns the nutation for Julian Date @code{@var{jd}} according to the IAU 1980
-   model.  @code{@var{dpsi}} and @code{@var{deps}} are the returned nutation components
-   (luni-solar + planetary) 
+[SOFA] Returns the nutation for Julian Date @code{@var{jdtt}}
+according to the IAU 1980 model.  @code{@var{dpsi}} and
+@code{@var{deps}} are the returned nutation components (in longitude
+and obliquity) in radians with respect to the ecliptic of date.  The
+output parameters get the same dimensions as @code{@var{jdtt}}.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUNUTM80, IAUOBL06, IAUNUT80, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUNUTM80
 
-@code{IAUNUTM80(@var{jd})}
+@code{IAUNUTM80(@var{jdtdb})}
 
-   Returns the nutation matrix for Julian Date @code{@var{jd}}, according to the
-   IAU 1980 model.
+[SOFA] Returns the nutation matrix for TDB Julian Date
+@code{@var{jdtdb}}, according to the IAU 1980 model.  The result has
+the same dimensions as @code{@var{jdtdb}} with two extra dimensions
+equal to 3 prefixed.  The returned matrix @code{m} can be used as
+follows: @code{V(true) = m V(mean)} where p-vector @code{V(true)} is
+with respect to the true equatorial triad of date and the p-vector
+@code{V(mean)} is with respect to the mean equatorial triad of date.
  
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUOBL06, IAUOBL80, IAUNUTM80, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUOBL06
 
-@code{IAUOBL06(@var{jd})}
+@code{IAUOBL06(@var{jdtt})}
 
-   Returns the mean obliquity of the ecliptic according to the IAU
-   2006 precession model.
- 
+[SOFA] Returns the mean obliquity of the ecliptic in radians for TT
+Julian Date @code{@var{jdtt}}, according to the IAU 2006 precession
+model.  The result has the same dimensions as @code{@var{jdtt}}.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUOBL80, IAUP06E, IAUOBL06, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUOBL80
 
-@code{IAUOBL80(@var{jd})}
+@code{IAUOBL80(@var{jdtt})}
 
-   Returns the mean obliquity of the ecliptic according to the IAU
-   1980 model. 
+[SOFA] Returns the mean obliquity of the ecliptic in radians for TT
+Julian Date @code{@var{jdtt}}, according to the IAU 1980 model.  The
+result has the same dimensions as @code{@var{jdtt}}.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUP06E, IAUP2S, IAUOBL80, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUP06E
 
-@code{IAUP06E, @var{jd}, @var{eps0}, @var{psia}, @var{oma}, @var{bpa}, @var{bqa}, @var{pia}, @var{bpia},}
-   @var{epsa}, @var{chia}, @var{za}, @var{zetaa}, @var{thetaa}, @var{pa}, @var{gam}, @var{phi}, @var{psi}
+@code{IAUP06E, @var{jdtt}, @var{eps0}, @var{psia}, @var{oma},
+@var{bpa}, @var{bqa}, @var{pia}, @var{bpia},} @var{epsa}, @var{chia},
+@var{za}, @var{zetaa}, @var{thetaa}, @var{pa}, @var{gam}, @var{phi},
+@var{psi}}
 
-   Returns IAU 2006 equinox-based precession angles for Julian Date
-   @code{@var{jd}}.  The returned precession angles are: epsilon_0, psi_A,
-   omega_A, P_A, Q_A, pi_A, Pi_A, obliquity epsilon_A, chi_A, z_A,
-   zeta_A, theta_A, p_A, F-W angle gamma_J2000, F-W angle phi_J2000,
-   F-W angle psi_J2000.
- 
+[SOFA] Returns IAU 2006 equinox-based precession angles for TT Julian
+Date @code{@var{jdtt}}.  The returned precession angles are: obliquity
+at J2000.0 @code{@var{epsilon_0}}, luni-solar precession
+@code{@var{psi_A}}, inclination of equator with respect to J2000.0
+ecliptic @code{@var{omega_A}}, ecliptic pole X from the J2000.0
+ecliptic triad @code{@var{P_A}}, ecliptic pole -Y from the J2000.0
+ecliptic triad @code{@var{Q_A}}, angle between the moving and J2000.0
+ecliptics @code{@var{pi_A}}, longitude of ascending node of the
+ecliptic @code{@var{Pi_A}}, obliquity of the ecliptic
+@code{@var{epsilon_A}}, planetary precession @code{@var{chi_A}},
+equatorial precession -3rd 323 Euler angle @code{@var{z_A}},
+equatorial precession -1st 323 Euler angle @code{@var{zeta_A}},
+equatorial precession 2nd 323 Euler angle @code{@var{theta_A}},
+general precession @code{@var{p_A}}, F-W angle J2000.0 right ascension
+difference of ecliptic poles @code{@var{gamma_J2000}}, F-W angle
+J2000.0 codeclination of ecliptic pole @code{@var{phi_J2000}}, F-W
+angle J2000.0 longitude difference of equator poles
+@code{@var{psi_J2000}}.  The returned values are all in radians and
+have the same dimensions as @code{@var{jdtt}}.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUP2S, IAUPAP, IAUP06E, Internal Routines
@@ -20837,8 +20890,14 @@ precession-nutation models from which @code{@var{dpsi}} and
 
 @code{IAUP2S(@var{p})}
 
-   Returns the spherical polar coordinates (theta, phi, r)
-   corresponding to the p-vector @code{@var{p}} 
+[SOFA] Returns the spherical polar coordinates (longitude in radians,
+latitude in radians, radial distance) corresponding to the p-vector
+@code{@var{p}}.  The radial distance has the same units as the
+coordinates in @code{@var{p}}.  @code{@var{p}} must have 3 elements in
+its first dimension.  The result has the same dimensions as
+@code{@var{p}}.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUPAP, IAUPAS, IAUP2S, Internal Routines
@@ -20847,8 +20906,13 @@ precession-nutation models from which @code{@var{dpsi}} and
 
 @code{IAUPAP(@var{ref}, @var{tgt})}
 
-   Returns the position angle of p-vector @code{@var{tgt}} from p-vector @code{@var{ref}}
-
+[SOFA] Returns the position angle of p-vector @code{@var{tgt}} from
+p-vector @code{@var{ref}}.  It is in the range from minus pi to plus
+pi radians.  The vectors @code{@var{ref}} and @code{@var{tgt}} need
+not be of unit length.  @code{@var{tgt}} and @code{@var{ref}} must
+have the same dimensions, and their first dimension must have 3
+elements.  The result has the same dimensions as @code{@var{tgt}}
+except that the first dimension (equal to 3) is omitted.
 
 @c -------------------------------------
 @node IAUPAS, IAUPB06, IAUPAP, Internal Routines
@@ -20857,22 +20921,30 @@ precession-nutation models from which @code{@var{dpsi}} and
 
 @code{IAUPAS(@var{al}, @var{ap}, @var{bl}, @var{bp})}
 
-   Returns the position angle of B with respect to A.  @code{@var{al}} =
-   longitude of point A in radians, @code{@var{ap}} = latitude of point A in
-   radians, @code{@var{bl}} = longitude of point B in radians, @code{@var{bp}} = latitude of
-   point B in radians
-
+[SOFA] Returns the position angle of B with respect to A.
+@code{@var{al}} = longitude of point A in radians, @code{@var{ap}} =
+latitude of point A in radians, @code{@var{bl}} = longitude of point B
+in radians, @code{@var{bp}} = latitude of point B in radians.  All
+arguments must have the same dimensions, which are also the dimensions
+of the result.
 
 @c -------------------------------------
 @node IAUPB06, IAUPDP, IAUPAS, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUPB06
 
-@code{IAUPB06, @var{jd}, @var{bzeta}, @var{bz}, @var{btheta}}
+@code{IAUPB06, @var{jdtt}, @var{bzeta}, @var{bz}, @var{btheta}}
 
-   Returns three Euler angles which implement general precesion from
-   epoch J2000.0, using the IAU 2006 model, for Julian Date @code{@var{jd}}.
-   Frame bias (the offset between ICRS and J2000.0) is included. 
+[SOFA] Returns three Euler angles @code{@var{bzeta}} (1st rotation,
+radians clockwise around z), @code{@var{bz}} (3rd rotation, radians
+clockwise around z), @code{@var{btheta}} (2nd rotation, radians
+counterclockwise around y) which implement general precesion from
+epoch J2000.0, using the IAU 2006 model, for TT Julian Date
+@code{@var{jdtt}}.  Frame bias (the offset between ICRS and J2000.0)
+is included.  The three output variables get the same dimensions as
+@code{@var{jdtt}}.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUPDP, IAUPFW06, IAUPB06, Internal Routines
@@ -20881,29 +20953,71 @@ precession-nutation models from which @code{@var{dpsi}} and
 
 @code{IAUPDP(@var{a}, @var{b})}
 
-   Returns the inner product of the two p-vectors @code{@var{a}} and @code{@var{b}} 
+[SOFA] Returns the inner product of the two p-vectors @code{@var{a}}
+and @code{@var{b}}, which must have the same dimensions, and must have
+3 elements in their first dimension.  The result has the same
+dimensions as the arguments except that the first dimension (equal to
+3) is omitted.
 
 @c -------------------------------------
 @node IAUPFW06, IAUPLAN94, IAUPDP, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUPFW06
 
-@code{IAUPFW06, @var{jd}, @var{gamb}, @var{phib}, @var{psib}, @var{epsa}}
+@code{IAUPFW06, @var{jdtt}, @var{gamb}, @var{phib}, @var{psib},
+@var{epsa}}
 
-   Returns the IAU 2006 precession angles in Fukushima-Williams
-   4-angle formulation. 
+[SOFA] Returns the IAU 2006 precession angles for TT Julian Date
+@code{@var{jdtt}} in Fukushima-Williams 4-angle formulation: F-W angle
+gamma_bar in radians @code{@var{gamb}}, F-W angle phi_bar in radians
+@code{@var{phib}}, F-W angle psi_bar in radians @code{@var{psib}}, F-W
+angle epsilon_A in radians @code{@var{epsa}}.  The four output
+variables get the same dimensions as @code{@var{jdtt}}.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUPLAN94, IAUPM, IAUPFW06, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUPLAN94
 
-@code{IAUPLAN94(@var{jd}, @var{planet})}
+@code{IAUPLAN94(@var{jdtdb}, @var{planet})}
 
-   Returns the approximate heliocentric position and velocity at
-   Julian Date @code{@var{jd}} of major planet @code{@var{planet}} (1 = Mercury, 2 = Venus,
-   3 = EMB, 4 = Mars, ..., 8 = Neptune) 
+[SOFA] Returns the approximate heliocentric position and velocity at
+TDB Julian Date @code{@var{jdtdb}} of major planet @code{@var{planet}}
+(1 = Mercury, 2 = Venus, 3 = EMB, 4 = Mars, ..., 8 = Neptune).
+@code{@var{planet}} must be a @code{SCALAR} or an @code{ARRAY} with
+exactly 1 element.  The result has the same dimensions as
+@code{@var{jdtdb}} except that two dimensions equal to 3 and 2 are
+prefixed.  If the result is @code{pv}, then @code{pv(*,0,/ALL)} are
+the heliocentric equatorial J2000.0 (mean equator & epoch) cartesian
+coordinates in AU, and @code{pv(*,1,/ALL)} are the corresponding
+heliocentric J2000.0 cartesian velocities (AU/d).
 
+The algorithm is due to Simon, Bretagnon et al. (1994).  Comparison
+with JPL ephemeris DE102 says that during the years 1800 - 2050 the
+maximum errors in longitude L (arcsec), in the numerical order of the
+planets given above: 4, 5, 6, 17, 71, 81, 86, 11.  The maximum errors
+in latitude B (arcsec) are: 1, 1, 1, 1, 5, 13, 7, 1.  The maximum
+errors in radian distance R (Mm) are: 0.3, 0.8, 1, 7.7, 76, 267, 712,
+253.
+
+During the years 1000 - 3000 the accuracy is no worse than 1.5 times
+that over the years 1800 - 2050.
+
+Comparison with the JPL DE200 ephemeris give the following RMS errors
+during the years 1960 - 2025: for position (Mm) 0.334, 1.06, 2.01,
+7.69, 71.7, 199, 564, 158; for velocity (m/s) 0.437, 0.855, 0.815,
+1.98, 7.7, 19.4, 16.4, 14.4.
+
+Comparison against DE200 during the years 1800 - 2100 gave the
+following maximum absolute differencs (and essentially the same using
+DE406):  longitude L (arcsec): 7, 7, 9, 26, 78, 87, 86, 11; latitude B
+(arcsec): 1, 1, 1, 1, 6, 14, 7, 2; radial distance R (Mm): 0.5, 1.1,
+1.3, 9, 82, 263, 661, 248; radial speed (m/s): 0.7, 0.9, 1.0, 2.5,
+8.2, 24.6, 27.4, 21.4.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUPM, IAUPMAT00, IAUPLAN94, Internal Routines
@@ -20912,40 +21026,64 @@ precession-nutation models from which @code{@var{dpsi}} and
 
 @code{IAUPM(@var{p})}
 
-   Returns the modulus of the p-vector @code{@var{p}}
-
+[SOFA]  Returns the modulus of the p-vector @code{@var{p}}, which must
+have 3 elements in its first dimension.  The result has the same
+dimensions as @code{@var{p}} except that the first dimension (equal to
+3) is omitted.
 
 @c -------------------------------------
 @node IAUPMAT00, IAUPMAT06, IAUPM, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUPMAT00
 
-@code{IAUPMAT00(@var{jd})}
+@code{IAUPMAT00(@var{jdtt})}
 
-   Returns the precession matrix (including frame bias) from GCRS to a
-   specified Julian Date @code{@var{jd}} according to the IAU 2000 model.
+[SOFA] Returns the precession matrix (including frame bias) from GCRS
+to a specified TT Julian Date @code{@var{jdtt}} according to the IAU
+2000 model.  The result has the same dimensions as @code{@var{jdtt}}
+except that two dimensions equal to 3 are prefixed.  If the result is
+@code{rbp} then @code{V(date) = rbp V(GCRS)} where @code{V(GCRS)} is a
+p-vector with respect to the Geocentric Celestial Reference System and
+@code{V(date)} is a p-vector with respect to the mean equatorial triad
+of the given date.
 
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUPMAT06, IAUPMAT76, IAUPMAT00, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUPMAT06
 
-@code{IAUPMAT06(@var{jd})}
+@code{IAUPMAT06(@var{jdtt})}
 
-   Returns the precession matrix (including frame bias) from GCRS to a
-   specified Julian Date @code{@var{jd}} according to the IAU 2006 model.
+[SOFA] Returns the precession matrix (including frame bias) from GCRS
+to a specified TT Julian Date @code{@var{jdtt}} according to the IAU
+2006 model.  The result has the same dimensions as @code{@var{jdtt}}
+except that two dimensions equal to 3 are prefixed.  If the result is
+@code{rbp} then @code{V(date) = rbp V(GCRS)} where @code{V(GCRS)} is a
+p-vector with respect to the Geocentric Celestial Reference System and
+@code{V(date)} is a p-vector with respect to the mean equatorial triad
+of the given date.
 
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUPMAT76, IAUPN, IAUPMAT06, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUPMAT76
 
-@code{IAUPMAT76(@var{jd})}
+@code{IAUPMAT76(@var{jdtt})}
 
-   Returns the precession matrix from J2000.0 to a specified Julian
-   Date @code{@var{jd}} according to the IAU 1976 model. 
+[SOFA] Returns the precession matrix from J2000.0 to a specified TT
+Julian Date @code{@var{jdtt}} according to the IAU 1976 model.  The
+result has the same dimensions as @code{@var{jdtt}} except that two
+dimensions equal to 3 are prefixed.  If the result is @code{rbp} then
+@code{V(date) = rbp V(GCRS)} where @code{V(GCRS)} is a p-vector with
+respect to the Geocentric Celestial Reference System and
+@code{V(date)} is a p-vector with respect to the mean equatorial triad
+of the given date.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUPN, IAUPN00, IAUPMAT76, Internal Routines
@@ -20954,59 +21092,101 @@ precession-nutation models from which @code{@var{dpsi}} and
 
 @code{IAUPN, @var{p}, @var{r}, @var{u}}
 
-   Converts p-vector @code{@var{p}} into a modulus @code{@var{r}} and unit vector @code{@var{u}} 
+[SOFA] Converts p-vector @code{@var{p}} into a modulus @code{@var{r}}
+and unit vector @code{@var{u}}.  @code{@var{p}} must have 3 elements
+in its first dimension.  @code{@var{r}} and @code{@var{u}} get the
+same dimensions as @code{@var{p}} except that @code{@var{r}} omits the
+first dimension (equal to 3).
 
 @c -------------------------------------
 @node IAUPN00, IAUPN00A, IAUPN, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUPN00
 
-@code{IAUPN00, @var{jd}, @var{dpsi}, @var{deps}, @var{epsa}, @var{rb}, @var{rp}, @var{rbp}, @var{rn}, @var{rbpn}}
+@code{IAUPN00, @var{jdtt}, @var{dpsi}, @var{deps}, @var{epsa},
+@var{rb}, @var{rp}, @var{rbp}, @var{rn}, @var{rbpn}}
 
-   Returns precession-nutation according to the IAU 2000 model for the
-   specified Julian Date @code{@var{jd}} and nutation @code{@var{dpsi}}, @code{@var{deps}}.  The output
-   parameters are the mean obliquity @code{@var{epsa}}, the frame bias matrix
-   @code{@var{rb}}, the precession matrix @code{@var{rp}}, the bias-precession matrix @code{@var{rbp}},
-   the nutation matrix @code{@var{rn}}, and the GCRS-to-true matrix @code{@var{rbpn}}. 
+[SOFA] Returns precession-nutation according to the IAU 2000 model for
+the specified TT Julian Date @code{@var{jdtt}} and nutation in
+longitude @code{@var{dpsi}} and obliquity @code{@var{deps}}, both in
+radians. The nutation values must be with respect to the equinox and
+ecliptic of date.  The output parameters are the mean obliquity
+@code{@var{epsa}}, the frame bias matrix @code{@var{rb}}, the
+precession matrix @code{@var{rp}}, the bias-precession matrix
+@code{@var{rbp}}, the nutation matrix @code{@var{rn}}, and the
+GCRS-to-true matrix @code{@var{rbpn}}.  @code{@var{epsa}} gets the
+same dimensions as @code{@var{jdtt}}.  The remaining output variables
+get those same dimensions plus two extra dimensions equal to 3
+prefixed.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUPN00A, IAUPN00B, IAUPN00, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUPN00A
 
-@code{IAUPN00A, @var{jd}, @var{dpsi}, @var{deps}, @var{epsa}, @var{rb}, @var{rp}, @var{rbp}, @var{rn}, @var{rbpn}}
+@code{IAUPN00A, @var{jdtt}, @var{dpsi}, @var{deps}, @var{epsa},
+@var{rb}, @var{rp}, @var{rbp}, @var{rn}, @var{rbpn}}
 
-   Returns precession-nutation according to the IAU 200A model for the
-   specified Julian Date @code{@var{jd}} and nutation @code{@var{dpsi}}, @code{@var{deps}}.  The output
-   parameters are the mean obliquity @code{@var{epsa}}, the frame bias matrix
-   @code{@var{rb}}, the precession matrix @code{@var{rp}}, the bias-precession matrix @code{@var{rbp}},
-   the nutation matrix @code{@var{rn}}, and the GCRS-to-true matrix @code{@var{rbpn}}. 
+[SOFA] Returns precession-nutation according to the IAU 2000A model
+for the specified TT Julian Date @code{@var{jdtt}}. The output
+parameters are the nutation in longitude in radians @code{@var{dpsi}},
+the nutation in obliquity in radians @code{@var{deps}}, the mean
+obliquity @code{@var{epsa}}, the frame bias matrix @code{@var{rb}},
+the precession matrix @code{@var{rp}}, the bias-precession matrix
+@code{@var{rbp}}, the nutation matrix @code{@var{rn}}, and the
+GCRS-to-true matrix @code{@var{rbpn}}.  @code{@var{dpsi}},
+@code{@var{deps}}, and @code{@var{epsa}} get the same dimensions as
+@code{@var{jdtt}}.  The remaining output variables get those same
+dimensions plus two extra dimensions equal to 3 prefixed.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUPN00B, IAUPN06, IAUPN00A, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUPN00B
 
-@code{IAUPN00B, @var{jd}, @var{dpsi}, @var{deps}, @var{epsa}, @var{rb}, @var{rp}, @var{rbp}, @var{rn}, @var{rbpn}}
+@code{IAUPN00B, @var{jdtt}, @var{dpsi}, @var{deps}, @var{epsa},
+@var{rb}, @var{rp}, @var{rbp}, @var{rn}, @var{rbpn}}
 
-   Returns precession-nutation according to the IAU 200A model for the
-   specified Julian Date @code{@var{jd}} and nutation @code{@var{dpsi}}, @code{@var{deps}}.  The output
-   parameters are the mean obliquity @code{@var{epsa}}, the frame bias matrix
-   @code{@var{rb}}, the precession matrix @code{@var{rp}}, the bias-precession matrix @code{@var{rbp}},
-   the nutation matrix @code{@var{rn}}, and the GCRS-to-true matrix @code{@var{rbpn}}. 
+[SOFA] Returns precession-nutation according to the IAU 2000B model
+for the specified TT Julian Date @code{@var{jdtt}} and nutation in
+longitude @code{@var{dpsi}} and obliquity @code{@var{deps}}, both in
+radians.  The output parameters are the mean obliquity
+@code{@var{epsa}}, the frame bias matrix @code{@var{rb}}, the
+precession matrix @code{@var{rp}}, the bias-precession matrix
+@code{@var{rbp}}, the nutation matrix @code{@var{rn}}, and the
+GCRS-to-true matrix @code{@var{rbpn}}.  @code{@var{dpsi}},
+@code{@var{deps}}, and @code{@var{epsa}} get the same dimensions as
+@code{@var{jdtt}}.  The remaining output variables get those same
+dimensions plus two extra dimensions equal to 3 prefixed.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUPN06, IAUPN06A, IAUPN00B, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUPN06
 
-@code{IAUPN06, @var{jd}, @var{dpsi}, @var{deps}, @var{epsa}, @var{rb}, @var{rp}, @var{rbp}, @var{rn}, @var{rbpn}}
+@code{IAUPN06, @var{jdtt}, @var{dpsi}, @var{deps}, @var{epsa},
+@var{rb}, @var{rp}, @var{rbp}, @var{rn}, @var{rbpn}}
 
-   Returns precession-nutation according to the IAU 2006 model for the
-   specified Julian Date @code{@var{jd}} and nutation @code{@var{dpsi}}, @code{@var{deps}}.  The output
-   parameters are the mean obliquity @code{@var{epsa}}, the frame bias matrix
-   @code{@var{rb}}, the precession matrix @code{@var{rp}}, the bias-precession matrix @code{@var{rbp}},
-   the nutation matrix @code{@var{rn}}, and the GCRS-to-true matrix @code{@var{rbpn}}. 
+[SOFA] Returns precession-nutation according to the IAU 2006 model for
+the specified TT Julian Date @code{@var{jdtt}} and nutation in
+longitude @code{@var{dpsi}} and obliquity @code{@var{deps}}, both in
+radians. The nutation values must be with respect to the equinox and
+ecliptic of date.  The output parameters are the mean obliquity
+@code{@var{epsa}}, the frame bias matrix @code{@var{rb}}, the
+precession matrix @code{@var{rp}}, the bias-precession matrix
+@code{@var{rbp}}, the nutation matrix @code{@var{rn}}, and the
+GCRS-to-true matrix @code{@var{rbpn}}.  @code{@var{epsa}} gets the
+same dimensions as @code{@var{jdtt}}.  The remaining output variables
+get those same dimensions plus two extra dimensions equal to 3
+prefixed.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUPN06A, IAUPNM00A, IAUPN06, Internal Routines

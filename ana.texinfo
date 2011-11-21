@@ -12955,11 +12955,13 @@ arguments.
 * IAUGC2GDE::                   
 * IAUGD2GC::                    
 * IAUGD2GCE::                   
+* IAUGMST00::                   
 * IAUGMST06::                   
 * IAUGMST82::                   
 * IAUGST00A::                   
 * IAUGST00B::                   
 * IAUGST06::                    
+* IAUGST06A::                   
 * IAUGST94::                    
 * IAUH2FK5::                    
 * IAUHFK5Z::                    
@@ -20430,44 +20432,82 @@ See also: @ref{Astronomical Coordinate Calculations}
 
 @code{IAUGD2GC(@var{eph}, @var{ellid})}
 
-   Returns geocentric coordinates (x, y, z) corresponding to geodetic
-   coordinates @code{@var{eph}} (elongation, phi, height) for the specified
-   reference ellipsoid @code{@var{ellid}} 
+[SOFA] Returns geocentric coordinates (x, y, z) in meters
+corresponding to geodetic coordinates @code{@var{eph}} (east longitude
+in radians, north latitude in radians, height in meters) for the
+specified reference ellipsoid @code{@var{ellid}} (1 = WGS84, 2 =
+GRS80, 3 = WGS72). @code{@var{eph}} must have 3 elements in its first
+dimension, and @code{@var{ellid}} must have a single element.  The
+result has the same dimensions as @code{@var{eph}}.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
-@node IAUGD2GCE, IAUGMST06, IAUGD2GC, Internal Routines
+@node IAUGD2GCE, IAUGMST00, IAUGD2GC, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUGD2GCE
 
 @code{IAUGD2GCE(@var{eph}, @var{a}, @var{f})}
 
-   Returns geocentric coordinates (x, y, z) corresponding to geodetic
-   coordinates @code{@var{eph}} (elongation, phi, height) for the reference
-   ellipsoid with equatorial radius @code{@var{a}} and flattening @code{@var{f}} 
+[SOFA] Returns geocentric coordinates (x, y, z) corresponding to
+geodetic coordinates @code{@var{eph}} (east longitude in radians,
+north latitude in radians, height) for the reference ellipsoid with
+equatorial radius @code{@var{a}} and flattening @code{@var{f}}.
+@code{@var{a}}, the height, and the returned coordinates x, y, z are
+all in the same units.  @code{@var{eph}} must have 3 elements in its
+first dimension.  The result has the same dimensions as
+@code{@var{eph}}.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
-@node IAUGMST06, IAUGMST82, IAUGD2GCE, Internal Routines
+@node IAUGMST00, IAUGMST06, IAUGD2GCE, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUGMST00
+
+@code{IAUGMST00(@var{jdut}, @var{jdtt})}
+
+[SOFA] Returns Greenwich mean sidereal time in radians according to a
+model consistent with IAU 2000 resolutions.  @code{@var{jdut}} is the
+Julian Date (UT1).  @code{@var{jdtt}} is the Julian Date (TT) of the
+same instant.  @code{@var{jdut}} is needed to predict the Earth
+rotation, and TT to predict the effects of precession.  If
+@code{@var{jdtt}} is set equal to @code{@var{jdut}} then errors of
+order 100 microarcseconds result.  Both parameters must have the same
+dimensions, and the result has those same dimensions, too.
+
+See also: @ref{Astronomical Coordinate Calculations}
+
+@c -------------------------------------
+@node IAUGMST06, IAUGMST82, IAUGMST00, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUGMST06
 
 @code{IAUGMST06(@var{jdut}, @var{jdtt})}
 
-   Returns Greenwich mean sidereal time according to a model that is
-   consistent with IAU 2006 precession.  @code{@var{jdut}} is the Julian Date
-   (UT1).  @code{@var{jdtt}} is the Julian Date (TT) of the same instant. @code{@var{jdut}}
-   is needed to predict the Earth rotation, and TT to predict the
-   effects of precession.  If @code{@var{jdtt}} is set equal to @code{@var{jdut}} then
-   errors of order 100 microarcseconds result. 
+[SOFA] Returns Greenwich mean sidereal time in radians according to a
+model that is consistent with IAU 2006 precession.  @code{@var{jdut}}
+is the Julian Date (UT1).  @code{@var{jdtt}} is the Julian Date (TT)
+of the same instant. @code{@var{jdut}} is needed to predict the Earth
+rotation, and TT to predict the effects of precession.  If
+@code{@var{jdtt}} is set equal to @code{@var{jdut}} then errors of
+order 100 microarcseconds result.  Both parameters must have the same
+dimensions, and the result has those same dimensions, too.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUGMST82, IAUGST00A, IAUGMST06, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUGMST82
 
-@code{IAUGMST82(@var{jd})}
+@code{IAUGMST82(@var{jdut})}
  
-   Returns Greenwich mean sidereal time for the given UT1 Julian Date
-   @code{@var{jd}}, according to the IAU 1982 model 
+[SOFA] Returns Greenwich mean sidereal time in radians for the given
+UT1 Julian Date @code{@var{jdut}}, according to the IAU 1982 model.
+The result has the same dimensions as @code{@var{jdut}}.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUGST00A, IAUGST00B, IAUGMST82, Internal Routines
@@ -20476,12 +20516,16 @@ See also: @ref{Astronomical Coordinate Calculations}
 
 @code{IAUGST00A(@var{jdut}, @var{jdtt})}
 
-   Returns Greenwich apparent sidereal time consisten with IAU 2000
-   resolutions.  @code{@var{jdut}} is the Julian Date (UT1).  @code{@var{jdtt}} is the
-   Julian Date (TT) of the same instant. @code{@var{jdut}} is needed to predict
-   the Earth rotation, and TT to predict the effects of precession.
-   If @code{@var{jdtt}} is set equal to @code{@var{jdut}} then errors of order 100
-   microarcseconds result. 
+[SOFA] Returns Greenwich apparent sidereal time in radians consistent
+with IAU 2000 resolutions.  @code{@var{jdut}} is the Julian Date
+(UT1).  @code{@var{jdtt}} is the Julian Date (TT) of the same
+instant. @code{@var{jdut}} is needed to predict the Earth rotation,
+and TT to predict the effects of precession.  If @code{@var{jdtt}} is
+set equal to @code{@var{jdut}} then errors of order 100
+microarcseconds result.  Both parameters must have the same
+dimensions, and the result has those same dimensions, too.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUGST00B, IAUGST06, IAUGST00A, Internal Routines
@@ -20490,65 +20534,115 @@ See also: @ref{Astronomical Coordinate Calculations}
 
 @code{IAUGST00B(@var{jdut}, @var{jdtt})}
 
-   Returns Greenwich apparent sidereal time consistent with IAU 2000
-   resolutions but using the truncated nutation model IAU 2000B.
-   @code{@var{jdut}} is the Julian Date (UT1).  @code{@var{jdtt}} is the Julian Date (TT) of
-   the same instant. @code{@var{jdut}} is needed to predict the Earth rotation,
-   and TT to predict the effects of precession.  If @code{@var{jdtt}} is set
-   equal to @code{@var{jdut}} then errors of order 100 microarcseconds result. 
+[SOFA] Returns Greenwich apparent sidereal time in radians consistent
+with IAU 2000 resolutions but using the truncated nutation model IAU
+2000B.  @code{@var{jdut}} is the Julian Date (UT1).  @code{@var{jdtt}}
+is the Julian Date (TT) of the same instant. @code{@var{jdut}} is
+needed to predict the Earth rotation, and TT to predict the effects of
+precession.  If @code{@var{jdtt}} is set equal to @code{@var{jdut}}
+then errors of order 100 microarcseconds result.  Both parameters must
+have the same dimensions, and the result has those same dimensions,
+too.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
-@node IAUGST06, IAUGST94, IAUGST00B, Internal Routines
+@node IAUGST06, IAUGST06A, IAUGST00B, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUGST06
 
 @code{IAUGST06(@var{jdut}, @var{jdtt}, @var{rnpb})}
 
-   Returns Greenwich apparent sidereal time consistent with IAU 2006
-   resolutions, given the nutation-precession-bias matrix
-   @code{@var{rnpb}}. @code{@var{jdtt}} is the Julian Date (TT) of the same instant. @code{@var{jdut}}
-   is needed to predict the Earth rotation, and TT to predict the
-   effects of precession.  If @code{@var{jdtt}} is set equal to @code{@var{jdut}} then
-   errors of order 100 microarcseconds result. 
+[SOFA] Returns Greenwich apparent sidereal time in radians consistent
+with IAU 2006 resolutions, given the nutation-precession-bias matrix
+@code{@var{rnpb}}. @code{@var{jdut}} is the Julian Date (UT1).
+@code{@var{jdtt}} is the Julian Date (TT) of the same
+instant. @code{@var{jdut}} is needed to predict the Earth rotation,
+and TT to predict the effects of precession.  If @code{@var{jdtt}} is
+set equal to @code{@var{jdut}} then errors of order 100
+microarcseconds result.  @code{@var{jdut}} and @code{@var{jdtt}} must
+have the same dimensions.  @code{@var{rnpb}} must have those
+dimensions, too, with two extra dimensions equal to 3 prefixed.  The
+result has the same dimensions as @code{@var{jdut}}.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
-@node IAUGST94, IAUH2FK5, IAUGST06, Internal Routines
+@node IAUGST06A, IAUGST94, IAUGST06, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAUGST06A
+
+@code{IAUGST06A(@var{jdut}, @var{jdtt})}
+
+[SOFA] Returns Greenwich apparent sidereal time in radians consistent
+with IAU 2000 and 2006 resolutions.  @code{@var{jdut}} is the Julian
+Date (UT1).  @code{@var{jdtt}} is the Julian Date (TT) of the same
+instant. @code{@var{jdut}} is needed to predict the Earth rotation,
+and TT to predict the effects of precession.  If @code{@var{jdtt}} is
+set equal to @code{@var{jdut}} then errors of order 100
+microarcseconds result.  @code{@var{jdut}} and @code{@var{jdtt}} must
+have the same dimensions.  The result has those same dimensions as
+well.
+
+See also: @ref{Astronomical Coordinate Calculations}
+
+@c -------------------------------------
+@node IAUGST94, IAUH2FK5, IAUGST06A, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUGST94
 
-@code{IAUGST94(@var{jd})}
+@code{IAUGST94(@var{jdut})}
  
-   Returns Greenwich apparent sidereal time for the given UT1 Julian
-   Date @code{@var{jd}}, consistent with IAU 1982/94 resolutions 
+[SOFA] Returns Greenwich apparent sidereal time in radians for the
+given UT1 Julian Date @code{@var{jdut}}, consistent with IAU 1982/94
+resolutions.  The result has the same dimensions as @code{@var{jdut}}.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUH2FK5, IAUHFK5Z, IAUGST94, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUH2FK5
 
-@code{IAUH2FK5, @var{rah}, @var{dech}, @var{drah}, @var{ddech}, @var{pxh}, @var{rvh}, @var{ra5},}
-   @var{dec5}, @var{dra5}, @var{ddec5}, @var{px5}, @var{rv5}
+@code{IAUH2FK5, @var{rah}, @var{dech}, @var{drah}, @var{ddech},
+@var{pxh}, @var{rvh}, @var{ra5},} @var{dec5}, @var{dra5}, @var{ddec5},
+@var{px5}, @var{rv5}}
 
-   Transforms Hipparcos star data into the FK5 (J2000.0) system.  The
-   Hipparcos data is: right ascension @code{@var{rah}}, declination @code{@var{dech}},
-   proper motion in right ascension @code{@var{drah}}, proper motion in
-   declination @code{@var{ddech}}, parallax @code{@var{pxh}}, radial velocity @code{@var{rvh}}.  The
-   FK5 data is: right ascension @code{@var{ra5}}, declination @code{@var{dec5}}, proper
-   motion in right ascension @code{@var{dra5}}, proper motion in declination
-   @code{@var{ddec5}}, parallax @code{@var{px5}}, radial velocity @code{@var{rv5}}. 
+[SOFA] Transforms Hipparcos star data into the FK5 (J2000.0) system.
+The Hipparcos data is: right ascension @code{@var{rah}} (radians),
+declination @code{@var{dech}} (radians), proper motion in right
+ascension @code{@var{drah}} (dRA/dt, in radians per Julian year),
+proper motion in declination @code{@var{ddech}} (dDec/dt, in radians
+per Julian year), parallax @code{@var{pxh}} (arcseconds), radial
+velocity @code{@var{rvh}} (km/s receding).  The FK5 data is: right
+ascension @code{@var{ra5}}, declination @code{@var{dec5}}, proper
+motion in right ascension @code{@var{dra5}}, proper motion in
+declination @code{@var{ddec5}}, parallax @code{@var{px5}}, radial
+velocity @code{@var{rv5}}, all in the same units as the corresponding
+Hipparcos quantities.  All input/output parameter (must) have the same
+dimensions.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUHFK5Z, IAUIR, IAUH2FK5, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUHFK5Z
 
-@code{IAUHFK5Z, @var{rah}, @var{dech}, @var{jd}, @var{ra5}, @var{dec5}}
+@code{IAUHFK5Z, @var{rah}, @var{dech}, @var{jdtdb}, @var{ra5},
+@var{dec5}, @var{dra5}, @var{ddec5}}
 
-   Transforms a Hipparcos star position (right ascension @code{@var{rah}},
-   declination @code{@var{dech}}) determined at Julian Date @code{@var{jd}} into the FK5
-   (J2000.0) system, assuming zero Hipparcos proper motion.  The
-   returned coordinates in the FK5 system are right ascension @code{@var{ra5}},
-   declination @code{@var{dec5}} 
+[SOFA] Transforms a Hipparcos star position (right ascension
+@code{@var{rah}} in radians, declination @code{@var{dech}} in radians)
+determined at TDB Julian Date @code{@var{jdtdb}} into the FK5
+(J2000.0) system, assuming zero Hipparcos proper motion.  The returned
+coordinates in the FK5 system are right ascension @code{@var{ra5}}
+(radians), declination @code{@var{dec5}} (radians), FK5 right
+ascension proper motion @code{@var{dra5}} (dRA/dt, radians per year),
+and FK5 declination proper motion @code{@var{ddec5}} (dDec/dt, radians
+per year).
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUIR, IAUJD2CAL, IAUHFK5Z, Internal Routines
@@ -20557,7 +20651,7 @@ See also: @ref{Astronomical Coordinate Calculations}
 
 @code{IAUIR()}
 
-   Returns an identity r-matrix 
+[SOFA] Returns an 3-by-3-element identity r-matrix.
 
 @c -------------------------------------
 @node IAUJD2CAL, IAUNUM00A, IAUIR, Internal Routines
@@ -20582,20 +20676,34 @@ on systems with 32-bit ints.
 @comment  node-name,  next,  previous,  up
 @subsection IAUNUM00A
 
-@code{IAUNUM00A(@var{jd})}
+@code{IAUNUM00A(@var{jdtt})}
 
-   Returns the matrix for nutation for a given Julian Date @code{@var{jd}},
-   according to the IAU 2000A model. 
+[SOFA] Returns the matrix for nutation for a given TT Julian Date
+@code{@var{jdtt}}, according to the IAU 2000A model.  The result has
+the same dimensions as @code{@var{jdtt}} with two dimensions equal to
+3 prefixed.  The returned matrix @code{m} can be used as follows:
+@code{V(true) = m V(mean)} where p-vector @code{V(true)} is with
+respect to the true equatorial triad of date and the p-vector
+@code{V(mean)} is with respect to the mean equatorial triad of date.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUNUM00B, IAUNUM06A, IAUNUM00A, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUNUM00B
 
-@code{IAUNUM00B(@var{jd})}
+@code{IAUNUM00B(@var{jdtt})}
 
-   Returns the matrix for nutation for a given Julian Date @code{@var{jd}},
-   according to the IAU 2000B model. 
+[SOFA] Returns the matrix for nutation for a given TT Julian Date
+@code{@var{jdtt}}, according to the IAU 2000B model.  The result has
+the same dimensions as @code{@var{jdtt}} with two dimensions equal to
+3 prefixed.  The returned matrix @code{m} can be used as follows:
+@code{V(true) = m V(mean)} where p-vector @code{V(true)} is with
+respect to the true equatorial triad of date and the p-vector
+@code{V(mean)} is with respect to the mean equatorial triad of date.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUNUM06A, IAUNUMAT, IAUNUM00B, Internal Routines
@@ -20604,8 +20712,15 @@ on systems with 32-bit ints.
 
 @code{IAUNUM06A(@var{jd})}
 
-   Returns the matrix for nutation for a given Julian Date @code{@var{jd}},
-   according to the IAU 2006/2000A model. 
+[SOFA] Returns the matrix for nutation for a given TT Julian Date
+@code{@var{jdtt}}, according to the IAU 2006/2000A model.  The result
+has the same dimensions as @code{@var{jdtt}} with two dimensions equal
+to 3 prefixed.  The returned matrix @code{m} can be used as follows:
+@code{V(true) = m V(mean)} where p-vector @code{V(true)} is with
+respect to the true equatorial triad of date and the p-vector
+@code{V(mean)} is with respect to the mean equatorial triad of date.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUNUMAT, IAUNUT00A, IAUNUM06A, Internal Routines
@@ -20614,8 +20729,13 @@ on systems with 32-bit ints.
 
 @code{IAUNUMAT(@var{epsa}, @var{dpsi}, @var{deps})}
 
-   Returns the matrix of nutation based on the mean obliquity of the
-   date @code{@var{epsa}} and the nutation components @code{@var{dpsi}} and @code{@var{deps}}. 
+[SOFA] Returns the matrix of nutation based on the mean obliquity of
+the date @code{@var{epsa}} (radians) and the nutation components
+in longitude @code{@var{dpsi}} and obliquity @code{@var{deps}} in
+radians, with respect to the equinox and ecliptic of date.  The mean
+obliquity @code{@var{epsa}} must be consistent with the
+precession-nutation models from which @code{@var{dpsi}} and
+@code{@var{deps}} were obtained.
 
 @c -------------------------------------
 @node IAUNUT00A, IAUNUT00B, IAUNUMAT, Internal Routines

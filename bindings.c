@@ -42,7 +42,7 @@ void register_ana_s(int (*f)(int, int []), char *name, int min_arg,
 }
 
 /*-----------------------------------------------------------------------*/
-int ana_iDDoC33_f_(int narg, int ps[], void (*f)(double, double, double, double (*)[3]))
+int ana_iDDDoC33_f_(int narg, int ps[], void (*f)(double, double, double, double (*)[3]))
 {
   pointer *ptrs;
   loopInfo *infos;

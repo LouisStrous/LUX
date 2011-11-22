@@ -20394,7 +20394,7 @@ See also: @ref{Astronomical Coordinate Calculations}
 @comment  node-name,  next,  previous,  up
 @subsection IAUGC2GD
 
-@code{IAUGC2GD(@var{xyz}, @var{ellid})}
+@code{IAUGC2GD(@var{ellid}, @var{xyz})}
  
 [SOFA] Returns geodetic coordinates (eastward longitude in radians,
 northward latitude in radians, height above the ellipsoid in meters)
@@ -20430,7 +20430,7 @@ See also: @ref{Astronomical Coordinate Calculations}
 @comment  node-name,  next,  previous,  up
 @subsection IAUGD2GC
 
-@code{IAUGD2GC(@var{eph}, @var{ellid})}
+@code{IAUGD2GC(@var{ellid}, @var{eph})}
 
 [SOFA] Returns geocentric coordinates (x, y, z) in meters
 corresponding to geodetic coordinates @code{@var{eph}} (east longitude
@@ -20455,8 +20455,8 @@ north latitude in radians, height) for the reference ellipsoid with
 equatorial radius @code{@var{a}} and flattening @code{@var{f}}.
 @code{@var{a}}, the height, and the returned coordinates x, y, z are
 all in the same units.  @code{@var{eph}} must have 3 elements in its
-first dimension.  The result has the same dimensions as
-@code{@var{eph}}.
+first dimension.  @code{@var{a}} and @code{@var{f}} must have exactly
+one element.  The result has the same dimensions as @code{@var{eph}}.
 
 See also: @ref{Astronomical Coordinate Calculations}
 
@@ -20651,7 +20651,7 @@ See also: @ref{Astronomical Coordinate Calculations}
 
 @code{IAUIR()}
 
-[SOFA] Returns an 3-by-3-element identity r-matrix.
+[SOFA] Returns a 3-by-3-element identity r-matrix.
 
 @c -------------------------------------
 @node IAUJD2CAL, IAUNUM00A, IAUIR, Internal Routines
@@ -20710,7 +20710,7 @@ See also: @ref{Astronomical Coordinate Calculations}
 @comment  node-name,  next,  previous,  up
 @subsection IAUNUM06A
 
-@code{IAUNUM06A(@var{jd})}
+@code{IAUNUM06A(@var{jdtt})}
 
 [SOFA] Returns the matrix for nutation for a given TT Julian Date
 @code{@var{jdtt}}, according to the IAU 2006/2000A model.  The result
@@ -21449,10 +21449,13 @@ The result has the same dimensions as the parameters.
 
 @code{IAURM2V(@var{r})}
 
-   Returns the rotation vector corresponding to rotation matrix @code{@var{r}}.
-   The rotation vector has the same direction as the Euler axis of
-   matrix @code{@var{r}} and has its magnitude equal to the rotation angle in
-   radians of the rotation matrix. 
+[SOFA] Returns the rotation vector corresponding to rotation matrix
+@code{@var{r}}, which must have 3 elements in its first two
+dimensions.  The returned rotation vector has the same direction as
+the Euler axis of matrix @code{@var{r}} and has its magnitude equal to
+the rotation angle in radians of the rotation matrix.  It has the same
+dimensions as @code{@var{r}} except that the first dimension (equal to
+3) is omitted.
 
 @c -------------------------------------
 @node IAURV2M, IAURX, IAURM2V, Internal Routines
@@ -21461,10 +21464,12 @@ The result has the same dimensions as the parameters.
 
 @code{IAURV2M(@var{w})}
 
-   Returns the rotation matrix corresponding to rotation vector @code{@var{w}}.
-   The rotation matrix Euler axis gets the direction of @code{@var{w}}, and the
-   rotation matrix gets a rotation angle equal to the modulus of
-   @code{@var{w}}. 
+[SOFA] Returns the rotation matrix corresponding to rotation vector
+@code{@var{w}}, which must have 3 elements in its first dimension.
+The rotation matrix Euler axis gets the direction of @code{@var{w}},
+and the rotation matrix gets a rotation angle equal to the modulus of
+@code{@var{w}}.  The result has the same dimensions as @code{@var{w}}
+but with one extra dimension equal to 3 prefixed.
 
 @c -------------------------------------
 @node IAURX, IAURXPV, IAURV2M, Internal Routines
@@ -21473,7 +21478,9 @@ The result has the same dimensions as the parameters.
 
 @code{IAURX, @var{phi}, @var{r}}
 
-   Rotates r-matrix @code{@var{r}} about the x axis over angle @code{@var{phi}} 
+[SOFA] Rotates r-matrix @code{@var{r}} (which must have its first two
+dimensions equal to 3) about the x axis over angle @code{@var{phi}}
+(in radians).
 
 @c -------------------------------------
 @node IAURXPV, IAURY, IAURX, Internal Routines
@@ -21482,7 +21489,12 @@ The result has the same dimensions as the parameters.
 
 @code{IAURXPV(@var{r}, @var{pv})}
 
-   Returns the matrix product of r-matrix @code{@var{r}} and pv-vector @code{@var{pv}} 
+[SOFA] Returns the matrix product of r-matrix @code{@var{r}} (which
+must have its first two dimensions equal to 3) and pv-vector
+@code{@var{pv}} (which must have its first two dimension equal to 2
+and 3, respectively).  The dimensions of @code{@var{r}} and
+@code{@var{pv}} beyond the first two must be equal.  The result has
+the same dimensions as @code{@var{pv}}.
 
 @c -------------------------------------
 @node IAURY, IAURZ, IAURXPV, Internal Routines
@@ -21491,7 +21503,9 @@ The result has the same dimensions as the parameters.
 
 @code{IAURY, @var{phi}, @var{r}}
 
-   Rotates r-matrix @code{@var{r}} about the y axis over angle @code{@var{phi}} 
+[SOFA] Rotates r-matrix @code{@var{r}} (which must have its first two
+dimensions equal to 3) about the y axis over angle @code{@var{phi}}
+(in radians).
 
 @c -------------------------------------
 @node IAURZ, IAUS00, IAURY, Internal Routines
@@ -21500,18 +21514,29 @@ The result has the same dimensions as the parameters.
 
 @code{IAURZ, @var{phi}, @var{r}}
 
-   Rotates r-matrix @code{@var{r}} about the z axis over angle @code{@var{phi}} 
+[SOFA] Rotates r-matrix @code{@var{r}} (which must have its first two
+dimensions equal to 3) about the z axis over angle @code{@var{phi}}
+(in radians).
 
 @c -------------------------------------
 @node IAUS00, IAUS00A, IAURZ, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUS00
 
-@code{IAUS00(@var{jd}, @var{x}, @var{y})}
+@code{IAUS00(@var{jdtt}, @var{x}, @var{y})}
 
-   Returns the CIO locator for the specified Julian Date @code{@var{jd}} given
-   the CIP's @code{@var{x}} and @code{@var{y}} coordinates, using IAU 2000A
-   precession-nutation 
+[SOFA] Returns the CIO locator in radians for the specified TT Julian
+Date @code{@var{jdtt}} given the CIP's @code{@var{x}} and
+@code{@var{y}} coordinates, using IAU 2000A precession-nutation.
+
+The CIO locator is the difference between the right ascensions of the
+same point in two systems.  The two systems are the GCRS and the
+CIP,CIO, and the point is the ascending node of the CIP equator.  The
+CIO locator remains below 0.1 arcsec throughout the years 1900 - 2100.
+
+The CIP coordinates must be appropriate for the given date. 
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUS00A, IAUS00B, IAUS00, Internal Routines
@@ -21520,39 +21545,69 @@ The result has the same dimensions as the parameters.
 
 @code{IAUS00A(@var{jd})}
 
-   Returns the CIO locator for the specified Julian Date @code{@var{jd}}, using
-   IAU 2000A precession-nutation 
+[SOFA] Returns the CIO locator for the specified TT Julian Date
+@code{@var{jdtt}}, using IAU 2000A precession-nutation.
+
+The CIO locator is the difference between the right ascensions of the
+same point in two systems.  The two systems are the GCRS and the
+CIP,CIO, and the point is the ascending node of the CIP equator.  The
+CIO locator remains below 0.1 arcsec throughout the years 1900 - 2100.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUS00B, IAUS06, IAUS00A, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUS00B
 
-@code{IAUS00B(@var{jd})}
+@code{IAUS00B(@var{jdtt})}
 
-   Returns the CIO locator for the specified Julian Date @code{@var{jd}}, using
-   IAU 2000B precession-nutation 
+[SOFA] Returns the CIO locator for the specified TT Julian Date
+@code{@var{jdtt}}, using IAU 2000B precession-nutation.
+
+The CIO locator is the difference between the right ascensions of the
+same point in two systems.  The two systems are the GCRS and the
+CIP,CIO, and the point is the ascending node of the CIP equator.  The
+CIO locator remains below 0.1 arcsec throughout the years 1900 - 2100.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUS06, IAUS06A, IAUS00B, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUS06
 
-@code{IAUS06(@var{jd}, @var{x}, @var{y})}
+@code{IAUS06(@var{jdtt}, @var{x}, @var{y})}
 
-   Returns the CIO locator for the specified Julian Date @code{@var{jd}} given
-   the CIP's @code{@var{x}} and @code{@var{y}} coordinates, using IAU 2006/2000A
-   precession-nutation 
+[SOFA] Returns the CIO locator in radians for the specified TT Julian
+Date @code{@var{jdtt}} given the CIP's @code{@var{x}} and
+@code{@var{y}} coordinates, using IAU 2006/2000A precession-nutation.
+
+The CIO locator is the difference between the right ascensions of the
+same point in two systems.  The two systems are the GCRS and the
+CIP,CIO, and the point is the ascending node of the CIP equator.  The
+CIO locator remains below 0.1 arcsec throughout the years 1900 - 2100.
+
+The CIP coordinates must be appropriate for the given date. 
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUS06A, IAUS2C, IAUS06, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUS06A
 
-@code{IAUS06A(@var{jd})}
+@code{IAUS06A(@var{jdtt})}
 
-   Returns the CIO locator for the specified Julian Date @code{@var{jd}}, using
-   IAU 2006 precession and IAU 2000A nutation 
+[SOFA] Returns the CIO locator for the specified TT Julian Date
+@code{@var{jdtt}}, using IAU 2006 precession and IAU 2000A nutation.
+
+The CIO locator is the difference between the right ascensions of the
+same point in two systems.  The two systems are the GCRS and the
+CIP,CIO, and the point is the ascending node of the CIP equator.  The
+CIO locator remains below 0.1 arcsec throughout the years 1900 - 2100.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUS2C, IAUS2P, IAUS06A, Internal Routines
@@ -21561,8 +21616,12 @@ The result has the same dimensions as the parameters.
 
 @code{IAUS2C(@var{theta}, @var{phi})}
 
-   Returns the cartesian coordinates (direction cosines) corresponding
-   to spherical coordinates longitude @code{@var{theta}} and latitude @code{@var{phi}} 
+[SOFA] Returns the cartesian coordinates (direction cosines)
+corresponding to spherical coordinates longitude @code{@var{theta}}
+and latitude @code{@var{phi}}, both in radians.  @code{@var{theta}}
+and @code{@var{phi}} must have the same dimensions.  The result has
+those same dimensions, but with an extra dimension equal to 3
+prefixed.
 
 @c -------------------------------------
 @node IAUS2P, IAUS2PV, IAUS2C, Internal Routines
@@ -21571,20 +21630,27 @@ The result has the same dimensions as the parameters.
 
 @code{IAUS2P(@var{theta}, @var{phi}, @var{r})}
 
-   Converts spherical polar coordinates longitude @code{@var{theta}}, latitude
-   @code{@var{phi}}, radial distance @code{@var{r}} to a p-vector 
+[SOFA] Converts spherical polar coordinates longitude
+@code{@var{theta}} in radians, latitude @code{@var{phi}} in radians,
+radial distance @code{@var{r}} to a p-vector.  The three arguments
+must have the same dimensions.  The result has those dimensions, too,
+but with an extra dimension equal to 3 prefixed.
 
 @c -------------------------------------
 @node IAUS2PV, IAUSEPP, IAUS2P, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUS2PV
 
-@code{IAUS2PV(@var{theta}, @var{phi}, @var{r}, @var{td}, @var{pd}, @var{rd})}
+@code{IAUS2PV(@var{theta}, @var{phi}, @var{r}, @var{td}, @var{pd},
+@var{rd})}
 
-   Returns the pv-vector that corresponds to the spherical coordinates
-   longitude @code{@var{theta}}, latitude @code{@var{phi}}, radial distance @code{@var{r}}, rate of
-   change of theta @code{@var{td}}, rate of change of phi @code{@var{pd}}, rate of change of
-   r @code{@var{rd}} 
+[SOFA] Returns the pv-vector that corresponds to the spherical
+coordinates longitude @code{@var{theta}} (radians), latitude
+@code{@var{phi}} (radians), radial distance @code{@var{r}}, rate of
+change of theta @code{@var{td}}, rate of change of phi
+@code{@var{pd}}, rate of change of r @code{@var{rd}}.  All arguments
+must have the same dimensions.  The result has those same dimensions,
+too, but with two extra dimensions equal to 2 and 3 prefixed.
 
 @c -------------------------------------
 @node IAUSEPP, IAUSEPS, IAUS2PV, Internal Routines
@@ -21593,7 +21659,11 @@ The result has the same dimensions as the parameters.
 
 @code{IAUSEPP(@var{a}, @var{b})}
 
-   Returns the angular separation between two p-vectors @code{@var{a}} and @code{@var{b}} 
+[SOFA] Returns the angular separation in radians between two p-vectors
+@code{@var{a}} and @code{@var{b}}, which must have the same dimensions
+and must have their first dimension equal to 3.  The result has the
+same dimensions as the arguments except that the first dimension
+(equal to 3) is omitted.
 
 @c -------------------------------------
 @node IAUSEPS, IAUSP00, IAUSEPP, Internal Routines
@@ -21602,42 +21672,67 @@ The result has the same dimensions as the parameters.
 
 @code{IAUSEPS(@var{lon1}, @var{lat1}, @var{lon2}, @var{lat2})}
 
-   Returns the angular separation between the direction with longitude
-   @code{@var{lon1}}, latitude @code{@var{lat1}} and the direction with longitude @code{@var{lon2}},
-   latitude @code{@var{lat2}} 
+[SOFA] Returns the angular separation in radians between the direction
+with longitude @code{@var{lon1}} (radians), latitude @code{@var{lat1}}
+(radians) and the direction with longitude @code{@var{lon2}}
+(radians), latitude @code{@var{lat2}} (radians).  All arguments must
+have the same dimensions.  The result has those same dimensions, too.
 
 @c -------------------------------------
 @node IAUSP00, IAUSTARPM, IAUSEPS, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUSP00
 
-@code{IAUSP00(@var{jd})}
+@code{IAUSP00(@var{jdtt})}
 
-   Returns the TIO locator s' for Julian Date @code{@var{jd}}, positioning the
-   Terrestrial Intermediate Origin on the equator of the Celestial
-   Intermediate Pole 
+[SOFA] Returns the TIO locator s' for TT Julian Date
+@code{@var{jdtt}}, positioning the Terrestrial Intermediate Origin on
+the equator of the Celestial Intermediate Pole.  The result is
+measured in radians and has the same dimensions as @code{@var{jdtt}}.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUSTARPM, IAUSTARPV, IAUSP00, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUSTARPM
 
-@code{IAUSTARPM, @var{ra1}, @var{dec1}, @var{pmr1}, @var{pmd1}, @var{px1}, @var{rv1}, @var{jd1},}
-   @var{jd2}, @var{ra2}, @var{dec2}, @var{pmr2}, @var{pmd2}, @var{px2}, @var{rv2}
+@code{IAUSTARPM, @var{ra1}, @var{dec1}, @var{pmr1}, @var{pmd1},
+@var{px1}, @var{rv1}, @var{jdtdb1}, @var{jdtdb2}, @var{ra2},
+@var{dec2}, @var{pmr2}, @var{pmd2}, @var{px2}, @var{rv2}}
 
-   Updates star catalog data for space motion. @code{@var{ra}} = right ascension,
-   @code{@var{dec}} = declination, @code{@var{pmr}} = right ascension proper motion, @code{@var{pmd}} =
-   declination proper motion, @code{@var{px}} = parallax, @code{@var{rv}} = radial velocity;
-   *1 = before, *2 = after 
+[SOFA] Updates star catalog data for space motion. The *1 parameters
+are ``before'' values for TDB Julian Date @code{@var{jdtdb1}}.  The *2
+parameters are returned ``after'' values for TDB Julian Date
+@code{@var{jdtdb2}}.  @code{@var{ra}} = right ascension (radians),
+@code{@var{dec}} = declination (radians), @code{@var{pmr}} = right
+ascension proper motion (rad/a), @code{@var{pmd}} = declination proper
+motion (rad/a), @code{@var{px}} = parallax (arcsec), @code{@var{rv}} =
+radial velocity (km/s receding).  The input arguments must all have
+the same dimensions.  The output variables get those same dimensions.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUSTARPV, IAUTAITT, IAUSTARPM, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUSTARPV
 
-@code{IAUSTARPV(@var{ra}, @var{dec}, @var{pmr}, @var{pmd}, @var{px}, @var{rv})}
+@code{IAUSTARPV(@var{ra}, @var{dec}, @var{pmr}, @var{pmd}, @var{px},
+@var{rv})}
 
-   Converts star catalog coordinates to a position-velocity matrix 
+[SOFA] Converts star catalog coordinates to a position-velocity
+matrix.  The input parameters are right ascension @code{@var{ra}}
+(radians), declination @code{@var{dec}} (radians), right ascension
+proper motion @code{@var{pmr}} (rad/a), declination proper motion
+@code{@var{pmd}} (rad/a), parallax @code{@var{px}} (arcsec), and
+radial velocity @code{@var{rv}} (km/s receding).  All input parameters
+must have the same dimensions.  The result gets those same dimension
+with extra dimensions equal to 2 and 3 prefixed.  If the results are
+@code{pv}, then @code{pv(0,*,/ALL)} is the position in AU, and
+@code{pv(1, *, /ALL)} is the velocity in AU/day.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUTAITT, IAUTAIUT1, IAUSTARPV, Internal Routines
@@ -21646,17 +21741,22 @@ The result has the same dimensions as the parameters.
 
 @code{IAUTAITT(@var{jdtai})}
 
-   Translates Julian Date @code{@var{jdtai}} from TAI to TT 
+[SOFA] Translates Julian Date @code{@var{jdtai}} from TAI to TT.  The
+result has the same dimensions as the input.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
-@node IAUTAIUT1, IAUTAIUTC, IAUTAITT, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUTAIUT1
 
 @code{IAUTAIUT1(@var{jdtai}, @var{dta})}
 
-   Translates Julian Date @code{@var{jdtai}} from TAI to UT1, given @code{@var{dta}} = UT1 -
-   TAi in seconds 
+[SOFA] Translates Julian Date @code{@var{jdtai}} from TAI to UT1,
+given @code{@var{dta}} = UT1 - TAI in seconds.  The arguments must
+have the same dimensions.  The result has those same dimensions, too.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUTAIUTC, IAUTCBTDB, IAUTAIUT1, Internal Routines
@@ -21665,7 +21765,10 @@ The result has the same dimensions as the parameters.
 
 @code{IAUTAIUTC(@var{jdtai})}
 
-   Translates Julian Date @code{@var{jdtai}} from TAI to UTC 
+[SOFA] Translates Julian Date @code{@var{jdtai}} from TAI to UTC.  The
+result has the same dimensions as the input.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUTCBTDB, IAUTCGTT, IAUTAIUTC, Internal Routines
@@ -21674,7 +21777,10 @@ The result has the same dimensions as the parameters.
 
 @code{IAUTCBTDB(@var{jdtcb})}
 
-   Translates Julian Date @code{@var{jdtcb}} from TCB to TDB 
+[SOFA] Translates Julian Date @code{@var{jdtcb}} from TCB to TDB.  The
+result has the same dimensions as the input.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUTCGTT, IAUTDBTCB, IAUTCBTDB, Internal Routines
@@ -21683,7 +21789,10 @@ The result has the same dimensions as the parameters.
 
 @code{IAUTCGTT(@var{jdtcg})}
 
-   Translates Julian Date @code{@var{jdtcg}} from TCG to TT 
+[SOFA] Translates Julian Date @code{@var{jdtcg}} from TCG to TT.  The
+result has the same dimensions as the input.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUTDBTCB, IAUTDBTT, IAUTCGTT, Internal Routines
@@ -21692,7 +21801,10 @@ The result has the same dimensions as the parameters.
 
 @code{IAUTDBTCB(@var{jdtdb})}
 
-   Translates Julian Date @code{@var{jdtdb}} from TDB to TCB 
+[SOFA] Translates Julian Date @code{@var{jdtdb}} from TDB to TCB.  The
+result has the same dimensions as the input.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUTDBTT, IAUTR, IAUTDBTCB, Internal Routines
@@ -21701,8 +21813,11 @@ The result has the same dimensions as the parameters.
 
 @code{IAUTDBTT(@var{jdtdb}, @var{dtr})}
 
-   Translates Julian Date @code{@var{jdtbd}} from TDB to TT, given @code{@var{dtr}} = TDB -
-   TT in seconds  
+[SOFA] Translates Julian Date @code{@var{jdtbd}} from TDB to TT, given
+@code{@var{dtr}} = TDB - TT in seconds.  The arguments must have the
+same dimensions.  The result has those same dimensions, too.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUTR, IAUTRXP, IAUTDBTT, Internal Routines
@@ -21711,7 +21826,9 @@ The result has the same dimensions as the parameters.
 
 @code{IAUTR(@var{r})}
 
-   Transposes r-matrix @code{@var{r}} 
+[SOFA] Transposes r-matrix @code{@var{r}}, which must have its first
+two dimensions equal to 3.  The result has the same dimensions as
+@code{@var{r}}.
 
 @c -------------------------------------
 @node IAUTRXP, IAUTRXPV, IAUTR, Internal Routines
@@ -21720,7 +21837,12 @@ The result has the same dimensions as the parameters.
 
 @code{IAUTRXP(@var{r}, @var{p})}
 
-   Multiply p-vector @code{@var{p}} by the transpose of r-matrix @code{@var{r}} 
+[SOFA] Multiply p-vector @code{@var{p}} (which must have its first
+dimension equal to 3) by the transpose of r-matrix @code{@var{r}}
+(which must have its first two dimensions equal to 3).  The dimensions
+of @code{@var{r}} beyond the first two must be the same as the
+dimensions of @code{@var{p}} beyond the first one.  The result has the
+same dimensions as @code{@var{p}}.
 
 @c -------------------------------------
 @node IAUTRXPV, IAUTTTAI, IAUTRXP, Internal Routines
@@ -21729,7 +21851,12 @@ The result has the same dimensions as the parameters.
 
 @code{IAUTRXPV(@var{r}, @var{pv})}
 
-   Multiply pv-vector @code{@var{pv}} by the transpose of r-matrix @code{@var{r}} 
+[SOFA] Multiply pv-vector @code{@var{pv}} (which must have its first
+two dimensions equal to 2 and 3, respectively) by the transpose of
+r-matrix @code{@var{r}} (which must have its first two dimensions
+equal to 3).  The dimensions of @code{@var{r}} beyond the first two
+must be equal to the dimensions of @code{@var{pv}} beyond the first
+two.  The result has the same dimensions as @code{@var{pv}}.
 
 @c -------------------------------------
 @node IAUTTTAI, IAUTTTCG, IAUTRXPV, Internal Routines
@@ -21738,7 +21865,10 @@ The result has the same dimensions as the parameters.
 
 @code{IAUTTTAI(@var{jdtt})}
 
-   Transforms Julian Date @code{@var{jdtt}} from TT to TAI 
+[SOFA] Transforms Julian Date @code{@var{jdtt}} from TT to TAI.  The
+result has the same dimensions as the input.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUTTTCG, IAUTTTDB, IAUTTTAI, Internal Routines
@@ -21747,7 +21877,10 @@ The result has the same dimensions as the parameters.
 
 @code{IAUTTTCG(@var{jdtt})}
 
-   Transforms Julian Date @code{@var{jdtt}} from TT to TCG 
+[SOFA] Transforms Julian Date @code{@var{jdtt}} from TT to TCG.  The
+result has the same dimensions as the input.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUTTTDB, IAUTTUT1, IAUTTTCG, Internal Routines
@@ -21756,8 +21889,11 @@ The result has the same dimensions as the parameters.
 
 @code{IAUTTTDB(@var{jdtt}, @var{dt})}
 
-   Transforms Julian Date @code{@var{jdtt}} from TT to TDB, given @code{@var{dt}} = TDB -
-   TT in seconds 
+[SOFA] Transforms Julian Date @code{@var{jdtt}} from TT to TDB, given
+@code{@var{dt}} = TDB - TT in seconds.  The arguments must have the
+same dimensions.  The result has those same dimensions, too.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUTTUT1, IAUUT1TAI, IAUTTTDB, Internal Routines
@@ -21766,8 +21902,11 @@ The result has the same dimensions as the parameters.
 
 @code{IAUTTUT1(@var{jdtt}, @var{dt})}
 
-   Transforms Julian Date @code{@var{jdtt}} from TT to UT1, given @code{@var{dt}} = TT - UT1
-   in seconds 
+[SOFA] Transforms Julian Date @code{@var{jdtt}} from TT to UT1, given
+@code{@var{dt}} = TT - UT1 in seconds.  The arguments must have the
+same dimensions.  The result has those same dimensions, too.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUUT1TAI, IAUUT1TT, IAUTTUT1, Internal Routines
@@ -21776,8 +21915,11 @@ The result has the same dimensions as the parameters.
 
 @code{IAUUT1TAI(@var{jdut}, @var{dt})}
 
-   Transforms Julian Date @code{@var{jdut}} from UT1 to TAI, given @code{@var{dt}} = UT1 -
-   TAI in seconds 
+[SOFA] Transforms Julian Date @code{@var{jdut}} from UT1 to TAI, given
+@code{@var{dt}} = UT1 - TAI in seconds.  The arguments must have the
+same dimensions.  The result has those same dimensions, too.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUUT1TT, IAUUT1UTC, IAUUT1TAI, Internal Routines
@@ -21786,8 +21928,11 @@ The result has the same dimensions as the parameters.
 
 @code{IAUUT1TT(@var{jdut}, @var{dt})}
 
-   Transforms Julian Date @code{@var{jdut}} from UT1 to TT, given @code{@var{dt}} = UT1 -
-   TT in seconds 
+[SOFA] Transforms Julian Date @code{@var{jdut}} from UT1 to TT, given
+@code{@var{dt}} = UT1 - TT in seconds.  The arguments must have the
+same dimensions.  The result has those same dimensions, too.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUUT1UTC, IAUUTCTAI, IAUUT1TT, Internal Routines
@@ -21796,8 +21941,11 @@ The result has the same dimensions as the parameters.
 
 @code{IAUUT1UTC(@var{jdut}, @var{dt})}
 
-   Transforms Julian Date @code{@var{jdut}} from UT1 to UTC, given @code{@var{dt}} = UT1 -
-   UTC in seconds 
+[SOFA] Transforms Julian Date @code{@var{jdut}} from UT1 to UTC, given
+@code{@var{dt}} = UT1 - UTC in seconds.  The arguments must have the
+same dimensions.  The result has those same dimensions, too.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUUTCTAI, IAUUTCUT1, IAUUT1UTC, Internal Routines
@@ -21806,7 +21954,10 @@ The result has the same dimensions as the parameters.
 
 @code{IAUUTCTAI(@var{jdut})}
 
-   Transforms Julian Date @code{@var{jdut}} from UTC to TAI 
+[SOFA] Transforms Julian Date @code{@var{jdut}} from UTC to TAI.  The
+result has the same dimensions as the input.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUUTCUT1, IAUXY06, IAUUTCTAI, Internal Routines
@@ -21815,52 +21966,93 @@ The result has the same dimensions as the parameters.
 
 @code{IAUUTCUT1(@var{jdut}, @var{dt})}
 
-   Transforms Julian Date @code{@var{jdut}} from UTC to UT1, given @code{@var{dt}} = UT1 -
-   UTC in seconds 
+[SOFA] Transforms Julian Date @code{@var{jdut}} from UTC to UT1, given
+@code{@var{dt}} = UT1 - UTC in seconds.  The arguments must have the
+same dimensions.  The result has those same dimensions, too.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUXY06, IAUXYS00A, IAUUTCUT1, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUXY06
 
-@code{IAUXY06, @var{jd}, @var{x}, @var{y}}
+@code{IAUXY06, @var{jdtt}, @var{x}, @var{y}}
 
-   Returns the Celestial Intermediate Pole @code{@var{x}}, @code{@var{y}} coordinates for
-   the given Julian Date @code{@var{jd}}, based on IAU 2006 precession and IAU
-   2000A nutation. 
+[SOFA] Returns the Celestial Intermediate Pole @code{@var{x}},
+@code{@var{y}} coordinates for the given TT Julian Date
+@code{@var{jdtt}}, based on IAU 2006 precession and IAU 2000A
+nutation.  The output variables have the same dimensions as
+@code{@var{jdtt}}.
+
+The @code{@var{x}} and @code{@var{y}} coordinates are those of the
+unit vector towards the celestial intermediate pole.  They represent
+the combined effects of frame bias, precession, and nutation.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUXYS00A, IAUXYS00B, IAUXY06, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUXYS00A
 
-@code{IAUXYS00A, @var{jd}, @var{x}, @var{y}, @var{s}}
+@code{IAUXYS00A, @var{jdtt}, @var{x}, @var{y}, @var{s}}
 
-   Returns the Celestial Intermediate Pole @code{@var{x}}, @code{@var{y}} coordinates and
-   the CIO locator @code{@var{s}} for Julian Date @code{@var{jd}}, based on the IAU 2000A
-   precession-nutation model 
+[SOFA] Returns the Celestial Intermediate Pole @code{@var{x}},
+@code{@var{y}} coordinates and the CIO locator @code{@var{s}} (in
+radians) for TT Julian Date @code{@var{jdtt}}, based on the IAU 2000A
+precession-nutation model.  The output variables have the same
+dimensions as @code{@var{jdtt}}.
+
+The @code{@var{x}} and @code{@var{y}} coordinates are those of the
+unit vector towards the celestial intermediate pole.  They represent
+the combined effects of frame bias, precession, and nutation.  The CIO
+locator positions the Celestial Intermediate Origin on the equator of
+the CIP.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUXYS00B, IAUXYS06A, IAUXYS00A, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUXYS00B
 
-@code{IAUXYS00B, @var{jd}, @var{x}, @var{y}, @var{s}}
+@code{IAUXYS00B, @var{jdtt}, @var{x}, @var{y}, @var{s}}
 
-   Returns the Celestial Intermediate Pole @code{@var{x}}, @code{@var{y}} coordinates and
-   the CIO locator @code{@var{s}} for Julian Date @code{@var{jd}}, based on the IAU 2000B
-   precession-nutation model 
+[SOFA] Returns the Celestial Intermediate Pole @code{@var{x}},
+@code{@var{y}} coordinates and the CIO locator @code{@var{s}} for TT
+Julian Date @code{@var{jd}}, based on the IAU 2000B
+precession-nutation model.  The output variables have the same
+dimensions as @code{@var{jdtt}}.
+
+The @code{@var{x}} and @code{@var{y}} coordinates are those of the
+unit vector towards the celestial intermediate pole.  They represent
+the combined effects of frame bias, precession, and nutation.  The CIO
+locator positions the Celestial Intermediate Origin on the equator of
+the CIP.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUXYS06A, IBETA, IAUXYS00B, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUXYS06A
 
-@code{IAUXYS06A, @var{jd}, @var{x}, @var{y}, @var{s}}
+@code{IAUXYS06A, @var{jdtt}, @var{x}, @var{y}, @var{s}}
 
-   Returns the Celestial Intermediate Pole @code{@var{x}}, @code{@var{y}} coordinates and
-   the CIO locator @code{@var{s}} for Julian Date @code{@var{jd}}, based on the IAU 2006
-   precession and IAU 2000A nutation models 
+[SOFA] Returns the Celestial Intermediate Pole @code{@var{x}},
+@code{@var{y}} coordinates and the CIO locator @code{@var{s}} for TT
+Julian Date @code{@var{jd}}, based on the IAU 2006 precession and IAU
+2000A nutation models.  The output variables have the same dimensions
+as @code{@var{jdtt}}.
+
+The @code{@var{x}} and @code{@var{y}} coordinates are those of the
+unit vector towards the celestial intermediate pole.  They represent
+the combined effects of frame bias, precession, and nutation.  The CIO
+locator positions the Celestial Intermediate Origin on the equator of
+the CIP.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IBETA, IDLREAD, IAUXYS06A, Internal Routines

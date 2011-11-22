@@ -20330,7 +20330,8 @@ See also: @ref{Astronomical Coordinate Calculations}
 @code{P_Hipparcos} is a p-vector in the Hipparcos frame and
 @code{P_FK5} is the equivalent FK5 p-vector.  @code{@var{s5h}} is the
 time derivative of the FK5-to-Hipparcos rotation, measured in radians
-per Julian TDB year.
+per Julian TDB year.  @code{@var{r5h}} has 3 by 3 elements,
+@code{@var{s5h}} has 3 elements.
 
 See also: @ref{Astronomical Coordinate Calculations}
 
@@ -20605,7 +20606,7 @@ See also: @ref{Astronomical Coordinate Calculations}
 @subsection IAUH2FK5
 
 @code{IAUH2FK5, @var{rah}, @var{dech}, @var{drah}, @var{ddech},
-@var{pxh}, @var{rvh}, @var{ra5},} @var{dec5}, @var{dra5}, @var{ddec5},
+@var{pxh}, @var{rvh}, @var{ra5}, @var{dec5}, @var{dra5}, @var{ddec5},
 @var{px5}, @var{rv5}}
 
 [SOFA] Transforms Hipparcos star data into the FK5 (J2000.0) system.
@@ -20750,7 +20751,7 @@ See also: @ref{Astronomical Coordinate Calculations}
 
 [SOFA] Returns the nutation for TT Julian Date @code{@var{jdtt}}
 according to the IAU 2000A model (MHB2000 luni-solar and planetary
-nutation with fre core nutation omitted).  @code{@var{dpsi}} and
+nutation with free core nutation omitted).  @code{@var{dpsi}} and
 @code{@var{deps}} are the returned nutation components (luni-solar +
 planetary) in radians with respect to the equinox and ecliptic of
 date.  The J2000.0 obliquity is assumed to be the Lieske et al. (1977)
@@ -20857,7 +20858,7 @@ See also: @ref{Astronomical Coordinate Calculations}
 @subsection IAUP06E
 
 @code{IAUP06E, @var{jdtt}, @var{eps0}, @var{psia}, @var{oma},
-@var{bpa}, @var{bqa}, @var{pia}, @var{bpia},} @var{epsa}, @var{chia},
+@var{bpa}, @var{bqa}, @var{pia}, @var{bpia}, @var{epsa}, @var{chia},
 @var{za}, @var{zetaa}, @var{thetaa}, @var{pa}, @var{gam}, @var{phi},
 @var{psi}}
 
@@ -21747,6 +21748,7 @@ result has the same dimensions as the input.
 See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
+@node IAUTAIUT1, IAUTAIUTC, IAUTAITT, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUTAIUT1
 

@@ -21275,45 +21275,85 @@ See also: @ref{Astronomical Coordinate Calculations}
 
 @code{IAUPOM00(@var{xp}, @var{yp}, @var{sp})}
 
-   Returns the matrix of polar motion, IAU 2000, given the coordinates
-   @code{@var{xp}}, @code{@var{yp}} of the pole and TIO locator @code{@var{sp}}. 
+[SOFA] Returns the matrix of polar motion, IAU 2000, given the
+coordinates @code{@var{xp}}, @code{@var{yp}} of the pole and TIO
+locator @code{@var{sp}}, all in radians.  The TIO locator positions
+the Terrestrial Intermediat Origin on the equator.  It is obtained
+from polar motion observations, so is in essence unpredictable.  The
+current function implements an approximation based on the dominant
+secular drift of about 47 microarcseconds per century.  All arguments
+must have the same dimensions.  The result has those same dimensions
+as well, with two dimensions equal to 3 prefixed.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUPR00, IAUPREC76, IAUPOM00, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUPR00
 
-@code{IAUPR00, @var{jd}, @var{dpsipr}, @var{depspr}}
+@code{IAUPR00, @var{jdtt}, @var{dpsipr}, @var{depspr}}
 
-   Returns the precession-rate part of the IAU 2000
-   precession-nutation models (part of MHB2000). 
+[SOFA] Returns the precession-rate part of the IAU 2000
+precession-nutation models (part of MHB2000), for the specified TT
+Julian Date @code{@var{jdtt}}.  Returns the nutation in longitude
+@code{@var{dpsipr}} and obliquity @code{@var{depspr}} in radians with
+respect to the J2000.0 equinox and ecliptic.  The output variables get
+the same dimensions as @code{@var{jdtt}}.
+
+The MHB2000 model does not specify which set of Euler angles to use to
+express precession.  The most literal and straightforward procedure is
+to adopt the 4-rotation @code{epsilon_0}, @code{psi_A},
+@code{omega_A}, and @code{xi_A}.  Then @code{@var{dpsipr}} can be
+added to @code{psi_A}, and @code{@var{depspr}} to both @code{omega_A}
+and @code{eps_A}.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUPREC76, IAUPV2S, IAUPR00, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUPREC76
 
-@code{IAUPREC76, @var{jd1}, @var{jd2}, @var{zeta}, @var{z}, @var{theta}}
+@code{IAUPREC76, @var{jdtdb1}, @var{jdtdb2}, @var{zeta}, @var{z},
+@var{theta}}
 
-   Returns the three Euler angles @code{@var{zeta}}, @code{@var{z}}, @code{@var{theta}} which implement
-   general precession between epochs (Julian Dates) @code{@var{jd1}} and @code{@var{jd2}},
-   using the IAU 1976 model (as for the FK5 catalog).  @code{@var{zeta}} is the
-   1st rotation angle in radians clockwise around the z axis, @code{@var{z}} the
-   3rd rotation angle in radians clockwise around the z axis, and
-   @code{@var{theta}} the 2nd rotation angle in radians counterclockwise around
-   the y axis. 
+[SOFA] Returns the three Euler angles @code{@var{zeta}} (1st rotation,
+radians clockwise around z), @code{@var{z}} (3rd rotation, radians
+clockwise around z), @code{@var{theta}} (2nd rotation, radians
+counterclockwise around y) which implement general precession between
+epochs (TDB Julian Dates) @code{@var{jdtdb1}} and @code{@var{jdtdb2}},
+using the IAU 1976 model (as for the FK5 catalog).
+
+The precession matrix is @code{R_3(-z) R_2(+theta) R_3(-zeta)}.
+
+The absolute accuracy is better than 0.1 arcsec from year 1960 through
+2040, better than 1 arcsec from 1640 through 2360, and remains below 3
+arcsec during -500 through 3000.  The errors exceed 10 arcsec outside
+-1200 through 3900, exceed 100 arcsec outside -4200 through 5600, and
+exceed 1000 arcsec outside -6800 through 8200.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUPV2S, IAUPVDPV, IAUPREC76, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUPV2S
 
-@code{IAUPV2S, @var{pv}, @var{theta}, @var{phi}, @var{r}, @var{td}, @var{pd}, @var{rd}}
+@code{IAUPV2S, @var{pv}, @var{theta}, @var{phi}, @var{r}, @var{td},
+@var{pd}, @var{rd}}
 
-   Converts position/velocity vector @code{@var{pv}} from Cartesian to spherical
-   coordinates.  @code{@var{theta}} = longitude angle, @code{@var{phi}} = latitude angle,
-   @code{@var{r}} = radial distance, @code{@var{td}} = rate of change of theta, @code{@var{pd}} = rate
-   of change of @code{@var{phi}}, @code{@var{rd}} = rate of change of @code{@var{r}} 
+[SOFA] Converts position/velocity vector @code{@var{pv}} (which has 2
+elements in its first dimension and 3 elements in its second
+dimension) from Cartesian to spherical coordinates.  The output
+parameters are: @code{@var{theta}} = longitude in radians,
+@code{@var{phi}} = latitude in radians, @code{@var{r}} = radial
+distance, @code{@var{td}} = rate of change of theta, @code{@var{pd}} =
+rate of change of @code{@var{phi}}, @code{@var{rd}} = rate of change
+of @code{@var{r}}.  The output variables get the same dimensions as
+@code{@var{pv}} except that the first two dimensions (equal to 2 and
+3) are omitted.
+
 @c -------------------------------------
 @node IAUPVDPV, IAUPVM, IAUPV2S, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -21321,7 +21361,11 @@ See also: @ref{Astronomical Coordinate Calculations}
 
 @code{IAUPVDPV(@var{a}, @var{b})}
 
-   Returns the inner product of pv-vectors @code{@var{a}} and @code{@var{b}} 
+[SOFA] Returns the inner product of pv-vectors @code{@var{a}} and
+@code{@var{b}}, which must have the same dimensions, of which the
+first one is equal to 2 and the second one equal to 3.  The result has
+those same dimensions as well, except that the second dimension (equal
+to 3) is omitted.
 
 @c -------------------------------------
 @node IAUPVM, IAUPVSTAR, IAUPVDPV, Internal Routines
@@ -21330,22 +21374,46 @@ See also: @ref{Astronomical Coordinate Calculations}
 
 @code{IAUPVM, @var{pv}, @var{r}, @var{s}}
 
-   Returns the modulus of pv-vector @code{@var{pv}}.  @code{@var{r}} is the modulus of the
-   position component, and @code{@var{s}} is the modulus of the velocity
-   component. 
+[SOFA] Returns the modulus of pv-vector @code{@var{pv}}, which must
+have 2 elements in its first dimension and 3 in its second dimension.
+In @code{@var{r}} is returned the modulus of the position component,
+and in @code{@var{s}} the modulus of the velocity component.  The
+output parameters get the same dimensions as @code{@var{pv}}, except
+that the first two dimensions (equal to 2 and 3) are omitted.
 
 @c -------------------------------------
 @node IAUPVSTAR, IAUPVXPV, IAUPVM, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAUPVSTAR
 
-@code{IAUPVSTAR, @var{pv}, @var{ra}, @var{dec}, @var{pmr}, @var{pmd}, @var{px}, @var{rv}}
+@code{IAUPVSTAR, @var{pv}, @var{ra}, @var{dec}, @var{pmr}, @var{pmd},
+@var{px}, @var{rv}}
 
-   Converts position-velocity matrix @code{@var{pv}} to catalog coordinates right
-   ascension @code{@var{ra}} (rad), declination @code{@var{dec}} (rad), right ascension
-   proper motion @code{@var{pmr}} in rad/a, declination proper motion @code{@var{pmd}}
-   (rad/a), parallax @code{@var{px}} (arcsec), and radial velocity @code{@var{rv}} (km/s
-   receding) 
+[SOFA] Converts position-velocity matrix @code{@var{pv}} (AU, AU/d) to
+catalog coordinates right ascension @code{@var{ra}} (rad), declination
+@code{@var{dec}} (rad), right ascension proper motion @code{@var{pmr}}
+(rad/Ja), declination proper motion @code{@var{pmd}} (rad/Ja),
+parallax @code{@var{px}} (arcsec), and radial velocity @code{@var{rv}}
+(km/s receding).  @code{@var{pv}} must have 2 elements in its first
+dimension and 3 in its second dimension.  The output parameters get
+the same dimensions as @code{@var{pv}} except that the first two
+dimensions (equal to 2 and 3) are omitted.
+
+The returned star data are observables for an imaginary observer at
+the solar-system barycenter.  Proper motion and radial velocity are in
+terms of barycentric coordinate time (TCB).  For most practical
+applications, the distinction between TCB and Terrestrial Time
+(TT/TAI) may be neglected.  Usually the result is limited by the
+intrinsic accuracy of the proper-motion and radial-velocity data.
+
+In accordance with normal star-catalog conventions, the object's right
+ascension and declination are freed from the effects of secular
+aberration.  The frame is aligned to the catalog equator and equinox,
+is Lorentzian and centered on the SSB.
+
+The proper motions are measured in radians per Julian year.
+
+See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
 @node IAUPVXPV, IAUPXP, IAUPVSTAR, Internal Routines
@@ -21354,7 +21422,14 @@ See also: @ref{Astronomical Coordinate Calculations}
 
 @code{IAUPVXPV(@var{a}, @var{b})}
 
-   Returns the outer product of two pv-vectors @code{@var{a}} and @code{@var{b}} 
+[SOFA] Returns the outer product of two pv-vectors @code{@var{a}} and
+@code{@var{b}}.  The parameters must have equal dimensions, of which
+the first one must be equal to 2 and the second one to 3.  The result
+gets the same dimensions as the parameters.
+
+If the position and velocity components of @code{@var{a}} and
+@code{@var{b}} are @code{(ap, av)} and @code{(bp, bv)}, then the
+result is the pair of vectors @code{(ap x bp, ap x bv + av x bp)}.
 
 @c -------------------------------------
 @node IAUPXP, IAURM2V, IAUPVXPV, Internal Routines
@@ -21363,7 +21438,9 @@ See also: @ref{Astronomical Coordinate Calculations}
 
 @code{IAUPXP(@var{a}, @var{b})}
 
-   Returns the outer product of two p-vectors @code{@var{a}} and @code{@var{b}} 
+[SOFA] Returns the outer product of two p-vectors @code{@var{a}} and
+@code{@var{b}}, which must have 3 elements in their first dimension.
+The result has the same dimensions as the parameters.
 
 @c -------------------------------------
 @node IAURM2V, IAURV2M, IAUPXP, Internal Routines

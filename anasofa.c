@@ -631,6 +631,16 @@ BIND(iauGd2gc, iLd3ob3rl, f, IAUGD2GC, 2, 2, NULL)
    ellipsoid with equatorial radius <a> and flattening <f> */
 BIND(iauGd2gce, id3DDob3rl, f, IAUGD2GCE, 3, 3, NULL)
 /*-----------------------------------------------------------------------*/
+/* IAUGMST00(<jdut>, <jdtt>)
+
+   Returns Greenwich mean sidereal time according to a model that is
+   consistent with IAU 2000 resolution.  <jdut> is the Julian Date
+   (UT1).  <jdtt> is the Julian Date (TT) of the same instant. <jdut>
+   is needed to predict the Earth rotation, and TT to predict the
+   effects of precession.  If <jdtt> is set equal to <jdut> then
+   errors of order 100 microarcseconds result. */
+BIND(iauGmst00, iddddrd_mod, f, IAUGMST00, 2, 2, NULL)
+/*-----------------------------------------------------------------------*/
 /* IAUGMST06(<jdut>, <jdtt>)
 
    Returns Greenwich mean sidereal time according to a model that is
@@ -657,15 +667,12 @@ BIND(iauGmst82, id0rd, f, IAUGMST82, 1, 1, NULL)
    microarcseconds result. */
 BIND(iauGst00a, iddddrd_mod, f, IAUGST00A, 2, 2, NULL)
 /*-----------------------------------------------------------------------*/
-/* IAUGST00B(<jdut>, <jdtt>)
+/* IAUGST00B(<jdut>)
 
    Returns Greenwich apparent sidereal time consistent with IAU 2000
    resolutions but using the truncated nutation model IAU 2000B.
-   <jdut> is the Julian Date (UT1).  <jdtt> is the Julian Date (TT) of
-   the same instant. <jdut> is needed to predict the Earth rotation,
-   and TT to predict the effects of precession.  If <jdtt> is set
-   equal to <jdut> then errors of order 100 microarcseconds result. */
-BIND(iauGst00b, id0rd, f, IAUGST00B, 2, 2, NULL)
+   <jdut> is the Julian Date (UT1). */
+BIND(iauGst00b, id0rd, f, IAUGST00B, 1, 1, NULL)
 /*-----------------------------------------------------------------------*/
 /* IAUGST06(<jdut>, <jdtt>, <rnpb>)
 
@@ -712,7 +719,7 @@ BIND(iauH2fk5, iddddddodddddd, s, IAUH2FK5, 12, 12, NULL)
    (J2000.0) system, assuming zero Hipparcos proper motion.  The
    returned coordinates in the FK5 system are right ascension <ra5>,
    declination <dec5> */
-BIND(iauHfk5z, iddd0odddd, s, IAUHFK5Z, 5, 5, NULL)
+BIND(iauHfk5z, iddd0odddd, s, IAUHFK5Z, 7, 7, NULL)
 /*-----------------------------------------------------------------------*/
 /* IAUIR()
 
@@ -818,7 +825,7 @@ BIND(iauP06e, id0odddddddddddddddd, s, IAUP06E, 17, 17, NULL)
 
    Returns the spherical polar coordinates (theta, phi, r)
    corresponding to the p-vector <p> */
-BIND(iauP2s, ib3od3, f, IAUP25, 1, 1, NULL)
+BIND(iauP2s, ib3od3, f, IAUP2S, 1, 1, NULL)
 /*-----------------------------------------------------------------------*/
 /* IAUPAP(<ref>, <tgt>)
 

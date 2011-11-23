@@ -77,7 +77,7 @@ int ana_iLd3ob3rl_f_(int narg, int ps[], int (*f)(int, double, double, double, d
   loopInfo *infos;
   int iq;
 
-  if ((iq = standard_args(narg, ps, "i>D3*;iL1;rD3*", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iL1;i>D3*;rD[-]*", &ptrs, &infos)) < 0)
     return ANA_ERROR;
   size_t nelem = infos[0].nelem/3;
   while (nelem--) {
@@ -182,8 +182,10 @@ int ana_ib3od3_f_(int narg, int ps[], void (*f)(double *, double *, double *, do
 
   if ((iq = standard_args(narg, ps, "i>D3*;rD3*", &ptrs, &infos)) < 0)
     return ANA_ERROR;
-  while (infos[0].nelem--) {
-    f(ptrs[0].d++, &ptrs[1].d[0], &ptrs[1].d[1], &ptrs[1].d[2]);
+  int nelem = infos[0].nelem/3;
+  while (nelem--) {
+    f(ptrs[0].d, &ptrs[1].d[0], &ptrs[1].d[1], &ptrs[1].d[2]);
+    ptrs[0].d += 3;
     ptrs[1].d += 3;
   }
   return iq;
@@ -602,7 +604,7 @@ int ana_id0ddodc33c33c33c33c33_s_(int narg, int ps[], void (*f)(double, double, 
   loopInfo *infos;
   int iq;
 
-  if ((iq = standard_args(narg, ps, "i>D*;i>D*;i>D*;oD*;oD+3,+3*;oD+3,+3*;oD+3,+3;oD+3,+3*;oD+3,+3*", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "i>D*;oD*;oD*;oD*;oD+3,+3*;oD+3,+3*;oD+3,+3;oD+3,+3*;oD+3,+3*", &ptrs, &infos)) < 0)
     return ANA_ERROR;
   while (infos[0].nelem--) {
     f(*ptrs[0].d++, 0.0, *ptrs[1].d++, *ptrs[2].d++, ptrs[3].d++,
@@ -882,7 +884,8 @@ int ana_id3rd_f_(int narg, int ps[], double (*f)(double *))
 
   if ((iq = standard_args(narg, ps, "i>D3*;rD-3*", &ptrs, &infos)) < 0)
     return ANA_ERROR;
-  while (infos[0].nelem--) {
+  int nelem = infos[0].nelem/3;
+  while (nelem--) {
     *ptrs[1].d++ = f(ptrs[0].d);
     ptrs[0].d += 3;
   }

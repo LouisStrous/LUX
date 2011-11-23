@@ -20533,17 +20533,12 @@ See also: @ref{Astronomical Coordinate Calculations}
 @comment  node-name,  next,  previous,  up
 @subsection IAUGST00B
 
-@code{IAUGST00B(@var{jdut}, @var{jdtt})}
+@code{IAUGST00B(@var{jdut})}
 
 [SOFA] Returns Greenwich apparent sidereal time in radians consistent
 with IAU 2000 resolutions but using the truncated nutation model IAU
-2000B.  @code{@var{jdut}} is the Julian Date (UT1).  @code{@var{jdtt}}
-is the Julian Date (TT) of the same instant. @code{@var{jdut}} is
-needed to predict the Earth rotation, and TT to predict the effects of
-precession.  If @code{@var{jdtt}} is set equal to @code{@var{jdut}}
-then errors of order 100 microarcseconds result.  Both parameters must
-have the same dimensions, and the result has those same dimensions,
-too.
+2000B.  @code{@var{jdut}} is the Julian Date (UT1).  The result has
+those same dimensions as @code{@var{jdut}}.
 
 See also: @ref{Astronomical Coordinate Calculations}
 

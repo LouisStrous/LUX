@@ -1908,7 +1908,9 @@ int standard_args(int narg, int ps[], char const *fmt, pointer **ptrs,
     int ref_param = pspec->ref_par;
     if (ref_param < 0)
       ref_param = (param_ix? param_ix - 1: 0);
-    if (num_in_out_params && ref_param != prev_ref_param) {
+    if (param_ix > 0            /* first parameter has no reference */
+        && (!ref_dims           /* no reference yet */
+            || ref_param != prev_ref_param)) { /* or different from before */
       /* get reference parameter's information */
       /* if the reference parameter is an output parameter, then
          we must get the information from its *final* value */
@@ -2069,13 +2071,7 @@ int standard_args(int narg, int ps[], char const *fmt, pointer **ptrs,
             tgt_dims_ix += e;
             src_dims_ix += e;
             ref_dims_ix += e;
-          } else {
-            returnSym = anaerror("Expected %d dimensions but found %d in "
-                                 "parameter specification",
-                                 param_ix < num_in_out_params? ps[param_ix]: 0,
-                                 num_ref_dims, ref_dims_ix);
-            goto error;
-          }
+          } /* else remaining dims need not be equal to reference */
         }
         if (param_ix == num_in_out_params)      /* a return parameter */
           iq = returnSym = array_scratch(pspec->data_type, tgt_dims_ix,

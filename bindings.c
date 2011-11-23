@@ -60,12 +60,12 @@ int ana_iLb3od3rl_f_(int narg, int ps[], int (*f)(int, double *, double *, doubl
   loopInfo *infos;
   int iq;
 
-  if ((iq = standard_args(narg, ps, "i>D3*;iL1;rD3*", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iL1;i>D3*;rD[-]*", &ptrs, &infos)) < 0)
     return ANA_ERROR;
-  size_t nelem = infos[0].nelem/3;
+  size_t nelem = infos[1].nelem/3;
   while (nelem--) {
-    f(*ptrs[1].l, ptrs[0].d, &ptrs[2].d[0], &ptrs[2].d[1], &ptrs[2].d[2]);
-    ptrs[0].d += 3;
+    f(*ptrs[0].l, ptrs[1].d, &ptrs[2].d[0], &ptrs[2].d[1], &ptrs[2].d[2]);
+    ptrs[1].d += 3;
     ptrs[2].d += 3;
   }
   return iq;

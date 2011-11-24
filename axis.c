@@ -1968,8 +1968,8 @@ int standard_args(int narg, int ps[], char const *fmt, pointer **ptrs,
             returnSym = anaerror("Requested copying dimension %d from the reference parameter which has only %d dimensions", ps[param_ix], src_dims_ix, num_ref_dims);
             goto error;
           }
-          tgt_dims[tgt_dims_ix++] = ref_dims[src_dims_ix++];
-          ref_dims_ix++;
+          tgt_dims[tgt_dims_ix++] = ref_dims[ref_dims_ix++];
+          src_dims_ix++;
           break;
         case DS_ADD:            /* assume PS_OUTPUT */
           d = dims_spec[pspec_dims_ix].size_add;
@@ -2073,6 +2073,9 @@ int standard_args(int narg, int ps[], char const *fmt, pointer **ptrs,
             ref_dims_ix += e;
           } /* else remaining dims need not be equal to reference */
         }
+        /* get rid of trailing dimensions equal to 1 */
+        while (tgt_dims_ix > 0 && tgt_dims[tgt_dims_ix - 1] == 1)
+          tgt_dims_ix--;
         if (param_ix == num_in_out_params)      /* a return parameter */
           iq = returnSym = array_scratch(pspec->data_type, tgt_dims_ix,
                                          tgt_dims);

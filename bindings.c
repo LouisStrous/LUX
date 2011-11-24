@@ -598,13 +598,35 @@ int ana_id0ddoc33_f_(int narg, int ps[], void (*f)(double, double, double, doubl
   return iq;
 }
 /*-----------------------------------------------------------------------*/
+int ana_id0odddc33c33c33c33c33_s_(int narg, int ps[], void (*f)(double, double, double *, double *, double *, double (*)[3], double (*)[3], double (*)[3], double (*)[3], double (*)[3]))
+{
+  pointer *ptrs;
+  loopInfo *infos;
+  int iq;
+
+  if ((iq = standard_args(narg, ps, "i>D*;oD*;oD*;oD*;oD+3,+3*;oD+3,+3*;oD+3,+3*;oD+3,+3*;oD+3,+3*", &ptrs, &infos)) < 0)
+    return ANA_ERROR;
+  while (infos[0].nelem--) {
+    f(*ptrs[0].d++, 0.0, ptrs[1].d++, ptrs[2].d++, ptrs[3].d++,
+      (double (*)[3]) ptrs[4].d, (double (*)[3]) ptrs[5].d,
+      (double (*)[3]) ptrs[6].d, (double (*)[3]) ptrs[7].d,
+      (double (*)[3]) ptrs[8].d);
+    ptrs[4].d += 9;
+    ptrs[5].d += 9;
+    ptrs[6].d += 9;
+    ptrs[7].d += 9;
+    ptrs[8].d += 9;
+  }
+  return iq;
+}
+/*-----------------------------------------------------------------------*/
 int ana_id0ddodc33c33c33c33c33_s_(int narg, int ps[], void (*f)(double, double, double, double, double *, double (*)[3], double (*)[3], double (*)[3], double (*)[3], double (*)[3]))
 {
   pointer *ptrs;
   loopInfo *infos;
   int iq;
 
-  if ((iq = standard_args(narg, ps, "i>D*;oD*;oD*;oD*;oD+3,+3*;oD+3,+3*;oD+3,+3;oD+3,+3*;oD+3,+3*", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "i>D*;i>D*;i>D*;oD*;oD+3,+3*;oD+3,+3*;oD+3,+3*;oD+3,+3*;oD+3,+3*", &ptrs, &infos)) < 0)
     return ANA_ERROR;
   while (infos[0].nelem--) {
     f(*ptrs[0].d++, 0.0, *ptrs[1].d++, *ptrs[2].d++, ptrs[3].d++,

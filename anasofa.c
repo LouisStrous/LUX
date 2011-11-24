@@ -911,20 +911,20 @@ BIND(iauPn00, id0ddodc33c33c33c33c33, s, IAUPN00, 9, 9, NULL)
 /* IAUPN00A, <jd>, <dpsi>, <deps>, <epsa>, <rb>, <rp>, <rbp>, <rn>, <rbpn>
 
    Returns precession-nutation according to the IAU 200A model for the
-   specified Julian Date <jd> and nutation <dpsi>, <deps>.  The output
-   parameters are the mean obliquity <epsa>, the frame bias matrix
+   specified Julian Date <jd>.  The output parameters are the nutation
+   <dpsi>, <deps>, the mean obliquity <epsa>, the frame bias matrix
    <rb>, the precession matrix <rp>, the bias-precession matrix <rbp>,
    the nutation matrix <rn>, and the GCRS-to-true matrix <rbpn>. */
-BIND(iauPn00a, id0ddodc33c33c33c33c33, s, IAUPN00A, 9, 9, NULL)
+BIND(iauPn00a, id0odddc33c33c33c33c33, s, IAUPN00A, 9, 9, NULL)
 /*-----------------------------------------------------------------------*/
 /* IAUPN00B, <jd>, <dpsi>, <deps>, <epsa>, <rb>, <rp>, <rbp>, <rn>, <rbpn>
 
    Returns precession-nutation according to the IAU 200A model for the
-   specified Julian Date <jd> and nutation <dpsi>, <deps>.  The output
-   parameters are the mean obliquity <epsa>, the frame bias matrix
+   specified Julian Date <jd>.  The output parameters are nutation
+   <dpsi>, <deps>, the mean obliquity <epsa>, the frame bias matrix
    <rb>, the precession matrix <rp>, the bias-precession matrix <rbp>,
    the nutation matrix <rn>, and the GCRS-to-true matrix <rbpn>. */
-BIND(iauPn00b, id0ddodc33c33c33c33c33, s, IAUPN00B, 9, 9, NULL)
+BIND(iauPn00b, id0odddc33c33c33c33c33, s, IAUPN00B, 9, 9, NULL)
 /*-----------------------------------------------------------------------*/
 /* IAUPN06, <jd>, <dpsi>, <deps>, <epsa>, <rb>, <rp>, <rbp>, <rn>, <rbpn>
 
@@ -938,12 +938,12 @@ BIND(iauPn06, id0ddodc33c33c33c33c33, s, IAUPN06, 9, 9, NULL)
 /* IAUPN06A, <jd>, <dpsi>, <deps>, <epsa>, <rb>, <rp>, <rbp>, <rn>, <rbpn>
 
    Returns precession-nutation according to the IAU 2006/2000A models
-   for the specified Julian Date <jd> and nutation <dpsi>, <deps>.
-   The output parameters are the mean obliquity <epsa>, the frame bias
+   for the specified Julian Date <jd>.  The output parameters are the
+   nutation <dpsi>, <deps>, the mean obliquity <epsa>, the frame bias
    matrix <rb>, the precession matrix <rp>, the bias-precession matrix
    <rbp>, the nutation matrix <rn>, and the GCRS-to-true matrix
    <rbpn>. */
-BIND(iauPn06a, id0ddodc33c33c33c33c33, s, IAUPN06A, 9, 9, NULL)
+BIND(iauPn06a, id0odddc33c33c33c33c33, s, IAUPN06A, 9, 9, NULL)
 /*-----------------------------------------------------------------------*/
 /* IAUPNM00A(<jd>)
 

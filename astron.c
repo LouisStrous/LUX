@@ -55,6 +55,7 @@
 #include <stdlib.h>
 #include <float.h>
 #include <assert.h>
+#include <time.h>
 #include "action.h"
 #include "astron.h"
 #include "astrodat2.h"
@@ -92,6 +93,7 @@ static char rcsid[] __attribute__ ((unused)) =
 
 int	findint(int, int *, int);
 void	UTC_to_TAI(double *), TAI_to_UTC(double *);
+void	CJDLT_to_TAI(double *), TAI_to_CJDLT(double *);
 
 char *GregorianMonths[] = {
   "January", "February", "March", "April", "May", "June", "July",
@@ -882,7 +884,8 @@ int ana_calendar(int narg, int ps[])
       tocalendar = CAL_CJD;
   }
 
-  if (fromcalendar == tocalendar) /* no conversion */
+  if (fromcalendar == tocalendar
+      && fromtime == totime)    /* no conversion */
     return *ps;
 
   void (*CJDNtoCal)(int const *CJDN, int *date)
@@ -906,7 +909,7 @@ int ana_calendar(int narg, int ps[])
      is not equal to 1, then work with a DOUBLE copy of the input
      symbol. */
   if (inputtype == ANA_LONG) {
-    if (CaltoCJDN)
+    if (CaltoCJDN && fromtime == totime)
       internaltype = ANA_LONG;
     else {
       internaltype = ANA_DOUBLE;
@@ -924,7 +927,7 @@ int ana_calendar(int narg, int ps[])
      input symbol. */
   
   else if (inputtype == ANA_DOUBLE) {
-    if (CaltoCJD)
+    if (CaltoCJD || fromtime != totime)
       internaltype = ANA_DOUBLE;
     else {
       internaltype = ANA_LONG;
@@ -956,9 +959,9 @@ int ana_calendar(int narg, int ps[])
     outputtype = ANA_STRING_ARRAY;
     output_elem_per_date = 1;   /* all date components in a single text value */
   } else if (outputkind == CAL_LONG || internaltype == ANA_LONG)
-    outputtype = CaltoCJDN? ANA_LONG: ANA_DOUBLE;
+    outputtype = CJDNtoCal? ANA_LONG: ANA_DOUBLE;
   else if (outputkind == CAL_DOUBLE || internaltype == ANA_DOUBLE)
-    outputtype = CaltoCJD? ANA_DOUBLE: ANA_LONG;
+    outputtype = CJDtoCal? ANA_DOUBLE: ANA_LONG;
   else                          /* should not happen */
     outputtype == internaltype;
 
@@ -1080,6 +1083,36 @@ int ana_calendar(int narg, int ps[])
       break;
     default:
       return cerror(ILL_TYPE, ps[0]);
+    }
+
+    if (fromtime != totime) {
+      switch (fromtime) {
+      case CAL_UTC:
+        UTC_to_TAI(&timestamp.d);
+        break;
+      case CAL_TAI:
+        break;
+      case CAL_TT:
+        TT_to_TAI(&timestamp.d);
+        break;
+      case CAL_LT:
+        CJDLT_to_TAI(&timestamp.d);
+        break;
+      }
+
+      switch (totime) {
+      case CAL_UTC:
+        TAI_to_UTC(&timestamp.d);
+        break;
+      case CAL_TAI:
+        break;
+      case CAL_TT:
+        TAI_to_TT(&timestamp.d);
+        break;
+      case CAL_LT:
+        TAI_to_CJDLT(&timestamp.d);
+        break;
+      }
     }
 
     /* translate CJD or CJDN to output */
@@ -1916,8 +1949,8 @@ int ana_EasterDate(int narg, int ps[])
   return iq;
 }
 /*--------------------------------------------------------------------------*/
-double deltaT(double JD)
-/* returns the difference between TAI and UTC for a given JD(UTC), in seconds.
+double deltaT(double CJD)
+/* returns the difference between TAI and UTC for a given CJD(UTC), in seconds.
    For UTC between 1961-01-01 and 2007-01-01. LS 24sep98 25dec06 */
 {
   static double	JDs[] = {
@@ -1957,6 +1990,7 @@ double deltaT(double JD)
   double	T, dT;
   int	lo, hi, mid;
 
+  double JD = CJD - 0.5;
   if (JD < JDs[0]) {		/* before 1961-01-01 */
     /* do a rough estimate */
     /* The algorithm is based on observations between years -390 */
@@ -1988,18 +2022,87 @@ double deltaT(double JD)
   lo = (hi < mid)? hi: mid;	/* the last one from the table */
   return offsets[lo] + units[lo]*(JD - t0s[lo]);
 }
+/* TIME SCALES:
+
+     TAI      physically realized
+      │
+   (offset)   observed, nominally +32.184 seconds
+      │
+     TT       terrestrial time
+      │
+ (rate adjustment L_G) definition of TT
+      │
+     TCG      time scale for GCRS
+      │
+  (periodic terms)  iauDtdb is an implementation
+      │
+  (rate adjustment L_C) function of solar-system ephemeris
+      │
+     TCB      time scale for BCRS
+      │
+  (rate adjustment -L_B)
+      │
+     TDB      TCB scaled to track TT
+      │
+   (periodic terms) -iauDtdb is an implementation
+      │
+     TT       terrestrial time
+
+  time_t is not a uniform timescale, because it does not count leap
+  seconds.  time_t encodes the date as 86400 seconds times the number
+  of calendar days since its epoch, plus 1 second for each second
+  elapsed since the beginning of the calendar day. A leap second at
+  the end of a calendar day gets the same time_t value as the first
+  second of the following calendar day. */
 /*--------------------------------------------------------------------------*/
-void UTC_to_TAI(double *JD)
+void UTC_to_TAI(double *CJD)
 {
-  *JD += deltaT(*JD)/86400;
+  *CJD += deltaT(*CJD)/86400;
 }
 /*--------------------------------------------------------------------------*/
-void TAI_to_UTC(double *JD)
+void TAI_to_UTC(double *CJD)
 {
-  double	d1;
-  
-  d1 = *JD - deltaT(*JD)/86400;
-  *JD = *JD - deltaT(d1)/86400;
+  /* deltaT(*JD) = ∆T = TAI - UTC for *JD interpreted as UTC
+
+          UTC ∆T(UTC)      TAI
+     23:59:42      17 23:59:59
+     23:59:43      17 00:00:00
+     23:59:59      17 00:00:16 
+     23:59:60      17 00:00:17
+     00:00:00      18 00:00:18
+
+     UTC_est = TAI - ∆T(TAI)
+
+          TAI ∆T(TAI)  UTC_est ∆(UTC_est) TAI-∆(UTC_est)
+     23:59:59      17 23:59:42         17 23:59:42
+     00:00:00      18 23:59:42         17 23:59:43
+     00:00:16      18 23:59:58         17 23:59:59
+     00:00:17      18 23:59:59         17 00:00:00
+     00:00:18      18 00:00:00         18 00:00:00
+     
+     TAI - ∆T(UTC_est) = UTC except for the leap second, as long as ∆T >= 0.
+  */
+
+  double UTC_est = *CJD - deltaT(*CJD)/86400;
+  *CJD -= -deltaT(UTC_est)/86400;
+}
+/*--------------------------------------------------------------------------*/
+void CJDLT_to_TAI(double *CJD)
+{
+  time_t t_LT = (time_t) ((*CJD - 2440588)*86400);
+  struct tm *bt = localtime(&t_LT);
+  time_t t_UTC = t_LT - bt->tm_gmtoff;
+  *CJD = t_UTC/(double) 86400.0 + 2440588;
+  UTC_to_TAI(CJD);
+}
+/*--------------------------------------------------------------------------*/
+void TAI_to_CJDLT(double *CJD)
+{
+  TAI_to_UTC(CJD);
+  time_t t_UTC = (time_t) ((*CJD - (double) 2440588)*86400);
+  struct tm *bt = localtime(&t_UTC);
+  time_t t_LT = t_UTC + bt->tm_gmtoff;
+  *CJD = t_LT/(double) 86400.0 + 2440588;
 }
 /*--------------------------------------------------------------------------*/
 double JDE(double JD, int direction)

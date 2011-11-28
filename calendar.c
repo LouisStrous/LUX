@@ -1134,13 +1134,7 @@ void EgyptianStoCJDA(char * const *date, double *CJD)
 /*--------------------------------------------------------------------------*/
 double JDtoCJD(double JD)
 {
-  time_t t_JD, t_CJD;
-  struct tm *bt;
-
-  t_JD = (time_t) ((JD - (double) 2440587.5)*86400);
-  bt = gmtime(&t_JD);
-  t_CJD = t_JD + bt->tm_gmtoff;
-  return t_CJD/(double) 86400.0 + 2440588;
+  return JD + 0.5;
 }
 /*--------------------------------------------------------------------------*/
 void JDtoCJDA(double const *JD, double *CJD)
@@ -1150,13 +1144,7 @@ void JDtoCJDA(double const *JD, double *CJD)
 /*--------------------------------------------------------------------------*/
 double CJDtoJD(double CJD)
 {
-  time_t t_JD, t_CJD;
-  struct tm *bt;
-
-  t_CJD = (time_t) ((CJD - 2440588)*86400);
-  bt = localtime(&t_CJD);
-  t_JD = t_CJD - bt->tm_gmtoff;
-  return t_JD/(double) 86400.0 + 2440587.5;
+  return CJD - 0.5;
 }
 /*--------------------------------------------------------------------------*/
 void CJDtoJDA(double const *CJD, double *JD)

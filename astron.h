@@ -28,7 +28,8 @@ enum Calendar_outputtype {
 enum Calendar_timescale {
   CAL_UTC,                      /* 0 */
   CAL_TAI,                      /* 1 */
-  CAL_TT                        /* 2 */
+  CAL_TT,                       /* 2 */
+  CAL_LT,                       /* 3 */
 };
 
 #define CAL_ORDER_BASE	14

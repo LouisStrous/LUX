@@ -12896,24 +12896,24 @@ arguments.
 * HILBERT::                     Hilbert transform
 * HIST::                        Histogram
 * HISTR::                       Normalized histogram
-* IAUBI00::                     
-* IAUBP00::                     
-* IAUBP06::                     
-* IAUBPN2XY::                   
-* IAUC2I00A::                   
-* IAUC2I00B::                   
-* IAUC2I06A::                   
-* IAUC2IBPN::                   
-* IAUC2IXY::                    
-* IAUC2IXYS::                   
-* IAUC2S::                      
-* IAUC2T00A::                   
-* IAUC2T00B::                   
-* IAUC2T06A::                   
-* IAUC2TCIO::                   
-* IAUC2TEQX::                   
-* IAUC2TPE::                    
-* IAUC2TXY::                    
+* IAUBI00::                     Frame bias vector
+* IAUBP00::                     Frame bias and precession, IAU2000
+* IAUBP06::                     Frame bias and precession, IAU2006
+* IAUBPN2XY::                   CIO x,y from bias-precession-nutation matrix
+* IAUC2I00A::                   CIO matrix, IAU2000A
+* IAUC2I00B::                   CIO matrix, IAU2000B
+* IAUC2I06A::                   CIO matrix, IAU2000A/2006
+* IAUC2IBPN::                   CIO matrix from BPN
+* IAUC2IXY::                    CIO matrix from CIP x,y
+* IAUC2IXYS::                   CIO matrix from CIP x,y, CIO s
+* IAUC2S::                      Cartesian to spherical coordinates
+* IAUC2T00A::                   C2T matrix from CIP xp,yp, IAU 2000A
+* IAUC2T00B::                   C2T matrix from CIP xp,yp, IAU 2000B
+* IAUC2T06A::                   C2T matrix from CIP xp,yp, IAU 2000A/2006
+* IAUC2TCIO::                   C2T matrix from C2I, ERA, POM
+* IAUC2TEQX::                   C2T matrix from BPN, GST, POM
+* IAUC2TPE::                    C2T matrix from nutation and polar coordinates
+* IAUC2TXY::                    C2T from CIP x,y and polar xp,yp
 * IAUCAL2JD::                   
 * IAUDAT::                      
 * IAUDTDB::                     
@@ -19615,20 +19615,20 @@ dimension is 2 instead of 3.
 @comment  node-name,  next,  previous,  up
 @subsection IAUC2T00A
 
-@code{IAUC2T00A(@var{jdtt}, @var{jdut}, @var{x}, @var{y})}
+@code{IAUC2T00A(@var{jdtt}, @var{jdut}, @var{xp}, @var{yp})}
 
 [SOFA] Returns the celestial-to-terrestrial matrix, given TT Julian
 Date @code{@var{jdtt}}, UT1 Julian Date @code{@var{jdut}}, and polar
-coordinates @code{@var{x}}, @code{@var{y}}, using the IAU 2000A
+coordinates @code{@var{xp}}, @code{@var{yp}}, using the IAU 2000A
 nutation model.
 
 @code{@var{jdtt}} and @code{@var{jdut}} should express the same
 instants of time: the first one in the TT timescale, and the second
-one in the UT1 timescale.  @code{@var{x}, @var{y}} are the coordinates
-(in radians) of the Celestial Intermediate Pole with respect to the
-International Terrestrial Reference System measured along the
-meridians to 0 and 90 degrees west, respectively, for those same
-instants.  All four arguments must have the same dimensions.
+one in the UT1 timescale.  @code{@var{xp}, @var{yp}} are the
+coordinates (in radians) of the Celestial Intermediate Pole with
+respect to the International Terrestrial Reference System measured
+along the meridians to 0 and 90 degrees west, respectively, for those
+same instants.  All four arguments must have the same dimensions.
 
 The result gets the same dimensions as all of the parameters, with two
 dimensions equal to 3 prefixed.
@@ -19642,20 +19642,20 @@ See also: @ref{IAUC2T00B}, @ref{IAUC2T06A}, @ref{Astronomical Coordinate Calcula
 @comment  node-name,  next,  previous,  up
 @subsection IAUC2T00B
 
-@code{IAUC2T00B(@var{jdtt}, @var{jdut}, @var{x}, @var{y})}
+@code{IAUC2T00B(@var{jdtt}, @var{jdut}, @var{xp}, @var{yp})}
 
 [SOFA] Returns the celestial-to-terrestrial matrix, given TT Julian
 Date @code{@var{jdtt}}, UT1 Julian Date @code{@var{jdut}}, and polar
-coordinates @code{@var{x}}, @code{@var{y}}, using the IAU 2000B
+coordinates @code{@var{xp}}, @code{@var{yp}}, using the IAU 2000B
 nutation model.
 
 @code{@var{jdtt}} and @code{@var{jdut}} should express the same
 instants of time: the first one in the TT timescale, and the second
-one in the UT1 timescale.  @code{@var{x}, @var{y}} are the coordinates
-(in radians) of the Celestial Intermediate Pole with respect to the
-International Terrestrial Reference System measured along the
-meridians to 0 and 90 degrees west, respectively, for those same
-instants.  All four arguments must have the same dimensions.
+one in the UT1 timescale.  @code{@var{xp}, @var{yp}} are the
+coordinates (in radians) of the Celestial Intermediate Pole with
+respect to the International Terrestrial Reference System measured
+along the meridians to 0 and 90 degrees west, respectively, for those
+same instants.  All four arguments must have the same dimensions.
 
 The result gets the same dimensions as all of the parameters, with two
 dimensions equal to 3 prefixed.
@@ -19669,11 +19669,11 @@ See also: @ref{IAUC2T00A}, @ref{IAUC2T06A}, @ref{Astronomical Coordinate Calcula
 @comment  node-name,  next,  previous,  up
 @subsection IAUC2T06A
 
-@code{IAUC2T06A(@var{jdtt}, @var{jdut}, @var{x}, @var{y})}
+@code{IAUC2T06A(@var{jdtt}, @var{jdut}, @var{xp}, @var{yp})}
 
 [SOFA] Returns the celestial-to-terrestrial matrix, given TT Julian
 Date @code{@var{jdtt}}, UT1 Julian Date @code{@var{jdut}}, and polar
-coordinates @code{@var{x}}, @code{@var{y}}, using the IAU 2006
+coordinates @code{@var{xp}}, @code{@var{yp}}, using the IAU 2006
 precession model and IAU 2000A nutation model.
 
 @code{@var{jdtt}} and @code{@var{jdut}} should express the same
@@ -19748,10 +19748,14 @@ See also: @ref{Astronomical Coordinate Calculations}
 @code{IAUC2TXY(@var{jdtt}, @var{x}, @var{y}, @var{xp}, @var{yp})}
 
 [SOFA] Returns the celestial-to-terrestrial matrix given the TT Julian
-Date @code{@var{jd}}, the CIP coordinates @code{@var{x}, @var{y}}, and
-the polar coordinates @code{@var{xp}, @var{yp}}.  All of the arguments
-must have the same dimensions.  The result has those same dimensions,
-but with two dimensions equal to 3 prefixed.
+Date @code{@var{jd}}, the CIP coordinates @code{@var{x}, @var{y}} (the
+x,y components of the unit vector in the Geocentric Celestial
+Reference System), and the polar coordinates @code{@var{xp}, @var{yp}}
+(the coordinates in radians of the Celestial Intermediate Pole with
+respect to the International Terestrial Reference System, measured
+along the meridians to 0 and 90 degrees west, respectively).  All of
+the arguments must have the same dimensions.  The result has those
+same dimensions, but with two dimensions equal to 3 prefixed.
 
 See also: @ref{Astronomical Coordinate Calculations}
 

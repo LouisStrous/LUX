@@ -12914,21 +12914,21 @@ arguments.
 * IAUC2TEQX::                   C2T matrix from BPN, GST, POM
 * IAUC2TPE::                    C2T matrix from nutation and polar coordinates
 * IAUC2TXY::                    C2T from CIP x,y and polar xp,yp
-* IAUCAL2JD::                   
-* IAUDAT::                      
-* IAUDTDB::                     
-* IAUEE00::                     
-* IAUEE00A::                    
-* IAUEE00B::                    
-* IAUEE06A::                    
-* IAUEECT00::                   
-* IAUEFORM::                    
-* IAUEO06A::                    
-* IAUEORS::                     
-* IAUEPB::                      
-* IAUEPB2JD::                   
-* IAUEPJ::                      
-* IAUEPJ2JD::                   
+* IAUCAL2JD::                   Julian Day Numbers from Gregorian Calendar dates
+* IAUDAT::                      TAI minus UTC
+* IAUDTDB::                     TDB minus TT
+* IAUEE00::                     Equation of Equinoxes from nutation, IAU2000
+* IAUEE00A::                    Equation of Equinoxes, IAU2000
+* IAUEE00B::                    Equation of Equinoxes, IAU2000B
+* IAUEE06A::                    Equation of Equinoxes, IAU2000A/2006
+* IAUEECT00::                   Equation of Equinoxes complementary terms
+* IAUEFORM::                    Earth reference ellipsoid
+* IAUEO06A::                    Equation of Origins, IAU2000A/2006
+* IAUEORS::                     Equation of Origins from bias-precession-nutation and CIO s
+* IAUEPB::                      Julian Date to Besselian epoch
+* IAUEPB2JD::                   Besselian epoch to Julian Date
+* IAUEPJ::                      Julian Date to Julian epoch
+* IAUEPJ2JD::                   Julian epoch to Julian Date
 * IAUEPV00::                    
 * IAUEQEQ94::                   
 * IAUERA00::                    
@@ -19766,8 +19766,9 @@ See also: @ref{Astronomical Coordinate Calculations}
 
 @code{IAUCAL2JD(@var{date})}
 
-[SOFA] Returns the Chronological Julian Day Numbers corresponding to
-the specified Gregorian calendar dates @code{@var{date}}.
+[SOFA] Returns the Chronological Julian Day Numbers (if
+@code{@var{date}} is @code{LONG}) or Julian Day Numbers corresponding
+to the specified Gregorian calendar dates @code{@var{date}}.
 @code{@var{date}} must have 3 elements in its first dimension (for
 year, month, day).  The result has the same type as @code{@var{date}}
 but is not less than @code{LONG}, and has the same dimensions as

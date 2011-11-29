@@ -2076,10 +2076,17 @@ int standard_args(int narg, int ps[], char const *fmt, pointer **ptrs,
         /* get rid of trailing dimensions equal to 1 */
         while (tgt_dims_ix > 0 && tgt_dims[tgt_dims_ix - 1] == 1)
           tgt_dims_ix--;
-        if (param_ix == num_in_out_params)      /* a return parameter */
-          iq = returnSym = array_scratch(pspec->data_type, tgt_dims_ix,
-                                         tgt_dims);
-        else {
+        if (param_ix == num_in_out_params) {      /* a return parameter */
+          if (ref_param >= 0) {
+            iq = ps[ref_param];
+            type = symbol_type(iq);
+            if (pspec->data_type_limit == PS_LOWER_LIMIT
+                && type < pspec->data_type)
+              type = pspec->data_type;
+          } else
+            type = pspec->data_type;
+          iq = returnSym = array_scratch(type, tgt_dims_ix, tgt_dims);
+        } else {
           iq = ps[param_ix];
           type = symbol_type(iq);
           if (symbol_class(iq) == ANA_UNUSED

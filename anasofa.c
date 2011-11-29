@@ -185,43 +185,42 @@ int ana_iauCal2jd(int narg, int ps[])
 
   if ((iq = standard_args(narg, ps, "i>L3*;r>L-3*", &ptrs, &infos)) < 0)
     return ANA_ERROR;
-  src = ptrs[0];
-  tgt = ptrs[1];
-  srcinfo = infos[0];
-  tgtinfo = infos[1];
 
   /* iauCal2jd(int iy, int im, int id, double *djm0, double *djm) */
   switch (infos[0].type) {
   case ANA_LONG:
-    do {
-      if (iauCal2jd(src.l[0], src.l[1], src.l[2], &djm0, &djm))
-        *tgt.l = 0;
+    while (infos[1].nelem--) {
+      if (iauCal2jd(ptrs[0].l[0], ptrs[0].l[1], ptrs[0].l[2], &djm0, &djm))
+        *ptrs[1].l = 0;
       else
-        *tgt.l = 2400000.5 + djm;
-      src.l += 3;
-    } while (advanceLoop(&tgtinfo), advanceLoop(&srcinfo) < srcinfo.rndim);
+        *ptrs[1].l = (djm0 + 0.5) + djm;
+      ptrs[0].l += 3;
+      ptrs[1].l++;
+    }
     break;
   case ANA_FLOAT:
-    do {
-      int day = floor(src.f[2]);
-      double daypart = src.f[2] - day;
-      if (iauCal2jd((int) src.f[0], (int) src.f[1], day, &djm0, &djm))
-        *tgt.f = 0;
+    while (infos[1].nelem--) {
+      int day = floor(ptrs[0].f[2]);
+      double daypart = ptrs[0].f[2] - day;
+      if (iauCal2jd((int) ptrs[0].f[0], (int) ptrs[0].f[1], day, &djm0, &djm))
+        *ptrs[1].f = 0;
       else
-        *tgt.f = 2400000.5 + djm + daypart;
-      src.f += 3;
-    } while (advanceLoop(&tgtinfo), advanceLoop(&srcinfo) < srcinfo.rndim);
+        *ptrs[1].f = djm0 + djm + daypart;
+      ptrs[0].f += 3;
+      ptrs[1].f++;
+    }
     break;
   case ANA_DOUBLE:
-    do {
-      int day = floor(src.d[2]);
-      double daypart = src.d[2] - day;
-      if (iauCal2jd((int) src.d[0], (int) src.d[1], day, &djm0, &djm))
-        *tgt.d = 0;
+    while (infos[1].nelem--) {
+      int day = floor(ptrs[0].d[2]);
+      double daypart = ptrs[0].d[2] - day;
+      if (iauCal2jd((int) ptrs[0].d[0], (int) ptrs[0].d[1], day, &djm0, &djm))
+        *ptrs[1].d = 0;
       else
-        *tgt.d = 2400000.5 + djm + daypart;
-      src.d += 3;
-    } while (advanceLoop(&tgtinfo), advanceLoop(&srcinfo) < srcinfo.rndim);
+        *ptrs[1].d = 2400000.5 + djm + daypart;
+      ptrs[0].d += 3;
+      ptrs[1].d++;
+    }
     break;
   default:
     return cerror(ILL_TYPE, ps[0]);

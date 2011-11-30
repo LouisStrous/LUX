@@ -4453,7 +4453,7 @@ int ana_astropos(int narg, int ps[])
           printf("el = %.10g rad, ph = %.10g rad, mag = %.10\n",
                  pos2[0], pos2[1], pos2[2]);        
         }
-      } else if ((internalMode & S_XYZ) == 0 || latitude != S_PLANETOCENTRIC) {
+      } else {
 	XYZtoLBR(pos2, pos);	/* to polar coordinates */
 	memcpy(pos2, pos, (getAstronError? 9: 3)*sizeof(double));
         if (vocal) {

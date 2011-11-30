@@ -2071,17 +2071,20 @@ int standard_args(int narg, int ps[], char const *fmt, pointer **ptrs,
             tgt_dims_ix += e;
             src_dims_ix += e;
             ref_dims_ix += e;
-          } /* else remaining dims need not be equal to reference */
+          } else if (ref_dims_ix == 0) {
+            returnSym = anaerror("Return symbol has no elements", 0);
+            goto error;
+          }
         }
         /* get rid of trailing dimensions equal to 1 */
         while (tgt_dims_ix > 0 && tgt_dims[tgt_dims_ix - 1] == 1)
           tgt_dims_ix--;
         if (param_ix == num_in_out_params) {      /* a return parameter */
-          if (ref_param >= 0) {
+          if (ref_param >= 0
+              && pspec->data_type_limit == PS_LOWER_LIMIT) {
             iq = ps[ref_param];
             type = symbol_type(iq);
-            if (pspec->data_type_limit == PS_LOWER_LIMIT
-                && type < pspec->data_type)
+            if (type < pspec->data_type)
               type = pspec->data_type;
           } else
             type = pspec->data_type;

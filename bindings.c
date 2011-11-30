@@ -112,7 +112,7 @@ int ana_ib3b3ob3_f_(int narg, int ps[], void (*f)(double *, double *, double *))
   loopInfo *infos;
   int iq;
 
-  if ((iq = standard_args(narg, ps, "i>D3*;i>D[-];rD[-]", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "i>D3*;i>D[-];rD[-]*", &ptrs, &infos)) < 0)
     return ANA_ERROR;
   size_t nelem = infos[0].nelem/3;
   while (nelem--) {
@@ -501,7 +501,7 @@ int ana_id0Loc23rl_f_(int narg, int ps[], int (*f)(double, double, int, double (
   loopInfo *infos;
   int iq;
 
-  if ((iq = standard_args(narg, ps, "i>D*;iL1;rD+2,+3*", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "i>D*;iL1;rD+3,+2*", &ptrs, &infos)) < 0)
     return ANA_ERROR;
 
   while (infos[0].nelem--) {

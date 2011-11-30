@@ -12917,140 +12917,140 @@ arguments.
 * IAUCAL2JD::                   Julian Day Numbers from Gregorian Calendar dates
 * IAUDAT::                      TAI minus UTC
 * IAUDTDB::                     TDB minus TT
-* IAUEE00::                     Equation of Equinoxes from nutation, IAU2000
-* IAUEE00A::                    Equation of Equinoxes, IAU2000
-* IAUEE00B::                    Equation of Equinoxes, IAU2000B
-* IAUEE06A::                    Equation of Equinoxes, IAU2000A/2006
+* IAUEE00::                     Equation of Equinoxes from nutation, IAU 2000
+* IAUEE00A::                    Equation of Equinoxes, IAU 2000
+* IAUEE00B::                    Equation of Equinoxes, IAU 2000B
+* IAUEE06A::                    Equation of Equinoxes, IAU 2000A/2006
 * IAUEECT00::                   Equation of Equinoxes complementary terms
 * IAUEFORM::                    Earth reference ellipsoid
-* IAUEO06A::                    Equation of Origins, IAU2000A/2006
+* IAUEO06A::                    Equation of Origins, IAU 2000A/2006
 * IAUEORS::                     Equation of Origins from bias-precession-nutation and CIO s
 * IAUEPB::                      Julian Date to Besselian epoch
 * IAUEPB2JD::                   Besselian epoch to Julian Date
 * IAUEPJ::                      Julian Date to Julian epoch
 * IAUEPJ2JD::                   Julian epoch to Julian Date
-* IAUEPV00::                    
-* IAUEQEQ94::                   
-* IAUERA00::                    
-* IAUFAD03::                    
-* IAUFAE03::                    
-* IAUFAF03::                    
-* IAUFAJU03::                   
-* IAUFAL03::                    
-* IAUFALP03::                   
-* IAUFAMA03::                   
-* IAUFAME03::                   
-* IAUFANE03::                   
-* IAUFAOM03::                   
-* IAUFAPA03::                   
-* IAUFASA03::                   
-* IAUFAUR03::                   
-* IAUFAVE03::                   
-* IAUFK52H::                    
-* IAUFK5HIP::                   
-* IAUFK5HZ::                    
-* IAUFW2M::                     
-* IAUFW2XY::                    
-* IAUGC2GD::                    
-* IAUGC2GDE::                   
-* IAUGD2GC::                    
-* IAUGD2GCE::                   
-* IAUGMST00::                   
-* IAUGMST06::                   
-* IAUGMST82::                   
-* IAUGST00A::                   
-* IAUGST00B::                   
-* IAUGST06::                    
-* IAUGST06A::                   
-* IAUGST94::                    
-* IAUH2FK5::                    
-* IAUHFK5Z::                    
-* IAUIR::                       
-* IAUJD2CAL::                   
-* IAUNUM00A::                   
-* IAUNUM00B::                   
-* IAUNUM06A::                   
-* IAUNUMAT::                    
-* IAUNUT00A::                   
-* IAUNUT00B::                   
-* IAUNUT06A::                   
-* IAUNUT80::                    
-* IAUNUTM80::                   
-* IAUOBL06::                    
-* IAUOBL80::                    
-* IAUP06E::                     
-* IAUP2S::                      
-* IAUPAP::                      
-* IAUPAS::                      
-* IAUPB06::                     
-* IAUPDP::                      
-* IAUPFW06::                    
-* IAUPLAN94::                   
-* IAUPM::                       
-* IAUPMAT00::                   
-* IAUPMAT06::                   
-* IAUPMAT76::                   
-* IAUPN::                       
-* IAUPN00::                     
-* IAUPN00A::                    
-* IAUPN00B::                    
-* IAUPN06::                     
-* IAUPN06A::                    
-* IAUPNM00A::                   
-* IAUPNM00B::                   
-* IAUPNM06A::                   
-* IAUPNM80::                    
-* IAUPOM00::                    
-* IAUPR00::                     
-* IAUPREC76::                   
-* IAUPV2S::                     
-* IAUPVDPV::                    
-* IAUPVM::                      
-* IAUPVSTAR::                   
-* IAUPVXPV::                    
-* IAUPXP::                      
-* IAURM2V::                     
-* IAURV2M::                     
-* IAURX::                       
-* IAURXPV::                     
-* IAURY::                       
-* IAURZ::                       
-* IAUS00::                      
-* IAUS00A::                     
-* IAUS00B::                     
-* IAUS06::                      
-* IAUS06A::                     
-* IAUS2C::                      
-* IAUS2P::                      
-* IAUS2PV::                     
-* IAUSEPP::                     
-* IAUSEPS::                     
-* IAUSP00::                     
-* IAUSTARPM::                   
-* IAUSTARPV::                   
-* IAUTAITT::                    
-* IAUTAIUT1::                   
-* IAUTAIUTC::                   
-* IAUTCBTDB::                   
-* IAUTCGTT::                    
-* IAUTDBTCB::                   
-* IAUTDBTT::                    
-* IAUTR::                       
-* IAUTRXP::                     
-* IAUTRXPV::                    
-* IAUTTTAI::                    
-* IAUTTTCG::                    
-* IAUTTTDB::                    
-* IAUTTUT1::                    
-* IAUUT1TAI::                   
-* IAUUT1TT::                    
-* IAUUT1UTC::                   
-* IAUUTCTAI::                   
-* IAUUTCUT1::                   
-* IAUXY06::                     
-* IAUXYS00A::                   
-* IAUXYS00B::                   
-* IAUXYS06A::                   
+* IAUEPV00::                    Earth position and velocity
+* IAUEQEQ94::                   Equation of Equinoxes, IAU 1994
+* IAUERA00::                    ERA, IAU 2000
+* IAUFAD03::                    Mean elongation of Moon
+* IAUFAE03::                    Mean longitude of Earth
+* IAUFAF03::                    Mean longitude of Moon from ascending node
+* IAUFAJU03::                   Mean longitude of Jupiter
+* IAUFAL03::                    Mean anomaly of Moon
+* IAUFALP03::                   Mean anomaly of Sun
+* IAUFAMA03::                   Mean longitude of Mars
+* IAUFAME03::                   Mean longitude of Mercury
+* IAUFANE03::                   Mean longitude of Neptune
+* IAUFAOM03::                   Mean longitude of Moon's ascending node
+* IAUFAPA03::                   General accumulated precession in longitude
+* IAUFASA03::                   Mean longitude of Saturn
+* IAUFAUR03::                   Mean longitude of Uranus
+* IAUFAVE03::                   Mean longitude of Venus
+* IAUFK52H::                    FK5 J2000.0 star positions to Hipparcos
+* IAUFK5HIP::                   FK5 J2000.0 rotation and spin to Hipparcos
+* IAUFK5HZ::                    FK5 J2000.0 star positions to Hipparcos (zero proper motion)
+* IAUFW2M::                     Fukushima-Williams angles to rotation matrix
+* IAUFW2XY::                    CIP x,y from Fukushima-Williams angles
+* IAUGC2GD::                    Geodetic from geocentric coordinates
+* IAUGC2GDE::                   Geodetic from geocentric coordinates and ellipsoid
+* IAUGD2GC::                    Geocentric from geodetic coordinates
+* IAUGD2GCE::                   Geocentric from geodetic coordinates and ellipsoid
+* IAUGMST00::                   Greenwich mean sidereal time, IAU 2000
+* IAUGMST06::                   Greenwich mean sidereal time, IAU 2006
+* IAUGMST82::                   Greenwich mean sidereal time, IAU 1982
+* IAUGST00A::                   Greenwich apparent sidereal time, IAU 2000
+* IAUGST00B::                   Greenwich apparent sidereal time, IAU 2000B
+* IAUGST06::                    Greenwich apparent sidereal time, IAU 2006
+* IAUGST06A::                   Greenwich apparent sidereal time, IAU 2000/2006
+* IAUGST94::                    Greenwich apparent sidereal time, IAU 1982/1994
+* IAUH2FK5::                    Hipparcos to FK5 J2000.0 star positions
+* IAUHFK5Z::                    Hipparcos to FK5 J2000.0 star positions (zero proper motion)
+* IAUIR::                       Identity 3-by-3 matrix
+* IAUJD2CAL::                   Gregorian dates from Julian Day Numbers
+* IAUNUM00A::                   Nutation matrix, IAU 2000A
+* IAUNUM00B::                   Nutation matrix, IAU 2000B
+* IAUNUM06A::                   Nutation matrix, IAU 2000A/2006
+* IAUNUMAT::                    Nutation matrix from nutation components
+* IAUNUT00A::                   Nutation components, IAU 2000A
+* IAUNUT00B::                   Nutation components, IAU 2000B
+* IAUNUT06A::                   Nutation components, IAU 2000A/2006
+* IAUNUT80::                    Nutation components, IAU 1980
+* IAUNUTM80::                   Nutation matrix, IAU 1980
+* IAUOBL06::                    Mean obliquity of ecliptic, IAU 2006
+* IAUOBL80::                    Mean obliquity of ecliptic, IAU 1980
+* IAUP06E::                     Precession angles, IAU 2006
+* IAUP2S::                      Spherical from cartesian coordinates
+* IAUPAP::                      Position angle from cartesian coordinates
+* IAUPAS::                      Position angle from angular coordinates
+* IAUPB06::                     Precession Euler angles, IAU 2006
+* IAUPDP::                      Inner product of 3-vectors
+* IAUPFW06::                    Fukushima-Williams precession angles, IAU 2006
+* IAUPLAN94::                   Heliocentric planet position and velocity
+* IAUPM::                       Modulus of 3-vectors
+* IAUPMAT00::                   Precession matrix, IAU 2000
+* IAUPMAT06::                   Precession matrix, IAU 2006
+* IAUPMAT76::                   Precession matrix, IAU 1976
+* IAUPN::                       Modulus and unit vector from 3-vector
+* IAUPN00::                     Precession-nutation matrix from nutation components, IAU 2000
+* IAUPN00A::                    Precession-nutation matrix, IAU 2000A
+* IAUPN00B::                    Precession-nutation matrix from nutation components, IAU 2000B
+* IAUPN06::                     Precession-nutation matrix from nutation components, IAU 2006
+* IAUPN06A::                    Precession-nutation matrix, IAU 2000A/2006
+* IAUPNM00A::                   Precession-nutation matrix, IAU 2000A
+* IAUPNM00B::                   Precession-nutation matrix, IAU 2000B
+* IAUPNM06A::                   Precession-nutation matrix, IAU 2000A/2006
+* IAUPNM80::                    Precession-nutation matrix, IAU 1976/1980
+* IAUPOM00::                    Polar motion matrix, IAU 2000
+* IAUPR00::                     Precession rate, IAU 2000
+* IAUPREC76::                   Precession Euler angles, IAU 1976
+* IAUPV2S::                     Spherical from cartesian position/velocity coordinates
+* IAUPVDPV::                    Inner product of position/velocity vectors
+* IAUPVM::                      Modulus of position/velocity vectors
+* IAUPVSTAR::                   Catalog coordinates from position/velocity vectors
+* IAUPVXPV::                    Outer product of two position/velocity vectors
+* IAUPXP::                      Outer product of two 3-vectors
+* IAURM2V::                     Rotation vector from rotation matrix
+* IAURV2M::                     Rotation matrix from rotation vector
+* IAURX::                       Rotates 3-by-3 matrix about x axis
+* IAURXPV::                     Product of 3-by-3 matrix and position/velocity vector
+* IAURY::                       Rotates 3-by-3 matrix about y axis
+* IAURZ::                       Rotates 3-by-3 matrix about z axis
+* IAUS00::                      CIO locator from CIP x,y, IAU 2000A
+* IAUS00A::                     CIO locator, IAU 2000A
+* IAUS00B::                     CIO locator, IAU 2000B
+* IAUS06::                      CIO locator from CIP x,y, IAU 2000A/2006
+* IAUS06A::                     CIO locator, IAU 2000A/2006
+* IAUS2C::                      Cartesian unit from spherical coordinates
+* IAUS2P::                      Cartesian from spherical coordinates
+* IAUS2PV::                     Cartesian position/velocity from spherical coordinates
+* IAUSEPP::                     Angular separation from cartesian coordinates
+* IAUSEPS::                     Angular separation from spherical coordinates
+* IAUSP00::                     TIO locator
+* IAUSTARPM::                   Update star catalog data for space motion
+* IAUSTARPV::                   Convert star catalog data to position/velocity vector
+* IAUTAITT::                    TAI to TT
+* IAUTAIUT1::                   TAI to UT1
+* IAUTAIUTC::                   TAI to UTC
+* IAUTCBTDB::                   TCB to TDB
+* IAUTCGTT::                    TCG to TT
+* IAUTDBTCB::                   TDB to TCB
+* IAUTDBTT::                    TDB to TT
+* IAUTR::                       Transpose a 3-by-3 matrix
+* IAUTRXP::                     Product of 3-vector and transposed 3-by-3 matrix
+* IAUTRXPV::                    Product of position/velocity vector and transposed 3-by-3 matrix
+* IAUTTTAI::                    TT to TAI
+* IAUTTTCG::                    TT to TCG
+* IAUTTTDB::                    TT to TDB
+* IAUTTUT1::                    TT to UT1
+* IAUUT1TAI::                   UT1 to TAI
+* IAUUT1TT::                    UT1 to TT
+* IAUUT1UTC::                   UT1 to UTC
+* IAUUTCTAI::                   UTC to TAI
+* IAUUTCUT1::                   UTC to UT1
+* IAUXY06::                     CIP x,y, IAU 2000A/2006
+* IAUXYS00A::                   CIP x,y, IAU 2000A
+* IAUXYS00B::                   CIP x,y, IAU 2000B
+* IAUXYS06A::                   CIP x,y and CIO locator, IAU 2000A/2006
 * IBETA::                       Incomplete beta function
 * IDLREAD::                     Read one variable from an IDL Save file
 * IDLRESTORE::                  Read all variables from an IDL Save file
@@ -20015,6 +20015,8 @@ dimensions as @code{@var{bepoch}}.
 @code{@var{jd}}.  The result has the same dimensions as
 @code{@var{jd}}.
 
+Opposite: @ref{IAUEPJ2JD}
+
 @c -------------------------------------
 @node IAUEPJ2JD, IAUEPV00, IAUEPJ, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -20025,6 +20027,8 @@ dimensions as @code{@var{bepoch}}.
 [SOFA] Returns the Julian Date corresponding to Julian epoch
 @code{@var{jepoch}} (e.g., 1957.3).  The result has the same
 dimensions as @code{@var{jepoch}}
+
+Opposite: @ref{IAUEPJ}
 
 @c -------------------------------------
 @node IAUEPV00, IAUEQEQ94, IAUEPJ2JD, Internal Routines
@@ -21000,7 +21004,7 @@ with JPL ephemeris DE102 says that during the years 1800 - 2050 the
 maximum errors in longitude L (arcsec), in the numerical order of the
 planets given above: 4, 5, 6, 17, 71, 81, 86, 11.  The maximum errors
 in latitude B (arcsec) are: 1, 1, 1, 1, 5, 13, 7, 1.  The maximum
-errors in radian distance R (Mm) are: 0.3, 0.8, 1, 7.7, 76, 267, 712,
+errors in radial distance R (Mm) are: 0.3, 0.8, 1, 7.7, 76, 267, 712,
 253.
 
 During the years 1000 - 3000 the accuracy is no worse than 1.5 times

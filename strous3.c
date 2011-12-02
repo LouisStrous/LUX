@@ -9,10 +9,9 @@
 #include <string.h>
 #include <float.h>
 #include <math.h>
+#include <errno.h>              /* for errno */
 #include "Bytestack.h"
 #include "action.h"
-static char rcsid[] __attribute__ ((unused)) =
- "$Id: strous3.c,v 4.0 2001/02/07 20:37:04 strous Exp $";
 
 int	to_scratch_array(int, int, int, int []);
 /*---------------------------------------------------------------------*/
@@ -2373,3 +2372,56 @@ int ana_hamming(int narg, int ps[]) {
   }
   return result;
 }
+/*--------------------------------------------------------------------*/
+int compare_doubles(const void *a, const void *b)
+{
+  const double *da = (const double *) a;
+  const double *db = (const double *) b;
+  return (*da > *db) - (*da < *db);
+}
+int ana_runord_d(double *data, int n, int width, int ord, double *result)
+{
+  int i;
+  
+  if (n < 1 || width < 1) {
+    errno = EDOM;
+    return -1;
+  }
+  double *temp = malloc(width*sizeof(double));
+  if (!temp) {
+    errno = ENOMEM;
+    return -1;
+  }
+  if (width > n)
+    width = n;
+  if (ord < 0)
+    ord = 0;
+  if (ord > width - 1)
+    ord = width - 1;
+  int o = width/2;
+  for (i = 0; i < n - width; i++) {
+    memcpy(temp, data + i, width*sizeof(double));
+    qsort(temp, width, sizeof(double), compare_doubles);
+    result[o + i] = temp[ord];
+  }
+  for ( ; i < n - o; i++)
+    result[i] = result[i - 1];
+  for (i = 0; i < o; i++)
+    result[i] = result[o];
+  free(temp);
+  return 0;
+}
+BIND(ana_runord_d, ibLLLobrl, f, RUNORD, 3, 3, NULL);
+/*--------------------------------------------------------------------*/
+int ana_runmax_d(double *data, int n, int width, double *result)
+{
+  return ana_runord_d(data, n, width, width - 1, result);
+}
+BIND(ana_runmax_d, ibLLobrl, f, RUNMAX, 2, 2, NULL);
+/*--------------------------------------------------------------------*/
+int ana_runmin_d(double *data, int n, int width, double *result)
+{
+  return ana_runord_d(data, n, width, 0, result);
+}
+BIND(ana_runmin_d, ibLLobrl, f, RUNMIN, 2, 2, NULL);
+/*--------------------------------------------------------------------*/

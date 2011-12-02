@@ -208,6 +208,40 @@ int ana_ib3odb3_s_(int narg, int ps[], void (*f)(double *, double *, double *))
   return iq;
 }
 /*-----------------------------------------------------------------------*/
+int ana_ibLLobrl_f_(int narg, int ps[], int (*f)(double *, int, int, double *))
+{
+  pointer *ptrs;
+  loopInfo *infos;
+  int iq;
+
+  if ((iq = standard_args(narg, ps, "i>D*;iL;rD*", &ptrs, &infos)) < 0)
+    return ANA_ERROR;
+  size_t nrepeat = infos[0].nelem/infos[0].rdims[0];
+  while (nrepeat--) {
+    f(ptrs[0].d, infos[0].rdims[0], *ptrs[1].l, ptrs[2].d);
+    ptrs[0].d += infos[0].rdims[0];
+    ptrs[2].d += infos[0].rdims[0];
+  }
+  return iq;  
+}
+/*-----------------------------------------------------------------------*/
+int ana_ibLLLobrl_f_(int narg, int ps[], int (*f)(double *, int, int, int, double *))
+{
+  pointer *ptrs;
+  loopInfo *infos;
+  int iq;
+
+  if ((iq = standard_args(narg, ps, "i>D*;iL;iL;rD*", &ptrs, &infos)) < 0)
+    return ANA_ERROR;
+  size_t nrepeat = infos[0].nelem/infos[0].rdims[0];
+  while (nrepeat--) {
+    f(ptrs[0].d, infos[0].rdims[0], *ptrs[1].l, *ptrs[2].l, ptrs[3].d);
+    ptrs[0].d += infos[0].rdims[0];
+    ptrs[3].d += infos[0].rdims[0];
+  }
+  return iq;  
+}
+/*-----------------------------------------------------------------------*/
 int ana_ic23c23ob2_f_(int narg, int ps[], void (*f)(double [2][3], double [2][3], double [2]))
 {
   pointer *ptrs;

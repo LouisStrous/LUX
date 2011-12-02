@@ -57,6 +57,8 @@ int ana_ib3rb2_f_(int narg, int ps[], void (*f)(double *, double *, double *));
 int ana_ib3oc33_f_(int narg, int ps[], void (*f)(double [3], double [3][3]));
 int ana_ib3od3_f_(int narg, int ps[], void (*f)(double *, double *, double *, double *));
 int ana_ib3odb3_s_(int narg, int ps[], void (*f)(double *, double *, double *));
+int ana_ibLLobrl_f_(int narg, int ps[], int (*f)(double *, int, int, double *));
+int ana_ibLLLobrl_f_(int narg, int ps[], int (*f)(double *, int, int, int, double *));
 int ana_ic23c23ob2_f_(int narg, int ps[], void (*f)(double [2][3], double [2][3], double [2]));
 int ana_ic23c23oc23_f_(int narg, int ps[], void (*f)(double [2][3], double [2][3], double [2][3]));
 int ana_ic23odd_s_(int narg, int ps[], void (*f)(double [2][3], double *, double *));

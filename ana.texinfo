@@ -13194,6 +13194,9 @@ arguments.
 * ROLL::                        Rearrange dimensions
 * ROOT3::                       Solve a cubic equation
 * RUNCUM::                      Running sum over a fixed width
+* RUNMAX::                      
+* RUNMIN::                      
+* RUNORD::                      
 * RUNPROD::                     Running product from the beginning
 * RUNSUM::                      Running sum from the beginning
 * S::                           Show information about variables
@@ -25366,12 +25369,12 @@ equivalent to @code{ROLL(x,[1,2,0])} and @code{x(>2,>0,>1)}.
 
 [3.2.432]
 @c -------------------------------------
-@node ROOT3, RUNCUM, ROLL, Internal Routines
+@node ROOT3, RUNMAX, ROLL, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection ROOT3
 
 @c -------------------------------------
-@node RUNCUM, RUNPROD, ROOT3, Internal Routines
+@node RUNCUM, RUNMAX, ROOT3, Internal Routines
 @subsection RUNCUM
 
 @code{RUNCUM(@var{x}, [[, @var{axes}], @var{width}] [, /PARTIAL_WIDTH])}
@@ -25393,7 +25396,55 @@ See also: @ref{RUNSUM}, @ref{SMOOTH}
 
 [2.13.272]
 @c -------------------------------------
-@node RUNPROD, RUNSUM, RUNCUM, Internal Routines
+@node RUNMAX, RUNMIN, RUNCUM, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection RUNMAX
+
+@code{RUNMAX(@var{x}, @var{width})}
+
+Returns the running maximum of the first dimension of @code{@var{x}},
+for the specified @code{@var{width}}.  The result has the same
+dimensions as @code{@var{x}}.  Each element of the result is equal to
+the maximum of the @code{@var{width}} values nearest that element in
+the first dimension.
+
+See also: @ref{RUNMIN}
+
+@c -------------------------------------
+@node RUNMIN, RUNORD, RUNMAX, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection RUNMIN
+
+@code{RUNMIN(@var{x}, @var{width})}
+
+Returns the running minimum of the first dimension of @code{@var{x}},
+for the specified @code{@var{width}}.  The result has the same
+dimensions as @code{@var{x}}.  Each element of the result is equal to
+the minimum of the @code{@var{width}} values nearest that element in
+the first dimension.
+
+See also: @ref{RUNMIN}
+
+@c -------------------------------------
+@node RUNORD, RUNPROD, RUNMIN, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection RUNORD
+
+@code{RUNORD(@var{x}, @var{width}, @var{ord})}
+
+Returns a running ordinal of the first dimension of @code{@var{x}},
+for the specified @code{@var{width}} and ordinal number
+@code{@var{ord}}.  Ordinal number 0 corresponds to the minimum,
+@code{@var{width} - 1} corresponds to the maximum, and
+@code{@var{widt}/2} corresponds to the median.  The result has the
+same dimensions as @code{@var{x}}.  Each element of the result is
+equal to the maximum of the @code{@var{width}} values nearest that
+element in the first dimension.
+
+See also: @ref{RUNMIN}
+
+@c -------------------------------------
+@node RUNPROD, RUNSUM, RUNORD, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection RUNPROD
 

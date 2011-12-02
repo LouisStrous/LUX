@@ -14008,10 +14008,10 @@ See also: @ref{ASTRON}, @ref{PRECESS}
 @subsection ASTRON
 
 @code{ASTRON(@var{jds}, @var{objects} [, @var{object0},
-OBSERVER=@var{observer}, EQUINOX=@var{equinox}, ELEMENTS=@var{elements}]
-[, /XYZ, /EQUATORIAL, /ECLIPTICAL, /HORIZONTAL, /ELONGATION, /DATE,
-/TDT, /GEOMETRIC, /ABBERATION, /ERROR, /QELEMENTS, /FK5, /TRUNCVSOP,
-/CONJSPREAD, /KEEPDIMS])}
+OBSERVER=@var{observer}, EQUINOX=@var{equinox},
+ELEMENTS=@var{elements}] [, /XYZ, /EQUATORIAL, /ECLIPTICAL,
+/HORIZONTAL, /ELONGATION, /DATE, /TDT, /GEOMETRIC, /ABBERATION,
+/QELEMENTS, /FK5, /TRUNCVSOP, /CONJSPREAD, /KEEPDIMS])}
 
 Returns the positions of a set of heavenly bodies at a specific set of
 times.  Unless the user specifies otherwise, the times are taken to be
@@ -14096,17 +14096,6 @@ activates @code{/NOABBERATION}
 @item /ABBERATION
 selects inclusion of abberation effects.  If @code{/NOABBERATION} is
 specified, then these effects are not included.
-@item /ERROR
-selects calculation and return of standard errors on the results, where
-available and implemented.  Six instead of three numbers are returned
-for each object and time.  The second set of three are the standard
-errors on the first set of three.  Standard errors are only available
-for the main objects (Sun through Neptune).  It is assumed that there is
-no covariance between the heliocentric longitudes, latitudes, and radii
-as returned by the VSOP87 theory, and that there is no variance on any
-coordinate of any object other than the main ones.  If a standard error
-is equal to zero, then that means that no standard error is available
-for the combination of objects and parameters that was chosen.
 @item /QELEMENTS
 indicates that @code{@var{elements}} is specified in terms of the
 perihelion (i.e., comet-style) rather than the semimajor axis (i.e.,

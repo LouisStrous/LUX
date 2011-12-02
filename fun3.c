@@ -1717,9 +1717,7 @@ int ana_hilbert(int narg, int ps[])
     trgt = trgt0;
     src = src0;
     n = srcinfo.rdims[0];
-    mq = n*20 + 120;
-    if (!fftdp)
-      mq = mq/2;
+    mq = (2*n + 15)*(fftdp? sizeof(double): sizeof(float));
     work.l = (int *) realloc(work.l, mq);
     if (!work.l) {
       zap(result);
@@ -1803,7 +1801,7 @@ int ana_hilbert(int narg, int ps[])
 	      tmp.d[j + 1] = v.d;
 	    }
 	  else			/* shift phases over +90 degrees */
-	    for (j = 2; j < n; j += 2) {
+	    for (j = 2; j < n - 1; j += 2) {
 	      v.d = tmp.d[j];
 	      tmp.d[j] = tmp.d[j + 1];
 	      tmp.d[j + 1] = -v.d;

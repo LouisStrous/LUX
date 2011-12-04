@@ -1779,7 +1779,7 @@ int ana_hilbert(int narg, int ps[])
 	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
 	break;
       case ANA_DOUBLE:
-	factor.d = 0.5/n;
+	factor.d = 1.0/n;
 	do {
 	  /* put current data string in tmp.d */
 	  for (j = 0; j < n; j++) {

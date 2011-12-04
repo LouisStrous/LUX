@@ -2379,7 +2379,7 @@ int compare_doubles(const void *a, const void *b)
   const double *db = (const double *) b;
   return (*da > *db) - (*da < *db);
 }
-int ana_runord_d(double *data, int n, int width, int ord, double *result)
+int runord_d(double *data, int n, int width, int ord, double *result)
 {
   int i;
   
@@ -2411,17 +2411,17 @@ int ana_runord_d(double *data, int n, int width, int ord, double *result)
   free(temp);
   return 0;
 }
-BIND(ana_runord_d, ibLLLobrl, f, RUNORD, 3, 3, NULL);
+BIND(runord_d, ibLLLobrl, f, RUNORD, 3, 3, NULL);
 /*--------------------------------------------------------------------*/
-int ana_runmax_d(double *data, int n, int width, double *result)
+int runmax_d(double *data, int n, int width, double *result)
 {
-  return ana_runord_d(data, n, width, width - 1, result);
+  return runord_d(data, n, width, width - 1, result);
 }
-BIND(ana_runmax_d, ibLLobrl, f, RUNMAX, 2, 2, NULL);
+BIND(runmax_d, ibLLobrl, f, RUNMAX, 2, 2, NULL);
 /*--------------------------------------------------------------------*/
-int ana_runmin_d(double *data, int n, int width, double *result)
+int runmin_d(double *data, int n, int width, double *result)
 {
-  return ana_runord_d(data, n, width, 0, result);
+  return runord_d(data, n, width, 0, result);
 }
-BIND(ana_runmin_d, ibLLobrl, f, RUNMIN, 2, 2, NULL);
+BIND(runmin_d, ibLLobrl, f, RUNMIN, 2, 2, NULL);
 /*--------------------------------------------------------------------*/

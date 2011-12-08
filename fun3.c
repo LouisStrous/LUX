@@ -1753,21 +1753,21 @@ int ana_hilbert(int narg, int ps[])
 	  /* advance the phases */
 	  if (!(internalMode & 4))/* don't keep the average */
 	    tmp.f[0] = 0.0;	/* average */
+	  if (!(internalMode & 8)) {/* don't keep the highest frequency */
+	    tmp.f[n - 1] = 0.0;	/* highest frequency */
+          }
 	  if (direction < 0)	/* shift phases over -90 degrees */
-	    for (j = 1; j < n - 1; j += 2) {
-	      v.f = tmp.f[j];
-	      tmp.f[j] = -tmp.f[j + 1];
-	      tmp.f[j + 1] = v.f;
-	    }
-	  else			/* shift phases over +90 degrees */
 	    for (j = 1; j < n - 1; j += 2) {
 	      v.f = tmp.f[j];
 	      tmp.f[j] = tmp.f[j + 1];
 	      tmp.f[j + 1] = -v.f;
 	    }
-	  if (j == n - 1
-	      && !(internalMode & 8)) /* zero the highest frequency */
-	    tmp.f[n - 1] = 0.0;	/* highest frequency */
+	  else			/* shift phases over +90 degrees */
+	    for (j = 1; j < n - 1; j += 2) {
+	      v.f = tmp.f[j];
+	      tmp.f[j] = -tmp.f[j + 1];
+	      tmp.f[j + 1] = v.f;
+	    }
 	  /* apply backward FFT */
 	  rfftb(&n, tmp.f, work.f);
 	  /* put in result array */
@@ -1793,18 +1793,18 @@ int ana_hilbert(int narg, int ps[])
 	  if (!(internalMode & 4))/* don't keep the average */
 	    tmp.d[0] = 0.0;	/* average */
 	  if (!(internalMode & 8)) /* don't keep the highest frequency */
-	    tmp.d[1] = 0.0;	/* highest frequency */
+	    tmp.d[n - 1] = 0.0;	/* highest frequency */
 	  if (direction < 0)	/* shift phases over -90 degrees */
-	    for (j = 2; j < n; j += 2) {
-	      v.d = tmp.d[j];
-	      tmp.d[j] = -tmp.d[j + 1];
-	      tmp.d[j + 1] = v.d;
-	    }
-	  else			/* shift phases over +90 degrees */
-	    for (j = 2; j < n - 1; j += 2) {
+	    for (j = 1; j < n - 1; j += 2) {
 	      v.d = tmp.d[j];
 	      tmp.d[j] = tmp.d[j + 1];
 	      tmp.d[j + 1] = -v.d;
+	    }
+	  else			/* shift phases over +90 degrees */
+	    for (j = 1; j < n - 1; j += 2) {
+	      v.d = tmp.d[j];
+	      tmp.d[j] = -tmp.d[j + 1];
+	      tmp.d[j + 1] = v.d;
 	    }
 	  /* apply backward FFT */
 	  rfftbd(&n, tmp.d, work.d);

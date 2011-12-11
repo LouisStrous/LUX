@@ -106,13 +106,14 @@ int ana_iddob3_f_(int narg, int ps[], void (*f)(double, double, double [3]));
 int ana_iddrd_f_(int narg, int ps[], double (*f)(double, double));
 int ana_idrd_f_(int narg, int ps[], double (*f)(double));
 int ana_ilob2rl_f_(int narg, int ps[], int (*f)(int, double *, double *));
+int ana_ivddovrl_f_(int narg, int ps[], int (*f)(double *, int, int, double, double, double *, int, int));
 int ana_oC33_f_(int narg, int ps[], void (*f)(double (*)[3]));
 int ana_oC33B3_s_(int narg, int ps[], void (*f)(double (*)[3], double *));
 int ana_oddd_combine_f_(int narg, int ps[], void (*f)(double *, double *, double *));
 
-int register_ana_f(int (*f)(int, int []), char *name, int min_arg,
+void register_ana_f(int (*f)(int, int []), char *name, int min_arg,
                    int max_arg, char *spec);
-int register_ana_s(int (*f)(int, int []), char *name, int min_arg,
+void register_ana_s(int (*f)(int, int []), char *name, int min_arg,
                    int max_arg, char *spec);
 
 #define REGISTER(func, fs, name, minarg, maxarg, fsspec)        \

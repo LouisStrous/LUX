@@ -1254,6 +1254,28 @@ int ana_ilob2rl_f_(int narg, int ps[], int (*f)(int, double *, double *))
   return iq;
 }
 /*-----------------------------------------------------------------------*/
+int ana_ivddovrl_f_(int narg, int ps[], int (*f)(double *, int, int,
+                                                 double, double,
+                                                 double *, int, int))
+{
+  pointer *ptrs;
+  loopInfo *infos;
+  int iq;
+
+  if ((iq = standard_args(narg, ps, "i>D*;iL;i>D;i>D;rD*", &ptrs, &infos)) < 0)
+    return ANA_ERROR;
+  setAxes(&infos[0], infos[1].nelem, ptrs[1].l, SL_EACHROW);
+  setAxes(&infos[4], infos[1].nelem, ptrs[1].l, SL_EACHROW);
+  do {
+    f(ptrs[0].d, infos[0].rdims[0], infos[0].rsinglestep[0], 
+      *ptrs[2].d, *ptrs[3].d,
+      ptrs[4].d, infos[4].rdims[0], infos[4].rsinglestep[0]);
+    ptrs[0].d += infos[0].rsinglestep[1];
+    ptrs[4].d += infos[4].rsinglestep[1];
+  } while (advanceLoop(&infos[0]), advanceLoop(&infos[4]) < infos[4].rndim);
+  return iq;
+}
+/*-----------------------------------------------------------------------*/
 int ana_oC33_f_(int narg, int ps[], void (*f)(double (*)[3]))
 {
   pointer *ptrs;

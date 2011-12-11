@@ -2348,3 +2348,44 @@ int runmin_d(double *data, int n, int width, double *result)
 }
 BIND(runmin_d, ibLLobrl, f, RUNMIN, 2, 2, NULL);
 /*--------------------------------------------------------------------*/
+/*
+  d = x₁ - x₀
+  e = [(d - m)/P]
+  s₀ = ⌊x₀/P⌋
+  s₁ = s₀ + e
+  y₁ = x₁ - Ps₁
+
+  y₁ = x₁ - Ps₀ - Pe
+     = x₁ - P⌊x₀/P⌋ - P[(d - m)/P]
+     = d + x₀ - P⌊x₀/P⌋ - P[(d - m)/P]
+     = d + (x₀ mod P) - P[(d - m)/P]
+ */
+double unmod(double cur, double prev, double period, double average)
+{
+  if (!period)
+    return cur;
+  return cur + period*ceil((prev - cur + average)/period - 0.5);
+}
+/*--------------------------------------------------------------------*/
+int unmod_slice_d(double *srcptr, int srccount, int srcstride,
+                  double period, double average,
+                  double *tgtptr, int tgtcount, int tgtstride)
+{
+  int i;
+
+  if (!period || !srcptr || srccount < 1 || !tgtptr || tgtcount < 1
+      || tgtcount != srccount) {
+    errno = EDOM;
+    return 1;
+  }
+  *tgtptr = *srcptr;
+  tgtptr += tgtstride;
+  srcptr += srcstride;
+  for (i = 1; i < srccount; i++) {
+    *tgtptr = unmod(*srcptr, tgtptr[-tgtstride], period, average);
+    tgtptr += tgtstride;
+    srcptr += srcstride;
+  }
+  return 0;
+}
+BIND(unmod_slice_d, ivddovrl, f, UNMOD, 4, 4, NULL);

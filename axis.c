@@ -39,8 +39,8 @@
 static char rcsid[] __attribute__ ((unused)) =
 "$Id: axis.c,v 4.0 2001/02/07 20:36:57 strous Exp $";
 
-void setupDimensionLoop(loopInfo *info, int ndim, int dims[], 
-                        enum Symboltype type, int naxes, int axes[],
+void setupDimensionLoop(loopInfo *info, int ndim, int const *dims, 
+                        enum Symboltype type, int naxes, int const *axes,
                         pointer *data, int mode);
 void rearrangeDimensionLoop(loopInfo *info);
 int standardLoop(int data, int axisSym, int mode, int outType,
@@ -61,7 +61,7 @@ int standardLoop1(int source,
                   int *target, 
                   loopInfo *tgtinf, pointer *tgtptr);
 /*-------------------------------------------------------------------------*/
-int setAxisMode(loopInfo *info, int mode) {
+void setAxisMode(loopInfo *info, int mode) {
   if ((mode & SL_EACHBLOCK) == SL_EACHBLOCK)
     info->advanceaxis = info->naxes;
   else if (mode & SL_EACHROW)
@@ -115,8 +115,8 @@ int setAxes(loopInfo *info, int nAxes, int *axes, int mode)
   return 0;
 }
 /*-------------------------------------------------------------------------*/
-void setupDimensionLoop(loopInfo *info, int ndim, int dims[], 
-                        enum Symboltype type, int naxes, int axes[],
+void setupDimensionLoop(loopInfo *info, int ndim, int const *dims, 
+                        enum Symboltype type, int naxes, int const *axes,
                         pointer *data, int mode)
 /* fills the loopInfo structure <info> with information
  suitable for looping through a dimensional structure.
@@ -820,11 +820,11 @@ int standardLoop0(int data, int nAxes, int *axes, int mode, int outType,
 #undef DEBUG_VOCAL
 /*-----------------------------------------------------------------------*/
 int standardLoop1(int source,
-                  int nAxes, int * axes,
+                  int nAxes, int const * axes,
                   int srcMode,
                   loopInfo *srcinf, pointer *srcptr,
-                  int nMore, int * more,
-                  int nLess, int * less,
+                  int nMore, int const * more,
+                  int nLess, int const * less,
                   enum Symboltype tgtType, int tgtMode,
                   int *target, 
                   loopInfo *tgtinf, pointer *tgtptr)
@@ -1898,7 +1898,7 @@ int standard_args(int narg, int ps[], char const *fmt, pointer **ptrs,
   struct param_spec_list *psl;
   struct dims_spec *dims_spec;
   struct obstack o;
-  size_t param_ix, num_ref_dims;
+  int param_ix, num_ref_dims;
   loopInfo li;
   pointer p;
   enum Symboltype type;
@@ -1912,10 +1912,10 @@ int standard_args(int narg, int ps[], char const *fmt, pointer **ptrs,
       *infos = NULL;
     return anaerror("Illegal standard arguments specification %s", 0, fmt);
   }
-  size_t num_in_out_params = psl->num_param_specs
+  int num_in_out_params = psl->num_param_specs
     - (psl->return_param_index >= 0);
   /* determine mininum and maximum required number of arguments */
-  size_t nmin;
+  int nmin;
   for (nmin = num_in_out_params; nmin > 0; nmin--)
     if (!psl->param_specs[nmin - 1].is_optional)
       break;
@@ -1936,12 +1936,12 @@ int standard_args(int narg, int ps[], char const *fmt, pointer **ptrs,
   /* now we treat the parameters. */
   prev_ref_param = -1; /* < 0 indicates no reference parameter set yet */
   for (param_ix = 0; param_ix < psl->num_param_specs; param_ix++) {
-    size_t pspec_dims_ix; /* parameter dimension specification index */
-    size_t tgt_dims_ix;   /* target dimension index */
-    size_t ref_dims_ix;   /* reference dimension index */
-    size_t src_dims_ix;   /* input dimension index */
+    int pspec_dims_ix; /* parameter dimension specification index */
+    int tgt_dims_ix;   /* target dimension index */
+    int ref_dims_ix;   /* reference dimension index */
+    int src_dims_ix;   /* input dimension index */
     int *src_dims;        /* dimensions of input parameter */
-    size_t num_src_dims;      /* number of dimensions of input parameter */
+    int num_src_dims;      /* number of dimensions of input parameter */
     int iq, d;
 
     pspec = &psl->param_specs[param_ix];

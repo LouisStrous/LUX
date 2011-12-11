@@ -66,13 +66,13 @@ int	standardLoop(int, int, int, int, loopInfo *, pointer *, int *,
                 int, int const *, enum Symboltype, int, int *, loopInfo *,
                 pointer *),
   loopIsAtStart(loopInfo const *), 
-  standard_args(int, int [], char const *, pointer **, loopInfo **),
-  setAxisMode(loopInfo *, int mode);
+  standard_args(int, int [], char const *, pointer **, loopInfo **);
 
 void	subdataLoop(int *, loopInfo *), addVerify(char *, char),
   *seekFacts(int symbol, int type, int flag),
   *setFacts(int symbol, int type, int flag),
-  deleteFacts(int symbol, int type), returnLoop(loopInfo *, int);
+  deleteFacts(int symbol, int type), returnLoop(loopInfo *, int),
+  setAxisMode(loopInfo *, int mode);
 
 void	newStack(int), push(int), deleteStack(void);
 int	pop(void);
@@ -97,8 +97,8 @@ void	clearToPopTempVariable(int), pushTempVariable(int), printw(char *),
 
 const csplineInfo empty_cubic_spline(void);
 
-void setupDimensionLoop(loopInfo *info, int ndim, int dims[], 
-                        enum Symboltype type, int naxes, int axes[],
+void setupDimensionLoop(loopInfo *info, int ndim, int const *dims, 
+                        enum Symboltype type, int naxes, int const *axes,
                         pointer *data, int mode),
   rearrangeDimensionLoop(loopInfo *), endian(void *, int, int),
   rearrangeEdgeLoop(loopInfo *, loopInfo *, int);

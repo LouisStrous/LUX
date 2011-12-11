@@ -13316,6 +13316,7 @@ arguments.
 * TYPENAME::                    Name of a data type
 * ULIB::                        User library
 * UNLOAD::                      Unload a tape
+* UNMOD::                       
 * UPCASE::                      Convert a string to upper case
 * UPPER::                       Convert a string to upper case
 * VARIANCE::                    Variance
@@ -25358,7 +25359,7 @@ equivalent to @code{ROLL(x,[1,2,0])} and @code{x(>2,>0,>1)}.
 
 [3.2.432]
 @c -------------------------------------
-@node ROOT3, RUNMAX, ROLL, Internal Routines
+@node ROOT3, RUNCUM, ROLL, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection ROOT3
 
@@ -27810,7 +27811,7 @@ function is also performed by environment variable @code{ANA_PATH}.
 See also: @ref{Environment}
 
 @c -------------------------------------
-@node UNLOAD, UPCASE, ULIB, Internal Routines
+@node UNLOAD, UNMOD, ULIB, Internal Routines
 @subsection UNLOAD
 
 @code{UNLOAD, @var{lun}}
@@ -27818,7 +27819,31 @@ See also: @ref{Environment}
 @code{[@ref{tape}]} Unloads the tape in tape drive @code{@var{lun}}.
 
 @c -------------------------------------
-@node UPCASE, UPPER, UNLOAD, Internal Routines
+@node UNMOD, UPCASE, UNLOAD, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection UNMOD
+
+@code{UNMOD(@var{x} [, @var{axis}] , @var{period} [, @var{average}])}
+
+Undoes the effects of the ``modulus'' function along the indicated
+@code{@var{axis}}, assuming that the average increase from one element
+to the next is @code{@var{average}}, and the modulus period is
+@code{@var{period}}.  For those elements that have coordinate 0 along
+the indicated axis, the result has the same value as @code{@var{x}}.
+
+If @code{@var{y}} is the result, then @code{@var{y} mod @var{period}
+eq @var{x} mod @var{period}}, and @code{differ(@var{y}, @var{axis}) ge
+@var{average} - 0.5*@var{period}} and @code{differ(@var{y},
+@var{axis}) lt @var{average} + 0.5*@var{period}}.
+
+If 3 arguments are specified, then the missing argument is
+@code{@var{axis}} and defaults to 0.  @code{@var{average}} defaults to
+0.
+
+See also: @ref{MOD}
+
+@c -------------------------------------
+@node UPCASE, UPPER, UNMOD, Internal Routines
 @subsection UPCASE
 
 @code{UPCASE(@var{s})}

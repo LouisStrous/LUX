@@ -2380,4 +2380,4 @@ int unmod_slice_d(double *srcptr, int srccount, int srcstride,
   }
   return 0;
 }
-BIND(unmod_slice_d, ivddovrl, f, UNMOD, 4, 4, NULL);
+BIND(unmod_slice_d, ivddovrl, f, UNMOD, 2, 4, ":AXIS:PERIOD:AVERAGE");

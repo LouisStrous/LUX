@@ -1260,19 +1260,45 @@ int ana_ivddovrl_f_(int narg, int ps[], int (*f)(double *, int, int,
 {
   pointer *ptrs;
   loopInfo *infos;
-  int iq;
+  int iq, ipar1, ipar2, iret;
 
-  if ((iq = standard_args(narg, ps, "i>D*;iL;i>D;i>D;rD*", &ptrs, &infos)) < 0)
-    return ANA_ERROR;
-  setAxes(&infos[0], infos[1].nelem, ptrs[1].l, SL_EACHROW);
-  setAxes(&infos[4], infos[1].nelem, ptrs[1].l, SL_EACHROW);
+  switch (narg) {
+  case 2:                       /* source, param1; (param2 = 0) */
+    if ((iq = standard_args(narg, ps, "i>D*;i>D;rD*", &ptrs, &infos)) < 0)
+      return ANA_ERROR;
+    ipar1 = 1;
+    ipar2 = -1;
+    iret = 2;
+    setAxes(&infos[0], 0, NULL, SL_EACHROW);
+    setAxes(&infos[iret], 0, NULL, SL_EACHROW);
+    break;    
+  case 3:                       /* source, param1, param2 */
+    if ((iq = standard_args(narg, ps, "i>D*;i>D;i>D;rD*", &ptrs, &infos)) < 0)
+      return ANA_ERROR;
+    ipar1 = 1;
+    ipar2 = 2;
+    iret = 3;
+    setAxes(&infos[0], 0, NULL, SL_EACHROW);
+    setAxes(&infos[iret], 0, NULL, SL_EACHROW);
+    break;    
+  case 4:                       /* source, axis, param1, param2 */
+    if ((iq = standard_args(narg, ps, "i>D*;iL;i>D;i>D;rD*", &ptrs, &infos)) < 0)
+      return ANA_ERROR;
+    ipar1 = 2;
+    ipar2 = 3;
+    iret = 4;
+    setAxes(&infos[0], infos[1].nelem, ptrs[1].l, SL_EACHROW);
+    setAxes(&infos[iret], infos[1].nelem, ptrs[1].l, SL_EACHROW);
+    break;
+  }
   do {
     f(ptrs[0].d, infos[0].rdims[0], infos[0].rsinglestep[0], 
-      *ptrs[2].d, *ptrs[3].d,
-      ptrs[4].d, infos[4].rdims[0], infos[4].rsinglestep[0]);
+      *ptrs[ipar1].d, (ipar2 >= 0? *ptrs[ipar2].d: 0.0),
+      ptrs[iret].d, infos[iret].rdims[0], infos[iret].rsinglestep[0]);
     ptrs[0].d += infos[0].rsinglestep[1];
-    ptrs[4].d += infos[4].rsinglestep[1];
-  } while (advanceLoop(&infos[0]), advanceLoop(&infos[4]) < infos[4].rndim);
+    ptrs[iret].d += infos[iret].rsinglestep[1];
+  } while (advanceLoop(&infos[0]), advanceLoop(&infos[iret])
+           < infos[iret].rndim);
   return iq;
 }
 /*-----------------------------------------------------------------------*/

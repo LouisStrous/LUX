@@ -12,7 +12,7 @@ terminal.o regex.o vsop.o anasofa.o intmath.o calendar.o \
 jpeg.o tape.o dummyterm.o projection.o bindings.o \
 xport.o zoom.o menu.o color.o random.o Bytestack.o poisson.o \
 
-CC=gcc
+CC=gcc -Wall
 LIBS=-lm -lc -ljpeg -lX11 -lgsl libsofa_c.a
 EXEC=ana
 MORELIBS=

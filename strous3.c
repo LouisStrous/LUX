@@ -378,6 +378,8 @@ int ana_bisect(int narg, int ps[])
 	src.d += step*srcinfo.rdims[0];
       } while (advanceLoop(&srcinfo) < srcinfo.rndim);
       break;
+  default:
+    break;
   }
   cleanup_cubic_spline_tables(&cspl);
   return result;
@@ -420,7 +422,7 @@ int ana_cspline_find(int narg, int ps[])
    index <index(i)> and run up to but not including index <index(i+1)>. */
 /* LS 2009-08-09 */
 {
-  int	result, iq, pos, nLev, lev, ySym, vSym, i, step, *index, j;
+  int	result, iq, nLev, lev, ySym, vSym, i, step, *index, j;
   pointer	src, level;
   csplineInfo	cspl;
   loopInfo	srcinfo;
@@ -562,6 +564,8 @@ int ana_cspline_find(int narg, int ps[])
 	} while ((i = advanceLoop(&srcinfo)) == 0);
       } while (i < srcinfo.rndim);
     break;
+  default:
+    break;
   }
   cleanup_cubic_spline_tables(&cspl);
 
@@ -575,7 +579,6 @@ int ana_cspline_find(int narg, int ps[])
     
     n = Bytestack_bytes(b, 0)/csize; /* number of found data points */
     if (n > 0) {
-      int k;
       Bytestack_index bi;
       union {
 	struct c *c; 
@@ -623,85 +626,6 @@ int ana_cspline_find(int narg, int ps[])
   free(c);
   
   return result;
-}
-/*--------------------------------------------------------------------------*/
-int ana_rtotal(int narg, int ps[])
-/* RTOTAL( <data>, <axes>, <center>) returns the total as a function of
- distance in the dimensions given by <axes> to a center given by
- the coordinates <center>.  LS 20may98 */
-{
-  int	result, dims[MAX_DIMS], axis[MAX_DIMS], i, j, n;
-  float	r, d, center[MAX_DIMS];
-  pointer	src, trgt, centers;
-  loopInfo	srcinfo;
-
-  if (standardLoop(ps[0], ps[1], SL_UPGRADE | SL_EACHCOORD | SL_AXESBLOCK,
-		   ANA_BYTE, &srcinfo, &src, NULL, NULL, NULL) < 0)
-    return ANA_ERROR;
-
-  if (numerical(ps[2], NULL, NULL, &n, NULL) < 0)
-    return ANA_ERROR;
-  if (n != srcinfo.ndim)
-    return cerror(INCMP_ARG, ps[2]);
-  result = ana_float(1, ps + 2);
-  numerical(result, NULL, NULL, NULL, &centers); /* FLOAT center coordinates */
-
-  /* get a list of the desired axes & center coordinates in ascending order */
-  zerobytes(axis, srcinfo.ndim*sizeof(int));
-  zerobytes(dims, srcinfo.ndim*sizeof(int));
-  for (i = 0; i < srcinfo.ndim; i++) {
-    axis[srcinfo.axes[i]] = 1;
-    center[srcinfo.axes[i]] = centers.f[i];
-  }
-
-  /* copy those dimensions that are not in <axes> to the output dimensions */
-  j = 1;
-  for (i = 0; i < srcinfo.ndim; i++)
-    if (!axis[i])
-      dims[j++] = srcinfo.dims[i];
-
-  /* now make the list of axes and center coordinates in order */
-  j = 0;
-  for (i = 0; j < srcinfo.naxes; i++)
-    if (axis[i]) {
-      axis[j] = i;
-      center[j] = center[i];
-    }
-
-  /* determine the size of the result */
-  zerobytes(dims, srcinfo.ndim*sizeof(int));
-  r = 0.0;
-  for (i = 0; i < srcinfo.naxes; i++) {
-    d = (center[i] > srcinfo.dims[i] - center[i])?
-      center[i]: srcinfo.dims[i] - center[i];
-    r += d*d;
-  }
-  n = ((int) sqrt(r)) + 1;
-  dims[0] = n;
-
-  /* now create the result */
-  result = array_scratch(symbol_type(ps[0]), srcinfo.ndim - srcinfo.naxes + 1,
-			 dims);
-  trgt.b = array_data(result);
-
-  /* reorder the axes for the loop */
-  /* NOT YET FINISHED */
-
-  /* and calculate the results */
-  switch (symbol_type(ps[0])) {
-    case ANA_FLOAT:
-      do {
-	r = 0.0;
-	for (i = 0; i < srcinfo.naxes; i++) {
-	  d = srcinfo.coords[i] - center[i];
-	  r += d*d;
-	}
-	r = sqrt(r);		/* distance to center */
-	
-      } while (1);
-  }
-  return result;
-  /* NOT YET FINISHED! */
 }
 /*--------------------------------------------------------------------------*/
 #ifdef WORDS_BIGENDIAN
@@ -1379,7 +1303,7 @@ int ana_dir_smooth2(int narg, int ps[])
 {
   int	iq, nx, ny, ix, iy, c, index, rindex, count, twosided, normalize,
     gaussian, iq0, di, straight;
-  float	x1, y1, x2, y2, *vx0, *vy0, value, vx, vy, s, s0, ds, dslimit,
+  float	x1, y1, x2, y2, *vx0, *vy0, vx, vy, s, s0, ds, dslimit,
     weight, ws, s1, norm;
   pointer	src, trgt, src0;
   loopInfo	srcinfo, trgtinfo;
@@ -1440,7 +1364,6 @@ int ana_dir_smooth2(int narg, int ps[])
 	 small.  We use an exponential decay scale of 2 steps and
 	 a limit value of 0.2. */
       dslimit = 1.0;		/* current weighted average of step sizes */
-      value = 0.0;
       while (count--) {
 	rindex = 0;		/* index relative to current start location */
 	ix = srcinfo.coords[0];	/* x pixel coordinate */
@@ -1562,7 +1485,6 @@ int ana_dir_smooth2(int narg, int ps[])
 	 small.  We use an exponential decay scale of 2 steps and
 	 a limit value of 0.2. */
       dslimit = 1.0;		/* current weighted average of step sizes */
-      value = 0.0;
       ws = 0.0;
       while (count--) {
 	rindex = 0;		/* index relative to current start location */
@@ -1794,6 +1716,7 @@ int ana_trajectory(int narg, int ps[])
     to_scratch_array(ps[narg - 1], type, i, dims);
     oy.v = array_data(ps[narg - 1]);
   } else {			/* use <gx> and <gy> for <ox> and <oy> */
+    int ana_convert(int, int [], int, int);
     ana_convert(2, ps, type, 0);
     ox.v = array_data(ps[0]);
     oy.v = array_data(ps[1]);
@@ -2200,7 +2123,7 @@ int ana_enhanceimage(int narg, int ps[])
   means to enhance only from the low end.  LS 2006jun15 */
 {
   pointer src, tgt;
-  int ndim, *dims, nhist, *hist, nelem, i, j, result;
+  int ndim, *dims, nhist, *hist, nelem, i, result;
   float target, part;
   float a, b;
   float *m;
@@ -2208,10 +2131,10 @@ int ana_enhanceimage(int narg, int ps[])
   if (!symbolIsNumericalArray(ps[0]))
     return cerror(NEED_NUM_ARR, ps[0]);
   if (symbol_type(ps[0]) != ANA_BYTE)
-    return error("Need BYTE array", ps[0]);
+    return anaerror("Need BYTE array", ps[0]);
   numerical(ps[0], &dims, &ndim, &nelem, &src);
   if (ndim < 2)
-    return error("Need 2 or more dimensions", ps[0]);
+    return anaerror("Need 2 or more dimensions", ps[0]);
   part = (narg > 1 && ps[1])? float_arg(ps[1]): 1;
   target = (narg > 2 && ps[2])? float_arg(ps[2]): 100.0/256;
 
@@ -2276,7 +2199,7 @@ int ana_hamming(int narg, int ps[]) {
   pointer src, src2, tgt;
 
   if (!symbolIsNumerical(ps[0]))
-    return error("Need a numerical argument", ps[0]);
+    return anaerror("Need a numerical argument", ps[0]);
   if (!symbolIsInteger(ps[0]))
     return cerror(NEED_INT_ARG, ps[0]);
   numerical(ps[0], &dims, &ndim, &nelem, &src);
@@ -2284,11 +2207,11 @@ int ana_hamming(int narg, int ps[]) {
 
   if (narg >= 2) {
     if (!symbolIsNumerical(ps[1]))
-      return error("Need a numerical argument", ps[1]);
+      return anaerror("Need a numerical argument", ps[1]);
     if (!symbolIsInteger(ps[1]))
       return cerror(NEED_INT_ARG, ps[1]);
     if (symbol_type(ps[1]) != type)
-      return error("Data type is different from previous argument", ps[1]);
+      return anaerror("Data type is different from previous argument", ps[1]);
     numerical(ps[1], NULL, NULL, &nelem2, &src2);
     if (nelem2 != nelem && nelem2 != 1)
       return cerror(INCMP_ARG, ps[1]);

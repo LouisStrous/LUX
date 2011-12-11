@@ -31,6 +31,7 @@
 #include "action.h"
 #include <obstack.h>
 #include <errno.h>
+#include <ctype.h>
 
 #define obstack_chunk_alloc malloc
 #define obstack_chunk_free free
@@ -50,7 +51,15 @@ int advanceLoop(loopInfo *info), ana_convert(int, int [], int, int),
 int nextLoop(loopInfo *info), nextLoops(loopInfo *info1, loopInfo *info2);
 int dimensionLoopResult(loopInfo const *sinfo, loopInfo *tinfo, int type,
 			pointer *tptr);
-
+int standardLoop1(int source,
+                  int nAxes, int const * axes,
+                  int srcMode,
+                  loopInfo *srcinf, pointer *srcptr,
+                  int nMore, int const * more,
+                  int nLess, int const * less,
+                  enum Symboltype tgtType, int tgtMode,
+                  int *target, 
+                  loopInfo *tgtinf, pointer *tgtptr);
 /*-------------------------------------------------------------------------*/
 int setAxisMode(loopInfo *info, int mode) {
   if ((mode & SL_EACHBLOCK) == SL_EACHBLOCK)
@@ -66,12 +75,51 @@ int setAxisMode(loopInfo *info, int mode) {
   rearrangeDimensionLoop(info);
 }
 /*-------------------------------------------------------------------------*/
+int setAxes(loopInfo *info, int nAxes, int *axes, int mode)
+{
+  int i;
+  int temp[MAX_DIMS];
+
+  if (mode & SL_TAKEONED)	/* take data as 1D */
+    nAxes = 0;			/* treat as 1D */
+  else if (mode & SL_ALLAXES) { /* select all axes */
+    nAxes = info->ndim;
+    axes = NULL;		/* treat as if all axes were specified */
+  } else if ((mode & SL_NEGONED)	/* negative-axis treatment */
+	     && nAxes == 1		/* one axis specified */
+	     && *axes < 0)	/* and it is negative */
+    nAxes = 0;
+  
+  if ((mode & SL_ONEAXIS)	/* only one axis allowed */
+      && nAxes > 1)		/* and more than one selected */
+    return anaerror("Only one axis allowed", -1);
+
+  /* check the specified axes for legality */
+  if (nAxes && axes) {
+    for (i = 0; i < nAxes; i++) /* check all specified axes */
+      if (axes[i] < 0		/* axis is negative */
+	  || axes[i] >= info->ndim)	/* or too great */
+	return anaerror("Illegal axis %1d", -1, axes[i]);
+    if (mode & SL_UNIQUEAXES) {	/* no axis must occur more than once */
+      zerobytes(temp, info->ndim*sizeof(int));
+      for (i = 0; i < nAxes; i++)
+	if (temp[axes[i]]++)
+	  return anaerror("Axis %1d illegally specified more than once",
+			  -1, axes[i]);
+    }
+  }
+  info->naxes = nAxes;
+  if (nAxes)
+    memcpy(info->axes, axes, nAxes*sizeof(*axes));
+  setAxisMode(info, mode);
+  return 0;
+}
+/*-------------------------------------------------------------------------*/
 void setupDimensionLoop(loopInfo *info, int ndim, int dims[], 
                         enum Symboltype type, int naxes, int axes[],
                         pointer *data, int mode)
 /* fills the loopInfo structure <info> with information
- suitable for looping through a dimensional structure, and returns a
- pointer to the loopInfo structure.
+ suitable for looping through a dimensional structure.
  <ndim>: number of dimensions in the data
  <dims>: pointer to the list of dimensions in the data
  <type>: data type of the data
@@ -81,8 +129,6 @@ void setupDimensionLoop(loopInfo *info, int ndim, int dims[],
           a list of all axes in ascending order
  <data>: pointer to a pointer to the data
  <mode>: flags indicating how to loop through the axes
-
- Returns ANA_OK if OK, ANA_ERROR if not OK.  LS 16jul98
 */
 {
   int	i;
@@ -130,7 +176,7 @@ void setupDimensionLoop(loopInfo *info, int ndim, int dims[],
   info->data = data;
   info->data0 = data->v;
 
-  /* now derive auxilliary data */
+  /* now derive auxiliary data */
   /* the step size per dimension (measured in elements), i.e. by how many
    elements one has to advance a suitable pointer to point at the next
    element in the selected dimension: */
@@ -562,7 +608,7 @@ int standardLoop(int data, int axisSym, int mode, int outType,
 
   if (axisSym > 0) {		/* <axisSym> is a regular symbol */
     if (!symbolIsNumerical(axisSym))
-      return error("Need a numerical argument", axisSym); /* <axisSym> was not numerical */
+      return anaerror("Need a numerical argument", axisSym); /* <axisSym> was not numerical */
     i = ana_long(1, &axisSym);	/* get a LONG copy */
     numerical(i, NULL, NULL, &nAxes, &axes); /* get info */
   } else {
@@ -589,7 +635,7 @@ int standardLoopX(int source, int axisSym, int srcMode,
 
   if (axisSym > 0) {		/* <axisSym> is a regular symbol */
     if (!symbolIsNumerical(axisSym))
-      return error("Need a numerical argument", axisSym); /* <axisSym> was not numerical */
+      return anaerror("Need a numerical argument", axisSym); /* <axisSym> was not numerical */
     i = ana_long(1, &axisSym);	/* get a LONG copy */
     numerical(i, NULL, NULL, &nAxes, &axes); /* get info */
   } else {
@@ -1971,7 +2017,7 @@ int standard_args(int narg, int ps[], char const *fmt, pointer **ptrs,
           tgt_dims[tgt_dims_ix++] = ref_dims[ref_dims_ix++];
           src_dims_ix++;
           break;
-        case DS_ADD:            /* assume PS_OUTPUT */
+        case DS_ADD:
           d = dims_spec[pspec_dims_ix].size_add;
           switch (pspec->logical_type) {
           case PS_INPUT:

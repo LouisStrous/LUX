@@ -2,8 +2,13 @@
 #include "error.h"
 #include <math.h>
 #include <obstack.h>
+#include "bindings.h"
 #define obstack_chunk_alloc malloc
 #define obstack_chunk_free free
+
+int standard_args(int, int [], char const *, pointer **, loopInfo **);
+int setAxes(loopInfo *, int, int *, int);
+int advanceLoop(loopInfo *);
 
 struct obstack *registered_functions = NULL, *registered_subroutines = NULL;
 
@@ -525,6 +530,8 @@ int ana_idd0DDDrd_f_(int narg, int ps[], double (*f)(double, double, double, dou
       *ptrs[5].d++ = f(*ptrs[0].d++, 0.0, *ptrs[1].d, *ptrs[2].d, 
                        *ptrs[3].d, *ptrs[4].d);
     break;
+  default:
+    break;
   }
   return iq;  
 }
@@ -577,6 +584,8 @@ int ana_id0c23c23rl_s_(int narg, int ps[], int (*f)(double, double, double (*)[3
       pvh += 2;
       pvb += 2;
     }
+    break;
+  default:
     break;
   }
   return iq;
@@ -697,6 +706,8 @@ int ana_id0ddrd_f_(int narg, int ps[], double (*f)(double, double, double, doubl
     while (infos[1].nelem--)
       *ptrs[3].d++ = f(*ptrs[0].d++, 0.0, *ptrs[1].d++, *ptrs[2].d++);
     break;
+  default:
+    break;
   }
   return iq;
 }
@@ -767,6 +778,8 @@ int ana_id0oC33c33c33_s_(int narg, int ps[], void (*f)(double, double, double (*
       ptrs[2].d += 9;
       ptrs[3].d += 9;
     }
+    break;
+  default:
     break;
   }
   return iq;
@@ -1205,6 +1218,8 @@ int ana_iddrd_f_(int narg, int ps[], double (*f)(double, double))
   case ANA_DOUBLE:
     while (infos[1].nelem--)
       *ptrs[1].d++ = f(*ptrs[0].d++, 0.0);
+    break;
+  default:
     break;
   }
   return iq;  

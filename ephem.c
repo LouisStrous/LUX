@@ -489,7 +489,7 @@ int sephem(int ny, float day)
    fraction of julian centuries elapsed since 1900.05 (noon 1st of january)
    =  j.d.2415020.0) 
  */
- double	sday, jd, h0, h, hh, ehel, eks, sml, anm, cc, el, sl, san, av, om, ba;
+ double	sday, jd, h, hh, ehel, eks, sml, anm, cc, el, sl, san, av, om, ba;
  double	year, eincl, t;
  int	id, im, idoy, iy;
  /* the day is done as a fp value such that the first day is 0 - 0.9999999,
@@ -499,7 +499,6 @@ int sephem(int ny, float day)
  admo(idoy, iy, &id, &im);
  /* printf("iy,im,id = %d %d %d\n",iy,im,id); */
  jd = (double) julian(iy,im,id)+0.5;
- h0 = (jd-2415020.0)/36525.0;
  h = (jd + sday - 2415020.0)/36525.0;	hh = h * h;
  /*printf("sday, jd, h0, h, hh = %f, %10.1f %g %g %g\n",sday, jd, h0, h, hh); */
 	 /* newcomb's formulae. (page 98 explanatory suppl. to the ephemeris)

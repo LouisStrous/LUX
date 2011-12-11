@@ -3458,23 +3458,23 @@ int setxpit(int type, int n)	/* used by several routines to set up
 			/*consisting of {0,1/n,2/n,...,(n-1)/n} */
 			/* type must be 3 or 4 */
 {
-register pointer qx;
-register float	del;
-register double	ddel;
-int	nsym, nx;
-array	*h;
-nx = n;
-nsym = array_scratch(type, 1, &nx );
-h = (array *) sym[nsym].spec.array.ptr;
-qx.l = (int *) ((char *)h + sizeof(array));
-switch (type) {
-case 3:
-del = 1.0 / nx;  *qx.f = 0.0;  while (--nx) *(qx.f+1) = *qx.f++ + del; break;
-case 4:
-ddel = 1.0/ nx;  *qx.d = 0.0;  while (--nx) *(qx.d+1) = *qx.d++ + ddel; break;
-}
-qx.l = (int *) ((char *)h + sizeof(array));
-return nsym;
+  register pointer qx;
+  register float	del;
+  register double	ddel;
+  int	nsym, nx;
+  array	*h;
+  nx = n;
+  nsym = array_scratch(type, 1, &nx );
+  h = (array *) sym[nsym].spec.array.ptr;
+  qx.d = (double *) ((char *)h + sizeof(array));
+  switch (type) {
+  case 3:
+    del = 1.0 / nx;  *qx.f = 0.0;  while (--nx) *(qx.f+1) = *qx.f++ + del; break;
+  case 4:
+    ddel = 1.0/ nx;  *qx.d = 0.0;  while (--nx) *(qx.d+1) = *qx.d++ + ddel; break;
+  }
+  qx.l = (int *) ((char *)h + sizeof(array));
+  return nsym;
 }
 /*------------------------------------------------------------------------- */
 int ana_detrend(int narg, int ps[])/*detrend function */
@@ -3492,7 +3492,7 @@ int ana_trend(int narg, int ps[]) /*trend function */
   register double	*a;
   double	*fbase, *cfbase;
   pointer qxbase,qybase,qzbase;
-  int	npow, symx, symy, nd, nxq, outer, outerx;
+  int	npow, symx, symy, nd, nxq, outer;
   int	toptype, result_sym;
   int	cana_poly(double *cfbase, pointer *qxbase, int nxq, int npow,
 		  pointer *qzbase, int toptype);
@@ -3517,7 +3517,6 @@ int ana_trend(int narg, int ps[]) /*trend function */
   outer = array_size(symy)/nxq;
 						/* make a fake x array */
   symx = setxpit(toptype, nxq);
-  outerx = 1;
 				/* check type and upgrade as necessary */
   switch (toptype)
   { case ANA_FLOAT:
@@ -3622,7 +3621,6 @@ int ana_poly(int narg, int ps[])
   int result, ndata, ncoeff, datasym, coeffsym, i;
   byte outtype;
   pointer data, tgt, coeff;
-  scalar t;
 
   if (!symbolIsNumerical(ps[0])
       || !isNumericalType(symbol_type(ps[0])))
@@ -4290,6 +4288,8 @@ void ksmooth(loopInfo *srcinfo, loopInfo *trgtinfo, float *kernel, int nkernel)
 	}
       }
       break;
+  default:
+    break;
   }
   src.b += nx*stride*srcinfo->stride;
   srcinfo->data->v = src.v;

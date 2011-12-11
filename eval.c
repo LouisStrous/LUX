@@ -5736,21 +5736,6 @@ void ana_idiv_sa(void)
   }
 }
 /*----------------------------------------------------------*/
-/* returns z = x mod y such that 0 <= z < |y| */
-int iamod(int x, int y)
-{
-  int v;
-
-  if (!y)
-    return 0;
-  if (y < 0)
-    y = -y;
-  v = x % y;
-  if (v < 0)
-    v += y;
-  return v;
-}
-/*----------------------------------------------------------*/
 /* returns z = x mod y such that -|y|/2 < z <= |y|/2 */
 int iasmod(int x, int y)
 {
@@ -14590,7 +14575,7 @@ int evalArrayBinOp(void)
 /* the operands and non-1 in the other.  The smaller operand is repeated */
 /* as needed to service all elements of the larger operand. */
 {
-  int	result, i, i0, nRepeats[MAX_DIMS], action[MAX_DIMS], nAction = 0,
+  int	result, i, nRepeats[MAX_DIMS], action[MAX_DIMS], nAction = 0,
     tally[MAX_DIMS], nCumulR[MAX_DIMS], nCumulL[MAX_DIMS], ndim,
     bigOne;
   extern int	pipeSym, pipeExec;
@@ -14624,7 +14609,7 @@ int evalArrayBinOp(void)
   nRepeat = 1;			/* default number of loops */
   lp.l = array_data(lhs);	/* lhs data */
   rp.l = array_data(rhs);	/* rhs data */
-  for (i0 = i = 0; i < ndim; i++) {
+  for (i = 0; i < ndim; i++) {
     if ((array_dims(rhs)[i] == 1) ^ (array_dims(lhs)[i] == 1)) {
       /* one is 1 and the other is not: implicit dimension */
       if (nRepeat > 1) {	/* already had some ordinary dimensions */
@@ -15107,6 +15092,8 @@ int evalListPtr(int symbol)
 int evalStructPtr(int symbol)
 /* evaluates <symbol> as a STRUCT_PTR */
 {
+  return anaerror("evaluation of structure pointers not yet implemented", symbol);
+#if IMPLEMENTED
   int	target, result, n, i, nout, one = 1, outdims[MAX_DIMS], outndim = 0,
     *dims, ndim, nms, i1, i2, j, k, nelem, *p, ne, type, total_ndim;
   structElem	*se;
@@ -15232,13 +15219,13 @@ int evalStructPtr(int symbol)
       break;
   } /* end of switch (type) */
 
-  
-
+  /* NOT YET FINISHED */
 
   return result;
 
   evalStructPtr_1:
   return ANA_ERROR;
+#endif
 }
 /*----------------------------------------------------------*/
 int evalLhs(symbol)

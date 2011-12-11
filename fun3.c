@@ -19,6 +19,12 @@ static char rcsid[] __attribute__ ((unused)) =
  "$Id: fun3.c,v 4.0 2001/02/07 20:37:01 strous Exp $";
 
 int	ezffti(int *, float *), fade_xsize, fade_ysize, fade_dim[2];
+int rffti(int *, float *);
+int rfftb(int *, float *, float *);
+int rfftf(int *, float *, float *);
+int rfftid(int *, double *);
+int rfftbd(int *, double *, double *);
+int rfftfd(int *, double *, double *);
 word	*fade1, *fade2;
 extern int	scalemax, scalemin, lastmaxloc, lastminloc, maxhistsize,
 	histmin, histmax, fftdp, lastmax_sym, lastmin_sym;
@@ -28,6 +34,7 @@ static pointer	work;
 int	minmax(int *, int, int), neutral(void *, int);
 void	zerobytes(void *, int), zap(int);
 int	simple_scale(void *, int, int, void *);
+void convertWidePointer(wideScalar *, int, int);
 /*------------------------------------------------------------------------- */
 int evalString(char *expr, int nmax)
 /* compiles and evaluates a string, interpreting it as code */
@@ -2184,7 +2191,7 @@ int ana_power(int narg, int ps[])
 int ana_scb(int narg, int ps[])	/* scb routine */		
 /* backwards sine-cosine style FFT --  scb, x, s, c */
 {
-  int	iq, nd, outer, nx, n, mq, dim[8], type, j, jq, nd2, outer2, nx2;
+  int	iq, nd, outer, nx, n, mq, dim[8], type, j, jq, outer2, nx2;
   pointer	q1,q2,q3;
   int	ezffti(int *n, float *wsave), ezfftid(int *n, double *wsave),
     ezfftb(int *n, float *r, float *azero, float *a, float *b, float *wsave),
@@ -2211,7 +2218,6 @@ int ana_scb(int narg, int ps[])	/* scb routine */
   outer = array_size(iq)/nx;
   memcpy(dim + 1, array_dims(iq) + 1, (nd - 1)*sizeof(int));
   q3.l = array_data(jq);
-  nd2 = array_num_dims(jq);
   nx2 = array_dims(jq)[0];
   outer2 = array_size(jq)/nx2;
 
@@ -2501,8 +2507,8 @@ int ana_hist(int narg, int ps[]) /* histogram function */
   /* always need the range */
   minmax( q1.l, n, type);
   /* get long (int) versions of min and max */
-  convertWidePointer(&lastmin, type, ANA_LONG);
-  convertWidePointer(&lastmax, type, ANA_LONG);
+  convertPointer(&lastmin, type, ANA_LONG);
+  convertPointer(&lastmax, type, ANA_LONG);
   /* create a long array for results */
   histmin = lastmin.l;
   histmax = lastmax.l;
@@ -3492,6 +3498,8 @@ int maxormin(int narg, int ps[], int code)
       max.d = sqrt(max.d);
       min.d = sqrt(min.d);
       break;
+  default:
+    break;
   }
 
   /* put results in global symbols */
@@ -3752,7 +3760,7 @@ int ana_scale(int narg, int ps[])
 /* add keyword /FULLRANGE: scale between 0 and the greatest color */
 /* cell index.  LS 30jul96 23mar99 */
 {
-  int	iq, type, result_sym, nd, n, oldScalemin, oldScalemax;
+  int	iq, type, result_sym, n, oldScalemin, oldScalemax;
   scalar	min, max;
   register	pointer q1, q2;
   double	sd, qd;
@@ -3769,7 +3777,6 @@ int ana_scale(int narg, int ps[])
     return cerror(NEED_ARR, iq);
   type = array_type(iq);
   q1.l = array_data(iq);
-  nd = array_num_dims(iq);
   n = array_size(iq);
   result_sym = array_clone(iq, colorIndexType);
   q2.l = array_data(result_sym);
@@ -3849,7 +3856,7 @@ int ana_scalerange(int narg, int ps[])
    is specified, then !ZOOMLOW and !ZOOMHIGH are taken for <lowvalue>
    and <hivalue>, respectively.  LS 16oct98 */
 {
-  int	iq, type, result_sym, nd, n, oldScalemin, oldScalemax;
+  int	iq, type, result_sym, n, oldScalemin, oldScalemax;
   scalar	min, max;
   register	pointer q1, q2;
   double	sd, qd, logrey, higrey;
@@ -3874,7 +3881,6 @@ int ana_scalerange(int narg, int ps[])
     higrey = 1.0;
   type = array_type(iq);
   q1.l = array_data(iq);
-  nd = array_num_dims(iq);
   n = array_size(iq);
   result_sym = array_clone(iq, colorIndexType);
   q2.l = array_data(result_sym);
@@ -4233,7 +4239,7 @@ int cubic_spline_tables(void *xx, int xType, int xStep,
    the data is assumed to be periodic; otherwise it is not. */
 /* LS 9may98; redone using GSL 2009sep27 */
 {
-  int	n, i;
+  int	n;
   pointer xin, yin;
   double *x, *y;
 
@@ -4908,6 +4914,8 @@ int ana_cubic_spline_extreme(int narg, int ps[])
         y.d += step*yinfo.rdims[0];
       } while (advanceLoop(&yinfo) < yinfo.rndim);
       break;
+  default:
+    break;
   }
   return ANA_OK;
 }
@@ -5012,7 +5020,7 @@ int ana_fade_init(int narg, int ps[])
 {
   byte	*p1, *p2;
   word	*q1, *q2;
-  int	n1, n2, n, nd, i, iq;
+  int	n, iq;
 
   iq = ps[0];
   if (!symbolIsNumericalArray(iq) || array_num_dims(iq) != 2)

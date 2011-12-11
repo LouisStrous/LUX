@@ -73,6 +73,7 @@ void	subdataLoop(int *, loopInfo *), addVerify(char *, char),
   *setFacts(int symbol, int type, int flag),
   deleteFacts(int symbol, int type), returnLoop(loopInfo *, int),
   setAxisMode(loopInfo *, int mode);
+void convertWidePointer(wideScalar *, int, int);
 
 void	newStack(int), push(int), deleteStack(void);
 int	pop(void);

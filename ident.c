@@ -355,7 +355,7 @@ int Sprintf_sexagesimal(char *str, double value, int precision, int width,
 /* it is not *truncated*. */
 /* LS 2003jul12 */
 {
-  int sign, n, h, sec, t, precision0;
+  int sign, n, h, t, precision0;
   char *str0, *p;
   double d;
 
@@ -436,7 +436,7 @@ int Sprintf_general(char *str, char *format, va_list ap)
 /* Sprintf does not attempt to write into <format>. */
 {
   static formatInfo	ownfmi, *fmi;
-  int	precision, width, n, sign, h, t;
+  int	precision, width, n;
   double	d, d2;
   char	*p;
   static char	tmp[20];
@@ -523,7 +523,7 @@ int Sprintf_general(char *str, char *format, va_list ap)
     {
       int year, month, iday;
       double day;
-      void JDtoDate(double, int *, int *, double *, int);
+      void CJDtoDate(double, int *, int *, double *, int);
       char *months[] = {
 	"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
 	"Sep", "Oct", "Nov", "Dec"

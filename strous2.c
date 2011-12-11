@@ -22,9 +22,6 @@ int ana_noop(int narg, int ps[])
      /* no operation - a dummy routine that provides an entry point
 	for debuggers */
 {
-  int	x;
-
-  x = 1;
   return 1;
 }
 /*---------------------------------------------------------*/
@@ -3294,6 +3291,8 @@ int ana_runprod(int narg, int ps[])
 	  value.d = 1;
       } while (n < srcinfo.rndim);
       break;
+  default:
+    break;
   }
   return result;
 }

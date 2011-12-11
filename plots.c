@@ -479,6 +479,7 @@ int plotxy(float xx[], float yy[], float ex[], float ey[], int n, int dx,
 		   int irf, int f, float wb, float wt, float plim_min,
 		   float plim_max, float *start, float *step, float *end,
 		   float *stepdvi);
+  int ana_erase(int, int *);
 
   iylog = ipltyp % 2;
   ixlog = (ipltyp/2) % 2;
@@ -744,6 +745,7 @@ int plotxy(float xx[], float yy[], float ex[], float ey[], int n, int dx,
   }
 
   if (n > 0) {			/* no bounding box checking required in */
+    int oplotx(float *, float *, float *, float *, int, int, int);
    /* oplotx, since all data points fall within the plot window, i.e. */
    /* also within the current bounding box.  May want to check when */
    /* the axis labels and titles are drawn, so don't just set to zero */
@@ -1196,7 +1198,7 @@ void setupticks(float *min, float *max, int ndlab, int fstep, int ilog,
 /* *min: INPUT: least value in data; OUTPUT: least plot data limit */
 /* *max: INPUT: greatest value in data; OUTPUT: greatest plot data limit */
 /* ndlab: INPUT: number of minor divisions per major division */
-/* fstep: INPUT: free step size (0 = automatic, 1 = take from <step>)
+/* fstep: INPUT: free step size (0 = automatic, 1 = take from <step>) */
 /* ilog: INPUT: flags logarithmic scale */
 /* irf: INPUT: plot limit rounding (1 = yes, 0 = no) */
 /* f: INPUT: free lower limit; if == 0, then lower limit is non-positive */
@@ -1212,7 +1214,6 @@ void setupticks(float *min, float *max, int ndlab, int fstep, int ilog,
 /* if <ilog> is set, then it is assumed that *min, *max > 0 */
 {
   float	xq, stepvalue;
-  int	ilg;
 
   if (ilog) {			/* logarithmic scale */
     /* we assume that *min > 0 */
@@ -1322,7 +1323,7 @@ int tkplot(float x, float y, int lineStyle, int symStyle)
   static char	penState;
   static float	s;
   float	dx, dy, s0, sd, xc, yc, xx[2], yy[2];
-  int	result, ix, iy, drawn;
+  int	result, ix, iy;
   int	symplot(float, float, int, int), 
   	postvec(float, float, int);
 #ifdef X11
@@ -1487,7 +1488,7 @@ int ana_pencolor(int narg, int ps[])
 #endif
   int	postcolorpen(float red, float green, float blue);
 #ifdef X11
-  XColor	color, *colorp;
+  XColor	color;
 #endif
   
   if (lunplt == 0) {
@@ -1550,10 +1551,6 @@ int ana_pencolor(int narg, int ps[])
 	red = *pf++;
 	green = *pf++;
 	blue = *pf++;
-#ifdef X11
-	if (xflag && !anaAllocNamedColor(pc, &colorp))
-	  return ANA_ERROR;
-#endif
 	break;
     }
     if (lunplt == 1)
@@ -1731,10 +1728,9 @@ int sform(float xb, float xt)
 {
  /* set default form */
   int	ie, il;
-  float	xq, xc, xd;
+  float	xq, xc;
 
   xc = MAX(ABS(xb), ABS(xt));	
-  xd = MIN(ABS(xb), ABS(xt));
   sprintf(form, "%s", "%8.1e");	/*default*/
   if (xc >= 1.e6 || xc < 1.e-5)
     return 1;
@@ -1798,7 +1794,7 @@ int symplot(float x, float y, int symStyle, int lineStyle)
      0.00216, 0.00318, 0.00411, 0.00495, 0.00566, 0.00624, 0.00666, 0.00691, 
      .007 };
   static float	xp, yp;
-  int	nsym = 8, ns, nsm, ia, ib, ysize, icept, i, iq;
+  int	nsym = 8, ns, nsm, ia, ib, icept, i, iq;
   float	tol = 1.e-5, delx, xq, yq, zq, xq2, yq2, slope, x2, y2, sq, pr;
   float	x1, y1;
   char	thing[2];
@@ -1856,8 +1852,7 @@ int symplot(float x, float y, int symStyle, int lineStyle)
 	   }
          }
 	 else				/* a polygon symbol, more work */
-	 { ysize = symsize*symratio;
-	   ia = is[nsm - 1];
+	 { ia = is[nsm - 1];
 	   ib = is[ns - 1] - 1;
 		 /* we assume that this is a connected series of lines */  
            icept = 0;
@@ -1951,8 +1946,7 @@ int symplot(float x, float y, int symStyle, int lineStyle)
   }
 					 /* draw the symbol if in range */
   if (nsm <= nsym) 
-  { ysize = symsize*symratio; 
-    ia = is[nsm - 1] - 1; 
+  { ia = is[nsm - 1] - 1; 
     ib = is[ns - 1] - 1;
     for (i = ia; i < ib; i++)
     { xq = dx[i]*symsize;

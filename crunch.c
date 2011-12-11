@@ -142,7 +142,8 @@ int ana_decrunch(int narg, int ps[])		/* decrunch subroutine */
  /*  decrunch, IN, OUT */
 {
   /* works only for I*2 and I*1 arrays */
-  int	iq, slice, bsize, nx, outer, nd, type, ctype, dim[2];
+  int	iq, slice, nx, outer, nd, type, ctype, dim[2];
+  /* int bsize; */
   struct	ahead	*h;
   union	types_ptr q1, q2;
 
@@ -151,13 +152,13 @@ int ana_decrunch(int narg, int ps[])		/* decrunch subroutine */
   /* decrunch doesn't care about input array type since it looks at bit stream*/
   h = (struct ahead *) sym[iq].spec.array.ptr;
   q1.l = (int *) ((char *)h + sizeof(struct ahead));
-  bsize =  *q1.l++;	outer = *q1.l++; nx = *q1.l++;
+  /* bsize =  *q1.l++; */	outer = *q1.l++; nx = *q1.l++;
   /* get the fixed slice width */
   slice = *q1.b++;	ctype = *q1.b++;
   /*printf("ctype = %d\n", ctype);*/
 #if !WORDS_BIGENDIAN
 #else
-  swapl(&bsize,1); swapl(&nx,1); swapl(&outer,1); 
+  /* swapl(&bsize,1); */ swapl(&nx,1); swapl(&outer,1); 
 #endif
   /* the result array */
   iq = ps[1];
@@ -227,7 +228,7 @@ int anacrunch32(byte *x, int array[], int slice, int nx, int ny, int limit)
     byte    slice_size,type; } *ch;
   unsigned int nb,ixa,ixb,big=0;
   unsigned register i,j,r1,in;
-  int r0,r2,fac;
+  int r0/*,r2,fac*/;
   long long	r3, mask, y64;
   int i2,k,iy;
   union { int i; short w; unsigned char b[4]; } y;
@@ -253,7 +254,7 @@ int anacrunch32(byte *x, int array[], int slice, int nx, int ny, int limit)
   limit = limit - 24;	/* need 14 for header and some margin since
 			   we don't check all times */
   mask=1; for (i=0;i<slice;i++) mask=2*mask;
-  fac=mask;       mask=mask-1; /* no inline expon. in C */
+  /*fac=mask;*/       mask=mask-1; /* no inline expon. in C */
   /* determine the # of bytes to transfer to 32 bit int for fixed portion */
   nb = (slice + 14)/8;	/* range 1 to 5 */
   if (slice == 0) nb=0;	/* but slice = 0 a special case */
@@ -275,7 +276,7 @@ int anacrunch32(byte *x, int array[], int slice, int nx, int ny, int limit)
     y.i=array[in]; x[i]=y.b[0]; x[i+1]=y.b[1]; x[i+2]=y.b[2]; x[i+3]=y.b[3];
 #endif 
     r1=r1+32;
-    r2=0;
+    /* r2=0; */
     ixa=1+iy*nx;    ixb=(iy+1)*nx;
     for (in=ixa; in<ixb; in++)      {               /* start of ix (inner) loop */
       /* first the fixed slice portion */
@@ -366,7 +367,7 @@ int anacrunch(byte *x, short array[], int slice, int nx, int ny, int limit)
     byte    slice_size,type; } *ch;
   unsigned nb,ixa,ixb;
   unsigned register i,j,r1,in;
-  int r0,r2,r3,mask,fac;
+  int r0/*,r2*/,r3,mask/*,fac*/;
   int i2,k,iy;
   union { int i; short w; unsigned char b[4]; } y;
   /* begin execution */
@@ -375,7 +376,7 @@ int anacrunch(byte *x, short array[], int slice, int nx, int ny, int limit)
   limit = limit - 24;	/* need 14 for header and some margin since
 			   we don't check all times */
   mask=1; for (i=0;i<slice;i++) mask=2*mask;
-  fac=mask;       mask=mask-1; /* no inline expon. in C */
+  /*fac=mask;*/       mask=mask-1; /* no inline expon. in C */
   /* determine the # of bytes to transfer to 32 bit int for fixed portion */
   if (slice == 0) nb=0; else { if (slice < 2 ) nb=1;
   else { if (slice < 10) nb=2; else nb=3;    }};
@@ -396,7 +397,7 @@ int anacrunch(byte *x, short array[], int slice, int nx, int ny, int limit)
     y.w=array[in]   ;x[i]=y.b[0]    ;x[i+1]=y.b[1];
 #endif 
     r1=r1+16;
-    r2=0;
+    /*r2=0;*/
     ixa=1+iy*nx;    ixb=(iy+1)*nx;
     for (in=ixa; in<ixb; in++)      {               /* start of ix (inner) loop */
       /* first the fixed slice portion */
@@ -481,7 +482,7 @@ int anacrunch8(byte *x, byte array[], int slice, int nx, int ny, int limit)
     byte    slice_size,type; } *ch;
   unsigned nb,ixa,ixb;
   unsigned register i,j,r1,in;
-  int r0,r2,r3,mask,fac;
+  int r0/*,r2*/,r3,mask/*,fac*/;
   int i2,k,iy;
   union { int i; short w; unsigned char b[4]; } y;
   /* begin execution */
@@ -490,7 +491,7 @@ int anacrunch8(byte *x, byte array[], int slice, int nx, int ny, int limit)
   limit = limit - 24;	/* need 14 for header and some margin since
 			   we don't check all times */
   mask=1; for (i=0;i<slice;i++) mask=2*mask;
-  fac=mask;       mask=mask-1; /* no inline expon. in C */
+  /*fac=mask;*/       mask=mask-1; /* no inline expon. in C */
   /* determine the # of bytes to transfer to 32 bit int for fixed portion */
   if (slice > 8) slice = 8;
   if (slice == 0) nb=0; else { if (slice < 2 ) nb=1;
@@ -508,7 +509,7 @@ int anacrunch8(byte *x, byte array[], int slice, int nx, int ny, int limit)
     /* load the first value */
     x[i] = array[in];
     r1=r1+8;
-    r2=0;
+    /*r2=0;*/
     ixa=1+iy*nx;    ixb=(iy+1)*nx;
     for (in=ixa; in<ixb; in++)      {               /* start of ix (inner) loop */
       /* first the fixed slice portion */
@@ -1005,7 +1006,7 @@ int anacrunchrun(byte *x, short array[], int slice, int nx, int ny, int limit)
   short	*p;
   unsigned nb;
   unsigned register i,j,r1;
-  int	r0,r2,r3,mask,fac, nrun, lrun, ic;
+  int	r0/*,r2*/,r3,mask/*,fac*/, nrun, lrun, ic;
   int	*dif, *d, nc, zq, yq, *dd;
   /* enum	state { RUN, LITERAL }; */
   int	i2,k,iy;
@@ -1015,7 +1016,7 @@ int anacrunchrun(byte *x, short array[], int slice, int nx, int ny, int limit)
     return anaerror("limit (%d) too small in crunchrun", 0, limit);
   limit = limit - 24;	/* some margin since we don't check all times */
   mask=1; for (i=0;i<slice;i++) mask=2*mask;
-  fac=mask;       mask=mask-1; /* no inline expon. in C */
+  /*fac=mask;*/       mask=mask-1; /* no inline expon. in C */
   /* determine the # of bytes to transfer to 32 bit int for fixed portion */
   if (slice == 0) nb=0; else { if (slice < 2 ) nb=1;
   else { if (slice < 10) nb=2; else nb=3;    }};
@@ -1040,7 +1041,7 @@ int anacrunchrun(byte *x, short array[], int slice, int nx, int ny, int limit)
     d=dif; yq=(int) *p++;	zq=(int) *p++;
     while (nc--) { *d++ = zq - yq; yq = zq; zq = (int) *p++; }
     r1=r1+16;
-    r2=0;
+    /*r2=0;*/
     p = (array+nx*iy);	nc=nx-1;
     d=dif;
     ic = i++;			/* count position */
@@ -1182,7 +1183,7 @@ int anacrunchrun8(byte *x, byte array[], int slice, int nx, int ny, int limit)
   byte	*p;
   unsigned nb;
   unsigned register i,j,r1;
-  int	r0,r2,r3,mask,fac, nrun, lrun, ic;
+  int	r0/*,r2*/,r3,mask/*,fac*/, nrun, lrun, ic;
   int	*dif, *d, nc, zq, yq, *dd;
   int	i2,k,iy;
   union { int i; short w; unsigned char b[4]; } y;
@@ -1191,7 +1192,7 @@ int anacrunchrun8(byte *x, byte array[], int slice, int nx, int ny, int limit)
     return anaerror("limit (%d) too small in crunchrun8", 0, limit);
   limit = limit - 24;	/* some margin since we don't check all times */
   mask=1; for (i=0;i<slice;i++) mask=2*mask;
-  fac=mask;       mask=mask-1; /* no inline expon. in C */
+  /*fac=mask;*/       mask=mask-1; /* no inline expon. in C */
   /* determine the # of bytes to transfer to 32 bit int for fixed portion */
   if (slice == 0) nb=0; else { if (slice < 2 ) nb=1;
   else { if (slice < 10) nb=2; else nb=3;    }};
@@ -1213,7 +1214,7 @@ int anacrunchrun8(byte *x, byte array[], int slice, int nx, int ny, int limit)
     d=dif; yq=(int) *p++;	zq=(int) *p++;
     while (nc--) { *d++ = zq - yq; yq = zq; zq = (int) *p++; }
     r1=r1+8;
-    r2=0;
+    /*r2=0;*/
     p = (array+nx*iy);	nc=nx-1;
     d=dif;
     ic = i++;			/* count position */
@@ -1353,7 +1354,7 @@ int anadecrunchrun(byte *x, short array[], int r9, int nx, int ny)
 {
   short iq;
   int r0,r1,r2,r4,nb,mask,nrun,n,nc;
-  int j,in,i,k,ix,iy;
+  int j,in,i,k,ix=0,iy;
   unsigned char xq;
   union { int i; short w; unsigned char b[4]; } y;
   /* begin execution */
@@ -1495,7 +1496,7 @@ int anadecrunchrun8(byte x[], byte array[], int r9, int nx, int ny)
 {
   byte iq;
   int r0,r1,r2,r4,nb,mask,nrun,n,nc;
-  int j,in,i,k,ix,iy;
+  int j,in,i,k,ix=0,iy;
   unsigned char xq;
   union { int i; short w; unsigned char b[4]; } y;
   /* begin execution */

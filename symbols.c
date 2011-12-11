@@ -26,6 +26,8 @@ void	zerobytes(void *, int), updateIndices(void), symdumpswitch(int, int);
 void	xsynchronize(int);
 #endif
 int	installString(char *), fixContext(int, int), ana_replace(int, int);
+char *fmttok(char *);
+int Sprintf_tok(char *, ...);
 /*-----------------------------------------------------*/
 void embed(int target, int context)
 /* gives <target> the specified <context>, if it is a contextless */
@@ -3101,7 +3103,7 @@ void read_a_number_fp(FILE *fp, scalar *value, int *type)
 /* Fixed reading of numbers with exponents.  LS 11jul2000 */
 {
   int	base = 10, kind, sign, ch;
-  char	*p, *numstart, c, ce, *p2;
+  char	*p, *numstart;
 
   *type = ANA_LONG;		/* default */
   /* skip non-digits, non-signs */
@@ -3221,7 +3223,6 @@ void read_a_number_fp(FILE *fp, scalar *value, int *type)
 	while (isdigit((int) p[-1]));
       }
       kind = toupper(p[-1]);
-      p2 = NULL;
       *type = ANA_FLOAT;	/* default */
       if (kind == 'D' || kind == 'E') {
 	if (kind == 'D') {
@@ -3442,6 +3443,7 @@ int nextchar(FILE *fp) {
       if (keyboard.ptr == keyboard.buffer) /* we must ask for more */
 	while (!*keyboard.ptr) {
 	  FILE *is;
+          int getNewLine(char *, char *, char);
 	  is = inputStream;
 	  inputStream = stdin;
 	  getNewLine(keyboard.buffer, "dat>", 0);

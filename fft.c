@@ -2626,7 +2626,7 @@ int passf(int *nac, int *ido, int *ip, int *l1, int *idl1,
 	    i__1, i__2, i__3;
 
     /* Local variables */
-    int idij, idlj, idot, ipph, i__, j, k, l, jc, lc, ik, nt, idj, 
+    int idij, idlj, idot, ipph, i__, j, k, l, jc, lc, ik, idj, 
 	    idl, inc, idp;
     double wai, war;
     int ipp2;
@@ -2654,7 +2654,6 @@ int passf(int *nac, int *ido, int *ip, int *l1, int *idl1,
 
     /* Function Body */
     idot = *ido / 2;
-    nt = *ip * *idl1;
     ipp2 = *ip + 2;
     ipph = (*ip + 1) / 2;
     idp = *ip * *ido;
@@ -3397,7 +3396,7 @@ int passb(int *nac, int *ido, int *ip, int *l1, int *idl1,
 	    i__1, i__2, i__3;
 
     /* Local variables */
-    int idij, idlj, idot, ipph, i__, j, k, l, jc, lc, ik, nt, idj, 
+    int idij, idlj, idot, ipph, i__, j, k, l, jc, lc, ik, idj, 
 	    idl, inc, idp;
     double wai, war;
     int ipp2;
@@ -3425,7 +3424,6 @@ int passb(int *nac, int *ido, int *ip, int *l1, int *idl1,
 
     /* Function Body */
     idot = *ido / 2;
-    nt = *ip * *idl1;
     ipp2 = *ip + 2;
     ipph = (*ip + 1) / 2;
     idp = *ip * *ido;
@@ -6427,7 +6425,7 @@ int passfd(int *nac, int *ido, int *ip, int *l1, int *idl1,
 	    i__1, i__2, i__3;
 
     /* Local variables */
-    int idij, idlj, idot, ipph, i__, j, k, l, jc, lc, ik, nt, idj, 
+    int idij, idlj, idot, ipph, i__, j, k, l, jc, lc, ik, idj, 
 	    idl, inc, idp;
     double wai, war;
     int ipp2;
@@ -6455,7 +6453,6 @@ int passfd(int *nac, int *ido, int *ip, int *l1, int *idl1,
 
     /* Function Body */
     idot = *ido / 2;
-    nt = *ip * *idl1;
     ipp2 = *ip + 2;
     ipph = (*ip + 1) / 2;
     idp = *ip * *ido;
@@ -7198,7 +7195,7 @@ int passbd(int *nac, int *ido, int *ip, int *l1, int *idl1,
 	    i__1, i__2, i__3;
 
     /* Local variables */
-    int idij, idlj, idot, ipph, i__, j, k, l, jc, lc, ik, nt, idj, 
+    int idij, idlj, idot, ipph, i__, j, k, l, jc, lc, ik, idj, 
 	    idl, inc, idp;
     double wai, war;
     int ipp2;
@@ -7226,7 +7223,6 @@ int passbd(int *nac, int *ido, int *ip, int *l1, int *idl1,
 
     /* Function Body */
     idot = *ido / 2;
-    nt = *ip * *idl1;
     ipp2 = *ip + 2;
     ipph = (*ip + 1) / 2;
     idp = *ip * *ido;

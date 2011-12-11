@@ -2349,16 +2349,8 @@ int runmin_d(double *data, int n, int width, double *result)
 BIND(runmin_d, ibLLobrl, f, RUNMIN, 2, 2, NULL);
 /*--------------------------------------------------------------------*/
 /*
-  d = x₁ - x₀
-  e = [(d - m)/P]
-  s₀ = ⌊x₀/P⌋
-  s₁ = s₀ + e
-  y₁ = x₁ - Ps₁
-
-  y₁ = x₁ - Ps₀ - Pe
-     = x₁ - P⌊x₀/P⌋ - P[(d - m)/P]
-     = d + x₀ - P⌊x₀/P⌋ - P[(d - m)/P]
-     = d + (x₀ mod P) - P[(d - m)/P]
+  Returns <x> such that <x> = <cur> (mod <period) and
+  <average> - <period>/2 <= <x> - <prev> < <average> + <period>/2
  */
 double unmod(double cur, double prev, double period, double average)
 {

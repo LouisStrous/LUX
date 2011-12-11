@@ -140,8 +140,8 @@ int ana_distr_f(int narg, int ps[])
   /* always need the range */
   minmax(arg1.l, n, type);
   /* get long (int) versions of min and max */
-  convertWidePointer(&lastmin, type, ANA_LONG);
-  convertWidePointer(&lastmax, type, ANA_LONG);
+  convertPointer(&lastmin, type, ANA_LONG);
+  convertPointer(&lastmax, type, ANA_LONG);
   /* create an array for results */
   histmin = lastmin.l;
   histmax = lastmax.l;
@@ -378,14 +378,12 @@ int ana_readarr(int narg, int ps[])
 /* reads array elements until they are exhausted and returns read elements */
 /* in an array.  Louis Strous 24may92 */
 {
- extern char	batch;
  extern FILE	*inputStream;
  FILE	*tp, *is;
  char	*p, *pt, lastchar, token[32], line[BUFSIZE];
  int	arrs=0, i, iq, maxtype = ANA_LONG, *iptr, 
 	getNewLine(char *, char *, char), redef_array(int, int, int, int *);
  float	*fptr;
- extern char *currentChar, tLine[];
 
  iq = ps[0];						/* target */
  tp = Tmpfile();					/* temporary storage */
@@ -454,6 +452,7 @@ int ana_find(int narg, int ps[])
   { iq = ana_long(1, &ps[2]);
     GET_NUMERICAL(theOff, noff); }
   else noff = 0;
+  indx.d = NULL;
   iq = ps[1];			/* key */
   switch (type)			/* change key to type of array */
   { case ANA_BYTE:
@@ -478,7 +477,7 @@ int ana_find(int narg, int ps[])
   if (mode & 2) resulttype = type; else resulttype = ANA_LONG;
   if (!repeat && class == ANA_SCALAR)
   { result = scalar_scratch(resulttype);
-    indx.l = &sym[result].spec.scalar.l;
+    indx.b = &sym[result].spec.scalar.b;
     nRepeat = 1; }
   else
   { if (!repeat)
@@ -1001,7 +1000,7 @@ int ana_differ(int narg, int ps[])
   LS 24nov92 */
 {
   pointer	src, trgt, order;
-  int	result, nOrder, loop, o, ww, stride, offset1, offset2, offset3,
+  int	result, nOrder, loop, o, ww, stride, offset1, offset3,
     w1, one = 1, iq, n, type, i, old, circular;
   loopInfo	srcinfo, trgtinfo;
 
@@ -1071,7 +1070,6 @@ int ana_differ(int narg, int ps[])
       ww = srcinfo.rdims[0];
     stride = srcinfo.step[0];
     offset1 = -ww*stride;
-    offset2 = srcinfo.step[0]*ww;
     offset3 = offset1 + srcinfo.rdims[0]*stride;
     w1 = (internalMode & 1)? ww/2: ww;
     switch (symbol_type(iq)) {
@@ -2146,7 +2144,7 @@ int ana_table(int narg, int ps[])
  int	symx, symy, symf, topType, nTable, nOut, nRepeat, ix, n1,
 	symr, i, nsymx, nsymy, nsymf, nLoop, n2;
  array	*hx, *hy, *hf, *hMax, *hr;
- pointer	x, y, xf, r, ox, oy, of, nx, ny, nf;
+ pointer	x, y, xf, r, ox, oy, of, nx, ny;
  scalar	grad;
  int	ana_table2d(int, int []);
 
@@ -2226,7 +2224,6 @@ int ana_table(int narg, int ps[])
  of.l = LPTR(hf);
  nx.b = ox.b + sym[symx].spec.array.bstore - sizeof(array);
  ny.b = oy.b + sym[symy].spec.array.bstore - sizeof(array);
- nf.b = of.b + sym[symf].spec.array.bstore - sizeof(array);
  r.l = LPTR(hr);
 	/* now the real work */
 	/* Search strategy:  hope that the next xnew value is near

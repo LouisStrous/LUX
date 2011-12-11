@@ -1,8 +1,13 @@
 #ifndef INTMATH_H
 #define INTMATH_H
 
-void quotfloor(int num, int den, int *quot, int *rem);
-int divfloor(int num, int den);
-int divlinefloor(int x, int factor, int addendum, int divisor);
+#include <stdlib.h>
+
+div_t adiv(int numerator, int denominator);
+int iaquot(int numerator, int denominator);
+int iamod(int numerator, int denominator);
+div_t alinediv(int numerator, int factor, int addend, int denominator);
+int alinequot(int numerator, int factor, int addend, int denominator);
+int alinemod(int numerator, int factor, int addend, int denominator);
 
 #endif

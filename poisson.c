@@ -237,7 +237,7 @@ int gauss_seidel_2d2o(pointer b, pointer x, scalar sx, scalar sy, int type,
 }
 
 int restrict2(pointer b, pointer x, int type, int nx, int ny, scalar sx, 
-	      scalar sy, int do_residual, pointer tgt)
+               scalar sy, int do_residual, pointer tgt)
 {
   int i, j, nx2, ny2;
   pointer r0, r;		/* nx+2 by 3 elements */
@@ -402,6 +402,7 @@ int restrict2(pointer b, pointer x, int type, int nx, int ny, scalar sx,
     free(r0.f);
     break;
   }
+  return 0;
 }
 
 int restrict_residual(pointer b, pointer x, int type, int nx, int ny,
@@ -422,7 +423,6 @@ int ana_antilaplace2d(int narg, int ps[])
 {
   int img, result = ANA_ERROR, nx, ny, type, nx2, ny2, nlevel, i, nelem;
   pointer src, tgt;
-  scalar sx, sy;
   Pyramid pyramid;
 
   img = ps[0];
@@ -482,7 +482,6 @@ int ana_antilaplace2d(int narg, int ps[])
       if (ny2 > 1)
 	ny2 /= 2;
     }
-    sx.f = sy.f = 1;
     break;
   case ANA_DOUBLE:
     tgt.d = pyramid->data.d;
@@ -497,7 +496,6 @@ int ana_antilaplace2d(int narg, int ps[])
       if (ny2 > 1)
 	ny2 /= 2;
     }
-    sx.d = sy.d = 1;
     break;
   }
 

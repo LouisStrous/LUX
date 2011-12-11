@@ -519,7 +519,7 @@ int draw(int ic)
 /*------------------------------------------------------------------------- */
 int fontchange(int font)
 {
-  int	n, i, iq;
+  int	n, iq;
   byte	*p;
   char	name[300];
   FILE	*fin;
@@ -546,7 +546,6 @@ int fontchange(int font)
   if ((p = (byte *) malloc(n)) == NULL)
     return ANA_ERROR;
   fontptr[font] = p;
-  i = 0;
   while (n--) {
     fscanf(fin, "%2x", &iq);
     *p++ = (byte) iq;

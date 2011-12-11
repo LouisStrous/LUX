@@ -218,7 +218,7 @@ int kurv1_(int *n, double *x, double *y, double *slp1, double *slpn,
     static int i, k;
     static double s, dels12, delnn, c1, c2, c3, sinhs;
     static int i1;
-    static double slppn, delnm1, sinhd1, sinhd2, diagin, tn, spdiag, xq, 
+    static double slppn, delnm1, sinhd1, sinhd2, diagin, tn, spdiag, 
 	    sx, sy, sigmap, sinhin;
     static int nm1;
     static double dx1, dy1, dx2, dy2, sum, del1, del2;
@@ -279,7 +279,6 @@ straight line */
 	    sx = c1 * x[1] + c2 * x[2] + c3 * x[3];
 	    sy = c1 * y[1] + c2 * y[2] + c3 * y[3];
 	    slpp1 = atan2(sy, sx);
-	    xq = slpp1 / degrad;
 /* Computing 2nd power */
 	    d_1 = x[*n - 2] - x[nm1];
 /* Computing 2nd power */

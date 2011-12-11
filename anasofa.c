@@ -1,6 +1,7 @@
 #include "sofam.h"
 #include "action.h"
 #include <string.h>
+#include <time.h>
 
 /* This file provides ANA bindings for SOFA routines */
 
@@ -176,8 +177,6 @@ BIND(iauC2txy, id000ddddoc33, f, IAUC2TXY, 5, 5, NULL)
    -4799-01-01 or after 1465073-02-28 are rejected. */
 int ana_iauCal2jd(int narg, int ps[])
 {
-  loopInfo srcinfo, tgtinfo;
-  pointer src, tgt;
   double djm0, djm;
   pointer *ptrs;
   loopInfo *infos;
@@ -239,7 +238,7 @@ int ana_iauDat(int narg, int ps[])
 
   if (internalMode & 1) {       /* /VALID */
     time_t t;
-    int jdlo, jdhi, y, m, d, shi, slo;
+    int jdlo, jdhi, y, m, d;
     double f, dt;
 
     /* determine the last date of validity of the current implementation */
@@ -248,9 +247,7 @@ int ana_iauDat(int narg, int ps[])
     t = time(NULL);
     jdhi = (double) t/86400.0 + 2440587.5 + 10000;
     iauJd2cal(jdlo, 0.0, &y, &m, &d, &f);
-    slo = iauDat(y, m, d, f, &dt);
     iauJd2cal(jdhi, 0.0, &y, &m, &d, &f);
-    shi = iauDat(y, m, d, f, &dt);
     do {
       int jd, s;
       jd = (jdhi + jdlo)/2;
@@ -258,10 +255,8 @@ int ana_iauDat(int narg, int ps[])
       s = iauDat(y, m, d, f, &dt);
       if (s) {
         jdhi = jd;
-        shi = s;
       } else {
         jdlo = jd;
-        slo = s;
       }
     } while (jdhi - jdlo > 1);
     iq = scalar_scratch(ANA_LONG);
@@ -294,6 +289,8 @@ int ana_iauDat(int narg, int ps[])
         iauDat((int) ptrs[0].d[0], (int) ptrs[0].d[1], d, f, ptrs[1].d++);
         ptrs[0].d += 3;
       }
+      break;
+    default:
       break;
     }
   }

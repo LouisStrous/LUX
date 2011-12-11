@@ -1196,7 +1196,6 @@ int yylex(YYSTYPE *lvalp)
  char	*p, c, *prompt, *p2;
  int	i;
  static int	len = 0;
- extern FILE	*recordFile;	/* file to which requested I/O is copied */
  extern char	recording, *currentInputFile;
  extern int	curLineNumber;	/* current line number */
  int	getNewLine(char *buffer, char *prompt, char historyFlag),
@@ -1558,7 +1557,7 @@ int main(int argc, char *argv[])
      /* main program */
 {
   int	site(int, int []), readHistory(void);
-  char	*p, *p2;
+  char	*p;
   extern int	nSymbolStack;
   extern void	getTerminalSize(void);
   void	pegParse(void), inHistory(char *), getTermCaps(void);

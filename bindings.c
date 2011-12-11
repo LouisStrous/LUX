@@ -405,7 +405,7 @@ int ana_ic33drd_f_(int narg, int ps[], double (*f)(double (*)[3], double))
     return ANA_ERROR;
   double (*rnpb)[3] = (double (*)[3]) ptrs[1].d;
   while (infos[1].nelem--) {
-    *ptrs[2].d++ = iauEors(rnpb, *ptrs[1].d++);
+    *ptrs[2].d++ = f(rnpb, *ptrs[1].d++);
     rnpb += 3;
   }
   return iq;  

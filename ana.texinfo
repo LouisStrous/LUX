@@ -13012,6 +13012,7 @@ arguments.
 * IAURM2V::                     Rotation vector from rotation matrix
 * IAURV2M::                     Rotation matrix from rotation vector
 * IAURX::                       Rotates 3-by-3 matrix about x axis
+* IAURXR::                      Multiplies two 3-by-3 matrices
 * IAURXPV::                     Product of 3-by-3 matrix and position/velocity vector
 * IAURY::                       Rotates 3-by-3 matrix about y axis
 * IAURZ::                       Rotates 3-by-3 matrix about z axis
@@ -21470,7 +21471,7 @@ and the rotation matrix gets a rotation angle equal to the modulus of
 but with one extra dimension equal to 3 prefixed.
 
 @c -------------------------------------
-@node IAURX, IAURXPV, IAURV2M, Internal Routines
+@node IAURX, IAURXR, IAURV2M, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAURX
 
@@ -21481,7 +21482,19 @@ dimensions equal to 3) about the x axis over angle @code{@var{phi}}
 (in radians).
 
 @c -------------------------------------
-@node IAURXPV, IAURY, IAURX, Internal Routines
+@node IAURXR, IAURXPV, IAURX, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection IAURXR
+
+@code{IAURXR(@var{r1}, @var{r2})}
+
+[SOFA] Multiplies two r-matrices @code{@var{r1}} and @code{@var{r2}}
+in their first two dimensions (which must each have a size equal to
+3) and returns the result.  The input parameters must have the same
+dimensions.  The result has those same dimensions, too.
+
+@c -------------------------------------
+@node IAURXPV, IAURY, IAURXR, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection IAURXPV
 

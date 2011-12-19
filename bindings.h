@@ -68,6 +68,7 @@ int ana_ic23odddddd_s_(int narg, int ps[], void (*f)(double [2][3], double *, do
 int ana_ic23oddddddrl_s_(int narg, int ps[], int (*f)(double [2][3], double *, double *, double *, double *, double *, double *));
 int ana_ic33b3ob3_f_(int narg, int ps[], void (*f)(double [3][3], double [3], double [3]));
 int ana_ic33c23oc23_f_(int narg, int ps[], void (*f)(double [3][3], double [2][3], double [2][3]));
+int ana_ic33c33oc33_f_(int narg, int ps[], void (*f)(double (*)[3], double (*)[3], double (*)[3]));
 int ana_ic33dc33oc33_f_(int narg, int ps[], void (*f)(double (*)[3], double, double (*)[3], double (*)[3]));
 int ana_ic33drd_f_(int narg, int ps[], double (*f)(double (*)[3], double));
 int ana_ic33ob3_f_(int narg, int ps[], void (*f)(double [3][3], double [3]));

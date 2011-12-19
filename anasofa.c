@@ -1037,6 +1037,16 @@ BIND(iauPxp, ib3b3ob3, f, IAUPXP, 2, 2, NULL)
    radians of the rotation matrix. */
 BIND(iauRm2v, ic33ob3, f, IAURM2V, 1, 1, NULL)
 /*-----------------------------------------------------------------------*/
+/* IAURXP(<r>, <p>)
+
+   Returns the matrix product of an r-matrix and a p-vector. */
+BIND(iauRxp, ic33b3ob3, f, IAURXP, 2, 2, NULL)
+/*-----------------------------------------------------------------------*/
+/* IAURXR(<r1>, <r2>)
+
+   Returns the matrix product of two r-matrices. */
+BIND(iauRxr, ic33c33oc33, f, IAURXR, 2, 2, NULL)
+/*-----------------------------------------------------------------------*/
 /* IAURV2M(<w>)
 
    Returns the rotation matrix corresponding to rotation vector <w>.

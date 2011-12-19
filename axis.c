@@ -1578,6 +1578,7 @@ struct param_spec {
   size_t num_dims_spec;
   struct dims_spec *dims_spec;
   int ref_par;
+  enum remaining_dims_type { PS_ABSENT, PS_EQUAL_TO_REFERENCE, PS_ARBITRARY } remaining_dims;
   int remaining_dims_equal_to_reference;
 };
 
@@ -1727,9 +1728,9 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
           goto error;
         }
       }
-      while (*fmt && *fmt != '*' && *fmt != ';') { /* all dims */
+      while (*fmt && !strchr("*;&", *fmt)) { /* all dims */
         memset(&d_spec, '\0', sizeof(d_spec));
-        while (*fmt && *fmt != ',' && *fmt != '*' && *fmt != ';') { /* every dim */
+        while (*fmt && !strchr(",*;&", *fmt)) { /* every dim */
           int type = 0;
           size_t size = 0;
           switch (*fmt) {
@@ -1788,17 +1789,23 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
               goto error;
             }
             break;
-          }
-        } /* end of while (*fmt && *fmt != ',' && *fmt != ';') */
+          } /* end switch type */
+        } /* end of while *fmt && !strchr(",*;&") */
         obstack_grow(&ods, &d_spec, sizeof(d_spec));
         if (*fmt == ',')
           fmt++;
-      } /* end of while (*fmt && *fmt != '*' && *fmt != ';') */
-      if (*fmt == '*') {
-        p_spec.remaining_dims_equal_to_reference = 1;
+      } /* end of while *fmt && !strchr("*;&", *fmt) */
+      switch (*fmt) {
+      case '*':
+        p_spec.remaining_dims = PS_ARBITRARY;
         fmt++;
-      } else
-        p_spec.remaining_dims_equal_to_reference = 0;
+        break;
+      case '&':
+        p_spec.remaining_dims = PS_EQUAL_TO_REFERENCE;
+        fmt++;
+        break;
+        /* default is PS_ABSENT */
+      }
       if (*fmt && *fmt != ';') {
         anaerror("Expected ; instead of %c at end of parameter "
                  "specification", 0, *fmt);
@@ -2078,26 +2085,41 @@ int standard_args(int narg, int ps[], char const *fmt, pointer **ptrs,
       }
       switch (pspec->logical_type) {
       case PS_INPUT:
-        if (ref_dims_ix < num_ref_dims) {
-          if (pspec->remaining_dims_equal_to_reference) {
-            if (ref_dims) {
-              if (num_src_dims - src_dims_ix != num_ref_dims - ref_dims_ix) {
-                returnSym = anaerror("Expected %d dimensions but found %d "
-                                     "in reference parameter %d", ps[param_ix],
-                                     num_ref_dims - ref_dims_ix + src_dims_ix,
-                                     num_src_dims, ref_param + 1);
+        switch (pspec->remaining_dims) {
+        case PS_EQUAL_TO_REFERENCE:
+          if (ref_dims && ref_dims_ix < num_ref_dims) {
+            if (num_src_dims - src_dims_ix != num_ref_dims - ref_dims_ix) {
+              returnSym = anaerror("Expected %d dimensions but found %d "
+                                   "in reference parameter %d", ps[param_ix],
+                                   num_ref_dims - ref_dims_ix + src_dims_ix,
+                                   num_src_dims, ref_param + 1);
+              goto error;
+            }
+            int i, j;
+            for (i = ref_dims_ix, j = src_dims_ix; i < num_ref_dims; i++, j++)
+              if (ref_dims[i] != src_dims[j]) {
+                returnSym = anaerror("Expected dimension %d equal to %d "
+                                     "but found %d", ps[param_ix], i + 1,
+                                     ref_dims[i], src_dims[j]);
                 goto error;
               }
-              int i, j;
-              for (i = ref_dims_ix, j = src_dims_ix; i < num_ref_dims; i++, j++)
-                if (ref_dims[i] != src_dims[j]) {
-                  returnSym = anaerror("Expected dimension %d equal to %d "
-                                       "but found %d", ps[param_ix], i + 1,
-                                       ref_dims[i], src_dims[j]);
-                  goto error;
-                }
-            }
+          } else {
+            returnSym = anaerror("Dimensions of parameter %d required to be "
+                                 "equal to those of the reference, but no "
+                                 "reference is available",
+                                 ps[param_ix], param_ix + 1);
+            goto error;
           }
+          break;
+        case PS_ARBITRARY:
+          break;
+        case PS_ABSENT:
+          if (src_dims_ix < num_src_dims) {
+            returnSym = anaerror("Has %d dimensions but %d are expected",
+                                 ps[param_ix], src_dims_ix, num_src_dims);
+            goto error;
+          }
+          break;
         }
         iq = ps[param_ix];
         type = symbol_type(iq);
@@ -2109,18 +2131,28 @@ int standard_args(int narg, int ps[], char const *fmt, pointer **ptrs,
         iq = ana_convert(1, &iq, type, 1);
         break;
       case PS_OUTPUT: case PS_RETURN:
-        if (ref_dims_ix < num_ref_dims) {
-          if (pspec->remaining_dims_equal_to_reference) {
+        switch (pspec->remaining_dims) {
+        case PS_EQUAL_TO_REFERENCE:
+          if (ref_dims_ix < num_ref_dims) {
             /* append remaining dimensions from reference parameter*/
             size_t e = num_ref_dims - ref_dims_ix;
             memcpy(tgt_dims + tgt_dims_ix, ref_dims + ref_dims_ix, e*sizeof(int));
             tgt_dims_ix += e;
             src_dims_ix += e;
             ref_dims_ix += e;
-          } else if (ref_dims_ix == 0) {
-            returnSym = anaerror("Return symbol has no elements", 0);
-            goto error;
           }
+          break;
+        case PS_ARBITRARY:
+          returnSym = anaerror("'Arbitrary' remaining dimensions makes no "
+                               "sense for an output or return parameter "
+                               " (number %d)", 0, param_ix + 1);
+          goto error;
+        case PS_ABSENT:
+          break;
+        }
+        if (tgt_dims_ix == 0) {
+          returnSym = anaerror("Return symbol has no elements", 0);
+          goto error;
         }
         /* get rid of trailing dimensions equal to 1 */
         while (tgt_dims_ix > 0 && tgt_dims[tgt_dims_ix - 1] == 1)

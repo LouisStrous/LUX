@@ -19,7 +19,7 @@
 
 	/* symbol classes */
 
-enum classes { 
+enum Symbolclass { 
   ANA_UNUSED = 0,		/* 0: not used */
   ANA_SCALAR,			/* 1: real scalar 17 */
   ANA_STRING,			/* 2: string 'xx' */
@@ -68,7 +68,7 @@ enum classes {
 /* might not work properly if you do. */
 
 	/* symbol types */
-enum types {
+enum Symboltype {
   ANA_BYTE,			/* 0: 1-byte integers */
   ANA_WORD,			/* 1: 2-byte integers */
   ANA_LONG,			/* 2: 4-byte integers */
@@ -78,7 +78,8 @@ enum types {
   ANA_LSTRING,			/* 6: literal strings */
   ANA_STRING_ARRAY,		/* 7: string arrays */
   ANA_CFLOAT,			/* 8: 8-byte complex floats */
-  ANA_CDOUBLE			/* 9: 16-byte complex floats */
+  ANA_CDOUBLE,			/* 9: 16-byte complex floats */
+  ANA_NO_SYMBOLTYPE,
 };
 
 	/* ANA_EVB classes */
@@ -591,7 +592,7 @@ typedef struct {
   int axisindex;		/* index to current axis (in axes[]) */
   int mode;			/* desired treatment modes */
   int stride;			/* bytes per data element */
-  int type;			/* data type */
+  enum Symboltype type;         /* data type */
   int advanceaxis;		/* how many axes not to advance (from start) */
   int raxes[MAX_DIMS];		/* from rearranged to old axes */
   int iraxes[MAX_DIMS];		/* from old to rearranged axes */

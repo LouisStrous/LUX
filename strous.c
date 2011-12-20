@@ -119,7 +119,7 @@ int ana_distr_f(int narg, int ps[])
 	minmax(int *, int, int);
   pointer arg1, arg2, res;
   int	ana_zero(int, int []);
-  int convertWidePointer(wideScalar *, int, int);
+  void convertWidePointer(wideScalar *, int, int);
 
   iq = ps[0];
   if (symbol_class(iq) != ANA_ARRAY)
@@ -453,6 +453,7 @@ int ana_find(int narg, int ps[])
   { iq = ana_long(1, &ps[2]);
     GET_NUMERICAL(theOff, noff); }
   else noff = 0;
+  indx.d = NULL;
   iq = ps[1];			/* key */
   switch (type)			/* change key to type of array */
   { case ANA_BYTE:
@@ -477,7 +478,7 @@ int ana_find(int narg, int ps[])
   if (mode & 2) resulttype = type; else resulttype = ANA_LONG;
   if (!repeat && class == ANA_SCALAR)
   { result = scalar_scratch(resulttype);
-    indx.l = &sym[result].spec.scalar.l;
+    indx.b = &sym[result].spec.scalar.b;
     nRepeat = 1; }
   else
   { if (!repeat)

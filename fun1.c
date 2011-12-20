@@ -14,6 +14,7 @@
 #include <ctype.h>
 #include "install.h"
 #include "action.h"
+#include "calendar.h"
 static char rcsid[] __attribute__ ((unused)) =
 "$Id: fun1.c,v 4.0 2001/02/07 20:37:00 strous Exp $";
 
@@ -233,7 +234,7 @@ int ana_date(void)
 }
 /*------------------------------------------------------------------------- */
 int ana_jd(void)
-/* returns current Julian Date in double precision */
+/* returns current Julian Day (relative to UTC) in double precision */
 {
   time_t	t;
   double	jd;
@@ -252,6 +253,17 @@ int ana_jd(void)
   jd = (double) t/86400.0 + 2440587.5;
   result = scalar_scratch(ANA_DOUBLE);
   scalar_value(result).d = jd;
+  return result;
+}
+/*------------------------------------------------------------------------- */
+int ana_cjd(void)
+/* returns current Chronological Julian Day, relative to the current
+   time zone */
+{
+  int result;
+
+  result = scalar_scratch(ANA_DOUBLE);
+  scalar_value(result).d = CJD_now();
   return result;
 }
 /*------------------------------------------------------------------------- */
@@ -2045,7 +2057,7 @@ int index_total(int narg, int ps[], int mean)
 	      }
 	      /* we now have the data value to the given unsigned power */
 	      /* add in the exponent sign and the weighte */
-	      if ((psign = -1)) { /* replace valuecf by *weights.f/valuecf */
+	      if (psign == -1) { /* replace valuecf by *weights.f/valuecf */
 		temp2f = valuecf.real*valuecf.real
 		  + valuecf.imaginary*valuecf.imaginary;
 		if (temp2f) {
@@ -2093,7 +2105,7 @@ int index_total(int narg, int ps[], int mean)
 		  }
 		  /* we now have the data value to the given unsigned power */
 		  /* add in the exponent sign and the weighte */
-		  if ((psign = -1)) {/* replace valuecd by *weights.f/valuecd */
+		  if (psign == -1) {/* replace valuecd by *weights.f/valuecd */
 		    temp2d = valuecd.real*valuecd.real
 		      + valuecd.imaginary*valuecd.imaginary;
 		    if (temp2d) {
@@ -2133,7 +2145,7 @@ int index_total(int narg, int ps[], int mean)
 		  }
 		  /* we now have the data value to the given unsigned power */
 		  /* add in the exponent sign and the weighte */
-		  if ((psign = -1)) {/* replace valuecd by *weights.f/valuecd */
+		  if (psign == -1) {/* replace valuecd by *weights.f/valuecd */
 		    temp2d = valuecd.real*valuecd.real
 		      + valuecd.imaginary*valuecd.imaginary;
 		    if (temp2d) {
@@ -2373,7 +2385,7 @@ int index_total(int narg, int ps[], int mean)
 	      }
 	      /* we now have the data value to the given unsigned power */
 	      /* add in the exponent sign and the weighte */
-	      if ((psign = -1)) { /* replace valuecf by *weights.f/valuecf */
+	      if (psign == -1) { /* replace valuecf by *weights.f/valuecf */
 		temp2f = valuecf.real*valuecf.real
 		  + valuecf.imaginary*valuecf.imaginary;
 		if (temp2f) {
@@ -2415,7 +2427,7 @@ int index_total(int narg, int ps[], int mean)
 		  }
 		  /* we now have the data value to the given unsigned power */
 		  /* add in the exponent sign and the weighte */
-		  if ((psign = -1)) {/* replace valuecd by *weights.f/valuecd */
+		  if (psign == -1) {/* replace valuecd by *weights.f/valuecd */
 		    temp2d = valuecd.real*valuecd.real
 		      + valuecd.imaginary*valuecd.imaginary;
 		    if (temp2d) {
@@ -2455,7 +2467,7 @@ int index_total(int narg, int ps[], int mean)
 		  }
 		  /* we now have the data value to the given unsigned power */
 		  /* add in the exponent sign and the weighte */
-		  if ((psign = -1)) {/* replace valuecd by *weights.f/valuecd */
+		  if (psign == -1) {/* replace valuecd by *weights.f/valuecd */
 		    temp2d = valuecd.real*valuecd.real
 		      + valuecd.imaginary*valuecd.imaginary;
 		    if (temp2d) {
@@ -2683,7 +2695,7 @@ int index_total(int narg, int ps[], int mean)
 	      }
 	      /* we now have the data value to the given unsigned power */
 	      /* add in the exponent sign and the weighte */
-	      if ((psign = -1)) { /* replace valuecf by *weights.f/valuecf */
+	      if (psign == -1) { /* replace valuecf by *weights.f/valuecf */
 		temp2f = valuecf.real*valuecf.real
 		  + valuecf.imaginary*valuecf.imaginary;
 		if (temp2f) {
@@ -2728,7 +2740,7 @@ int index_total(int narg, int ps[], int mean)
 		  }
 		  /* we now have the data value to the given unsigned power */
 		  /* add in the exponent sign and the weighte */
-		  if ((psign = -1)) {/* replace valuecd by *weights.f/valuecd */
+		  if (psign == -1) {/* replace valuecd by *weights.f/valuecd */
 		    temp2d = valuecd.real*valuecd.real
 		      + valuecd.imaginary*valuecd.imaginary;
 		    if (temp2d) {
@@ -2765,7 +2777,7 @@ int index_total(int narg, int ps[], int mean)
 		  }
 		  /* we now have the data value to the given unsigned power */
 		  /* add in the exponent sign and the weighte */
-		  if ((psign = -1)) {/* replace valuecd by *weights.f/valuecd */
+		  if (psign == -1) {/* replace valuecd by *weights.f/valuecd */
 		    temp2d = valuecd.real*valuecd.real
 		      + valuecd.imaginary*valuecd.imaginary;
 		    if (temp2d) {
@@ -2975,7 +2987,7 @@ int index_total(int narg, int ps[], int mean)
 	      }
 	      /* we now have the data value to the given unsigned power */
 	      /* add in the exponent sign and the weighte */
-	      if ((psign = -1)) { /* replace valuecf by *weights.f/valuecf */
+	      if (psign == -1) { /* replace valuecf by *weights.f/valuecf */
 		temp2f = valuecf.real*valuecf.real
 		  + valuecf.imaginary*valuecf.imaginary;
 		if (temp2f) {
@@ -3013,7 +3025,7 @@ int index_total(int narg, int ps[], int mean)
 		  }
 		  /* we now have the data value to the given unsigned power */
 		  /* add in the exponent sign and the weighte */
-		  if ((psign = -1)) {/* replace valuecd by *weights.f/valuecd */
+		  if (psign == -1) {/* replace valuecd by *weights.f/valuecd */
 		    temp2d = valuecd.real*valuecd.real
 		      + valuecd.imaginary*valuecd.imaginary;
 		    if (temp2d) {
@@ -3049,7 +3061,7 @@ int index_total(int narg, int ps[], int mean)
 		  }
 		  /* we now have the data value to the given unsigned power */
 		  /* add in the exponent sign and the weighte */
-		  if ((psign = -1)) {/* replace valuecd by *weights.f/valuecd */
+		  if (psign == -1) {/* replace valuecd by *weights.f/valuecd */
 		    temp2d = valuecd.real*valuecd.real
 		      + valuecd.imaginary*valuecd.imaginary;
 		    if (temp2d) {
@@ -3997,7 +4009,7 @@ int total(int narg, int ps[], int mean)
 		tempcf.imaginary = 2*tempcf.real*tempcf.imaginary;
 		tempcf.real = temp2f;
 	      }
-	      if ((psign = -1)) { /* replace valuecf by *weights.f/valuecf */
+	      if (psign == -1) { /* replace valuecf by *weights.f/valuecf */
 		temp2f = valuecf.real*valuecf.real
 		  + valuecf.imaginary*valuecf.imaginary;
 		if (temp2f) {
@@ -4051,7 +4063,7 @@ int total(int narg, int ps[], int mean)
 		    tempcd.imaginary = 2*tempcd.real*tempcd.imaginary;
 		    tempcd.real = temp2d;
 		  }
-		  if ((psign = -1)) { /* replace valuecd by *weights.f/valuecd */
+		  if (psign == -1) { /* replace valuecd by *weights.f/valuecd */
 		    temp2d = valuecd.real*valuecd.real
 		      + valuecd.imaginary*valuecd.imaginary;
 		    if (temp2d) {
@@ -4103,7 +4115,7 @@ int total(int narg, int ps[], int mean)
 		    tempcd.imaginary = 2*tempcd.real*tempcd.imaginary;
 		    tempcd.real = temp2d;
 		  }
-		  if ((psign = -1)) { /* replace valuecd by *weights.f/valuecd */
+		  if (psign == -1) { /* replace valuecd by *weights.f/valuecd */
 		    temp2d = valuecd.real*valuecd.real
 		      + valuecd.imaginary*valuecd.imaginary;
 		    if (temp2d) {
@@ -4415,7 +4427,7 @@ int total(int narg, int ps[], int mean)
 		tempcf.imaginary = 2*tempcf.real*tempcf.imaginary;
 		tempcf.real = temp2f;
 	      }
-	      if ((psign = -1)) { /* replace valuecf by *weights.f/valuecf */
+	      if (psign == -1) { /* replace valuecf by *weights.f/valuecf */
 		temp2f = valuecf.real*valuecf.real
 		  + valuecf.imaginary*valuecf.imaginary;
 		if (temp2f) {
@@ -4461,7 +4473,7 @@ int total(int narg, int ps[], int mean)
 		    tempcd.imaginary = 2*tempcd.real*tempcd.imaginary;
 		    tempcd.real = temp2d;
 		  }
-		  if ((psign = -1)) { /* replace valuecd by *weights.f/valuecd */
+		  if (psign == -1) { /* replace valuecd by *weights.f/valuecd */
 		    temp2d = valuecd.real*valuecd.real
 		      + valuecd.imaginary*valuecd.imaginary;
 		    if (temp2d) {
@@ -4505,7 +4517,7 @@ int total(int narg, int ps[], int mean)
 		    tempcd.imaginary = 2*tempcd.real*tempcd.imaginary;
 		    tempcd.real = temp2d;
 		  }
-		  if ((psign = -1)) { /* replace valuecd by *weights.f/valuecd */
+		  if (psign == -1) { /* replace valuecd by *weights.f/valuecd */
 		    temp2d = valuecd.real*valuecd.real
 		      + valuecd.imaginary*valuecd.imaginary;
 		    if (temp2d) {

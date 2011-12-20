@@ -3700,6 +3700,8 @@ int ana_xtvread(int narg, int ps[])
  XDestroyImage(xi);
  XFlush(display);
  if (internalMode & 1) {
+   int ana_colorstogrey(int narg, int ps[]);
+   int ana_delete(int narg, int ps[]);
    if (ana_colorstogrey(1, &result_sym) != ANA_OK) {
      ana_delete(1, &result_sym);
      return ANA_ERROR;

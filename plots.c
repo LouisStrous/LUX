@@ -746,6 +746,7 @@ int plotxy(float xx[], float yy[], float ex[], float ey[], int n, int dx,
   }
 
   if (n > 0) {			/* no bounding box checking required in */
+    int oplotx(float *, float *, float *, float *, int, int, int);
    /* oplotx, since all data points fall within the plot window, i.e. */
    /* also within the current bounding box.  May want to check when */
    /* the axis labels and titles are drawn, so don't just set to zero */
@@ -1488,7 +1489,7 @@ int ana_pencolor(int narg, int ps[])
 #endif
   int	postcolorpen(float red, float green, float blue);
 #ifdef X11
-  XColor	color, *colorp;
+  XColor	color;
 #endif
   
   if (lunplt == 0) {
@@ -1551,10 +1552,6 @@ int ana_pencolor(int narg, int ps[])
 	red = *pf++;
 	green = *pf++;
 	blue = *pf++;
-#ifdef X11
-	if (xflag && !anaAllocNamedColor(pc, &colorp))
-	  return ANA_ERROR;
-#endif
 	break;
     }
     if (lunplt == 1)

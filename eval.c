@@ -5736,21 +5736,6 @@ void ana_idiv_sa(void)
   }
 }
 /*----------------------------------------------------------*/
-/* returns z = x mod y such that 0 <= z < |y| */
-int iamod(int x, int y)
-{
-  int v;
-
-  if (!y)
-    return 0;
-  if (y < 0)
-    y = -y;
-  v = x % y;
-  if (v < 0)
-    v += y;
-  return v;
-}
-/*----------------------------------------------------------*/
 /* returns z = x mod y such that -|y|/2 < z <= |y|/2 */
 int iasmod(int x, int y)
 {
@@ -15107,7 +15092,9 @@ int evalListPtr(int symbol)
 int evalStructPtr(int symbol)
 /* evaluates <symbol> as a STRUCT_PTR */
 {
-  int	target, result, n, i, one = 1, outdims[MAX_DIMS], outndim = 0,
+  return anaerror("evaluation of structure pointers not yet implemented", symbol);
+#if IMPLEMENTED
+  int	target, result, n, i, nout, one = 1, outdims[MAX_DIMS], outndim = 0,
     *dims, ndim, nms, i1, i2, j, k, nelem, *p, ne, type, total_ndim;
   structElem	*se;
   structPtr	*spe;
@@ -15214,23 +15201,30 @@ int evalStructPtr(int symbol)
     case ANA_TEMP_STRING:	/* a string or string array */
       if (outndim > 1) {	/* a string array */
 	result = array_scratch(type, outndim - 1, outdims + 1);
+	trgt.sp = array_data(result);
       } else {
 	result = string_scratch(0);
+	trgt.sp = &string_value(result);
       }
       break;
     default:			/* everything else */
       if (outndim) { 		/* an array */
 	result = array_scratch(type, outndim, outdims);
+	trgt.v = array_data(result);
       } else {			/* a scalar */
 	result = scalar_scratch(type);
+	trgt.v = &scalar_value(result).b;
       }
       break;
   } /* end of switch (type) */
+
+  /* NOT YET FINISHED */
 
   return result;
 
   evalStructPtr_1:
   return ANA_ERROR;
+#endif
 }
 /*----------------------------------------------------------*/
 int evalLhs(symbol)

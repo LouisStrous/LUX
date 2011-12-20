@@ -54,10 +54,13 @@
 #include <math.h>
 #include <stdlib.h>
 #include <float.h>
+#include <assert.h>
+#include <time.h>
 #include "action.h"
 #include "astron.h"
 #include "astrodat2.h"
 #include "astrodat3.h"
+#include "calendar.h"
 /* #include "astrodat.h" */
 static char rcsid[] __attribute__ ((unused)) =
  "$Id: astron.c,v 4.0 2001/02/07 20:36:57 strous Exp $";
@@ -89,6 +92,8 @@ static char rcsid[] __attribute__ ((unused)) =
 #define EARTH		3
 
 int	findint(int, int *, int);
+void	UTC_to_TAI(double *), TAI_to_UTC(double *);
+void	CJDLT_to_TAI(double *), TAI_to_CJDLT(double *);
 
 char *GregorianMonths[] = {
   "January", "February", "March", "April", "May", "June", "July",
@@ -321,138 +326,74 @@ double JDtoLunar(double JD)
   return k;
 }
 /*--------------------------------------------------------------------------*/
-double JulianDate(int year, int month, double day, int calendar)
-/* the Julian Date at the given date.  "calendar" indicates the
-   calendar that year, month, and date are in.  possible values
-   for calendar:  CAL_GREGORIAN (Gregorian, started 15 October 1582) 
-   [ES12.92-1,Fliegel&Van_Flandern1968]; CAL_ISLAMIC (civil calendar)
-   [ES12.93-1,Fliegel&Van_Flandern1968]; CAL_JULIAN (Julian proleptic
-   calendar) [ES12.95,Fliegel1990].  The Julian Date is returned in
-   the same time base as its arguments (TAI, UTC, TT, or something else
-   altogether) */
+int DatetoCJDN(int year, int month, int day, int calendar)
+/* Calculated the Chronological Julian Day Number at the given
+   calendar date.  "calendar" indicates the calendar that year, month,
+   and date are in.  possible values for calendar: CAL_GREGORIAN
+   (Gregorian, started 15 October 1582); CAL_ISLAMIC (civil calendar);
+   CAL_JULIAN (Julian proleptic calendar). */
 {
-  double	hebrewToJulian(int, int, double);
+  static int (*f[])(int, int, int) =
+    { NULL, CommontoCJDN, GregoriantoCJDN, IslamictoCJDN,
+      JuliantoCJDN, HebrewtoCJDN, EgyptiantoCJDN };
 
-  switch (calendar) {
-    case CAL_GREGORIAN: case CAL_COMMON:
-      if (month < 1 || month > 12) {
-	int n;
-
-	n = idiv(month-1,12);
-	year += n;
-	month -= 12*n;
-      }
-      if (calendar == CAL_COMMON)
-	calendar = (year < 1582 || (year == 1582 && (month < 10
-                   || (month == 10 && day < 15))))? CAL_JULIAN: CAL_GREGORIAN;
-      if (calendar == CAL_GREGORIAN)
-	return idiv(1461*(year + (month - 14)/12),4)
-	  + (367*(month - 2 - 12*((month - 14)/12)))/12
-	  - idiv(3*idiv(year + 100 + (month - 14)/12,100),4) + day + 1721088.5;
-    case CAL_JULIAN:
-      if (month < 1 || month > 12) {
-	int n;
-
-	n = idiv(month-1,12);
-	year += n;
-	month -= 12*n;
-      }
-      /*      return 367*year - (7*(year + 5001 + (month - 9)/7))/4 + (275*month)/9
-	      + day + 1729776.5; */
-      return 367*year - idiv(7*(year + 1 + (month - 9)/7),4) + (275*month)/9
-	+ day + 1721026.5;
-    case CAL_ISLAMIC:
-      if (month < 1 || month > 12) {
-	int n;
-
-	n = idiv(month - 1, 12);
-	year += n;
-	month -= 12*n;
-      }
-      return idiv(11*year + 3, 30) + 354*year + 30*month - (month - 1)/2
-	+ day + 1948440 - 385.5;
-    case CAL_HEBREW:
-      if (month < 1 || month > 12)
-	return
-	  anaerror("Month number %1d is not valid in the Hebrew calendar"
-		" (1-12)", 0, month);
-      return hebrewToJulian(year, month, day);
-    case CAL_EGYPTIAN:		/* Era of Nabonassar
-	(1 Thoth, year 1 = 26 February, 747 BC = JD 1448272.5) */
-      /* era of Philippos (since the death of Alexander) = 425 Nabonassar
-	 era of Hadrian = 864 Nabonassar
-	 era of Antoninus = 885 Nabonassar */
-      return 365*year + 30*month + day + 1448241.5;
-  }
-  return 0;
+  if (calendar < 0 || calendar >= sizeof(f)/sizeof(*f)
+      || !f[calendar])
+    return 0;
+  
+  return f[calendar](year, month, day);
 }
 /*--------------------------------------------------------------------------*/
-void JDtoDate(double JD, int *year, int *month, double *day, int calendar)
+double DatetoCJD(int year, int month, double day, int calendar)
+/* Calculates the Chronological Julian Date at the given date.
+   "calendar" indicates the calendar that year, month, and date are
+   in.  possible values for calendar: CAL_GREGORIAN (Gregorian,
+   started 15 October 1582); CAL_ISLAMIC (civil calendar); CAL_JULIAN
+   (Julian proleptic calendar).  The Chronological Julian Date is
+   returned in the same time base as its arguments (TAI, UTC, TT, or
+   something else altogether) */
+{
+  static double (*f[])(int, int, double) =
+    { NULL, CommontoCJD, GregoriantoCJD, IslamictoCJD,
+      JuliantoCJD, HebrewtoCJD, EgyptiantoCJD };
+
+  if (calendar < 0 || calendar >= sizeof(f)/sizeof(*f)
+      || !f[calendar])
+    return 0.0;
+  
+  return f[calendar](year, month, day);
+}
+/*--------------------------------------------------------------------------*/
+void CJDNtoDate(int CJDN, int *year, int *month, int *day, int calendar)
      /* returns the date corresponding to Julian Date JD. */
      /* possible values for calendar (see JulianDate): CAL_GREGORIAN, */
      /* CAL_ISLAMIC, CAL_JULIAN, CAL_HEBREW, CAL_EGYPTIAN, CAL_COMMON */
 {
-  int	jd, l, n, i, j, d, k;
+  static void (*f[])(int, int *, int *, int *) =
+    { CJDNtoCommon, CJDNtoGregorian, CJDNtoIslamic,
+      CJDNtoJulian, CJDNtoHebrew, CJDNtoEgyptian };
 
-  jd = (int) (JD + 0.5);	/* get Julian Day Number */
-  if (jd > JD + 0.5)
-    jd--;
-  if (calendar == CAL_COMMON)
-    calendar = (JD < 2299160.5)? CAL_JULIAN: CAL_GREGORIAN;
-  switch (calendar) {
-    case CAL_GREGORIAN:
-      l = jd + 68569;
-      n = idiv(4*l,146097);
-      l = l - idiv(146097*n + 3,4);
-      i = (4000*(l + 1))/1461001;
-      l = l - (1461*i)/4 + 31;
-      j = (80*l)/2447;
-      d = l - (2447*j)/80;
-      l = j/11;
-      *month = j + 2 - 12*l;
-      *year = 100*(n - 49) + i + l;
-      *day = d + JD + 0.5 - jd;
-      break;
-    case CAL_HEBREW:
-      {
-        int JDtoHebrew(double, int *, int *, double *);
-        JDtoHebrew(JD, year, month, day);
-      }
-      break;
-    case CAL_ISLAMIC:
-      l = jd - 1948440 + 10632;
-      n = idiv(l - 1,10631);
-      l = l - 10631*n + 354;
-      j = ((10985 - l)/5316)*((50*l)/17719) + (l/5670)*((43*l)/15238);
-      l = l - ((30 - j)/15)*((17719*j)/50) - (j/16)*((15238*j)/43) + 29;
-      *month = (24*l)/709;
-      d = l - (709* *month)/24;
-      *year = 30*n + j - 30;
-      *day = d + JD + 0.5 - jd;
-      break;
-    case CAL_JULIAN:
-      j = jd + 1402;
-      k = idiv(j - 1,1461);
-      l = j - 1461*k;
-      n = (l - 1)/365 - l/1461;
-      i = l - 365*n + 30;
-      j = (80*i)/2447;
-      *day = i - (2447*j)/80 + JD + 0.5 - jd;
-      i = j/11;
-      *month = j + 2 - 12*i;
-      *year = 4*k + n + i - 4716;
-      break;
-    case CAL_EGYPTIAN:
-      JD -= 1448272.5;
-      *year = (int) floor(JD/365);
-      JD -= 365**year;
-      *month = (int) (JD/30) + 1;
-      JD -= 30**month;
-      *day = JD + 31;
-      break;
-  default:
-    anaerror("Illegal calendar type %d in JDtoDate()", calendar);
-  }
+  if (calendar < 0 || calendar >= sizeof(f)/sizeof(*f))
+    *year = *month = *day = 0;
+  else
+    f[calendar](CJDN, year, month, day);
+}
+/*--------------------------------------------------------------------------*/
+void CJDtoDate(double CJD, int *year, int *month, double *day, int calendar)
+     /* returns the date corresponding to Chronological Julian Day
+        CJD.  possible values for calendar (see JulianDate):
+        CAL_GREGORIAN, CAL_ISLAMIC, CAL_JULIAN, CAL_HEBREW,
+        CAL_EGYPTIAN, CAL_COMMON */
+{
+  static void (*f[])(double, int *, int *, double *) =
+    { CJDtoCommon, CJDtoGregorian, CJDtoIslamic,
+      CJDtoJulian, CJDtoHebrew, CJDtoEgyptian };
+
+  if (calendar < 0 || calendar >= sizeof(f)/sizeof(*f)
+      || !f[calendar])
+    *year = *month = *day = 0;
+  else
+    f[calendar](CJD, year, month, day);
 }
 /*--------------------------------------------------------------------------*/
 int tishri(int year)
@@ -498,75 +439,6 @@ int tishri(int year)
     dow++;
 
   return weeks*7 + dow;
-}
-/*--------------------------------------------------------------------------*/
-static int	hebrewMonthStarts[][13] = {
-  /* deficient ordinary year: */
-  /*   30, 29, 29,  29,  30,  29,  30,  29,  30,  29,  30,  29 */
-  { 0, 30, 59, 88, 117, 147, 176, 206, 235, 265, 294, 324, 353 },
-  /* regular ordinary year: */
-  /*   30, 29, 30,  29,  30,  29,  30,  29,  30,  29,  30,  29 */
-  { 0, 30, 59, 89, 118, 148, 177, 207, 236, 266, 295, 325, 354 },
-  /* complete ordinary year: */
-  /*   30, 30, 30,  29,  30,  29,  30,  29,  30,  29,  30,  29 */
-  { 0, 30, 60, 90, 119, 149, 178, 208, 237, 267, 296, 326, 355 },
-  /* deficient leap year: */
-  /*   30, 29, 29,  29,  30,  59,  30,  29,  30,  29,  30,  29 */
-  { 0, 30, 59, 88, 117, 147, 206, 236, 265, 295, 324, 354, 383 },
-  /* regular leap year: */
-  /*   30, 29, 30,  29,  30,  59,  30,  29,  30,  29,  30,  29 */
-  { 0, 30, 59, 89, 118, 148, 207, 237, 266, 296, 325, 355, 384 },
-  /* complete leap year: */
-  /*   30, 30, 30,  29,  30,  59,  30,  29,  30,  29,  30,  29 */
-  { 0, 30, 60, 90, 119, 149, 208, 238, 267, 297, 326, 356, 385 }
-};
-#define EPOCH	347996.5	/* JD of epoch of Hebrew calendar */
-double hebrewToJulian(int year, int month, double day)
-{
-  double	JD;
-  int	n1, loy, yearType;
-  
-  n1 = tishri(year);
-  loy = tishri(year + 1) - n1;
-
-  yearType = (loy > 365)*3 + (loy % 30) - 23;
-
-  JD = EPOCH + n1 + hebrewMonthStarts[yearType][month - 1] + day - 1;
-  
-  return JD;
-}
-/*--------------------------------------------------------------------------*/
-int JDtoHebrew(double JD, int *year, int *month, double *day)
-{
-  double	d, jd, jd0;
-  int	approx_year, loy, yearType, m;
-
-  d = JD - EPOCH;
-  approx_year = floor(d*98496.0/35975351.0) - 1;
-  jd = -DBL_MAX;
-  jd = hebrewToJulian(approx_year, 1, 1);
-  if (jd < JD)
-    do {
-      jd0 = jd;
-      jd = hebrewToJulian(++approx_year, 1, 1);
-    } while (jd < JD);
-  else {
-    jd0 = jd;
-    do { 
-      jd = jd0;
-      jd0 = hebrewToJulian(--approx_year, 1, 1);
-    } while (jd0 > JD);
-  }
-  loy = jd - jd0;		/* length of target year */
-  yearType = (loy > 365)*3 + (loy % 30) - 23;
-  d = JD - jd0;			/* day number in the year */
-  m = floor(d/35);
-  while (m < 11 && hebrewMonthStarts[yearType][m + 1] < d)
-    m++;
-  *year = approx_year - 1;
-  *month = m + 1;
-  *day = d - hebrewMonthStarts[yearType][m] + 1;
-  return 1;
 }
 /*--------------------------------------------------------------------------*/
 void findTextDate(char *text, int *year, int *month, double *day, int *cal,
@@ -887,21 +759,442 @@ int construct_output_dims(int *input_dims, int num_input_dims,
   return num_output_dims;
 }
 /*--------------------------------------------------------------------------*/
+int gcd(int a, int b)
+{
+  int c;
+
+  if (!a || !b)
+    return 1;
+  if (a < 0)
+    a = -a;
+  if (b < 0)
+    b = -b;
+  if (b > a) {
+    c = b; b = a; a = c;
+  }
+  /* now a >= b > 0 */
+  c = a % b;
+  while (c) {
+    a = b; b = c;
+  }
+  return b;
+}
+/*--------------------------------------------------------------------------*/
 int ana_calendar(int narg, int ps[])
+{
+  int result, input_elem_per_date, output_elem_per_date, iq;
+  int *dims, ndim;
+  loopInfo tgtinfo, srcinfo;
+  pointer src, tgt;
+  /* enum Calendar_order fromorder, toorder; */
+  enum Calendar fromcalendar, tocalendar;
+  enum Calendar_timescale fromtime, totime;
+  enum Symboltype inputtype, internaltype, outputtype;
+  enum Calendar_outputtype outputkind;
+  static struct {
+    int to_elements_per_date;   /* translating to calendar date */
+    int from_elements_per_date; /* translating from calendar date */
+    void (*CJDNtoCal)(int const *CJDN, int *date);
+    void (*CJDtoCal)(double const *CJD, double *date);
+    void (*CaltoCJDN)(int const *date, int *CJDN);
+    void (*CaltoCJD)(double const *date, double *CJD);
+    void (*CJDNtoCalS)(int const *CJDN, char **date);
+    void (*CJDtoCalS)(double const *CJD, char **date);
+    void (*CalStoCJDN)(char * const *date, int *CJDN);
+    void (*CalStoCJD)(char * const *date, double *CJD);
+  } cal_data[] = {
+    { 0, 0, NULL,             NULL,            NULL,             NULL,            NULL,              NULL,             NULL,              NULL },
+    { 3, 3, CJDNtoCommonA,    CJDtoCommonA,    CommontoCJDNA,    CommontoCJDA,    CJDNtoCommonSA,    CJDtoCommonSA,    CommonStoCJDNA,    CommonStoCJDA },
+    { 3, 3, CJDNtoGregorianA, CJDtoGregorianA, GregoriantoCJDNA, GregoriantoCJDA, CJDNtoGregorianSA, CJDtoGregorianSA, GregorianStoCJDNA, GregorianStoCJDA },
+    { 3, 3, CJDNtoIslamicA,   CJDtoIslamicA,   IslamictoCJDNA,   IslamictoCJDA,   CJDNtoIslamicSA,   CJDtoIslamicSA,   IslamicStoCJDNA,   IslamicStoCJDA },
+    { 3, 3, CJDNtoJulianA,    CJDtoJulianA,    JuliantoCJDNA,    JuliantoCJDA,    CJDNtoJulianSA,    CJDtoJulianSA,    JulianStoCJDNA,    JulianStoCJDA },
+    { 3, 3, CJDNtoHebrewA,    CJDtoHebrewA,    HebrewtoCJDNA,    HebrewtoCJDA,    CJDNtoHebrewSA,    CJDtoHebrewSA,    HebrewStoCJDNA,    HebrewStoCJDA },
+    { 3, 3, CJDNtoEgyptianA,  CJDtoEgyptianA,  EgyptiantoCJDNA,  EgyptiantoCJDA,  CJDNtoEgyptianSA,  CJDtoEgyptianSA,  EgyptianStoCJDNA,  EgyptianStoCJDA },
+    { 1, 1, NULL,             CJDtoJDA,        NULL,             JDtoCJDA,        NULL,              NULL,             NULL,              NULL },
+    { 1, 1, CJDNtoCJDNA,      CJDtoCJDA,       CJDNtoCJDNA,      CJDtoCJDA,       NULL,              NULL,             NULL,              NULL },
+    { 1, 1, NULL,             CJDtoLunarA,     NULL,             LunartoCJDA,     NULL,              NULL,             NULL,              NULL },
+    { 6, 7, CJDNtoMayanA,     CJDtoMayanA,     MayantoCJDNA,     MayantoCJDA,     CJDNtoMayanSA,     CJDtoMayanSA,     MayanStoCJDNA,     MayanStoCJDA },
+    { 5, 5, CJDNtoLongCountA, CJDtoLongCountA, LongCounttoCJDNA, LongCounttoCJDA, CJDNtoLongCountSA, CJDtoLongCountSA, LongCountStoCJDNA, LongCountStoCJDA },
+  };
+
+  fromcalendar = extractbits(internalMode, CAL_CALENDAR_BASE,
+			     CAL_CALENDAR_BITS);
+  tocalendar = extractbits(internalMode, CAL_CALENDAR_BASE + CAL_CALENDAR_BITS,
+			   CAL_CALENDAR_BITS);
+  outputkind = extractbits(internalMode, CAL_OUTPUT_BASE, CAL_OUTPUT_BITS); /* /NUMERIC, /TEXT, /ISOTEXT */
+  /*
+  fromorder = extractbits(internalMode, CAL_ORDER_BASE, CAL_ORDER_BITS); / /FROMYMD, /FROMDMY /
+  toorder = extractbits(internalMode, CAL_ORDER_BASE + CAL_ORDER_BITS,
+			CAL_ORDER_BITS); / /TOYMD, /TODMY /
+  */
+  fromtime = extractbits(internalMode, CAL_TIME_BASE, CAL_TIME_BITS);
+  totime = extractbits(internalMode, CAL_TIME_BASE + CAL_TIME_BITS,
+		       CAL_TIME_BITS);
+
+  numerical_or_string(ps[0], &dims, &ndim, NULL, NULL);
+
+  /* If no specific "from" calendar is specified, then assume the Common
+     calendar if the input is a string or string array, or if the input
+     has 3 elements in its first dimension.  Otherwise, assume CJD. */
+  if (fromcalendar == CAL_DEFAULT) { 
+    if (symbolIsString(ps[0])
+        || dims[0] == 3)
+      fromcalendar = CAL_COMMON;
+    else
+      fromcalendar = CAL_CJD;
+  }
+
+  void (*CaltoCJDN)(int const *date, int *CJDN)
+    = cal_data[fromcalendar].CaltoCJDN;
+  void (*CaltoCJD)(double const *date, double *CJDN)
+    = cal_data[fromcalendar].CaltoCJD;
+  /*
+  void (*CalStoCJDN)(char * const *date, int *CJDN)
+    = cal_data[fromcalendar].CalStoCJDN;
+  */
+  void (*CalStoCJD)(char * const *date, double *CJD)
+    = cal_data[fromcalendar].CalStoCJD;
+
+  iq = ps[0];
+  {
+    enum Symboltype type;
+
+    /* if the input type is integer, then promote to LONG.  If the
+       input type is floating point, then promote to DOUBLE. */
+    type = symbol_type(iq);
+    if (isIntegerType(type)) {
+      iq = ana_long(1, &iq);
+      inputtype = ANA_LONG;
+    } else if (isFloatType(type)) {
+      iq = ana_double(1, &iq);
+      inputtype = ANA_DOUBLE;
+    } else                        /* must be text type */
+      inputtype = ANA_STRING_ARRAY;
+  }
+
+  /* number of input elements expected per calendar date */
+  input_elem_per_date = cal_data[fromcalendar].from_elements_per_date;
+  if (isStringType(inputtype))
+    input_elem_per_date = 1; /* strings have all elements of a date in a single string */
+
+  if (dims[0] % input_elem_per_date)
+    return anaerror("Incompatible first dimension: expected a multiple "
+                    "of %d but found %d", ps[0], input_elem_per_date,
+                    dims[0]);
+  
+  /* If no specific "to" calendar is specified, then assume the Common
+     calendar if the (effective) "from" calendar is a
+     one-element-per-date calendar, and otherwise CJD */
+  if (tocalendar == CAL_DEFAULT) {
+    if (input_elem_per_date == 1)
+      tocalendar = CAL_COMMON;
+    else
+      tocalendar = CAL_CJD;
+  }
+
+  if (fromcalendar == tocalendar
+      && fromtime == totime)    /* no conversion */
+    return *ps;
+
+  void (*CJDNtoCal)(int const *CJDN, int *date)
+    = cal_data[tocalendar].CJDNtoCal;
+  void (*CJDtoCal)(double const *CJD, double *date)
+    = cal_data[tocalendar].CJDtoCal;
+  void (*CJDNtoCalS)(int const *CJDN, char **date)
+    = cal_data[tocalendar].CJDNtoCalS;
+  void (*CJDtoCalS)(double const *CJD, char **date)
+    = cal_data[tocalendar].CJDtoCalS;
+  
+  assert(CaltoCJDN || CaltoCJD);
+  assert(CJDNtoCal || CJDtoCal);
+
+  /* number of output elements per calendar date */
+  output_elem_per_date = cal_data[tocalendar].to_elements_per_date;
+
+  /* if the (promoted) input type is LONG, then the internal type is
+     LONG if CaltoCJDN is not NULL, or DOUBLE if CaltoCJDN is NULL.
+     If CaltoCJDN is NULL and the number of input elements per date
+     is not equal to 1, then work with a DOUBLE copy of the input
+     symbol. */
+  if (inputtype == ANA_LONG) {
+    if (CaltoCJDN && fromtime == totime)
+      internaltype = ANA_LONG;
+    else {
+      internaltype = ANA_DOUBLE;
+      if (input_elem_per_date != 1) {
+        iq = ana_double(1, &iq);
+        inputtype = ANA_DOUBLE;
+      }
+    }
+  }
+
+  /* if the (promoted) input type is DOUBLE, then the internal type
+     is DOUBLE if CaltoCJD is not NULL, or LONG if CaltoCJD is NULL.
+     If CaltoCJD is NULL and the number of input elements per date
+     is not equal to 1, then work with a LONG ("floor") copy of the
+     input symbol. */
+  
+  else if (inputtype == ANA_DOUBLE) {
+    if (CaltoCJD || fromtime != totime)
+      internaltype = ANA_DOUBLE;
+    else {
+      internaltype = ANA_LONG;
+      if (input_elem_per_date != 1) {
+        int ana_floor(int, int *);
+        iq = ana_floor(1, &iq);
+        inputtype = ANA_LONG;
+      }
+    }
+  }
+
+  /* if the input type is a string type, then the internal type
+     depends on the output kind. */
+  else {
+    if (outputkind == CAL_DOUBLE)
+      internaltype = ANA_DOUBLE;
+    else
+      internaltype = ANA_LONG;
+    input_elem_per_date = 1; /* all input elements in a single text value */
+  }
+  
+  /* for numeric output, the output type is DOUBLE if CJDNtoCal is
+     NULL (i.e., a conversion routine to LONG is not available), or
+     LONG if CJDtoCal is NULL (i.e., a conversion routine to DOUBLE is
+     not available), or else is equal to the internal type.  For
+     non-numerical (i.e., text) output, then output type indicates
+     text.
+  */
+  if (outputkind == CAL_TEXT) {
+    outputtype = ANA_STRING_ARRAY;
+    output_elem_per_date = 1;   /* all date components in a single text value */
+  } else if (outputkind == CAL_LONG || internaltype == ANA_LONG)
+    outputtype = CJDNtoCal? ANA_LONG: ANA_DOUBLE;
+  else if (outputkind == CAL_DOUBLE || internaltype == ANA_DOUBLE)
+    outputtype = CJDtoCal? ANA_DOUBLE: ANA_LONG;
+  else                          /* should not happen */
+    outputtype = internaltype;
+
+  {
+    int more[1], less[1], nMore, nLess;
+
+    /* does the output need more elements than the input? */
+    nMore = nLess = 0;
+    if (output_elem_per_date != input_elem_per_date) { /* yes, different */
+      if (output_elem_per_date > 1) { /* output needs more elements */
+        nMore = 1;                    /* prefix one dimension */
+        more[0] = output_elem_per_date;
+      }
+      if (input_elem_per_date > 1) { /* output needs fewer elements */
+        nLess = 1;
+        less[0] = input_elem_per_date; /* reduce 1st dimension */
+      }
+    }
+    
+    if (standardLoopX(iq, ANA_ZERO,
+                      SL_AXISCOORD
+                      | SL_EACHROW,
+                      &srcinfo, &src,
+                      nMore, more,
+                      nLess, less,
+                      outputtype,
+                      SL_AXISCOORD
+                      | SL_EACHROW,
+                      &result,
+                      &tgtinfo, &tgt) < 0)
+      return ANA_ERROR;
+  }
+
+  if (srcinfo.rdims[0] != input_elem_per_date) {
+    /* we have a multiple of the expected number of input elements per
+       date, but the first dimension must be exactly equal to the
+       expected number else the standard loop ignores the excess
+       elements.  We shift the excess to the second dimension. */
+    int dims[MAX_DIMS];
+
+    assert(srcinfo.dims[0] % input_elem_per_date == 0);
+    memcpy(dims, srcinfo.dims, srcinfo.ndim*sizeof(*dims));
+    if (srcinfo.ndim == 1) {    /* there is only one dimension */
+      dims[1] = 1;              /* add a 2nd dimension */
+      srcinfo.ndim = 2;
+    }
+    int d = srcinfo.dims[0]/input_elem_per_date;
+    dims[1] *= d;
+    dims[0] /= d;
+    setupDimensionLoop(&srcinfo, srcinfo.ndim, dims, srcinfo.type,
+                       srcinfo.naxes, srcinfo.axes, srcinfo.data,
+                       srcinfo.mode);
+  }    
+
+  /* complain if the desired type of translation is not available.  We
+     don't need to check for numerical types, because we demand that
+     at least one of the translations (to LONG/DOUBLE) is available,
+     and are prepared to handle the case where only one is
+     available. */
+  if (inputtype == ANA_STRING_ARRAY && !CalStoCJD)
+    return anaerror("Translating from STRING is not supported for this calendar", ps[0]);
+
+  /* complain if the desired type of translation is not available.  We
+     don't need to check for numerical types, because we demand that
+     at least one of the translations (from LONG/DOUBLE) is available,
+     and are prepared to handle the case where only one is
+     available. */
+  if (outputtype == ANA_STRING_ARRAY)
+    switch (internaltype) {
+    case ANA_LONG:
+      if (!CJDNtoCalS)
+        return anaerror("Translating CJDN to STRING is not supported for this calendar", ps[0]);
+      break;
+    case ANA_DOUBLE:
+      if (!CJDtoCalS)
+        return anaerror("Translating CJD to STRING is not supported for this calendar", ps[0]);
+      break;
+    default:
+      break;
+    }
+
+  /* now loop over all dates to translate */
+  do {
+    scalar timestamp, temp;
+
+    /* translate input to CJD or CJDN */
+    switch (internaltype) {
+    case ANA_LONG:              /* translate to CJDN */
+      switch (inputtype) {
+      case ANA_LONG:
+        CaltoCJDN(src.l, &timestamp.l);
+        src.l += input_elem_per_date;
+        break;
+      case ANA_DOUBLE: /* only cases with one element per date reach here */
+        assert(input_elem_per_date == 1);
+        temp.l = (int) floor(*src.d); /* translate from DOUBLE to LONG */
+        CaltoCJDN(&temp.l, &timestamp.l); /* use LONG translation */
+        src.d += input_elem_per_date;
+        break;
+      default:
+        break;
+      }
+      break;
+    case ANA_DOUBLE:            /* translate to CJD */
+      switch (inputtype) {
+      case ANA_LONG: /* only cases with one element per date reach here */
+        assert(input_elem_per_date == 1);
+        temp.d = (double) *src.l; /* translate from LONG to DOUBLE */
+        CaltoCJD(&temp.d, &timestamp.d); /* use DOUBLE translation */
+        src.l += input_elem_per_date;
+        break;
+      case ANA_DOUBLE:
+        CaltoCJD(src.d, &timestamp.d);
+        src.d += input_elem_per_date;
+        break;
+      case ANA_STRING_ARRAY: case ANA_LSTRING:
+        CalStoCJD(src.sp, &timestamp.d);
+        src.sp += input_elem_per_date;
+        break;
+      default:
+        return cerror(ILL_TYPE, ps[0]);
+      }
+      break;
+    default:
+      return cerror(ILL_TYPE, ps[0]);
+    }
+
+    if (fromtime != totime) {
+      switch (fromtime) {
+      case CAL_UTC:
+        UTC_to_TAI(&timestamp.d);
+        break;
+      case CAL_TAI:
+        break;
+      case CAL_TT:
+        TT_to_TAI(&timestamp.d);
+        break;
+      case CAL_LT:
+        CJDLT_to_TAI(&timestamp.d);
+        break;
+      }
+
+      switch (totime) {
+      case CAL_UTC:
+        TAI_to_UTC(&timestamp.d);
+        break;
+      case CAL_TAI:
+        break;
+      case CAL_TT:
+        TAI_to_TT(&timestamp.d);
+        break;
+      case CAL_LT:
+        TAI_to_CJDLT(&timestamp.d);
+        break;
+      }
+    }
+
+    /* translate CJD or CJDN to output */
+    switch (internaltype) {
+    case ANA_LONG:
+      switch (outputtype) {
+      case ANA_LONG:
+        CJDNtoCal(&timestamp.l, tgt.l);
+        tgt.l += output_elem_per_date;
+        break;
+      case ANA_DOUBLE: /* only cases with one element per date reach here */
+        assert(output_elem_per_date == 1);
+        temp.d = (double) timestamp.l; /* translate from LONG to DOUBLE */
+        CJDtoCal(&temp.d, tgt.d);      /* use DOUBLE translation */
+        tgt.d += output_elem_per_date;
+        break;
+      case ANA_STRING_ARRAY:
+        CJDNtoCalS(&timestamp.l, tgt.sp);
+        tgt.sp += output_elem_per_date;
+        break;
+      default:
+        break;
+      }
+      break;
+    case ANA_DOUBLE:
+      switch (outputtype) {
+      case ANA_LONG:
+        temp.l = (int) floor(timestamp.d); /* translate from DOUBLE to LONG */
+        CJDNtoCal(&temp.l, tgt.l);         /* use LONG translation */
+        tgt.l += output_elem_per_date;
+        break;
+      case ANA_DOUBLE:
+        CJDtoCal(&timestamp.d, tgt.d);
+        tgt.d += output_elem_per_date;
+        break;
+      case ANA_STRING_ARRAY:
+        CJDtoCalS(&timestamp.d, tgt.sp);
+        tgt.sp += output_elem_per_date;
+        break;
+      default:
+        break;
+      }
+      break;
+    default:
+      break;
+    }
+  } while (advanceLoop(&tgtinfo), advanceLoop(&srcinfo) < srcinfo.rndim);
+  if (!loopIsAtStart(&tgtinfo))
+    return anaerror("Source loop is finished but target loop is not!", ps[0]);
+
+  return result;
+}
+/*--------------------------------------------------------------------------*/
+int ana_calendar_OLD(int narg, int ps[])
      /* general calendar conversion routine */
      /* syntax: DATE2 = CALENDAR(DATE1, /FROMCALENDAR, /TOCALENDAR) */
      /* "/FROMCALENDAR":  /FROMCOMMON /FROMGREGORIAN /FROMISLAMIC */
-     /*                   /FROMJULIAN /FROMJD /FROMUTC /FROMTAI /FROMTT */
+     /*                   /FROMJULIAN /FROMJD /FROMCJD
+                          /FROMUTC /FROMTAI /FROMTT */
      /* "/TOCALENDAR": /TOCOMMON /TOGREGORIAN /TOISLAMIC /TOJULIAN /TOJD */
-     /*                /TOMAYAN /TOLONGCOUNT /TOUTC /TOTAI /TOTT */
+     /*                /TOCJD /TOMAYAN /TOLONGCOUNT /TOUTC /TOTAI /TOTT */
 {
   int	n, *dims, ndim, nRepeat, type, i, iq, cal, newDims[MAX_DIMS],
     num_newDims, year, month, nd, d, t, v, m, sec, min, hour,
-    fromcalendar, tocalendar, fromtime, totime, output, fromorder, toorder;
+    fromcalendar, tocalendar, fromtime, totime, output, fromorder, toorder,
+    outtype, iday;
   char	isFree = 0, *line, **monthNames;
-  pointer	data;
-  double	*JD, day;
-  void	UTC_to_TAI(double *), TAI_to_UTC(double *);
+  pointer	data, JD;
+  double	day;
 
   fromcalendar = extractbits(internalMode, CAL_CALENDAR_BASE,
 			     CAL_CALENDAR_BITS);
@@ -919,93 +1212,110 @@ int ana_calendar(int narg, int ps[])
     return *ps;			/* no conversion */
   iq = *ps;
   switch (symbol_class(iq)) {
-    case ANA_SCALAR:
+  case ANA_SCALAR:
+    n = 1;
+    nRepeat = 1;
+    ndim = 1;
+    dims = &n;
+    type = scalar_type(iq);
+    if (type < ANA_LONG) {
+      iq = ana_long(1, ps);
+      type = ANA_LONG;
+    } else if (type == ANA_FLOAT) {
+      iq = ana_double(1, ps);
+      type = ANA_DOUBLE;
+    }
+    data.b = &scalar_value(iq).b;
+    break;
+  case ANA_ARRAY:
+    nRepeat = array_size(iq);
+    ndim = array_num_dims(iq);
+    dims = array_dims(iq);
+    if (symbolIsStringArray(iq) || dims[0] != 3)
       n = 1;
-      nRepeat = 1;
-      ndim = 1;
-      dims = &n;
-      type = scalar_type(iq);
-      if (type < ANA_LONG) {
-	iq = ana_long(1, ps);
-	type = ANA_LONG;
-      } else if (type == ANA_FLOAT) {
-	iq = ana_double(1, ps);
-	type = ANA_DOUBLE;
-      }
-      data.b = &scalar_value(iq).b;
-      break;
-    case ANA_ARRAY:
-      nRepeat = array_size(iq);
-      ndim = array_num_dims(iq);
-      dims = array_dims(iq);
-      if (symbolIsStringArray(iq) || dims[0] != 3)
-	n = 1;
-      else {
-	n = 3;
-	nRepeat /= 3;
-      }
-      type = array_type(iq);
-      if (type < ANA_LONG) {
-	iq = ana_long(1, ps);
-	type = ANA_LONG;
-      } else if (type == ANA_FLOAT) {
-	iq = ana_double(1, ps);
-	type = ANA_DOUBLE;
-      }
-      data.l = (int *) array_data(iq);
-      break;
-    case ANA_STRING:
-      nRepeat = 1;
-      n = 1;
-      ndim = 1;
-      dims = &n;
-      type = ANA_STRING_ARRAY;
-      data.sp = &string_value(iq);
-      break;
-    default:
-      return cerror(ILL_CLASS, *ps);
+    else {
+      n = 3;
+      nRepeat /= 3;
+    }
+    type = array_type(iq);
+    if (type < ANA_LONG) {
+      iq = ana_long(1, ps);
+      type = ANA_LONG;
+    } else if (type == ANA_FLOAT) {
+      iq = ana_double(1, ps);
+      type = ANA_DOUBLE;
+    }
+    data.l = (int *) array_data(iq);
+    break;
+  case ANA_STRING:
+    nRepeat = 1;
+    n = 1;
+    ndim = 1;
+    dims = &n;
+    type = ANA_STRING_ARRAY;
+    data.sp = &string_value(iq);
+    break;
+  default:
+    return cerror(ILL_CLASS, *ps);
   }
 
   switch (fromcalendar) {	/* source calendar */
-    case CAL_DEFAULT:
-      /* if the first dimension has 3 elements or if it is a string
-	 array, then we assume it is in the common calendar; otherwise
-	 we assume it is measured in Julian Days */
-      if (type != ANA_STRING_ARRAY) {
-	if (n == 3)
-	  fromcalendar = cal = CAL_COMMON;
-	else
-	  fromcalendar = cal = CAL_JD;
-      } else
-	cal = CAL_DEFAULT;
-      break;
-    case CAL_JD: case CAL_LUNAR: /* /FROMJD, /FROMLUNAR */
-      nRepeat *= n;
-      n = 1;
-      /* fall-through */
-    default:
-      cal = fromcalendar;
-      break;
+  case CAL_DEFAULT:
+    /* if the first dimension has 3 elements or if it is a string
+       array, then we assume it is in the common calendar; otherwise
+       we assume it is measured in Julian Days */
+    if (type != ANA_STRING_ARRAY) {
+      if (n == 3)
+        fromcalendar = cal = CAL_COMMON;
+      else if (type == ANA_DOUBLE)
+        fromcalendar = cal = CAL_JD;
+      else
+        fromcalendar = cal = CAL_CJD;
+    } else
+      cal = CAL_DEFAULT;
+    break;
+  case CAL_JD: case CAL_CJD: case CAL_LUNAR: /* /FROMJD, /FROMCJD, /FROMLUNAR */
+    nRepeat *= n;
+    n = 1;
+    /* fall-through */
+  default:
+    cal = fromcalendar;
+    break;
   }
-  if (!(JD = (double *) malloc(nRepeat*sizeof(double))))
-					/* temporary space for JDs */
-    return cerror(ALLOC_ERR, *ps);
+
+  outtype = type;               /* default */
+  if (fromcalendar == CAL_LUNAR || tocalendar == CAL_LUNAR
+      || fromcalendar == CAL_JD || tocalendar == CAL_JD 
+      || type == ANA_STRING_ARRAY)
+    outtype = ANA_DOUBLE;
+
+  /* if outtype == ANA_LONG, then JD.l contains CJDN values
+     if outtype == ANA_DOUBLE, then JD.d contains JD values
+     CJDN = floor(JD + 0.5) */
+
+  /* temporary space for JDs */
+  switch (outtype) {
+  case ANA_LONG:
+    JD.l = (int *) malloc(nRepeat*sizeof(int));
+    if (!JD.l)
+      return cerror(ALLOC_ERR, *ps);
+    break;
+  case ANA_DOUBLE: case ANA_TEMP_STRING:
+    JD.d = (double *) malloc(nRepeat*sizeof(double));
+    if (!JD.d)
+      return cerror(ALLOC_ERR, *ps);
+    break;
+  default:
+    return cerror(ILL_CLASS, ps[0]);
+  }
 
   if (type == ANA_STRING_ARRAY) {
+    assert(outtype == ANA_DOUBLE);
     switch (cal) {
     case CAL_COMMON: case CAL_DEFAULT: case CAL_GREGORIAN: case CAL_JULIAN:
       for (i = 0; i < nRepeat; i++) {
 	findTextDate(*data.sp, &year, &month, &day, &cal, fromorder);
-	if (cal == CAL_COMMON || cal == CAL_DEFAULT) {
-	  if (year > 1582
-	      || (year == 1582
-		  && (month > 10
-		      || (month == 10 && day >= 15))))
-	    cal = CAL_GREGORIAN;
-	  else
-	    cal = CAL_JULIAN;
-	}
-	JD[i] = JulianDate(year, month, day, cal);
+	JD.d[i] = CommontoCJD(year, month, day);
 	data.sp++;
       }
       break;
@@ -1030,478 +1340,511 @@ int ana_calendar(int narg, int ps[])
 	    level++;
 	  }
 	}	  
-	JD[i] = 584282.5 + d;
+	JD.d[i] = 584282.5 + d;
       }
       break;
     default:
       return anaerror("Cannot parse text-based dates in this calendar", *ps);
     }
-    cal = CAL_JD;
+    cal = CAL_JD;               /* signify that translation to JD is complete */
   } else switch (cal) {		/* from calendar */
-    case CAL_COMMON:
-      switch (type) {
-	case ANA_LONG:
-	  switch (fromorder) {
-	    case CAL_YMD:
-	      for (i = 0; i < nRepeat; i++) {
-		if (data.l[3*i] > 1582
-		    || (data.l[3*i] == 1582
-			&& (data.l[3*i + 1] > 10
-			    || (data.l[3*i + 1] == 10
-				&& data.l[3*i + 2] >= 15))))
-		  cal = CAL_GREGORIAN;
-		else
-		  cal = CAL_JULIAN;
-		JD[i] = JulianDate(data.l[3*i], data.l[3*i + 1],
-				   (double) data.l[3*i + 2], cal);
-	      }	/* end of for (i = 0; i < nRepeat; i++) */
-	      break;
-	    case CAL_DMY:
-	      for (i = 0; i < nRepeat; i++) {
-		if (data.l[3*i + 2] > 1582
-		    || (data.l[3*i + 2] == 1582
-			&& (data.l[3*i + 1] > 10
-			    || (data.l[3*i + 1] == 10
-				&& data.l[3*i] >= 15))))
-		  cal = CAL_GREGORIAN;
-		else
-		  cal = CAL_JULIAN;
-		JD[i] = JulianDate(data.l[3*i + 2], data.l[3*i + 1],
-				   (double) data.l[3*i], cal);
-	      }	/* end of for (i = 0; i < nRepeat; i++) */
-	      break;
-	  } /* end of switch (fromorder) */
-	  break;
-	case ANA_DOUBLE:
-	  switch (fromorder) {
-	    case CAL_YMD:
-	      for (i = 0; i < nRepeat; i++) {
-		if (data.d[3*i] > 1582
-		    || (data.d[3*i] == 1582
-			&& (data.d[3*i + 1] > 10
-			    || (data.d[3*i + 1] == 10
-				&& data.d[3*i + 2] >= 15))))
-		  cal = CAL_GREGORIAN;
-		else
-		  cal = CAL_JULIAN;
-		JD[i] = JulianDate(data.d[3*i], data.d[3*i + 1],
-				   (double) data.d[3*i + 2], cal);
-	      }	/* end of for (i = 0; i < nRepeat; i++) */
-	      break;
-	    case CAL_DMY:
-	      for (i = 0; i < nRepeat; i++) {
-		if (data.d[3*i + 2] > 1582
-		    || (data.d[3*i + 2] == 1582
-			&& (data.d[3*i + 1] > 10
-			    || (data.d[3*i + 1] == 10
-				&& data.d[3*i] >= 15))))
-		  cal = CAL_GREGORIAN;
-		else
-		  cal = CAL_JULIAN;
-		JD[i] = JulianDate(data.d[3*i + 2], data.d[3*i + 1],
-				   (double) data.d[3*i], cal);
-	      }	/* end of for (i = 0; i < nRepeat; i++) */
-	      break;
-	  } /* end of switch (fromorder) */
-	  break;
-      }	/* end of switch (type) */
-      cal = CAL_JD;		/* flags that we're done with the
-				   conversion to JD */
-      break;			/* end of case CAL_COMMON */
-    case CAL_GREGORIAN:	/* from Gregorian */
-      if (n != 3 && type != ANA_STRING_ARRAY)
-	return anaerror("Need 3 numbers (year, month, day) per Gregorian date!", *ps);
-      break;
-    case CAL_ISLAMIC:	/* from Islamic */
-      if (n != 3 && type != ANA_STRING_ARRAY)
-	return anaerror("Need 3 numbers (year, month, day) per Islamic date!", *ps);
-      break;
-    case CAL_JULIAN:	/* from Julian proleptic */
-      if (n != 3 && type != ANA_STRING_ARRAY)
+    case CAL_COMMON: case CAL_GREGORIAN: case CAL_ISLAMIC: case CAL_JULIAN:
+    case CAL_HEBREW: case CAL_EGYPTIAN:
+      if (n != 3)
 	return
-	  anaerror("Need 3 numbers (year, month, day) per Julian proleptic date!", *ps);
+	  anaerror("Need 3 numbers (year, month, day) per calendar date!", *ps);
       break;
-    case CAL_JD:		/* from Julian day */
+    case CAL_JD:		/* from Julian Day */
+      assert(outtype == ANA_DOUBLE);
       switch (type) {
-	case ANA_LONG:
-	  for (i = 0; i < nRepeat; i++)
-	    JD[i] = (double) data.l[i];
-	  break;
-	case ANA_FLOAT:
-	  for (i = 0; i < nRepeat; i++)
-	    JD[i] = (double) data.f[i];
-	  break;
-	case ANA_DOUBLE:
-	  memcpy(JD, data.d, nRepeat*sizeof(JD[0]));
-	  break;
-      }	/* end of switch (type) */
+      case ANA_LONG:
+        for (i = 0; i < nRepeat; i++)
+          JD.d[i] = data.l[i];
+        break;
+      case ANA_DOUBLE:
+        memcpy(JD.d, data.d, nRepeat*sizeof(*JD.d));
+        break;
+      }
+      break;
+    case CAL_CJD:		/* from Chronological Julian Day */
+      switch (outtype) {
+      case ANA_LONG:
+        switch (type) {
+        case ANA_LONG:
+          memcpy(JD.l, data.l, nRepeat*sizeof(*JD.l));
+          break;
+        case ANA_DOUBLE:
+          /* from JD to CJDN */
+          for (i = 0; i < nRepeat; i++)
+            JD.l[i] = floor(JDtoCJD(data.d[i]));
+          break;
+        }
+        break;
+      case ANA_DOUBLE:
+        switch (type) {
+        case ANA_LONG:
+          for (i = 0; i < nRepeat; i++)
+            JD.d[i] = CJDtoJD((double) data.l[i]);
+          break;
+        case ANA_DOUBLE:
+          memcpy(JD.d, data.d, nRepeat*sizeof(*JD.d));
+          break;
+        }
+      }
       break;
     case CAL_LUNAR:		/* from lunar calendar */
+      assert(outtype == ANA_DOUBLE);
       switch (type) {
-	case ANA_LONG:
-	  for (i = 0; i < nRepeat; i++)
-	    JD[i] = lunarToJD((double) data.l[i]);
-	  break;
-	case ANA_FLOAT:
-	  for (i = 0; i < nRepeat; i++)
-	    JD[i] = lunarToJD((double) data.f[i]);
-	  break;
-	case ANA_DOUBLE:
-	  for (i = 0; i < nRepeat; i++)
-	    JD[i] = lunarToJD(data.d[i]);
-	  break;
+      case ANA_LONG:
+        for (i = 0; i < nRepeat; i++)
+          JD.d[i] = lunarToJD((double) data.l[i]);
+        break;
+      case ANA_DOUBLE:
+        for (i = 0; i < nRepeat; i++)
+          JD.d[i] = lunarToJD(data.d[i]);
+        break;
       }
       cal = CAL_JD;
       break;
-    case CAL_HEBREW:		/* from Hebrew calendar */
-      if (n != 3 && type != ANA_STRING_ARRAY)
-	return anaerror("Need 3 numbers (year, month, day) per Hebrew date!",
-		     *ps);
-      break;
-    case CAL_EGYPTIAN:
-      if (n != 3 && type != ANA_STRING_ARRAY)
-	return anaerror("Need 3 numbers (year, month, day) per Egyptian date!", *ps);
-      break;
     default:
-      free(JD);
-      return anaerror("Illegal source calendar specification (%1d)", 0, cal);
-  }
-
-  /* go from FROM_CALENDAR to Julian Date */
-  if (cal != CAL_JD)		/* calculate Julian date */
-    switch (type) {
+      switch (type) {
       case ANA_LONG:
-	switch (fromorder) {
-	  case CAL_YMD:
-	    for (i = 0; i < nRepeat; i++)
-	      JD[i] = JulianDate(data.l[3*i], data.l[3*i + 1],
-				 (double) data.l[3*i + 2], cal);
-	    break;
-	  case CAL_DMY:
-	    for (i = 0; i < nRepeat; i++)
-	      JD[i] = JulianDate(data.l[3*i + 2], data.l[3*i + 1],
-				 (double) data.l[3*i], cal);
-	    break;
-	}
-	break;
+        free(JD.l);
+        break;
       case ANA_DOUBLE:
-	switch (fromorder) {
-	  case CAL_YMD:
-	    for (i = 0; i < nRepeat; i++)
-	      JD[i] = JulianDate((int) data.d[3*i], (int) data.d[3*i + 1],
-				 data.d[3*i + 2], cal);
-	    break;
-	  case CAL_DMY:
-	    for (i = 0; i < nRepeat; i++)
-	      JD[i] = JulianDate((int) data.d[3*i + 2], (int) data.d[3*i + 1],
-				 data.d[3*i], cal);
-	    break;
-	}
-	break;
+        free(JD.d);
+        break;
+      }
+      return anaerror("Illegal source calendar specification (%1d)", 0, cal);
     }
 
-  /* now do any required time base translation */
-  if (fromtime != totime) {	/* we need some conversion */
-    /* we go through TAI, which is a uniform time base */
-    switch (fromtime) {
+  /* go from FROM_CALENDAR to Julian Date */
+  if (cal != CAL_JD)		/* not done yet, calculate Julian date */
+    switch (outtype) {
+    case ANA_LONG:              /* convert to CJDN */
+      switch (type) {
+      case ANA_LONG:
+        switch (fromorder) {
+        case CAL_YMD:
+          for (i = 0; i < nRepeat; i++)
+            JD.l[i] = DatetoCJDN(data.l[3*i], data.l[3*i + 1],
+                                 data.l[3*i + 2], cal);
+          break;
+        case CAL_DMY:
+          for (i = 0; i < nRepeat; i++)
+            JD.l[i] = DatetoCJDN(data.l[3*i + 2], data.l[3*i + 1],
+                                 data.l[3*i], cal);
+          break;
+        }
+        break;
+      case ANA_DOUBLE:
+        switch (fromorder) {
+        case CAL_YMD:
+          for (i = 0; i < nRepeat; i++)
+            JD.l[i] = DatetoCJDN((int) data.d[3*i], (int) data.d[3*i + 1],
+                                 (int) data.d[3*i + 2], cal);
+          break;
+        case CAL_DMY:
+          for (i = 0; i < nRepeat; i++)
+            JD.l[i] = DatetoCJDN((int) data.d[3*i + 2], (int) data.d[3*i + 1],
+                                 (int) data.d[3*i], cal);
+          break;
+        }
+        break;
+      }
+      break;
+    case ANA_DOUBLE:            /* convert to JD */
+      switch (type) {
+      case ANA_LONG:
+        switch (fromorder) {
+        case CAL_YMD:
+          for (i = 0; i < nRepeat; i++)
+            JD.d[i] = DatetoCJD(data.l[3*i], data.l[3*i + 1],
+                                (double) data.l[3*i + 2], cal);
+          break;
+        case CAL_DMY:
+          for (i = 0; i < nRepeat; i++)
+            JD.d[i] = DatetoCJD(data.l[3*i + 2], data.l[3*i + 1],
+                                (double) data.l[3*i], cal);
+          break;
+        }
+        break;
+      case ANA_DOUBLE:
+        switch (fromorder) {
+        case CAL_YMD:
+          for (i = 0; i < nRepeat; i++)
+            JD.d[i] = DatetoCJD((int) data.d[3*i], (int) data.d[3*i + 1],
+                                data.d[3*i + 2], cal);
+          break;
+        case CAL_DMY:
+          for (i = 0; i < nRepeat; i++)
+            JD.d[i] = DatetoCJD((int) data.d[3*i + 2], (int) data.d[3*i + 1],
+                                data.d[3*i], cal);
+          break;
+        }
+        break;
+      }
+      break;
+    }
+
+  switch (outtype) {
+  case ANA_DOUBLE:
+    /* now do any required time base translation */
+    if (fromtime != totime) {	/* we need some conversion */
+      /* we go through TAI, which is a uniform time base */
+      switch (fromtime) {
       case CAL_UTC:		/* /FROMUTC */
 	for (i = 0; i < nRepeat; i++)
-	  UTC_to_TAI(JD + i);
+	  UTC_to_TAI(&JD.d[i]);
 	break;
       case CAL_TT:		/* /FROMTT */
 	for (i = 0; i < nRepeat; i++)
-	  TT_to_TAI(JD + i);
+	  TT_to_TAI(&JD.d[i]);
 	break;
-    }
-    /* and now to the target base */
-    switch (totime) {
+      }
+      /* and now to the target base */
+      switch (totime) {
       case CAL_UTC:		/* /TOUTC */
 	for (i = 0; i < nRepeat; i++)
-	  TAI_to_UTC(JD + i);
+	  TAI_to_UTC(&JD.d[i]);
 	break;
       case CAL_TT:		/* /TOTT */
 	for (i = 0; i < nRepeat; i++)
-	  TAI_to_TT(JD + i);
+	  TAI_to_TT(&JD.d[i]);
 	break;
+      }
+      break;
+    case ANA_LONG:                /* no time translation */
+      break;
     }
   }
   
   /* n = number of input values per input calendar date */
 
-  /* now from Julian Date to the required target calendar */
+  /* now from JD or CJDN to the required target calendar */
   if (tocalendar == CAL_DEFAULT)/* default */
     tocalendar = (fromcalendar == CAL_JD)? CAL_COMMON: CAL_JD;
   switch (tocalendar) {
-    case CAL_COMMON:		/* to common */
-      if (output != CAL_NUMERIC) { /* text output */
-	if (nRepeat > 1) {
-	  num_newDims = construct_output_dims(dims, ndim, n,
-					      newDims, MAX_DIMS, 1);
-	  iq = array_scratch(ANA_TEMP_STRING, num_newDims, newDims);
-	  data.sp = (char **) array_data(iq);
-	} else {
-	  iq = string_scratch(-1);
-	  data.sp = (char **) &string_value(iq);
-	}
-	allocate(line, 80, char);
-      } else {			/* numeric output */
-	num_newDims = construct_output_dims(dims, ndim, n,
-					    newDims, MAX_DIMS, 3);
-	iq = array_scratch(ANA_DOUBLE, num_newDims, newDims);
-	data.d = (double *) array_data(iq);
-      }
-      for (i = 0; i < nRepeat; i++) {
-	JDtoDate(JD[i], &year, &month, &day, CAL_COMMON);
-	switch (output) {
-	  case CAL_ISOTEXT:
-	    sec = (day - (int) day)*86400;
-	    min = sec/60;
-	    sec = sec % 60;
-	    hour = min/60;
-	    min = min % 60;
-	    sprintf(line,"%4d-%02d-%02dT%02d:%02d:%02d", year, month,
-		    (int) day, hour, min, sec);
-	    *data.sp++ = strsave(line);
-	    break;
-	  case CAL_TEXT:
-	    switch (toorder) {
-	      case CAL_YMD:
-		sprintf(line, "%1d %s %1d", year,
-			GregorianMonths[month - 1], (int) day);
-		break;
-	      case CAL_DMY:
-		sprintf(line, "%1d %s %1d", (int) day,
-			GregorianMonths[month - 1], year);
-		break;
-	    }
-	    *data.sp++ = strsave(line);
-	    break;
-	  case CAL_NUMERIC:
-	    switch (toorder) {
-	      case CAL_YMD:
-		*data.d++ = year;
-		*data.d++ = month;
-		*data.d++ = day;
-		break;
-	      case CAL_DMY:
-		*data.d++ = day;
-		*data.d++ = month;
-		*data.d++ = year;
-		break;
-	    }
-	    break;
-	}
-      }
-      if (!isFree)
-	free(JD);
-      if (output != CAL_NUMERIC)
-	free(line);
-      if (symbol_class(iq) == ANA_STRING)
-	symbol_memory(iq) = strlen(string_value(iq)) + 1;
-      return iq;
-    case CAL_GREGORIAN: case CAL_JULIAN: /* to Gregorian */
-      monthNames = GregorianMonths;
-      break;
-    case CAL_ISLAMIC:		/* to Islamic */
-      monthNames = IslamicMonths;
-      break;
-    case CAL_EGYPTIAN:
-      monthNames = EgyptianMonths;
-      break;
-    case CAL_LATIN:
-      /* the "Latin" calendar is equal to the /TOTEXT version of the
-	 Common calendar but using the Roman way of writing year numbers,
-	 designating days within the month, and writing month names. */
+  case CAL_COMMON:		/* to common */
+    if (output != CAL_NUMERIC) { /* text output */
       if (nRepeat > 1) {
-	num_newDims = construct_output_dims(dims, ndim, n,
-					    newDims, MAX_DIMS, 1);
-	iq = array_scratch(ANA_TEMP_STRING, num_newDims, newDims);
-	data.sp = (char **) array_data(iq);
+        num_newDims = construct_output_dims(dims, ndim, n,
+                                            newDims, MAX_DIMS, 1);
+        iq = array_scratch(ANA_TEMP_STRING, num_newDims, newDims);
+        data.sp = (char **) array_data(iq);
       } else {
-	iq = string_scratch(-1);
-	data.sp = (char **) &string_value(iq);
-      }
-      for (i = 0; i < nRepeat; i++) {
-	char	*p = curScrat, type = 0;
-	int	l;
-
-	JDtoDate(JD[i], &year, &month, &day,
-		 JD[i] < 2299160.5? CAL_JULIAN: CAL_GREGORIAN);
-	/* first we determine the designation of the day; days are counted
-	   backwards from the next Nonae, Idus, or Kalendae */
-	day = (int) day;	/* integer part only */
-	if (day == 1) {
-	  strcpy(curScrat, "Kalendis ");
-	  curScrat += strlen(curScrat);
-	} else if (day < nonae[month - 1]) {
-	  l = nonae[month - 1] - day + 1;
-	  if (l == 2)
-	    strcpy(curScrat, "Pridie");
-	  else {
-	    strcpy(curScrat, "Ante Diem ");
-	    curScrat += strlen(curScrat);
-	    roman_numeral(l);
-	  }
-	  curScrat += strlen(curScrat);
-	  *curScrat++ = ' ';
-	  strcpy(curScrat, "Nonas ");
-	  curScrat += strlen(curScrat);
-	  type = 1;
-	} else if (day == nonae[month - 1]) {
-	  strcpy(curScrat, "Nonis ");
-	  curScrat += strlen(curScrat);
-	} else if (day < idus[month - 1]) {
-	  l = idus[month - 1] - day + 1;
-	  if (l == 2)
-	    strcpy(curScrat, "Pridie");
-	  else {
-	    strcpy(curScrat, "Ante Diem ");
-	    curScrat += strlen(curScrat);
-	    roman_numeral(l);
-	  }
-	  curScrat += strlen(curScrat);
-	  *curScrat++ = ' ';
-	  strcpy(curScrat, "Idus ");
-	  curScrat += strlen(curScrat);
-	  type = 1;
-	} else if (day == idus[month - 1]) {
-	  strcpy(curScrat, "Idibus ");
-	  curScrat += strlen(curScrat);
-	} else {
-	  if (month == 12)
-	    l = 33 - day;
-	  else
-	    l = JulianDate(year, month + 1, 1, CAL_COMMON)
-	      - JulianDate(year, month, 1, CAL_COMMON) + 2 - day;
-	  if (l == 2)
-	    strcpy(curScrat, "Pridie");
-	  else {
-	    strcpy(curScrat, "Ante Diem ");
-	    curScrat += strlen(curScrat);
-	    roman_numeral(l);
-	  }
-	  curScrat += strlen(curScrat);
-	  *curScrat++ = ' ';
-	  strcpy(curScrat, "Kalendas ");
-	  curScrat += strlen(curScrat);
-	  if (++month == 13) {
-	    month -= 12;
-	    year++;
-	  }
-	  type = 1;
-	}
-	strcpy(curScrat,
-	       type? latinMonthsII[month - 1]: latinMonthsI[month - 1]);
-	curScrat += strlen(curScrat);
-	strcpy(curScrat, " Anno ");
-	curScrat += strlen(curScrat);
-	roman_numeral(year);
-	*data.sp++ = strsave(p);
-	curScrat = p;
-      }
-      if (!isFree)
-	free(JD);
-      if (symbol_class(iq) == ANA_STRING)
-	symbol_memory(iq) = strlen(data.sp[-1]) + 1;
-      return iq;
-      break;
-    case CAL_JD:		/* /TOJD */
-      if (nRepeat == 1) {	/* need scalar */
-	iq = scalar_scratch(ANA_DOUBLE);
-	data.d = &scalar_value(iq).d;
-      } else {			/* need array */
-	num_newDims = construct_output_dims(dims, ndim, n,
-					    newDims, MAX_DIMS, 1);
-	iq = array_scratch(ANA_DOUBLE, num_newDims, newDims);
-	data.d = (double *) array_data(iq);
-      }
-      for (i = 0; i < nRepeat; i++)
-	*data.d++ = JD[i];
-      if (!isFree)
-	free(JD);
-      return iq;
-    case CAL_LUNAR:
-      if (nRepeat == 1) {	/* need scalar */
-	iq = scalar_scratch(ANA_DOUBLE);
-	data.d = &scalar_value(iq).d;
-      } else {			/* need array */
-	num_newDims = construct_output_dims(dims, ndim, n,
-					    newDims, MAX_DIMS, 1);
-	iq = array_scratch(ANA_DOUBLE, num_newDims, newDims);
-	data.d = (double *) array_data(iq);
-      }
-      for (i = 0; i < nRepeat; i++)
-	*data.d++ = JDtoLunar(JD[i]);
-      if (!isFree)
-	free(JD);
-      return iq;
-    case CAL_MAYAN:		/* /TOMAYAN */
-      if (nRepeat > 1) {
-	num_newDims = construct_output_dims(dims, ndim, n,
-					    newDims, MAX_DIMS, 1);
-	iq = array_scratch(ANA_TEMP_STRING, num_newDims, newDims);
-	data.sp = (char **) array_data(iq);
-      } else {
-	iq = string_scratch(-1);
-	data.sp = (char **) &string_value(iq);
+        iq = string_scratch(-1);
+        data.sp = (char **) &string_value(iq);
       }
       allocate(line, 80, char);
-      for (i = 0; i < nRepeat; i++) {
-	d = floor(JD[i] + 0.5);
-	t = iamod(d + 5, 13) + 1;
-	v = iamod(d + 16, 20);
-	d = iamod(d + 65, 365);
-	m = d/20;
-	d = iamod(d, 20);
-	sprintf(line, "%1d %s %1d %s", t, tikalVenteina[v], d, tikalMonth[m]);
-	*data.sp++ = strsave(line);
+    } else {			/* numeric output */
+      num_newDims = construct_output_dims(dims, ndim, n,
+                                          newDims, MAX_DIMS, 3);
+      iq = array_scratch(outtype, num_newDims, newDims);
+      data.d = (double *) array_data(iq);
+    }
+    for (i = 0; i < nRepeat; i++) {
+      if (outtype == ANA_DOUBLE)
+        CJDtoDate(JD.d[i], &year, &month, &day, CAL_COMMON);
+      else
+        CJDNtoDate(JD.l[i], &year, &month, &iday, CAL_COMMON);
+      switch (output) {
+      case 999 /* CAL_ISOTEXT */:
+        if (outtype == ANA_DOUBLE) {
+          sec = (day - (int) day)*86400;
+          min = sec/60;
+          sec = sec % 60;
+          hour = min/60;
+          min = min % 60;
+          sprintf(line,"%4d-%02d-%02dT%02d:%02d:%02d", year, month,
+                  (int) day, hour, min, sec);
+        } else
+          sprintf(line,"%4d-%02d-%02d", year, month, iday);
+        *data.sp++ = strsave(line);
+        break;
+      case CAL_TEXT:
+        switch (toorder) {
+        case CAL_YMD:
+          if (outtype == ANA_DOUBLE)
+            sprintf(line, "%1d %s %1d", year,
+                    GregorianMonths[month - 1], (int) day);
+          else
+            sprintf(line, "%1d %s %1d", year,
+                    GregorianMonths[month - 1], iday);
+          break;
+        case CAL_DMY:
+          if (outtype == ANA_DOUBLE)
+            sprintf(line, "%1d %s %1d", (int) day,
+                    GregorianMonths[month - 1], year);
+          else
+            sprintf(line, "%1d %s %1d", iday,
+                    GregorianMonths[month - 1], year);
+          break;
+        }
+        *data.sp++ = strsave(line);
+        break;
+      case CAL_NUMERIC:
+        switch (toorder) {
+        case CAL_YMD:
+          if (outtype == ANA_DOUBLE) {
+            *data.d++ = year;
+            *data.d++ = month;
+            *data.d++ = day;
+          } else {
+            *data.l++ = year;
+            *data.l++ = month;
+            *data.l++ = iday;
+          }
+          break;
+        case CAL_DMY:
+          if (outtype == ANA_DOUBLE) {
+            *data.d++ = day;
+            *data.d++ = month;
+            *data.d++ = year;
+          } else {
+            *data.l++ = iday;
+            *data.l++ = month;
+            *data.l++ = year;
+          }
+          break;
+        }
+        break;
       }
-      if (!isFree)
-	free(JD);
-      return iq;
-    case CAL_LONGCOUNT:		/* /TOLONGCOUNT */
-      if (nRepeat > 1) {
-	num_newDims = construct_output_dims(dims, ndim, n,
-					    newDims, MAX_DIMS, 1);
-	iq = array_scratch(ANA_TEMP_STRING, num_newDims, newDims);
-	data.sp = (char **) array_data(iq);
-      } else {
-	iq = string_scratch(-1);
-	data.sp = (char **) &string_value(iq);
-      }
-      allocate(line, 80, char);
-      for (i = 0; i < nRepeat; i++) {
-	int n;
+    }
+    if (!isFree)
+      free(JD.l);
+    if (output != CAL_NUMERIC)
+      free(line);
+    if (symbol_class(iq) == ANA_STRING)
+      symbol_memory(iq) = strlen(string_value(iq)) + 1;
+    return iq;
+  case CAL_GREGORIAN: case CAL_JULIAN: /* to Gregorian */
+    monthNames = GregorianMonths;
+    break;
+  case CAL_ISLAMIC:		/* to Islamic */
+    monthNames = IslamicMonths;
+    break;
+  case CAL_EGYPTIAN:
+    monthNames = EgyptianMonths;
+    break;
+  case CAL_LATIN:
+    /* the "Latin" calendar is equal to the /TOTEXT version of the
+       Common calendar but using the Roman way of writing year numbers,
+       designating days within the month, and writing month names. */
+    if (nRepeat > 1) {
+      num_newDims = construct_output_dims(dims, ndim, n,
+                                          newDims, MAX_DIMS, 1);
+      iq = array_scratch(ANA_TEMP_STRING, num_newDims, newDims);
+      data.sp = (char **) array_data(iq);
+    } else {
+      iq = string_scratch(-1);
+      data.sp = (char **) &string_value(iq);
+    }
+    for (i = 0; i < nRepeat; i++) {
+      char	*p = curScrat, type = 0;
+      int	l;
 
-	d = floor(JD[i] - 584282.5);
-	n = idiv(d,20);
-	t = d - n*20;
-        d = idiv(n,18);
-	v = n - d*18;
-	n = idiv(d,20);
-	m = d - n*20;
-	d = idiv(n,20);
-	nd = n - d*20;
-	n = idiv(d,20);
-	d -= n*20;
-	sprintf(line, "%1d.%1d.%1d.%1d.%1d", d, nd, m, v, t);
-	*data.sp++ = strsave(line);
+      if (outtype == ANA_DOUBLE) {
+        CJDtoDate(JD.d[i], &year, &month, &day, CAL_COMMON);
+        iday = (int) day;
+      } else
+        CJDNtoDate(JD.l[i], &year, &month, &iday, CAL_COMMON);
+      /* first we determine the designation of the day; days are counted
+         backwards from the next Nonae, Idus, or Kalendae */
+      if (iday == 1) {
+        strcpy(curScrat, "Kalendis ");
+        curScrat += strlen(curScrat);
+      } else if (iday < nonae[month - 1]) {
+        l = nonae[month - 1] - iday + 1;
+        if (l == 2)
+          strcpy(curScrat, "Pridie");
+        else {
+          strcpy(curScrat, "Ante Diem ");
+          curScrat += strlen(curScrat);
+          roman_numeral(l);
+        }
+        curScrat += strlen(curScrat);
+        *curScrat++ = ' ';
+        strcpy(curScrat, "Nonas ");
+        curScrat += strlen(curScrat);
+        type = 1;
+      } else if (iday == nonae[month - 1]) {
+        strcpy(curScrat, "Nonis ");
+        curScrat += strlen(curScrat);
+      } else if (iday < idus[month - 1]) {
+        l = idus[month - 1] - iday + 1;
+        if (l == 2)
+          strcpy(curScrat, "Pridie");
+        else {
+          strcpy(curScrat, "Ante Diem ");
+          curScrat += strlen(curScrat);
+          roman_numeral(l);
+        }
+        curScrat += strlen(curScrat);
+        *curScrat++ = ' ';
+        strcpy(curScrat, "Idus ");
+        curScrat += strlen(curScrat);
+        type = 1;
+      } else if (iday == idus[month - 1]) {
+        strcpy(curScrat, "Idibus ");
+        curScrat += strlen(curScrat);
+      } else {
+        if (month == 12)
+          l = 33 - iday;
+        else
+          l = DatetoCJDN(year, month + 1, 1, CAL_COMMON)
+            - DatetoCJDN(year, month, 1, CAL_COMMON) + 2 - iday;
+        if (l == 2)
+          strcpy(curScrat, "Pridie");
+        else {
+          strcpy(curScrat, "Ante Diem ");
+          curScrat += strlen(curScrat);
+          roman_numeral(l);
+        }
+        curScrat += strlen(curScrat);
+        *curScrat++ = ' ';
+        strcpy(curScrat, "Kalendas ");
+        curScrat += strlen(curScrat);
+        if (++month == 13) {
+          month -= 12;
+          year++;
+        }
+        type = 1;
       }
-      if (!isFree)
-	free(JD);
-      return iq;
-    case CAL_HEBREW:
-      monthNames = HebrewMonths;
-      break;
-    default:
-      if (!isFree)
-	free(JD);
-      return anaerror("Illegal target calendar specification (%1d)", 0, cal);
+      strcpy(curScrat,
+             type? latinMonthsII[month - 1]: latinMonthsI[month - 1]);
+      curScrat += strlen(curScrat);
+      strcpy(curScrat, " Anno ");
+      curScrat += strlen(curScrat);
+      roman_numeral(year);
+      *data.sp++ = strsave(p);
+      curScrat = p;
+    }
+    if (!isFree)
+      free(JD.l);
+    if (symbol_class(iq) == ANA_STRING)
+      symbol_memory(iq) = strlen(data.sp[-1]) + 1;
+    return iq;
+    break;
+  case CAL_JD:		/* /TOJD */
+    assert(outtype == ANA_DOUBLE);
+    if (nRepeat == 1) {	/* need scalar */
+      iq = scalar_scratch(outtype);
+      data.d = &scalar_value(iq).d;
+    } else {			/* need array */
+      num_newDims = construct_output_dims(dims, ndim, n,
+                                          newDims, MAX_DIMS, 1);
+      iq = array_scratch(outtype, num_newDims, newDims);
+      data.d = (double *) array_data(iq);
+    }
+    memcpy(data.d, JD.d, nRepeat*sizeof(double));
+    if (!isFree)
+      free(JD.l);
+    return iq;
+  case CAL_CJD:		/* /TOCJD */
+    assert(outtype == ANA_LONG);
+    if (nRepeat == 1) {	/* need scalar */
+      iq = scalar_scratch(outtype);
+      data.l = &scalar_value(iq).l;
+    } else {			/* need array */
+      num_newDims = construct_output_dims(dims, ndim, n,
+                                          newDims, MAX_DIMS, 1);
+      iq = array_scratch(outtype, num_newDims, newDims);
+      data.l = (int *) array_data(iq);
+    }
+    memcpy(data.l, JD.l, nRepeat*sizeof(*JD.l));
+    if (!isFree)
+      free(JD.l);
+    return iq;
+  case CAL_LUNAR:
+    assert(outtype == ANA_DOUBLE);
+    if (nRepeat == 1) {	/* need scalar */
+      iq = scalar_scratch(ANA_DOUBLE);
+      data.d = &scalar_value(iq).d;
+    } else {			/* need array */
+      num_newDims = construct_output_dims(dims, ndim, n,
+                                          newDims, MAX_DIMS, 1);
+      iq = array_scratch(ANA_DOUBLE, num_newDims, newDims);
+      data.d = (double *) array_data(iq);
+    }
+    for (i = 0; i < nRepeat; i++)
+      *data.d++ = JDtoLunar(JD.d[i]);
+    if (!isFree)
+      free(JD.d);
+    return iq;
+  case CAL_MAYAN:		/* /TOMAYAN */
+    if (nRepeat > 1) {
+      num_newDims = construct_output_dims(dims, ndim, n,
+                                          newDims, MAX_DIMS, 1);
+      iq = array_scratch(ANA_TEMP_STRING, num_newDims, newDims);
+      data.sp = (char **) array_data(iq);
+    } else {
+      iq = string_scratch(-1);
+      data.sp = (char **) &string_value(iq);
+    }
+    allocate(line, 80, char);
+    for (i = 0; i < nRepeat; i++) {
+      if (outtype == ANA_DOUBLE)
+        d = floor(JDtoCJD(JD.d[i]));
+      else
+        d = JD.l[i];
+      t = iamod(d + 5, 13) + 1;
+      v = iamod(d + 16, 20);
+      d = iamod(d + 65, 365);
+      m = d/20;
+      d = iamod(d, 20);
+      sprintf(line, "%1d %s %1d %s", t, tikalVenteina[v], d, tikalMonth[m]);
+      *data.sp++ = strsave(line);
+    }
+    if (!isFree)
+      free(JD.l);
+    return iq;
+  case CAL_LONGCOUNT:		/* /TOLONGCOUNT */
+    if (nRepeat > 1) {
+      num_newDims = construct_output_dims(dims, ndim, n,
+                                          newDims, MAX_DIMS, 1);
+      iq = array_scratch(ANA_TEMP_STRING, num_newDims, newDims);
+      data.sp = (char **) array_data(iq);
+    } else {
+      iq = string_scratch(-1);
+      data.sp = (char **) &string_value(iq);
+    }
+    allocate(line, 80, char);
+    for (i = 0; i < nRepeat; i++) {
+      int n;
+
+      if (outtype == ANA_DOUBLE)
+        d = floor(JDtoCJD(JD.d[i]) - 584283);
+      else
+        d = JD.l[i] - 584283;
+      n = idiv(d,20);
+      t = d - n*20;
+      d = idiv(n,18);
+      v = n - d*18;
+      n = idiv(d,20);
+      m = d - n*20;
+      d = idiv(n,20);
+      nd = n - d*20;
+      n = idiv(d,20);
+      d -= n*20;
+      sprintf(line, "%1d.%1d.%1d.%1d.%1d", d, nd, m, v, t);
+      *data.sp++ = strsave(line);
+    }
+    if (!isFree)
+      free(JD.l);
+    return iq;
+  case CAL_HEBREW:
+    monthNames = HebrewMonths;
+    break;
+  default:
+    if (!isFree)
+      free(JD.l);
+    return anaerror("Illegal target calendar specification (%1d)", 0, cal);
   }
   if (output != CAL_NUMERIC) {
     if (nRepeat > 1) {
       num_newDims = construct_output_dims(dims, ndim, n,
-					  newDims, MAX_DIMS, 1);
+                                          newDims, MAX_DIMS, 1);
       iq = array_scratch(ANA_TEMP_STRING, num_newDims, newDims);
       data.sp = (char **) array_data(iq);
     } else {
@@ -1511,54 +1854,79 @@ int ana_calendar(int narg, int ps[])
     allocate(line, 80, char);
   } else {
     num_newDims = construct_output_dims(dims, ndim, n,
-					newDims, MAX_DIMS, 3);
-    iq = array_scratch(ANA_DOUBLE, num_newDims, newDims);
+                                        newDims, MAX_DIMS, 3);
+    iq = array_scratch(outtype, num_newDims, newDims);
     data.d = (double *) array_data(iq);
   }
   for (i = 0; i < nRepeat; i++) {
-    JDtoDate(JD[i], &year, &month, &day, tocalendar);
+    if (outtype == ANA_DOUBLE) {
+      CJDtoDate(JD.d[i], &year, &month, &day, tocalendar);
+      iday = (int) day;
+    } else
+      CJDNtoDate(JD.l[i], &year, &month, &iday, tocalendar);
     switch (output) {
-      case CAL_ISOTEXT:
-	sec = (day - (int) day)*86400;
-	min = sec/60;
-	sec = sec % 60;
-	hour = min/60;
-	min = min % 60;
-	sprintf(line,"%4d-%02d-%02dT%02d:%02d:%02d", year, month,
-		(int) day, hour, min, sec);
-	*data.sp++ = strsave(line);
-	break;
-      case CAL_TEXT:
-	switch (toorder) {
-	  case CAL_YMD:
-	    sprintf(line, "%1d %s %1d", year,
-		    monthNames[month - 1], (int) day);
-	    break;
-	  case CAL_DMY:
-	    sprintf(line, "%1d %s %1d", (int) day,
-		    monthNames[month - 1], year);
-	    break;
-	}
-	*data.sp++ = strsave(line);
-	break;
-      case CAL_NUMERIC:
-	switch (toorder) {
-	  case CAL_YMD:
-	    *data.d++ = year;
-	    *data.d++ = month;
-	    *data.d++ = day;
-	    break;
-	  case CAL_DMY:
-	    *data.d++ = day;
-	    *data.d++ = month;
-	    *data.d++ = year;
-	    break;
-	}
-	break;
+    case 999 /* CAL_ISOTEXT */:
+      if (outtype == ANA_DOUBLE) {
+        sec = (day - (int) day)*86400;
+        min = sec/60;
+        sec = sec % 60;
+        hour = min/60;
+        min = min % 60;
+        sprintf(line,"%4d-%02d-%02dT%02d:%02d:%02d", year, month,
+                iday, hour, min, sec);
+      } else
+        sprintf(line,"%4d-%02d-%02d", year, month, iday);
+      *data.sp++ = strsave(line);
+      break;
+    case CAL_TEXT:
+      switch (toorder) {
+      case CAL_YMD:
+        sprintf(line, "%1d %s %1d", year,
+                monthNames[month - 1], iday);
+        break;
+      case CAL_DMY:
+        sprintf(line, "%1d %s %1d", iday,
+                monthNames[month - 1], year);
+        break;
+      }
+      *data.sp++ = strsave(line);
+      break;
+    case CAL_NUMERIC:
+      switch (outtype) {
+      case ANA_DOUBLE:
+        switch (toorder) {
+        case CAL_YMD:
+          *data.d++ = year;
+          *data.d++ = month;
+          *data.d++ = day;
+          break;
+        case CAL_DMY:
+          *data.d++ = day;
+          *data.d++ = month;
+          *data.d++ = year;
+          break;
+        }
+        break;
+      case ANA_LONG:
+        switch (toorder) {
+        case CAL_YMD:
+          *data.l++ = year;
+          *data.l++ = month;
+          *data.l++ = iday;
+          break;
+        case CAL_DMY:
+          *data.l++ = iday;
+          *data.l++ = month;
+          *data.l++ = year;
+          break;
+        }
+        break;
+      }
+      break;
     }
   }
   if (!isFree)
-    free(JD);
+    free(JD.l);
   if (output != CAL_NUMERIC)
     free(line);
   if (symbol_class(iq) == ANA_STRING)
@@ -1600,8 +1968,8 @@ int ana_EasterDate(int narg, int ps[])
   return iq;
 }
 /*--------------------------------------------------------------------------*/
-double deltaT(double JD)
-/* returns the difference between TAI and UTC for a given JD(UTC), in seconds.
+double deltaT(double CJD)
+/* returns the difference between TAI and UTC for a given CJD(UTC), in seconds.
    For UTC between 1961-01-01 and 2007-01-01. LS 24sep98 25dec06 */
 {
   static double	JDs[] = {
@@ -1641,6 +2009,7 @@ double deltaT(double JD)
   double	T, dT;
   int	lo, hi, mid;
 
+  double JD = CJD - 0.5;
   if (JD < JDs[0]) {		/* before 1961-01-01 */
     /* do a rough estimate */
     /* The algorithm is based on observations between years -390 */
@@ -1672,18 +2041,87 @@ double deltaT(double JD)
   lo = (hi < mid)? hi: mid;	/* the last one from the table */
   return offsets[lo] + units[lo]*(JD - t0s[lo]);
 }
+/* TIME SCALES:
+
+     TAI      physically realized
+      │
+   (offset)   observed, nominally +32.184 seconds
+      │
+     TT       terrestrial time
+      │
+ (rate adjustment L_G) definition of TT
+      │
+     TCG      time scale for GCRS
+      │
+  (periodic terms)  iauDtdb is an implementation
+      │
+  (rate adjustment L_C) function of solar-system ephemeris
+      │
+     TCB      time scale for BCRS
+      │
+  (rate adjustment -L_B)
+      │
+     TDB      TCB scaled to track TT
+      │
+   (periodic terms) -iauDtdb is an implementation
+      │
+     TT       terrestrial time
+
+  time_t is not a uniform timescale, because it does not count leap
+  seconds.  time_t encodes the date as 86400 seconds times the number
+  of calendar days since its epoch, plus 1 second for each second
+  elapsed since the beginning of the calendar day. A leap second at
+  the end of a calendar day gets the same time_t value as the first
+  second of the following calendar day. */
 /*--------------------------------------------------------------------------*/
-void UTC_to_TAI(double *JD)
+void UTC_to_TAI(double *CJD)
 {
-  *JD += deltaT(*JD)/86400;
+  *CJD += deltaT(*CJD)/86400;
 }
 /*--------------------------------------------------------------------------*/
-void TAI_to_UTC(double *JD)
+void TAI_to_UTC(double *CJD)
 {
-  double	d1;
-  
-  d1 = *JD - deltaT(*JD)/86400;
-  *JD = *JD - deltaT(d1)/86400;
+  /* deltaT(*JD) = ∆T = TAI - UTC for *JD interpreted as UTC
+
+          UTC ∆T(UTC)      TAI
+     23:59:42      17 23:59:59
+     23:59:43      17 00:00:00
+     23:59:59      17 00:00:16 
+     23:59:60      17 00:00:17
+     00:00:00      18 00:00:18
+
+     UTC_est = TAI - ∆T(TAI)
+
+          TAI ∆T(TAI)  UTC_est ∆(UTC_est) TAI-∆(UTC_est)
+     23:59:59      17 23:59:42         17 23:59:42
+     00:00:00      18 23:59:42         17 23:59:43
+     00:00:16      18 23:59:58         17 23:59:59
+     00:00:17      18 23:59:59         17 00:00:00
+     00:00:18      18 00:00:00         18 00:00:00
+     
+     TAI - ∆T(UTC_est) = UTC except for the leap second, as long as ∆T >= 0.
+  */
+
+  double UTC_est = *CJD - deltaT(*CJD)/86400;
+  *CJD -= -deltaT(UTC_est)/86400;
+}
+/*--------------------------------------------------------------------------*/
+void CJDLT_to_TAI(double *CJD)
+{
+  time_t t_LT = (time_t) ((*CJD - 2440588)*86400);
+  struct tm *bt = localtime(&t_LT);
+  time_t t_UTC = t_LT - bt->tm_gmtoff;
+  *CJD = t_UTC/(double) 86400.0 + 2440588;
+  UTC_to_TAI(CJD);
+}
+/*--------------------------------------------------------------------------*/
+void TAI_to_CJDLT(double *CJD)
+{
+  TAI_to_UTC(CJD);
+  time_t t_UTC = (time_t) ((*CJD - (double) 2440588)*86400);
+  struct tm *bt = localtime(&t_UTC);
+  time_t t_LT = t_UTC + bt->tm_gmtoff;
+  *CJD = t_LT/(double) 86400.0 + 2440588;
 }
 /*--------------------------------------------------------------------------*/
 double JDE(double JD, int direction)
@@ -2007,6 +2445,7 @@ int constellation(double alpha, double delta)
    equinox of B1875.0.  LS 2004may03
  */
 {
+  int nb = sizeof(constellation_boundaries)/sizeof(struct constellation_struct);
   int i;
   struct constellation_struct *cb = constellation_boundaries;
 
@@ -2017,8 +2456,8 @@ int constellation(double alpha, double delta)
   alpha = famod(alpha, 360.0);	/* reduce to interval 0 - 360 degrees */
   alpha /= 15;			/* from degrees to hours */
 
-  for (i = 0; delta < cb[i].delta || alpha >= cb[i].alpha2
-	 || alpha < cb[i].alpha1; i++);
+  for (i = 0; i < nb && (delta < cb[i].delta || alpha >= cb[i].alpha2
+                         || alpha < cb[i].alpha1); i++);
   return cb[i].constellation;
 }
 /*--------------------------------------------------------------------------*/
@@ -2456,6 +2895,18 @@ int ana_siderealtime(int narg, int ps[])
   }
 
   return result;
+}
+/*--------------------------------------------------------------------------*/
+void VSOPtoFK5(double T, double *pos)
+/* transforms from VSOP polar coordinates to FK5 polar coordinates */
+{
+  double	ll, cll, sll;
+  
+  ll = pos[0] - 0.024382*(1 + 0.000222);
+  cll = cos(ll);
+  sll = sin(ll);
+  pos[0] += -4.3793e-7 + 1.8985e-7*(cll + sll)*tan(pos[1]);
+  pos[1] += 1.8985e-7*(cll - sll);
 }
 /*--------------------------------------------------------------------------*/
 #define EQUINOX_OF_DATE	DBL_MAX
@@ -3333,6 +3784,8 @@ int ana_astrf(int narg, int ps[], int forward) {
 	pos[0] = (double) src.f[0]*DEG;
 	pos[1] = (double) src.f[1]*DEG;
 	break;
+      default:
+        break;
       }
       switch (from) {
       case 2:			/* ecliptical */
@@ -3375,6 +3828,8 @@ int ana_astrf(int narg, int ps[], int forward) {
 	pos[0] = src.d[0]*DEG;
 	pos[1] = src.d[1]*DEG;
 	break;
+      default:
+        break;
       }
       switch (from) {
       case 2:			/* ecliptical */
@@ -3394,6 +3849,8 @@ int ana_astrf(int narg, int ps[], int forward) {
       }
       tgt.d[0] = pos[0]*RAD;
       tgt.d[1] = pos[1]*RAD;
+      break;
+    default:
       break;
     }
     src.b += srcinfo.rdims[0]*srcinfo.stride;
@@ -3904,8 +4361,8 @@ int ana_astropos(int narg, int ps[])
           printf("el = %.10g rad, ph = %.10g rad, mag = %.10\n",
                  final[0], final[1], final[2]);
         }
-      } else if ((internalMode & S_XYZ) == 0 || latitude != S_PLANETOCENTRIC) {
-	XYZtoLBR(pos_obs_tgt, final); /* to polar coordinates */
+      } else {
+	XYZtoLBR(pos_obs_tgt, final);	/* to polar coordinates */
         if (vocal) {
           puts("ASTRON: ecliptic planetocentric coordinates:");
           printLBRtoXYZ(final);

@@ -1351,6 +1351,19 @@ int sdev(int narg, int ps[], int sq)
 
   trgt0 = trgt;
 
+  /* Knuth (the Art of Computer Programming, Volume 2: Seminumerical
+     Algorithms) gives the following algorithm for calculating the
+     standard deviation with just one pass through the data and the
+     least round-off error and guaranteed nonnegative variance:
+
+     M₁ = x₁
+     S₁ = 0
+     M_k = M_{k-1} + (x_k - M_{k-1})/k
+     S_k = S_{k-1} + (x_k - M_{k-1})(x_k - M_k)
+     σ = √(S_k/(n - 1))
+
+     TODO: Extend this algorithm to weighted data */
+
   /* we make two passes: one to get the average, and then one to calculate */
   /* the standard deviation; this way we limit truncation and roundoff */
   /* errors */
@@ -2913,9 +2926,9 @@ int ana_strpbrk(int narg, int ps[])
   int  mq, off;
   int    result_sym;
 
-  if (!symbolIsString(ps[0]))
+  if (!symbolIsStringScalar(ps[0]))
     return cerror(NEED_STR, ps[0]);
-  if (!symbolIsString(ps[1]))
+  if (!symbolIsStringScalar(ps[1]))
     return cerror(NEED_STR, ps[1]);
   p1 = string_value(ps[0]);
   p2 = string_value(ps[1]);
@@ -3964,23 +3977,23 @@ int setxpit(int type, int n)	/* used by several routines to set up
 			/*consisting of {0,1/n,2/n,...,(n-1)/n} */
 			/* type must be 3 or 4 */
 {
-register pointer qx;
-register float	del;
-register double	ddel;
-int	nsym, nx;
-array	*h;
-nx = n;
-nsym = array_scratch(type, 1, &nx );
-h = (array *) sym[nsym].spec.array.ptr;
-qx.l = (int *) ((char *)h + sizeof(array));
-switch (type) {
-case 3:
-del = 1.0 / nx;  *qx.f = 0.0;  while (--nx) *(qx.f+1) = *qx.f++ + del; break;
-case 4:
-ddel = 1.0/ nx;  *qx.d = 0.0;  while (--nx) *(qx.d+1) = *qx.d++ + ddel; break;
-}
-qx.l = (int *) ((char *)h + sizeof(array));
-return nsym;
+  register pointer qx;
+  register float	del;
+  register double	ddel;
+  int	nsym, nx;
+  array	*h;
+  nx = n;
+  nsym = array_scratch(type, 1, &nx );
+  h = (array *) sym[nsym].spec.array.ptr;
+  qx.d = (double *) ((char *)h + sizeof(array));
+  switch (type) {
+  case 3:
+    del = 1.0 / nx;  *qx.f = 0.0;  while (--nx) *(qx.f+1) = *qx.f++ + del; break;
+  case 4:
+    ddel = 1.0/ nx;  *qx.d = 0.0;  while (--nx) *(qx.d+1) = *qx.d++ + ddel; break;
+  }
+  qx.l = (int *) ((char *)h + sizeof(array));
+  return nsym;
 }
 /*------------------------------------------------------------------------- */
 int ana_detrend(int narg, int ps[])/*detrend function */
@@ -4794,6 +4807,8 @@ void ksmooth(loopInfo *srcinfo, loopInfo *trgtinfo, float *kernel, int nkernel)
 	}
       }
       break;
+  default:
+    break;
   }
   src.b += nx*stride*srcinfo->stride;
   srcinfo->data->v = src.v;

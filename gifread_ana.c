@@ -70,7 +70,7 @@ int ana_gifread(int narg, int ps[])       /* gifread subroutine */
  struct GIFScreen gh;
  
  		/* first arg is the variable to load, second is name of file */
- if (!symbolIsString(ps[1]))
+ if (!symbolIsStringScalar(ps[1]))
    return cerror(NEED_STR, ps[1]);
  name = expand_name(string_value(ps[1]), NULL);
  /* try to open the file */
@@ -107,8 +107,6 @@ int ana_gifread(int narg, int ps[])       /* gifread subroutine */
  if (gcmflag) {
  cr = (gh.mask >> 4) & 0x7;	cr += 1;	cr = 1 << cr;
  pixel = gh.mask & 0x7;	pixel += 1;	pixel = 1 << pixel;
- /* if (vn == 89) gsortflag = (gh.mask >> 3) & 1; else gsortflag = 0; */
- /* printf("cr, pixel, gsortflag = %d %d %d\n", cr, pixel, gsortflag); */
  /* set the data array to the background color */
  p = data; n = nxs*nys; while (n--) *p++ = gh.background;
  /* still in global color table exist conditional, read the color table

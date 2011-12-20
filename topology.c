@@ -1264,7 +1264,8 @@ int area_general(int narg, int ps[], int isFunction)
 	return anaerror("Seed position %1d (index %1d) outside of the data",
 		     seed[i], i);
       }
-  } else
+  }
+  
   /* treat all elements that are on an edge: if they are equal to 1, then
      set them to EDGE */
   for (i = 0; i < 2*srcinfo.ndim; i++) {

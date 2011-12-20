@@ -19,6 +19,12 @@ static char rcsid[] __attribute__ ((unused)) =
  "$Id: fun3.c,v 4.0 2001/02/07 20:37:01 strous Exp $";
 
 int	ezffti(int *, float *), fade_xsize, fade_ysize, fade_dim[2];
+int rffti(int *, float *);
+int rfftb(int *, float *, float *);
+int rfftf(int *, float *, float *);
+int rfftid(int *, double *);
+int rfftbd(int *, double *, double *);
+int rfftfd(int *, double *, double *);
 word	*fade1, *fade2;
 extern int	scalemax, scalemin, lastmaxloc, lastminloc, maxhistsize,
 	histmin, histmax, fftdp, lastmax_sym, lastmin_sym;
@@ -28,6 +34,7 @@ static pointer	work;
 int	minmax(int *, int, int), neutral(void *, int);
 void	zerobytes(void *, int), zap(int);
 int	simple_scale(void *, int, int, void *);
+void convertWidePointer(wideScalar *, int, int);
 /*------------------------------------------------------------------------- */
 int evalString(char *expr, int nmax)
 /* compiles and evaluates a string, interpreting it as code */
@@ -1723,9 +1730,7 @@ int ana_hilbert(int narg, int ps[])
     trgt = trgt0;
     src = src0;
     n = srcinfo.rdims[0];
-    mq = n*20 + 120;
-    if (!fftdp)
-      mq = mq/2;
+    mq = (2*n + 15)*(fftdp? sizeof(double): sizeof(float));
     work.l = (int *) realloc(work.l, mq);
     if (!work.l) {
       zap(result);
@@ -1761,21 +1766,21 @@ int ana_hilbert(int narg, int ps[])
 	  /* advance the phases */
 	  if (!(internalMode & 4))/* don't keep the average */
 	    tmp.f[0] = 0.0;	/* average */
+	  if (!(internalMode & 8)) {/* don't keep the highest frequency */
+	    tmp.f[n - 1] = 0.0;	/* highest frequency */
+          }
 	  if (direction < 0)	/* shift phases over -90 degrees */
-	    for (j = 1; j < n - 1; j += 2) {
-	      v.f = tmp.f[j];
-	      tmp.f[j] = -tmp.f[j + 1];
-	      tmp.f[j + 1] = v.f;
-	    }
-	  else			/* shift phases over +90 degrees */
 	    for (j = 1; j < n - 1; j += 2) {
 	      v.f = tmp.f[j];
 	      tmp.f[j] = tmp.f[j + 1];
 	      tmp.f[j + 1] = -v.f;
 	    }
-	  if (j == n - 1
-	      && !(internalMode & 8)) /* zero the highest frequency */
-	    tmp.f[n - 1] = 0.0;	/* highest frequency */
+	  else			/* shift phases over +90 degrees */
+	    for (j = 1; j < n - 1; j += 2) {
+	      v.f = tmp.f[j];
+	      tmp.f[j] = -tmp.f[j + 1];
+	      tmp.f[j + 1] = v.f;
+	    }
 	  /* apply backward FFT */
 	  rfftb(&n, tmp.f, work.f);
 	  /* put in result array */
@@ -1787,7 +1792,7 @@ int ana_hilbert(int narg, int ps[])
 	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
 	break;
       case ANA_DOUBLE:
-	factor.d = 0.5/n;
+	factor.d = 1.0/n;
 	do {
 	  /* put current data string in tmp.d */
 	  for (j = 0; j < n; j++) {
@@ -1801,18 +1806,18 @@ int ana_hilbert(int narg, int ps[])
 	  if (!(internalMode & 4))/* don't keep the average */
 	    tmp.d[0] = 0.0;	/* average */
 	  if (!(internalMode & 8)) /* don't keep the highest frequency */
-	    tmp.d[1] = 0.0;	/* highest frequency */
+	    tmp.d[n - 1] = 0.0;	/* highest frequency */
 	  if (direction < 0)	/* shift phases over -90 degrees */
-	    for (j = 2; j < n; j += 2) {
-	      v.d = tmp.d[j];
-	      tmp.d[j] = -tmp.d[j + 1];
-	      tmp.d[j + 1] = v.d;
-	    }
-	  else			/* shift phases over +90 degrees */
-	    for (j = 2; j < n; j += 2) {
+	    for (j = 1; j < n - 1; j += 2) {
 	      v.d = tmp.d[j];
 	      tmp.d[j] = tmp.d[j + 1];
 	      tmp.d[j + 1] = -v.d;
+	    }
+	  else			/* shift phases over +90 degrees */
+	    for (j = 1; j < n - 1; j += 2) {
+	      v.d = tmp.d[j];
+	      tmp.d[j] = -tmp.d[j + 1];
+	      tmp.d[j + 1] = v.d;
 	    }
 	  /* apply backward FFT */
 	  rfftbd(&n, tmp.d, work.d);
@@ -3500,6 +3505,8 @@ int maxormin(int narg, int ps[], int code)
       max.d = sqrt(max.d);
       min.d = sqrt(min.d);
       break;
+  default:
+    break;
   }
 
   /* put results in global symbols */
@@ -4914,6 +4921,8 @@ int ana_cubic_spline_extreme(int narg, int ps[])
         y.d += step*yinfo.rdims[0];
       } while (advanceLoop(&yinfo) < yinfo.rndim);
       break;
+  default:
+    break;
   }
   return ANA_OK;
 }

@@ -2,6 +2,7 @@
 #include "anaparser.h"
 /*#include "anaparser.c.tab.h"*/
 #include "dmalloc.h"
+#include "bindings.h"
 
 extern char		expname[], line[], *curScrat, *currentRoutineName;
 extern word		listStack[],  curContext;
@@ -13,7 +14,7 @@ extern FILE		*inputStream, *ana_file[];
 extern hashTableEntry	*varHashTable[], *subrHashTable[], *funcHashTable[],
 			*blockHashTable[];
 extern symTableEntry	sym[];
-extern internalRoutine	subroutine[], function[];
+extern internalRoutine	*subroutine, *function;
 extern int		nSubroutine, nFunction, curLineNumber, compileLevel,
 			ignoreInput, curSymbol, axisTally[];
 extern unsigned int     internalMode;
@@ -45,7 +46,8 @@ int 	dereferenceScalPointer(int), scalar_scratch(int),
   to_scratch_array(int, int, int, int *), get_dims(int *, int *, int *),
   listNumElements(int), ana_zero(int, int []),
   cubic_spline_tables(void *, int, int, void *, int, int, int,
-		      byte, csplineInfo *),
+		      byte, csplineInfo *), 
+  numerical_clone(int, enum Symboltype),
   redef_array(int, int, int, int *), string_scratch(int),
   transferAll(int symbol), transfer(int), copySym(int),
   scalar_scratch_copy(int), redef_scalar(int, int, void *),
@@ -58,15 +60,21 @@ int	standardLoop(int, int, int, int, loopInfo *, pointer *, int *,
   standardLoop0(int, int, int *, int, int, loopInfo *, pointer *, int *,
 	       loopInfo *, pointer *), advanceLoop(loopInfo *),
   advanceLoops(loopInfo *, loopInfo *), nextLoop(loopInfo *),
-  dimensionLoopResult(loopInfo *, loopInfo *, int, pointer *),
   nextLoops(loopInfo *, loopInfo *),
   prepareDiagonals(int, loopInfo *, int, int **, int **, int **, int **),
-  moveLoop(loopInfo *, int, int);
+  moveLoop(loopInfo *, int, int),
+  standardLoopX(int, int, int, loopInfo *, pointer *, int, int const *,
+                int, int const *, enum Symboltype, int, int *, loopInfo *,
+                pointer *),
+  loopIsAtStart(loopInfo const *), 
+  standard_args(int, int [], char const *, pointer **, loopInfo **);
 
 void	subdataLoop(int *, loopInfo *), addVerify(char *, char),
   *seekFacts(int symbol, int type, int flag),
   *setFacts(int symbol, int type, int flag),
-  deleteFacts(int symbol, int type), returnLoop(loopInfo *, int);
+  deleteFacts(int symbol, int type), returnLoop(loopInfo *, int),
+  setAxisMode(loopInfo *, int mode);
+void convertWidePointer(wideScalar *, int, int);
 
 void	newStack(int), push(int), deleteStack(void);
 int	pop(void);
@@ -91,8 +99,9 @@ void	clearToPopTempVariable(int), pushTempVariable(int), printw(char *),
 
 const csplineInfo empty_cubic_spline(void);
 
-void	setupDimensionLoop(loopInfo *, int, int [], int, int, int [],
-			   pointer *, int),
+void setupDimensionLoop(loopInfo *info, int ndim, int const *dims, 
+                        enum Symboltype type, int naxes, int const *axes,
+                        pointer *data, int mode),
   rearrangeDimensionLoop(loopInfo *), endian(void *, int, int),
   rearrangeEdgeLoop(loopInfo *, loopInfo *, int);
 

@@ -26,6 +26,8 @@ void	zerobytes(void *, int), updateIndices(void), symdumpswitch(int, int);
 void	xsynchronize(int);
 #endif
 int	installString(char *), fixContext(int, int), ana_replace(int, int);
+char *fmttok(char *);
+int Sprintf_tok(char *, ...);
 /*-----------------------------------------------------*/
 void embed(int target, int context)
 /* gives <target> the specified <context>, if it is a contextless */
@@ -313,6 +315,17 @@ int array_clone(int symbol, int type)
  return n; 
 }
 /*-----------------------------------------------------*/
+int numerical_clone(int iq, enum Symboltype type) {
+  switch (symbol_class(iq)) {
+  case ANA_ARRAY:
+    return array_clone(iq, type);
+  case ANA_SCALAR:
+    return scalar_scratch(type);
+  default:
+    return anaerror("Need numerical argument", iq);
+  }
+}
+/*-----------------------------------------------------*/
 int dereferenceScalPointer(int nsym)
 /* returns an ordinary ANA_SCALAR for a ANA_SCAL_PTR.  NOTE: assumes that
  <nsym> is a SCAL_PTR!  LS 31jul98 */
@@ -594,7 +607,7 @@ int ana_floor(int narg, int ps[])
 
  iq = *ps;
  if (!symbolIsNumerical(iq)	/* not numerical */
-     && !symbolIsString(iq))	/* and not a string either */
+     && !symbolIsStringScalar(iq))	/* and not a string either */
    return cerror(ILL_CLASS, iq); /* reject */
  if (symbol_type(iq) == ANA_LONG) /* if it's already BYTE then we're done */
    return iq;
@@ -708,7 +721,7 @@ int ana_ceil(int narg, int ps[])
 
  iq = *ps;
  if (!symbolIsNumerical(iq)	/* not numerical */
-     && !symbolIsString(iq))	/* and not a string either */
+     && !symbolIsStringScalar(iq))	/* and not a string either */
    return cerror(ILL_CLASS, iq); /* reject */
  if (symbol_type(iq) == ANA_LONG) /* if it's already BYTE then we're done */
    return iq;
@@ -858,7 +871,7 @@ int ana_convert(int narg, int ps[], int totype, int isFunc)
   while (narg--) {
     iq = *ps++;
     if (!symbolIsNumerical(iq)	/* not numerical */
-	&& !symbolIsString(iq)	/* and not a string */
+	&& !symbolIsStringScalar(iq)	/* and not a string */
 	&& !symbolIsStringArray(iq))	/* and not a string array either */
       return cerror(ILL_CLASS, iq); /* reject */
     if (!isFunc && (!symbolIsNamed(iq) || iq <= nFixed))
@@ -1850,8 +1863,8 @@ int redef_string(int nsym, int len)
 }
 /*-----------------------------------------------------*/
 int redef_array(int nsym, int ntype, int ndim, int *dims)
-/* redefines symbol nsym to be an array of the given type,
-  number of dimensions, and dimensions */
+/* redefines symbol nsym to be an array of the given type, number of
+  dimensions, and dimensions; or a scalar if <ndim> == 0 */
 {                                /*redefine a symbol i to an array */
   int   mq, j;
   array	*h;
@@ -1859,6 +1872,14 @@ int redef_array(int nsym, int ntype, int ndim, int *dims)
 
   if (ndim > MAX_DIMS)
     return cerror(N_DIMS_OVR, 0);
+  if (ndim < 0)
+    return cerror(ILL_DIM, 0);
+  if (!ndim) {
+    undefine(nsym);
+    symbol_class(nsym) = ANA_SCALAR;
+    scalar_type(nsym) = ntype;
+    return 1;
+  }
   mq = ana_type_size[ntype];
   for (j = 0; j < ndim; j++)
     mq *= dims[j];
@@ -1886,6 +1907,25 @@ int redef_array(int nsym, int ntype, int ndim, int *dims)
       *p.sp++ = NULL;
   }
   return 1;
+}
+/*-----------------------------------------------------*/
+int redef_array_extra_dims(int tgt, int src, enum Symboltype type, int ndim, int *dims)
+{
+  int *srcdims, srcndim;
+  int tgtdims[MAX_DIMS];
+
+  if (!symbolIsModifiable(tgt))
+    return cerror(NEED_NAMED, tgt);
+  if (!numerical(src, &srcdims, &srcndim, NULL, NULL))
+    return cerror(NEED_NUM_ARR, src);
+  if (symbolIsScalar(src))
+    srcndim = 0;
+  if (srcndim + ndim > MAX_DIMS)
+    return cerror(N_DIMS_OVR, tgt);
+  memcpy(tgtdims, dims, ndim*sizeof(*tgtdims));
+  memcpy(tgtdims + ndim, srcdims, srcndim*sizeof(*tgtdims));
+  ndim += srcndim;
+  return redef_array(tgt, type, ndim, tgtdims);
 }
 /*-----------------------------------------------------*/
 int bytarr(int narg, int ps[])
@@ -2381,7 +2421,7 @@ int ana_set(int narg, int ps[])
   if (narg) {
     if (*ps) {			/* VISUAL */
 #ifdef X11
-      if (!symbolIsString(*ps))
+      if (!symbolIsStringScalar(*ps))
 	return cerror(NEED_STR, *ps);
       string = string_value(*ps);
       for (i = 0; i < 18; i++)
@@ -3406,6 +3446,7 @@ int nextchar(FILE *fp) {
       if (keyboard.ptr == keyboard.buffer) /* we must ask for more */
 	while (!*keyboard.ptr) {
 	  FILE *is;
+          int getNewLine(char *, char *, char);
 	  is = inputStream;
 	  inputStream = stdin;
 	  getNewLine(keyboard.buffer, "dat>", 0);

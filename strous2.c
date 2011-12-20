@@ -3291,6 +3291,8 @@ int ana_runprod(int narg, int ps[])
 	  value.d = 1;
       } while (n < srcinfo.rndim);
       break;
+  default:
+    break;
   }
   return result;
 }

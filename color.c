@@ -1070,8 +1070,8 @@ int ana_pixelsto8bit(int narg, int ps[])
   */
 {
   int result, ncolors, iq;
-  int ana_tolookup(int, int []);
-  int ana_byte_inplace(int, int []);
+  int ana_tolookup(int, int *);
+  int ana_byte_inplace(int, int *);
 
   if (!symbolIsNumericalArray(ps[0]))
     return cerror(ILL_CLASS, ps[0]);

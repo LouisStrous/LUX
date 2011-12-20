@@ -29,11 +29,19 @@
 #include <string.h>
 #include <limits.h>
 #include "action.h"
+#include <obstack.h>
+#include <errno.h>
+#include <ctype.h>
+
+#define obstack_chunk_alloc malloc
+#define obstack_chunk_free free
+
 static char rcsid[] __attribute__ ((unused)) =
 "$Id: axis.c,v 4.0 2001/02/07 20:36:57 strous Exp $";
 
-void setupDimensionLoop(loopInfo *info, int ndim, int dims[], int type,
-		       int naxes, int axes[], pointer *data, int mode);
+void setupDimensionLoop(loopInfo *info, int ndim, int const *dims, 
+                        enum Symboltype type, int naxes, int const *axes,
+                        pointer *data, int mode);
 void rearrangeDimensionLoop(loopInfo *info);
 int standardLoop(int data, int axisSym, int mode, int outType,
 		 loopInfo *src, pointer *srcptr, int *output, loopInfo *trgt,
@@ -41,15 +49,77 @@ int standardLoop(int data, int axisSym, int mode, int outType,
 int advanceLoop(loopInfo *info), ana_convert(int, int [], int, int),
   advanceLoops(loopInfo *info1, loopInfo *info2);
 int nextLoop(loopInfo *info), nextLoops(loopInfo *info1, loopInfo *info2);
-int dimensionLoopResult(loopInfo *sinfo, loopInfo *tinfo, int type,
+int dimensionLoopResult(loopInfo const *sinfo, loopInfo *tinfo, int type,
 			pointer *tptr);
-
+int standardLoop1(int source,
+                  int nAxes, int const * axes,
+                  int srcMode,
+                  loopInfo *srcinf, pointer *srcptr,
+                  int nMore, int const * more,
+                  int nLess, int const * less,
+                  enum Symboltype tgtType, int tgtMode,
+                  int *target, 
+                  loopInfo *tgtinf, pointer *tgtptr);
 /*-------------------------------------------------------------------------*/
-void setupDimensionLoop(loopInfo *info, int ndim, int dims[], int type,
-		       int naxes, int axes[], pointer *data, int mode)
+void setAxisMode(loopInfo *info, int mode) {
+  if ((mode & SL_EACHBLOCK) == SL_EACHBLOCK)
+    info->advanceaxis = info->naxes;
+  else if (mode & SL_EACHROW)
+    info->advanceaxis = 1;
+  else
+    info->advanceaxis = 0;
+  info->axisindex = 0;
+  info->mode = mode;
+
+  /* rearrange the dimensions for the first pass */
+  rearrangeDimensionLoop(info);
+}
+/*-------------------------------------------------------------------------*/
+int setAxes(loopInfo *info, int nAxes, int *axes, int mode)
+{
+  int i;
+  int temp[MAX_DIMS];
+
+  if (mode & SL_TAKEONED)	/* take data as 1D */
+    nAxes = 0;			/* treat as 1D */
+  else if (mode & SL_ALLAXES) { /* select all axes */
+    nAxes = info->ndim;
+    axes = NULL;		/* treat as if all axes were specified */
+  } else if ((mode & SL_NEGONED)	/* negative-axis treatment */
+	     && nAxes == 1		/* one axis specified */
+	     && *axes < 0)	/* and it is negative */
+    nAxes = 0;
+  
+  if ((mode & SL_ONEAXIS)	/* only one axis allowed */
+      && nAxes > 1)		/* and more than one selected */
+    return anaerror("Only one axis allowed", -1);
+
+  /* check the specified axes for legality */
+  if (nAxes && axes) {
+    for (i = 0; i < nAxes; i++) /* check all specified axes */
+      if (axes[i] < 0		/* axis is negative */
+	  || axes[i] >= info->ndim)	/* or too great */
+	return anaerror("Illegal axis %1d", -1, axes[i]);
+    if (mode & SL_UNIQUEAXES) {	/* no axis must occur more than once */
+      zerobytes(temp, info->ndim*sizeof(int));
+      for (i = 0; i < nAxes; i++)
+	if (temp[axes[i]]++)
+	  return anaerror("Axis %1d illegally specified more than once",
+			  -1, axes[i]);
+    }
+  }
+  info->naxes = nAxes;
+  if (nAxes)
+    memcpy(info->axes, axes, nAxes*sizeof(*axes));
+  setAxisMode(info, mode);
+  return 0;
+}
+/*-------------------------------------------------------------------------*/
+void setupDimensionLoop(loopInfo *info, int ndim, int const *dims, 
+                        enum Symboltype type, int naxes, int const *axes,
+                        pointer *data, int mode)
 /* fills the loopInfo structure <info> with information
- suitable for looping through a dimensional structure, and returns a
- pointer to the loopInfo structure.
+ suitable for looping through a dimensional structure.
  <ndim>: number of dimensions in the data
  <dims>: pointer to the list of dimensions in the data
  <type>: data type of the data
@@ -59,8 +129,6 @@ void setupDimensionLoop(loopInfo *info, int ndim, int dims[], int type,
           a list of all axes in ascending order
  <data>: pointer to a pointer to the data
  <mode>: flags indicating how to loop through the axes
-
- Returns ANA_OK if OK, ANA_ERROR if not OK.  LS 16jul98
 */
 {
   int	i;
@@ -73,7 +141,7 @@ void setupDimensionLoop(loopInfo *info, int ndim, int dims[], int type,
   info->ndim = ndim;
   /* the list of dimensions of the data: */
   if (ndim)
-    memcpy(info->dims, dims, ndim*sizeof(int));
+    memmove(info->dims, dims, ndim*sizeof(int));
   else				/* a scalar */
     info->dims[0] = 1;		/* need something reasonable here or else
 				   advanceLoop() won't work properly. */
@@ -93,11 +161,12 @@ void setupDimensionLoop(loopInfo *info, int ndim, int dims[], int type,
      must fit in a signed long int.  If it does not, then we emit a warning.
      LS 2dec98 */
   if (size > LONG_MAX)
-    printf("WARNING - array size (%lu elements) may be too great\nfor this operation!  Serious errors may occur!\n", size);
+    printf("WARNING - array size (%lu elements) may be too great\n"
+           "for this operation!  Serious errors may occur!\n", size);
   info->nelem = size;
   /* the list of dimensions along which should be looped */
   if (axes)
-    memcpy(info->axes, axes, naxes*sizeof(int));
+    memmove(info->axes, axes, naxes*sizeof(int));
   else
     for (i = 0; i < info->naxes; i++)
       info->axes[i] = i;		/* SL_ALLAXES was selected */
@@ -107,7 +176,7 @@ void setupDimensionLoop(loopInfo *info, int ndim, int dims[], int type,
   info->data = data;
   info->data0 = data->v;
 
-  /* now derive auxilliary data */
+  /* now derive auxiliary data */
   /* the step size per dimension (measured in elements), i.e. by how many
    elements one has to advance a suitable pointer to point at the next
    element in the selected dimension: */
@@ -117,17 +186,7 @@ void setupDimensionLoop(loopInfo *info, int ndim, int dims[], int type,
   /* the number of bytes per data element: */
   info->stride = ana_type_size[type];
 
-  if ((mode & SL_EACHBLOCK) == SL_EACHBLOCK)
-    info->advanceaxis = info->naxes;
-  else if (mode & SL_EACHROW)
-    info->advanceaxis = 1;
-  else
-    info->advanceaxis = 0;
-  info->axisindex = 0;
-  info->mode = mode;
-
-  /* rearrange the dimensions for the first pass */
-  rearrangeDimensionLoop(info);
+  setAxisMode(info, mode);
 }
 /*-----------------------------------------------------------------------*/
 int advanceLoop(loopInfo *info)
@@ -159,6 +218,18 @@ int advanceLoop(loopInfo *info)
   }
   return done;
 }  
+/*-----------------------------------------------------------------------*/
+int loopIsAtStart(loopInfo const *info)
+/* returns 1 if all coordinates are equal to 0, and 0 otherwise.
+   Can be used to test if the loop is back at the start again -- i.e.,
+   has completed.  See also advanceLoop(). */
+{
+  int state = 1, i;
+
+  for (i = 0; i < info->rndim; i++)
+    state &= (info->coords[i] == 0);
+  return state;
+}
 /*-----------------------------------------------------------------------*/
 int advanceLoops(loopInfo *info1, loopInfo *info2)
 /* advance two loops.  The dimensional structure of info1 and info2
@@ -344,11 +415,39 @@ void rearrangeDimensionLoop(loopInfo *info)
   info->data->v = info->data0;	/* initialize pointer */
 }
 /*-----------------------------------------------------------------------*/
-int dimensionLoopResult(loopInfo *sinfo, loopInfo *tinfo, int type,
-			pointer *tptr)
+void omitRedundantDimensions(int *ndim, int *dims, int *naxes, int *axes)
+{
+  /* if we get rid of dimension <d>, then all axis numbers greater
+     than or equal to <d> must be decremented by one */
+  int newAxisNr[MAX_DIMS];
+  int omitted = 0, i;
+
+  for (i = 0; i < *ndim; i++) {
+    newAxisNr[i] = i - omitted;
+    if (dims[i] == 1)
+      omitted++;
+  }
+  if (omitted) {
+    for (i = 0; i < *naxes; i++)
+      axes[i] = newAxisNr[axes[i]];
+    for (i = 0; i < *ndim - omitted; i++)
+      dims[i] = dims[newAxisNr[i]];
+    *ndim -= omitted;
+    *naxes -= omitted;
+    /* TODO: some of axes[i] may have gotten equal. Handle.
+       TODO: some of axes[i] may refer to now-omitted
+       dimensions.  Handle. */
+  }
+}
+/*-----------------------------------------------------------------------*/
+int dimensionLoopResult1(loopInfo const *sinfo,
+                         int tmode, enum Symboltype ttype,
+                         int nMore, int const * more,
+                         int nLess, int const * less,
+                         loopInfo *tinfo, pointer *tptr)
 /* create an appropriate result symbol
    <sinfo>: contains information about the loops through the source
-   <sinfo->mode>: specifies desired result
+   <tmode>: specifies desired result
      SL_ONEDIMS:   set omitted dimensions to 1 in the output.  If this
         option is not selected, then omitted dimensions are really
 	not present in the output.  If due to such omissions no dimensions
@@ -362,31 +461,79 @@ int dimensionLoopResult(loopInfo *sinfo, loopInfo *tinfo, int type,
    <tptr>: a pointer to a pointer to the target data
  */
 {
-  int	output, n, i, ndim, dims[MAX_DIMS], naxes, axes[MAX_DIMS], j, mode;
+  int	target, n, i, ndim, dims[MAX_DIMS], naxes, axes[MAX_DIMS], j;
   pointer	ptr;
 
-  mode = sinfo->mode;
   ndim = sinfo->ndim;		/* default */
-  memcpy(dims, sinfo->dims, ndim*sizeof(int));
+  memcpy(dims, sinfo->dims, ndim*sizeof(*dims));
   naxes = sinfo->naxes;
-  memcpy(axes, sinfo->axes, naxes*sizeof(int));
+  memcpy(axes, sinfo->axes, naxes*sizeof(*axes));
+  /* it is assumed that 0 <= axes[i] < ndim for i = 0..naxes-1 */
 
-  switch (mode & (SL_SAMEDIMS | SL_COMPRESS | SL_COMPRESSALL)) {
-    case SL_SAMEDIMS:		/* output has same dimensions as source */
-      break;			/* nothing to do */
+  if (nLess && less) {
+    if (nLess < 1 || nLess > naxes)
+      return anaerror("Illegal number %d of dimensions to reduce:"
+                      " expected 1..%d", -1, nLess, naxes);
+    for (i = 0; i < nLess; i++) {
+      if (less[i] < 1)
+        return anaerror("Illegal reduction factor %d for axis %d",
+                        -1, less[i], i);
+      if (dims[axes[i]] % less[i])
+        return anaerror("Reduction factor %d is not a divisor of dimension"
+                        " %d size %d", -1, less[i], axes[i], dims[axes[i]]);
+      dims[axes[i]] /= less[i];
+    }
+    for ( ; i < naxes; i++) {
+      if (dims[axes[i]] % less[nLess - 1])
+        return anaerror("Reduction factor %d is not a divisor of dimension"
+                        " %d size %d", -1, less[nLess - 1], axes[i],
+                        dims[axes[i]]);
+      dims[axes[i]] /= less[nLess - 1];
+    }
+    if (!(tmode & SL_ONEDIMS))  /* remove dimensions equal to 1 */
+      omitRedundantDimensions(&ndim, dims, &naxes, axes);
+  }
+  if (nMore && more) {
+    if (nMore < 1)
+      return anaerror("Illegal number %d of dimensions to add", -1, nMore);
+    if (nMore + ndim > MAX_DIMS)
+      return anaerror("Requested total number of dimensions %d "
+                    "exceeds allowed maximum %d", -1, nMore + ndim, MAX_DIMS);
+    if (nMore + naxes > MAX_DIMS)
+      return anaerror("Total number of axes %d after growing "
+                    "exceeds allowed maximum %d", nMore + naxes, MAX_DIMS);
+    for (i = 0; i < nMore; i++)
+      if (more[i] < 1)
+        return anaerror("Illegal size %d requested for new dimension %d", -1,
+                      more[i], i);
+    memmove(dims + nMore, dims, ndim*sizeof(*dims));
+    memcpy(dims, more, nMore*sizeof(*dims));
+    ndim += nMore;
+    for (i = 0; i < naxes; i++) /* adjust axes for new dimensions */
+      axes[i] += nMore;
+    memmove(axes + nMore, axes, naxes*sizeof(*axes));
+    for (i = 0; i < nMore; i++)
+      axes[i] = i;
+    naxes += nMore;
+    if (!(tmode & SL_ONEDIMS))  /* remove dimensions equal to 1 */
+      omitRedundantDimensions(&ndim, dims, &naxes, axes);
+  }
+
+  if (!less && !more) {
+    switch (tmode & (SL_COMPRESS | SL_COMPRESSALL)) {
     case SL_COMPRESS:		/* output has same dimensions as source,
-				 except that first selected axis dimension
-				 is omitted -- or set to 1 */
+                                   except that first selected axis dimension
+                                   is omitted -- or set to 1 */
     case SL_COMPRESSALL:	/* output has same dimensions as source,
-				 except that all selected axis dimensions
-				 are omitted -- or set to 1 */
-      if ((mode & (SL_SAMEDIMS | SL_COMPRESS | SL_COMPRESSALL)) == SL_COMPRESS)
+                                   except that all selected axis dimensions
+                                   are omitted -- or set to 1 */
+      if ((tmode & (SL_COMPRESS | SL_COMPRESSALL)) == SL_COMPRESS)
 	n = 1;			/* omit one axis only */
       else
 	n = sinfo->naxes;	/* omit all axes */
       
       if (sinfo->axes) {	/* have specific axes */
-        if (mode & SL_ONEDIMS)  /* replace by dimension of 1 */
+        if (tmode & SL_ONEDIMS)  /* replace by dimension of 1 */
 	  for (i = 0; i < n; i++)
 	    dims[sinfo->axes[i]] = 1;
 	else {			/* really omit */
@@ -411,18 +558,29 @@ int dimensionLoopResult(loopInfo *sinfo, loopInfo *tinfo, int type,
 	naxes = 0;
       memcpy(axes, axes + n, naxes*sizeof(int));
       break;
+    }
   }
 
   /* create the output symbol */
   if (ndim) {		/* get an array */
-    output = array_scratch(type, ndim, dims);
-    ptr.l = (int *) array_data(output);
+    target = array_scratch(ttype, ndim, dims);
+    ptr.l = (int *) array_data(target);
   } else {			/* get a scalar */
-    output = scalar_scratch(type);
-    if (isComplexType(type))
-      ptr.cf = complex_scalar_data(output).cf;
-    else
-      ptr.l = &scalar_value(output).l;
+    if (isStringType(ttype)) {
+      target = string_scratch(0);
+      /* we must produce a NULL pointer, because that's what happens
+         for string arrays, too, and the interface doesn't know
+         whether we're dealing with a string array or a string. */
+      free(string_value(target));
+      string_value(target) = NULL;
+      ptr.sp = &string_value(target);
+    } else {
+      target = scalar_scratch(ttype);
+      if (isComplexType(ttype))
+        ptr.cf = complex_scalar_data(target).cf;
+      else
+        ptr.l = &scalar_value(target).l;
+    }
   }
 
   *tptr = ptr;			/* store pointer to output data */
@@ -430,8 +588,15 @@ int dimensionLoopResult(loopInfo *sinfo, loopInfo *tinfo, int type,
    element of tinfo. */
 
   /* fill loop structure for output symbol */
-  setupDimensionLoop(tinfo, ndim, dims, type, naxes, axes, tptr, mode); 
-  return output;
+  setupDimensionLoop(tinfo, ndim, dims, ttype, naxes, axes, tptr, tmode);
+  return target;
+}
+/*-----------------------------------------------------------------------*/
+int dimensionLoopResult(loopInfo const *sinfo, loopInfo *tinfo,
+                         int ttype, pointer *tptr)
+{
+  return dimensionLoopResult1(sinfo, sinfo->mode, ttype,
+                              0, NULL, 0, NULL, tinfo, tptr);
 }
 /*-----------------------------------------------------------------------*/
 int standardLoop(int data, int axisSym, int mode, int outType,
@@ -453,6 +618,34 @@ int standardLoop(int data, int axisSym, int mode, int outType,
   return standardLoop0(data, nAxes, axes.l, mode, outType,
 		       src, srcptr, output, trgt, trgtptr);
 
+}
+/*-----------------------------------------------------------------------*/
+/* Like standardLoop but can produce a target like the source
+   but with adjusted dimensions. LS 2011-07-22 */
+int standardLoopX(int source, int axisSym, int srcMode,
+                  loopInfo *srcinf, pointer *srcptr,
+                  int nMore, int const * more,
+                  int nLess, int const * less,
+                  enum Symboltype tgtType, int tgtMode,
+                  int *target,
+                  loopInfo *tgtinf, pointer *tgtptr)
+{
+  int i, nAxes;
+  pointer axes;
+
+  if (axisSym > 0) {		/* <axisSym> is a regular symbol */
+    if (!symbolIsNumerical(axisSym))
+      return anaerror("Need a numerical argument", axisSym); /* <axisSym> was not numerical */
+    i = ana_long(1, &axisSym);	/* get a LONG copy */
+    numerical(i, NULL, NULL, &nAxes, &axes); /* get info */
+  } else {
+    nAxes = 0;
+    axes.l = NULL;
+  }
+  int result = standardLoop1(source, nAxes, axes.l, srcMode,
+                             srcinf, srcptr, nMore, more, nLess, less,
+                             tgtType, tgtMode, target, tgtinf, tgtptr);
+  return result;
 }
 /*-----------------------------------------------------------------------*/
 int standardLoop0(int data, int nAxes, int *axes, int mode, int outType,
@@ -625,6 +818,225 @@ int standardLoop0(int data, int nAxes, int *axes, int mode, int outType,
   return ANA_OK;
 }
 #undef DEBUG_VOCAL
+/*-----------------------------------------------------------------------*/
+int standardLoop1(int source,
+                  int nAxes, int const * axes,
+                  int srcMode,
+                  loopInfo *srcinf, pointer *srcptr,
+                  int nMore, int const * more,
+                  int nLess, int const * less,
+                  enum Symboltype tgtType, int tgtMode,
+                  int *target, 
+                  loopInfo *tgtinf, pointer *tgtptr)
+/* initiates a standard array loop.  advanceLoop() runs through the loop.
+   <source> (in): source data symbol, must be numerical
+   <nAxes> (in): the number of axes to treat
+   <axes> (in): a pointer to the list of axes to treat
+   <srcMode> (in): flags that indicate desired action for source
+   <srcinf> (out): loop info for source
+   <srcptr> (out): pointer to the data in source
+   <nMore> (in): the number of axes (out of <axes>) of which to
+     increase the size
+   <more> (in): a pointer to the list of axis size factors
+   <nLess> (in): the number of axes (out of <axes>) of which to
+     decrease the size
+   <less> (in): a pointer to the list of axis size divisors
+   <tgtType> (in): desired data type for newly created target data symbol
+   <tgtmode> (in): flags that indicate desired action for target
+   <target> (out): created target data symbol
+   <tgtinf> (out): returns loop info for target
+   <trgtptr> (out): pointer to the data in target
+
+   if <target> is NULL, then no target-related output variables are
+   filled in.  If any of the output variables are NULL, then those
+   variables are not filled in.
+
+   If <axes> is NULL, then <nAxes> is ignored.  If <axes> is not NULL,
+   then it must point to an array of <nAxes> numbers indicating the
+   axes (dimensions) of interest.  If any of those axes are negative
+   or greater than or equal to the number of dimensions in <source>,
+   then an error is declared.  If <nAxes> is less than 1, then an
+   error is declared.  Further restrictions on the axis values may be
+   specified through <srcMode>.
+
+   By default, <target> gets the same dimensions as <source>.  This
+   can be changed through <more>, <nMore>, <less>, <nLess>, and
+   <tgtMode>.  <nMore> and <more> specify how many dimensions to add,
+   and of what size.
+
+   If <more> is NULL, then <nMore> is ignored.  If <nMore> is zero,
+   then <more> is ignored.  If <more> is not NULL, then it must point
+   to an array of <nMore> numbers indicating the sizes of the new
+   dimensions to be added to <target>.  If any of those sizes are less
+   than 1, then an error is declared.  If <nMore> is less than 1, then
+   an error is declared.  The extra dimensions are prefixed to the
+   existing ones, in the indicated order.
+
+   If <less> is NULL, then <nLess> is ignored.  If <nLess> is zero,
+   then <less> is ignored.  If <less> is not NULL, then it must point
+   to an array of <nLess> numbers indicating by which factors the
+   sizes of the indicated axes should be reduced.  The "indicated
+   axes" are those from <axes>.  If <nLess> is greater than the number
+   of indicated axes, then an error is declared.  If <nLess> is less
+   than 1, then an error is declared.  If <nLess> is greater than 0
+   but less than the number of indicated axes, then the last element
+   of <less> is implicitly repeated as needed.  If the size of one of
+   the corresponding axes of <source> is not a multiple of the
+   corresponding number from <more>, then an error is declared.  If
+   after reduction the size of the dimension is equal to 1, then that
+   dimension may be omitted from the result, depending on the value of
+   <tgtMode>.
+
+   If the final number of dimensions in <target> (taking into account
+   <more> and <less> and <tgtMode>) would exceed MAX_DIMS, then an
+   error is declared.
+    
+   <srcMode> flags:
+
+   about the axes:
+   SL_ALLAXES: same as specifying all dimensions of <data> in ascending order
+           in <axes>; the values of <axes> and <nAxes> are ignored.
+   SL_TAKEONED: take the <data> as one-dimensional; the values of <axes>
+           and <nAxes> are ignored
+
+   about specified axes:
+   SL_NEGONED:  if the user supplies a single axis and that axis is negative,
+           then <data> is treated as if it were one-dimensional (yet
+	   containing all of its data elements)
+   SL_ONEAXIS:  only a single axis is allowed
+   SL_UNIQUEAXES: all specified axes must be unique (no duplicates)
+
+   about the input <data>:
+   SL_SRCUPGRADE: use a copy of <data> which is upgraded to <tgtType> if
+           necessary
+
+   about the desired axis order and coordinate availability:
+   SL_EACHCOORD: the currently selected axis goes first; the remaining
+           axes come later, in their original order; the user gets
+	   access to all coordinates (DEFAULT)
+   SL_AXISCOORD: the currently selected axis goes first; the user gets access
+	    only to the coordinate along the indicated axis; remaining axes
+	    come later, lumped together as much as possible for faster
+	    execution
+   SL_AXESBLOCK: all specified axes go first in the specified order;
+	    the remaining axes come later, in their original order; the user
+	    gets access to all coordinates.  Implies SL_UNIQUEAXES.
+
+   about the coordinate treatment:
+   SL_EACHROW: the data is advanced one row at a time; the user must
+	    take care of advancing the data pointer to the beginning of
+	    the next row   
+   SL_EACHBLOCK: like SL_EACHROW, but all selected axes together are
+	    considered to be a "row".  Implies SL_AXESBLOCK.
+
+   <tgtMode> flags:
+
+   about the output symbol:
+   SL_EXACT: must get exactly the data type indicated by <tgtType> (DEFAULT)
+   SL_UPGRADE: must get the data type of <source> or <tgtType>, whichever is
+           greater
+   SL_KEEPTYPE: gets the same type as <source>
+
+   SL_ONEDIMS: omitted dimensions are not really removed but rather set to 1
+
+   SL_COMPRESS: gets the same dimensions as <data>, except that
+           the currently selected axis is omitted.  If no dimensions
+           are left, then a scalar is returned.  Ignored unless <less>
+           is NULL.
+   SL_COMPRESSALL: gets the same dimensions as <data>, except that all
+           selected axes are omitted.  If no dimensions are left, then
+           a scalar is returned.  Ignored unless <less> is NULL.
+
+   about the desired axis order and coordinate availability:
+   SL_EACHCOORD: the currently selected axis goes first; the remaining
+           axes come later, in their original order; the user gets
+	   access to all coordinates (DEFAULT)
+   SL_AXISCOORD: the currently selected axis goes first; the user gets access
+	    only to the coordinate along the indicated axis; remaining axes
+	    come later, lumped together as much as possible for faster
+	    execution
+   SL_AXESBLOCK: all specified axes go first in the specified order;
+	    the remaining axes come later, in their original order; the user
+	    gets access to all coordinates.  Implies SL_UNIQUEAXES.
+
+   about the coordinate treatment:
+   SL_EACHROW: the data is advanced one row at a time; the user must
+	    take care of advancing the data pointer to the beginning of
+	    the next row   
+   SL_EACHBLOCK: like SL_EACHROW, but all selected axes together are
+	    considered to be a "row".  Implies SL_AXESBLOCK.
+  */
+{
+  int *dims;
+  int ndim, i, temp[MAX_DIMS];
+
+  /* check if <source> is of proper class, and get some info about it */
+  if (numerical_or_string(source, &dims, &ndim, NULL, srcptr) == ANA_ERROR)
+    return ANA_ERROR;		/* some error */
+  
+  if (srcMode & SL_TAKEONED)	/* take data as 1D */
+    nAxes = 0;			/* treat as 1D */
+  else if (srcMode & SL_ALLAXES) { /* select all axes */
+    nAxes = ndim;
+    axes = NULL;		/* treat as if all axes were specified */
+  } else if ((srcMode & SL_NEGONED)	/* negative-axis treatment */
+	     && nAxes == 1		/* one axis specified */
+	     && *axes < 0)	/* and it is negative */
+    nAxes = 0;
+  
+  if ((srcMode & SL_ONEAXIS)	/* only one axis allowed */
+      && nAxes > 1)		/* and more than one selected */
+    return anaerror("Only one axis allowed", -1);
+
+  /* check the specified axes for legality */
+  if (nAxes && axes) {
+    for (i = 0; i < nAxes; i++) /* check all specified axes */
+      if (axes[i] < 0		/* axis is negative */
+	  || axes[i] >= ndim)	/* or too great */
+	return anaerror("Illegal axis %1d", -1, axes[i]);
+    if (srcMode & SL_UNIQUEAXES) { /* no axis must occur more than once */
+      zerobytes(temp, ndim*sizeof(int));
+      for (i = 0; i < nAxes; i++)
+	if (temp[axes[i]]++)
+	  return anaerror("Axis %1d illegally specified more than once",
+			  -1, axes[i]);
+    }
+  }
+  
+  /* The input is of legal classes and types. */
+    
+  if ((srcMode & SL_SRCUPGRADE)	/* upgrade source if necessary */
+      && (symbol_type(source) < tgtType))	{ /* source needs upgrading */
+    source = ana_convert(1, &source, tgtType, 1); /* upgrade */
+    numerical_or_string(source, NULL, NULL, NULL, srcptr);
+  }
+
+  setupDimensionLoop(srcinf, ndim, dims, symbol_type(source), nAxes,
+		     axes, srcptr, srcMode);
+
+  if (target) {			/* user wants an output symbol */
+    if (((tgtMode & SL_UPGRADE)
+	 && tgtType < srcinf->type)
+	|| (tgtMode & SL_KEEPTYPE))
+      tgtinf->type = srcinf->type; /* output type equal to source type */
+    else
+      tgtinf->type = tgtType;	/* take specified output type */
+        
+    *target = dimensionLoopResult1(srcinf, tgtMode, tgtinf->type, 
+                                   nMore, more, nLess, less, tgtinf,
+                                   tgtptr);
+    if (*target == ANA_ERROR)
+      /* but didn't get one */
+      return ANA_ERROR;
+  }
+  
+  if (srcMode & SL_TAKEONED) { /* mimic 1D array */
+    srcinf->dims[0] = srcinf->rdims[0] = srcinf->nelem;
+    srcinf->ndim = srcinf->rndim = 1;
+  }
+
+  return ANA_OK;
+}
 /*-----------------------------------------------------------------------*/
 int nextLoop(loopInfo *info)
 /* rearranges dimensions for a next loop through the array; returns 1
@@ -982,7 +1394,7 @@ static int numerical_or_string_choice(int data, int **dims, int *nDim, int *size
 
   switch (symbol_class(data)) {
   default:
-    return cerror(ILL_CLASS, data);
+      return ANA_ERROR;         /* no message, because not always wanted */
   case ANA_SCAL_PTR:
     data = dereferenceScalPointer(data);
     /* fall-thru */
@@ -1048,4 +1460,724 @@ int numerical_or_string(int data, int **dims, int *nDim, int *size, pointer *src
    reserved memory space. LS 21apr97 */
 {
   return numerical_or_string_choice(data, dims, nDim, size, src, 1);
+}
+/*--------------------------------------------------------------------*/
+/*
+   <params-spec> = <param-spec>[;<param-spec>]*
+   <param-spec> = {'i'|'o'|'r'}['?'][<type-spec>][<dims-spec>]
+   <type-spec> = {['>']{'B'|'W'|'L'|'F'|'D'}}|'S'
+   <dims-spec> = ['['<ref-par>']']<dim-spec>[,<dim-spec>]*['*']
+   <dim-spec> = [{'+'NUMBER|'-'|'-'NUMBER|'='|'='NUMBER|':'}]*
+
+   Some of the characteristics of a parameter may depend on those of a
+   reference parameter.  That reference parameter is the very first
+   parameter (parameter 0) unless [<ref-par>] is specified at the
+   beginning of the <dims-spec>.
+
+   param-spec:
+   i = input parameter.
+
+   o = output parameter.  An error is declared if this is not a named
+   parameter.
+
+   r = return value.  There can be at most one of these in the
+   params-spec (for functions only).
+
+   ? = optional parameter
+
+   type-spec:
+
+   > = type should be at least equal to the indicated type.
+   B W L F D S : type = BYTE, WORD, LONG, FLOAT, DOUBLE, STRING.
+
+   For input parameters, a copy is created with the indicated
+   (minimum) type if the input parameter does not meet the condition,
+   and further processing is based on that copy.  For output
+   parameters, an array is created with the indicate type, unless '>'
+   is specified and the reference parameter has a greater type, in
+   which case that type is used.
+
+   ref-par:
+
+     If absent, then 0 is taken for it (i.e., the first parameter)
+
+     If a number, then the indicated parameter is taken for it
+
+     If '-', then the previous parameter is taken for it
+
+   dim-spec:
+
+   NUMBER = the current dimension has the specified size.  For input
+     parameters, an error is declared if the dimension does not have
+     the specified size.
+
+   +NUMBER = for output or return parameters, a new dimension with the
+     specified size is inserted here
+
+   = = for output or return parameters, the current dimension is taken
+     from the reference parameter
+
+   =NUMBER = for output or return parameters, the current dimension is
+     taken from the reference parameter, and must be equal to the
+     specified number.  An error is declared if the reference
+     parameter's dimension does not have the indicated size
+
+   - = the corresponding dimension from the reference parameter is
+     skipped
+
+   : = for input parameters, accept the current dimension
+
+   * = the remaining dimensions must be equal to those of the
+     reference parameter
+
+   Both a +NUMBER and a -NUMBER may be given in the same dim_spec.
+  */
+/*--------------------------------------------------------------------*/
+struct dims_spec {
+  enum dim_spec_type { DS_NONE = 0, DS_ACCEPT = (1<<0), DS_ADD = (1<<1),
+                       DS_REMOVE = (1<<2), DS_ADD_REMOVE = (DS_ADD | DS_REMOVE),
+                       DS_COPY_REF = (1<<3), DS_EXACT = (1<<4) } type;
+  size_t size_add;
+  size_t size_remove;
+};
+
+struct param_spec {
+  enum param_spec_type { PS_INPUT, PS_OUTPUT, PS_RETURN } logical_type;
+  int is_optional;
+  enum type_spec_limit_type { PS_EXACT, PS_LOWER_LIMIT } data_type_limit;
+  enum Symboltype data_type;
+  size_t num_dims_spec;
+  struct dims_spec *dims_spec;
+  int ref_par;
+  enum remaining_dims_type { PS_ABSENT, PS_EQUAL_TO_REFERENCE, PS_ARBITRARY } remaining_dims;
+  int remaining_dims_equal_to_reference;
+};
+
+struct param_spec_list {
+  size_t num_param_specs;
+  struct param_spec *param_specs;
+  int return_param_index;
+};
+
+void free_param_spec_list(struct param_spec_list *psl)
+{
+  if (psl) {
+    size_t i;
+    for (i = 0; i < psl->num_param_specs; i++) {
+      struct param_spec *p = &psl->param_specs[i];
+      free(p->dims_spec);
+    }
+    free(psl->param_specs);
+    free(psl);
+  }
+}
+
+struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
+{
+  struct obstack ops, ods;
+  struct param_spec_list *psl = NULL;
+  struct param_spec *ps = NULL;
+  struct dims_spec *ds = NULL;
+  size_t i, prev_ods_num_elem;
+  int return_param_index = -1;
+  int param_index;
+  char const *fmt0 = fmt;
+
+  if (!fmt || !*fmt)
+    return NULL;
+
+  obstack_init(&ops);
+  obstack_init(&ods);
+  param_index = 0;
+  prev_ods_num_elem = 0;
+  while (*fmt) {
+    struct param_spec p_spec;
+    memset(&p_spec, '\0', sizeof(p_spec));
+    
+    while (*fmt && *fmt != ';') { /* every parameter specification */
+      /* required parameter kind specification */
+      switch (*fmt) {
+      case 'i':
+        p_spec.logical_type = PS_INPUT;
+        break;
+      case 'o':
+        p_spec.logical_type = PS_OUTPUT;
+        break;
+      case 'r':
+        p_spec.logical_type = PS_RETURN;
+        if (return_param_index >= 0) {
+          /* already had a return parameter */
+          anaerror("Specified multiple return parameters", 0);
+          errno = EINVAL;
+          goto error;
+        } else
+          return_param_index = param_index;
+        break;
+      default:
+        /* illegal parameter kind specification */
+        anaerror("Illegal parameter kind %d specified", 0, *fmt);
+        errno = EINVAL;
+        goto error;
+      } /* end of switch (*fmt) */
+      fmt++;
+    
+      /* optional data type limit specification */
+      switch (*fmt) {
+      case '>':
+        p_spec.data_type_limit = PS_LOWER_LIMIT;
+        fmt++;
+        break;
+      default:
+        p_spec.data_type_limit = PS_EXACT;
+        break;
+      } /* end of switch (*fmt) */
+
+      /* optional data type specification */
+      switch (*fmt) {
+      case 'B':
+        p_spec.data_type = ANA_BYTE;
+        fmt++;
+        break;
+      case 'W':
+        p_spec.data_type = ANA_WORD;
+        fmt++;
+        break;
+      case 'L':
+        p_spec.data_type = ANA_LONG;
+        fmt++;
+        break;
+      case 'F':
+        p_spec.data_type = ANA_FLOAT;
+        fmt++;
+        break;
+      case 'D':
+        p_spec.data_type = ANA_DOUBLE;
+        fmt++;
+        break;
+      case 'S':
+        p_spec.data_type = ANA_TEMP_STRING;
+        fmt++;
+        break;
+      default:
+        p_spec.data_type = ANA_NO_SYMBOLTYPE;
+        break;
+      } /* end of switch (*fmt) */
+      
+      if (*fmt == '?') {        /* optional argument */
+        if (p_spec.logical_type == PS_RETURN) {
+          /* return parameter cannot be optional */
+          anaerror("Return parameter was illegally specified as optional", 0);
+          errno = EINVAL;
+          goto error;
+        } else
+          p_spec.is_optional = 1;
+        fmt++;
+      } else
+        p_spec.is_optional = 0;
+
+      /* optional dims-specs */
+      struct dims_spec d_spec;
+      if (*fmt == '[') {       /* reference parameter specification */
+        fmt++;
+        if (*fmt++ == '-')
+          p_spec.ref_par = -1;  /* point at previous parameter */
+        else if (isdigit(*fmt)) { /* a specific parameter */
+          char *p;
+          p_spec.ref_par = strtol(fmt, &p, 10);
+        } else {
+          anaerror("Expected a digit or minus sign after [ in"
+                   " reference parameter specification but found %c", 0, *fmt);
+          errno = EINVAL;
+          goto error;
+        }
+        if (*fmt == ']')
+          fmt++;
+        else {
+          anaerror("Expected ] instead of %c at end of reference "
+                   "parameter specification", 0, *fmt);
+          errno = EINVAL;
+          goto error;
+        }
+      }
+      while (*fmt && !strchr("*;&", *fmt)) { /* all dims */
+        memset(&d_spec, '\0', sizeof(d_spec));
+        while (*fmt && !strchr(",*;&", *fmt)) { /* every dim */
+          int type = 0;
+          size_t size = 0;
+          switch (*fmt) {
+          case '+':
+            type = DS_ADD;
+            fmt++;
+            break;
+          case '-':
+            type = DS_REMOVE;
+            fmt++;
+            break;
+          case '=':
+            type = DS_COPY_REF;
+            fmt++;
+            break;
+          case ':':
+            type = DS_ACCEPT;
+            break;
+          default:
+            type = DS_EXACT;
+            break;
+          } /* end of switch (*fmt) */
+          if (isdigit(*fmt)) {
+            char *p;
+            size = strtol(fmt, &p, 10);
+            fmt = p;
+          }
+          switch (type) {
+          case DS_ADD:
+            if (d_spec.type == DS_NONE || d_spec.type == DS_REMOVE) {
+              d_spec.size_add = size;
+              d_spec.type |= type;
+            } else {
+              anaerror("Illegal combination of multiple types for dimension; parameter specification #%d: %s", 0, param_index + 1, fmt0);
+              errno = EINVAL;
+              goto error;
+            }
+            break;
+          case DS_REMOVE:
+            if (d_spec.type == DS_NONE || d_spec.type == DS_ADD) {
+              d_spec.size_remove = size;
+              d_spec.type |= type;
+            } else {
+              anaerror("Illegal combination of multiple types for dimension; parameter specification #%d: %s", 0, param_index + 1, fmt0);
+              errno = EINVAL;
+              goto error;
+            }
+            break;
+          default:
+            if (d_spec.type == DS_NONE) {
+              d_spec.size_add = size;
+              d_spec.type = type;
+            } else {
+              anaerror("Illegal combination of multiple types for dimension; parameter specification #%d: %s", 0, param_index + 1, fmt0);
+              errno = EINVAL;
+              goto error;
+            }
+            break;
+          } /* end switch type */
+        } /* end of while *fmt && !strchr(",*;&") */
+        obstack_grow(&ods, &d_spec, sizeof(d_spec));
+        if (*fmt == ',')
+          fmt++;
+      } /* end of while *fmt && !strchr("*;&", *fmt) */
+      switch (*fmt) {
+      case '*':
+        p_spec.remaining_dims = PS_ARBITRARY;
+        fmt++;
+        break;
+      case '&':
+        p_spec.remaining_dims = PS_EQUAL_TO_REFERENCE;
+        fmt++;
+        break;
+        /* default is PS_ABSENT */
+      }
+      if (*fmt && *fmt != ';') {
+        anaerror("Expected ; instead of %c at end of parameter "
+                 "specification", 0, *fmt);
+        errno = EINVAL;
+        goto error;
+      }
+      /* determine the number of dims_specs added to the list for this
+         parameter */
+      size_t n = obstack_object_size(&ods)/sizeof(struct dims_spec) - prev_ods_num_elem;
+      p_spec.num_dims_spec = n;
+      p_spec.dims_spec = NULL;                     /* will be filled in later */
+      obstack_grow(&ops, &p_spec, sizeof(p_spec)); /* the param_spec */
+      prev_ods_num_elem += n;
+    } /* end of while (*fmt && *fmt != ';') */
+    if (*fmt == ';')
+      fmt++;
+    else if (*fmt) {
+      /* unexpected character */
+      anaerror("Expected ; instead of %c at end of parameter specification",
+               0, *fmt);
+      errno = EINVAL;
+      goto error;
+    }
+    param_index++;
+  }   /* end of while (*fmt) */
+  /* now we copy the information into the final allocated memory */
+  psl = malloc(sizeof(struct param_spec_list));
+  if (!psl) {                   /* malloc sets errno */
+    cerror(ALLOC_ERR, 0);
+    goto error;
+  }
+  // size_t size = param_index*sizeof(struct param_spec);
+  psl->param_specs = calloc(param_index, sizeof(struct param_spec));
+  if (!psl->param_specs) {        /* malloc sets errno */
+    cerror(ALLOC_ERR, 0);
+    goto error;
+  }
+  /* the return parameter, if any, gets moved to the end */
+  psl->num_param_specs = param_index;
+  psl->return_param_index = -1; /* default, may be updated later */
+  ps = obstack_finish(&ops);
+  ds = obstack_finish(&ods);
+
+  struct param_spec *pstgt;
+  size_t ds_ix, j;
+
+  pstgt = psl->param_specs;
+  ds_ix = 0;
+  for (i = j = 0; i < psl->num_param_specs; i++) {
+    size_t j0;
+    if (i == return_param_index) {
+      j0 = j;
+      j = psl->return_param_index = psl->num_param_specs - 1;
+    }
+    memcpy(pstgt + j, ps + i, sizeof(struct param_spec));
+    if (pstgt[j].num_dims_spec) {
+      size_t size = pstgt[j].num_dims_spec*sizeof(struct dims_spec);
+      pstgt[j].dims_spec = malloc(size);
+      if (!pstgt[j].dims_spec) {
+        cerror(ALLOC_ERR, 0);
+        goto error;
+      }
+      memcpy(pstgt[j].dims_spec, ds + ds_ix, size);
+      ds_ix += pstgt[j].num_dims_spec;
+    } /* else pstgt[j].dims_spec == NULL */
+    if (i == return_param_index)
+      j = j0;
+    else
+      j++;
+  }
+  /* check that the reference parameter does not point outside the list */
+  int n = psl->num_param_specs - (psl->return_param_index >= 0);
+  if (n) {
+    for (i = 0; i < psl->num_param_specs; i++) {
+      if (psl->param_specs[i].ref_par >= n) {
+        errno = EINVAL;
+        anaerror("Reference parameter %d for parameter %d points outside of the list (size %d)", 0, psl->param_specs[i].ref_par + 1, i + 1, n);
+        goto error;
+      }
+    }
+  }
+  obstack_free(&ops, NULL);
+  obstack_free(&ods, NULL);
+  return psl;
+ error:
+  obstack_free(&ops, NULL);
+  obstack_free(&ods, NULL);
+  free_param_spec_list(psl);
+  return NULL;
+}
+
+int standard_args(int narg, int ps[], char const *fmt, pointer **ptrs,
+                  loopInfo **infos)
+{
+  int returnSym, *ref_dims, tgt_dims[MAX_DIMS], prev_ref_param, *final;
+  struct param_spec *pspec;
+  struct param_spec_list *psl;
+  struct dims_spec *dims_spec;
+  struct obstack o;
+  int param_ix, num_ref_dims;
+  loopInfo li;
+  pointer p;
+  enum Symboltype type;
+
+  returnSym = ANA_ONE;
+  psl = parse_standard_arg_fmt(fmt);
+  if (!psl) {
+    if (ptrs)
+      *ptrs = NULL;
+    if (infos)
+      *infos = NULL;
+    return anaerror("Illegal standard arguments specification %s", 0, fmt);
+  }
+  int num_in_out_params = psl->num_param_specs
+    - (psl->return_param_index >= 0);
+  /* determine mininum and maximum required number of arguments */
+  int nmin;
+  for (nmin = num_in_out_params; nmin > 0; nmin--)
+    if (!psl->param_specs[nmin - 1].is_optional)
+      break;
+  if (narg < nmin || narg > num_in_out_params) {
+    if (ptrs)
+      *ptrs = NULL;
+    if (infos)
+      *infos = NULL;
+    return anaerror("Standard arguments specification asks for between %d and %d input/output arguments but %d are specified (%s)", 0, nmin, num_in_out_params, narg, fmt);
+  }
+  if (ptrs)
+    *ptrs = malloc(psl->num_param_specs*sizeof(pointer));
+  if (infos)
+    *infos = malloc(psl->num_param_specs*sizeof(loopInfo));
+  final = calloc(psl->num_param_specs, sizeof(int));
+  
+  obstack_init(&o);
+  /* now we treat the parameters. */
+  prev_ref_param = -1; /* < 0 indicates no reference parameter set yet */
+  for (param_ix = 0; param_ix < psl->num_param_specs; param_ix++) {
+    int pspec_dims_ix; /* parameter dimension specification index */
+    int tgt_dims_ix;   /* target dimension index */
+    int ref_dims_ix;   /* reference dimension index */
+    int src_dims_ix;   /* input dimension index */
+    int *src_dims;        /* dimensions of input parameter */
+    int num_src_dims;      /* number of dimensions of input parameter */
+    int iq, d;
+
+    pspec = &psl->param_specs[param_ix];
+    dims_spec = pspec->dims_spec;
+    if (param_ix == num_in_out_params || param_ix >= narg || !ps[param_ix] ||
+        numerical(ps[param_ix], &src_dims, &num_src_dims, NULL, NULL) < 0) {
+      src_dims = NULL;
+      num_src_dims = 0;
+    }
+    int ref_param = pspec->ref_par;
+    if (ref_param < 0)
+      ref_param = (param_ix? param_ix - 1: 0);
+    if (param_ix > 0            /* first parameter has no reference */
+        && (!ref_dims           /* no reference yet */
+            || ref_param != prev_ref_param)) { /* or different from before */
+      /* get reference parameter's information */
+      /* if the reference parameter is an output parameter, then
+         we must get the information from its *final* value */
+      switch (psl->param_specs[ref_param].logical_type) {
+      case PS_INPUT:
+        if (numerical(ps[ref_param], &ref_dims, &num_ref_dims, NULL, NULL) < 0) {
+          returnSym = anaerror("Reference parameter %d must be an array",
+                               ps[param_ix], ref_param + 1);
+          goto error;
+        }
+        break;
+      case PS_OUTPUT: case PS_RETURN:
+        if (!final[ref_param]) {
+          returnSym = anaerror("Illegal forward output/return reference "
+                               "parameter %d for parameter %d", 0,
+                               ref_param + 1, param_ix + 1);
+          goto error;
+        }
+        if (numerical(final[ref_param], &ref_dims, &num_ref_dims, NULL, NULL)
+            < 0) {
+          returnSym = anaerror("Reference parameter %d must be an array",
+                               final[param_ix], ref_param + 1);
+          goto error;
+        }
+        break;
+      }
+      prev_ref_param = ref_param;
+    } else if (!param_ix) {
+      ref_dims = NULL;
+      num_ref_dims = 0;
+    }
+    if (!pspec->is_optional || param_ix == num_in_out_params
+        || (param_ix < narg && ps[param_ix])) {
+      for (pspec_dims_ix = 0, tgt_dims_ix = 0, src_dims_ix = 0, ref_dims_ix = 0;
+           pspec_dims_ix < pspec->num_dims_spec; pspec_dims_ix++) {
+        switch (dims_spec[pspec_dims_ix].type) {
+        case DS_EXACT: /* an input parameter must have the exact
+                          specified dimension */
+          if (pspec->logical_type == PS_INPUT
+              && src_dims[src_dims_ix]
+              != dims_spec[pspec_dims_ix].size_add) {
+            returnSym = anaerror("Expected size %d for dimension %d "
+                                 "but found %d", ps[param_ix],
+                                 dims_spec[pspec_dims_ix].size_add,
+                                 src_dims_ix, src_dims[src_dims_ix]);
+            goto error;
+          }
+          /* the target gets the exact specified dimension */
+          tgt_dims[tgt_dims_ix++] = dims_spec[pspec_dims_ix].size_add;
+          src_dims_ix++;
+          ref_dims_ix++;
+          break;
+        case DS_COPY_REF:       /* copy from reference */
+          if (src_dims_ix >= num_ref_dims) {
+            returnSym = anaerror("Requested copying dimension %d from the reference parameter which has only %d dimensions", ps[param_ix], src_dims_ix, num_ref_dims);
+            goto error;
+          }
+          tgt_dims[tgt_dims_ix++] = ref_dims[ref_dims_ix++];
+          src_dims_ix++;
+          break;
+        case DS_ADD:
+          d = dims_spec[pspec_dims_ix].size_add;
+          switch (pspec->logical_type) {
+          case PS_INPUT:
+            if (src_dims[src_dims_ix] != d) {
+              returnSym = anaerror("Expected size %d for dimension %d "
+                                   "but found %d", ps[param_ix],
+                                   d, src_dims_ix, src_dims[src_dims_ix]);
+              goto error;
+            }
+            src_dims_ix++;
+            tgt_dims[tgt_dims_ix++] = d;
+            break;
+          case PS_OUTPUT: case PS_RETURN:
+            tgt_dims[tgt_dims_ix++] = d;
+            break;
+          }
+          break;
+        case DS_REMOVE: case DS_ADD_REMOVE:
+          switch (pspec->logical_type) {
+          case PS_INPUT:
+            {
+              int d = dims_spec[pspec_dims_ix].size_remove;
+              if (d && ref_dims[ref_dims_ix] != d) {
+                returnSym = anaerror("Expected size %d for dimension %d "
+                                     "but found %d", ps[param_ix],
+                                     d, ref_dims_ix, ref_dims[ref_dims_ix]);
+                goto error;
+              }
+            }
+            break;
+          case PS_OUTPUT: case PS_RETURN:
+            {
+              int d = dims_spec[pspec_dims_ix].size_remove;
+              if (d && ref_dims[ref_dims_ix] != d) {
+                returnSym = anaerror("Expected size %d for dimension %d "
+                                     "but found %d", ps[param_ix],
+                                     d, ref_dims_ix, ref_dims[ref_dims_ix]);
+                goto error;
+              }
+            }
+            if (dims_spec[pspec_dims_ix].type == DS_ADD_REMOVE)
+              tgt_dims[tgt_dims_ix++] = dims_spec[pspec_dims_ix].size_add;
+            break;
+          }
+          ref_dims_ix++;
+          break;
+        case DS_ACCEPT:         /* copy from input */
+          tgt_dims[tgt_dims_ix++] = src_dims[src_dims_ix++];
+          ref_dims_ix++;
+          break;
+        default:
+          returnSym = anaerror("Dimension specification type %d "
+                               "not implemented yet", ps[param_ix],
+                               dims_spec[pspec_dims_ix].type);
+          goto error;
+          break;
+        }
+      }
+      switch (pspec->logical_type) {
+      case PS_INPUT:
+        switch (pspec->remaining_dims) {
+        case PS_EQUAL_TO_REFERENCE:
+          if (ref_dims && ref_dims_ix < num_ref_dims) {
+            if (num_src_dims - src_dims_ix != num_ref_dims - ref_dims_ix) {
+              returnSym = anaerror("Expected %d dimensions but found %d "
+                                   "in reference parameter %d", ps[param_ix],
+                                   num_ref_dims - ref_dims_ix + src_dims_ix,
+                                   num_src_dims, ref_param + 1);
+              goto error;
+            }
+            int i, j;
+            for (i = ref_dims_ix, j = src_dims_ix; i < num_ref_dims; i++, j++)
+              if (ref_dims[i] != src_dims[j]) {
+                returnSym = anaerror("Expected dimension %d equal to %d "
+                                     "but found %d", ps[param_ix], i + 1,
+                                     ref_dims[i], src_dims[j]);
+                goto error;
+              }
+          } else {
+            returnSym = anaerror("Dimensions of parameter %d required to be "
+                                 "equal to those of the reference, but no "
+                                 "reference is available",
+                                 ps[param_ix], param_ix + 1);
+            goto error;
+          }
+          break;
+        case PS_ARBITRARY:
+          break;
+        case PS_ABSENT:
+          if (src_dims_ix < num_src_dims) {
+            returnSym = anaerror("Has %d dimensions but %d are expected",
+                                 ps[param_ix], src_dims_ix, num_src_dims);
+            goto error;
+          }
+          break;
+        }
+        iq = ps[param_ix];
+        type = symbol_type(iq);
+        if ((pspec->data_type_limit == PS_LOWER_LIMIT
+             && type < pspec->data_type)
+            || (pspec->data_type_limit == PS_EXACT
+                && type != pspec->data_type))
+          type = pspec->data_type;
+        iq = ana_convert(1, &iq, type, 1);
+        break;
+      case PS_OUTPUT: case PS_RETURN:
+        switch (pspec->remaining_dims) {
+        case PS_EQUAL_TO_REFERENCE:
+          if (ref_dims_ix < num_ref_dims) {
+            /* append remaining dimensions from reference parameter*/
+            size_t e = num_ref_dims - ref_dims_ix;
+            memcpy(tgt_dims + tgt_dims_ix, ref_dims + ref_dims_ix, e*sizeof(int));
+            tgt_dims_ix += e;
+            src_dims_ix += e;
+            ref_dims_ix += e;
+          }
+          break;
+        case PS_ARBITRARY:
+          returnSym = anaerror("'Arbitrary' remaining dimensions makes no "
+                               "sense for an output or return parameter "
+                               " (number %d)", 0, param_ix + 1);
+          goto error;
+        case PS_ABSENT:
+          break;
+        }
+        if (tgt_dims_ix == 0) {
+          returnSym = anaerror("Return symbol has no elements", 0);
+          goto error;
+        }
+        /* get rid of trailing dimensions equal to 1 */
+        while (tgt_dims_ix > 0 && tgt_dims[tgt_dims_ix - 1] == 1)
+          tgt_dims_ix--;
+        if (param_ix == num_in_out_params) {      /* a return parameter */
+          if (ref_param >= 0
+              && pspec->data_type_limit == PS_LOWER_LIMIT) {
+            iq = ps[ref_param];
+            type = symbol_type(iq);
+            if (type < pspec->data_type)
+              type = pspec->data_type;
+          } else
+            type = pspec->data_type;
+          iq = returnSym = array_scratch(type, tgt_dims_ix, tgt_dims);
+        } else {
+          iq = ps[param_ix];
+          type = symbol_type(iq);
+          if (symbol_class(iq) == ANA_UNUSED
+              || ((pspec->data_type_limit == PS_LOWER_LIMIT
+                   && type < pspec->data_type)
+                  || (pspec->data_type_limit == PS_EXACT
+                      && type != pspec->data_type)))
+            type = pspec->data_type;
+          redef_array(iq, type, tgt_dims_ix, tgt_dims);
+        }
+        break;
+      }
+      final[param_ix] = iq;
+      standardLoop(iq, 0, SL_ALLAXES, symbol_type(iq), &li, &p, NULL, NULL, NULL);
+      if (infos)
+        (*infos)[param_ix] = li;
+      if (ptrs)
+        (*ptrs)[param_ix] = p;
+    } else {
+      if (infos)
+        memset(&(*infos)[param_ix], 0, sizeof(loopInfo));
+      if (ptrs)
+        (*ptrs)[param_ix].v = NULL;
+    }
+  }
+
+  free_param_spec_list(psl);
+  obstack_free(&o, NULL);
+  return returnSym;
+
+  error:
+  obstack_free(&o, NULL);
+  if (ptrs) {
+    free(*ptrs);
+    *ptrs = NULL;
+  }
+  if (infos) {
+    free(*infos);
+    *infos = NULL;
+  }
+  return returnSym;
 }

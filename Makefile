@@ -8,22 +8,30 @@ install.o memck.o plots.o post.o rawio.o sort.o strous.o strous2.o	\
 strous3.o subsc.o symbols.o tense.o orientation.o rcsversion.o		\
 output.o axis.o coord.o cluster.o ephem2.o paerror.o	\
 idl.o trace_decoder_ana.o gifread_ana.o gifwrite_ana.o astron.o		\
-terminal.o regex.o vsop.o precession.o \
-jpeg.o tape.o dummyterm.o projection.o \
+terminal.o regex.o vsop.o anasofa.o intmath.o calendar.o \
+jpeg.o tape.o dummyterm.o projection.o bindings.o \
 xport.o zoom.o menu.o color.o random.o Bytestack.o poisson.o \
-printf_extensions.o calendar.o
+precession.o
 
 CC=gcc -Wall
-LIBS=-lm -lc -ljpeg -lX11 -lgsl
+LIBS=-lm -lc -ljpeg -lX11 -lgsl libsofa_c.a
 EXEC=ana
 MORELIBS=
 LDFLAGS= $(MORELIBS)
 MOREINCLDIRS=.
 
-ana: $(OBS)
-	./updatelevel
+BRANCH = $(subst refs/heads/,,$(shell git symbolic-ref HEAD 2>/dev/null))
+ifeq ($(BRANCH),)
+BRANCH = "(unnamed branch)"
+endif
+TAG = $(shell git describe --exact-match HEAD 2>/dev/null)
+ifeq ($(TAG),)
+TAG = $(shell git rev-parse HEAD)
+endif
+
+ana: sofam.h $(OBS) libsofa_c.a sofa.h
 	rm -f site.o
-	$(CC) $(CPPFLAGS) $(CFLAGS) -DHAVE_CONFIG_H -c site.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -DHAVE_CONFIG_H -DBRANCH=\"$(BRANCH)\" -DTAG=\"$(TAG)\" -c site.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $(OBS) site.o $(LIBS) -o $(EXEC)
 anaparser.c.tab.c anaparser.c.tab.h: anaparser.c
 	bison --defines=anaparser.c.tab.h --output-file=anaparser.c.tab.c anaparser.c
@@ -34,6 +42,9 @@ calculator.o: anaparser.h calculator.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) -DHAVE_CONFIG_H -c -o calculator.o calculator.c.tab.c
 .c.o:
 	$(CC) $(CPPFLAGS) $(CFLAGS) -DHAVE_CONFIG_H -c $<
+
+libsofa_c.a sofa.h sofam.h:
+	$(MAKE) -C sofa/20101201/c/src && $(MAKE) -C sofa/20101201/c/src test
 
 site:
 	rm -f site.o
@@ -51,7 +62,7 @@ install:
 uninstall:
 	./uninstall-sh
 clean:
-	rm -f *.o
+	rm -f *.o $(EXEC)
 distclean:
 	rm -f *.o $(EXEC) config.cache config.log Makefile
 

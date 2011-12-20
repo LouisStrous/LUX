@@ -977,7 +977,6 @@ int trace_scan(x, limit)
 	   /* remember that gaprollover is now the accumulated rollover, so only change
 	   the value prior to the gap here, leave later positions alone */
 	   gaprollover[i] += j1;
-	   /* gaprollover[i+1] += j2; */
 	   }
 	  } else {
 	   /* the mode = 0 case, here we want s1 > s2 or we need a change */
@@ -993,7 +992,6 @@ int trace_scan(x, limit)
 	   }
 	    /* printf("re-align, j1 = %d\n", j1); */
 	   gaprollover[i] += j1;
-	   /* gaprollover[i+1] += j2; */
 	   }
 	  }
 	 }
@@ -1076,6 +1074,7 @@ int preload_q()
 	  free(fname);    return -1; }
   if ( fread(qt_all[iq], 2, 64, fin) != 64) { perror("QT file read error");
 	  free(fname);    return -1; }
+  int swapb(char *, int);
  if (!bigendian) swapb( (char *) qt_all[iq], 128);
  fclose(fin);
  }

@@ -17,6 +17,7 @@ static char rcsid[] __attribute__ ((unused)) =
 
 char    PoissonChiSq;           /* flag: Poisson chi-square fitting? */
 unsigned int random_bits(void);
+void indexxr_d(int, double *, int *);
 
 /*-----------------------------------------------------------------------*/
 double gaussians(double *par, int nPar, double *x, double *y, double *w, int nData)
@@ -859,7 +860,7 @@ int ana_geneticfit(int narg, int ps[])
   void indexxr_d(int, double *, int *);
  
   iq = ps[3];                   /* fit */
-  if (!symbolIsString(iq))
+  if (!symbolIsStringScalar(iq))
     return cerror(NEED_STR, ps[3]);
   fitSym = stringpointer(string_value(iq), SP_USER_FUNC);
   if (fitSym < 0)
@@ -1087,7 +1088,7 @@ int ana_geneticfit(int narg, int ps[])
      per parameter to fit, beginning with the most significant byte.
      TODO: implement additional stop criteria other than just
      "number of generations"; at least something like "stop if
-     quality unchanged for a fixed number of iteratiosn" */
+     quality unchanged for a fixed number of iterations" */
   
   generation = nGeneration;
   /* iterate over the desired number of generations */

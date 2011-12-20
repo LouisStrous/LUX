@@ -9,10 +9,9 @@
 #include <string.h>
 #include <float.h>
 #include <math.h>
+#include <errno.h>              /* for errno */
 #include "Bytestack.h"
 #include "action.h"
-static char rcsid[] __attribute__ ((unused)) =
- "$Id: strous3.c,v 4.0 2001/02/07 20:37:04 strous Exp $";
 
 int	to_scratch_array(int, int, int, int []);
 /*---------------------------------------------------------------------*/
@@ -379,6 +378,8 @@ int ana_bisect(int narg, int ps[])
 	src.d += step*srcinfo.rdims[0];
       } while (advanceLoop(&srcinfo) < srcinfo.rndim);
       break;
+  default:
+    break;
   }
   cleanup_cubic_spline_tables(&cspl);
   return result;
@@ -562,6 +563,8 @@ int ana_cspline_find(int narg, int ps[])
 	  }
 	} while ((i = advanceLoop(&srcinfo)) == 0);
       } while (i < srcinfo.rndim);
+    break;
+  default:
     break;
   }
   cleanup_cubic_spline_tables(&cspl);
@@ -1714,6 +1717,7 @@ int ana_trajectory(int narg, int ps[])
     to_scratch_array(ps[narg - 1], type, i, dims);
     oy.v = array_data(ps[narg - 1]);
   } else {			/* use <gx> and <gy> for <ox> and <oy> */
+    int ana_convert(int, int [], int, int);
     ana_convert(2, ps, type, 0);
     ox.v = array_data(ps[0]);
     oy.v = array_data(ps[1]);
@@ -2316,3 +2320,89 @@ double hypota(int n, double *x)
     arg = hypot(arg, *x++);
   return arg;
 }
+/*--------------------------------------------------------------------*/
+int compare_doubles(const void *a, const void *b)
+{
+  const double *da = (const double *) a;
+  const double *db = (const double *) b;
+  return (*da > *db) - (*da < *db);
+}
+int runord_d(double *data, int n, int width, int ord, double *result)
+{
+  int i;
+  
+  if (n < 1 || width < 1) {
+    errno = EDOM;
+    return -1;
+  }
+  double *temp = malloc(width*sizeof(double));
+  if (!temp) {
+    errno = ENOMEM;
+    return -1;
+  }
+  if (width > n)
+    width = n;
+  if (ord < 0)
+    ord = 0;
+  if (ord > width - 1)
+    ord = width - 1;
+  int o = width/2;
+  for (i = 0; i < n - width; i++) {
+    memcpy(temp, data + i, width*sizeof(double));
+    qsort(temp, width, sizeof(double), compare_doubles);
+    result[o + i] = temp[ord];
+  }
+  for ( ; i < n - o; i++)
+    result[i] = result[i - 1];
+  for (i = 0; i < o; i++)
+    result[i] = result[o];
+  free(temp);
+  return 0;
+}
+BIND(runord_d, ibLLLobrl, f, RUNORD, 3, 3, NULL);
+/*--------------------------------------------------------------------*/
+int runmax_d(double *data, int n, int width, double *result)
+{
+  return runord_d(data, n, width, width - 1, result);
+}
+BIND(runmax_d, ibLLobrl, f, RUNMAX, 2, 2, NULL);
+/*--------------------------------------------------------------------*/
+int runmin_d(double *data, int n, int width, double *result)
+{
+  return runord_d(data, n, width, 0, result);
+}
+BIND(runmin_d, ibLLobrl, f, RUNMIN, 2, 2, NULL);
+/*--------------------------------------------------------------------*/
+/*
+  Returns <x> such that <x> = <cur> (mod <period) and
+  <average> - <period>/2 <= <x> - <prev> < <average> + <period>/2
+ */
+double unmod(double cur, double prev, double period, double average)
+{
+  if (!period)
+    return cur;
+  return cur + period*ceil((prev - cur + average)/period - 0.5);
+}
+/*--------------------------------------------------------------------*/
+int unmod_slice_d(double *srcptr, int srccount, int srcstride,
+                  double period, double average,
+                  double *tgtptr, int tgtcount, int tgtstride)
+{
+  int i;
+
+  if (!period || !srcptr || srccount < 1 || !tgtptr || tgtcount < 1
+      || tgtcount != srccount) {
+    errno = EDOM;
+    return 1;
+  }
+  *tgtptr = *srcptr;
+  tgtptr += tgtstride;
+  srcptr += srcstride;
+  for (i = 1; i < srccount; i++) {
+    *tgtptr = unmod(*srcptr, tgtptr[-tgtstride], period, average);
+    tgtptr += tgtstride;
+    srcptr += srcstride;
+  }
+  return 0;
+}
+BIND(unmod_slice_d, ivddovrl, f, UNMOD, 2, 4, ":AXIS:PERIOD:AVERAGE");

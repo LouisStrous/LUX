@@ -1910,6 +1910,7 @@ int ana_subsc_func(int narg, int ps[])
 	break;
     }
   }
+  int ana_endian(int, int *);
   if (class == ANA_FILEMAP && file_map_swap(nsym))
     ana_endian(1, &iq);		/* byte swap */
   return iq;

@@ -3590,50 +3590,6 @@ void heliocentricXYZr(double JDE, int object, double equinox, double *pos,
   }
 }
 /*--------------------------------------------------------------------------*/
-void propagateError(double *der, double *var, double *var2)
-/* takes the covariances in <var> and calculates the transformed covariances */
-/* according to the partial derivatives in <der>, and stores the results */
-/* in <var2>. <var> = [var[x_0],var[x_1],var[x_2],cov[x_0,x_1],cov[x_0,x_2], */
-/* cov[x_1,x_2]].  <var2> = similar but for y.  <der(i,j)> = dy_i/dx_j. */
-{
-  var2[0] = (der[0]*der[0]*var[0] + /* cov_y[00] = d00^2 cov_x[00] + */
-	     der[3]*der[3]*var[1] + /* d01^2 cov_x[11] + */
-	     der[6]*der[6]*var[2] + /* d02^2 cov_x[22] + */
-	     2*(der[0]*der[3]*var[3] + /* 2*(d00 d01 cov_x[01] + */
-		der[0]*der[6]*var[4] + /* d00 d02 cov_x[02] + */
-		der[3]*der[6]*var[5]));	/* d01 d02 cov_x[12]) */
-  var2[1] = (der[1]*der[1]*var[0] + /* cov_y[11] = d10^2 cov_x[00] + */
-	     der[4]*der[4]*var[1] + /* d11^2 cov_x[11] + */
-	     der[7]*der[7]*var[2] + /* d12^2 cov_x[22] + */
-	     2*(der[1]*der[4]*var[3] + /* 2*(d10 d11 cov_x[01] + */
-		der[1]*der[7]*var[4] + /* d10 d12 cov_x[02] + */
-		der[4]*der[7]*var[5]));	/* d11 d12 cov_x[12]) */
-  var2[2] = (der[2]*der[2]*var[0] + /* cov_y[22] = d20^2 cov_x[00] + */
-	     der[5]*der[5]*var[1] + /* d21^2 cov_x[11] + */
-	     der[8]*der[8]*var[2] + /* d22^2 cov_x[22] + */
-	     2*(der[2]*der[5]*var[3] + /* 2*(d20 d21 cov_x[01] + */
-		der[2]*der[8]*var[4] + /* d20 d22 cov_x[02] + */
-		der[5]*der[8]*var[5]));	/* d21 d22 cov_x[12]) */
-  var2[3] = (der[0]*der[1]*var[0] + /* cov_y[01] = d00 d10 cov_x[00] + */
-	     der[3]*der[4]*var[1] + /* d01 d11 cov_x[11] + */
-	     der[6]*der[7]*var[2] + /* d02 d12 cov_x[22] + */
-	     2*(der[0]*der[4]*var[3] + /* 2*(d00 d11 cov_x[01] + */
-		der[0]*der[7]*var[4] + /* d00 d12 cov_x[02] + */
-		der[3]*der[7]*var[5]));	/* d01 d12 cov_x[12]) */
-  var2[4] = (der[0]*der[2]*var[0] + /* cov_y[02] = d00 d20 cov_x[00] + */
-	     der[3]*der[5]*var[1] + /* d01 d21 cov_x[11] + */
-	     der[6]*der[8]*var[2] + /* d02 d22 cov_x[22] + */
-	     2*(der[0]*der[5]*var[3] + /* 2*(d00 d21 cov_x[01] + */
-		der[0]*der[8]*var[4] + /* d00 d22 cov_x[02] + */
-		der[3]*der[8]*var[5]));	/* d01 d22 cov_x[12]) */
-  var2[5] = (der[1]*der[2]*var[0] + /* cov_y[12] = d10 d20 cov_x[00] + */
-	     der[4]*der[5]*var[1] + /* d11 d21 cov_x[11] + */
-	     der[7]*der[8]*var[2] + /* d12 d22 cov_x[22] + */
-	     2*(der[1]*der[5]*var[3] + /* 2*(d10 d21 cov_x[01] + */
-		der[1]*der[8]*var[4] + /* d10 d22 cov_x[02] + */
-		der[4]*der[8]*var[5]));	/* d11 d22 cov_x[12]) */
-}
-/*--------------------------------------------------------------------------*/
 void LBRtoXYZ(double *pos, double *pos2)
      /* calculates cartesian coordinates XYZ from polar coordinates LBR.
       pos must be unequal to pos2. */
@@ -4177,7 +4133,7 @@ int ana_astropos(int narg, int ps[])
     if (internalMode & S_CONJSPREAD)
       mean[0] = mean[1] = mean[2] = 0;
 
-    double pos_sun_obs[9], r_sun_obs;
+    double pos_sun_obs[3], r_sun_obs;
     /* calculate the position of the observer */
     heliocentricXYZr(jd, object0, equinox, pos_sun_obs, &r_sun_obs, tolerance, 
                      vocal);
@@ -4409,7 +4365,7 @@ int ana_astropos(int narg, int ps[])
 	  /* back to cartesian coordinates */
           double pos[3];
           memcpy(pos, final, sizeof(pos));
-	  LBRtoXYZ(final, pos);
+	  LBRtoXYZ(pos, final);
           if (vocal) {
             puts("ASTRON: back to cartesian coordinates:");
             printXYZtoLBR(final);

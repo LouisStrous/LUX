@@ -2085,9 +2085,19 @@ int standard_args(int narg, int ps[], char const *fmt, pointer **ptrs,
         case PS_ARBITRARY:
           break;
         case PS_ABSENT:
+          if (!pspec_dims_ix) {     /* had no dimensions */
+            /* assume dimension equal to 1 */
+            if (src_dims[src_dims_ix] != 1) {
+              returnSym = anaerror("Expected dimension %d equal to 1 "
+                                   "but found %d", ps[param_ix],
+                                   src_dims_ix + 1, src_dims[src_dims_ix]);
+              goto error;
+            } else
+              src_dims_ix++;
+          }
           if (src_dims_ix < num_src_dims) {
-            returnSym = anaerror("Has %d dimensions but %d are expected",
-                                 ps[param_ix], src_dims_ix, num_src_dims);
+            returnSym = anaerror("Specification (parameter %d) says %d dimensions but source has %d dimensions",
+                                 ps[param_ix], param_ix, src_dims_ix, num_src_dims);
             goto error;
           }
           break;

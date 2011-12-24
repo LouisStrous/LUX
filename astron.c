@@ -2902,7 +2902,7 @@ void VSOPtoFK5(double T, double *pos)
 {
   double	ll, cll, sll;
   
-  ll = pos[0] - 0.024382*(1 + 0.000222);
+  ll = pos[0] - 0.024382*T*(1 + 0.000222*T);
   cll = cos(ll);
   sll = sin(ll);
   pos[0] += -4.3793e-7 + 1.8985e-7*(cll + sll)*tan(pos[1]);
@@ -4319,6 +4319,8 @@ int ana_astropos(int narg, int ps[])
         }
       } else {
 	XYZtoLBR(pos_obs_tgt, final);	/* to polar coordinates */
+        if (internalMode & S_FK5)
+          VSOPtoFK5(TC2000(jd), final);     /* to FK5 */
         if (vocal) {
           puts("ASTRON: ecliptic planetocentric coordinates:");
           printLBRtoXYZ(final);

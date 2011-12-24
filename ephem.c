@@ -519,7 +519,7 @@ int sephem(int ny, float day)
 							 /* true anomaly*/
  /*printf("anm, cc = %f %f\n", anm, cc);*/
  san = anm + cc;	el = sl;
-					 /* no correction for abberation */
+					 /* no correction for aberration */
 					 /* distance to sun*/
  /*printf("san, eks = %f %f\n",san,eks);*/
  av = (1-eks*eks)/(1+eks*cos(san));

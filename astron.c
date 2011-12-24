@@ -221,6 +221,9 @@ int idiv(int x, int y)
   return (int) floor(((float) x)/y);
 }
 
+void printXYZtoLBR(double *xyz);
+void printLBRtoXYZ(double *lbr);
+
 #define TAI_to_TT(jd)	(*(jd) += 32.184/86400)
 #define TT_to_TAI(jd)	(*(jd) -= 32.184/86400)
 
@@ -3418,32 +3421,6 @@ void extraElementsHeliocentric(double JDE, double *equinox, double *f,
   f[2] = *r*zfac*sin(zangle + m);
 }
 /*--------------------------------------------------------------------------*/
-void printXYZtoLBR(double *pos) {
-  printf("X = %.10g, Y = %.10g, Z = %.10g AU\n",
-         pos[0], pos[1], pos[2]);
-  double lbr[3];
-  XYZtoLBR(pos, lbr);
-  printf("lon = %.10g, lat = %.10g rad, r = %.10g AU\n",
-         lbr[0], lbr[1], lbr[2]);
-  printf("lon = %.10g, lat = %.10g deg\n",
-         lbr[0]*RAD, lbr[1]*RAD);
-  printf("lon = %-#13.2T hms, lat = %-12.2T dms\n",
-          lbr[0]*RAD, lbr[1]*RAD);
-}
-/*--------------------------------------------------------------------------*/
-void printLBRtoXYZ(double *pos) {
-  printf("lon = %.10g, lat = %.10g rad, r = %.10g AU\n",
-         pos[0], pos[1], pos[2]);
-  printf("lon = %.10g, lat = %.10g deg\n",
-         pos[0]*RAD, pos[1]*RAD);
-  printf("lon = %-#13.2T hms, lat = %-12.2T dms\n",
-         pos[0]*RAD, pos[1]*RAD);
-  double xyz[3];
-  LBRtoXYZ(pos, xyz);
-  printf("X = %.10g, Y = %.10g, Z = %.10g AU\n",
-         pos[0], pos[1], pos[2]);
-}
-/*--------------------------------------------------------------------------*/
 void heliocentricXYZr(double JDE, int object, double equinox, double *pos,
 		      double *r, double tolerance, int vocal)
      /* returns in <f> the cartesian heliocentric eclipic coordinates of
@@ -3534,8 +3511,10 @@ void heliocentricXYZr(double JDE, int object, double equinox, double *pos,
         printLBRtoXYZ(pos);
       }
       eclipticPrecession(pos, JDE, equinox);
-      printf("ASTRON: lunar ecliptic geocentric coordinates for equinox:\n");
-      printLBRtoXYZ(pos);
+      if (vocal) {
+        printf("ASTRON: lunar ecliptic geocentric coordinates for equinox:\n");
+        printLBRtoXYZ(pos);
+      }
       LBRtoXYZ(pos, XYZmoon);
 
       XYZfromVSOPA(T, 3, pos, tolerance); /* position of Earth */
@@ -3904,6 +3883,26 @@ void showraddms(char *prefix, double x)
 void showradhms(char *prefix, double x)
 {
   printf("%1$s%2$.10g rad = %3$.10g deg = %3$#-13.2T hms\n", prefix, x, x*RAD);
+}
+/*--------------------------------------------------------------------------*/
+void printXYZtoLBR(double *xyz)
+{
+  double lbr[3];
+  XYZtoLBR(xyz, lbr);
+  printf(" X = %.10g, Y = %.10g, Z = %.10g\n", xyz[0], xyz[1], xyz[2]);
+  showraddms(" L = ", lbr[0]);
+  showraddms(" B = ", lbr[1]);
+  printf(" R = %.10g\n", lbr[2]);
+}
+/*--------------------------------------------------------------------------*/
+void printLBRtoXYZ(double *lbr)
+{
+  double xyz[3];
+  LBRtoXYZ(lbr, xyz);
+  showraddms(" L = ", lbr[0]);
+  showraddms(" B = ", lbr[1]);
+  printf(" R = %.10g\n", lbr[2]);
+  printf(" X = %.10g, Y = %.10g, Z = %.10g\n", xyz[0], xyz[1], xyz[2]);
 }
 /*--------------------------------------------------------------------------*/
 int ana_astropos(int narg, int ps[])
@@ -4326,8 +4325,9 @@ int ana_astropos(int narg, int ps[])
 	final[2] = magnitude(r_sun_tgt, r_obs_tgt, final[1]*RAD, object[i]);
         if (vocal) {
           puts("ASTRON: transform to elongation, phase angle, magnitude");
-          printf("el = %.10g rad, ph = %.10g rad, mag = %.10\n",
-                 final[0], final[1], final[2]);
+          showraddms(" el = ", final[0]);
+          showraddms(" ph = ", final[1]);
+          printf(" mag = %.10g\n", final[2]);
         }
       } else {
 	XYZtoLBR(pos_obs_tgt, final);	/* to polar coordinates */
@@ -4348,9 +4348,8 @@ int ana_astropos(int narg, int ps[])
 	    /* we need to take parallax into account */
 	    final[0] = Tsid - longitude - final[0]; /* RA to local hour angle */
             if (vocal) {
-              printf("ASTRON: local hour angle:\n"
-                     " %1$.10g rad = %2$.10g deg = %2-#13.2T\n",
-                     final[0], final[0]*RAD);
+              printf("ASTRON: local hour angle\n");
+              showradhms(" H = ", final[0]);
             }
 	    parallax(final, r_obs_tgt, rcp, rsp);
             if (vocal) {

@@ -4297,7 +4297,7 @@ int ana_astropos(int narg, int ps[])
       /* now have (in pos_obs_tgt[]) the planetocentric ecliptic
          cartesian coordinates referred to the desired equinox */
 
-      if (internalMode & S_NUTATION) {
+      if (dPsi) {
         /* apply nutation */
         double pos_nut[3];
         pos_nut[0] = pos_obs_tgt[0]*cdPsi - pos_obs_tgt[1]*sdPsi;

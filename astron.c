@@ -4115,15 +4115,21 @@ int ana_astropos(int narg, int ps[])
         puts("Ignoring nutation.");
     }
     if (vocal) {
-      printf("ASTRON: nutation/abberation constants:\n");
-      showraddms(" dPsi = ", dPsi);
-      showraddms(" dEps = ", dEps);
+      if (dPsi) {
+        printf("ASTRON: nutation constants:\n");
+        showraddms(" dPsi = ", dPsi);
+        showraddms(" dEps = ", dEps);
+      } else
+        printf("ASTRON: no nutation correction\n");
     }
     double epsilon = obliquity(jd, &dEps); /* obliquity of the
                                               ecliptic corrected for
                                               nutation */
     if (vocal) {
-      printf("ASTRON: obliquity of ecliptic corrected for nutation:\n");
+      if (dPsi)
+        printf("ASTRON: obliquity of ecliptic corrected for nutation:\n");
+      else
+        printf("ASTRON: mean obliquity of ecliptic:\n");
       showraddms(" epsilon = ", epsilon);
     }
     double ceps = cos(epsilon);
@@ -4132,7 +4138,10 @@ int ana_astropos(int narg, int ps[])
     /* apparent sidereal time at longitude zero (possibly corrected
        for nutation), at UT time, in radians */
     if (vocal) {
-      printf("ASTRON: apparent sidereal time (0 longitude, nutation)\n");
+      if (dPsi)
+        printf("ASTRON: apparent sidereal time (0 longitude, nutation)\n");
+      else
+        printf("ASTRON: mean sidereal time (0 longitude)\n");
       showradhms(" Tsid = ", Tsid);
     }
     if (internalMode & S_DATE)

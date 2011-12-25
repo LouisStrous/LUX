@@ -76,7 +76,6 @@ static char rcsid[] __attribute__ ((unused)) =
 #define S_LIGHTTIME	(1<<4) // 16
 #define S_DATE		(1<<5) // 32
 #define S_TDT		(1<<6) // 64
-#define S_ERROR		(1<<7) // 128
 #define S_ABERRATION	(1<<8) // 256
 #define S_NUTATION	(1<<9) // 512
 #define S_QELEMENTS	(1<<10) // 1024
@@ -3476,14 +3475,23 @@ void heliocentricXYZr(double JDE, int object, double equinox, double *pos,
     /* heliocentric cartesian coordinates referred to the mean
        dynamical ecliptic and equinox of J2000.0 */
     if (vocal) {
-      printf("ASTRON: VSOP-A (%s) ecliptic heliocentric coordinates J2000.0:\n",
+      printf("ASTRON: VSOP-A (%s) geometric heliocentric ecliptic coordinates J2000.0:\n",
              objectName(object));
       printXYZtoLBR(pos);
     }
+    if (internalMode & S_FK5) {
+      XYZ_eclipticPrecession(pos, J2000, JDE); /* precess to equinox of date */
+      VSOPtoFK5(T, pos);                       /* transform to FK5 */
+      if (vocal) {
+        printf("ASTRON: FK5 (%s) geometric heliocentric ecliptic coordinates, equinox/ecliptic of date for JD %2$.14g = %2$-#24.6J:\n", objectName(object), JDE);
+        printLBRtoXYZ(pos);
+      }
+      XYZ_eclipticPrecession(pos, JDE, equinox); /* precess to desired equinox */
+    } else
+      XYZ_eclipticPrecession(pos, J2000, equinox); /* precess to desired equinox */
     *r = hypota(3, pos);        /* heliocentric distance */
-    XYZ_eclipticPrecession(pos, J2000, equinox);
     if (vocal) {
-      printf("ASTRON: (%s) ecliptic heliocentric coordinates for equinox:\n", 
+      printf("ASTRON: (%s) geometric heliocentric ecliptic coordinates for equinox:\n", 
              objectName(object));
       printXYZtoLBR(pos);
     }
@@ -3557,7 +3565,16 @@ void heliocentricXYZr(double JDE, int object, double equinox, double *pos,
       LBRtoXYZ(pos, XYZmoon);
 
       XYZfromVSOPA(T, 3, pos, tolerance); /* position of Earth */
-      XYZ_eclipticPrecession(pos, JDE, equinox);
+    if (internalMode & S_FK5) {
+      XYZ_eclipticPrecession(pos, J2000, JDE); /* precess to equinox of date */
+      VSOPtoFK5(T, pos);                       /* transform to FK5 */
+      if (vocal) {
+        printf("ASTRON: FK5 (Earth) geometric heliocentric ecliptic coordinates, equinox/ecliptic of date for JD %2$.14g = %2$-#24.6J:\n", JDE);
+        printLBRtoXYZ(pos);
+      }
+      XYZ_eclipticPrecession(pos, JDE, equinox); /* precess to desired equinox */
+    } else
+      XYZ_eclipticPrecession(pos, J2000, equinox); /* precess to desired equinox */
       pos[0] += XYZmoon[0];
       pos[1] += XYZmoon[1];
       pos[2] += XYZmoon[2];
@@ -3998,8 +4015,7 @@ int ana_astropos(int narg, int ps[])
   double	tolerance;
 
   if (internalMode & S_CONJSPREAD) 	/* /CONJSPREAD */
-    internalMode = (internalMode & ~(S_ERROR)) | S_XYZ
-      | S_ECLIPTICAL;
+    internalMode = internalMode | S_XYZ | S_ECLIPTICAL;
   coordSystem = (internalMode & S_COORDS); /* desired coordinate system */
   if (!coordSystem)
     coordSystem = S_ECLIPTICAL;	/* default: ecliptical */
@@ -4161,7 +4177,7 @@ int ana_astropos(int narg, int ps[])
       dPsi = sdPsi = dEps = 0.0;	/* ignore nutation */
       cdPsi = 1.0;
       if (vocal)
-        puts("Ignoring nutation.");
+        puts("ASTRON: no nutation correction.");
     }
     double epsilon = obliquity(jd, &dEps);
     if (vocal) {
@@ -4187,6 +4203,8 @@ int ana_astropos(int narg, int ps[])
       equinox = jd;
     if (vocal)
       printf("ASTRON: equinox:        JD = %.7f\n", equinox);
+    if (!(internalMode & S_FK5))
+      puts("ASTRON: coordinates relative to VSOP axes, not FK5");
     
     double mean[3];
     if (internalMode & S_CONJSPREAD)
@@ -4201,7 +4219,7 @@ int ana_astropos(int narg, int ps[])
     /* pos_sun_obs[0] = X, pos_sun_obs[1] = Y, pos_sun_obs[2] = Z, */
     /* r_sun_obs = heliocentric distance of the observer */
     if (vocal) {
-      printf("ASTRON: observer (%d) geometric ecliptic heliocentric coordinates for equinox:\n", object0);
+      printf("ASTRON: observer (%s) geometric heliocentric ecliptic coordinates for equinox:\n", objectName(object0));
       printXYZtoLBR(pos_sun_obs);
     }
 
@@ -4209,6 +4227,9 @@ int ana_astropos(int narg, int ps[])
       double lighttime = 0.0;
       double r_sun_tgt, r_obs_tgt, pos_sun_tgt[9], pos_obs_tgt[9];
       if (internalMode & (S_LIGHTTIME | S_ABERRATION)) {
+        if (vocal)              /* print geometric position */
+          heliocentricXYZr(jd, object[i], equinox, pos_sun_tgt, &r_sun_tgt,
+                           tolerance, 1);
         /* calculate light time */
 	/* get initial guess of "average" distance between the objects */
 	/* for an initial guess of the light time */
@@ -4345,7 +4366,7 @@ int ana_astropos(int narg, int ps[])
         pos_nut[2] = pos_obs_tgt[2];
         memcpy(pos_obs_tgt, pos_nut, 3*sizeof(double));
         if (vocal) {
-          puts("ASTRON: ecliptic planetocentric coordinates corrected for nutation:");
+          puts("ASTRON: planetocentric ecliptic coordinates corrected for nutation:");
           printXYZtoLBR(pos_obs_tgt);
         }
       }
@@ -4383,7 +4404,7 @@ int ana_astropos(int narg, int ps[])
         if (internalMode & S_FK5)
           VSOPtoFK5(TC2000(jd), final);     /* to FK5 */
         if (vocal) {
-          puts("ASTRON: ecliptic planetocentric coordinates:");
+          puts("ASTRON: planetocentric ecliptic coordinates:");
           printLBRtoXYZ(final);
         }
 	if (latitude != S_PLANETOCENTRIC /* topocentric -> parallax */
@@ -4402,7 +4423,7 @@ int ana_astropos(int narg, int ps[])
             }
 	    parallax(final, r_obs_tgt, rcp, rsp);
             if (vocal) {
-              puts("ASTRON: equatorial topocentric coordinates (parallax):");
+              puts("ASTRON: topocentric equatorial coordinates (parallax):");
               printHBRtoXYZ(final);
             }
 	    if (coordSystem == S_ECLIPTICAL || coordSystem == S_EQUATORIAL)

@@ -223,6 +223,7 @@ int idiv(int x, int y)
 
 void printXYZtoLBR(double *xyz);
 void printLBRtoXYZ(double *lbr);
+void printHBRtoXYZ(double *lbr);
 
 #define TAI_to_TT(jd)	(*(jd) += 32.184/86400)
 #define TT_to_TAI(jd)	(*(jd) -= 32.184/86400)
@@ -2745,6 +2746,42 @@ float magnitude(double d, double r, double beta, int objNum)
   }
 }
 /*--------------------------------------------------------------------------*/
+const char const *objectName(int objNum)
+{
+  switch (objNum) {
+    default:
+      if (nExtraObj) {
+	int i = findint(objNum, extraIDs, nExtraObj);
+	return extraOrbits[i].comment;
+      }
+      return "Unknown";
+    case -1:			/* ELEMENTS */
+      return "ELEMENTS";
+    case 0:			/* Sun */
+      return "Sun";
+    case 1:			/* Mercury */
+      return "Mercury";
+    case 2:			/* Venus */
+      return "Venus";
+    case 3:			/* Earth */
+      return "Earth";
+    case 4:			/* Mars */
+      return "Mars";
+    case 5:			/* Jupiter */
+      return "Jupiter";
+    case 6:			/* Saturn */
+      return "Saturn";
+    case 7:			/* Uranus */
+      return "Uranus";
+    case 8:			/* Neptune */
+      return "Neptune";
+    case 9:			/* Pluto */
+      return "Pluto";
+    case 10:			/* Moon [ES 9.342-2] */
+      return "Moon";
+  }
+}
+/*--------------------------------------------------------------------------*/
 void nutation(double JDE, double *dPsi, double *cdPsi, double *sdPsi,
 	      double *dEps)
 /* calculates the nutation in longitude and/or obliquity */
@@ -3439,7 +3476,7 @@ void heliocentricXYZr(double JDE, int object, double equinox, double *pos,
     /* heliocentric cartesian coordinates referred to the mean
        dynamical ecliptic and equinox of J2000.0 */
     if (vocal) {
-      printf("ASTRON: VSOP (%d) ecliptic heliocentric coordinates, equinox/ecliptic of J2000.0:\n", object);
+      printf("ASTRON: VSOP-A (%d) ecliptic heliocentric coordinates, equinox/ecliptic of J2000.0:\n", object);
       printXYZtoLBR(pos);
     }
     *r = hypota(3, pos);        /* heliocentric distance */
@@ -3905,6 +3942,16 @@ void printLBRtoXYZ(double *lbr)
   printf(" X = %.10g, Y = %.10g, Z = %.10g\n", xyz[0], xyz[1], xyz[2]);
 }
 /*--------------------------------------------------------------------------*/
+void printHBRtoXYZ(double *lbr)
+{
+  double xyz[3];
+  LBRtoXYZ(lbr, xyz);
+  showradhms(" H = ", lbr[0]);
+  showraddms(" B = ", lbr[1]);
+  printf(" R = %.10g\n", lbr[2]);
+  printf(" X = %.10g, Y = %.10g, Z = %.10g\n", xyz[0], xyz[1], xyz[2]);
+}
+/*--------------------------------------------------------------------------*/
 int ana_astropos(int narg, int ps[])
      /* returns the positions of a set of heavenly bodies at a specific */
      /* set of times, for equinox 2000.0 */
@@ -4090,7 +4137,7 @@ int ana_astropos(int narg, int ps[])
   /* calculate coordinates */
   for (j = 0; j < nJD; j++) {	/* all dates */
     if (vocal)
-      printf("ASTRON: calculating for JD = %.7f\n", JD[j]);
+      printf("ASTRON: calculating for JD = %1$.7f = %1$#-24.6J\n", JD[j]);
     double jd = tdt? JD[j]: JDE(JD[j], +1); /* calculate date in TDT */
     if (vocal) {
       if (tdt) {
@@ -4350,8 +4397,8 @@ int ana_astropos(int narg, int ps[])
 	    || coordSystem == S_EQUATORIAL || coordSystem == S_HORIZONTAL) {
 	  ectoeq(final, ceps, seps, 1); /* to equatorial coordinates */
           if (vocal) {
-            puts("ASTRON: equatorial planetocentric coordinates:");
-            printLBRtoXYZ(final);
+            puts("ASTRON: planetocentric equatorial coordinates:");
+            printHBRtoXYZ(final);
           }
 	  if (latitude != S_PLANETOCENTRIC) {
 	    /* we need to take parallax into account */
@@ -4363,7 +4410,7 @@ int ana_astropos(int narg, int ps[])
 	    parallax(final, r_obs_tgt, rcp, rsp);
             if (vocal) {
               puts("ASTRON: equatorial topocentric coordinates (parallax):");
-              printLBRtoXYZ(final);
+              printHBRtoXYZ(final);
             }
 	    if (coordSystem == S_ECLIPTICAL || coordSystem == S_EQUATORIAL)
 	      final[0] = Tsid - longitude - final[0]; /* back to RA */

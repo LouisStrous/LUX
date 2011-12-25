@@ -132,367 +132,515 @@ int strcmp2(1127,30070
 int isKeyWord(1133,30263
 int readIdentifier(1157,31286
 int yylex(1192,32741
-int calc_lex(1544,44512
-int calc_error(1550,44688
-char	*programName;programName1556,44857
-int main(1557,44876
+int calc_lex(1543,44442
+int calc_error(1549,44618
+char	*programName;programName1555,44787
+int main(1556,44806
 
 anaparser.c.tab.c,5550
-#define YYBISON 46,2102
-#define YYBISON_VERSION 49,2143
-#define YYSKELETON_NAME 52,2198
-#define YYPURE 55,2253
-#define YYPUSH 58,2292
-#define YYPULL 61,2331
-#define YYLSP_NEEDED 64,2373
-# define YYDEBUG 129,4738
-# undef YYERROR_VERBOSE134,4828
-# define YYERROR_VERBOSE 135,4852
-# define YYERROR_VERBOSE 137,4885
-# define YYTOKEN_TABLE 142,4975
-# define YYTOKENTYPE148,5044
-   enum yytokentype 151,5168
-     NEWLINE 152,5190
-     C_ID 153,5210
-     S_ID 154,5228
-     NUMBER 155,5246
-     STR 156,5266
-     INCLUDE 157,5283
-     REPORT 158,5304
-     IF 159,5324
-     THEN 160,5340
-     ELSE 161,5358
-     FOR 162,5376
-     REPEAT 163,5393
-     UNTIL 164,5413
-     WHILE 165,5432
-     DO 166,5451
-     CASE 167,5467
-     ENDCASE 168,5485
-     NCASE 169,5506
-     SUBR 170,5525
-     ENDSUBR 171,5543
-     FUNC 172,5564
-     ENDFUNC 173,5582
-     BLOCK 174,5603
-     ENDBLOCK 175,5622
-     RETURN 176,5644
-     BREAK 177,5664
-     CONTINUE 178,5683
-     RUN 179,5705
-     BEGIN 180,5722
-     END 181,5741
-     PLUSIS 182,5758
-     MINUSIS 183,5778
-     TIMESIS 184,5799
-     DIVIDEIS 185,5820
-     POWERIS 186,5842
-     RETALL 187,5863
-     STRUCTTAG 188,5883
-     ERRORSTATE 189,5906
-     ELLIPSIS 190,5930
-     ORIF 191,5952
-     ANDIF 192,5970
-     XOR 193,5989
-     OR 194,6006
-     AND 195,6022
-     NE 196,6039
-     EQ 197,6055
-     LT 198,6071
-     GT 199,6087
-     LE 200,6103
-     GE 201,6119
-     SMOD 202,6135
-     UMINUS 203,6153
-typedef int YYSTYPE;210,6243
-# define YYSTYPE_IS_TRIVIAL 211,6264
-# define yystype 212,6294
-# define YYSTYPE_IS_DECLARED 213,6356
-# undef short224,6518
-typedef YYTYPE_UINT8 yytype_uint8;228,6560
-typedef unsigned char yytype_uint8;230,6601
-typedef YYTYPE_INT8 yytype_int8;234,6664
-typedef signed char yytype_int8;237,6797
-typedef short int yytype_int8;239,6836
-typedef YYTYPE_UINT16 yytype_uint16;243,6896
-typedef unsigned short int yytype_uint16;245,6939
-typedef YYTYPE_INT16 yytype_int16;249,7009
-typedef short int yytype_int16;251,7050
-#  define YYSIZE_T 256,7129
-#  define YYSIZE_T 258,7184
-#  define YYSIZE_T 262,7390
-#  define YYSIZE_T 264,7423
-#define YYSIZE_MAXIMUM 268,7471
-#   define YY_(274,7617
-#  define YY_(278,7703
-# define YYUSE(284,7840
-# define YYUSE(286,7877
-# define YYID(291,8007
-YYID 296,8143
-#    define YYSTACK_ALLOC 314,8423
-#    define YYSTACK_ALLOC 318,8586
-#    define alloca 321,8706
-#    define YYSTACK_ALLOC 323,8742
-#      define _STDLIB_H 328,9006
-#  define YYSTACK_FREE(337,9153
-#   define YYSTACK_ALLOC_MAXIMUM 343,9550
-#  define YYSTACK_ALLOC 346,9632
-#  define YYSTACK_FREE 347,9665
-#   define YYSTACK_ALLOC_MAXIMUM 349,9727
-#    define _STDLIB_H 356,10011
-#   define YYMALLOC 360,10073
-#   define YYFREE 367,10340
-union yyalloc382,10823
-  yytype_int16 yyss_alloc;384,10839
-  YYSTYPE yyvs_alloc;385,10866
-# define YYSTACK_GAP_MAXIMUM 389,10967
-# define YYSTACK_BYTES(393,11115
-#   define YYCOPY(401,11375
-#   define YYCOPY(404,11482
-# define YYSTACK_RELOCATE(420,11973
-#define YYFINAL 434,12393
-#define YYLAST 436,12453
-#define YYNTOKENS 439,12517
-#define YYNNTS 441,12580
-#define YYNRULES 443,12635
-#define YYNSTATES 445,12694
-#define YYUNDEFTOK 448,12791
-#define YYMAXUTOK 449,12813
-#define YYTRANSLATE(451,12839
-static const yytype_uint8 yytranslate[yytranslate455,13015
-static const yytype_uint16 yyprhs[yyprhs568,20840
-static const yytype_int16 yyrhs[yyrhs592,22285
-static const yytype_uint16 yyrline[yyrline654,26508
-static const char *const yytname[yytname681,28088
-static const yytype_uint16 yytoknum[yytoknum709,29639
-static const yytype_uint8 yyr1[yyr1723,30315
-static const yytype_uint8 yyr2[yyr2747,31777
-static const yytype_uint8 yydefact[yydefact773,33334
-static const yytype_int16 yydefgoto[yydefgoto808,35590
-#define YYPACT_NINF 821,36196
-static const yytype_int16 yypact[yypact822,36221
-static const yytype_int16 yypgoto[yypgoto857,38473
-#define YYTABLE_NINF 872,39224
-static const yytype_int16 yytable[yytable873,39250
-static const yytype_int16 yycheck[yycheck1009,48929
-static const yytype_uint8 yystos[yystos1147,58705
-#define yyerrok	1181,60930
-#define yyclearin	1182,60965
-#define YYEMPTY	1183,61002
-#define YYEOF	1184,61024
-#define YYACCEPT	1186,61042
-#define YYABORT	1187,61076
-#define YYERROR	1188,61109
-#define YYFAIL	1195,61347
-#define YYRECOVERING(1197,61378
-#define YYBACKUP(1199,61419
-#define YYTERROR	1217,61847
-#define YYERRCODE	1218,61866
-#define YYRHSLOC(1225,62072
-# define YYLLOC_DEFAULT(1227,62131
-#  define YY_LOCATION_PRINT(1253,63044
-#  define YY_LOCATION_PRINT(1258,63224
-# define YYLEX 1266,63369
-# define YYLEX 1268,63419
-#  define YYFPRINTF 1276,63584
-# define YYDPRINTF(1279,63621
-# define YY_SYMBOL_PRINT(1285,63728
-yy_symbol_value_print 1305,64270
-yy_symbol_print 1337,64938
-yy_stack_print 1363,65784
-# define YY_STACK_PRINT(1380,66145
-yy_reduce_print 1394,66555
-# define YY_REDUCE_PRINT(1418,67159
-int yydebug;1426,67388
-# define YYDPRINTF(1428,67422
-# define YY_SYMBOL_PRINT(1429,67447
-# define YY_STACK_PRINT(1430,67502
-# define YY_REDUCE_PRINT(1431,67539
-# define YYINITDEPTH 1437,67673
-# define YYMAXDEPTH 1448,68029
-#   define yystrlen 1457,68150
-yystrlen 1463,68334
-#   define yystpcpy 1480,68629
-yystpcpy 1487,68865
-yytnamerr 1515,69606
-yysyntax_error 1562,70665
-      enum { YYERROR_VERBOSE_ARGS_MAXIMUM 1575,71013
-yydestruct 1672,73834
-yyparse 1722,74744
-#define YYPOPSTACK(1787,76180
-#  undef YYSTACK_RELOCATE1869,78538
+#define YYBISON 45,2113
+#define YYBISON_VERSION 48,2154
+#define YYSKELETON_NAME 51,2209
+#define YYPURE 54,2264
+#define YYPUSH 57,2303
+#define YYPULL 60,2342
+#define YYLSP_NEEDED 63,2384
+# define YYDEBUG 128,4749
+# undef YYERROR_VERBOSE133,4839
+# define YYERROR_VERBOSE 134,4863
+# define YYERROR_VERBOSE 136,4896
+# define YYTOKEN_TABLE 141,4986
+# define YYTOKENTYPE147,5055
+   enum yytokentype 150,5179
+     NEWLINE 151,5201
+     C_ID 152,5221
+     S_ID 153,5239
+     NUMBER 154,5257
+     STR 155,5277
+     INCLUDE 156,5294
+     REPORT 157,5315
+     IF 158,5335
+     THEN 159,5351
+     ELSE 160,5369
+     FOR 161,5387
+     REPEAT 162,5404
+     UNTIL 163,5424
+     WHILE 164,5443
+     DO 165,5462
+     CASE 166,5478
+     ENDCASE 167,5496
+     NCASE 168,5517
+     SUBR 169,5536
+     ENDSUBR 170,5554
+     FUNC 171,5575
+     ENDFUNC 172,5593
+     BLOCK 173,5614
+     ENDBLOCK 174,5633
+     RETURN 175,5655
+     BREAK 176,5675
+     CONTINUE 177,5694
+     RUN 178,5716
+     BEGIN 179,5733
+     END 180,5752
+     PLUSIS 181,5769
+     MINUSIS 182,5789
+     TIMESIS 183,5810
+     DIVIDEIS 184,5831
+     POWERIS 185,5853
+     RETALL 186,5874
+     STRUCTTAG 187,5894
+     ERRORSTATE 188,5917
+     ELLIPSIS 189,5941
+     ORIF 190,5963
+     ANDIF 191,5981
+     XOR 192,6000
+     OR 193,6017
+     AND 194,6033
+     NE 195,6050
+     EQ 196,6066
+     LT 197,6082
+     GT 198,6098
+     LE 199,6114
+     GE 200,6130
+     SMOD 201,6146
+     UMINUS 202,6164
+typedef int YYSTYPE;209,6254
+# define YYSTYPE_IS_TRIVIAL 210,6275
+# define yystype 211,6305
+# define YYSTYPE_IS_DECLARED 212,6367
+# undef short223,6529
+typedef YYTYPE_UINT8 yytype_uint8;227,6571
+typedef unsigned char yytype_uint8;229,6612
+typedef YYTYPE_INT8 yytype_int8;233,6675
+typedef signed char yytype_int8;236,6808
+typedef short int yytype_int8;238,6847
+typedef YYTYPE_UINT16 yytype_uint16;242,6907
+typedef unsigned short int yytype_uint16;244,6950
+typedef YYTYPE_INT16 yytype_int16;248,7020
+typedef short int yytype_int16;250,7061
+#  define YYSIZE_T 255,7140
+#  define YYSIZE_T 257,7195
+#  define YYSIZE_T 261,7401
+#  define YYSIZE_T 263,7434
+#define YYSIZE_MAXIMUM 267,7482
+#   define YY_(273,7652
+#  define YY_(277,7738
+# define YYUSE(283,7875
+# define YYUSE(285,7912
+# define YYID(290,8042
+YYID 295,8178
+#    define YYSTACK_ALLOC 313,8458
+#    define YYSTACK_ALLOC 317,8621
+#    define alloca 320,8741
+#    define YYSTACK_ALLOC 322,8777
+#      define _STDLIB_H 327,9041
+#  define YYSTACK_FREE(336,9188
+#   define YYSTACK_ALLOC_MAXIMUM 342,9585
+#  define YYSTACK_ALLOC 345,9667
+#  define YYSTACK_FREE 346,9700
+#   define YYSTACK_ALLOC_MAXIMUM 348,9762
+#    define _STDLIB_H 355,10046
+#   define YYMALLOC 359,10108
+#   define YYFREE 366,10375
+union yyalloc381,10858
+  yytype_int16 yyss_alloc;383,10874
+  YYSTYPE yyvs_alloc;384,10901
+# define YYSTACK_GAP_MAXIMUM 388,11002
+# define YYSTACK_BYTES(392,11150
+#   define YYCOPY(400,11410
+#   define YYCOPY(403,11517
+# define YYSTACK_RELOCATE(419,12008
+#define YYFINAL 433,12428
+#define YYLAST 435,12488
+#define YYNTOKENS 438,12552
+#define YYNNTS 440,12615
+#define YYNRULES 442,12670
+#define YYNSTATES 444,12729
+#define YYUNDEFTOK 447,12826
+#define YYMAXUTOK 448,12848
+#define YYTRANSLATE(450,12874
+static const yytype_uint8 yytranslate[yytranslate454,13050
+static const yytype_uint16 yyprhs[yyprhs567,20875
+static const yytype_int16 yyrhs[yyrhs591,22320
+static const yytype_uint16 yyrline[yyrline653,26543
+static const char *const yytname[yytname680,28123
+static const yytype_uint16 yytoknum[yytoknum708,29674
+static const yytype_uint8 yyr1[yyr1722,30350
+static const yytype_uint8 yyr2[yyr2746,31812
+static const yytype_uint8 yydefact[yydefact772,33369
+static const yytype_int16 yydefgoto[yydefgoto807,35625
+#define YYPACT_NINF 820,36231
+static const yytype_int16 yypact[yypact821,36256
+static const yytype_int16 yypgoto[yypgoto856,38508
+#define YYTABLE_NINF 871,39259
+static const yytype_int16 yytable[yytable872,39285
+static const yytype_int16 yycheck[yycheck1008,48964
+static const yytype_uint8 yystos[yystos1146,58740
+#define yyerrok	1180,60965
+#define yyclearin	1181,61000
+#define YYEMPTY	1182,61037
+#define YYEOF	1183,61059
+#define YYACCEPT	1185,61077
+#define YYABORT	1186,61111
+#define YYERROR	1187,61144
+#define YYFAIL	1197,61543
+#define YYRECOVERING(1205,61863
+#define YYBACKUP(1207,61904
+#define YYTERROR	1225,62332
+#define YYERRCODE	1226,62351
+#define YYRHSLOC(1233,62557
+# define YYLLOC_DEFAULT(1235,62616
+#  define YY_LOCATION_PRINT(1261,63559
+#  define YY_LOCATION_PRINT(1266,63739
+# define YYLEX 1274,63884
+# define YYLEX 1276,63934
+#  define YYFPRINTF 1284,64099
+# define YYDPRINTF(1287,64136
+# define YY_SYMBOL_PRINT(1293,64243
+yy_symbol_value_print 1313,64785
+yy_symbol_print 1345,65453
+yy_stack_print 1371,66299
+# define YY_STACK_PRINT(1388,66660
+yy_reduce_print 1402,67070
+# define YY_REDUCE_PRINT(1426,67674
+int yydebug;1434,67903
+# define YYDPRINTF(1436,67937
+# define YY_SYMBOL_PRINT(1437,67962
+# define YY_STACK_PRINT(1438,68017
+# define YY_REDUCE_PRINT(1439,68054
+# define YYINITDEPTH 1445,68188
+# define YYMAXDEPTH 1456,68544
+#   define yystrlen 1465,68665
+yystrlen 1471,68849
+#   define yystpcpy 1488,69144
+yystpcpy 1495,69380
+yytnamerr 1523,70121
+yysyntax_error 1570,71180
+      enum { YYERROR_VERBOSE_ARGS_MAXIMUM 1583,71528
+yydestruct 1680,74349
+yyparse 1730,75259
+#define YYPOPSTACK(1795,76695
+#  undef YYSTACK_RELOCATE1877,79053
+
+anasofa.c,87
+BIND(48,2093
+int ana_iauDat(233,9749
+BIND(309,11987
+BIND(392,15189
+BIND(423,16215
 
 anaterm.c,23
 void getTermCaps(2,57
 
-astron.c,4428
-static char rcsid[rcsid62,2886
-#define extractbits(65,2991
-#define S_ECLIPTICAL	67,3069
-#define S_EQUATORIAL	68,3092
-#define S_HORIZONTAL	69,3115
-#define S_ELONGATION	70,3138
-#define S_COORDS	71,3161
-#define S_XYZ	72,3180
-#define S_FAST	73,3202
-#define S_DATE	74,3225
-#define S_TDT	75,3248
-#define S_ERROR	76,3270
-#define S_ABBERATION	77,3294
-#define S_GEOMETRIC	78,3322
-#define S_QELEMENTS	79,3349
-#define S_FK5	80,3377
-#define S_TRUNCATEVSOP 81,3400
-#define S_CONJSPREAD 82,3432
-#define S_PLANETOCENTRIC 83,3464
-#define S_KEEPDIMS	84,3497
-#define S_VOCAL 85,3524
-#define AUtoJD	86,3556
-#define NOBJECTS	87,3604
-#define EARTH	89,3624
-char *GregorianMonths[GregorianMonths93,3673
-char *IslamicMonths[IslamicMonths98,3830
-char *tikalVenteina[tikalVenteina104,4012
-char *tikalMonth[tikalMonth110,4221
-char *HebrewMonths[HebrewMonths116,4410
-char *EgyptianMonths[EgyptianMonths121,4550
-int	nonae[nonae126,4721
-}, idus[idus128,4774
-char *latinMonthsI[latinMonthsI131,4840
-}, *latinMonthsII[latinMonthsII135,5022
-char **calendars[calendars140,5195
-int calendarType[calendarType143,5284
-#define pol2(148,5402
-#define pol3(151,5498
-#define pol4(154,5610
-#define TC1900(158,5749
-#define TC2000(160,5836
-#define TM2000(162,5923
-#define mpol2(165,6017
-#define mpol3(168,6123
-#define mpol4(171,6241
-#define J2000	173,6323
-#define B1950 174,6349
-#define ecos	176,6381
-#define esin	177,6431
-static int	*extraIDs;extraIDs179,6482
-static struct extraInfo 180,6504
-  int		nterms;181,6530
-  double	equinox;182,6545
-  double	absmag;183,6563
-  char		*comment;comment184,6580
-  struct orbitParams 185,6598
-    double	JDE;186,6621
-    double	q;187,6637
-    double	e;188,6651
-    double	v_factor;189,6665
-    double	xfac;190,6686
-    double	yfac;191,6703
-    double	zfac;192,6720
-    double	xangle;193,6737
-    double	yangle;194,6756
-    double	zangle;195,6775
-    double	M;196,6794
-    double	n;197,6808
-  } *orbits;orbits198,6822
-} *extraOrbits extraOrbits199,6835
-static int	nExtraObj 201,6861
-static double	extraElements[extraElements203,6888
-static char	haveExtraElements;204,6920
-int idiv(209,7001
-#define TAI_to_TT(215,7126
-#define TT_to_TAI(216,7172
-double meanTropicalYear(241,8816
-double meanSynodicMonth(253,9286
-int EasterDate(265,9745
-double lunarToJD(300,10761
-double JDtoLunar(310,11003
-double JulianDate(320,11254
-void JDtoDate(387,13580
-int tishri(452,15572
-static int	hebrewMonthStarts[hebrewMonthStarts497,16914
-#define EPOCH	517,17927
-double hebrewToJulian(518,17987
-int JDtoHebrew(533,18352
-void findTextDate(566,19252
-void roman_numeral(749,24589
-int construct_output_dims(828,25988
-int ana_calendar(884,28141
-int ana_EasterDate(1563,47295
-double deltaT(1597,48483
-void UTC_to_TAI(1670,51099
-void TAI_to_UTC(1675,51238
-double JDE(1683,51429
-void rotate(1704,52400
-void precess(1770,54105
-double	p_ce,1797,55039
-double	p_ce, p_se,1797,55039
-double	p_ce, p_se, p_pi,1797,55039
-double	p_ce, p_se, p_pi, p_p;1797,55039
-void initEclipticPrecession(1798,55069
-void eclipticPrecession(1816,55713
-void precessEquatorial(1842,56501
-int ana_precess(1870,57585
-int constellation(1997,61056
-#define B1875 2020,61890
-int ana_constellation(2021,61920
-int ana_constellationname(2173,67359
-float magnitude(2248,69089
-void nutation(2301,70995
-double obliquity(2349,72632
-double standardSiderealTime(2366,73223
-double siderealTime(2383,73802
-int ana_siderealtime(2400,74408
-void VSOPtoFK5(2456,75916
-#define EQUINOX_OF_DATE	2468,76303
-int readExtra(2470,76336
-int ana_readorbits(2752,85875
-void showExtra(2763,86286
-int ana_showorbits(2777,86716
-void kepler(2783,86865
-double interpolate_angle(2818,87939
-int extraHeliocentric(2832,88439
-void extraElementsHeliocentric(2908,91191
-void heliocentricXYZr(2982,93309
-static double der[der3200,102112
-void propagateError(3201,102134
-void LBRtoXYZ(3245,104652
-void XYZtoLBR(3273,105562
-void ectoeq(3308,106672
-void galtoeq(3341,107759
-int ana_astrf(3368,108730
-#define s_parallax 3510,112803
-void parallax(3511,112836
-void refract(3551,114321
-void eqtohor(3568,114810
-#define FLAT	3601,115853
-#define R_EARTH	3602,115877
-void geocentricCoords(3603,115901
-double meanDistance(3613,116279
-void showraddms(3621,116515
-void showradhms(3626,116717
-void printXYZtoLBR(3631,116920
-void printLBRtoXYZ(3641,117242
-int ana_astropos(3651,117564
+astron.c,4899
+static char rcsid[rcsid65,2946
+#define extractbits(68,3051
+#define S_ECLIPTICAL	70,3135
+#define S_EQUATORIAL	71,3158
+#define S_HORIZONTAL	72,3181
+#define S_ELONGATION	73,3204
+#define S_COORDS	74,3227
+#define S_XYZ	75,3246
+#define S_LIGHTTIME	76,3273
+#define S_DATE	77,3306
+#define S_TDT	78,3335
+#define S_ERROR	79,3363
+#define S_ABERRATION	80,3394
+#define S_NUTATION	81,3429
+#define S_QELEMENTS	82,3462
+#define S_FK5	83,3498
+#define S_TRUNCATEVSOP 84,3529
+#define S_CONJSPREAD 85,3569
+#define S_PLANETOCENTRIC 86,3609
+#define S_KEEPDIMS	87,3651
+#define S_VOCAL 88,3687
+#define AUtoJD	89,3728
+#define NOBJECTS	90,3776
+#define EARTH	92,3796
+char *GregorianMonths[GregorianMonths98,3947
+char *IslamicMonths[IslamicMonths103,4104
+char *tikalVenteina[tikalVenteina109,4286
+char *tikalMonth[tikalMonth115,4495
+char *HebrewMonths[HebrewMonths121,4684
+char *EgyptianMonths[EgyptianMonths126,4824
+int	nonae[nonae131,4995
+}, idus[idus133,5048
+char *latinMonthsI[latinMonthsI136,5114
+}, *latinMonthsII[latinMonthsII140,5296
+char **calendars[calendars145,5469
+int calendarType[calendarType148,5558
+#define pol2(153,5676
+#define pol3(156,5772
+#define pol4(159,5884
+#define TC1900(163,6023
+#define TC2000(165,6110
+#define TM2000(167,6197
+#define mpol2(170,6291
+#define mpol3(173,6397
+#define mpol4(176,6515
+#define J2000	178,6597
+#define B1950 179,6623
+#define ecos	181,6655
+#define esin	182,6705
+static int	*extraIDs;extraIDs184,6756
+static struct extraInfo 185,6778
+  int		nterms;186,6804
+  double	equinox;187,6819
+  double	absmag;188,6837
+  char		*comment;comment189,6854
+  struct orbitParams 190,6872
+    double	JDE;191,6895
+    double	q;192,6911
+    double	e;193,6925
+    double	v_factor;194,6939
+    double	xfac;195,6960
+    double	yfac;196,6977
+    double	zfac;197,6994
+    double	xangle;198,7011
+    double	yangle;199,7030
+    double	zangle;200,7049
+    double	M;201,7068
+    double	n;202,7082
+  } *orbits;orbits203,7096
+} *extraOrbits extraOrbits204,7109
+static int	nExtraObj 206,7135
+static double	extraElements[extraElements208,7162
+static char	haveExtraElements;209,7194
+int idiv(218,7423
+#define TAI_to_TT(228,7648
+#define TT_to_TAI(229,7694
+double meanTropicalYear(254,9338
+double meanSynodicMonth(266,9808
+int EasterDate(278,10267
+double lunarToJD(313,11283
+double JDtoLunar(323,11525
+int DatetoCJDN(333,11776
+double DatetoCJD(351,12517
+void CJDNtoDate(371,13382
+void CJDtoDate(386,14034
+int tishri(403,14728
+void findTextDate(448,16070
+void roman_numeral(631,21401
+int construct_output_dims(710,22800
+int gcd(766,24953
+int ana_calendar(787,25276
+    int to_elements_per_date;799,25690
+    int from_elements_per_date;800,25757
+    void (*CJDNtoCal)CJDNtoCal801,25826
+    void (*CJDtoCal)CJDtoCal802,25877
+    void (*CaltoCJDN)CaltoCJDN803,25932
+    void (*CaltoCJD)CaltoCJD804,25983
+    void (*CJDNtoCalS)CJDNtoCalS805,26038
+    void (*CJDtoCalS)CJDtoCalS806,26092
+    void (*CalStoCJDN)CalStoCJDN807,26147
+    void (*CalStoCJD)CalStoCJD808,26202
+int ana_calendar_OLD(1186,40500
+int ana_EasterDate(1941,63520
+double deltaT(1975,64708
+void UTC_to_TAI(2081,68336
+void TAI_to_UTC(2086,68478
+void CJDLT_to_TAI(2113,69367
+void TAI_to_CJDLT(2122,69669
+double JDE(2131,69981
+void rotate(2152,70952
+void precess(2218,72657
+double	p_ce,2245,73591
+double	p_ce, p_se,2245,73591
+double	p_ce, p_se, p_pi,2245,73591
+double	p_ce, p_se, p_pi, p_p;2245,73591
+void initEclipticPrecession(2246,73621
+void eclipticPrecession(2264,74265
+void precessEquatorial(2290,75053
+int ana_precess(2318,76137
+int constellation(2445,79608
+#define B1875 2468,80477
+int ana_constellation(2469,80507
+int ana_constellationname(2621,85946
+float magnitude(2696,87676
+const char const *objectName(objectName2749,89582
+void nutation(2785,90482
+double obliquity(2833,92119
+double standardSiderealTime(2850,92710
+double siderealTime(2867,93289
+int ana_siderealtime(2884,93895
+void VSOPtoFK5(2940,95400
+#define EQUINOX_OF_DATE	2952,95791
+int readExtra(2954,95824
+int ana_readorbits(3236,105363
+void showExtra(3247,105774
+int ana_showorbits(3261,106204
+void kepler(3267,106353
+double interpolate_angle(3302,107427
+int extraHeliocentric(3316,107927
+void extraElementsHeliocentric(3390,110595
+void heliocentricXYZr(3461,112578
+void LBRtoXYZ(3609,117956
+void XYZtoLBR(3625,118432
+void ectoeq(3640,118902
+void galtoeq(3659,119461
+int ana_astrf(3686,120432
+#define s_parallax 3834,124591
+void parallax(3835,124624
+void refract(3859,125520
+void eqtohor(3876,126009
+#define FLAT	3895,126558
+#define R_EARTH	3896,126582
+void geocentricCoords(3897,126606
+double meanDistance(3907,126984
+void showraddms(3915,127220
+void showradhms(3920,127422
+void printXYZtoLBR(3925,127625
+void printLBRtoXYZ(3935,127947
+void printHBRtoXYZ(3945,128269
+int ana_astropos(3955,128591
 
-axis.c,497
-static char rcsid[rcsid32,1233
-void setupDimensionLoop(48,2019
-int advanceLoop(133,5436
-int advanceLoops(163,6512
-void rearrangeDimensionLoop(195,7615
-int dimensionLoopResult(347,13109
-int standardLoop(437,16549
-int standardLoop0(458,17266
-#undef DEBUG_VOCAL627,23498
-int nextLoop(629,23593
-int nextLoops(639,23930
-void subdataLoop(651,24340
-void rearrangeEdgeLoop(674,25193
-int prepareDiagonals(749,28030
-int moveLoop(915,33692
-void returnLoop(961,35520
-int numerical(974,35994
+axis.c,3043
+#define obstack_chunk_alloc 36,1293
+#define obstack_chunk_free 37,1328
+static char rcsid[rcsid39,1361
+void setAxisMode(64,2611
+int setAxes(78,3038
+void setupDimensionLoop(118,4437
+int advanceLoop(192,7549
+int loopIsAtStart(222,8625
+int advanceLoops(234,9037
+void rearrangeDimensionLoop(266,10140
+void omitRedundantDimensions(418,15634
+int dimensionLoopResult1(443,16426
+int dimensionLoopResult(595,22630
+int standardLoop(602,22944
+int standardLoopX(625,23776
+int standardLoop0(651,24805
+#undef DEBUG_VOCAL820,31037
+int standardLoop1(822,31132
+int nextLoop(1041,40915
+int nextLoops(1051,41252
+void subdataLoop(1063,41662
+void rearrangeEdgeLoop(1086,42515
+int prepareDiagonals(1161,45352
+int moveLoop(1327,51014
+void returnLoop(1373,52842
+static int numerical_or_string_choice(1386,53316
+int numerical(1445,54840
+int numerical_or_string(1455,55369
+struct dims_spec 1536,58429
+  enum dim_spec_type 1537,58448
+  enum dim_spec_type { DS_NONE 1537,58448
+  enum dim_spec_type { DS_NONE = 0, DS_ACCEPT 1537,58448
+  enum dim_spec_type { DS_NONE = 0, DS_ACCEPT = (1<<0), DS_ADD 1537,58448
+                       DS_REMOVE 1538,58521
+                       DS_REMOVE = (1<<2), DS_ADD_REMOVE 1538,58521
+                       DS_REMOVE = (1<<2), DS_ADD_REMOVE = (DS_ADD 1538,58521
+                       DS_REMOVE = (1<<2), DS_ADD_REMOVE = (DS_ADD | DS_REMOVE)1538,58521
+                       DS_COPY_REF 1539,58602
+                       DS_COPY_REF = (1<<3), DS_EXACT 1539,58602
+  size_t size_add;1540,58673
+  size_t size_remove;1541,58692
+struct param_spec 1544,58718
+  enum param_spec_type 1545,58738
+  enum param_spec_type { PS_INPUT,1545,58738
+  enum param_spec_type { PS_INPUT, PS_OUTPUT,1545,58738
+  enum param_spec_type { PS_INPUT, PS_OUTPUT, PS_RETURN 1545,58738
+  enum param_spec_type { PS_INPUT, PS_OUTPUT, PS_RETURN } logical_type;1545,58738
+  int is_optional;1546,58810
+  enum type_spec_limit_type 1547,58829
+  enum type_spec_limit_type { PS_EXACT,1547,58829
+  enum type_spec_limit_type { PS_EXACT, PS_LOWER_LIMIT 1547,58829
+  enum type_spec_limit_type { PS_EXACT, PS_LOWER_LIMIT } data_type_limit;1547,58829
+  enum Symboltype data_type;1548,58903
+  size_t num_dims_spec;1549,58932
+  struct dims_spec *dims_spec;dims_spec1550,58956
+  int ref_par;1551,58987
+  enum remaining_dims_type 1552,59002
+  enum remaining_dims_type { PS_ABSENT,1552,59002
+  enum remaining_dims_type { PS_ABSENT, PS_EQUAL_TO_REFERENCE,1552,59002
+  enum remaining_dims_type { PS_ABSENT, PS_EQUAL_TO_REFERENCE, PS_ARBITRARY 1552,59002
+  enum remaining_dims_type { PS_ABSENT, PS_EQUAL_TO_REFERENCE, PS_ARBITRARY } remaining_dims;1552,59002
+  int remaining_dims_equal_to_reference;1553,59096
+struct param_spec_list 1556,59141
+  size_t num_param_specs;1557,59166
+  struct param_spec *param_specs;param_specs1558,59192
+  int return_param_index;1559,59226
+void free_param_spec_list(1562,59256
+struct param_spec_list *parse_standard_arg_fmt(parse_standard_arg_fmt1575,59522
+int standard_args(1871,68633
+
+bindings.c,2470
+#define obstack_chunk_alloc 6,103
+#define obstack_chunk_free 7,138
+struct obstack *registered_functions registered_functions13,314
+void register_ana_f(15,392
+void register_ana_s(32,900
+int ana_iDDDoC33_f_(50,1420
+int ana_iLb3od3rl_f_(62,1820
+int ana_iLd3ob3rl_f_(79,2329
+int ana_ib3DDod3rl_f_(96,2829
+int ana_ib3b3ob3_f_(114,3372
+int ana_ib3b3rd_f_(132,3855
+int ana_ib3rb2_f_(148,4284
+int ana_ib3oc33_f_(166,4748
+int ana_ib3od3_f_(182,5177
+int ana_ib3odb3_s_(199,5658
+int ana_ibLLobrl_f_(216,6117
+int ana_ibLLLobrl_f_(233,6644
+int ana_ic23c23ob2_f_(250,7192
+int ana_ic23c23oc23_f_(269,7744
+int ana_ic23odd_s_(288,8302
+int ana_ic23odddddd_s_(304,8771
+int ana_ic23oddddddrl_s_(321,9365
+int ana_ic33b3ob3_f_(338,9960
+int ana_ic33c23oc23_f_(363,10640
+int ana_ic33c33oc33_f_(382,11192
+int ana_ic33dc33oc33_f_(404,11797
+int ana_ic33drd_f_(427,12467
+int ana_ic33ob3_f_(443,12928
+int ana_ic33oc33_f_(461,13386
+int ana_ic33odd_s_(479,13864
+int ana_id000ddddoc33_f_(496,14339
+int ana_id0d0ddoc33_mod_f_(519,15072
+int ana_idd0DDDrd_f_(537,15664
+int ana_id0Loc23rl_f_(568,16609
+int ana_id0c23c23rl_s_(584,17056
+int ana_id0c33oc33_f_(623,17976
+int ana_id0d0oddd_s_(643,18510
+int ana_id0ddoc33_f_(656,18979
+int ana_id0odddc33c33c33c33c33_s_(673,19485
+int ana_id0ddodc33c33c33c33c33_s_(695,20306
+int ana_id0ddrd_f_(717,21127
+int ana_id0doddrl_jd_f_(744,21911
+int ana_id0oc33_f_(760,22381
+int ana_id0oC33c33c33_s_(777,22819
+int ana_id0oddrl_jd_f_(817,23939
+int ana_id0odd_s_(833,24381
+int ana_id0oddd_s_(846,24780
+int ana_id0odddd_s_(859,25207
+int ana_id0odddddddddddddddd_s_(872,25662
+int ana_id0ollldrl_cal_f_(888,26478
+int ana_id0rd_f_(947,28003
+int ana_id3DDob3rl_f_(960,28368
+int ana_id3rd_f_(977,28894
+int ana_idc33_s_(993,29297
+int ana_iddd0odd_s_(1008,29706
+int ana_iddd0odddd_s_(1021,30161
+int ana_iddddc33rd_mod_f_(1035,30677
+int ana_iddddddd0d0oddddddrl_s_(1056,31323
+int ana_iddddddoc23rl_f_(1071,32061
+int ana_iddddddoc23_f_(1087,32617
+int ana_iddddddodddddd_s_(1103,33172
+int ana_iddddoc33_f_(1118,33823
+int ana_iddddodd_s_(1134,34330
+int ana_iddddrd_f_(1148,34805
+int ana_iddddrd_mod_f_(1161,35240
+int ana_idddob3_f_(1180,35788
+int ana_idddoc33_f_(1196,36233
+int ana_iddob3_f_(1213,36717
+int ana_iddrd_f_(1229,37134
+int ana_idrd_f_(1257,37808
+int ana_ilob2rl_f_(1271,38160
+int ana_ivddovrl_f_(1286,38570
+int ana_oC33_f_(1334,40329
+int ana_oC33B3_s_(1346,40651
+int ana_oddd_combine_f_(1358,41011
 
 binop.c,98
 #define ORDINARY	6,69
@@ -548,17 +696,17 @@ Bytestack_sprintf(463,12007
 Bytestack_vsprintf(490,12648
 Bytestack_quotify(511,13076
 Bytestack_unescapify(576,14192
-  Bytestack stack;631,15229
-  Bytestack_index index;632,15272
-} *Bytestack_cookie;Bytestack_cookie633,15326
-Bytestack_stream_read(650,15778
-Bytestack_stream_write(679,16537
-Bytestack_stream_seek(710,17476
-Bytestack_stream_close(747,18190
-cookie_io_functions_t Bytestack_stream_funcs 757,18415
-Bytestack_create_cookie(772,18774
-Bytestack_delete_cookie(794,19206
-Bytestack_open(820,19944
+  Bytestack stack;631,15223
+  Bytestack_index index;632,15266
+} *Bytestack_cookie;Bytestack_cookie633,15320
+Bytestack_stream_read(650,15772
+Bytestack_stream_write(679,16531
+Bytestack_stream_seek(710,17470
+Bytestack_stream_close(747,18184
+cookie_io_functions_t Bytestack_stream_funcs 757,18409
+Bytestack_create_cookie(772,18768
+Bytestack_delete_cookie(794,19200
+Bytestack_open(820,19938
 
 calculator.c,1474
 #define startList(14,178
@@ -847,9 +995,182 @@ yyparse 1559,60176
 #define YYPOPSTACK(1620,61493
 #  undef YYSTACK_RELOCATE1708,63910
 
-calendar.c,56
-void JDtoCommonDate(4,66
-double CommonDateToJD(27,847
+calendar.c,5975
+#define _GNU_SOURCE 1,0
+#define arraysize(15,434
+static void CJDtoCal(26,943
+static double CaltoCJD(47,1692
+static char *CJDNto3S(CJDNto3S73,2717
+static void CJDNto3SA(106,3984
+static char *CJDto3S(CJDto3S134,5095
+static void CJDto3SA(167,6329
+static int stralnumtouppercmp(189,7100
+static size_t find_name(220,7950
+static int S3toCJDN(250,8964
+static void S3toCJDNA(288,10310
+static double S3toCJD(325,11658
+static void S3toCJDA(367,13178
+double CJD_now(389,13847
+int CJDN_now(401,14107
+static char const * const Gregorian_Julian_monthnames[Gregorian_Julian_monthnames408,14295
+#define GREGORIAN_EPOCH 419,14756
+void CJDNtoGregorian(420,14790
+void CJDNtoGregorianA(437,15394
+char *CJDNtoGregorianS(CJDNtoGregorianS442,15583
+void CJDNtoGregorianSA(447,15770
+void CJDtoGregorian(452,15978
+void CJDtoGregorianA(457,16182
+char *CJDtoGregorianS(CJDtoGregorianS465,16442
+void CJDtoGregorianSA(470,16627
+int GregoriantoCJDN(475,16833
+void GregoriantoCJDNA(490,17342
+int GregorianStoCJDN(495,17529
+void GregorianStoCJDNA(502,17799
+double GregoriantoCJD(509,18073
+void GregoriantoCJDA(514,18265
+double GregorianStoCJD(519,18466
+void GregorianStoCJDA(526,18734
+#define JULIAN_EPOCH 538,19190
+void CJDNtoJulian(539,19221
+void CJDNtoJulianA(553,19717
+char *CJDNtoJulianS(CJDNtoJulianS558,19900
+void CJDNtoJulianSA(563,20081
+void CJDtoJulian(568,20283
+void CJDtoJulianA(573,20480
+char *CJDtoJulianS(CJDtoJulianS581,20734
+void CJDtoJulianSA(586,20913
+int JuliantoCJDN(591,21113
+void JuliantoCJDNA(601,21505
+int JulianStoCJDN(606,21686
+void JulianStoCJDNA(613,21949
+double JuliantoCJD(620,22216
+void JuliantoCJDA(625,22402
+double JulianStoCJD(630,22597
+void JulianStoCJDA(637,22858
+void CJDNtoCommon(648,23224
+void CJDNtoCommonA(656,23498
+char *CJDNtoCommonS(CJDNtoCommonS661,23681
+void CJDNtoCommonSA(666,23862
+void CJDtoCommon(671,24064
+void CJDtoCommonA(676,24261
+char *CJDtoCommonS(CJDtoCommonS684,24515
+void CJDtoCommonSA(689,24694
+int CommontoCJDN(694,24894
+void CommontoCJDNA(705,25231
+int CommonStoCJDN(710,25412
+void CommonStoCJDNA(717,25675
+double CommontoCJD(724,25942
+void CommontoCJDA(729,26128
+double CommonStoCJD(734,26323
+void CommonStoCJDA(741,26584
+static int	hebrewMonthStarts[hebrewMonthStarts752,26950
+#define HEBREW_EPOCH	774,28043
+static char const * const Hebrew_monthnames[Hebrew_monthnames776,28074
+void CJDNtoHebrew(781,28317
+void CJDNtoHebrewA(812,29214
+char *CJDNtoHebrewS(CJDNtoHebrewS817,29397
+void CJDNtoHebrewSA(822,29568
+void CJDtoHebrew(827,29760
+void CJDtoHebrewA(832,29957
+char *CJDtoHebrewS(CJDtoHebrewS840,30211
+void CJDtoHebrewSA(845,30380
+int HebrewtoCJDN(850,30570
+void HebrewtoCJDNA(863,30925
+int HebrewStoCJDN(868,31106
+void HebrewStoCJDNA(875,31351
+double HebrewtoCJD(882,31599
+void HebrewtoCJDA(887,31785
+double HebrewStoCJD(892,31980
+void HebrewStoCJDA(899,32221
+#define ISLAMIC_EPOCH 910,32569
+static char const *Islamic_monthnames[Islamic_monthnames912,32602
+void CJDNtoIslamic(919,32881
+void CJDNtoIslamicA(931,33378
+char *CJDNtoIslamicS(CJDNtoIslamicS936,33563
+void CJDNtoIslamicSA(941,33737
+void CJDtoIslamic(946,33932
+void CJDtoIslamicA(951,34131
+char *CJDtoIslamicS(CJDtoIslamicS959,34387
+void CJDtoIslamicSA(964,34559
+int IslamictoCJDN(969,34752
+void IslamictoCJDNA(977,35079
+int IslamicStoCJDN(982,35262
+void IslamicStoCJDNA(989,35509
+double IslamictoCJD(996,35760
+void IslamictoCJDA(1001,35948
+double IslamicStoCJD(1006,36145
+void IslamicStoCJDA(1013,36390
+#define EGYPTIAN_EPOCH 1024,36744
+static char const *Egyptian_monthnames[Egyptian_monthnames1026,36778
+void CJDNtoEgyptian(1032,37046
+void CJDNtoEgyptianA(1045,37454
+char *CJDNtoEgyptianS(CJDNtoEgyptianS1050,37641
+void CJDNtoEgyptianSA(1055,37818
+void CJDtoEgyptian(1060,38016
+void CJDtoEgyptianA(1065,38217
+char *CJDtoEgyptianS(CJDtoEgyptianS1073,38475
+void CJDtoEgyptianSA(1078,38650
+int EgyptiantoCJDN(1083,38846
+void EgyptiantoCJDNA(1090,39137
+int EgyptianStoCJDN(1095,39322
+void EgyptianStoCJDNA(1102,39573
+double EgyptiantoCJD(1109,39828
+void EgyptiantoCJDA(1114,40018
+double EgyptianStoCJD(1119,40217
+void EgyptianStoCJDA(1126,40466
+double JDtoCJD(1137,40815
+void JDtoCJDA(1142,40943
+double CJDtoJD(1147,41094
+void CJDtoJDA(1152,41224
+void CJDNtoCJDNA(1157,41375
+void CJDtoCJDA(1162,41514
+double CJDtoLunar(1171,41759
+void CJDtoLunarA(1181,42027
+double LunartoCJD(1186,42190
+void LunartoCJDA(1196,42456
+static char const *Mayan_venteina_names[Mayan_venteina_names1204,42655
+static char const *Mayan_haab_names[Mayan_haab_names1210,42884
+#define find_venteina_name(1216,43092
+#define find_haab_name(1217,43190
+void CJDNtoMayan(1220,43356
+void CJDNtoMayanA(1233,43868
+char *CJDNtoMayanS(CJDNtoMayanS1239,44093
+void CJDNtoMayanSA(1254,44678
+void CJDtoMayan(1267,45255
+void CJDtoMayanA(1281,45727
+char *CJDtoMayanS(CJDtoMayanS1297,46111
+void CJDtoMayanSA(1313,46703
+int MayantoCJDN(1318,46865
+void MayantoCJDNA(1387,49813
+static void MayanSto(1393,50050
+  enum state 1401,50284
+    BUSY,1402,50299
+    BUSY, OK,1402,50299
+    BUSY, OK, BAD1402,50299
+int MayanStoCJDN(1501,53444
+void MayanStoCJDNA(1509,53621
+double MayantoCJD(1514,53785
+void MayantoCJDA(1524,54246
+double MayanStoCJD(1530,54525
+void MayanStoCJDA(1538,54706
+#define LONGCOUNT_EPOCH 1546,54904
+static int longcount_periods[longcount_periods1547,54937
+void CJDNtoLongCount(1549,54991
+void CJDNtoLongCountA(1567,55485
+char *CJDNtoLongCountS(CJDNtoLongCountS1580,55825
+void CJDNtoLongCountSA(1591,56165
+void CJDtoLongCount(1600,56497
+void CJDtoLongCountA(1621,57036
+char *CJDtoLongCountS(CJDtoLongCountS1634,57418
+void CJDtoLongCountSA(1639,57574
+int LongCounttoCJDN(1645,57771
+void LongCounttoCJDNA(1657,58128
+int LongCountStoCJDN(1663,58389
+void LongCountStoCJDNA(1683,58922
+double LongCounttoCJD(1688,59094
+void LongCounttoCJDA(1695,59373
+double LongCountStoCJD(1701,59632
+void LongCountStoCJDA(1706,59789
 
 cluster.c,80
 static char rcsid[rcsid14,299
@@ -897,9 +1218,9 @@ XColor *anaFindBestRGB(anaFindBestRGB694,25523
 void storeColorTable(749,27490
 int getXcolor(812,29692
 int threecolors(850,31103
-int ana_colorComponents(979,35201
-int ana_pixelsto8bit(1068,38342
-int ana_colorstogrey(1191,41669
+int ana_colorComponents(977,35155
+int ana_pixelsto8bit(1066,38296
+int ana_colorstogrey(1191,41691
 
 contour.c,437
 static char rcsid[rcsid11,198
@@ -928,7 +1249,7 @@ int coordMap(25,717
 int coordTrf(33,1011
 int ana_coordtrf(201,4558
 
-crunch.c,3075
+crunch.c,3076
 byte bits[bits17,876
 int	crunch_bits;18,913
 float	crunch_bpp;19,930
@@ -939,84 +1260,84 @@ int ana_crunch(53,2257
 int ana_crunch_f(58,2407
 int docrunch(63,2559
 int ana_decrunch(140,4963
-void bitprint(210,7221
-int anacrunch32(221,7534
-  struct compresshead 225,7743
-    int     tsize,226,7767
-    int     tsize,nblocks,226,7767
-    int     tsize,nblocks,bsize;226,7767
-    byte    slice_size,227,7800
-    byte    slice_size,type;227,7800
-  union { int i;233,7959
-  union { int i; short w;233,7959
-  union { int i; short w; unsigned char b[b233,7959
-  union { long long l64;234,8010
-  union { long long l64; unsigned char b[b234,8010
-int anacrunch(360,13015
-  struct compresshead 364,13224
-    int     tsize,365,13248
-    int     tsize,nblocks,365,13248
-    int     tsize,nblocks,bsize;365,13248
-    byte    slice_size,366,13281
-    byte    slice_size,type;366,13281
-  union { int i;371,13411
-  union { int i; short w;371,13411
-  union { int i; short w; unsigned char b[b371,13411
-int anacrunch8(475,17624
-  struct compresshead 479,17832
-    int     tsize,480,17856
-    int     tsize,nblocks,480,17856
-    int     tsize,nblocks,bsize;480,17856
-    byte    slice_size,481,17889
-    byte    slice_size,type;481,17889
-  union { int i;486,18019
-  union { int i; short w;486,18019
-  union { int i; short w; unsigned char b[b486,18019
-void swapl(576,21696
-void swapd(601,22131
-int swapb(615,22640
-int anadecrunch32(626,23000
-  union { int i;635,23269
-  union { int i; short w;635,23269
-  union { int i; short w; unsigned char b[b635,23269
-  union { long long l64;636,23320
-  union { long long l64; unsigned char b[b636,23320
-int anadecrunch(795,28437
-  union { int i;803,28681
-  union { int i; short w;803,28681
-  union { int i; short w; unsigned char b[b803,28681
-int anadecrunch8(902,32394
-  union { int i;912,32701
-  union { int i; short w;912,32701
-  union { int i; short w; unsigned char b[b912,32701
-int anacrunchrun(998,35951
-  struct compresshead 1002,36163
-    int     tsize,1003,36187
-    int     tsize,nblocks,1003,36187
-    int     tsize,nblocks,bsize;1003,36187
-    byte    slice_size,1004,36220
-    byte    slice_size,type;1004,36220
-  union { int i;1012,36437
-  union { int i; short w;1012,36437
-  union { int i; short w; unsigned char b[b1012,36437
-int anacrunchrun8(1175,42923
-  struct compresshead 1179,43134
-    int     tsize,1180,43158
-    int     tsize,nblocks,1180,43158
-    int     tsize,nblocks,bsize;1180,43158
-    byte    slice_size,1181,43191
-    byte    slice_size,type;1181,43191
-  union { int i;1188,43370
-  union { int i; short w;1188,43370
-  union { int i; short w; unsigned char b[b1188,43370
-int anadecrunchrun(1349,49656
-  union { int i;1358,49986
-  union { int i; short w;1358,49986
-  union { int i; short w; unsigned char b[b1358,49986
-int anadecrunchrun8(1491,54852
-  union { int i;1500,55182
-  union { int i; short w;1500,55182
-  union { int i; short w; unsigned char b[b1500,55182
+void bitprint(217,7292
+int anacrunch32(228,7605
+  struct compresshead 232,7814
+    int     tsize,233,7838
+    int     tsize,nblocks,233,7838
+    int     tsize,nblocks,bsize;233,7838
+    byte    slice_size,234,7871
+    byte    slice_size,type;234,7871
+  union { int i;240,8023
+  union { int i; short w;240,8023
+  union { int i; short w; unsigned char b[b240,8023
+  union { long long l64;241,8074
+  union { long long l64; unsigned char b[b241,8074
+int anacrunch(366,13053
+  struct compresshead 370,13262
+    int     tsize,371,13286
+    int     tsize,nblocks,371,13286
+    int     tsize,nblocks,bsize;371,13286
+    byte    slice_size,372,13319
+    byte    slice_size,type;372,13319
+  union { int i;377,13442
+  union { int i; short w;377,13442
+  union { int i; short w; unsigned char b[b377,13442
+int anacrunch8(480,17629
+  struct compresshead 484,17837
+    int     tsize,485,17861
+    int     tsize,nblocks,485,17861
+    int     tsize,nblocks,bsize;485,17861
+    byte    slice_size,486,17894
+    byte    slice_size,type;486,17894
+  union { int i;491,18017
+  union { int i; short w;491,18017
+  union { int i; short w; unsigned char b[b491,18017
+void swapl(580,21668
+void swapd(605,22103
+int swapb(619,22612
+int anadecrunch32(630,22972
+  union { int i;639,23241
+  union { int i; short w;639,23241
+  union { int i; short w; unsigned char b[b639,23241
+  union { long long l64;640,23292
+  union { long long l64; unsigned char b[b640,23292
+int anadecrunch(799,28409
+  union { int i;807,28653
+  union { int i; short w;807,28653
+  union { int i; short w; unsigned char b[b807,28653
+int anadecrunch8(906,32366
+  union { int i;916,32673
+  union { int i; short w;916,32673
+  union { int i; short w; unsigned char b[b916,32673
+int anacrunchrun(1002,35923
+  struct compresshead 1006,36135
+    int     tsize,1007,36159
+    int     tsize,nblocks,1007,36159
+    int     tsize,nblocks,bsize;1007,36159
+    byte    slice_size,1008,36192
+    byte    slice_size,type;1008,36192
+  union { int i;1016,36402
+  union { int i; short w;1016,36402
+  union { int i; short w; unsigned char b[b1016,36402
+int anacrunchrun8(1178,42862
+  struct compresshead 1182,43073
+    int     tsize,1183,43097
+    int     tsize,nblocks,1183,43097
+    int     tsize,nblocks,bsize;1183,43097
+    byte    slice_size,1184,43130
+    byte    slice_size,type;1184,43130
+  union { int i;1191,43302
+  union { int i; short w;1191,43302
+  union { int i; short w; unsigned char b[b1191,43302
+int anadecrunchrun(1351,49562
+  union { int i;1360,49889
+  union { int i; short w;1360,49889
+  union { int i; short w; unsigned char b[b1360,49889
+int anadecrunchrun8(1493,54744
+  union { int i;1502,55071
+  union { int i; short w;1502,55071
+  union { int i; short w; unsigned char b[b1502,55071
 
 cubic.c,27
 int ana_cubic_spline(2,79
@@ -1145,18 +1466,18 @@ char *prevBOW(prevBOW394,10326
 char *nextEOE(nextEOE405,10579
 char *prevBOE(prevBOE504,12465
 void close_groups(595,14371
-int strsame(671,15765
-#define SEVERAL	682,16038
-void completeWord(683,16056
-void help(802,19036
-void transpose(822,19950
-static char	historyLine[historyLine839,20446
-static int	historyIndex 840,20493
-void inHistory(842,20579
-int readHistory(856,21006
-int saveHistory(877,21504
-int charpending(895,22027
-int getNewLine(918,22840
+int strsame(670,15744
+#define SEVERAL	681,16017
+void completeWord(682,16035
+void help(801,19015
+void transpose(821,19929
+static char	historyLine[historyLine838,20425
+static int	historyIndex 839,20472
+void inHistory(841,20558
+int readHistory(855,20985
+int saveHistory(876,21483
+int charpending(894,22006
+int getNewLine(917,22819
 
 endian.c,86
 int main(3,20
@@ -1247,7 +1568,7 @@ int anaerror(289,7242
 int cerror(308,7665
 int ana_error(347,8718
 
-eval.c,2906
+eval.c,2883
 static char rcsid[rcsid11,220
 char *binOpName[binOpName14,323
 char *binOpSign[binOpSign23,745
@@ -1280,114 +1601,113 @@ void ana_div_sa(4813,120485
 void ana_idiv(5202,130308
 void ana_idiv_as(5381,134017
 void ana_idiv_sa(5560,137689
-int iamod(5740,141410
-int iasmod(5755,141666
-double famod(5772,141945
-double fasmod(5787,142218
-doubleComplex zamod(5803,142463
-doubleComplex zasmod(5830,143158
-void ana_smod(5835,143302
-void ana_smod_as(6276,153438
-void ana_smod_sa(6717,163234
-void ana_mod(7158,173034
-void ana_mod_as(7599,183120
-void ana_mod_sa(8040,192866
-void ana_max(8481,202616
-void ana_max_as(9026,215880
-void ana_max_sa(9598,229622
-void ana_min(9621,230121
-void ana_min_as(10166,243386
-void ana_min_sa(10738,257127
-void ana_eq(10761,257626
-void ana_eq_as(11091,264768
-void ana_eq_sa(11342,270909
-void ana_gt(11364,271374
-void ana_gt_as(11712,279120
-void ana_gt_sa(12041,286492
-void ana_ge(12370,293864
-void ana_ge_as(12718,301666
-void ana_ge_sa(13047,309097
-void ana_lt(13376,316528
-void ana_lt_as(13390,316993
-void ana_lt_sa(13404,317459
-void ana_le(13418,317927
-void ana_le_as(13432,318351
-void ana_le_sa(13446,318793
-void ana_ne(13460,319235
-void ana_ne_as(13790,326381
-void ana_ne_sa(14041,332526
-void ana_and(14055,332975
-void ana_and_as(14118,334335
-void ana_and_sa(14181,335690
-void ana_or(14195,336141
-void ana_or_as(14258,337499
-void ana_or_sa(14321,338852
-void ana_xor(14335,339299
-void ana_xor_as(14398,340668
-void ana_xor_sa(14461,342032
-int ana_string_add(14475,342491
-int evalScalarBinOp(14512,343866
-int evalScalarArrayBinOp(14537,344665
-int evalArrayScalarBinOp(14561,345426
-#define ORDINARY	14585,346187
-#define SCALAR_LEFT	14586,346206
-#define SCALAR_RIGHT	14587,346228
-int evalArrayBinOp(14588,346251
-int evalStringBinOp(14778,353654
-int evalSArrayStringBinOp(14815,354412
-int evalStringSArrayBinOp(14862,355491
-int evalScalarRangeBinOp(14909,356570
-int evalRangeScalarBinOp(14956,358101
-int extractListElem(15001,359491
-int evalListPtr(15082,361827
-int evalStructPtr(15107,362696
-int evalLhs(15244,367170
-int evalExtractRhs(15472,375226
-int eval(16080,395599
-int evals(16534,410559
-#define UNKNOWN	16545,410831
-#define NEXT 16546,410850
-branchInfo checkBranch(16547,410866
-int	pipeExec 16690,415745
-branchInfo checkTree(16691,415776
+int iasmod(5740,141417
+double famod(5757,141696
+double fasmod(5772,141969
+doubleComplex zamod(5788,142214
+doubleComplex zasmod(5815,142909
+void ana_smod(5820,143053
+void ana_smod_as(6261,153189
+void ana_smod_sa(6702,162985
+void ana_mod(7143,172785
+void ana_mod_as(7584,182871
+void ana_mod_sa(8025,192617
+void ana_max(8466,202367
+void ana_max_as(9011,215631
+void ana_max_sa(9583,229373
+void ana_min(9606,229872
+void ana_min_as(10151,243137
+void ana_min_sa(10723,256878
+void ana_eq(10746,257377
+void ana_eq_as(11076,264519
+void ana_eq_sa(11327,270660
+void ana_gt(11349,271125
+void ana_gt_as(11697,278871
+void ana_gt_sa(12026,286243
+void ana_ge(12355,293615
+void ana_ge_as(12703,301417
+void ana_ge_sa(13032,308848
+void ana_lt(13361,316279
+void ana_lt_as(13375,316744
+void ana_lt_sa(13389,317210
+void ana_le(13403,317678
+void ana_le_as(13417,318102
+void ana_le_sa(13431,318544
+void ana_ne(13445,318986
+void ana_ne_as(13775,326132
+void ana_ne_sa(14026,332277
+void ana_and(14040,332726
+void ana_and_as(14103,334086
+void ana_and_sa(14166,335441
+void ana_or(14180,335892
+void ana_or_as(14243,337250
+void ana_or_sa(14306,338603
+void ana_xor(14320,339050
+void ana_xor_as(14383,340419
+void ana_xor_sa(14446,341783
+int ana_string_add(14460,342242
+int evalScalarBinOp(14497,343617
+int evalScalarArrayBinOp(14522,344416
+int evalArrayScalarBinOp(14546,345177
+#define ORDINARY	14570,345938
+#define SCALAR_LEFT	14571,345957
+#define SCALAR_RIGHT	14572,345979
+int evalArrayBinOp(14573,346002
+int evalStringBinOp(14763,353396
+int evalSArrayStringBinOp(14800,354154
+int evalStringSArrayBinOp(14847,355233
+int evalScalarRangeBinOp(14894,356312
+int evalRangeScalarBinOp(14941,357843
+int extractListElem(14986,359233
+int evalListPtr(15067,361569
+int evalStructPtr(15092,362438
+int evalLhs(15230,367023
+int evalExtractRhs(15458,375079
+int eval(16066,395452
+int evals(16520,410412
+#define UNKNOWN	16531,410684
+#define NEXT 16532,410703
+branchInfo checkBranch(16533,410719
+int	pipeExec 16676,415598
+branchInfo checkTree(16677,415629
 
-execute.c,989
+execute.c,998
 static char rcsid[rcsid15,298
 int	nArg,20,435
 int	nArg, currentEVB 20,435
-int	nExecuted 21,478
-char	preserveKey;23,588
-char	*currentRoutineName currentRoutineName25,607
-void fixContext(33,906
-int copyToSym(82,2286
-int copySym(273,8427
-int extractReplace(283,8691
-int ana_replace(364,11530
-#define NOKEY	550,17411
-#define ORKEY	551,17432
-#define MODEKEY	552,17453
-#define ZEROKEY	553,17476
-int matchKey(554,17499
-int matchUserKey(617,19489
-#define PRESERVE_KEY	640,20268
-int internal_routine(641,20294
-int getBody(923,31244
-int usr_routine(953,32201
-int OLDinsert(1308,44618
-int ana_for(1549,54439
-#define ACTION_BREAKPOINT	1881,62907
-#define ACTION_TRACE	1882,62935
-#define ACTION_STEP	1883,62958
-float	CPUtime 1884,62980
-int execute(1885,63001
-int ana_execute(2452,79704
-int compileString(2477,80426
-#define UNDEFINED	2494,80825
-#define INNER	2495,80845
-#define OUTER	2496,80861
-int insert(2498,80878
-int einsert(3842,116706
-int ana_test(5315,155217
+unsigned int internalMode;21,478
+int	nExecuted 22,505
+char	preserveKey;24,601
+char	*currentRoutineName currentRoutineName26,620
+void fixContext(37,1033
+int copyToSym(86,2413
+int copySym(277,8554
+int extractReplace(287,8818
+int ana_replace(368,11657
+#define NOKEY	554,17538
+#define ORKEY	555,17559
+#define MODEKEY	556,17580
+#define ZEROKEY	557,17603
+int matchKey(558,17626
+int matchUserKey(632,19927
+#define PRESERVE_KEY	655,20706
+int internal_routine(656,20732
+int getBody(942,32002
+int usr_routine(972,32959
+int ana_for(1328,45437
+#define ACTION_BREAKPOINT	1660,53905
+#define ACTION_TRACE	1661,53933
+#define ACTION_STEP	1662,53956
+float	CPUtime 1663,53978
+int execute(1664,53999
+int ana_execute(2232,70734
+int compileString(2257,71456
+#define UNDEFINED	2274,71855
+#define INNER	2275,71875
+#define OUTER	2276,71891
+int insert(2278,71908
+int einsert(3622,107736
+int ana_test(5095,146247
 
 fft.c,1727
 static char rcsid[rcsid499,16098
@@ -1412,57 +1732,57 @@ int rfftf1(2367,66812
 int rffti(2489,69333
 int rffti1(2504,69675
 int passf(2620,71676
-int passf2(2859,77545
-int passf3(2919,79469
-int passf4(3005,82377
-int passf5(3109,85938
-int cfftf1(3243,90968
-int cfftf(3372,93609
-int passb(3391,94043
-int passb2(3630,99911
-int passb3(3690,101835
-int passb4(3776,104742
-int passb5(3880,108303
-int cfftb1(4014,113331
-int cfftb(4143,115973
-int cffti1(4162,116426
-int cffti(4279,118449
-int ezfft1d(4302,119046
-int ezfftbd(4420,121131
-int ezfftfd(4467,122057
-int ezfftid(4530,123334
-int radb2d(4545,123688
-int radb3d(4620,125832
-int radb4d(4701,128357
-int radb5d(4825,132243
-int radbgd(4946,136481
-int radf2d(5286,145209
-int radf3d(5361,147302
-int radf4d(5437,149816
-int radf5d(5550,153633
-int radfgd(5665,157863
-int rfftbd(6009,166467
-int rfftb1d(6025,166874
-int rfftfd(6152,169472
-int rfftf1d(6168,169876
-int rfftid(6290,172441
-int rffti1d(6305,172789
-int passfd(6421,174803
-int passf2d(6660,180679
-int passf3d(6720,182607
-int passf4d(6806,185522
-int passf5d(6910,189089
-int cfftf1d(7044,194130
-int cfftfd(7173,196815
-int passbd(7192,197258
-int passb2d(7431,203133
-int passb3d(7491,205061
-int passb4d(7577,207975
-int passb5d(7681,211542
-int cfftb1d(7815,216581
-int cfftbd(7944,219267
-int cffti1d(7963,219729
-int cfftid(8080,221760
+int passf2(2858,77519
+int passf3(2918,79443
+int passf4(3004,82351
+int passf5(3108,85912
+int cfftf1(3242,90942
+int cfftf(3371,93583
+int passb(3390,94017
+int passb2(3628,99859
+int passb3(3688,101783
+int passb4(3774,104690
+int passb5(3878,108251
+int cfftb1(4012,113279
+int cfftb(4141,115921
+int cffti1(4160,116374
+int cffti(4277,118397
+int ezfft1d(4300,118994
+int ezfftbd(4418,121079
+int ezfftfd(4465,122005
+int ezfftid(4528,123282
+int radb2d(4543,123636
+int radb3d(4618,125780
+int radb4d(4699,128305
+int radb5d(4823,132191
+int radbgd(4944,136429
+int radf2d(5284,145157
+int radf3d(5359,147250
+int radf4d(5435,149764
+int radf5d(5548,153581
+int radfgd(5663,157811
+int rfftbd(6007,166415
+int rfftb1d(6023,166822
+int rfftfd(6150,169420
+int rfftf1d(6166,169824
+int rfftid(6288,172389
+int rffti1d(6303,172737
+int passfd(6419,174751
+int passf2d(6657,180601
+int passf3d(6717,182529
+int passf4d(6803,185444
+int passf5d(6907,189011
+int cfftf1d(7041,194052
+int cfftfd(7170,196737
+int passbd(7189,197180
+int passb2d(7427,203029
+int passb3d(7487,204957
+int passb4d(7573,207871
+int passb5d(7677,211438
+int cfftb1d(7811,216477
+int cfftbd(7940,219163
+int cffti1d(7959,219625
+int cfftid(8076,221656
 
 filemap.c,286
 static char rcsid[rcsid12,280
@@ -1478,7 +1798,7 @@ int ana_i_file_output(87,3309
 int ana_file_output(134,4691
 int ana_fzarr(285,9371
 
-files.c,5098
+files.c,5095
 #define FMT_INSTALL	75,3027
 #define FMT_CLEANUP	76,3049
 static char rcsid[rcsid78,3072
@@ -1496,342 +1816,346 @@ int	column 109,4229
 static char	fits_head_malloc_flag 111,4246
 static int	runlengthflag 112,4307
 int	byte_count;124,4722
-#define ASK_MORE	127,4830
-#define ERROR_EOF	128,4849
-#define CONT_EOF	129,4869
-#define TRUNCATE_EOF	130,4888
-char *expand_name(expand_name132,4990
-int ana_setenv(189,7296
-int ana_getenv(215,8100
-int ana_spawn(237,8639
-int ana_spawn_f(256,9175
-FILE *openPathFile(openPathFile274,9691
-int ana_ulib(369,12568
-int ana_type(390,13076
-int ana_printf(398,13295
-int ana_printf_f(424,14025
-int format_width 430,14257
-int format_check(431,14301
-int input_format_check(530,17516
-int ana_format_set(643,20874
-static int	pager 723,23103
-static int	printwLines 725,23175
-void setPager(726,23249
-void resetPager(732,23461
-void printwf(738,23608
-void type_ascii_one(754,24011
-char *nextformat(nextformat999,30380
-int type_ascii(1066,32209
-int type_formatted_ascii(1153,34846
-int ana_fprint(1813,52534
-int ana_fprintf(1825,52790
-int ana_close(1845,53303
-int open_file(1865,53764
-int ana_openr_f(1940,56646
-int ana_openw_f(1949,57061
-int ana_openu_f(1955,57281
-int ana_openr(1961,57495
-int ana_openw(1969,57843
-int ana_openu(1975,58055
-int ana_rewindf(1981,58269
-int ana_read(1998,58717
-int readf(2010,59082
-int ana_readf(2028,59554
-int ana_readf_f(2034,59742
-char *moreInput(moreInput2040,59960
-int read_ascii(2082,61332
-int gscanf(2303,68346
-int read_formatted_ascii(2351,69800
-int ana_freadf(2673,80960
-int ana_fread(2693,81513
-int ana_freadf_f(2715,81997
-int ana_assoc_input(2746,82756
-int ana_assoc_output(2894,87422
-FILE *fopenr_sym(fopenr_sym3017,91717
-#define SYNCH_OK	3039,92276
-#define SYNCH_REVERSE	3040,92304
-#define SYNCH_OK	3042,92343
-#define SYNCH_REVERSE	3043,92371
-int ck_synch_hd(3045,92411
-void fz_get_header(3074,93302
-void fz_print_header(3100,94135
-int ana_fzinspect(3126,94814
-int fzhead(3188,96740
-int fzread(3234,98242
-  struct compresshead 3256,98987
-    int     tsize,3257,99011
-    int     tsize, nblocks,3257,99011
-    int     tsize, nblocks, bsize;3257,99011
-    byte    slice_size,3258,99046
-    byte    slice_size, type;3258,99046
-  union { int i;3260,99084
-  union { int i;  byte b[b3260,99084
-int fzwrite(3414,103356
-int fcrunwrite(3592,108887
-int fcwrite(3604,109319
- union { int i;3619,109804
- union { int i;  byte b[b3619,109804
-int ana_fzread(3789,114708
-int ana_fzwrite(3793,114877
-int ana_fzhead(3797,115048
-int ana_fcwrite(3801,115217
-int ana_fcrunwrite(3805,115388
-int ana_fzread_f(3808,115542
-int ana_fzhead_f(3812,115756
-int ana_fzwrite_f(3816,115970
-int ana_fcwrite_f(3820,116157
-int ana_fcrunwrite_f(3824,116344
-int readu(3827,116526
-int writeu(3883,118187
-int ana_readu(3935,119648
-int ana_readu_f(3939,119818
-int ana_writeu(3943,120001
-int ana_writeu_f(3947,120173
-int astore(3951,120358
-int ana_astore(4043,123045
-int ana_astore_f(4048,123193
-int readunf(4053,123343
-int arestore(4071,124001
-int ana_arestore(4229,129270
-int ana_arestore_f(4234,129422
-int fileptr(4240,129616
-int ana_fileptr(4325,132629
-int ana_fileptr_f(4330,132786
-int ana_dump_lun(4335,132945
-int ana_get_lun(4357,133488
-int ana_chdir(4372,133911
-int ana_filesize(4402,134737
-int ana_freads(4425,135402
-int ana_freads_f(4435,135855
-int ana_file_to_fz(4459,136558
-char *file_find(file_find4530,138775
-int ana_findfile(4616,141078
-static int	match_flag 4663,142699
-static char	**p;p4665,142780
-static regex_t	re;4667,142814
-#define REG_BASIC	4669,142851
-int ana_getmatchedfiles(4671,142878
-int ana_getmatchedfiles_r(4706,143972
-int file_get(4719,144352
-int directs_get(4802,146803
-int ana_getfiles_r(4870,148882
-int ana_getfiles(4885,149326
-int ana_getdirectories(4950,151347
-int ana_identify_file(4960,151692
-void printw(5071,154724
-void fprintw(5171,158414
-void vfprintfw(5186,158823
-void printfw(5204,159444
-int ana_hex(5217,159787
-#define	HEAD_LIMIT	5282,162671
-int fits_problems(5283,162694
-char *bigger_header(bigger_header5320,164676
-int fits_fatality(5346,165274
-void apply_bscale_bzero_blank(5359,165615
-int ana_fits_read_general(5493,168623
-int ana_fits_read(5532,169773
-int ana_fits_read_f(5537,169939
-int ana_fits_header_f(5542,170107
-int ana_fits_xread_f(5567,170788
-int fits_read_compressed(5601,171827
-int fits_read(5913,180581
-  struct ext_params 5936,181663
-    int	repeat;5937,181685
-    int	type;5938,181701
-    double	scale,5939,181715
-    double	scale, zero;5939,181715
-    char	*lab;lab5940,181739
-int ana_fits_write_general(6602,203170
-int ana_fits_write(6880,211818
-int ana_fits_write_f(6885,211986
-int ana_fileread(6890,212156
-int ana_filewrite(6955,214208
+#define ASK_MORE	129,4879
+#define ERROR_EOF	130,4898
+#define CONT_EOF	131,4918
+#define TRUNCATE_EOF	132,4937
+char *expand_name(expand_name134,5039
+int ana_setenv(191,7345
+int ana_getenv(217,8149
+int ana_spawn(239,8688
+int ana_spawn_f(258,9230
+FILE *openPathFile(openPathFile276,9752
+int ana_ulib(371,12629
+int ana_type(392,13137
+int ana_printf(400,13356
+int ana_printf_f(426,14086
+int format_width 432,14318
+int format_check(433,14362
+int input_format_check(532,17577
+int ana_format_set(645,20920
+static int	pager 725,23149
+static int	printwLines 727,23221
+void setPager(728,23295
+void resetPager(734,23507
+void printwf(740,23654
+void type_ascii_one(756,24057
+char *nextformat(nextformat1001,30426
+int type_ascii(1068,32255
+int type_formatted_ascii(1155,34892
+int ana_fprint(1815,52580
+int ana_fprintf(1827,52836
+int ana_close(1847,53349
+int open_file(1867,53810
+int ana_openr_f(1942,56692
+int ana_openw_f(1951,57107
+int ana_openu_f(1957,57327
+int ana_openr(1963,57541
+int ana_openw(1971,57889
+int ana_openu(1977,58101
+int ana_rewindf(1983,58315
+int ana_read(2000,58763
+int readf(2012,59128
+int ana_readf(2030,59600
+int ana_readf_f(2036,59788
+char *moreInput(moreInput2042,60006
+int read_ascii(2084,61378
+int gscanf(2306,68442
+int read_formatted_ascii(2351,69698
+int ana_freadf(2668,80709
+int ana_fread(2688,81262
+int ana_freadf_f(2710,81746
+int ana_assoc_input(2741,82505
+int ana_assoc_output(2889,87171
+FILE *fopenr_sym(fopenr_sym3012,91466
+#define SYNCH_OK	3034,92031
+#define SYNCH_REVERSE	3035,92059
+#define SYNCH_OK	3037,92098
+#define SYNCH_REVERSE	3038,92126
+int ck_synch_hd(3040,92166
+void fz_get_header(3067,93047
+void fz_print_header(3093,93880
+int ana_fzinspect(3119,94559
+int fzhead(3181,96478
+int fzread(3227,97973
+  struct compresshead 3249,98718
+    int     tsize,3250,98742
+    int     tsize, nblocks,3250,98742
+    int     tsize, nblocks, bsize;3250,98742
+    byte    slice_size,3251,98777
+    byte    slice_size, type;3251,98777
+  union { int i;3254,98835
+  union { int i;  byte b[b3254,98835
+int fzwrite(3407,103087
+int fcrunwrite(3585,108626
+int fcwrite(3597,109058
+ union { int i;3612,109539
+ union { int i;  byte b[b3612,109539
+int ana_fzread(3782,114455
+int ana_fzwrite(3786,114624
+int ana_fzhead(3790,114795
+int ana_fcwrite(3794,114964
+int ana_fcrunwrite(3798,115135
+int ana_fzread_f(3801,115289
+int ana_fzhead_f(3805,115503
+int ana_fzwrite_f(3809,115717
+int ana_fcwrite_f(3813,115904
+int ana_fcrunwrite_f(3817,116091
+int readu(3820,116273
+int writeu(3876,117934
+int ana_readu(3928,119395
+int ana_readu_f(3932,119565
+int ana_writeu(3936,119748
+int ana_writeu_f(3940,119920
+int astore(3944,120105
+int ana_astore(4036,122792
+int ana_astore_f(4041,122940
+int readunf(4046,123090
+int arestore(4064,123748
+int ana_arestore(4222,129017
+int ana_arestore_f(4227,129169
+int fileptr(4233,129363
+int ana_fileptr(4318,132376
+int ana_fileptr_f(4323,132533
+int ana_dump_lun(4328,132692
+int ana_get_lun(4350,133235
+int ana_chdir(4365,133658
+int ana_filesize(4395,134484
+int ana_freads(4418,135149
+int ana_freads_f(4428,135602
+int ana_file_to_fz(4452,136305
+char *file_find(file_find4523,138522
+int ana_findfile(4609,140825
+static int	nfiles 4656,142458
+static char	**p;p4657,142486
+static regex_t	re;4659,142520
+#define REG_BASIC	4661,142557
+int ana_getmatchedfiles(4663,142584
+int ana_getmatchedfiles_r(4698,143678
+int file_get(4711,144058
+int directs_get(4794,146509
+int ana_getfiles_r(4862,148588
+int ana_getfiles(4877,149032
+int ana_getdirectories(4942,151053
+int ana_identify_file(4952,151398
+void printw(5063,154436
+void fprintw(5163,158126
+void vfprintfw(5178,158535
+void printfw(5196,159156
+int ana_hex(5209,159499
+#define	HEAD_LIMIT	5273,162351
+int fits_problems(5274,162374
+char *bigger_header(bigger_header5311,164356
+int fits_fatality(5337,164954
+void apply_bscale_bzero_blank(5350,165295
+int ana_fits_read_general(5484,168303
+int ana_fits_read(5523,169459
+int ana_fits_read_f(5528,169625
+int ana_fits_header_f(5533,169793
+int ana_fits_xread_f(5558,170480
+int fits_read_compressed(5592,171525
+int fits_read(5904,180329
+  struct ext_params 5927,181397
+    int	repeat;5928,181419
+    int	type;5929,181435
+    double	scale,5930,181449
+    double	scale, zero;5930,181449
+    char	*lab;lab5931,181473
+int ana_fits_write_general(6592,202859
+int ana_fits_write(6870,211519
+int ana_fits_write_f(6875,211687
+int ana_fileread(6880,211857
+int ana_filewrite(6945,213909
 
 fit.c,480
 static char rcsid[rcsid15,360
 char    PoissonChiSq;18,461
-double gaussians(21,610
-double powerfunc(61,1893
-int ana_generalfit(83,2539
-  byte  *b;b669,21788
-  unsigned short        *w;w670,21800
-  unsigned int  *l;l671,21828
-  float *f;f672,21848
-  double        *d;d673,21860
-} uscalar;674,21880
-void denan(677,21942
-void printgene(712,22750
-void printgenenl(753,23582
-int hasnan(759,23758
-void calculate_distribution(797,24731
-int ana_geneticfit(837,25689
+double gaussians(23,680
+double powerfunc(63,1963
+int ana_generalfit(85,2609
+  byte  *b;b667,21661
+  unsigned short        *w;w668,21673
+  unsigned int  *l;l669,21701
+  float *f;f670,21721
+  double        *d;d671,21733
+} uscalar;672,21753
+void denan(675,21815
+void printgene(710,22623
+void printgenenl(751,23455
+int hasnan(757,23631
+void calculate_distribution(795,24604
+int ana_geneticfit(835,25562
 
 float.c,16
 void main(4,40
 
-fun1.c,5194
-static char rcsid[rcsid17,351
-static	int	result_sym;28,943
-enum fd 33,1118
-  F_SIN,34,1128
-  F_SIN, F_COS,34,1128
-  F_SIN, F_COS, F_TAN,34,1128
-  F_SIN, F_COS, F_TAN, F_ASIN,34,1128
-  F_SIN, F_COS, F_TAN, F_ASIN, F_ACOS,34,1128
-  F_SIN, F_COS, F_TAN, F_ASIN, F_ACOS, F_ATAN,34,1128
-  F_SIN, F_COS, F_TAN, F_ASIN, F_ACOS, F_ATAN, F_SINH,34,1128
-  F_SIN, F_COS, F_TAN, F_ASIN, F_ACOS, F_ATAN, F_SINH, F_COSH,34,1128
-  F_SIN, F_COS, F_TAN, F_ASIN, F_ACOS, F_ATAN, F_SINH, F_COSH, F_TANH,34,1128
-  F_SQRT,35,1199
-  F_SQRT, F_CBRT,35,1199
-  F_SQRT, F_CBRT, F_EXP,35,1199
-  F_SQRT, F_CBRT, F_EXP, F_EXPM1,35,1199
-  F_SQRT, F_CBRT, F_EXP, F_EXPM1, F_LOG,35,1199
-  F_SQRT, F_CBRT, F_EXP, F_EXPM1, F_LOG, F_LOG10,35,1199
-  F_SQRT, F_CBRT, F_EXP, F_EXPM1, F_LOG, F_LOG10, F_LOG1P,35,1199
-  F_SQRT, F_CBRT, F_EXP, F_EXPM1, F_LOG, F_LOG10, F_LOG1P, F_ERF,35,1199
-  F_SQRT, F_CBRT, F_EXP, F_EXPM1, F_LOG, F_LOG10, F_LOG1P, F_ERF, F_ERFC,35,1199
-  F_J0,36,1273
-  F_J0, F_J1,36,1273
-  F_J0, F_J1, F_Y0,36,1273
-  F_J0, F_J1, F_Y0, F_Y1,36,1273
-  F_J0, F_J1, F_Y0, F_Y1, F_GAMMA,36,1273
-  F_J0, F_J1, F_Y0, F_Y1, F_GAMMA, F_LOGGAMMA,36,1273
-  F_J0, F_J1, F_Y0, F_Y1, F_GAMMA, F_LOGGAMMA, F_I0,36,1273
-  F_J0, F_J1, F_Y0, F_Y1, F_GAMMA, F_LOGGAMMA, F_I0, F_I1,36,1273
-  F_J0, F_J1, F_Y0, F_Y1, F_GAMMA, F_LOGGAMMA, F_I0, F_I1, F_K0,36,1273
-  F_J0, F_J1, F_Y0, F_Y1, F_GAMMA, F_LOGGAMMA, F_I0, F_I1, F_K0, F_K1,36,1273
-  F_SGN,37,1344
-  F_SGN, F_ASINH,37,1344
-  F_SGN, F_ASINH, F_ACOSH,37,1344
-  F_SGN, F_ASINH, F_ACOSH, F_ATANH37,1344
-enum fdd 40,1383
-  F_ATAN2,41,1394
-  F_ATAN2, F_POW,41,1394
-  F_ATAN2, F_POW, F_VOIGT,41,1394
-  F_ATAN2, F_POW, F_VOIGT, F_BETA,41,1394
-  F_ATAN2, F_POW, F_VOIGT, F_BETA, F_LOGBETA,41,1394
-  F_ATAN2, F_POW, F_VOIGT, F_BETA, F_LOGBETA, F_IGAMMA,41,1394
-  F_ATAN2, F_POW, F_VOIGT, F_BETA, F_LOGBETA, F_IGAMMA, F_CHI2,41,1394
-  F_ATAN2, F_POW, F_VOIGT, F_BETA, F_LOGBETA, F_IGAMMA, F_CHI2, F_STUDENT41,1394
-enum fid 44,1472
-  F_JN,45,1483
-  F_JN, F_YN,45,1483
-  F_JN, F_YN, F_KN45,1483
-enum fddd 48,1506
-  F_NCCHI2,49,1518
-  F_NCCHI2, F_IBETA,49,1518
-  F_NCCHI2, F_IBETA, F_FRATIO49,1518
-int defined(88,2958
-int ana_defined(115,3864
-int ana_delete(129,4703
-int ana_quit(151,5277
-int ana_cputime(165,5609
-int ana_systime(175,5866
-int ana_ctime(189,6285
-int ana_time(201,6562
-int ana_date(217,6934
-int ana_jd(235,7318
-int ana_show(258,8250
-void symdumpswitch(307,9468
-int ana_dump(400,12271
-int ana_zero(480,14392
-int ana_onef(610,17947
-int ana_one(674,19299
-int ana_zerof(745,20592
-int ana_indgen(812,22553
-int ana_neg_func(867,24079
-int ana_isnan(916,25438
-int zapnan(987,27397
-int ana_zapnan(1070,29264
-int ana_zapnan_f(1077,29556
-int ana_abs(1084,29855
-int ana_complexsquare(1178,32139
-int ana_conjugate(1296,35504
-int index_total(1349,36774
-int total(3077,87310
-#undef DEBUG_VOCAL4546,130040
-int ana_total(4548,130138
-int ana_mean(4553,130287
-doubleComplex c_sin(4558,130435
-doubleComplex c_cos(4568,130721
-doubleComplex c_tan(4578,131010
-doubleComplex c_arcsin(4590,131360
-doubleComplex c_arccos(4608,131807
-doubleComplex c_arctan(4626,132257
-doubleComplex c_sinh(4642,132679
-doubleComplex c_cosh(4652,132977
-doubleComplex c_tanh(4662,133277
-doubleComplex c_log(4674,133637
-doubleComplex c_exp(4684,133940
-int ana_sin(4702,134677
-int ana_cos(4707,134827
-int ana_tan(4712,134977
-int ana_asin(4717,135127
-int ana_acos(4722,135279
-int ana_atan(4727,135431
-int ana_sinh(4732,135583
-int ana_cosh(4737,135735
-int ana_tanh(4742,135887
-int ana_asinh(4747,136039
-int ana_acosh(4752,136193
-int ana_atanh(4757,136347
-int ana_sqrt(4762,136501
-int ana_cbrt(4767,136653
-int ana_exp(4772,136805
-int ana_expm1(4777,136955
-int ana_log(4782,137109
-int ana_log10(4787,137259
-int ana_log1p(4792,137413
-int ana_erf(4797,137567
-int ana_erfc(4802,137717
-int ana_atan2(4807,137869
-int ana_j0(4813,138098
-int ana_j1(4818,138246
-int ana_jn(4823,138394
-int ana_y0(4828,138553
-int ana_y1(4833,138701
-int ana_yn(4838,138849
-int ana_pow(4843,139008
-int ana_voigt(4848,139168
-int ana_gamma(4854,139362
-int ana_beta(4861,139661
-int ana_incomplete_gamma(4869,140008
-int ana_chi_square(4875,140240
-int ana_noncentral_chi_square(4881,140474
-int ana_bessel_i0(4887,140723
-int ana_bessel_i1(4893,140916
-int ana_bessel_k0(4899,141109
-int ana_bessel_k1(4905,141302
-int ana_bessel_kn(4911,141495
-int ana_sgn(4917,141699
-int ana_incomplete_beta(4924,141965
-int ana_student(4930,142203
-int ana_f_ratio(4936,142415
-int math_funcs(4942,142625
-int math_funcs_2f(5029,145074
-int math_funcs_i_f(5368,153866
-int math_funcs_3f(5701,162549
-double voigt(5879,166992
-double loggamma(5914,167955
-double gamma(5942,168727
-double incomplete_gamma(5971,169466
-double beta(6036,171127
-double logbeta(6043,171359
-double chi_square(6050,171606
-double incomplete_beta(6057,171877
-double student(6117,173415
-double F(6129,173817
-double non_central_chi_square(6136,174094
-double bessel_i0(6164,174929
-double bessel_i1(6186,175699
-double bessel_k0(6208,176408
-double bessel_k1(6228,177073
-double bessel_kn(6248,177749
-double sgn(6268,178245
-int ana_array_statistics(6279,178511
+foo3.c,15
+int main(4,40
 
-fun2.c,3178
+fun1.c,5216
+static char rcsid[rcsid18,373
+static	int	result_sym;29,965
+enum fd 34,1140
+  F_SIN,35,1150
+  F_SIN, F_COS,35,1150
+  F_SIN, F_COS, F_TAN,35,1150
+  F_SIN, F_COS, F_TAN, F_ASIN,35,1150
+  F_SIN, F_COS, F_TAN, F_ASIN, F_ACOS,35,1150
+  F_SIN, F_COS, F_TAN, F_ASIN, F_ACOS, F_ATAN,35,1150
+  F_SIN, F_COS, F_TAN, F_ASIN, F_ACOS, F_ATAN, F_SINH,35,1150
+  F_SIN, F_COS, F_TAN, F_ASIN, F_ACOS, F_ATAN, F_SINH, F_COSH,35,1150
+  F_SIN, F_COS, F_TAN, F_ASIN, F_ACOS, F_ATAN, F_SINH, F_COSH, F_TANH,35,1150
+  F_SQRT,36,1221
+  F_SQRT, F_CBRT,36,1221
+  F_SQRT, F_CBRT, F_EXP,36,1221
+  F_SQRT, F_CBRT, F_EXP, F_EXPM1,36,1221
+  F_SQRT, F_CBRT, F_EXP, F_EXPM1, F_LOG,36,1221
+  F_SQRT, F_CBRT, F_EXP, F_EXPM1, F_LOG, F_LOG10,36,1221
+  F_SQRT, F_CBRT, F_EXP, F_EXPM1, F_LOG, F_LOG10, F_LOG1P,36,1221
+  F_SQRT, F_CBRT, F_EXP, F_EXPM1, F_LOG, F_LOG10, F_LOG1P, F_ERF,36,1221
+  F_SQRT, F_CBRT, F_EXP, F_EXPM1, F_LOG, F_LOG10, F_LOG1P, F_ERF, F_ERFC,36,1221
+  F_J0,37,1295
+  F_J0, F_J1,37,1295
+  F_J0, F_J1, F_Y0,37,1295
+  F_J0, F_J1, F_Y0, F_Y1,37,1295
+  F_J0, F_J1, F_Y0, F_Y1, F_GAMMA,37,1295
+  F_J0, F_J1, F_Y0, F_Y1, F_GAMMA, F_LOGGAMMA,37,1295
+  F_J0, F_J1, F_Y0, F_Y1, F_GAMMA, F_LOGGAMMA, F_I0,37,1295
+  F_J0, F_J1, F_Y0, F_Y1, F_GAMMA, F_LOGGAMMA, F_I0, F_I1,37,1295
+  F_J0, F_J1, F_Y0, F_Y1, F_GAMMA, F_LOGGAMMA, F_I0, F_I1, F_K0,37,1295
+  F_J0, F_J1, F_Y0, F_Y1, F_GAMMA, F_LOGGAMMA, F_I0, F_I1, F_K0, F_K1,37,1295
+  F_SGN,38,1366
+  F_SGN, F_ASINH,38,1366
+  F_SGN, F_ASINH, F_ACOSH,38,1366
+  F_SGN, F_ASINH, F_ACOSH, F_ATANH38,1366
+enum fdd 41,1405
+  F_ATAN2,42,1416
+  F_ATAN2, F_POW,42,1416
+  F_ATAN2, F_POW, F_VOIGT,42,1416
+  F_ATAN2, F_POW, F_VOIGT, F_BETA,42,1416
+  F_ATAN2, F_POW, F_VOIGT, F_BETA, F_LOGBETA,42,1416
+  F_ATAN2, F_POW, F_VOIGT, F_BETA, F_LOGBETA, F_IGAMMA,42,1416
+  F_ATAN2, F_POW, F_VOIGT, F_BETA, F_LOGBETA, F_IGAMMA, F_CHI2,42,1416
+  F_ATAN2, F_POW, F_VOIGT, F_BETA, F_LOGBETA, F_IGAMMA, F_CHI2, F_STUDENT42,1416
+enum fid 45,1494
+  F_JN,46,1505
+  F_JN, F_YN,46,1505
+  F_JN, F_YN, F_KN46,1505
+enum fddd 49,1528
+  F_NCCHI2,50,1540
+  F_NCCHI2, F_IBETA,50,1540
+  F_NCCHI2, F_IBETA, F_FRATIO50,1540
+int defined(89,2980
+int ana_defined(116,3886
+int ana_delete(130,4725
+int ana_quit(152,5299
+int ana_cputime(166,5631
+int ana_systime(176,5888
+int ana_ctime(190,6307
+int ana_time(202,6584
+int ana_date(218,6956
+int ana_jd(236,7340
+int ana_cjd(259,8289
+int ana_show(270,8584
+void symdumpswitch(319,9802
+int ana_dump(411,12568
+int ana_zero(491,14689
+int ana_onef(621,18244
+int ana_one(685,19596
+int ana_zerof(756,20889
+int ana_indgen(823,22850
+int ana_neg_func(878,24376
+int ana_isnan(927,25735
+int zapnan(998,27694
+int ana_zapnan(1081,29561
+int ana_zapnan_f(1088,29853
+int ana_abs(1095,30152
+int ana_complexsquare(1189,32436
+int ana_conjugate(1307,35801
+int index_total(1360,37071
+int total(3088,87619
+#undef DEBUG_VOCAL4557,130355
+int ana_total(4559,130453
+int ana_mean(4564,130602
+doubleComplex c_sin(4569,130750
+doubleComplex c_cos(4579,131036
+doubleComplex c_tan(4589,131325
+doubleComplex c_arcsin(4601,131675
+doubleComplex c_arccos(4619,132122
+doubleComplex c_arctan(4637,132572
+doubleComplex c_sinh(4653,132994
+doubleComplex c_cosh(4663,133292
+doubleComplex c_tanh(4673,133592
+doubleComplex c_log(4685,133952
+doubleComplex c_exp(4695,134255
+int ana_sin(4713,134992
+int ana_cos(4718,135142
+int ana_tan(4723,135292
+int ana_asin(4728,135442
+int ana_acos(4733,135594
+int ana_atan(4738,135746
+int ana_sinh(4743,135898
+int ana_cosh(4748,136050
+int ana_tanh(4753,136202
+int ana_asinh(4758,136354
+int ana_acosh(4763,136508
+int ana_atanh(4768,136662
+int ana_sqrt(4773,136816
+int ana_cbrt(4778,136968
+int ana_exp(4783,137120
+int ana_expm1(4788,137270
+int ana_log(4793,137424
+int ana_log10(4798,137574
+int ana_log1p(4803,137728
+int ana_erf(4808,137882
+int ana_erfc(4813,138032
+int ana_atan2(4818,138184
+int ana_j0(4824,138413
+int ana_j1(4829,138561
+int ana_jn(4834,138709
+int ana_y0(4839,138868
+int ana_y1(4844,139016
+int ana_yn(4849,139164
+int ana_pow(4854,139323
+int ana_voigt(4859,139483
+int ana_gamma(4865,139677
+int ana_beta(4872,139976
+int ana_incomplete_gamma(4880,140323
+int ana_chi_square(4886,140555
+int ana_noncentral_chi_square(4892,140789
+int ana_bessel_i0(4898,141038
+int ana_bessel_i1(4904,141231
+int ana_bessel_k0(4910,141424
+int ana_bessel_k1(4916,141617
+int ana_bessel_kn(4922,141810
+int ana_sgn(4928,142014
+int ana_incomplete_beta(4935,142280
+int ana_student(4941,142518
+int ana_f_ratio(4947,142730
+int math_funcs(4953,142940
+int math_funcs_2f(5040,145389
+int math_funcs_i_f(5379,154181
+int math_funcs_3f(5712,162864
+double voigt(5890,167307
+double loggamma(5925,168270
+double gamma(5953,169042
+double incomplete_gamma(5982,169781
+double beta(6047,171442
+double logbeta(6054,171674
+double chi_square(6061,171921
+double incomplete_beta(6068,172192
+double student(6128,173730
+double F(6140,174132
+double non_central_chi_square(6147,174409
+double bessel_i0(6175,175244
+double bessel_i1(6197,176014
+double bessel_k0(6219,176723
+double bessel_k1(6239,177388
+double bessel_kn(6259,178064
+double sgn(6279,178560
+int ana_array_statistics(6290,178826
+
+fun2.c,3216
 static char rcsid[rcsid20,431
 static	int	result_sym 24,553
 static	int	result_sym , type,24,553
@@ -1839,197 +2163,197 @@ static	int	result_sym , type, detrend_flag;24,553
 static	char	templine[templine25,597
 int ana_runsum(31,935
 int index_sdev(126,4577
-int sdev(745,22615
-int ana_sdev(1265,37302
-int ana_variance(1271,37483
-int ana_swab(1277,37659
-int ana_wait(1315,38719
-int ana_esmooth(1330,39114
-void vargsmoothkernel(1406,41705
-int ana_gsmooth(1474,44444
-int ana_lower(2262,70820
-int ana_upper(2280,71457
-int ana_strpos(2298,72094
-int ana_strcount(2328,73108
-int ana_strreplace(2346,73779
-nc 2383,75048
-*p4 p42385,75156
-int ana_strpbrk(2389,75268
-int ana_strloc(2413,76040
-int ana_strskp(2435,76799
-int ana_skipc(2459,77634
-int ana_strsub(2480,78345
-int ana_strtrim(2501,79004
-int ana_istring(2531,79784
-n=2544,80058
-mode 2545,80064
-mq 2557,80448
-result_sym 2559,80529
-p3 2560,80589
-*(p3 + mq)2562,80661
-int ana_fstring(2566,80777
-int ana_string(2589,81448
-int ana_strlen(2669,83328
-int ana_decomp(2698,84162
-int ana_dsolve(2729,85100
-if (jq != ps[1] ) ana_replace(ps[1], jq);	jq 2759,86158
-h 2760,86212
-q1.l l2761,86250
-h 2762,86294
-q2.l l2763,86332
-int ana_matmul(2776,86679
-int ana_pit(3304,97520
-toptype 3336,98565
-h 3337,98616
-nd 3339,98723
-nd = h->ndim;	nxq 3339,98723
-nd = h->ndim;	nxq = h->dims[0];	outer 3339,98723
-if (nd > 1) for(j=1;j<nd;nd3340,98766
-if (nd > 1) for(j=1;j<nd;j++) outer 3340,98766
-} else 3350,99255
-h 3360,99555
-qybase.l l3361,99595
-h 3362,99643
-qxbase.l l3363,99683
-dim[dim3365,99784
-dim[0] = npow + 1;	dim[dim3365,99784
-	else cfsym 3367,99889
-h 3368,99929
-cfbase 3369,99970
-int cana_pit(3383,100502
-f 3408,101343
-f = fbase; n 3408,101343
-for (k=0;k <= (npow);k++) { sum 3409,101393
-for (k=0;k <= (npow);k++) { sum = 0.0; f 3409,101393
-for (k=0;k <= (npow);k++) { sum = 0.0; f = fbase; n 3409,101393
-for (k=0;k <= (npow);k++) { sum = 0.0; f = fbase; n = nxq; qx.l l3409,101393
-qybase->f += nxq;  if (outerx != 1) qxbase->f += nxq; break;3412,101542
-n 3418,101720
-*a a3419,101758
-for (k=0;k < (2*npow)npow3420,101768
-for (k=0;k < (2*npow);k++) { sum 3420,101768
-for (k=0;k < (2*npow);k++) { sum = 0.0; f 3420,101768
-for (k=0;k < (2*npow);k++) { sum = 0.0; f = fbase; n 3420,101768
-for (k=0;k < (2*npow);k++) { sum = 0.0; f = fbase; n = nxq; qx.l l3420,101768
-	ib 3422,101902
-	ie 3423,101954
-	*( a + i + (npow+1)*(ie+ib-i)i3425,102030
-f 3429,102100
-f = fbase; n 3429,102100
-for (k=0;k <= (npow);k++) { sum 3430,102150
-for (k=0;k <= (npow);k++) { sum = 0.0; f 3430,102150
-for (k=0;k <= (npow);k++) { sum = 0.0; f = fbase; n 3430,102150
-for (k=0;k <= (npow);k++) { sum = 0.0; f = fbase; n = nxq; qx.l l3430,102150
-qybase->d += nxq;  if (outerx != 1) qxbase->d += nxq; break;3433,102299
-int setxpit(3443,102589
-qx.l l3463,103161
-int ana_detrend(3467,103299
-int ana_trend(3476,103638
-int cana_poly(3569,106592
-qzbase->f += nxq; break;3588,107142
-n 3590,107175
-qzbase->d += nxq; break;3599,107449
-int ana_poly(3604,107567
-int ana_strtok(3683,109692
-void ksmooth(3738,111569
-int ana_ksmooth(4286,122904
-int ana_crosscorr(4320,124010
-void wait_sec(4598,133140
+int ana_covariance(745,22615
+int sdev(1264,39041
+int ana_sdev(1797,54197
+int ana_variance(1803,54378
+int ana_swab(1809,54554
+int ana_wait(1847,55614
+int ana_esmooth(1862,56009
+void vargsmoothkernel(1938,58600
+int ana_gsmooth(2006,61339
+int ana_lower(2794,87715
+int ana_upper(2812,88352
+int ana_strpos(2830,88989
+int ana_strcount(2860,90003
+int ana_strreplace(2878,90674
+nc 2915,91943
+*p4 p42917,92051
+int ana_strpbrk(2921,92163
+int ana_strloc(2945,92947
+int ana_strskp(2967,93706
+int ana_skipc(2991,94541
+int ana_strsub(3012,95252
+int ana_strtrim(3033,95911
+int ana_istring(3063,96691
+n=3076,96965
+mode 3077,96971
+mq 3089,97355
+result_sym 3091,97436
+p3 3092,97496
+*(p3 + mq)3094,97568
+int ana_fstring(3098,97684
+int ana_string(3121,98355
+int ana_strlen(3201,100235
+int ana_decomp(3230,101069
+int ana_dsolve(3261,102007
+if (jq != ps[1] ) ana_replace(ps[1], jq);	jq 3291,103065
+h 3292,103119
+q1.l l3293,103157
+h 3294,103201
+q2.l l3295,103239
+int ana_matmul(3308,103586
+int ana_pit(3836,114427
+toptype 3868,115472
+h 3869,115523
+nd 3871,115630
+nd = h->ndim;	nxq 3871,115630
+nd = h->ndim;	nxq = h->dims[0];	outer 3871,115630
+if (nd > 1) for(j=1;j<nd;nd3872,115673
+if (nd > 1) for(j=1;j<nd;j++) outer 3872,115673
+} else 3882,116162
+h 3892,116462
+qybase.l l3893,116502
+h 3894,116550
+qxbase.l l3895,116590
+dim[dim3897,116691
+dim[0] = npow + 1;	dim[dim3897,116691
+	else cfsym 3899,116796
+h 3900,116836
+cfbase 3901,116877
+int cana_pit(3915,117409
+f 3940,118250
+f = fbase; n 3940,118250
+for (k=0;k <= (npow);k++) { sum 3941,118300
+for (k=0;k <= (npow);k++) { sum = 0.0; f 3941,118300
+for (k=0;k <= (npow);k++) { sum = 0.0; f = fbase; n 3941,118300
+for (k=0;k <= (npow);k++) { sum = 0.0; f = fbase; n = nxq; qx.l l3941,118300
+qybase->f += nxq;  if (outerx != 1) qxbase->f += nxq; break;3944,118449
+n 3950,118627
+*a a3951,118665
+for (k=0;k < (2*npow)npow3952,118675
+for (k=0;k < (2*npow);k++) { sum 3952,118675
+for (k=0;k < (2*npow);k++) { sum = 0.0; f 3952,118675
+for (k=0;k < (2*npow);k++) { sum = 0.0; f = fbase; n 3952,118675
+for (k=0;k < (2*npow);k++) { sum = 0.0; f = fbase; n = nxq; qx.l l3952,118675
+	ib 3954,118809
+	ie 3955,118861
+	*( a + i + (npow+1)*(ie+ib-i)i3957,118937
+f 3961,119007
+f = fbase; n 3961,119007
+for (k=0;k <= (npow);k++) { sum 3962,119057
+for (k=0;k <= (npow);k++) { sum = 0.0; f 3962,119057
+for (k=0;k <= (npow);k++) { sum = 0.0; f = fbase; n 3962,119057
+for (k=0;k <= (npow);k++) { sum = 0.0; f = fbase; n = nxq; qx.l l3962,119057
+qybase->d += nxq;  if (outerx != 1) qxbase->d += nxq; break;3965,119206
+int setxpit(3975,119496
+int ana_detrend(3999,120247
+int ana_trend(4008,120586
+int cana_poly(4100,123518
+qzbase->f += nxq; break;4119,124068
+n 4121,124101
+qzbase->d += nxq; break;4130,124375
+int ana_poly(4135,124493
+int ana_strtok(4213,126606
+void ksmooth(4268,128483
+int ana_ksmooth(4818,139840
+int ana_crosscorr(4852,140946
+void wait_sec(5130,150076
 
-fun3.c,2618
+fun3.c,2621
 static char rcsid[rcsid18,369
 int	ezffti(int *, float *), fade_xsize,21,472
 int	ezffti(int *, float *), fade_xsize, fade_ysize,21,472
 int	ezffti(int *, float *), fade_xsize, fade_ysize, fade_dim[fade_dim21,472
-word	*fade1,fade122,537
-word	*fade1, *fade2;fade222,537
-static	int	nold 26,710
-static pointer	work;27,748
-int evalString(32,982
-int ana_eval(114,3850
-int ana_tense(174,5754
-int ana_tense_curve(218,7519
-n 253,8822
-sigma 254,8848
-sigma = 1.0;	der_left 254,8848
-sigma = 1.0;	der_left = 0.0;	der_right 254,8848
-sigma 258,9045
-dim[dim259,9062
-dim[0] = nf = len[2];	dim[dim259,9062
-result_sym 260,9096
-h 261,9135
-xf 262,9181
-yf 263,9226
-st 265,9286
-iq 266,9320
-int ana_tense_loop(272,9569
-n 306,10869
-sigma 307,10895
-sigma 309,10966
-dim[dim310,10983
-dim[0] = nf = len[2];	dim[dim310,10983
-result_sym 311,11017
-h 312,11056
-xf 313,11102
-yf 314,11147
-st 317,11243
-iq 318,11277
-int ana_sc(324,11504
-#define SQRTHALF	402,13734
-#define SQRTWO	403,13771
-int fft(404,13807
-int single_fft(707,21853
-int cfft(753,22758
-int ana_fft_f(1022,30229
-int ana_fft(1030,30453
-int ana_sccomplex(1038,30675
-int ana_real(1456,45752
-int ana_imaginary(1504,46973
-int ana_arg(1552,48231
-int ana_complex(1654,50584
-int ana_hilbert(1665,50988
-int fftshift(1831,55603
-int ana_fftshift(2032,61144
-int ana_fftshift_f(2037,61296
-int ana_power(2042,61450
-int ana_scb(2186,65132
-int ana_histr(2321,69277
-int findint(2357,70580
-int ana_hist_dense(2379,71213
-int ana_hist(2467,74054
-int ana_sieve(2575,77338
-int ana_maxf(2873,83348
-int index_maxormin(2881,83575
-int maxormin(3235,91732
-int ana_minf(3508,99220
-int ana_minloc(3514,99412
-int ana_maxloc(3521,99609
-void scale(3528,99806
-int ana_scale(3751,104824
-int ana_scalerange(3838,107401
-int minmax(3945,111186
-int simple_scale(4046,113575
-int neutral(4182,117033
-const csplineInfo empty_cubic_spline(4212,117616
-void cleanup_cubic_spline_tables(4217,117794
-int cubic_spline_tables(4226,118079
-double cspline_value(4342,120817
-double cspline_derivative(4349,121161
-void cspline_value_and_derivative(4358,121568
-double cspline_second_derivative(4366,121931
-#define LIMIT	4373,122250
-double find_cspline_value(4374,122267
-void find_cspline_extremes(4424,123664
-int ana_cubic_spline(4519,126305
-int ana_cubic_spline_extreme(4625,130262
-int ana_strtol(4917,138407
-unsigned int bitmask[bitmask4938,138986
-static unsigned int bits[bits4942,139134
-int ana_extract_bits_f(4945,139248
-int ana_extract_bits(4960,139783
-int extract_bits(4974,140292
-int ana_fade_init(5010,141446
-int ana_fade(5060,143026
+word	*fade1,fade128,743
+word	*fade1, *fade2;fade228,743
+static	int	nold 32,916
+static pointer	work;33,954
+int evalString(39,1237
+int ana_eval(121,4105
+int ana_tense(181,6009
+int ana_tense_curve(225,7774
+n 260,9077
+sigma 261,9103
+sigma = 1.0;	der_left 261,9103
+sigma = 1.0;	der_left = 0.0;	der_right 261,9103
+sigma 265,9300
+dim[dim266,9317
+dim[0] = nf = len[2];	dim[dim266,9317
+result_sym 267,9351
+h 268,9390
+xf 269,9436
+yf 270,9481
+st 272,9541
+iq 273,9575
+int ana_tense_loop(279,9824
+n 313,11124
+sigma 314,11150
+sigma 316,11221
+dim[dim317,11238
+dim[0] = nf = len[2];	dim[dim317,11238
+result_sym 318,11272
+h 319,11311
+xf 320,11357
+yf 321,11402
+st 324,11498
+iq 325,11532
+int ana_sc(331,11759
+#define SQRTHALF	409,13989
+#define SQRTWO	410,14026
+int fft(411,14062
+int single_fft(714,22108
+int cfft(766,23231
+int ana_fft_f(1035,30702
+int ana_fft(1043,30926
+int ana_sccomplex(1051,31148
+int ana_real(1469,46225
+int ana_imaginary(1517,47446
+int ana_arg(1565,48704
+int ana_complex(1667,51057
+int ana_hilbert(1678,51461
+int fftshift(1842,56092
+int ana_fftshift(2043,61633
+int ana_fftshift_f(2048,61785
+int ana_power(2053,61939
+int ana_scb(2197,65621
+int ana_histr(2331,69733
+int findint(2367,71036
+int ana_hist_dense(2389,71669
+int ana_hist(2477,74510
+int ana_sieve(2586,77837
+int ana_maxf(2884,83847
+int index_maxormin(2892,84074
+int maxormin(3246,92231
+int ana_minf(3521,99741
+int ana_minloc(3527,99933
+int ana_maxloc(3534,100130
+void scale(3541,100327
+int ana_scale(3764,105345
+int ana_scalerange(3850,107891
+int minmax(3956,111645
+int simple_scale(4057,114034
+int neutral(4193,117492
+const csplineInfo empty_cubic_spline(4223,118075
+void cleanup_cubic_spline_tables(4228,118253
+int cubic_spline_tables(4237,118538
+double cspline_value(4353,121273
+double cspline_derivative(4360,121617
+void cspline_value_and_derivative(4369,122024
+double cspline_second_derivative(4377,122387
+#define LIMIT	4384,122706
+double find_cspline_value(4385,122723
+void find_cspline_extremes(4435,124120
+int ana_cubic_spline(4530,126761
+int ana_cubic_spline_extreme(4636,130718
+int ana_strtol(4930,138885
+unsigned int bitmask[bitmask4951,139464
+static unsigned int bits[bits4955,139612
+int ana_extract_bits_f(4958,139726
+int ana_extract_bits(4973,140261
+int extract_bits(4987,140770
+int ana_fade_init(5023,141924
+int ana_fade(5073,143489
 
 fun4.c,2229
 static char rcsid[rcsid11,193
@@ -2056,56 +2380,56 @@ int ana_getmin2(805,22326
 int getminSYM(828,23093
 void getmin(849,23825
 int getmin2(893,25079
-int expandImage(911,25737
-int ana_expand(1101,30705
-static int regridtypeflag,1130,31346
-static int regridtypeflag, stretchmark_flag,1130,31346
-static int regridtypeflag, stretchmark_flag, regrid_type,1130,31346
-  nm1,1131,31404
-  nm1, mm1,1131,31404
-  nm1, mm1, nm2,1131,31404
-  nm1, mm1, nm2, mm2,1131,31404
-  nm1, mm1, nm2, mm2, n;1131,31404
-static float	fnm1,1132,31429
-static float	fnm1, fnm5,1132,31429
-static float	fnm1, fnm5, fmm1,1132,31429
-static float	fnm1, fnm5, fmm1, fmm5,1132,31429
-static float	fnm1, fnm5, fmm1, fmm5, xl,1132,31429
-static float	fnm1, fnm5, fmm1, fmm5, xl, yl;1132,31429
-static pointer	base,1133,31474
-static pointer	base, out;1133,31474
-void bicubic_f(1136,31533
-void bicubic_fc(1271,36869
-int ana_regrid(1460,42729
-int ana_regrid3(1468,43016
-int ana_regrid3ns(1480,43512
-int regrid_common(1492,44024
-int ana_compress(1764,51901
-int ana_oldcompress(1962,58078
-int ana_sort(2055,60813
-int ana_index(2120,63144
-static char	*zoomtemp zoomtemp2176,65300
-int zoomer2(2177,65338
-int zoomer3(2299,68297
-int zoomer4(2374,70206
-int zoomer8(2444,71982
-  union	{ byte	bb[bb2453,72331
-  union	{ byte	bb[4];   int  ii;2453,72331
-int zoomer16(2513,73817
-  union	{ byte	bb[bb2522,74170
-  union	{ byte	bb[4];   int  ii;2522,74170
-int compress2(2638,76896
-int compress4(2692,78269
-void shift_bicubic(2762,79888
-int ana_shift3(3030,86358
-void interpolate(3082,88068
-int ana_regridls(3179,91821
-int bigger235(3285,95858
-int ana_bigger235(3367,98143
-int ana_cartesian_to_polar(3396,98830
-int ana_polar_to_cartesian(3468,101009
+int expandImage(909,25644
+int ana_expand(1098,30590
+static int regridtypeflag,1127,31231
+static int regridtypeflag, stretchmark_flag,1127,31231
+static int regridtypeflag, stretchmark_flag, regrid_type,1127,31231
+  nm1,1128,31289
+  nm1, mm1,1128,31289
+  nm1, mm1, nm2,1128,31289
+  nm1, mm1, nm2, mm2,1128,31289
+  nm1, mm1, nm2, mm2, n;1128,31289
+static float	fnm1,1129,31314
+static float	fnm1, fnm5,1129,31314
+static float	fnm1, fnm5, fmm1,1129,31314
+static float	fnm1, fnm5, fmm1, fmm5,1129,31314
+static float	fnm1, fnm5, fmm1, fmm5, xl,1129,31314
+static float	fnm1, fnm5, fmm1, fmm5, xl, yl;1129,31314
+static pointer	base,1130,31359
+static pointer	base, out;1130,31359
+void bicubic_f(1133,31418
+void bicubic_fc(1268,36754
+int ana_regrid(1457,42614
+int ana_regrid3(1465,42901
+int ana_regrid3ns(1477,43397
+int regrid_common(1489,43909
+int ana_compress(1761,51786
+int ana_oldcompress(1959,57963
+int ana_sort(2052,60699
+int ana_index(2117,63030
+static char	*zoomtemp zoomtemp2173,65184
+int zoomer2(2174,65222
+int zoomer3(2295,68161
+int zoomer4(2369,70050
+int zoomer8(2439,71826
+  union	{ byte	bb[bb2448,72168
+  union	{ byte	bb[4];   int  ii;2448,72168
+int zoomer16(2508,73647
+  union	{ byte	bb[bb2517,73993
+  union	{ byte	bb[4];   int  ii;2517,73993
+int compress2(2633,76712
+int compress4(2686,78064
+void shift_bicubic(2755,79663
+int ana_shift3(3023,86133
+void interpolate(3075,87843
+int ana_regridls(3172,91588
+int bigger235(3278,95622
+int ana_bigger235(3360,97904
+int ana_cartesian_to_polar(3389,98591
+int ana_polar_to_cartesian(3461,100770
 
-fun5.c,1385
+fun5.c,1334
 static char rcsid[rcsid11,248
 static double	subdx,14,350
 static double	subdx, subdy;14,350
@@ -2129,20 +2453,18 @@ static double	a1, a2, a3,a4,a5, a6, a7, a8, a9 ,a10, a11, a12, a13, a14, a15;16
 double	meritc;18,503
 int ana_subshift(20,597
 int ana_subshiftc(55,1633
-int ana_fluxcell(107,3309
-void fluxcell(152,4693
-double mert(172,5113
-double mertc(185,5499
-double sxvalue(193,5749
-double syvalue(217,6688
-void getsxsy(241,7627
-void  subshift(277,8963
-double sxvaluec(766,23316
-double syvaluec(789,24031
-double  subshiftc(812,24744
-double  subshiftc_apod(901,26520
-int ana_dilate(996,28486
-int ana_erode(1116,31963
+double mert(107,3309
+double mertc(120,3695
+double sxvalue(128,3945
+double syvalue(152,4884
+void getsxsy(176,5823
+void  subshift(212,7159
+double sxvaluec(697,21448
+double syvaluec(720,22163
+double  subshiftc(743,22876
+double  subshiftc_apod(831,24636
+int ana_dilate(925,26586
+int ana_erode(1045,30063
 
 fun6.c,294
 static void rdct_spike(7,170
@@ -2160,7 +2482,7 @@ int ana_reorder(494,14254
 getcharcodes.c,16
 void main(6,79
 
-gifread_ana.c,1510
+gifread_ana.c,1509
  struct GIFScreen 9,200
         char id[id10,220
         unsigned char width_lsb;11,240
@@ -2201,13 +2523,13 @@ gifread_ana.c,1510
  static int	nxs, nys;47,1406
 int ana_gifread_f(53,1577
 int ana_gifread(60,1820
-void readextension(157,4979
-void readimage(167,5333
-void loadcolortable(218,7319
-void fatal(238,8090
-void outcode(249,8396
-void process(260,8790
-void readraster(299,10124
+void readextension(154,4806
+void readimage(164,5148
+void loadcolortable(214,7088
+void fatal(234,7859
+void outcode(245,8165
+void process(256,8559
+void readraster(295,9893
 
 gifwrite_ana.c,1971
  struct GIFScreen 12,263
@@ -2232,43 +2554,43 @@ gifwrite_ana.c,1971
         unsigned char mask;32,830
 int ana_gifwrite_f(40,1143
 int ana_gifwrite(47,1388
- static unsigned long cur_accum 132,4698
- static int           cur_bits 133,4735
-#define min(135,4772
-#define XV_BITS 136,4812
-#define MSDOS 137,4881
-#define HSIZE 138,4899
- typedef unsigned char   char_type;140,4951
- static int n_bits;142,4989
- static int maxbits 143,5054
- static int maxcode;144,5129
- static int maxmaxcode 145,5201
-#define MAXCODE(147,5267
- static  int      htab 149,5319
- static  unsigned short codetab 150,5351
-#define HashTabOf(151,5392
-#define CodeTabOf(152,5423
- static int hsize 154,5458
-#define tab_prefixof(165,5952
-#define tab_suffixof(166,5989
-#define de_stack 167,6045
-static int free_ent 169,6118
- static int clear_flg 175,6292
- static long int in_count 176,6319
- static long int out_count 177,6383
- static int g_init_bits;195,7302
- static FILE *g_outfile;g_outfile196,7327
- static int ClearCode;198,7354
- static int EOFCode;199,7377
-static void compress(202,7459
- unsigned long masks[masks323,10216
-static void output(328,10484
-static void cl_block(384,11596
-static void cl_hash(395,11830
-static int a_count;433,12784
- static char accum[accum446,12958
-static void char_out(452,13105
-static void flush_char(462,13271
+ static unsigned long cur_accum 129,4517
+ static int           cur_bits 130,4554
+#define min(132,4591
+#define XV_BITS 133,4631
+#define MSDOS 134,4700
+#define HSIZE 135,4718
+ typedef unsigned char   char_type;137,4770
+ static int n_bits;139,4808
+ static int maxbits 140,4873
+ static int maxcode;141,4948
+ static int maxmaxcode 142,5020
+#define MAXCODE(144,5086
+ static  int      htab 146,5138
+ static  unsigned short codetab 147,5170
+#define HashTabOf(148,5211
+#define CodeTabOf(149,5242
+ static int hsize 151,5277
+#define tab_prefixof(162,5771
+#define tab_suffixof(163,5808
+#define de_stack 164,5864
+static int free_ent 166,5937
+ static int clear_flg 172,6111
+ static long int in_count 173,6138
+ static long int out_count 174,6202
+ static int g_init_bits;192,7121
+ static FILE *g_outfile;g_outfile193,7146
+ static int ClearCode;195,7173
+ static int EOFCode;196,7196
+static void compress(199,7278
+ unsigned long masks[masks320,10035
+static void output(325,10303
+static void cl_block(381,11415
+static void cl_hash(392,11649
+static int a_count;430,12603
+ static char accum[accum443,12777
+static void char_out(449,12924
+static void flush_char(459,13090
 
 hersh.c,3994
 static char rcsid[rcsid12,241
@@ -2412,168 +2734,181 @@ int fmt_entry(49,1491
 formatInfo	theFormat;291,8676
 char *fmttok(fmttok292,8698
 int Sprintf_general(345,10524
-int Sprintf_tok(437,13173
-int Sprintf(452,13665
-char *symbolIdent(symbolIdent468,14201
-int identStruct(1896,52902
-void dumpTree(1965,54705
-void dumpLine(2454,67229
-int ana_list(2461,67432
+int Sprintf_tok(436,13120
+int Sprintf(451,13612
+char *symbolIdent(symbolIdent467,14148
+int identStruct(1895,52849
+void dumpTree(1964,54652
+void dumpLine(2453,67176
+int ana_list(2460,67379
 
 idl.c,54
 int ana_idlrestore(6,110
 int ana_idlread_f(211,5245
 
-install.c,4953
-static char rcsid[rcsid26,1196
-int	nFixed 47,1974
-char	batch 49,2027
-int	traceMode 51,2102
-word	*listStackItem listStackItem53,2158
-int	symbolStackIndex 55,2192
-int	markStack[markStack62,2537
-int	markStack[MSSIZE], markIndex 62,2537
-executionLevelInfo	*exInfo exInfo64,2576
-int	nexInfo 65,2611
-static char	installing 68,2669
-#define MAX_ARG	182,7798
-internalRoutine	subroutine[subroutine256,11552
-int	nSubroutine 665,33010
-internalRoutine function[function790,39436
-int	nFunction 1290,66610
-void undefine(1292,66737
-void zap(1537,74025
-void cleanUp(1626,76479
-void cleanUpRoutine(1667,77920
-void updateIndices(1727,79877
-int nextFreeStackEntry(1739,80312
-int nextFreeNamedVariable(1754,80772
-int nextFreeTempVariable(1774,81538
-int nextFreeTempExecutable(1791,82105
-int nextFreeExecutable(1807,82678
-int nextFreeUndefined(1828,83416
-void pushList(1841,83753
-word popList(1852,84089
-int moveList(1860,84352
-void swapList(1871,84753
-int stackListLength(1881,85035
-void dupList(1897,85442
-void unlinkString(1908,85688
-void freeString(1920,86077
-int installStruct(1928,86344
-int copyElement(1946,87058
-int findTarget(1960,87562
-int newSymbol(2036,90320
-int hash(2751,112031
-int findInternalName(2759,112198
-static compileInfo	*c_info c_info2780,112784
-int	cur_c_info 2781,112819
-compileInfo	*curCompileInfo;curCompileInfo2782,112853
-int nextCompileLevel(2784,112883
-static int	compileCount 2868,115614
-int compile(2869,115643
-int ana_compile(2910,116839
-int newBlockSymbol(2926,117196
-int newSubrSymbol(2966,118492
-int lookForName(3024,120718
-int findSym(3051,121738
-char *symName(symName3070,122290
-char *symbolName(symbolName3092,122917
-int suppressEvalRoutine(3118,123618
-#define	IGNORE_SIG	3131,124008
-#define ASK_SIG	3132,124029
-#define SIG_BREAK	3133,124048
-void exception(3134,124068
-char *typeName(typeName3224,126453
-char *className(className3243,126982
-  static struct classInfo 3246,127047
-    byte number;3247,127075
-    byte number; char *name;name3247,127075
-int ana_classname(3315,129289
-int ana_typeName(3330,129739
-char *evbName(evbName3345,130204
-char *filetypeName(filetypeName3363,130837
-int ana_filetype_name(3377,131354
-void fixedValue(3388,131633
-int installSysFunc(3441,133108
-int installPointer(3455,133498
-int convertRange(3470,133905
-void convertPointer(3532,136287
-void convertWidePointer(3619,138243
-void convertScalar(3807,142255
-int ana_symbol_memory(3914,144418
-int ana_trace(3948,145540
-#define b_fix(3994,146822
-#define l_fix(3995,146899
-#define f_fix(3996,146976
-#define d_fix(3997,147054
-#define s_fix(3998,147133
-#define cf_fix(3999,147213
-#define cd_fix(4000,147294
-#define l_ptr(4001,147375
-#define f_ptr(4002,147440
-#define d_ptr(4003,147506
-#define s_ptr(4004,147573
-#define fnc_p(4005,147645
-char	*defaultRedirect defaultRedirect4007,147701
-int range_warn_flag 4009,147744
-float	contour_dash_lev,4019,148273
-float	contour_dash_lev, contour_tick_fac 4019,148273
-scalar	lastmin,4020,148327
-scalar	lastmin, lastmax,4020,148327
-scalar	lastmin, lastmax, lastmean,4020,148327
-scalar	lastmin, lastmax, lastmean, lastsdev;4020,148327
-char	*firstbreak;firstbreak4064,149877
-enumElem	classesStruct[classesStruct4066,149915
-enumElem	typesStruct[typesStruct4089,150543
-enumElem	eventStruct[eventStruct4101,150824
-enumElem	coordSysStruct[coordSysStruct4112,151081
-enumElem	filetypeStruct[filetypeStruct4123,151243
-struct boundsStruct	bounds 4142,151773
-int	ANA_MATMUL_FUN;4147,151906
-#define	FORMATSIZE	4149,151927
-void symbolInitialization(4150,151951
- union { byte b[b4163,152264
- union { byte b[2]; word w;4163,152264
-int matchInternalName(4558,163050
-void zerobytes(4581,163691
-char *strcasestr(strcasestr4590,163899
-int strncasecmp_p(4611,164617
-int strcasecmp_p(4628,165132
-int	nBreakpoint 4643,165591
-breakpointInfo	breakpoint[breakpoint4644,165612
-int ana_breakpoint(4645,165653
-word	watchVars[watchVars4756,169219
-int	nWatchVars 4757,169247
-int ana_watch(4758,169267
-int ana_symbol_number(4802,170439
-void mark(4812,170713
-void pegMark(4820,170951
-void pegParse(4828,171181
-void zapParseTemps(4836,171413
-void removeParseMarker(4848,171745
-void unMark(4856,172000
-void zapMarked(4868,172214
-void checkTemps(4876,172400
-int ana_restart(4900,173106
-int strccmp(4911,173376
-int structSize(4919,173646
-int makeStruct(4975,175239
-int ana_struct(5070,178344
-int ana_buffering(5148,180849
-int translateEscapes(5184,181832
-int installString(5228,183307
-#undef malloc5261,184231
-void installKeys(5262,184245
-int findName(5343,186950
-int ana_verify(5395,188541
-compileInfo *nextFreeCompileInfo(nextFreeCompileInfo5506,191493
-void releaseCompileInfo(5520,191869
-static executionLevelInfo	*e_info;e_info5528,192048
-static int	n_e_info 5529,192083
-void pushExecutionLevel(5530,192124
-void popExecutionLevel(5547,192689
-void showExecutionLevel(5552,192807
+install.c,5218
+static char rcsid[rcsid27,1217
+internalRoutine *subroutine,subroutine40,1678
+internalRoutine *subroutine, *function;function40,1678
+int	nFixed 49,2041
+char	batch 51,2094
+int	traceMode 53,2169
+word	*listStackItem listStackItem55,2225
+int	symbolStackIndex 57,2259
+int	markStack[markStack64,2604
+int	markStack[MSSIZE], markIndex 64,2604
+executionLevelInfo	*exInfo exInfo66,2643
+int	nexInfo 67,2678
+static char	installing 70,2736
+#define MAX_ARG	184,7865
+internalRoutine	subroutine_table[subroutine_table258,11619
+int nSubroutine 667,33083
+internalRoutine function_table[function_table792,39557
+int nFunction 1279,66946
+void undefine(1281,67079
+void zap(1524,74272
+void cleanUp(1613,76726
+void cleanUpRoutine(1654,78167
+void updateIndices(1714,80124
+int nextFreeStackEntry(1726,80559
+int nextFreeNamedVariable(1741,81019
+int nextFreeTempVariable(1761,81785
+int nextFreeTempExecutable(1778,82352
+int nextFreeExecutable(1794,82925
+int nextFreeUndefined(1815,83663
+void pushList(1828,84000
+word popList(1839,84336
+int moveList(1847,84599
+void swapList(1858,85000
+int stackListLength(1868,85282
+void dupList(1884,85689
+void unlinkString(1895,85935
+void freeString(1907,86324
+int installStruct(1915,86591
+int copyElement(1933,87305
+int findTarget(1947,87809
+int newSymbol(2023,90567
+int hash(2738,112278
+int ircmp(2746,112445
+int findInternalName(2755,112686
+static compileInfo	*c_info c_info2775,113216
+int	cur_c_info 2776,113251
+compileInfo	*curCompileInfo;curCompileInfo2777,113285
+int nextCompileLevel(2779,113315
+static int	compileCount 2863,116046
+int compile(2864,116075
+int ana_compile(2905,117271
+int newBlockSymbol(2921,117628
+int newSubrSymbol(2961,118924
+int lookForName(3017,121109
+int findSym(3044,122129
+char *symName(symName3063,122681
+char *symbolName(symbolName3085,123308
+int suppressEvalRoutine(3111,124009
+#define	IGNORE_SIG	3124,124399
+#define ASK_SIG	3125,124420
+#define SIG_BREAK	3126,124439
+void exception(3127,124459
+char *typeName(typeName3217,126844
+char *className(className3236,127373
+  static struct classInfo 3239,127438
+    byte number;3240,127466
+    byte number; char *name;name3240,127466
+int ana_classname(3308,129680
+int ana_typeName(3323,130130
+char *evbName(evbName3338,130595
+char *filetypeName(filetypeName3356,131228
+int ana_filetype_name(3370,131745
+void fixedValue(3381,132024
+int installSysFunc(3434,133499
+int installPointer(3448,133889
+int convertRange(3463,134296
+void convertPointer(3525,136678
+void convertWidePointer(3612,138634
+void convertScalar(3800,142646
+int ana_symbol_memory(3907,144809
+int ana_trace(3941,145931
+#define b_fix(3986,147186
+#define l_fix(3987,147263
+#define f_fix(3988,147340
+#define d_fix(3989,147418
+#define s_fix(3990,147497
+#define cf_fix(3991,147577
+#define cd_fix(3992,147658
+#define l_ptr(3993,147739
+#define f_ptr(3994,147804
+#define d_ptr(3995,147870
+#define s_ptr(3996,147937
+#define fnc_p(3997,148009
+char	*defaultRedirect defaultRedirect3999,148065
+int range_warn_flag 4001,148108
+float	contour_dash_lev,4011,148637
+float	contour_dash_lev, contour_tick_fac 4011,148637
+scalar	lastmin,4012,148691
+scalar	lastmin, lastmax,4012,148691
+scalar	lastmin, lastmax, lastmean,4012,148691
+scalar	lastmin, lastmax, lastmean, lastsdev;4012,148691
+char	*firstbreak;firstbreak4056,150241
+enumElem	classesStruct[classesStruct4058,150279
+enumElem	typesStruct[typesStruct4081,150907
+enumElem	eventStruct[eventStruct4093,151188
+enumElem	coordSysStruct[coordSysStruct4104,151445
+enumElem	filetypeStruct[filetypeStruct4115,151607
+struct boundsStruct	bounds 4134,152137
+int	ANA_MATMUL_FUN;4139,152270
+internalRoutine *subroutine,subroutine4141,152291
+internalRoutine *subroutine, *function;function4141,152291
+#define	FORMATSIZE	4143,152332
+void symbolInitialization(4144,152356
+ union { byte b[b4157,152669
+ union { byte b[2]; word w;4157,152669
+int matchInternalName(4592,165263
+void zerobytes(4615,165904
+char *strcasestr(strcasestr4624,166112
+int strncasecmp_p(4645,166830
+int strcasecmp_p(4662,167345
+int	nBreakpoint 4677,167804
+breakpointInfo	breakpoint[breakpoint4678,167825
+int ana_breakpoint(4679,167866
+word	watchVars[watchVars4790,171432
+int	nWatchVars 4791,171460
+int ana_watch(4792,171480
+int ana_symbol_number(4836,172652
+void mark(4846,172926
+void pegMark(4854,173164
+void pegParse(4862,173394
+void zapParseTemps(4870,173626
+void removeParseMarker(4882,173958
+void unMark(4890,174213
+void zapMarked(4902,174427
+void checkTemps(4910,174613
+int ana_restart(4934,175319
+int strccmp(4945,175589
+int structSize(4953,175859
+int makeStruct(5009,177452
+int ana_struct(5104,180557
+int ana_buffering(5180,183027
+int translateEscapes(5216,184010
+int installString(5260,185485
+#undef malloc5293,186409
+void installKeys(5294,186423
+int findName(5375,189128
+int ana_verify(5427,190719
+compileInfo *nextFreeCompileInfo(nextFreeCompileInfo5538,193671
+void releaseCompileInfo(5552,194052
+static executionLevelInfo	*e_info;e_info5560,194231
+static int	n_e_info 5561,194266
+void pushExecutionLevel(5562,194307
+void popExecutionLevel(5579,194872
+void showExecutionLevel(5584,194990
+
+intmath.c,125
+div_t adiv(10,437
+int iaquot(25,671
+int iamod(31,778
+div_t alinediv(47,1066
+int alinequot(58,1316
+int alinemod(64,1470
 
 jpeg.c,355
 struct my_error_mgr 12,451
@@ -2582,11 +2917,11 @@ struct my_error_mgr 12,451
 typedef struct my_error_mgr *my_error_ptr;my_error_ptr16,530
 METHODDEF(19,653
 int read_jpeg6b(32,1082
-int ana_read_jpeg6b(156,4928
-int ana_read_jpeg6b_f(161,5086
-int write_jpeg6b(166,5277
-int ana_write_jpeg6b(266,8425
-int ana_write_jpeg6b_f(271,8585
+int ana_read_jpeg6b(156,4926
+int ana_read_jpeg6b_f(161,5084
+int write_jpeg6b(166,5275
+int ana_write_jpeg6b(266,8432
+int ana_write_jpeg6b_f(271,8592
 
 jreadw.c,703
  int	nx,8,192
@@ -3091,34 +3426,34 @@ int ana_oplot(218,6231
 int preplot(232,6709
 int mm(449,11804
 int plotxy(464,12183
-int positionClassWindow(761,21187
-#define NONE_IN	783,21695
-#define ALL_IN	784,21714
-#define FIRST_IN	785,21732
-#define SECOND_IN	786,21751
-#define PART_IN	787,21771
-int clipToWindow(788,21790
-int oplotx(917,25897
-int dashload(1086,31234
-int setl(1110,32218
-void setupticks(1192,34271
-int tkplot(1314,37892
-int ana_pen(1459,41721
-int ana_pencolor(1475,42184
-void set_cur_pen(1567,44998
-int set_pen(1586,45402
-int ana_erase(1606,45829
-int ana_limits(1644,46714
-int ana_window(1666,47414
-int ana_pdev(1711,48368
-int sform(1729,48901
-int empty(1764,49780
-int symplot(1770,49939
-int ana_xymov(1981,56882
-int ana_postimage(2180,61330
-int ana_postraw(2226,62550
+int positionClassWindow(764,21353
+#define NONE_IN	786,21861
+#define ALL_IN	787,21880
+#define FIRST_IN	788,21898
+#define SECOND_IN	789,21917
+#define PART_IN	790,21937
+int clipToWindow(791,21956
+int oplotx(920,26073
+int dashload(1089,31410
+int setl(1113,32394
+void setupticks(1195,34447
+int tkplot(1316,38060
+int ana_pen(1461,41882
+int ana_pencolor(1477,42345
+void set_cur_pen(1565,45070
+int set_pen(1584,45474
+int ana_erase(1604,45901
+int ana_limits(1642,46786
+int ana_window(1664,47486
+int ana_pdev(1709,48440
+int sform(1727,48973
+int empty(1761,49818
+int symplot(1767,49977
+int ana_xymov(1978,56862
+int ana_postimage(2177,61310
+int ana_postraw(2223,62530
 
-poisson.c,341
+poisson.c,344
   int num_levels;10,203
   int *nx;nx11,221
   int *ny;ny12,232
@@ -3128,10 +3463,10 @@ poisson.c,341
 } *Pyramid;Pyramid16,290
 int ana_laplace2d(18,303
 int gauss_seidel_2d2o(128,3260
-int restrict2(239,5907
-int restrict_residual(407,10948
-int restrict(413,11122
-int ana_antilaplace2d(421,11284
+void restrict2(239,5907
+void restrict_residual(407,10949
+void restrict(413,11117
+int ana_antilaplace2d(421,11273
 
 post.c,445
 static char rcsid[rcsid11,214
@@ -3153,6 +3488,26 @@ int postgray(182,5389
 int postcolor(277,7792
 int postrelease(381,10634
 
+precession.c,648
+#define TM2000(9,212
+void matmul3(12,337
+#define F(60,1351
+static double s11c[s11c61,1374
+static double c11c[c11c62,1481
+static double s12c[s12c63,1588
+static double c12c[c12c64,1695
+static double s13c[s13c65,1803
+static double c13c[c13c66,1910
+static double a31c[a31c67,2017
+static double a32c[a32c68,2124
+static double a33c[a33c69,2231
+static double a_fromJ2000[a_fromJ200070,2338
+static double a_toJ2000[a_toJ200071,2411
+static double a_from_to[a_from_to72,2482
+void init_XYZ_eclipticPrecession(73,2510
+double *XYZ_eclipticPrecessionMatrix(XYZ_eclipticPrecessionMatrix158,5752
+void XYZ_eclipticPrecession(163,5898
+
 printf_extensions.c,490
 #define _GNU_SOURCE1,0
 #define obstack_chunk_alloc 9,141
@@ -3163,11 +3518,11 @@ static int obstack_printf_sexagesimal_int_left(19,622
 int printf_sexagesimal(66,2212
 int printf_double1_arginfo(117,3887
 static int obstack_printf_date_int_left(127,4099
-int printf_date(207,6512
-void constructor(260,8129
-void constructor(262,8184
-void destructor(270,8417
-void destructor(271,8469
+int printf_date(207,6542
+void constructor(260,8159
+void constructor(262,8214
+void destructor(270,8447
+void destructor(271,8499
 
 projection0.c,2441
 static char rcsid[rcsid14,475
@@ -3298,34 +3653,34 @@ enum { POLY_INIT, POLY_NEXT, POLY_END 899,27871
 #define X_UP	900,27912
 #define Y_UP	901,27927
 int comparePtrs(903,27943
-int scanPolygon(913,28280
-int ana_inPolygon(1032,32986
-int tkhide(1057,33810
-  float	x;1073,34527
-  float y;1074,34583
-  float dx;1075,34639
-  float dy;1076,34689
-  byte status;1077,34739
-} lineSegment;1078,34754
-  float xmin;1081,34787
-  float xmax;1082,34828
-  float ymin;1083,34872
-  float ymax;1084,34913
-  int	nTopSegment;1085,34957
-  int	nBottomSegment;1086,35018
-  int	nTopFree;1087,35085
-  int	nBottomFree;1088,35141
-  lineSegment	*top;top1089,35203
-  lineSegment	*bottom;bottom1090,35243
-} drawnArea;1091,35288
-#define HL_MOVE	1093,35302
-#define HL_DRAW	1094,35345
-#define HL_NEW_CANVAS	1095,35388
-#define HL_NEW_AREA	1096,35459
-#define	HL_DRAWN_BLOCK	1099,35539
-#define HL_SEGMENT_BLOCK	1100,35566
-int hiddenLine(1102,35596
-int ana_projectmap(1162,37828
+int scanPolygon(914,28286
+int ana_inPolygon(1033,32992
+int tkhide(1059,33823
+  float	x;1075,34540
+  float y;1076,34596
+  float dx;1077,34652
+  float dy;1078,34702
+  byte status;1079,34752
+} lineSegment;1080,34767
+  float xmin;1083,34800
+  float xmax;1084,34841
+  float ymin;1085,34885
+  float ymax;1086,34926
+  int	nTopSegment;1087,34970
+  int	nBottomSegment;1088,35031
+  int	nTopFree;1089,35098
+  int	nBottomFree;1090,35154
+  lineSegment	*top;top1091,35216
+  lineSegment	*bottom;bottom1092,35256
+} drawnArea;1093,35301
+#define HL_MOVE	1095,35315
+#define HL_DRAW	1096,35358
+#define HL_NEW_CANVAS	1097,35401
+#define HL_NEW_AREA	1098,35472
+#define	HL_DRAWN_BLOCK	1101,35552
+#define HL_SEGMENT_BLOCK	1102,35579
+int hiddenLine(1104,35609
+int ana_projectmap(1156,37552
 
 random.c,513
 static unsigned int	currentBitSeed 13,299
@@ -3334,18 +3689,18 @@ void random_init(18,449
 double random_one(28,688
 int locate_value(37,981
 int random_distributed(58,1343
-byte random_bit(71,1857
-unsigned int random_bits(86,2305
-void randomu(105,2854
-void random_unique(137,4070
-void random_unique_shuffle(170,5359
-void randomn(196,6519
-int ana_randomu(226,7671
-int ana_randomd(272,8779
-int ana_randomn(320,10396
-int ana_randomb(343,11211
-int ana_randome(391,12749
-int ana_random(453,15003
+byte random_bit(70,1835
+unsigned int random_bits(85,2283
+void randomu(104,2832
+void random_unique(136,4048
+void random_unique_shuffle(169,5337
+void randomn(195,6497
+int ana_randomu(225,7649
+int ana_randomd(271,8757
+int ana_randomn(319,10374
+int ana_randomb(342,11189
+int ana_randome(390,12727
+int ana_random(452,14981
 
 rawio.c,161
 static char rcsid[rcsid12,271
@@ -3363,12 +3718,11 @@ regex.c,54
 static int countMatches(11,169
 int ana_regex(41,697
 
-site.c,129
-static char rcsid[rcsid13,287
-#define PATCH 17,404
-void printnice(26,649
-char	ANAversion[ANAversion41,840
-int site(42,861
+site.c,107
+static char rcsid[rcsid12,258
+void printnice(21,580
+char	ANAversion[ANAversion36,771
+int site(37,792
 
 sort.c,615
 static char rcsid[rcsid12,272
@@ -3401,125 +3755,132 @@ void invertPermutation(625,11703
 strous2.c,1116
 static char rcsid[rcsid14,281
 int ana_noop(21,659
-int ana_zap(31,875
-int showstats(61,1837
-int ana_system(88,2728
-int ana_psum(98,2947
-pointer	multiCompData;341,10218
-int	multiCompNPoints,342,10241
-int	multiCompNPoints, multiCompNCoord,342,10241
-int	multiCompNPoints, multiCompNCoord, multiCompType;342,10241
-int multiCompare(343,10295
-int ana_tolookup(396,11678
-pointer	src;456,13952
-int	type;457,13965
-int mcmp(458,13975
-int cmp(489,14892
-int ana_orderfilter(513,15613
-int ana_medfilter(658,20072
-int ana_quantile(665,20257
-int ana_median(765,22889
-int ana_minfilter(772,23068
-int ana_maxfilter(1017,29572
-int ana_distarr(1262,36071
-int ana_multisieve(1356,38899
-int ana_temp(1544,44193
-int shift(1556,44531
-int ana_shift_f(1731,50649
-int ana_shift(1736,50780
-int ana_swaphalf(1741,50909
-int ana_equivalence(1799,52658
-int local_extrema(1858,54487
-int ana_find_maxloc(2334,69076
-int ana_find_minloc(2339,69219
-int ana_find_max(2344,69362
-int ana_find_min(2349,69502
-int ana_replace_values(2354,69642
-int ana_lsq(2524,74207
-int ana_lsq2(2848,84180
-int ana_runprod(3231,95271
+int ana_zap(28,856
+int showstats(58,1818
+int ana_system(85,2709
+int ana_psum(95,2928
+pointer	multiCompData;338,10199
+int	multiCompNPoints,339,10222
+int	multiCompNPoints, multiCompNCoord,339,10222
+int	multiCompNPoints, multiCompNCoord, multiCompType;339,10222
+int multiCompare(340,10276
+int ana_tolookup(393,11659
+pointer	src;453,13933
+int	type;454,13946
+int mcmp(455,13956
+int cmp(486,14873
+int ana_orderfilter(510,15594
+int ana_medfilter(655,20053
+int ana_quantile(662,20238
+int ana_median(762,22870
+int ana_minfilter(769,23049
+int ana_maxfilter(1014,29553
+int ana_distarr(1259,36052
+int ana_multisieve(1353,38880
+int ana_temp(1541,44174
+int shift(1553,44512
+int ana_shift_f(1728,50630
+int ana_shift(1733,50761
+int ana_swaphalf(1738,50890
+int ana_equivalence(1796,52639
+int local_extrema(1855,54468
+int ana_find_maxloc(2331,69057
+int ana_find_minloc(2336,69200
+int ana_find_max(2341,69343
+int ana_find_min(2346,69483
+int ana_replace_values(2351,69623
+int ana_lsq(2521,74188
+int ana_lsq2(2845,84161
+int ana_runprod(3228,95252
 
-strous3.c,1068
-static char rcsid[rcsid14,267
-int ana_bisect(19,492
-static int cmp0(387,11004
-  struct c 389,11052
-  struct c { double v;389,11052
-  struct c { double v; int l;389,11052
-int ana_cspline_find(408,11398
-  struct c 429,12300
-  struct c { double v;429,12300
-  struct c { double v; int l;429,12300
-  struct c { double v; int l; int c;429,12300
-	struct c *c;c582,17264
-	byte *b;b583,17279
-int ana_rtotal(629,18319
-#define SYNCH_OK	709,20649
-#define SYNCH_REVERSE	710,20677
-#define SYNCH_OK	712,20716
-#define SYNCH_REVERSE	713,20744
-int ana_fitskey(715,20784
-#define LEFT	943,27519
-#define DOWN	944,27534
-#define RIGHT	945,27549
-#define UP	946,27565
-#define CENTER	947,27578
-#define DONE	948,27595
-int sign(950,27611
-int sgnclass(960,27787
-int traverseElement(970,27966
-#define FACTOR	1046,30772
-int ana_dir_smooth(1047,30820
-int ana_dir_smooth2(1375,40561
-int ana_trajectory(1693,49716
-void legendre(2043,60249
-void spherical_harmonics(2104,62127
-int ana_legendre(2170,64289
-int ana_enhanceimage(2192,64941
-int ana_hamming(2275,67420
+strous3.c,1222
+int ana_bisect(18,435
+static int cmp0(388,10969
+  struct c 390,11017
+  struct c { double v;390,11017
+  struct c { double v; int l;390,11017
+int ana_cspline_find(409,11363
+  struct c 430,12260
+  struct c { double v;430,12260
+  struct c { double v; int l;430,12260
+  struct c { double v; int l; int c;430,12260
+	struct c *c;c584,17233
+	byte *b;b585,17248
+#define SYNCH_OK	632,18311
+#define SYNCH_REVERSE	633,18339
+#define SYNCH_OK	635,18378
+#define SYNCH_REVERSE	636,18406
+int ana_fitskey(638,18446
+#define LEFT	866,25181
+#define DOWN	867,25196
+#define RIGHT	868,25211
+#define UP	869,25227
+#define CENTER	870,25240
+#define DONE	871,25257
+int sign(873,25273
+int sgnclass(883,25449
+int traverseElement(893,25628
+#define FACTOR	969,28434
+int ana_dir_smooth(970,28482
+int ana_dir_smooth2(1298,38223
+int ana_trajectory(1614,47333
+void legendre(1966,57952
+void spherical_harmonics(2027,59830
+int ana_legendre(2093,61992
+int ana_enhanceimage(2115,62644
+int ana_hamming(2198,65126
+double vhypot(2300,67639
+double hypota(2314,67961
+int compare_doubles(2324,68176
+int runord_d(2330,68348
+int runmax_d(2364,69160
+int runmin_d(2370,69401
+double unmod(2380,69761
+int unmod_slice_d(2387,70003
 
-strous.c,1159
+strous.c,1187
 static char rcsid[rcsid21,433
 word	stack[stack24,538
 word	stack[STACKSIZE], *stackPointer stackPointer24,538
 int ana_distr(31,916
 int ana_distr_f(112,2709
-int readkey(343,7885
-int ana_readkey(364,8659
-int ana_readkeyne(370,8847
-int ana_readarr(377,9081
-int ana_find(425,10785
-int ana_help(570,15936
-void endian(931,25827
-int ana_endian(961,26598
-int ana_differ(988,27293
-int varsmooth(1256,34877
-int smooth(1638,47239
-int ana_smooth(1976,57489
-int ana_runcum(1982,57653
-static int	pcmp_type;1986,57820
-static pointer	pcmp_ptr;1987,57842
-int pcmp(1988,57867
-int pcmp2(2019,58889
-int ana_match(2050,59859
-int ana_not(2105,61439
-int ana_table(2130,62413
-int ana_table2d(2299,68383
-int ana_push(2505,76008
-int ana_pop(2525,76569
-int ana_dump_stack(2588,78634
-int peek(2607,79136
-int ana_atomize(2627,79700
-int ana_redirect_diagnostic(2649,80296
-int ana_default(2665,80727
-int local_maxormin(2692,81731
-int ana_local_maxf(3420,103758
-int ana_local_maxloc(3428,104111
-int ana_local_minf(3436,104472
-int ana_local_minloc(3444,104825
-int ana_zinv(3452,105186
-int ana_find_maxloc_old(3553,107672
-int ana_bsmooth(3663,111361
+int readkey(344,7928
+int ana_readkey(365,8702
+int ana_readkeyne(371,8890
+int ana_readarr(378,9124
+int ana_find(424,10772
+int ana_find2(569,15921
+int ana_help(664,18618
+void endian(1025,28509
+int ana_endian(1055,29280
+int ana_differ(1082,29975
+int varsmooth(1349,37516
+int smooth(1731,49878
+int ana_smooth(2069,60128
+int ana_runcum(2075,60292
+static int	pcmp_type;2079,60459
+static pointer	pcmp_ptr;2080,60481
+int pcmp(2081,60506
+int pcmp2(2112,61528
+int ana_match(2143,62498
+int ana_not(2198,64078
+int ana_table(2223,65052
+int ana_table2d(2391,70958
+int ana_push(2597,78583
+int ana_pop(2617,79144
+int ana_dump_stack(2680,81209
+int peek(2699,81711
+int ana_atomize(2719,82275
+int ana_redirect_diagnostic(2741,82871
+int ana_default(2757,83302
+int local_maxormin(2784,84306
+int ana_local_maxf(3512,106333
+int ana_local_maxloc(3520,106686
+int ana_local_minf(3528,107047
+int ana_local_minloc(3536,107400
+int ana_zinv(3544,107761
+int ana_find_maxloc_old(3645,110247
+int ana_bsmooth(3755,113936
 
 subsc.c,1051
 static char rcsid[rcsid11,212
@@ -3544,132 +3905,134 @@ int treatListArguments_w(796,23998
 #define INNER	886,26772
 #define OUTER	887,26788
 int ana_subsc_func(889,26805
-int string_sub(1922,60996
-int ana_symclass(2013,63988
-int ana_symdtype(2035,64634
-int ana_num_elem(2047,64989
-int ana_num_dimen(2122,66977
-int ana_dimen(2148,67740
-int ana_redim_f(2210,69645
-int ana_redim(2231,70162
-int ana_concat_list(2287,72302
-int ana_concat(2401,75528
-int ana_isscalar(2816,87609
-int ana_isarray(2820,87824
-int ana_isstring(2824,88037
-int ana_subsc_subgrid(2828,88252
-int extractNumerical(3020,93059
-int ana_roll(3037,93533
+int string_sub(1924,61057
+int ana_symclass(2014,64014
+int ana_symdtype(2036,64660
+int ana_num_elem(2048,65015
+int ana_num_dimen(2123,67003
+int ana_dimen(2149,67766
+int ana_redim_f(2211,69671
+int ana_redim(2232,70188
+int ana_concat_list(2288,72328
+int ana_concat(2402,75554
+int ana_isscalar(2816,87618
+int ana_isarray(2820,87833
+int ana_isstring(2824,88046
+int ana_subsc_subgrid(2828,88261
+int extractNumerical(3019,93025
+int ana_roll(3036,93499
 
 svd.c,64
 #define TOLERANCE 20,705
 void SVD(22,732
 int ana_svd(93,2990
 
-symbols.c,2974
+symbols.c,3054
 static char rcsid[rcsid21,468
-void embed(30,821
-int structPtrTarget(44,1284
-int transfer(100,3018
-int ana_convertsym(120,3670
-int scalar_scratch(141,4255
-int scalar_scratch_copy(160,4788
-int string_scratch(173,5151
-int to_scratch_array(192,5636
-int to_scalar(244,7596
-int array_scratch(258,8063
-int array_clone(268,8333
-int dereferenceScalPointer(316,9837
-char *strsave(strsave380,11530
-int int_arg(394,11817
-int int_arg_stat(423,12579
-float float_arg(451,13411
-int float_arg_stat(474,14169
-double double_arg(503,15021
-int double_arg_stat(526,15799
-char *string_arg(string_arg555,16659
-int ana_byte(566,17078
-int ana_word(572,17267
-int ana_long(578,17456
-int ana_floor(584,17645
-int ana_ceil(698,21110
-int ana_float(812,24570
-int ana_double(818,24762
-int ana_cfloat(824,24957
-int ana_cdouble(830,25153
-int ana_convert(837,25371
-int ana_byte_inplace(1654,45846
-int ana_word_inplace(1660,46034
-int ana_long_inplace(1666,46222
-int ana_float_inplace(1672,46410
-int ana_double_inplace(1678,46602
-int ana_cfloat_inplace(1684,46798
-int ana_cdouble_inplace(1690,46994
-int ana_string_inplace(1696,47194
-int get_dims(1702,47401
-int create_sub_ptr(1731,48240
-int ana_array_convert(1746,48698
-int redef_scalar(1791,51055
-int redef_string(1839,52599
-int redef_array(1850,52950
-int bytarr(1889,54216
-int intarr(1899,54472
-int lonarr(1909,54728
-int fltarr(1919,54984
-int dblarr(1929,55241
-int cfltarr(1939,55499
-int cdblarr(1949,55752
-int strarr(1959,56007
-int show_routine(1985,56652
-int ana_show_subr(2040,58263
-int ana_show_func(2045,58420
-int ana_switch(2050,58573
-int ana_array(2098,59978
-int ana_assoc(2114,60410
-int ana_rfix(2146,61284
-int ana_echo(2189,62717
-int ana_noecho(2198,62958
-int ana_batch(2207,63159
-FILE	*recordFile recordFile2217,63422
-int ana_record(2219,63470
-int step 2272,64780
-int ana_step(2273,64794
-int ana_varname(2283,65081
-int namevar(2295,65385
-char *keyName(keyName2331,66824
-void checkErrno(2350,67461
-char	allowPromptInInput 2360,67756
-int ana_set(2361,67799
-void zapTemp(2450,70717
-int copyEvalSym(2461,71132
-int getNumerical(2484,71923
-int getSimpleNumerical(2559,74433
-int file_map_size(2583,75203
-int ana_pointer(2595,75470
-int ana_symbol(2665,77831
-int stringpointer(2674,78266
-int ana_show_temps(2729,79725
-int routineContext(2746,80221
-#define isodigit(2797,82282
-void read_a_number(2799,82328
-void read_a_number_fp(3051,89630
-void *seekFacts(seekFacts3251,95517
-void *setFacts(setFacts3274,96186
-void deleteFacts(3312,97407
-#undef malloc3340,98064
-char *strsave_system(strsave_system3341,98078
-static int *stack,stack3362,98855
-static int *stack, stack_sentinel;3362,98855
-void newStack(3363,98890
-void push(3369,99048
-int pop(3374,99151
-void deleteStack(3379,99246
-  char *buffer;buffer3386,99395
-  char *ptr;ptr3387,99411
-} keyboard 3388,99424
-int nextchar(3390,99454
-int unnextchar(3425,100561
-char *nextline(nextline3437,100928
+void embed(32,873
+int structPtrTarget(46,1336
+int transfer(102,3070
+int ana_convertsym(122,3722
+int scalar_scratch(143,4307
+int scalar_scratch_copy(162,4840
+int string_scratch(175,5203
+int to_scratch_array(194,5688
+int to_scalar(246,7648
+int array_scratch(260,8115
+int array_clone(270,8385
+int numerical_clone(318,9889
+int dereferenceScalPointer(329,10202
+char *strsave(strsave393,11895
+int int_arg(407,12182
+int int_arg_stat(436,12944
+float float_arg(464,13776
+int float_arg_stat(487,14534
+double double_arg(516,15386
+int double_arg_stat(539,16164
+char *string_arg(string_arg568,17024
+int ana_byte(579,17443
+int ana_word(585,17632
+int ana_long(591,17821
+int ana_floor(597,18010
+int ana_ceil(711,21481
+int ana_float(825,24947
+int ana_double(831,25139
+int ana_cfloat(837,25334
+int ana_cdouble(843,25530
+int ana_convert(850,25748
+int ana_byte_inplace(1669,46285
+int ana_word_inplace(1675,46473
+int ana_long_inplace(1681,46661
+int ana_float_inplace(1687,46849
+int ana_double_inplace(1693,47041
+int ana_cfloat_inplace(1699,47237
+int ana_cdouble_inplace(1705,47433
+int ana_string_inplace(1711,47633
+int get_dims(1717,47840
+int create_sub_ptr(1746,48679
+int ana_array_convert(1761,49137
+int redef_scalar(1806,51494
+int redef_string(1854,53038
+int redef_array(1865,53389
+int redef_array_extra_dims(1912,54851
+int bytarr(1931,55502
+int intarr(1941,55758
+int lonarr(1951,56014
+int fltarr(1961,56270
+int dblarr(1971,56527
+int cfltarr(1981,56785
+int cdblarr(1991,57038
+int strarr(2001,57293
+int show_routine(2027,57938
+int ana_show_subr(2082,59549
+int ana_show_func(2087,59706
+int ana_switch(2092,59859
+int ana_array(2140,61264
+int ana_assoc(2156,61696
+int ana_rfix(2188,62570
+int ana_echo(2231,64003
+int ana_noecho(2240,64244
+int ana_batch(2249,64445
+FILE	*recordFile recordFile2259,64708
+int ana_record(2261,64756
+int step 2314,66066
+int ana_step(2315,66080
+int ana_varname(2325,66367
+int namevar(2337,66671
+char *keyName(keyName2373,68110
+void checkErrno(2392,68747
+char	allowPromptInInput 2402,69042
+int ana_set(2403,69085
+void zapTemp(2492,72009
+int copyEvalSym(2503,72424
+int getNumerical(2526,73233
+int getSimpleNumerical(2601,75743
+int file_map_size(2625,76513
+int ana_pointer(2637,76780
+int ana_symbol(2707,79141
+int stringpointer(2716,79576
+int ana_show_temps(2771,81035
+int routineContext(2788,81531
+#define isodigit(2839,83592
+void read_a_number(2841,83638
+void read_a_number_fp(3093,90940
+void *seekFacts(seekFacts3292,96798
+void *setFacts(setFacts3315,97467
+void deleteFacts(3353,98688
+#undef malloc3381,99345
+char *strsave_system(strsave_system3382,99359
+static int *stack,stack3403,100136
+static int *stack, stack_sentinel;3403,100136
+void newStack(3404,100171
+void push(3410,100329
+int pop(3415,100432
+void deleteStack(3420,100527
+  char *buffer;buffer3427,100676
+  char *ptr;ptr3428,100692
+} keyboard 3429,100705
+int nextchar(3431,100735
+int unnextchar(3468,101930
+char *nextline(nextline3480,102297
 
 tape.c,740
 static char rcsid[rcsid19,406
@@ -3693,16 +4056,16 @@ int ana_unload(121,3511
 int ana_skipr(135,3865
 int ana_skipf(150,4318
 int ana_taprd(165,4771
-int ana_tapwrt(207,5882
-int ana_tapebufout(237,6745
-int ana_tapebufin(298,8801
-int ana_wait_for_tape(394,11566
+int ana_tapwrt(206,5851
+int ana_tapebufout(236,6714
+int ana_tapebufin(297,8770
+int ana_wait_for_tape(392,11505
 
 tense.c,95
 static char rcsid[rcsid11,252
 int curv1_(14,356
 int kurv1_(200,5017
-int kurvp1_(431,11410
+int kurvp1_(430,11380
 
 termcap.c,804
 char	*c_left,c_left8,109
@@ -3763,6 +4126,9 @@ void getTermCaps(24,720
 #undef malloc245,7216
 char *termEntry(termEntry246,7230
 
+test_printf_extensions.c,16
+void main(3,20
+
 test_projection.c,322
 #define DEG 8,109
 #define CURRENT	10,133
@@ -3778,6 +4144,10 @@ int main(100,2338
     float ay;105,2412
     float az;106,2426
     float q[q107,2440
+
+test_XYZ_eclipticPrecession.c,36
+double diff(4,38
+void main(16,212
 
 topology.c,829
 static char rcsid[rcsid13,281
@@ -3795,22 +4165,22 @@ int ana_max_dir(717,18081
 #define EDGEMARKED	985,24091
 int area_2d(986,24113
 int area_general(1179,31472
-int ana_area(1440,41765
-#define SEEK_MAXIMUM	1453,42192
-int area2_2d(1454,42230
-int area2_general(1866,56506
-int ana_area2(2317,71628
-int ana_basin(2333,72138
-int ana_basin2(2509,77880
-int ana_extreme_general(3794,111276
-int ana_inpolygon(4270,124802
-int	*ptr1,ptr14395,128315
-int	*ptr1, *ptr2;ptr24395,128315
-int ac_compare(4396,128333
-int intcmp(4406,128588
-int ana_area_connect(4411,128754
+int ana_area(1438,41659
+#define SEEK_MAXIMUM	1451,42086
+int area2_2d(1452,42124
+int area2_general(1864,56400
+int ana_area2(2314,71439
+int ana_basin(2330,71949
+int ana_basin2(2506,77691
+int ana_extreme_general(3790,111067
+int ana_inpolygon(4266,124593
+int	*ptr1,ptr14391,128106
+int	*ptr1, *ptr2;ptr24391,128106
+int ac_compare(4392,128124
+int intcmp(4402,128379
+int ana_area_connect(4407,128545
 
-trace_decoder_ana.c,2123
+trace_decoder_ana.c,2118
 #define huff_EXTEND(32,966
 #define MAX_GAPS 33,1046
  static const int extend_test[extend_test44,1386
@@ -3842,27 +4212,27 @@ trace_decoder_ana.c,2123
  static float aansf[aansf80,2883
  static float ws[ws82,3003
  static float ws[64], fqtbl[fqtbl82,3003
- static float ws[64], fqtbl[64], jpeg_bias 82,3003
- char	dct_area[dct_area84,3095
- int	del_indices[del_indices85,3120
- byte	*start_indices[start_indices86,3144
- char	*dct_head dct_head87,3172
- short	*dct dct88,3200
- static	short	*qt;qt89,3261
- static	short	qt_all[qt_all90,3280
- int	bigendian;91,3310
- short	bcorrect;92,3326
-void prefill(95,3403
-int huff_setups(107,3777
-static int huff_decode_err(196,6657
-static int dct_buffer_decode_err(203,6839
-static int huff_decode_dct(210,7070
-static int dct_err(386,13340
-static int rdct(393,13501
-int scan_err(561,18072
-int trace_scan(568,18228
-int preload_q(1063,38353
-int ana_trace_decoder(1089,39172
+ static float ws[64], fqtbl[64], bias 82,3003
+ char	dct_area[dct_area84,3076
+ int	del_indices[del_indices85,3101
+ byte	*start_indices[start_indices86,3125
+ char	*dct_head dct_head87,3153
+ short	*dct dct88,3181
+ static	short	*qt;qt89,3242
+ static	short	qt_all[qt_all90,3261
+ int	bigendian;91,3291
+ short	bcorrect;92,3307
+void prefill(95,3384
+int huff_setups(107,3758
+static int huff_decode_err(196,6631
+static int dct_buffer_decode_err(203,6813
+static int huff_decode_dct(210,7044
+static int dct_err(386,13310
+static int rdct(393,13471
+int scan_err(560,17988
+int trace_scan(567,18144
+int preload_q(1057,37965
+int ana_trace_decoder(1085,38836
 
 unittest.c,248
 int num_assertions 12,327
@@ -3906,11 +4276,17 @@ int test_ft_comparison(80,2128
     int eeq;88,2242
     int gt;89,2255
 
-vsop.c,104
-int	getAstronError 10,206
-int	fullVSOP 11,230
-void gatherTruncVSOP(13,249
-void LBRfromVSOPD(50,1744
+vsop87test.c,56
+#define NREC 5,56
+#define J2000 6,74
+void main(8,101
+
+vsop.c,252
+static struct planetIndex usedPlanetIndices[usedPlanetIndices10,151
+static double planetIndexTolerance 11,203
+struct planetIndex *planetIndicesForTolerance(planetIndicesForTolerance13,245
+static void gatherVSOP(50,1716
+void XYZfromVSOPA(74,2663
 
 xport.c,3194
 static char rcsid[rcsid24,537
@@ -3967,52 +4343,52 @@ int ana_xexist(394,11211
 int ana_xport(412,11687
 int ck_window(487,13818
 int ck_events(497,14173
-int set_defw(576,16481
-int ana_xcreat(597,17004
-int ana_xsetinputs(768,23355
-int ana_xcursor(782,23749
-int ana_xsetbackground(822,24967
-int ana_xsetforeground(880,26796
-int ana_xdelete(936,28506
-int ana_xerase(955,29022
-int ana_xsetaction(1049,31349
-int reverseYImage(1078,32502
-int ana_xtv_general(1092,32888
-int ana_xtvraw(1155,34681
-int tvraw(1170,35463
-int ana_colorpixel(3050,87181
-int ana_xtv(3282,93309
-int ana_xtvmap(3289,93606
-int ana_xcopy(3296,93865
-int ana_xevent(3341,95688
-int ana_xpurge(3395,97557
-int ana_xplace(3409,97873
-int xwindow_plot(3473,99749
-int ana_xflush(3508,100690
-int ana_xpen(3513,100825
-int ana_xfont(3547,101840
-int ana_xlabel(3568,102634
-int ana_xlabelwidth(3590,103412
-int xlabel(3609,104012
-int xlabelwidth(3620,104331
-int ana_xtvread(3632,104743
-int ana_xquery(3712,106794
-int ana_xquery_f(3720,106971
-int xquery(3730,107228
-Bool windowButtonPress(3749,107873
-int ana_check_window(3764,108466
-int ana_xraise(3786,109181
-int ana_xanimate(3802,109582
-int ana_xzoom(3881,112113
-int tvplanezoom 3945,113842
-int ana_xtvplane(3946,113863
-int ana_threecolors(4115,119117
-int ana_tv3(4146,120092
-int invert_flag 4229,122362
-int ana_xdrawline(4230,122383
-int ana_xinvertline(4331,125255
-int ana_xinvertarc(4343,125577
-int ana_xdrawarc(4354,125823
+int set_defw(576,16478
+int ana_xcreat(597,17001
+int ana_xsetinputs(767,23328
+int ana_xcursor(781,23722
+int ana_xsetbackground(821,24940
+int ana_xsetforeground(879,26769
+int ana_xdelete(935,28479
+int ana_xerase(954,28995
+int ana_xsetaction(1048,31322
+int reverseYImage(1077,32475
+int ana_xtv_general(1091,32861
+int ana_xtvraw(1154,34654
+int tvraw(1169,35436
+int ana_colorpixel(3049,87154
+int ana_xtv(3281,93282
+int ana_xtvmap(3288,93579
+int ana_xcopy(3295,93838
+int ana_xevent(3338,95583
+int ana_xpurge(3392,97452
+int ana_xplace(3406,97768
+int xwindow_plot(3470,99644
+int ana_xflush(3505,100585
+int ana_xpen(3510,100720
+int ana_xfont(3544,101735
+int ana_xlabel(3565,102529
+int ana_xlabelwidth(3587,103307
+int xlabel(3606,103907
+int xlabelwidth(3617,104226
+int ana_xtvread(3629,104638
+int ana_xquery(3713,106839
+int ana_xquery_f(3721,107016
+int xquery(3731,107273
+Bool windowButtonPress(3749,107906
+int ana_check_window(3764,108499
+int ana_xraise(3786,109214
+int ana_xanimate(3802,109615
+int ana_xzoom(3881,112146
+int tvplanezoom 3944,113863
+int ana_xtvplane(3945,113884
+int ana_threecolors(4114,119138
+int ana_tv3(4145,120113
+int invert_flag 4228,122383
+int ana_xdrawline(4229,122404
+int ana_xinvertline(4330,125276
+int ana_xinvertarc(4342,125598
+int ana_xdrawarc(4353,125844
 
 zoom.c,1161
 static char rcsid[rcsid12,216
@@ -4047,14 +4423,14 @@ float	zoom_xc 71,1970
 double	zoom_clo 72,2022
 int	zoom_frame 73,2061
 int ana_zoom(75,2082
-int tvzoom(935,26275
+int tvzoom(934,26240
 
 action.h,133
-#define axisAxes(106,4719
-#define round(108,4767
-#define debugout(110,4810
-#define debugout1(111,4894
-#define ALLOCATE(113,5007
+#define axisAxes(117,5339
+#define round(119,5387
+#define debugout(121,5430
+#define debugout1(122,5514
+#define ALLOCATE(124,5627
 
 ana_bitmap.h,173
 #define icon_bitmap_width 1,0
@@ -4063,721 +4439,719 @@ static char icon_bitmap_bits[icon_bitmap_bits3,59
 #define back_width 34,2285
 #define back_height 35,2307
 
-anaparser.c.tab.h,1228
-# define YYTOKENTYPE38,1615
-   enum yytokentype 41,1739
-     NEWLINE 42,1761
-     C_ID 43,1781
-     S_ID 44,1799
-     NUMBER 45,1817
-     STR 46,1837
-     INCLUDE 47,1854
-     REPORT 48,1875
-     IF 49,1895
-     THEN 50,1911
-     ELSE 51,1929
-     FOR 52,1947
-     REPEAT 53,1964
-     UNTIL 54,1984
-     WHILE 55,2003
-     DO 56,2022
-     CASE 57,2038
-     ENDCASE 58,2056
-     NCASE 59,2077
-     SUBR 60,2096
-     ENDSUBR 61,2114
-     FUNC 62,2135
-     ENDFUNC 63,2153
-     BLOCK 64,2174
-     ENDBLOCK 65,2193
-     RETURN 66,2215
-     BREAK 67,2235
-     CONTINUE 68,2254
-     RUN 69,2276
-     BEGIN 70,2293
-     END 71,2312
-     PLUSIS 72,2329
-     MINUSIS 73,2349
-     TIMESIS 74,2370
-     DIVIDEIS 75,2391
-     POWERIS 76,2413
-     RETALL 77,2434
-     STRUCTTAG 78,2454
-     ERRORSTATE 79,2477
-     ELLIPSIS 80,2501
-     ORIF 81,2523
-     ANDIF 82,2541
-     XOR 83,2560
-     OR 84,2577
-     AND 85,2593
-     NE 86,2610
-     EQ 87,2626
-     LT 88,2642
-     GT 89,2658
-     LE 90,2674
-     GE 91,2690
-     SMOD 92,2706
-     UMINUS 93,2724
-typedef int YYSTYPE;100,2814
-# define YYSTYPE_IS_TRIVIAL 101,2835
-# define yystype 102,2865
-# define YYSTYPE_IS_DECLARED 103,2927
+anaparser.c.tab.h,1227
+# define YYTOKENTYPE37,1626
+   enum yytokentype 40,1750
+     NEWLINE 41,1772
+     C_ID 42,1792
+     S_ID 43,1810
+     NUMBER 44,1828
+     STR 45,1848
+     INCLUDE 46,1865
+     REPORT 47,1886
+     IF 48,1906
+     THEN 49,1922
+     ELSE 50,1940
+     FOR 51,1958
+     REPEAT 52,1975
+     UNTIL 53,1995
+     WHILE 54,2014
+     DO 55,2033
+     CASE 56,2049
+     ENDCASE 57,2067
+     NCASE 58,2088
+     SUBR 59,2107
+     ENDSUBR 60,2125
+     FUNC 61,2146
+     ENDFUNC 62,2164
+     BLOCK 63,2185
+     ENDBLOCK 64,2204
+     RETURN 65,2226
+     BREAK 66,2246
+     CONTINUE 67,2265
+     RUN 68,2287
+     BEGIN 69,2304
+     END 70,2323
+     PLUSIS 71,2340
+     MINUSIS 72,2360
+     TIMESIS 73,2381
+     DIVIDEIS 74,2402
+     POWERIS 75,2424
+     RETALL 76,2445
+     STRUCTTAG 77,2465
+     ERRORSTATE 78,2488
+     ELLIPSIS 79,2512
+     ORIF 80,2534
+     ANDIF 81,2552
+     XOR 82,2571
+     OR 83,2588
+     AND 84,2604
+     NE 85,2621
+     EQ 86,2637
+     LT 87,2653
+     GT 88,2669
+     LE 89,2685
+     GE 90,2701
+     SMOD 91,2717
+     UMINUS 92,2735
+typedef int YYSTYPE;99,2825
+# define YYSTYPE_IS_TRIVIAL 100,2846
+# define yystype 101,2876
+# define YYSTYPE_IS_DECLARED 102,2938
 
-anaparser.h,21916
+anaparser.h,21967
 #define anaparser_h2,20
 #define TRANS_FIXED_STRING	18,246
-enum classes 22,299
-  ANA_UNUSED 23,315
-  ANA_SCALAR,24,352
-  ANA_STRING,25,392
-  ANA_RANGE,26,429
-  ANA_ARRAY,27,466
-  ANA_TRANSFER,28,527
-  ANA_ASSOC,29,570
-  ANA_FUNC_PTR,30,620
-  ANA_SCAL_PTR,31,669
-  ANA_SUBSC_PTR,32,716
-  ANA_FILEMAP,33,767
-  ANA_CLIST,34,811
-  ANA_LIST,35,853
-  ANA_STRUCT,36,886
-  ANA_KEYWORD,37,926
-  ANA_LIST_PTR,38,966
-  ANA_PRE_RANGE,39,1019
-  ANA_PRE_CLIST,40,1063
-  ANA_PRE_LIST,41,1112
-  ANA_ENUM,42,1153
-  ANA_META,43,1189
-  ANA_CSCALAR,44,1235
-  ANA_CARRAY,45,1277
-  ANA_CPLIST,46,1317
-  ANA_POINTER,47,1364
-  ANA_STRUCT_PTR,48,1402
-  ANA_SUBROUTINE 49,1467
-  ANA_FUNCTION,50,1523
-  ANA_BLOCKROUTINE,51,1571
-  ANA_DEFERRED_SUBR,52,1627
-  ANA_DEFERRED_FUNC,53,1690
-  ANA_DEFERRED_BLOCK,54,1751
-  ANA_BIN_OP 55,1807
-  ANA_INT_FUNC,56,1856
-  ANA_USR_FUNC,57,1908
-  ANA_IF_OP,58,1964
-  ANA_EXTRACT,59,2010
-  ANA_PRE_EXTRACT,60,2049
-  ANA_EVB 61,2095
-  ANA_FIXED_NUMBER,62,2135
-  ANA_FIXED_STRING,63,2180
-  ANA_UNDEFINED 64,2225
-enum types 71,2409
-  ANA_BYTE,72,2422
-  ANA_WORD,73,2461
-  ANA_LONG,74,2500
-  ANA_FLOAT,75,2539
-  ANA_DOUBLE,76,2577
-  ANA_TEMP_STRING,77,2616
-  ANA_LSTRING,78,2663
-  ANA_STRING_ARRAY,79,2705
-  ANA_CFLOAT,80,2749
-  ANA_CDOUBLE	81,2796
-enum EVBclasses 86,2872
-  EVB_BLOCK 87,2890
-  EVB_REPLACE,88,2937
-  EVB_INT_SUB,89,2986
-  EVB_FOR,90,3040
-  EVB_INSERT,91,3076
-  EVB_IF,92,3118
-  EVB_USR_SUB,93,3152
-  EVB_WHILE_DO,94,3210
-  EVB_DO_WHILE,95,3256
-  EVB_RETURN,96,3302
-  EVB_CASE,97,3345
-  EVB_NCASE,98,3384
-  EVB_REPEAT,99,3425
-  EVB_USR_CODE,100,3468
-  EVB_FILE	101,3510
-enum includeTypes 104,3558
-  FILE_INCLUDE,105,3578
-  FILE_REPORT	106,3611
-#define ANA_ERROR	110,3677
-#define ANA_OK	111,3716
-#define LOOP_BREAK	112,3749
-#define LOOP_CONTINUE	113,3789
-#define LOOP_RETALL	114,3835
-#define LOOP_RETURN	115,3877
-#define BR_ENABLE	118,3938
-#define BR_EXIST	119,3982
-#define BR_UNSET	120,4025
-#define BR_ENABLED	121,4044
-#define BIGENDIAN	125,4136
-#define LITTLEENDIAN	127,4162
-enum fmtTypes 131,4212
-  FMT_ERROR,132,4228
-  FMT_PLAIN,133,4267
-  FMT_INTEGER,134,4309
-  FMT_FLOAT,135,4350
-  FMT_TIME,136,4387
-  FMT_DATE,137,4422
-  FMT_STRING,138,4457
-  FMT_COMPLEX,139,4496
-  FMT_EMPTY	140,4543
-enum binaryOps 151,4992
-  ANA_ADD,152,5009
-  ANA_SUB,153,5033
-  ANA_MUL,154,5057
-  ANA_DIV,155,5081
-  ANA_IDIV,156,5105
-  ANA_MOD,157,5130
-  ANA_SMOD,158,5159
-  ANA_MAX,159,5187
-  ANA_MIN,160,5211
-  ANA_EQ,161,5235
-  ANA_GT,162,5259
-  ANA_GE,163,5284
-  ANA_LT,164,5309
-  ANA_LE,165,5334
-  ANA_NE,166,5359
-  ANA_OR,167,5384
-  ANA_AND,168,5409
-  ANA_XOR,169,5436
-  ANA_POW,170,5463
-  ANA_ANDIF,171,5488
-  ANA_ORIF	172,5519
-#define NUM_BIN_OP	174,5550
-#define BB_NONE	178,5698
-#define BB_ALL	179,5739
-#define BB_PLOT	180,5778
-#define CLEANUP_VARS	183,5844
-#define CLEANUP_EDBS	184,5867
-#define CLEANUP_COMP	185,5890
-#define CLEANUP_BOTH	186,5913
-#define CLEANUP_ALL	187,5936
-#define CLEANUP_ERROR	188,5958
-#define ANA_NEW_LIST	191,6020
-#define ANA_EXTEND	192,6071
-#define ANA_LIST_DELIM	193,6097
-#define ANA_ZERO	194,6127
-#define ANA_ONE	195,6147
-#define ANA_MINUS_ONE	196,6166
-#define ANA_UNSPECIFIED	198,6191
-#define ANA_NEG_FUN	201,6265
-#define ANA_SUBSC_FUN	202,6287
-#define ANA_CONCAT_FUN	203,6311
-#define ANA_POW_FUN	204,6336
-#define ANA_INSERT_SUB	206,6359
-#define FIND_SUBR	209,6413
-#define FIND_FUNC	210,6433
-#define FIND_EITHER	211,6453
-#define FIND_LOWER	212,6475
-#define FILE_TYPE_ANA_FZ	216,6520
-#define FILE_TYPE_IDL_SAVE	217,6565
-#define FILE_TYPE_GIF	218,6614
-#define FILE_TYPE_ANA_ASTORE	219,6654
-#define FILE_TYPE_JPEG	220,6707
-#define FILE_TYPE_TIFF	221,6749
-#define FILE_TYPE_FITS	222,6791
-#define FILE_TYPE_PPM_RAW	223,6833
-#define FILE_TYPE_PPM_ASCII	224,6861
-#define FILE_TYPE_XPM	225,6891
-#define FILE_TYPE_XBM	226,6917
-#define FILE_TYPE_BMP	227,6960
-#define FILE_TYPE_SUN_RAS	228,6986
-#define FILE_TYPE_IRIS_RGB	229,7037
-#define FILE_TYPE_TARGA_24	230,7067
-#define FILE_TYPE_PM	231,7097
-#define I_FILELEVEL	235,7160
-#define I_LINE	236,7198
-#define I_VALUE	237,7221
-#define I_TRUNCATE	238,7245
-#define I_PARENT	239,7271
-#define I_NL	240,7295
-#define I_ROUTINE	241,7316
-#define I_LENGTH	242,7341
-#define I_ALTERNATIVE	243,7365
-#define I_SINGLEMODE	244,7394
-#define I_SINGLEEXEC	245,7452
-#define T_FILE	248,7549
-#define T_LOOP	249,7574
-#define T_BLOCK	250,7599
-#define T_ROUTINE	251,7625
-#define T_SHOWSTATS	252,7652
-#define T_CPUTIME	253,7681
-#define T_SHOWEXEC	254,7708
-#define T_ROUTINEIO	255,7736
-#define FMT_LEFT_JUSTIFY	258,7786
-#define FMT_ALWAYS_SIGN	259,7837
-#define FMT_ZERO_PAD	260,7888
-#define FMT_ALTERNATIVE	261,7936
-#define FMT_POSITIVE_BLANK	262,7987
-#define FMT_SUPPRESS	263,8042
-#define FMT_BIG	264,8090
-#define FMT_SMALL	265,8134
-#define FMT_MIX	266,8179
-#define FMT_MIX2	267,8223
-#define TV_SCREEN	270,8290
-#define TV_POSTSCRIPT	271,8326
-#define TV_PDEV	272,8367
-#define TV_PLOTWINDOW	273,8422
-#define TV_ZOOM	274,8463
-#define TV_CENTER	275,8499
-#define TV_SCALE	276,8538
-#define TV_MAP	277,8576
-#define TV_RAW	278,8613
-#define TV_24	279,8650
-#define visualIsRW(282,8747
-#define visualIsRO(283,8790
-#define visualIsGray(284,8833
-#define visualIsColor(285,8873
-#define visualPrimariesAreLinked(286,8915
-#define visualPrimariesAreSeparate(287,8966
-#define visualIsLegal(288,9019
-#define PLOT_INFTY	290,9074
-#define TWOPI	295,9223
-#define DEG	297,9253
-#define RAD	298,9276
-#define ANA_DEP	301,9327
-#define ANA_DVI	303,9417
-#define ANA_DEV	304,9461
-#define ANA_IMG	305,9511
-#define ANA_PLT	306,9559
-#define ANA_RIM	307,9601
-#define ANA_RPL	308,9653
-#define ANA_X11	309,9704
-#define ANA_XLOG	310,9749
-#define ANA_YLOG	311,9790
-#define DEBUG_STEP	314,9862
-#define PROTECT_CONTEXT	316,9884
-#define PROTECTED	317,9917
-#define MAINTAIN	318,9953
-#define GN_UPDATE	322,10062
-#define GN_UPGRADE	323,10108
-#define GN_EXACT	324,10161
-#define SL_SAMEDIMS	327,10244
-#define SL_COMPRESS	328,10310
-#define SL_COMPRESSALL	329,10377
-#define SL_EXACT	331,10447
-#define SL_UPGRADE	332,10515
-#define SL_KEEPTYPE	333,10586
-#define SL_EACHCOORD	335,10654
-#define SL_AXISCOORD	336,10711
-#define SL_EACHROW	337,10787
-#define SL_UNIQUEAXES	338,10836
-#define SL_ONEAXIS	339,10895
-#define SL_AXESBLOCK	340,10944
-#define SL_ONEDIMS	342,11058
-#define SL_SRCUPGRADE	343,11129
-#define SL_NEGONED	344,11203
-#define SL_EACHBLOCK	345,11274
-#define SL_ALLAXES	346,11349
-#define SL_TAKEONED	347,11412
-#define SP_VAR	350,11493
-#define SP_USER_FUNC	351,11511
-#define SP_USER_SUBR	352,11534
-#define SP_INT_FUNC	353,11557
-#define SP_INT_SUBR	354,11579
-#define SP_FUNC	355,11602
-#define SP_SUBR	356,11648
-#define SP_ANY	357,11694
-#define scratSize(359,11740
-typedef unsigned char		byte;362,11847
-typedef unsigned short int	uword;363,11876
-typedef signed short int	word;364,11910
-  float real;367,11959
-  float real; float imaginary;367,11959
-} floatComplex;368,11990
-  double real;371,12024
-  double real; double imaginary;371,12024
-} doubleComplex;372,12057
-  floatComplex *f;f375,12091
-  floatComplex *f; doubleComplex *d;d375,12091
-} complexPointer;376,12128
-  byte b;379,12165
-  byte b; word w;379,12165
-  byte b; word w; int l;379,12165
-  byte b; word w; int l; long int ll;379,12165
-  byte b; word w; int l; long int ll; float f;379,12165
-  byte b; word w; int l; long int ll; float f; double d;379,12165
-  byte b; word w; int l; long int ll; float f; double d; char *s;s379,12165
-  byte b; word w; int l; long int ll; float f; double d; char *s; char **sp;sp379,12165
-} scalar;380,12242
-  byte b;386,12446
-  byte b; word w;386,12446
-  byte b; word w; int l;386,12446
-  byte b; word w; int l; long int ll;386,12446
-  byte b; word w; int l; long int ll; float f;386,12446
-  byte b; word w; int l; long int ll; float f; double d;386,12446
-  byte b; word w; int l; long int ll; float f; double d; floatComplex cf;386,12446
-  doubleComplex cd;387,12520
-  doubleComplex cd; char *s;s387,12520
-  doubleComplex cd; char *s; char **sp;sp387,12520
-} wideScalar;388,12560
-typedef union pointerUnion 390,12575
-  byte *b;b391,12604
-  byte *b; word *w;w391,12604
-  byte *b; word *w; int *l;l391,12604
-  byte *b; word *w; int *l; long int *ll;ll391,12604
-  byte *b; word *w; int *l; long int *ll; float *f;f391,12604
-  byte *b; word *w; int *l; long int *ll; float *f; double *d;d391,12604
-  byte *b; word *w; int *l; long int *ll; float *f; double *d; char *s;s391,12604
-  char **sp;sp392,12676
-  char **sp; void *v;v392,12676
-  char **sp; void *v; floatComplex *cf;cf392,12676
-  char **sp; void *v; floatComplex *cf; doubleComplex *cd;cd392,12676
-} pointer;393,12735
-  char *key;key396,12764
-  char *key; word value;396,12764
-} listElem;397,12789
-  char *key;key400,12819
-  char *key; int value;400,12819
-} enumElem;401,12843
-  char suppressEval;404,12873
-  char suppressEval; char pipe;404,12873
-  char suppressEval; char pipe; char suppressUnused;404,12873
-  int defaultMode;405,12926
-  int defaultMode; byte offset;405,12926
-  int defaultMode; byte offset; char **keys;keys405,12926
-} keyList;406,12971
-  ANA_NO_FACT,410,13011
-  ANA_NO_FACT, ANA_STAT_FACTS410,13011
-#define ANA_ANY_FACT	413,13045
-#define ANA_STAT_FACTS_MINMAX	415,13081
-#define ANA_STAT_FACTS_TOTAL	416,13118
-#define ANA_STAT_FACTS_SDEV	417,13154
-  int min;420,13207
-  int min; int max;420,13207
-  int min; int max; int minloc;420,13207
-  int min; int max; int minloc; int maxloc;420,13207
-  int min; int max; int minloc; int maxloc; double total;420,13207
-  int min; int max; int minloc; int maxloc; double total; double sdev;420,13207
-} statFacts_b;421,13278
-  word min;424,13311
-  word min; word max;424,13311
-  word min; word max; int minloc;424,13311
-  word min; word max; int minloc; int maxloc;424,13311
-  word min; word max; int minloc; int maxloc; double total;424,13311
-  word min; word max; int minloc; int maxloc; double total; double sdev;424,13311
-} statFacts_w;425,13384
-  int min;428,13417
-  int min; int max;428,13417
-  int min; int max; int minloc;428,13417
-  int min; int max; int minloc; int maxloc;428,13417
-  int min; int max; int minloc; int maxloc; double total;428,13417
-  int min; int max; int minloc; int maxloc; double total; double sdev;428,13417
-} statFacts_l;429,13488
-  float min;432,13521
-  float min; float max;432,13521
-  float min; float max; int minloc;432,13521
-  float min; float max; int minloc; int maxloc;432,13521
-  float min; float max; int minloc; int maxloc; double total;432,13521
-  float min; float max; int minloc; int maxloc; double total; double sdev;432,13521
-} statFacts_f;433,13596
-  double min;436,13629
-  double min; double max;436,13629
-  double min; double max; int minloc;436,13629
-  double min; double max; int minloc; int maxloc;436,13629
-  double min; double max; int minloc; int maxloc; double total;436,13629
-  double min; double max; int minloc; int maxloc; double total; double sdev;436,13629
-} statFacts_d;437,13706
-  floatComplex min;440,13739
-  floatComplex min; floatComplex max;440,13739
-  floatComplex min; floatComplex max; int minloc;440,13739
-  floatComplex min; floatComplex max; int minloc; int maxloc;440,13739
-  doubleComplex total;441,13801
-  doubleComplex total; double sdev;441,13801
-} statFacts_cf;442,13837
-  doubleComplex min;445,13871
-  doubleComplex min; doubleComplex max;445,13871
-  doubleComplex min; doubleComplex max; int minloc;445,13871
-  doubleComplex min; doubleComplex max; int minloc; int maxloc;445,13871
-  doubleComplex total;446,13935
-  doubleComplex total; double sdev;446,13935
-} statFacts_cd;447,13971
-  statFacts_b	*b;b450,14004
-  statFacts_w	*w;w451,14022
-  statFacts_l	*l;l452,14040
-  statFacts_f	*f;f453,14058
-  statFacts_d	*d;d454,14076
-  statFacts_cf	*cf;cf455,14094
-  statFacts_cd	*cd;cd456,14114
-  void	*any;any457,14134
-} allFacts;458,14147
-  byte	type;461,14177
-  byte	flags;462,14190
-  byte	pad[pad463,14204
-  allFacts	fact;464,14219
-} arrayFacts;465,14236
-typedef struct arrayStruct 467,14251
-  byte ndim,468,14280
-  byte ndim, c1,468,14280
-  byte ndim, c1, c2,468,14280
-  byte ndim, c1, c2, nfacts;468,14280
-  byte ndim, c1, c2, nfacts; int dims[dims468,14280
-  byte ndim, c1, c2, nfacts; int dims[MAX_DIMS]; arrayFacts *facts;facts468,14280
-} array;469,14348
-struct boundsStruct 471,14358
-  struct { byte b;472,14380
-  struct { byte b; word w;472,14380
-  struct { byte b; word w; int l;472,14380
-  struct { byte b; word w; int l; float f;472,14380
-  struct { byte b; word w; int l; float f; double d;472,14380
-  struct { byte b; word w; int l; float f; double d; } min;472,14380
-  struct { byte b;473,14440
-  struct { byte b; word w;473,14440
-  struct { byte b; word w; int l;473,14440
-  struct { byte b; word w; int l; float f;473,14440
-  struct { byte b; word w; int l; float f; double d;473,14440
-  struct { byte b; word w; int l; float f; double d; } max;473,14440
-typedef struct structElemStruct 476,14504
-      int nelem;479,14561
-      int nelem; int size;479,14561
-      int nelem; int size; int *dims;dims479,14561
-      int nelem; int size; int *dims; byte ndim;479,14561
-    } first;480,14610
-      char *tag;tag482,14636
-      char *tag; unsigned int offset;482,14636
-      char *tag; unsigned int offset; byte type;482,14636
-	  int *dims;dims485,14709
-	  int *dims; byte ndim;485,14709
-	} singular;486,14734
-	int member;487,14747
-      } spec;488,14760
-    } regular;489,14774
-  } u;490,14789
-} structElem;491,14796
-  byte type;494,14828
-  uword number;495,14841
-  union { word *w;w496,14857
-  union { word *w; char **sp;sp496,14857
-  union { word *w; char **sp; } ptr;496,14857
-} extractSec;497,14894
-  byte	type;500,14926
-      int	value;503,15007
-    } scalar;504,15060
-      int	start;506,15087
-      int	end;507,15135
-    } range;508,15179
-      int	n_elem;510,15205
-      int	*ptr;ptr511,15265
-    } array;512,15324
-  } data;513,15337
-} structPtrMember;514,15347
-typedef struct structPtrStruct 516,15367
-  int	desc;517,15400
-  int	n_subsc;518,15450
-  structPtrMember	*member;member519,15493
-} structPtr;520,15520
-  char	*name;name523,15552
-  extractSec	*extract;extract524,15566
-} preExtract;525,15589
-typedef struct symTableEntryStruct 527,15604
- byte class; byte type;528,15641
- byte class; byte type; word xx;528,15641
- byte class; byte type; word xx; int line;528,15641
- byte class; byte type; word xx; int line; word context;528,15641
- byte class; byte type; word xx; int line; word context; int exec;528,15641
-  union specUnion529,15708
-  { scalar scalar;530,15726
-    struct { array      *ptr;ptr531,15745
-    struct { array      *ptr; int bstore;531,15745
-    struct { array      *ptr; int bstore; } array;531,15745
-    struct { word       *ptr;ptr532,15796
-    struct { word       *ptr; int bstore;532,15796
-    struct { word       *ptr; int bstore; } wlist;532,15796
-    struct { uword	*ptr;ptr533,15847
-    struct { uword	*ptr; int bstore;533,15847
-    struct { uword	*ptr; int bstore; } uwlist;533,15847
-    struct { enumElem   *ptr;ptr534,15894
-    struct { enumElem   *ptr; int bstore;534,15894
-    struct { enumElem   *ptr; int bstore; } enumElem;534,15894
-    struct { char       *ptr;ptr535,15948
-    struct { char       *ptr; int bstore;535,15948
-    struct { char       *ptr; int bstore; } name;535,15948
-    struct { listElem   *ptr;ptr536,15998
-    struct { listElem   *ptr; int bstore;536,15998
-    struct { listElem   *ptr; int bstore; } listElem;536,15998
-    struct { int	*ptr;ptr537,16052
-    struct { int	*ptr; int bstore;537,16052
-    struct { int	*ptr; int bstore; } intList;537,16052
-    struct { extractSec	*ptr;ptr538,16098
-    struct { extractSec	*ptr; int bstore;538,16098
-    struct { extractSec	*ptr; int bstore; } extract;538,16098
-    struct { preExtract	*ptr;ptr539,16151
-    struct { preExtract	*ptr; int bstore;539,16151
-    struct { preExtract	*ptr; int bstore; } preExtract;539,16151
-    struct { void	*ptr;ptr540,16207
-    struct { void	*ptr; int bstore;540,16207
-    struct { void	*ptr; int bstore; } general;540,16207
-    struct { structPtr	*ptr;ptr541,16254
-    struct { structPtr	*ptr; int bstore;541,16254
-    struct { structPtr	*ptr; int bstore; } structPtr;541,16254
-    pointer	pointer;542,16308
-    struct { word args[args543,16331
-    struct { word args[4]; } evb;543,16331
-    struct { uword args[args544,16365
-    struct { uword args[4]; } uevb;544,16365
-    struct { byte narg;545,16401
-    struct { byte narg; char **keys;keys545,16401
-    struct { byte narg; char **keys; byte extend;545,16401
-    struct { byte narg; char **keys; byte extend; uword nstmnt;545,16401
-      word *ptr;ptr546,16465
-      word *ptr; } routine;546,16465
-  } spec;547,16493
-} symTableEntry;548,16503
-typedef struct hashTableEntryStruct 550,16521
-  char *name;name551,16559
-  char *name; int symNum;551,16559
-  char *name; int symNum; struct hashTableEntryStruct *next;next551,16559
-} hashTableEntry;552,16620
-typedef struct internalRoutineStruct 554,16639
-  char *name;name555,16678
-  char *name; word minArg;555,16678
-  char *name; word minArg; word maxArg;555,16678
-  char *name; word minArg; word maxArg; int (*ptr)ptr555,16678
-  char *name; word minArg; word maxArg; int (*ptr)(int, int []); void *keys;keys555,16678
-} internalRoutine;556,16755
- int	synch_pattern;559,16792
- byte	subf,560,16812
- byte	subf, source,560,16812
- byte	subf, source, nhb,560,16812
- byte	subf, source, nhb, datyp,560,16812
- byte	subf, source, nhb, datyp, ndim,560,16812
- byte	subf, source, nhb, datyp, ndim, free1,560,16812
- byte	subf, source, nhb, datyp, ndim, free1, cbytes[cbytes560,16812
- byte	subf, source, nhb, datyp, ndim, free1, cbytes[4], free[free560,16812
- int	dim[dim561,16879
- char	txt[txt562,16893
-} fzHead;563,16909
-  int symbol;566,16937
-  int symbol;  char kind;566,16937
-  int symbol;  char kind; char mode;566,16937
-} debugItem;567,16974
-  int depth,570,17005
-  int depth, symbol,570,17005
-  int depth, symbol, size;570,17005
-  int depth, symbol, size;  char containLHS;570,17005
-} branchInfo;571,17050
-  gsl_spline *spline;spline574,17082
-  gsl_spline *spline; gsl_interp_accel *acc;acc574,17082
-} csplineInfo;575,17127
-  pointer *data;data578,17160
-  void *data0;data0579,17205
-  int coords[coords580,17253
-  int singlestep[singlestep581,17317
-  int step[step582,17376
-  int dims[dims583,17442
-  int nelem;584,17491
-  int ndim;585,17531
-  int axes[axes586,17581
-  int naxes;587,17624
-  int rdims[rdims588,17669
-  int rndim;589,17732
-  int rsinglestep[rsinglestep590,17790
-  int axisindex;591,17861
-  int mode;592,17919
-  int stride;593,17963
-  int type;594,18008
-  int advanceaxis;595,18038
-  int raxes[raxes596,18106
-  int iraxes[iraxes597,18164
-} loopInfo;598,18223
-typedef struct compileInfoStruct 601,18264
-  char	*line;line602,18299
-  int (*charfunc)charfunc603,18313
-  char	*name;name604,18338
-  FILE	*stream;stream605,18352
-  int	line_number;606,18368
-  struct compileInfoStruct	*next;next607,18387
-  struct compileInfoStruct	*prev;prev608,18421
-} compileInfo;609,18455
-typedef struct executionLevelInfoStruct 612,18505
-  int	target;613,18547
-  int	line;614,18561
-} executionLevelInfo;615,18573
-  char	*format;format618,18613
-  char	*current;current619,18656
-  char	*start;start620,18716
-  char	*spec_char;spec_char621,18773
-  char	*repeat;repeat622,18831
-  char	*plain;plain623,18876
-  char	*end;end624,18920
-  char	*next;next625,18969
-  int	type;626,19018
-  int	width;627,19050
-  int	precision;628,19084
-  int	flags;629,19125
-  int	count;630,19172
-  int	active_group;631,19217
-  int	group_count[group_count632,19278
-  char	*group_start[group_start633,19332
-  char	save1;634,19388
-  char	save2;635,19433
-} formatInfo;636,19477
-  int	line;640,19532
-  char	*name;name641,19544
-  char	status;642,19558
-} breakpointInfo;643,19573
-#define BP_DEFINED	644,19591
-#define BP_ENABLED	645,19612
-#define BP_VARIABLE	646,19633
-#define types_ptr	650,19680
-#define ahead	651,19711
-#define sym_desc	652,19738
-#define class8_to_1(653,19775
-#define symbol_ident_single(655,19825
-#define getFreeTempVariable(663,20217
-#define getFreeNamedVariable(665,20302
-#define getFreeExecutable(667,20389
-#define getFreeTempExecutable(669,20470
-#define isTemp(671,20559
-#define isFreeTemp(672,20613
-#define scalPointer(673,20685
-#define findVar(675,20783
-#define findSubr(676,20853
-#define findFunc(677,20911
-#define findBlock(678,20969
-#define findInternalSym(680,21056
-#define findInternalSubr(681,21130
-#define findInternalFunc(682,21188
-#define lookForSym(683,21246
-#define lookForVar(684,21334
-#define lookForVarName(685,21410
-#define findVarName(686,21489
-#define lookForSubr(687,21562
-#define lookForFunc(688,21625
-#define lookForBlock(689,21688
-#define lookForSubrName(690,21753
-#define lookForFuncName(691,21819
-#define lookForBlockName(692,21885
-#define varName(693,21953
-#define subrName(694,22006
-#define funcName(695,22061
-#define blockName(696,22116
-#define doit(697,22172
-#define restore	698,22234
-#define readGhost(699,22276
-#undef MIN705,22483
-#define MIN(706,22494
-#undef MAX707,22528
-#define MAX(708,22539
-#undef ABS709,22573
-#define ABS(710,22584
-#define HEAD(711,22625
-#define LPTR(712,22680
-#define CK_ARR(713,22741
-#define CK_SGN(715,22834
-#define CK_MAG(718,22945
-#define GET_SIZE(721,23071
-#define N_ELEM(723,23159
-#define allocate(726,23269
-#define eallocate(730,23450
-#define GET_NUMERICAL(732,23565
-#define multiSwitch2(740,23891
-#define multiSwitch3(748,24188
-#define multiSwitch4(756,24537
-#define multiSwitch5(764,24944
-
-ana-patch-level.h,19
-#define PATCH 1,0
+enum Symbolclass 22,299
+  ANA_UNUSED 23,319
+  ANA_SCALAR,24,356
+  ANA_STRING,25,396
+  ANA_RANGE,26,433
+  ANA_ARRAY,27,470
+  ANA_TRANSFER,28,531
+  ANA_ASSOC,29,574
+  ANA_FUNC_PTR,30,624
+  ANA_SCAL_PTR,31,673
+  ANA_SUBSC_PTR,32,720
+  ANA_FILEMAP,33,771
+  ANA_CLIST,34,815
+  ANA_LIST,35,857
+  ANA_STRUCT,36,890
+  ANA_KEYWORD,37,930
+  ANA_LIST_PTR,38,970
+  ANA_PRE_RANGE,39,1023
+  ANA_PRE_CLIST,40,1067
+  ANA_PRE_LIST,41,1116
+  ANA_ENUM,42,1157
+  ANA_META,43,1193
+  ANA_CSCALAR,44,1239
+  ANA_CARRAY,45,1281
+  ANA_CPLIST,46,1321
+  ANA_POINTER,47,1368
+  ANA_STRUCT_PTR,48,1406
+  ANA_SUBROUTINE 49,1471
+  ANA_FUNCTION,50,1527
+  ANA_BLOCKROUTINE,51,1575
+  ANA_DEFERRED_SUBR,52,1631
+  ANA_DEFERRED_FUNC,53,1694
+  ANA_DEFERRED_BLOCK,54,1755
+  ANA_BIN_OP 55,1811
+  ANA_INT_FUNC,56,1860
+  ANA_USR_FUNC,57,1912
+  ANA_IF_OP,58,1968
+  ANA_EXTRACT,59,2014
+  ANA_PRE_EXTRACT,60,2053
+  ANA_EVB 61,2099
+  ANA_FIXED_NUMBER,62,2139
+  ANA_FIXED_STRING,63,2184
+  ANA_UNDEFINED 64,2229
+enum Symboltype 71,2413
+  ANA_BYTE,72,2431
+  ANA_WORD,73,2470
+  ANA_LONG,74,2509
+  ANA_FLOAT,75,2548
+  ANA_DOUBLE,76,2586
+  ANA_TEMP_STRING,77,2625
+  ANA_LSTRING,78,2672
+  ANA_STRING_ARRAY,79,2714
+  ANA_CFLOAT,80,2758
+  ANA_CDOUBLE,81,2805
+  ANA_NO_SYMBOLTYPE,82,2854
+enum EVBclasses 87,2903
+  EVB_BLOCK 88,2921
+  EVB_REPLACE,89,2968
+  EVB_INT_SUB,90,3017
+  EVB_FOR,91,3071
+  EVB_INSERT,92,3107
+  EVB_IF,93,3149
+  EVB_USR_SUB,94,3183
+  EVB_WHILE_DO,95,3241
+  EVB_DO_WHILE,96,3287
+  EVB_RETURN,97,3333
+  EVB_CASE,98,3376
+  EVB_NCASE,99,3415
+  EVB_REPEAT,100,3456
+  EVB_USR_CODE,101,3499
+  EVB_FILE	102,3541
+enum includeTypes 105,3589
+  FILE_INCLUDE,106,3609
+  FILE_REPORT	107,3642
+#define ANA_ERROR	111,3708
+#define ANA_OK	112,3747
+#define LOOP_BREAK	113,3780
+#define LOOP_CONTINUE	114,3820
+#define LOOP_RETALL	115,3866
+#define LOOP_RETURN	116,3908
+#define BR_ENABLE	119,3969
+#define BR_EXIST	120,4013
+#define BR_UNSET	121,4056
+#define BR_ENABLED	122,4075
+#define BIGENDIAN	126,4167
+#define LITTLEENDIAN	128,4193
+enum fmtTypes 132,4243
+  FMT_ERROR,133,4259
+  FMT_PLAIN,134,4298
+  FMT_INTEGER,135,4340
+  FMT_FLOAT,136,4381
+  FMT_TIME,137,4418
+  FMT_DATE,138,4453
+  FMT_STRING,139,4488
+  FMT_COMPLEX,140,4527
+  FMT_EMPTY	141,4574
+enum binaryOps 152,5023
+  ANA_ADD,153,5040
+  ANA_SUB,154,5064
+  ANA_MUL,155,5088
+  ANA_DIV,156,5112
+  ANA_IDIV,157,5136
+  ANA_MOD,158,5161
+  ANA_SMOD,159,5190
+  ANA_MAX,160,5218
+  ANA_MIN,161,5242
+  ANA_EQ,162,5266
+  ANA_GT,163,5290
+  ANA_GE,164,5315
+  ANA_LT,165,5340
+  ANA_LE,166,5365
+  ANA_NE,167,5390
+  ANA_OR,168,5415
+  ANA_AND,169,5440
+  ANA_XOR,170,5467
+  ANA_POW,171,5494
+  ANA_ANDIF,172,5519
+  ANA_ORIF	173,5550
+#define NUM_BIN_OP	175,5581
+#define BB_NONE	179,5729
+#define BB_ALL	180,5770
+#define BB_PLOT	181,5809
+#define CLEANUP_VARS	184,5875
+#define CLEANUP_EDBS	185,5898
+#define CLEANUP_COMP	186,5921
+#define CLEANUP_BOTH	187,5944
+#define CLEANUP_ALL	188,5967
+#define CLEANUP_ERROR	189,5989
+#define ANA_NEW_LIST	192,6051
+#define ANA_EXTEND	193,6102
+#define ANA_LIST_DELIM	194,6128
+#define ANA_ZERO	195,6158
+#define ANA_ONE	196,6178
+#define ANA_MINUS_ONE	197,6197
+#define ANA_UNSPECIFIED	199,6222
+#define ANA_NEG_FUN	202,6296
+#define ANA_SUBSC_FUN	203,6318
+#define ANA_CONCAT_FUN	204,6342
+#define ANA_POW_FUN	205,6367
+#define ANA_INSERT_SUB	207,6390
+#define FIND_SUBR	210,6444
+#define FIND_FUNC	211,6464
+#define FIND_EITHER	212,6484
+#define FIND_LOWER	213,6506
+#define FILE_TYPE_ANA_FZ	217,6551
+#define FILE_TYPE_IDL_SAVE	218,6596
+#define FILE_TYPE_GIF	219,6645
+#define FILE_TYPE_ANA_ASTORE	220,6685
+#define FILE_TYPE_JPEG	221,6738
+#define FILE_TYPE_TIFF	222,6780
+#define FILE_TYPE_FITS	223,6822
+#define FILE_TYPE_PPM_RAW	224,6864
+#define FILE_TYPE_PPM_ASCII	225,6892
+#define FILE_TYPE_XPM	226,6922
+#define FILE_TYPE_XBM	227,6948
+#define FILE_TYPE_BMP	228,6991
+#define FILE_TYPE_SUN_RAS	229,7017
+#define FILE_TYPE_IRIS_RGB	230,7068
+#define FILE_TYPE_TARGA_24	231,7098
+#define FILE_TYPE_PM	232,7128
+#define I_FILELEVEL	236,7191
+#define I_LINE	237,7229
+#define I_VALUE	238,7252
+#define I_TRUNCATE	239,7276
+#define I_PARENT	240,7302
+#define I_NL	241,7326
+#define I_ROUTINE	242,7347
+#define I_LENGTH	243,7372
+#define I_ALTERNATIVE	244,7396
+#define I_SINGLEMODE	245,7425
+#define I_SINGLEEXEC	246,7483
+#define T_FILE	249,7580
+#define T_LOOP	250,7605
+#define T_BLOCK	251,7630
+#define T_ROUTINE	252,7656
+#define T_SHOWSTATS	253,7683
+#define T_CPUTIME	254,7712
+#define T_SHOWEXEC	255,7739
+#define T_ROUTINEIO	256,7767
+#define FMT_LEFT_JUSTIFY	259,7817
+#define FMT_ALWAYS_SIGN	260,7868
+#define FMT_ZERO_PAD	261,7919
+#define FMT_ALTERNATIVE	262,7967
+#define FMT_POSITIVE_BLANK	263,8018
+#define FMT_SUPPRESS	264,8073
+#define FMT_BIG	265,8121
+#define FMT_SMALL	266,8165
+#define FMT_MIX	267,8210
+#define FMT_MIX2	268,8254
+#define TV_SCREEN	271,8321
+#define TV_POSTSCRIPT	272,8357
+#define TV_PDEV	273,8398
+#define TV_PLOTWINDOW	274,8453
+#define TV_ZOOM	275,8494
+#define TV_CENTER	276,8530
+#define TV_SCALE	277,8569
+#define TV_MAP	278,8607
+#define TV_RAW	279,8644
+#define TV_24	280,8681
+#define visualIsRW(283,8778
+#define visualIsRO(284,8821
+#define visualIsGray(285,8864
+#define visualIsColor(286,8904
+#define visualPrimariesAreLinked(287,8946
+#define visualPrimariesAreSeparate(288,8997
+#define visualIsLegal(289,9050
+#define PLOT_INFTY	291,9105
+#define TWOPI	296,9254
+#define DEG	298,9284
+#define RAD	299,9307
+#define ANA_DEP	302,9358
+#define ANA_DVI	304,9448
+#define ANA_DEV	305,9492
+#define ANA_IMG	306,9542
+#define ANA_PLT	307,9590
+#define ANA_RIM	308,9632
+#define ANA_RPL	309,9684
+#define ANA_X11	310,9735
+#define ANA_XLOG	311,9780
+#define ANA_YLOG	312,9821
+#define DEBUG_STEP	315,9893
+#define PROTECT_CONTEXT	317,9915
+#define PROTECTED	318,9948
+#define MAINTAIN	319,9984
+#define GN_UPDATE	323,10093
+#define GN_UPGRADE	324,10139
+#define GN_EXACT	325,10192
+#define SL_SAMEDIMS	328,10275
+#define SL_COMPRESS	329,10345
+#define SL_COMPRESSALL	330,10416
+#define SL_EXACT	332,10490
+#define SL_UPGRADE	333,10562
+#define SL_KEEPTYPE	334,10637
+#define SL_EACHCOORD	336,10709
+#define SL_AXISCOORD	337,10770
+#define SL_EACHROW	338,10851
+#define SL_UNIQUEAXES	339,10905
+#define SL_ONEAXIS	340,10969
+#define SL_AXESBLOCK	341,11023
+#define SL_ONEDIMS	343,11143
+#define SL_SRCUPGRADE	344,11220
+#define SL_NEGONED	345,11300
+#define SL_EACHBLOCK	346,11377
+#define SL_ALLAXES	347,11459
+#define SL_TAKEONED	348,11529
+#define SP_VAR	351,11617
+#define SP_USER_FUNC	352,11635
+#define SP_USER_SUBR	353,11658
+#define SP_INT_FUNC	354,11681
+#define SP_INT_SUBR	355,11703
+#define SP_FUNC	356,11726
+#define SP_SUBR	357,11772
+#define SP_ANY	358,11818
+#define scratSize(360,11864
+typedef unsigned char		byte;363,11971
+typedef unsigned short int	uword;364,12000
+typedef signed short int	word;365,12034
+  float real;368,12083
+  float real; float imaginary;368,12083
+} floatComplex;369,12114
+  double real;372,12148
+  double real; double imaginary;372,12148
+} doubleComplex;373,12181
+  floatComplex *f;f376,12215
+  floatComplex *f; doubleComplex *d;d376,12215
+} complexPointer;377,12252
+  byte b;380,12289
+  byte b; word w;380,12289
+  byte b; word w; int l;380,12289
+  byte b; word w; int l; long int ll;380,12289
+  byte b; word w; int l; long int ll; float f;380,12289
+  byte b; word w; int l; long int ll; float f; double d;380,12289
+  byte b; word w; int l; long int ll; float f; double d; char *s;s380,12289
+  byte b; word w; int l; long int ll; float f; double d; char *s; char **sp;sp380,12289
+} scalar;381,12366
+  byte b;387,12570
+  byte b; word w;387,12570
+  byte b; word w; int l;387,12570
+  byte b; word w; int l; long int ll;387,12570
+  byte b; word w; int l; long int ll; float f;387,12570
+  byte b; word w; int l; long int ll; float f; double d;387,12570
+  byte b; word w; int l; long int ll; float f; double d; floatComplex cf;387,12570
+  doubleComplex cd;388,12644
+  doubleComplex cd; char *s;s388,12644
+  doubleComplex cd; char *s; char **sp;sp388,12644
+} wideScalar;389,12684
+typedef union pointerUnion 391,12699
+  byte *b;b392,12728
+  byte *b; word *w;w392,12728
+  byte *b; word *w; int *l;l392,12728
+  byte *b; word *w; int *l; long int *ll;ll392,12728
+  byte *b; word *w; int *l; long int *ll; float *f;f392,12728
+  byte *b; word *w; int *l; long int *ll; float *f; double *d;d392,12728
+  byte *b; word *w; int *l; long int *ll; float *f; double *d; char *s;s392,12728
+  char **sp;sp393,12800
+  char **sp; void *v;v393,12800
+  char **sp; void *v; floatComplex *cf;cf393,12800
+  char **sp; void *v; floatComplex *cf; doubleComplex *cd;cd393,12800
+} pointer;394,12859
+  char *key;key397,12888
+  char *key; word value;397,12888
+} listElem;398,12913
+  char *key;key401,12943
+  char *key; int value;401,12943
+} enumElem;402,12967
+  char suppressEval;405,12997
+  char suppressEval; char pipe;405,12997
+  char suppressEval; char pipe; char suppressUnused;405,12997
+  int defaultMode;406,13050
+  int defaultMode; byte offset;406,13050
+  int defaultMode; byte offset; char **keys;keys406,13050
+} keyList;407,13095
+  ANA_NO_FACT,411,13135
+  ANA_NO_FACT, ANA_STAT_FACTS411,13135
+#define ANA_ANY_FACT	414,13169
+#define ANA_STAT_FACTS_MINMAX	416,13205
+#define ANA_STAT_FACTS_TOTAL	417,13242
+#define ANA_STAT_FACTS_SDEV	418,13278
+  int min;421,13331
+  int min; int max;421,13331
+  int min; int max; int minloc;421,13331
+  int min; int max; int minloc; int maxloc;421,13331
+  int min; int max; int minloc; int maxloc; double total;421,13331
+  int min; int max; int minloc; int maxloc; double total; double sdev;421,13331
+} statFacts_b;422,13402
+  word min;425,13435
+  word min; word max;425,13435
+  word min; word max; int minloc;425,13435
+  word min; word max; int minloc; int maxloc;425,13435
+  word min; word max; int minloc; int maxloc; double total;425,13435
+  word min; word max; int minloc; int maxloc; double total; double sdev;425,13435
+} statFacts_w;426,13508
+  int min;429,13541
+  int min; int max;429,13541
+  int min; int max; int minloc;429,13541
+  int min; int max; int minloc; int maxloc;429,13541
+  int min; int max; int minloc; int maxloc; double total;429,13541
+  int min; int max; int minloc; int maxloc; double total; double sdev;429,13541
+} statFacts_l;430,13612
+  float min;433,13645
+  float min; float max;433,13645
+  float min; float max; int minloc;433,13645
+  float min; float max; int minloc; int maxloc;433,13645
+  float min; float max; int minloc; int maxloc; double total;433,13645
+  float min; float max; int minloc; int maxloc; double total; double sdev;433,13645
+} statFacts_f;434,13720
+  double min;437,13753
+  double min; double max;437,13753
+  double min; double max; int minloc;437,13753
+  double min; double max; int minloc; int maxloc;437,13753
+  double min; double max; int minloc; int maxloc; double total;437,13753
+  double min; double max; int minloc; int maxloc; double total; double sdev;437,13753
+} statFacts_d;438,13830
+  floatComplex min;441,13863
+  floatComplex min; floatComplex max;441,13863
+  floatComplex min; floatComplex max; int minloc;441,13863
+  floatComplex min; floatComplex max; int minloc; int maxloc;441,13863
+  doubleComplex total;442,13925
+  doubleComplex total; double sdev;442,13925
+} statFacts_cf;443,13961
+  doubleComplex min;446,13995
+  doubleComplex min; doubleComplex max;446,13995
+  doubleComplex min; doubleComplex max; int minloc;446,13995
+  doubleComplex min; doubleComplex max; int minloc; int maxloc;446,13995
+  doubleComplex total;447,14059
+  doubleComplex total; double sdev;447,14059
+} statFacts_cd;448,14095
+  statFacts_b	*b;b451,14128
+  statFacts_w	*w;w452,14146
+  statFacts_l	*l;l453,14164
+  statFacts_f	*f;f454,14182
+  statFacts_d	*d;d455,14200
+  statFacts_cf	*cf;cf456,14218
+  statFacts_cd	*cd;cd457,14238
+  void	*any;any458,14258
+} allFacts;459,14271
+  byte	type;462,14301
+  byte	flags;463,14314
+  byte	pad[pad464,14328
+  allFacts	fact;465,14343
+} arrayFacts;466,14360
+typedef struct arrayStruct 468,14375
+  byte ndim,469,14404
+  byte ndim, c1,469,14404
+  byte ndim, c1, c2,469,14404
+  byte ndim, c1, c2, nfacts;469,14404
+  byte ndim, c1, c2, nfacts; int dims[dims469,14404
+  byte ndim, c1, c2, nfacts; int dims[MAX_DIMS]; arrayFacts *facts;facts469,14404
+} array;470,14472
+struct boundsStruct 472,14482
+  struct { byte b;473,14504
+  struct { byte b; word w;473,14504
+  struct { byte b; word w; int l;473,14504
+  struct { byte b; word w; int l; float f;473,14504
+  struct { byte b; word w; int l; float f; double d;473,14504
+  struct { byte b; word w; int l; float f; double d; } min;473,14504
+  struct { byte b;474,14564
+  struct { byte b; word w;474,14564
+  struct { byte b; word w; int l;474,14564
+  struct { byte b; word w; int l; float f;474,14564
+  struct { byte b; word w; int l; float f; double d;474,14564
+  struct { byte b; word w; int l; float f; double d; } max;474,14564
+typedef struct structElemStruct 477,14628
+      int nelem;480,14685
+      int nelem; int size;480,14685
+      int nelem; int size; int *dims;dims480,14685
+      int nelem; int size; int *dims; byte ndim;480,14685
+    } first;481,14734
+      char *tag;tag483,14760
+      char *tag; unsigned int offset;483,14760
+      char *tag; unsigned int offset; byte type;483,14760
+	  int *dims;dims486,14833
+	  int *dims; byte ndim;486,14833
+	} singular;487,14858
+	int member;488,14871
+      } spec;489,14884
+    } regular;490,14898
+  } u;491,14913
+} structElem;492,14920
+  byte type;495,14952
+  uword number;496,14965
+  union { word *w;w497,14981
+  union { word *w; char **sp;sp497,14981
+  union { word *w; char **sp; } ptr;497,14981
+} extractSec;498,15018
+  byte	type;501,15050
+      int	value;504,15131
+    } scalar;505,15184
+      int	start;507,15211
+      int	end;508,15259
+    } range;509,15303
+      int	n_elem;511,15329
+      int	*ptr;ptr512,15389
+    } array;513,15448
+  } data;514,15461
+} structPtrMember;515,15471
+typedef struct structPtrStruct 517,15491
+  int	desc;518,15524
+  int	n_subsc;519,15574
+  structPtrMember	*member;member520,15617
+} structPtr;521,15644
+  char	*name;name524,15676
+  extractSec	*extract;extract525,15690
+} preExtract;526,15713
+typedef struct symTableEntryStruct 528,15728
+ byte class; byte type;529,15765
+ byte class; byte type; word xx;529,15765
+ byte class; byte type; word xx; int line;529,15765
+ byte class; byte type; word xx; int line; word context;529,15765
+ byte class; byte type; word xx; int line; word context; int exec;529,15765
+  union specUnion530,15832
+  { scalar scalar;531,15850
+    struct { array      *ptr;ptr532,15869
+    struct { array      *ptr; int bstore;532,15869
+    struct { array      *ptr; int bstore; } array;532,15869
+    struct { word       *ptr;ptr533,15920
+    struct { word       *ptr; int bstore;533,15920
+    struct { word       *ptr; int bstore; } wlist;533,15920
+    struct { uword	*ptr;ptr534,15971
+    struct { uword	*ptr; int bstore;534,15971
+    struct { uword	*ptr; int bstore; } uwlist;534,15971
+    struct { enumElem   *ptr;ptr535,16018
+    struct { enumElem   *ptr; int bstore;535,16018
+    struct { enumElem   *ptr; int bstore; } enumElem;535,16018
+    struct { char       *ptr;ptr536,16072
+    struct { char       *ptr; int bstore;536,16072
+    struct { char       *ptr; int bstore; } name;536,16072
+    struct { listElem   *ptr;ptr537,16122
+    struct { listElem   *ptr; int bstore;537,16122
+    struct { listElem   *ptr; int bstore; } listElem;537,16122
+    struct { int	*ptr;ptr538,16176
+    struct { int	*ptr; int bstore;538,16176
+    struct { int	*ptr; int bstore; } intList;538,16176
+    struct { extractSec	*ptr;ptr539,16222
+    struct { extractSec	*ptr; int bstore;539,16222
+    struct { extractSec	*ptr; int bstore; } extract;539,16222
+    struct { preExtract	*ptr;ptr540,16275
+    struct { preExtract	*ptr; int bstore;540,16275
+    struct { preExtract	*ptr; int bstore; } preExtract;540,16275
+    struct { void	*ptr;ptr541,16331
+    struct { void	*ptr; int bstore;541,16331
+    struct { void	*ptr; int bstore; } general;541,16331
+    struct { structPtr	*ptr;ptr542,16378
+    struct { structPtr	*ptr; int bstore;542,16378
+    struct { structPtr	*ptr; int bstore; } structPtr;542,16378
+    pointer	pointer;543,16432
+    struct { word args[args544,16455
+    struct { word args[4]; } evb;544,16455
+    struct { uword args[args545,16489
+    struct { uword args[4]; } uevb;545,16489
+    struct { byte narg;546,16525
+    struct { byte narg; char **keys;keys546,16525
+    struct { byte narg; char **keys; byte extend;546,16525
+    struct { byte narg; char **keys; byte extend; uword nstmnt;546,16525
+      word *ptr;ptr547,16589
+      word *ptr; } routine;547,16589
+  } spec;548,16617
+} symTableEntry;549,16627
+typedef struct hashTableEntryStruct 551,16645
+  char *name;name552,16683
+  char *name; int symNum;552,16683
+  char *name; int symNum; struct hashTableEntryStruct *next;next552,16683
+} hashTableEntry;553,16744
+typedef struct internalRoutineStruct 555,16763
+  char *name;name556,16802
+  char *name; word minArg;556,16802
+  char *name; word minArg; word maxArg;556,16802
+  char *name; word minArg; word maxArg; int (*ptr)ptr556,16802
+  char *name; word minArg; word maxArg; int (*ptr)(int, int []); void *keys;keys556,16802
+} internalRoutine;557,16879
+ int	synch_pattern;560,16916
+ byte	subf,561,16936
+ byte	subf, source,561,16936
+ byte	subf, source, nhb,561,16936
+ byte	subf, source, nhb, datyp,561,16936
+ byte	subf, source, nhb, datyp, ndim,561,16936
+ byte	subf, source, nhb, datyp, ndim, free1,561,16936
+ byte	subf, source, nhb, datyp, ndim, free1, cbytes[cbytes561,16936
+ byte	subf, source, nhb, datyp, ndim, free1, cbytes[4], free[free561,16936
+ int	dim[dim562,17003
+ char	txt[txt563,17017
+} fzHead;564,17033
+  int symbol;567,17061
+  int symbol;  char kind;567,17061
+  int symbol;  char kind; char mode;567,17061
+} debugItem;568,17098
+  int depth,571,17129
+  int depth, symbol,571,17129
+  int depth, symbol, size;571,17129
+  int depth, symbol, size;  char containLHS;571,17129
+} branchInfo;572,17174
+  gsl_spline *spline;spline575,17206
+  gsl_spline *spline; gsl_interp_accel *acc;acc575,17206
+} csplineInfo;576,17251
+  pointer *data;data579,17284
+  void *data0;data0580,17329
+  int coords[coords581,17377
+  int singlestep[singlestep582,17441
+  int step[step583,17500
+  int dims[dims584,17566
+  int nelem;585,17615
+  int ndim;586,17655
+  int axes[axes587,17705
+  int naxes;588,17748
+  int rdims[rdims589,17793
+  int rndim;590,17856
+  int rsinglestep[rsinglestep591,17914
+  int axisindex;592,17985
+  int mode;593,18043
+  int stride;594,18087
+  enum Symboltype type;595,18132
+  int advanceaxis;596,18180
+  int raxes[raxes597,18248
+  int iraxes[iraxes598,18306
+} loopInfo;599,18365
+typedef struct compileInfoStruct 602,18406
+  char	*line;line603,18441
+  int (*charfunc)charfunc604,18455
+  char	*name;name605,18480
+  FILE	*stream;stream606,18494
+  int	line_number;607,18510
+  struct compileInfoStruct	*next;next608,18529
+  struct compileInfoStruct	*prev;prev609,18563
+} compileInfo;610,18597
+typedef struct executionLevelInfoStruct 613,18647
+  int	target;614,18689
+  int	line;615,18703
+} executionLevelInfo;616,18715
+  char	*format;format619,18755
+  char	*current;current620,18798
+  char	*start;start621,18858
+  char	*spec_char;spec_char622,18915
+  char	*repeat;repeat623,18973
+  char	*plain;plain624,19018
+  char	*end;end625,19062
+  char	*next;next626,19111
+  int	type;627,19160
+  int	width;628,19192
+  int	precision;629,19226
+  int	flags;630,19267
+  int	count;631,19314
+  int	active_group;632,19359
+  int	group_count[group_count633,19420
+  char	*group_start[group_start634,19474
+  char	save1;635,19530
+  char	save2;636,19575
+} formatInfo;637,19619
+  int	line;641,19674
+  char	*name;name642,19686
+  char	status;643,19700
+} breakpointInfo;644,19715
+#define BP_DEFINED	645,19733
+#define BP_ENABLED	646,19754
+#define BP_VARIABLE	647,19775
+#define types_ptr	651,19822
+#define ahead	652,19853
+#define sym_desc	653,19880
+#define class8_to_1(654,19917
+#define symbol_ident_single(656,19967
+#define getFreeTempVariable(664,20359
+#define getFreeNamedVariable(666,20444
+#define getFreeExecutable(668,20531
+#define getFreeTempExecutable(670,20612
+#define isTemp(672,20701
+#define isFreeTemp(673,20755
+#define scalPointer(674,20827
+#define findVar(676,20925
+#define findSubr(677,20995
+#define findFunc(678,21053
+#define findBlock(679,21111
+#define findInternalSym(681,21198
+#define findInternalSubr(682,21272
+#define findInternalFunc(683,21330
+#define lookForSym(684,21388
+#define lookForVar(685,21476
+#define lookForVarName(686,21552
+#define findVarName(687,21631
+#define lookForSubr(688,21704
+#define lookForFunc(689,21767
+#define lookForBlock(690,21830
+#define lookForSubrName(691,21895
+#define lookForFuncName(692,21961
+#define lookForBlockName(693,22027
+#define varName(694,22095
+#define subrName(695,22148
+#define funcName(696,22203
+#define blockName(697,22258
+#define doit(698,22314
+#define restore	699,22376
+#define readGhost(700,22418
+#undef MIN706,22625
+#define MIN(707,22636
+#undef MAX708,22670
+#define MAX(709,22681
+#undef ABS710,22715
+#define ABS(711,22726
+#define HEAD(712,22767
+#define LPTR(713,22822
+#define CK_ARR(714,22883
+#define CK_SGN(716,22976
+#define CK_MAG(719,23087
+#define GET_SIZE(722,23213
+#define N_ELEM(724,23301
+#define allocate(727,23411
+#define eallocate(731,23592
+#define GET_NUMERICAL(733,23707
+#define multiSwitch2(741,24033
+#define multiSwitch3(749,24330
+#define multiSwitch4(757,24679
+#define multiSwitch5(765,25086
 
 ana_structures.h,407
 #define ana_subr	7,232
@@ -4817,35 +5191,47 @@ struct moonbTerm { int d; int m; int mm; int f;65,1678
 struct moonbTerm { int d; int m; int mm; int f; int b;65,1678
 moonb[moonb66,1735
 
-astron.h,766
+astron.h,1005
 #define CAL_CALENDAR_BASE	1,0
-#define CAL_CALENDAR_BITS	2,28
-#define CAL_DEFAULT	3,56
-#define CAL_COMMON	4,78
-#define CAL_GREGORIAN	5,99
-#define CAL_ISLAMIC	6,123
-#define CAL_JULIAN	7,145
-#define CAL_JD	8,166
-#define CAL_HEBREW	9,184
-#define CAL_MAYAN	10,205
-#define CAL_LONGCOUNT	11,225
-#define CAL_EGYPTIAN	12,249
-#define CAL_LUNAR	13,272
-#define CAL_LATIN	14,293
-#define CAL_OUTPUT_BASE	16,315
-#define CAL_OUTPUT_BITS	17,341
-#define CAL_NUMERIC	18,367
-#define CAL_TEXT	19,389
-#define CAL_ISOTEXT	20,408
-#define CAL_TIME_BASE	22,431
-#define CAL_TIME_BITS	23,456
-#define CAL_UTC	24,480
-#define CAL_TAI	25,499
-#define CAL_TT	26,518
-#define CAL_ORDER_BASE	28,537
-#define CAL_ORDER_BITS	29,563
-#define CAL_YMD	30,588
-#define	CAL_DMY	31,607
+#define CAL_CALENDAR_BITS	2,30
+enum Calendar 3,60
+enum Calendar { CAL_DEFAULT,3,60
+                CAL_COMMON,4,109
+                CAL_GREGORIAN,5,158
+                CAL_ISLAMIC,6,207
+                CAL_JULIAN,7,256
+                CAL_HEBREW,8,305
+                CAL_EGYPTIAN,9,354
+                CAL_JD,10,403
+                CAL_CJD,11,452
+                CAL_LUNAR,12,501
+                CAL_MAYAN,13,550
+                CAL_LONGCOUNT,14,600
+                CAL_LATIN 15,650
+#define CAL_OUTPUT_BASE	17,701
+#define CAL_OUTPUT_BITS	18,727
+enum Calendar_outputtype 19,753
+  CAL_NUMERIC,20,780
+  CAL_LONG,21,820
+  CAL_DOUBLE,22,860
+  CAL_TEXT,23,900
+#define CAL_TIME_BASE	26,944
+#define CAL_TIME_BITS	27,969
+enum Calendar_timescale 28,993
+  CAL_UTC,29,1019
+  CAL_TAI,30,1059
+  CAL_TT,31,1099
+  CAL_LT,32,1139
+#define CAL_ORDER_BASE	35,1183
+#define CAL_ORDER_BITS	36,1209
+enum Calendar_order 37,1234
+  CAL_YMD,38,1256
+  CAL_DMY 39,1296
+
+bindings.h,80
+#define HAVE_BINDINGS_H2,24
+#define REGISTER(130,9903
+#define BIND(136,10173
 
 Bytestack.h,169
 #define HAVE_BYTESTACK_H_5,150
@@ -4907,11 +5293,10 @@ calculator.c.tab.h,1133
 #define	NE	53,926
 #define	UMINUS	54,941
 
-calendar.h,45
-#define intfloor(1,0
-#define divfloor(2,70
+calendar.h,24
+#define CALENDAR_H2,19
 
-config.h,408
+config.h,430
 #define STDC_HEADERS 11,444
 #define SIZEOF_LONG_LONG_INT 18,679
 #define SIZEOF_UNSIGNED_CHAR 21,758
@@ -4922,10 +5307,11 @@ config.h,408
 #define HAVE_LIBJPEG 42,1321
 #define HAVE_LIBM 45,1392
 #define INFTY 48,1474
-#define DEVELOP 60,1720
-#define X11 66,1811
-#define JPEG 70,1868
-#define PLATFORM 77,1965
+#define SOFA 50,1499
+#define DEVELOP 62,1736
+#define X11 68,1827
+#define JPEG 72,1884
+#define PLATFORM 79,1981
 
 constellations0.h,4186
   And,2,15
@@ -5540,6 +5926,9 @@ install.h,824
 #define EXE_END 39,1700
 #define TEMP_EXE_END 40,1752
 
+intmath.h,23
+#define INTMATH_H2,18
+
 jconfig.h,1979
 #define HAVE_STDC33,1243
 #define PROTO47,1542
@@ -5979,7 +6368,39 @@ output.h,327
 #define putc(40,1108
 #define putchar(42,1211
 
-symbols.h,6969
+sofa.h,22
+#define SOFAHDEF2,17
+
+sofam.h,590
+#define SOFAMHDEF2,18
+#define DS2R 24,453
+#define DPI 27,508
+#define D2PI 30,560
+#define DD2R 33,628
+#define DR2AS 36,702
+#define DAS2R 39,774
+#define TURNAS 42,855
+#define DMAS2R 45,916
+#define DTY 48,989
+#define DAYSEC 51,1041
+#define DJY 54,1094
+#define DJC 57,1146
+#define DJM 60,1202
+#define DJ00 63,1271
+#define DJM0 66,1344
+#define DJM00 69,1424
+#define DJM77 72,1475
+#define TTMTAI 75,1523
+#define DAU 78,1561
+#define DC 81,1622
+#define ELG 84,1685
+#define ELB 87,1777
+#define TDB0 88,1806
+#define dint(91,1902
+#define dnint(94,2002
+#define dsign(97,2117
+
+symbols.h,7047
 #define array_data(4,147
 #define array_dims(5,225
 #define array_facts(6,302
@@ -6171,20 +6592,22 @@ symbols.h,6969
 #define symbolIsInteger(196,14993
 #define symbolIsComplex(197,15093
 #define symbolIsString(198,15193
-#define symbolIsScalar(199,15263
-#define symbolIsUnitaryExpression(200,15405
-#define symbolIsNamed(201,15489
-#define numericalSize(202,15556
-#define isNumericalType(203,15645
-#define isStringType(204,15728
-#define isRealType(205,15806
-#define isComplexType(206,15862
-#define isIntegerType(207,15921
-#define isFloatType(208,15978
-#define isLegalType(209,16101
-#define highestType(217,16633
-#define realType(220,16873
-#define complexMag2(221,16969
+#define symbolIsStringScalar(199,15289
+#define symbolIsScalar(200,15365
+#define symbolIsUnitaryExpression(201,15507
+#define symbolIsNamed(202,15591
+#define symbolIsModifiable(203,15658
+#define numericalSize(204,15739
+#define isNumericalType(205,15828
+#define isStringType(206,15911
+#define isRealType(207,15989
+#define isComplexType(208,16045
+#define isIntegerType(209,16104
+#define isFloatType(210,16161
+#define isLegalType(211,16284
+#define highestType(219,16816
+#define realType(222,17056
+#define complexMag2(223,17152
 
 terminfo.h,19393
 enum boolean_caps 1,0
@@ -6634,13 +7057,16 @@ int definitegt(84,3852
 int definitegt_l(85,3926
 int definitegt_f(86,4012
 
-vsop.h,269
-struct planetIndex 1,0
-struct planetIndex { short int index;1,0
-struct planetIndex { short int index; short int nTerms;1,0
-planetIndicesVSOPD[planetIndicesVSOPD2,58
-truncPlanetIndicesVSOPD[truncPlanetIndicesVSOPD42,2342
-double planetTermsD[planetTermsD81,4490
+vsopdata.h,95
+struct planetIndex planetIndices[planetIndices10,141
+double planetTerms[planetTerms55,2523
+
+vsop.h,227
+#define NUMBEROFPLANETTERMS 1,0
+struct planetIndex 2,36
+struct planetIndex { short unsigned int index;2,36
+struct planetIndex { short unsigned int index; short unsigned int nTerms;2,36
+double planetTerms[planetTerms3,113
 
 calculator.c.tab.c,1316
 #define YYBISON 6,78

@@ -3476,13 +3476,15 @@ void heliocentricXYZr(double JDE, int object, double equinox, double *pos,
     /* heliocentric cartesian coordinates referred to the mean
        dynamical ecliptic and equinox of J2000.0 */
     if (vocal) {
-      printf("ASTRON: VSOP-A (%d) ecliptic heliocentric coordinates, equinox/ecliptic of J2000.0:\n", object);
+      printf("ASTRON: VSOP-A (%s) ecliptic heliocentric coordinates J2000.0:\n",
+             objectName(object));
       printXYZtoLBR(pos);
     }
     *r = hypota(3, pos);        /* heliocentric distance */
     XYZ_eclipticPrecession(pos, J2000, equinox);
     if (vocal) {
-      printf("ASTRON: (%d) ecliptic heliocentric coordinates for equinox:\n", object);
+      printf("ASTRON: (%s) ecliptic heliocentric coordinates for equinox:\n", 
+             objectName(object));
       printXYZtoLBR(pos);
     }
     break;
@@ -4152,8 +4154,8 @@ int ana_astropos(int narg, int ps[])
       nutation(jd, &dPsi, &cdPsi, &sdPsi, &dEps); /* nutation parameters */
       if (vocal) {
         printf("ASTRON: nutation constants:\n");
-        printf(" dPsi = %.10g, dEps = %.10g rad\n", dPsi, dEps);
-        printf(" dPsi = %.10g, dEps = %.10g deg\n", dPsi*RAD, dEps*RAD);
+        showraddms(" dPsi = ", dPsi);
+        showraddms(" dEps = ", dEps);
       }
     } else {
       dPsi = sdPsi = dEps = 0.0;	/* ignore nutation */
@@ -4161,17 +4163,7 @@ int ana_astropos(int narg, int ps[])
       if (vocal)
         puts("Ignoring nutation.");
     }
-    if (vocal) {
-      if (dPsi) {
-        printf("ASTRON: nutation constants:\n");
-        showraddms(" dPsi = ", dPsi);
-        showraddms(" dEps = ", dEps);
-      } else
-        printf("ASTRON: no nutation correction\n");
-    }
-    double epsilon = obliquity(jd, &dEps); /* obliquity of the
-                                              ecliptic corrected for
-                                              nutation */
+    double epsilon = obliquity(jd, &dEps);
     if (vocal) {
       if (dPsi)
         printf("ASTRON: obliquity of ecliptic corrected for nutation:\n");
@@ -4235,7 +4227,7 @@ int ana_astropos(int narg, int ps[])
           prev_lighttime = lighttime; /* old estimate is previous estimate */
           double jd_lt = jd - lighttime; /* time corrected for light time */
           heliocentricXYZr(jd_lt, object[i], equinox, pos_sun_tgt, &r_sun_tgt,
-                           tolerance, vocal);
+                           tolerance, 0);
           /* pos_tgt = cartesian ecliptic heliocentric coordinates of the
              target, r_sun_tgt = heliocentric distance of the target */
           pos_obs_tgt[0] = pos_sun_tgt[0] - pos_sun_obs[0]; /* dX/AU */
@@ -4247,7 +4239,8 @@ int ana_astropos(int narg, int ps[])
           count++;
         } /* end of while */
         if (vocal)
-          printf("light-time = %.10g min\n", lighttime*24*60);
+          printf("ASTRON: light-time = %.10g min = %.10g days\n",
+                 lighttime*24*60, lighttime);
       }
 
       /*
@@ -4286,14 +4279,14 @@ int ana_astropos(int narg, int ps[])
         pos_obs_tgt[2] = pos_sun_tgt[2] - pos_sun_obs[2];
         r_obs_tgt = hypota(3, pos_obs_tgt);
         if (vocal) {
-          puts("ASTRON: target ecliptic planetocentric coordinates (geometrical):");
+          puts("ASTRON: target geometric planetocentric ecliptic coordinates:");
           printXYZtoLBR(pos_obs_tgt);
         }
         break;
       case S_LIGHTTIME:         /* observer at jd, target at jd - lighttime */
         /* calculated this already when figuring out the lighttime */
         if (vocal) {
-          puts("ASTRON: target ecliptic planetocentric coordinates corrected for light-time:");
+          puts("ASTRON: target planetocentric ecliptic coordinates corrected for light-time:");
           printXYZtoLBR(pos_obs_tgt);
         }
         break;
@@ -4317,7 +4310,7 @@ int ana_astropos(int narg, int ps[])
         pos_obs_tgt[1] *= f;
         pos_obs_tgt[2] *= f;
         if (vocal) {
-          puts("ASTRON: target ecliptic planetocentric coordinates corrected for aberration:");
+          puts("ASTRON: target planetocentric ecliptic coordinates corrected for aberration:");
           printXYZtoLBR(pos_obs_tgt);
         }
         break;
@@ -4335,7 +4328,7 @@ int ana_astropos(int narg, int ps[])
         pos_obs_tgt[1] *= fac;
         pos_obs_tgt[2] *= fac;
         if (vocal) {
-          puts("ASTRON: target ecliptic planetocentric coordinates corrected for lighttime and aberration:");
+          puts("ASTRON: target planetocentric ecliptic coordinates corrected for lighttime and aberration:");
           printXYZtoLBR(pos_obs_tgt);
         }
         break;

@@ -223,6 +223,8 @@ int idiv(int x, int y)
 void printXYZtoLBR(double *xyz);
 void printLBRtoXYZ(double *lbr);
 void printHBRtoXYZ(double *lbr);
+void showraddms(char *prefix, double x);
+void showradhms(char *prefix, double x);
 
 #define TAI_to_TT(jd)	(*(jd) += 32.184/86400)
 #define TT_to_TAI(jd)	(*(jd) -= 32.184/86400)
@@ -2517,13 +2519,15 @@ int ana_constellation(int narg, int ps[])
 	done = advanceLoop(&srcinfo);
       while (!done);
       if (vocal) {
-        printf("CONSTELLATION: (equinox %.10g) %.10g %.10g rad\n", equinox, alpha, delta);
-        printf("CONSTELLATION: (equinox %.10g) %.10g %.10g deg\n", equinox, alpha*RAD, delta*RAD);
+        printf("CONSTELLATION (equinox %.10g)\n", equinox);
+        showradhms(" alpha = ", alpha);
+        showraddms(" delta = ", delta);
       }
       precessEquatorial(&alpha, &delta, equinox, B1875);
       if (vocal) {
-        printf("CONSTELLATION: (equinox B1875.0) %.10g %.10g rad\n", alpha, delta);
-        printf("CONSTELLATION: (equinox B1875.0) %.10g %.10g deg\n", alpha*RAD, delta*RAD);
+        printf("CONSTELLATION (equinox B1875.0)\n");
+        showradhms(" alpha = ", alpha);
+        showraddms(" delta = ", delta);
       }
       *tgt.b = constellation(alpha*RAD, delta*RAD);
       advanceLoop(&tgtinfo);
@@ -2538,13 +2542,15 @@ int ana_constellation(int narg, int ps[])
 	done = advanceLoop(&srcinfo);
       while (!done);
       if (vocal) {
-        printf("CONSTELLATION: (equinox %.10g) %.10g %.10g rad\n", equinox, alpha, delta);
-        printf("CONSTELLATION: (equinox %.10g) %.10g %.10g deg\n", equinox, alpha*RAD, delta*RAD);
+        printf("CONSTELLATION (equinox %.10g)\n", equinox);
+        showradhms(" alpha = ", alpha);
+        showraddms(" delta = ", delta);
       }
       precessEquatorial(&alpha, &delta, equinox, B1875);
       if (vocal) {
-        printf("CONSTELLATION: (equinox B1875.0) %.10g %.10g rad\n", alpha, delta);
-        printf("CONSTELLATION: (equinox B1875.0) %.10g %.10g deg\n", alpha*RAD, delta*RAD);
+        printf("CONSTELLATION (equinox B1875.0)\n");
+        showradhms(" alpha = ", alpha);
+        showraddms(" delta = ", delta);
       }
       *tgt.b = constellation(alpha*RAD, delta*RAD);
       advanceLoop(&tgtinfo);
@@ -2559,13 +2565,15 @@ int ana_constellation(int narg, int ps[])
 	done = advanceLoop(&srcinfo);
       while (!done);
       if (vocal) {
-        printf("CONSTELLATION: (equinox %.10g) %.10g %.10g rad\n", equinox, alpha, delta);
-        printf("CONSTELLATION: (equinox %.10g) %.10g %.10g deg\n", equinox, alpha*RAD, delta*RAD);
+        printf("CONSTELLATION (equinox %.10g)\n", equinox);
+        showradhms(" alpha = ", alpha);
+        showraddms(" delta = ", delta);
       }
       precessEquatorial(&alpha, &delta, equinox, B1875);
       if (vocal) {
-        printf("CONSTELLATION: (equinox B1875.0) %.10g %.10g rad\n", alpha, delta);
-        printf("CONSTELLATION: (equinox B1875.0) %.10g %.10g deg\n", alpha*RAD, delta*RAD);
+        printf("CONSTELLATION (equinox B1875.0)\n");
+        showradhms(" alpha = ", alpha);
+        showraddms(" delta = ", delta);
       }
       *tgt.b = constellation(alpha*RAD, delta*RAD);
       advanceLoop(&tgtinfo);
@@ -2580,13 +2588,15 @@ int ana_constellation(int narg, int ps[])
 	done = advanceLoop(&srcinfo);
       while (!done);
       if (vocal) {
-        printf("CONSTELLATION: (equinox %.10g) %.10g %.10g rad\n", equinox, alpha, delta);
-        printf("CONSTELLATION: (equinox %.10g) %.10g %.10g deg\n", equinox, alpha*RAD, delta*RAD);
+        printf("CONSTELLATION (equinox %.10g)\n", equinox);
+        showradhms(" alpha = ", alpha);
+        showraddms(" delta = ", delta);
       }
       precessEquatorial(&alpha, &delta, equinox, B1875);
       if (vocal) {
-        printf("CONSTELLATION: (equinox B1875.0) %.10g %.10g rad\n", alpha, delta);
-        printf("CONSTELLATION: (equinox B1875.0) %.10g %.10g deg\n", alpha*RAD, delta*RAD);
+        printf("CONSTELLATION (equinox B1875.0)\n");
+        showradhms(" alpha = ", alpha);
+        showraddms(" delta = ", delta);
       }
       *tgt.b = constellation(alpha*RAD, delta*RAD);
       advanceLoop(&tgtinfo);
@@ -2601,13 +2611,15 @@ int ana_constellation(int narg, int ps[])
 	done = advanceLoop(&srcinfo);
       while (!done);
       if (vocal) {
-        printf("CONSTELLATION: (equinox %.10g) %.10g %.10g rad\n", equinox, alpha, delta);
-        printf("CONSTELLATION: (equinox %.10g) %.10g %.10g deg\n", equinox, alpha*RAD, delta*RAD);
+        printf("CONSTELLATION (equinox %.10g)\n", equinox);
+        showradhms(" alpha = ", alpha);
+        showraddms(" delta = ", delta);
       }
       precessEquatorial(&alpha, &delta, equinox, B1875);
       if (vocal) {
-        printf("CONSTELLATION: (equinox B1875.0) %.10g %.10g rad\n", alpha, delta);
-        printf("CONSTELLATION: (equinox B1875.0) %.10g %.10g deg\n", alpha*RAD, delta*RAD);
+        printf("CONSTELLATION (equinox B1875.0)\n");
+        showradhms(" alpha = ", alpha);
+        showraddms(" delta = ", delta);
       }
       *tgt.b = constellation(alpha*RAD, delta*RAD);
       advanceLoop(&tgtinfo);
@@ -3481,7 +3493,7 @@ void heliocentricXYZr(double JDE, int object, double equinox, double *pos,
     }
     if (internalMode & S_FK5) {
       XYZ_eclipticPrecession(pos, J2000, JDE); /* precess to equinox of date */
-      VSOPtoFK5(T, pos);                       /* transform to FK5 */
+      VSOPtoFK5(10*T, pos);                    /* transform to FK5 */
       if (vocal) {
         printf("ASTRON: FK5 (%s) geometric heliocentric ecliptic coordinates, equinox/ecliptic of date for JD %2$.14g = %2$-#24.6J:\n", objectName(object), JDE);
         printLBRtoXYZ(pos);
@@ -3565,16 +3577,16 @@ void heliocentricXYZr(double JDE, int object, double equinox, double *pos,
       LBRtoXYZ(pos, XYZmoon);
 
       XYZfromVSOPA(T, 3, pos, tolerance); /* position of Earth */
-    if (internalMode & S_FK5) {
-      XYZ_eclipticPrecession(pos, J2000, JDE); /* precess to equinox of date */
-      VSOPtoFK5(T, pos);                       /* transform to FK5 */
-      if (vocal) {
-        printf("ASTRON: FK5 (Earth) geometric heliocentric ecliptic coordinates, equinox/ecliptic of date for JD %2$.14g = %2$-#24.6J:\n", JDE);
-        printLBRtoXYZ(pos);
-      }
-      XYZ_eclipticPrecession(pos, JDE, equinox); /* precess to desired equinox */
-    } else
-      XYZ_eclipticPrecession(pos, J2000, equinox); /* precess to desired equinox */
+      if (internalMode & S_FK5) {
+        XYZ_eclipticPrecession(pos, J2000, JDE); /* precess to equinox of date */
+        VSOPtoFK5(10*T, pos);   /* transform to FK5 */
+        if (vocal) {
+          printf("ASTRON: FK5 (Earth) geometric heliocentric ecliptic coordinates, equinox/ecliptic of date for JD %2$.14g = %2$-#24.6J:\n", JDE);
+          printLBRtoXYZ(pos);
+        }
+        XYZ_eclipticPrecession(pos, JDE, equinox); /* precess to desired equinox */
+      } else
+        XYZ_eclipticPrecession(pos, J2000, equinox); /* precess to desired equinox */
       pos[0] += XYZmoon[0];
       pos[1] += XYZmoon[1];
       pos[2] += XYZmoon[2];
@@ -4179,12 +4191,16 @@ int ana_astropos(int narg, int ps[])
       if (vocal)
         puts("ASTRON: no nutation correction.");
     }
-    double epsilon = obliquity(jd, &dEps);
+    if (internalMode & S_DATE)
+      equinox = jd;
+    if (vocal)
+      printf("ASTRON: equinox:        JD = %.7f\n", equinox);
+    double epsilon = obliquity(equinox, &dEps);
     if (vocal) {
       if (dPsi)
-        printf("ASTRON: obliquity of ecliptic corrected for nutation:\n");
+        printf("ASTRON: obliquity of ecliptic for equinox, corrected for nutation:\n");
       else
-        printf("ASTRON: mean obliquity of ecliptic:\n");
+        printf("ASTRON: mean obliquity of ecliptic for equinox:\n");
       showraddms(" epsilon = ", epsilon);
     }
     double ceps = cos(epsilon);
@@ -4199,11 +4215,7 @@ int ana_astropos(int narg, int ps[])
         printf("ASTRON: mean sidereal time (0 longitude)\n");
       showradhms(" Tsid = ", Tsid);
     }
-    if (internalMode & S_DATE)
-      equinox = jd;
-    if (vocal)
-      printf("ASTRON: equinox:        JD = %.7f\n", equinox);
-    if (!(internalMode & S_FK5))
+    if (vocal && !(internalMode & S_FK5))
       puts("ASTRON: coordinates relative to VSOP axes, not FK5");
     
     double mean[3];

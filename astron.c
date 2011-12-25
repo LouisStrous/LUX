@@ -3896,6 +3896,16 @@ double meanDistance(int obj1, int obj2)
     return meanDistances[obj1][obj2];
 }
 /*--------------------------------------------------------------------------*/
+void showraddms(char *prefix, double x)
+{
+  printf("%1$s%2$.10g rad = %3$.10g deg = %3$-13.2T dms\n", prefix, x, x*RAD);
+}
+/*--------------------------------------------------------------------------*/
+void showradhms(char *prefix, double x)
+{
+  printf("%1$s%2$.10g rad = %3$.10g deg = %3$#-13.2T hms\n", prefix, x, x*RAD);
+}
+/*--------------------------------------------------------------------------*/
 int ana_astropos(int narg, int ps[])
      /* returns the positions of a set of heavenly bodies at a specific */
      /* set of times, for equinox 2000.0 */
@@ -4105,14 +4115,17 @@ int ana_astropos(int narg, int ps[])
       if (vocal)
         puts("Ignoring nutation.");
     }
-    double epsilon = obliquity(jd, &dEps); /* obliquity of the ecliptic
-                                              possibly corrected for
+    if (vocal) {
+      printf("ASTRON: nutation/abberation constants:\n");
+      showraddms(" dPsi = ", dPsi);
+      showraddms(" dEps = ", dEps);
+    }
+    double epsilon = obliquity(jd, &dEps); /* obliquity of the
+                                              ecliptic corrected for
                                               nutation */
     if (vocal) {
-      printf("ASTRON: obliquity of ecliptic%1$s:\n"
-             " %2$.10g rad = %3$.10g deg = %3$-13.2T\n",
-             internalMode & S_NUTATION? " corrected for nutation": "",
-             epsilon, epsilon*RAD);
+      printf("ASTRON: obliquity of ecliptic corrected for nutation:\n");
+      showraddms(" epsilon = ", epsilon);
     }
     double ceps = cos(epsilon);
     double seps = sin(epsilon);
@@ -4120,9 +4133,8 @@ int ana_astropos(int narg, int ps[])
     /* apparent sidereal time at longitude zero (possibly corrected
        for nutation), at UT time, in radians */
     if (vocal) {
-      printf("ASTRON: apparent sidereal time (0 longitude%1$s):\n"
-             " %2$.10g rad = %3$.10g deg = %3$-#13.2T\n", 
-             internalMode & S_NUTATION? ", nutation": "", Tsid, Tsid*RAD);
+      printf("ASTRON: apparent sidereal time (0 longitude, nutation)\n");
+      showradhms(" Tsid = ", Tsid);
     }
     if (internalMode & S_DATE)
       equinox = jd;

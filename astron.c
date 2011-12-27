@@ -85,7 +85,7 @@ static char rcsid[] __attribute__ ((unused)) =
 #define S_PLANETOCENTRIC (1<<14) // 16384
 #define S_KEEPDIMS	(1<<15) // 32768
 #define S_VOCAL         (1<<16) // 65536
-#define AUtoJD		((149.59787e9/299792458)/86400)
+#define AUtoJD		((149.597870691e9/299792458)/86400)
 #define NOBJECTS	9
 
 #define EARTH		3

@@ -497,15 +497,13 @@ void findTextDate(char *text, int *year, int *month, double *day, int *cal,
       text = daystring;
       while (text > text0 && isspace((int) text[-1]))
 	text--;
-      c = *text;
-      *text = '\0';
     } else if (yearstring > monthstring) {
       text = yearstring;
       while (text > text0 && isspace((int) text[-1]))
 	text--;
-      c = *text;
-      *text = '\0';
     }
+    c = *text;
+    *text = '\0';
     if (*cal == CAL_DEFAULT) {
       for (j = 0; j < 4; j++) {
 	for (i = 0; i < 12; i++)
@@ -4058,6 +4056,10 @@ int ana_astropos(int narg, int ps[])
     latitude = S_PLANETOCENTRIC;
     if (coordSystem == S_HORIZONTAL)
       return anaerror("Need OBSERVER to return horizontal coordinates", 0);
+    /* avoid compiler warnings about possibly uninitialized variables */
+    longitude = 0;
+    clat = 1;
+    slat = 0;
   }
 
   if (narg > 4 && ps[4]) { 	/* EQUINOX */

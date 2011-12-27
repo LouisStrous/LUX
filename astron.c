@@ -401,51 +401,6 @@ void CJDtoDate(double CJD, int *year, int *month, double *day, int calendar)
     f[calendar](CJD, year, month, day);
 }
 /*--------------------------------------------------------------------------*/
-int tishri(int year)
-/* returns the number of days between Tishri 1, A.M. 1 and Tishri 1, */
-/* A.M. <year>.  LS 2oct98 */
-{
-  static int	nLeap[] = {
-    0, 0, 0, 1, 1, 1, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6
-  };
-  static int	isLeap[] = {
-    0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1
-  };
-  int	n, leap, halakim, hours, dow, weeks, j;
-
-  year--;
-  n = idiv(year,19);		/* number of cycles of Meton */
-  year -= n*19;			/* year within current cycle */
-  leap = nLeap[year];		/* number of leap days in current cycle */
-
-  halakim = 595*n + 876*year - 287*leap + 204;
-  j = idiv(halakim,1080);
-  hours = j + 16*n + 8*year + 13*leap + 5;
-  halakim -= 1080*j;
-  j = idiv(hours,24);
-  dow = j + 6939*n + 354*year + 29*leap + 1;
-  hours -= 24*j;
-  weeks = idiv(dow,7);
-  dow -= 7*weeks;
-  if (dow == 0 || dow == 3 || dow == 5)	/* dehiyyot 1 */
-    dow++;
-  else if (hours >= 18) {	/* dehiyyot 2 */
-    dow++;
-    if (dow == 7) {
-      weeks++;
-      dow = 0;
-    }
-    if (dow == 0 || dow == 3 || dow == 5) /* dehiyyot 1 */
-      dow++;
-  } else if (!isLeap[year] && dow == 2 && 1080*hours + halakim >= 9924)
-    dow += 2;
-  else if ((year == 0 || isLeap[year - 1])
-	   && dow == 1 && 1080*hours + halakim >= 16789)
-    dow++;
-
-  return weeks*7 + dow;
-}
-/*--------------------------------------------------------------------------*/
 void findTextDate(char *text, int *year, int *month, double *day, int *cal,
 		  int order)
 /* interpret the <text> as a date string in the calendar indicated by */

@@ -13998,20 +13998,21 @@ See also: @ref{ASTRON}, @ref{PRECESS}
 @code{ASTRON(@var{jds}, @var{objects} [, @var{object0},
 OBSERVER=@var{observer}, EQUINOX=@var{equinox},
 ELEMENTS=@var{elements}] [, /XYZ, /EQUATORIAL, /ECLIPTICAL,
-/HORIZONTAL, /ELONGATION, /DATE, /TDT, /GEOMETRIC, /ABBERATION,
-/QELEMENTS, /FK5, /TRUNCVSOP, /CONJSPREAD, /KEEPDIMS])}
+/HORIZONTAL, /ELONGATION, /DATE, /TDT, /LIGHTTIME, /ABERRATION,
+/NUTATION, /APPARENT, /QELEMENTS, /FK5, /CONJSPREAD, /PLANETOCENTRIC,
+/KEEPDIMENSIONS, /VOCAL, /VSOP87A, /VSOP87C])}
 
 Returns the positions of a set of heavenly bodies at a specific set of
 times.  Unless the user specifies otherwise, the times are taken to be
-in UT, light-time and abberation effects are included, the observer is
-assumed to be at the center of the Earth, and ecliptical coordinates
-(longitude and latitude in degrees, distance in AU) for equinox
-J2000.0 are returned, referred to the FK5 system.  The data for the
-major planets and the Sun are derived from the VSOP87D model of
-Bretagnon and Francou (@emph{Astronomy and Astrophysics}, Vol. 202,
-pp. 309-315, 1988), optionally truncated as by Meeus
-(@emph{Astronomical Algorithms}, Willmann-Bell Inc., 1991, ISBN
-0-943396-35-2).
+in UT, light-time, nutation, and aberration effects are not included,
+the observer is assumed to be at the center of the Earth, and
+ecliptical coordinates (longitude and latitude in degrees, distance in
+AU) for equinox J2000.0 are returned, referred to the VSOP dynamical
+ecliptic and equinox.  The data for the major planets and the Sun are
+derived from the VSOP87C or (by default) VSOP87A models of Bretagnon
+and Francou (@emph{Astronomy and Astrophysics}, Vol. 202, pp. 309-315,
+1988), optionally truncated as by Meeus (@emph{Astronomical
+Algorithms}, Willmann-Bell Inc., 1991, ISBN 0-943396-35-2).
 
 @table @var
 @item jds
@@ -14031,13 +14032,12 @@ requested, if any.
 observer.  If none is specified, then the observer is assumed to
 reside at the center of the planet.
 @item equinox
-The year of the equinox relative to which the results are returned.  If
-a scalar, then the unit is Julian years, with (J) 2000.0 equivalent to
-JDE 2451545.0.  If a string, then the first character must be either a j
-or J (indicating Julian years), or a b or B (indicating pseudo-Besselian
-years).  Besselian years are taken to be 365.2421988 days long, and
-B1950.0 corresponds to JDE 2433282.4235.  The equinox of the date can be
-requested through the /DATE keyword.
+The year of the equinox relative to which the results are returned.
+If a scalar, then the unit is Julian years, with (J) 2000.0 equivalent
+to JDE 2451545.0.  If a string, then the first character must be
+either a j or J (indicating Julian years), or a b or B (indicating
+Besselian years).  The equinox of the date can be requested through
+the /DATE keyword.
 @item elements
 A nine-element array containing orbital elements for the target object.
 The elements are, if @code{/QELEMENTS} is also specified: the equinox,
@@ -14077,13 +14077,17 @@ UT (a time based on the Earth's rotation) varies slowly with time.  ANA
 uses a quadratic fit to past estimates of the difference to calculate an
 estimated difference for the times you specify.  All the planetary
 calculations are performed in TDT.
-@item /GEOMETRIC
-selects return of geometrical rather than apparent coordinates by
-neglecting the light-time effect and abberation.  This keyword also
-activates @code{/NOABBERATION}
-@item /ABBERATION
-selects inclusion of abberation effects.  If @code{/NOABBERATION} is
-specified, then these effects are not included.
+@item /LIGHTTIME
+selects inclusion of light-time effects: the returned coordinates say
+where the target object was at the time when light left it to reach
+the observer at time @code{@var{jds}}.
+@item /ABERRATION
+selects inclusion of aberration effects.
+@item /NUTATION
+selects inclusion of nutation effects.
+@item /APPARENT
+selects return of apparent positions, including the effects of
+light-time, aberration, and nutation.
 @item /QELEMENTS
 indicates that @code{@var{elements}} is specified in terms of the
 perihelion (i.e., comet-style) rather than the semimajor axis (i.e.,
@@ -14092,10 +14096,6 @@ planet-style).
 returns coordinates relative to the FK5 system.  If @code{/NOFK5} is
 specified, then the coordinates are referred to the mean dynamical
 ecliptic defined by the VSOP system.
-@item /TRUNCVSOP
-indicates that the calculations should be performed using not the full
-VSOP theory but the truncated form published by Meeus.  This yields
-less accuracy but much faster calculation.
 @item /CONJSPREAD
 return the average position (ecliptical longitude and latitude) and
 the the conjunction spread of all indicated objects, measured in
@@ -14105,9 +14105,17 @@ conjunction spread is practically equal to their mutual distance.  For
 many objects on a great circle (e.g., planets on the ecliptic), the
 conjunction spread is equal to twice the standard deviation of their
 positions along the great circle.
-@item /KEEPDIMS
+@item /KEEPDIMENSIONS
 returns dimensions for the number of objects and number of dates even
 if these are equal to 1.
+@item /VOCAL
+makes the routine print intermediate results.
+@item /VSOP87A
+selects the VSOP87A model (cartesian heliocentric coordinates for
+J2000.0) to base the results on.
+@item /VSOP87C
+selects the VSOP87C model (cartesian heliocentric coordinates for the
+equinox of the date) to base the results on.
 @end table
 
 If objects not listed above are indicated in @code{@var{objects}} and/or

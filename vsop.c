@@ -1,16 +1,18 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
-#include "vsopdata.h"
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
 #include "anaparser.h"
+#include "vsop.h"
 
-static struct planetIndex usedPlanetIndices[6*3*8];
+#if DONOTIGNORE
+static struct VSOPdata usedVSOPdata;
 static double planetIndexTolerance = -1;
 
-struct planetIndex *planetIndicesForTolerance(double tolerance)
+struct VSOPdata *planetIndicesForTolerance(struct VSOPdata *data, 
+                                           double tolerance)
 /* returns a pointer to an array of planet indices into the VSOP model
    values, suitable for an error tolerance of nonnegative <tolerance>.
    None of the amplitudes of the VSOP planet terms represented by the
@@ -22,8 +24,10 @@ struct planetIndex *planetIndicesForTolerance(double tolerance)
 {
   if (tolerance < 0)
     tolerance = 0;
-  if (tolerance == planetIndexTolerance)
+  if (tolerance == planetIndexTolerance && planetIndices == planetIndexSrc)
     return usedPlanetIndices;
+  planetIndexSrc = planetIndices;
+  planetIndexTolerance = tolerance;
   memcpy(usedPlanetIndices, planetIndices, sizeof(planetIndices));
   if (tolerance > 0) {
     int planet;
@@ -46,13 +50,14 @@ struct planetIndex *planetIndicesForTolerance(double tolerance)
   }
   return usedPlanetIndices;
 }
+#endif
 /*--------------------------------------------------------------------------*/
 static void gatherVSOP(double T, struct planetIndex *index, double *terms, 
                        double *value)
 /* calculates one coordinate of one object, as indicated by <index>,
    at time <T> in Julian centuries since J2000.0, using the VSOP87
-   theory of Bretagnon & Francou (1988).  The heliocentric longitude,
-   latitude, (in radians) or radius (in AU) is returned in <*value>. */
+   theory of Bretagnon & Francou (1988).  The heliocentric coordinate
+   is returned in <*value>. */
 {
   double	*ptr;
   int	nTerm, i;
@@ -71,7 +76,42 @@ static void gatherVSOP(double T, struct planetIndex *index, double *terms,
   }
 }
 /*--------------------------------------------------------------------------*/
-void XYZfromVSOPA(double T, int object, double *pos, double tolerance)
+void XYZfromVSOP(double T, int object, double *pos, double tolerance,
+                 struct VSOPdata *data)
+{
+  switch (object) {
+    case 0:			/* Sun */
+      pos[0] = pos[1] = pos[2] = 0.0;
+      break;
+    default:			/* other planets */
+				/* heliocentric ecliptic X (AU) */
+      gatherVSOP(T, &data->indices[6*3*(object - 1)], data->terms, &pos[0]);
+				/* heliocentric ecliptic Y (AU) */
+      gatherVSOP(T, &data->indices[6*3*(object - 1) + 6], data->terms, &pos[1]);
+				/* heliocentric ecliptic Z (AU) */
+      gatherVSOP(T, &data->indices[6*3*(object - 1) + 12], data->terms, &pos[2]);
+      break;
+  }
+}
+/*--------------------------------------------------------------------------*/
+void XYZdatefromVSOPC(double T, int object, double *pos, double tolerance)
+/* returns the heliocentric cartesian coordinates referred to the mean
+ dynamical ecliptic and equinox of the date using the VSOP87C theory as
+ described in Bretagnon & Francou: "Planetary theories in rectangular
+ and spherical variables.  VSOP 87 solutions", Astronomy and
+ Astrophysics, 202, 309-315 (1988).  <T> represents the desired
+ instant of time, measured in Julian centuries since J2000.0.
+ <object> indicates the object for which coordinates are to be
+ returned (0 = the Sun, 1 = Mercury, ..., 8 = Neptune).  <pos> points
+ at an array of at least 3 elements, in which the results are
+ returned.  pos[0] -> X, pos[1] -> Y, pos[2] -> Z. <tolerance>
+ indicates the maximum error allowed in the results due to truncation
+ of the VSOP model series.  Specify 0 to get the highest accuracy. */
+{
+  return XYZfromVSOP(T, object, pos, tolerance, &VSOP87Cdata);
+}
+/*--------------------------------------------------------------------------*/
+void XYZJ2000fromVSOPA(double T, int object, double *pos, double tolerance)
 /* returns the heliocentric cartesian coordinates referred to the mean
  dynamical ecliptic and equinox of J2000.0 using the VSOP87A theory as
  described in Bretagnon & Francou: "Planetary theories in rectangular
@@ -85,20 +125,5 @@ void XYZfromVSOPA(double T, int object, double *pos, double tolerance)
  indicates the maximum error allowed in the results due to truncation
  of the VSOP model series.  Specify 0 to get the highest accuracy. */
 {
-  struct planetIndex *indices;
-
-  indices = planetIndicesForTolerance(tolerance);
-  switch (object) {
-    case 0:			/* Sun */
-      pos[0] = pos[1] = pos[2] = 0.0;
-      break;
-    default:			/* other planets */
-				/* heliocentric ecliptic X (AU) */
-      gatherVSOP(T, &indices[6*3*(object - 1)], planetTerms, &pos[0]);
-				/* heliocentric ecliptic Y (AU) */
-      gatherVSOP(T, &indices[6*3*(object - 1) + 6], planetTerms, &pos[1]);
-				/* heliocentric ecliptic Z (AU) */
-      gatherVSOP(T, &indices[6*3*(object - 1) + 12], planetTerms, &pos[2]);
-      break;
-  }
+  return XYZfromVSOP(T, object, pos, tolerance, &VSOP87Adata);
 }

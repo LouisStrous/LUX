@@ -374,7 +374,7 @@ int ana_iauEpb2jd(int narg, int ps[])
   loopInfo *infos;
   int iq;
 
-  if ((iq = standard_args(narg, ps, "i>D*;rD*", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "i>D*;rD&", &ptrs, &infos)) < 0)
     return ANA_ERROR;
   while (infos[0].nelem--) {
     double djm0, djm;

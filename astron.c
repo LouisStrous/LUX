@@ -2419,7 +2419,7 @@ int constellation(double alpha, double delta)
   return cb[i].constellation;
 }
 /*--------------------------------------------------------------------------*/
-#define B1875 (2405889.25855)
+#define B1875 (2405889.258551)
 int ana_constellation(int narg, int ps[])
 /* CONSTELLATION(coords [, equinox, /JULIAN, /BESSELIAN]) returns the
    constellation of each set of <coords> relative to the given <equinox>.

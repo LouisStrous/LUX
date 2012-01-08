@@ -2373,7 +2373,7 @@ int read_formatted_ascii(int narg, int ps[], void *ptr, int showerrors,
    <string.h>: strcpy(), strlen()
  */
 {
-  char	*fmt, *scr, *p, c;
+  char	*fmt, *scr, *p, c, *ptr0;
   int	type, string2, pr, i, len, nout = 0;
   double	d, k, f, d2;
   pointer	trgt;
@@ -2394,6 +2394,8 @@ int read_formatted_ascii(int narg, int ps[], void *ptr, int showerrors,
       isString = 1;
     }
   }
+
+  ptr0 = (char *) ptr;
 
   fmt = string_arg(*ps++);	/* format string */
   if (!fmt)
@@ -2435,7 +2437,7 @@ int read_formatted_ascii(int narg, int ps[], void *ptr, int showerrors,
 	  break;
 	default:
 	  if (showerrors)
-	    return anaerror("Illegal format", 0);
+	    return anaerror("Illegal format %s", 0, fmt);
 	  else
 	    return nout;
 	case FMT_INTEGER:
@@ -2579,7 +2581,7 @@ int read_formatted_ascii(int narg, int ps[], void *ptr, int showerrors,
 		  if (pr) {	/* not the last one: read an integer */
 		    if (!gscanf(ptr2, "%d", &i, string2))
 		      return
-			showerrors? anaerror("Unexpected input", 0): nout;
+			showerrors? anaerror("Expected a digit while looking for a time at character index %d in %s", 0, (char *) *ptr2 - ptr0, ptr0): nout;
 		    d += i*k;
 		    if (i < 0)
 		      k = -k;
@@ -2587,11 +2589,11 @@ int read_formatted_ascii(int narg, int ps[], void *ptr, int showerrors,
 		    /* skip the separator: anything except digits */
 		    if (!gscanf(ptr2, "%*[^0-9]", NULL, string2))
 		      return
-			showerrors? anaerror("Unexpected input", 0): nout;
+			showerrors? anaerror("Expected a non-digit while looking for a time at character index %d in %s", 0, (char *) *ptr2 - ptr0, ptr0): nout;
 		  } else {	/* the last one: read a float */
 		    if (!gscanf(ptr2, "%lf", &f, string2))
 		      return
-			showerrors? anaerror("Unexpected input", 0): nout;
+			showerrors? anaerror("Expected a (floating-point) number while looking for a time at character index %d in %s", 0, (char *) *ptr2 - ptr0, ptr0): nout;
 		    d += f*k;
 		  }
 		}
@@ -2633,7 +2635,7 @@ int read_formatted_ascii(int narg, int ps[], void *ptr, int showerrors,
 		if (!gscanf(ptr2, theFormat.current,
 			    (theFormat.flags & FMT_SUPPRESS)? NULL: trgt.b,
 			    string2))
-		  return showerrors? anaerror("Unexpected input", 0): nout;
+		  return showerrors? anaerror("Expected a number at character index %d in %s", 0, (char *) *ptr2 - ptr0, ptr0): nout;
 		break;
 	    } /* end of switch (type) */
 	    trgt.b += ana_type_size[type];
@@ -2682,7 +2684,10 @@ int ana_freadf(int narg, int ps[])
   if (ana_file_open[lun] != 1)
     return cerror(WRITE_ONLY, *ps);
   fp = ana_file[lun];
-  return read_formatted_ascii(narg - 1, &ps[1], (void *) fp, 1, 0) == ANA_ERROR? ANA_ERROR: ANA_OK;
+  if (read_formatted_ascii(narg - 1, &ps[1], (void *) fp, 1, 0) == ANA_ERROR)
+    return anaerror("Error reading file %s", 0, ana_file_name[lun]);
+  else 
+    return ANA_OK;
 }
 /*------------------------------------------------------------------------- */
 int ana_fread(int narg, int ps[])
@@ -2696,6 +2701,7 @@ int ana_fread(int narg, int ps[])
   result = read_formatted_ascii(narg, ps, (void *) stdin, 1, 0);
   switch (result) {
     case ANA_ERROR: case 0:
+      anaerror("Error reading from standard input", 0);
       return ANA_ZERO;
     case 1:
       return ANA_ONE;
@@ -2727,6 +2733,7 @@ int ana_freadf_f(int narg, int ps[])
   result = read_formatted_ascii(narg - 1, &ps[1], (void *) fp, 0, 0);
   switch (result) {
     case ANA_ERROR: case 0:
+      anaerror("Error reading from file %s", 0, ana_file_name[lun]);
       return ANA_ZERO;
     case 1:
       return ANA_ONE;

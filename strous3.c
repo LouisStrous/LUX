@@ -2390,12 +2390,11 @@ double unmod(double cur, double prev, double period, double average)
 /*--------------------------------------------------------------------*/
 int unmod_slice_d(double *srcptr, int srccount, int srcstride,
                   double period, double average,
-                  double *tgtptr, int tgtcount, int tgtstride)
+                  double *tgtptr, int tgtstride)
 {
   int i;
 
-  if (!period || !srcptr || srccount < 1 || !tgtptr || tgtcount < 1
-      || tgtcount != srccount) {
+  if (!period || !srcptr || srccount < 1 || !tgtptr) {
     errno = EDOM;
     return 1;
   }
@@ -2410,3 +2409,15 @@ int unmod_slice_d(double *srcptr, int srccount, int srcstride,
   return 0;
 }
 BIND(unmod_slice_d, ivddovrl, f, UNMOD, 2, 4, ":AXIS:PERIOD:AVERAGE");
+/*--------------------------------------------------------------------*/
+double hypot_stride(double *data, int count, int stride)
+{
+  double result = 0.0;
+  while (count-- > 0) {
+    result = hypot(result, *data);
+    data += stride;
+  }
+  return result;
+}
+BIND(hypot_stride, ivard, f, HYPOT, 1, 2, ":AXIS");
+/*--------------------------------------------------------------------*/

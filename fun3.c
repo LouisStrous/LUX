@@ -3289,7 +3289,17 @@ double cspline_value(double x, csplineInfo *cspl)
 /* interpolate using cubic splines.   Assumes <cspl> contains the required */
 /* information about the cubic spline (installed with cubic_spline_tables() */
 {
-  return gsl_spline_eval(cspl->spline, x, cspl->acc);
+  gsl_spline *s = cspl->spline;
+
+  if (x < s->x[0])
+    return s->y[0]
+      + (x - s->x[0])*(s->y[1] - s->y[0])/(s->x[1] - s->x[0]);
+  if (x > s->x[s->size - 1]) {
+    int n = s->size;
+    return s->y[n-1]
+      + (x - s->x[n-1])*(s->y[n-2] - s->y[n-1])/(s->x[n-2] - s->x[n-1]);
+  }
+  return gsl_spline_eval(s, x, cspl->acc);
 }
 /*------------------------------------------------------------------------- */
 double cspline_derivative(double x, csplineInfo *cspl)
@@ -3298,6 +3308,13 @@ double cspline_derivative(double x, csplineInfo *cspl)
 /* (installed with cubic_spline_tables). */
 /* LS 9may98 */
 {
+  gsl_spline *s = cspl->spline;
+  if (x < s->x[0])
+    return (s->y[1] - s->y[0])/(s->x[1] - s->x[0]);
+  if (x > s->x[s->size - 1]) {
+    int n = s->size;
+    return (s->y[n-1] - s->y[n-2])/(s->x[n-1] - s->x[n-2]);
+  }
   return gsl_spline_eval_deriv(cspl->spline, x, cspl->acc);
 }
 /*------------------------------------------------------------------------- */

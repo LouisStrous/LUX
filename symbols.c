@@ -1815,19 +1815,19 @@ int redef_scalar(int nsym, int ntype, void *val)
   symbol_type(nsym) = ntype;
   switch (ntype) {
     case ANA_BYTE:
-      scalar_value(nsym).b = value->b;
+      scalar_value(nsym).b = value? value->b: 0;
       break;
     case ANA_WORD:
-      scalar_value(nsym).w = value->w;
+      scalar_value(nsym).w = value? value->w: 0;
       break;
     case ANA_LONG:
-      scalar_value(nsym).l = value->l;
+      scalar_value(nsym).l = value? value->l: 0;
       break;
     case ANA_FLOAT:
-      scalar_value(nsym).f = value->f;
+      scalar_value(nsym).f = value? value->f: 0.0;
       break;
     case ANA_DOUBLE:
-      scalar_value(nsym).d = value->d;
+      scalar_value(nsym).d = value? value->d: 0.0;
       break;
     case ANA_CFLOAT:
       complex_scalar_memory(nsym) = ana_type_size[ANA_CFLOAT];
@@ -1835,8 +1835,8 @@ int redef_scalar(int nsym, int ntype, void *val)
       if (!complex_scalar_data(nsym).cf)
 	return cerror(ALLOC_ERR, nsym);
       symbol_class(nsym) = ANA_CSCALAR;
-      complex_scalar_data(nsym).cf->real = value->cf.real;
-      complex_scalar_data(nsym).cf->imaginary = value->cf.imaginary;
+      complex_scalar_data(nsym).cf->real = value? value->cf.real: 0.0;
+      complex_scalar_data(nsym).cf->imaginary = value? value->cf.imaginary: 0.0;
       break;
     case ANA_CDOUBLE:
       complex_scalar_memory(nsym) = ana_type_size[ANA_CDOUBLE];
@@ -1844,8 +1844,8 @@ int redef_scalar(int nsym, int ntype, void *val)
       if (!complex_scalar_data(nsym).cd)
 	return cerror(ALLOC_ERR, nsym);
       symbol_class(nsym) = ANA_CSCALAR;
-      complex_scalar_data(nsym).cd->real = value->cd.real;
-      complex_scalar_data(nsym).cd->imaginary = value->cd.imaginary;
+      complex_scalar_data(nsym).cd->real = value? value->cd.real: 0.0;
+      complex_scalar_data(nsym).cd->imaginary = value? value->cd.imaginary: 0.0;
       break;
   }
   return ANA_OK;

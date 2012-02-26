@@ -212,7 +212,7 @@ int ana_inserter(int narg, int ps[])
       default:
 	return cerror(ILL_TYPE, ps[0]);
     }
-  } while (advanceLoop(&trgtinfo) < trgtinfo.rndim);
+  } while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.rndim);
   return ANA_OK;
 }
 /*------------------------------------------------------------------------- */
@@ -529,7 +529,8 @@ int ana_reverse(int narg, int ps[])
 	    } /* end of while (i--) */
 	  src.b = src2.b + stride*srcinfo.rdims[0];
 	  trgt.b = trgt2.b + stride*srcinfo.rdims[0];
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
       else {			/* center is out of bounds */
 	if (internalMode & 1) {	/* /ZERO */
 	  zerobytes(trgt.b, trgtinfo.nelem*trgtinfo.stride);
@@ -3029,7 +3030,7 @@ int extractNumerical(pointer src, pointer trgt, int type, int ndim, int *dims,
   do {
     memcpy(trgt.b, src.b, info.stride);
     trgt.b += info.stride;
-  } while (advanceLoop(&info) < info.rndim);
+  } while (advanceLoop(&info, &trgt) < info.rndim);
   return 1;
 }
 /*------------------------------------------------------------------------- */
@@ -3091,7 +3092,7 @@ int ana_roll(int narg, int ps[])
   do {
     memcpy(trgt.b, src.b, srcinfo.stride);
     trgt.b += srcinfo.stride;
-  } while (advanceLoop(&srcinfo) < srcinfo.rndim);
+  } while (advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 
   return result;
 }

@@ -17,7 +17,7 @@
 
    The tricky bit of standardLoop() is that the user must specify
    the location of a pointer for use in traversing the array.  This
-   pointer will be updated by routine advanceLoop() or advanceLoops()
+   pointer will be updated by routine advanceLoop()
    appropriate for the dimensional structure of the array and the axis
    along which the array is traversed.  See at standardLoop() for more
    info.
@@ -46,8 +46,8 @@ void rearrangeDimensionLoop(loopInfo *info);
 int standardLoop(int data, int axisSym, int mode, int outType,
 		 loopInfo *src, pointer *srcptr, int *output, loopInfo *trgt,
 		 pointer *trgtptr);
-int advanceLoop(loopInfo *info), ana_convert(int, int [], int, int),
-  advanceLoops(loopInfo *info1, loopInfo *info2);
+int advanceLoop(loopInfo *info, pointer *ptr),
+  ana_convert(int, int [], int, int);
 int nextLoop(loopInfo *info), nextLoops(loopInfo *info1, loopInfo *info2);
 int dimensionLoopResult(loopInfo const *sinfo, loopInfo *tinfo, int type,
 			pointer *tptr);
@@ -189,7 +189,7 @@ void setupDimensionLoop(loopInfo *info, int ndim, int const *dims,
   setAxisMode(info, mode);
 }
 /*-----------------------------------------------------------------------*/
-int advanceLoop(loopInfo *info)
+int advanceLoop(loopInfo *info, pointer *ptr)
 /* advance coordinates; return index of first encountered incomplete
  axis.  I.e., if the array has 4 by 5 by 6 elements, then advancement
  from element (2,0,0) (to element (3,0,0)) yields 0, (3,0,0) yields 1,
@@ -198,7 +198,7 @@ int advanceLoop(loopInfo *info)
   int	i, done;
 
   /* advance pointer */
-  (*info->data).b += info->step[info->advanceaxis]*info->stride;
+  ptr->b += info->step[info->advanceaxis]*info->stride;
   
   if (info->advanceaxis >= info->rndim)	/* already done */
     done = info->rndim;
@@ -213,7 +213,7 @@ int advanceLoop(loopInfo *info)
       info->coords[i] = 0;	/* back to start */
       done = i + 1;		/* keep track of last advanced dimension */
       if (done < info->rndim)
-	(*info->data).b += info->step[i + 1]*info->stride;
+	ptr->b += info->step[i + 1]*info->stride;
     }
   }
   return done;
@@ -229,38 +229,6 @@ int loopIsAtStart(loopInfo const *info)
   for (i = 0; i < info->rndim; i++)
     state &= (info->coords[i] == 0);
   return state;
-}
-/*-----------------------------------------------------------------------*/
-int advanceLoops(loopInfo *info1, loopInfo *info2)
-/* advance two loops.  The dimensional structure of info1 and info2
- must be equal!  Both data pointers are advanced, but only the
- coordinates of info1. */
-{
-  int	i, done, s;
-
-  /* advance pointer */
-  s = info1->step[info1->advanceaxis];
-  (*info1->data).b += s*info1->stride;
-  (*info2->data).b += s*info2->stride;
-  
-  if (info1->advanceaxis >= info1->rndim) /* we're already done */
-    done = info1->rndim;
-  else {
-    done = 0;			/* default: not done yet */
-
-    /* update coordinates */
-    for (i = info1->advanceaxis; i < info1->rndim; i++) {
-      if (++(info1->coords[i]) != info1->rdims[i])
-	break;			/* not yet at end of this dimension */
-      /* if we get here, we are at the end of a dimension */
-      info1->coords[i] = 0;	/* back to start */
-      done = i + 1;		/* keep track of last advanced dimension */
-      s = info1->step[i + 1];
-      (*info1->data).b += s*info1->stride;
-      (*info2->data).b += s*info2->stride;
-    }
-  }
-  return done;    
 }
 /*-----------------------------------------------------------------------*/
 void rearrangeDimensionLoop(loopInfo *info)

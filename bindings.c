@@ -6,9 +6,11 @@
 #define obstack_chunk_alloc malloc
 #define obstack_chunk_free free
 
+extern int internalMode;
+
 int standard_args(int, int [], char const *, pointer **, loopInfo **);
 int setAxes(loopInfo *, int, int *, int);
-int advanceLoop(loopInfo *);
+int advanceLoop(loopInfo *, pointer *);
 
 struct obstack *registered_functions = NULL, *registered_subroutines = NULL;
 

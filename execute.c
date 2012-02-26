@@ -5117,7 +5117,7 @@ int ana_test(int narg, int ps[])
       rearrangeEdgeLoop(&info, NULL, i);
       do
 	*src.l = value;
-      while (advanceLoop(&info) < info.ndim - 1);
+      while (advanceLoop(&info, &src) < info.ndim - 1);
     }
   }
 

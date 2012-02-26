@@ -255,7 +255,7 @@ int ana_bisect(int narg, int ps[])
 	  } /* end of if (*ptr.f > level.f[lev]) else */
 	} /* end of for (lev = 0; ...) */
 	src.f += step*srcinfo.rdims[0];
-      } while (advanceLoop(&srcinfo) < srcinfo.rndim);
+      } while (advanceLoop(&srcinfo, &src) < srcinfo.rndim);
       break;
     case ANA_DOUBLE:
       do {
@@ -376,7 +376,7 @@ int ana_bisect(int narg, int ps[])
 	  } /* end of if (*ptr.d > level.d[lev]) else */
 	} /* end of for (lev = 0; ...) */
 	src.d += step*srcinfo.rdims[0];
-      } while (advanceLoop(&srcinfo) < srcinfo.rndim);
+      } while (advanceLoop(&srcinfo, &src) < srcinfo.rndim);
       break;
   default:
     break;
@@ -517,7 +517,7 @@ int ana_cspline_find(int narg, int ps[])
 	      Bytestack_push_data(b, c, (byte *) c + csize);
 	    }
 	  }
-	} while ((i = advanceLoop(&srcinfo)) == 0);
+	} while ((i = advanceLoop(&srcinfo, &src)) == 0);
       } while (i < srcinfo.rndim);
       break;
   case ANA_DOUBLE:
@@ -561,7 +561,7 @@ int ana_cspline_find(int narg, int ps[])
 	      Bytestack_push_data(b, c, (byte *) c + csize);
 	    }
 	  }
-	} while ((i = advanceLoop(&srcinfo)) == 0);
+	} while ((i = advanceLoop(&srcinfo, &src)) == 0);
       } while (i < srcinfo.rndim);
     break;
   default:
@@ -1152,7 +1152,8 @@ LS 9nov98 */
 	  value *= 0.5;
       }
       *trgt.f = value;
-    } while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+    } while (advanceLoop(&trgtinfo, &trgt),
+	     advanceLoop(&srcinfo, &src) < srcinfo.rndim);
   else				/* gaussian smoothing */
     do {
       count = twosided + 1;
@@ -1291,7 +1292,8 @@ LS 9nov98 */
       if (!total)
 	value /= ws;
       *trgt.f = value;
-    } while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+    } while (advanceLoop(&trgtinfo, &trgt), 
+	     advanceLoop(&srcinfo, &src) < srcinfo.rndim);
   return iq;
 }
 /*--------------------------------------------------------------------*/
@@ -1467,7 +1469,8 @@ int ana_dir_smooth2(int narg, int ps[])
 	  }
 	} /* end of while (s < s0) */
       } /* end of while (count--) */
-    } while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+    } while (advanceLoop(&trgtinfo, &trgt),
+	     advanceLoop(&srcinfo, &src) < srcinfo.rndim);
   } else {			/* gaussian smoothing */
     norm = 0.5*M_2_SQRTPI;
     do {
@@ -1606,7 +1609,8 @@ int ana_dir_smooth2(int narg, int ps[])
 	  }
 	} /* end of while (d < DONE) */
       } /* end of while (count--) */
-    } while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+    } while (advanceLoop(&trgtinfo, &trgt),
+	     advanceLoop(&srcinfo, &src) < srcinfo.rndim);
   }
   return iq;
 }

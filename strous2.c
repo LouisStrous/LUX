@@ -584,7 +584,8 @@ int ana_orderfilter(int narg, int ps[])
     rearrangeEdgeLoop(&tmpinfo, &tmpinfo2, i); /* get ready */
     do
       memcpy(tmptrgt.b, tmpsrc.b, tmpinfo.stride); /* copy */
-    while (advanceLoops(&tmpinfo, &tmpinfo2) < tmpinfo.ndim - 1);
+    while (advanceLoop(&tmpinfo2, &tmptrgt),
+	   advanceLoop(&tmpinfo, &tmpsrc) < tmpinfo.ndim - 1);
   }
 
   /* we calculate the offsets of the elements to be considered */
@@ -605,7 +606,7 @@ int ana_orderfilter(int narg, int ps[])
     for (j = 0; j < srcinfo.naxes; j++)
       offset[i] += srcinfo.rsinglestep[j]*(tmpinfo.coords[j] - w);
     i++;
-  } while (advanceLoop(&tmpinfo) < tmpinfo.ndim);
+  } while (advanceLoop(&tmpinfo, &tmpsrc) < tmpinfo.ndim);
 
   /* now we arrange to select only the interior area.
      we start by specifying ranges comprising the whole data set */
@@ -645,7 +646,8 @@ int ana_orderfilter(int narg, int ps[])
 	*trgt.d = src.d[index[med]];
 	break;
     }
-  } while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.ndim);
+  } while (advanceLoop(&trgtinfo, &trgt),
+	   advanceLoop(&srcinfo, &src) < srcinfo.ndim);
 
   free(index);
   free(offset);
@@ -719,7 +721,7 @@ int ana_quantile(int narg, int ps[])
     do {
       memcpy(tmp.b, src.b, srcinfo.stride);
       tmp.b += srcinfo.stride;
-    } while (advanceLoop(&srcinfo) < srcinfo.naxes);
+    } while (advanceLoop(&srcinfo, &src) < srcinfo.naxes);
     qsort(tmp0.b, nelem, srcinfo.stride, cmp);
     switch (type) {
       case ANA_BYTE:
@@ -753,7 +755,7 @@ int ana_quantile(int narg, int ps[])
 	  *trgt.d = (tmp0.d[med] + tmp0.d[med + 1])/2;
 	break;
     }
-  } while (advanceLoop(&trgtinfo) < trgtinfo.rndim);
+  } while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.rndim);
 
   free(tmp0.b);
   return output;
@@ -847,7 +849,8 @@ int ana_minfilter(int narg, int ps[])
 	    *trgt.b = value.b;
 	    trgt.b += stride;
 	  }
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
       case ANA_WORD:
 	do {
@@ -883,7 +886,8 @@ int ana_minfilter(int narg, int ps[])
 	    *trgt.w = value.w;
 	    trgt.w += stride;
 	  }
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
       case ANA_LONG:
 	do {
@@ -919,7 +923,8 @@ int ana_minfilter(int narg, int ps[])
 	    *trgt.l = value.l;
 	    trgt.l += stride;
 	  }
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
       case ANA_FLOAT:
 	do {
@@ -955,7 +960,8 @@ int ana_minfilter(int narg, int ps[])
 	    *trgt.f = value.f;
 	    trgt.f += stride;
 	  }
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
       case ANA_DOUBLE:
 	do {
@@ -991,7 +997,8 @@ int ana_minfilter(int narg, int ps[])
 	    *trgt.d = value.d;
 	    trgt.d += stride;
 	  }
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
     }
     if (loop < srcinfo.naxes - 1) {
@@ -1092,7 +1099,8 @@ int ana_maxfilter(int narg, int ps[])
 	    *trgt.b = value.b;
 	    trgt.b += stride;
 	  }
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
       case ANA_WORD:
 	do {
@@ -1128,7 +1136,8 @@ int ana_maxfilter(int narg, int ps[])
 	    *trgt.w = value.w;
 	    trgt.w += stride;
 	  }
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
       case ANA_LONG:
 	do {
@@ -1164,7 +1173,8 @@ int ana_maxfilter(int narg, int ps[])
 	    *trgt.l = value.l;
 	    trgt.l += stride;
 	  }
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
       case ANA_FLOAT:
 	do {
@@ -1200,7 +1210,8 @@ int ana_maxfilter(int narg, int ps[])
 	    *trgt.f = value.f;
 	    trgt.f += stride;
 	  }
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
       case ANA_DOUBLE:
 	do {
@@ -1236,7 +1247,8 @@ int ana_maxfilter(int narg, int ps[])
 	    *trgt.d = value.d;
 	    trgt.d += stride;
 	  }
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
     }
     if (loop < srcinfo.naxes - 1) {
@@ -1339,7 +1351,7 @@ int ana_distarr(int narg, int ps[])
   { temp = (trgtinfo.coords[0] - center[0])*stretch[0];
     *trgt.f = temp*temp + temptot;
     *trgt.f = sqrt((double) *trgt.f); /* distance */
-    done = advanceLoop(&trgtinfo);
+    done = advanceLoop(&trgtinfo, &trgt);
     if (done && done < ndim)
     { temptot = 0.0;
       for (i = 1; i < ndim; i++)
@@ -1675,7 +1687,8 @@ int shift(int narg, int ps[], int isFunction)
 	  tmp += srcinfo.stride;
 	  trgt.b += step;
 	}
-      } while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+      } while (advanceLoop(&trgtinfo, &trgt),
+	       advanceLoop(&srcinfo, &src) < srcinfo.rndim);
       src0.b = trgt0.b;		/* take result of previous loop as source */
       /* of next one */
     } while (nextLoops(&srcinfo, &trgtinfo));
@@ -1717,7 +1730,8 @@ int shift(int narg, int ps[], int isFunction)
 	  tmp += srcinfo.stride;
 	  trgt.b += step;
 	}
-      } while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+      } while (advanceLoop(&trgtinfo, &trgt),
+	       advanceLoop(&srcinfo, &src) < srcinfo.rndim);
       src0.b = trgt0.b;		/* take result of previous loop as source */
       /* of next one */
     } while (nextLoops(&srcinfo, &trgtinfo));
@@ -1922,7 +1936,7 @@ int local_extrema(int narg, int ps[], int code)
 	rearrangeEdgeLoop(&trgtinfo, NULL, i);
 	do
 	  *trgt.l = 0;
-	while (advanceLoop(&trgtinfo) < trgtinfo.ndim - 1);
+	while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.ndim - 1);
       }
     /* and exclude the edges from further dealings */
     subdataLoop(edge, &trgtinfo);
@@ -1952,8 +1966,9 @@ int local_extrema(int narg, int ps[], int code)
 	  *trgt.l = nok;
 	else if (nok)
 	  *trgt.l++ = src.b - (byte *) srcinfo.data0;
-	done = degree? advanceLoops(&srcinfo, &trgtinfo):
-	  advanceLoop(&srcinfo);
+	done = degree? (advanceLoop(&trgtinfo, &trgt),
+			advanceLoop(&srcinfo, &src)):
+	  advanceLoop(&srcinfo, &src);
       } while (done < srcinfo.ndim);
       break;
     case ANA_WORD:
@@ -1976,8 +1991,9 @@ int local_extrema(int narg, int ps[], int code)
 	  *trgt.l = nok;
 	else if (nok)
 	  *trgt.l++ = src.w - (word *) srcinfo.data0;
-	done = degree? advanceLoops(&srcinfo, &trgtinfo):
-	  advanceLoop(&srcinfo);
+	done = degree? (advanceLoop(&trgtinfo, &trgt),
+			advanceLoop(&srcinfo, &src)):
+	  advanceLoop(&srcinfo, &src);
       } while (done < srcinfo.ndim);
       break;
     case ANA_LONG:
@@ -2000,8 +2016,9 @@ int local_extrema(int narg, int ps[], int code)
 	  *trgt.l = nok;
 	else if (nok)
 	  *trgt.l++ = src.l - (int *) srcinfo.data0;
-	done = degree? advanceLoops(&srcinfo, &trgtinfo):
-	  advanceLoop(&srcinfo);
+	done = degree? (advanceLoop(&trgtinfo, &trgt),
+			advanceLoop(&srcinfo, &src)):
+	  advanceLoop(&srcinfo, &src);
       } while (done < srcinfo.ndim);
       break;
     case ANA_FLOAT:
@@ -2024,8 +2041,9 @@ int local_extrema(int narg, int ps[], int code)
 	  *trgt.l = nok;
 	else if (nok)
 	  *trgt.l++ = src.f - (float *) srcinfo.data0;
-	done = degree? advanceLoops(&srcinfo, &trgtinfo):
-	  advanceLoop(&srcinfo);
+	done = degree? (advanceLoop(&trgtinfo, &trgt),
+			advanceLoop(&srcinfo, &src)):
+	  advanceLoop(&srcinfo, &src);
       } while (done < srcinfo.ndim);
       break;
     case ANA_DOUBLE:
@@ -2048,8 +2066,9 @@ int local_extrema(int narg, int ps[], int code)
 	  *trgt.l = nok;
 	else if (nok)
 	  *trgt.l++ = src.d - (double *) srcinfo.data0;
-	done = degree? advanceLoops(&srcinfo, &trgtinfo):
-	  advanceLoop(&srcinfo);
+	done = degree? (advanceLoop(&trgtinfo, &trgt),
+			advanceLoop(&srcinfo, &src)):
+	  advanceLoop(&srcinfo, &src);
       } while (done < srcinfo.ndim);
       break;
   }
@@ -3246,7 +3265,7 @@ int ana_runprod(int narg, int ps[])
       do {
 	value.b *= *src.b;
 	*trgt.b = value.b;
-	n = advanceLoops(&srcinfo, &trgtinfo);
+	n = advanceLoop(&trgtinfo, &trgt), advanceLoop(&srcinfo, &src);
 	if (n)
 	  value.b = 1;
       } while (n < srcinfo.rndim);
@@ -3256,7 +3275,7 @@ int ana_runprod(int narg, int ps[])
       do {
 	value.w *= *src.w;
 	*trgt.w = value.w;
-	n = advanceLoops(&srcinfo, &trgtinfo);
+	n = advanceLoop(&trgtinfo, &trgt), advanceLoop(&srcinfo, &src);
 	if (n)
 	  value.w = 1;
       } while (n < srcinfo.rndim);
@@ -3266,7 +3285,7 @@ int ana_runprod(int narg, int ps[])
       do {
 	value.l *= *src.l;
 	*trgt.l = value.l;
-	n = advanceLoops(&srcinfo, &trgtinfo);
+	n = advanceLoop(&trgtinfo, &trgt), advanceLoop(&srcinfo, &src);
 	if (n)
 	  value.l = 1;
       } while (n < srcinfo.rndim);
@@ -3276,7 +3295,7 @@ int ana_runprod(int narg, int ps[])
       do {
 	value.f *= *src.f;
 	*trgt.f = value.f;
-	n = advanceLoops(&srcinfo, &trgtinfo);
+	n = advanceLoop(&trgtinfo, &trgt), advanceLoop(&srcinfo, &src);
 	if (n)
 	  value.f = 1;
       } while (n < srcinfo.rndim);
@@ -3286,7 +3305,7 @@ int ana_runprod(int narg, int ps[])
       do {
 	value.d *= *src.d;
 	*trgt.d = value.d;
-	n = advanceLoops(&srcinfo, &trgtinfo);
+	n = advanceLoop(&trgtinfo, &trgt), advanceLoop(&srcinfo, &src);
 	if (n)
 	  value.d = 1;
       } while (n < srcinfo.rndim);

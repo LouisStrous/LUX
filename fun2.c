@@ -881,8 +881,9 @@ int ana_covariance(int narg, int ps[])
             ymean += (double) *ysrc.b * *weight.b;
 	    nn += (double) *weight.b;
 	  }
-	  while (advanceLoops(&xsrcinfo, &winfo),
-                 advanceLoop(&ysrcinfo) < xsrcinfo.naxes);
+	  while (advanceLoop(&winfo, &weight), 
+		 advanceLoop(&ysrcinfo, &ysrc),
+                 advanceLoop(&xsrcinfo, &xsrc) < xsrcinfo.naxes);
 	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(int));
 	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(int));
 	  xsrc = xsrc0;
@@ -895,8 +896,9 @@ int ana_covariance(int narg, int ps[])
 	    xtemp = ((double) *xsrc.b - xmean);
             ytemp = ((double) *ysrc.b - ymean);
 	    cov += xtemp*ytemp* *weight.b;
-	  } while ((done = advanceLoops(&xsrcinfo, &winfo),
-                    advanceLoop(&ysrcinfo)) < xsrcinfo.naxes);
+	  } while ((done = (advanceLoop(&winfo, &weight),
+			    advanceLoop(&ysrcinfo, &ysrc),
+			    advanceLoop(&xsrcinfo, &xsrc))) < xsrcinfo.naxes);
 	  if (!nn)
 	    nn = 1;
 	  cov /= nn;
@@ -924,8 +926,9 @@ int ana_covariance(int narg, int ps[])
             ymean += (double) *ysrc.w * *weight.w;
 	    nn += (double) *weight.w;
 	  }
-	  while (advanceLoops(&xsrcinfo, &winfo),
-                 advanceLoop(&ysrcinfo) < xsrcinfo.naxes);
+	  while (advanceLoop(&winfo, &weight),
+		 advanceLoop(&ysrcinfo, &ysrc),
+                 advanceLoop(&xsrcinfo, &xsrc) < xsrcinfo.naxes);
 	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(int));
 	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(int));
 	  xsrc = xsrc0;
@@ -938,8 +941,9 @@ int ana_covariance(int narg, int ps[])
 	    xtemp = ((double) *xsrc.w - xmean);
             ytemp = ((double) *ysrc.w - ymean);
 	    cov += xtemp*ytemp* *weight.w;
-	  } while ((done = advanceLoops(&xsrcinfo, &winfo),
-                    advanceLoop(&ysrcinfo)) < xsrcinfo.naxes);
+	  } while ((done = (advanceLoop(&winfo, &weight),
+			    advanceLoop(&ysrcinfo, &ysrc),
+			    advanceLoop(&xsrcinfo, &xsrc))) < xsrcinfo.naxes);
 	  if (!nn)
 	    nn = 1;
 	  cov /= nn;
@@ -967,8 +971,9 @@ int ana_covariance(int narg, int ps[])
             ymean += (double) *ysrc.l * *weight.l;
 	    nn += (double) *weight.l;
 	  }
-	  while (advanceLoops(&xsrcinfo, &winfo),
-                 advanceLoop(&ysrcinfo) < xsrcinfo.naxes);
+	  while (advanceLoop(&winfo, &weight),
+		 advanceLoop(&ysrcinfo, &ysrc),
+                 advanceLoop(&xsrcinfo, &xsrc) < xsrcinfo.naxes);
 	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(int));
 	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(int));
 	  xsrc = xsrc0;
@@ -981,8 +986,9 @@ int ana_covariance(int narg, int ps[])
 	    xtemp = ((double) *xsrc.l - xmean);
             ytemp = ((double) *ysrc.l - ymean);
 	    cov += xtemp*ytemp* *weight.l;
-	  } while ((done = advanceLoops(&xsrcinfo, &winfo),
-                    advanceLoop(&ysrcinfo)) < xsrcinfo.naxes);
+	  } while ((done = (advanceLoop(&winfo, &weight),
+			    advanceLoop(&ysrcinfo, &ysrc),
+			    advanceLoop(&xsrcinfo, &xsrc))) < xsrcinfo.naxes);
 	  if (!nn)
 	    nn = 1;
 	  cov /= nn;
@@ -1011,8 +1017,9 @@ int ana_covariance(int narg, int ps[])
             ymean += (double) *ysrc.f * *weight.f;
 	    nn += (double) *weight.f;
 	  }
-	  while (advanceLoops(&xsrcinfo, &winfo),
-                 advanceLoop(&ysrcinfo) < xsrcinfo.naxes);
+	  while (advanceLoop(&winfo, &weight),
+		 advanceLoop(&ysrcinfo, &ysrc),
+                 advanceLoop(&xsrcinfo, &xsrc) < xsrcinfo.naxes);
 	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(int));
 	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(int));
 	  xsrc = xsrc0;
@@ -1025,8 +1032,9 @@ int ana_covariance(int narg, int ps[])
 	    xtemp = ((double) *xsrc.f - xmean);
             ytemp = ((double) *ysrc.f - ymean);
 	    cov += xtemp*ytemp* *weight.f;
-	  } while ((done = advanceLoops(&xsrcinfo, &winfo),
-                    advanceLoop(&ysrcinfo)) < xsrcinfo.naxes);
+	  } while ((done = (advanceLoop(&winfo, &weight),
+			    advanceLoop(&ysrcinfo, &ysrc),
+			    advanceLoop(&xsrcinfo, &xsrc))) < xsrcinfo.naxes);
 	  if (!nn)
 	    nn = 1;
 	  cov /= nn;
@@ -1055,8 +1063,9 @@ int ana_covariance(int narg, int ps[])
             ymean += (double) *ysrc.d * *weight.d;
 	    nn += (double) *weight.d;
 	  }
-	  while (advanceLoops(&xsrcinfo, &winfo),
-                 advanceLoop(&ysrcinfo) < xsrcinfo.naxes);
+	  while (advanceLoop(&winfo, &weight),
+		 advanceLoop(&ysrcinfo, &ysrc),
+                 advanceLoop(&xsrcinfo, &xsrc) < xsrcinfo.naxes);
 	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(int));
 	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(int));
 	  xsrc = xsrc0;
@@ -1069,8 +1078,9 @@ int ana_covariance(int narg, int ps[])
 	    xtemp = ((double) *xsrc.d - xmean);
             ytemp = ((double) *ysrc.d - ymean);
 	    cov += xtemp*ytemp* *weight.d;
-	  } while ((done = advanceLoops(&xsrcinfo, &winfo),
-                    advanceLoop(&ysrcinfo)) < xsrcinfo.naxes);
+	  } while ((done = (advanceLoop(&winfo, &weight),
+			    advanceLoop(&ysrcinfo, &ysrc),
+			    advanceLoop(&xsrcinfo, &xsrc))) < xsrcinfo.naxes);
 	  if (!nn)
 	    nn = 1;
 	  cov /= nn;
@@ -1098,7 +1108,8 @@ int ana_covariance(int narg, int ps[])
 	  do {
 	    xmean += (double) *xsrc.b;
             ymean += (double) *ysrc.b;
-	  } while (advanceLoops(&xsrcinfo, &ysrcinfo) < xsrcinfo.naxes);
+	  } while (advanceLoop(&ysrcinfo, &ysrc),
+		   advanceLoop(&xsrcinfo, &xsrc) < xsrcinfo.naxes);
 	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(int));
 	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(int));
 	  xsrc = xsrc0;
@@ -1110,7 +1121,8 @@ int ana_covariance(int narg, int ps[])
 	    xtemp = ((double) *xsrc.b - xmean);
             ytemp = ((double) *ysrc.b - ymean);
 	    cov += xtemp*ytemp;
-	  } while ((done = advanceLoops(&xsrcinfo, &ysrcinfo)) < xsrcinfo.naxes);
+	  } while ((done = (advanceLoop(&ysrcinfo, &ysrc),
+			    advanceLoop(&xsrcinfo, &xsrc))) < xsrcinfo.naxes);
 	  switch (outtype) {
 	    case ANA_FLOAT:
 	      *trgt.f++ = (float) (cov/n2);
@@ -1132,7 +1144,8 @@ int ana_covariance(int narg, int ps[])
 	  do {
 	    xmean += (double) *xsrc.w;
             ymean += (double) *ysrc.w;
-	  } while (advanceLoops(&xsrcinfo, &ysrcinfo) < xsrcinfo.naxes);
+	  } while (advanceLoop(&ysrcinfo, &ysrc),
+		   advanceLoop(&xsrcinfo, &xsrc) < xsrcinfo.naxes);
 	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(int));
 	  xsrc = xsrc0;
           ysrc = ysrc0;
@@ -1143,7 +1156,8 @@ int ana_covariance(int narg, int ps[])
 	    xtemp = ((double) *xsrc.w - xmean);
             ytemp = ((double) *ysrc.w - ymean);
 	    cov += xtemp*ytemp;
-	  } while ((done = advanceLoops(&xsrcinfo, &ysrcinfo)) < xsrcinfo.naxes);
+	  } while ((done = (advanceLoop(&ysrcinfo, &ysrc),
+			    advanceLoop(&xsrcinfo, &xsrc))) < xsrcinfo.naxes);
 	  switch (outtype) {
 	    case ANA_FLOAT:
 	      *trgt.f++ = (float) (cov/n2);
@@ -1164,7 +1178,8 @@ int ana_covariance(int narg, int ps[])
 	  do {
 	    xmean += (double) *xsrc.l;
             ymean += (double) *ysrc.l;
-	  } while (advanceLoops(&xsrcinfo, &ysrcinfo) < xsrcinfo.naxes);
+	  } while (advanceLoop(&ysrcinfo, &ysrc),
+		   advanceLoop(&xsrcinfo, &xsrc) < xsrcinfo.naxes);
 	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(int));
 	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(int));
 	  xsrc = xsrc0;
@@ -1176,7 +1191,8 @@ int ana_covariance(int narg, int ps[])
 	    xtemp = ((double) *xsrc.l - xmean);
             ytemp = ((double) *ysrc.l - ymean);
 	    cov += xtemp*ytemp;
-	  } while ((done = advanceLoops(&xsrcinfo, &ysrcinfo)) < xsrcinfo.naxes);
+	  } while ((done = (advanceLoop(&ysrcinfo, &ysrc),
+			    advanceLoop(&xsrcinfo, &xsrc))) < xsrcinfo.naxes);
 	  switch (outtype) {
 	    case ANA_FLOAT:
 	      *trgt.f++ = (float) (cov/n2);
@@ -1197,7 +1213,8 @@ int ana_covariance(int narg, int ps[])
 	  do {
 	    xmean += (double) *xsrc.f;
             ymean += (double) *ysrc.f;
-	  } while (advanceLoops(&xsrcinfo, &ysrcinfo) < xsrcinfo.naxes);
+	  } while (advanceLoop(&ysrcinfo, &ysrc),
+		   advanceLoop(&xsrcinfo, &xsrc) < xsrcinfo.naxes);
 	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(int));
 	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(int));
 	  xsrc = xsrc0;
@@ -1209,7 +1226,8 @@ int ana_covariance(int narg, int ps[])
 	    xtemp = ((double) *xsrc.f - xmean);
             ytemp = ((double) *ysrc.f - ymean);
 	    cov += xtemp*ytemp;
-	  } while ((done = advanceLoops(&xsrcinfo, &ysrcinfo)) < xsrcinfo.naxes);
+	  } while ((done = (advanceLoop(&ysrcinfo, &ysrc),
+			    advanceLoop(&xsrcinfo, &xsrc))) < xsrcinfo.naxes);
 	  switch (outtype) {
 	    case ANA_FLOAT:
 	      *trgt.f++ = (float) (cov/n2);
@@ -1230,7 +1248,8 @@ int ana_covariance(int narg, int ps[])
 	  do {
 	    xmean += (double) *xsrc.d;
             ymean += (double) *ysrc.d;
-	  } while (advanceLoops(&xsrcinfo, &ysrcinfo) < xsrcinfo.naxes);
+	  } while (advanceLoop(&ysrcinfo, &ysrc),
+		   advanceLoop(&xsrcinfo, &xsrc) < xsrcinfo.naxes);
 	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(int));
 	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(int));
 	  xsrc = xsrc0;
@@ -1242,7 +1261,8 @@ int ana_covariance(int narg, int ps[])
 	    xtemp = ((double) *xsrc.d - xmean);
             ytemp = ((double) *ysrc.d - ymean);
 	    cov += xtemp*ytemp;
-	  } while ((done = advanceLoops(&xsrcinfo, &ysrcinfo)) < xsrcinfo.naxes);
+	  } while ((done = (advanceLoop(&ysrcinfo, &ysrc),
+			    advanceLoop(&xsrcinfo, &xsrc))) < xsrcinfo.naxes);
           *trgt.d++ = (cov/n2);
 	} while (done < xsrcinfo.rndim);
         break;
@@ -1380,7 +1400,8 @@ int sdev(int narg, int ps[], int sq)
 	    mean += (double) *src.b * *weight.b;
 	    nn += (double) *weight.b;
 	  }
-	  while (advanceLoops(&srcinfo, &winfo) < srcinfo.naxes);
+	  while (advanceLoop(&winfo, &weight),
+		 advanceLoop(&srcinfo, &src) < srcinfo.naxes);
 	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(int));
 	  src = src0;
 	  weight = weight0;
@@ -1389,7 +1410,8 @@ int sdev(int narg, int ps[], int sq)
 	  do {
 	    temp = ((double) *src.b - mean);
 	    sdev += temp*temp* *weight.b;
-	  } while ((done = advanceLoops(&srcinfo, &winfo)) < srcinfo.naxes);
+	  } while ((done = (advanceLoop(&winfo, &weight),
+			    advanceLoop(&srcinfo, &src))) < srcinfo.naxes);
 	  if (!nn)
 	    nn = 1;
 	  sdev /= nn;
@@ -1414,7 +1436,8 @@ int sdev(int narg, int ps[], int sq)
 	    mean += (double) *src.w * *weight.w;
 	    nn += (double) *weight.w;
 	  }
-	  while (advanceLoops(&srcinfo, &winfo) < srcinfo.naxes);
+	  while (advanceLoop(&winfo, &weight),
+		 advanceLoop(&srcinfo, &src) < srcinfo.naxes);
 	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(int));
 	  src = src0;
 	  weight = weight0;
@@ -1423,7 +1446,8 @@ int sdev(int narg, int ps[], int sq)
 	  do {
 	    temp = ((double) *src.w - mean);
 	    sdev += temp*temp* *weight.w;
-	  } while ((done = advanceLoops(&srcinfo, &winfo)) < srcinfo.naxes);
+	  } while ((done = (advanceLoop(&winfo, &weight),
+			    advanceLoop(&srcinfo, &src))) < srcinfo.naxes);
 	  if (!nn)
 	    nn = 1;
 	  sdev /= nn;
@@ -1448,7 +1472,8 @@ int sdev(int narg, int ps[], int sq)
 	    mean += (double) *src.l * *weight.l;
 	    nn += (double) *weight.l;
 	  }
-	  while (advanceLoops(&srcinfo, &winfo) < srcinfo.naxes);
+	  while (advanceLoop(&winfo, &weight),
+		 advanceLoop(&srcinfo, &src) < srcinfo.naxes);
 	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(int));
 	  src = src0;
 	  weight = weight0;
@@ -1457,7 +1482,8 @@ int sdev(int narg, int ps[], int sq)
 	  do {
 	    temp = ((double) *src.l - mean);
 	    sdev += temp*temp* *weight.l;
-	  } while ((done = advanceLoops(&srcinfo, &winfo)) < srcinfo.naxes);
+	  } while ((done = (advanceLoop(&winfo, &weight),
+			    advanceLoop(&srcinfo, &src))) < srcinfo.naxes);
 	  if (!nn)
 	    nn = 1;
 	  sdev /= nn;
@@ -1482,7 +1508,8 @@ int sdev(int narg, int ps[], int sq)
 	    mean += (double) *src.f * *weight.f;
 	    nn += (double) *weight.f;
 	  }
-	  while (advanceLoops(&srcinfo, &winfo) < srcinfo.naxes);
+	  while (advanceLoop(&winfo, &weight),
+		 advanceLoop(&srcinfo, &src) < srcinfo.naxes);
 	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(int));
 	  src = src0;
 	  weight = weight0;
@@ -1491,7 +1518,8 @@ int sdev(int narg, int ps[], int sq)
 	  do {
 	    temp = ((double) *src.f - mean);
 	    sdev += temp*temp* *weight.f;
-	  } while ((done = advanceLoops(&srcinfo, &winfo)) < srcinfo.naxes);
+	  } while ((done = (advanceLoop(&winfo, &weight),
+			    advanceLoop(&srcinfo, &src))) < srcinfo.naxes);
 	  if (!nn)
 	    nn = 1;
 	  sdev /= nn;
@@ -1516,7 +1544,8 @@ int sdev(int narg, int ps[], int sq)
 	    mean += (double) *src.d * *weight.d;
 	    nn += (double) *weight.d;
 	  }
-	  while (advanceLoops(&srcinfo, &winfo) < srcinfo.naxes);
+	  while (advanceLoop(&winfo, &weight),
+		 advanceLoop(&srcinfo, &src) < srcinfo.naxes);
 	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(int));
 	  src = src0;
 	  weight = weight0;
@@ -1525,7 +1554,8 @@ int sdev(int narg, int ps[], int sq)
 	  do {
 	    temp = ((double) *src.d - mean);
 	    sdev += temp*temp* *weight.d;
-	  } while ((done = advanceLoops(&srcinfo, &winfo)) < srcinfo.naxes);
+	  } while ((done = (advanceLoop(&winfo, &weight),
+			    advanceLoop(&srcinfo, &src))) < srcinfo.naxes);
 	  if (!nn)
 	    nn = 1;
 	  sdev /= nn;
@@ -1557,7 +1587,7 @@ int sdev(int narg, int ps[], int sq)
 	  src0 = src;
 	  do
 	    mean += (double) *src.b;
-	  while (advanceLoop(&srcinfo) < srcinfo.naxes);
+	  while (advanceLoop(&srcinfo, &src) < srcinfo.naxes);
 	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(int));
 	  src = src0;
 	  mean /= n;
@@ -1565,7 +1595,7 @@ int sdev(int narg, int ps[], int sq)
 	  do {
 	    temp = ((double) *src.b - mean);
 	    sdev += temp*temp;
-	  } while ((done = advanceLoop(&srcinfo)) < srcinfo.naxes);
+	  } while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 	  switch (outtype) {
 	    case ANA_FLOAT:
 	      *trgt.f++ = (float) (sdev/n2);
@@ -1583,7 +1613,7 @@ int sdev(int narg, int ps[], int sq)
 	  src0 = src;
 	  do
 	    mean += (double) *src.w;
-	  while (advanceLoop(&srcinfo) < srcinfo.naxes);
+	  while (advanceLoop(&srcinfo, &src) < srcinfo.naxes);
 	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(int));
 	  src = src0;
 	  mean /= n;
@@ -1591,7 +1621,7 @@ int sdev(int narg, int ps[], int sq)
 	  do {
 	    temp = ((double) *src.w - mean);
 	    sdev += temp*temp;
-	  } while ((done = advanceLoop(&srcinfo)) < srcinfo.naxes);
+	  } while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 	  switch (outtype) {
 	    case ANA_FLOAT:
 	      *trgt.f++ = (float) (sdev/n2);
@@ -1609,7 +1639,7 @@ int sdev(int narg, int ps[], int sq)
 	  src0 = src;
 	  do
 	    mean += (double) *src.l;
-	  while (advanceLoop(&srcinfo) < srcinfo.naxes);
+	  while (advanceLoop(&srcinfo, &src) < srcinfo.naxes);
 	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(int));
 	  src = src0;
 	  mean /= n;
@@ -1617,7 +1647,7 @@ int sdev(int narg, int ps[], int sq)
 	  do {
 	    temp = ((double) *src.l - mean);
 	    sdev += temp*temp;
-	  } while ((done = advanceLoop(&srcinfo)) < srcinfo.naxes);
+	  } while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 	  switch (outtype) {
 	    case ANA_FLOAT:
 	      *trgt.f++ = (float) (sdev/n2);
@@ -1635,7 +1665,7 @@ int sdev(int narg, int ps[], int sq)
 	  src0 = src;
 	  do
 	    mean += (double) *src.f;
-	  while (advanceLoop(&srcinfo) < srcinfo.naxes);
+	  while (advanceLoop(&srcinfo, &src) < srcinfo.naxes);
 	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(int));
 	  src = src0;
 	  mean /= n;
@@ -1643,7 +1673,7 @@ int sdev(int narg, int ps[], int sq)
 	  do {
 	    temp = ((double) *src.f - mean);
 	    sdev += temp*temp;
-	  } while ((done = advanceLoop(&srcinfo)) < srcinfo.naxes);
+	  } while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 	  switch (outtype) {
 	    case ANA_FLOAT:
 	      *trgt.f++ = (float) (sdev/n2);
@@ -1661,7 +1691,7 @@ int sdev(int narg, int ps[], int sq)
 	  src0 = src;
 	  do
 	    mean += (double) *src.d;
-	  while (advanceLoop(&srcinfo) < srcinfo.naxes);
+	  while (advanceLoop(&srcinfo, &src) < srcinfo.naxes);
 	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(int));
 	  src = src0;
 	  mean /= n;
@@ -1669,7 +1699,7 @@ int sdev(int narg, int ps[], int sq)
 	  do {
 	    temp = ((double) *src.d - mean);
 	    sdev += temp*temp;
-	  } while ((done = advanceLoop(&srcinfo)) < srcinfo.naxes);
+	  } while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 	  *trgt.d++ = sdev/n2;
 	} while (done < srcinfo.rndim);
 	break;
@@ -1681,7 +1711,7 @@ int sdev(int narg, int ps[], int sq)
 	  do {
 	    cmean.real += (double) src.cf->real;
 	    cmean.imaginary += (double) src.cf->imaginary;
-	  } while (advanceLoop(&srcinfo) < srcinfo.naxes);
+	  } while (advanceLoop(&srcinfo, &src) < srcinfo.naxes);
 	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(int));
 	  src = src0;
 	  cmean.real /= n;
@@ -1692,7 +1722,7 @@ int sdev(int narg, int ps[], int sq)
 	    sdev += temp*temp;
 	    temp = src.cf->imaginary - cmean.imaginary;
 	    sdev += temp*temp;
-	  } while ((done = advanceLoop(&srcinfo)) < srcinfo.naxes);
+	  } while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 	  switch (outtype) {
 	    case ANA_FLOAT:
 	      *trgt.f++ = (float) (sdev/n2);
@@ -1711,7 +1741,7 @@ int sdev(int narg, int ps[], int sq)
 	  do {
 	    cmean.real += (double) src.cd->real;
 	    cmean.imaginary += (double) src.cd->imaginary;
-	  } while (advanceLoop(&srcinfo) < srcinfo.naxes);
+	  } while (advanceLoop(&srcinfo, &src) < srcinfo.naxes);
 	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(int));
 	  src = src0;
 	  cmean.real /= n;
@@ -1722,7 +1752,7 @@ int sdev(int narg, int ps[], int sq)
 	    sdev += temp*temp;
 	    temp = src.cd->imaginary - cmean.imaginary;
 	    sdev += temp*temp;
-	  } while ((done = advanceLoop(&srcinfo)) < srcinfo.naxes);
+	  } while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 	  *trgt.d++ = sdev/n2;
 	} while (done < srcinfo.rndim);
 	break;
@@ -2397,7 +2427,8 @@ int ana_gsmooth(int narg, int ps[])
 	    }
 	  }
 	  src.b += nx*stride;
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
       case ANA_WORD:
 	do {		/* main loop */
@@ -2490,7 +2521,8 @@ int ana_gsmooth(int narg, int ps[])
 	    }
 	  }
 	  src.w += nx*stride;
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
       case ANA_LONG:
 	do {		/* main loop */
@@ -2583,7 +2615,8 @@ int ana_gsmooth(int narg, int ps[])
 	    }
 	  }
 	  src.l += nx*stride;
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
       case ANA_FLOAT:
 	do {		/* main loop */
@@ -2676,7 +2709,8 @@ int ana_gsmooth(int narg, int ps[])
 	    }
 	  }
 	  src.f += nx*stride;
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
       case ANA_DOUBLE:
 	do {		/* main loop */
@@ -2769,7 +2803,8 @@ int ana_gsmooth(int narg, int ps[])
 	    }
 	  }
 	  src.d += nx*stride;
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
     }
     if (nextLoops(&srcinfo, &trgtinfo)) {
@@ -4843,7 +4878,8 @@ int ana_ksmooth(int narg, int ps[])
   do {
     do {
       ksmooth(&srcinfo, &trgtinfo, kernel, nkernel);
-    } while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+    } while (advanceLoop(&trgtinfo, &trgt), 
+	     advanceLoop(&srcinfo, &src) < srcinfo.rndim);
   } while (nextLoops(&srcinfo, &trgtinfo));
 
   return result;
@@ -4913,7 +4949,8 @@ int ana_crosscorr(int narg, int ps[])
 	do {
 	  meanx += (double) *src1.b;
 	  meany += (double) *src2.b;
-	} while (advanceLoops(&srcinfo1, &srcinfo2) < srcinfo1.naxes);
+	} while (advanceLoop(&srcinfo2, &src2),
+		 advanceLoop(&srcinfo1, &src1) < srcinfo1.naxes);
 	memcpy(srcinfo1.coords, save, srcinfo1.ndim*sizeof(int));
 	src1 = src1save;
 	src2 = src2save;
@@ -4926,7 +4963,8 @@ int ana_crosscorr(int narg, int ps[])
 	  kx += tempx*tempx;
 	  ky += tempy*tempy;
 	  pxy += tempx*tempy;
-	} while ((done = advanceLoops(&srcinfo1, &srcinfo2)) < srcinfo1.naxes);
+	} while ((done = (advanceLoop(&srcinfo2, &src2),
+			  advanceLoop(&srcinfo1, &src1))) < srcinfo1.naxes);
 	tempx = kx*ky;
 	*trgt.f++ = tempx? pxy/sqrt(tempx): 0.0;
       } while (done < srcinfo1.rndim);
@@ -4940,7 +4978,8 @@ int ana_crosscorr(int narg, int ps[])
 	do {
 	  meanx += (double) *src1.w;
 	  meany += (double) *src2.w;
-	} while (advanceLoops(&srcinfo1, &srcinfo2) < srcinfo1.naxes);
+	} while (advanceLoop(&srcinfo2, &src2),
+		 advanceLoop(&srcinfo1, &src1) < srcinfo1.naxes);
 	memcpy(srcinfo1.coords, save, srcinfo1.ndim*sizeof(int));
 	src1 = src1save;
 	src2 = src2save;
@@ -4953,7 +4992,8 @@ int ana_crosscorr(int narg, int ps[])
 	  kx += tempx*tempx;
 	  ky += tempy*tempy;
 	  pxy += tempx*tempy;
-	} while ((done = advanceLoops(&srcinfo1, &srcinfo2)) < srcinfo1.naxes);
+	} while ((done = (advanceLoop(&srcinfo2, &src2),
+			  advanceLoop(&srcinfo1, &src1))) < srcinfo1.naxes);
 	tempx = kx*ky;
 	*trgt.f++ = tempx? pxy/sqrt(tempx): 0.0;
       } while (done < srcinfo1.rndim);
@@ -4967,7 +5007,8 @@ int ana_crosscorr(int narg, int ps[])
 	do {
 	  meanx += (double) *src1.l;
 	  meany += (double) *src2.l;
-	} while (advanceLoops(&srcinfo1, &srcinfo2) < srcinfo1.naxes);
+	} while (advanceLoop(&srcinfo2, &src2),
+		 advanceLoop(&srcinfo1, &src1) < srcinfo1.naxes);
 	memcpy(srcinfo1.coords, save, srcinfo1.ndim*sizeof(int));
 	src1 = src1save;
 	src2 = src2save;
@@ -4980,7 +5021,8 @@ int ana_crosscorr(int narg, int ps[])
 	  kx += tempx*tempx;
 	  ky += tempy*tempy;
 	  pxy += tempx*tempy;
-	} while ((done = advanceLoops(&srcinfo1, &srcinfo2)) < srcinfo1.naxes);
+	} while ((done = (advanceLoop(&srcinfo2, &src2),
+			  advanceLoop(&srcinfo1, &src1))) < srcinfo1.naxes);
 	tempx = kx*ky;
 	*trgt.f++ = tempx? pxy/sqrt(tempx): 0.0;
       } while (done < srcinfo1.rndim);
@@ -4994,7 +5036,8 @@ int ana_crosscorr(int narg, int ps[])
 	do {
 	  meanx += (double) *src1.f;
 	  meany += (double) *src2.f;
-	} while (advanceLoops(&srcinfo1, &srcinfo2) < srcinfo1.naxes);
+	} while (advanceLoop(&srcinfo2, &src2),
+		 advanceLoop(&srcinfo1, &src1) < srcinfo1.naxes);
 	memcpy(srcinfo1.coords, save, srcinfo1.ndim*sizeof(int));
 	src1 = src1save;
 	src2 = src2save;
@@ -5007,7 +5050,8 @@ int ana_crosscorr(int narg, int ps[])
 	  kx += tempx*tempx;
 	  ky += tempy*tempy;
 	  pxy += tempx*tempy;
-	} while ((done = advanceLoops(&srcinfo1, &srcinfo2)) < srcinfo1.naxes);
+	} while ((done = (advanceLoop(&srcinfo2, &src2),
+			  advanceLoop(&srcinfo1, &src1))) < srcinfo1.naxes);
 	tempx = kx*ky;
 	*trgt.f++ = tempx? pxy/sqrt(tempx): 0.0;
       } while (done < srcinfo1.rndim);
@@ -5021,7 +5065,8 @@ int ana_crosscorr(int narg, int ps[])
 	do {
 	  meanx += (double) *src1.d;
 	  meany += (double) *src2.d;
-	} while (advanceLoops(&srcinfo1, &srcinfo2) < srcinfo1.naxes);
+	} while (advanceLoop(&srcinfo2, &src2),
+		 advanceLoop(&srcinfo1, &src1) < srcinfo1.naxes);
 	memcpy(srcinfo1.coords, save, srcinfo1.ndim*sizeof(int));
 	src1 = src1save;
 	src2 = src2save;
@@ -5034,7 +5079,8 @@ int ana_crosscorr(int narg, int ps[])
 	  kx += tempx*tempx;
 	  ky += tempy*tempy;
 	  pxy += tempx*tempy;
-	} while ((done = advanceLoops(&srcinfo1, &srcinfo2)) < srcinfo1.naxes);
+	} while ((done = (advanceLoop(&srcinfo2, &src2),
+			  advanceLoop(&srcinfo1, &src1))) < srcinfo1.naxes);
 	tempx = kx*ky;
 	*trgt.d++ = tempx? pxy/sqrt(tempx): 0.0;
       } while (done < srcinfo1.rndim);
@@ -5050,7 +5096,8 @@ int ana_crosscorr(int narg, int ps[])
 	  cmeanx.imaginary += (double) src1.cf->imaginary;
 	  cmeany.real += (double) src2.cf->real;
 	  cmeany.imaginary += (double) src2.cf->imaginary;
-	} while (advanceLoops(&srcinfo1, &srcinfo2) < srcinfo1.naxes);
+	} while (advanceLoop(&srcinfo2, &src2),
+		 advanceLoop(&srcinfo1, &src1) < srcinfo1.naxes);
 	memcpy(srcinfo1.coords, save, srcinfo1.ndim*sizeof(int));
 	src1 = src1save;
 	src2 = src2save;
@@ -5070,7 +5117,8 @@ int ana_crosscorr(int narg, int ps[])
 	    + ctempx.imaginary*ctempy.imaginary;
 	  cpxy.imaginary += ctempx.imaginary*ctempy.real
 	    - ctempx.real*ctempy.imaginary;
-	} while ((done = advanceLoops(&srcinfo1, &srcinfo2)) < srcinfo1.naxes);
+	} while ((done = (advanceLoop(&srcinfo2, &src2),
+			  advanceLoop(&srcinfo1, &src1))) < srcinfo1.naxes);
 	tempx = kx*ky;
 	if (tempx) {
 	  tempx = sqrt(tempx);
@@ -5092,7 +5140,8 @@ int ana_crosscorr(int narg, int ps[])
 	  cmeanx.imaginary += (double) src1.cd->imaginary;
 	  cmeany.real += (double) src2.cd->real;
 	  cmeany.imaginary += (double) src2.cd->imaginary;
-	} while (advanceLoops(&srcinfo1, &srcinfo2) < srcinfo1.naxes);
+	} while (advanceLoop(&srcinfo2, &src2),
+		 advanceLoop(&srcinfo1, &src1) < srcinfo1.naxes);
 	memcpy(srcinfo1.coords, save, srcinfo1.ndim*sizeof(int));
 	src1 = src1save;
 	src2 = src2save;
@@ -5112,7 +5161,8 @@ int ana_crosscorr(int narg, int ps[])
 	    + ctempx.imaginary*ctempy.imaginary;
 	  cpxy.imaginary += ctempx.imaginary*ctempy.real
 	    - ctempx.real*ctempy.imaginary;
-	} while ((done = advanceLoops(&srcinfo1, &srcinfo2)) < srcinfo1.naxes);
+	} while ((done = (advanceLoop(&srcinfo2, &src2),
+			  advanceLoop(&srcinfo1, &src1))) < srcinfo1.naxes);
 	tempx = kx*ky;
 	if (tempx) {
 	  tempx = sqrt(tempx);

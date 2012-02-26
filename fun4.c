@@ -1887,10 +1887,10 @@ int ana_compress(int narg, int ps[])
 	sum.l = 0;
 	do
 	  sum.l += (int) src.b[offset];
-	while (advanceLoop(&tmpinfo) < tmpinfo.rndim);
+	while (advanceLoop(&tmpinfo, &src) < tmpinfo.rndim);
 	*trgt.b = sum.l/nel;
 	src.b = (byte *) tmpinfo.data0;
-	n = advanceLoop(&trgtinfo);
+	n = advanceLoop(&trgtinfo, &trgt);
 	offset = 0;
 	for (i = 0; i < trgtinfo.ndim; i++)
 	  offset += srcinfo.rsinglestep[i]*trgtinfo.coords[i]*div[srcinfo.raxes[i]];
@@ -1901,10 +1901,10 @@ int ana_compress(int narg, int ps[])
 	sum.l = 0;
 	do
 	  sum.l += (int) src.w[offset];
-	while (advanceLoop(&tmpinfo) < tmpinfo.rndim);
+	while (advanceLoop(&tmpinfo, &src) < tmpinfo.rndim);
 	*trgt.w = sum.l/nel;
 	src.w = (word *) tmpinfo.data0;
-	n = advanceLoop(&trgtinfo);
+	n = advanceLoop(&trgtinfo, &trgt);
 	offset = 0;
 	for (i = 0; i < trgtinfo.ndim; i++)
 	  offset += srcinfo.rsinglestep[i]*trgtinfo.coords[i]*div[srcinfo.raxes[i]];
@@ -1915,10 +1915,10 @@ int ana_compress(int narg, int ps[])
 	sum.l = 0;
 	do
 	  sum.l += src.l[offset];
-	while (advanceLoop(&tmpinfo) < tmpinfo.rndim);
+	while (advanceLoop(&tmpinfo, &src) < tmpinfo.rndim);
 	*trgt.l = sum.l/nel;
 	src.l = (int *) tmpinfo.data0;
-	n = advanceLoop(&trgtinfo);
+	n = advanceLoop(&trgtinfo, &trgt);
 	offset = 0;
 	for (i = 0; i < trgtinfo.ndim; i++)
 	  offset += srcinfo.rsinglestep[i]*trgtinfo.coords[i]*div[srcinfo.raxes[i]];
@@ -1929,10 +1929,10 @@ int ana_compress(int narg, int ps[])
 	sum.d = 0;
 	do
 	  sum.d += (double) src.f[offset];
-	while (advanceLoop(&tmpinfo) < tmpinfo.rndim);
+	while (advanceLoop(&tmpinfo, &src) < tmpinfo.rndim);
 	*trgt.f = sum.d/nel;
 	src.f = (float *) tmpinfo.data0;
-	n = advanceLoop(&trgtinfo);
+	n = advanceLoop(&trgtinfo, &trgt);
 	offset = 0;
 	for (i = 0; i < trgtinfo.ndim; i++)
 	  offset += srcinfo.rsinglestep[i]*trgtinfo.coords[i]*div[srcinfo.raxes[i]];
@@ -1943,10 +1943,10 @@ int ana_compress(int narg, int ps[])
 	sum.d = 0;
 	do
 	  sum.d += src.d[offset];
-	while (advanceLoop(&tmpinfo) < tmpinfo.rndim);
+	while (advanceLoop(&tmpinfo, &src) < tmpinfo.rndim);
 	*trgt.d = sum.d/nel;
 	src.d = (double *) tmpinfo.data0;
-	n = advanceLoop(&trgtinfo);
+	n = advanceLoop(&trgtinfo, &trgt);
 	offset = 0;
 	for (i = 0; i < trgtinfo.ndim; i++)
 	  offset += srcinfo.rsinglestep[i]*trgtinfo.coords[i]*div[srcinfo.raxes[i]];

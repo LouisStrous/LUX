@@ -1200,7 +1200,8 @@ int ana_differ(int narg, int ps[])
 	    *trgt.b = 0;	/* zeros */
 	    trgt.b += stride;
 	  }
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
       case ANA_WORD:
 	do {
@@ -1232,7 +1233,8 @@ int ana_differ(int narg, int ps[])
 	    *trgt.w = 0;	/* zeros */
 	    trgt.w += stride;
 	  }
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
       case ANA_LONG:
 	do {
@@ -1264,7 +1266,8 @@ int ana_differ(int narg, int ps[])
 	    *trgt.l = 0;	/* zeros */
 	    trgt.l += stride;
 	  }
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
       case ANA_FLOAT:
 	do {
@@ -1296,7 +1299,8 @@ int ana_differ(int narg, int ps[])
 	    *trgt.f = 0;	/* zeros */
 	    trgt.f += stride;
 	  }
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
       case ANA_DOUBLE:
 	do {
@@ -1328,7 +1332,8 @@ int ana_differ(int narg, int ps[])
 	    *trgt.d = 0;	/* zeros */
 	    trgt.d += stride;
 	  }
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
     }
     if (loop < srcinfo.naxes - 1)
@@ -1428,7 +1433,8 @@ int varsmooth(int narg, int ps[], int cumul)
 	    for (i = i1; i < i2; i += step)
 	      sum.l += (int) src.b[i];
 	    *trgt.l = sum.l;
-	    done = advanceLoops(&srcinfo, &trgtinfo);
+	    done = advanceLoop(&trgtinfo, &trgt), 
+	      advanceLoop(&srcinfo, &src);
 	    width.l++;
 	    if (done == widthNDim)	/* done with indicated axis */
 	      width.l = width0.l;
@@ -1453,7 +1459,8 @@ int varsmooth(int narg, int ps[], int cumul)
 	    for (i = i1; i < i2; i += step)
 	      sum.l += (int) src.w[i];
 	    *trgt.l = sum.l;
-	    done = advanceLoops(&srcinfo, &trgtinfo);
+	    done = advanceLoop(&trgtinfo, &trgt),
+	      advanceLoop(&srcinfo, &src);
 	    width.l++;
 	    if (done == widthNDim)	/* done with indicated axis */
 	      width.l = width0.l;
@@ -1478,7 +1485,8 @@ int varsmooth(int narg, int ps[], int cumul)
 	    for (i = i1; i < i2; i += step)
 	      sum.l += src.l[i];
 	    *trgt.l = sum.l;
-	    done = advanceLoops(&srcinfo, &trgtinfo);
+	    done = advanceLoop(&trgtinfo, &trgt),
+	      advanceLoop(&srcinfo, &src);
 	    width.l++;
 	    if (done == widthNDim)	/* done with indicated axis */
 	      width.l = width0.l;
@@ -1507,7 +1515,8 @@ int varsmooth(int narg, int ps[], int cumul)
 	    for (i = i1; i < i2; i += step)
 	      sum.f += (float) src.b[i];
 	    *trgt.f = sum.f/weight;
-	    done = advanceLoops(&srcinfo, &trgtinfo);
+	    done = advanceLoop(&trgtinfo, &trgt),
+	      advanceLoop(&srcinfo, &src);
 	    width.l++;
 	    if (done == widthNDim)	/* done with indicated axis */
 	      width.l = width0.l;
@@ -1533,7 +1542,8 @@ int varsmooth(int narg, int ps[], int cumul)
 	    for (i = i1; i < i2; i += step)
 	      sum.f += (float) src.w[i];
 	    *trgt.f = sum.f/weight;
-	    done = advanceLoops(&srcinfo, &trgtinfo);
+	    done = advanceLoop(&trgtinfo, &trgt),
+	      advanceLoop(&srcinfo, &src);
 	    width.l++;
 	    if (done == widthNDim)	/* done with indicated axis */
 	      width.l = width0.l;
@@ -1559,7 +1569,8 @@ int varsmooth(int narg, int ps[], int cumul)
 	    for (i = i1; i < i2; i += step)
 	      sum.f += (float) src.l[i];
 	    *trgt.f = sum.f/weight;
-	    done = advanceLoops(&srcinfo, &trgtinfo);
+	    done = advanceLoop(&trgtinfo, &trgt),
+	      advanceLoop(&srcinfo, &src);
 	    width.l++;
 	    if (done == widthNDim)	/* done with indicated axis */
 	      width.l = width0.l;
@@ -1585,7 +1596,8 @@ int varsmooth(int narg, int ps[], int cumul)
 	    for (i = i1; i < i2; i += step)
 	      sum.f += src.f[i];
 	    *trgt.f = sum.f/weight;
-	    done = advanceLoops(&srcinfo, &trgtinfo);
+	    done = advanceLoop(&trgtinfo, &trgt),
+	      advanceLoop(&srcinfo, &src);
 	    width.l++;
 	    if (done == widthNDim) /* done with indicated axes */
 	      width.l = width0.l;
@@ -1614,7 +1626,8 @@ int varsmooth(int narg, int ps[], int cumul)
 	    for (i = i1; i < i2; i += step)
 	      sum.d += (double) src.b[i];
 	    *trgt.d = sum.d/weight;
-	    done = advanceLoops(&srcinfo, &trgtinfo);
+	    done = advanceLoop(&trgtinfo, &trgt),
+	      advanceLoop(&srcinfo, &src);
 	    width.l++;
 	    if (done == widthNDim)	/* done with indicated axis */
 	      width.l = width0.l;
@@ -1640,7 +1653,8 @@ int varsmooth(int narg, int ps[], int cumul)
 	    for (i = i1; i < i2; i += step)
 	      sum.d += (double) src.w[i];
 	    *trgt.d = sum.d/weight;
-	    done = advanceLoops(&srcinfo, &trgtinfo);
+	    done = advanceLoop(&trgtinfo, &trgt),
+	      advanceLoop(&srcinfo, &src);
 	    width.l++;
 	    if (done == widthNDim)	/* done with indicated axis */
 	      width.l = width0.l;
@@ -1666,7 +1680,8 @@ int varsmooth(int narg, int ps[], int cumul)
 	    for (i = i1; i < i2; i += step)
 	      sum.d += (double) src.l[i];
 	    *trgt.d = sum.d/weight;
-	    done = advanceLoops(&srcinfo, &trgtinfo);
+	    done = advanceLoop(&trgtinfo, &trgt),
+	      advanceLoop(&srcinfo, &src);
 	    width.l++;
 	    if (done == widthNDim)	/* done with indicated axis */
 	      width.l = width0.l;
@@ -1692,7 +1707,8 @@ int varsmooth(int narg, int ps[], int cumul)
 	    for (i = i1; i < i2; i += step)
 	      sum.d += (double) src.f[i];
 	    *trgt.d = sum.d/weight;
-	    done = advanceLoops(&srcinfo, &trgtinfo);
+	    done = advanceLoop(&trgtinfo, &trgt),
+	      advanceLoop(&srcinfo, &src);
 	    width.l++;
 	    if (done == widthNDim)	/* done with indicated axis */
 	      width.l = width0.l;
@@ -1718,7 +1734,8 @@ int varsmooth(int narg, int ps[], int cumul)
 	    for (i = i1; i < i2; i += step)
 	      sum.d += src.d[i];
 	    *trgt.d = sum.d/weight;
-	    done = advanceLoops(&srcinfo, &trgtinfo);
+	    done = advanceLoop(&trgtinfo, &trgt),
+	      advanceLoop(&srcinfo, &src);
 	    width.l++;
 	    if (done == widthNDim)	/* done with indicated axis */
 	      width.l = width0.l;
@@ -1837,7 +1854,8 @@ int smooth(int narg, int ps[], int cumul)
 	    for (i = w1; i < ww; i++) /* right edge */
 	    { *trgt.f = value.f/norm;
 	      trgt.f += stride; }
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
       case ANA_WORD:
 	do
@@ -1888,7 +1906,8 @@ int smooth(int narg, int ps[], int cumul)
 	    for (i = w1; i < ww; i++) /* right edge */
 	    { *trgt.f = value.f/norm;
 	      trgt.f += stride; }
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
       case ANA_LONG:
 	do
@@ -1939,7 +1958,8 @@ int smooth(int narg, int ps[], int cumul)
 	    for (i = w1; i < ww; i++) /* right edge */
 	    { *trgt.f = value.f/norm;
 	      trgt.f += stride; }
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
       case ANA_FLOAT:
 	do
@@ -1990,7 +2010,8 @@ int smooth(int narg, int ps[], int cumul)
 	    for (i = w1; i < ww; i++) /* right edge */
 	    { *trgt.f = value.f/norm;
 	      trgt.f += stride; }
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
       case ANA_DOUBLE:
 	do
@@ -2041,7 +2062,8 @@ int smooth(int narg, int ps[], int cumul)
 	    for (i = w1; i < ww; i++) /* right edge */
 	    { *trgt.d = value.d/norm;
 	      trgt.d += stride; }
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
     }
     if (loop < srcinfo.naxes - 1) {

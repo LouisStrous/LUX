@@ -1134,7 +1134,8 @@ int ana_calendar(int narg, int ps[])
     default:
       break;
     }
-  } while (advanceLoop(&tgtinfo), advanceLoop(&srcinfo) < srcinfo.rndim);
+  } while (advanceLoop(&tgtinfo, &tgt), 
+	   advanceLoop(&srcinfo, &src) < srcinfo.rndim);
   if (!loopIsAtStart(&tgtinfo))
     return anaerror("Source loop is finished but target loop is not!", ps[0]);
 
@@ -2313,15 +2314,15 @@ int ana_precess(int narg, int ps[])
   case ANA_BYTE:
     do {
       alpha = *src.b*DEG;
-      advanceLoop(&srcinfo);
+      advanceLoop(&srcinfo, &src);
       delta = *src.b*DEG;
       precessEquatorial(&alpha, &delta, JDfrom, JDto);
       *tgt.f = alpha*RAD;
-      advanceLoop(&tgtinfo);
+      advanceLoop(&tgtinfo, &tgt);
       *tgt.f = delta*RAD;
       do {
-	done = advanceLoop(&srcinfo);
-	advanceLoop(&tgtinfo);
+	done = advanceLoop(&srcinfo, &src);
+	advanceLoop(&tgtinfo, &tgt);
 	if (!done)
 	  *tgt.f = *src.b;
       } while (!done);
@@ -2330,15 +2331,15 @@ int ana_precess(int narg, int ps[])
   case ANA_WORD:
     do {
       alpha = *src.w*DEG;
-      advanceLoop(&srcinfo);
+      advanceLoop(&srcinfo, &src);
       delta = *src.w*DEG;
       precessEquatorial(&alpha, &delta, JDfrom, JDto);
       *tgt.f = alpha*RAD;
-      advanceLoop(&tgtinfo);
+      advanceLoop(&tgtinfo, &tgt);
       *tgt.f = delta*RAD;
       do {
-	done = advanceLoop(&srcinfo);
-	advanceLoop(&tgtinfo);
+	done = advanceLoop(&srcinfo, &src);
+	advanceLoop(&tgtinfo, &tgt);
 	if (!done)
 	  *tgt.f = *src.w;
       } while (!done);
@@ -2347,15 +2348,15 @@ int ana_precess(int narg, int ps[])
   case ANA_LONG:
     do {
       alpha = *src.l*DEG;
-      advanceLoop(&srcinfo);
+      advanceLoop(&srcinfo, &src);
       delta = *src.l*DEG;
       precessEquatorial(&alpha, &delta, JDfrom, JDto);
       *tgt.f = alpha*RAD;
-      advanceLoop(&tgtinfo);
+      advanceLoop(&tgtinfo, &tgt);
       *tgt.f = delta*RAD;
       do {
-	done = advanceLoop(&srcinfo);
-	advanceLoop(&tgtinfo);
+	done = advanceLoop(&srcinfo, &src);
+	advanceLoop(&tgtinfo, &tgt);
 	if (!done)
 	  *tgt.f = *src.l;
       } while (!done);
@@ -2364,15 +2365,15 @@ int ana_precess(int narg, int ps[])
   case ANA_FLOAT:
     do {
       alpha = *src.f*DEG;
-      advanceLoop(&srcinfo);
+      advanceLoop(&srcinfo, &src);
       delta = *src.f*DEG;
       precessEquatorial(&alpha, &delta, JDfrom, JDto);
       *tgt.f = alpha*RAD;
-      advanceLoop(&tgtinfo);
+      advanceLoop(&tgtinfo, &tgt);
       *tgt.f = delta*RAD;
       do {
-	done = advanceLoop(&srcinfo);
-	advanceLoop(&tgtinfo);
+	done = advanceLoop(&srcinfo, &src);
+	advanceLoop(&tgtinfo, &tgt);
 	if (!done)
 	  *tgt.f = *src.f;
       } while (!done);
@@ -2381,15 +2382,15 @@ int ana_precess(int narg, int ps[])
   case ANA_DOUBLE:
     do {
       alpha = *src.d*DEG;
-      advanceLoop(&srcinfo);
+      advanceLoop(&srcinfo, &src);
       delta = *src.d*DEG;
       precessEquatorial(&alpha, &delta, JDfrom, JDto);
       *tgt.d = alpha*RAD;
-      advanceLoop(&tgtinfo);
+      advanceLoop(&tgtinfo, &tgt);
       *tgt.d = delta*RAD;
       do {
-	done = advanceLoop(&srcinfo);
-	advanceLoop(&tgtinfo);
+	done = advanceLoop(&srcinfo, &src);
+	advanceLoop(&tgtinfo, &tgt);
 	if (!done)
 	  *tgt.d = *src.d;
       } while (!done);
@@ -2470,10 +2471,10 @@ int ana_constellation(int narg, int ps[])
   case ANA_BYTE:
     do {
       alpha = *src.b*DEG;
-      advanceLoop(&srcinfo);
+      advanceLoop(&srcinfo, &src);
       delta = *src.b*DEG;
       do
-	done = advanceLoop(&srcinfo);
+	done = advanceLoop(&srcinfo, &src);
       while (!done);
       if (vocal) {
         printf("CONSTELLATION (equinox %.10g)\n", equinox);
@@ -2487,16 +2488,16 @@ int ana_constellation(int narg, int ps[])
         showraddms(" delta = ", delta);
       }
       *tgt.b = constellation(alpha*RAD, delta*RAD);
-      advanceLoop(&tgtinfo);
+      advanceLoop(&tgtinfo, &tgt);
     } while (done < srcinfo.rndim);
     break;
   case ANA_WORD:
     do {
       alpha = *src.w*DEG;
-      advanceLoop(&srcinfo);
+      advanceLoop(&srcinfo, &src);
       delta = *src.w*DEG;
       do
-	done = advanceLoop(&srcinfo);
+	done = advanceLoop(&srcinfo, &src);
       while (!done);
       if (vocal) {
         printf("CONSTELLATION (equinox %.10g)\n", equinox);
@@ -2510,16 +2511,16 @@ int ana_constellation(int narg, int ps[])
         showraddms(" delta = ", delta);
       }
       *tgt.b = constellation(alpha*RAD, delta*RAD);
-      advanceLoop(&tgtinfo);
+      advanceLoop(&tgtinfo, &tgt);
     } while (done < srcinfo.rndim);
     break;
   case ANA_LONG:
     do {
       alpha = *src.l*DEG;
-      advanceLoop(&srcinfo);
+      advanceLoop(&srcinfo, &src);
       delta = *src.l*DEG;
       do
-	done = advanceLoop(&srcinfo);
+	done = advanceLoop(&srcinfo, &src);
       while (!done);
       if (vocal) {
         printf("CONSTELLATION (equinox %.10g)\n", equinox);
@@ -2533,16 +2534,16 @@ int ana_constellation(int narg, int ps[])
         showraddms(" delta = ", delta);
       }
       *tgt.b = constellation(alpha*RAD, delta*RAD);
-      advanceLoop(&tgtinfo);
+      advanceLoop(&tgtinfo, &tgt);
     } while (done < srcinfo.rndim);
     break;
   case ANA_FLOAT:
     do {
       alpha = *src.f*DEG;
-      advanceLoop(&srcinfo);
+      advanceLoop(&srcinfo, &src);
       delta = *src.f*DEG;
       do
-	done = advanceLoop(&srcinfo);
+	done = advanceLoop(&srcinfo, &src);
       while (!done);
       if (vocal) {
         printf("CONSTELLATION (equinox %.10g)\n", equinox);
@@ -2556,16 +2557,16 @@ int ana_constellation(int narg, int ps[])
         showraddms(" delta = ", delta);
       }
       *tgt.b = constellation(alpha*RAD, delta*RAD);
-      advanceLoop(&tgtinfo);
+      advanceLoop(&tgtinfo, &tgt);
     } while (done < srcinfo.rndim);
     break;
   case ANA_DOUBLE:
     do {
       alpha = *src.d*DEG;
-      advanceLoop(&srcinfo);
+      advanceLoop(&srcinfo, &src);
       delta = *src.d*DEG;
       do
-	done = advanceLoop(&srcinfo);
+	done = advanceLoop(&srcinfo, &src);
       while (!done);
       if (vocal) {
         printf("CONSTELLATION (equinox %.10g)\n", equinox);
@@ -2579,7 +2580,7 @@ int ana_constellation(int narg, int ps[])
         showraddms(" delta = ", delta);
       }
       *tgt.b = constellation(alpha*RAD, delta*RAD);
-      advanceLoop(&tgtinfo);
+      advanceLoop(&tgtinfo, &tgt);
     } while (done < srcinfo.rndim);
     break;
   }
@@ -3831,7 +3832,7 @@ int ana_astrf(int narg, int ps[], int forward) {
     }
     src.b += srcinfo.rdims[0]*srcinfo.stride;
     tgt.b += tgtinfo.rdims[0]*tgtinfo.stride;
-  } while (advanceLoop(&srcinfo) < srcinfo.rndim);
+  } while (advanceLoop(&srcinfo, &src) < srcinfo.rndim);
   return result;
 }
 /*--------------------------------------------------------------------------*/

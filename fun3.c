@@ -1981,7 +1981,8 @@ int fftshift(int narg, int ps[], int subroutine)
 	      trgt.f += step;
 	    }
 	    tmp.f = otmp.f;
-	  } while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+	  } while (advanceLoop(&trgtinfo, &trgt),
+		   advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	} else if (src0.f != trgt0.f)
 	  memcpy(trgt0.f, src0.f, array_size(iq)*sizeof(type));
 	dist.f++;
@@ -2023,7 +2024,8 @@ int fftshift(int narg, int ps[], int subroutine)
 	      trgt.d += step;
 	    }
 	    tmp.d = otmp.d;
-	  } while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+	  } while (advanceLoop(&trgtinfo, &trgt),
+		   advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	} else if (src0.d != trgt0.d)
 	  memcpy(trgt0.d, src0.d, array_size(iq)*sizeof(type));
 	dist.d++;
@@ -2150,7 +2152,7 @@ int ana_power(int narg, int ps[])
 	    *trgt.f *= 2;
 	  trgt.f++;
 	  tmp.f = otmp.f;
-	} while (advanceLoop(&srcinfo) < srcinfo.rndim);
+	} while (advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
       case ANA_DOUBLE:
 	factor.d = 2.0/n;
@@ -2183,7 +2185,7 @@ int ana_power(int narg, int ps[])
 	    *trgt.d *= 2;
 	  trgt.d++;
 	  tmp.d = otmp.d;
-	} while (advanceLoop(&srcinfo) < srcinfo.rndim);
+	} while (advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
     }
     src0 = trgt0;
@@ -3292,7 +3294,7 @@ int maxormin(int narg, int ps[], int code)
 	    min.b = *src.b;
 	    minloc = src.b - (byte *) srcinfo.data0;
 	  }
-	} while ((n = advanceLoop(&srcinfo)) < n1);
+	} while ((n = advanceLoop(&srcinfo, &src)) < n1);
 	switch (code) {
 	  case 0:		/* max value */
 	    *trgt.b++ = max.b;
@@ -3323,7 +3325,7 @@ int maxormin(int narg, int ps[], int code)
 	    min.w = *src.w;
 	    minloc = src.w - (word *) srcinfo.data0;
 	  }
-	} while ((n = advanceLoop(&srcinfo)) < n1);
+	} while ((n = advanceLoop(&srcinfo, &src)) < n1);
 	switch (code) {
 	  case 0:		/* max value */
 	    *trgt.w++ = max.w;
@@ -3354,7 +3356,7 @@ int maxormin(int narg, int ps[], int code)
 	    min.l = *src.l;
 	    minloc = src.l - (int *) srcinfo.data0;
 	  }
-	} while ((n = advanceLoop(&srcinfo)) < n1);
+	} while ((n = advanceLoop(&srcinfo, &src)) < n1);
 	switch (code) {
 	  case 0:		/* max value */
 	    *trgt.l++ = max.l;
@@ -3385,7 +3387,7 @@ int maxormin(int narg, int ps[], int code)
 	    min.f = *src.f;
 	    minloc = src.f - (float *) srcinfo.data0;
 	  }
-	} while ((n = advanceLoop(&srcinfo)) < n1);
+	} while ((n = advanceLoop(&srcinfo, &src)) < n1);
 	switch (code) {
 	  case 0:		/* max value */
 	    *trgt.f++ = max.f;
@@ -3416,7 +3418,7 @@ int maxormin(int narg, int ps[], int code)
 	    min.d = *src.d;
 	    minloc = src.d - (double *) srcinfo.data0;
 	  }
-	} while ((n = advanceLoop(&srcinfo)) < n1);
+	} while ((n = advanceLoop(&srcinfo, &src)) < n1);
 	switch (code) {
 	  case 0:		/* max value */
 	    *trgt.d++ = max.d;
@@ -3450,7 +3452,7 @@ int maxormin(int narg, int ps[], int code)
 	    min.f = value;
 	    minloc = src.cf - (floatComplex *) srcinfo.data0;
 	  }
-	} while ((n = advanceLoop(&srcinfo)) < n1);
+	} while ((n = advanceLoop(&srcinfo, &src)) < n1);
 	switch (code) {
 	  case 0:		/* max value */
 	    *trgt.cf++ = ((floatComplex *) srcinfo.data0)[maxloc];
@@ -3486,7 +3488,7 @@ int maxormin(int narg, int ps[], int code)
 	    min.d = value;
 	    minloc = src.cd - (doubleComplex *) srcinfo.data0;
 	  }
-	} while ((n = advanceLoop(&srcinfo)) < n1);
+	} while ((n = advanceLoop(&srcinfo, &src)) < n1);
 	switch (code) {
 	  case 0:		/* max value */
 	    *trgt.cd++ = ((doubleComplex *) srcinfo.data0)[maxloc];
@@ -4828,7 +4830,7 @@ int ana_cubic_spline_extreme(int narg, int ps[])
 	    *max.f++ = thisext;
 	}
         y.f += step*yinfo.rdims[0];
-      } while (advanceLoop(&yinfo) < yinfo.rndim);
+      } while (advanceLoop(&yinfo, &y) < yinfo.rndim);
       break;
     case ANA_DOUBLE:
       do {
@@ -4919,7 +4921,7 @@ int ana_cubic_spline_extreme(int narg, int ps[])
 	    *max.d++ = thisext;
 	}
         y.d += step*yinfo.rdims[0];
-      } while (advanceLoop(&yinfo) < yinfo.rndim);
+      } while (advanceLoop(&yinfo, &y) < yinfo.rndim);
       break;
   default:
     break;

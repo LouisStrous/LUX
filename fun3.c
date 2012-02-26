@@ -406,1065 +406,162 @@ int ana_sc(int narg, int ps[])	/* sc routine */
   return 1;
 }
 /*------------------------------------------------------------------------- */
-#define SQRTHALF	(0.707106781186548)
-#define SQRTWO		(1.414213562373095)
-int fft(int narg, int ps[], int isFunction)
-/* This routine calculates the fourier transform of a real data set. */
-/* y = FFT(x [, axes, DIRECTION=<direction>]) */
-/* y = FFT(x) and y = FFT(x,DIRECTION=+1) calculate the forward, and */
-/* y = FFT(x,/back) and y = FFT(x,DIRECTION=-1) the backward transform. */
+#include <gsl/gsl_fft_real.h>
+#include <gsl/gsl_fft_halfcomplex.h>
+static gsl_fft_real_wavetable* rwave = NULL;
+static int nrwave = -1;
+static gsl_fft_real_workspace* rwork = NULL;
+static int nrwork = -1;
+static gsl_fft_halfcomplex_wavetable* hwave = NULL;
+static int nhwave = -1;
+static double *ffttemp = NULL;
+static int nffttemp = -1;
+
+gsl_fft_real_wavetable *update_rwave(int n)
 {
-  int	iq, n, mq, type, j, jq, direction, result, step, doublePrecision;
-  pointer	src, trgt, work, tmp, otmp, src0, trgt0;
-  scalar	factor;
-  int	rfftb(int *, float *, float *), rfftf(int *, float *, float *),
-    rfftbd(int *, double *, double *), rfftfd(int *, double *, double *),
-    rffti(int *, float *), rfftid(int *, double *);
-  int mode;
-  loopInfo	srcinfo, trgtinfo;
-
-  iq = ps[0];
-  if (!symbolIsArray(iq))
-    return cerror(NEED_ARR, ps[0]);
-
-  if (isFunction) {		/* function form */
-    /*float the input */
-    if (fftdp == 0) {		/* single precision */
-      iq = ana_float(1, ps);
-      type = ANA_FLOAT;
-    } else {			/* double precision */
-      iq = ana_double(1, ps);
-      type = ANA_DOUBLE;
-    }
-  } else {			/* subroutine form: data type must match */
-    type = array_type(ps[0]);
-    switch (array_type(ps[0])) {
-      case ANA_FLOAT:
-	if (fftdp) {
-	  fftdp = 0;
-	  puts("FFT - Changed !FFTDP to 0 to match FLOAT data type");
-	}
-	break;
-      case ANA_DOUBLE:
-	if (fftdp == 0) {
-	  fftdp = 1;
-	  puts("FFT - Changed !FFTDP to 1 to match DOUBLE data type");
-	}
-	break;
-      default:
-	return anaerror("Need FLOAT or DOUBLE data", ps[0]);
-    }
-  }      
-
-  if (narg > 2 && ps[2])	/* have <direction> */
-    direction = int_arg(ps[1]);
-  else
-    direction = (internalMode & 1)? -1: 1;
-
-  mode = 0;
-  jq = 0;
-  if (narg > 1 && ps[1]) 	/* have <axes> */
-    jq = ps[1];
-  else if (internalMode & 2)	/* /ALL */
-    mode = SL_ALLAXES;
-  else				/* take the first axis */
-    jq = ANA_ZERO;
-  
-  if (isFunction) {
-    if (standardLoop(iq, jq, mode | SL_EACHROW | SL_UNIQUEAXES, type,
-		     &srcinfo, &src, &result, &trgtinfo, &trgt) < 0)
-      return ANA_ERROR;
-    src0 = src;
-    trgt0 = trgt;
-  } else {
-    if (standardLoop(iq, jq, mode | SL_EACHROW | SL_UNIQUEAXES, type,
-		     &srcinfo, &src, NULL, NULL, NULL) < 0)
-      return ANA_ERROR;
-    trgtinfo = srcinfo;
-    trgtinfo.data = &trgt;
-    trgt0 = trgt = src0 = src;
-    result = ANA_ONE;
+  if (n != nrwave) {
+    gsl_fft_real_wavetable_free(rwave);
+    rwave = gsl_fft_real_wavetable_alloc(n);
+    nrwave = rwave? n: -1;
   }
-
-  doublePrecision = (fftdp || type == ANA_DOUBLE);
-  work.b = otmp.b = NULL;
-  do {
-    trgt = trgt0;
-    src = src0;
-    n = srcinfo.rdims[0];	/* number of data elements in each FFT */
-    mq = n*20 + 120;		/* scratch memory space */
-    if (!doublePrecision)
-      mq = mq/2;
-    work.l = (int *) realloc(work.l, mq);
-    if (!work.l) {
-      zap(result);
-      result = cerror(ALLOC_ERR, 0);
-      break;
-    }
-    if (doublePrecision)
-      rfftid(&n, work.d);	/* initialize scratch space */
-    else
-      rffti(&n, work.f);
-
-    tmp.f = otmp.f = realloc(otmp.b, n*ana_type_size[doublePrecision?
-						  ANA_DOUBLE: ANA_FLOAT]);
-    if (tmp.f == NULL) {
-      zap(result);
-      result = cerror(ALLOC_ERR, 0);
-      break;
-    }
-
-    step = srcinfo.step[0];	/* basic step size */
-    if (doublePrecision) {
-      switch (type) {
-	case ANA_FLOAT:
-	  if (direction < 0) { 	/* /BACK */
-	    do {
-	      tmp.d += n - 1;
-	      if (n % 2) {
-		tmp.d--;
-		*tmp.d = 0.5**src.f; /* highest frequency cosine */
-	      } else
-		*tmp.d = *src.f;
-	      tmp.d -= 2;
-	      src.f += step;
-	      for (j = 0; j < n/2 - 1; j++) {
-		*tmp.d = 0.5**src.f;	/* cosines */
-		tmp.d -= 2;
-		src.f += step;
-	      }
-	      tmp.d[1] = *src.f; /* average */
-	      src.f += step;
-	      tmp.d += 3;
-	      for (j = 0; j < (n - 1)/2; j++) {
-		*tmp.d = -0.5**src.f;	/* sines */
-		tmp.d += 2;
-		src.f += step;
-	      }
-	      tmp.d = otmp.d;
-	      rfftbd(&n, tmp.d, work.d);
-	      for (j = 0; j < n; j++) {
-		*trgt.f = *tmp.d++;
-		trgt.f += step;
-	      }
-	      tmp.d = otmp.d;
-	    } while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
-	  } else {			/* forward */
-	    factor.d = 2.0/n;
-	    do {
-	      for (j = 0; j < n; j++) {
-		*tmp.d++ = *src.f;
-		src.f += step;
-	      }
-	      tmp.d = otmp.d;
-	      rfftfd(&n, tmp.d, work.d);
-	      tmp.d += n - 1 - (n % 2); /*  highest frequency cosine */
-	      if (n % 2 == 0)
-		tmp.d[0] *= 0.5;
-	      for (j = 0; j < n/2; j++) {
-		*trgt.f = *tmp.d *factor.d; /* the cosines */
-		tmp.d -= 2;
-		trgt.f += step;
-	      }
-	      *trgt.f = tmp.d[1] * 0.5 * factor.d; /* the average */
-	      trgt.f += step;
-	      tmp.d += 3;
-	      for (j = 0; j < (n - 1)/2; j++) {
-		*trgt.f = -*tmp.d *factor.d; /* the sines */
-		tmp.d += 2;
-		trgt.f += step;
-	      }
-	      tmp.d = otmp.d;
-	    } while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
-	  }
-	  break;
-	case ANA_DOUBLE:
-	  if (direction < 0) { 	/* /BACK */
-	    do {
-	      tmp.d += n - 1;
-	      if (n % 2) {
-		tmp.d--;
-		*tmp.d = 0.5**src.d; /* highest frequency cosine */
-	      } else
-		*tmp.d = *src.d;
-	      tmp.d -= 2;
-	      src.d += step;
-	      for (j = 0; j < n/2 - 1; j++) {
-		*tmp.d = 0.5**src.d;	/* cosines */
-		tmp.d -= 2;
-		src.d += step;
-	      }
-	      tmp.d[1] = *src.d; /* average */
-	      src.d += step;
-	      tmp.d += 3;
-	      for (j = 0; j < (n - 1)/2; j++) {
-		*tmp.d = -0.5**src.d;	/* sines */
-		tmp.d += 2;
-		src.d += step;
-	      }
-	      tmp.d = otmp.d;
-	      rfftbd(&n, tmp.d, work.d);
-	      for (j = 0; j < n; j++) {
-		*trgt.d = *tmp.d++;
-		trgt.d += step;
-	      }
-	      tmp.d = otmp.d;
-	    } while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
-	  } else {			/* forward */
-	    factor.d = 2.0/n;
-	    do {
-	      for (j = 0; j < n; j++) {
-		*tmp.d++ = *src.d;
-		src.d += step;
-	      }
-	      tmp.d = otmp.d;
-	      rfftfd(&n, tmp.d, work.d);
-	      tmp.d += n - 1 - (n % 2); /*  highest frequency cosine */
-	      if (n % 2 == 0)
-		tmp.d[0] *= 0.5;
-	      for (j = 0; j < n/2; j++) {
-		*trgt.d = *tmp.d *factor.d; /* the cosines */
-		tmp.d -= 2;
-		trgt.d += step;
-	      }
-	      *trgt.d = tmp.d[1] * 0.5 * factor.d; /* the average */
-	      trgt.d += step;
-	      tmp.d += 3;
-	      for (j = 0; j < (n - 1)/2; j++) {
-		*trgt.d = -*tmp.d *factor.d; /* the sines */
-		tmp.d += 2;
-		trgt.d += step;
-	      }
-	      tmp.d = otmp.d;
-	    } while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
-	  }
-	  break;
-      }
-    } else {			/* single-precision calculations
-				   must be ANA_FLOAT data */
-      if (direction < 0) { 	/* /BACK */
-	do {
-	  tmp.f += n - 1;
-	  if (n % 2) {
-	    tmp.f--;
-	    *tmp.f = 0.5**src.f; /* highest frequency cosine */
-	  } else
-	    *tmp.f = *src.f;
-	  tmp.f -= 2;
-	  src.f += step;
-	  for (j = 0; j < n/2 - 1; j++) {
-	    *tmp.f = 0.5**src.f;	/* cosines */
-	    tmp.f -= 2;
-	    src.f += step;
-	  }
-	  tmp.f[1] = *src.f; /* average */
-	  src.f += step;
-	  tmp.f += 3;
-	  for (j = 0; j < (n - 1)/2; j++) {
-	    *tmp.f = -0.5**src.f;	/* sines */
-	    tmp.f += 2;
-	    src.f += step;
-	  }
-	  tmp.f = otmp.f;
-	  rfftb(&n, tmp.f, work.f);
-	  for (j = 0; j < n; j++) {
-	    *trgt.f = *tmp.f++;
-	    trgt.f += step;
-	  }
-	  tmp.f = otmp.f;
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
-      } else {			/* forward */
-	factor.f = 2.0/n;
-	do {
-	  for (j = 0; j < n; j++) {
-	    *tmp.f++ = *src.f;
-	    src.f += step;
-	  }
-	  tmp.f = otmp.f;
-	  rfftf(&n, tmp.f, work.f);
-	  tmp.f += n - 1 - (n % 2); /*  highest frequency cosine */
-	  if (n % 2 == 0)
-	    tmp.f[0] *= 0.5;
-	  for (j = 0; j < n/2; j++) {
-	    *trgt.f = *tmp.f *factor.f; /* the cosines */
-	    tmp.f -= 2;
-	    trgt.f += step;
-	  }
-	  *trgt.f = tmp.f[1] * 0.5 * factor.f; /* the average */
-	  trgt.f += step;
-	  tmp.f += 3;
-	  for (j = 0; j < (n - 1)/2; j++) {
-	    *trgt.f = -*tmp.f *factor.f; /* the sines */
-	    tmp.f += 2;
-	    trgt.f += step;
-	  }
-	  tmp.f = otmp.f;
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
-      }
-    }
-    src = trgt = src0 = trgt0;	/* target of last pass becomes source of
-				 next one */
-  } while (nextLoops(&srcinfo, &trgtinfo));
+  return rwave;
+}
+/*------------------------------------------------------------------------- */
+void clear_rwave(void)
+{
+  gsl_fft_real_wavetable_free(rwave);
+  rwave = NULL;
+  nrwave = -1;
+}
+/*------------------------------------------------------------------------- */
+gsl_fft_halfcomplex_wavetable *update_hwave(int n)
+{
+  if (n != nhwave) {
+    gsl_fft_halfcomplex_wavetable_free(hwave);
+    hwave = gsl_fft_halfcomplex_wavetable_alloc(n);
+    nhwave = hwave? n: -1;
+  }
+  return hwave;
+}
+/*------------------------------------------------------------------------- */
+void clear_hwave(void)
+{
+  gsl_fft_halfcomplex_wavetable_free(hwave);
+  hwave = NULL;
+  nhwave = -1;
+}
+/*------------------------------------------------------------------------- */
+gsl_fft_real_workspace *update_rwork(int n)
+{
+  if (n != nrwork) {
+    gsl_fft_real_workspace_free(rwork);
+    rwork = gsl_fft_real_workspace_alloc(n);
+    nrwork = rwork? n: -1;
+  }
+  return rwork;
+}
+/*------------------------------------------------------------------------- */
+void clear_rwork(void)
+{
+  gsl_fft_real_workspace_free(rwork);
+  rwork = NULL;
+  nrwork = -1;
+}
+/*------------------------------------------------------------------------- */
+double *update_ffttemp(int n)
+{
+  if (n != nffttemp) {
+    free(ffttemp);
+    ffttemp = malloc(n*sizeof(double));
+    nffttemp = ffttemp? n: -1;
+  }
+  return ffttemp;
+}
+/*------------------------------------------------------------------------- */
+void clear_ffttemp(void)
+{
+  free(ffttemp);
+  ffttemp = NULL;
+  nffttemp = -1;
+}
+/*------------------------------------------------------------------------- */
+int gsl_fft(double *data, int n, int stride)
+{
+  if (!update_rwave(n) || !update_rwork(n))
+    return 1;
   
-  free(otmp.b);
-  free(work.f);
+  int result = gsl_fft_real_transform(data, stride, n, rwave, rwork);
+  if (internalMode & 2) {	/* /AMPLITUDES */
+    double factor1 = 1.0/n;
+    /* average */
+    *data *= factor1;
+    data += stride;
+    /* non-Nyquist non-zero frequencies */
+    int i;
+    double factor2 = 2.0/n;
+    /* 5 -> 3; 6 -> 3; 7 -> 4 */
+    for (i = 1; i <= (n + 1)/2; i += 2) {
+      *data *= factor2;
+      data += stride;
+    }
+    /* Nyquist frequency */
+    if (n % 2 == 0)
+      *data *= factor1;
+  }
   return result;
 }
+BIND(gsl_fft, ivarl_copy_eachaxis, f, FFT, 1, 2, "1ALLAXES:2AMPLITUDES");
+BIND(gsl_fft, ivarl_eachaxis, s, FFT, 1, 2, "1ALLAXES:2AMPLITUDES");
 /*------------------------------------------------------------------------- */
-int single_fft(pointer src, int n, int type, int backwards)
+int gsl_fft_back(double *data, int n, int stride)
 {
-  int	mq;
-  static int	nsave = 0;
-  static pointer	temp;
-  int rffti(int *, float *);
-  int rfftb(int *, float *, float *);
-  int rfftf(int *, float *, float *);
-  int rfftid(int *, double *);
-  int rfftbd(int *, double *, double *);
-  int rfftfd(int *, double *, double *);
+  if (!update_hwave(n) || !update_rwork(n))
+    return 1;
 
-  if (!n) {			/* cleanup */
-    free(temp.v);
-    nsave = 0;
-    return ANA_OK;
+  if (internalMode & 2) {	/* /AMPLITUDES */
+    double factor1 = n;
+    /* average */
+    *data *= factor1;
+    data += stride;
+    /* non-Nyquist non-zero frequencies */
+    int i;
+    double factor2 = n/2.0;
+    /* 5 -> 3; 6 -> 3; 7 -> 4 */
+    for (i = 1; i <= (n + 1)/2; i += 2) {
+      *data *= factor2;
+      data += stride;
+    }
+    /* Nyquist frequency */
+    if (n % 2 == 0)
+      *data *= factor1;
   }
-
-  mq = (type == ANA_DOUBLE)? n*20 + 120: n*10 + 60;
-  if (n != nsave) {
-    temp.v = realloc(temp.v, mq);
-    if (!temp.v)
-      return cerror(ALLOC_ERR, 0);
-  }
-
-  switch (type) {
-    case ANA_FLOAT:
-      if (n != nsave) {
-	rffti(&n, temp.f);
-	nsave = n;
-      }
-      if (backwards)
-	rfftb(&n, src.f, temp.f);
-      else
-	rfftf(&n, src.f, temp.f);
-      break;
-    case ANA_DOUBLE:
-      if (n != nsave) {
-	rfftid(&n, temp.d);
-	nsave = n;
-      }
-      if (backwards)
-	rfftbd(&n, src.d, temp.d);
-      else
-	rfftfd(&n, src.d, temp.d);
-      break;
-    default:
-      return cerror(ILL_TYPE, 0);
-  }
-  return ANA_OK;
+  return gsl_fft_halfcomplex_inverse(data, stride, n, hwave, rwork);
 }
+BIND(gsl_fft_back, ivarl_copy_eachaxis, f, FFTB, 1, 2, "1ALLAXES:2AMPLITUDES");
+BIND(gsl_fft_back, ivarl_eachaxis, s, FFTB, 1, 2, "1ALLAXES:2AMPLITUDES");
 /*------------------------------------------------------------------------- */
-int cfft(int narg, int ps[], int isFunction)
-/* This routine calculates the fourier transform of a complex data set. */
-/* y = FFTC(x [, axes, DIRECTION=<direction>]) */
-/* y = FFTC(x) and y = FFTC(x,DIRECTION=+1) calculate the forward, and */
-/* y = FFTC(x,/back) and y = FFTC(x,DIRECTION=-1) the backward transform. */
+int hilbert(double *data, int n, int stride)
 {
-  int	iq, n, mq, type, j, jq, direction, result, step, doublePrecision;
-  pointer	src, trgt, work, tmp, otmp, src0, trgt0;
-  scalar	factor;
-  int	cfftb(int *, float *, float *), cfftf(int *, float *, float *),
-    cffti(int *, float *), cfftid(int *, double *),
-    cfftbd(int *, double *, double *), cfftfd(int *, double *, double *);
-  loopInfo	srcinfo, trgtinfo;
-  int mode;
-
-  iq = ps[0];
-  if (!symbolIsArray(iq))
-    return cerror(NEED_ARR, ps[0]);
-
-  if (isFunction) {		/* function form */
-    /*float the input */
-    if (fftdp == 0) {		/* single precision */
-      iq = ana_cfloat(1, ps);
-      type = ANA_CFLOAT;
-    } else {			/* double precision */
-      iq = ana_cdouble(1, ps);
-      type = ANA_CDOUBLE;
-    }
-  } else {			/* subroutine form: data type must match */
-    type = array_type(ps[0]);
-    switch (array_type(ps[0])) {
-      case ANA_CFLOAT:
-	if (fftdp) {
-	  fftdp = 0;
-	  puts("FFT - Changed !FFTDP to 0 to match CFLOAT data type");
-	}
-	break;
-      case ANA_CDOUBLE:
-	if (fftdp == 0) {
-	  fftdp = 1;
-	  puts("FFT - Changed !FFTDP to 1 to match CDOUBLE data type");
-	}
-	break;
-      default:
-	return anaerror("Need CFLOAT or CDOUBLE data", ps[0]);
-    }
-  }      
-
-  if (narg > 2 && ps[2] && symbol_class(ps[2]) != ANA_UNDEFINED) /* have <direction> */
-    direction = int_arg(ps[1]);
-  else
-    direction = (internalMode & 1)? -1: 1;
-
-  mode = 0;
-  jq = 0;
-  if (narg > 1 && ps[1] && symbol_class(ps[1]) != ANA_UNDEFINED) /* have <axes> */
-    jq = ps[1];
-  else if (internalMode & 2)	/* /ALL */
-    mode = SL_ALLAXES;
-  else				/* take the first axis */
-    jq = ANA_ZERO;
+  if (!update_rwave(n) || !update_hwave(n) || !update_rwork(n))
+    return 1;
   
-  if (isFunction) {
-    if (standardLoop(iq, jq, mode | SL_EACHROW | SL_UNIQUEAXES, type,
-		     &srcinfo, &src, &result, &trgtinfo, &trgt) < 0)
-      return ANA_ERROR;
-    src0 = src;
-    trgt0 = trgt;
-  } else {
-    if (standardLoop(iq, jq, mode | SL_EACHROW | SL_UNIQUEAXES, type,
-		     &srcinfo, &src, NULL, NULL, NULL) < 0)
-      return ANA_ERROR;
-    trgtinfo = srcinfo;
-    trgtinfo.data = &trgt;
-    trgt0 = trgt = src0 = src;
-    result = ANA_ONE;
+  int result = gsl_fft_real_transform(data, stride, n, rwave, rwork);
+  if (result)
+    return 1;
+  int i;
+  for (i = 1; i < n - 1; i+= 2) {
+    /* advance phase by 90 degrees */
+    double t = data[i*stride];
+    data[i*stride] = -data[(i + 1)*stride];
+    data[(i + 1)*stride] = t;
   }
-
-  doublePrecision = (fftdp || type == ANA_CDOUBLE);
-  work.f = otmp.f = NULL;
-  do {
-    trgt = trgt0;
-    src = src0;
-    n = srcinfo.rdims[0];	/* number of data elements in each FFT */
-    mq = n*64 + 240;		/* scratch memory space */
-    if (!doublePrecision)
-      mq = mq/2;
-    work.l = (int *) realloc(work.l, mq);
-    if (!work.l) {
-      zap(result);
-      result = cerror(ALLOC_ERR, 0);
-      break;
-    }
-    if (doublePrecision)
-      cfftid(&n, work.d);	/* initialize scratch space */
-    else
-      cffti(&n, work.f);
-
-    tmp.f = otmp.f = realloc(otmp.b, n*ana_type_size[type]);
-    if (tmp.f == NULL) {
-      zap(result);
-      result = cerror(ALLOC_ERR, 0);
-      break;
-    }
-
-    step = srcinfo.step[0];	/* basic step size */
-    if (doublePrecision) {
-      switch (type) {
-	case ANA_CFLOAT:
-	  if (direction < 0) { 	/* /BACK */
-	    do {
-	      tmp.cd += n/2;
-	      for (j = n/2; j < n; j++) {
-		*tmp.d++ = (double) src.cf->real;
-		*tmp.d++ = (double) src.cf->imaginary;
-		src.cf += step;
-	      }
-	      tmp.cd = otmp.cd;
-	      for (j = 0; j < n/2; j++) {
-		*tmp.d++ = (double) src.cf->real;
-		*tmp.d++ = (double) src.cf->imaginary;
-		src.cf += step;
-	      }
-	      tmp.cd = otmp.cd;
-	      cfftbd(&n, tmp.d, work.d);
-	      for (j = 0; j < n; j++) {
-		trgt.cf->real = (float) *tmp.d++;
-		trgt.cf->imaginary = (float) *tmp.d++;
-		trgt.cf += step;
-	      }
-	      tmp.cd = otmp.cd;
-	    } while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
-	  } else {			/* forward */
-	    factor.d = 1.0/n;
-	    do {
-	      for (j = 0; j < n; j++) {
-		*tmp.d++ = (double) src.cf->real;
-		*tmp.d++ = (double) src.cf->imaginary;
-		src.cf += step;
-	      }
-	      tmp.cd = otmp.cd;
-	      cfftfd(&n, tmp.d, work.d);
-	      tmp.cd += n/2;
-	      for (j = n/2; j < n; j++) {
-		trgt.cf->real = *tmp.d++*factor.d;
-		trgt.cf->imaginary = *tmp.d++*factor.d;
-		trgt.cf += step;
-	      }	    
-	      tmp.cd = otmp.cd;
-	      for (j = 0; j < n/2; j++) {
-		trgt.cf->real = *tmp.d++*factor.d;
-		trgt.cf->imaginary = *tmp.d++*factor.d;
-		trgt.cf += step;
-	      }	    
-	      tmp.cd = otmp.cd;
-	    } while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
-	  }
-	  break;
-	case ANA_CDOUBLE:
-	  if (direction < 0) { 	/* /BACK */
-	    do {
-	      tmp.cd += n/2;
-	      for (j = n/2; j < n; j++) {
-		*tmp.d++ = src.cd->real;
-		*tmp.d++ = src.cd->imaginary;
-		src.cd += step;
-	      }
-	      tmp.cd = otmp.cd;
-	      for (j = 0; j < n/2; j++) {
-		*tmp.d++ = src.cd->real;
-		*tmp.d++ = src.cd->imaginary;
-		src.cd += step;
-	      }
-	      tmp.cd = otmp.cd;
-	      cfftbd(&n, tmp.d, work.d);
-	      for (j = 0; j < n; j++) {
-		trgt.cd->real = *tmp.d++;
-		trgt.cd->imaginary = *tmp.d++;
-		trgt.cd += step;
-	      }
-	      tmp.cd = otmp.cd;
-	    } while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
-	  } else {			/* forward */
-	    factor.d = 1.0/n;
-	    do {
-	      for (j = 0; j < n; j++) {
-		*tmp.d++ = src.cd->real;
-		*tmp.d++ = src.cd->imaginary;
-		src.cd += step;
-	      }
-	      tmp.cd = otmp.cd;
-	      cfftfd(&n, tmp.d, work.d);
-	      tmp.cd += n/2;
-	      for (j = n/2; j < n; j++) {
-		trgt.cd->real = *tmp.d++*factor.d;
-		trgt.cd->imaginary = *tmp.d++*factor.d;
-		trgt.cd += step;
-	      }	    
-	      tmp.cd = otmp.cd;
-	      for (j = 0; j < n/2; j++) {
-		trgt.cd->real = *tmp.d++*factor.d;
-		trgt.cd->imaginary = *tmp.d++*factor.d;
-		trgt.cd += step;
-	      }	    
-	      tmp.cd = otmp.cd;
-	    } while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
-	  }
-	  break;
-      }
-    } else {			/* single precision calculations;
-				   must be ANA_CFLOAT */
-      if (direction < 0) { 	/* /BACK */
-	do {
-	  tmp.cf += n/2;
-	  for (j = n/2; j < n; j++) {
-	    *tmp.f++ = src.cf->real;
-	    *tmp.f++ = src.cf->imaginary;
-	    src.cf += step;
-	  }
-	  tmp.cf = otmp.cf;
-	  for (j = 0; j < n/2; j++) {
-	    *tmp.f++ = src.cf->real;
-	    *tmp.f++ = src.cf->imaginary;
-	    src.cf += step;
-	  }
-	  tmp.cf = otmp.cf;
-	  cfftb(&n, tmp.f, work.f);
-	  for (j = 0; j < n; j++) {
-	    trgt.cf->real = *tmp.f++;
-	    trgt.cf->imaginary = *tmp.f++;
-	    trgt.cf += step;
-	  }
-	  tmp.cf = otmp.cf;
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
-      } else {			/* forward */
-	factor.f = 1.0/n;
-	do {
-	  for (j = 0; j < n; j++) {
-	    *tmp.f++ = src.cf->real;
-	    *tmp.f++ = src.cf->imaginary;
-	    src.cf += step;
-	  }
-	  tmp.cf = otmp.cf;
-	  cfftf(&n, tmp.f, work.f);
-	  tmp.cf += n/2;
-	  for (j = n/2; j < n; j++) {
-	    trgt.cf->real = *tmp.f++*factor.f;
-	    trgt.cf->imaginary = *tmp.f++*factor.f;
-	    trgt.cf += step;
-	  }	    
-	  tmp.cf = otmp.cf;
-	  for (j = 0; j < n/2; j++) {
-	    trgt.cf->real = *tmp.f++*factor.f;
-	    trgt.cf->imaginary = *tmp.f++*factor.f;
-	    trgt.cf += step;
-	  }	    
-	  tmp.cf = otmp.cf;
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
-      }
-    }
-    src = trgt = src0 = trgt0;	/* target of last pass becomes source of
-				 next one */
-  } while (nextLoops(&srcinfo, &trgtinfo));
-
-  free(otmp.b);
-  free(work.f);
-  return result;
+  return gsl_fft_halfcomplex_inverse(data, stride, n, hwave, rwork);
 }
+BIND(hilbert, ivarl_copy_eachaxis, f, HILBERT, 1, 2, "1ALLAXES");
+BIND(hilbert, ivarl_eachaxis, s, HILBERT, 1, 2, "1ALLAXES");
 /*------------------------------------------------------------------------- */
-int ana_fft_f(int narg, int ps[])
-{
-  if (isComplexType(symbol_type(ps[0])))
-    return cfft(narg, ps, 1);
-  else
-    return fft(narg, ps, 1);
-}
-/*------------------------------------------------------------------------- */
-int ana_fft(int narg, int ps[])
-{
-  if (isComplexType(symbol_type(ps[0])))
-    return cfft(narg, ps, 0);
-  else
-    return fft(narg, ps, 0);
-}
-/*------------------------------------------------------------------------- */
-int ana_sccomplex(int narg, int ps[])
-/* SCCOMPLEX(data [, /TOCOMPLEX, /TOSC])
-   transforms <data> between the sine-cosine fft and complex fft
-   representations.  If /TOCOMPLEX is specified, then <data> is assumed
-   to be in sine-cosine representation and is transformed to a complex
-   representation.  A dimension of 2 is added at the beginning of <data>'s
-   dimensions: the first index refers to the real part, and the second
-   index to the imaginary part of each number.
-
-   If /TOSC is specified, and if the first dimension of <data> is equal to
-   2, then <data> is assumed to be in complex representation as described
-   above, and is transformed into sine-cosine representation.  If /TOSC
-   is specified but the first dimension of <data> is not equal to 2, then
-   an error is generated.
-
-   If neither /TOCOMPLEX nor /TOSC is specified, then /TOCOMPLEX is
-   assumed if the first dimension is unequal to 2, and /TOSC otherwise.
-
-   LS 20jul98
-*/
-{
-  int type, result, coords[MAX_DIMS], acoords[MAX_DIMS], i, ntemp,
-    center, indx, k, sign[MAX_DIMS], j, n, c, nodata, direction,
-    index1, index2;
-  scalar	s;
-  pointer	src, trgt, temp, src0;
-  loopInfo	srcinfo, trgtinfo;
-
-  if (!symbolIsArray(ps[0]))
-    return cerror(NEED_ARR, ps[0]); /* need array */
-  type = array_type(ps[0]);
-  if (type < ANA_FLOAT)
-    type = ANA_FLOAT;		/* data type must be at least FLOAT */
-
-  switch (internalMode & 3) {
-    case 1:			/* /TOCOMPLEX */
-      direction = +1;
-      break;
-    case 2:			/* /TOSC */
-      direction = -1;
-      break;
-    default:
-      if (array_dims(ps[0])[0] == 2)
-	direction = -1;		/* assume /TOSC */
-      else
-	direction = +1;		/* assume /TOCOMPLEX */
-  }
-
-  if (direction == +1) {	/* /TOCOMPLEX */
-    /* Strategy:
-
-       A complex FFT component is equal to the cosine component plus or
-       minus the sine component times the imaginary unit.  The sign of
-       the multiplication factor for the sine component is equal to the
-       sign of the frequency.  We combine each corresponding cosine and
-       sine component appropriately into a complex component, repeating
-       the process for each dimension.
-
-       We maintain the frequency scheme of the sine/cosine pattern
-       (i.e., the one generated by the FFT function: the all-zero
-       frequency corresponds to all subscripts equal to the size of the
-       corresponding dimension, divided by 2), with negative frequencies
-       before, and positive frequencies after the all-zero frequency.
-       
-       Complication arise in two cases: (1) If the frequency is equal
-       to zero in some dimension, then there is no sine component
-       (i.e., no imaginary component) corresponding to the cosine
-       component in that dimension.  (2) If the frequency is maximally
-       negative in some dimension and the size of that dimension is
-       even, then there is no sine component corresponding to the
-       cosine component in that dimension.  In both of these cases,
-       the cosine component should be multiplied by 2 for every
-       dimension in which these cases arise.  For normalization
-       purposes, the results are divided by 2^(number-of-dimensions).
-       After this, the sum of each coefficient times the corresponding
-       Fourier basis function is equal to the original data.
-              
-       The sine/cosine components that contribute to a particular
-       complex component all have the same absolute coordinates relative
-       to the all-zero frequency position: only the signs of the
-       relative coordinates vary from sine/cosine component to component.
-       
-       Examples in one dimension:
-         sine/cosine   -->         complex
-           1  2  3         (1 - 3i)/2  2  (1 + 3i)/2
-
-           1  2  3  4      1  (2 - 4i)/2  3  (2 + 4i)/2
-
-       Example in two dimensions:
-         sine/cosine       
-           1  2  3         
-           4  5  6         
-           7  8  9         
-
-       First we treat dimension 0:
-        (1 - 3i)/4  2/2  (1 + 3i)/4
-        (4 - 6i)/4  5    (4 + 6i)/4
-        (7 - 9i)/4  8/2  (7 + 9i)/4
-
-       Then dimension 1:
-                            complex
-       ((1 - 3i) - (7 - 9i)i)/4  (2 - 8i)/2  ((1 + 3i) - (7 + 9i)i)/4
-       (4 - 6i)/2                5           (4 + 6i)/2
-       ((1 - 3i) + (7 - 9i)i)/4  (2 + 8i)/2  ((1 + 3i) + (7 + 9i)i)/4
-
-       which is equal to
-         -2 - 2.5i  1 - 4i  2.5 -    i
-          2 -   3i  5         2 +   3i
-        2.5 +    i  1 + 4i   -2 + 2.5i
-    */
-
-    if (standardLoop(ps[0], 0,
-		     SL_ALLAXES | SL_EACHCOORD | SL_SRCUPGRADE | SL_UPGRADE,
-		     type, &srcinfo, &src, NULL, NULL, NULL) == ANA_ERROR)
-      return ANA_ERROR;
-    src0 = src;
-
-    /* calculate the offset of the center (zero frequency) position */
-    center = 0;
-    for (i = 0; i < srcinfo.ndim; i++)
-      center += (srcinfo.dims[i]/2)*srcinfo.singlestep[i];
-    
-    /* calculate # data values on which each Fourier component depends */
-    ntemp = 2;
-    for (i = 1; i < srcinfo.ndim; i++)
-      ntemp *= 2;			/* calculate 2^ndim */
-    
-    /* reserve space for intermediate results */
-    temp.b = malloc(ntemp*ana_type_size[type]);
-    if (temp.b == NULL)
-      return cerror(ALLOC_ERR, 0);
-
-    /* create result symbol: add a dimension of 2 at the beginning */
-    trgtinfo.dims[0] = 2;
-    memcpy(trgtinfo.dims + 1, srcinfo.dims, srcinfo.ndim*sizeof(int));
-    trgtinfo.ndim = srcinfo.ndim + 1;
-    result = array_scratch(type, trgtinfo.ndim, trgtinfo.dims);
-    if (result == ANA_ERROR) {
-      free(temp.b);
-      return ANA_ERROR;
-    }
-    trgt.f = (float *) array_data(result);
-    setupDimensionLoop(&trgtinfo, trgtinfo.ndim, trgtinfo.dims, type,
-		       trgtinfo.ndim, NULL, &trgt, SL_EACHCOORD | SL_EACHROW);
-
-    switch (type) {
-      case ANA_FLOAT:
-	do {
-	  /* we calculate the coordinates relative to the all-zero frequency */
-	  for (i = 0; i < srcinfo.ndim; i++) {
-	    c = srcinfo.coords[i] - srcinfo.rdims[i]/2;	/* relative freq. */
-	    sign[i] = (c < 0)? -1: (c > 0)? +1: 0; /* get its sign */
-	    acoords[i] = c*sign[i]; /* and absolute value, too */
-	  }
-	  
-	  /* initialize for extraction of proper cosine/sine components */
-	  indx = 0;		/* initialize index offset for calculation
-				   of first complex component */
-	  for (i = 0; i < srcinfo.ndim; i++) {
-	    coords[i] = -1;	/* sign of current offset for this component */
-	    indx -= srcinfo.singlestep[i]*acoords[i];
-	  }
-
-	  s.f = 1.0/ntemp;	/* product of all imaginary units
-				 for the current component, + normalization */
-	  for (i = 0; i < ntemp; i++) {
-	    n = 1;
-	    nodata = 0;		/* initialize: 0 -> value available;
-				 > 0 -> no value available */
-	    for (k = 0; k < srcinfo.ndim; k++) /* check all dimensions */
-	      if (!acoords[k] /* in center of this dimension */
-		  || (!srcinfo.coords[k] /* or at beginning */
-		      && srcinfo.dims[k] % 2 == 0)) { /* and even dim */
-		n *= 2;
-		if ((i >> k) % 2) /* imaginary part */
-		  nodata = 1;
-	      }
-	    temp.f[i] = nodata? 0.0: src0.f[center + indx]*s.f*n; /* value */
-	    for (k = 0; k < srcinfo.ndim; k++) { /* advance to next
-						  sine/cosine component */
-	      coords[k] = -coords[k]; /* sign of frequency offset changes */
-	      indx += coords[k]*srcinfo.singlestep[k]*2*acoords[k];
-	      if (sign[k] < 0)
-		s.f = -s.f;	/* multiply one more imaginary unit */
-	      if (coords[k] > 0)
-		break;		/* done updating */
-	    }
-	  }
-	  
-	  /* combine the individual real and imaginary parts into one
-	     real and one imaginary part */
-	  for (n = ntemp/4; n; n /= 2) {
-	    j = 0;
-	    for (i = 0; i < n; ) {
-	      temp.f[i++] = temp.f[j] - temp.f[j + 3]; /* real part */
-	      temp.f[i++] = temp.f[j + 1] + temp.f[j + 2]; /* imaginary part */
-	      j += 4;
-	    }
-	  }  
-	  *trgt.f++ = temp.f[0]; /* store complex component */
-	  *trgt.f++ = temp.f[1];
-	  advanceLoop(&trgtinfo);
-	} while (advanceLoop(&srcinfo) < srcinfo.ndim);
-	break;
-      case ANA_DOUBLE:
-	do {
-	  /* we calculate the coordinates relative to the all-zero frequency */
-	  for (i = 0; i < srcinfo.ndim; i++) {
-	    c = srcinfo.coords[i] - srcinfo.rdims[i]/2;	/* relative freq. */
-	    sign[i] = (c < 0)? -1: (c > 0)? +1: 0; /* get its sign */
-	    acoords[i] = c*sign[i]; /* and absolute value, too */
-	  }
-	  
-	  /* initialize for extraction of proper cosine/sine components */
-	  indx = 0;		/* initialize index offset for calculation
-				   of first complex component */
-	  for (i = 0; i < srcinfo.ndim; i++) {
-	    coords[i] = -1;	/* sign of current offset for this component */
-	    indx -= srcinfo.singlestep[i]*acoords[i];
-	  }
-
-	  s.d = (double) 1.0/ntemp;	/* product of all imaginary units
-				 for the current component, + normalization */
-	  for (i = 0; i < ntemp; i++) {
-	    n = 1;
-	    nodata = 0;		/* initialize: 0 -> value available;
-				 > 0 -> no value available */
-	    for (k = 0; k < srcinfo.ndim; k++) /* check all dimensions */
-	      if (!acoords[k] /* in center of this dimension */
-		  || (!srcinfo.coords[k] /* or at beginning */
-		      && srcinfo.dims[k] % 2 == 0)) { /* and even dim */
-		n *= 2;
-		if ((i >> k) % 2) /* imaginary part */
-		  nodata = 1;
-	      }
-	    temp.d[i] = nodata? 0.0: src0.d[center + indx]*s.d*n; /* value */
-	    for (k = 0; k < srcinfo.ndim; k++) { /* advance to next
-						  sine/cosine component */
-	      coords[k] = -coords[k]; /* sign of frequency offset changes */
-	      indx += coords[k]*srcinfo.singlestep[k]*2*acoords[k];
-	      if (sign[k] < 0)
-		s.d = -s.d;		/* multiply one more imaginary unit */
-	      if (coords[k] > 0)
-		break;		/* done updating */
-	    }
-	  }
-	  
-	  /* combine the individual real and imaginary parts into one
-	     real and one imaginary part */
-	  for (n = ntemp/4; n; n /= 2) {
-	    j = 0;
-	    for (i = 0; i < n; ) {
-	      temp.d[i++] = temp.d[j] - temp.d[j + 3]; /* real part */
-	      temp.d[i++] = temp.d[j + 1] + temp.d[j + 2]; /* imaginary part */
-	      j += 4;
-	    }
-	  }  
-	  *trgt.d++ = temp.d[0]; /* store complex component */
-	  *trgt.d++ = temp.d[1];
-	  advanceLoop(&trgtinfo);
-	} while (advanceLoop(&srcinfo) < srcinfo.ndim);
-	break;
-    }
-  } else {			/* /TOSC */
-
-    if (standardLoop(ps[0], 0,
-		     SL_ALLAXES | SL_EACHCOORD | SL_SRCUPGRADE | SL_UPGRADE
-		     | SL_AXESBLOCK, type, &srcinfo, &src,
-		     NULL, NULL, NULL) == ANA_ERROR)
-      return ANA_ERROR;
-    src0 = src;
-    
-    /* in walking through the array, we ignore the first dimension: */
-    /* we take care of that one manually. */
-    memmove(srcinfo.axes, srcinfo.axes + 1, --srcinfo.naxes*sizeof(int));
-    rearrangeDimensionLoop(&srcinfo);
-    srcinfo.advanceaxis = 1;	/* we take care of the active one */
-
-    /* calculate the offset of the center (zero frequency) position */
-    center = 0;
-    for (i = 0; i < srcinfo.naxes; i++)
-      center += (srcinfo.rdims[i]/2)*srcinfo.rsinglestep[i];
-
-    /* create result symbol */
-    result = array_clone(ps[0], type);
-    if (result == ANA_ERROR)
-      return ANA_ERROR;
-    trgt.f = (float *) array_data(result);
-    setupDimensionLoop(&trgtinfo, srcinfo.ndim, srcinfo.dims, type,
-		       srcinfo.ndim, NULL, &trgt, SL_EACHCOORD | SL_EACHROW);
-
-    temp.b = malloc(4*ana_type_size[type]);
-    if (!temp.b)
-      return cerror(ALLOC_ERR, 0);
-    
-    /* Strategy:
-
-       A particular cosine component is equal to the sum of the
-       complex components for positive and negative frequencies.  A
-       particular sine component is equal to the difference between
-       the complex components for positive and negative frequencies,
-       divided by the imaginary unit.  At frequency zero, the cosine
-       component is equal to the complex component, and there is no
-       sine component.
-
-       In principle, the complex spectrum may not derive from strictly
-       real data, so we calculate the sine/cosine representation of the
-       real and imaginary parts separately.
-
-       Examples in one dimension:
-
-       0.5 - 1.5i  2  0.5 + 1.5i
-
-       --> (0.5 - 1.5i) + (0.5 + 1.5i)   2   ((0.5 + 1.5i) - (0.5 - 1.5i))/i
-       =    1  2  3
-
-       1  1 - 2i  3  1 + 2i 
-
-       -->  1  (1 - 2i) + (1 + 2i)  3  ((1 + 2i) - (1 - 2i))/i
-       =    1  2  3  4
-
-       Example in two dimensions:
-
-         -2 -2.5i  1 - 4i  2.5 -    i
-          2 -  3i  5         2 +   3i
-        2.5 +   i  1 + 4i   -2 + 2.5i
-
-       First treat dimension 0:
-        0.5 - 3.5i  1 - 4i  3.5 - 4.5i
-          4         5       6
-        0.5 + 3.5i  1 + 4i  3.5 + 4.5i
-
-        Then dimension 1:
-          1  2  3
-          4  5  6
-          7  8  9
-     */
-
-    switch (type) {
-      case ANA_FLOAT:
-	do {
-	  do {
-	    for (j = 0; j <= srcinfo.rdims[0]/2; j++) {
-
-	      indx = 0;		/* initialize index offset for calculation
-				   of first complex component */
-	      srcinfo.coords[0] = j;
-	      indx = 0;
-	      for (i = 0; i < srcinfo.naxes; i++) {
-		acoords[i] = srcinfo.coords[i] - srcinfo.rdims[i]/2;
-		indx += srcinfo.rsinglestep[i]*acoords[i];
-	      }
-	      
-	      index1 = center + indx;
-	      if (!acoords[0]
-		  || (!j && srcinfo.rdims[0] % 2 == 0)) {
-		/* have no separate positive/negative-frequency values */
-		trgt.f[index1] = src0.f[index1];
-		trgt.f[index1 + 1] = src0.f[index1 + 1];
-	      } else {
-		index2 = index1 - 2*srcinfo.rsinglestep[0]*acoords[0];
-		temp.f[0] = src0.f[index1] + src0.f[index2];
-		temp.f[1] = src0.f[index1 + 1] + src0.f[index2 + 1];
-		temp.f[2] = src0.f[index2 + 1] - src0.f[index1 + 1];
-		temp.f[3] = src0.f[index1] - src0.f[index2];
-		trgt.f[index1] = temp.f[0];
-		trgt.f[index1 + 1] = temp.f[1];
-		trgt.f[index2] = temp.f[2];
-		trgt.f[index2 + 1] = temp.f[3];
-	      }
-	    }
-	  } while (advanceLoop(&srcinfo) < srcinfo.naxes);
-	  src0 = trgt;		/* previous target is new source */
-	} while (nextLoop(&srcinfo));
-	break;
-      case ANA_DOUBLE:
-	do {
-	  do {
-	    for (j = 0; j <= srcinfo.rdims[0]/2; j++) {
-
-	      indx = 0;		/* initialize index offset for calculation
-				   of first complex component */
-	      srcinfo.coords[0] = j;
-	      indx = 0;
-	      for (i = 0; i < srcinfo.naxes; i++) {
-		acoords[i] = srcinfo.coords[i] - srcinfo.rdims[i]/2;
-		indx += srcinfo.rsinglestep[i]*acoords[i];
-	      }
-	      
-	      index1 = center + indx;
-	      if (!acoords[0]
-		  || (!j && srcinfo.rdims[0] % 2 == 0)) {
-		/* have no separate positive/negative-frequency values */
-		trgt.d[index1] = src0.d[index1];
-		trgt.d[index1 + 1] = src0.d[index1 + 1];
-	      } else {
-		index2 = index1 - 2*srcinfo.rsinglestep[0]*acoords[0];
-		temp.d[0] = src0.d[index1] + src0.d[index2];
-		temp.d[1] = src0.d[index1 + 1] + src0.d[index2 + 1];
-		temp.d[2] = src0.d[index2 + 1] - src0.d[index1 + 1];
-		temp.d[3] = src0.d[index1] - src0.d[index2];
-		trgt.d[index1] = temp.d[0];
-		trgt.d[index1 + 1] = temp.d[1];
-		trgt.d[index2] = temp.d[2];
-		trgt.d[index2 + 1] = temp.d[3];
-	      }
-	    }
-	  } while (advanceLoop(&srcinfo) < srcinfo.naxes);
-	  src0 = trgt;		/* previous target is new source */
-	} while (nextLoop(&srcinfo));
-	break;
-    }
-  }
-
-  free(temp.b);
-  return result;
-}
+//#define SQRTHALF	M_SQRT1_2
+//#define SQRTWO		M_SQRT2
 /*------------------------------------------------------------------------- */
 int ana_real(int narg, int ps[])
 /* returns the real part of the argument.  LS 17nov98 */
@@ -1673,170 +770,6 @@ int ana_complex(int narg, int ps[])
     return ps[0];		/* already done */
   return (symbol_type(ps[0]) == ANA_DOUBLE)?
     ana_cdouble(1, ps): ana_cfloat(1, ps);
-}
-/*------------------------------------------------------------------------- */
-int ana_hilbert(int narg, int ps[])
-/* This routine calculates the Hilbert transform of a real data set. */
-/* y = HILBERT(x [, axes, DIRECTION=<direction>]) */
-/* y = HILBERT(x) and y = HILBERT(x,DIRECTION=+1) calculate the forward, and */
-/* y = HILBERT(x,/back) and y = HILBERT(x,DIRECTION=-1) the backward */
-/* transform.  LS 10jun98 */
-{
-  int	iq, n, mq, type, j, jq, direction, result, step;
-  pointer	src, trgt, work, tmp, otmp, src0, trgt0;
-  scalar	v, factor;
-  int	rfftb(int *, float *, float *), rfftf(int *, float *, float *),
-    rfftbd(int *, double *, double *), rfftfd(int *, double *, double *),
-    rffti(int *, float *), rfftid(int *, double *);
-  loopInfo	srcinfo, trgtinfo;
-  int mode;
-
-  iq = ps[0];
-  if (!symbolIsArray(iq))
-    return cerror(NEED_ARR, ps[0]);
-
-  /*float the input */
-  if (fftdp == 0) {		/* single precision */
-    iq = ana_float(1, ps);
-    type = ANA_FLOAT;
-  } else {			/* double precision */
-    iq = ana_double(1, ps);
-    type = ANA_DOUBLE;
-  }
-
-  if (narg > 2 && ps[2])	/* have <direction> */
-    direction = int_arg(ps[2]);
-  else
-    direction = (internalMode & 1)? -1: 1;
-
-  mode = 0;
-  jq = 0;
-  if (narg > 1 && ps[1]) 	/* have <axes> */
-    jq = ps[1];
-  else if (internalMode & 2)	/* /ALL */
-    mode = SL_ALLAXES;
-  else				/* take the first axis */
-    jq = ANA_ZERO;
-  
-  if (standardLoop(iq, jq, mode | SL_EACHROW | SL_UNIQUEAXES, type,
-		   &srcinfo, &src, &result, &trgtinfo, &trgt) < 0)
-    /* restore dimensional structure of iq, if necessary */
-    return ANA_ERROR;
-  trgt0 = trgt;
-  src0 = src;
-
-  work.b = otmp.b = NULL;
-  do {
-    trgt = trgt0;
-    src = src0;
-    n = srcinfo.rdims[0];
-    mq = (2*n + 15)*(fftdp? sizeof(double): sizeof(float));
-    work.l = (int *) realloc(work.l, mq);
-    if (!work.l) {
-      zap(result);
-      result = cerror(ALLOC_ERR, 0);
-      break;
-    }
-    if (!fftdp)
-      rffti(&n, work.f);
-    else
-      rfftid(&n, work.d);
-
-    tmp.f = otmp.f = realloc(otmp.b, n*ana_type_size[type]);
-    if (tmp.f == NULL) {
-      zap(result);
-      result = cerror(ALLOC_ERR, 0);
-      break;
-    }
-
-    step = srcinfo.step[0];
-
-    switch (type) {
-      case ANA_FLOAT:
-	factor.f = 1.0/n;
-	do {
-	  /* put current data string in tmp.f */
-	  for (j = 0; j < n; j++) {
-	    *tmp.f++ = *src.f;
-	    src.f += step;
-	  }
-	  tmp.f = otmp.f;
-	  /* apply forward FFT */
-	  rfftf(&n, tmp.f, work.f);
-	  /* advance the phases */
-	  if (!(internalMode & 4))/* don't keep the average */
-	    tmp.f[0] = 0.0;	/* average */
-	  if (!(internalMode & 8)) {/* don't keep the highest frequency */
-	    tmp.f[n - 1] = 0.0;	/* highest frequency */
-          }
-	  if (direction < 0)	/* shift phases over -90 degrees */
-	    for (j = 1; j < n - 1; j += 2) {
-	      v.f = tmp.f[j];
-	      tmp.f[j] = tmp.f[j + 1];
-	      tmp.f[j + 1] = -v.f;
-	    }
-	  else			/* shift phases over +90 degrees */
-	    for (j = 1; j < n - 1; j += 2) {
-	      v.f = tmp.f[j];
-	      tmp.f[j] = -tmp.f[j + 1];
-	      tmp.f[j + 1] = v.f;
-	    }
-	  /* apply backward FFT */
-	  rfftb(&n, tmp.f, work.f);
-	  /* put in result array */
-	  for (j = 0; j < n; j++) {
-	    *trgt.f = *tmp.f++ * factor.f;
-	    trgt.f += step;
-	  }
-	  tmp.f = otmp.f;
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
-	break;
-      case ANA_DOUBLE:
-	factor.d = 1.0/n;
-	do {
-	  /* put current data string in tmp.d */
-	  for (j = 0; j < n; j++) {
-	    *tmp.d++ = *src.d;
-	    src.d += step;
-	  }
-	  tmp.d = otmp.d;
-	  /* apply forward FFT */
-	  rfftfd(&n, tmp.d, work.d);
-	  /* advance the phases */
-	  if (!(internalMode & 4))/* don't keep the average */
-	    tmp.d[0] = 0.0;	/* average */
-	  if (!(internalMode & 8)) /* don't keep the highest frequency */
-	    tmp.d[n - 1] = 0.0;	/* highest frequency */
-	  if (direction < 0)	/* shift phases over -90 degrees */
-	    for (j = 1; j < n - 1; j += 2) {
-	      v.d = tmp.d[j];
-	      tmp.d[j] = tmp.d[j + 1];
-	      tmp.d[j + 1] = -v.d;
-	    }
-	  else			/* shift phases over +90 degrees */
-	    for (j = 1; j < n - 1; j += 2) {
-	      v.d = tmp.d[j];
-	      tmp.d[j] = -tmp.d[j + 1];
-	      tmp.d[j + 1] = v.d;
-	    }
-	  /* apply backward FFT */
-	  rfftbd(&n, tmp.d, work.d);
-	  /* put in result array */
-	  for (j = 0; j < n; j++) {
-	    *trgt.d = *tmp.d++ * factor.d;
-	    trgt.d += step;
-	  }
-	  tmp.d = otmp.d;
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
-	break;
-    }
-    src = trgt = src0 = trgt0;	/* target of last pass becomes source
-				 of next one */
-  } while (nextLoops(&srcinfo, &trgtinfo));
-
-  free(otmp.b);
-  free(work.f);
-  return result;
 }
 /*------------------------------------------------------------------------- */
 int fftshift(int narg, int ps[], int subroutine)

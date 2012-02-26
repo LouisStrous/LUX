@@ -12815,6 +12815,7 @@ arguments.
 * FCW::                         Write compressed data to an FZ file
 * FCWRITE::                     Write compressed data to an FZ file
 * FFT::                         Discrete Fast Fourier Transform
+* FFTB::                        
 * FFTSHIFT::                    Shifts data using Fourier interpolation
 * FILEPTR::                     Manipulate a file pointer
 * FILEREAD::                    Unformatted reading from a file
@@ -17640,100 +17641,122 @@ See also: @ref{FZWRITE}, @ref{FZREAD}, @ref{FZHEAD}
 
 [3.1.548]
 @c -------------------------------------
-@node FFT, FFTSHIFT, FCWRITE, Internal Routines
+@node FFT, FFTB, FCWRITE, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection FFT
 
-@code{FFT(@var{data} [, @var{axes}, @var{direction}, /BACK, /ALL])}
+@code{FFT(@var{data} [, @var{axes}, /ALLAXES, /AMPLITUDES])}
 
-@code{FFT, @var{data} [, @var{axes}, @var{direction}, /BACK, /ALL]}
+@code{FFT, @var{data} [, @var{axes}, /ALLAXES, /AMPLITUDES]}
 
-Returns a discrete Fourier transform of the real or complex
-@code{@var{data}} along the indicated @code{@var{axes}} in the indicated
-@code{@var{direction}}.  By default, the forward transform (to frequency
-space) is applied, in the first dimension.  The function form converts
-the data to the data type corresponding to the value of @code{!FFTDP} (0
-for single precision, 1 for double precision) and returns the
-FFT-transformed data, which is of the data type indicated by
-@code{!FFTDP}.  The subroutine form generates an error if
-@code{@var{data}} is not floating-point; otherwise it modifies
-@code{!FFTDP} to match the data type of @code{@var{data}}, and then
-replaces the original data with the transformed data (i.e., it
-transforms in place).
+Returns a discrete forward Fourier transform of the real
+@code{@var{data}} along the indicated @code{@var{axes}}
+@code{@var{direction}}.  By default, the forward transform (to
+frequency space) is applied in the first dimension.  The returned
+values are of type @code{DOUBLE}.  The subroutine form replaces
+@code{@var{data}} with the transformed version.
 
-If @code{@var{direction}} (after transformation to an integer) is
-negative, then the backward transform is applied.  If
-@code{@var{direction}} is zero or positive, then the forward transform
-is applied.  If @code{@var{direction}} is not specified, then
-@code{/BACK} implies the backward transform.
-
-If @code{@var{axes}} is specified, then it is taken to contain the axes
-along which transformation is to be done.  No axis may appear more than
-once.  The axes need not be in any specific order.  If @code{@var{axes}}
-is not specified, then if @code{/ALL} is specified, all axes are
-treated.  If neither @code{@var{axes}} nor @code{/ALL} are specified,
-then the first axis is assumed.  The data may have arbitrary positive
-dimensions.
+If @code{@var{axes}} is specified, then it is taken to contain the
+axes along which transformation is to be done.  No axis may appear
+more than once.  The axes need not be in any specific order.  If
+@code{/ALLAXES} is specified, then all axes are treated.  If neither
+@code{@var{axes}} nor @code{/ALLAXES} are specified, then the first
+axis is assumed.  The data may have arbitrary positive dimensions.
 
 The returned array has the same dimensions as @code{@var{data}}.
 
-If @code{@var{data}} is a complex array, then the result is the complex
-Fourier transform, with the results for frequency @code{k} at coordinate
-@code{n/2 + k}, where @code{n} is the size of the dimension.
+The result are stored as 'half-complex' sequences, in order of
+increasing frequency.  For each frequency, first the real and then the
+imaginary part is given, except that no imaginary part is given for
+values that are always real, i.e., for frequency zero and (for
+even-length sequences) also for the highest represented frequency
+(equal to half of the sequence length).  The Fourier transform (of
+real data) at a negative frequency is the complex conjugate of the
+Fourier transform at the corresponding positive frequency, and the
+Fourier transform at frequency @code{@var{f}} is equal to that at
+frequency @code{@var{f} mod @var{n}} for sequence length
+@code{@var{n}}.
 
-If @code{@var{data}} has a real data type, then the result is real,
-also, and consists of sine and cosine transforms.  If @code{y} contains
-the transform results, then @code{y(*,n/2+k)} contains the results at
-frequency @code{k} (period @code{n/k}), where @code{n} is the total
-number of elements in @code{y}): For @code{k} greater than zero you find
-the sine amplitudes, for @code{k} less than zero the cosine amplitudes,
-and for @code{k} equal to zero the average.
+NOTE that only one half of the relevant frequencies are represented in
+the results, because the missing half can be constructed from the
+provided half by complex conjugation.  Just adding up the squares of
+all of the values in the result and dividing by the sequence length
+does not give you the sum of squares of @code{@var{x}}; you have to
+add in the missing part, too.  And remember that frequency zero counts
+only once, and [for even-length sequences] the highest represented
+frequency counts only once, too.
 
 The returned values are such that if @code{x} contains a pure sine or
-cosine wave, then the magnitude of the value in the appropriate element
-of the result is equal to the amplitude of the wave.  The sum of squares
-of the sine and cosine amplitudes at a particular frequency are equal to
-the value returned by @code{POWER(x)} at that same frequency.
+cosine wave, then the magnitude of the value in the appropriate
+element of the result is equal to the amplitude of the wave times
+@code{@var{n}} (for the very first element, and -- if @code{@var{n}}
+is even -- also the very last element) or @code{@var{n}/2}.
 
-The complex Fourier transform of one-dimensional @code{@var{data}} at a
-particular frequency is proportional to the cosine amplitude plus or
-minus the imaginary unit times the sine amplitude, both at that same
-frequency.  The plus sign is appropriate for positive frequencies; the
-minus sign for negative frequencies.
+If @code{/AMPLITUDES} is specified, then the returned values are
+scaled such that their magitude is equal to the magnitude of the
+corresponding wave.
 
-The forward and backward transforms are each other's inverse: if you
-apply the one and the equivalent other in succession, then you get the
-original back.
+The calculation speed of the algorithm depends strongly on the number
+of data points in the dimension in which the algorithm is applied.
+For quickest results, that number of data points should only have
+factors equal to small prime numbers, such as 2, 3, and 5.
 
-The calculation speed of the algorithm depends strongly on the number of
-data points in the dimension in which the algorithm is applied.  For
-quickest results, that number of data points should only have factors
-equal to small prime numbers, such as 2, 3, and 5.
+Opposite: @ref{FFTB}
 
-See also: @ref{!FFTDP}, @ref{POWER}, @ref{SC}, @ref{SCB}
+See also: @ref{POWER}, @ref{SC}, @ref{SCB}
 
-[2.12.322]
+[2.12.322, 4.0]
 
-@menu
-* FFT Details::                 
-@end menu
 @c -------------------------------------
-@node FFT Details,  , FFT, FFT
+@node FFTB, FFTSHIFT, FFT, Internal Routines
 @comment  node-name,  next,  previous,  up
-@subsubsection FFT Details
+@subsection FFTB
 
-@code{FFT} is implemented using some routines from Paul
-N. Schwarztrauber's FFTPACK version 4, obtained from the Netlib CD-ROM
-(2nd edition).
+@code{FFTB(@var{data} [, @var{axes}, /ALLAXES])}
 
-The calculation speed of the algorithm varies with the number of data
-points.  Regard a set of @code{n} data points of which the Fourier
-transform is to be calculated.  If all prime factors of @code{n} are at
-most equal to 5, then the calculation speed is approximately equal to
-@code{k n} with @code{k} depending on your computer: this is the best
-case.  For @code{n} equal to a prime factor greater than 5, the
-calculation speed approximately equal to @code{0.12 k n^2}: this is the
-worst case.
+@code{FFTB, @var{data} [, @var{axes}, /ALLAXES]}
+
+Returns a discrete backward Fourier transform of the real
+@code{@var{data}} along the indicated @code{@var{axes}}
+@code{@var{direction}}.  By default, the backward transform (from
+frequency space) is applied in the first dimension.  The returned
+values are of type @code{DOUBLE}.  The subroutine form replaces
+@code{@var{data}} with the transformed version.
+
+If @code{@var{axes}} is specified, then it is taken to contain the
+axes along which transformation is to be done.  No axis may appear
+more than once.  The axes need not be in any specific order.  If
+@code{/ALLAXES} is specified, then all axes are treated.  If neither
+@code{@var{axes}} nor @code{/ALLAXES} are specified, then the first
+axis is assumed.  The data may have arbitrary positive dimensions.
+
+The returned array has the same dimensions as @code{@var{data}}.
+
+The @code{@var{data}} are assumed to be stored as 'half-complex'
+sequences, in order of increasing frequency.  For each frequency,
+first the real and then the imaginary part is given, except that no
+imaginary part is given for values that are always real, i.e., for
+frequency zero and (for even-length sequences) also for the highest
+represented frequency (equal to half of the sequence length).
+
+NOTE that only one half of the relevant frequencies are represented in
+@code{@var{data}}, because the missing half can be constructed from
+the provided half by complex conjugation.
+
+@code{x = FFTB(y)} is the opposite of @code{y = FFT(x)}}, and @code{x
+= FFTB(y, /AMPLITUDES)} is the opposite of @code{y = FFT(x,
+/AMPLITUDES)}.
+
+The calculation speed of the algorithm depends strongly on the number
+of data points in the dimension in which the algorithm is applied.
+For quickest results, that number of data points should only have
+factors equal to small prime numbers, such as 2, 3, and 5.
+
+Opposite: @ref{FFT}
+
+See also: @ref{POWER}, @ref{SC}, @ref{SCB}
+
+[2.12.322, 4.0]
 
 @c -------------------------------------
 @node FFTSHIFT, FILEPTR, FFT, Internal Routines

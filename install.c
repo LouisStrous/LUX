@@ -95,7 +95,7 @@ extern int ana_area(), ana_area2(), ana_array_statistics(),
   ana_astore(), ana_fzinspect(), ana_multisieve(), ana_crunchrun(),
   ana_swaphalf(), ana_chdir(), ana_replace_values(),
   ana_freads(), ana_one(), ana_disableNewline(), ana_enableNewline(),
-  ana_shift(), ana_file_to_fz(), ana_zapnan(), ana_fft(),
+  ana_shift(), ana_file_to_fz(), ana_zapnan(),
   ana_buffering(), ana_pencolor(), ana_idlrestore(), ana_list(),
   ana_extract_bits(), ana_fftshift(), ana_manualterm(), ana_watch(),
   ana_fcrunwrite(), ana_fits_read(), ana_fits_write(), ana_subshift(),
@@ -335,8 +335,6 @@ internalRoutine	subroutine_table[] = {
   { "FCRW",	2, 3, ana_fcrunwrite, 0 }, /* files.c */
   { "FCW",	2, 3, ana_fcwrite, "1RUNLENGTH" }, /* files.c */
   { "FCWRITE",	2, 3, ana_fcwrite, "1RUNLENGTH" }, /* files.c */
-  { "FFT",	1, 3, ana_fft,	/* fun3.c */
-    "::DIRECTION:1BACK:2ALL:4COMPLEX" }, 
   { "FFTSHIFT",	2, 2, ana_fftshift, 0 }, /* fun3.c */
   { "FILEPTR",	1, 2, ana_fileptr, "1START:2EOF:4ADVANCE" }, /* files.c */
   { "FILEREAD", 5, 5, ana_fileread, 0 }, /* files.c */
@@ -683,7 +681,7 @@ extern int ana_abs(), ana_acos(), ana_arestore_f(), ana_arg(),
   ana_erf(), ana_erfc(), ana_erode(), ana_erode_dir(), ana_esmooth(),
   ana_eval(), ana_exp(), ana_expand(), ana_expm1(),
   ana_extract_bits_f(), ana_extreme_general(), ana_f_ratio(),
-  ana_fcwrite_f(), ana_fft_f(), ana_fftshift_f(), ana_fileptr_f(),
+  ana_fcwrite_f(), ana_fftshift_f(), ana_fileptr_f(),
   ana_filesize(), ana_filetype_name(), ana_find(), ana_find2(), ana_findfile(),
   ana_find_max(), ana_find_maxloc(), ana_find_min(),
   ana_find_minloc(), ana_fitskey(), ana_fits_header_f(),
@@ -714,7 +712,7 @@ extern int ana_abs(), ana_acos(), ana_arestore_f(), ana_arg(),
   ana_readkeyne(), ana_readu_f(), ana_real(), ana_redim_f(),
   ana_regrid(), ana_regrid3(), ana_regrid3ns(), ana_reorder(),
   ana_reverse(), ana_rfix(), ana_root3(), ana_runcum(), ana_runprod(),
-  ana_runsum(), ana_scale(), ana_scalerange(), ana_sccomplex(),
+  ana_runsum(), ana_scale(), ana_scalerange(),
   ana_sdev(), ana_segment(), ana_segment_dir(), ana_sgn(),
   ana_shift_f(), ana_sieve(), ana_sin(), ana_sinh(), ana_skipc(),
   ana_smap(), ana_smooth(), ana_solar_b(), ana_solar_l(),
@@ -940,7 +938,6 @@ internalRoutine function_table[] = {
   { "FCRW",	2, 3, ana_fcrunwrite_f, 0 }, /* files.c */
   { "FCW",	2, 3, ana_fcwrite_f, "1RUNLENGTH" }, /* files.c */
   { "FCWRITE",	2, 3, ana_fcwrite_f, "1RUNLENGTH" }, /* files.c */
-  { "FFT",	1, 3, ana_fft_f, "::DIRECTION:1BACK:2ALL" }, /* fun3.c */
   { "FFTSHIFT",	2, 2, ana_fftshift_f, 0 }, /* fun3.c */
   { "FILEPTR",	1, 2, ana_fileptr_f, "1START:2EOF:4ADVANCE" }, /* files.c */
   { "FILESIZE",	1, 1, ana_filesize, 0 }, /* files.c */
@@ -998,8 +995,6 @@ internalRoutine function_table[] = {
   { "GSMOOTH",	1, 4, ana_gsmooth, /* fun2.c */
     ":::KERNEL:1NORMALIZE:2FULLNORM:4BALANCED:8ALL" },
   { "HAMMING",  1, 2, ana_hamming, 0 }, /* strous3.c */
-  { "HILBERT",	1, 3, ana_hilbert, /* fun3.c */
-    "::DIRECTION:1BACK:2ALL:4AVGKEEP:8HIGHKEEP" },
   { "HIST",	1, 2, ana_hist, /* fun3.c */
     "1FIRST:2IGNORELIMIT:4INCREASELIMIT:8SILENT" },
   { "HISTR",	1, 1, ana_histr, /* fun3.c */
@@ -1125,7 +1120,6 @@ internalRoutine function_table[] = {
   { "SCALE",	1, 3, ana_scale, "*1FULLRANGE:2ZOOM" }, /* fun3.c */
   { "SCALERANGE", 3, 5, ana_scalerange, "*1FULLRANGE:2ZOOM" }, /* fun3.c */
   { "SCANF",	2, MAX_ARG, ana_freadf_f, "|1|1EOF" }, /* files.c */
-  { "SCCOMPLEX", 1, 1, ana_sccomplex, "1TOCOMPLEX:2TOSC" }, /* fun3.c */
   { "SDEV",	1, 3, ana_sdev, /* fun2.c */
     "::WEIGHTS:*0SAMPLE:1POPULATION:2KEEPDIMS:4DOUBLE" },
   { "SEGMENT",	1, 3, ana_segment, ":SIGN:DIAGONAL:1DEGREE" }, /* topology.c */

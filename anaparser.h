@@ -634,6 +634,7 @@ typedef struct {
   char	*group_start[MAXFMT];	/* current group starts */
   char	save1;			/* for temporary storage  */
   char	save2;			/* for temporary storage */
+  char  only_whitespace;	/* whitespace only? */
 } formatInfo;
 
 /* for breakpoints: */

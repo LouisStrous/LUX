@@ -2646,7 +2646,8 @@ int read_formatted_ascii(int narg, int ps[], void *ptr, int showerrors,
     if (theFormat.type == FMT_PLAIN || theFormat.end > theFormat.plain) {
       c = *theFormat.end;
       *theFormat.end = '\0';	/* temporary end */
-      if (!gscanf(&ptr, theFormat.plain, NULL, isString)) {
+      if (!gscanf(&ptr, theFormat.plain, NULL, isString)
+	  && !theFormat.only_whitespace) {
 	/* text did not match */
 	if (showerrors)
 	  return anaerror("Input did not match explicit text '%s'", 0,

@@ -68,6 +68,7 @@ int fmt_entry(formatInfo *fmi)
            if any (if the _ or = modifiers are specified).
    fmi->next: a pointer to the beginning of the next format entry, if any,
            or else to one beyond the end of the current entry (the \0).
+   fmi->only_whitespace: non-zero if the format consists of whitespace only.
    LS 16nov98 23jan99
    Return values: one of
    FMT_ERROR	illegal format
@@ -285,6 +286,10 @@ int fmt_entry(formatInfo *fmi)
     fmi->next = fmi->end;
 
   fmi->type = type;
+  fmi->only_whitespace = 
+    (fmi->type == FMT_PLAIN
+     && fmi->start == fmi->plain
+     && strspn(fmi->plain, " ") == fmi->next - fmi->plain);
   return type;
 }
 /*---------------------------------------------------------------------*/

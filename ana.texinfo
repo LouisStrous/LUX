@@ -21294,7 +21294,7 @@ See also: @ref{Astronomical Coordinate Calculations}
 [SOFA] Returns the matrix of polar motion, IAU 2000, given the
 coordinates @code{@var{xp}}, @code{@var{yp}} of the pole and TIO
 locator @code{@var{sp}}, all in radians.  The TIO locator positions
-the Terrestrial Intermediat Origin on the equator.  It is obtained
+the Terrestrial Intermediate Origin on the equator.  It is obtained
 from polar motion observations, so is in essence unpredictable.  The
 current function implements an approximation based on the dominant
 secular drift of about 47 microarcseconds per century.  All arguments

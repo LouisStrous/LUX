@@ -1285,9 +1285,146 @@ int ana_ilob2rl_f_(int narg, int ps[], int (*f)(int, double *, double *))
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int ana_ivddovrl_f_(int narg, int ps[], int (*f)(double *, int, int,
-                                                 double, double,
-                                                 double *, int, int))
+int ana_ivard_f_(int narg, int ps[], double (*f)(double *, int count, int stride))
+{
+  pointer *ptrs, ptrs0, ptrsr;
+  loopInfo *infos;
+  int iq, iret;
+  int *axes, naxes, oneaxis[1] = { 0 }, allaxes;
+
+  switch (narg) {
+  case 1:                       /* source */
+    if ((iq = standard_args(narg, ps, "i>D*;rD-&", &ptrs, &infos)) < 0)
+      return ANA_ERROR;
+    axes = oneaxis;
+    naxes = 1;
+    setAxes(&infos[0], 0, NULL, SL_EACHROW);
+    iret = 1;
+    break;    
+  case 2:                       /* source, axes */
+    if ((iq = standard_args(narg, ps, "i>D*;iL*;rD{-}&", &ptrs, &infos)) < 0)
+      return ANA_ERROR;
+    axes = ptrs[1].l;
+    naxes = infos[1].nelem;
+    if (setAxes(&infos[0], infos[1].nelem, ptrs[1].l,
+		SL_EACHROW | SL_UNIQUEAXES) < 0)
+      return ANA_ERROR;
+    iret = 2;
+    break;
+  }
+
+  if (internalMode & 1) {	/* /ALLAXES */
+    naxes = infos[0].ndim;
+    axes = malloc(naxes*sizeof(int));
+    allaxes = 1;
+    int i;
+    for (i = 0; i < naxes; i++)
+      axes[i] = i;
+  } else
+    allaxes = 0;  ptrs0 = ptrs[0];
+  ptrsr = ptrs[iret];
+  int iaxis;
+  for (iaxis = 0; iaxis < naxes; iaxis++) {
+    setAxes(&infos[0], 1, &axes[iaxis], SL_EACHROW);
+    ptrs[0] = ptrs0;
+    ptrs[iret] = ptrsr;
+    do {
+      *ptrs[iret].d = f(ptrs[0].d, infos[0].rdims[0], infos[0].rsinglestep[0]);
+      ptrs[0].d += infos[0].rsinglestep[1];
+    } while (advanceLoop(&infos[iret], &ptrs[iret]),
+	     advanceLoop(&infos[0], &ptrs[0]) < infos[0].rndim);
+  }
+  if (allaxes)
+    free(axes);
+  return iq;
+}
+/*-----------------------------------------------------------------------*/
+int ana_ivarl_copy_eachaxis_(int narg, int ps[], int (*f)(double *, int count, int stride), int isfunction)
+/* copy input to output, apply function to output, go through each axis separately */
+{
+  pointer *ptrs, ptrs0, ptrsr;
+  loopInfo *infos;
+  int iq, iret;
+  int *axes, naxes, oneaxis[1] = { 0 }, allaxes;
+
+  switch (narg) {
+  case 1:                       /* source */
+    if ((iq = standard_args(narg, ps, isfunction? "i>D*;rD&": "i>D*", &ptrs, &infos)) < 0)
+      return ANA_ERROR;
+    axes = oneaxis;
+    naxes = 1;
+    setAxes(&infos[0], 0, NULL, SL_EACHROW);
+    if (isfunction) {
+      iret = 1;
+      setAxes(&infos[iret], 0, NULL, SL_EACHROW);
+    } else
+      iret = 0;
+    break;    
+  case 2:                       /* source, axes */
+    if ((iq = standard_args(narg, ps, isfunction? "i>D*;iL*;rD&": "i>D*;iL*", &ptrs, &infos)) < 0)
+      return ANA_ERROR;
+    axes = ptrs[1].l;
+    naxes = infos[1].nelem;
+    if (setAxes(&infos[0], infos[1].nelem, ptrs[1].l,
+		SL_EACHROW | SL_UNIQUEAXES) < 0)
+      return ANA_ERROR;
+    if (isfunction) {
+      iret = 2;
+      if (setAxes(&infos[iret], infos[1].nelem, ptrs[1].l,
+		  SL_EACHROW | SL_UNIQUEAXES) < 0)
+	return ANA_ERROR;
+    } else
+      iret = 0;
+    break;
+  }
+
+  if (internalMode & 1) {	/* /ALLAXES */
+    naxes = infos[0].ndim;
+    axes = malloc(naxes*sizeof(int));
+    allaxes = 1;
+    int i;
+    for (i = 0; i < naxes; i++)
+      axes[i] = i;
+  } else
+    allaxes = 0;
+
+  ptrs0 = ptrs[0];
+  if (isfunction) {
+    memcpy(ptrs[iret].d, ptrs[0].d, infos[0].nelem*sizeof(double));
+    ptrsr = ptrs[iret];
+  }
+  int iaxis;
+  for (iaxis = 0; iaxis < naxes; iaxis++) {
+    setAxes(&infos[0], 1, &axes[iaxis], SL_EACHROW);
+    ptrs[0] = ptrs0;
+    if (isfunction) {
+      setAxes(&infos[iret], 1, &axes[iaxis], SL_EACHROW);
+      ptrs[iret] = ptrsr;
+    }
+    do {
+      f(ptrs[iret].d, infos[iret].rdims[0], infos[iret].rsinglestep[0]);
+      ptrs[iret].d += infos[iret].rsinglestep[1];
+    } while (advanceLoop(&infos[iret], &ptrs[iret]) < infos[iret].rndim);
+  }
+  if (allaxes)
+    free(axes);
+  return iq;
+}
+/*-----------------------------------------------------------------------*/
+int ana_ivarl_copy_eachaxis_f_(int narg, int ps[], int (*f)(double *, int count, int stride))
+{
+  return ana_ivarl_copy_eachaxis_(narg, ps, f, 1);
+}
+/*-----------------------------------------------------------------------*/
+int ana_ivarl_eachaxis_s_(int narg, int ps[], int (*f)(double *, int count, int stride))
+{
+  return ana_ivarl_copy_eachaxis_(narg, ps, f, 0);
+}
+/*-----------------------------------------------------------------------*/
+int ana_ivddovrl_f_(int narg, int ps[], int (*f)
+		    (double *, int srcount, int srcstride,
+		     double par1, double par2,
+		     double *, int tgtstride))
 {
   pointer *ptrs;
   loopInfo *infos;
@@ -1325,10 +1462,11 @@ int ana_ivddovrl_f_(int narg, int ps[], int (*f)(double *, int, int,
   do {
     f(ptrs[0].d, infos[0].rdims[0], infos[0].rsinglestep[0], 
       *ptrs[ipar1].d, (ipar2 >= 0? *ptrs[ipar2].d: 0.0),
-      ptrs[iret].d, infos[iret].rdims[0], infos[iret].rsinglestep[0]);
+      ptrs[iret].d, infos[iret].rsinglestep[0]);
     ptrs[0].d += infos[0].rsinglestep[1];
     ptrs[iret].d += infos[iret].rsinglestep[1];
-  } while (advanceLoop(&infos[0]), advanceLoop(&infos[iret])
+  } while (advanceLoop(&infos[0], &ptrs[0]),
+	   advanceLoop(&infos[iret], &ptrs[iret])
            < infos[iret].rndim);
   return iq;
 }

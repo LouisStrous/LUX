@@ -1434,8 +1434,10 @@ int numerical_or_string(int data, int **dims, int *nDim, int *size, pointer *src
    <params-spec> = <param-spec>[;<param-spec>]*
    <param-spec> = {'i'|'o'|'r'}['?'][<type-spec>][<dims-spec>]
    <type-spec> = {['>']{'B'|'W'|'L'|'F'|'D'}}|'S'
-   <dims-spec> = ['['<ref-par>']']<dim-spec>[,<dim-spec>]*['*']
+   <dims-spec> = ['['<ref-par>']']<dim-spec>[,<dim-spec>]*['*'|'&']
    <dim-spec> = [{'+'NUMBER|'-'|'-'NUMBER|'='|'='NUMBER|':'}]*
+
+   <dims-spec> = ['['<ref-par>']']['{'<axis-par>'}']<dim-spec>[,<dim-spec>]*['*'|'&']
 
    Some of the characteristics of a parameter may depend on those of a
    reference parameter.  That reference parameter is the very first
@@ -1473,6 +1475,20 @@ int numerical_or_string(int data, int **dims, int *nDim, int *size, pointer *src
 
      If '-', then the previous parameter is taken for it
 
+   axis-par:
+
+     The specified parameter is expected to indicate one or more
+     unique axes to remove from the current parameter, which must be
+     of type 'r' or 'o'.
+
+     If a number, then the indicated parameter is taken for it
+
+     If '-', then the previous parameter is taken for it
+
+     The removal of dimensions is done, and the axis numbers apply,
+     only after all the other dimension specifications have been
+     processed.
+
    dim-spec:
 
    NUMBER = the current dimension has the specified size.  For input
@@ -1495,8 +1511,10 @@ int numerical_or_string(int data, int **dims, int *nDim, int *size, pointer *src
 
    : = for input parameters, accept the current dimension
 
-   * = the remaining dimensions must be equal to those of the
+   & = the remaining dimensions must be equal to those of the
      reference parameter
+
+   * = the remaining dimensions are unrestricted
 
    Both a +NUMBER and a -NUMBER may be given in the same dim_spec.
   */
@@ -1517,6 +1535,7 @@ struct param_spec {
   size_t num_dims_spec;
   struct dims_spec *dims_spec;
   int ref_par;
+  int axis_par;
   enum remaining_dims_type { PS_ABSENT, PS_EQUAL_TO_REFERENCE, PS_ARBITRARY } remaining_dims;
   int remaining_dims_equal_to_reference;
 };
@@ -1667,6 +1686,35 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
           goto error;
         }
       }
+      if (*fmt == '{') {   /* optional axis parameter specification */
+	if (p_spec.logical_type == PS_INPUT) {
+	  anaerror("Axis parameter illegally specified for input parameter",
+		   0, fmt);
+	  errno = EINVAL;
+	  goto error;
+	}
+        fmt++;
+        if (*fmt++ == '-')
+          p_spec.axis_par = -1;  /* point at previous parameter */
+        else if (isdigit(*fmt)) { /* a specific parameter */
+          char *p;
+          p_spec.axis_par = strtol(fmt, &p, 10);
+        } else {
+          anaerror("Expected a digit or minus sign after { in"
+                   " reference parameter specification but found %c", 0, *fmt);
+          errno = EINVAL;
+          goto error;
+        }
+        if (*fmt == '}')
+          fmt++;
+        else {
+          anaerror("Expected } instead of %c at end of reference "
+                   "parameter specification", 0, *fmt);
+          errno = EINVAL;
+          goto error;
+        }
+      } else
+	p_spec.axis_par = -2;		     /* indicates "none" */
       while (*fmt && !strchr("*;&", *fmt)) { /* all dims */
         memset(&d_spec, '\0', sizeof(d_spec));
         while (*fmt && !strchr(",*;&", *fmt)) { /* every dim */
@@ -2099,10 +2147,58 @@ int standard_args(int narg, int ps[], char const *fmt, pointer **ptrs,
         case PS_ABSENT:
           break;
         }
-        if (tgt_dims_ix == 0) {
-          returnSym = anaerror("Return symbol has no elements", 0);
-          goto error;
-        }
+	if (pspec->axis_par > -2) {
+	  /* We have an axis parameter specified for this one. */
+	  int axis_param = pspec->axis_par;
+	  if (axis_param == -1) /* points at previous parameter */
+	    axis_param = param_ix - 1;
+
+	  if (axis_param < 0 || axis_param >= narg) {
+	    returnSym = anaerror("Axis parameter %d for parameter %d is "
+				 "out of bounds", 0, axis_param, param_ix + 1);
+	    goto error;
+	  }
+	  if (axis_param == param_ix) {
+	    returnSym = anaerror("Parameter %d cannot be its own axis"
+				 " parameter", 0, param_ix + 1);
+	    goto error;
+	  }
+	  if (!final[axis_param]) {
+	    returnSym = anaerror("Illegal forward output/return axis "
+				 "parameter %d for parameter %d", 0,
+				 axis_param + 1, param_ix + 1);
+	    goto error;
+	  }
+	  int aq = ps[axis_param];
+	  if (!symbolIsNumerical(aq)) {
+	    returnSym = anaerror("Axis parameter %d is not numerical for"
+				 " parameter %d", 0,
+				 axis_param + 1, param_ix + 1);
+	    goto error;
+	  }
+	  aq = ana_long(1, &aq);
+	  int nAxes;
+	  pointer axes;
+	  numerical(aq, NULL, NULL, &nAxes, &axes);
+	  int j;
+	  for (j = 0; j < nAxes; j++) {
+	    if (axes.l[j] < 0 || axes.l[j] >= tgt_dims_ix) {
+	      returnSym = anaerror("Axis %d out of bounds for"
+				   " parameter %d", 0,
+				   axes.l[j], param_ix + 1);
+	      goto error;
+	    }
+	    tgt_dims[axes.l[j]] = 0; /* flags removal.  Note: no check for
+				      duplicate axes */
+	  }
+	  int k;
+	  /* remove flagged dimensions */
+	  for (j = k = 0; j < tgt_dims_ix; j++) {
+	    if (tgt_dims[j])
+	      tgt_dims[k++] = tgt_dims[j];
+	  }
+	  tgt_dims_ix = k;
+	}
         /* get rid of trailing dimensions equal to 1 */
         while (tgt_dims_ix > 0 && tgt_dims[tgt_dims_ix - 1] == 1)
           tgt_dims_ix--;
@@ -2115,7 +2211,10 @@ int standard_args(int narg, int ps[], char const *fmt, pointer **ptrs,
               type = pspec->data_type;
           } else
             type = pspec->data_type;
-          iq = returnSym = array_scratch(type, tgt_dims_ix, tgt_dims);
+	  if (tgt_dims_ix)
+	    iq = returnSym = array_scratch(type, tgt_dims_ix, tgt_dims);
+	  else
+	    iq = returnSym = scalar_scratch(type);
         } else {
           iq = ps[param_ix];
           type = symbol_type(iq);
@@ -2125,7 +2224,10 @@ int standard_args(int narg, int ps[], char const *fmt, pointer **ptrs,
                   || (pspec->data_type_limit == PS_EXACT
                       && type != pspec->data_type)))
             type = pspec->data_type;
-          redef_array(iq, type, tgt_dims_ix, tgt_dims);
+	  if (tgt_dims_ix)
+	    redef_array(iq, type, tgt_dims_ix, tgt_dims);
+	  else
+	    redef_scalar(iq, type, NULL);
         }
         break;
       }
@@ -2159,3 +2261,4 @@ int standard_args(int narg, int ps[], char const *fmt, pointer **ptrs,
   }
   return returnSym;
 }
+

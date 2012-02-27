@@ -4232,21 +4232,21 @@ void symbolInitialization(void)
 #endif
  d_fix("#PI",		M_PI);
  d_fix("#2PI",		2*M_PI);
- f_fix("#E",		2.718281828);
- f_fix("#C",		2.997929E10);
- f_fix("#G",		6.668E-8);
- f_fix("#H",		6.6252E-27);
- f_fix("#HB",		1.0544E-27);
- f_fix("#EC",		6.6252E-27);
- f_fix("#M",		9.1084E-28);
- f_fix("#K",		1.308046E-16);
- f_fix("#R",		8.317E7); 
+ d_fix("#E",		M_E);
+ d_fix("#C",		299792458e0);
+ d_fix("#G",		6.668E-8);
+ d_fix("#H",		6.6252E-27);
+ d_fix("#HB",		1.0544E-27);
+ d_fix("#EC",		6.6252E-27);
+ d_fix("#M",		9.1084E-28);
+ d_fix("#K",		1.308046E-16);
+ d_fix("#R",		8.317E7); 
  d_fix("#RAD",		RAD);
  r_d_sym = nFixed;
- f_fix("#R.D",		RAD);
+ d_fix("#R.D",		RAD);
  d_fix("#DEG",		DEG);
  d_r_sym = nFixed;
- f_fix("#D.R",		DEG);
+ d_fix("#D.R",		DEG);
 
  iq = installString("#CLASS");
  stackSym = findVar(iq, 0);	/* stackSym is a dummy variable */

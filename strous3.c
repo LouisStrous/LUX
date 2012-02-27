@@ -2421,3 +2421,33 @@ double hypot_stride(double *data, int count, int stride)
 }
 BIND(hypot_stride, ivard, f, HYPOT, 1, 2, ":AXIS");
 /*--------------------------------------------------------------------*/
+#if NOTOBSOLETE
+int singular_value_decomposition(Array *a_in, Array *u_out, Array *s_out,
+				 Array *v_out)
+{
+  if (!matrix
+      || matrix->num_dims != 2
+      || matrix->dims[1] < matrix->dims[0]
+      || matrix->type != ANA_DOUBLE) {
+    errno = EDOM;
+    return 1;
+  }
+  int n = matrix->dims[0];
+  int m = matrix->dims[1];
+  gsl_matrix *a = gsl_matrix_alloc(n, m);
+  gsl_matrix *v = gsl_matrix_alloc(n, n);
+  gsl_vector *s = gsl_vector_alloc(n);
+  gsl_vector *w = gsl_vector_alloc(n);
+
+  memcpy(a->data, matrix->data.d, matrix->num_elem*sizeof(double));
+  /* maybe transpose? */
+
+  gsl_linalg_SV_decomp(a, v, s, w);
+  
+  gsl_matrix_free(a);
+  gsl_matrix_free(v);
+  gsl_vector_free(s);
+  gsl_vector_free(w);
+}
+#endif
+/*--------------------------------------------------------------------*/

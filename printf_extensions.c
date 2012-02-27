@@ -230,8 +230,8 @@ int printf_date(FILE *stream, const struct printf_info *info,
                        info->width - width - 1, value2);
       } else {
         obstack_blank(&o, -2);
-        obstack_printf(&o, "%0#*.*f", info->width - width + 2,
-                       info->width - width - 1, value2);
+        obstack_printf(&o, "%0#*.*f", (int) (info->width - width + 2),
+                       (int) (info->width - width - 1), value2);
       }
     } else {
       obstack_blank(&o, -width);

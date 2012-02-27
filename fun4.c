@@ -3386,13 +3386,35 @@ int ana_bigger235(int narg, int ps[])
   return result;
 }
 /*-------------------------------------------------------------------------*/
+int single_fft(pointer data, int n, int type, int back)
+/* type = ANA_FLOAT or ANA_DOUBLE */
+{
+  int gsl_fft(double *, int, int);
+  int gsl_fft_back(double *, int, int);
+  double *ddata;
+  if (type == ANA_DOUBLE)
+    ddata = data.d;
+  else
+    ddata = malloc(n*sizeof(double));
+  if (back)
+    gsl_fft_back(ddata, n, 1);
+  else
+    gsl_fft(ddata, n, 1);
+  if (type != ANA_DOUBLE) {
+    int i;
+    for (i = 0; i < n; i++)
+      data.f[i] = ddata[i];
+    free(ddata);
+  }
+  return 0;
+}
+/*-------------------------------------------------------------------------*/
 int ana_cartesian_to_polar(int narg, int ps[])
 /* y = CTOP(x [, x0, y0]) */
 {
   int	nx, ny, result, dims[2], r, rmax, n, az, type, step, i;
   float	x0, y0, x, y, daz;
   pointer	src, trgt;
-  int	single_fft(pointer src, int n, int type, int backwards);
 
   /* <x> */
   if (!symbolIsNumericalArray(ps[0]) || array_num_dims(ps[0]) != 2)

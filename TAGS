@@ -332,167 +332,168 @@ BIND(423,16215
 anaterm.c,23
 void getTermCaps(2,57
 
-astron.c,4899
-static char rcsid[rcsid65,2946
-#define extractbits(68,3051
-#define S_ECLIPTICAL	70,3135
-#define S_EQUATORIAL	71,3158
-#define S_HORIZONTAL	72,3181
-#define S_ELONGATION	73,3204
-#define S_COORDS	74,3227
-#define S_XYZ	75,3246
-#define S_LIGHTTIME	76,3273
-#define S_DATE	77,3306
-#define S_TDT	78,3335
-#define S_ERROR	79,3363
-#define S_ABERRATION	80,3394
-#define S_NUTATION	81,3429
-#define S_QELEMENTS	82,3462
-#define S_FK5	83,3498
-#define S_TRUNCATEVSOP 84,3529
-#define S_CONJSPREAD 85,3569
-#define S_PLANETOCENTRIC 86,3609
-#define S_KEEPDIMS	87,3651
-#define S_VOCAL 88,3687
-#define AUtoJD	89,3728
-#define NOBJECTS	90,3776
-#define EARTH	92,3796
-char *GregorianMonths[GregorianMonths98,3947
-char *IslamicMonths[IslamicMonths103,4104
-char *tikalVenteina[tikalVenteina109,4286
-char *tikalMonth[tikalMonth115,4495
-char *HebrewMonths[HebrewMonths121,4684
-char *EgyptianMonths[EgyptianMonths126,4824
-int	nonae[nonae131,4995
-}, idus[idus133,5048
-char *latinMonthsI[latinMonthsI136,5114
-}, *latinMonthsII[latinMonthsII140,5296
-char **calendars[calendars145,5469
-int calendarType[calendarType148,5558
-#define pol2(153,5676
-#define pol3(156,5772
-#define pol4(159,5884
-#define TC1900(163,6023
-#define TC2000(165,6110
-#define TM2000(167,6197
-#define mpol2(170,6291
-#define mpol3(173,6397
-#define mpol4(176,6515
-#define J2000	178,6597
-#define B1950 179,6623
-#define ecos	181,6655
-#define esin	182,6705
-static int	*extraIDs;extraIDs184,6756
-static struct extraInfo 185,6778
-  int		nterms;186,6804
-  double	equinox;187,6819
-  double	absmag;188,6837
-  char		*comment;comment189,6854
-  struct orbitParams 190,6872
-    double	JDE;191,6895
-    double	q;192,6911
-    double	e;193,6925
-    double	v_factor;194,6939
-    double	xfac;195,6960
-    double	yfac;196,6977
-    double	zfac;197,6994
-    double	xangle;198,7011
-    double	yangle;199,7030
-    double	zangle;200,7049
-    double	M;201,7068
-    double	n;202,7082
-  } *orbits;orbits203,7096
-} *extraOrbits extraOrbits204,7109
-static int	nExtraObj 206,7135
-static double	extraElements[extraElements208,7162
-static char	haveExtraElements;209,7194
-int idiv(218,7423
-#define TAI_to_TT(228,7648
-#define TT_to_TAI(229,7694
-double meanTropicalYear(254,9338
-double meanSynodicMonth(266,9808
-int EasterDate(278,10267
-double lunarToJD(313,11283
-double JDtoLunar(323,11525
-int DatetoCJDN(333,11776
-double DatetoCJD(351,12517
-void CJDNtoDate(371,13382
-void CJDtoDate(386,14034
-int tishri(403,14728
-void findTextDate(448,16070
-void roman_numeral(631,21401
-int construct_output_dims(710,22800
-int gcd(766,24953
-int ana_calendar(787,25276
-    int to_elements_per_date;799,25690
-    int from_elements_per_date;800,25757
-    void (*CJDNtoCal)CJDNtoCal801,25826
-    void (*CJDtoCal)CJDtoCal802,25877
-    void (*CaltoCJDN)CaltoCJDN803,25932
-    void (*CaltoCJD)CaltoCJD804,25983
-    void (*CJDNtoCalS)CJDNtoCalS805,26038
-    void (*CJDtoCalS)CJDtoCalS806,26092
-    void (*CalStoCJDN)CalStoCJDN807,26147
-    void (*CalStoCJD)CalStoCJD808,26202
-int ana_calendar_OLD(1186,40500
-int ana_EasterDate(1941,63520
-double deltaT(1975,64708
-void UTC_to_TAI(2081,68336
-void TAI_to_UTC(2086,68478
-void CJDLT_to_TAI(2113,69367
-void TAI_to_CJDLT(2122,69669
-double JDE(2131,69981
-void rotate(2152,70952
-void precess(2218,72657
-double	p_ce,2245,73591
-double	p_ce, p_se,2245,73591
-double	p_ce, p_se, p_pi,2245,73591
-double	p_ce, p_se, p_pi, p_p;2245,73591
-void initEclipticPrecession(2246,73621
-void eclipticPrecession(2264,74265
-void precessEquatorial(2290,75053
-int ana_precess(2318,76137
-int constellation(2445,79608
-#define B1875 2468,80477
-int ana_constellation(2469,80507
-int ana_constellationname(2621,85946
-float magnitude(2696,87676
-const char const *objectName(objectName2749,89582
-void nutation(2785,90482
-double obliquity(2833,92119
-double standardSiderealTime(2850,92710
-double siderealTime(2867,93289
-int ana_siderealtime(2884,93895
-void VSOPtoFK5(2940,95400
-#define EQUINOX_OF_DATE	2952,95791
-int readExtra(2954,95824
-int ana_readorbits(3236,105363
-void showExtra(3247,105774
-int ana_showorbits(3261,106204
-void kepler(3267,106353
-double interpolate_angle(3302,107427
-int extraHeliocentric(3316,107927
-void extraElementsHeliocentric(3390,110595
-void heliocentricXYZr(3461,112578
-void LBRtoXYZ(3609,117956
-void XYZtoLBR(3625,118432
-void ectoeq(3640,118902
-void galtoeq(3659,119461
-int ana_astrf(3686,120432
-#define s_parallax 3834,124591
-void parallax(3835,124624
-void refract(3859,125520
-void eqtohor(3876,126009
-#define FLAT	3895,126558
-#define R_EARTH	3896,126582
-void geocentricCoords(3897,126606
-double meanDistance(3907,126984
-void showraddms(3915,127220
-void showradhms(3920,127422
-void printXYZtoLBR(3925,127625
-void printLBRtoXYZ(3935,127947
-void printHBRtoXYZ(3945,128269
-int ana_astropos(3955,128591
+astron.c,4931
+static char rcsid[rcsid66,2964
+#define extractbits(69,3069
+#define S_ECLIPTICAL	71,3153
+#define S_EQUATORIAL	72,3178
+#define S_HORIZONTAL	73,3203
+#define S_ELONGATION	74,3228
+#define S_COORDS	75,3253
+#define S_XYZ	76,3274
+#define S_LIGHTTIME	77,3301
+#define S_DATE	78,3334
+#define S_TDT	79,3363
+#define S_ABERRATION	80,3391
+#define S_NUTATION	81,3426
+#define S_QELEMENTS	82,3459
+#define S_FK5	83,3495
+#define S_TRUNCATEVSOP 84,3526
+#define S_CONJSPREAD 85,3566
+#define S_PLANETOCENTRIC 86,3606
+#define S_KEEPDIMS	87,3648
+#define S_VOCAL 88,3684
+#define S_VSOP87A 89,3725
+#define S_VSOP87C 90,3753
+#define S_VSOP 91,3795
+#define AUtoJD	92,3831
+#define NOBJECTS	93,3883
+#define EARTH	95,3903
+char *GregorianMonths[GregorianMonths101,4054
+char *IslamicMonths[IslamicMonths106,4211
+char *tikalVenteina[tikalVenteina112,4393
+char *tikalMonth[tikalMonth118,4602
+char *HebrewMonths[HebrewMonths124,4791
+char *EgyptianMonths[EgyptianMonths129,4931
+int	nonae[nonae134,5102
+}, idus[idus136,5155
+char *latinMonthsI[latinMonthsI139,5221
+}, *latinMonthsII[latinMonthsII143,5403
+char **calendars[calendars148,5576
+int calendarType[calendarType151,5665
+#define pol2(156,5783
+#define pol3(159,5879
+#define pol4(162,5991
+#define TC1900(166,6130
+#define TC2000(168,6217
+#define TM2000(170,6304
+#define mpol2(173,6398
+#define mpol3(176,6504
+#define mpol4(179,6622
+#define J2000	181,6704
+#define B1950 182,6730
+#define ecos	184,6762
+#define esin	185,6812
+static int	*extraIDs;extraIDs187,6863
+static struct extraInfo 188,6885
+  int		nterms;189,6911
+  double	equinox;190,6926
+  double	absmag;191,6944
+  char		*comment;comment192,6961
+  struct orbitParams 193,6979
+    double	JDE;194,7002
+    double	q;195,7018
+    double	e;196,7032
+    double	v_factor;197,7046
+    double	xfac;198,7067
+    double	yfac;199,7084
+    double	zfac;200,7101
+    double	xangle;201,7118
+    double	yangle;202,7137
+    double	zangle;203,7156
+    double	M;204,7175
+    double	n;205,7189
+  } *orbits;orbits206,7203
+} *extraOrbits extraOrbits207,7216
+static int	nExtraObj 209,7242
+static double	extraElements[extraElements211,7269
+static char	haveExtraElements;212,7301
+int idiv(221,7530
+#define TAI_to_TT(233,7837
+#define TT_to_TAI(234,7883
+double meanTropicalYear(259,9527
+double meanSynodicMonth(271,9997
+int EasterDate(283,10456
+double lunarToJD(318,11472
+double JDtoLunar(328,11714
+int DatetoCJDN(338,11965
+double DatetoCJD(356,12706
+void CJDNtoDate(376,13571
+void CJDtoDate(391,14223
+void findTextDate(408,14917
+void roman_numeral(589,20207
+int construct_output_dims(668,21606
+int gcd(724,23759
+int ana_calendar(745,24082
+    int to_elements_per_date;757,24496
+    int from_elements_per_date;758,24563
+    void (*CJDNtoCal)CJDNtoCal759,24632
+    void (*CJDtoCal)CJDtoCal760,24683
+    void (*CaltoCJDN)CaltoCJDN761,24738
+    void (*CaltoCJD)CaltoCJD762,24789
+    void (*CJDNtoCalS)CJDNtoCalS763,24844
+    void (*CJDtoCalS)CJDtoCalS764,24898
+    void (*CalStoCJDN)CalStoCJDN765,24953
+    void (*CalStoCJD)CalStoCJD766,25008
+int ana_calendar_OLD(1144,39306
+int ana_EasterDate(1899,62326
+double deltaT(1933,63514
+void UTC_to_TAI(2039,67142
+void TAI_to_UTC(2044,67284
+void CJDLT_to_TAI(2071,68173
+void TAI_to_CJDLT(2080,68475
+double JDE(2089,68787
+void rotate(2110,69758
+void precess(2176,71463
+double	p_ce,2203,72397
+double	p_ce, p_se,2203,72397
+double	p_ce, p_se, p_pi,2203,72397
+double	p_ce, p_se, p_pi, p_p;2203,72397
+void initEclipticPrecession(2204,72427
+void eclipticPrecession(2222,73071
+void precessEquatorial(2248,73859
+int ana_precess(2276,74943
+int constellation(2403,78414
+#define B1875 2426,79283
+int ana_constellation(2427,79347
+int ana_constellationname(2589,84321
+float magnitude(2664,86051
+const char const *objectName(objectName2717,87957
+void nutation(2753,88857
+double obliquity(2801,90494
+double standardSiderealTime(2818,91085
+double siderealTime(2835,91664
+int ana_siderealtime(2852,92270
+void VSOPtoFK5(2908,93775
+#define EQUINOX_OF_DATE	2920,94166
+int readExtra(2922,94199
+int ana_readorbits(3204,103738
+void showExtra(3215,104149
+int ana_showorbits(3229,104579
+void kepler(3235,104728
+double interpolate_angle(3270,105802
+int extraHeliocentric(3284,106302
+void extraElementsHeliocentric(3358,108970
+void heliocentricXYZr(3429,110953
+void LBRtoXYZ(3613,117968
+void XYZtoLBR(3629,118444
+void ectoeq(3644,118914
+void galtoeq(3663,119473
+int ana_astrf(3690,120444
+#define s_parallax 3838,124603
+void parallax(3839,124636
+void refract(3863,125532
+void eqtohor(3880,126021
+#define FLAT	3899,126570
+#define R_EARTH	3900,126594
+void geocentricCoords(3901,126618
+double meanDistance(3911,126996
+void showraddms(3919,127232
+void showradhms(3924,127434
+void printXYZtoLBR(3929,127637
+void printLBRtoXYZ(3939,127959
+void printHBRtoXYZ(3949,128281
+int ana_astropos(3959,128603
 
 axis.c,3043
 #define obstack_chunk_alloc 36,1293
@@ -995,7 +996,7 @@ yyparse 1559,60176
 #define YYPOPSTACK(1620,61493
 #  undef YYSTACK_RELOCATE1708,63910
 
-calendar.c,5975
+calendar.c,6011
 #define _GNU_SOURCE 1,0
 #define arraysize(15,434
 static void CJDtoCal(26,943
@@ -1074,103 +1075,104 @@ void CJDtoHebrew(827,29760
 void CJDtoHebrewA(832,29957
 char *CJDtoHebrewS(CJDtoHebrewS840,30211
 void CJDtoHebrewSA(845,30380
-int HebrewtoCJDN(850,30570
-void HebrewtoCJDNA(863,30925
-int HebrewStoCJDN(868,31106
-void HebrewStoCJDNA(875,31351
-double HebrewtoCJD(882,31599
-void HebrewtoCJDA(887,31785
-double HebrewStoCJD(892,31980
-void HebrewStoCJDA(899,32221
-#define ISLAMIC_EPOCH 910,32569
-static char const *Islamic_monthnames[Islamic_monthnames912,32602
-void CJDNtoIslamic(919,32881
-void CJDNtoIslamicA(931,33378
-char *CJDNtoIslamicS(CJDNtoIslamicS936,33563
-void CJDNtoIslamicSA(941,33737
-void CJDtoIslamic(946,33932
-void CJDtoIslamicA(951,34131
-char *CJDtoIslamicS(CJDtoIslamicS959,34387
-void CJDtoIslamicSA(964,34559
-int IslamictoCJDN(969,34752
-void IslamictoCJDNA(977,35079
-int IslamicStoCJDN(982,35262
-void IslamicStoCJDNA(989,35509
-double IslamictoCJD(996,35760
-void IslamictoCJDA(1001,35948
-double IslamicStoCJD(1006,36145
-void IslamicStoCJDA(1013,36390
-#define EGYPTIAN_EPOCH 1024,36744
-static char const *Egyptian_monthnames[Egyptian_monthnames1026,36778
-void CJDNtoEgyptian(1032,37046
-void CJDNtoEgyptianA(1045,37454
-char *CJDNtoEgyptianS(CJDNtoEgyptianS1050,37641
-void CJDNtoEgyptianSA(1055,37818
-void CJDtoEgyptian(1060,38016
-void CJDtoEgyptianA(1065,38217
-char *CJDtoEgyptianS(CJDtoEgyptianS1073,38475
-void CJDtoEgyptianSA(1078,38650
-int EgyptiantoCJDN(1083,38846
-void EgyptiantoCJDNA(1090,39137
-int EgyptianStoCJDN(1095,39322
-void EgyptianStoCJDNA(1102,39573
-double EgyptiantoCJD(1109,39828
-void EgyptiantoCJDA(1114,40018
-double EgyptianStoCJD(1119,40217
-void EgyptianStoCJDA(1126,40466
-double JDtoCJD(1137,40815
-void JDtoCJDA(1142,40943
-double CJDtoJD(1147,41094
-void CJDtoJDA(1152,41224
-void CJDNtoCJDNA(1157,41375
-void CJDtoCJDA(1162,41514
-double CJDtoLunar(1171,41759
-void CJDtoLunarA(1181,42027
-double LunartoCJD(1186,42190
-void LunartoCJDA(1196,42456
-static char const *Mayan_venteina_names[Mayan_venteina_names1204,42655
-static char const *Mayan_haab_names[Mayan_haab_names1210,42884
-#define find_venteina_name(1216,43092
-#define find_haab_name(1217,43190
-void CJDNtoMayan(1220,43356
-void CJDNtoMayanA(1233,43868
-char *CJDNtoMayanS(CJDNtoMayanS1239,44093
-void CJDNtoMayanSA(1254,44678
-void CJDtoMayan(1267,45255
-void CJDtoMayanA(1281,45727
-char *CJDtoMayanS(CJDtoMayanS1297,46111
-void CJDtoMayanSA(1313,46703
-int MayantoCJDN(1318,46865
-void MayantoCJDNA(1387,49813
-static void MayanSto(1393,50050
-  enum state 1401,50284
-    BUSY,1402,50299
-    BUSY, OK,1402,50299
-    BUSY, OK, BAD1402,50299
-int MayanStoCJDN(1501,53444
-void MayanStoCJDNA(1509,53621
-double MayantoCJD(1514,53785
-void MayantoCJDA(1524,54246
-double MayanStoCJD(1530,54525
-void MayanStoCJDA(1538,54706
-#define LONGCOUNT_EPOCH 1546,54904
-static int longcount_periods[longcount_periods1547,54937
-void CJDNtoLongCount(1549,54991
-void CJDNtoLongCountA(1567,55485
-char *CJDNtoLongCountS(CJDNtoLongCountS1580,55825
-void CJDNtoLongCountSA(1591,56165
-void CJDtoLongCount(1600,56497
-void CJDtoLongCountA(1621,57036
-char *CJDtoLongCountS(CJDtoLongCountS1634,57418
-void CJDtoLongCountSA(1639,57574
-int LongCounttoCJDN(1645,57771
-void LongCounttoCJDNA(1657,58128
-int LongCountStoCJDN(1663,58389
-void LongCountStoCJDNA(1683,58922
-double LongCounttoCJD(1688,59094
-void LongCounttoCJDA(1695,59373
-double LongCountStoCJD(1701,59632
-void LongCountStoCJDA(1706,59789
+static int tishri(850,30570
+int HebrewtoCJDN(895,31927
+void HebrewtoCJDNA(907,32263
+int HebrewStoCJDN(912,32444
+void HebrewStoCJDNA(919,32689
+double HebrewtoCJD(926,32937
+void HebrewtoCJDA(931,33123
+double HebrewStoCJD(936,33318
+void HebrewStoCJDA(943,33559
+#define ISLAMIC_EPOCH 954,33907
+static char const *Islamic_monthnames[Islamic_monthnames956,33940
+void CJDNtoIslamic(963,34219
+void CJDNtoIslamicA(975,34716
+char *CJDNtoIslamicS(CJDNtoIslamicS980,34901
+void CJDNtoIslamicSA(985,35075
+void CJDtoIslamic(990,35270
+void CJDtoIslamicA(995,35469
+char *CJDtoIslamicS(CJDtoIslamicS1003,35725
+void CJDtoIslamicSA(1008,35897
+int IslamictoCJDN(1013,36090
+void IslamictoCJDNA(1021,36417
+int IslamicStoCJDN(1026,36600
+void IslamicStoCJDNA(1033,36847
+double IslamictoCJD(1040,37098
+void IslamictoCJDA(1045,37286
+double IslamicStoCJD(1050,37483
+void IslamicStoCJDA(1057,37728
+#define EGYPTIAN_EPOCH 1068,38082
+static char const *Egyptian_monthnames[Egyptian_monthnames1070,38116
+void CJDNtoEgyptian(1076,38384
+void CJDNtoEgyptianA(1089,38792
+char *CJDNtoEgyptianS(CJDNtoEgyptianS1094,38979
+void CJDNtoEgyptianSA(1099,39156
+void CJDtoEgyptian(1104,39354
+void CJDtoEgyptianA(1109,39555
+char *CJDtoEgyptianS(CJDtoEgyptianS1117,39813
+void CJDtoEgyptianSA(1122,39988
+int EgyptiantoCJDN(1127,40184
+void EgyptiantoCJDNA(1134,40475
+int EgyptianStoCJDN(1139,40660
+void EgyptianStoCJDNA(1146,40911
+double EgyptiantoCJD(1153,41166
+void EgyptiantoCJDA(1158,41356
+double EgyptianStoCJD(1163,41555
+void EgyptianStoCJDA(1170,41804
+double JDtoCJD(1181,42153
+void JDtoCJDA(1186,42281
+double CJDtoJD(1191,42432
+void CJDtoJDA(1196,42562
+void CJDNtoCJDNA(1201,42713
+void CJDtoCJDA(1206,42852
+double CJDtoLunar(1215,43097
+void CJDtoLunarA(1225,43365
+double LunartoCJD(1230,43528
+void LunartoCJDA(1240,43794
+static char const *Mayan_venteina_names[Mayan_venteina_names1248,43993
+static char const *Mayan_haab_names[Mayan_haab_names1254,44222
+#define find_venteina_name(1260,44430
+#define find_haab_name(1261,44528
+void CJDNtoMayan(1264,44694
+void CJDNtoMayanA(1277,45206
+char *CJDNtoMayanS(CJDNtoMayanS1283,45431
+void CJDNtoMayanSA(1298,46016
+void CJDtoMayan(1311,46593
+void CJDtoMayanA(1325,47065
+char *CJDtoMayanS(CJDtoMayanS1341,47449
+void CJDtoMayanSA(1357,48041
+int MayantoCJDN(1362,48203
+void MayantoCJDNA(1431,51151
+static void MayanSto(1437,51388
+  enum state 1445,51622
+    BUSY,1446,51637
+    BUSY, OK,1446,51637
+    BUSY, OK, BAD1446,51637
+int MayanStoCJDN(1545,54782
+void MayanStoCJDNA(1553,54959
+double MayantoCJD(1558,55123
+void MayantoCJDA(1568,55584
+double MayanStoCJD(1574,55863
+void MayanStoCJDA(1582,56044
+#define LONGCOUNT_EPOCH 1590,56242
+static int longcount_periods[longcount_periods1591,56275
+void CJDNtoLongCount(1593,56329
+void CJDNtoLongCountA(1611,56823
+char *CJDNtoLongCountS(CJDNtoLongCountS1624,57163
+void CJDNtoLongCountSA(1635,57503
+void CJDtoLongCount(1644,57835
+void CJDtoLongCountA(1665,58374
+char *CJDtoLongCountS(CJDtoLongCountS1678,58756
+void CJDtoLongCountSA(1683,58912
+int LongCounttoCJDN(1689,59109
+void LongCounttoCJDNA(1701,59466
+int LongCountStoCJDN(1707,59727
+void LongCountStoCJDNA(1727,60260
+double LongCounttoCJD(1732,60432
+void LongCounttoCJDA(1739,60711
+double LongCountStoCJD(1745,60970
+void LongCountStoCJDA(1750,61127
 
 cluster.c,80
 static char rcsid[rcsid14,299
@@ -1862,110 +1864,110 @@ char *moreInput(moreInput2042,60006
 int read_ascii(2084,61378
 int gscanf(2306,68442
 int read_formatted_ascii(2351,69698
-int ana_freadf(2668,80709
-int ana_fread(2688,81262
-int ana_freadf_f(2710,81746
-int ana_assoc_input(2741,82505
-int ana_assoc_output(2889,87171
-FILE *fopenr_sym(fopenr_sym3012,91466
-#define SYNCH_OK	3034,92031
-#define SYNCH_REVERSE	3035,92059
-#define SYNCH_OK	3037,92098
-#define SYNCH_REVERSE	3038,92126
-int ck_synch_hd(3040,92166
-void fz_get_header(3067,93047
-void fz_print_header(3093,93880
-int ana_fzinspect(3119,94559
-int fzhead(3181,96478
-int fzread(3227,97973
-  struct compresshead 3249,98718
-    int     tsize,3250,98742
-    int     tsize, nblocks,3250,98742
-    int     tsize, nblocks, bsize;3250,98742
-    byte    slice_size,3251,98777
-    byte    slice_size, type;3251,98777
-  union { int i;3254,98835
-  union { int i;  byte b[b3254,98835
-int fzwrite(3407,103087
-int fcrunwrite(3585,108626
-int fcwrite(3597,109058
- union { int i;3612,109539
- union { int i;  byte b[b3612,109539
-int ana_fzread(3782,114455
-int ana_fzwrite(3786,114624
-int ana_fzhead(3790,114795
-int ana_fcwrite(3794,114964
-int ana_fcrunwrite(3798,115135
-int ana_fzread_f(3801,115289
-int ana_fzhead_f(3805,115503
-int ana_fzwrite_f(3809,115717
-int ana_fcwrite_f(3813,115904
-int ana_fcrunwrite_f(3817,116091
-int readu(3820,116273
-int writeu(3876,117934
-int ana_readu(3928,119395
-int ana_readu_f(3932,119565
-int ana_writeu(3936,119748
-int ana_writeu_f(3940,119920
-int astore(3944,120105
-int ana_astore(4036,122792
-int ana_astore_f(4041,122940
-int readunf(4046,123090
-int arestore(4064,123748
-int ana_arestore(4222,129017
-int ana_arestore_f(4227,129169
-int fileptr(4233,129363
-int ana_fileptr(4318,132376
-int ana_fileptr_f(4323,132533
-int ana_dump_lun(4328,132692
-int ana_get_lun(4350,133235
-int ana_chdir(4365,133658
-int ana_filesize(4395,134484
-int ana_freads(4418,135149
-int ana_freads_f(4428,135602
-int ana_file_to_fz(4452,136305
-char *file_find(file_find4523,138522
-int ana_findfile(4609,140825
-static int	nfiles 4656,142458
-static char	**p;p4657,142486
-static regex_t	re;4659,142520
-#define REG_BASIC	4661,142557
-int ana_getmatchedfiles(4663,142584
-int ana_getmatchedfiles_r(4698,143678
-int file_get(4711,144058
-int directs_get(4794,146509
-int ana_getfiles_r(4862,148588
-int ana_getfiles(4877,149032
-int ana_getdirectories(4942,151053
-int ana_identify_file(4952,151398
-void printw(5063,154436
-void fprintw(5163,158126
-void vfprintfw(5178,158535
-void printfw(5196,159156
-int ana_hex(5209,159499
-#define	HEAD_LIMIT	5273,162351
-int fits_problems(5274,162374
-char *bigger_header(bigger_header5311,164356
-int fits_fatality(5337,164954
-void apply_bscale_bzero_blank(5350,165295
-int ana_fits_read_general(5484,168303
-int ana_fits_read(5523,169459
-int ana_fits_read_f(5528,169625
-int ana_fits_header_f(5533,169793
-int ana_fits_xread_f(5558,170480
-int fits_read_compressed(5592,171525
-int fits_read(5904,180329
-  struct ext_params 5927,181397
-    int	repeat;5928,181419
-    int	type;5929,181435
-    double	scale,5930,181449
-    double	scale, zero;5930,181449
-    char	*lab;lab5931,181473
-int ana_fits_write_general(6592,202859
-int ana_fits_write(6870,211519
-int ana_fits_write_f(6875,211687
-int ana_fileread(6880,211857
-int ana_filewrite(6945,213909
+int ana_freadf(2670,81074
+int ana_fread(2693,81701
+int ana_freadf_f(2716,82241
+int ana_assoc_input(2748,83069
+int ana_assoc_output(2896,87735
+FILE *fopenr_sym(fopenr_sym3019,92030
+#define SYNCH_OK	3041,92595
+#define SYNCH_REVERSE	3042,92623
+#define SYNCH_OK	3044,92662
+#define SYNCH_REVERSE	3045,92690
+int ck_synch_hd(3047,92730
+void fz_get_header(3074,93611
+void fz_print_header(3100,94444
+int ana_fzinspect(3126,95123
+int fzhead(3188,97042
+int fzread(3234,98537
+  struct compresshead 3256,99282
+    int     tsize,3257,99306
+    int     tsize, nblocks,3257,99306
+    int     tsize, nblocks, bsize;3257,99306
+    byte    slice_size,3258,99341
+    byte    slice_size, type;3258,99341
+  union { int i;3261,99399
+  union { int i;  byte b[b3261,99399
+int fzwrite(3414,103651
+int fcrunwrite(3592,109190
+int fcwrite(3604,109622
+ union { int i;3619,110103
+ union { int i;  byte b[b3619,110103
+int ana_fzread(3789,115019
+int ana_fzwrite(3793,115188
+int ana_fzhead(3797,115359
+int ana_fcwrite(3801,115528
+int ana_fcrunwrite(3805,115699
+int ana_fzread_f(3808,115853
+int ana_fzhead_f(3812,116067
+int ana_fzwrite_f(3816,116281
+int ana_fcwrite_f(3820,116468
+int ana_fcrunwrite_f(3824,116655
+int readu(3827,116837
+int writeu(3883,118498
+int ana_readu(3935,119959
+int ana_readu_f(3939,120129
+int ana_writeu(3943,120312
+int ana_writeu_f(3947,120484
+int astore(3951,120669
+int ana_astore(4043,123356
+int ana_astore_f(4048,123504
+int readunf(4053,123654
+int arestore(4071,124312
+int ana_arestore(4229,129581
+int ana_arestore_f(4234,129733
+int fileptr(4240,129927
+int ana_fileptr(4325,132940
+int ana_fileptr_f(4330,133097
+int ana_dump_lun(4335,133256
+int ana_get_lun(4357,133799
+int ana_chdir(4372,134222
+int ana_filesize(4402,135048
+int ana_freads(4425,135713
+int ana_freads_f(4435,136166
+int ana_file_to_fz(4459,136869
+char *file_find(file_find4530,139086
+int ana_findfile(4616,141389
+static int	nfiles 4663,143022
+static char	**p;p4664,143050
+static regex_t	re;4666,143084
+#define REG_BASIC	4668,143121
+int ana_getmatchedfiles(4670,143148
+int ana_getmatchedfiles_r(4705,144242
+int file_get(4718,144622
+int directs_get(4801,147073
+int ana_getfiles_r(4869,149152
+int ana_getfiles(4884,149596
+int ana_getdirectories(4949,151617
+int ana_identify_file(4959,151962
+void printw(5070,155000
+void fprintw(5170,158690
+void vfprintfw(5185,159099
+void printfw(5203,159720
+int ana_hex(5216,160063
+#define	HEAD_LIMIT	5280,162915
+int fits_problems(5281,162938
+char *bigger_header(bigger_header5318,164920
+int fits_fatality(5344,165518
+void apply_bscale_bzero_blank(5357,165859
+int ana_fits_read_general(5491,168867
+int ana_fits_read(5530,170023
+int ana_fits_read_f(5535,170189
+int ana_fits_header_f(5540,170357
+int ana_fits_xread_f(5565,171044
+int fits_read_compressed(5599,172089
+int fits_read(5911,180893
+  struct ext_params 5934,181961
+    int	repeat;5935,181983
+    int	type;5936,181999
+    double	scale,5937,182013
+    double	scale, zero;5937,182013
+    char	*lab;lab5938,182037
+int ana_fits_write_general(6599,203423
+int ana_fits_write(6877,212083
+int ana_fits_write_f(6882,212251
+int ana_fileread(6887,212421
+int ana_filewrite(6952,214473
 
 fit.c,480
 static char rcsid[rcsid15,360
@@ -2764,143 +2766,143 @@ static char	installing 70,2736
 internalRoutine	subroutine_table[subroutine_table258,11619
 int nSubroutine 667,33083
 internalRoutine function_table[function_table792,39557
-int nFunction 1279,66946
-void undefine(1281,67079
-void zap(1524,74272
-void cleanUp(1613,76726
-void cleanUpRoutine(1654,78167
-void updateIndices(1714,80124
-int nextFreeStackEntry(1726,80559
-int nextFreeNamedVariable(1741,81019
-int nextFreeTempVariable(1761,81785
-int nextFreeTempExecutable(1778,82352
-int nextFreeExecutable(1794,82925
-int nextFreeUndefined(1815,83663
-void pushList(1828,84000
-word popList(1839,84336
-int moveList(1847,84599
-void swapList(1858,85000
-int stackListLength(1868,85282
-void dupList(1884,85689
-void unlinkString(1895,85935
-void freeString(1907,86324
-int installStruct(1915,86591
-int copyElement(1933,87305
-int findTarget(1947,87809
-int newSymbol(2023,90567
-int hash(2738,112278
-int ircmp(2746,112445
-int findInternalName(2755,112686
-static compileInfo	*c_info c_info2775,113216
-int	cur_c_info 2776,113251
-compileInfo	*curCompileInfo;curCompileInfo2777,113285
-int nextCompileLevel(2779,113315
-static int	compileCount 2863,116046
-int compile(2864,116075
-int ana_compile(2905,117271
-int newBlockSymbol(2921,117628
-int newSubrSymbol(2961,118924
-int lookForName(3017,121109
-int findSym(3044,122129
-char *symName(symName3063,122681
-char *symbolName(symbolName3085,123308
-int suppressEvalRoutine(3111,124009
-#define	IGNORE_SIG	3124,124399
-#define ASK_SIG	3125,124420
-#define SIG_BREAK	3126,124439
-void exception(3127,124459
-char *typeName(typeName3217,126844
-char *className(className3236,127373
-  static struct classInfo 3239,127438
-    byte number;3240,127466
-    byte number; char *name;name3240,127466
-int ana_classname(3308,129680
-int ana_typeName(3323,130130
-char *evbName(evbName3338,130595
-char *filetypeName(filetypeName3356,131228
-int ana_filetype_name(3370,131745
-void fixedValue(3381,132024
-int installSysFunc(3434,133499
-int installPointer(3448,133889
-int convertRange(3463,134296
-void convertPointer(3525,136678
-void convertWidePointer(3612,138634
-void convertScalar(3800,142646
-int ana_symbol_memory(3907,144809
-int ana_trace(3941,145931
-#define b_fix(3986,147186
-#define l_fix(3987,147263
-#define f_fix(3988,147340
-#define d_fix(3989,147418
-#define s_fix(3990,147497
-#define cf_fix(3991,147577
-#define cd_fix(3992,147658
-#define l_ptr(3993,147739
-#define f_ptr(3994,147804
-#define d_ptr(3995,147870
-#define s_ptr(3996,147937
-#define fnc_p(3997,148009
-char	*defaultRedirect defaultRedirect3999,148065
-int range_warn_flag 4001,148108
-float	contour_dash_lev,4011,148637
-float	contour_dash_lev, contour_tick_fac 4011,148637
-scalar	lastmin,4012,148691
-scalar	lastmin, lastmax,4012,148691
-scalar	lastmin, lastmax, lastmean,4012,148691
-scalar	lastmin, lastmax, lastmean, lastsdev;4012,148691
-char	*firstbreak;firstbreak4056,150241
-enumElem	classesStruct[classesStruct4058,150279
-enumElem	typesStruct[typesStruct4081,150907
-enumElem	eventStruct[eventStruct4093,151188
-enumElem	coordSysStruct[coordSysStruct4104,151445
-enumElem	filetypeStruct[filetypeStruct4115,151607
-struct boundsStruct	bounds 4134,152137
-int	ANA_MATMUL_FUN;4139,152270
-internalRoutine *subroutine,subroutine4141,152291
-internalRoutine *subroutine, *function;function4141,152291
-#define	FORMATSIZE	4143,152332
-void symbolInitialization(4144,152356
- union { byte b[b4157,152669
- union { byte b[2]; word w;4157,152669
-int matchInternalName(4592,165263
-void zerobytes(4615,165904
-char *strcasestr(strcasestr4624,166112
-int strncasecmp_p(4645,166830
-int strcasecmp_p(4662,167345
-int	nBreakpoint 4677,167804
-breakpointInfo	breakpoint[breakpoint4678,167825
-int ana_breakpoint(4679,167866
-word	watchVars[watchVars4790,171432
-int	nWatchVars 4791,171460
-int ana_watch(4792,171480
-int ana_symbol_number(4836,172652
-void mark(4846,172926
-void pegMark(4854,173164
-void pegParse(4862,173394
-void zapParseTemps(4870,173626
-void removeParseMarker(4882,173958
-void unMark(4890,174213
-void zapMarked(4902,174427
-void checkTemps(4910,174613
-int ana_restart(4934,175319
-int strccmp(4945,175589
-int structSize(4953,175859
-int makeStruct(5009,177452
-int ana_struct(5104,180557
-int ana_buffering(5180,183027
-int translateEscapes(5216,184010
-int installString(5260,185485
-#undef malloc5293,186409
-void installKeys(5294,186423
-int findName(5375,189128
-int ana_verify(5427,190719
-compileInfo *nextFreeCompileInfo(nextFreeCompileInfo5538,193671
-void releaseCompileInfo(5552,194052
-static executionLevelInfo	*e_info;e_info5560,194231
-static int	n_e_info 5561,194266
-void pushExecutionLevel(5562,194307
-void popExecutionLevel(5579,194872
-void showExecutionLevel(5584,194990
+int nFunction 1279,66955
+void undefine(1281,67088
+void zap(1524,74281
+void cleanUp(1613,76735
+void cleanUpRoutine(1654,78176
+void updateIndices(1714,80133
+int nextFreeStackEntry(1726,80568
+int nextFreeNamedVariable(1741,81028
+int nextFreeTempVariable(1761,81794
+int nextFreeTempExecutable(1778,82361
+int nextFreeExecutable(1794,82934
+int nextFreeUndefined(1815,83672
+void pushList(1828,84009
+word popList(1839,84345
+int moveList(1847,84608
+void swapList(1858,85009
+int stackListLength(1868,85291
+void dupList(1884,85698
+void unlinkString(1895,85944
+void freeString(1907,86333
+int installStruct(1915,86600
+int copyElement(1933,87314
+int findTarget(1947,87818
+int newSymbol(2023,90576
+int hash(2738,112287
+int ircmp(2746,112454
+int findInternalName(2755,112695
+static compileInfo	*c_info c_info2775,113225
+int	cur_c_info 2776,113260
+compileInfo	*curCompileInfo;curCompileInfo2777,113294
+int nextCompileLevel(2779,113324
+static int	compileCount 2863,116055
+int compile(2864,116084
+int ana_compile(2905,117280
+int newBlockSymbol(2921,117637
+int newSubrSymbol(2961,118933
+int lookForName(3017,121118
+int findSym(3044,122138
+char *symName(symName3063,122690
+char *symbolName(symbolName3085,123317
+int suppressEvalRoutine(3111,124018
+#define	IGNORE_SIG	3124,124408
+#define ASK_SIG	3125,124429
+#define SIG_BREAK	3126,124448
+void exception(3127,124468
+char *typeName(typeName3217,126853
+char *className(className3236,127382
+  static struct classInfo 3239,127447
+    byte number;3240,127475
+    byte number; char *name;name3240,127475
+int ana_classname(3308,129689
+int ana_typeName(3323,130139
+char *evbName(evbName3338,130604
+char *filetypeName(filetypeName3356,131237
+int ana_filetype_name(3370,131754
+void fixedValue(3381,132033
+int installSysFunc(3434,133508
+int installPointer(3448,133898
+int convertRange(3463,134305
+void convertPointer(3525,136687
+void convertWidePointer(3612,138643
+void convertScalar(3800,142655
+int ana_symbol_memory(3907,144818
+int ana_trace(3941,145940
+#define b_fix(3986,147195
+#define l_fix(3987,147272
+#define f_fix(3988,147349
+#define d_fix(3989,147427
+#define s_fix(3990,147506
+#define cf_fix(3991,147586
+#define cd_fix(3992,147667
+#define l_ptr(3993,147748
+#define f_ptr(3994,147813
+#define d_ptr(3995,147879
+#define s_ptr(3996,147946
+#define fnc_p(3997,148018
+char	*defaultRedirect defaultRedirect3999,148074
+int range_warn_flag 4001,148117
+float	contour_dash_lev,4011,148646
+float	contour_dash_lev, contour_tick_fac 4011,148646
+scalar	lastmin,4012,148700
+scalar	lastmin, lastmax,4012,148700
+scalar	lastmin, lastmax, lastmean,4012,148700
+scalar	lastmin, lastmax, lastmean, lastsdev;4012,148700
+char	*firstbreak;firstbreak4056,150250
+enumElem	classesStruct[classesStruct4058,150288
+enumElem	typesStruct[typesStruct4081,150916
+enumElem	eventStruct[eventStruct4093,151197
+enumElem	coordSysStruct[coordSysStruct4104,151454
+enumElem	filetypeStruct[filetypeStruct4115,151616
+struct boundsStruct	bounds 4134,152146
+int	ANA_MATMUL_FUN;4139,152279
+internalRoutine *subroutine,subroutine4141,152300
+internalRoutine *subroutine, *function;function4141,152300
+#define	FORMATSIZE	4143,152341
+void symbolInitialization(4144,152365
+ union { byte b[b4157,152678
+ union { byte b[2]; word w;4157,152678
+int matchInternalName(4592,165272
+void zerobytes(4615,165913
+char *strcasestr(strcasestr4624,166121
+int strncasecmp_p(4645,166839
+int strcasecmp_p(4662,167354
+int	nBreakpoint 4677,167813
+breakpointInfo	breakpoint[breakpoint4678,167834
+int ana_breakpoint(4679,167875
+word	watchVars[watchVars4790,171441
+int	nWatchVars 4791,171469
+int ana_watch(4792,171489
+int ana_symbol_number(4836,172661
+void mark(4846,172935
+void pegMark(4854,173173
+void pegParse(4862,173403
+void zapParseTemps(4870,173635
+void removeParseMarker(4882,173967
+void unMark(4890,174222
+void zapMarked(4902,174436
+void checkTemps(4910,174622
+int ana_restart(4934,175328
+int strccmp(4945,175598
+int structSize(4953,175868
+int makeStruct(5009,177461
+int ana_struct(5104,180566
+int ana_buffering(5180,183036
+int translateEscapes(5216,184019
+int installString(5260,185494
+#undef malloc5293,186418
+void installKeys(5294,186432
+int findName(5375,189137
+int ana_verify(5427,190728
+compileInfo *nextFreeCompileInfo(nextFreeCompileInfo5538,193680
+void releaseCompileInfo(5552,194061
+static executionLevelInfo	*e_info;e_info5560,194240
+static int	n_e_info 5561,194275
+void pushExecutionLevel(5562,194316
+void popExecutionLevel(5579,194881
+void showExecutionLevel(5584,194999
 
 intmath.c,125
 div_t adiv(10,437
@@ -4276,17 +4278,35 @@ int test_ft_comparison(80,2128
     int eeq;88,2242
     int gt;89,2255
 
+vsop87adata.c,82
+double VSOP87Aterms[VSOP87Aterms3,19
+struct VSOPdata VSOP87Adata 39211,1912370
+
+vsop87cdata.c,82
+double VSOP87Cterms[VSOP87Cterms3,19
+struct VSOPdata VSOP87Cdata 47779,2328231
+
+vsop87ddata2.c,81
+double VSOP87Dterms[VSOP87Dterms3,19
+struct VSOPdata VSOP87Ddata 5275,1514637
+
+vsop87ddata.c,82
+double VSOP87Dterms[VSOP87Dterms3,19
+struct VSOPdata VSOP87Ddata 31590,1540952
+
 vsop87test.c,56
 #define NREC 5,56
 #define J2000 6,74
 void main(8,101
 
-vsop.c,252
-static struct planetIndex usedPlanetIndices[usedPlanetIndices10,151
-static double planetIndexTolerance 11,203
-struct planetIndex *planetIndicesForTolerance(planetIndicesForTolerance13,245
-static void gatherVSOP(50,1716
-void XYZfromVSOPA(74,2663
+vsop.c,286
+static struct VSOPdata usedVSOPdata;11,163
+static double planetIndexTolerance 12,200
+struct VSOPdata *planetIndicesForTolerance(planetIndicesForTolerance14,242
+static void gatherVSOP(55,1889
+void XYZfromVSOP(79,2795
+void XYZdatefromVSOPC(97,3492
+void XYZJ2000fromVSOPA(114,4511
 
 xport.c,3194
 static char rcsid[rcsid24,537
@@ -7057,16 +7077,16 @@ int definitegt(84,3852
 int definitegt_l(85,3926
 int definitegt_f(86,4012
 
-vsopdata.h,95
-struct planetIndex planetIndices[planetIndices10,141
-double planetTerms[planetTerms55,2523
-
-vsop.h,227
-#define NUMBEROFPLANETTERMS 1,0
-struct planetIndex 2,36
-struct planetIndex { short unsigned int index;2,36
-struct planetIndex { short unsigned int index; short unsigned int nTerms;2,36
-double planetTerms[planetTerms3,113
+vsop.h,292
+struct planetIndex 1,0
+  short unsigned int index;2,21
+  short unsigned int nTerms;3,49
+struct VSOPdata 5,81
+  struct planetIndex indices[indices6,99
+  short unsigned int nTerms;7,136
+  double *terms;terms8,165
+struct VSOPdata VSOP87Adata;12,312
+struct VSOPdata VSOP87Cdata;13,341
 
 calculator.c.tab.c,1316
 #define YYBISON 6,78

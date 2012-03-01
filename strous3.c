@@ -2363,19 +2363,19 @@ int runord_d(double *data, int n, int width, int ord, double *result)
   free(temp);
   return 0;
 }
-BIND(runord_d, ibLLLobrl, f, RUNORD, 3, 3, NULL);
+BIND(runord_d, i_dpiT3dp_iDaiLiLrDq_00T3, f, RUNORD, 3, 3, NULL);
 /*--------------------------------------------------------------------*/
 int runmax_d(double *data, int n, int width, double *result)
 {
   return runord_d(data, n, width, width - 1, result);
 }
-BIND(runmax_d, ibLLobrl, f, RUNMAX, 2, 2, NULL);
+BIND(runmax_d, i_dpiidp_iDaLrDq_00T2, f, RUNMAX, 2, 2, NULL);
 /*--------------------------------------------------------------------*/
 int runmin_d(double *data, int n, int width, double *result)
 {
   return runord_d(data, n, width, 0, result);
 }
-BIND(runmin_d, ibLLobrl, f, RUNMIN, 2, 2, NULL);
+BIND(runmin_d, i_dpiidp_iDaLrDq_00T2, f, RUNMIN, 2, 2, NULL);
 /*--------------------------------------------------------------------*/
 /*
   Returns <x> such that <x> = <cur> (mod <period) and
@@ -2388,9 +2388,9 @@ double unmod(double cur, double prev, double period, double average)
   return cur + period*ceil((prev - cur + average)/period - 0.5);
 }
 /*--------------------------------------------------------------------*/
-int unmod_slice_d(double *srcptr, int srccount, int srcstride,
+int unmod_slice_d(double *srcptr, size_t srccount, size_t srcstride,
                   double period, double average,
-                  double *tgtptr, int tgtstride)
+                  double *tgtptr, size_t tgtcount, size_t tgtstride)
 {
   int i;
 
@@ -2408,9 +2408,9 @@ int unmod_slice_d(double *srcptr, int srccount, int srcstride,
   }
   return 0;
 }
-BIND(unmod_slice_d, ivddovrl, f, UNMOD, 2, 4, ":AXIS:PERIOD:AVERAGE");
+BIND(unmod_slice_d, i_sdddsd_iDaLDDrDq_000T333, f, UNMOD, 2, 4, ":AXIS:PERIOD:AVERAGE");
 /*--------------------------------------------------------------------*/
-double hypot_stride(double *data, int count, int stride)
+double hypot_stride(double *data, size_t count, size_t stride)
 {
   double result = 0.0;
   while (count-- > 0) {
@@ -2419,7 +2419,7 @@ double hypot_stride(double *data, int count, int stride)
   }
   return result;
 }
-BIND(hypot_stride, ivard, f, HYPOT, 1, 2, ":AXIS");
+BIND(hypot_stride, d_sd_iDaLarDxq_000_2, f, HYPOT, 1, 2, ":AXIS");
 /*--------------------------------------------------------------------*/
 #if NOTOBSOLETE
 int singular_value_decomposition(Array *a_in, Array *u_out, Array *s_out,

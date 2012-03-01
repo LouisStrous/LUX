@@ -485,7 +485,7 @@ void clear_ffttemp(void)
   nffttemp = -1;
 }
 /*------------------------------------------------------------------------- */
-int gsl_fft(double *data, int n, int stride)
+int gsl_fft(double *data, size_t n, size_t stride)
 {
   if (!update_rwave(n) || !update_rwork(n))
     return 1;
@@ -510,10 +510,10 @@ int gsl_fft(double *data, int n, int stride)
   }
   return result;
 }
-BIND(gsl_fft, ivarl_copy_eachaxis, f, FFT, 1, 2, "1ALLAXES:2AMPLITUDES");
-BIND(gsl_fft, ivarl_eachaxis, s, FFT, 1, 2, "1ALLAXES:2AMPLITUDES");
+BIND(gsl_fft, i_sd_iDaLarDq_000, f, FFT, 1, 2, "1ALLAXES:2AMPLITUDES");
+BIND(gsl_fft, i_sd_iDaLa_000, s, FFT, 1, 2, "1ALLAXES:2AMPLITUDES");
 /*------------------------------------------------------------------------- */
-int gsl_fft_back(double *data, int n, int stride)
+int gsl_fft_back(double *data, size_t n, size_t stride)
 {
   if (!update_hwave(n) || !update_rwork(n))
     return 1;
@@ -537,10 +537,10 @@ int gsl_fft_back(double *data, int n, int stride)
   }
   return gsl_fft_halfcomplex_inverse(data, stride, n, hwave, rwork);
 }
-BIND(gsl_fft_back, ivarl_copy_eachaxis, f, FFTB, 1, 2, "1ALLAXES:2AMPLITUDES");
-BIND(gsl_fft_back, ivarl_eachaxis, s, FFTB, 1, 2, "1ALLAXES:2AMPLITUDES");
+BIND(gsl_fft_back, i_sd_iDaLarDq_000, f, FFTB, 1, 2, "1ALLAXES:2AMPLITUDES");
+BIND(gsl_fft_back, i_sd_iDaLa_000, s, FFTB, 1, 2, "1ALLAXES:2AMPLITUDES");
 /*------------------------------------------------------------------------- */
-int hilbert(double *data, int n, int stride)
+int hilbert(double *data, size_t n, size_t stride)
 {
   if (!update_rwave(n) || !update_hwave(n) || !update_rwork(n))
     return 1;
@@ -557,8 +557,8 @@ int hilbert(double *data, int n, int stride)
   }
   return gsl_fft_halfcomplex_inverse(data, stride, n, hwave, rwork);
 }
-BIND(hilbert, ivarl_copy_eachaxis, f, HILBERT, 1, 2, "1ALLAXES");
-BIND(hilbert, ivarl_eachaxis, s, HILBERT, 1, 2, "1ALLAXES");
+BIND(hilbert, i_sd_iDaLarDq_000, f, HILBERT, 1, 2, "1ALLAXES");
+BIND(hilbert, i_sd_iDaLa_000, s, HILBERT, 1, 2, "1ALLAXES");
 /*------------------------------------------------------------------------- */
 //#define SQRTHALF	M_SQRT1_2
 //#define SQRTWO		M_SQRT2

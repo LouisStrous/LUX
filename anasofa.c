@@ -1035,7 +1035,8 @@ BIND(iauPxp, v_dT3d3_iD3DcqrDcq_0T2, f, IAUPXP, 2, 2, NULL)
    The rotation vector has the same direction as the Euler axis of
    matrix <r> and has its magnitude equal to the rotation angle in
    radians of the rotation matrix. */
-BIND(iauRm2v, v_dp3dp_iD33aoDm3q_01, f, IAURM2V, 1, 1, NULL)
+/* void iauRm2v(double r[3][3], double [3]) */
+BIND(iauRm2v, v_dp3dp_iD33arDm3q_01, f, IAURM2V, 1, 1, NULL)
 /*-----------------------------------------------------------------------*/
 /* IAURXP(<r>, <p>)
 

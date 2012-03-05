@@ -27,7 +27,7 @@ int ana_v_dp3T3_iD33aDaoDc_0T2_f_(int narg, int ps[], void (*f)(double [3][3], d
 int ana_v_dp3T3_iD33aDarDq_0T2_f_(int narg, int ps[], void (*f)(double (*)[3], double (*)[3], double (*)[3]));
 int ana_v_dp3ddp3dp3_iD33aDmmaDarDq_0T3_f_(int narg, int ps[], void (*f)(double (*)[3], double, double (*)[3], double (*)[3]));
 int ana_d_dp3d_iD33aDmmarDmmq_01_2_f_(int narg, int ps[], double (*f)(double (*)[3], double));
-int ana_v_dp3dp_iD33aoDm3q_01_f_(int narg, int ps[], void (*f)(double [3][3], double [3]));
+int ana_v_dp3dp_iD33arDm3q_01_f_(int narg, int ps[], void (*f)(double [3][3], double [3]));
 int ana_v_dp3dp3_iD33arDq_01_f_(int narg, int ps[], void (*f)(double [3][3], double [3][3]));
 int ana_v_dp3dpdp_iD33aoDm3m3qT2_0T2_s_(int narg, int ps[], void (*f)(double (*)[3], double *, double *));
 int ana_v_dT8dp3_iDaT5rDp3p3q_0zzz1T5_f_(int narg, int ps[], void (*f)(double, double, double, double, double, double, double, double, double (*)[3]));

@@ -4669,20 +4669,6 @@ int ana_matrix_product(int narg, int ps[])
   if ((iq = standard_args(narg, ps, "i>D*;i>D*;iL2?;rD1", &ptrs, &infos)) < 0)
     return ANA_ERROR;
 
-  int *axes = ptrs[2].l;
-  int stdaxes[2] = { 0, 1 };
-  if (axes) {
-    if (axes[0] < 0
-	|| axes[0] >= infos[0].ndim
-	|| axes[0] >= infos[1].ndim
-	|| axes[1] < 0
-	|| axes[1] >= infos[0].ndim
-	|| axes[1] >= infos[1].ndim
-	|| axes[0] == axes[1])
-      return anaerror("Illegal axes specification", ps[2]);
-  } else
-    axes = stdaxes;
-
   int *dims1, *dims2;
   if (infos[0].ndim >= 2)
     dims1 = infos[0].dims;

@@ -66,14 +66,16 @@ int	standardLoop(int, int, int, int, loopInfo *, pointer *, int *,
   standardLoopX(int, int, int, loopInfo *, pointer *, int, int const *,
                 int, int const *, enum Symboltype, int, int *, loopInfo *,
                 pointer *),
-  loopIsAtStart(loopInfo const *), 
+  loopIsAtStart(loopInfo const *), setAxes(loopInfo *, int, int *, int),
   standard_args(int, int [], char const *, pointer **, loopInfo **);
 
 void	subdataLoop(int *, loopInfo *), addVerify(char *, char),
   *seekFacts(int symbol, int type, int flag),
   *setFacts(int symbol, int type, int flag),
-  deleteFacts(int symbol, int type), returnLoop(loopInfo *, int),
-  setAxisMode(loopInfo *, int mode);
+  deleteFacts(int symbol, int type), returnLoop(loopInfo *, pointer *, int),
+  setAxisMode(loopInfo *, int mode),
+  standard_redef_array(int, enum Symboltype, int, int *, int, int *, pointer *,
+		       loopInfo *);
 void convertWidePointer(wideScalar *, int, int);
 
 void	newStack(int), push(int), deleteStack(void);

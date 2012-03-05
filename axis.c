@@ -109,7 +109,7 @@ int setAxes(loopInfo *info, int nAxes, int *axes, int mode)
     }
   }
   info->naxes = nAxes;
-  if (nAxes)
+  if (nAxes && axes)
     memcpy(info->axes, axes, nAxes*sizeof(*axes));
   setAxisMode(info, mode);
   return 0;
@@ -244,7 +244,7 @@ void rearrangeDimensionLoop(loopInfo *info)
          only to the coordinate along the indicated axis; remaining axes
          come later, lumped together as much as possible for faster
          execution
-      SL_AXESBLOCK: the active axis goes, first, then all remaining
+      SL_AXESBLOCK: the active axis goes first, then all remaining
          specified axes, and then the unspecified ones; in ascending order
 	 within each group
 */
@@ -1338,7 +1338,7 @@ int moveLoop(loopInfo *info, int index, int distance)
   return index;
 }
 /*--------------------------------------------------------------------*/
-void returnLoop(loopInfo *info, int index)
+void returnLoop(loopInfo *info, pointer *ptr, int index)
 /* moves to the start of the rearranged axis indicated by <index>, */
 /* zeroing all rearranged coordinates up to and including that one and */
 /* adjusting the pointer accordingly.  LS 9apr99 */
@@ -1346,7 +1346,7 @@ void returnLoop(loopInfo *info, int index)
   int	i;
   
   for (i = 0; i <= index; i++) {
-    info->data->b -= info->coords[index]*info->rsinglestep[index]*info->stride;
+    ptr->b -= info->coords[index]*info->rsinglestep[index]*info->stride;
     info->coords[index] = 0;
   }
 }
@@ -1428,6 +1428,16 @@ int numerical_or_string(int data, int **dims, int *nDim, int *size, pointer *src
    reserved memory space. LS 21apr97 */
 {
   return numerical_or_string_choice(data, dims, nDim, size, src, 1);
+}
+/*--------------------------------------------------------------------*/
+void standard_redef_array(int iq, enum Symboltype type,
+			  int num_dims, int *dims, 
+			  int naxes, int *axes,
+			  pointer *ptr, loopInfo *info)
+{
+  redef_array(iq, type, num_dims, dims);
+  ptr->v = array_data(iq);
+  setupDimensionLoop(info, num_dims, dims, type, naxes, axes, ptr, info->mode);
 }
 /*--------------------------------------------------------------------*/
 /*
@@ -1650,18 +1660,6 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
         break;
       } /* end of switch (*fmt) */
       
-      if (*fmt == '?') {        /* optional argument */
-        if (p_spec.logical_type == PS_RETURN) {
-          /* return parameter cannot be optional */
-          anaerror("Return parameter was illegally specified as optional", 0);
-          errno = EINVAL;
-          goto error;
-        } else
-          p_spec.is_optional = 1;
-        fmt++;
-      } else
-        p_spec.is_optional = 0;
-
       /* optional dims-specs */
       struct dims_spec d_spec;
       if (*fmt == '[') {       /* reference parameter specification */
@@ -1715,9 +1713,9 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
         }
       } else
 	p_spec.axis_par = -2;		     /* indicates "none" */
-      while (*fmt && !strchr("*;&", *fmt)) { /* all dims */
+      while (*fmt && !strchr("*?;&", *fmt)) { /* all dims */
         memset(&d_spec, '\0', sizeof(d_spec));
-        while (*fmt && !strchr(",*;&", *fmt)) { /* every dim */
+        while (*fmt && !strchr(",?*;&", *fmt)) { /* every dim */
           int type = 0;
           size_t size = 0;
           switch (*fmt) {
@@ -1793,6 +1791,19 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
         break;
         /* default is PS_ABSENT */
       }
+
+      if (*fmt == '?') {        /* optional argument */
+        if (p_spec.logical_type == PS_RETURN) {
+          /* return parameter cannot be optional */
+          anaerror("Return parameter was illegally specified as optional", 0);
+          errno = EINVAL;
+          goto error;
+        } else
+          p_spec.is_optional = 1;
+        fmt++;
+      } else
+        p_spec.is_optional = 0;
+
       if (*fmt && *fmt != ';') {
         anaerror("Expected ; instead of %c at end of parameter "
                  "specification", 0, *fmt);

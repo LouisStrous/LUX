@@ -699,7 +699,7 @@ extern int ana_abs(), ana_acos(), ana_arestore_f(), ana_arg(),
   ana_local_maxloc(),
   ana_local_minf(), ana_local_minloc(), ana_log(), ana_log10(),
   ana_log1p(), lonarr(), lonfarr(), ana_long(), ana_lower(),
-  ana_lsq(), ana_lsq2(), ana_match(), ana_matmul(), ana_max_dir(),
+  ana_lsq(), ana_lsq2(), ana_match(), ana_max_dir(),
   ana_maxf(), ana_maxfilter(), ana_maxloc(), ana_mean(),
   ana_medfilter(), ana_median(), ana_memory(), ana_minf(),
   ana_minfilter(), ana_minloc(), ana_neg_func(),
@@ -1048,7 +1048,6 @@ internalRoutine function_table[] = {
   { "LSQ",	2, 6, ana_lsq,	/* strous2.c */
     "::WEIGHTS:COV:ERR:CHISQ:1FORMAL:2REDUCE" },
   { "MATCH",	2, 2, ana_match, 0 }, /* strous.c */
-  { "MATMUL",	2, 2, ana_matmul, 0 }, /* fun2.c */
   { "MAX",	1, 2, ana_maxf, "1KEEPDIMS" }, /* fun3.c */
   { "MAXDIR",	2, 3, ana_max_dir, 0 },	/* topology.c */
   { "MAXFILTER", 1, 3, ana_maxfilter, 0 }, /* strous2.c */
@@ -4205,7 +4204,7 @@ void symbolInitialization(void)
               0, function[i].name);
    installKeys(&function[i].keys);
  }
- ANA_MATMUL_FUN = findInternalName("MATMUL", 0);
+ ANA_MATMUL_FUN = findInternalName("MPRODUCT", 0);
  inputStream = stdin;
  outputStream = stdout;
  l_fix("#ZERO", 	0);

@@ -3340,534 +3340,6 @@ d_solve( q1.d, q2.d, nx, nx ); q2.d += nx;	break;
 return 1;
 }
 /*------------------------------------------------------------------------- */
-int ana_matmul(int narg, int ps[])
-/* multiply two matrices: c(i,j) = sum_k a(k,i) b(j,k) (in ANA array
-   index notation) */
-{
-  int	dims[2], type, n, nn, result, rhsstep, rhsstep2, ix, iy;
-  pointer	lhs, rhs, ptr;
-
-  if (!symbolIsNumericalArray(ps[0])
-      || array_num_dims(ps[0]) > 2)
-    return cerror(ILL_ARG, ps[0]);
-  if (!symbolIsNumericalArray(ps[1])
-      || array_num_dims(ps[1]) > 2)
-    return cerror(ILL_ARG, ps[1]);
-  if (array_dims(ps[0])[0] !=
-      (array_num_dims(ps[1]) == 2 ? array_dims(ps[1])[1]: array_size(ps[1])))
-    return cerror(INCMP_ARG, ps[1]);
-  switch (array_num_dims(ps[0])*2 + array_num_dims(ps[1])) {
-    case 3:			/* (n,1)(1,n) -> (1,1) */
-      dims[0] = dims[1] = 1;
-      break;
-    case 4:			/* (n,1)(m,n) -> (m,1) */
-      dims[0] = array_dims(ps[1])[0];
-      dims[1] = 1;
-      break;
-    case 5:			/* (n,m)(1,n) -> (1,m) */
-      dims[0] = 1;
-      dims[1] = array_dims(ps[0])[1];
-      break;
-    case 6:			/* (n,m)(p,n) -> (p,m) */
-      dims[0] = array_dims(ps[1])[0];
-      dims[1] = array_dims(ps[0])[1];
-      break;
-  }
-  rhsstep = dims[0];
-  n = array_dims(ps[0])[0];
-  rhsstep2 = 1 - n*rhsstep;
-  type = highestType(array_type(ps[0]), array_type(ps[1]));
-  if (type < ANA_LONG)
-    type = ANA_LONG;
-  lhs.v = array_data(ps[0]);
-  rhs.v = array_data(ps[1]);
-  result = array_scratch(type, 2, dims);
-  ptr.v = array_data(result);
-  switch (array_type(ps[0])) {
-    case ANA_BYTE:
-      switch (array_type(ps[1])) {
-	case ANA_BYTE:
-	  for (iy = 0; iy < dims[1]; iy++) {
-	    for (ix = 0; ix < dims[0]; ix++) {
-	      *ptr.l = 0;
-	      nn = n;
-	      while (nn--) {
-		*ptr.l += (int) *lhs.b * (int) *rhs.b;
-		lhs.b++;
-		rhs.b += rhsstep;
-	      }
-	      lhs.b -= n;
-	      rhs.b += rhsstep2;
-	      ptr.l++;
-	    }
-	    lhs.b += n;
-	    rhs.b -= dims[0];
-	  }
-	  break;
-	case ANA_WORD:
-	  for (iy = 0; iy < dims[1]; iy++) {
-	    for (ix = 0; ix < dims[0]; ix++) {
-	      *ptr.l = 0;
-	      nn = n;
-	      while (nn--) {
-		*ptr.l += (int) *lhs.b * (int) *rhs.w;
-		lhs.b++;
-		rhs.w += rhsstep;
-	      }
-	      lhs.b -= n;
-	      rhs.w += rhsstep2;
-	      ptr.l++;
-	    }
-	    lhs.b += n;
-	    rhs.w -= dims[0];
-	  }
-	  break;
-	case ANA_LONG:
-	  for (iy = 0; iy < dims[1]; iy++) {
-	    for (ix = 0; ix < dims[0]; ix++) {
-	      *ptr.l = 0;
-	      nn = n;
-	      while (nn--) {
-		*ptr.l += (int) *lhs.b * *rhs.l;
-		lhs.b++;
-		rhs.l += rhsstep;
-	      }
-	      lhs.b -= n;
-	      rhs.l += rhsstep2;
-	      ptr.l++;
-	    }
-	    lhs.b += n;
-	    rhs.l -= dims[0];
-	  }
-	  break;
-	case ANA_FLOAT:
-	  for (iy = 0; iy < dims[1]; iy++) {
-	    for (ix = 0; ix < dims[0]; ix++) {
-	      *ptr.f = 0;
-	      nn = n;
-	      while (nn--) {
-		*ptr.f += (int) *lhs.b * *rhs.f;
-		lhs.b++;
-		rhs.f += rhsstep;
-	      }
-	      lhs.b -= n;
-	      rhs.f += rhsstep2;
-	      ptr.f++;
-	    }
-	    lhs.b += n;
-	    rhs.f -= dims[0];
-	  }
-	  break;
-	case ANA_DOUBLE:
-	  for (iy = 0; iy < dims[1]; iy++) {
-	    for (ix = 0; ix < dims[0]; ix++) {
-	      *ptr.d = 0;
-	      nn = n;
-	      while (nn--) {
-		*ptr.d += (int) *lhs.b * *rhs.d;
-		lhs.b++;
-		rhs.d += rhsstep;
-	      }
-	      lhs.b -= n;
-	      rhs.d += rhsstep2;
-	      ptr.d++;
-	    }
-	    lhs.b += n;
-	    rhs.d -= dims[0];
-	  }
-	  break;
-	default:
-	  return cerror(ILL_TYPE, ps[1]);
-      }
-      break;
-    case ANA_WORD:
-      switch (array_type(ps[1])) {
-	case ANA_BYTE:
-	  for (iy = 0; iy < dims[1]; iy++) {
-	    for (ix = 0; ix < dims[0]; ix++) {
-	      *ptr.l = 0;
-	      nn = n;
-	      while (nn--) {
-		*ptr.l += (int) *lhs.w * (int) *rhs.b;
-		lhs.w++;
-		rhs.b += rhsstep;
-	      }
-	      lhs.w -= n;
-	      rhs.b += rhsstep2;
-	      ptr.l++;
-	    }
-	    lhs.w += n;
-	    rhs.b -= dims[0];
-	  }
-	  break;
-	case ANA_WORD:
-	  for (iy = 0; iy < dims[1]; iy++) {
-	    for (ix = 0; ix < dims[0]; ix++) {
-	      *ptr.l = 0;
-	      nn = n;
-	      while (nn--) {
-		*ptr.l += (int) *lhs.w * (int) *rhs.w;
-		lhs.w++;
-		rhs.w += rhsstep;
-	      }
-	      lhs.w -= n;
-	      rhs.w += rhsstep2;
-	      ptr.l++;
-	    }
-	    lhs.w += n;
-	    rhs.w -= dims[0];
-	  }
-	  break;
-	case ANA_LONG:
-	  for (iy = 0; iy < dims[1]; iy++) {
-	    for (ix = 0; ix < dims[0]; ix++) {
-	      *ptr.l = 0;
-	      nn = n;
-	      while (nn--) {
-		*ptr.l += (int) *lhs.w * (int) *rhs.l;
-		lhs.w++;
-		rhs.l += rhsstep;
-	      }
-	      lhs.w -= n;
-	      rhs.l += rhsstep2;
-	      ptr.l++;
-	    }
-	    lhs.w += n;
-	    rhs.l -= dims[0];
-	  }
-	  break;
-	case ANA_FLOAT:
-	  for (iy = 0; iy < dims[1]; iy++) {
-	    for (ix = 0; ix < dims[0]; ix++) {
-	      *ptr.f = 0;
-	      nn = n;
-	      while (nn--) {
-		*ptr.f += (int) *lhs.w * *rhs.f;
-		lhs.w++;
-		rhs.f += rhsstep;
-	      }
-	      lhs.w -= n;
-	      rhs.f += rhsstep2;
-	      ptr.f++;
-	    }
-	    lhs.w += n;
-	    rhs.f -= dims[0];
-	  }
-	  break;
-	case ANA_DOUBLE:
-	  for (iy = 0; iy < dims[1]; iy++) {
-	    for (ix = 0; ix < dims[0]; ix++) {
-	      *ptr.d = 0;
-	      nn = n;
-	      while (nn--) {
-		*ptr.d += (int) *lhs.w * *rhs.d;
-		lhs.w++;
-		rhs.d += rhsstep;
-	      }
-	      lhs.w -= n;
-	      rhs.d += rhsstep2;
-	      ptr.d++;
-	    }
-	    lhs.w += n;
-	    rhs.d -= dims[0];
-	  }
-	  break;
-	default:
-	  return cerror(ILL_TYPE, ps[1]);
-      }
-      break;
-    case ANA_LONG:
-      switch (array_type(ps[1])) {
-	case ANA_BYTE:
-	  for (iy = 0; iy < dims[1]; iy++) {
-	    for (ix = 0; ix < dims[0]; ix++) {
-	      *ptr.l = 0;
-	      nn = n;
-	      while (nn--) {
-		*ptr.l += (int) *lhs.l * (int) *rhs.b;
-		lhs.l++;
-		rhs.b += rhsstep;
-	      }
-	      lhs.l -= n;
-	      rhs.b += rhsstep2;
-	      ptr.l++;
-	    }
-	    lhs.l += n;
-	    rhs.b -= dims[0];
-	  }
-	  break;
-	case ANA_WORD:
-	  for (iy = 0; iy < dims[1]; iy++) {
-	    for (ix = 0; ix < dims[0]; ix++) {
-	      *ptr.l = 0;
-	      nn = n;
-	      while (nn--) {
-		*ptr.l += (int) *lhs.l * (int) *rhs.w;
-		lhs.l++;
-		rhs.w += rhsstep;
-	      }
-	      lhs.l -= n;
-	      rhs.w += rhsstep2;
-	      ptr.l++;
-	    }
-	    lhs.l += n;
-	    rhs.w -= dims[0];
-	  }
-	  break;
-	case ANA_LONG:
-	  for (iy = 0; iy < dims[1]; iy++) {
-	    for (ix = 0; ix < dims[0]; ix++) {
-	      *ptr.l = 0;
-	      nn = n;
-	      while (nn--) {
-		*ptr.l += (int) *lhs.l * (int) *rhs.l;
-		lhs.l++;
-		rhs.l += rhsstep;
-	      }
-	      lhs.l -= n;
-	      rhs.l += rhsstep2;
-	      ptr.l++;
-	    }
-	    lhs.l += n;
-	    rhs.l -= dims[0];
-	  }
-	  break;
-	case ANA_FLOAT:
-	  for (iy = 0; iy < dims[1]; iy++) {
-	    for (ix = 0; ix < dims[0]; ix++) {
-	      *ptr.f = 0;
-	      nn = n;
-	      while (nn--) {
-		*ptr.f += *lhs.l * *rhs.f;
-		lhs.l++;
-		rhs.f += rhsstep;
-	      }
-	      lhs.l -= n;
-	      rhs.f += rhsstep2;
-	      ptr.f++;
-	    }
-	    lhs.l += n;
-	    rhs.f -= dims[0];
-	  }
-	  break;
-	case ANA_DOUBLE:
-	  for (iy = 0; iy < dims[1]; iy++) {
-	    for (ix = 0; ix < dims[0]; ix++) {
-	      *ptr.d = 0;
-	      nn = n;
-	      while (nn--) {
-		*ptr.d += *lhs.l * *rhs.d;
-		lhs.l++;
-		rhs.d += rhsstep;
-	      }
-	      lhs.l -= n;
-	      rhs.d += rhsstep2;
-	      ptr.d++;
-	    }
-	    lhs.l += n;
-	    rhs.d -= dims[0];
-	  }
-	  break;
-	default:
-	  return cerror(ILL_TYPE, ps[1]);
-      }
-      break;
-    case ANA_FLOAT:
-      switch (array_type(ps[1])) {
-	case ANA_BYTE:
-	  for (iy = 0; iy < dims[1]; iy++) {
-	    for (ix = 0; ix < dims[0]; ix++) {
-	      *ptr.f = 0;
-	      nn = n;
-	      while (nn--) {
-		*ptr.f += *lhs.f * (int) *rhs.b;
-		lhs.f++;
-		rhs.b += rhsstep;
-	      }
-	      lhs.f -= n;
-	      rhs.b += rhsstep2;
-	      ptr.f++;
-	    }
-	    lhs.f += n;
-	    rhs.b -= dims[0];
-	  }
-	  break;
-	case ANA_WORD:
-	  for (iy = 0; iy < dims[1]; iy++) {
-	    for (ix = 0; ix < dims[0]; ix++) {
-	      *ptr.f = 0;
-	      nn = n;
-	      while (nn--) {
-		*ptr.f += *lhs.f * (int) *rhs.w;
-		lhs.f++;
-		rhs.w += rhsstep;
-	      }
-	      lhs.f -= n;
-	      rhs.w += rhsstep2;
-	      ptr.f++;
-	    }
-	    lhs.f += n;
-	    rhs.w -= dims[0];
-	  }
-	  break;
-	case ANA_LONG:
-	  for (iy = 0; iy < dims[1]; iy++) {
-	    for (ix = 0; ix < dims[0]; ix++) {
-	      *ptr.f = 0;
-	      nn = n;
-	      while (nn--) {
-		*ptr.f += *lhs.f * (int) *rhs.l;
-		lhs.f++;
-		rhs.l += rhsstep;
-	      }
-	      lhs.f -= n;
-	      rhs.l += rhsstep2;
-	      ptr.f++;
-	    }
-	    lhs.f += n;
-	    rhs.l -= dims[0];
-	  }
-	  break;
-	case ANA_FLOAT:
-	  for (iy = 0; iy < dims[1]; iy++) {
-	    for (ix = 0; ix < dims[0]; ix++) {
-	      *ptr.f = 0;
-	      nn = n;
-	      while (nn--) {
-		*ptr.f += *lhs.f * *rhs.f;
-		lhs.f++;
-		rhs.f += rhsstep;
-	      }
-	      lhs.f -= n;
-	      rhs.f += rhsstep2;
-	      ptr.f++;
-	    }
-	    lhs.f += n;
-	    rhs.f -= dims[0];
-	  }
-	  break;
-	case ANA_DOUBLE:
-	  for (iy = 0; iy < dims[1]; iy++) {
-	    for (ix = 0; ix < dims[0]; ix++) {
-	      *ptr.d = 0;
-	      nn = n;
-	      while (nn--) {
-		*ptr.d += *lhs.f * *rhs.d;
-		lhs.f++;
-		rhs.d += rhsstep;
-	      }
-	      lhs.f -= n;
-	      rhs.d += rhsstep2;
-	      ptr.d++;
-	    }
-	    lhs.f += n;
-	    rhs.d -= dims[0];
-	  }
-	  break;
-	default:
-	  return cerror(ILL_TYPE, ps[1]);
-      }
-      break;
-    case ANA_DOUBLE:
-      switch (array_type(ps[1])) {
-	case ANA_BYTE:
-	  for (iy = 0; iy < dims[1]; iy++) {
-	    for (ix = 0; ix < dims[0]; ix++) {
-	      *ptr.d = 0;
-	      nn = n;
-	      while (nn--) {
-		*ptr.d += *lhs.d * (int) *rhs.b;
-		lhs.d++;
-		rhs.b += rhsstep;
-	      }
-	      lhs.d -= n;
-	      rhs.b += rhsstep2;
-	      ptr.d++;
-	    }
-	    lhs.d += n;
-	    rhs.b -= dims[0];
-	  }
-	  break;
-	case ANA_WORD:
-	  for (iy = 0; iy < dims[1]; iy++) {
-	    for (ix = 0; ix < dims[0]; ix++) {
-	      *ptr.d = 0;
-	      nn = n;
-	      while (nn--) {
-		*ptr.d += *lhs.d * (int) *rhs.w;
-		lhs.d++;
-		rhs.w += rhsstep;
-	      }
-	      lhs.d -= n;
-	      rhs.w += rhsstep2;
-	      ptr.d++;
-	    }
-	    lhs.d += n;
-	    rhs.w -= dims[0];
-	  }
-	  break;
-	case ANA_LONG:
-	  for (iy = 0; iy < dims[1]; iy++) {
-	    for (ix = 0; ix < dims[0]; ix++) {
-	      *ptr.d = 0;
-	      nn = n;
-	      while (nn--) {
-		*ptr.d += *lhs.d * *rhs.l;
-		lhs.d++;
-		rhs.l += rhsstep;
-	      }
-	      lhs.d -= n;
-	      rhs.l += rhsstep2;
-	      ptr.d++;
-	    }
-	    lhs.d += n;
-	    rhs.l -= dims[0];
-	  }
-	  break;
-	case ANA_FLOAT:
-	  for (iy = 0; iy < dims[1]; iy++) {
-	    for (ix = 0; ix < dims[0]; ix++) {
-	      *ptr.d = 0;
-	      nn = n;
-	      while (nn--) {
-		*ptr.d += *lhs.d * *rhs.f;
-		lhs.d++;
-		rhs.f += rhsstep;
-	      }
-	      lhs.d -= n;
-	      rhs.f += rhsstep2;
-	      ptr.d++;
-	    }
-	    lhs.d += n;
-	    rhs.f -= dims[0];
-	  }
-	  break;
-	case ANA_DOUBLE:
-	  for (iy = 0; iy < dims[1]; iy++) {
-	    for (ix = 0; ix < dims[0]; ix++) {
-	      *ptr.d = 0;
-	      nn = n;
-	      while (nn--) {
-		*ptr.d += *lhs.d * *rhs.d;
-		lhs.d++;
-		rhs.d += rhsstep;
-	      }
-	      lhs.d -= n;
-	      rhs.d += rhsstep2;
-	      ptr.d++;
-	    }
-	    lhs.d += n;
-	    rhs.d -= dims[0];
-	  }
-	  break;
-	default:
-	  return cerror(ILL_TYPE, ps[1]);
-      }
-      break;
-  }
-  return result;
-}
-/*------------------------------------------------------------------------- */
 int ana_pit(int narg, int ps[])	/*pit function */
 			/* polynomial fit, CALL IS C=PIT([X],Y,[NPOW])*/
 {
@@ -5187,4 +4659,123 @@ void wait_sec(float xq) /* for internal use */
   tval.tv_usec = (unsigned int) xq;
   select(0, NULL, NULL, NULL,&tval);
 }
+/*------------------------------------------------------------------------- */
+int ana_matrix_product(int narg, int ps[])
+{
+  pointer *ptrs;
+  loopInfo *infos;
+  int iq;
+
+  if ((iq = standard_args(narg, ps, "i>D*;i>D*;iL2?;rD1", &ptrs, &infos)) < 0)
+    return ANA_ERROR;
+
+  int *axes = ptrs[2].l;
+  int stdaxes[2] = { 0, 1 };
+  if (axes) {
+    if (axes[0] < 0
+	|| axes[0] >= infos[0].ndim
+	|| axes[0] >= infos[1].ndim
+	|| axes[1] < 0
+	|| axes[1] >= infos[0].ndim
+	|| axes[1] >= infos[1].ndim
+	|| axes[0] == axes[1])
+      return anaerror("Illegal axes specification", ps[2]);
+  } else
+    axes = stdaxes;
+
+  int *dims1, *dims2;
+  if (infos[0].ndim >= 2)
+    dims1 = infos[0].dims;
+  else
+    return anaerror("Need at least 2 dimensions", ps[0]);
+  if (infos[1].ndim >= 2)
+    dims2 = infos[1].dims;
+  else
+    return anaerror("Need at least 2 dimensions", ps[1]);
+  
+  /* the elements are stored in column-major order */
+  /* dimsX[0] = number of columns
+     dimsX[1] = number of rows
+     the number of columns of argument 1 must equal the number of rows
+     of argument 2 */
+  if (dims1[0] != dims2[1])
+    return anaerror("The number of columns (now %d) of the 1st argument must equal the number of rows (now %d) of the 2nd argument", ps[1], dims1[0], dims2[1]);
+
+  int i, *tdims, tndim;
+  if (internalMode & 1) {	/* /OUTER */
+    tndim = infos[0].ndim + infos[1].ndim - 2;
+    if (tndim > MAX_DIMS)
+      return anaerror("Result would have %d dimensions, "
+		      "but at most %d are allowed",
+		      ps[1], tndim, MAX_DIMS);
+    tdims = malloc(tndim*sizeof(int));
+    memcpy(tdims + 2, infos[0].dims + 2, (infos[0].ndim - 2)*sizeof(int));
+    memcpy(tdims + 2 + infos[0].ndim - 2, infos[1].dims + 2,
+	   (infos[1].ndim - 2)*sizeof(int));
+  } else {			/* /INNER */
+    tndim = infos[0].ndim;
+    tdims = malloc(tndim*sizeof(int));
+    if (infos[1].ndim != infos[0].ndim) {
+      iq = anaerror("Needs the same number of dimensions as the previous argument", ps[1]);
+      goto error_1;
+    }
+    for (i = 2; i < infos[0].ndim; i++)
+      if (dims1[i] != dims2[i]) {
+	iq = anaerror("The dimensions beyond the first two must be the same as in the previous argument", ps[1]);
+	goto error_1;
+      }
+    memcpy(tdims + 2, infos[0].dims + 2, (infos[0].ndim - 2)*sizeof(int));
+  }
+  tdims[0] = dims2[0];
+  tdims[1] = dims1[1];
+
+  standard_redef_array(iq, ANA_DOUBLE, tndim, tdims, 0, NULL,
+		       &ptrs[3], &infos[3]);
+  free(tdims);
+  setAxes(&infos[0], 2, NULL, SL_EACHBLOCK);
+  setAxes(&infos[1], 2, NULL, SL_EACHBLOCK);
+  setAxes(&infos[3], 2, NULL, SL_EACHBLOCK);
+
+  int j, k;
+  if (internalMode & 1) {	/* /OUTER */
+    do {
+      do {
+	for (i = 0; i < dims1[1]; i++) /* rows of #1 */
+	  for (j = 0; j < dims2[0]; j++) { /* columns of #2 */
+	    double *p = &ptrs[3].d[j + i*dims2[0]];
+	    *p = 0.0;
+	    for (k = 0; k < dims1[0]; k++) /* columns of #1 = rows of #2 */
+	      *p += ptrs[0].d[k + i*dims1[0]]*ptrs[1].d[j + k*dims2[0]];
+	  }
+	ptrs[0].d += infos[0].rsinglestep[2];
+	ptrs[3].d += infos[3].rsinglestep[2];
+      } while (advanceLoop(&infos[0], &ptrs[0]),
+	       advanceLoop(&infos[3], &ptrs[3]) < 2);
+      ptrs[0].d -= infos[0].ndim < 3? infos[0].rsinglestep[3]: infos[0].nelem;
+      ptrs[1].d += infos[1].rsinglestep[2];
+    } while (advanceLoop(&infos[3], &ptrs[3]),
+	     advanceLoop(&infos[1], &ptrs[1]) < infos[1].rndim);
+  } else {			/* /INNER */
+    do {
+      for (i = 0; i < dims1[1]; i++) /* rows of #1 */
+	for (j = 0; j < dims2[0]; j++) { /* columns of #2 */
+	  double *p = &ptrs[3].d[j + i*dims2[0]];
+	  *p = 0.0;
+	  for (k = 0; k < dims1[0]; k++) /* columns of #1 = rows of #2 */
+	    *p += ptrs[0].d[k + i*dims1[0]]*ptrs[1].d[j + k*dims2[0]];
+	}
+      ptrs[0].d += infos[0].rsinglestep[2];
+      ptrs[1].d += infos[1].rsinglestep[2];
+      ptrs[3].d += infos[3].rsinglestep[2];
+    } while (advanceLoop(&infos[0], &ptrs[0]),
+	     advanceLoop(&infos[1], &ptrs[1]),
+	     advanceLoop(&infos[3], &ptrs[3]) < infos[3].rndim);
+  }  
+  return iq;
+
+ error_1:
+  free(tdims);
+  return iq;
+}
+REGISTER(matrix_product, f, MPRODUCT, 2, 3, "::AXES:0INNER:1OUTER");
 /*------------------------------------------------------------------------- */

@@ -12,6 +12,7 @@
 #include <errno.h>              /* for errno */
 #include "Bytestack.h"
 #include "action.h"
+#include <gsl/gsl_linalg.h>
 
 int	to_scratch_array(int, int, int, int []);
 /*---------------------------------------------------------------------*/
@@ -2421,33 +2422,202 @@ double hypot_stride(double *data, size_t count, size_t stride)
 }
 BIND(hypot_stride, d_sd_iDaLarDxq_000_2, f, HYPOT, 1, 2, ":AXIS");
 /*--------------------------------------------------------------------*/
-#if NOTOBSOLETE
-int singular_value_decomposition(Array *a_in, Array *u_out, Array *s_out,
-				 Array *v_out)
+int singular_value_decomposition(double *a_in, size_t ncol, size_t nrow, 
+				 double *u_out, double *s_out,
+				 double *v_out)
 {
-  if (!matrix
-      || matrix->num_dims != 2
-      || matrix->dims[1] < matrix->dims[0]
-      || matrix->type != ANA_DOUBLE) {
+  if (!a_in || !u_out || !s_out || !v_out || !nrow || !ncol) {
     errno = EDOM;
     return 1;
   }
-  int n = matrix->dims[0];
-  int m = matrix->dims[1];
-  gsl_matrix *a = gsl_matrix_alloc(n, m);
-  gsl_matrix *v = gsl_matrix_alloc(n, n);
-  gsl_vector *s = gsl_vector_alloc(n);
-  gsl_vector *w = gsl_vector_alloc(n);
-
-  memcpy(a->data, matrix->data.d, matrix->num_elem*sizeof(double));
-  /* maybe transpose? */
-
-  gsl_linalg_SV_decomp(a, v, s, w);
   
+  gsl_matrix *a;
+  gsl_matrix *v;
+  gsl_vector *s;
+  gsl_vector *w;
+  int result;
+  int nmin, nmax;
+
+  if (ncol <= nrow) {
+    nmin = ncol;
+    nmax = nrow;
+
+    a = gsl_matrix_alloc(nmax, nmin);
+    memcpy(a->data, a_in, nmin*nmax*sizeof(*a_in));
+
+    v = gsl_matrix_alloc(nmin, nmin);
+    s = gsl_vector_alloc(nmin);
+    w = gsl_vector_alloc(nmin);
+    
+    result = gsl_linalg_SV_decomp(a, v, s, w);
+
+    if (!result) {
+      memcpy(u_out, a->data, nmin*nmax*sizeof(*u_out));
+      memcpy(s_out, s->data, nmin*sizeof(*s_out));
+      memcpy(v_out, v->data, nmin*nmin*sizeof(*v_out));
+    }
+  } else {			/* ncol > nrow */
+    nmin = nrow;
+    nmax = ncol;
+    a = gsl_matrix_alloc(nmax, nmin);
+
+    int i, j;
+
+    for (i = 0; i < nmax; i++)
+      for (j = 0; j < nmin; j++)
+	a->data[i*a->tda + j] = a_in[i + j*nmax];
+    
+    v = gsl_matrix_alloc(nmin, nmin);
+    s = gsl_vector_alloc(nmin);
+    w = gsl_vector_alloc(nmin);
+
+    result = gsl_linalg_SV_decomp(a, v, s, w);
+    
+    if (!result) {
+      for (i = 0; i < nmax; i++)
+	for (j = 0; j < nmin; j++)
+	  v_out[i + j*nmax] = a->data[i*a->tda + j];
+      memcpy(s_out, s->data, nmin*sizeof(*s_out));
+      for (i = 0; i < nmin; i++)
+	for (j = 0; j < nmin; j++)
+	  u_out[i + j*nmin] = v->data[i*v->tda + j];
+    }
+  }
   gsl_matrix_free(a);
   gsl_matrix_free(v);
   gsl_vector_free(s);
   gsl_vector_free(w);
+  return result;
 }
-#endif
+/*--------------------------------------------------------------------*/
+/* 
+   SVD,A,U2,S2,V2
+   
+   Calculates the 'thin' singular value decomposition of matrix A,
+   which is easier to calculate and takes less storage than the 'full'
+   singular value decomposition.  If A is an m-by-n matrix (has m rows
+   and n columns), then A = U # S # V is the 'full' singular value
+   decomposition of A, where U is an m-by-m orthogonal matrix, S is an
+   m-by-n diagonal matrix (all elements not on the main diagnonal are
+   zero), and V is an n-by-n orthogonal matrix.
+
+   In S2 is returned a vector containing the min(m,n) values from the
+   diagnonal of S, in non-increasing order.  All other values of S are
+   zero.
+
+   If m = n, then returned U2 and V2 have the same dimensions as A,
+   and U2 is U, and V2 is the transpose of V.
+
+   If m > n, then U2 is U except that the rightmost columns of U
+   beyond the first min(m,n) columns are omitted.  These correspond to
+   the bottommost all-zero rows of S.  U2 has the same dimensions as
+   A.  V2 is the transpose of V.
+
+   If m < n, then V2 is V except that the bottommost rows of V beyond
+   the first min(m,n) rows are omitted.  These correspond to the
+   rightmost all-zero columns of S.  V2 has the same dimensions as
+   A.  U2 is the transpose of U.
+
+   If Sd is the square matrix with the values of S2 on its diagnonal,
+   then A = U2 # Sd # transpose(V2).
+*/
+int ana_svd(int narg, int ps[])
+{
+  pointer *ptrs;
+  loopInfo *infos;
+  int iq;
+
+  if ((iq = standard_args(narg, ps, "i>D*;oD&;oD1;oD1", &ptrs, &infos)) < 0)
+    return ANA_ERROR;
+  if (infos[0].ndim != 2)
+    return anaerror("Need exactly two dimensions", ps[0]);
+  int dims[2];
+  if (infos[0].dims[0] <= infos[0].dims[1]) {
+    dims[0] = dims[1] = infos[0].dims[0];    /* # columns */
+    standard_redef_array(ps[2], ANA_DOUBLE, 1, dims, 0, NULL,
+			 &ptrs[2], &infos[2]);
+    standard_redef_array(ps[3], ANA_DOUBLE, 2, dims, 0, NULL,
+			 &ptrs[3], &infos[3]); /* Vt */
+    ptrs[3].d = array_data(ps[3]);
+  } else {
+    standard_redef_array(ps[3], ANA_DOUBLE, 2, infos[0].dims, 0, NULL,
+			 &ptrs[3], &infos[3]); /* Vt */
+    dims[0] = dims[1] = infos[0].dims[1]; /* # rows */
+    standard_redef_array(ps[2], ANA_DOUBLE, 1, dims, 0, NULL,
+			 &ptrs[2], &infos[2]);
+    standard_redef_array(ps[1], ANA_DOUBLE, 2, dims, 0, NULL,
+			 &ptrs[1], &infos[1]);
+  }
+  if (singular_value_decomposition(ptrs[0].d, infos[0].dims[0], /* # cols */
+				   infos[0].dims[1],		/* # rows */
+				   ptrs[1].d, ptrs[2].d, ptrs[3].d))
+    return anaerror("SVD decomposition failed", ps[0]);
+  return ANA_OK;
+}
+REGISTER(svd, s, SVD, 4, 4, NULL);
+/*--------------------------------------------------------------------*/
+int matrix_transpose(double *in, double *out, size_t in_ncol, size_t in_nrow)
+{
+  int i, j;
+  
+  if (!in || !out || in_ncol < 1 || in_nrow < 1) {
+    errno = EDOM;
+    return 1;
+  }
+  for (i = 0; i < in_ncol; i++)
+    for (j = 0; j < in_nrow; j++)
+      out[j + i*in_nrow] = in[i + j*in_ncol];
+  return 0;
+}
+/*--------------------------------------------------------------------*/
+int ana_transpose_matrix(int narg, int ps[])
+{
+  pointer *ptrs;
+  loopInfo *infos;
+  int iq;
+
+  if ((iq = standard_args(narg, ps, "i>D*;rD1", &ptrs, &infos)) < 0)
+    return ANA_ERROR;
+  if (infos[0].ndim < 2)
+    return anaerror("Need at least 2 dimensions", ps[0]);
+  int *dims = malloc(infos[0].ndim*sizeof(int));
+  dims[0] = infos[0].dims[1];
+  dims[1] = infos[0].dims[0];
+  memcpy(dims + 2, infos[0].dims + 2, (infos[0].ndim - 2)*sizeof(int));
+  standard_redef_array(iq, ANA_DOUBLE, infos[0].ndim, dims, 0, NULL,
+		       &ptrs[1], &infos[1]);
+  dims[0] = 0;
+  dims[1] = 1;
+  setAxes(&infos[0], 2, dims, SL_EACHBLOCK);
+  setAxes(&infos[1], 2, dims, SL_EACHBLOCK);
+  free(dims);
+  int n = infos[0].dims[0]*infos[0].dims[1];
+  do {
+    matrix_transpose(ptrs[0].d, ptrs[1].d, infos[0].dims[0], infos[0].dims[1]);
+    ptrs[0].d += n;
+    ptrs[1].d += n;
+  } while (advanceLoop(&infos[0], &ptrs[0]),
+	   advanceLoop(&infos[1], &ptrs[1]) < infos[1].rndim);
+  return iq;
+}
+REGISTER(transpose_matrix, f, TRANSPOSE, 1, 1, NULL);
+/*--------------------------------------------------------------------*/
+int ana_diagonal_matrix(int narg, int ps[])
+{
+  pointer *ptrs;
+  loopInfo *infos;
+  int iq;
+
+  if ((iq = standard_args(narg, ps, "i>D*;rD1", &ptrs, &infos)) < 0)
+    return ANA_ERROR;
+  int dims[2];
+  dims[0] = dims[1] = infos[0].nelem;
+  standard_redef_array(iq, ANA_DOUBLE, 2, dims, 0, NULL, &ptrs[1], &infos[1]);
+  ana_zero(1, &iq);
+  int i;
+  for (i = 0; i < infos[0].nelem; i++)
+    ptrs[1].d[i + i*infos[0].nelem] = ptrs[0].d[i];
+  return iq;
+}
+REGISTER(diagonal_matrix, f, MDIAGONAL, 1, 1, NULL);
 /*--------------------------------------------------------------------*/

@@ -1029,7 +1029,6 @@ Internal Functions and Subroutines
 * LSQ::                         Least-squares fit
 * LT::                          Less-than
 * MATCH::                       Match source values to target values
-* MATMUL::                      Matrix multiplication
 * MAX::                         Maximum
 * MAXDIR::                      
 * MAXFILTER::                   Running maximum
@@ -1430,10 +1429,6 @@ CALENDAR
 CTOP
 
 * CTOP Details::                
-
-FFT
-
-* FFT Details::                 
 
 HILBERT
 
@@ -4945,8 +4940,8 @@ instance, @code{'alpha' + 'bet'} equals @code{'alphabet'}.
 @code{x * y} multiplies the values of @code{x} and @code{y}.
 
 @item Matrix multiplication
-@code{x # y} multiplies matrix @code{x} and matrix @code{y}.  Both
-arguments must be arrays with one or two dimensions.
+@code{x # y} multiplies matrix @code{x} and matrix @code{y}.  See
+@ref{MPRODUCT}.
 
 @item Division
 @code{x / y} divides the value of @code{x} by the value of @code{y}.  If
@@ -9182,7 +9177,7 @@ These routines perform various functions on matrices.
 LU decomposition of a matrix.
 @item @ref{DSOLVE}
 Solves a matrix equation using LU decomposition.
-@item @ref{MATMUL}
+@item @ref{MPRODUCT}
 Multiplies two matrices.
 @end table
 
@@ -13084,11 +13079,11 @@ arguments.
 * LSQ::                         Least-squares fit
 * LT::                          Less-than
 * MATCH::                       Match source values to target values
-* MATMUL::                      Matrix multiplication
 * MAX::                         Maximum
 * MAXDIR::                      
 * MAXFILTER::                   Running maximum
 * MAXLOC::                      Location of maximum
+* MDIAGONAL::                   
 * MEAN::                        Mean value
 * MEDFILTER::                   Running median
 * MEDIAN::                      Median valuey
@@ -13103,6 +13098,7 @@ arguments.
 * MINFILTER::                   Running minimum
 * MINLOC::                      Location of minimum
 * MOD::                         Modulus
+* MPRODUCT::                    
 * MULTISIEVE::                  Determine locations of particular values
 * NAME::                        
 * NCCHI2::                      Non-central chi-square function
@@ -13259,6 +13255,7 @@ arguments.
 * SUN_D::                       Solar distance
 * SUN_P::                       Solar P angle
 * SUN_R::                       Solar radius
+* SVD::                         Singular Value Decomposition
 * SWAB::                        Swap bytes in pairs
 * SWAPB::                       Swap bytes in pairs
 * SWAPHALF::                    Swap array halfs
@@ -13289,6 +13286,7 @@ arguments.
 * TRACE::                       Trace execution of ANA code
 * TRACE_DECODER::               
 * TRAJECTORY::                  Calculate particle trajectories
+* TRANSPOSE::                   
 * TREND::                       Determine polynomial trend in data
 * TRI_NAME_FROM_TAI::           
 * TV::                          Display an image
@@ -17743,7 +17741,7 @@ NOTE that only one half of the relevant frequencies are represented in
 @code{@var{data}}, because the missing half can be constructed from
 the provided half by complex conjugation.
 
-@code{x = FFTB(y)} is the opposite of @code{y = FFT(x)}}, and @code{x
+@code{x = FFTB(y)} is the opposite of @code{y = FFT(x)}, and @code{x
 = FFTB(y, /AMPLITUDES)} is the opposite of @code{y = FFT(x,
 /AMPLITUDES)}.
 
@@ -17759,7 +17757,7 @@ See also: @ref{POWER}, @ref{SC}, @ref{SCB}
 [2.12.322, 4.0]
 
 @c -------------------------------------
-@node FFTSHIFT, FILEPTR, FFT, Internal Routines
+@node FFTSHIFT, FILEPTR, FFTB, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection FFTSHIFT
 
@@ -22949,7 +22947,7 @@ according to the positions of the characters in the character set.
 See also: @ref{NE}, @ref{EQ}, @ref{GE}, @ref{GT}, @ref{LE}
 
 @c -------------------------------------
-@node MATCH, MATMUL, LT, Internal Routines
+@node MATCH, MAX, LT, Internal Routines
 @subsection MATCH
 
 @code{MATCH(@var{target}, @var{set})}
@@ -22961,21 +22959,7 @@ that are not in @code{@var{set}}.
 [2.10.199]
 
 @c -------------------------------------
-@node MATMUL, MAX, MATCH, Internal Routines
-@subsection MATMUL
-
-@code{MATMUL(@var{m1}, @var{m2})}
-
-Returns the matrix product of one- or two-dimensional matrices
-@code{@var{m1}} and @code{@var{m2}}.  If @code{@var{m1}} has only one
-dimension, then it is taken as an n-by-one matrix.  If @code{@var{m2}}
-has only one dimension, then it is taken as a one-by-n matrix.
-
-See also: @ref{DECOMP}, @ref{DSOLVE}
-
-[3.1.471]
-@c -------------------------------------
-@node MAX, MAXDIR, MATMUL, Internal Routines
+@node MAX, MAXDIR, MATCH, Internal Routines
 @subsection MAX
 
 @code{MAX(@var{array} [, @var{arg}] [, /KEEPDIMS])}
@@ -23045,7 +23029,7 @@ See also:  @code{MINFILTER}, @code{ORDFILTER}, @code{MEDFILTER}
 
 [2.13.273]
 @c -------------------------------------
-@node MAXLOC, MEAN, MAXFILTER, Internal Routines
+@node MAXLOC, MDIAGONAL, MAXFILTER, Internal Routines
 @subsection MAXLOC
 
 @code{MAXLOC(@var{array} [, @var{arg}] [, /KEEPDIMS])}
@@ -23086,7 +23070,19 @@ See also: @ref{MAX}, @ref{!LASTMAX}, @ref{!LASTMAXLOC}
 
 [3.0.235]
 @c -------------------------------------
-@node MEAN, MEDFILTER, MAXLOC, Internal Routines
+@node MDIAGONAL, MEAN, MAXLOC, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection MDIAGONAL
+
+@code{MDIAGONAL(@var{values})}
+
+Returns a square matrix with the specified @code{@var{values}} on the
+diagonal, and zeros everywhere else.  The matrix has its number of
+rows and columns equal to the number of elements in
+@code{@var{values}}.
+
+@c -------------------------------------
+@node MEAN, MEDFILTER, MDIAGONAL, Internal Routines
 @subsection MEAN
 
 @code{MEAN(@var{x} [, @var{mode}, POWER=@var{power},
@@ -23417,7 +23413,7 @@ E.g. if @code{x = [[[1,7]],[[3,5]]]} then @code{MIN(x) = 7 MIN(x,0) =
 See also: @ref{MIN}, @ref{!LASTMIN}, @ref{!LASTMINLOC}
 
 @c -------------------------------------
-@node MOD, MULTISIEVE, MINLOC, Internal Routines
+@node MOD, MPRODUCT, MINLOC, Internal Routines
 @subsection MOD
 
 @code{x MOD y}
@@ -23430,7 +23426,52 @@ Alias: @code{%}
 See also: @code{SMOD}
 
 @c -------------------------------------
-@node MULTISIEVE, NAME, MOD, Internal Routines
+@node MPRODUCT, MULTISIEVE, MOD, Internal Routines
+@subsection MPRODUCT
+
+@code{MPRODUCT(@var{m1}, @var{m2} [, /INNER, /OUTER])}
+
+Returns the matrix product of two- or more-dimensional real-valued
+column-major matrices @code{@var{m1}} and @code{@var{m2}}.  The matrix
+product is calculated across the first two dimensions only.  The 1st
+(column) dimension of @code{@var{m1}} must equal the 2nd (row)
+dimension of @code{@var{m2}}.
+
+If @code{@var{m1}} or @code{@var{m2}} have more than two dimensions,
+then they can be multiplied in ``inner'' or ``outer'' fashion,
+selected by @code{/INNER} (the default) or @code{/OUTER},
+respectively.
+
+By default, or if @code{/INNER} is selected, then dimensions beyond
+the first two must be equal in both arguments, and one matrix product
+of the first two dimensions is calculated for each element of
+@code{@var{m1}} beyond the first two dimension and for the
+corresponding element of @code{@code{m2}}.
+
+For example, if @code{X = INDGEN(DBLARR(2,3,4))} and @code{Y =
+INDGEN(DBLARR(5,2,4))}, then @code{Z = MPRODUCT(X,Y)} or @code{Z =
+MPRODUCT(X,Y,/INNER)} gets dimensions 5, 3, 4, and @code{Z(*,*,I)} is
+equal to @code{MPRODUCT(X(*,*,I),Y(*,*,I))}.
+
+If @code{/OUTER} is selected, then dimensions beyond the first two do
+not need to be equal in both arguments, and one matrix product of the
+first two dimensions is calculated for each possible combination of
+one element of @code{@var{m1}} beyond the first two dimensions and one
+element of @code{@var{m2}} beyond the first two dimensions.
+
+For example, if @code{X = INDGEN(DBLARR(2,3,4)} and @code{Y =
+INDGEN(DBLARR(5,2,4)}, then @code{Z = MPRODUCT(X,Y,/OUTER)} gets
+dimensions 5, 3, 4, 4, and @code{Z(*,*,I,J)} is equal to
+@code{MPRODUCT(X(*,*,i),Y(*,*,J))}.
+
+This functions gets called when the @code{#} operator is used.
+@code{X # Y} is equivalent to @code{MPRODUCT(X,Y)}.
+
+See also: @ref{DECOMP}, @ref{DSOLVE}, @ref{SVD}
+
+[3.1.471]
+@c -------------------------------------
+@node MULTISIEVE, NAME, MPRODUCT, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection MULTISIEVE
 
@@ -26950,7 +26991,7 @@ Returns the solar P angle in radians for day-of-year @code{@var{doy}}
 See also: @ref{SUN_B}, @ref{SUN_D}, @ref{SUN_R}
 
 @c -------------------------------------
-@node SUN_R, SWAB, SUN_P, Internal Routines
+@node SUN_R, SVD, SUN_P, Internal Routines
 @subsection SUN_R
 
 @code{SUN_R(@var{doy}, @var{year})}
@@ -26962,7 +27003,104 @@ Returns the Sun's radius in arcseconds for day-of-year @code{@var{doy}}
 See also: @ref{SUN_B}, @ref{SUN_D}, @ref{SUN_P}
 
 @c -------------------------------------
-@node SWAB, SWAPB, SUN_R, Internal Routines
+@node SVD, SWAB, SUN_R, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection SVD
+
+@code{SVD, @var{M}, @var{U2}, @var{S2}, @var{V2}}
+   
+Calculates the 'thin' singular value decomposition of matrix
+@code{@var{M}}, which is easier to calculate and takes less storage
+than the 'full' singular value decomposition.  @code{@var{M}} must be
+of a real (non-complex) data type.
+
+If @code{@var{M}} is an m-by-n matrix (has m rows and n columns), then
+@code{@var{M} = @var{U} # @var{S} # TRANSPOSE(@var{V})} is the 'full'
+singular value decomposition of @code{@var{M}}, where @code{@var{U}}
+is an m-by-m orthonormal matrix, @code{@var{S}} is an m-by-n matrix
+with nonnegative numbers on the diagonal and zeros elsewhere, and
+@code{@var{V}} is an n-by-n orthonormal matrix.  The diagonal entries
+of @code{@var{S}} are the singular values of @code{@var{M}}
+
+In @code{@var{S2}} is returned a vector containing the min(n,m)
+singular values of @code{@var{M}} in non-increasing order.
+
+If m = n, then returned @code{@var{U2}} and @code{@var{V2}} have the
+same dimensions as @code{@var{M}}, and @code{@var{U2}} is
+@code{@var{U}}, and @code{@var{V2}} is @code{@var{V}}.  In that case,
+the 'thin' singular value decomposition is equal to the 'full'
+singular value decomposition.
+
+If m > n, then @code{@var{U2}} is @code{@var{U}} except that the
+rightmost columns of @code{@var{U}} beyond the first min(m,n) columns
+are omitted.  These correspond to the bottommost all-zero rows of
+@code{@var{S}}.  @code{@var{U2}} has the same dimensions as
+@code{@var{M}}.  @code{@var{V2}} is @code{@var{V}}.  Then
+@code{@var{M} = @var{U2} # MDIAGONAL(@var{S2}) # TRANSPOSE(@var{V2}}.
+
+If m < n, then @code{@var{M} = TRANSPOSE(@var{U2}) #
+MDIAGONAL(@var{S2}) # @var{V2}}.  In that case, @code{@var{V2}}
+is @code{@var{V}} except that the bottommost rows of @code{@var{V}}
+beyond the first min(m,n) rows are omitted.  These correspond to the
+rightmost all-zero columns of @code{@var{S}}.  @code{@var{V2}} has the
+same dimensions as @code{@var{M}}.  @code{@var{U2}} is the transpose
+of @code{@var{U}}.
+
+See also: @ref{MDIAGONAL}, @ref{TRANSPOSE}
+
+@menu
+* SVD Applications::            
+@end menu
+
+@c -------------------------------------
+@node SVD Applications,  , SVD, SVD
+@comment  node-name,  next,  previous,  up
+@subsubsection SVD Applications
+
+Applications of the singular value decomposition:
+
+A nonnegative real number @code{s} is a singular value of matrix
+@code{M} if there exist unit-length vectors @code{u} and @code{v} such
+that @code{M # v = s * u} and @code{TRANSPOSE(M) # u = s * v}.
+@code{u} and @code{v} are then called the left-singular and
+right-singular vectors for @code{s}.  After @code{SVD, M, U2, S2, V2},
+the elements of @code{S2} are the singular values of @code{M}.
+
+The pseudo-inverse of matrix @code{M} with singular value
+decomposition @code{M = U2 # MDIAGONAL(S2) # TRANSPOSE(V2)} is
+equal to @code{Mpi = V2 # MDIAGONAL(Spi) # TRANSPOSE(U2)}, where
+vector @code{Spi} is obtained from vector @code{S2} by replacing each
+non-zero element by its reciprocal.  The solution of the linear
+least-squares problem @code{M # b = y} is @code{bs = Mpi # y}, but
+going through the pseudoinverse is not the most efficient method of
+solving the least-squares problem.
+
+The unit vector @code{x} that yields the smallest @code{M # x} is the
+right singular vector of @code{M} corresponding to the smallest
+singular value.
+
+The null space of matrix @code{M} is spanned by the right singular
+vectors corresponding to vanishing singular values of @code{M}.  The
+range of matrix @code{M} is spanned by the left singular vectors
+corresponding to non-zero singular values of @code{M}.  The rank of
+matrix @code{M} equals the number of non-zero singular values.
+
+The matrix @code{Mr} of rank @code{r} that best approximates matrix
+@code{M} (by minimizing the Frobenius norm of the difference) is
+@code{Mr = U2 # MDIAGONAL(Sr) # TRANSPOSE(V2)} where @code{Sr} is
+the same as @code{S2} but has all singular values beyond the first
+@code{r} set to zero.
+
+The orthonormal matrix @code{R} closest to @code{M} (under the
+Frobenius norm) is @code{U # TRANSPOSE(V)} -- i.e., has all singular
+values replaced by 1.
+
+The orthonormal matrix @code{R} which most closely maps @code{A} to
+@code{B} (for the orthogonal Procrustes problem) is the nearest
+orthonormal matrix to @code{TRANSPOSE(A) # B}.
+
+@c -------------------------------------
+@node SWAB, SWAPB, SVD, Internal Routines
 @subsection SWAB
 
 @code{SWAB, @var{x}}
@@ -27474,7 +27612,7 @@ See also: @ref{ATOMIZE}, @ref{DUMP}, @ref{SHOW}, @ref{ECHO}, @ref{STEP},
 @subsection TRACE_DECODER
 
 @c -------------------------------------
-@node TRAJECTORY, TREND, TRACE_DECODER, Internal Routines
+@node TRAJECTORY, TRANSPOSE, TRACE_DECODER, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection TRAJECTORY
 
@@ -27527,7 +27665,19 @@ there.
 
 [3.1.945]
 @c -------------------------------------
-@node TREND, TRI_NAME_FROM_TAI, TRAJECTORY, Internal Routines
+@node TRANSPOSE, TREND, TRAJECTORY, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection TRANSPOSE
+
+@code{TRANSPOSE(@var{matrix})}
+
+Returns a copy of the given @code{@var{matrix}}, with the first two
+dimensions transposed.  @code{@var{matrix}} must have at least 2
+dimensions.  If @code{@var{y} = TRANSPOSE(@var{x})}, then
+@code{@var{y}(@var{i},@var{j}) = @var{x}(@var{j},@var{i})}.
+
+@c -------------------------------------
+@node TREND, TRI_NAME_FROM_TAI, TRANSPOSE, Internal Routines
 @subsection TREND
 
 @code{TREND(@var{x} [, @var{n}])}

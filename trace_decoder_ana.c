@@ -79,7 +79,7 @@
 
  static float aansf[8] = { 1.0, 1.387039845, 1.306562965, 1.175875602,
 	   1.0, 0.785694958, 0.541196100, 0.275899379};
- static float ws[64], fqtbl[64], jpeg_bias = 2048., bias = 2048.5;
+ static float ws[64], fqtbl[64], bias = 2048.5;
 /* short	*dct = NULL; */
  char	dct_area[2400000];
  int	del_indices[2048];
@@ -111,7 +111,7 @@ int huff_setups( packed_huffman)
  unsigned short	huffcode[256], *pc;
  int	*mincode, *maxcode, *valptr;
  byte	*look_nbits, *look_sym;
- int	i, j, code, k, iq, n, lastp;
+ int	i, j, code, k, iq, n;
  int	jq, ntable, lookbits;
  /* unpack the Huffman tables read from file, make our own copy
  format for Huffman files:
@@ -215,7 +215,7 @@ static int huff_decode_dct(dct, nblocks, x, limit)
  byte	x[];
  int	limit, nblocks;
  {
- int	i, j, sq, k, idct, r1, last_dc=0;
+ int	i, j, k, idct, r1, last_dc=0;
  int	jq, look, nb, lbits, ks;
  unsigned int	temp, temp2, nbits, rs;
  unsigned int mask[] = { 0x00, 0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f, 0xff,
@@ -399,9 +399,8 @@ static int rdct(image, nx, ny, nblocks, qtable, dct_array)
  int	nx, ny, nblocks;
  {
    /* void rdct_cell(); */
- int	n, i, ncx, iq, ystride, icx, icy, row, col, j;
- float	dctfp[64], *pf;
- short	*dctstart, *pff;
+ int	n, i, ncx, iq, ystride, icx, icy, row, col;
+ short	*dctstart;
  /* condition the q table for the dct's we created, must be same input qtable */
  i = 0;
  for (i = 0; i < 64; i++) {
@@ -425,10 +424,10 @@ static int rdct(image, nx, ny, nblocks, qtable, dct_array)
  /* for (j=0;j < 64; j++)  *pf++ = (float) *pff++; */
 
  {
- int i, j, n;
+ int i;
  float tmp0, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7;
  float tmp10, tmp11, tmp12, tmp13;
- float z1, z2, z3, z4, z5, z11, z13, z10, z12;
+ float z5, z11, z13, z10, z12;
 
  /* first de-zag and de-quantize */
  { register float *wsptr;
@@ -571,14 +570,13 @@ int trace_scan(x, limit)
  int	limit;
  {
  byte	*px, *pt, *pb;
- short	sq, *ps, *dct_ptr;
- byte	bq;
- int	i, j, k, n, code, iblock = 0, restart_interval = 8, nb, stat;
+ short	*dct_ptr;
+ int	i, j, k, n, code, iblock = 0, restart_interval = 8, stat;
  int    RestartNumber, PrevRestartNumber, bcount, knowngaps, expected_restarts;
  int    GapCount, missed, lq, dcount, gcount, next_gap, dq, count_prior;
  int    gapsize[MAX_GAPS], gaprollover[MAX_GAPS];
  int    gapblock[MAX_GAPS], gaprs[MAX_GAPS], gapdel[MAX_GAPS];
- float	gap_del_prior[MAX_GAPS], gap_rollf[MAX_GAPS];
+ float	gap_rollf[MAX_GAPS];
  float	del_mean, gapdel_mean, fq, gsum, cfac, delq, dismerit1, dismerit2;
  int	del_total, gapdel_total, gap_guess, del_prior, missed_total;
  n_restarts_found = n_unexpected = 0;
@@ -912,14 +910,12 @@ int trace_scan(x, limit)
 	if (nx == 1024 && GapCount > 1) {
 	 for (i=0;i<(GapCount-1);i++) {
 	  short *source;
-	  int	mode, istart, iroll_before, iroll_after, icq;
-	  int	i1,i2,i3,i4,iq,j1,j2;
-	  float	d1, d2, s1, s2, r1, r2;
+	  int	mode, istart, icq;
+	  int	i1,i2,i3,i4,iq,j1;
+	  float	s1, s2;
 	  short	v1,v2,v3,v4;
 	  istart = gapblock[i];
 	  /* printf("initial istart = %d, istart*64 = %d\n", istart, istart*64); */
-	  iroll_before = gaprollover[i];
-	  iroll_after  = gaprollover[i+1];
 	  iq = (istart%64);
 	  if (iq != 0) istart = (iq+1)*64;  /* next higher if not on boundary */
 	  source = dct + istart*64;	/* a 4096 boundary in pixels */
@@ -968,36 +964,34 @@ int trace_scan(x, limit)
 	  if (mode) {
 	   /* the mode = 1 case, here we want s2 > s1 or we need a change */
 	   if (s2 < s1) {
-	    if (i1 == 0) { j1 = 1;  j2 = -1;}
-	    else if (i2 == 0) { j2 = 1;  j1 = -1;}
+	    if (i1 == 0) { j1 = 1;}
+	    else if (i2 == 0) { j1 = -1;}
 	    else {	/* normal case, consider merit of two possibilities */
 	    dismerit1 = ABS((float) i1 + 1.0 - gap_rollf[i])+
 	    	ABS((float) i2 - 1.0 - gap_rollf[i+1]);
 	    dismerit2 = ABS((float) i1 - 1.0 - gap_rollf[i])+
 	    	ABS((float) i2 + 1.0 - gap_rollf[i+1]);
-		if (dismerit1 < dismerit2) { j1 = 1; j2 = -1; } else { j1 = -1; j2 = 1; }
+		if (dismerit1 < dismerit2) { j1 = 1; } else { j1 = -1; }
 	   }
 	    /* printf("re-align, j1 = %d\n", j1); */
 	   /* remember that gaprollover is now the accumulated rollover, so only change
 	   the value prior to the gap here, leave later positions alone */
 	   gaprollover[i] += j1;
-	   /* gaprollover[i+1] += j2; */
 	   }
 	  } else {
 	   /* the mode = 0 case, here we want s1 > s2 or we need a change */
 	   if (s1 < s2) {
-	    if (i1 == 0) { j1 = 1;  j2 = -1;}
-	    else if (i2 == 0) { j2 = 1;  j1 = -1;}
+	    if (i1 == 0) { j1 = 1;}
+	    else if (i2 == 0) { j1 = -1;}
 	    else {	/* normal case, consider merit of two possibilities */
 	    dismerit1 = ABS((float) i1 + 1.0 - gap_rollf[i])+
 	    	ABS((float) i2 - 1.0 - gap_rollf[i+1]);
 	    dismerit2 = ABS((float) i1 - 1.0 - gap_rollf[i])+
 	    	ABS((float) i2 + 1.0 - gap_rollf[i+1]);
-		if (dismerit1 < dismerit2) { j1 = 1; j2 = -1; } else { j1 = -1; j2 = 1; }
+		if (dismerit1 < dismerit2) { j1 = 1; } else { j1 = -1; }
 	   }
 	    /* printf("re-align, j1 = %d\n", j1); */
 	   gaprollover[i] += j1;
-	   /* gaprollover[i+1] += j2; */
 	   }
 	  }
 	 }
@@ -1064,6 +1058,7 @@ int preload_q()
  {
  int	iq;
  char	*fname, *pname;
+ int swapb(char [], int);
  /* get path name */
  pname = (char *) getenv("QTAB");
  if (!pname) pname = "/hosts/shimmer/usr/people/shine/trace/qtables/";
@@ -1079,6 +1074,7 @@ int preload_q()
 	  free(fname);    return -1; }
   if ( fread(qt_all[iq], 2, 64, fin) != 64) { perror("QT file read error");
 	  free(fname);    return -1; }
+  int swapb(char *, int);
  if (!bigendian) swapb( (char *) qt_all[iq], 128);
  fclose(fin);
  }
@@ -1093,7 +1089,7 @@ int ana_trace_decoder(narg,ps)	/* initial TRACE decompresser */
  /* presently we read each huffman and q result from files, plan to save the
  entire set in memory for faster results eventually */
  static	int last_htin = -1, qs_loaded = 0;
- int	htin, qtin, iq, nd, limit, blimit, j, dim[8], result_sym, stat;
+ int	htin, qtin, iq, nd, limit, j, dim[8], result_sym, stat;
  int	i;
  static	char	*dctarray = {"$DCT_ARRAY"};
  char	*fname, *pname;

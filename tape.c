@@ -166,7 +166,7 @@ int ana_taprd(int narg, int ps[])
 /* read tape record.  Modified LS 27mar98 to read records until the */
 /* requested number of bytes is read (or an error occurs) */
 {
-  int	fd, nbr, iq, nd, n, type, nread, cur;
+  int	fd, nbr, iq, n, type, nread, cur;
   pointer q1;
   
   if ( (fd = tape_setup(narg,ps)) < 0)
@@ -177,7 +177,6 @@ int ana_taprd(int narg, int ps[])
     return cerror(NEED_ARR, iq);
 
   q1.l = (int *) array_data(iq);
-  nd = array_num_dims(iq);
   type = array_type(iq);
   n = cur = ana_type_size[type]*array_size(iq);
   nread = 0;
@@ -304,7 +303,7 @@ int ana_tapebufin(int narg, int ps[])/* read tape record */
  acquiring or processing data
  */
 {
- int	fd, nbr, iq, nd, n, recsize, nb, ic, offset, len, type;
+ int	fd, nbr, iq, n, recsize, nb, ic, offset, len, type;
  pointer q1;
 #if !WORDS_BIGENDIAN
  char	*p;
@@ -317,7 +316,6 @@ int ana_tapebufin(int narg, int ps[])/* read tape record */
  if (symbol_class(iq) != ANA_ARRAY)
    return cerror(NEED_ARR, iq);
  q1.l = (int *) array_data(iq);
- nd = array_num_dims(iq);
  type = array_type(iq);
  nb = n = ana_type_size[type];
  errno = 0;

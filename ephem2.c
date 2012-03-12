@@ -45,7 +45,7 @@ void solar_physical(double jd, int select)
   /* true anomaly */
   m += c;
   r = (1 - e*e)/(1 + e*cos(m));	/* solar distance/AU */
-  /* sun's true geometric longitude, corrected for abberation */
+  /* sun's true geometric longitude, corrected for aberration */
   l += c - 0.00569*DEG;
   o = (125.04 - 1934.136*T)*DEG;
   l2 = l - 0.00478*sin(o)*DEG;	/* corrected for nutation */

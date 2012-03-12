@@ -119,6 +119,7 @@ int ana_distr_f(int narg, int ps[])
 	minmax(int *, int, int);
   pointer arg1, arg2, res;
   int	ana_zero(int, int []);
+  void convertWidePointer(wideScalar *, int, int);
 
   iq = ps[0];
   if (symbol_class(iq) != ANA_ARRAY)
@@ -140,8 +141,8 @@ int ana_distr_f(int narg, int ps[])
   /* always need the range */
   minmax(arg1.l, n, type);
   /* get long (int) versions of min and max */
-  convertWidePointer(&lastmin, type, ANA_LONG);
-  convertWidePointer(&lastmax, type, ANA_LONG);
+  convertPointer(&lastmin, type, ANA_LONG);
+  convertPointer(&lastmax, type, ANA_LONG);
   /* create an array for results */
   histmin = lastmin.l;
   histmax = lastmax.l;
@@ -378,14 +379,12 @@ int ana_readarr(int narg, int ps[])
 /* reads array elements until they are exhausted and returns read elements */
 /* in an array.  Louis Strous 24may92 */
 {
- extern char	batch;
  extern FILE	*inputStream;
  FILE	*tp, *is;
  char	*p, *pt, lastchar, token[32], line[BUFSIZE];
  int	arrs=0, i, iq, maxtype = ANA_LONG, *iptr, 
 	getNewLine(char *, char *, char), redef_array(int, int, int, int *);
  float	*fptr;
- extern char *currentChar, tLine[];
 
  iq = ps[0];						/* target */
  tp = Tmpfile();					/* temporary storage */
@@ -454,6 +453,7 @@ int ana_find(int narg, int ps[])
   { iq = ana_long(1, &ps[2]);
     GET_NUMERICAL(theOff, noff); }
   else noff = 0;
+  indx.d = NULL;
   iq = ps[1];			/* key */
   switch (type)			/* change key to type of array */
   { case ANA_BYTE:
@@ -478,7 +478,7 @@ int ana_find(int narg, int ps[])
   if (mode & 2) resulttype = type; else resulttype = ANA_LONG;
   if (!repeat && class == ANA_SCALAR)
   { result = scalar_scratch(resulttype);
-    indx.l = &sym[result].spec.scalar.l;
+    indx.b = &sym[result].spec.scalar.b;
     nRepeat = 1; }
   else
   { if (!repeat)
@@ -563,6 +563,100 @@ int ana_find(int narg, int ps[])
     }	/* end of while (loop--) */
     base.b += nar*step;
   } /* end of while (nRepeat--) */
+  return result;
+}
+/*------------------------------------------------------------------------- */
+int ana_find2(int narg, int ps[])
+/* FIND2(array, key) */
+{
+  int *data_dims, data_dim_count, data_count, keys_count, result, type;
+  pointer data, keys, target;
+  int i, j;
+
+  if (numerical_or_string(ps[0], &data_dims, &data_dim_count, &data_count, &data) < 0)
+    return ANA_ERROR;
+  if (numerical_or_string(ps[1], NULL, NULL, &keys_count, &keys) < 0)
+    return ANA_ERROR;
+  if (symbol_type(ps[1]) != symbol_type(ps[0])) {
+    if (symbol_type(ps[1]) > symbol_type(ps[0])) {
+      int iq = ana_converts[symbol_type(ps[1])](1, &ps[0]);
+      numerical_or_string(iq, NULL, NULL, NULL, &data);
+      type = symbol_type(ps[1]);
+    } else {
+      int iq = ana_converts[symbol_type(ps[0])](1, &ps[1]);
+      numerical_or_string(iq, NULL, NULL, NULL, &keys);
+      type = symbol_type(ps[0]);
+    }
+  }
+  switch (symbol_class(ps[1])) {
+  case ANA_SCALAR: case ANA_STRING:
+    result = scalar_scratch(ANA_LONG);
+    target.b = &scalar_value(result).b;
+    break;
+  case ANA_ARRAY:
+    result = array_clone(ps[1], ANA_LONG);
+    target.v = array_data(result);
+  default:
+    return cerror(ILL_CLASS, ps[1]);
+  }
+  switch (type) {
+  case ANA_BYTE:
+    for (i = 0; i < keys_count; i++) {
+      for (j = 0; j < data_count; j++)
+        if (*keys.b == data.b[j])
+          break;
+      *target.l++ = (j == data_count? -1: j);
+      keys.b++;
+    }
+    break;
+  case ANA_WORD:
+    for (i = 0; i < keys_count; i++) {
+      for (j = 0; j < data_count; j++)
+        if (*keys.w == data.w[j])
+          break;
+      *target.w++ = (j == data_count? -1: j);
+      keys.w++;
+    }
+    break;
+  case ANA_LONG:
+    for (i = 0; i < keys_count; i++) {
+      for (j = 0; j < data_count; j++)
+        if (*keys.l == data.l[j])
+          break;
+      *target.l++ = (j == data_count? -1: j);
+      keys.l++;
+    }
+    break;
+  case ANA_FLOAT:
+    for (i = 0; i < keys_count; i++) {
+      for (j = 0; j < data_count; j++)
+        if (*keys.f == data.f[j])
+          break;
+      *target.l++ = (j == data_count? -1: j);
+      keys.f++;
+    }
+    break;
+  case ANA_DOUBLE:
+    for (i = 0; i < keys_count; i++) {
+      for (j = 0; j < data_count; j++)
+        if (*keys.d == data.d[j])
+          break;
+      *target.l++ = (j == data_count? -1: j);
+      keys.d++;
+    }
+    break;
+  case ANA_STRING_ARRAY:
+    for (i = 0; i < keys_count; i++) {
+      for (j = 0; j < data_count; j++)
+        if (!strcmp(*keys.sp, data.sp[j]))
+          break;
+      *target.l++ = (j == data_count? -1: j);
+      keys.sp++;
+    }
+    break;
+  default:
+    return anaerror("Illegal type in arguments to FIND2 function", 0);
+  }
   return result;
 }
 /*------------------------------------------------------------------------- */
@@ -1001,7 +1095,7 @@ int ana_differ(int narg, int ps[])
   LS 24nov92 */
 {
   pointer	src, trgt, order;
-  int	result, nOrder, loop, o, ww, stride, offset1, offset2, offset3,
+  int	result, nOrder, loop, o, ww, stride, offset1, offset3,
     w1, one = 1, iq, n, type, i, old, circular;
   loopInfo	srcinfo, trgtinfo;
 
@@ -1071,7 +1165,6 @@ int ana_differ(int narg, int ps[])
       ww = srcinfo.rdims[0];
     stride = srcinfo.step[0];
     offset1 = -ww*stride;
-    offset2 = srcinfo.step[0]*ww;
     offset3 = offset1 + srcinfo.rdims[0]*stride;
     w1 = (internalMode & 1)? ww/2: ww;
     switch (symbol_type(iq)) {
@@ -1107,7 +1200,8 @@ int ana_differ(int narg, int ps[])
 	    *trgt.b = 0;	/* zeros */
 	    trgt.b += stride;
 	  }
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
       case ANA_WORD:
 	do {
@@ -1139,7 +1233,8 @@ int ana_differ(int narg, int ps[])
 	    *trgt.w = 0;	/* zeros */
 	    trgt.w += stride;
 	  }
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
       case ANA_LONG:
 	do {
@@ -1171,7 +1266,8 @@ int ana_differ(int narg, int ps[])
 	    *trgt.l = 0;	/* zeros */
 	    trgt.l += stride;
 	  }
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
       case ANA_FLOAT:
 	do {
@@ -1203,7 +1299,8 @@ int ana_differ(int narg, int ps[])
 	    *trgt.f = 0;	/* zeros */
 	    trgt.f += stride;
 	  }
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
       case ANA_DOUBLE:
 	do {
@@ -1235,7 +1332,8 @@ int ana_differ(int narg, int ps[])
 	    *trgt.d = 0;	/* zeros */
 	    trgt.d += stride;
 	  }
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
     }
     if (loop < srcinfo.naxes - 1)
@@ -1335,7 +1433,8 @@ int varsmooth(int narg, int ps[], int cumul)
 	    for (i = i1; i < i2; i += step)
 	      sum.l += (int) src.b[i];
 	    *trgt.l = sum.l;
-	    done = advanceLoops(&srcinfo, &trgtinfo);
+	    done = advanceLoop(&trgtinfo, &trgt), 
+	      advanceLoop(&srcinfo, &src);
 	    width.l++;
 	    if (done == widthNDim)	/* done with indicated axis */
 	      width.l = width0.l;
@@ -1360,7 +1459,8 @@ int varsmooth(int narg, int ps[], int cumul)
 	    for (i = i1; i < i2; i += step)
 	      sum.l += (int) src.w[i];
 	    *trgt.l = sum.l;
-	    done = advanceLoops(&srcinfo, &trgtinfo);
+	    done = advanceLoop(&trgtinfo, &trgt),
+	      advanceLoop(&srcinfo, &src);
 	    width.l++;
 	    if (done == widthNDim)	/* done with indicated axis */
 	      width.l = width0.l;
@@ -1385,7 +1485,8 @@ int varsmooth(int narg, int ps[], int cumul)
 	    for (i = i1; i < i2; i += step)
 	      sum.l += src.l[i];
 	    *trgt.l = sum.l;
-	    done = advanceLoops(&srcinfo, &trgtinfo);
+	    done = advanceLoop(&trgtinfo, &trgt),
+	      advanceLoop(&srcinfo, &src);
 	    width.l++;
 	    if (done == widthNDim)	/* done with indicated axis */
 	      width.l = width0.l;
@@ -1414,7 +1515,8 @@ int varsmooth(int narg, int ps[], int cumul)
 	    for (i = i1; i < i2; i += step)
 	      sum.f += (float) src.b[i];
 	    *trgt.f = sum.f/weight;
-	    done = advanceLoops(&srcinfo, &trgtinfo);
+	    done = advanceLoop(&trgtinfo, &trgt),
+	      advanceLoop(&srcinfo, &src);
 	    width.l++;
 	    if (done == widthNDim)	/* done with indicated axis */
 	      width.l = width0.l;
@@ -1440,7 +1542,8 @@ int varsmooth(int narg, int ps[], int cumul)
 	    for (i = i1; i < i2; i += step)
 	      sum.f += (float) src.w[i];
 	    *trgt.f = sum.f/weight;
-	    done = advanceLoops(&srcinfo, &trgtinfo);
+	    done = advanceLoop(&trgtinfo, &trgt),
+	      advanceLoop(&srcinfo, &src);
 	    width.l++;
 	    if (done == widthNDim)	/* done with indicated axis */
 	      width.l = width0.l;
@@ -1466,7 +1569,8 @@ int varsmooth(int narg, int ps[], int cumul)
 	    for (i = i1; i < i2; i += step)
 	      sum.f += (float) src.l[i];
 	    *trgt.f = sum.f/weight;
-	    done = advanceLoops(&srcinfo, &trgtinfo);
+	    done = advanceLoop(&trgtinfo, &trgt),
+	      advanceLoop(&srcinfo, &src);
 	    width.l++;
 	    if (done == widthNDim)	/* done with indicated axis */
 	      width.l = width0.l;
@@ -1492,7 +1596,8 @@ int varsmooth(int narg, int ps[], int cumul)
 	    for (i = i1; i < i2; i += step)
 	      sum.f += src.f[i];
 	    *trgt.f = sum.f/weight;
-	    done = advanceLoops(&srcinfo, &trgtinfo);
+	    done = advanceLoop(&trgtinfo, &trgt),
+	      advanceLoop(&srcinfo, &src);
 	    width.l++;
 	    if (done == widthNDim) /* done with indicated axes */
 	      width.l = width0.l;
@@ -1521,7 +1626,8 @@ int varsmooth(int narg, int ps[], int cumul)
 	    for (i = i1; i < i2; i += step)
 	      sum.d += (double) src.b[i];
 	    *trgt.d = sum.d/weight;
-	    done = advanceLoops(&srcinfo, &trgtinfo);
+	    done = advanceLoop(&trgtinfo, &trgt),
+	      advanceLoop(&srcinfo, &src);
 	    width.l++;
 	    if (done == widthNDim)	/* done with indicated axis */
 	      width.l = width0.l;
@@ -1547,7 +1653,8 @@ int varsmooth(int narg, int ps[], int cumul)
 	    for (i = i1; i < i2; i += step)
 	      sum.d += (double) src.w[i];
 	    *trgt.d = sum.d/weight;
-	    done = advanceLoops(&srcinfo, &trgtinfo);
+	    done = advanceLoop(&trgtinfo, &trgt),
+	      advanceLoop(&srcinfo, &src);
 	    width.l++;
 	    if (done == widthNDim)	/* done with indicated axis */
 	      width.l = width0.l;
@@ -1573,7 +1680,8 @@ int varsmooth(int narg, int ps[], int cumul)
 	    for (i = i1; i < i2; i += step)
 	      sum.d += (double) src.l[i];
 	    *trgt.d = sum.d/weight;
-	    done = advanceLoops(&srcinfo, &trgtinfo);
+	    done = advanceLoop(&trgtinfo, &trgt),
+	      advanceLoop(&srcinfo, &src);
 	    width.l++;
 	    if (done == widthNDim)	/* done with indicated axis */
 	      width.l = width0.l;
@@ -1599,7 +1707,8 @@ int varsmooth(int narg, int ps[], int cumul)
 	    for (i = i1; i < i2; i += step)
 	      sum.d += (double) src.f[i];
 	    *trgt.d = sum.d/weight;
-	    done = advanceLoops(&srcinfo, &trgtinfo);
+	    done = advanceLoop(&trgtinfo, &trgt),
+	      advanceLoop(&srcinfo, &src);
 	    width.l++;
 	    if (done == widthNDim)	/* done with indicated axis */
 	      width.l = width0.l;
@@ -1625,7 +1734,8 @@ int varsmooth(int narg, int ps[], int cumul)
 	    for (i = i1; i < i2; i += step)
 	      sum.d += src.d[i];
 	    *trgt.d = sum.d/weight;
-	    done = advanceLoops(&srcinfo, &trgtinfo);
+	    done = advanceLoop(&trgtinfo, &trgt),
+	      advanceLoop(&srcinfo, &src);
 	    width.l++;
 	    if (done == widthNDim)	/* done with indicated axis */
 	      width.l = width0.l;
@@ -1744,7 +1854,8 @@ int smooth(int narg, int ps[], int cumul)
 	    for (i = w1; i < ww; i++) /* right edge */
 	    { *trgt.f = value.f/norm;
 	      trgt.f += stride; }
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
       case ANA_WORD:
 	do
@@ -1795,7 +1906,8 @@ int smooth(int narg, int ps[], int cumul)
 	    for (i = w1; i < ww; i++) /* right edge */
 	    { *trgt.f = value.f/norm;
 	      trgt.f += stride; }
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
       case ANA_LONG:
 	do
@@ -1846,7 +1958,8 @@ int smooth(int narg, int ps[], int cumul)
 	    for (i = w1; i < ww; i++) /* right edge */
 	    { *trgt.f = value.f/norm;
 	      trgt.f += stride; }
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
       case ANA_FLOAT:
 	do
@@ -1897,7 +2010,8 @@ int smooth(int narg, int ps[], int cumul)
 	    for (i = w1; i < ww; i++) /* right edge */
 	    { *trgt.f = value.f/norm;
 	      trgt.f += stride; }
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
       case ANA_DOUBLE:
 	do
@@ -1948,7 +2062,8 @@ int smooth(int narg, int ps[], int cumul)
 	    for (i = w1; i < ww; i++) /* right edge */
 	    { *trgt.d = value.d/norm;
 	      trgt.d += stride; }
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
     }
     if (loop < srcinfo.naxes - 1) {
@@ -2146,7 +2261,7 @@ int ana_table(int narg, int ps[])
  int	symx, symy, symf, topType, nTable, nOut, nRepeat, ix, n1,
 	symr, i, nsymx, nsymy, nsymf, nLoop, n2;
  array	*hx, *hy, *hf, *hMax, *hr;
- pointer	x, y, xf, r, ox, oy, of, nx, ny, nf;
+ pointer	x, y, xf, r, ox, oy, of, nx, ny;
  scalar	grad;
  int	ana_table2d(int, int []);
 
@@ -2226,7 +2341,6 @@ int ana_table(int narg, int ps[])
  of.l = LPTR(hf);
  nx.b = ox.b + sym[symx].spec.array.bstore - sizeof(array);
  ny.b = oy.b + sym[symy].spec.array.bstore - sizeof(array);
- nf.b = of.b + sym[symf].spec.array.bstore - sizeof(array);
  r.l = LPTR(hr);
 	/* now the real work */
 	/* Search strategy:  hope that the next xnew value is near

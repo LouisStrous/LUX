@@ -124,6 +124,8 @@ int	anacrunch32(byte *, int [], int, int, int, int);
 int	byte_count;		/* also used by tape.c, which is only */
 				/* included if HAVE_SYS_MTIO_H is defined */
 
+void read_a_number_fp(FILE *, scalar *, int *);
+
 #define ASK_MORE	0
 #define ERROR_EOF	1
 #define CONT_EOF	2
@@ -244,7 +246,7 @@ int ana_spawn(int narg, int ps[])		/* execute a shell command */
   char *p;
   int	result;
 
-  if (!symbolIsString(ps[0]))
+  if (!symbolIsStringScalar(ps[0]))
     return cerror(NEED_STR, *ps);
   p = string_value(ps[0]);
   result = system(p);
@@ -263,7 +265,7 @@ int ana_spawn_f(int narg, int ps[])		/* execute a shell command */
   char *p;
   int	result;
 
-  if (!symbolIsString(ps[0]))
+  if (!symbolIsStringScalar(ps[0]))
     return cerror(NEED_STR, *ps);
   p = string_value(ps[0]);
   result = scalar_scratch(ANA_LONG);
@@ -548,7 +550,7 @@ int input_format_check(char *format, char **next, char **widths, int *datatype,
    <stdlib.h>: strtol()
  */
 {
-  int	big, explicit, width;
+  int	big, explicit;
   char	*p, *p2;
 
   /* skip initial whitespace: not all compilers handle it the same way */
@@ -580,7 +582,7 @@ int input_format_check(char *format, char **next, char **widths, int *datatype,
   *number = 0;			/* count elements per format */
   *widths = format;
   while (1) {
-    width = strtol(format, &format, 10); /* format width - if any */
+    strtol(format, &format, 10); /* format width - if any */
     (*number)++;
     if (*format == '-')		/* format set */
       format++;
@@ -2100,6 +2102,7 @@ int read_ascii(int narg, int ps[], FILE *fp, int flag)
   char	*p;
   scalar	value;
   pointer	pp;
+  void read_a_number_fp(FILE *, scalar *, int *);
 
   index_cnt = 0;		/* keep track of the number of read elements */
   for (i = 0; i < narg; i++) {	/* loop over all arguments */
@@ -2309,7 +2312,7 @@ int gscanf(void **source, char *format, void *arg, int isString)
 {
   static char	*aformat = NULL;
   static int	nformat = 0;
-  int	ok, i;
+  int	i;
 
   i = strlen(format) + 2;
   if (i > nformat) {
@@ -2330,21 +2333,18 @@ int gscanf(void **source, char *format, void *arg, int isString)
     if (!*((char **) source) || !**((char **) source)) /* empty string */
       return 0;
     if (arg) 			/* want to keep the argument */
-      ok = sscanf(*((char **) source), aformat, arg, &i);
+      sscanf(*((char **) source), aformat, arg, &i);
     else
-      ok = sscanf(*((char **) source), aformat, &i);
+      sscanf(*((char **) source), aformat, &i);
     *(char **) source += i;	/* advance string pointer */
   } else {			/* reading from a file */
     if (feof(*((FILE **) source)))
       return 0;
     if (arg) 
-      ok = fscanf(*((FILE **) source), aformat, arg, &i);
+      fscanf(*((FILE **) source), aformat, arg, &i);
     else
-      ok = fscanf(*((FILE **) source), aformat, &i);
+      fscanf(*((FILE **) source), aformat, &i);
   }
-  /* if arg == NULL, then we read zero items, so ok is always zero. */
-  /* in that case we can only detect success from the value of i, which */
-  /* should be non-zero. */
   return i;
 }
 /*------------------------------------------------------------------------- */
@@ -2373,8 +2373,8 @@ int read_formatted_ascii(int narg, int ps[], void *ptr, int showerrors,
    <string.h>: strcpy(), strlen()
  */
 {
-  char	*fmt, *scr, *p, c;
-  int	type, n, string2, pr, i, len, nout = 0;
+  char	*fmt, *scr, *p, c, *ptr0;
+  int	type, string2, pr, i, len, nout = 0;
   double	d, k, f, d2;
   pointer	trgt;
   void	**ptr2;
@@ -2394,6 +2394,8 @@ int read_formatted_ascii(int narg, int ps[], void *ptr, int showerrors,
       isString = 1;
     }
   }
+
+  ptr0 = (char *) ptr;
 
   fmt = string_arg(*ps++);	/* format string */
   if (!fmt)
@@ -2435,7 +2437,7 @@ int read_formatted_ascii(int narg, int ps[], void *ptr, int showerrors,
 	  break;
 	default:
 	  if (showerrors)
-	    return anaerror("Illegal format", 0);
+	    return anaerror("Illegal format %s", 0, fmt);
 	  else
 	    return nout;
 	case FMT_INTEGER:
@@ -2579,7 +2581,7 @@ int read_formatted_ascii(int narg, int ps[], void *ptr, int showerrors,
 		  if (pr) {	/* not the last one: read an integer */
 		    if (!gscanf(ptr2, "%d", &i, string2))
 		      return
-			showerrors? anaerror("Unexpected input", 0): nout;
+			showerrors? anaerror("Expected a digit while looking for a time at character index %d in %s", 0, (char *) *ptr2 - ptr0, ptr0): nout;
 		    d += i*k;
 		    if (i < 0)
 		      k = -k;
@@ -2587,11 +2589,11 @@ int read_formatted_ascii(int narg, int ps[], void *ptr, int showerrors,
 		    /* skip the separator: anything except digits */
 		    if (!gscanf(ptr2, "%*[^0-9]", NULL, string2))
 		      return
-			showerrors? anaerror("Unexpected input", 0): nout;
+			showerrors? anaerror("Expected a non-digit while looking for a time at character index %d in %s", 0, (char *) *ptr2 - ptr0, ptr0): nout;
 		  } else {	/* the last one: read a float */
 		    if (!gscanf(ptr2, "%lf", &f, string2))
 		      return
-			showerrors? anaerror("Unexpected input", 0): nout;
+			showerrors? anaerror("Expected a (floating-point) number while looking for a time at character index %d in %s", 0, (char *) *ptr2 - ptr0, ptr0): nout;
 		    d += f*k;
 		  }
 		}
@@ -2633,7 +2635,7 @@ int read_formatted_ascii(int narg, int ps[], void *ptr, int showerrors,
 		if (!gscanf(ptr2, theFormat.current,
 			    (theFormat.flags & FMT_SUPPRESS)? NULL: trgt.b,
 			    string2))
-		  return showerrors? anaerror("Unexpected input", 0): nout;
+		  return showerrors? anaerror("Expected a number at character index %d in %s", 0, (char *) *ptr2 - ptr0, ptr0): nout;
 		break;
 	    } /* end of switch (type) */
 	    trgt.b += ana_type_size[type];
@@ -2644,7 +2646,8 @@ int read_formatted_ascii(int narg, int ps[], void *ptr, int showerrors,
     if (theFormat.type == FMT_PLAIN || theFormat.end > theFormat.plain) {
       c = *theFormat.end;
       *theFormat.end = '\0';	/* temporary end */
-      if (!gscanf(&ptr, theFormat.plain, NULL, isString)) {
+      if (!gscanf(&ptr, theFormat.plain, NULL, isString)
+	  && !theFormat.only_whitespace) {
 	/* text did not match */
 	if (showerrors)
 	  return anaerror("Input did not match explicit text '%s'", 0,
@@ -2682,7 +2685,10 @@ int ana_freadf(int narg, int ps[])
   if (ana_file_open[lun] != 1)
     return cerror(WRITE_ONLY, *ps);
   fp = ana_file[lun];
-  return read_formatted_ascii(narg - 1, &ps[1], (void *) fp, 1, 0) == ANA_ERROR? ANA_ERROR: ANA_OK;
+  if (read_formatted_ascii(narg - 1, &ps[1], (void *) fp, 1, 0) == ANA_ERROR)
+    return anaerror("Error reading file %s", 0, ana_file_name[lun]);
+  else 
+    return ANA_OK;
 }
 /*------------------------------------------------------------------------- */
 int ana_fread(int narg, int ps[])
@@ -2696,6 +2702,7 @@ int ana_fread(int narg, int ps[])
   result = read_formatted_ascii(narg, ps, (void *) stdin, 1, 0);
   switch (result) {
     case ANA_ERROR: case 0:
+      anaerror("Error reading from standard input", 0);
       return ANA_ZERO;
     case 1:
       return ANA_ONE;
@@ -2727,6 +2734,7 @@ int ana_freadf_f(int narg, int ps[])
   result = read_formatted_ascii(narg - 1, &ps[1], (void *) fp, 0, 0);
   switch (result) {
     case ANA_ERROR: case 0:
+      anaerror("Error reading from file %s", 0, ana_file_name[lun]);
       return ANA_ZERO;
     case 1:
       return ANA_ONE;
@@ -3018,7 +3026,7 @@ FILE *fopenr_sym(int nsym)	/* internal utility */
 {
   FILE *fopen(),*fin;
 
-  if (!symbolIsString(nsym)) {
+  if (!symbolIsStringScalar(nsym)) {
     cerror(NEED_STR, nsym); 
     return NULL;
   }
@@ -3045,8 +3053,6 @@ int ck_synch_hd(FILE *fin, fzHead *fh, int *wwflag)
    <stdio.h>: fread(), perror(), printf(), fclose()
  */
 {
-  int	i;
-
   if (fread(fh, 1, 256, fin) != 256)
     perror("fzread in header");
   if (fh->synch_pattern != SYNCH_OK) {
@@ -3132,8 +3138,8 @@ int ana_fzinspect(int narg, int ps[])		/* fzinspect subroutine */
    <sys/stat.h>: stat()
  */
 {
-  int	n, wwflag=0, *q1, i;
-  char	*p, *name;
+  int	wwflag=0, *q1, i;
+  char	*name;
   fzHead	*fh;
   FILE	*fin;
   struct stat statbuf;
@@ -3189,8 +3195,8 @@ int fzhead(int narg, int ps[], int flag) /* fzhead subroutine */
    <stdio.h>: FILE, fopen(), perror(), printf(), fclose()
  */
 {
- int	n, wwflag;
- char	*name, *p;
+ int	wwflag;
+ char	*name;
  fzHead	*fh;
  FILE	*fin;
 
@@ -3252,7 +3258,9 @@ int fzread(int narg, int ps[], int flag) /* fzread subroutine */
     int     tsize, nblocks, bsize;
     byte    slice_size, type; } ch;
  
+#if WORDS_BIGENDIAN
   union { int i;  byte b[4];} lmap;
+#endif
 
 	 /* first arg is the variable to load, second is name of file */
   if (symbol_class(ps[1]) != ANA_STRING)
@@ -3310,10 +3318,8 @@ int fzread(int narg, int ps[], int flag) /* fzread subroutine */
     endian(&ch.tsize, sizeof(int), ANA_LONG);
     endian(&ch.nblocks, sizeof(int), ANA_LONG);
     endian(&ch.bsize, sizeof(int), ANA_LONG);
-#endif
     for (i = 0; i < 4; i++)
       lmap.b[i] = fh->cbytes[i];
-#if WORDS_BIGENDIAN
     endian(&lmap.i, sizeof(int), ANA_LONG);
 #endif
     mq = ch.tsize - 14;
@@ -3425,7 +3431,7 @@ int fzwrite(int narg, int ps[], int flag) /* fzwrite subroutine */
  */
 {
   int	iq, n, nd, j, type, mq, i, sz;
-  char	*name, *p, *q, safe, *safename;
+  char	*name, *p, safe, *safename;
   fzHead	*fh;
   pointer q1, q2;
   FILE	*fout;
@@ -3489,7 +3495,7 @@ int fzwrite(int narg, int ps[], int flag) /* fzwrite subroutine */
     /* NOTE: the first 256 bytes of the first 512-byte block are used */
     /* for other stuff, so only 256 bytes of header text can be */
     /* stored in the first block, and 512 bytes in all subsequent blocks */
-    if (symbolIsString(ps[2]))  /* the header is a string */
+    if (symbolIsStringScalar(ps[2]))  /* the header is a string */
       mq = symbol_memory(ps[2]) - 1; /* don't count final \0 */
     else {
       q2.sp = array_data(ps[2]);
@@ -3505,7 +3511,7 @@ int fzwrite(int narg, int ps[], int flag) /* fzwrite subroutine */
     j = fwrite(fh, 1, 256, fout); /* write the first block until the start */
     if (j != 256)
       goto fzwrite_1;
-    if (symbolIsString(ps[2])) { /* the header is a string */
+    if (symbolIsStringScalar(ps[2])) { /* the header is a string */
       p = string_value(ps[2]);
       if (fwrite(p, 1, mq, fout) != mq) /* write the header */
 	goto fzwrite_1;
@@ -3608,7 +3614,7 @@ int fcwrite(int narg, int ps[], int flag)/* fcwrite subroutine */
  */
 {
  int	iq, n, nd, j, type, i, mq, nx, ny, limit, sz;
- char	*name, *p, *q;
+ char	*name, *p;
  fzHead	*fh;
  pointer q1, q2;
  union { int i;  byte b[4];} lmap;
@@ -3716,7 +3722,7 @@ int fcwrite(int narg, int ps[], int flag)/* fcwrite subroutine */
    /* NOTE: the first 256 bytes of the first 512-byte block are used */
    /* for other stuff, so only 256 bytes of header text can be */
    /* stored in the first block, and 512 bytes in all subsequent blocks */
-   if (symbolIsString(ps[2]))  /* the header is a string */
+   if (symbolIsStringScalar(ps[2]))  /* the header is a string */
      mq = symbol_memory(ps[2]) - 1; /* don't count final \0 */
    else {
      q2.sp = array_data(ps[2]);
@@ -3732,7 +3738,7 @@ int fcwrite(int narg, int ps[], int flag)/* fcwrite subroutine */
    j = fwrite(fh, 1, 256, fout); /* write the first block until the start */
    if (j != 256)
      goto fcwrite_1;
-   if (symbolIsString(ps[2])) { /* the header is a string */
+   if (symbolIsStringScalar(ps[2])) { /* the header is a string */
      p = string_value(ps[2]);
      j = fwrite(p, 1, mq, fout); /* write the header */
      if (j != mq)
@@ -4619,7 +4625,7 @@ int ana_findfile(int narg, int ps[])
   int	ns, result_sym;
 
   /* first argment is a string with the start path */
-  if (!symbolIsString(ps[0]))
+  if (!symbolIsStringScalar(ps[0]))
     return cerror(NEED_STR, ps[0]);
   startpath = string_value(ps[0]);
 
@@ -4627,7 +4633,7 @@ int ana_findfile(int narg, int ps[])
     startpath = current_dir;
 
   /* second is the file name */
-  if (!symbolIsString(ps[1]))
+  if (!symbolIsStringScalar(ps[1]))
     return cerror(NEED_STR, ps[1]);
   fname = string_value(ps[1]);
 
@@ -4655,8 +4661,7 @@ int ana_findfile(int narg, int ps[])
    in POSIX (e.g., linux).  Under POSIX, basic behavior results if
    REG_EXTENDED is *not* selected, so we can define REG_BASIC to be
    equal to zero if it is not already defined.  LS 21sep98 */
-static int	match_flag = 0, recursive_flag = 0, nfiles = 0, max,
-  get_type_flag;
+static int	nfiles = 0, max;
 static char	**p;
 #if HAVE_REGEX_H
 static regex_t	re;
@@ -4964,7 +4969,7 @@ int ana_identify_file(int narg, int ps[])
   FILE	*fp;
   int	type, result;
 
-  if (!symbolIsString(ps[0]))
+  if (!symbolIsStringScalar(ps[0]))
     return cerror(NEED_STR, ps[0]);
   name = string_value(ps[0]);
   fp = fopen(expand_name(name, NULL), "r");
@@ -5220,7 +5225,7 @@ int ana_hex(int narg, int ps[])
   register int	nelem;
   register union types_ptr p1;
   register int	j;
-  int i,k,iq,jq,nd,flag=0;
+  int i,k,iq,jq,flag=0;
   char	*ptr;
 
   fp = stdout;
@@ -5250,7 +5255,6 @@ int ana_hex(int narg, int ps[])
 	if ( sym[iq].spec.array.bstore < 3) fprintf(fp, "%.1s",ptr); else
 	  fprintf(fp, "%s",ptr); flag=1; break;
       case ANA_ARRAY:		/*array case */
-    nd = array_num_dims(iq);
     nelem = array_size(iq);
     ptr = array_data(iq);
     jq = sym[iq].type;
@@ -5511,7 +5515,7 @@ int ana_fits_read_general(int narg, int ps[], int func)/* read fits files */
   }
   if (narg >= 6) {
     mode = mode + 64; 
-    if (!symbolIsString(ps[5]))
+    if (!symbolIsStringScalar(ps[5]))
       return func? ANA_ZERO: cerror(NEED_STR, ps[5]);
     preamble = string_value(ps[5]);
   }
@@ -5552,7 +5556,7 @@ int ana_fits_header_f(int narg, int ps[])/* read fits header */
   }
   if (narg >= 4) {
     mode = mode + 64; 
-    if (!symbolIsString(ps[3]))
+    if (!symbolIsStringScalar(ps[3]))
       return cerror(NEED_STR, ps[3]);
     preamble = string_value(ps[3]);
   }
@@ -5581,7 +5585,7 @@ int ana_fits_xread_f(int narg, int ps[])/* read fits extension and headers */
  }
  if (narg >= 6) {
    mode = mode + 64; 
-   if (!symbolIsString(ps[5]))
+   if (!symbolIsStringScalar(ps[5]))
      return cerror(NEED_STR, ps[5]);
    preamble = string_value(ps[5]);
  }
@@ -5606,10 +5610,10 @@ int fits_read_compressed(int mode, int datasym, FILE *fp, int headersym,
  */
 {
   int	ncbytes, type, ndim, dims[MAX_DIMS], i, nblock, ok, slice, nx, ny,
-    type0, n;
+    type0;
   float	bscale = 0.0, bzero = 0.0, blank = FLT_MAX, min, max;
-  char	*block, usescrat, *curblock, runlength, strip = '\0';
-  pointer	p, q;
+  char	*block, usescrat, *curblock, runlength;
+  pointer	p;
 
   /* header structure:
 
@@ -5717,9 +5721,9 @@ int fits_read_compressed(int mode, int datasym, FILE *fp, int headersym,
   for (i = 7 + ndim; i < 36; i++)
     if (!strncmp(curblock + 80*i, "END      ", 9))
       break;
-    else sscanf(block + i*80, "BSCALE  =%f", &bscale)
-	   || sscanf(block + i*80, "BZERO   =%f", &bzero)
-	   || sscanf(block + i*80, "BLANK   =%f", &blank);
+    else (void) (sscanf(block + i*80, "BSCALE  =%f", &bscale)
+                 || sscanf(block + i*80, "BZERO   =%f", &bzero)
+                 || sscanf(block + i*80, "BLANK   =%f", &blank));
   
   while (i == 36) {
     nblock++;
@@ -5751,9 +5755,9 @@ int fits_read_compressed(int mode, int datasym, FILE *fp, int headersym,
     for (i = 0; i < 36; i++)
       if (!strncmp(curblock + 80*i, "END      ", 9))
 	break;
-      else sscanf(block + i*80, "BSCALE  =%f", &bscale)
-	     || sscanf(block + i*80, "BZERO   =%f", &bzero)
-	     || sscanf(block + i*80, "BLANK   =%f", &blank);
+      else (void) (sscanf(block + i*80, "BSCALE  =%f", &bscale)
+                   || sscanf(block + i*80, "BZERO   =%f", &bzero)
+                   || sscanf(block + i*80, "BLANK   =%f", &blank));
   } /* end of while (i == 36) */
 
   if (!usescrat)
@@ -5924,7 +5928,7 @@ int fits_read(int mode, int dsym, int namsym, int hsym, int offsetsym,
   int	bitpix, type, nlines, end_flag = 0, nhblks, lc, iq, id, new_sym;
   int	maxdim, i, rsym = 1, nbsize, ext_flag=0, data_offset, npreamble;
   int	fits_type, ndim_var, *dim_var, n_ext_rows, nrow_bytes, m;
-  int	xtension_found = 0, xdata_offset, tfields, gcount, row_bytes,
+  int	xtension_found = 0, tfields, gcount, row_bytes,
     dim[MAX_DIMS], type0;
   int	ext_stuff_malloc_flag = 0;
   float	bscale = 0.0, bzero = 0.0, blank = FLT_MAX, min, max;
@@ -6319,7 +6323,6 @@ int fits_read(int mode, int dsym, int namsym, int hsym, int offsetsym,
     
     /* check out */
     /* printf("nhblks = %d, maxdim = %d\n", nhblks, maxdim); */
-    xdata_offset = ext_flag + nhblks * 2880;
     /* for (i=0;i<maxdim;i++) printf("extension: dim%d = %d\n", i, dim[i]); */
     /* compute size of data array */
     nbsize = ana_type_size[type];
@@ -6613,7 +6616,7 @@ int ana_fits_write_general(int narg, int ps[], int func)
 
   if (!symbolIsNumericalArray(ps[0]) || symbolIsComplexArray(ps[0]))
     return func? ANA_ZERO: cerror(ILL_CLASS, ps[0]);
-  if (!symbolIsString(ps[1]))
+  if (!symbolIsStringScalar(ps[1]))
     return func? ANA_ZERO: cerror(ILL_CLASS, ps[1]);
 
   /* the data */
@@ -6627,7 +6630,7 @@ int ana_fits_write_general(int narg, int ps[], int func)
       header.sp = array_data(ps[2]);
       headertype = ANA_STRING_ARRAY;
       nheader = array_size(ps[2]);
-    } else if (symbolIsString(ps[2])) {
+    } else if (symbolIsStringScalar(ps[2])) {
       header.s = string_value(ps[2]);
       headertype = ANA_TEMP_STRING;
     } else return func? ANA_ZERO: cerror(ILL_CLASS, ps[2]);
@@ -6959,7 +6962,7 @@ int ana_filewrite(int narg, int ps[])
    <stdio.h>: FILE, fseek(), perror(), fwrite(), printf()
  */
 {
-  int	iq, lun, type, j, start, num, nd, typesize;
+  int	iq, lun, type, j, start, num, typesize;
   char	*p;
   FILE	*fp;
 
@@ -6987,7 +6990,6 @@ int ana_filewrite(int narg, int ps[])
     case ANA_ARRAY:		/*array case */
       p = (char *) array_data(iq);
       typesize = num = ana_type_size[type];
-      nd = array_num_dims(iq);
       num = array_size(iq);
       break;
     default:

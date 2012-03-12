@@ -2,20 +2,22 @@
 #include "anaparser.h"
 /*#include "anaparser.c.tab.h"*/
 #include "dmalloc.h"
+#include "bindings.h"
 
 extern char		expname[], line[], *curScrat, *currentRoutineName;
 extern word		listStack[],  curContext;
 extern int		scrat[], ana_file_open[], errorSym,
-			internalMode, MSBfirst, suppressMsg;
+			MSBfirst, suppressMsg;
 extern int	ana_type_size[];
 
 extern FILE		*inputStream, *ana_file[];
 extern hashTableEntry	*varHashTable[], *subrHashTable[], *funcHashTable[],
 			*blockHashTable[];
 extern symTableEntry	sym[];
-extern internalRoutine	subroutine[], function[];
+extern internalRoutine	*subroutine, *function;
 extern int		nSubroutine, nFunction, curLineNumber, compileLevel,
-			internalMode, ignoreInput, curSymbol, axisTally[];
+			ignoreInput, curSymbol, axisTally[];
+extern unsigned int     internalMode;
 extern struct boundsStruct	bounds;
 extern int	(*ana_converts[10])(int, int []);
 
@@ -36,14 +38,16 @@ int 	dereferenceScalPointer(int), scalar_scratch(int),
   getNumerical(int, int, int *, pointer *, char, int *, pointer *),
   strccmp(char *, char *), eval(int), evals(int), ana_cdouble(int, int []),
   strncasecmp_p(char *, char *, int), strcasecmp_p(char *, char *),
-  stringpointer(char *, int), routineContext(int),
+  stringpointer(char *, int), routineContext(int), ana_string(int, int []),
   getSimpleNumerical(int, pointer *, int *), double_arg_stat(int, double *),
   numerical(int, int **, int *, int *, pointer *),
+  numerical_or_string(int, int **, int *, int *, pointer *),
   findName(char *, hashTableEntry **, int), to_scalar(int, int),
   to_scratch_array(int, int, int, int *), get_dims(int *, int *, int *),
   listNumElements(int), ana_zero(int, int []),
   cubic_spline_tables(void *, int, int, void *, int, int, int,
-		      byte, csplineInfo *),
+		      byte, csplineInfo *), 
+  numerical_clone(int, enum Symboltype),
   redef_array(int, int, int, int *), string_scratch(int),
   transferAll(int symbol), transfer(int), copySym(int),
   scalar_scratch_copy(int), redef_scalar(int, int, void *),
@@ -54,17 +58,25 @@ int 	dereferenceScalPointer(int), scalar_scratch(int),
 int	standardLoop(int, int, int, int, loopInfo *, pointer *, int *,
 		     loopInfo *, pointer *),
   standardLoop0(int, int, int *, int, int, loopInfo *, pointer *, int *,
-	       loopInfo *, pointer *), advanceLoop(loopInfo *),
-  advanceLoops(loopInfo *, loopInfo *), nextLoop(loopInfo *),
-  dimensionLoopResult(loopInfo *, loopInfo *, int, pointer *),
+		loopInfo *, pointer *), advanceLoop(loopInfo *, pointer *),
+  nextLoop(loopInfo *),
   nextLoops(loopInfo *, loopInfo *),
   prepareDiagonals(int, loopInfo *, int, int **, int **, int **, int **),
-  moveLoop(loopInfo *, int, int);
+  moveLoop(loopInfo *, int, int),
+  standardLoopX(int, int, int, loopInfo *, pointer *, int, int const *,
+                int, int const *, enum Symboltype, int, int *, loopInfo *,
+                pointer *),
+  loopIsAtStart(loopInfo const *), setAxes(loopInfo *, int, int *, int),
+  standard_args(int, int [], char const *, pointer **, loopInfo **);
 
 void	subdataLoop(int *, loopInfo *), addVerify(char *, char),
   *seekFacts(int symbol, int type, int flag),
   *setFacts(int symbol, int type, int flag),
-  deleteFacts(int symbol, int type), returnLoop(loopInfo *, int);
+  deleteFacts(int symbol, int type), returnLoop(loopInfo *, pointer *, int),
+  setAxisMode(loopInfo *, int mode),
+  standard_redef_array(int, enum Symboltype, int, int *, int, int *, pointer *,
+		       loopInfo *);
+void convertWidePointer(wideScalar *, int, int);
 
 void	newStack(int), push(int), deleteStack(void);
 int	pop(void);
@@ -89,8 +101,9 @@ void	clearToPopTempVariable(int), pushTempVariable(int), printw(char *),
 
 const csplineInfo empty_cubic_spline(void);
 
-void	setupDimensionLoop(loopInfo *, int, int [], int, int, int [],
-			   pointer *, int),
+void setupDimensionLoop(loopInfo *info, int ndim, int const *dims, 
+                        enum Symboltype type, int naxes, int const *axes,
+                        pointer *data, int mode),
   rearrangeDimensionLoop(loopInfo *), endian(void *, int, int),
   rearrangeEdgeLoop(loopInfo *, loopInfo *, int);
 
@@ -99,7 +112,7 @@ double	double_arg(int), cspline_value(double, csplineInfo *),
 	find_cspline_value(double, double, double, csplineInfo *),
 	cspline_derivative(double, csplineInfo *),
   cspline_second_derivative(double, csplineInfo *), famod(double,double),
-  fasmod(double,double);
+  fasmod(double,double), vhypot(int, double, double, ...), hypota(int, double *);
 int iamod(int,int), iasmod(int,int);
 FILE	*openPathFile(char *, int);
 

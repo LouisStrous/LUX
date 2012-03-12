@@ -36,11 +36,11 @@ int read_jpeg6b(int narg, int ps[], int isFunc)
   struct jpeg_decompress_struct	cinfo;
   struct my_error_mgr		jerr;
   FILE	*infile;
-  int	result, dims[3], i, stride, n;
+  int	dims[3], i, stride, n;
   JSAMPROW	row_pointer[1];	/* pointer to a single row */
   JSAMPLE	*image;
 
-  if (!symbolIsString(ps[1]))
+  if (!symbolIsStringScalar(ps[1]))
     return isFunc? ANA_ERROR: cerror(NEED_STR, ps[1]);
   filename = string_value(ps[1]);
   if (!(infile = fopen(filename, "rb")))
@@ -166,7 +166,7 @@ int ana_read_jpeg6b_f(int narg, int ps[])
 int write_jpeg6b(int narg, int ps[], int isFunc)
 /* JWRITE,<x>,<file>[,<header>,<quality>] */
 {
-  int	nx, ny, i, nd, quality, stride;
+  int	nx, ny, nd, quality, stride;
   struct jpeg_compress_struct	cinfo;
   struct my_error_mgr		jerr;
   FILE	*outfile;
@@ -188,13 +188,13 @@ int write_jpeg6b(int narg, int ps[], int isFunc)
   ny = array_dims(ps[0])[1 + (nd == 3)];
 
   if (narg > 2 && ps[2]) {	/* have a <header> */
-    if (!symbolIsString(ps[2]))
+    if (!symbolIsStringScalar(ps[2]))
       return isFunc? ANA_ERROR: cerror(NEED_STR, ps[2]);
     header = string_value(ps[2]);
   } else
     header = NULL;
 
-  if (!symbolIsString(ps[1]))
+  if (!symbolIsStringScalar(ps[1]))
     return isFunc? ANA_ERROR: cerror(NEED_STR, ps[1]);
   outfile = fopen(string_value(ps[1]), "wb");
   if (!outfile)

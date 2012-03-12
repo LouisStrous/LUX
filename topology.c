@@ -261,7 +261,7 @@ int segment_general(int narg, int ps[])
       rearrangeEdgeLoop(&trgtinfo, NULL, i);
       do
 	*trgt.l = 0;
-      while (advanceLoop(&trgtinfo) < trgtinfo.ndim - 1);
+      while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.ndim - 1);
     }
   }
 
@@ -288,7 +288,8 @@ int segment_general(int narg, int ps[])
 	      break;
 	  }
 	  *trgt.l = (j == n);
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.ndim);
+	} while (advanceLoop(&trgtinfo, &trgt), 
+		 advanceLoop(&srcinfo, &src) < srcinfo.ndim);
 	break;
       case ANA_WORD:
 	do {
@@ -301,7 +302,8 @@ int segment_general(int narg, int ps[])
 	      break;
 	  }
 	  *trgt.l = (j == n);
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.ndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.ndim);
 	break;
       case ANA_LONG:
 	do {
@@ -314,7 +316,8 @@ int segment_general(int narg, int ps[])
 	      break;
 	  }
 	  *trgt.l = (j == n);
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.ndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.ndim);
 	break;
       case ANA_FLOAT:
 	do {
@@ -327,7 +330,8 @@ int segment_general(int narg, int ps[])
 	      break;
 	  }
 	  *trgt.l = (j == n);
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.ndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.ndim);
 	break;
       case ANA_DOUBLE:
 	do {
@@ -340,7 +344,8 @@ int segment_general(int narg, int ps[])
 	      break;
 	  }
 	  *trgt.l = (j == n);
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.ndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.ndim);
 	break;
     } else 				/* general case - a bit slower */
       switch (array_type(ps[0])) {
@@ -362,7 +367,8 @@ int segment_general(int narg, int ps[])
 	      }
 	    }
 	    *trgt.l = nok;
-	  } while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.ndim);
+	  } while (advanceLoop(&trgtinfo, &trgt),
+		   advanceLoop(&srcinfo, &src) < srcinfo.ndim);
 	  break;
 	case ANA_WORD:
 	  do {
@@ -382,7 +388,8 @@ int segment_general(int narg, int ps[])
 	      }
 	    }
 	    *trgt.l = nok;
-	  } while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.ndim);
+	  } while (advanceLoop(&trgtinfo, &trgt),
+		   advanceLoop(&srcinfo, &src) < srcinfo.ndim);
 	  break;
 	case ANA_LONG:
 	  do {
@@ -402,7 +409,8 @@ int segment_general(int narg, int ps[])
 	      }
 	    }
 	    *trgt.l = nok;
-	  } while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.ndim);
+	  } while (advanceLoop(&trgtinfo, &trgt),
+		   advanceLoop(&srcinfo, &src) < srcinfo.ndim);
 	  break;
 	case ANA_FLOAT:
 	  do {
@@ -422,7 +430,8 @@ int segment_general(int narg, int ps[])
 	      }
 	    }
 	    *trgt.l = nok;
-	  } while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.ndim);
+	  } while (advanceLoop(&trgtinfo, &trgt),
+		   advanceLoop(&srcinfo, &src) < srcinfo.ndim);
 	  break;
 	case ANA_DOUBLE:
 	  do {
@@ -442,7 +451,8 @@ int segment_general(int narg, int ps[])
 	      }
 	    }
 	    *trgt.l = nok;
-	  } while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.ndim);
+	  } while (advanceLoop(&trgtinfo, &trgt),
+		   advanceLoop(&srcinfo, &src) < srcinfo.ndim);
 	  break;
       }
   
@@ -1211,7 +1221,7 @@ int area_general(int narg, int ps[], int isFunction)
  LS 17jun98, 5sep98 */
 {
   int	iq, *dims, ndim, nelem, nSeed, nNumber, nDirection, *seed, *number,
-    i, ndo, *rcoord, *offset, j, nStack, **stack, **stack0, areaNumber,
+    i, *rcoord, *offset, j, nStack, **stack, **stack0, areaNumber,
     direction, *edge;
   int	*ptr0, *ptr, *ptrend, **stackend, *ptr1, onEdge, ix, ix2, *ptr2;
   pointer	src;
@@ -1257,7 +1267,6 @@ int area_general(int narg, int ps[], int isFunction)
 
   nelem = array_size(ps[0]);	/* number of elements in array */
   if (nSeed) {
-    ndo = nSeed;		/* number of positions to treat */
     for (i = 0; i < nSeed; i++)
       if (seed[i] < 0 || seed[i] >= nelem) { /* check if in range */
 	free(offset);
@@ -1265,8 +1274,7 @@ int area_general(int narg, int ps[], int isFunction)
 	return anaerror("Seed position %1d (index %1d) outside of the data",
 		     seed[i], i);
       }
-  } else
-    ndo = nelem;		/* treat all elements */
+  }
   
   /* treat all elements that are on an edge: if they are equal to 1, then
      set them to EDGE */
@@ -1276,7 +1284,7 @@ int area_general(int narg, int ps[], int isFunction)
       do
 	if (*src.l == 1)
 	  *src.l = EDGE;
-      while (advanceLoop(&srcinfo) < srcinfo.ndim - 1);
+      while (advanceLoop(&srcinfo, &src) < srcinfo.ndim - 1);
     }
   }
   free(edge);
@@ -1898,7 +1906,7 @@ int area2_general(int narg, int ps[])
  LS 17jun98, 5sep98 */
 {
   int	iq, *dims, ndim, nelem, nSeed, nNumber, nDirection, *seed, *number,
-    i, ndo, *rcoord, *offset, j, nStack, **stack, **stack0, areaNumber,
+    i, *rcoord, *offset, j, nStack, **stack, **stack0, areaNumber,
     direction, stride, maximum, type, *edge;
   int	*ptr0, *ptr, *ptrend, **stackend, *ptr1, onEdge, ix, ix2, *ptr2;
   pointer	src, dataptr0, dataptr, dataptr2;
@@ -1935,13 +1943,11 @@ int area2_general(int narg, int ps[])
 
   nelem = array_size(ps[0]);
   if (nSeed) {
-    ndo = nSeed;		/* number of positions to treat */
     for (i = 0; i < nSeed; i++)
       if (seed[i] < 0 || seed[i] >= nelem) /* check if in range */
 	return anaerror("Seed position %1d (index %1d) outside of the data",
 		     ps[2], seed[i], i);
-  } else
-    ndo = nelem;		/* treat all elements */
+  }
 
   number = NULL;		/* default: no <number> */
   if (narg > 3 && ps[3]) {	/* have <number> */
@@ -1969,7 +1975,7 @@ int area2_general(int narg, int ps[])
     do {
       if (*src.l == 1)
 	*src.l = EDGE;
-    } while (advanceLoop(&srcinfo) < srcinfo.rndim - 1);
+    } while (advanceLoop(&srcinfo, &src) < srcinfo.rndim - 1);
   }
   free(edge);
 
@@ -1997,6 +2003,7 @@ int area2_general(int narg, int ps[])
   stackend = stack0 + nStack;
 
   ndim = srcinfo.rndim;
+  dims = srcinfo.dims;
 
   ptr1 = ptr0;
   do {				/* still more to do */
@@ -2523,7 +2530,7 @@ int ana_basin2(int narg, int ps[])
 {
   int	result, mode, n, i, j, k, *offsets, *rcoords, edge = 0,
     mini, loc[3], nel, label = 0, sign, maxi = 0;
-  pointer	src, trgt, src0, trgt0;
+  pointer	src, trgt, trgt0;
   scalar	min[3], max[3];
   extern struct boundsStruct	bounds;
   loopInfo	srcinfo, trgtinfo;
@@ -2541,7 +2548,6 @@ int ana_basin2(int narg, int ps[])
 		   &srcinfo, &src, &result, &trgtinfo, &trgt) < 0)
     return ANA_ERROR;
   trgt0 = trgt;
-  src0 = src;
   nel = array_size(ps[0]);
   
   if (narg > 1 && ps[1]) {	/* SIGN */
@@ -2711,7 +2717,8 @@ int ana_basin2(int narg, int ps[])
 	}
 	/* now min[mini].b is the lowest value */
 	*trgt.l = -loc[mini] - n*mini;
-      } while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+      } while (advanceLoop(&trgtinfo, &trgt),
+	       advanceLoop(&srcinfo, &src) < srcinfo.rndim);
       break;
     case ANA_WORD:
       min[0].w = min[1].w = bounds.max.w;
@@ -2825,7 +2832,8 @@ int ana_basin2(int narg, int ps[])
 	}
 	/* now min[mini].w is the lowest value */
 	*trgt.l = -loc[mini] - n*mini;
-      } while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+      } while (advanceLoop(&trgtinfo, &trgt),
+	       advanceLoop(&srcinfo, &src) < srcinfo.rndim);
       break;
     case ANA_LONG:
       min[0].l = min[1].l = bounds.max.l;
@@ -2939,7 +2947,8 @@ int ana_basin2(int narg, int ps[])
 	}
 	/* now min[mini].l is the lowest value */
 	*trgt.l = -loc[mini] - n*mini;
-      } while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+      } while (advanceLoop(&trgtinfo, &trgt),
+	       advanceLoop(&srcinfo, &src) < srcinfo.rndim);
       break;
     case ANA_FLOAT:
       min[0].f = min[1].f = bounds.max.f;
@@ -3053,7 +3062,8 @@ int ana_basin2(int narg, int ps[])
 	}
 	/* now min[mini].f is the lowest value */
 	*trgt.l = -loc[mini] - n*mini;
-      } while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+      } while (advanceLoop(&trgtinfo, &trgt),
+	       advanceLoop(&srcinfo, &src) < srcinfo.rndim);
       break;
     case ANA_DOUBLE:
       min[0].d = min[1].d = bounds.max.d;
@@ -3167,7 +3177,8 @@ int ana_basin2(int narg, int ps[])
 	}
 	/* now min[mini].d is the lowest value */
 	*trgt.l = -loc[mini] - n*mini;
-      } while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+      } while (advanceLoop(&trgtinfo, &trgt),
+	       advanceLoop(&srcinfo, &src) < srcinfo.rndim);
       break;
 
     case ANA_BYTE | 0x20:
@@ -3282,7 +3293,8 @@ int ana_basin2(int narg, int ps[])
 	}
 	/* now max[maxi].b is the highest value */
 	*trgt.l = -loc[maxi] - n*maxi;
-      } while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+      } while (advanceLoop(&trgtinfo, &trgt),
+	       advanceLoop(&srcinfo, &src) < srcinfo.rndim);
       break;
     case ANA_WORD | 0x20:
       max[0].w = max[1].w = bounds.min.w;
@@ -3396,7 +3408,8 @@ int ana_basin2(int narg, int ps[])
 	}
 	/* now max[maxi].w is the highest value */
 	*trgt.l = -loc[maxi] - n*maxi;
-      } while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+      } while (advanceLoop(&trgtinfo, &trgt),
+	       advanceLoop(&srcinfo, &src) < srcinfo.rndim);
       break;
     case ANA_LONG | 0x20:
       max[0].l = max[1].l = bounds.min.l;
@@ -3510,7 +3523,8 @@ int ana_basin2(int narg, int ps[])
 	}
 	/* now max[maxi].l is the highest value */
 	*trgt.l = -loc[maxi] - n*maxi;
-      } while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+      } while (advanceLoop(&trgtinfo, &trgt),
+	       advanceLoop(&srcinfo, &src) < srcinfo.rndim);
       break;
     case ANA_FLOAT | 0x20:
       max[0].f = max[1].f = bounds.min.f;
@@ -3624,7 +3638,8 @@ int ana_basin2(int narg, int ps[])
 	}
 	/* now max[maxi].f is the highest value */
 	*trgt.l = -loc[maxi] - n*maxi;
-      } while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+      } while (advanceLoop(&trgtinfo, &trgt),
+	       advanceLoop(&srcinfo, &src) < srcinfo.rndim);
       break;
     case ANA_DOUBLE | 0x20:
       max[0].d = max[1].d = bounds.min.d;
@@ -3738,7 +3753,8 @@ int ana_basin2(int narg, int ps[])
 	}
 	/* now max[maxi].d is the highest value */
 	*trgt.l = -loc[maxi] - n*maxi;
-      } while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+      } while (advanceLoop(&trgtinfo, &trgt),
+	       advanceLoop(&srcinfo, &src) < srcinfo.rndim);
       break;
   }
 
@@ -3956,7 +3972,8 @@ int ana_extreme_general(int narg, int ps[])
 	    *trgt.b++ = 0;		/* right edge */
 	    src.b++;
 	  }
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.ndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.ndim);
 	break;
       case ANA_WORD:
 	do {
@@ -3985,7 +4002,8 @@ int ana_extreme_general(int narg, int ps[])
 	    *trgt.b++ = 0;		/* right edge */
 	    src.w++;
 	  }
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.ndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.ndim);
 	break;
       case ANA_LONG:
 	do {
@@ -4014,7 +4032,8 @@ int ana_extreme_general(int narg, int ps[])
 	    *trgt.b++ = 0;		/* right edge */
 	    src.l++;
 	  }
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.ndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.ndim);
 	break;
       case ANA_FLOAT:
 	do {
@@ -4043,7 +4062,8 @@ int ana_extreme_general(int narg, int ps[])
 	    *trgt.b++ = 0;		/* right edge */
 	    src.f++;
 	  }
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.ndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.ndim);
 	break;
       case ANA_DOUBLE:
 	do {
@@ -4072,7 +4092,8 @@ int ana_extreme_general(int narg, int ps[])
 	    *trgt.b++ = 0;		/* right edge */
 	    src.d++;
 	  }
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.ndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.ndim);
 	break;
     } else 				/* general case - a bit slower */
       switch (array_type(ps[0])) {
@@ -4111,7 +4132,8 @@ int ana_extreme_general(int narg, int ps[])
 		src.b++;
 	      }
 	    }
-	  } while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.ndim);
+	  } while (advanceLoop(&trgtinfo, &trgt),
+		   advanceLoop(&srcinfo, &src) < srcinfo.ndim);
 	  break;
 	case ANA_WORD:
 	  do {
@@ -4148,7 +4170,8 @@ int ana_extreme_general(int narg, int ps[])
 		src.w++;
 	      }
 	    }
-	  } while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.ndim);
+	  } while (advanceLoop(&trgtinfo, &trgt),
+		   advanceLoop(&srcinfo, &src) < srcinfo.ndim);
 	  break;
 	case ANA_LONG:
 	  do {
@@ -4185,7 +4208,8 @@ int ana_extreme_general(int narg, int ps[])
 		src.l++;
 	      }
 	    }
-	  } while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.ndim);
+	  } while (advanceLoop(&trgtinfo, &trgt),
+		   advanceLoop(&srcinfo, &src) < srcinfo.ndim);
 	  break;
 	case ANA_FLOAT:
 	  do {
@@ -4222,7 +4246,8 @@ int ana_extreme_general(int narg, int ps[])
 		src.f++;
 	      }
 	    }
-	  } while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.ndim);
+	  } while (advanceLoop(&trgtinfo, &trgt),
+		   advanceLoop(&srcinfo, &src) < srcinfo.ndim);
 	  break;
 	case ANA_DOUBLE:
 	  do {
@@ -4259,7 +4284,8 @@ int ana_extreme_general(int narg, int ps[])
 		src.d++;
 	      }
 	    }
-	  } while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.ndim);
+	  } while (advanceLoop(&trgtinfo, &trgt),
+		   advanceLoop(&srcinfo, &src) < srcinfo.ndim);
 	  break;
       }
 

@@ -19,7 +19,7 @@
 
 	/* symbol classes */
 
-enum classes { 
+enum Symbolclass { 
   ANA_UNUSED = 0,		/* 0: not used */
   ANA_SCALAR,			/* 1: real scalar 17 */
   ANA_STRING,			/* 2: string 'xx' */
@@ -68,7 +68,7 @@ enum classes {
 /* might not work properly if you do. */
 
 	/* symbol types */
-enum types {
+enum Symboltype {
   ANA_BYTE,			/* 0: 1-byte integers */
   ANA_WORD,			/* 1: 2-byte integers */
   ANA_LONG,			/* 2: 4-byte integers */
@@ -78,7 +78,8 @@ enum types {
   ANA_LSTRING,			/* 6: literal strings */
   ANA_STRING_ARRAY,		/* 7: string arrays */
   ANA_CFLOAT,			/* 8: 8-byte complex floats */
-  ANA_CDOUBLE			/* 9: 16-byte complex floats */
+  ANA_CDOUBLE,			/* 9: 16-byte complex floats */
+  ANA_NO_SYMBOLTYPE,
 };
 
 	/* ANA_EVB classes */
@@ -324,27 +325,27 @@ enum binaryOps {
 #define GN_EXACT	4	/* output exactly <minType> */
 
 /* startStandardLoop() stuff */
-#define SL_SAMEDIMS	0	/* output needs same dimensions as input */
-#define SL_COMPRESS	1	/* output lacks first dimension from axis */
-#define SL_COMPRESSALL	2	/* output lacks all dimensions from axis */
+#define SL_SAMEDIMS	0	/* 0x0 output needs same dimensions as input */
+#define SL_COMPRESS	1	/* 0x1 output lacks first dimension from axis */
+#define SL_COMPRESSALL	2	/* 0x2 output lacks all dimensions from axis */
 
-#define SL_EXACT	0*(1<<2) /* output type is exactly as specified */
-#define SL_UPGRADE	1*(1<<2) /* output type is upgraded if necessary */
-#define SL_KEEPTYPE	2*(1<<2) /* output type equal to input type */
+#define SL_EXACT	0*(1<<2) /* 0x0 output type is exactly as specified */
+#define SL_UPGRADE	1*(1<<2) /* 0x4 output type is upgraded if necessary */
+#define SL_KEEPTYPE	2*(1<<2) /* 0x8 output type equal to input type */
 
-#define SL_EACHCOORD	0*(1<<4) /* need all coordinates */
-#define SL_AXISCOORD	(1<<4)	/* need only coordinate along specified axis */
-#define SL_EACHROW	(1<<5)	/* treat row by row */
-#define SL_UNIQUEAXES	(1<<6)	/* all axes must be unique */
-#define SL_ONEAXIS	(1<<7)	/* at most one axis */
-#define SL_AXESBLOCK	((1<<8) | SL_UNIQUEAXES) /* treat selected axes
+#define SL_EACHCOORD	0*(1<<4) /* 0x0 need all coordinates */
+#define SL_AXISCOORD	(1<<4)	/* 0x10 need only coordinate along specified axis */
+#define SL_EACHROW	(1<<5)	/* 0x20 treat row by row */
+#define SL_UNIQUEAXES	(1<<6)	/* 0x40 all axes must be unique */
+#define SL_ONEAXIS	(1<<7)	/* 0x80 at most one axis */
+#define SL_AXESBLOCK	((1<<8) | SL_UNIQUEAXES) /* 0x140 treat selected axes
 				   as a block, includes SL_UNIQUEAXES */
-#define SL_ONEDIMS	(1<<9)	/* "compressed" dimensions replaced by 1s */
-#define SL_SRCUPGRADE	(1<<10)	/* upgrade source data type if necessary */
-#define SL_NEGONED	(1<<11)	/* negative axis argument -> treat as 1D */
-#define SL_EACHBLOCK	((1<<12) | SL_AXESBLOCK) /* treat all axes at once */
-#define SL_ALLAXES	(1<<13)	/* select all axes for treatment */
-#define SL_TAKEONED	(1<<14)	/* treat ax 1D array */
+#define SL_ONEDIMS	(1<<9)	/* 0x200 "compressed" dimensions replaced by 1s */
+#define SL_SRCUPGRADE	(1<<10)	/* 0x400 upgrade source data type if necessary */
+#define SL_NEGONED	(1<<11)	/* 0x800 negative axis argument -> treat as 1D */
+#define SL_EACHBLOCK	((1<<12) | SL_AXESBLOCK) /* 0x1140 treat all axes at once */
+#define SL_ALLAXES	(1<<13)	/* 0x2000 select all axes for treatment */
+#define SL_TAKEONED	(1<<14)	/* 0x4000 treat ax 1D array */
 
 /* stringpointer() stuff */
 #define SP_VAR		1
@@ -591,7 +592,7 @@ typedef struct {
   int axisindex;		/* index to current axis (in axes[]) */
   int mode;			/* desired treatment modes */
   int stride;			/* bytes per data element */
-  int type;			/* data type */
+  enum Symboltype type;         /* data type */
   int advanceaxis;		/* how many axes not to advance (from start) */
   int raxes[MAX_DIMS];		/* from rearranged to old axes */
   int iraxes[MAX_DIMS];		/* from old to rearranged axes */
@@ -633,6 +634,7 @@ typedef struct {
   char	*group_start[MAXFMT];	/* current group starts */
   char	save1;			/* for temporary storage  */
   char	save2;			/* for temporary storage */
+  char  only_whitespace;	/* whitespace only? */
 } formatInfo;
 
 /* for breakpoints: */

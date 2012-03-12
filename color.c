@@ -864,7 +864,7 @@ int threecolors(float *list, int n)
    LS 12nov98 */
 {
   float	factor, tlist[9], off[3], fac[3];
-  int	i, j, second, third;
+  int	i, j;
 
   switch (n) {
     case 0:			/* uninstall */
@@ -938,7 +938,6 @@ int threecolors(float *list, int n)
 	fac[j] = -tlist[j + 3]*factor;
 	off[j] = (1 + tlist[j + 3])*65535.0 - i*fac[j];
       }
-    second = i;
     for ( ; i < 2*(nColors/3); i++) {
       colors[i].red = i*fac[0] + off[0];
       colors[i].green = i*fac[1] + off[1];
@@ -953,7 +952,6 @@ int threecolors(float *list, int n)
 	fac[j] = -tlist[j + 6]*factor;
 	off[j] = (1 + tlist[j + 6])*65535.0 - i*fac[j];
       }
-    third = i;
     for ( ; i < 3*(nColors/3); i++) {
       colors[i].red = i*fac[0] + off[0];
       colors[i].green = i*fac[1] + off[1];
@@ -1072,6 +1070,8 @@ int ana_pixelsto8bit(int narg, int ps[])
   */
 {
   int result, ncolors, iq;
+  int ana_tolookup(int, int *);
+  int ana_byte_inplace(int, int *);
 
   if (!symbolIsNumericalArray(ps[0]))
     return cerror(ILL_CLASS, ps[0]);

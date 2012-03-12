@@ -54,41 +54,50 @@
 #include <math.h>
 #include <stdlib.h>
 #include <float.h>
+#include <assert.h>
+#include <time.h>
 #include "action.h"
 #include "astron.h"
 #include "astrodat2.h"
 #include "astrodat3.h"
+#include "calendar.h"
+#include "vsop.h"
 /* #include "astrodat.h" */
 static char rcsid[] __attribute__ ((unused)) =
  "$Id: astron.c,v 4.0 2001/02/07 20:36:57 strous Exp $";
 
-#define extractbits(value, base, bits) ((value >> base) & ((1 << bits) - 1))
+#define extractbits(value, base, bits) (((value) >> (base)) & ((1 << (bits)) - 1))
 
-#define S_ECLIPTICAL	1
-#define S_EQUATORIAL	2
-#define S_HORIZONTAL	3
-#define S_ELONGATION	4
-#define S_COORDS	7
-#define S_XYZ		(1<<3)
-#define S_FAST		(1<<4)
-#define S_DATE		(1<<5)
-#define S_TDT		(1<<6)
-#define S_ERROR		(1<<7)
-#define S_ABBERATION	(1<<8)
-#define S_GEOMETRIC	(1<<9)
-#define S_QELEMENTS	(1<<10)
-#define S_FK5		(1<<11)
-#define S_TRUNCATEVSOP  (1<<12)
-#define S_CONJSPREAD    (1<<13)
-#define S_PLANETOCENTRIC (1<<14)
-#define S_KEEPDIMS	(1<<15)
-#define S_VOCAL         (1<<16)
-#define AUtoJD		((149.59787e9/299792458)/86400)
+#define S_ECLIPTICAL	(1)
+#define S_EQUATORIAL	(2)
+#define S_HORIZONTAL	(3)
+#define S_ELONGATION	(4)
+#define S_COORDS	(7)
+#define S_XYZ		(1<<3) // 8
+#define S_LIGHTTIME	(1<<4) // 16
+#define S_DATE		(1<<5) // 32
+#define S_TDT		(1<<6) // 64
+#define S_ABERRATION	(1<<8) // 256
+#define S_NUTATION	(1<<9) // 512
+#define S_QELEMENTS	(1<<10) // 1024
+#define S_FK5		(1<<11) // 2048
+#define S_TRUNCATEVSOP  (1<<12) // 4096
+#define S_CONJSPREAD    (1<<13) // 8192
+#define S_PLANETOCENTRIC (1<<14) // 16384
+#define S_KEEPDIMS	(1<<15) // 32768
+#define S_VOCAL         (1<<16) // 65536
+#define S_VSOP87A       (0)
+#define S_VSOP87C       (1<<17) // 131072
+#define S_VSOP          (S_VSOP87A|S_VSOP87C)
+#define S_BARE          (1<<18) // 262144
+#define AUtoJD		((149.597870691e9/299792458)/86400)
 #define NOBJECTS	9
 
 #define EARTH		3
 
 int	findint(int, int *, int);
+void	UTC_to_TAI(double *), TAI_to_UTC(double *);
+void	CJDLT_to_TAI(double *), TAI_to_CJDLT(double *);
 
 char *GregorianMonths[] = {
   "January", "February", "March", "April", "May", "June", "July",
@@ -206,11 +215,21 @@ static char	haveExtraElements;
 extern int getAstronError;
 extern int fullVSOP;
 
+void LBRtoXYZ(double *pos, double *pos2),
+  XYZtoLBR(double *, double *),
+  XYZ_eclipticPrecession(double *pos, double equinox1, double equinox2);
+
 int idiv(int x, int y)
      /* returns the largest integer n such that x >= y*n */
 {
   return (int) floor(((float) x)/y);
 }
+
+void printXYZtoLBR(double *xyz);
+void printLBRtoXYZ(double *lbr);
+void printHBRtoXYZ(double *lbr);
+void showraddms(char *prefix, double x);
+void showradhms(char *prefix, double x);
 
 #define TAI_to_TT(jd)	(*(jd) += 32.184/86400)
 #define TT_to_TAI(jd)	(*(jd) -= 32.184/86400)
@@ -317,250 +336,74 @@ double JDtoLunar(double JD)
   return k;
 }
 /*--------------------------------------------------------------------------*/
-double JulianDate(int year, int month, double day, int calendar)
-/* the Julian Date at the given date.  "calendar" indicates the
-   calendar that year, month, and date are in.  possible values
-   for calendar:  CAL_GREGORIAN (Gregorian, started 15 October 1582) 
-   [ES12.92-1,Fliegel&Van_Flandern1968]; CAL_ISLAMIC (civil calendar)
-   [ES12.93-1,Fliegel&Van_Flandern1968]; CAL_JULIAN (Julian proleptic
-   calendar) [ES12.95,Fliegel1990].  The Julian Date is returned in
-   the same time base as its arguments (TAI, UTC, TT, or something else
-   altogether) */
+int DatetoCJDN(int year, int month, int day, int calendar)
+/* Calculated the Chronological Julian Day Number at the given
+   calendar date.  "calendar" indicates the calendar that year, month,
+   and date are in.  possible values for calendar: CAL_GREGORIAN
+   (Gregorian, started 15 October 1582); CAL_ISLAMIC (civil calendar);
+   CAL_JULIAN (Julian proleptic calendar). */
 {
-  int	i;
-  double	hebrewToJulian(int, int, double);
+  static int (*f[])(int, int, int) =
+    { NULL, CommontoCJDN, GregoriantoCJDN, IslamictoCJDN,
+      JuliantoCJDN, HebrewtoCJDN, EgyptiantoCJDN };
 
-  switch (calendar) {
-    case CAL_GREGORIAN: case CAL_COMMON:
-      if (month < 1 || month > 12) {
-	int n;
-
-	n = idiv(month-1,12);
-	year += n;
-	month -= 12*n;
-      }
-      if (calendar == CAL_COMMON)
-	calendar = (year < 1582 || (year == 1582 && (month < 10
-                   || (month == 10 && day < 15))))? CAL_JULIAN: CAL_GREGORIAN;
-      if (calendar == CAL_GREGORIAN)
-	return idiv(1461*(year + (month - 14)/12),4)
-	  + (367*(month - 2 - 12*((month - 14)/12)))/12
-	  - idiv(3*idiv(year + 100 + (month - 14)/12,100),4) + day + 1721088.5;
-    case CAL_JULIAN:
-      if (month < 1 || month > 12) {
-	int n;
-
-	n = idiv(month-1,12);
-	year += n;
-	month -= 12*n;
-      }
-      /*      return 367*year - (7*(year + 5001 + (month - 9)/7))/4 + (275*month)/9
-	      + day + 1729776.5; */
-      return 367*year - idiv(7*(year + 1 + (month - 9)/7),4) + (275*month)/9
-	+ day + 1721026.5;
-    case CAL_ISLAMIC:
-      if (month < 1 || month > 12) {
-	int n;
-
-	n = idiv(month - 1, 12);
-	year += n;
-	month -= 12*n;
-      }
-      return idiv(11*year + 3, 30) + 354*year + 30*month - (month - 1)/2
-	+ day + 1948440 - 385.5;
-    case CAL_HEBREW:
-      if (month < 1 || month > 12)
-	return
-	  anaerror("Month number %1d is not valid in the Hebrew calendar"
-		" (1-12)", 0, month);
-      return hebrewToJulian(year, month, day);
-    case CAL_EGYPTIAN:		/* Era of Nabonassar
-	(1 Thoth, year 1 = 26 February, 747 BC = JD 1448272.5) */
-      /* era of Philippos (since the death of Alexander) = 425 Nabonassar
-	 era of Hadrian = 864 Nabonassar
-	 era of Antoninus = 885 Nabonassar */
-      return 365*year + 30*month + day + 1448241.5;
-  }
-  return 0;
+  if (calendar < 0 || calendar >= sizeof(f)/sizeof(*f)
+      || !f[calendar])
+    return 0;
+  
+  return f[calendar](year, month, day);
 }
 /*--------------------------------------------------------------------------*/
-void JDtoDate(double JD, int *year, int *month, double *day, int calendar)
+double DatetoCJD(int year, int month, double day, int calendar)
+/* Calculates the Chronological Julian Date at the given date.
+   "calendar" indicates the calendar that year, month, and date are
+   in.  possible values for calendar: CAL_GREGORIAN (Gregorian,
+   started 15 October 1582); CAL_ISLAMIC (civil calendar); CAL_JULIAN
+   (Julian proleptic calendar).  The Chronological Julian Date is
+   returned in the same time base as its arguments (TAI, UTC, TT, or
+   something else altogether) */
+{
+  static double (*f[])(int, int, double) =
+    { NULL, CommontoCJD, GregoriantoCJD, IslamictoCJD,
+      JuliantoCJD, HebrewtoCJD, EgyptiantoCJD };
+
+  if (calendar < 0 || calendar >= sizeof(f)/sizeof(*f)
+      || !f[calendar])
+    return 0.0;
+  
+  return f[calendar](year, month, day);
+}
+/*--------------------------------------------------------------------------*/
+void CJDNtoDate(int CJDN, int *year, int *month, int *day, int calendar)
      /* returns the date corresponding to Julian Date JD. */
      /* possible values for calendar (see JulianDate): CAL_GREGORIAN, */
      /* CAL_ISLAMIC, CAL_JULIAN, CAL_HEBREW, CAL_EGYPTIAN, CAL_COMMON */
 {
-  int	jd, l, n, i, j, d, k;
+  static void (*f[])(int, int *, int *, int *) =
+    { CJDNtoCommon, CJDNtoGregorian, CJDNtoIslamic,
+      CJDNtoJulian, CJDNtoHebrew, CJDNtoEgyptian };
 
-  jd = (int) (JD + 0.5);	/* get Julian Day Number */
-  if (jd > JD + 0.5)
-    jd--;
-  if (calendar == CAL_COMMON)
-    calendar = (JD < 2299160.5)? CAL_JULIAN: CAL_GREGORIAN;
-  switch (calendar) {
-    case CAL_GREGORIAN:
-      l = jd + 68569;
-      n = idiv(4*l,146097);
-      l = l - idiv(146097*n + 3,4);
-      i = (4000*(l + 1))/1461001;
-      l = l - (1461*i)/4 + 31;
-      j = (80*l)/2447;
-      d = l - (2447*j)/80;
-      l = j/11;
-      *month = j + 2 - 12*l;
-      *year = 100*(n - 49) + i + l;
-      *day = d + JD + 0.5 - jd;
-      break;
-    case CAL_HEBREW:
-      JDtoHebrew(JD, year, month, day);
-      break;
-    case CAL_ISLAMIC:
-      l = jd - 1948440 + 10632;
-      n = idiv(l - 1,10631);
-      l = l - 10631*n + 354;
-      j = ((10985 - l)/5316)*((50*l)/17719) + (l/5670)*((43*l)/15238);
-      l = l - ((30 - j)/15)*((17719*j)/50) - (j/16)*((15238*j)/43) + 29;
-      *month = (24*l)/709;
-      d = l - (709* *month)/24;
-      *year = 30*n + j - 30;
-      *day = d + JD + 0.5 - jd;
-      break;
-    case CAL_JULIAN:
-      j = jd + 1402;
-      k = idiv(j - 1,1461);
-      l = j - 1461*k;
-      n = (l - 1)/365 - l/1461;
-      i = l - 365*n + 30;
-      j = (80*i)/2447;
-      *day = i - (2447*j)/80 + JD + 0.5 - jd;
-      i = j/11;
-      *month = j + 2 - 12*i;
-      *year = 4*k + n + i - 4716;
-      break;
-    case CAL_EGYPTIAN:
-      JD -= 1448272.5;
-      *year = (int) floor(JD/365);
-      JD -= 365**year;
-      *month = (int) (JD/30) + 1;
-      JD -= 30**month;
-      *day = JD + 31;
-      break;
-  default:
-    anaerror("Illegal calendar type %d in JDtoDate()", calendar);
-  }
+  if (calendar < 0 || calendar >= sizeof(f)/sizeof(*f))
+    *year = *month = *day = 0;
+  else
+    f[calendar](CJDN, year, month, day);
 }
 /*--------------------------------------------------------------------------*/
-int tishri(int year)
-/* returns the number of days between Tishri 1, A.M. 1 and Tishri 1, */
-/* A.M. <year>.  LS 2oct98 */
+void CJDtoDate(double CJD, int *year, int *month, double *day, int calendar)
+     /* returns the date corresponding to Chronological Julian Day
+        CJD.  possible values for calendar (see JulianDate):
+        CAL_GREGORIAN, CAL_ISLAMIC, CAL_JULIAN, CAL_HEBREW,
+        CAL_EGYPTIAN, CAL_COMMON */
 {
-  static int	nLeap[] = {
-    0, 0, 0, 1, 1, 1, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6
-  };
-  static int	isLeap[] = {
-    0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1
-  };
-  int	n, leap, halakim, hours, dow, weeks, j;
+  static void (*f[])(double, int *, int *, double *) =
+    { CJDtoCommon, CJDtoGregorian, CJDtoIslamic,
+      CJDtoJulian, CJDtoHebrew, CJDtoEgyptian };
 
-  year--;
-  n = idiv(year,19);		/* number of cycles of Meton */
-  year -= n*19;			/* year within current cycle */
-  leap = nLeap[year];		/* number of leap days in current cycle */
-
-  halakim = 595*n + 876*year - 287*leap + 204;
-  j = idiv(halakim,1080);
-  hours = j + 16*n + 8*year + 13*leap + 5;
-  halakim -= 1080*j;
-  j = idiv(hours,24);
-  dow = j + 6939*n + 354*year + 29*leap + 1;
-  hours -= 24*j;
-  weeks = idiv(dow,7);
-  dow -= 7*weeks;
-  if (dow == 0 || dow == 3 || dow == 5)	/* dehiyyot 1 */
-    dow++;
-  else if (hours >= 18) {	/* dehiyyot 2 */
-    dow++;
-    if (dow == 7) {
-      weeks++;
-      dow = 0;
-    }
-    if (dow == 0 || dow == 3 || dow == 5) /* dehiyyot 1 */
-      dow++;
-  } else if (!isLeap[year] && dow == 2 && 1080*hours + halakim >= 9924)
-    dow += 2;
-  else if ((year == 0 || isLeap[year - 1])
-	   && dow == 1 && 1080*hours + halakim >= 16789)
-    dow++;
-
-  return weeks*7 + dow;
-}
-/*--------------------------------------------------------------------------*/
-static int	hebrewMonthStarts[][13] = {
-  /* deficient ordinary year: */
-  /*   30, 29, 29,  29,  30,  29,  30,  29,  30,  29,  30,  29 */
-  { 0, 30, 59, 88, 117, 147, 176, 206, 235, 265, 294, 324, 353 },
-  /* regular ordinary year: */
-  /*   30, 29, 30,  29,  30,  29,  30,  29,  30,  29,  30,  29 */
-  { 0, 30, 59, 89, 118, 148, 177, 207, 236, 266, 295, 325, 354 },
-  /* complete ordinary year: */
-  /*   30, 30, 30,  29,  30,  29,  30,  29,  30,  29,  30,  29 */
-  { 0, 30, 60, 90, 119, 149, 178, 208, 237, 267, 296, 326, 355 },
-  /* deficient leap year: */
-  /*   30, 29, 29,  29,  30,  59,  30,  29,  30,  29,  30,  29 */
-  { 0, 30, 59, 88, 117, 147, 206, 236, 265, 295, 324, 354, 383 },
-  /* regular leap year: */
-  /*   30, 29, 30,  29,  30,  59,  30,  29,  30,  29,  30,  29 */
-  { 0, 30, 59, 89, 118, 148, 207, 237, 266, 296, 325, 355, 384 },
-  /* complete leap year: */
-  /*   30, 30, 30,  29,  30,  59,  30,  29,  30,  29,  30,  29 */
-  { 0, 30, 60, 90, 119, 149, 208, 238, 267, 297, 326, 356, 385 }
-};
-#define EPOCH	347996.5	/* JD of epoch of Hebrew calendar */
-double hebrewToJulian(int year, int month, double day)
-{
-  double	JD;
-  int	n1, loy, yearType;
-  
-  n1 = tishri(year);
-  loy = tishri(year + 1) - n1;
-
-  yearType = (loy > 365)*3 + (loy % 30) - 23;
-
-  JD = EPOCH + n1 + hebrewMonthStarts[yearType][month - 1] + day - 1;
-  
-  return JD;
-}
-/*--------------------------------------------------------------------------*/
-int JDtoHebrew(double JD, int *year, int *month, double *day)
-{
-  double	d, jd, jd0;
-  int	approx_year, loy, yearType, m;
-
-  d = JD - EPOCH;
-  approx_year = floor(d*98496.0/35975351.0) - 1;
-  jd = -DBL_MAX;
-  jd = hebrewToJulian(approx_year, 1, 1);
-  if (jd < JD)
-    do {
-      jd0 = jd;
-      jd = hebrewToJulian(++approx_year, 1, 1);
-    } while (jd < JD);
-  else {
-    jd0 = jd;
-    do { 
-      jd = jd0;
-      jd0 = hebrewToJulian(--approx_year, 1, 1);
-    } while (jd0 > JD);
-  }
-  loy = jd - jd0;		/* length of target year */
-  yearType = (loy > 365)*3 + (loy % 30) - 23;
-  d = JD - jd0;			/* day number in the year */
-  m = floor(d/35);
-  while (m < 11 && hebrewMonthStarts[yearType][m + 1] < d)
-    m++;
-  *year = approx_year - 1;
-  *month = m + 1;
-  *day = d - hebrewMonthStarts[yearType][m] + 1;
-  return 1;
+  if (calendar < 0 || calendar >= sizeof(f)/sizeof(*f)
+      || !f[calendar])
+    *year = *month = *day = 0;
+  else
+    f[calendar](CJD, year, month, day);
 }
 /*--------------------------------------------------------------------------*/
 void findTextDate(char *text, int *year, int *month, double *day, int *cal,
@@ -573,7 +416,7 @@ void findTextDate(char *text, int *year, int *month, double *day, int *cal,
 /* deduced calendar is returned in <*cal>, and the year, month number, */
 /* and day are returned in <*year>, <*month>, and <*day>, respectively. */
 {
-  int	i, j, nnum = 0, ntext = 0, c, kind;
+  int	i, j, nnum = 0, ntext = 0, c;
   char	*daystring = NULL, *monthstring = NULL, *yearstring = NULL, *text0;
 
   /* first we seek the starts of the day, month, and year.  We assume that */
@@ -659,15 +502,13 @@ void findTextDate(char *text, int *year, int *month, double *day, int *cal,
       text = daystring;
       while (text > text0 && isspace((int) text[-1]))
 	text--;
-      c = *text;
-      *text = '\0';
     } else if (yearstring > monthstring) {
       text = yearstring;
       while (text > text0 && isspace((int) text[-1]))
 	text--;
-      c = *text;
-      *text = '\0';
     }
+    c = *text;
+    *text = '\0';
     if (*cal == CAL_DEFAULT) {
       for (j = 0; j < 4; j++) {
 	for (i = 0; i < 12; i++)
@@ -881,21 +722,443 @@ int construct_output_dims(int *input_dims, int num_input_dims,
   return num_output_dims;
 }
 /*--------------------------------------------------------------------------*/
+int gcd(int a, int b)
+{
+  int c;
+
+  if (!a || !b)
+    return 1;
+  if (a < 0)
+    a = -a;
+  if (b < 0)
+    b = -b;
+  if (b > a) {
+    c = b; b = a; a = c;
+  }
+  /* now a >= b > 0 */
+  c = a % b;
+  while (c) {
+    a = b; b = c;
+  }
+  return b;
+}
+/*--------------------------------------------------------------------------*/
 int ana_calendar(int narg, int ps[])
+{
+  int result, input_elem_per_date, output_elem_per_date, iq;
+  int *dims, ndim;
+  loopInfo tgtinfo, srcinfo;
+  pointer src, tgt;
+  /* enum Calendar_order fromorder, toorder; */
+  enum Calendar fromcalendar, tocalendar;
+  enum Calendar_timescale fromtime, totime;
+  enum Symboltype inputtype, internaltype, outputtype;
+  enum Calendar_outputtype outputkind;
+  static struct {
+    int to_elements_per_date;   /* translating to calendar date */
+    int from_elements_per_date; /* translating from calendar date */
+    void (*CJDNtoCal)(int const *CJDN, int *date);
+    void (*CJDtoCal)(double const *CJD, double *date);
+    void (*CaltoCJDN)(int const *date, int *CJDN);
+    void (*CaltoCJD)(double const *date, double *CJD);
+    void (*CJDNtoCalS)(int const *CJDN, char **date);
+    void (*CJDtoCalS)(double const *CJD, char **date);
+    void (*CalStoCJDN)(char * const *date, int *CJDN);
+    void (*CalStoCJD)(char * const *date, double *CJD);
+  } cal_data[] = {
+    { 0, 0, NULL,             NULL,            NULL,             NULL,            NULL,              NULL,             NULL,              NULL },
+    { 3, 3, CJDNtoCommonA,    CJDtoCommonA,    CommontoCJDNA,    CommontoCJDA,    CJDNtoCommonSA,    CJDtoCommonSA,    CommonStoCJDNA,    CommonStoCJDA },
+    { 3, 3, CJDNtoGregorianA, CJDtoGregorianA, GregoriantoCJDNA, GregoriantoCJDA, CJDNtoGregorianSA, CJDtoGregorianSA, GregorianStoCJDNA, GregorianStoCJDA },
+    { 3, 3, CJDNtoIslamicA,   CJDtoIslamicA,   IslamictoCJDNA,   IslamictoCJDA,   CJDNtoIslamicSA,   CJDtoIslamicSA,   IslamicStoCJDNA,   IslamicStoCJDA },
+    { 3, 3, CJDNtoJulianA,    CJDtoJulianA,    JuliantoCJDNA,    JuliantoCJDA,    CJDNtoJulianSA,    CJDtoJulianSA,    JulianStoCJDNA,    JulianStoCJDA },
+    { 3, 3, CJDNtoHebrewA,    CJDtoHebrewA,    HebrewtoCJDNA,    HebrewtoCJDA,    CJDNtoHebrewSA,    CJDtoHebrewSA,    HebrewStoCJDNA,    HebrewStoCJDA },
+    { 3, 3, CJDNtoEgyptianA,  CJDtoEgyptianA,  EgyptiantoCJDNA,  EgyptiantoCJDA,  CJDNtoEgyptianSA,  CJDtoEgyptianSA,  EgyptianStoCJDNA,  EgyptianStoCJDA },
+    { 1, 1, NULL,             CJDtoJDA,        NULL,             JDtoCJDA,        NULL,              NULL,             NULL,              NULL },
+    { 1, 1, CJDNtoCJDNA,      CJDtoCJDA,       CJDNtoCJDNA,      CJDtoCJDA,       NULL,              NULL,             NULL,              NULL },
+    { 1, 1, NULL,             CJDtoLunarA,     NULL,             LunartoCJDA,     NULL,              NULL,             NULL,              NULL },
+    { 6, 7, CJDNtoMayanA,     CJDtoMayanA,     MayantoCJDNA,     MayantoCJDA,     CJDNtoMayanSA,     CJDtoMayanSA,     MayanStoCJDNA,     MayanStoCJDA },
+    { 5, 5, CJDNtoLongCountA, CJDtoLongCountA, LongCounttoCJDNA, LongCounttoCJDA, CJDNtoLongCountSA, CJDtoLongCountSA, LongCountStoCJDNA, LongCountStoCJDA },
+  };
+
+  fromcalendar = extractbits(internalMode, CAL_CALENDAR_BASE,
+			     CAL_CALENDAR_BITS);
+  tocalendar = extractbits(internalMode, CAL_CALENDAR_BASE + CAL_CALENDAR_BITS,
+			   CAL_CALENDAR_BITS);
+  outputkind = extractbits(internalMode, CAL_OUTPUT_BASE, CAL_OUTPUT_BITS); /* /NUMERIC, /TEXT, /ISOTEXT */
+  /*
+  fromorder = extractbits(internalMode, CAL_ORDER_BASE, CAL_ORDER_BITS); / /FROMYMD, /FROMDMY /
+  toorder = extractbits(internalMode, CAL_ORDER_BASE + CAL_ORDER_BITS,
+			CAL_ORDER_BITS); / /TOYMD, /TODMY /
+  */
+  fromtime = extractbits(internalMode, CAL_TIME_BASE, CAL_TIME_BITS);
+  totime = extractbits(internalMode, CAL_TIME_BASE + CAL_TIME_BITS,
+		       CAL_TIME_BITS);
+
+  numerical_or_string(ps[0], &dims, &ndim, NULL, NULL);
+
+  /* If no specific "from" calendar is specified, then assume the Common
+     calendar if the input is a string or string array, or if the input
+     has 3 elements in its first dimension.  Otherwise, assume CJD. */
+  if (fromcalendar == CAL_DEFAULT) { 
+    if (symbolIsString(ps[0])
+        || dims[0] == 3)
+      fromcalendar = CAL_COMMON;
+    else
+      fromcalendar = CAL_CJD;
+  }
+
+  void (*CaltoCJDN)(int const *date, int *CJDN)
+    = cal_data[fromcalendar].CaltoCJDN;
+  void (*CaltoCJD)(double const *date, double *CJDN)
+    = cal_data[fromcalendar].CaltoCJD;
+  /*
+  void (*CalStoCJDN)(char * const *date, int *CJDN)
+    = cal_data[fromcalendar].CalStoCJDN;
+  */
+  void (*CalStoCJD)(char * const *date, double *CJD)
+    = cal_data[fromcalendar].CalStoCJD;
+
+  iq = ps[0];
+  {
+    enum Symboltype type;
+
+    /* if the input type is integer, then promote to LONG.  If the
+       input type is floating point, then promote to DOUBLE. */
+    type = symbol_type(iq);
+    if (isIntegerType(type)) {
+      iq = ana_long(1, &iq);
+      inputtype = ANA_LONG;
+    } else if (isFloatType(type)) {
+      iq = ana_double(1, &iq);
+      inputtype = ANA_DOUBLE;
+    } else                        /* must be text type */
+      inputtype = ANA_STRING_ARRAY;
+  }
+
+  /* number of input elements expected per calendar date */
+  input_elem_per_date = cal_data[fromcalendar].from_elements_per_date;
+  if (isStringType(inputtype))
+    input_elem_per_date = 1; /* strings have all elements of a date in a single string */
+
+  if (dims[0] % input_elem_per_date)
+    return anaerror("Incompatible first dimension: expected a multiple "
+                    "of %d but found %d", ps[0], input_elem_per_date,
+                    dims[0]);
+  
+  /* If no specific "to" calendar is specified, then assume the Common
+     calendar if the (effective) "from" calendar is a
+     one-element-per-date calendar, and otherwise CJD */
+  if (tocalendar == CAL_DEFAULT) {
+    if (input_elem_per_date == 1)
+      tocalendar = CAL_COMMON;
+    else
+      tocalendar = CAL_CJD;
+  }
+
+  if (fromcalendar == tocalendar
+      && fromtime == totime)    /* no conversion */
+    return *ps;
+
+  void (*CJDNtoCal)(int const *CJDN, int *date)
+    = cal_data[tocalendar].CJDNtoCal;
+  void (*CJDtoCal)(double const *CJD, double *date)
+    = cal_data[tocalendar].CJDtoCal;
+  void (*CJDNtoCalS)(int const *CJDN, char **date)
+    = cal_data[tocalendar].CJDNtoCalS;
+  void (*CJDtoCalS)(double const *CJD, char **date)
+    = cal_data[tocalendar].CJDtoCalS;
+  
+  assert(CaltoCJDN || CaltoCJD);
+  assert(CJDNtoCal || CJDtoCal);
+
+  /* number of output elements per calendar date */
+  output_elem_per_date = cal_data[tocalendar].to_elements_per_date;
+
+  /* if the (promoted) input type is LONG, then the internal type is
+     LONG if CaltoCJDN is not NULL, or DOUBLE if CaltoCJDN is NULL.
+     If CaltoCJDN is NULL and the number of input elements per date
+     is not equal to 1, then work with a DOUBLE copy of the input
+     symbol. */
+  if (inputtype == ANA_LONG) {
+    if (CaltoCJDN && fromtime == totime)
+      internaltype = ANA_LONG;
+    else {
+      internaltype = ANA_DOUBLE;
+      if (input_elem_per_date != 1) {
+        iq = ana_double(1, &iq);
+        inputtype = ANA_DOUBLE;
+      }
+    }
+  }
+
+  /* if the (promoted) input type is DOUBLE, then the internal type
+     is DOUBLE if CaltoCJD is not NULL, or LONG if CaltoCJD is NULL.
+     If CaltoCJD is NULL and the number of input elements per date
+     is not equal to 1, then work with a LONG ("floor") copy of the
+     input symbol. */
+  
+  else if (inputtype == ANA_DOUBLE) {
+    if (CaltoCJD || fromtime != totime)
+      internaltype = ANA_DOUBLE;
+    else {
+      internaltype = ANA_LONG;
+      if (input_elem_per_date != 1) {
+        int ana_floor(int, int *);
+        iq = ana_floor(1, &iq);
+        inputtype = ANA_LONG;
+      }
+    }
+  }
+
+  /* if the input type is a string type, then the internal type
+     depends on the output kind. */
+  else {
+    if (outputkind == CAL_DOUBLE)
+      internaltype = ANA_DOUBLE;
+    else
+      internaltype = ANA_LONG;
+    input_elem_per_date = 1; /* all input elements in a single text value */
+  }
+  
+  /* for numeric output, the output type is DOUBLE if CJDNtoCal is
+     NULL (i.e., a conversion routine to LONG is not available), or
+     LONG if CJDtoCal is NULL (i.e., a conversion routine to DOUBLE is
+     not available), or else is equal to the internal type.  For
+     non-numerical (i.e., text) output, then output type indicates
+     text.
+  */
+  if (outputkind == CAL_TEXT) {
+    outputtype = ANA_STRING_ARRAY;
+    output_elem_per_date = 1;   /* all date components in a single text value */
+  } else if (outputkind == CAL_LONG || internaltype == ANA_LONG)
+    outputtype = CJDNtoCal? ANA_LONG: ANA_DOUBLE;
+  else if (outputkind == CAL_DOUBLE || internaltype == ANA_DOUBLE)
+    outputtype = CJDtoCal? ANA_DOUBLE: ANA_LONG;
+  else                          /* should not happen */
+    outputtype = internaltype;
+
+  {
+    int more[1], less[1], nMore, nLess;
+
+    /* does the output need more elements than the input? */
+    nMore = nLess = 0;
+    if (output_elem_per_date != input_elem_per_date) { /* yes, different */
+      if (output_elem_per_date > 1) { /* output needs more elements */
+        nMore = 1;                    /* prefix one dimension */
+        more[0] = output_elem_per_date;
+      }
+      if (input_elem_per_date > 1) { /* output needs fewer elements */
+        nLess = 1;
+        less[0] = input_elem_per_date; /* reduce 1st dimension */
+      }
+    }
+    
+    if (standardLoopX(iq, ANA_ZERO,
+                      SL_AXISCOORD
+                      | SL_EACHROW,
+                      &srcinfo, &src,
+                      nMore, more,
+                      nLess, less,
+                      outputtype,
+                      SL_AXISCOORD
+                      | SL_EACHROW,
+                      &result,
+                      &tgtinfo, &tgt) < 0)
+      return ANA_ERROR;
+  }
+
+  if (srcinfo.rdims[0] != input_elem_per_date) {
+    /* we have a multiple of the expected number of input elements per
+       date, but the first dimension must be exactly equal to the
+       expected number else the standard loop ignores the excess
+       elements.  We shift the excess to the second dimension. */
+    int dims[MAX_DIMS];
+
+    assert(srcinfo.dims[0] % input_elem_per_date == 0);
+    memcpy(dims, srcinfo.dims, srcinfo.ndim*sizeof(*dims));
+    if (srcinfo.ndim == 1) {    /* there is only one dimension */
+      dims[1] = 1;              /* add a 2nd dimension */
+      srcinfo.ndim = 2;
+    }
+    int d = srcinfo.dims[0]/input_elem_per_date;
+    dims[1] *= d;
+    dims[0] /= d;
+    setupDimensionLoop(&srcinfo, srcinfo.ndim, dims, srcinfo.type,
+                       srcinfo.naxes, srcinfo.axes, srcinfo.data,
+                       srcinfo.mode);
+  }    
+
+  /* complain if the desired type of translation is not available.  We
+     don't need to check for numerical types, because we demand that
+     at least one of the translations (to LONG/DOUBLE) is available,
+     and are prepared to handle the case where only one is
+     available. */
+  if (inputtype == ANA_STRING_ARRAY && !CalStoCJD)
+    return anaerror("Translating from STRING is not supported for this calendar", ps[0]);
+
+  /* complain if the desired type of translation is not available.  We
+     don't need to check for numerical types, because we demand that
+     at least one of the translations (from LONG/DOUBLE) is available,
+     and are prepared to handle the case where only one is
+     available. */
+  if (outputtype == ANA_STRING_ARRAY)
+    switch (internaltype) {
+    case ANA_LONG:
+      if (!CJDNtoCalS)
+        return anaerror("Translating CJDN to STRING is not supported for this calendar", ps[0]);
+      break;
+    case ANA_DOUBLE:
+      if (!CJDtoCalS)
+        return anaerror("Translating CJD to STRING is not supported for this calendar", ps[0]);
+      break;
+    default:
+      break;
+    }
+
+  /* now loop over all dates to translate */
+  do {
+    scalar timestamp, temp;
+
+    /* translate input to CJD or CJDN */
+    switch (internaltype) {
+    case ANA_LONG:              /* translate to CJDN */
+      switch (inputtype) {
+      case ANA_LONG:
+        CaltoCJDN(src.l, &timestamp.l);
+        src.l += input_elem_per_date;
+        break;
+      case ANA_DOUBLE: /* only cases with one element per date reach here */
+        assert(input_elem_per_date == 1);
+        temp.l = (int) floor(*src.d); /* translate from DOUBLE to LONG */
+        CaltoCJDN(&temp.l, &timestamp.l); /* use LONG translation */
+        src.d += input_elem_per_date;
+        break;
+      default:
+        break;
+      }
+      break;
+    case ANA_DOUBLE:            /* translate to CJD */
+      switch (inputtype) {
+      case ANA_LONG: /* only cases with one element per date reach here */
+        assert(input_elem_per_date == 1);
+        temp.d = (double) *src.l; /* translate from LONG to DOUBLE */
+        CaltoCJD(&temp.d, &timestamp.d); /* use DOUBLE translation */
+        src.l += input_elem_per_date;
+        break;
+      case ANA_DOUBLE:
+        CaltoCJD(src.d, &timestamp.d);
+        src.d += input_elem_per_date;
+        break;
+      case ANA_STRING_ARRAY: case ANA_LSTRING:
+        CalStoCJD(src.sp, &timestamp.d);
+        src.sp += input_elem_per_date;
+        break;
+      default:
+        return cerror(ILL_TYPE, ps[0]);
+      }
+      break;
+    default:
+      return cerror(ILL_TYPE, ps[0]);
+    }
+
+    if (fromtime != totime) {
+      switch (fromtime) {
+      case CAL_UTC:
+        UTC_to_TAI(&timestamp.d);
+        break;
+      case CAL_TAI:
+        break;
+      case CAL_TT:
+        TT_to_TAI(&timestamp.d);
+        break;
+      case CAL_LT:
+        CJDLT_to_TAI(&timestamp.d);
+        break;
+      }
+
+      switch (totime) {
+      case CAL_UTC:
+        TAI_to_UTC(&timestamp.d);
+        break;
+      case CAL_TAI:
+        break;
+      case CAL_TT:
+        TAI_to_TT(&timestamp.d);
+        break;
+      case CAL_LT:
+        TAI_to_CJDLT(&timestamp.d);
+        break;
+      }
+    }
+
+    /* translate CJD or CJDN to output */
+    switch (internaltype) {
+    case ANA_LONG:
+      switch (outputtype) {
+      case ANA_LONG:
+        CJDNtoCal(&timestamp.l, tgt.l);
+        tgt.l += output_elem_per_date;
+        break;
+      case ANA_DOUBLE: /* only cases with one element per date reach here */
+        assert(output_elem_per_date == 1);
+        temp.d = (double) timestamp.l; /* translate from LONG to DOUBLE */
+        CJDtoCal(&temp.d, tgt.d);      /* use DOUBLE translation */
+        tgt.d += output_elem_per_date;
+        break;
+      case ANA_STRING_ARRAY:
+        CJDNtoCalS(&timestamp.l, tgt.sp);
+        tgt.sp += output_elem_per_date;
+        break;
+      default:
+        break;
+      }
+      break;
+    case ANA_DOUBLE:
+      switch (outputtype) {
+      case ANA_LONG:
+        temp.l = (int) floor(timestamp.d); /* translate from DOUBLE to LONG */
+        CJDNtoCal(&temp.l, tgt.l);         /* use LONG translation */
+        tgt.l += output_elem_per_date;
+        break;
+      case ANA_DOUBLE:
+        CJDtoCal(&timestamp.d, tgt.d);
+        tgt.d += output_elem_per_date;
+        break;
+      case ANA_STRING_ARRAY:
+        CJDtoCalS(&timestamp.d, tgt.sp);
+        tgt.sp += output_elem_per_date;
+        break;
+      default:
+        break;
+      }
+      break;
+    default:
+      break;
+    }
+  } while (advanceLoop(&tgtinfo, &tgt), 
+	   advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+  if (!loopIsAtStart(&tgtinfo))
+    return anaerror("Source loop is finished but target loop is not!", ps[0]);
+
+  return result;
+}
+/*--------------------------------------------------------------------------*/
+int ana_calendar_OLD(int narg, int ps[])
      /* general calendar conversion routine */
      /* syntax: DATE2 = CALENDAR(DATE1, /FROMCALENDAR, /TOCALENDAR) */
      /* "/FROMCALENDAR":  /FROMCOMMON /FROMGREGORIAN /FROMISLAMIC */
-     /*                   /FROMJULIAN /FROMJD /FROMUTC /FROMTAI /FROMTT */
+     /*                   /FROMJULIAN /FROMJD /FROMCJD
+                          /FROMUTC /FROMTAI /FROMTT */
      /* "/TOCALENDAR": /TOCOMMON /TOGREGORIAN /TOISLAMIC /TOJULIAN /TOJD */
-     /*                /TOMAYAN /TOLONGCOUNT /TOUTC /TOTAI /TOTT */
+     /*                /TOCJD /TOMAYAN /TOLONGCOUNT /TOUTC /TOTAI /TOTT */
 {
   int	n, *dims, ndim, nRepeat, type, i, iq, cal, newDims[MAX_DIMS],
-    num_newDims, year, month, nd, d, t, v, m, t1, t2, time, sec, min, hour,
-    fromcalendar, tocalendar, fromtime, totime, output, fromorder, toorder;
+    num_newDims, year, month, nd, d, t, v, m, sec, min, hour,
+    fromcalendar, tocalendar, fromtime, totime, output, fromorder, toorder,
+    outtype, iday;
   char	isFree = 0, *line, **monthNames;
-  pointer	data;
-  double	*JD, day;
-  void	UTC_to_TAI(double *), TAI_to_UTC(double *);
+  pointer	data, JD;
+  double	day;
 
   fromcalendar = extractbits(internalMode, CAL_CALENDAR_BASE,
 			     CAL_CALENDAR_BITS);
@@ -913,93 +1176,110 @@ int ana_calendar(int narg, int ps[])
     return *ps;			/* no conversion */
   iq = *ps;
   switch (symbol_class(iq)) {
-    case ANA_SCALAR:
+  case ANA_SCALAR:
+    n = 1;
+    nRepeat = 1;
+    ndim = 1;
+    dims = &n;
+    type = scalar_type(iq);
+    if (type < ANA_LONG) {
+      iq = ana_long(1, ps);
+      type = ANA_LONG;
+    } else if (type == ANA_FLOAT) {
+      iq = ana_double(1, ps);
+      type = ANA_DOUBLE;
+    }
+    data.b = &scalar_value(iq).b;
+    break;
+  case ANA_ARRAY:
+    nRepeat = array_size(iq);
+    ndim = array_num_dims(iq);
+    dims = array_dims(iq);
+    if (symbolIsStringArray(iq) || dims[0] != 3)
       n = 1;
-      nRepeat = 1;
-      ndim = 1;
-      dims = &n;
-      type = scalar_type(iq);
-      if (type < ANA_LONG) {
-	iq = ana_long(1, ps);
-	type = ANA_LONG;
-      } else if (type == ANA_FLOAT) {
-	iq = ana_double(1, ps);
-	type = ANA_DOUBLE;
-      }
-      data.b = &scalar_value(iq).b;
-      break;
-    case ANA_ARRAY:
-      nRepeat = array_size(iq);
-      ndim = array_num_dims(iq);
-      dims = array_dims(iq);
-      if (symbolIsStringArray(iq) || dims[0] != 3)
-	n = 1;
-      else {
-	n = 3;
-	nRepeat /= 3;
-      }
-      type = array_type(iq);
-      if (type < ANA_LONG) {
-	iq = ana_long(1, ps);
-	type = ANA_LONG;
-      } else if (type == ANA_FLOAT) {
-	iq = ana_double(1, ps);
-	type = ANA_DOUBLE;
-      }
-      data.l = (int *) array_data(iq);
-      break;
-    case ANA_STRING:
-      nRepeat = 1;
-      n = 1;
-      ndim = 1;
-      dims = &n;
-      type = ANA_STRING_ARRAY;
-      data.sp = &string_value(iq);
-      break;
-    default:
-      return cerror(ILL_CLASS, *ps);
+    else {
+      n = 3;
+      nRepeat /= 3;
+    }
+    type = array_type(iq);
+    if (type < ANA_LONG) {
+      iq = ana_long(1, ps);
+      type = ANA_LONG;
+    } else if (type == ANA_FLOAT) {
+      iq = ana_double(1, ps);
+      type = ANA_DOUBLE;
+    }
+    data.l = (int *) array_data(iq);
+    break;
+  case ANA_STRING:
+    nRepeat = 1;
+    n = 1;
+    ndim = 1;
+    dims = &n;
+    type = ANA_STRING_ARRAY;
+    data.sp = &string_value(iq);
+    break;
+  default:
+    return cerror(ILL_CLASS, *ps);
   }
 
   switch (fromcalendar) {	/* source calendar */
-    case CAL_DEFAULT:
-      /* if the first dimension has 3 elements or if it is a string
-	 array, then we assume it is in the common calendar; otherwise
-	 we assume it is measured in Julian Days */
-      if (type != ANA_STRING_ARRAY) {
-	if (n == 3)
-	  fromcalendar = cal = CAL_COMMON;
-	else
-	  fromcalendar = cal = CAL_JD;
-      } else
-	cal = CAL_DEFAULT;
-      break;
-    case CAL_JD: case CAL_LUNAR: /* /FROMJD, /FROMLUNAR */
-      nRepeat *= n;
-      n = 1;
-      /* fall-through */
-    default:
-      cal = fromcalendar;
-      break;
+  case CAL_DEFAULT:
+    /* if the first dimension has 3 elements or if it is a string
+       array, then we assume it is in the common calendar; otherwise
+       we assume it is measured in Julian Days */
+    if (type != ANA_STRING_ARRAY) {
+      if (n == 3)
+        fromcalendar = cal = CAL_COMMON;
+      else if (type == ANA_DOUBLE)
+        fromcalendar = cal = CAL_JD;
+      else
+        fromcalendar = cal = CAL_CJD;
+    } else
+      cal = CAL_DEFAULT;
+    break;
+  case CAL_JD: case CAL_CJD: case CAL_LUNAR: /* /FROMJD, /FROMCJD, /FROMLUNAR */
+    nRepeat *= n;
+    n = 1;
+    /* fall-through */
+  default:
+    cal = fromcalendar;
+    break;
   }
-  if (!(JD = (double *) malloc(nRepeat*sizeof(double))))
-					/* temporary space for JDs */
-    return cerror(ALLOC_ERR, *ps);
+
+  outtype = type;               /* default */
+  if (fromcalendar == CAL_LUNAR || tocalendar == CAL_LUNAR
+      || fromcalendar == CAL_JD || tocalendar == CAL_JD 
+      || type == ANA_STRING_ARRAY)
+    outtype = ANA_DOUBLE;
+
+  /* if outtype == ANA_LONG, then JD.l contains CJDN values
+     if outtype == ANA_DOUBLE, then JD.d contains JD values
+     CJDN = floor(JD + 0.5) */
+
+  /* temporary space for JDs */
+  switch (outtype) {
+  case ANA_LONG:
+    JD.l = (int *) malloc(nRepeat*sizeof(int));
+    if (!JD.l)
+      return cerror(ALLOC_ERR, *ps);
+    break;
+  case ANA_DOUBLE: case ANA_TEMP_STRING:
+    JD.d = (double *) malloc(nRepeat*sizeof(double));
+    if (!JD.d)
+      return cerror(ALLOC_ERR, *ps);
+    break;
+  default:
+    return cerror(ILL_CLASS, ps[0]);
+  }
 
   if (type == ANA_STRING_ARRAY) {
+    assert(outtype == ANA_DOUBLE);
     switch (cal) {
     case CAL_COMMON: case CAL_DEFAULT: case CAL_GREGORIAN: case CAL_JULIAN:
       for (i = 0; i < nRepeat; i++) {
 	findTextDate(*data.sp, &year, &month, &day, &cal, fromorder);
-	if (cal == CAL_COMMON || cal == CAL_DEFAULT) {
-	  if (year > 1582
-	      || (year == 1582
-		  && (month > 10
-		      || (month == 10 && day >= 15))))
-	    cal = CAL_GREGORIAN;
-	  else
-	    cal = CAL_JULIAN;
-	}
-	JD[i] = JulianDate(year, month, day, cal);
+	JD.d[i] = CommontoCJD(year, month, day);
 	data.sp++;
       }
       break;
@@ -1024,478 +1304,511 @@ int ana_calendar(int narg, int ps[])
 	    level++;
 	  }
 	}	  
-	JD[i] = 584282.5 + d;
+	JD.d[i] = 584282.5 + d;
       }
       break;
     default:
-      return error("Cannot parse text-based dates in this calendar", *ps);
+      return anaerror("Cannot parse text-based dates in this calendar", *ps);
     }
-    cal = CAL_JD;
+    cal = CAL_JD;               /* signify that translation to JD is complete */
   } else switch (cal) {		/* from calendar */
-    case CAL_COMMON:
-      switch (type) {
-	case ANA_LONG:
-	  switch (fromorder) {
-	    case CAL_YMD:
-	      for (i = 0; i < nRepeat; i++) {
-		if (data.l[3*i] > 1582
-		    || (data.l[3*i] == 1582
-			&& (data.l[3*i + 1] > 10
-			    || (data.l[3*i + 1] == 10
-				&& data.l[3*i + 2] >= 15))))
-		  cal = CAL_GREGORIAN;
-		else
-		  cal = CAL_JULIAN;
-		JD[i] = JulianDate(data.l[3*i], data.l[3*i + 1],
-				   (double) data.l[3*i + 2], cal);
-	      }	/* end of for (i = 0; i < nRepeat; i++) */
-	      break;
-	    case CAL_DMY:
-	      for (i = 0; i < nRepeat; i++) {
-		if (data.l[3*i + 2] > 1582
-		    || (data.l[3*i + 2] == 1582
-			&& (data.l[3*i + 1] > 10
-			    || (data.l[3*i + 1] == 10
-				&& data.l[3*i] >= 15))))
-		  cal = CAL_GREGORIAN;
-		else
-		  cal = CAL_JULIAN;
-		JD[i] = JulianDate(data.l[3*i + 2], data.l[3*i + 1],
-				   (double) data.l[3*i], cal);
-	      }	/* end of for (i = 0; i < nRepeat; i++) */
-	      break;
-	  } /* end of switch (fromorder) */
-	  break;
-	case ANA_DOUBLE:
-	  switch (fromorder) {
-	    case CAL_YMD:
-	      for (i = 0; i < nRepeat; i++) {
-		if (data.d[3*i] > 1582
-		    || (data.d[3*i] == 1582
-			&& (data.d[3*i + 1] > 10
-			    || (data.d[3*i + 1] == 10
-				&& data.d[3*i + 2] >= 15))))
-		  cal = CAL_GREGORIAN;
-		else
-		  cal = CAL_JULIAN;
-		JD[i] = JulianDate(data.d[3*i], data.d[3*i + 1],
-				   (double) data.d[3*i + 2], cal);
-	      }	/* end of for (i = 0; i < nRepeat; i++) */
-	      break;
-	    case CAL_DMY:
-	      for (i = 0; i < nRepeat; i++) {
-		if (data.d[3*i + 2] > 1582
-		    || (data.d[3*i + 2] == 1582
-			&& (data.d[3*i + 1] > 10
-			    || (data.d[3*i + 1] == 10
-				&& data.d[3*i] >= 15))))
-		  cal = CAL_GREGORIAN;
-		else
-		  cal = CAL_JULIAN;
-		JD[i] = JulianDate(data.d[3*i + 2], data.d[3*i + 1],
-				   (double) data.d[3*i], cal);
-	      }	/* end of for (i = 0; i < nRepeat; i++) */
-	      break;
-	  } /* end of switch (fromorder) */
-	  break;
-      }	/* end of switch (type) */
-      cal = CAL_JD;		/* flags that we're done with the
-				   conversion to JD */
-      break;			/* end of case CAL_COMMON */
-    case CAL_GREGORIAN:	/* from Gregorian */
-      if (n != 3 && type != ANA_STRING_ARRAY)
-	return anaerror("Need 3 numbers (year, month, day) per Gregorian date!", *ps);
-      break;
-    case CAL_ISLAMIC:	/* from Islamic */
-      if (n != 3 && type != ANA_STRING_ARRAY)
-	return anaerror("Need 3 numbers (year, month, day) per Islamic date!", *ps);
-      break;
-    case CAL_JULIAN:	/* from Julian proleptic */
-      if (n != 3 && type != ANA_STRING_ARRAY)
+    case CAL_COMMON: case CAL_GREGORIAN: case CAL_ISLAMIC: case CAL_JULIAN:
+    case CAL_HEBREW: case CAL_EGYPTIAN:
+      if (n != 3)
 	return
-	  anaerror("Need 3 numbers (year, month, day) per Julian proleptic date!", *ps);
+	  anaerror("Need 3 numbers (year, month, day) per calendar date!", *ps);
       break;
-    case CAL_JD:		/* from Julian day */
+    case CAL_JD:		/* from Julian Day */
+      assert(outtype == ANA_DOUBLE);
       switch (type) {
-	case ANA_LONG:
-	  for (i = 0; i < nRepeat; i++)
-	    JD[i] = (double) data.l[i];
-	  break;
-	case ANA_FLOAT:
-	  for (i = 0; i < nRepeat; i++)
-	    JD[i] = (double) data.f[i];
-	  break;
-	case ANA_DOUBLE:
-	  memcpy(JD, data.d, nRepeat*sizeof(JD[0]));
-	  break;
-      }	/* end of switch (type) */
+      case ANA_LONG:
+        for (i = 0; i < nRepeat; i++)
+          JD.d[i] = data.l[i];
+        break;
+      case ANA_DOUBLE:
+        memcpy(JD.d, data.d, nRepeat*sizeof(*JD.d));
+        break;
+      }
+      break;
+    case CAL_CJD:		/* from Chronological Julian Day */
+      switch (outtype) {
+      case ANA_LONG:
+        switch (type) {
+        case ANA_LONG:
+          memcpy(JD.l, data.l, nRepeat*sizeof(*JD.l));
+          break;
+        case ANA_DOUBLE:
+          /* from JD to CJDN */
+          for (i = 0; i < nRepeat; i++)
+            JD.l[i] = floor(JDtoCJD(data.d[i]));
+          break;
+        }
+        break;
+      case ANA_DOUBLE:
+        switch (type) {
+        case ANA_LONG:
+          for (i = 0; i < nRepeat; i++)
+            JD.d[i] = CJDtoJD((double) data.l[i]);
+          break;
+        case ANA_DOUBLE:
+          memcpy(JD.d, data.d, nRepeat*sizeof(*JD.d));
+          break;
+        }
+      }
       break;
     case CAL_LUNAR:		/* from lunar calendar */
+      assert(outtype == ANA_DOUBLE);
       switch (type) {
-	case ANA_LONG:
-	  for (i = 0; i < nRepeat; i++)
-	    JD[i] = lunarToJD((double) data.l[i]);
-	  break;
-	case ANA_FLOAT:
-	  for (i = 0; i < nRepeat; i++)
-	    JD[i] = lunarToJD((double) data.f[i]);
-	  break;
-	case ANA_DOUBLE:
-	  for (i = 0; i < nRepeat; i++)
-	    JD[i] = lunarToJD(data.d[i]);
-	  break;
+      case ANA_LONG:
+        for (i = 0; i < nRepeat; i++)
+          JD.d[i] = lunarToJD((double) data.l[i]);
+        break;
+      case ANA_DOUBLE:
+        for (i = 0; i < nRepeat; i++)
+          JD.d[i] = lunarToJD(data.d[i]);
+        break;
       }
       cal = CAL_JD;
       break;
-    case CAL_HEBREW:		/* from Hebrew calendar */
-      if (n != 3 && type != ANA_STRING_ARRAY)
-	return anaerror("Need 3 numbers (year, month, day) per Hebrew date!",
-		     *ps);
-      break;
-    case CAL_EGYPTIAN:
-      if (n != 3 && type != ANA_STRING_ARRAY)
-	return anaerror("Need 3 numbers (year, month, day) per Egyptian date!", *ps);
-      break;
     default:
-      free(JD);
-      return anaerror("Illegal source calendar specification (%1d)", 0, cal);
-  }
-
-  /* go from FROM_CALENDAR to Julian Date */
-  if (cal != CAL_JD)		/* calculate Julian date */
-    switch (type) {
+      switch (type) {
       case ANA_LONG:
-	switch (fromorder) {
-	  case CAL_YMD:
-	    for (i = 0; i < nRepeat; i++)
-	      JD[i] = JulianDate(data.l[3*i], data.l[3*i + 1],
-				 (double) data.l[3*i + 2], cal);
-	    break;
-	  case CAL_DMY:
-	    for (i = 0; i < nRepeat; i++)
-	      JD[i] = JulianDate(data.l[3*i + 2], data.l[3*i + 1],
-				 (double) data.l[3*i], cal);
-	    break;
-	}
-	break;
+        free(JD.l);
+        break;
       case ANA_DOUBLE:
-	switch (fromorder) {
-	  case CAL_YMD:
-	    for (i = 0; i < nRepeat; i++)
-	      JD[i] = JulianDate((int) data.d[3*i], (int) data.d[3*i + 1],
-				 data.d[3*i + 2], cal);
-	    break;
-	  case CAL_DMY:
-	    for (i = 0; i < nRepeat; i++)
-	      JD[i] = JulianDate((int) data.d[3*i + 2], (int) data.d[3*i + 1],
-				 data.d[3*i], cal);
-	    break;
-	}
-	break;
+        free(JD.d);
+        break;
+      }
+      return anaerror("Illegal source calendar specification (%1d)", 0, cal);
     }
 
-  /* now do any required time base translation */
-  if (fromtime != totime) {	/* we need some conversion */
-    /* we go through TAI, which is a uniform time base */
-    switch (fromtime) {
+  /* go from FROM_CALENDAR to Julian Date */
+  if (cal != CAL_JD)		/* not done yet, calculate Julian date */
+    switch (outtype) {
+    case ANA_LONG:              /* convert to CJDN */
+      switch (type) {
+      case ANA_LONG:
+        switch (fromorder) {
+        case CAL_YMD:
+          for (i = 0; i < nRepeat; i++)
+            JD.l[i] = DatetoCJDN(data.l[3*i], data.l[3*i + 1],
+                                 data.l[3*i + 2], cal);
+          break;
+        case CAL_DMY:
+          for (i = 0; i < nRepeat; i++)
+            JD.l[i] = DatetoCJDN(data.l[3*i + 2], data.l[3*i + 1],
+                                 data.l[3*i], cal);
+          break;
+        }
+        break;
+      case ANA_DOUBLE:
+        switch (fromorder) {
+        case CAL_YMD:
+          for (i = 0; i < nRepeat; i++)
+            JD.l[i] = DatetoCJDN((int) data.d[3*i], (int) data.d[3*i + 1],
+                                 (int) data.d[3*i + 2], cal);
+          break;
+        case CAL_DMY:
+          for (i = 0; i < nRepeat; i++)
+            JD.l[i] = DatetoCJDN((int) data.d[3*i + 2], (int) data.d[3*i + 1],
+                                 (int) data.d[3*i], cal);
+          break;
+        }
+        break;
+      }
+      break;
+    case ANA_DOUBLE:            /* convert to JD */
+      switch (type) {
+      case ANA_LONG:
+        switch (fromorder) {
+        case CAL_YMD:
+          for (i = 0; i < nRepeat; i++)
+            JD.d[i] = DatetoCJD(data.l[3*i], data.l[3*i + 1],
+                                (double) data.l[3*i + 2], cal);
+          break;
+        case CAL_DMY:
+          for (i = 0; i < nRepeat; i++)
+            JD.d[i] = DatetoCJD(data.l[3*i + 2], data.l[3*i + 1],
+                                (double) data.l[3*i], cal);
+          break;
+        }
+        break;
+      case ANA_DOUBLE:
+        switch (fromorder) {
+        case CAL_YMD:
+          for (i = 0; i < nRepeat; i++)
+            JD.d[i] = DatetoCJD((int) data.d[3*i], (int) data.d[3*i + 1],
+                                data.d[3*i + 2], cal);
+          break;
+        case CAL_DMY:
+          for (i = 0; i < nRepeat; i++)
+            JD.d[i] = DatetoCJD((int) data.d[3*i + 2], (int) data.d[3*i + 1],
+                                data.d[3*i], cal);
+          break;
+        }
+        break;
+      }
+      break;
+    }
+
+  switch (outtype) {
+  case ANA_DOUBLE:
+    /* now do any required time base translation */
+    if (fromtime != totime) {	/* we need some conversion */
+      /* we go through TAI, which is a uniform time base */
+      switch (fromtime) {
       case CAL_UTC:		/* /FROMUTC */
 	for (i = 0; i < nRepeat; i++)
-	  UTC_to_TAI(JD + i);
+	  UTC_to_TAI(&JD.d[i]);
 	break;
       case CAL_TT:		/* /FROMTT */
 	for (i = 0; i < nRepeat; i++)
-	  TT_to_TAI(JD + i);
+	  TT_to_TAI(&JD.d[i]);
 	break;
-    }
-    /* and now to the target base */
-    switch (totime) {
+      }
+      /* and now to the target base */
+      switch (totime) {
       case CAL_UTC:		/* /TOUTC */
 	for (i = 0; i < nRepeat; i++)
-	  TAI_to_UTC(JD + i);
+	  TAI_to_UTC(&JD.d[i]);
 	break;
       case CAL_TT:		/* /TOTT */
 	for (i = 0; i < nRepeat; i++)
-	  TAI_to_TT(JD + i);
+	  TAI_to_TT(&JD.d[i]);
 	break;
+      }
+      break;
+    case ANA_LONG:                /* no time translation */
+      break;
     }
   }
   
   /* n = number of input values per input calendar date */
 
-  /* now from Julian Date to the required target calendar */
+  /* now from JD or CJDN to the required target calendar */
   if (tocalendar == CAL_DEFAULT)/* default */
     tocalendar = (fromcalendar == CAL_JD)? CAL_COMMON: CAL_JD;
   switch (tocalendar) {
-    case CAL_COMMON:		/* to common */
-      if (output != CAL_NUMERIC) { /* text output */
-	if (nRepeat > 1) {
-	  num_newDims = construct_output_dims(dims, ndim, n,
-					      newDims, MAX_DIMS, 1);
-	  iq = array_scratch(ANA_TEMP_STRING, num_newDims, newDims);
-	  data.sp = (char **) array_data(iq);
-	} else {
-	  iq = string_scratch(-1);
-	  data.sp = (char **) &string_value(iq);
-	}
-	allocate(line, 80, char);
-      } else {			/* numeric output */
-	num_newDims = construct_output_dims(dims, ndim, n,
-					    newDims, MAX_DIMS, 3);
-	iq = array_scratch(ANA_DOUBLE, num_newDims, newDims);
-	data.d = (double *) array_data(iq);
-      }
-      for (i = 0; i < nRepeat; i++) {
-	JDtoDate(JD[i], &year, &month, &day, CAL_COMMON);
-	switch (output) {
-	  case CAL_ISOTEXT:
-	    sec = (day - (int) day)*86400;
-	    min = sec/60;
-	    sec = sec % 60;
-	    hour = min/60;
-	    min = min % 60;
-	    sprintf(line,"%4d-%02d-%02dT%02d:%02d:%02d", year, month,
-		    (int) day, hour, min, sec);
-	    *data.sp++ = strsave(line);
-	    break;
-	  case CAL_TEXT:
-	    switch (toorder) {
-	      case CAL_YMD:
-		sprintf(line, "%1d %s %1d", year,
-			GregorianMonths[month - 1], (int) day);
-		break;
-	      case CAL_DMY:
-		sprintf(line, "%1d %s %1d", (int) day,
-			GregorianMonths[month - 1], year);
-		break;
-	    }
-	    *data.sp++ = strsave(line);
-	    break;
-	  case CAL_NUMERIC:
-	    switch (toorder) {
-	      case CAL_YMD:
-		*data.d++ = year;
-		*data.d++ = month;
-		*data.d++ = day;
-		break;
-	      case CAL_DMY:
-		*data.d++ = day;
-		*data.d++ = month;
-		*data.d++ = year;
-		break;
-	    }
-	    break;
-	}
-      }
-      if (!isFree)
-	free(JD);
-      if (output != CAL_NUMERIC)
-	free(line);
-      if (symbol_class(iq) == ANA_STRING)
-	symbol_memory(iq) = strlen(string_value(iq)) + 1;
-      return iq;
-    case CAL_GREGORIAN: case CAL_JULIAN: /* to Gregorian */
-      monthNames = GregorianMonths;
-      break;
-    case CAL_ISLAMIC:		/* to Islamic */
-      monthNames = IslamicMonths;
-      break;
-    case CAL_EGYPTIAN:
-      monthNames = EgyptianMonths;
-      break;
-    case CAL_LATIN:
-      /* the "Latin" calendar is equal to the /TOTEXT version of the
-	 Common calendar but using the Roman way of writing year numbers,
-	 designating days within the month, and writing month names. */
+  case CAL_COMMON:		/* to common */
+    if (output != CAL_NUMERIC) { /* text output */
       if (nRepeat > 1) {
-	num_newDims = construct_output_dims(dims, ndim, n,
-					    newDims, MAX_DIMS, 1);
-	iq = array_scratch(ANA_TEMP_STRING, num_newDims, newDims);
-	data.sp = (char **) array_data(iq);
+        num_newDims = construct_output_dims(dims, ndim, n,
+                                            newDims, MAX_DIMS, 1);
+        iq = array_scratch(ANA_TEMP_STRING, num_newDims, newDims);
+        data.sp = (char **) array_data(iq);
       } else {
-	iq = string_scratch(-1);
-	data.sp = (char **) &string_value(iq);
-      }
-      for (i = 0; i < nRepeat; i++) {
-	char	*p = curScrat, type = 0;
-	int	l;
-
-	JDtoDate(JD[i], &year, &month, &day,
-		 JD[i] < 2299160.5? CAL_JULIAN: CAL_GREGORIAN);
-	/* first we determine the designation of the day; days are counted
-	   backwards from the next Nonae, Idus, or Kalendae */
-	day = (int) day;	/* integer part only */
-	if (day == 1) {
-	  strcpy(curScrat, "Kalendis ");
-	  curScrat += strlen(curScrat);
-	} else if (day < nonae[month - 1]) {
-	  l = nonae[month - 1] - day + 1;
-	  if (l == 2)
-	    strcpy(curScrat, "Pridie");
-	  else {
-	    strcpy(curScrat, "Ante Diem ");
-	    curScrat += strlen(curScrat);
-	    roman_numeral(l);
-	  }
-	  curScrat += strlen(curScrat);
-	  *curScrat++ = ' ';
-	  strcpy(curScrat, "Nonas ");
-	  curScrat += strlen(curScrat);
-	  type = 1;
-	} else if (day == nonae[month - 1]) {
-	  strcpy(curScrat, "Nonis ");
-	  curScrat += strlen(curScrat);
-	} else if (day < idus[month - 1]) {
-	  l = idus[month - 1] - day + 1;
-	  if (l == 2)
-	    strcpy(curScrat, "Pridie");
-	  else {
-	    strcpy(curScrat, "Ante Diem ");
-	    curScrat += strlen(curScrat);
-	    roman_numeral(l);
-	  }
-	  curScrat += strlen(curScrat);
-	  *curScrat++ = ' ';
-	  strcpy(curScrat, "Idus ");
-	  curScrat += strlen(curScrat);
-	  type = 1;
-	} else if (day == idus[month - 1]) {
-	  strcpy(curScrat, "Idibus ");
-	  curScrat += strlen(curScrat);
-	} else {
-	  if (month == 12)
-	    l = 33 - day;
-	  else
-	    l = JulianDate(year, month + 1, 1, CAL_COMMON)
-	      - JulianDate(year, month, 1, CAL_COMMON) + 2 - day;
-	  if (l == 2)
-	    strcpy(curScrat, "Pridie");
-	  else {
-	    strcpy(curScrat, "Ante Diem ");
-	    curScrat += strlen(curScrat);
-	    roman_numeral(l);
-	  }
-	  curScrat += strlen(curScrat);
-	  *curScrat++ = ' ';
-	  strcpy(curScrat, "Kalendas ");
-	  curScrat += strlen(curScrat);
-	  if (++month == 13) {
-	    month -= 12;
-	    year++;
-	  }
-	  type = 1;
-	}
-	strcpy(curScrat,
-	       type? latinMonthsII[month - 1]: latinMonthsI[month - 1]);
-	curScrat += strlen(curScrat);
-	strcpy(curScrat, " Anno ");
-	curScrat += strlen(curScrat);
-	roman_numeral(year);
-	*data.sp++ = strsave(p);
-	curScrat = p;
-      }
-      if (!isFree)
-	free(JD);
-      if (symbol_class(iq) == ANA_STRING)
-	symbol_memory(iq) = strlen(data.sp[-1]) + 1;
-      return iq;
-      break;
-    case CAL_JD:		/* /TOJD */
-      if (nRepeat == 1) {	/* need scalar */
-	iq = scalar_scratch(ANA_DOUBLE);
-	data.d = &scalar_value(iq).d;
-      } else {			/* need array */
-	num_newDims = construct_output_dims(dims, ndim, n,
-					    newDims, MAX_DIMS, 1);
-	iq = array_scratch(ANA_DOUBLE, num_newDims, newDims);
-	data.d = (double *) array_data(iq);
-      }
-      for (i = 0; i < nRepeat; i++)
-	*data.d++ = JD[i];
-      if (!isFree)
-	free(JD);
-      return iq;
-    case CAL_LUNAR:
-      if (nRepeat == 1) {	/* need scalar */
-	iq = scalar_scratch(ANA_DOUBLE);
-	data.d = &scalar_value(iq).d;
-      } else {			/* need array */
-	num_newDims = construct_output_dims(dims, ndim, n,
-					    newDims, MAX_DIMS, 1);
-	iq = array_scratch(ANA_DOUBLE, num_newDims, newDims);
-	data.d = (double *) array_data(iq);
-      }
-      for (i = 0; i < nRepeat; i++)
-	*data.d++ = JDtoLunar(JD[i]);
-      if (!isFree)
-	free(JD);
-      return iq;
-    case CAL_MAYAN:		/* /TOMAYAN */
-      if (nRepeat > 1) {
-	num_newDims = construct_output_dims(dims, ndim, n,
-					    newDims, MAX_DIMS, 1);
-	iq = array_scratch(ANA_TEMP_STRING, num_newDims, newDims);
-	data.sp = (char **) array_data(iq);
-      } else {
-	iq = string_scratch(-1);
-	data.sp = (char **) &string_value(iq);
+        iq = string_scratch(-1);
+        data.sp = (char **) &string_value(iq);
       }
       allocate(line, 80, char);
-      for (i = 0; i < nRepeat; i++) {
-	d = floor(JD[i] + 0.5);
-	t = iamod(d + 5, 13) + 1;
-	v = iamod(d + 16, 20);
-	d = iamod(d + 65, 365);
-	m = d/20;
-	d = iamod(d, 20);
-	sprintf(line, "%1d %s %1d %s", t, tikalVenteina[v], d, tikalMonth[m]);
-	*data.sp++ = strsave(line);
+    } else {			/* numeric output */
+      num_newDims = construct_output_dims(dims, ndim, n,
+                                          newDims, MAX_DIMS, 3);
+      iq = array_scratch(outtype, num_newDims, newDims);
+      data.d = (double *) array_data(iq);
+    }
+    for (i = 0; i < nRepeat; i++) {
+      if (outtype == ANA_DOUBLE)
+        CJDtoDate(JD.d[i], &year, &month, &day, CAL_COMMON);
+      else
+        CJDNtoDate(JD.l[i], &year, &month, &iday, CAL_COMMON);
+      switch (output) {
+      case 999 /* CAL_ISOTEXT */:
+        if (outtype == ANA_DOUBLE) {
+          sec = (day - (int) day)*86400;
+          min = sec/60;
+          sec = sec % 60;
+          hour = min/60;
+          min = min % 60;
+          sprintf(line,"%4d-%02d-%02dT%02d:%02d:%02d", year, month,
+                  (int) day, hour, min, sec);
+        } else
+          sprintf(line,"%4d-%02d-%02d", year, month, iday);
+        *data.sp++ = strsave(line);
+        break;
+      case CAL_TEXT:
+        switch (toorder) {
+        case CAL_YMD:
+          if (outtype == ANA_DOUBLE)
+            sprintf(line, "%1d %s %1d", year,
+                    GregorianMonths[month - 1], (int) day);
+          else
+            sprintf(line, "%1d %s %1d", year,
+                    GregorianMonths[month - 1], iday);
+          break;
+        case CAL_DMY:
+          if (outtype == ANA_DOUBLE)
+            sprintf(line, "%1d %s %1d", (int) day,
+                    GregorianMonths[month - 1], year);
+          else
+            sprintf(line, "%1d %s %1d", iday,
+                    GregorianMonths[month - 1], year);
+          break;
+        }
+        *data.sp++ = strsave(line);
+        break;
+      case CAL_NUMERIC:
+        switch (toorder) {
+        case CAL_YMD:
+          if (outtype == ANA_DOUBLE) {
+            *data.d++ = year;
+            *data.d++ = month;
+            *data.d++ = day;
+          } else {
+            *data.l++ = year;
+            *data.l++ = month;
+            *data.l++ = iday;
+          }
+          break;
+        case CAL_DMY:
+          if (outtype == ANA_DOUBLE) {
+            *data.d++ = day;
+            *data.d++ = month;
+            *data.d++ = year;
+          } else {
+            *data.l++ = iday;
+            *data.l++ = month;
+            *data.l++ = year;
+          }
+          break;
+        }
+        break;
       }
-      if (!isFree)
-	free(JD);
-      return iq;
-    case CAL_LONGCOUNT:		/* /TOLONGCOUNT */
-      if (nRepeat > 1) {
-	num_newDims = construct_output_dims(dims, ndim, n,
-					    newDims, MAX_DIMS, 1);
-	iq = array_scratch(ANA_TEMP_STRING, num_newDims, newDims);
-	data.sp = (char **) array_data(iq);
-      } else {
-	iq = string_scratch(-1);
-	data.sp = (char **) &string_value(iq);
-      }
-      allocate(line, 80, char);
-      for (i = 0; i < nRepeat; i++) {
-	int n;
+    }
+    if (!isFree)
+      free(JD.l);
+    if (output != CAL_NUMERIC)
+      free(line);
+    if (symbol_class(iq) == ANA_STRING)
+      symbol_memory(iq) = strlen(string_value(iq)) + 1;
+    return iq;
+  case CAL_GREGORIAN: case CAL_JULIAN: /* to Gregorian */
+    monthNames = GregorianMonths;
+    break;
+  case CAL_ISLAMIC:		/* to Islamic */
+    monthNames = IslamicMonths;
+    break;
+  case CAL_EGYPTIAN:
+    monthNames = EgyptianMonths;
+    break;
+  case CAL_LATIN:
+    /* the "Latin" calendar is equal to the /TOTEXT version of the
+       Common calendar but using the Roman way of writing year numbers,
+       designating days within the month, and writing month names. */
+    if (nRepeat > 1) {
+      num_newDims = construct_output_dims(dims, ndim, n,
+                                          newDims, MAX_DIMS, 1);
+      iq = array_scratch(ANA_TEMP_STRING, num_newDims, newDims);
+      data.sp = (char **) array_data(iq);
+    } else {
+      iq = string_scratch(-1);
+      data.sp = (char **) &string_value(iq);
+    }
+    for (i = 0; i < nRepeat; i++) {
+      char	*p = curScrat, type = 0;
+      int	l;
 
-	d = floor(JD[i] - 584282.5);
-	n = idiv(d,20);
-	t = d - n*20;
-        d = idiv(n,18);
-	v = n - d*18;
-	n = idiv(d,20);
-	m = d - n*20;
-	d = idiv(n,20);
-	nd = n - d*20;
-	n = idiv(d,20);
-	d -= n*20;
-	sprintf(line, "%1d.%1d.%1d.%1d.%1d", d, nd, m, v, t);
-	*data.sp++ = strsave(line);
+      if (outtype == ANA_DOUBLE) {
+        CJDtoDate(JD.d[i], &year, &month, &day, CAL_COMMON);
+        iday = (int) day;
+      } else
+        CJDNtoDate(JD.l[i], &year, &month, &iday, CAL_COMMON);
+      /* first we determine the designation of the day; days are counted
+         backwards from the next Nonae, Idus, or Kalendae */
+      if (iday == 1) {
+        strcpy(curScrat, "Kalendis ");
+        curScrat += strlen(curScrat);
+      } else if (iday < nonae[month - 1]) {
+        l = nonae[month - 1] - iday + 1;
+        if (l == 2)
+          strcpy(curScrat, "Pridie");
+        else {
+          strcpy(curScrat, "Ante Diem ");
+          curScrat += strlen(curScrat);
+          roman_numeral(l);
+        }
+        curScrat += strlen(curScrat);
+        *curScrat++ = ' ';
+        strcpy(curScrat, "Nonas ");
+        curScrat += strlen(curScrat);
+        type = 1;
+      } else if (iday == nonae[month - 1]) {
+        strcpy(curScrat, "Nonis ");
+        curScrat += strlen(curScrat);
+      } else if (iday < idus[month - 1]) {
+        l = idus[month - 1] - iday + 1;
+        if (l == 2)
+          strcpy(curScrat, "Pridie");
+        else {
+          strcpy(curScrat, "Ante Diem ");
+          curScrat += strlen(curScrat);
+          roman_numeral(l);
+        }
+        curScrat += strlen(curScrat);
+        *curScrat++ = ' ';
+        strcpy(curScrat, "Idus ");
+        curScrat += strlen(curScrat);
+        type = 1;
+      } else if (iday == idus[month - 1]) {
+        strcpy(curScrat, "Idibus ");
+        curScrat += strlen(curScrat);
+      } else {
+        if (month == 12)
+          l = 33 - iday;
+        else
+          l = DatetoCJDN(year, month + 1, 1, CAL_COMMON)
+            - DatetoCJDN(year, month, 1, CAL_COMMON) + 2 - iday;
+        if (l == 2)
+          strcpy(curScrat, "Pridie");
+        else {
+          strcpy(curScrat, "Ante Diem ");
+          curScrat += strlen(curScrat);
+          roman_numeral(l);
+        }
+        curScrat += strlen(curScrat);
+        *curScrat++ = ' ';
+        strcpy(curScrat, "Kalendas ");
+        curScrat += strlen(curScrat);
+        if (++month == 13) {
+          month -= 12;
+          year++;
+        }
+        type = 1;
       }
-      if (!isFree)
-	free(JD);
-      return iq;
-    case CAL_HEBREW:
-      monthNames = HebrewMonths;
-      break;
-    default:
-      if (!isFree)
-	free(JD);
-      return anaerror("Illegal target calendar specification (%1d)", 0, cal);
+      strcpy(curScrat,
+             type? latinMonthsII[month - 1]: latinMonthsI[month - 1]);
+      curScrat += strlen(curScrat);
+      strcpy(curScrat, " Anno ");
+      curScrat += strlen(curScrat);
+      roman_numeral(year);
+      *data.sp++ = strsave(p);
+      curScrat = p;
+    }
+    if (!isFree)
+      free(JD.l);
+    if (symbol_class(iq) == ANA_STRING)
+      symbol_memory(iq) = strlen(data.sp[-1]) + 1;
+    return iq;
+    break;
+  case CAL_JD:		/* /TOJD */
+    assert(outtype == ANA_DOUBLE);
+    if (nRepeat == 1) {	/* need scalar */
+      iq = scalar_scratch(outtype);
+      data.d = &scalar_value(iq).d;
+    } else {			/* need array */
+      num_newDims = construct_output_dims(dims, ndim, n,
+                                          newDims, MAX_DIMS, 1);
+      iq = array_scratch(outtype, num_newDims, newDims);
+      data.d = (double *) array_data(iq);
+    }
+    memcpy(data.d, JD.d, nRepeat*sizeof(double));
+    if (!isFree)
+      free(JD.l);
+    return iq;
+  case CAL_CJD:		/* /TOCJD */
+    assert(outtype == ANA_LONG);
+    if (nRepeat == 1) {	/* need scalar */
+      iq = scalar_scratch(outtype);
+      data.l = &scalar_value(iq).l;
+    } else {			/* need array */
+      num_newDims = construct_output_dims(dims, ndim, n,
+                                          newDims, MAX_DIMS, 1);
+      iq = array_scratch(outtype, num_newDims, newDims);
+      data.l = (int *) array_data(iq);
+    }
+    memcpy(data.l, JD.l, nRepeat*sizeof(*JD.l));
+    if (!isFree)
+      free(JD.l);
+    return iq;
+  case CAL_LUNAR:
+    assert(outtype == ANA_DOUBLE);
+    if (nRepeat == 1) {	/* need scalar */
+      iq = scalar_scratch(ANA_DOUBLE);
+      data.d = &scalar_value(iq).d;
+    } else {			/* need array */
+      num_newDims = construct_output_dims(dims, ndim, n,
+                                          newDims, MAX_DIMS, 1);
+      iq = array_scratch(ANA_DOUBLE, num_newDims, newDims);
+      data.d = (double *) array_data(iq);
+    }
+    for (i = 0; i < nRepeat; i++)
+      *data.d++ = JDtoLunar(JD.d[i]);
+    if (!isFree)
+      free(JD.d);
+    return iq;
+  case CAL_MAYAN:		/* /TOMAYAN */
+    if (nRepeat > 1) {
+      num_newDims = construct_output_dims(dims, ndim, n,
+                                          newDims, MAX_DIMS, 1);
+      iq = array_scratch(ANA_TEMP_STRING, num_newDims, newDims);
+      data.sp = (char **) array_data(iq);
+    } else {
+      iq = string_scratch(-1);
+      data.sp = (char **) &string_value(iq);
+    }
+    allocate(line, 80, char);
+    for (i = 0; i < nRepeat; i++) {
+      if (outtype == ANA_DOUBLE)
+        d = floor(JDtoCJD(JD.d[i]));
+      else
+        d = JD.l[i];
+      t = iamod(d + 5, 13) + 1;
+      v = iamod(d + 16, 20);
+      d = iamod(d + 65, 365);
+      m = d/20;
+      d = iamod(d, 20);
+      sprintf(line, "%1d %s %1d %s", t, tikalVenteina[v], d, tikalMonth[m]);
+      *data.sp++ = strsave(line);
+    }
+    if (!isFree)
+      free(JD.l);
+    return iq;
+  case CAL_LONGCOUNT:		/* /TOLONGCOUNT */
+    if (nRepeat > 1) {
+      num_newDims = construct_output_dims(dims, ndim, n,
+                                          newDims, MAX_DIMS, 1);
+      iq = array_scratch(ANA_TEMP_STRING, num_newDims, newDims);
+      data.sp = (char **) array_data(iq);
+    } else {
+      iq = string_scratch(-1);
+      data.sp = (char **) &string_value(iq);
+    }
+    allocate(line, 80, char);
+    for (i = 0; i < nRepeat; i++) {
+      int n;
+
+      if (outtype == ANA_DOUBLE)
+        d = floor(JDtoCJD(JD.d[i]) - 584283);
+      else
+        d = JD.l[i] - 584283;
+      n = idiv(d,20);
+      t = d - n*20;
+      d = idiv(n,18);
+      v = n - d*18;
+      n = idiv(d,20);
+      m = d - n*20;
+      d = idiv(n,20);
+      nd = n - d*20;
+      n = idiv(d,20);
+      d -= n*20;
+      sprintf(line, "%1d.%1d.%1d.%1d.%1d", d, nd, m, v, t);
+      *data.sp++ = strsave(line);
+    }
+    if (!isFree)
+      free(JD.l);
+    return iq;
+  case CAL_HEBREW:
+    monthNames = HebrewMonths;
+    break;
+  default:
+    if (!isFree)
+      free(JD.l);
+    return anaerror("Illegal target calendar specification (%1d)", 0, cal);
   }
   if (output != CAL_NUMERIC) {
     if (nRepeat > 1) {
       num_newDims = construct_output_dims(dims, ndim, n,
-					  newDims, MAX_DIMS, 1);
+                                          newDims, MAX_DIMS, 1);
       iq = array_scratch(ANA_TEMP_STRING, num_newDims, newDims);
       data.sp = (char **) array_data(iq);
     } else {
@@ -1505,54 +1818,79 @@ int ana_calendar(int narg, int ps[])
     allocate(line, 80, char);
   } else {
     num_newDims = construct_output_dims(dims, ndim, n,
-					newDims, MAX_DIMS, 3);
-    iq = array_scratch(ANA_DOUBLE, num_newDims, newDims);
+                                        newDims, MAX_DIMS, 3);
+    iq = array_scratch(outtype, num_newDims, newDims);
     data.d = (double *) array_data(iq);
   }
   for (i = 0; i < nRepeat; i++) {
-    JDtoDate(JD[i], &year, &month, &day, tocalendar);
+    if (outtype == ANA_DOUBLE) {
+      CJDtoDate(JD.d[i], &year, &month, &day, tocalendar);
+      iday = (int) day;
+    } else
+      CJDNtoDate(JD.l[i], &year, &month, &iday, tocalendar);
     switch (output) {
-      case CAL_ISOTEXT:
-	sec = (day - (int) day)*86400;
-	min = sec/60;
-	sec = sec % 60;
-	hour = min/60;
-	min = min % 60;
-	sprintf(line,"%4d-%02d-%02dT%02d:%02d:%02d", year, month,
-		(int) day, hour, min, sec);
-	*data.sp++ = strsave(line);
-	break;
-      case CAL_TEXT:
-	switch (toorder) {
-	  case CAL_YMD:
-	    sprintf(line, "%1d %s %1d", year,
-		    monthNames[month - 1], (int) day);
-	    break;
-	  case CAL_DMY:
-	    sprintf(line, "%1d %s %1d", (int) day,
-		    monthNames[month - 1], year);
-	    break;
-	}
-	*data.sp++ = strsave(line);
-	break;
-      case CAL_NUMERIC:
-	switch (toorder) {
-	  case CAL_YMD:
-	    *data.d++ = year;
-	    *data.d++ = month;
-	    *data.d++ = day;
-	    break;
-	  case CAL_DMY:
-	    *data.d++ = day;
-	    *data.d++ = month;
-	    *data.d++ = year;
-	    break;
-	}
-	break;
+    case 999 /* CAL_ISOTEXT */:
+      if (outtype == ANA_DOUBLE) {
+        sec = (day - (int) day)*86400;
+        min = sec/60;
+        sec = sec % 60;
+        hour = min/60;
+        min = min % 60;
+        sprintf(line,"%4d-%02d-%02dT%02d:%02d:%02d", year, month,
+                iday, hour, min, sec);
+      } else
+        sprintf(line,"%4d-%02d-%02d", year, month, iday);
+      *data.sp++ = strsave(line);
+      break;
+    case CAL_TEXT:
+      switch (toorder) {
+      case CAL_YMD:
+        sprintf(line, "%1d %s %1d", year,
+                monthNames[month - 1], iday);
+        break;
+      case CAL_DMY:
+        sprintf(line, "%1d %s %1d", iday,
+                monthNames[month - 1], year);
+        break;
+      }
+      *data.sp++ = strsave(line);
+      break;
+    case CAL_NUMERIC:
+      switch (outtype) {
+      case ANA_DOUBLE:
+        switch (toorder) {
+        case CAL_YMD:
+          *data.d++ = year;
+          *data.d++ = month;
+          *data.d++ = day;
+          break;
+        case CAL_DMY:
+          *data.d++ = day;
+          *data.d++ = month;
+          *data.d++ = year;
+          break;
+        }
+        break;
+      case ANA_LONG:
+        switch (toorder) {
+        case CAL_YMD:
+          *data.l++ = year;
+          *data.l++ = month;
+          *data.l++ = iday;
+          break;
+        case CAL_DMY:
+          *data.l++ = iday;
+          *data.l++ = month;
+          *data.l++ = year;
+          break;
+        }
+        break;
+      }
+      break;
     }
   }
   if (!isFree)
-    free(JD);
+    free(JD.l);
   if (output != CAL_NUMERIC)
     free(line);
   if (symbol_class(iq) == ANA_STRING)
@@ -1594,8 +1932,8 @@ int ana_EasterDate(int narg, int ps[])
   return iq;
 }
 /*--------------------------------------------------------------------------*/
-double deltaT(double JD)
-/* returns the difference between TAI and UTC for a given JD(UTC), in seconds.
+double deltaT(double CJD)
+/* returns the difference between TAI and UTC for a given CJD(UTC), in seconds.
    For UTC between 1961-01-01 and 2007-01-01. LS 24sep98 25dec06 */
 {
   static double	JDs[] = {
@@ -1635,6 +1973,7 @@ double deltaT(double JD)
   double	T, dT;
   int	lo, hi, mid;
 
+  double JD = CJD - 0.5;
   if (JD < JDs[0]) {		/* before 1961-01-01 */
     /* do a rough estimate */
     /* The algorithm is based on observations between years -390 */
@@ -1666,18 +2005,87 @@ double deltaT(double JD)
   lo = (hi < mid)? hi: mid;	/* the last one from the table */
   return offsets[lo] + units[lo]*(JD - t0s[lo]);
 }
+/* TIME SCALES:
+
+     TAI      physically realized
+      │
+   (offset)   observed, nominally +32.184 seconds
+      │
+     TT       terrestrial time
+      │
+ (rate adjustment L_G) definition of TT
+      │
+     TCG      time scale for GCRS
+      │
+  (periodic terms)  iauDtdb is an implementation
+      │
+  (rate adjustment L_C) function of solar-system ephemeris
+      │
+     TCB      time scale for BCRS
+      │
+  (rate adjustment -L_B)
+      │
+     TDB      TCB scaled to track TT
+      │
+   (periodic terms) -iauDtdb is an implementation
+      │
+     TT       terrestrial time
+
+  time_t is not a uniform timescale, because it does not count leap
+  seconds.  time_t encodes the date as 86400 seconds times the number
+  of calendar days since its epoch, plus 1 second for each second
+  elapsed since the beginning of the calendar day. A leap second at
+  the end of a calendar day gets the same time_t value as the first
+  second of the following calendar day. */
 /*--------------------------------------------------------------------------*/
-void UTC_to_TAI(double *JD)
+void UTC_to_TAI(double *CJD)
 {
-  *JD += deltaT(*JD)/86400;
+  *CJD += deltaT(*CJD)/86400;
 }
 /*--------------------------------------------------------------------------*/
-void TAI_to_UTC(double *JD)
+void TAI_to_UTC(double *CJD)
 {
-  double	d1;
-  
-  d1 = *JD - deltaT(*JD)/86400;
-  *JD = *JD - deltaT(d1)/86400;
+  /* deltaT(*JD) = ∆T = TAI - UTC for *JD interpreted as UTC
+
+          UTC ∆T(UTC)      TAI
+     23:59:42      17 23:59:59
+     23:59:43      17 00:00:00
+     23:59:59      17 00:00:16 
+     23:59:60      17 00:00:17
+     00:00:00      18 00:00:18
+
+     UTC_est = TAI - ∆T(TAI)
+
+          TAI ∆T(TAI)  UTC_est ∆(UTC_est) TAI-∆(UTC_est)
+     23:59:59      17 23:59:42         17 23:59:42
+     00:00:00      18 23:59:42         17 23:59:43
+     00:00:16      18 23:59:58         17 23:59:59
+     00:00:17      18 23:59:59         17 00:00:00
+     00:00:18      18 00:00:00         18 00:00:00
+     
+     TAI - ∆T(UTC_est) = UTC except for the leap second, as long as ∆T >= 0.
+  */
+
+  double UTC_est = *CJD - deltaT(*CJD)/86400;
+  *CJD -= -deltaT(UTC_est)/86400;
+}
+/*--------------------------------------------------------------------------*/
+void CJDLT_to_TAI(double *CJD)
+{
+  time_t t_LT = (time_t) ((*CJD - 2440588)*86400);
+  struct tm *bt = localtime(&t_LT);
+  time_t t_UTC = t_LT - bt->tm_gmtoff;
+  *CJD = t_UTC/(double) 86400.0 + 2440588;
+  UTC_to_TAI(CJD);
+}
+/*--------------------------------------------------------------------------*/
+void TAI_to_CJDLT(double *CJD)
+{
+  TAI_to_UTC(CJD);
+  time_t t_UTC = (time_t) ((*CJD - (double) 2440588)*86400);
+  struct tm *bt = localtime(&t_UTC);
+  time_t t_LT = t_UTC + bt->tm_gmtoff;
+  *CJD = t_LT/(double) 86400.0 + 2440588;
 }
 /*--------------------------------------------------------------------------*/
 double JDE(double JD, int direction)
@@ -1907,15 +2315,15 @@ int ana_precess(int narg, int ps[])
   case ANA_BYTE:
     do {
       alpha = *src.b*DEG;
-      advanceLoop(&srcinfo);
+      advanceLoop(&srcinfo, &src);
       delta = *src.b*DEG;
       precessEquatorial(&alpha, &delta, JDfrom, JDto);
       *tgt.f = alpha*RAD;
-      advanceLoop(&tgtinfo);
+      advanceLoop(&tgtinfo, &tgt);
       *tgt.f = delta*RAD;
       do {
-	done = advanceLoop(&srcinfo);
-	advanceLoop(&tgtinfo);
+	done = advanceLoop(&srcinfo, &src);
+	advanceLoop(&tgtinfo, &tgt);
 	if (!done)
 	  *tgt.f = *src.b;
       } while (!done);
@@ -1924,15 +2332,15 @@ int ana_precess(int narg, int ps[])
   case ANA_WORD:
     do {
       alpha = *src.w*DEG;
-      advanceLoop(&srcinfo);
+      advanceLoop(&srcinfo, &src);
       delta = *src.w*DEG;
       precessEquatorial(&alpha, &delta, JDfrom, JDto);
       *tgt.f = alpha*RAD;
-      advanceLoop(&tgtinfo);
+      advanceLoop(&tgtinfo, &tgt);
       *tgt.f = delta*RAD;
       do {
-	done = advanceLoop(&srcinfo);
-	advanceLoop(&tgtinfo);
+	done = advanceLoop(&srcinfo, &src);
+	advanceLoop(&tgtinfo, &tgt);
 	if (!done)
 	  *tgt.f = *src.w;
       } while (!done);
@@ -1941,15 +2349,15 @@ int ana_precess(int narg, int ps[])
   case ANA_LONG:
     do {
       alpha = *src.l*DEG;
-      advanceLoop(&srcinfo);
+      advanceLoop(&srcinfo, &src);
       delta = *src.l*DEG;
       precessEquatorial(&alpha, &delta, JDfrom, JDto);
       *tgt.f = alpha*RAD;
-      advanceLoop(&tgtinfo);
+      advanceLoop(&tgtinfo, &tgt);
       *tgt.f = delta*RAD;
       do {
-	done = advanceLoop(&srcinfo);
-	advanceLoop(&tgtinfo);
+	done = advanceLoop(&srcinfo, &src);
+	advanceLoop(&tgtinfo, &tgt);
 	if (!done)
 	  *tgt.f = *src.l;
       } while (!done);
@@ -1958,15 +2366,15 @@ int ana_precess(int narg, int ps[])
   case ANA_FLOAT:
     do {
       alpha = *src.f*DEG;
-      advanceLoop(&srcinfo);
+      advanceLoop(&srcinfo, &src);
       delta = *src.f*DEG;
       precessEquatorial(&alpha, &delta, JDfrom, JDto);
       *tgt.f = alpha*RAD;
-      advanceLoop(&tgtinfo);
+      advanceLoop(&tgtinfo, &tgt);
       *tgt.f = delta*RAD;
       do {
-	done = advanceLoop(&srcinfo);
-	advanceLoop(&tgtinfo);
+	done = advanceLoop(&srcinfo, &src);
+	advanceLoop(&tgtinfo, &tgt);
 	if (!done)
 	  *tgt.f = *src.f;
       } while (!done);
@@ -1975,15 +2383,15 @@ int ana_precess(int narg, int ps[])
   case ANA_DOUBLE:
     do {
       alpha = *src.d*DEG;
-      advanceLoop(&srcinfo);
+      advanceLoop(&srcinfo, &src);
       delta = *src.d*DEG;
       precessEquatorial(&alpha, &delta, JDfrom, JDto);
       *tgt.d = alpha*RAD;
-      advanceLoop(&tgtinfo);
+      advanceLoop(&tgtinfo, &tgt);
       *tgt.d = delta*RAD;
       do {
-	done = advanceLoop(&srcinfo);
-	advanceLoop(&tgtinfo);
+	done = advanceLoop(&srcinfo, &src);
+	advanceLoop(&tgtinfo, &tgt);
 	if (!done)
 	  *tgt.d = *src.d;
       } while (!done);
@@ -2012,12 +2420,12 @@ int constellation(double alpha, double delta)
   alpha = famod(alpha, 360.0);	/* reduce to interval 0 - 360 degrees */
   alpha /= 15;			/* from degrees to hours */
 
-  for (i = 0; delta < cb[i].delta || alpha >= cb[i].alpha2
-	 || alpha < cb[i].alpha1; i++);
+  for (i = 0; i < nb && (delta < cb[i].delta || alpha >= cb[i].alpha2
+                         || alpha < cb[i].alpha1); i++);
   return cb[i].constellation;
 }
 /*--------------------------------------------------------------------------*/
-#define B1875 (2405889.25855)
+#define B1875 (2405889.25855047) /* from SOFA Epb2jd routine */
 int ana_constellation(int narg, int ps[])
 /* CONSTELLATION(coords [, equinox, /JULIAN, /BESSELIAN]) returns the
    constellation of each set of <coords> relative to the given <equinox>.
@@ -2064,106 +2472,116 @@ int ana_constellation(int narg, int ps[])
   case ANA_BYTE:
     do {
       alpha = *src.b*DEG;
-      advanceLoop(&srcinfo);
+      advanceLoop(&srcinfo, &src);
       delta = *src.b*DEG;
       do
-	done = advanceLoop(&srcinfo);
+	done = advanceLoop(&srcinfo, &src);
       while (!done);
       if (vocal) {
-        printf("CONSTELLATION: (equinox %.10g) %.10g %.10g rad\n", equinox, alpha, delta);
-        printf("CONSTELLATION: (equinox %.10g) %.10g %.10g deg\n", equinox, alpha*RAD, delta*RAD);
+        printf("CONSTELLATION (equinox %.10g)\n", equinox);
+        showradhms(" alpha = ", alpha);
+        showraddms(" delta = ", delta);
       }
       precessEquatorial(&alpha, &delta, equinox, B1875);
       if (vocal) {
-        printf("CONSTELLATION: (equinox B1875.0) %.10g %.10g rad\n", alpha, delta);
-        printf("CONSTELLATION: (equinox B1875.0) %.10g %.10g deg\n", alpha*RAD, delta*RAD);
+        printf("CONSTELLATION (equinox B1875.0)\n");
+        showradhms(" alpha = ", alpha);
+        showraddms(" delta = ", delta);
       }
       *tgt.b = constellation(alpha*RAD, delta*RAD);
-      advanceLoop(&tgtinfo);
+      advanceLoop(&tgtinfo, &tgt);
     } while (done < srcinfo.rndim);
     break;
   case ANA_WORD:
     do {
       alpha = *src.w*DEG;
-      advanceLoop(&srcinfo);
+      advanceLoop(&srcinfo, &src);
       delta = *src.w*DEG;
       do
-	done = advanceLoop(&srcinfo);
+	done = advanceLoop(&srcinfo, &src);
       while (!done);
       if (vocal) {
-        printf("CONSTELLATION: (equinox %.10g) %.10g %.10g rad\n", equinox, alpha, delta);
-        printf("CONSTELLATION: (equinox %.10g) %.10g %.10g deg\n", equinox, alpha*RAD, delta*RAD);
+        printf("CONSTELLATION (equinox %.10g)\n", equinox);
+        showradhms(" alpha = ", alpha);
+        showraddms(" delta = ", delta);
       }
       precessEquatorial(&alpha, &delta, equinox, B1875);
       if (vocal) {
-        printf("CONSTELLATION: (equinox B1875.0) %.10g %.10g rad\n", alpha, delta);
-        printf("CONSTELLATION: (equinox B1875.0) %.10g %.10g deg\n", alpha*RAD, delta*RAD);
+        printf("CONSTELLATION (equinox B1875.0)\n");
+        showradhms(" alpha = ", alpha);
+        showraddms(" delta = ", delta);
       }
       *tgt.b = constellation(alpha*RAD, delta*RAD);
-      advanceLoop(&tgtinfo);
+      advanceLoop(&tgtinfo, &tgt);
     } while (done < srcinfo.rndim);
     break;
   case ANA_LONG:
     do {
       alpha = *src.l*DEG;
-      advanceLoop(&srcinfo);
+      advanceLoop(&srcinfo, &src);
       delta = *src.l*DEG;
       do
-	done = advanceLoop(&srcinfo);
+	done = advanceLoop(&srcinfo, &src);
       while (!done);
       if (vocal) {
-        printf("CONSTELLATION: (equinox %.10g) %.10g %.10g rad\n", equinox, alpha, delta);
-        printf("CONSTELLATION: (equinox %.10g) %.10g %.10g deg\n", equinox, alpha*RAD, delta*RAD);
+        printf("CONSTELLATION (equinox %.10g)\n", equinox);
+        showradhms(" alpha = ", alpha);
+        showraddms(" delta = ", delta);
       }
       precessEquatorial(&alpha, &delta, equinox, B1875);
       if (vocal) {
-        printf("CONSTELLATION: (equinox B1875.0) %.10g %.10g rad\n", alpha, delta);
-        printf("CONSTELLATION: (equinox B1875.0) %.10g %.10g deg\n", alpha*RAD, delta*RAD);
+        printf("CONSTELLATION (equinox B1875.0)\n");
+        showradhms(" alpha = ", alpha);
+        showraddms(" delta = ", delta);
       }
       *tgt.b = constellation(alpha*RAD, delta*RAD);
-      advanceLoop(&tgtinfo);
+      advanceLoop(&tgtinfo, &tgt);
     } while (done < srcinfo.rndim);
     break;
   case ANA_FLOAT:
     do {
       alpha = *src.f*DEG;
-      advanceLoop(&srcinfo);
+      advanceLoop(&srcinfo, &src);
       delta = *src.f*DEG;
       do
-	done = advanceLoop(&srcinfo);
+	done = advanceLoop(&srcinfo, &src);
       while (!done);
       if (vocal) {
-        printf("CONSTELLATION: (equinox %.10g) %.10g %.10g rad\n", equinox, alpha, delta);
-        printf("CONSTELLATION: (equinox %.10g) %.10g %.10g deg\n", equinox, alpha*RAD, delta*RAD);
+        printf("CONSTELLATION (equinox %.10g)\n", equinox);
+        showradhms(" alpha = ", alpha);
+        showraddms(" delta = ", delta);
       }
       precessEquatorial(&alpha, &delta, equinox, B1875);
       if (vocal) {
-        printf("CONSTELLATION: (equinox B1875.0) %.10g %.10g rad\n", alpha, delta);
-        printf("CONSTELLATION: (equinox B1875.0) %.10g %.10g deg\n", alpha*RAD, delta*RAD);
+        printf("CONSTELLATION (equinox B1875.0)\n");
+        showradhms(" alpha = ", alpha);
+        showraddms(" delta = ", delta);
       }
       *tgt.b = constellation(alpha*RAD, delta*RAD);
-      advanceLoop(&tgtinfo);
+      advanceLoop(&tgtinfo, &tgt);
     } while (done < srcinfo.rndim);
     break;
   case ANA_DOUBLE:
     do {
       alpha = *src.d*DEG;
-      advanceLoop(&srcinfo);
+      advanceLoop(&srcinfo, &src);
       delta = *src.d*DEG;
       do
-	done = advanceLoop(&srcinfo);
+	done = advanceLoop(&srcinfo, &src);
       while (!done);
       if (vocal) {
-        printf("CONSTELLATION: (equinox %.10g) %.10g %.10g rad\n", equinox, alpha, delta);
-        printf("CONSTELLATION: (equinox %.10g) %.10g %.10g deg\n", equinox, alpha*RAD, delta*RAD);
+        printf("CONSTELLATION (equinox %.10g)\n", equinox);
+        showradhms(" alpha = ", alpha);
+        showraddms(" delta = ", delta);
       }
       precessEquatorial(&alpha, &delta, equinox, B1875);
       if (vocal) {
-        printf("CONSTELLATION: (equinox B1875.0) %.10g %.10g rad\n", alpha, delta);
-        printf("CONSTELLATION: (equinox B1875.0) %.10g %.10g deg\n", alpha*RAD, delta*RAD);
+        printf("CONSTELLATION (equinox B1875.0)\n");
+        showradhms(" alpha = ", alpha);
+        showraddms(" delta = ", delta);
       }
       *tgt.b = constellation(alpha*RAD, delta*RAD);
-      advanceLoop(&tgtinfo);
+      advanceLoop(&tgtinfo, &tgt);
     } while (done < srcinfo.rndim);
     break;
   }
@@ -2298,6 +2716,42 @@ float magnitude(double d, double r, double beta, int objNum)
   }
 }
 /*--------------------------------------------------------------------------*/
+const char const *objectName(int objNum)
+{
+  switch (objNum) {
+    default:
+      if (nExtraObj) {
+	int i = findint(objNum, extraIDs, nExtraObj);
+	return extraOrbits[i].comment;
+      }
+      return "Unknown";
+    case -1:			/* ELEMENTS */
+      return "ELEMENTS";
+    case 0:			/* Sun */
+      return "Sun";
+    case 1:			/* Mercury */
+      return "Mercury";
+    case 2:			/* Venus */
+      return "Venus";
+    case 3:			/* Earth */
+      return "Earth";
+    case 4:			/* Mars */
+      return "Mars";
+    case 5:			/* Jupiter */
+      return "Jupiter";
+    case 6:			/* Saturn */
+      return "Saturn";
+    case 7:			/* Uranus */
+      return "Uranus";
+    case 8:			/* Neptune */
+      return "Neptune";
+    case 9:			/* Pluto */
+      return "Pluto";
+    case 10:			/* Moon [ES 9.342-2] */
+      return "Moon";
+  }
+}
+/*--------------------------------------------------------------------------*/
 void nutation(double JDE, double *dPsi, double *cdPsi, double *sdPsi,
 	      double *dEps)
 /* calculates the nutation in longitude and/or obliquity */
@@ -2402,7 +2856,7 @@ int ana_siderealtime(int narg, int ps[])
 /* julian dates, in hours */
 /* LS 31mar2002 */
 {
-  double *jd, *out, d;
+  double *jd, *out;
   int n, iq, result;
   double dPsi, cdPsi, sdPsi, dEps, epsilon;
 
@@ -2458,7 +2912,7 @@ void VSOPtoFK5(double T, double *pos)
 {
   double	ll, cll, sll;
   
-  ll = pos[0] - 0.024382*(1 + 0.000222);
+  ll = pos[0] - 0.024382*T*(1 + 0.000222*T);
   cll = cos(ll);
   sll = sin(ll);
   pos[0] += -4.3793e-7 + 1.8985e-7*(cll + sll)*tan(pos[1]);
@@ -2830,7 +3284,7 @@ double interpolate_angle(double a1, double a2, double f)
 }
 /*--------------------------------------------------------------------------*/
 int extraHeliocentric(double JDE, int object, double *equinox,
-		       double *f, double *r)
+                      double *f, double *r)
 /* For <JDE>, return the polar coordinates of <object> in <f>, and the
  equinox for which it was specified in <equinox>. */
 {
@@ -2900,20 +3354,18 @@ int extraHeliocentric(double JDE, int object, double *equinox,
       * sin((qq->zangle*d2 + qq[1].zangle*d1) + m);
   }
   *equinox = pp->equinox;
-  if (getAstronError)			/* no errors known */
-    f[3] = f[4] = f[5] = f[6] = f[7] = f[8] = 0.0;
   return 1;
 }
 /*--------------------------------------------------------------------------*/
-void extraElementsHeliocentric(double JDE, double *equinox, double *f,
-			       double *r)
+void extraElementsHeliocentric(double JDE, double *equinox, double *f, 
+                               double *r)
 {
   static double	xfac, yfac, zfac, xangle, yangle, zangle, epoch, m0, n,
 	v_factor, e, a, q, theequinox;
   double m;
 
   if (haveExtraElements & 4) {	/* new */
-    double i, node, peri, absmag, ci, si, cn, sn,
+    double i, node, peri, ci, si, cn, sn,
       ff, g, p, qq;
     int ii;
 
@@ -2923,7 +3375,6 @@ void extraElementsHeliocentric(double JDE, double *equinox, double *f,
     i = extraElements[4]*DEG;
     node = extraElements[5]*DEG;
     peri = extraElements[6]*DEG;
-    absmag = extraElements[8];
     v_factor = (e == 1)? 0: sqrt(fabs((1 + e)/(1 - e)));
     switch (haveExtraElements & 3) {
       case 2:			/* /QELEMENTS */
@@ -2940,7 +3391,7 @@ void extraElementsHeliocentric(double JDE, double *equinox, double *f,
       case 1:			/* default */
 	if (e == 1) {
 	  anaerror("Parabolic orbits have an infinite semimajor axis", 0);
-	  for (ii = 0; ii < (getAstronError? 9: 3); ii++)
+	  for (ii = 0; ii < 3; ii++)
 	    f[ii] = 0.0;
 	  *r = 0.0;
 	  return;
@@ -2975,80 +3426,94 @@ void extraElementsHeliocentric(double JDE, double *equinox, double *f,
   f[0] = *r*xfac*sin(xangle + m);
   f[1] = *r*yfac*sin(yangle + m);
   f[2] = *r*zfac*sin(zangle + m);
-  if (getAstronError)			/* no errors known */
-    f[3] = f[4] = f[5] = f[6] = f[7] = f[8] = 0.0;
 }
 /*--------------------------------------------------------------------------*/
-void heliocentricXYZr(double JDE, int object, double equinox, double *f,
-		      double *r, int vocal)
-     /* returns in <f> the cartesian heliocentric eclipic coordinates of
+void heliocentricXYZr(double JDE, int object, double equinox, double *pos,
+		      double *r, double tolerance, int vocal, int source)
+     /* returns in <f> the cartesian heliocentric ecliptic coordinates of
 	object <object> for the desired <equinox> at <JDE>, and in
 	<r> the heliocentric distance */
 {
-  void	LBRtoXYZ(double *, double *), XYZtoLBR(double *, double *);
-  double	pos[9], T, standardEquinox;
+  double	T, standardEquinox;
   int	i;
 
   T = (JDE - J2000)/365250;	/* Julian millennia since J2000.0 */
   switch (object) {
   case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7:
   case 8:
-    LBRfromVSOPD(T, object, pos); /* heliocentric longitude, latitude,
-				       and distance referred to the mean
-				       dynamical ecliptic and equinox of
-				       the date */
+    switch (source) {
+    case S_VSOP87A:
+      XYZJ2000fromVSOPA(T, object, pos, tolerance);
+      /* heliocentric cartesian coordinates referred to the mean
+         dynamical ecliptic and equinox of J2000.0 */
+      if (vocal) {
+        printf("ASTRON: VSOP87A (%s) geometric heliocentric ecliptic coordinates J2000.0:\n",
+               objectName(object));
+        printXYZtoLBR(pos);
+      }
+      if ((internalMode & S_BARE) == 0) {
+	if (internalMode & S_FK5) {
+	  if (vocal && J2000 != JDE)
+	    printf("ASTRON: precess ecliptic coordinates from J2000.0 to JD %1$.14g = %1$-#24.6J\n", JDE);
+	  XYZ_eclipticPrecession(pos, J2000, JDE); /* precess to equinox of date */
+	  VSOPtoFK5(10*T, pos);                    /* transform to FK5 */
+	  if (vocal) {
+	    printf("ASTRON: FK5 (%s) geometric heliocentric ecliptic coordinates, equinox/ecliptic of date (JD %2$.14g = %2$-#24.6J):\n", objectName(object), JDE);
+	    printLBRtoXYZ(pos);
+	  }
+	  if (vocal && JDE != equinox)
+	    printf("ASTRON: precess ecliptic coordinates from JD %1$.14g = %1$-#24.6J to JD %2$.14g = %2$-#24.6J\n", JDE, equinox);
+	  XYZ_eclipticPrecession(pos, JDE, equinox); /* precess to desired equinox */
+	} else {
+	  if (vocal && J2000 != equinox)
+	    printf("ASTRON: precess ecliptic coordinates from J2000.0 to JD %1$.14g = %1$-#24.6J\n", equinox);
+	  XYZ_eclipticPrecession(pos, J2000, equinox); /* precess to desired equinox */
+	}
+      }
+      break;
+    case S_VSOP87C:
+      XYZdatefromVSOPC(T, object, pos, tolerance);
+      /* heliocentric cartesian coordinates referred to the mean
+         dynamical ecliptic and equinox of the date */
+      if (vocal) {
+        printf("ASTRON: VSOP87C (%s) geometric heliocentric ecliptic coordinates equinox/ecliptic of date (JD %2$.14g = %2$-#24.6J):\n",
+               objectName(object), JDE);
+        printXYZtoLBR(pos);
+      }
+      if ((internalMode & S_BARE) == 0) {
+	if (internalMode & S_FK5) {
+	  VSOPtoFK5(10*T, pos);                    /* transform to FK5 */
+	  if (vocal) {
+	    printf("ASTRON: FK5 (%s) geometric heliocentric ecliptic coordinates, equinox/ecliptic of date (JD %2$.14g = %2$-#24.6J):\n", objectName(object), JDE);
+	    printLBRtoXYZ(pos);
+	  }
+	}
+	if (vocal && JDE != equinox)
+	  printf("ASTRON: precess ecliptic coordinates from JD %1$.14g = %1$-#24.6J to JD %2$.14g = %2$-#24.6J\n", JDE, equinox);
+	XYZ_eclipticPrecession(pos, JDE, equinox); /* precess to desired equinox */
+      }
+      break;
+    default:
+      anaerror("Illegal VSOP model type", 0);
+      pos[0] = pos[1] = pos[2] = *r = 0.0;
+      return;
+    }
+    *r = hypota(3, pos);        /* heliocentric distance */
     if (vocal) {
-      printf("ASTRON: VSOP (%d) ecliptic heliocentric coordinates, equinox/ecliptic of date:\n", object);
-      printf("lon = %.10g, lat = %.10g rad, r = %.10g AU\n",
-             pos[0], pos[1], pos[2]);
-      printf("lon = %.10g, lat = %.10g deg\n",
-             pos[0]*RAD, pos[1]*RAD);
-      double xyz[3];
-      LBRtoXYZ(pos, xyz);
-      printf("X = %.10g, Y = %.10g, Z = %.10g\n", xyz[0], xyz[1], xyz[2]);
+      printf("ASTRON: (%s) geometric heliocentric ecliptic coordinates for equinox JD %2$.14g = %2$-#24.6J:\n", 
+             objectName(object), equinox);
+      printXYZtoLBR(pos);
     }
-    *r = pos[2];		/* heliocentric distance */
-    if (internalMode & S_FK5) {
-      VSOPtoFK5(10*T, pos);	/* to FK5 system (equinox of date)*/
-      if (vocal) {
-        printf("ASTRON: FK5 (%d) ecliptic heliocentric coordinates, equinox/ecliptic of date:\n", object);
-        printf("lon = %.10g, lat = %.10g rad, r = %.10g AU\n",
-               pos[0], pos[1], pos[2]);
-        printf("lon = %.10g, lat = %.10g deg\n",
-               pos[0]*RAD, pos[1]*RAD);
-        double xyz[3];
-        LBRtoXYZ(pos, xyz);
-        printf("X = %.10g, Y = %.10g, Z = %.10g\n", xyz[0], xyz[1], xyz[2]);
-      }
-    } else if (vocal)
-      puts("ASTRON: no transformation to FK5 system");
-    if (fabs(JDE - equinox) > 1) { 	/* precession */
-	/* we ignore precession when the difference in time between the
-	 calculation date and the equinox is less than or equal to 1 day */
-      eclipticPrecession(pos, JDE, equinox);
-      if (vocal) {
-        printf("ASTRON: (%d) ecliptic heliocentric coordinates for equinox:\n", object);
-        printf("lon = %.10g, lat = %.10g rad, r = %.10g AU\n",
-               pos[0], pos[1], pos[2]);
-        printf("lon = %.10g, lat = %.10g deg\n",
-               pos[0]*RAD, pos[1]*RAD);
-        double xyz[3];
-        LBRtoXYZ(pos, xyz);
-        printf("X = %.10g, Y = %.10g, Z = %.10g\n", xyz[0], xyz[1], xyz[2]);
-      }
-    }
-    LBRtoXYZ(pos, f);		/* to cartesian coordinates */
     break;
   case 10:			/* the Moon */
     {
       double lmoon, elon, msun, mmoon, nodedist, a1, a2, a3, suml, sumr,
-	sumb, E[5], lambda, beta, delta, XYZmoon[3], Tc;
+	sumb, E[5], XYZmoon[3], Tc;
       struct moonlrTerm *mlrt;
       struct moonbTerm *mbt;
       int i;
 
-      /* Tc = T*10 + 4.069459e-10; /* convert from julian millennia to */
-      Tc = T*10; /* convert from julian millennia to */
+      Tc = T*10 + 4.069459e-10; /* convert from julian millennia to */
       /* julian centuries and take out light-time correction which is */
       /* implicitly included in the used lunar ephemeris (assumed */
       /* equivalent to 385000.56 km) */
@@ -3099,69 +3564,34 @@ void heliocentricXYZr(double JDE, int object, double equinox, double *f,
       pos[2] = (385000.56 + sumr/1000)/149597870; /* AU (center-center) */
       if (vocal) {
         printf("ASTRON: lunar ecliptic geocentric coordinates for equinox of date:\n");
-        printf("lon = %.10g, lat = %.10g rad, r = %.10g AU\n",
-               pos[0], pos[1], pos[2]);
-        printf("lon = %.10g, lat = %.10g deg\n",
-               pos[0]*RAD, pos[1]*RAD);
-        double xyz[3];
-        LBRtoXYZ(pos, xyz);
-        printf("X = %.10g, Y = %.10g, Z = %.10g\n", xyz[0], xyz[1], xyz[2]);
+        printLBRtoXYZ(pos);
       }
-      if (fabs(JDE - equinox) > 1) {
-	eclipticPrecession(pos, JDE, equinox);
+      if (vocal && JDE != equinox)
+	printf("ASTRON: precess ecliptic coordinates from JD %1$.14g = %1$-#24.6J to JD %2$.14g = %2$-#24.6J\n", JDE, equinox);
+      eclipticPrecession(pos, JDE, equinox);
+      if (vocal) {
         printf("ASTRON: lunar ecliptic geocentric coordinates for equinox:\n");
-        printf("lon = %.10g, lat = %.10g rad, r = %.10g AU\n",
-               pos[0], pos[1], pos[2]);
-        printf("lon = %.10g, lat = %.10g deg\n",
-               pos[0]*RAD, pos[1]*RAD);
-        double xyz[3];
-        LBRtoXYZ(pos, xyz);
-        printf("X = %.10g, Y = %.10g, Z = %.10g\n", xyz[0], xyz[1], xyz[2]);
+        printLBRtoXYZ(pos);
       }
       LBRtoXYZ(pos, XYZmoon);
-      LBRfromVSOPD(T, 3, pos);	/* position of Earth */
-      if (internalMode & 2048)
-	VSOPtoFK5(10*T, pos);	/* to FK5 system (equinox of date) */
-      if (fabs(JDE - equinox) > 1) 	/* precession */
-	/* we ignore precession when the difference in time between the
-	   calculation date and the equinox is less than or equal to 1 day */
-	eclipticPrecession(pos, JDE, equinox);
-      if (fabs(JDE - equinox) > 1) {
-	eclipticPrecession(pos, JDE, equinox);
-        if (vocal) {
-          printf("ASTRON: earth ecliptic heliocentric coordinates for equinox:\n");
-          printf("lon = %.10g, lat = %.10g rad, r = %.10g AU\n",
-                 pos[0], pos[1], pos[2]);
-          printf("lon = %.10g, lat = %.10g deg\n",
-                 pos[0]*RAD, pos[1]*RAD);
-          double xyz[3];
-          LBRtoXYZ(pos, xyz);
-          printf("X = %.10g, Y = %.10g, Z = %.10g\n", xyz[0], xyz[1], xyz[2]);
-        }
-      }
-      LBRtoXYZ(pos, f);		/* to cartesian coordinates */
-      f[0] += XYZmoon[0];
-      f[1] += XYZmoon[1];
-      f[2] += XYZmoon[2];
-      *r = sqrt(f[0]*f[0] + f[1]*f[1] + f[2]*f[2]);
+
+      heliocentricXYZr(JDE, 3, equinox, pos, r, tolerance, vocal, source);
+
+      pos[0] += XYZmoon[0];
+      pos[1] += XYZmoon[1];
+      pos[2] += XYZmoon[2];
+      *r = hypota(3, pos);
       if (vocal) {
-        printf("ASTRON: lunar ecliptic heliocentric coordinates for equinox:\n");
-        printf("X = %.10g, Y = %.10g, Z = %.10g AU\n",
-               f[0], f[1], f[2]);
-        double lbr[3];
-        XYZtoLBR(f, lbr);
-        printf("lon = %.10g, lat = %.10g rad, r = %.10g AU\n",
-               lbr[0], lbr[1], lbr[2]);
-        printf("lon = %.10g, lat = %.10g deg\n",
-               lbr[0]*RAD, lbr[1]*RAD);
+        printf("ASTRON: lunar ecliptic heliocentric coordinates for equinox JD %1$.14g = %1$-#24.6J:\n", equinox);
+        printXYZtoLBR(pos);
       }
     }
     break;
   case -1:			/* ELEMENTS object - if defined */
     if (!haveExtraElements) {
       anaerror("Illegal object number %1d", 0, object);
-      for (i = 0; i < (getAstronError? 9: 3); i++)
-	f[i] = 0.0;
+      for (i = 0; i < 3; i++)
+	pos[i] = 0.0;
       *r = 0.0;
       return;
     }
@@ -3170,17 +3600,17 @@ void heliocentricXYZr(double JDE, int object, double equinox, double *f,
       standardEquinox = JDE;
     if (fabs(standardEquinox - equinox) > 1) { /* precession */
 	/* currently circuitous -> inefficient */
+      double f[3];
       XYZtoLBR(pos, f);
       eclipticPrecession(f, standardEquinox, equinox);
       LBRtoXYZ(f, pos);
     }
-    memcpy(f, pos, (getAstronError? 9: 3)*sizeof(double));
     break;
   default:
     if (extraHeliocentric(JDE, object, &standardEquinox, pos, r)
 	== ANA_ERROR) {		/* cartesian */
-      for (i = 0; i < (getAstronError? 9: 3); i++)
-	f[i] = 0.0;
+      for (i = 0; i < 3; i++)
+	pos[i] = 0.0;
       *r = 0.0;
       return;
     }
@@ -3188,58 +3618,13 @@ void heliocentricXYZr(double JDE, int object, double equinox, double *f,
       standardEquinox = JDE;
     if (fabs(standardEquinox - equinox) > 1) { /* precession */
       /* currently circuitous -> inefficient */
+      double f[3];
       XYZtoLBR(pos, f);
       eclipticPrecession(f, standardEquinox, equinox);
       LBRtoXYZ(f, pos);
     }
-    memcpy(f, pos, (getAstronError? 9: 3)*sizeof(double));
     break;
   }
-}
-/*--------------------------------------------------------------------------*/
-static double der[9];
-void propagateError(double *der, double *var, double *var2)
-/* takes the covariances in <var> and calculates the transformed covariances */
-/* according to the partial derivatives in <der>, and stores the results */
-/* in <var2>. <var> = [var[x_0],var[x_1],var[x_2],cov[x_0,x_1],cov[x_0,x_2], */
-/* cov[x_1,x_2]].  <var2> = similar but for y.  <der(i,j)> = dy_i/dx_j. */
-{
-  var2[0] = (der[0]*der[0]*var[0] + /* cov_y[00] = d00^2 cov_x[00] + */
-	     der[3]*der[3]*var[1] + /* d01^2 cov_x[11] + */
-	     der[6]*der[6]*var[2] + /* d02^2 cov_x[22] + */
-	     2*(der[0]*der[3]*var[3] + /* 2*(d00 d01 cov_x[01] + */
-		der[0]*der[6]*var[4] + /* d00 d02 cov_x[02] + */
-		der[3]*der[6]*var[5]));	/* d01 d02 cov_x[12]) */
-  var2[1] = (der[1]*der[1]*var[0] + /* cov_y[11] = d10^2 cov_x[00] + */
-	     der[4]*der[4]*var[1] + /* d11^2 cov_x[11] + */
-	     der[7]*der[7]*var[2] + /* d12^2 cov_x[22] + */
-	     2*(der[1]*der[4]*var[3] + /* 2*(d10 d11 cov_x[01] + */
-		der[1]*der[7]*var[4] + /* d10 d12 cov_x[02] + */
-		der[4]*der[7]*var[5]));	/* d11 d12 cov_x[12]) */
-  var2[2] = (der[2]*der[2]*var[0] + /* cov_y[22] = d20^2 cov_x[00] + */
-	     der[5]*der[5]*var[1] + /* d21^2 cov_x[11] + */
-	     der[8]*der[8]*var[2] + /* d22^2 cov_x[22] + */
-	     2*(der[2]*der[5]*var[3] + /* 2*(d20 d21 cov_x[01] + */
-		der[2]*der[8]*var[4] + /* d20 d22 cov_x[02] + */
-		der[5]*der[8]*var[5]));	/* d21 d22 cov_x[12]) */
-  var2[3] = (der[0]*der[1]*var[0] + /* cov_y[01] = d00 d10 cov_x[00] + */
-	     der[3]*der[4]*var[1] + /* d01 d11 cov_x[11] + */
-	     der[6]*der[7]*var[2] + /* d02 d12 cov_x[22] + */
-	     2*(der[0]*der[4]*var[3] + /* 2*(d00 d11 cov_x[01] + */
-		der[0]*der[7]*var[4] + /* d00 d12 cov_x[02] + */
-		der[3]*der[7]*var[5]));	/* d01 d12 cov_x[12]) */
-  var2[4] = (der[0]*der[2]*var[0] + /* cov_y[02] = d00 d20 cov_x[00] + */
-	     der[3]*der[5]*var[1] + /* d01 d21 cov_x[11] + */
-	     der[6]*der[8]*var[2] + /* d02 d22 cov_x[22] + */
-	     2*(der[0]*der[5]*var[3] + /* 2*(d00 d21 cov_x[01] + */
-		der[0]*der[8]*var[4] + /* d00 d22 cov_x[02] + */
-		der[3]*der[8]*var[5]));	/* d01 d22 cov_x[12]) */
-  var2[5] = (der[1]*der[2]*var[0] + /* cov_y[12] = d10 d20 cov_x[00] + */
-	     der[4]*der[5]*var[1] + /* d11 d21 cov_x[11] + */
-	     der[7]*der[8]*var[2] + /* d12 d22 cov_x[22] + */
-	     2*(der[1]*der[5]*var[3] + /* 2*(d10 d21 cov_x[01] + */
-		der[1]*der[8]*var[4] + /* d10 d22 cov_x[02] + */
-		der[4]*der[8]*var[5]));	/* d11 d22 cov_x[12]) */
 }
 /*--------------------------------------------------------------------------*/
 void LBRtoXYZ(double *pos, double *pos2)
@@ -3256,59 +3641,27 @@ void LBRtoXYZ(double *pos, double *pos2)
   pos2[0] = pos[2]*cb*cl;	/* X */
   pos2[1] = pos[2]*cb*sl;	/* Y */
   pos2[2] = pos[2]*sb;		/* Z */
-  if (getAstronError)
-  { /* calculate vX vY vZ from vL vB vR */
-    der[0] = -pos[2]*cb*sl;	/* dX/dL */
-    der[1] = pos[2]*cb*cl;	/* dY/dL */
-    der[2] = 0.0;		/* dZ/dL */
-    der[3] = -pos[2]*sb*cl;	/* dX/dB */
-    der[4] = -pos[2]*sb*sl;	/* dY/dB */
-    der[5] = pos[2]*cb;		/* dZ/dB */
-    der[6] = cb*cl;		/* dX/dR */
-    der[7] = cb*sl;		/* dY/dR */
-    der[8] = sb;		/* dZ/dR */
-    propagateError(der, pos + 3, pos2 + 3); }
 }
 /*--------------------------------------------------------------------------*/
 void XYZtoLBR(double *pos, double *pos2)
 /* transform from cartesian to polar coordinates.  pos must be unequal to
  pos2 */
 {
-  double	r2, r, h2, h;
+  double	r, h;
 
-  h2 = pos[0]*pos[0] + pos[1]*pos[1];
-  r2 = h2 + pos[2]*pos[2];
-  pos2[2] = r = sqrt(r2);		/* R */
-  pos2[0] = h2? atan2(pos[1], pos[0]): 0.0; /* L */
+  h = hypot(pos[0], pos[1]);
+  r = hypot(h, pos[2]);
+  pos2[2] = r;                              /* R */
+  pos2[0] = h? atan2(pos[1], pos[0]): 0.0; /* L */
   if (pos2[0] < 0)
     pos2[0] += TWOPI;
   pos2[1] = r? asin(pos[2]/pos2[2]): 0.0;	/* B */
-  if (getAstronError) {		/* covariances */
-    h = sqrt(h2);
-    if (h2) {
-      der[0] = -pos[1]/h2;	/* dL/dX */
-      der[3] = pos[0]/h2;	/* dL/dY */
-      if (r2) {
-	der[1] = -pos[0]*pos[2]/(h*r2); /* dB/dX */
-	der[4] = -pos[1]*pos[2]/(h*r2); /* dB/dY */
-      } else
-	der[1] = der[4] = 0.0;
-    } else der[0] = der[1] = der[3] = der[4] = 0.0;
-    if (r) {
-      der[2] = pos[0]/r;	/* dR/dX */
-      der[5] = pos[1]/r;	/* dR/dY */
-      der[7] = h/r2;		/* dB/dZ */
-      der[8] = pos[2]/r;	/* dR/dZ */
-    } else der[2] = der[5] = der[7] = der[8] = 0.0;
-    der[6] = 0.0;		/* dL/dZ */
-    propagateError(der, pos + 3, pos2 + 3);
-  }
 }
 /*--------------------------------------------------------------------------*/
 void ectoeq(double *pos, double ceps, double seps, char forward)
 /* transforms from ecliptical to equatorial coordinates or vice versa */
 { 
-  double	alpha, delta, sl, cl, sb, cb, d[6], ca, sa, cd, sd;
+  double	alpha, delta, sl, cl, sb, cb;
 
   sl = sin(pos[0]);
   cl = cos(pos[0]);
@@ -3322,20 +3675,6 @@ void ectoeq(double *pos, double ceps, double seps, char forward)
   delta = asin(sb*ceps + cb*seps*sl);
   pos[0] = alpha;
   pos[1] = delta;
-  if (getAstronError)
-  { ca = cos(pos[0]);
-    sa = sin(pos[0]);
-    cd = cos(pos[1]);
-    sd = sin(pos[1]);
-    der[0] = (ceps*cl*ca + sl*sa)*ca; /* da/dl */
-    der[1] = cb*cl*seps/cd;	/* dd/dl */
-    der[2] = 0.0;		/* dr/dl */
-    der[3] = -seps*ca*ca/(cl*cb*cb); /* da/db */
-    der[4] = (cb*ceps - sb*seps*sl)/cd;	/* dd/db */
-    der[5] = der[6] = der[7] = 0.0; /* dr/db, da/dr, dd/dr */
-    der[8] = 1.0;		/* dr/dr */
-    propagateError(der, pos + 3, d);
-    memcpy(pos + 3, d, 6*sizeof(double)); }
 }
 /*--------------------------------------------------------------------------*/
 void galtoeq(double *pos, double equinox, char forward)
@@ -3438,6 +3777,8 @@ int ana_astrf(int narg, int ps[], int forward) {
 	pos[0] = (double) src.f[0]*DEG;
 	pos[1] = (double) src.f[1]*DEG;
 	break;
+      default:
+        break;
       }
       switch (from) {
       case 2:			/* ecliptical */
@@ -3480,6 +3821,8 @@ int ana_astrf(int narg, int ps[], int forward) {
 	pos[0] = src.d[0]*DEG;
 	pos[1] = src.d[1]*DEG;
 	break;
+      default:
+        break;
       }
       switch (from) {
       case 2:			/* ecliptical */
@@ -3500,10 +3843,12 @@ int ana_astrf(int narg, int ps[], int forward) {
       tgt.d[0] = pos[0]*RAD;
       tgt.d[1] = pos[1]*RAD;
       break;
+    default:
+      break;
     }
     src.b += srcinfo.rdims[0]*srcinfo.stride;
     tgt.b += tgtinfo.rdims[0]*tgtinfo.stride;
-  } while (advanceLoop(&srcinfo) < srcinfo.rndim);
+  } while (advanceLoop(&srcinfo, &src) < srcinfo.rndim);
   return result;
 }
 /*--------------------------------------------------------------------------*/
@@ -3514,7 +3859,7 @@ void parallax(double *pos, double r0, double rcp, double rsp)
 /* local sidereal time, r0 is the apparent planetocentric distance, */
 /* rcp and rsp indicate the topocentric coordinates of the observer */
 {
-  double	r, cd, ch, sd, sh, u, d1, d2, A, B, C, q;
+  double	r, cd, ch, sd, sh, u, A, B, C, q;
 
   r = s_parallax/r0;	/* sine of equatorial horizontal parallax */
   cd = cos(pos[1]);		/* declination */
@@ -3530,22 +3875,6 @@ void parallax(double *pos, double r0, double rcp, double rsp)
   if (pos[0] < 0)
     pos[0] += TWOPI;	/* apparent hour angle */
   pos[1] = asin(C/q);	/* apparent declination */
-  if (getAstronError)
-  { u = sqrt(u);
-    d1 = r*u*u;
-    d2 = u*r*q;
-    der[0] = cd*(r*cd - ch*rcp*s_parallax)/d1; /* da'/da */
-    der[1] = -A*C*rcp*s_parallax/d2; /* dd'/da */
-    der[2] = 0.0;		/* dr'/da */
-    der[3] = sd*sh*rcp*s_parallax/d1; /* da'/dd */
-				/* dd'/dd */
-    der[4] = (r*q*q*cd + C*s_parallax*(rsp*cd - rcp*sd*ch))/d2;
-    der[5] = 0.0;		/* dr'/dd */
-    der[6] = cd*sh*rcp*s_parallax/d1; /* da'/dr */
-				/* dd'/dr */
-    der[7] = s_parallax*(rsp - C*(B*rcp + C*rsp))/(r*r*u);
-    der[8] = 1.0;		/* dr'/dr */
-    propagateError(der, pos + 3, pos + 3); }
 }
 /*--------------------------------------------------------------------------*/
 void refract(double *pos, double height)
@@ -3568,7 +3897,7 @@ void refract(double *pos, double height)
 void eqtohor(double *pos, double cphi, double sphi, char forward)
 /* transforms from equatorial to horizontal coordinates, or vice versa */
 {
-  double	A, h, sH, cH, sd, cd, sa, ca, ch;
+  double	A, h, sH, cH, sd, cd;
 
   sH = sin(pos[0]);
   cH = cos(pos[0]);
@@ -3582,20 +3911,6 @@ void eqtohor(double *pos, double cphi, double sphi, char forward)
   h = asin(sphi*sd + cphi*cd*cH);
   pos[0] = A;
   pos[1] = h;
-  if (getAstronError)
-  { sa = sin(pos[0]);
-    ca = cos(pos[0]);
-    ch = cos(pos[1]);
-    der[0] = sa*ca*sH/cH + sa*sa*sphi; /* dA/dH */
-    der[1] = -cd*cphi*sH/ch;	/* dh/dH */
-    der[2] = 0.0;		/* dr/dH */
-    der[3] = cphi*sa*sa/(sH*cd*cd); /* dA/dd */
-    der[4] = (-cH*cphi*sd + cd*sphi)/ch; /* dh/dd */
-    der[5] = 0.0;		/* dr/dd; */
-    der[6] = 0.0;		/* dA/dr */
-    der[7] = 0.0;		/* dh/dr */
-    der[8] = 1.0;		/* dr/dr */
-    propagateError(der, pos + 3, pos + 3); }
 }
 /*--------------------------------------------------------------------------*/
 #define FLAT	0.99664719
@@ -3618,14 +3933,55 @@ double meanDistance(int obj1, int obj2)
     return meanDistances[obj1][obj2];
 }
 /*--------------------------------------------------------------------------*/
+void showraddms(char *prefix, double x)
+{
+  printf("%1$s%2$.10g rad = %3$.10g deg = %3$-13.2T dms\n", prefix, x, x*RAD);
+}
+/*--------------------------------------------------------------------------*/
+void showradhms(char *prefix, double x)
+{
+  printf("%1$s%2$.10g rad = %3$.10g deg = %3$#-13.2T hms\n", prefix, x, x*RAD);
+}
+/*--------------------------------------------------------------------------*/
+void printXYZtoLBR(double *xyz)
+{
+  double lbr[3];
+  XYZtoLBR(xyz, lbr);
+  printf(" X = %.10g, Y = %.10g, Z = %.10g\n", xyz[0], xyz[1], xyz[2]);
+  showraddms(" L = ", lbr[0]);
+  showraddms(" B = ", lbr[1]);
+  printf(" R = %.10g\n", lbr[2]);
+}
+/*--------------------------------------------------------------------------*/
+void printLBRtoXYZ(double *lbr)
+{
+  double xyz[3];
+  LBRtoXYZ(lbr, xyz);
+  showraddms(" L = ", lbr[0]);
+  showraddms(" B = ", lbr[1]);
+  printf(" R = %.10g\n", lbr[2]);
+  printf(" X = %.10g, Y = %.10g, Z = %.10g\n", xyz[0], xyz[1], xyz[2]);
+}
+/*--------------------------------------------------------------------------*/
+void printHBRtoXYZ(double *lbr)
+{
+  double xyz[3];
+  LBRtoXYZ(lbr, xyz);
+  showradhms(" H = ", lbr[0]);
+  showraddms(" B = ", lbr[1]);
+  printf(" R = %.10g\n", lbr[2]);
+  printf(" X = %.10g, Y = %.10g, Z = %.10g\n", xyz[0], xyz[1], xyz[2]);
+}
+/*--------------------------------------------------------------------------*/
 int ana_astropos(int narg, int ps[])
      /* returns the positions of a set of heavenly bodies at a specific */
      /* set of times, for equinox 2000.0 */
      /* Syntax: X = ASTRON(JDs, OBJECTS [, OBJECT0, OBSERVER=OBSERVER, */
      /*                    EQUINOX=EQUINOX, ELEMENTS=elements] */
      /*			   [, /XYZ, /EQUATORIAL, /ECLIPTICAL, /ELONGATION, */
-     /*			    /HORIZONTAL, /DATE, /ERROR, /ABBERATION, */
-     /*                     /GEOMETRICAL, /TDT, /QELEMENTS, /FK5 ]) */
+     /*			    /HORIZONTAL, /DATE, /ERROR, /ABERRATION, */
+     /*                     /GEOMETRICAL, /TDT, /QELEMENTS, /FK5, /NUTATION,
+                            /LIGHTTIME]) */
      /* JDs = Julian dates for which elements are desired, in UT */
      /* OBJECTS = scalar or array of object numbers. */
      /* OBJECT2 = number of the object relative to which the other */
@@ -3654,20 +4010,17 @@ int ana_astropos(int narg, int ps[])
      /* 8 - Neptune, 9 - Pluto, 10 - Moon. */
 {
   char	tdt, *string;
-  int	iq, nJD, nJDdims, *JDdims, *object, nObjects, object0, dims[MAX_DIMS],
-    nDims, i, j, n, result, coordSystem, count, vocal;
-  double	*JD, *f, *f0, jd0, djd, djd0, r, r0, dPsi,
-    dEps, epsilon, ceps, seps, longitude, latitude, height = 0.0, rsp,
-    rcp, clat, slat, Tsid, equinox, robject, robject0, jd, cdPsi, sdPsi;
-  double	pos[9], pos2[9], pos3[9], mean[3];
+  int	iq, nJD, *object, nObjects, object0, dims[MAX_DIMS],
+    nDims, i, j, result, coordSystem, vocal;
+  double	*JD, *f, *f0, longitude, latitude, height = 0.0, rsp,
+    rcp, clat, slat, equinox;
+  double	tolerance;
 
   if (internalMode & S_CONJSPREAD) 	/* /CONJSPREAD */
-    internalMode = (internalMode & ~(S_ERROR)) | S_XYZ
-      | S_ECLIPTICAL;
+    internalMode = internalMode | S_XYZ | S_ECLIPTICAL;
   coordSystem = (internalMode & S_COORDS); /* desired coordinate system */
   if (!coordSystem)
     coordSystem = S_ECLIPTICAL;	/* default: ecliptical */
-  fullVSOP = !(internalMode & S_TRUNCATEVSOP);
   vocal = (internalMode & S_VOCAL); /* print intermediate results */
 
   iq = *ps;			/* JDs */
@@ -3678,15 +4031,11 @@ int ana_astropos(int narg, int ps[])
       iq = ana_double(1, &iq);
       JD = &scalar_value(iq).d;
       nJD = 1;
-      nJDdims = 1;
-      JDdims = &nJD;
       break;
     case ANA_ARRAY:
       iq = ana_double(1, &iq);
       JD = (double *) array_data(iq);
       nJD = array_size(iq);
-      nJDdims = array_num_dims(iq);
-      JDdims = array_dims(iq);
       break;
     default:
       return cerror(ILL_CLASS, *ps);
@@ -3744,6 +4093,10 @@ int ana_astropos(int narg, int ps[])
     latitude = S_PLANETOCENTRIC;
     if (coordSystem == S_HORIZONTAL)
       return anaerror("Need OBSERVER to return horizontal coordinates", 0);
+    /* avoid compiler warnings about possibly uninitialized variables */
+    longitude = 0;
+    clat = 1;
+    slat = 0;
   }
 
   if (narg > 4 && ps[4]) { 	/* EQUINOX */
@@ -3787,8 +4140,7 @@ int ana_astropos(int narg, int ps[])
   } else haveExtraElements = 0;		/* none */
 
   				/* create result array */
-  getAstronError = (internalMode & S_ERROR)? 1: 0;
-  dims[0] = getAstronError? 6: 3;	/* include error bars if requested */
+  dims[0] = 3;
   nDims = 1;
   if ((nObjects > 1 || internalMode & S_KEEPDIMS)
       && (internalMode & S_CONJSPREAD) == 0)
@@ -3799,16 +4151,18 @@ int ana_astropos(int narg, int ps[])
   f = f0 = (double *) array_data(result);
   
   tdt = internalMode & S_TDT;	/* time is specified in TDT rather than UT */
-  if ((internalMode & S_GEOMETRIC) && (internalMode & S_ABBERATION)) {
-    /* puts("ASTRON - ignoring /ABBERATION because of /GEOMETRIC"); */
-    internalMode = internalMode & ~S_ABBERATION;
-  }
+
+  tolerance = 0;
+  if (narg > 6 && ps[6])
+    tolerance = double_arg(ps[6]);
+  if (internalMode & S_TRUNCATEVSOP && !tolerance)
+    tolerance = 1e-4;
 
   /* calculate coordinates */
   for (j = 0; j < nJD; j++) {	/* all dates */
     if (vocal)
-      printf("ASTRON: calculating for JD = %.7f\n", JD[j]);
-    jd = tdt? JD[j]: JDE(JD[j], +1); /* calculate date in TDT */
+      printf("ASTRON: calculating for JD = %1$.7f = %1$#-24.6J\n", JD[j]);
+    double jd = tdt? JD[j]: JDE(JD[j], +1); /* calculate date in TDT */
     if (vocal) {
       if (tdt) {
         puts("ASTRON: JD is in TDT already");
@@ -3817,338 +4171,331 @@ int ana_astropos(int narg, int ps[])
         printf("ASTRON: delta T = %.10g s\n", (jd - JD[j])*86400);
       }
     }
-    jd0 = jd;
-    if (internalMode & S_ABBERATION) { /* nutation and abberation */
-      nutation(jd0, &dPsi, &cdPsi, &sdPsi, &dEps); /* nutation */
+    double dPsi, cdPsi, sdPsi, dEps;
+    if (internalMode & S_NUTATION) { /* nutation */
+      nutation(jd, &dPsi, &cdPsi, &sdPsi, &dEps); /* nutation parameters */
+      if (vocal) {
+        printf("ASTRON: nutation constants:\n");
+        showraddms(" dPsi = ", dPsi);
+        showraddms(" dEps = ", dEps);
+      }
     } else {
-      dPsi = sdPsi = dEps = 0.0;	/* ignore abberation */
+      dPsi = sdPsi = dEps = 0.0;	/* ignore nutation */
       cdPsi = 1.0;
-    }
-    if (vocal) {
-      printf("ASTRON: nutation/abberation constants:\n");
-      printf(" dPsi = %.10g, dEps = %.10g rad\n", dPsi, dEps);
-      printf(" dPsi = %.10g, dEps = %.10g deg\n", dPsi*RAD, dEps*RAD);
-    }
-    epsilon = obliquity(jd0, &dEps); /* obliquity of the ecliptic corrected */
-				    /* for nutation */
-    if (vocal) {
-      printf("ASTRON: obliquity of ecliptic corrected for nutation: %.10g rad\n",
-             epsilon);
-      printf("ASTRON: obliquity of ecliptic corrected for nutation: %.10g deg\n",
-             epsilon*RAD);
-    }
-    ceps = cos(epsilon);
-    seps = sin(epsilon);
-    Tsid = siderealTime(JDE(jd, -1), &dPsi, ceps); /* apparent sidereal time */
-				/* at longitude zero (corrected for */
-				/* nutation), at UT time, in radians */
-    if (vocal) {
-      printf("ASTRON: apparent sidereal time (0 longitude, nutation) = %.10g rad\n", Tsid);
-      printf("ASTRON: apparent sidereal time (0 longitude, nutation) = %.10g deg\n", Tsid*RAD);
+      if (vocal)
+        puts("ASTRON: no nutation correction.");
     }
     if (internalMode & S_DATE)
       equinox = jd;
     if (vocal)
       printf("ASTRON: equinox:        JD = %.7f\n", equinox);
-
+    double epsilon = obliquity(equinox, &dEps);
+    if (vocal) {
+      if (dPsi)
+        printf("ASTRON: obliquity of ecliptic for equinox, corrected for nutation:\n");
+      else
+        printf("ASTRON: mean obliquity of ecliptic for equinox:\n");
+      showraddms(" epsilon = ", epsilon);
+    }
+    double ceps = cos(epsilon);
+    double seps = sin(epsilon);
+    double Tsid = siderealTime(JDE(jd, -1), &dPsi, ceps);
+    /* apparent sidereal time at longitude zero (possibly corrected
+       for nutation), at UT time, in radians */
+    if (vocal) {
+      if (dPsi)
+        printf("ASTRON: apparent sidereal time (0 longitude, nutation)\n");
+      else
+        printf("ASTRON: mean sidereal time (0 longitude)\n");
+      showradhms(" Tsid = ", Tsid);
+    }
+    if (vocal && !(internalMode & S_FK5))
+      puts("ASTRON: coordinates relative to VSOP axes, not FK5");
+    
+    double mean[3];
     if (internalMode & S_CONJSPREAD)
       mean[0] = mean[1] = mean[2] = 0;
+
+    double pos_sun_obs[3], r_sun_obs;
+    /* calculate the position of the observer */
+    heliocentricXYZr(jd, object0, equinox, pos_sun_obs, &r_sun_obs, tolerance, 
+                     vocal, internalMode & S_VSOP);
+    /* cartesian ecliptic heliocentric coordinates of the observer
+       at target time */
+    /* pos_sun_obs[0] = X, pos_sun_obs[1] = Y, pos_sun_obs[2] = Z, */
+    /* r_sun_obs = heliocentric distance of the observer */
+    if (vocal) {
+      printf("ASTRON: observer (%s) geometric heliocentric ecliptic coordinates for equinox:\n", objectName(object0));
+      printXYZtoLBR(pos_sun_obs);
+    }
+
     for (i = 0; i < nObjects; i++) { /* all objects */
-      if (internalMode & S_GEOMETRIC) { /* geometric position: no correction */
-				        /* for light-time */
-	djd = r = 0.0;
-	djd0 = 1.0;
-      } else {			/* apparent */
-	/* we include the effects of light-time and abberation due to the
-	   observer's motion by combining the positions of the object and
-	   the observer at time t - dt where dt is the light-time correction
-	   that fits the distance between the object at time t - dt and
-	   the observer at time t (NOT t - dt) */
+      double lighttime = 0.0;
+      double r_sun_tgt, r_obs_tgt, pos_sun_tgt[9], pos_obs_tgt[9];
+      if (internalMode & (S_LIGHTTIME | S_ABERRATION)) {
+        if (vocal)              /* print geometric position */
+          heliocentricXYZr(jd, object[i], equinox, pos_sun_tgt, &r_sun_tgt,
+                           tolerance, 1, internalMode & S_VSOP);
+        /* calculate light time */
 	/* get initial guess of "average" distance between the objects */
 	/* for an initial guess of the light time */
-	r = meanDistance(object[i],object0 >= 0? object0: 0);
-	djd = r*AUtoJD;		/* initial estimate of light time */
-	djd0 = djd + 1;		/* old estimate (should here be different */
-				/* from dT to get iteration going) */
-	r0 = 0.0; 		/* initial estimate of geometrical distance */
-      }	/* end of if (internalMode & S_GEOMETRIC) else */
-      /* first get position of observer: it is assumed constant during the
-	 calculation of the light time */
-      heliocentricXYZr(jd0, object0, equinox, pos3, &robject0, vocal);
-      /* cartesian ecliptic heliocentric coordinates of the observer: */
-      /* pos3[0] = X, pos3[1] = Y, pos3[2] = Z, */
-      /* robject0 = heliocentric distance of the observer */
-      if (vocal) {
-        printf("ASTRON: observer (%d) geometric ecliptic heliocentric coordinates for equinox:\n", object0);
-        printf("X = %.10g, Y = %.10g, Z = %.10g, r = %.10g AU\n",
-               pos3[0], pos3[1], pos3[2], robject0);
-        double pol[3];
-        XYZtoLBR(pos3, pol);
-        printf("lon = %.10g, lat = %.10g rad\n", pol[0], pol[1]);
-        pol[0] *= RAD;
-        pol[1] *= RAD;
-        printf("lon = %.10g, lat = %.10g deg\n", pol[0], pol[1]);
-      }
+	r_sun_tgt = meanDistance(object[i],object0 >= 0? object0: 0);
+	lighttime = r_sun_tgt*AUtoJD;   /* initial estimate of light time */
+	double prev_lighttime = lighttime + 1; /* previous estimate */
+        /* to get loop going, set initial value of prev_lighttime
+           different from current value of lighttime */
+	r_obs_tgt = 0.0; /* initial estimate of geometrical distance */
 
-      /* now we converge upon the light-time to the target object */
-      count = 0;
-      while (fabs(djd - djd0) > DBL_EPSILON*1000 && count < 25) {
-			/* no convergence yet */ 
-	djd0 = djd;		/* old estimate is previous estimate */
-	jd = jd0 - djd;		/* time corrected for light time */
-	heliocentricXYZr(jd, object[i], equinox, pos2, &robject, vocal);
-	/* pos2 = cartesian ecliptic heliocentric coordinates of the target, */
-	/* robject = heliocentric distance of the target */
-	pos[0] = pos2[0] - pos3[0]; /* dX/AU */
-	pos[1] = pos2[1] - pos3[1]; /* dY/AU */
-	pos[2] = pos2[2] - pos3[2]; /* dZ/AU */
-				/* apparent distance */
-	r0 = sqrt(pos[0]*pos[0] + pos[1]*pos[1] + pos[2]*pos[2]);
-	if (internalMode & S_GEOMETRIC) /* no light-time */
-	  break;
-        if (vocal && !count) {
-          printf("ASTRON: target (%d) geometric ecliptic heliocentric coordinates for equinox:\n", object[i]);
-          printf("X = %.10g, Y = %.10g, Z = %.10g, r = %.10g AU\n",
-                 pos2[0], pos2[1], pos2[2], robject);
-          double pol[3];
-          XYZtoLBR(pos2, pol);
-          printf("lon = %.10g, lat = %.10g rad\n", pol[0], pol[1]);
-          pol[0] *= RAD;
-          pol[1] *= RAD;
-          printf("lon = %.10g, lat = %.10g deg\n", pol[0], pol[1]);
-        }
-	djd = r0*AUtoJD;	/* new estimate of light time */
+        /* now we converge upon the light-time to the target object */
+        unsigned int count = 0;
+        while (fabs(lighttime - prev_lighttime) > DBL_EPSILON*1000
+               && count < 25) {
+          /* no convergence yet */ 
+          prev_lighttime = lighttime; /* old estimate is previous estimate */
+          double jd_lt = jd - lighttime; /* time corrected for light time */
+          heliocentricXYZr(jd_lt, object[i], equinox, pos_sun_tgt, &r_sun_tgt,
+                           tolerance, 0, internalMode & S_VSOP);
+          /* pos_tgt = cartesian ecliptic heliocentric coordinates of the
+             target, r_sun_tgt = heliocentric distance of the target */
+          pos_obs_tgt[0] = pos_sun_tgt[0] - pos_sun_obs[0]; /* dX/AU */
+          pos_obs_tgt[1] = pos_sun_tgt[1] - pos_sun_obs[1]; /* dY/AU */
+          pos_obs_tgt[2] = pos_sun_tgt[2] - pos_sun_obs[2]; /* dZ/AU */
+          /* apparent distance */
+          r_obs_tgt = hypota(3, pos_obs_tgt);
+          lighttime = r_obs_tgt*AUtoJD; /* new estimate of light time */
+          count++;
+        } /* end of while */
         if (vocal)
-          printf("light-time = %.10g min\n", djd*24*60);
-	count++;
-      }	/* end of while */
-      /* now pos3 = cartesian ecliptic heliocentric observer object coordinates
-	 pos2 = apparent cartesian ecliptic heliocentric target object coordinates
-	 pos = apparent cartesian ecliptic planetocentric target object coordinates */
-      if (vocal) {
-        if (internalMode & S_GEOMETRIC)
-          puts("ASTRON: No correction for light time: geometric coordinates");
-        else
-          puts("ASTRON: Corrected for light time: apparent coordinates");
-        printf("ASTRON: target (%d) ecliptic heliocentric coordinates for equinox:\n", object[i]);
-        printf("X = %.10g, Y = %.10g, Z = %.10g, r = %.10g AU\n",
-               pos2[0], pos2[1], pos2[2], robject);
-        double pol[3];
-        XYZtoLBR(pos2, pol);
-        printf("lon = %.10g, lat = %.10g rad\n", pol[0], pol[1]);
-        pol[0] *= RAD;
-        pol[1] *= RAD;
-        printf("lon = %.10g, lat = %.10g deg\n", pol[0], pol[1]);
-        printf("ASTRON: target (%d) ecliptic planetocentric coordinates for equinox:\n", object[i]);
-        printf("X = %.10g, Y = %.10g, Z = %.10g, r = %.10g AU\n",
-               pos[0], pos[1], pos[2], r0);
-        XYZtoLBR(pos, pol);
-        printf("lon = %.10g, lat = %.10g rad\n", pol[0], pol[1]);
-        pol[0] *= RAD;
-        pol[1] *= RAD;
-        printf("lon = %.10g, lat = %.10g deg\n", pol[0], pol[1]);
+          printf("ASTRON: light-time = %.10g min = %.10g days\n",
+                 lighttime*24*60, lighttime);
       }
 
-      /* now have the planetocentric apparent position corrected for
-	 light-time (if not S_GEOMETRIC) but not yet for abberation. */
-      if (internalMode & S_ABBERATION) {
-	/* correct for abberation */
-	heliocentricXYZr(jd0 - djd, object0, equinox, pos3, &r, vocal);
-	pos[0] = pos2[0] - pos3[0];
-	pos[1] = pos2[1] - pos3[1];
-	pos[2] = pos2[2] - pos3[2];
-	/* pos[i] now contain cartesian coordinates that point in the
-	 right direction but do not indicate the right distance,
-	 which is r0.  correct. */
-        r = r0? r0/sqrt(pos[0]*pos[0] + pos[1]*pos[1] + pos[2]*pos[2]): 0;
-        pos[0] *= r;
-	pos[1] *= r;
-	pos[2] *= r;
-        if (vocal) {
-          puts("ASTRON: target ecliptic planetocentric coordinates corrected for abberation:");
-          printf("X = %.10g, Y = %.10g, Z = %.10g, r = %.10g AU\n",
-                 pos[0], pos[1], pos[2], r0);
-          double pol[3];
-          XYZtoLBR(pos, pol);
-          printf("lon = %.10g, lat = %.10g rad\n", pol[0], pol[1]);
-          pol[0] *= RAD;
-          pol[1] *= RAD;
-          printf("lon = %.10g, lat = %.10g deg\n", pol[0], pol[1]);
-        }
-      } else if (vocal) {
-        puts("ASTRON: no correction for abberation");
-      }
-      if (getAstronError)
-	for (n = 3; n < 9; n++) /* update covariance matrix */
-	  pos[n] = r*(pos2[n] + pos3[n]); /* covariances add */
+      /*
+        now we have cartesian ecliptic coordinates
+        pos3 = observer helioceontric at jd
+        pos2 = target heliocentric at jd (geometrical) or jd - lighttime
+        pos = target (at jd or jd - lighttime) relative to observer (at jd)
+      */
 
-      /* now have (in pos[]) the planetocentric ecliptic cartesian */
-      /* coordinates referred to the desired equinox, FK5 */
+      /* we include the effects of light-time and (if requested)
+         aberration due to the observer's motion.
+
+         The light-time dt is the time that light takes to travel from
+         the object at time t - dt to the observer at time t.
+
+         Light-time only: combine the position of the object at time t
+         - dt with the position of the observer at time t.
+
+         Aberration only: combine the position of the object at time t
+         with the position of the observer at time t - dt.
+
+         Light-time and aberration: combine the position of the object
+         at time t - dt with the position of the observer at time t -
+         dt.
+
+         (These procedures assume that the motion of the observer
+         during the light-time period is linear.)
+      */
       
-      /* apply nutation */
-      pos2[0] = pos[0]*cdPsi - pos[1]*sdPsi;
-      pos2[1] = pos[0]*sdPsi + pos[1]*cdPsi;
-      pos2[2] = pos[2];
-      if (getAstronError)
-	memcpy(pos2 + 3, pos + 3, 6*sizeof(double));
-      if (vocal) {
-        puts("ASTRON: ecliptic planetocentric coordinates corrected for nutation:");
-        printf("X = %.10g, Y = %.10g, Z = %.10g, r = %.10g AU\n",
-               pos2[0], pos2[1], pos2[2], r0);        
-        double pol[3];
-        XYZtoLBR(pos2, pol);
-        printf("lon = %.10g, lat = %.10g rad\n", pol[0], pol[1]);
-        pol[0] *= RAD;
-        pol[1] *= RAD;
-        printf("lon = %.10g, lat = %.10g deg\n", pol[0], pol[1]);
+      switch (internalMode & (S_LIGHTTIME | S_ABERRATION)) {
+      case 0:                   /* geometrical; obs + target at jd */
+        heliocentricXYZr(jd, object[i], equinox, pos_sun_tgt, &r_sun_tgt,
+                         tolerance, vocal, internalMode & S_VSOP);
+        pos_obs_tgt[0] = pos_sun_tgt[0] - pos_sun_obs[0];
+        pos_obs_tgt[1] = pos_sun_tgt[1] - pos_sun_obs[1];
+        pos_obs_tgt[2] = pos_sun_tgt[2] - pos_sun_obs[2];
+        r_obs_tgt = hypota(3, pos_obs_tgt);
+        if (vocal) {
+          puts("ASTRON: target geometric planetocentric ecliptic coordinates:");
+          printXYZtoLBR(pos_obs_tgt);
+        }
+        break;
+      case S_LIGHTTIME:         /* observer at jd, target at jd - lighttime */
+        /* calculated this already when figuring out the lighttime */
+        if (vocal) {
+          puts("ASTRON: target planetocentric ecliptic coordinates corrected for light-time:");
+          printXYZtoLBR(pos_obs_tgt);
+        }
+        break;
+      case S_ABERRATION:        /* observer at jd - lighttime, target at jd */
+        {
+          double pos_sun_obs_lt[3], r_sun_obs_lt, pos_sun_tgt_nolt[3],
+            r_sun_tgt_nolt;
+          heliocentricXYZr(jd - lighttime, object0, equinox, pos_sun_obs_lt,
+                           &r_sun_obs_lt, tolerance, vocal,
+                           internalMode & S_VSOP);
+          heliocentricXYZr(jd, object[i], equinox, pos_sun_tgt_nolt,
+                           &r_sun_tgt_nolt, tolerance, vocal,
+                           internalMode & S_VSOP);
+          pos_obs_tgt[0] = pos_sun_tgt_nolt[0] - pos_sun_obs_lt[0];
+          pos_obs_tgt[1] = pos_sun_tgt_nolt[1] - pos_sun_obs_lt[1];
+          pos_obs_tgt[2] = pos_sun_tgt_nolt[2] - pos_sun_obs_lt[2];
+        }
+        /* pos_obs_tgt[i] now contain cartesian coordinates that
+           point in the right direction but do not indicate the
+           right distance, which is r_sun_obs.  correct. */
+        double f = r_obs_tgt/hypota(3, pos_obs_tgt);
+        pos_obs_tgt[0] *= f;
+        pos_obs_tgt[1] *= f;
+        pos_obs_tgt[2] *= f;
+        if (vocal) {
+          puts("ASTRON: target planetocentric ecliptic coordinates corrected for aberration:");
+          printXYZtoLBR(pos_obs_tgt);
+        }
+        break;
+      case S_LIGHTTIME | S_ABERRATION: /* observer + target at jd - lighttime */
+        {
+          double pos_sun_obs_lt[9], r_sun_obs_lt;
+          heliocentricXYZr(jd - lighttime, object0, equinox, pos_sun_obs_lt,
+                           &r_sun_obs_lt, tolerance, vocal,
+                           internalMode & S_VSOP);
+          pos_obs_tgt[0] = pos_sun_tgt[0] - pos_sun_obs_lt[0];
+          pos_obs_tgt[1] = pos_sun_tgt[1] - pos_sun_obs_lt[1];
+          pos_obs_tgt[2] = pos_sun_tgt[2] - pos_sun_obs_lt[2];
+        }
+        double fac = r_obs_tgt/hypota(3, pos_obs_tgt);
+        pos_obs_tgt[0] *= fac;
+        pos_obs_tgt[1] *= fac;
+        pos_obs_tgt[2] *= fac;
+        if (vocal) {
+          puts("ASTRON: target planetocentric ecliptic coordinates corrected for lighttime and aberration:");
+          printXYZtoLBR(pos_obs_tgt);
+        }
+        break;
       }
 
+      /* now have (in pos_obs_tgt[]) the planetocentric ecliptic
+         cartesian coordinates referred to the desired equinox */
+
+      if (dPsi) {
+        /* apply nutation */
+        double pos_nut[3];
+        pos_nut[0] = pos_obs_tgt[0]*cdPsi - pos_obs_tgt[1]*sdPsi;
+        pos_nut[1] = pos_obs_tgt[0]*sdPsi + pos_obs_tgt[1]*cdPsi;
+        pos_nut[2] = pos_obs_tgt[2];
+        memcpy(pos_obs_tgt, pos_nut, 3*sizeof(double));
+        if (vocal) {
+          puts("ASTRON: planetocentric ecliptic coordinates corrected for nutation:");
+          printXYZtoLBR(pos_obs_tgt);
+        }
+      }
+
+      double final[3];
       if (coordSystem == S_ELONGATION) { /* elongation, phase angle, magn */
-	pos2[0] = (robject0*robject0 + r0*r0 - robject*robject)/
-	  (2*robject0*r0);
-        if (pos2[0] > 1)	/* ignore round-off errors */
-	  pos2[0] = 1;
-	else if (pos2[0] < -1)	/* ignore round-off errors */
-	  pos2[0] = -1;
-	pos2[0] = acos(pos2[0]); /* elongation */
-	pos2[1] = (robject*robject + r0*r0 - robject0*robject0)/
-	  (2*robject*r0);
-        if (pos2[1] > 1)
-	  pos2[1] = 1;
-	else if (pos2[1] < -1)
-	  pos2[1] = -1;
-	pos2[1] = acos(pos2[1]); /* phase angle */
-	pos2[2] = magnitude(r0, robject, pos2[1]*RAD, object[i]);
-	if (getAstronError)		/* not yet implemented */
-	  pos2[3] = pos2[4] = pos2[5] = pos2[6] = pos2[7] = pos2[8] = 0.0;
+        /* calculate the elongation */
+        final[0] = (r_sun_obs*r_sun_obs + r_obs_tgt*r_obs_tgt
+                     - r_sun_tgt*r_sun_tgt)/(2*r_sun_obs*r_obs_tgt);
+        if (final[0] > 1)      /* ignore round-off errors */
+	  final[0] = 1;
+	else if (final[0] < -1) /* ignore round-off errors */
+	  final[0] = -1;
+	final[0] = acos(final[0]); /* elongation */
+
+        /* calculate the phase angle */
+	final[1] = (r_obs_tgt*r_obs_tgt + r_sun_tgt*r_sun_tgt
+                     - r_sun_obs*r_sun_obs)/(2*r_sun_tgt*r_obs_tgt);
+        if (final[1] > 1)
+	  final[1] = 1;
+	else if (final[1] < -1)
+	  final[1] = -1;
+	final[1] = acos(final[1]); /* phase angle */
+
+        /* calculate the magniture */
+	final[2] = magnitude(r_sun_tgt, r_obs_tgt, final[1]*RAD, object[i]);
         if (vocal) {
           puts("ASTRON: transform to elongation, phase angle, magnitude");
-          printf("el = %.10g rad, ph = %.10g rad, mag = %.10\n",
-                 pos2[0], pos2[1], pos2[2]);        
+          showraddms(" el = ", final[0]);
+          showraddms(" ph = ", final[1]);
+          printf(" mag = %.10g\n", final[2]);
         }
-      } else if ((internalMode & S_XYZ) == 0 || latitude != S_PLANETOCENTRIC) {
-	XYZtoLBR(pos2, pos);	/* to polar coordinates */
-	memcpy(pos2, pos, (getAstronError? 9: 3)*sizeof(double));
+      } else {
+	XYZtoLBR(pos_obs_tgt, final);	/* to polar coordinates */
+        if (internalMode & S_FK5)
+          VSOPtoFK5(TC2000(jd), final);     /* to FK5 */
         if (vocal) {
-          puts("ASTRON: ecliptic planetocentric coordinates:");
-          printf("lon = %.10g rad, lat = %.10g rad, r = %.10g AU\n",
-                 pos2[0], pos2[1], pos2[2]);        
-          printf("lon = %.10g, lat = %.10g deg\n",
-                 pos2[0]*RAD, pos2[1]*RAD);
+          puts("ASTRON: planetocentric ecliptic coordinates:");
+          printLBRtoXYZ(final);
         }
 	if (latitude != S_PLANETOCENTRIC /* topocentric -> parallax */
 	    || coordSystem == S_EQUATORIAL || coordSystem == S_HORIZONTAL) {
-	  ectoeq(pos2, ceps, seps, 1); /* to equatorial coordinates */
+	  ectoeq(final, ceps, seps, 1); /* to equatorial coordinates */
           if (vocal) {
-            puts("ASTRON: equatorial planetocentric coordinates:");
-            printf("lon = %.10g rad, lat = %.10g rad, r = %.10g AU\n",
-                   pos2[0], pos2[1], pos2[2]);        
-            printf("lon = %.10g, lat = %.10g deg\n",
-                   pos2[0]*RAD, pos2[1]*RAD);
+            puts("ASTRON: planetocentric equatorial coordinates:");
+            printHBRtoXYZ(final);
           }
 	  if (latitude != S_PLANETOCENTRIC) {
 	    /* we need to take parallax into account */
-	    pos2[0] = Tsid - longitude - pos2[0]; /* RA to local hour angle */
+	    final[0] = Tsid - longitude - final[0]; /* RA to local hour angle */
             if (vocal) {
-              printf("ASTRON: local hour angle = %.10g rad\n", pos2[0]);
-              printf("ASTRON: local hour angle = %.10g deg\n", pos2[0]*RAD);
+              printf("ASTRON: local hour angle\n");
+              showradhms(" H = ", final[0]);
             }
-	    parallax(pos2, r0, rcp, rsp);
+	    parallax(final, r_obs_tgt, rcp, rsp);
             if (vocal) {
-              puts("ASTRON: equatorial topocentric coordinates (parallax):");
-              printf("lon = %.10g rad, lat = %.10g rad, r = %.10g AU\n",
-                     pos2[0], pos2[1], pos2[2]);        
-              printf("lon = %.10g, lat = %.10g deg\n",
-                     pos2[0]*RAD, pos2[1]*RAD);
+              puts("ASTRON: topocentric equatorial coordinates (parallax):");
+              printHBRtoXYZ(final);
             }
 	    if (coordSystem == S_ECLIPTICAL || coordSystem == S_EQUATORIAL)
-	      pos2[0] = Tsid - longitude - pos2[0]; /* back to RA */
+	      final[0] = Tsid - longitude - final[0]; /* back to RA */
 	    if (coordSystem == S_ECLIPTICAL)
-	      ectoeq(pos2, ceps, seps, 0); /* back to ecliptical */
+	      ectoeq(final, ceps, seps, 0); /* back to ecliptical */
 	  }
 	  /* we have ecliptical coordinates if S_ECLIPTICAL
 	     or equatorial coordinates if S_EQUATORIAL
 	     or hour angle - declination - distance if S_HORIZONTAL */
 	  if (coordSystem == S_HORIZONTAL
 	      && latitude != S_PLANETOCENTRIC) { /* to horizontal coordinates */
-	    eqtohor(pos2, clat, slat, 1);
+	    eqtohor(final, clat, slat, 1);
             if (vocal) {
               puts("ASTRON: horizontal coordinates:");
-              printf("az = %.10g rad, el = %.10g rad, r = %.10g AU\n",
-                     pos2[0], pos2[1], pos2[2]);  
-              printf("az = %.10g, el = %.10g deg\n",
-                     pos2[0]*RAD, pos2[1]*RAD);
+              printLBRtoXYZ(final);
             }
           }
 	}
-	pos2[0] = famod(pos2[0], TWOPI);
+	final[0] = famod(final[0], TWOPI);
 	if ((internalMode & S_XYZ) != 0) {
 	  /* back to cartesian coordinates */
-	  LBRtoXYZ(pos2, pos);
-	  memcpy(pos2, pos, (getAstronError? 9: 3)*sizeof(double));
+          double pos[3];
+          memcpy(pos, final, sizeof(pos));
+	  LBRtoXYZ(pos, final);
           if (vocal) {
             puts("ASTRON: back to cartesian coordinates:");
-            printf("X = %.10g, Y = %.10g, Z = %.10g AU\n",
-                   pos2[0], pos2[1], pos2[2]);  
+            printXYZtoLBR(final);
           }
 	}
       }
       if (internalMode & S_CONJSPREAD) { /* /CONJSPREAD */
 	double r;
 
-	r = sqrt(pos2[0]*pos2[0] + pos2[1]*pos2[1] + pos2[2]*pos2[2]);
+	r = hypota(3, final);
 	if (r) {
-	  pos2[0] /= r;
-	  pos2[1] /= r;
-	  pos2[2] /= r;
+	  final[0] /= r;
+	  final[1] /= r;
+	  final[2] /= r;
 	}
-	mean[0] += pos2[0];
-	mean[1] += pos2[1];
-	mean[2] += pos2[2];
-	/* TODO: errors */
+	mean[0] += final[0];
+	mean[1] += final[1];
+	mean[2] += final[2];
       } else {
-	memcpy(f, pos2, dims[0]*sizeof(double));
-	f += dims[0];
+	memcpy(f, final, 3*sizeof(double));
+	f += 3;
       }
     } /* end of for all objects */
     if (internalMode & S_CONJSPREAD) {
-      double w;
-      w = sqrt(mean[0]*mean[0] + mean[1]*mean[1] + mean[2]*mean[2])/nObjects;
+      double w, final[3];
+      w = hypota(3, mean)/nObjects;
       w = sqrt(-26262.45*log(w));
-      XYZtoLBR(mean, pos);
-      memcpy(f, pos, 2*sizeof(double));
+      XYZtoLBR(mean, final);
+      memcpy(f, final, 2*sizeof(double));
       f[2] = w;
-      if (getAstronError)
-	f[3] = f[4] = f[5] = 0;
-      f += dims[0];
+      f += 3;
     }
   } /* end of for all dates */
 
   /* turn variances into standard deviations and radians into degrees */
   f = f0;
-  if (getAstronError) {
-    if (internalMode & S_XYZ)	/* XYZ */
-      for (i = 0; i < nJD*nObjects; i++) {
-	f[3] = sqrt(f[3]);
-	f[4] = sqrt(f[4]);
-	f[5] = sqrt(f[5]);
-	f += 6;
-      }
-    else
-      for (i = 0; i < nJD*nObjects; i++) {
-	f[0] *= RAD;
-	f[1] *= RAD;
-	f[3] = sqrt(f[3])*RAD;
-	f[4] = sqrt(f[4])*RAD;
-	f[5] = sqrt(f[5]);
-	f += 6;
-      }
-  } else if ((internalMode & S_XYZ) == 0)
+  if ((internalMode & S_XYZ) == 0)
     for (i = 0; i < nJD*nObjects; i++) {
-      if (vocal) {
-        printf("ASTRON: %.10g rad => %.10g deg\n", f[0], f[0]*RAD);
-        printf("ASTRON: %.10g rad => %.10g deg\n", f[1], f[1]*RAD);
-      }
       f[0] *= RAD;
       f[1] *= RAD;
       f += 3;

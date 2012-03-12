@@ -18,8 +18,9 @@ static char rcsid[] __attribute__ ((unused)) =
 extern int	nFixed, traceMode;
 
 int	nArg, currentEVB = 0, suppressMsg = 0;
+unsigned int internalMode;
 int	nExecuted = 0, executeLevel = 0, fileLevel = 0,
-	internalMode, returnSym, noTrace = 0, curRoutineNum = 0;
+	returnSym, noTrace = 0, curRoutineNum = 0;
 char	preserveKey;
 
 char	*currentRoutineName = NULL;
@@ -28,6 +29,9 @@ int	ana_convert(int, int *, int, int), convertScalar(scalar *, int, int),
 	dereferenceScalPointer(int), eval(int),
 	nextCompileLevel(FILE *, char *);
 void	zap(int symbol), updateIndices(void);
+void pushExecutionLevel(int line, int target);
+void popExecutionLevel(void);
+void showExecutionLevel(int symbol);
 
 /*------------------------------------------------------------------*/
 void fixContext(int symbol, int context)
@@ -566,8 +570,8 @@ int matchKey(word index, char **keys, int *var)
 /* always nonnegative).  *var returns the same, except in the ZEROKEY case, */
 /* in which *var receives the index to the parameter list. */
 {
- char	*key, *theKey, modeKey;
- int	n, l, indx, theMode;
+  char	*key, *theKey, modeKey, negate;
+  unsigned int	n, l, indx, theMode;
 
  if (symbol_class(index) != ANA_STRING)
    return anaerror("Non-string keyword??", index);
@@ -577,7 +581,12 @@ int matchKey(word index, char **keys, int *var)
    for (n = indx = 0; *keys; n++) {
      preserveKey = 0;
      modeKey = 0;
+     negate = 0;
      theKey = *keys++;
+     if (*theKey == '~') {      /* unset bits corresponding to mode */
+       negate = 1;
+       theKey++;
+     }
      if (isdigit((byte) *theKey)) {
        modeKey = 1;
        theMode = strtol(theKey, &theKey, 10);
@@ -588,7 +597,10 @@ int matchKey(word index, char **keys, int *var)
      }
      if (!strncmp(key, theKey, l)) {
        if (modeKey) {
-	 internalMode |= theMode;
+         if (negate)
+           internalMode &= ~theMode;
+         else
+           internalMode |= theMode;
 	 *var = ORKEY;
 	 return *var;
        }
@@ -598,7 +610,10 @@ int matchKey(word index, char **keys, int *var)
      else if (l > 2 && !strncmp(key + 2, theKey, l - 2)
 	      && !strncmp(key, "NO", 2)) {
        if (modeKey) {
-	 internalMode &= ~theMode;
+         if (negate)
+           internalMode |= theMode;
+         else
+           internalMode &= ~theMode;
 	 *var = ORKEY;
 	 return *var;
        }
@@ -697,9 +712,11 @@ int internal_routine(int symbol, internalRoutine *routine)
 
 		/* legal number of arguments? */
  if (nArg - nKeys > routine[routineNum].maxArg)
-   return anaerror("Illegal number of arguments to %s %s",
-		symbol, isSubroutine? "subroutine": "function",
-		routine[routineNum].name);
+   return anaerror("Too many arguments to %s %s: found %d,"
+                   " cannot accept more than %d",
+                   symbol, isSubroutine? "subroutine": "function",
+                   routine[routineNum].name, nArg - nKeys,
+                   routine[routineNum].maxArg);
 
  /* treat the arguments */
  if (nKeys? maxArg: (nArg + ordinary)) {/* arguments possible */
@@ -883,9 +900,11 @@ int internal_routine(int symbol, internalRoutine *routine)
  if (maxArg < routine[routineNum].minArg
      || maxArg > routine[routineNum].maxArg) {
    free(evalArgs);
-   return anaerror("Illegal number of arguments to %s %s",
-		symbol, isSubroutine? "subroutine": "function",
-		routine[routineNum].name);
+   return anaerror("Illegal number of arguments to %s %s:"
+                   "found %d, accept between %d and %d",
+                   symbol, isSubroutine? "subroutine": "function",
+                   routine[routineNum].name, maxArg,
+                   routine[routineNum].minArg, routine[routineNum].maxArg);
  }
 
  /* suppress unused (class 0) arguments if requested.  Remove any such */
@@ -964,6 +983,7 @@ int usr_routine(int symbol)
  symTableEntry	*oldpars;
  extern int	returnSym, defined(int, int);
  extern char	evalScalPtr;
+ void pushExecutionLevel(int, int), popExecutionLevel(void);
  
  executeLevel++;
  fileLevel++;
@@ -1303,247 +1323,6 @@ int usr_routine(int symbol)
    noTrace--;
  popExecutionLevel();
  return ANA_ERROR;
-}
-/*------------------------------------------------------------------*/
-int OLDinsert(int nsym)
-/* inserts data in a target symbol */
-{
- extern int	trace, step;
- int	target, source, nArg, nSubsc, *indexPtr, subArg[MAX_DIMS],
-	nTarget, nTargetDims, nSourceDims, stringTarget, *dims, nSource, i,
-	size, offset, j, subscArray, stringSource, stride;
- pointer	src, trgt;
- int	ana_assoc_output(int, int, int, int),
-	ana_file_output(int, int, int, int);
-
- target = insert_target(nsym);		/* target */
- nArg = insert_num_target_indices(nsym);
- if (nArg > MAX_DIMS)
-   return cerror(N_ARG_OVR, 0);
- source = insert_source(nsym);		/* symbol to be inserted */
-	 	/* check if legal to change this symbol */
- if (target <= nFixed)
-   return cerror(CST_LHS, target);
- 		/* check if target is a transfer symbol, and resolve if so */
- target = transfer(target);
-		/* put all indices in one array (if more than one)
-                   we allow one user-specified array of indices, or a list
-		   of scalars */
- nSubsc = 0;	/* nSubsc will contain # subsc numbers (scalar list) */
-		/* or # indices (index array) */
- subscArray = 0;			/* 0 -> scalars, 1 -> array */
- for (j = 0; j < nArg; j++)	/* all coordinates */
- { subArg[j] = evals(insert_target_indices(nsym)[j]);
-   mark(subArg[j]);
-   if (subArg[j] < 0)
-     return -1;
-   switch (symbol_class(subArg[j]))
-   { case ANA_SCALAR:
-       nSubsc++; break;
-     case ANA_ARRAY:		/* array of indices, then only one allowed */
-       if (nSubsc)
-	 return cerror(ILL_SUBSC_LHS, nsym);
-       subArg[0] = ana_long(1, subArg);	/* make sure indices are ANA_LONG */
-       indexPtr = (int *) array_data(subArg[0]); /* points to index list */
-       subscArray = 1;		/* indicates an array of indices */
-       nSubsc = array_size(subArg[0]);
-       break;
-     default:
-       return cerror(ILL_SUBSC_TYPE, nsym); }
- }
- if (!nSubsc)			/* no arguments -> assume zero */
- { subArg[0] = ANA_ZERO;
-   nSubsc = 1; }
- if (!subscArray)		/* a list of scalars; assemble the list */
-				/* in subArg */
- { for (i = 0; i < nSubsc; i++)
-     subArg[i] = int_arg(subArg[i]);
-   indexPtr = subArg; }
- /* now, nSusbc indices are listed in indexPtr */
- /* get target size and data pointer */
- stringTarget = 0;			/* no strings involved */
- switch (symbol_class(target))
- { case ANA_SCALAR: case ANA_SCAL_PTR:	/* cannot insert in scalars */
-     if (symbol_type(target) != ANA_TEMP_STRING) /* string pointer is OK */
-       return cerror(ILL_CLASS, target); /* else fall-thru */
-   case ANA_STRING:			/*string target */
-     trgt.s = string_value(target);
-     nTarget = string_size(target);
-     nTargetDims = 1;			/* ? */
-     dims = &nTarget;
-     stringTarget = ANA_STRING;		/* string target */
-     break;
-   case ANA_ARRAY:			/*array target */
-     trgt.l = (int *) array_data(target);
-     nTargetDims = array_num_dims(target);
-     dims = array_dims(target);
-     nTarget = array_size(target);
-     if (array_type(target) == ANA_TEMP_STRING)
-       stringTarget = ANA_ARRAY;
-     break;
-   case ANA_ASSOC:		/*assoc variables go to files.c */
-				/* only scalar list allowed! */
-     if (subscArray)
-       return cerror(ILL_SUBSC_LHS, nsym); /* fall-thru */
-   case ANA_FILEMAP:			/* file arrays go to filemap.c */
-     if ((source = eval(source)) < 0)
-       return source;		/* data */
-     mark(source);		/* ? */
-     if (!subscArray && nSubsc > 1)	/* scalar list > 1 element */
-     { i = array_scratch(ANA_LONG, 1, &nSubsc);
-       memcpy(array_data(i), indexPtr, nSubsc*sizeof(int));
-       offset = -1; }
-     else
-     { i = *subArg;
-       offset = -3; }
-     if (symbol_class(target) == ANA_ASSOC) /* simple insert */
-       target = ana_assoc_output(target, source, i, offset);
-     else if (subscArray)	/* file array with index array */
-       target = ana_file_output(target, source, i, -2);
-     else			/* file array with list of scalars */
-       target = ana_file_output(target, source, i, -1);
-     return target;
-   default:
-     return cerror(ILL_CLASS, target);
-   }
- /* get here if the source is an array or string */
- /* if scalar subscripts, then need # subscripts equal to # target */
- /* dimensions. */
- if (!subscArray && (nTargetDims != nSubsc && nSubsc > 1))
-   return cerror(WR_N_SUBSC, target);
- /* trgt is pointer to first element of data, nTarget is number of elements, */
- /* nTargetDims is number of dimensions.  now get source info */
- if ((source = eval(source)) < 0)
-   return source;		/* eval the source */
- mark(source);
- if (trace > executeLevel || step > executeLevel) /* output some info */
- { printf("      ( %s(", symbolIdent(target, 0));
-   for (j = 0; j < nArg; j++)
-   { if (j) putchar(',');
-     if (subscArray) printf("%s", symbolIdent(subArg[j], I_VALUE));
-     else printf("%d", subArg[j]); }
-   printf(") = %s )\n", symbolIdent(source, I_VALUE)); }
- /* does source contain a string or string array? */
- stringSource = 0;
- if (symbol_class(source) == ANA_STRING) stringSource = ANA_STRING;
- else if (symbol_class(source) == ANA_ARRAY
-	  && array_type(source) == ANA_TEMP_STRING)
-   stringSource = ANA_ARRAY;
- /* if target or source are string then the other one must be also. */
- /* also, a string array cannot be inserted into a string */
- if ((stringTarget
-      && (!stringSource
-	  || (stringTarget == ANA_STRING && stringSource == ANA_ARRAY)))
-     || (!stringTarget && stringSource))
-   return cerror(INCMP_ARG, insert_source(nsym));
- /* make source same type as target (if numerical) */
- if (!stringSource)
-   switch (symbol_type(target))
-   { case ANA_BYTE:    source = ana_byte(1, &source); break;
-     case ANA_WORD:    source = ana_word(1, &source); break;
-     case ANA_LONG:    source = ana_long(1, &source); break;
-     case ANA_FLOAT:   source = ana_float(1, &source); break;
-     case ANA_DOUBLE:  source = ana_double(1, &source); break; }
- /* get source data pointer and extent */
- switch (symbol_class(source))
- { case ANA_SCALAR:
-     src.b = &scalar_value(source).b;  nSource = 1;
-     nSourceDims = 1;  break;
-   case ANA_ARRAY:
-     nSource = array_size(source);  src.b = (byte *) array_data(source);
-     nSourceDims = array_num_dims(source);  break;
-   case ANA_STRING:
-     src.s = string_value(source);
-     nSourceDims = 1;
-	/* for insertion in string array, count number of strings, not size */
-     nSource = (stringTarget == ANA_ARRAY)? 1: string_size(source);
-     break;
-   default:
-     return cerror(ILL_CLASS, insert_source(nsym)); }
-/* get the size of a single element in the target */
- switch(stringTarget)
- { case 0:			/* numerical */
-     size = ana_type_size[symbol_type(target)];  break;
-   case ANA_STRING:			/* a single string */
-     size = sizeof(char);  break;
-   case ANA_ARRAY:			/* a string array */
-     size = sizeof(char **);  break; }
- /* for a subscript array, need # indices equal to source size, */
- /* or souce must be a single scalar */
- if (subscArray)
- { if (nSource == 1)
-     stride = 0;
-   else if (nSubsc != nSource)
-     return cerror(INCMP_ARR, insert_source(nsym));
-   else stride = size; }
-  		/* now go ahead */
- if (!subscArray)		/* bunch of scalar coords */
- { /* calculate offset in target */
-   offset = 0;
-   for (i = nSubsc - 1; i >= 0; i--)
-   { /* if there is just one scalar subscript, then it may address the */
-     /* whole array;  if there are more than one, then each has to fit */
-     /* in its own dimension */
-     if (subArg[i] < 0 || subArg[i] >= ((nSubsc == 1)? nTarget: dims[i]))
-     { printf(" index %1d;  size %1d\n", subArg[i], nSubsc == 1?
-	      nTarget: dims[i]);
-       return cerror(SUBSC_RANGE, insert_source(nsym)); }
-     offset = offset*dims[i] + subArg[i]; }
-   if (offset + nSource > nTarget)
-   { printf(" offset %1d;  size %1d;  target size %1d\n", offset,
-	    nSource, nTarget);
-     return cerror(SUBSC_RANGE, insert_source(nsym)); }
-   trgt.b += offset*size;
-   /* now insert */
-   switch (stringTarget)
-   { case ANA_STRING:		/* a string target; source is also a string */
-       memcpy(trgt.s, src.s, nSource);
-       break;
-     case ANA_ARRAY:		/* a string array target */
-       switch (stringSource)
-       { case ANA_STRING:	/* insert single string into string array */
-	   if (*trgt.sp) free(*trgt.sp); /* remove old */
-	   *trgt.sp = strsave(src.s);
-	   break;
-	 case ANA_ARRAY:	/* insert string array into string array */
-	   while (nSource--)
-	   { if (*trgt.sp) free(*trgt.sp); /* remove old */
-	     *trgt.sp++ = strsave(*src.sp++); }
-	   break; }
-       break;
-     case 0:			/* numerical only, both source and target */
-       memcpy(trgt.b, src.b, nSource*size);
-       break; }
- }
- else		/* get here if an array of subscripts. */
-		/* indexPtr points at the indices */
-   while (nSubsc--)		/* treat all indices */
-   { /* calculate offset in target; the indices may address the whole array */
-     if (*indexPtr < 0 || *indexPtr >= nTarget)
-     { printf(" index %1d;  size %1d\n", *indexPtr, nTarget);
-       return cerror(SUBSC_RANGE, insert_source(nsym)); }
-     /* now insert */
-     switch (stringTarget)
-     { case ANA_STRING:		/* a string target; source is also a string */
-	 memcpy(&trgt.s[*indexPtr], src.s, nSource);
-	 break;
-       case ANA_ARRAY:		/* a string array target */
-	 switch (stringSource)
-	 { case ANA_STRING:	/* insert single string into string array */
-	     if (trgt.sp[*indexPtr]) free(trgt.sp[*indexPtr]); /* remove old */
-	     trgt.sp[*indexPtr] = strsave(src.s);
-	     break;
-	   case ANA_ARRAY:	/* insert string array into string array */
-	     while (nSource--)
-	     { if (trgt.sp[*indexPtr]) free(trgt.sp[*indexPtr]);
-	       trgt.sp[*indexPtr] = strsave(*src.sp); }
-	     break; }
-       case 0:			/* numerical only, both source and target */
-	 memcpy(trgt.b + *indexPtr*size, src.b, size);
-	 break; }
-     src.b += stride;
-     indexPtr++; }
- return 1;					/*end of index array cases */
 }
 /*------------------------------------------------------------------*/
 int ana_for(int nsym)
@@ -1907,6 +1686,7 @@ int execute(int symbol)
   int	showstats(int, int []), getNewLine(char *, char *, char),
     ana_restart(int, int []), showError(int), insert(int, int []),
     nextFreeStackEntry(void);
+  void showExecutionLevel(int);
 
   curSymbol = symbol;		/* put in global so we know where an */
 				/* exception (interrupt) occurred, if any */
@@ -5337,7 +5117,7 @@ int ana_test(int narg, int ps[])
       rearrangeEdgeLoop(&info, NULL, i);
       do
 	*src.l = value;
-      while (advanceLoop(&info) < info.ndim - 1);
+      while (advanceLoop(&info, &src) < info.ndim - 1);
     }
   }
 

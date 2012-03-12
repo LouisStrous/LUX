@@ -14,6 +14,7 @@
 #include <ctype.h>
 #include "install.h"
 #include "action.h"
+#include "calendar.h"
 static char rcsid[] __attribute__ ((unused)) =
 "$Id: fun1.c,v 4.0 2001/02/07 20:37:00 strous Exp $";
 
@@ -233,7 +234,7 @@ int ana_date(void)
 }
 /*------------------------------------------------------------------------- */
 int ana_jd(void)
-/* returns current Julian Date in double precision */
+/* returns current Julian Day (relative to UTC) in double precision */
 {
   time_t	t;
   double	jd;
@@ -252,6 +253,17 @@ int ana_jd(void)
   jd = (double) t/86400.0 + 2440587.5;
   result = scalar_scratch(ANA_DOUBLE);
   scalar_value(result).d = jd;
+  return result;
+}
+/*------------------------------------------------------------------------- */
+int ana_cjd(void)
+/* returns current Chronological Julian Day, relative to the current
+   time zone */
+{
+  int result;
+
+  result = scalar_scratch(ANA_DOUBLE);
+  scalar_value(result).d = CJD_now();
   return result;
 }
 /*------------------------------------------------------------------------- */
@@ -307,7 +319,7 @@ int ana_show(int narg, int ps[])
 void symdumpswitch(int nsym, int mode)
 {
   char	*s, *typeName(int), *save;
-  int	nd, j, *ip;
+  int	j, *ip;
   int	evalListPtr(int);
   
   if (symbol_class(nsym) == ANA_TRANSFER || symbol_class(nsym) == ANA_POINTER) {
@@ -359,7 +371,6 @@ void symdumpswitch(int nsym, int mode)
       printw(")\n");
       return;
     case ANA_ASSOC:			/* assoc */
-      nd = assoc_num_dims(nsym);
       s = typeName((int) assoc_type(nsym));
       printwf("lun = %d, offset = %d, ", assoc_lun(nsym),
 	      assoc_has_offset(nsym)? assoc_offset(nsym): 0);
@@ -826,39 +837,39 @@ int ana_indgen(int narg, int ps[])
     case ANA_BYTE:
       do 
 	*trgt.b = (byte) trgtinfo.coords[0];
-      while (advanceLoop(&trgtinfo) < trgtinfo.rndim);
+      while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.rndim);
       break;
     case ANA_WORD:
       do 
 	*trgt.w = (word) trgtinfo.coords[0];
-      while (advanceLoop(&trgtinfo) < trgtinfo.rndim);
+      while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.rndim);
       break;
     case ANA_LONG:
       do 
 	*trgt.l = (int) trgtinfo.coords[0];
-      while (advanceLoop(&trgtinfo) < trgtinfo.rndim);
+      while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.rndim);
       break;
     case ANA_FLOAT:
       do 
 	*trgt.f = (float) trgtinfo.coords[0];
-      while (advanceLoop(&trgtinfo) < trgtinfo.rndim);
+      while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.rndim);
       break;
     case ANA_DOUBLE:
       do 
 	*trgt.d = (double) trgtinfo.coords[0];
-      while (advanceLoop(&trgtinfo) < trgtinfo.rndim);
+      while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.rndim);
       break;
     case ANA_CFLOAT:
       do {
 	trgt.cf->real = trgtinfo.coords[0];
 	trgt.cf->imaginary = 0.0;
-      } while (advanceLoop(&trgtinfo) < trgtinfo.rndim);
+      } while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.rndim);
       break;
     case ANA_CDOUBLE:
       do {
 	trgt.cd->real = trgtinfo.coords[0];
 	trgt.cd->imaginary = 0.0;
-      } while (advanceLoop(&trgtinfo) < trgtinfo.rndim);
+      } while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.rndim);
       break;
   }
   return result;
@@ -2046,7 +2057,7 @@ int index_total(int narg, int ps[], int mean)
 	      }
 	      /* we now have the data value to the given unsigned power */
 	      /* add in the exponent sign and the weighte */
-	      if (psign = -1) {	/* replace valuecf by *weights.f/valuecf */
+	      if (psign == -1) { /* replace valuecf by *weights.f/valuecf */
 		temp2f = valuecf.real*valuecf.real
 		  + valuecf.imaginary*valuecf.imaginary;
 		if (temp2f) {
@@ -2094,7 +2105,7 @@ int index_total(int narg, int ps[], int mean)
 		  }
 		  /* we now have the data value to the given unsigned power */
 		  /* add in the exponent sign and the weighte */
-		  if (psign = -1) {/* replace valuecd by *weights.f/valuecd */
+		  if (psign == -1) {/* replace valuecd by *weights.f/valuecd */
 		    temp2d = valuecd.real*valuecd.real
 		      + valuecd.imaginary*valuecd.imaginary;
 		    if (temp2d) {
@@ -2134,7 +2145,7 @@ int index_total(int narg, int ps[], int mean)
 		  }
 		  /* we now have the data value to the given unsigned power */
 		  /* add in the exponent sign and the weighte */
-		  if (psign = -1) {/* replace valuecd by *weights.f/valuecd */
+		  if (psign == -1) {/* replace valuecd by *weights.f/valuecd */
 		    temp2d = valuecd.real*valuecd.real
 		      + valuecd.imaginary*valuecd.imaginary;
 		    if (temp2d) {
@@ -2374,7 +2385,7 @@ int index_total(int narg, int ps[], int mean)
 	      }
 	      /* we now have the data value to the given unsigned power */
 	      /* add in the exponent sign and the weighte */
-	      if (psign = -1) {	/* replace valuecf by *weights.f/valuecf */
+	      if (psign == -1) { /* replace valuecf by *weights.f/valuecf */
 		temp2f = valuecf.real*valuecf.real
 		  + valuecf.imaginary*valuecf.imaginary;
 		if (temp2f) {
@@ -2416,7 +2427,7 @@ int index_total(int narg, int ps[], int mean)
 		  }
 		  /* we now have the data value to the given unsigned power */
 		  /* add in the exponent sign and the weighte */
-		  if (psign = -1) {/* replace valuecd by *weights.f/valuecd */
+		  if (psign == -1) {/* replace valuecd by *weights.f/valuecd */
 		    temp2d = valuecd.real*valuecd.real
 		      + valuecd.imaginary*valuecd.imaginary;
 		    if (temp2d) {
@@ -2456,7 +2467,7 @@ int index_total(int narg, int ps[], int mean)
 		  }
 		  /* we now have the data value to the given unsigned power */
 		  /* add in the exponent sign and the weighte */
-		  if (psign = -1) {/* replace valuecd by *weights.f/valuecd */
+		  if (psign == -1) {/* replace valuecd by *weights.f/valuecd */
 		    temp2d = valuecd.real*valuecd.real
 		      + valuecd.imaginary*valuecd.imaginary;
 		    if (temp2d) {
@@ -2684,7 +2695,7 @@ int index_total(int narg, int ps[], int mean)
 	      }
 	      /* we now have the data value to the given unsigned power */
 	      /* add in the exponent sign and the weighte */
-	      if (psign = -1) {	/* replace valuecf by *weights.f/valuecf */
+	      if (psign == -1) { /* replace valuecf by *weights.f/valuecf */
 		temp2f = valuecf.real*valuecf.real
 		  + valuecf.imaginary*valuecf.imaginary;
 		if (temp2f) {
@@ -2729,7 +2740,7 @@ int index_total(int narg, int ps[], int mean)
 		  }
 		  /* we now have the data value to the given unsigned power */
 		  /* add in the exponent sign and the weighte */
-		  if (psign = -1) {/* replace valuecd by *weights.f/valuecd */
+		  if (psign == -1) {/* replace valuecd by *weights.f/valuecd */
 		    temp2d = valuecd.real*valuecd.real
 		      + valuecd.imaginary*valuecd.imaginary;
 		    if (temp2d) {
@@ -2766,7 +2777,7 @@ int index_total(int narg, int ps[], int mean)
 		  }
 		  /* we now have the data value to the given unsigned power */
 		  /* add in the exponent sign and the weighte */
-		  if (psign = -1) {/* replace valuecd by *weights.f/valuecd */
+		  if (psign == -1) {/* replace valuecd by *weights.f/valuecd */
 		    temp2d = valuecd.real*valuecd.real
 		      + valuecd.imaginary*valuecd.imaginary;
 		    if (temp2d) {
@@ -2976,7 +2987,7 @@ int index_total(int narg, int ps[], int mean)
 	      }
 	      /* we now have the data value to the given unsigned power */
 	      /* add in the exponent sign and the weighte */
-	      if (psign = -1) {	/* replace valuecf by *weights.f/valuecf */
+	      if (psign == -1) { /* replace valuecf by *weights.f/valuecf */
 		temp2f = valuecf.real*valuecf.real
 		  + valuecf.imaginary*valuecf.imaginary;
 		if (temp2f) {
@@ -3014,7 +3025,7 @@ int index_total(int narg, int ps[], int mean)
 		  }
 		  /* we now have the data value to the given unsigned power */
 		  /* add in the exponent sign and the weighte */
-		  if (psign = -1) {/* replace valuecd by *weights.f/valuecd */
+		  if (psign == -1) {/* replace valuecd by *weights.f/valuecd */
 		    temp2d = valuecd.real*valuecd.real
 		      + valuecd.imaginary*valuecd.imaginary;
 		    if (temp2d) {
@@ -3050,7 +3061,7 @@ int index_total(int narg, int ps[], int mean)
 		  }
 		  /* we now have the data value to the given unsigned power */
 		  /* add in the exponent sign and the weighte */
-		  if (psign = -1) {/* replace valuecd by *weights.f/valuecd */
+		  if (psign == -1) {/* replace valuecd by *weights.f/valuecd */
 		    temp2d = valuecd.real*valuecd.real
 		      + valuecd.imaginary*valuecd.imaginary;
 		    if (temp2d) {
@@ -3249,7 +3260,8 @@ int total(int narg, int ps[], int mean)
 		do {
 		  sum.l += *src.b * *weights.b;
 		  w.l += *weights.b;
-		} while ((done = advanceLoops(&srcinfo, &winfo))
+		} while ((done = (advanceLoop(&winfo, &weights),
+				  advanceLoop(&srcinfo, &src)))
 			 < srcinfo.naxes);
 		*trgt.l++ = mean? (w.l? sum.l/w.l: 0): sum.l;
 	      } while (done < srcinfo.rndim);
@@ -3261,7 +3273,8 @@ int total(int narg, int ps[], int mean)
 		do {
 		  sum.l += *src.w * *weights.w;
 		  w.l += *weights.w;
-		} while ((done = advanceLoops(&srcinfo, &winfo))
+		} while ((done = (advanceLoop(&winfo, &weights),
+				  advanceLoop(&srcinfo, &src)))
 			 < srcinfo.naxes);
 		*trgt.l++ = mean? (w.l? sum.l/w.l: 0): sum.l;
 	      } while (done < srcinfo.rndim);
@@ -3273,7 +3286,8 @@ int total(int narg, int ps[], int mean)
 		do {
 		  sum.l += *src.l * *weights.l;
 		  w.l += *weights.l;
-		} while ((done = advanceLoops(&srcinfo, &winfo))
+		} while ((done = (advanceLoop(&winfo, &weights),
+				  advanceLoop(&srcinfo, &src)))
 			 < srcinfo.naxes);
 		*trgt.l++ = mean? (w.l? sum.l/w.l: 0): sum.l;
 	      } while (done < srcinfo.rndim);
@@ -3289,7 +3303,8 @@ int total(int narg, int ps[], int mean)
 		do {
 		  sum.f += *src.b * *weights.b;
 		  w.f += *weights.b;
-		} while ((done = advanceLoops(&srcinfo, &winfo))
+		} while ((done = (advanceLoop(&winfo, &weights),
+				  advanceLoop(&srcinfo, &src)))
 			 < srcinfo.naxes);
 		*trgt.f++ = mean? (w.f? sum.f/w.f: 0): sum.f;
 	      } while (done < srcinfo.rndim);
@@ -3301,7 +3316,8 @@ int total(int narg, int ps[], int mean)
 		do {
 		  sum.f += *src.w * *weights.w;
 		  w.f += *weights.w;
-		} while ((done = advanceLoops(&srcinfo, &winfo))
+		} while ((done = (advanceLoop(&winfo, &weights),
+				  advanceLoop(&srcinfo, &src)))
 			 < srcinfo.naxes);
 		*trgt.f++ = mean? (w.f? sum.f/w.f: 0): sum.f;
 	      } while (done < srcinfo.rndim);
@@ -3313,7 +3329,8 @@ int total(int narg, int ps[], int mean)
 		do {
 		  sum.f += *src.l * *weights.l;
 		  w.f += *weights.l;
-		} while ((done = advanceLoops(&srcinfo, &winfo))
+		} while ((done = (advanceLoop(&winfo, &weights),
+				  advanceLoop(&srcinfo, &src)))
 			 < srcinfo.naxes);
 		*trgt.f++ = mean? (w.f? sum.f/w.f: 0): sum.f;
 	      } while (done < srcinfo.rndim);
@@ -3325,7 +3342,8 @@ int total(int narg, int ps[], int mean)
 		do {
 		  sum.f += *src.f * *weights.f;
 		  w.f += *weights.f;
-		} while ((done = advanceLoops(&srcinfo, &winfo))
+		} while ((done = (advanceLoop(&winfo, &weights),
+				  advanceLoop(&srcinfo, &src)))
 			 < srcinfo.naxes);
 		*trgt.f++ = mean? (w.f? sum.f/w.f: 0): sum.f;
 	      } while (done < srcinfo.rndim);
@@ -3343,7 +3361,8 @@ int total(int narg, int ps[], int mean)
 		do {
 		  sum.d += (double) *src.b * *weights.b;
 		  w.d += *weights.b;
-		} while ((done = advanceLoops(&srcinfo, &winfo))
+		} while ((done = (advanceLoop(&winfo, &weights),
+				  advanceLoop(&srcinfo, &src)))
 			 < srcinfo.naxes);
 		*trgt.d++ = mean? (w.d? sum.d/w.d: 0): sum.d;
 	      } while (done < srcinfo.rndim);
@@ -3355,7 +3374,8 @@ int total(int narg, int ps[], int mean)
 		do {
 		  sum.d += (double) *src.w * *weights.w;
 		  w.d += *weights.w;
-		} while ((done = advanceLoops(&srcinfo, &winfo))
+		} while ((done = (advanceLoop(&winfo, &weights),
+				  advanceLoop(&srcinfo, &src)))
 			 < srcinfo.naxes);
 		*trgt.d++ = mean? (w.d? sum.d/w.d: 0): sum.d;
 	      } while (done < srcinfo.rndim);
@@ -3367,7 +3387,8 @@ int total(int narg, int ps[], int mean)
 		do {
 		  sum.d += (double) *src.l * *weights.l;
 		  w.d += *weights.l;
-		} while ((done = advanceLoops(&srcinfo, &winfo))
+		} while ((done = (advanceLoop(&winfo, &weights),
+				  advanceLoop(&srcinfo, &src)))
 			 < srcinfo.naxes);
 		*trgt.d++ = mean? (w.d? sum.d/w.d: 0): sum.d;
 	      } while (done < srcinfo.rndim);
@@ -3379,7 +3400,8 @@ int total(int narg, int ps[], int mean)
 		do {
 		  sum.d += (double) *src.f * *weights.f;
 		  w.d += *weights.f;
-		} while ((done = advanceLoops(&srcinfo, &winfo))
+		} while ((done = (advanceLoop(&winfo, &weights),
+				  advanceLoop(&srcinfo, &src)))
 			 < srcinfo.naxes);
 		*trgt.d++ = mean? (w.d? sum.d/w.d: 0): sum.d;
 	      } while (done < srcinfo.rndim);
@@ -3391,7 +3413,8 @@ int total(int narg, int ps[], int mean)
 		do {
 		  sum.d += *src.d * *weights.d;
 		  w.d += *weights.d;
-		} while ((done = advanceLoops(&srcinfo, &winfo))
+		} while ((done = (advanceLoop(&winfo, &weights),
+				  advanceLoop(&srcinfo, &src)))
 			 < srcinfo.naxes);
 		*trgt.d++ = mean? (w.d? sum.d/w.d: 0): sum.d;
 	      } while (done < srcinfo.rndim);
@@ -3409,7 +3432,8 @@ int total(int narg, int ps[], int mean)
 	      sumcf.real += src.cf->real * *weights.f;
 	      sumcf.imaginary += src.cf->imaginary * *weights.f;
 	      w.f += *weights.f;
-	    } while ((done = advanceLoops(&srcinfo, &winfo))
+	    } while ((done = (advanceLoop(&winfo, &weights),
+			      advanceLoop(&srcinfo, &src)))
 			 < srcinfo.naxes);
 	    if (mean) {
 	      if (w.f) {
@@ -3435,7 +3459,8 @@ int total(int narg, int ps[], int mean)
 		  sumcd.real += (double) src.cf->real * *weights.f;
 		  sumcd.imaginary += (double) src.cf->imaginary * *weights.f;
 		  w.d += *weights.d;
-		} while ((done = advanceLoops(&srcinfo, &winfo))
+		} while ((done = (advanceLoop(&winfo, &weights),
+				  advanceLoop(&srcinfo, &src)))
 			 < srcinfo.naxes);
 		if (mean) {
 		  if (w.d) {
@@ -3458,7 +3483,8 @@ int total(int narg, int ps[], int mean)
 		  sumcd.real += src.cd->real * *weights.d;
 		  sumcd.imaginary += src.cd->imaginary * *weights.d;
 		  w.d += *weights.d;
-		} while ((done = advanceLoops(&srcinfo, &winfo))
+		} while ((done = (advanceLoop(&winfo, &weights),
+				  advanceLoop(&srcinfo, &src)))
 			 < srcinfo.naxes);
 		if (mean) {
 		  if (w.d) {
@@ -3488,7 +3514,7 @@ int total(int narg, int ps[], int mean)
 		sum.l = 0.0;
 		do
 		  sum.l += *src.b;
-		while ((done = advanceLoop(&srcinfo)) < srcinfo.naxes);
+		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 		*trgt.l++ = mean? sum.l/n: sum.l;
 	      } while (done < srcinfo.rndim);
 	      break;
@@ -3497,7 +3523,7 @@ int total(int narg, int ps[], int mean)
 		sum.l = 0.0;
 		do
 		  sum.l += *src.w;
-		while ((done = advanceLoop(&srcinfo)) < srcinfo.naxes);
+		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 		*trgt.l++ = mean? sum.l/n: sum.l;
 	      } while (done < srcinfo.rndim);
 	      break;
@@ -3506,7 +3532,7 @@ int total(int narg, int ps[], int mean)
 		sum.l = 0.0;
 		do
 		  sum.l += *src.l;
-		while ((done = advanceLoop(&srcinfo)) < srcinfo.naxes);
+		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 		*trgt.l++ = mean? sum.l/n: sum.l;
 	      } while (done < srcinfo.rndim);
 	      break;
@@ -3519,7 +3545,7 @@ int total(int narg, int ps[], int mean)
 		sum.f = 0.0;
 		do
 		  sum.f += *src.b;
-		while ((done = advanceLoop(&srcinfo)) < srcinfo.naxes);
+		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 		*trgt.f++ = mean? sum.f/n: sum.f;
 	      } while (done < srcinfo.rndim);
 	      break;
@@ -3528,7 +3554,7 @@ int total(int narg, int ps[], int mean)
 		sum.f = 0.0;
 		do
 		  sum.f += *src.w;
-		while ((done = advanceLoop(&srcinfo)) < srcinfo.naxes);
+		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 		*trgt.f++ = mean? sum.f/n: sum.f;
 	      } while (done < srcinfo.rndim);
 	      break;
@@ -3537,7 +3563,7 @@ int total(int narg, int ps[], int mean)
 		sum.f = 0.0;
 		do
 		  sum.f += *src.l;
-		while ((done = advanceLoop(&srcinfo)) < srcinfo.naxes);
+		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 		*trgt.f++ = mean? sum.f/n: sum.f;
 	      } while (done < srcinfo.rndim);
 	      break;
@@ -3546,7 +3572,7 @@ int total(int narg, int ps[], int mean)
 		sum.f = 0.0;
 		do
 		  sum.f += *src.f;
-		while ((done = advanceLoop(&srcinfo)) < srcinfo.naxes);
+		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 		*trgt.f++ = mean? sum.f/n: sum.f;
 	      } while (done < srcinfo.rndim);
 	      break;
@@ -3560,7 +3586,7 @@ int total(int narg, int ps[], int mean)
 		sum.d = 0.0;
 		do
 		  sum.d += *src.b;
-		while ((done = advanceLoop(&srcinfo)) < srcinfo.naxes);
+		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 		*trgt.d++ = mean? sum.d/n: sum.d;
 	      } while (done < srcinfo.rndim);
 	      break;
@@ -3569,7 +3595,7 @@ int total(int narg, int ps[], int mean)
 		sum.d = 0.0;
 		do
 		  sum.d += *src.w;
-		while ((done = advanceLoop(&srcinfo)) < srcinfo.naxes);
+		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 		*trgt.d++ = mean? sum.d/n: sum.d;
 	      } while (done < srcinfo.rndim);
 	      break;
@@ -3578,7 +3604,7 @@ int total(int narg, int ps[], int mean)
 		sum.d = 0.0;
 		do
 		  sum.d += *src.l;
-		while ((done = advanceLoop(&srcinfo)) < srcinfo.naxes);
+		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 		*trgt.d++ = mean? sum.d/n: sum.d;
 	      } while (done < srcinfo.rndim);
 	      break;
@@ -3587,7 +3613,7 @@ int total(int narg, int ps[], int mean)
 		sum.d = 0.0;
 		do
 		  sum.d += *src.f;
-		while ((done = advanceLoop(&srcinfo)) < srcinfo.naxes);
+		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 		*trgt.d++ = mean? sum.d/n: sum.d;
 	      } while (done < srcinfo.rndim);
 	      break;
@@ -3596,7 +3622,7 @@ int total(int narg, int ps[], int mean)
 		sum.d = 0.0;
 		do
 		  sum.d += *src.d;
-		while ((done = advanceLoop(&srcinfo)) < srcinfo.naxes);
+		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 		*trgt.d++ = mean? sum.d/n: sum.d;
 	      } while (done < srcinfo.rndim);
 	      break;
@@ -3609,7 +3635,7 @@ int total(int narg, int ps[], int mean)
 	    do {
 	      sumcf.real += src.cf->real;
 	      sumcf.imaginary += src.cf->imaginary;
-	    } while ((done = advanceLoop(&srcinfo)) < srcinfo.naxes);
+	    } while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 	    if (mean) {
 	      trgt.cf->real = sumcf.real/n;
 	      trgt.cf++->imaginary = sumcf.imaginary/n;
@@ -3627,7 +3653,7 @@ int total(int narg, int ps[], int mean)
 		do {
 		  sumcd.real += src.cf->real;
 		  sumcd.imaginary += src.cf->imaginary;
-		} while ((done = advanceLoop(&srcinfo)) < srcinfo.naxes);
+		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 		if (mean) {
 		  trgt.cd->real = sumcd.real/n;
 		  trgt.cd++->imaginary = sumcd.imaginary/n;
@@ -3643,7 +3669,7 @@ int total(int narg, int ps[], int mean)
 		do {
 		  sumcd.real += src.cd->real;
 		  sumcd.imaginary += src.cd->imaginary;
-		} while ((done = advanceLoop(&srcinfo)) < srcinfo.naxes);
+		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 		if (mean) {
 		  trgt.cd->real = sumcd.real/n;
 		  trgt.cd++->imaginary = sumcd.imaginary/n;
@@ -3697,7 +3723,8 @@ int total(int narg, int ps[], int mean)
 		    value.l *= *weights.b;
 		  sum.l += value.l;
 		  w.l += *weights.b;
-		} while ((done = advanceLoops(&srcinfo, &winfo))
+		} while ((done = (advanceLoop(&winfo, &weights),
+				  advanceLoop(&srcinfo, &src)))
 			 < srcinfo.naxes);
 		*trgt.l++ = mean? (w.l? sum.l/w.l: 0.0): sum.l;
 	      } while (done < srcinfo.rndim);
@@ -3721,7 +3748,8 @@ int total(int narg, int ps[], int mean)
 		    value.l *= *weights.w;
 		  sum.l += value.l;
 		  w.l += *weights.w;
-		} while ((done = advanceLoops(&srcinfo, &winfo))
+		} while ((done = (advanceLoop(&winfo, &weights),
+				  advanceLoop(&srcinfo, &src)))
 			 < srcinfo.naxes);
 		*trgt.l++ = mean? (w.l? sum.l/w.l: 0.0): sum.l;
 	      } while (done < srcinfo.rndim);
@@ -3745,7 +3773,8 @@ int total(int narg, int ps[], int mean)
 		    value.l *= *weights.l;
 		  sum.l += value.l;
 		  w.l += *weights.l;
-		} while ((done = advanceLoops(&srcinfo, &winfo))
+		} while ((done = (advanceLoop(&winfo, &weights),
+				  advanceLoop(&srcinfo, &src)))
 			 < srcinfo.naxes);
 		*trgt.l++ = mean? (w.l? sum.l/w.l: 0.0): sum.l;
 	      } while (done < srcinfo.rndim);
@@ -3773,7 +3802,8 @@ int total(int narg, int ps[], int mean)
 		    value.f *= *weights.b;
 		  sum.f += value.f;
 		  w.f += *weights.b;
-		} while ((done = advanceLoops(&srcinfo, &winfo))
+		} while ((done = (advanceLoop(&winfo, &weights),
+				  advanceLoop(&srcinfo, &src)))
 			 < srcinfo.naxes);
 		*trgt.f++ = mean? (w.f? sum.f/w.f: 0.0): sum.f;
 	      } while (done < srcinfo.rndim);
@@ -3797,7 +3827,8 @@ int total(int narg, int ps[], int mean)
 		    value.f *= *weights.w;
 		  sum.f += value.f;
 		  w.f += *weights.w;
-		} while ((done = advanceLoops(&srcinfo, &winfo))
+		} while ((done = (advanceLoop(&winfo, &weights),
+				  advanceLoop(&srcinfo, &src)))
 			 < srcinfo.naxes);
 		*trgt.f++ = mean? (w.f? sum.f/w.f: 0.0): sum.f;
 	      } while (done < srcinfo.rndim);
@@ -3821,7 +3852,8 @@ int total(int narg, int ps[], int mean)
 		    value.f *= *weights.l;
 		  sum.f += value.f;
 		  w.f += *weights.l;
-		} while ((done = advanceLoops(&srcinfo, &winfo))
+		} while ((done = (advanceLoop(&winfo, &weights),
+				  advanceLoop(&srcinfo, &src)))
 			 < srcinfo.naxes);
 		*trgt.f++ = mean? (w.f? sum.f/w.f: 0.0): sum.f;
 	      } while (done < srcinfo.rndim);
@@ -3845,7 +3877,8 @@ int total(int narg, int ps[], int mean)
 		    value.f *= *weights.f;
 		  sum.f += value.f;
 		  w.f += *weights.f;
-		} while ((done = advanceLoops(&srcinfo, &winfo))
+		} while ((done = (advanceLoop(&winfo, &weights),
+				  advanceLoop(&srcinfo, &src)))
 			 < srcinfo.naxes);
 		*trgt.f++ = mean? (w.f? sum.f/w.f: 0.0): sum.f;
 	      } while (done < srcinfo.rndim);
@@ -3873,7 +3906,8 @@ int total(int narg, int ps[], int mean)
 		    value.d *= *weights.b;
 		  sum.d += value.d;
 		  w.d += *weights.b;
-		} while ((done = advanceLoops(&srcinfo, &winfo))
+		} while ((done = (advanceLoop(&winfo, &weights),
+				  advanceLoop(&srcinfo, &src)))
 			 < srcinfo.naxes);
 		*trgt.d++ = mean? (w.d? sum.d/w.d: 0.0): sum.d;
 	      } while (done < srcinfo.rndim);
@@ -3897,7 +3931,8 @@ int total(int narg, int ps[], int mean)
 		    value.d *= *weights.w;
 		  sum.d += value.d;
 		  w.d += *weights.w;
-		} while ((done = advanceLoops(&srcinfo, &winfo))
+		} while ((done = (advanceLoop(&winfo, &weights),
+				  advanceLoop(&srcinfo, &src)))
 			 < srcinfo.naxes);
 		*trgt.d++ = mean? (w.d? sum.d/w.d: 0.0): sum.d;
 	      } while (done < srcinfo.rndim);
@@ -3921,7 +3956,8 @@ int total(int narg, int ps[], int mean)
 		    value.d *= *weights.l;
 		  sum.d += value.d;
 		  w.d += *weights.l;
-		} while ((done = advanceLoops(&srcinfo, &winfo))
+		} while ((done = (advanceLoop(&winfo, &weights),
+				  advanceLoop(&srcinfo, &src)))
 			 < srcinfo.naxes);
 		*trgt.d++ = mean? (w.d? sum.d/w.d: 0.0): sum.d;
 	      } while (done < srcinfo.rndim);
@@ -3945,7 +3981,8 @@ int total(int narg, int ps[], int mean)
 		    value.d *= *weights.f;
 		  sum.d += value.d;
 		  w.d += *weights.f;
-		} while ((done = advanceLoops(&srcinfo, &winfo))
+		} while ((done = (advanceLoop(&winfo, &weights),
+				  advanceLoop(&srcinfo, &src)))
 			 < srcinfo.naxes);
 		*trgt.d++ = mean? (w.d? sum.d/w.d: 0.0): sum.d;
 	      } while (done < srcinfo.rndim);
@@ -3969,7 +4006,8 @@ int total(int narg, int ps[], int mean)
 		    value.d *= *weights.d;
 		  sum.d += value.d;
 		  w.d += *weights.d;
-		} while ((done = advanceLoops(&srcinfo, &winfo))
+		} while ((done = (advanceLoop(&winfo, &weights),
+				  advanceLoop(&srcinfo, &src)))
 			 < srcinfo.naxes);
 		*trgt.d++ = mean? (w.d? sum.d/w.d: 0.0): sum.d;
 	      } while (done < srcinfo.rndim);
@@ -3998,7 +4036,7 @@ int total(int narg, int ps[], int mean)
 		tempcf.imaginary = 2*tempcf.real*tempcf.imaginary;
 		tempcf.real = temp2f;
 	      }
-	      if (psign = -1) {	/* replace valuecf by *weights.f/valuecf */
+	      if (psign == -1) { /* replace valuecf by *weights.f/valuecf */
 		temp2f = valuecf.real*valuecf.real
 		  + valuecf.imaginary*valuecf.imaginary;
 		if (temp2f) {
@@ -4013,7 +4051,8 @@ int total(int narg, int ps[], int mean)
 	      sumcf.real += valuecf.real;
 	      sumcf.imaginary *= valuecf.imaginary;
 	      w.f += *weights.f;
-	    } while ((done = advanceLoops(&srcinfo, &winfo))
+	    } while ((done = (advanceLoop(&winfo, &weights),
+			      advanceLoop(&srcinfo, &src)))
 		     < srcinfo.naxes);
 	    if (mean) {
 	      if (w.f) {
@@ -4052,7 +4091,7 @@ int total(int narg, int ps[], int mean)
 		    tempcd.imaginary = 2*tempcd.real*tempcd.imaginary;
 		    tempcd.real = temp2d;
 		  }
-		  if (psign = -1) { /* replace valuecd by *weights.f/valuecd */
+		  if (psign == -1) { /* replace valuecd by *weights.f/valuecd */
 		    temp2d = valuecd.real*valuecd.real
 		      + valuecd.imaginary*valuecd.imaginary;
 		    if (temp2d) {
@@ -4067,7 +4106,8 @@ int total(int narg, int ps[], int mean)
 		  sumcd.real += valuecd.real;
 		  sumcd.imaginary *= valuecd.imaginary;
 		  w.d += *weights.f;
-		} while ((done = advanceLoops(&srcinfo, &winfo))
+		} while ((done = (advanceLoop(&winfo, &weights),
+				  advanceLoop(&srcinfo, &src)))
 			 < srcinfo.naxes);
 		if (mean) {
 		  if (w.d) {
@@ -4104,7 +4144,7 @@ int total(int narg, int ps[], int mean)
 		    tempcd.imaginary = 2*tempcd.real*tempcd.imaginary;
 		    tempcd.real = temp2d;
 		  }
-		  if (psign = -1) { /* replace valuecd by *weights.f/valuecd */
+		  if (psign == -1) { /* replace valuecd by *weights.f/valuecd */
 		    temp2d = valuecd.real*valuecd.real
 		      + valuecd.imaginary*valuecd.imaginary;
 		    if (temp2d) {
@@ -4119,7 +4159,8 @@ int total(int narg, int ps[], int mean)
 		  sumcd.real += valuecd.real;
 		  sumcd.imaginary *= valuecd.imaginary;
 		  w.d += *weights.d;
-		} while ((done = advanceLoops(&srcinfo, &winfo))
+		} while ((done = (advanceLoop(&winfo, &weights),
+				  advanceLoop(&srcinfo, &src)))
 			 < srcinfo.naxes);
 		if (mean) {
 		  if (w.d) {
@@ -4160,7 +4201,7 @@ int total(int narg, int ps[], int mean)
 		  if (psign == -1) /* negative exponent: must divide */
 		    value.l = value.l? 1.0/value.l: 0.0;
 		  sum.l += value.l;
-		} while ((done = advanceLoop(&srcinfo)) < srcinfo.naxes);
+		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 		*trgt.l++ = mean? sum.l/n: sum.l;
 	      } while (done < srcinfo.rndim);
 	      break;
@@ -4180,7 +4221,7 @@ int total(int narg, int ps[], int mean)
 		  if (psign == -1) /* negative exponent: must divide */
 		    value.l = value.l? 1.0/value.l: 0.0;
 		  sum.l += value.l;
-		} while ((done = advanceLoop(&srcinfo)) < srcinfo.naxes);
+		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 		*trgt.l++ = mean? sum.l/n: sum.l;
 	      } while (done < srcinfo.rndim);
 	      break;
@@ -4200,7 +4241,7 @@ int total(int narg, int ps[], int mean)
 		  if (psign == -1) /* negative exponent: must divide */
 		    value.l = value.l? 1.0/value.l: 0.0;
 		  sum.l += value.l;
-		} while ((done = advanceLoop(&srcinfo)) < srcinfo.naxes);
+		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 		*trgt.l++ = mean? sum.l/n: sum.l;
 	      } while (done < srcinfo.rndim);
 	      break;
@@ -4224,7 +4265,7 @@ int total(int narg, int ps[], int mean)
 		  if (psign == -1) /* negative exponent: must divide */
 		    value.f = value.f? 1.0/value.f: 0.0;
 		  sum.f += value.f;
-		} while ((done = advanceLoop(&srcinfo)) < srcinfo.naxes);
+		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 		*trgt.f++ = mean? sum.f/n: sum.f;
 	      } while (done < srcinfo.rndim);
 	      break;
@@ -4244,7 +4285,7 @@ int total(int narg, int ps[], int mean)
 		  if (psign == -1) /* negative exponent: must divide */
 		    value.f = value.f? 1.0/value.f: 0.0;
 		  sum.f += value.f;
-		} while ((done = advanceLoop(&srcinfo)) < srcinfo.naxes);
+		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 		*trgt.f++ = mean? sum.f/n: sum.f;
 	      } while (done < srcinfo.rndim);
 	      break;
@@ -4264,7 +4305,7 @@ int total(int narg, int ps[], int mean)
 		  if (psign == -1) /* negative exponent: must divide */
 		    value.f = value.f? 1.0/value.f: 0.0;
 		  sum.f += value.f;
-		} while ((done = advanceLoop(&srcinfo)) < srcinfo.naxes);
+		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 		*trgt.f++ = mean? sum.f/n: sum.f;
 	      } while (done < srcinfo.rndim);
 	      break;
@@ -4284,7 +4325,7 @@ int total(int narg, int ps[], int mean)
 		  if (psign == -1) /* negative exponent: must divide */
 		    value.f = value.f? 1.0/value.f: 0.0;
 		  sum.f += value.f;
-		} while ((done = advanceLoop(&srcinfo)) < srcinfo.naxes);
+		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 		*trgt.f++ = mean? sum.f/n: sum.f;
 	      } while (done < srcinfo.rndim);
 	      break;
@@ -4308,7 +4349,7 @@ int total(int narg, int ps[], int mean)
 		  if (psign == -1) /* negative exponent: must divide */
 		    value.d = value.d? 1.0/value.d: 0.0;
 		  sum.d += value.d;
-		} while ((done = advanceLoop(&srcinfo)) < srcinfo.naxes);
+		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 		*trgt.d++ = mean? sum.d/n: sum.d;
 	      } while (done < srcinfo.rndim);
 	      break;
@@ -4328,7 +4369,7 @@ int total(int narg, int ps[], int mean)
 		  if (psign == -1) /* negative exponent: must divide */
 		    value.d = value.d? 1.0/value.d: 0.0;
 		  sum.d += value.d;
-		} while ((done = advanceLoop(&srcinfo)) < srcinfo.naxes);
+		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 		*trgt.d++ = mean? sum.d/n: sum.d;
 	      } while (done < srcinfo.rndim);
 	      break;
@@ -4348,7 +4389,7 @@ int total(int narg, int ps[], int mean)
 		  if (psign == -1) /* negative exponent: must divide */
 		    value.d = value.d? 1.0/value.d: 0.0;
 		  sum.d += value.d;
-		} while ((done = advanceLoop(&srcinfo)) < srcinfo.naxes);
+		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 		*trgt.d++ = mean? sum.d/n: sum.d;
 	      } while (done < srcinfo.rndim);
 	      break;
@@ -4368,7 +4409,7 @@ int total(int narg, int ps[], int mean)
 		  if (psign == -1) /* negative exponent: must divide */
 		    value.d = value.d? 1.0/value.d: 0.0;
 		  sum.d += value.d;
-		} while ((done = advanceLoop(&srcinfo)) < srcinfo.naxes);
+		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 		*trgt.d++ = mean? sum.d/n: sum.d;
 	      } while (done < srcinfo.rndim);
 	      break;
@@ -4388,7 +4429,7 @@ int total(int narg, int ps[], int mean)
 		  if (psign == -1) /* negative exponent: must divide */
 		    value.d = value.d? 1.0/value.d: 0.0;
 		  sum.d += value.d;
-		} while ((done = advanceLoop(&srcinfo)) < srcinfo.naxes);
+		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 		*trgt.d++ = mean? sum.d/n: sum.d;
 	      } while (done < srcinfo.rndim);
 	      break;
@@ -4416,7 +4457,7 @@ int total(int narg, int ps[], int mean)
 		tempcf.imaginary = 2*tempcf.real*tempcf.imaginary;
 		tempcf.real = temp2f;
 	      }
-	      if (psign = -1) {	/* replace valuecf by *weights.f/valuecf */
+	      if (psign == -1) { /* replace valuecf by *weights.f/valuecf */
 		temp2f = valuecf.real*valuecf.real
 		  + valuecf.imaginary*valuecf.imaginary;
 		if (temp2f) {
@@ -4427,7 +4468,7 @@ int total(int narg, int ps[], int mean)
 	      }
 	      sumcf.real += valuecf.real;
 	      sumcf.imaginary *= valuecf.imaginary;
-	    } while ((done = advanceLoop(&srcinfo)) < srcinfo.naxes);
+	    } while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 	    if (mean) {
 	      trgt.cf->real = sumcf.real/n;
 	      trgt.cf->imaginary = sumcf.imaginary/n;
@@ -4462,7 +4503,7 @@ int total(int narg, int ps[], int mean)
 		    tempcd.imaginary = 2*tempcd.real*tempcd.imaginary;
 		    tempcd.real = temp2d;
 		  }
-		  if (psign = -1) { /* replace valuecd by *weights.f/valuecd */
+		  if (psign == -1) { /* replace valuecd by *weights.f/valuecd */
 		    temp2d = valuecd.real*valuecd.real
 		      + valuecd.imaginary*valuecd.imaginary;
 		    if (temp2d) {
@@ -4473,7 +4514,7 @@ int total(int narg, int ps[], int mean)
 		  }
 		  sumcd.real += valuecd.real;
 		  sumcd.imaginary *= valuecd.imaginary;
-		} while ((done = advanceLoop(&srcinfo)) < srcinfo.naxes);
+		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 		if (mean) {
 		  trgt.cd->real = sumcd.real/n;
 		  trgt.cd->imaginary = sumcd.imaginary/n;
@@ -4506,7 +4547,7 @@ int total(int narg, int ps[], int mean)
 		    tempcd.imaginary = 2*tempcd.real*tempcd.imaginary;
 		    tempcd.real = temp2d;
 		  }
-		  if (psign = -1) { /* replace valuecd by *weights.f/valuecd */
+		  if (psign == -1) { /* replace valuecd by *weights.f/valuecd */
 		    temp2d = valuecd.real*valuecd.real
 		      + valuecd.imaginary*valuecd.imaginary;
 		    if (temp2d) {
@@ -4517,7 +4558,7 @@ int total(int narg, int ps[], int mean)
 		  }
 		  sumcd.real += valuecd.real;
 		  sumcd.imaginary *= valuecd.imaginary;
-		} while ((done = advanceLoop(&srcinfo)) < srcinfo.naxes);
+		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 		if (mean) {
 		  trgt.cd->real = sumcd.real/n;
 		  trgt.cd->imaginary = sumcd.imaginary/n;

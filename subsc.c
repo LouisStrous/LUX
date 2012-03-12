@@ -212,7 +212,7 @@ int ana_inserter(int narg, int ps[])
       default:
 	return cerror(ILL_TYPE, ps[0]);
     }
-  } while (advanceLoop(&trgtinfo) < trgtinfo.rndim);
+  } while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.rndim);
   return ANA_OK;
 }
 /*------------------------------------------------------------------------- */
@@ -529,7 +529,8 @@ int ana_reverse(int narg, int ps[])
 	    } /* end of while (i--) */
 	  src.b = src2.b + stride*srcinfo.rdims[0];
 	  trgt.b = trgt2.b + stride*srcinfo.rdims[0];
-	} while (advanceLoops(&srcinfo, &trgtinfo) < srcinfo.rndim);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
       else {			/* center is out of bounds */
 	if (internalMode & 1) {	/* /ZERO */
 	  zerobytes(trgt.b, trgtinfo.nelem*trgtinfo.stride);
@@ -903,6 +904,7 @@ int ana_subsc_func(int narg, int ps[])
   listElem	*le;
   FILE	*fp = NULL;
   int	ana_subsc_subgrid(int, int []);
+  int ana_endian(int, int []);
 
   nsym = ps[--narg];
   /* now nsym is the source (subscripted) symbol and narg is the number
@@ -1909,6 +1911,7 @@ int ana_subsc_func(int narg, int ps[])
 	break;
     }
   }
+  int ana_endian(int, int *);
   if (class == ANA_FILEMAP && file_map_swap(nsym))
     ana_endian(1, &iq);		/* byte swap */
   return iq;
@@ -1925,7 +1928,7 @@ int string_sub(int narg, int ps[])
  LS 19aug98 */
 {
   /* this is a subset of cases for arrays since strings are 1-D */
-  int	iq, n, result_sym, nd, ns, nsym, i;
+  int	iq, n, result_sym, ns, nsym, i;
   char	*p, *q;
   pointer p2;
 
@@ -1961,7 +1964,6 @@ int string_sub(int narg, int ps[])
       /* a string is created with length = # elements in array */
       iq = ana_long(1, &iq);	/* get a long version */
       p2.l = (int *) array_data(iq);
-      nd = array_num_dims(iq);
       ns = array_size(iq);
       result_sym = string_scratch(ns);
       q = string_value(result_sym);
@@ -2417,7 +2419,6 @@ int ana_concat(int narg, int ps[])
   int	nd, j, i, dim[MAX_DIMS], nundef = 0;
   int	iq, nsym, mq, toptype = ANA_BYTE, topnd = 0, sflag = 0, n, nq;
   scalar	temp;
-  loopInfo	info;
 
   if (narg <= 0)
     return cerror(WRNG_N_ARG, 0);
@@ -2833,7 +2834,7 @@ int ana_subsc_subgrid(int narg, int ps[])
    LS 19aug98 */
 {
   byte	class, type;
-  int	ndim, *dims, nelem, i, subsc[MAX_DIMS], nSubsc, iq, j, mid,
+  int	ndim, *dims, i, subsc[MAX_DIMS], nSubsc, iq, j, mid,
     stride[MAX_DIMS], index, tally[MAX_DIMS], step[2][MAX_DIMS];
   float	*coord[MAX_DIMS], d[MAX_DIMS];
   scalar	value, cvalue;
@@ -2850,7 +2851,6 @@ int ana_subsc_subgrid(int narg, int ps[])
       src.l = array_data(ps[narg]);
       ndim = array_num_dims(ps[narg]);
       dims = array_dims(ps[narg]);
-      nelem = array_size(ps[narg]);
       break;
   }
 
@@ -3030,7 +3030,7 @@ int extractNumerical(pointer src, pointer trgt, int type, int ndim, int *dims,
   do {
     memcpy(trgt.b, src.b, info.stride);
     trgt.b += info.stride;
-  } while (advanceLoop(&info) < info.rndim);
+  } while (advanceLoop(&info, &trgt) < info.rndim);
   return 1;
 }
 /*------------------------------------------------------------------------- */
@@ -3092,7 +3092,7 @@ int ana_roll(int narg, int ps[])
   do {
     memcpy(trgt.b, src.b, srcinfo.stride);
     trgt.b += srcinfo.stride;
-  } while (advanceLoop(&srcinfo) < srcinfo.rndim);
+  } while (advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 
   return result;
 }

@@ -1,35 +1,70 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
-#include "vsop.h"
 #include <math.h>
 #include <stdio.h>
+#include <string.h>
 #include "anaparser.h"
+#include "vsop.h"
 
+#if DONOTIGNORE
+static struct VSOPdata usedVSOPdata;
+static double planetIndexTolerance = -1;
+
+struct VSOPdata *planetIndicesForTolerance(struct VSOPdata *data, 
+                                           double tolerance)
+/* returns a pointer to an array of planet indices into the VSOP model
+   values, suitable for an error tolerance of nonnegative <tolerance>.
+   None of the amplitudes of the VSOP planet terms represented by the
+   returned indices is greater than the indicated tolerance.  If
+   <tolerance> is equal to 0, then the returned indices represent the
+   full set of VSOP model values. The returned pointer is to a
+   statically allocated array, which gets overwritten by subsequent
+   calls to the same routine. */
+{
+  if (tolerance < 0)
+    tolerance = 0;
+  if (tolerance == planetIndexTolerance && planetIndices == planetIndexSrc)
+    return usedPlanetIndices;
+  planetIndexSrc = planetIndices;
+  planetIndexTolerance = tolerance;
+  memcpy(usedPlanetIndices, planetIndices, sizeof(planetIndices));
+  if (tolerance > 0) {
+    int planet;
+    for (planet = 0; planet < 8; planet++) {
+      int coordinate;
+      for (coordinate = 0; coordinate < 3; coordinate++) {
+        int poweroft;
+        for (poweroft = 0; poweroft < 6; poweroft++) {
+          struct planetIndex *pi = &usedPlanetIndices[poweroft + 6*coordinate + 6*3*planet];
+          int i, j;
+          for (i = pi->index, j = 1; i < pi->index + pi->nTerms; i++, j++) {
+            if (planetTerms[3*i]*sqrt(j)*2 < tolerance) {
+              pi->nTerms = i - pi->index;
+              break;
+            }
+          }
+        }
+      }
+    }
+  }
+  return usedPlanetIndices;
+}
+#endif
 /*--------------------------------------------------------------------------*/
-int	getAstronError = 0;
-int	fullVSOP = 1;
-
-void gatherTruncVSOP(double T, struct planetIndex *index, double *terms, 
-                     double *value, double *error2)
+static void gatherVSOP(double T, struct planetIndex *index, double *terms, 
+                       double *value)
 /* calculates one coordinate of one object, as indicated by <index>,
    at time <T> in Julian centuries since J2000.0, using the VSOP87
-   theory of Bretagnon & Francou (1988), truncated as given by Meeus.
-   The heliocentric longitude, latitude, (in radians) or radius (in
-   AU) relative to the dynamical ecliptic and equinox of the date is
-   returned in <*value>.  The associated estimated variance is
-   returned in <*error2>. */
+   theory of Bretagnon & Francou (1988).  The heliocentric coordinate
+   is returned in <*value>. */
 {
   double	*ptr;
   int	nTerm, i;
 
   *value = 0.0;			/* initialize */
-  if (getAstronError)
-    *error2 = 0.0;
   for (i = 5; i >= 0; i--) {	/* powers of T */
     *value *= T;		/* move previous stuff to next power of T */
-    if (getAstronError)
-      *error2 *= T;
     nTerm = index[i].nTerms;	/* number of terms to add */
     if (nTerm) {
       ptr = terms + 3*(index[i].index); /* points at first term */
@@ -37,50 +72,58 @@ void gatherTruncVSOP(double T, struct planetIndex *index, double *terms,
 	*value += ptr[0]*cos(ptr[1] + ptr[2]*T); /* add term */
 	ptr += 3;		/* go to next term for this coordinate */
       }
-      if (getAstronError)		/* variance estimate: number of terms
-				 times square of amplitude of smallest
-				 (last) term times a number smaller than 4 */
-	*error2 += index[i].nTerms*ptr[-3]*ptr[-3];
     }
   }
-  if (getAstronError)			/* apply factor of 4 mentioned before */
-    *error2 = 4* *error2;
 }
 /*--------------------------------------------------------------------------*/
-void LBRfromVSOPD(double T, int object, double *pos)
-/* returns the heliocentric longitude, latitude, and distance referred
- to the mean dynamical ecliptic and equinox of the date using the
- VSOP87D theory (as described in Meeus: Astronomical Algorithms).
- pos[0] -> L, pos[1] -> B, pos[2] -> R, pos[3] -> var[L]; if
- getAstronError is unequal to zero, then also pos[4] -> var[B], pos[5]
- -> var[R], pos[6] -> cov[L,B], pos[7] -> cov[L,R], pos[8] ->
- cov[B,R].  The covariances are assumed equal to zero (for want of a
- regular estimate). */
+void XYZfromVSOP(double T, int object, double *pos, double tolerance,
+                 struct VSOPdata *data)
 {
-  struct planetIndex *indices;
-
-  indices = fullVSOP? planetIndicesVSOPD: truncPlanetIndicesVSOPD;
   switch (object) {
     case 0:			/* Sun */
       pos[0] = pos[1] = pos[2] = 0.0;
-      if (getAstronError)
-	pos[3] = pos[4] = pos[5] = pos[6] = pos[7] = pos[8] = 0.0;
       break;
     default:			/* other planets */
-				/* heliocentric ecliptic longitude (rad) */
-      gatherTruncVSOP(T, &indices[6*3*(object - 1)], planetTermsD, &pos[0],
-		      getAstronError? &pos[3]: NULL);
-      pos[0] = fmod(pos[0], TWOPI);
-      if (pos[0] < 0)
-	pos[0] += TWOPI;
-				/* heliocentric ecliptic latitude (rad) */
-      gatherTruncVSOP(T, &indices[6*3*(object - 1) + 6], planetTermsD, 
-                      &pos[1], getAstronError? &pos[4]: NULL);
-				/* heliocentric distance (AU) */
-      gatherTruncVSOP(T, &indices[6*3*(object - 1) + 12], planetTermsD,
-                      &pos[2], getAstronError? &pos[5]: NULL);
-      if (getAstronError)
-	pos[6] = pos[7] = pos[8] = 0.0;
+				/* heliocentric ecliptic X (AU) */
+      gatherVSOP(T, &data->indices[6*3*(object - 1)], data->terms, &pos[0]);
+				/* heliocentric ecliptic Y (AU) */
+      gatherVSOP(T, &data->indices[6*3*(object - 1) + 6], data->terms, &pos[1]);
+				/* heliocentric ecliptic Z (AU) */
+      gatherVSOP(T, &data->indices[6*3*(object - 1) + 12], data->terms, &pos[2]);
       break;
   }
+}
+/*--------------------------------------------------------------------------*/
+void XYZdatefromVSOPC(double T, int object, double *pos, double tolerance)
+/* returns the heliocentric cartesian coordinates referred to the mean
+ dynamical ecliptic and equinox of the date using the VSOP87C theory as
+ described in Bretagnon & Francou: "Planetary theories in rectangular
+ and spherical variables.  VSOP 87 solutions", Astronomy and
+ Astrophysics, 202, 309-315 (1988).  <T> represents the desired
+ instant of time, measured in Julian centuries since J2000.0.
+ <object> indicates the object for which coordinates are to be
+ returned (0 = the Sun, 1 = Mercury, ..., 8 = Neptune).  <pos> points
+ at an array of at least 3 elements, in which the results are
+ returned.  pos[0] -> X, pos[1] -> Y, pos[2] -> Z. <tolerance>
+ indicates the maximum error allowed in the results due to truncation
+ of the VSOP model series.  Specify 0 to get the highest accuracy. */
+{
+  return XYZfromVSOP(T, object, pos, tolerance, &VSOP87Cdata);
+}
+/*--------------------------------------------------------------------------*/
+void XYZJ2000fromVSOPA(double T, int object, double *pos, double tolerance)
+/* returns the heliocentric cartesian coordinates referred to the mean
+ dynamical ecliptic and equinox of J2000.0 using the VSOP87A theory as
+ described in Bretagnon & Francou: "Planetary theories in rectangular
+ and spherical variables.  VSOP 87 solutions", Astronomy and
+ Astrophysics, 202, 309-315 (1988).  <T> represents the desired
+ instant of time, measured in Julian centuries since J2000.0.
+ <object> indicates the object for which coordinates are to be
+ returned (0 = the Sun, 1 = Mercury, ..., 8 = Neptune).  <pos> points
+ at an array of at least 3 elements, in which the results are
+ returned.  pos[0] -> X, pos[1] -> Y, pos[2] -> Z. <tolerance>
+ indicates the maximum error allowed in the results due to truncation
+ of the VSOP model series.  Specify 0 to get the highest accuracy. */
+{
+  return XYZfromVSOP(T, object, pos, tolerance, &VSOP87Adata);
 }

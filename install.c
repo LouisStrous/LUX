@@ -19,6 +19,7 @@
 #include <string.h> /* for index(41) strlen(17) memcpy(12) strcpy(4) strcmp(4) ... */
 #include <time.h> /* for CLK_TCK(1) clock(1) time(1) */
 #include <unistd.h> /* for pipe(2) execl(1) sbrk(1) */
+#include <obstack.h>
 /* clock() on mips-sgi-irix64-6.2 is in unistd.h rather than in ANSI time.h */
 
 #include "editorcharclass.h"
@@ -31,11 +32,12 @@ extern symTableEntry	sym[];
 extern hashTableEntry	*varHashTable[], *subrHashTable[], *funcHashTable[],
 			*blockHashTable[];
 extern word		listStack[];
-extern internalRoutine	subroutine[], function[];
 extern int		keepEVB;
 extern char		*currentChar, line[];
 extern FILE		*inputStream, *outputStream;
 extern int		nExecuted;
+/* extern internalRoutine	subroutine[], function[]; */
+internalRoutine *subroutine, *function;
 
 int	anaerror(char *, int, ...), lookForName(char *, hashTableEntry *[], int),
 	newSymbol(int, ...), ana_setup(), rawIo(void), cookedIo(void);
@@ -93,7 +95,7 @@ extern int ana_area(), ana_area2(), ana_array_statistics(),
   ana_astore(), ana_fzinspect(), ana_multisieve(), ana_crunchrun(),
   ana_swaphalf(), ana_chdir(), ana_replace_values(),
   ana_freads(), ana_one(), ana_disableNewline(), ana_enableNewline(),
-  ana_shift(), ana_file_to_fz(), ana_zapnan(), ana_fft(),
+  ana_shift(), ana_file_to_fz(), ana_zapnan(),
   ana_buffering(), ana_pencolor(), ana_idlrestore(), ana_list(),
   ana_extract_bits(), ana_fftshift(), ana_manualterm(), ana_watch(),
   ana_fcrunwrite(), ana_fits_read(), ana_fits_write(), ana_subshift(),
@@ -253,7 +255,7 @@ int	ana_zeroifnotdefined(), ana_compile_file();	/* browser */
   "%1%SPECIAL" -> FOO,3,2 yields (none),3,2
                   FOO,3,SPECIAL=1 yields 1,3 */
 
-internalRoutine	subroutine[] = {
+internalRoutine	subroutine_table[] = {
   { "%INSERT",	3, MAX_ARG, insert, /* execute.c */
     "1INNER:2OUTER:4ONEDIM:8SKIPSPACE:16ZERO:32ALL:64SEPARATE" },
   { "AREA",	1, 4, ana_area, ":SEED:NUMBERS:DIAGONAL" }, /* topology.c */
@@ -333,8 +335,6 @@ internalRoutine	subroutine[] = {
   { "FCRW",	2, 3, ana_fcrunwrite, 0 }, /* files.c */
   { "FCW",	2, 3, ana_fcwrite, "1RUNLENGTH" }, /* files.c */
   { "FCWRITE",	2, 3, ana_fcwrite, "1RUNLENGTH" }, /* files.c */
-  { "FFT",	1, 3, ana_fft,	/* fun3.c */
-    "::DIRECTION:1BACK:2ALL:4COMPLEX" }, 
   { "FFTSHIFT",	2, 2, ana_fftshift, 0 }, /* fun3.c */
   { "FILEPTR",	1, 2, ana_fileptr, "1START:2EOF:4ADVANCE" }, /* files.c */
   { "FILEREAD", 5, 5, ana_fileread, 0 }, /* files.c */
@@ -662,7 +662,7 @@ internalRoutine	subroutine[] = {
   { "ZOOM",	1, 3, ana_zoom, "1OLDCONTRAST" }, /* zoom.c */
 #endif
 };
-int	nSubroutine = sizeof(subroutine)/sizeof(internalRoutine);
+int nSubroutine = sizeof(subroutine_table)/sizeof(internalRoutine);
 
 extern int ana_abs(), ana_acos(), ana_arestore_f(), ana_arg(),
   ana_array(), ana_asin(), ana_assoc(), ana_astore_f(), ana_atan(),
@@ -681,8 +681,8 @@ extern int ana_abs(), ana_acos(), ana_arestore_f(), ana_arg(),
   ana_erf(), ana_erfc(), ana_erode(), ana_erode_dir(), ana_esmooth(),
   ana_eval(), ana_exp(), ana_expand(), ana_expm1(),
   ana_extract_bits_f(), ana_extreme_general(), ana_f_ratio(),
-  ana_fcwrite_f(), ana_fft_f(), ana_fftshift_f(), ana_fileptr_f(),
-  ana_filesize(), ana_filetype_name(), ana_find(), ana_findfile(),
+  ana_fcwrite_f(), ana_fftshift_f(), ana_fileptr_f(),
+  ana_filesize(), ana_filetype_name(), ana_find(), ana_find2(), ana_findfile(),
   ana_find_max(), ana_find_maxloc(), ana_find_min(),
   ana_find_minloc(), ana_fitskey(), ana_fits_header_f(),
   ana_fits_read_f(), ana_fits_xread_f(), ana_float(), ana_floor(),
@@ -694,12 +694,12 @@ extern int ana_abs(), ana_acos(), ana_arestore_f(), ana_arg(),
   ana_imaginary(), ana_incomplete_beta(), ana_incomplete_gamma(),
   ana_index(), ana_indgen(), ana_inpolygon(), intarr(), intfarr(),
   ana_isarray(), ana_isnan(), ana_isscalar(), ana_isstring(),
-  ana_istring(), ana_j0(), ana_j1(), ana_jd(), ana_jn(),
+  ana_istring(), ana_j0(), ana_j1(), ana_jd(), ana_jn(), ana_cjd(),
   ana_ksmooth(), ana_laplace2d(), ana_lmap(), ana_local_maxf(),
   ana_local_maxloc(),
   ana_local_minf(), ana_local_minloc(), ana_log(), ana_log10(),
   ana_log1p(), lonarr(), lonfarr(), ana_long(), ana_lower(),
-  ana_lsq(), ana_lsq2(), ana_match(), ana_matmul(), ana_max_dir(),
+  ana_lsq(), ana_lsq2(), ana_match(), ana_max_dir(),
   ana_maxf(), ana_maxfilter(), ana_maxloc(), ana_mean(),
   ana_medfilter(), ana_median(), ana_memory(), ana_minf(),
   ana_minfilter(), ana_minloc(), ana_neg_func(),
@@ -712,7 +712,7 @@ extern int ana_abs(), ana_acos(), ana_arestore_f(), ana_arg(),
   ana_readkeyne(), ana_readu_f(), ana_real(), ana_redim_f(),
   ana_regrid(), ana_regrid3(), ana_regrid3ns(), ana_reorder(),
   ana_reverse(), ana_rfix(), ana_root3(), ana_runcum(), ana_runprod(),
-  ana_runsum(), ana_scale(), ana_scalerange(), ana_sccomplex(),
+  ana_runsum(), ana_scale(), ana_scalerange(),
   ana_sdev(), ana_segment(), ana_segment_dir(), ana_sgn(),
   ana_shift_f(), ana_sieve(), ana_sin(), ana_sinh(), ana_skipc(),
   ana_smap(), ana_smooth(), ana_solar_b(), ana_solar_l(),
@@ -734,7 +734,7 @@ extern int ana_abs(), ana_acos(), ana_arestore_f(), ana_arg(),
   ana_cartesian_to_polar(), ana_polar_to_cartesian(), ana_roll(),
   ana_siderealtime(), ana_asinh(),
   ana_acosh(), ana_atanh(), ana_astrf(), ana_antilaplace2d(),
-  ana_cspline_find();
+  ana_cspline_find(), ana_covariance();
 
 #if HAVE_REGEX_H
 extern int ana_getdirectories(), ana_getfiles(), ana_getfiles_r(),
@@ -787,10 +787,9 @@ extern int ana_read_jpeg6b_f(), ana_write_jpeg6b_f();
 
 extern int	vargsmooth(), ana_test();
 
-internalRoutine function[] = {
+internalRoutine function_table[] = {
   { "%A_UNARY_NEGATIVE", 1, 1, ana_neg_func, "*" },	/* fun1.c */
-  { "%B_SUBSCRIPT", 1, MAX_ARG, ana_subsc_func, /* subsc.c */
-    "1INNER:2OUTER:4ZERO:8SUBGRID:16KEEPDIMS:32ALL:64SEPARATE" },
+  { "%B_SUBSCRIPT", 1, MAX_ARG, ana_subsc_func, /* subsc.c */ "1INNER:2OUTER:4ZERO:8SUBGRID:16KEEPDIMS:32ALL:64SEPARATE" },
   { "%C_CPUTIME", 0, 0, ana_cputime, 0 }, /* fun1.c */
   { "%D_POWER",	2, 2, ana_pow, "*" }, /* fun1.c */
   { "%E_CONCAT", 1, MAX_ARG, ana_concat, "1SLOPPY" }, /* subsc.c */
@@ -801,6 +800,7 @@ internalRoutine function[] = {
   { "%J_READKEYNE", 0, 0, ana_readkeyne, 0 }, /* strous.c */
   { "%K_SYSTIME", 0, 0, ana_systime, 0 }, /* fun1.c */
   { "%L_JD",	0, 0, ana_jd, 0 }, /* fun1.c */
+  { "%M_CJD",   0, 0, ana_cjd, 0 },                /* fun1.c */
   { "ABS",	1, 1, ana_abs, "*" }, /* fun1.c */
   { "ACOS",	1, 1, ana_acos, "*" }, /* fun1.c */
   { "ACOSH",	1, 1, ana_acosh, "*" }, /* fun1.c */
@@ -816,14 +816,12 @@ internalRoutine function[] = {
   { "ASSOC",	2, 3, ana_assoc, "::OFFSET" }, /* symbols.c */
   { "ASTORE",	2, MAX_ARG, ana_astore_f, 0 }, /* files.c */
   { "ASTRF",	1, 2, ana_astrf, "1FROMEQUATORIAL:2FROMECLIPTICAL:4FROMGALACTIC:8TOEQUATORIAL:16TOECLIPTICAL:32TOGALACTIC:64JULIAN:128BESSELIAN" }, /* astron.c */
-  { "ASTRON",	2, 6, ana_astropos, /* astron.c */
-    "|2304|:::OBSERVER:EQUINOX:ELEMENTS:1ECLIPTICAL:2EQUATORIAL:3HORIZONTAL:4ELONGATION:8XYZ:32DATE:64TDT:128ERROR:256ABBERATION:512GEOMETRIC:1024QELEMENTS:2048FK5:4096TRUNCVSOP:8192CONJSPREAD:16384PLANETOCENTRIC:32768KEEPDIMENSIONS:65536VOCAL" },
+  { "ASTRON",	2, 7, ana_astropos, /* astron.c */ ":::OBSERVER:EQUINOX:ELEMENTS:TOLERANCE:1ECLIPTICAL:2EQUATORIAL:3HORIZONTAL:4ELONGATION:8XYZ:16LIGHTTIME:32DATE:64TDT:256ABERRATION:512NUTATION:2832APPARENT:1024QELEMENTS:2048FK5:8192CONJSPREAD:16384PLANETOCENTRIC:32768KEEPDIMENSIONS:65536VOCAL:~131072VSOP87A:131072VSOP87C:262144BARE" },
   { "ATAN",	1, 1, ana_atan, "*" }, /* fun1.c */
   { "ATAN2",	2, 2, ana_atan2, "*" }, /* fun1.c */
   { "ATANH",	1, 1, ana_atanh, "*" }, /* fun1.c */
   { "ATOL",	1, 2, ana_strtol, 0 }, /* fun3.c */
-  { "BASIN",	1, 2, ana_basin2, /* strous.c */
-    "*1NUMBER:2SINK:4DIFFERENCE" },
+  { "BASIN",	1, 2, ana_basin2, /* strous.c */ "*1NUMBER:2SINK:4DIFFERENCE" },
 #if DEVELOP
   { "BESSEL_I0",  1, 1, ana_bessel_i0, "*1DEFLATE" }, /* fun1.c */
   { "BESSEL_I1",  1, 1, ana_bessel_i1, "*" }, /* fun1.c */
@@ -864,8 +862,7 @@ internalRoutine function[] = {
   { "BYTARR",	1, MAX_DIMS, bytarr, 0 }, /* symbols.c */
   { "BYTE",	1, 1, ana_byte, "*" }, /* symbols.c */
   { "BYTFARR",	3, MAX_DIMS + 1, bytfarr, "%1%OFFSET:1READONLY:2SWAP" }, /* filemap.c */
- { "CALENDAR",	1, 1, ana_calendar, /* astron.c */
-   "1FROMCOMMON:2FROMGREGORIAN:3FROMISLAMIC:4FROMJULIAN:5FROMJD:6FROMHEBREW:8FROMLONGCOUNT:9FROMEGYPTIAN:10FROMLUNAR:16TOCOMMON:32TOGREGORIAN:48TOISLAMIC:64TOJULIAN:80TOJD:96TOHEBREW:112TOMAYAN:128TOLONGCOUNT:144TOEGYPTIAN:160TOLUNAR:176TOLATIN:256TOTEXT:512TOISOTEXT:0FROMUTC:1024FROMTAI:2048FROMTT:0TOUTC:4096TOTAI:8192TOTT:0FROMYMD:16384FROMDMY:0TOYMD:32768TODMY" },
+  { "CALENDAR",	1, 1, ana_calendar, /* astron.c */ "1FROMCOMMON:2FROMGREGORIAN:3FROMISLAMIC:4FROMJULIAN:5FROMHEBREW:6FROMEGYPTIAN:7FROMJD:8FROMCJD:9FROMLUNAR:10FROMMAYAN:11FROMLONGCOUNT:12FROMLATIN:16TOCOMMON:32TOGREGORIAN:48TOISLAMIC:64TOJULIAN:80TOHEBREW:96TOEGYPTIAN:112TOJD:128TOCJD:144TOLUNAR:160TOMAYAN:176TOLONGCOUNT:192TOLATIN:0TONUMERIC:256TOLONG:512TODOUBLE:768TOTEXT:0FROMUTC:1024FROMTAI:2048FROMTT:3072FROMLT:0TOUTC:4096TOTAI:8192TOTT:12288TOLT:0FROMYMD:16384FROMDMY:0TOYMD:32768TODMY" },
   { "CBRT",	1, 1, ana_cbrt, "*" }, /* fun1.c */
   { "CDBLARR",	1, MAX_ARG, cdblarr, 0 }, /* symbols.c */
   { "CDBLFARR", 3, MAX_DIMS + 1, cdblfarr, "%1%OFFSET:1READONLY:2SWAP" }, /* filemap.c */
@@ -898,16 +895,16 @@ internalRoutine function[] = {
   { "CONVERT",	2, 2, ana_convertsym, "*" }, /* symbols.c */
   { "COS",	1, 1, ana_cos, "*" }, /* fun1.c */
   { "COSH",	1, 1, ana_cosh, "*" }, /* fun1.c */
+  { "COVARIANCE", 2, 4, ana_covariance,
+    ":::WEIGHTS:*0SAMPLE:1POPULATION:2KEEPDIMS:4DOUBLE" }, /* fun2.c */
   { "CROSSCORR", 2, 3, ana_crosscorr, 0 }, /* fun2.c */
   { "CRUNCH",	3, 3, ana_crunch_f, 0 }, /* crunch.c */
-  { "CSPLINE",	0, 5, ana_cubic_spline, /* fun3.c */
-    "1KEEP:2PERIODIC:4GETDERIVATIVE" },
-  { "CSPLINE_FIND", 1, 4, ana_cspline_find, "::AXIS:INDEX" }, /* strous3.c */
+  { "CSPLINE",	0, 5, ana_cubic_spline, /* fun3.c */ "1KEEP:2PERIODIC:4GETDERIVATIVE" },
+  { "CSPLINE_FIND", 2, 4, ana_cspline_find, ":::AXIS:INDEX" }, /* strous3.c */
   { "CTOP",	1, 3, ana_cartesian_to_polar, 0 }, /* fun4.c */
   { "DATE_FROM_TAI", 1, 2, ana_date_from_tai, 0 }, /* ephem.c */
   { "DBLARR",	1, MAX_DIMS, dblarr, 0 }, /* symbols.c */
-  { "DBLFARR",	3, MAX_DIMS + 1, dblfarr, /* filemap.c */
-    "%1%OFFSET:1READONLY:2SWAP" },
+  { "DBLFARR",	3, MAX_DIMS + 1, dblfarr, /* filemap.c */ "%1%OFFSET:1READONLY:2SWAP" },
   { "DEFINED",	1, 1, ana_defined, "+1TARGET" }, /* fun1.c */
   { "DESPIKE",  1, 6, ana_despike, ":FRAC:LEVEL:NITER:SPIKES:RMS" }, /* fun6.c */
   { "DETREND",	1, 2, ana_detrend, "*" }, /* fun2.c */
@@ -915,13 +912,11 @@ internalRoutine function[] = {
   { "DILATE",	1, 1, ana_dilate, 0 }, /* fun5.c */
   { "DIMEN",	1, 2, ana_dimen, 0 }, /* subsc.c */
   { "DISTARR",	1, 3, ana_distarr, 0 }, /* strous2.c */
-  { "DISTR",	2, 2, ana_distr_f, /* strous.c */
-    "2IGNORELIMIT:4INCREASELIMIT" },
+  { "DISTR",	2, 2, ana_distr_f, /* strous.c */ "2IGNORELIMIT:4INCREASELIMIT" },
   { "DMAP",	1, 1, ana_dmap, 0 }, /* subsc.c */
   { "DOUB",	1, 1, ana_double, "*" }, /* symbols.c */
   { "DOUBLE",	1, 1, ana_double, "*" }, /* symbols.c */
-  { "DSMOOTH",	3, 3, ana_dir_smooth,
-    "0TWOSIDED:0BOXCAR:1ONESIDED:2GAUSSIAN:4TOTAL:8STRAIGHT" }, /* strous3.c */
+  { "DSMOOTH",	3, 3, ana_dir_smooth, "0TWOSIDED:0BOXCAR:1ONESIDED:2GAUSSIAN:4TOTAL:8STRAIGHT" }, /* strous3.c */
   { "DSUM",	1, 4, ana_total, "|1|::POWER:WEIGHTS:2KEEPDIMS" }, /* fun1.c */
   { "EASTERDATE", 1, 1, ana_EasterDate, 0 }, /* astron.c */
   { "ENHANCEIMAGE", 1, 3, ana_enhanceimage, ":PART:TARGET:1SYMMETRIC" }, /* strous3.c */
@@ -929,8 +924,7 @@ internalRoutine function[] = {
   { "ERF",	1, 1, ana_erf, "*" }, /* fun1.c */
   { "ERFC",	1, 1, ana_erfc, "*" }, /* fun1.c */
   { "ERODE",	1, 1, ana_erode, "1ZEROEDGE" }, /* fun5.c */
-  { "ESEGMENT",	1, 4, ana_extreme_general, /* topology.c */
-    ":SIGN:DIAGONAL:THRESHOLD" },
+  { "ESEGMENT",	1, 4, ana_extreme_general, /* topology.c */ ":SIGN:DIAGONAL:THRESHOLD" },
   { "ESMOOTH",	1, 3, ana_esmooth, 0 }, /* fun2.c */
   { "EVAL",	1, 2, ana_eval, "1ALLNUMBER" }, /* fun3.c */
 #if X11
@@ -944,26 +938,19 @@ internalRoutine function[] = {
   { "FCRW",	2, 3, ana_fcrunwrite_f, 0 }, /* files.c */
   { "FCW",	2, 3, ana_fcwrite_f, "1RUNLENGTH" }, /* files.c */
   { "FCWRITE",	2, 3, ana_fcwrite_f, "1RUNLENGTH" }, /* files.c */
-  { "FFT",	1, 3, ana_fft_f, "::DIRECTION:1BACK:2ALL" }, /* fun3.c */
   { "FFTSHIFT",	2, 2, ana_fftshift_f, 0 }, /* fun3.c */
   { "FILEPTR",	1, 2, ana_fileptr_f, "1START:2EOF:4ADVANCE" }, /* files.c */
   { "FILESIZE",	1, 1, ana_filesize, 0 }, /* files.c */
   { "FILETYPE",	1, 1, ana_identify_file, 0 }, /* files.c */
   { "FILETYPENAME", 1, 1, ana_filetype_name, 0 }, /* install.c */
-  { "FIND",	2, 4, ana_find,	/* strous.c */
-    "0EXACT:1INDEX_GE:2VALUE_GE:4FIRST" },
-  { "CSPLINE_FIND", 2, 4, ana_cspline_find, ":::AXIS:INDEX" }, /* strous3.c */
+  { "FIND",	2, 4, ana_find,	/* strous.c */ "0EXACT:1INDEX_GE:2VALUE_GE:4FIRST" },
+  { "FIND2",    2, 2, ana_find2, "0EXACT" },    /* strous.c */
   { "FINDFILE",	2, 2, ana_findfile, 0 }, /* files.c */
-  { "FIND_MAX",	1, 3, ana_find_max, /* strous2.c */
-    "::DIAGONAL:1DEGREE:2SUBGRID" },
-  { "FIND_MAXLOC", 1, 3, ana_find_maxloc, /* strous2.c */
-    "::DIAGONAL:1DEGREE:2SUBGRID:4COORDS:8OLD" },
-  { "FIND_MIN",	1, 3, ana_find_min, /* strous2.c */
-    "::DIAGONAL:1DEGREE:2SUBGRID" },
-  { "FIND_MINLOC", 1, 3, ana_find_minloc, /* strous2.c */
-    "::DIAGONAL:1DEGREE:2SUBGRID:4COORDS" },
-  { "FIT",	3, 17, ana_generalfit, /* fit.c */
-  "|4|::START:STEP:LOWBOUND:HIGHBOUND:WEIGHTS:QTHRESH:PTHRESH:ITHRESH:DTHRESH:FAC:NITER:NSAME:ERR:FIT:TTHRESH:1VOCAL:4DOWN:8PCHI:16GAUSSIANS:32POWERFUNC:64ONEBYONE" },
+  { "FIND_MAX",	1, 3, ana_find_max, /* strous2.c */ "::DIAGONAL:1DEGREE:2SUBGRID" },
+  { "FIND_MAXLOC", 1, 3, ana_find_maxloc, /* strous2.c */ "::DIAGONAL:1DEGREE:2SUBGRID:4COORDS:8OLD" },
+  { "FIND_MIN",	1, 3, ana_find_min, /* strous2.c */ "::DIAGONAL:1DEGREE:2SUBGRID" },
+  { "FIND_MINLOC", 1, 3, ana_find_minloc, /* strous2.c */ "::DIAGONAL:1DEGREE:2SUBGRID:4COORDS" },
+  { "FIT",	3, 17, ana_generalfit, /* fit.c */ "|4|::START:STEP:LOWBOUND:HIGHBOUND:WEIGHTS:QTHRESH:PTHRESH:ITHRESH:DTHRESH:FAC:NITER:NSAME:ERR:FIT:TTHRESH:1VOCAL:4DOWN:8PCHI:16GAUSSIANS:32POWERFUNC:64ONEBYONE" },
 #if DEVELOP
   { "FIT2",	4, 11, ana_geneticfit, "X:Y:NPAR:FIT:WEIGHTS:MU:GENERATIONS:POPULATION:PCROSS:PMUTATE:VOCAL:1ELITE:2BYTE:4WORD:6LONG:8FLOAT:10DOUBLE" }, /* fit.c */
 #endif
@@ -975,8 +962,7 @@ internalRoutine function[] = {
   { "FLOAT",	1, 1, ana_float, "*" }, /* symbols.c */
   { "FLOOR",	1, 1, ana_floor, "*" }, /* symbols.c */
   { "FLTARR",	1, MAX_DIMS, fltarr, 0 }, /* symbols.c */
-  { "FLTFARR",	3, MAX_DIMS + 1, fltfarr, /* filemap.c */
-    "%1%OFFSET:1READONLY:2SWAP" },
+  { "FLTFARR",	3, MAX_DIMS + 1, fltfarr, /* filemap.c */ "%1%OFFSET:1READONLY:2SWAP" },
   { "FMAP",	1, 1, ana_fmap, 0 }, /* subsc.c */
   { "FRATIO",	3, 3, ana_f_ratio, "*1COMPLEMENT:2LOG" }, /* fun1.c */
   { "FREADF",	2, MAX_ARG, ana_freadf_f, "|1|1EOF" }, /* files.c */
@@ -1009,8 +995,6 @@ internalRoutine function[] = {
   { "GSMOOTH",	1, 4, ana_gsmooth, /* fun2.c */
     ":::KERNEL:1NORMALIZE:2FULLNORM:4BALANCED:8ALL" },
   { "HAMMING",  1, 2, ana_hamming, 0 }, /* strous3.c */
-  { "HILBERT",	1, 3, ana_hilbert, /* fun3.c */
-    "::DIRECTION:1BACK:2ALL:4AVGKEEP:8HIGHKEEP" },
   { "HIST",	1, 2, ana_hist, /* fun3.c */
     "1FIRST:2IGNORELIMIT:4INCREASELIMIT:8SILENT" },
   { "HISTR",	1, 1, ana_histr, /* fun3.c */
@@ -1064,7 +1048,6 @@ internalRoutine function[] = {
   { "LSQ",	2, 6, ana_lsq,	/* strous2.c */
     "::WEIGHTS:COV:ERR:CHISQ:1FORMAL:2REDUCE" },
   { "MATCH",	2, 2, ana_match, 0 }, /* strous.c */
-  { "MATMUL",	2, 2, ana_matmul, 0 }, /* fun2.c */
   { "MAX",	1, 2, ana_maxf, "1KEEPDIMS" }, /* fun3.c */
   { "MAXDIR",	2, 3, ana_max_dir, 0 },	/* topology.c */
   { "MAXFILTER", 1, 3, ana_maxfilter, 0 }, /* strous2.c */
@@ -1136,7 +1119,6 @@ internalRoutine function[] = {
   { "SCALE",	1, 3, ana_scale, "*1FULLRANGE:2ZOOM" }, /* fun3.c */
   { "SCALERANGE", 3, 5, ana_scalerange, "*1FULLRANGE:2ZOOM" }, /* fun3.c */
   { "SCANF",	2, MAX_ARG, ana_freadf_f, "|1|1EOF" }, /* files.c */
-  { "SCCOMPLEX", 1, 1, ana_sccomplex, "1TOCOMPLEX:2TOSC" }, /* fun3.c */
   { "SDEV",	1, 3, ana_sdev, /* fun2.c */
     "::WEIGHTS:*0SAMPLE:1POPULATION:2KEEPDIMS:4DOUBLE" },
   { "SEGMENT",	1, 3, ana_segment, ":SIGN:DIAGONAL:1DEGREE" }, /* topology.c */
@@ -1287,13 +1269,13 @@ internalRoutine function[] = {
   { "ZERONANS",	1, 2, ana_zapnan_f, "*%1%VALUE" }, /* fun1.c */
   { "ZINV",	1, 1, ana_zinv, "*" }, /* strous.c */
 };
-int	nFunction = sizeof(function)/sizeof(internalRoutine);
+int nFunction = sizeof(function_table)/sizeof(internalRoutine);
 /*----------------------------------------------------------------*/
 void undefine(int symbol)
 /* free up memory allocated for <symbol> and make it undefined */
 {
   void	zap(int), updateIndices(void);
-  char	hasMem = 0, **key, *temp;
+  char	hasMem = 0;
   int	n, k, oldZapContext, i;
   word	*ptr;
   pointer	p2;
@@ -1315,7 +1297,6 @@ void undefine(int symbol)
       break;
     case ANA_SCAL_PTR:
       if (symbol_type(symbol) == ANA_TEMP_STRING) {
-	temp = scal_ptr_pointer(symbol).s;
 	free(scal_ptr_pointer(symbol).s);
       }
       break;
@@ -1398,7 +1379,6 @@ void undefine(int symbol)
       zapContext = symbol;
       ptr = routine_parameters(symbol);
       n = routine_num_parameters(symbol);
-      key = routine_parameter_names(symbol);
       while (n--)
 	zap(*ptr++);
       n = routine_num_statements(symbol);
@@ -2756,25 +2736,33 @@ int hash(char *string)
  return i % HASHSIZE;
 }
 /*----------------------------------------------------------------*/
+int ircmp(const void *a, const void *b)
+{
+  internalRoutine *ra, *rb;
+  
+  ra = (internalRoutine *) a;
+  rb = (internalRoutine *) b;
+  return strcmp(ra->name, rb->name);
+}
+/*----------------------------------------------------------------*/
 int findInternalName(char *name, int isSubroutine)
 /* searches for name in the appropriate subroutine
   or function table.  if found, returns
   index, else returns -1 */
 {
- int	hi, lo = 0, mid, s;
- internalRoutine	*table;
+  internalRoutine	*table, *found, key;
+  size_t n;
 
- if (isSubroutine)
- { table = subroutine;  hi = nSubroutine - 1; }
- else
- { table = function;  hi = nFunction - 1; }
- while (lo <= hi)
- { mid = (lo + hi)/2;
-   if ((s = strcmp(name, table[mid].name)) < 0)
-     hi = mid - 1;
-   else if (s > 0)  lo = mid + 1;
-   else return mid; }
- return -1;
+  if (isSubroutine) {
+    table = subroutine;
+    n = nSubroutine;
+  } else {
+    table = function;
+    n = nFunction;
+  }
+  key.name = name;
+  found = bsearch(&key, table, n, sizeof(*table), ircmp);
+  return found? found - table: -1;
 }
 /*----------------------------------------------------------------*/
 static compileInfo	*c_info = NULL;
@@ -2973,7 +2961,6 @@ int newSubrSymbol(int index)
   an error is generated. */
 {
  int	n, i;
- char	*name;
  extern char	reportBody;
  extern int	findBody;
 
@@ -3003,7 +2990,6 @@ int newSubrSymbol(int index)
    }
  }
  /* no subroutine pointer */
- name = symbolStack[index];
  n = lookForSubr(index);	/* already defined user-defined routine? */
  if (n < 0) {			/* none found */
    if ((n = findInternalSym(index, 1)) >= 0) { /* internal routine */
@@ -3948,7 +3934,6 @@ int ana_symbol_memory()
 int ana_trace(int narg, int ps[])
 /* activates/deactivates trace facility */
 {
-  extern int	internalMode;
   extern float	CPUtime;
 
   if (narg > 0)
@@ -4146,6 +4131,8 @@ struct boundsStruct	bounds = {
 
 int	ANA_MATMUL_FUN;
 
+internalRoutine *subroutine, *function;
+
 #define	FORMATSIZE	1024
 void symbolInitialization(void)
 {
@@ -4174,11 +4161,50 @@ void symbolInitialization(void)
      || signal(SIGCONT, exception) == SIG_ERR
      || signal(SIGTRAP, exception) == SIG_ERR)
    anaerror("Could not install exception handlers", 0);
- for (i = 0; i < nSubroutine; i++)
+
+ extern struct obstack *registered_subroutines;
+ int registered_subroutines_size
+   = registered_subroutines? obstack_object_size(registered_subroutines): 0;
+ subroutine = malloc(registered_subroutines_size
+                     + nSubroutine*sizeof(internalRoutine));
+ if (registered_subroutines)
+   memcpy(subroutine, obstack_finish(registered_subroutines), 
+          registered_subroutines_size);
+ memcpy((char *) subroutine + registered_subroutines_size,
+        subroutine_table, nSubroutine*sizeof(internalRoutine));
+ nSubroutine += registered_subroutines_size/sizeof(internalRoutine);
+ if (registered_subroutines)
+   obstack_free(registered_subroutines, NULL);
+
+ extern struct obstack *registered_functions;
+ int registered_functions_size
+   = registered_functions? obstack_object_size(registered_functions): 0;
+ function = malloc(registered_functions_size
+                     + nFunction*sizeof(internalRoutine));
+ if (registered_functions)
+   memcpy(function, obstack_finish(registered_functions), 
+          registered_functions_size);
+ memcpy((char *) function + registered_functions_size,
+        function_table, nFunction*sizeof(internalRoutine));
+ nFunction += registered_functions_size/sizeof(internalRoutine);
+ if (registered_functions)
+   obstack_free(registered_functions, NULL);
+
+ qsort(subroutine, nSubroutine, sizeof(internalRoutine), ircmp);
+ qsort(function, nFunction, sizeof(internalRoutine), ircmp);
+ for (i = 0; i < nSubroutine; i++) {
+   if (i && !strcmp(subroutine[i].name, subroutine[i - 1].name))
+     anaerror("Internal subroutine name %s is used for multiple routines!",
+              0, subroutine[i].name);
    installKeys(&subroutine[i].keys);
- for (i = 0; i < nFunction; i++)
+ }
+ for (i = 0; i < nFunction; i++) {
+   if (i && !strcmp(function[i].name, function[i - 1].name))
+     anaerror("Internal function name %s is used for multiple routines!",
+              0, function[i].name);
    installKeys(&function[i].keys);
- ANA_MATMUL_FUN = findInternalName("MATMUL", 0);
+ }
+ ANA_MATMUL_FUN = findInternalName("MPRODUCT", 0);
  inputStream = stdin;
  outputStream = stdout;
  l_fix("#ZERO", 	0);
@@ -4205,21 +4231,21 @@ void symbolInitialization(void)
 #endif
  d_fix("#PI",		M_PI);
  d_fix("#2PI",		2*M_PI);
- f_fix("#E",		2.718281828);
- f_fix("#C",		2.997929E10);
- f_fix("#G",		6.668E-8);
- f_fix("#H",		6.6252E-27);
- f_fix("#HB",		1.0544E-27);
- f_fix("#EC",		6.6252E-27);
- f_fix("#M",		9.1084E-28);
- f_fix("#K",		1.308046E-16);
- f_fix("#R",		8.317E7); 
+ d_fix("#E",		M_E);
+ d_fix("#C",		299792458e0);
+ d_fix("#G",		6.668E-8);
+ d_fix("#H",		6.6252E-27);
+ d_fix("#HB",		1.0544E-27);
+ d_fix("#EC",		6.6252E-27);
+ d_fix("#M",		9.1084E-28);
+ d_fix("#K",		1.308046E-16);
+ d_fix("#R",		8.317E7); 
  d_fix("#RAD",		RAD);
  r_d_sym = nFixed;
- f_fix("#R.D",		RAD);
+ d_fix("#R.D",		RAD);
  d_fix("#DEG",		DEG);
  d_r_sym = nFixed;
- f_fix("#D.R",		DEG);
+ d_fix("#D.R",		DEG);
 
  iq = installString("#CLASS");
  stackSym = findVar(iq, 0);	/* stackSym is a dummy variable */
@@ -4308,6 +4334,7 @@ void symbolInitialization(void)
  f_ptr("!BXT",		&postXTop);
  f_ptr("!BYB",		&postYBot);
  f_ptr("!BYT",		&postYTop);
+ fnc_p("!CJD",		12);
  l_ptr("!COL",		&uTermCol);
 #if X11
  l_ptr("!COLORMAX",	&colormax);
@@ -5082,10 +5109,8 @@ int ana_struct(int narg, int ps[])
 */
 {
   int	result, size, nstruct, dims[MAX_DIMS], ndim, n, i, offset;
-  word	*arg;
-  listElem	*le;
   pointer	data;
-  structElem	*se, *se0;
+  structElem	*se;
   
   if (structSize(ps[0], &nstruct, &size) == ANA_ERROR) /* check
 							  specification */
@@ -5511,7 +5536,7 @@ compileInfo *nextFreeCompileInfo(void)
     if (!c_info) {
       puts("pushCompileLevel:");
 	cerror(ALLOC_ERR, 0);
-      return;
+      return NULL;
     }
   }
   return &c_info[cur_c_info++];

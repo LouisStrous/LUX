@@ -595,7 +595,7 @@ char *prevBOE(char *p, char *buf)
 void close_groups(char *buf)
 /* close all open expressions */
 {
-  char	*q, *q2, *end, inString = (char) 0;
+  char	*q, *end, inString = (char) 0;
   int	npar = 0, nbrack = 0, nbrace = 0;
 
   q = buf;
@@ -605,8 +605,7 @@ void close_groups(char *buf)
     { if (inString && q[1] == '\'') /* quote in string */
 	q++;
       else
-      { inString = inString ^ (char) 1;
-        q2 = q; }
+      { inString = inString ^ (char) 1; }
     }
     q++; }
   if (q == buf)			/* nothing to do */

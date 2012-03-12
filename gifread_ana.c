@@ -63,14 +63,14 @@ int ana_gifread(int narg, int ps[])       /* gifread subroutine */
  map not in argument list, you don't get it! */
  {
  FILE	*fin;
- int    iq, n, cr, pixel, gsortflag;
- int    vn, sep, cmsym, dim[8];
+ int    iq, n, cr, pixel;
+ int    sep, cmsym, dim[8];
  char   *p, *name, *data;
  struct ahead   *h;
  struct GIFScreen gh;
  
  		/* first arg is the variable to load, second is name of file */
- if (!symbolIsString(ps[1]))
+ if (!symbolIsStringScalar(ps[1]))
    return cerror(NEED_STR, ps[1]);
  name = expand_name(string_value(ps[1]), NULL);
  /* try to open the file */
@@ -89,9 +89,8 @@ int ana_gifread(int narg, int ps[])       /* gifread subroutine */
  if (strncmp(((gh.id))+3,"87a",3) != 0) {
  	if (strncmp(((gh.id))+3,"89a",3) != 0) {
  	printf("invalid GIF version #\n"); return -1; } else {
-	vn = 89;
 	printf("version 89a, warning, not all options supported\n"); }
-	} else vn = 87;
+	} 
  /* yank out the screen size */
  nxs = ( (gh.width_msb << 8) | gh.width_lsb );
  nys = ( (gh.height_msb << 8) | gh.height_lsb );
@@ -108,8 +107,6 @@ int ana_gifread(int narg, int ps[])       /* gifread subroutine */
  if (gcmflag) {
  cr = (gh.mask >> 4) & 0x7;	cr += 1;	cr = 1 << cr;
  pixel = gh.mask & 0x7;	pixel += 1;	pixel = 1 << pixel;
- if (vn == 89) gsortflag = (gh.mask >> 3) & 1; else gsortflag = 0;
- /* printf("cr, pixel, gsortflag = %d %d %d\n", cr, pixel, gsortflag); */
  /* set the data array to the background color */
  p = data; n = nxs*nys; while (n--) *p++ = gh.background;
  /* still in global color table exist conditional, read the color table
@@ -157,9 +154,9 @@ int ana_gifread(int narg, int ps[])       /* gifread subroutine */
 void readextension(FILE *fin)
  /* Read a GIF extension block (and do nothing with it). */
  {
- unsigned char code,count;
+ unsigned char count;
  char buf[255];
- code = getc(fin);
+ getc(fin);
  while ((count = getc(fin))) fread(buf, 1, count, fin);
  /* printf("note , extension with code = %c ignored\n"); */
  }
@@ -168,7 +165,7 @@ void readimage(FILE *fin, int cmsym, char *data)
  {
  struct GIFImage gimage;
  int	nx, ny, ix, iy, local, localbits, nc, fflag;
- int	n, m, stride, interleave;
+ int	n, m, stride;
  char	*image, *p, *p2;
  if (fread(&gimage.left_lsb,1,9,fin) != 9) {
  perror("gifread in image descriptor");
@@ -179,7 +176,6 @@ void readimage(FILE *fin, int cmsym, char *data)
  nx = ( (gimage.width_msb << 8) | gimage.width_lsb );
  ny = ( (gimage.height_msb << 8) | gimage.height_lsb );
  local = gimage.mask & 0x80;
- interleave = gimage.mask & 0x40;
  /* printf("ix, iy, nx, ny = %d %d %d %d\n", ix, iy, nx, ny); */
  /* printf("mask = %#x\n", gimage.mask); */
  if (local) {

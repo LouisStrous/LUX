@@ -35,43 +35,91 @@ preserved on all copies.
 \parindent 0pt
 @end tex
 
-
 @menu
 * Functionality::               
-* Concept Index::               
+
+@detailmenu
+ --- The Detailed Node Listing ---
+
+Functionality
+
+* axis.h::                      
+
+@end detailmenu
 @end menu
 
-@node Functionality, Concept Index, Top, Top
+@node Functionality,  , Top, Top
 @comment  node-name,  next,  previous,  up
 @chapter Functionality
 
 @menu
-* axis.c::                      
+* axis.h::                      
 @end menu
 
-@node axis.c,  , Functionality, Functionality
+@node axis.h,  , Functionality, Functionality
 @comment  node-name,  next,  previous,  up
-@section axis.c
+@section axis.h
 
-File @file{axis.c} provides functionality to walk through a
+File @file{axis.h} declares functionality to walk through a
 multi-dimensional array.
 
-@deftypefn int standardLoop @
-(int @var{data}, int @var{axisSym}, int @var{mode}, int @var{outType}, @
-loopInfo *@var{src}, pointer *@var{srcptr}, int *@var{output}, @
-loopInfo *@var{trgt}, pointer *@var{trgtptr})
+@table @bullet
 
+@item SL_ALLAXES
 
+All axes should be traversed in their natural order.  Equivalent to
+specifying all axes in ascending order.  Explicitly specified axes are
+ignored.
 
+@item SL_TAKEONED
 
-@end deftypefn
+The data should be treated as if it has one dimension containing all
+elements.  Explicitly specified axes are ignored.
 
-@c --------------------------------------
-@node Concept Index,  , Functionality, Top
-@comment  node-name,  next,  previous,  up
-@unnumbered Concept Index
+@item SL_NEGONED
 
-@printindex cp
+If a single axes is explicitly specified, and if that axis is
+negative, then the data should be treated as if it has one dimension
+containing all elements.
+
+@item SL_ONEAXIS
+
+Only a single axis is allowed to be specified.
+
+@item SL_UNIQUEAXES
+
+All specified axes must be unique.
+
+@item SL_EACHCOORD
+
+The currently selected axis goes first.  The remaining axes come after
+that, in their original order.  The user gets access to all
+coordinates.
+
+@item SL_AXISCOORD
+
+The currently selected axis goes first.  The remaining axes come after
+that, lumped together as much as possible.  The user gets access only
+to the coordinate along the selected axis.
+
+@item SL_AXESBLOCK
+
+All specified axes go first, in the specified order.  The remaining
+axes come later, in their original order.  The user gets access to all
+coordinates.  Implies SL_UNIQUEAXES.
+
+@item SL_EACHROW
+
+@code{advanceLoop} advances the data by rows rather than elements.
+The user must advance the data pointer by elements for each row.
+
+@item SL_EACHBLOCK
+
+@code{advanceLoop} advances the data in blocks corresponding to all
+selected axes.  The user must advance the data pointer by elements for
+each block.  Implies SL_AXESBLOCK.
+
+@end table
 
 @c --------------------------------------
 

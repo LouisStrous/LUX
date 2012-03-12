@@ -51,8 +51,8 @@ int ana_gifwrite(narg,ps)      /* gifwrite subroutine */
  int    narg, ps[];
  {
  FILE	*fout;
- int    iq, n, nd, type, i, bigendian;
- int    nx, ny, ncolmap, map_malloc_flag=0;
+ int    iq, nd, type, i;
+ int    nx, ny, ncolmap;
  byte   codesize=8;
  char   *p, *data, *colormap, *name;
  struct ahead   *h, *h2;
@@ -88,15 +88,12 @@ int ana_gifwrite(narg,ps)      /* gifwrite subroutine */
  /* if no colormap passed, we provide a b/w one */
  colormap = malloc(ncolmap);
  if (colormap == NULL) { printf("malloc error in gifwrite\n"); return -1;}
- map_malloc_flag=0;
  p = colormap;
  for (i=0; i < 256; i++) { *p++ = i; *p++ = i; *p++ = i; }
  }
- nx = h->dims[0];       ny = h->dims[1];        n = nx * ny;
+ nx = h->dims[0];       ny = h->dims[1];
                                                  /* try to open the file */
  if ((fout=fopen(name,"w")) == NULL) return file_open_error();
- /* an endian detector, taken from SL's tiff library */
- { int one = 1; bigendian = (*(char *)&one == 0); }
 
  gh.width_lsb = nx & 0xff;
  gh.width_msb = nx >> 8;

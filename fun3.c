@@ -12,6 +12,7 @@
 #include <ctype.h>
 #include <float.h>
 #include <stdlib.h>		/* for strtol */
+#include <errno.h>
 #include "action.h"
 #include "editorcharclass.h"
 #include "anaparser.c.tab.h"
@@ -27,7 +28,7 @@ int rfftbd(int *, double *, double *);
 int rfftfd(int *, double *, double *);
 word	*fade1, *fade2;
 extern int	scalemax, scalemin, lastmaxloc, lastminloc, maxhistsize,
-	histmin, histmax, fftdp, lastmax_sym, lastmin_sym;
+  histmin, histmax, fftdp, lastmax_sym, lastmin_sym, errno;
 extern scalar	lastmin, lastmax;
 static	int	nold = 0, fftdpold, mqold;
 static pointer	work;
@@ -559,6 +560,101 @@ int hilbert(double *data, size_t n, size_t stride)
 }
 BIND(hilbert, i_sd_iDaLarDq_000, f, HILBERT, 1, 2, "1ALLAXES");
 BIND(hilbert, i_sd_iDaLa_000, s, HILBERT, 1, 2, "1ALLAXES");
+/*------------------------------------------------------------------------- */
+int gsl_fft_expand(double *sdata, size_t scount, size_t sstride,
+		   double *tdata, size_t tcount, size_t tstride)
+{
+  if (!update_rwave(scount) || !update_hwave(tcount))
+    return 1;
+  
+  int i, result;
+  double *sdata2 = sdata;
+  double *tdata2 = tdata;
+  if (tcount >= scount) {
+    /* copy source to target, append zeros, forward fft of copied source data,
+       then backward fft including appended zeros */
+    for (i = 0; i < scount; i++) {
+      *tdata2 = *sdata2;
+      sdata2 += sstride;
+      tdata2 += tstride;
+    }
+    for ( ; i < tcount; i++) {
+      *tdata2 = 0.0;
+      tdata2 += tstride;
+    }
+    update_rwork(scount);
+    result = gsl_fft_real_transform(tdata, tstride, scount, rwave, rwork);
+    if (result)
+      return 1;
+    update_rwork(tcount);
+    result = gsl_fft_halfcomplex_inverse(tdata, tstride, tcount, hwave, rwork);
+    if (result)
+      return 1;
+  } else {
+    /* copy source to temporary storage, forward fft, then backward fft
+       for target size, then copy to target */
+    double *temp = malloc(tcount*sizeof(double));
+    if (!temp) {
+      errno = ENOMEM;
+      return 1;
+    }
+    double *temp2 = temp;
+    for (i = 0; i < scount; i++) {
+      *temp2++ = *sdata2;
+      sdata2 += sstride;
+    }
+    update_rwork(scount);
+    result = gsl_fft_real_transform(temp, 1, scount, rwave, rwork);
+    if (!result) {
+      update_rwork(tcount);
+      result = gsl_fft_halfcomplex_inverse(temp, 1, tcount, hwave, rwork);
+    }
+    if (!result) {
+      temp2 = temp;
+      for (i = 0; i < tcount; i++) {
+	*tdata2 = *temp2++;
+	tdata2 += tstride;
+      }
+    }
+    free(temp);
+  }
+  return 0;
+}
+/*------------------------------------------------------------------------- */
+int ana_fft_expand(int narg, int ps[])
+{
+  pointer *ptrs;
+  loopInfo *infos;
+  int iq;
+
+  if ((iq = standard_args(narg, ps, "i>D*;i>D1;rD1", &ptrs, &infos)) < 0)
+    return ANA_ERROR;
+  double factor = *ptrs[1].d;
+  if (factor <= 0)
+    return anaerror("Need positive expansion factor", ps[1]);
+  
+  int ndim = infos[0].ndim;
+  int *dims = malloc(ndim*sizeof(int));
+  if (!dims)
+    return cerror(ALLOC_ERR, 0);
+  memcpy(dims, infos[0].dims, ndim*sizeof(int));
+  dims[0] = (int) (dims[0]*factor + 0.5);
+  standard_redef_array(iq, ANA_DOUBLE, ndim, dims, 0, NULL,
+		       &ptrs[2], &infos[2]);
+  free(dims);
+  setAxes(&infos[0], 1, NULL, SL_EACHBLOCK);
+  setAxes(&infos[2], 1, NULL, SL_EACHBLOCK);
+
+  do {
+    gsl_fft_expand(ptrs[0].d, infos[0].dims[0], 1,
+		   ptrs[2].d, infos[2].dims[0], 1);
+    ptrs[0].d += infos[0].singlestep[1];
+    ptrs[2].d += infos[2].singlestep[2];
+  } while (advanceLoop(&infos[0], &ptrs[0]),
+	   advanceLoop(&infos[2], &ptrs[2]) < infos[2].ndim);
+  return iq;
+}
+REGISTER(fft_expand, f, FFTEXPAND, 2, 2, NULL);
 /*------------------------------------------------------------------------- */
 //#define SQRTHALF	M_SQRT1_2
 //#define SQRTWO		M_SQRT2

@@ -11,7 +11,8 @@ idl.o trace_decoder_ana.o gifread_ana.o gifwrite_ana.o astron.o		\
 terminal.o regex.o vsop.o anasofa.o intmath.o calendar.o \
 jpeg.o tape.o dummyterm.o projection.o bindings.o \
 xport.o zoom.o menu.o color.o random.o Bytestack.o poisson.o \
-precession.o printf_extensions.o vsop87adata.o vsop87cdata.o
+precession.o printf_extensions.o vsop87adata.o vsop87cdata.o \
+matrix.o
 
 CC=gcc -Wall
 LIBS=-lm -lc -ljpeg -lX11 -lgsl libsofa_c.a

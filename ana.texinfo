@@ -12811,6 +12811,7 @@ arguments.
 * FCWRITE::                     Write compressed data to an FZ file
 * FFT::                         Discrete Fast Fourier Transform
 * FFTB::                        
+* FFTEXPAND::                   
 * FFTSHIFT::                    Shifts data using Fourier interpolation
 * FILEPTR::                     Manipulate a file pointer
 * FILEREAD::                    Unformatted reading from a file
@@ -17706,7 +17707,7 @@ See also: @ref{POWER}, @ref{SC}, @ref{SCB}
 [2.12.322, 4.0]
 
 @c -------------------------------------
-@node FFTB, FFTSHIFT, FFT, Internal Routines
+@node FFTB, FFTEXPAND, FFT, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection FFTB
 
@@ -17757,7 +17758,21 @@ See also: @ref{POWER}, @ref{SC}, @ref{SCB}
 [2.12.322, 4.0]
 
 @c -------------------------------------
-@node FFTSHIFT, FILEPTR, FFTB, Internal Routines
+@node FFTEXPAND, FFTSHIFT, FFTB, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection FFTEXPAND
+
+@code{FFTEXPAND(@var{data}, @var{factor})}
+
+Returns a copy of @code{@var{data}} expanded in its first dimension by
+the specified @code{@var{factor}}, which may be any positive
+(fractional or integer) number.  The extra elements are interpolated
+using Fourier transforms.
+
+See also: @ref{FFT}, @ref{FFTSHIFT}
+
+@c -------------------------------------
+@node FFTSHIFT, FILEPTR, FFTEXPAND, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection FFTSHIFT
 

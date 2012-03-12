@@ -2086,11 +2086,12 @@ int standard_args(int narg, int ps[], char const *fmt, pointer **ptrs,
         switch (pspec->remaining_dims) {
         case PS_EQUAL_TO_REFERENCE:
           if (ref_dims && ref_dims_ix < num_ref_dims) {
-            if (num_src_dims - src_dims_ix != num_ref_dims - ref_dims_ix) {
-              returnSym = anaerror("Expected %d dimensions but found %d "
-                                   "in reference parameter %d", ps[param_ix],
-                                   num_ref_dims - ref_dims_ix + src_dims_ix,
-                                   num_src_dims, ref_param + 1);
+	    int expect = num_ref_dims + src_dims_ix - ref_dims_ix;
+            if (expect != num_src_dims) {
+              returnSym = anaerror("Expected %d dimensions but found %d",
+                                   ps[param_ix],
+                                   num_ref_dims + src_dims_ix - ref_dims_ix,
+                                   num_src_dims);
               goto error;
             }
             int i, j;

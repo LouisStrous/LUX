@@ -1059,7 +1059,7 @@ BIND(iauRv2m, v_dpdp3_iD3arDp3q_01, f, IAURV2M, 1, 1, NULL)
 /* IAURX, <phi>, <r>
 
    Rotates r-matrix <r> about the x axis over angle <phi> */
-BIND(iauRx, v_ddp3_iDaDp3p3q_01, s, IAURX, 2, 2, NULL)
+BIND(iauRx, v_ddp3_iD1D33_01, s, IAURX, 2, 2, NULL)
 /*-----------------------------------------------------------------------*/
 /* IAURXPV(<r>, <pv>)
 
@@ -1069,12 +1069,12 @@ BIND(iauRxpv, v_dp3T3_iD33aDaoDc_0T2, f, IAURXPV, 2, 2, NULL)
 /* IAURY, <phi>, <r>
 
    Rotates r-matrix <r> about the y axis over angle <phi> */
-BIND(iauRy, v_ddp3_iDaDp3p3q_01, s, IAURY, 2, 2, NULL)
+BIND(iauRy, v_ddp3_iD1D33_01, s, IAURY, 2, 2, NULL)
 /*-----------------------------------------------------------------------*/
 /* IAURZ, <phi>, <r>
 
    Rotates r-matrix <r> about the z axis over angle <phi> */
-BIND(iauRz, v_ddp3_iDaDp3p3q_01, s, IAURZ, 2, 2, NULL)
+BIND(iauRz, v_ddp3_iD1D33_01, s, IAURZ, 2, 2, NULL)
 /*-----------------------------------------------------------------------*/
 /* IAUS00(<jd>, <x>, <y>)
 

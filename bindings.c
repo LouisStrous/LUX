@@ -1042,13 +1042,13 @@ int ana_d_dp_iD3arDm3q_0_1_f_(int narg, int ps[], double (*f)(double *))
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int ana_v_ddp3_iDaDp3p3q_01_s_(int narg, int ps[], void (*f)(double, double [3][3]))
+int ana_v_ddp3_iD1D33_01_s_(int narg, int ps[], void (*f)(double, double [3][3]))
 {
   pointer *ptrs;
   loopInfo *infos;
   int iq;
 
-  if ((iq = standard_args(narg, ps, "i>D*;i>D+3,+3&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "i>D1;i>D3,3", &ptrs, &infos)) < 0)
     return ANA_ERROR;
   while (infos[0].nelem--) {
     f(*ptrs[0].d++, (double (*)[3]) ptrs[1].d);

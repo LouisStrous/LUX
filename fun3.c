@@ -3252,7 +3252,7 @@ int neutral(void *p, int n)
 }
 /*------------------------------------------------------------------------- */
 const csplineInfo empty_cubic_spline(void) {
-  const csplineInfo c = { NULL, NULL };
+  const csplineInfo c = { NULL, NULL, NULL, NULL };
   return c;
 }
 /*------------------------------------------------------------------------- */
@@ -3263,6 +3263,10 @@ void cleanup_cubic_spline_tables(csplineInfo *cspl) {
     cspl->spline = NULL;
     cspl->acc = NULL;
   }    
+  free(cspl->x);
+  cspl->x = NULL;
+  free(cspl->y);
+  cspl->y = NULL;
 }
 /*------------------------------------------------------------------------- */
 int cubic_spline_tables(void *xx, int xType, int xStep,
@@ -3281,16 +3285,23 @@ int cubic_spline_tables(void *xx, int xType, int xStep,
   pointer xin, yin;
   double *x, *y;
 
-  if (!nPoints)
+  const gsl_interp_type *interp_type
+    = periodic? gsl_interp_cspline_periodic: gsl_interp_cspline;
+
+  unsigned int minsize = gsl_interp_type_min_size(interp_type);
+  if (nPoints < minsize) {
+    anaerror("Have %d data points but need at least %d for this interpolation",
+	     0, nPoints, minsize);
     return 1;
+  }
 
   cleanup_cubic_spline_tables(cspl);
-  cspl->spline = gsl_spline_alloc(periodic? gsl_interp_cspline_periodic:
-				  gsl_interp_cspline, nPoints);
+  cspl->spline = gsl_spline_alloc(interp_type, nPoints);
+    
   cspl->acc = gsl_interp_accel_alloc();
 
-  x = malloc(nPoints*sizeof(double));
-  y = malloc(nPoints*sizeof(double));
+  x = cspl->x = malloc(nPoints*sizeof(double));
+  y = cspl->y = malloc(nPoints*sizeof(double));
   xin.b = (byte *) xx;
   yin.b = (byte *) yy;
 
@@ -3377,8 +3388,8 @@ int cubic_spline_tables(void *xx, int xType, int xStep,
       *y++ = (double) n;
     y -= nPoints;
   }
-  gsl_spline_init(cspl->spline, x, y, nPoints);
-  return 1;
+  gsl_spline_init(cspl->spline, cspl->x, cspl->y, nPoints);
+  return 0;
 }
 /*------------------------------------------------------------------------- */
 double cspline_value(double x, csplineInfo *cspl)
@@ -3599,7 +3610,7 @@ int ana_cubic_spline(int narg, int ps[])
    LS 29apr96 */
 {
   static char	haveTable = '\0';
-  static csplineInfo	cspl = { NULL, NULL };
+  static csplineInfo	cspl = { NULL, NULL, NULL, NULL };
   int	xNewSym, xTabSym, yTabSym, size, oldType, result_sym;
   pointer	src, trgt;
   int	ana_convert(int, int [], int, int);
@@ -3630,8 +3641,7 @@ int ana_cubic_spline(int narg, int ps[])
   if (xTabSym) {		/* install new table */
     if (cubic_spline_tables(array_data(xTabSym), array_type(xTabSym), 1,
 			    array_data(yTabSym), array_type(yTabSym), 1,
-			    array_size(xTabSym), internalMode & 2, &cspl)
-	< 0)
+			    array_size(xTabSym), internalMode & 2, &cspl))
       return ANA_ERROR;		/* some error */
     haveTable = 1;
   }

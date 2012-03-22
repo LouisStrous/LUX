@@ -572,7 +572,7 @@ typedef struct {
 } branchInfo;
 
 typedef struct {
-  gsl_spline *spline; gsl_interp_accel *acc;
+  gsl_spline *spline; gsl_interp_accel *acc; double *x; double *y;
 } csplineInfo;
 
 typedef struct {

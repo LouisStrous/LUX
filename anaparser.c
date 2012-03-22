@@ -13,6 +13,7 @@
 #include "action.h"
 #include "anaparser.c.tab.h"
 #include "editor.h"
+#include "gsl/gsl_errno.h"
 #define YYERROR_VERBOSE
 static char rcsid[] __attribute__ ((unused)) =
  "$Id: anaparser.c,v 4.0 2001/02/07 20:36:54 strous Exp $";
@@ -1552,6 +1553,11 @@ int calc_error(char *s)
   return yyerror(s);
 }
 /*--------------------------------------------------------------*/
+void gehandler(const char *reason, const char *file, int line, int gsl_errno)
+{
+  anaerror("GSL error %d (%s line %d): %s", 0, gsl_errno, file, line, reason);
+}
+/*--------------------------------------------------------------*/
 char	*programName;
 int main(int argc, char *argv[])
      /* main program */
@@ -1574,6 +1580,10 @@ int main(int argc, char *argv[])
   readHistory();
   *line = '\0';			/* start with an empty line */
   p = line;
+
+  void gehandler(const char *, const char *, int, int);
+
+  gsl_set_error_handler(&gehandler);
   /* seek .anainit in home directory */
   fp = fopen(expand_name("~/.anainit", NULL), "r");
   if (fp) {

@@ -1745,6 +1745,29 @@ int varsmooth(int narg, int ps[], int cumul)
   return result;
 }
 /*------------------------------------------------------------------------- */
+/*
+  It is tricky to avoid round-off error when calculating running sums.
+  Even using Kahan summation it is possible to get small residual
+  round-off errors, and to get negative running sums for all-zero data
+  in the running-sum window at the end of a sequence containing
+  non-zero values.
+
+  ACP 4.2.2 says:
+
+  Let u′ = (u f+ v) f- w
+      v′ = (u f+ v) f- u
+      u″ = (u f+ v) f- v′
+      v″ = (u f+ v) f- u′
+
+  where f+ is properly rounded floating-point addition and f- is
+  properly rounded floating-point subtraction.
+
+  Then u + v = (u f+ v) + ((u f- u′) f+ (v f- v″))
+ */
+
+#define kahan_sum_f(value,sum,compensation) { float y = (value) - (compensation); float t = (sum) + y; (compensation) = (t - (sum)) - y; (sum) = t; }
+#define kahan_sum_d(value,sum,compensation) { double y = (value) - (compensation); double t = (sum) + y; (compensation) = (t - (sum)) - y; (sum) = t; }
+
 int smooth(int narg, int ps[], int cumul)
 /* return smoothed version syntax: y = smooth/runcum(x [,axis,width]
   [,/FW_EDGE_NEIGHBOR]) <axis> is the dimension along which summing is
@@ -1760,7 +1783,7 @@ int smooth(int narg, int ps[], int cumul)
   because "integer" range of floats is too small. */
 {
   byte	type;
-  int	n, result, i, offset, stride, nWidth, w1, ww, loop, three=3, norm,
+  int	n, result, i, offset, stride, nWidth, w1, w2, ww, loop, three=3, norm,
     iq, jq;
   pointer	src, trgt, width;
   scalar	value;
@@ -1794,189 +1817,306 @@ int smooth(int narg, int ps[], int cumul)
   iq = ps[0];			/* data */
   if (!srcinfo.naxes)
     srcinfo.naxes++;
-  for (loop = 0; loop < srcinfo.naxes; loop++)
-  { ww = (*width.l > srcinfo.rdims[0])? srcinfo.rdims[0]: *width.l;
+  for (loop = 0; loop < srcinfo.naxes; loop++) {
+    ww = (*width.l > srcinfo.rdims[0])? srcinfo.rdims[0]: *width.l;
     if (nWidth > 1)
       width.l++;
     norm = cumul? 1: ww;
     stride = srcinfo.step[0];
     offset = -stride*ww;
+    /*
+      n = 5 ∧ ww = 3
+      tgt[0] ← src[0] (/PW) ∨ src[0..2] (/NOPW)  0 1
+      tgt[1] ← src[0..2]                         1 1
+      tgt[2] ← src[1..3]                         2 2
+      tgt[3] ← src[2..4]                         3 3
+      tgt[4] ← src[4] (/PW) ∨ src[2..4] (/NOPW)  4 3
+      w1 = 2, w2 = 4
+      
+      n = 5 ∧ ww = 4
+      tgt[0] ← src[0..1] (/PW) ∨ src[0..3] (/NOPW)  ½ 1½
+      tgt[1] ← src[0..3]                           1½ 1½
+      tgt[2] ← src[1..4]                           2½ 2½
+      tgt[3] ← src[3..4] (/PW) ∨ src[1..4] (/NOPW) 3½ 2½
+      tgt[4] ← src[4] (/PW) ∨ src[1..4] (/NOPW)    4  2½
+      w1 = 2, w2 = 3
+      
+      n = 6 ∧ ww = 3
+      tgt[0] ← src[0] (/PW) ∨ src[0..2] (/NOPW) 0 1
+      tgt[1] ← src[0..2]                        1 1
+      tgt[2] ← src[1..3]                        2 2
+      tgt[3] ← src[2..4]                        3 3
+      tgt[4] ← src[3..5]                        4 4
+      tgt[5] ← src[5] (/PW) ∨ src[3..5] (/NOPW) 5 4
+      w1 = 2, w2 = 5
+      
+      n = 6 ∧ ww = 4
+      tgt[0] ← src[0..1] (/PW) ∨ src[0..3] (/NOPW)  ½ 1½ 
+      tgt[1] ← src[0..3]                           1½ 1½
+      tgt[2] ← src[1..4]                           2½ 2½
+      tgt[3] ← src[2..5]                           3½ 3½
+      tgt[4] ← src[4..5] (/PW) ∨ src[2..5] (/NOPW) 4½ 3½
+      tgt[5] ← src[5] (/PW) ∨ src[2..5] (/NOPW)    5  3½
+      w1 = 2, w2 = 4
+
+      n ww w1 w2  
+      5  3  2  4
+      5  4  2  3
+      6  3  2  5
+      6  4  2  4
+      
+      w1 = ⌊(ww + 1)/2⌋
+      w2 = ⌊n - ww/2⌋
+    */
     w1 = (ww + 1)/2;
+    w2 = srcinfo.rdims[0] - ww/2;
     switch (symbol_type(iq)) {
       default:
 	return cerror(ILL_TYPE, ps[0]);
       case ANA_BYTE:
-	do
-	{ value.f = 0.0;	/* initialize */
+	do {
+	  value.l = 0;		  /* initialize */
+	  /* left-hand edge */
 	  if (internalMode & 1) { /* /PARTIAL_WIDTH */
-	    if (!cumul)
-	      norm = 2 - ww%2;
-	    for (i = 0; i < 2 - ww%2; i++) {
-	      value.f += (float) *src.b;
+	    norm = cumul? ww: 0;
+	    if (ww%2) {		/* odd width */
+	      value.l += *src.b;
 	      src.b += stride;
-	    }
-	    *trgt.f = value.f/norm;
-	    trgt.f += stride;
-	    for (i = 1; i < w1; i++) {
-	      value.f += (float) *src.b;
+	      if (!cumul)
+		++norm;
+	      *trgt.b = (byte) (value.l/norm);
+	      trgt.b += stride;
+	      i = 1;
+	    } else
+	      i = 0;
+	    for ( ; i < w1; i++) {
+	      value.l += *src.b;
 	      src.b += stride;
-	      value.f += (float) *src.b;
+	      value.l += *src.b;
 	      src.b += stride;
 	      if (!cumul)
 		norm += 2;
-	      *trgt.f = value.f/norm;
-	      trgt.f += stride;
+	      *trgt.b = (byte) (value.l/norm);
+	      trgt.b += stride;
 	    }
 	  } else {		/* full width */
-	    for (i = 0; i < ww; i++) /* do the left edge */
-	    { value.f += (float) *src.b;
-	      src.b += stride; }
-	    for (i = 0; i < w1; i++)
-	    { *trgt.f = value.f/norm;
-	      trgt.f += stride; }
+	    for (i = 0; i < ww; i++) { /* do the left edge */
+	      value.l += *src.b;
+	      src.b += stride; 
+	    }
+	    byte v = (byte) (value.l/norm);
+	    for (i = 0; i < w1; i++) {
+	      *trgt.b = v;
+	      trgt.b += stride; 
+	    }
 	  }
-	  for (i = ww; i < srcinfo.rdims[0]; i++) /* middle part */
-	  { value.f += (float) *src.b - (float) src.b[offset];
+	  /* middle part */
+	  for ( ; i < w2; i++) {
+	    value.l += *src.b - src.b[offset];
 	    src.b += stride;
-	    *trgt.f = value.f/norm;
-	    trgt.f += stride; }
-	  if (internalMode & 1)	/* /PARTIAL_WIDTH */
-	    for (i = w1; i < ww; i++) {
-	      value.f -= (float) src.b[offset];
-	      src.b += stride;
-	      value.f -= (float) src.b[offset];
-	      src.b += stride;
+	    *trgt.b = (byte) (value.l/norm);
+	    trgt.b += stride;
+	  }
+	  /* right-hand edge */
+	  if (internalMode & 1) { /* /PARTIAL_WIDTH */
+	    for ( ; i < srcinfo.rdims[0] - !(ww%2); i++) {
+	      value.l -= src.b[offset];
+	      offset += stride;
+	      value.l -= src.b[offset];
+	      offset += stride;
 	      if (!cumul)
 		norm -= 2;
-	      *trgt.f = value.f/norm;
-	      trgt.f += stride; }
-	  else
-	    for (i = w1; i < ww; i++) /* right edge */
-	    { *trgt.f = value.f/norm;
-	      trgt.f += stride; }
+	      *trgt.b = (byte) (value.l/norm);
+	      trgt.b += stride;
+	    }
+	    if (!(ww%2)) {
+	      value.l -= src.b[offset];
+	      offset += stride;
+	      if (!cumul)
+		--norm;
+	      *trgt.b = (byte) (value.l/norm);
+	      trgt.b += stride;
+	    }
+	  } else {
+	    byte v = (byte) (value.l/norm);
+	    for ( ; i < srcinfo.rdims[0]; i++) { /* right edge */
+	      *trgt.b = v;
+	      trgt.b += stride;
+	    }
+	  }
 	} while (advanceLoop(&trgtinfo, &trgt),
 		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
       case ANA_WORD:
-	do
-	{ value.f = 0.0;	/* initialize */
+	do {
+	  value.l = 0;		  /* initialize */
+	  /* left-hand edge */
 	  if (internalMode & 1) { /* /PARTIAL_WIDTH */
-	    if (!cumul)
-	      norm = 2 - ww%2;
-	    for (i = 0; i < 2 - ww%2; i++) {
-	      value.f += (float) *src.w;
+	    norm = cumul? ww: 0;
+	    if (ww%2) {		/* odd width */
+	      value.l += *src.w;
 	      src.w += stride;
-	    }
-	    *trgt.f = value.f/norm;
-	    trgt.f += stride;
-	    for (i = 1; i < w1; i++) {
-	      value.f += (float) *src.w;
+	      if (!cumul)
+		++norm;
+	      *trgt.w = (word) (value.l/norm);
+	      trgt.w += stride;
+	      i = 1;
+	    } else
+	      i = 0;
+	    for ( ; i < w1; i++) {
+	      value.l += *src.w;
 	      src.w += stride;
-	      value.f += (float) *src.w;
+	      value.l += *src.w;
 	      src.w += stride;
 	      if (!cumul)
 		norm += 2;
-	      *trgt.f = value.f/norm;
-	      trgt.f += stride;
+	      *trgt.w = (word) (value.l/norm);
+	      trgt.w += stride;
 	    }
 	  } else {		/* full width */
-	    for (i = 0; i < ww; i++) /* do the left edge */
-	    { value.f += (float) *src.w;
-	      src.w += stride; }
-	    for (i = 0; i < w1; i++)
-	    { *trgt.f = value.f/norm;
-	      trgt.f += stride; }
+	    for (i = 0; i < ww; i++) { /* do the left edge */
+	      value.l += *src.w;
+	      src.w += stride; 
+	    }
+	    word v = (word) (value.l/norm);
+	    for (i = 0; i < w1; i++) {
+	      *trgt.w = v;
+	      trgt.w += stride; 
+	    }
 	  }
-	  for (i = ww; i < srcinfo.rdims[0]; i++) /* middle part */
-	  { value.f += (float) *src.w - (float) src.w[offset];
+	  /* middle part */
+	  for ( ; i < w2; i++) {
+	    value.l += *src.w - src.w[offset];
 	    src.w += stride;
-	    *trgt.f = value.f/norm;
-	    trgt.f += stride; }
-	  if (internalMode & 1)	/* /PARTIAL_WIDTH */
-	    for (i = w1; i < ww; i++) {
-	      value.f -= (float) src.w[offset];
-	      src.w += stride;
-	      value.f -= (float) src.w[offset];
-	      src.w += stride;
+	    *trgt.w = (word) (value.l/norm);
+	    trgt.w += stride;
+	  }
+	  /* right-hand edge */
+	  if (internalMode & 1) { /* /PARTIAL_WIDTH */
+	    for ( ; i < srcinfo.rdims[0] - !(ww%2); i++) {
+	      value.l -= src.w[offset];
+	      offset += stride;
+	      value.l -= src.w[offset];
+	      offset += stride;
 	      if (!cumul)
 		norm -= 2;
-	      *trgt.f = value.f/norm;
-	      trgt.f += stride; }
-	  else
-	    for (i = w1; i < ww; i++) /* right edge */
-	    { *trgt.f = value.f/norm;
-	      trgt.f += stride; }
+	      *trgt.w = (word) (value.l/norm);
+	      trgt.w += stride;
+	    }
+	    if (!(ww%2)) {
+	      value.l -= src.w[offset];
+	      offset += stride;
+	      if (!cumul)
+		--norm;
+	      *trgt.w = (word) (value.l/norm);
+	      trgt.w += stride;
+	    }
+	  } else {
+	    word v = (word) (value.l/norm);
+	    for ( ; i < srcinfo.rdims[0]; i++) { /* right edge */
+	      *trgt.w = v;
+	      trgt.w += stride;
+	    }
+	  }
 	} while (advanceLoop(&trgtinfo, &trgt),
 		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
       case ANA_LONG:
-	do
-	{ value.f = 0.0;	/* initialize */
+	do {
+	  value.l = 0;		  /* initialize */
+	  /* left-hand edge */
 	  if (internalMode & 1) { /* /PARTIAL_WIDTH */
-	    if (!cumul)
-	      norm = 2 - ww%2;
-	    for (i = 0; i < 2 - ww%2; i++) {
-	      value.f += (float) *src.l;
+	    norm = cumul? ww: 0;
+	    if (ww%2) {		/* odd width */
+	      value.l += *src.l;
 	      src.l += stride;
-	    }
-	    *trgt.f = value.f/norm;
-	    trgt.f += stride;
-	    for (i = 1; i < w1; i++) {
-	      value.f += (float) *src.l;
+	      if (!cumul)
+		++norm;
+	      *trgt.l = value.l/norm;
+	      trgt.l += stride;
+	      i = 1;
+	    } else
+	      i = 0;
+	    for ( ; i < w1; i++) {
+	      value.l += *src.l;
 	      src.l += stride;
-	      value.f += (float) *src.l;
+	      value.l += *src.l;
 	      src.l += stride;
 	      if (!cumul)
 		norm += 2;
-	      *trgt.f = value.f/norm;
-	      trgt.f += stride;
+	      *trgt.l = value.l/norm;
+	      trgt.l += stride;
 	    }
 	  } else {		/* full width */
-	    for (i = 0; i < ww; i++) /* do the left edge */
-	    { value.f += (float) *src.l;
-	      src.l += stride; }
-	    for (i = 0; i < w1; i++)
-	    { *trgt.f = value.f/norm;
-	      trgt.f += stride; }
+	    for (i = 0; i < ww; i++) { /* do the left edge */
+	      value.l += *src.l;
+	      src.l += stride; 
+	    }
+	    int v = value.l/norm;
+	    for (i = 0; i < w1; i++) {
+	      *trgt.l = v;
+	      trgt.l += stride; 
+	    }
 	  }
-	  for (i = ww; i < srcinfo.rdims[0]; i++) /* middle part */
-	  { value.f += (float) *src.l - (float) src.l[offset];
+	  /* middle part */
+	  for ( ; i < w2; i++) {
+	    value.l += *src.l - src.l[offset];
 	    src.l += stride;
-	    *trgt.f = value.f/norm;
-	    trgt.f += stride; }
-	  if (internalMode & 1)	/* /PARTIAL_WIDTH */
-	    for (i = w1; i < ww; i++) {
-	      value.f -= (float) src.l[offset];
-	      src.l += stride;
-	      value.f -= (float) src.l[offset];
-	      src.l += stride;
+	    *trgt.l = value.l/norm;
+	    trgt.l += stride;
+	  }
+	  /* right-hand edge */
+	  if (internalMode & 1) { /* /PARTIAL_WIDTH */
+	    for ( ; i < srcinfo.rdims[0] - !(ww%2); i++) {
+	      value.l -= src.l[offset];
+	      offset += stride;
+	      value.l -= src.l[offset];
+	      offset += stride;
 	      if (!cumul)
 		norm -= 2;
-	      *trgt.f = value.f/norm;
-	      trgt.f += stride; }
-	  else
-	    for (i = w1; i < ww; i++) /* right edge */
-	    { *trgt.f = value.f/norm;
-	      trgt.f += stride; }
+	      *trgt.l = value.l/norm;
+	      trgt.l += stride;
+	    }
+	    if (!(ww%2)) {
+	      value.l -= src.l[offset];
+	      offset += stride;
+	      if (!cumul)
+		--norm;
+	      *trgt.l = value.l/norm;
+	      trgt.l += stride;
+	    }
+	  } else {
+	    int v = value.l/norm;
+	    for ( ; i < srcinfo.rdims[0]; i++) { /* right edge */
+	      *trgt.l = v;
+	      trgt.l += stride;
+	    }
+	  }
 	} while (advanceLoop(&trgtinfo, &trgt),
 		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
       case ANA_FLOAT:
-	do
-	{ value.f = 0.0;	/* initialize */
+	/* we use the Kahan algorithm to limit roundoff error */
+	do {
+	  value.f = 0;		  /* initialize */
+	  float c = 0.0;
+	  /* left-hand edge */
 	  if (internalMode & 1) { /* /PARTIAL_WIDTH */
-	    if (!cumul)
-	      norm = 2 - ww%2;
-	    for (i = 0; i < 2 - ww%2; i++) {
-	      value.f += (float) *src.f;
+	    norm = cumul? ww: 0;
+	    if (ww%2) {		/* odd width */
+	      kahan_sum_f(*src.f, value.f, c);
 	      src.f += stride;
-	    }
-	    *trgt.f = value.f/norm;
-	    trgt.f += stride;
-	    for (i = 1; i < w1; i++) {
-	      value.f += (float) *src.f;
+	      if (!cumul)
+		++norm;
+	      *trgt.f = value.f/norm;
+	      trgt.f += stride;
+	      i = 1;
+	    } else
+	      i = 0;
+	    for ( ; i < w1; i++) {
+	      kahan_sum_f(*src.f, value.f, c);
 	      src.f += stride;
-	      value.f += (float) *src.f;
+	      kahan_sum_f(*src.f, value.f, c);
 	      src.f += stride;
 	      if (!cumul)
 		norm += 2;
@@ -1984,51 +2124,75 @@ int smooth(int narg, int ps[], int cumul)
 	      trgt.f += stride;
 	    }
 	  } else {		/* full width */
-	    for (i = 0; i < ww; i++) /* do the left edge */
-	    { value.f += (float) *src.f;
-	      src.f += stride; }
-	    for (i = 0; i < w1; i++)
-	    { *trgt.f = value.f/norm;
-	      trgt.f += stride; }
+	    for (i = 0; i < ww; i++) { /* do the left edge */
+	      kahan_sum_f(*src.f, value.f, c);
+	      src.f += stride; 
+	    }
+	    double v = value.f/norm;
+	    for (i = 0; i < w1; i++) {
+	      *trgt.f = v;
+	      trgt.f += stride; 
+	    }
 	  }
-	  for (i = ww; i < srcinfo.rdims[0]; i++) /* middle part */
-	  { value.f += (float) *src.f - (float) src.f[offset];
+	  /* middle part */
+	  for ( ; i < w2; i++) {
+	    kahan_sum_f(*src.f - src.f[offset], value.f, c);
 	    src.f += stride;
 	    *trgt.f = value.f/norm;
-	    trgt.f += stride; }
-	  if (internalMode & 1)	/* /PARTIAL_WIDTH */
-	    for (i = w1; i < ww; i++) {
-	      value.f -= (float) src.f[offset];
-	      src.f += stride;
-	      value.f -= (float) src.f[offset];
-	      src.f += stride;
+	    trgt.f += stride;
+	  }
+	  /* right-hand edge */
+	  if (internalMode & 1) { /* /PARTIAL_WIDTH */
+	    for ( ; i < srcinfo.rdims[0] - !(ww%2); i++) {
+	      kahan_sum_f(-src.f[offset], value.f, c);
+	      offset += stride;
+	      kahan_sum_f(-src.f[offset], value.f, c);
+	      offset += stride;
 	      if (!cumul)
 		norm -= 2;
 	      *trgt.f = value.f/norm;
-	      trgt.f += stride; }
-	  else
-	    for (i = w1; i < ww; i++) /* right edge */
-	    { *trgt.f = value.f/norm;
-	      trgt.f += stride; }
+	      trgt.f += stride;
+	    }
+	    if (!(ww%2)) {
+	      kahan_sum_f(-src.f[offset], value.f, c);
+	      offset += stride;
+	      if (!cumul)
+		--norm;
+	      *trgt.f = value.f/norm;
+	      trgt.f += stride;
+	    }
+	  } else {
+	    float v = value.f/norm;
+	    for ( ; i < srcinfo.rdims[0]; i++) { /* right edge */
+	      *trgt.f = v;
+	      trgt.f += stride;
+	    }
+	  }
 	} while (advanceLoop(&trgtinfo, &trgt),
 		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
       case ANA_DOUBLE:
-	do
-	{ value.d = 0.0;	/* initialize */
+	/* we use the Kahan algorithm to limit roundoff error */
+	do {
+	  value.d = 0;		  /* initialize */
+	  double c = 0.0;
+	  /* left-hand edge */
 	  if (internalMode & 1) { /* /PARTIAL_WIDTH */
-	    if (!cumul)
-	      norm = 2 - ww%2;
-	    for (i = 0; i < 2 - ww%2; i++) {
-	      value.d += (double) *src.d;
+	    norm = cumul? ww: 0;
+	    if (ww%2) {		/* odd width */
+	      kahan_sum_d(*src.d, value.d, c);
 	      src.d += stride;
-	    }
-	    *trgt.d = value.d/norm;
-	    trgt.d += stride;
-	    for (i = 1; i < w1; i++) {
-	      value.d += (double) *src.d;
+	      if (!cumul)
+		++norm;
+	      *trgt.d = value.d/norm;
+	      trgt.d += stride;
+	      i = 1;
+	    } else
+	      i = 0;
+	    for ( ; i < w1; i++) {
+	      kahan_sum_d(*src.d, value.d, c);
 	      src.d += stride;
-	      value.d += (double) *src.d;
+	      kahan_sum_d(*src.d, value.d, c);
 	      src.d += stride;
 	      if (!cumul)
 		norm += 2;
@@ -2036,32 +2200,50 @@ int smooth(int narg, int ps[], int cumul)
 	      trgt.d += stride;
 	    }
 	  } else {		/* full width */
-	    for (i = 0; i < ww; i++) /* do the left edge */
-	    { value.d += (double) *src.d;
-	      src.d += stride; }
-	    for (i = 0; i < w1; i++)
-	    { *trgt.d = value.d/norm;
-	      trgt.d += stride; }
+	    for (i = 0; i < ww; i++) { /* do the left edge */
+	      kahan_sum_d(*src.d, value.d, c);
+	      src.d += stride; 
+	    }
+	    double v = value.d/norm;
+	    for (i = 0; i < w1; i++) {
+	      *trgt.d = v;
+	      trgt.d += stride; 
+	    }
 	  }
-	  for (i = ww; i < srcinfo.rdims[0]; i++) /* middle part */
-	  { value.d += (double) *src.d - (double) src.d[offset];
+	  /* middle part */
+	  for ( ; i < w2; i++) {
+	    kahan_sum_d(*src.d - src.d[offset], value.d, c);
 	    src.d += stride;
 	    *trgt.d = value.d/norm;
-	    trgt.d += stride; }
-	  if (internalMode & 1)	/* /PARTIAL_WIDTH */
-	    for (i = w1; i < ww; i++) {
-	      value.d -= (double) src.d[offset];
-	      src.d += stride;
-	      value.d -= (double) src.d[offset];
-	      src.d += stride;
+	    trgt.d += stride;
+	  }
+	  /* right-hand edge */
+	  if (internalMode & 1) { /* /PARTIAL_WIDTH */
+	    for ( ; i < srcinfo.rdims[0] - !(ww%2); i++) {
+	      kahan_sum_d(-src.d[offset], value.d, c);
+	      offset += stride;
+	      kahan_sum_d(-src.d[offset], value.d, c);
+	      offset += stride;
 	      if (!cumul)
 		norm -= 2;
 	      *trgt.d = value.d/norm;
-	      trgt.d += stride; }
-	  else
-	    for (i = w1; i < ww; i++) /* right edge */
-	    { *trgt.d = value.d/norm;
-	      trgt.d += stride; }
+	      trgt.d += stride;
+	    }
+	    if (!(ww%2)) {
+	      kahan_sum_d(-src.d[offset], value.d, c);
+	      offset += stride;
+	      if (!cumul)
+		--norm;
+	      *trgt.d = value.d/norm;
+	      trgt.d += stride;
+	    }
+	  } else {
+	    double v = value.d/norm;
+	    for ( ; i < srcinfo.rdims[0]; i++) { /* right edge */
+	      *trgt.d = v;
+	      trgt.d += stride;
+	    }
+	  }
 	} while (advanceLoop(&trgtinfo, &trgt),
 		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;

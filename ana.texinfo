@@ -26439,7 +26439,7 @@ See also: @code{MOD}
 @node SMOOTH, SOLAR_B, SMOD, Internal Routines
 @subsection SMOOTH
 
-@code{SMOOTH(@var{x} [[, @var{axis}], @var{width}][, /FW_EDGE_NEIGHBOR,
+@code{SMOOTH(@var{x} [[, @var{axis}], @var{width}][, /PARTIAL_WIDTH,
 /ALL])}
 
 Boxcar-smooths @code{@var{x}} along the axes indicated in
@@ -26458,20 +26458,10 @@ results are as if @code{INDGEN(@var{width})} were specified for
 then @code{@var{x}} is regarded as a one-dimensional array.  In that
 case, @code{@var{width}} must be scalar.
 
-@code{/FW_EDGE_NEIGHBOR} determines handling at the edges: if it is set
-(as it is by default), then the edges are filled with the nearest
-full-width value; if it is unset (@code{/NO..}) then the edges are
-filled with the nearest smaller-width value.
-
-Two different algorithms are used to perform the smoothing: the first
-one is for fixed-width smoothing only and the second one is for
-variable-width smoothing.  When @code{@var{width}} is a scalar then
-either algorithm can be used.  In that case, the fixed-width algorithm
-is faster than the variable-width one (especially if @code{@var{width}}
-is large) but also has more roundoff trouble (especially when the
-dimension that is smoothed over is large).  By default, the fixed-width
-algorithm is used.  You can select to use the variable-width algorithm
-by specifying the @code{/VARSMOOTH} keyword.
+@code{/PARTIAL_WIDTH} determines handling at the edges: If it is set ,
+then the edges are filled with the nearest smaller-width value.  If it
+is not set, then the edges are filled with the nearest full-width
+value.
 
 See also: @ref{RUNCUM}, @ref{RUNSUM}, @ref{GSMOOTH}, @ref{ESMOOTH}
 

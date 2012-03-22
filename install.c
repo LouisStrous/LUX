@@ -1132,7 +1132,7 @@ internalRoutine function_table[] = {
   { "SINH",	1, 1, ana_sinh, "*" }, /* fun1.c */
   { "SKIPC",	2, 2, ana_skipc, 0 }, /* fun2.c */
   { "SMAP",	1, 1, ana_smap, "1TRUNCATE:2ARRAY" }, /* subsc.c */
-  { "SMOOTH",	1, 3, ana_smooth, "1PARTIAL_WIDTH:2VARSMOOTH:4ALL" }, /* strous.c */
+  { "SMOOTH",	1, 3, ana_smooth, "1PARTIAL_WIDTH:4ALL" }, /* strous.c */
   { "SOLAR_B",	1, 1, ana_solar_b, "*2MODERN" }, /* ephem2.c */
   { "SOLAR_L",	1, 1, ana_solar_l, "*1FULL:2MODERN" }, /* ephem2.c */
   { "SOLAR_P",	1, 1, ana_solar_p, "*2MODERN" }, /* ephem2.c */

@@ -1885,29 +1885,6 @@ M₂ = 2 + (1 - 2)/3 = 4/3
 S₂ = 0 + (1 - 2)*(1 - 4/3)*2 = 2/3
 s = √(2/3/(3 - 1)) = √(1/3) = ⅓√3
  */
-void spread_d(int count, double *data, double *weight, double *spread, double *sumweight)
-{
-  double M, W, S;
-
-  if (count <= 1)
-    return 0.0;
-  M = *data++;
-  W = *weight++;
-  S = 0.0;
-  while (--count) {
-    W += *weight;
-    double Mold = M;
-    if (W)
-      M += (*data - Mold)/W;
-    S += (*data - Mold)*(*data - M)**weight;
-  }
-  if (mean)
-    *mean = M;
-  if (variance)
-    *variance = S;
-  if (sumweight)
-    *sumweight = W;
-}
 /*------------------------------------------------------------------------- */
 int ana_swab(int narg, int ps[])
 /*swap bytes in an array or even an scalar */

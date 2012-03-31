@@ -18364,10 +18364,8 @@ is limited in change to a factor of between @code{@var{fac}} and
 1/@code{@var{fac}}. 
 @code{@var{fac}} defaults to 0.5.
 @item err
-If @code{@var{err}} is defined, then estimates for the formal errors on
-the parameters are returned in it.  These estimates are equal to the
-square root of the inverse of the second derivative of the fit quality
-with respect to each of the parameters.   
+If @code{@var{err}} is defined, then rough estimates for the formal
+errors on the parameters are returned in it.
 @end table
 
 @table @code

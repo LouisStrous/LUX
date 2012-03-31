@@ -475,13 +475,43 @@ int ana_generalfit(int narg, int ps[])
            && iter < iThresh
            && same <= nSame
            && (!tThresh || time(NULL) - starttime < tThresh));
-  temp = (1 << nSame);
-  for (j = 0; j < nPar; j++)
-    err[j] /= temp;
   memcpy(par, parBest2, size);
   par[nPar] = qBest2;
 
-  if (narg > 14 && ps[14]) {    /* have explicity ERROR; calculate */
+  if (narg > 14 && ps[14]) {
+    memcpy(par, parBest2, nPar*sizeof(*par));
+    double qualplus, qualmin;
+    for (i = 0; i < nPar; i++) {
+      if (!step[i])
+	err[i] = 0;
+      else {
+	double h = fabs(step[i])*0.1;
+	par[i] = parBest2[i] + h;
+	if (fitSym) {
+	  j = eval(fitTemp);
+	  if (j < 0)
+	    goto generalfit_1;
+	  qualplus = double_arg(j);
+	  zapTemp(j);
+	} else
+	  qualplus = fitFunc(par, nPar, xp, yp, weights, nPoints);
+	par[i] = parBest2[i] - h;
+	if (fitSym) {
+	  j = eval(fitTemp);
+	  if (j < 0)
+	    goto generalfit_1;
+	  qualmin = double_arg(j);
+	  zapTemp(j);
+	} else
+	  qualmin = fitFunc(par, nPar, xp, yp, weights, nPoints);
+	err[i] = h*h/(qualplus + qualmin - 2*qBest2);
+	par[i] = parBest2[i];	/* restore */
+      }
+    }
+  } else
+    free(err);
+
+  if (narg > 14 && ps[14] && 0) {    /* have explicity ERROR; calculate */
                                 /* "standard" errors */
     if (!qBest2) {              /* the fit is perfect */
       for (j = 0; j < nPar; j++)
@@ -629,8 +659,7 @@ int ana_generalfit(int narg, int ps[])
       if (vocal)
         printf("%g\n", err[i]);
     } /* end of for (i = 0; i < nPar; i++) */
-  } else
-    free(err);
+  }
   if (!xSym)
     zap(xTemp);
   if (fitSym) {
@@ -662,6 +691,114 @@ int ana_generalfit(int narg, int ps[])
   free(meanShift);
   return j;
 }
+/*------------------------------------------------------------*/
+gsl_vector *gsl_vector_from_ana_symbol(int iq, int axis)
+{
+  gsl_vector *v;
+  int ndim, *dims, nelem, i;
+  pointer data;
+
+  iq = ana_double(1, &iq);
+  if (numerical(iq, &ndim, dims, &nelem, &data) < 0
+      || axis < 0 || axis >= ndim) {
+    errno = EDOM;
+    return NULL;
+  }
+
+  v = gsl_vector_alloc(0);
+  if (!v) {
+    errno = ENOMEM;
+    return NULL;
+  }
+  v->size = dims[axis];
+  v->stride = 1;
+  for (i = 0; i < axis; i++)
+    v->stride *= dims[i];
+  v->data = data.d;
+  v->owner = 0;
+  return v;
+}
+/*------------------------------------------------------------*/
+#if FINISH_LATER
+/* par = FIT2(x, y, start, step, funcname)
+
+   Seeks parameters <par> such that <funcname>(<par>, <x>, <y>) is as
+   small as possible.
+
+   We use the GSL framework to seek X that minimizes the value of
+   function double generalfit2_func(const gsl_vector * X, void *
+   PARAMS).  Their X corresponds to our <par>, and their PARAMS
+   corresponds to our <x> and <y> -- confusing!
+
+   generalfit2_func evaluates 
+*/
+int ana_generalfit2(int narg, int ps[])
+{
+  size_t nPar, nPoints, nComponents;
+  pointer x, y, start;
+  int xTemp, ySym, fitSym, fitTemp, result, par_sym = 0;
+  gsl_multimin_fminimizer *minimizer = NULL;
+  ana_func_if *afif = NULL;
+
+  {
+    int nx, ny, dims, ndim;
+
+    if (numerical(ps[0], &ndim, dims, &nx, &x) < 0
+	|| numerical(ps[1], NULL, NULL, &ny, &y) < 0
+	|| numerical(ana_double(1, &ps[2]), NULL, NULL, &nPar, &start) < 0)
+      return ANA_ERROR;
+    nComponents = (ndims > 1? dims[0]: 1);
+    nPoints = nx/nComponents;
+    if (ny != nPoints)
+      return cerror(INCMP_ARG, ps[1]);
+    if (!symbolIsString(ps[3]))
+      return cerror(NEED_STR, ps[3]);
+  }
+
+  afif = ana_func_if_alloc(string_value(ps[3]), 3);
+  if (!afif) {
+    switch (errno) {
+    case EDOM:
+      result = anaerror("Cannot fit to internal routine", ps[3]);
+      break;
+    case ENOMEM:
+      result = cerror(ALLOC_ERR, 0);
+      break;
+    default:
+      result = cerror("Unhandled error %d", 0, errno);
+      break;
+    }
+    goto end;
+  }
+
+  par_sym = array_scratch(ANA_DOUBLE, 1, &nPar);
+
+  ana_func_if_set_param(afif, 0, ana_double(1, &ps[0]));
+  ana_func_if_set_param(afif, 1, ana_double(1, &ps[1]));
+  ana_func_if_set_param(afif, 2, par_sym);
+
+  minimizer = gsl_multimin_fminimizer_alloc(gsl_multimin_fminimizer_nmsimplex2,
+					    nComponents);
+  if (!minimizer)
+    return anaerror("Unable to allocate memory for minimizer", 0);
+
+  gsl_multimin_function m_func_spec;
+  m_func_spec.n = nComponents;
+  m_func_spec.f = minimizer_function;
+  m_func_spec.params = (void *) x.d;
+
+  const gsl_vector *m_x;
+  const gsl_vector *m_step;
+
+  gsl_multimin_fminimizer_set(minimizer, m_func, par, step);
+
+ end:
+  zap(par_sym);
+  gsl_multimin_fminimizer_free(minimizer);
+  ana_func_if_free(afif);
+  return result;
+}
+#endif
 /*------------------------------------------------------------*/
 typedef union {
   byte  *b;

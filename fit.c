@@ -692,6 +692,7 @@ int ana_generalfit(int narg, int ps[])
   return j;
 }
 /*------------------------------------------------------------*/
+#if FINISH_LATER
 gsl_vector *gsl_vector_from_ana_symbol(int iq, int axis)
 {
   gsl_vector *v;
@@ -719,7 +720,6 @@ gsl_vector *gsl_vector_from_ana_symbol(int iq, int axis)
   return v;
 }
 /*------------------------------------------------------------*/
-#if FINISH_LATER
 /* par = FIT2(x, y, start, step, funcname)
 
    Seeks parameters <par> such that <funcname>(<par>, <x>, <y>) is as

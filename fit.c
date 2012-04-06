@@ -12,6 +12,10 @@
 #include <limits.h>             /* for LONG_MAX */
 #include <time.h>               /* for difftime */
 #include "action.h"
+#include "ana_func_if.h"
+#include <gsl/gsl_vector.h>
+#include <gsl/gsl_multimin.h>
+#include <limits.h>
 static char rcsid[] __attribute__ ((unused)) =
 "$Id: fit.c,v 4.0 2001/02/07 20:37:00 strous Exp $";
 
@@ -692,7 +696,6 @@ int ana_generalfit(int narg, int ps[])
   return j;
 }
 /*------------------------------------------------------------*/
-#if FINISH_LATER
 gsl_vector *gsl_vector_from_ana_symbol(int iq, int axis)
 {
   gsl_vector *v;
@@ -700,27 +703,42 @@ gsl_vector *gsl_vector_from_ana_symbol(int iq, int axis)
   pointer data;
 
   iq = ana_double(1, &iq);
-  if (numerical(iq, &ndim, dims, &nelem, &data) < 0
-      || axis < 0 || axis >= ndim) {
+  if (numerical(iq, &dims, &ndim, &nelem, &data) < 0
+      || axis >= ndim) {
     errno = EDOM;
     return NULL;
   }
 
-  v = gsl_vector_alloc(0);
+  v = calloc(1, sizeof(gsl_vector));
+  /* v->owner = 0 is essential! */
   if (!v) {
     errno = ENOMEM;
     return NULL;
   }
-  v->size = dims[axis];
   v->stride = 1;
-  for (i = 0; i < axis; i++)
-    v->stride *= dims[i];
+  if (axis < 0) {
+    v->size = nelem;
+  } else {
+    v->size = dims[axis];
+    for (i = 0; i < axis; i++)
+      v->stride *= dims[i];
+  }
   v->data = data.d;
-  v->owner = 0;
   return v;
 }
 /*------------------------------------------------------------*/
-/* par = FIT2(x, y, start, step, funcname)
+double fit2_func(const gsl_vector *a, void *p)
+{
+  ana_func_if *afif = (ana_func_if *) p;
+  pointer par = ana_func_if_get_param_data(afif, 0);
+  memcpy(par.d, a->data, a->size*sizeof(double));
+  double result = ana_func_if_call(afif);
+  if (isnan(result))
+    return GSL_NAN;
+  return result;
+}
+
+/* par = FIT3(x, y, start, step, funcname)
 
    Seeks parameters <par> such that <funcname>(<par>, <x>, <y>) is as
    small as possible.
@@ -728,77 +746,142 @@ gsl_vector *gsl_vector_from_ana_symbol(int iq, int axis)
    We use the GSL framework to seek X that minimizes the value of
    function double generalfit2_func(const gsl_vector * X, void *
    PARAMS).  Their X corresponds to our <par>, and their PARAMS
-   corresponds to our <x> and <y> -- confusing!
+   corresponds to our <x> and <y> -- confusing! 
 
    generalfit2_func evaluates 
 */
 int ana_generalfit2(int narg, int ps[])
 {
-  size_t nPar, nPoints, nComponents;
-  pointer x, y, start;
-  int xTemp, ySym, fitSym, fitTemp, result, par_sym = 0;
+  int nPar;
+  int result;
   gsl_multimin_fminimizer *minimizer = NULL;
   ana_func_if *afif = NULL;
+  gsl_vector *par_v = NULL, *step_v = NULL;
+  int d_step_sym, d_par_sym, d_x_sym, d_y_sym;
+
+  int vocal = (internalMode & 1);
 
   {
-    int nx, ny, dims, ndim;
+    int nx, ny, *dims, ndim, nStep;
 
-    if (numerical(ps[0], &ndim, dims, &nx, &x) < 0
-	|| numerical(ps[1], NULL, NULL, &ny, &y) < 0
-	|| numerical(ana_double(1, &ps[2]), NULL, NULL, &nPar, &start) < 0)
+    d_x_sym = ana_double(1, &ps[0]);	/* X */
+    if (isFreeTemp(d_x_sym))
+      symbol_context(d_x_sym) = 1;     /* avoid premature deletion */
+    d_y_sym = ana_double(1, &ps[1]);	/* Y */
+    if (isFreeTemp(d_y_sym))
+      symbol_context(d_y_sym) = 1;
+    d_par_sym = ana_double(1, &ps[2]); /* PAR */
+    if (isFreeTemp(d_par_sym))
+      symbol_context(d_par_sym) = 1;	/* avoid premature deletion */
+    d_step_sym = ana_double(1, &ps[3]); /* STEP */
+    if (isFreeTemp(d_step_sym))
+      symbol_context(d_step_sym) = 1;
+    if (numerical(d_x_sym, &dims, &ndim, &nx, NULL) < 0 /* X */
+	|| numerical(d_y_sym, NULL, NULL, &ny, NULL) < 0 /* Y */
+	|| numerical(d_par_sym, NULL, NULL, &nPar, NULL) < 0
+	|| numerical(d_step_sym, NULL, NULL, &nStep, NULL) < 0)
       return ANA_ERROR;
-    nComponents = (ndims > 1? dims[0]: 1);
-    nPoints = nx/nComponents;
-    if (ny != nPoints)
-      return cerror(INCMP_ARG, ps[1]);
-    if (!symbolIsString(ps[3]))
-      return cerror(NEED_STR, ps[3]);
+    if (nStep != nPar) {
+      result = anaerror("Number of elements (%d) in step argument is unequal to number of elements (%d) in parameters argument", ps[3], nStep, nPar);
+      goto end;
+    }
+    if (!symbolIsString(ps[4])) {
+      result = cerror(NEED_STR, ps[4]);
+      goto end;
+    }
   }
 
-  afif = ana_func_if_alloc(string_value(ps[3]), 3);
+  afif = ana_func_if_alloc(string_value(ps[4]), 3);
   if (!afif) {
     switch (errno) {
     case EDOM:
-      result = anaerror("Cannot fit to internal routine", ps[3]);
+      result = anaerror("Cannot fit to internal routine", ps[4]);
       break;
     case ENOMEM:
       result = cerror(ALLOC_ERR, 0);
       break;
     default:
-      result = cerror("Unhandled error %d", 0, errno);
+      result = anaerror("Unhandled error %d", 0, errno);
       break;
     }
     goto end;
   }
 
-  par_sym = array_scratch(ANA_DOUBLE, 1, &nPar);
+  ana_func_if_set_param(afif, 0, d_par_sym);		 /* par */
+  ana_func_if_set_param(afif, 1, d_x_sym);		 /* x */
+  ana_func_if_set_param(afif, 2, d_y_sym);		 /* y */
 
-  ana_func_if_set_param(afif, 0, ana_double(1, &ps[0]));
-  ana_func_if_set_param(afif, 1, ana_double(1, &ps[1]));
-  ana_func_if_set_param(afif, 2, par_sym);
+  par_v = gsl_vector_from_ana_symbol(d_par_sym, -1);
+  step_v = gsl_vector_from_ana_symbol(d_step_sym, -1);
 
   minimizer = gsl_multimin_fminimizer_alloc(gsl_multimin_fminimizer_nmsimplex2,
-					    nComponents);
-  if (!minimizer)
-    return anaerror("Unable to allocate memory for minimizer", 0);
+					    nPar);
+  if (!minimizer) {
+    result = anaerror("Unable to allocate memory for minimizer", 0);
+    goto end;
+  }
 
-  gsl_multimin_function m_func_spec;
-  m_func_spec.n = nComponents;
-  m_func_spec.f = minimizer_function;
-  m_func_spec.params = (void *) x.d;
+  gsl_multimin_function m_func;
+  m_func.n = nPar;
+  m_func.f = &fit2_func;
+  m_func.params = (void *) afif;
 
-  const gsl_vector *m_x;
-  const gsl_vector *m_step;
+  if (gsl_multimin_fminimizer_set(minimizer, &m_func, par_v, step_v)) {
+    result = ANA_ERROR;
+    goto end;
+  }
 
-  gsl_multimin_fminimizer_set(minimizer, m_func, par, step);
+  int status;
+  int iter = 0;
+  int show = nPar;
+  if (nPar > 10)
+    show = 10;
+  do {
+    ++iter;
+    status = gsl_multimin_fminimizer_iterate(minimizer);
+    if (status)
+      break;
+    double size = gsl_multimin_fminimizer_size(minimizer);
+    if (vocal) {
+      int i, j = 0;
+      printf("%d %g:", iter, size);
+      for (i = 0; i < nPar && j < show; i++) {
+	if (step_v->data[i]) {
+	  printf(" %g", par_v->data[i]);
+	  j++;
+	}
+      }
+      putchar('\n');
+    }
+    status = gsl_multimin_test_size(size, 10*DBL_MIN);
+  } while (status == GSL_CONTINUE && iter < 100);
+  gsl_vector *best_par = gsl_multimin_fminimizer_x(minimizer);
+  double best_min = gsl_multimin_fminimizer_minimum(minimizer);
+
+  {
+    int n = best_par->size + 1;
+    result = array_scratch(ANA_DOUBLE, 1, &n);
+  }
+  double *tgt = array_data(result);
+  memcpy(tgt, best_par->data, best_par->size*sizeof(double));
+  tgt[best_par->size] = best_min;
 
  end:
-  zap(par_sym);
+  gsl_vector_free(par_v);
+  gsl_vector_free(step_v);
   gsl_multimin_fminimizer_free(minimizer);
   ana_func_if_free(afif);
+  if (symbol_context(d_par_sym) == 1)
+    symbol_context(d_par_sym) = -compileLevel; /* so it is deleted when appropriate */
+  if (symbol_context(d_x_sym) == 1)
+    symbol_context(d_x_sym) = -compileLevel; /* so it is deleted when appropriate */
+  if (symbol_context(d_y_sym) == 1)
+    symbol_context(d_y_sym) = -compileLevel; /* so it is deleted when appropriate */
+  if (symbol_context(d_step_sym) == 1)
+    symbol_context(d_step_sym) = -compileLevel; /* so it is deleted when appropriate */
   return result;
 }
-#endif
+REGISTER(generalfit2, f, FIT3, 5, 5, "1VOCAL");
 /*------------------------------------------------------------*/
 typedef union {
   byte  *b;

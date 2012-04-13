@@ -90,7 +90,7 @@ pointer ana_func_if_get_param_data(ana_func_if *afif, size_t index)
 double ana_func_if_call(ana_func_if *afif)
 {
   int result_sym = eval(afif->func_sym);
-  int result = (result_sym < 0? NAN: double_arg(result_sym));
+  double result = (result_sym < 0? NAN: double_arg(result_sym));
   zap(result_sym);
   return result;
 }

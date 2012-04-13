@@ -12828,6 +12828,7 @@ arguments.
 * FIND_MINLOC::                 Find the locations of local minima
 * FIT::                         Fit arbitrary function to data
 * FIT2::                        Fit arbitrary function to data
+* FIT3::                        
 * FIT3DCUBE::                   Ensure complete 3D plot fits on screen
 * FITS_HEADER::                 Read the header of a FITS file
 * FITS_KEY::                    Get a value from a FITS file header
@@ -18382,11 +18383,11 @@ unequal to zero are shown, and at most the first twenty such parameters
 are displayed.
 @end table
 
-See also: @ref{TREND}, @ref{LSQ}
+See also: @ref{TREND}, @ref{LSQ}, @ref{FIT}
 
 [2.13.264]
 @c -------------------------------------
-@node FIT2, FIT3DCUBE, FIT, Internal Routines
+@node FIT2, FIT3, FIT, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection FIT2
 
@@ -18398,7 +18399,62 @@ PCROSS=@var{pcross}, PMUTATE=@var{pmutate}, VOCAL=@var{vocal}] [,
 [@ref{develop} package]
 
 @c -------------------------------------
-@node FIT3DCUBE, FITS_HEADER, FIT2, Internal Routines
+@node FIT3, FIT3DCUBE, FIT2, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection FIT3
+
+@code{@var{par} = FIT3( X=@var{x}, Y=@var{y}, START=@var{start},
+STEP=@var{step}, F=@var{funcname} [, ERR=@var{errors},
+ITHRESH=@var{ithresh}, STHRESH=@var{sthresh}, NITHRESH=@var{nithresh}]
+[, /VOCAL])}
+
+Seeks parameters @code{@var{par}} such that
+@code{@var{funcname}(@var{par}, @var{x}, @var{y})} is as small as
+possible, using the Simplex algorithm.  @code{@var{start}} specifies
+the startup values for the parameters.  @code{@var{step}} specifies
+the initial step size for each of the parameters, for searching for
+the minimum.  @code{@var{funcname}} must be a @code{STRING} that names
+the user-defined function to call to obtain the quality of the fit.
+This function is assumed to return the sum of the square of the
+residuals between the data and the model for the current set of
+parameters.
+
+@code{@var{ithresh}} specifies the maximum number of search iterations
+that is done.  It defaults to 0, which corresponds to no iteration
+limit.
+
+The search algorithm searches a certain volume of parameter space for
+the minimum.  During every iteration it updates the vertex
+corresponding to the greatest function value, to home in on the
+location of the minimum.  @code{@var{sthresh}} specifies below which
+size of the search volume the iteration should stop.  The used measure
+is the root-mean-square distance of all vertices from the center of
+the search volume.  This size may increase or decrease, and need not
+end up at zero.
+
+If the best fit does not improve for more than @code{@var{nithresh}}
+consecutive search iterations, then the iteration stops.  A value of 0
+corresponds to no limit.  It defaults to 10 times the number of
+parameters.
+
+Upon exit, the last element of @var{par} contains the standard
+deviation of the difference between @code{@var{y}} and
+@code{@var{funcname}(@var{par}, @var{x}, @var{y})}.  If
+@code{@var{errors}} is specified, then the estimated standard errors
+on the parameters are returned in it. 
+
+If @code{/VOCAL} is specified, then about every 2 seconds a line is
+printed that lists (1) the iteration number, (2) the residual standard
+error of the current best fit, (3) the difference with the previously
+printed residual standard error, (4) a measure of the linear size of
+the multidimensional volume that is being considered, (5) the
+difference with the previously printed size, (6) the current best
+values for the first few parameters that have a non-zero step size.
+
+See also: @ref{FIT}
+
+@c -------------------------------------
+@node FIT3DCUBE, FITS_HEADER, FIT3, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection FIT3DCUBE
 

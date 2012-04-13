@@ -738,31 +738,51 @@ double fit2_func(const gsl_vector *a, void *p)
   return result;
 }
 
-/* par = FIT3(x, y, start, step, funcname)
+/*
+  
+  par = FIT3(x, y, start, step, funcname [, err, ithresh, sthresh,
+  nithresh] [, /VOCAL])
 
-   Seeks parameters <par> such that <funcname>(<par>, <x>, <y>) is as
-   small as possible.
+  Seeks parameters <par> such that <funcname>(<par>, <x>, <y>) is as
+  small as possible.  The last element of <par> contains the standard
+  deviation of the difference <y> and <funcname>(<par>, <x>, <y>).
 
-   We use the GSL framework to seek X that minimizes the value of
-   function double generalfit2_func(const gsl_vector * X, void *
-   PARAMS).  Their X corresponds to our <par>, and their PARAMS
-   corresponds to our <x> and <y> -- confusing! 
+  We use the GSL framework to seek X that minimizes the value of
+  function double generalfit2_func(const gsl_vector * X, void *
+  PARAMS).  Their X corresponds to our <par>, and their PARAMS
+  corresponds to our <x> and <y> -- confusing!
 
-   generalfit2_func evaluates 
+  <err> receives estimates of the uncertainty in the elements of
+  <par>.
+
+  <ithresh> is the maximum number of iterations.  It defaults to 0,
+  which means "no limit".
+
+  <stresh> is the threshold on the linear size of the parameter space
+  volume that is being searched for the minimum by the algorithm.  If
+  the size becomes less than the threshold, then the search stops.  It
+  defaults to 0, which means "no limit".
+
+  <nithresh> is the maximum allowed number of successive iterations
+  during which no better fit is found.  If no improvement is found
+  after more than that many iterations (once the search is well on its
+  way), then the search is stopped.  This parameter defaults to 10
+  times the number of parameters.  0 means "no limit".
+
 */
 int ana_generalfit2(int narg, int ps[])
 {
-  int nPar;
-  int result;
+  int nPar, nPoints, result, ithresh = 0, nithresh;
   gsl_multimin_fminimizer *minimizer = NULL;
   ana_func_if *afif = NULL;
   gsl_vector *par_v = NULL, *step_v = NULL;
   int d_step_sym, d_par_sym, d_x_sym, d_y_sym;
+  double *errors = NULL, sthresh = 0;
 
   int vocal = (internalMode & 1);
 
   {
-    int nx, ny, *dims, ndim, nStep;
+    int nx, *dims, ndim, nStep;
 
     d_x_sym = ana_double(1, &ps[0]);	/* X */
     if (isFreeTemp(d_x_sym))
@@ -777,7 +797,7 @@ int ana_generalfit2(int narg, int ps[])
     if (isFreeTemp(d_step_sym))
       symbol_context(d_step_sym) = 1;
     if (numerical(d_x_sym, &dims, &ndim, &nx, NULL) < 0 /* X */
-	|| numerical(d_y_sym, NULL, NULL, &ny, NULL) < 0 /* Y */
+	|| numerical(d_y_sym, NULL, NULL, &nPoints, NULL) < 0 /* Y */
 	|| numerical(d_par_sym, NULL, NULL, &nPar, NULL) < 0
 	|| numerical(d_step_sym, NULL, NULL, &nStep, NULL) < 0)
       return ANA_ERROR;
@@ -785,11 +805,30 @@ int ana_generalfit2(int narg, int ps[])
       result = anaerror("Number of elements (%d) in step argument is unequal to number of elements (%d) in parameters argument", ps[3], nStep, nPar);
       goto end;
     }
-    if (!symbolIsString(ps[4])) {
-      result = cerror(NEED_STR, ps[4]);
-      goto end;
-    }
   }
+  if (!symbolIsString(ps[4])) {	/* FUNCNAME */
+    result = cerror(NEED_STR, ps[4]);
+    goto end;
+  }
+  if (narg > 5 && ps[5]) {	/* ERR */
+    redef_array(ps[5], ANA_DOUBLE, 1, &nPar);
+    errors = (double *) array_data(ps[5]);
+  }
+  if (narg > 6 && ps[6])	/* ITHRESH */
+    ithresh = int_arg(ps[6]);
+  if (ithresh <= 0)
+    ithresh = INT_MAX;
+  if (narg > 7 && ps[7])	/* STHRESH */
+    sthresh = double_arg(ps[7]);
+  if (narg > 8 && ps[8])	/* NITHRESH */
+    nithresh = int_arg(ps[8]);
+  else
+    nithresh = nPar*10;
+  if (nithresh <= 0)
+    nithresh = INT_MAX;
+
+  par_v = gsl_vector_from_ana_symbol(d_par_sym, -1);
+  step_v = gsl_vector_from_ana_symbol(d_step_sym, -1);
 
   afif = ana_func_if_alloc(string_value(ps[4]), 3);
   if (!afif) {
@@ -811,9 +850,6 @@ int ana_generalfit2(int narg, int ps[])
   ana_func_if_set_param(afif, 1, d_x_sym);		 /* x */
   ana_func_if_set_param(afif, 2, d_y_sym);		 /* y */
 
-  par_v = gsl_vector_from_ana_symbol(d_par_sym, -1);
-  step_v = gsl_vector_from_ana_symbol(d_step_sym, -1);
-
   minimizer = gsl_multimin_fminimizer_alloc(gsl_multimin_fminimizer_nmsimplex2,
 					    nPar);
   if (!minimizer) {
@@ -834,27 +870,47 @@ int ana_generalfit2(int narg, int ps[])
   int status;
   int iter = 0;
   int show = nPar;
-  if (nPar > 10)
-    show = 10;
+  if (nPar > 9)
+    show = 9;
+  time_t report_after;
+  if (vocal)
+    report_after = time(NULL);
+  double oldqual, newqual = 0, vocal_oldqual = 0, size, vocal_oldsize = 0;
+  int no_improvement_niter = 0;
   do {
     ++iter;
     status = gsl_multimin_fminimizer_iterate(minimizer);
     if (status)
       break;
-    double size = gsl_multimin_fminimizer_size(minimizer);
-    if (vocal) {
+    size = gsl_multimin_fminimizer_size(minimizer);
+    oldqual = newqual;
+    newqual = sqrt(minimizer->fval/nPoints);
+    double improvement = newqual - oldqual;
+    if (improvement)
+      no_improvement_niter = 0;
+    else
+      ++no_improvement_niter;
+    if (vocal && time(NULL) > report_after) {
       int i, j = 0;
-      printf("%d %g:", iter, size);
+      double vocal_improvement = newqual - vocal_oldqual;
+      vocal_oldqual = newqual;
+      double size_improvement = size - vocal_oldsize;
+      vocal_oldsize = size;
+      printf("%d %g (%.3g) %.3g (%+.3g):", iter, newqual, vocal_improvement,
+	     size, size_improvement);
       for (i = 0; i < nPar && j < show; i++) {
 	if (step_v->data[i]) {
-	  printf(" %g", par_v->data[i]);
+	  printf(" %g", gsl_vector_get(minimizer->x, i));
 	  j++;
 	}
       }
       putchar('\n');
+      report_after = time(NULL) + 2;
     }
-    status = gsl_multimin_test_size(size, 10*DBL_MIN);
-  } while (status == GSL_CONTINUE && iter < 100);
+  } while (iter < ithresh 
+	   && gsl_multimin_test_size(size, sthresh) == GSL_CONTINUE
+	   && (no_improvement_niter < nithresh 
+	       || no_improvement_niter == iter - 1));
   gsl_vector *best_par = gsl_multimin_fminimizer_x(minimizer);
   double best_min = gsl_multimin_fminimizer_minimum(minimizer);
 
@@ -864,7 +920,45 @@ int ana_generalfit2(int narg, int ps[])
   }
   double *tgt = array_data(result);
   memcpy(tgt, best_par->data, best_par->size*sizeof(double));
-  tgt[best_par->size] = best_min;
+  tgt[best_par->size] = sqrt(best_min/nPoints);
+
+  if (errors) {
+    /*
+      q ≈ q₀ + ah²
+      a = (q - q₀)/h²
+      q₊ = q₀ + ah₊² = q₀ + (q - q₀)h₊²/h²
+      h₊² = h²(q₊ - q₀)/(q - q₀)
+     */
+    int i;
+    for (i = 0; i < nPar; i++) {
+      if (step_v->data[i]) {
+	double hp, hm, q, qtgt, qeps;
+	memcpy(par_v->data, best_par->data, nPar*sizeof(double));
+	hp = step_v->data[i];
+	qtgt = best_min*(nPar + 1.0)/nPar;
+	qeps = best_min*1e-5;
+	do {
+	  par_v->data[i] = best_par->data[i] + hp;
+	  q = ana_func_if_call(afif);
+	  if (q == best_min)
+	    hp *= 2;
+	  else
+	    hp *= sqrt((qtgt - best_min)/(q - best_min));
+	} while (fabs(q - qtgt) > qeps);
+	hm = -hp;
+	do {
+	  par_v->data[i] = best_par->data[i] + hm;
+	  q = ana_func_if_call(afif);
+	  if (q == best_min)
+	    hm *= 2;
+	  else
+	    hm *= sqrt((qtgt - best_min)/(q - best_min));
+	} while (fabs(q - qtgt) > qeps);
+	errors[i] = (hp - hm)/2;
+      } else
+	errors[i] = 0.0;
+    }
+  }
 
  end:
   gsl_vector_free(par_v);
@@ -881,7 +975,7 @@ int ana_generalfit2(int narg, int ps[])
     symbol_context(d_step_sym) = -compileLevel; /* so it is deleted when appropriate */
   return result;
 }
-REGISTER(generalfit2, f, FIT3, 5, 5, "1VOCAL");
+REGISTER(generalfit2, f, FIT3, 5, 7, "X:Y:START:STEP:F:ERR:ITHRESH:1VOCAL");
 /*------------------------------------------------------------*/
 typedef union {
   byte  *b;

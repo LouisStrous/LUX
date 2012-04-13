@@ -71,6 +71,7 @@
 #include "install.h"
 #include "editor.h"		/* for BUFSIZE */
 #include "format.h"
+#include <errno.h>
 
 #define FMT_INSTALL	1
 #define FMT_CLEANUP	2
@@ -3949,6 +3950,62 @@ int ana_writeu_f(int narg, int ps[])
  /* function version */
 { return (writeu(narg, ps, 1) == 1)? 1: 4; }
 /*------------------------------------------------------------------------- */
+int ok_for_astore(int iq)
+{
+  switch (symbol_class(iq)) {
+  case ANA_STRING: case ANA_SUBSC_PTR:
+  case ANA_FILEMAP: case ANA_ASSOC:
+  case ANA_SCALAR: case ANA_UNDEFINED:
+  case ANA_ARRAY: case ANA_CLIST:
+    return 1;
+  default:
+    return 0;
+  }
+}
+/*------------------------------------------------------------------------- */
+void astore_one(FILE *fp, int iq)
+{
+  int n, sz, i;
+  pointer p;
+
+  fwrite(&sym[iq], sizeof(symTableEntry), 1, fp); /* the symbol */
+  switch (symbol_class(iq)) {
+  case ANA_ARRAY:
+    n = symbol_memory(iq);
+    p.l = (int *) array_header(iq);
+    fwrite(p.b, 1, n, fp);
+    if (isStringType(array_type(iq))) { /* string array */
+      sz = array_size(iq);	/* number of elements */
+      p.sp = array_data(iq); /* pointer to list of strings */
+      while (sz--) {
+	n = *p.sp? strlen(*p.sp): 0; /* the length of the string */
+	fwrite(&n, sizeof(int), 1, fp); /* write it */
+	if (n)
+	  fwrite(*p.sp, 1, n, fp); /* write the string */
+	p.sp++;
+      }
+    }
+    break;
+  case ANA_STRING:
+    n = symbol_memory(iq);
+    p.s = string_value(iq);
+    fwrite(p.b, 1, n, fp);
+    break;
+  case ANA_FILEMAP:
+    n = symbol_memory(iq);
+    p.s = (char *) file_map_header(iq);
+    fwrite(p.b, 1, n, fp);
+    break;
+  case ANA_CLIST:
+    n = clist_num_symbols(iq);
+    p.w = clist_symbols(iq);
+    fwrite(&n, 1, sizeof(n), fp);
+    for (i = 0; i < n; i++)
+      astore_one(fp, p.w[i]);
+    break;
+  }
+}
+/*------------------------------------------------------------------------- */
 int astore(int narg, int ps[], int flag)
 /* STORE,x1 [, x2, x3, ...], file
   stores arbitrary data <x1>, <x2>, etcetera in file <file>.  The names
@@ -3960,8 +4017,7 @@ int astore(int narg, int ps[], int flag)
    <string.h>: strlen()
  */
 {
-  int	iq, i, intro[2], n, sz;
-  pointer	p;
+  int	iq, i, intro[2], n;
   char	*file, *name;
   FILE	*fp;
 
@@ -3972,15 +4028,8 @@ int astore(int narg, int ps[], int flag)
   --narg;
   for (i = 0; i < narg; i++) { /* all data arguments */
     iq = ps[i];
-    switch (symbol_class(iq)) {
-      case ANA_STRING: case ANA_SUBSC_PTR:
-      case ANA_FILEMAP: case ANA_ASSOC:
-      case ANA_SCALAR: case ANA_UNDEFINED:
-      case ANA_ARRAY:
-	break;
-      default:
-	return flag? ANA_ZERO: cerror(ILL_CLASS, iq);
-    }
+    if (!ok_for_astore(iq))
+      return flag? cerror(ILL_CLASS, iq): ANA_ZERO;
   }
   /* all arguments are OK for storing */
   fp = fopen(expand_name(file, NULL), "w");
@@ -4007,35 +4056,7 @@ int astore(int narg, int ps[], int flag)
       fwrite(&n, sizeof(int), 1, fp);
     }
     iq = transfer(iq);
-    fwrite(&sym[iq], sizeof(symTableEntry), 1, fp); /* the symbol */
-    switch (symbol_class(iq)) {
-      case ANA_ARRAY:
-	n = symbol_memory(iq);
-	p.l = (int *) array_header(iq);
-	fwrite(p.b, 1, n, fp);
-	if (isStringType(array_type(iq))) { /* string array */
-	  sz = array_size(iq);	/* number of elements */
-	  p.sp = array_data(iq); /* pointer to list of strings */
-	  while (sz--) {
-	    n = *p.sp? strlen(*p.sp): 0; /* the length of the string */
-	    fwrite(&n, sizeof(int), 1, fp); /* write it */
-	    if (n)
-	      fwrite(*p.sp, 1, n, fp); /* write the string */
-	    p.sp++;
-	  }
-	}
-	break;
-      case ANA_STRING:
-	n = symbol_memory(iq);
-	p.s = string_value(iq);
-	fwrite(p.b, 1, n, fp);
-	break;
-      case ANA_FILEMAP:
-	n = symbol_memory(iq);
-	p.s = (char *) file_map_header(iq);
-	fwrite(p.b, 1, n, fp);
-	break;
-    }
+    astore_one(fp, iq);
   }
   fclose(fp);
   return flag? ANA_ONE: 1;
@@ -4051,22 +4072,96 @@ int ana_astore_f(int narg, int ps[])
   return astore(narg, ps, 0);
 }
 /*------------------------------------------------------------------------- */
-int readunf(void *ptr, int n, FILE *fp, int flag)
-/* reads <n> bytes from file <fp> into array at <ptr>.  if necessary, */
-/* generates appropriate error messages (if flag == 0).  fp must be */
-/* a legal file pointer.  returns 1 on success, -1 on failure. */
-/* closes file on error.  LS 11mar97 */
-/* Headers:
-   <stdio.h>: FILE, fread(), fclose(), perror()
- */
+int arestore_one(FILE* fp, int iq, int reverseOrder)
 {
-  if (!fread(ptr, 1, n, fp))	/* some error during reading */
-  { fclose(fp);
-    if (flag)
-    { perror("System message:");
-      return cerror(READ_ERR, 0); }
-    return -1; }
-  return 1;			/* everything OK */
+  word hash, context;
+  int line, exec, n, j;
+  pointer p;
+
+  hash = sym[iq].xx;		/* save because they'll be overwritten */
+  line = sym[iq].line;
+  context = symbol_context(iq);
+  exec = sym[iq].exec;
+  if (!fread(&sym[iq], sizeof(symTableEntry), 1, fp))
+    return 1;			/* some problem: check errno for kind */
+  sym[iq].xx = hash;		/* restore */
+  symbol_line(iq) = line;
+  symbol_context(iq) = context;
+  sym[iq].exec = exec;
+  switch (symbol_class(iq)) {
+  case ANA_ARRAY:
+    if (reverseOrder)
+      endian(&symbol_memory(iq), sizeof(int), ANA_LONG);
+    n = symbol_memory(iq);
+    allocate(p.v, n, char);
+    array_header(iq) = (array *) p.v;
+    if (!fread(p.b, n, 1, fp))
+      return 1;
+    n = array_num_dims(iq);
+    if (reverseOrder) {
+      endian(array_dims(iq), n*sizeof(int), ANA_LONG);
+      endian(array_data(iq), array_size(iq)*ana_type_size[array_type(iq)],
+	     array_type(iq));
+    }
+    if (isStringType(symbol_type(iq))) { /* a string array */
+      n = array_size(iq);	/* the number of strings */
+      p.sp = array_data(iq);
+      while (n--) {
+	/* read the size of the next string */
+	if (!fread(&j, sizeof(int), 1, fp))
+	  return 1;
+	if (reverseOrder)
+	  endian(&j, sizeof(int), ANA_LONG);
+	if (j) {
+	  *p.sp = malloc(j + 1); /* reserve space for the string */
+	  if (!*p.sp)
+	    return 1;
+	  if (!fread(*p.sp, j, 1, fp))
+	    return 1;
+	  (*p.sp)[j] = '\0'; /* terminate properly */
+	} else
+	  *p.sp = NULL;
+	p.sp++;
+      }
+    }
+    break;
+  case ANA_STRING:
+    n = symbol_memory(iq);
+    if (reverseOrder)
+      endian(&n, sizeof(int), ANA_LONG);
+    allocate(p.s, n, char);
+    string_value(iq) = p.s;
+    if (!fread(p.b, n, 1, fp))
+      return 1;
+    break;
+  case ANA_FILEMAP:
+    n = symbol_memory(iq);
+    if (reverseOrder)
+      endian(&n, sizeof(int), ANA_LONG);
+    allocate(p.s, n, char);
+    file_map_header(iq) = (array *) p.s;
+    if (!fread(p.b, n, 1, fp))
+      return 1;
+    n = file_map_num_dims(iq);
+    endian(file_map_dims(iq), n*sizeof(int), ANA_LONG);
+    endian(&file_map_offset(iq), sizeof(int), ANA_LONG);
+    break;
+  case ANA_CLIST:
+    if (!fread(&n, sizeof(int), 1, fp))
+      return 1;
+    if (reverseOrder)
+      endian(&n, sizeof(int), ANA_LONG);
+    allocate(p.w, n*sizeof(word), word);
+    clist_symbols(iq) = p.w;
+    for (j = 0; j < n; j++) {
+      int iq2 = nextFreeTempVariable();
+      arestore_one(fp, iq2, reverseOrder);
+      symbol_context(iq2) = iq;
+      p.w[j] = iq2;
+    }
+    break;
+  }	  
+  return 0;
 }
 /*------------------------------------------------------------------------- */
 int arestore(int narg, int ps[], int flag)
@@ -4085,11 +4180,9 @@ int arestore(int narg, int ps[], int flag)
    <stdlib.h>: malloc(), free()
  */
 {
-  int	iq, i, intro[2], n, nvalue, line, exec, j;
-  pointer	p;
+  int	iq, i, intro[2], n, nvalue;
   char	*file, *name, reverseOrder;
   FILE	*fp;
-  word	hash, context;
   
   iq = ps[narg - 1];		/* file name */
   if (symbol_class(iq) != ANA_STRING) /* filename is not a string */
@@ -4104,8 +4197,8 @@ int arestore(int narg, int ps[], int flag)
     } else
       return ANA_ZERO;
   }
-  if (readunf(intro, 2*sizeof(int), fp, flag) < 0) /* some error */
-    return flag? ANA_ERROR: ANA_ZERO;
+  if (!fread(intro, 2*sizeof(int), 1, fp)) /* some error */
+    return flag? cerror(READ_ERR, 0): ANA_ZERO;
   if (intro[0] == 0x6666aaaa)	/* native byte order */
     reverseOrder = 0;
   else if (intro[0] == 0xaaaa6666) /* reversed byte order */
@@ -4126,16 +4219,16 @@ int arestore(int narg, int ps[], int flag)
 	return flag? anaerror("Need a named variable", ps[i]): ANA_ZERO;
       }
   for (i = 0; i < nvalue; i++) {
-    if (readunf(&n, sizeof(int), fp, flag) < 0)  /* size of name */
-      return flag? ANA_ERROR: ANA_ZERO;
+    if (!fread(&n, sizeof(int), 1, fp))  /* size of name */
+      return flag? cerror(READ_ERR, 0): ANA_ZERO;
     if (reverseOrder)
       endian(&n, sizeof(int), ANA_LONG);
     if (!narg) {		/* reading all of them: restore original */
 				/* names */
       name = (char *) malloc(n);
-      if (readunf(name, n, fp, flag) < 0) { /* reading the name failed */
+      if (!fread(name, n, 1, fp)) { /* reading the name failed */
 	free(name);
-	return flag? ANA_ERROR: ANA_ZERO;
+	return flag? cerror(READ_ERR, 0): ANA_ZERO;
       }
       if ((iq = findVarName(name, curContext)) < 0) { /* could not get
 							 variable */
@@ -4151,76 +4244,15 @@ int arestore(int narg, int ps[], int flag)
 	return flag? ANA_ERROR: ANA_ZERO;
       }
       iq = ps[i];
-      undefine(iq); 		/* get rid of previous contents, if any */
     }
-    hash = sym[iq].xx;		/* save because they'll be overwritten */
-    line = sym[iq].line;
-    context = symbol_context(iq);
-    exec = sym[iq].exec;
-    if (readunf(&sym[iq], sizeof(symTableEntry), fp, flag) < 0)
-      return flag? ANA_ERROR: ANA_ZERO;
-    sym[iq].xx = hash;		/* restore */
-    symbol_line(iq) = line;
-    symbol_context(iq) = context;
-    sym[iq].exec = exec;
-    switch (symbol_class(iq)) {
-      case ANA_ARRAY:
-	if (reverseOrder)
-	  endian(&symbol_memory(iq), sizeof(int), ANA_LONG);
-	n = symbol_memory(iq);
-	allocate(p.v, n, char);
-	array_header(iq) = (array *) p.v;
-	if (readunf(p.b, n, fp, flag) < 0)
-	  return flag? ANA_ERROR: ANA_ZERO;
-	n = array_num_dims(iq);
-	if (reverseOrder) {
-	  endian(array_dims(iq), n*sizeof(int), ANA_LONG);
-	  endian(array_data(iq), array_size(iq)*ana_type_size[array_type(iq)],
-		 array_type(iq));
-	}
-	if (isStringType(symbol_type(iq))) { /* a string array */
-	  n = array_size(iq);	/* the number of strings */
-	  p.sp = array_data(iq);
-	  while (n--) {
-	    /* read the size of the next string */
-	    if (readunf(&j, sizeof(int), fp, flag) < 0)
-	      return flag? ANA_ERROR: ANA_ZERO;
-	    if (reverseOrder)
-	      endian(&j, sizeof(int), ANA_LONG);
-	    if (j) {
-	      *p.sp = malloc(j + 1); /* reserve space for the string */
-	      if (!*p.sp)
-		return cerror(ALLOC_ERR, 0);
-	      if (readunf(*p.sp, j, fp, flag) < 0)
-		return flag? ANA_ERROR: ANA_ZERO;
-	      (*p.sp)[j] = '\0'; /* terminate properly */
-	    } else
-	      *p.sp = NULL;
-	    p.sp++;
-	  }
-	}
-	break;
-      case ANA_STRING:
-	n = symbol_memory(iq);
-	if (reverseOrder)
-	  endian(&n, sizeof(int), ANA_LONG);
-	allocate(p.s, n, char);
-	string_value(iq) = p.s;
-	if (readunf(p.b, n, fp, flag) < 0)
-	  return flag? ANA_ERROR: ANA_ZERO;
-	break;
-      case ANA_FILEMAP:
-	n = symbol_memory(iq);
-	if (reverseOrder)
-	  endian(&n, sizeof(int), ANA_LONG);
-	allocate(p.s, n, char);
-	file_map_header(iq) = (array *) p.s;
-	if (readunf(p.b, n, fp, flag) < 0)
-	  return flag? ANA_ERROR: ANA_ZERO;
-	n = file_map_num_dims(iq);
-	endian(file_map_dims(iq), n*sizeof(int), ANA_LONG);
-	endian(&file_map_offset(iq), sizeof(int), ANA_LONG);
-	break;
+    undefine(iq); 		/* get rid of previous contents, if any */
+    if (arestore_one(fp, iq, curContext)) {
+      switch (errno) {
+      case ENOMEM:
+	return flag? cerror(ALLOC_ERR, 0): ANA_ZERO;
+      default:
+	return flag? cerror(READ_ERR, 0): ANA_ZERO;
+      }
     }
   }
   fclose(fp);

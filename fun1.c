@@ -370,6 +370,9 @@ void symdumpswitch(int nsym, int mode)
       }
       printw(")\n");
       return;
+  case ANA_CLIST:
+    printwf("#elem = %1d, ", clist_num_symbols(nsym));
+    break;
     case ANA_ASSOC:			/* assoc */
       s = typeName((int) assoc_type(nsym));
       printwf("lun = %d, offset = %d, ", assoc_lun(nsym),

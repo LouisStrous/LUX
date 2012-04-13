@@ -529,17 +529,19 @@ int ana_generalfit(int narg, int ps[])
       }
       if (vocal)
         printf("%3d/%1d error estimate = ", i, nPar);
-      /* we define the "error" in a parameter as the average distance */
-      /* of that parameter from its "best" value at which the fit quality */
-      /* has doubled.  We find the parameter values at which the double */
-      /* of the minimum error occurs using bisecting.  First, we start */
-      /* from the best parameter value and go to higher values until we */
-      /* find a parameter value at which the error value is high enough. */
-      /* Then we use bisecting to find the exact value of the parameter */
-      /* at which double the error occurs.  Then we do the same thing */
-      /* going from the best value to lower values, and then the resulting */
-      /* error estimate for the parameter is the average of the distances */
-      /* going up and going down. */
+      /* we define the "error" in a parameter as the average distance
+	 of that parameter from its "best" value at which the fit
+	 quality has increased by a factor of (n+1)/n where n is the
+	 number of data points.  We find the parameter values at which
+	 the higher error value occurs using bisecting.  First, we
+	 start from the best parameter value and go to higher values
+	 until we find a parameter value at which the error value is
+	 high enough.  Then we use bisecting to find the exact value
+	 of the parameter at which double the error occurs.  Then we
+	 do the same thing going from the best value to lower values,
+	 and then the resulting error estimate for the parameter is
+	 the average of the distances going up and going down. */
+      double qual2 = qBest2*(nPoints + 1)/nPoints;
       h = fabs(step[i]);        /* first estimate: the step size */
       do {
         par[i] = parBest2[i] + h; /* best parameter value + error estimate */
@@ -552,10 +554,9 @@ int ana_generalfit(int narg, int ps[])
           zapTemp(j);
         } else
           qual = fitFunc(par, nPar, xp, yp, weights, nPoints);
-        qual /= qBest2;
-        if (qual < 2)           /* not yet high enough */
+        if (qual < qual2)	/* not yet high enough */
           h *= 2;
-      } while (qual < 2 && h < FLT_MAX);
+      } while (qual < qual2 && h < FLT_MAX);
       if (h >= FLT_MAX) {
         err[i] = FLT_MAX;
         par[i] = parBest2[i];
@@ -575,7 +576,7 @@ int ana_generalfit(int narg, int ps[])
         zapTemp(j);
       } else
         qmax = fitFunc(par, nPar, xp, yp, weights, nPoints);
-      qmax = qmax/qBest2 - 2;
+      qmax = (qmax - qual2)/qBest2;
       /* OK, now do the bisecting */
       do {
         h = 0.5*(hmin + hmax);  /* middle of current range */
@@ -589,7 +590,7 @@ int ana_generalfit(int narg, int ps[])
           zapTemp(j);
         } else
           qual = fitFunc(par, nPar, xp, yp, weights, nPoints);
-        qual = qual/qBest2 - 2;
+        qual = (qual - qual2)/qBest2;
         if (qual > 0) {         /* we're too high */
           hmax = h;
           qmax = qual;
@@ -614,10 +615,9 @@ int ana_generalfit(int narg, int ps[])
           zapTemp(j);
         } else
           qual = fitFunc(par, nPar, xp, yp, weights, nPoints);
-        qual /= qBest2;
-        if (qual < 2)           /* not yet high enough */
+        if (qual < qual2)	/* not yet high enough */
           h *= 2;
-      } while (qual < 2 && h < FLT_MAX);
+      } while (qual < qual2 && h < FLT_MAX);
       if (h >= FLT_MAX) {
         err[i] = FLT_MAX;
         par[i] = parBest2[i];
@@ -636,7 +636,7 @@ int ana_generalfit(int narg, int ps[])
         zapTemp(j);
       } else
         qmax = fitFunc(par, nPar, xp, yp, weights, nPoints);
-      qmax = qmax/qBest2 - 2;
+      qmax = (qmax - qual2)/qBest2;
       /* OK, now do the bisecting */
       do {
         h = 0.5*(hmin + hmax);  /* middle of current range */
@@ -650,7 +650,7 @@ int ana_generalfit(int narg, int ps[])
           zapTemp(j);
         } else
           qual = fitFunc(par, nPar, xp, yp, weights, nPoints);
-        qual = qual/qBest2 - 2;
+        qual = (qual - qual2)/qBest2;
         if (qual > 0) {         /* we're too high */
           hmax = h;
           qmax = qual;
@@ -658,7 +658,7 @@ int ana_generalfit(int narg, int ps[])
           hmin = h;
         }
       } while (fabs(qual) > 1e-4);
-      err[i] = 0.5*(err[i] + h)/sqrt(2*qBest2);
+      err[i] = 0.5*(err[i] + h);
       par[i] = parBest2[i];     /* restore */
       if (vocal)
         printf("%g\n", err[i]);

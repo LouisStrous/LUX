@@ -823,7 +823,7 @@ int ana_generalfit2(int narg, int ps[])
   if (narg > 8 && ps[8])	/* NITHRESH */
     nithresh = int_arg(ps[8]);
   else
-    nithresh = nPar*10;
+    nithresh = sqrt(nPar)*10;
   if (nithresh <= 0)
     nithresh = INT_MAX;
 

@@ -80,6 +80,7 @@ int ana_v_dpT3_iD3arDm3p2q_011_f_(int narg, int ps[], void (*f)(double *, double
 int ana_v_dpT3_rD3_000_f_(int narg, int ps[], void (*f)(double *, double *, double *));
 int ana_v_dpT4_iD3arD3q_0111_f_(int narg, int ps[], void (*f)(double *, double *, double *, double *));
 int ana_v_dpdp3_iD3arDp3q_01_f_(int narg, int ps[], void (*f)(double [3], double [3][3]));
+int ana_v_sddsd_iDaD1rDq_012_f_(int narg, int ps[], void (*f)(double *, size_t, size_t, double, double *, size_t, size_t));
 
 void register_ana_f(int (*f)(int, int []), char *name, int min_arg,
                    int max_arg, char *spec);

@@ -1555,3 +1555,16 @@ int ana_v_dpT3_rD3_000_f_(int narg, int ps[], void (*f)(double *, double *, doub
   f(&tgts[0].d[0], &tgts[0].d[1], &tgts[0].d[2]);
   return iq;
 }
+/*-----------------------------------------------------------------------*/
+int ana_v_sddsd_iDaD1rDq_012_f_(int narg, int ps[], void (*f)(double *, size_t, size_t, double, double *, size_t, size_t))
+{
+  pointer *ptrs;
+  loopInfo *infos;
+  int iq;
+
+  if ((iq = standard_args(narg, ps, "i>D*;iD1?;rD&", &ptrs, &infos)) < 0)
+    return ANA_ERROR;
+  double width = ptrs[1].d? ptrs[1].d[0]: 3;
+  f(&ptrs[0].d[0], infos[0].dims[0], 1, width, &ptrs[2].d[0], infos[2].dims[0], 1);
+  return iq;
+}

@@ -2015,6 +2015,85 @@ int ana_esmooth(int narg, int ps[])
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
+void esmooth_asymmetric(double *srcdata, size_t srccount, size_t srcstride,
+			double width,
+			double *tgtdata, size_t tgtcount, size_t tgtstride)
+{
+  double damping = exp(-1.0/width);
+  double sum = 0.0;
+  double weight = 0.0;
+  int i;
+
+  assert(tgtcount >= srccount);
+
+  /*
+    a = exp(-1/w)
+    y[i]   = x[i] + x[i-1]*a + x[i-2]*a² + …
+    y[i+1] = x[i+1] + x[i]*a + x[i-1]*a² + …
+           = x[i+1] + y[i]*a
+  */
+
+  for (i = 0; i < srccount; i++) {
+    sum = sum*damping + *srcdata;
+    weight = weight*damping + 1;
+    *tgtdata = sum/weight;
+    srcdata += srcstride;
+    tgtdata += tgtstride;
+  }
+}
+/* i>D*;i?D1;rD& */
+BIND(esmooth_asymmetric, v_sddsd_iDaD1rDq_012, f, ESMOOTH1, 1, 2, NULL);
+/*------------------------------------------------------------------------- */
+void esmooth_symmetric(double *srcdata, size_t srccount, size_t srcstride,
+		       double width,
+		       double *tgtdata, size_t tgtcount, size_t tgtstride)
+{
+  double damping = exp(-1.0/width);
+  double sum = 0.0;
+  double weight = 0.0;
+  int i;
+
+  assert(tgtcount >= srccount);
+
+  /*
+    a = exp(-1/w)
+    z[i]   = … + x[i-2]*a² + x[i-1]*a + x[i] + x[i+1]*a + x[i+2]*a² + …
+    z[i+1] = … + x[i-1]*a² + x[i]*a + x[i+1] + x[i+2]*a + x[i+3]*a² + …
+           = … + x[i-2]*a³ + x[i-1]*a² + x[i]*a + x[i+1] + x[i+2]*a + …
+
+    z₊[i] = x[i+1]*a + x[i+2]*a² + …
+    z₋[i] = … + x[i-2]*a² + x[i-1]*a
+    z[i] = z₋[i] + x[i] + z₊[i]
+    z[i+1] = z₋[i+1] + x[i+1] + z₊[i+1]
+
+    z₋[i+1] = … + x[i-1]*a² + x[i]*a
+            = z‐[i]*a + x[i]*a
+    z₊[i+1] = x[i+2]*a + x[i+3]*a² + …
+            = z₊[i]/a - x[i+1]
+
+	    TODO: adjust below
+  */
+
+  for (i = 0; i < srccount; i++) {
+    sum = sum*damping + *srcdata;
+    weight = weight*damping + 1;
+    *tgtdata = sum/weight;
+    srcdata += srcstride;
+    tgtdata += tgtstride;
+  }
+  sum = 0;
+  weight = 0;
+  for (i = 0; i < srccount; i++) {
+    srcdata -= srcstride;
+    tgtdata -= tgtstride;
+    sum = sum*damping + *srcdata;
+    weight = weight*damping + 1;
+    *tgtdata += (sum - *srcdata)/weight;
+  }
+}
+/* i>D*;i?D1;rD& */
+BIND(esmooth_symmetric, v_sddsd_iDaD1rDq_012, f, ESMOOTH2, 1, 2, NULL);
+/*------------------------------------------------------------------------- */
 void vargsmoothkernel(double width, int nx, int *n2, int *ng, double **gkern,
 		      double *gsum, double **partial)
 /* makes sure a gaussian kernel of FWHM <width> and kernel size at

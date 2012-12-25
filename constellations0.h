@@ -22,9 +22,9 @@ char *constellation_names[] = {
 };
 
 struct constellation_struct {
-  float alpha1;
-  float alpha2;
-  float delta; 
+  Float alpha1;
+  Float alpha2;
+  Float delta; 
   CONSTELLATION constellation;
 };
 

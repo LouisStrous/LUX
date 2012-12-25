@@ -63,18 +63,18 @@ extern Colormap	colorMap;	/* from color.c */
  void wprint(char *, ...), draw_in_callback(), draw_re_callback(), draw_ex_callback();
  void color_not_available(), font_not_available();
 void destroy_cb(Widget, XtPointer, void *);		/* LS 20jan99 */
- Widget PostDialog(Widget parent, int dialog_type, char *msg);
+ Widget PostDialog(Widget parent, Int dialog_type, char *msg);
  Widget	ana_command_widget;
  
 /*#define MAXWIDGETS       4000 */
 /*#define MAXPIXMAPS       20*/
- int	motif_flag = 1, motif_realized_flag = 0, motif_init_flag = 0;
- int	motif_called_widget = -1; /* set by call backs */
- int	xtloop_running = 0, input_modal_flag = 0;
-int ck_widget_count(void);
+ Int	motif_flag = 1, motif_realized_flag = 0, motif_init_flag = 0;
+ Int	motif_called_widget = -1; /* set by call backs */
+ Int	xtloop_running = 0, input_modal_flag = 0;
+Int ck_widget_count(void);
  static XmStringCharSet cset = (XmStringCharSet) XmSTRING_DEFAULT_CHARSET;
  static	XmString exit_button_text;
- static	int	nlist, n_widgets = 0, toplevel;
+ static	Int	nlist, n_widgets = 0, toplevel;
  static XtAppContext   app_context;
  static	XEvent	event;
  Widget	ana_widget_id[MAXWIDGETS], text_output;
@@ -91,7 +91,7 @@ int ck_widget_count(void);
  static	char	*radio_button = {"$RADIO_BUTTON"};
  static	char	*check_button = {"$CHECK_BUTTON"};
  */
- int	radio_button, radio_state;
+ Int	radio_button, radio_state;
  static	char	*option_value = {"$OPTION_VALUE"};
  static	XFontStruct	*font = NULL;
  static	XmFontList	fontlist = NULL;
@@ -99,8 +99,8 @@ int ck_widget_count(void);
 static Colormap	cmap;
  static	XColor  colorcell, rgb_def;
  static Arg	wargs[20];	/* shared by many routines */
- static	int	n;		/* arg counter */
- static	int	radiobox = 1;	/* an internal flag */
+ static	Int	n;		/* arg counter */
+ static	Int	radiobox = 1;	/* an internal flag */
   /*------------------------------------------------------------------------- */
 Widget xmgettopshell(wg)
  Widget wg;
@@ -112,7 +112,7 @@ Widget xmgettopshell(wg)
 Widget xmtoplevel_form(width, height, title, hs, vs, mx, my)
  /* creates a toplevel form widget, does not popup, returns the form
  widget created inside the toplevel */
- int	width, height, hs, vs, mx, my;
+ Int	width, height, hs, vs, mx, my;
  char	*title;
  {
  Widget	toplevel_form, form;
@@ -145,7 +145,7 @@ Widget xmtoplevel_form(width, height, title, hs, vs, mx, my)
 Widget xmtoplevel_board(width, height, title, mx, my)
  /* creates a toplevel form widget, does not popup, returns the form
  widget created inside the toplevel */
- int	width, height, mx, my;
+ Int	width, height, mx, my;
  char	*title;
  {
  Widget	toplevel_board, board;
@@ -172,11 +172,11 @@ Widget xmtoplevel_board(width, height, title, mx, my)
  return board;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmgettopshell(narg, ps)
+Int ana_xmgettopshell(narg, ps)
  /* top = xmgettopshell (widget) */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	w;
+ Int	w;
  Widget wg;
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
  wg = ana_widget_id[w];
@@ -185,12 +185,12 @@ int ana_xmgettopshell(narg, ps)
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmmessage(narg, ps) /* (string,[font,color,ix,iy]) */
+Int ana_xmmessage(narg, ps) /* (string,[font,color,ix,iy]) */
  /* a temporary widget, does not return a widget id, used as an ana subr */
  /* 5/29/95 disable the menu and resize */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	iq, menus, ix, iy;
+ Int	iq, menus, ix, iy;
  Position	x, y;
  char *s;
  Widget dialog, parent;
@@ -254,12 +254,12 @@ int ana_xmmessage(narg, ps) /* (string,[font,color,ix,iy]) */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmprompt(narg, ps)	/* see next line for args */
+Int ana_xmprompt(narg, ps)	/* see next line for args */
  /* (string, default, call_back, modal_flag, [font,color,ix,iy]) */
  /* a temporary widget, does not return a widget id, used as an ana subr */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	iq, nsym, modal_flag = 0, ix, iy;
+ Int	iq, nsym, modal_flag = 0, ix, iy;
  char *s, *sd, *sm;
  Widget dialog, parent;
  XmString text;
@@ -323,16 +323,16 @@ int ana_xmprompt(narg, ps)	/* see next line for args */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmcommand(narg, ps) /*see next line for args */
+Int ana_xmcommand(narg, ps) /*see next line for args */
  /*(parent, callback, nvisible, [nmax, prompt,font,color])*/
  /* returns widget id, an ana function */
  /* creates a command widget, original intent is to experiment
  with this to develop a widget command interface for ana */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	iq, nsym, parent, nvisible, hmax = 100;
+ Int	iq, nsym, parent, nvisible, hmax = 100;
  char	*s;
- int	command, result_sym;
+ Int	command, result_sym;
  XmString	prompt;
  Widget		wg;
  /* command widget interface */
@@ -398,7 +398,7 @@ int ana_xmcommand(narg, ps) /*see next line for args */
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmdialog_board(narg, ps)	/* see next line for args */
+Int ana_xmdialog_board(narg, ps)	/* see next line for args */
  /* (parent, width, height, title, [ix, iy, lr_margin, tb_margin,
  resize_flag]) */
  /* note that the close_flag idea didn't work, code for it commented out, the
@@ -406,10 +406,10 @@ int ana_xmdialog_board(narg, ps)	/* see next line for args */
  /* 5/29/95,  added ix, iy for positioning on screen */
  /* create a dialog bulletin board widget, usually the main container */
  /* returns widget id, an ana function */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	dx, dy, parent, board, result_sym, iq, ix, iy, mx=0, my=0;
- int	resize_flag = 0, ck_widget_count(void);
+ Int	dx, dy, parent, board, result_sym, iq, ix, iy, mx=0, my=0;
+ Int	resize_flag = 0, ck_widget_count(void);
  XmString	title;
  Widget		wb;
  Position	x, y;
@@ -475,14 +475,14 @@ int ana_xmdialog_board(narg, ps)	/* see next line for args */
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmdialog_form(narg, ps)	/* see next line for args */
+Int ana_xmdialog_form(narg, ps)	/* see next line for args */
  /* (parent, width, height, title, [ hspace, vspace, lr_margin, tb_margin) */
  /* 5/19/96 */
  /* create a dialog form widget, usually the main container */
  /* returns widget id, an ana function */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	dx, dy, parent, form, result_sym, iq, hs=0, vs=0, mx=0, my=0;
+ Int	dx, dy, parent, form, result_sym, iq, hs=0, vs=0, mx=0, my=0;
  XmString	title;
  Widget		wb;
  char	*s;
@@ -523,7 +523,7 @@ int ana_xmdialog_form(narg, ps)	/* see next line for args */
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmtoplevel_form(narg, ps)	/* see next line for args */
+Int ana_xmtoplevel_form(narg, ps)	/* see next line for args */
  /* (width, height, title, [ hspace, vspace, lr_margin, tb_margin) */
  /* 12/26/97 */
  /* create a toplevel form widget, does not popup, returns the form
@@ -531,9 +531,9 @@ int ana_xmtoplevel_form(narg, ps)	/* see next line for args */
  /* returns widget id, an ana function */
  /* similar to ana_xmdialog_form except that this is toplevel, do not use
  manage and unmanage, instead use popup and popdown */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	dx, dy, form, result_sym, iq, hs=0, vs=0, mx=0, my=0;
+ Int	dx, dy, form, result_sym, iq, hs=0, vs=0, mx=0, my=0;
  char	*s;
  if (ck_motif() != 1) return -1;
  /* get the arguments */
@@ -556,7 +556,7 @@ int ana_xmtoplevel_form(narg, ps)	/* see next line for args */
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmtoplevel_board(narg, ps)	/* see next line for args */
+Int ana_xmtoplevel_board(narg, ps)	/* see next line for args */
  /* (width, height, title, [lr_margin, tb_margin]) */
  /* 5/17/98 */
  /* create a toplevel board widget, does not popup, returns the form
@@ -564,9 +564,9 @@ int ana_xmtoplevel_board(narg, ps)	/* see next line for args */
  /* returns widget id, an ana function */
  /* similar to ana_xmdialog_board except that this is toplevel, do not use
  manage and unmanage, instead use popup and popdown */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	dx, dy, board, result_sym, iq, mx=0, my=0;
+ Int	dx, dy, board, result_sym, iq, mx=0, my=0;
  char	*s;
  if (ck_motif() != 1) return -1;
  /* get the arguments */
@@ -585,12 +585,12 @@ int ana_xmtoplevel_board(narg, ps)	/* see next line for args */
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmboard(narg, ps)	/* (parent, [width, height, lr_margin, tb_margin]) */
+Int ana_xmboard(narg, ps)	/* (parent, [width, height, lr_margin, tb_margin]) */
  /* create a managed bulletin board widget */
  /* returns widget id, an ana function */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	dx=0, dy=0, parent, board, result_sym, mx=0, my=0;
+ Int	dx=0, dy=0, parent, board, result_sym, mx=0, my=0;
  if (ck_motif() != 1) return -1;
  /* get parent widget */
  if ( get_widget_id( ps[0], &parent) != 1 ) return -1;
@@ -616,11 +616,11 @@ int ana_xmboard(narg, ps)	/* (parent, [width, height, lr_margin, tb_margin]) */
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmform(narg, ps)	/* (parent, [width,height,hspace,vspace,mx,my]) */
+Int ana_xmform(narg, ps)	/* (parent, [width,height,hspace,vspace,mx,my]) */
  /* returns widget id, an ana function */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	dx=0, dy=0, parent, form, result_sym, hs=0, vs=0, mx=0, my=0;
+ Int	dx=0, dy=0, parent, form, result_sym, hs=0, vs=0, mx=0, my=0;
  if (ck_motif() != 1) return -1;
  /* get parent widget */
  if ( get_widget_id( ps[0], &parent) != 1 ) return -1;
@@ -651,12 +651,12 @@ int ana_xmform(narg, ps)	/* (parent, [width,height,hspace,vspace,mx,my]) */
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmframe(narg, ps) /* (parent, [lr_margin, tb_margin, width, type]) */
+Int ana_xmframe(narg, ps) /* (parent, [lr_margin, tb_margin, width, type]) */
  /* create a frame widget */
  /* returns widget id, an ana function */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	dx, parent, frame, result_sym, type, mx, my;
+ Int	dx, parent, frame, result_sym, type, mx, my;
  if (ck_motif() != 1) return -1;
  /* get parent widget */
  n = 0;
@@ -690,15 +690,15 @@ int ana_xmframe(narg, ps) /* (parent, [lr_margin, tb_margin, width, type]) */
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmseparator(narg, ps) /* (parent, [orient, margin, type]) */
+Int ana_xmseparator(narg, ps) /* (parent, [orient, margin, type]) */
  /* orient = 0 for horozontal, otherwise vertical
  margin is width or height
- type is 1 for simple line, 0 for empty space, 2 for double line, 3 for dotted
+ type is 1 for simple line, 0 for empty space, 2 for Double line, 3 for dotted
  line, 5 for etched line */
  /* returns widget id, an ana function */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	margin, parent, sep, result_sym, type=1, orient=0;
+ Int	margin, parent, sep, result_sym, type=1, orient=0;
  if (ck_motif() != 1) return -1;
  /* get parent widget */
  n = 0;
@@ -726,21 +726,21 @@ int ana_xmseparator(narg, ps) /* (parent, [orient, margin, type]) */
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmcolumns(narg, ps)	/* (parent, width, height, [ncolumns],[pack_flag]) */
+Int ana_xmcolumns(narg, ps)	/* (parent, width, height, [ncolumns],[pack_flag]) */
  /* returns widget id, an ana function */
- int     narg, ps[];
+ Int     narg, ps[];
  { return rows_or_columns(narg, ps, 0); }
  /*------------------------------------------------------------------------- */
-int ana_xmrows(narg, ps)	/* (parent, width, height, [nrows],[pack_flag]) */
+Int ana_xmrows(narg, ps)	/* (parent, width, height, [nrows],[pack_flag]) */
  /* returns widget id, an ana function */
- int     narg, ps[];
+ Int     narg, ps[];
  { return rows_or_columns(narg, ps, 1); }
  /*------------------------------------------------------------------------- */
-int rows_or_columns(narg, ps,mode)	/*(parent, width, height, [ncolumns],[p_flag]) */
+Int rows_or_columns(narg, ps,mode)	/*(parent, width, height, [ncolumns],[p_flag]) */
  /* returns widget id, an ana function */
- int     narg, ps[], mode;
+ Int     narg, ps[], mode;
  {
- int	dx, dy, parent,rowcolumn, result_sym, ncol, p_flag = 0;
+ Int	dx, dy, parent,rowcolumn, result_sym, ncol, p_flag = 0;
  if (ck_motif() != 1) return -1;
  /* get parent widget */
  if ( get_widget_id( ps[0], &parent) != 1 ) return -1;
@@ -771,12 +771,12 @@ int rows_or_columns(narg, ps,mode)	/*(parent, width, height, [ncolumns],[p_flag]
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmscrolledwindow(narg, ps)	/* (parent, width, height) */
+Int ana_xmscrolledwindow(narg, ps)	/* (parent, width, height) */
  /* create a scrolled window */
  /* returns widget id, an ana function */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	dx, dy, parent, scroll, result_sym;
+ Int	dx, dy, parent, scroll, result_sym;
  if (ck_motif() != 1) return -1;
  /* get parent widget */
  if ( get_widget_id( ps[0], &parent) != 1 ) return -1;
@@ -797,12 +797,12 @@ int ana_xmscrolledwindow(narg, ps)	/* (parent, width, height) */
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmscrolledwindowapp(narg, ps)	/* (parent,hmargin,vmargin,space) */
+Int ana_xmscrolledwindowapp(narg, ps)	/* (parent,hmargin,vmargin,space) */
  /* create a scrolled window, application controlled */
  /* returns widget id, an ana function */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	mx, my, parent, scroll, result_sym, space;
+ Int	mx, my, parent, scroll, result_sym, space;
  if (ck_motif() != 1) return -1;
  /* get parent widget */
  if ( get_widget_id( ps[0], &parent) != 1 ) return -1;
@@ -826,29 +826,29 @@ int ana_xmscrolledwindowapp(narg, ps)	/* (parent,hmargin,vmargin,space) */
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmhscrollbar(narg, ps)/*(parent,max,slidersize,dpage,callback,[drag]) */
+Int ana_xmhscrollbar(narg, ps)/*(parent,max,slidersize,dpage,callback,[drag]) */
  /* creates a horizontal scroll widget, returns widget id */
- int     narg, ps[];
+ Int     narg, ps[];
  {
  return ana_int_xmscrollbar(narg, ps, 1);	/* the 1 indicates horizontal */
  }
  /*------------------------------------------------------------------------- */
-int ana_xmvscrollbar(narg, ps)/*(parent,max,slidersize,dpage,callback,[drag]) */
+Int ana_xmvscrollbar(narg, ps)/*(parent,max,slidersize,dpage,callback,[drag]) */
  /* creates a vertical scroll widget, returns widget id */
- int     narg, ps[];
+ Int     narg, ps[];
  {
  return ana_int_xmscrollbar(narg, ps, 0);	/* the 0 indicates vertical */
  }
  /*------------------------------------------------------------------------- */
-int ana_int_xmscrollbar(narg, ps, mode)  /* internal, mode = 1 for horizontal */
+Int ana_int_xmscrollbar(narg, ps, mode)  /* internal, mode = 1 for horizontal */
  /*(parent,max,slidersize,dpage,callback,[drag]) */
  /* note that the default increment of 1 is used since the max can always
  be set so that 1 is the single step size, of course, we may change this
  someday for more flexibility */
- int     narg, ps[], mode;
+ Int     narg, ps[], mode;
  {
- int	iq, nsym, w, scroll, result_sym, slidersize, max, dpage;
- int	drag_flag=0;
+ Int	iq, nsym, w, scroll, result_sym, slidersize, max, dpage;
+ Int	drag_flag=0;
  char *s;
  if (ck_motif() != 1) return -1;
  /* get parent widget */
@@ -885,12 +885,12 @@ int ana_int_xmscrollbar(narg, ps, mode)  /* internal, mode = 1 for horizontal */
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmscrollbarsetvalues(narg, ps)/*(widget,value,max,slidersize,dpage) */
+Int ana_xmscrollbarsetvalues(narg, ps)/*(widget,value,max,slidersize,dpage) */
  /* changes the slider size and range (and dpage) */
  /* if a value is 0 or < 0, we assume it isn't supposed to be changed */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	w, value=-1, slidersize=-1, max=-1, dpage=-1;
+ Int	w, value=-1, slidersize=-1, max=-1, dpage=-1;
  if (ck_motif() != 1) return -1;
  if (get_widget_id(ps[0], &w) != 1) return -1;
  n = 0;
@@ -908,18 +908,18 @@ int ana_xmscrollbarsetvalues(narg, ps)/*(widget,value,max,slidersize,dpage) */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmdrawingarea(narg, ps)  /*(parent,ana_win,w,h,input_cb,resize_cb,ex_cb) */
+Int ana_xmdrawingarea(narg, ps)  /*(parent,ana_win,w,h,input_cb,resize_cb,ex_cb) */
  /* create a drawing window */
  /* returns widget id, an ana function */
  /* note that we can't get the window number until after the widgets
  are realized */
- int     narg, ps[];
+ Int     narg, ps[];
  {
  Widget	wdraw;
- int	dx=0, dy=0, parent, draw, result_sym, iq, ana_win, nsym;
+ Int	dx=0, dy=0, parent, draw, result_sym, iq, ana_win, nsym;
  char	*s;
- extern	int	drawingareas[];
- extern	int	ck_window();
+ extern	Int	drawingareas[];
+ extern	Int	ck_window();
  extern	 Window  win[];
  if (ck_motif() != 1) return -1;
  /* get parent widget */
@@ -947,38 +947,38 @@ int ana_xmdrawingarea(narg, ps)  /*(parent,ana_win,w,h,input_cb,resize_cb,ex_cb)
  	XmCreateDrawingArea(ana_widget_id[parent], "draw",wargs, n);
  /* callbacks (if any), first the input callback */
  if (narg>4) {
- int	*pt;
+ Int	*pt;
  iq = ps[4];
  if (sym[iq].class != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  if (strlen(s) == 0 )  nsym = 0;  else	nsym = ana_execute_symbol(s,1);
  /* instead of just passing the execution symbol, we make a little
  array containing it and the ana X window # and pass the pointer */
- pt = (int *) malloc(2*sizeof(int));
+ pt = (Int *) malloc(2*sizeof(Int));
  *pt = nsym;	*(pt+1) = ana_win;
  XtAddCallback(wdraw, XmNinputCallback, draw_in_callback, (XtPointer) pt);
  }
  if (narg>5) {
- int	*pt;
+ Int	*pt;
  iq = ps[5];
  if (sym[iq].class != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  if (strlen(s) == 0 )  nsym = 0;  else	nsym = ana_execute_symbol(s,1);
  /* instead of just passing the exection sysmbol, we make a little
  array containing it and the ana X window # and pass the pointer */
- pt = (int *) malloc(2*sizeof(int));
+ pt = (Int *) malloc(2*sizeof(Int));
  *pt = nsym;	*(pt+1) = ana_win;
  XtAddCallback(wdraw, XmNresizeCallback, draw_re_callback, (XtPointer) pt);
  }
  if (narg>6) {
- int	*pt;
+ Int	*pt;
  iq = ps[6];
  if (sym[iq].class != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  if (strlen(s) == 0 )  nsym = 0;  else	nsym = ana_execute_symbol(s,1);
  /* instead of just passing the exection sysmbol, we make a little
  array containing it and the ana X window # and pass the pointer */
- pt = (int *) malloc(2*sizeof(int));
+ pt = (Int *) malloc(2*sizeof(Int));
  *pt = nsym;	*(pt+1) = ana_win;
  XtAddCallback(wdraw, XmNexposeCallback, draw_ex_callback, (XtPointer) pt);
  }
@@ -987,7 +987,7 @@ int ana_xmdrawingarea(narg, ps)  /*(parent,ana_win,w,h,input_cb,resize_cb,ex_cb)
  result_sym = scalar_scratch(2);		/*for widget id */
  sym[result_sym].spec.scalar.l = drawingareas[ana_win] = draw;
 #ifdef DEPRECATED
- printf("created widget %d, %d\n", draw, (unsigned int) wdraw);
+ printf("created widget %d, %d\n", draw, (uint32_t) wdraw);
 #endif
  /* the X window won't actually be created until the manager of this drawing
  area is managed, the final setups of the window are therefore deferred until
@@ -997,21 +997,21 @@ int ana_xmdrawingarea(narg, ps)  /*(parent,ana_win,w,h,input_cb,resize_cb,ex_cb)
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmdrawinglink(narg, ps)	/* (widget, ana_win) */
+Int ana_xmdrawinglink(narg, ps)	/* (widget, ana_win) */
  /* link a drawing area widget to an ana window */
  /* a subroutine */
- int     narg, ps[];
+ Int     narg, ps[];
  {
  extern	Window  win[];
  extern	 GC     gc[];
- extern	 int     wd[], ht[];
- int	w;
- unsigned int	valuemask=0;
+ extern	 Int     wd[], ht[];
+ Int	w;
+ uint32_t	valuemask=0;
  Display	*display;
  Bool	status;
  XWindowAttributes	wat;
  XSetWindowAttributes	setwat;
- int	ana_win, screen_num;
+ Int	ana_win, screen_num;
  if (ck_motif() != 1) return -1;
  /* get widget */
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
@@ -1047,11 +1047,11 @@ int ana_xmdrawinglink(narg, ps)	/* (widget, ana_win) */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmtextfromfile(narg, ps)/*(parent, filename, [rows, cols, font,color])*/
+Int ana_xmtextfromfile(narg, ps)/*(parent, filename, [rows, cols, font,color])*/
  /* returns widget id, an ana function */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	iq, i, text, result_sym, parent, rows = 24, cols = 80;
+ Int	iq, i, text, result_sym, parent, rows = 24, cols = 80;
  char *filename, *buffer;
  FILE		*fin;
  struct	stat	file_info;
@@ -1103,14 +1103,14 @@ int ana_xmtextfromfile(narg, ps)/*(parent, filename, [rows, cols, font,color])*/
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmtext(narg, ps)/*(parent, rows, cols, [font,color])*/
+Int ana_xmtext(narg, ps)/*(parent, rows, cols, [font,color])*/
  /* creates an empty text widget, scrollable */
  /* returns widget id, an ana function */
  /* note that the text widget is returned, to position this, you must
  use the scrolled text widget which is the parent of the returned one */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	text, result_sym, parent, rows = 24, cols = 80;
+ Int	text, result_sym, parent, rows = 24, cols = 80;
  if (ck_motif() != 1) return -1;
  /* get parent widget */
  if ( get_widget_id( ps[0], &parent) != 1 ) return -1;
@@ -1142,12 +1142,12 @@ int ana_xmtext(narg, ps)/*(parent, rows, cols, [font,color])*/
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmtextbox(narg, ps)/*(parent, rows, cols, [font,color])*/
+Int ana_xmtextbox(narg, ps)/*(parent, rows, cols, [font,color])*/
  /* creates an empty text widget, not scrolled, write only, not editable */
  /* returns widget id, an ana function */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	text, result_sym, parent, rows = 24, cols = 80;
+ Int	text, result_sym, parent, rows = 24, cols = 80;
  if (ck_motif() != 1) return -1;
  /* get parent widget */
  if ( get_widget_id( ps[0], &parent) != 1 ) return -1;
@@ -1177,12 +1177,12 @@ int ana_xmtextbox(narg, ps)/*(parent, rows, cols, [font,color])*/
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmtextappend(narg, ps)	/* (widget_id, string, [lf_flag]) */
+Int ana_xmtextappend(narg, ps)	/* (widget_id, string, [lf_flag]) */
  /* adds string to the text widget, this is a subroutine */
  /* if lf_flag is present and ne 0, then a line feed is included */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	iq, w, lflag=0, mq;
+ Int	iq, w, lflag=0, mq;
  XmTextPosition		i;
  char *s, *s2;
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
@@ -1204,11 +1204,11 @@ int ana_xmtextappend(narg, ps)	/* (widget_id, string, [lf_flag]) */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmtextgetstring(narg, ps) /* (widget) */
+Int ana_xmtextgetstring(narg, ps) /* (widget) */
  /* gets a copy of the text contents as a string */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	w, mq, result_sym;
+ Int	w, mq, result_sym;
  char    *s, *p, *pt;
  if (ck_motif() != 1) return -1;
  if (get_widget_id(ps[0], &w) != 1) return -1;
@@ -1224,10 +1224,10 @@ int ana_xmtextgetstring(narg, ps) /* (widget) */
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmtextsetstring(narg, ps) /* (widget, value) */
- int     narg, ps[];
+Int ana_xmtextsetstring(narg, ps) /* (widget, value) */
+ Int     narg, ps[];
  {
- int	w, iq;
+ Int	w, iq;
  char    *s;
   if (ck_motif() != 1) return -1;
  if (get_widget_id(ps[0], &w) != 1) return -1;
@@ -1240,10 +1240,10 @@ int ana_xmtextsetstring(narg, ps) /* (widget, value) */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmtextsetposition(narg, ps) /* (widget, position) */
- int     narg, ps[];
+Int ana_xmtextsetposition(narg, ps) /* (widget, position) */
+ Int     narg, ps[];
  {
- int	w, i;
+ Int	w, i;
   if (ck_motif() != 1) return -1;
  if (get_widget_id(ps[0], &w) != 1) return -1;
  if (int_arg_stat(ps[1], &i) != 1) return -1;
@@ -1252,10 +1252,10 @@ int ana_xmtextsetposition(narg, ps) /* (widget, position) */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmtextgetlastposition(narg, ps) /* (widget) */
- int     narg, ps[];
+Int ana_xmtextgetlastposition(narg, ps) /* (widget) */
+ Int     narg, ps[];
  {
- int	w, i, result_sym;
+ Int	w, i, result_sym;
   if (ck_motif() != 1) return -1;
  if (get_widget_id(ps[0], &w) != 1) return -1;
  
@@ -1265,10 +1265,10 @@ int ana_xmtextgetlastposition(narg, ps) /* (widget) */
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmtextgetinsertposition(narg, ps) /* (widget) */
- int     narg, ps[];
+Int ana_xmtextgetinsertposition(narg, ps) /* (widget) */
+ Int     narg, ps[];
  {
- int	w, i, result_sym;
+ Int	w, i, result_sym;
   if (ck_motif() != 1) return -1;
  if (get_widget_id(ps[0], &w) != 1) return -1;
  
@@ -1278,12 +1278,12 @@ int ana_xmtextgetinsertposition(narg, ps) /* (widget) */
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmtextgetselection(narg, ps) /* (widget, [left, right]) */
+Int ana_xmtextgetselection(narg, ps) /* (widget, [left, right]) */
  /* returns the primary selection as a string, optionally returns the
  position */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	w, mq, result_sym;
+ Int	w, mq, result_sym;
  char    *s, *p, *pt;
  
  if (ck_motif() != 1) return -1;
@@ -1301,21 +1301,21 @@ int ana_xmtextgetselection(narg, ps) /* (widget, [left, right]) */
  /* get the position, this is optional */
  XmTextPosition	left;
  XmTextPosition	right;
- int	i1, i2;
+ Int	i1, i2;
  if (narg !=3) execute_error(55);
  XmTextGetSelectionPosition (ana_widget_id[w], &left, &right);
- i1 = (int) left;
- i2 = (int) right;
+ i1 = (Int) left;
+ i2 = (Int) right;
  redef_scalar(ps[1], 2, &i1);
  redef_scalar(ps[2], 2, &i2);
  }
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmtextreplace(narg, ps) /* (widget, i1, i2, s) */
- int     narg, ps[];
+Int ana_xmtextreplace(narg, ps) /* (widget, i1, i2, s) */
+ Int     narg, ps[];
  {
- int	w, iq, i1, i2;
+ Int	w, iq, i1, i2;
  char    *s;
   if (ck_motif() != 1) return -1;
  if (get_widget_id(ps[0], &w) != 1) return -1;
@@ -1330,24 +1330,24 @@ int ana_xmtextreplace(narg, ps) /* (widget, i1, i2, s) */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmtexterase(narg, ps)	/* (widget_id) */
+Int ana_xmtexterase(narg, ps)	/* (widget_id) */
  /* erases all the text in a text widget */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	w;
+ Int	w;
  char *s = {""};
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
  XmTextSetString(ana_widget_id[w], s);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmtextfield(narg, ps) /* (parent, text, length, callback, ... see next line
+Int ana_xmtextfield(narg, ps) /* (parent, text, length, callback, ... see next line
 	[font, color, lostfocus_callback, gotfocus_callback]) */
  /* creates a textfield widget, returns widget id */
  /* 9/14/96 added the optional focus callbacks */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	iq, nsym, w, textfield, result_sym, length;
+ Int	iq, nsym, w, textfield, result_sym, length;
  char *s, *ls;
  if (ck_motif() != 1) return -1;
  /* get parent widget */
@@ -1403,10 +1403,10 @@ int ana_xmtextfield(narg, ps) /* (parent, text, length, callback, ... see next l
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmtextfieldsetstring(narg, ps) /* (widget, string, [cursor]) */
- int     narg, ps[];
+Int ana_xmtextfieldsetstring(narg, ps) /* (widget, string, [cursor]) */
+ Int     narg, ps[];
  {
- int	w, iq, cflag=0, n;
+ Int	w, iq, cflag=0, n;
  char    *s;
   if (ck_motif() != 1) return -1;
  if (get_widget_id(ps[0], &w) != 1) return -1;
@@ -1426,10 +1426,10 @@ int ana_xmtextfieldsetstring(narg, ps) /* (widget, string, [cursor]) */
   return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmtextfieldseteditable(narg, ps) /* (widget, value) */
- int     narg, ps[];
+Int ana_xmtextfieldseteditable(narg, ps) /* (widget, value) */
+ Int     narg, ps[];
  {
- int	w, iq;
+ Int	w, iq;
   if (ck_motif() != 1) return -1;
  if (get_widget_id(ps[0], &w) != 1) return -1;
  /* get the condition */
@@ -1440,10 +1440,10 @@ int ana_xmtextfieldseteditable(narg, ps) /* (widget, value) */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmtextfieldsetmaxlength(narg, ps) /* (widget, value) */
- int     narg, ps[];
+Int ana_xmtextfieldsetmaxlength(narg, ps) /* (widget, value) */
+ Int     narg, ps[];
  {
- int	w, iq;
+ Int	w, iq;
   if (ck_motif() != 1) return -1;
  if (get_widget_id(ps[0], &w) != 1) return -1;
  /* get the condition */
@@ -1453,10 +1453,10 @@ int ana_xmtextfieldsetmaxlength(narg, ps) /* (widget, value) */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmtextseteditable(narg, ps) /* (widget, value) */
- int     narg, ps[];
+Int ana_xmtextseteditable(narg, ps) /* (widget, value) */
+ Int     narg, ps[];
  {
- int	w, iq;
+ Int	w, iq;
   if (ck_motif() != 1) return -1;
  if (get_widget_id(ps[0], &w) != 1) return -1;
  /* get the condition */
@@ -1467,10 +1467,10 @@ int ana_xmtextseteditable(narg, ps) /* (widget, value) */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmtextfieldgetstring(narg, ps) /* (widget) */
- int     narg, ps[];
+Int ana_xmtextfieldgetstring(narg, ps) /* (widget) */
+ Int     narg, ps[];
  {
- int	w, mq, result_sym;
+ Int	w, mq, result_sym;
  char    *s, *p, *pt;
  if (ck_motif() != 1) return -1;
  if (get_widget_id(ps[0], &w) != 1) return -1;
@@ -1486,17 +1486,17 @@ int ana_xmtextfieldgetstring(narg, ps) /* (widget) */
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmtextfieldarray(narg, ps)  /* lots of arguments */
+Int ana_xmtextfieldarray(narg, ps)  /* lots of arguments */
  /* (parent,callback,font,color,nxl,nxm,nxt,ny,l1,[l2, l3 ...], [len]) */
  /* nxl is horiz. size of labels, nxm is margin, nxt is horiz. text size */
  /* the font and color preceed the labels to allow easier parsing, if
  these are null strings or scalars, you get the defaults */
  /* added 8/7/95, if the last argument is a scalar, it is the allowed
  length of each field, otherwise 10 is used as a default */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	iq, nsym, i, w, text, result_sym, j, k, *wids, nq;
- int	nxl, nxm, nxt, ny, ix, iy, ix2, length;
+ Int	iq, nsym, i, w, text, result_sym, j, k, *wids, nq;
+ Int	nxl, nxm, nxt, ny, ix, iy, ix2, length;
  char *s;
  Widget	wg;
  struct	ahead	*h;
@@ -1539,7 +1539,7 @@ int ana_xmtextfieldarray(narg, ps)  /* lots of arguments */
  nq=i+1;
  result_sym = array_scratch(2, 1, &nq );
  h = (struct ahead *) sym[result_sym].spec.array.ptr;
- wids = (int *) ((char *)h + sizeof(struct ahead));
+ wids = (Int *) ((char *)h + sizeof(struct ahead));
  if (ck_widget_count() < 0) return -1;
  text = n_widgets++;
  ana_widget_id[text] = wg;
@@ -1606,16 +1606,16 @@ int ana_xmtextfieldarray(narg, ps)  /* lots of arguments */
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmlistfromfile(narg, ps) /*(parent, callback, filename,
+Int ana_xmlistfromfile(narg, ps) /*(parent, callback, filename,
 	nvisible,[font,color])*/
  /* returns widget id, an ana function */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	iq, nsym, i, parent, nvisible;
+ Int	iq, nsym, i, parent, nvisible;
  char *s, *filename;
  char		line[200], *p;
  FILE		*fin;
- int	list, result_sym;
+ Int	list, result_sym;
  XmString	ms;
  /* list widget interface */
  if (ck_motif() != 1) return -1;
@@ -1670,11 +1670,11 @@ int ana_xmlistfromfile(narg, ps) /*(parent, callback, filename,
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmaddfiletolist(narg, ps) /*(list_widget, filename)*/
+Int ana_xmaddfiletolist(narg, ps) /*(list_widget, filename)*/
  /* an ana function, returns error if file not readable */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	iq, i, w;
+ Int	iq, i, w;
  char *filename;
  char		line[200], *p;
  FILE		*fin;
@@ -1702,13 +1702,13 @@ int ana_xmaddfiletolist(narg, ps) /*(list_widget, filename)*/
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmlistsubr(narg, ps) /*(list_widget)*/
+Int ana_xmlistsubr(narg, ps) /*(list_widget)*/
  /* an ana subr, loads given list widget with internal subr names */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- extern int	num_ana_subr;
+ extern Int	num_ana_subr;
  extern	 struct	ana_subr_struct	ana_subr[];
- int	i, list_widget;
+ Int	i, list_widget;
  char		line[100];
  XmString	ms;
  /* get list widget */
@@ -1724,13 +1724,13 @@ int ana_xmlistsubr(narg, ps) /*(list_widget)*/
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmlistfunc(narg, ps) /*(list_widget)*/
+Int ana_xmlistfunc(narg, ps) /*(list_widget)*/
  /* an ana subr, loads given list widget with internal func names */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- extern int	num_ana_func;
+ extern Int	num_ana_func;
  extern	 struct	ana_subr_struct	ana_func[];
- int	i, list_widget;
+ Int	i, list_widget;
  char		line[100];
  XmString	ms;
  /* get list widget */
@@ -1747,15 +1747,15 @@ int ana_xmlistfunc(narg, ps) /*(list_widget)*/
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmlist(narg, ps) /*(parent, callback, nvisible,[font,color, resize_flag])*/
+Int ana_xmlist(narg, ps) /*(parent, callback, nvisible,[font,color, resize_flag])*/
  /* returns widget id, an ana function */
  /* creates an empty list, nvisible is the vertical size in lines,
  resize_flag chooses the list size policy (see below) */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	iq, nsym, parent, nvisible, resize_flag=0;
+ Int	iq, nsym, parent, nvisible, resize_flag=0;
  char *s;
- int	list, result_sym;
+ Int	list, result_sym;
  /* list widget interface */
  if (ck_motif() != 1) return -1;
  /* get parent widget */
@@ -1795,11 +1795,11 @@ int ana_xmlist(narg, ps) /*(parent, callback, nvisible,[font,color, resize_flag]
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmlistadditem(narg, ps)	/* (widget_id, string, [position]) */
+Int ana_xmlistadditem(narg, ps)	/* (widget_id, string, [position]) */
  /* adds string to the list widget, this is a subroutine */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	iq, i, w;
+ Int	iq, i, w;
  char *s;
  XmString	ms;
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
@@ -1818,32 +1818,32 @@ int ana_xmlistadditem(narg, ps)	/* (widget_id, string, [position]) */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmlistdeleteitem(narg, ps)	/* (widget_id, position) */
+Int ana_xmlistdeleteitem(narg, ps)	/* (widget_id, position) */
  /* delete the input position from list, this is a subroutine */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	i, w;
+ Int	i, w;
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
  if (int_arg_stat(ps[1], & i) != 1) return -1;
  XmListDeletePos(ana_widget_id[w], i);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmlistdeleteall(narg, ps)	/* (widget_id) */
+Int ana_xmlistdeleteall(narg, ps)	/* (widget_id) */
  /* delete all items in a list, this is a subroutine */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	w;
+ Int	w;
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
  XmListDeleteAllItems(ana_widget_id[w]);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmlistcount(narg, ps)	/* (widget_id) */
+Int ana_xmlistcount(narg, ps)	/* (widget_id) */
  /* get the count in a list, a function which returns count */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	i, w, result_sym;
+ Int	i, w, result_sym;
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
  n = 0;
  XtSetArg(wargs[n], XmNitemCount, &i); n++;
@@ -1853,12 +1853,12 @@ int ana_xmlistcount(narg, ps)	/* (widget_id) */
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmlistselect(narg, ps)	/* (widget_id, position, cb_flag) */
+Int ana_xmlistselect(narg, ps)	/* (widget_id, position, cb_flag) */
  /* selects position in list and callback is notified if cb_flag > 0
  if the cb_flag is 2, then position is not set */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	i, w, cb_flag = 0;
+ Int	i, w, cb_flag = 0;
  Widget	wg;
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
  if (int_arg_stat(ps[1], &i) != 1) return -1;
@@ -1870,12 +1870,12 @@ int ana_xmlistselect(narg, ps)	/* (widget_id, position, cb_flag) */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmlabel(narg, ps)	/* (parent, label, [font, color, size_flag]) */
+Int ana_xmlabel(narg, ps)	/* (parent, label, [font, color, size_flag]) */
  /* creates a label widget, returns widget id */
  /* 7/26/96 size_flag added, sets XmNrecomputeSize to true/false (1/0) */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	iq, w, label, result_sym, size_flag = 0;
+ Int	iq, w, label, result_sym, size_flag = 0;
  char *s, *pc;
  XmString	ms;
  if (ck_motif() != 1) return -1;
@@ -1916,19 +1916,19 @@ int ana_xmlabel(narg, ps)	/* (parent, label, [font, color, size_flag]) */
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmfileselect(narg, ps) /*(parent, title, ok_callback, (more on next line)
+Int ana_xmfileselect(narg, ps) /*(parent, title, ok_callback, (more on next line)
  [ok_label, help_callback, cancel_callback, font, button_font, color, dir,
  help_label, cancel_label] )*/
  /* returns widget id, an ana function */
  /* creates a file selection dialog, you get the file name from the
  callback routine
  10/3/95 add another paramter to be the directory mask */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	iq, nsym, parent;
- int	nsym_help=0, nsym_cancel=0;
+ Int	iq, nsym, parent;
+ Int	nsym_help=0, nsym_cancel=0;
  char *s;
- int	fselect, result_sym;
+ Int	fselect, result_sym;
  XmString	title, ms, directory;
  Widget		dialog;
  /* list widget interface */
@@ -2035,12 +2035,12 @@ int ana_xmfileselect(narg, ps) /*(parent, title, ok_callback, (more on next line
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmfilegetlist(narg, ps)	/* (widget_id) */
+Int ana_xmfilegetlist(narg, ps)	/* (widget_id) */
  /* get the files in a file selection widget, puts them in a string array
  strarr = xmfilegetlist(widget)  where widget must be a file selection widget */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	w, result_sym, fcount, dim[8];
+ Int	w, result_sym, fcount, dim[8];
  XmString	*names;
  char	**q, *text, *strsave();
  
@@ -2059,8 +2059,8 @@ int ana_xmfilegetlist(narg, ps)	/* (widget_id) */
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int set_fontlist(nsym)
- int	nsym;
+Int set_fontlist(nsym)
+ Int	nsym;
  {
  char    *fontname;
  if (sym[nsym].class != 2) return execute_error(70);
@@ -2076,8 +2076,8 @@ int set_fontlist(nsym)
  return 1; 
  }
  /*------------------------------------------------------------------------- */
-int set_textfontlist(nsym)
- int	nsym;
+Int set_textfontlist(nsym)
+ Int	nsym;
  {
  char    *fontname;
  if (sym[nsym].class != 2) return execute_error(70);
@@ -2093,8 +2093,8 @@ int set_textfontlist(nsym)
  return 1; 
  }
  /*------------------------------------------------------------------------- */
-int set_labelfontlist(nsym)
- int	nsym;
+Int set_labelfontlist(nsym)
+ Int	nsym;
  {
  char    *fontname;
  if (sym[nsym].class != 2) return execute_error(70);
@@ -2110,8 +2110,8 @@ int set_labelfontlist(nsym)
  return 1; 
  }
  /*------------------------------------------------------------------------- */
-int set_defaultfontlist(nsym)
- int	nsym;
+Int set_defaultfontlist(nsym)
+ Int	nsym;
  {
  char    *fontname;
  if (sym[nsym].class != 2) return execute_error(70);
@@ -2126,13 +2126,13 @@ int set_defaultfontlist(nsym)
  return 1; 
  }
 /*------------------------------------------------------------------------- */
-int setup_colors(int nsym)
+Int setup_colors(Int nsym)
 {
   char	*pc;
   Pixel	ts, bs, fc, sc;
   Status	anaAllocNamedColor(char *, XColor **);
   XColor	*color;
-  void	installPixel(int);
+  void	installPixel(Int);
 
   /* try to figure out the color */
   /* a string ? */
@@ -2166,11 +2166,11 @@ int setup_colors(int nsym)
   return 1; 
  }
  /*------------------------------------------------------------------------- */
-int ana_xmbutton(narg, ps) /* (parent, label, callback, [font,color]) */
+Int ana_xmbutton(narg, ps) /* (parent, label, callback, [font,color]) */
  /* creates a button widget, returns widget id */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	iq, nsym, w, push, result_sym;
+ Int	iq, nsym, w, push, result_sym;
  char *s;
  XmString	ms;
  if (ck_motif() != 1) return -1;
@@ -2207,12 +2207,12 @@ int ana_xmbutton(narg, ps) /* (parent, label, callback, [font,color]) */
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmgetpixmap(narg, ps) /* (id, pixmap_file) */
+Int ana_xmgetpixmap(narg, ps) /* (id, pixmap_file) */
  /* reads a pixmap (bitmap) file and associates it with id, the
  maximum number of pixmaps is  MAXPIXMAPS with id's from 0 to MAXPIXMAPS-1 */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	iq, id;
+ Int	iq, id;
  char *s;
  Pixel	fg, bg;
  if (ck_motif() != 1) return -1;
@@ -2236,12 +2236,12 @@ int ana_xmgetpixmap(narg, ps) /* (id, pixmap_file) */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmsetpixmap(narg, ps) /* (widget, pixmap_file) */
- int     narg, ps[];
+Int ana_xmsetpixmap(narg, ps) /* (widget, pixmap_file) */
+ Int     narg, ps[];
  {
  Pixmap	pixmap;
  Pixel	fg, bg;
- int	w, iq;
+ Int	w, iq;
  char    *s;
  if (ck_motif() != 1) return -1;
  if (get_widget_id(ps[0], &w) != 1) return -1;
@@ -2265,11 +2265,11 @@ int ana_xmsetpixmap(narg, ps) /* (widget, pixmap_file) */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmpixmapbutton(narg, ps) /* (parent, pixmap_file, callback) */
+Int ana_xmpixmapbutton(narg, ps) /* (parent, pixmap_file, callback) */
  /* creates a button widget, returns widget id */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	iq, nsym, w, push, result_sym;
+ Int	iq, nsym, w, push, result_sym;
  char *s;
  Pixmap	pixmap;
  Pixel	fg, bg;
@@ -2309,16 +2309,16 @@ int ana_xmpixmapbutton(narg, ps) /* (parent, pixmap_file, callback) */
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmradiobox(narg, ps) /* (parent,callback,font,color,l1,[l2, l3 ...]) */
+Int ana_xmradiobox(narg, ps) /* (parent,callback,font,color,l1,[l2, l3 ...]) */
  /* creates a simple radio box widget, returns array of widget id's for
  toggles and the container widget as the first value */
  /* the font and color preceed the labels to allow easier parsing, if
  these are null strings or scalars, you get the defaults */
  /* 2/3/95 addition, if the last argument is a scalar, it is used as
  the # of columns, otherwise there is only one column */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	iq, nsym, i, w, radio, result_sym, j, k, *wids, nq, ncolumns;
+ Int	iq, nsym, i, w, radio, result_sym, j, k, *wids, nq, ncolumns;
  char *s;
  Widget	wg;
  struct	ahead	*h;
@@ -2364,7 +2364,7 @@ int ana_xmradiobox(narg, ps) /* (parent,callback,font,color,l1,[l2, l3 ...]) */
  nq=i+1;
  result_sym = array_scratch(2, 1, &nq );
  h = (struct ahead *) sym[result_sym].spec.array.ptr;
- wids = (int *) ((char *)h + sizeof(struct ahead));
+ wids = (Int *) ((char *)h + sizeof(struct ahead));
  if (ck_widget_count() < 0) return -1;
  radio = n_widgets++;
  ana_widget_id[radio] = wg;
@@ -2390,10 +2390,10 @@ int ana_xmradiobox(narg, ps) /* (parent,callback,font,color,l1,[l2, l3 ...]) */
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmtogglegetstate(narg, ps) /* (widget) */
- int     narg, ps[];
+Int ana_xmtogglegetstate(narg, ps) /* (widget) */
+ Int     narg, ps[];
  {
- int	w, result_sym, iq;
+ Int	w, result_sym, iq;
  if (ck_motif() != 1) return -1;
  if (get_widget_id(ps[0], &w) != 1) return -1;
  result_sym = scalar_scratch(2);		/* state */
@@ -2404,13 +2404,13 @@ int ana_xmtogglegetstate(narg, ps) /* (widget) */
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmtogglesetstate(narg, ps) /* (widget, state, [notify]) */
+Int ana_xmtogglesetstate(narg, ps) /* (widget, state, [notify]) */
  /* this is a subroutine call, state is 0 or non-zero for True/False */
  /* added a notify option, default is to notify which means the callback
     gets executed */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	w, iq;
+ Int	w, iq;
  Boolean state, notify = True;
  if (ck_motif() != 1) return -1;
  if (get_widget_id(ps[0], &w) != 1) return -1;
@@ -2422,22 +2422,22 @@ int ana_xmtogglesetstate(narg, ps) /* (widget, state, [notify]) */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmcheckbox(narg, ps) /* (parent,callback,font,color,l1,[l2, l3 ...]) */
+Int ana_xmcheckbox(narg, ps) /* (parent,callback,font,color,l1,[l2, l3 ...]) */
  /* this works very much like a radio box except for a few details, so
  we just set a flag here and call ana_xmradiobox(narg, ps) */
  /* note that there is no management of which buttons are set at this level */
  /* the user will have to keep track of that from the callbacks or by
  using the getstate call */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	iq;
+ Int	iq;
  radiobox = 0;
  iq = ana_xmradiobox(narg, ps);
  radiobox = 1; /* reset default */
  return iq;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmpixmapoptionmenu(narg, ps) /* (parent,callback,font,color,s,p1,[p2 ...]) */
+Int ana_xmpixmapoptionmenu(narg, ps) /* (parent,callback,font,color,s,p1,[p2 ...]) */
  /* creates a simple option menu widget that uses pixmaps for the button
  labels, all items must be pixmaps, s is the title for this option */
  /* based on original xmoptionmenu, the arguments p1, p2, ... are
@@ -2446,9 +2446,9 @@ int ana_xmpixmapoptionmenu(narg, ps) /* (parent,callback,font,color,s,p1,[p2 ...
  6/26/94 addition - if the last argument is a scalar instead of a string,
  it is used to set the default menu item, otherwise this is the first on
  the list (first is 0, etc) */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	iq, nsym, i, w, option, result_sym, j, k, *wids, nq, dmenu;
+ Int	iq, nsym, i, w, option, result_sym, j, k, *wids, nq, dmenu;
  char *s;
  Widget	wg, optionsubmenu, woption;
  XmString	ms;
@@ -2504,7 +2504,7 @@ int ana_xmpixmapoptionmenu(narg, ps) /* (parent,callback,font,color,s,p1,[p2 ...
  nq=i+3;
  result_sym = array_scratch(2, 1, &nq );
  h = (struct ahead *) sym[result_sym].spec.array.ptr;
- wids = (int *) ((char *)h + sizeof(struct ahead));
+ wids = (Int *) ((char *)h + sizeof(struct ahead));
  wg = optionsubmenu;
  while (i--) {
  /* get filename string */
@@ -2567,7 +2567,7 @@ int ana_xmpixmapoptionmenu(narg, ps) /* (parent,callback,font,color,s,p1,[p2 ...
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmoptionmenu(narg, ps) /* (parent,callback,font,color,s,l1,[l2 ...]) */
+Int ana_xmoptionmenu(narg, ps) /* (parent,callback,font,color,s,l1,[l2 ...]) */
  /* creates a simple option menu widget, s is the title for this option */
  /* the font and color preceed the labels to allow easier parsing, if
  these are null strings or scalars, you get the defaults, the option label
@@ -2575,9 +2575,9 @@ int ana_xmoptionmenu(narg, ps) /* (parent,callback,font,color,s,l1,[l2 ...]) */
  6/26/94 addition - if the last argument is a scalar instead of a string,
  it is used to set the default menu item, otherwise this is the first on
  the list (first is 0, etc) */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	iq, nsym, i, w, option, result_sym, j, k, *wids, nq, dmenu;
+ Int	iq, nsym, i, w, option, result_sym, j, k, *wids, nq, dmenu;
  char *s;
  Widget	wg, optionsubmenu, woption;
  XmString	ms;
@@ -2625,7 +2625,7 @@ int ana_xmoptionmenu(narg, ps) /* (parent,callback,font,color,s,l1,[l2 ...]) */
  nq=i+3;
  result_sym = array_scratch(2, 1, &nq );
  h = (struct ahead *) sym[result_sym].spec.array.ptr;
- wids = (int *) ((char *)h + sizeof(struct ahead));
+ wids = (Int *) ((char *)h + sizeof(struct ahead));
  while (i--) {
  /* get label string */
  iq = ps[j++];
@@ -2682,11 +2682,11 @@ int ana_xmoptionmenu(narg, ps) /* (parent,callback,font,color,s,l1,[l2 ...]) */
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmgetoptionselection(narg, ps)
+Int ana_xmgetoptionselection(narg, ps)
  /* arg is row/column widget from an option menu */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	w, result_sym, wm;
+ Int	w, result_sym, wm;
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
  /* this should be a row/column type but we aren't checking here */
  if (ck_widget_count() < 0) return -1;
@@ -2699,12 +2699,12 @@ int ana_xmgetoptionselection(narg, ps)
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmsetoptionselection(narg, ps)
+Int ana_xmsetoptionselection(narg, ps)
  /* 2 args, row/column widget from an option menu and widget for the
  menu item it should be set to */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	w, wm;
+ Int	w, wm;
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
  if ( get_widget_id( ps[1], &wm) != 1 ) return -1;
  n = 0;
@@ -2713,7 +2713,7 @@ int ana_xmsetoptionselection(narg, ps)
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmmenubar(narg, ps) /* (parent,font,color,l1,[l2 ...]) */
+Int ana_xmmenubar(narg, ps) /* (parent,font,color,l1,[l2 ...]) */
  /* creates a menu bar widget, you will need pulldowns to attach */
  /* the font and color preceed the labels to allow easier parsing, if
  these are null strings or scalars, you get the defaults
@@ -2721,9 +2721,9 @@ int ana_xmmenubar(narg, ps) /* (parent,font,color,l1,[l2 ...]) */
  an array of widget id's is returned, the first is the menubar
  widget followed by each cascade button, we need the latter for attaching
  pulldowns to these cascade buttons */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	iq, i, w, result_sym, j, k, *wids, nq, menu;
+ Int	iq, i, w, result_sym, j, k, *wids, nq, menu;
  char *s;
  Widget	wg, menu_bar;
  XmString	ms;
@@ -2751,7 +2751,7 @@ int ana_xmmenubar(narg, ps) /* (parent,font,color,l1,[l2 ...]) */
  /* i is the count of cascade buttons */
  result_sym = array_scratch(2, 1, &nq );
  h = (struct ahead *) sym[result_sym].spec.array.ptr;
- wids = (int *) ((char *)h + sizeof(struct ahead));
+ wids = (Int *) ((char *)h + sizeof(struct ahead));
  wids[0] =  menu;
  k = 1;
  while (i--) {
@@ -2777,7 +2777,7 @@ int ana_xmmenubar(narg, ps) /* (parent,font,color,l1,[l2 ...]) */
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmpulldownmenu(narg, ps) /* (parent,casc,callback,font,color,l1,[l2 ...]) */
+Int ana_xmpulldownmenu(narg, ps) /* (parent,casc,callback,font,color,l1,[l2 ...]) */
  /* creates a pulldown menu widget, you first need a menubar to attach to,
  the parent must be a menubar widget, the casc is the cascade button
  widget id that this pulldown is attached to, these are the addition
@@ -2788,9 +2788,9 @@ int ana_xmpulldownmenu(narg, ps) /* (parent,casc,callback,font,color,l1,[l2 ...]
  these are null strings or scalars, you get the defaults
  the labels for each cascade button are l1, l2 ... */
  /* returns the widget number for the pulldown and each button */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	iq, nsym, i, w, result_sym, j, k, nq, c_button, wc, *wids;
+ Int	iq, nsym, i, w, result_sym, j, k, nq, c_button, wc, *wids;
  char *s;
  Widget	wg, pull_down;
  struct	ahead	*h;
@@ -2838,7 +2838,7 @@ int ana_xmpulldownmenu(narg, ps) /* (parent,casc,callback,font,color,l1,[l2 ...]
  nq = i + 1;
  result_sym = array_scratch(2, 1, &nq );
  h = (struct ahead *) sym[result_sym].spec.array.ptr;
- wids = (int *) ((char *)h + sizeof(struct ahead));
+ wids = (Int *) ((char *)h + sizeof(struct ahead));
  wids[0] =  wc;
  while (i--) {
  /* get label string */
@@ -2866,23 +2866,23 @@ int ana_xmpulldownmenu(narg, ps) /* (parent,casc,callback,font,color,l1,[l2 ...]
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmgetwidgetaddress(narg, ps)
+Int ana_xmgetwidgetaddress(narg, ps)
  /* (widget) */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	w, result_sym, wm;
+ Int	w, result_sym, wm;
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
- wm = (int) ana_widget_id[w]; 
+ wm = (Int) ana_widget_id[w]; 
  result_sym = scalar_scratch(2);		/*for widget id */
  sym[result_sym].spec.scalar.l = wm;
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmarrow(narg, ps) /* (parent, direction, callback, [color]) */
+Int ana_xmarrow(narg, ps) /* (parent, direction, callback, [color]) */
  /* creates an arrow widget, returns widget id */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	iq, nsym, w, arrow, result_sym, mode;
+ Int	iq, nsym, w, arrow, result_sym, mode;
  char	*s;
  if (ck_motif() != 1) return -1;
  /* get parent widget */
@@ -2917,25 +2917,25 @@ int ana_xmarrow(narg, ps) /* (parent, direction, callback, [color]) */
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmhscale(narg, ps)/*(parent,min,max,dshift,callback,[show,size,drag]) */
+Int ana_xmhscale(narg, ps)/*(parent,min,max,dshift,callback,[show,size,drag]) */
  /* creates a horizontal scale widget, returns widget id */
- int     narg, ps[];
+ Int     narg, ps[];
  {
  return ana_int_xmscale(narg, ps, 1);	/* the 1 indicates horizontal */
  }
  /*------------------------------------------------------------------------- */
-int ana_xmvscale(narg, ps)/*(parent,min,max,dshift,callback,[show,size,drag]) */
+Int ana_xmvscale(narg, ps)/*(parent,min,max,dshift,callback,[show,size,drag]) */
  /* creates a vertical scale widget, returns widget id */
- int     narg, ps[];
+ Int     narg, ps[];
  {
  return ana_int_xmscale(narg, ps, 0);	/* the 0 indicates vertical */
  }
  /*------------------------------------------------------------------------- */
-int ana_int_xmscale(narg, ps, mode)	/* internal, mode = 1 for horizontal */
- int     narg, ps[], mode;
+Int ana_int_xmscale(narg, ps, mode)	/* internal, mode = 1 for horizontal */
+ Int     narg, ps[], mode;
  {
- int	iq, nsym, w, scale, result_sym, min, max, dshift, show, size;
- int	drag_flag=0;
+ Int	iq, nsym, w, scale, result_sym, min, max, dshift, show, size;
+ Int	drag_flag=0;
  char *s;
  if (ck_motif() != 1) return -1;
  /* get parent widget */
@@ -2980,10 +2980,10 @@ int ana_int_xmscale(narg, ps, mode)	/* internal, mode = 1 for horizontal */
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmscalesetvalue(narg, ps) /* (widget, value) */
- int     narg, ps[];
+Int ana_xmscalesetvalue(narg, ps) /* (widget, value) */
+ Int     narg, ps[];
  {
- int	w, value;
+ Int	w, value;
   if (ck_motif() != 1) return -1;
  if (get_widget_id(ps[0], &w) != 1) return -1;
  if (int_arg_stat(ps[1], &value) != 1) return -1;
@@ -2992,10 +2992,10 @@ int ana_xmscalesetvalue(narg, ps) /* (widget, value) */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmscalegetvalue(narg, ps) /* (widget) */
- int     narg, ps[];
+Int ana_xmscalegetvalue(narg, ps) /* (widget) */
+ Int     narg, ps[];
  {
- int	w, result_sym, value;
+ Int	w, result_sym, value;
   if (ck_motif() != 1) return -1;
  if (get_widget_id(ps[0], &w) != 1) return -1;
  
@@ -3005,10 +3005,10 @@ int ana_xmscalegetvalue(narg, ps) /* (widget) */
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmscaleresetlimits(narg, ps) /* (widget, min, max,[dshift]) */
- int     narg, ps[];
+Int ana_xmscaleresetlimits(narg, ps) /* (widget, min, max,[dshift]) */
+ Int     narg, ps[];
  {
- int	w, min, max, dshift;
+ Int	w, min, max, dshift;
   if (ck_motif() != 1) return -1;
  if (get_widget_id(ps[0], &w) != 1) return -1;
  /* get min and max */
@@ -3027,16 +3027,16 @@ int ana_xmscaleresetlimits(narg, ps) /* (widget, min, max,[dshift]) */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmattach(narg, ps)
+Int ana_xmattach(narg, ps)
  /* (widget, ref_widget, left, right, top, bottom) */
  /* top, etc are 1 for attachment on that side and 0 for no change */
  /* -1 for attach opposite */
  /* the parent should be a form widget, use ref_widget = 0 to make attachments
  to the parent, otherwise ref_widget must be a sibling widget (with the same
  parent */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	w1, w2, attach[4], i;
+ Int	w1, w2, attach[4], i;
  if (ck_motif() != 1) return -1;
  /* get the arguments */
  if (get_widget_id(ps[0], &w1) != 1) return -1;
@@ -3086,13 +3086,13 @@ int ana_xmattach(narg, ps)
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmattach_relative(narg, ps)
+Int ana_xmattach_relative(narg, ps)
  /* (widget, left, right, top, bottom) */
  /* top, etc are relative positions (in percent) for attachment on that side */
  /* the parent should be a form widget */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	w1, attach[4], i;
+ Int	w1, attach[4], i;
  if (ck_motif() != 1) return -1;
  /* get the arguments */
  if (get_widget_id(ps[0], &w1) != 1) return -1;
@@ -3111,11 +3111,11 @@ int ana_xmattach_relative(narg, ps)
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmposition(narg, ps) /* (widget, x, y, [sx, sy]) */
+Int ana_xmposition(narg, ps) /* (widget, x, y, [sx, sy]) */
  /* note that (x,y) position is not set if values are negative */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	w1, x, y, dx, dy;
+ Int	w1, x, y, dx, dy;
  if (ck_motif() != 1) return -1;
  /* get the arguments */
  if (get_widget_id(ps[0], &w1) != 1) return -1;
@@ -3133,11 +3133,11 @@ int ana_xmposition(narg, ps) /* (widget, x, y, [sx, sy]) */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmsize(narg, ps) /* (widget, sx, sy) */
+Int ana_xmsize(narg, ps) /* (widget, sx, sy) */
  /* just reset the sizes */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	w1, dx, dy;
+ Int	w1, dx, dy;
  if (ck_motif() != 1) return -1;
  /* get the arguments */
  if (get_widget_id(ps[0], &w1) != 1) return -1;
@@ -3150,11 +3150,11 @@ int ana_xmsize(narg, ps) /* (widget, sx, sy) */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmresizepolicy(narg, ps) /* (widget, flag) */
+Int ana_xmresizepolicy(narg, ps) /* (widget, flag) */
  /* 3 policies available, 0 = none, 1 = grow only, 2 = any */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	w1, flag;
+ Int	w1, flag;
  if (ck_motif() != 1) return -1;
  /* get the arguments */
  if (get_widget_id(ps[0], &w1) != 1) return -1;
@@ -3170,12 +3170,12 @@ int ana_xmresizepolicy(narg, ps) /* (widget, flag) */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmsetmodal(narg, ps) /* (widget, modal_flag) */
+Int ana_xmsetmodal(narg, ps) /* (widget, modal_flag) */
  /* use with care, 0 sets modeless (turns off modal), 1 makes the widget
  modal */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	w1, modal_flag;
+ Int	w1, modal_flag;
  if (ck_motif() != 1) return -1;
  /* get the arguments */
  if (get_widget_id(ps[0], &w1) != 1) return -1;
@@ -3190,11 +3190,11 @@ int ana_xmsetmodal(narg, ps) /* (widget, modal_flag) */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmsetdirectory(narg, ps) /* (widget, directory_path) */
+Int ana_xmsetdirectory(narg, ps) /* (widget, directory_path) */
  /* can only be used for file select widgets */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	w1;
+ Int	w1;
  char *s;
  XmString	directory;
  if (ck_motif() != 1) return -1;
@@ -3212,11 +3212,11 @@ int ana_xmsetdirectory(narg, ps) /* (widget, directory_path) */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmborderwidth(narg, ps) /* (widget, width) */
+Int ana_xmborderwidth(narg, ps) /* (widget, width) */
  /* manipulate the border */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	w1, wq;
+ Int	w1, wq;
  if (ck_motif() != 1) return -1;
  /* get the arguments */
  if (get_widget_id(ps[0], &w1) != 1) return -1;
@@ -3228,43 +3228,43 @@ int ana_xmborderwidth(narg, ps) /* (widget, width) */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmgetwidgetsize(narg, ps)
+Int ana_xmgetwidgetsize(narg, ps)
  /* a subroutine; i.e, xmgetwidgetsize, widget, dx, dy  returns dx, dy */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	w, dxx, dyy;
+ Int	w, dxx, dyy;
  Dimension	dx, dy;
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
  XtSetArg(wargs[0], XmNwidth, &dx);
  XtSetArg(wargs[1], XmNheight, &dy);
  XtGetValues(ana_widget_id[w], wargs, 2);
- dxx = (int) dx;	dyy = (int) dy;
+ dxx = (Int) dx;	dyy = (Int) dy;
  redef_scalar(ps[1], 2, &dxx);
  redef_scalar(ps[2], 2, &dyy);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmgetwidgetposition(narg, ps)
+Int ana_xmgetwidgetposition(narg, ps)
  /* a subroutine; i.e, xmgetwidgetposition, widget, x, y  returns x, y */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	w, dxx, dyy;
+ Int	w, dxx, dyy;
  Dimension	dx, dy;
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
  XtSetArg(wargs[0], XmNx, &dx);
  XtSetArg(wargs[1], XmNy, &dy);
  XtGetValues(ana_widget_id[w], wargs, 2);
- dxx = (int) dx;	dyy = (int) dy;
+ dxx = (Int) dx;	dyy = (Int) dy;
  redef_scalar(ps[1], 2, &dxx);
  redef_scalar(ps[2], 2, &dyy);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmalignment(narg, ps) /* (widget, mode) */
+Int ana_xmalignment(narg, ps) /* (widget, mode) */
  /* makes sense for label and button widgets or their parents */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	w, mode;
+ Int	w, mode;
  if (ck_motif() != 1) return -1;
  /* get the widget */
  if (get_widget_id(ps[0], &w) != 1) return -1;
@@ -3282,12 +3282,12 @@ int ana_xmalignment(narg, ps) /* (widget, mode) */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmsensitive(narg, ps) /* (widget, mode) */
+Int ana_xmsensitive(narg, ps) /* (widget, mode) */
  /* use to make labels or button insensitive or sensitive */
  /* this doesn't make sense for all types of widgets */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	w, mode;
+ Int	w, mode;
  if (ck_motif() != 1) return -1;
  /* get the widget */
  if (get_widget_id(ps[0], &w) != 1) return -1;
@@ -3300,10 +3300,10 @@ int ana_xmsensitive(narg, ps) /* (widget, mode) */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmfont(narg, ps) /* (widget, font_string) */
- int     narg, ps[];
+Int ana_xmfont(narg, ps) /* (widget, font_string) */
+ Int     narg, ps[];
  {
- int	w, iq;
+ Int	w, iq;
  char    *fontname;
   if (ck_motif() != 1) return -1;
  if (get_widget_id(ps[0], &w) != 1) return -1;
@@ -3323,10 +3323,10 @@ int ana_xmfont(narg, ps) /* (widget, font_string) */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmsetlabel(narg, ps) /* (widget, string) */
- int     narg, ps[];
+Int ana_xmsetlabel(narg, ps) /* (widget, string) */
+ Int     narg, ps[];
  {
- int	w, iq;
+ Int	w, iq;
  char    *s;
  XmString	ms;
  if (ck_motif() != 1) return -1;
@@ -3343,10 +3343,10 @@ int ana_xmsetlabel(narg, ps) /* (widget, string) */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmsettitle(narg, ps) /* (widget, string) */
- int     narg, ps[];
+Int ana_xmsettitle(narg, ps) /* (widget, string) */
+ Int     narg, ps[];
  {
- int	w, iq;
+ Int	w, iq;
  char    *s;
  XmString	title;
  if (ck_motif() != 1) return -1;
@@ -3363,11 +3363,11 @@ int ana_xmsettitle(narg, ps) /* (widget, string) */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmsetmnemonic(narg, ps) /* (widget, string) */
+Int ana_xmsetmnemonic(narg, ps) /* (widget, string) */
  /* string should be a single character, we take only the first if not */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	w, iq;
+ Int	w, iq;
  char    *s;
  if (ck_motif() != 1) return -1;
  if (get_widget_id(ps[0], &w) != 1) return -1;
@@ -3381,10 +3381,10 @@ int ana_xmsetmnemonic(narg, ps) /* (widget, string) */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmsetmargins(narg, ps) /* (widget, xm, ym) */
- int     narg, ps[];
+Int ana_xmsetmargins(narg, ps) /* (widget, xm, ym) */
+ Int     narg, ps[];
  {
- int	w, xm, ym;
+ Int	w, xm, ym;
  if (ck_motif() != 1) return -1;
  if (get_widget_id(ps[0], &w) != 1) return -1;
  if (int_arg_stat(ps[1], &xm) != 1) return -1;
@@ -3396,11 +3396,11 @@ int ana_xmsetmargins(narg, ps) /* (widget, xm, ym) */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmtextsetrowcolumnsize(narg, ps) /* (widget, rows, columns) */
+Int ana_xmtextsetrowcolumnsize(narg, ps) /* (widget, rows, columns) */
  /* reset the number of rows and columns for a text image */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	w, rows, cols;
+ Int	w, rows, cols;
  if (ck_motif() != 1) return -1;
  if (get_widget_id(ps[0], &w) != 1) return -1;
  if (int_arg_stat(ps[1], &rows) != 1) return -1;
@@ -3413,38 +3413,38 @@ int ana_xmtextsetrowcolumnsize(narg, ps) /* (widget, rows, columns) */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmforegroundcolor(narg, ps) /* (widget, color) */
- int     narg, ps[];
+Int ana_xmforegroundcolor(narg, ps) /* (widget, color) */
+ Int     narg, ps[];
  { return colorset(narg, ps, 1); }
  /*------------------------------------------------------------------------- */
-int ana_xmbackgroundcolor(narg, ps) /* (widget, color) */
- int     narg, ps[];
+Int ana_xmbackgroundcolor(narg, ps) /* (widget, color) */
+ Int     narg, ps[];
  { return colorset(narg, ps, 0); }
  /*------------------------------------------------------------------------- */
-int ana_xmtopshadowcolor(narg, ps) /* (widget, color) */
- int     narg, ps[];
+Int ana_xmtopshadowcolor(narg, ps) /* (widget, color) */
+ Int     narg, ps[];
  { return colorset(narg, ps, 2); }
  /*------------------------------------------------------------------------- */
-int ana_xmbottomshadowcolor(narg, ps) /* (widget, color) */
- int     narg, ps[];
+Int ana_xmbottomshadowcolor(narg, ps) /* (widget, color) */
+ Int     narg, ps[];
  { return colorset(narg, ps, 3); }
  /*------------------------------------------------------------------------- */
-int ana_xmselectcolor(narg, ps) /* (widget, color) */
- int     narg, ps[];
+Int ana_xmselectcolor(narg, ps) /* (widget, color) */
+ Int     narg, ps[];
  { return colorset(narg, ps, 4); }
  /*------------------------------------------------------------------------- */
-int ana_xmarmcolor(narg, ps) /* (widget, color) */
- int     narg, ps[];
+Int ana_xmarmcolor(narg, ps) /* (widget, color) */
+ Int     narg, ps[];
  { return colorset(narg, ps, 5); }
  /*------------------------------------------------------------------------- */
-int ana_xmbordercolor(narg, ps) /* (widget, color) */
- int     narg, ps[];
+Int ana_xmbordercolor(narg, ps) /* (widget, color) */
+ Int     narg, ps[];
  { return colorset(narg, ps, 6); }
  /*------------------------------------------------------------------------- */
-int colorset(narg, ps, mode) /* internal routine */
- int     narg, ps[], mode;
+Int colorset(narg, ps, mode) /* internal routine */
+ Int     narg, ps[], mode;
  {
- int	w, iq;
+ Int	w, iq;
  char    *pc;
  if (ck_motif() != 1) return -1;
  if (get_widget_id(ps[0], &w) != 1) return -1;
@@ -3476,12 +3476,12 @@ int colorset(narg, ps, mode) /* internal routine */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmsetcolors(narg, ps) /* (widget, bg_color) */
- int     narg, ps[];
+Int ana_xmsetcolors(narg, ps) /* (widget, bg_color) */
+ Int     narg, ps[];
  /* given a new background color for a widget, set it and an "appropiate"
  set of the other colors */
  {
- int	w, iq;
+ Int	w, iq;
  if (ck_motif() != 1) return -1;
  if (get_widget_id(ps[0], &w) != 1) return -1;
  /* get the color string */
@@ -3492,15 +3492,15 @@ int ana_xmsetcolors(narg, ps) /* (widget, bg_color) */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmquery(narg, ps) /* (widget) */
- int     narg, ps[];
+Int ana_xmquery(narg, ps) /* (widget) */
+ Int     narg, ps[];
  /* a subroutine, gets pointer location in this widget and for root window */
  {
- int	w, status;
+ Int	w, status;
  Window	qroot, qchild;
  Window win;
- extern  int	xcoord, ycoord, root_x, root_y;
- extern  unsigned int    kb;
+ extern  Int	xcoord, ycoord, root_x, root_y;
+ extern  uint32_t    kb;
 
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
  win = XtWindowOfObject(ana_widget_id[w]);
@@ -3509,15 +3509,15 @@ int ana_xmquery(narg, ps) /* (widget) */
  return -1; }
  status = XQueryPointer(disp, win, &qroot, &qchild, &root_x,
  &root_y,&xcoord, &ycoord, &kb);
- /*printf("qroot, qchild = %d, %d\n", (int) qroot, (int) qchild);*/
+ /*printf("qroot, qchild = %d, %d\n", (Int) qroot, (Int) qchild);*/
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmraise(narg, ps) /* (widget) */
- int     narg, ps[];
+Int ana_xmraise(narg, ps) /* (widget) */
+ Int     narg, ps[];
  /* a subroutine, gets window for this widget and does a xraise on it */
  {
- int	w;
+ Int	w;
  Window win;
 
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
@@ -3529,11 +3529,11 @@ int ana_xmraise(narg, ps) /* (widget) */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xtparent(narg, ps)
+Int ana_xtparent(narg, ps)
  /* (widget) */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	w, result_sym, parent;
+ Int	w, result_sym, parent;
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
  if (ck_widget_count() < 0) return -1;
  parent = n_widgets++;
@@ -3543,11 +3543,11 @@ int ana_xtparent(narg, ps)
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xtwindow(narg, ps)
+Int ana_xtwindow(narg, ps)
  /* (widget) */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	w, result_sym;
+ Int	w, result_sym;
  Window wid;
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
  wid = XtWindowOfObject(ana_widget_id[w]);
@@ -3559,68 +3559,68 @@ int ana_xtwindow(narg, ps)
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-int ana_xtmanage(narg, ps)
+Int ana_xtmanage(narg, ps)
  /* (widget) */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	w;
+ Int	w;
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
  XtManageChild(ana_widget_id[w]);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xtunmanage(narg, ps)
+Int ana_xtunmanage(narg, ps)
  /* (widget) */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	w;
+ Int	w;
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
  XtUnmanageChild(ana_widget_id[w]);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xtpopup(narg, ps)
+Int ana_xtpopup(narg, ps)
  /* xtpopup, widget */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	w;
+ Int	w;
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
  XtPopup(xmgettopshell(ana_widget_id[w]), XtGrabNone);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xtpopdown(narg, ps)
+Int ana_xtpopdown(narg, ps)
  /* xtpopdown, widget */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	w;
+ Int	w;
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
  XtPopdown(xmgettopshell(ana_widget_id[w]));
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmdestroy(narg, ps)
- int     narg, ps[];
+Int ana_xmdestroy(narg, ps)
+ Int     narg, ps[];
  {
- int	w;
+ Int	w;
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
  XtDestroyWidget(ana_widget_id[w]);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xmset_text_output(narg, ps) /* assigns a widget text_output */
+Int ana_xmset_text_output(narg, ps) /* assigns a widget text_output */
  /* this takes an already defined widget number in the ANA environment and
  assigns it to the text_output widget used by wprint */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int	w;
+ Int	w;
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
  text_output = ana_widget_id[w];
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int get_widget_id( nsym, w)
- int nsym, *w;
+Int get_widget_id( nsym, w)
+ Int nsym, *w;
  {
  /* verify that symbol is an integer */
  if (int_arg_stat(nsym, w) != 1) {
@@ -3634,13 +3634,13 @@ int get_widget_id( nsym, w)
  /*------------------------------------------------------------------------- */
 void ana_xminit(void) 	/* the motif initialization */
 {
- extern	int	display_width, display_height;
+ extern	Int	display_width, display_height;
  Widget   exit_button;
  Screen	*screen;
- int	argc = 1;
+ Int	argc = 1;
  Pixmap  icon_pixmap;
  char *argv = {"ana motif"};
- extern int	connect_flag, depth;	/* from color.c */
+ extern Int	connect_flag, depth;	/* from color.c */
  extern Display	*display;
  extern Visual	*visual;
 
@@ -3711,15 +3711,15 @@ void ana_xminit(void) 	/* the motif initialization */
  XtSetValues(ana_widget_id[toplevel], wargs, n);
 }
  /*------------------------------------------------------------------------- */
-int ck_motif()
+Int ck_motif()
  {
  if (motif_init_flag == 0) { ana_xminit(); motif_init_flag = 1; }
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ck_widget_count()
+Int ck_widget_count()
  {
- int	mx;
+ Int	mx;
  mx = MAXWIDGETS;
  if ( (n_widgets +1000) > mx) {
  	printf("WARNING - widget table is getting large, n = %d\n", n_widgets);
@@ -3729,10 +3729,10 @@ int ck_widget_count()
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_xtloop(narg, ps)
- int     narg, ps[];
+Int ana_xtloop(narg, ps)
+ Int     narg, ps[];
  {
- extern int	ck_events();
+ extern Int	ck_events();
  /* have we been realized ? */
  if ( motif_realized_flag != 1) {
 	XtRealizeWidget(ana_widget_id[toplevel]);
@@ -3791,9 +3791,9 @@ void browse_callback(w, ptq, call_data)
  XtPointer	ptq;
  XmListCallbackStruct *call_data;
  {
- int	mq;
+ Int	mq;
  char *text, *p, *s;
- int	result_position, result_string;
+ Int	result_position, result_string;
  switch (call_data->reason) {
   case XmCR_BROWSE_SELECT:
    XmStringGetLtoR (call_data->item, cset, &text);
@@ -3809,7 +3809,7 @@ void browse_callback(w, ptq, call_data)
  result_position = find_sym(list_item_position);
  redef_scalar(result_position, 2, &call_data->item_position);
  XtFree(text);
- (void) ana_callback_execute( (int) ptq);
+ (void) ana_callback_execute( (Int) ptq);
  }
  /*------------------------------------------------------------------------- */
 void fselect_callback(w, ptq, call_data)
@@ -3817,8 +3817,8 @@ void fselect_callback(w, ptq, call_data)
  XmFileSelectionBoxCallbackStruct *call_data;
  XtPointer	ptq;
  {
- int	mq;
- int	result_string;
+ Int	mq;
+ Int	result_string;
  char *filename, *p, *s;
  switch (call_data->reason) {
   case XmCR_OK:
@@ -3835,7 +3835,7 @@ void fselect_callback(w, ptq, call_data)
  while (mq--) *p++ = *s++;	*p = 0;			/*load it */
  XtFree(filename);
 
- (void) ana_callback_execute( (int) ptq);
+ (void) ana_callback_execute( (Int) ptq);
  }
  /*------------------------------------------------------------------------- */
 void fhelp_callback(w, ptq, call_data)
@@ -3843,8 +3843,8 @@ void fhelp_callback(w, ptq, call_data)
  XmFileSelectionBoxCallbackStruct *call_data;
  XtPointer	ptq;
  {
- int	mq;
- int	result_string;
+ Int	mq;
+ Int	result_string;
  char *filename, *p, *s;
 
  XmStringGetLtoR (call_data->value, cset, &filename);
@@ -3854,7 +3854,7 @@ void fhelp_callback(w, ptq, call_data)
  p = (char *) sym[result_string].spec.array.ptr;	s = filename;
  while (mq--) *p++ = *s++;	*p = 0;			/*load it */
  XtFree(filename);
- (void) ana_callback_execute( (int) ptq);
+ (void) ana_callback_execute( (Int) ptq);
  }
  /*------------------------------------------------------------------------- */
 void fcancel_callback(w, ptq, call_data)
@@ -3862,7 +3862,7 @@ void fcancel_callback(w, ptq, call_data)
  XmFileSelectionBoxCallbackStruct *call_data;
  XtPointer	ptq;
  {
- (void) ana_callback_execute( (int) ptq);
+ (void) ana_callback_execute( (Int) ptq);
  }
  /*------------------------------------------------------------------------- */
 void bcancel_callback(w, ptq, call_data)
@@ -3870,7 +3870,7 @@ void bcancel_callback(w, ptq, call_data)
  XmAnyCallbackStruct *call_data;
  XtPointer	ptq;
  {
- (void) ana_callback_execute( (int) ptq);
+ (void) ana_callback_execute( (Int) ptq);
  }
  /*------------------------------------------------------------------------- */
 void command_callback(w, ptq, call_data)
@@ -3879,9 +3879,9 @@ void command_callback(w, ptq, call_data)
  XmCommandCallbackStruct *call_data;
  XtPointer	ptq;
  {
- int	mq;
+ Int	mq;
  char *text, *p, *s;
- int	result_string;
+ Int	result_string;
  switch (call_data->reason) {
   case XmCR_COMMAND_ENTERED:
    XmStringGetLtoR (call_data->value, cset, &text);
@@ -3895,13 +3895,13 @@ void command_callback(w, ptq, call_data)
  p = (char *) sym[result_string].spec.array.ptr;	s = text;
  while (mq--) *p++ = *s++;	*p = 0;			/*load it */
 
- (void) ana_callback_execute( (int) ptq);
+ (void) ana_callback_execute( (Int) ptq);
  }
  /*------------------------------------------------------------------------- */
 void ana_callback_execute(nsym)
- int nsym;
+ Int nsym;
  {
- int iq;
+ Int iq;
  if (nsym > 0) { iq = execute(nsym);
  	if (iq <= 0) printf("problem with callback execution\n"); }
  }
@@ -3911,7 +3911,7 @@ void button_callback(w, ptq, call_data)
  caddr_t	call_data;
  XtPointer	ptq;
  {
- (void) ana_callback_execute( (int) ptq);
+ (void) ana_callback_execute( (Int) ptq);
  }
  /*------------------------------------------------------------------------- */
 void selectionbox_cb(w, ptq, call_data)
@@ -3919,7 +3919,7 @@ void selectionbox_cb(w, ptq, call_data)
  XmSelectionBoxCallbackStruct	*call_data;
  XtPointer	ptq;
  {
- int	result_string, mq;
+ Int	result_string, mq;
  char *text, *p, *s;
  /* get the value in the textfield */
  XmStringGetLtoR (call_data->value, cset, &text);
@@ -3929,8 +3929,8 @@ void selectionbox_cb(w, ptq, call_data)
  p = (char *) sym[result_string].spec.array.ptr;	s = text;
  while (mq--) *p++ = *s++;	*p = 0;			/*load it */
  XtFree(text);
- (void) ana_callback_execute( (int) ptq);
- zap(run_block_number((int) ptq)); /* get rid of callback - LS 20jan99 */
+ (void) ana_callback_execute( (Int) ptq);
+ zap(run_block_number((Int) ptq)); /* get rid of callback - LS 20jan99 */
  }
  /*------------------------------------------------------------------------- */
 void radio_which(w, ptq, state)
@@ -3943,7 +3943,7 @@ void radio_which(w, ptq, state)
  printf("%s: %s\n", XtName(w), state->set ? "on" : "off");
  */
  if (state->set) radio_state = 1; else radio_state = 0;
- radio_button = (int) ptq;
+ radio_button = (Int) ptq;
  }
  /*------------------------------------------------------------------------- */
 void radio_callback(w, ptq, state)
@@ -3952,7 +3952,7 @@ void radio_callback(w, ptq, state)
  XtPointer	ptq;
  {
  /* 7/11/95, changed to callback ana routine for either state set on or off */
- (void) ana_callback_execute( (int) ptq);
+ (void) ana_callback_execute( (Int) ptq);
  }
  /*------------------------------------------------------------------------- */
 void menu_which(w, ptq, state)
@@ -3960,10 +3960,10 @@ void menu_which(w, ptq, state)
  XmToggleButtonCallbackStruct	*state;
  XtPointer	ptq;
  {
- int	iq, which;
+ Int	iq, which;
  /* printf("menu_which called\n"); */
  iq = find_sym(option_value);
- which = (int) ptq;
+ which = (Int) ptq;
  redef_scalar(iq, 2, &which);
  }
  /*------------------------------------------------------------------------- */
@@ -3976,7 +3976,7 @@ void scale_callback(w, ptq, call_data)
  if ( call_data != (XmScaleCallbackStruct *) NULL)
   {
   redef_scalar(find_sym(scale_value), 2, &call_data->value);
- (void) ana_callback_execute( (int) ptq);
+ (void) ana_callback_execute( (Int) ptq);
   }
  }
  /*------------------------------------------------------------------------- */
@@ -3989,18 +3989,18 @@ void scroll_callback(w, ptq, call_data)
  if ( call_data != (XmScaleCallbackStruct *) NULL)
   {
   redef_scalar(find_sym(scroll_value), 2, &call_data->value);
- (void) ana_callback_execute( (int) ptq);
+ (void) ana_callback_execute( (Int) ptq);
   }
  }
  /*------------------------------------------------------------------------- */
 void draw_in_callback(w, ptq, call_data)
  Widget	w;
  XmDrawingAreaCallbackStruct *call_data;
- int	*ptq;
+ Int	*ptq;
  {
- extern	int	ana_keycode, ana_button, last_wid, xcoord, ycoord;
- extern	int	root_x, root_y, ana_keystate, ana_keysym;
- int	nc;
+ extern	Int	ana_keycode, ana_button, last_wid, xcoord, ycoord;
+ extern	Int	root_x, root_y, ana_keystate, ana_keysym;
+ Int	nc;
  XEvent  *report = call_data->event;
  char	buffer[16];
  KeySym	keysym;
@@ -4030,7 +4030,7 @@ void draw_in_callback(w, ptq, call_data)
     nc = XLookupString(&(report->xkey), buffer, 15, &keysym, NULL);
     buffer[nc] = '\0';
     /*printf("nc = %d, string = %s\n", nc, buffer);*/
-    ana_keysym = (int) keysym;
+    ana_keysym = (Int) keysym;
     break;
  }
  (void) ana_callback_execute( *ptq);
@@ -4039,13 +4039,13 @@ void draw_in_callback(w, ptq, call_data)
 void draw_re_callback(w, ptq, call_data)
  Widget	w;
  XmDrawingAreaCallbackStruct *call_data;
- int	*ptq;
+ Int	*ptq;
  {
- extern	 int    wd[], ht[], last_wid,  set_defw();
- extern  float   xfac, yfac;
- extern  int     ixhigh, iyhigh;
+ extern	 Int    wd[], ht[], last_wid,  set_defw();
+ extern  Float   xfac, yfac;
+ extern  Int     ixhigh, iyhigh;
  Dimension	ww, wh;
- static	int	kilroy;
+ static	Int	kilroy;
 
  /* this callback is particularly likely to cause re-entrant problems in the
  ana code because the ana call backs may do some limit checking and hence
@@ -4082,10 +4082,10 @@ void draw_re_callback(w, ptq, call_data)
 void draw_ex_callback(w, ptq, call_data)
  Widget	w;
  XmDrawingAreaCallbackStruct *call_data;
- int	*ptq;
+ Int	*ptq;
  {
- extern	int	last_wid;
- static	int	kilroy;
+ extern	Int	last_wid;
+ static	Int	kilroy;
 
  /* 5/28/96 - added, tried to handle expose events in the same callbacks
  that do re-sizing but problems */
@@ -4109,9 +4109,9 @@ void textfield_which(w, ptq, state)
  XmToggleButtonCallbackStruct	*state;
  XtPointer	ptq;
  {
- int	iq, which;
+ Int	iq, which;
  iq = find_sym(textfield_number);
- which = (int) ptq;
+ which = (Int) ptq;
  redef_scalar(iq, 2, &which);
  }
  /*------------------------------------------------------------------------- */
@@ -4128,7 +4128,7 @@ void textfield_callback(w, ptq, call_data)
  XmAnyCallbackStruct *call_data;
  XtPointer	ptq;
  {
- int	result_string, mq;
+ Int	result_string, mq;
  char *text, *p, *s;
  /* get the value in the textfield */
  text = XmTextFieldGetString(w);
@@ -4138,7 +4138,7 @@ void textfield_callback(w, ptq, call_data)
  p = (char *) sym[result_string].spec.array.ptr;	s = text;
  while (mq--) *p++ = *s++;	*p = 0;			/*load it */
  XtFree(text);
- (void) ana_callback_execute( (int) ptq);
+ (void) ana_callback_execute( (Int) ptq);
  }
  /*------------------------------------------------------------------------- */
 void quit_callback(w, client_data, call_data)
@@ -4170,19 +4170,19 @@ void motif_command_callback(Widget w, XtPointer ptq,
    motif_flag = 0;		/* turn off xtloop */
 }
 /*------------------------------------------------------------------------- */
-int ana_motif_input(narg, ps) /* get our commands via motif widget */
+Int ana_motif_input(narg, ps) /* get our commands via motif widget */
  /* when called, command input is allowed via a command widget,
  somewhat complicated because of multi-line commands, we want to lock out
  other motif callbacks in the middle of same */
  /* jul 9, 1995, modified, no longer makes its own dialog board, hence
  it needs to be put in one (needs a parent), allows more flexibility */
  /* arguments are: parent, width, nvisible, hmax, font, color */
- int     narg, ps[];
+ Int     narg, ps[];
  {
  /* first create a managed bulletin board dialog widget */
- int	iq, parent, nvisible = 20, hmax = 100, width=600;
+ Int	iq, parent, nvisible = 20, hmax = 100, width=600;
  struct	ahead	*h;
- int	result_sym, nq, *wids;
+ Int	result_sym, nq, *wids;
  XmString	prompt;
  Widget		commandw, wg;
  if (ck_motif() != 1) return -1;
@@ -4193,7 +4193,7 @@ int ana_motif_input(narg, ps) /* get our commands via motif widget */
  nq = 4;
  result_sym = array_scratch(2, 1, &nq);
  h = (struct ahead *) sym[result_sym].spec.array.ptr;
- wids = (int *) ((char *)h + sizeof(struct ahead));
+ wids = (Int *) ((char *)h + sizeof(struct ahead));
  
  if (narg > 1) { if (int_arg_stat(ps[1], &width) != 1) return -1; }
  if (narg > 2) { if (int_arg_stat(ps[2], &nvisible) != 1) return -1; }
@@ -4249,7 +4249,7 @@ int ana_motif_input(narg, ps) /* get our commands via motif widget */
 void wprint(char *fmt, ...)
 {
  char	msgbuf[256];	/* should be coordinated with maximum size elsewhere */
- int	i;
+ Int	i;
  va_list args;
  
  va_start(args, fmt);
@@ -4259,8 +4259,8 @@ void wprint(char *fmt, ...)
  XmTextInsert(text_output, i, msgbuf);
 }
  /*------------------------------------------------------------------------- */
-int ana_test_wprint(narg,ps)
- int	narg,ps[];
+Int ana_test_wprint(narg,ps)
+ Int	narg,ps[];
  {
  wprint("a test of wprint\n");
  wprint("now with a value = %d\n", 13);
@@ -4269,13 +4269,13 @@ int ana_test_wprint(narg,ps)
  /*------------------------------------------------------------------------- */
 void destroy_cb(Widget w, XtPointer ptq, void *call_data)
 {
-  printf("zapping %1d (%s)\n", (int) ptq, symbolIdent((int) ptq,0));
-  zap((int) ptq);
+  printf("zapping %1d (%s)\n", (Int) ptq, symbolIdent((Int) ptq,0));
+  zap((Int) ptq);
 }
 /*------------------------------------------------------------------------- */
-void xminfo(int w)
+void xminfo(Int w)
 {
-  int	minwidth, maxwidth, minheight, maxheight, basewidth, baseheight;
+  Int	minwidth, maxwidth, minheight, maxheight, basewidth, baseheight;
   Dimension	width, height;
 
   if (w < 0 || w >= n_widgets) {
@@ -4328,10 +4328,10 @@ void xminfo(int w)
     printf("%d\n", baseheight);
 }
 /*------------------------------------------------------------------------- */
-int ana_xminfo(int narg, int ps[])
+Int ana_xminfo(Int narg, Int ps[])
 {
-  int	w;
-  int	minwidth, maxwidth, minheight, maxheight, basewidth, baseheight;
+  Int	w;
+  Int	minwidth, maxwidth, minheight, maxheight, basewidth, baseheight;
   Dimension	width, height;
 
   if (get_widget_id(ps[0], &w) == ANA_ERROR)

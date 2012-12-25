@@ -75,24 +75,24 @@
 #include "editor.h"
 #include "action.h"
 
-extern int	ans;
+extern Int	ans;
 
 #define startList(x)	{ pushList(ANA_NEW_LIST); pushList(x); }
 				/* start a new list */
-void	pushList(word symNum),	/* push symbol number onto list stack */
-	swapList(int, int),	/* swap items in the list stack */
+void	pushList(Word symNum),	/* push symbol number onto list stack */
+	swapList(Int, Int),	/* swap items in the list stack */
 	away(void);
-word	popList(void);		/* pop an item from the list stack's top */
-int	stackListLength(void),	/* return length of list at top of stack */
-	isInternalSubr(int),	/* 1 if symbol is internal subroutine */
+Word	popList(void);		/* pop an item from the list stack's top */
+Int	stackListLength(void),	/* return length of list at top of stack */
+	isInternalSubr(Int),	/* 1 if symbol is internal subroutine */
 	installExec(void),
-	findSym(int, hashTableEntry *[], int),
-	installSubsc(int),
-	anaerror(char *, int, ...), ana_replace(int, int), ana_type(int, int []),
-	newSymbol(int, ...);
-int	yyerror(char *), yylex(YYSTYPE *);
+	findSym(Int, hashTableEntry *[], Int),
+	installSubsc(Int),
+	anaerror(char *, Int, ...), ana_replace(Int, Int), ana_type(Int, Int []),
+	newSymbol(Int, ...);
+Int	yyerror(char *), yylex(YYSTYPE *);
 #ifndef YYSTYPE
-#define YYSTYPE int
+#define YYSTYPE Int
 #endif
 #include <stdio.h>
 
@@ -705,7 +705,7 @@ while (0)
 
 #ifndef YYPURE
 
-int	yychar;			/*  the lookahead symbol		*/
+Int	yychar;			/*  the lookahead symbol		*/
 YYSTYPE	yylval;			/*  the semantic value of the		*/
 				/*  lookahead symbol			*/
 
@@ -714,11 +714,11 @@ YYLTYPE yylloc;			/*  location data for the lookahead	*/
 				/*  symbol				*/
 #endif
 
-int yynerrs;			/*  number of parse errors so far       */
+Int yynerrs;			/*  number of parse errors so far       */
 #endif  /* not YYPURE */
 
 #if YYDEBUG != 0
-int yydebug;			/*  nonzero means print parse trace	*/
+Int yydebug;			/*  nonzero means print parse trace	*/
 /* Since this is uninitialized, it does not stop multiple parsers
    from coexisting.  */
 #endif
@@ -741,9 +741,9 @@ int yydebug;			/*  nonzero means print parse trace	*/
 #endif
 
 /* Define __yy_memcpy.  Note that the size argument
-   should be passed with type unsigned int, because that is what the non-GCC
+   should be passed with type uint32_t, because that is what the non-GCC
    definitions require.  With GCC, __builtin_memcpy takes an arg
-   of type size_t, but it can handle unsigned int.  */
+   of type size_t, but it can handle uint32_t.  */
 
 #if __GNUC__ > 1		/* GNU C and GNU C++ define this.  */
 #define __yy_memcpy(TO,FROM,COUNT)	__builtin_memcpy(TO,FROM,COUNT)
@@ -756,11 +756,11 @@ static void
 __yy_memcpy (to, from, count)
      char *to;
      char *from;
-     unsigned int count;
+     uint32_t count;
 {
   register char *f = from;
   register char *t = to;
-  register int i = count;
+  register Int i = count;
 
   while (i-- > 0)
     *t++ = *f++;
@@ -771,11 +771,11 @@ __yy_memcpy (to, from, count)
 /* This is the most reliable way to avoid incompatibilities
    in available built-in functions on various systems.  */
 static void
-__yy_memcpy (char *to, char *from, unsigned int count)
+__yy_memcpy (char *to, char *from, uint32_t count)
 {
   register char *t = to;
   register char *f = from;
-  register int i = count;
+  register Int i = count;
 
   while (i-- > 0)
     *t++ = *f++;
@@ -808,22 +808,22 @@ __yy_memcpy (char *to, char *from, unsigned int count)
 /* Prevent warning if -Wstrict-prototypes.  */
 #ifdef __GNUC__
 #ifdef YYPARSE_PARAM
-int yyparse (void *);
+Int yyparse (void *);
 #else
-int yyparse (void);
+Int yyparse (void);
 #endif
 #endif
 
-int
+Int
 yyparse(YYPARSE_PARAM_ARG)
      YYPARSE_PARAM_DECL
 {
-  register int yystate;
-  register int yyn;
+  register Int yystate;
+  register Int yyn;
   register short *yyssp;
   register YYSTYPE *yyvsp;
-  int yyerrstatus;	/*  number of tokens to shift before error messages enabled */
-  int yychar1 = 0;		/*  lookahead token as an internal (translated) token number */
+  Int yyerrstatus;	/*  number of tokens to shift before error messages enabled */
+  Int yychar1 = 0;		/*  lookahead token as an internal (translated) token number */
 
   short	yyssa[YYINITDEPTH];	/*  the state stack			*/
   YYSTYPE yyvsa[YYINITDEPTH];	/*  the semantic value stack		*/
@@ -841,13 +841,13 @@ yyparse(YYPARSE_PARAM_ARG)
 #define YYPOPSTACK   (yyvsp--, yyssp--)
 #endif
 
-  int yystacksize = YYINITDEPTH;
-  int yyfree_stacks = 0;
+  Int yystacksize = YYINITDEPTH;
+  Int yyfree_stacks = 0;
 
 #ifdef YYPURE
-  int yychar;
+  Int yychar;
   YYSTYPE yylval;
-  int yynerrs;
+  Int yynerrs;
 #ifdef YYLSP_NEEDED
   YYLTYPE yylloc;
 #endif
@@ -857,7 +857,7 @@ yyparse(YYPARSE_PARAM_ARG)
 				/*  semantic values from the action	*/
 				/*  routines				*/
 
-  int yylen;
+  Int yylen;
 
 #if YYDEBUG != 0
   if (yydebug)
@@ -898,7 +898,7 @@ yynewstate:
 #endif
 
       /* Get the current used size of the three stacks, in elements.  */
-      int size = yyssp - yyss + 1;
+      Int size = yyssp - yyss + 1;
 
 #ifdef yyoverflow
       /* Each stack pointer address is followed by the size of
@@ -945,14 +945,14 @@ yynewstate:
 #endif
       yyss = (short *) YYSTACK_ALLOC (yystacksize * sizeof (*yyssp));
       __yy_memcpy ((char *)yyss, (char *)yyss1,
-		   size * (unsigned int) sizeof (*yyssp));
+		   size * (uint32_t) sizeof (*yyssp));
       yyvs = (YYSTYPE *) YYSTACK_ALLOC (yystacksize * sizeof (*yyvsp));
       __yy_memcpy ((char *)yyvs, (char *)yyvs1,
-		   size * (unsigned int) sizeof (*yyvsp));
+		   size * (uint32_t) sizeof (*yyvsp));
 #ifdef YYLSP_NEEDED
       yyls = (YYLTYPE *) YYSTACK_ALLOC (yystacksize * sizeof (*yylsp));
       __yy_memcpy ((char *)yyls, (char *)yyls1,
-		   size * (unsigned int) sizeof (*yylsp));
+		   size * (uint32_t) sizeof (*yylsp));
 #endif
 #endif /* no yyoverflow */
 
@@ -1097,7 +1097,7 @@ yyreduce:
 #if YYDEBUG != 0
   if (yydebug)
     {
-      int i;
+      Int i;
 
       fprintf (stderr, "Reducing via rule %d (line %d), ",
 	       yyn, yyrline[yyn]);
@@ -1516,9 +1516,9 @@ yyerrlab:   /* here on detecting error */
 
       if (yyn > YYFLAG && yyn < YYLAST)
 	{
-	  int size = 0;
+	  Int size = 0;
 	  char *msg;
-	  int x, count;
+	  Int x, count;
 
 	  count = 0;
 	  /* Start X at -yyn if nec to avoid negative indexes in yycheck.  */
@@ -1680,32 +1680,32 @@ static char rcsid[] __attribute__ ((unused)) =
 #include <string.h>
 #include <stdlib.h>
 
-int	ans;
+Int	ans;
 
-int calcerror(char *s)
+Int calcerror(char *s)
 /* reports parser errors - required by calcparse() */
 {
-  extern int	anaerror(char *);
+  extern Int	anaerror(char *);
 
   return anaerror(s);
 }
 /*----------------------------------------------------------------------*/
-int calclex(YYSTYPE *lvalp)
+Int calclex(YYSTYPE *lvalp)
 /* returns semantic value of next red token in *lvalp and the lexical
  value as function return value */
 {
-  extern int	analex(YYSTYPE *);
+  extern Int	analex(YYSTYPE *);
 
   return analex(lvalp);
 }
 /*----------------------------------------------------------------------*/
-int ana_calculator(int narg, int ps[])
+Int ana_calculator(Int narg, Int ps[])
 /* go into calculator mode */
 {
-  extern int	calculatorMode;
+  extern Int	calculatorMode;
   extern char	inHistoryBuffer;
-  int	oldhb;
-  int	calcparse(void);
+  Int	oldhb;
+  Int	calcparse(void);
 
   if (curContext)
     return anaerror("Can only enter calculator mode from main execution level.",

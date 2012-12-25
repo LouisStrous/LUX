@@ -5,14 +5,11 @@
 #include "install.h"
 #endif
 
-#ifndef transfer_target
-#include "symbols.h"
-#endif
+#include "types.h"
 
 #include <stdio.h>
 #include <stdarg.h>
 #include <gsl/gsl_spline.h>
-#include "output.h"
 
 	/* tLine code */
 #define TRANS_FIXED_STRING	1
@@ -69,16 +66,16 @@ enum Symbolclass {
 
 	/* symbol types */
 enum Symboltype {
-  ANA_BYTE,			/* 0: 1-byte integers */
-  ANA_WORD,			/* 1: 2-byte integers */
-  ANA_LONG,			/* 2: 4-byte integers */
-  ANA_FLOAT,			/* 3: 4-byte floats */
-  ANA_DOUBLE,			/* 4: 8-byte floats */
+  ANA_BYTE,			/* 0: 1-Byte integers */
+  ANA_WORD,			/* 1: 2-Byte integers */
+  ANA_LONG,			/* 2: 4-Byte integers */
+  ANA_FLOAT,			/* 3: 4-Byte floats */
+  ANA_DOUBLE,			/* 4: 8-Byte floats */
   ANA_TEMP_STRING,		/* 5: temporary strings */
   ANA_LSTRING,			/* 6: literal strings */
   ANA_STRING_ARRAY,		/* 7: string arrays */
-  ANA_CFLOAT,			/* 8: 8-byte complex floats */
-  ANA_CDOUBLE,			/* 9: 16-byte complex floats */
+  ANA_CFLOAT,			/* 8: 8-Byte complex floats */
+  ANA_CDOUBLE,			/* 9: 16-Byte complex floats */
   ANA_NO_SYMBOLTYPE,
 };
 
@@ -133,11 +130,11 @@ enum fmtTypes {
   FMT_ERROR,			/* 0: illegal format */
   FMT_PLAIN,			/* 1: plain text format */
   FMT_INTEGER,			/* 2: integer format */
-  FMT_FLOAT,			/* 3: float format */
+  FMT_FLOAT,			/* 3: Float format */
   FMT_TIME,			/* 4: time format */
   FMT_DATE,			/* 5: date format */
   FMT_STRING,			/* 6: string format */
-  FMT_COMPLEX,			/* 7: complex float format */
+  FMT_COMPLEX,			/* 7: complex Float format */
   FMT_EMPTY			/* 8: empty format */
 };
 
@@ -314,8 +311,8 @@ enum binaryOps {
 /* debug breakpoint modes */
 #define DEBUG_STEP	1
 
-#define PROTECT_CONTEXT	SHRT_MAX
-#define PROTECTED	(SHRT_MAX - 2000)
+#define PROTECT_CONTEXT	INT16_MAX
+#define PROTECTED	(INT16_MAX - 2000)
 #define MAINTAIN	128	/* to mark symbols that may not be */
 				/* overwritten */
 
@@ -357,19 +354,14 @@ enum binaryOps {
 #define SP_SUBR		(SP_USER_SUBR + SP_INT_SUBR)
 #define SP_ANY		(SP_VAR + SP_FUNC + SP_SUBR)
 
-#define scratSize()	(NSCRAT*sizeof(int) + (curScrat - (char *) scrat))
-
-	/* C auxilliary variable types */
-typedef unsigned char		byte;
-typedef unsigned short int	uword;
-typedef signed short int	word;
+#define scratSize()	(NSCRAT*sizeof(Int) + (curScrat - (char *) scrat))
 
 typedef struct {
-  float real; float imaginary;
+  Float real; Float imaginary;
 } floatComplex;
 
 typedef struct {
-  double real; double imaginary;
+  Double real; Double imaginary;
 } doubleComplex;
 
 typedef union {
@@ -377,33 +369,33 @@ typedef union {
 } complexPointer;
   
 typedef union {
-  byte b; word w; int l; long int ll; float f; double d; char *s; char **sp;
+  Byte b; Word w; Int l; Float f; Double d; char *s; char **sp;
 } scalar;
 
 /* wideScalar is equal to scalar plus the complex data types; we have */
 /* separate scalar and wideScalars because wideScalar is wider, which is */
 /* not always desirable. */
 typedef union {
-  byte b; word w; int l; long int ll; float f; double d; floatComplex cf;
+  Byte b; Word w; Int l; Float f; Double d; floatComplex cf;
   doubleComplex cd; char *s; char **sp;
 } wideScalar;
 
 typedef union pointerUnion {
-  byte *b; word *w; int *l; long int *ll; float *f; double *d; char *s;
+  Byte *b; Word *w; Int *l; Float *f; Double *d; char *s;
   char **sp; void *v; floatComplex *cf; doubleComplex *cd;
 } pointer;
 
 typedef struct {
-  char *key; word value;
+  char *key; Word value;
 } listElem;
 
 typedef struct {
-  char *key; int value;
+  char *key; Int value;
 } enumElem;
 
 typedef struct {
   char suppressEval; char pipe; char suppressUnused;
-  int defaultMode; byte offset; char **keys;
+  Int defaultMode; Byte offset; char **keys;
 } keyList;
 
 /* kinds of facts */
@@ -418,33 +410,33 @@ enum {
 #define ANA_STAT_FACTS_SDEV	(1<<2)
 
 typedef struct {
-  int min; int max; int minloc; int maxloc; double total; double sdev;
+  Int min; Int max; Int minloc; Int maxloc; Double total; Double sdev;
 } statFacts_b;
 
 typedef struct {
-  word min; word max; int minloc; int maxloc; double total; double sdev;
+  Word min; Word max; Int minloc; Int maxloc; Double total; Double sdev;
 } statFacts_w;
 
 typedef struct {
-  int min; int max; int minloc; int maxloc; double total; double sdev;
+  Int min; Int max; Int minloc; Int maxloc; Double total; Double sdev;
 } statFacts_l;
 
 typedef struct {
-  float min; float max; int minloc; int maxloc; double total; double sdev;
+  Float min; Float max; Int minloc; Int maxloc; Double total; Double sdev;
 } statFacts_f;
 
 typedef struct {
-  double min; double max; int minloc; int maxloc; double total; double sdev;
+  Double min; Double max; Int minloc; Int maxloc; Double total; Double sdev;
 } statFacts_d;
 
 typedef struct {
-  floatComplex min; floatComplex max; int minloc; int maxloc;
-  doubleComplex total; double sdev;
+  floatComplex min; floatComplex max; Int minloc; Int maxloc;
+  doubleComplex total; Double sdev;
 } statFacts_cf;
 
 typedef struct {
-  doubleComplex min; doubleComplex max; int minloc; int maxloc;
-  doubleComplex total; double sdev;
+  doubleComplex min; doubleComplex max; Int minloc; Int maxloc;
+  doubleComplex total; Double sdev;
 } statFacts_cd;
 
 typedef union {
@@ -459,64 +451,64 @@ typedef union {
 } allFacts;
 
 typedef struct {
-  byte	type;
-  byte	flags;
-  byte	pad[2];
+  Byte	type;
+  Byte	flags;
+  Byte	pad[2];
   allFacts	fact;
 } arrayFacts;
 
 typedef struct arrayStruct {
-  byte ndim, c1, c2, nfacts; int dims[MAX_DIMS]; arrayFacts *facts;
+  Byte ndim, c1, c2, nfacts; Int dims[MAX_DIMS]; arrayFacts *facts;
 } array;
 
 struct boundsStruct {
-  struct { byte b; word w; int l; float f; double d; } min;
-  struct { byte b; word w; int l; float f; double d; } max;
+  struct { Byte b; Word w; Int l; Float f; Double d; } min;
+  struct { Byte b; Word w; Int l; Float f; Double d; } max;
 };
 
 typedef struct structElemStruct {
   union {
     struct {
-      int nelem; int size; int *dims; byte ndim;
+      Int nelem; Int size; Int *dims; Byte ndim;
     } first;
     struct {
-      char *tag; unsigned int offset; byte type;
+      char *tag; off_t offset; Byte type;
       union {
 	struct {
-	  int *dims; byte ndim;
+	  Int *dims; Byte ndim;
 	} singular;
-	int member;
+	Int member;
       } spec;
     } regular;
   } u;
 } structElem;
 
 typedef struct {
-  byte type;
-  uword number;
-  union { word *w; char **sp; } ptr;
+  Byte type;
+  uWord number;
+  union { Word *w; char **sp; } ptr;
 } extractSec;
 
 typedef struct {
-  byte	type;			/* subscript type: scalar, range, index */
+  Byte	type;			/* subscript type: scalar, range, index */
   union {
     struct {
-      int	value;		/* the single integer subscript */
+      Int	value;		/* the single integer subscript */
     } scalar;
     struct {
-      int	start;		/* the integer range start */
-      int	end;		/* the integer range end */
+      Int	start;		/* the integer range start */
+      Int	end;		/* the integer range end */
     } range;
     struct {
-      int	n_elem;		/* the number of index array elements */
-      int	*ptr;		/* pointer to the index array elements */
+      Int	n_elem;		/* the number of index array elements */
+      Int	*ptr;		/* pointer to the index array elements */
     } array;
   } data;
 } structPtrMember;
 
 typedef struct structPtrStruct {
-  int	desc;			/* index of structure descriptor */
-  int	n_subsc;		/* number of subscripts */
+  Int	desc;			/* index of structure descriptor */
+  Int	n_subsc;		/* number of subscripts */
   structPtrMember	*member;
 } structPtr;
 	
@@ -526,93 +518,93 @@ typedef struct {
 } preExtract;
 
 typedef struct symTableEntryStruct {
- byte class; byte type; word xx; int line; word context; int exec;
+ Byte class; Byte type; Word xx; Int line; Word context; Int exec;
   union specUnion
   { scalar scalar;
-    struct { array      *ptr; int bstore; } array;
-    struct { word       *ptr; int bstore; } wlist;
-    struct { uword	*ptr; int bstore; } uwlist;
-    struct { enumElem   *ptr; int bstore; } enumElem;
-    struct { char       *ptr; int bstore; } name;
-    struct { listElem   *ptr; int bstore; } listElem;
-    struct { int	*ptr; int bstore; } intList;
-    struct { extractSec	*ptr; int bstore; } extract;
-    struct { preExtract	*ptr; int bstore; } preExtract;
-    struct { void	*ptr; int bstore; } general;
-    struct { structPtr	*ptr; int bstore; } structPtr;
+    struct { array      *ptr; Int bstore; } array;
+    struct { Word       *ptr; Int bstore; } wlist;
+    struct { uWord	*ptr; Int bstore; } uwlist;
+    struct { enumElem   *ptr; Int bstore; } enumElem;
+    struct { char       *ptr; Int bstore; } name;
+    struct { listElem   *ptr; Int bstore; } listElem;
+    struct { Int	*ptr; Int bstore; } intList;
+    struct { extractSec	*ptr; Int bstore; } extract;
+    struct { preExtract	*ptr; Int bstore; } preExtract;
+    struct { void	*ptr; Int bstore; } general;
+    struct { structPtr	*ptr; Int bstore; } structPtr;
     pointer	pointer;  
-    struct { word args[4]; } evb;
-    struct { uword args[4]; } uevb;
-    struct { byte narg; char **keys; byte extend; uword nstmnt;
-      word *ptr; } routine;
+    struct { Word args[4]; } evb;
+    struct { uWord args[4]; } uevb;
+    struct { Byte narg; char **keys; Byte extend; uWord nstmnt;
+      Word *ptr; } routine;
   } spec;
 } symTableEntry;
 
 typedef struct hashTableEntryStruct {
-  char *name; int symNum; struct hashTableEntryStruct *next;
+  char *name; Int symNum; struct hashTableEntryStruct *next;
 } hashTableEntry;
 
 typedef struct internalRoutineStruct {
-  char *name; word minArg; word maxArg; int (*ptr)(int, int []); void *keys;
+  char *name; Word minArg; Word maxArg; Int (*ptr)(Int, Int []); void *keys;
 } internalRoutine;
 
 typedef struct {
- int	synch_pattern;
- byte	subf, source, nhb, datyp, ndim, free1, cbytes[4], free[178];
- int	dim[16];
+ Int	synch_pattern;
+ Byte	subf, source, nhb, datyp, ndim, free1, cbytes[4], free[178];
+ Int	dim[16];
  char	txt[256];
 } fzHead;
 
 typedef struct {
-  int symbol;  char kind; char mode;
+  Int symbol;  char kind; char mode;
 } debugItem;
 
 typedef struct {
-  int depth, symbol, size;  char containLHS;
+  Int depth, symbol, size;  char containLHS;
 } branchInfo;
 
 typedef struct {
-  gsl_spline *spline; gsl_interp_accel *acc; double *x; double *y;
+  gsl_spline *spline; gsl_interp_accel *acc; Double *x; Double *y;
 } csplineInfo;
 
 typedef struct {
   pointer *data;		/* data pointer pointer */
   void *data0;			/* pointer to start of data */
-  int coords[MAX_DIMS];		/* current (rearranged) coordinates */
-  int singlestep[MAX_DIMS];	/* step size per coordinate */
-  int step[MAX_DIMS];		/* combined step size for loop transfer */
-  int dims[MAX_DIMS];		/* original dimensions */
-  int nelem;			/* number of elements */
-  int ndim;			/* number of original dimensions */
-  int axes[MAX_DIMS];		/* selected axes */
-  int naxes;			/* selected number of axes */
-  int rdims[MAX_DIMS];		/* compressed rearranged dimensions */
-  int rndim;			/* number of compressed rearranged dims */
-  int rsinglestep[MAX_DIMS];	/* step size per rearranged coordinate */
-  int axisindex;		/* index to current axis (in axes[]) */
-  int mode;			/* desired treatment modes */
-  int stride;			/* bytes per data element */
+  Int coords[MAX_DIMS];		/* current (rearranged) coordinates */
+  Int singlestep[MAX_DIMS];	/* step size per coordinate */
+  Int step[MAX_DIMS];		/* combined step size for loop transfer */
+  Int dims[MAX_DIMS];		/* original dimensions */
+  Int nelem;			/* number of elements */
+  Int ndim;			/* number of original dimensions */
+  Int axes[MAX_DIMS];		/* selected axes */
+  Int naxes;			/* selected number of axes */
+  Int rdims[MAX_DIMS];		/* compressed rearranged dimensions */
+  Int rndim;			/* number of compressed rearranged dims */
+  Int rsinglestep[MAX_DIMS];	/* step size per rearranged coordinate */
+  Int axisindex;		/* index to current axis (in axes[]) */
+  Int mode;			/* desired treatment modes */
+  Int stride;			/* bytes per data element */
   enum Symboltype type;         /* data type */
-  int advanceaxis;		/* how many axes not to advance (from start) */
-  int raxes[MAX_DIMS];		/* from rearranged to old axes */
-  int iraxes[MAX_DIMS];		/* from old to rearranged axes */
+  Int advanceaxis;		/* how many axes not to advance (from start) */
+  Int raxes[MAX_DIMS];		/* from rearranged to old axes */
+  Int iraxes[MAX_DIMS];		/* from old to rearranged axes */
 } loopInfo;
 
 /* for nextCompileLevel: */
 typedef struct compileInfoStruct {
   char	*line;
-  int (*charfunc)(void);
+  Int (*charfunc)(void);
   char	*name;
   FILE	*stream;
-  int	line_number;
+  Int	line_number;
   struct compileInfoStruct	*next;
   struct compileInfoStruct	*prev;
 } compileInfo;
 
 /* for execution nesting info: */
 typedef struct executionLevelInfoStruct {
-  int	target;
-  int	line;
+  Int	target;
+  Int	line;
 } executionLevelInfo;
 
 typedef struct {
@@ -624,13 +616,13 @@ typedef struct {
   char	*plain;			/* start of plain text? */
   char	*end;			/* end of current format entry */
   char	*next;			/* start of next format entry */
-  int	type;			/* format type */
-  int	width;			/* format width */
-  int	precision;		/* format precision */
-  int	flags;			/* format modification flags */
-  int	count;			/* format repetition count */
-  int	active_group;		/* number of currently active groups */
-  int	group_count[MAXFMT];	/* current group counts */
+  Int	type;			/* format type */
+  Int	width;			/* format width */
+  Int	precision;		/* format precision */
+  Int	flags;			/* format modification flags */
+  Int	count;			/* format repetition count */
+  Int	active_group;		/* number of currently active groups */
+  Int	group_count[MAXFMT];	/* current group counts */
   char	*group_start[MAXFMT];	/* current group starts */
   char	save1;			/* for temporary storage  */
   char	save2;			/* for temporary storage */
@@ -639,7 +631,7 @@ typedef struct {
 
 /* for breakpoints: */
 typedef struct {
-  int	line;
+  Int	line;
   char	*name;
   char	status;
 } breakpointInfo;
@@ -655,12 +647,12 @@ typedef struct {
 #define class8_to_1(x)	dereferenceScalPointer(x)
 
 #define symbol_ident_single(x,y)	what(x,y)
-int	nextFreeTempVariable(void), nextFreeNamedVariable(void),
+Int	nextFreeTempVariable(void), nextFreeNamedVariable(void),
 	nextFreeExecutable(void), nextFreeTempExecutable(void),
-	dereferenceScalPointer(int), findSym(int, hashTableEntry *[], int),
-	findInternalName(char *, int), anaerror(char *, int, ...),
-	lookForName(char *, hashTableEntry *[], int), execute(int);
-char	*symName(int, hashTableEntry *[]);
+	dereferenceScalPointer(Int), findSym(Int, hashTableEntry *[], Int),
+	findInternalName(char *, Int), anaerror(char *, Int, ...),
+	lookForName(char *, hashTableEntry *[], Int), execute(Int);
+char	*symName(Int, hashTableEntry *[]);
 
 #define getFreeTempVariable(a)\
 	{ if ((a = nextFreeTempVariable()) < 0) return a; }
@@ -711,7 +703,7 @@ extern char *symbolStack[];
 #undef ABS
 #define ABS(A)			(((A) >= 0)? (A): -(A))
 #define HEAD(SYM)		((array *) sym[SYM].spec.array.ptr)
-#define LPTR(HEAD)		((int *)((char *) HEAD + sizeof(array)))
+#define LPTR(HEAD)		((Int *)((char *) HEAD + sizeof(array)))
 #define CK_ARR(SYM, ARGN)	if (sym[SYM].class != ANA_ARRAY)\
 				return cerror(NEED_ARR, SYM)
 #define CK_SGN(ARR, N, ARGN, SYM)\
@@ -720,7 +712,7 @@ extern char *symbolStack[];
 #define CK_MAG(MAG, ARR, N, ARGN, SYM) \
   for (i = 0; i < N; i++) \
     if (ARR[i] >= MAG) return cerror(ILL_DIM, ARGN, SYM)
-#define GET_SIZE(SIZ, ARR, N) SIZ = 1; for (i = 0; i < (int) N; i++)\
+#define GET_SIZE(SIZ, ARR, N) SIZ = 1; for (i = 0; i < (Int) N; i++)\
 			 SIZ *= ARR[i]
 #define N_ELEM(N) ((sym[N].spec.array.bstore - sizeof(array))\
                    /anaTypeSize[sym[N].type])
@@ -770,5 +762,11 @@ extern char *symbolStack[];
    case ANA_LONG:   first .l second .l third .b fourth .b fifth ; break; \
    case ANA_FLOAT:  first .f second .f third .b fourth .b fifth ; break; \
    case ANA_DOUBLE: first .d second .d third .b fourth .b fifth ; break; }
+
+#include "output.h"
+
+#ifndef transfer_target
+#include "symbols.h"
+#endif
 
 #endif

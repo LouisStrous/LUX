@@ -11,19 +11,19 @@
 #include <unistd.h>		/* for ssize_t */
 /* END HEADERS */
 
-/** Defines a byte stack, as a pointer to an opaque structure. */
+/** Defines a Byte stack, as a pointer to an opaque structure. */
 typedef struct Bytestack_struct *Bytestack;
 
-/** Defines an unsigned integral type for an index into a byte
+/** Defines an unsigned integral type for an index into a Byte
     stack. The value #BYTESTACK_INDEX_ERROR indicates an error state.
-    Other values indicate locations in a byte stack. */
+    Other values indicate locations in a Byte stack. */
 typedef ssize_t Bytestack_index;
 
 Bytestack Bytestack_create(void);
 void Bytestack_delete(Bytestack bytestack);
 char *Bytestack_pop(Bytestack bytestack, Bytestack_index index);
 char *Bytestack_pop_all(Bytestack bytestack);
-int Bytestack_restore(Bytestack bytestack, int size);
+Int Bytestack_restore(Bytestack bytestack, Int size);
 Bytestack_index Bytestack_push_text(Bytestack bytestack,
 				    const char *text);
 char *Bytestack_strcpy(Bytestack bytestack,

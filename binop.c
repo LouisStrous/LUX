@@ -6,18 +6,18 @@
 #define ORDINARY	1
 #define SCALAR_LEFT	2
 #define SCALAR_RIGHT	3
-int evalBinOp(int lhs, int rhs,
-	      int (*function)(pointer, pointer, pointer))
+Int evalBinOp(Int lhs, Int rhs,
+	      Int (*function)(pointer, pointer, pointer))
 /* supports "implicit dimensions", i.e. dimensions which are 1 in one of */
 /* the operands and non-1 in the other.  The smaller operand is repeated */
 /* as needed to service all elements of the larger operand. */
 {
-  int	result, i, i0, nRepeats[MAX_DIMS], action[MAX_DIMS], nAction = 0,
+  Int	result, i, i0, nRepeats[MAX_DIMS], action[MAX_DIMS], nAction = 0,
     tally[MAX_DIMS], nCumulR[MAX_DIMS], nCumulL[MAX_DIMS], ndim,
     bigOne;
-  extern int	pipeSym, pipeExec;
-  int ldims[MAX_DIMS], rdims[MAX_DIMS], lndims, rndims;
-  int topType, ltype, rtype;
+  extern Int	pipeSym, pipeExec;
+  Int ldims[MAX_DIMS], rdims[MAX_DIMS], lndims, rndims;
+  Int topType, ltype, rtype;
 
   if (numerical(lhs, ldims, &lndims, NULL, &lp) == ANA_ERROR)
     return ANA_ERROR;
@@ -94,7 +94,7 @@ int evalBinOp(int lhs, int rhs,
     tp.l = array_data(result);	/* output data */
     array_type(result) = topType;
     {
-      int repeat = nRepeat;
+      Int repeat = nRepeat;
 
       while (repeat--) {
 	function(&lp, &rp, &tp, lhsType, rhsType, topType);
@@ -102,7 +102,7 @@ int evalBinOp(int lhs, int rhs,
     }
     return result;
   } else {				/* implicit dimensions */
-    int	lStride, rStride;
+    Int	lStride, rStride;
     char	done = 0;
     
     /* create result array: first calculate its number of elements */

@@ -14,28 +14,28 @@ static char rcsid[] __attribute__ ((unused)) =
 
 #define	VSPACE	14.0
 #define	SFAC	0.70
-int	tkplot(float x, float y, int lineStyle, int symStyle), fontchange(int),
-  draw(int);
-void	swapl(char *, int);
-extern	float	xfac, yfac;
+Int	tkplot(Float x, Float y, Int lineStyle, Int symStyle), fontchange(Int),
+  draw(Int);
+void	swapl(char *, Int);
+extern	Float	xfac, yfac;
 extern	char	*expand_name(char *, char *);
-int	hflag, penDown;
-extern int	ifont;
-byte	*fontbase;
-byte	*fontptr[40];
-float	callig_xb, callig_yb, theta = 0.0, size = 1.0, dx, dy, sxb, syb;
-float	st, ct, x, y, nct, nst, angle, callig_ratio = 1.0;
-float	float_arg(int);
-int	calligCoordSys, current_font = 1;
+Int	hflag, penDown;
+extern Int	ifont;
+Byte	*fontbase;
+Byte	*fontptr[40];
+Float	callig_xb, callig_yb, theta = 0.0, size = 1.0, dx, dy, sxb, syb;
+Float	st, ct, x, y, nct, nst, angle, callig_ratio = 1.0;
+Float	float_arg(Int);
+Int	calligCoordSys, current_font = 1;
 /*------------------------------------------------------------------------- */
-int ana_callig(int narg, int ps[])
+Int ana_callig(Int narg, Int ps[])
 /* draws Hershy character sets */
 {
-  int	iq;
+  Int	iq;
   char	*s;
-  extern int	tkCoordSys;
+  extern Int	tkCoordSys;
   void	set_cur_pen(void);
-  int	callig2(char *);
+  Int	callig2(char *);
 
   penDown = 1;
 					/* first arg must be a string */
@@ -63,7 +63,7 @@ int ana_callig(int narg, int ps[])
   return iq;
 }
 /*------------------------------------------------------------------------- */
-int strpcmp(const void *arg1, const void *arg2)
+Int strpcmp(const void *arg1, const void *arg2)
 /* compare strings <arg1> (up to the next non-alphabetic character) and
    <arg2>, and return a number > 0, == 0, or < 0, depending on whether
    <arg2> is lexographically after, equal to, or before <arg1>.  LS 1jun99 */
@@ -79,11 +79,11 @@ int strpcmp(const void *arg1, const void *arg2)
   /* when we get here then either the two arguments are no longer equal,
      or we're at the end of arg2. */
   if (*s2) {			/* not at the end of arg2 -> unequal */
-    if (isalpha((int) *s1))
+    if (isalpha((Int) *s1))
       return *s1 - *s2;
     return -1;			/* s2 is "greater" */
   }
-  return isalpha((int) *s1)? +1: 0;
+  return isalpha((Int) *s1)? +1: 0;
 }
 /*------------------------------------------------------------------------- */
 void drawlatex(char **text)
@@ -97,7 +97,7 @@ void drawlatex(char **text)
     "Zeta", "alpha", "beta", "bf", "box", "cap", "chi", "clubsuit",
     "cup", "dag", "ddag", "delta", "diamondsuit", "downarrow",
     "epsilon", "eta", "exists", "gamma", "ge", "heartsuit", "in",
-    "int", "iota", "it", "kappa", "lambda", "le", "leftarrow", "mu",
+    "Int", "iota", "it", "kappa", "lambda", "le", "leftarrow", "mu",
     "nabla", "nu", "odot", "oint", "omega", "omicron", "partial",
     "perp", "phi", "pi", "pm", "propto", "psi", "rho", "rightarrow",
     "rm", "sf", "sigma", "sim", "size", "spadesuit", "subset",
@@ -121,11 +121,11 @@ void drawlatex(char **text)
   static char *fonts =  "77777777777777777777777777099799997997797999970779979799779977997790079099997799777";
   static char *member = "ABVDEGCIJKLMXOUPWQRSHTNFab0B3vU1OodV5egEcbueii0jkl4lGmnJxodxup+cwq600rA0U02rshX7tnf";
   char	**match, *p1, *p2;
-  int	code, oldfont, level, c;
-  double	newsize;
+  Int	code, oldfont, level, c;
+  Double	newsize;
 
   while (1)
-    switch ((int) **text) {
+    switch ((Int) **text) {
       case '^':			/* superscript */
 	/* figure out the token(s) that this applies to */
 	(*text)++;
@@ -148,7 +148,7 @@ void drawlatex(char **text)
 	  level--;		/* to indicate that we are treating a group */
 	} else if (*p1 == '`') { /* a token */
 	  p2++;
-	  while (isalpha((int) *p2))
+	  while (isalpha((Int) *p2))
 	    p2++;
 	} else			/* take a single character */
 	  p2++;
@@ -193,7 +193,7 @@ void drawlatex(char **text)
 	  level--;		/* to indicate that we are treating a group */
 	} else if (*p1 == '`') { /* a token */
 	  p2++;
-	  while (isalpha((int) *p2))
+	  while (isalpha((Int) *p2))
 	    p2++;
 	} else			/* take a single character */
 	  p2++;
@@ -291,7 +291,7 @@ void drawlatex(char **text)
 		p1++;		/* just after the opening brace */
 		p2--;		/* just before the closing brace */
 		level--;	/* to indicate that we are treating a group */
-	      } else if (isdigit((int) *p2))
+	      } else if (isdigit((Int) *p2))
 		p2 += 1;
 	      if (p2 > p1) {
 		c = *p2;
@@ -311,13 +311,13 @@ void drawlatex(char **text)
     }
 }
 /*------------------------------------------------------------------------- */
-int callig2(char *s)
+Int callig2(char *s)
 /* called by either ana_callig or callig, finishes the job */
 {
-  int	ic;
-  float	angle, xq;
-  int	coordTrf(float *, float *, int, int), fontchange(int), hcom(char **),
-    draw(int), empty(void);
+  Int	ic;
+  Float	angle, xq;
+  Int	coordTrf(Float *, Float *, Int, Int), fontchange(Int), hcom(char **),
+    draw(Int), empty(void);
 					/* setup context */
   coordTrf(&callig_xb, &callig_yb, calligCoordSys, ANA_DVI);
   angle = theta*0.017453293;
@@ -350,8 +350,8 @@ int callig2(char *s)
   return 1;
 }
 /*------------------------------------------------------------------------- */
-int callig(char *s, float xb, float yb, float fsize, float th, int font,
-	   int nu)
+Int callig(char *s, Float xb, Float yb, Float fsize, Float th, Int font,
+	   Int nu)
 /* for internal calls, sets variables and calls callig2 */
 {
   callig_xb = xb;
@@ -363,11 +363,11 @@ int callig(char *s, float xb, float yb, float fsize, float th, int font,
   return callig2(s);
 }
 /*------------------------------------------------------------------------- */
-int hcom(char **s)
+Int hcom(char **s)
 					/* an inline callig command */
 {
-  int	ic, i1;
-  float	newsize;
+  Int	ic, i1;
+  Float	newsize;
 
   ic = *(*s)++;
   switch (ic) {
@@ -376,7 +376,7 @@ int hcom(char **s)
 						/* font change */
       ic = ic % 128;
       i1 = ic - 48;			/* convert ASCII to binary */
-      if ( isdigit ((byte) **s ) ) i1 = 10 * i1 + (*(*s)++) - 48;
+      if ( isdigit ((Byte) **s ) ) i1 = 10 * i1 + (*(*s)++) - 48;
       if (fontchange(i1) < 0) return -1;	break;
     case 'A':  case 'a':
 				/* move up, no change in size */
@@ -457,9 +457,9 @@ int hcom(char **s)
   return 1;
 }
 /*------------------------------------------------------------------------- */
-int draw(int ic)
+Int draw(Int ic)
 {
-  int	nvec, offset, ll0 = 0, mode, iq, ix, iy, gap;
+  Int	nvec, offset, ll0 = 0, mode, iq, ix, iy, gap;
   short	is1, is2;
   pointer p;
   extern char	callig_update;	/* added 4oct93 LS (see file plots.c) */
@@ -468,7 +468,7 @@ int draw(int ic)
   { printf("illegal char. in callig\n");  return -1; }
   ic -= 32;
   p.b = fontbase;
-  p.b = p.b + 4 * ic;	nvec = (int) *p.b;	gap = (int) *(p.b + 1);
+  p.b = p.b + 4 * ic;	nvec = (Int) *p.b;	gap = (Int) *(p.b + 1);
   if (penDown)
   {
 #if WORDS_BIGENDIAN
@@ -477,7 +477,7 @@ int draw(int ic)
 #else
     is2 = *(p.w + 1);
 #endif
-    offset = (int) is2;
+    offset = (Int) is2;
 			/* offset is in I*2 amounts */
     p.b = fontbase;
     p.w += offset;
@@ -494,9 +494,9 @@ int draw(int ic)
     {
 #if WORDS_BIGENDIAN
       is2 = *p.w++;	swab((char *) &is2, (char *) &is1, 2);
-      iq = (int) is1;
+      iq = (Int) is1;
 #else
-      iq = (int) *p.w++;
+      iq = (Int) *p.w++;
 #endif
       if (iq & 0x4000) mode = 0; else mode = 1;
       iy = (iq & 0x7f);  ix = (iq/ 0x7f) & 0x7f;
@@ -504,23 +504,23 @@ int draw(int ic)
       if (ix > 63) ix = ix - 128;
       ix = ix - ll0;
       iy = iy - ll0;		/* for abnormals */
-      x = (float) ix*ct - (float) iy*st + callig_xb;
-      y = ((float) ix*st + (float) iy*ct)*callig_ratio + callig_yb;
+      x = (Float) ix*ct - (Float) iy*st + callig_xb;
+      y = ((Float) ix*st + (Float) iy*ct)*callig_ratio + callig_yb;
       callig_update = 0;
       tkplot(x, y, mode, 0);
       callig_update = 1;
     }
   }
 			/* update callig_xb and callig_yb */
-  callig_xb += ct*(float) gap;
-  callig_yb += st*(float) gap*callig_ratio;
+  callig_xb += ct*(Float) gap;
+  callig_yb += st*(Float) gap*callig_ratio;
   return 1;
 }
 /*------------------------------------------------------------------------- */
-int fontchange(int font)
+Int fontchange(Int font)
 {
-  int	n, iq;
-  byte	*p;
+  Int	n, iq;
+  Byte	*p;
   char	name[300];
   FILE	*fin;
   
@@ -543,12 +543,12 @@ int fontchange(int font)
 					/* read in file */
   fscanf(fin, "%d", &n);
   n = n/2;
-  if ((p = (byte *) malloc(n)) == NULL)
+  if ((p = (Byte *) malloc(n)) == NULL)
     return ANA_ERROR;
   fontptr[font] = p;
   while (n--) {
     fscanf(fin, "%2x", &iq);
-    *p++ = (byte) iq;
+    *p++ = (Byte) iq;
   }
   fontbase = fontptr[font];
   fclose(fin);

@@ -15,7 +15,7 @@
   void Free(void *), *Malloc(size_t), *Calloc(size_t, size_t),
        *Realloc(void *, size_t);
   FILE *Fopen(const char *, const char *), *Tmpfile(void);
-  int  Fclose(FILE *);
+  Int  Fclose(FILE *);
 #define free	Free
 #define malloc	Malloc
 #define calloc	Calloc

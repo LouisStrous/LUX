@@ -74,7 +74,7 @@
   assertionEquals(__FILE__, __LINE__, __func__, (expected) == (found), \
   "Expected " #expected " = %lu but found %lu for " #found, (expected), (found))
 /**
-   <assertEqualULongs> asserts that the <unsigned long int> values
+   <assertEqualULongs> asserts that the <unsigned int64_t> values
    <<expected>> and <<found>> are equal, and prints a suitable error
    message otherwise.  The error message reports the file, line
    number, and function name where the error occurred.
@@ -84,7 +84,7 @@
   assertionEquals(__FILE__, __LINE__, __func__, (expected) == (found), \
   "Expected " #expected " = %Ld but found %Ld for " #found, (expected), (found))
 /**
-   <assertEqualLlongs> asserts that the <long long int> values
+   <assertEqualLlongs> asserts that the <long int64_t> values
    <<expected>> and <<found>> are equal, and prints a suitable error
    message otherwise.  The error message reports the file, line
    number, and function name where the error occurred.
@@ -94,7 +94,7 @@
   assertionEquals(__FILE__, __LINE__, __func__, approxeq_f((expected), (found)), \
   "Expected " #expected " = %g but found %g for " #found, (expected), (found))
 /**
-   <assertEqualFloats> asserts that the <float> values <<expected>>
+   <assertEqualFloats> asserts that the <Float> values <<expected>>
    and <<found>> are approximately equal (taking reasonable round-off
    errors into account), and prints a suitable error message
    otherwise.  The error message reports the file, line number, and
@@ -105,7 +105,7 @@
   assertionEquals(__FILE__, __LINE__, __func__, approxeq((expected), (found)), \
   "Expected " #expected " = %g but found %g for " #found, (expected), (found))
 /**
-   <assertEqualDoubles> asserts that the <double> values <<expected>>
+   <assertEqualDoubles> asserts that the <Double> values <<expected>>
    and <<found>> are approximately equal (taking reasonable round-off
    errors into account), and prints a suitable error message
    otherwise.  The error message reports the file, line number, and
@@ -116,7 +116,7 @@
   assertionEquals(__FILE__, __LINE__, __func__, approxeq_l((expected), (found)), \
   "Expected " #expected " = %Lg but found %Lg for " #found, (expected), (found))
 /**
-   <assertEqualLdoubles> asserts that the <long double> values
+   <assertEqualLdoubles> asserts that the <long Double> values
    <<expected>> and <<found>> are approximately equal (taking
    reasonable round-off errors into account), and prints a suitable
    error message otherwise.  The error message reports the file, line
@@ -143,8 +143,8 @@
    where the error occurred.
  */
 
-int assertion(const char *file, const int line, const char *func,
-	      const int condition, const char *text);
+Int assertion(const char *file, const Int line, const char *func,
+	      const Int condition, const char *text);
 /**
    <assertion> asserts that the <<condition>> is true, and prints a
    suitable error message otherwise.  <<file>> is supposed to point to
@@ -157,8 +157,8 @@ int assertion(const char *file, const int line, const char *func,
    text.
  */
 
-int assertionEquals(const char *file, const int line, const char *func,
-		    const int equals, const char *format, ...)
+Int assertionEquals(const char *file, const Int line, const char *func,
+		    const Int equals, const char *format, ...)
      __attribute__ ((format (printf, 5, 6)));
 /**
    <assertionEquals> asserts that <<equals>> is non-zero, and prints a
@@ -173,13 +173,13 @@ int assertionEquals(const char *file, const int line, const char *func,
    text.
  */
 
-int num_assertions;
+Int num_assertions;
 /**
    <num_assertions> counts the number of assertions that have been
    made so far.
  */
 
-int assertion_count;
+Int assertion_count;
 /**
    <assertion_count> counts the number of assertions that have been
    made so far.  The value of <assertion_count> is printed in error

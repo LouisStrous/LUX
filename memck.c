@@ -12,11 +12,11 @@ static char rcsid[] __attribute__ ((unused)) =
 #ifdef SBRK_H
 #include SBRK_H
 #else
-void	*sbrk(int);
+void	*sbrk(Int);
 #endif
 
 /*-------------------------------------------------------------------*/
-int ana_memstat(int narg, int ps[])
+Int ana_memstat(Int narg, Int ps[])
 /* returns some info on memory usage */
 {
  char		*p;
@@ -28,10 +28,10 @@ int ana_memstat(int narg, int ps[])
  return 1;
 }
 /*-------------------------------------------------------------------*/
-int ana_memory(int narg, int ps[])
+Int ana_memory(Int narg, Int ps[])
      /* returns size of allocated memory */
 {
-  int	result;
+  Int	result;
   char	*p;
   extern char	*firstbreak;
 

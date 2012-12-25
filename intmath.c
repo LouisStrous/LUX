@@ -1,17 +1,25 @@
 #include <stdlib.h>
 #include "intmath.h"
 
+#if INT_MAX >= INT32_MAX
+#define div32 div
+#define div32_t div_t
+#else
+#define div32 ldiv
+#define div32_t ldiv_t
+#endif
+
 /* determines the quotient and remainder of dividing the <numerator>
    by the <denominator>, in such a way that the remainder is always
    non-negative and less than the magnitude of <denominator>.  This
    function is similar to div() but ensures that the remainder is
    nonnegative (unlike div(), which returns nonpositive remainders if
    the <numerator> or <denominator> are negative). */
-div_t adiv(int numerator, int denominator)
+Div_t adiv(Int numerator, Int denominator)
 {
-  div_t d;
+  div32_t d;
 
-  d = div(numerator, denominator);
+  d = div32(numerator, denominator);
   if (d.rem < 0) {
     if (denominator < 0)
       d.rem -= denominator;
@@ -19,18 +27,25 @@ div_t adiv(int numerator, int denominator)
       d.rem += denominator;
     d.quot--;
   }
+#if INT_MAX == INT32_MAX
   return d;
+#else
+  Div_t dd;
+  dd.quot = d.quot;
+  dd.rem = d.rem;
+  return dd;
+#endif
 }
 
-int iaquot(int numerator, int denominator)
+Int iaquot(Int numerator, Int denominator)
 {
-  div_t d = adiv(numerator, denominator);
+  Div_t d = adiv(numerator, denominator);
   return d.quot;
 }
 
-int iamod(int numerator, int denominator)
+Int iamod(Int numerator, Int denominator)
 {
-  div_t d = adiv(numerator, denominator);
+  Div_t d = adiv(numerator, denominator);
   return d.rem;
 }
 
@@ -50,9 +65,9 @@ int iamod(int numerator, int denominator)
   greater than fd.
  */
 
-div_t alinediv(int numerator, int factor, int addend, int denominator)
+Div_t alinediv(Int numerator, Int factor, Int addend, Int denominator)
 {
-  div_t d1, d2, d;
+  Div_t d1, d2, d;
 
   d1 = adiv(numerator, denominator);
   d2 = adiv(factor*d1.rem + addend, denominator);
@@ -61,14 +76,14 @@ div_t alinediv(int numerator, int factor, int addend, int denominator)
   return d;
 }
 
-int alinequot(int numerator, int factor, int addend, int denominator)
+Int alinequot(Int numerator, Int factor, Int addend, Int denominator)
 {
-  div_t d = alinediv(numerator, factor, addend, denominator);
+  Div_t d = alinediv(numerator, factor, addend, denominator);
   return d.quot;
 }
 
-int alinemod(int numerator, int factor, int addend, int denominator)
+Int alinemod(Int numerator, Int factor, Int addend, Int denominator)
 {
-  div_t d = alinediv(numerator, factor, addend, denominator);
+  Div_t d = alinediv(numerator, factor, addend, denominator);
   return d.rem;
 }

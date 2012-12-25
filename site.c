@@ -12,7 +12,7 @@
 static char rcsid[] __attribute__ ((unused)) =
  "$Id: site.c,v 4.0 2001/02/07 20:37:04 strous Exp $";
 
-extern int	internalMode;
+extern Int	internalMode;
 void	printw(char *), printwf(char *, ...);
 extern char	*c_left, *k_left, *c_right, *k_right,
 	*c_up, *k_up, *c_down, *k_down, *k_delete,
@@ -25,7 +25,7 @@ void printnice(char *p)
     return;
   }
   while (*p) {
-    if (isprint((byte) *p))
+    if (isprint((Byte) *p))
       putchar(*p);
     else
       printf("\\%03o", *p);
@@ -34,13 +34,13 @@ void printnice(char *p)
 }
 
 char	ANAversion[10];
-int site(int narg, int ps[])
+Int site(Int narg, Int ps[])
 /* Prints greeting message.  More info available when arguments are used.
    Be sure to delete  site.o  before every compilation, because otherwise the
    compilation time etc. aren't updated!   LS 10/5/92 */
 {
   char	fmt[] = " %22s %6d %6d\n", hasInclude = 0, *p, *p2;
-  void	setPager(int), resetPager(void);
+  void	setPager(Int), resetPager(void);
   extern char	revision[];
   
   setPager(0);

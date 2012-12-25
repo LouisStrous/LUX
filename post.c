@@ -15,13 +15,13 @@ static char rcsid[] __attribute__ ((unused)) =
 #define _Xdebug			/* to get synchronous X error messages */
 #endif
 
-int	ipen = 7, ipost = 0;
-extern int	landscape;
-static int	nline = 0,	/* number of lines since last Stroke */
+Int	ipen = 7, ipost = 0;
+extern Int	landscape;
+static Int	nline = 0,	/* number of lines since last Stroke */
   icnt = 0;			/* number of chars on current output line */
-static float	xq, yq;
-extern float	current_gray;
-extern int	current_pen;
+static Float	xq, yq;
+extern Float	current_gray;
+extern Int	current_pen;
 FILE	*postScriptFp;
 void	xyup(void), xydown(void);
 /*------------------------------------------------------------------------*/
@@ -32,10 +32,10 @@ void	xyup(void), xydown(void);
   r g b setrgbcolor	selects DeviceRGB color space
   width height bits/comp matrix datasrc false 3 colorimage
  */
-int postreset(int landscape)
+Int postreset(Int landscape)
 {
  char	*fname = NULL;
- extern int	psfile, updateBoundingBox;
+ extern Int	psfile, updateBoundingBox;
 
  if (ipost == 0) {	/* check if already started up */
    if (symbol_type(psfile) == ANA_TEMP_STRING)
@@ -71,7 +71,7 @@ int postreset(int landscape)
  return 1;
 }
 /*------------------------------------------------------------------------*/
-int postpen(int pen, float gray)
+Int postpen(Int pen, Float gray)
 {
   if (postreset(landscape) == ANA_ERROR) /* start up if not already */
     return ANA_ERROR;
@@ -87,7 +87,7 @@ int postpen(int pen, float gray)
   return 1;
 }
 /*------------------------------------------------------------------------*/
-int postcolorpen(float red, float green, float blue)
+Int postcolorpen(Float red, Float green, Float blue)
 {
   postreset(landscape);		/* start up if not already */
   if (nline) {
@@ -102,7 +102,7 @@ int postcolorpen(float red, float green, float blue)
   return 1;
 }
 /*------------------------------------------------------------------------*/
-int postvec(float xin, float yin, int mode)
+Int postvec(Float xin, Float yin, Int mode)
 {
   if (postreset(landscape) == ANA_ERROR) /* start up if not already */
     return ANA_ERROR;
@@ -130,7 +130,7 @@ int postvec(float xin, float yin, int mode)
 /*------------------------------------------------------------------------*/
 void xyup(void)
 {
-  extern int	alternateDash;
+  extern Int	alternateDash;
 
   if (alternateDash)
     fprintf(postScriptFp, " %.6f setgray %.4f %.4f L %.6f setgray",
@@ -146,7 +146,7 @@ void xydown(void)
   icnt += 14;
 }
 /*------------------------------------------------------------------------*/
-int postcopy()
+Int postcopy()
 {
   if (!ipost) {			/* if the output file is not yet opened, */
 	/* then we don't need to generate an empty page with "showpage". */
@@ -167,7 +167,7 @@ int postcopy()
   return 1;
 }
 /*------------------------------------------------------------------------*/
-int postrawout(char *s)
+Int postrawout(char *s)
 {
   if (postreset(landscape) == ANA_ERROR) /* start up if not already */
     return ANA_ERROR;
@@ -179,12 +179,12 @@ int postrawout(char *s)
   return 1;
 }
 /*------------------------------------------------------------------------*/
-int postgray(char *barray, int nx, int ny, float xbot, float xtop, float ybot,
-	     float ytop, int iorder)
+Int postgray(char *barray, Int nx, Int ny, Float xbot, Float xtop, Float ybot,
+	     Float ytop, Int iorder)
 {
-  int	matrx[6], i;
-  int	c;
-  extern float	postXBot, postXTop, postYBot, postYTop;
+  Int	matrx[6], i;
+  Int	c;
+  extern Float	postXBot, postXTop, postYBot, postYTop;
 
   for (i = 0; i < 6; i++)
     matrx[i] = 0;
@@ -274,17 +274,17 @@ int postgray(char *barray, int nx, int ny, float xbot, float xtop, float ybot,
   return 1;
 }
 /*------------------------------------------------------------------------*/
-int postcolor(char *barray, int nx, int ny, float xbot, float xtop, float ybot,
-	      float ytop, int iorder)
+Int postcolor(char *barray, Int nx, Int ny, Float xbot, Float xtop, Float ybot,
+	      Float ytop, Int iorder)
 /* writes an RGB image to a postscript file.  The image has dimensions
  <nx> by <ny> and has three bytes of color information per pixel, in
  the order red, green, blue.  <xbot>, <xtop>, <ybot>, <ytop> selects
  the coordinate ranges (in PostScript units) where the image is displayed.
  LS 10oct99 */
 {
-  int	matrx[6], i, s;
-  int	c;
-  extern float	postXBot, postXTop, postYBot, postYTop;
+  Int	matrx[6], i, s;
+  Int	c;
+  extern Float	postXBot, postXTop, postYBot, postYTop;
 
   for (i = 0; i < 6; i++)
     matrx[i] = 0;
@@ -378,12 +378,12 @@ int postcolor(char *barray, int nx, int ny, float xbot, float xtop, float ybot,
   return ANA_OK;
 }
 /*------------------------------------------------------------------------*/
-int postrelease(int narg, int ps[])
+Int postrelease(Int narg, Int ps[])
 {
   char  ok = 0;
-  int	bb1, bb2, bb3, bb4;
-  extern float	postXBot, postXTop, postYBot, postYTop;
-  extern int	psfile;
+  Int	bb1, bb2, bb3, bb4;
+  extern Float	postXBot, postXTop, postYBot, postYTop;
+  extern Int	psfile;
 
   if (ipost) {
     if (narg)
@@ -421,15 +421,15 @@ int postrelease(int narg, int ps[])
       }
       if (!ok) {
 	if (landscape) {
-	  bb1 = (int) (594 - 720*postYTop);
-	  bb2 = (int) (36 + 720*postXBot);
-	  bb3 = (int) (594 - 720*postYBot);
-	  bb4 = (int) (36 + 720*postXTop);
+	  bb1 = (Int) (594 - 720*postYTop);
+	  bb2 = (Int) (36 + 720*postXBot);
+	  bb3 = (Int) (594 - 720*postYBot);
+	  bb4 = (Int) (36 + 720*postXTop);
 	} else {
-	  bb1 = (int) (720*(0.05 + postXBot));
-	  bb2 = (int) (720*(0.025+ postYBot));
-	  bb3 = (int) (720*(0.05 + postXTop));
-	  bb4 = (int) (720*(0.025 + postYTop));
+	  bb1 = (Int) (720*(0.05 + postXBot));
+	  bb2 = (Int) (720*(0.025+ postYBot));
+	  bb3 = (Int) (720*(0.05 + postXTop));
+	  bb4 = (Int) (720*(0.025 + postYTop));
 	}	  
       }
       fprintf(postScriptFp, "% 4.4d % 4.4d % 4.4d % 4.4d", bb1, bb2, bb3, bb4);

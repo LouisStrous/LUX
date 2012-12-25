@@ -16,12 +16,12 @@ static const char *const ffmts[] =
   { "%#*.*f", "%+#*.*f", "%# *.*f", "%+# *.*f", "%-#*.*f", "%+-#*.*f", "%-# *.*f", "%+# -*.*f",
      "%0#*.*f", "%0+#*.*f", "%0# *.*f", "%0+# *.*f", "%0-#*.*f", "%0+-#*.*f", "%0-# *.*f", "%0+# -*.*f" };
 
-static int obstack_printf_sexagesimal_int_left(struct obstack *o,
+static Int obstack_printf_sexagesimal_int_left(struct obstack *o,
                                                const struct printf_info *info,
-                                               double value, double *lastvalue,
-                                               int firstwidth)
+                                               Double value, Double *lastvalue,
+                                               Int firstwidth)
 {
-  int ivalue, sign, size, precision;
+  Int ivalue, sign, size, precision;
 
   size = obstack_object_size(o);
   precision = info->prec;
@@ -33,7 +33,7 @@ static int obstack_printf_sexagesimal_int_left(struct obstack *o,
      minus sign on the fist component value */
   sign = (value < 0)? -1: 1;
   value = fabs(value);
-  ivalue = (int) value;
+  ivalue = (Int) value;
   if (info->pad == L'0') {      /* sign comes first */
     if (sign < 0)
       obstack_1grow(o, '-');
@@ -55,7 +55,7 @@ static int obstack_printf_sexagesimal_int_left(struct obstack *o,
   obstack_printf(o, "%d", ivalue);
   while (precision-- > 0) {	/* do the rest of them */
     value = 60*(value - ivalue);
-    ivalue = (int) value;
+    ivalue = (Int) value;
     obstack_printf(o, ":%02d", ivalue);
   }
   if (lastvalue)
@@ -63,12 +63,12 @@ static int obstack_printf_sexagesimal_int_left(struct obstack *o,
   return obstack_object_size(o) - size;
 }
 
-int printf_sexagesimal(FILE *stream, const struct printf_info *info,
+Int printf_sexagesimal(FILE *stream, const struct printf_info *info,
                        const void *const *args)
 {
-  int width;
-  double lastvalue;
-  double value = *((const double *)(args[0]));
+  Int width;
+  Double lastvalue;
+  Double value = *((const Double *)(args[0]));
   struct obstack o;
   
   if (info->alt)                /* %#T */
@@ -82,7 +82,7 @@ int printf_sexagesimal(FILE *stream, const struct printf_info *info,
   if (width < info->width) {    /* room left over */
     if (info->left) {
       if (info->prec == 0) {
-        int fmttype;
+        Int fmttype;
 
         fmttype = 0;
         if (info->showsign)
@@ -114,24 +114,24 @@ int printf_sexagesimal(FILE *stream, const struct printf_info *info,
   return width;
 }
 
-int printf_double1_arginfo(const struct printf_info *p,
-                           size_t n, int *argtypes, int *size)
+Int printf_double1_arginfo(const struct printf_info *p,
+                           size_t n, Int *argtypes, Int *size)
 {
   if (n > 0) {
     argtypes[0] = PA_DOUBLE;
-    *size = sizeof(double);
+    *size = sizeof(Double);
   }
   return 1;
 }
 
-static int obstack_printf_date_int_left(struct obstack *o,
+static Int obstack_printf_date_int_left(struct obstack *o,
                                         const struct printf_info *info,
-                                        double value, double *last,
-                                        int firstwidth)
+                                        Double value, Double *last,
+                                        Int firstwidth)
 {
-  int year, month, ivalue, prec, size;
-  double day, lastvalue;
-  int fmttype = 0;
+  Int year, month, ivalue, prec, size;
+  Double day, lastvalue;
+  Int fmttype = 0;
   
   size = obstack_object_size(o);
   if (info->showsign)
@@ -164,17 +164,17 @@ static int obstack_printf_date_int_left(struct obstack *o,
   }
   obstack_printf(o, "%d", year < 0? -year: year);
   if (prec == 1) {
-    double JD1 = CJDtoJD(CommontoCJD(year, 1, 1));
-    double JD2 = CJDtoJD(CommontoCJD(year + 1, 1, 1));
+    Double JD1 = CJDtoJD(CommontoCJD(year, 1, 1));
+    Double JD2 = CJDtoJD(CommontoCJD(year + 1, 1, 1));
     lastvalue = (value - JD1)/(JD2 - JD1) + year;
   } else if (prec >= 2) {       /* month */
     obstack_printf(o, "-%02d", month);
     if (prec == 2) {
-      double JD1 = CJDtoJD(CommontoCJD(year, month, 1));
-      double JD2 = CJDtoJD(CommontoCJD(year, month + 1, 1));
+      Double JD1 = CJDtoJD(CommontoCJD(year, month, 1));
+      Double JD2 = CJDtoJD(CommontoCJD(year, month + 1, 1));
       lastvalue = (value - JD1)/(JD2 - JD1) + month;
     } else if (prec >= 3) {     /* day */
-      ivalue = (int) day;
+      ivalue = (Int) day;
       obstack_printf(o, "-%02d", ivalue);
       if (prec == 3)
         lastvalue = day;
@@ -183,7 +183,7 @@ static int obstack_printf_date_int_left(struct obstack *o,
         prec -= 3;
         obstack_1grow(o, 'T');
         while (prec > 0) {
-          ivalue = (int) lastvalue;
+          ivalue = (Int) lastvalue;
           obstack_printf(o, "%02d", ivalue);
           if (--prec) {
             obstack_1grow(o, ':');
@@ -204,15 +204,15 @@ static int obstack_printf_date_int_left(struct obstack *o,
    .4 -> year-month-dayThour
    .5 -> year-month-dayThour:minute
    .6 -> year-month-dayThour:minute:second */
-int printf_date(FILE *stream, const struct printf_info *info,
+Int printf_date(FILE *stream, const struct printf_info *info,
                 const void *const *args)
 {
-  double value = *((const double *)(args[0]));
-  double value2;
-  void JDtoDate(double, int *, int *, double *, int);
+  Double value = *((const Double *)(args[0]));
+  Double value2;
+  void JDtoDate(Double, Int *, Int *, Double *, Int);
   struct obstack o;
   size_t width;
-  int fmttype = 0;
+  Int fmttype = 0;
   
   if (info->showsign)
     fmttype++;
@@ -230,8 +230,8 @@ int printf_date(FILE *stream, const struct printf_info *info,
                        info->width - width - 1, value2);
       } else {
         obstack_blank(&o, -2);
-        obstack_printf(&o, "%0#*.*f", (int) (info->width - width + 2),
-                       (int) (info->width - width - 1), value2);
+        obstack_printf(&o, "%0#*.*f", (Int) (info->width - width + 2),
+                       (Int) (info->width - width - 1), value2);
       }
     } else {
       obstack_blank(&o, -width);

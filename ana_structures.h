@@ -3,25 +3,25 @@
 				   by anaparser.h */
 #include "action.h"
 
-int	execute_error(int), file_open_error(void);
+Int	execute_error(Int), file_open_error(void);
 #define ana_subr	subroutine
 #define ana_func	function
 #define ana_subr_struct	internalRoutineStruct
 #define STROUS	1
 
-struct sdesc { int n; byte *p; };
+struct sdesc { Int n; Byte *p; };
 
 /* declarations for use in motif.c */
-int	ck_motif(void), set_textfontlist(int), setup_colors(int),
-  set_fontlist(int), compile(char *), get_widget_id(int, int *),
-  rows_or_columns(int, int [], int), ana_int_xmscrollbar(int, int [], int),
-  ck_window(int), ana_xdelete(int, int []),
-  ana_xmradiobox(int, int []),
-  set_labelfontlist(int), ana_int_xmscale(int, int [], int),
-  colorset(int, int [], int), ck_events(void), redef_string(int, int),
-  ana_xtloop(int, int []), compileString(char *);
+Int	ck_motif(void), set_textfontlist(Int), setup_colors(Int),
+  set_fontlist(Int), compile(char *), get_widget_id(Int, Int *),
+  rows_or_columns(Int, Int [], Int), ana_int_xmscrollbar(Int, Int [], Int),
+  ck_window(Int), ana_xdelete(Int, Int []),
+  ana_xmradiobox(Int, Int []),
+  set_labelfontlist(Int), ana_int_xmscale(Int, Int [], Int),
+  colorset(Int, Int [], Int), ck_events(void), redef_string(Int, Int),
+  ana_xtloop(Int, Int []), compileString(char *);
 void	color_not_available(void), font_not_available(void), ana_xminit(void),
-  ana_callback_execute(int);
+  ana_callback_execute(Int);
 #define ana_execute_symbol(symbol,u)		compile(symbol)
 /*#define bcopy(src, dst, len)	memcpy(dst, src, len)*/
 #define strarr_scratch(ndim,dims)	array_scratch(ANA_STRING_ARRAY,ndim,dims)

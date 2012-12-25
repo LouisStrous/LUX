@@ -15,12 +15,12 @@ static char rcsid[] __attribute__ ((unused)) =
 #define ALN2I 1.442695022
 #define TINY 1.0e-5
 /*------------------------------------------------------------------------- */
-void shell_s(int n, char *arr[])
+void shell_s(Int n, char *arr[])
 {
-  int	nn,m,j,i,lognb2;
+  Int	nn,m,j,i,lognb2;
   char	*t;
 
-  lognb2 = (log((double) n)*ALN2I + TINY);
+  lognb2 = (log((Double) n)*ALN2I + TINY);
   m = n;
   for (nn = 1; nn <= lognb2; nn++) {
     m >>= 1;
@@ -36,12 +36,12 @@ void shell_s(int n, char *arr[])
   }
 }
 /*------------------------------------------------------------------------- */
-void shell_f(int n, float arr[])
+void shell_f(Int n, Float arr[])
 {
-  int	nn,m,j,i,lognb2;
-  float	t;
+  Int	nn,m,j,i,lognb2;
+  Float	t;
 
-  lognb2 = (log((double) n)*ALN2I + TINY);
+  lognb2 = (log((Double) n)*ALN2I + TINY);
   m = n;
   for (nn = 1; nn <= lognb2; nn++) {
     m >>= 1;
@@ -57,12 +57,12 @@ void shell_f(int n, float arr[])
   }
 }
 /*------------------------------------------------------------------------- */
-void shell_b(int n, byte arr[])
+void shell_b(Int n, Byte arr[])
 {
-  int	nn,m,j,i,lognb2;
-  byte	t;
+  Int	nn,m,j,i,lognb2;
+  Byte	t;
 
-  lognb2 = (log((double) n)*ALN2I + TINY);
+  lognb2 = (log((Double) n)*ALN2I + TINY);
   m = n;
   for (nn = 1; nn <= lognb2; nn++) {
     m >>= 1;
@@ -78,12 +78,12 @@ void shell_b(int n, byte arr[])
   }
 }
 /*------------------------------------------------------------------------- */
-void shell_l(int n, int arr[])
+void shell_l(Int n, Int arr[])
 {
- int	nn,m,j,i,lognb2;
- int	t;
+ Int	nn,m,j,i,lognb2;
+ Int	t;
 
- lognb2 = (log((double) n)*ALN2I + TINY);
+ lognb2 = (log((Double) n)*ALN2I + TINY);
  m = n;
  for (nn = 1; nn <= lognb2; nn++) {
    m >>= 1;
@@ -99,12 +99,12 @@ void shell_l(int n, int arr[])
  }
 }
 /*------------------------------------------------------------------------- */
-void shell_w(int n, word arr[])
+void shell_w(Int n, Word arr[])
 {
-  int	nn,m,j,i,lognb2;
-  word	t;
+  Int	nn,m,j,i,lognb2;
+  Word	t;
 
-  lognb2 = (log((double) n)*ALN2I + TINY);
+  lognb2 = (log((Double) n)*ALN2I + TINY);
   m = n;
   for (nn = 1; nn <= lognb2; nn++) {
     m >>= 1;
@@ -120,12 +120,12 @@ void shell_w(int n, word arr[])
   }
 }
 /*------------------------------------------------------------------------- */
-void shell_d(int n, double arr[])
+void shell_d(Int n, Double arr[])
 {
-  int	nn,m,j,i,lognb2;
-  double	t;
+  Int	nn,m,j,i,lognb2;
+  Double	t;
 
-  lognb2 = (log((double) n)*ALN2I + TINY);
+  lognb2 = (log((Double) n)*ALN2I + TINY);
   m = n;
   for (nn = 1; nn <= lognb2; nn++) {
     m >>= 1;
@@ -141,9 +141,9 @@ void shell_d(int n, double arr[])
   }
 }
 /*------------------------------------------------------------------------- */
-void sort_s(int n, char *ra[])
+void sort_s(Int n, char *ra[])
 {
-  int	l,j,ir,i;
+  Int	l,j,ir,i;
   char	*rra;
 
   l = (n/2);
@@ -174,10 +174,10 @@ void sort_s(int n, char *ra[])
   }
 }
 /*------------------------------------------------------------------------- */
-void sort_f(int n, float ra[])
+void sort_f(Int n, Float ra[])
 {
-  int	l,j,ir,i;
-  float	rra;
+  Int	l,j,ir,i;
+  Float	rra;
 
   l = (n/2);
   ir = n-1;
@@ -207,10 +207,10 @@ void sort_f(int n, float ra[])
   }
 }
 /*------------------------------------------------------------------------- */
-void sort_b(int n, byte ra[])
+void sort_b(Int n, Byte ra[])
 {
-  int	l,j,ir,i;
-  byte	rra;
+  Int	l,j,ir,i;
+  Byte	rra;
 
   l = (n/2);
   ir = n-1;
@@ -240,10 +240,10 @@ void sort_b(int n, byte ra[])
   }
 }
 /*------------------------------------------------------------------------- */
-void sort_w(int n, word ra[])
+void sort_w(Int n, Word ra[])
 {
-  int	l,j,ir,i;
-  word	rra;
+  Int	l,j,ir,i;
+  Word	rra;
 
   l = (n/2);
   ir = n-1;
@@ -273,9 +273,9 @@ void sort_w(int n, word ra[])
   }
 }
 /*------------------------------------------------------------------------- */
-void sort_l(int n, int ra[])
+void sort_l(Int n, Int ra[])
 {
-  int	l,j,ir,i;
+  Int	l,j,ir,i;
   long	rra;
   
   l = (n/2);
@@ -306,10 +306,10 @@ void sort_l(int n, int ra[])
   }
 }
 /*------------------------------------------------------------------------ */
-void sort_d(int n, double ra[])
+void sort_d(Int n, Double ra[])
 {
-  int	l,j,ir,i;
-  double rra;
+  Int	l,j,ir,i;
+  Double rra;
 
   l = (n/2);
   ir = n-1;
@@ -339,9 +339,9 @@ void sort_d(int n, double ra[])
   }
 }
 /*------------------------------------------------------------------------- */
-void indexx_s(int n, char *ra[], int indx[])
+void indexx_s(Int n, char *ra[], Int indx[])
 {
-  int	l,j,ir,i,indxt;
+  Int	l,j,ir,i,indxt;
   char	*q;
  
   for (i = 0; i < n; i++)
@@ -374,10 +374,10 @@ void indexx_s(int n, char *ra[], int indx[])
   }
 }
 /*------------------------------------------------------------------------- */
-void indexx_d(int n, double ra[], int indx[])
+void indexx_d(Int n, Double ra[], Int indx[])
 {
-  int	l,j,ir,i,indxt;
-  double	q;
+  Int	l,j,ir,i,indxt;
+  Double	q;
  
   for (i = 0; i < n; i++)
     indx[i] = i;
@@ -409,10 +409,10 @@ void indexx_d(int n, double ra[], int indx[])
   }
 }
 /*------------------------------------------------------------------------- */
-void indexx_b(int n, byte ra[], int indx[])
+void indexx_b(Int n, Byte ra[], Int indx[])
 {
-  int	l,j,ir,i,indxt;
-  byte	q;
+  Int	l,j,ir,i,indxt;
+  Byte	q;
  
   for (i = 0; i < n; i++)
     indx[i] = i;
@@ -444,10 +444,10 @@ void indexx_b(int n, byte ra[], int indx[])
   }
 }
 /*------------------------------------------------------------------------- */
-void indexx_w(int n, word ra[], int indx[])
+void indexx_w(Int n, Word ra[], Int indx[])
 {
-  int	l,j,ir,i,indxt;
-  word	q;
+  Int	l,j,ir,i,indxt;
+  Word	q;
  
   for (i = 0; i < n; i++)
     indx[i] = i;
@@ -479,10 +479,10 @@ void indexx_w(int n, word ra[], int indx[])
   }
 }
 /*------------------------------------------------------------------------- */
-void indexx_l(int n, int ra[], int indx[])
+void indexx_l(Int n, Int ra[], Int indx[])
 {
-  int	l,j,ir,i,indxt;
-  int	q;
+  Int	l,j,ir,i,indxt;
+  Int	q;
  
   for (i = 0; i < n; i++)
     indx[i] = i;
@@ -514,10 +514,10 @@ void indexx_l(int n, int ra[], int indx[])
   }
 }
 /*------------------------------------------------------------------------- */
-void indexx_f(int n, float ra[], int indx[])
+void indexx_f(Int n, Float ra[], Int indx[])
 {
-  int	l,j,ir,i,indxt;
-  float	q;
+  Int	l,j,ir,i,indxt;
+  Float	q;
   
   for (i = 0; i < n; i++)
     indx[i] = i;
@@ -549,10 +549,10 @@ void indexx_f(int n, float ra[], int indx[])
   }
 }
 /*------------------------------------------------------------------------- */
-void indexxr_f(int n, float ra[], int indx[])
+void indexxr_f(Int n, Float ra[], Int indx[])
 {
-  int	l,j,ir,i,indxt;
-  float	q;
+  Int	l,j,ir,i,indxt;
+  Float	q;
   
   for (i = 0; i < n; i++)
     indx[i] = i;
@@ -584,10 +584,10 @@ void indexxr_f(int n, float ra[], int indx[])
   }
 }
 /*------------------------------------------------------------------------- */
-void indexxr_d(int n, double ra[], int indx[])
+void indexxr_d(Int n, Double ra[], Int indx[])
 {
-  int	l,j,ir,i,indxt;
-  double q;
+  Int	l,j,ir,i,indxt;
+  Double q;
   
   for (i = 0; i < n; i++)
     indx[i] = i;
@@ -622,13 +622,13 @@ void indexxr_d(int n, double ra[], int indx[])
 #undef ALN2I
 #undef TINY
 
-void invertPermutation(int *data, int n)
+void invertPermutation(Int *data, Int n)
 /* assumes data[] contains a permutation of the numbers between 0 and */
 /* <n - 1> (inclusive), and rearranges them into the inverse permutation. */
 /* I.e., if beforehand data[i] = j, then afterwards data[j] = i. */
 /* LS 25aug2000 */
 {
-  int	nloop, i, j, k;
+  Int	nloop, i, j, k;
 
   i = 0;
   nloop = 0;

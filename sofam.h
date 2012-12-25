@@ -87,13 +87,13 @@
 #define ELB (1.550519768e-8)
 #define TDB0 (-6.55e-5)
 
-/* dint(A) - truncate to nearest whole number towards zero (double) */
+/* dint(A) - truncate to nearest whole number towards zero (Double) */
 #define dint(A) ((A)<0.0?ceil(A):floor(A))
 
-/* dnint(A) - round to nearest whole number (double) */
+/* dnint(A) - round to nearest whole number (Double) */
 #define dnint(A) ((A)<0.0?ceil((A)-0.5):floor((A)+0.5))
 
-/* dsign(A,B) - magnitude of A with sign of B (double) */
+/* dsign(A,B) - magnitude of A with sign of B (Double) */
 #define dsign(A,B) ((B)<0.0?-(A):(A))
 
 #endif

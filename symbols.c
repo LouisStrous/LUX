@@ -21,15 +21,15 @@
 static char rcsid[] __attribute__ ((unused)) =
  "$Id: symbols.c,v 4.0 2001/02/07 20:37:05 strous Exp $";
 
-void	zerobytes(void *, int), updateIndices(void), symdumpswitch(int, int);
+void	zerobytes(void *, Int), updateIndices(void), symdumpswitch(Int, Int);
 #ifdef X11
-void	xsynchronize(int);
+void	xsynchronize(Int);
 #endif
-int	installString(char *), fixContext(int, int), ana_replace(int, int);
+Int	installString(char *), fixContext(Int, Int), ana_replace(Int, Int);
 char *fmttok(char *);
-int Sprintf_tok(char *, ...);
+Int Sprintf_tok(char *, ...);
 /*-----------------------------------------------------*/
-void embed(int target, int context)
+void embed(Int target, Int context)
 /* gives <target> the specified <context>, if it is a contextless */
 /* temporary.  LS 15jun98 */
 {
@@ -43,10 +43,10 @@ void embed(int target, int context)
   }
 }
 /*-----------------------------------------------------*/
-int structPtrTarget(int symbol)
+Int structPtrTarget(Int symbol)
 /* returns number of symbol that LIST_PTR <symbol> points at */
 {
-  int	base, index = -1, i, n;
+  Int	base, index = -1, i, n;
   char	*key;
   
   base = list_ptr_target(symbol); /* the enveloping structure */
@@ -99,7 +99,7 @@ int structPtrTarget(int symbol)
   }
 }
 /*-----------------------------------------------------*/
-int transfer(int symbol)
+Int transfer(Int symbol)
 /* if symbol is a TRANSFER or POINTER, return symbol number of */
 /* ultimate target */
 {
@@ -118,12 +118,12 @@ int transfer(int symbol)
   return symbol;
 }
 /*-----------------------------------------------------*/
-int ana_convert(int, int [], int, int);
-int ana_convertsym(int narg, int ps[])
+Int ana_convert(Int, Int [], Int, Int);
+Int ana_convertsym(Int narg, Int ps[])
      /* Y = CONVERT(X, TYPE) returns a copy of X converted to data type */
      /* TYPE (according to #TYPE).  LS 1aug97 */
 {
-  int	iq, type;
+  Int	iq, type;
 
   iq = ps[0];
   switch (symbol_class(ps[1])) {
@@ -140,10 +140,10 @@ int ana_convertsym(int narg, int ps[])
   return ana_convert(1, ps, type, 1);
 }
 /*-----------------------------------------------------*/
-int scalar_scratch(int type)
+Int scalar_scratch(Int type)
 /* returns a temporary scalar of the indicated type */
 {
- int	n;
+ Int	n;
 
  getFreeTempVariable(n);
  symbol_type(n) = type;
@@ -159,24 +159,24 @@ int scalar_scratch(int type)
  return n;
 }
 /*-----------------------------------------------------*/
-int scalar_scratch_copy(int nsym)
+Int scalar_scratch_copy(Int nsym)
 /* creates a temporary scalar which is a copy of <nsym> */
 {
- int	n;
+ Int	n;
 
  getFreeTempVariable(n);
  sym[n].class = ANA_SCALAR;
  sym[n].type = sym[nsym].type;
  sym[n].line = curLineNumber;
- memcpy(&sym[n].spec.scalar.b, &sym[nsym].spec.scalar.b, sizeof(double));
+ memcpy(&sym[n].spec.scalar.b, &sym[nsym].spec.scalar.b, sizeof(Double));
  return n;
 }
 /*-----------------------------------------------------*/
-int string_scratch(int size)
+Int string_scratch(Int size)
 /* returns a new temporary string with the indicated size
    (terminating null not counted) */
 {
- int	n;
+ Int	n;
 
  getFreeTempVariable(n);
  sym[n].class = ANA_STRING;
@@ -191,13 +191,13 @@ int string_scratch(int size)
  return n;
 }
 /*-----------------------------------------------------*/
-int to_scratch_array(int n, int type, int ndim, int dims[])
+Int to_scratch_array(Int n, Int type, Int ndim, Int dims[])
 /* modifies symbol <n> to an array of the specified type and dimensions */
 /* if the type is ANA_TEMP_STRING or ANA_LSTRING, then the new */
 /* array gets type ANA_STRING_ARRAY.  LS 28mar98 */
 {
  size_t	size, i;
- float	fsize;
+ Float	fsize;
  array	*h;
  pointer	ptr;
  
@@ -223,7 +223,7 @@ int to_scratch_array(int n, int type, int ndim, int dims[])
  }
  size += sizeof(array);
  fsize += sizeof(array);
- if (fabs(((float) size)/fsize - 1) > 1e-3 || size > INT_MAX)
+ if (fabs(((Float) size)/fsize - 1) > 1e-3 || size > INT32_MAX)
    return anaerror("The number of bytes requested for the array\n(about %g) is too great", 0, fsize);
  undefine(n);
  symbol_class(n) = isComplexType(type)? ANA_CARRAY: ANA_ARRAY;
@@ -236,14 +236,14 @@ int to_scratch_array(int n, int type, int ndim, int dims[])
  array_header(n) = h = (array *) ptr.v;
  symbol_memory(n) = size;
  array_num_dims(n) = ndim;
- memcpy(array_dims(n), dims, ndim*sizeof(int));
+ memcpy(array_dims(n), dims, ndim*sizeof(Int));
  h->c1 = h->c2 = h->nfacts = 0;
  h->facts = NULL;
  zerobytes(array_data(n), array_size(n)*ana_type_size[type]);
  return n;
 } 
 /*-----------------------------------------------------*/
-int to_scalar(int nsym, int type)
+Int to_scalar(Int nsym, Int type)
 /* turns symbol <nsym> into a scalar or cscalar of the given <type> */
 {
   undefine(nsym);
@@ -257,9 +257,9 @@ int to_scalar(int nsym, int type)
   return ANA_OK;
 }
 /*-----------------------------------------------------*/
-int array_scratch(int type, int ndim, int dims[])
+Int array_scratch(Int type, Int ndim, Int dims[])
 {
-  int	n;
+  Int	n;
 
   if (!isLegalType(type))
     return cerror(ILL_TYPE, 0, typeName(type));
@@ -267,24 +267,24 @@ int array_scratch(int type, int ndim, int dims[])
   return to_scratch_array(n, type, ndim, dims);
 }
 /*-----------------------------------------------------*/
-int array_clone(int symbol, int type)
+Int array_clone(Int symbol, Int type)
 /* returns a new temporary array of the indicated type,
   with the same structure as <symbol> */
 {
- int	n, size;
- float	fsize;
+ Int	n, size;
+ Float	fsize;
  array	*h, *hOld;
  void	*ptr;
- extern int	pipeSym, pipeExec;
+ extern Int	pipeSym, pipeExec;
 
  size = ((symbol_memory(symbol) - sizeof(array))
 	 / ana_type_size[array_type(symbol)]) * ana_type_size[type]
    + sizeof(array);
  if (ana_type_size[type] > ana_type_size[array_type(symbol)]) {
-   fsize = ((float) (symbol_memory(symbol) - sizeof(array))
+   fsize = ((Float) (symbol_memory(symbol) - sizeof(array))
 	    / ana_type_size[array_type(symbol)]) * ana_type_size[type]
      + sizeof(array);
-   if (fsize != (float) size)
+   if (fsize != (Float) size)
      return anaerror("The number of bytes requested for the array\n(about %g) is too great", 0, fsize);
  }
  if (!pipeExec
@@ -307,7 +307,7 @@ int array_clone(int symbol, int type)
    h = (array *) ptr;
    hOld = HEAD(symbol);
    h->ndim = hOld->ndim;
-   memcpy(h->dims, hOld->dims, h->ndim*sizeof(int));
+   memcpy(h->dims, hOld->dims, h->ndim*sizeof(Int));
    h->c1 = h->c2 = h->nfacts = 0;
    h->facts = NULL;
  }
@@ -315,7 +315,7 @@ int array_clone(int symbol, int type)
  return n; 
 }
 /*-----------------------------------------------------*/
-int numerical_clone(int iq, enum Symboltype type) {
+Int numerical_clone(Int iq, enum Symboltype type) {
   switch (symbol_class(iq)) {
   case ANA_ARRAY:
     return array_clone(iq, type);
@@ -326,11 +326,11 @@ int numerical_clone(int iq, enum Symboltype type) {
   }
 }
 /*-----------------------------------------------------*/
-int dereferenceScalPointer(int nsym)
+Int dereferenceScalPointer(Int nsym)
 /* returns an ordinary ANA_SCALAR for a ANA_SCAL_PTR.  NOTE: assumes that
  <nsym> is a SCAL_PTR!  LS 31jul98 */
 {
- int	n, type;
+ Int	n, type;
  pointer	ptr;
 
  type = scal_ptr_type(nsym);
@@ -404,7 +404,7 @@ char *strsave(char *str)
  return p;
 }
 /*-----------------------------------------------------*/
-int int_arg(int nsym)
+Int int_arg(Int nsym)
 /* returns the integer value of a scalar symbol */
 {
  if (nsym < 0 || nsym >= NSYM) {
@@ -419,21 +419,21 @@ int int_arg(int nsym)
  }
  switch (scalar_type(nsym)) {
    case ANA_BYTE:
-     return (int) scalar_value(nsym).b;
+     return (Int) scalar_value(nsym).b;
    case ANA_WORD:
-     return (int) scalar_value(nsym).w;
+     return (Int) scalar_value(nsym).w;
    case ANA_LONG:
-     return (int) scalar_value(nsym).l;
+     return (Int) scalar_value(nsym).l;
    case ANA_FLOAT:
-     return (int) scalar_value(nsym).f;
+     return (Int) scalar_value(nsym).f;
    case ANA_DOUBLE:
-     return (int) scalar_value(nsym).d;
+     return (Int) scalar_value(nsym).d;
    default:
      return cerror(ILL_TYPE, nsym);
  }
 }
 /*-----------------------------------------------------*/
-int int_arg_stat(int nsym, int *value)
+Int int_arg_stat(Int nsym, Int *value)
 /* returns integer value of symbol <nsym>, if any, or an error */
 {
  if (nsym < 0 || nsym >= NSYM) 
@@ -444,25 +444,25 @@ int int_arg_stat(int nsym, int *value)
    return cerror(NO_SCAL, nsym);
  switch (scalar_type(nsym))
  { case ANA_BYTE:
-     *value = (int) scalar_value(nsym).b;
+     *value = (Int) scalar_value(nsym).b;
      break;
    case ANA_WORD:
-     *value = (int) scalar_value(nsym).w;
+     *value = (Int) scalar_value(nsym).w;
      break;
    case ANA_LONG:
-     *value = (int) scalar_value(nsym).l;
+     *value = (Int) scalar_value(nsym).l;
      break;
    case ANA_FLOAT:
-     *value = (int) scalar_value(nsym).f;
+     *value = (Int) scalar_value(nsym).f;
      break;
    case ANA_DOUBLE:
-     *value = (int) scalar_value(nsym).d;
+     *value = (Int) scalar_value(nsym).d;
      break; }
  return 1;			/* everything OK */
 }  
 /*-----------------------------------------------------*/
-float float_arg(int nsym)
-/* returns the float value of a scalar symbol */
+Float float_arg(Int nsym)
+/* returns the Float value of a scalar symbol */
 {
  if (nsym < 0 || nsym >= NSYM) 
  { cerror(ILL_SYM, 0, nsym, "float_arg");
@@ -471,21 +471,21 @@ float float_arg(int nsym)
  if (sym[nsym].class != ANA_SCALAR) { cerror(NO_SCAL, nsym);  return 0.0; }
  switch (scalar_type(nsym))
  { case ANA_BYTE:
-     return (float) scalar_value(nsym).b;
+     return (Float) scalar_value(nsym).b;
    case ANA_WORD:
-     return (float) scalar_value(nsym).w;
+     return (Float) scalar_value(nsym).w;
    case ANA_LONG:
-     return (float) scalar_value(nsym).l;
+     return (Float) scalar_value(nsym).l;
    case ANA_FLOAT:
-     return (float) scalar_value(nsym).f;
+     return (Float) scalar_value(nsym).f;
    case ANA_DOUBLE:
-     return (float) scalar_value(nsym).d;
+     return (Float) scalar_value(nsym).d;
    default:
      return cerror(ILL_TYPE, nsym); }
 }
 /*-----------------------------------------------------*/
-int float_arg_stat(int nsym, float *value)
-/* returns float value of symbol <nsym>, if any, or an error */
+Int float_arg_stat(Int nsym, Float *value)
+/* returns Float value of symbol <nsym>, if any, or an error */
 {
  if (nsym < 0 || nsym >= NSYM) 
    return cerror(ILL_SYM, 0, nsym, "int_arg_stat");
@@ -495,26 +495,26 @@ int float_arg_stat(int nsym, float *value)
    return cerror(NO_SCAL, nsym);
  switch (scalar_type(nsym)) {
    case ANA_BYTE:
-     *value = (float) scalar_value(nsym).b;
+     *value = (Float) scalar_value(nsym).b;
      break;
    case ANA_WORD:
-     *value = (float) scalar_value(nsym).w;
+     *value = (Float) scalar_value(nsym).w;
      break;
    case ANA_LONG:
-     *value = (float) scalar_value(nsym).l;
+     *value = (Float) scalar_value(nsym).l;
      break;
    case ANA_FLOAT:
-     *value = (float) scalar_value(nsym).f;
+     *value = (Float) scalar_value(nsym).f;
      break;
    case ANA_DOUBLE:
-     *value = (float) scalar_value(nsym).d;
+     *value = (Float) scalar_value(nsym).d;
      break;
  }
  return ANA_OK;			/* everything OK */
 }  
 /*-----------------------------------------------------*/
-double double_arg(int nsym)
-/* returns the double value of a ANA_DOUBLE scalar symbol */
+Double double_arg(Int nsym)
+/* returns the Double value of a ANA_DOUBLE scalar symbol */
 {
  if (nsym < 0 || nsym >= NSYM) 
  { cerror(ILL_SYM, 0, nsym, "double_arg");
@@ -523,21 +523,21 @@ double double_arg(int nsym)
  if (sym[nsym].class != ANA_SCALAR) { cerror(NO_SCAL, nsym);  return 0.0; }
  switch (scalar_type(nsym))
  { case ANA_BYTE:
-     return (double) scalar_value(nsym).b;
+     return (Double) scalar_value(nsym).b;
    case ANA_WORD:
-     return (double) scalar_value(nsym).w;
+     return (Double) scalar_value(nsym).w;
    case ANA_LONG:
-     return (double) scalar_value(nsym).l;
+     return (Double) scalar_value(nsym).l;
    case ANA_FLOAT:
-     return (double) scalar_value(nsym).f;
+     return (Double) scalar_value(nsym).f;
    case ANA_DOUBLE:
-     return (double) scalar_value(nsym).d;
+     return (Double) scalar_value(nsym).d;
    default:
      return cerror(ILL_TYPE, nsym); }
 }
 /*-----------------------------------------------------*/
-int double_arg_stat(int nsym, double *value)
-/* returns double value of symbol <nsym>, if any, or an error */
+Int double_arg_stat(Int nsym, Double *value)
+/* returns Double value of symbol <nsym>, if any, or an error */
 {
  if (nsym < 0 || nsym >= NSYM) 
    return cerror(ILL_SYM, 0, nsym, "int_arg_stat");
@@ -547,25 +547,25 @@ int double_arg_stat(int nsym, double *value)
    return cerror(NO_SCAL, nsym);
  switch (scalar_type(nsym)) {
    case ANA_BYTE:
-     *value = (double) scalar_value(nsym).b;
+     *value = (Double) scalar_value(nsym).b;
      break;
    case ANA_WORD:
-     *value = (double) scalar_value(nsym).w;
+     *value = (Double) scalar_value(nsym).w;
      break;
    case ANA_LONG:
-     *value = (double) scalar_value(nsym).l;
+     *value = (Double) scalar_value(nsym).l;
      break;
    case ANA_FLOAT:
-     *value = (double) scalar_value(nsym).f;
+     *value = (Double) scalar_value(nsym).f;
      break;
    case ANA_DOUBLE:
-     *value = (double) scalar_value(nsym).d;
+     *value = (Double) scalar_value(nsym).d;
      break;
  }
  return ANA_OK;			/* everything OK */
 }  
 /*-----------------------------------------------------*/
-char *string_arg(int nsym)
+char *string_arg(Int nsym)
 /* returns the string value of a string symbol, or NULL */
 {
  if (nsym < 0 || nsym >= NSYM) 
@@ -576,33 +576,33 @@ char *string_arg(int nsym)
  return string_value(nsym);
 }
 /*-----------------------------------------------------*/
-int ana_byte(int narg, int ps[])
+Int ana_byte(Int narg, Int ps[])
 /* returns a ANA_BYTE version of the argument */
 {
   return ana_convert(narg, ps, ANA_BYTE, 1);
 }
 /*-----------------------------------------------------*/
-int ana_word(int narg, int ps[])
+Int ana_word(Int narg, Int ps[])
 /* returns a ANA_WORD version of the argument */
 {
   return ana_convert(narg, ps, ANA_WORD, 1);
 }
 /*-----------------------------------------------------*/
-int ana_long(int narg, int ps[])
+Int ana_long(Int narg, Int ps[])
 /* returns a ANA_LONG version of the argument */
 {
   return ana_convert(narg, ps, ANA_LONG, 1);
 }
 /*-----------------------------------------------------*/
-int ana_floor(int narg, int ps[])
+Int ana_floor(Int narg, Int ps[])
 /* returns a ANA_LONG version of the argument */
-/* each float number is transformed into the next lower integer */
-/* compare ana_long(), where each float number is transformed into the */
-/* next integer closer to zero, and ana_rfix(), where each float is */
+/* each Float number is transformed into the next lower integer */
+/* compare ana_long(), where each Float number is transformed into the */
+/* next integer closer to zero, and ana_rfix(), where each Float is */
 /* transformed into the closest integer.  LS 24may96 */
 {
- int	iq, result, n, temp, size, type;
- int	value;
+ Int	iq, result, n, temp, size, type;
+ Int	value;
  pointer	src, trgt;
 
  iq = *ps;
@@ -632,7 +632,7 @@ int ana_floor(int narg, int ps[])
        result = iq; 
      else
        result = scalar_scratch(ANA_LONG);
-     value = (int) floor(atof((char *) string_value(iq))); /* convert */
+     value = (Int) floor(atof((char *) string_value(iq))); /* convert */
      if (temp) {
        free(string_value(iq));	/* change string to scalar: free up memory */
        symbol_class(result) = ANA_SCALAR;
@@ -651,7 +651,7 @@ int ana_floor(int narg, int ps[])
      /* we can use the input symbol if it is free and if
 	it has at least as much memory as we need */
      if (temp
-	 && (int) array_type(iq) >= ANA_LONG)
+	 && (Int) array_type(iq) >= ANA_LONG)
        result = iq;
      else {
        result = array_clone(iq, ANA_LONG);
@@ -669,37 +669,37 @@ int ana_floor(int narg, int ps[])
  switch (type) {
    case ANA_BYTE:
      while (n--)
-       *trgt.l++ = (int) *src.b++;
+       *trgt.l++ = (Int) *src.b++;
      break;
    case ANA_WORD:
      while (n--)
-       *trgt.l++ = (int) *src.w++;
+       *trgt.l++ = (Int) *src.w++;
      break;
    case ANA_LONG:
      while (n--)
-       *trgt.l++ = (int) *src.l++;
+       *trgt.l++ = (Int) *src.l++;
      break;
    case ANA_FLOAT:
      while (n--)
-       *trgt.l++ = (int) floor(*src.f++);
+       *trgt.l++ = (Int) floor(*src.f++);
      break;
    case ANA_DOUBLE:
      while (n--)
-       *trgt.l++ = (int) floor(*src.d++);
+       *trgt.l++ = (Int) floor(*src.d++);
      break;
    case ANA_CFLOAT:
      while (n--)
-       *trgt.l++ = (int) floor(src.cf++->real);
+       *trgt.l++ = (Int) floor(src.cf++->real);
      break;
    case ANA_CDOUBLE:
      while (n--)
-       *trgt.l++ = (int) floor(src.cd++->real);
+       *trgt.l++ = (Int) floor(src.cd++->real);
      break;
  }
  if (temp			/* we used input symbol to store results */
      && symbol_class(iq) == ANA_ARRAY /* it's an array */
      && array_type(iq) > ANA_LONG) { /* and bigger than we needed */
-   symbol_memory(iq) = sizeof(array) + size*sizeof(int);
+   symbol_memory(iq) = sizeof(array) + size*sizeof(Int);
    symbol_data(iq) = (array *) realloc(symbol_data(iq), symbol_memory(iq));
    if (!symbol_data(iq))	/* reallocation failed */
      return anaerror("Realloc() failed in ana_floor", 0);
@@ -708,15 +708,15 @@ int ana_floor(int narg, int ps[])
  return result;
 }
 /*-----------------------------------------------------*/
-int ana_ceil(int narg, int ps[])
+Int ana_ceil(Int narg, Int ps[])
 /* returns a ANA_LONG version of the argument */
-/* each float number is transformed into the next higher integer */
-/* compare ana_long(), where each float number is transformed into the */
-/* next integer closer to zero, and ana_rfix(), where each float is */
+/* each Float number is transformed into the next higher integer */
+/* compare ana_long(), where each Float number is transformed into the */
+/* next integer closer to zero, and ana_rfix(), where each Float is */
 /* transformed into the closest integer.  LS 24may96 */
 {
- int	iq, result, n, temp, size, type;
- int	value;
+ Int	iq, result, n, temp, size, type;
+ Int	value;
  pointer	src, trgt;
 
  iq = *ps;
@@ -746,7 +746,7 @@ int ana_ceil(int narg, int ps[])
        result = iq; 
      else
        result = scalar_scratch(ANA_LONG);
-     value = (int) ceil(atof((char *) string_value(iq))); /* convert */
+     value = (Int) ceil(atof((char *) string_value(iq))); /* convert */
      if (temp) {
        free(string_value(iq));	/* change string to scalar: free up memory */
        symbol_class(result) = ANA_SCALAR;
@@ -765,7 +765,7 @@ int ana_ceil(int narg, int ps[])
      /* we can use the input symbol if it is free and if
 	it has at least as much memory as we need */
      if (temp
-	 && (int) array_type(iq) >= ANA_LONG)
+	 && (Int) array_type(iq) >= ANA_LONG)
        result = iq;
      else {
        result = array_clone(iq, ANA_LONG);
@@ -783,37 +783,37 @@ int ana_ceil(int narg, int ps[])
  switch (type) {
    case ANA_BYTE:
      while (n--)
-       *trgt.l++ = (int) *src.b++;
+       *trgt.l++ = (Int) *src.b++;
      break;
    case ANA_WORD:
      while (n--)
-       *trgt.l++ = (int) *src.w++;
+       *trgt.l++ = (Int) *src.w++;
      break;
    case ANA_LONG:
      while (n--)
-       *trgt.l++ = (int) *src.l++;
+       *trgt.l++ = (Int) *src.l++;
      break;
    case ANA_FLOAT:
      while (n--)
-       *trgt.l++ = (int) ceil(*src.f++);
+       *trgt.l++ = (Int) ceil(*src.f++);
      break;
    case ANA_DOUBLE:
      while (n--)
-       *trgt.l++ = (int) ceil(*src.d++);
+       *trgt.l++ = (Int) ceil(*src.d++);
      break;
    case ANA_CFLOAT:
      while (n--)
-       *trgt.l++ = (int) ceil(src.cf++->real);
+       *trgt.l++ = (Int) ceil(src.cf++->real);
      break;
    case ANA_CDOUBLE:
      while (n--)
-       *trgt.l++ = (int) ceil(src.cd++->real);
+       *trgt.l++ = (Int) ceil(src.cd++->real);
      break;
  }
  if (temp			/* we used input symbol to store results */
      && symbol_class(iq) == ANA_ARRAY /* it's an array */
      && array_type(iq) > ANA_LONG) { /* and bigger than we needed */
-   symbol_memory(iq) = sizeof(array) + size*sizeof(int);
+   symbol_memory(iq) = sizeof(array) + size*sizeof(Int);
    symbol_data(iq) = (array *) realloc(symbol_data(iq), symbol_memory(iq));
    if (!symbol_data(iq))	/* reallocation failed */
      return anaerror("Realloc() failed in ana_floor", 0);
@@ -822,32 +822,32 @@ int ana_ceil(int narg, int ps[])
  return result;
 }
 /*-----------------------------------------------------*/
-int ana_float(int narg, int ps[])
+Int ana_float(Int narg, Int ps[])
 /* returns a ANA_FLOAT version of the argument */
 {
   return ana_convert(narg, ps, ANA_FLOAT, 1);
 }
 /*-----------------------------------------------------*/
-int ana_double(int narg, int ps[])
+Int ana_double(Int narg, Int ps[])
 /* returns a ANA_DOUBLE version of the argument */
 {
   return ana_convert(narg, ps, ANA_DOUBLE, 1);
 }
 /*-----------------------------------------------------*/
-int ana_cfloat(int narg, int ps[])
+Int ana_cfloat(Int narg, Int ps[])
 /* returns an ANA_CFLOAT version of the argument */
 {
   return ana_convert(narg, ps, ANA_CFLOAT, 1);
 }
 /*-----------------------------------------------------*/
-int ana_cdouble(int narg, int ps[])
+Int ana_cdouble(Int narg, Int ps[])
 /* returns an ANA_CDOUBLE version of the argument */
 {
   return ana_convert(narg, ps, ANA_CDOUBLE, 1);
 }
 /*-----------------------------------------------------*/
-extern int	nFixed;
-int ana_convert(int narg, int ps[], int totype, int isFunc)
+extern Int	nFixed;
+Int ana_convert(Int narg, Int ps[], Int totype, Int isFunc)
 /* converts ps[0] to data type <totype>. */
 /* we use this function in one of two modes: function mode (isFunc != 0)
    or subroutine mode (isFunc = 0).  In function mode, there can be
@@ -859,14 +859,14 @@ int ana_convert(int narg, int ps[], int totype, int isFunc)
    arguments must be a named, writeable symbol, and we convert each
    of them in-place.  LS 16dec99 */
 {
-  int	iq, n, size, type, srcstep, trgtstep, temp, result;
+  Int	iq, n, size, type, srcstep, trgtstep, temp, result;
   char	do_realloc = 0;
   pointer	src, trgt;
   scalar	value;
   extern char	*fmt_integer, *fmt_float, *fmt_complex;
-  void	read_a_number(char **, scalar *, int *);
+  void	read_a_number(char **, scalar *, Int *);
   char *fmttok(char *);
-  int Sprintf_tok(char *, ...);
+  Int Sprintf_tok(char *, ...);
 
   while (narg--) {
     iq = *ps++;
@@ -906,23 +906,23 @@ int ana_convert(int narg, int ps[], int totype, int isFunc)
 	  switch (type) {
 	    case ANA_BYTE:
 	      fmttok(fmt_integer);
-	      Sprintf_tok(curScrat, (int) *src.b);
+	      Sprintf_tok(curScrat, (Int) *src.b);
 	      break;
 	    case ANA_WORD:
 	      fmttok(fmt_integer);
-	      Sprintf_tok(curScrat, (int) *src.w);
+	      Sprintf_tok(curScrat, (Int) *src.w);
 	      break;
 	    case ANA_LONG:
 	      fmttok(fmt_integer);
-	      Sprintf_tok(curScrat, (int) *src.l);
+	      Sprintf_tok(curScrat, (Int) *src.l);
 	      break;
 	    case ANA_FLOAT:
 	      fmttok(fmt_float);
-	      Sprintf_tok(curScrat, (double) *src.f);
+	      Sprintf_tok(curScrat, (Double) *src.f);
 	      break;
 	    case ANA_DOUBLE:
 	      fmttok(fmt_float);
-	      Sprintf_tok(curScrat, (double) *src.d);
+	      Sprintf_tok(curScrat, (Double) *src.d);
 	      break;
 	  }
 	  size = strlen(curScrat) + 1;
@@ -1011,19 +1011,19 @@ int ana_convert(int narg, int ps[], int totype, int isFunc)
 	  symbol_class(result) = ANA_SCALAR;
 	  switch (totype) {
 	    case ANA_BYTE:
-	      scalar_value(result).b = (byte) value.d;
+	      scalar_value(result).b = (Byte) value.d;
 	      break;
 	    case ANA_WORD:
-	      scalar_value(result).w = (word) value.d;
+	      scalar_value(result).w = (Word) value.d;
 	      break;
 	    case ANA_LONG:
-	      scalar_value(result).l = (int) value.d;
+	      scalar_value(result).l = (Int) value.d;
 	      break;
 	    case ANA_FLOAT:
-	      scalar_value(result).f = (float) value.d;
+	      scalar_value(result).f = (Float) value.d;
 	      break;
 	    case ANA_DOUBLE:
-	      scalar_value(result).d = (double) value.d;
+	      scalar_value(result).d = (Double) value.d;
 	      break;
 	  }
 	  scalar_type(result) = totype;
@@ -1034,23 +1034,23 @@ int ana_convert(int narg, int ps[], int totype, int isFunc)
 	  switch (type) {
 	    case ANA_BYTE:
 	      fmttok(fmt_integer);
-	      Sprintf_tok(curScrat, (int) *src.b);
+	      Sprintf_tok(curScrat, (Int) *src.b);
 	      break;
 	    case ANA_WORD:
 	      fmttok(fmt_integer);
-	      Sprintf_tok(curScrat, (int) *src.w);
+	      Sprintf_tok(curScrat, (Int) *src.w);
 	      break;
 	    case ANA_LONG:
 	      fmttok(fmt_integer);
-	      Sprintf_tok(curScrat, (int) *src.l);
+	      Sprintf_tok(curScrat, (Int) *src.l);
 	      break;
 	    case ANA_FLOAT:
 	      fmttok(fmt_float);
-	      Sprintf_tok(curScrat, (double) *src.f);
+	      Sprintf_tok(curScrat, (Double) *src.f);
 	      break;
 	    case ANA_DOUBLE:
 	      fmttok(fmt_float);
-	      Sprintf_tok(curScrat, (double) *src.d);
+	      Sprintf_tok(curScrat, (Double) *src.d);
 	      break;
 	  }
 	  if (result == iq)
@@ -1132,35 +1132,35 @@ int ana_convert(int narg, int ps[], int totype, int isFunc)
 	switch (totype) {		/* target type */
 	  case ANA_WORD:
 	    while (n--) {
-	      *trgt.w = (word) *src.b;
+	      *trgt.w = (Word) *src.b;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case ANA_LONG:
 	    while (n--) {
-	      *trgt.l = (int) *src.b;
+	      *trgt.l = (Int) *src.b;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case ANA_FLOAT:
 	    while (n--) {
-	      *trgt.f = (float) *src.b;
+	      *trgt.f = (Float) *src.b;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case ANA_DOUBLE:
 	    while (n--) {
-	      *trgt.d = (double) *src.b;
+	      *trgt.d = (Double) *src.b;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case ANA_CFLOAT:
 	    while (n--) {
-	      trgt.cf->real = (float) *src.b;
+	      trgt.cf->real = (Float) *src.b;
 	      trgt.cf->imaginary = 0.0;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
@@ -1168,7 +1168,7 @@ int ana_convert(int narg, int ps[], int totype, int isFunc)
 	    break;
 	  case ANA_CDOUBLE:
 	    while (n--) {
-	      trgt.cd->real = (double) *src.b;
+	      trgt.cd->real = (Double) *src.b;
 	      trgt.cd->imaginary = 0.0;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
@@ -1177,7 +1177,7 @@ int ana_convert(int narg, int ps[], int totype, int isFunc)
 	  case ANA_STRING_ARRAY:
 	    fmttok(fmt_integer);
 	    while (n--) {
-	      Sprintf_tok(curScrat, (int) *src.b);
+	      Sprintf_tok(curScrat, (Int) *src.b);
 	      temp = strlen(curScrat) + 1;
 	      *trgt.sp = malloc(temp);
 	      if (!*trgt.sp)
@@ -1193,35 +1193,35 @@ int ana_convert(int narg, int ps[], int totype, int isFunc)
 	switch (totype) {		/* target type */
 	  case ANA_BYTE:
 	    while (n--) {
-	      *trgt.b = (word) *src.w;
+	      *trgt.b = (Word) *src.w;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case ANA_LONG:
 	    while (n--) {
-	      *trgt.l = (word) *src.w;
+	      *trgt.l = (Word) *src.w;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case ANA_FLOAT:
 	    while (n--) {
-	      *trgt.f = (word) *src.w;
+	      *trgt.f = (Word) *src.w;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case ANA_DOUBLE:
 	    while (n--) {
-	      *trgt.d = (word) *src.w;
+	      *trgt.d = (Word) *src.w;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case ANA_CFLOAT:
 	    while (n--) {
-	      trgt.cf->real = (float) *src.w;
+	      trgt.cf->real = (Float) *src.w;
 	      trgt.cf->imaginary = 0.0;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
@@ -1229,7 +1229,7 @@ int ana_convert(int narg, int ps[], int totype, int isFunc)
 	    break;
 	  case ANA_CDOUBLE:
 	    while (n--) {
-	      trgt.cd->real = (double) *src.w;
+	      trgt.cd->real = (Double) *src.w;
 	      trgt.cd->imaginary = 0.0;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
@@ -1238,7 +1238,7 @@ int ana_convert(int narg, int ps[], int totype, int isFunc)
 	  case ANA_STRING_ARRAY:
 	    fmttok(fmt_integer);
 	    while (n--) {
-	      Sprintf_tok(curScrat, (int) *src.w);
+	      Sprintf_tok(curScrat, (Int) *src.w);
 	      temp = strlen(curScrat) + 1;
 	      *trgt.sp = malloc(temp);
 	      if (!*trgt.sp)
@@ -1254,35 +1254,35 @@ int ana_convert(int narg, int ps[], int totype, int isFunc)
 	switch (totype) {		/* target type */
 	  case ANA_BYTE:
 	    while (n--) {
-	      *trgt.b = (int) *src.l;
+	      *trgt.b = (Int) *src.l;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case ANA_WORD:
 	    while (n--) {
-	      *trgt.w = (int) *src.l;
+	      *trgt.w = (Int) *src.l;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case ANA_FLOAT:
 	    while (n--) {
-	      *trgt.f = (int) *src.l;
+	      *trgt.f = (Int) *src.l;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case ANA_DOUBLE:
 	    while (n--) {
-	      *trgt.d = (int) *src.l;
+	      *trgt.d = (Int) *src.l;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case ANA_CFLOAT:
 	    while (n--) {
-	      trgt.cf->real = (float) *src.l;
+	      trgt.cf->real = (Float) *src.l;
 	      trgt.cf->imaginary = 0.0;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
@@ -1290,7 +1290,7 @@ int ana_convert(int narg, int ps[], int totype, int isFunc)
 	    break;
 	  case ANA_CDOUBLE:
 	    while (n--) {
-	      trgt.cd->real = (double) *src.l;
+	      trgt.cd->real = (Double) *src.l;
 	      trgt.cd->imaginary = 0.0;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
@@ -1299,7 +1299,7 @@ int ana_convert(int narg, int ps[], int totype, int isFunc)
 	  case ANA_STRING_ARRAY:
 	    fmttok(fmt_integer);
 	    while (n--) {
-	      Sprintf_tok(curScrat, (int) *src.l);
+	      Sprintf_tok(curScrat, (Int) *src.l);
 	      temp = strlen(curScrat) + 1;
 	      *trgt.sp = malloc(temp);
 	      if (!*trgt.sp)
@@ -1315,35 +1315,35 @@ int ana_convert(int narg, int ps[], int totype, int isFunc)
 	switch (totype) {		/* target type */
 	  case ANA_BYTE:
 	    while (n--) {
-	      *trgt.b = (float) *src.f;
+	      *trgt.b = (Float) *src.f;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case ANA_WORD:
 	    while (n--) {
-	      *trgt.w = (float) *src.f;
+	      *trgt.w = (Float) *src.f;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case ANA_LONG:
 	    while (n--) {
-	      *trgt.l = (float) *src.f;
+	      *trgt.l = (Float) *src.f;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case ANA_DOUBLE:
 	    while (n--) {
-	      *trgt.d = (float) *src.f;
+	      *trgt.d = (Float) *src.f;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case ANA_CFLOAT:
 	    while (n--) {
-	      trgt.cf->real = (float) *src.f;
+	      trgt.cf->real = (Float) *src.f;
 	      trgt.cf->imaginary = 0.0;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
@@ -1351,7 +1351,7 @@ int ana_convert(int narg, int ps[], int totype, int isFunc)
 	    break;
 	  case ANA_CDOUBLE:
 	    while (n--) {
-	      trgt.cd->real = (double) *src.f;
+	      trgt.cd->real = (Double) *src.f;
 	      trgt.cd->imaginary = 0.0;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
@@ -1360,7 +1360,7 @@ int ana_convert(int narg, int ps[], int totype, int isFunc)
 	  case ANA_STRING_ARRAY:
 	    fmttok(fmt_float);
 	    while (n--) {
-	      Sprintf_tok(curScrat, (double) *src.f);
+	      Sprintf_tok(curScrat, (Double) *src.f);
 	      temp = strlen(curScrat) + 1;
 	      *trgt.sp = malloc(temp);
 	      if (!*trgt.sp)
@@ -1376,35 +1376,35 @@ int ana_convert(int narg, int ps[], int totype, int isFunc)
 	switch (totype) {		/* target type */
 	  case ANA_BYTE:
 	    while (n--) {
-	      *trgt.b = (double) *src.d;
+	      *trgt.b = (Double) *src.d;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case ANA_WORD:
 	    while (n--) {
-	      *trgt.w = (double) *src.d;
+	      *trgt.w = (Double) *src.d;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case ANA_LONG:
 	    while (n--) {
-	      *trgt.l = (double) *src.d;
+	      *trgt.l = (Double) *src.d;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case ANA_FLOAT:
 	    while (n--) {
-	      *trgt.f = (double) *src.d;
+	      *trgt.f = (Double) *src.d;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case ANA_CFLOAT:
 	    while (n--) {
-	      trgt.cf->real = (float) *src.d;
+	      trgt.cf->real = (Float) *src.d;
 	      trgt.cf->imaginary = 0.0;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
@@ -1412,7 +1412,7 @@ int ana_convert(int narg, int ps[], int totype, int isFunc)
 	    break;
 	  case ANA_CDOUBLE:
 	    while (n--) {
-	      trgt.cd->real = (double) *src.d;
+	      trgt.cd->real = (Double) *src.d;
 	      trgt.cd->imaginary = 0.0;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
@@ -1421,7 +1421,7 @@ int ana_convert(int narg, int ps[], int totype, int isFunc)
 	  case ANA_STRING_ARRAY:
 	    fmttok(fmt_float);
 	    while (n--) {
-	      Sprintf_tok(curScrat, (double) *src.d);
+	      Sprintf_tok(curScrat, (Double) *src.d);
 	      temp = strlen(curScrat) + 1;
 	      *trgt.sp = malloc(temp);
 	      if (!*trgt.sp)
@@ -1437,35 +1437,35 @@ int ana_convert(int narg, int ps[], int totype, int isFunc)
 	switch (totype) {
 	  case ANA_BYTE:
 	    while (n--) {
-	      *trgt.b = (byte) src.cf->real;
+	      *trgt.b = (Byte) src.cf->real;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case ANA_WORD:
 	    while (n--) {
-	      *trgt.w = (word) src.cf->real;
+	      *trgt.w = (Word) src.cf->real;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case ANA_LONG:
 	    while (n--) {
-	      *trgt.l = (int) src.cf->real;
+	      *trgt.l = (Int) src.cf->real;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case ANA_FLOAT:
 	    while (n--) {
-	      *trgt.f = (float) src.cf->real;
+	      *trgt.f = (Float) src.cf->real;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case ANA_DOUBLE:
 	    while (n--) {
-	      *trgt.d = (double) src.cf->real;
+	      *trgt.d = (Double) src.cf->real;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
@@ -1480,8 +1480,8 @@ int ana_convert(int narg, int ps[], int totype, int isFunc)
 	    break;
 	  case ANA_STRING_ARRAY:
 	    while (n--) {
-	      Sprintf(curScrat, fmt_complex, (double) src.cf->real,
-		      (double) src.cf->imaginary);
+	      Sprintf(curScrat, fmt_complex, (Double) src.cf->real,
+		      (Double) src.cf->imaginary);
 	      temp = strlen(curScrat) + 1;
 	      *trgt.sp = malloc(temp);
 	      if (!*trgt.sp)
@@ -1497,35 +1497,35 @@ int ana_convert(int narg, int ps[], int totype, int isFunc)
 	switch (totype) {
 	  case ANA_BYTE:
 	    while (n--) {
-	      *trgt.b = (byte) src.cd->real;
+	      *trgt.b = (Byte) src.cd->real;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case ANA_WORD:
 	    while (n--) {
-	      *trgt.w = (word) src.cd->real;
+	      *trgt.w = (Word) src.cd->real;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case ANA_LONG:
 	    while (n--) {
-	      *trgt.l = (int) src.cd->real;
+	      *trgt.l = (Int) src.cd->real;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case ANA_FLOAT:
 	    while (n--) {
-	      *trgt.f = (float) src.cd->real;
+	      *trgt.f = (Float) src.cd->real;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case ANA_DOUBLE:
 	    while (n--) {
-	      *trgt.d = (double) src.cd->real;
+	      *trgt.d = (Double) src.cd->real;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
@@ -1540,8 +1540,8 @@ int ana_convert(int narg, int ps[], int totype, int isFunc)
 	    break;
 	  case ANA_STRING_ARRAY:
 	    while (n--) {
-	      Sprintf(curScrat, fmt_complex, (double) src.cd->real,
-		      (double) src.cd->imaginary);
+	      Sprintf(curScrat, fmt_complex, (Double) src.cd->real,
+		      (Double) src.cd->imaginary);
 	      temp = strlen(curScrat) + 1;
 	      *trgt.sp = malloc(temp);
 	      if (!*trgt.sp)
@@ -1666,60 +1666,60 @@ int ana_convert(int narg, int ps[], int totype, int isFunc)
   return isFunc? result: ANA_OK;
 }
 /*-----------------------------------------------------*/
-int ana_byte_inplace(int narg, int ps[])
+Int ana_byte_inplace(Int narg, Int ps[])
 /* BYTE,x  converts <x> to ANA_BYTE. */
 {
   return ana_convert(narg, ps, ANA_BYTE, 0);
 }
 /*-----------------------------------------------------*/
-int ana_word_inplace(int narg, int ps[])
+Int ana_word_inplace(Int narg, Int ps[])
 /* WORD,x  converts <x> to ANA_WORD. */
 {
   return ana_convert(narg, ps, ANA_WORD, 0);
 }
 /*-----------------------------------------------------*/
-int ana_long_inplace(int narg, int ps[])
+Int ana_long_inplace(Int narg, Int ps[])
 /* LONG,x  converts <x> to ANA_LONG. */
 {
   return ana_convert(narg, ps, ANA_LONG, 0);
 }
 /*-----------------------------------------------------*/
-int ana_float_inplace(int narg, int ps[])
+Int ana_float_inplace(Int narg, Int ps[])
 /* FLOAT,x  converts <x> to ANA_FLOAT. */
 {
   return ana_convert(narg, ps, ANA_FLOAT, 0);
 }
 /*-----------------------------------------------------*/
-int ana_double_inplace(int narg, int ps[])
+Int ana_double_inplace(Int narg, Int ps[])
 /* DOUBLE,x  converts <x> to ANA_DOUBLE. */
 {
   return ana_convert(narg, ps, ANA_DOUBLE, 0);
 }
 /*-----------------------------------------------------*/
-int ana_cfloat_inplace(int narg, int ps[])
+Int ana_cfloat_inplace(Int narg, Int ps[])
 /* CFLOAT,x  converts <x> to ANA_CFLOAT. */
 {
   return ana_convert(narg, ps, ANA_CFLOAT, 0);
 }
 /*-----------------------------------------------------*/
-int ana_cdouble_inplace(int narg, int ps[])
+Int ana_cdouble_inplace(Int narg, Int ps[])
 /* CDOUBLE,x  converts <x> to ANA_CDOUBLE. */
 {
   return ana_convert(narg, ps, ANA_CDOUBLE, 0);
 }
 /*-----------------------------------------------------*/
-int ana_string_inplace(int narg, int ps[])
+Int ana_string_inplace(Int narg, Int ps[])
 /* STRING,x  converts <x> into a string form. */
 {
   return ana_convert(narg, ps, ANA_STRING_ARRAY, 0);
 }
 /*-----------------------------------------------------*/
-int get_dims(int *num, int *arg, int *dims)
+Int get_dims(Int *num, Int *arg, Int *dims)
 /* reads *num positive integers from subsequent arg[]s and puts them */
 /* in dims[]; returns the actual number of dimensions that were read
  in *num. */
 {
- int	n, iq, size, *ptr, i;
+ Int	n, iq, size, *ptr, i;
 
  n = *num;
  while (n--) {
@@ -1733,7 +1733,7 @@ int get_dims(int *num, int *arg, int *dims)
        return cerror(N_DIMS_OVR, arg[-1]);
      ptr = array_data(iq);
      *num = size;
-     memcpy(dims, ptr, size*sizeof(int));
+     memcpy(dims, ptr, size*sizeof(Int));
      for (i = 0; i < size; i++)
        if (dims[i] <= 0)
 	 return cerror(ILL_DIM, iq);
@@ -1743,12 +1743,12 @@ int get_dims(int *num, int *arg, int *dims)
  return 1;
 }
 /*-----------------------------------------------------*/
-int create_sub_ptr(int nsym, char *p, int index)
+Int create_sub_ptr(Int nsym, char *p, Int index)
 /* creates a ANA_SCAL_PTR symbol pointing at the element with
   index <index> in the array <p> with the data type
   of symbol <nsym> */
 {
- int	iq;
+ Int	iq;
 
  getFreeTempVariable(iq);
  sym[iq].class = ANA_SCAL_PTR;
@@ -1758,7 +1758,7 @@ int create_sub_ptr(int nsym, char *p, int index)
  return iq;
 }
 /*-----------------------------------------------------*/
-int ana_array_convert(pointer *q1, pointer *q2, int type1, int type2, int n)
+Int ana_array_convert(pointer *q1, pointer *q2, Int type1, Int type2, Int n)
  /* more general conversion, converts data starting at q1 of type1 to type2
          data starting at q2, n count */
  /* note that indices are bumped even when count is one */
@@ -1766,10 +1766,10 @@ int ana_array_convert(pointer *q1, pointer *q2, int type1, int type2, int n)
  switch (type2) {
    case 0: switch (type1) {
          case 0:        while (n) { *q2->b++ =  (*q1->b++);n--;} break;
-         case 1: while (n) { *q2->b++ = (byte) (*q1->w++);n--;} break;
-         case 2: while (n) { *q2->b++ = (byte) (*q1->l++);n--;} break;
-         case 3: while (n) { *q2->b++ = (byte) (*q1->f++);n--;} break;
-         case 4: while (n) { *q2->b++ = (byte) (*q1->d++);n--;} break;
+         case 1: while (n) { *q2->b++ = (Byte) (*q1->w++);n--;} break;
+         case 2: while (n) { *q2->b++ = (Byte) (*q1->l++);n--;} break;
+         case 3: while (n) { *q2->b++ = (Byte) (*q1->f++);n--;} break;
+         case 4: while (n) { *q2->b++ = (Byte) (*q1->d++);n--;} break;
          }
    case 1: switch (type1) {
          case 1: while (n) { *q2->w++ =  (*q1->w++);n--;} break;
@@ -1780,30 +1780,30 @@ int ana_array_convert(pointer *q1, pointer *q2, int type1, int type2, int n)
          }      break;
    case 2: switch (type1) {
          case 2: while (n) { *q2->l++ =  (*q1->l++);n--;} break;
-         case 1: while (n) { *q2->l++ = (int) (*q1->w++);n--;} break;
-         case 0: while (n) { *q2->l++ = (int) (*q1->b++);n--;} break;
-         case 3: while (n) { *q2->l++ = (int) (*q1->f++);n--;} break;
-         case 4: while (n) { *q2->l++ = (int) (*q1->d++);n--;} break;
+         case 1: while (n) { *q2->l++ = (Int) (*q1->w++);n--;} break;
+         case 0: while (n) { *q2->l++ = (Int) (*q1->b++);n--;} break;
+         case 3: while (n) { *q2->l++ = (Int) (*q1->f++);n--;} break;
+         case 4: while (n) { *q2->l++ = (Int) (*q1->d++);n--;} break;
          }      break;
    case 3: switch (type1) {
          case 3: while (n) { *q2->f++ =  (*q1->f++);n--;} break;
-         case 2: while (n) { *q2->f++ = (float) (*q1->l++);n--;} break;
-         case 1: while (n) { *q2->f++ = (float) (*q1->w++);n--;} break;
-         case 0: while (n) { *q2->f++ = (float) (*q1->b++);n--;} break;
-         case 4: while (n) { *q2->f++ = (float) (*q1->d++);n--;} break;
+         case 2: while (n) { *q2->f++ = (Float) (*q1->l++);n--;} break;
+         case 1: while (n) { *q2->f++ = (Float) (*q1->w++);n--;} break;
+         case 0: while (n) { *q2->f++ = (Float) (*q1->b++);n--;} break;
+         case 4: while (n) { *q2->f++ = (Float) (*q1->d++);n--;} break;
          }      break;
    case 4: switch (type1) {
          case 4: while (n) { *q2->d++ =  (*q1->d++);n--;} break;
-         case 3: while (n) { *q2->d++ = (double) (*q1->f++);n--;} break;
-         case 2: while (n) { *q2->d++ = (double) (*q1->l++);n--;} break;
-         case 1: while (n) { *q2->d++ = (double) (*q1->w++);n--;} break;
-         case 0: while (n) { *q2->d++ = (double) (*q1->b++);n--;} break;
+         case 3: while (n) { *q2->d++ = (Double) (*q1->f++);n--;} break;
+         case 2: while (n) { *q2->d++ = (Double) (*q1->l++);n--;} break;
+         case 1: while (n) { *q2->d++ = (Double) (*q1->w++);n--;} break;
+         case 0: while (n) { *q2->d++ = (Double) (*q1->b++);n--;} break;
          }      break;
   }
  return 1;
  }
 /*-----------------------------------------------------*/
-int redef_scalar(int nsym, int ntype, void *val)
+Int redef_scalar(Int nsym, Int ntype, void *val)
 /* redefine symbol nsym to be a scalar of type ntype with value *val */
 {
   wideScalar	*value;
@@ -1851,7 +1851,7 @@ int redef_scalar(int nsym, int ntype, void *val)
   return ANA_OK;
 }
 /*-----------------------------------------------------*/
-int redef_string(int nsym, int len)
+Int redef_string(Int nsym, Int len)
 /* redefine symbol nsym to be a string with length len (excluding \0) */
 {
  undefine(nsym);
@@ -1862,11 +1862,11 @@ int redef_string(int nsym, int len)
  return 1;
 }
 /*-----------------------------------------------------*/
-int redef_array(int nsym, int ntype, int ndim, int *dims)
+Int redef_array(Int nsym, Int ntype, Int ndim, Int *dims)
 /* redefines symbol nsym to be an array of the given type, number of
   dimensions, and dimensions; or a scalar if <ndim> == 0 */
 {                                /*redefine a symbol i to an array */
-  int   mq, j;
+  Int   mq, j;
   array	*h;
   pointer	p;
 
@@ -1897,7 +1897,7 @@ int redef_array(int nsym, int ntype, int ndim, int *dims)
   h = array_header(nsym);
   h->ndim = ndim;
   h->c1 = 0; h->c2 = 0; h->nfacts = 0;
-  memcpy(h->dims, dims, ndim*sizeof(int));
+  memcpy(h->dims, dims, ndim*sizeof(Int));
   h->facts = NULL;                      /* no known facts */
   if (ntype == ANA_STRING_ARRAY) {
     /* a string array: set all elements to NULL */
@@ -1909,10 +1909,10 @@ int redef_array(int nsym, int ntype, int ndim, int *dims)
   return 1;
 }
 /*-----------------------------------------------------*/
-int redef_array_extra_dims(int tgt, int src, enum Symboltype type, int ndim, int *dims)
+Int redef_array_extra_dims(Int tgt, Int src, enum Symboltype type, Int ndim, Int *dims)
 {
-  int *srcdims, srcndim;
-  int tgtdims[MAX_DIMS];
+  Int *srcdims, srcndim;
+  Int tgtdims[MAX_DIMS];
 
   if (!symbolIsModifiable(tgt))
     return cerror(NEED_NAMED, tgt);
@@ -1928,80 +1928,80 @@ int redef_array_extra_dims(int tgt, int src, enum Symboltype type, int ndim, int
   return redef_array(tgt, type, ndim, tgtdims);
 }
 /*-----------------------------------------------------*/
-int bytarr(int narg, int ps[])
+Int bytarr(Int narg, Int ps[])
 /* create an array of I*1 elements */
 {
- int	dims[MAX_DIMS];
+ Int	dims[MAX_DIMS];
 
  if (get_dims(&narg, ps, dims) != 1)
    return ANA_ERROR;
  return array_scratch(ANA_BYTE, narg, dims);
 }
 /*-----------------------------------------------------*/
-int intarr(int narg, int ps[])
+Int intarr(Int narg, Int ps[])
 /* create an array of I*2 elements */
 {
- int	dims[MAX_DIMS];
+ Int	dims[MAX_DIMS];
 
  if (get_dims(&narg, ps, dims) != 1)
    return ANA_ERROR;
  return array_scratch(ANA_WORD, narg, dims);
 }
 /*-----------------------------------------------------*/
-int lonarr(int narg, int ps[])
+Int lonarr(Int narg, Int ps[])
 /* create an array of I*4 elements */
 {
- int	dims[MAX_DIMS];
+ Int	dims[MAX_DIMS];
 
  if (get_dims(&narg, ps, dims) != 1)
    return ANA_ERROR;
  return array_scratch(ANA_LONG, narg, dims);
 }
 /*-----------------------------------------------------*/
-int fltarr(int narg, int ps[])
+Int fltarr(Int narg, Int ps[])
 /* create an array of F*4 elements */
 {
- int	dims[MAX_DIMS];
+ Int	dims[MAX_DIMS];
 
  if (get_dims(&narg, ps, dims) != 1)
    return ANA_ERROR;
  return array_scratch(ANA_FLOAT, narg, dims);
 }
 /*-----------------------------------------------------*/
-int dblarr(int narg, int ps[])
+Int dblarr(Int narg, Int ps[])
 /* create an array of I*1 elements */
 {
- int	dims[MAX_DIMS];
+ Int	dims[MAX_DIMS];
 
  if (get_dims(&narg, ps, dims) != 1)
    return ANA_ERROR;
  return array_scratch(ANA_DOUBLE, narg, dims);
 }
 /*-----------------------------------------------------*/
-int cfltarr(int narg, int ps[])
+Int cfltarr(Int narg, Int ps[])
 /* create a CFLOAT array */
 {
-  int	dims[MAX_DIMS];
+  Int	dims[MAX_DIMS];
 
   if (get_dims(&narg, ps, dims) != 1)
     return ANA_ERROR;
   return array_scratch(ANA_CFLOAT, narg, dims);
 }
 /*-----------------------------------------------------*/
-int cdblarr(int narg, int ps[])
+Int cdblarr(Int narg, Int ps[])
 /* create a CDOUBLE array */
 {
-  int	dims[MAX_DIMS];
+  Int	dims[MAX_DIMS];
 
   if (get_dims(&narg, ps, dims) != 1)
     return ANA_ERROR;
   return array_scratch(ANA_CDOUBLE, narg, dims);
 }
 /*-----------------------------------------------------*/
-int strarr(int narg, int ps[])
+Int strarr(Int narg, Int ps[])
 /* create an array of NULL string pointers */
 {
- int	dims[MAX_DIMS], iq, size, n;
+ Int	dims[MAX_DIMS], iq, size, n;
  char	**ptr;
 
  size = ps[0]? int_arg(ps[0]): 0;
@@ -2024,12 +2024,12 @@ int strarr(int narg, int ps[])
  return iq;
 }
 /*-----------------------------------------------------*/
-int show_routine(internalRoutine *table, int tableLength, int narg, int ps[])
+Int show_routine(internalRoutine *table, Int tableLength, Int narg, Int ps[])
 /* shows all routine names that contain a specified substring,
  or all of them */
 {
- extern int	uTermCol;
- int	i, nOut = 0, nLine = uTermCol/16;
+ extern Int	uTermCol;
+ Int	i, nOut = 0, nLine = uTermCol/16;
  char	*chars, *p;
  char	*name, **ptr;
  keyList	*keys;
@@ -2079,23 +2079,23 @@ int show_routine(internalRoutine *table, int tableLength, int narg, int ps[])
  return 1;
 }
 /*-----------------------------------------------------*/
-int ana_show_subr(int narg, int ps[])
+Int ana_show_subr(Int narg, Int ps[])
 {
  return show_routine(subroutine, nSubroutine, narg, ps);
 }
 /*-----------------------------------------------------*/
-int ana_show_func(int narg, int ps[])
+Int ana_show_func(Int narg, Int ps[])
 {
  return show_routine(function, nFunction, narg, ps);
 }
 /*-----------------------------------------------------*/
-int ana_switch(int narg, int ps[])
+Int ana_switch(Int narg, Int ps[])
 /* switches identity of two symbols.  We cannot just swap the names
    because then the connection between a particular name and a
    particular symbol number is broken.  We must swap the values instead.
    LS 9nov98 9oct2010*/
 {
- int	sym1, sym2;
+ Int	sym1, sym2;
  symTableEntry	temp1, temp2;
 
  sym1 = ps[0];
@@ -2137,10 +2137,10 @@ int ana_switch(int narg, int ps[])
  return 1;
 } 
 /*-----------------------------------------------------*/
-int ana_array(int narg, int ps[])
+Int ana_array(Int narg, Int ps[])
 /* create an array of the specified type and dimensions */
 {
- int	dims[MAX_DIMS], type;
+ Int	dims[MAX_DIMS], type;
 
  narg--;
  type = int_arg(*ps);
@@ -2153,11 +2153,11 @@ int ana_array(int narg, int ps[])
  return array_scratch(type, narg, dims);
 }
 /*-----------------------------------------------------*/
-int ana_assoc(int narg, int ps[])
+Int ana_assoc(Int narg, Int ps[])
 /* returns an associated variable.
   syntax: assoc(lun, array [, offset]) */
 {
- int	lun, result, iq, size;
+ Int	lun, result, iq, size;
  array	*h;
 
  lun = int_arg(*ps);
@@ -2169,7 +2169,7 @@ int ana_assoc(int narg, int ps[])
  sym[result].line = curLineNumber;
  h = HEAD(iq);
  size = sizeof(array);
- if (narg >= 3) size += sizeof(int);
+ if (narg >= 3) size += sizeof(Int);
  if (!(sym[result].spec.array.ptr = (array *) Malloc(size)))
    return cerror(ALLOC_ERR, iq);
  sym[result].spec.array.bstore = size;
@@ -2185,13 +2185,13 @@ int ana_assoc(int narg, int ps[])
  return result;
 }
 /*-----------------------------------------------------*/
-int ana_rfix(int narg, int ps[])
+Int ana_rfix(Int narg, Int ps[])
 /* returns an I*4 version of the argument, rounded to the nearest
  integer if necessary */
 {
- int	nsym, type, size, *trgt, i, result;
+ Int	nsym, type, size, *trgt, i, result;
  pointer	src;
- double	temp;
+ Double	temp;
  array	*h;
 
  nsym = *ps;
@@ -2212,41 +2212,41 @@ int ana_rfix(int narg, int ps[])
  		/* now convert */
  switch (type)
  { case ANA_BYTE:
-     while (size--) *trgt++ = (int) *src.b++;  break;
+     while (size--) *trgt++ = (Int) *src.b++;  break;
    case ANA_WORD:
-     while (size--) *trgt++ = (int) *src.w++;  break;
+     while (size--) *trgt++ = (Int) *src.w++;  break;
    case ANA_FLOAT:
      while (size--)
-     { *trgt++ = (int) (*src.f + ((*src.f >= 0)? 0.5: -0.5));
+     { *trgt++ = (Int) (*src.f + ((*src.f >= 0)? 0.5: -0.5));
        src.f++; }
      break;
    case ANA_DOUBLE:
      while (size--)
-     {*trgt++ = (int) (*src.d + ((*src.d >= 0)? 0.5: -0.5));
+     {*trgt++ = (Int) (*src.d + ((*src.d >= 0)? 0.5: -0.5));
       src.d++; }
      break; }
  return result;
 }
 /*-----------------------------------------------------*/
-int ana_echo(int narg, int ps[])
+Int ana_echo(Int narg, Int ps[])
 /* turn on echoing of input lines from non-keyboard sources */
 {
- extern int	echo;
+ extern Int	echo;
  
  if (narg >= 1) echo = int_arg(*ps); else echo = 1;
  return 1;
 }
 /*-----------------------------------------------------*/
-int ana_noecho(int narg, int ps[])
+Int ana_noecho(Int narg, Int ps[])
 /* turn on echoing of input lines from non-keyboard sources */
 {
- extern int	echo;
+ extern Int	echo;
 
  echo = 0;
  return 1;
 }
 /*-----------------------------------------------------*/
-int ana_batch(int narg, int ps[])
+Int ana_batch(Int narg, Int ps[])
 /* turn on/off batch mode */
 {
  extern char	batch;
@@ -2258,7 +2258,7 @@ int ana_batch(int narg, int ps[])
 /*-----------------------------------------------------*/
 FILE	*recordFile = NULL;
 extern char	recording;
-int ana_record(int narg, int ps[])
+Int ana_record(Int narg, Int ps[])
  /* start/stop recording. */
  /* Syntax:  RECORD [,file] [,/RESET,/INPUT,/OUTPUT] */
 {
@@ -2311,10 +2311,10 @@ int ana_record(int narg, int ps[])
   return 1;
 }
 /*-------------------------------------------------------------------------*/
-int step = 0;
-int ana_step(int narg, int ps[])
+Int step = 0;
+Int ana_step(Int narg, Int ps[])
 {
-  int	i = 1;
+  Int	i = 1;
 
   if (narg) i = int_arg(*ps);
   if (i) { step = i;  printf("Commence stepping at level %d\n", step); }
@@ -2322,11 +2322,11 @@ int ana_step(int narg, int ps[])
   return 1;
 }
 /*-------------------------------------------------------------------------*/
-int ana_varname(int narg, int ps[])
+Int ana_varname(Int narg, Int ps[])
 /* returns the name of the variable */
 {
   char	*name;
-  int	iq;
+  Int	iq;
 
   name = varName(*ps);
   iq = string_scratch(strlen(name));
@@ -2334,7 +2334,7 @@ int ana_varname(int narg, int ps[])
   return iq;
 }
 /*-------------------------------------------------------------------------*/
-int namevar(int symbol, int safe)
+Int namevar(Int symbol, Int safe)
 /* if safe == 0: returns the variable that goes with the name string */
 /* in the current context, or an error if not found. */
 /* if safe == 1: as for safe == 0, but if not found and if at main level */
@@ -2343,16 +2343,16 @@ int namevar(int symbol, int safe)
 /* if safe == 3: as for safe == 1, but search and create at main level. */
 {
   char	*name;
-  int	iq, context;
+  Int	iq, context;
 
   if (symbol_class(symbol) != ANA_STRING)
     return cerror(NEED_STR, symbol);
   name = string_value(symbol);
   strcpy(line, name);
-  if (!isalpha((byte) *name) && *name != '$' && *name != '!')
+  if (!isalpha((Byte) *name) && *name != '$' && *name != '!')
     return anaerror("Illegal symbol name: %s", symbol, name);
   for (name = line; *name; name++)
-  { if (!isalnum((byte) *name))
+  { if (!isalnum((Byte) *name))
     return anaerror("Illegal symbol name: %s", symbol, name);
     *name = toupper(*name); }
   safe = safe & 3;
@@ -2370,7 +2370,7 @@ int namevar(int symbol, int safe)
   return iq;
 }
 /*-------------------------------------------------------------------------*/
-char *keyName(internalRoutine *routine, int number, int index)
+char *keyName(internalRoutine *routine, Int number, Int index)
 /* returns the name of the <index>th positional keyword of <routine> */
 /* #<number>.  LS 19jan95 */
 {
@@ -2383,7 +2383,7 @@ char *keyName(internalRoutine *routine, int number, int index)
   keys = list->keys;
   if (index < 0) return "(unnamed)";	/* before first named key */
   while (*keys && index)
-  { if (!isdigit((int) **keys)) index--;
+  { if (!isdigit((Int) **keys)) index--;
     keys++; }
   if (index) return "(unnamed)";	/* beyond last key */
   return *keys;
@@ -2400,21 +2400,21 @@ void checkErrno(void)
 }
 /*-------------------------------------------------------------------------*/
 char	allowPromptInInput = 1; /* default */
-int ana_set(int narg, int ps[])
+Int ana_set(Int narg, Int ps[])
 /* SET[,/SHOWALLOC,/WHITEBACKGROUND,/INVIMCOORDS,/SET,/RESET,/ZOOM]
  governs aspects of the behaviour of various routines.  LS 11mar98 */
 {
-  extern int	setup;
+  extern Int	setup;
 #ifdef X11
   char	*string;
   char	*visualNames[] = { "StaticGray", "StaticColor", "TrueColor",
 			   "GrayScale", "PseudoColor", "DirectColor",
 			   "SG", "SC", "TC", "GS", "PC", "DC",
 			   "GSL", "CSL", "CSI", "GDL", "CDL", "CDI" };
-  int	visualClassCode[] = { StaticGray, StaticColor, TrueColor,
+  Int	visualClassCode[] = { StaticGray, StaticColor, TrueColor,
 			      GrayScale, PseudoColor, DirectColor };
-  int	setup_x_visual(int), i;
-  extern int	connect_flag;
+  Int	setup_x_visual(Int), i;
+  extern Int	connect_flag;
   extern Visual	*visual;
 #endif
 
@@ -2489,7 +2489,7 @@ int ana_set(int narg, int ps[])
   return ANA_ONE;
 }
 /*-------------------------------------------------------------------------*/
-void zapTemp(int symbol)
+void zapTemp(Int symbol)
 /* zaps <symbol> only if it is a temporary variable */
 /* and if its context is equal to -compileLevel */
 {
@@ -2500,10 +2500,10 @@ void zapTemp(int symbol)
     updateIndices(); }
 }
 /*-------------------------------------------------------------------------*/
-int copyEvalSym(int source)
+Int copyEvalSym(Int source)
   /* evaluates <source> and returns it in a temp */
 {
-  int	result, target;
+  Int	result, target;
 
   result = eval(source);
   if (result < 0) return -1;	/* some error */
@@ -2519,12 +2519,12 @@ int copyEvalSym(int source)
   return target;
 }
 /*-------------------------------------------------------------------------*/
-int (*ana_converts[10])(int, int []) = {
+Int (*ana_converts[10])(Int, Int []) = {
   ana_byte, ana_word, ana_long, ana_float, ana_double, ana_string,
   ana_string, ana_string, ana_cfloat, ana_cdouble
 };
-int getNumerical(int iq, int minType, int *n, pointer *src, char mode,
-		 int *result, pointer *trgt)
+Int getNumerical(Int iq, Int minType, Int *n, pointer *src, char mode,
+		 Int *result, pointer *trgt)
 /* gets pointer to and size of the data in numerical argument <iq>.
    returns pointer in <*src>, number of elements in <*n>.
 
@@ -2548,7 +2548,7 @@ int getNumerical(int iq, int minType, int *n, pointer *src, char mode,
 
    LS 19nov98 */
 {
-  int	type;
+  Int	type;
 
   if (!symbolIsNumerical(iq))
     return cerror(ILL_CLASS, iq);
@@ -2575,11 +2575,11 @@ int getNumerical(int iq, int minType, int *n, pointer *src, char mode,
 	*result = iq;
       break;
     case ANA_ARRAY: case ANA_CARRAY:
-      (*src).b = (byte *) array_data(iq);
+      (*src).b = (Byte *) array_data(iq);
       *n = array_size(iq);
       if (trgt) {
 	*result = array_clone(iq, type);
-	(*trgt).b = (byte *) array_data(*result);
+	(*trgt).b = (Byte *) array_data(*result);
       } else if (result)
 	*result = iq;
       break;
@@ -2598,7 +2598,7 @@ int getNumerical(int iq, int minType, int *n, pointer *src, char mode,
   return 1;
 }  
 /*-------------------------------------------------------------------------*/
-int getSimpleNumerical(int iq, pointer *data, int *nelem)
+Int getSimpleNumerical(Int iq, pointer *data, Int *nelem)
 /* returns pointer in <*data> to data in symbol <iq>, and in <*nelem> the
    number of data elements, and 1 as function return value, if <iq>
    is of numerical type.  Otherwise, returns -1 as function value, 0 in
@@ -2622,9 +2622,9 @@ int getSimpleNumerical(int iq, pointer *data, int *nelem)
   return 1;
 }
 /*-------------------------------------------------------------------------*/
-int file_map_size(int symbol)
+Int file_map_size(Int symbol)
 {
- int	i, n, *p, size;
+ Int	i, n, *p, size;
 
   p = file_map_dims(symbol);
   n = file_map_num_dims(symbol);
@@ -2634,7 +2634,7 @@ int file_map_size(int symbol)
   return size;
 }
 /*-------------------------------------------------------------------------*/
-int ana_pointer(int narg, int ps[])
+Int ana_pointer(Int narg, Int ps[])
 /* POINTER,pointer,target [,/FUNCTION, /SUBROUTINE, /INTERNAL, /MAIN] */
 /* makes named variable */
 /* <pointer> point at named variable <target>.  If <pointer> is a pointer */
@@ -2642,7 +2642,7 @@ int ana_pointer(int narg, int ps[])
 /* place.  <target> may be an expression as long as it evaluates to a */
 /* named variable.  LS 11feb97 */
 {
-  int	iq;
+  Int	iq;
   char	*name, *name2, *p;
   
   if (ps[0] >= TEMPS_START)
@@ -2704,7 +2704,7 @@ int ana_pointer(int narg, int ps[])
   return 1;
 }
 /*-------------------------------------------------------------------------*/
-int ana_symbol(int narg, int ps[])
+Int ana_symbol(Int narg, Int ps[])
 /* SYMBOL('name') returns the variable with the <name> in the current */
 /* context, or if not found and if at the main level, then creates */
 /* such a variable and returns it.  SYMBOL('name',/MAIN) checks */
@@ -2713,7 +2713,7 @@ int ana_symbol(int narg, int ps[])
   return namevar(ps[0], (internalMode & 1) == 1? 3: 1);
 }
 /*-------------------------------------------------------------------------*/
-int stringpointer(char *name, int type)
+Int stringpointer(char *name, Int type)
 /* seeks <name> as user-defined function (SP_USER_FUNC), user-defined */
 /* subroutine (SP_USER_SUBR), variable (SP_VAR), internal function */
 /* (SP_INT_FUNC), or internal subroutine (SP_INT_SUBR).  Also: */
@@ -2721,7 +2721,7 @@ int stringpointer(char *name, int type)
 /* (SP_SUBR = SP_USER_SUBR then SP_INT_SUBR), and any at all (SP_ANY). */
 /* LS 1apr97 */
 {
-  int	n;
+  Int	n;
   char	*p;
 
   allocate(p, strlen(name) + 1, char);
@@ -2768,11 +2768,11 @@ int stringpointer(char *name, int type)
   return -1;			/* not found */
 }
 /*-------------------------------------------------------------------------*/
-int ana_show_temps(int narg, int ps[])
+Int ana_show_temps(Int narg, Int ps[])
 /* a routine for debugging ANA.  It shows the temporary variables that */
 /* are currently defined.  LS 2mar97 */
 {
-  int	i;
+  Int	i;
 
   setPager(0);
   for (i = TEMPS_START; i < TEMPS_END; i++) {
@@ -2785,7 +2785,7 @@ int ana_show_temps(int narg, int ps[])
   return 1;
 }
 /*-------------------------------------------------------------------------*/
-int routineContext(int nsym)
+Int routineContext(Int nsym)
 /* returns the number of the user-defined subroutine or function that
    symbol <nsym> is in, or 0 if at the main level.  LS 18apr97 */
 {
@@ -2838,7 +2838,7 @@ int routineContext(int nsym)
 /*-------------------------------------------------------------------------*/
 #define isodigit(x) (isdigit(x) && x < '8')
  
-void read_a_number(char **buf, scalar *value, int *type)
+void read_a_number(char **buf, scalar *value, Int *type)
 /* reads the number at <*buf>, puts it in <*value> and its data type
    in <*type>, and modifies <*buf> to point just after the detected
    value.  NOTE: if the type is integer (BYTE, WORD, LONG), then the
@@ -2850,13 +2850,13 @@ void read_a_number(char **buf, scalar *value, int *type)
    exactly to the <*type>: e.g., a BYTE number gets its value returned
    in value->l and *type set to ANA_BYTE.  LS 17sep98 */
 {
-  int	base = 10, kind, sign;
+  Int	base = 10, kind, sign;
   char	*p, *numstart, c, ce, *p2;
 
   p = *buf;
   *type = ANA_LONG;		/* default */
   /* skip whitespace */
-  while (!isdigit((int) *p) && !strchr("+-.", (int) *p))
+  while (!isdigit((Int) *p) && !strchr("+-.", (Int) *p))
     p++;
 
   /* skip sign, if any */
@@ -2878,7 +2878,7 @@ void read_a_number(char **buf, scalar *value, int *type)
   /* character; <c> contains the last read character, which must match */
   /* one of the characters just after a vertical bar. */
 
-  while (isodigit((int) *p))
+  while (isodigit((Int) *p))
     p++;
   
   /* ooo|O[{BWLI}] */
@@ -2901,7 +2901,7 @@ void read_a_number(char **buf, scalar *value, int *type)
 	   ^ we are here */
   } else
     /* skip remaining digits, if any */
-    while (isdigit((int) *p))
+    while (isdigit((Int) *p))
       p++;
 
   /* oooO|{BWLI} */
@@ -2925,7 +2925,7 @@ void read_a_number(char **buf, scalar *value, int *type)
 	/* 0|X[hhh][{WLI}] */
 	/*  ^ we are here */
 	p++;
-	while (isxdigit((int) *p))
+	while (isxdigit((Int) *p))
 	  p++;
 	base = 16;
 	/*  0X[hhh]|[{WLI}] */
@@ -2944,17 +2944,17 @@ void read_a_number(char **buf, scalar *value, int *type)
       numstart = p;
       /* ddd{SH}|[ddd:]*[ddd][.ddd][{DE}][I] */
       /*        ^ we are here */
-      while (isdigit((int) *p)) {
-	while (isdigit((int) *p))
+      while (isdigit((Int) *p)) {
+	while (isdigit((Int) *p))
 	  p++;
 	/* ddd{SH}ddd|:[ddd:]*[ddd][.ddd][{DE}][I] */
 	/* ddd{SH}ddd|.[ddd][{DE}][I] */
 	/* ddd{SH}ddd|{DE}[I] */
 	/* ddd{SH}ddd|I */
 	/*           ^ we are here */
-	if (*p == '.') {	/* a float number: the last entry */
+	if (*p == '.') {	/* a Float number: the last entry */
 	  p++;
-	  while (isdigit((int) *p)) /* find the rest */
+	  while (isdigit((Int) *p)) /* find the rest */
 	    p++;
 	  /* ddd{SH}[ddd:]*[ddd][.ddd]|[{DE}][I] */
 	  /*                          ^ we are here */
@@ -3002,7 +3002,7 @@ void read_a_number(char **buf, scalar *value, int *type)
       /*    ^ we are here */
       if (*p == '.') {
 	p++;			/* skip . */
-	while (isdigit((int) *p))
+	while (isdigit((Int) *p))
 	  p++;
       }
       /* ddd.[ddd]|[I] */
@@ -3029,7 +3029,7 @@ void read_a_number(char **buf, scalar *value, int *type)
 	/* ddd.[ddd]{DE}[[{+-}|ddd][I] */
 	/*      .ddd{DE}[[{+-}|ddd][I] */
 	/*                    ^ we are here */
-	while (isdigit((int) *p))
+	while (isdigit((Int) *p))
 	  p++;
 	kind = toupper(*p);
       }
@@ -3059,7 +3059,7 @@ void read_a_number(char **buf, scalar *value, int *type)
   *p = '\0';			/* temporary end */
   /* NOTE: have to use strtoul() instead of strtol() because strtol() */
   /* -- at least on SGI Irix6.3 -- does not accept numbers with their most */
-  /* significant byte set (such as 0xc9460fc0), even though printf() */
+  /* significant Byte set (such as 0xc9460fc0), even though printf() */
   /* has no trouble generating such numbers.  I.e., t,'%x',-0x35b9f040 */
   /* yielded c9460fd0 but t,'%x',0xc9460fd0 when using strtol() yields */
   /* 0xffffffff.  LS 11nov99 */
@@ -3090,7 +3090,7 @@ void read_a_number(char **buf, scalar *value, int *type)
   *buf = p;
 }
 /*-------------------------------------------------------------------------*/
-void read_a_number_fp(FILE *fp, scalar *value, int *type)
+void read_a_number_fp(FILE *fp, scalar *value, Int *type)
 /* reads the number at <*fp>, puts it in <*value> and its data type
    in <*type>.  Other than the source of the data, exactly the same as
    read_a_number().
@@ -3104,7 +3104,7 @@ void read_a_number_fp(FILE *fp, scalar *value, int *type)
    in value->l and *type set to ANA_BYTE.  LS 17sep98 */
 /* Fixed reading of numbers with exponents.  LS 11jul2000 */
 {
-  int	base = 10, kind, sign, ch;
+  Int	base = 10, kind, sign, ch;
   char	*p, *numstart;
 
   *type = ANA_LONG;		/* default */
@@ -3129,7 +3129,7 @@ void read_a_number_fp(FILE *fp, scalar *value, int *type)
   *p++ = ch;
   do
     *p++ = nextchar(fp);
-  while (isodigit((int) p[-1]));
+  while (isodigit((Int) p[-1]));
   ch = p[-1];
 
   if (ch == EOF) {
@@ -3147,7 +3147,7 @@ void read_a_number_fp(FILE *fp, scalar *value, int *type)
     /* read remaining digits, if any */
     do
       *p++ = nextchar(fp);
-    while (isdigit((int) p[-1]));
+    while (isdigit((Int) p[-1]));
     ch = p[-1];
   }
 		   
@@ -3158,7 +3158,7 @@ void read_a_number_fp(FILE *fp, scalar *value, int *type)
       if (p == numstart + 2 && numstart[0] == '0') { /* yes, a hex number */
 	do
 	  *p++ = nextchar(fp);
-	while (isxdigit((int) p[-1]));
+	while (isxdigit((Int) p[-1]));
 	ch = p[-1];
 	base = 16;
       } /* else we're already at the end of the non-hex number */
@@ -3173,7 +3173,7 @@ void read_a_number_fp(FILE *fp, scalar *value, int *type)
       base = 0;			/* count the number of elements */
       ch = nextchar(fp);
       if (ch == EOF) {
-	value->l = (int) value->d;
+	value->l = (Int) value->d;
 	return;
       }
       while (isdigit(ch)) {
@@ -3181,14 +3181,14 @@ void read_a_number_fp(FILE *fp, scalar *value, int *type)
 	  *p++ = ch;
 	  ch = nextchar(fp);
 	  if (ch == EOF) {
-	    value->l = (int) value->d;
+	    value->l = (Int) value->d;
 	    return;
 	  }
 	}
-	if (ch == '.') {	/* a float number: the last entry */
+	if (ch == '.') {	/* a Float number: the last entry */
 	  do
 	    *p++ = nextchar(fp);
-	  while (isdigit((int) p[-1])); /* find the rest */
+	  while (isdigit((Int) p[-1])); /* find the rest */
 	  *p = '\0';		/* temporary termination */
 	  value->d *= 60;
 	  value->d += atof(numstart);
@@ -3222,7 +3222,7 @@ void read_a_number_fp(FILE *fp, scalar *value, int *type)
       if (ch == '.') {
 	do
 	  *p++ = nextchar(fp);
-	while (isdigit((int) p[-1]));
+	while (isdigit((Int) p[-1]));
       }
       kind = toupper(p[-1]);
       *type = ANA_FLOAT;	/* default */
@@ -3238,7 +3238,7 @@ void read_a_number_fp(FILE *fp, scalar *value, int *type)
 	  unnextchar(ch, fp);
 	do
 	  *p++ = nextchar(fp);
-	while (isdigit((int) p[-1]));
+	while (isdigit((Int) p[-1]));
 	kind = toupper(p[-1]); /* must look for I */
       }
       *p = '\0';		/* temporary end */
@@ -3263,7 +3263,7 @@ void read_a_number_fp(FILE *fp, scalar *value, int *type)
   p[-1] = '\0';			/* temporary end */
   /* NOTE: have to use strtoul() instead of strtol() because strtol() */
   /* -- at least on SGI Irix6.3 -- does not accept numbers with their most */
-  /* significant byte set (such as 0xc9460fc0), even though printf() */
+  /* significant Byte set (such as 0xc9460fc0), even though printf() */
   /* has no trouble generating such numbers.  I.e., t,'%x',-0x35b9f040 */
   /* yielded c9460fd0 but t,'%x',0xc9460fd0 when using strtol() yields */
   /* 0xffffffff.  LS 11nov99 */
@@ -3289,13 +3289,13 @@ void read_a_number_fp(FILE *fp, scalar *value, int *type)
 }
 /*-------------------------------------------------------------------------*/
 #ifdef FACTS
-void *seekFacts(int symbol, int type, int flag)
+void *seekFacts(Int symbol, Int type, Int flag)
 /* seeks facts of the indicated <type> and <flag> associated with the */
 /* <symbol>. */
 /* Returns a pointer to the facts, if found, or else returns NULL. */
 /* LS 6apr99 */
 {
-  byte	n;
+  Byte	n;
   arrayFacts	*facts;
 
   if (!symbolIsNumericalArray(symbol) /* not a numerical symbol */
@@ -3312,7 +3312,7 @@ void *seekFacts(int symbol, int type, int flag)
   return NULL;
 }
 /*-------------------------------------------------------------------------*/
-void *setFacts(int symbol, int type, int flag)
+void *setFacts(Int symbol, Int type, Int flag)
 /* seeks facts of the indicated <type> associated with the <symbol>. */
 /* Returns a pointer to the facts, if found.  Otherwise, allocates a */
 /* new slot for the facts and returns a pointer to it. */
@@ -3320,7 +3320,7 @@ void *setFacts(int symbol, int type, int flag)
 /* Returns NULL if unsucessful.  LS 6apr99 */
 {
   arrayFacts	*facts;
-  int	n;
+  Int	n;
 
   if (!symbolIsNumericalArray(symbol)) /* not a numerical symbol */
     return NULL;
@@ -3350,9 +3350,9 @@ void *setFacts(int symbol, int type, int flag)
   return facts;			/* pointer to the last one */
 }
 /*-------------------------------------------------------------------------*/
-void deleteFacts(int symbol, int type)
+void deleteFacts(Int symbol, Int type)
 {
-  int	n, nf;
+  Int	n, nf;
   arrayFacts	*facts;
 
   if (!symbolIsNumericalArray(symbol))
@@ -3400,19 +3400,19 @@ char *strsave_system(char *str)
 /* push value <x> unto the stack, and call pop() to pop the top element */
 /* from the stack.  When pop() returns the sentinel value, then the */
 /* stack is empty.  Call deleteStack() to properly clean up. */
-static int *stack, stack_sentinel;
-void newStack(int sentinel)
+static Int *stack, stack_sentinel;
+void newStack(Int sentinel)
 {
-  stack = (int *) curScrat;
+  stack = (Int *) curScrat;
   *stack++ = stack_sentinel = sentinel;
 }
 /*-----------------------------------------------------*/
-void push(int value)
+void push(Int value)
 {
   *stack++ = value;
 }
 /*-----------------------------------------------------*/
-int pop(void)
+Int pop(void)
 {
   return *--stack;
 }
@@ -3428,13 +3428,13 @@ static struct {
   char *ptr;
 } keyboard = { NULL, NULL };
 
-int nextchar(FILE *fp) {
+Int nextchar(FILE *fp) {
   /* returns the next char from the indicated file pointer */
   /* if fp == stdin (i.e., reading from the keyboard), then a special */
   /* data input buffer is used, with all command line editing except */
   /* history buffer stuff enabled.  This can be used as an alternative */
   /* for fgetc(). LS 29mar2001 */
-  int getNewLine(char *, char *, char);
+  Int getNewLine(char *, char *, char);
 
   if (fp == stdin) {
     if (!keyboard.ptr) {
@@ -3446,7 +3446,7 @@ int nextchar(FILE *fp) {
       if (keyboard.ptr == keyboard.buffer) /* we must ask for more */
 	while (!*keyboard.ptr) {
 	  FILE *is;
-          int getNewLine(char *, char *, char);
+          Int getNewLine(char *, char *, char);
 	  is = inputStream;
 	  inputStream = stdin;
 	  getNewLine(keyboard.buffer, "dat>", 0);
@@ -3465,7 +3465,7 @@ int nextchar(FILE *fp) {
     return fgetc(fp);
 }
 /*------------------------------------------------------------------------- */
-int unnextchar(int c, FILE *fp) {
+Int unnextchar(Int c, FILE *fp) {
   /* push-back analogon to nextchar().  Can be used instead of ungetc(). */
   /* LS 29mar2001 */
   if (fp == stdin) {

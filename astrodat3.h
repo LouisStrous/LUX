@@ -1,4 +1,4 @@
-struct moonlrTerm { int d; int m; int mm; int f; int l; int r; }
+struct moonlrTerm { Int d; Int m; Int mm; Int f; Int l; Int r; }
 moonlr[] = {
   { 0,0,1,0,6288774,-20905355 },
   { 2,0,-1,0,1274027,-3699111 },
@@ -62,7 +62,7 @@ moonlr[] = {
   { 2,0,-1,-2,0,8752 }
 };
 
-struct moonbTerm { int d; int m; int mm; int f; int b; }
+struct moonbTerm { Int d; Int m; Int mm; Int f; Int b; }
 moonb[] = {
   { 0,0,0,1,5128122 },
   { 0,0,1,1,280602 },

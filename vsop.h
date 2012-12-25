@@ -1,17 +1,19 @@
+#include "action.h"
+
 struct planetIndex {
-  short unsigned int index;
-  short unsigned int nTerms;
+  int16_t index;
+  int16_t nTerms;
 };
 struct VSOPdata {
   struct planetIndex indices[6*3*8];
-  short unsigned int nTerms;
-  double *terms;
+  int16_t nTerms;
+  Double *terms;
 };
 struct VSOPdata planetIndicesForTolerance(struct VSOPdata *data, 
-                                          double tolerance);
+                                          Double tolerance);
 struct VSOPdata VSOP87Adata;
 struct VSOPdata VSOP87Cdata;
 
-void XYZJ2000fromVSOPA(double T, int object, double *pos, double tolerance);
-void XYZdatefromVSOPC(double T, int object, double *pos, double tolerance);
+void XYZJ2000fromVSOPA(Double T, Int object, Double *pos, Double tolerance);
+void XYZdatefromVSOPC(Double T, Int object, Double *pos, Double tolerance);
 

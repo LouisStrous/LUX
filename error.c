@@ -62,7 +62,7 @@ char	*errorMessages[] = {
 /* SUBSC_RANGE	17*/
  "Subscript/index/coordinate out of range",
 /* INCMP_INNER_BC	18*/
- "Inner dimension byte count is not a multiple of element length",
+ "Inner dimension Byte count is not a multiple of element length",
 /* ANA_SUB_ARG	19*/
  "(X) Impossible error in ana_sub_arg",
 /* NEED_ARR	20*/
@@ -232,20 +232,20 @@ char	*errorMessages[] = {
  "Need BYTE argument"
 };
 
-int     nErrorMessages = sizeof(errorMessages)/sizeof(char **);
+Int     nErrorMessages = sizeof(errorMessages)/sizeof(char **);
 #if __STDC__
-char	*what(int, char);
+char	*what(Int, char);
 #else
 char	*what();
 #endif
 extern char	*currentInputFile;
-extern int	fileLevel;
-int	errorSym = 0;
+extern Int	fileLevel;
+Int	errorSym = 0;
 char	*errorPtr = NULL;
 static char	storedErrorMessage[256];
 
 /*-------------------------------------------------------------------*/
-char *verrorMessage(char *message, int symbol, va_list ap)
+char *verrorMessage(char *message, Int symbol, va_list ap)
 /* returns error messages */
 {
   char	*ptr;
@@ -275,7 +275,7 @@ char *verrorMessage(char *message, int symbol, va_list ap)
   return curScrat;
 }
 /*-------------------------------------------------------------------*/
-char *errorMessage(char *message, int symbol, ...)
+char *errorMessage(char *message, Int symbol, ...)
 {
   char	*result;
   va_list	ap;
@@ -286,7 +286,7 @@ char *errorMessage(char *message, int symbol, ...)
   return result;
 }
 /*-------------------------------------------------------------------*/
-int anaerror(char *message, int symbol, ...)
+Int anaerror(char *message, Int symbol, ...)
 /* displays error messages */
 {
   va_list	ap;
@@ -305,7 +305,7 @@ int anaerror(char *message, int symbol, ...)
   return ANA_ERROR;
 }
 /*-------------------------------------------------------------------*/
-int cerror(int message, int symbol, ...)
+Int cerror(Int message, Int symbol, ...)
 /* displays error messages according to message numbers */
 {
   va_list	ap;
@@ -344,12 +344,12 @@ int cerror(int message, int symbol, ...)
   return ANA_ERROR;
 }
 /*-------------------------------------------------------------------*/
-int ana_error(int narg, int ps[])
+Int ana_error(Int narg, Int ps[])
 /* allows the user to generate an error message */
 /* syntax:  error [,format,symbol] [, /store, /restore] */
 {
   char   *format;
-  int    symbol;
+  Int    symbol;
 
   if (narg) {
     format = string_arg(*ps++);

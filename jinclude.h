@@ -66,7 +66,7 @@
 /*
  * In ANSI C, and indeed any rational implementation, size_t is also the
  * type returned by sizeof().  However, it seems there are some irrational
- * implementations out there, in which sizeof() returns an int even though
+ * implementations out there, in which sizeof() returns an Int even though
  * size_t is defined as long or unsigned long.  To ensure consistent results
  * we always use this SIZEOF() macro in place of using sizeof() directly.
  */

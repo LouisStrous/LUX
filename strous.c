@@ -21,18 +21,18 @@
 static char rcsid[] __attribute__ ((unused)) =
  "$Id: strous.c,v 4.0 2001/02/07 20:37:04 strous Exp $";
 
-word	stack[STACKSIZE], *stackPointer = &stack[STACKSIZE];
-extern int	stackSym;
-int	ana_convert(int, int [], int, int), copyToSym(int, int),
-  ana_replace(int, int), format_check(char *, char **, int),
-  f_decomp(float *, int, int), f_solve(float *, float *, int, int);
-void	symdumpswitch(int, int);
+Word	stack[STACKSIZE], *stackPointer = &stack[STACKSIZE];
+extern Int	stackSym;
+Int	ana_convert(Int, Int [], Int, Int), copyToSym(Int, Int),
+  ana_replace(Int, Int), format_check(char *, char **, Int),
+  f_decomp(Float *, Int, Int), f_solve(Float *, Float *, Int, Int);
+void	symdumpswitch(Int, Int);
 /*------------------------------------------------------------------------- */
-int ana_distr(int narg, int ps[])
+Int ana_distr(Int narg, Int ps[])
 /* DISTR,target,bins,values  puts each <value> in the corresponding
    <bin> of <target>.  LS */
 {
- int	iq, ntarget, i, targettype, n, *bin, nout = 0;
+ Int	iq, ntarget, i, targettype, n, *bin, nout = 0;
  array	*h, *h2;
  pointer	target, value;
 
@@ -54,7 +54,7 @@ int ana_distr(int narg, int ps[])
  value.l = LPTR(h2);
  if (h2->ndim != h->ndim)
    return cerror(INCMP_ARR, iq);
- for (i = 0; i < (int) h->ndim; i++)
+ for (i = 0; i < (Int) h->ndim; i++)
    if (h->dims[i] != h2->dims[i])
      return cerror(INCMP_DIMS, iq);
  switch (targettype) {
@@ -109,17 +109,17 @@ int ana_distr(int narg, int ps[])
  return 1;
 } 
 /*------------------------------------------------------------------------- */
-int ana_distr_f(int narg, int ps[])
+Int ana_distr_f(Int narg, Int ps[])
 /* y=DISTR(bins,values)  puts each <value> in the corresponding <bin> and
    returns an array containing bins 0 through max(values). LS */
 {
-  extern int	maxhistsize, histmin, histmax;
+  extern Int	maxhistsize, histmin, histmax;
   extern scalar	lastmin, lastmax;
-  int	iq, i, n, nd, nd2, range, type, type2, result_sym,
-	minmax(int *, int, int);
+  Int	iq, i, n, nd, nd2, range, type, type2, result_sym,
+	minmax(Int *, Int, Int);
   pointer arg1, arg2, res;
-  int	ana_zero(int, int []);
-  void convertWidePointer(wideScalar *, int, int);
+  Int	ana_zero(Int, Int []);
+  void convertWidePointer(wideScalar *, Int, Int);
 
   iq = ps[0];
   if (symbol_class(iq) != ANA_ARRAY)
@@ -140,7 +140,7 @@ int ana_distr_f(int narg, int ps[])
   arg2.l = array_data(iq);
   /* always need the range */
   minmax(arg1.l, n, type);
-  /* get long (int) versions of min and max */
+  /* get long (Int) versions of min and max */
   convertPointer(&lastmin, type, ANA_LONG);
   convertPointer(&lastmax, type, ANA_LONG);
   /* create an array for results */
@@ -341,7 +341,7 @@ int ana_distr_f(int narg, int ps[])
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-int readkey(int mode)
+Int readkey(Int mode)
 /* returns the code for the next pressed key and echos that key */
 /* escape sequence  ESC char           yields  char + 0x200
                     ESC [ char         yields  char + 0x100
@@ -352,8 +352,8 @@ int readkey(int mode)
     hex     0171  0D71    1971 41  A171   8B71
    LS 22may92 */
 {
- int	ch, result_sym;
- void	putChar(int);
+ Int	ch, result_sym;
+ void	putChar(Int);
  
  ch = getchar();
  result_sym = scalar_scratch(ANA_LONG);
@@ -362,29 +362,29 @@ int readkey(int mode)
  return result_sym;
 }
 /*------------------------------------------------------------------------- */
-int ana_readkey()
+Int ana_readkey()
 /* returns the code for the next pressed key and echos that key */
 {
  return readkey(1);
 }
 /*------------------------------------------------------------------------- */
-int ana_readkeyne()
+Int ana_readkeyne()
 /* returns the code for the next pressed key but does not echo that key */
 /* see ana_readkey for more info */
 {
  return readkey(0);
 }
 /*------------------------------------------------------------------------- */
-int ana_readarr(int narg, int ps[])
+Int ana_readarr(Int narg, Int ps[])
 /* reads array elements until they are exhausted and returns read elements */
 /* in an array.  Louis Strous 24may92 */
 {
  extern FILE	*inputStream;
  FILE	*tp, *is;
  char	*p, *pt, lastchar, token[32], line[BUFSIZE];
- int	arrs=0, i, iq, maxtype = ANA_LONG, *iptr, 
-	getNewLine(char *, char *, char), redef_array(int, int, int, int *);
- float	*fptr;
+ Int	arrs=0, i, iq, maxtype = ANA_LONG, *iptr, 
+	getNewLine(char *, char *, char), redef_array(Int, Int, Int, Int *);
+ Float	*fptr;
 
  iq = ps[0];						/* target */
  tp = Tmpfile();					/* temporary storage */
@@ -395,10 +395,10 @@ int ana_readarr(int narg, int ps[])
  if (i > 0)
  { p = line; lastchar = *p;
    while (lastchar)					/* more chars */
-   { while (isspace((byte) *p) || *p == ',') p++; /* skip space & , */
+   { while (isspace((Byte) *p) || *p == ',') p++; /* skip space & , */
      pt = p;						/* token start */
-     while (isspace((byte) *p) == 0 && *p != ',' && *p != 0) /* scan value */
-     { if (*p == 'e' || *p == 'E' || *p == '.')		/* float? */
+     while (isspace((Byte) *p) == 0 && *p != ',' && *p != 0) /* scan value */
+     { if (*p == 'e' || *p == 'E' || *p == '.')		/* Float? */
          maxtype = ANA_FLOAT; p++; }
      lastchar = *p;  *p++ = '\0';
      if (*pt) {
@@ -411,17 +411,17 @@ int ana_readarr(int narg, int ps[])
    if (redef_array(iq, maxtype, 1, &arrs) != 1) 		/* target */
    { printf("(redef_array): "); fclose(tp); return cerror(ALLOC_ERR, iq); }
    if (maxtype == ANA_FLOAT)
-   { fptr = (float *) ((char *) sym[iq].spec.array.ptr + sizeof(array));
+   { fptr = (Float *) ((char *) sym[iq].spec.array.ptr + sizeof(array));
      for (i = arrs; i > 0; i--) fscanf(tp, "%f", fptr++); }
    else
-   { iptr = (int *) ((char *) sym[iq].spec.array.ptr + sizeof(array));
+   { iptr = (Int *) ((char *) sym[iq].spec.array.ptr + sizeof(array));
      for (i = arrs; i > 0; i--) fscanf(tp, "%d", iptr++); }
  }
  fclose(tp);
  return 1;
 }  
 /*------------------------------------------------------------------------- */
-int ana_find(int narg, int ps[])
+Int ana_find(Int narg, Int ps[])
 /* for each element of <key>, finds first occurrence of that
    element in <array>.
    Call:  y = FIND(array,key,offset,mode)
@@ -438,9 +438,9 @@ int ana_find(int narg, int ps[])
   array	*h, *har;
   pointer	ar, base, key, off, indx, theKey, theOff;
   char	repeat = 0;
-  int	type, mode = 0, result, i, index = 0, offset, nRepeat;
-  int	resulttype, iq, nar, noff, nkey, class, n, step, loop;
-  int   dims[MAX_DIMS], ndim;
+  Int	type, mode = 0, result, i, index = 0, offset, nRepeat;
+  Int	resulttype, iq, nar, noff, nkey, class, n, step, loop;
+  Int   dims[MAX_DIMS], ndim;
   
   iq = ps[0];			/* array */
   CK_ARR(iq,1);
@@ -486,13 +486,13 @@ int ana_find(int narg, int ps[])
       nRepeat = 1; }
     else
     { if (nkey == 1)
-      { memcpy(dims, har->dims + 1, (har->ndim - 1)*sizeof(int));
+      { memcpy(dims, har->dims + 1, (har->ndim - 1)*sizeof(Int));
 	ndim = har->ndim - 1; }
       else
-      { if ((int) h->ndim + (int) har->ndim - 1 > MAX_DIMS)
+      { if ((Int) h->ndim + (Int) har->ndim - 1 > MAX_DIMS)
 	  return anaerror("too many dimensions for returned array", iq);
-        memcpy(dims + h->ndim, har->dims + 1, (har->ndim - 1)*sizeof(int));
-	memcpy(dims, h->dims, h->ndim*sizeof(int));
+        memcpy(dims + h->ndim, har->dims + 1, (har->ndim - 1)*sizeof(Int));
+	memcpy(dims, h->dims, h->ndim*sizeof(Int));
 	ndim = har->ndim - 1 + h->ndim; }
       result = array_scratch(resulttype, ndim, dims);
       nRepeat = nar/har->dims[0];
@@ -566,12 +566,12 @@ int ana_find(int narg, int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-int ana_find2(int narg, int ps[])
+Int ana_find2(Int narg, Int ps[])
 /* FIND2(array, key) */
 {
-  int *data_dims, data_dim_count, data_count, keys_count, result, type;
+  Int *data_dims, data_dim_count, data_count, keys_count, result, type;
   pointer data, keys, target;
-  int i, j;
+  Int i, j;
 
   if (numerical_or_string(ps[0], &data_dims, &data_dim_count, &data_count, &data) < 0)
     return ANA_ERROR;
@@ -579,11 +579,11 @@ int ana_find2(int narg, int ps[])
     return ANA_ERROR;
   if (symbol_type(ps[1]) != symbol_type(ps[0])) {
     if (symbol_type(ps[1]) > symbol_type(ps[0])) {
-      int iq = ana_converts[symbol_type(ps[1])](1, &ps[0]);
+      Int iq = ana_converts[symbol_type(ps[1])](1, &ps[0]);
       numerical_or_string(iq, NULL, NULL, NULL, &data);
       type = symbol_type(ps[1]);
     } else {
-      int iq = ana_converts[symbol_type(ps[0])](1, &ps[1]);
+      Int iq = ana_converts[symbol_type(ps[0])](1, &ps[1]);
       numerical_or_string(iq, NULL, NULL, NULL, &keys);
       type = symbol_type(ps[0]);
     }
@@ -661,17 +661,17 @@ int ana_find2(int narg, int ps[])
 }
 /*------------------------------------------------------------------------- */
 #include <errno.h>
-int ana_help(int narg, int ps[])
+Int ana_help(Int narg, Int ps[])
 /* HELP,'topic' */
 {
   char	*topic, *topic2, line[256], *next, table, menu = 0, nl = 0,
 	example = 0, *menuitems, *menuitems0, *p, temp[10], c2, *p2, **q;
   char	*matches[10];
-  int	n, item, menucount = 0, menucount0 = 0, isItem = 0, i,
+  Int	n, item, menucount = 0, menucount0 = 0, isItem = 0, i,
 	getNewLine(char *, char *, char);
   FILE	*fp;
-  void	setPager(int), resetPager(void);
-  extern int	column;
+  void	setPager(Int), resetPager(void);
+  extern Int	column;
   
   q = matches;
   topic = narg? string_arg(*ps): "Top";
@@ -697,7 +697,7 @@ int ana_help(int narg, int ps[])
       if (strncmp(line, "@node ", 6)) /* must start with @node */
 	continue;
       topic = line + 6;
-      while (isspace((byte) *topic))	/* skip whitespace, if any */
+      while (isspace((Byte) *topic))	/* skip whitespace, if any */
 	topic++;
       next = topic;
       while (*next && *next != ',')
@@ -755,7 +755,7 @@ int ana_help(int narg, int ps[])
     *topic2 = '\0';
     p = menuitems;
     p2 = topic;			/* beginning of "next" node name */
-    while (isspace((byte) *p2))
+    while (isspace((Byte) *p2))
       p2++;
     if (*p2) {			/* we really have a node name here */
       printwf("Next: [%1d:] %s; ", ++menucount, p2);
@@ -768,7 +768,7 @@ int ana_help(int narg, int ps[])
     topic2 = strchr(topic, ',');
     *topic2 = '\0';
     p2 = topic;
-    while (isspace((byte) *p2))
+    while (isspace((Byte) *p2))
       p2++;
     if (*p2 && *p2 != '(') {
       printwf("Prev: [%1d:] %s; ", ++menucount, p2);
@@ -781,7 +781,7 @@ int ana_help(int narg, int ps[])
     topic2 = strchr(topic, '\n');
     *topic2 = '\0';
     p2 = topic;
-    while (isspace((byte) *p2))
+    while (isspace((Byte) *p2))
       p2++;
     if (*p2 && *p2 != '(') {
       printwf("Up: [%1d:] %s;", ++menucount, p2);
@@ -798,7 +798,7 @@ int ana_help(int narg, int ps[])
       if ((next = strchr(next, '\n')))
 	*next = ' ';
       next = topic;
-      while (isspace((byte) *next))
+      while (isspace((Byte) *next))
 	next++;
       if (!*next)		/* end of line: whitespace only */
 	*topic = '\0';
@@ -815,7 +815,7 @@ int ana_help(int narg, int ps[])
 	{ default:
 	    break;
 	  case '@':
-	    if (topic[1] && !isalnum((byte) topic[1])) { /* escape sequence */
+	    if (topic[1] && !isalnum((Byte) topic[1])) { /* escape sequence */
 	      next = topic + 1;
 	      if (*next == '@')	{ /* @@ -> @ */
 		memmove(topic, next, strlen(next) + 1);
@@ -921,7 +921,7 @@ int ana_help(int narg, int ps[])
 	    }
 	    if (!strcmp(topic, "@enumerate"))
 	    { table = 2;	/* enumeration */
-	      while (*next && isspace((byte) *next))
+	      while (*next && isspace((Byte) *next))
 		next++;
 	      item = *next? atol(next): 1;  /* note: may be a letter, too! */
 	      *topic-- = 0;
@@ -980,9 +980,9 @@ int ana_help(int narg, int ps[])
     printwf("name (RETURN for exit, 0 for back):\n");
     getNewLine(line, "tpc:", (char) 0);
     topic2 = line;
-    while (*topic2 && isspace((byte) *topic2))
+    while (*topic2 && isspace((Byte) *topic2))
       topic2++;
-    if (isdigit((byte) *topic2)) {
+    if (isdigit((Byte) *topic2)) {
       item = atol(line);
       if (item > 0 && item <= menucount) /* item selected */
       { example = menu = nl = 0;
@@ -1022,19 +1022,19 @@ int ana_help(int narg, int ps[])
   return ANA_ONE;
 }
 /*------------------------------------------------------------------------- */
-void endian(void *pp, int n, int type)
+void endian(void *pp, Int n, Int type)
 /* swap bytes according to data type, starting at p, spanning n bytes.
    goes from bigendian to littleendian or back.
-   byte -> do nothing
-   word -> swap 1 2 to 2 1
-   long, float -> swap 1 2 3 4 to 4 3 2 1
-   double -> swap 1 2 3 4 5 6 7 8 to 8 7 6 5 4 3 2 1
+   Byte -> do nothing
+   Word -> swap 1 2 to 2 1
+   long, Float -> swap 1 2 3 4 to 4 3 2 1
+   Double -> swap 1 2 3 4 5 6 7 8 to 8 7 6 5 4 3 2 1
    Works between Ultrix and Irix.   LS 10/12/92	*/
 {
- int	size, i, n2, n3;
- byte	temp, *p2, *p;
+ Int	size, i, n2, n3;
+ Byte	temp, *p2, *p;
 
- p = (byte *) pp;
+ p = (Byte *) pp;
  size = ana_type_size[type];
  if (size <= 1)
    return;
@@ -1052,12 +1052,12 @@ void endian(void *pp, int n, int type)
  return;
 }
 /*------------------------------------------------------------------------- */
-int ana_endian(int narg, int ps[])
+Int ana_endian(Int narg, Int ps[])
 /* Switches an array between littleendian and bigendian or vice versa.
    Works between Ultrix and Irix.  LS 10/12/92 */
 /* added support for scalars.  LS 10oct97 */
 {
- int	iq, n, type;
+ Int	iq, n, type;
  pointer	q;
 
  iq = ps[0];
@@ -1079,7 +1079,7 @@ int ana_endian(int narg, int ps[])
  return 1;
 }
 /*------------------------------------------------------------------------- */
-int ana_differ(int narg, int ps[])
+Int ana_differ(Int narg, Int ps[])
 /* running difference; reverse of running sum 
   syntax:  y = differ(x [[,axis] ,order]) 
   axis is the dimension along which differencing is performed; for each of the
@@ -1095,7 +1095,7 @@ int ana_differ(int narg, int ps[])
   LS 24nov92 */
 {
   pointer	src, trgt, order;
-  int	result, nOrder, loop, o, ww, stride, offset1, offset3,
+  Int	result, nOrder, loop, o, ww, stride, offset1, offset3,
     w1, one = 1, iq, n, type, i, old, circular;
   loopInfo	srcinfo, trgtinfo;
 
@@ -1351,12 +1351,12 @@ int ana_differ(int narg, int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-int varsmooth(int narg, int ps[], int cumul)
+Int varsmooth(Int narg, Int ps[], Int cumul)
 /* SMOOTH(data [[, axis], widths] [,/FW_EDGE_NEIGHBOR]) */
 {
-  int	axisSym, widthSym, nWidth, nData, nDim, result, done, type, outType,
+  Int	axisSym, widthSym, nWidth, nData, nDim, result, done, type, outType,
     i1, i2, i, step, widthNDim, *widthDim, axis;
-  float	weight;
+  Float	weight;
   pointer	src, trgt, width, width0;
   scalar	sum;
   loopInfo	srcinfo, trgtinfo;
@@ -1431,7 +1431,7 @@ int varsmooth(int narg, int ps[], int cumul)
 	    i2 *= step;
 	    sum.l = 0.0;
 	    for (i = i1; i < i2; i += step)
-	      sum.l += (int) src.b[i];
+	      sum.l += (Int) src.b[i];
 	    *trgt.l = sum.l;
 	    done = advanceLoop(&trgtinfo, &trgt), 
 	      advanceLoop(&srcinfo, &src);
@@ -1457,7 +1457,7 @@ int varsmooth(int narg, int ps[], int cumul)
 	    i2 *= step;
 	    sum.l = 0.0;
 	    for (i = i1; i < i2; i += step)
-	      sum.l += (int) src.w[i];
+	      sum.l += (Int) src.w[i];
 	    *trgt.l = sum.l;
 	    done = advanceLoop(&trgtinfo, &trgt),
 	      advanceLoop(&srcinfo, &src);
@@ -1513,7 +1513,7 @@ int varsmooth(int narg, int ps[], int cumul)
 	    sum.f = 0.0;
 	    weight = cumul? 1: (i2 - i1)/step;
 	    for (i = i1; i < i2; i += step)
-	      sum.f += (float) src.b[i];
+	      sum.f += (Float) src.b[i];
 	    *trgt.f = sum.f/weight;
 	    done = advanceLoop(&trgtinfo, &trgt),
 	      advanceLoop(&srcinfo, &src);
@@ -1540,7 +1540,7 @@ int varsmooth(int narg, int ps[], int cumul)
 	    sum.f = 0.0;
 	    weight = cumul? 1: (i2 - i1)/step;
 	    for (i = i1; i < i2; i += step)
-	      sum.f += (float) src.w[i];
+	      sum.f += (Float) src.w[i];
 	    *trgt.f = sum.f/weight;
 	    done = advanceLoop(&trgtinfo, &trgt),
 	      advanceLoop(&srcinfo, &src);
@@ -1567,7 +1567,7 @@ int varsmooth(int narg, int ps[], int cumul)
 	    sum.f = 0.0;
 	    weight = cumul? 1: (i2 - i1)/step;
 	    for (i = i1; i < i2; i += step)
-	      sum.f += (float) src.l[i];
+	      sum.f += (Float) src.l[i];
 	    *trgt.f = sum.f/weight;
 	    done = advanceLoop(&trgtinfo, &trgt),
 	      advanceLoop(&srcinfo, &src);
@@ -1624,7 +1624,7 @@ int varsmooth(int narg, int ps[], int cumul)
 	    sum.d = 0.0;
 	    weight = cumul? 1: (i2 - i1)/step;
 	    for (i = i1; i < i2; i += step)
-	      sum.d += (double) src.b[i];
+	      sum.d += (Double) src.b[i];
 	    *trgt.d = sum.d/weight;
 	    done = advanceLoop(&trgtinfo, &trgt),
 	      advanceLoop(&srcinfo, &src);
@@ -1651,7 +1651,7 @@ int varsmooth(int narg, int ps[], int cumul)
 	    sum.d = 0.0;
 	    weight = cumul? 1: (i2 - i1)/step;
 	    for (i = i1; i < i2; i += step)
-	      sum.d += (double) src.w[i];
+	      sum.d += (Double) src.w[i];
 	    *trgt.d = sum.d/weight;
 	    done = advanceLoop(&trgtinfo, &trgt),
 	      advanceLoop(&srcinfo, &src);
@@ -1678,7 +1678,7 @@ int varsmooth(int narg, int ps[], int cumul)
 	    sum.d = 0.0;
 	    weight = cumul? 1: (i2 - i1)/step;
 	    for (i = i1; i < i2; i += step)
-	      sum.d += (double) src.l[i];
+	      sum.d += (Double) src.l[i];
 	    *trgt.d = sum.d/weight;
 	    done = advanceLoop(&trgtinfo, &trgt),
 	      advanceLoop(&srcinfo, &src);
@@ -1705,7 +1705,7 @@ int varsmooth(int narg, int ps[], int cumul)
 	    sum.d = 0.0;
 	    weight = cumul? 1: (i2 - i1)/step;
 	    for (i = i1; i < i2; i += step)
-	      sum.d += (double) src.f[i];
+	      sum.d += (Double) src.f[i];
 	    *trgt.d = sum.d/weight;
 	    done = advanceLoop(&trgtinfo, &trgt),
 	      advanceLoop(&srcinfo, &src);
@@ -1765,10 +1765,10 @@ int varsmooth(int narg, int ps[], int cumul)
   Then u + v = (u f+ v) + ((u f- u′) f+ (v f- v″))
  */
 
-#define kahan_sum_f(value,sum,compensation) { float y = (value) - (compensation); float t = (sum) + y; (compensation) = (t - (sum)) - y; (sum) = t; }
-#define kahan_sum_d(value,sum,compensation) { double y = (value) - (compensation); double t = (sum) + y; (compensation) = (t - (sum)) - y; (sum) = t; }
+#define kahan_sum_f(value,sum,compensation) { Float y = (value) - (compensation); Float t = (sum) + y; (compensation) = (t - (sum)) - y; (sum) = t; }
+#define kahan_sum_d(value,sum,compensation) { Double y = (value) - (compensation); Double t = (sum) + y; (compensation) = (t - (sum)) - y; (sum) = t; }
 
-int smooth(int narg, int ps[], int cumul)
+Int smooth(Int narg, Int ps[], Int cumul)
 /* return smoothed version syntax: y = smooth/runcum(x [,axis,width]
   [,/FW_EDGE_NEIGHBOR]) <axis> is the dimension along which summing is
   performed; for each of the remaining coordinates summing is started
@@ -1782,13 +1782,13 @@ int smooth(int narg, int ps[], int cumul)
   LS 26nov92 5mar93 implement ANA_LONG, ANA_FLOAT, and ANA_DOUBLE,
   because "integer" range of floats is too small. */
 {
-  byte	type;
-  int	n, result, i, offset, stride, nWidth, w1, w2, ww, loop, three=3, norm,
+  Byte	type;
+  Int	n, result, i, offset, stride, nWidth, w1, w2, ww, loop, three=3, norm,
     iq, jq;
   pointer	src, trgt, width;
   scalar	value;
   loopInfo	srcinfo, trgtinfo;
-  int mode;
+  Int mode;
 
   mode = 0;
   if (narg > 2)			/* have <axes> */
@@ -1884,7 +1884,7 @@ int smooth(int narg, int ps[], int cumul)
 	      src.b += stride;
 	      if (!cumul)
 		++norm;
-	      *trgt.b = (byte) (value.l/norm);
+	      *trgt.b = (Byte) (value.l/norm);
 	      trgt.b += stride;
 	      i = 1;
 	    } else
@@ -1896,7 +1896,7 @@ int smooth(int narg, int ps[], int cumul)
 	      src.b += stride;
 	      if (!cumul)
 		norm += 2;
-	      *trgt.b = (byte) (value.l/norm);
+	      *trgt.b = (Byte) (value.l/norm);
 	      trgt.b += stride;
 	    }
 	  } else {		/* full width */
@@ -1904,7 +1904,7 @@ int smooth(int narg, int ps[], int cumul)
 	      value.l += *src.b;
 	      src.b += stride; 
 	    }
-	    byte v = (byte) (value.l/norm);
+	    Byte v = (Byte) (value.l/norm);
 	    for (i = 0; i < w1; i++) {
 	      *trgt.b = v;
 	      trgt.b += stride; 
@@ -1914,7 +1914,7 @@ int smooth(int narg, int ps[], int cumul)
 	  for ( ; i < w2; i++) {
 	    value.l += *src.b - src.b[offset];
 	    src.b += stride;
-	    *trgt.b = (byte) (value.l/norm);
+	    *trgt.b = (Byte) (value.l/norm);
 	    trgt.b += stride;
 	  }
 	  /* right-hand edge */
@@ -1926,7 +1926,7 @@ int smooth(int narg, int ps[], int cumul)
 	      offset += stride;
 	      if (!cumul)
 		norm -= 2;
-	      *trgt.b = (byte) (value.l/norm);
+	      *trgt.b = (Byte) (value.l/norm);
 	      trgt.b += stride;
 	    }
 	    if (!(ww%2)) {
@@ -1934,11 +1934,11 @@ int smooth(int narg, int ps[], int cumul)
 	      offset += stride;
 	      if (!cumul)
 		--norm;
-	      *trgt.b = (byte) (value.l/norm);
+	      *trgt.b = (Byte) (value.l/norm);
 	      trgt.b += stride;
 	    }
 	  } else {
-	    byte v = (byte) (value.l/norm);
+	    Byte v = (Byte) (value.l/norm);
 	    for ( ; i < srcinfo.rdims[0]; i++) { /* right edge */
 	      *trgt.b = v;
 	      trgt.b += stride;
@@ -1958,7 +1958,7 @@ int smooth(int narg, int ps[], int cumul)
 	      src.w += stride;
 	      if (!cumul)
 		++norm;
-	      *trgt.w = (word) (value.l/norm);
+	      *trgt.w = (Word) (value.l/norm);
 	      trgt.w += stride;
 	      i = 1;
 	    } else
@@ -1970,7 +1970,7 @@ int smooth(int narg, int ps[], int cumul)
 	      src.w += stride;
 	      if (!cumul)
 		norm += 2;
-	      *trgt.w = (word) (value.l/norm);
+	      *trgt.w = (Word) (value.l/norm);
 	      trgt.w += stride;
 	    }
 	  } else {		/* full width */
@@ -1978,7 +1978,7 @@ int smooth(int narg, int ps[], int cumul)
 	      value.l += *src.w;
 	      src.w += stride; 
 	    }
-	    word v = (word) (value.l/norm);
+	    Word v = (Word) (value.l/norm);
 	    for (i = 0; i < w1; i++) {
 	      *trgt.w = v;
 	      trgt.w += stride; 
@@ -1988,7 +1988,7 @@ int smooth(int narg, int ps[], int cumul)
 	  for ( ; i < w2; i++) {
 	    value.l += *src.w - src.w[offset];
 	    src.w += stride;
-	    *trgt.w = (word) (value.l/norm);
+	    *trgt.w = (Word) (value.l/norm);
 	    trgt.w += stride;
 	  }
 	  /* right-hand edge */
@@ -2000,7 +2000,7 @@ int smooth(int narg, int ps[], int cumul)
 	      offset += stride;
 	      if (!cumul)
 		norm -= 2;
-	      *trgt.w = (word) (value.l/norm);
+	      *trgt.w = (Word) (value.l/norm);
 	      trgt.w += stride;
 	    }
 	    if (!(ww%2)) {
@@ -2008,11 +2008,11 @@ int smooth(int narg, int ps[], int cumul)
 	      offset += stride;
 	      if (!cumul)
 		--norm;
-	      *trgt.w = (word) (value.l/norm);
+	      *trgt.w = (Word) (value.l/norm);
 	      trgt.w += stride;
 	    }
 	  } else {
-	    word v = (word) (value.l/norm);
+	    Word v = (Word) (value.l/norm);
 	    for ( ; i < srcinfo.rdims[0]; i++) { /* right edge */
 	      *trgt.w = v;
 	      trgt.w += stride;
@@ -2052,7 +2052,7 @@ int smooth(int narg, int ps[], int cumul)
 	      value.l += *src.l;
 	      src.l += stride; 
 	    }
-	    int v = value.l/norm;
+	    Int v = value.l/norm;
 	    for (i = 0; i < w1; i++) {
 	      *trgt.l = v;
 	      trgt.l += stride; 
@@ -2086,7 +2086,7 @@ int smooth(int narg, int ps[], int cumul)
 	      trgt.l += stride;
 	    }
 	  } else {
-	    int v = value.l/norm;
+	    Int v = value.l/norm;
 	    for ( ; i < srcinfo.rdims[0]; i++) { /* right edge */
 	      *trgt.l = v;
 	      trgt.l += stride;
@@ -2099,7 +2099,7 @@ int smooth(int narg, int ps[], int cumul)
 	/* we use the Kahan algorithm to limit roundoff error */
 	do {
 	  value.f = 0;		  /* initialize */
-	  float c = 0.0;
+	  Float c = 0.0;
 	  /* left-hand edge */
 	  if (internalMode & 1) { /* /PARTIAL_WIDTH */
 	    norm = cumul? ww: 0;
@@ -2128,7 +2128,7 @@ int smooth(int narg, int ps[], int cumul)
 	      kahan_sum_f(*src.f, value.f, c);
 	      src.f += stride; 
 	    }
-	    double v = value.f/norm;
+	    Double v = value.f/norm;
 	    for (i = 0; i < w1; i++) {
 	      *trgt.f = v;
 	      trgt.f += stride; 
@@ -2162,7 +2162,7 @@ int smooth(int narg, int ps[], int cumul)
 	      trgt.f += stride;
 	    }
 	  } else {
-	    float v = value.f/norm;
+	    Float v = value.f/norm;
 	    for ( ; i < srcinfo.rdims[0]; i++) { /* right edge */
 	      *trgt.f = v;
 	      trgt.f += stride;
@@ -2175,7 +2175,7 @@ int smooth(int narg, int ps[], int cumul)
 	/* we use the Kahan algorithm to limit roundoff error */
 	do {
 	  value.d = 0;		  /* initialize */
-	  double c = 0.0;
+	  Double c = 0.0;
 	  /* left-hand edge */
 	  if (internalMode & 1) { /* /PARTIAL_WIDTH */
 	    norm = cumul? ww: 0;
@@ -2204,7 +2204,7 @@ int smooth(int narg, int ps[], int cumul)
 	      kahan_sum_d(*src.d, value.d, c);
 	      src.d += stride; 
 	    }
-	    double v = value.d/norm;
+	    Double v = value.d/norm;
 	    for (i = 0; i < w1; i++) {
 	      *trgt.d = v;
 	      trgt.d += stride; 
@@ -2238,7 +2238,7 @@ int smooth(int narg, int ps[], int cumul)
 	      trgt.d += stride;
 	    }
 	  } else {
-	    double v = value.d/norm;
+	    Double v = value.d/norm;
 	    for ( ; i < srcinfo.rdims[0]; i++) { /* right edge */
 	      *trgt.d = v;
 	      trgt.d += stride;
@@ -2270,88 +2270,88 @@ int smooth(int narg, int ps[], int cumul)
   return result;
 }
 /*------------------------------------------------------------------------- */
-int ana_smooth(int narg, int ps[])
+Int ana_smooth(Int narg, Int ps[])
 /* smoothing */
 {
   return smooth(narg, ps, 0);
 }
 /*------------------------------------------------------------------------- */
-int ana_runcum(int narg, int ps[])
+Int ana_runcum(Int narg, Int ps[])
 /* running cumulative */
 { return smooth(narg, ps, 1); }
 /*----------------------------------------------------------------------*/
-static int	pcmp_type;
+static Int	pcmp_type;
 static pointer	pcmp_ptr;
-int pcmp(const void *arg1, const void *arg2)
+Int pcmp(const void *arg1, const void *arg2)
 {
   extern pointer	pcmp_ptr;
-  extern int	pcmp_type;
+  extern Int	pcmp_type;
   scalar	d1, d2;
 
   switch (pcmp_type) {
     case ANA_BYTE:
-      d1.b = pcmp_ptr.b[*(int *) arg1];
-      d2.b = pcmp_ptr.b[*(int *) arg2];
+      d1.b = pcmp_ptr.b[*(Int *) arg1];
+      d2.b = pcmp_ptr.b[*(Int *) arg2];
       return d1.b < d2.b? -1: (d1.b > d2.b? 1: 0);
     case ANA_WORD:
-      d1.w = pcmp_ptr.w[*(int *) arg1];
-      d2.w = pcmp_ptr.w[*(int *) arg2];
+      d1.w = pcmp_ptr.w[*(Int *) arg1];
+      d2.w = pcmp_ptr.w[*(Int *) arg2];
       return d1.w < d2.w? -1: (d1.w > d2.w? 1: 0);
     case ANA_LONG:
-      d1.l = pcmp_ptr.l[*(int *) arg1];
-      d2.l = pcmp_ptr.l[*(int *) arg2];
+      d1.l = pcmp_ptr.l[*(Int *) arg1];
+      d2.l = pcmp_ptr.l[*(Int *) arg2];
       return d1.l < d2.l? -1: (d1.l > d2.l? 1: 0);
     case ANA_FLOAT:
-      d1.f = pcmp_ptr.f[*(int *) arg1];
-      d2.f = pcmp_ptr.f[*(int *) arg2];
+      d1.f = pcmp_ptr.f[*(Int *) arg1];
+      d2.f = pcmp_ptr.f[*(Int *) arg2];
       return d1.f < d2.f? -1: (d1.f > d2.f? 1: 0);
     case ANA_DOUBLE:
-      d1.d = pcmp_ptr.d[*(int *) arg1];
-      d2.d = pcmp_ptr.d[*(int *) arg2];
+      d1.d = pcmp_ptr.d[*(Int *) arg1];
+      d2.d = pcmp_ptr.d[*(Int *) arg2];
       return d1.d < d2.d? -1: (d1.d > d2.d? 1: 0);
     }
   return 1;			/* or some compilers complain */
 }
 /*----------------------------------------------------------------------*/
-int pcmp2(const void *arg1, const void *arg2)
+Int pcmp2(const void *arg1, const void *arg2)
 {
   extern pointer	pcmp_ptr;
-  extern int	pcmp_type;
+  extern Int	pcmp_type;
   scalar	d1, d2;
 
   switch (pcmp_type) {
     case ANA_BYTE:
-      d1.b = *(byte *) arg1;
-      d2.b = pcmp_ptr.b[*(int *) arg2];
+      d1.b = *(Byte *) arg1;
+      d2.b = pcmp_ptr.b[*(Int *) arg2];
       return d1.b < d2.b? -1: (d1.b > d2.b? 1: 0);
     case ANA_WORD:
-      d1.w = *(word *) arg1;
-      d2.w = pcmp_ptr.w[*(int *) arg2];
+      d1.w = *(Word *) arg1;
+      d2.w = pcmp_ptr.w[*(Int *) arg2];
       return d1.w < d2.w? -1: (d1.w > d2.w? 1: 0);
     case ANA_LONG:
-      d1.l = *(int *) arg1;
-      d2.l = pcmp_ptr.l[*(int *) arg2];
+      d1.l = *(Int *) arg1;
+      d2.l = pcmp_ptr.l[*(Int *) arg2];
       return d1.l < d2.l? -1: (d1.l > d2.l? 1: 0);
     case ANA_FLOAT:
-      d1.f = *(float *) arg1;
-      d2.f = pcmp_ptr.f[*(int *) arg2];
+      d1.f = *(Float *) arg1;
+      d2.f = pcmp_ptr.f[*(Int *) arg2];
       return d1.f < d2.f? -1: (d1.f > d2.f? 1: 0);
     case ANA_DOUBLE:
-      d1.d = *(double *) arg1;
-      d2.d = pcmp_ptr.d[*(int *) arg2];
+      d1.d = *(Double *) arg1;
+      d2.d = pcmp_ptr.d[*(Int *) arg2];
       return d1.d < d2.d? -1: (d1.d > d2.d? 1: 0);
     }
   return 1;			/* or some compilers complain */
 }
 /*----------------------------------------------------------------------*/
-int ana_match(int narg, int ps[])
+Int ana_match(Int narg, Int ps[])
 /* y = match(target, set) returns the index of each element of <target>
    in <set>, or -1 for elements that are not in <set>.
    LS 14apr97 */
 {
- int	nTarget, nSet, iq, step, *ptr, i, *p;
+ Int	nTarget, nSet, iq, step, *ptr, i, *p;
  pointer	target, set, result;
- byte	maxType;
+ Byte	maxType;
 
  if (getSimpleNumerical(ps[0], &target, &nTarget) < 0)
    return -1;			/* some error */
@@ -2380,18 +2380,18 @@ int ana_match(int narg, int ps[])
    result.l = &scalar_value(iq).l;
  }
 
- ptr = malloc(nSet*sizeof(int));
+ ptr = malloc(nSet*sizeof(Int));
  if (!ptr)
    return cerror(ALLOC_ERR, 0);
  for (i = 0; i < nSet; i++)
    ptr[i] = i;
  pcmp_ptr = set;
  pcmp_type = maxType;
- qsort(ptr, nSet, sizeof(int), pcmp);
+ qsort(ptr, nSet, sizeof(Int), pcmp);
 
  step = ana_type_size[maxType];
  while (nTarget--) {
-   p = bsearch(target.b, ptr, nSet, sizeof(int), pcmp2);
+   p = bsearch(target.b, ptr, nSet, sizeof(Int), pcmp2);
    *result.l++ = p? *p: -1;
    target.b += step;
  }
@@ -2399,11 +2399,11 @@ int ana_match(int narg, int ps[])
  return iq;
 }
 /*----------------------------------------------------------------------*/
-int ana_not(int narg, int ps[])
-/* returns a byte 1 for every 0, and 0 for every non-zero element.
+Int ana_not(Int narg, Int ps[])
+/* returns a Byte 1 for every 0, and 0 for every non-zero element.
    LS 25feb93 */
 {
- int	iq, i, type;
+ Int	iq, i, type;
  array	*h;
  register pointer	arg, result;
 
@@ -2424,7 +2424,7 @@ int ana_not(int narg, int ps[])
  return iq;
 }
 /*----------------------------------------------------------------------*/
-int ana_table(int narg, int ps[])
+Int ana_table(Int narg, Int ps[])
 /* General linear interpolation routine.
    Syntax:  ynew = table(x, y, [index,] xnew)
    Use:  The first dimensions of <x> and <y> must be equal and
@@ -2440,12 +2440,12 @@ int ana_table(int narg, int ps[])
      then the result gets dimensions [7,5,2]
 */
 {
- int	symx, symy, symf, topType, nTable, nOut, nRepeat, ix, n1,
+ Int	symx, symy, symf, topType, nTable, nOut, nRepeat, ix, n1,
 	symr, i, nsymx, nsymy, nsymf, nLoop, n2;
  array	*hx, *hy, *hf, *hMax, *hr;
  pointer	x, y, xf, r, ox, oy, of, nx, ny;
  scalar	grad;
- int	ana_table2d(int, int []);
+ Int	ana_table2d(Int, Int []);
 
  if (narg == 4)
    return ana_table2d(narg, ps);
@@ -2477,7 +2477,7 @@ int ana_table(int narg, int ps[])
  if (hy->ndim > hMax->ndim)
    hMax = hy;
 	/* all common dims between x and y must be equal */
- for (i = 1; i < (int) ((hMax == hx)? hy->ndim: hx->ndim); i++)
+ for (i = 1; i < (Int) ((hMax == hx)? hy->ndim: hx->ndim); i++)
    if (hy->dims[i] != hx->dims[i])
      return cerror(INCMP_DIMS, symy);
  nTable = hx->dims[0];
@@ -2488,12 +2488,12 @@ int ana_table(int narg, int ps[])
    GET_SIZE(nOut, hf->dims, hf->ndim);
    nLoop = 1; }   
  else
- { for (i = 1; i < (int) ((hMax->ndim > hf->ndim)? hf->ndim: hMax->ndim); i++)
+ { for (i = 1; i < (Int) ((hMax->ndim > hf->ndim)? hf->ndim: hMax->ndim); i++)
      if (hMax->dims[i] != hf->dims[i])
        return cerror(INCMP_DIMS, symf);
    if (hMax->ndim > hf->ndim)
    { GET_SIZE(nRepeat, (&hMax->dims[hf->ndim]),
-	      ((int) hMax->ndim - hf->ndim)); }
+	      ((Int) hMax->ndim - hf->ndim)); }
    else nRepeat = 1;
    nOut = hf->dims[0];
    GET_SIZE(nLoop, (&hf->dims[1]), hf->ndim - 1);
@@ -2507,16 +2507,16 @@ int ana_table(int narg, int ps[])
  if (internalMode & 1)		/* first dim from xnew, higher from x,y,xnew */
  { if (hMax->ndim > hf->ndim)
    { hr->dims[0] = hf->dims[0];
-     memcpy(hr->dims + 1, hMax->dims + 1, (hMax->ndim - 1)*sizeof(int));
+     memcpy(hr->dims + 1, hMax->dims + 1, (hMax->ndim - 1)*sizeof(Int));
      hr->ndim = hMax->ndim; }
    else
-   { memcpy(hr->dims, hf->dims, hf->ndim*sizeof(int));
+   { memcpy(hr->dims, hf->dims, hf->ndim*sizeof(Int));
      hr->ndim = hf->ndim; }
  }
  else				/* all dims from xnew, all higher from x,y */
- { memcpy(hr->dims, hf->dims, hf->ndim*sizeof(int));
+ { memcpy(hr->dims, hf->dims, hf->ndim*sizeof(Int));
    if (hMax->ndim > 1)
-     memcpy(hr->dims + hf->ndim, hMax->dims + 1, (hMax->ndim - 1)*sizeof(int));
+     memcpy(hr->dims + hf->ndim, hMax->dims + 1, (hMax->ndim - 1)*sizeof(Int));
    hr->ndim = hf->ndim + hMax->ndim - 1; }
  ox.l = x.l = LPTR(hx);
  oy.l = y.l = LPTR(hy);
@@ -2592,7 +2592,7 @@ int ana_table(int narg, int ps[])
  return symr;
 }
 /*----------------------------------------------------------------------*/
-int ana_table2d(int narg, int ps[])
+Int ana_table2d(Int narg, Int ps[])
 /* General linear interpolation routine.
    Syntax:  ynew = table2d(x, y, index, xnew)
    Standard use:  <x> and <y> have the same dimensions; <xnew> and <index>
@@ -2609,7 +2609,7 @@ int ana_table2d(int narg, int ps[])
   LS 30aug93
 */
 {
- int	symx, symy, symf, symi, topType, nTable, nIndex, nRepeat, ix,
+ Int	symx, symy, symf, symi, topType, nTable, nIndex, nRepeat, ix,
 	symr, i, nsymx, nsymy, nsymf, nsymi, nx, ny, iTable;
  array	*hx, *hy, *hf, *hi;
  pointer	x, y, xf, xi, r, ox, oy, of, nf, oi, ni;
@@ -2645,13 +2645,13 @@ int ana_table2d(int narg, int ps[])
  nRepeat = 1;			/* the number of tables */
 		/* shared dimensions must be equal */
  if (hy->ndim > hx->ndim)
- { for (i = 1; i < (int) hx->ndim; i++)  if (hx->dims[i] != hy->dims[i])
+ { for (i = 1; i < (Int) hx->ndim; i++)  if (hx->dims[i] != hy->dims[i])
      return cerror(INCMP_DIMS, symy);
    if (hy->ndim > 1)
    { GET_SIZE(nRepeat, (hy->dims + 1), hy->ndim - 1); }
  }
  else
- { for (i = 1; i < (int) hy->ndim; i++)  if (hx->dims[i] != hy->dims[i])
+ { for (i = 1; i < (Int) hy->ndim; i++)  if (hx->dims[i] != hy->dims[i])
      return cerror(INCMP_DIMS, symy);
    if (hx->ndim > 1)
    { GET_SIZE(nRepeat, (hx->dims + 1), hx->ndim - 1); }
@@ -2662,15 +2662,15 @@ int ana_table2d(int narg, int ps[])
 	/* shared dimensions must be equal; single numbers are taken
 	   as arrays with zero dimensions */
    if (hf->ndim > hi->ndim)
-   { if ((int) hi->ndim > 1 || (hi->dims[0] > 1 && hf->dims[0] > 1))
+   { if ((Int) hi->ndim > 1 || (hi->dims[0] > 1 && hf->dims[0] > 1))
 						/* not zero dimensions */
-       for (i = 0; i < (int) hi->ndim; i++)  if (hf->dims[i] != hi->dims[i])
+       for (i = 0; i < (Int) hi->ndim; i++)  if (hf->dims[i] != hi->dims[i])
          return cerror(INCMP_DIMS, symi);
      GET_SIZE(nIndex, hf->dims, hf->ndim);
      ix = symf; }
    else
-   { if ((int) hf->ndim > 1 || (hf->dims[0] > 1 && hi->dims[0] > 1))
-       for (i = 0; i < (int) hf->ndim; i++)  if (hf->dims[i] != hi->dims[i])
+   { if ((Int) hf->ndim > 1 || (hf->dims[0] > 1 && hi->dims[0] > 1))
+       for (i = 0; i < (Int) hf->ndim; i++)  if (hf->dims[i] != hi->dims[i])
          return cerror(INCMP_DIMS, symi);
      if (hi->ndim > 1 || hi->dims[0] > hf->dims[0])
      { GET_SIZE(nIndex, hi->dims, hi->ndim);
@@ -2728,9 +2728,9 @@ int ana_table2d(int narg, int ps[])
      ix = nTable/2;		/* start looking in the middle */
      while (nIndex--)
      { table.f = *xi.f;
-       iTable = (int) table.f;
+       iTable = (Int) table.f;
        if (iTable < 0) iTable = 0;
-       if (iTable > nRepeat - ((float) iTable == table.f? 1: 2))
+       if (iTable > nRepeat - ((Float) iTable == table.f? 1: 2))
          iTable = nRepeat - 2;
        x.f = ox.f + iTable*nTable % nx;	/* start of relevant table */
        y.f = oy.f + iTable*nTable % ny;
@@ -2744,7 +2744,7 @@ int ana_table2d(int narg, int ps[])
        grad.f = x.f[ix + 1] - x.f[ix];
        if (grad.f != 0.0) grad.f = (y.f[ix + 1] - y.f[ix])/grad.f;
        *r.f = y.f[ix] + grad.f*(*xf.f - x.f[ix]);
-       if (table.f != (float) iTable)
+       if (table.f != (Float) iTable)
        { x.f += nTable % nx;  y.f += nTable % ny;
          if (*xf.f > x.f[ix])
          { while (ix < nTable - 1 && *xf.f > x.f[ix]) ix++;
@@ -2763,9 +2763,9 @@ int ana_table2d(int narg, int ps[])
      ix = nTable/2;		/* start looking in the middle */
      while (nIndex--)
      { table.d = *xi.d;
-       iTable = (int) table.d;
+       iTable = (Int) table.d;
        if (iTable < 0) iTable = 0;
-       if (iTable > nRepeat - ((double) iTable == table.d? 1: 2))
+       if (iTable > nRepeat - ((Double) iTable == table.d? 1: 2))
          iTable = nRepeat - 2;
        x.d = ox.d + iTable*nTable % nx;
        y.d = oy.d + iTable*nTable % ny;
@@ -2779,7 +2779,7 @@ int ana_table2d(int narg, int ps[])
        grad.d = x.d[ix + 1] - x.d[ix];
        if (grad.d != 0.0) grad.d = (y.d[ix + 1] - y.d[ix])/grad.d;
        *r.d = y.d[ix] + grad.d*(*xf.d - x.d[ix]);
-       if (table.d != (double) iTable)
+       if (table.d != (Double) iTable)
        { x.d += nTable % nx;  y.d += nTable % ny;
          if (*xf.d > x.d[ix])
          { while (ix < nTable - 1 && *xf.d > x.d[ix]) ix++;
@@ -2798,11 +2798,11 @@ int ana_table2d(int narg, int ps[])
  return symr;
 }
 /*----------------------------------------------------------------------*/
-int ana_push(int narg, int ps[])
+Int ana_push(Int narg, Int ps[])
 /* Push a number of variables onto the user stack
    LS 27may94 3aug99 */
 { 
-  int	iq;
+  Int	iq;
 
   while (narg--) {
     if (stackPointer == stack)
@@ -2813,12 +2813,12 @@ int ana_push(int narg, int ps[])
     ps++;
     *--stackPointer = iq;
     clist_symbols(stackSym) = stackPointer;
-    symbol_memory(stackSym) += sizeof(word);
+    symbol_memory(stackSym) += sizeof(Word);
   }
   return 1;
 }
 /*----------------------------------------------------------------------*/
-int ana_pop(int narg, int ps[])
+Int ana_pop(Int narg, Int ps[])
 /* pop a number of variables from the user stack, in reverse order from PUSH;
    i.e. after  push,x,y  pop,x,y  restores x and y.
    pop,NUM=<number> pops the top <number> symbols into their original sources.
@@ -2827,7 +2827,7 @@ int ana_pop(int narg, int ps[])
    LS 27may94 3aug99 */
 {
   char	isError = 0;
-  int	number, iq, i1, i2, i;
+  Int	number, iq, i1, i2, i;
 
   if (ps[0]) {			/* have NUM */
     number = int_arg(ps[0]);
@@ -2841,7 +2841,7 @@ int ana_pop(int narg, int ps[])
       } else if (ana_replace(sym[iq].xx, iq) == ANA_ERROR)
 	isError = 1;
       zap(iq);
-      symbol_memory(stackSym) -= sizeof(word);
+      symbol_memory(stackSym) -= sizeof(Word);
       clist_symbols(stackSym) = stackPointer;
     }
   }
@@ -2857,7 +2857,7 @@ int ana_pop(int narg, int ps[])
       if (ana_replace(ps[i], *stackPointer) == ANA_ERROR)
 	isError = 1;
       zap(*stackPointer++);
-      symbol_memory(stackSym) -= sizeof(word);
+      symbol_memory(stackSym) -= sizeof(Word);
       clist_symbols(stackSym) = stackPointer;
     }
     if (i2 < narg) {		/* number of symbols to pop */
@@ -2872,7 +2872,7 @@ int ana_pop(int narg, int ps[])
 	} else if (ana_replace(sym[iq].xx, iq) == ANA_ERROR)
 	  isError = 1;
 	zap(iq);
-        symbol_memory(stackSym) -= sizeof(word);
+        symbol_memory(stackSym) -= sizeof(Word);
         clist_symbols(stackSym) = stackPointer;
       }
     }
@@ -2881,12 +2881,12 @@ int ana_pop(int narg, int ps[])
   return isError? ANA_ERROR: ANA_OK;
 }
 /*----------------------------------------------------------------------*/
-int ana_dump_stack(int narg, int ps[])
+Int ana_dump_stack(Int narg, Int ps[])
 /* Displays the contents of the user stack
    LS 27may94 */
 {
-  int	iq, count = 0;
-  word	*p;
+  Int	iq, count = 0;
+  Word	*p;
   
   if (stackPointer == stack + STACKSIZE) {
     puts("The stack is empty.");
@@ -2900,11 +2900,11 @@ int ana_dump_stack(int narg, int ps[])
   return 1;
 }
 /*----------------------------------------------------------------------*/
-int peek(int narg, int ps[])
+Int peek(Int narg, Int ps[])
 /* display memory contents */
 { 
-  int	start, nr;
-  byte	*adr, i;
+  Int	start, nr;
+  Byte	*adr, i;
   char	s;
 
 /* we're in trouble on OSF machines, where pointers are bigger than ints. */
@@ -2912,7 +2912,7 @@ int peek(int narg, int ps[])
   start = int_arg(ps[0]);
   if (narg > 1) nr = int_arg(ps[1]); else nr = 1;
   if (nr < 1) nr = 1;
-  adr = (byte *) NULL + start;
+  adr = (Byte *) NULL + start;
   while (nr--)
   { i = *adr++;
     if (isprint(i)) s = (char) i; else s = '*';
@@ -2920,15 +2920,15 @@ int peek(int narg, int ps[])
   return 1;
 }
 /*----------------------------------------------------------------------*/
-int ana_atomize(int narg, int ps[])
+Int ana_atomize(Int narg, Int ps[])
 /* atomizes and displays symbol *ps - for debugging purposes
    second argument determines whether all individual atomic arguments
    are also ana_dump-ed
    LS 18may93 */
 {
- char	*symbol_ident(char *, int, int, char);
- int	iq, dump;
- void	dumpLine(int), dumpTree(int);
+ char	*symbol_ident(char *, Int, Int, char);
+ Int	iq, dump;
+ void	dumpLine(Int), dumpTree(Int);
 
  iq = int_arg(*ps++);
  if (internalMode & 2)
@@ -2942,7 +2942,7 @@ int ana_atomize(int narg, int ps[])
  return 1;
 }
 /*----------------------------------------------------------------------*/
-int ana_redirect_diagnostic(int narg, int ps[])
+Int ana_redirect_diagnostic(Int narg, Int ps[])
 /* specifies file to which diagnostic information is redirected */
 /* LS 29may93 */
 {
@@ -2958,7 +2958,7 @@ int ana_redirect_diagnostic(int narg, int ps[])
  return 1;
 }
 /*----------------------------------------------------------------------*/
-int ana_default(int narg, int ps[])
+Int ana_default(Int narg, Int ps[])
 /* syntax:  default,var1,val1,var2,val2,...
    assigns <val1>, <val2>,... to <var1>, <var2>,... if <var1> etc. are
    undefined, i.e. specifies default values.   LS 4jun93 */
@@ -2967,7 +2967,7 @@ int ana_default(int narg, int ps[])
 /* DEFAULT,A,3,B,2*A  works fine even when A and B are both undefined */
 /* before this statement was executed.  LS 27mar97 */
 {
- int	i, n = 1, iq;
+ Int	i, n = 1, iq;
 
  for (i = 0; i < narg/2; i++)
  { iq = *ps;
@@ -2985,7 +2985,7 @@ int ana_default(int narg, int ps[])
  return n;
 }
 /*----------------------------------------------------------------------*/
-int local_maxormin(int narg, int ps[], int code)
+Int local_maxormin(Int narg, Int ps[], Int code)
 /* arguments:  (array, position, code)
    searches for local extreme in <array>, starting at <position> (which
    is either a scalar or an array of indices)
@@ -3012,14 +3012,14 @@ int local_maxormin(int narg, int ps[], int code)
    position in !LASTMAX or !LASTMIN.   LS 9jun93 */
 /* added ghost-array support  LS 23jun93 */
 {
- int		iq, *dims, ndim, type, n, i, currentIndex,
+ Int		iq, *dims, ndim, type, n, i, currentIndex,
 		comparisonIndex, nextIndex,
 		size[MAX_DIMS], typesize, max, indx[MAX_DIMS], j,
 		defaultOffset, *indexPtr, n2, trgttype, ntarget, nelem;
- extern int	lastmaxloc, lastminloc, lastmin_sym, lastmax_sym;
+ extern Int	lastmaxloc, lastminloc, lastmin_sym, lastmax_sym;
  extern scalar	lastmax, lastmin;
  char		count[MAX_DIMS], *fname, filemap = 0, ready, edge;
- float		*grad, *grad2, *hessian, *hessian2, x, v;
+ Float		*grad, *grad2, *hessian, *hessian2, x, v;
  scalar		value, nextValue;
  pointer	data, trgt, extr;
  FILE		*fp;
@@ -3077,7 +3077,7 @@ int local_maxormin(int narg, int ps[], int code)
        puts("Sub-grid position array needs too many dimensions.");
        return cerror(N_DIMS_OVR, 0);
      }
-     memcpy(size, array_dims(iq), array_num_dims(iq)*sizeof(float));
+     memcpy(size, array_dims(iq), array_num_dims(iq)*sizeof(Float));
      j = array_num_dims(iq);
      size[j++] = ndim;
    }
@@ -3099,10 +3099,10 @@ int local_maxormin(int narg, int ps[], int code)
    defaultOffset -= size[i];
  }
  if (code & 4) {		/* subgrid stuff */
-   allocate(grad, ndim, float);
-   allocate(grad2, ndim, float);
-   allocate(hessian, ndim*ndim, float);
-   allocate(hessian2, ndim, float);
+   allocate(grad, ndim, Float);
+   allocate(grad2, ndim, Float);
+   allocate(hessian, ndim*ndim, Float);
+   allocate(hessian2, ndim, Float);
  }
 		/* setup for search */
  n = ntarget;
@@ -3239,10 +3239,10 @@ int local_maxormin(int narg, int ps[], int code)
 	   /* calculate gradient and hessian matrix */
 	   if (!filemap) {
 	     extr.b = &data.b[currentIndex];
-	     v = (float) *extr.b;
+	     v = (Float) *extr.b;
 	     for (i = 0; i < ndim; i++)
-	       grad[i] = grad2[i] = ((float) extr.b[size[i]]
-				     - (float) extr.b[-size[i]])/2;
+	       grad[i] = grad2[i] = ((Float) extr.b[size[i]]
+				     - (Float) extr.b[-size[i]])/2;
 	     ready = 1;		/* zero gradient? */
 	     for (i = 0; i < ndim; i++) {
 	       if (grad[i] != 0) {
@@ -3256,23 +3256,23 @@ int local_maxormin(int narg, int ps[], int code)
 	       for (j = 0; j <= i; j++) {
 		 if (i == j)
 		   hessian[i + i*ndim] = hessian2[i] = 
-		     (float) extr.b[size[i]] + (float) extr.b[-size[i]] - 2*v;
+		     (Float) extr.b[size[i]] + (Float) extr.b[-size[i]] - 2*v;
 		 else {
-		   x = ((float) extr.b[size[i] + size[j]]
-			+ (float) extr.b[-size[i] - size[j]]
-			- (float) extr.b[size[i] - size[j]]
-			- (float) extr.b[size[j] - size[i]])/4;
+		   x = ((Float) extr.b[size[i] + size[j]]
+			+ (Float) extr.b[-size[i] - size[j]]
+			- (Float) extr.b[size[i] - size[j]]
+			- (Float) extr.b[size[j] - size[i]])/4;
 		   hessian[i + j*ndim] = hessian[j + i*ndim] = x;
 		 }
 	       }
 	   } else {		/* filemap array */
 	     readGhost(fp, value.b, currentIndex, typesize);
-	     v = (float) value.b;
+	     v = (Float) value.b;
 	     for (i = 0; i < ndim; i++) {
 	       readGhost(fp, value.b, currentIndex + size[i], typesize);
-	       grad[i] = (float) value.b;
+	       grad[i] = (Float) value.b;
 	       readGhost(fp, value.b, currentIndex - size[i], typesize);
-	       grad[i] = (grad[i] - (float) value.b)/2;
+	       grad[i] = (grad[i] - (Float) value.b)/2;
 	     }
 	     ready = 1;		/* zero gradient? */
 	     for (i = 0; i < ndim; i++) {
@@ -3287,23 +3287,23 @@ int local_maxormin(int narg, int ps[], int code)
 	       for (j = 0; j <= i; j++) {
 		 if (i == j) {
 		   readGhost(fp, value.b, currentIndex + size[i], typesize);
-		   x = (float) value.b;
+		   x = (Float) value.b;
 		   readGhost(fp, value.b, currentIndex - size[i], typesize);
 		   hessian[i + i*ndim] = hessian2[i] =
-		     x + (float) value.b - 2*v;
+		     x + (Float) value.b - 2*v;
 		 } else {
 		   readGhost(fp, value.b, currentIndex + size[i] + size[j],
 			     typesize);
-		   x = (float) value.b;
+		   x = (Float) value.b;
 		   readGhost(fp, value.b, currentIndex - size[i] - size[j],
 			     typesize);
-		   x += (float) value.b;
+		   x += (Float) value.b;
 		   readGhost(fp, value.b, currentIndex + size[i] - size[j],
 			     typesize);
-		   x -= (float) value.b;
+		   x -= (Float) value.b;
 		   readGhost(fp, value.b, currentIndex - size[i] + size[j],
 			     typesize);
-		   x -= (float) value.b;
+		   x -= (Float) value.b;
 		   hessian[i + j*ndim] = hessian[j + i*ndim] = x/4;
 		 }
 	       }
@@ -3313,10 +3313,10 @@ int local_maxormin(int narg, int ps[], int code)
 	   /* calculate gradient and hessian matrix */
 	   if (!filemap) {
 	     extr.w = &data.w[currentIndex];
-	     v = (float) *extr.w;
+	     v = (Float) *extr.w;
 	     for (i = 0; i < ndim; i++)
-	       grad[i] = grad2[i] = ((float) extr.w[size[i]]
-				     - (float) extr.w[-size[i]])/2;
+	       grad[i] = grad2[i] = ((Float) extr.w[size[i]]
+				     - (Float) extr.w[-size[i]])/2;
 	     ready = 1;		/* zero gradient? */
 	     for (i = 0; i < ndim; i++) {
 	       if (grad[i] != 0) {
@@ -3330,23 +3330,23 @@ int local_maxormin(int narg, int ps[], int code)
 	       for (j = 0; j <= i; j++) {
 		 if (i == j)
 		   hessian[i + i*ndim] = hessian2[i] = 
-		     (float) extr.w[size[i]] + (float) extr.w[-size[i]] - 2*v;
+		     (Float) extr.w[size[i]] + (Float) extr.w[-size[i]] - 2*v;
 		 else {
-		   x = ((float) extr.w[size[i] + size[j]]
-			+ (float) extr.w[-size[i] - size[j]]
-			- (float) extr.w[size[i] - size[j]]
-			- (float) extr.w[size[j] - size[i]])/4;
+		   x = ((Float) extr.w[size[i] + size[j]]
+			+ (Float) extr.w[-size[i] - size[j]]
+			- (Float) extr.w[size[i] - size[j]]
+			- (Float) extr.w[size[j] - size[i]])/4;
 		   hessian[i + j*ndim] = hessian[j + i*ndim] = x;
 		 }
 	       }
 	   } else {		/* filemap array */
 	     readGhost(fp, value.w, currentIndex, typesize);
-	     v = (float) value.w;
+	     v = (Float) value.w;
 	     for (i = 0; i < ndim; i++) {
 	       readGhost(fp, value.w, currentIndex + size[i], typesize);
-	       grad[i] = (float) value.w;
+	       grad[i] = (Float) value.w;
 	       readGhost(fp, value.w, currentIndex - size[i], typesize);
-	       grad[i] = (grad[i] - (float) value.w)/2;
+	       grad[i] = (grad[i] - (Float) value.w)/2;
 	     }
 	     ready = 1;		/* zero gradient? */
 	     for (i = 0; i < ndim; i++) {
@@ -3361,23 +3361,23 @@ int local_maxormin(int narg, int ps[], int code)
 	       for (j = 0; j <= i; j++) {
 		 if (i == j) {
 		   readGhost(fp, value.w, currentIndex + size[i], typesize);
-		   x = (float) value.w;
+		   x = (Float) value.w;
 		   readGhost(fp, value.w, currentIndex - size[i], typesize);
 		   hessian[i + i*ndim] = hessian2[i] =
-		     x + (float) value.w - 2*v;
+		     x + (Float) value.w - 2*v;
 		 } else {
 		   readGhost(fp, value.w, currentIndex + size[i] + size[j],
 			     typesize);
-		   x = (float) value.w;
+		   x = (Float) value.w;
 		   readGhost(fp, value.w, currentIndex - size[i] - size[j],
 			     typesize);
-		   x += (float) value.w;
+		   x += (Float) value.w;
 		   readGhost(fp, value.w, currentIndex + size[i] - size[j],
 			     typesize);
-		   x -= (float) value.w;
+		   x -= (Float) value.w;
 		   readGhost(fp, value.w, currentIndex - size[i] + size[j],
 			     typesize);
-		   x -= (float) value.w;
+		   x -= (Float) value.w;
 		   hessian[i + j*ndim] = hessian[j + i*ndim] = x/4;
 		 }
 	       }
@@ -3387,10 +3387,10 @@ int local_maxormin(int narg, int ps[], int code)
 	   /* calculate gradient and hessian matrix */
 	   if (!filemap) {
 	     extr.l = &data.l[currentIndex];
-	     v = (float) *extr.l;
+	     v = (Float) *extr.l;
 	     for (i = 0; i < ndim; i++)
-	       grad[i] = grad2[i] = ((float) extr.l[size[i]]
-				     - (float) extr.l[-size[i]])/2;
+	       grad[i] = grad2[i] = ((Float) extr.l[size[i]]
+				     - (Float) extr.l[-size[i]])/2;
 	     ready = 1;		/* zero gradient? */
 	     for (i = 0; i < ndim; i++) {
 	       if (grad[i] != 0) {
@@ -3404,23 +3404,23 @@ int local_maxormin(int narg, int ps[], int code)
 	       for (j = 0; j <= i; j++) {
 		 if (i == j)
 		   hessian[i + i*ndim] = hessian2[i] = 
-		     (float) extr.l[size[i]] + (float) extr.l[-size[i]] - 2*v;
+		     (Float) extr.l[size[i]] + (Float) extr.l[-size[i]] - 2*v;
 		 else {
-		   x = ((float) extr.l[size[i] + size[j]]
-			+ (float) extr.l[-size[i] - size[j]]
-			- (float) extr.l[size[i] - size[j]]
-			- (float) extr.l[size[j] - size[i]])/4;
+		   x = ((Float) extr.l[size[i] + size[j]]
+			+ (Float) extr.l[-size[i] - size[j]]
+			- (Float) extr.l[size[i] - size[j]]
+			- (Float) extr.l[size[j] - size[i]])/4;
 		   hessian[i + j*ndim] = hessian[j + i*ndim] = x;
 		 }
 	       }
 	   } else {		/* filemap array */
 	     readGhost(fp, value.l, currentIndex, typesize);
-	     v = (float) value.l;
+	     v = (Float) value.l;
 	     for (i = 0; i < ndim; i++) {
 	       readGhost(fp, value.l, currentIndex + size[i], typesize);
-	       grad[i] = (float) value.l;
+	       grad[i] = (Float) value.l;
 	       readGhost(fp, value.l, currentIndex - size[i], typesize);
-	       grad[i] = (grad[i] - (float) value.l)/2;
+	       grad[i] = (grad[i] - (Float) value.l)/2;
 	     }
 	     ready = 1;		/* zero gradient? */
 	     for (i = 0; i < ndim; i++) {
@@ -3435,23 +3435,23 @@ int local_maxormin(int narg, int ps[], int code)
 	       for (j = 0; j <= i; j++) {
 		 if (i == j) {
 		   readGhost(fp, value.l, currentIndex + size[i], typesize);
-		   x = (float) value.l;
+		   x = (Float) value.l;
 		   readGhost(fp, value.l, currentIndex - size[i], typesize);
 		   hessian[i + i*ndim] = hessian2[i] =
-		     x + (float) value.l - 2*v;
+		     x + (Float) value.l - 2*v;
 		 } else {
 		   readGhost(fp, value.l, currentIndex + size[i] + size[j],
 			     typesize);
-		   x = (float) value.l;
+		   x = (Float) value.l;
 		   readGhost(fp, value.l, currentIndex - size[i] - size[j],
 			     typesize);
-		   x += (float) value.l;
+		   x += (Float) value.l;
 		   readGhost(fp, value.l, currentIndex + size[i] - size[j],
 			     typesize);
-		   x -= (float) value.l;
+		   x -= (Float) value.l;
 		   readGhost(fp, value.l, currentIndex - size[i] + size[j],
 			     typesize);
-		   x -= (float) value.l;
+		   x -= (Float) value.l;
 		   hessian[i + j*ndim] = hessian[j + i*ndim] = x/4;
 		 }
 	       }
@@ -3461,10 +3461,10 @@ int local_maxormin(int narg, int ps[], int code)
 	   /* calculate gradient and hessian matrix */
 	   if (!filemap) {
 	     extr.f = &data.f[currentIndex];
-	     v = (float) *extr.f;
+	     v = (Float) *extr.f;
 	     for (i = 0; i < ndim; i++)
-	       grad[i] = grad2[i] = ((float) extr.f[size[i]]
-				     - (float) extr.f[-size[i]])/2;
+	       grad[i] = grad2[i] = ((Float) extr.f[size[i]]
+				     - (Float) extr.f[-size[i]])/2;
 	     ready = 1;		/* zero gradient? */
 	     for (i = 0; i < ndim; i++) {
 	       if (grad[i] != 0) {
@@ -3478,23 +3478,23 @@ int local_maxormin(int narg, int ps[], int code)
 	       for (j = 0; j <= i; j++) {
 		 if (i == j)
 		   hessian[i + i*ndim] = hessian2[i] = 
-		     (float) extr.f[size[i]] + (float) extr.f[-size[i]] - 2*v;
+		     (Float) extr.f[size[i]] + (Float) extr.f[-size[i]] - 2*v;
 		 else {
-		   x = ((float) extr.f[size[i] + size[j]]
-			+ (float) extr.f[-size[i] - size[j]]
-			- (float) extr.f[size[i] - size[j]]
-			- (float) extr.f[size[j] - size[i]])/4;
+		   x = ((Float) extr.f[size[i] + size[j]]
+			+ (Float) extr.f[-size[i] - size[j]]
+			- (Float) extr.f[size[i] - size[j]]
+			- (Float) extr.f[size[j] - size[i]])/4;
 		   hessian[i + j*ndim] = hessian[j + i*ndim] = x;
 		 }
 	       }
 	   } else {		/* filemap array */
 	     readGhost(fp, value.f, currentIndex, typesize);
-	     v = (float) value.f;
+	     v = (Float) value.f;
 	     for (i = 0; i < ndim; i++) {
 	       readGhost(fp, value.f, currentIndex + size[i], typesize);
-	       grad[i] = (float) value.f;
+	       grad[i] = (Float) value.f;
 	       readGhost(fp, value.f, currentIndex - size[i], typesize);
-	       grad[i] = (grad[i] - (float) value.f)/2;
+	       grad[i] = (grad[i] - (Float) value.f)/2;
 	     }
 	     ready = 1;		/* zero gradient? */
 	     for (i = 0; i < ndim; i++) {
@@ -3509,23 +3509,23 @@ int local_maxormin(int narg, int ps[], int code)
 	       for (j = 0; j <= i; j++) {
 		 if (i == j) {
 		   readGhost(fp, value.f, currentIndex + size[i], typesize);
-		   x = (float) value.f;
+		   x = (Float) value.f;
 		   readGhost(fp, value.f, currentIndex - size[i], typesize);
 		   hessian[i + i*ndim] = hessian2[i] =
-		     x + (float) value.f - 2*v;
+		     x + (Float) value.f - 2*v;
 		 } else {
 		   readGhost(fp, value.f, currentIndex + size[i] + size[j],
 			     typesize);
-		   x = (float) value.f;
+		   x = (Float) value.f;
 		   readGhost(fp, value.f, currentIndex - size[i] - size[j],
 			     typesize);
-		   x += (float) value.f;
+		   x += (Float) value.f;
 		   readGhost(fp, value.f, currentIndex + size[i] - size[j],
 			     typesize);
-		   x -= (float) value.f;
+		   x -= (Float) value.f;
 		   readGhost(fp, value.f, currentIndex - size[i] + size[j],
 			     typesize);
-		   x -= (float) value.f;
+		   x -= (Float) value.f;
 		   hessian[i + j*ndim] = hessian[j + i*ndim] = x/4;
 		 }
 	       }
@@ -3535,10 +3535,10 @@ int local_maxormin(int narg, int ps[], int code)
 	   /* calculate gradient and hessian matrix */
 	   if (!filemap) {
 	     extr.d = &data.d[currentIndex];
-	     v = (float) *extr.d;
+	     v = (Float) *extr.d;
 	     for (i = 0; i < ndim; i++)
-	       grad[i] = grad2[i] = ((float) extr.d[size[i]]
-				     - (float) extr.d[-size[i]])/2;
+	       grad[i] = grad2[i] = ((Float) extr.d[size[i]]
+				     - (Float) extr.d[-size[i]])/2;
 	     ready = 1;		/* zero gradient? */
 	     for (i = 0; i < ndim; i++) {
 	       if (grad[i] != 0) {
@@ -3552,23 +3552,23 @@ int local_maxormin(int narg, int ps[], int code)
 	       for (j = 0; j <= i; j++) {
 		 if (i == j)
 		   hessian[i + i*ndim] = hessian2[i] = 
-		     (float) extr.d[size[i]] + (float) extr.d[-size[i]] - 2*v;
+		     (Float) extr.d[size[i]] + (Float) extr.d[-size[i]] - 2*v;
 		 else {
-		   x = ((float) extr.d[size[i] + size[j]]
-			+ (float) extr.d[-size[i] - size[j]]
-			- (float) extr.d[size[i] - size[j]]
-			- (float) extr.d[size[j] - size[i]])/4;
+		   x = ((Float) extr.d[size[i] + size[j]]
+			+ (Float) extr.d[-size[i] - size[j]]
+			- (Float) extr.d[size[i] - size[j]]
+			- (Float) extr.d[size[j] - size[i]])/4;
 		   hessian[i + j*ndim] = hessian[j + i*ndim] = x;
 		 }
 	       }
 	   } else {		/* filemap array */
 	     readGhost(fp, value.d, currentIndex, typesize);
-	     v = (float) value.d;
+	     v = (Float) value.d;
 	     for (i = 0; i < ndim; i++) {
 	       readGhost(fp, value.d, currentIndex + size[i], typesize);
-	       grad[i] = (float) value.d;
+	       grad[i] = (Float) value.d;
 	       readGhost(fp, value.d, currentIndex - size[i], typesize);
-	       grad[i] = (grad[i] - (float) value.d)/2;
+	       grad[i] = (grad[i] - (Float) value.d)/2;
 	     }
 	     ready = 1;		/* zero gradient? */
 	     for (i = 0; i < ndim; i++) {
@@ -3583,23 +3583,23 @@ int local_maxormin(int narg, int ps[], int code)
 	       for (j = 0; j <= i; j++) {
 		 if (i == j) {
 		   readGhost(fp, value.d, currentIndex + size[i], typesize);
-		   x = (float) value.d;
+		   x = (Float) value.d;
 		   readGhost(fp, value.d, currentIndex - size[i], typesize);
 		   hessian[i + i*ndim] = hessian2[i] =
-		     x + (float) value.d - 2*v;
+		     x + (Float) value.d - 2*v;
 		 } else {
 		   readGhost(fp, value.d, currentIndex + size[i] + size[j],
 			     typesize);
-		   x = (float) value.d;
+		   x = (Float) value.d;
 		   readGhost(fp, value.d, currentIndex - size[i] - size[j],
 			     typesize);
-		   x += (float) value.d;
+		   x += (Float) value.d;
 		   readGhost(fp, value.d, currentIndex + size[i] - size[j],
 			     typesize);
-		   x -= (float) value.d;
+		   x -= (Float) value.d;
 		   readGhost(fp, value.d, currentIndex - size[i] + size[j],
 			     typesize);
-		   x -= (float) value.d;
+		   x -= (Float) value.d;
 		   hessian[i + j*ndim] = hessian[j + i*ndim] = x/4;
 		 }
 	       }
@@ -3656,19 +3656,19 @@ int local_maxormin(int narg, int ps[], int code)
      if (code & 4) {		/* subgrid value */
        switch (type) {
        case ANA_BYTE:
-	 *trgt.f++ = (float) nextValue.b;
+	 *trgt.f++ = (Float) nextValue.b;
 	 break;
        case ANA_WORD:
-	 *trgt.f++ = (float) nextValue.w;
+	 *trgt.f++ = (Float) nextValue.w;
 	 break;
        case ANA_LONG:
-	 *trgt.f++ = (float) nextValue.l;
+	 *trgt.f++ = (Float) nextValue.l;
 	 break;
        case ANA_FLOAT:
-	 *trgt.f++ = (float) nextValue.f;
+	 *trgt.f++ = (Float) nextValue.f;
 	 break;
        case ANA_DOUBLE:
-	 *trgt.f++ = (float) nextValue.d;
+	 *trgt.f++ = (Float) nextValue.d;
 	 break;
        }
      } else {			/* grid value */
@@ -3703,17 +3703,17 @@ int local_maxormin(int narg, int ps[], int code)
 		/* prepare result */
  if (max) {			/* sought maximum */
    lastmaxloc = currentIndex;
-   memcpy(&lastmax.b, &nextValue.b, (code & 4)? sizeof(float): typesize);
+   memcpy(&lastmax.b, &nextValue.b, (code & 4)? sizeof(Float): typesize);
    symbol_type(lastmax_sym) = (code & 4)? ANA_FLOAT: type;
  } else {
    lastminloc = currentIndex;
-   memcpy(&lastmin.b, &nextValue.b, (code & 4)? sizeof(float): typesize);
+   memcpy(&lastmin.b, &nextValue.b, (code & 4)? sizeof(Float): typesize);
    symbol_type(lastmin_sym) = (code & 4)? ANA_FLOAT: type;
  }
  return iq;
 }
 /*----------------------------------------------------------------------*/
-int ana_local_maxf(int narg, int ps[])
+Int ana_local_maxf(Int narg, Int ps[])
 /* find value of local maximum in <array>, starting at <position> and
    walking along the steepest gradient.
    Adjusts !LASTMAX, !LASTMAXLOC.
@@ -3721,7 +3721,7 @@ int ana_local_maxf(int narg, int ps[])
    LS 9jun93 */
 { return local_maxormin(narg, ps, 2); }
 /*----------------------------------------------------------------------*/
-int ana_local_maxloc(int narg, int ps[])
+Int ana_local_maxloc(Int narg, Int ps[])
 /* find position of local maximum in <array>, starting at <position> and
    walking along the steepest gradient.
    Adjusts !LASTMAX, !LASTMAXLOC.
@@ -3729,7 +3729,7 @@ int ana_local_maxloc(int narg, int ps[])
    LS 9jun93 */
 { return local_maxormin(narg, ps, 3); }
 /*----------------------------------------------------------------------*/
-int ana_local_minf(int narg, int ps[])
+Int ana_local_minf(Int narg, Int ps[])
 /* find value of local minimum in <array>, starting at <position> and
    walking along the steepest gradient.
    Adjusts !LASTMIN, !LASTMINLOC.
@@ -3737,7 +3737,7 @@ int ana_local_minf(int narg, int ps[])
    LS 9jun93 */
 { return local_maxormin(narg, ps, 0); }
 /*----------------------------------------------------------------------*/
-int ana_local_minloc(int narg, int ps[])
+Int ana_local_minloc(Int narg, Int ps[])
 /* find position of local minimum in <array>, starting at <position> and
    walking along the steepest gradient.
    Adjusts !LASTMIN, !LASTMINLOC.
@@ -3745,14 +3745,14 @@ int ana_local_minloc(int narg, int ps[])
    LS 9jun93 */
 { return local_maxormin(narg, ps, 1); }
 /*----------------------------------------------------------------------*/
-int ana_zinv(int narg, int ps[])
+Int ana_zinv(Int narg, Int ps[])
 /* y = zinv(x)
    y = 1.0/x if x not equal to 0, y = 0 otherwise.
    LS 30aug93 */
 {
- int	topType, result, iq, n;
+ Int	topType, result, iq, n;
  pointer	data, target;
- double	value;
+ Double	value;
 
  iq = *ps;
  if (!symbolIsNumerical(iq))
@@ -3846,13 +3846,13 @@ int ana_zinv(int narg, int ps[])
  return result;
 }
 /*----------------------------------------------------------------------*/
-int ana_find_maxloc_old(int narg, int ps[])
+Int ana_find_maxloc_old(Int narg, Int ps[])
 /* Returns the indices of local maximums in a 2D image.
    Must be maximums in 4 directions (N-S, E-W, NE-SW, NW-SE).
    The edges are disregarded.
    LS 18feb94 */
 {
- int	nx, ny, row, column, result, indx, num = 0;
+ Int	nx, ny, row, column, result, indx, num = 0;
  pointer	data, data_start;
  scalar		this;
  array	*h;
@@ -3879,7 +3879,7 @@ int ana_find_maxloc_old(int narg, int ps[])
            && this.b >= data.b[-1-nx] && this.b > data.b[-1+nx]
            && this.b >= data.b[1-nx] && this.b > data.b[1+nx])
          { indx = data.b - data_start.b;
-           fwrite(&indx, sizeof(int), 1, fp);  num++; }
+           fwrite(&indx, sizeof(Int), 1, fp);  num++; }
          data.b++; }
        data.b += 2; }
      break;
@@ -3894,7 +3894,7 @@ int ana_find_maxloc_old(int narg, int ps[])
            && this.w >= data.w[-1-nx] && this.w > data.w[-1+nx]
            && this.w >= data.w[1-nx] && this.w > data.w[1+nx])
          { indx = data.w - data_start.w;
-           fwrite(&indx, sizeof(int), 1, fp);  num++; }
+           fwrite(&indx, sizeof(Int), 1, fp);  num++; }
          data.w++; }
        data.w += 2; }
      break;
@@ -3909,7 +3909,7 @@ int ana_find_maxloc_old(int narg, int ps[])
            && this.l >= data.l[-1-nx] && this.l > data.l[-1+nx]
            && this.l >= data.l[1-nx] && this.l > data.l[1+nx])
          { indx = data.l - data_start.l;
-           fwrite(&indx, sizeof(int), 1, fp);  num++; }
+           fwrite(&indx, sizeof(Int), 1, fp);  num++; }
          data.l++; }
        data.l += 2; }
      break;
@@ -3924,7 +3924,7 @@ int ana_find_maxloc_old(int narg, int ps[])
            && this.f >= data.f[-1-nx] && this.f > data.f[-1+nx]
            && this.f >= data.f[1-nx] && this.f > data.f[1+nx])
          { indx = data.f - data_start.f;
-           fwrite(&indx, sizeof(int), 1, fp);  num++; }
+           fwrite(&indx, sizeof(Int), 1, fp);  num++; }
          data.f++; }
        data.f += 2; }
      break;
@@ -3939,7 +3939,7 @@ int ana_find_maxloc_old(int narg, int ps[])
            && this.d >= data.d[-1-nx] && this.d > data.d[-1+nx]
            && this.d >= data.d[1-nx] && this.d > data.d[1+nx])
          { indx = data.d - data_start.d;
-           fwrite(&indx, sizeof(int), 1, fp);  num++; }
+           fwrite(&indx, sizeof(Int), 1, fp);  num++; }
          data.d++; }
        data.d += 2; }
      break;
@@ -3948,7 +3948,7 @@ int ana_find_maxloc_old(int narg, int ps[])
  { result = array_scratch(ANA_LONG, 1, &num);
    data.l = LPTR(HEAD(result));
    rewind(fp);
-   if (num != fread(data.l, sizeof(int), num, fp))
+   if (num != fread(data.l, sizeof(Int), num, fp))
    { puts("FIND_MAXLOC: some numbers got lost"); fclose(fp); return -1; }
  }
  else result = ANA_MINUS_ONE;	/* none found */
@@ -3956,7 +3956,7 @@ int ana_find_maxloc_old(int narg, int ps[])
  return result;
 }
 /*----------------------------------------------------------------------*/
-int ana_bsmooth(int narg, int ps[])
+Int ana_bsmooth(Int narg, Int ps[])
 /* binary smooth.  Smooths an array by repeatedly applying two-element */
 /* (binary) averaging along dimension AXIS.  The number of repeats is */
 /* WIDTH*WIDTH/2, so the FWHM of this filter is about WIDTH. */
@@ -3967,10 +3967,10 @@ int ana_bsmooth(int narg, int ps[])
 /* division by 2 with a shift operation may speed things up for integer */
 /* data. */
 {
-  int	iq, axis, outtype, type, result_sym, *dims, ndim, xdims[MAX_DIMS],
+  Int	iq, axis, outtype, type, result_sym, *dims, ndim, xdims[MAX_DIMS],
 	width, i, n, tally[MAX_DIMS], step[MAX_DIMS], m, done, j, k, stride;
   pointer	src, trgt, src0, trgt0;
-  float	fwidth;
+  Float	fwidth;
 
   if (narg > 2)
   { iq = ps[2];			/* WIDTH */
@@ -3982,7 +3982,7 @@ int ana_bsmooth(int narg, int ps[])
   { fwidth = float_arg(iq);
     if (fwidth <= 0)
       return cerror(NEED_POS_ARG, iq);
-    width = (int) (fwidth*fwidth/2);
+    width = (Int) (fwidth*fwidth/2);
     if (!width)
       width = 1; }
   else
@@ -3998,8 +3998,8 @@ int ana_bsmooth(int narg, int ps[])
       outtype = type = array_type(iq);
       if (type < ANA_FLOAT) 
       { outtype = ANA_FLOAT;
-	iq = ana_float(1, &iq); } /*float the input */
-      src0.l = (int *) array_data(iq);
+	iq = ana_float(1, &iq); } /*Float the input */
+      src0.l = (Int *) array_data(iq);
       m = array_size(iq);
       if (axis >= 0)		/* axis specified */
       { dims = array_dims(iq);
@@ -4013,11 +4013,11 @@ int ana_bsmooth(int narg, int ps[])
       break;
     default:
       return cerror(ILL_CLASS, iq); }
-  memcpy(xdims, dims, sizeof(int)*ndim);		/* copy dims */
+  memcpy(xdims, dims, sizeof(Int)*ndim);		/* copy dims */
   if (width >= (axis >= 0? xdims[axis]: m)) /* just return original */
     return iq;
   result_sym = array_clone(iq, outtype);
-  trgt0.l = (int *) array_data(result_sym);
+  trgt0.l = (Int *) array_data(result_sym);
   /* set up for walk through array */
   n = *step = ana_type_size[outtype];
   for (i = 1; i < ndim; i++)

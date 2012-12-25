@@ -33,28 +33,28 @@ static struct allocItem
   size_t		size;	/* size of allocated memory */
   struct allocItem	*prev;	/* link to previous allocation element */
   struct allocItem	*next;	/* link to next allocation element */
-  int			context; /* context of symbol for which memory */
+  Int			context; /* context of symbol for which memory */
 				 /* is allocated*/
-  int			line;	/* line number of symbol for which */
+  Int			line;	/* line number of symbol for which */
 				/* memory is allocated*/
-  int			count;	/* current execution count */
+  Int			count;	/* current execution count */
   char			flag;
 } allocList[MAXALLOC];
 
 size_t	tSize;
-int	nAlloc = 0;
+Int	nAlloc = 0;
 
-extern int	setup, curLineNumber, nExecuted;
-int	checkChain(void), findAddress(void *, struct allocItem **),
-  addressToSymbol(void *), ana_dump(int, int []);
+extern Int	setup, curLineNumber, nExecuted;
+Int	checkChain(void), findAddress(void *, struct allocItem **),
+  addressToSymbol(void *), ana_dump(Int, Int []);
 
-char	*evbName(int);
+char	*evbName(Int);
 
 static FILE	*Fopen_ptr[FOPEN_MAX];
 static char	*Fopen_name[FOPEN_MAX], *Fopen_type[FOPEN_MAX];
-static int	Fopen_index = 0;
+static Int	Fopen_index = 0;
 
-int checkListMessage(void *ptr, int size, int limit, int symbol, char *msg)
+Int checkListMessage(void *ptr, Int size, Int limit, Int symbol, char *msg)
 {
   struct allocItem	*ap;
   char	*p;
@@ -70,12 +70,12 @@ int checkListMessage(void *ptr, int size, int limit, int symbol, char *msg)
   return 1;
 }
 
-int checkOneSymbol(int symbol, int limit)
+Int checkOneSymbol(Int symbol, Int limit)
 {
   char	regular, *p, ok;
   struct allocItem	*ap;
   extractSec	*eptr;
-  int	n, i;
+  Int	n, i;
   pointer	pp;
 
   regular = 0;			/* default: not a regular symbol */
@@ -112,7 +112,7 @@ int checkOneSymbol(int symbol, int limit)
 			       routine_num_parameters(symbol)*sizeof(char *),
 			       limit, symbol, "routine_parameter_names"))
 	ok = 0;
-      if (!checkListMessage(routine_parameters(symbol), (routine_num_parameters(symbol) + routine_num_statements(symbol))*sizeof(word), limit, symbol, "routine_parameters"))
+      if (!checkListMessage(routine_parameters(symbol), (routine_num_parameters(symbol) + routine_num_statements(symbol))*sizeof(Word), limit, symbol, "routine_parameters"))
 	ok = 0;
       break;
     case ANA_EXTRACT: case ANA_PRE_EXTRACT:
@@ -139,7 +139,7 @@ int checkOneSymbol(int symbol, int limit)
       while (n--) {
 	switch (eptr->type) {
 	  case ANA_RANGE:
-	    if (!checkListMessage(eptr->ptr.w, eptr->number*sizeof(word),
+	    if (!checkListMessage(eptr->ptr.w, eptr->number*sizeof(Word),
 				  limit, symbol, "eptr->ptr.w"))
 	      ok = 0;
 	    break;
@@ -195,18 +195,18 @@ int checkOneSymbol(int symbol, int limit)
 }
 
 char	checkListOk = 0;
-int checkList(int narg, int ps[])
+Int checkList(Int narg, Int ps[])
 /* checks all allocation entries against the ANA symbol tables and
    reports discrepancies.  NOTE: internal function and routine key lists
    are not regarded, so they result in spurious error messages.  These lists
    at present do not exceed 32 bytes in size, so a limit of 33 ought to take
    care of them. */
 {
- int	limit, i, nbad = 0, symbol;
+ Int	limit, i, nbad = 0, symbol;
  struct allocItem	*ap;
- char	*symbolProperName(int);
- extern int nSymbolStack;
- void	setPager(int), resetPager(void);
+ char	*symbolProperName(Int);
+ extern Int nSymbolStack;
+ void	setPager(Int), resetPager(void);
  extern char	*theFormat, *ulib_path;
 
  if (narg)
@@ -272,7 +272,7 @@ int checkList(int narg, int ps[])
  return 1;
 }
 /*------------------------------------------------------------------*/
-int findAddress(void *p, struct allocItem **ap)
+Int findAddress(void *p, struct allocItem **ap)
 /* finds address p in list.  Returns FOUND if found, BEYOND if beyond last
    item, FIRST if first item, BEFORE if before first item,
    and BETWEEN otherwise.
@@ -298,11 +298,11 @@ int findAddress(void *p, struct allocItem **ap)
  return (ai->prev && p == ai->prev->ptr)? FOUND: BETWEEN;
 }
 /*-----------------------------------------------------------------------*/
-int freeAllocItemIndex = 1;
-int findFreeItem(void)
+Int freeAllocItemIndex = 1;
+Int findFreeItem(void)
 /* returns index to next free item in allocList, or -1 if none available */
 {
- int		oldindx;
+ Int		oldindx;
 
  oldindx = freeAllocItemIndex;
  while (allocList[freeAllocItemIndex].size) {
@@ -314,10 +314,10 @@ int findFreeItem(void)
  return freeAllocItemIndex;
 }
 /*-----------------------------------------------------------------------*/
-int listAddress(void *address)
+Int listAddress(void *address)
 {
   struct allocItem	*ap;
-  int	result;
+  Int	result;
   
   result = findAddress(address, &ap);
   switch (result) {
@@ -340,7 +340,7 @@ int listAddress(void *address)
 void Free(void *ptr)
 /* Like standard free(), but keeping records for debugging */
 {
-  int			found;
+  Int			found;
   struct allocItem	*ap;
 
   if (!ptr) return;
@@ -378,7 +378,7 @@ void *Malloc(size_t size)
 {
   void	*p;
   struct allocItem	*ap;
-  int	found, i;
+  Int	found, i;
   
   if (!size)
     return NULL;
@@ -444,7 +444,7 @@ void *Calloc(size_t nobj, size_t size)
 {
   void	*p;
   char	*c;
-  int	n;
+  Int	n;
 
   p = Malloc(n = nobj*size);
   c = (char *) p;
@@ -456,7 +456,7 @@ void *Calloc(size_t nobj, size_t size)
 void *Realloc(void *p, size_t size)
 /* realloc with stored information for consistency checks */
 {
-  int	i, found;
+  Int	i, found;
   struct allocItem	*ai;
   void	*p2;
 
@@ -549,11 +549,11 @@ void *Realloc(void *p, size_t size)
   return p2;
 }
 /*-----------------------------------------------------------------------*/
-int checkChain(void)
+Int checkChain(void)
      /* checks the allocation list for consistency */
 {
   struct allocItem	*ai;
-  int	count = 0;
+  Int	count = 0;
 
   ai = allocList;
   while (ai->next) {
@@ -587,7 +587,7 @@ int checkChain(void)
   return 1;
 }
 /*-----------------------------------------------------------------------*/
-int findWorm(void)
+Int findWorm(void)
 /* checks the allocation list for internal consistency */
 {
   struct allocItem	*ai, *ai2;
@@ -595,8 +595,8 @@ int findWorm(void)
 
   ai = allocList;
   while (ai->next) {
-    if ((int) ai->next < 0x10000000 || ai->flag ||
-	(ai != allocList && (int) ai->ptr < 0x10000000)) {
+    if ((Int) ai->next < 0x10000000 || ai->flag ||
+	(ai != allocList && (Int) ai->ptr < 0x10000000)) {
       printf("*** Suspect allocation element at %p\n", ai);
       if (ai->flag)
 	suspect = 1;
@@ -613,10 +613,10 @@ int findWorm(void)
   return suspect;
 }
 /*-----------------------------------------------------------------------*/
-int ana_whereisAddress(int narg, int ps[])
+Int ana_whereisAddress(Int narg, Int ps[])
 /* returns information on memory at a given address */
 {
-  int	address, where, cut;
+  Int	address, where, cut;
   struct allocItem	*ai;
 
   if (internalMode & 1) {
@@ -638,8 +638,8 @@ int ana_whereisAddress(int narg, int ps[])
       where = 0;
       break;
     case BETWEEN: case BEYOND:
-      where = (address < (int) ai->ptr ||
-	       address >= (int) ai->ptr + ai->size)? 0: 1;
+      where = (address < (Int) ai->ptr ||
+	       address >= (Int) ai->ptr + ai->size)? 0: 1;
       break;
     case FOUND:
       where = 1;
@@ -654,9 +654,9 @@ int ana_whereisAddress(int narg, int ps[])
   return 1;
 }
 /*-----------------------------------------------------------------------*/
-int addressToSymbol(void *address)
+Int addressToSymbol(void *address)
 {
-  int	iq, symbol = -1, i, n, j;
+  Int	iq, symbol = -1, i, n, j;
   array	*h;
   pointer	ptr;
 
@@ -715,13 +715,13 @@ int addressToSymbol(void *address)
   return symbol;
 }
 /*-----------------------------------------------------------------------*/
-int ana_newallocs(int narg, int ps[])
+Int ana_newallocs(Int narg, Int ps[])
      /* NEWALLOCS reports on new allocations since the last call to */
      /* NEWALLOCS.  LS 11dec97 */
 {
   struct allocItem	*ai;
-  static int	baseCount = 0, *baseExecs = NULL;
-  int	count, i;
+  static Int	baseCount = 0, *baseExecs = NULL;
+  Int	count, i;
 
   if (narg) {
     if (symbol_class(ps[0]) != ANA_SCALAR)
@@ -747,7 +747,7 @@ int ana_newallocs(int narg, int ps[])
     if (!count)
       count = 1;
     baseCount = count;
-    baseExecs = (int *) Malloc(baseCount*sizeof(int));
+    baseExecs = (Int *) Malloc(baseCount*sizeof(Int));
     for (i = 0; i < baseCount; i++)
       baseExecs[i] = nExecuted;
   } else {			/* report */
@@ -768,16 +768,16 @@ int ana_newallocs(int narg, int ps[])
       }
       ai = ai->next;
     }
-    memcpy(baseExecs, baseExecs + sizeof(int), (baseCount - 1)*sizeof(int));
+    memcpy(baseExecs, baseExecs + sizeof(Int), (baseCount - 1)*sizeof(Int));
     baseExecs[baseCount - 1] = nExecuted;
   }
   return 1;
 }
 /*-----------------------------------------------------------------------*/
-int squeeze(void)
+Int squeeze(void)
 {
-  int	brk, last;
-  word	*position;
+  Int	brk, last;
+  Word	*position;
   extern char	*firstbreak;
   struct allocItem	*ai;
 
@@ -786,14 +786,14 @@ int squeeze(void)
   while (ai->next) ai = ai->next;
   last = (char *) ai->ptr - firstbreak;
   printf("last: %d;  break: %d;  allocated %d\n", last, brk, tSize);
-  position = (word *) calloc(nAlloc, sizeof(word));
+  position = (Word *) calloc(nAlloc, sizeof(Word));
   return 1;
 }
 /*-----------------------------------------------------------------------*/
-int ana_squeeze(int narg, int ps[])
+Int ana_squeeze(Int narg, Int ps[])
 {
   struct allocItem	*ai;
-  int	iq, dim, *p;
+  Int	iq, dim, *p;
   array	*h;
   
   dim = nAlloc*2;
@@ -806,7 +806,7 @@ int ana_squeeze(int narg, int ps[])
   ai = allocList;
   while (ai->next)
   { ai = ai->next;
-    *p++ = (int) ai->ptr;
+    *p++ = (Int) ai->ptr;
     *p++ = ai->size; }
   return iq;
 }
@@ -856,9 +856,9 @@ FILE *Tmpfile(void)
   return fp;    
 }
 /*-----------------------------------------------------------------------*/
-int Fclose(FILE *stream)
+Int Fclose(FILE *stream)
 {
-  int	n, i;
+  Int	n, i;
 
   n = fclose(stream);
   if (!n) {			/* closed OK */
@@ -877,9 +877,9 @@ int Fclose(FILE *stream)
   return n;
 }
 /*-----------------------------------------------------------------------*/
-int show_files(int narg, int ps[])
+Int show_files(Int narg, Int ps[])
 {
-  int	i;
+  Int	i;
 
   puts("Open files:");
   for (i = 0; i < FOPEN_MAX; i++)

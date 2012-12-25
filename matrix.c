@@ -9,16 +9,16 @@
 #include "errno.h"
 #include <gsl/gsl_linalg.h>
 
-int ana_matrix_product(int narg, int ps[])
+Int ana_matrix_product(Int narg, Int ps[])
 {
   pointer *ptrs;
   loopInfo *infos;
-  int iq;
+  Int iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;i>D*;rD1", &ptrs, &infos)) < 0)
     return ANA_ERROR;
 
-  int *dims1, *dims2;
+  Int *dims1, *dims2;
   if (infos[0].ndim >= 2)
     dims1 = infos[0].dims;
   else
@@ -36,20 +36,20 @@ int ana_matrix_product(int narg, int ps[])
   if (dims1[0] != dims2[1])
     return anaerror("The number of columns (now %d) of the 1st argument must equal the number of rows (now %d) of the 2nd argument", ps[1], dims1[0], dims2[1]);
 
-  int i, *tdims, tndim;
+  Int i, *tdims, tndim;
   if (internalMode & 1) {	/* /OUTER */
     tndim = infos[0].ndim + infos[1].ndim - 2;
     if (tndim > MAX_DIMS)
       return anaerror("Result would have %d dimensions, "
 		      "but at most %d are allowed",
 		      ps[1], tndim, MAX_DIMS);
-    tdims = malloc(tndim*sizeof(int));
-    memcpy(tdims + 2, infos[0].dims + 2, (infos[0].ndim - 2)*sizeof(int));
+    tdims = malloc(tndim*sizeof(Int));
+    memcpy(tdims + 2, infos[0].dims + 2, (infos[0].ndim - 2)*sizeof(Int));
     memcpy(tdims + 2 + infos[0].ndim - 2, infos[1].dims + 2,
-	   (infos[1].ndim - 2)*sizeof(int));
+	   (infos[1].ndim - 2)*sizeof(Int));
   } else {			/* /INNER */
     tndim = infos[0].ndim;
-    tdims = malloc(tndim*sizeof(int));
+    tdims = malloc(tndim*sizeof(Int));
     if (infos[1].ndim != infos[0].ndim) {
       iq = anaerror("Needs the same number of dimensions as the previous argument", ps[1]);
       goto error_1;
@@ -59,7 +59,7 @@ int ana_matrix_product(int narg, int ps[])
 	iq = anaerror("The dimensions beyond the first two must be the same as in the previous argument", ps[1]);
 	goto error_1;
       }
-    memcpy(tdims + 2, infos[0].dims + 2, (infos[0].ndim - 2)*sizeof(int));
+    memcpy(tdims + 2, infos[0].dims + 2, (infos[0].ndim - 2)*sizeof(Int));
   }
   tdims[0] = dims2[0];
   tdims[1] = dims1[1];
@@ -71,13 +71,13 @@ int ana_matrix_product(int narg, int ps[])
   setAxes(&infos[1], 2, NULL, SL_EACHBLOCK);
   setAxes(&infos[2], 2, NULL, SL_EACHBLOCK);
 
-  int j, k;
+  Int j, k;
   if (internalMode & 1) {	/* /OUTER */
     do {
       do {
 	for (i = 0; i < dims1[1]; i++) /* rows of #1 */
 	  for (j = 0; j < dims2[0]; j++) { /* columns of #2 */
-	    double *p = &ptrs[2].d[j + i*dims2[0]];
+	    Double *p = &ptrs[2].d[j + i*dims2[0]];
 	    *p = 0.0;
 	    for (k = 0; k < dims1[0]; k++) /* columns of #1 = rows of #2 */
 	      *p += ptrs[0].d[k + i*dims1[0]]*ptrs[1].d[j + k*dims2[0]];
@@ -93,7 +93,7 @@ int ana_matrix_product(int narg, int ps[])
     do {
       for (i = 0; i < dims1[1]; i++) /* rows of #1 */
 	for (j = 0; j < dims2[0]; j++) { /* columns of #2 */
-	  double *p = &ptrs[2].d[j + i*dims2[0]];
+	  Double *p = &ptrs[2].d[j + i*dims2[0]];
 	  *p = 0.0;
 	  for (k = 0; k < dims1[0]; k++) /* columns of #1 = rows of #2 */
 	    *p += ptrs[0].d[k + i*dims1[0]]*ptrs[1].d[j + k*dims2[0]];
@@ -113,9 +113,9 @@ int ana_matrix_product(int narg, int ps[])
 }
 REGISTER(matrix_product, f, MPRODUCT, 2, 2, "0INNER:1OUTER");
 /*------------------------------------------------------------------------- */
-int singular_value_decomposition(double *a_in, size_t ncol, size_t nrow, 
-				 double *u_out, double *s_out,
-				 double *v_out)
+Int singular_value_decomposition(Double *a_in, size_t ncol, size_t nrow, 
+				 Double *u_out, Double *s_out,
+				 Double *v_out)
 {
   if (!a_in || !u_out || !s_out || !v_out || !nrow || !ncol) {
     errno = EDOM;
@@ -126,8 +126,8 @@ int singular_value_decomposition(double *a_in, size_t ncol, size_t nrow,
   gsl_matrix *v;
   gsl_vector *s;
   gsl_vector *w;
-  int result;
-  int nmin, nmax;
+  Int result;
+  Int nmin, nmax;
 
   if (ncol <= nrow) {
     nmin = ncol;
@@ -152,7 +152,7 @@ int singular_value_decomposition(double *a_in, size_t ncol, size_t nrow,
     nmax = ncol;
     a = gsl_matrix_alloc(nmax, nmin);
 
-    int i, j;
+    Int i, j;
 
     for (i = 0; i < nmax; i++)
       for (j = 0; j < nmin; j++)
@@ -212,18 +212,18 @@ int singular_value_decomposition(double *a_in, size_t ncol, size_t nrow,
    If Sd is the square matrix with the values of S2 on its diagnonal,
    then A = U2 # Sd # transpose(V2).
 */
-int ana_svd(int narg, int ps[])
+Int ana_svd(Int narg, Int ps[])
 {
   pointer *ptrs;
   loopInfo *infos;
-  int iq;
+  Int iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;oD&;oD1;oD1", &ptrs, &infos)) < 0)
     return ANA_ERROR;
   if (infos[0].ndim < 2)
     return anaerror("Need at least two dimensions", ps[0]);
-  int dims[MAX_DIMS];
-  memcpy(dims, infos[0].dims, infos[0].ndim*sizeof(int));
+  Int dims[MAX_DIMS];
+  memcpy(dims, infos[0].dims, infos[0].ndim*sizeof(Int));
   if (infos[0].dims[0] <= infos[0].dims[1]) {
     dims[1] = dims[0];		/* # columns */
     standard_redef_array(ps[2], ANA_DOUBLE, infos[0].ndim - 1, dims + 1,
@@ -260,9 +260,9 @@ int ana_svd(int narg, int ps[])
 }
 REGISTER(svd, s, SVD, 4, 4, NULL);
 /*--------------------------------------------------------------------*/
-int matrix_transpose(double *in, double *out, size_t in_ncol, size_t in_nrow)
+Int matrix_transpose(Double *in, Double *out, size_t in_ncol, size_t in_nrow)
 {
-  int i, j;
+  Int i, j;
   
   if (!in || !out || in_ncol < 1 || in_nrow < 1) {
     errno = EDOM;
@@ -274,20 +274,20 @@ int matrix_transpose(double *in, double *out, size_t in_ncol, size_t in_nrow)
   return 0;
 }
 /*--------------------------------------------------------------------*/
-int ana_transpose_matrix(int narg, int ps[])
+Int ana_transpose_matrix(Int narg, Int ps[])
 {
   pointer *ptrs;
   loopInfo *infos;
-  int iq;
+  Int iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;rD1", &ptrs, &infos)) < 0)
     return ANA_ERROR;
   if (infos[0].ndim < 2)
     return anaerror("Need at least 2 dimensions", ps[0]);
-  int *dims = malloc(infos[0].ndim*sizeof(int));
+  Int *dims = malloc(infos[0].ndim*sizeof(Int));
   dims[0] = infos[0].dims[1];
   dims[1] = infos[0].dims[0];
-  memcpy(dims + 2, infos[0].dims + 2, (infos[0].ndim - 2)*sizeof(int));
+  memcpy(dims + 2, infos[0].dims + 2, (infos[0].ndim - 2)*sizeof(Int));
   standard_redef_array(iq, ANA_DOUBLE, infos[0].ndim, dims, 0, NULL,
 		       &ptrs[1], &infos[1]);
   dims[0] = 0;
@@ -295,7 +295,7 @@ int ana_transpose_matrix(int narg, int ps[])
   setAxes(&infos[0], 2, dims, SL_EACHBLOCK);
   setAxes(&infos[1], 2, dims, SL_EACHBLOCK);
   free(dims);
-  int n = infos[0].dims[0]*infos[0].dims[1];
+  Int n = infos[0].dims[0]*infos[0].dims[1];
   do {
     matrix_transpose(ptrs[0].d, ptrs[1].d, infos[0].dims[0], infos[0].dims[1]);
     ptrs[0].d += n;
@@ -306,19 +306,19 @@ int ana_transpose_matrix(int narg, int ps[])
 }
 REGISTER(transpose_matrix, f, TRANSPOSE, 1, 1, NULL);
 /*--------------------------------------------------------------------*/
-int ana_diagonal_matrix(int narg, int ps[])
+Int ana_diagonal_matrix(Int narg, Int ps[])
 {
   pointer *ptrs;
   loopInfo *infos;
-  int iq;
+  Int iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;rD1", &ptrs, &infos)) < 0)
     return ANA_ERROR;
-  int dims[2];
+  Int dims[2];
   dims[0] = dims[1] = infos[0].nelem;
   standard_redef_array(iq, ANA_DOUBLE, 2, dims, 0, NULL, &ptrs[1], &infos[1]);
   ana_zero(1, &iq);
-  int i;
+  Int i;
   for (i = 0; i < infos[0].nelem; i++)
     ptrs[1].d[i + i*infos[0].nelem] = ptrs[0].d[i];
   return iq;

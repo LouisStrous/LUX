@@ -18,18 +18,18 @@
 static char rcsid[] __attribute__ ((unused)) =
 "$Id: fun1.c,v 4.0 2001/02/07 20:37:00 strous Exp $";
 
-extern	double	cbrt(double), expm1(double), log1p(double);
-double	voigt(double, double), beta(double, double), gamma(double),
-	incomplete_gamma(double, double), chi_square(double, double),
-	incomplete_beta(double, double, double), student(double, double),
-	F(double, double, double), loggamma(double), logbeta(double, double),
-	non_central_chi_square(double, double, double), bessel_i0(double),
-	bessel_i1(double), bessel_k0(double), bessel_k1(double),
-	bessel_kn(int, double), sgn(double);
-static	int	result_sym;
-int	math_funcs(int, int), math_funcs_2f(int, int, int),
-	math_funcs_i_f(int, int, int), math_funcs_3f(int, int, int, int);
-int	ana_zerof(int, int []);
+extern	Double	cbrt(Double), expm1(Double), log1p(Double);
+Double	voigt(Double, Double), beta(Double, Double), gamma(Double),
+	incomplete_gamma(Double, Double), chi_square(Double, Double),
+	incomplete_beta(Double, Double, Double), student(Double, Double),
+	F(Double, Double, Double), loggamma(Double), logbeta(Double, Double),
+	non_central_chi_square(Double, Double, Double), bessel_i0(Double),
+	bessel_i1(Double), bessel_k0(Double), bessel_k1(Double),
+	bessel_kn(Int, Double), sgn(Double);
+static	Int	result_sym;
+Int	math_funcs(Int, Int), math_funcs_2f(Int, Int, Int),
+	math_funcs_i_f(Int, Int, Int), math_funcs_3f(Int, Int, Int, Int);
+Int	ana_zerof(Int, Int []);
 
 enum fd {
   F_SIN, F_COS, F_TAN, F_ASIN, F_ACOS, F_ATAN, F_SINH, F_COSH, F_TANH,
@@ -50,31 +50,31 @@ enum fddd {
   F_NCCHI2, F_IBETA, F_FRATIO
 };
 
-double (*func_d[])(double) = {
+Double (*func_d[])(Double) = {
   sin, cos, tan, asin, acos, atan, sinh, cosh, tanh, sqrt, cbrt, exp,
   expm1, log, log10, log1p, erf, erfc, j0, j1, y0, y1, gamma, loggamma,
   bessel_i0, bessel_i1, bessel_k0, bessel_k1, sgn, asinh, acosh, atanh
 };
 
-double (*func_id[])(int, double) = {
+Double (*func_id[])(Int, Double) = {
   jn, yn, bessel_kn
 };
 
-double (*func_dd[])(double, double) = {
+Double (*func_dd[])(Double, Double) = {
   atan2, pow, voigt, beta, logbeta, incomplete_gamma, chi_square, student
 };
 
-double (*func_ddd[])(double, double, double) = {
+Double (*func_ddd[])(Double, Double, Double) = {
   non_central_chi_square, incomplete_beta, F
 };
 
-doubleComplex c_sin(double, double), c_cos(double, double),
-  c_tan(double, double), c_arcsin(double, double), c_arccos(double,
-  double), c_arctan(double, double), c_sinh(double, double),
-  c_cosh(double, double), c_tanh(double, double), c_log(double,
-  double), c_exp(double, double);
+doubleComplex c_sin(Double, Double), c_cos(Double, Double),
+  c_tan(Double, Double), c_arcsin(Double, Double), c_arccos(Double,
+  Double), c_arctan(Double, Double), c_sinh(Double, Double),
+  c_cosh(Double, Double), c_tanh(Double, Double), c_log(Double,
+  Double), c_exp(Double, Double);
 
-doubleComplex (*func_c[])(double, double) = {
+doubleComplex (*func_c[])(Double, Double) = {
   c_sin, c_cos, c_tan, c_arcsin, c_arccos, c_arctan, c_sinh, c_cosh,
   c_tanh, NULL, NULL, c_exp, NULL, c_log, NULL, NULL, NULL, NULL,
   NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
@@ -86,7 +86,7 @@ doubleComplex (*func_c[])(double, double) = {
 /* an ANA_EVB, so they are superfluous here.  keep them around just in case */
 /* LS 29aug94 */
 /*------------------------------------------------------------------------- */
-int defined(int symbol, int argument)
+Int defined(Int symbol, Int argument)
 /* <argument> = 0: Returns 0 if <symbol> is or links to (through ANA_TRANSFERs)
     a class of ANA_UNDEFINED or ANA_UNUSED, 1 otherwise.
  <argument> != 0: same as <argument> = 0 except when <symbol> is an argument
@@ -94,7 +94,7 @@ int defined(int symbol, int argument)
     specified a (possibly undefined) value for <symbol>, 0 otherwise.
  LS 27may96 4aug97 */
 {
-  int	target;
+  Int	target;
 
   target = symbol;
   target = transfer(target);
@@ -113,7 +113,7 @@ int defined(int symbol, int argument)
 	  || symbol_class(target) == ANA_UNDEFINED)? 0: 1;
 }
 /*------------------------------------------------------------------------- */
-int ana_defined(int narg, int ps[])
+Int ana_defined(Int narg, Int ps[])
 /* DEFINED(x) returns 0 if <x> is itself, or is linked through ANA_TRANSFERs */
 /* with, a class of ANA_UNUSED or ANA_UNDEFINED.  DEFINED(x,/TARGET) returns 0 */
 /* if it is itself, or is linked through ANA_POINTERs with, a class of */
@@ -127,10 +127,10 @@ int ana_defined(int narg, int ps[])
   return defined(*ps, internalMode)? ANA_ONE: ANA_ZERO;
 }
 /*------------------------------------------------------------------------- */
-int ana_delete(int narg, int ps[])
+Int ana_delete(Int narg, Int ps[])
 /* deletes symbols (deallocates memory & makes undefined) */
 {
-  int   i, iq;
+  Int   i, iq;
 
   for (i = 0; i < narg; i++) {
     iq = *ps++;
@@ -149,11 +149,11 @@ int ana_delete(int narg, int ps[])
   return ANA_OK;
 }
 /*------------------------------------------------------------------------- */
-int ana_quit(int narg, int ps[])
+Int ana_quit(Int narg, Int ps[])
 /*exit routine, calls are exit,status or quit,status */
 {
- int	iq, saveHistory(void);
- void	Quit(int);
+ Int	iq, saveHistory(void);
+ void	Quit(Int);
 
  if (narg)
    iq = int_arg(ps[0]);
@@ -163,34 +163,34 @@ int ana_quit(int narg, int ps[])
  return ANA_OK;			/* or some compilers complain */
 }
 /*------------------------------------------------------------------------- */
-int ana_cputime(void)
+Int ana_cputime(void)
      /*returns an cpu time in seconds */
 {
-  int	i;
+  Int	i;
 
   i = scalar_scratch(ANA_FLOAT);
-  scalar_value(i).f = ((float) clock())/CLOCKS_PER_SEC;
+  scalar_value(i).f = ((Float) clock())/CLOCKS_PER_SEC;
   return i;
 }
 /*------------------------------------------------------------------------- */
-int ana_systime(void)
+Int ana_systime(void)
      /* returns the system time in ANA_DOUBLE seconds */
 {
-  int     i;
+  Int     i;
   struct timeval tp;
   struct timezone tzp;
 
   gettimeofday(&tp, &tzp);
   i = scalar_scratch(ANA_DOUBLE);
-  scalar_value(i).d = (double) tp.tv_sec + 0.000001* (double) tp.tv_usec;
+  scalar_value(i).d = (Double) tp.tv_sec + 0.000001* (Double) tp.tv_usec;
   return i;
   return ANA_ZERO;		/* return 0 if not available */
 }
 /*------------------------------------------------------------------------- */
-int ana_ctime(void)
+Int ana_ctime(void)
      /* returns current time and date in a string */
 {
-  int	i;
+  Int	i;
   time_t	t;
 
   i = string_scratch(24);
@@ -199,11 +199,11 @@ int ana_ctime(void)
   return i;
 }
 /*------------------------------------------------------------------------- */
-int ana_time(void)
+Int ana_time(void)
      /* returns current time in a string */
      /* added \0 to result string  LS 22may94 */
 {
-  int	i;
+  Int	i;
   time_t	t;
   char	*p;
   
@@ -215,10 +215,10 @@ int ana_time(void)
   return i;
 }
 /*------------------------------------------------------------------------- */
-int ana_date(void)
+Int ana_date(void)
      /* returns current date in a string */
 {
-  int	i;
+  Int	i;
   time_t	t;
   char	*p, *p2;
 
@@ -233,12 +233,12 @@ int ana_date(void)
   return i;
 }
 /*------------------------------------------------------------------------- */
-int ana_jd(void)
-/* returns current Julian Day (relative to UTC) in double precision */
+Int ana_jd(void)
+/* returns current Julian Day (relative to UTC) in Double precision */
 {
   time_t	t;
-  double	jd;
-  int	result;
+  Double	jd;
+  Int	result;
 
   t = time(NULL);
   /* NOTE: I assume here that t indicates the number of seconds since */
@@ -250,29 +250,29 @@ int ana_jd(void)
   /* Use of the struct tm representation is awkward, since I am not */
   /* interested in the (integer) second, minute, hour, day, and year. */
   /* LS 7oct97 */
-  jd = (double) t/86400.0 + 2440587.5;
+  jd = (Double) t/86400.0 + 2440587.5;
   result = scalar_scratch(ANA_DOUBLE);
   scalar_value(result).d = jd;
   return result;
 }
 /*------------------------------------------------------------------------- */
-int ana_cjd(void)
+Int ana_cjd(void)
 /* returns current Chronological Julian Day, relative to the current
    time zone */
 {
-  int result;
+  Int result;
 
   result = scalar_scratch(ANA_DOUBLE);
   scalar_value(result).d = CJD_now();
   return result;
 }
 /*------------------------------------------------------------------------- */
-int ana_show(int narg, int ps[])
+Int ana_show(Int narg, Int ps[])
 /*show some info about symbols by number or subname */
 {
-  int	iq, i;
+  Int	iq, i;
   char	*s, *s2;
-  int	ana_dump(int, int []);
+  Int	ana_dump(Int, Int []);
   
   if (narg == 0)
     return ana_dump(-1, ps);	/* everybody */
@@ -293,7 +293,7 @@ int ana_show(int narg, int ps[])
       s2 = strsave(s);
       s = s2;
       while (*s2) {
-	*s2 = toupper((int) *s2);
+	*s2 = toupper((Int) *s2);
 	s2++;
       }
       for (i = 0; i < NSYM; i++) {
@@ -316,11 +316,11 @@ int ana_show(int narg, int ps[])
   }
 }
 /*------------------------------------------------------------------------- */
-void symdumpswitch(int nsym, int mode)
+void symdumpswitch(Int nsym, Int mode)
 {
-  char	*s, *typeName(int), *save;
-  int	j, *ip;
-  int	evalListPtr(int);
+  char	*s, *typeName(Int), *save;
+  Int	j, *ip;
+  Int	evalListPtr(Int);
   
   if (symbol_class(nsym) == ANA_TRANSFER || symbol_class(nsym) == ANA_POINTER) {
     j = transfer_target(nsym);
@@ -374,7 +374,7 @@ void symdumpswitch(int nsym, int mode)
     printwf("#elem = %1d, ", clist_num_symbols(nsym));
     break;
     case ANA_ASSOC:			/* assoc */
-      s = typeName((int) assoc_type(nsym));
+      s = typeName((Int) assoc_type(nsym));
       printwf("lun = %d, offset = %d, ", assoc_lun(nsym),
 	      assoc_has_offset(nsym)? assoc_offset(nsym): 0);
       break;
@@ -411,7 +411,7 @@ void symdumpswitch(int nsym, int mode)
   return;
 }
 /*------------------------------------------------------------------------- */
-int ana_dump(int narg, int ps[])
+Int ana_dump(Int narg, Int ps[])
 /* show some info about symbols in list */
 /* internalMode:  1 fixed, 2 system, 4 zero, 8 local, 16 context */
 /* 1 -> all fixed numbers (#s < nFixed)
@@ -420,10 +420,10 @@ int ana_dump(int narg, int ps[])
    8 -> all local variables
    16 -> all variables of a specific context (in *ps) */
 {
- int	i, mode, iq, context = -1, imode, j;
+ Int	i, mode, iq, context = -1, imode, j;
  char	*s, *save;
- extern int	tempSym, nFixed;
- void	setPager(int), resetPager(void);
+ extern Int	tempSym, nFixed;
+ void	setPager(Int), resetPager(void);
 
  mode = 0;
  imode = internalMode;
@@ -491,14 +491,14 @@ int ana_dump(int narg, int ps[])
  return 1;
 }							/*end of ana_dump */
 /*------------------------------------------------------------------------- */
-int ana_zero(int narg, int ps[])
+Int ana_zero(Int narg, Int ps[])
 /* subroutine version,  ANA_ZERO, x, [y ...] zero symbols in list */
 {
-  int	i, iq, mq, n;
-  extern int	nFixed;
+  Int	i, iq, mq, n;
+  extern Int	nFixed;
   char	*p;
   pointer	q;
-  extern int	scrat[];
+  extern Int	scrat[];
   FILE	*fp;
   
   for (i = 0; i < narg; i++) {
@@ -518,13 +518,13 @@ int ana_zero(int narg, int ps[])
 	  printf("File %s; ", p);
 	  return cerror(ERR_OPEN, iq);
 	}
-	if (mq > NSCRAT*sizeof(int)) {
-	  zerobytes(scrat, NSCRAT*sizeof(int));
-	  n = (int) (mq/NSCRAT/sizeof(int));
+	if (mq > NSCRAT*sizeof(Int)) {
+	  zerobytes(scrat, NSCRAT*sizeof(Int));
+	  n = (Int) (mq/NSCRAT/sizeof(Int));
 	  for (i = 0; i < n; i++)
-	    if (fwrite(scrat, 1, NSCRAT*sizeof(int), fp) < 1)
+	    if (fwrite(scrat, 1, NSCRAT*sizeof(Int), fp) < 1)
 	      return cerror(WRITE_ERR, iq);
-	  n = mq - n*NSCRAT*sizeof(int);
+	  n = mq - n*NSCRAT*sizeof(Int);
 	  if (n && (fwrite(scrat, 1, n, fp) < 1))
 	    return cerror(WRITE_ERR, iq);
 	} else {
@@ -621,12 +621,12 @@ int ana_zero(int narg, int ps[])
   return 1;
 }							/*end of ana_type */
 /*------------------------------------------------------------------------- */
-int ana_onef(int narg, int ps[])
+Int ana_onef(Int narg, Int ps[])
 /* ONE(x) returns copy of numerical <x> with all elements equal to 1 */
 /* LS 7apr98 */
 {
   pointer	p;
-  int	n, iq;
+  Int	n, iq;
 
   iq = ps[0];
   switch (symbol_class(iq)) {
@@ -685,12 +685,12 @@ int ana_onef(int narg, int ps[])
   return iq;
 }
 /*------------------------------------------------------------------------- */
-int ana_one(int narg, int ps[])
+Int ana_one(Int narg, Int ps[])
 /* replaces all values in numerical array ps[0] by ones. */
 /* LS 7apr98 */
 {
   pointer	p;
-  int	n, iq;
+  Int	n, iq;
 
   while (narg--) {
     iq = *ps++;
@@ -756,11 +756,11 @@ int ana_one(int narg, int ps[])
   return ANA_OK;
 }
 /*------------------------------------------------------------------------- */
-int ana_zerof(int narg, int ps[])
+Int ana_zerof(Int narg, Int ps[])
 /* function version,  x = ANA_ZERO(y)
    create array x of same type and size as y and set all elements to zero */
 {
-  int	iq, mq;
+  Int	iq, mq;
   char	*p;
 
   iq = ps[0];
@@ -823,14 +823,14 @@ int ana_zerof(int narg, int ps[])
   }
 }
 /*------------------------------------------------------------------------- */
-int indgen(int narg, int ps[], int isFunc)
+Int indgen(Int narg, Int ps[], Int isFunc)
 /* fills array elements with their element index or with the value of
  one of their coordinates */
 /* if called as function: INDGEN(<tgt> [, <axis>])
    if called as subroutine: INDGEN, <tgt> [, <axis>] */
 {
   pointer	src, trgt;
-  int	result;
+  Int	result;
   loopInfo	srcinfo, trgtinfo;
 
   if (isFunc) {
@@ -850,27 +850,27 @@ int indgen(int narg, int ps[], int isFunc)
   switch (symbol_type(ps[0])) {
     case ANA_BYTE:
       do 
-	*trgt.b = (byte) trgtinfo.coords[0];
+	*trgt.b = (Byte) trgtinfo.coords[0];
       while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.rndim);
       break;
     case ANA_WORD:
       do 
-	*trgt.w = (word) trgtinfo.coords[0];
+	*trgt.w = (Word) trgtinfo.coords[0];
       while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.rndim);
       break;
     case ANA_LONG:
       do 
-	*trgt.l = (int) trgtinfo.coords[0];
+	*trgt.l = (Int) trgtinfo.coords[0];
       while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.rndim);
       break;
     case ANA_FLOAT:
       do 
-	*trgt.f = (float) trgtinfo.coords[0];
+	*trgt.f = (Float) trgtinfo.coords[0];
       while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.rndim);
       break;
     case ANA_DOUBLE:
       do 
-	*trgt.d = (double) trgtinfo.coords[0];
+	*trgt.d = (Double) trgtinfo.coords[0];
       while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.rndim);
       break;
     case ANA_CFLOAT:
@@ -889,21 +889,21 @@ int indgen(int narg, int ps[], int isFunc)
   return result;
 }
 /*------------------------------------------------------------------------- */
-int ana_indgen(int narg, int ps[])
+Int ana_indgen(Int narg, Int ps[])
 {
   return indgen(narg, ps, 1);
 }
 /*------------------------------------------------------------------------- */
-int ana_indgen_s(int narg, int ps[])
+Int ana_indgen_s(Int narg, Int ps[])
 {
   return indgen(narg, ps, 0);
 }
 REGISTER(indgen_s, s, INDGEN, 1, 2, "*");
 /*------------------------------------------------------------------------- */
-int ana_neg_func(int narg, int ps[])
+Int ana_neg_func(Int narg, Int ps[])
      /*take the negative of something */
 {
-  int	n, result;
+  Int	n, result;
   pointer	src, trgt;
 
   /* check that <*ps> is numerical, return number of elements in <n>,
@@ -949,11 +949,11 @@ int ana_neg_func(int narg, int ps[])
   return result;
 } /* end of ana_neg_func */
 /*------------------------------------------------------------------------- */
-int ana_isnan(int narg, int ps[])
+Int ana_isnan(Int narg, Int ps[])
      /* returns 1 if the argument is not a number (NaN).  Only works */
      /* if IEEE function isnan is available.  LS 28jun97 */
 {
-  int	n, result, iq, *trgt;
+  Int	n, result, iq, *trgt;
   pointer	src;
   floatComplex	*trgtc;
 
@@ -981,7 +981,7 @@ int ana_isnan(int narg, int ps[])
       if (isStringType(array_type(iq)))
 	return cerror(ILL_TYPE, *ps); /* no string arrays allowed here */
       n = array_size(iq);
-      src.f = (float *) array_data(iq);
+      src.f = (Float *) array_data(iq);
       result = array_clone(iq, ANA_LONG);
       trgt = array_data(result);
       break;
@@ -998,7 +998,7 @@ int ana_isnan(int narg, int ps[])
   switch (symbol_type(*ps)) {
     case ANA_FLOAT:
       while (n--)
-	*trgt++ = isnan((double) *src.f++);
+	*trgt++ = isnan((Double) *src.f++);
       break;
     case ANA_DOUBLE:
       while (n--)
@@ -1020,13 +1020,13 @@ int ana_isnan(int narg, int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-int zapnan(int narg, int ps[], int func)
+Int zapnan(Int narg, Int ps[], Int func)
 /* ZERONANS,value=<value>, <arg1>, <arg2>, ... */
 /* ZERONANS(value=<value>, <arg1>) */
 /* replaces NaNs in numerical <arg1> &c with <value> (if defined), or */
 /* with 0.  LS 27apr99 */
 {
-  int	size, result, valueSym;
+  Int	size, result, valueSym;
   scalar	value;
   pointer	data, trgt;
 
@@ -1103,24 +1103,24 @@ int zapnan(int narg, int ps[], int func)
   return func? result: ANA_OK;
 }
 /*------------------------------------------------------------------------- */
-int ana_zapnan(int narg, int ps[])
+Int ana_zapnan(Int narg, Int ps[])
 /* ZAPNAN,value=<value>, <x1>, <x2>, ... replaces NaNs in the <x>s with the */
 /* scalar <value>, which defaults to zero.  LS 8jun98 27apr99 */
 {
   return zapnan(narg, ps, 0);
 }
 /*------------------------------------------------------------------------- */
-int ana_zapnan_f(int narg, int ps[])
+Int ana_zapnan_f(Int narg, Int ps[])
 /* ZAPNAN(value=<value>, <x>) returns a copy of <x> with all NaNs replaced */
 /* by the scalar <value> which defaults to zero.  LS 8jun98 27apr99 */
 {
   return zapnan(narg, ps, 1);
 }
 /*------------------------------------------------------------------------- */
-int ana_abs(int narg, int ps[])
+Int ana_abs(Int narg, Int ps[])
 /*take the absolute value of something */
 {
-  int	n, result, iq;
+  Int	n, result, iq;
   pointer	src, trgt;
 
   iq = *ps;
@@ -1211,14 +1211,14 @@ int ana_abs(int narg, int ps[])
   return result;
 }						/*end of ana_abs */
 /*------------------------------------------------------------------------- */
-int ana_complexsquare(int narg, int ps[])
+Int ana_complexsquare(Int narg, Int ps[])
 /* returns the complex square of argument <x>, i.e., the product of
    <x> and its complex conjugate; if <x> is not complex, then assumes
    that it came from a call to the FFT function with real argument,
    i.e., that it contains the amplitudes of sine and cosine series.
    LS 2005dec18 */
 {
-  int	n, result, iq;
+  Int	n, result, iq;
   pointer	src, trgt;
 
   iq = *ps;
@@ -1263,7 +1263,7 @@ int ana_complexsquare(int narg, int ps[])
       return cerror(ILL_CLASS, *ps);
   }
 
-  int i, n2;
+  Int i, n2;
 
   switch (symbol_type(*ps)) {
     case ANA_BYTE:
@@ -1329,11 +1329,11 @@ int ana_complexsquare(int narg, int ps[])
   return result;  
 }
 /*------------------------------------------------------------------------- */
-int ana_conjugate(int narg, int ps[])
+Int ana_conjugate(Int narg, Int ps[])
 /* returns the complex conjugate of numerical symbols */
 /* LS 31jul98 */
 {
-  int	result, n;
+  Int	result, n;
   pointer	src, trgt;
 
   if (!symbolIsNumerical(*ps))
@@ -1382,20 +1382,20 @@ int ana_conjugate(int narg, int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-int index_total(int narg, int ps[], int mean)
+Int index_total(Int narg, Int ps[], Int mean)
 /* accumulates source values by class */
 {
-  int	type, offset, *indx, i, size, result, nElem, indices2,
+  Int	type, offset, *indx, i, size, result, nElem, indices2,
   	outType, haveWeights, p, psign, pp, nbase, j;
   pointer	src, trgt, sum, weights, hist;
   scalar	temp, value;
   floatComplex	tempcf, valuecf;
   doubleComplex	tempcd, valuecd;
-  float	temp2f;
-  double	temp2d;
-  byte	*present;
+  Float	temp2f;
+  Double	temp2d;
+  Byte	*present;
   extern scalar	lastmin, lastmax;
-  int	minmax(int *, int, int);
+  Int	minmax(Int *, Int, Int);
 
   if (narg > 3 && ps[3]) {	/* have <weights> */
     if (!symbolIsNumericalArray(ps[3]) /* not a numerical array */
@@ -1455,8 +1455,8 @@ int index_total(int narg, int ps[], int mean)
   if (p == 1) {			/* regular summation */
     if (haveWeights) {		/* have <weights> */
       if (mean) {		/* want average */
-	allocate(hist.d, size, double);
-	zerobytes(hist.d, size*sizeof(double));
+	allocate(hist.d, size, Double);
+	zerobytes(hist.d, size*sizeof(Double));
 	hist.d += offset;
 	switch (outType) {
 	  case ANA_FLOAT:
@@ -1464,28 +1464,28 @@ int index_total(int narg, int ps[], int mean)
 	      case ANA_BYTE:
 		while (i--) {		/* get the sum */
 		  hist.f[*indx] += *weights.f;
-		  trgt.f[*indx] += (float) *src.b++ * *weights.f++;
+		  trgt.f[*indx] += (Float) *src.b++ * *weights.f++;
 		  indx++;
 		}
 		break;
 	      case ANA_WORD:
 		while (i--) {		/* first, get the sum */
 		  hist.f[*indx] += *weights.f;
-		  trgt.f[*indx] += (float) *src.w++ * *weights.f++;
+		  trgt.f[*indx] += (Float) *src.w++ * *weights.f++;
 		  indx++;
 		}
 		break;
 	      case ANA_LONG:
 		while (i--) {		/* first, get the sum */
 		  hist.f[*indx] += *weights.f;
-		  trgt.f[*indx] += (float) *src.l++ * *weights.f++;
+		  trgt.f[*indx] += (Float) *src.l++ * *weights.f++;
 		  indx++;
 		}
 		break;
 	      case ANA_FLOAT:
 		while (i--) {		/* first, get the sum */
 		  hist.f[*indx] += *weights.f;
-		  trgt.f[*indx] += (float) *src.f++ * *weights.f++;
+		  trgt.f[*indx] += (Float) *src.f++ * *weights.f++;
 		  indx++;
 		}
 		break;
@@ -1500,28 +1500,28 @@ int index_total(int narg, int ps[], int mean)
 	      case ANA_BYTE:
 		while (i--) {		/* get the sum */
 		  hist.d[*indx] += *weights.d;
-		  trgt.d[*indx] += (double) *src.b++ * *weights.d++;
+		  trgt.d[*indx] += (Double) *src.b++ * *weights.d++;
 		  indx++;
 		}
 		break;
 	      case ANA_WORD:
 		while (i--) {		/* first, get the sum */
 		  hist.d[*indx] += *weights.d;
-		  trgt.d[*indx] += (double) *src.w++ * *weights.d++;
+		  trgt.d[*indx] += (Double) *src.w++ * *weights.d++;
 		  indx++;
 		}
 		break;
 	      case ANA_LONG:
 		while (i--) {		/* first, get the sum */
 		  hist.d[*indx] += *weights.d;
-		  trgt.d[*indx] += (double) *src.l++ * *weights.d++;
+		  trgt.d[*indx] += (Double) *src.l++ * *weights.d++;
 		  indx++;
 		}
 		break;
 	      case ANA_FLOAT:
 		while (i--) {		/* first, get the sum */
 		  hist.d[*indx] += *weights.d;
-		  trgt.d[*indx] += (double) *src.f++ * *weights.d++;
+		  trgt.d[*indx] += (Double) *src.f++ * *weights.d++;
 		  indx++;
 		}
 		break;
@@ -1541,9 +1541,9 @@ int index_total(int narg, int ps[], int mean)
 	  case ANA_CFLOAT:
 	    while (i--) {
 	      hist.f[*indx] += *weights.f;
-	      trgt.cf[*indx].real += (float) src.cf->real * *weights.f;
+	      trgt.cf[*indx].real += (Float) src.cf->real * *weights.f;
 	      trgt.cf[*indx++].imaginary +=
-		(float) src.cf++->imaginary * *weights.f++;
+		(Float) src.cf++->imaginary * *weights.f++;
 	    }
 	    for (i = -offset; i < size - offset; i++)
 	      if (hist.f[i]) {
@@ -1557,17 +1557,17 @@ int index_total(int narg, int ps[], int mean)
 	      case ANA_CFLOAT:
 		while (i--) {
 		  hist.d[*indx] += *weights.d;
-		  trgt.cd[*indx].real += (float) src.cf->real * *weights.d;
+		  trgt.cd[*indx].real += (Float) src.cf->real * *weights.d;
 		  trgt.cd[*indx++].imaginary +=
-		    (float) src.cf++->imaginary * *weights.d++;
+		    (Float) src.cf++->imaginary * *weights.d++;
 		}
 		break;
 	      case ANA_CDOUBLE:
 		while (i--) {
 		  hist.d[*indx] += *weights.d;
-		  trgt.cd[*indx].real += (float) src.cd->real * *weights.d;
+		  trgt.cd[*indx].real += (Float) src.cd->real * *weights.d;
 		  trgt.cd[*indx++].imaginary +=
-		    (float) src.cd++->imaginary * *weights.d++;
+		    (Float) src.cd++->imaginary * *weights.d++;
 		}
 		break;
 	    } /* end of switch (type) */
@@ -1586,19 +1586,19 @@ int index_total(int narg, int ps[], int mean)
 	    switch (type) {
 	      case ANA_BYTE:
 		while (i--) 		/* get the sum */
-		  trgt.f[*indx++] += (float) *src.b++ * *weights.f++;
+		  trgt.f[*indx++] += (Float) *src.b++ * *weights.f++;
 		break;
 	      case ANA_WORD:
 		while (i--)		/* first, get the sum */
-		  trgt.f[*indx++] += (float) *src.w++ * *weights.f++;
+		  trgt.f[*indx++] += (Float) *src.w++ * *weights.f++;
 		break;
 	      case ANA_LONG:
 		while (i--)		/* first, get the sum */
-		  trgt.f[*indx++] += (float) *src.l++ * *weights.f++;
+		  trgt.f[*indx++] += (Float) *src.l++ * *weights.f++;
 		break;
 	      case ANA_FLOAT:
 		while (i--)		/* first, get the sum */
-		  trgt.f[*indx++] += (float) *src.f++ * *weights.f++;
+		  trgt.f[*indx++] += (Float) *src.f++ * *weights.f++;
 		break;
 	    } /* end of switch (type) */
 	    break;
@@ -1606,19 +1606,19 @@ int index_total(int narg, int ps[], int mean)
 	    switch (type) {
 	      case ANA_BYTE:
 		while (i--) 	/* get the sum */
-		  trgt.d[*indx++] += (double) *src.b++ * *weights.d++;
+		  trgt.d[*indx++] += (Double) *src.b++ * *weights.d++;
 		break;
 	      case ANA_WORD:
 		while (i--) 		/* first, get the sum */
-		  trgt.d[*indx++] += (double) *src.w++ * *weights.d++;
+		  trgt.d[*indx++] += (Double) *src.w++ * *weights.d++;
 		break;
 	      case ANA_LONG:
 		while (i--) 		/* first, get the sum */
-		  trgt.d[*indx++] += (double) *src.l++ * *weights.d++;
+		  trgt.d[*indx++] += (Double) *src.l++ * *weights.d++;
 		break;
 	      case ANA_FLOAT:
 		while (i--) 		/* first get the sum */
-		  trgt.d[*indx++] += (double) *src.f++ * *weights.d++;
+		  trgt.d[*indx++] += (Double) *src.f++ * *weights.d++;
 		break;
 	      case ANA_DOUBLE:
 		while (i--) 		/* first get the sum */
@@ -1654,8 +1654,8 @@ int index_total(int narg, int ps[], int mean)
       }	/* end of if (mean) else */
     } else {			/* no <weights>: each element counts once */
       if (mean) {		/* want average */
-	allocate(hist.l, size, int);
-	zerobytes(hist.l, size*sizeof(int));
+	allocate(hist.l, size, Int);
+	zerobytes(hist.l, size*sizeof(Int));
 	hist.l += offset;
 	switch (outType) {
 	  case ANA_FLOAT:
@@ -1663,28 +1663,28 @@ int index_total(int narg, int ps[], int mean)
 	      case ANA_BYTE:
 		while (i--) {		/* get the sum */
 		  hist.l[*indx]++;
-		  trgt.f[*indx] += (float) *src.b++;
+		  trgt.f[*indx] += (Float) *src.b++;
 		  indx++;
 		}
 		break;
 	      case ANA_WORD:
 		while (i--) {		/* first, get the sum */
 		  hist.l[*indx]++;
-		  trgt.f[*indx] += (float) *src.w++;
+		  trgt.f[*indx] += (Float) *src.w++;
 		  indx++;
 		}
 		break;
 	      case ANA_LONG:
 		while (i--) {		/* first, get the sum */
 		  hist.l[*indx]++;
-		  trgt.f[*indx] += (float) *src.l++;
+		  trgt.f[*indx] += (Float) *src.l++;
 		  indx++;
 		}
 		break;
 	      case ANA_FLOAT:
 		while (i--) {		/* first, get the sum */
 		  hist.l[*indx]++;
-		  trgt.f[*indx] += (float) *src.f++;
+		  trgt.f[*indx] += (Float) *src.f++;
 		  indx++;
 		}
 		break;
@@ -1699,28 +1699,28 @@ int index_total(int narg, int ps[], int mean)
 	      case ANA_BYTE:
 		while (i--) {		/* get the sum */
 		  hist.l[*indx]++;
-		  trgt.d[*indx] += (float) *src.b++;
+		  trgt.d[*indx] += (Float) *src.b++;
 		  indx++;
 		}
 		break;
 	      case ANA_WORD:
 		while (i--) {		/* first, get the sum */
 		  hist.l[*indx]++;
-		  trgt.d[*indx] += (float) *src.w++;
+		  trgt.d[*indx] += (Float) *src.w++;
 		  indx++;
 		}
 		break;
 	      case ANA_LONG:
 		while (i--) {		/* first, get the sum */
 		  hist.l[*indx]++;
-		  trgt.d[*indx] += (float) *src.l++;
+		  trgt.d[*indx] += (Float) *src.l++;
 		  indx++;
 		}
 		break;
 	      case ANA_FLOAT:
 		while (i--) {		/* first, get the sum */
 		  hist.l[*indx]++;
-		  trgt.d[*indx] += (float) *src.f++;
+		  trgt.d[*indx] += (Float) *src.f++;
 		  indx++;
 		}
 		break;
@@ -1740,8 +1740,8 @@ int index_total(int narg, int ps[], int mean)
 	  case ANA_CFLOAT:
 	    while (i--) {
 	      hist.l[*indx]++;
-	      trgt.cf[*indx].real += (float) src.cf->real;
-	      trgt.cf[*indx++].imaginary += (float) src.cf++->imaginary;
+	      trgt.cf[*indx].real += (Float) src.cf->real;
+	      trgt.cf[*indx++].imaginary += (Float) src.cf++->imaginary;
 	    }
 	    for (i = -offset; i < size - offset; i++)
 	      if (hist.l[i]) {
@@ -1755,15 +1755,15 @@ int index_total(int narg, int ps[], int mean)
 	      case ANA_CFLOAT:
 		while (i--) {
 		  hist.l[*indx]++;
-		  trgt.cd[*indx].real += (float) src.cf->real;
-		  trgt.cd[*indx++].imaginary += (float) src.cf++->imaginary;
+		  trgt.cd[*indx].real += (Float) src.cf->real;
+		  trgt.cd[*indx++].imaginary += (Float) src.cf++->imaginary;
 		}
 		break;
 	      case ANA_CDOUBLE:
 		while (i--) {
 		  hist.l[*indx]++;
-		  trgt.cd[*indx].real += (float) src.cd->real;
-		  trgt.cd[*indx++].imaginary += (float) src.cd++->imaginary;
+		  trgt.cd[*indx].real += (Float) src.cd->real;
+		  trgt.cd[*indx++].imaginary += (Float) src.cd++->imaginary;
 		}
 		break;
 	    } /* end of switch (type) */
@@ -1782,19 +1782,19 @@ int index_total(int narg, int ps[], int mean)
 	    switch (type) {
 	      case ANA_BYTE:
 		while (i--) 		/* get the sum */
-		  trgt.f[*indx++] += (float) *src.b++;
+		  trgt.f[*indx++] += (Float) *src.b++;
 		break;
 	      case ANA_WORD:
 		while (i--)		/* first, get the sum */
-		  trgt.f[*indx++] += (float) *src.w++;
+		  trgt.f[*indx++] += (Float) *src.w++;
 		break;
 	      case ANA_LONG:
 		while (i--)		/* first, get the sum */
-		  trgt.f[*indx++] += (float) *src.l++;
+		  trgt.f[*indx++] += (Float) *src.l++;
 		break;
 	      case ANA_FLOAT:
 		while (i--)		/* first, get the sum */
-		  trgt.f[*indx++] += (float) *src.f++;
+		  trgt.f[*indx++] += (Float) *src.f++;
 		break;
 	    } /* end of switch (type) */
 	    break;
@@ -1802,19 +1802,19 @@ int index_total(int narg, int ps[], int mean)
 	    switch (type) {
 	      case ANA_BYTE:
 		while (i--) 	/* get the sum */
-		  trgt.d[*indx++] += (float) *src.b++;
+		  trgt.d[*indx++] += (Float) *src.b++;
 		break;
 	      case ANA_WORD:
 		while (i--) 		/* first, get the sum */
-		  trgt.d[*indx++] += (float) *src.w++;
+		  trgt.d[*indx++] += (Float) *src.w++;
 		break;
 	      case ANA_LONG:
 		while (i--) 		/* first, get the sum */
-		  trgt.d[*indx++] += (float) *src.l++;
+		  trgt.d[*indx++] += (Float) *src.l++;
 		break;
 	      case ANA_FLOAT:
 		while (i--) 		/* first get the sum */
-		  trgt.d[*indx++] += (float) *src.f++;
+		  trgt.d[*indx++] += (Float) *src.f++;
 		break;
 	      case ANA_DOUBLE:
 		while (i--) 		/* first get the sum */
@@ -1850,18 +1850,18 @@ int index_total(int narg, int ps[], int mean)
   } else {			/* power summation */
     /* we set up for the calculation of the powers.  We use a scheme that */
     /* minimizes the number of multiplications that need to be performed. */
-    present = (byte *) curScrat;/* some scratch space */
+    present = (Byte *) curScrat;/* some scratch space */
     pp = p;
     while (pp) {
       *present++ = (pp & 1);
       pp >>= 1;
     }
-    nbase = present - (byte *) curScrat; /* number of bits in the exponent */
-    present = (byte *) curScrat;
+    nbase = present - (Byte *) curScrat; /* number of bits in the exponent */
+    present = (Byte *) curScrat;
     if (haveWeights) {		/* weighted power summation */
       if (mean) {		/* want averages */
-	allocate(hist.d, size, double);
-	zerobytes(hist.d, size*sizeof(double));
+	allocate(hist.d, size, Double);
+	zerobytes(hist.d, size*sizeof(Double));
 	hist.d += offset;
 	switch (outType) {
 	  case ANA_FLOAT:
@@ -2516,8 +2516,8 @@ int index_total(int narg, int ps[], int mean)
       }	/* end of if (mean) else */
     } else {			/* unweighted power summation */
       if (mean) {		/* want averages */
-	allocate(hist.l, size, int);
-	zerobytes(hist.l, size*sizeof(int));
+	allocate(hist.l, size, Int);
+	zerobytes(hist.l, size*sizeof(Int));
 	hist.l += offset;
 	switch (outType) {
 	  case ANA_FLOAT:
@@ -3110,7 +3110,7 @@ int index_total(int narg, int ps[], int mean)
   return result;
 }
 /*-----------------------------------------------------------------------*/
-int total(int narg, int ps[], int mean)
+Int total(Int narg, Int ps[], Int mean)
 /* TOTAL(x, [ mode, POWER=p, WEIGHTS=w, /KEEPDIMS, /FLOAT, /DOUBLE]) */
 
 /* TOTAL(array) sums all elements of <array> and returns a ANA_SCALAR. */
@@ -3125,16 +3125,16 @@ int total(int narg, int ps[], int mean)
 /* The result is at least ANA_LONG.   LS 14jan96 */
 /* TOTAL(array [, axis], POWER=p) returns the total of the <p>th */
 /*   (integer) power of <array>.  LS 22jul98 */
-/* Fixed erroneous cast to (float) in (double) summations.  LS 11jul2000 */
+/* Fixed erroneous cast to (Float) in (Double) summations.  LS 11jul2000 */
 /* Allow ANA_LONG output.  LS 27oct2010 */
 {
-  int	result, done, p, psign, pp, outtype, type, nbase, i, haveWeights, n;
-  byte	*present;
+  Int	result, done, p, psign, pp, outtype, type, nbase, i, haveWeights, n;
+  Byte	*present;
   scalar	sum, value, temp, w;
   floatComplex	sumcf, tempcf, valuecf;
   doubleComplex	sumcd, tempcd, valuecd;
-  float	temp2f;
-  double	temp2d;
+  Float	temp2f;
+  Double	temp2d;
   pointer	src, trgt, weights;
   loopInfo	srcinfo, trgtinfo, winfo;
   
@@ -3384,7 +3384,7 @@ int total(int narg, int ps[], int mean)
 		sum.d = 0.0;
 		w.d = 0.0;
 		do {
-		  sum.d += (double) *src.b * *weights.b;
+		  sum.d += (Double) *src.b * *weights.b;
 		  w.d += *weights.b;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
@@ -3397,7 +3397,7 @@ int total(int narg, int ps[], int mean)
 		sum.d = 0.0;
 		w.d = 0.0;
 		do {
-		  sum.d += (double) *src.w * *weights.w;
+		  sum.d += (Double) *src.w * *weights.w;
 		  w.d += *weights.w;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
@@ -3410,7 +3410,7 @@ int total(int narg, int ps[], int mean)
 		sum.d = 0.0;
 		w.d = 0.0;
 		do {
-		  sum.d += (double) *src.l * *weights.l;
+		  sum.d += (Double) *src.l * *weights.l;
 		  w.d += *weights.l;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
@@ -3423,7 +3423,7 @@ int total(int narg, int ps[], int mean)
 		sum.d = 0.0;
 		w.d = 0.0;
 		do {
-		  sum.d += (double) *src.f * *weights.f;
+		  sum.d += (Double) *src.f * *weights.f;
 		  w.d += *weights.f;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
@@ -3481,8 +3481,8 @@ int total(int narg, int ps[], int mean)
 		sumcd.real = sumcd.imaginary = 0.0;
 		w.d = 0.0;
 		do {
-		  sumcd.real += (double) src.cf->real * *weights.f;
-		  sumcd.imaginary += (double) src.cf->imaginary * *weights.f;
+		  sumcd.real += (Double) src.cf->real * *weights.f;
+		  sumcd.imaginary += (Double) src.cf->imaginary * *weights.f;
 		  w.d += *weights.d;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
@@ -3714,14 +3714,14 @@ int total(int narg, int ps[], int mean)
 #endif
     /* we set up for the calculation of the powers.  We use a scheme that */
     /* minimizes the number of multiplications that need to be performed. */
-    present = (byte *) curScrat;/* some scratch space */
+    present = (Byte *) curScrat;/* some scratch space */
     pp = p;
     while (pp) {
       *present++ = (pp & 1);
       pp >>= 1;
     }
-    nbase = present - (byte *) curScrat; /* number of bits in the exponent */
-    present = (byte *) curScrat;
+    nbase = present - (Byte *) curScrat; /* number of bits in the exponent */
+    present = (Byte *) curScrat;
     if (haveWeights) {		/* weighted power summation */
 #if DEBUG_VOCAL
       debugout("weighted power summation");
@@ -4611,17 +4611,17 @@ int total(int narg, int ps[], int mean)
 }
 #undef DEBUG_VOCAL
 /*------------------------------------------------------------------------- */
-int ana_total(int narg, int ps[])
+Int ana_total(Int narg, Int ps[])
  {
    return total(narg, ps, 0);
  }
 /*------------------------------------------------------------------------- */
-int ana_mean(int narg, int ps[])
+Int ana_mean(Int narg, Int ps[])
  {
    return total(narg, ps, 1);
  }
 /*------------------------------------------------------------------------- */
-doubleComplex c_sin(double real, double imaginary)
+doubleComplex c_sin(Double real, Double imaginary)
 /* complex sine */
 {
   doubleComplex	result;
@@ -4631,7 +4631,7 @@ doubleComplex c_sin(double real, double imaginary)
   return result;
 }
 /*------------------------------------------------------------------------- */
-doubleComplex c_cos(double real, double imaginary)
+doubleComplex c_cos(Double real, Double imaginary)
 /* complex cosine */
 {
   doubleComplex	result;
@@ -4641,11 +4641,11 @@ doubleComplex c_cos(double real, double imaginary)
   return result;
 }
 /*------------------------------------------------------------------------- */
-doubleComplex c_tan(double real, double imaginary)
+doubleComplex c_tan(Double real, Double imaginary)
 /* complex tangent */
 {
   doubleComplex result;
-  double	factor;
+  Double	factor;
   
   factor = 1.0/(cos(2*real) + cosh(2*imaginary));
   result.real = sin(2*real)*factor;
@@ -4653,10 +4653,10 @@ doubleComplex c_tan(double real, double imaginary)
   return result;
 }
 /*------------------------------------------------------------------------- */
-doubleComplex c_arcsin(double real, double imaginary)
+doubleComplex c_arcsin(Double real, Double imaginary)
 /* complex arc sine */
 {
-  double	a, b, c, d;
+  Double	a, b, c, d;
   doubleComplex	result;
 
   imaginary *= imaginary;
@@ -4671,10 +4671,10 @@ doubleComplex c_arcsin(double real, double imaginary)
   return result;
 }
 /*------------------------------------------------------------------------- */
-doubleComplex c_arccos(double real, double imaginary)
+doubleComplex c_arccos(Double real, Double imaginary)
 /* complex arc cosine */
 {
-  double	a, b, c, d;
+  Double	a, b, c, d;
   doubleComplex	result;
 
   imaginary *= imaginary;
@@ -4689,10 +4689,10 @@ doubleComplex c_arccos(double real, double imaginary)
   return result;
 }
 /*------------------------------------------------------------------------- */
-doubleComplex c_arctan(double real, double imaginary)
+doubleComplex c_arctan(Double real, Double imaginary)
 /* complex arc tangent */
 {
-  double	a, b;
+  Double	a, b;
   doubleComplex	result;
 
   result.real = 0.5*atan(2*real/(1 - real*real - imaginary*imaginary));
@@ -4705,7 +4705,7 @@ doubleComplex c_arctan(double real, double imaginary)
   return result;
 }
 /*------------------------------------------------------------------------- */
-doubleComplex c_sinh(double real, double imaginary)
+doubleComplex c_sinh(Double real, Double imaginary)
 /* complex hyperbolic sine */
 {
   doubleComplex	result;
@@ -4715,7 +4715,7 @@ doubleComplex c_sinh(double real, double imaginary)
   return result;
 }
 /*------------------------------------------------------------------------- */
-doubleComplex c_cosh(double real, double imaginary)
+doubleComplex c_cosh(Double real, Double imaginary)
 /* complex hyperbolic cosine */
 {
   doubleComplex	result;
@@ -4725,10 +4725,10 @@ doubleComplex c_cosh(double real, double imaginary)
   return result;
 }
 /*------------------------------------------------------------------------- */
-doubleComplex c_tanh(double real, double imaginary)
+doubleComplex c_tanh(Double real, Double imaginary)
 /* complex hyperbolic tangent */
 {
-  double	factor;
+  Double	factor;
   doubleComplex	result;
 
   factor = 1.0/(cosh(2*real) + cos(2*imaginary));
@@ -4737,7 +4737,7 @@ doubleComplex c_tanh(double real, double imaginary)
   return result;
 }
 /*------------------------------------------------------------------------- */
-doubleComplex c_log(double real, double imaginary)
+doubleComplex c_log(Double real, Double imaginary)
 /* complex logarithm */
 {
   doubleComplex	result;
@@ -4747,10 +4747,10 @@ doubleComplex c_log(double real, double imaginary)
   return result;
 }
 /*------------------------------------------------------------------------- */
-doubleComplex c_exp(double real, double imaginary)
+doubleComplex c_exp(Double real, Double imaginary)
 /* complex exponential */
 {
-  double	r;
+  Double	r;
   doubleComplex	result;
 
   r = exp(real);
@@ -4765,166 +4765,166 @@ doubleComplex c_exp(double real, double imaginary)
 /*math functions with 1 argument, all just call math_funcs with approiate
 code, all have names of form ana_xxx... */
 /*------------------------------------------------------------------------- */
-int ana_sin(int narg, int ps[])
+Int ana_sin(Int narg, Int ps[])
 {
   return math_funcs(ps[0], F_SIN);
 }
 /*------------------------------------------------------------------------- */
-int ana_cos(int narg, int ps[])
+Int ana_cos(Int narg, Int ps[])
 {
   return math_funcs(ps[0], F_COS);
 }
 /*------------------------------------------------------------------------- */
-int ana_tan(int narg, int ps[])
+Int ana_tan(Int narg, Int ps[])
 {
   return math_funcs(ps[0], F_TAN);
 }
 /*------------------------------------------------------------------------- */
-int ana_asin(int narg, int ps[])
+Int ana_asin(Int narg, Int ps[])
 {
   return math_funcs(ps[0], F_ASIN);
 }
 /*------------------------------------------------------------------------- */
-int ana_acos(int narg, int ps[])
+Int ana_acos(Int narg, Int ps[])
 {
   return math_funcs(ps[0], F_ACOS);
 }
 /*------------------------------------------------------------------------- */
-int ana_atan(int narg, int ps[])
+Int ana_atan(Int narg, Int ps[])
 {
   return math_funcs(ps[0], F_ATAN);
 }
 /*------------------------------------------------------------------------- */
-int ana_sinh(int narg, int ps[])
+Int ana_sinh(Int narg, Int ps[])
 {
   return math_funcs(ps[0], F_SINH);
 }
 /*------------------------------------------------------------------------- */
-int ana_cosh(int narg, int ps[])
+Int ana_cosh(Int narg, Int ps[])
 {
   return math_funcs(ps[0], F_COSH);
 }
 /*------------------------------------------------------------------------- */
-int ana_tanh(int narg, int ps[])
+Int ana_tanh(Int narg, Int ps[])
 {
   return math_funcs(ps[0], F_TANH);
 }
 /*------------------------------------------------------------------------- */
-int ana_asinh(int narg, int ps[])
+Int ana_asinh(Int narg, Int ps[])
 {
   return math_funcs(ps[0], F_ASINH);
 }
 /*------------------------------------------------------------------------- */
-int ana_acosh(int narg, int ps[])
+Int ana_acosh(Int narg, Int ps[])
 {
   return math_funcs(ps[0], F_ACOSH);
 }
 /*------------------------------------------------------------------------- */
-int ana_atanh(int narg, int ps[])
+Int ana_atanh(Int narg, Int ps[])
 {
   return math_funcs(ps[0], F_ATANH);
 }
 /*------------------------------------------------------------------------- */
-int ana_sqrt(int narg, int ps[])
+Int ana_sqrt(Int narg, Int ps[])
 {
   return math_funcs(ps[0], F_SQRT);
 }
 /*------------------------------------------------------------------------- */
-int ana_cbrt(int narg, int ps[])
+Int ana_cbrt(Int narg, Int ps[])
 {
   return math_funcs(ps[0], F_CBRT);
 }
 /*------------------------------------------------------------------------- */
-int ana_exp(int narg, int ps[])
+Int ana_exp(Int narg, Int ps[])
 {
   return math_funcs(ps[0], F_EXP);
 }
 /*------------------------------------------------------------------------- */
-int ana_expm1(int narg, int ps[])
+Int ana_expm1(Int narg, Int ps[])
 {
   return math_funcs(ps[0], F_EXPM1);
 }
 /*------------------------------------------------------------------------- */
-int ana_log(int narg, int ps[])
+Int ana_log(Int narg, Int ps[])
 {
   return math_funcs(ps[0], F_LOG);
 }
 /*------------------------------------------------------------------------- */
-int ana_log10(int narg, int ps[])
+Int ana_log10(Int narg, Int ps[])
 {
   return math_funcs(ps[0], F_LOG10);
 }
 /*------------------------------------------------------------------------- */
-int ana_log1p(int narg, int ps[])
+Int ana_log1p(Int narg, Int ps[])
 {
   return math_funcs(ps[0], F_LOG1P);
 }
 /*------------------------------------------------------------------------- */
-int ana_erf(int narg, int ps[])
+Int ana_erf(Int narg, Int ps[])
 {
   return math_funcs(ps[0], F_ERF);
 }
 /*------------------------------------------------------------------------- */
-int ana_erfc(int narg, int ps[])
+Int ana_erfc(Int narg, Int ps[])
 {
   return math_funcs(ps[0], F_ERFC);
 }
 /*------------------------------------------------------------------------- */
-int ana_atan2(int narg, int ps[])
+Int ana_atan2(Int narg, Int ps[])
 /*the right way to do atan's, the atan2 function, 2 arguments */
 {
   return math_funcs_2f(ps[0], ps[1], F_ATAN2);
 }
 /*------------------------------------------------------------------------- */
-int ana_j0(int narg, int ps[])
+Int ana_j0(Int narg, Int ps[])
 {
   return math_funcs(ps[0], F_J0);
 }
 /*------------------------------------------------------------------------- */
-int ana_j1(int narg, int ps[])
+Int ana_j1(Int narg, Int ps[])
 {
   return math_funcs(ps[0], F_J1);
 }
 /*------------------------------------------------------------------------- */
-int ana_jn(int narg, int ps[])
+Int ana_jn(Int narg, Int ps[])
 {
   return math_funcs_i_f(ps[0], ps[1], F_JN);
 }
 /*------------------------------------------------------------------------- */
-int ana_y0(int narg, int ps[])
+Int ana_y0(Int narg, Int ps[])
 {
   return math_funcs(ps[0], F_Y0);
 }
 /*------------------------------------------------------------------------- */
-int ana_y1(int narg, int ps[])
+Int ana_y1(Int narg, Int ps[])
 {
   return math_funcs(ps[0], F_Y1);
 }
 /*------------------------------------------------------------------------- */
-int ana_yn(int narg, int ps[])
+Int ana_yn(Int narg, Int ps[])
 {
   return math_funcs_i_f(ps[0], ps[1], F_YN);
 }
 /*------------------------------------------------------------------------- */
-int ana_pow(int narg, int ps[])
+Int ana_pow(Int narg, Int ps[])
 {
   return math_funcs_2f(ps[0], ps[1], F_POW);
 }
 /*------------------------------------------------------------------------- */
-int ana_voigt(int narg, int ps[])
+Int ana_voigt(Int narg, Int ps[])
 /* the voigt function.  LS */
 {
   return math_funcs_2f(ps[0], ps[1], F_VOIGT);
 }
 /*------------------------------------------------------------------------- */
-int ana_gamma(int narg, int ps[])
+Int ana_gamma(Int narg, Int ps[])
 /* returns the gamma function - or the natural logarithm of it (if keyword */
 /* /LOG is present)  LS 11jan96 */
 {
   return math_funcs(ps[0], (internalMode & 1)? F_LOGGAMMA: F_GAMMA);
 }
 /*------------------------------------------------------------------------- */
-int ana_beta(int narg, int ps[])
+Int ana_beta(Int narg, Int ps[])
 /* the beta function: beta(x,y) = gamma(x)*gamma(y)/gamma(x+y). */
 /* Switch /COMPLEMENT returns one minus the beta function. */
 /* LS 11jan96 22jul96 */
@@ -4932,83 +4932,83 @@ int ana_beta(int narg, int ps[])
   return math_funcs_2f(ps[0], ps[1], (internalMode & 1)? F_LOGBETA: F_BETA);
 }
 /*------------------------------------------------------------------------- */
-int ana_incomplete_gamma(int narg, int ps[])
+Int ana_incomplete_gamma(Int narg, Int ps[])
 /* the incomplete gamma function P(a,x).  LS 11jan96 */
 {
   return math_funcs_2f(ps[0], ps[1], F_IGAMMA);
 }
 /*------------------------------------------------------------------------- */
-int ana_chi_square(int narg, int ps[])
+Int ana_chi_square(Int narg, Int ps[])
 /* the chi-square function chi2(chi2, nu).  LS 11jan96 19oct96 */
 {
   return math_funcs_2f(ps[0], ps[1], F_CHI2);
 }
 /*------------------------------------------------------------------------- */
-int ana_noncentral_chi_square(int narg, int ps[])
+Int ana_noncentral_chi_square(Int narg, Int ps[])
 /* the noncentral chi-squre function ncchi2(chi2, nu, nc) */
 {
   return math_funcs_3f(ps[0], ps[1], ps[2], F_NCCHI2);
 }
 /*------------------------------------------------------------------------- */
-int ana_bessel_i0(int narg, int ps[])
+Int ana_bessel_i0(Int narg, Int ps[])
 /* the modified bessel function I0 */
 {
   return math_funcs(ps[0], F_I0);
 }
 /*------------------------------------------------------------------------- */
-int ana_bessel_i1(int narg, int ps[])
+Int ana_bessel_i1(Int narg, Int ps[])
 /* the modified bessel function I1 */
 {
   return math_funcs(ps[0], F_I1);
 }
 /*------------------------------------------------------------------------- */
-int ana_bessel_k0(int narg, int ps[])
+Int ana_bessel_k0(Int narg, Int ps[])
 /* the modified bessel function K0 */
 {
   return math_funcs(ps[0], F_K0);
 }
 /*------------------------------------------------------------------------- */
-int ana_bessel_k1(int narg, int ps[])
+Int ana_bessel_k1(Int narg, Int ps[])
 /* the modified bessel function K1 */
 {
   return math_funcs(ps[0], F_K1);
 }
 /*------------------------------------------------------------------------- */
-int ana_bessel_kn(int narg, int ps[])
+Int ana_bessel_kn(Int narg, Int ps[])
 /* the modified bessel function Kn */
 {
   return math_funcs_i_f(ps[0], ps[1], F_KN);
 }
 /*------------------------------------------------------------------------- */
-int ana_sgn(int narg, int ps[])
+Int ana_sgn(Int narg, Int ps[])
 /* the signum function: returns +1 if the argument is positive, -1 if */
 /* negative, and 0 if zero.  LS 19may98 */
 {
   return math_funcs(ps[0], F_SGN);
 }
 /*------------------------------------------------------------------------- */
-int ana_incomplete_beta(int narg, int ps[])
+Int ana_incomplete_beta(Int narg, Int ps[])
 /* the incomplete beta function I_x(a,b).  LS 15jan96 */
 {
   return math_funcs_3f(ps[0], ps[1], ps[2], F_IBETA);
 }
 /*------------------------------------------------------------------------- */
-int ana_student(int narg, int ps[])
+Int ana_student(Int narg, Int ps[])
 /* Student's t-distribution.  LS 15jan96 */
 {
   return math_funcs_2f(ps[0], ps[1], F_STUDENT);
 }
 /*------------------------------------------------------------------------- */
-int ana_f_ratio(int narg, int ps[])
+Int ana_f_ratio(Int narg, Int ps[])
 /* F variance ratio.  LS 15jan96 */
 {
   return math_funcs_3f(ps[0], ps[1], ps[2], F_FRATIO);
 }
 /*------------------------------------------------------------------------- */
-int math_funcs(int nsym, int code)
+Int math_funcs(Int nsym, Int code)
      /*general program for floating point functions */
 {
-  int	n, result, type, out_type;
+  Int	n, result, type, out_type;
   pointer	trgt, src;
   doubleComplex	value;
 
@@ -5092,14 +5092,14 @@ int math_funcs(int nsym, int code)
   return result;
 }						/*end of math_funcs */
 /*------------------------------------------------------------------------- */
-int math_funcs_2f(int nsym1, int nsym2, int code)
+Int math_funcs_2f(Int nsym1, Int nsym2, Int code)
 /*general program for floating point functions with 2 floating arguments */
 /*messier than the 1 argument case but not as bad as binary ops routines */
-/*assumes that the function requires double arguments (most C functions) */
+/*assumes that the function requires Double arguments (most C functions) */
 {
-  int	n1, n2, nelem, i, result_sym, type1, type2, out_type;
+  Int	n1, n2, nelem, i, result_sym, type1, type2, out_type;
   pointer	src1, src2, trgt;
-  double	value;
+  Double	value;
 
   errno = 0;
 
@@ -5431,13 +5431,13 @@ int math_funcs_2f(int nsym1, int nsym2, int code)
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-int math_funcs_i_f(int nsym1, int nsym2, int code)
-/*general program for floating point functions with int and float arguments */
-/*assumes that the function requires double arguments (most C functions) */
+Int math_funcs_i_f(Int nsym1, Int nsym2, Int code)
+/*general program for floating point functions with Int and Float arguments */
+/*assumes that the function requires Double arguments (most C functions) */
 {
-  int	n1, n2, nelem, i, result_sym, type1, type2, out_type, valuei;
+  Int	n1, n2, nelem, i, result_sym, type1, type2, out_type, valuei;
   pointer	src1, src2, trgt;
-  double	valued;
+  Double	valued;
 
   errno = 0;
 
@@ -5764,7 +5764,7 @@ int math_funcs_i_f(int nsym1, int nsym2, int code)
   return result_sym;
 }						/*end of math_funcs_i_f */
 /*------------------------------------------------------------------------- */
-int math_funcs_3f(int sym1, int sym2, int sym3, int code)
+Int math_funcs_3f(Int sym1, Int sym2, Int sym3, Int code)
 /* mathematical function with three arguments.  This code goes for */
 /* conciseness, not for speed.  It is assumed that the calculation */
 /* of the actual mathematical function takes more time than */
@@ -5773,9 +5773,9 @@ int math_funcs_3f(int sym1, int sym2, int sym3, int code)
 /* the same number of elements.  The dimensional structures are not */
 /* checked.  LS 15jan96 */
 {
-  int	n1, n2, n3, iq, n, type1, type2, type3, step1, step2, step3, type;
+  Int	n1, n2, n3, iq, n, type1, type2, type3, step1, step2, step3, type;
   pointer	src1, src2, src3, trgt;
-  double	val1, val2, val3, val;
+  Double	val1, val2, val3, val;
 
   errno = 0;
   /* get sizes and pointers */
@@ -5813,7 +5813,7 @@ int math_funcs_3f(int sym1, int sym2, int sym3, int code)
   if (symbol_class(iq) == ANA_SCALAR) /* get pointer to output data */
     trgt.b =  &scalar_value(iq).b;
   else
-    trgt.b = (byte *) array_data(iq);
+    trgt.b = (Byte *) array_data(iq);
   step1 = (n1 == 1)? 0: ana_type_size[type1]; /* get step sizes */
   step2 = (n2 == 1)? 0: ana_type_size[type2];
   step3 = (n3 == 1)? 0: ana_type_size[type3];
@@ -5822,93 +5822,93 @@ int math_funcs_3f(int sym1, int sym2, int sym3, int code)
   if (!step1)
     switch (type1) {
       case ANA_BYTE:
-	val1 = (double) *src1.b;
+	val1 = (Double) *src1.b;
 	break;
       case ANA_WORD:
-	val1 = (double) *src1.w;
+	val1 = (Double) *src1.w;
 	break;
       case ANA_LONG:
-	val1 = (double) *src1.l;
+	val1 = (Double) *src1.l;
 	break;
       case ANA_FLOAT:
-	val1 = (double) *src1.f;
+	val1 = (Double) *src1.f;
 	break;
       case ANA_DOUBLE:
-	val1 = (double) *src1.d;
+	val1 = (Double) *src1.d;
 	break;
     }
   if (!step2)
     switch (type2) {
       case ANA_BYTE:
-	val2 = (double) *src2.b;
+	val2 = (Double) *src2.b;
 	break;
       case ANA_WORD:
-	val2 = (double) *src2.w;
+	val2 = (Double) *src2.w;
 	break;
       case ANA_LONG:
-	val2 = (double) *src2.l;
+	val2 = (Double) *src2.l;
 	break;
       case ANA_FLOAT:
-	val2 = (double) *src2.f;
+	val2 = (Double) *src2.f;
 	break;
       case ANA_DOUBLE:
-	val2 = (double) *src2.d;
+	val2 = (Double) *src2.d;
 	break;
     }
   if (!step3)
     switch (type3) {
       case ANA_BYTE:
-	val3 = (double) *src3.b;
+	val3 = (Double) *src3.b;
 	break;
       case ANA_WORD:
-	val3 = (double) *src3.w;
+	val3 = (Double) *src3.w;
 	break;
       case ANA_LONG:
-	val3 = (double) *src3.l;
+	val3 = (Double) *src3.l;
 	break;
       case ANA_FLOAT:
-	val3 = (double) *src3.f;
+	val3 = (Double) *src3.f;
 	break;
       case ANA_DOUBLE:
-	val3 = (double) *src3.d;
+	val3 = (Double) *src3.d;
 	break;
     }
   while (n--) {			/* loop over all elements */
     if (step1) {		/* new element */
       switch (type1) {
 	case ANA_BYTE:
-	  val1 = (double) *src1.b;
+	  val1 = (Double) *src1.b;
 	  break;
 	case ANA_WORD:
-	  val1 = (double) *src1.w;
+	  val1 = (Double) *src1.w;
 	  break;
 	case ANA_LONG:
-	  val1 = (double) *src1.l;
+	  val1 = (Double) *src1.l;
 	  break;
 	case ANA_FLOAT:
-	  val1 = (double) *src1.f;
+	  val1 = (Double) *src1.f;
 	  break;
 	case ANA_DOUBLE:
-	  val1 = (double) *src1.d;
+	  val1 = (Double) *src1.d;
 	  break; }
       src1.b += step1;
     }
     if (step2) {
       switch (type2) {
 	case ANA_BYTE:
-	  val2 = (double) *src2.b;
+	  val2 = (Double) *src2.b;
 	  break;
 	case ANA_WORD:
-	  val2 = (double) *src2.w;
+	  val2 = (Double) *src2.w;
 	  break;
 	case ANA_LONG:
-	  val2 = (double) *src2.l;
+	  val2 = (Double) *src2.l;
 	  break;
 	case ANA_FLOAT:
-	  val2 = (double) *src2.f;
+	  val2 = (Double) *src2.f;
 	  break;
 	case ANA_DOUBLE:
-	  val2 = (double) *src2.d;
+	  val2 = (Double) *src2.d;
 	  break;
       }
       src2.b += step2;
@@ -5916,37 +5916,37 @@ int math_funcs_3f(int sym1, int sym2, int sym3, int code)
     if (step3) {
       switch (type3) {
 	case ANA_BYTE:
-	  val3 = (double) *src3.b;
+	  val3 = (Double) *src3.b;
 	  break;
 	case ANA_WORD:
-	  val3 = (double) *src3.w;
+	  val3 = (Double) *src3.w;
 	  break;
 	case ANA_LONG:
-	  val3 = (double) *src3.l;
+	  val3 = (Double) *src3.l;
 	  break;
 	case ANA_FLOAT:
-	  val3 = (double) *src3.f;
+	  val3 = (Double) *src3.f;
 	  break;
 	case ANA_DOUBLE:
-	  val3 = (double) *src3.d;
+	  val3 = (Double) *src3.d;
 	  break;
       }
       src3.b += step3;
     }
     val = (*func_ddd[code])(val1, val2, val3); /* get function value */
     if (type == ANA_FLOAT)		/* store result */
-      *trgt.f++ = (float) val;
+      *trgt.f++ = (Float) val;
     else
       *trgt.d++ = val;
   }
   return iq;
 }
 /*------------------------------------------------------------------------- */
-double voigt(double a, double v)
+Double voigt(Double a, Double v)
 {
-    double	anhs, avsd, sumb, avss;
-    int		n;
-    double	c1, d1, p2, ab, ef, al, aa,
+    Double	anhs, avsd, sumb, avss;
+    Int		n;
+    Double	c1, d1, p2, ab, ef, al, aa,
 		av, aph, avs, vph, sum = 0;
 
     if (a < 0) a = -a;
@@ -5977,17 +5977,17 @@ double voigt(double a, double v)
     return a/(2*M_PI*avss) + a/M_PI*sum + p2;
 }
 /*------------------------------------------------------------------------- */
-double loggamma(double x)
+Double loggamma(Double x)
 /* returns the natural logarithm of the absolute value of the gamma */
 /* function at ordinate <x>. */
 /* Uses the approximation of Lanczos.   LS 11jan96 22jul96 */
 {
-  static double	a[6] =
+  static Double	a[6] =
   { 76.18009172947146, -86.50532032941677, 24.01409824083091,
       -1.231739572450155, 1.208650973866179e-3, -5.395239384953e-6 };
   char	flip;
-  int	i;
-  double	y, z, w;
+  Int	i;
+  Double	y, z, w;
 
   if (x <= 0)
   { x = 1 - x;
@@ -6005,15 +6005,15 @@ double loggamma(double x)
   return y;
 }
 /*------------------------------------------------------------------------- */
-double gamma(double x)
+Double gamma(Double x)
 /* returns the value of the gamma function at ordinate <x>.  LS 22jul96 */
 {
-  static double	a[6] =
+  static Double	a[6] =
   { 76.18009172947146, -86.50532032941677, 24.01409824083091,
       -1.231739572450155, 1.208650973866179e-3, -5.395239384953e-6 };
   char	flip;
-  int	i;
-  double	y, z, w;
+  Int	i;
+  Double	y, z, w;
 
   if (x <= 0)
   { x = 1 - x;
@@ -6029,19 +6029,19 @@ double gamma(double x)
   if (flip)
     y = 1.14472988584940017 - y - log(fabs(sin(x*M_PI)));
   y = exp(y);
-  if (flip && ((int) x) % 2 == 1)
+  if (flip && ((Int) x) % 2 == 1)
     y = -y;
   return y;
 }
 /*------------------------------------------------------------------------- */
-double incomplete_gamma(double a, double x)
+Double incomplete_gamma(Double a, Double x)
 /* returns the incomplete gamma function P(a,x) */
 /* series expansion for x < a + 1, and continued fraction for x > a + 1 */
 /* if internalMode & 1, then 1 - P(a,x) is returned. */
 /* LS 11jan96 22jul96 */
 {
-  double	z, g, z0, c, d, tiny, aa, bb, del;
-  int	i;
+  Double	z, g, z0, c, d, tiny, aa, bb, del;
+  Int	i;
 
   if (a < 0.0)
     return sqrt(-1);
@@ -6099,35 +6099,35 @@ double incomplete_gamma(double a, double x)
   return 1.0;			/* or some compilers complain */
 }
 /*------------------------------------------------------------------------- */
-double beta(double x, double y)
+Double beta(Double x, Double y)
 /* returns the beta function. */
 /* LS 15jan96 22jul96 */
 {
   return exp(loggamma(x) + loggamma(y) - loggamma(x + y));
 }
 /*------------------------------------------------------------------------- */
-double logbeta(double x, double y)
+Double logbeta(Double x, Double y)
 /* returns the logarithm of the beta function. */
 /* LS 15jan96 22jul96 */
 {
   return loggamma(x) + loggamma(y) - loggamma(x + y);
 }
 /*------------------------------------------------------------------------- */
-double chi_square(double chi2, double nu)
+Double chi_square(Double chi2, Double nu)
 /* returns the chi-square function or, if internalMode & 1, its */
 /* complement.  LS 15jan95 22jul96 */
 {
   return incomplete_gamma(nu/2, chi2/2);
 }
 /*------------------------------------------------------------------------- */
-double incomplete_beta(double x, double a, double b)
+Double incomplete_beta(Double x, Double a, Double b)
 /* returns the incomplete beta function or (if internalMode & 1) its */
 /* complement or (if internalMode & 2) its natural logarithm. */
 /* LS 15jan96 5nov96 */
 {
-  double	x0, tiny, c, f, d, e1, e2, e3, e4, e5, aa, del, k, g;
+  Double	x0, tiny, c, f, d, e1, e2, e3, e4, e5, aa, del, k, g;
   char	flip;
-  int	j;
+  Int	j;
 
   if (a <= 0 || b <= 0)
     return -1.0;			/* error condition */
@@ -6180,11 +6180,11 @@ double incomplete_beta(double x, double a, double b)
     return (flip ^ (internalMode & 1))? 1 - f: f; }
 }
 /*------------------------------------------------------------------------- */
-double student(double t, double nu)
+Double student(Double t, Double nu)
 /* returns Student's t distribution or, if internalMode & 1, its complement */
 /* or, if internalMode & 2, its natural logarithm.  LS 22jul96 5nov96 */
 {
-  double result;
+  Double result;
 
   internalMode ^= 1;
   result = incomplete_beta(nu/(nu + t*t), nu/2, 0.5);
@@ -6192,19 +6192,19 @@ double student(double t, double nu)
   return result;
 }
 /*------------------------------------------------------------------------- */
-double F(double F, double nu1, double nu2)
+Double F(Double F, Double nu1, Double nu2)
 /* returns the F-ratio function or, if internalMode & 1, its complement */
 /* LS 22jul96 */
 {
   return incomplete_beta(nu2/(nu2 + nu1*F), nu2/2, nu1/2);
 }
 /*------------------------------------------------------------------------- */
-double non_central_chi_square(double chi2, double nu, double lambda)
+Double non_central_chi_square(Double chi2, Double nu, Double lambda)
 /* returns the value of the non-central chi-square distribution for */
 /* chi-square <chi2>, <nu> degrees of freedom, and non-centrality */
 /* parameter <lambda>.  algorithm of my own devising.  LS 19oct96  */
 {
-  double	a, b, c, d, y, c2, l2, i1, i2;
+  Double	a, b, c, d, y, c2, l2, i1, i2;
 
   if (chi2 < 0.0 || lambda < 0.0 || nu < 0) /* all parameters must be */
 					    /* non-negative */
@@ -6227,12 +6227,12 @@ double non_central_chi_square(double chi2, double nu, double lambda)
   return y*exp(-l2);
 }
 /*------------------------------------------------------------------------- */
-double bessel_i0(double x)
+Double bessel_i0(Double x)
 /* returns value of the modified Bessel function of order zero I0. */
 /* LS 2dec96.  uses Abramowitz & Stegun approximations. */
 /* if internalMode & 1 then returns I0(x)*exp(-x).  LS 3dec95 */
 {
-  double	t;
+  Double	t;
   
   if (x < 0)
     x = -x;
@@ -6249,12 +6249,12 @@ double bessel_i0(double x)
   return (internalMode & 1)? t: t*exp(x);
 }
 /*------------------------------------------------------------------------- */
-double bessel_i1(double x)
+Double bessel_i1(Double x)
 /* returns value of the modified Bessel function of order one I1. */
 /* LS 3dec96.  uses Abramowitz & Stegun approximations. */
 {
-  double	t;
-  double	sign;
+  Double	t;
+  Double	sign;
 
   if (x < 0)
   { sign = -1;
@@ -6271,11 +6271,11 @@ double bessel_i1(double x)
 	    - 0.00362018)*t - 0.03988024)*t + 0.39894228)/sqrt(x)*exp(x)*sign;
 }
 /*------------------------------------------------------------------------- */
-double bessel_k0(double x)
+Double bessel_k0(Double x)
 /* returns value of the modified Bessel function of order zero K0. */
 /* LS 3dec96.  uses Abramowitz & Stegun approximations. */
 {
-  double	t;
+  Double	t;
 
   if (x <= 0)
     return sqrt(-1);		/* generate error */
@@ -6291,11 +6291,11 @@ double bessel_k0(double x)
 	  + 1.25331414)*exp(-x)/sqrt(x);
 }
 /*------------------------------------------------------------------------- */
-double bessel_k1(double x)
+Double bessel_k1(Double x)
 /* returns value of the modified Bessel function of order one K1. */
 /* LS 3dec96.  uses Abramowitz & Stegun approximations. */
 {
-  double	t;
+  Double	t;
   
   if (x <= 0)
     return sqrt(-1);		/* generate domain error */
@@ -6311,12 +6311,12 @@ double bessel_k1(double x)
 	  + 1.25331414)*exp(-x)/sqrt(x);
 }
 /*------------------------------------------------------------------------- */
-double bessel_kn(int n, double x)
+Double bessel_kn(Int n, Double x)
 /* returns value of the modified Bessel function of order n Kn. */
 /* LS 3dec96.  uses Abramowitz & Stegun approximations. */
 {
-  double	z, b0, b1, b2;
-  int	i;
+  Double	z, b0, b1, b2;
+  Int	i;
 
   if (n < 2 || x <= 0)
     return sqrt(-1);		/* generate error */
@@ -6331,7 +6331,7 @@ double bessel_kn(int n, double x)
   return b2;
 }
 /*------------------------------------------------------------------------- */
-double sgn(double x)
+Double sgn(Double x)
 /* returns the sign of x: +1 if x > 0, -1 if x < 0, and 0 if x == 0. */
 /* LS 19may98 */
 {
@@ -6342,18 +6342,18 @@ double sgn(double x)
   return 0.0;
 }
 /*------------------------------------------------------------------------- */
-int ana_array_statistics(int narg, int ps[])
+Int ana_array_statistics(Int narg, Int ps[])
 /* returns mean, sdev, and other statistics for an array */
 /* this a subroutine with a variable number of arguments of the
    form:  array_statistics, array, max, min, mean, [sdev, skew, kurtosis]
-   where mean, etc are returned values, either float or double */
+   where mean, etc are returned values, either Float or Double */
 {
-  int	n, nc, sdev_flag=0, skew_flag=0, kurtosis_flag=0;
-  double	fac;
+  Int	n, nc, sdev_flag=0, skew_flag=0, kurtosis_flag=0;
+  Double	fac;
   pointer	q1;
-  int	*save_ptr;
-  int	type;
-  int	iq;
+  Int	*save_ptr;
+  Int	type;
+  Int	iq;
 
   iq = ps[0];
   if (numerical(iq, NULL, NULL, &n, &q1) == ANA_ERROR)
@@ -6363,7 +6363,7 @@ int ana_array_statistics(int narg, int ps[])
   type = symbol_type(iq);
   if (isComplexType(type))
     return anaerror("Sorry, complex numbers not implemented.", ps[0]);
-  fac = 1.0/(double) n;
+  fac = 1.0/(Double) n;
   switch (narg) {
     case 7:
       kurtosis_flag = 1;
@@ -6374,17 +6374,17 @@ int ana_array_statistics(int narg, int ps[])
   }
  /* two major branches, one for doubles and one for everyone else */
   if (type < ANA_DOUBLE) {
-    float	s, sdev, skew, kurtosis, mean, ss, max, min, xq;
-    int	imax, imin;
+    Float	s, sdev, skew, kurtosis, mean, ss, max, min, xq;
+    Int	imax, imin;
     
     s = sdev = skew = kurtosis = 0.0;
    /* need a first pass to get the mean value */
     switch (type) {
       case ANA_WORD:
-	imax = imin = (int) *q1.w;
+	imax = imin = (Int) *q1.w;
 	while (n--) { 
-	  iq = (int) *q1.w++;
-	  s += (float) iq;
+	  iq = (Int) *q1.w++;
+	  s += (Float) iq;
 	  if (iq > imax)
 	    imax = iq;
 	  else if (iq < imin)
@@ -6395,7 +6395,7 @@ int ana_array_statistics(int narg, int ps[])
 	imax = imin = *q1.l;
 	while (n--) { 
 	  iq = *q1.l++;
-	  s += (float) iq; 
+	  s += (Float) iq; 
 	  if (iq > imax)
 	    imax = iq; 
 	  else if (iq < imin) 
@@ -6414,10 +6414,10 @@ int ana_array_statistics(int narg, int ps[])
 	}
 	break;
       case ANA_BYTE:
-	imax = imin = (int) *q1.b;
+	imax = imin = (Int) *q1.b;
 	while (n--) { 
-	  iq = (int) *q1.b++;
-	  s += (float) iq;
+	  iq = (Int) *q1.b++;
+	  s += (Float) iq;
 	  if (iq > imax)
 	    imax = iq;
 	  else if (iq < imin)
@@ -6441,7 +6441,7 @@ int ana_array_statistics(int narg, int ps[])
       switch (type) {
 	case ANA_WORD:
 	  while (n--) {
-	    s = (float) *q1.w++ - mean; 
+	    s = (Float) *q1.w++ - mean; 
 	    ss = s * s; 
 	    sdev += ss; 
 	    if (skew_flag) {
@@ -6453,7 +6453,7 @@ int ana_array_statistics(int narg, int ps[])
 	  break;
 	case ANA_LONG:
 	  while (n--) {
-	    s = (float) *q1.l++ - mean; 
+	    s = (Float) *q1.l++ - mean; 
 	    ss = s * s;
 	    sdev += ss; 
 	    if (skew_flag) {
@@ -6475,7 +6475,7 @@ int ana_array_statistics(int narg, int ps[])
 	  } break;
 	case ANA_BYTE:
 	  while (n--) {
-	    s = (float) *q1.b++ - mean; 
+	    s = (Float) *q1.b++ - mean; 
 	    ss = s * s; 
 	    sdev += ss; 
 	    if (skew_flag) {
@@ -6499,7 +6499,7 @@ int ana_array_statistics(int narg, int ps[])
     return ANA_OK;
   } else {
     /* the doubles case */
-    double	s, sdev, skew, kurtosis, mean, ss, max, min, xq;
+    Double	s, sdev, skew, kurtosis, mean, ss, max, min, xq;
 
     s = sdev = skew = kurtosis = 0.0;
     /* need a first pass to get the mean value */

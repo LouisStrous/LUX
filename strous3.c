@@ -10,12 +10,12 @@
 #include <float.h>
 #include <math.h>
 #include <errno.h>              /* for errno */
-#include "Bytestack.h"
 #include "action.h"
+#include "Bytestack.h"
 
-int	to_scratch_array(int, int, int, int []);
+Int	to_scratch_array(Int, Int, Int, Int []);
 /*---------------------------------------------------------------------*/
-int ana_bisect(int narg, int ps[])
+Int ana_bisect(Int narg, Int ps[])
 /* y = BISECT([x,] y, values [, AXIS=axis, POS=pos, WIDTH=width]) */
 /* calculates bisector positions */
 /* <axis> may only have a single dimension. */
@@ -33,9 +33,9 @@ int ana_bisect(int narg, int ps[])
    bisector positions are returned in it. */
 /* LS 7may98 */
 {
-  int	result, iq, pos, nLev, outDims[MAX_DIMS], step,
+  Int	result, iq, pos, nLev, outDims[MAX_DIMS], step,
     lev, xSym, ySym, vSym, il, ir;
-  double	xl, xr, min, minpos, max, maxpos, x1l, x2l, x1r, x2r;
+  Double	xl, xr, min, minpos, max, maxpos, x1l, x2l, x1r, x2r;
   pointer	src, trgt, level, ptr, rightedge, left, width, x;
   csplineInfo	cspl;
   loopInfo	srcinfo;
@@ -86,9 +86,9 @@ int ana_bisect(int narg, int ps[])
   /* create output symbol */
   if (nLev > 1) {
     outDims[0] = nLev;
-    memcpy(outDims + 1, srcinfo.dims, srcinfo.raxes[0]*sizeof(int));
+    memcpy(outDims + 1, srcinfo.dims, srcinfo.raxes[0]*sizeof(Int));
     memcpy(outDims + srcinfo.raxes[0] + 1, srcinfo.dims + srcinfo.raxes[0] + 1,
-	   (srcinfo.ndim - srcinfo.raxes[0] - 1)*sizeof(int));
+	   (srcinfo.ndim - srcinfo.raxes[0] - 1)*sizeof(Int));
     result = array_scratch(srcinfo.type, srcinfo.ndim, outDims);
     if (narg > 5 && ps[5])	/* have <width> */
       if (to_scratch_array(ps[5], srcinfo.type, srcinfo.ndim, outDims)
@@ -96,9 +96,9 @@ int ana_bisect(int narg, int ps[])
 	return ANA_ERROR;
   } else {
     if (srcinfo.ndim > 1) {
-      memcpy(outDims, srcinfo.dims, srcinfo.raxes[0]*sizeof(int));
+      memcpy(outDims, srcinfo.dims, srcinfo.raxes[0]*sizeof(Int));
       memcpy(outDims + srcinfo.raxes[0], srcinfo.dims + srcinfo.raxes[0] + 1,
-	     (srcinfo.ndim - srcinfo.raxes[0] - 1)*sizeof(int));
+	     (srcinfo.ndim - srcinfo.raxes[0] - 1)*sizeof(Int));
       result = array_scratch(srcinfo.type, srcinfo.ndim - 1, outDims);
       if (narg > 5 && ps[5])	/* have <width> */
 	if (to_scratch_array(ps[5], srcinfo.type, srcinfo.ndim, outDims)
@@ -117,9 +117,9 @@ int ana_bisect(int narg, int ps[])
     return ANA_ERROR;
   switch (symbol_class(result)) {
     case ANA_ARRAY:
-      trgt.f = (float *) array_data(result);
+      trgt.f = (Float *) array_data(result);
       if (narg > 5 && ps[5])
-	width.f = (float *) array_data(ps[5]);
+	width.f = (Float *) array_data(ps[5]);
       else
 	width.f = NULL;
       break;
@@ -385,10 +385,10 @@ int ana_bisect(int narg, int ps[])
   return result;
 }
 /*---------------------------------------------------------------------*/
-static int cmp0(const void *a, const void *b)
+static Int cmp0(const void *a, const void *b)
 {
-  struct c { double v; int l; } aa, bb;
-  int d;
+  struct c { Double v; Int l; } aa, bb;
+  Int d;
   
   aa = *(struct c *) a;
   bb = *(struct c *) b;
@@ -396,7 +396,7 @@ static int cmp0(const void *a, const void *b)
   if (d)
     return d;
   else {
-    double dl;
+    Double dl;
     dl = aa.v - bb.v;
     if (dl < 0)
       return -1;
@@ -406,7 +406,7 @@ static int cmp0(const void *a, const void *b)
   return 0;
 }
 /*---------------------------------------------------------------------*/
-int ana_cspline_find(int narg, int ps[])
+Int ana_cspline_find(Int narg, Int ps[])
 /* z = CSPLINE_FIND(y, levels [, AXIS=axis, INDEX=index]) */
 /* locates positions where a certain value gets attained, using cubic
    splines
@@ -422,13 +422,13 @@ int ana_cspline_find(int narg, int ps[])
    index <index(i)> and run up to but not including index <index(i+1)>. */
 /* LS 2009-08-09 */
 {
-  int	result, iq, nLev, lev, ySym, vSym, i, step, *index, j;
+  Int	result, iq, nLev, lev, ySym, vSym, i, step, *index, j;
   pointer	src, level;
   csplineInfo	cspl;
   loopInfo	srcinfo;
   Bytestack b;
-  struct c { double v; int l; int c; } *c;
-  int csize;
+  struct c { Double v; Int l; Int c; } *c;
+  Int csize;
 
   ySym = ps[0];		/* <y> */
   vSym = ps[1];		/* <values> */
@@ -453,23 +453,23 @@ int ana_cspline_find(int narg, int ps[])
   if (narg > 3 && ps[3]) {	/* <index> */
     if (to_scratch_array(ps[3], ANA_LONG, 1, &nLev) == ANA_ERROR)
       return ANA_ERROR;
-    index = (int *) array_data(ps[3]);
-    memset(index, 0, srcinfo.ndim*sizeof(int));
+    index = (Int *) array_data(ps[3]);
+    memset(index, 0, srcinfo.ndim*sizeof(Int));
   } else
     index = NULL;
     
   /* we don't know beforehand how many output values there will be */
-  b = Bytestack_create();	/* so store them on a byte stack */
+  b = Bytestack_create();	/* so store them on a Byte stack */
 
   step = srcinfo.rsinglestep[0];
 
-  /* we'll store the data as follows on the byte stack:
-     1. the found location in the target dimension (double)
-     2. the index of the level of which this is the location (int)
-     3. the (one or more) coordinates of the location (int) */
+  /* we'll store the data as follows on the Byte stack:
+     1. the found location in the target dimension (Double)
+     2. the index of the level of which this is the location (Int)
+     3. the (one or more) coordinates of the location (Int) */
   {
     struct c cc;
-    csize = (byte *) &cc.c - (byte *) &cc.v + srcinfo.ndim*sizeof(int);
+    csize = (Byte *) &cc.c - (Byte *) &cc.v + srcinfo.ndim*sizeof(Int);
   }
   c = malloc(csize);
 
@@ -488,7 +488,7 @@ int ana_cspline_find(int narg, int ps[])
 	    for (lev = 0; lev < nLev && *src.f > level.f[lev]; lev++) ;
 	    /* now level.f[lev - 1] <= *src.f < level.f[lev] */
 	  } else {
-	    double z;
+	    Double z;
 
 	    if (lev > 0 && *src.f < level.f[lev - 1]) {
 	      /* passed a target level going down: determine &
@@ -502,7 +502,7 @@ int ana_cspline_find(int narg, int ps[])
 	      /* and after that the coordinates */
 	      for (j = 0; j < srcinfo.ndim; j++)
 		(&c->c)[srcinfo.raxes[j]] = srcinfo.coords[j];
-	      Bytestack_push_data(b, c, (byte *) c + csize);
+	      Bytestack_push_data(b, c, (Byte *) c + csize);
 	    } else if (lev < nLev && *src.f >= level.f[lev]) {
 	      /* passed a target level going up: determine &
 		 remember detailed location */
@@ -514,7 +514,7 @@ int ana_cspline_find(int narg, int ps[])
 	      c->l = lev++;
 	      for (j = 0; j < srcinfo.ndim; j++)
 		(&c->c)[srcinfo.raxes[j]] = srcinfo.coords[j];
-	      Bytestack_push_data(b, c, (byte *) c + csize);
+	      Bytestack_push_data(b, c, (Byte *) c + csize);
 	    }
 	  }
 	} while ((i = advanceLoop(&srcinfo, &src)) == 0);
@@ -533,7 +533,7 @@ int ana_cspline_find(int narg, int ps[])
 	    for (lev = 0; lev < nLev && *src.d > level.d[lev]; lev++) ;
 	    /* now level.d[lev - 1] <= *src.d < level.d[lev] */
 	  } else {
-	    double z;
+	    Double z;
 
 	    if (lev > 0 && *src.d < level.d[lev - 1]) {
 	      /* passed a target level going down: determine &
@@ -546,7 +546,7 @@ int ana_cspline_find(int narg, int ps[])
 	      c->l = --lev;
 	      for (j = 0; j < srcinfo.ndim; j++)
 		(&c->c)[srcinfo.raxes[j]] = srcinfo.coords[j];
-	      Bytestack_push_data(b, c, (byte *) c + csize);
+	      Bytestack_push_data(b, c, (Byte *) c + csize);
 	    } else if (lev < nLev && *src.d >= level.d[lev]) {
 	      /* passed a target level going up: determine &
 		 remember detailed location */
@@ -558,7 +558,7 @@ int ana_cspline_find(int narg, int ps[])
 	      c->l = lev++;
 	      for (j = 0; j < srcinfo.ndim; j++)
 		(&c->c)[srcinfo.raxes[j]] = srcinfo.coords[j];
-	      Bytestack_push_data(b, c, (byte *) c + csize);
+	      Bytestack_push_data(b, c, (Byte *) c + csize);
 	    }
 	  }
 	} while ((i = advanceLoop(&srcinfo, &src)) == 0);
@@ -574,7 +574,7 @@ int ana_cspline_find(int narg, int ps[])
      so that we first have the positions for the first level, then
      those for the second level, and so on. */
   {
-    int n;
+    Int n;
     struct c *d;
     
     n = Bytestack_bytes(b, 0)/csize; /* number of found data points */
@@ -582,7 +582,7 @@ int ana_cspline_find(int narg, int ps[])
       Bytestack_index bi;
       union {
 	struct c *c; 
-	byte *b; 
+	Byte *b; 
       } q;
 
       d = (struct c *) Bytestack_peek(b, 0); /* beginning of data */
@@ -594,11 +594,11 @@ int ana_cspline_find(int narg, int ps[])
 	Bytestack_push_var(NULL, srcinfo.ndim);
       Bytestack_push_var(NULL, n);
       result = array_scratch(ANA_DOUBLE, (srcinfo.ndim > 1? 2: 1),
-			     (int *) Bytestack_pop(NULL, bi));
+			     (Int *) Bytestack_pop(NULL, bi));
       src.d = array_data(result);
       q.c = d;
       for (i = 0; i < n; i++) {
-	int j;
+	Int j;
 	for (j = 0; j < srcinfo.ndim; j++) {
 	  if (j == srcinfo.raxes[0])
 	    *src.d++ = q.c->v;
@@ -614,7 +614,7 @@ int ana_cspline_find(int narg, int ps[])
 	  for (i = 0; i < n; i++) {
 	    while (d->l != lev)
 	      index[++lev] = i;
-	    d = (struct c *) ((byte *)d + csize);
+	    d = (struct c *) ((Byte *)d + csize);
 	  }
 	}
       }
@@ -635,7 +635,7 @@ int ana_cspline_find(int narg, int ps[])
 #define SYNCH_OK	0x5555aaaa
 #define SYNCH_REVERSE	0xaaaa5555
 #endif
-int ana_fitskey(int narg, int ps[])
+Int ana_fitskey(Int narg, Int ps[])
 /* FITSKEY(file, key) returns the value associated with the string <key> */
 /* in FITS file <file>.  If <file> is a string, then it is taken as the
    name of the FITS file.  If <file> is a scalar, then its (integer) value
@@ -650,11 +650,11 @@ int ana_fitskey(int narg, int ps[])
 /* in the file.  LS 4jun98 */
 {
   char	*file, *key, *key2, *scr, mustclose, ok;
-  int	n, n2, i, evalString(char *, int), ptr, iq, i0, type;
+  Int	n, n2, i, evalString(char *, Int), ptr, iq, i0, type;
   pointer	p;
   scalar	value;
   FILE	*fp;
-  void	read_a_number(char **buf, scalar *value, int *type);
+  void	read_a_number(char **buf, scalar *value, Int *type);
 
   switch (symbol_class(ps[0])) {
     case ANA_STRING:
@@ -773,7 +773,7 @@ int ana_fitskey(int narg, int ps[])
   /* LS 26may99 */
   scr += 9;			/* beginning of data value */
   n = 0;
-  while (isspace((int) *scr))
+  while (isspace((Int) *scr))
     scr++;
   key = scr;
   while (*key) {
@@ -785,10 +785,10 @@ int ana_fitskey(int narg, int ps[])
 	if (!n) { 		/* not in a literal text string */
 	  if (internalMode & 1) { /* /COMMENT */
 	    scr = key + 1;	/* start reading here */
-	    while (isspace((int) *scr))
+	    while (isspace((Int) *scr))
 	      scr++;		/* skip initial whitespace */
 	    key = scr + strlen(scr) - 1; /* skip final whitespace */
-	    while (key > scr && isspace((int) *key))
+	    while (key > scr && isspace((Int) *key))
 	      key--;
 	    key[1] = '\0';
 	    iq = string_scratch(strlen(scr));
@@ -796,7 +796,7 @@ int ana_fitskey(int narg, int ps[])
 	    return iq;
 	  } else {
 	    while (key > scr
-		   && isspace((int) key[-1])) /* skip trailing spaces */
+		   && isspace((Int) key[-1])) /* skip trailing spaces */
 	      key--;
 	    *key-- = '\0';	/* terminate data value */
 	  }
@@ -818,12 +818,12 @@ int ana_fitskey(int narg, int ps[])
       break;
     case '-': case '+':		/* may be a number */
       scr = key++;
-      while (isspace((int) *key)) /* skip whitespace */
+      while (isspace((Int) *key)) /* skip whitespace */
 	key++;
-      if (!isdigit((int) *key)) { /* treat it as a string */
+      if (!isdigit((Int) *key)) { /* treat it as a string */
 	key += strlen(key);	/* go to the end of the string */
 	while (key > scr
-	       && isspace((int) key[-1])) /* skip trailing whitespace */
+	       && isspace((Int) key[-1])) /* skip trailing whitespace */
 	  key--;
 	break;
       }
@@ -834,20 +834,20 @@ int ana_fitskey(int narg, int ps[])
       iq = scalar_scratch(type);
       switch (type) {
 	case ANA_BYTE:
-	  scalar_value(iq).b = (byte) value.l;
+	  scalar_value(iq).b = (Byte) value.l;
 	  break;
 	case ANA_WORD:
-	  scalar_value(iq).w = (word) value.l;
+	  scalar_value(iq).w = (Word) value.l;
 	  break;
 	case ANA_LONG:
 	  scalar_value(iq).l = value.l;
 	  break;
 	case ANA_FLOAT:
-	  scalar_value(iq).f = (float) value.d;
+	  scalar_value(iq).f = (Float) value.d;
 	  break;
 	case ANA_CFLOAT:
 	  complex_scalar_data(iq).cf->real = 0.0;
-	  complex_scalar_data(iq).cf->imaginary = (float) value.d;
+	  complex_scalar_data(iq).cf->imaginary = (Float) value.d;
 	  break;
 	case ANA_CDOUBLE:
 	  complex_scalar_data(iq).cd->real = 0.0;
@@ -870,7 +870,7 @@ int ana_fitskey(int narg, int ps[])
 #define CENTER	4
 #define DONE	5
 
-int sign(float x)
+Int sign(Float x)
 {
   if (x > 0)
     return 1;
@@ -880,7 +880,7 @@ int sign(float x)
     return 0;
 }
 /*--------------------------------------------------------------------*/
-int sgnclass(float x)
+Int sgnclass(Float x)
 {
   if (x > 0)
     return 2;
@@ -890,8 +890,8 @@ int sgnclass(float x)
     return 1;
 }
 /*--------------------------------------------------------------------*/
-int traverseElement(float xin, float yin, float vx, float vy,
-		    float *xout, float *yout)
+Int traverseElement(Float xin, Float yin, Float vx, Float vy,
+		    Float *xout, Float *yout)
 /* if you start at position (<xin>,<yin>), with 0 <= <xin>,<yin> <= 1,
    and move in the direction given by (<vx>,<vy>), then this routine
    determines which pixel boundary you cross (UP, DOWN, LEFT, RIGHT,
@@ -967,7 +967,7 @@ int traverseElement(float xin, float yin, float vx, float vy,
 }
 /*--------------------------------------------------------------------*/
 #define FACTOR	(0.886226925)	/* 0.5*sqrt(pi) */
-int ana_dir_smooth(int narg, int ps[])
+Int ana_dir_smooth(Int narg, Int ps[])
 /* Y = DSMOOTH(<data>,<vx>,<vy> [, /TWOSIDED, /ONESIDED, /BOXCAR, /GAUSSIAN,
                /NORMALIZE])
    smooths 2D image <data> in the direction indicated by the
@@ -984,9 +984,9 @@ int ana_dir_smooth(int narg, int ps[])
 
 LS 9nov98 */
 {
-  int	iq, nx, ny, ix, iy, c, index, rindex, count, twosided, total,
+  Int	iq, nx, ny, ix, iy, c, index, rindex, count, twosided, total,
     gaussian, iq0, di, straight;
-  float	x1, y1, x2, y2, *vx0, *vy0, value, vx, vy, s, s0, ds, dslimit,
+  Float	x1, y1, x2, y2, *vx0, *vy0, value, vx, vy, s, s0, ds, dslimit,
     weight, ws, s1;
   pointer	src, trgt, src0;
   loopInfo	srcinfo, trgtinfo;
@@ -1297,15 +1297,15 @@ LS 9nov98 */
   return iq;
 }
 /*--------------------------------------------------------------------*/
-int ana_dir_smooth2(int narg, int ps[])
+Int ana_dir_smooth2(Int narg, Int ps[])
 /* Y = LSMOOTH(<data>,<vx>,<vy>)
    smooths 2D image <data> in the direction indicated by the
    angle <vx> and <vy>, over a distance indicated by the magnitude of vector
    <v>. */
 {
-  int	iq, nx, ny, ix, iy, c, index, rindex, count, twosided, normalize,
+  Int	iq, nx, ny, ix, iy, c, index, rindex, count, twosided, normalize,
     gaussian, iq0, di, straight;
-  float	x1, y1, x2, y2, *vx0, *vy0, vx, vy, s, s0, ds, dslimit,
+  Float	x1, y1, x2, y2, *vx0, *vy0, vx, vy, s, s0, ds, dslimit,
     weight, ws, s1, norm;
   pointer	src, trgt, src0;
   loopInfo	srcinfo, trgtinfo;
@@ -1346,7 +1346,7 @@ int ana_dir_smooth2(int narg, int ps[])
   gaussian = (internalMode & 2)? 1: 0; /* /GAUSSIAN */
   straight = (internalMode & 8);
 
-  zerobytes(trgt.f, array_size(iq)*sizeof(float)); /* set to zero */
+  zerobytes(trgt.f, array_size(iq)*sizeof(Float)); /* set to zero */
 
   if (!gaussian) {		/* boxcar */
     if (!normalize)
@@ -1615,7 +1615,7 @@ int ana_dir_smooth2(int narg, int ps[])
   return iq;
 }
 /*--------------------------------------------------------------------*/
-int ana_trajectory(int narg, int ps[])
+Int ana_trajectory(Int narg, Int ps[])
 /* TRAJECTORY,<gx>,<gy>,<vx>,<vy>[,<n>][,<ox>,<oy>])
   Takes the positions indicated by <gx>,<gy> and advances them for <n>
   time steps according to the velocity field in <vx>,<vy>.  The first
@@ -1640,11 +1640,11 @@ int ana_trajectory(int narg, int ps[])
      gx,gy,vx,vy, n,ox,oy
   */
 {
-  int	iq, nx, ny, ix, iy, c, index, di, n, i, dims[MAX_DIMS],
+  Int	iq, nx, ny, ix, iy, c, index, di, n, i, dims[MAX_DIMS],
     ngrid, type, dv;
-  float	x1, y1, x2, y2, vx, vy, s, s0, ds, dslimit, s1;
+  Float	x1, y1, x2, y2, vx, vy, s, s0, ds, dslimit, s1;
   pointer	gx, gy, vx0, vy0, ox, oy;
-  int ana_convert(int, int [], int, int);
+  Int ana_convert(Int, Int [], Int, Int);
 
   /* we treat all arguments. */
   if (!symbolIsRealArray(ps[0]))/* <gx> must be a real array */
@@ -1714,14 +1714,14 @@ int ana_trajectory(int narg, int ps[])
     i = 0;
     if (n > 1)
       dims[i++] = n;
-    memcpy(dims + i, array_dims(ps[0]), array_num_dims(ps[0])*sizeof(int));
+    memcpy(dims + i, array_dims(ps[0]), array_num_dims(ps[0])*sizeof(Int));
     i += array_num_dims(ps[0]);
     to_scratch_array(ps[narg - 2], type, i, dims);
     ox.v = array_data(ps[narg - 2]);
     to_scratch_array(ps[narg - 1], type, i, dims);
     oy.v = array_data(ps[narg - 1]);
   } else {			/* use <gx> and <gy> for <ox> and <oy> */
-    int ana_convert(int, int [], int, int);
+    Int ana_convert(Int, Int [], Int, Int);
     ana_convert(2, ps, type, 0);
     ox.v = array_data(ps[0]);
     oy.v = array_data(ps[1]);
@@ -1778,34 +1778,34 @@ int ana_trajectory(int narg, int ps[])
       } else {
 	switch (type) {
 	  case ANA_BYTE:
-	    ix = (int) *gx.b;	/* x pixel coordinate */
-	    iy = (int) *gy.b;	/* y pixel coordinate */
-	    x1 = (double) *gx.b++ - ix;
-	    y1 = (double) *gy.b++ - iy;
+	    ix = (Int) *gx.b;	/* x pixel coordinate */
+	    iy = (Int) *gy.b;	/* y pixel coordinate */
+	    x1 = (Double) *gx.b++ - ix;
+	    y1 = (Double) *gy.b++ - iy;
 	    break;
 	  case ANA_WORD:
-	    ix = (int) *gx.w;	/* x pixel coordinate */
-	    iy = (int) *gy.w;	/* y pixel coordinate */
-	    x1 = (double) *gx.w++ - ix;
-	    y1 = (double) *gy.w++ - iy;
+	    ix = (Int) *gx.w;	/* x pixel coordinate */
+	    iy = (Int) *gy.w;	/* y pixel coordinate */
+	    x1 = (Double) *gx.w++ - ix;
+	    y1 = (Double) *gy.w++ - iy;
 	    break;
 	  case ANA_LONG:
-	    ix = (int) *gx.l;	/* x pixel coordinate */
-	    iy = (int) *gy.l;	/* y pixel coordinate */
-	    x1 = (double) *gx.l++ - ix;
-	    y1 = (double) *gy.l++ - iy;
+	    ix = (Int) *gx.l;	/* x pixel coordinate */
+	    iy = (Int) *gy.l;	/* y pixel coordinate */
+	    x1 = (Double) *gx.l++ - ix;
+	    y1 = (Double) *gy.l++ - iy;
 	    break;
 	  case ANA_FLOAT:
-	    ix = (int) *gx.f;	/* x pixel coordinate */
-	    iy = (int) *gy.f;	/* y pixel coordinate */
-	    x1 = (double) *gx.f++ - ix;
-	    y1 = (double) *gy.f++ - iy;
+	    ix = (Int) *gx.f;	/* x pixel coordinate */
+	    iy = (Int) *gy.f;	/* y pixel coordinate */
+	    x1 = (Double) *gx.f++ - ix;
+	    y1 = (Double) *gy.f++ - iy;
 	    break;
 	  case ANA_DOUBLE:
-	    ix = (int) *gx.d;	/* x pixel coordinate */
-	    iy = (int) *gy.d;	/* y pixel coordinate */
-	    x1 = (double) *gx.d++ - ix;
-	    y1 = (double) *gy.d++ - iy;
+	    ix = (Int) *gx.d;	/* x pixel coordinate */
+	    iy = (Int) *gy.d;	/* y pixel coordinate */
+	    x1 = (Double) *gx.d++ - ix;
+	    y1 = (Double) *gy.d++ - iy;
 	    break;
 	}
 	if (ix < 0 || ix > nx - 1 || iy < 0 || iy > ny - 1) { /* out of range */
@@ -1821,24 +1821,24 @@ int ana_trajectory(int narg, int ps[])
     
       switch (type) {
 	case ANA_BYTE:
-	  vx = (double) vx0.b[index*dv]; /* x velocity */
-	  vy = (double) vy0.b[index*dv]; /* y velocity */
+	  vx = (Double) vx0.b[index*dv]; /* x velocity */
+	  vy = (Double) vy0.b[index*dv]; /* y velocity */
 	  break;
 	case ANA_WORD:
-	  vx = (double) vx0.w[index*dv]; /* x velocity */
-	  vy = (double) vy0.w[index*dv]; /* y velocity */
+	  vx = (Double) vx0.w[index*dv]; /* x velocity */
+	  vy = (Double) vy0.w[index*dv]; /* y velocity */
 	  break;
 	case ANA_LONG:
-	  vx = (double) vx0.l[index*dv]; /* x velocity */
-	  vy = (double) vy0.l[index*dv]; /* y velocity */
+	  vx = (Double) vx0.l[index*dv]; /* x velocity */
+	  vy = (Double) vy0.l[index*dv]; /* y velocity */
 	  break;
 	case ANA_FLOAT:
-	  vx = (double) vx0.f[index*dv]; /* x velocity */
-	  vy = (double) vy0.f[index*dv]; /* y velocity */
+	  vx = (Double) vx0.f[index*dv]; /* x velocity */
+	  vy = (Double) vy0.f[index*dv]; /* y velocity */
 	  break;
 	case ANA_DOUBLE:
-	  vx = (double) vx0.d[index*dv]; /* x velocity */
-	  vy = (double) vy0.d[index*dv]; /* y velocity */
+	  vx = (Double) vx0.d[index*dv]; /* x velocity */
+	  vy = (Double) vy0.d[index*dv]; /* y velocity */
 	  break;
       }
     
@@ -1915,24 +1915,24 @@ int ana_trajectory(int narg, int ps[])
 	s += ds;
 	switch (type) {
 	  case ANA_BYTE:
-	    vx = (double) vx0.b[index*dv];
-	    vy = (double) vy0.b[index*dv];
+	    vx = (Double) vx0.b[index*dv];
+	    vy = (Double) vy0.b[index*dv];
 	    break;
 	  case ANA_WORD:
-	    vx = (double) vx0.w[index*dv];
-	    vy = (double) vy0.w[index*dv];
+	    vx = (Double) vx0.w[index*dv];
+	    vy = (Double) vy0.w[index*dv];
 	    break;
 	  case ANA_LONG:
-	    vx = (double) vx0.l[index*dv];
-	    vy = (double) vy0.l[index*dv];
+	    vx = (Double) vx0.l[index*dv];
+	    vy = (Double) vy0.l[index*dv];
 	    break;
 	  case ANA_FLOAT:
-	    vx = (double) vx0.f[index*dv];
-	    vy = (double) vy0.f[index*dv];
+	    vx = (Double) vx0.f[index*dv];
+	    vy = (Double) vy0.f[index*dv];
 	    break;
 	  case ANA_DOUBLE:
-	    vx = (double) vx0.d[index*dv];
-	    vy = (double) vy0.d[index*dv];
+	    vx = (Double) vx0.d[index*dv];
+	    vy = (Double) vy0.d[index*dv];
 	    break;
 	}
       } /* end of while (s < s0) */
@@ -1967,7 +1967,7 @@ int ana_trajectory(int narg, int ps[])
   return ANA_OK;
 }
 /*--------------------------------------------------------------------*/
-void legendre(double x, int lmax, double *values)
+void legendre(Double x, Int lmax, Double *values)
 /* calculates the values of the associate Legendre polynomials */
 /* P_l^m(x) at ordinate <x> for all <l> from 0 through <lmax> and all <m> */
 /* from 0 through <l> */
@@ -1980,10 +1980,10 @@ void legendre(double x, int lmax, double *values)
 /* (with n!! the product of all *odd* values between 1 and n) */
 /* P_{m+1}^m = x (2 m + 1) P_m^m */
 {
-  int	l, m, j1, j2, j3, j4;
-  double	z, *p, v1, v2;
+  Int	l, m, j1, j2, j3, j4;
+  Double	z, *p, v1, v2;
 
-  zerobytes(values, (lmax + 1)*(lmax + 2)*sizeof(double)/2);
+  zerobytes(values, (lmax + 1)*(lmax + 2)*sizeof(Double)/2);
 
   p = values;
   z = sqrt(1 - x*x);
@@ -2028,7 +2028,7 @@ void legendre(double x, int lmax, double *values)
   }
 }
 /*--------------------------------------------------------------------*/
-void spherical_harmonics(double x, int lmax, double *values)
+void spherical_harmonics(Double x, Int lmax, Double *values)
 /* calculates the values of the normalized associate Legendre polynomials */
 /* y_l^m(x) at ordinate <x> for all <l> from 0 through <lmax> and all <m> */
 /* from 0 through <l>.  The normalization is such that */
@@ -2039,8 +2039,8 @@ void spherical_harmonics(double x, int lmax, double *values)
 /* m 0 0 1 0 1 2 0 1 2 3 */
 /* NOTE: doesn't seem quite OK yet */
 {
-  int	l, m, j4;
-  double	z, *p, v1, v2, w1, w2, w3, w4, w5, w6;
+  Int	l, m, j4;
+  Double	z, *p, v1, v2, w1, w2, w3, w4, w5, w6;
 
   p = values;
   z = sqrt(1 - x*x);
@@ -2094,11 +2094,11 @@ void spherical_harmonics(double x, int lmax, double *values)
   }
 }
 /*--------------------------------------------------------------------*/
-int ana_legendre(int narg, int ps[])
+Int ana_legendre(Int narg, Int ps[])
 /* LEGENDRE(x, lmax) */
 {
-  double	x, *values;
-  int	lmax, out, n;
+  Double	x, *values;
+  Int	lmax, out, n;
 
   x = double_arg(ps[0]);
   if (x < -1 || x > 1)
@@ -2116,7 +2116,7 @@ int ana_legendre(int narg, int ps[])
   return out;
 }
 /*--------------------------------------------------------------------*/
-int ana_enhanceimage(int narg, int ps[])
+Int ana_enhanceimage(Int narg, Int ps[])
 /* ENHANCEIMAGE(<x> [, <part>, <tgt>, /SYMMETRIC]) enhances an image
   <x>.  The first dimension of <x> is assumed to select between color
   channels.  <x> is assumed to contain BYTE values between 0 and 255,
@@ -2128,10 +2128,10 @@ int ana_enhanceimage(int narg, int ps[])
   means to enhance only from the low end.  LS 2006jun15 */
 {
   pointer src, tgt;
-  int ndim, *dims, nhist, *hist, nelem, i, result;
-  float target, part;
-  float a, b;
-  float *m;
+  Int ndim, *dims, nhist, *hist, nelem, i, result;
+  Float target, part;
+  Float a, b;
+  Float *m;
 
   if (!symbolIsNumericalArray(ps[0]))
     return cerror(NEED_NUM_ARR, ps[0]);
@@ -2158,7 +2158,7 @@ int ana_enhanceimage(int narg, int ps[])
   }
   tgt.b = array_data(result);
   for (i = 0; i < nelem; i += dims[0]) {
-    int j, x = 0;
+    Int j, x = 0;
 
     for (j = 0; j < dims[0]; j++) /* over all color channels */
       x += *src.b++;
@@ -2171,9 +2171,9 @@ int ana_enhanceimage(int narg, int ps[])
   b = 1 - a;
   m[0] = 1.0;
   for (i = 1; i < nhist; i++) {	/* calculate adjustment factors */
-    float q;
+    Float q;
 
-    q = (float) hist[i]*dims[0]/nelem;
+    q = (Float) hist[i]*dims[0]/nelem;
     m[i] = q*(a*q + b)/i*nhist;
     if (m[i] < 1 && !(internalMode & 1))
       m[i] = 1;
@@ -2181,12 +2181,12 @@ int ana_enhanceimage(int narg, int ps[])
       m[i] = part*m[i] + 1 - part;
   }
   for (i = 0; i < nelem; i += dims[0]) { /* calculate adjusted image */
-    int j, x = 0;
+    Int j, x = 0;
 
     for (j = 0; j < dims[0]; j++)
       x += src.b[j];
     for (j = 0; j < dims[0]; j++) {
-      int y;
+      Int y;
 
       y = *src.b++ * m[x];
       if (y > 255)
@@ -2199,8 +2199,8 @@ int ana_enhanceimage(int narg, int ps[])
   return result;
 }
 /*--------------------------------------------------------------------*/
-int ana_hamming(int narg, int ps[]) {
-  int nelem, nelem2, ndim, *dims, result, i, type, nr2isarray;
+Int ana_hamming(Int narg, Int ps[]) {
+  Int nelem, nelem2, ndim, *dims, result, i, type, nr2isarray;
   pointer src, src2, tgt;
 
   if (!symbolIsNumerical(ps[0]))
@@ -2233,7 +2233,7 @@ int ana_hamming(int narg, int ps[]) {
 
   if (narg == 1) {
     for (i = 0; i < nelem; i++) {
-      unsigned int dist = 0, val;
+      uint32_t dist = 0, val;
       switch (type) {
       case ANA_BYTE:
         val = *src.b++;
@@ -2263,7 +2263,7 @@ int ana_hamming(int narg, int ps[]) {
     }
   } else {
     for (i = 0; i < nelem; i++) {
-      unsigned int dist = 0, val;
+      uint32_t dist = 0, val;
       switch (type) {
       case ANA_BYTE:
         val = *src.b++ ^ *src2.b;
@@ -2301,45 +2301,45 @@ int ana_hamming(int narg, int ps[]) {
   return result;
 }
 /*--------------------------------------------------------------------*/
-double vhypot(int n, double arg1, double arg2, ...)
+Double vhypot(Int n, Double arg1, Double arg2, ...)
 {
-  double arg = hypot(arg1, arg2);
+  Double arg = hypot(arg1, arg2);
   if (n < 3)
     return arg;
   va_list ap;
   va_start(ap, arg2);
   n -= 2;
   while (n--)
-    arg = hypot(arg, va_arg(ap, double));
+    arg = hypot(arg, va_arg(ap, Double));
   va_end(ap);
   return arg;
 }
 /*--------------------------------------------------------------------*/
-double hypota(int n, double *x)
+Double hypota(Int n, Double *x)
 {
   if (n < 1)
     return 0.0;
-  double arg = *x++;
+  Double arg = *x++;
   while (--n)
     arg = hypot(arg, *x++);
   return arg;
 }
 /*--------------------------------------------------------------------*/
-int compare_doubles(const void *a, const void *b)
+Int compare_doubles(const void *a, const void *b)
 {
-  const double *da = (const double *) a;
-  const double *db = (const double *) b;
+  const Double *da = (const Double *) a;
+  const Double *db = (const Double *) b;
   return (*da > *db) - (*da < *db);
 }
-int runord_d(double *data, int n, int width, int ord, double *result)
+Int runord_d(Double *data, Int n, Int width, Int ord, Double *result)
 {
-  int i;
+  Int i;
   
   if (n < 1 || width < 1) {
     errno = EDOM;
     return -1;
   }
-  double *temp = malloc(width*sizeof(double));
+  Double *temp = malloc(width*sizeof(Double));
   if (!temp) {
     errno = ENOMEM;
     return -1;
@@ -2350,10 +2350,10 @@ int runord_d(double *data, int n, int width, int ord, double *result)
     ord = 0;
   if (ord > width - 1)
     ord = width - 1;
-  int o = width/2;
+  Int o = width/2;
   for (i = 0; i < n - width; i++) {
-    memcpy(temp, data + i, width*sizeof(double));
-    qsort(temp, width, sizeof(double), compare_doubles);
+    memcpy(temp, data + i, width*sizeof(Double));
+    qsort(temp, width, sizeof(Double), compare_doubles);
     result[o + i] = temp[ord];
   }
   for ( ; i < n - o; i++)
@@ -2365,13 +2365,13 @@ int runord_d(double *data, int n, int width, int ord, double *result)
 }
 BIND(runord_d, i_dpiT3dp_iDaiLiLrDq_00T3, f, RUNORD, 3, 3, NULL);
 /*--------------------------------------------------------------------*/
-int runmax_d(double *data, int n, int width, double *result)
+Int runmax_d(Double *data, Int n, Int width, Double *result)
 {
   return runord_d(data, n, width, width - 1, result);
 }
 BIND(runmax_d, i_dpiidp_iDaLrDq_00T2, f, RUNMAX, 2, 2, NULL);
 /*--------------------------------------------------------------------*/
-int runmin_d(double *data, int n, int width, double *result)
+Int runmin_d(Double *data, Int n, Int width, Double *result)
 {
   return runord_d(data, n, width, 0, result);
 }
@@ -2381,18 +2381,18 @@ BIND(runmin_d, i_dpiidp_iDaLrDq_00T2, f, RUNMIN, 2, 2, NULL);
   Returns <x> such that <x> = <cur> (mod <period) and
   <average> - <period>/2 <= <x> - <prev> < <average> + <period>/2
  */
-double unmod(double cur, double prev, double period, double average)
+Double unmod(Double cur, Double prev, Double period, Double average)
 {
   if (!period)
     return cur;
   return cur + period*ceil((prev - cur + average)/period - 0.5);
 }
 /*--------------------------------------------------------------------*/
-int unmod_slice_d(double *srcptr, size_t srccount, size_t srcstride,
-                  double period, double average,
-                  double *tgtptr, size_t tgtcount, size_t tgtstride)
+Int unmod_slice_d(Double *srcptr, size_t srccount, size_t srcstride,
+                  Double period, Double average,
+                  Double *tgtptr, size_t tgtcount, size_t tgtstride)
 {
-  int i;
+  Int i;
 
   if (!period || !srcptr || srccount < 1 || !tgtptr) {
     errno = EDOM;
@@ -2410,9 +2410,9 @@ int unmod_slice_d(double *srcptr, size_t srccount, size_t srcstride,
 }
 BIND(unmod_slice_d, i_sdddsd_iDaLDDrDq_000T333, f, UNMOD, 2, 4, ":AXIS:PERIOD:AVERAGE");
 /*--------------------------------------------------------------------*/
-double hypot_stride(double *data, size_t count, size_t stride)
+Double hypot_stride(Double *data, size_t count, size_t stride)
 {
-  double result = 0.0;
+  Double result = 0.0;
   while (count-- > 0) {
     result = hypot(result, *data);
     data += stride;

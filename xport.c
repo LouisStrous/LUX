@@ -29,49 +29,49 @@ static char rcsid[] __attribute__ ((unused)) =
 #define BIG_ENOUGH      1
 #define WHITE_BACKGR	2
 
-int	getNewLine(char *, char *, char), coordTrf(float *, float *, int, int),
-  checkCoordSys(int mode, int defaultmode);
+Int	getNewLine(char *, char *, char), coordTrf(Float *, Float *, Int, Int),
+  checkCoordSys(Int mode, Int defaultmode);
 
-int	setup_x(void), anaAllocNamedColor(char *, XColor **);
+Int	setup_x(void), anaAllocNamedColor(char *, XColor **);
 
-extern  int     scalemin, scalemax, setup, connect_flag, visualClass;
-extern  float   xfac, yfac, xlimit, ylimit;
-extern  int     ixlow, iylow, ixhigh, iyhigh, threeColors;
+extern  Int     scalemin, scalemax, setup, connect_flag, visualClass;
+extern  Float   xfac, yfac, xlimit, ylimit;
+extern  Int     ixlow, iylow, ixhigh, iyhigh, threeColors;
 char    *display_name = NULL;
-int     last_wid = 0;
+Int     last_wid = 0;
 
-double  last_time;
-int     xcoord, ycoord, ana_button, ana_keycode, ana_keypress, root_x, root_y,
+Double  last_time;
+Int     xcoord, ycoord, ana_button, ana_keycode, ana_keypress, root_x, root_y,
 	preventEventFlush = 0, ana_keystate, ana_keysym;
-unsigned int	kb;
-float	xhair, yhair, tvscale = 1.0;
+uint32_t	kb;
+Float	xhair, yhair, tvscale = 1.0;
 Window  win[MAXWINDOWS];
 /* the size of each of the windows and pixmaps for our use */
 
-int     wd[MAXWINDOWS], ht[MAXWINDOWS], wdmap[MAXPIXMAPS], htmap[MAXPIXMAPS];
-int     xerrors;
+Int     wd[MAXWINDOWS], ht[MAXWINDOWS], wdmap[MAXPIXMAPS], htmap[MAXPIXMAPS];
+Int     xerrors;
 extern Atom	wm_delete;
 GC      gc[MAXWINDOWS], gcmap[MAXPIXMAPS];
-int	drawingareas[MAXWINDOWS]; /* used in motif.c */
+Int	drawingareas[MAXWINDOWS]; /* used in motif.c */
 XFontStruct     *font_info[MAXWINDOWS];
 XImage  *xi;
 Pixmap  icon_pixmap, maps[MAXPIXMAPS], back_pixmap;
 extern Colormap        colorMap;
-int	xold, yold;
-float     tvix, tviy, tvixb, tviyb;
+Int	xold, yold;
+Float     tvix, tviy, tvixb, tviyb;
 extern GC	gcnot;
 
 /* from color.c */
 extern unsigned long	black_pixel, white_pixel, *pixels;
 extern Visual	*visual;
-extern unsigned int	depth;
-extern int	private_colormap, screen_num;
-extern unsigned int	display_width, display_height, display_cells, nColors;
+extern uint32_t	depth;
+extern Int	private_colormap, screen_num;
+extern uint32_t	display_width, display_height, display_cells, nColors;
 extern Display	*display;
 
 extern char   *strsave(char  *s), *visualNames[];
 
-int	freeCellIndex, nFreeCells;
+Int	freeCellIndex, nFreeCells;
 
 #ifdef MOTIF
 #include <X11/Intrinsic.h>
@@ -85,7 +85,7 @@ extern Widget	ana_widget_id[MAXWIDGETS];
 /*  *                 TV                    *   */
 
 /*--------------------------------------------------------------------------*/
-int xerr(Display *display, XErrorEvent *err)
+Int xerr(Display *display, XErrorEvent *err)
 /* our own non-fatal X window error routine */
 /* essentially copied from manual */
 /* Expanded 9 oct 97 - LS */
@@ -100,7 +100,7 @@ int xerr(Display *display, XErrorEvent *err)
   return ANA_ERROR;
 }
  /*--------------------------------------------------------------------------*/
-void eventType(int type)
+void eventType(Int type)
 /* reports the name corresponding to the event type */
 {
   static unsigned long	count = 0;
@@ -210,7 +210,7 @@ void eventType(int type)
   }
 }
  /*--------------------------------------------------------------------------*/
-void xsynchronize(int status)
+void xsynchronize(Int status)
      /* sets (status != 0) or resets (status == 0) X-window event */
      /* synchronization.  If set, all X events are treated in the order */
      /* in which the commands are specified.  If reset, then X events */
@@ -227,11 +227,11 @@ void xsynchronize(int status)
   printf("X synchronization %sset.\n", status? "": "re");
 }
  /*--------------------------------------------------------------------------*/
-int ana_show_visuals(int narg, int ps[])
+Int ana_show_visuals(Int narg, Int ps[])
 {
   XVisualInfo	*vInfo, vTemplate;
   extern char	*visualNames[];
-  int	nVisual, i, mask, j;
+  Int	nVisual, i, mask, j;
 
   if (!connect_flag && setup_x() < 0)
     return ANA_ERROR;
@@ -271,12 +271,12 @@ int ana_show_visuals(int narg, int ps[])
   return 1;
 }
 /*--------------------------------------------------------------------------*/
-int ana_xclose(int narg, int ps[])
+Int ana_xclose(Int narg, Int ps[])
 /* close connection to window manager: close and destroy all windows, */
 /* pixmaps, color maps, etc.  LS 30jul96 */
 {
-  int	i;
-  extern int	menu_setup_done;
+  Int	i;
+  extern Int	menu_setup_done;
   void	disconnect_x();
 
   if (connect_flag) {
@@ -290,14 +290,14 @@ int ana_xclose(int narg, int ps[])
   return 1;
 }
 /*--------------------------------------------------------------------------*/
-int ck_area(int wid, int *xpos, int *ypos, int *width, int *height)
+Int ck_area(Int wid, Int *xpos, Int *ypos, Int *width, Int *height)
 /* checks whether the specified DEV area lies within window <wid>.
    If OK, then returns 1.  If the area lies partially in the window,
    then the parameters are adjusted so the area is wholly inside the
    window, and 1 is returned.  If the area is wholly outside the window,
    or the window does not exist, then 0 is returned.  LS 16apr93 */
 {
- int	dwd, dht;
+ Int	dwd, dht;
 
  if (wid >= 0) {
    if (!win[wid])
@@ -329,13 +329,13 @@ int ck_area(int wid, int *xpos, int *ypos, int *width, int *height)
  return 1;
 }
  /*--------------------------------------------------------------------------*/
-int ana_xtvlct(int narg, int ps[])
+Int ana_xtvlct(Int narg, Int ps[])
 /* load color table, scaling to available range */
 /* expect 3 arrays for RGB */
 {
-  int	i, n, nmin = INT_MAX, iq;
-  float	*p[3];
-  void	storeColorTable(float *, float *, float *, int, int);
+  Int	i, n, nmin = INT32_MAX, iq;
+  Float	*p[3];
+  void	storeColorTable(Float *, Float *, Float *, Int, Int);
 
   for (i = 0; i < 3; i++) {
     if (!symbolIsNumericalArray(ps[i]))
@@ -344,7 +344,7 @@ int ana_xtvlct(int narg, int ps[])
     n = array_size(iq);
     if (n < nmin)
       nmin = n;
-    p[i] = (float *) array_data(iq);
+    p[i] = (Float *) array_data(iq);
   }
   if (setup_x() == ANA_ERROR)
     return ANA_ERROR;
@@ -352,11 +352,11 @@ int ana_xtvlct(int narg, int ps[])
   return ANA_OK;
 }
 /*--------------------------------------------------------------------------*/
-int ana_xopen(int narg, int ps[])
+Int ana_xopen(Int narg, Int ps[])
 /* sets or changes the display name for x setup and/or sets or changes the */
 /* color map default.  LS 30jul96 */
 {
-  extern int	select_visual;
+  extern Int	select_visual;
 
   if (narg && ps[0]) {			/* set display name */
     if (symbol_class(ps[0]) != ANA_STRING)
@@ -391,10 +391,10 @@ int ana_xopen(int narg, int ps[])
   return setup_x();
 }
 /*--------------------------------------------------------------------------*/
-int ana_xexist(int narg, int ps[])/* return 1 if window exists */
+Int ana_xexist(Int narg, Int ps[])/* return 1 if window exists */
  /* argument is port # */
 {
-  int     wid;
+  Int     wid;
 
   if (int_arg_stat(ps[0], &wid) != 1)
     return ANA_ERROR;
@@ -409,7 +409,7 @@ int ana_xexist(int narg, int ps[])/* return 1 if window exists */
   return ANA_ZERO;
 }
 /*--------------------------------------------------------------------------*/
-int ana_xport(int narg, int ps[])	/* open a window or pixmap */
+Int ana_xport(Int narg, Int ps[])	/* open a window or pixmap */
  /* arguments are port #, width , height (default is 512x512) */
  /* position x, y, window title (<128 chars), icon title (<16 chars) */
  /* might be nice to have some commands to change things like the background
@@ -417,11 +417,11 @@ int ana_xport(int narg, int ps[])	/* open a window or pixmap */
  /* added titles  LS 13apr93 */
 /* check validity of window number  LS 14jul2000 */
 {
-  int     wid, mapid, xpos = 0, ypos = 0, pflag, n;
-  unsigned int	width, height;
+  Int     wid, mapid, xpos = 0, ypos = 0, pflag, n;
+  uint32_t	width, height;
   char	*wtitle = NULL, *ititle = NULL;
-  int	ck_window(int), set_defw(int), ana_xdelete(int, int []),
-    ana_xcreat(int, unsigned int, unsigned int, int, int, int, char *,
+  Int	ck_window(Int), set_defw(Int), ana_xdelete(Int, Int []),
+    ana_xcreat(Int, uint32_t, uint32_t, Int, Int, Int, char *,
 	       char *);
   
   if (narg > 0)
@@ -484,7 +484,7 @@ int ana_xport(int narg, int ps[])	/* open a window or pixmap */
   return n;
 }
  /*--------------------------------------------------------------------------*/
-int ck_window(int wid)
+Int ck_window(Int wid)
 /* only checks if a window value is in allowed range */
 {
   if (wid >= MAXWINDOWS || wid <= -MAXPIXMAPS)
@@ -494,7 +494,7 @@ int ck_window(int wid)
     return ANA_OK;
 }
  /*--------------------------------------------------------------------------*/
-int ck_events(void)         /* checks events for focus and size changes */
+Int ck_events(void)         /* checks events for focus and size changes */
  /* updates the last_wid and any window sizes */
  /* will also change last_win to a window with a button or key pressed even
  if focus not changed; i.e., ANA's focus for a plot or tv can be changed
@@ -503,9 +503,9 @@ int ck_events(void)         /* checks events for focus and size changes */
  other windows including the xterm (or whatever) that ANA is running in */
 {
    XEvent  report;
-   int     nev, i, j, iq;
+   Int     nev, i, j, iq;
    Window wq;
-   int	set_defw(int);
+   Int	set_defw(Int);
    
    if (setup_x() < 0)
      return ANA_ERROR;
@@ -573,10 +573,10 @@ int ck_events(void)         /* checks events for focus and size changes */
    return  1;
 }
 /*-------------------------------------------------------------------------*/
-int set_defw(int wid)
+Int set_defw(Int wid)
 /* assumes window is defined, sets last_wid and plotting context */
 {
-  int     mapid;
+  Int     mapid;
 
   last_wid = wid;
   if (wid < 0 ) {		/* pixmap case */
@@ -594,13 +594,13 @@ int set_defw(int wid)
   return  1;
 }
 /*--------------------------------------------------------------------------*/
-int ana_xcreat(int wid, unsigned int height, unsigned int width, int xpos,
-	       int ypos, int pflag, char *wtitle, char *ititle)
+Int ana_xcreat(Int wid, uint32_t height, uint32_t width, Int xpos,
+	       Int ypos, Int pflag, char *wtitle, char *ititle)
  /* might be nice to have some commands to change things like the background
  color and pattern and cursor */
 {
- unsigned        int     border_width = 1;
- unsigned        int     valuemask;
+ uint32_t     border_width = 1;
+ uint32_t     valuemask;
  char    window_title[128], *window_name = window_title;
  char    icon_title[16], *icon_name = icon_title;
  char    snum[3];
@@ -609,7 +609,7 @@ int ana_xcreat(int wid, unsigned int height, unsigned int width, int xpos,
  XWMHints        wm_hints;
  XSetWindowAttributes    attributes;
  Cursor cursor;
- int     mapid;
+ Int     mapid;
 
  /* start execution here */
  if (setup_x() < 0)
@@ -764,9 +764,9 @@ int ana_xcreat(int wid, unsigned int height, unsigned int width, int xpos,
  return 1;
 }
 /*--------------------------------------------------------------------------*/
-int ana_xsetinputs(int narg, int ps[])		/* set the input mask */
+Int ana_xsetinputs(Int narg, Int ps[])		/* set the input mask */
 {
-  int	wid;
+  Int	wid;
 
   if (ck_events() != 1)
     return ANA_ERROR;
@@ -778,9 +778,9 @@ int ana_xsetinputs(int narg, int ps[])		/* set the input mask */
   return 1;
 }
  /*-------------------------------------------------------------------------*/
-int ana_xcursor(int narg, int ps[]) /* set the cursor */
+Int ana_xcursor(Int narg, Int ps[]) /* set the cursor */
 {
-  int    wid, iq;
+  Int    wid, iq;
   Cursor cursor;
   XColor	*cfore, *cback;
   char	*cfore_default = {"red"};
@@ -818,16 +818,16 @@ int ana_xcursor(int narg, int ps[]) /* set the cursor */
   return ANA_OK;
 }
 /*--------------------------------------------------------------------------*/
-int ana_xsetbackground(int narg, int ps[])/* set the background color */
+Int ana_xsetbackground(Int narg, Int ps[])/* set the background color */
  /* setbackground [, win#] , color */
 /* made first argument optional.  Also check that window/pixmap */
 /* really exists before attempting to change its background color */
 /* LS 13jul2000 */
 /* allow three-element array for <color> to specify RGB values. LS 14jul2000 */
 {
-  int    wid, iq;
+  Int    wid, iq;
   char	*pc;
-  float	*value;
+  Float	*value;
   XColor	*color;
   
   ck_events();
@@ -876,16 +876,16 @@ int ana_xsetbackground(int narg, int ps[])/* set the background color */
   return anaerror("error in foreground color", 0);
 }
 /*--------------------------------------------------------------------------*/
-int ana_xsetforeground(int narg, int ps[])/* set the foreground color */
+Int ana_xsetforeground(Int narg, Int ps[])/* set the foreground color */
  /* setforeground [, win#] , color */
 /* made first argument optional.  Also check that window/pixmap */
 /* really exists before attempting to change its foreground color */
 /* LS 13jul2000 */
 /* allow three-element array for <color> to specify RGB values. LS 14jul2000 */
 {
-  int    wid, iq;
+  Int    wid, iq;
   char	*pc;
-  float	*value;
+  Float	*value;
   XColor	*color;
   
   ck_events();
@@ -932,9 +932,9 @@ int ana_xsetforeground(int narg, int ps[])/* set the foreground color */
   return anaerror("error in foreground color", 0);
 }
 /*--------------------------------------------------------------------------*/
-int ana_xdelete(int narg, int ps[]) /* delete a window or a pixmap */
+Int ana_xdelete(Int narg, Int ps[]) /* delete a window or a pixmap */
 {
-  int    wid;
+  Int    wid;
   
   ck_events();
   wid = int_arg( ps[0] );
@@ -951,12 +951,12 @@ int ana_xdelete(int narg, int ps[]) /* delete a window or a pixmap */
   return 1;
  }
  /*--------------------------------------------------------------------------*/
-int ana_xerase(int narg, int ps[])
+Int ana_xerase(Int narg, Int ps[])
      /* erase a window */
      /* pixmap support added.  LS 8oct97 */
 {
- int    wid, xx, yx, wx, hx, old, cs;
- float	x, y, w, h;
+ Int    wid, xx, yx, wx, hx, old, cs;
+ Float	x, y, w, h;
  XGCValues	values;
 
  ck_events();
@@ -1020,10 +1020,10 @@ int ana_xerase(int narg, int ps[])
      cs = ANA_X11;
    coordTrf(&x, &y, cs, ANA_X11);
    coordTrf(&w, &h, cs, ANA_X11);
-   xx = (int) x;
-   yx = (int) y;
-   wx = (int) fabs(w - x);
-   hx = (int) fabs(h - y);
+   xx = (Int) x;
+   yx = (Int) y;
+   wx = (Int) fabs(w - x);
+   hx = (Int) fabs(h - y);
  }
 
  if (!ck_area(wid, &xx, &yx, &wx, &hx)) /* area wholly outside window */
@@ -1045,15 +1045,15 @@ int ana_xerase(int narg, int ps[])
  return 1;
 }
  /*------------------------------------------------------------------------*/
-int ana_xsetaction(int narg, int ps[])
+Int ana_xsetaction(Int narg, Int ps[])
 /* This routine associates a certain copy action with a window.
    Codes 1 and 2 select sprite action.  A sprite disappears
    without a trace if drawn for a second time.  LS 14apr93 */
 /* syntax:  xsetaction [,code,window]
     code defaults to 1, window to last_win */
 {
-  int	wid = last_wid, code = 1;
-  static int	function_code[] = {
+  Int	wid = last_wid, code = 1;
+  static Int	function_code[] = {
 	GXcopy, GXxor, GXequiv, GXclear, GXset, GXnoop, GXinvert, GXand,
 	GXandReverse, GXandInverted, GXor, GXorReverse, GXorInverted,
 	GXnand, GXnor, GXcopyInverted };
@@ -1074,11 +1074,11 @@ int ana_xsetaction(int narg, int ps[])
   return 1;
 }
  /*------------------------------------------------------------------------*/
-int reverseYImage(int iq)
+Int reverseYImage(Int iq)
 /* returns a copy of 2D image <iq> reversed in the y direction */
 {
-  int	ps[2];
-  int	ana_reverse(int, int *);
+  Int	ps[2];
+  Int	ana_reverse(Int, Int *);
 
   if (symbol_class(iq) != ANA_ARRAY
       || array_num_dims(iq) != 2)
@@ -1088,14 +1088,14 @@ int reverseYImage(int iq)
   return ana_reverse(2, ps);
 }
 /*------------------------------------------------------------------------*/
-int ana_xtv_general(int narg, int ps[], int mode)
+Int ana_xtv_general(Int narg, Int ps[], Int mode)
 {
   pointer	data;
-  int	type, nx, ny, wid;
-  float	x, y;
-  int	tvraw(pointer data, int type, int nx, int ny, float x1, float x2,
-	  float y1, float y2, float sxf, float syf, int wid, float *mag,
-	  int mode, double clo, double chi, byte *bitmap1, byte *bitmap2);
+  Int	type, nx, ny, wid;
+  Float	x, y;
+  Int	tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
+	  Float y1, Float y2, Float sxf, Float syf, Int wid, Float *mag,
+	  Int mode, Double clo, Double chi, Byte *bitmap1, Byte *bitmap2);
 
   if (internalMode & TV_24) {
     mode |= TV_24;
@@ -1151,7 +1151,7 @@ int ana_xtv_general(int narg, int ps[], int mode)
 	       mode, 0.0, 0.0, NULL, NULL);
 }
 /*------------------------------------------------------------------------*/
-int ana_xtvraw(int narg, int ps[])
+Int ana_xtvraw(Int narg, Int ps[])
 /* scales non-ANA_BYTE arrays; displays on screen */
 /* NOTE: in older versions of ANA the coordinates of the image were
  counted from the upper left-hand corner of the screen, and the
@@ -1166,9 +1166,9 @@ int ana_xtvraw(int narg, int ps[])
   return ana_xtv_general(narg, ps, TV_RAW);
 }
 /*------------------------------------------------------------------------*/
-int tvraw(pointer data, int type, int nx, int ny, float x1, float x2,
-	  float y1, float y2, float sxf, float syf, int wid, float *mag,
-	  int mode, double clo, double chi, byte *bitmap1, byte *bitmap2)
+Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
+	  Float y1, Float y2, Float sxf, Float syf, Int wid, Float *mag,
+	  Int mode, Double clo, Double chi, Byte *bitmap1, Byte *bitmap2)
 /* display data in a window. */
 /* data: pointer to the start of the data */
 /* type: data type */
@@ -1186,18 +1186,18 @@ int tvraw(pointer data, int type, int nx, int ny, float x1, float x2,
 /* it is assumed here that the arguments are consistent! */
 {
   pointer	image, image0;
-  int	hq, wq, nxx, nyy, ix, iy, xsrc, ysrc, indx, i, toscreen, maxdim,
+  Int	hq, wq, nxx, nyy, ix, iy, xsrc, ysrc, indx, i, toscreen, maxdim,
     iq, sx, sy, bpp, s;
   scalar	min, max, value, factor, offset;
-  float	fx, fy, fx2, fy2, magx, magy, nxxf, nyyf;
-  extern float	postXBot, postXTop, postYBot, postYTop,
+  Float	fx, fy, fx2, fy2, magx, magy, nxxf, nyyf;
+  extern Float	postXBot, postXTop, postYBot, postYTop,
     zoom_mag, zoom_xc, zoom_yc, zoom_clo, zoom_chi, wxb, wxt, wyb, wyt;
-  extern int	lunplt, bits_per_pixel;
+  extern Int	lunplt, bits_per_pixel;
   extern unsigned long	red_mask, green_mask, blue_mask;
-  int	ana_threecolors(int, int []), checkCoordSys(int, int),
-    coordTrf(float *, float *, int, int),
-    postgray(char *, int, int, float, float, float, float, int),
-    postcolor(char *, int, int, float, float, float, float, int);
+  Int	ana_threecolors(Int, Int []), checkCoordSys(Int, Int),
+    coordTrf(Float *, Float *, Int, Int),
+    postgray(char *, Int, Int, Float, Float, Float, Float, Int),
+    postcolor(char *, Int, Int, Float, Float, Float, Float, Int);
   
   toscreen = (internalMode & (TV_SCREEN | TV_POSTSCRIPT | TV_PDEV));
   switch (toscreen) {
@@ -1241,8 +1241,8 @@ int tvraw(pointer data, int type, int nx, int ny, float x1, float x2,
   if (internalMode & TV_ZOOM) {	/* use ZOOM parameters instead */
     sxf = wq*0.5;		/* zoom target coordinates: image center */
     syf = hq*0.5;
-    sx = (int) sxf;
-    sy = (int) syf;
+    sx = (Int) sxf;
+    sy = (Int) syf;
     *mag = zoom_mag;		/* zoom scale */
     internalMode |= TV_CENTER;	/* zoom coordinates indicate image center */
     internalMode = (internalMode & ~63) | ANA_DEV;
@@ -1283,35 +1283,35 @@ int tvraw(pointer data, int type, int nx, int ny, float x1, float x2,
     }
   } else if ((mode & TV_SCALE) || (setup & 32)) {
 				/* set magnification to standard value */
-    *mag = MIN((float) hq/ny, (float) wq/nx);
+    *mag = MIN((Float) hq/ny, (Float) wq/nx);
     if (*mag >= 1)
-      *mag = (int) *mag;
+      *mag = (Int) *mag;
     else
-      *mag = 1.0/((int) 1.0/ *mag);
+      *mag = 1.0/((Int) 1.0/ *mag);
     magx = magy = *mag;
   } else if ((x2 - x1 + 1)**mag > 2*wq || (y2 - y1 + 1)**mag > 2*hq) {
     puts(
       "WARNING - scaled image is significantly bigger than target window.");
     puts(" -- reducing scale factor to accommodate.");
-    *mag = MIN((float) hq/ny, (float) wq/nx);
+    *mag = MIN((Float) hq/ny, (Float) wq/nx);
     if (*mag >= 1)
-      *mag = (int) *mag;
+      *mag = (Int) *mag;
     else
-      *mag = 1.0/((int) 1.0/ *mag);
+      *mag = 1.0/((Int) 1.0/ *mag);
     magx = magy = *mag;
   } else
     magx = magy = *mag;
 
   nxxf = (x2 + 1 - x1)*magx; /* scaled dimensions */
   nyyf = (y2 + 1 - y1)*magy;
-  nxx = (int) nxxf;
-  nyy = (int) nyyf;
+  nxx = (Int) nxxf;
+  nyy = (Int) nyyf;
 
   if (internalMode & TV_PLOTWINDOW) {
     sxf = wxb * wq;
     syf = (1 - wyt) * hq;
-    sx = (int) sxf;
-    sy = (int) syf;
+    sx = (Int) sxf;
+    sy = (Int) syf;
   } else {
     i = (internalMode & 7);
     if (toscreen		/* displaying on screen */
@@ -1319,8 +1319,8 @@ int tvraw(pointer data, int type, int nx, int ny, float x1, float x2,
 	&& i == ANA_DEV)	/* have DEV coordinates */
       i = ANA_X11;		/* interpret as X11 */
     coordTrf(&sxf, &syf, i, ANA_DEV); /* transform to DEV */
-    sx = (int) sxf;
-    sy = (int) syf;
+    sx = (Int) sxf;
+    sy = (Int) syf;
     /* calculate coordinates of image's upper right-hand corner in X11
        coordinates */
     switch (internalMode & TV_CENTER) {	/* /CENTER */
@@ -1371,7 +1371,7 @@ int tvraw(pointer data, int type, int nx, int ny, float x1, float x2,
       if (mode & TV_24) {		/* three bytes per pixel */
 	switch (type) {
 	  case ANA_BYTE:
-	    min.b = UCHAR_MAX;
+	    min.b = UINT8_MAX;
 	    max.b = 0;
 	    for (iy = y1; iy <= y2; iy++)
 	      for (ix = x1; ix <= x2; ix++) {
@@ -1394,14 +1394,14 @@ int tvraw(pointer data, int type, int nx, int ny, float x1, float x2,
 	    if (max.b == min.b)
 	      factor.f = 1;
 	    else if (threeColors)
-	      factor.f = (256/3)/((float) max.b - min.b);
+	      factor.f = (256/3)/((Float) max.b - min.b);
 	    else
-	      factor.f = 255/((float) max.b - min.b);
-	    offset.f = (float) min.b;
+	      factor.f = 255/((Float) max.b - min.b);
+	    offset.f = (Float) min.b;
 	    break;
 	  case ANA_WORD:
-	    min.w = SHRT_MAX;
-	    max.w = -SHRT_MAX;
+	    min.w = INT16_MAX;
+	    max.w = -INT16_MAX;
 	    for (iy = y1; iy <= y2; iy++)
 	      for (ix = x1; ix <= x2; ix++) {
 		value.w = data.w[ix + iy*nx];
@@ -1423,14 +1423,14 @@ int tvraw(pointer data, int type, int nx, int ny, float x1, float x2,
 	    if (max.w == min.w)
 	      factor.f = 1;
 	    else if (threeColors)
-	      factor.f = (256/3)/((float) max.w - min.w);
+	      factor.f = (256/3)/((Float) max.w - min.w);
 	    else
-	      factor.f = 255/((float) max.w - min.w);
-	    offset.f = (float) min.w;
+	      factor.f = 255/((Float) max.w - min.w);
+	    offset.f = (Float) min.w;
 	    break;
 	  case ANA_LONG:
-	    min.l = INT_MAX;
-	    max.l = -INT_MAX;
+	    min.l = INT32_MAX;
+	    max.l = -INT32_MAX;
 	    for (iy = y1; iy <= y2; iy++)
 	      for (ix = x1; ix <= x2; ix++) {
 		value.l = data.l[ix + iy*nx];
@@ -1452,10 +1452,10 @@ int tvraw(pointer data, int type, int nx, int ny, float x1, float x2,
 	    if (max.l == min.l)
 	      factor.f = 1;
 	    else if (threeColors)
-	      factor.f = (256/3)/((float) max.l - min.l);
+	      factor.f = (256/3)/((Float) max.l - min.l);
 	    else
-	      factor.f = 255/((float) max.l - min.l);
-	    offset.f = (float) min.l;
+	      factor.f = 255/((Float) max.l - min.l);
+	    offset.f = (Float) min.l;
 	    break;
 	  case ANA_FLOAT:
 	    min.f = FLT_MAX;
@@ -1481,10 +1481,10 @@ int tvraw(pointer data, int type, int nx, int ny, float x1, float x2,
 	    if (max.f == min.f)
 	      factor.f = 1;
 	    else if (threeColors)
-	      factor.f = (256/3)/((float) max.f - min.f);
+	      factor.f = (256/3)/((Float) max.f - min.f);
 	    else
-	      factor.f = 255/((float) max.f - min.f);
-	    offset.f = (float) min.f;
+	      factor.f = 255/((Float) max.f - min.f);
+	    offset.f = (Float) min.f;
 	    break;
 	  case ANA_DOUBLE:
 	    min.d = DBL_MAX;
@@ -1510,16 +1510,16 @@ int tvraw(pointer data, int type, int nx, int ny, float x1, float x2,
 	    if (max.d == min.d)
 	      factor.f = 1;
 	    else if (threeColors)
-	      factor.f = (256/3)/((float) max.d - min.d);
+	      factor.f = (256/3)/((Float) max.d - min.d);
 	    else
-	      factor.f = 255/((float) max.d - min.d);
-	    offset.f = (float) min.d;
+	      factor.f = 255/((Float) max.d - min.d);
+	    offset.f = (Float) min.d;
 	    break;
 	}
-      } else {			/* one byte per pixel */
+      } else {			/* one Byte per pixel */
 	switch (type) {
 	  case ANA_BYTE:
-	    min.b = UCHAR_MAX;
+	    min.b = UINT8_MAX;
 	    max.b = 0;
 	    for (iy = y1; iy <= y2; iy++)
 	      for (ix = x1; ix <= x2; ix++) {
@@ -1532,14 +1532,14 @@ int tvraw(pointer data, int type, int nx, int ny, float x1, float x2,
 	    if (max.b == min.b)
 	      factor.f = 1;
 	    else if (threeColors)
-	      factor.f = (256/3)/((float) max.b - min.b);
+	      factor.f = (256/3)/((Float) max.b - min.b);
 	    else
-	      factor.f = ((float) scalemax - scalemin)/((float) max.b - min.b);
-	    offset.f = (float) min.b;
+	      factor.f = ((Float) scalemax - scalemin)/((Float) max.b - min.b);
+	    offset.f = (Float) min.b;
 	    break;
 	  case ANA_WORD:
-	    min.w = SHRT_MAX;
-	    max.w = -SHRT_MAX;
+	    min.w = INT16_MAX;
+	    max.w = -INT16_MAX;
 	    for (iy = y1; iy <= y2; iy++)
 	      for (ix = x1; ix <= x2; ix++) {
 		value.w = data.w[ix + iy*nx];
@@ -1551,14 +1551,14 @@ int tvraw(pointer data, int type, int nx, int ny, float x1, float x2,
 	    if (max.w == min.w)
 	      factor.f = 1;
 	    else if (threeColors)
-	      factor.f = (256/3)/((float) max.w - min.w);
+	      factor.f = (256/3)/((Float) max.w - min.w);
 	    else
-	      factor.f = ((float) scalemax - scalemin)/((float) max.w - min.w);
-	    offset.f = (float) min.w;
+	      factor.f = ((Float) scalemax - scalemin)/((Float) max.w - min.w);
+	    offset.f = (Float) min.w;
 	    break;
 	  case ANA_LONG:
-	    min.l = INT_MAX;
-	    max.l = -INT_MAX;
+	    min.l = INT32_MAX;
+	    max.l = -INT32_MAX;
 	    for (iy = y1; iy <= y2; iy++)
 	      for (ix = x1; ix <= x2; ix++) {
 		value.l = data.l[ix + iy*nx];
@@ -1570,10 +1570,10 @@ int tvraw(pointer data, int type, int nx, int ny, float x1, float x2,
 	    if (max.l == min.l)
 	      factor.f = 1;
 	    else if (threeColors)
-	      factor.f = (256/3)/((float) max.l - min.l);
+	      factor.f = (256/3)/((Float) max.l - min.l);
 	    else
-	      factor.f = ((float) scalemax - scalemin)/((float) max.l - min.l);
-	    offset.f = (float) min.l;
+	      factor.f = ((Float) scalemax - scalemin)/((Float) max.l - min.l);
+	    offset.f = (Float) min.l;
 	    break;
 	  case ANA_FLOAT:
 	    min.f = FLT_MAX;
@@ -1627,7 +1627,7 @@ int tvraw(pointer data, int type, int nx, int ny, float x1, float x2,
 	  factor.f = (256/3)/(chi - clo);
 	else
 	  factor.f = (scalemax - scalemin)/(chi - clo);
-	offset.f = (float) clo;
+	offset.f = (Float) clo;
       }
     }
   }
@@ -1639,14 +1639,14 @@ int tvraw(pointer data, int type, int nx, int ny, float x1, float x2,
   tviyb = hq - sy;
   
   /* update bounding box */
-  if (postXBot > tvix/(float) wq)
-    postXBot = tvix/(float) wq;
-  if (postXTop < tvixb/(float) wq)
-    postXTop = tvixb/(float) wq;
-  if (postYBot > tviy/(float) hq)
-    postYBot = tviy/(float) hq;
-  if (postYTop < tviyb/(float) hq)
-    postYTop = tviyb/(float) hq;
+  if (postXBot > tvix/(Float) wq)
+    postXBot = tvix/(Float) wq;
+  if (postXTop < tvixb/(Float) wq)
+    postXTop = tvixb/(Float) wq;
+  if (postYBot > tviy/(Float) hq)
+    postYBot = tviy/(Float) hq;
+  if (postYTop < tviyb/(Float) hq)
+    postYTop = tviyb/(Float) hq;
   /* if we're sending the image to a postscript file, then we can scale
      it to arbitrary size by specifying different desired corner positions
      on the canvas; we do not actually need to change the number of
@@ -3030,10 +3030,10 @@ int tvraw(pointer data, int type, int nx, int ny, float x1, float x2,
     /* we try to work things so that you get the same aspect ratio on */
     /* screen as on paper.  LS 23mar98 */
     maxdim = MAX(hq, wq);
-    fx = (float) sxf/maxdim;
-    fy = (float) syf/maxdim;
-    fx2 = (float) (sxf + nxxf)/maxdim;
-    fy2 = (float) (syf + nyyf)/maxdim;
+    fx = (Float) sxf/maxdim;
+    fy = (Float) syf/maxdim;
+    fx2 = (Float) (sxf + nxxf)/maxdim;
+    fy2 = (Float) (syf + nyyf)/maxdim;
     /* NOTE: must modify this to support 16 and 32-bit color indices */
     if (mode & TV_24)
       iq = postcolor((void *) image0.b, nx, ny, fx, fx2, fy, fy2, 2);
@@ -3046,12 +3046,12 @@ int tvraw(pointer data, int type, int nx, int ny, float x1, float x2,
   return iq;
 }
  /*------------------------------------------------------------------------*/
-int ana_colorpixel(int narg, int ps[])
+Int ana_colorpixel(Int narg, Int ps[])
 /* maps color indices to pixel values */
 {
   pointer	p, q;
-  int	n, iq, bpp, type;
-  extern int	bits_per_pixel;
+  Int	n, iq, bpp, type;
+  extern Int	bits_per_pixel;
   extern unsigned long	red_mask, green_mask, blue_mask;
 
   bpp = bits_per_pixel? bits_per_pixel: 
@@ -3111,54 +3111,54 @@ int ana_colorpixel(int narg, int ps[])
 	switch (symbol_type(*ps)) {
 	  case ANA_BYTE:
 	    while (n--)
-	      *q.b++ = (pixels[(int) *p.b] & red_mask)
-		| (pixels[(int) p.b[n]] & green_mask)
-		| (pixels[(int) p.b[2*n]] & blue_mask);
+	      *q.b++ = (pixels[(Int) *p.b] & red_mask)
+		| (pixels[(Int) p.b[n]] & green_mask)
+		| (pixels[(Int) p.b[2*n]] & blue_mask);
 	    break;
 	  case ANA_WORD:
 	    while (n--)
-	      *q.b++ = (pixels[(int) *p.w] & red_mask)
-		| (pixels[(int) p.w[n]] & green_mask)
-		| (pixels[(int) p.w[2*n]] & blue_mask);
+	      *q.b++ = (pixels[(Int) *p.w] & red_mask)
+		| (pixels[(Int) p.w[n]] & green_mask)
+		| (pixels[(Int) p.w[2*n]] & blue_mask);
 	    break;
 	  case ANA_LONG:
 	    while (n--)
-	      *q.b++ = (pixels[(int) *p.l] & red_mask)
-		| (pixels[(int) p.l[n]] & green_mask)
-		| (pixels[(int) p.l[2*n]] & blue_mask);
+	      *q.b++ = (pixels[(Int) *p.l] & red_mask)
+		| (pixels[(Int) p.l[n]] & green_mask)
+		| (pixels[(Int) p.l[2*n]] & blue_mask);
 	    break;
 	  case ANA_FLOAT:
 	    while (n--)
-	      *q.b++ = (pixels[(int) *p.f] & red_mask)
-		| (pixels[(int) p.f[n]] & green_mask)
-		| (pixels[(int) p.f[2*n]] & blue_mask);
+	      *q.b++ = (pixels[(Int) *p.f] & red_mask)
+		| (pixels[(Int) p.f[n]] & green_mask)
+		| (pixels[(Int) p.f[2*n]] & blue_mask);
 	    break;
 	  case ANA_DOUBLE:
 	    while (n--)
-	      *q.b++ = (pixels[(int) *p.d] & red_mask)
-		| (pixels[(int) p.d[n]] & green_mask)
-		| (pixels[(int) p.d[2*n]] & blue_mask);
+	      *q.b++ = (pixels[(Int) *p.d] & red_mask)
+		| (pixels[(Int) p.d[n]] & green_mask)
+		| (pixels[(Int) p.d[2*n]] & blue_mask);
 	    break;
 	} else switch (symbol_type(*ps)) {
 	  case ANA_BYTE:
 	    while (n--)
-	      *q.b++ = pixels[(int) *p.b++];
+	      *q.b++ = pixels[(Int) *p.b++];
 	    break;
 	  case ANA_WORD:
 	    while (n--)
-	      *q.b++ = pixels[(int) ((byte) *p.w++)];
+	      *q.b++ = pixels[(Int) ((Byte) *p.w++)];
 	    break;
 	  case ANA_LONG:
 	    while (n--)
-	      *q.b++ = pixels[(int) ((byte) *p.l++)];
+	      *q.b++ = pixels[(Int) ((Byte) *p.l++)];
 	    break;
 	  case ANA_FLOAT:
 	    while (n--)
-	      *q.b++ = pixels[(int) ((byte) *p.f++)];
+	      *q.b++ = pixels[(Int) ((Byte) *p.f++)];
 	    break;
 	  case ANA_DOUBLE:
 	    while (n--)
-	      *q.b++ = pixels[(int) ((byte) *p.d++)];
+	      *q.b++ = pixels[(Int) ((Byte) *p.d++)];
 	    break;
 	}
       break;
@@ -3167,54 +3167,54 @@ int ana_colorpixel(int narg, int ps[])
 	switch (symbol_type(*ps)) {
 	  case ANA_BYTE:
 	    while (n--)
-	      *q.w++ = (pixels[(int) *p.b] & red_mask)
-		| (pixels[(int) p.b[n]] & green_mask)
-		| (pixels[(int) p.b[2*n]] & blue_mask);
+	      *q.w++ = (pixels[(Int) *p.b] & red_mask)
+		| (pixels[(Int) p.b[n]] & green_mask)
+		| (pixels[(Int) p.b[2*n]] & blue_mask);
 	    break;
 	  case ANA_WORD:
 	    while (n--)
-	      *q.w++ = (pixels[(int) *p.w] & red_mask)
-		| (pixels[(int) p.w[n]] & green_mask)
-		| (pixels[(int) p.w[2*n]] & blue_mask);
+	      *q.w++ = (pixels[(Int) *p.w] & red_mask)
+		| (pixels[(Int) p.w[n]] & green_mask)
+		| (pixels[(Int) p.w[2*n]] & blue_mask);
 	    break;
 	  case ANA_LONG:
 	    while (n--)
-	      *q.w++ = (pixels[(int) *p.l] & red_mask)
-		| (pixels[(int) p.l[n]] & green_mask)
-		| (pixels[(int) p.l[2*n]] & blue_mask);
+	      *q.w++ = (pixels[(Int) *p.l] & red_mask)
+		| (pixels[(Int) p.l[n]] & green_mask)
+		| (pixels[(Int) p.l[2*n]] & blue_mask);
 	    break;
 	  case ANA_FLOAT:
 	    while (n--)
-	      *q.w++ = (pixels[(int) *p.f] & red_mask)
-		| (pixels[(int) p.f[n]] & green_mask)
-		| (pixels[(int) p.f[2*n]] & blue_mask);
+	      *q.w++ = (pixels[(Int) *p.f] & red_mask)
+		| (pixels[(Int) p.f[n]] & green_mask)
+		| (pixels[(Int) p.f[2*n]] & blue_mask);
 	    break;
 	  case ANA_DOUBLE:
 	    while (n--)
-	      *q.w++ = (pixels[(int) *p.d] & red_mask)
-		| (pixels[(int) p.d[n]] & green_mask)
-		| (pixels[(int) p.d[2*n]] & blue_mask);
+	      *q.w++ = (pixels[(Int) *p.d] & red_mask)
+		| (pixels[(Int) p.d[n]] & green_mask)
+		| (pixels[(Int) p.d[2*n]] & blue_mask);
 	    break;
 	} else switch (symbol_type(*ps)) {
 	  case ANA_BYTE:
 	    while (n--)
-	      *q.w++ = pixels[(int) *p.b++];
+	      *q.w++ = pixels[(Int) *p.b++];
 	    break;
 	  case ANA_WORD:
 	    while (n--)
-	      *q.w++ = pixels[(int) ((byte) *p.w++)];
+	      *q.w++ = pixels[(Int) ((Byte) *p.w++)];
 	    break;
 	  case ANA_LONG:
 	    while (n--)
-	      *q.w++ = pixels[(int) ((byte) *p.l++)];
+	      *q.w++ = pixels[(Int) ((Byte) *p.l++)];
 	    break;
 	  case ANA_FLOAT:
 	    while (n--)
-	      *q.w++ = pixels[(int) ((byte) *p.f++)];
+	      *q.w++ = pixels[(Int) ((Byte) *p.f++)];
 	    break;
 	  case ANA_DOUBLE:
 	    while (n--)
-	      *q.w++ = pixels[(int) ((byte) *p.d++)];
+	      *q.w++ = pixels[(Int) ((Byte) *p.d++)];
 	    break;
 	}
       break;
@@ -3223,54 +3223,54 @@ int ana_colorpixel(int narg, int ps[])
 	switch (symbol_type(*ps)) {
 	  case ANA_BYTE:
 	    while (n--)
-	      *q.l++ = (pixels[(int) *p.b] & red_mask)
-		| (pixels[(int) p.b[n]] & green_mask)
-		| (pixels[(int) p.b[2*n]] & blue_mask);
+	      *q.l++ = (pixels[(Int) *p.b] & red_mask)
+		| (pixels[(Int) p.b[n]] & green_mask)
+		| (pixels[(Int) p.b[2*n]] & blue_mask);
 	    break;
 	  case ANA_WORD:
 	    while (n--)
-	      *q.l++ = (pixels[(int) *p.w] & red_mask)
-		| (pixels[(int) p.w[n]] & green_mask)
-		| (pixels[(int) p.w[2*n]] & blue_mask);
+	      *q.l++ = (pixels[(Int) *p.w] & red_mask)
+		| (pixels[(Int) p.w[n]] & green_mask)
+		| (pixels[(Int) p.w[2*n]] & blue_mask);
 	    break;
 	  case ANA_LONG:
 	    while (n--)
-	      *q.l++ = (pixels[(int) *p.l] & red_mask)
-		| (pixels[(int) p.l[n]] & green_mask)
-		| (pixels[(int) p.l[2*n]] & blue_mask);
+	      *q.l++ = (pixels[(Int) *p.l] & red_mask)
+		| (pixels[(Int) p.l[n]] & green_mask)
+		| (pixels[(Int) p.l[2*n]] & blue_mask);
 	    break;
 	  case ANA_FLOAT:
 	    while (n--)
-	      *q.l++ = (pixels[(int) *p.f] & red_mask)
-		| (pixels[(int) p.f[n]] & green_mask)
-		| (pixels[(int) p.f[2*n]] & blue_mask);
+	      *q.l++ = (pixels[(Int) *p.f] & red_mask)
+		| (pixels[(Int) p.f[n]] & green_mask)
+		| (pixels[(Int) p.f[2*n]] & blue_mask);
 	    break;
 	  case ANA_DOUBLE:
 	    while (n--)
-	      *q.l++ = (pixels[(int) *p.d] & red_mask)
-		| (pixels[(int) p.d[n]] & green_mask)
-		| (pixels[(int) p.d[2*n]] & blue_mask);
+	      *q.l++ = (pixels[(Int) *p.d] & red_mask)
+		| (pixels[(Int) p.d[n]] & green_mask)
+		| (pixels[(Int) p.d[2*n]] & blue_mask);
 	    break;
 	} else switch (symbol_type(*ps)) {
 	  case ANA_BYTE:
 	    while (n--)
-	      *q.l++ = pixels[(int) *p.b++];
+	      *q.l++ = pixels[(Int) *p.b++];
 	    break;
 	  case ANA_WORD:
 	    while (n--)
-	      *q.l++ = pixels[(int) ((byte) *p.w++)];
+	      *q.l++ = pixels[(Int) ((Byte) *p.w++)];
 	    break;
 	  case ANA_LONG:
 	    while (n--)
-	      *q.l++ = pixels[(int) ((byte) *p.l++)];
+	      *q.l++ = pixels[(Int) ((Byte) *p.l++)];
 	    break;
 	  case ANA_FLOAT:
 	    while (n--)
-	      *q.l++ = pixels[(int) ((byte) *p.f++)];
+	      *q.l++ = pixels[(Int) ((Byte) *p.f++)];
 	    break;
 	  case ANA_DOUBLE:
 	    while (n--)
-	      *q.l++ = pixels[(int) ((byte) *p.d++)];
+	      *q.l++ = pixels[(Int) ((Byte) *p.d++)];
 	    break;
 	}
       break;
@@ -3278,27 +3278,27 @@ int ana_colorpixel(int narg, int ps[])
   return iq;
 }
  /*------------------------------------------------------------------------*/
-int ana_xtv(int narg, int ps[])
+Int ana_xtv(Int narg, Int ps[])
 /* displays an image, properly colored for the current color map, on screen.
    LS 18jan94 */
 {
   return ana_xtv_general(narg, ps, (narg && symbol_type(ps[0]) == ANA_BYTE)? TV_MAP: 0);
 }
  /*------------------------------------------------------------------------*/
-int ana_xtvmap(int narg, int ps[])
+Int ana_xtvmap(Int narg, Int ps[])
 /* displays an image of color indices, mapped to proper pixel values,
   on screen.  LS 18jan94 */
 {
   return ana_xtv_general(narg, ps, TV_MAP);
 }
  /*------------------------------------------------------------------------*/
-int ana_xcopy(int narg, int ps[])
+Int ana_xcopy(Int narg, Int ps[])
  /* 1/8/92 modified to treat negative numbers as pixmaps and 0 and >0 as
    displayed windows */
  /* needs lots of checking which isn't implemented yet */
  /* also just assumes 512x512 for testing */
  {
- int     id1, id2, ixs, iys, ixd, iyd, w, h, ws, hs;
+ Int     id1, id2, ixs, iys, ixd, iyd, w, h, ws, hs;
  Drawable        *src, *dest;
  GC      *cgc;
 
@@ -3335,10 +3335,10 @@ int ana_xcopy(int narg, int ps[])
  return 1;
  }
  /*------------------------------------------------------------------------*/
-int ana_xevent(int narg, int ps[])
+Int ana_xevent(Int narg, Int ps[])
 {
  XEvent  report;
- int     nev, i;
+ Int     nev, i;
 
  XFlush(display);
  nev = XPending( display);
@@ -3352,19 +3352,19 @@ int ana_xevent(int narg, int ps[])
  printf("button down, window = %ld\n", report.xbutton.window);
  printf("x and y = %d %d\n",report.xbutton.x,report.xbutton.y);
  printf("button # %d\n", report.xbutton.button);
- printf("time = %x\n", (unsigned int) report.xbutton.time);
+ printf("time = %x\n", (uint32_t) report.xbutton.time);
  break;
   case ButtonRelease:
  printf("button up, window = %ld\n", report.xbutton.window);
  printf("x and y = %d %d\n",report.xbutton.x,report.xbutton.y);
  printf("button # %d\n", report.xbutton.button);
- printf("time = %x\n", (unsigned int) report.xbutton.time);
+ printf("time = %x\n", (uint32_t) report.xbutton.time);
  break;
   case KeyPress:
  printf("key press, window = %ld\n", report.xkey.window);
  printf("x and y = %d %d\n",report.xkey.x,report.xkey.y);
  printf("keycode # %d\n", report.xkey.keycode);
- printf("time = %x\n", (unsigned int) report.xkey.time);
+ printf("time = %x\n", (uint32_t) report.xkey.time);
  break;
   case FocusIn:
  printf("focus in, window = %ld\n", report.xfocus.window);
@@ -3389,11 +3389,11 @@ int ana_xevent(int narg, int ps[])
  return 1;
  }
  /*------------------------------------------------------------------------*/
-int ana_xpurge(narg,ps)	/* just throw away any pending X events */
- int narg, ps[];
+Int ana_xpurge(narg,ps)	/* just throw away any pending X events */
+ Int narg, ps[];
  {
  XEvent  report;
- int     nev, i;
+ Int     nev, i;
 
  XFlush(display);
  nev = XPending( display);
@@ -3403,15 +3403,15 @@ int ana_xpurge(narg,ps)	/* just throw away any pending X events */
  return 1;
  }
  /*------------------------------------------------------------------------*/
-int ana_xplace(int narg, int ps[])
+Int ana_xplace(Int narg, Int ps[])
  /* response to a key or button press in an ana window and note the
  time and position */
 {
- int	i, cs, nc;
+ Int	i, cs, nc;
  KeySym	keysym;
  char	buffer[16];
- int	coordTrf(float *, float *, int, int);
- extern int	ana_keysym, ana_keystate;
+ Int	coordTrf(Float *, Float *, Int, Int);
+ extern Int	ana_keysym, ana_keystate;
 
  XEvent  report;
 
@@ -3435,13 +3435,13 @@ int ana_xplace(int narg, int ps[])
  xhair = report.xbutton.x;
  yhair = report.xbutton.y;
  coordTrf(&xhair, &yhair, ANA_X11, ANA_DEV);
- xcoord = (int) xhair;
- ycoord = (int) yhair;
+ xcoord = (Int) xhair;
+ ycoord = (Int) yhair;
  cs = (internalMode & 7);
  if (!cs)
    cs = ANA_DVI;
  coordTrf(&xhair, &yhair, ANA_DEV, cs);
- last_time = (double) report.xbutton.time / 1000.0; /* time in seconds */
+ last_time = (Double) report.xbutton.time / 1000.0; /* time in seconds */
  switch (report.type) {
  case ButtonPress:
    ana_button = report.xbutton.button;
@@ -3452,7 +3452,7 @@ int ana_xplace(int narg, int ps[])
    ana_keystate = report.xkey.state;
    nc = XLookupString(&(report.xkey), buffer, 15, &keysym, NULL);
    buffer[nc] = '\0';
-   ana_keysym = (int) keysym;
+   ana_keysym = (Int) keysym;
    break;
  }
 	/* return parameters if they were arguments */
@@ -3467,14 +3467,14 @@ int ana_xplace(int narg, int ps[])
  return 1;
 }
  /*------------------------------------------------------------------------*/
-int xwindow_plot(int ix, int iy, int mode)
+Int xwindow_plot(Int ix, Int iy, Int mode)
 /* drawing on X-window */
 /* added pixmap case - LS 8oct97 */
 /* added alternateDash - LS 16oct98 */
 {
- int     wid, ana_xpen(int, float);
- extern int	alternateDash, current_pen;
- extern float	current_gray;
+ Int     wid, ana_xpen(Int, Float);
+ extern Int	alternateDash, current_pen;
+ extern Float	current_gray;
 
  wid = last_wid;
  if ((wid >= 0 && !win[wid]) || (wid < 0 && !maps[-wid]))
@@ -3482,7 +3482,7 @@ int xwindow_plot(int ix, int iy, int mode)
 
  if (mode == 0) {
    if (alternateDash)
-     ana_xpen(current_pen, (float) 1 - current_gray);
+     ana_xpen(current_pen, (Float) 1 - current_gray);
    else {
      xold = ix;
      yold = iy;
@@ -3502,17 +3502,17 @@ int xwindow_plot(int ix, int iy, int mode)
  return 1;
 }
  /*------------------------------------------------------------------------*/
-int ana_xflush()
+Int ana_xflush()
  {
  XFlush(display);       return 1;
  }
  /*------------------------------------------------------------------------*/
-int ana_xpen(int pen, float gray)
+Int ana_xpen(Int pen, Float gray)
 {
-  int	wid;
-  extern int	standardGray;
+  Int	wid;
+  extern Int	standardGray;
   XColor	seek_color, *return_color;
-  XColor	*anaFindBestRGB(XColor *, int);
+  XColor	*anaFindBestRGB(XColor *, Int);
 
   /* lines on screen with a given non-unity pen width appear much
      fatter than the corresponding lines on paper, so reduce screen
@@ -3541,11 +3541,11 @@ int ana_xpen(int pen, float gray)
  return 1;
 }
  /*------------------------------------------------------------------------*/
-int ana_xfont(narg, ps)
+Int ana_xfont(narg, ps)
                                         /* set font for a window */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int      wid, iq;
+ Int      wid, iq;
  char    *fontname;
  /* first arg is a string which should be a font name */
  ck_events();
@@ -3562,11 +3562,11 @@ int ana_xfont(narg, ps)
  return 1;
  }
  /*------------------------------------------------------------------------*/
-int ana_xlabel(narg, ps)
+Int ana_xlabel(narg, ps)
                                         /* user labels */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int     wid, iq, ix, iy, len;
+ Int     wid, iq, ix, iy, len;
  char    *s;
  /* first arg is a string which will be the label */
  ck_events();
@@ -3584,11 +3584,11 @@ int ana_xlabel(narg, ps)
  return 1;
  }
  /*------------------------------------------------------------------------*/
-int ana_xlabelwidth(narg, ps)
+Int ana_xlabelwidth(narg, ps)
                                         /* user label width */
- int     narg, ps[];
+ Int     narg, ps[];
  {
- int     wid, iq, len, result_sym;
+ Int     wid, iq, len, result_sym;
  char    *s;
  /* arg is a string which will be the label */
  ck_events();
@@ -3603,10 +3603,10 @@ int ana_xlabelwidth(narg, ps)
  return result_sym;
  }
  /*------------------------------------------------------------------------*/
-int xlabel(char *s, int ix, int iy)
+Int xlabel(char *s, Int ix, Int iy)
                                         /* internal call for labels */
 {
-  int     len, wid;
+  Int     len, wid;
 
   len = strlen(s);
   wid = last_wid;
@@ -3614,11 +3614,11 @@ int xlabel(char *s, int ix, int iy)
   return 1;
 }
  /*------------------------------------------------------------------------*/
-int xlabelwidth(s)
+Int xlabelwidth(s)
                                         /* internal call for labels */
  char    *s;
  {
- int     len, wid;
+ Int     len, wid;
  len = strlen(s);
  wid = last_wid;
  /* does window exist? If not create a default size */
@@ -3626,16 +3626,16 @@ int xlabelwidth(s)
  return  XTextWidth(font_info[wid], s, len );
  }
  /*------------------------------------------------------------------------*/
-int ana_xtvread(int narg, int ps[])
+Int ana_xtvread(Int narg, Int ps[])
 {
- /* read from an X window or pixmap and create a byte array */
- int  nx, ny, ix, iy, wid, result_sym, dim[2], w, hh, type;
+ /* read from an X window or pixmap and create a Byte array */
+ Int  nx, ny, ix, iy, wid, result_sym, dim[2], w, hh, type;
  pointer    ptr;
  Drawable        *src;
- int	ana_zerof(int, int *);
- extern int	bits_per_pixel;
- int ana_colorstogrey(int, int []);
- int ana_delete(int, int []);
+ Int	ana_zerof(Int, Int *);
+ extern Int	bits_per_pixel;
+ Int ana_colorstogrey(Int, Int []);
+ Int ana_delete(Int, Int []);
 
  /* the input arguments are all scalars */
  ck_events();
@@ -3700,8 +3700,8 @@ int ana_xtvread(int narg, int ps[])
  XDestroyImage(xi);
  XFlush(display);
  if (internalMode & 1) {
-   int ana_colorstogrey(int narg, int ps[]);
-   int ana_delete(int narg, int ps[]);
+   Int ana_colorstogrey(Int narg, Int ps[]);
+   Int ana_delete(Int narg, Int ps[]);
    if (ana_colorstogrey(1, &result_sym) != ANA_OK) {
      ana_delete(1, &result_sym);
      return ANA_ERROR;
@@ -3710,28 +3710,28 @@ int ana_xtvread(int narg, int ps[])
  return reverseYImage(result_sym);
 }
 /*------------------------------------------------------------------------*/
-int ana_xquery(int narg, int ps[])
+Int ana_xquery(Int narg, Int ps[])
 {
-  int	xquery(int, int []);
+  Int	xquery(Int, Int []);
 
   xquery(narg, ps);
   return 1;
 }
  /*------------------------------------------------------------------------*/
-int ana_xquery_f(int narg, int ps[])
+Int ana_xquery_f(Int narg, Int ps[])
 {
- int	result;
- int	xquery(int, int []);
+ Int	result;
+ Int	xquery(Int, Int []);
 
  result = scalar_scratch(ANA_LONG);
  sym[result].spec.scalar.l = xquery(narg, ps);
  return result;
 }
 /*------------------------------------------------------------------------*/
-int xquery(int narg, int ps[])
+Int xquery(Int narg, Int ps[])
 /* note time and position of mouse */
 {
-  int	wid;
+  Int	wid;
   Window	qroot, qchild;
 
   wid = narg? int_arg(ps[0]): last_wid;
@@ -3750,21 +3750,21 @@ Bool windowButtonPress(Display *display, XEvent *event, XPointer arg)
 /* returns True if the event is a ButtonPress in an ANA window,
    False otherwise */
 {
-  int	i, num;
+  Int	i, num;
   extern Window	win[];
   
   if (event->type != ButtonPress) return False;
-  if (arg) num = *((int *) arg); else num = -1;
+  if (arg) num = *((Int *) arg); else num = -1;
   for (i = (num < 0)? 0: num; i < (num < 0? MAXWINDOWS: num + 1); i++)
     /* if no arg, then check all windows, else just indicated one */
     if (win[i] && event->xbutton.window == win[i]) return True;
   return False;
 }
 /*------------------------------------------------------------------------*/
-int ana_check_window(int narg, int ps[])
+Int ana_check_window(Int narg, Int ps[])
      /* checks event buffer for any pending window selections */
 {
-  int	num, w, i;
+  Int	num, w, i;
   XEvent	event;
   
   if (setup_x() < 0)
@@ -3778,14 +3778,14 @@ int ana_check_window(int narg, int ps[])
     xcoord = event.xbutton.x;
     ycoord = event.xbutton.y;
     ana_button = event.xbutton.button;
-    last_time = (double) event.xbutton.time / 1000.0;
+    last_time = (Double) event.xbutton.time / 1000.0;
     return 1; }
   return 4;
 } 
 /*------------------------------------------------------------------------*/
-int ana_xraise(int narg, int ps[]) /* raise (popup) a window */
+Int ana_xraise(Int narg, Int ps[]) /* raise (popup) a window */
 {
-  int    wid;
+  Int    wid;
 
   wid = int_arg( ps[0] );
   if (ck_window(wid) != 1)
@@ -3799,12 +3799,12 @@ int ana_xraise(int narg, int ps[]) /* raise (popup) a window */
   return 1;
 }
 /*------------------------------------------------------------------------*/
-int ana_xanimate(int narg, int ps[])
+Int ana_xanimate(Int narg, Int ps[])
 /* XANIMATE,data [, x, y, FR1=fr1, FR2=fr2, FRSTEP=frstep] [, /TIME, */
 /* /REPEAT] */
 {
-  int	wid, nx, ny, ix, iy, *dims, nFrame, i, nnx, nny, fr1, fr2, frs;
-  double	ts, tc;
+  Int	wid, nx, ny, ix, iy, *dims, nFrame, i, nnx, nny, fr1, fr2, frs;
+  Double	ts, tc;
   struct timeval	tp;
   struct timezone	tzp;
   pointer	data;
@@ -3878,11 +3878,11 @@ int ana_xanimate(int narg, int ps[])
   return 1;
 }
 /*---------------------------------------------------------*/
-int ana_xzoom(int narg, int ps[])
+Int ana_xzoom(Int narg, Int ps[])
 /* ZOOM,image [,x,y,window] */
 {
   XEvent	event;
-  int	wid, i, type, nx, ny;
+  Int	wid, i, type, nx, ny;
   pointer	ptr;
 
   if (symbol_class(ps[0]) != ANA_ARRAY)
@@ -3941,8 +3941,8 @@ int ana_xzoom(int narg, int ps[])
   }
 }
 /*---------------------------------------------------------*/
-int tvplanezoom = 1;
-int ana_xtvplane(int narg, int ps[])
+Int tvplanezoom = 1;
+Int ana_xtvplane(Int narg, Int ps[])
  /* use negative zoom factors for compression, not real fast */
  /* 9/21/96 allow 2-D arrays also but verify that plane is 0 */
  /* tvplane, cube, in, ix,iy, window
@@ -3957,17 +3957,17 @@ int ana_xtvplane(int narg, int ps[])
  windows. Also, don't set the !tvix,!tvixb stuff for this routine.
  */
 {
-  int iq, nx, ny, nz, nd, ix=0, iy=0, wid, hq, wq, ip;
-  int	zoom_sym, ns, ms;
-  byte	*ptr, *ptr2, *ptr0;
-  static byte *subfree;
-  int zoomer2(byte *, int, int, int *, int *, int *, int),
-    zoomer3(byte *, int, int, int *, int *, int *, int),
-    zoomer4(byte *, int, int, int *, int *, int *, int),
-    zoomer8(byte *, int, int, int *, int *, int *, int),
-    zoomer16(byte *, int, int, int *, int *, int *, int),
-    compress2(byte *, int, int, int *, int *, int *, int),
-    compress4(byte *, int, int, int *, int *, int *, int);
+  Int iq, nx, ny, nz, nd, ix=0, iy=0, wid, hq, wq, ip;
+  Int	zoom_sym, ns, ms;
+  Byte	*ptr, *ptr2, *ptr0;
+  static Byte *subfree;
+  Int zoomer2(Byte *, Int, Int, Int *, Int *, Int *, Int),
+    zoomer3(Byte *, Int, Int, Int *, Int *, Int *, Int),
+    zoomer4(Byte *, Int, Int, Int *, Int *, Int *, Int),
+    zoomer8(Byte *, Int, Int, Int *, Int *, Int *, Int),
+    zoomer16(Byte *, Int, Int, Int *, Int *, Int *, Int),
+    compress2(Byte *, Int, Int, Int *, Int *, Int *, Int),
+    compress4(Byte *, Int, Int, Int *, Int *, Int *, Int);
 
   if (ck_events() != 1)
     return ANA_ERROR;
@@ -4003,7 +4003,7 @@ int ana_xtvplane(int narg, int ps[])
     return anaerror("TVPLANE - window must be pre-defined, %d\n", narg > 4? ps[4]: 0, wid);
 
   /* get pointer to the unzoomed image */
-  ptr = (byte *) array_data(iq) + ip*nx*ny;
+  ptr = (Byte *) array_data(iq) + ip*nx*ny;
 
   /* how much do we need ? depends on destination window and zoom */
   wq = wd[wid];
@@ -4029,8 +4029,8 @@ int ana_xtvplane(int narg, int ps[])
   if (ix != 0 || iy != 0 || nx != wq || ny != hq) {
     /* 2 obvious upgrades, if zooming, the extraction and zoom can be
        combined and the data could be re-oriented while extracting */
-    byte	*sub, *p;
-    int	m = hq, n, stride;
+    Byte	*sub, *p;
+    Int	m = hq, n, stride;
     
     p = ptr;
     sub = ptr = malloc(wq*hq);
@@ -4095,7 +4095,7 @@ int ana_xtvplane(int narg, int ps[])
   ptr0 = ptr2;
   wq = nx*ny;			/* size of final image */
   while (wq--) 
-    *ptr2++ = pixels[(byte) *ptr++];
+    *ptr2++ = pixels[(Byte) *ptr++];
 
 		 /* create image structure */
   xi = XCreateImage(display, visual, depth, ZPixmap, 0, (char *) ptr0,
@@ -4111,7 +4111,7 @@ int ana_xtvplane(int narg, int ps[])
   return 1;
 }
 /*---------------------------------------------------------*/
-int ana_threecolors(int narg, int ps[])
+Int ana_threecolors(Int narg, Int ps[])
 /* installs color table with three domains */
 /* THREECOLORS,arg */
 /* the color table consists of a grey domain, a red domain, and a blue
@@ -4120,8 +4120,8 @@ int ana_threecolors(int narg, int ps[])
    the blue domain from 2*threeColors through 3*threeColors - 1.
    LS 12nov98 */
 {
-  float	fraction, *list;
-  int	threecolors(float *, int);
+  Float	fraction, *list;
+  Int	threecolors(Float *, Int);
 
   if (ck_events() != ANA_OK)
     return ANA_ERROR;
@@ -4142,14 +4142,14 @@ int ana_threecolors(int narg, int ps[])
   return threecolors(list, 9);
 }
 /*---------------------------------------------------------*/
-int ana_tv3(int narg, int ps[])
+Int ana_tv3(Int narg, Int ps[])
 /* TV3,<image>[,<bitmap1>,<bitmap2>] */
 {
-  int	iq, nx, ny, mode, i, wid;
-  float	fx, fy;
-  byte	*bitmap1, *bitmap2;
+  Int	iq, nx, ny, mode, i, wid;
+  Float	fx, fy;
+  Byte	*bitmap1, *bitmap2;
   pointer	data;
-  int	coordTrf(float *, float *, int, int);
+  Int	coordTrf(Float *, Float *, Int, Int);
 
   if (!symbolIsNumericalArray(ps[0]) /* <image> */
       || isComplexType(array_type(ps[0]))
@@ -4225,14 +4225,14 @@ int ana_tv3(int narg, int ps[])
   return i;
 }
 /*---------------------------------------------------------*/
-int invert_flag = 0;
-int ana_xdrawline(int narg, int ps[])
+Int invert_flag = 0;
+Int ana_xdrawline(Int narg, Int ps[])
 /* subroutine, call is xdrawline, x1, y1, x2, y2 where the arguments can
    be scalars or arrays but all must match in length */
 /* used for X window drawing with lower overhead than xymov calls */
 /* better for interactive graphics */
 {
-  int     wid, ixs, iys, ix, iy;
+  Int     wid, ixs, iys, ix, iy;
   Drawable	dq;
   GC		gq;
 
@@ -4281,7 +4281,7 @@ int ana_xdrawline(int narg, int ps[])
     }
   } else {
     /* here we expect 4 arrays of the same size */
-    int	*px1, *px2, *py1, *py2, n, nx, iq;
+    Int	*px1, *px2, *py1, *py2, n, nx, iq;
 
     iq = ana_long(1, &ps[0]);
     nx = array_size(iq);
@@ -4327,11 +4327,11 @@ int ana_xdrawline(int narg, int ps[])
   return ANA_OK;
 }
 /*---------------------------------------------------------*/
-int ana_xinvertline(int narg, int ps[])
+Int ana_xinvertline(Int narg, Int ps[])
 /* used for X window drawing with lower overhead than xymov calls */
 /* better for interactive graphics */
 {
-  int	iq;
+  Int	iq;
 
   invert_flag = 1;
   iq = ana_xdrawline(narg, ps);
@@ -4339,10 +4339,10 @@ int ana_xinvertline(int narg, int ps[])
   return iq;
 }
 /*------------------------------------------------------------------------*/
-int ana_xinvertarc(int narg, int ps[])
+Int ana_xinvertarc(Int narg, Int ps[])
 {
-  int	iq;
-  int	ana_xdrawarc(int, int []);
+  Int	iq;
+  Int	ana_xdrawarc(Int, Int []);
 
   invert_flag = 1;
   iq = ana_xdrawarc(narg, ps);
@@ -4350,11 +4350,11 @@ int ana_xinvertarc(int narg, int ps[])
   return iq;
 }
 /*------------------------------------------------------------------------*/
-int ana_xdrawarc(int narg, int ps[])
+Int ana_xdrawarc(Int narg, Int ps[])
 /* subroutine, call is xdrawarc, x1, y1, w, h, [a1, a2, win] */
 {
-  int     wid, ixs, iys, w, h, xa1, xa2;
-  float	a1, a2;
+  Int     wid, ixs, iys, w, h, xa1, xa2;
+  Float	a1, a2;
   Drawable	dq;
   GC		gq;
 
@@ -4392,8 +4392,8 @@ int ana_xdrawarc(int narg, int ps[])
   if (narg > 5 && float_arg_stat(ps[5], &a2) != ANA_OK)
     return ANA_ERROR;
   /* convert these fp angles into X units */
-  xa1 = (int) 64.*a1;
-  xa2 = (int) 64.*a2;
+  xa1 = (Int) 64.*a1;
+  xa2 = (Int) 64.*a2;
 
   switch (invert_flag) {
     case 0:

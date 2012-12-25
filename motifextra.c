@@ -3,10 +3,10 @@
 #include <string.h>
 #include <stdlib.h>
 
-int	motif_input_flag = 0;
+Int	motif_input_flag = 0;
 
 /*-------------------------------------------*/
-int ana_zeroifnotdefined(int narg, int ps[])
+Int ana_zeroifnotdefined(Int narg, Int ps[])
 /* assigns zero to the argument if the argument is undefined.
  (should replace by DEFAULT,arg,0 instead) */
 {
@@ -21,11 +21,11 @@ int ana_zeroifnotdefined(int narg, int ps[])
   return 1;
 }
 /*-------------------------------------------*/
-int ana_compile_file(int narg, int ps[])
+Int ana_compile_file(Int narg, Int ps[])
 /* COMPILE_FILE compiles the contents of a file at the top level */
 {
   FILE	*fp;
-  int	result, nextCompileLevel(FILE *, char *);
+  Int	result, nextCompileLevel(FILE *, char *);
   
   if (symbol_class(ps[0]) != ANA_STRING)
     return cerror(NEED_STR, ps[0]);

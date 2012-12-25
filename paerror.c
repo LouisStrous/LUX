@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include "ana_structures.h"
 
-int execute_error(n)		/* handle errors */
- int n;
+Int execute_error(n)		/* handle errors */
+ Int n;
  {
  printf("execution error: ");
  switch (n) {
@@ -92,7 +92,7 @@ int execute_error(n)		/* handle errors */
  case 78: printf("illegal power specified for poly. fit (range 1-10)\n"); break;
  case 79: printf("incompatiable LU decomp and rhs in dsolve\n"); break;
  case 80:
- printf("inner dimen. byte count isn't a multiple of element length \n");
+ printf("inner dimen. Byte count isn't a multiple of element length \n");
  break;
  case 81: printf("reversal specified for non-existent dimension\n"); break;
  case 82: printf("duplicate index in REVERSE\n"); break;
@@ -147,7 +147,7 @@ int execute_error(n)		/* handle errors */
  return -1;
  }						/*end of execute_error */
 
-int file_open_error()
+Int file_open_error()
 {
   puts("Error opening file");
   return -1;

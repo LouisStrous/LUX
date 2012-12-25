@@ -23,14 +23,14 @@ ana_func_if * ana_func_if_alloc(char const * const name, size_t num_params)
   ana_func_if *afif = calloc(1, sizeof(ana_func_if));
   if (!afif)
     return NULL;
-  int func_sym = stringpointer((char *) name, SP_USER_FUNC);
+  Int func_sym = stringpointer((char *) name, SP_USER_FUNC);
   if (func_sym < 0) {
     errno = EDOM;
     goto error;
   }
   afif->num_params = num_params;
   if (num_params) {
-    afif->param_syms = calloc(num_params, sizeof(word));
+    afif->param_syms = calloc(num_params, sizeof(Word));
     afif->param_data = calloc(num_params, sizeof(pointer));
     if (!afif->param_syms || !afif->param_data)
       goto error;
@@ -38,7 +38,7 @@ ana_func_if * ana_func_if_alloc(char const * const name, size_t num_params)
   afif->func_sym = nextFreeTempExecutable();
   symbol_class(afif->func_sym) = ANA_USR_FUNC;
   usr_func_arguments(afif->func_sym) = afif->param_syms;
-  symbol_memory(afif->func_sym) = num_params*sizeof(word);
+  symbol_memory(afif->func_sym) = num_params*sizeof(Word);
   usr_func_number(afif->func_sym) = func_sym;
   return afif;
  error:
@@ -55,7 +55,7 @@ void ana_func_if_free(ana_func_if * afif)
   }
 }
 
-int ana_func_if_set_param(ana_func_if *afif, size_t index, int param)
+Int ana_func_if_set_param(ana_func_if *afif, size_t index, Int param)
 {
   if (!afif || index >= afif->num_params
       || !symbolIsNumerical(param)) {
@@ -67,7 +67,7 @@ int ana_func_if_set_param(ana_func_if *afif, size_t index, int param)
   return 0;
 }
 
-int ana_func_if_get_param_sym(ana_func_if *afif, size_t index)
+Int ana_func_if_get_param_sym(ana_func_if *afif, size_t index)
 {
   if (index >= afif->num_params) {
     errno = EDOM;
@@ -87,10 +87,10 @@ pointer ana_func_if_get_param_data(ana_func_if *afif, size_t index)
   return afif->param_data[index];
 }
 
-double ana_func_if_call(ana_func_if *afif)
+Double ana_func_if_call(ana_func_if *afif)
 {
-  int result_sym = eval(afif->func_sym);
-  double result = (result_sym < 0? NAN: double_arg(result_sym));
+  Int result_sym = eval(afif->func_sym);
+  Double result = (result_sym < 0? NAN: double_arg(result_sym));
   zap(result_sym);
   return result;
 }

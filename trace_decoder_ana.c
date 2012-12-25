@@ -33,19 +33,19 @@
 #define MAX_GAPS  50
  extern	struct sym_desc sym[];
  extern	struct sym_list		*subr_sym_list[];
- extern	int	temp_base;
- extern	int	edb_context;
- extern	int	ana_float();
+ extern	Int	temp_base;
+ extern	Int	edb_context;
+ extern	Int	ana_float();
  extern	char *find_sym_name();
- extern	int	ana_type_size[];
- extern	int	vfix_top, num_ana_subr, next_user_subr_num;
- extern	float	float_arg();
- extern	double	double_arg();
- static const int extend_test[16] =   /* entry n is 2**(n-1) */
+ extern	Int	ana_type_size[];
+ extern	Int	vfix_top, num_ana_subr, next_user_subr_num;
+ extern	Float	float_arg();
+ extern	Double	double_arg();
+ static const Int extend_test[16] =   /* entry n is 2**(n-1) */
   { 0, 0x0001, 0x0002, 0x0004, 0x0008, 0x0010, 0x0020, 0x0040, 0x0080,
     0x0100, 0x0200, 0x0400, 0x0800, 0x1000, 0x2000, 0x4000 };
 
- static const int extend_offset[16] = /* entry n is (-1 << n) + 1 */
+ static const Int extend_offset[16] = /* entry n is (-1 << n) + 1 */
   { 0, ((-1)<<1) + 1, ((-1)<<2) + 1, ((-1)<<3) + 1, ((-1)<<4) + 1,
     ((-1)<<5) + 1, ((-1)<<6) + 1, ((-1)<<7) + 1, ((-1)<<8) + 1,
     ((-1)<<9) + 1, ((-1)<<10) + 1, ((-1)<<11) + 1, ((-1)<<12) + 1,
@@ -55,18 +55,18 @@
  char	*default_huffman = {"/hosts/shimmer/usr/people/shine/trace/hufpack1"};
  char	*default_qt = {"/hosts/shimmer/usr/people/shine/trace/qt1"};
  /* global tables for Huffman decoding*/
- byte	dc_look_nbits[256],dc_look_sym[256],ac_look_nbits[256],ac_look_sym[256];
- byte	dc_bits[16], dc_huffval[16], ac_bits[16], ac_huffval[256];
- int	dc_mincode[16], dc_maxcode[16], dc_valptr[16];
- int	ac_mincode[16], ac_maxcode[16], ac_valptr[16];
+ Byte	dc_look_nbits[256],dc_look_sym[256],ac_look_nbits[256],ac_look_sym[256];
+ Byte	dc_bits[16], dc_huffval[16], ac_bits[16], ac_huffval[256];
+ Int	dc_mincode[16], dc_maxcode[16], dc_valptr[16];
+ Int	ac_mincode[16], ac_maxcode[16], ac_valptr[16];
 
  /* image size and # of blocks */
- static	int	nblocks, nx, ny, qfactor;
- static	int	n_restarts_found = 0, n_unexpected = 0;
+ static	Int	nblocks, nx, ny, qfactor;
+ static	Int	n_restarts_found = 0, n_unexpected = 0;
 
  /* zag[i] is the natural-order position of the i'th element of zigzag order. */
  
- static const int zag[64] = {
+ static const Int zag[64] = {
    0,  1,  8, 16,  9,  2,  3, 10,
   17, 24, 32, 25, 18, 11,  4,  5,
   12, 19, 26, 33, 40, 48, 41, 34,
@@ -77,18 +77,18 @@
   53, 60, 61, 54, 47, 55, 62, 63
  };
 
- static float aansf[8] = { 1.0, 1.387039845, 1.306562965, 1.175875602,
+ static Float aansf[8] = { 1.0, 1.387039845, 1.306562965, 1.175875602,
 	   1.0, 0.785694958, 0.541196100, 0.275899379};
- static float ws[64], fqtbl[64], bias = 2048.5;
+ static Float ws[64], fqtbl[64], bias = 2048.5;
 /* short	*dct = NULL; */
  char	dct_area[2400000];
- int	del_indices[2048];
- byte	*start_indices[2048];
+ Int	del_indices[2048];
+ Byte	*start_indices[2048];
  char	*dct_head = dct_area;
  short	*dct = (short *) (dct_area + sizeof( struct ahead ));
  static	short	*qt;
  static	short	qt_all[64][64];
- int	bigendian;
+ Int	bigendian;
  short	bcorrect;
 
  /* ----------------------------------------------------*/
@@ -96,7 +96,7 @@ void prefill(dct_ptr, nb)
  /* used for areas where data may not be present, results in zero after
  DCT operation */
  short	*dct_ptr;
- int	nb;
+ Int	nb;
  {
  short * pq = dct_ptr;
  bzero(dct_ptr, nb*64*sizeof(short));
@@ -104,15 +104,15 @@ void prefill(dct_ptr, nb)
  while (nb--) { *pq = bcorrect;  pq += 64;}
  }
  /* ----------------------------------------------------*/
-int huff_setups( packed_huffman)
- byte *packed_huffman;
+Int huff_setups( packed_huffman)
+ Byte *packed_huffman;
  {
  unsigned char huffsize[256], *p, *bits, *huffval;
  unsigned short	huffcode[256], *pc;
- int	*mincode, *maxcode, *valptr;
- byte	*look_nbits, *look_sym;
- int	i, j, code, k, iq, n;
- int	jq, ntable, lookbits;
+ Int	*mincode, *maxcode, *valptr;
+ Byte	*look_nbits, *look_sym;
+ Int	i, j, code, k, iq, n;
+ Int	jq, ntable, lookbits;
  /* unpack the Huffman tables read from file, make our own copy
  format for Huffman files:
 
@@ -123,7 +123,7 @@ int huff_setups( packed_huffman)
  acbits		32:47
  acvalues	48:303
  
- first 3 are 16 byte arrays, last is 156 byte array
+ first 3 are 16 Byte arrays, last is 156 Byte array
  */
   p = dc_bits;
   n = 16;	while (n--) *p++ = *packed_huffman++;
@@ -145,7 +145,7 @@ int huff_setups( packed_huffman)
  pc = huffcode;
  code = 0;
  for (k = 0; k < 16; k++) {
-   j = k + 1;	n = (int) bits[k];	/* n is the number of this length */
+   j = k + 1;	n = (Int) bits[k];	/* n is the number of this length */
    while (n--)  {			/* the codes of a common length */
      /* *p++ = (unsigned char) (j); */	/* just increase by 1 wrt previous */
 	*pc++ = code++;	  }
@@ -174,7 +174,7 @@ int huff_setups( packed_huffman)
  bzero(look_nbits, 256);
  iq = 0;
  for (k = 0; k < 8; k++) {
-  for (i = 0; i < (int) bits[k]; i++, iq++) {
+  for (i = 0; i < (Int) bits[k]; i++, iq++) {
   /* k+1 = current code's length, iq = its index in huffcode[] & huffval[]. */
   /* Generate left-justified code followed by all possible bit sequences */
     lookbits = huffcode[iq] << (7 - k);
@@ -193,34 +193,34 @@ int huff_setups( packed_huffman)
  return 1;
  }
  /*------------------------------------------------------------------------- */
-static int huff_decode_err(n)
- int	n;
+static Int huff_decode_err(n)
+ Int	n;
  {
  printf("Huffman decoding error # %d\n", n);
  return -1; 
  }
  /*------------------------------------------------------------------------- */
-static int dct_buffer_decode_err(limit)
- int limit;
+static Int dct_buffer_decode_err(limit)
+ Int limit;
  {
  printf("Exceeded data size during Huffman decompression , limit =%d\n", limit);
  return -1;
  }
  /*------------------------------------------------------------------------- */
-static int huff_decode_dct(dct, nblocks, x, limit)
+static Int huff_decode_dct(dct, nblocks, x, limit)
  /* returns decoded dct, the coded data is in x, huffman tables as in
  huff_encode_dct */
  /* assumes messages and pads already removed by a pre-scan */
  short	dct[];
- byte	x[];
- int	limit, nblocks;
+ Byte	x[];
+ Int	limit, nblocks;
  {
- int	i, j, k, idct, r1, last_dc=0;
- int	jq, look, nb, lbits, ks;
- unsigned int	temp, temp2, nbits, rs;
- unsigned int mask[] = { 0x00, 0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f, 0xff,
+ Int	i, j, k, idct, r1, last_dc=0;
+ Int	jq, look, nb, lbits, ks;
+ uint32_t	temp, temp2, nbits, rs;
+ uint32_t mask[] = { 0x00, 0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f, 0xff,
   0x1ff,0x3ff,0x7ff,0xfff,0x1fff,0x3fff,0x7fff,0xffff};
- byte *px;
+ Byte *px;
 
  px = x;	/* where we get the Huffman coded version */
  r1 = 0;	/* a bit count */
@@ -234,15 +234,15 @@ static int huff_decode_dct(dct, nblocks, x, limit)
  /* start dc decode, grab 8 bits and use lookup shortcut to see if we
  got a short Huffman code */
  
- i=r1>>3;	j=r1%8;		/* our byte and bit addresses */
+ i=r1>>3;	j=r1%8;		/* our Byte and bit addresses */
  if (i > limit) return dct_buffer_decode_err(limit);
  px = x + i;
- if (j == 0) {	/* aligned on byte, lucky 1/8 */
+ if (j == 0) {	/* aligned on Byte, lucky 1/8 */
   look = *px;
- } else {	/* need part of next byte as well */
+ } else {	/* need part of next Byte as well */
   jq = 8 - j;	/* available bits in px */
   look = *px++ << j;	/* msb, make room for lsb */
-  look |= ((int) *px) >> jq;
+  look |= ((Int) *px) >> jq;
   look = look & 0xff;
  }
  if ((nb = dc_look_nbits[look]) != 0) {
@@ -254,13 +254,13 @@ static int huff_decode_dct(dct, nblocks, x, limit)
      r1 += 8;	/* point after look */
      i=r1>>3;	j=r1%8;		px = x + i;
      /* get 16 bits in temp */
-     temp = ((int) look) << 8;	/* look will be top 8 */
-     if (j == 0) { temp = temp | ( (int) *px );
+     temp = ((Int) look) << 8;	/* look will be top 8 */
+     if (j == 0) { temp = temp | ( (Int) *px );
      } else {
      /* need 2 transfers, 8 bits total */
      jq = 8 - j;	/* available bits in px */
      temp |= ( *px++ << j );
-     temp |= ( ((int) *px) >> jq);
+     temp |= ( ((Int) *px) >> jq);
      }
      k = 7;	nb = 8;		/* here nb is code size - 1 */
      while ( (ks =(temp >> k)) > dc_maxcode[nb] ) { k--; nb++;
@@ -284,9 +284,9 @@ static int huff_decode_dct(dct, nblocks, x, limit)
  temp = ( *px  & mask[jq] );	/* gets us jq ls bits */
  ks = nbits - jq;		/* how much more needed (could be < 0) */
  if (ks>0) { temp = temp << ks;	/* shift over to make room */
-  ks -=8;	temp2 = ((int) *++px);
+  ks -=8;	temp2 = ((Int) *++px);
   if (ks>0) { temp |= ( temp2 << ks );	/* need a third ? */
-    ks -=8;	temp2 = ((int) *++px);
+    ks -=8;	temp2 = ((Int) *++px);
     }
  temp |= ( temp2 >> (-ks) );		/* last, #2 or #3 */
  } else { temp = temp >> (-ks); }
@@ -303,12 +303,12 @@ static int huff_decode_dct(dct, nblocks, x, limit)
  i=r1>>3;	j=r1%8;		px = x + i;
  if (i > limit) return dct_buffer_decode_err(limit);
  /* decode the Huffman symbol, use ac tables */
- if (j == 0) {	/* aligned on byte, lucky 1/8 */
+ if (j == 0) {	/* aligned on Byte, lucky 1/8 */
   look = *px;
- } else {	/* need part of next byte as well */
+ } else {	/* need part of next Byte as well */
   jq = 8 - j;	/* available bits in px */
   look = *px++ << j;	/* msb, make room for lsb */
-  look |= ((int) *px) >> jq;
+  look |= ((Int) *px) >> jq;
   look = look & 0xff;
  }
  if ((nb = ac_look_nbits[look]) != 0) {
@@ -320,13 +320,13 @@ static int huff_decode_dct(dct, nblocks, x, limit)
      r1 += 8;	/* point after look */
      i=r1>>3;	j=r1%8;		px = x + i;
      /* get 16 bits in temp */
-     temp = ((int) look) << 8;	/* look will be top 8 */
-     if (j == 0) { temp = temp | ( (int) *px );
+     temp = ((Int) look) << 8;	/* look will be top 8 */
+     if (j == 0) { temp = temp | ( (Int) *px );
      } else {
      /* need 2 transfers, 8 bits total */
      jq = 8 - j;	/* available bits in px */
      temp |= ( *px++ << j );
-     temp |= ( ((int) *px) >> jq);
+     temp |= ( ((Int) *px) >> jq);
      }
      /*printf("16 bit candidate in slow decode = %#x\n", temp);*/
      k = 7;	nb = 8;		/* here nb is code size - 1 */
@@ -363,9 +363,9 @@ static int huff_decode_dct(dct, nblocks, x, limit)
  temp = ( *px  & mask[jq] );	/* gets us jq ls bits */
  ks = nbits - jq;		/* how much more needed (could be < 0) */
  if (ks>0) { temp = temp << ks;	/* shift over to make room */
-  ks -=8;	temp2 = ((int) *++px);
+  ks -=8;	temp2 = ((Int) *++px);
   if (ks>0) { temp |= ( temp2 << ks );	/* need a third ? */
-    ks -=8;	temp2 = ((int) *++px);
+    ks -=8;	temp2 = ((Int) *++px);
     }
  temp |= ( temp2 >> (-ks) );		/* last, #2 or #3 */
  } else { temp = temp >> (-ks); }
@@ -383,30 +383,30 @@ static int huff_decode_dct(dct, nblocks, x, limit)
  return 1;
  }
  /*------------------------------------------------------------------------- */
-static int dct_err(n)
- int	n;
+static Int dct_err(n)
+ Int	n;
  {
  printf("DCT error # %d\n", n);
  return -1; 
  }
  /*------------------------------------------------------------------------- */
-static int rdct(image, nx, ny, nblocks, qtable, dct_array)
+static Int rdct(image, nx, ny, nblocks, qtable, dct_array)
  /* reverse dct, quant, and re-order included, result is I*2 */
  /* nx and ny must be multiples of 8 (check in calling routine) */
  /* qtable is not modified */
  short	*dct_array;
  short	*qtable, *image;
- int	nx, ny, nblocks;
+ Int	nx, ny, nblocks;
  {
    /* void rdct_cell(); */
- int	n, i, ncx, iq, ystride, icx, icy, row, col;
+ Int	n, i, ncx, iq, ystride, icx, icy, row, col;
  short	*dctstart;
  /* condition the q table for the dct's we created, must be same input qtable */
  i = 0;
  for (i = 0; i < 64; i++) {
    row = zag[i] >> 3;
    col = zag[i] & 7;
-   fqtbl[i] = (float) qtable[i] * aansf[row] * aansf[col] * 0.125;
+   fqtbl[i] = (Float) qtable[i] * aansf[row] * aansf[col] * 0.125;
    }
  n = nx*ny/64;	/* number of cells */
  /* check consistency of nx, ny, and nblocks */
@@ -421,29 +421,29 @@ static int rdct(image, nx, ny, nblocks, qtable, dct_array)
  start = image + iq;
  /* make a fp copy of this cell */
  /* pf = dctfp;	pff = dctstart; */
- /* for (j=0;j < 64; j++)  *pf++ = (float) *pff++; */
+ /* for (j=0;j < 64; j++)  *pf++ = (Float) *pff++; */
 
  {
- int i;
- float tmp0, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7;
- float tmp10, tmp11, tmp12, tmp13;
- float z5, z11, z13, z10, z12;
+ Int i;
+ Float tmp0, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7;
+ Float tmp10, tmp11, tmp12, tmp13;
+ Float z5, z11, z13, z10, z12;
 
  /* first de-zag and de-quantize */
- { register float *wsptr;
+ { register Float *wsptr;
   short	 *dctptr;
   wsptr = ws;	dctptr = dctstart;
   for (i=0; i < 64; i++) {
-  wsptr[zag[i]] = (float) *dctptr++ * fqtbl[i];
+  wsptr[zag[i]] = (Float) *dctptr++ * fqtbl[i];
   }
  }
   /* Pass 1: process columns. */
   /* we don't check for columns of zeroes since this usually uses full
   precision */
   {
-  register float *wsptr = ws;
-  /* register float *fqtptr = fqtbl; */
-  int	nq = 8;
+  register Float *wsptr = ws;
+  /* register Float *fqtptr = fqtbl; */
+  Int	nq = 8;
   while (nq--) {
     tmp0 = wsptr[0];
     tmp1 = wsptr[8*2];
@@ -499,9 +499,9 @@ static int rdct(image, nx, ny, nblocks, qtable, dct_array)
 
   /* Pass 2: process rows. */
   {
-  register float *wsptr;
+  register Float *wsptr;
   register short *elemptr;
-  int	nq = 8;
+  Int	nq = 8;
   wsptr = ws;	elemptr = start;
   while (nq--) {
       /* Even part */
@@ -557,28 +557,28 @@ static int rdct(image, nx, ny, nblocks, qtable, dct_array)
  return 1;	/* success return */
  }
  /*---------------------------------------------------------------------------*/
-int scan_err(n)
- int	n;
+Int scan_err(n)
+ Int	n;
  {
  printf("scan error # %d\n", n);
  return -1; 
  }
  /*------------------------------------------------------------------------- */
-int trace_scan(x, limit)
+Int trace_scan(x, limit)
  /* scans the contents of x for a TRACE image, decodes cleaned up blocks */
- byte	x[];
- int	limit;
+ Byte	x[];
+ Int	limit;
  {
- byte	*px, *pt, *pb;
+ Byte	*px, *pt, *pb;
  short	*dct_ptr;
- int	i, j, k, n, code, iblock = 0, restart_interval = 8, stat;
- int    RestartNumber, PrevRestartNumber, bcount, knowngaps, expected_restarts;
- int    GapCount, missed, lq, dcount, gcount, next_gap, dq, count_prior;
- int    gapsize[MAX_GAPS], gaprollover[MAX_GAPS];
- int    gapblock[MAX_GAPS], gaprs[MAX_GAPS], gapdel[MAX_GAPS];
- float	gap_rollf[MAX_GAPS];
- float	del_mean, gapdel_mean, fq, gsum, cfac, delq, dismerit1, dismerit2;
- int	del_total, gapdel_total, gap_guess, del_prior, missed_total;
+ Int	i, j, k, n, code, iblock = 0, restart_interval = 8, stat;
+ Int    RestartNumber, PrevRestartNumber, bcount, knowngaps, expected_restarts;
+ Int    GapCount, missed, lq, dcount, gcount, next_gap, dq, count_prior;
+ Int    gapsize[MAX_GAPS], gaprollover[MAX_GAPS];
+ Int    gapblock[MAX_GAPS], gaprs[MAX_GAPS], gapdel[MAX_GAPS];
+ Float	gap_rollf[MAX_GAPS];
+ Float	del_mean, gapdel_mean, fq, gsum, cfac, delq, dismerit1, dismerit2;
+ Int	del_total, gapdel_total, gap_guess, del_prior, missed_total;
  n_restarts_found = n_unexpected = 0;
  /* for TRACE the restart_interval is always 8 but in general it could be
  specified by a DRI message */
@@ -599,7 +599,7 @@ int trace_scan(x, limit)
 	return scan_err(0);
 	}
   }
- px++;   /* skip next byte since only evens can be messages for TRACE */
+ px++;   /* skip next Byte since only evens can be messages for TRACE */
  if ( (limit = limit - 2) <= 0) return scan_err(0);
  }
  /* the comment length should be 20, in the next 2 bytes */
@@ -637,7 +637,7 @@ int trace_scan(x, limit)
   	px--;
 	printf("unexpected code before SOI = %#x\n", *px ); }
   }
- px++;   /* skip next byte since only evens can be messages for TRACE */
+ px++;   /* skip next Byte since only evens can be messages for TRACE */
  }
 
  /* in the TRACE world, the data starts after the SOI rather than a SOS */
@@ -738,7 +738,7 @@ int trace_scan(x, limit)
 	   /* this is a known gap */
 	   gapdel_total += dq;
 	   /* gapdel[gcount] = dq;
-	   //if (count_prior) gap_del_prior[gcount] = (float) del_prior/count_prior;
+	   //if (count_prior) gap_del_prior[gcount] = (Float) del_prior/count_prior;
 	   //   else gap_del_prior[gcount] = 0.0;
 	   //del_prior = 0;	count_prior = 0;
 	   //printf("del at gap %d = %d, mean del prior = %6.1f\n", gcount, dq,
@@ -755,10 +755,10 @@ int trace_scan(x, limit)
 	 dq = del_indices[n_restarts_found-1] = pt - start_indices[n_restarts_found-1];
 	 gapdel_total =+ dq;
 	} else del_indices[n_restarts_found-1] = 0;
-	del_mean = (float) del_total/dcount;
+	del_mean = (Float) del_total/dcount;
 	/* printf("del_mean = %6.1f, intervals used = %d\n", del_mean, dcount); */
 	/* compute mean del for the missing areas */
-	gapdel_mean = (float) gapdel_total/(missed_total);
+	gapdel_mean = (Float) gapdel_total/(missed_total);
 	/* printf("gapdel_mean = %6.1f\n", gapdel_mean); */
 
 	/* scan for large values in del_indices that might be hidden gaps */
@@ -772,7 +772,7 @@ int trace_scan(x, limit)
 	   /* this is a known gap, mark with a negative del */
 	   del_indices[i] = -del_indices[i];
 	   /* printf("large del = %d at %d, factor = %6.1f", dq, i,
-	//	(float) dq/del_mean);
+	//	(Float) dq/del_mean);
 	//printf("   known gap # %d\n", gcount); */
 	   gcount++;
 	   if (gcount < GapCount)  next_gap = gaprs[gcount]; else next_gap = -1;
@@ -781,7 +781,7 @@ int trace_scan(x, limit)
 	 k +=  restart_interval;
 	 if (dq > 1010 && dq > 5.*del_mean) {
 	   /* printf("large del = %d at %d, factor = %6.1f", dq, i,
-	   //	(float) dq/del_mean );
+	   //	(Float) dq/del_mean );
 	   //printf("   potential hidden gap\n"); */
 	   del_indices[i] = -del_indices[i]; /* mark it */
 	   /* insert this into the list of gaps, gapcount is the next gap and
@@ -804,7 +804,7 @@ int trace_scan(x, limit)
 	   }
 	 }
 	}
-	gapdel_mean = (float) gapdel_total/(missed_total);
+	gapdel_mean = (Float) gapdel_total/(missed_total);
 	/* printf("gapdel_mean = %6.1f\n", gapdel_mean); */
 	
 	printf("found %d gaps\n", GapCount);
@@ -834,13 +834,13 @@ int trace_scan(x, limit)
 	 }
 	 /* if we have something, use it, else use gapdel_mean */
 	 /* printf("final: del_prior, count_prior %d %d\n",del_prior, count_prior); */
-	 if (count_prior>0) delq = (float) del_prior/count_prior;
+	 if (count_prior>0) delq = (Float) del_prior/count_prior;
 	 	else delq = gapdel_mean;
 	 /* printf("delq = %6.1f , gapdel_mean = %6.1f\n", delq, gapdel_mean);
 	 //if (gap_del_prior[i] > 0.0) delq=gap_del_prior[i]; else delq=gapdel_mean;
 	 //fq = gapdel[i]/delq - gapsize[i];
 	 //printf("dq, delq, gapsize[i] = %d, %6.1f, %d\n", dq, delq, gapsize[i]); */
-	 fq = (float) dq/delq - (float) gapsize[i];
+	 fq = (Float) dq/delq - (Float) gapsize[i];
 	 /* printf("fq = %6.1f\n", fq); */
 	 if (fq >= 0) {
 	 gap_rollf[i] = fq;	/* actually 8 times the rollover */
@@ -855,14 +855,14 @@ int trace_scan(x, limit)
 	    //printf("rollover predict = %6.1f for gap %d\n", 0.125*gap_rollf[i],i); */
 	}
 
-	cfac = (float) missed/gsum;
+	cfac = (Float) missed/gsum;
 	/* printf("cfac = %7.3f\n", cfac); */
 	gap_guess = 0;
 
 	for (i=0; i<GapCount; i++) {
 	 gap_rollf[i] = fq = 0.125*(cfac*gap_rollf[i]);
 	 /* note that we save fp value in gap_rollf for future use */
-	 dq = (int) (fq + 0.5);
+	 dq = (Int) (fq + 0.5);
 	 gaprollover[i] = dq;
 	 gap_guess += dq;
 	 /* printf("rollover predict = %6.1f -> %d for gap %d\n",fq,gaprollover[i],i); */
@@ -910,9 +910,9 @@ int trace_scan(x, limit)
 	if (nx == 1024 && GapCount > 1) {
 	 for (i=0;i<(GapCount-1);i++) {
 	  short *source;
-	  int	mode, istart, icq;
-	  int	i1,i2,i3,i4,iq,j1;
-	  float	s1, s2;
+	  Int	mode, istart, icq;
+	  Int	i1,i2,i3,i4,iq,j1;
+	  Float	s1, s2;
 	  short	v1,v2,v3,v4;
 	  istart = gapblock[i];
 	  /* printf("initial istart = %d, istart*64 = %d\n", istart, istart*64); */
@@ -939,12 +939,12 @@ int trace_scan(x, limit)
 	  v1 = *(source + i1);
 	  v2 = *(source + i2);
 	  v3 = *(source + i3);
-	  /* d1 += (float) ABS(v1 - v2);
-	     //d2 += (float) ABS(v3 - v4); */
+	  /* d1 += (Float) ABS(v1 - v2);
+	     //d2 += (Float) ABS(v3 - v4); */
 	   s1 += v1 + v2;
 	   s2 += v3 + v4;
-	   /* r1 += ((float) ABS(v1 - v2))/(float)(v1 + v2);
-	   //r2 += ((float) ABS(v3 - v4))/(float)(v3 + v4);
+	   /* r1 += ((Float) ABS(v1 - v2))/(Float)(v1 + v2);
+	   //r2 += ((Float) ABS(v3 - v4))/(Float)(v3 + v4);
 	   //printf("i1, i2 = %#x, %#x, values=%d, %d, dif=%d, sum=%d\n",i1+iq,i2+iq,v1,v2, v1-v2,v1+v2);
 	   //printf("i3, i4 = %#x, %#x, values=%d, %d, dif=%d, sum=%d\n",i3+iq,i4+iq,v3,v4, v3-v4,v3+v4); */
 	   }
@@ -957,8 +957,8 @@ int trace_scan(x, limit)
 	  /* of possible discriminators, the edge vs the mid sum looks most
 	  reliable, derivatives and various ways of adding them fail in my test
 	  cases */
-	  i1 = (int) (gap_rollf[i] + 0.5);
-	  i2 = (int) (gap_rollf[i+1] + 0.5);
+	  i1 = (Int) (gap_rollf[i] + 0.5);
+	  i2 = (Int) (gap_rollf[i+1] + 0.5);
 	  if ( (i1 > 0) || (i2 > 0) ) {	/* note we can't make a change if
 	  				both rollovers are 0 */
 	  if (mode) {
@@ -967,10 +967,10 @@ int trace_scan(x, limit)
 	    if (i1 == 0) { j1 = 1;}
 	    else if (i2 == 0) { j1 = -1;}
 	    else {	/* normal case, consider merit of two possibilities */
-	    dismerit1 = ABS((float) i1 + 1.0 - gap_rollf[i])+
-	    	ABS((float) i2 - 1.0 - gap_rollf[i+1]);
-	    dismerit2 = ABS((float) i1 - 1.0 - gap_rollf[i])+
-	    	ABS((float) i2 + 1.0 - gap_rollf[i+1]);
+	    dismerit1 = ABS((Float) i1 + 1.0 - gap_rollf[i])+
+	    	ABS((Float) i2 - 1.0 - gap_rollf[i+1]);
+	    dismerit2 = ABS((Float) i1 - 1.0 - gap_rollf[i])+
+	    	ABS((Float) i2 + 1.0 - gap_rollf[i+1]);
 		if (dismerit1 < dismerit2) { j1 = 1; } else { j1 = -1; }
 	   }
 	    /* printf("re-align, j1 = %d\n", j1); */
@@ -984,10 +984,10 @@ int trace_scan(x, limit)
 	    if (i1 == 0) { j1 = 1;}
 	    else if (i2 == 0) { j1 = -1;}
 	    else {	/* normal case, consider merit of two possibilities */
-	    dismerit1 = ABS((float) i1 + 1.0 - gap_rollf[i])+
-	    	ABS((float) i2 - 1.0 - gap_rollf[i+1]);
-	    dismerit2 = ABS((float) i1 - 1.0 - gap_rollf[i])+
-	    	ABS((float) i2 + 1.0 - gap_rollf[i+1]);
+	    dismerit1 = ABS((Float) i1 + 1.0 - gap_rollf[i])+
+	    	ABS((Float) i2 - 1.0 - gap_rollf[i+1]);
+	    dismerit2 = ABS((Float) i1 - 1.0 - gap_rollf[i])+
+	    	ABS((Float) i2 + 1.0 - gap_rollf[i+1]);
 		if (dismerit1 < dismerit2) { j1 = 1; } else { j1 = -1; }
 	   }
 	    /* printf("re-align, j1 = %d\n", j1); */
@@ -1046,7 +1046,7 @@ int trace_scan(x, limit)
      /*return scan_err(1);*/
      }
      } }
-  } else { *pt++ = *px++;  n += 2; } /* if not a ff, get next byte also*/
+  } else { *pt++ = *px++;  n += 2; } /* if not a ff, get next Byte also*/
 
   }
      /* printf("final limit value = %d\n", limit);
@@ -1054,11 +1054,11 @@ int trace_scan(x, limit)
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int preload_q()
+Int preload_q()
  {
- int	iq;
+ Int	iq;
  char	*fname, *pname;
- int swapb(char [], int);
+ Int swapb(char [], Int);
  /* get path name */
  pname = (char *) getenv("QTAB");
  if (!pname) pname = "/hosts/shimmer/usr/people/shine/trace/qtables/";
@@ -1074,7 +1074,7 @@ int preload_q()
 	  free(fname);    return -1; }
   if ( fread(qt_all[iq], 2, 64, fin) != 64) { perror("QT file read error");
 	  free(fname);    return -1; }
-  int swapb(char *, int);
+  Int swapb(char *, Int);
  if (!bigendian) swapb( (char *) qt_all[iq], 128);
  fclose(fin);
  }
@@ -1082,22 +1082,22 @@ int preload_q()
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int ana_trace_decoder(narg,ps)	/* initial TRACE decompresser */
+Int ana_trace_decoder(narg,ps)	/* initial TRACE decompresser */
  /* image = trace_decoder(qt, ht, buf) */
- int	narg, ps[];
+ Int	narg, ps[];
  {
  /* presently we read each huffman and q result from files, plan to save the
  entire set in memory for faster results eventually */
- static	int last_htin = -1, qs_loaded = 0;
- int	htin, qtin, iq, nd, limit, j, dim[8], result_sym, stat;
- int	i;
+ static	Int last_htin = -1, qs_loaded = 0;
+ Int	htin, qtin, iq, nd, limit, j, dim[8], result_sym, stat;
+ Int	i;
  static	char	*dctarray = {"$DCT_ARRAY"};
  char	*fname, *pname;
- byte	packed[304], *buf;
+ Byte	packed[304], *buf;
  short	*image;
  struct	ahead	*h;
  /* determine our endian */
- { int one = 1; bigendian = (*(char *)&one == 0); }
+ { Int one = 1; bigendian = (*(char *)&one == 0); }
  /* get the h and q table entries */
  if (int_arg_stat(ps[1], &htin) != 1) return -1;
  if (int_arg_stat(ps[0], &qtin) != 1) return -1;
@@ -1105,7 +1105,7 @@ int ana_trace_decoder(narg,ps)	/* initial TRACE decompresser */
  iq = ps[2];
  if ( sym[iq].class != 4 ) return execute_error(66);
  h = (struct ahead *) sym[iq].spec.array.ptr;
- buf = (byte *) ((char *)h + sizeof(struct ahead));
+ buf = (Byte *) ((char *)h + sizeof(struct ahead));
  nd = h->ndim;
  limit = ana_type_size[sym[iq].type];
  for (j=0;j<nd;j++) limit *= h->dims[j]; 		/* # of bytes */

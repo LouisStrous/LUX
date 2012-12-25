@@ -9,22 +9,22 @@
 #include "action.h"
 #include "anaparser.c.tab.h"
 
-extern int	ans;
+extern Int	ans;
 
 #define startList(x)	{ pushList(ANA_NEW_LIST); pushList(x); }
 				/* start a new list */
-void	pushList(word symNum),	/* push symbol number onto list stack */
-	swapList(int, int),	/* swap items in the list stack */
+void	pushList(Word symNum),	/* push symbol number onto list stack */
+	swapList(Int, Int),	/* swap items in the list stack */
 	away(void);
-word	popList(void);		/* pop an item from the list stack's top */
-int	stackListLength(void),	/* return length of list at top of stack */
-	isInternalSubr(int),	/* 1 if symbol is internal subroutine */
+Word	popList(void);		/* pop an item from the list stack's top */
+Int	stackListLength(void),	/* return length of list at top of stack */
+	isInternalSubr(Int),	/* 1 if symbol is internal subroutine */
 	installExec(void),
-	findSym(int, hashTableEntry *[], int),
-	installSubsc(int),
-	anaerror(char *, int, ...), ana_replace(int, int), ana_type(int, int []),
-	newSymbol(int, ...);
-int	yyerror(char *), yylex(YYSTYPE *);
+	findSym(Int, hashTableEntry *[], Int),
+	installSubsc(Int),
+	anaerror(char *, Int, ...), ana_replace(Int, Int), ana_type(Int, Int []),
+	newSymbol(Int, ...);
+Int	yyerror(char *), yylex(YYSTYPE *);
 %}
 
 %pure_parser
@@ -308,32 +308,32 @@ static char rcsid[] __attribute__ ((unused)) =
 #include <string.h>
 #include <stdlib.h>
 
-int	ans;
+Int	ans;
 
-int calcerror(char *s)
+Int calcerror(char *s)
 /* reports parser errors - required by calcparse() */
 {
-  extern int	calc_error(char *);
+  extern Int	calc_error(char *);
 
   return calc_error(s);
 }
 /*----------------------------------------------------------------------*/
-int calclex(YYSTYPE *lvalp)
+Int calclex(YYSTYPE *lvalp)
 /* returns semantic value of next red token in *lvalp and the lexical
  value as function return value */
 {
-  extern int	calc_lex(YYSTYPE *);
+  extern Int	calc_lex(YYSTYPE *);
 
   return calc_lex(lvalp);
 }
 /*----------------------------------------------------------------------*/
-int ana_calculator(int narg, int ps[])
+Int ana_calculator(Int narg, Int ps[])
 /* go into calculator mode */
 {
-  extern int	calculatorMode;
+  extern Int	calculatorMode;
   extern char	inHistoryBuffer;
-  int	oldhb;
-  int	calcparse(void);
+  Int	oldhb;
+  Int	calcparse(void);
 
   if (curContext)
     return anaerror("Can only enter calculator mode from main execution level.",

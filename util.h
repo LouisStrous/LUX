@@ -36,61 +36,61 @@
    "definitely greater than" means that neither of the numbers is in
    the segment surrounding the other number.
 
-   The function mentioned above compare <double> values.  The
-   corresponding functions that deal with <float> values have <_f>
+   The function mentioned above compare <Double> values.  The
+   corresponding functions that deal with <Float> values have <_f>
    appended to their name, and the corresponding functions that deal
-   with <long double> values have <_l> appended to their name.
+   with <long Double> values have <_l> appended to their name.
  */
 
-int approxeq(const double v1, const double v2) __attribute__ ((const));
-int approxeq_l(const long double v1, const long double v2) __attribute__ ((const));
-int approxeq_f(const float v1, const float v2) __attribute__ ((const));
+Int approxeq(const Double v1, const Double v2) __attribute__ ((const));
+Int approxeq_l(const long Double v1, const long Double v2) __attribute__ ((const));
+Int approxeq_f(const Float v1, const Float v2) __attribute__ ((const));
 /**
    <approxeq> returns non-zero if the two arguments are approximately
    equal, and 0 if they are not, taking the possibility of round-off
    errors into account.  <approxeq> is weaker than <essenteq>.
 
    <approxeq_l> and <approxeq_f> are similar to <approxeq>, but deal
-   with <long double> and <float> arguments rather than <double>
+   with <long Double> and <Float> arguments rather than <Double>
    arguments.
  */
 
-int essenteq(const double v1, const double v2) __attribute__ ((const));
-int essenteq_l(const long double v1, const long double v2) __attribute__ ((const));
-int essenteq_f(const float v1, const float v2) __attribute__ ((const));
+Int essenteq(const Double v1, const Double v2) __attribute__ ((const));
+Int essenteq_l(const long Double v1, const long Double v2) __attribute__ ((const));
+Int essenteq_f(const Float v1, const Float v2) __attribute__ ((const));
 /**
    <essenteq> returns non-zero if the two arguments are essentially
    equal, and 0 if they are not, taking the possibility of round-off
    errors into account.  <essenteq> is stronger than <approxeq>.
 
    <essenteq_l> and <essenteq_f> are similar to <essenteq>, but deal
-   with <long double> and <float> arguments rather than <double>
+   with <long Double> and <Float> arguments rather than <Double>
    arguments.
  */
 
-int definitelt(const double v1, const double v2) __attribute__ ((const));
-int definitelt_l(const long double v1, const long double v2) __attribute__ ((const));
-int definitelt_f(const float v1, const float v2) __attribute__ ((const));
+Int definitelt(const Double v1, const Double v2) __attribute__ ((const));
+Int definitelt_l(const long Double v1, const long Double v2) __attribute__ ((const));
+Int definitelt_f(const Float v1, const Float v2) __attribute__ ((const));
 /**
    <definitelt> returns non-zero if the first argument is definitely
    less than the second, and 0 if it is not, taking the possibility of
    round-off errors into account.
 
    <definitelt_l> and <definitelt_f> are similar to <definitelt>, but
-   deal with <long double> and <float> arguments rather than <double>
+   deal with <long Double> and <Float> arguments rather than <Double>
    arguments.
  */
 
-int definitegt(const double v1, const double v2) __attribute__ ((const));
-int definitegt_l(const long double v1, const long double v2) __attribute__ ((const));
-int definitegt_f(const float v1, const float v2) __attribute__ ((const));
+Int definitegt(const Double v1, const Double v2) __attribute__ ((const));
+Int definitegt_l(const long Double v1, const long Double v2) __attribute__ ((const));
+Int definitegt_f(const Float v1, const Float v2) __attribute__ ((const));
 /**
    <definitegt> returns non-zero if the first argument is definitely
    greater than the second, and 0 if it is not, taking the possibility
    of round-off errors into account.
 
    <definitegt_l> and <definitegt_f> are similar to <definitegt>, but
-   deal with <long double> and <float> arguments rather than <double>
+   deal with <long Double> and <Float> arguments rather than <Double>
    arguments.
  */
 

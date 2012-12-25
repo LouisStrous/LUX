@@ -196,22 +196,22 @@
 #include "action.h"
 #include "anaparser.c.tab.h"
 
-extern int	ans;
+extern Int	ans;
 
 #define startList(x)	{ pushList(ANA_NEW_LIST); pushList(x); }
 				/* start a new list */
-void	pushList(word symNum),	/* push symbol number onto list stack */
-	swapList(int, int),	/* swap items in the list stack */
+void	pushList(Word symNum),	/* push symbol number onto list stack */
+	swapList(Int, Int),	/* swap items in the list stack */
 	away(void);
-word	popList(void);		/* pop an item from the list stack's top */
-int	stackListLength(void),	/* return length of list at top of stack */
-	isInternalSubr(int),	/* 1 if symbol is internal subroutine */
+Word	popList(void);		/* pop an item from the list stack's top */
+Int	stackListLength(void),	/* return length of list at top of stack */
+	isInternalSubr(Int),	/* 1 if symbol is internal subroutine */
 	installExec(void),
-	findSym(int, hashTableEntry *[], int),
-	installSubsc(int),
-	anaerror(char *, int, ...), ana_replace(int, int), ana_type(int, int []),
-	newSymbol(int, ...);
-int	yyerror(char *), yylex(YYSTYPE *);
+	findSym(Int, hashTableEntry *[], Int),
+	installSubsc(Int),
+	anaerror(char *, Int, ...), ana_replace(Int, Int), ana_type(Int, Int []),
+	newSymbol(Int, ...);
+Int	yyerror(char *), yylex(YYSTYPE *);
 
 
 /* Enabling traces.  */
@@ -233,7 +233,7 @@ int	yyerror(char *), yylex(YYSTYPE *);
 #endif
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef int YYSTYPE;
+typedef Int YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
 # define YYSTYPE_IS_TRIVIAL 1
@@ -263,19 +263,19 @@ typedef YYTYPE_INT8 yytype_int8;
      || defined __cplusplus || defined _MSC_VER)
 typedef signed char yytype_int8;
 #else
-typedef short int yytype_int8;
+typedef int16_t yytype_int8;
 #endif
 
 #ifdef YYTYPE_UINT16
 typedef YYTYPE_UINT16 yytype_uint16;
 #else
-typedef unsigned short int yytype_uint16;
+typedef uint16_t yytype_uint16;
 #endif
 
 #ifdef YYTYPE_INT16
 typedef YYTYPE_INT16 yytype_int16;
 #else
-typedef short int yytype_int16;
+typedef int16_t yytype_int16;
 #endif
 
 #ifndef YYSIZE_T
@@ -288,7 +288,7 @@ typedef short int yytype_int16;
 #  include <stddef.h> /* INFRINGES ON USER NAME SPACE */
 #  define YYSIZE_T size_t
 # else
-#  define YYSIZE_T unsigned int
+#  define YYSIZE_T uint32_t
 # endif
 #endif
 
@@ -319,12 +319,12 @@ typedef short int yytype_int16;
 #else
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
-static int
-YYID (int i)
+static Int
+YYID (Int i)
 #else
-static int
+static Int
 YYID (i)
-    int i;
+    Int i;
 #endif
 {
   return i;
@@ -476,7 +476,7 @@ union yyalloc
 #define YYMAXUTOK   1050
 
 #define YYTRANSLATE(YYX)						\
-  ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
+  ((uint32_t) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
 
 /* YYTRANSLATE[YYLEX] -- Bison symbol number corresponding to YYLEX.  */
 static const yytype_uint8 yytranslate[] =
@@ -1139,12 +1139,12 @@ do {									  \
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep)
+yy_symbol_value_print (FILE *yyoutput, Int yytype, YYSTYPE const * const yyvaluep)
 #else
 static void
 yy_symbol_value_print (yyoutput, yytype, yyvaluep)
     FILE *yyoutput;
-    int yytype;
+    Int yytype;
     YYSTYPE const * const yyvaluep;
 #endif
 {
@@ -1171,12 +1171,12 @@ yy_symbol_value_print (yyoutput, yytype, yyvaluep)
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yy_symbol_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep)
+yy_symbol_print (FILE *yyoutput, Int yytype, YYSTYPE const * const yyvaluep)
 #else
 static void
 yy_symbol_print (yyoutput, yytype, yyvaluep)
     FILE *yyoutput;
-    int yytype;
+    Int yytype;
     YYSTYPE const * const yyvaluep;
 #endif
 {
@@ -1225,17 +1225,17 @@ do {								\
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yy_reduce_print (YYSTYPE *yyvsp, int yyrule)
+yy_reduce_print (YYSTYPE *yyvsp, Int yyrule)
 #else
 static void
 yy_reduce_print (yyvsp, yyrule)
     YYSTYPE *yyvsp;
-    int yyrule;
+    Int yyrule;
 #endif
 {
-  int yynrhs = yyr2[yyrule];
-  int yyi;
-  unsigned long int yylno = yyrline[yyrule];
+  Int yynrhs = yyr2[yyrule];
+  Int yyi;
+  unsigned int64_t yylno = yyrline[yyrule];
   YYFPRINTF (stderr, "Reducing stack by rule %d (line %lu):\n",
 	     yyrule - 1, yylno);
   /* The symbols being reduced.  */
@@ -1257,7 +1257,7 @@ do {					\
 
 /* Nonzero means print parse trace.  It is left uninitialized so that
    multiple parsers can coexist.  */
-int yydebug;
+Int yydebug;
 #else /* !YYDEBUG */
 # define YYDPRINTF(Args)
 # define YY_SYMBOL_PRINT(Title, Type, Value, Location)
@@ -1340,7 +1340,7 @@ yystpcpy (yydest, yysrc)
 # ifndef yytnamerr
 /* Copy to YYRES the contents of YYSTR after stripping away unnecessary
    quotes and backslashes, so that it's suitable for yyerror.  The
-   heuristic is that double-quoting is unnecessary unless the string
+   heuristic is that Double-quoting is unnecessary unless the string
    contains an apostrophe, a comma, or backslash (other than
    backslash-backslash).  YYSTR is taken from yytname.  If YYRES is
    null, do not copy; instead, return the length of what the result
@@ -1387,28 +1387,28 @@ yytnamerr (char *yyres, const char *yystr)
 
 /* Copy into YYRESULT an error message about the unexpected token
    YYCHAR while in state YYSTATE.  Return the number of bytes copied,
-   including the terminating null byte.  If YYRESULT is null, do not
+   including the terminating null Byte.  If YYRESULT is null, do not
    copy anything; just return the number of bytes that would be
    copied.  As a special case, return 0 if an ordinary "syntax error"
    message will do.  Return YYSIZE_MAXIMUM if overflow occurs during
    size calculation.  */
 static YYSIZE_T
-yysyntax_error (char *yyresult, int yystate, int yychar)
+yysyntax_error (char *yyresult, Int yystate, Int yychar)
 {
-  int yyn = yypact[yystate];
+  Int yyn = yypact[yystate];
 
   if (! (YYPACT_NINF < yyn && yyn <= YYLAST))
     return 0;
   else
     {
-      int yytype = YYTRANSLATE (yychar);
+      Int yytype = YYTRANSLATE (yychar);
       YYSIZE_T yysize0 = yytnamerr (0, yytname[yytype]);
       YYSIZE_T yysize = yysize0;
       YYSIZE_T yysize1;
-      int yysize_overflow = 0;
+      Int yysize_overflow = 0;
       enum { YYERROR_VERBOSE_ARGS_MAXIMUM = 5 };
       char const *yyarg[YYERROR_VERBOSE_ARGS_MAXIMUM];
-      int yyx;
+      Int yyx;
 
 # if 0
       /* This is so xgettext sees the translatable formats that are
@@ -1432,12 +1432,12 @@ yysyntax_error (char *yyresult, int yystate, int yychar)
 
       /* Start YYX at -YYN if negative to avoid negative indexes in
 	 YYCHECK.  */
-      int yyxbegin = yyn < 0 ? -yyn : 0;
+      Int yyxbegin = yyn < 0 ? -yyn : 0;
 
       /* Stay within bounds of both yycheck and yytname.  */
-      int yychecklim = YYLAST - yyn + 1;
-      int yyxend = yychecklim < YYNTOKENS ? yychecklim : YYNTOKENS;
-      int yycount = 1;
+      Int yychecklim = YYLAST - yyn + 1;
+      Int yyxend = yychecklim < YYNTOKENS ? yychecklim : YYNTOKENS;
+      Int yycount = 1;
 
       yyarg[0] = yytname[yytype];
       yyfmt = yystpcpy (yyformat, yyunexpected);
@@ -1474,7 +1474,7 @@ yysyntax_error (char *yyresult, int yystate, int yychar)
 	     Don't have undefined behavior even if the translation
 	     produced a string with the wrong number of "%s"s.  */
 	  char *yyp = yyresult;
-	  int yyi = 0;
+	  Int yyi = 0;
 	  while ((*yyp = *yyf) != '\0')
 	    {
 	      if (*yyp == '%' && yyf[1] == 's' && yyi < yycount)
@@ -1503,12 +1503,12 @@ yysyntax_error (char *yyresult, int yystate, int yychar)
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep)
+yydestruct (const char *yymsg, Int yytype, YYSTYPE *yyvaluep)
 #else
 static void
 yydestruct (yymsg, yytype, yyvaluep)
     const char *yymsg;
-    int yytype;
+    Int yytype;
     YYSTYPE *yyvaluep;
 #endif
 {
@@ -1531,15 +1531,15 @@ yydestruct (yymsg, yytype, yyvaluep)
 
 #ifdef YYPARSE_PARAM
 #if defined __STDC__ || defined __cplusplus
-int yyparse (void *YYPARSE_PARAM);
+Int yyparse (void *YYPARSE_PARAM);
 #else
-int yyparse ();
+Int yyparse ();
 #endif
 #else /* ! YYPARSE_PARAM */
 #if defined __STDC__ || defined __cplusplus
-int yyparse (void);
+Int yyparse (void);
 #else
-int yyparse ();
+Int yyparse ();
 #endif
 #endif /* ! YYPARSE_PARAM */
 
@@ -1555,41 +1555,41 @@ int yyparse ();
 #ifdef YYPARSE_PARAM
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
-int
+Int
 yyparse (void *YYPARSE_PARAM)
 #else
-int
+Int
 yyparse (YYPARSE_PARAM)
     void *YYPARSE_PARAM;
 #endif
 #else /* ! YYPARSE_PARAM */
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
-int
+Int
 yyparse (void)
 #else
-int
+Int
 yyparse ()
 
 #endif
 #endif
 {
   /* The look-ahead symbol.  */
-int yychar;
+Int yychar;
 
 /* The semantic value of the look-ahead symbol.  */
 YYSTYPE yylval;
 
 /* Number of syntax errors so far.  */
-int yynerrs;
+Int yynerrs;
 
-  int yystate;
-  int yyn;
-  int yyresult;
+  Int yystate;
+  Int yyn;
+  Int yyresult;
   /* Number of tokens to shift before error messages enabled.  */
-  int yyerrstatus;
+  Int yyerrstatus;
   /* Look-ahead token as an internal (translated) token number.  */
-  int yytoken = 0;
+  Int yytoken = 0;
 #if YYERROR_VERBOSE
   /* Buffer for error messages, and its allocated size.  */
   char yymsgbuf[128];
@@ -1628,7 +1628,7 @@ int yynerrs;
 
   /* The number of symbols on the RHS of the reduced rule.
      Keep to zero when no symbol should be popped.  */
-  int yylen = 0;
+  Int yylen = 0;
 
   YYDPRINTF ((stderr, "Starting parse\n"));
 
@@ -1717,7 +1717,7 @@ int yynerrs;
 
 
       YYDPRINTF ((stderr, "Stack size increased to %lu\n",
-		  (unsigned long int) yystacksize));
+		  (unsigned int64_t) yystacksize));
 
       if (yyss + yystacksize - 1 <= yyssp)
 	YYABORT;
@@ -2459,32 +2459,32 @@ static char rcsid[] __attribute__ ((unused)) =
 #include <string.h>
 #include <stdlib.h>
 
-int	ans;
+Int	ans;
 
-int calcerror(char *s)
+Int calcerror(char *s)
 /* reports parser errors - required by calcparse() */
 {
-  extern int	calc_error(char *);
+  extern Int	calc_error(char *);
 
   return calc_error(s);
 }
 /*----------------------------------------------------------------------*/
-int calclex(YYSTYPE *lvalp)
+Int calclex(YYSTYPE *lvalp)
 /* returns semantic value of next red token in *lvalp and the lexical
  value as function return value */
 {
-  extern int	calc_lex(YYSTYPE *);
+  extern Int	calc_lex(YYSTYPE *);
 
   return calc_lex(lvalp);
 }
 /*----------------------------------------------------------------------*/
-int ana_calculator(int narg, int ps[])
+Int ana_calculator(Int narg, Int ps[])
 /* go into calculator mode */
 {
-  extern int	calculatorMode;
+  extern Int	calculatorMode;
   extern char	inHistoryBuffer;
-  int	oldhb;
-  int	calcparse(void);
+  Int	oldhb;
+  Int	calcparse(void);
 
   if (curContext)
     return anaerror("Can only enter calculator mode from main execution level.",

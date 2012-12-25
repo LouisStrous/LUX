@@ -3,9 +3,9 @@
 
 char	batch='\0';
 
-int main(void)
+Int main(void)
 {
-  int	c;
+  Int	c;
 
   rawIo();
   do {

@@ -32,39 +32,39 @@
 #define FALSE 0
 #define TRUE 1
 
- typedef int bool;
+ typedef Int bool;
  typedef struct codestruct {
             struct codestruct *prefix;
             unsigned char first,suffix;
         } codetype;
  codetype *codetable;                /* LZW compression code data */
- int datasize,codesize,codemask;     /* Decoder working variables */
- int clear,eoi;                      /* Special code values */
+ Int datasize,codesize,codemask;     /* Decoder working variables */
+ Int clear,eoi;                      /* Special code values */
  
- void readextension(FILE *), readimage(FILE *, int, char *),
-   loadcolortable(FILE *, int, int), readraster(int, FILE *, unsigned char *);
- static	int	quit = 0, status = 1, gcmflag;
- static int	nxs, nys;
+ void readextension(FILE *), readimage(FILE *, Int, char *),
+   loadcolortable(FILE *, Int, Int), readraster(Int, FILE *, unsigned char *);
+ static	Int	quit = 0, status = 1, gcmflag;
+ static Int	nxs, nys;
 
-int	ana_gifread(int, int []);
-void	process(int, unsigned char **);
+Int	ana_gifread(Int, Int []);
+void	process(Int, unsigned char **);
 
  /*------------------------------------------------------------------------- */
-int ana_gifread_f(narg, ps)
+Int ana_gifread_f(narg, ps)
  /* a function version that returns 1 if read OK */
- int	narg, ps[];
+ Int	narg, ps[];
  {
  if ( ana_gifread(narg, ps) == 1 ) return 1; else return 4;
  }
  /*------------------------------------------------------------------------- */
-int ana_gifread(int narg, int ps[])       /* gifread subroutine */
+Int ana_gifread(Int narg, Int ps[])       /* gifread subroutine */
  /* read a "simple" gif file, 8 bit deep */
  /* call is gifread,array,file,map where map is the color map, if
  map not in argument list, you don't get it! */
  {
  FILE	*fin;
- int    iq, n, cr, pixel;
- int    sep, cmsym, dim[8];
+ Int    iq, n, cr, pixel;
+ Int    sep, cmsym, dim[8];
  char   *p, *name, *data;
  struct ahead   *h;
  struct GIFScreen gh;
@@ -79,7 +79,7 @@ int ana_gifread(int narg, int ps[])       /* gifread subroutine */
  /* ck if output colormap wanted, set cmsym = 0 if not */
  if (narg > 2) { cmsym = ps[2]; } else cmsym = 0;
 
- /* gif files must have a 6 byte signature followed by a screen descriptor and
+ /* gif files must have a 6 Byte signature followed by a screen descriptor and
  normally followed by a global color map, the first 2 of these total 15 bytes*/
 
  if (fread(&gh,1,13,fin) != 13) { perror("gifread in header");
@@ -96,7 +96,7 @@ int ana_gifread(int narg, int ps[])       /* gifread subroutine */
  nys = ( (gh.height_msb << 8) | gh.height_lsb );
  /* printf("screen size %d %d\n", nxs, nys); */
 
- /* define the output array as a byte of the screen size */
+ /* define the output array as a Byte of the screen size */
  iq = ps[0];	dim[0] = nxs;	dim[1] = nys;
  if ( redef_array(iq, 0, 2, dim) != 1) { fclose(fin); return -1; }
  h = (struct ahead *) sym[iq].spec.array.ptr;
@@ -161,11 +161,11 @@ void readextension(FILE *fin)
  /* printf("note , extension with code = %c ignored\n"); */
  }
  /*------------------------------------------------------------------------- */
-void readimage(FILE *fin, int cmsym, char *data)
+void readimage(FILE *fin, Int cmsym, char *data)
  {
  struct GIFImage gimage;
- int	nx, ny, ix, iy, local, localbits, nc, fflag;
- int	n, m, stride;
+ Int	nx, ny, ix, iy, local, localbits, nc, fflag;
+ Int	n, m, stride;
  char	*image, *p, *p2;
  if (fread(&gimage.left_lsb,1,9,fin) != 9) {
  perror("gifread in image descriptor");
@@ -211,9 +211,9 @@ void readimage(FILE *fin, int cmsym, char *data)
  }
  }
  /*------------------------------------------------------------------------- */
-void loadcolortable(FILE *fin, int nc, int cmsym)
+void loadcolortable(FILE *fin, Int nc, Int cmsym)
  {
- int	dim[8], ncolmap;
+ Int	dim[8], ncolmap;
  struct ahead   *h;
  char	*colormap;
  /* we either load the color table into ana symbol cmsym or we just
@@ -253,9 +253,9 @@ void outcode(register codetype *p, register unsigned char **fill)
    code. */
 
  /*------------------------------------------------------------------------- */
-void process(int code, unsigned char **fill)
+void process(Int code, unsigned char **fill)
  {
-        static int avail,oldcode;
+        static Int avail,oldcode;
         register codetype *p;
 
         if (code == clear) {
@@ -292,14 +292,14 @@ void process(int code, unsigned char **fill)
         }
 }
  /*------------------------------------------------------------------------- */
-void readraster(int nsize, FILE *fin, unsigned char *raster)
+void readraster(Int nsize, FILE *fin, unsigned char *raster)
  {
 	unsigned char *fill;
         unsigned char buf[255];
-        register int bits=0;
+        register Int bits=0;
         register unsigned count,datum=0;
         register unsigned char *ch;
-        register int code;
+        register Int code;
 
 	fill = raster;
         datasize = getc(fin);

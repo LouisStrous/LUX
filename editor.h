@@ -15,7 +15,7 @@
 /* a "line" is only complete when the RETURN key is pressed.  [L]
    a "sentence" fits in a single line on the screen.  [S]
    an "exp" is a single unambiguous expression.  [E]
-   a "word" is a single word.  [W]
+   a "Word" is a single Word.  [W]
    a "char" is a single character. [C] */
 /* the codes are all the same as in standard Emacs except where noted */
 
@@ -36,7 +36,7 @@
 #define UAR	0x106
 #define DAR	0x107
 #define CGR	0x229   /* ESC-)  (complete groups) NON-EMACS */
-#define CPW	0x257   /* ESC-w  (complete word) NON-EMACS */
+#define CPW	0x257   /* ESC-w  (complete Word) NON-EMACS */
 #define ARG	'\x15'  /* C-u    (argument) */
 
 /* line: */
@@ -60,11 +60,11 @@
 #define BDE	0x301    /* kill expr back		(ESC BKS) NON-EMACS */
 #define TRE	0x214	/* transpose exprs		(ESC C-t) */
 
-/* word: */
-#define FWW	0x246	/* forward word			(ESC-f) */
-#define BKW	0x242	/* back word			(ESC-b) */
-#define DLW	0x244	/* delete word forward		(ESC-d) */
-#define BDW	(0x200 + DEL)	/* delete word back	(ESC-del) */
+/* Word: */
+#define FWW	0x246	/* forward Word			(ESC-f) */
+#define BKW	0x242	/* back Word			(ESC-b) */
+#define DLW	0x244	/* delete Word forward		(ESC-d) */
+#define BDW	(0x200 + DEL)	/* delete Word back	(ESC-del) */
 #define TRW	0x254	/* transpose words		(ESC-t) */
 
 /* char: */

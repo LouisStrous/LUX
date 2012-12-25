@@ -24,13 +24,13 @@
 extern char recording;
 extern FILE *recordFile;
 
-int Printf(const char *format, ...);
-int Fprintf(FILE *stream, const char *format, ...);
-int Vprintf(const char *format, va_list arg);
-int Vfprintf(FILE *stream, const char *format, va_list arg);
-int Puts(const char *s);
-int Fputs(const char *s, FILE *stream);
-int Fputc(int c, FILE *stream);
+Int Printf(const char *format, ...);
+Int Fprintf(FILE *stream, const char *format, ...);
+Int Vprintf(const char *format, va_list arg);
+Int Vfprintf(FILE *stream, const char *format, va_list arg);
+Int Puts(const char *s);
+Int Fputs(const char *s, FILE *stream);
+Int Fputc(Int c, FILE *stream);
 
 /* also redefine the output macros: first undefine the old ones so no */
 /* warnings ensue during compilation */

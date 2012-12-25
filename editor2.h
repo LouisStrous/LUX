@@ -11,7 +11,7 @@
 /* a "line" is only complete when the RETURN key is pressed.  [L]
    a "sentence" fits in a single line on the screen.  [S]
    an "exp" is a single unambiguous expression.  [E]
-   a "word" is a single word.  [W]
+   a "Word" is a single Word.  [W]
    a "char" is a single character. [C] */
 /* the codes are all the same as in standard Emacs except where noted */
 
@@ -55,14 +55,14 @@
 #define BKEM	0xffffff82	/* back expr		(C-M-b) */
 #define DLEM	0xffffff8b	/* kill expr forw	(C-M-k) */
 
-/* word: */
-#define FWW	0x266	/* forward word			(ESC-f) */
-#define BKW	0x262	/* back word			(ESC-b) */
-#define DLW	0x264	/* delete word forward		(ESC-d) */
-#define BDW	0x27f	/* delete word back		(ESC-del) */
+/* Word: */
+#define FWW	0x266	/* forward Word			(ESC-f) */
+#define BKW	0x262	/* back Word			(ESC-b) */
+#define DLW	0x264	/* delete Word forward		(ESC-d) */
+#define BDW	0x27f	/* delete Word back		(ESC-del) */
 #define TRW	0x274	/* transpose words		(ESC-t) */
-#define FWWM	0xffffffe6	/* forward word		(M-f) */
-#define BKWM	0xffffffe2	/* backward word	(M-b) */
+#define FWWM	0xffffffe6	/* forward Word		(M-f) */
+#define BKWM	0xffffffe2	/* backward Word	(M-b) */
 #define DLWM	0xffffffe4	/* delete w forw	(M-d) */
 #define BDWM	0xffffffff	/* delete w back	(M-del) */
 #define TRWM	0xfffffff4	/* transpose words	(M-t) */

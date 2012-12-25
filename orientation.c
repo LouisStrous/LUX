@@ -9,10 +9,10 @@
 static char rcsid[] __attribute__ ((unused)) =
  "$Id: orientation.c,v 4.0 2001/02/07 20:37:04 strous Exp $";
 
-int	ana_replace(int, int);
+Int	ana_replace(Int, Int);
 /*--------------------------------------------------------------------*/
 #define SQRT3	1.7320508075688772935
-int ana_orientation(int narg, int ps[])
+Int ana_orientation(Int narg, Int ps[])
 /* determine local orientation in a two- or three-dimensional data array */
 /* Syntax: ORIENTATION,data,widths[,orientation,values,wavenumber, */
 /*                                  grid,order] */
@@ -37,15 +37,15 @@ int ana_orientation(int narg, int ps[])
 /*          Applications", 2nd edition, Springer Verlag, 1993 */
 /* see at end of file for more info on the method */
 {
-  double	j11, j22, j33, j12, j13, j23, gg;
-  float	*out, *comp, *widths, *data, *wave;
-  float	*smooth1, *smooth2, *smooth3;
-  float	x, sum, *ptr, *ptr2, y, d1, d2, d3, *ptr3, *ptr0, *aspect;
-  double	c0, c1, c2;
-  double	q, r, ang, c, s, w;
-  int	values, vector, d, *dims, i, iq, n1, n2, n3, odims[4], j, t, *grid;
-  int	step[4], w1, w2, w3, m1, m2, m3, i2, j2, t2, grid2[3], i3, j3, t3;
-  int	order, wavenum, ndim, xdims[3];
+  Double	j11, j22, j33, j12, j13, j23, gg;
+  Float	*out, *comp, *widths, *data, *wave;
+  Float	*smooth1, *smooth2, *smooth3;
+  Float	x, sum, *ptr, *ptr2, y, d1, d2, d3, *ptr3, *ptr0, *aspect;
+  Double	c0, c1, c2;
+  Double	q, r, ang, c, s, w;
+  Int	values, vector, d, *dims, i, iq, n1, n2, n3, odims[4], j, t, *grid;
+  Int	step[4], w1, w2, w3, m1, m2, m3, i2, j2, t2, grid2[3], i3, j3, t3;
+  Int	order, wavenum, ndim, xdims[3];
   char	vocal, getVal, getVec, getJ, getWave, parallel;
 
   /* First, treat input data */
@@ -70,14 +70,14 @@ int ana_orientation(int narg, int ps[])
     return anaerror("Need 2D or 3D array", *ps);
   dims = array_dims(*ps);
   iq = ana_float(1, ps);
-  data = (float *) array_data(iq);
+  data = (Float *) array_data(iq);
   if (symbol_class(ps[1]) != ANA_ARRAY) /* WIDTHS */
     return cerror(NEED_ARR, ps[1]);
   d = array_size(ps[1]);
   if (d != ndim)
     return anaerror("Need %1d smooth widths", ps[1], ndim);
   iq = ana_float(1, &ps[1]);
-  widths = (float *) array_data(iq);
+  widths = (Float *) array_data(iq);
   for (i = 0; i < ndim; i++)
     if (widths[i] < 0)
       return anaerror("Need nonnegative smoothing widths", ps[1]);
@@ -85,8 +85,8 @@ int ana_orientation(int narg, int ps[])
     iq = ana_long(1, &ps[5]);
     if (array_size(iq) != ndim)
       return anaerror("Need %1d output cube dimensions", ps[5], ndim);
-    grid = (int *) array_data(iq);
-    memcpy(grid2, grid, ndim*sizeof(float));
+    grid = (Int *) array_data(iq);
+    memcpy(grid2, grid, ndim*sizeof(Float));
     if (grid[0] == 0)
       grid2[0] = dims[0];
     else if (grid[0] < 0 || grid[0] > dims[0])
@@ -102,13 +102,13 @@ int ana_orientation(int narg, int ps[])
 	return anaerror("Illegal output cube y dimension: %d", ps[5], grid[2]);
     }
   } else
-    memcpy(grid2, dims, ndim*sizeof(float));
+    memcpy(grid2, dims, ndim*sizeof(Float));
   if (narg > 6 && ps[6]) {	/* ASPECT */
     if (symbol_class(ps[6]) != ANA_ARRAY)
       return cerror(NEED_ARR, ps[6]);
     if (array_size(ps[6]) != ndim)
       return anaerror("Need %1d aspect sizes", ps[6], ndim);
-    aspect = (float *) array_data(ana_float(1, ps + 6));
+    aspect = (Float *) array_data(ana_float(1, ps + 6));
   } else
     aspect = NULL;
   if (narg > 7 && ps[7]) {	/* ORDER: discrete derivative accuracy */
@@ -126,15 +126,15 @@ int ana_orientation(int narg, int ps[])
   /* Create Gaussian smoothing kernels */
 				/* X kernel */
   w = widths[0]*0.6005612;
-  n1 = 4*((int) w) + 1;
+  n1 = 4*((Int) w) + 1;
   if (n1 > dims[0]) {
     n1 = dims[0];
     if (n1 % 2 == 0)
       n1--;
   }
-  allocate(smooth1, n1, float);
+  allocate(smooth1, n1, Float);
   y = w? 1./w: 0;
-  x = -((int) n1/2)*y;
+  x = -((Int) n1/2)*y;
   ptr = smooth1;
   sum = 0;
   for (i = 0; i < n1; i++) {
@@ -149,13 +149,13 @@ int ana_orientation(int narg, int ps[])
   }
 				/* Y kernel */
   w = widths[1]*0.6005612;
-  n2 = 4*((int) w) + 1;
+  n2 = 4*((Int) w) + 1;
   if (n2 > dims[1]) {
     n2 = dims[1];
     if (n2 % 2 == 0)
       n2--;
   }
-  allocate(smooth2, n2, float);
+  allocate(smooth2, n2, Float);
   y = w? 1./w: 0;
   x = -(n2/2)*y;
   ptr = smooth2;
@@ -173,13 +173,13 @@ int ana_orientation(int narg, int ps[])
 				/* T kernel */
   if (ndim == 3) {
     w = widths[2]*0.6005612;
-    n3 = 4*((int) w) + 1;
+    n3 = 4*((Int) w) + 1;
     if (n3 > dims[2]) {
       n3 = dims[2];
       if (n3 % 2 == 0)
 	n3--;
     }
-    allocate(smooth3, n3, float);
+    allocate(smooth3, n3, Float);
     y = w? 1./w: 0;
     x = -(n3/2)*y;
     ptr = smooth3;
@@ -199,7 +199,7 @@ int ana_orientation(int narg, int ps[])
   n1 /= 2;
   n2 /= 2;
 				/* Create the output symbols */
-  memcpy(odims + 1, grid2, ndim*sizeof(int));
+  memcpy(odims + 1, grid2, ndim*sizeof(Int));
   if (getVal) {
     odims[0] = ndim;
     if ((values = array_scratch(ANA_FLOAT, ndim + 1, odims)) < 0) {
@@ -209,7 +209,7 @@ int ana_orientation(int narg, int ps[])
 	free(smooth3);
       return ANA_ERROR;
     }
-    out = (float *) array_data(values);
+    out = (Float *) array_data(values);
   }
   if (getVec) {
     if (ndim == 3) {
@@ -227,7 +227,7 @@ int ana_orientation(int narg, int ps[])
 	return ANA_ERROR;
       }
     }
-    comp = (float *) array_data(vector);
+    comp = (Float *) array_data(vector);
   }
   if (getWave) {
     if ((wavenum = array_scratch(ANA_FLOAT, ndim, odims + 1)) < 0) {
@@ -237,12 +237,12 @@ int ana_orientation(int narg, int ps[])
 	free(smooth3);
       return ANA_ERROR;
     }
-    wave = (float *) array_data(wavenum);
+    wave = (Float *) array_data(wavenum);
   }
   vocal = (internalMode & 1);
   getJ = (internalMode & 2)? 1: 0;
   /* Now start the real work */
-  memcpy(xdims, dims, ndim*sizeof(int));
+  memcpy(xdims, dims, ndim*sizeof(Int));
   if (ndim == 2) {
     xdims[2] = 1;
     grid2[2] = 1;
@@ -584,10 +584,10 @@ int ana_orientation(int narg, int ps[])
   return 1;
 }
 
-int ana_root3(int narg, int ps[])
+Int ana_root3(Int narg, Int ps[])
 {
-  float	c0, c1, c2, q, r, s, c, ang, *p;
-  int	iq;
+  Float	c0, c1, c2, q, r, s, c, ang, *p;
+  Int	iq;
 
   c0 = float_arg(*ps++);
   c1 = float_arg(*ps++);
@@ -611,7 +611,7 @@ int ana_root3(int narg, int ps[])
   c2 = r - q;
   iq = 3;
   iq = array_scratch(ANA_FLOAT, 1, &iq);
-  p = (float *) LPTR(HEAD(iq));
+  p = (Float *) LPTR(HEAD(iq));
   *p++ = c0;  *p++ = c1;  *p++ = c2;
   return iq;
 }

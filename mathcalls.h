@@ -26,19 +26,19 @@
 
    __MATHCALL (NAME,[_r], (ARGS...));
 
-   This means there is a function `NAME' returning `double' and a function
-   `NAMEf' returning `float'.  Each place `_Mdouble_' appears in the
-   prototype, that is actually `double' in the prototype for `NAME' and
-   `float' in the prototype for `NAMEf'.  Reentrant variant functions are
+   This means there is a function `NAME' returning `Double' and a function
+   `NAMEf' returning `Float'.  Each place `_Mdouble_' appears in the
+   prototype, that is actually `Double' in the prototype for `NAME' and
+   `Float' in the prototype for `NAMEf'.  Reentrant variant functions are
    called `NAME_r' and `NAMEf_r'.
 
-   Functions returning other types like `int' are declared using the macro:
+   Functions returning other types like `Int' are declared using the macro:
 
    __MATHDECL (TYPE, NAME,[_r], (ARGS...));
 
    This is just like __MATHCALL but for a function returning `TYPE'
    instead of `_Mdouble_'.  In all of these cases, there is still
-   both a `NAME' and a `NAMEf' that takes `float' arguments.
+   both a `NAME' and a `NAMEf' that takes `Float' arguments.
 
    Note that there must be no whitespace before the argument passed for
    NAME, to make token pasting work with -traditional.  */
@@ -101,10 +101,10 @@ _Mdouble_BEGIN_NAMESPACE
 __MATHCALL (exp,, (_Mdouble_ __x));
 
 /* Break VALUE into a normalized fraction and an integral power of 2.  */
-__MATHCALL (frexp,, (_Mdouble_ __x, int *__exponent));
+__MATHCALL (frexp,, (_Mdouble_ __x, Int *__exponent));
 
 /* X times (two to the EXP power).  */
-__MATHCALL (ldexp,, (_Mdouble_ __x, int __exponent));
+__MATHCALL (ldexp,, (_Mdouble_ __x, Int __exponent));
 
 /* Natural logarithm of X.  */
 __MATHCALL (log,, (_Mdouble_ __x));
@@ -190,19 +190,19 @@ __MATHCALL (fmod,, (_Mdouble_ __x, _Mdouble_ __y));
 
 /* Return 0 if VALUE is finite or NaN, +1 if it
    is +Infinity, -1 if it is -Infinity.  */
-__MATHDECL_1 (int,__isinf,, (_Mdouble_ __value)) __attribute__ ((__const__));
+__MATHDECL_1 (Int,__isinf,, (_Mdouble_ __value)) __attribute__ ((__const__));
 
 /* Return nonzero if VALUE is finite and not NaN.  */
-__MATHDECL_1 (int,__finite,, (_Mdouble_ __value)) __attribute__ ((__const__));
+__MATHDECL_1 (Int,__finite,, (_Mdouble_ __value)) __attribute__ ((__const__));
 _Mdouble_END_NAMESPACE
 
 #ifdef __USE_MISC
 /* Return 0 if VALUE is finite or NaN, +1 if it
    is +Infinity, -1 if it is -Infinity.  */
-__MATHDECL_1 (int,isinf,, (_Mdouble_ __value)) __attribute__ ((__const__));
+__MATHDECL_1 (Int,isinf,, (_Mdouble_ __value)) __attribute__ ((__const__));
 
 /* Return nonzero if VALUE is finite and not NaN.  */
-__MATHDECL_1 (int,finite,, (_Mdouble_ __value)) __attribute__ ((__const__));
+__MATHDECL_1 (Int,finite,, (_Mdouble_ __value)) __attribute__ ((__const__));
 
 /* Return the remainder of X/Y.  */
 __MATHCALL (drem,, (_Mdouble_ __x, _Mdouble_ __y));
@@ -221,26 +221,26 @@ __END_NAMESPACE_C99
 
 #ifdef __USE_ISOC99
 __BEGIN_NAMESPACE_C99
-/* Return representation of NaN for double type.  */
+/* Return representation of NaN for Double type.  */
 __MATHCALLX (nan,, (__const char *__tagb), (__const__));
 __END_NAMESPACE_C99
 #endif
 
 
 /* Return nonzero if VALUE is not a number.  */
-__MATHDECL_1 (int,__isnan,, (_Mdouble_ __value)) __attribute__ ((__const__));
+__MATHDECL_1 (Int,__isnan,, (_Mdouble_ __value)) __attribute__ ((__const__));
 
 #if defined __USE_MISC || defined __USE_XOPEN
 /* Return nonzero if VALUE is not a number.  */
-__MATHDECL_1 (int,isnan,, (_Mdouble_ __value)) __attribute__ ((__const__));
+__MATHDECL_1 (Int,isnan,, (_Mdouble_ __value)) __attribute__ ((__const__));
 
 /* Bessel functions.  */
 __MATHCALL (j0,, (_Mdouble_));
 __MATHCALL (j1,, (_Mdouble_));
-__MATHCALL (jn,, (int, _Mdouble_));
+__MATHCALL (jn,, (Int, _Mdouble_));
 __MATHCALL (y0,, (_Mdouble_));
 __MATHCALL (y1,, (_Mdouble_));
-__MATHCALL (yn,, (int, _Mdouble_));
+__MATHCALL (yn,, (Int, _Mdouble_));
 #endif
 
 
@@ -269,7 +269,7 @@ __MATHCALL (gamma,, (_Mdouble_));
 /* Reentrant version of lgamma.  This function uses the global variable
    `signgam'.  The reentrant version instead takes a pointer and stores
    the value through it.  */
-__MATHCALL (lgamma,_r, (_Mdouble_, int *__signgamp));
+__MATHCALL (lgamma,_r, (_Mdouble_, Int *__signgamp));
 #endif
 
 
@@ -282,7 +282,7 @@ __MATHCALL (rint,, (_Mdouble_ __x));
 /* Return X + epsilon if X < Y, X - epsilon if X > Y.  */
 __MATHCALLX (nextafter,, (_Mdouble_ __x, _Mdouble_ __y), (__const__));
 # ifdef __USE_ISOC99
-__MATHCALLX (nexttoward,, (_Mdouble_ __x, long double __y), (__const__));
+__MATHCALLX (nexttoward,, (_Mdouble_ __x, long Double __y), (__const__));
 # endif
 
 /* Return the remainder of integer divison X / Y with infinite precision.  */
@@ -290,16 +290,16 @@ __MATHCALL (remainder,, (_Mdouble_ __x, _Mdouble_ __y));
 
 # if defined __USE_MISC || defined __USE_ISOC99
 /* Return X times (2 to the Nth power).  */
-__MATHCALL (scalbn,, (_Mdouble_ __x, int __n));
+__MATHCALL (scalbn,, (_Mdouble_ __x, Int __n));
 # endif
 
 /* Return the binary exponent of X, which must be nonzero.  */
-__MATHDECL (int,ilogb,, (_Mdouble_ __x));
+__MATHDECL (Int,ilogb,, (_Mdouble_ __x));
 #endif
 
 #ifdef __USE_ISOC99
 /* Return X times (2 to the Nth power).  */
-__MATHCALL (scalbln,, (_Mdouble_ __x, long int __n));
+__MATHCALL (scalbln,, (_Mdouble_ __x, int64_t __n));
 
 /* Round X to integral value in floating-point format using current
    rounding direction, but do not raise inexact exception.  */
@@ -316,20 +316,20 @@ __MATHCALLX (trunc,, (_Mdouble_ __x), (__const__));
 /* Compute remainder of X and Y and put in *QUO a value with sign of x/y
    and magnitude congruent `mod 2^n' to the magnitude of the integral
    quotient x/y, with n >= 3.  */
-__MATHCALL (remquo,, (_Mdouble_ __x, _Mdouble_ __y, int *__quo));
+__MATHCALL (remquo,, (_Mdouble_ __x, _Mdouble_ __y, Int *__quo));
 
 
 /* Conversion functions.  */
 
 /* Round X to nearest integral value according to current rounding
    direction.  */
-__MATHDECL (long int,lrint,, (_Mdouble_ __x));
-__MATHDECL (long long int,llrint,, (_Mdouble_ __x));
+__MATHDECL (int64_t,lrint,, (_Mdouble_ __x));
+__MATHDECL (long int64_t,llrint,, (_Mdouble_ __x));
 
 /* Round X to nearest integral value, rounding halfway cases away from
    zero.  */
-__MATHDECL (long int,lround,, (_Mdouble_ __x));
-__MATHDECL (long long int,llround,, (_Mdouble_ __x));
+__MATHDECL (int64_t,lround,, (_Mdouble_ __x));
+__MATHDECL (long int64_t,llround,, (_Mdouble_ __x));
 
 
 /* Return positive difference between X and Y.  */
@@ -343,11 +343,11 @@ __MATHCALL (fmin,, (_Mdouble_ __x, _Mdouble_ __y));
 
 
 /* Classify given number.  */
-__MATHDECL_1 (int, __fpclassify,, (_Mdouble_ __value))
+__MATHDECL_1 (Int, __fpclassify,, (_Mdouble_ __value))
      __attribute__ ((__const__));
 
 /* Test for negative number.  */
-__MATHDECL_1 (int, __signbit,, (_Mdouble_ __value))
+__MATHDECL_1 (Int, __signbit,, (_Mdouble_ __value))
      __attribute__ ((__const__));
 
 

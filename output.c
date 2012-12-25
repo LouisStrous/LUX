@@ -7,6 +7,7 @@
 #endif
 #include <stdio.h>
 #include <stdarg.h>
+#include "types.h"
 static char rcsid[] __attribute__ ((unused)) =
 "$Id: output.c,v 4.0 2001/02/07 20:37:04 strous Exp $";
 
@@ -14,10 +15,10 @@ extern char	recording;
 extern FILE	*recordFile;
 
 /*----------------------------------------------------------------------*/
-int Printf(const char *format, ...)
+Int Printf(const char *format, ...)
 {
   va_list	ap;
-  int	result;
+  Int	result;
 
   va_start(ap, format);
   if (recording & 2)		/* record output */
@@ -27,10 +28,10 @@ int Printf(const char *format, ...)
   return result;
 }
 /*----------------------------------------------------------------------*/
-int Fprintf(FILE *stream, const char *format, ...)
+Int Fprintf(FILE *stream, const char *format, ...)
 {
   va_list	ap;
-  int	result;
+  Int	result;
 
   va_start(ap, format);
   if ((stream == stdout || stream == stderr) && (recording & 2))
@@ -41,9 +42,9 @@ int Fprintf(FILE *stream, const char *format, ...)
   return result;
 }
 /*----------------------------------------------------------------------*/
-int Vprintf(const char *format, va_list arg)
+Int Vprintf(const char *format, va_list arg)
 {
-  int	result;
+  Int	result;
 
   if (recording & 2) /* record output */
     vfprintf(recordFile, format, arg);
@@ -51,9 +52,9 @@ int Vprintf(const char *format, va_list arg)
   return result;
 }  
 /*----------------------------------------------------------------------*/
-int Vfprintf(FILE *stream, const char *format, va_list arg)
+Int Vfprintf(FILE *stream, const char *format, va_list arg)
 {
-  int	result;
+  Int	result;
 
   if ((stream == stdout || stream == stderr) && (recording & 2))
 						/* record output */
@@ -62,7 +63,7 @@ int Vfprintf(FILE *stream, const char *format, va_list arg)
   return result;
 }
 /*----------------------------------------------------------------------*/
-int Puts(const char *s)
+Int Puts(const char *s)
 {
   if (recording & 2)		/* record output */
   { fputs(s, recordFile);
@@ -70,7 +71,7 @@ int Puts(const char *s)
   return puts(s);
 }  
 /*----------------------------------------------------------------------*/
-int Fputs(const char *s, FILE *stream)
+Int Fputs(const char *s, FILE *stream)
 {
   if ((stream == stdout || stream == stderr)
       && (recording & 2)
@@ -79,7 +80,7 @@ int Fputs(const char *s, FILE *stream)
   return fputs(s, stream);
 }
 /*----------------------------------------------------------------------*/
-int Fputc(int c, FILE *stream)
+Int Fputc(Int c, FILE *stream)
 {
   if ((stream == stdout || stream == stderr)
       && (recording & 2)

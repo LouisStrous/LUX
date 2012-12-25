@@ -4,20 +4,20 @@
 #include "action.h"
 
  /*------------------------------------------------------------------------- */
-static void rdct_spike(word *start, int ystride, float *ws)
+static void rdct_spike(Word *start, Int ystride, Float *ws)
  /* does reverse dct for one cell, specialize for a spike smooth */
 {
-  float	tmp0, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7;
-  float	tmp10, tmp11, tmp12, tmp13;
-  float	z5, z11, z13, z10, z12;
+  Float	tmp0, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7;
+  Float	tmp10, tmp11, tmp12, tmp13;
+  Float	z5, z11, z13, z10, z12;
 
   /* no de-zag and de-quantize here */
   /* Pass 1: process columns. */
   /* we don't check for columns of zeroes since this usually uses full
      precision */
 {
-  register float *wsptr = ws;
-  int	nq = 8;
+  register Float *wsptr = ws;
+  Int	nq = 8;
 
   while (nq--) {
     tmp0 = wsptr[0];
@@ -75,9 +75,9 @@ static void rdct_spike(word *start, int ystride, float *ws)
 
   /* Pass 2: process rows. */
 {
-  register float *wsptr;
+  register Float *wsptr;
   register short *elemptr;
-  int	nq = 8;
+  Int	nq = 8;
   
   wsptr = ws;
   elemptr = start;
@@ -134,21 +134,21 @@ static void rdct_spike(word *start, int ystride, float *ws)
 /*---------------------------------------------------------------------------*/
 #define ALN2I 1.442695022
 #define TINY 1.0e-5
-int	despike_count = 0, cell_smooth_type = 1;
-int ana_despike(int narg, int ps[])
+Int	despike_count = 0, cell_smooth_type = 1;
+Int ana_despike(Int narg, Int ps[])
 /* despike function RAS */
 /* the call is x = despike(array, [frac, level, niter, cell_flag, rms]) */
 {
-  int	iq, result_sym, type, nx, ny, n, m, level=7, sum, nc, cell_flag=0;
-  int	lognb2, cell_malloc = 0, cell_count, jj, jc;
-  int	nxc, nyc, cell_flag_sign, niter=1, rms_flag_sign, rms_flag;
-  int	sign_flag, bad_flag, bb_flag, save_niter, ntotal, dim[2];
-  byte	*cell_status;
-  float	frac = 0.25, fsum, cfrac, tq, rms=0.0, fdif;
-  word	*p, *q, *ptr, *p1, *p2, *p3, *out, *out2;
-  word	arr[16], *pps, *ss;
+  Int	iq, result_sym, type, nx, ny, n, m, level=7, sum, nc, cell_flag=0;
+  Int	lognb2, cell_malloc = 0, cell_count, jj, jc;
+  Int	nxc, nyc, cell_flag_sign, niter=1, rms_flag_sign, rms_flag;
+  Int	sign_flag, bad_flag, bb_flag, save_niter, ntotal, dim[2];
+  Byte	*cell_status;
+  Float	frac = 0.25, fsum, cfrac, tq, rms=0.0, fdif;
+  Word	*p, *q, *ptr, *p1, *p2, *p3, *out, *out2;
+  Word	arr[16], *pps, *ss;
 
-  lognb2 = (log((double) 16)*ALN2I+TINY);
+  lognb2 = (log((Double) 16)*ALN2I+TINY);
 
   if (narg > 1 && ps[1] && float_arg_stat(ps[1], &frac) != 1)
     return ANA_ERROR;
@@ -204,10 +204,10 @@ int ana_despike(int narg, int ps[])
  results */
  if (bb_flag) {
   cell_count = nx*ny/64;
-  if (cell_count <= (NSCRAT*sizeof(int) + ((char *) scrat - curScrat)))
-    cell_status = (byte *) scrat;
+  if (cell_count <= (NSCRAT*sizeof(Int) + ((char *) scrat - curScrat)))
+    cell_status = (Byte *) scrat;
   else {
-    cell_status = (byte *) malloc(cell_count);
+    cell_status = (Byte *) malloc(cell_count);
     if (!cell_status)
       return cerror(ALLOC_ERR, 0);
     cell_malloc = 1;
@@ -232,7 +232,7 @@ int ana_despike(int narg, int ps[])
  /* if there are 2 or more iterations, we need an extra array, we can't do the
     despike step in place because it "erodes" from the low y direction. */
  if (niter > 1) {
-   out2 = malloc(nx*ny*sizeof(word));
+   out2 = malloc(nx*ny*sizeof(Word));
    if (!out2)
      return cerror(ALLOC_ERR, 0);
  }
@@ -262,10 +262,10 @@ int ana_despike(int narg, int ps[])
  p3 = p2 + nx;
  while (n--) {
   /* add the 8 */
-  tq = (cfrac * (float) *p);
+  tq = (cfrac * (Float) *p);
   sum = *p1 + *(p1+1) + *(p1+2) + *p2 + *(p2+2) + *p3 + *(p3+1) + *(p3+2);
   p1++;  p2++;  p3++;
-  fsum = (float) sum * 0.125;
+  fsum = (Float) sum * 0.125;
   /* now the test */
   if ( fsum <= tq) {  /* we have a bady, zap it */
     nc++;
@@ -286,7 +286,7 @@ int ana_despike(int narg, int ps[])
      pps = p +2 *nx - 2;
      *ss++ = *pps++; *ss++ = *pps++; *ss++ = *pps++; *ss++ = *pps++; *ss++ = *pps++;
       /* a built in sorter here */
-      { int nn,m,j,i,n=16;
+      { Int nn,m,j,i,n=16;
         short t;
         m=n;
         for (nn=1;nn<=lognb2;nn++) {
@@ -330,10 +330,10 @@ int ana_despike(int narg, int ps[])
 
 
  if (bb_flag) {
-  int badcells = 0;
-  float	dc[9], ws[64], *pf;
-  int 	i, ix, jx, ic, stride = nx - 8, ii, jj, istart,k;
-  int	ioff[3], joff[3];
+  Int badcells = 0;
+  Float	dc[9], ws[64], *pf;
+  Int 	i, ix, jx, ic, stride = nx - 8, ii, jj, istart,k;
+  Int	ioff[3], joff[3];
   for (i=0;i<cell_count;i++) {
    /* we can have a bad cell by the number of spikes (the strike out
    option) and/or we can check the rms, if doing both we check the
@@ -355,7 +355,7 @@ int ana_despike(int narg, int ps[])
       nc = 8;
       /* get the checkerboard metric */
       while (nc--) { m = 4; while(m--) {
-      	fsum += (float) *q++; fsum += (float) *q++;
+      	fsum += (Float) *q++; fsum += (Float) *q++;
 	fdif = fdif + *ps1 - *ps2;
 	ps1 += 2;	ps2 += 2;
       	}
@@ -391,7 +391,7 @@ int ana_despike(int narg, int ps[])
       k = ii + jj*3;
       fsum = 0.0;
       nc = 8;
-      while (nc--) { m = 8; while(m--) fsum += (float) *q++; q += stride; }
+      while (nc--) { m = 8; while(m--) fsum += (Float) *q++; q += stride; }
       dc[k] = fsum*0.015625; /* that's 1/64 */
       dc[4] += dc[k];
       }
@@ -417,7 +417,7 @@ int ana_despike(int narg, int ps[])
     break;
     case 1:
     {
-    int	a1, a2, acc, t1, t2, nxmo=nx-8 , nymo=ny-8;
+    Int	a1, a2, acc, t1, t2, nxmo=nx-8 , nymo=ny-8;
     /* get array index for start of cell */
     ix = ic*8;  jx = jc*8;
     istart = ix + jx*nx;
@@ -429,11 +429,11 @@ int ana_despike(int narg, int ps[])
     while (nc--) {
     /* get a point to left of cell if available */
     if (ix) { p--;	
-    	a2 = (int)*p++;
-    	a1 = (int)*p++;
+    	a2 = (Int)*p++;
+    	a1 = (Int)*p++;
     	a2 = a2 + a1;
      } else {
-    	a1 = (int)*p++;
+    	a1 = (Int)*p++;
     	a2 = a1 + a1;
      }
      /* proceed over 7 points */
@@ -458,11 +458,11 @@ int ana_despike(int narg, int ps[])
     while (nc--) {
     /* get a point to bottom of cell if available */
     if (jx) { p = p - nx;
-   	a2 = (int)*p;	p += nx;
-    	a1 = (int)*p;	p += nx;
+   	a2 = (Int)*p;	p += nx;
+    	a1 = (Int)*p;	p += nx;
     	a2 = a2 + a1;
      } else {
-    	a1 = (int)*p;	p += nx;
+    	a1 = (Int)*p;	p += nx;
     	a2 = a1 + a1;
      }
      /* proceed over 7 points */
@@ -491,14 +491,14 @@ int ana_despike(int narg, int ps[])
  return result_sym;
 }
 /*------------------------------------------------------------------------- */
-int ana_reorder(int narg, int ps[])/* reorder function */
+Int ana_reorder(Int narg, Int ps[])/* reorder function */
 /* the call is x = reorder(array, order)
    where array must be a 2-D array, returns the re-ordered result */
 /* reordering is reversals and transposes of a 2-D array, there are
    8 ways to "flip" an array, the "order" ranges from 0-7 accordingly */
 {
-  int  iorder, iq, result_sym, type, nx, ny, m, inc, dim[2];
-  byte   *p, *q, *ptr;
+  Int  iorder, iq, result_sym, type, nx, ny, m, inc, dim[2];
+  Byte   *p, *q, *ptr;
 
   if (int_arg_stat(ps[1], &iorder) != 1)
     return ANA_ERROR;
@@ -522,7 +522,7 @@ int ana_reorder(int narg, int ps[])/* reorder function */
   dim[1] = ny;
   result_sym = array_scratch(type, 2, dim); /* for the result */
   q = array_data(result_sym);
-  p = (byte *) ptr;
+  p = (Byte *) ptr;
   if (iorder == 0)        /* no change, make a copy */
     bcopy(p, q, nx*ny*ana_type_size[type]);
   else {
@@ -530,8 +530,8 @@ int ana_reorder(int narg, int ps[])/* reorder function */
     switch (type) {
       case ANA_BYTE:
 	if (iorder < 4) {
-	  register  byte *pp, *qq;
-	  register  int  nn, mm, nxx, inc;
+	  register  Byte *pp, *qq;
+	  register  Int  nn, mm, nxx, inc;
 
 	  nxx = nx;
 	  mm = ny;
@@ -574,8 +574,8 @@ int ana_reorder(int narg, int ps[])/* reorder function */
 	      break;
 	  }
 	} else {
-	  register  byte *pp, *qq;
-	  register  int  nn, mm, nyy, inc;
+	  register  Byte *pp, *qq;
+	  register  Int  nn, mm, nyy, inc;
 
 	  mm = ny;
 	  qq = q;
@@ -615,7 +615,7 @@ int ana_reorder(int narg, int ps[])/* reorder function */
       case ANA_WORD:
 	if (iorder < 4) {
 	  register  short *pp, *qq;
-	  register  int  nn, mm, nxx, inc;
+	  register  Int  nn, mm, nxx, inc;
 
 	  nxx = nx;
 	  mm = ny;
@@ -659,7 +659,7 @@ int ana_reorder(int narg, int ps[])/* reorder function */
 	  } 
 	} else {
 	  register  short *pp, *qq;
-	  register  int  nyy, nn, mm;
+	  register  Int  nyy, nn, mm;
 
 	  switch (iorder) {
 	    case 4:		/* transpose in x and y */
@@ -698,18 +698,18 @@ int ana_reorder(int narg, int ps[])/* reorder function */
 	break;
       case ANA_LONG:
 	if (iorder < 4) {
-	  register  int *pp, *qq;
-	  register  int  nn, mm, nxx;
+	  register  Int *pp, *qq;
+	  register  Int  nn, mm, nxx;
 
 	  nxx = nx;
 	  mm = ny;
-	  qq = (int *) q;
+	  qq = (Int *) q;
 
 	  switch (iorder) {
 	    case 1:		/* reverse in x */
 	    {
-	      register  int *pp = (int *) p + nx;
-	      register  int inc = 2*nx;
+	      register  Int *pp = (Int *) p + nx;
+	      register  Int inc = 2*nx;
 
 	      while (mm--) {
 		nn = nxx;
@@ -722,7 +722,7 @@ int ana_reorder(int narg, int ps[])/* reorder function */
 	    }
 	    break;
 	    case 2:		/* just reverse in y */
-	      pp = (int *) p + nx * ny - nx;
+	      pp = (Int *) p + nx * ny - nx;
 	      inc = -2*nx;
 	      while (mm--) {
 		nn = nxx;
@@ -734,7 +734,7 @@ int ana_reorder(int narg, int ps[])/* reorder function */
 	      }
 	      break;
 	    case 3:		/* reverse in x and y */
-	      pp = (int *) p + nx*ny;
+	      pp = (Int *) p + nx*ny;
 	      while (mm--) {
 		nn = nxx;
 		while (nn) {
@@ -745,29 +745,29 @@ int ana_reorder(int narg, int ps[])/* reorder function */
 	      break;
 	  } 
 	} else {
-	  register  int *pp, *qq;
-	  register  int  nn, mm, nyy;
+	  register  Int *pp, *qq;
+	  register  Int  nn, mm, nyy;
 	  
 	  mm = ny;
-	  qq = (int *) q;
+	  qq = (Int *) q;
 	  switch (iorder) {
 	    case 4:		/* transpose in x and y */
-	      pp = (int *) p;
+	      pp = (Int *) p;
 	      inc = -nx*ny + 1;
 	      nyy = ny;
 	      break;
 	    case 5:		/* transpose plus reverse in y */
-	      pp = (int *) p +nx*ny - ny;
+	      pp = (Int *) p +nx*ny - ny;
 	      inc = nx*ny + 1;
 	      nyy = -ny;
 	      break;
 	    case 6:		/* transpose plus reverse in x */
-	      pp = (int *) p + ny - 1;
+	      pp = (Int *) p + ny - 1;
 	      inc = -nx*ny - 1;
 	      nyy = ny;
 	      break;
 	    case 7:		/* transpose plus reverse in x,y */
-	      pp = (int *) p + ny*nx - 1;
+	      pp = (Int *) p + ny*nx - 1;
 	      inc = nx*ny - 1;
 	      nyy = -ny;
 	      break;
@@ -785,16 +785,16 @@ int ana_reorder(int narg, int ps[])/* reorder function */
 	break;
       case ANA_FLOAT:
 	if (iorder < 4) {
-	  register  float *pp, *qq;
-	  register  int  nn, mm, nxx;
+	  register  Float *pp, *qq;
+	  register  Int  nn, mm, nxx;
 
 	  nxx = nx;
 	  mm = ny;
-	  qq = (float *) q;
+	  qq = (Float *) q;
 
 	  switch (iorder) {
 	    case 1:		/* reverse in x */
-	      pp = (float *) p + nx;
+	      pp = (Float *) p + nx;
 	      inc = 2*nx;
 	      while (mm--) {
 		nn = nxx;
@@ -806,7 +806,7 @@ int ana_reorder(int narg, int ps[])/* reorder function */
 	      }
 	      break;
 	    case 2:		/* just reverse in y */
-	      pp = (float *) p + nx * ny - nx;
+	      pp = (Float *) p + nx * ny - nx;
 	      inc = -2*nx;
 	      while (mm--) {
 		nn = nxx;
@@ -818,7 +818,7 @@ int ana_reorder(int narg, int ps[])/* reorder function */
 	      }
 	      break;
 	    case 3:		/* reverse in x and y */
-	      pp = (float *) p + nx*ny;
+	      pp = (Float *) p + nx*ny;
 	      while (mm--) {
 		nn = nxx;
 		while (nn) {
@@ -829,29 +829,29 @@ int ana_reorder(int narg, int ps[])/* reorder function */
 	      break;
 	  } 
 	} else {
-	  register  float *pp, *qq;
-	  register  int  nn, mm, nyy;
+	  register  Float *pp, *qq;
+	  register  Int  nn, mm, nyy;
 	  
 	  mm = ny;
-	  qq = (float *) q;
+	  qq = (Float *) q;
 	  switch (iorder) {
 	    case 4:		/* transpose in x and y */
-	      pp = (float *) p;
+	      pp = (Float *) p;
 	      inc = -nx*ny + 1;
 	      nyy = ny;
 	      break;
 	    case 5:		/* transpose plus reverse in y */
-	      pp = (float *) p +nx*ny - ny;
+	      pp = (Float *) p +nx*ny - ny;
 	      inc = nx*ny + 1;
 	      nyy = -ny;
 	      break;
 	    case 6:		/* transpose plus reverse in x */
-	      pp = (float *) p + ny - 1;
+	      pp = (Float *) p + ny - 1;
 	      inc = -nx*ny - 1;
 	      nyy = ny;
 	      break;
 	    case 7:		/* transpose plus reverse in x,y */
-	      pp = (float *) p + ny*nx - 1;
+	      pp = (Float *) p + ny*nx - 1;
 	      inc = nx*ny - 1;
 	      nyy = -ny;
 	      break;
@@ -869,16 +869,16 @@ int ana_reorder(int narg, int ps[])/* reorder function */
 	break;
       case ANA_DOUBLE:
 	if (iorder < 4) {
-	  register  double *pp, *qq;
-	  register  int  nn, mm, nxx;
+	  register  Double *pp, *qq;
+	  register  Int  nn, mm, nxx;
 
 	  nxx = nx;
 	  mm = ny;
-	  qq = (double *) q;
+	  qq = (Double *) q;
 
 	  switch (iorder) {
 	    case 1:		/* reverse in x */
-	      pp = (double *) p + nx;
+	      pp = (Double *) p + nx;
 	      inc = 2*nx;
 	      while (mm--) {
 		nn = nxx;
@@ -890,7 +890,7 @@ int ana_reorder(int narg, int ps[])/* reorder function */
 	      }
 	      break;
 	    case 2:		/* just reverse in y */
-	      pp = (double *) p + nx * ny - nx;
+	      pp = (Double *) p + nx * ny - nx;
 	      inc = -2*nx;
 	      while (mm--) {
 		nn = nxx;
@@ -902,7 +902,7 @@ int ana_reorder(int narg, int ps[])/* reorder function */
 	      }
 	      break;
 	    case 3:		/* reverse in x and y */
-	      pp = (double *) p + nx*ny;
+	      pp = (Double *) p + nx*ny;
 	      while (mm--) {
 		nn = nxx;
 		while (nn) {
@@ -913,29 +913,29 @@ int ana_reorder(int narg, int ps[])/* reorder function */
 	      break;
 	  } 
 	} else {
-	  register  double *pp, *qq;
-	  register  int  nn, mm, nyy;
+	  register  Double *pp, *qq;
+	  register  Int  nn, mm, nyy;
 	  
 	  mm = ny;
-	  qq = (double *) q;
+	  qq = (Double *) q;
 	  switch (iorder) {
 	    case 4:		/* transpose in x and y */
-	      pp = (double *) p;
+	      pp = (Double *) p;
 	      inc = -nx*ny + 1;
 	      nyy = ny;
 	      break;
 	    case 5:		/* transpose plus reverse in y */
-	      pp = (double *) p +nx*ny - ny;
+	      pp = (Double *) p +nx*ny - ny;
 	      inc = nx*ny + 1;
 	      nyy = -ny;
 	      break;
 	    case 6:		/* transpose plus reverse in x */
-	      pp = (double *) p + ny - 1;
+	      pp = (Double *) p + ny - 1;
 	      inc = -nx*ny - 1;
 	      nyy = ny;
 	      break;
 	    case 7:		/* transpose plus reverse in x,y */
-	      pp = (double *) p + ny*nx - 1;
+	      pp = (Double *) p + ny*nx - 1;
 	      inc = nx*ny - 1;
 	      nyy = -ny;
 	      break;

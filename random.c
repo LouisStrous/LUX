@@ -10,22 +10,22 @@
 
 #include <gsl/gsl_rng.h>
 
-static unsigned int	currentBitSeed = 123459876;
+static uint32_t	currentBitSeed = 123459876;
 
 static gsl_rng *rng;
 
 /*------------------------------------------------------------------------- */
-void random_init(int seed)
+void random_init(Int seed)
 {
-  unsigned long int s;
+  uint64_t s;
 
-  s = (unsigned long) seed;
+  s = (uint64_t) seed;
   if (!rng)
     rng = gsl_rng_alloc(gsl_rng_mt19937);
   gsl_rng_set(rng, s);
 }
 /*------------------------------------------------------------------------- */
-double random_one(void)
+Double random_one(void)
 /* Returns a single uniformly distributed pseudo-random number */
 /* between 0 and 1 (exclusive). */
 {
@@ -34,9 +34,9 @@ double random_one(void)
   return gsl_rng_uniform(rng);
 }
 /*------------------------------------------------------------------------- */
-int locate_value(double value, double *values, int nElem)
+Int locate_value(Double value, Double *values, Int nElem)
 {
-  int	ilo, ihi, imid;
+  Int	ilo, ihi, imid;
 
   ilo = 0;
   ihi = nElem - 1;
@@ -55,39 +55,39 @@ int locate_value(double value, double *values, int nElem)
   return ihi;
 }
 
-int random_distributed(int modulus, double *distr)
+Int random_distributed(Int modulus, Double *distr)
 /* returns a random number between 0 and <modulus - 1> drawn according */
 /* to the distribution function <distr>, which must have at least */
 /* <modulus> elements, with distr[0] == 0 and distr[modulus - 1] <= 1, */
 /* and no element smaller than the previous one.  LS 25aug2000 */
 {
-  double r;
+  Double r;
 
   r = random_one();
   return locate_value(r, distr, modulus);
 }
 /*------------------------------------------------------------------------- */
-byte random_bit(void)
+Byte random_bit(void)
 /* Returns a random bit (either zero or one), using primitive polynomials */
 /* modulo 2. */
 {
-  static unsigned int	mask = 0x9, mask1 = 0x80000000;
+  static uint32_t	mask = 0x9, mask1 = 0x80000000;
 
   if (currentBitSeed & mask1) {
     currentBitSeed = ((currentBitSeed ^ mask) << 1) | 1;
-    return (byte) 1;
+    return (Byte) 1;
   } else {
     currentBitSeed = (currentBitSeed << 1) & ~1;
-    return (byte) 0;
+    return (Byte) 0;
   }
 }
 /*------------------------------------------------------------------------- */
-unsigned int random_bits(void)
-/* Returns a int-full of random bits, using primitive polynomials modulo 2. */
+uint32_t random_bits(void)
+/* Returns a Int-full of random bits, using primitive polynomials modulo 2. */
 {
-  static unsigned int	mask = 0x9, mask1 = 0x80000000;
-  int	n = 32;
-  unsigned int	result;
+  static uint32_t	mask = 0x9, mask1 = 0x80000000;
+  Int	n = 32;
+  uint32_t	result;
   
   while (n--) {
     if (currentBitSeed & mask1) {
@@ -101,21 +101,21 @@ unsigned int random_bits(void)
   return result;
 }
 /*------------------------------------------------------------------------- */
-void randomu(int seed, void *output, int number, int modulo)
+void randomu(Int seed, void *output, Int number, Int modulo)
 /* generates <number> uniformly distributed pseudo-random numbers */
 /* and stores them in <output>, for which */
 /* memory must have been allocated by the user.  <seed> is an optional seed. */
 /* a negative value indicates complete reinitialization of the random */
 /* sequence.  a positive value indicates a mere change of seed.  a zero */
 /* value indicates that the current random sequence is continued. */
-/* if <modulo> is zero, then <output> is considered (float *) and the */
+/* if <modulo> is zero, then <output> is considered (Float *) and the */
 /* generated random sequence is ANA_DOUBLE.  if <modulo> is positive, then */
-/* <output> is considered (int *) and the generated random sequence */
+/* <output> is considered (Int *) and the generated random sequence */
 /* runs between 0 and <modulo> - 1 (inclusive) */
 {
- int	j;
- double	*fp;
- int	*ip;
+ Int	j;
+ Double	*fp;
+ Int	*ip;
 
  /* check if we are initializing */
  if (seed)
@@ -123,17 +123,17 @@ void randomu(int seed, void *output, int number, int modulo)
  if (modulo) {			/* integers */
    if (modulo < 0)
      modulo = -modulo;
-   ip = (int *) output;
+   ip = (Int *) output;
    for (j = 0; j < number; j++)
-     *ip++ = (int) (random_one()*modulo);
+     *ip++ = (Int) (random_one()*modulo);
  } else { /* floating point */
-   fp = (double *) output;
+   fp = (Double *) output;
    for (j = 0; j < number; j++)
      *fp++ = random_one();
  }
 }
 /*----------------------------------------------------------------------*/
-void random_unique(int seed, int *output, int number, int modulo)
+void random_unique(Int seed, Int *output, Int number, Int modulo)
 /* generates <number> uniformly distributed integer pseudo-random numbers */
 /* in the range 0 to <modulo> - 1 (inclusive) in which no particular */
 /* number appears more than once, and stores them in <output>, for which */
@@ -145,7 +145,7 @@ void random_unique(int seed, int *output, int number, int modulo)
 /* <number> is more than <modulo>. */
 /* LS 24nov95 */
 {
-  int	m, t;
+  Int	m, t;
 
   if (number > modulo) {	/* both are assumed positive */
     anaerror("random_unique: asked %1d unique numbers modulo %1d: Impossible",
@@ -158,7 +158,7 @@ void random_unique(int seed, int *output, int number, int modulo)
   /* Use Knuth's Algorithm S (D. Knuth, Seminumerical Algorithms) */
   t = m = 0;
   while (m < number) {
-    if ((int) ((modulo - t)*random_one()) < number - m) {
+    if ((Int) ((modulo - t)*random_one()) < number - m) {
       *output++ = t;
       m++;
     }
@@ -166,7 +166,7 @@ void random_unique(int seed, int *output, int number, int modulo)
   }
 }
 /*----------------------------------------------------------------------*/
-void random_unique_shuffle(int seed, int *output, int number, int modulo)
+void random_unique_shuffle(Int seed, Int *output, Int number, Int modulo)
 /* generates <number> uniformly distributed integer pseudo-random numbers */
 /* in the range 0 to <modulo> - 1 (inclusive) in which no particular */
 /* number appears more than once, and stores them in <output>, for which */
@@ -178,21 +178,21 @@ void random_unique_shuffle(int seed, int *output, int number, int modulo)
 /* <number> is less than <modulo>.  The random numbers are shuffled.  */
 /* LS 5oct97 */
 {
-  int	i, j, temp;
+  Int	i, j, temp;
 
   random_unique(seed, output, number, modulo);
   if (number > modulo)
     return;			/* error */
   /* now shuffle.  I hope this algorithm is sufficient.  LS */
   for (i = 0; i < number; i++) {
-    j = (int) (random_one()*number);
+    j = (Int) (random_one()*number);
     temp = output[i];
     output[i] = output[j];
     output[j] = temp;
   }
 }
 /*----------------------------------------------------------------------*/
-void randomn(int seed, double *output, int number, char hasUniform)
+void randomn(Int seed, Double *output, Int number, char hasUniform)
 /* returns <number> pseudo-random numbers following the standard */
 /* normal distribution (mean zero, standard deviation one), using the */
 /* Box-Muller transformation.  Sufficient memory for the numbers */
@@ -201,8 +201,8 @@ void randomn(int seed, double *output, int number, char hasUniform)
 /* pseudo-random numbers are already present in <output>, */
 /* otherwise they are generated in this routine.  LS 25oct95 */
 {
-  int	n, i;
-  double	r, a, extra[2];
+  Int	n, i;
+  Double	r, a, extra[2];
 
   n = number%2;
   if (!hasUniform)
@@ -222,12 +222,12 @@ void randomn(int seed, double *output, int number, char hasUniform)
   }
 }  
 /*----------------------------------------------------------------------*/
-int ana_randomu(int narg, int ps[])
+Int ana_randomu(Int narg, Int ps[])
  /*create an array of random elements in the [0,1.0] range (exclusive) */
 {
- double *p;
- int	k, seed, cycle;
- int	dims[8], *pd, j, result_sym, n;
+ Double *p;
+ Int	k, seed, cycle;
+ Int	dims[8], *pd, j, result_sym, n;
 
  if (*ps) {
    seed = int_arg(*ps);
@@ -268,7 +268,7 @@ int ana_randomu(int narg, int ps[])
  return result_sym;
 }
 /*------------------------------------------------------------------------- */
-int ana_randomd(int narg, int ps[])
+Int ana_randomd(Int narg, Int ps[])
 /* RANDOMD([seed,]distr,dimens) generates a LONG array with dimensions */
 /* <dimens> with each number drawn at random from the range 0 through */
 /* <NUM_ELEM(distr) - 1> (inclusive) according to the distribution */
@@ -276,8 +276,8 @@ int ana_randomd(int narg, int ps[])
 /* increasing, <distr(0)> must be greater than or equal to 0, and */
 /* <distr(*-1)> must be equal to one.  LS 25aug2000 */
 {
-  int	result, dims[MAX_DIMS], *pd, n, j, modulus, seed;
-  double	*distr;
+  Int	result, dims[MAX_DIMS], *pd, n, j, modulus, seed;
+  Double	*distr;
 
   if (*ps) {			/* seed */
     seed = int_arg(ps[0]);
@@ -316,7 +316,7 @@ int ana_randomd(int narg, int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-int ana_randomn(int narg, int ps[])
+Int ana_randomn(Int narg, Int ps[])
  /*create a normal distribution of pseudo-random #'s, centered at 0 with */
  /* a width of 1.0
  uses Box-Muller transformation, given 2 uniformly random #'s (0 to 1 range)
@@ -327,7 +327,7 @@ int ana_randomn(int narg, int ps[])
 
  */
 {
-  int	result_sym;
+  Int	result_sym;
 
   /* first get a uniform distribution */
   result_sym = ana_randomu(narg,ps);
@@ -335,16 +335,16 @@ int ana_randomn(int narg, int ps[])
       || result_sym == ANA_ONE)	/* we just initialized with a specific seed */
     return result_sym;
   /* then apply Box-Muller transformation */
-  randomn(0, (double *) array_data(result_sym), array_size(result_sym), 1);
+  randomn(0, (Double *) array_data(result_sym), array_size(result_sym), 1);
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-int ana_randomb(int narg, int ps[])
+Int ana_randomb(Int narg, Int ps[])
 /* RANDOMB([SEED=seed,] dimens, [/LONG]) */
 /* returns a BYTE array of the indicated dimensions where each value */
 /* is either a 0 or a 1. LS 21jul98 */
 {
-  int	dims[MAX_DIMS], ndim, iq, result, n;
+  Int	dims[MAX_DIMS], ndim, iq, result, n;
   pointer p;
 
   if (*ps) 			/* seed */
@@ -362,7 +362,7 @@ int ana_randomb(int narg, int ps[])
 	if (ndim + array_size(*ps) > MAX_DIMS)
 	  return anaerror("Too many dimensions specified", 0);
 	iq = ana_long(1, ps);	/* ensure LONG dimensions */
-	memcpy(dims + ndim, array_data(iq), array_size(iq)*sizeof(int));
+	memcpy(dims + ndim, array_data(iq), array_size(iq)*sizeof(Int));
 	ndim += array_size(iq);
 	break;
       default:
@@ -387,15 +387,15 @@ int ana_randomb(int narg, int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-int ana_randome(int narg, int ps[])
+Int ana_randome(Int narg, Int ps[])
 /* RANDOME([SEED=seed,] dimens) */
 /* returns a FLOAT or DOUBLE (if /DOUBLE is set) array of the indicated */
 /* dimensions, filled with values drawn from an exponential distribution */
 /* over all representable numbers.  LS 27aug2000 */
 {
-  int	dims[MAX_DIMS], ndim, iq, result, n;
+  Int	dims[MAX_DIMS], ndim, iq, result, n;
   pointer	p;
-  byte	type;
+  Byte	type;
 
   if (*ps) 			/* seed */
     currentBitSeed = int_arg(*ps); /* install new seed */
@@ -412,7 +412,7 @@ int ana_randome(int narg, int ps[])
 	if (ndim + array_size(*ps) > MAX_DIMS)
 	  return anaerror("Too many dimensions specified", 0);
 	iq = ana_long(1, ps);	/* ensure LONG dimensions */
-	memcpy(dims + ndim, array_data(iq), array_size(iq)*sizeof(int));
+	memcpy(dims + ndim, array_data(iq), array_size(iq)*sizeof(Int));
 	ndim += array_size(iq);
 	break;
       default:
@@ -428,9 +428,9 @@ int ana_randome(int narg, int ps[])
     return ANA_ERROR;
   p.v = array_data(result);	/* pointer to result data */
 
-  /* we generate random bits by the int-full, so we do a loop over */
-  /* the number of int-fulls in the array */
-  n = array_size(result)*ana_type_size[type]/sizeof(int);
+  /* we generate random bits by the Int-full, so we do a loop over */
+  /* the number of Int-fulls in the array */
+  n = array_size(result)*ana_type_size[type]/sizeof(Int);
   /* some of the generated bit patterns do not correspond to representable */
   /* numbers but rather to NaNs.  We must replace those with representable */
   /* numbers.  We use a single scheme for both FLOAT and DOUBLE numbers, */
@@ -441,7 +441,7 @@ int ana_randome(int narg, int ps[])
   /* number. */
   while (n--) {
     do 
-      *p.l = random_bits();	/* get one int-full of bits */
+      *p.l = random_bits();	/* get one Int-full of bits */
     while (isnan(*p.f));
     p.l++;
   }
@@ -449,7 +449,7 @@ int ana_randome(int narg, int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-int ana_random(int narg, int ps[])
+Int ana_random(Int narg, Int ps[])
 /* General pseudo-random-number generating routine.  Switches select the */
 /* distribution of the numbers.  General Syntax: */
 /*   Y = RANDOM([SEED=seed, PERIOD=period,] dimens */
@@ -482,8 +482,8 @@ int ana_random(int narg, int ps[])
 /*       generates an ANA_BYTE array with dimensions <dimens>, containing */
 /*       either a 0 or a 1, drawn at random with equal probability.  */
 {
-  int	result, ndim, dims[MAX_DIMS], iq, i, period, seed;
-  byte	*p;
+  Int	result, ndim, dims[MAX_DIMS], iq, i, period, seed;
+  Byte	*p;
 
   if (!internalMode)
     internalMode = 1;
@@ -494,7 +494,7 @@ int ana_random(int narg, int ps[])
   } else
     seed = 0;
   if (internalMode == 5) 	/* /BITS */
-    currentBitSeed = (unsigned int) seed;
+    currentBitSeed = (uint32_t) seed;
   else {			/* other distributions */
     if (seed) /* need to (re)initialize */
       random_init(seed);
@@ -507,7 +507,7 @@ int ana_random(int narg, int ps[])
 	  if (ndim + array_size(ps[i]) > MAX_DIMS)
 	    return anaerror("Too many dimensions", 0);
 	  iq = ana_long(1, &ps[i]); /* ensure LONG dimensions */
-	  memcpy(dims + ndim, array_data(iq), ndim*sizeof(int));
+	  memcpy(dims + ndim, array_data(iq), ndim*sizeof(Int));
 	  ndim += array_size(iq);
 	  break;
 	case ANA_SCALAR:
@@ -535,11 +535,11 @@ int ana_random(int narg, int ps[])
 	result = array_scratch(ANA_LONG, ndim, dims);
 	if (result == ANA_ERROR)
 	  return ANA_ERROR;
-	randomu(seed, (int *) array_data(result), array_size(result),
+	randomu(seed, (Int *) array_data(result), array_size(result),
 		period);
       } else {			/* no PERIOD, so get FLOATs */
 	result = array_scratch(ANA_DOUBLE, ndim, dims);
-	randomu(seed, (double *) array_data(result), array_size(result), 0);
+	randomu(seed, (Double *) array_data(result), array_size(result), 0);
       }
       break;
     case 2:			/* /NORMAL */
@@ -548,7 +548,7 @@ int ana_random(int narg, int ps[])
       result = array_scratch(ANA_DOUBLE, ndim, dims);
       if (result == ANA_ERROR)
 	return ANA_ERROR;
-      randomn(seed, (double *) array_data(result), array_size(result), 0);
+      randomn(seed, (Double *) array_data(result), array_size(result), 0);
       break;
     case 3: case 4:			/* /SAMPLE, /SHUFFLE */
       if (narg < 1 || !ps[1])	/* PERIOD absent, but is required */
@@ -558,10 +558,10 @@ int ana_random(int narg, int ps[])
       if (result == ANA_ERROR)
 	return ANA_ERROR;
       if (internalMode == 3)
-	random_unique(seed, (int *) array_data(result), array_size(result),
+	random_unique(seed, (Int *) array_data(result), array_size(result),
 		      period);
       else
-	random_unique_shuffle(seed, (int *) array_data(result),
+	random_unique_shuffle(seed, (Int *) array_data(result),
 			      array_size(result), period);
       break;
     case 5:			/* /BITS */

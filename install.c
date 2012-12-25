@@ -7,7 +7,7 @@
 #include <errno.h> /* for errno(2) */
 #include <error.h> /* for anaerror(58) */
 #include <float.h> /* for FLT_MAX(2) DBL_MAX(2) DBL_MIN(1) FLT_MIN(1) */
-#include <limits.h> /* for UCHAR_MAX(3) INT_MAX(1) SHRT_MAX(1) SHRT_MIN(1) INT_MIN(1) */
+#include <limits.h> /* for UINT8_MAX(3) INT32_MAX(1) INT16_MAX(1) INT16_MIN(1) INT32_MIN(1) */
 #include <malloc.h> /* for malloc(25) free(18) realloc(4) */
 #include <math.h> /* for j1(12) */
 #include <setjmp.h> /* for longjmp(1) jmp_buf(1) setjmp(1) */
@@ -31,46 +31,46 @@ extern char		*symbolStack[];
 extern symTableEntry	sym[];
 extern hashTableEntry	*varHashTable[], *subrHashTable[], *funcHashTable[],
 			*blockHashTable[];
-extern word		listStack[];
-extern int		keepEVB;
+extern Word		listStack[];
+extern Int		keepEVB;
 extern char		*currentChar, line[];
 extern FILE		*inputStream, *outputStream;
-extern int		nExecuted;
+extern Int		nExecuted;
 /* extern internalRoutine	subroutine[], function[]; */
 internalRoutine *subroutine, *function;
 
-int	anaerror(char *, int, ...), lookForName(char *, hashTableEntry *[], int),
-	newSymbol(int, ...), ana_setup(), rawIo(void), cookedIo(void);
-void	installKeys(void *keys), zerobytes(void *, int);
-char	*strsave(char *), *symName(int, hashTableEntry *[]), *className(int),
-	*typeName(int);
-FILE	*openPathFile(char *, int);
+Int	anaerror(char *, Int, ...), lookForName(char *, hashTableEntry *[], Int),
+	newSymbol(Int, ...), ana_setup(), rawIo(void), cookedIo(void);
+void	installKeys(void *keys), zerobytes(void *, Int);
+char	*strsave(char *), *symName(Int, hashTableEntry *[]), *className(Int),
+	*typeName(Int);
+FILE	*openPathFile(char *, Int);
 
-int	nFixed = 0, noioctl = 0, trace = 0, curTEIndex;
+Int	nFixed = 0, noioctl = 0, trace = 0, curTEIndex;
 
 char	batch = 0, *currentInputFile = NULL, ignoreSymbols = 0, restart = 0;
 
-int	traceMode = T_FILE | T_LOOP | T_BLOCK | T_ROUTINE;
+Int	traceMode = T_FILE | T_LOOP | T_BLOCK | T_ROUTINE;
 
-word	*listStackItem = listStack;
+Word	*listStackItem = listStack;
 
-int	symbolStackIndex = 0, tempVariableIndex = TEMPS_START,
+Int	symbolStackIndex = 0, tempVariableIndex = TEMPS_START,
 	nTempVariable = 0, namedVariableIndex = NAMED_START,
 	nNamedVariable = 0, nSymbolStack = 0, executableIndex = EXE_START,
 	nExecutable = 0, tempExecutableIndex = TEMP_EXE_START,
 	nTempExecutable, zapContext = 0, installString(char *),
-	ana_verify(int, int []), eval_func, insert_subr;
+	ana_verify(Int, Int []), eval_func, insert_subr;
 
-int	markStack[MSSIZE], markIndex = 0;
+Int	markStack[MSSIZE], markIndex = 0;
 
 executionLevelInfo	*exInfo = NULL;
-int	nexInfo = 0;
+Int	nexInfo = 0;
 
-extern int	compileLevel, curLineNumber;
+extern Int	compileLevel, curLineNumber;
 static char	installing = 1;
 
 /*----------------------------------------------------------------*/ 
-extern int ana_area(), ana_area2(), ana_array_statistics(),
+extern Int ana_area(), ana_area2(), ana_array_statistics(),
   ana_atomize(), ana_batch(), ana_callig(), ana_close(),
   ana_contour(), ana_coordmap(), ana_crunch(),
   ana_cubic_spline_extreme(), ana_debug(), ana_decomp(),
@@ -104,32 +104,32 @@ extern int ana_area(), ana_area2(), ana_array_statistics(),
   ana_cfloat_inplace(), ana_cdouble_inplace(), ana_string_inplace(),
   ana_fade(), ana_fade_init();
 
-int	ana_name();
+Int	ana_name();
 
 #if DEVELOP
-extern int ana_fitUnitCube(), ana_projection(), ana_plot3d(),
+extern Int ana_fitUnitCube(), ana_projection(), ana_plot3d(),
   ana_trajectory(), ana_getmin2(), ana_projectmap();
 #endif
 
 #if DEBUG
-extern int	checkList(), ana_whereisAddress(), ana_show_temps(),
+extern Int	checkList(), ana_whereisAddress(), ana_show_temps(),
 		ana_newallocs(), show_files();
 #endif
 
 #if HAVE_LIBJPEG
-extern int	ana_read_jpeg6b(), ana_write_jpeg6b();
+extern Int	ana_read_jpeg6b(), ana_write_jpeg6b();
 #endif
 
 #if HAVE_SYS_MTIO_H
-extern int	ana_tape_status(), ana_rewind(), ana_weof(), ana_unload(),
+extern Int	ana_tape_status(), ana_rewind(), ana_weof(), ana_unload(),
   ana_skipr(), ana_skipf(), ana_taprd(), ana_tapwrt(), ana_tapebufin(),
   ana_tapebufout(), ana_wait_for_tape();
 #endif
 
-extern int	ana_gifread(), ana_gifwrite();
+extern Int	ana_gifread(), ana_gifwrite();
 
 #if X11
-extern int ana_menu(), ana_menu_hide(), ana_menu_item(),
+extern Int ana_menu(), ana_menu_hide(), ana_menu_item(),
   ana_menu_kill(), ana_menu_pop(), ana_menu_read(),
   ana_register_event(), ana_window(), ana_xcopy(),
   ana_xdelete(), ana_xdrawline(), ana_xevent(), ana_xflush(),
@@ -146,7 +146,7 @@ extern int ana_menu(), ana_menu_hide(), ana_menu_item(),
 #endif
 
 #if MOTIF
-extern int ana_xmalignment(), ana_xmarmcolor(), ana_xmattach(),
+extern Int ana_xmalignment(), ana_xmarmcolor(), ana_xmattach(),
   ana_xmattach_relative(), ana_xmbackgroundcolor(),
   ana_xmbordercolor(), ana_xmborderwidth(), ana_xmbottomshadowcolor(),
   ana_xmdestroy(), ana_xmdrawinglink(), ana_xmfont(),
@@ -170,15 +170,15 @@ extern int ana_xmalignment(), ana_xmarmcolor(), ana_xmattach(),
   ana_xmgetwidgetposition(), ana_xminfo();
 #endif
 
-extern int ana_readorbits(), ana_showorbits();
+extern Int ana_readorbits(), ana_showorbits();
 
-extern int	peek();
-extern int	ana_breakpoint();
-extern int	insert();
-int	ana_restart(int, int []);
+extern Int	peek();
+extern Int	ana_breakpoint();
+extern Int	insert();
+Int	ana_restart(Int, Int []);
 
 #if MOTIF
-int	ana_zeroifnotdefined(), ana_compile_file();	/* browser */
+Int	ana_zeroifnotdefined(), ana_compile_file();	/* browser */
 #endif
 
 #define MAX_ARG	100
@@ -662,9 +662,9 @@ internalRoutine	subroutine_table[] = {
   { "ZOOM",	1, 3, ana_zoom, "1OLDCONTRAST" }, /* zoom.c */
 #endif
 };
-int nSubroutine = sizeof(subroutine_table)/sizeof(internalRoutine);
+Int nSubroutine = sizeof(subroutine_table)/sizeof(internalRoutine);
 
-extern int ana_abs(), ana_acos(), ana_arestore_f(), ana_arg(),
+extern Int ana_abs(), ana_acos(), ana_arestore_f(), ana_arg(),
   ana_array(), ana_asin(), ana_assoc(), ana_astore_f(), ana_atan(),
   ana_atan2(), ana_basin(), ana_basin2(), ana_beta(), ana_bisect(),
   ana_bmap(), bytarr(), ana_byte(), bytfarr(), ana_cbrt(), cdblarr(),
@@ -737,31 +737,31 @@ extern int ana_abs(), ana_acos(), ana_arestore_f(), ana_arg(),
   ana_cspline_find(), ana_covariance();
 
 #if HAVE_REGEX_H
-extern int ana_getdirectories(), ana_getfiles(), ana_getfiles_r(),
+extern Int ana_getdirectories(), ana_getfiles(), ana_getfiles_r(),
   ana_getmatchedfiles(), ana_getmatchedfiles_r(), ana_regex();
 #endif
 
 #if DEVELOP
-extern int	ana_project(), ana_bsmooth(), ana_compile(),
+extern Int	ana_project(), ana_bsmooth(), ana_compile(),
   ana_bessel_i0(), ana_bessel_i1(), ana_bessel_k0(), ana_bessel_k1(),
   ana_bessel_kn(), ana_regridls(), ana_bigger235(),
   ana_geneticfit();
 #endif
 
-extern int	ana_gifread_f(), ana_gifwrite_f();
+extern Int	ana_gifread_f(), ana_gifwrite_f();
 
 #if X11
-extern int	ana_check_menu(), ana_check_window(), ana_colorpixel(),
+extern Int	ana_check_menu(), ana_check_window(), ana_colorpixel(),
   ana_event_name(), ana_xlabelwidth(), ana_xquery_f(), ana_xexist();
 #endif
 
-extern int ana_calendar(), ana_EasterDate(), /* ana_orbitalElement(), */
+extern Int ana_calendar(), ana_EasterDate(), /* ana_orbitalElement(), */
   ana_astropos(), ana_precess(), ana_constellation(),
   ana_constellationname(), ana_enhanceimage();
 
 #if MOTIF
 
-extern int ana_xmarrow(), ana_xmboard(), ana_xmbutton(),
+extern Int ana_xmarrow(), ana_xmboard(), ana_xmbutton(),
   ana_xmcheckbox(), ana_xmcolumns(), ana_xmcommand(),
   ana_xmdialog_board(), ana_xmdrawingarea(), ana_xmfileselect(),
   ana_xmform(), ana_xmframe(), ana_xmgetoptionselection(),
@@ -782,10 +782,10 @@ extern int ana_xmarrow(), ana_xmboard(), ana_xmbutton(),
 #endif
 
 #if HAVE_LIBJPEG
-extern int ana_read_jpeg6b_f(), ana_write_jpeg6b_f();
+extern Int ana_read_jpeg6b_f(), ana_write_jpeg6b_f();
 #endif
 
-extern int	vargsmooth(), ana_test();
+extern Int	vargsmooth(), ana_test();
 
 internalRoutine function_table[] = {
   { "%A_UNARY_NEGATIVE", 1, 1, ana_neg_func, "*" },	/* fun1.c */
@@ -1269,19 +1269,19 @@ internalRoutine function_table[] = {
   { "ZERONANS",	1, 2, ana_zapnan_f, "*%1%VALUE" }, /* fun1.c */
   { "ZINV",	1, 1, ana_zinv, "*" }, /* strous.c */
 };
-int nFunction = sizeof(function_table)/sizeof(internalRoutine);
+Int nFunction = sizeof(function_table)/sizeof(internalRoutine);
 /*----------------------------------------------------------------*/
-void undefine(int symbol)
+void undefine(Int symbol)
 /* free up memory allocated for <symbol> and make it undefined */
 {
-  void	zap(int), updateIndices(void);
+  void	zap(Int), updateIndices(void);
   char	hasMem = 0;
-  int	n, k, oldZapContext, i;
-  word	*ptr;
+  Int	n, k, oldZapContext, i;
+  Word	*ptr;
   pointer	p2;
   listElem	*p;
   extractSec	*eptr, *eptr0;
-  extern int	tempSym;
+  extern Int	tempSym;
   extern char	restart;
 
   if (symbol < 0 || symbol > NSYM)
@@ -1467,7 +1467,7 @@ void undefine(int symbol)
 	  /* fall through to the below case */
 	case EVB_INT_SUB: case EVB_INSERT: case ANA_INT_FUNC: case
 	ANA_USR_FUNC: case EVB_CASE: case EVB_NCASE: case EVB_BLOCK:
-	  n = symbol_memory(symbol)/sizeof(word);
+	  n = symbol_memory(symbol)/sizeof(Word);
 	  ptr = symbol_data(symbol);
 	  while (n--)
 	    if (symbol_context(k = *ptr++) == symbol
@@ -1514,11 +1514,11 @@ void undefine(int symbol)
 /* when they are undefined (e.g. as lhs in a replacement) */
 }
 /*----------------------------------------------------------------*/
-void zap(int nsym)
+void zap(Int nsym)
 /* undefine & remove name (if any) */
 {
  char	*name, *noName = "[]";
- int	context, hashValue;
+ Int	context, hashValue;
  hashTableEntry	*hp, *oldHp, **hashTable;
 #if DEBUG
  void	checkTemps(void);
@@ -1603,7 +1603,7 @@ void zap(int nsym)
 #endif
 }
 /*----------------------------------------------------------------*/
-void cleanUp(int context, int which)
+void cleanUp(Int context, Int which)
 /* names in symbolStack are supposed to be removed after use by the */
 /* routines that use them.  only resetting of the index is done here. */
 /* all temporary variables that have the specified context are removed */ 
@@ -1611,7 +1611,7 @@ void cleanUp(int context, int which)
 /* CLEANUP_COMP CLEANUP_ERROR */
 {
   char	comp;
-  int	i;
+  Int	i;
   void	zapParseTemps(void);
 
   comp = which & CLEANUP_COMP;
@@ -1644,7 +1644,7 @@ void cleanUp(int context, int which)
     zapParseTemps();
 }
 /*----------------------------------------------------------------*/
-void cleanUpRoutine(int context, char keepBase)
+void cleanUpRoutine(Int context, char keepBase)
 /* completely removes all traces of the routine with the given context */
 /* keeps the ANA_SUBROUTINE, ANA_FUNCTION, or ANA_BLOCKROUTINE symbol */
 /* itself if keepBase is unequal to zero.  If keepBase is unequal to
@@ -1653,8 +1653,8 @@ void cleanUpRoutine(int context, char keepBase)
  into an ANA_BLOCK.  LS 19feb97 21may99 */
 {
   char	mem;
-  int	n;
-  word	*ptr;
+  Int	n;
+  Word	*ptr;
 
   if (context < nFixed || context >= NAMED_END) {
     anaerror("Illegal routine or function specified", context);
@@ -1716,10 +1716,10 @@ void updateIndices(void)
     tempExecutableIndex--;
 }
 /*----------------------------------------------------------------*/
-int nextFreeStackEntry(void)
+Int nextFreeStackEntry(void)
      /* returns index to next free item in symbolStack.  May cycle. */
 {
-  int	oldIndex = symbolStackIndex;
+  Int	oldIndex = symbolStackIndex;
 
   while (symbolStack[symbolStackIndex]) {
     if (++symbolStackIndex == SYMBOLSTACKSIZE)
@@ -1731,13 +1731,13 @@ int nextFreeStackEntry(void)
   return symbolStackIndex;
 }
 /*----------------------------------------------------------------*/
-int nextFreeNamedVariable(void)
+Int nextFreeNamedVariable(void)
      /* returns index to next free named variable in symbol table.
 	some may have been zapped in the meantime, so cycle if at end of
 	table */
 {
-  int	oldIndex = namedVariableIndex;
-  extern int	compileLevel;
+  Int	oldIndex = namedVariableIndex;
+  extern Int	compileLevel;
 
   while (sym[namedVariableIndex].class) {
     if (++namedVariableIndex == NAMED_END) namedVariableIndex = NAMED_START;
@@ -1751,10 +1751,10 @@ int nextFreeNamedVariable(void)
   return namedVariableIndex++;
 }
 /*----------------------------------------------------------------*/
-int nextFreeTempVariable(void)
+Int nextFreeTempVariable(void)
 /* returns index to next free temporary variable in symbol table */
 {
- extern int	compileLevel;
+ extern Int	compileLevel;
 
  while (sym[tempVariableIndex].class)
    if (++tempVariableIndex == TEMPS_END) {
@@ -1768,10 +1768,10 @@ int nextFreeTempVariable(void)
  return tempVariableIndex++;
 }
 /*----------------------------------------------------------------*/
-int nextFreeTempExecutable(void)
+Int nextFreeTempExecutable(void)
 /* returns index to next free temporary executable in symbol table */
 {
-  extern int	compileLevel;
+  extern Int	compileLevel;
 
   while (sym[tempExecutableIndex].class) {
     if (++tempExecutableIndex == EXE_END) 
@@ -1784,13 +1784,13 @@ int nextFreeTempExecutable(void)
   return tempExecutableIndex++;
 }
 /*----------------------------------------------------------------*/
-int nextFreeExecutable(void)
+Int nextFreeExecutable(void)
 /* returns index to next free executable in symbol table
    some may have been zapped in the meantime, so cycle if at end
    of table */
 {
-  int    oldIndex = executableIndex;
-  extern int	compileLevel;
+  Int    oldIndex = executableIndex;
+  extern Int	compileLevel;
 
   while (sym[executableIndex].class) {
     if (++executableIndex == EXE_END)
@@ -1805,11 +1805,11 @@ int nextFreeExecutable(void)
   return executableIndex++;
 }
 /*----------------------------------------------------------------*/
-int nextFreeUndefined(void)
+Int nextFreeUndefined(void)
 /* returns a free undefined temporary variable */
 {
-  extern int	compileLevel;
-  int	n;
+  extern Int	compileLevel;
+  Int	n;
 
   n = nextFreeTempVariable();
   if (n < 0) return n;		/* some error */
@@ -1818,7 +1818,7 @@ int nextFreeUndefined(void)
   return n;
 }
 /*----------------------------------------------------------------*/
-void pushList(word symNum)
+void pushList(Word symNum)
 /* pushes a symbol number unto the list stack */
 {
  if (listStackItem - listStack < NLIST) {
@@ -1829,7 +1829,7 @@ void pushList(word symNum)
        listStackItem - listStack);
 }
 /*----------------------------------------------------------------*/
-word popList(void)
+Word popList(void)
 /* pops a symbol number from the list stack */
 {
  if (listStackItem > listStack)
@@ -1837,33 +1837,33 @@ word popList(void)
  return anaerror("Attempt to read from empty list stack\n", 0);
 }
 /*----------------------------------------------------------------*/
-int moveList(int n)
+Int moveList(Int n)
 /* moves the topmost <n> entries on the list stack over by one */
 {
   if (listStackItem - listStack < NLIST)
-  { memcpy(listStack + 1, listStack, n*sizeof(word));
+  { memcpy(listStack + 1, listStack, n*sizeof(Word));
     listStackItem++;
     return 1; }
   return anaerror("Too many elements (%d) in list; list stack full\n", 0,
 	       listStackItem - listStack);
 }
 /*----------------------------------------------------------------*/
-void swapList(int n1, int n2)
+void swapList(Int n1, Int n2)
 /* swaps the elements <n1> and <n2> positions down the list stack */
 {
- int	temp;
+ Int	temp;
 
  temp = listStackItem[-n2];
  listStackItem[-n2] = listStackItem[-n1];
  listStackItem[-n1] = temp;
 }
 /*----------------------------------------------------------------*/
-int stackListLength(void)
+Int stackListLength(void)
 /* returns the number of elements in the topmost list in the stack */
 /* assumes that all lists are delimited by ANA_NEW_LIST */
 {
- word	*i = listStackItem - 1;
- int	n = 0;
+ Word	*i = listStackItem - 1;
+ Int	n = 0;
 
  if (i < listStack)
    return -1;		/* no list in stack */
@@ -1877,7 +1877,7 @@ int stackListLength(void)
 void dupList(void)
 /* duplicates the topmost list */
 {
-  int	n, n2;
+  Int	n, n2;
 
   n = n2 = stackListLength();
   pushList(ANA_NEW_LIST);
@@ -1885,7 +1885,7 @@ void dupList(void)
     pushList(listStackItem[-n-1]);
 }
 /*----------------------------------------------------------------*/
-void unlinkString(int index)
+void unlinkString(Int index)
 /* zero symbolStack[index] and update symbolStackIndex, */
 /* but do not free the memory */
 {
@@ -1897,7 +1897,7 @@ void unlinkString(int index)
   nSymbolStack--;
 }
 /*----------------------------------------------------------------*/
-void freeString(int index)
+void freeString(Int index)
      /* removes the string (if any) from index <index> in symbolStack[] */
      /* and updates symbolStackIndex  */
 {
@@ -1905,11 +1905,11 @@ void freeString(int index)
   unlinkString(index);
 }
 /*----------------------------------------------------------------*/
-int installStruct(int base, int key)
+Int installStruct(Int base, Int key)
 /* returns a struct pointer, supports variables, user-functions, */
 /* and user-routines as structures */
 {
-  int	n;
+  Int	n;
 
   n = lookForVar(base, curContext); /* seek user-defined item */
   if (n < 0)			/* no such item found */
@@ -1923,13 +1923,13 @@ int installStruct(int base, int key)
   return newSymbol(ANA_LIST_PTR, n, key);
 }
 /*----------------------------------------------------------------*/
-int copyElement(int symbol, char *key)
+Int copyElement(Int symbol, char *key)
 /* return a complete copy of variable <symbol>, with name (key) <key>, for */
 /* inclusion in a list, structure, or range.  such a variable must */
 /* not be a temporary, to prevent its premature deletion. */
 {
-  int	n;
-  int	ana_replace(int, int);
+  Int	n;
+  Int	ana_replace(Int, Int);
 
   if ((n = installString(key)) < 0) return n;
   if ((n = findVar(n, 0)) < 0) return n;
@@ -1937,7 +1937,7 @@ int copyElement(int symbol, char *key)
   return n;
 }
 /*----------------------------------------------------------------*/
-int findTarget(char *name, int *type, int allowSubr)
+Int findTarget(char *name, Int *type, Int allowSubr)
 /* seeks identification of the name <*name> as a
    variable or a user-defined routine or an internal function.
    User-defined subroutines are only checked if <allowSubr> is non-zero.
@@ -1955,9 +1955,9 @@ int findTarget(char *name, int *type, int allowSubr)
    no target was found.  The symbolStack[] entry is removed.
    LS 26dec98 */
 {
-  int	result;
+  Int	result;
   FILE	*fp;
-  int	nextCompileLevel(FILE *, char *);
+  Int	nextCompileLevel(FILE *, char *);
 
   /* seek a named variable */
   result = lookForName(name, varHashTable, curContext);
@@ -2013,7 +2013,7 @@ int findTarget(char *name, int *type, int allowSubr)
   return ANA_ERROR;
 }
 /*----------------------------------------------------------------*/
-int newSymbol(int kind, ...)
+Int newSymbol(Int kind, ...)
 /* returns index to symbol table for a new symbol.
    arguments depend on kind:
      (ANA_SCALAR, type)
@@ -2050,19 +2050,19 @@ int newSymbol(int kind, ...)
      (ANA_STRUCT_PTR)
 */
 {
-  int		n, i, narg, isStruct, isScalarRange, j, target, depth;
+  Int		n, i, narg, isStruct, isScalarRange, j, target, depth;
   extern char	reportBody, ignoreSymbols, compileOnly;
   extractSec	*eptr;
-  word	*ptr;
+  Word	*ptr;
   pointer	p;
 #if YYDEBUG
-  extern int	yydebug;
+  extern Int	yydebug;
 #endif
   /* static char	inDefinition = 0; */
-  word		*arg;
+  Word		*arg;
   va_list	ap;
-  int	int_arg(int);
-  void	fixContext(int, int);
+  Int	int_arg(Int);
+  void	fixContext(Int, Int);
 
  /* don't generate symbols in bodies of routines when using @@file */
  /* (reportBody) and when defining a routine (inDefinition).  */
@@ -2098,14 +2098,14 @@ int newSymbol(int kind, ...)
     }
     switch (kind) {
       case ANA_SCALAR:
-	scalar_type(n) = va_arg(ap, int);
+	scalar_type(n) = va_arg(ap, Int);
 	break;
       case ANA_FIXED_NUMBER:
 	/* same as an ordinary scalar, but in EDB symbol space, so that it */
 	/* doesn't get overwritten as "just another temp" (i.e. isFreeTemp() */
 	/* returns 0).  otherwise, get problems e.g. in a for-loop, where */
 	/* temp numbers are used more than once.  */
-	symbol_type(n) = va_arg(ap, int);
+	symbol_type(n) = va_arg(ap, Int);
 	if (symbol_type(n) >= ANA_CFLOAT) { /* a complex scalar */
 	  symbol_class(n) = ANA_CSCALAR;
 	  complex_scalar_memory(n) = ana_type_size[symbol_type(n)];
@@ -2119,7 +2119,7 @@ int newSymbol(int kind, ...)
 	/* a literal string */
 	symbol_class(n) = ANA_STRING;
 	string_type(n) = ANA_LSTRING;
-	string_value(n) = symbolStack[i = va_arg(ap, int)];
+	string_value(n) = symbolStack[i = va_arg(ap, Int)];
 	symbol_memory(n) = strlen(symbolStack[i]) + 1; /* count \0 */
 	unlinkString(i);		/* free position in stack */
 	break;
@@ -2163,7 +2163,7 @@ int newSymbol(int kind, ...)
 	  i = eptr->number;
 	  switch (eptr->type) {
 	    case ANA_RANGE:
-	      eptr->ptr.w = malloc(i*sizeof(word));
+	      eptr->ptr.w = malloc(i*sizeof(Word));
 	      p.w = eptr->ptr.w + i; /* start at the end */
 	      while (i--) {
 		*--p.w = popList();
@@ -2186,13 +2186,13 @@ int newSymbol(int kind, ...)
 	break;
       case ANA_META:		/* a meta symbol, i.e. a string expression */
 				/* which points at a symbol */
-	meta_target(n) = va_arg(ap, int);
+	meta_target(n) = va_arg(ap, Int);
 	embed(meta_target(n), n);
 	break;
       case ANA_RANGE:  /* a range */
 	isScalarRange = 1;
 	/* range start: */
-	i = va_arg(ap, int);
+	i = va_arg(ap, Int);
 	range_start(n) = i;
 	if (i < 0)
 	  i = -i;
@@ -2200,7 +2200,7 @@ int newSymbol(int kind, ...)
 	if (symbol_class(i) != ANA_SCALAR)
 	  isScalarRange = 0;
 	/* range end: */
-	i = va_arg(ap, int);
+	i = va_arg(ap, Int);
 	range_end(n) = i;
 	if (i < 0)
 	  i = -i;
@@ -2214,7 +2214,7 @@ int newSymbol(int kind, ...)
       case ANA_PRE_RANGE:
 	isScalarRange = 1;
 	/* pre_range start: */
-	i = va_arg(ap, int);
+	i = va_arg(ap, Int);
 	pre_range_start(n) = i;
 	if (i < 0)
 	  i = -i;
@@ -2222,7 +2222,7 @@ int newSymbol(int kind, ...)
 	if (symbol_class(i) != ANA_SCALAR)
 	  isScalarRange = 0;
 	/* pre_range end: */
-	i = va_arg(ap, int);
+	i = va_arg(ap, Int);
 	pre_range_end(n) = i;
 	if (i < 0)
 	  i = -i;
@@ -2234,8 +2234,8 @@ int newSymbol(int kind, ...)
 	pre_range_scalar(n) = isScalarRange;
 	break;
       case ANA_LIST_PTR:		/* pointer to a struct element */
-	list_ptr_target(n) = va_arg(ap, int); /* the struct */
-	if ((i = va_arg(ap, int)) >= 0) { /* non-numerical key */
+	list_ptr_target(n) = va_arg(ap, Int); /* the struct */
+	if ((i = va_arg(ap, Int)) >= 0) { /* non-numerical key */
 	  list_ptr_tag_string(n) = symbolStack[i]; /* key */
 	 list_ptr_tag_size(n) = strlen(symbolStack[i]) + 1;
 	 unlinkString(i);	/* unlink keyword from stack */
@@ -2285,13 +2285,13 @@ int newSymbol(int kind, ...)
 	} else {		/* must be a list */
 	  symbol_class(n) = ANA_PRE_CLIST;
 	  if (narg) {
-	    if (!(arg = (word *) malloc(narg*sizeof(word)))) {
+	    if (!(arg = (Word *) malloc(narg*sizeof(Word)))) {
 	      va_end(ap); 
 	      return anaerror("Could not allocate memory for a list", 0);
 	    }
 	  } else
 	    arg = NULL;
-	  symbol_memory(n) = narg*sizeof(word);
+	  symbol_memory(n) = narg*sizeof(Word);
 	  pre_clist_symbols(n) = arg;
 	  arg += narg;
 	  while (narg--) {
@@ -2303,17 +2303,17 @@ int newSymbol(int kind, ...)
 	popList();				/* pop ANA_NEW_LIST */
 	break;
       case ANA_SUBSC_PTR:	/* subscript pointer */
-	if (!(symbol_data(n) = (int *) malloc(4*sizeof(int)))) {
+	if (!(symbol_data(n) = (Int *) malloc(4*sizeof(Int)))) {
 	  va_end(ap);
 	  printf("newSymbol: ");
 	  return cerror(ALLOC_ERR, 0);
 	}
-	symbol_memory(n) = 4*sizeof(int);
+	symbol_memory(n) = 4*sizeof(Int);
 	break;
       case ANA_POINTER:
 	transfer_is_parameter(n) = 0;	/* not a formal argument in a */
 					/* user-defined function or routine */
-	narg = va_arg(ap, int);
+	narg = va_arg(ap, Int);
 	i = lookForSubr(narg);
 	if (i < 0)
 	  i = lookForFunc(narg);
@@ -2344,9 +2344,9 @@ int newSymbol(int kind, ...)
 	transfer_target(n) = i;
 	break;
       case ANA_KEYWORD:
-	keyword_name_symbol(n) = newSymbol(ANA_FIXED_STRING, va_arg(ap, int));
+	keyword_name_symbol(n) = newSymbol(ANA_FIXED_STRING, va_arg(ap, Int));
 	embed(keyword_name_symbol(n), n);
-	keyword_value(n) = va_arg(ap, int);
+	keyword_value(n) = va_arg(ap, Int);
 	embed(keyword_value(n), n);
 	break;
       case ANA_SUBROUTINE: case ANA_FUNCTION: case ANA_BLOCKROUTINE:
@@ -2358,11 +2358,11 @@ int newSymbol(int kind, ...)
 	  if encountered during a @@-compilation, then don't do anything
 	  if the routine is already compiled;  merely note the file if
 	  the routine is not yet defined */
-      { word	nArg, nStatement;
-	int	oldContext;
+      { Word	nArg, nStatement;
+	Int	oldContext;
 	char	**key;
 	 
-	n = i = va_arg(ap, int);
+	n = i = va_arg(ap, Int);
 	if (n >= 0) {		/* first pass: n = index of routine's name */
 				/* in symbolStack[] */
 	  switch (kind)	{	/* first see if the routine is already */
@@ -2410,16 +2410,16 @@ int newSymbol(int kind, ...)
 		nArg--;
 	      } else
 		routine_has_extended_param(n) = 0;
-	      if (nArg > UCHAR_MAX) { /* too many parameters */
+	      if (nArg > UINT8_MAX) { /* too many parameters */
 		va_end(ap);
 		reportBody = 0;
 		return anaerror("More than %1d parameters specified\n", n,
-			     UCHAR_MAX);
+			     UINT8_MAX);
 	      }
 	      routine_num_parameters(n) = nArg;
 	      if (nArg
 		  && !(routine_parameters(n)
-		       = (word *) malloc(nArg*sizeof(word)))) {
+		       = (Word *) malloc(nArg*sizeof(Word)))) {
 				/* could not allocate room for parameters */
 		va_end(ap);
 		reportBody = 0;
@@ -2507,7 +2507,7 @@ int newSymbol(int kind, ...)
 	    /* the beginning of the combined parameters+statements list) */
 	    if (nStatement &&
 		!(routine_parameters(n) =
-		  (word *) malloc(nStatement*sizeof(word)))) {
+		  (Word *) malloc(nStatement*sizeof(Word)))) {
 	      va_end(ap); 
 	      curContext = oldContext;	/* restore context */
 	      ignoreSymbols = 0;
@@ -2521,12 +2521,12 @@ int newSymbol(int kind, ...)
 	    if (nArg)		/* reallocate memory for combined */
 				/* parameters+statements list */
 	      routine_parameters(n) =
-		(word *) realloc(routine_parameters(n),
-				 (nArg + nStatement)*sizeof(word));
+		(Word *) realloc(routine_parameters(n),
+				 (nArg + nStatement)*sizeof(Word));
 	    else		/* no parameters, just allocate space for */
 				/* statements */
 	      routine_parameters(n) =
-		(word *) malloc(nStatement*sizeof(word));
+		(Word *) malloc(nStatement*sizeof(Word));
 	    if (!routine_parameters(n)) { /* allocation failed */
 	      va_end(ap);
 	      curContext = oldContext;	/* restore context */
@@ -2558,7 +2558,7 @@ int newSymbol(int kind, ...)
       }
       case ANA_EVB: case ANA_INT_FUNC: case ANA_USR_FUNC:
 	if (kind == ANA_EVB) {
-	  kind = va_arg(ap, int);
+	  kind = va_arg(ap, Int);
 	  symbol_type(n) = kind;
 	}
 	i = 0;			/* default: no more items to retrieve */
@@ -2577,31 +2577,31 @@ int newSymbol(int kind, ...)
 	    i = 4; 
 	    break;
 	  case EVB_USR_CODE:
-	    usr_code_routine_num(n) = va_arg(ap, int); /* routine number */
+	    usr_code_routine_num(n) = va_arg(ap, Int); /* routine number */
 	    break;
 	  case EVB_FILE:
-	    i = va_arg(ap, int);	/* index to string */
+	    i = va_arg(ap, Int);	/* index to string */
 	    file_name(n) = symbolStack[i];
 	    symbol_memory(n) = strlen(symbolStack[i]) + 1;
 	    unlinkString(i);
-	    i = va_arg(ap, int);	/* include type: INCLUDE -> always,
+	    i = va_arg(ap, Int);	/* include type: INCLUDE -> always,
 					   REPORT -> only if necessary */
 	    file_include_type(n) = i;
 	    i = 0;		/* no more items to retrieve */
 	    break;
 	  case EVB_INT_SUB: case EVB_USR_SUB: case EVB_INSERT:
 	  case ANA_INT_FUNC: case ANA_USR_FUNC:
-	    sym[n].xx = va_arg(ap, int); /* routine number (SUB) or target */
+	    sym[n].xx = va_arg(ap, Int); /* routine number (SUB) or target */
 	  case EVB_CASE: case EVB_NCASE: case EVB_BLOCK: 
 	    i = stackListLength();		/* # of expr and statements */
 	    if (i) {			/* only if there are any elements */
-	      if (!(arg = (word *) malloc(i*sizeof(word)))) {
+	      if (!(arg = (Word *) malloc(i*sizeof(Word)))) {
 		va_end(ap);
 		return anaerror("Could not allocate memory for stacked elements",
 			     0);
 	      }
 	      symbol_data(n) = arg; /* the elements */
-	      symbol_memory(n) = i*sizeof(word);	/* the memory size */
+	      symbol_memory(n) = i*sizeof(Word);	/* the memory size */
 	      arg += i;	/* start with the last element (which is */
 	      /* on top of the stack) */
 	      while (i--) {	/* all elements */
@@ -2617,33 +2617,33 @@ int newSymbol(int kind, ...)
 	if (i > 0) {
 	  arg = sym[n].spec.evb.args;
 	  while (i--) {
-	    *arg = va_arg(ap, int);
+	    *arg = va_arg(ap, Int);
 	    embed(*arg, n);
 	    arg++;
 	  }
 	  if (kind == EVB_FOR) {
-	    for_body(n) = va_arg(ap, int);
+	    for_body(n) = va_arg(ap, Int);
 	    embed(for_body(n), n);
 	  }
 	}
 	break;
       case ANA_BIN_OP: case ANA_IF_OP:
-	bin_op_type(n) = va_arg(ap, int);
-	bin_op_lhs(n) = va_arg(ap, int);
+	bin_op_type(n) = va_arg(ap, Int);
+	bin_op_lhs(n) = va_arg(ap, Int);
 	embed(bin_op_lhs(n), n);
-	bin_op_rhs(n) = va_arg(ap, int);
+	bin_op_rhs(n) = va_arg(ap, Int);
 	embed(bin_op_rhs(n), n);
 	break;
     }
   } else {			/* reportBody & in definition */
     switch (kind) {
       case ANA_FIXED_STRING:
-	i = va_arg(ap, int);	/* index to symbolStack */
+	i = va_arg(ap, Int);	/* index to symbolStack */
 	freeString(i);
 	break;
       case ANA_LIST_PTR:
-	i = va_arg(ap, int);	/* struct number */
-	i = va_arg(ap, int);	/* key */
+	i = va_arg(ap, Int);	/* struct number */
+	i = va_arg(ap, Int);	/* key */
 	if (i >= 0)		/* non-numerical key */
 	  freeString(i); 
 	break;
@@ -2657,14 +2657,14 @@ int newSymbol(int kind, ...)
 	}
 	break;
       case ANA_KEYWORD:
-	i = va_arg(ap, int);
+	i = va_arg(ap, Int);
 	freeString(i);
 	break;
       case ANA_SUBROUTINE: case ANA_FUNCTION: case ANA_BLOCKROUTINE:
 	/* when we get here, a symbol has already been reserved for the */
 	/* routine, and the parameters have been ignored.  we only need to */
 	/* get rid of the routine body. */
-	n = va_arg(ap, int);
+	n = va_arg(ap, Int);
 	n = -n - 1;		/* routine # */
 	routine_num_statements(n) = 0; /* no statements */
 	i = stackListLength();
@@ -2700,10 +2700,10 @@ int newSymbol(int kind, ...)
 	break;
       case ANA_EVB: case ANA_INT_FUNC: case ANA_USR_FUNC:
 	if (kind == ANA_EVB)
-	  kind = va_arg(ap, int);
+	  kind = va_arg(ap, Int);
 	switch (kind) {
 	  case EVB_FILE:
-	    i = va_arg(ap, int);
+	    i = va_arg(ap, Int);
 	    freeString(i);
 	    break;
 	  case EVB_INT_SUB: case EVB_USR_SUB: case EVB_INSERT:
@@ -2728,15 +2728,15 @@ int newSymbol(int kind, ...)
   return n;
 }
 /*----------------------------------------------------------------*/
-int hash(char *string)
+Int hash(char *string)
 {
- int	i;
+ Int	i;
 
  for (i = 0; *string; ) i += *string++;
  return i % HASHSIZE;
 }
 /*----------------------------------------------------------------*/
-int ircmp(const void *a, const void *b)
+Int ircmp(const void *a, const void *b)
 {
   internalRoutine *ra, *rb;
   
@@ -2745,7 +2745,7 @@ int ircmp(const void *a, const void *b)
   return strcmp(ra->name, rb->name);
 }
 /*----------------------------------------------------------------*/
-int findInternalName(char *name, int isSubroutine)
+Int findInternalName(char *name, Int isSubroutine)
 /* searches for name in the appropriate subroutine
   or function table.  if found, returns
   index, else returns -1 */
@@ -2766,21 +2766,21 @@ int findInternalName(char *name, int isSubroutine)
 }
 /*----------------------------------------------------------------*/
 static compileInfo	*c_info = NULL;
-int	cur_c_info = 0, n_c_info = 0;
+Int	cur_c_info = 0, n_c_info = 0;
 compileInfo	*curCompileInfo;
 
-int nextCompileLevel(FILE *fp, char *fileName)
+Int nextCompileLevel(FILE *fp, char *fileName)
 /* saves the rest of the current input line and starts reading
  input from file fp.  When the file is processed, compilation
  at the current level is resumed. */
 {
- int	n, oldZapContext;
+ Int	n, oldZapContext;
  char	*name;
- extern int	echo; 
+ extern Int	echo; 
  extern char	inHistoryBuffer, tLine[], *inputString;
- extern byte	disableNewline;
- int	yyparse(void), getStreamChar(void), getStringChar(void);
- extern int	(*getChar)(void);
+ extern Byte	disableNewline;
+ Int	yyparse(void), getStreamChar(void), getStringChar(void);
+ extern Int	(*getChar)(void);
  compileInfo	*nextFreeCompileInfo(void);
  void	pegParse(void), removeParseMarker(void), releaseCompileInfo(void);
 
@@ -2853,16 +2853,16 @@ int nextCompileLevel(FILE *fp, char *fileName)
  return n;
 } 
 /*----------------------------------------------------------------*/
-static int	compileCount = 0;
-int compile(char *string)
+static Int	compileCount = 0;
+Int compile(char *string)
 /* compiles string <string> and store in BLOCKROUTINE.  Returns */
 /* but does not execute the block routine.  LS 5feb96 */
 {
-  int	oldContext, n, getStringChar(void), getStreamChar(void), nsym, result;
+  Int	oldContext, n, getStringChar(void), getStreamChar(void), nsym, result;
   extern char	*inputString, compileOnly;
-  extern int	(*getChar)(void), executeLevel;
+  extern Int	(*getChar)(void), executeLevel;
   char	compileName[12], oldInstalling;
-  int	newBlockSymbol(int);
+  Int	newBlockSymbol(Int);
 
   inputString = string;
   compileOnly++;
@@ -2895,10 +2895,10 @@ int compile(char *string)
 }
 /*----------------------------------------------------------------*/
 #if DEVELOP
-int ana_compile(int narg, int ps[])
+Int ana_compile(Int narg, Int ps[])
 {
   char	*string;
-  int	result, value;
+  Int	result, value;
 
   string = string_arg(*ps);
   result = scalar_scratch(ANA_LONG);
@@ -2911,11 +2911,11 @@ int ana_compile(int narg, int ps[])
 }
 #endif
 /*----------------------------------------------------------------*/
-int newBlockSymbol(int index)
+Int newBlockSymbol(Int index)
 /* searches for user block symbolStack[index] in list of user-defined
   block routines.  treats function pointers */
 {
-  int	n, result;
+  Int	n, result;
   extern char	reportBody;
   
   if (reportBody) {		/* remove name from stack */
@@ -2951,7 +2951,7 @@ int newBlockSymbol(int index)
   return result;
 }
 /*----------------------------------------------------------------*/
-int newSubrSymbol(int index)
+Int newSubrSymbol(Int index)
 /* searches for subroutine symbolStack[index] in lists of internal
   and user-defined subroutines.  if not found, then searches for an
   appropriate file to find a definition.  if such a file is found,
@@ -2960,9 +2960,9 @@ int newSubrSymbol(int index)
   or EVB_USR_SUB) is returned.  if such a file is not found, then
   an error is generated. */
 {
- int	n, i;
+ Int	n, i;
  extern char	reportBody;
- extern int	findBody;
+ extern Int	findBody;
 
  /* In order, look for: */
  /* 1. function pointer to some user-defined or internal subroutine */
@@ -3007,11 +3007,11 @@ int newSubrSymbol(int index)
  return newSymbol(ANA_EVB, EVB_USR_SUB, n);
 }
 /*----------------------------------------------------------------*/
-int lookForName(char *name, hashTableEntry *hashTable[], int context)
+Int lookForName(char *name, hashTableEntry *hashTable[], Int context)
      /* searches name in hashTable[] for context.  if found,
 	returns symbol number, otherwise returns -1 */
 {
-  int		hashValue, n;
+  Int		hashValue, n;
   hashTableEntry	*hp;
   
   hashValue = hash(name);
@@ -3034,13 +3034,13 @@ int lookForName(char *name, hashTableEntry *hashTable[], int context)
   return -1;
 }
 /*----------------------------------------------------------------*/
-int findSym(int index, hashTableEntry *hashTable[], int context)
+Int findSym(Int index, hashTableEntry *hashTable[], Int context)
 /* searches symbolStack[index] in hashTable[] for context.  if found,
    returns symbol number, otherwise installs the name in hashTable[]
    and sym[].  always removes the entry from the symbolStack. */
 {
  char	*name;
- int	n;
+ Int	n;
  extern char	ignoreSymbols;
 
  if (ignoreSymbols) {
@@ -3053,11 +3053,11 @@ int findSym(int index, hashTableEntry *hashTable[], int context)
  return n;
 }
 /*----------------------------------------------------------------*/
-char *symName(int symNum, hashTableEntry *hashTable[])
+char *symName(Int symNum, hashTableEntry *hashTable[])
 /* returns the name of the symbol, if any, or "[symNum]" */
 {
  static char	name[7];
- int		hashValue;
+ Int		hashValue;
  hashTableEntry	*hp;
 
  if (symNum < 0 || symNum >= NSYM)
@@ -3075,7 +3075,7 @@ char *symName(int symNum, hashTableEntry *hashTable[])
  return name;
 }
 /*----------------------------------------------------------------*/
-char *symbolName(int symbol)
+char *symbolName(Int symbol)
 /* returns the name of the symbol. */
 {
   hashTableEntry	**hashTable;
@@ -3101,11 +3101,11 @@ char *symbolName(int symbol)
   return symName(symbol, hashTable);
 }
 /*----------------------------------------------------------------*/
-int suppressEvalRoutine(int index)
+Int suppressEvalRoutine(Int index)
 /* returns evaluation suppression associated with internal routine */
 /* symbolStack[index] */
 {
-  int	n;
+  Int	n;
   keyList	*keys;
 
   n = findInternalSym(index, 1); /* >= 0 -> internal subroutine */
@@ -3117,13 +3117,13 @@ int suppressEvalRoutine(int index)
 #define	IGNORE_SIG	1
 #define ASK_SIG		2
 #define SIG_BREAK	3
-void exception(int sig)
+void exception(Int sig)
 /* exception handler */
 {
- int	c, saveHistory(void);
- extern int	curSymbol, executeLevel, step, statementDepth;
+ Int	c, saveHistory(void);
+ extern Int	curSymbol, executeLevel, step, statementDepth;
  extern jmp_buf	jmpenv;
- void	cleanUp(int, int), Quit(int);
+ void	cleanUp(Int, Int), Quit(Int);
 
  if (sig != SIGCONT && curSymbol)
    puts(symbolIdent(curSymbol, 1));
@@ -3207,7 +3207,7 @@ void exception(int sig)
  return;
 }
 /*----------------------------------------------------------------*/
-char *typeName(int type)
+char *typeName(Int type)
 /* returns the name that goes with the data type */
 {
   static char *typeNames[] = {
@@ -3215,7 +3215,7 @@ char *typeName(int type)
     "STRING", "STRING", "STRING", "CFLOAT", "CDOUBLE",
     "undefined", "unknown"
   };
-  int	index;
+  Int	index;
 
   if (type == ANA_UNDEFINED)
     index = 10;			/* undefined */
@@ -3226,11 +3226,11 @@ char *typeName(int type)
   return typeNames[index];
 }
 /*----------------------------------------------------------------*/
-char *className(int class)
+char *className(Int class)
 /* returns the name of the class */
 {
   static struct classInfo {
-    byte number; char *name;
+    Byte number; char *name;
   } classes[] = {
     { ANA_UNUSED, "not used" },
     { ANA_SCALAR, "scalar" },
@@ -3283,7 +3283,7 @@ char *className(int class)
   42, 42, 32, 33, 34, 35, 36, 37, 42, 42, 38, 39, 40
  };
 
- int	hash;
+ Int	hash;
 
  if (class < 0)
    hash = 26;
@@ -3292,16 +3292,16 @@ char *className(int class)
    if (hash > 51)
      hash = 25;
    hash = classHashTable[hash];
-   if (class != (int) classes[hash].number)
+   if (class != (Int) classes[hash].number)
      hash = 42;
  }
  return classes[hash].name;
 }
 /*----------------------------------------------------------------*/
-int ana_classname(int narg, int ps[])
+Int ana_classname(Int narg, Int ps[])
      /* returns name associated with class number */
 {
-  int	class, result;
+  Int	class, result;
   char	*name;
 
   class = int_arg(*ps);
@@ -3313,10 +3313,10 @@ int ana_classname(int narg, int ps[])
   return result;
 }
 /*----------------------------------------------------------------*/
-int ana_typeName(int narg, int ps[])
+Int ana_typeName(Int narg, Int ps[])
      /* returns name associated with type number */
 {
-  int	type, result;
+  Int	type, result;
   char	*name;
 
   if ((type = int_arg(*ps)) < 0) return -1;
@@ -3328,7 +3328,7 @@ int ana_typeName(int narg, int ps[])
   return result;
 }
 /*----------------------------------------------------------------*/
-char *evbName(int evbType)
+char *evbName(Int evbType)
      /* returns the name of an EVB type */
 {
   static char *evbTypeNames[] = {
@@ -3346,7 +3346,7 @@ char *evbName(int evbType)
   return evbTypeNames[evbType - 1];
 }
 /*----------------------------------------------------------------*/
-char *filetypeName(int filetype)
+char *filetypeName(Int filetype)
 /* returns the name associated with a file type */
 {
   static char *filetypeNames[] = {
@@ -3360,10 +3360,10 @@ char *filetypeName(int filetype)
   return filetypeNames[filetype];
 }
 /*----------------------------------------------------------------*/
-int ana_filetype_name(int narg, int ps[])
+Int ana_filetype_name(Int narg, Int ps[])
 {
   char	*name;
-  int	result;
+  Int	result;
 
   name = filetypeName(int_arg(ps[0]));
   result = string_scratch(strlen(name));
@@ -3371,10 +3371,10 @@ int ana_filetype_name(int narg, int ps[])
   return result;
 }
 /*----------------------------------------------------------------*/
-void fixedValue(char *name, int type, ...)
+void fixedValue(char *name, Int type, ...)
 /* install a numerical constant */
 {
- int	n, iq;
+ Int	n, iq;
  pointer	p;
  va_list	ap;
 
@@ -3397,12 +3397,12 @@ void fixedValue(char *name, int type, ...)
      complex_scalar_type(n) = type;
      p.cf = complex_scalar_data(n).cf;
      if (type == ANA_CFLOAT) {
-       p.cf->real = (float) va_arg(ap, double);
-       p.cf->imaginary = (float) va_arg(ap, double);
+       p.cf->real = (Float) va_arg(ap, Double);
+       p.cf->imaginary = (Float) va_arg(ap, Double);
        p.cf++;
      } else {
-       p.cd->real = va_arg(ap, double);
-       p.cd->imaginary = va_arg(ap, double);
+       p.cd->real = va_arg(ap, Double);
+       p.cd->imaginary = va_arg(ap, Double);
        p.cd++;
      }
      break;
@@ -3411,24 +3411,24 @@ void fixedValue(char *name, int type, ...)
      scalar_type(n) = type;
      switch (type) {
        case ANA_LONG:
-	 scalar_value(n).l = va_arg(ap, int);
+	 scalar_value(n).l = va_arg(ap, Int);
 	 break;
        case ANA_FLOAT:
-	 scalar_value(n).f = (float) va_arg(ap, double);
+	 scalar_value(n).f = (Float) va_arg(ap, Double);
 	 break;
        case ANA_DOUBLE:
-	 scalar_value(n).d = va_arg(ap, double);
+	 scalar_value(n).d = va_arg(ap, Double);
 	 break;
      }
      break;
  }
 }
 /*----------------------------------------------------------------*/
-int installSysFunc(char *name, int number)
+Int installSysFunc(char *name, Int number)
 /* install a system function.  These are implemented as FUNC_PTRs to */
 /* the appropriate function */
 {
- int	n, iq;
+ Int	n, iq;
 
  iq = installString(name);
  n = findVar(iq,0);
@@ -3438,22 +3438,22 @@ int installSysFunc(char *name, int number)
  return n;
 }
 /*----------------------------------------------------------------*/
-int installPointer(char *name, int type, void *ptr)
+Int installPointer(char *name, Int type, void *ptr)
 /* install a ANA_SCAL_PTR system variable */
 { 
- int	n, iq;
+ Int	n, iq;
  
  iq = installString(name);
  n = findVar(iq, 0);
  sym[n].class = ANA_SCAL_PTR;
  scal_ptr_type(n) = type;
- scal_ptr_pointer(n).l = (int *) ptr;
+ scal_ptr_pointer(n).l = (Int *) ptr;
  if (type == ANA_TEMP_STRING)
    symbol_memory(n) = strlen(ptr) + 1;
  return n;
 }
 /*----------------------------------------------------------------*/
-int convertRange(int range)
+Int convertRange(Int range)
 /* convert a ANA_RANGE symbol to a ANA_SUBSC_PTR symbol. */
 /* elements:  #1:  range start */
 /*            #2:  range end */
@@ -3464,7 +3464,7 @@ int convertRange(int range)
 /*            element of the list/array.  if #2 == ANA_ZERO, then only one */
 /*            element is requested. */
 {
-  int	subsc, eval(int), j1, j2;
+  Int	subsc, eval(Int), j1, j2;
   
   if ((subsc = newSymbol(ANA_SUBSC_PTR)) < 0) return -1;
   j1 = range_start(range);
@@ -3515,94 +3515,94 @@ int convertRange(int range)
   return subsc;
 }
 /*----------------------------------------------------------------*/
-void convertPointer(scalar *target, int inType, int outType)
+void convertPointer(scalar *target, Int inType, Int outType)
 /* converts value in target from inType to outType */
 {
   switch (outType) {
   case ANA_BYTE:
     switch (inType) {
     case ANA_WORD:
-      (*target).b = (byte) (*target).w;
+      (*target).b = (Byte) (*target).w;
       break;
     case ANA_LONG:
-      (*target).b = (byte) (*target).l;
+      (*target).b = (Byte) (*target).l;
       break;
     case ANA_FLOAT:
-      (*target).b = (byte) (*target).f;
+      (*target).b = (Byte) (*target).f;
       break;
     case ANA_DOUBLE:
-      (*target).b = (byte) (*target).d;
+      (*target).b = (Byte) (*target).d;
       break;
     }
     break;
   case ANA_WORD:
     switch (inType) {
     case ANA_BYTE:
-      (*target).w = (word) (*target).b;
+      (*target).w = (Word) (*target).b;
       break;
     case ANA_LONG:
-      (*target).w = (word) (*target).l;
+      (*target).w = (Word) (*target).l;
       break;
     case ANA_FLOAT:
-      (*target).w = (word) (*target).f;
+      (*target).w = (Word) (*target).f;
       break;
     case ANA_DOUBLE:
-      (*target).w = (word) (*target).d;
+      (*target).w = (Word) (*target).d;
       break;
     }
     break;
   case ANA_LONG:
     switch (inType) {
     case ANA_BYTE:
-      (*target).l = (int) (*target).b;
+      (*target).l = (Int) (*target).b;
       break;
     case ANA_WORD:
-      (*target).l = (int) (*target).w;
+      (*target).l = (Int) (*target).w;
       break;
     case ANA_FLOAT:
-      (*target).l = (int) (*target).f;
+      (*target).l = (Int) (*target).f;
       break;
     case ANA_DOUBLE:
-      (*target).l = (int) (*target).d;
+      (*target).l = (Int) (*target).d;
       break;
     }
     break;
   case ANA_FLOAT:
     switch (inType) {
     case ANA_BYTE:
-      (*target).f = (float) (*target).b;
+      (*target).f = (Float) (*target).b;
       break;
     case ANA_WORD:
-      (*target).f = (float) (*target).w;
+      (*target).f = (Float) (*target).w;
       break;
     case ANA_LONG:
-      (*target).f = (float) (*target).l;
+      (*target).f = (Float) (*target).l;
       break;
     case ANA_DOUBLE:
-      (*target).f = (float) (*target).d;
+      (*target).f = (Float) (*target).d;
       break;
     }
     break;
   case ANA_DOUBLE:
     switch (inType) {
     case ANA_BYTE:
-      (*target).d = (double) (*target).b;
+      (*target).d = (Double) (*target).b;
       break;
     case ANA_WORD:
-      (*target).d = (double) (*target).w;
+      (*target).d = (Double) (*target).w;
       break;
     case ANA_LONG:
-      (*target).d = (double) (*target).l;
+      (*target).d = (Double) (*target).l;
       break;
     case ANA_FLOAT:
-      (*target).d = (double) (*target).f;
+      (*target).d = (Double) (*target).f;
       break;
     }
     break;
   }
 }
 /*----------------------------------------------------------------*/
-void convertWidePointer(wideScalar *target, int inType, int outType)
+void convertWidePointer(wideScalar *target, Int inType, Int outType)
 /* converts value in <target> from <inType> to <outType> */
 {
   switch (inType) {
@@ -3611,23 +3611,23 @@ void convertWidePointer(wideScalar *target, int inType, int outType)
 	case ANA_BYTE:
 	  break;
 	case ANA_WORD:
-	  target->w = (word) target->b;
+	  target->w = (Word) target->b;
 	  break;
 	case ANA_LONG:
-	  target->l = (int) target->b;
+	  target->l = (Int) target->b;
 	  break;
 	case ANA_FLOAT:
-	  target->f = (float) target->b;
+	  target->f = (Float) target->b;
 	  break;
 	case ANA_DOUBLE:
-	  target->d = (double) target->b;
+	  target->d = (Double) target->b;
 	  break;
 	case ANA_CFLOAT:
-	  target->cf.real = (float) target->b;
+	  target->cf.real = (Float) target->b;
 	  target->cf.imaginary = 0.0;
 	  break;
 	case ANA_CDOUBLE:
-	  target->cd.real = (double) target->b;
+	  target->cd.real = (Double) target->b;
 	  target->cd.imaginary = 0.0;
 	  break;
       }
@@ -3635,25 +3635,25 @@ void convertWidePointer(wideScalar *target, int inType, int outType)
     case ANA_WORD:
       switch (outType) {
 	case ANA_BYTE:
-	  target->b = (byte) target->w;
+	  target->b = (Byte) target->w;
 	  break;
 	case ANA_WORD:
 	  break;
 	case ANA_LONG:
-	  target->l = (int) target->w;
+	  target->l = (Int) target->w;
 	  break;
 	case ANA_FLOAT:
-	  target->f = (float) target->w;
+	  target->f = (Float) target->w;
 	  break;
 	case ANA_DOUBLE:
-	  target->d = (double) target->w;
+	  target->d = (Double) target->w;
 	  break;
 	case ANA_CFLOAT:
-	  target->cf.real = (float) target->w;
+	  target->cf.real = (Float) target->w;
 	  target->cf.imaginary = 0.0;
 	  break;
 	case ANA_CDOUBLE:
-	  target->cd.real = (double) target->w;
+	  target->cd.real = (Double) target->w;
 	  target->cd.imaginary = 0.0;
 	  break;
       }
@@ -3661,26 +3661,26 @@ void convertWidePointer(wideScalar *target, int inType, int outType)
     case ANA_LONG:
       switch (outType) {
 	case ANA_BYTE:
-	  target->b = (byte) target->l;
+	  target->b = (Byte) target->l;
 	  break;
 	  break;
 	case ANA_WORD:
-	  target->w = (word) target->l;
+	  target->w = (Word) target->l;
 	  break;
 	case ANA_LONG:
 	  break;
 	case ANA_FLOAT:
-	  target->f = (float) target->l;
+	  target->f = (Float) target->l;
 	  break;
 	case ANA_DOUBLE:
-	  target->d = (double) target->l;
+	  target->d = (Double) target->l;
 	  break;
 	case ANA_CFLOAT:
-	  target->cf.real = (float) target->l;
+	  target->cf.real = (Float) target->l;
 	  target->cf.imaginary = 0.0;
 	  break;
 	case ANA_CDOUBLE:
-	  target->cd.real = (double) target->l;
+	  target->cd.real = (Double) target->l;
 	  target->cd.imaginary = 0.0;
 	  break;
       }
@@ -3688,25 +3688,25 @@ void convertWidePointer(wideScalar *target, int inType, int outType)
     case ANA_FLOAT:
       switch (outType) {
 	case ANA_BYTE:
-	  target->b = (byte) target->f;
+	  target->b = (Byte) target->f;
 	  break;
 	case ANA_WORD:
-	  target->w = (word) target->f;
+	  target->w = (Word) target->f;
 	  break;
 	case ANA_LONG:
-	  target->l = (int) target->f;
+	  target->l = (Int) target->f;
 	  break;
 	case ANA_FLOAT:
 	  break;
 	case ANA_DOUBLE:
-	  target->d = (double) target->f;
+	  target->d = (Double) target->f;
 	  break;
 	case ANA_CFLOAT:
-	  target->cf.real = (float) target->f;
+	  target->cf.real = (Float) target->f;
 	  target->cf.imaginary = 0.0;
 	  break;
 	case ANA_CDOUBLE:
-	  target->cd.real = (double) target->f;
+	  target->cd.real = (Double) target->f;
 	  target->cd.imaginary = 0.0;
 	  break;
       }
@@ -3714,25 +3714,25 @@ void convertWidePointer(wideScalar *target, int inType, int outType)
     case ANA_DOUBLE:
       switch (outType) {
 	case ANA_BYTE:
-	  target->b = (byte) target->d;
+	  target->b = (Byte) target->d;
 	  break;
 	case ANA_WORD:
-	  target->w = (word) target->d;
+	  target->w = (Word) target->d;
 	  break;
 	case ANA_LONG:
-	  target->l = (int) target->d;
+	  target->l = (Int) target->d;
 	  break;
 	case ANA_FLOAT:
-	  target->f = (float) target->d;
+	  target->f = (Float) target->d;
 	  break;
 	case ANA_DOUBLE:
 	  break;
 	case ANA_CFLOAT:
-	  target->cf.real = (float) target->d;
+	  target->cf.real = (Float) target->d;
 	  target->cf.imaginary = 0.0;
 	  break;
 	case ANA_CDOUBLE:
-	  target->cd.real = (double) target->d;
+	  target->cd.real = (Double) target->d;
 	  target->cd.imaginary = 0.0;
 	  break;
       }
@@ -3740,48 +3740,48 @@ void convertWidePointer(wideScalar *target, int inType, int outType)
     case ANA_CFLOAT:
       switch (outType) {
 	case ANA_BYTE:
-	  target->b = (byte) target->cf.real;
+	  target->b = (Byte) target->cf.real;
 	  break;
 	case ANA_WORD:
-	  target->w = (word) target->cf.real;
+	  target->w = (Word) target->cf.real;
 	  break;
 	case ANA_LONG:
-	  target->l = (int) target->cf.real;
+	  target->l = (Int) target->cf.real;
 	  break;
 	case ANA_FLOAT:
-	  target->f = (float) target->cf.real;
+	  target->f = (Float) target->cf.real;
 	  break;
 	case ANA_DOUBLE:
-	  target->d = (double) target->cf.real;
+	  target->d = (Double) target->cf.real;
 	  break;
 	case ANA_CFLOAT:
 	  break;
 	case ANA_CDOUBLE:
-	  target->cd.real = (double) target->cf.real;
-	  target->cd.imaginary = (double) target->cf.imaginary;
+	  target->cd.real = (Double) target->cf.real;
+	  target->cd.imaginary = (Double) target->cf.imaginary;
 	  break;
       }
       break;
     case ANA_CDOUBLE:
       switch (outType) {
 	case ANA_BYTE:
-	  target->b = (byte) target->cd.real;
+	  target->b = (Byte) target->cd.real;
 	  break;
 	case ANA_WORD:
-	  target->w = (word) target->cd.real;
+	  target->w = (Word) target->cd.real;
 	  break;
 	case ANA_LONG:
-	  target->l = (int) target->cd.real;
+	  target->l = (Int) target->cd.real;
 	  break;
 	case ANA_FLOAT:
-	  target->f = (float) target->cd.real;
+	  target->f = (Float) target->cd.real;
 	  break;
 	case ANA_DOUBLE:
-	  target->d = (double) target->cd.real;
+	  target->d = (Double) target->cd.real;
 	  break;
 	case ANA_CFLOAT:
-	  target->cf.real = (float) target->cd.real;
-	  target->cf.imaginary = (float) target->cd.imaginary;
+	  target->cf.real = (Float) target->cd.real;
+	  target->cf.imaginary = (Float) target->cd.imaginary;
 	  break;
 	case ANA_CDOUBLE:
 	  break;
@@ -3790,10 +3790,10 @@ void convertWidePointer(wideScalar *target, int inType, int outType)
   }
 }
 /*----------------------------------------------------------------*/
-void convertScalar(scalar *target, int nsym, int type)
+void convertScalar(scalar *target, Int nsym, Int type)
 /* returns scalar value of nsym, converted to proper type, in target */
 {
- int		n;
+ Int		n;
  pointer	ptr;
 
  n = scalar_type(nsym);
@@ -3802,107 +3802,107 @@ void convertScalar(scalar *target, int nsym, int type)
  case ANA_BYTE:
    switch (n) {
    case ANA_BYTE:
-     (*target).b = (byte) *ptr.b;
+     (*target).b = (Byte) *ptr.b;
      break;
    case ANA_WORD:
-     (*target).b = (byte) *ptr.w;
+     (*target).b = (Byte) *ptr.w;
      break;
    case ANA_LONG:
-     (*target).b = (byte) *ptr.l;
+     (*target).b = (Byte) *ptr.l;
      break;
    case ANA_FLOAT:
-     (*target).b = (byte) *ptr.f;
+     (*target).b = (Byte) *ptr.f;
      break;
    case ANA_DOUBLE:
-     (*target).b = (byte) *ptr.d;
+     (*target).b = (Byte) *ptr.d;
      break;
    }
    break;
  case ANA_WORD:
    switch (n) {
    case ANA_BYTE:
-     (*target).w = (word) *ptr.b;
+     (*target).w = (Word) *ptr.b;
      break;
    case ANA_WORD:
-     (*target).w = (word) *ptr.w;
+     (*target).w = (Word) *ptr.w;
      break;
    case ANA_LONG:
-     (*target).w = (word) *ptr.l;
+     (*target).w = (Word) *ptr.l;
      break;
    case ANA_FLOAT:
-     (*target).w = (word) *ptr.f;
+     (*target).w = (Word) *ptr.f;
      break;
    case ANA_DOUBLE:
-     (*target).w = (word) *ptr.d;
+     (*target).w = (Word) *ptr.d;
      break;
    }
    break;
  case ANA_LONG:
    switch (n) {
    case ANA_BYTE:
-     (*target).l = (int) *ptr.b;
+     (*target).l = (Int) *ptr.b;
      break;
    case ANA_WORD:
-     (*target).l = (int) *ptr.w;
+     (*target).l = (Int) *ptr.w;
      break;
    case ANA_LONG:
-     (*target).l = (int) *ptr.l;
+     (*target).l = (Int) *ptr.l;
      break;
    case ANA_FLOAT:
-     (*target).l = (int) *ptr.f;
+     (*target).l = (Int) *ptr.f;
      break;
    case ANA_DOUBLE:
-     (*target).l = (int) *ptr.d;
+     (*target).l = (Int) *ptr.d;
      break;
    }
    break;
  case ANA_FLOAT:
    switch (n) {
    case ANA_BYTE:
-     (*target).f = (float) *ptr.b;
+     (*target).f = (Float) *ptr.b;
      break;
    case ANA_WORD:
-     (*target).f = (float) *ptr.w;
+     (*target).f = (Float) *ptr.w;
      break;
    case ANA_LONG:
-     (*target).f = (float) *ptr.l;
+     (*target).f = (Float) *ptr.l;
      break;
    case ANA_FLOAT:
-     (*target).f = (float) *ptr.f;
+     (*target).f = (Float) *ptr.f;
      break;
    case ANA_DOUBLE:
-     (*target).f = (float) *ptr.d;
+     (*target).f = (Float) *ptr.d;
      break;
    }
    break;
  case ANA_DOUBLE:
    switch (n) {
    case ANA_BYTE:
-     (*target).d = (double) *ptr.b;
+     (*target).d = (Double) *ptr.b;
      break;
    case ANA_WORD:
-     (*target).d = (double) *ptr.w;
+     (*target).d = (Double) *ptr.w;
      break;
    case ANA_LONG:
-     (*target).d = (double) *ptr.l;
+     (*target).d = (Double) *ptr.l;
      break;
    case ANA_FLOAT:
-     (*target).d = (double) *ptr.f;
+     (*target).d = (Double) *ptr.f;
      break;
    case ANA_DOUBLE:
-     (*target).d = (double) *ptr.d;
+     (*target).d = (Double) *ptr.d;
      break;
    }
    break;
  }
 }
 /*----------------------------------------------------------------*/
-int ana_symbol_memory()
+Int ana_symbol_memory()
 /* returns the total of the memory allocated for each ANA symbol */
 /* - which is NOT the same as the total allocated memory. */
 /* Note:  some small stuff is not included. */
 {
- int	i, mem = 0;
+ Int	i, mem = 0;
 
  for (i = 0; i < NSYM; i++)
  { switch (sym[i].class)
@@ -3922,8 +3922,8 @@ int ana_symbol_memory()
 	 mem += strlen(list_ptr_tag_string(i)) + 1;
        break;
      case ANA_SUBROUTINE: case ANA_FUNCTION: case ANA_BLOCKROUTINE:
-       mem += routine_num_parameters(i)*(sizeof(char *) + sizeof(word))
-	 + routine_num_statements(i)*sizeof(word);
+       mem += routine_num_parameters(i)*(sizeof(char *) + sizeof(Word))
+	 + routine_num_statements(i)*sizeof(Word);
        break; }
  }
  i = scalar_scratch(ANA_LONG);
@@ -3931,10 +3931,10 @@ int ana_symbol_memory()
  return i;
 }
 /*----------------------------------------------------------------*/
-int ana_trace(int narg, int ps[])
+Int ana_trace(Int narg, Int ps[])
 /* activates/deactivates trace facility */
 {
-  extern float	CPUtime;
+  extern Float	CPUtime;
 
   if (narg > 0)
     trace = int_arg(*ps);
@@ -3966,7 +3966,7 @@ int ana_trace(int narg, int ps[])
       printw(".\nRegular SHOWSTATS output");
     if (traceMode & T_CPUTIME) {
       printw(".  CPUtime output");
-      CPUtime = (float) clock()/CLOCKS_PER_SEC;
+      CPUtime = (Float) clock()/CLOCKS_PER_SEC;
     }
     if (traceMode & T_SHOWEXEC)
       printw(".  Statement execution index");
@@ -3991,7 +3991,7 @@ int ana_trace(int narg, int ps[])
 
 char	*defaultRedirect = "diagnostic.ana";
 
-int range_warn_flag = 0, redim_warn_flag = 0, error_extra = 0,
+Int range_warn_flag = 0, redim_warn_flag = 0, error_extra = 0,
   maxhistsize = 20000, histmin, histmax, lastmaxloc, lastminloc,
   scalemin = 0, scalemax = 255, fftdp = 0, lastmax_sym, lastmin_sym,
   autocon = 1, contour_mode, contour_box, contour_nlev = 5,
@@ -4001,49 +4001,49 @@ int range_warn_flag = 0, redim_warn_flag = 0, error_extra = 0,
   MSBfirst, area_diag = 1, lastmean_sym, lastsdev_sym, r_d_sym,
   d_r_sym;
 
-float	contour_dash_lev, contour_tick_fac = 0.5, *p3d;
+Float	contour_dash_lev, contour_tick_fac = 0.5, *p3d;
 scalar	lastmin, lastmax, lastmean, lastsdev;
-extern int	lunplt, landscape, iorder, ilabx, ilaby, irxf, iryf, ndx,
+extern Int	lunplt, landscape, iorder, ilabx, ilaby, irxf, iryf, ndx,
         ndxs, nd, ndys, ifz, ifzx, ier, ifont, ndlabx, ndlaby, 
         ndot, ipltyp, iblank, maxregridsize, nExecuted,
         kb, nArg, ixhigh, iyhigh,
         tvsmt, badmatch, fstepx, fstepy,
         sort_flag, crunch_bits, crunch_slice, byte_count,
 	current_pen, updateBoundingBox, index_cnt, uTermCol, page;
-extern double	meritc;
+extern Double	meritc;
 #if MOTIF
-extern int	radio_state, radio_button;
+extern Int	radio_state, radio_button;
 #endif
-extern float	xfac, yfac, xmin, xmax, ymin, ymax,
+extern Float	xfac, yfac, xmin, xmax, ymin, ymax,
 	wxb, wxt, wyb, wyt, ticx, ticxr, ticy, ticyr, plims[],
 	fsized,	symsize, symratio, startx, starty, stepx, stepy,
 	callig_xb, callig_yb, callig_ratio, slabx, slaby,
         dashsize, crunch_bpp, postXBot, postXTop,
 	postYBot, postYTop, xerrsize, yerrsize;
-extern word	*stackPointer;
+extern Word	*stackPointer;
 
 #if DEVELOP
-extern int	irzf, ifzz, ndz, ndzs, resample_type, fstepz;
-extern float	wzb, wzt, ticz, ticzr, zmin, zmax, defaultProjection[], dvz;
+extern Int	irzf, ifzz, ndz, ndzs, resample_type, fstepz;
+extern Float	wzb, wzt, ticz, ticzr, zmin, zmax, defaultProjection[], dvz;
 #endif
 
 #if X11
-extern int	text_menus, tvplanezoom;
+extern Int	text_menus, tvplanezoom;
 #endif
 
 #if X11
-extern int ana_button, eventSource, xcoord, ycoord, ana_keycode, ana_keysym,
+extern Int ana_button, eventSource, xcoord, ycoord, ana_keycode, ana_keysym,
   last_menu, menu_item, ana_event, preventEventFlush, root_x, root_y,
   xerrors, last_wid, display_width, display_height, private_colormap,
   zoom_frame, foreground_pixel, nColors, colormin, colormax, ana_keystate;
 
-extern float	tviy, tviyb, tvix, tvixb, xhair, yhair, menu_x, menu_y,
+extern Float	tviy, tviyb, tvix, tvixb, xhair, yhair, menu_x, menu_y,
 		tvscale, zoom_xc, zoom_yc, zoom_mag, lumpx;
-extern double	last_time, zoom_clo, zoom_chi;
+extern Double	last_time, zoom_clo, zoom_chi;
 #endif
 
 #if MOTIF
-extern int	motif_flag;
+extern Int	motif_flag;
 #endif
 
 char	*firstbreak;		/* for memck.c */
@@ -4125,33 +4125,33 @@ enumElem	filetypeStruct[] = {
 };
 
 struct boundsStruct	bounds = {
- { 0, SHRT_MIN, INT_MIN, -FLT_MAX, -DBL_MAX},
- { UCHAR_MAX, SHRT_MAX, INT_MAX, FLT_MAX, DBL_MAX }
+ { 0, INT16_MIN, INT32_MIN, -FLT_MAX, -DBL_MAX},
+ { UINT8_MAX, INT16_MAX, INT32_MAX, FLT_MAX, DBL_MAX }
 };
 
-int	ANA_MATMUL_FUN;
+Int	ANA_MATMUL_FUN;
 
 internalRoutine *subroutine, *function;
 
 #define	FORMATSIZE	1024
 void symbolInitialization(void)
 {
- int	i, iq;
+ Int	i, iq;
 #if YYDEBUG
- extern int	yydebug;
+ extern Int	yydebug;
 #endif
- extern int	termRow, termCol, despike_count;
+ extern Int	termRow, termCol, despike_count;
 #if DEVELOP
  char	*p;
 #endif
- int	to_scratch_array(int, int, int, int []);
+ Int	to_scratch_array(Int, Int, Int, Int []);
  extern char	*fmt_integer, *fmt_float, *fmt_string, *fmt_complex,
   *curScrat, *printString, ANAversion[];
- union { byte b[2]; word w; } whichendian;
+ union { Byte b[2]; Word w; } whichendian;
 
  /* determine if the machine is little-endian or bigendian */
  whichendian.w = 1;
- MSBfirst = (int) whichendian.b[1]; /* most significant byte first? */
+ MSBfirst = (Int) whichendian.b[1]; /* most significant Byte first? */
 
  firstbreak = sbrk(0);		/* for memck.c */
  curTEIndex = tempExecutableIndex;
@@ -4163,7 +4163,7 @@ void symbolInitialization(void)
    anaerror("Could not install exception handlers", 0);
 
  extern struct obstack *registered_subroutines;
- int registered_subroutines_size
+ Int registered_subroutines_size
    = registered_subroutines? obstack_object_size(registered_subroutines): 0;
  subroutine = malloc(registered_subroutines_size
                      + nSubroutine*sizeof(internalRoutine));
@@ -4177,7 +4177,7 @@ void symbolInitialization(void)
    obstack_free(registered_subroutines, NULL);
 
  extern struct obstack *registered_functions;
- int registered_functions_size
+ Int registered_functions_size
    = registered_functions? obstack_object_size(registered_functions): 0;
  function = malloc(registered_functions_size
                      + nFunction*sizeof(internalRoutine));
@@ -4293,13 +4293,13 @@ void symbolInitialization(void)
  sym[projectSym].class = ANA_ARRAY;
  array_type(projectSym) = ANA_FLOAT;
  symbol_memory(projectSym) =
-   sizeof(array) + 16*sizeof(float);
+   sizeof(array) + 16*sizeof(Float);
  eallocate(p, i, char);
  array_header(projectSym) = (array *) p;
  array_num_dims(projectSym) = 2;
  array_dims(projectSym)[0] = array_dims(projectSym)[1] = 4;
- memcpy(array_data(projectSym), defaultProjection, 16*sizeof(float));
- p3d = (float *) array_data(projectSym);
+ memcpy(array_data(projectSym), defaultProjection, 16*sizeof(Float));
+ p3d = (Float *) array_data(projectSym);
  nFixed++;
 #endif
 
@@ -4313,7 +4313,7 @@ void symbolInitialization(void)
  iq = findVarName("#TYPESIZE", 0);
  i = 10;			/* ana_type_size[] # elements! */
  to_scratch_array(iq, ANA_LONG, 1, &i);
- memcpy(array_data(iq), ana_type_size, i*sizeof(int));
+ memcpy(array_data(iq), ana_type_size, i*sizeof(Int));
 
  /* s_fix("#NL",		"\n"); */
  l_ptr("#COL",		&termCol);
@@ -4582,12 +4582,12 @@ void symbolInitialization(void)
  installing = 0;
 }
 /*----------------------------------------------------------------*/
-int matchInternalName(char *name, internalRoutine *table, int size, int hi)
+Int matchInternalName(char *name, internalRoutine *table, Int size, Int hi)
 /* matches name against the initial parts of all names in the table.
    returns index of first match (i.e., closest to the start of the table),
    or -1 if none were found.  LS97 */
 {
- int	lo = 0, mid, s;
+ Int	lo = 0, mid, s;
 
  hi--;
  while (lo <= hi) {
@@ -4605,7 +4605,7 @@ int matchInternalName(char *name, internalRoutine *table, int size, int hi)
  return -1;
 }
 /*----------------------------------------------------------------*/
-void zerobytes(void *sp, int len)
+void zerobytes(void *sp, Int len)
 /* zeros <len> bytes starting at <sp> */
 {
   char	*p;
@@ -4614,35 +4614,14 @@ void zerobytes(void *sp, int len)
   while (len--) *p++ = '\0';
 }
 /*----------------------------------------------------------------*/
-char *strcasestr(char *s1, char *s2)
-/* locates the first occurrence of string <s2> in string <s1> and returns
-   a pointer to the located string, or NULL if string <s1> is not found.
-   If <s2> is an empty string, then returns <s1>.  Case is disregarded.
-   LS 7jun95 */
-{
-  char	*p1, *p2;
-
-  if (!s2) return s1;
-  do
-				/* find first char of <s2> in <s1> */
-  { while (*s1 && toupper(*s1) != toupper(*s2)) s1++;
-    if (!*s1) return NULL;	/* not found */
-    p1 = s1;  p2 = s2;
-    while (*p2 && toupper(*p1) == toupper(*p2)) /* how far do they match? */
-    { p1++;  p2++; }
-    if (!*p2) return s1;	/* all the way */
-    s1++;
-  } while (1);
-}
-/*----------------------------------------------------------------*/
-int strncasecmp_p(char *s1, char *s2, int n)
+Int strncasecmp_p(char *s1, char *s2, Int n)
 /* compares the first <n> bytes of strings <s1> and <s2> and returns 0 */
 /* if they are equal in both strings, a number > 0 if <s2> is later */
 /* that <s1> in the internal character set, or < 0 otherwise. */
 /* LS 17feb97 */
 {
   char	c1, c2;
-  int	i = 0;
+  Int	i = 0;
 
   do
   { c1 = toupper(*s1++);
@@ -4652,13 +4631,13 @@ int strncasecmp_p(char *s1, char *s2, int n)
   return c2 - c1;
 }
 /*----------------------------------------------------------------*/
-int strcasecmp_p(char *s1, char *s2)
+Int strcasecmp_p(char *s1, char *s2)
 /* compares strings <s1> and <s2> without regard to case and returns 0 */
 /* if they are equal, a number > 0 if <s2> is later */
 /* that <s1> in the internal character set, or < 0 otherwise. */
 /* LS 21feb97 */
 {
-  int	c1, c2;
+  Int	c1, c2;
 
   do
   { c1 = toupper(*s1++);
@@ -4667,17 +4646,17 @@ int strcasecmp_p(char *s1, char *s2)
   return c2 - c1;
 }
 /*----------------------------------------------------------------*/
-int	nBreakpoint = 0;
+Int	nBreakpoint = 0;
 breakpointInfo	breakpoint[NBREAKPOINTS];
-int ana_breakpoint(int narg, int ps[])
+Int ana_breakpoint(Int narg, Int ps[])
 /* BREAKPOINT,string[,/SET,/VARIABLE] */
 /* BREAKPOINT,n[,/DISABLE,/ENABLE,/DELETE] */
 /* BREAKPOINT,/LIST */
 /* /LIST can be specified together with one of the other switches */
 {
-  static int	curBreakpoint = 0;
+  static Int	curBreakpoint = 0;
   char	*s, *p;
-  int	n;
+  Int	n;
   
   if (narg) 
     switch (internalMode & 3) {
@@ -4702,7 +4681,7 @@ int ana_breakpoint(int narg, int ps[])
 	    if (!p)			/* no number */
 	      breakpoint[curBreakpoint].line = 0;
 	    else {
-	      if (!isdigit((byte) *p))
+	      if (!isdigit((Byte) *p))
 		return
 		  anaerror("Illegal breakpoint line number specification (%s)",
 			ps[0], p);
@@ -4780,13 +4759,13 @@ int ana_breakpoint(int narg, int ps[])
   return 1;
 }
 /*----------------------------------------------------------------*/
-word	watchVars[NWATCHVARS];
-int	nWatchVars = 0;
-int ana_watch(int narg, int ps[])
+Word	watchVars[NWATCHVARS];
+Int	nWatchVars = 0;
+Int ana_watch(Int narg, Int ps[])
 /* WATCH,<variable>[,/DELETE,/LIST] */
 {
-  static int	curWatchVar = 0;
-  int	i;
+  static Int	curWatchVar = 0;
+  Int	i;
 
   if (narg) {
     if (!symbolIsNamed(ps[0]))
@@ -4826,17 +4805,17 @@ int ana_watch(int narg, int ps[])
   return ANA_OK;
 }
 /*----------------------------------------------------------------*/
-int ana_symbol_number(int narg, int ps[])
+Int ana_symbol_number(Int narg, Int ps[])
      /* returns the symbol number of the argument */
 {
-  int	result;
+  Int	result;
   
   result = scalar_scratch(ANA_LONG);
   sym[result].spec.scalar.l = *ps;
   return result;
 }
 /*----------------------------------------------------------------*/
-void mark(int symbol)
+void mark(Int symbol)
 {
   if (markIndex == MSSIZE - 1)
   { anaerror("mark: WARNING - Too many temps marked", symbol);
@@ -4862,7 +4841,7 @@ void pegParse(void)
 /*----------------------------------------------------------------*/
 void zapParseTemps(void)
 {
-  int	iq;
+  Int	iq;
   
   while (markIndex > 0 && (iq = markStack[--markIndex]) >= 0)
     zapTemp(iq);
@@ -4880,9 +4859,9 @@ void removeParseMarker(void)
   markIndex--;
 }
 /*----------------------------------------------------------------*/
-void unMark(int symbol)
+void unMark(Int symbol)
 {
-  int	i;
+  Int	i;
 
   i = markIndex;
   while (i--)
@@ -4894,7 +4873,7 @@ void unMark(int symbol)
 /*----------------------------------------------------------------*/
 void zapMarked(void)
 {
-  int	iq;
+  Int	iq;
   
   while (markIndex > 0 && (iq = markStack[--markIndex]) >= 0)
     zapTemp(iq);
@@ -4904,8 +4883,8 @@ void checkTemps(void)
 /* for debugging: checks that the number of temporary (unnamed) */
 /* variables is equal to what is expected. */
 {
-  int	i, n;
-  extern int	nTempVariable;
+  Int	i, n;
+  extern Int	nTempVariable;
 
   n = 0;
   for (i = TEMPS_START; i < TEMPS_END; i++)
@@ -4924,10 +4903,10 @@ void checkTemps(void)
 }
 /*----------------------------------------------------------------*/
 #include <unistd.h>
-int ana_restart(int narg, int ps[])
+Int ana_restart(Int narg, Int ps[])
 {
   extern char	*programName;
-  int	saveHistory(void);
+  Int	saveHistory(void);
 
   printf("\nRestarting ANA...\n\n");
   saveHistory();
@@ -4935,7 +4914,7 @@ int ana_restart(int narg, int ps[])
   return 1;
 }
 /*----------------------------------------------------------------*/
-int strccmp(char *s1, char *s2)
+Int strccmp(char *s1, char *s2)
 /* checks strings s1 and s2 for equality disregarding upper/lower case */
 /* distinctions */
 {
@@ -4943,12 +4922,12 @@ int strccmp(char *s1, char *s2)
   return *s1 - *s2;
 }
 /*----------------------------------------------------------------*/
-int structSize(int symbol, int *nstruct, int *nbyte)
+Int structSize(Int symbol, Int *nstruct, Int *nbyte)
 /* returns in <*nstruct> the number of structure descriptors that are
    required to describe <symbol>, and in <*nbyte> the total number of bytes
    covered by the data in <symbol>. */
 {
-  int	n, ns, nb;
+  Int	n, ns, nb;
   pointer	p;
   listElem	*l;
 
@@ -4999,19 +4978,19 @@ int structSize(int symbol, int *nstruct, int *nbyte)
   }
 }
 /*----------------------------------------------------------------*/
-int makeStruct(int symbol, char *tag, structElem **se, char *data,
-	       int *offset, int descend)
+Int makeStruct(Int symbol, char *tag, structElem **se, char *data,
+	       Int *offset, Int descend)
 {
-  int	size, offset0, ndim, n;
+  Int	size, offset0, ndim, n;
   structElem	*se0;
-  word	*arg;
+  Word	*arg;
   listElem	*le;
 
   if (descend) {
     return ANA_OK;
   } else {
     (*se)->u.regular.tag = tag? strsave(tag): NULL;
-    (*se)->u.regular.offset = *offset; /* byte offset from start */
+    (*se)->u.regular.offset = *offset; /* Byte offset from start */
     switch (symbol_class(symbol)) {
       case ANA_SCALAR: case ANA_CSCALAR:
 	(*se)->u.regular.type = scalar_type(symbol); /* data type */
@@ -5023,7 +5002,7 @@ int makeStruct(int symbol, char *tag, structElem **se, char *data,
       case ANA_STRING:
 	(*se)->u.regular.type = ANA_TEMP_STRING; /* data type */
 	(*se)->u.regular.spec.singular.ndim = 1; /* strings always have 1 */
-	if (!((*se)->u.regular.spec.singular.dims = malloc(sizeof(int))))
+	if (!((*se)->u.regular.spec.singular.dims = malloc(sizeof(Int))))
 	  return cerror(ALLOC_ERR, 0);
 	size = string_size(symbol); /* bytes per value */
 	(*se)->u.regular.spec.singular.dims[0] = size; /* first dimension */
@@ -5036,17 +5015,17 @@ int makeStruct(int symbol, char *tag, structElem **se, char *data,
 	  ndim++;		/* add one for string arrays to hold the */
 				/* length of the strings */
 	(*se)->u.regular.spec.singular.ndim = ndim;
-	if (!((*se)->u.regular.spec.singular.dims = malloc(ndim*sizeof(int))))
+	if (!((*se)->u.regular.spec.singular.dims = malloc(ndim*sizeof(Int))))
 	  return cerror(ALLOC_ERR, 0);
 	if (array_type(symbol) == ANA_STRING_ARRAY) {
 	  (*se)->u.regular.spec.singular.dims[0] =
 	    strlen(*(char **) array_data(symbol)); /* take length of first */
 						   /* one for all */
 	  memcpy((*se)->u.regular.spec.singular.dims + 1, 
-		 array_dims(symbol), array_num_dims(symbol)*sizeof(int));
+		 array_dims(symbol), array_num_dims(symbol)*sizeof(Int));
 	} else
 	  memcpy((*se)->u.regular.spec.singular.dims,
-		 array_dims(symbol), array_num_dims(symbol)*sizeof(int));
+		 array_dims(symbol), array_num_dims(symbol)*sizeof(Int));
 	size = ana_type_size[array_type(symbol)]*array_size(symbol);
 	memcpy(data + *offset, array_data(symbol), size); /* copy values */
 	break;
@@ -5094,7 +5073,7 @@ int makeStruct(int symbol, char *tag, structElem **se, char *data,
   return ANA_OK;
 }
 /*----------------------------------------------------------------*/
-int ana_struct(int narg, int ps[])
+Int ana_struct(Int narg, Int ps[])
 /* definition of a structure.  Structures can contain values of all
    numerical and string types, with individual dimensional structures
    for each component.  Each element of a structure covers a specific
@@ -5108,7 +5087,7 @@ int ana_struct(int narg, int ps[])
    LS 8aug98
 */
 {
-  int	result, size, nstruct, dims[MAX_DIMS], ndim, n, i, offset;
+  Int	result, size, nstruct, dims[MAX_DIMS], ndim, n, i, offset;
   pointer	data;
   structElem	*se;
   
@@ -5128,7 +5107,7 @@ int ana_struct(int narg, int ps[])
   if (result == ANA_ERROR)
     return ANA_ERROR;
   symbol_class(result) = ANA_STRUCT;
-  symbol_memory(result) = sizeof(int) /* to store the number of elements */
+  symbol_memory(result) = sizeof(Int) /* to store the number of elements */
     + nstruct*sizeof(structElem) /* to store the structure information */
     + size*n;			/* to store the data values */
   data.v = malloc(symbol_memory(result));
@@ -5158,9 +5137,9 @@ int ana_struct(int narg, int ps[])
   se->u.first.nelem = n;
   se->u.first.size = size;
   se->u.first.ndim = ndim;
-  if (!(se->u.first.dims = malloc(ndim*sizeof(int))))
+  if (!(se->u.first.dims = malloc(ndim*sizeof(Int))))
     return cerror(ALLOC_ERR, 0);
-  memcpy(se->u.first.dims, dims, ndim*sizeof(int));
+  memcpy(se->u.first.dims, dims, ndim*sizeof(Int));
   se++;				/* point at the next one */
   offset = 0;
 
@@ -5170,7 +5149,7 @@ int ana_struct(int narg, int ps[])
   return result;
 }
 /*----------------------------------------------------------------*/
-int ana_buffering(int narg, int ps[])
+Int ana_buffering(Int narg, Int ps[])
 /* BUFFERING [, <type>, /LINE, /CHAR ]
  shows or sets the kind of input buffering for ANA.
  no arguments -> show current setting
@@ -5178,9 +5157,9 @@ int ana_buffering(int narg, int ps[])
  <type> == 1 or /LINE -> by line
  <type> == 0 or /CHAR -> by char */
 {
-  extern int	buffering, noPrompt;
+  extern Int	buffering, noPrompt;
   extern char	*programName;
-  int	newBuf;
+  Int	newBuf;
 
   if (!narg && !internalMode) {
     printf("%s currently reads %sbuffered input.\n", programName,
@@ -5206,13 +5185,13 @@ int ana_buffering(int narg, int ps[])
   return ANA_OK;
 }
 /*----------------------------------------------------------------*/
-int translateEscapes(char *p)
+Int translateEscapes(char *p)
 /* replace explicit escape sequences \x by internal ones; returns */
 /* the final length of the string */
 {
   char	escapechars[] = "ntvbrfa\\?'\"", escapes[] = "\n\t\v\b\r\f\a\\?'\"",
     *p2, *p0;
-  int	i, c;
+  Int	i, c;
 
   p0 = p;
   while (*p) {
@@ -5225,7 +5204,7 @@ int translateEscapes(char *p)
 	i = strtol(p + 2, &p2, 10);
 	*p = i;
 	memcpy(p + 1, p2, strlen(p2) + 1);
-      } else if (isdigit((byte) p[1]) && p[1] < '8') { /* an octal number */
+      } else if (isdigit((Byte) p[1]) && p[1] < '8') { /* an octal number */
 	/* octal-number escape sequences have at most 3 octal digits.
 	   we cannot rely on strtol because it may find more than 3
 	   (e.g., when the user specifies '\000123' the \000 is an octal
@@ -5234,7 +5213,7 @@ int translateEscapes(char *p)
 	   octal number manually. */
 	p2 = p + 2;		/* just beyond the first octal digit */
 	for (i = 2; i < 4; i++)
-	  if (isdigit((byte) *p2) && *p2 < '8')	/* an octal digit */
+	  if (isdigit((Byte) *p2) && *p2 < '8')	/* an octal digit */
 	    p2++;
 	c = *p2;		/* temporary storage */
 	*p2 = '\0';		/* temporary end to force strtol not to
@@ -5250,13 +5229,13 @@ int translateEscapes(char *p)
   return p - p0;
 }
 /*----------------------------------------------------------------*/
-int installString(char *string)
+Int installString(char *string)
 /* installs string in symbol stack; returns index to stack */
 {
- int	index, n;
+ Int	index, n;
  char	*p, *p0;
 #if YYDEBUG
- extern int	yydebug;
+ extern Int	yydebug;
 #endif
 
  if ((index = nextFreeStackEntry()) == ANA_ERROR)
@@ -5305,7 +5284,7 @@ void installKeys(void *keys)
 {
  char	*p, **result, *copy;
  keyList	*theKeyList;
- int	n = 1, i;
+ Int	n = 1, i;
 
  if (!*(char **) keys)		/* empty key */
    return;
@@ -5365,15 +5344,15 @@ void installKeys(void *keys)
  *(keyList **) keys = theKeyList;
 }
 /*----------------------------------------------------------------*/
-int findName(char *name, hashTableEntry *hashTable[], int context)
+Int findName(char *name, hashTableEntry *hashTable[], Int context)
 /* searches for <name> in <hashTable[]> (with <context>).  if found, */
 /* returns symbol number, otherwise installs a copy of the name in */
 /* <hashTable[]> and sym[].  Returns -1 if an error occurs.  LS 6feb96 */
 {
- int		hashValue, i;
+ Int		hashValue, i;
  hashTableEntry	*hp, *oldHp;
 #if YYDEBUG
- extern int	yydebug;
+ extern Int	yydebug;
 #endif
  extern char	ignoreSymbols;
 
@@ -5417,15 +5396,15 @@ int findName(char *name, hashTableEntry *hashTable[], int context)
  return i;
 }
 /*----------------------------------------------------------------*/
-int ana_verify(int narg, int ps[])
+Int ana_verify(Int narg, Int ps[])
 /* verifies that all referenced subroutines, functions, and files
    actually exist */
 {
   char	*name, *p, compileName[12], oldInstalling;
   FILE	*fp;
-  int	i, n, oldContext, nsym, result;
+  Int	i, n, oldContext, nsym, result;
   extern char	compileOnly;
-  extern int	executeLevel;
+  extern Int	executeLevel;
 
   result = 0;
   if (narg) {
@@ -5551,8 +5530,8 @@ void releaseCompileInfo(void)
 }
 /*----------------------------------------------------------------*/
 static executionLevelInfo	*e_info;
-static int	n_e_info = 0, cur_e_info = 0;
-void pushExecutionLevel(int line, int target)
+static Int	n_e_info = 0, cur_e_info = 0;
+void pushExecutionLevel(Int line, Int target)
 {
   if (cur_e_info + 1 >= n_e_info) { /* need more room */
     n_e_info += 16;
@@ -5574,9 +5553,9 @@ void popExecutionLevel(void)
   cur_e_info--;
 }
 /*----------------------------------------------------------------*/
-void showExecutionLevel(int symbol)
+void showExecutionLevel(Int symbol)
 {
-  int	i, target;
+  Int	i, target;
 
   if (cur_e_info)
     for (i = cur_e_info; i >= 0; i--) {

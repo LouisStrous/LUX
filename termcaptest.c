@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <ctype.h>
 void getTermCaps(void);
-int	scrat[8192];
+Int	scrat[8192];
 
 char *pp(char *p)
 {

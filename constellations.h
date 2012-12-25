@@ -22,13 +22,13 @@ char *constellation_names[] = {
 };
 
 struct constellation_struct {
-  double alpha1;
-  double alpha2;
-  double delta; 
+  Double alpha1;
+  Double alpha2;
+  Double delta; 
   CONSTELLATION constellation;
 };
 
-#define S (1/(double)3600)
+#define S (1/(Double)3600)
 
 struct constellation_struct constellation_boundaries[357] = {
    {     0*S, 86400*S,  316800*S, UMi, },

@@ -9,28 +9,28 @@
 static char rcsid[] __attribute__ ((unused)) =
 "$Id: coord.c,v 4.0 2001/02/07 20:36:58 strous Exp $";
 
-extern float	xfac, yfac, wxt, wxb, wyt, wyb, xmin, xmax, ymin, ymax;
+extern Float	xfac, yfac, wxt, wxb, wyt, wyb, xmin, xmax, ymin, ymax;
 #ifdef X11
-extern float	tvix, tviy, tvixb, tviyb, tvscale;
+extern Float	tvix, tviy, tvixb, tviyb, tvscale;
 #endif
-extern int	iorder, iyhigh, ipltyp;
+extern Int	iorder, iyhigh, ipltyp;
 
-int	ana_replace(int, int);
+Int	ana_replace(Int, Int);
 
 /* A bunch of coordinate transformation routines */
 /* choices: ANA_DVI, ANA_DEV (xport), ANA_IMG, ANA_PLT (plot),
    ANA_RIM, ANA_RPL */
-int fromCoordinateSystem, toCoordinateSystem;
+Int fromCoordinateSystem, toCoordinateSystem;
 /*---------------------------------------------------------------------*/
-int coordMap(float *x, float *y)
+Int coordMap(Float *x, Float *y)
 /* transforms (x,y) (in fromCoordinateSystem) to toCoordinateSystem */
 {
-  int coordTrf(float *, float *, int, int);
+  Int coordTrf(Float *, Float *, Int, Int);
 
   return coordTrf(x, y, fromCoordinateSystem, toCoordinateSystem);
 }
 /*---------------------------------------------------------------------*/
-int coordTrf(float *x, float *y, int from, int to)
+Int coordTrf(Float *x, Float *y, Int from, Int to)
      /* xfac,yfac are the pixel dimensions of the current window */
      /* wxb,wxt is the DVI x range of the plot window */
      /* wyb,wyt is the DVI y range of the plot window */
@@ -40,7 +40,7 @@ int coordTrf(float *x, float *y, int from, int to)
 /* if <x> or <y> are equal to NULL, then the corresponding coordinate */
 /* is not treated. */
 {
-  extern int	setup;
+  extern Int	setup;
 
   if (from == to)
     return 1;
@@ -198,19 +198,19 @@ int coordTrf(float *x, float *y, int from, int to)
   return 1;
 }
 /*---------------------------------------------------------------------*/
-int ana_coordtrf(int narg, int ps[])
+Int ana_coordtrf(Int narg, Int ps[])
 /* transform coordinates between various coordinate systems */
 /* syntax:  COORDTRF,xold,yold[,xnew,ynew] */
 /* specify the coordinate systems with keywords: */
 /* /DVI, /DEV, /IMG, /PLT, /RIM, /RPL, /DEP, /X11 */
 /* /TODVI, /TODEV, /TOIMG, /TOPLT, /TORIM, /TORPL, /TOX11 */
 {
-  int	iq, n, n2, from, to;
-  float	*xold, *yold, *xnew, *ynew, x, y;
+  Int	iq, n, n2, from, to;
+  Float	*xold, *yold, *xnew, *ynew, x, y;
 
   from = (internalMode & 7);
   to = (internalMode/8 & 7);
-  iq = ana_float(1, ps);	/* float xold */
+  iq = ana_float(1, ps);	/* Float xold */
   switch (symbol_class(iq)) {
     case ANA_SCAL_PTR:
       iq = dereferenceScalPointer(iq);
@@ -220,12 +220,12 @@ int ana_coordtrf(int narg, int ps[])
       break;
     case ANA_ARRAY:
       n = array_size(iq);
-      xold = (float *) array_data(iq);
+      xold = (Float *) array_data(iq);
       break;
     default:
       return cerror(ILL_CLASS, iq);
   }
-  iq = ana_float(1, &ps[1]);	/* float yold */
+  iq = ana_float(1, &ps[1]);	/* Float yold */
   switch (symbol_class(iq)) {
     case ANA_SCAL_PTR:
       iq = dereferenceScalPointer(iq);
@@ -235,7 +235,7 @@ int ana_coordtrf(int narg, int ps[])
       break;
     case ANA_ARRAY:
       n2 = array_size(iq);
-      yold = (float *) array_data(iq);
+      yold = (Float *) array_data(iq);
       break;
     default:
       return cerror(ILL_CLASS, iq);
@@ -248,7 +248,7 @@ int ana_coordtrf(int narg, int ps[])
     if (symbol_class(iq) == ANA_SCALAR)
       xnew = &scalar_value(iq).f;
     else
-      xnew = (float *) array_data(iq);
+      xnew = (Float *) array_data(iq);
   } else
     xnew = xold;
   if (narg >= 4) {		/* ynew */
@@ -257,7 +257,7 @@ int ana_coordtrf(int narg, int ps[])
     if (symbol_class(iq) == ANA_SCALAR)
       ynew = &scalar_value(iq).f;
     else
-      ynew = (float *) array_data(iq);
+      ynew = (Float *) array_data(iq);
   } else
     ynew = yold;
   while (n--) {

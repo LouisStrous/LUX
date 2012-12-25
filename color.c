@@ -13,11 +13,11 @@
 #include <X11/Xutil.h>		/* for XVisualInfo */
 
 Display		*display;
-int		screen_num, connect_flag = 0, private_colormap = 0,
+Int		screen_num, connect_flag = 0, private_colormap = 0,
   threeColors = 0, foreground_pixel, colormin, colormax, nColors,
   select_visual = 0, bits_per_rgb, bits_per_pixel, colorIndexType,
   visualClass;
-unsigned int	display_cells, depth, display_width, display_height,
+uint32_t	display_cells, depth, display_width, display_height,
   nColorCells, colorIndex;
 unsigned long	*pixels, black_pixel, white_pixel, red_mask, green_mask,
   blue_mask, red_mask_bits, green_mask_bits, blue_mask_bits,
@@ -28,8 +28,8 @@ XColor		*colors;
 GC	gcnot;
 Atom	wm_delete;
 
-int	xerr(Display *, XErrorEvent *), selectVisual(void);
-XColor	*anaFindBestRGB(XColor *color, int mode);
+Int	xerr(Display *, XErrorEvent *), selectVisual(void);
+XColor	*anaFindBestRGB(XColor *color, Int mode);
 Status	anaAllocNamedColor(char *, XColor **);
 
 #define FBRGB_RAMP		1 /* color ramp */
@@ -117,7 +117,7 @@ char	*visualNames[] = { "StaticGray", "GrayScale", "StaticColor",
 			   "PseudoColor", "TrueColor", "DirectColor" };
 
 
-int setup_x_visual(int desiredVisualClass)
+Int setup_x_visual(Int desiredVisualClass)
 /* tries to open a connection to the X server and initializes a grey ramp */
 /* colormap.  Returns ANA_OK and sets connect_flag to 1 on success; */
 /* returns ANA_ERROR and sets connect_flag to 0 on failure.  If connect_flag */
@@ -125,9 +125,9 @@ int setup_x_visual(int desiredVisualClass)
 /* routine returns ANA_OK immediately.  Sets some of the globals. */
 /* LS 12mar99 */
 {
-  extern int	scalemin, scalemax;
+  extern Int	scalemin, scalemax;
   Window	win;
-  int	i, j;
+  Int	i, j;
   XColor	*tempColor, rgb;
   unsigned long	n;
   extern char	*display_name;
@@ -212,11 +212,11 @@ int setup_x_visual(int desiredVisualClass)
        || visual->class == TrueColor) */
 
   /* we may need more than 8 bits to specify a color index */
-  if (depth <= 8*sizeof(byte))
+  if (depth <= 8*sizeof(Byte))
     colorIndexType = ANA_BYTE;
-  else if (depth <= 8*sizeof(int))
+  else if (depth <= 8*sizeof(Int))
     colorIndexType = ANA_WORD;
-  else if (depth <= 8*sizeof(long int))
+  else if (depth <= 8*sizeof(int64_t))
     colorIndexType = ANA_LONG;
 
   /* 5. get a colormap for the selected visual */
@@ -468,7 +468,7 @@ int setup_x_visual(int desiredVisualClass)
   return ANA_OK;
 }
 /*-------------------------------------------------------------------------*/
-int setup_x(void)
+Int setup_x(void)
 {
   return setup_x_visual(-1);
 }
@@ -488,13 +488,13 @@ void disconnect_x(void)
   free(colors);
 }
 /*-------------------------------------------------------------------------*/
-int selectVisual(void)
+Int selectVisual(void)
 /* allow the user to select a visual */
 {
   XVisualInfo	*vInfo, vTemplate;
-  int	nVisual, i, mask, j;
-  int	getNewLine(char *, char *, char);
-  unsigned int	r, x;
+  Int	nVisual, i, mask, j;
+  Int	getNewLine(char *, char *, char);
+  uint32_t	r, x;
   char	*name;
 
   mask = VisualScreenMask;
@@ -567,11 +567,11 @@ int selectVisual(void)
   return ANA_OK;
 }
 /*-------------------------------------------------------------------------*/
-int nextFreeColorsIndex(void)
+Int nextFreeColorsIndex(void)
 /* returns an index to a free colors[] element. */
 /* NOTE: this routine assumes there is such an element! */
 {
-  static int	index = 0;
+  static Int	index = 0;
 
   while (colors[index].flags) {
     index++;
@@ -581,11 +581,11 @@ int nextFreeColorsIndex(void)
   return index;
 }
 /*-------------------------------------------------------------------------*/
-void installPixel(int pixel)
+void installPixel(Int pixel)
 /* installs the indicated pixel value as one incidental color in the */
 /* colors[] database if it does not already exist there. */
 {
-  int	i;
+  Int	i;
 
   for (i = nColors; i < nColorCells; i++)
     if (colors[i].pixel == pixel)
@@ -621,7 +621,7 @@ Status anaAllocNamedColor(char *colorName, XColor **return_color)
   unsigned long	pixel;
   XColor	color, color2, *bestcolor;
   static XColor	rcolor;
-  int	index;
+  Int	index;
 
   if (visual->class == GrayScale || visual->class == PseudoColor) {
     /* figure out which RGB values to store */
@@ -691,7 +691,7 @@ Status anaAllocNamedColor(char *colorName, XColor **return_color)
   return 1;
 }
 /*-------------------------------------------------------------------------*/
-XColor *anaFindBestRGB(XColor *color, int mode)
+XColor *anaFindBestRGB(XColor *color, Int mode)
 /* finds the color in the current colormap that has RGB values closest to */
 /* those in <color>, and returns a pointer to the associated color. */
 /* <mode> is the logical sum of: */
@@ -699,8 +699,8 @@ XColor *anaFindBestRGB(XColor *color, int mode)
 /* FBRGB_INCIDENTAL -> check ANA's incidental colors */
 /* LS 12mar99 */
 {
-  unsigned int	i, best, i1, i2;
-  float	mindist, dist, temp;	/* use float because unsigned int is not */
+  uint32_t	i, best, i1, i2;
+  Float	mindist, dist, temp;	/* use Float because uint32_t is not */
 				/* big enough in all cases */
 
   if (visualPrimariesAreSeparate(visual->class)) {
@@ -746,8 +746,8 @@ XColor *anaFindBestRGB(XColor *color, int mode)
   } /* end of if (visualPrimariesAreSeparate(visual->class)) else */
 }
 /*-------------------------------------------------------------------------*/
-void storeColorTable(float *red, float *green, float *blue, int nelem,
-		     int stretch)
+void storeColorTable(Float *red, Float *green, Float *blue, Int nelem,
+		     Int stretch)
 /* stores a new color table in ANA's color map. */
 /* <red>: points at an array of red color intensities between 0 and 1 */
 /* <green>: points at an array of green color intensities between 0 and 1 */
@@ -759,7 +759,7 @@ void storeColorTable(float *red, float *green, float *blue, int nelem,
 /* If any color value is not within the range 0 - 1, then wraparound occurs */
 /* LS 12mar99 */
 {
-  unsigned int	i, j, k1, k2, n;
+  uint32_t	i, j, k1, k2, n;
   XColor	rgb;
 
   if (stretch) {
@@ -775,14 +775,14 @@ void storeColorTable(float *red, float *green, float *blue, int nelem,
       for (i = 0; i < n; i++) {
 	j = (i*k2)/k1;
 	colors[i].red = colors[i].green = colors[i].blue =
-	  ((int) floor((red[j] + green[j] + blue[j])/3.0*0xffff)) & 0xffff;
+	  ((Int) floor((red[j] + green[j] + blue[j])/3.0*0xffff)) & 0xffff;
       }
     else
       for (i = 0; i < n; i++) {
 	j = (i*k2)/k1;
-	colors[i].red = ((int) floor(red[j]*0xffff)) & 0xffff;
-	colors[i].blue = ((int) floor(blue[j]*0xffff)) & 0xffff;
-	colors[i].green = ((int) floor(green[j]*0xffff)) & 0xffff;
+	colors[i].red = ((Int) floor(red[j]*0xffff)) & 0xffff;
+	colors[i].blue = ((Int) floor(blue[j]*0xffff)) & 0xffff;
+	colors[i].green = ((Int) floor(green[j]*0xffff)) & 0xffff;
       }
     XStoreColors(display, colorMap, colors, n);
     XFlush(display);
@@ -792,24 +792,24 @@ void storeColorTable(float *red, float *green, float *blue, int nelem,
       for (i = 0; i < display_cells; i++) {
 	j = (i*k2)/k1;
 	rgb.red = rgb.green = rgb.blue =
-	  ((int) floor((red[j] + green[j] + blue[j])/3.0*0xffff)) & 0xffff;
+	  ((Int) floor((red[j] + green[j] + blue[j])/3.0*0xffff)) & 0xffff;
 	XAllocColor(display, colorMap, &rgb);
 	pixels[i] = rgb.pixel;
       }
     else
       for (i = 0; i < display_cells; i++) {
 	j = (i*k2)/k1;
-	rgb.red = ((int) floor(red[j]*0xffff)) & 0xffff;
-	rgb.blue = ((int) floor(blue[j]*0xffff)) & 0xffff;
-	rgb.green = ((int) floor(green[j]*0xffff)) & 0xffff;
+	rgb.red = ((Int) floor(red[j]*0xffff)) & 0xffff;
+	rgb.blue = ((Int) floor(blue[j]*0xffff)) & 0xffff;
+	rgb.green = ((Int) floor(green[j]*0xffff)) & 0xffff;
 	XAllocColor(display, colorMap, &rgb);
 	pixels[i] = rgb.pixel;
       }
   }
 }
 /*-------------------------------------------------------------------------*/
-int	ck_window(int);
-int getXcolor(char *colorname, XColor *color, int alloc)
+Int	ck_window(Int);
+Int getXcolor(char *colorname, XColor *color, Int alloc)
 /* looks for the named color in the current colormap.  Returns the found */
 /* color in <color>, which must be predefined.  If <alloc> is non-zero, then */
 /* the color is placed in the current colormap.   Currently, no checks are */
@@ -818,9 +818,9 @@ int getXcolor(char *colorname, XColor *color, int alloc)
 /* LS 12mar99 */
 {
   XColor	color2, *pcolor;
-  extern int	last_wid;
+  extern Int	last_wid;
   extern GC	gc[], gcmap[];
-  int	ana_xcreat(int, unsigned int, unsigned int, int, int, int, char *,
+  Int	ana_xcreat(Int, uint32_t, uint32_t, Int, Int, Int, char *,
 		   char *);
   extern Window	win[];
   extern Pixmap	maps[];
@@ -847,7 +847,7 @@ int getXcolor(char *colorname, XColor *color, int alloc)
     return XLookupColor(display, colorMap, colorname, &color2, color);
 }
 /*-------------------------------------------------------------------------*/
-int threecolors(float *list, int n)
+Int threecolors(Float *list, Int n)
 /* If <n> is 0 or if <n> is 1 and <*list> is 0, then a standard
    greyscale table is installed; otherwise if <n> is 1 or 9 then a
    three-color color table is installed.  If <n> is 9, then the numbers
@@ -863,8 +863,8 @@ int threecolors(float *list, int n)
    a table with a grey section, a red section, and a blue section.
    LS 12nov98 */
 {
-  float	factor, tlist[9], off[3], fac[3];
-  int	i, j;
+  Float	factor, tlist[9], off[3], fac[3];
+  Int	i, j;
 
   switch (n) {
     case 0:			/* uninstall */
@@ -974,16 +974,16 @@ int threecolors(float *list, int n)
   return ANA_OK;
 }
 /*---------------------------------------------------------*/
-int ana_colorComponents(int narg, int ps[])
+Int ana_colorComponents(Int narg, Int ps[])
 /* colorcomponents,pixels,r,g,b */
 /* takes raw pixel values <pixels> and returns the relative red, green, */
 /* and blue components in <r>, <g>, and <b>, which range between 0 and 255. */
 /* <pixels> must have type */
 {
-  byte	*data;
-  int *q1, *q2, *q3;
-  byte	*red, *green, *blue;
-  int	nelem, i, step, pix;
+  Byte	*data;
+  Int *q1, *q2, *q3;
+  Byte	*red, *green, *blue;
+  Int	nelem, i, step, pix;
   XColor	*color;
 
   if (!symbolIsNumericalArray(ps[0]))
@@ -1012,7 +1012,7 @@ int ana_colorComponents(int narg, int ps[])
 
   switch (visual->class) {
   case PseudoColor: case GrayScale: case StaticColor: case StaticGray:
-    q1 = malloc(display_cells*sizeof(int));
+    q1 = malloc(display_cells*sizeof(Int));
     if (!q1)
       return cerror(ALLOC_ERR, 0);
     for (i = 0; i < display_cells; i++)
@@ -1029,9 +1029,9 @@ int ana_colorComponents(int narg, int ps[])
     free(q1);
     break;
   case DirectColor:
-    q1 = malloc(display_cells*sizeof(int));
-    q2 = malloc(display_cells*sizeof(int));
-    q3 = malloc(display_cells*sizeof(int));
+    q1 = malloc(display_cells*sizeof(Int));
+    q2 = malloc(display_cells*sizeof(Int));
+    q3 = malloc(display_cells*sizeof(Int));
     if (!q1 || !q2 || !q3)
       return cerror(ALLOC_ERR, 0);
     for (i = 0; i < nColors; i++) {
@@ -1063,15 +1063,15 @@ int ana_colorComponents(int narg, int ps[])
   return ANA_OK;
 }
 /*---------------------------------------------------------*/
-int ana_pixelsto8bit(int narg, int ps[])
+Int ana_pixelsto8bit(Int narg, Int ps[])
  /* pixelsto8bit,pixels,bits,colormap
     returns 8-bit pixel values in <bits> and a color map in <colormap>
     based on the pixel values in <pixels>.  
   */
 {
-  int result, ncolors, iq;
-  int ana_tolookup(int, int *);
-  int ana_byte_inplace(int, int *);
+  Int result, ncolors, iq;
+  Int ana_tolookup(Int, Int *);
+  Int ana_byte_inplace(Int, Int *);
 
   if (!symbolIsNumericalArray(ps[0]))
     return cerror(ILL_CLASS, ps[0]);
@@ -1089,10 +1089,10 @@ int ana_pixelsto8bit(int narg, int ps[])
     return result;
   ncolors = array_size(ps[1]);
   if (ncolors <= 256) {
-    int dims[2] = { 3, 256 };
-    int i, pix;
-    byte *p, *q;
-    int *q1, step, *q2, *q3;
+    Int dims[2] = { 3, 256 };
+    Int i, pix;
+    Byte *p, *q;
+    Int *q1, step, *q2, *q3;
 
     /* we can use the indices from tolookup if we convert them to ANA_BYTE */
     if (ana_byte_inplace(1, ps + 2) == ANA_ERROR
@@ -1103,7 +1103,7 @@ int ana_pixelsto8bit(int narg, int ps[])
     step = bits_per_pixel/8;
     switch (visual->class) {
     case PseudoColor: case GrayScale: case StaticColor: case StaticGray:
-      q1 = malloc(display_cells*sizeof(int));
+      q1 = malloc(display_cells*sizeof(Int));
       if (!q1) {
 	cerror(ALLOC_ERR, 0);
 	goto error_1;
@@ -1112,7 +1112,7 @@ int ana_pixelsto8bit(int narg, int ps[])
 	if (colors[i].flags & (DoRed | DoGreen | DoBlue))
 	  q1[colors[i].pixel] = i;
       for (i = 0; i < ncolors; i++) {
-	int pix;
+	Int pix;
 	XColor *color;
 
 	memcpy(&pix, p, step);
@@ -1130,9 +1130,9 @@ int ana_pixelsto8bit(int narg, int ps[])
       }
       break;
     case DirectColor:
-      q1 = malloc(display_cells*sizeof(int));
-      q2 = malloc(display_cells*sizeof(int));
-      q3 = malloc(display_cells*sizeof(int));
+      q1 = malloc(display_cells*sizeof(Int));
+      q2 = malloc(display_cells*sizeof(Int));
+      q3 = malloc(display_cells*sizeof(Int));
       if (!q1 || !q2 || !q3) {
 	free(q1);
 	free(q2);
@@ -1188,15 +1188,15 @@ int ana_pixelsto8bit(int narg, int ps[])
   return ANA_ERROR;
 }
 /*---------------------------------------------------------*/
-int ana_colorstogrey(int narg, int ps[])
+Int ana_colorstogrey(Int narg, Int ps[])
 /* colorstogrey,pixels
    takes raw pixel values and replaces them by the corresponding grey
    scale values, which range between 0 and 255.
    LS 2003mar08 */
 {
-  int *q1, *q2, *q3, i;
-  byte *data;
-  int nelem, red, green, blue, grey, pix = 0, step;
+  Int *q1, *q2, *q3, i;
+  Byte *data;
+  Int nelem, red, green, blue, grey, pix = 0, step;
   XColor *color;
     
   if (!symbolIsNumericalArray(ps[0]))
@@ -1210,7 +1210,7 @@ int ana_colorstogrey(int narg, int ps[])
   step = bits_per_pixel/8;
   switch (visual->class) {
   case PseudoColor: case GrayScale: case StaticColor: case StaticGray:
-    q1 = malloc(display_cells*sizeof(int));
+    q1 = malloc(display_cells*sizeof(Int));
     if (!q1)
       return cerror(ALLOC_ERR, 0);
     for (i = 0; i < display_cells; i++)
@@ -1229,9 +1229,9 @@ int ana_colorstogrey(int narg, int ps[])
     free(q1);
     break;
   case DirectColor:
-    q1 = malloc(display_cells*sizeof(int));
-    q2 = malloc(display_cells*sizeof(int));
-    q3 = malloc(display_cells*sizeof(int));
+    q1 = malloc(display_cells*sizeof(Int));
+    q2 = malloc(display_cells*sizeof(Int));
+    q3 = malloc(display_cells*sizeof(Int));
     if (!q1 || !q2 || !q3)
       return cerror(ALLOC_ERR, 0);
     for (i = 0; i < nColors; i++) {

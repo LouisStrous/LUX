@@ -1,7 +1,9 @@
 /* This is file dummyterm.c, part of the ANA software package. */
 /* LS 28apr99 */
 
-void	manualTerm(int);
+#include "action.h"
+
+void	manualTerm(Int);
 
 void getTermCaps(void)
 {

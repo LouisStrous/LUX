@@ -3,17 +3,17 @@
 #include <stdio.h>
 #include "action.h"
 
-int ana_idlrestore(int narg, int ps[])
+Int ana_idlrestore(Int narg, Int ps[])
 /* IDLRESTORE,<filename> restores all variables from the IDL Save file
    with name <filename>.  Supports scalars, strings, and numerical arrays
    LS 18sep98 */
 {
-  byte	bytes[8];
+  Byte	bytes[8];
   char	*p;
-  int	ints[3], dims[MAX_DIMS], n, var, ndim, type, nread;
+  Int	ints[3], dims[MAX_DIMS], n, var, ndim, type, nread;
   FILE	*fp;
-  void	endian(void *, int, int);
-  int	installString(char *);
+  void	endian(void *, Int, Int);
+  Int	installString(char *);
   scalar	value;
   pointer	pp, data;
 
@@ -46,8 +46,8 @@ int ana_idlrestore(int narg, int ps[])
 
   pp.b = &value.b;
 
-  fseek(fp, 4, SEEK_CUR);	/* skip one int */
-  fread(ints, 4, 1, fp);	/* read one int */
+  fseek(fp, 4, SEEK_CUR);	/* skip one Int */
+  fread(ints, 4, 1, fp);	/* read one Int */
 #if !LITTLEENDIAN
   endian(ints, 4, ANA_LONG);
 #endif
@@ -86,7 +86,7 @@ int ana_idlrestore(int narg, int ps[])
     n = installString(curScrat);
     var = findVar(n, curContext);	/* get the variable */
 
-    /* align on next 4-byte boundary */
+    /* align on next 4-Byte boundary */
     n = 3 - (ints[2] - 1) % 4;
     if (n)
       fseek(fp, n, SEEK_CUR);
@@ -119,15 +119,15 @@ int ana_idlrestore(int narg, int ps[])
       data.b = array_data(var);
       switch (type) {
 	case 1:			/* bytes stored as longs (!) */
-	  fseek(fp, 4, SEEK_CUR); /* skip extra int */
+	  fseek(fp, 4, SEEK_CUR); /* skip extra Int */
 	  fread(data.b, 1, n, fp);
 	  n = 3 - (n - 1) % 4;
-	  if (n)		/* align on int boundary */
+	  if (n)		/* align on Int boundary */
 	    fseek(fp, n, SEEK_CUR);
 	  break;
-	case 2:			/* word */
+	case 2:			/* Word */
 	  /* words are stored as longs (!) so we have to read them one by
-	     one and byte-swap if necessary */
+	     one and Byte-swap if necessary */
 	  while (n--) {
 	    fread(pp.b, 4, 1, fp);
 #if !LITTLEENDIAN
@@ -136,7 +136,7 @@ int ana_idlrestore(int narg, int ps[])
 	    *data.w++ = *pp.l;
 	  }
 	  break;
-	case 3:	case 4: case 5:	/* long, float, double */
+	case 3:	case 4: case 5:	/* long, Float, Double */
 	  fread(data.b, ana_type_size[type - 1], n, fp);
 #if !LITTLEENDIAN
 	  endian(data.b, ana_type_size[type - 1]*n, ANA_LONG);
@@ -149,7 +149,7 @@ int ana_idlrestore(int narg, int ps[])
       }
     } else {			/* assume scalar or string */
       switch (ints[0]) {
-	case 1:			/* byte */
+	case 1:			/* Byte */
 	  fread(pp.b, 1, 4, fp);
 #if !LITTLEENDIAN
 	  endian(pp.b, 4, ANA_LONG);
@@ -157,7 +157,7 @@ int ana_idlrestore(int narg, int ps[])
 	  value.b = value.l;
 	  redef_scalar(var, ANA_BYTE, &value.b);
 	  break;
-	case 2:			/* word */
+	case 2:			/* Word */
 	  fread(pp.b, 1, 4, fp); /* words are stored as ints */
 #if !LITTLEENDIAN
 	  endian(pp.b, 4, ANA_LONG);
@@ -172,14 +172,14 @@ int ana_idlrestore(int narg, int ps[])
 #endif
 	  redef_scalar(var, ANA_LONG, &value.l);
 	  break;
-	case 4:			/* float */
+	case 4:			/* Float */
 	  fread(pp.b, 1, 4, fp);
 #if !LITTLEENDIAN
 	  endian(pp.b, 4, ANA_FLOAT);
 #endif
 	  redef_scalar(var, ANA_FLOAT, &value.f);
 	  break;
-	case 5:			/* double */
+	case 5:			/* Double */
 	  fread(pp.b, 1, 8, fp);
 #if !LITTLEENDIAN
 	  endian(pp.b, 8, ANA_DOUBLE);
@@ -197,7 +197,7 @@ int ana_idlrestore(int narg, int ps[])
 	  p[ints[0]] = '\0';	/* terminate string */
 	  n = 3 - (ints[0] - 1) % 4;
 	  if (n)
-	    fseek(fp, n, SEEK_CUR); /* align on int */
+	    fseek(fp, n, SEEK_CUR); /* align on Int */
 	  break;
 	default:
 	  fclose(fp);
@@ -208,18 +208,18 @@ int ana_idlrestore(int narg, int ps[])
   } while (1);
 }
 /*-----------------------------------------------------------------------*/
-int ana_idlread_f(int narg, int ps[])
+Int ana_idlread_f(Int narg, Int ps[])
 /* IDLREAD(<var>, <filename>) restores the first variable from the IDL
    Save file with name <filename> into <var>.  Supports scalars, strings,
    and numerical arrays.  Returns ANA_ONE on success, ANA_ZERO on failure.
    LS 18sep98 */
 {
-  byte	bytes[8];
+  Byte	bytes[8];
   char	*p;
-  int	ints[3], dims[MAX_DIMS], n, var, ndim, type;
+  Int	ints[3], dims[MAX_DIMS], n, var, ndim, type;
   FILE	*fp;
-  void	endian(void *, int, int);
-  int	installString(char *);
+  void	endian(void *, Int, Int);
+  Int	installString(char *);
   scalar	value;
   pointer	pp, data;
 
@@ -250,8 +250,8 @@ int ana_idlread_f(int narg, int ps[])
 
   pp.b = &value.b;
 
-  fseek(fp, 4, SEEK_CUR);	/* skip one int */
-  fread(ints, 4, 1, fp);	/* read one int */
+  fseek(fp, 4, SEEK_CUR);	/* skip one Int */
+  fread(ints, 4, 1, fp);	/* read one Int */
 #if LITTLEENDIAN
   endian(ints, 4, ANA_LONG);
 #endif
@@ -282,7 +282,7 @@ int ana_idlread_f(int narg, int ps[])
 
   var = ps[0];			/* get the variable */
 
-  /* align on next 4-byte boundary */
+  /* align on next 4-Byte boundary */
   n = 3 - (ints[2] - 1) % 4;
   if (n)
     fseek(fp, n, SEEK_CUR);
@@ -315,12 +315,12 @@ int ana_idlread_f(int narg, int ps[])
     data.b = array_data(var);
     switch (type) {
       case 1:			/* bytes stored as longs (!) */
-	fseek(fp, 4, SEEK_CUR); /* skip extra int */
+	fseek(fp, 4, SEEK_CUR); /* skip extra Int */
 	fread(data.b, 1, n, fp);
 	break;
-      case 2:			/* word */
+      case 2:			/* Word */
 	/* words are stored as longs (!) so we have to read them one by
-	   one and byte-swap if necessary */
+	   one and Byte-swap if necessary */
 	while (n--) {
 	  fread(pp.b, 4, 1, fp);
 #if LITTLEENDIAN
@@ -329,7 +329,7 @@ int ana_idlread_f(int narg, int ps[])
 	  *data.w++ = *pp.l;
 	}
 	break;
-      case 3: case 4: case 5:	/* long, float, double */
+      case 3: case 4: case 5:	/* long, Float, Double */
 	fread(data.b, ana_type_size[type - 1], n, fp);
 #if LITTLEENDIAN
 	endian(data.b, ana_type_size[type - 1]*n, ANA_LONG);
@@ -341,7 +341,7 @@ int ana_idlread_f(int narg, int ps[])
     }
   } else {			/* assume scalar or string */
     switch (ints[0]) {
-      case 1:			/* byte */
+      case 1:			/* Byte */
 	fread(pp.b, 1, 4, fp);
 #if LITTLEENDIAN
 	endian(pp.b, 4, ANA_LONG);
@@ -349,7 +349,7 @@ int ana_idlread_f(int narg, int ps[])
 	value.b = value.l;
 	redef_scalar(var, ANA_BYTE, &value.b);
 	break;
-      case 2:			/* word */
+      case 2:			/* Word */
 	fread(pp.b, 1, 4, fp);	/* words are stored as ints */
 #if LITTLEENDIAN
 	endian(pp.b, 4, ANA_LONG);
@@ -364,14 +364,14 @@ int ana_idlread_f(int narg, int ps[])
 #endif
 	redef_scalar(var, ANA_LONG, &value.l);
 	break;
-      case 4:			/* float */
+      case 4:			/* Float */
 	fread(pp.b, 1, 4, fp);
 #if LITTLEENDIAN
 	endian(pp.b, 4, ANA_FLOAT);
 #endif
 	redef_scalar(var, ANA_FLOAT, &value.f);
 	break;
-      case 5:			/* double */
+      case 5:			/* Double */
 	fread(pp.b, 1, 8, fp);
 #if LITTLEENDIAN
 	endian(pp.b, 8, ANA_DOUBLE);

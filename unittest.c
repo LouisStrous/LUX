@@ -9,10 +9,10 @@
 #include <stdio.h> /* for printf(1) putchar(1) */
 #include "unittest.h"
 
-int num_assertions = 0;
-int assertion_count = 0;
+Int num_assertions = 0;
+Int assertion_count = 0;
 char *assertion_file = NULL;
-int assertion_line = 0;
+Int assertion_line = 0;
 char *assertion_func = NULL;
 
 void assertion_new(const char *file, const char *func) {
@@ -23,8 +23,8 @@ void assertion_new(const char *file, const char *func) {
   assertion_func = (char *) func;
 }
 
-int assertion(const char *file, const int line, const char *func,
-	      const int condition, const char *text)
+Int assertion(const char *file, const Int line, const char *func,
+	      const Int condition, const char *text)
 {
   num_assertions++;
   assertion_count++;
@@ -46,8 +46,8 @@ int assertion(const char *file, const int line, const char *func,
   }
 }
 
-int assertionEquals(const char *file, const int line, const char *func,
-		    const int equal, const char *format, ...)
+Int assertionEquals(const char *file, const Int line, const char *func,
+		    const Int equal, const char *format, ...)
 {
   va_list ap;
 

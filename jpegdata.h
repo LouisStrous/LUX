@@ -117,7 +117,7 @@ typedef JCOEF FAR *JCOEFPTR;	/* useful in a couple of places */
  * the following type, which need not be the same as JCOEF.
  * For example, on a machine with fast floating point, it might make sense
  * to recode the DCT routines to use floating point; then DCTELEM would be
- * 'float' or 'double'.
+ * 'Float' or 'Double'.
  */
 
 typedef JCOEF DCTELEM;
@@ -243,7 +243,7 @@ struct compress_info_struct {
 	COLOR_SPACE in_color_space; /* colorspace of input file */
 	COLOR_SPACE jpeg_color_space; /* colorspace of JPEG file */
 
-	double input_gamma;	/* image gamma of input file */
+	Double input_gamma;	/* image gamma of input file */
 
 	boolean write_JFIF_header; /* should a JFIF marker be written? */
 	/* These three values are not used by the JPEG code, only copied */
@@ -286,8 +286,8 @@ struct compress_info_struct {
  * These fields may be useful for progress monitoring
  */
 
-	int total_passes;	/* number of passes expected */
-	int completed_passes;	/* number of passes completed so far */
+	Int total_passes;	/* number of passes expected */
+	Int completed_passes;	/* number of passes completed so far */
 
 /*
  * These fields are valid during any one scan
@@ -335,13 +335,13 @@ struct decompress_info_struct {
 
 	COLOR_SPACE out_color_space; /* colorspace of output */
 
-	double output_gamma;	/* image gamma wanted in output */
+	Double output_gamma;	/* image gamma wanted in output */
 
 	boolean quantize_colors; /* T if output is a colormapped format */
 	/* the following are ignored if not quantize_colors: */
 	boolean two_pass_quantize;	/* use two-pass color quantization? */
 	boolean use_dithering;		/* want color dithering? */
-	int desired_number_of_colors;	/* max number of colors to use */
+	Int desired_number_of_colors;	/* max number of colors to use */
 
 	boolean do_block_smoothing; /* T = apply cross-block smoothing */
 	boolean do_pixel_smoothing; /* T = apply post-subsampling smoothing */
@@ -358,8 +358,8 @@ struct decompress_info_struct {
  * j_d_defaults in a typical implementation.
  */
 	char * input_buffer;	/* start of buffer (private to input code) */
-	char * next_input_byte;	/* => next byte to read from buffer */
-	int bytes_in_buffer;	/* # of bytes remaining in buffer */
+	char * next_input_byte;	/* => next Byte to read from buffer */
+	Int bytes_in_buffer;	/* # of bytes remaining in buffer */
 
 /*
  * These fields are set by read_file_header or read_scan_header
@@ -414,7 +414,7 @@ struct decompress_info_struct {
  * is called (must be before any put_pixel_rows calls) until shutdown (more
  * specifically, until free_all is called to release memory).
  */
-	int actual_number_of_colors; /* actual number of entries */
+	Int actual_number_of_colors; /* actual number of entries */
 	JSAMPARRAY colormap;	/* NULL if not valid */
 	/* map has color_out_comps rows * actual_number_of_colors columns */
 
@@ -422,8 +422,8 @@ struct decompress_info_struct {
  * These fields may be useful for progress monitoring
  */
 
-	int total_passes;	/* number of passes expected */
-	int completed_passes;	/* number of passes completed so far */
+	Int total_passes;	/* number of passes expected */
+	Int completed_passes;	/* number of passes completed so far */
 
 /*
  * These fields are valid during any one scan
@@ -455,11 +455,11 @@ typedef struct decompress_info_struct * decompress_info_ptr;
 #ifdef CHAR_IS_UNSIGNED
 #define JGETC(cinfo)	( --(cinfo)->bytes_in_buffer < 0 ? \
 			 (*(cinfo)->methods->read_jpeg_data) (cinfo) : \
-			 (int) (*(cinfo)->next_input_byte++) )
+			 (Int) (*(cinfo)->next_input_byte++) )
 #else
 #define JGETC(cinfo)	( --(cinfo)->bytes_in_buffer < 0 ? \
 			 (*(cinfo)->methods->read_jpeg_data) (cinfo) : \
-			 (int) (*(cinfo)->next_input_byte++) & 0xFF )
+			 (Int) (*(cinfo)->next_input_byte++) & 0xFF )
 #endif
 
 #define JUNGETC(ch,cinfo)  ((cinfo)->bytes_in_buffer++, \
@@ -501,23 +501,23 @@ typedef METHOD(void, MCU_output_method_ptr, (compress_info_ptr cinfo,
 typedef METHOD(void, MCU_output_caller_ptr, (compress_info_ptr cinfo,
 					     MCU_output_method_ptr output_method));
 typedef METHOD(void, subsample_ptr, (compress_info_ptr cinfo,
-				     int which_component,
-				     long input_cols, int input_rows,
-				     long output_cols, int output_rows,
+				     Int which_component,
+				     long input_cols, Int input_rows,
+				     long output_cols, Int output_rows,
 				     JSAMPARRAY above,
 				     JSAMPARRAY input_data,
 				     JSAMPARRAY below,
 				     JSAMPARRAY output_data));
 typedef METHOD(void, unsubsample_ptr, (decompress_info_ptr cinfo,
-				       int which_component,
-				       long input_cols, int input_rows,
-				       long output_cols, int output_rows,
+				       Int which_component,
+				       long input_cols, Int input_rows,
+				       long output_cols, Int output_rows,
 				       JSAMPARRAY above,
 				       JSAMPARRAY input_data,
 				       JSAMPARRAY below,
 				       JSAMPARRAY output_data));
 typedef METHOD(void, quantize_method_ptr, (decompress_info_ptr cinfo,
-					   int num_rows,
+					   Int num_rows,
 					   JSAMPIMAGE input_data,
 					   JSAMPARRAY output_workspace));
 typedef METHOD(void, quantize_caller_ptr, (decompress_info_ptr cinfo,
@@ -542,11 +542,11 @@ struct external_methods_struct {
 
 	/* Working data for error/trace facility */
 	/* See macros below for the usage of these variables */
-	int trace_level;	/* level of detail of tracing messages */
+	Int trace_level;	/* level of detail of tracing messages */
 	/* Use level 0 for unsuppressable messages (nonfatal errors) */
 	/* Use levels 1, 2, 3 for successively more detailed trace options */
 
-	int message_parm[8];	/* store numeric parms for messages here */
+	Int message_parm[8];	/* store numeric parms for messages here */
 
 	/* Memory management */
 	/* NB: alloc routines never return NULL. They exit to */
@@ -618,17 +618,17 @@ struct external_methods_struct {
 		(*(emeth)->trace_message) (msg); } )
 #define TRACEMS3(emeth,lvl,msg,p1,p2,p3)    \
   MAKESTMT( if ((emeth)->trace_level >= (lvl)) { \
-		int * _mp = (emeth)->message_parm; \
+		Int * _mp = (emeth)->message_parm; \
 		*_mp++ = (p1); *_mp++ = (p2); *_mp = (p3); \
 		(*(emeth)->trace_message) (msg); } )
 #define TRACEMS4(emeth,lvl,msg,p1,p2,p3,p4)    \
   MAKESTMT( if ((emeth)->trace_level >= (lvl)) { \
-		int * _mp = (emeth)->message_parm; \
+		Int * _mp = (emeth)->message_parm; \
 		*_mp++ = (p1); *_mp++ = (p2); *_mp++ = (p3); *_mp = (p4); \
 		(*(emeth)->trace_message) (msg); } )
 #define TRACEMS8(emeth,lvl,msg,p1,p2,p3,p4,p5,p6,p7,p8)    \
   MAKESTMT( if ((emeth)->trace_level >= (lvl)) { \
-		int * _mp = (emeth)->message_parm; \
+		Int * _mp = (emeth)->message_parm; \
 		*_mp++ = (p1); *_mp++ = (p2); *_mp++ = (p3); *_mp++ = (p4); \
 		*_mp++ = (p5); *_mp++ = (p6); *_mp++ = (p7); *_mp = (p8); \
 		(*(emeth)->trace_message) (msg); } )
@@ -650,13 +650,13 @@ struct compress_methods_struct {
 	/* Color space and gamma conversion */
 	METHOD(void, colorin_init, (compress_info_ptr cinfo));
 	METHOD(void, get_sample_rows, (compress_info_ptr cinfo,
-				       int rows_to_read,
+				       Int rows_to_read,
 				       JSAMPIMAGE image_data));
 	METHOD(void, colorin_term, (compress_info_ptr cinfo));
 	/* Expand picture data at edges */
 	METHOD(void, edge_expand, (compress_info_ptr cinfo,
-				   long input_cols, int input_rows,
-				   long output_cols, int output_rows,
+				   long input_cols, Int input_rows,
+				   long output_cols, Int output_rows,
 				   JSAMPIMAGE image_data));
 	/* Subsample pixel values of a single component */
 	/* There can be a different subsample method for each component */
@@ -668,7 +668,7 @@ struct compress_methods_struct {
 	METHOD(void, extract_init, (compress_info_ptr cinfo));
 	METHOD(void, extract_MCUs, (compress_info_ptr cinfo,
 				    JSAMPIMAGE image_data,
-				    int num_mcu_rows,
+				    Int num_mcu_rows,
 				    MCU_output_method_ptr output_method));
 	METHOD(void, extract_term, (compress_info_ptr cinfo));
 	/* Entropy encoding parameter optimization */
@@ -684,14 +684,14 @@ struct compress_methods_struct {
 	METHOD(void, write_scan_header, (compress_info_ptr cinfo));
 	METHOD(void, write_jpeg_data, (compress_info_ptr cinfo,
 				       char *dataptr,
-				       int datacount));
+				       Int datacount));
 	METHOD(void, write_scan_trailer, (compress_info_ptr cinfo));
 	METHOD(void, write_file_trailer, (compress_info_ptr cinfo));
 	/* Pipeline control */
 	METHOD(void, c_pipeline_controller, (compress_info_ptr cinfo));
 	METHOD(void, entropy_output, (compress_info_ptr cinfo,
 				      char *dataptr,
-				      int datacount));
+				      Int datacount));
 	/* Overall control */
 	METHOD(void, c_per_scan_method_selection, (compress_info_ptr cinfo));
 };
@@ -707,7 +707,7 @@ struct decompress_methods_struct {
 	/* JPEG file scanning */
 	METHOD(void, read_file_header, (decompress_info_ptr cinfo));
 	METHOD(boolean, read_scan_header, (decompress_info_ptr cinfo));
-	METHOD(int, read_jpeg_data, (decompress_info_ptr cinfo));
+	METHOD(Int, read_jpeg_data, (decompress_info_ptr cinfo));
 	METHOD(void, read_scan_trailer, (decompress_info_ptr cinfo));
 	METHOD(void, read_file_trailer, (decompress_info_ptr cinfo));
 	/* Entropy decoding */
@@ -722,7 +722,7 @@ struct decompress_methods_struct {
 				       JBLOCKIMAGE image_data));
 	METHOD(void, reverse_DCT, (decompress_info_ptr cinfo,
 				   JBLOCKIMAGE coeff_data,
-				   JSAMPIMAGE output_data, int start_row));
+				   JSAMPIMAGE output_data, Int start_row));
 	METHOD(void, disassemble_term, (decompress_info_ptr cinfo));
 	/* Cross-block smoothing */
 	METHOD(void, smooth_coefficients, (decompress_info_ptr cinfo,
@@ -739,18 +739,18 @@ struct decompress_methods_struct {
 	/* Color space and gamma conversion */
 	METHOD(void, colorout_init, (decompress_info_ptr cinfo));
 	METHOD(void, color_convert, (decompress_info_ptr cinfo,
-				     int num_rows, long num_cols,
+				     Int num_rows, long num_cols,
 				     JSAMPIMAGE input_data,
 				     JSAMPIMAGE output_data));
 	METHOD(void, colorout_term, (decompress_info_ptr cinfo));
 	/* Color quantization */
 	METHOD(void, color_quant_init, (decompress_info_ptr cinfo));
 	METHOD(void, color_quantize, (decompress_info_ptr cinfo,
-				      int num_rows,
+				      Int num_rows,
 				      JSAMPIMAGE input_data,
 				      JSAMPARRAY output_data));
 	METHOD(void, color_quant_prescan, (decompress_info_ptr cinfo,
-					   int num_rows,
+					   Int num_rows,
 					   JSAMPIMAGE image_data,
 					   JSAMPARRAY workspace));
 	METHOD(void, color_quant_doit, (decompress_info_ptr cinfo,
@@ -759,9 +759,9 @@ struct decompress_methods_struct {
 	/* Output image writing */
 	METHOD(void, output_init, (decompress_info_ptr cinfo));
 	METHOD(void, put_color_map, (decompress_info_ptr cinfo,
-				     int num_colors, JSAMPARRAY colormap));
+				     Int num_colors, JSAMPARRAY colormap));
 	METHOD(void, put_pixel_rows, (decompress_info_ptr cinfo,
-				      int num_rows,
+				      Int num_rows,
 				      JSAMPIMAGE pixel_data));
 	METHOD(void, output_term, (decompress_info_ptr cinfo));
 	/* Pipeline control */
@@ -786,10 +786,10 @@ struct decompress_methods_struct {
 EXTERN void jpeg_compress PP((compress_info_ptr cinfo));
 
 /* default parameter setup for compression */
-EXTERN void j_c_defaults PP((compress_info_ptr cinfo, int quality,
+EXTERN void j_c_defaults PP((compress_info_ptr cinfo, Int quality,
 			     boolean force_baseline));
 EXTERN void j_monochrome_default PP((compress_info_ptr cinfo));
-EXTERN void j_set_quality PP((compress_info_ptr cinfo, int quality,
+EXTERN void j_set_quality PP((compress_info_ptr cinfo, Int quality,
 			      boolean force_baseline));
 
 /* main entry for decompression */
@@ -806,9 +806,9 @@ EXTERN void j_rev_dct PP((DCTBLOCK data));
 
 /* utility routines in jutils.c */
 EXTERN long jround_up PP((long a, long b));
-EXTERN void jcopy_sample_rows PP((JSAMPARRAY input_array, int source_row,
-				  JSAMPARRAY output_array, int dest_row,
-				  int num_rows, long num_cols));
+EXTERN void jcopy_sample_rows PP((JSAMPARRAY input_array, Int source_row,
+				  JSAMPARRAY output_array, Int dest_row,
+				  Int num_rows, long num_cols));
 EXTERN void jcopy_block_row PP((JBLOCKROW input_row, JBLOCKROW output_row,
 				long num_blocks));
 EXTERN void jzero_far PP((void FAR * target, size_t bytestozero));

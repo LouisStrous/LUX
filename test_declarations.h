@@ -1,1 +1,1 @@
-int test_rotate(); 	/* UNITTEST */
+Int test_rotate(); 	/* UNITTEST */

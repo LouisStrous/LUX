@@ -1,5 +1,5 @@
 #ifndef YYSTYPE
-#define YYSTYPE int
+#define YYSTYPE Int
 #endif
 #define	NEWLINE	999
 #define	C_ID	258

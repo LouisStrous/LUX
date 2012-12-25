@@ -9,6 +9,7 @@
 #endif
 #include <stdio.h>
 #include <string.h>
+#include <stdint.h>
 #include <gsl/gsl_spline.h>
 #include "action.h"
 #include "anaparser.c.tab.h"
@@ -19,7 +20,7 @@ static char rcsid[] __attribute__ ((unused)) =
  "$Id: anaparser.c,v 4.0 2001/02/07 20:36:54 strous Exp $";
 #define startList(x)	{ pushList(ANA_NEW_LIST); pushList(x); }
 				/* start a new list */
-extern int	scrat[],	/* general-purpose scratch storage (once.h) */
+extern Int	scrat[],	/* general-purpose scratch storage (once.h) */
 		compileLevel,	/* number of nested open input files */
 		executeLevel,	/* number of nested execution items */
 		symbolStackIndex, /* next free slot in symbol stack */
@@ -27,7 +28,7 @@ extern int	scrat[],	/* general-purpose scratch storage (once.h) */
 extern char	*symbolStack[],	/* stack of not-yet parsed symbols */
 		line[],		/* raw user input */
 		tLine[];	/* translated user input */
-extern word	curContext,	/* context of current execution */
+extern Word	curContext,	/* context of current execution */
 		listStack[],	/* stack of unincorporated list items */
 		*listStackItem;	/* next free list stack item */
 extern hashTableEntry	*varHashTable[], /* name hash table for variables */
@@ -37,23 +38,23 @@ extern symTableEntry	sym[];	/* all symbols */
 char	debugLine = 0,		/* we're not in a debugger line */
 	errorState = 0,		/* we've not just experienced an error */
 	compileOnly = 0;	/* not just compiling but also executing */
-byte disableNewline = 0;	/* disables NEWLINE token so that complex */
+Byte disableNewline = 0;	/* disables NEWLINE token so that complex */
 				/* structures can be parsed across newlines */
-void	pushList(word),		/* push symbol number onto list stack */
-	swapList(int, int),	/* swap items in the list stack */
-	cleanUp(int, int),
+void	pushList(Word),		/* push symbol number onto list stack */
+	swapList(Int, Int),	/* swap items in the list stack */
+	cleanUp(Int, Int),
 	away(void);
-word	popList(void);		/* pop an item from the list stack's top */
-int	stackListLength(void),	/* return length of list at top of stack */
-	isInternalSubr(int),	/* 1 if symbol is internal subroutine */
+Word	popList(void);		/* pop an item from the list stack's top */
+Int	stackListLength(void),	/* return length of list at top of stack */
+	isInternalSubr(Int),	/* 1 if symbol is internal subroutine */
 	installExec(void),
-	findSym(int, hashTableEntry *[], int),
-	installSubsc(int),
-	addSubsc(int, int, int), newSubrSymbol(int),
-	newSymbol(int, ...), newBlockSymbol(int), copySym(int),
-	anaerror(char *, int, ...);
-int	statementDepth = 0, keepEVB = 0;
-int	yyerror(char *), yylex(YYSTYPE *);
+	findSym(Int, hashTableEntry *[], Int),
+	installSubsc(Int),
+	addSubsc(Int, Int, Int), newSubrSymbol(Int),
+	newSymbol(Int, ...), newBlockSymbol(Int), copySym(Int),
+	anaerror(char *, Int, ...);
+Int	statementDepth = 0, keepEVB = 0;
+Int	yyerror(char *), yylex(YYSTYPE *);
 %}
 
 %pure_parser			/* reentrant parser, so we can compile a
@@ -832,7 +833,7 @@ opt_step:			/* optional STEP for FOR statement */
 }
 ;
 
-opt_do:				/* optional DO word in WHILE-DO statement */
+opt_do:				/* optional DO Word in WHILE-DO statement */
 
 /* empty */
 
@@ -861,7 +862,7 @@ char	*currentChar,		/* the character currently being parsed */
 static char	oldChar = '\0';
 extern FILE	*inputStream;		/* source of input, if file */
 extern char	*inputString;		/* source of input, if string */
-int	ignoreInput = 0,	/* nesting level of IGNORE-RESUME pairs */
+Int	ignoreInput = 0,	/* nesting level of IGNORE-RESUME pairs */
         findBody = 0,		/* nonzero if a specific user-routine */
 				/* is sought for recompilation */
 	calculatorMode = 0;	/* nonzero if in calculator mode
@@ -872,7 +873,7 @@ char	*ANAPrompts[] =	{	/* legal ANA prompts */
 };
 #define N_ANAPROMPTS 5
 
-int	rawIo(void),		/* selects untreated key-by-key input */
+Int	rawIo(void),		/* selects untreated key-by-key input */
   cookedIo(void);		/* selects treated line-by-line input */
 extern char	line[],		/* raw user input */
 	tLine[];		/* translated user input */
@@ -886,8 +887,8 @@ void away(void)
      /* clean up the symbol stack and reinitialize various counters */
 {
   char	**p;
-  extern int	keepEVB, (*getChar)(void), nSymbolStack;
-  int	getStreamChar(void);
+  extern Int	keepEVB, (*getChar)(void), nSymbolStack;
+  Int	getStreamChar(void);
 
   /* statementDepth = disableNewline = curContext = keepEVB = 0; */
   curContext = keepEVB = 0;
@@ -906,10 +907,10 @@ void away(void)
   getChar = getStreamChar;
 }
 
-int yyerror(char *s)
+Int yyerror(char *s)
      /* reports errors occurring during parsing (required by yyparse()) */
 {
- extern int	curLineNumber;	/* current line number */
+ extern Int	curLineNumber;	/* current line number */
  extern compileInfo	*curCompileInfo;
 
  if (setup & 1024)	/* no parser warnings */
@@ -944,7 +945,7 @@ void translateLine(void)
    string in line[] may be changed */
 {
   char	*p, *tp, inString = 0;
-  int	nonWhite, i;
+  Int	nonWhite, i;
   extern char	*ANAPrompts[],
 		allowPromptInInput; /* allow prompts at start of line */
 
@@ -960,12 +961,12 @@ void translateLine(void)
 	break;
       }
   if (!inString)
-    while (isspace((byte) *p))
+    while (isspace((Byte) *p))
       p++;			/* skip heading whitespace
 				   outside literal strings */
   nonWhite = 0;			/* number of consecutive non-whitespaces */
   while (*p) {			/* not at end of line */
-    if (iscntrl((byte) *p))
+    if (iscntrl((Byte) *p))
       *p = ' ';			/* control characters are transformed into
 				   whitespace */
     switch (*p) {
@@ -991,7 +992,7 @@ void translateLine(void)
 	if (!inString) {	/* we're not inside a literal string, so
 				   it must be a "@filename" */
 	  *tp++ = *p++;		/* @ goes into the translation */
-          while (isFileNameChar((byte) *p))
+          while (isFileNameChar((Byte) *p))
 	    *tp++ = *p++;	/* file name goes into the translation */
 	  p--;
 	} else
@@ -1044,14 +1045,14 @@ void translateLine(void)
   *tp++ = '\0';			/* sure close */
 }
 /*--------------------------------------------------------------*/
-void Quit(int result)
+void Quit(Int result)
 /* Quits the program */
 {
-  int	saveHistory(void);
+  Int	saveHistory(void);
 
   cookedIo();			/* back to line-by-line input */
   saveHistory();
-  printf("\nCPUtime: %g seconds\n", ((float) clock())/CLOCKS_PER_SEC);
+  printf("\nCPUtime: %g seconds\n", ((Float) clock())/CLOCKS_PER_SEC);
   puts("Quitting... Bye!");	/* farewell message */
   exit(result);
 }
@@ -1078,13 +1079,13 @@ void Quit(int result)
                    2EX = 0X2E = ANA_LONG hex 2E = ANA_LONG 46
 */
 /*--------------------------------------------------------------*/
-int readNumber(YYSTYPE *lvalp)
+Int readNumber(YYSTYPE *lvalp)
 /* reads the number at currentChar, puts it in a new sybol, assigns
    the symbol number to *lvalp, and returns the proper parser code */
 {
-  int	type;
+  Int	type;
   scalar	v;
-  void	read_a_number(char **, scalar *, int *);
+  void	read_a_number(char **, scalar *, Int *);
 
   read_a_number(&currentChar, &v, &type);
   if (!ignoreInput) {		/* we're not ignoring stuff */
@@ -1095,16 +1096,16 @@ int readNumber(YYSTYPE *lvalp)
       switch(type) {		/* non-zero return value (??) */
 				/* insert value of proper type */
 	case ANA_BYTE:
-	  scalar_value(*lvalp).b = (byte) v.l;
+	  scalar_value(*lvalp).b = (Byte) v.l;
 	  break;
 	case ANA_WORD:
-	  scalar_value(*lvalp).w = (word) v.l;
+	  scalar_value(*lvalp).w = (Word) v.l;
 	  break;
 	case ANA_LONG:
 	  scalar_value(*lvalp).l = v.l;
 	  break;
 	case ANA_FLOAT:
-	  scalar_value(*lvalp).f = (float) v.d;
+	  scalar_value(*lvalp).f = (Float) v.d;
 	  break;
 	case ANA_DOUBLE:
 	  scalar_value(*lvalp).d = v.d;
@@ -1125,14 +1126,14 @@ int readNumber(YYSTYPE *lvalp)
     return 0;
 }
 /*--------------------------------------------------------------*/
-int strcmp2(const void *key, const void *data)
+Int strcmp2(const void *key, const void *data)
 /* compares key to data */
 {
   return strcmp((char *) key, *(char **) data);
 }
 /*--------------------------------------------------------------*/
-int isKeyWord(void)
-/* checks if the string starting at currentChar is a reserved (key) word;
+Int isKeyWord(void)
+/* checks if the string starting at currentChar is a reserved (key) Word;
   if so, returns the keyword's code */
 {
  static char	*keyWords[] = {
@@ -1142,7 +1143,7 @@ int isKeyWord(void)
    "MOD", "NCASE", "NE", "OR", "ORIF", "REPEAT", "RETALL", "RETURN", 
    "RUN", "SMOD", "SUBR", "SUBROUTINE", "THEN", "UNTIL", "WHILE", "XOR"
  };
- static int	keyCodes[] = {
+ static Int	keyCodes[] = {
    AND, ANDIF, BEGIN, BLOCK, BREAK, CASE, CONTINUE, DO, ELSE,
    END, ENDBLOCK, ENDCASE, ENDFUNC, ENDSUBR, EQ, FOR, FUNC, FUNC, GE,
    GT, IF, LE, LT, '%', NCASE, NE, OR, ORIF, REPEAT, RETALL, RETURN, RUN,
@@ -1155,31 +1156,31 @@ int isKeyWord(void)
  return (ptr)? keyCodes[ptr - keyWords]: 0;
 }
 /*--------------------------------------------------------------*/
-int readIdentifier(YYSTYPE *lvalp)
+Int readIdentifier(YYSTYPE *lvalp)
 /* identifies keywords at currentChar and returns appropriate lexical number;
   otherwise reads identifier, stores in stack, returns index to
   stack in *lvalp, and returns appropriate lexical number. */
 {
  char	*p, c;
- int	n;
- int	installString(char *string);
+ Int	n;
+ Int	installString(char *string);
 
  p = currentChar + 1;		/* skip over first character, which */
 				/* is assumed to be OK by this routine */
- while (isNextChar((byte) *p))
+ while (isNextChar((Byte) *p))
    p++;				/* span identifier */
  c = *p;
  *p = '\0';			/* terminate string, but save clobbered char */
- if ((n = isKeyWord())) {	/* a standard ANA-language key word */
+ if ((n = isKeyWord())) {	/* a standard ANA-language key Word */
    *p = c;			/* restore clobbered char */
-   currentChar = p;		/* continue parsing beyond key word */
+   currentChar = p;		/* continue parsing beyond key Word */
    return n;			/* return keyword index */
  }
- /* the identifier is not a standard key word */
+ /* the identifier is not a standard key Word */
  if (!ignoreInput) {		/* we're not ignoring stuff, so need to save */
    *lvalp = installString(currentChar);	/* save string, index in *lvalp */
    *p = c;			/* restore clobbered char */
-   n = isNextChar((byte) *currentChar)? C_ID: S_ID;
+   n = isNextChar((Byte) *currentChar)? C_ID: S_ID;
    currentChar = p;		/* continue parse beyond string */
    if (*lvalp < 0)
      return ANA_ERROR;		/* some error occurred */
@@ -1190,17 +1191,17 @@ int readIdentifier(YYSTYPE *lvalp)
  }
 }
 /*--------------------------------------------------------------*/
-int yylex(YYSTYPE *lvalp)
+Int yylex(YYSTYPE *lvalp)
 /* returns semantic value of next read token in *lvalp, and the
    lexical value as function return value */
 {
  char	*p, c, *prompt, *p2;
- int	i;
- static int	len = 0;
+ Int	i;
+ static Int	len = 0;
  extern char	recording, *currentInputFile;
- extern int	curLineNumber;	/* current line number */
- int	getNewLine(char *buffer, char *prompt, char historyFlag),
-   showstats(int narg, int ps[]), installString(char *);
+ extern Int	curLineNumber;	/* current line number */
+ Int	getNewLine(char *buffer, char *prompt, char historyFlag),
+   showstats(Int narg, Int ps[]), installString(char *);
 
  if (errorState)
    return ERRORSTATE;		/* if a syntax error occurred, then */
@@ -1240,17 +1241,17 @@ int yylex(YYSTYPE *lvalp)
      currentChar = tLine; 	/* first character of translated input line */
 				/* is current one in parsing */
    }
-   while (isspace((byte) *currentChar))
+   while (isspace((Byte) *currentChar))
      currentChar++;		/* skip leading spaces */
 
    /* we recognize RESUME and IGNORE only at the beginning of a line */
    if (currentChar == tLine) {
      if (!strncmp(currentChar, "IGNORE", 6)
-	 && !isNextChar((byte) currentChar[6])) {
+	 && !isNextChar((Byte) currentChar[6])) {
        ignoreInput++;
        prompt = ANAPrompts[2];	/* ign> */
      } else if (!strncmp(currentChar, "RESUME", 6)
-		&& !isNextChar((byte) currentChar[6])) {
+		&& !isNextChar((Byte) currentChar[6])) {
        if (!ignoreInput)
 	 puts("Unmatched RESUME ignored");
        else
@@ -1307,7 +1308,7 @@ int yylex(YYSTYPE *lvalp)
      return '#';
    }
 
-   if (isFirstChar((byte) *currentChar)) { /* an identifier of some sort */
+   if (isFirstChar((Byte) *currentChar)) { /* an identifier of some sort */
      i = readIdentifier(lvalp);	/* which standard one or what kind is it? */
      switch (i) {
        case SUBR: case FUNC: case BLOCK: /* SUBR, FUNC, BLOCK: */
@@ -1316,7 +1317,7 @@ int yylex(YYSTYPE *lvalp)
 				/* routine/function.  If the just */
 				/* encounterd routine/function is the */
 				/* sought one, then we need to compile it */
-	   for (p = currentChar + 2; isNextChar((byte) *p); p++);
+	   for (p = currentChar + 2; isNextChar((Byte) *p); p++);
 	   /* end of name */
 	   c = *p;
 	   *p = '\0';		/* temporary termination */
@@ -1365,7 +1366,7 @@ int yylex(YYSTYPE *lvalp)
      }
    }
 
-   if (isdigit((byte) *currentChar)) {	/* a number */
+   if (isdigit((Byte) *currentChar)) {	/* a number */
      i = readNumber(lvalp);	/* read number into symbol */
      if (ignoreInput)
        continue;		/* we're ignoring stuff, so the number */
@@ -1375,7 +1376,7 @@ int yylex(YYSTYPE *lvalp)
        return i; 		/* pass token NUM on to yyparse() */
    }
 
-   if (isTwoOperator((byte) *currentChar)) { /* possibly op-assignment */
+   if (isTwoOperator((Byte) *currentChar)) { /* possibly op-assignment */
      if (currentChar[1] == '=')	{ /* yes, an operation-assignment (e.g. +=) */
        currentChar += 2;	/* continue parse beyond operator */
        if (ignoreInput)
@@ -1417,7 +1418,7 @@ int yylex(YYSTYPE *lvalp)
 	i = 1;			/* no ignoring, signal @@ */
        currentChar++; 		/* skip extra @ */
     }
-    for (p = currentChar + 1; isFileNameChar((byte) *p); p++); /* span name */
+    for (p = currentChar + 1; isFileNameChar((Byte) *p); p++); /* span name */
     if (!ignoreInput) {		/* not ignoring, so note file name */
       c = *p;			/* save character beyond file name */
       *p = '\0';		/* temporary string terminator */
@@ -1448,15 +1449,15 @@ int yylex(YYSTYPE *lvalp)
   }
 
   if (*currentChar == '.') {	/* a structure tag or ellipsis or a number */
-    if (isdigit((byte) currentChar[1])) { /* a number */
+    if (isdigit((Byte) currentChar[1])) { /* a number */
       i = readNumber(lvalp);
       if (ignoreInput)
 	continue;
       else
 	return i;
-    } else if (isNextChar((byte) currentChar[1])) { /* a string tag */
+    } else if (isNextChar((Byte) currentChar[1])) { /* a string tag */
       p = ++currentChar;	/* skip . */
-      while (isNextChar((byte) *currentChar))
+      while (isNextChar((Byte) *currentChar))
 	currentChar++;		/* span identifier */
       if (ignoreInput)
 	continue;
@@ -1541,34 +1542,34 @@ int yylex(YYSTYPE *lvalp)
  }
 }
 /*--------------------------------------------------------------*/
-int calc_lex(YYSTYPE *lvalp)
+Int calc_lex(YYSTYPE *lvalp)
 /* required to make ana_calculator() parsing work */
 {
   return yylex(lvalp);
 }
 /*--------------------------------------------------------------*/
-int calc_error(char *s)
+Int calc_error(char *s)
 /* required to make ana_calculator() parsing work */
 {
   return yyerror(s);
 }
 /*--------------------------------------------------------------*/
-void gehandler(const char *reason, const char *file, int line, int gsl_errno)
+void gehandler(const char *reason, const char *file, Int line, Int gsl_errno)
 {
   anaerror("GSL error %d (%s line %d): %s", 0, gsl_errno, file, line, reason);
 }
 /*--------------------------------------------------------------*/
 char	*programName;
-int main(int argc, char *argv[])
+Int main(Int argc, char *argv[])
      /* main program */
 {
-  int	site(int, int []), readHistory(void);
+  Int	site(Int, Int []), readHistory(void);
   char	*p;
-  extern int	nSymbolStack;
+  extern Int	nSymbolStack;
   extern void	getTerminalSize(void);
   void	pegParse(void), inHistory(char *), getTermCaps(void);
   FILE	*fp;
-  int	yyparse(void);
+  Int	yyparse(void);
 
   programName = argv[0];
   getTerminalSize();
@@ -1581,7 +1582,7 @@ int main(int argc, char *argv[])
   *line = '\0';			/* start with an empty line */
   p = line;
 
-  void gehandler(const char *, const char *, int, int);
+  void gehandler(const char *, const char *, Int, Int);
 
   gsl_set_error_handler(&gehandler);
   /* seek .anainit in home directory */

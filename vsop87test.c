@@ -7,13 +7,13 @@
 
 void main(void) {
   FILE *fin;
-  int planet[NREC];
-  double JD[NREC];
-  double l[NREC];
-  double b[NREC];
-  double r[NREC];
-  double pos[3];
-  int i;
+  Int planet[NREC];
+  Double JD[NREC];
+  Double l[NREC];
+  Double b[NREC];
+  Double r[NREC];
+  Double pos[3];
+  Int i;
 
   fin = fopen("vsop87test.txt", "r");
   if (!fin) {
@@ -26,11 +26,11 @@ void main(void) {
   }
   fclose(fin);
 
-  double maxerr = 0;
+  Double maxerr = 0;
   for (i = 0; i < NREC; i++) {
-    double T;
-    double pos[3];
-    double x;
+    Double T;
+    Double pos[3];
+    Double x;
 
     T = (JD[i] - J2000)/365250;
     XYZfromVSOPA(T, planet[i], pos, 0, 0);
@@ -50,14 +50,14 @@ void main(void) {
   printf("maxerr = %g\n", maxerr);
 
   /* now test tolerance truncation */
-  int nmax = sizeof(planetTerms)/(3*sizeof(double));
-  double tol;
-  int bad = 0;
+  Int nmax = sizeof(planetTerms)/(3*sizeof(Double));
+  Double tol;
+  Int bad = 0;
   for (tol = 0.1; tol > 1e-20; tol /= 10) {
     struct planetIndex *pi = planetIndicesForTolerance(tol);
     for (i = 0; i < 6*3*8; i++) {
-      int index = pi[i].index;
-      int n = pi[i].nTerms;
+      Int index = pi[i].index;
+      Int n = pi[i].nTerms;
       if (index < 0 || index > nmax
           || (index == nmax && n > 0)) {
         printf("index at %d = %d out of bounds\n", i, index);

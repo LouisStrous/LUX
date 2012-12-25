@@ -1,4 +1,4 @@
-int cerror(int, int, ...);
+Int cerror(Int, Int, ...);
 
 #define COND_NO_SCAL	0
 #define ILL_COMB	1

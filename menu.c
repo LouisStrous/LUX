@@ -29,18 +29,18 @@ static char rcsid[] __attribute__ ((unused)) =
 
 #define TEXTMENU	1
 
-int	ana_replace(int, int), define_menu(int, int, int, int []),
-  redefine_menu(int, int []), coordTrf(float *, float *, int, int),
-  set_defw(int);
+Int	ana_replace(Int, Int), define_menu(Int, Int, Int, Int []),
+  redefine_menu(Int, Int []), coordTrf(Float *, Float *, Int, Int),
+  set_defw(Int);
 void	printfw(char *, ...);
 
 extern Display	*display;
-extern int	screen_num, black_pixel, white_pixel;
-extern double	last_time;
-int	theMenu, theItem;
+extern Int	screen_num, black_pixel, white_pixel;
+extern Double	last_time;
+Int	theMenu, theItem;
 
 struct Menu {
-  int          n_items;		/* number of menu panes (including title) */
+  Int          n_items;		/* number of menu panes (including title) */
   char         **text;		/* pointer to item strings */
   Window       *window;		/* pointer to item windows */
 };
@@ -53,16 +53,16 @@ char	*menu_font_name = "fixed", menu_setup_done = 0;
 Window	menu_win[MAXMENU], inverted_pane = NONE;
 GC	menugc, menurgc;
 Cursor	cursor;
-int	last_menu, menu_item, fontheight, fontwidth;
-float	menu_x, menu_y;
-int	text_menus = 0;
+Int	last_menu, menu_item, fontheight, fontwidth;
+Float	menu_x, menu_y;
+Int	text_menus = 0;
 
-void	delete_menu(int);
+void	delete_menu(Int);
 /*------------------------------------------------------------------------*/
-int menu_setup(void)
+Int menu_setup(void)
 /* setup for menus.  executed once before first menu is created */
 {
- int	i;
+ Int	i;
 
  setup_x();
  menu_font_info = XLoadQueryFont(display, menu_font_name);
@@ -85,13 +85,13 @@ int menu_setup(void)
  return ANA_OK;
 }
 /*------------------------------------------------------------------------*/
-int placeEvent(XEvent *event)
+Int placeEvent(XEvent *event)
 /* returns 1 if the event occurred in one of our menus;  0 otherwise. */
 /* if 1, then stores the menu number in theMenu and the item number in */
 /* theItem.  KeyPress and PointerMotion events always have theItem = -1. */
 /* if 0, then both theMenu and theItem are -1. */
 {
- int	i, j;
+ Int	i, j;
 
  theMenu = -1;
  theItem = -1;
@@ -110,10 +110,10 @@ int placeEvent(XEvent *event)
  return 0;
 } 
 /*------------------------------------------------------------------------*/
-void paint_pane(int menu_num, int menu_item, int mode)
+void paint_pane(Int menu_num, Int menu_item, Int mode)
 /* paints a menu item */
 {
- int	x = 2, y;
+ Int	x = 2, y;
  GC	gc;
  Window	window;
 
@@ -139,11 +139,11 @@ void paint_pane(int menu_num, int menu_item, int mode)
  return;
 }
 /*------------------------------------------------------------------------*/
-int ana_menu_hide(int narg, int ps[])
+Int ana_menu_hide(Int narg, Int ps[])
 /* remove menu from window, but keep in memory */
 /* if argument is -1, then hide all */
 {
- int	num, i1, i2;
+ Int	num, i1, i2;
 
  num = int_arg(ps[0]);
  if (num < -1 || num >= MAXMENU) 
@@ -163,11 +163,11 @@ int ana_menu_hide(int narg, int ps[])
  return ANA_OK;
 }
  /*------------------------------------------------------------------------*/
-int ana_menu_kill(int narg, int ps[])
+Int ana_menu_kill(Int narg, Int ps[])
 /* remove menu from window and from memory
    argument -1 -> remove all menus */
 {
- int	num, i1, i2;
+ Int	num, i1, i2;
 
  num = int_arg(ps[0]);
  if (num < -1 || num >= MAXMENU)
@@ -192,10 +192,10 @@ Bool menuButtonPress(Display *display, XEvent *event, XPointer arg)
 /* returns True if the event is a ButtonPress, EnterNotify, or LeaveNotify */
 /* in one of our menus, False otherwise */
 {
-  int	num;
+  Int	num;
 
   if (arg)
-    num = *((int *) arg);
+    num = *((Int *) arg);
   else
     num = -1;
   switch (event->type) {
@@ -211,9 +211,9 @@ Bool menuKeyPress(Display *display, XEvent *event, XPointer arg)
 /* returns True if the event is a KeyPress */
 /* in one of our menus, False otherwise */
 {
-  int	num;
+  Int	num;
 
-  if (arg) num = *((int *) arg); else num = -1;
+  if (arg) num = *((Int *) arg); else num = -1;
   switch (event->type) {
     case KeyPress:
       return (placeEvent(event) && (num < 0 || theMenu == num))?
@@ -229,11 +229,11 @@ Bool menuEvent(Display *display, XEvent *event, XPointer arg)
   return placeEvent(event)? True: False;
 }
 /*------------------------------------------------------------------------*/
-int ana_check_menu(int narg, int ps[])
+Int ana_check_menu(Int narg, Int ps[])
 /* checks event buffer for any pending menu selections */
 /* function: returns 1 if pending, 0 if not pending, error if illegal */
 {
- int	num;
+ Int	num;
  XEvent	event;
 
  if (text_menus)
@@ -263,7 +263,7 @@ int ana_check_menu(int narg, int ps[])
    return ANA_ZERO;
 } 
  /*------------------------------------------------------------------------*/
-char getMenuChar(int menu_num)
+char getMenuChar(Int menu_num)
 /* reads the next character from menu #menu_num */
 {
   XEvent	event;
@@ -281,11 +281,11 @@ char getMenuChar(int menu_num)
   }
 }
  /*------------------------------------------------------------------------*/
-char *readPane(int menu_num, int item_num, char *query)
+char *readPane(Int menu_num, Int item_num, char *query)
 {
-  extern int	scrat[];
+  extern Int	scrat[];
   char	*current, *old, *answer;
-  int	y, c = 'x', revert_to;
+  Int	y, c = 'x', revert_to;
   Window	focusWindow;
   
   /* make item text pointer point at "current" instead of "old", */
@@ -349,11 +349,11 @@ char *readPane(int menu_num, int item_num, char *query)
   return answer;
 }
 /*---------------------------------------------------------------------*/
-int ana_menu_read(int narg, int ps[])
+Int ana_menu_read(Int narg, Int ps[])
      /* read string through menu item; 
 	Syntax:  menuread,menu#,item#,query,answer */
 {
-  int	menu_num, item_num, result;
+  Int	menu_num, item_num, result;
   char	*query, *answer;
 
   if (text_menus)
@@ -374,10 +374,10 @@ int ana_menu_read(int narg, int ps[])
   return ana_replace(*ps, result);
 }
  /*------------------------------------------------------------------------*/
-int ana_wait_for_menu(int narg, int ps[])
+Int ana_wait_for_menu(Int narg, Int ps[])
 /* grabs pointer and waits for menu input */
 {
- int	mode;
+ Int	mode;
  XEvent	event;
 
  if (text_menus)
@@ -405,9 +405,9 @@ int ana_wait_for_menu(int narg, int ps[])
      case ButtonPress:
        last_menu = theMenu;
        menu_item = theItem;
-       last_time = (double) event.xbutton.time/1000.0;
-       menu_x = (float) event.xbutton.x/((float) fontwidth);
-       menu_y = (float) event.xbutton.y/((float) fontheight);
+       last_time = (Double) event.xbutton.time/1000.0;
+       menu_x = (Float) event.xbutton.x/((Float) fontwidth);
+       menu_y = (Float) event.xbutton.y/((Float) fontheight);
        paint_pane(theMenu, theItem, BLACK);
        paint_pane(theMenu, theItem, WHITE);
        XFlush(display);
@@ -417,11 +417,11 @@ int ana_wait_for_menu(int narg, int ps[])
  }
 }
  /*------------------------------------------------------------------------*/
-int ana_menu_pop(int narg, int ps[])
+Int ana_menu_pop(Int narg, Int ps[])
 /* as ana_menu, but fix x and y according to mouse position */
 {
- int	x, y, i, xd, yd;
- unsigned int	kb;
+ Int	x, y, i, xd, yd;
+ uint32_t	kb;
  Window	qroot, qchild;
 
  if (text_menus)
@@ -435,9 +435,9 @@ int ana_menu_pop(int narg, int ps[])
  return i;
 }
 /*------------------------------------------------------------------------*/
-int createMenu(int num, int x, int y, int nItem, char **item)
+Int createMenu(Int num, Int x, Int y, Int nItem, char **item)
 {
-  int	i, direction, ascent, descent, menu_width = 0,
+  Int	i, direction, ascent, descent, menu_width = 0,
     border_width = BORDER_WIDTH, item_height = 0, menu_height;
   char	*title, *text;
   XCharStruct	overall;
@@ -504,7 +504,7 @@ int createMenu(int num, int x, int y, int nItem, char **item)
   return ANA_OK;
 }
 /*------------------------------------------------------------------------*/
-int ana_menu(int narg, int ps[])
+Int ana_menu(Int narg, Int ps[])
 /* try at menus.  Syntax:
    MENU,num,x,y,title,item1 [,item2...]             (re)create menu
    MENU,num,title,item1 [,item2...]                  repaint menu
@@ -512,7 +512,7 @@ int ana_menu(int narg, int ps[])
  Note that in a repaint, the menu does not change its size!
 */
 {
- int	num, i, n_items, iq, x = 0, y = 0;
+ Int	num, i, n_items, iq, x = 0, y = 0;
 
  num = int_arg(ps[0]);		/* menu number */
  if (num < 0 || num >= MAXMENU)
@@ -547,11 +547,11 @@ int ana_menu(int narg, int ps[])
  return ANA_OK;
 }
 /*------------------------------------------------------------------------*/
-int redefine_menu(int narg, int ps[])
+Int redefine_menu(Int narg, Int ps[])
 /* store new menu items in existing Menu struct. 
    ps[]:  menu_number, menu_item, ... */
 {
- int	num, n_new, i;
+ Int	num, n_new, i;
  char	string_array = 0, *text, *zilch = "", **ptr, *title;
 
  num = int_arg(ps[0]);
@@ -591,12 +591,12 @@ int redefine_menu(int narg, int ps[])
  return ANA_OK;
 }
 /*------------------------------------------------------------------------*/
-int ana_menu_item(int narg, int ps[])
+Int ana_menu_item(Int narg, Int ps[])
 /* change a single menu item
    Syntax: MenuItem,menu,item,text
    LS 29apr93 */
 {
- int	num, item;
+ Int	num, item;
  char	*text;
 
  if (text_menus)
@@ -620,13 +620,13 @@ int ana_menu_item(int narg, int ps[])
  return ANA_OK;
 }
  /*------------------------------------------------------------------------*/ 
-int define_menu(int x, int y, int narg, int ps[])
+Int define_menu(Int x, Int y, Int narg, Int ps[])
 /* store menu items in Menu struct.  menu number must be valid!
    also finds appropriate menu sizes, creates windows (but doesn't map
    them to the screen)  ps[]:  menu_num, menu_item, ...
    returns ANA_OK if successful, ANA_ERROR if an error occurred */
 {
-  int	num, i;
+  Int	num, i;
   char	string_array = 0, **item, *text;
   pointer	ptr;
 
@@ -675,10 +675,10 @@ int define_menu(int x, int y, int narg, int ps[])
   return ANA_OK;
 }
  /*------------------------------------------------------------------------*/
-void delete_menu(int num)
+void delete_menu(Int num)
 /* delete a menu.  assumes that menu number <num> is legal. */
 {
- int	i;
+ Int	i;
  XEvent	e;
 
  if (!menu_win[num])
@@ -712,8 +712,8 @@ void delete_menu(int num)
 			X_LEAVEWINDOW)
 #define X_WINDOW	256
 #define X_MENU		512
-static int	XRegisteredWindow[MAXWINDOWS], XRegisteredMenu[MAXMENU];
-static int	eventCode[] = {
+static Int	XRegisteredWindow[MAXWINDOWS], XRegisteredMenu[MAXMENU];
+static Int	eventCode[] = {
   X_KEYPRESS, X_BUTTONPRESS, X_BUTTONRELEASE,
   X_POINTERMOTION, X_ENTERWINDOW, X_LEAVEWINDOW
 };
@@ -722,19 +722,19 @@ static char	*XEventName[] = {
   "mouse motion", "mouse enters window", "mouse leaves window",
 };
 static char	anythingRegistered = 0;
-static int	N_XMask = sizeof(eventCode)/sizeof(int);
-int	ana_event, eventSource;
-extern int	ana_button, root_x, root_y, xcoord, ycoord, last_wid,
+static Int	N_XMask = sizeof(eventCode)/sizeof(Int);
+Int	ana_event, eventSource;
+extern Int	ana_button, root_x, root_y, xcoord, ycoord, last_wid,
 		ht[], wd[];
-extern float	xhair, yhair;
+extern Float	xhair, yhair;
 extern Window	win[];
 
-int ana_register_event(int narg, int ps[])
+Int ana_register_event(Int narg, Int ps[])
      /* registers event types that XLOOP must act on */
      /* syntax:  XREGISTER,event_mask,window,menu,item */
      /* a negative event_mask unregisters;  a zero mask clears. */
 {
-  int	type, addEvent, i, j, temp, iq, *windows, *menus, nWindow, nMenu,
+  Int	type, addEvent, i, j, temp, iq, *windows, *menus, nWindow, nMenu,
   	sources;
   char	started;
 
@@ -933,7 +933,7 @@ int ana_register_event(int narg, int ps[])
 #define XLOOP_WINDOW	-1
 #define XLOOP_MENU	-2
 #define XLOOP_NONE	-3
-int ana_xloop(int narg, int ps[])
+Int ana_xloop(Int narg, Int ps[])
      /* ANA interface to X window manager. */
      /* waits for a registered event, returns event type in !EVENT_TYPE */
      /* important global variables:  button -> mouse button #; */
@@ -947,11 +947,11 @@ int ana_xloop(int narg, int ps[])
      /* of whether such events were selected. */
 {
   XEvent	event;
-  int	type, arg, i, j, mask;
+  Int	type, arg, i, j, mask;
   char	status = 0, buffer[4];
   KeySym	keysym;
   Window	w;
-  extern int	ana_keycode, ana_button, ana_keysym, ana_keystate;
+  extern Int	ana_keycode, ana_button, ana_keysym, ana_keystate;
 
   if (narg)
     arg = int_arg(*ps);		/* if 1 then flush event queue first */
@@ -1023,7 +1023,7 @@ int ana_xloop(int narg, int ps[])
 	  ana_button = event.xbutton.button;
 	  root_x = event.xbutton.x_root;
 	  root_y = event.xbutton.y_root;
-	  last_time = (double) event.xbutton.time/1000.0;
+	  last_time = (Double) event.xbutton.time/1000.0;
 	  ana_keystate = event.xbutton.state;
 	  switch (j) {
 	    case XLOOP_WINDOW:	/* button press in an ANA window */
@@ -1031,15 +1031,15 @@ int ana_xloop(int narg, int ps[])
 	      xhair = event.xbutton.x;
 	      yhair = event.xbutton.y;
 	      coordTrf(&xhair, &yhair, ANA_X11, ANA_DEV);
-	      xcoord = (int) xhair;
-	      ycoord = (int) yhair;
+	      xcoord = (Int) xhair;
+	      ycoord = (Int) yhair;
 	      coordTrf(&xhair, &yhair, ANA_DEV, ANA_DVI);
 	      break;
 	    case XLOOP_MENU:	/* button press in ANA menu envelope */
 	      return anaerror("?? button press in enveloping menu window?", 0);
 	    default:		/* button press in ANA menu item */
-	      menu_x = (float) event.xbutton.x / (float) fontwidth;
-	      menu_y = (float) event.xbutton.y / (float) fontheight;
+	      menu_x = (Float) event.xbutton.x / (Float) fontwidth;
+	      menu_y = (Float) event.xbutton.y / (Float) fontheight;
 	      eventSource = i | X_MENU;
 	      last_menu = i;
 	      menu_item = j;
@@ -1058,10 +1058,10 @@ int ana_xloop(int narg, int ps[])
 	  ana_keystate = event.xkey.state;
 	  i = XLookupString(&event.xkey, buffer, 15, &keysym, NULL);
 	  buffer[i] = '\0';
-	  ana_keysym = (int) keysym;
+	  ana_keysym = (Int) keysym;
 	  root_x = event.xkey.x_root;
 	  root_y = event.xkey.y_root;
-	  last_time = (double) event.xkey.time/1000.0;
+	  last_time = (Double) event.xkey.time/1000.0;
 	  switch (j) {
 	    case XLOOP_WINDOW:	/* key press in an ANA window */
 	      eventSource = i | X_WINDOW;
@@ -1086,14 +1086,14 @@ int ana_xloop(int narg, int ps[])
 	if (status) {
 	  root_x = event.xmotion.x_root;
 	  root_y = event.xmotion.y_root;
-	  last_time = (double) event.xmotion.time/1000.0;
+	  last_time = (Double) event.xmotion.time/1000.0;
 	  switch (j) {
 	    case XLOOP_WINDOW:
 	      xhair = event.xbutton.x;
 	      yhair = event.xbutton.y;
 	      coordTrf(&xhair, &yhair, ANA_X11, ANA_DEV);
-	      xcoord = (int) xhair;
-	      ycoord = (int) yhair;
+	      xcoord = (Int) xhair;
+	      ycoord = (Int) yhair;
 	      coordTrf(&xhair, &yhair, ANA_DEV, ANA_DVI);
 	      eventSource = i | X_WINDOW;
 	      break;
@@ -1112,7 +1112,7 @@ int ana_xloop(int narg, int ps[])
 	switch (j) {
 	  case XLOOP_WINDOW:	/* entering an ANA window */
 	    if (status) {
-	      last_time = (double) event.xcrossing.time/1000.0;
+	      last_time = (Double) event.xcrossing.time/1000.0;
 	      eventSource = i | X_WINDOW;
 	    }
 	    break;
@@ -1123,7 +1123,7 @@ int ana_xloop(int narg, int ps[])
 	      last_menu = i;
 	      menu_item = j;
 	      eventSource = i | X_MENU;
-	      last_time = (double) event.xcrossing.time/1000.0;
+	      last_time = (Double) event.xcrossing.time/1000.0;
 	    }
 	    paint_pane(i, j, BLACK);
 	    XFlush(display);
@@ -1139,7 +1139,7 @@ int ana_xloop(int narg, int ps[])
 	  case XLOOP_WINDOW:	/* leaving an ANA window */
 	    if (status) {
 	      eventSource = i | X_WINDOW;
-	      last_time = (double) event.xcrossing.time/1000.0;
+	      last_time = (Double) event.xcrossing.time/1000.0;
 	    }
 	    break;
 	  case XLOOP_MENU:	/* entering a menu envelope */
@@ -1149,7 +1149,7 @@ int ana_xloop(int narg, int ps[])
 	      last_menu = i;
 	      menu_item = j;
 	      eventSource = i | X_MENU;
-	      last_time = (double) event.xcrossing.time/1000.0;
+	      last_time = (Double) event.xcrossing.time/1000.0;
 	    }
 	    paint_pane(i, j, WHITE);
 	    XFlush(display);
@@ -1173,13 +1173,13 @@ int ana_xloop(int narg, int ps[])
   return ANA_OK;
 }
  /*------------------------------------------------------------------------*/
-char *eventName(int type)
+char *eventName(Int type)
 /* returns name of ANA X event */
 {
   static char	eventHashTable[] = {
     3, 6, 5, 7, 0, 1, 7, 2, 4
   };
-  int	hash;
+  Int	hash;
 
   if (type < 0)
     type = 9;
@@ -1192,9 +1192,9 @@ char *eventName(int type)
   return XEventName[hash];
 }
  /*------------------------------------------------------------------------*/
-int ana_event_name(int narg, int ps[])
+Int ana_event_name(Int narg, Int ps[])
 {
-  int	type, result;
+  Int	type, result;
   
   type = int_arg(*ps);
   result = string_scratch(strlen(eventName(type)) + 1);

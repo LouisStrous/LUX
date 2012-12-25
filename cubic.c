@@ -1,5 +1,5 @@
 /*------------------------------------------------------------------------- */
-int ana_cubic_spline(int narg, int ps[])
+Int ana_cubic_spline(Int narg, Int ps[])
 /* Cubic spline interpolation along the first dimension of an array.
    ynew = CSPLINE(xtab, ytab [, xnew][, d1, d2][,/keep])
      interpolates in the table of <ytab> versus <xtab> (must be in
@@ -20,11 +20,11 @@ int ana_cubic_spline(int narg, int ps[])
    LS 29apr96 */
 {
   static char	haveTable = '\0';
-  int	xNewSym = 0, xTabSym = 0, yTabSym, d1Sym = 0, d2Sym, size,
+  Int	xNewSym = 0, xTabSym = 0, yTabSym, d1Sym = 0, d2Sym, size,
 	oldType, n;
   pointer	src, trgt, p, q;
-  float	a, b, c, x;
-  static int	nPoints, type;
+  Float	a, b, c, x;
+  static Int	nPoints, type;
   static pointer	xTable, yTable, der2;
 
   /* first check on all the arguments */
@@ -64,9 +64,9 @@ int ana_cubic_spline(int narg, int ps[])
       array_type(xTabSym): array_type(yTabSym);
     type = (oldType < ANA_FLOAT)? ANA_FLOAT: oldType;
     size = ana_type_size[type]*nPoints;
-    xTable.b = (byte *) Malloc(size);
-    yTable.b = (byte *) Malloc(size);
-    der2.b = (byte *) Malloc(size);
+    xTable.b = (Byte *) Malloc(size);
+    yTable.b = (Byte *) Malloc(size);
+    der2.b = (Byte *) Malloc(size);
     if (oldType == type)
     { memcpy(xTable.b, array_data(xTabSym), size);
       memcpy(yTable.b, array_data(yTabSym), size); }
@@ -79,62 +79,62 @@ int ana_cubic_spline(int narg, int ps[])
 	  switch (oldType)
 	  { case ANA_BYTE:
 	      while (n--)
-		*trgt.f++ = (float) *src.b++;
+		*trgt.f++ = (Float) *src.b++;
 	      src.b = array_data(yTabSym);
 	      trgt = yTable;
 	      while (n--)
-		*trgt.f++ = (float) *src.b++;
+		*trgt.f++ = (Float) *src.b++;
 	      break;
 	    case ANA_WORD:
 	      while (n--)
-		*trgt.f++ = (float) *src.w++;
+		*trgt.f++ = (Float) *src.w++;
 	      src.b = array_data(yTabSym);
 	      trgt = yTable;
 	      while (n--)
-		*trgt.f++ = (float) *src.w++;
+		*trgt.f++ = (Float) *src.w++;
 	      break;
 	    case ANA_LONG:
 	      while (n--)
-		*trgt.f++ = (float) *src.l++;
+		*trgt.f++ = (Float) *src.l++;
 	      src.b = array_data(yTabSym);
 	      trgt = yTable;
 	      while (n--)
-		*trgt.f++ = (float) *src.l++;
+		*trgt.f++ = (Float) *src.l++;
 	      break; }
 	  break;
 	case ANA_DOUBLE:
 	  switch (oldType)
 	  { case ANA_BYTE:
 	      while (n--)
-		*trgt.d++ = (double) *src.b++;
+		*trgt.d++ = (Double) *src.b++;
 	      src.b = array_data(yTabSym);
 	      trgt = yTable;
 	      while (n--)
-		*trgt.d++ = (double) *src.b++;
+		*trgt.d++ = (Double) *src.b++;
 	      break;
 	    case ANA_WORD:
 	      while (n--)
-		*trgt.d++ = (double) *src.w++;
+		*trgt.d++ = (Double) *src.w++;
 	      src.b = array_data(yTabSym);
 	      trgt = yTable;
 	      while (n--)
-		*trgt.d++ = (double) *src.w++;
+		*trgt.d++ = (Double) *src.w++;
 	      break;
 	    case ANA_LONG:
 	      while (n--)
-		*trgt.d++ = (double) *src.l++;
+		*trgt.d++ = (Double) *src.l++;
 	      src.b = array_data(yTabSym);
 	      trgt = yTable;
 	      while (n--)
-		*trgt.d++ = (double) *src.l++;
+		*trgt.d++ = (Double) *src.l++;
 	      break; 
 	    case ANA_FLOAT:
 	      while (n--)
-		*trgt.d++ = (double) *src.f++;
+		*trgt.d++ = (Double) *src.f++;
 	      src.b = array_data(yTabSym);
 	      trgt = yTable;
 	      while (n--)
-		*trgt.d++ = (double) *src.f++;
+		*trgt.d++ = (Double) *src.f++;
 	      break; }
 	  break; }
     }
@@ -143,7 +143,7 @@ int ana_cubic_spline(int narg, int ps[])
       der2.f[0] = der2.f[nPoints - 1] = 0.0;
     else
       der2.d[0] = der2.d[nPoints - 1] = 0.0;
-    temp.b = (byte *) Malloc(size*nPoints);
+    temp.b = (Byte *) Malloc(size*nPoints);
     src = xTable;
     trgt = yTable;
     switch (type)

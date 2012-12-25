@@ -10,7 +10,7 @@ void getTermCaps(void)
   char	*term, *cscrat = (char *) scrat;
   extern char	expname[];
   FILE	*fp;
-  int	i, n;
+  Int	i, n;
   
   term = getenv("TERM");
   if (!term)

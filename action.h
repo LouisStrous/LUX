@@ -1,124 +1,125 @@
-#include "error.h"
+#define _GNU_SOURCE
+
 #include "anaparser.h"
-/*#include "anaparser.c.tab.h"*/
+#include "error.h"
 #include "dmalloc.h"
 #include "bindings.h"
 
 extern char		expname[], line[], *curScrat, *currentRoutineName;
-extern word		listStack[],  curContext;
-extern int		scrat[], ana_file_open[], errorSym,
+extern Word		listStack[],  curContext;
+extern Int		scrat[], ana_file_open[], errorSym,
 			MSBfirst, suppressMsg;
-extern int	ana_type_size[];
+extern Int	ana_type_size[];
 
 extern FILE		*inputStream, *ana_file[];
 extern hashTableEntry	*varHashTable[], *subrHashTable[], *funcHashTable[],
 			*blockHashTable[];
 extern symTableEntry	sym[];
 extern internalRoutine	*subroutine, *function;
-extern int		nSubroutine, nFunction, curLineNumber, compileLevel,
+extern Int		nSubroutine, nFunction, curLineNumber, compileLevel,
 			ignoreInput, curSymbol, axisTally[];
 extern unsigned int     internalMode;
 extern struct boundsStruct	bounds;
-extern int	(*ana_converts[10])(int, int []);
+extern Int	(*ana_converts[10])(Int, Int []);
 
-char 	*strsave(char *), *symbolIdent(int, int),
-	*symName(int, hashTableEntry *[]), *string_arg(int),
-	*expand_name(char *, char *), *className(int), *typeName(int),
-	*symbolProperName(int), *strcasestr(char *, char *),
-	*keyName(internalRoutine *routine, int number, int index),
+char 	*strsave(char *), *symbolIdent(Int, Int),
+	*symName(Int, hashTableEntry *[]), *string_arg(Int),
+	*expand_name(char *, char *), *className(Int), *typeName(Int),
+	*symbolProperName(Int),
+	*keyName(internalRoutine *routine, Int number, Int index),
 	*strsave_system(char *), *nextline(char *, size_t, FILE *);
 
-int 	dereferenceScalPointer(int), scalar_scratch(int),
-  array_scratch(int, int, int []), int_arg(int), array_clone(int, int),
-  convertRange(int), popTempVariable(int), int_arg_stat(int, int *),
-  findSym(int, hashTableEntry *[], int), findInternalName(char *, int),
-  ana_float(int, int []), ana_long(int, int []), ana_byte(int , int []),
-  ana_word(int, int []), ana_double(int, int []), ana_cfloat(int, int []),
-  anaerror(char *, int, ...), cerror(int, int, ...), copyEvalSym(int),
-  getNumerical(int, int, int *, pointer *, char, int *, pointer *),
-  strccmp(char *, char *), eval(int), evals(int), ana_cdouble(int, int []),
-  strncasecmp_p(char *, char *, int), strcasecmp_p(char *, char *),
-  stringpointer(char *, int), routineContext(int), ana_string(int, int []),
-  getSimpleNumerical(int, pointer *, int *), double_arg_stat(int, double *),
-  numerical(int, int **, int *, int *, pointer *),
-  numerical_or_string(int, int **, int *, int *, pointer *),
-  findName(char *, hashTableEntry **, int), to_scalar(int, int),
-  to_scratch_array(int, int, int, int *), get_dims(int *, int *, int *),
-  listNumElements(int), ana_zero(int, int []),
-  cubic_spline_tables(void *, int, int, void *, int, int, int,
-		      byte, csplineInfo *), 
-  numerical_clone(int, enum Symboltype),
-  redef_array(int, int, int, int *), string_scratch(int),
-  transferAll(int symbol), transfer(int), copySym(int),
-  scalar_scratch_copy(int), redef_scalar(int, int, void *),
-  redef_string(int, int), float_arg_stat(int, float *),
+Int 	dereferenceScalPointer(Int), scalar_scratch(Int),
+  array_scratch(Int, Int, Int []), int_arg(Int), array_clone(Int, Int),
+  convertRange(Int), popTempVariable(Int), int_arg_stat(Int, Int *),
+  findSym(Int, hashTableEntry *[], Int), findInternalName(char *, Int),
+  ana_float(Int, Int []), ana_long(Int, Int []), ana_byte(Int , Int []),
+  ana_word(Int, Int []), ana_double(Int, Int []), ana_cfloat(Int, Int []),
+  anaerror(char *, Int, ...), cerror(Int, Int, ...), copyEvalSym(Int),
+  getNumerical(Int, Int, Int *, pointer *, char, Int *, pointer *),
+  strccmp(char *, char *), eval(Int), evals(Int), ana_cdouble(Int, Int []),
+  strncasecmp_p(char *, char *, Int), strcasecmp_p(char *, char *),
+  stringpointer(char *, Int), routineContext(Int), ana_string(Int, Int []),
+  getSimpleNumerical(Int, pointer *, Int *), double_arg_stat(Int, Double *),
+  numerical(Int, Int **, Int *, Int *, pointer *),
+  numerical_or_string(Int, Int **, Int *, Int *, pointer *),
+  findName(char *, hashTableEntry **, Int), to_scalar(Int, Int),
+  to_scratch_array(Int, Int, Int, Int *), get_dims(Int *, Int *, Int *),
+  listNumElements(Int), ana_zero(Int, Int []),
+  cubic_spline_tables(void *, Int, Int, void *, Int, Int, Int,
+		      Byte, csplineInfo *), 
+  numerical_clone(Int, enum Symboltype),
+  redef_array(Int, Int, Int, Int *), string_scratch(Int),
+  transferAll(Int symbol), transfer(Int), copySym(Int),
+  scalar_scratch_copy(Int), redef_scalar(Int, Int, void *),
+  redef_string(Int, Int), float_arg_stat(Int, Float *),
   Sprintf(char *, char *, ...), translateEscapes(char *),
-  nextchar(FILE *), unnextchar(int, FILE *);
+  nextchar(FILE *), unnextchar(Int, FILE *);
 
-int	standardLoop(int, int, int, int, loopInfo *, pointer *, int *,
+Int	standardLoop(Int, Int, Int, Int, loopInfo *, pointer *, Int *,
 		     loopInfo *, pointer *),
-  standardLoop0(int, int, int *, int, int, loopInfo *, pointer *, int *,
+  standardLoop0(Int, Int, Int *, Int, Int, loopInfo *, pointer *, Int *,
 		loopInfo *, pointer *), advanceLoop(loopInfo *, pointer *),
   nextLoop(loopInfo *),
   nextLoops(loopInfo *, loopInfo *),
-  prepareDiagonals(int, loopInfo *, int, int **, int **, int **, int **),
-  moveLoop(loopInfo *, int, int),
-  standardLoopX(int, int, int, loopInfo *, pointer *, int, int const *,
-                int, int const *, enum Symboltype, int, int *, loopInfo *,
+  prepareDiagonals(Int, loopInfo *, Int, Int **, Int **, Int **, Int **),
+  moveLoop(loopInfo *, Int, Int),
+  standardLoopX(Int, Int, Int, loopInfo *, pointer *, Int, Int const *,
+                Int, Int const *, enum Symboltype, Int, Int *, loopInfo *,
                 pointer *),
-  loopIsAtStart(loopInfo const *), setAxes(loopInfo *, int, int *, int),
-  standard_args(int, int [], char const *, pointer **, loopInfo **);
+  loopIsAtStart(loopInfo const *), setAxes(loopInfo *, Int, Int *, Int),
+  standard_args(Int, Int [], char const *, pointer **, loopInfo **);
 
-void	subdataLoop(int *, loopInfo *), addVerify(char *, char),
-  *seekFacts(int symbol, int type, int flag),
-  *setFacts(int symbol, int type, int flag),
-  deleteFacts(int symbol, int type), returnLoop(loopInfo *, pointer *, int),
-  setAxisMode(loopInfo *, int mode),
-  standard_redef_array(int, enum Symboltype, int, int *, int, int *, pointer *,
+void	subdataLoop(Int *, loopInfo *), addVerify(char *, char),
+  *seekFacts(Int symbol, Int type, Int flag),
+  *setFacts(Int symbol, Int type, Int flag),
+  deleteFacts(Int symbol, Int type), returnLoop(loopInfo *, pointer *, Int),
+  setAxisMode(loopInfo *, Int mode),
+  standard_redef_array(Int, enum Symboltype, Int, Int *, Int, Int *, pointer *,
 		       loopInfo *);
-void convertWidePointer(wideScalar *, int, int);
+void convertWidePointer(wideScalar *, Int, Int);
 
-void	newStack(int), push(int), deleteStack(void);
-int	pop(void);
+void	newStack(Int), push(Int), deleteStack(void);
+Int	pop(void);
         
 #ifdef X11
-int	setup_x(void);
+Int	setup_x(void);
 #endif
 
-void	clearToPopTempVariable(int), pushTempVariable(int), printw(char *),
-  protect(int *, int), protectOne(word), unProtect(int *, int),
+void	clearToPopTempVariable(Int), pushTempVariable(Int), printw(char *),
+  protect(Int *, Int), protectOne(Word), unProtect(Int *, Int),
   pushTempVariableIndex(void), checkErrno(void), updatIndices(void),
-  zapTemp(int), freeString(int), unlinkString(int), mark(int),
-  zapMarked(void), pegMark(void), unMark(int),
-  dupList(void), zerobytes(void *, int), printwf(char *, ...),
+  zapTemp(Int), freeString(Int), unlinkString(Int), mark(Int),
+  zapMarked(void), pegMark(void), unMark(Int),
+  dupList(void), zerobytes(void *, Int), printwf(char *, ...),
   cleanup_cubic_spline_tables(csplineInfo *),
-  cspline_value_and_derivative(double, double *, double *, csplineInfo *),
-  find_cspline_extremes(double, double, double *, double *,
-			double *, double *, csplineInfo *),
-  undefine(int),
-  setPager(int), resetPager(void), embed(int, int),
-  convertPointer(scalar *, int, int), zap(int);
+  cspline_value_and_derivative(Double, Double *, Double *, csplineInfo *),
+  find_cspline_extremes(Double, Double, Double *, Double *,
+			Double *, Double *, csplineInfo *),
+  undefine(Int),
+  setPager(Int), resetPager(void), embed(Int, Int),
+  convertPointer(scalar *, Int, Int), zap(Int);
 
 const csplineInfo empty_cubic_spline(void);
 
-void setupDimensionLoop(loopInfo *info, int ndim, int const *dims, 
-                        enum Symboltype type, int naxes, int const *axes,
-                        pointer *data, int mode),
-  rearrangeDimensionLoop(loopInfo *), endian(void *, int, int),
-  rearrangeEdgeLoop(loopInfo *, loopInfo *, int);
+void setupDimensionLoop(loopInfo *info, Int ndim, Int const *dims, 
+                        enum Symboltype type, Int naxes, Int const *axes,
+                        pointer *data, Int mode),
+  rearrangeDimensionLoop(loopInfo *), endian(void *, Int, Int),
+  rearrangeEdgeLoop(loopInfo *, loopInfo *, Int);
 
-float	float_arg(int);
-double	double_arg(int), cspline_value(double, csplineInfo *),
-	find_cspline_value(double, double, double, csplineInfo *),
-	cspline_derivative(double, csplineInfo *),
-  cspline_second_derivative(double, csplineInfo *), famod(double,double),
-  fasmod(double,double), vhypot(int, double, double, ...), hypota(int, double *);
-int iamod(int,int), iasmod(int,int);
-FILE	*openPathFile(char *, int);
+Float	float_arg(Int);
+Double	double_arg(Int), cspline_value(Double, csplineInfo *),
+	find_cspline_value(Double, Double, Double, csplineInfo *),
+	cspline_derivative(Double, csplineInfo *),
+  cspline_second_derivative(Double, csplineInfo *), famod(Double,Double),
+  fasmod(Double,Double), vhypot(Int, Double, Double, ...), hypota(Int, Double *);
+Int iamod(Int,Int), iasmod(Int,Int);
+FILE	*openPathFile(char *, Int);
 
 #define axisAxes(i)	(axisAxis? axisAxis[i]: i)
 
-#define round(x)	((int) (floor(x + 0.5)))
+#define round(x)	((Int) (floor(x + 0.5)))
 
 #define debugout(msg)	printf("DEBUG - %s [%s, line %d]\n", msg, __FILE__, __LINE__)
 #define debugout1(fmt,arg)	printf("DEBUG - "); printf(fmt, arg); printf(" [%s, line %d]\n", __FILE__, __LINE__)

@@ -6,11 +6,11 @@
 /* Override initializing hook from the C library. */
 void (*__malloc_initialize_hook)(void) = my_init_hook;
 
-int main(int narg, char *argv[]) {
-  int bad = 0;
-  extern int num_assertions;
+Int main(Int narg, char *argv[]) {
+  Int bad = 0;
+  extern Int num_assertions;
 
-  int test_hershey(void);
+  Int test_hershey(void);
 
   bad += test_hershey();
   printf("\n%u Test(s), %d Failure(s)\n", num_assertions, bad);

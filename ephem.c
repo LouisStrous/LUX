@@ -10,29 +10,29 @@
 static char rcsid[] __attribute__ ((unused)) =
  "$Id: ephem.c,v 4.0 2001/02/07 20:36:58 strous Exp $";
 
- typedef double TIME;
- static	int	m[]  =  {31,28,31,30,31,30,31,31,30,31,30,31};
- static	float	rq = 57.2957795;
- static	float	pi = 3.141592654, b, r, d, p;
- static	int	choice;
+ typedef Double TIME;
+ static	Int	m[]  =  {31,28,31,30,31,30,31,31,30,31,30,31};
+ static	Float	rq = 57.2957795;
+ static	Float	pi = 3.141592654, b, r, d, p;
+ static	Int	choice;
  /*--------------------------------------------------------------------------*/
  /* this section has a copy of part of Bogart's time routines, we want to be
  able to get UTC time strings from TAI in seconds and the reverse */
  static struct date_time {
-    double second;
-    double julday;
-    double delta;
-    int year;
-    int month;
-    int dofm;
-    int dofy;
-    int hour;
-    int minute;
-    int civil;
-    int ut_flag;
+    Double second;
+    Double julday;
+    Double delta;
+    Int year;
+    Int month;
+    Int dofm;
+    Int dofy;
+    Int hour;
+    Int minute;
+    Int civil;
+    Int ut_flag;
     char zone[8];
  } dattim;
- double	time_tai,  last_tai = 0.0;
+ Double	time_tai,  last_tai = 0.0;
 #define JD_EPOCH        (2443144.5)
 #define EPOCH_2000_01_01        ( 725760000.0)
 #define EPOCH_1601_01_01        (-11865398400.0)
@@ -48,8 +48,8 @@ static char rcsid[] __attribute__ ((unused)) =
 #define SEC_JCNT        (3155760000.0)                        /*   36525 d  */
 #define SEC_GR4C        (12622780800.0)                       /*  146097 d  */
 #define SEC_JL4C        (12623040000.0)                       /*  146100 d  */
- static int molen[] = {31, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
- static double ut_leap_time[] = {
+ static Int molen[] = {31, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+ static Double ut_leap_time[] = {
  -536543999.0,                                                /*  1960.01.01  */
  -457747198.0,                                                /*  1962.07.01  */
  -394588797.0,                                                /*  1964.07.01  */
@@ -103,7 +103,7 @@ TIME tai_adjustment (TIME t)
  for TAI */
  {
   TIME dt;
-  int leapsecs, ct;
+  Int leapsecs, ct;
 
   leapsecs = sizeof (ut_leap_time) / sizeof (TIME);
   dt = 0.0;
@@ -118,8 +118,8 @@ TIME tai_adjustment (TIME t)
   }
  /* -------------------------------------------------------------*/
 void date_from_epoch_time (TIME t) {
-  double century, four_year, one_year;
-  int year, month, day;
+  Double century, four_year, one_year;
+  Int year, month, day;
 
   if (t < EPOCH_1582_10_15) {
                            /*  time < 1582.10.15_00:00: use Julian calendar  */
@@ -208,7 +208,7 @@ TIME epoch_time_from_date ()
  /* modified from one used by Rick Bogart to work with day of year rather
  than month, day of month */
   TIME t;
-  int	yr1601;
+  Int	yr1601;
 
   t = dattim.second + 60.0 * (dattim.minute + 60.0 * (dattim.hour));
   t += SEC_DAY * (dattim.dofy - 1);
@@ -252,7 +252,7 @@ TIME epoch_time_from_date ()
  /*--------------------------------------------------------------------------*/
 TIME utc_adjustment (TIME t, char *zone) {
   TIME dt;
-  int leapsecs, ct;
+  Int leapsecs, ct;
 
   dattim.ut_flag = 0;
   /* _raise_case (zone); */
@@ -283,7 +283,7 @@ TIME utc_adjustment (TIME t, char *zone) {
   return (dt);
  }
  /*--------------------------------------------------------------------------*/
-void sprint_time (char *out, TIME t, char *zone, int precision)
+void sprint_time (char *out, TIME t, char *zone, Int precision)
  {
   char format[64];
 
@@ -306,12 +306,12 @@ void sprint_time (char *out, TIME t, char *zone, int precision)
  seconds from the string */
  }
  /*--------------------------------------------------------------------------*/
-int ana_tai_from_date(narg,ps)			/* returns TAI */
+Int ana_tai_from_date(narg,ps)			/* returns TAI */
  /* call is tai =  tai_from_date(year, doy, hour, minute, second) */
  /* may want to upgrade to accept strings using Rick's routines */
- int	narg, ps[];
+ Int	narg, ps[];
  {
- int result_sym;
+ Int result_sym;
  if (int_arg_stat(ps[0], &dattim.year) != 1) return -1;
  if (int_arg_stat(ps[1], &dattim.dofy) != 1) return -1;
  if (int_arg_stat(ps[2], &dattim.hour) != 1) return -1;
@@ -322,12 +322,12 @@ int ana_tai_from_date(narg,ps)			/* returns TAI */
  return result_sym;
  }
  /*--------------------------------------------------------------------------*/
-int ana_date_from_tai(narg,ps)			/* returns date string */
+Int ana_date_from_tai(narg,ps)			/* returns date string */
  /* call is s =  date_from_tai(tai) */
- int	narg, ps[];
+ Int	narg, ps[];
  {
  char	utc[64];		/* just to hold times */
- int result_sym, prec = 0;
+ Int result_sym, prec = 0;
  TIME	t;
  if (double_arg_stat(ps[0], &t) != 1) return -1;
  if (narg > 1) {
@@ -339,12 +339,12 @@ int ana_date_from_tai(narg,ps)			/* returns date string */
  return result_sym;
  }
  /*--------------------------------------------------------------------------*/
-int ana_tri_name_from_tai(narg,ps)		/* returns date string */
+Int ana_tri_name_from_tai(narg,ps)		/* returns date string */
  /* call is s =  tri_name_tai(tai) */
- int	narg, ps[];
+ Int	narg, ps[];
  {
  char	*p;
- int result_sym;
+ Int result_sym;
  TIME	t;
  if (double_arg_stat(ps[0], &t) != 1) return -1;
 #define TRILENGTH 16
@@ -363,44 +363,44 @@ int ana_tri_name_from_tai(narg,ps)		/* returns date string */
  return result_sym;
  }
  /*--------------------------------------------------------------------------*/
-int ephem_setup(int, int []);
-int ana_sun_b(int narg, int ps[])/* sun_b function */
+Int ephem_setup(Int, Int []);
+Int ana_sun_b(Int narg, Int ps[])/* sun_b function */
  /* returns solar B angle, b = sun_b(day_of_year, year) */
 {
   choice = 0;
   return ephem_setup(narg,ps);
 }
  /*--------------------------------------------------------------------------*/
-int ana_sun_r(narg,ps)				/* sun_r function */
+Int ana_sun_r(narg,ps)				/* sun_r function */
  /* returns solar radius, r = sun_r(day_of_year, year) */
- int	narg, ps[];
+ Int	narg, ps[];
  {
  choice = 1;
  return	ephem_setup(narg,ps);
  }
  /*--------------------------------------------------------------------------*/
-int ana_sun_d(narg,ps)				/* sun_d function */
+Int ana_sun_d(narg,ps)				/* sun_d function */
  /* returns solar d angle, d = sun_d(day_of_year, year) */
- int	narg, ps[];
+ Int	narg, ps[];
  {
  choice = 2;
  return	ephem_setup(narg,ps);
  }
  /*--------------------------------------------------------------------------*/
-int ana_sun_p(narg,ps)				/* sun_p function */
+Int ana_sun_p(narg,ps)				/* sun_p function */
  /* returns solar P angle, p = sun_p(day_of_year, year) */
- int	narg, ps[];
+ Int	narg, ps[];
  {
  choice = 3;
  return	ephem_setup(narg,ps);
  }
  /*--------------------------------------------------------------------------*/
-int	execute_error(int), sephem(int, float);
-int ephem_setup(narg,ps)
- int	narg, ps[];
+Int	execute_error(Int), sephem(Int, Float);
+Int ephem_setup(narg,ps)
+ Int	narg, ps[];
  {
- int	nsym, result_sym, j, nd, n, iy;
- float	day;
+ Int	nsym, result_sym, j, nd, n, iy;
+ Float	day;
  struct	ahead	*h;
  register union	types_ptr q1,q3;
 
@@ -417,12 +417,12 @@ int ephem_setup(narg,ps)
  q3.l = &sym[result_sym].spec.scalar.l; break;
  case 4:							/*array */
  h = (struct ahead *) sym[nsym].spec.array.ptr;
- q1.l = (int *) ((char *)h + sizeof(struct ahead));
+ q1.l = (Int *) ((char *)h + sizeof(struct ahead));
  nd = h->ndim;
  n = 1; for (j=0;j<nd;j++) n *= h->dims[j];	/* # of elements for nsym */
  result_sym = array_clone(nsym,3);
  h = (struct ahead *) sym[result_sym].spec.array.ptr;
- q3.f = (float *) ((char *)h + sizeof(struct ahead));
+ q3.f = (Float *) ((char *)h + sizeof(struct ahead));
  break;
  default:	return execute_error(32);
  }
@@ -448,11 +448,11 @@ int ephem_setup(narg,ps)
  return	result_sym;
  }
  /*--------------------------------------------------------------------------*/
-int admo(idoy,iyr,idm,imy)
- int idoy, iyr, *idm, *imy;
+Int admo(idoy,iyr,idm,imy)
+ Int idoy, iyr, *idm, *imy;
  {
  /* convert day of year to month and day of month */
- int	ndt, i;
+ Int	ndt, i;
  if (iyr%4 == 0) m[1]  =  29; else m[1]  =  28;
  ndt = 0;
  for (i=0;i<12;i++) {ndt = ndt + m[i];if (ndt >= idoy) break;}
@@ -460,8 +460,8 @@ int admo(idoy,iyr,idm,imy)
  return 1; 
  }
  /*--------------------------------------------------------------------------*/
-int julian(iy,im,id)
- int	iy,im,id;
+Int julian(iy,im,id)
+ Int	iy,im,id;
  /*  (j.meeus: astr. formulae for calculators, willmann bell inc. 1982)
  c   parameters in :
  c         iy  -  year no. after 1900 
@@ -471,16 +471,16 @@ int julian(iy,im,id)
  c         jd  -  julian day
  */
  {
- double	b, did, a;
- int	ii, iyy, ij;
+ Double	b, did, a;
+ Int	ii, iyy, ij;
  iyy  =  1900. + iy;
  if (im <= 2) { iyy = iyy - 1;	im = im+12; }
- a = ((float) iyy)/100.;	b = 2.-a+a/4.;	did = id;
- ii = 365.25 * (float) iyy;	ij = 30.6001* (float) (im+1);
- return	(int) (ii + ij + b + 1720994.5 + did);
+ a = ((Float) iyy)/100.;	b = 2.-a+a/4.;	did = id;
+ ii = 365.25 * (Float) iyy;	ij = 30.6001* (Float) (im+1);
+ return	(Int) (ii + ij + b + 1720994.5 + did);
  }
  /*--------------------------------------------------------------------------*/
-int sephem(int ny, float day)
+Int sephem(Int ny, Float day)
  {
  /*	returns solar b angle (in radians) and solar radius (in arcsec)
 	 input is year and day of year (including fraction of day)*/
@@ -489,16 +489,16 @@ int sephem(int ny, float day)
    fraction of julian centuries elapsed since 1900.05 (noon 1st of january)
    =  j.d.2415020.0) 
  */
- double	sday, jd, h, hh, ehel, eks, sml, anm, cc, el, sl, san, av, om, ba;
- double	year, eincl, t;
- int	id, im, idoy, iy;
+ Double	sday, jd, h, hh, ehel, eks, sml, anm, cc, el, sl, san, av, om, ba;
+ Double	year, eincl, t;
+ Int	id, im, idoy, iy;
  /* the day is done as a fp value such that the first day is 0 - 0.9999999,
  this means that to use the julian date function, we have to add 1,
  we finally get the f.p. day since 1900.05 */
- idoy = (int) (day+1.0);	iy = ny;	sday = (day- (int) day);
+ idoy = (Int) (day+1.0);	iy = ny;	sday = (day- (Int) day);
  admo(idoy, iy, &id, &im);
  /* printf("iy,im,id = %d %d %d\n",iy,im,id); */
- jd = (double) julian(iy,im,id)+0.5;
+ jd = (Double) julian(iy,im,id)+0.5;
  h = (jd + sday - 2415020.0)/36525.0;	hh = h * h;
  /*printf("sday, jd, h0, h, hh = %f, %10.1f %g %g %g\n",sday, jd, h0, h, hh); */
 	 /* newcomb's formulae. (page 98 explanatory suppl. to the ephemeris)

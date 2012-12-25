@@ -21,12 +21,12 @@ void (*__malloc_initialize_hook)(void) = my_init_hook;
 
 static jmp_buf dojmp;
 
-int signals = 0;
+Int signals = 0;
 
-static void report_fault(int sig) {
-  extern int assertion_count;
+static void report_fault(Int sig) {
+  extern Int assertion_count;
   extern char *assertion_file;
-  extern int assertion_line;
+  extern Int assertion_line;
   extern char *assertion_func;
 
   printf("\n%s:%d (%s) [%d] {sig=%d}: %s\n",
@@ -41,9 +41,9 @@ static void report_fault(int sig) {
 void testcleanup(void) {
 }
 
-int main(int narg, char *argv[]) {
-  int bad = 0;
-  extern int num_assertions;
+Int main(Int narg, char *argv[]) {
+  Int bad = 0;
+  extern Int num_assertions;
 
   signal(SIGSEGV, report_fault);
 

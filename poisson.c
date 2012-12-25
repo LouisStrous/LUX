@@ -7,18 +7,18 @@
 #include <string.h>		/* for memcpy */
 
 typedef struct {
-  int num_levels;
-  int *nx;
-  int *ny;
-  int type;
+  Int num_levels;
+  Int *nx;
+  Int *ny;
+  Int type;
   pointer data;
   pointer *levels;
 } *Pyramid;
 
-int ana_laplace2d(int narg, int ps[])
+Int ana_laplace2d(Int narg, Int ps[])
 /* LAPLACE(img) calculates the Laplacian of 2D <img> */
 {
-  int img, nx, ny, result, i, j;
+  Int img, nx, ny, result, i, j;
   pointer src, tgt;
 
   img = ps[0];
@@ -125,10 +125,10 @@ int ana_laplace2d(int narg, int ps[])
   return result;
 }
   
-int gauss_seidel_2d2o(pointer b, pointer x, scalar sx, scalar sy, int type,
-		      int nx, int ny)
+Int gauss_seidel_2d2o(pointer b, pointer x, scalar sx, scalar sy, Int type,
+		      Int nx, Int ny)
 {
-  int i, j;
+  Int i, j;
   scalar s;
   
   switch (type) {
@@ -236,10 +236,10 @@ int gauss_seidel_2d2o(pointer b, pointer x, scalar sx, scalar sy, int type,
   return 0;
 }
 
-void restrict2(pointer b, pointer x, int type, int nx, int ny, scalar sx, 
-	      scalar sy, int do_residual, pointer tgt)
+void restrict2(pointer b, pointer x, Int type, Int nx, Int ny, scalar sx, 
+	      scalar sy, Int do_residual, pointer tgt)
 {
-  int i, j, nx2, ny2;
+  Int i, j, nx2, ny2;
   pointer r0, r;		/* nx+2 by 3 elements */
 
   nx2 = nx/2;
@@ -404,13 +404,13 @@ void restrict2(pointer b, pointer x, int type, int nx, int ny, scalar sx,
   }
 }
 
-void restrict_residual(pointer b, pointer x, int type, int nx, int ny,
+void restrict_residual(pointer b, pointer x, Int type, Int nx, Int ny,
 		      scalar sx, scalar sy, pointer tgt)
 {
   restrict2(b, x, type, nx, ny, sx, sy, 1, tgt);
 }
 
-void restrict(pointer x, int type, int nx, int ny, pointer tgt)
+void restrict(pointer x, Int type, Int nx, Int ny, pointer tgt)
 {
   scalar dummy;
 
@@ -418,9 +418,9 @@ void restrict(pointer x, int type, int nx, int ny, pointer tgt)
   restrict2(x, x, type, nx, ny, dummy, dummy, 0, tgt);
 }
 
-int ana_antilaplace2d(int narg, int ps[])
+Int ana_antilaplace2d(Int narg, Int ps[])
 {
-  int img, result = ANA_ERROR, nx, ny, type, nx2, ny2, nlevel, i, nelem;
+  Int img, result = ANA_ERROR, nx, ny, type, nx2, ny2, nlevel, i, nelem;
   pointer src, tgt;
   Pyramid pyramid;
 
@@ -511,7 +511,7 @@ int ana_antilaplace2d(int narg, int ps[])
   //  gauss_seidel_2d2o(src, tgt, sx, sy, type, nx, ny);
 
   {
-    int ndim, *dims;
+    Int ndim, *dims;
 
     ndim = array_num_dims(img);
     ALLOCATE(dims, ndim + 1);

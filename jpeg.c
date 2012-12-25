@@ -29,14 +29,14 @@ METHODDEF(void) my_error_exit(j_common_ptr cinfo)
   longjmp(myerr->setjmp_buffer, 1);
 }
 /*--------------------------------------------------------------------------*/
-int read_jpeg6b(int narg, int ps[], int isFunc)
+Int read_jpeg6b(Int narg, Int ps[], Int isFunc)
 /* JREAD,<x>,<file>[,<header>,SHRINK=<shrink>][,/GREYSCALE] */
 {
   char	*filename, *p;
   struct jpeg_decompress_struct	cinfo;
   struct my_error_mgr		jerr;
   FILE	*infile;
-  int	dims[3], i, stride, n;
+  Int	dims[3], i, stride, n;
   JSAMPROW	row_pointer[1];	/* pointer to a single row */
   JSAMPLE	*image;
 
@@ -153,20 +153,20 @@ int read_jpeg6b(int narg, int ps[], int isFunc)
   return ANA_OK;
 }
 /*--------------------------------------------------------------------------*/
-int ana_read_jpeg6b(int narg, int ps[])
+Int ana_read_jpeg6b(Int narg, Int ps[])
 {
   return read_jpeg6b(narg, ps, 0);
 }
 /*--------------------------------------------------------------------------*/
-int ana_read_jpeg6b_f(int narg, int ps[])
+Int ana_read_jpeg6b_f(Int narg, Int ps[])
 {
   return (read_jpeg6b(narg, ps, 1) == ANA_OK)? ANA_ONE: ANA_ZERO;
 }
 /*--------------------------------------------------------------------------*/
-int write_jpeg6b(int narg, int ps[], int isFunc)
+Int write_jpeg6b(Int narg, Int ps[], Int isFunc)
 /* JWRITE,<x>,<file>[,<header>,<quality>] */
 {
-  int	nx, ny, nd, quality, stride;
+  Int	nx, ny, nd, quality, stride;
   struct jpeg_compress_struct	cinfo;
   struct my_error_mgr		jerr;
   FILE	*outfile;
@@ -263,12 +263,12 @@ int write_jpeg6b(int narg, int ps[], int isFunc)
   return ANA_OK;
 }
 /*--------------------------------------------------------------------------*/
-int ana_write_jpeg6b(int narg, int ps[])
+Int ana_write_jpeg6b(Int narg, Int ps[])
 {
   return write_jpeg6b(narg, ps, 0);
 }
 /*--------------------------------------------------------------------------*/
-int ana_write_jpeg6b_f(int narg, int ps[])
+Int ana_write_jpeg6b_f(Int narg, Int ps[])
 {
   return (write_jpeg6b(narg, ps, 1) == ANA_OK)? ANA_ONE: ANA_ZERO;
 }

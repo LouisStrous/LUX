@@ -25,7 +25,7 @@ char *binOpSign[] = {		/* token of binary operators, for messages */
  "NE", "OR", "AND", "XOR", "^", "ANDIF", "ORIF"
 };
 
-static int	lhs,		/* the current left-hand side operand */
+static Int	lhs,		/* the current left-hand side operand */
 		rhs,		/* the current right-hand side operand */
 		binOp,		/* the current binary operator */
 		topType,	/* the data type of the result */
@@ -36,13 +36,13 @@ static pointer	lp,		/* pointer to the LHS values */
 		rp,		/* pointer to the RHS values */
 		tp;		/* pointer to the result values */
 
-int	internal_routine(int, internalRoutine *), /* interal routine call */
-	usr_routine(int);	/* user routine call */
+Int	internal_routine(Int, internalRoutine *), /* interal routine call */
+	usr_routine(Int);	/* user routine call */
 char	evalScalPtr = 1;	/* we need to evaluate scalar pointers, too */
 
-int	newSymbol(int kind, ...), nextCompileLevel(FILE *fp, char *filename),
-  ana_neg_func(int, int []);
-void	embed(int target, int context), zap(int symbol);
+Int	newSymbol(Int kind, ...), nextCompileLevel(FILE *fp, char *filename),
+  ana_neg_func(Int, Int []);
+void	embed(Int target, Int context), zap(Int symbol);
 /*----------------------------------------------------------*/
 void ana_bin_pow(void)
      /* power-taking with two array operands */
@@ -54,23 +54,23 @@ void ana_bin_pow(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.f++ = (float) pow((double) *lp.b++, (double) *rp.b++);
+	    *tp.f++ = (Float) pow((Double) *lp.b++, (Double) *rp.b++);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.f++ = (float) pow((double) *lp.b++, (double) *rp.w++);
+	    *tp.f++ = (Float) pow((Double) *lp.b++, (Double) *rp.w++);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.f++ = (float) pow((double) *lp.b++, (double) *rp.l++);
+	    *tp.f++ = (Float) pow((Double) *lp.b++, (Double) *rp.l++);
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.f++ = (float) pow((double) *lp.b++, (double) *rp.f++);
+	    *tp.f++ = (Float) pow((Double) *lp.b++, (Double) *rp.f++);
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = pow((double) *lp.b++, *rp.d++);
+	    *tp.d++ = pow((Double) *lp.b++, *rp.d++);
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
@@ -110,28 +110,28 @@ void ana_bin_pow(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.f++ = (float) pow((double) *lp.w++, (double) *rp.b++);
+	    *tp.f++ = (Float) pow((Double) *lp.w++, (Double) *rp.b++);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.f++ = (float) pow((double) *lp.w++, (double) *rp.w++);
+	    *tp.f++ = (Float) pow((Double) *lp.w++, (Double) *rp.w++);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.f++ = (float) pow((double) *lp.w++, (double) *rp.l++);
+	    *tp.f++ = (Float) pow((Double) *lp.w++, (Double) *rp.l++);
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.f++ = (float) pow((double) *lp.w++, (double) *rp.f++);
+	    *tp.f++ = (Float) pow((Double) *lp.w++, (Double) *rp.f++);
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = pow((double) *lp.w++, *rp.d++);
+	    *tp.d++ = pow((Double) *lp.w++, *rp.d++);
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
 	    if (*lp.w) {
-	      mod1.f = log(fabs((double) *lp.w));
+	      mod1.f = log(fabs((Double) *lp.w));
 	      arg1.f = (*lp.w >= 0.0)? 0.0: M_PI;
 	      mod2.f = exp(rp.cf->real*mod1.f - rp.cf->imaginary*arg1.f);
 	      arg2.f = mod1.f*rp.cf->imaginary + rp.cf->real*arg1.f;
@@ -147,7 +147,7 @@ void ana_bin_pow(void)
 	case ANA_CDOUBLE:
 	  while (nRepeat--) {
 	    if (*lp.w) {
-	      mod1.d = log(fabs((double) *lp.w));
+	      mod1.d = log(fabs((Double) *lp.w));
 	      arg1.d = (*lp.w >= 0.0)? 0.0: M_PI;
 	      mod2.d = exp(rp.cd->real*mod1.d - rp.cd->imaginary*arg1.d);
 	      arg2.d = mod1.d*rp.cd->imaginary + rp.cd->real*arg1.d;
@@ -168,28 +168,28 @@ void ana_bin_pow(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.f++ = (float) pow((double) *lp.l++, (double) *rp.b++);
+	    *tp.f++ = (Float) pow((Double) *lp.l++, (Double) *rp.b++);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.f++ = (float) pow((double) *lp.l++, (double) *rp.w++);
+	    *tp.f++ = (Float) pow((Double) *lp.l++, (Double) *rp.w++);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.f++ = (float) pow((double) *lp.l++, (double) *rp.l++);
+	    *tp.f++ = (Float) pow((Double) *lp.l++, (Double) *rp.l++);
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.f++ = (float) pow((double) *lp.l++, (double) *rp.f++);
+	    *tp.f++ = (Float) pow((Double) *lp.l++, (Double) *rp.f++);
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = pow((double) *lp.l++, *rp.d++);
+	    *tp.d++ = pow((Double) *lp.l++, *rp.d++);
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
 	    if (*lp.l) {
-	      mod1.f = log(fabs((double) *lp.l));
+	      mod1.f = log(fabs((Double) *lp.l));
 	      arg1.f = (*lp.l >= 0.0)? 0.0: M_PI;
 	      mod2.f = exp(rp.cf->real*mod1.f - rp.cf->imaginary*arg1.f);
 	      arg2.f = mod1.f*rp.cf->imaginary + rp.cf->real*arg1.f;
@@ -205,7 +205,7 @@ void ana_bin_pow(void)
 	case ANA_CDOUBLE:
 	  while (nRepeat--) {
 	    if (*lp.l) {
-	      mod1.d = log(fabs((double) *lp.l));
+	      mod1.d = log(fabs((Double) *lp.l));
 	      arg1.d = (*lp.l >= 0.0)? 0.0: M_PI;
 	      mod2.d = exp(rp.cd->real*mod1.d - rp.cd->imaginary*arg1.d);
 	      arg2.d = mod1.d*rp.cd->imaginary + rp.cd->real*arg1.d;
@@ -226,28 +226,28 @@ void ana_bin_pow(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.f++ = (float) pow((double) *lp.f++, (double) *rp.b++);
+	    *tp.f++ = (Float) pow((Double) *lp.f++, (Double) *rp.b++);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.f++ = (float) pow((double) *lp.f++, (double) *rp.w++);
+	    *tp.f++ = (Float) pow((Double) *lp.f++, (Double) *rp.w++);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.f++ = (float) pow((double) *lp.f++, (double) *rp.l++);
+	    *tp.f++ = (Float) pow((Double) *lp.f++, (Double) *rp.l++);
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.f++ = (float) pow((double) *lp.f++, (double) *rp.f++);
+	    *tp.f++ = (Float) pow((Double) *lp.f++, (Double) *rp.f++);
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = pow((double) *lp.f++, *rp.d++);
+	    *tp.d++ = pow((Double) *lp.f++, *rp.d++);
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
 	    if (*lp.f) {
-	      mod1.f = log(fabs((double) *lp.f));
+	      mod1.f = log(fabs((Double) *lp.f));
 	      arg1.f = (*lp.f >= 0.0)? 0.0: M_PI;
 	      mod2.f = exp(rp.cf->real*mod1.f - rp.cf->imaginary*arg1.f);
 	      arg2.f = mod1.f*rp.cf->imaginary + rp.cf->real*arg1.f;
@@ -263,7 +263,7 @@ void ana_bin_pow(void)
 	case ANA_CDOUBLE:
 	  while (nRepeat--) {
 	    if (*lp.f) {
-	      mod1.d = log(fabs((double) *lp.f));
+	      mod1.d = log(fabs((Double) *lp.f));
 	      arg1.d = (*lp.f >= 0.0)? 0.0: M_PI;
 	      mod2.d = exp(rp.cd->real*mod1.d - rp.cd->imaginary*arg1.d);
 	      arg2.d = mod1.d*rp.cd->imaginary + rp.cd->real*arg1.d;
@@ -284,19 +284,19 @@ void ana_bin_pow(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.d++ = pow(*lp.d++, (double) *rp.b++);
+	    *tp.d++ = pow(*lp.d++, (Double) *rp.b++);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.d++ = pow(*lp.d++, (double) *rp.w++);
+	    *tp.d++ = pow(*lp.d++, (Double) *rp.w++);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.d++ = pow(*lp.d++, (double) *rp.l++);
+	    *tp.d++ = pow(*lp.d++, (Double) *rp.l++);
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.d++ = pow(*lp.d++, (double) *rp.f++);
+	    *tp.d++ = pow(*lp.d++, (Double) *rp.f++);
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
@@ -305,7 +305,7 @@ void ana_bin_pow(void)
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
 	    if (*lp.d) {
-	      mod1.d = log(fabs((double) *lp.d));
+	      mod1.d = log(fabs((Double) *lp.d));
 	      arg1.d = (*lp.d > 0.0)? 0.0: M_PI;
 	      mod2.d = exp(rp.cf->real*mod1.d - rp.cf->imaginary*arg1.d);
 	      arg2.d = mod1.d*rp.cf->imaginary + rp.cf->real*arg1.d;
@@ -321,7 +321,7 @@ void ana_bin_pow(void)
 	case ANA_CDOUBLE:
 	  while (nRepeat--) {
 	    if (*lp.d) {
-	      mod1.d = log(fabs((double) *lp.d));
+	      mod1.d = log(fabs((Double) *lp.d));
 	      arg1.d = (*lp.d >= 0.0)? 0.0: M_PI;
 	      mod2.d = exp(rp.cd->real*mod1.d - rp.cd->imaginary*arg1.d);
 	      arg2.d = mod1.d*rp.cd->imaginary + rp.cd->real*arg1.d;
@@ -616,29 +616,29 @@ void ana_pow_as(void)
     case ANA_BYTE:
       switch (rhsType) {
 	case ANA_BYTE:
-	  re.f = (double) *rp.b;
+	  re.f = (Double) *rp.b;
 	  while (nRepeat--)
-	    *tp.f++ = (float) pow((double) *lp.b++, re.f);
+	    *tp.f++ = (Float) pow((Double) *lp.b++, re.f);
 	  break;
 	case ANA_WORD:
-	  re.f = (double) *rp.w;
+	  re.f = (Double) *rp.w;
 	  while (nRepeat--)
-	    *tp.f++ = (float) pow((double) *lp.b++, re.f);
+	    *tp.f++ = (Float) pow((Double) *lp.b++, re.f);
 	  break;
 	case ANA_LONG:
-	  re.f = (double) *rp.l;
+	  re.f = (Double) *rp.l;
 	  while (nRepeat--)
-	    *tp.f++ = (float) pow((double) *lp.b++, re.f);
+	    *tp.f++ = (Float) pow((Double) *lp.b++, re.f);
 	  break;
 	case ANA_FLOAT:
-	  re.f = (double) *rp.f;
+	  re.f = (Double) *rp.f;
 	  while (nRepeat--)
-	    *tp.f++ = (float) pow((double) *lp.b++, re.f);
+	    *tp.f++ = (Float) pow((Double) *lp.b++, re.f);
 	  break;
 	case ANA_DOUBLE:
 	  re.d = *rp.d;
 	  while (nRepeat--)
-	    *tp.f++ = (float) pow((double) *lp.b++, re.d);
+	    *tp.f++ = (Float) pow((Double) *lp.b++, re.d);
 	  break;
 	case ANA_CFLOAT:
 	  re.f = rp.cf->real;
@@ -681,34 +681,34 @@ void ana_pow_as(void)
 	case ANA_BYTE:
 	  re.f = *rp.b;
 	  while (nRepeat--)
-	    *tp.f++ = (float) pow((double) *lp.w++, re.f);
+	    *tp.f++ = (Float) pow((Double) *lp.w++, re.f);
 	  break;
 	case ANA_WORD:
 	  re.f = *rp.w;
 	  while (nRepeat--)
-	    *tp.f++ = (float) pow((double) *lp.w++, re.f);
+	    *tp.f++ = (Float) pow((Double) *lp.w++, re.f);
 	  break;
 	case ANA_LONG:
 	  re.f = *rp.l;
 	  while (nRepeat--)
-	    *tp.f++ = (float) pow((double) *lp.w++, re.f);
+	    *tp.f++ = (Float) pow((Double) *lp.w++, re.f);
 	  break;
 	case ANA_FLOAT:
 	  re.f = *rp.f;
 	  while (nRepeat--)
-	    *tp.f++ = (float) pow((double) *lp.w++, re.f);
+	    *tp.f++ = (Float) pow((Double) *lp.w++, re.f);
 	  break;
 	case ANA_DOUBLE:
 	  re.d = *rp.d;
 	  while (nRepeat--)
-	    *tp.d++ = pow((double) *lp.w++, re.d);
+	    *tp.d++ = pow((Double) *lp.w++, re.d);
 	  break;
 	case ANA_CFLOAT:
 	  re.f = rp.cf->real;
 	  im.f = rp.cf->imaginary;
 	  while (nRepeat--) {
 	    if (*lp.w) {
-	      mod1.f = log(fabs((double) *lp.w));
+	      mod1.f = log(fabs((Double) *lp.w));
 	      arg1.f = (*lp.w >= 0.0)? 0.0: M_PI;
 	      mod2.f = exp(re.f*mod1.f - im.f*arg1.f);
 	      arg2.f = im.f*mod1.f + re.f*arg1.f;
@@ -725,7 +725,7 @@ void ana_pow_as(void)
 	  im.d = rp.cd->imaginary;
 	  while (nRepeat--) {
 	    if (*lp.w) {
-	      mod1.d = log(fabs((double) *lp.w));
+	      mod1.d = log(fabs((Double) *lp.w));
 	      arg1.d = (*lp.w >= 0.0)? 0.0: M_PI;
 	      mod2.d = exp(re.d*mod1.d - im.d*arg1.d);
 	      arg2.d = im.d*mod1.d + re.d*arg1.d;
@@ -746,34 +746,34 @@ void ana_pow_as(void)
 	case ANA_BYTE:
 	  re.f = *rp.b;
 	  while (nRepeat--)
-	    *tp.f++ = (float) pow((double) *lp.l++, re.f);
+	    *tp.f++ = (Float) pow((Double) *lp.l++, re.f);
 	  break;
 	case ANA_WORD:
 	  re.f = *rp.w;
 	  while (nRepeat--)
-	    *tp.f++ = (float) pow((double) *lp.l++, re.f);
+	    *tp.f++ = (Float) pow((Double) *lp.l++, re.f);
 	  break;
 	case ANA_LONG:
 	  re.f = *rp.l;
 	  while (nRepeat--)
-	    *tp.f++ = (float) pow((double) *lp.l++, re.f);
+	    *tp.f++ = (Float) pow((Double) *lp.l++, re.f);
 	  break;
 	case ANA_FLOAT:
 	  re.f = *rp.f;
 	  while (nRepeat--)
-	    *tp.f++ = (float) pow((double) *lp.l++, re.f);
+	    *tp.f++ = (Float) pow((Double) *lp.l++, re.f);
 	  break;
 	case ANA_DOUBLE:
 	  re.d = *rp.d;
 	  while (nRepeat--)
-	    *tp.f++ = (float) pow((double) *lp.l++, re.d);
+	    *tp.f++ = (Float) pow((Double) *lp.l++, re.d);
 	  break;
 	case ANA_CFLOAT:
 	  re.f = rp.cf->real;
 	  im.f = rp.cf->imaginary;
 	  while (nRepeat--) {
 	    if (*lp.l) {
-	      mod1.f = log(fabs((double) *lp.l));
+	      mod1.f = log(fabs((Double) *lp.l));
 	      arg1.f = (*lp.l >= 0.0)? 0.0: M_PI;
 	      mod2.f = exp(re.f*mod1.f - im.f*arg1.f);
 	      arg2.f = im.f*mod1.f + re.f*arg1.f;
@@ -790,7 +790,7 @@ void ana_pow_as(void)
 	  im.d = rp.cd->imaginary;
 	  while (nRepeat--) {
 	    if (*lp.l) {
-	      mod1.d = log(fabs((double) *lp.l));
+	      mod1.d = log(fabs((Double) *lp.l));
 	      arg1.d = (*lp.l >= 0.0)? 0.0: M_PI;
 	      mod2.d = exp(re.d*mod1.d - im.d*arg1.d);
 	      arg2.d = im.d*mod1.d + re.d*arg1.d;
@@ -811,34 +811,34 @@ void ana_pow_as(void)
 	case ANA_BYTE:
 	  re.f = *rp.b;
 	  while (nRepeat--)
-	    *tp.f++ = (float) pow((double) *lp.f++, re.f);
+	    *tp.f++ = (Float) pow((Double) *lp.f++, re.f);
 	  break;
 	case ANA_WORD:
 	  re.f = *rp.w;
 	  while (nRepeat--)
-	    *tp.f++ = (float) pow((double) *lp.f++, re.f);
+	    *tp.f++ = (Float) pow((Double) *lp.f++, re.f);
 	  break;
 	case ANA_LONG:
-	  re.f = (double) *rp.l;
+	  re.f = (Double) *rp.l;
 	  while (nRepeat--)
-	    *tp.f++ = (float) pow((double) *lp.f++, re.f);
+	    *tp.f++ = (Float) pow((Double) *lp.f++, re.f);
 	  break;
 	case ANA_FLOAT:
-	  re.f = (double) *rp.f;
+	  re.f = (Double) *rp.f;
 	  while (nRepeat--)
-	    *tp.f++ = (float) pow((double) *lp.f++, re.f);
+	    *tp.f++ = (Float) pow((Double) *lp.f++, re.f);
 	  break;
 	case ANA_DOUBLE:
 	  re.f = *rp.d;
 	  while (nRepeat--)
-	    *tp.f++ = (float) pow((double) *lp.f++, re.f);
+	    *tp.f++ = (Float) pow((Double) *lp.f++, re.f);
 	  break;
 	case ANA_CFLOAT:
 	  re.f = rp.cf->real;
 	  im.f = rp.cf->imaginary;
 	  while (nRepeat--) {
 	    if (*lp.f) {
-	      mod1.f = log(fabs((double) *lp.f));
+	      mod1.f = log(fabs((Double) *lp.f));
 	      arg1.f = (*lp.f >= 0.0)? 0.0: M_PI;
 	      mod2.f = exp(re.f*mod1.f - im.f*arg1.f);
 	      arg2.f = im.f*mod1.f + re.f*arg1.f;
@@ -855,7 +855,7 @@ void ana_pow_as(void)
 	  im.d = rp.cd->imaginary;
 	  while (nRepeat--) {
 	    if (*lp.f) {
-	      mod1.d = log(fabs((double) *lp.f));
+	      mod1.d = log(fabs((Double) *lp.f));
 	      arg1.d = (*lp.f >= 0.0)? 0.0: M_PI;
 	      mod2.d = exp(re.d*mod1.d - im.d*arg1.d);
 	      arg2.d = im.d*mod1.d + re.d*arg1.d;
@@ -903,7 +903,7 @@ void ana_pow_as(void)
 	  im.d = rp.cf->imaginary;
 	  while (nRepeat--) {
 	    if (*lp.d) {
-	      mod1.d = log(fabs((double) *lp.d));
+	      mod1.d = log(fabs((Double) *lp.d));
 	      arg1.d = (*lp.d >= 0.0)? 0.0: M_PI;
 	      mod2.d = exp(re.d*mod1.d - im.d*arg1.d);
 	      arg2.d = im.d*mod1.d + re.d*arg1.d;
@@ -920,7 +920,7 @@ void ana_pow_as(void)
 	  im.d = rp.cd->imaginary;
 	  while (nRepeat--) {
 	    if (*lp.d) {
-	      mod1.d = log(fabs((double) *lp.d));
+	      mod1.d = log(fabs((Double) *lp.d));
 	      arg1.d = (*lp.d >= 0.0)? 0.0: M_PI;
 	      mod2.d = exp(re.d*mod1.d - im.d*arg1.d);
 	      arg2.d = im.d*mod1.d + re.d*arg1.d;
@@ -1304,7 +1304,7 @@ void ana_pow_sa(void)
 	  break;
 	case ANA_CFLOAT:
 	  if (*lp.w) {
-	    mod1.f = log(fabs((double) *lp.w));
+	    mod1.f = log(fabs((Double) *lp.w));
 	    arg1.f = (*lp.w > 0.0)? 0.0: M_PI;
 	    while (nRepeat--) {
 	      re.f = rp.cf->real;
@@ -1321,7 +1321,7 @@ void ana_pow_sa(void)
 	  break;
 	case ANA_CDOUBLE:
 	  if (*lp.w) {
-	    mod1.d = log(fabs((double) *lp.w));
+	    mod1.d = log(fabs((Double) *lp.w));
 	    arg1.d = (*lp.w >= 0.0)? 0.0: M_PI;
 	    while (nRepeat--) {
 	      re.d = rp.cd->real;
@@ -1369,7 +1369,7 @@ void ana_pow_sa(void)
 	  break;
 	case ANA_CFLOAT:
 	  if (*lp.l) {
-	    mod1.f = log(fabs((double) *lp.l));
+	    mod1.f = log(fabs((Double) *lp.l));
 	    arg1.f = (*lp.l > 0.0)? 0.0: M_PI;
 	    while (nRepeat--) {
 	      re.f = rp.cf->real;
@@ -1386,7 +1386,7 @@ void ana_pow_sa(void)
 	  break;
 	case ANA_CDOUBLE:
 	  if (*lp.l) {
-	    mod1.d = log(fabs((double) *lp.l));
+	    mod1.d = log(fabs((Double) *lp.l));
 	    arg1.f = (*lp.l > 0.0)? 0.0: M_PI;
 	    while (nRepeat--) {
 	      re.d = rp.cd->real;
@@ -1434,7 +1434,7 @@ void ana_pow_sa(void)
 	  break;
 	case ANA_CFLOAT:
 	  if (*lp.f) {
-	    mod1.f = log(fabs((double) *lp.f));
+	    mod1.f = log(fabs((Double) *lp.f));
 	    arg1.f = (*lp.f > 0.0)? 0.0: M_PI;
 	    while (nRepeat--) {
 	      re.f = rp.cf->real;
@@ -1451,7 +1451,7 @@ void ana_pow_sa(void)
 	  break;
 	case ANA_CDOUBLE:
 	  if (*lp.f) {
-	    mod1.d = log(fabs((double) *lp.f));
+	    mod1.d = log(fabs((Double) *lp.f));
 	    arg1.d = (*lp.f > 0.0)? 0.0: M_PI;
 	    while (nRepeat--) {
 	      re.d = rp.cd->real;
@@ -1499,7 +1499,7 @@ void ana_pow_sa(void)
 	  break;
 	case ANA_CFLOAT:
 	  if (*lp.d) {
-	    mod1.d = log(fabs((double) *lp.d));
+	    mod1.d = log(fabs((Double) *lp.d));
 	    arg1.d = (*lp.d > 0.0)? 0.0: M_PI;
 	    while (nRepeat--) {
 	      re.d = rp.cf->real;
@@ -1516,7 +1516,7 @@ void ana_pow_sa(void)
 	  break;
 	case ANA_CDOUBLE:
 	  if (*lp.d) {
-	    mod1.d = log(fabs((double) *lp.d));
+	    mod1.d = log(fabs((Double) *lp.d));
 	    arg1.d = (*lp.d >= 0.0)? 0.0: M_PI;
 	    while (nRepeat--) {
 	      re.d = rp.cd->real;
@@ -2073,7 +2073,7 @@ void ana_add(void)
 	  while (nRepeat--) {
 	    tp.cd->real = lp.cd->real + rp.cf->real;
 	    tp.cd++->imaginary = lp.cd++->imaginary
-	      + (double) rp.cf++->imaginary;
+	      + (Double) rp.cf++->imaginary;
 	  }
 	  break;
 	case ANA_CDOUBLE:
@@ -2103,29 +2103,29 @@ void ana_add_as(void)
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.w++ = (word) *lp.b++ + *rp.w;
+	    *tp.w++ = (Word) *lp.b++ + *rp.w;
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = (int) *lp.b++ + *rp.l;
+	    *tp.l++ = (Int) *lp.b++ + *rp.l;
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.f++ = (float) *lp.b++ + *rp.f;
+	    *tp.f++ = (Float) *lp.b++ + *rp.f;
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = (double) *lp.b++ + *rp.d;
+	    *tp.d++ = (Double) *lp.b++ + *rp.d;
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
-	    tp.cf->real = (float) *lp.b++ + rp.cf->real;
+	    tp.cf->real = (Float) *lp.b++ + rp.cf->real;
 	    tp.cf++->imaginary = rp.cf->imaginary;
 	  }
 	  break;
 	case ANA_CDOUBLE:
 	  while (nRepeat--) {
-	    tp.cd->real = (double) *lp.b++ + rp.cd->real;
+	    tp.cd->real = (Double) *lp.b++ + rp.cd->real;
 	    tp.cd++->imaginary = rp.cd->imaginary;
 	  }
 	  break;
@@ -2137,7 +2137,7 @@ void ana_add_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.w++ = *lp.w++ + (word) *rp.b;
+	    *tp.w++ = *lp.w++ + (Word) *rp.b;
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
@@ -2145,25 +2145,25 @@ void ana_add_as(void)
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = (int) *lp.w++ + *rp.l;
+	    *tp.l++ = (Int) *lp.w++ + *rp.l;
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.f++ = (float) *lp.w++ + *rp.f;
+	    *tp.f++ = (Float) *lp.w++ + *rp.f;
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = (double) *lp.w++ + *rp.d;
+	    *tp.d++ = (Double) *lp.w++ + *rp.d;
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
-	    tp.cf->real = (float) *lp.w++ + rp.cf->real;
+	    tp.cf->real = (Float) *lp.w++ + rp.cf->real;
 	    tp.cf++->imaginary = rp.cf->imaginary;
 	  }
 	  break;
 	case ANA_CDOUBLE:
 	  while (nRepeat--) {
-	    tp.cd->real = (double) *lp.w++ + rp.cd->real;
+	    tp.cd->real = (Double) *lp.w++ + rp.cd->real;
 	    tp.cd++->imaginary = rp.cd->imaginary;
 	  }
 	  break;
@@ -2175,11 +2175,11 @@ void ana_add_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = *lp.l++ + (int) *rp.b;
+	    *tp.l++ = *lp.l++ + (Int) *rp.b;
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = *lp.l++ + (int) *rp.w;
+	    *tp.l++ = *lp.l++ + (Int) *rp.w;
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
@@ -2187,21 +2187,21 @@ void ana_add_as(void)
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.f++ = (float) *lp.l++ + *rp.f;
+	    *tp.f++ = (Float) *lp.l++ + *rp.f;
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = (double) *lp.l++ + *rp.d;
+	    *tp.d++ = (Double) *lp.l++ + *rp.d;
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
-	    tp.cf->real = (float) *lp.l++ + rp.cf->real;
+	    tp.cf->real = (Float) *lp.l++ + rp.cf->real;
 	    tp.cf++->imaginary = rp.cf->imaginary;
 	  }
 	  break;
 	case ANA_CDOUBLE:
 	  while (nRepeat--) {
-	    tp.cd->real = (double) *lp.l++ + rp.cd->real;
+	    tp.cd->real = (Double) *lp.l++ + rp.cd->real;
 	    tp.cd++->imaginary = rp.cd->imaginary;
 	  }
 	default:
@@ -2213,15 +2213,15 @@ void ana_add_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.f++ = *lp.f++ + (float) *rp.b;
+	    *tp.f++ = *lp.f++ + (Float) *rp.b;
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.f++ = *lp.f++ + (float) *rp.w;
+	    *tp.f++ = *lp.f++ + (Float) *rp.w;
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.f++ = *lp.f++ + (float) *rp.l;
+	    *tp.f++ = *lp.f++ + (Float) *rp.l;
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
@@ -2229,7 +2229,7 @@ void ana_add_as(void)
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = (double) *lp.f++ + *rp.d;
+	    *tp.d++ = (Double) *lp.f++ + *rp.d;
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
@@ -2239,7 +2239,7 @@ void ana_add_as(void)
 	  break;
 	case ANA_CDOUBLE:
 	  while (nRepeat--) {
-	    tp.cd->real = (double) *lp.f++ + rp.cd->real;
+	    tp.cd->real = (Double) *lp.f++ + rp.cd->real;
 	    tp.cd++->imaginary = rp.cd->imaginary;
 	  }
 	  break;
@@ -2251,19 +2251,19 @@ void ana_add_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.d++ = *lp.d++ + (double) *rp.b;
+	    *tp.d++ = *lp.d++ + (Double) *rp.b;
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.d++ = *lp.d++ + (double) *rp.w;
+	    *tp.d++ = *lp.d++ + (Double) *rp.w;
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.d++ = *lp.d++ + (double) *rp.l;
+	    *tp.d++ = *lp.d++ + (Double) *rp.l;
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.d++ = *lp.d++ + (double) *rp.f;
+	    *tp.d++ = *lp.d++ + (Double) *rp.f;
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
@@ -2271,8 +2271,8 @@ void ana_add_as(void)
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
-	    tp.cd->real = *lp.d++ + (double) rp.cf->real;
-	    tp.cd++->imaginary = (double) rp.cf->imaginary;
+	    tp.cd->real = *lp.d++ + (Double) rp.cf->real;
+	    tp.cd++->imaginary = (Double) rp.cf->imaginary;
 	  }
 	  break;
 	case ANA_CDOUBLE:
@@ -2289,19 +2289,19 @@ void ana_add_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--) {
-	    tp.cf->real = lp.cf->real + (float) *rp.b;
+	    tp.cf->real = lp.cf->real + (Float) *rp.b;
 	    tp.cf++->imaginary = lp.cf++->imaginary;
 	  }
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--) {
-	    tp.cf->real = lp.cf->real + (float) *rp.w;
+	    tp.cf->real = lp.cf->real + (Float) *rp.w;
 	    tp.cf++->imaginary = lp.cf++->imaginary;
 	  }
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--) {
-	    tp.cf->real = lp.cf->real + (float) *rp.l;
+	    tp.cf->real = lp.cf->real + (Float) *rp.l;
 	    tp.cf++->imaginary = lp.cf++->imaginary;
 	  }
 	  break;
@@ -2313,8 +2313,8 @@ void ana_add_as(void)
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--) {
-	    tp.cd->real = (double) lp.cf->real + *rp.d;
-	    tp.cd++->imaginary = (double) lp.cf++->imaginary;
+	    tp.cd->real = (Double) lp.cf->real + *rp.d;
+	    tp.cd++->imaginary = (Double) lp.cf++->imaginary;
 	  }
 	  break;
 	case ANA_CFLOAT:
@@ -2325,8 +2325,8 @@ void ana_add_as(void)
 	  break;
 	case ANA_CDOUBLE:
 	  while (nRepeat--) {
-	    tp.cd->real = (double) lp.cf->real + rp.cd->real;
-	    tp.cd++->imaginary = (double) lp.cf++->imaginary
+	    tp.cd->real = (Double) lp.cf->real + rp.cd->real;
+	    tp.cd++->imaginary = (Double) lp.cf++->imaginary
 	      + rp.cd->imaginary;
 	  }
 	  break;
@@ -2338,25 +2338,25 @@ void ana_add_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--) {
-	    tp.cd->real = lp.cd->real + (double) *rp.b;
+	    tp.cd->real = lp.cd->real + (Double) *rp.b;
 	    tp.cd++->imaginary = lp.cd++->imaginary;
 	  }
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--) {
-	    tp.cd->real = lp.cd->real + (double) *rp.w;
+	    tp.cd->real = lp.cd->real + (Double) *rp.w;
 	    tp.cd++->imaginary = lp.cd++->imaginary;
 	  }
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--) {
-	    tp.cd->real = lp.cd->real + (double) *rp.l;
+	    tp.cd->real = lp.cd->real + (Double) *rp.l;
 	    tp.cd++->imaginary = lp.cd++->imaginary;
 	  }
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--) {
-	    tp.cd->real = lp.cd->real + (double) *rp.f;
+	    tp.cd->real = lp.cd->real + (Double) *rp.f;
 	    tp.cd++->imaginary = lp.cd++->imaginary;
 	  }
 	  break;
@@ -2368,9 +2368,9 @@ void ana_add_as(void)
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
-	    tp.cd->real = lp.cd->real + (double) rp.cf->real;
+	    tp.cd->real = lp.cd->real + (Double) rp.cf->real;
 	    tp.cd++->imaginary = lp.cd++->imaginary
-	      + (double) rp.cf->imaginary;
+	      + (Double) rp.cf->imaginary;
 	  }
 	  break;
 	case ANA_CDOUBLE:
@@ -2393,7 +2393,7 @@ void ana_add_sa(void)
      /* commutative, we just swap the LHS and RHS and pass on to */
      /* ana_add_as() */
 {
- int		temp;
+ Int		temp;
  pointer	tempp;
 
  temp = lhsType;
@@ -2423,29 +2423,29 @@ void ana_sub(void)
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.w++ = (word) *lp.b++ - *rp.w++;
+	    *tp.w++ = (Word) *lp.b++ - *rp.w++;
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = (int) *lp.b++ - *rp.l++;
+	    *tp.l++ = (Int) *lp.b++ - *rp.l++;
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.f++ = (float) *lp.b++ - *rp.f++;
+	    *tp.f++ = (Float) *lp.b++ - *rp.f++;
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = (double) *lp.b++ - *rp.d++;
+	    *tp.d++ = (Double) *lp.b++ - *rp.d++;
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
-	    tp.cf->real = (float) *lp.b++ - rp.cf->real;
+	    tp.cf->real = (Float) *lp.b++ - rp.cf->real;
 	    tp.cf++->imaginary = -rp.cf++->imaginary;
 	  }
 	  break;
 	case ANA_CDOUBLE:
 	  while (nRepeat--) {
-	    tp.cd->real = (double) *lp.b++ - rp.cd->real;
+	    tp.cd->real = (Double) *lp.b++ - rp.cd->real;
 	    tp.cd++->imaginary = -rp.cd++->imaginary;
 	  }
 	  break;
@@ -2457,7 +2457,7 @@ void ana_sub(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.w++ = *lp.w++ - (word) *rp.b++;
+	    *tp.w++ = *lp.w++ - (Word) *rp.b++;
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
@@ -2465,25 +2465,25 @@ void ana_sub(void)
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = (int) *lp.w++ - *rp.l++;
+	    *tp.l++ = (Int) *lp.w++ - *rp.l++;
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.f++ = (float) *lp.w++ - *rp.f++;
+	    *tp.f++ = (Float) *lp.w++ - *rp.f++;
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = (double) *lp.w++ - *rp.d++;
+	    *tp.d++ = (Double) *lp.w++ - *rp.d++;
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
-	    tp.cf->real = (float) *lp.w++ - rp.cf->real;
+	    tp.cf->real = (Float) *lp.w++ - rp.cf->real;
 	    tp.cf++->imaginary = -rp.cf++->imaginary;
 	  }
 	  break;
 	case ANA_CDOUBLE:
 	  while (nRepeat--) {
-	    tp.cd->real = (double) *lp.w++ - rp.cd->real;
+	    tp.cd->real = (Double) *lp.w++ - rp.cd->real;
 	    tp.cd++->imaginary = -rp.cd++->imaginary;
 	  }
 	  break;
@@ -2495,11 +2495,11 @@ void ana_sub(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = *lp.l++ - (int) *rp.b++;
+	    *tp.l++ = *lp.l++ - (Int) *rp.b++;
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = *lp.l++ - (int) *rp.w++;
+	    *tp.l++ = *lp.l++ - (Int) *rp.w++;
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
@@ -2507,21 +2507,21 @@ void ana_sub(void)
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.f++ = (float) *lp.l++ - *rp.f++;
+	    *tp.f++ = (Float) *lp.l++ - *rp.f++;
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = (double) *lp.l++ - *rp.d++;
+	    *tp.d++ = (Double) *lp.l++ - *rp.d++;
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
-	    tp.cf->real = (float) *lp.l++ - rp.cf->real;
+	    tp.cf->real = (Float) *lp.l++ - rp.cf->real;
 	    tp.cf++->imaginary = -rp.cf++->imaginary;
 	  }
 	  break;
 	case ANA_CDOUBLE:
 	  while (nRepeat--) {
-	    tp.cd->real = (double) *lp.l++ - rp.cd->real;
+	    tp.cd->real = (Double) *lp.l++ - rp.cd->real;
 	    tp.cd++->imaginary = -rp.cd++->imaginary;
 	  }
 	  break;
@@ -2533,15 +2533,15 @@ void ana_sub(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.f++ = *lp.f++ - (float) *rp.b++;
+	    *tp.f++ = *lp.f++ - (Float) *rp.b++;
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.f++ = *lp.f++ - (float) *rp.w++;
+	    *tp.f++ = *lp.f++ - (Float) *rp.w++;
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.f++ = *lp.f++ - (float) *rp.l++;
+	    *tp.f++ = *lp.f++ - (Float) *rp.l++;
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
@@ -2549,7 +2549,7 @@ void ana_sub(void)
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = (double) *lp.f++ - *rp.d++;
+	    *tp.d++ = (Double) *lp.f++ - *rp.d++;
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
@@ -2559,7 +2559,7 @@ void ana_sub(void)
 	  break;
 	case ANA_CDOUBLE:
 	  while (nRepeat--) {
-	    tp.cd->real = (double) *lp.f++ - rp.cd->real;
+	    tp.cd->real = (Double) *lp.f++ - rp.cd->real;
 	    tp.cd++->imaginary = -rp.cd++->imaginary;
 	  }
 	  break;
@@ -2571,19 +2571,19 @@ void ana_sub(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.d++ = *lp.d++ - (double) *rp.b++;
+	    *tp.d++ = *lp.d++ - (Double) *rp.b++;
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.d++ = *lp.d++ - (double) *rp.w++;
+	    *tp.d++ = *lp.d++ - (Double) *rp.w++;
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.d++ = *lp.d++ - (double) *rp.l++;
+	    *tp.d++ = *lp.d++ - (Double) *rp.l++;
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.d++ = *lp.d++ - (double) *rp.f++;
+	    *tp.d++ = *lp.d++ - (Double) *rp.f++;
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
@@ -2591,8 +2591,8 @@ void ana_sub(void)
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
-	    tp.cd->real = *lp.d++ - (double) rp.cf->real;
-	    tp.cd++->imaginary = (double) -rp.cf++->imaginary;
+	    tp.cd->real = *lp.d++ - (Double) rp.cf->real;
+	    tp.cd++->imaginary = (Double) -rp.cf++->imaginary;
 	  }
 	  break;
 	case ANA_CDOUBLE:
@@ -2609,19 +2609,19 @@ void ana_sub(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--) {
-	    tp.cf->real = lp.cf->real - (float) *rp.b++;
+	    tp.cf->real = lp.cf->real - (Float) *rp.b++;
 	    tp.cf++->imaginary = lp.cf++->imaginary;
 	  }
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--) {
-	    tp.cf->real = lp.cf->real - (float) *rp.w++;
+	    tp.cf->real = lp.cf->real - (Float) *rp.w++;
 	    tp.cf++->imaginary = lp.cf++->imaginary;
 	  }
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--) {
-	    tp.cf->real = lp.cf->real - (float) *rp.l++;
+	    tp.cf->real = lp.cf->real - (Float) *rp.l++;
 	    tp.cf++->imaginary = lp.cf++->imaginary;
 	  }
 	  break;
@@ -2633,8 +2633,8 @@ void ana_sub(void)
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--) {
-	    tp.cd->real = (double) lp.cf->real - *rp.d++;
-	    tp.cd++->imaginary = (double) lp.cf++->imaginary;
+	    tp.cd->real = (Double) lp.cf->real - *rp.d++;
+	    tp.cd++->imaginary = (Double) lp.cf++->imaginary;
 	  }
 	  break;
 	case ANA_CFLOAT:
@@ -2645,8 +2645,8 @@ void ana_sub(void)
 	  break;
 	case ANA_CDOUBLE:
 	  while (nRepeat--) {
-	    tp.cd->real = (double) lp.cf->real - rp.cd->real;
-	    tp.cd++->imaginary = (double) lp.cf++->imaginary
+	    tp.cd->real = (Double) lp.cf->real - rp.cd->real;
+	    tp.cd++->imaginary = (Double) lp.cf++->imaginary
 	      - rp.cd++->imaginary;
 	  }
 	  break;
@@ -2658,19 +2658,19 @@ void ana_sub(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--) {
-	    tp.cd->real = lp.cd->real - (float) *rp.b++;
+	    tp.cd->real = lp.cd->real - (Float) *rp.b++;
 	    tp.cd++->imaginary = lp.cd++->imaginary;
 	  }
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--) {
-	    tp.cd->real = lp.cd->real - (float) *rp.w++;
+	    tp.cd->real = lp.cd->real - (Float) *rp.w++;
 	    tp.cd++->imaginary = lp.cd++->imaginary;
 	  }
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--) {
-	    tp.cd->real = lp.cd->real - (float) *rp.l++;
+	    tp.cd->real = lp.cd->real - (Float) *rp.l++;
 	    tp.cd++->imaginary = lp.cd++->imaginary;
 	  }
 	  break;
@@ -2682,8 +2682,8 @@ void ana_sub(void)
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--) {
-	    tp.cd->real = (double) lp.cd->real - *rp.d++;
-	    tp.cd++->imaginary = (double) lp.cd++->imaginary;
+	    tp.cd->real = (Double) lp.cd->real - *rp.d++;
+	    tp.cd++->imaginary = (Double) lp.cd++->imaginary;
 	  }
 	  break;
 	case ANA_CFLOAT:
@@ -2694,8 +2694,8 @@ void ana_sub(void)
 	  break;
 	case ANA_CDOUBLE:
 	  while (nRepeat--) {
-	    tp.cd->real = (double) lp.cd->real - rp.cd->real;
-	    tp.cd++->imaginary = (double) lp.cd++->imaginary
+	    tp.cd->real = (Double) lp.cd->real - rp.cd->real;
+	    tp.cd++->imaginary = (Double) lp.cd++->imaginary
 	      - rp.cd++->imaginary;
 	  }
 	  break;
@@ -2720,29 +2720,29 @@ void ana_sub_as(void)
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.w++ = (word) *lp.b++ - *rp.w;
+	    *tp.w++ = (Word) *lp.b++ - *rp.w;
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = (int) *lp.b++ - *rp.l;
+	    *tp.l++ = (Int) *lp.b++ - *rp.l;
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.f++ = (float) *lp.b++ - *rp.f;
+	    *tp.f++ = (Float) *lp.b++ - *rp.f;
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = (double) *lp.b++ - *rp.d;
+	    *tp.d++ = (Double) *lp.b++ - *rp.d;
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
-	    tp.cf->real = (float) *lp.b++ - rp.cf->real;
+	    tp.cf->real = (Float) *lp.b++ - rp.cf->real;
 	    tp.cf++->imaginary = -rp.cf->imaginary;
 	  }
 	  break;
 	case ANA_CDOUBLE:
 	  while (nRepeat--) {
-	    tp.cd->real = (double) *lp.b++ - rp.cd->real;
+	    tp.cd->real = (Double) *lp.b++ - rp.cd->real;
 	    tp.cd++->imaginary = -rp.cd->imaginary;
 	  }
 	  break;
@@ -2754,7 +2754,7 @@ void ana_sub_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.w++ = *lp.w++ - (word) *rp.b;
+	    *tp.w++ = *lp.w++ - (Word) *rp.b;
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
@@ -2762,25 +2762,25 @@ void ana_sub_as(void)
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = (int) *lp.w++ - *rp.l;
+	    *tp.l++ = (Int) *lp.w++ - *rp.l;
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.f++ = (float) *lp.w++ - *rp.f;
+	    *tp.f++ = (Float) *lp.w++ - *rp.f;
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = (double) *lp.w++ - *rp.d;
+	    *tp.d++ = (Double) *lp.w++ - *rp.d;
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
-	    tp.cf->real = (float) *lp.w++ - rp.cf->real;
+	    tp.cf->real = (Float) *lp.w++ - rp.cf->real;
 	    tp.cf++->imaginary = -rp.cf->imaginary;
 	  }
 	  break;
 	case ANA_CDOUBLE:
 	  while (nRepeat--) {
-	    tp.cd->real = (double) *lp.w++ - rp.cd->real;
+	    tp.cd->real = (Double) *lp.w++ - rp.cd->real;
 	    tp.cd++->imaginary = -rp.cd->imaginary;
 	  }
 	  break;
@@ -2792,11 +2792,11 @@ void ana_sub_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = *lp.l++ - (int) *rp.b;
+	    *tp.l++ = *lp.l++ - (Int) *rp.b;
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = *lp.l++ - (int) *rp.w;
+	    *tp.l++ = *lp.l++ - (Int) *rp.w;
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
@@ -2804,21 +2804,21 @@ void ana_sub_as(void)
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.f++ = (float) *lp.l++ - *rp.f;
+	    *tp.f++ = (Float) *lp.l++ - *rp.f;
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = (double) *lp.l++ - *rp.d;
+	    *tp.d++ = (Double) *lp.l++ - *rp.d;
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
-	    tp.cf->real = (float) *lp.l++ - rp.cf->real;
+	    tp.cf->real = (Float) *lp.l++ - rp.cf->real;
 	    tp.cf++->imaginary = -rp.cf->imaginary;
 	  }
 	  break;
 	case ANA_CDOUBLE:
 	  while (nRepeat--) {
-	    tp.cd->real = (double) *lp.l++ - rp.cd->real;
+	    tp.cd->real = (Double) *lp.l++ - rp.cd->real;
 	    tp.cd++->imaginary = -rp.cd->imaginary;
 	  }
 	  break;
@@ -2830,15 +2830,15 @@ void ana_sub_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.f++ = *lp.f++ - (float) *rp.b;
+	    *tp.f++ = *lp.f++ - (Float) *rp.b;
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.f++ = *lp.f++ - (float) *rp.w;
+	    *tp.f++ = *lp.f++ - (Float) *rp.w;
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.f++ = *lp.f++ - (float) *rp.l;
+	    *tp.f++ = *lp.f++ - (Float) *rp.l;
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
@@ -2846,7 +2846,7 @@ void ana_sub_as(void)
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = (double) *lp.f++ - *rp.d;
+	    *tp.d++ = (Double) *lp.f++ - *rp.d;
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
@@ -2856,7 +2856,7 @@ void ana_sub_as(void)
 	  break;
 	case ANA_CDOUBLE:
 	  while (nRepeat--) {
-	    tp.cd->real = (double) *lp.f++ - rp.cd->real;
+	    tp.cd->real = (Double) *lp.f++ - rp.cd->real;
 	    tp.cd++->imaginary = -rp.cd->imaginary;
 	  }
 	  break;
@@ -2868,19 +2868,19 @@ void ana_sub_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.d++ = *lp.d++ - (double) *rp.b;
+	    *tp.d++ = *lp.d++ - (Double) *rp.b;
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.d++ = *lp.d++ - (double) *rp.w;
+	    *tp.d++ = *lp.d++ - (Double) *rp.w;
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.d++ = *lp.d++ - (double) *rp.l;
+	    *tp.d++ = *lp.d++ - (Double) *rp.l;
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.d++ = *lp.d++ - (double) *rp.f;
+	    *tp.d++ = *lp.d++ - (Double) *rp.f;
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
@@ -2888,8 +2888,8 @@ void ana_sub_as(void)
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
-	    tp.cd->real = *lp.d++ - (double) rp.cf->real;
-	    tp.cd++->imaginary = (double) -rp.cf->imaginary;
+	    tp.cd->real = *lp.d++ - (Double) rp.cf->real;
+	    tp.cd++->imaginary = (Double) -rp.cf->imaginary;
 	  }
 	  break;
 	case ANA_CDOUBLE:
@@ -2906,19 +2906,19 @@ void ana_sub_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--) {
-	    tp.cf->real = lp.cf->real - (float) *rp.b;
+	    tp.cf->real = lp.cf->real - (Float) *rp.b;
 	    tp.cf++->imaginary = lp.cf++->imaginary;
 	  }
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--) {
-	    tp.cf->real = lp.cf->real - (float) *rp.w;
+	    tp.cf->real = lp.cf->real - (Float) *rp.w;
 	    tp.cf++->imaginary = lp.cf++->imaginary;
 	  }
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--) {
-	    tp.cf->real = lp.cf->real - (float) *rp.l;
+	    tp.cf->real = lp.cf->real - (Float) *rp.l;
 	    tp.cf++->imaginary = lp.cf++->imaginary;
 	  }
 	  break;
@@ -2930,8 +2930,8 @@ void ana_sub_as(void)
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--) {
-	    tp.cd->real = (double) lp.cf->real - *rp.d;
-	    tp.cd++->imaginary = (double) lp.cf++->imaginary;
+	    tp.cd->real = (Double) lp.cf->real - *rp.d;
+	    tp.cd++->imaginary = (Double) lp.cf++->imaginary;
 	  }
 	  break;
 	case ANA_CFLOAT:
@@ -2942,8 +2942,8 @@ void ana_sub_as(void)
 	  break;
 	case ANA_CDOUBLE:
 	  while (nRepeat--) {
-	    tp.cd->real = (double) lp.cf->real - rp.cd->real;
-	    tp.cd++->imaginary = (double) lp.cf++->imaginary
+	    tp.cd->real = (Double) lp.cf->real - rp.cd->real;
+	    tp.cd++->imaginary = (Double) lp.cf++->imaginary
 	      - rp.cd->imaginary;
 	  }
 	  break;
@@ -2955,25 +2955,25 @@ void ana_sub_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--) {
-	    tp.cd->real = lp.cd->real - (double) *rp.b;
+	    tp.cd->real = lp.cd->real - (Double) *rp.b;
 	    tp.cd++->imaginary = lp.cd++->imaginary;
 	  }
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--) {
-	    tp.cd->real = lp.cd->real - (double) *rp.w;
+	    tp.cd->real = lp.cd->real - (Double) *rp.w;
 	    tp.cd++->imaginary = lp.cd++->imaginary;
 	  }
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--) {
-	    tp.cd->real = lp.cd->real - (double) *rp.l;
+	    tp.cd->real = lp.cd->real - (Double) *rp.l;
 	    tp.cd++->imaginary = lp.cd++->imaginary;
 	  }
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--) {
-	    tp.cd->real = lp.cd->real - (double) *rp.f;
+	    tp.cd->real = lp.cd->real - (Double) *rp.f;
 	    tp.cd++->imaginary = lp.cd++->imaginary;
 	  }
 	  break;
@@ -2985,9 +2985,9 @@ void ana_sub_as(void)
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
-	    tp.cd->real = lp.cd->real - (double) rp.cf->real;
+	    tp.cd->real = lp.cd->real - (Double) rp.cf->real;
 	    tp.cd++->imaginary = lp.cd++->imaginary
-	      - (double) rp.cf->imaginary;
+	      - (Double) rp.cf->imaginary;
 	  }
 	  break;
 	case ANA_CDOUBLE:
@@ -3017,29 +3017,29 @@ void ana_sub_sa(void)
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.w++ = (word) *lp.b - *rp.w++;
+	    *tp.w++ = (Word) *lp.b - *rp.w++;
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = (int) *lp.b - *rp.l++;
+	    *tp.l++ = (Int) *lp.b - *rp.l++;
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.f++ = (float) *lp.b - *rp.f++;
+	    *tp.f++ = (Float) *lp.b - *rp.f++;
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = (double) *lp.b - *rp.d++;
+	    *tp.d++ = (Double) *lp.b - *rp.d++;
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
-	    tp.cf->real = (float) *lp.b - rp.cf->real;
+	    tp.cf->real = (Float) *lp.b - rp.cf->real;
 	    tp.cf++->imaginary = -rp.cf++->imaginary;
 	  }
 	  break;
 	case ANA_CDOUBLE:
 	  while (nRepeat--) {
-	    tp.cd->real = (double) *lp.b - rp.cd->real;
+	    tp.cd->real = (Double) *lp.b - rp.cd->real;
 	    tp.cd++->imaginary = -rp.cd++->imaginary;
 	  }
 	  break;
@@ -3051,7 +3051,7 @@ void ana_sub_sa(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.w++ = *lp.w - (word) *rp.b++;
+	    *tp.w++ = *lp.w - (Word) *rp.b++;
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
@@ -3059,25 +3059,25 @@ void ana_sub_sa(void)
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = (int) *lp.w - *rp.l++;
+	    *tp.l++ = (Int) *lp.w - *rp.l++;
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.f++ = (float) *lp.w - *rp.f++;
+	    *tp.f++ = (Float) *lp.w - *rp.f++;
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = (double) *lp.w - *rp.d++;
+	    *tp.d++ = (Double) *lp.w - *rp.d++;
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
-	    tp.cf->real = (float) *lp.w - rp.cf->real;
+	    tp.cf->real = (Float) *lp.w - rp.cf->real;
 	    tp.cf++->imaginary = -rp.cf++->imaginary;
 	  }
 	  break;
 	case ANA_CDOUBLE:
 	  while (nRepeat--) {
-	    tp.cd->real = (double) *lp.w - rp.cd->real;
+	    tp.cd->real = (Double) *lp.w - rp.cd->real;
 	    tp.cd++->imaginary = -rp.cd++->imaginary;
 	  }
 	  break;
@@ -3089,11 +3089,11 @@ void ana_sub_sa(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = *lp.l - (int) *rp.b++;
+	    *tp.l++ = *lp.l - (Int) *rp.b++;
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = *lp.l - (int) *rp.w++;
+	    *tp.l++ = *lp.l - (Int) *rp.w++;
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
@@ -3101,21 +3101,21 @@ void ana_sub_sa(void)
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.f++ = (float) *lp.l - *rp.f++;
+	    *tp.f++ = (Float) *lp.l - *rp.f++;
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = (double) *lp.l - *rp.d++;
+	    *tp.d++ = (Double) *lp.l - *rp.d++;
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
-	    tp.cf->real = (float) *lp.l - rp.cf->real;
+	    tp.cf->real = (Float) *lp.l - rp.cf->real;
 	    tp.cf++->imaginary = -rp.cf++->imaginary;
 	  }
 	  break;
 	case ANA_CDOUBLE:
 	  while (nRepeat--) {
-	    tp.cd->real = (double) *lp.l - rp.cd->real;
+	    tp.cd->real = (Double) *lp.l - rp.cd->real;
 	    tp.cd++->imaginary = -rp.cd++->imaginary;
 	  }
 	  break;
@@ -3127,15 +3127,15 @@ void ana_sub_sa(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.f++ = *lp.f - (float) *rp.b++;
+	    *tp.f++ = *lp.f - (Float) *rp.b++;
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.f++ = *lp.f - (float) *rp.w++;
+	    *tp.f++ = *lp.f - (Float) *rp.w++;
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.f++ = *lp.f - (float) *rp.l++;
+	    *tp.f++ = *lp.f - (Float) *rp.l++;
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
@@ -3143,7 +3143,7 @@ void ana_sub_sa(void)
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = (double) *lp.f - *rp.d++;
+	    *tp.d++ = (Double) *lp.f - *rp.d++;
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
@@ -3153,7 +3153,7 @@ void ana_sub_sa(void)
 	  break;
 	case ANA_CDOUBLE:
 	  while (nRepeat--) {
-	    tp.cd->real = (double) *lp.f - rp.cd->real;
+	    tp.cd->real = (Double) *lp.f - rp.cd->real;
 	    tp.cd++->imaginary = -rp.cd++->imaginary;
 	  }
 	  break;
@@ -3165,19 +3165,19 @@ void ana_sub_sa(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.d++ = *lp.d - (double) *rp.b++;
+	    *tp.d++ = *lp.d - (Double) *rp.b++;
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.d++ = *lp.d - (double) *rp.w++;
+	    *tp.d++ = *lp.d - (Double) *rp.w++;
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.d++ = *lp.d - (double) *rp.l++;
+	    *tp.d++ = *lp.d - (Double) *rp.l++;
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.d++ = *lp.d - (double) *rp.f++;
+	    *tp.d++ = *lp.d - (Double) *rp.f++;
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
@@ -3185,8 +3185,8 @@ void ana_sub_sa(void)
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
-	    tp.cd->real = *lp.d - (double) rp.cf->real;
-	    tp.cd++->imaginary = (double) -rp.cf++->imaginary;
+	    tp.cd->real = *lp.d - (Double) rp.cf->real;
+	    tp.cd++->imaginary = (Double) -rp.cf++->imaginary;
 	  }
 	  break;
 	case ANA_CDOUBLE:
@@ -3203,19 +3203,19 @@ void ana_sub_sa(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--) {
-	    tp.cf->real = lp.cf->real - (float) *rp.b++;
+	    tp.cf->real = lp.cf->real - (Float) *rp.b++;
 	    tp.cf++->imaginary = lp.cf->imaginary;
 	  }
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--) {
-	    tp.cf->real = lp.cf->real - (float) *rp.w++;
+	    tp.cf->real = lp.cf->real - (Float) *rp.w++;
 	    tp.cf++->imaginary = lp.cf->imaginary;
 	  }
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--) {
-	    tp.cf->real = lp.cf->real - (float) *rp.l++;
+	    tp.cf->real = lp.cf->real - (Float) *rp.l++;
 	    tp.cf++->imaginary = lp.cf->imaginary;
 	  }
 	  break;
@@ -3227,8 +3227,8 @@ void ana_sub_sa(void)
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--) {
-	    tp.cd->real = (double) lp.cf->real - *rp.d++;
-	    tp.cd++->imaginary = (double) lp.cf->imaginary;
+	    tp.cd->real = (Double) lp.cf->real - *rp.d++;
+	    tp.cd++->imaginary = (Double) lp.cf->imaginary;
 	  }
 	  break;
 	case ANA_CFLOAT:
@@ -3239,8 +3239,8 @@ void ana_sub_sa(void)
 	  break;
 	case ANA_CDOUBLE:
 	  while (nRepeat--) {
-	    tp.cd->real = (double) lp.cf->real - rp.cd->real;
-	    tp.cd++->imaginary = (double) lp.cf->imaginary
+	    tp.cd->real = (Double) lp.cf->real - rp.cd->real;
+	    tp.cd++->imaginary = (Double) lp.cf->imaginary
 	      - rp.cd++->imaginary;
 	  }
 	  break;
@@ -3252,25 +3252,25 @@ void ana_sub_sa(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--) {
-	    tp.cd->real = lp.cd->real - (double) *rp.b++;
+	    tp.cd->real = lp.cd->real - (Double) *rp.b++;
 	    tp.cd++->imaginary = lp.cd->imaginary;
 	  }
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--) {
-	    tp.cd->real = lp.cd->real - (double) *rp.w++;
+	    tp.cd->real = lp.cd->real - (Double) *rp.w++;
 	    tp.cd++->imaginary = lp.cd->imaginary;
 	  }
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--) {
-	    tp.cd->real = lp.cd->real - (double) *rp.l++;
+	    tp.cd->real = lp.cd->real - (Double) *rp.l++;
 	    tp.cd++->imaginary = lp.cd->imaginary;
 	  }
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--) {
-	    tp.cd->real = lp.cd->real - (double) *rp.f++;
+	    tp.cd->real = lp.cd->real - (Double) *rp.f++;
 	    tp.cd++->imaginary = lp.cd->imaginary;
 	  }
 	  break;
@@ -3282,9 +3282,9 @@ void ana_sub_sa(void)
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
-	    tp.cd->real = lp.cd->real - (double) rp.cf->real;
+	    tp.cd->real = lp.cd->real - (Double) rp.cf->real;
 	    tp.cd++->imaginary = lp.cd->imaginary
-	      - (double) rp.cf++->imaginary;
+	      - (Double) rp.cf++->imaginary;
 	  }
 	  break;
 	case ANA_CDOUBLE:
@@ -3316,32 +3316,32 @@ void ana_mul(void)
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.w++ = (word) *lp.b++ * *rp.w++;
+	    *tp.w++ = (Word) *lp.b++ * *rp.w++;
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = (int) *lp.b++ * *rp.l++;
+	    *tp.l++ = (Int) *lp.b++ * *rp.l++;
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.f++ = (float) *lp.b++ * *rp.f++;
+	    *tp.f++ = (Float) *lp.b++ * *rp.f++;
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = (double) *lp.b++ * *rp.d++;
+	    *tp.d++ = (Double) *lp.b++ * *rp.d++;
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
-	    re.f = (float) *lp.b * rp.cf->real;
-	    im.f = (float) *lp.b++ * rp.cf++->imaginary;
+	    re.f = (Float) *lp.b * rp.cf->real;
+	    im.f = (Float) *lp.b++ * rp.cf++->imaginary;
 	    tp.cf->real = re.f;
 	    tp.cf++->imaginary = im.f;
 	  }
 	  break;
 	case ANA_CDOUBLE:
 	  while (nRepeat--) {
-	    re.d = (double) *lp.b * rp.cd->real;
-	    im.d = (double) *lp.b++ * rp.cd++->imaginary;
+	    re.d = (Double) *lp.b * rp.cd->real;
+	    im.d = (Double) *lp.b++ * rp.cd++->imaginary;
 	    tp.cd->real = re.d;
 	    tp.cd++->imaginary = im.d;
 	  }
@@ -3354,7 +3354,7 @@ void ana_mul(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.w++ = *lp.w++ * (word) *rp.b++;
+	    *tp.w++ = *lp.w++ * (Word) *rp.b++;
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
@@ -3362,28 +3362,28 @@ void ana_mul(void)
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = (int) *lp.w++ * *rp.l++;
+	    *tp.l++ = (Int) *lp.w++ * *rp.l++;
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.f++ = (float) *lp.w++ * *rp.f++;
+	    *tp.f++ = (Float) *lp.w++ * *rp.f++;
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = (double) *lp.w++ * *rp.d++;
+	    *tp.d++ = (Double) *lp.w++ * *rp.d++;
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
-	    re.f = (float) *lp.w * rp.cf->real;
-	    im.f = (float) *lp.w++ * rp.cf++->imaginary;
+	    re.f = (Float) *lp.w * rp.cf->real;
+	    im.f = (Float) *lp.w++ * rp.cf++->imaginary;
 	    tp.cf->real = re.f;
 	    tp.cf++->imaginary = im.f;
 	  }
 	  break;
 	case ANA_CDOUBLE:
 	  while (nRepeat--) {
-	    re.d = (double) *lp.w * rp.cd->real;
-	    im.d = (double) *lp.w++ * rp.cd++->imaginary;
+	    re.d = (Double) *lp.w * rp.cd->real;
+	    im.d = (Double) *lp.w++ * rp.cd++->imaginary;
 	    tp.cd->real = re.d;
 	    tp.cd++->imaginary = im.d;
 	  }
@@ -3396,11 +3396,11 @@ void ana_mul(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = *lp.l++ * (int) *rp.b++;
+	    *tp.l++ = *lp.l++ * (Int) *rp.b++;
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = *lp.l++ * (int) *rp.w++;
+	    *tp.l++ = *lp.l++ * (Int) *rp.w++;
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
@@ -3408,24 +3408,24 @@ void ana_mul(void)
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.f++ = (float) *lp.l++ * *rp.f++;
+	    *tp.f++ = (Float) *lp.l++ * *rp.f++;
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = (double) *lp.l++ * *rp.d++;
+	    *tp.d++ = (Double) *lp.l++ * *rp.d++;
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
-	    re.f = (float) *lp.l * rp.cf->real;
-	    im.f = (float) *lp.l++ * rp.cf++->imaginary;
+	    re.f = (Float) *lp.l * rp.cf->real;
+	    im.f = (Float) *lp.l++ * rp.cf++->imaginary;
 	    tp.cf->real = re.f;
 	    tp.cf++->imaginary = im.f;
 	  }
 	  break;
 	case ANA_CDOUBLE:
 	  while (nRepeat--) {
-	    re.d = (double) *lp.l * rp.cd->real;
-	    im.d = (double) *lp.l++ * rp.cd++->imaginary;
+	    re.d = (Double) *lp.l * rp.cd->real;
+	    im.d = (Double) *lp.l++ * rp.cd++->imaginary;
 	    tp.cd->real = re.d;
 	    tp.cd++->imaginary = im.d;
 	  }
@@ -3438,15 +3438,15 @@ void ana_mul(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.f++ = *lp.f++ * (float) *rp.b++;
+	    *tp.f++ = *lp.f++ * (Float) *rp.b++;
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.f++ = *lp.f++ * (float) *rp.w++;
+	    *tp.f++ = *lp.f++ * (Float) *rp.w++;
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.f++ = *lp.f++ * (float) *rp.l++;
+	    *tp.f++ = *lp.f++ * (Float) *rp.l++;
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
@@ -3454,7 +3454,7 @@ void ana_mul(void)
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = (double) *lp.f++ * *rp.d++;
+	    *tp.d++ = (Double) *lp.f++ * *rp.d++;
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
@@ -3466,8 +3466,8 @@ void ana_mul(void)
 	  break;
 	case ANA_CDOUBLE:
 	  while (nRepeat--) {
-	    re.d = (double) *lp.f * rp.cd->real;
-	    im.d = (double) *lp.f++ * rp.cd++->imaginary;
+	    re.d = (Double) *lp.f * rp.cd->real;
+	    im.d = (Double) *lp.f++ * rp.cd++->imaginary;
 	    tp.cd->real = re.d;
 	    tp.cd++->imaginary = im.d;
 	  }
@@ -3480,19 +3480,19 @@ void ana_mul(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.d++ = *lp.d++ * (double) *rp.b++;
+	    *tp.d++ = *lp.d++ * (Double) *rp.b++;
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.d++ = *lp.d++ * (double) *rp.w++;
+	    *tp.d++ = *lp.d++ * (Double) *rp.w++;
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.d++ = *lp.d++ * (double) *rp.l++;
+	    *tp.d++ = *lp.d++ * (Double) *rp.l++;
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.d++ = *lp.d++ * (double) *rp.f++;
+	    *tp.d++ = *lp.d++ * (Double) *rp.f++;
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
@@ -3500,8 +3500,8 @@ void ana_mul(void)
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
-	    re.d = *lp.d * (double) rp.cf->real;
-	    im.d = *lp.d++ * (double) rp.cf++->imaginary;
+	    re.d = *lp.d * (Double) rp.cf->real;
+	    im.d = *lp.d++ * (Double) rp.cf++->imaginary;
 	    tp.cd->real = re.d;
 	    tp.cd++->imaginary = im.d;
 	  }
@@ -3522,24 +3522,24 @@ void ana_mul(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--) {
-	    re.f = lp.cf->real * (float) *rp.b;
-	    im.f = lp.cf++->imaginary * (float) *rp.b++;
+	    re.f = lp.cf->real * (Float) *rp.b;
+	    im.f = lp.cf++->imaginary * (Float) *rp.b++;
 	    tp.cf->real = re.f;
 	    tp.cf++->imaginary = im.f;
 	  }
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--) {
-	    re.f = lp.cf->real * (float) *rp.w;
-	    im.f = lp.cf++->imaginary * (float) *rp.w++;
+	    re.f = lp.cf->real * (Float) *rp.w;
+	    im.f = lp.cf++->imaginary * (Float) *rp.w++;
 	    tp.cf->real = re.f;
 	    tp.cf++->imaginary = im.f;
 	  }
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--) {
-	    re.f = lp.cf->real * (float) *rp.l;
-	    im.f = lp.cf++->imaginary * (float) *rp.l++;
+	    re.f = lp.cf->real * (Float) *rp.l;
+	    im.f = lp.cf++->imaginary * (Float) *rp.l++;
 	    tp.cf->real = re.f;
 	    tp.cf++->imaginary = im.f;
 	  }
@@ -3554,8 +3554,8 @@ void ana_mul(void)
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--) {
-	    re.d = (double) lp.cf->real * *rp.d;
-	    im.d = (double) lp.cf++->imaginary * *rp.d++;
+	    re.d = (Double) lp.cf->real * *rp.d;
+	    im.d = (Double) lp.cf++->imaginary * *rp.d++;
 	    tp.cd->real = re.d;
 	    tp.cd++->imaginary = im.d;
 	  }
@@ -3574,10 +3574,10 @@ void ana_mul(void)
 	  break;
 	case ANA_CDOUBLE:
 	  while (nRepeat--) {
-	    re.d = (double) lp.cf->real*rp.cd->real
-	      - (double) lp.cf->imaginary*rp.cd->imaginary;
-	    im.d = (double) lp.cf->real*rp.cd->imaginary
-	     + (double) lp.cf->imaginary*rp.cd->real;
+	    re.d = (Double) lp.cf->real*rp.cd->real
+	      - (Double) lp.cf->imaginary*rp.cd->imaginary;
+	    im.d = (Double) lp.cf->real*rp.cd->imaginary
+	     + (Double) lp.cf->imaginary*rp.cd->real;
 	    tp.cd->real = re.d;
 	    tp.cd++->imaginary = im.d;
 	    lp.cf++;
@@ -3592,32 +3592,32 @@ void ana_mul(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--) {
-	    re.d = lp.cd->real * (float) *rp.b;
-	    im.d = lp.cd++->imaginary * (float) *rp.b++;
+	    re.d = lp.cd->real * (Float) *rp.b;
+	    im.d = lp.cd++->imaginary * (Float) *rp.b++;
 	    tp.cd->real = re.d;
 	    tp.cd++->imaginary = im.d;
 	  }
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--) {
-	    re.d = lp.cd->real * (float) *rp.w;
-	    im.d = lp.cd++->imaginary * (float) *rp.w++;
+	    re.d = lp.cd->real * (Float) *rp.w;
+	    im.d = lp.cd++->imaginary * (Float) *rp.w++;
 	    tp.cd->real = re.d;
 	    tp.cd++->imaginary = im.d;
 	  }
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--) {
-	    re.d = lp.cd->real * (float) *rp.l;
-	    im.d = lp.cd++->imaginary * (float) *rp.l++;
+	    re.d = lp.cd->real * (Float) *rp.l;
+	    im.d = lp.cd++->imaginary * (Float) *rp.l++;
 	    tp.cd->real = re.d;
 	    tp.cd++->imaginary = im.d;
 	  }
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--) {
-	    re.d = lp.cd->real * (double) *rp.f;
-	    im.d = lp.cd++->imaginary * (double) *rp.f++;
+	    re.d = lp.cd->real * (Double) *rp.f;
+	    im.d = lp.cd++->imaginary * (Double) *rp.f++;
 	    tp.cd->real = re.d;
 	    tp.cd++->imaginary = im.d;
 	  }
@@ -3632,10 +3632,10 @@ void ana_mul(void)
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
-	    re.d = lp.cd->real * (double) rp.cf->real
-	      - lp.cd->imaginary * (double) rp.cf->imaginary;
-	    im.d = lp.cd->real * (double) rp.cf->imaginary
-	      + lp.cd->imaginary * (double) rp.cf->real;
+	    re.d = lp.cd->real * (Double) rp.cf->real
+	      - lp.cd->imaginary * (Double) rp.cf->imaginary;
+	    im.d = lp.cd->real * (Double) rp.cf->imaginary
+	      + lp.cd->imaginary * (Double) rp.cf->real;
 	    tp.cd->real = re.d;
 	    tp.cd++->imaginary = im.d;
 	    lp.cd++;
@@ -3677,32 +3677,32 @@ void ana_mul_as(void)
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.w++ = (word) *lp.b++ * *rp.w;
+	    *tp.w++ = (Word) *lp.b++ * *rp.w;
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = (int) *lp.b++ * *rp.l;
+	    *tp.l++ = (Int) *lp.b++ * *rp.l;
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.f++ = (float) *lp.b++ * *rp.f;
+	    *tp.f++ = (Float) *lp.b++ * *rp.f;
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = (double) *lp.b++ * *rp.d;
+	    *tp.d++ = (Double) *lp.b++ * *rp.d;
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
-	    re.f = (float) *lp.b * rp.cf->real;
-	    im.f = (float) *lp.b++ * rp.cf->imaginary;
+	    re.f = (Float) *lp.b * rp.cf->real;
+	    im.f = (Float) *lp.b++ * rp.cf->imaginary;
 	    tp.cf->real = re.f;
 	    tp.cf++->imaginary = im.f;
 	  }
 	  break;
 	case ANA_CDOUBLE:
 	  while (nRepeat--) {
-	    re.d = (double) *lp.b * rp.cd->real;
-	    im.d = (double) *lp.b++ * rp.cd->imaginary;
+	    re.d = (Double) *lp.b * rp.cd->real;
+	    im.d = (Double) *lp.b++ * rp.cd->imaginary;
 	    tp.cd->real = re.d;
 	    tp.cd++->imaginary = im.d;
 	  }
@@ -3715,7 +3715,7 @@ void ana_mul_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.w++ = *lp.w++ * (word) *rp.b;
+	    *tp.w++ = *lp.w++ * (Word) *rp.b;
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
@@ -3723,28 +3723,28 @@ void ana_mul_as(void)
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = (int) *lp.w++ * *rp.l;
+	    *tp.l++ = (Int) *lp.w++ * *rp.l;
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.f++ = (float) *lp.w++ * *rp.f;
+	    *tp.f++ = (Float) *lp.w++ * *rp.f;
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = (double) *lp.w++ * *rp.d;
+	    *tp.d++ = (Double) *lp.w++ * *rp.d;
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
-	    re.f = (float) *lp.w * rp.cf->real;
-	    im.f = (float) *lp.w++ * rp.cf->imaginary;
+	    re.f = (Float) *lp.w * rp.cf->real;
+	    im.f = (Float) *lp.w++ * rp.cf->imaginary;
 	    tp.cf->real = re.f;
 	    tp.cf++->imaginary = im.f;
 	  }
 	  break;
 	case ANA_CDOUBLE:
 	  while (nRepeat--) {
-	    re.d = (double) *lp.w * rp.cd->real;
-	    im.d = (double) *lp.w++ * rp.cd->imaginary;
+	    re.d = (Double) *lp.w * rp.cd->real;
+	    im.d = (Double) *lp.w++ * rp.cd->imaginary;
 	    tp.cd->real = re.d;
 	    tp.cd++->imaginary = im.d;
 	  }
@@ -3757,11 +3757,11 @@ void ana_mul_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = *lp.l++ * (int) *rp.b;
+	    *tp.l++ = *lp.l++ * (Int) *rp.b;
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = *lp.l++ * (int) *rp.w;
+	    *tp.l++ = *lp.l++ * (Int) *rp.w;
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
@@ -3769,24 +3769,24 @@ void ana_mul_as(void)
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.f++ = (float) *lp.l++ * *rp.f;
+	    *tp.f++ = (Float) *lp.l++ * *rp.f;
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = (double) *lp.l++ * *rp.d;
+	    *tp.d++ = (Double) *lp.l++ * *rp.d;
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
-	    re.f = (float) *lp.l * rp.cf->real;
-	    im.f = (float) *lp.l++ * rp.cf->imaginary;
+	    re.f = (Float) *lp.l * rp.cf->real;
+	    im.f = (Float) *lp.l++ * rp.cf->imaginary;
 	    tp.cf->real = re.f;
 	    tp.cf++->imaginary = im.f;
 	  }
 	  break;
 	case ANA_CDOUBLE:
 	  while (nRepeat--) {
-	    re.d = (double) *lp.l * rp.cd->real;
-	    im.d = (double) *lp.l++ * rp.cd->imaginary;
+	    re.d = (Double) *lp.l * rp.cd->real;
+	    im.d = (Double) *lp.l++ * rp.cd->imaginary;
 	    tp.cd->real = re.d;
 	    tp.cd++->imaginary = im.d;
 	  }
@@ -3799,15 +3799,15 @@ void ana_mul_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.f++ = *lp.f++ * (float) *rp.b;
+	    *tp.f++ = *lp.f++ * (Float) *rp.b;
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.f++ = *lp.f++ * (float) *rp.w;
+	    *tp.f++ = *lp.f++ * (Float) *rp.w;
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.f++ = *lp.f++ * (float) *rp.l;
+	    *tp.f++ = *lp.f++ * (Float) *rp.l;
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
@@ -3815,20 +3815,20 @@ void ana_mul_as(void)
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = (double) *lp.f++ * *rp.d;
+	    *tp.d++ = (Double) *lp.f++ * *rp.d;
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
-	    re.f = (float) *lp.f * rp.cf->real;
-	    im.f = (float) *lp.f++ * rp.cf->imaginary;
+	    re.f = (Float) *lp.f * rp.cf->real;
+	    im.f = (Float) *lp.f++ * rp.cf->imaginary;
 	    tp.cf->real = re.f;
 	    tp.cf++->imaginary = im.f;
 	  }
 	  break;
 	case ANA_CDOUBLE:
 	  while (nRepeat--) {
-	    re.d = (double) *lp.f * rp.cd->real;
-	    im.d = (double) *lp.f++ * rp.cd->imaginary;
+	    re.d = (Double) *lp.f * rp.cd->real;
+	    im.d = (Double) *lp.f++ * rp.cd->imaginary;
 	    tp.cd->real = re.d;
 	    tp.cd++->imaginary = im.d;
 	  }
@@ -3841,19 +3841,19 @@ void ana_mul_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.d++ = *lp.d++ * (double) *rp.b;
+	    *tp.d++ = *lp.d++ * (Double) *rp.b;
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.d++ = *lp.d++ * (double) *rp.w;
+	    *tp.d++ = *lp.d++ * (Double) *rp.w;
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.d++ = *lp.d++ * (double) *rp.l;
+	    *tp.d++ = *lp.d++ * (Double) *rp.l;
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.d++ = *lp.d++ * (double) *rp.f;
+	    *tp.d++ = *lp.d++ * (Double) *rp.f;
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
@@ -3861,8 +3861,8 @@ void ana_mul_as(void)
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
-	    re.d = *lp.d * (double) rp.cf->real;
-	    im.d = *lp.d++ * (double) rp.cf->imaginary;
+	    re.d = *lp.d * (Double) rp.cf->real;
+	    im.d = *lp.d++ * (Double) rp.cf->imaginary;
 	    tp.cd->real = re.d;
 	    tp.cd++->imaginary = im.d;
 	  }
@@ -3883,20 +3883,20 @@ void ana_mul_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--) {
-	    tp.cf->real = lp.cf->real*(float) *rp.b;
-	    tp.cf++->imaginary = lp.cf++->imaginary*(float) *rp.b;
+	    tp.cf->real = lp.cf->real*(Float) *rp.b;
+	    tp.cf++->imaginary = lp.cf++->imaginary*(Float) *rp.b;
 	  }
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--) {
-	    tp.cf->real = lp.cf->real*(float) *rp.w;
-	    tp.cf++->imaginary = lp.cf++->imaginary*(float) *rp.w;
+	    tp.cf->real = lp.cf->real*(Float) *rp.w;
+	    tp.cf++->imaginary = lp.cf++->imaginary*(Float) *rp.w;
 	  }
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--) {
-	    tp.cf->real = lp.cf->real*(float) *rp.l;
-	    tp.cf++->imaginary = lp.cf++->imaginary*(float) *rp.l;
+	    tp.cf->real = lp.cf->real*(Float) *rp.l;
+	    tp.cf++->imaginary = lp.cf++->imaginary*(Float) *rp.l;
 	  }
 	  break;
 	case ANA_FLOAT:
@@ -3907,8 +3907,8 @@ void ana_mul_as(void)
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--) {
-	    tp.cd->real = (double) lp.cf->real * *rp.d;
-	    tp.cd++->imaginary = (double) lp.cf++->imaginary * *rp.d;
+	    tp.cd->real = (Double) lp.cf->real * *rp.d;
+	    tp.cd++->imaginary = (Double) lp.cf++->imaginary * *rp.d;
 	  }
 	  break;
 	case ANA_CFLOAT:
@@ -3943,26 +3943,26 @@ void ana_mul_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--) {
-	    tp.cd->real = lp.cd->real*(double) *rp.b;
-	    tp.cd++->imaginary = lp.cd++->imaginary*(double) *rp.b;
+	    tp.cd->real = lp.cd->real*(Double) *rp.b;
+	    tp.cd++->imaginary = lp.cd++->imaginary*(Double) *rp.b;
 	  }
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--) {
-	    tp.cd->real = lp.cd->real*(double) *rp.w;
-	    tp.cd++->imaginary = lp.cd++->imaginary*(double) *rp.w;
+	    tp.cd->real = lp.cd->real*(Double) *rp.w;
+	    tp.cd++->imaginary = lp.cd++->imaginary*(Double) *rp.w;
 	  }
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--) {
-	    tp.cd->real = lp.cd->real*(double) *rp.l;
-	    tp.cd++->imaginary = lp.cd++->imaginary*(double) *rp.l;
+	    tp.cd->real = lp.cd->real*(Double) *rp.l;
+	    tp.cd++->imaginary = lp.cd++->imaginary*(Double) *rp.l;
 	  }
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--) {
-	    tp.cd->real = lp.cd->real*(double) *rp.f;
-	    tp.cd++->imaginary = lp.cd++->imaginary*(double) *rp.f;
+	    tp.cd->real = lp.cd->real*(Double) *rp.f;
+	    tp.cd++->imaginary = lp.cd++->imaginary*(Double) *rp.f;
 	  }
 	  break;
 	case ANA_DOUBLE:
@@ -4009,7 +4009,7 @@ void ana_mul_sa(void)
      /* is commutative, we just swap the LHS and RHS and pass on to */
      /* ana_mul_as() */
 {
-  int		temp;
+  Int		temp;
   pointer	tempp;
   
   temp = lhsType;
@@ -4042,27 +4042,27 @@ void ana_div(void)
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.w++ = (word) *lp.b++ / *rp.w++;
+	    *tp.w++ = (Word) *lp.b++ / *rp.w++;
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = (int) *lp.b++ / *rp.l++;
+	    *tp.l++ = (Int) *lp.b++ / *rp.l++;
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.f++ = (float) *lp.b++ / *rp.f++;
+	    *tp.f++ = (Float) *lp.b++ / *rp.f++;
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = (double) *lp.b++ / *rp.d++;
+	    *tp.d++ = (Double) *lp.b++ / *rp.d++;
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
 	    d.f = rp.cf->real*rp.cf->real
 	      + rp.cf->imaginary*rp.cf->imaginary;
 	    d.f = 1.0/d.f;
-	    re.f = ((float) *lp.b * rp.cf->real)*d.f;
-	    im.f = (-(float) *lp.b++ * rp.cf++->imaginary)*d.f;
+	    re.f = ((Float) *lp.b * rp.cf->real)*d.f;
+	    im.f = (-(Float) *lp.b++ * rp.cf++->imaginary)*d.f;
 	    tp.cf->real = re.f;
 	    tp.cf++->imaginary = im.f;
 	  }
@@ -4072,8 +4072,8 @@ void ana_div(void)
 	    d.d = rp.cd->real*rp.cd->real
 	      + rp.cd->imaginary*rp.cd->imaginary;
 	    d.d = 1.0/d.d;
-	    re.d = ((double) *lp.b * rp.cd->real)*d.d;
-	    im.d = (-(double) *lp.b++ * rp.cd++->imaginary)*d.d;
+	    re.d = ((Double) *lp.b * rp.cd->real)*d.d;
+	    im.d = (-(Double) *lp.b++ * rp.cd++->imaginary)*d.d;
 	    tp.cd->real = re.d;
 	    tp.cd++->imaginary = im.d;
 	  }
@@ -4086,7 +4086,7 @@ void ana_div(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.w++ = *lp.w++ / (word) *rp.b++;
+	    *tp.w++ = *lp.w++ / (Word) *rp.b++;
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
@@ -4094,23 +4094,23 @@ void ana_div(void)
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = (int) *lp.w++ / *rp.l++;
+	    *tp.l++ = (Int) *lp.w++ / *rp.l++;
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.f++ = (float) *lp.w++ / *rp.f++;
+	    *tp.f++ = (Float) *lp.w++ / *rp.f++;
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = (double) *lp.w++ / *rp.d++;
+	    *tp.d++ = (Double) *lp.w++ / *rp.d++;
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
 	    d.f = rp.cf->real*rp.cf->real
 	      + rp.cf->imaginary*rp.cf->imaginary;
 	    d.f = 1.0/d.f;
-	    re.f = ((float) *lp.w * rp.cf->real)*d.f;
-	    im.f = (-(float) *lp.w++ * rp.cf++->imaginary)*d.f;
+	    re.f = ((Float) *lp.w * rp.cf->real)*d.f;
+	    im.f = (-(Float) *lp.w++ * rp.cf++->imaginary)*d.f;
 	    tp.cf->real = re.f;
 	    tp.cf++->imaginary = im.f;
 	  }
@@ -4120,8 +4120,8 @@ void ana_div(void)
 	    d.d = rp.cd->real*rp.cd->real
 	      + rp.cd->imaginary*rp.cd->imaginary;
 	    d.d = 1.0/d.d;
-	    re.d = ((double) *lp.w * rp.cd->real)*d.d;
-	    im.d = (-(double) *lp.w++ * rp.cd++->imaginary)*d.d;
+	    re.d = ((Double) *lp.w * rp.cd->real)*d.d;
+	    im.d = (-(Double) *lp.w++ * rp.cd++->imaginary)*d.d;
 	    tp.cd->real = re.d;
 	    tp.cd++->imaginary = im.d;
 	  }
@@ -4134,11 +4134,11 @@ void ana_div(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = *lp.l++ / (int) *rp.b++;
+	    *tp.l++ = *lp.l++ / (Int) *rp.b++;
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = *lp.l++ / (int) *rp.w++;
+	    *tp.l++ = *lp.l++ / (Int) *rp.w++;
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
@@ -4146,19 +4146,19 @@ void ana_div(void)
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.f++ = (float) *lp.l++ / *rp.f++;
+	    *tp.f++ = (Float) *lp.l++ / *rp.f++;
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = (double) *lp.l++ / *rp.d++;
+	    *tp.d++ = (Double) *lp.l++ / *rp.d++;
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
 	    d.f = rp.cf->real*rp.cf->real
 	      + rp.cf->imaginary*rp.cf->imaginary;
 	    d.f = 1.0/d.f;
-	    re.f = ((float) *lp.l * rp.cf->real)*d.f;
-	    im.f = (-(float) *lp.l++ * rp.cf++->imaginary)*d.f;
+	    re.f = ((Float) *lp.l * rp.cf->real)*d.f;
+	    im.f = (-(Float) *lp.l++ * rp.cf++->imaginary)*d.f;
 	    tp.cf->real = re.f;
 	    tp.cf++->imaginary = im.f;
 	  }
@@ -4168,8 +4168,8 @@ void ana_div(void)
 	    d.d = rp.cd->real*rp.cd->real
 	      + rp.cd->imaginary*rp.cd->imaginary;
 	    d.d = 1.0/d.d;
-	    re.d = ((double) *lp.l * rp.cd->real)*d.d;
-	    im.d = (-(double) *lp.l++ * rp.cd++->imaginary)*d.d;
+	    re.d = ((Double) *lp.l * rp.cd->real)*d.d;
+	    im.d = (-(Double) *lp.l++ * rp.cd++->imaginary)*d.d;
 	    tp.cd->real = re.d;
 	    tp.cd++->imaginary = im.d;
 	  }
@@ -4182,15 +4182,15 @@ void ana_div(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.f++ = *lp.f++ / (float) *rp.b++;
+	    *tp.f++ = *lp.f++ / (Float) *rp.b++;
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.f++ = *lp.f++ / (float) *rp.w++;
+	    *tp.f++ = *lp.f++ / (Float) *rp.w++;
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.f++ = *lp.f++ / (float) *rp.l++;
+	    *tp.f++ = *lp.f++ / (Float) *rp.l++;
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
@@ -4198,15 +4198,15 @@ void ana_div(void)
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = (double) *lp.f++ / *rp.d++;
+	    *tp.d++ = (Double) *lp.f++ / *rp.d++;
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
 	    d.f = rp.cf->real*rp.cf->real
 	      + rp.cf->imaginary*rp.cf->imaginary;
 	    d.f = 1.0/d.f;
-	    re.f = ((float) *lp.f * rp.cf->real)*d.f;
-	    im.f = (-(float) *lp.f++ * rp.cf++->imaginary)*d.f;
+	    re.f = ((Float) *lp.f * rp.cf->real)*d.f;
+	    im.f = (-(Float) *lp.f++ * rp.cf++->imaginary)*d.f;
 	    tp.cf->real = re.f;
 	    tp.cf++->imaginary = im.f;
 	  }
@@ -4216,8 +4216,8 @@ void ana_div(void)
 	    d.d = rp.cd->real*rp.cd->real
 	      + rp.cd->imaginary*rp.cd->imaginary;
 	    d.d = 1.0/d.d;
-	    re.d = ((double) *lp.f * rp.cd->real)*d.d;
-	    im.d = (-(double) *lp.f++ * rp.cd++->imaginary)*d.d;
+	    re.d = ((Double) *lp.f * rp.cd->real)*d.d;
+	    im.d = (-(Double) *lp.f++ * rp.cd++->imaginary)*d.d;
 	    tp.cd->real = re.d;
 	    tp.cd++->imaginary = im.d;
 	  }
@@ -4230,19 +4230,19 @@ void ana_div(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.d++ = *lp.d++ / (double) *rp.b++;
+	    *tp.d++ = *lp.d++ / (Double) *rp.b++;
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.d++ = *lp.d++ / (double) *rp.w++;
+	    *tp.d++ = *lp.d++ / (Double) *rp.w++;
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.d++ = *lp.d++ / (double) *rp.l++;
+	    *tp.d++ = *lp.d++ / (Double) *rp.l++;
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.d++ = *lp.d++ / (double) *rp.f++;
+	    *tp.d++ = *lp.d++ / (Double) *rp.f++;
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
@@ -4250,11 +4250,11 @@ void ana_div(void)
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
-	    d.d = (double) rp.cf->real*(double) rp.cf->real
-	     + (double) rp.cf->imaginary*(double) rp.cf->imaginary;
+	    d.d = (Double) rp.cf->real*(Double) rp.cf->real
+	     + (Double) rp.cf->imaginary*(Double) rp.cf->imaginary;
 	    d.d = 1.0/d.d;
-	    re.d = (*lp.d * (double) rp.cf->real)*d.d;
-	    im.d = (-*lp.d++ * (double) rp.cf++->imaginary)*d.d;
+	    re.d = (*lp.d * (Double) rp.cf->real)*d.d;
+	    im.d = (-*lp.d++ * (Double) rp.cf++->imaginary)*d.d;
 	    tp.cd->real = re.d;
 	    tp.cd++->imaginary = im.d;
 	  }
@@ -4278,21 +4278,21 @@ void ana_div(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--) {
-	    d.f = 1.0/(float) *rp.b++;
+	    d.f = 1.0/(Float) *rp.b++;
 	    tp.cf->real = lp.cf->real*d.f;
 	    tp.cf++->imaginary = lp.cf++->imaginary*d.f;
 	  }
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--) {
-	    d.f = 1.0/(float) *rp.w++;
+	    d.f = 1.0/(Float) *rp.w++;
 	    tp.cf->real = lp.cf->real*d.f;
 	    tp.cf++->imaginary = lp.cf++->imaginary*d.f;
 	  }
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--) {
-	    d.f = 1.0/(float) *rp.l++;
+	    d.f = 1.0/(Float) *rp.l++;
 	    tp.cf->real = lp.cf->real*d.f;
 	    tp.cf++->imaginary = lp.cf++->imaginary*d.f;
 	  }
@@ -4307,8 +4307,8 @@ void ana_div(void)
 	case ANA_DOUBLE:
 	  while (nRepeat--) {
 	    d.d = 1.0/ *rp.d++;
-	    tp.cd->real = (double) lp.cf->real*d.d;
-	    tp.cd++->imaginary = (double) lp.cf++->imaginary*d.d;
+	    tp.cd->real = (Double) lp.cf->real*d.d;
+	    tp.cd++->imaginary = (Double) lp.cf++->imaginary*d.d;
 	  }
 	  break;
 	case ANA_CFLOAT:
@@ -4331,10 +4331,10 @@ void ana_div(void)
 	    d.d = rp.cd->real*rp.cd->real
 	      + rp.cd->imaginary*rp.cd->imaginary;
 	    d.d = 1.0/d.d;
-	    re.d = ((double) lp.cf->real*rp.cd->real
-		    + (double) lp.cf->imaginary*rp.cd->imaginary)*d.d;
-	    im.d = ((double) lp.cf->imaginary*rp.cd->real
-		    - (double) lp.cf->real*rp.cd->imaginary)*d.d;
+	    re.d = ((Double) lp.cf->real*rp.cd->real
+		    + (Double) lp.cf->imaginary*rp.cd->imaginary)*d.d;
+	    im.d = ((Double) lp.cf->imaginary*rp.cd->real
+		    - (Double) lp.cf->real*rp.cd->imaginary)*d.d;
 	    tp.cd->real = re.d;
 	    tp.cd++->imaginary = im.d;
 	    lp.cf++;
@@ -4349,28 +4349,28 @@ void ana_div(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--) {
-	    d.d = 1.0/(double) *rp.b++;
+	    d.d = 1.0/(Double) *rp.b++;
 	    tp.cd->real = lp.cd->real*d.d;
 	    tp.cd++->imaginary = lp.cd++->imaginary*d.d;
 	  }
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--) {
-	    d.d = 1.0/(double) *rp.w++;
+	    d.d = 1.0/(Double) *rp.w++;
 	    tp.cd->real = lp.cd->real*d.d;
 	    tp.cd++->imaginary = lp.cd++->imaginary*d.d;
 	  }
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--) {
-	    d.d = 1.0/(double) *rp.l++;
+	    d.d = 1.0/(Double) *rp.l++;
 	    tp.cd->real = lp.cd->real*d.d;
 	    tp.cd++->imaginary = lp.cd++->imaginary*d.d;
 	  }
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--) {
-	    d.d = 1.0/(double) *rp.f++;
+	    d.d = 1.0/(Double) *rp.f++;
 	    tp.cd->real = lp.cd->real*d.d;
 	    tp.cd++->imaginary = lp.cd++->imaginary*d.d;
 	  }
@@ -4384,13 +4384,13 @@ void ana_div(void)
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
-	    d.d = (double) rp.cf->real*(double) rp.cf->real
-	      + (double) rp.cf->imaginary*(double) rp.cf->imaginary;
+	    d.d = (Double) rp.cf->real*(Double) rp.cf->real
+	      + (Double) rp.cf->imaginary*(Double) rp.cf->imaginary;
 	    d.d = 1.0/d.d;
-	    re.d = (lp.cd->real*(double) rp.cf->real
-		    + lp.cd->imaginary*(double) rp.cf->imaginary)*d.d;
-	    im.d = (lp.cd->imaginary*(double) rp.cf->real
-		    - lp.cd->real*(double) rp.cf->imaginary)*d.d;
+	    re.d = (lp.cd->real*(Double) rp.cf->real
+		    + lp.cd->imaginary*(Double) rp.cf->imaginary)*d.d;
+	    im.d = (lp.cd->imaginary*(Double) rp.cf->real
+		    - lp.cd->real*(Double) rp.cf->imaginary)*d.d;
 	    tp.cd->real = re.d;
 	    tp.cd++->imaginary = im.d;
 	    lp.cd++;
@@ -4435,27 +4435,27 @@ void ana_div_as(void)
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.w++ = (word) *lp.b++ / *rp.w;
+	    *tp.w++ = (Word) *lp.b++ / *rp.w;
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = (int) *lp.b++ / *rp.l;
+	    *tp.l++ = (Int) *lp.b++ / *rp.l;
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.f++ = (float) *lp.b++ / *rp.f;
+	    *tp.f++ = (Float) *lp.b++ / *rp.f;
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = (double) *lp.b++ / *rp.d;
+	    *tp.d++ = (Double) *lp.b++ / *rp.d;
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
 	    d.f = rp.cf->real*rp.cf->real
 	      + rp.cf->imaginary*rp.cf->imaginary;
 	    d.f = 1.0/d.f;
-	    re.f = ((float) *lp.b * rp.cf->real)*d.f;
-	    im.f = (-(float) *lp.b++ * rp.cf->imaginary)*d.f;
+	    re.f = ((Float) *lp.b * rp.cf->real)*d.f;
+	    im.f = (-(Float) *lp.b++ * rp.cf->imaginary)*d.f;
 	    tp.cf->real = re.f;
 	    tp.cf++->imaginary = im.f;
 	  }
@@ -4465,8 +4465,8 @@ void ana_div_as(void)
 	    d.d = rp.cd->real*rp.cd->real
 	      + rp.cd->imaginary*rp.cd->imaginary;
 	    d.d = 1.0/d.d;
-	    re.d = ((double) *lp.b * rp.cd->real)*d.d;
-	    im.d = (-(double) *lp.b++ * rp.cd->imaginary)*d.d;
+	    re.d = ((Double) *lp.b * rp.cd->real)*d.d;
+	    im.d = (-(Double) *lp.b++ * rp.cd->imaginary)*d.d;
 	    tp.cd->real = re.d;
 	    tp.cd++->imaginary = im.d;
 	  }
@@ -4479,7 +4479,7 @@ void ana_div_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.w++ = *lp.w++ / (word) *rp.b;
+	    *tp.w++ = *lp.w++ / (Word) *rp.b;
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
@@ -4487,23 +4487,23 @@ void ana_div_as(void)
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = (int) *lp.w++ / *rp.l;
+	    *tp.l++ = (Int) *lp.w++ / *rp.l;
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.f++ = (float) *lp.w++ / *rp.f;
+	    *tp.f++ = (Float) *lp.w++ / *rp.f;
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = (double) *lp.w++ / *rp.d;
+	    *tp.d++ = (Double) *lp.w++ / *rp.d;
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
 	    d.f = rp.cf->real*rp.cf->real
 	      + rp.cf->imaginary*rp.cf->imaginary;
 	    d.f = 1.0/d.f;
-	    re.f = ((float) *lp.w * rp.cf->real)*d.f;
-	    im.f = (-(float) *lp.w++ * rp.cf->imaginary)*d.f;
+	    re.f = ((Float) *lp.w * rp.cf->real)*d.f;
+	    im.f = (-(Float) *lp.w++ * rp.cf->imaginary)*d.f;
 	    tp.cf->real = re.f;
 	    tp.cf++->imaginary = im.f;
 	  }
@@ -4513,8 +4513,8 @@ void ana_div_as(void)
 	    d.d = rp.cd->real*rp.cd->real
 	      + rp.cd->imaginary*rp.cd->imaginary;
 	    d.d = 1.0/d.d;
-	    re.d = ((double) *lp.w * rp.cd->real)*d.d;
-	    im.d = (-(double) *lp.w++ * rp.cd->imaginary)*d.d;
+	    re.d = ((Double) *lp.w * rp.cd->real)*d.d;
+	    im.d = (-(Double) *lp.w++ * rp.cd->imaginary)*d.d;
 	    tp.cd->real = re.d;
 	    tp.cd++->imaginary = im.d;
 	  }
@@ -4527,11 +4527,11 @@ void ana_div_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = *lp.l++ / (int) *rp.b;
+	    *tp.l++ = *lp.l++ / (Int) *rp.b;
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = *lp.l++ / (int) *rp.w;
+	    *tp.l++ = *lp.l++ / (Int) *rp.w;
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
@@ -4539,19 +4539,19 @@ void ana_div_as(void)
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.f++ = (float) *lp.l++ / *rp.f;
+	    *tp.f++ = (Float) *lp.l++ / *rp.f;
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = (double) *lp.l++ / *rp.d;
+	    *tp.d++ = (Double) *lp.l++ / *rp.d;
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
 	    d.f = rp.cf->real*rp.cf->real
 	      + rp.cf->imaginary*rp.cf->imaginary;
 	    d.f = 1.0/d.f;
-	    re.f = ((float) *lp.l * rp.cf->real)*d.f;
-	    im.f = (-(float) *lp.l++ * rp.cf->imaginary)*d.f;
+	    re.f = ((Float) *lp.l * rp.cf->real)*d.f;
+	    im.f = (-(Float) *lp.l++ * rp.cf->imaginary)*d.f;
 	    tp.cf->real = re.f;
 	    tp.cf++->imaginary = im.f;
 	  }
@@ -4561,8 +4561,8 @@ void ana_div_as(void)
 	    d.d = rp.cd->real*rp.cd->real
 	      + rp.cd->imaginary*rp.cd->imaginary;
 	    d.d = 1.0/d.d;
-	    re.d = ((double) *lp.l * rp.cd->real)*d.d;
-	    im.d = (-(double) *lp.l++ * rp.cd->imaginary)*d.d;
+	    re.d = ((Double) *lp.l * rp.cd->real)*d.d;
+	    im.d = (-(Double) *lp.l++ * rp.cd->imaginary)*d.d;
 	    tp.cd->real = re.d;
 	    tp.cd++->imaginary = im.d;
 	  }
@@ -4575,15 +4575,15 @@ void ana_div_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.f++ = *lp.f++ / (float) *rp.b;
+	    *tp.f++ = *lp.f++ / (Float) *rp.b;
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.f++ = *lp.f++ / (float) *rp.w;
+	    *tp.f++ = *lp.f++ / (Float) *rp.w;
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.f++ = *lp.f++ / (float) *rp.l;
+	    *tp.f++ = *lp.f++ / (Float) *rp.l;
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
@@ -4591,15 +4591,15 @@ void ana_div_as(void)
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = (double) *lp.f++ / *rp.d;
+	    *tp.d++ = (Double) *lp.f++ / *rp.d;
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
 	    d.f = rp.cf->real*rp.cf->real
 	      + rp.cd->imaginary*rp.cd->imaginary;
 	    d.f = 1.0/d.f;
-	    re.f = ((float) *lp.f * rp.cf->real)*d.f;
-	    im.f = (-(float) *lp.f++ * rp.cf->imaginary)*d.f;
+	    re.f = ((Float) *lp.f * rp.cf->real)*d.f;
+	    im.f = (-(Float) *lp.f++ * rp.cf->imaginary)*d.f;
 	    tp.cf->real = re.f;
 	    tp.cf++->imaginary = im.f;
 	  }
@@ -4609,8 +4609,8 @@ void ana_div_as(void)
 	    d.d = rp.cd->real*rp.cd->real
 	      + rp.cd->imaginary*rp.cd->imaginary;
 	    d.d = 1.0/d.d;
-	    re.d = ((double) *lp.f * rp.cd->real)*d.d;
-	    im.d = (-(double) *lp.f++ * rp.cd->imaginary)*d.d;
+	    re.d = ((Double) *lp.f * rp.cd->real)*d.d;
+	    im.d = (-(Double) *lp.f++ * rp.cd->imaginary)*d.d;
 	    tp.cd->real = re.d;
 	    tp.cd++->imaginary = im.d;
 	  }
@@ -4623,19 +4623,19 @@ void ana_div_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.d++ = *lp.d++ / (double) *rp.b;
+	    *tp.d++ = *lp.d++ / (Double) *rp.b;
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.d++ = *lp.d++ / (double) *rp.w;
+	    *tp.d++ = *lp.d++ / (Double) *rp.w;
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.d++ = *lp.d++ / (double) *rp.l;
+	    *tp.d++ = *lp.d++ / (Double) *rp.l;
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.d++ = *lp.d++ / (double) *rp.f;
+	    *tp.d++ = *lp.d++ / (Double) *rp.f;
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
@@ -4643,11 +4643,11 @@ void ana_div_as(void)
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
-	    d.d = (double) rp.cf->real*(double) rp.cf->real
-	     + (double) rp.cf->imaginary*(double) rp.cf->imaginary;
+	    d.d = (Double) rp.cf->real*(Double) rp.cf->real
+	     + (Double) rp.cf->imaginary*(Double) rp.cf->imaginary;
 	    d.d = 1.0/d.d;
-	    re.d = (*lp.d * (double) rp.cf->real)*d.d;
-	    im.d = (-*lp.d++ * (double) rp.cf->imaginary)*d.d;
+	    re.d = (*lp.d * (Double) rp.cf->real)*d.d;
+	    im.d = (-*lp.d++ * (Double) rp.cf->imaginary)*d.d;
 	    tp.cd->real = re.d;
 	    tp.cd++->imaginary = im.d;
 	  }
@@ -4671,21 +4671,21 @@ void ana_div_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--) {
-	    d.f = 1.0/(float) *rp.b;
+	    d.f = 1.0/(Float) *rp.b;
 	    tp.cf->real = lp.cf->real*d.f;
 	    tp.cf++->imaginary = lp.cf++->imaginary*d.f;
 	  }
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--) {
-	    d.f = 1.0/(float) *rp.w;
+	    d.f = 1.0/(Float) *rp.w;
 	    tp.cf->real = lp.cf->real*d.f;
 	    tp.cf++->imaginary = lp.cf++->imaginary*d.f;
 	  }
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--) {
-	    d.f = 1.0/(float) *rp.l;
+	    d.f = 1.0/(Float) *rp.l;
 	    tp.cf->real = lp.cf->real*d.f;
 	    tp.cf++->imaginary = lp.cf++->imaginary*d.f;
 	  }
@@ -4700,8 +4700,8 @@ void ana_div_as(void)
 	case ANA_DOUBLE:
 	  while (nRepeat--) {
 	    d.d = 1.0/ *rp.d;
-	    tp.cd->real = (double) lp.cf->real*d.d;
-	    tp.cd++->imaginary = (double) lp.cf++->imaginary*d.d;
+	    tp.cd->real = (Double) lp.cf->real*d.d;
+	    tp.cd++->imaginary = (Double) lp.cf++->imaginary*d.d;
 	  }
 	  break;
 	case ANA_CFLOAT:
@@ -4723,10 +4723,10 @@ void ana_div_as(void)
 	    d.d = rp.cd->real*rp.cd->real
 	      + rp.cd->imaginary*rp.cd->imaginary;
 	    d.d = 1.0/d.d;
-	    re.d = ((double) lp.cf->real*rp.cd->real
-		    + (double) lp.cf->imaginary*rp.cd->imaginary)*d.d;
-	    im.d = ((double) lp.cf->imaginary*rp.cd->real
-		    - (double) lp.cf->real*rp.cd->imaginary)*d.d;
+	    re.d = ((Double) lp.cf->real*rp.cd->real
+		    + (Double) lp.cf->imaginary*rp.cd->imaginary)*d.d;
+	    im.d = ((Double) lp.cf->imaginary*rp.cd->real
+		    - (Double) lp.cf->real*rp.cd->imaginary)*d.d;
 	    tp.cd->real = re.d;
 	    tp.cd++->imaginary = im.d;
 	    lp.cf++;
@@ -4740,28 +4740,28 @@ void ana_div_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--) {
-	    d.d = 1.0/(double) *rp.b;
+	    d.d = 1.0/(Double) *rp.b;
 	    tp.cd->real = lp.cd->real*d.d;
 	    tp.cd++->imaginary = lp.cd++->imaginary*d.d;
 	  }
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--) {
-	    d.d = 1.0/(double) *rp.w;
+	    d.d = 1.0/(Double) *rp.w;
 	    tp.cd->real = lp.cd->real*d.d;
 	    tp.cd++->imaginary = lp.cd++->imaginary*d.d;
 	  }
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--) {
-	    d.d = 1.0/(double) *rp.l;
+	    d.d = 1.0/(Double) *rp.l;
 	    tp.cd->real = lp.cd->real*d.d;
 	    tp.cd++->imaginary = lp.cd++->imaginary*d.d;
 	  }
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--) {
-	    d.d = 1.0/(double) *rp.f;
+	    d.d = 1.0/(Double) *rp.f;
 	    tp.cd->real = lp.cd->real*d.d;
 	    tp.cd++->imaginary = lp.cd++->imaginary*d.d;
 	  }
@@ -4775,13 +4775,13 @@ void ana_div_as(void)
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
-	    d.d = (double) rp.cf->real*(double) rp.cf->real
-	      + (double) rp.cf->imaginary*(double) rp.cf->imaginary;
+	    d.d = (Double) rp.cf->real*(Double) rp.cf->real
+	      + (Double) rp.cf->imaginary*(Double) rp.cf->imaginary;
 	    d.d = 1.0/d.d;
-	    re.d = (lp.cd->real*(double) rp.cf->real
-		    + lp.cd->imaginary*(double) rp.cf->imaginary)*d.d;
-	    im.d = (lp.cd->imaginary*(double) rp.cf->real
-		    - lp.cd->real*(double) rp.cf->imaginary)*d.d;
+	    re.d = (lp.cd->real*(Double) rp.cf->real
+		    + lp.cd->imaginary*(Double) rp.cf->imaginary)*d.d;
+	    im.d = (lp.cd->imaginary*(Double) rp.cf->real
+		    - lp.cd->real*(Double) rp.cf->imaginary)*d.d;
 	    tp.cd->real = re.d;
 	    tp.cd++->imaginary = im.d;
 	    lp.cd++;
@@ -4824,27 +4824,27 @@ void ana_div_sa(void)
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.w++ = (word) *lp.b / *rp.w++;
+	    *tp.w++ = (Word) *lp.b / *rp.w++;
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = (int) *lp.b / *rp.l++;
+	    *tp.l++ = (Int) *lp.b / *rp.l++;
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.f++ = (float) *lp.b / *rp.f++;
+	    *tp.f++ = (Float) *lp.b / *rp.f++;
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = (double) *lp.b / *rp.d++;
+	    *tp.d++ = (Double) *lp.b / *rp.d++;
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
 	    d.f = rp.cf->real*rp.cf->real
 	      + rp.cf->imaginary*rp.cf->imaginary;
 	    d.f = 1.0/d.f;
-	    re.f = ((float) *lp.b * rp.cf->real)*d.f;
-	    im.f = (-(float) *lp.b * rp.cf++->imaginary)*d.f;
+	    re.f = ((Float) *lp.b * rp.cf->real)*d.f;
+	    im.f = (-(Float) *lp.b * rp.cf++->imaginary)*d.f;
 	    tp.cf->real = re.f;
 	    tp.cf++->imaginary = im.f;
 	  }
@@ -4854,8 +4854,8 @@ void ana_div_sa(void)
 	    d.d = rp.cd->real*rp.cd->real
 	      + rp.cd->imaginary*rp.cd->imaginary;
 	    d.d = 1.0/d.d;
-	    re.d = ((double) *lp.b * rp.cd->real)*d.d;
-	    im.d = (-(double) *lp.b * rp.cd++->imaginary)*d.d;
+	    re.d = ((Double) *lp.b * rp.cd->real)*d.d;
+	    im.d = (-(Double) *lp.b * rp.cd++->imaginary)*d.d;
 	    tp.cd->real = re.d;
 	    tp.cd++->imaginary = im.d;
 	  }
@@ -4868,7 +4868,7 @@ void ana_div_sa(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.w++ = *lp.w / (word) *rp.b++;
+	    *tp.w++ = *lp.w / (Word) *rp.b++;
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
@@ -4876,23 +4876,23 @@ void ana_div_sa(void)
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = (int) *lp.w / *rp.l++;
+	    *tp.l++ = (Int) *lp.w / *rp.l++;
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.f++ = (float) *lp.w / *rp.f++;
+	    *tp.f++ = (Float) *lp.w / *rp.f++;
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = (double) *lp.w / *rp.d++;
+	    *tp.d++ = (Double) *lp.w / *rp.d++;
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
 	    d.f = rp.cf->real*rp.cf->real
 	      + rp.cf->imaginary*rp.cf->imaginary;
 	    d.f = 1.0/d.f;
-	    re.f = ((float) *lp.w * rp.cf->real)*d.f;
-	    im.f = (-(float) *lp.w * rp.cf++->imaginary)*d.f;
+	    re.f = ((Float) *lp.w * rp.cf->real)*d.f;
+	    im.f = (-(Float) *lp.w * rp.cf++->imaginary)*d.f;
 	    tp.cf->real = re.f;
 	    tp.cf++->imaginary = im.f;
 	  }
@@ -4902,8 +4902,8 @@ void ana_div_sa(void)
 	    d.d = rp.cd->real*rp.cd->real
 	      + rp.cd->imaginary*rp.cd->imaginary;
 	    d.d = 1.0/d.d;
-	    re.d = ((double) *lp.w * rp.cd->real)*d.d;
-	    im.d = (-(double) *lp.w * rp.cd++->imaginary)*d.d;
+	    re.d = ((Double) *lp.w * rp.cd->real)*d.d;
+	    im.d = (-(Double) *lp.w * rp.cd++->imaginary)*d.d;
 	    tp.cd->real = re.d;
 	    tp.cd++->imaginary = im.d;
 	  }
@@ -4916,11 +4916,11 @@ void ana_div_sa(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = *lp.l / (int) *rp.b++;
+	    *tp.l++ = *lp.l / (Int) *rp.b++;
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = *lp.l / (int) *rp.w++;
+	    *tp.l++ = *lp.l / (Int) *rp.w++;
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
@@ -4928,19 +4928,19 @@ void ana_div_sa(void)
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.f++ = (float) *lp.l / *rp.f++;
+	    *tp.f++ = (Float) *lp.l / *rp.f++;
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = (double) *lp.l / *rp.d++;
+	    *tp.d++ = (Double) *lp.l / *rp.d++;
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
 	    d.f = rp.cf->real*rp.cf->real
 	      + rp.cf->imaginary*rp.cf->imaginary;
 	    d.f = 1.0/d.f;
-	    re.f = ((float) *lp.l * rp.cf->real)*d.f;
-	    im.f = (-(float) *lp.l * rp.cf++->imaginary)*d.f;
+	    re.f = ((Float) *lp.l * rp.cf->real)*d.f;
+	    im.f = (-(Float) *lp.l * rp.cf++->imaginary)*d.f;
 	    tp.cf->real = re.f;
 	    tp.cf++->imaginary = im.f;
 	  }
@@ -4950,8 +4950,8 @@ void ana_div_sa(void)
 	    d.d = rp.cd->real*rp.cd->real
 	      + rp.cd->imaginary*rp.cd->imaginary;
 	    d.d = 1.0/d.d;
-	    re.d = ((double) *lp.l * rp.cd->real)*d.d;
-	    im.d = (-(double) *lp.l * rp.cd++->imaginary)*d.d;
+	    re.d = ((Double) *lp.l * rp.cd->real)*d.d;
+	    im.d = (-(Double) *lp.l * rp.cd++->imaginary)*d.d;
 	    tp.cd->real = re.d;
 	    tp.cd++->imaginary = im.d;
 	  }
@@ -4964,15 +4964,15 @@ void ana_div_sa(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.f++ = *lp.f / (float) *rp.b++;
+	    *tp.f++ = *lp.f / (Float) *rp.b++;
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.f++ = *lp.f / (float) *rp.w++;
+	    *tp.f++ = *lp.f / (Float) *rp.w++;
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.f++ = *lp.f / (float) *rp.l++;
+	    *tp.f++ = *lp.f / (Float) *rp.l++;
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
@@ -4980,15 +4980,15 @@ void ana_div_sa(void)
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = (double) *lp.f / *rp.d++;
+	    *tp.d++ = (Double) *lp.f / *rp.d++;
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
 	    d.f = rp.cf->real*rp.cf->real
 	      + rp.cf->imaginary*rp.cf->imaginary;
 	    d.f = 1.0/d.f;
-	    re.f = ((float) *lp.f * rp.cf->real)*d.f;
-	    im.f = (-(float) *lp.f * rp.cf++->imaginary)*d.f;
+	    re.f = ((Float) *lp.f * rp.cf->real)*d.f;
+	    im.f = (-(Float) *lp.f * rp.cf++->imaginary)*d.f;
 	    tp.cf->real = re.f;
 	    tp.cf++->imaginary = im.f;
 	  }
@@ -4998,8 +4998,8 @@ void ana_div_sa(void)
 	    d.d = rp.cd->real*rp.cd->real
 	      + rp.cd->imaginary*rp.cd->imaginary;
 	    d.d = 1.0/d.d;
-	    re.d = ((double) *lp.f * rp.cd->real)*d.d;
-	    im.d = (-(double) *lp.f * rp.cd++->imaginary)*d.d;
+	    re.d = ((Double) *lp.f * rp.cd->real)*d.d;
+	    im.d = (-(Double) *lp.f * rp.cd++->imaginary)*d.d;
 	    tp.cd->real = re.d;
 	    tp.cd++->imaginary = im.d;
 	  }
@@ -5012,19 +5012,19 @@ void ana_div_sa(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.d++ = *lp.d / (double) *rp.b++;
+	    *tp.d++ = *lp.d / (Double) *rp.b++;
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.d++ = *lp.d / (double) *rp.w++;
+	    *tp.d++ = *lp.d / (Double) *rp.w++;
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.d++ = *lp.d / (double) *rp.l++;
+	    *tp.d++ = *lp.d / (Double) *rp.l++;
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.d++ = *lp.d / (double) *rp.f++;
+	    *tp.d++ = *lp.d / (Double) *rp.f++;
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
@@ -5032,11 +5032,11 @@ void ana_div_sa(void)
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
-	    d.d = (double) rp.cf->real*(double) rp.cf->real
-	     + (double) rp.cf->imaginary*(double) rp.cf->imaginary;
+	    d.d = (Double) rp.cf->real*(Double) rp.cf->real
+	     + (Double) rp.cf->imaginary*(Double) rp.cf->imaginary;
 	    d.d = 1.0/d.d;
-	    re.d = (*lp.d * (double) rp.cf->real)*d.d;
-	    im.d = (-*lp.d * (double) rp.cf++->imaginary)*d.d;
+	    re.d = (*lp.d * (Double) rp.cf->real)*d.d;
+	    im.d = (-*lp.d * (Double) rp.cf++->imaginary)*d.d;
 	    tp.cd->real = re.d;
 	    tp.cd++->imaginary = im.d;
 	  }
@@ -5060,21 +5060,21 @@ void ana_div_sa(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--) {
-	    d.f = 1.0/(float) *rp.b++;
+	    d.f = 1.0/(Float) *rp.b++;
 	    tp.cf->real = lp.cf->real*d.f;
 	    tp.cf++->imaginary = lp.cf->imaginary*d.f;
 	  }
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--) {
-	    d.f = 1.0/(float) *rp.w++;
+	    d.f = 1.0/(Float) *rp.w++;
 	    tp.cf->real = lp.cf->real*d.f;
 	    tp.cf++->imaginary = lp.cf->imaginary*d.f;
 	  }
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--) {
-	    d.f = 1.0/(float) *rp.l++;
+	    d.f = 1.0/(Float) *rp.l++;
 	    tp.cf->real = lp.cf->real*d.f;
 	    tp.cf++->imaginary = lp.cf->imaginary*d.f;
 	  }
@@ -5089,8 +5089,8 @@ void ana_div_sa(void)
 	case ANA_DOUBLE:
 	  while (nRepeat--) {
 	    d.d = 1.0/ *rp.d++;
-	    tp.cd->real = (double) lp.cf->real*d.d;
-	    tp.cd++->imaginary = (double) lp.cf->imaginary*d.d;
+	    tp.cd->real = (Double) lp.cf->real*d.d;
+	    tp.cd++->imaginary = (Double) lp.cf->imaginary*d.d;
 	  }
 	  break;
 	case ANA_CFLOAT:
@@ -5112,10 +5112,10 @@ void ana_div_sa(void)
 	    d.d = rp.cd->real*rp.cd->real
 	      + rp.cd->imaginary*rp.cd->imaginary;
 	    d.d = 1.0/d.d;
-	    re.d = ((double) lp.cf->real*rp.cd->real
-		    + (double) lp.cf->imaginary*rp.cd->imaginary)*d.d;
-	    im.d = ((double) lp.cf->imaginary*rp.cd->real
-		    - (double) lp.cf->real*rp.cd->imaginary)*d.d;
+	    re.d = ((Double) lp.cf->real*rp.cd->real
+		    + (Double) lp.cf->imaginary*rp.cd->imaginary)*d.d;
+	    im.d = ((Double) lp.cf->imaginary*rp.cd->real
+		    - (Double) lp.cf->real*rp.cd->imaginary)*d.d;
 	    tp.cd->real = re.d;
 	    tp.cd++->imaginary = im.d;
 	    rp.cd++;
@@ -5129,28 +5129,28 @@ void ana_div_sa(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--) {
-	    d.d = 1.0/(double) *rp.b++;
+	    d.d = 1.0/(Double) *rp.b++;
 	    tp.cd->real = lp.cd->real*d.d;
 	    tp.cd++->imaginary = lp.cd->imaginary*d.d;
 	  }
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--) {
-	    d.d = 1.0/(double) *rp.w++;
+	    d.d = 1.0/(Double) *rp.w++;
 	    tp.cd->real = lp.cd->real*d.d;
 	    tp.cd++->imaginary = lp.cd->imaginary*d.d;
 	  }
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--) {
-	    d.d = 1.0/(double) *rp.l++;
+	    d.d = 1.0/(Double) *rp.l++;
 	    tp.cd->real = lp.cd->real*d.d;
 	    tp.cd++->imaginary = lp.cd->imaginary*d.d;
 	  }
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--) {
-	    d.d = 1.0/(double) *rp.f++;
+	    d.d = 1.0/(Double) *rp.f++;
 	    tp.cd->real = lp.cd->real*d.d;
 	    tp.cd++->imaginary = lp.cd->imaginary*d.d;
 	  }
@@ -5164,13 +5164,13 @@ void ana_div_sa(void)
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
-	    d.d = (double) rp.cf->real*(double) rp.cf->real
-	      + (double) rp.cf->imaginary*(double) rp.cf->imaginary;
+	    d.d = (Double) rp.cf->real*(Double) rp.cf->real
+	      + (Double) rp.cf->imaginary*(Double) rp.cf->imaginary;
 	    d.d = 1.0/d.d;
-	    re.d = (lp.cd->real*(double) rp.cf->real
-		    + lp.cd->imaginary*(double) rp.cf->imaginary)*d.d;
-	    im.d = (lp.cd->imaginary*(double) rp.cf->real
-		    - lp.cd->real*(double) rp.cf->imaginary)*d.d;
+	    re.d = (lp.cd->real*(Double) rp.cf->real
+		    + lp.cd->imaginary*(Double) rp.cf->imaginary)*d.d;
+	    im.d = (lp.cd->imaginary*(Double) rp.cf->real
+		    - lp.cd->real*(Double) rp.cf->imaginary)*d.d;
 	    tp.cd->real = re.d;
 	    tp.cd++->imaginary = im.d;
 	    rp.cf++;
@@ -5737,9 +5737,9 @@ void ana_idiv_sa(void)
 }
 /*----------------------------------------------------------*/
 /* returns z = x mod y such that -|y|/2 < z <= |y|/2 */
-int iasmod(int x, int y)
+Int iasmod(Int x, Int y)
 {
-  int v;
+  Int v;
 
   if (!y)
     return 0;
@@ -5754,9 +5754,9 @@ int iasmod(int x, int y)
 }
 /*----------------------------------------------------------*/
 /* returns z = x mod y such that 0 <= z < |y| */
-double famod(double x, double y)
+Double famod(Double x, Double y)
 {
-  double v;
+  Double v;
 
   if (!y)
     return 0;
@@ -5769,9 +5769,9 @@ double famod(double x, double y)
 }
 /*----------------------------------------------------------*/
 /* returns z = x mod y such that -|y|/2 < z <= |y|/2 */
-double fasmod(double x, double y)
+Double fasmod(Double x, Double y)
 {
-  double v;
+  Double v;
 
   if (!y)
     return 0;
@@ -5790,8 +5790,8 @@ doubleComplex zamod(doubleComplex x, doubleComplex y)
   /* we formally define the modulus z1 amod z2 as
      z1 - n*z2 where n is the greatest integer not smaller
      than the real number closest to z2 */
-  double rx, ry, ax, ay, d;
-  int n;
+  Double rx, ry, ax, ay, d;
+  Int n;
   doubleComplex z;
 
   ry = hypot(y.real, y.imaginary);
@@ -5803,7 +5803,7 @@ doubleComplex zamod(doubleComplex x, doubleComplex y)
     ax = atan2(x.imaginary, x.real);
   
     d = rx/ry*cos(ax - ay);
-    n = (int) d;
+    n = (Int) d;
     if (d < 0)
       n--;
     z.real = x.real - n*y.real;
@@ -8479,25 +8479,25 @@ void ana_max(void)
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.w++ = ((value1.w = (word) *lp.b++) > (value2.w = *rp.w++))?
+	    *tp.w++ = ((value1.w = (Word) *lp.b++) > (value2.w = *rp.w++))?
 	      value1.w:
 	      value2.w;
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = ((value1.l = (int) *lp.b++) > (value2.l = *rp.l++))?
+	    *tp.l++ = ((value1.l = (Int) *lp.b++) > (value2.l = *rp.l++))?
 	      value1.l:
 	      value2.l;
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.f++ = ((value1.f = (float) *lp.b++) > (value2.f = *rp.f++))?
+	    *tp.f++ = ((value1.f = (Float) *lp.b++) > (value2.f = *rp.f++))?
 	      value1.f:
 	      value2.f;
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = ((value1.d = (double) *lp.b++) > (value2.d = *rp.d++))?
+	    *tp.d++ = ((value1.d = (Double) *lp.b++) > (value2.d = *rp.d++))?
 	      value1.d:
 	      value2.d;
 	  break;
@@ -8537,7 +8537,7 @@ void ana_max(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.w++ = ((value1.w = *lp.w++) > (value2.w = (word) *rp.b++))?
+	    *tp.w++ = ((value1.w = *lp.w++) > (value2.w = (Word) *rp.b++))?
 	      value1.w:
 	      value2.w;
 	  break;
@@ -8549,19 +8549,19 @@ void ana_max(void)
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = ((value1.l = (int) *lp.w++) > (value2.l = *rp.l++))?
+	    *tp.l++ = ((value1.l = (Int) *lp.w++) > (value2.l = *rp.l++))?
 	      value1.l:
 	      value2.l;
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.f++ = ((value1.f = (float) *lp.w++) > (value2.f = *rp.f++))?
+	    *tp.f++ = ((value1.f = (Float) *lp.w++) > (value2.f = *rp.f++))?
 	      value1.f:
 	      value2.f;
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = ((value1.d = (double) *lp.w++) > (value2.d = *rp.d++))?
+	    *tp.d++ = ((value1.d = (Double) *lp.w++) > (value2.d = *rp.d++))?
 	      value1.d:
 	      value2.d;
 	  break;
@@ -8601,13 +8601,13 @@ void ana_max(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = ((value1.l = *lp.l++) > (value2.l = (int) *rp.b++))?
+	    *tp.l++ = ((value1.l = *lp.l++) > (value2.l = (Int) *rp.b++))?
 	      value1.l:
 	      value2.l;
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = ((value1.l = *lp.l++) > (value2.l = (int) *rp.w++))?
+	    *tp.l++ = ((value1.l = *lp.l++) > (value2.l = (Int) *rp.w++))?
 	      value1.l:
 	      value2.l;
 	  break;
@@ -8619,13 +8619,13 @@ void ana_max(void)
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.f++ = ((value1.f = (float) *lp.l++) > (value2.f = *rp.f++))?
+	    *tp.f++ = ((value1.f = (Float) *lp.l++) > (value2.f = *rp.f++))?
 	      value1.f:
 	      value2.f;
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = ((value1.d = (double) *lp.l++) > (value2.d = *rp.d++))?
+	    *tp.d++ = ((value1.d = (Double) *lp.l++) > (value2.d = *rp.d++))?
 	      value1.d:
 	      value2.d;
 	  break;
@@ -8665,19 +8665,19 @@ void ana_max(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.f++ = ((value1.f = *lp.f++) > (value2.f = (float) *rp.b++))?
+	    *tp.f++ = ((value1.f = *lp.f++) > (value2.f = (Float) *rp.b++))?
 	      value1.f:
 	      value2.f;
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.f++ = ((value1.f = *lp.f++) > (value2.f = (float) *rp.w++))?
+	    *tp.f++ = ((value1.f = *lp.f++) > (value2.f = (Float) *rp.w++))?
 	      value1.f:
 	      value2.f;
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.f++ = ((value1.f = *lp.f++) > (value2.f = (float) *rp.l++))?
+	    *tp.f++ = ((value1.f = *lp.f++) > (value2.f = (Float) *rp.l++))?
 	      value1.f:
 	      value2.f;
 	  break;
@@ -8689,7 +8689,7 @@ void ana_max(void)
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = ((value1.d = (double) *lp.f++) > (value2.d = *rp.d++))?
+	    *tp.d++ = ((value1.d = (Double) *lp.f++) > (value2.d = *rp.d++))?
 	      value1.d:
 	      value2.d;
 	  break;
@@ -8729,25 +8729,25 @@ void ana_max(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.d++ = ((value1.d = *lp.d++) > (value2.d = (double) *rp.b++))?
+	    *tp.d++ = ((value1.d = *lp.d++) > (value2.d = (Double) *rp.b++))?
 	      value1.d:
 	      value2.d;
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.d++ = ((value1.d = *lp.d++) > (value2.d = (double) *rp.w++))?
+	    *tp.d++ = ((value1.d = *lp.d++) > (value2.d = (Double) *rp.w++))?
 	      value1.d:
 	      value2.d;
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.d++ = ((value1.d = *lp.d++) > (value2.d = (double) *rp.l++))?
+	    *tp.d++ = ((value1.d = *lp.d++) > (value2.d = (Double) *rp.l++))?
 	      value1.d:
 	      value2.d;
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.d++ = ((value1.d = *lp.d++) > (value2.d = (double) *rp.f++))?
+	    *tp.d++ = ((value1.d = *lp.d++) > (value2.d = (Double) *rp.f++))?
 	      value1.d:
 	      value2.d;
 	  break;
@@ -9088,7 +9088,7 @@ void ana_max_as(void)
     case ANA_WORD:
       switch (rhsType) {
 	case ANA_BYTE:
-	  value2.w = (word) *rp.b;  while (nRepeat--)
+	  value2.w = (Word) *rp.b;  while (nRepeat--)
 	    *tp.w++ = ((value1.w = *lp.w++) > value2.w)?
 	      value1.w:
 	      value2.w;
@@ -9101,19 +9101,19 @@ void ana_max_as(void)
 	  break;
 	case ANA_LONG:
 	  value2.l = *rp.l;  while (nRepeat--)
-	    *tp.l++ = ((value1.l = (int) *lp.w++) > value2.l)?
+	    *tp.l++ = ((value1.l = (Int) *lp.w++) > value2.l)?
 	      value1.l:
 	      value2.l;
 	  break;
 	case ANA_FLOAT:
 	  value2.f = *rp.f;  while (nRepeat--)
-	    *tp.f++ = ((value1.f = (float) *lp.w++) > value2.f)?
+	    *tp.f++ = ((value1.f = (Float) *lp.w++) > value2.f)?
 	      value1.f:
 	      value2.f;
 	  break;
 	case ANA_DOUBLE:
 	  value2.d = *rp.d;  while (nRepeat--)
-	    *tp.d++ = ((value1.d = (double) *lp.w++) > value2.d)?
+	    *tp.d++ = ((value1.d = (Double) *lp.w++) > value2.d)?
 	      value1.d:
 	      value2.d;
 	  break;
@@ -9154,13 +9154,13 @@ void ana_max_as(void)
     case ANA_LONG:
       switch (rhsType) {
 	case ANA_BYTE:
-	  value2.l = (int) *rp.b;  while (nRepeat--)
+	  value2.l = (Int) *rp.b;  while (nRepeat--)
 	    *tp.l++ = ((value1.l = *lp.l++) > value2.l)?
 	      value1.l:
 	      value2.l;
 	  break;
 	case ANA_WORD:
-	  value2.l = (int) *rp.w;  while (nRepeat--)
+	  value2.l = (Int) *rp.w;  while (nRepeat--)
 	    *tp.l++ = ((value1.l = *lp.l++) > value2.l)?
 	      value1.l:
 	      value2.l;
@@ -9173,13 +9173,13 @@ void ana_max_as(void)
 	  break;
 	case ANA_FLOAT:
 	  value2.f = *rp.f;  while (nRepeat--)
-	    *tp.f++ = ((value1.f = (float) *lp.l++) > value2.f)?
+	    *tp.f++ = ((value1.f = (Float) *lp.l++) > value2.f)?
 	      value1.f:
 	      value2.f;
 	  break;
 	case ANA_DOUBLE:
 	  value2.d = *rp.d;  while (nRepeat--)
-	    *tp.d++ = ((value1.d = (double) *lp.l++) > value2.d)?
+	    *tp.d++ = ((value1.d = (Double) *lp.l++) > value2.d)?
 	      value1.d:
 	      value2.d;
 	  break;
@@ -9220,19 +9220,19 @@ void ana_max_as(void)
     case ANA_FLOAT:
       switch (rhsType) {
 	case ANA_BYTE:
-	  value2.f = (float) *rp.b;  while (nRepeat--)
+	  value2.f = (Float) *rp.b;  while (nRepeat--)
 	    *tp.f++ = ((value1.f = *lp.f++) > value2.f)?
 	      value1.f:
 	      value2.f;
 	  break;
 	case ANA_WORD:
-	  value2.f = (float) *rp.w;  while (nRepeat--)
+	  value2.f = (Float) *rp.w;  while (nRepeat--)
 	    *tp.f++ = ((value1.f = *lp.f++) > value2.f)?
 	      value1.f:
 	      value2.f;
 	  break;
 	case ANA_LONG:
-	  value2.f = (float) *rp.l;  while (nRepeat--)
+	  value2.f = (Float) *rp.l;  while (nRepeat--)
 	    *tp.f++ = ((value1.f = *lp.f++) > value2.f)?
 	      value1.f:
 	      value2.f;
@@ -9245,7 +9245,7 @@ void ana_max_as(void)
 	  break;
 	case ANA_DOUBLE:
 	  value2.d = *rp.d;  while (nRepeat--)
-	    *tp.d++ = ((value1.d = (double) *lp.f++) > value2.d)?
+	    *tp.d++ = ((value1.d = (Double) *lp.f++) > value2.d)?
 	      value1.d:
 	      value2.d;
 	  break;
@@ -9286,25 +9286,25 @@ void ana_max_as(void)
     case ANA_DOUBLE:
       switch (rhsType) {
 	case ANA_BYTE:
-	  value2.d = (double) *rp.b;  while (nRepeat--)
+	  value2.d = (Double) *rp.b;  while (nRepeat--)
 	    *tp.d++ = ((value1.d = *lp.d++) > value2.d)?
 	      value1.d:
 	      value2.d;
 	  break;
 	case ANA_WORD:
-	  value2.d = (double) *rp.w;  while (nRepeat--)
+	  value2.d = (Double) *rp.w;  while (nRepeat--)
 	    *tp.d++ = ((value1.d = *lp.d++) > value2.d)?
 	      value1.d:
 	      value2.d;
 	  break;
 	case ANA_LONG:
-	  value2.d = (double) *rp.l;  while (nRepeat--)
+	  value2.d = (Double) *rp.l;  while (nRepeat--)
 	    *tp.d++ = ((value1.d = *lp.d++) > value2.d)?
 	      value1.d:
 	      value2.d;
 	  break;
 	case ANA_FLOAT:
-	  value2.d = (double) *rp.f;  while (nRepeat--)
+	  value2.d = (Double) *rp.f;  while (nRepeat--)
 	    *tp.d++ = ((value1.d = *lp.d++) > value2.d)?
 	      value1.d:
 	      value2.d;
@@ -9585,7 +9585,7 @@ void ana_max_sa(void)
      /* is commutative, we just swap LHS and RHS and pass on to */
      /* ana_max_as() */
 {
-  int		temp;
+  Int		temp;
   pointer	tempp;
   
   temp = lhsType;
@@ -9619,25 +9619,25 @@ void ana_min(void)
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.w++ = ((value1.w = (word) *lp.b++) < (value2.w = *rp.w++))?
+	    *tp.w++ = ((value1.w = (Word) *lp.b++) < (value2.w = *rp.w++))?
 	      value1.w:
 	      value2.w;
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = ((value1.l = (int) *lp.b++) < (value2.l = *rp.l++))?
+	    *tp.l++ = ((value1.l = (Int) *lp.b++) < (value2.l = *rp.l++))?
 	      value1.l:
 	      value2.l;
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.f++ = ((value1.f = (float) *lp.b++) < (value2.f = *rp.f++))?
+	    *tp.f++ = ((value1.f = (Float) *lp.b++) < (value2.f = *rp.f++))?
 	      value1.f:
 	      value2.f;
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = ((value1.d = (double) *lp.b++) < (value2.d = *rp.d++))?
+	    *tp.d++ = ((value1.d = (Double) *lp.b++) < (value2.d = *rp.d++))?
 	      value1.d:
 	      value2.d;
 	  break;
@@ -9677,7 +9677,7 @@ void ana_min(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.w++ = ((value1.w = *lp.w++) < (value2.w = (word) *rp.b++))?
+	    *tp.w++ = ((value1.w = *lp.w++) < (value2.w = (Word) *rp.b++))?
 	      value1.w:
 	      value2.w;
 	  break;
@@ -9689,19 +9689,19 @@ void ana_min(void)
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = ((value1.l = (int) *lp.w++) < (value2.l = *rp.l++))?
+	    *tp.l++ = ((value1.l = (Int) *lp.w++) < (value2.l = *rp.l++))?
 	      value1.l:
 	      value2.l;
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.f++ = ((value1.f = (float) *lp.w++) < (value2.f = *rp.f++))?
+	    *tp.f++ = ((value1.f = (Float) *lp.w++) < (value2.f = *rp.f++))?
 	      value1.f:
 	      value2.f;
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = ((value1.d = (double) *lp.w++) < (value2.d = *rp.d++))?
+	    *tp.d++ = ((value1.d = (Double) *lp.w++) < (value2.d = *rp.d++))?
 	      value1.d:
 	      value2.d;
 	  break;
@@ -9741,13 +9741,13 @@ void ana_min(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = ((value1.l = *lp.l++) < (value2.l = (int) *rp.b++))?
+	    *tp.l++ = ((value1.l = *lp.l++) < (value2.l = (Int) *rp.b++))?
 	      value1.l:
 	      value2.l;
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = ((value1.l = *lp.l++) < (value2.l = (int) *rp.w++))?
+	    *tp.l++ = ((value1.l = *lp.l++) < (value2.l = (Int) *rp.w++))?
 	      value1.l:
 	      value2.l;
 	  break;
@@ -9759,13 +9759,13 @@ void ana_min(void)
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.f++ = ((value1.f = (float) *lp.l++) < (value2.f = *rp.f++))?
+	    *tp.f++ = ((value1.f = (Float) *lp.l++) < (value2.f = *rp.f++))?
 	      value1.f:
 	      value2.f;
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = ((value1.d = (double) *lp.l++) < (value2.d = *rp.d++))?
+	    *tp.d++ = ((value1.d = (Double) *lp.l++) < (value2.d = *rp.d++))?
 	      value1.d:
 	      value2.d;
 	  break;
@@ -9805,19 +9805,19 @@ void ana_min(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.f++ = ((value1.f = *lp.f++) < (value2.f = (float) *rp.b++))?
+	    *tp.f++ = ((value1.f = *lp.f++) < (value2.f = (Float) *rp.b++))?
 	      value1.f:
 	      value2.f;
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.f++ = ((value1.f = *lp.f++) < (value2.f = (float) *rp.w++))?
+	    *tp.f++ = ((value1.f = *lp.f++) < (value2.f = (Float) *rp.w++))?
 	      value1.f:
 	      value2.f;
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.f++ = ((value1.f = *lp.f++) < (value2.f = (float) *rp.l++))?
+	    *tp.f++ = ((value1.f = *lp.f++) < (value2.f = (Float) *rp.l++))?
 	      value1.f:
 	      value2.f;
 	  break;
@@ -9829,7 +9829,7 @@ void ana_min(void)
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.d++ = ((value1.d = (double) *lp.f++) < (value2.d = *rp.d++))?
+	    *tp.d++ = ((value1.d = (Double) *lp.f++) < (value2.d = *rp.d++))?
 	      value1.d:
 	      value2.d;
 	  break;
@@ -9869,25 +9869,25 @@ void ana_min(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.d++ = ((value1.d = *lp.d++) < (value2.d = (double) *rp.b++))?
+	    *tp.d++ = ((value1.d = *lp.d++) < (value2.d = (Double) *rp.b++))?
 	      value1.d:
 	      value2.d;
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.d++ = ((value1.d = *lp.d++) < (value2.d = (double) *rp.w++))?
+	    *tp.d++ = ((value1.d = *lp.d++) < (value2.d = (Double) *rp.w++))?
 	      value1.d:
 	      value2.d;
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.d++ = ((value1.d = *lp.d++) < (value2.d = (double) *rp.l++))?
+	    *tp.d++ = ((value1.d = *lp.d++) < (value2.d = (Double) *rp.l++))?
 	      value1.d:
 	      value2.d;
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.d++ = ((value1.d = *lp.d++) < (value2.d = (double) *rp.f++))?
+	    *tp.d++ = ((value1.d = *lp.d++) < (value2.d = (Double) *rp.f++))?
 	      value1.d:
 	      value2.d;
 	  break;
@@ -10228,7 +10228,7 @@ void ana_min_as(void)
     case ANA_WORD:
       switch (rhsType) {
 	case ANA_BYTE:
-	  value2.w = (word) *rp.b;  while (nRepeat--)
+	  value2.w = (Word) *rp.b;  while (nRepeat--)
 	    *tp.w++ = ((value1.w = *lp.w++) < value2.w)?
 	      value1.w:
 	      value2.w;
@@ -10241,19 +10241,19 @@ void ana_min_as(void)
 	  break;
 	case ANA_LONG:
 	  value2.l = *rp.l;  while (nRepeat--)
-	    *tp.l++ = ((value1.l = (int) *lp.w++) < value2.l)?
+	    *tp.l++ = ((value1.l = (Int) *lp.w++) < value2.l)?
 	      value1.l:
 	      value2.l;
 	  break;
 	case ANA_FLOAT:
 	  value2.f = *rp.f;  while (nRepeat--)
-	    *tp.f++ = ((value1.f = (float) *lp.w++) < value2.f)?
+	    *tp.f++ = ((value1.f = (Float) *lp.w++) < value2.f)?
 	      value1.f:
 	      value2.f;
 	  break;
 	case ANA_DOUBLE:
 	  value2.d = *rp.d;  while (nRepeat--)
-	    *tp.d++ = ((value1.d = (double) *lp.w++) < value2.d)?
+	    *tp.d++ = ((value1.d = (Double) *lp.w++) < value2.d)?
 	      value1.d:
 	      value2.d;
 	  break;
@@ -10294,13 +10294,13 @@ void ana_min_as(void)
     case ANA_LONG:
       switch (rhsType) {
 	case ANA_BYTE:
-	  value2.l = (int) *rp.b;  while (nRepeat--)
+	  value2.l = (Int) *rp.b;  while (nRepeat--)
 	    *tp.l++ = ((value1.l = *lp.l++) < value2.l)?
 	      value1.l:
 	      value2.l;
 	  break;
 	case ANA_WORD:
-	  value2.l = (int) *rp.w;  while (nRepeat--)
+	  value2.l = (Int) *rp.w;  while (nRepeat--)
 	    *tp.l++ = ((value1.l = *lp.l++) < value2.l)?
 	      value1.l:
 	      value2.l;
@@ -10313,13 +10313,13 @@ void ana_min_as(void)
 	  break;
 	case ANA_FLOAT:
 	  value2.f = *rp.f;  while (nRepeat--)
-	    *tp.f++ = ((value1.f = (float) *lp.l++) < value2.f)?
+	    *tp.f++ = ((value1.f = (Float) *lp.l++) < value2.f)?
 	      value1.f:
 	      value2.f;
 	  break;
 	case ANA_DOUBLE:
 	  value2.d = *rp.d;  while (nRepeat--)
-	    *tp.d++ = ((value1.d = (double) *lp.l++) < value2.d)?
+	    *tp.d++ = ((value1.d = (Double) *lp.l++) < value2.d)?
 	      value1.d:
 	      value2.d;
 	  break;
@@ -10360,19 +10360,19 @@ void ana_min_as(void)
     case ANA_FLOAT:
       switch (rhsType) {
 	case ANA_BYTE:
-	  value2.f = (float) *rp.b;  while (nRepeat--)
+	  value2.f = (Float) *rp.b;  while (nRepeat--)
 	    *tp.f++ = ((value1.f = *lp.f++) < value2.f)?
 	      value1.f:
 	      value2.f;
 	  break;
 	case ANA_WORD:
-	  value2.f = (float) *rp.w;  while (nRepeat--)
+	  value2.f = (Float) *rp.w;  while (nRepeat--)
 	    *tp.f++ = ((value1.f = *lp.f++) < value2.f)?
 	      value1.f:
 	      value2.f;
 	  break;
 	case ANA_LONG:
-	  value2.f = (float) *rp.l;  while (nRepeat--)
+	  value2.f = (Float) *rp.l;  while (nRepeat--)
 	    *tp.f++ = ((value1.f = *lp.f++) < value2.f)?
 	      value1.f:
 	      value2.f;
@@ -10385,7 +10385,7 @@ void ana_min_as(void)
 	  break;
 	case ANA_DOUBLE:
 	  value2.d = *rp.d;  while (nRepeat--)
-	    *tp.d++ = ((value1.d = (double) *lp.f++) < value2.d)?
+	    *tp.d++ = ((value1.d = (Double) *lp.f++) < value2.d)?
 	      value1.d:
 	      value2.d;
 	  break;
@@ -10426,25 +10426,25 @@ void ana_min_as(void)
     case ANA_DOUBLE:
       switch (rhsType) {
 	case ANA_BYTE:
-	  value2.d = (double) *rp.b;  while (nRepeat--)
+	  value2.d = (Double) *rp.b;  while (nRepeat--)
 	    *tp.d++ = ((value1.d = *lp.d++) < value2.d)?
 	      value1.d:
 	      value2.d;
 	  break;
 	case ANA_WORD:
-	  value2.d = (double) *rp.w;  while (nRepeat--)
+	  value2.d = (Double) *rp.w;  while (nRepeat--)
 	    *tp.d++ = ((value1.d = *lp.d++) < value2.d)?
 	      value1.d:
 	      value2.d;
 	  break;
 	case ANA_LONG:
-	  value2.d = (double) *rp.l;  while (nRepeat--)
+	  value2.d = (Double) *rp.l;  while (nRepeat--)
 	    *tp.d++ = ((value1.d = *lp.d++) < value2.d)?
 	      value1.d:
 	      value2.d;
 	  break;
 	case ANA_FLOAT:
-	  value2.d = (double) *rp.f;  while (nRepeat--)
+	  value2.d = (Double) *rp.f;  while (nRepeat--)
 	    *tp.d++ = ((value1.d = *lp.d++) < value2.d)?
 	      value1.d:
 	      value2.d;
@@ -10725,7 +10725,7 @@ void ana_min_sa(void)
      /* is commutative we just swap LHS and RHS and pass on to */
      /* ana_min_as() */
 {
-  int		temp;
+  Int		temp;
   pointer	tempp;
   
   temp = lhsType;
@@ -10791,23 +10791,23 @@ void ana_eq(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.w++ == (word) *rp.b++);
+	    *tp.l++ = (*lp.w++ == (Word) *rp.b++);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.w++ == (word) *rp.w++);
+	    *tp.l++ = (*lp.w++ == (Word) *rp.w++);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.w++ == (word) *rp.l++);
+	    *tp.l++ = (*lp.w++ == (Word) *rp.l++);
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.w++ == (word) *rp.f++);
+	    *tp.l++ = (*lp.w++ == (Word) *rp.f++);
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.w++ == (word) *rp.d++);
+	    *tp.l++ = (*lp.w++ == (Word) *rp.d++);
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
@@ -10831,11 +10831,11 @@ void ana_eq(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.l++ == (int) *rp.b++);
+	    *tp.l++ = (*lp.l++ == (Int) *rp.b++);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.l++ == (int) *rp.w++);
+	    *tp.l++ = (*lp.l++ == (Int) *rp.w++);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
@@ -10843,11 +10843,11 @@ void ana_eq(void)
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.l++ = ((float) *lp.l++ == *rp.f++);
+	    *tp.l++ = ((Float) *lp.l++ == *rp.f++);
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.l++ = ((double) *lp.l++ == *rp.d++);
+	    *tp.l++ = ((Double) *lp.l++ == *rp.d++);
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
@@ -10871,15 +10871,15 @@ void ana_eq(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.f++ == (float) *rp.b++);
+	    *tp.l++ = (*lp.f++ == (Float) *rp.b++);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.f++ == (float) *rp.w++);
+	    *tp.l++ = (*lp.f++ == (Float) *rp.w++);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.f++ == (float) *rp.l++);
+	    *tp.l++ = (*lp.f++ == (Float) *rp.l++);
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
@@ -10887,7 +10887,7 @@ void ana_eq(void)
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.l++ = ((double) *lp.f++ == *rp.d++);
+	    *tp.l++ = ((Double) *lp.f++ == *rp.d++);
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
@@ -10911,19 +10911,19 @@ void ana_eq(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.d++ == (double) *rp.b++);
+	    *tp.l++ = (*lp.d++ == (Double) *rp.b++);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.d++ == (double) *rp.w++);
+	    *tp.l++ = (*lp.d++ == (Double) *rp.w++);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.d++ == (double) *rp.l++);
+	    *tp.l++ = (*lp.d++ == (Double) *rp.l++);
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.d++ == (double) *rp.f++);
+	    *tp.l++ = (*lp.d++ == (Double) *rp.f++);
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
@@ -11085,19 +11085,19 @@ void ana_eq_as(void)
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = ((word) *lp.b++ == *rp.w);
+	    *tp.l++ = ((Word) *lp.b++ == *rp.w);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = ((int) *lp.b++ == *rp.l);
+	    *tp.l++ = ((Int) *lp.b++ == *rp.l);
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.l++ = ((float) *lp.b++ == *rp.f);
+	    *tp.l++ = ((Float) *lp.b++ == *rp.f);
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.l++ = ((double) *lp.b++ == *rp.d);
+	    *tp.l++ = ((Double) *lp.b++ == *rp.d);
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--)
@@ -11115,7 +11115,7 @@ void ana_eq_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.w++ == (word) *rp.b);
+	    *tp.l++ = (*lp.w++ == (Word) *rp.b);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
@@ -11123,15 +11123,15 @@ void ana_eq_as(void)
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = ((int) *lp.w++ == *rp.l);
+	    *tp.l++ = ((Int) *lp.w++ == *rp.l);
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.l++ = ((float) *lp.w++ == *rp.f);
+	    *tp.l++ = ((Float) *lp.w++ == *rp.f);
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.l++ = ((double) *lp.w++ == *rp.d);
+	    *tp.l++ = ((Double) *lp.w++ == *rp.d);
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--)
@@ -11149,11 +11149,11 @@ void ana_eq_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.l++ == (int) *rp.b);
+	    *tp.l++ = (*lp.l++ == (Int) *rp.b);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.l++ == (int) *rp.w);
+	    *tp.l++ = (*lp.l++ == (Int) *rp.w);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
@@ -11161,11 +11161,11 @@ void ana_eq_as(void)
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.l++ = ((float) *lp.l++ == *rp.f);
+	    *tp.l++ = ((Float) *lp.l++ == *rp.f);
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.l++ = ((double) *lp.l++ == *rp.d);
+	    *tp.l++ = ((Double) *lp.l++ == *rp.d);
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--)
@@ -11183,15 +11183,15 @@ void ana_eq_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.f++ == (float) *rp.b);
+	    *tp.l++ = (*lp.f++ == (Float) *rp.b);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.f++ == (float) *rp.w);
+	    *tp.l++ = (*lp.f++ == (Float) *rp.w);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.f++ == (float) *rp.l);
+	    *tp.l++ = (*lp.f++ == (Float) *rp.l);
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
@@ -11199,7 +11199,7 @@ void ana_eq_as(void)
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.l++ = ((double) *lp.f++ == *rp.d);
+	    *tp.l++ = ((Double) *lp.f++ == *rp.d);
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--)
@@ -11217,19 +11217,19 @@ void ana_eq_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.d++ == (double) *rp.b);
+	    *tp.l++ = (*lp.d++ == (Double) *rp.b);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.d++ == (double) *rp.w);
+	    *tp.l++ = (*lp.d++ == (Double) *rp.w);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.d++ == (double) *rp.l);
+	    *tp.l++ = (*lp.d++ == (Double) *rp.l);
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.d++ == (double) *rp.f); 
+	    *tp.l++ = (*lp.d++ == (Double) *rp.f); 
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
@@ -11328,7 +11328,7 @@ void ana_eq_sa(void)
      /* equal-to with scalar LHS and array RHS; a commutative operation, */
      /* so we swap LHS and RHS and pass on to ana_eq_as() */
 {
-  int		temp;
+  Int		temp;
   pointer	tempp;
   
   temp = lhsType;
@@ -11358,19 +11358,19 @@ void ana_gt(void)
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = ((word) *lp.b++ > *rp.w++);
+	    *tp.l++ = ((Word) *lp.b++ > *rp.w++);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = ((int) *lp.b++ > *rp.l++);
+	    *tp.l++ = ((Int) *lp.b++ > *rp.l++);
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.l++ = ((float) *lp.b++ > *rp.f++);
+	    *tp.l++ = ((Float) *lp.b++ > *rp.f++);
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.l++ = ((double) *lp.b++ > *rp.d++);
+	    *tp.l++ = ((Double) *lp.b++ > *rp.d++);
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
@@ -11394,7 +11394,7 @@ void ana_gt(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.w++ > (word) *rp.b++);
+	    *tp.l++ = (*lp.w++ > (Word) *rp.b++);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
@@ -11402,15 +11402,15 @@ void ana_gt(void)
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = ((int) *lp.w++ > *rp.l++);
+	    *tp.l++ = ((Int) *lp.w++ > *rp.l++);
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.l++ = ((float) *lp.w++ > *rp.f++);
+	    *tp.l++ = ((Float) *lp.w++ > *rp.f++);
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.l++ = ((double) *lp.w++ > *rp.d++);
+	    *tp.l++ = ((Double) *lp.w++ > *rp.d++);
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
@@ -11434,11 +11434,11 @@ void ana_gt(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.l++ > (int) *rp.b++);
+	    *tp.l++ = (*lp.l++ > (Int) *rp.b++);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.l++ > (int) *rp.w++);
+	    *tp.l++ = (*lp.l++ > (Int) *rp.w++);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
@@ -11446,11 +11446,11 @@ void ana_gt(void)
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.l++ = ((float) *lp.l++ > *rp.f++);
+	    *tp.l++ = ((Float) *lp.l++ > *rp.f++);
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.l++ = ((double) *lp.l++ > *rp.d++);
+	    *tp.l++ = ((Double) *lp.l++ > *rp.d++);
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
@@ -11474,15 +11474,15 @@ void ana_gt(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.f++ > (float) *rp.b++);
+	    *tp.l++ = (*lp.f++ > (Float) *rp.b++);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.f++ > (float) *rp.w++);
+	    *tp.l++ = (*lp.f++ > (Float) *rp.w++);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.f++ > (float) *rp.l++);
+	    *tp.l++ = (*lp.f++ > (Float) *rp.l++);
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
@@ -11490,7 +11490,7 @@ void ana_gt(void)
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.l++ = ((double) *lp.f++ > *rp.d++);
+	    *tp.l++ = ((Double) *lp.f++ > *rp.d++);
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
@@ -11514,19 +11514,19 @@ void ana_gt(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.d++ > (double) *rp.b++);
+	    *tp.l++ = (*lp.d++ > (Double) *rp.b++);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.d++ > (double) *rp.w++);
+	    *tp.l++ = (*lp.d++ > (Double) *rp.w++);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.d++ > (double) *rp.l++);
+	    *tp.l++ = (*lp.d++ > (Double) *rp.l++);
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.d++ > (double) *rp.f++);
+	    *tp.l++ = (*lp.d++ > (Double) *rp.f++);
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
@@ -11697,7 +11697,7 @@ void ana_gt(void)
 void ana_gt_as(void)
      /* greater-than with array LHS and scalar RHS */
 {
-  double	value;
+  Double	value;
 
   switch (lhsType) {
     case ANA_BYTE:
@@ -11708,19 +11708,19 @@ void ana_gt_as(void)
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = ((word) *lp.b++ > *rp.w);
+	    *tp.l++ = ((Word) *lp.b++ > *rp.w);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = ((int) *lp.b++ > *rp.l);
+	    *tp.l++ = ((Int) *lp.b++ > *rp.l);
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.l++ = ((float) *lp.b++ > *rp.f);
+	    *tp.l++ = ((Float) *lp.b++ > *rp.f);
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.l++ = ((double) *lp.b++ > *rp.d);
+	    *tp.l++ = ((Double) *lp.b++ > *rp.d);
 	  break;
 	case ANA_CFLOAT:
 	  value = rp.cf->real*rp.cf->real;
@@ -11744,7 +11744,7 @@ void ana_gt_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.w++ > (word) *rp.b);
+	    *tp.l++ = (*lp.w++ > (Word) *rp.b);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
@@ -11752,15 +11752,15 @@ void ana_gt_as(void)
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = ((int) *lp.w++ > *rp.l);
+	    *tp.l++ = ((Int) *lp.w++ > *rp.l);
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.l++ = ((float) *lp.w++ > *rp.f);
+	    *tp.l++ = ((Float) *lp.w++ > *rp.f);
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.l++ = ((double) *lp.w++ > *rp.d);
+	    *tp.l++ = ((Double) *lp.w++ > *rp.d);
 	  break;
 	case ANA_CFLOAT:
 	  value = rp.cf->real*rp.cf->real;
@@ -11784,11 +11784,11 @@ void ana_gt_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.l++ > (int) *rp.b);
+	    *tp.l++ = (*lp.l++ > (Int) *rp.b);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.l++ > (int) *rp.w);
+	    *tp.l++ = (*lp.l++ > (Int) *rp.w);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
@@ -11796,11 +11796,11 @@ void ana_gt_as(void)
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.l++ = ((float) *lp.l++ > *rp.f);
+	    *tp.l++ = ((Float) *lp.l++ > *rp.f);
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.l++ = ((double) *lp.l++ > *rp.d);
+	    *tp.l++ = ((Double) *lp.l++ > *rp.d);
 	  break;
 	case ANA_CFLOAT:
 	  value = rp.cf->real*rp.cf->real;
@@ -11824,15 +11824,15 @@ void ana_gt_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.f++ > (float) *rp.b);
+	    *tp.l++ = (*lp.f++ > (Float) *rp.b);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.f++ > (float) *rp.w);
+	    *tp.l++ = (*lp.f++ > (Float) *rp.w);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.f++ > (float) *rp.l);
+	    *tp.l++ = (*lp.f++ > (Float) *rp.l);
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
@@ -11840,7 +11840,7 @@ void ana_gt_as(void)
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.l++ = ((double) *lp.f++ > *rp.d);
+	    *tp.l++ = ((Double) *lp.f++ > *rp.d);
 	  break;
 	case ANA_CFLOAT:
 	  value = rp.cf->real*rp.cf->real;
@@ -11864,19 +11864,19 @@ void ana_gt_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.d++ > (double) *rp.b);
+	    *tp.l++ = (*lp.d++ > (Double) *rp.b);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.d++ > (double) *rp.w);
+	    *tp.l++ = (*lp.d++ > (Double) *rp.w);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.d++ > (double) *rp.l);
+	    *tp.l++ = (*lp.d++ > (Double) *rp.l);
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.d++ > (double) *rp.f);
+	    *tp.l++ = (*lp.d++ > (Double) *rp.f);
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
@@ -12026,7 +12026,7 @@ void ana_gt_as(void)
 void ana_gt_sa(void)
      /* greater-than with scalar LHS and array RHS */
 {
-  double	value;
+  Double	value;
 
   switch (lhsType) {
     case ANA_BYTE:
@@ -12037,19 +12037,19 @@ void ana_gt_sa(void)
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = ((word) *lp.b > *rp.w++);
+	    *tp.l++ = ((Word) *lp.b > *rp.w++);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = ((int) *lp.b > *rp.l++);
+	    *tp.l++ = ((Int) *lp.b > *rp.l++);
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.l++ = ((float) *lp.b > *rp.f++);
+	    *tp.l++ = ((Float) *lp.b > *rp.f++);
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.l++ = ((double) *lp.b > *rp.d++);
+	    *tp.l++ = ((Double) *lp.b > *rp.d++);
 	  break;
 	case ANA_CFLOAT:
 	  value = rp.cf->real*rp.cf->real;
@@ -12073,7 +12073,7 @@ void ana_gt_sa(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.w > (word) *rp.b++);
+	    *tp.l++ = (*lp.w > (Word) *rp.b++);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
@@ -12081,15 +12081,15 @@ void ana_gt_sa(void)
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = ((int) *lp.w > *rp.l++);
+	    *tp.l++ = ((Int) *lp.w > *rp.l++);
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.l++ = ((float) *lp.w > *rp.f++);
+	    *tp.l++ = ((Float) *lp.w > *rp.f++);
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.l++ = ((double) *lp.w > *rp.d++);
+	    *tp.l++ = ((Double) *lp.w > *rp.d++);
 	  break;
 	case ANA_CFLOAT:
 	  value = rp.cf->real*rp.cf->real;
@@ -12113,11 +12113,11 @@ void ana_gt_sa(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.l > (int) *rp.b++);
+	    *tp.l++ = (*lp.l > (Int) *rp.b++);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.l > (int) *rp.w++);
+	    *tp.l++ = (*lp.l > (Int) *rp.w++);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
@@ -12125,11 +12125,11 @@ void ana_gt_sa(void)
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.l++ = ((float) *lp.l > *rp.f++);
+	    *tp.l++ = ((Float) *lp.l > *rp.f++);
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.l++ = ((double) *lp.l > *rp.d++);
+	    *tp.l++ = ((Double) *lp.l > *rp.d++);
 	  break;
 	case ANA_CFLOAT:
 	  value = rp.cf->real*rp.cf->real;
@@ -12153,15 +12153,15 @@ void ana_gt_sa(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.f > (float) *rp.b++);
+	    *tp.l++ = (*lp.f > (Float) *rp.b++);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.f > (float) *rp.w++);
+	    *tp.l++ = (*lp.f > (Float) *rp.w++);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.f > (float) *rp.l++);
+	    *tp.l++ = (*lp.f > (Float) *rp.l++);
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
@@ -12169,7 +12169,7 @@ void ana_gt_sa(void)
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.l++ = ((double) *lp.f > *rp.d++);
+	    *tp.l++ = ((Double) *lp.f > *rp.d++);
 	  break;
 	case ANA_CFLOAT:
 	  value = rp.cf->real*rp.cf->real;
@@ -12193,19 +12193,19 @@ void ana_gt_sa(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.d > (double) *rp.b++);
+	    *tp.l++ = (*lp.d > (Double) *rp.b++);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.d > (double) *rp.w++);
+	    *tp.l++ = (*lp.d > (Double) *rp.w++);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.d > (double) *rp.l++);
+	    *tp.l++ = (*lp.d > (Double) *rp.l++);
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.d > (double) *rp.f++);
+	    *tp.l++ = (*lp.d > (Double) *rp.f++);
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
@@ -12364,19 +12364,19 @@ void ana_ge(void)
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = ((word) *lp.b++ >= *rp.w++);
+	    *tp.l++ = ((Word) *lp.b++ >= *rp.w++);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = ((int) *lp.b++ >= *rp.l++);
+	    *tp.l++ = ((Int) *lp.b++ >= *rp.l++);
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.l++ = ((float) *lp.b++ >= *rp.f++);
+	    *tp.l++ = ((Float) *lp.b++ >= *rp.f++);
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.l++ = ((double) *lp.b++ >= *rp.d++);
+	    *tp.l++ = ((Double) *lp.b++ >= *rp.d++);
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
@@ -12400,7 +12400,7 @@ void ana_ge(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.w++ >= (word) *rp.b++);
+	    *tp.l++ = (*lp.w++ >= (Word) *rp.b++);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
@@ -12408,15 +12408,15 @@ void ana_ge(void)
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = ((int) *lp.w++ >= *rp.l++);
+	    *tp.l++ = ((Int) *lp.w++ >= *rp.l++);
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.l++ = ((float) *lp.w++ >= *rp.f++);
+	    *tp.l++ = ((Float) *lp.w++ >= *rp.f++);
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.l++ = ((double) *lp.w++ >= *rp.d++);
+	    *tp.l++ = ((Double) *lp.w++ >= *rp.d++);
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
@@ -12440,11 +12440,11 @@ void ana_ge(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.l++ >= (int) *rp.b++);
+	    *tp.l++ = (*lp.l++ >= (Int) *rp.b++);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.l++ >= (int) *rp.w++);
+	    *tp.l++ = (*lp.l++ >= (Int) *rp.w++);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
@@ -12452,11 +12452,11 @@ void ana_ge(void)
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.l++ = ((float) *lp.l++ >= *rp.f++);
+	    *tp.l++ = ((Float) *lp.l++ >= *rp.f++);
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.l++ = ((double) *lp.l++ >= *rp.d++);
+	    *tp.l++ = ((Double) *lp.l++ >= *rp.d++);
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
@@ -12480,15 +12480,15 @@ void ana_ge(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.f++ >= (float) *rp.b++);
+	    *tp.l++ = (*lp.f++ >= (Float) *rp.b++);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.f++ >= (float) *rp.w++);
+	    *tp.l++ = (*lp.f++ >= (Float) *rp.w++);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.f++ >= (float) *rp.l++);
+	    *tp.l++ = (*lp.f++ >= (Float) *rp.l++);
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
@@ -12496,7 +12496,7 @@ void ana_ge(void)
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.l++ = ((double) *lp.f++ >= *rp.d++);
+	    *tp.l++ = ((Double) *lp.f++ >= *rp.d++);
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
@@ -12520,19 +12520,19 @@ void ana_ge(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.d++ >= (double) *rp.b++);
+	    *tp.l++ = (*lp.d++ >= (Double) *rp.b++);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.d++ >= (double) *rp.w++);
+	    *tp.l++ = (*lp.d++ >= (Double) *rp.w++);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.d++ >= (double) *rp.l++);
+	    *tp.l++ = (*lp.d++ >= (Double) *rp.l++);
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.d++ >= (double) *rp.f++);
+	    *tp.l++ = (*lp.d++ >= (Double) *rp.f++);
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
@@ -12703,7 +12703,7 @@ void ana_ge(void)
 void ana_ge_as(void)
      /* greater-than-or-equal-to with array LHS and scalar RHS */
 {
-  double	value;
+  Double	value;
 
   switch (lhsType) {
     case ANA_BYTE:
@@ -12714,19 +12714,19 @@ void ana_ge_as(void)
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = ((word) *lp.b++ >= *rp.w);
+	    *tp.l++ = ((Word) *lp.b++ >= *rp.w);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = ((int) *lp.b++ >= *rp.l);
+	    *tp.l++ = ((Int) *lp.b++ >= *rp.l);
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.l++ = ((float) *lp.b++ >= *rp.f);
+	    *tp.l++ = ((Float) *lp.b++ >= *rp.f);
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.l++ = ((double) *lp.b++ >= *rp.d);
+	    *tp.l++ = ((Double) *lp.b++ >= *rp.d);
 	  break;
 	case ANA_CFLOAT:
 	  value = rp.cf->real*rp.cf->real;
@@ -12750,7 +12750,7 @@ void ana_ge_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.w++ >= (word) *rp.b);
+	    *tp.l++ = (*lp.w++ >= (Word) *rp.b);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
@@ -12758,15 +12758,15 @@ void ana_ge_as(void)
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = ((int) *lp.w++ >= *rp.l);
+	    *tp.l++ = ((Int) *lp.w++ >= *rp.l);
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.l++ = ((float) *lp.w++ >= *rp.f);
+	    *tp.l++ = ((Float) *lp.w++ >= *rp.f);
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.l++ = ((double) *lp.w++ >= *rp.d);
+	    *tp.l++ = ((Double) *lp.w++ >= *rp.d);
 	  break;
 	case ANA_CFLOAT:
 	  value = rp.cf->real*rp.cf->real;
@@ -12790,11 +12790,11 @@ void ana_ge_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.l++ >= (int) *rp.b);
+	    *tp.l++ = (*lp.l++ >= (Int) *rp.b);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.l++ >= (int) *rp.w);
+	    *tp.l++ = (*lp.l++ >= (Int) *rp.w);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
@@ -12802,11 +12802,11 @@ void ana_ge_as(void)
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.l++ = ((float) *lp.l++ >= *rp.f);
+	    *tp.l++ = ((Float) *lp.l++ >= *rp.f);
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.l++ = ((double) *lp.l++ >= *rp.d);
+	    *tp.l++ = ((Double) *lp.l++ >= *rp.d);
 	  break;
 	case ANA_CFLOAT:
 	  value = rp.cf->real*rp.cf->real;
@@ -12830,15 +12830,15 @@ void ana_ge_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.f++ >= (float) *rp.b);
+	    *tp.l++ = (*lp.f++ >= (Float) *rp.b);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.f++ >= (float) *rp.w);
+	    *tp.l++ = (*lp.f++ >= (Float) *rp.w);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.f++ >= (float) *rp.l);
+	    *tp.l++ = (*lp.f++ >= (Float) *rp.l);
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
@@ -12846,7 +12846,7 @@ void ana_ge_as(void)
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.l++ = ((double) *lp.f++ >= *rp.d);
+	    *tp.l++ = ((Double) *lp.f++ >= *rp.d);
 	  break;
 	case ANA_CFLOAT:
 	  value = rp.cf->real*rp.cf->real;
@@ -12870,19 +12870,19 @@ void ana_ge_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.d++ >= (double) *rp.b);
+	    *tp.l++ = (*lp.d++ >= (Double) *rp.b);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.d++ >= (double) *rp.w);
+	    *tp.l++ = (*lp.d++ >= (Double) *rp.w);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.d++ >= (double) *rp.l);
+	    *tp.l++ = (*lp.d++ >= (Double) *rp.l);
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.d++ >= (double) *rp.f);
+	    *tp.l++ = (*lp.d++ >= (Double) *rp.f);
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
@@ -13032,7 +13032,7 @@ void ana_ge_as(void)
 void ana_ge_sa(void)
      /* greater-than-or-equal-to with scalar LHS and array RHS */
 {
-  double	value;
+  Double	value;
 
   switch (lhsType) {
     case ANA_BYTE:
@@ -13043,19 +13043,19 @@ void ana_ge_sa(void)
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = ((word) *lp.b >= *rp.w++);
+	    *tp.l++ = ((Word) *lp.b >= *rp.w++);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = ((int) *lp.b >= *rp.l++);
+	    *tp.l++ = ((Int) *lp.b >= *rp.l++);
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.l++ = ((float) *lp.b >= *rp.f++);
+	    *tp.l++ = ((Float) *lp.b >= *rp.f++);
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.l++ = ((double) *lp.b >= *rp.d++);
+	    *tp.l++ = ((Double) *lp.b >= *rp.d++);
 	  break;
 	case ANA_CFLOAT:
 	  value = rp.cf->real*rp.cf->real;
@@ -13079,7 +13079,7 @@ void ana_ge_sa(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.w >= (word) *rp.b++);
+	    *tp.l++ = (*lp.w >= (Word) *rp.b++);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
@@ -13087,15 +13087,15 @@ void ana_ge_sa(void)
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = ((int) *lp.w >= *rp.l++);
+	    *tp.l++ = ((Int) *lp.w >= *rp.l++);
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.l++ = ((float) *lp.w >= *rp.f++);
+	    *tp.l++ = ((Float) *lp.w >= *rp.f++);
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.l++ = ((double) *lp.w >= *rp.d++);
+	    *tp.l++ = ((Double) *lp.w >= *rp.d++);
 	  break;
 	case ANA_CFLOAT:
 	  value = rp.cf->real*rp.cf->real;
@@ -13119,11 +13119,11 @@ void ana_ge_sa(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.l >= (int) *rp.b++);
+	    *tp.l++ = (*lp.l >= (Int) *rp.b++);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.l >= (int) *rp.w++);
+	    *tp.l++ = (*lp.l >= (Int) *rp.w++);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
@@ -13131,11 +13131,11 @@ void ana_ge_sa(void)
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.l++ = ((float) *lp.l >= *rp.f++);
+	    *tp.l++ = ((Float) *lp.l >= *rp.f++);
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.l++ = ((double) *lp.l >= *rp.d++);
+	    *tp.l++ = ((Double) *lp.l >= *rp.d++);
 	  break;
 	case ANA_CFLOAT:
 	  value = rp.cf->real*rp.cf->real;
@@ -13159,15 +13159,15 @@ void ana_ge_sa(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.f >= (float) *rp.b++);
+	    *tp.l++ = (*lp.f >= (Float) *rp.b++);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.f >= (float) *rp.w++);
+	    *tp.l++ = (*lp.f >= (Float) *rp.w++);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.f >= (float) *rp.l++);
+	    *tp.l++ = (*lp.f >= (Float) *rp.l++);
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
@@ -13175,7 +13175,7 @@ void ana_ge_sa(void)
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.l++ = ((double) *lp.f >= *rp.d++);
+	    *tp.l++ = ((Double) *lp.f >= *rp.d++);
 	  break;
 	case ANA_CFLOAT:
 	  value = rp.cf->real*rp.cf->real;
@@ -13199,19 +13199,19 @@ void ana_ge_sa(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.d >= (double) *rp.b++);
+	    *tp.l++ = (*lp.d >= (Double) *rp.b++);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.d >= (double) *rp.w++);
+	    *tp.l++ = (*lp.d >= (Double) *rp.w++);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.d >= (double) *rp.l++);
+	    *tp.l++ = (*lp.d >= (Double) *rp.l++);
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.d >= (double) *rp.f++);
+	    *tp.l++ = (*lp.d >= (Double) *rp.f++);
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
@@ -13362,7 +13362,7 @@ void ana_lt(void)
      /* less-than with array operands.  This operator is the mirror image */
      /* of greater-than, so we swap LHS and RHS and pass on to ana_gt() */
 {
-  int	temp;
+  Int	temp;
   pointer	tempp;
   
   temp = lhsType;  lhsType = rhsType;  rhsType = temp;
@@ -13376,7 +13376,7 @@ void ana_lt_as(void)
      /* less-than with array LHS and scalar RHS.  This operand is the */
      /* mirror image of ana_gt_as(), so swap LHS and RHS and use that */
 {
-  int		temp;
+  Int		temp;
   pointer	tempp;
   
   temp = lhsType;  lhsType = rhsType;  rhsType = temp;
@@ -13390,7 +13390,7 @@ void ana_lt_sa(void)
      /* less-than with scalar LHS and array RHS.  This operand is the mirror */
      /* image of ana_gt_sa() so we swap LHS and RHS and use that */
 {
-  int		temp;
+  Int		temp;
   pointer	tempp;
   
   temp = lhsType;  lhsType = rhsType;  rhsType = temp;
@@ -13404,7 +13404,7 @@ void ana_le(void)
      /* less-than with array operands.  Mirror image of ana_ge(), so */
      /* swap operands and use that */
 {
-  int		temp;
+  Int		temp;
   pointer	tempp;
   
   temp = lhsType;  lhsType = rhsType;  rhsType = temp;
@@ -13418,7 +13418,7 @@ void ana_le_as(void)
      /* less-than with array LHS and scalar RHS.  Mirror image of */
      /* ana_ge_as() so swap operands and use that */
 {
-  int		temp;
+  Int		temp;
   pointer	tempp;
   
   temp = lhsType;  lhsType = rhsType;  rhsType = temp;
@@ -13432,7 +13432,7 @@ void ana_le_sa(void)
      /* less-than with scalar LHS and array RHS.  Mirror image of */
      /* ana_ge_sa() so swap operands and use that */
 {
-  int		temp;
+  Int		temp;
   pointer	tempp;
   
   temp = lhsType;  lhsType = rhsType;  rhsType = temp;
@@ -13490,23 +13490,23 @@ void ana_ne(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.w++ != (word) *rp.b++);
+	    *tp.l++ = (*lp.w++ != (Word) *rp.b++);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.w++ != (word) *rp.w++);
+	    *tp.l++ = (*lp.w++ != (Word) *rp.w++);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.w++ != (word) *rp.l++);
+	    *tp.l++ = (*lp.w++ != (Word) *rp.l++);
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.w++ != (word) *rp.f++);
+	    *tp.l++ = (*lp.w++ != (Word) *rp.f++);
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.w++ != (word) *rp.d++);
+	    *tp.l++ = (*lp.w++ != (Word) *rp.d++);
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
@@ -13530,11 +13530,11 @@ void ana_ne(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.l++ != (int) *rp.b++);
+	    *tp.l++ = (*lp.l++ != (Int) *rp.b++);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.l++ != (int) *rp.w++);
+	    *tp.l++ = (*lp.l++ != (Int) *rp.w++);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
@@ -13542,11 +13542,11 @@ void ana_ne(void)
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.l++ = ((float) *lp.l++ != *rp.f++);
+	    *tp.l++ = ((Float) *lp.l++ != *rp.f++);
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.l++ = ((double) *lp.l++ != *rp.d++);
+	    *tp.l++ = ((Double) *lp.l++ != *rp.d++);
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
@@ -13570,15 +13570,15 @@ void ana_ne(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.f++ != (float) *rp.b++);
+	    *tp.l++ = (*lp.f++ != (Float) *rp.b++);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.f++ != (float) *rp.w++);
+	    *tp.l++ = (*lp.f++ != (Float) *rp.w++);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.f++ != (float) *rp.l++);
+	    *tp.l++ = (*lp.f++ != (Float) *rp.l++);
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
@@ -13586,7 +13586,7 @@ void ana_ne(void)
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.l++ = ((double) *lp.f++ != *rp.d++);
+	    *tp.l++ = ((Double) *lp.f++ != *rp.d++);
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--) {
@@ -13610,19 +13610,19 @@ void ana_ne(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.d++ != (double) *rp.b++);
+	    *tp.l++ = (*lp.d++ != (Double) *rp.b++);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.d++ != (double) *rp.w++);
+	    *tp.l++ = (*lp.d++ != (Double) *rp.w++);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.d++ != (double) *rp.l++);
+	    *tp.l++ = (*lp.d++ != (Double) *rp.l++);
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.d++ != (double) *rp.f++);
+	    *tp.l++ = (*lp.d++ != (Double) *rp.f++);
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
@@ -13784,19 +13784,19 @@ void ana_ne_as(void)
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = ((word) *lp.b++ != *rp.w);
+	    *tp.l++ = ((Word) *lp.b++ != *rp.w);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = ((int) *lp.b++ != *rp.l);
+	    *tp.l++ = ((Int) *lp.b++ != *rp.l);
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.l++ = ((float) *lp.b++ != *rp.f);
+	    *tp.l++ = ((Float) *lp.b++ != *rp.f);
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.l++ = ((double) *lp.b++ != *rp.d);
+	    *tp.l++ = ((Double) *lp.b++ != *rp.d);
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--)
@@ -13814,7 +13814,7 @@ void ana_ne_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.w++ != (word) *rp.b);
+	    *tp.l++ = (*lp.w++ != (Word) *rp.b);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
@@ -13822,15 +13822,15 @@ void ana_ne_as(void)
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = ((int) *lp.w++ != *rp.l);
+	    *tp.l++ = ((Int) *lp.w++ != *rp.l);
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.l++ = ((float) *lp.w++ != *rp.f);
+	    *tp.l++ = ((Float) *lp.w++ != *rp.f);
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.l++ = ((double) *lp.w++ != *rp.d);
+	    *tp.l++ = ((Double) *lp.w++ != *rp.d);
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--)
@@ -13848,11 +13848,11 @@ void ana_ne_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.l++ != (int) *rp.b);
+	    *tp.l++ = (*lp.l++ != (Int) *rp.b);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.l++ != (int) *rp.w);
+	    *tp.l++ = (*lp.l++ != (Int) *rp.w);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
@@ -13860,11 +13860,11 @@ void ana_ne_as(void)
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.l++ = ((float) *lp.l++ != *rp.f);
+	    *tp.l++ = ((Float) *lp.l++ != *rp.f);
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.l++ = ((double) *lp.l++ != *rp.d);
+	    *tp.l++ = ((Double) *lp.l++ != *rp.d);
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--)
@@ -13882,15 +13882,15 @@ void ana_ne_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.f++ != (float) *rp.b);
+	    *tp.l++ = (*lp.f++ != (Float) *rp.b);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.f++ != (float) *rp.w);
+	    *tp.l++ = (*lp.f++ != (Float) *rp.w);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.f++ != (float) *rp.l);
+	    *tp.l++ = (*lp.f++ != (Float) *rp.l);
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
@@ -13898,7 +13898,7 @@ void ana_ne_as(void)
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
-	    *tp.l++ = ((double) *lp.f++ != *rp.d);
+	    *tp.l++ = ((Double) *lp.f++ != *rp.d);
 	  break;
 	case ANA_CFLOAT:
 	  while (nRepeat--)
@@ -13916,19 +13916,19 @@ void ana_ne_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.d++ != (double) *rp.b);
+	    *tp.l++ = (*lp.d++ != (Double) *rp.b);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.d++ != (double) *rp.w);
+	    *tp.l++ = (*lp.d++ != (Double) *rp.w);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.d++ != (double) *rp.l);
+	    *tp.l++ = (*lp.d++ != (Double) *rp.l);
 	  break;
 	case ANA_FLOAT:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.d++ != (double) *rp.f); 
+	    *tp.l++ = (*lp.d++ != (Double) *rp.f); 
 	  break;
 	case ANA_DOUBLE:
 	  while (nRepeat--)
@@ -14027,7 +14027,7 @@ void ana_ne_sa(void)
      /* not-equal-to with scalar LHS and array RHS.  Operator is */
      /* commutative, so swap operands and use ana_ne_as() */
 {
-  int		temp;
+  Int		temp;
   pointer	tempp;
   
   temp = lhsType;  lhsType = rhsType;  rhsType = temp;
@@ -14049,11 +14049,11 @@ void ana_and(void)
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = ((word) *lp.b++ & *rp.w++);
+	    *tp.l++ = ((Word) *lp.b++ & *rp.w++);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = ((int) *lp.b++ & *rp.l++);
+	    *tp.l++ = ((Int) *lp.b++ & *rp.l++);
 	  break;
 	default:
 	  cerror(ILL_TYPE, rhs, typeName(rhsType));
@@ -14063,7 +14063,7 @@ void ana_and(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.w++ & (word) *rp.b++);
+	    *tp.l++ = (*lp.w++ & (Word) *rp.b++);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
@@ -14071,7 +14071,7 @@ void ana_and(void)
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = ((int) *lp.w++ & *rp.l++);
+	    *tp.l++ = ((Int) *lp.w++ & *rp.l++);
 	  break;
 	default:
 	  cerror(ILL_TYPE, rhs, typeName(rhsType));
@@ -14081,11 +14081,11 @@ void ana_and(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.l++ & (int) *rp.b++);
+	    *tp.l++ = (*lp.l++ & (Int) *rp.b++);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.l++ & (int) *rp.w++);
+	    *tp.l++ = (*lp.l++ & (Int) *rp.w++);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
@@ -14112,11 +14112,11 @@ void ana_and_as(void)
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = ((word) *lp.b++ & *rp.w);
+	    *tp.l++ = ((Word) *lp.b++ & *rp.w);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = ((int) *lp.b++ & *rp.l);
+	    *tp.l++ = ((Int) *lp.b++ & *rp.l);
 	  break;
 	default:
 	  cerror(ILL_TYPE, rhs, typeName(rhsType));
@@ -14126,7 +14126,7 @@ void ana_and_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.w++ & (word) *rp.b);
+	    *tp.l++ = (*lp.w++ & (Word) *rp.b);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
@@ -14134,7 +14134,7 @@ void ana_and_as(void)
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = ((int) *lp.w++ & *rp.l);
+	    *tp.l++ = ((Int) *lp.w++ & *rp.l);
 	  break;
 	default:
 	  cerror(ILL_TYPE, rhs, typeName(rhsType));
@@ -14144,11 +14144,11 @@ void ana_and_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.l++ & (int) *rp.b);
+	    *tp.l++ = (*lp.l++ & (Int) *rp.b);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.l++ & (int) *rp.w);
+	    *tp.l++ = (*lp.l++ & (Int) *rp.w);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
@@ -14167,7 +14167,7 @@ void ana_and_sa(void)
      /* logical-and with scalar LHS and array RHS.  Operator is commutative, */
      /* so swap operands and use ana_and_as() */
 {
-  int		temp;
+  Int		temp;
   pointer	tempp;
   
   temp = lhsType;  lhsType = rhsType;  rhsType = temp;
@@ -14189,11 +14189,11 @@ void ana_or(void)
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = ((word) *lp.b++ | *rp.w++);
+	    *tp.l++ = ((Word) *lp.b++ | *rp.w++);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = ((int) *lp.b++ | *rp.l++);
+	    *tp.l++ = ((Int) *lp.b++ | *rp.l++);
 	  break;
 	default:
 	  cerror(ILL_TYPE, rhs, typeName(rhsType));
@@ -14203,7 +14203,7 @@ void ana_or(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.w++ | (word) *rp.b++);
+	    *tp.l++ = (*lp.w++ | (Word) *rp.b++);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
@@ -14211,7 +14211,7 @@ void ana_or(void)
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = ((int) *lp.w++ | *rp.l++);
+	    *tp.l++ = ((Int) *lp.w++ | *rp.l++);
 	  break;
 	default:
 	  cerror(ILL_TYPE, rhs, typeName(rhsType));
@@ -14221,11 +14221,11 @@ void ana_or(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.l++ | (int) *rp.b++);
+	    *tp.l++ = (*lp.l++ | (Int) *rp.b++);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.l++ | (int) *rp.w++);
+	    *tp.l++ = (*lp.l++ | (Int) *rp.w++);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
@@ -14252,11 +14252,11 @@ void ana_or_as(void)
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = ((word) *lp.b++ | *rp.w);
+	    *tp.l++ = ((Word) *lp.b++ | *rp.w);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = ((int) *lp.b++ | *rp.l);
+	    *tp.l++ = ((Int) *lp.b++ | *rp.l);
 	  break;
 	default:
 	  cerror(ILL_TYPE, rhs, typeName(rhsType));
@@ -14266,7 +14266,7 @@ void ana_or_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.w++ | (word) *rp.b);
+	    *tp.l++ = (*lp.w++ | (Word) *rp.b);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
@@ -14274,7 +14274,7 @@ void ana_or_as(void)
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = ((int) *lp.w++ | *rp.l);
+	    *tp.l++ = ((Int) *lp.w++ | *rp.l);
 	  break;
 	default:
 	  cerror(ILL_TYPE, rhs, typeName(rhsType));
@@ -14284,11 +14284,11 @@ void ana_or_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.l++ | (int) *rp.b);
+	    *tp.l++ = (*lp.l++ | (Int) *rp.b);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.l++ | (int) *rp.w);
+	    *tp.l++ = (*lp.l++ | (Int) *rp.w);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
@@ -14307,7 +14307,7 @@ void ana_or_sa(void)
      /* logical-or with scalar LHS and array RHS.  Operator is */
      /* commutative, so swap operands and use ana_or_as() */
 {
-  int		temp;
+  Int		temp;
   pointer	tempp;
   
   temp = lhsType;  lhsType = rhsType;  rhsType = temp;
@@ -14329,11 +14329,11 @@ void ana_xor(void)
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = ((word) *lp.b++ ^ *rp.w++);
+	    *tp.l++ = ((Word) *lp.b++ ^ *rp.w++);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = ((int) *lp.b++ ^ *rp.l++);
+	    *tp.l++ = ((Int) *lp.b++ ^ *rp.l++);
 	  break;
 	default:
 	  cerror(ILL_TYPE, rhs, typeName(rhsType));
@@ -14343,7 +14343,7 @@ void ana_xor(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.w++ ^ (word) *rp.b++);
+	    *tp.l++ = (*lp.w++ ^ (Word) *rp.b++);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
@@ -14351,7 +14351,7 @@ void ana_xor(void)
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = ((int) *lp.w++ ^ *rp.l++);
+	    *tp.l++ = ((Int) *lp.w++ ^ *rp.l++);
 	  break;
 	default:
 	  cerror(ILL_TYPE, rhs, typeName(rhsType));
@@ -14361,11 +14361,11 @@ void ana_xor(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.l++ ^ (int) *rp.b++);
+	    *tp.l++ = (*lp.l++ ^ (Int) *rp.b++);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.l++ ^ (int) *rp.w++);
+	    *tp.l++ = (*lp.l++ ^ (Int) *rp.w++);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
@@ -14392,11 +14392,11 @@ void ana_xor_as(void)
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = ((word) *lp.b++ ^ *rp.w);
+	    *tp.l++ = ((Word) *lp.b++ ^ *rp.w);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = ((int) *lp.b++ ^ *rp.l);
+	    *tp.l++ = ((Int) *lp.b++ ^ *rp.l);
 	  break;
 	default:
 	  cerror(ILL_TYPE, rhs, typeName(rhsType));
@@ -14406,7 +14406,7 @@ void ana_xor_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.w++ ^ (word) *rp.b);
+	    *tp.l++ = (*lp.w++ ^ (Word) *rp.b);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
@@ -14414,7 +14414,7 @@ void ana_xor_as(void)
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
-	    *tp.l++ = ((int) *lp.w++ ^ *rp.l);
+	    *tp.l++ = ((Int) *lp.w++ ^ *rp.l);
 	  break;
 	default:
 	  cerror(ILL_TYPE, rhs, typeName(rhsType));
@@ -14424,11 +14424,11 @@ void ana_xor_as(void)
       switch (rhsType) {
 	case ANA_BYTE:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.l++ ^ (int) *rp.b);
+	    *tp.l++ = (*lp.l++ ^ (Int) *rp.b);
 	  break;
 	case ANA_WORD:
 	  while (nRepeat--)
-	    *tp.l++ = (*lp.l++ ^ (int) *rp.w);
+	    *tp.l++ = (*lp.l++ ^ (Int) *rp.w);
 	  break;
 	case ANA_LONG:
 	  while (nRepeat--)
@@ -14447,7 +14447,7 @@ void ana_xor_sa(void)
      /* logical-exlusive-or with scalar LHS and array RHS.  Operator is */
      /* commutative, so swap operands and use ana_xor_as() */
 {
-  int		temp;
+  Int		temp;
   pointer	tempp;
   
   temp = lhsType;  lhsType = rhsType;  rhsType = temp;
@@ -14457,10 +14457,10 @@ void ana_xor_sa(void)
   tempp = lp;  lp = rp;  rp = tempp;
 }
 /*----------------------------------------------------------*/
-int ana_string_add(void)
+Int ana_string_add(void)
      /* add (i.e. concatenate) two strings */
 {
-  int	result, i;
+  Int	result, i;
   
   i = string_size(lhs) + string_size(rhs); /* size of result */
   result = string_scratch(i);	/* get result symbol */
@@ -14494,12 +14494,12 @@ static void (*binFunc_as[])(void) = {
 };
 
 /*----------------------------------------------------------*/
-int evalScalarBinOp(void)
+Int evalScalarBinOp(void)
 /* evaluate binary operation with scalar operands.
  return value: symbol number of newly created output symbol
 */
 {
-  int	result;
+  Int	result;
   
   result = scalar_scratch(topType); /* get symbol for result */
   if (isComplexType(lhsType))
@@ -14519,12 +14519,12 @@ int evalScalarBinOp(void)
   return result;			/* done */
 }
 /*----------------------------------------------------------*/
-int evalScalarArrayBinOp(void)
+Int evalScalarArrayBinOp(void)
 /* evaluate binary operation with scalar as left-hand operand and
    array as right-hand operand
    return value: number of newly created output symbol */
 {
-  int	result;
+  Int	result;
   
   if (array_type(rhs) == topType && isFreeTemp(rhs))
     /* we can overwrite the array with the results */
@@ -14543,12 +14543,12 @@ int evalScalarArrayBinOp(void)
   return result;
 }
 /*----------------------------------------------------------*/
-int evalArrayScalarBinOp(void)
+Int evalArrayScalarBinOp(void)
 /* evaluate binary operation with array as left-hand operand and
  scalar as right-hand operand.  Return value: number of newly created
  output symbol */
 {
-  int	result;
+  Int	result;
   
   if (array_type(lhs) == topType && (isFreeTemp(lhs)))
     /* we can overwrite the array with the results */
@@ -14570,15 +14570,15 @@ int evalArrayScalarBinOp(void)
 #define ORDINARY	1
 #define SCALAR_LEFT	2
 #define SCALAR_RIGHT	3
-int evalArrayBinOp(void)
+Int evalArrayBinOp(void)
 /* supports "implicit dimensions", i.e. dimensions which are 1 in one of */
 /* the operands and non-1 in the other.  The smaller operand is repeated */
 /* as needed to service all elements of the larger operand. */
 {
-  int	result, i, nRepeats[MAX_DIMS], action[MAX_DIMS], nAction = 0,
+  Int	result, i, nRepeats[MAX_DIMS], action[MAX_DIMS], nAction = 0,
     tally[MAX_DIMS], nCumulR[MAX_DIMS], nCumulL[MAX_DIMS], ndim,
     bigOne;
-  extern int	pipeSym, pipeExec;
+  extern Int	pipeSym, pipeExec;
   
   /* the arrays must have an equal number of dimensions, except for */
   /* possible trailing dimensions of one element */
@@ -14651,7 +14651,7 @@ int evalArrayBinOp(void)
     (*binFunc[binOp])();
     return result;
   } else {				/* implicit dimensions */
-    int	lStride, rStride;
+    Int	lStride, rStride;
     char	done = 0;
     
     /* create result array: first calculate its number of elements */
@@ -14760,10 +14760,10 @@ int evalArrayBinOp(void)
   }
 }
 /*----------------------------------------------------------*/
-int evalStringBinOp(void)
+Int evalStringBinOp(void)
      /* binary operation with two string arguments */
 {
-  int	result, i;
+  Int	result, i;
   
   lp.s = string_value(lhs);
   rp.s = string_value(rhs);
@@ -14797,10 +14797,10 @@ int evalStringBinOp(void)
   return result;
 }
 /*----------------------------------------------------------*/
-int evalSArrayStringBinOp(void)
+Int evalSArrayStringBinOp(void)
 /* binary operation with a string and a string array */
 {
-  int	n, result;
+  Int	n, result;
 
   lp.sp = array_data(lhs);
   rp.s = string_value(rhs);
@@ -14844,10 +14844,10 @@ int evalSArrayStringBinOp(void)
   return result;
 }
 /*----------------------------------------------------------*/
-int evalStringSArrayBinOp(void)
+Int evalStringSArrayBinOp(void)
 /* binary operation with a string and a string array */
 {
-  int	n, result;
+  Int	n, result;
 
   rp.sp = array_data(rhs);
   lp.s = string_value(lhs);
@@ -14891,13 +14891,13 @@ int evalStringSArrayBinOp(void)
   return result;
 }
 /*----------------------------------------------------------*/
-int evalScalarRangeBinOp(void)
+Int evalScalarRangeBinOp(void)
 /* binary operation on a scalar and a scalar ANA_RANGE symbol */
 /* if range start or end has * - expr notation, then must apply */
 /* operation to minus its value, so that, say, (1:*-10) + 3 yields */
 /* (4:*-7) rather than (4:*-13). */
 {
-  int	range, result;
+  Int	range, result;
   
   range = rhs;
   result = newSymbol(ANA_RANGE, 0, 0);
@@ -14912,9 +14912,9 @@ int evalScalarRangeBinOp(void)
     topType = rhsType;
   range_start(result) = evalScalarBinOp();
   if (range_start(range) < 0) {	/* restore * - expr notation */
-    rhs = (int) range_start(result);
+    rhs = (Int) range_start(result);
     rhs = ana_neg_func(1, &rhs);
-    range_start(result) = (word) -rhs;
+    range_start(result) = (Word) -rhs;
     embed(-range_start(result), result);
   } else
     embed(range_start(result), result);
@@ -14929,20 +14929,20 @@ int evalScalarRangeBinOp(void)
     topType = rhsType;
   range_end(result) = evalScalarBinOp();
   if (range_end(range) < 0) {	/* restore * - expr notation */
-    rhs = (int) range_end(result);
+    rhs = (Int) range_end(result);
     rhs = ana_neg_func(1, &rhs);
-    range_end(result) = (word) -rhs;
+    range_end(result) = (Word) -rhs;
     embed(-range_end(result), result);
   } else
     embed(range_end(result), result);
   return result;
 }
 /*----------------------------------------------------------*/
-int evalRangeScalarBinOp(void)
+Int evalRangeScalarBinOp(void)
      /* binary operation on a scalar and a scalar ANA_RANGE symbol */
 {
-  int	range, result;
-  int	newSymbol(int, ...);
+  Int	range, result;
+  Int	newSymbol(Int, ...);
   
   range = lhs;
   result = newSymbol(ANA_RANGE, 0, 0);
@@ -14957,9 +14957,9 @@ int evalRangeScalarBinOp(void)
     topType = lhsType;
   range_start(result) = evalScalarBinOp();
   if (range_start(range) < 0) {	/* restore * - expr notation */
-    lhs = (int) range_start(result);
+    lhs = (Int) range_start(result);
     lhs = ana_neg_func(1, &lhs);
-    range_start(result) = (word) -lhs;
+    range_start(result) = (Word) -lhs;
     embed(-range_start(result), result);
   } else
     embed(range_start(result), result);
@@ -14974,23 +14974,23 @@ int evalRangeScalarBinOp(void)
     topType = lhsType;
   range_end(result) = evalScalarBinOp();
   if (range_end(range) < 0) {	/* restore * - expr notation */
-    lhs = (int) range_end(result);
+    lhs = (Int) range_end(result);
     lhs = ana_neg_func(1, &lhs);
-    range_end(result) = (word) -lhs;
+    range_end(result) = (Word) -lhs;
     embed(-range_end(result), result);
   } else
     embed(range_end(result), result);
   return result;
 }
 /*----------------------------------------------------------*/
-int extractListElem(int base, int index, char *key, int write)
+Int extractListElem(Int base, Int index, char *key, Int write)
 /* returns the number of the symbol that <arg> points at in
    the CLIST or LIST <base>.  If <base> is negative, then
    <index> is the numerical tag; otherwise <key> is the string tag.
    LS 14sep98 */
 {
-  int	i, n;
-  int	eval(int), copySym(int), installString(char *);
+  Int	i, n;
+  Int	eval(Int), copySym(Int), installString(char *);
   
   if (base < 0)			/* numerical tag */
     base = -base;
@@ -15064,7 +15064,7 @@ int extractListElem(int base, int index, char *key, int write)
   }
 }
 /*----------------------------------------------------------*/
-int evalListPtr(int symbol)
+Int evalListPtr(Int symbol)
      /* evaluates pointers to elements of structures, lists, */
      /* ranges, and enums, and also pointers to local variables */
      /* in user functions, routines, and block-routines */
@@ -15072,7 +15072,7 @@ int evalListPtr(int symbol)
      /* (for LISTs, and RANGEs) because the same */
      /* element may be pointed at more than once. */
 {
-  int	base, index = -1, n;
+  Int	base, index = -1, n;
   char	*key;
   
   base = list_ptr_target(symbol); /* the enveloping structure */
@@ -15089,12 +15089,12 @@ int evalListPtr(int symbol)
   return n;
 }
 /*----------------------------------------------------------*/
-int evalStructPtr(int symbol)
+Int evalStructPtr(Int symbol)
 /* evaluates <symbol> as a STRUCT_PTR */
 {
   return anaerror("evaluation of structure pointers not yet implemented", symbol);
 #if IMPLEMENTED
-  int	target, result, n, i, nout, one = 1, outdims[MAX_DIMS], outndim = 0,
+  Int	target, result, n, i, nout, one = 1, outdims[MAX_DIMS], outndim = 0,
     *dims, ndim, nms, i1, i2, j, k, nelem, *p, ne, type, total_ndim;
   structElem	*se;
   structPtr	*spe;
@@ -15227,18 +15227,18 @@ int evalStructPtr(int symbol)
 #endif
 }
 /*----------------------------------------------------------*/
-int evalLhs(symbol)
+Int evalLhs(symbol)
 /* evaluate <symbol> as a left-hand side of an assignment: resolves
    TRANSFERs and finds the member of LISTs that is pointed at.
    Returns an ANA_EXTRACT symbol wherein the head is a simple variable.
    LS 7jan99 */
 {
-  int	target, kind, depth, nitem, class, modified, result, n, special, j;
+  Int	target, kind, depth, nitem, class, modified, result, n, special, j;
   extractSec	*eptr, *tptr;
   char	**sptr, *name, *p;
-  int	findTarget(char *, int *, int);
+  Int	findTarget(char *, Int *, Int);
   void	*v;
-  extern int	eval_func,  /* function number of EVAL function */
+  extern Int	eval_func,  /* function number of EVAL function */
     d_r_sym, r_d_sym;		/* symbol numbers of #D.R and #R.D */
 
   switch (symbol_class(symbol)) {
@@ -15399,11 +15399,11 @@ int evalLhs(symbol)
 		for (j = 0; j <= depth; j++) {
 		  tptr[j].type = eptr[j].type;
 		  tptr[j].number = eptr[j].number;
-		  tptr[j].ptr.w = malloc(tptr[j].number*sizeof(word));
+		  tptr[j].ptr.w = malloc(tptr[j].number*sizeof(Word));
 		  if (!tptr[j].ptr.w)
 		    return cerror(ALLOC_ERR, 0);
 		  memcpy(tptr[j].ptr.w, eptr[j].ptr.w,
-			 tptr[j].number*sizeof(word));
+			 tptr[j].number*sizeof(Word));
 		}
 		return result;
 	      } else
@@ -15431,7 +15431,7 @@ int evalLhs(symbol)
 	      }
 	      break;
 	    case ANA_LIST:
-	    { int	i;
+	    { Int	i;
 
 	      for (i = 0; i < list_num_symbols(target); i++)
 		if (!strcmp(list_key(target, i), *sptr))
@@ -15455,17 +15455,17 @@ int evalLhs(symbol)
   return anaerror("Unexpected exit from evalLhs()", symbol);
 } /* end of evalLhs() */
 /*----------------------------------------------------------*/
-int evalExtractRhs(int symbol)
+Int evalExtractRhs(Int symbol)
 /* evaluate ANA_EXTRACT symbol as rhs */
 {
-  int	target, class, depth, result, n, nitem, i, kind, special, allowSubr,
+  Int	target, class, depth, result, n, nitem, i, kind, special, allowSubr,
     j, k, *ip;
-  int	findTarget(char *, int *, int), getBody(int);
-  word	*wptr;
+  Int	findTarget(char *, Int *, Int), getBody(Int);
+  Word	*wptr;
   extractSec	*eptr;
   char	**sptr;
   pointer	p, q, r;
-  extern int	d_r_sym, r_d_sym;
+  extern Int	d_r_sym, r_d_sym;
   structElem	*se;
   structPtr	*spe;
   structPtrMember	*spm;
@@ -15602,12 +15602,12 @@ int evalExtractRhs(int symbol)
 		return ANA_ERROR;
 	      symbol_class(result) = ANA_INT_FUNC;
 	      int_func_number(result) = target;
-	      int_func_arguments(result) = malloc(eptr->number*sizeof(word));
+	      int_func_arguments(result) = malloc(eptr->number*sizeof(Word));
 	      if (!int_func_arguments(result))
 		return cerror(ALLOC_ERR, 0);
-	      symbol_memory(result) = eptr->number*sizeof(word);
+	      symbol_memory(result) = eptr->number*sizeof(Word);
 	      memcpy(int_func_arguments(result), eptr->ptr.w,
-		     eptr->number*sizeof(word));
+		     eptr->number*sizeof(Word));
 	      target = eval(result);
 	      zap(result);	/*  it was a temp */
 	      break;
@@ -15627,9 +15627,9 @@ int evalExtractRhs(int symbol)
 	      symbol_class(result) = ANA_INT_FUNC;
 	      int_func_number(result) = ANA_SUBSC_FUN;
 	      n = eptr->number;
-	      symbol_memory(result) = (n + 1)*sizeof(word);
+	      symbol_memory(result) = (n + 1)*sizeof(Word);
 	      int_func_arguments(result) = malloc(symbol_memory(result));
-	      memcpy(int_func_arguments(result), eptr->ptr.w, n*sizeof(word));
+	      memcpy(int_func_arguments(result), eptr->ptr.w, n*sizeof(Word));
 	      int_func_arguments(result)[n] = target;
 	      target = eval(result);
 	      unMark(result);
@@ -15652,7 +15652,7 @@ int evalExtractRhs(int symbol)
 		return ANA_ERROR;
 	      symbol_class(result) = ANA_USR_FUNC;
 	      usr_func_number(result) = target;
-	      symbol_memory(result) = eptr->number*sizeof(word);
+	      symbol_memory(result) = eptr->number*sizeof(Word);
 	      usr_func_arguments(result) = malloc(symbol_memory(result));
 	      memcpy(usr_func_arguments(result), eptr->ptr.w,
 		     symbol_memory(result));
@@ -15703,7 +15703,7 @@ int evalExtractRhs(int symbol)
 		      return cerror(SUBSC_RANGE, symbol);
 		  target = nextFreeTempVariable();
 		  symbol_class(target) = ANA_LIST;
-		  symbol_memory(target) = n*sizeof(word);
+		  symbol_memory(target) = n*sizeof(Word);
 		  q.w = clist_symbols(target) = malloc(symbol_memory(target));
 		  if (!q.w)
 		    return cerror(ALLOC_ERR, symbol);
@@ -15742,7 +15742,7 @@ int evalExtractRhs(int symbol)
 		      return cerror(SUBSC_RANGE, symbol);
 		  target = nextFreeTempVariable();
 		  symbol_class(target) = ANA_CLIST;
-		  symbol_memory(target) = n*sizeof(word);
+		  symbol_memory(target) = n*sizeof(Word);
 		  q.w = clist_symbols(target) = malloc(symbol_memory(target));
 		  if (!q.w)
 		    return cerror(ALLOC_ERR, symbol);
@@ -15803,7 +15803,7 @@ int evalExtractRhs(int symbol)
 		    return ANA_ERROR;
 		  symbol_class(n) = ANA_INT_FUNC;
 		  int_func_number(n) = ANA_SUBSC_FUN;
-		  symbol_memory(n) = 2*sizeof(word);
+		  symbol_memory(n) = 2*sizeof(Word);
 		  int_func_arguments(n) = malloc(symbol_memory(result));
 		  *int_func_arguments(n) = result;
 		  int_func_arguments(n)[1] = target;
@@ -15843,7 +15843,7 @@ int evalExtractRhs(int symbol)
 		      return cerror(SUBSC_RANGE, symbol);
 		  target = nextFreeTempVariable();
 		  symbol_class(target) = ANA_CLIST;
-		  symbol_memory(target) = n*sizeof(word);
+		  symbol_memory(target) = n*sizeof(Word);
 		  q.w = clist_symbols(target) = malloc(symbol_memory(target));
 		  if (!q.w)
 		    return cerror(ALLOC_ERR, symbol);
@@ -15960,7 +15960,7 @@ int evalExtractRhs(int symbol)
 	      if (spe->n_subsc) { /* we already have subscripts on this
 				     one -- illegal! */
 		zapTemp(result);
-		return anaerror("No double subscripts allowed here!", symbol);
+		return anaerror("No Double subscripts allowed here!", symbol);
 	      }
 	      n = spe->n_subsc = eptr->number; /* number of subscripts */
 	      spm = spe->member = malloc(spe->n_subsc*sizeof(structPtrMember));
@@ -15991,27 +15991,27 @@ int evalExtractRhs(int symbol)
 		    /* assume the data type is real! */
 		    spm->type = ANA_ARRAY;
 		    k = spm->data.array.n_elem = array_size(i);
-		    ip = spm->data.array.ptr = malloc(k*sizeof(int));
+		    ip = spm->data.array.ptr = malloc(k*sizeof(Int));
 		    p.v = array_data(i);
 		    switch (array_type(i)) {
 		      case ANA_BYTE:
 			while (k--)
-			  *ip++ = (int) *p.b++;
+			  *ip++ = (Int) *p.b++;
 			break;
 		      case ANA_WORD:
 			while (k--)
-			  *ip++ = (int) *p.w++;
+			  *ip++ = (Int) *p.w++;
 			break;
 		      case ANA_LONG:
-			memcpy(ip, p.l, k*sizeof(int));
+			memcpy(ip, p.l, k*sizeof(Int));
 			break;
 		      case ANA_FLOAT:
 			while (k--)
-			  *ip++ = (int) *p.f++;
+			  *ip++ = (Int) *p.f++;
 			break;
 		      case ANA_DOUBLE:
 			while (k--)
-			  *ip++ = (int) *p.d++;
+			  *ip++ = (Int) *p.d++;
 			break;
 		    }
 		    break;
@@ -16063,18 +16063,18 @@ int evalExtractRhs(int symbol)
   return anaerror("Unexpected exit from extractRhsSymbol", symbol);
 }
 /*----------------------------------------------------------*/
-int eval(int symbol)
+Int eval(Int symbol)
      /* evaluates the symbol.  classes PRE_XXX */
      /* contain unevaluated member symbols.  classes XXX */
      /* only contain evaluated member symbols. */
 {
-  int	n, thisLhs, thisRhs, result, i;
+  Int	n, thisLhs, thisRhs, result, i;
   char	isScalarRange, offsetEnd;
-  extern int	tempSym,	/* symbol number of !TEMP */
+  extern Int	tempSym,	/* symbol number of !TEMP */
 	tempVariableIndex,
 	pipeExec,	/* pipe executable */
 	pipeSym;	/* pipe symbol */
-  int	namevar(int, int), transfer(int);
+  Int	namevar(Int, Int), transfer(Int);
   void	updateIndices(void);
   
   if (symbol == ANA_ERROR)		/* some error */
@@ -16165,7 +16165,7 @@ int eval(int symbol)
       symbol_class(result) = ANA_CLIST; /* generate ANA_CLIST symbol */
       symbol_context(result) = -compileLevel; /* main level */
       n = pre_clist_num_symbols(symbol); /* number of elements */
-      allocate(clist_symbols(result), n, word); /* get memory */
+      allocate(clist_symbols(result), n, Word); /* get memory */
       symbol_memory(result) = symbol_memory(symbol); /* same size */
       for (i = 0; i < n; i++) {	/* all elements */
 	if ((clist_symbols(result)[i]
@@ -16517,9 +16517,9 @@ int eval(int symbol)
     return cerror(-1, symbol);
 }
 /*----------------------------------------------------------*/
-int evals(int nsym)
+Int evals(Int nsym)
      /* always evaluate ANA_SCAL_PTR to ANA_SCALAR or ANA_TEMP_STRING */
-{ int	temp;
+{ Int	temp;
   
   temp = evalScalPtr;
   evalScalPtr = 1;
@@ -16530,14 +16530,14 @@ int evals(int nsym)
 /*----------------------------------------------------------*/
 #define UNKNOWN	-1
 #define NEXT -2
-branchInfo checkBranch(int lhs, int rhs)
+branchInfo checkBranch(Int lhs, Int rhs)
      /* determines at what level in the assignment <lhs> = <rhs> the <lhs> can */
      /* be used for storage of intermediate results */
 {
   branchInfo	result = { 0, 0, 0, 0}, branch1, branch2;
-  static int	depth, lhsSize;
-  word	*args;
-  int	n;
+  static Int	depth, lhsSize;
+  Word	*args;
+  Int	n;
   
   if (!rhs)			/* initialization */
   { depth = 0;
@@ -16673,8 +16673,8 @@ branchInfo checkBranch(int lhs, int rhs)
   return result;
 }
 /*----------------------------------------------------------*/
-int	pipeExec = 0, pipeSym = 0;
-branchInfo checkTree(int lhs, int rhs)
+Int	pipeExec = 0, pipeSym = 0;
+branchInfo checkTree(Int lhs, Int rhs)
 {
   branchInfo	result;
   

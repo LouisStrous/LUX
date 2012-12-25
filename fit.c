@@ -20,11 +20,11 @@ static char rcsid[] __attribute__ ((unused)) =
 "$Id: fit.c,v 4.0 2001/02/07 20:37:00 strous Exp $";
 
 char    PoissonChiSq;           /* flag: Poisson chi-square fitting? */
-unsigned int random_bits(void);
-void indexxr_d(int, double *, int *);
+uint32_t random_bits(void);
+void indexxr_d(Int, Double *, Int *);
 
 /*-----------------------------------------------------------------------*/
-double gaussians(double *par, int nPar, double *x, double *y, double *w, int nData)
+Double gaussians(Double *par, Int nPar, Double *x, Double *y, Double *w, Int nData)
 /* Returns the rms error (if PoissonChiSq is zero) or chi-square for */
 /* Poisson distributions (if PoissonChiSq is nonzero) in fitting y vs x */
 /* with a set of gaussians. */
@@ -33,8 +33,8 @@ double gaussians(double *par, int nPar, double *x, double *y, double *w, int nDa
 /* at least 4 elements and for each three more another gaussian is */
 /* added.   LS 26oct95  31oct95 */
 {
-  int   j, wstep;
-  double        rms, fit, arg, one = 1.0;
+  Int   j, wstep;
+  Double        rms, fit, arg, one = 1.0;
 
   if (w)
     wstep = 1;
@@ -64,14 +64,14 @@ double gaussians(double *par, int nPar, double *x, double *y, double *w, int nDa
     return sqrt(rms); }
 }
 /*-----------------------------------------------------------------------*/
-double powerfunc(double *par, int nPar, double *x, double *y, double *w, int nData)
+Double powerfunc(Double *par, Int nPar, Double *x, Double *y, Double *w, Int nData)
 /* returns the error in fitting y vs x with a general power function */
 /* superposed on a linear trend. */
 /* the fit profile is  par[0] + par[1]*x + par[2]*(x - par[3])^par[4] */
 /* LS 13nov95 */
 {
-  int   wstep;
-  double        rms, dfit, one;
+  Int   wstep;
+  Double        rms, dfit, one;
 
   if (w)
     wstep = 1;
@@ -86,7 +86,7 @@ double powerfunc(double *par, int nPar, double *x, double *y, double *w, int nDa
   return sqrt(rms);
 }
 /*-----------------------------------------------------------------------*/
-int ana_generalfit(int narg, int ps[])
+Int ana_generalfit(Int narg, Int ps[])
 /* FIT([X,]Y,START,STEP[,LOWBOUND,HIGHBOUND][,WEIGHTS][,QTHRESH,PTHRESH,
    ITHRESH,DTHRESH][,FAC,NITER,NSAME][,ERR][,FIT][,TTHRESH][,/VOCAL,/DOWN,
    /PCHI][/GAUSSIANS,/POWERFUNC]) */
@@ -94,20 +94,20 @@ int ana_generalfit(int narg, int ps[])
 /* to any profile specification. */
 /* LS 24oct95 */
 {
-  int   ySym, xSym, nPoints, n, nPar, nIter, iThresh, nSame, size,
+  Int   ySym, xSym, nPoints, n, nPar, nIter, iThresh, nSame, size,
     iq, i, j, iter, same, fitSym, fitTemp, xTemp, nn, wSym;
-  double *yp, *xp, *start, *step, qThresh, *pThresh, fac, *lowbound, *hibound,
+  Double *yp, *xp, *start, *step, qThresh, *pThresh, fac, *lowbound, *hibound,
         *err, *par, qBest1, qBest2, *parBest1, *parBest2, *ran, qual, temp,
     dir, dThresh, qLast, mu, *meanShift, *weights, tThresh;
   char  vocal, onebyone;
-  void  randomn(int seed, double *output, int number, char hasUniform);
-  double (*fitProfiles[2])(double *, int, double *, double *, double *, int) =
+  void  randomn(Int seed, Double *output, Int number, char hasUniform);
+  Double (*fitProfiles[2])(Double *, Int, Double *, Double *, Double *, Int) =
   { gaussians, powerfunc };
-  double (*fitFunc)(double *, int, double *, double *, double *, int);
-  extern int    nFixed;
-  word  fitPar, fitArg[4];
-  int   ana_indgen(int, int []), eval(int);
-  void  zap(int);
+  Double (*fitFunc)(Double *, Int, Double *, Double *, Double *, Int);
+  extern Int    nFixed;
+  Word  fitPar, fitArg[4];
+  Int   ana_indgen(Int, Int []), eval(Int);
+  void  zap(Int);
   time_t starttime;
   
   /* check input variables */
@@ -142,7 +142,7 @@ int ana_generalfit(int narg, int ps[])
     return cerror(NEED_ARR, ySym);
   ySym = ana_double(1, &ySym);  /* ensure ANA_DOUBLE */
   nPoints = array_size(ySym);   /* number of data points */
-  yp = (double *) array_data(ySym); /* pointer to data */
+  yp = (Double *) array_data(ySym); /* pointer to data */
 
   if (xSym)                     /* X */
     switch (symbol_class(xSym)) {
@@ -159,14 +159,14 @@ int ana_generalfit(int narg, int ps[])
         xSym = ana_double(1, &xSym);
         xTemp = xSym;
         if (symbol_class(xSym) == ANA_ARRAY)
-          xp = (double *) array_data(xSym);
+          xp = (Double *) array_data(xSym);
         break;
       default:
         return cerror(ILL_CLASS, xSym);
     }
   else {
     xTemp = ana_indgen(1, &ySym);
-    xp = (double *) array_data(xTemp);
+    xp = (Double *) array_data(xTemp);
   }
 
   iq = ps[2];                   /* START: initial parameter values */
@@ -174,7 +174,7 @@ int ana_generalfit(int narg, int ps[])
     return cerror(NEED_ARR, iq);
   iq = ana_double(1, &iq);
   nPar = array_size(iq);
-  start = (double *) array_data(iq);
+  start = (Double *) array_data(iq);
   
   iq = ps[3];                   /* STEP: initial parameter step sizes */
   if (symbol_class(iq) != ANA_ARRAY)
@@ -196,7 +196,7 @@ int ana_generalfit(int narg, int ps[])
           return anaerror("Need five parameters for power-function fits", ps[3]);
         break;
     }
-  step = (double *) array_data(iq);
+  step = (Double *) array_data(iq);
 
   if (narg >= 5 && (iq = ps[4])) { /* LOWBOUND: lower bound on parameters */
     if (symbol_class(iq) != ANA_ARRAY)
@@ -205,7 +205,7 @@ int ana_generalfit(int narg, int ps[])
     n = array_size(iq);
     if (n != nPar)
       return cerror(INCMP_ARG, ps[4]);
-    lowbound = (double *) array_data(iq);
+    lowbound = (Double *) array_data(iq);
   } else
     lowbound = NULL;
 
@@ -216,7 +216,7 @@ int ana_generalfit(int narg, int ps[])
     n = array_size(iq);
     if (n != nPar)
       return cerror(INCMP_ARG, ps[5]);
-    hibound = (double *) array_data(iq);
+    hibound = (Double *) array_data(iq);
   } else
     hibound = NULL;
 
@@ -227,7 +227,7 @@ int ana_generalfit(int narg, int ps[])
     n = array_size(wSym);
     if (n != nPoints)
       return cerror(INCMP_ARG, ps[6]);
-    weights = (double *) array_data(wSym);
+    weights = (Double *) array_data(wSym);
   } else
     weights = NULL;
 
@@ -243,7 +243,7 @@ int ana_generalfit(int narg, int ps[])
     n = array_size(iq);
     if (n != nPar)
       return cerror(INCMP_ARG, ps[8]);
-    pThresh = (double *) array_data(iq);
+    pThresh = (Double *) array_data(iq);
   } else
     pThresh = NULL;
 
@@ -284,9 +284,9 @@ int ana_generalfit(int narg, int ps[])
     }
     i = nPar;
     redef_array(ps[14], ANA_DOUBLE, 1, &i);
-    err = (double *) array_data(ps[14]);
+    err = (Double *) array_data(ps[14]);
   } else {
-    err = malloc(nPar*sizeof(double));
+    err = malloc(nPar*sizeof(Double));
     if (!err)
       return cerror(ALLOC_ERR, 0);
   }
@@ -307,9 +307,9 @@ int ana_generalfit(int narg, int ps[])
 
   i = nPar + 1;
   fitPar = array_scratch(ANA_DOUBLE, 1, &i); /* fit parameters */
-  par = (double *) array_data(fitPar);
+  par = (Double *) array_data(fitPar);
 
-  size = nPar*sizeof(double);
+  size = nPar*sizeof(Double);
 
   /* copy start values into par */
   memcpy(par, start, size);
@@ -343,7 +343,7 @@ int ana_generalfit(int narg, int ps[])
     fitTemp = nextFreeTempExecutable();
     symbol_class(fitTemp) = ANA_USR_FUNC;
     usr_func_arguments(fitTemp) = fitArg;
-    symbol_memory(fitTemp) = (weights? 4: 3)*sizeof(word);
+    symbol_memory(fitTemp) = (weights? 4: 3)*sizeof(Word);
     usr_func_number(fitTemp) = fitSym;
   }
 
@@ -373,13 +373,13 @@ int ana_generalfit(int narg, int ps[])
     zapTemp(i);
   } else
     qBest2 = qBest1 = fitFunc(par, nPar, xp, yp, weights, nPoints);
-  allocate(parBest1, nPar, double);
-  allocate(parBest2, nPar, double);
-  allocate(ran, nPar, double);
+  allocate(parBest1, nPar, Double);
+  allocate(parBest2, nPar, Double);
+  allocate(ran, nPar, Double);
   memcpy(parBest1, par, size);
   memcpy(parBest2, par, size);
   memcpy(err, step, size);
-  allocate(meanShift, nPar, double);
+  allocate(meanShift, nPar, Double);
   for (i = 0; i < nPar; i++)
     meanShift[i] = 0.0;
 
@@ -484,12 +484,12 @@ int ana_generalfit(int narg, int ps[])
 
   if (narg > 14 && ps[14]) {
     memcpy(par, parBest2, nPar*sizeof(*par));
-    double qualplus, qualmin;
+    Double qualplus, qualmin;
     for (i = 0; i < nPar; i++) {
       if (!step[i])
 	err[i] = 0;
       else {
-	double h = fabs(step[i])*0.1;
+	Double h = fabs(step[i])*0.1;
 	par[i] = parBest2[i] + h;
 	if (fitSym) {
 	  j = eval(fitTemp);
@@ -521,7 +521,7 @@ int ana_generalfit(int narg, int ps[])
       for (j = 0; j < nPar; j++)
         err[j] = 0;             /* so all errors are zero */
     } else for (i = 0; i < nPar; i++) {/* check all parameters */
-      double    h, h0, hmax, hmin, qmax;
+      Double    h, h0, hmax, hmin, qmax;
 
       if (!step[i]) {           /* this parameter was kept fixed, */
         err[i] = 0;             /* so we have no error estimate */
@@ -537,11 +537,11 @@ int ana_generalfit(int narg, int ps[])
 	 start from the best parameter value and go to higher values
 	 until we find a parameter value at which the error value is
 	 high enough.  Then we use bisecting to find the exact value
-	 of the parameter at which double the error occurs.  Then we
+	 of the parameter at which Double the error occurs.  Then we
 	 do the same thing going from the best value to lower values,
 	 and then the resulting error estimate for the parameter is
 	 the average of the distances going up and going down. */
-      double qual2 = qBest2*(nPoints + 1)/nPoints;
+      Double qual2 = qBest2*(nPoints + 1)/nPoints;
       h = fabs(step[i]);        /* first estimate: the step size */
       do {
         par[i] = parBest2[i] + h; /* best parameter value + error estimate */
@@ -603,7 +603,7 @@ int ana_generalfit(int narg, int ps[])
       /* to lower values */
       h = h0;                   /* value we got from going up is probably */
                                 /* pretty good */
-      /* we bracket the location with double the minimum error */
+      /* we bracket the location with Double the minimum error */
       do {
         par[i] = parBest2[i] - h; /* best parameter value - error estimate */
         /* calculate the quality */
@@ -696,10 +696,10 @@ int ana_generalfit(int narg, int ps[])
   return j;
 }
 /*------------------------------------------------------------*/
-gsl_vector *gsl_vector_from_ana_symbol(int iq, int axis)
+gsl_vector *gsl_vector_from_ana_symbol(Int iq, Int axis)
 {
   gsl_vector *v;
-  int ndim, *dims, nelem, i;
+  Int ndim, *dims, nelem, i;
   pointer data;
 
   iq = ana_double(1, &iq);
@@ -727,12 +727,12 @@ gsl_vector *gsl_vector_from_ana_symbol(int iq, int axis)
   return v;
 }
 /*------------------------------------------------------------*/
-double fit2_func(const gsl_vector *a, void *p)
+Double fit2_func(const gsl_vector *a, void *p)
 {
   ana_func_if *afif = (ana_func_if *) p;
   pointer par = ana_func_if_get_param_data(afif, 0);
-  memcpy(par.d, a->data, a->size*sizeof(double));
-  double result = ana_func_if_call(afif);
+  memcpy(par.d, a->data, a->size*sizeof(Double));
+  Double result = ana_func_if_call(afif);
   if (isnan(result))
     return GSL_NAN;
   return result;
@@ -748,7 +748,7 @@ double fit2_func(const gsl_vector *a, void *p)
   deviation of the difference <y> and <funcname>(<par>, <x>, <y>).
 
   We use the GSL framework to seek X that minimizes the value of
-  function double generalfit2_func(const gsl_vector * X, void *
+  function Double generalfit2_func(const gsl_vector * X, void *
   PARAMS).  Their X corresponds to our <par>, and their PARAMS
   corresponds to our <x> and <y> -- confusing!
 
@@ -770,19 +770,19 @@ double fit2_func(const gsl_vector *a, void *p)
   times the number of parameters.  0 means "no limit".
 
 */
-int ana_generalfit2(int narg, int ps[])
+Int ana_generalfit2(Int narg, Int ps[])
 {
-  int nPar, nPoints, result, ithresh = 0, nithresh;
+  Int nPar, nPoints, result, ithresh = 0, nithresh;
   gsl_multimin_fminimizer *minimizer = NULL;
   ana_func_if *afif = NULL;
   gsl_vector *par_v = NULL, *step_v = NULL;
-  int d_step_sym, d_par_sym, d_x_sym, d_y_sym;
-  double *errors = NULL, sthresh = 0;
+  Int d_step_sym, d_par_sym, d_x_sym, d_y_sym;
+  Double *errors = NULL, sthresh = 0;
 
-  int vocal = (internalMode & 1);
+  Int vocal = (internalMode & 1);
 
   {
-    int nx, *dims, ndim, nStep;
+    Int nx, *dims, ndim, nStep;
 
     d_x_sym = ana_double(1, &ps[0]);	/* X */
     if (isFreeTemp(d_x_sym))
@@ -812,12 +812,12 @@ int ana_generalfit2(int narg, int ps[])
   }
   if (narg > 5 && ps[5]) {	/* ERR */
     redef_array(ps[5], ANA_DOUBLE, 1, &nPar);
-    errors = (double *) array_data(ps[5]);
+    errors = (Double *) array_data(ps[5]);
   }
   if (narg > 6 && ps[6])	/* ITHRESH */
     ithresh = int_arg(ps[6]);
   if (ithresh <= 0)
-    ithresh = INT_MAX;
+    ithresh = INT32_MAX;
   if (narg > 7 && ps[7])	/* STHRESH */
     sthresh = double_arg(ps[7]);
   if (narg > 8 && ps[8])	/* NITHRESH */
@@ -825,7 +825,7 @@ int ana_generalfit2(int narg, int ps[])
   else
     nithresh = sqrt(nPar)*10;
   if (nithresh <= 0)
-    nithresh = INT_MAX;
+    nithresh = INT32_MAX;
 
   par_v = gsl_vector_from_ana_symbol(d_par_sym, -1);
   step_v = gsl_vector_from_ana_symbol(d_step_sym, -1);
@@ -867,16 +867,16 @@ int ana_generalfit2(int narg, int ps[])
     goto end;
   }
 
-  int status;
-  int iter = 0;
-  int show = nPar;
+  Int status;
+  Int iter = 0;
+  Int show = nPar;
   if (nPar > 9)
     show = 9;
   time_t report_after;
   if (vocal)
     report_after = time(NULL);
-  double oldqual, newqual = 0, vocal_oldqual = 0, size, vocal_oldsize = 0;
-  int no_improvement_niter = 0;
+  Double oldqual, newqual = 0, vocal_oldqual = 0, size, vocal_oldsize = 0;
+  Int no_improvement_niter = 0;
   do {
     ++iter;
     status = gsl_multimin_fminimizer_iterate(minimizer);
@@ -885,16 +885,16 @@ int ana_generalfit2(int narg, int ps[])
     size = gsl_multimin_fminimizer_size(minimizer);
     oldqual = newqual;
     newqual = sqrt(minimizer->fval/nPoints);
-    double improvement = newqual - oldqual;
+    Double improvement = newqual - oldqual;
     if (improvement)
       no_improvement_niter = 0;
     else
       ++no_improvement_niter;
     if (vocal && time(NULL) > report_after) {
-      int i, j = 0;
-      double vocal_improvement = newqual - vocal_oldqual;
+      Int i, j = 0;
+      Double vocal_improvement = newqual - vocal_oldqual;
       vocal_oldqual = newqual;
-      double size_improvement = size - vocal_oldsize;
+      Double size_improvement = size - vocal_oldsize;
       vocal_oldsize = size;
       printf("%d %g (%.3g) %.3g (%+.3g):", iter, newqual, vocal_improvement,
 	     size, size_improvement);
@@ -912,14 +912,14 @@ int ana_generalfit2(int narg, int ps[])
 	   && (no_improvement_niter < nithresh 
 	       || no_improvement_niter == iter - 1));
   gsl_vector *best_par = gsl_multimin_fminimizer_x(minimizer);
-  double best_min = gsl_multimin_fminimizer_minimum(minimizer);
+  Double best_min = gsl_multimin_fminimizer_minimum(minimizer);
 
   {
-    int n = best_par->size + 1;
+    Int n = best_par->size + 1;
     result = array_scratch(ANA_DOUBLE, 1, &n);
   }
-  double *tgt = array_data(result);
-  memcpy(tgt, best_par->data, best_par->size*sizeof(double));
+  Double *tgt = array_data(result);
+  memcpy(tgt, best_par->data, best_par->size*sizeof(Double));
   tgt[best_par->size] = sqrt(best_min/nPoints);
 
   if (errors) {
@@ -929,11 +929,11 @@ int ana_generalfit2(int narg, int ps[])
       q₊ = q₀ + ah₊² = q₀ + (q - q₀)h₊²/h²
       h₊² = h²(q₊ - q₀)/(q - q₀)
      */
-    int i;
+    Int i;
     for (i = 0; i < nPar; i++) {
       if (step_v->data[i]) {
-	double hp, hm, q, qtgt, qeps;
-	memcpy(par_v->data, best_par->data, nPar*sizeof(double));
+	Double hp, hm, q, qtgt, qeps;
+	memcpy(par_v->data, best_par->data, nPar*sizeof(Double));
 	hp = step_v->data[i];
 	qtgt = best_min*(nPar + 1.0)/nPar;
 	qeps = best_min*1e-5;
@@ -978,40 +978,40 @@ int ana_generalfit2(int narg, int ps[])
 REGISTER(generalfit2, f, FIT3, 5, 7, "X:Y:START:STEP:F:ERR:ITHRESH:1VOCAL");
 /*------------------------------------------------------------*/
 typedef union {
-  byte  *b;
+  Byte  *b;
   unsigned short        *w;
-  unsigned int  *l;
-  float *f;
-  double        *d;
+  uint32_t  *l;
+  Float *f;
+  Double        *d;
 } uscalar;
 
 /* replace NaN values by (other) random values */
-void denan(byte *data, int size, int partype)
+void denan(Byte *data, Int size, Int partype)
 /* <data> = start of data
    <size> = size of data, in bytes
    <partpe> = data type (ANA_BYTE ... ANA_FLOAT) */
 {
   uscalar p;
-  int i;
+  Int i;
 
   switch (partype) {
   case ANA_FLOAT:
-    p.f = (float *) data;
-    for (i = 0; i < size/sizeof(float); i++) {
+    p.f = (Float *) data;
+    for (i = 0; i < size/sizeof(Float); i++) {
       while (isnan(*p.f)) {
-        unsigned int *r;
-        for (r = (unsigned int *) p.b; (byte *) r < p.b + sizeof(float); r++)
+        uint32_t *r;
+        for (r = (uint32_t *) p.b; (Byte *) r < p.b + sizeof(Float); r++)
           *r = random_bits();
       }
       p.f++;
     }
     break;
   case ANA_DOUBLE:
-    p.d = (double *) data;
-    for (i = 0; i < size/sizeof(double); i++) {
+    p.d = (Double *) data;
+    for (i = 0; i < size/sizeof(Double); i++) {
       while (isnan(*p.d)) {
-        unsigned int *r;
-        for (r = (unsigned int *) p.b; (byte *) r < p.b + sizeof(double); r++) {
+        uint32_t *r;
+        for (r = (uint32_t *) p.b; (Byte *) r < p.b + sizeof(Double); r++) {
           *r = random_bits();
         }
       }
@@ -1021,9 +1021,9 @@ void denan(byte *data, int size, int partype)
   }
 }
 
-void printgene(byte *gene, int nPar, int partype, int showbits, 
-               double *quality) {
-  int j;
+void printgene(Byte *gene, Int nPar, Int partype, Int showbits, 
+               Double *quality) {
+  Int j;
   uscalar p;
 
   p.b = gene;
@@ -1049,8 +1049,8 @@ void printgene(byte *gene, int nPar, int partype, int showbits,
       break;
     }
     if (showbits) {
-      int i;
-      byte *b = gene + ana_type_size[partype]*j;
+      Int i;
+      Byte *b = gene + ana_type_size[partype]*j;
       printf(" {");
       for (i = ana_type_size[partype] - 1; i >= 0; i--)
         printf("%02x", b[i]);
@@ -1062,26 +1062,26 @@ void printgene(byte *gene, int nPar, int partype, int showbits,
   putchar(']');
 }
 
-void printgenenl(byte *gene, int nPar, int partype, int showbits, 
-                 double *quality) {
+void printgenenl(Byte *gene, Int nPar, Int partype, Int showbits, 
+                 Double *quality) {
   printgene(gene, nPar, partype, showbits, quality);
   putchar('\n');
 }
 
-int hasnan(byte *gene, int nPar, int partype) {
-  int i;
+Int hasnan(Byte *gene, Int nPar, Int partype) {
+  Int i;
   uscalar p;
 
   switch (partype) {
   case ANA_FLOAT:
-    p.f = (float *) gene;
+    p.f = (Float *) gene;
     for (i = 0; i < nPar; i++) {
       if (isnan(*p.f++))
         return 1;
     }
     break;
   case ANA_DOUBLE:
-    p.d = (double *) gene;
+    p.d = (Double *) gene;
     for (i = 0; i < nPar; i++) {
       if (isnan(*p.d++))
         return 1;
@@ -1106,18 +1106,18 @@ int hasnan(byte *gene, int nPar, int partype) {
      = (fitness*(mu - 1) + best - avg*mu)/(best - avg)
      = fitness*((mu - 1)/(best - avg)) + (best - avg*mu)/(best - avg)
 */
-void calculate_distribution(double *distr, double *deviation, int *rtoi,
-                            int nPopulation, double mu)
+void calculate_distribution(Double *distr, Double *deviation, Int *rtoi,
+                            Int nPopulation, Double mu)
 {
-  double sum = 0.0;
-  int i;
+  Double sum = 0.0;
+  Int i;
 
   for (i = 0; i < nPopulation; i++)
     sum += 1/deviation[i];
-  double a = 1, b = 0;
+  Double a = 1, b = 0;
   if (sum > 0) {
-    double avg_fitness = sum/nPopulation;
-    double best_fitness = 1/deviation[rtoi[nPopulation - 1]];
+    Double avg_fitness = sum/nPopulation;
+    Double best_fitness = 1/deviation[rtoi[nPopulation - 1]];
     if (avg_fitness != best_fitness) {
       a = (mu - 1)/(best_fitness - avg_fitness);
       b = (best_fitness - avg_fitness*mu)/(best_fitness - avg_fitness);
@@ -1126,7 +1126,7 @@ void calculate_distribution(double *distr, double *deviation, int *rtoi,
   sum = 0.0;
   distr[0] = 0.0;
   for (i = 1; i <= nPopulation; i++) {
-    double x = 1/deviation[rtoi[i - 1]];
+    Double x = 1/deviation[rtoi[i - 1]];
     if (x) {
       x = a*x + b;
       if (x < 0)
@@ -1146,32 +1146,32 @@ void calculate_distribution(double *distr, double *deviation, int *rtoi,
   }
 }
 
-int ana_geneticfit(int narg, int ps[])
+Int ana_geneticfit(Int narg, Int ps[])
 /* FIT2(x,y,START,fit [,mu,ngenerations,population,pcross,pmutate,vocal]
         [,/ELITE,/BYTE,/WORD,/LONG,/FLOAT,/DOUBLE]) */
 {
-  int   fitSym, iq, nPoints, nPopulation, nPar, fitTemp, i, j, size, result,
+  Int   fitSym, iq, nPoints, nPopulation, nPar, fitTemp, i, j, size, result,
     *rtoi, pair, k, w, generation, i1, i2, ibit,
     iter = 0, vocal, typesize, nGeneration;
   uscalar p;
-  word  *par, fitPar, xSym, ySym, fitArg[4], wSym;
-  byte  *genes, *parent1, *parent2, *genes2, t1, t2;
-  double *deviation, mu, *distr, random_one(void), pcross, *deviation2,
+  Word  *par, fitPar, xSym, ySym, fitArg[4], wSym;
+  Byte  *genes, *parent1, *parent2, *genes2, t1, t2;
+  Double *deviation, mu, *distr, random_one(void), pcross, *deviation2,
     crossmark, mutatemark, pmutate, sum;
-  double *weights, *start;
-  void  invertPermutation(int *data, int n),
-    indexxr_f(int n, float ra[], int indx[]);
-  int   random_distributed(int modulus, double *distr);
-  byte  changed, elite, partype;
-  static unsigned short int mask1[] = {
+  Double *weights, *start;
+  void  invertPermutation(Int *data, Int n),
+    indexxr_f(Int n, Float ra[], Int indx[]);
+  Int   random_distributed(Int modulus, Double *distr);
+  Byte  changed, elite, partype;
+  static uint16_t mask1[] = {
     0xff, 0x7f, 0x3f, 0x1f, 0x0f, 0x07, 0x03, 0x01
   }, mask2[] = {
     0x00, 0x80, 0xc0, 0xe0, 0xf0, 0xf8, 0xfc, 0xfe,
   }, mask3[] = {
     0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01,
   };
-  int *crossoversites, *mutationsites;
-  void indexxr_d(int, double *, int *);
+  Int *crossoversites, *mutationsites;
+  void indexxr_d(Int, Double *, Int *);
  
   iq = ps[3];                   /* fit */
   if (!symbolIsStringScalar(iq))
@@ -1206,9 +1206,9 @@ int ana_geneticfit(int narg, int ps[])
       break;
     }
   } else if (symbolIsArray(ps[2])) { /* start values */
-    int iq = ana_double(1, &ps[2]);
+    Int iq = ana_double(1, &ps[2]);
     nPar = array_size(iq);
-    start = (double *) array_data(iq);
+    start = (Double *) array_data(iq);
     partype = symbol_type(iq);
   }
 
@@ -1242,7 +1242,7 @@ int ana_geneticfit(int narg, int ps[])
       nPopulation = 1;
     /* we make sure that the population fills a number of ints exactly */
     if (partype < ANA_LONG)
-      nPopulation += (nPopulation % (sizeof(int)/ana_type_size[partype]));
+      nPopulation += (nPopulation % (sizeof(Int)/ana_type_size[partype]));
   } else
     nPopulation = 100;
 
@@ -1272,14 +1272,14 @@ int ana_geneticfit(int narg, int ps[])
     symbol_context(ySym) = 1;
 
   if (narg > 4 && (iq = ps[4])) { /* weights */
-    int n;
+    Int n;
     if (symbol_class(iq) != ANA_ARRAY)
       return cerror(NEED_ARR, iq);
     wSym = ana_double(1, &iq);
     n = array_size(wSym);
     if (n != nPoints)
       return cerror(INCMP_ARG, iq);
-    weights = (double *) array_data(wSym);
+    weights = (Double *) array_data(wSym);
     if (isFreeTemp(wSym))
       symbol_context(wSym) = 1;
   } else
@@ -1306,27 +1306,27 @@ int ana_geneticfit(int narg, int ps[])
   fitTemp = nextFreeTempExecutable();
   symbol_class(fitTemp) = ANA_USR_FUNC;
   usr_func_arguments(fitTemp) = fitArg;
-  symbol_memory(fitTemp) = (weights? 4: 3)*sizeof(word);
+  symbol_memory(fitTemp) = (weights? 4: 3)*sizeof(Word);
   usr_func_number(fitTemp) = fitSym;
 
   /* create initial population */
   genes = malloc(nPopulation*size);
   genes2 = malloc(nPopulation*size);
-  deviation = malloc(nPopulation*sizeof(double));
-  deviation2 = malloc(nPopulation*sizeof(double));
-  rtoi = malloc(nPopulation*sizeof(int));
-  /* itor = malloc(nPopulation*sizeof(int)); */
+  deviation = malloc(nPopulation*sizeof(Double));
+  deviation2 = malloc(nPopulation*sizeof(Double));
+  rtoi = malloc(nPopulation*sizeof(Int));
+  /* itor = malloc(nPopulation*sizeof(Int)); */
 
   /* we fill <genes> with random bits.  <genes> exactly spans a number */
   /* of ints, so we don't need to worry about the exact type */
-  p.l = (unsigned int *) genes;
+  p.l = (uint32_t *) genes;
   if (start) {                  /* fill first member with start values */
-    memcpy(p.d, start, nPar*sizeof(double));
+    memcpy(p.d, start, nPar*sizeof(Double));
     p.d += nPar;
-    i = size/sizeof(int);
+    i = size/sizeof(Int);
   } else
     i = 0;
-  for ( ; i < nPopulation*size/sizeof(int); i++)
+  for ( ; i < nPopulation*size/sizeof(Int); i++)
     *p.l++ = random_bits();
   /* if the parameter type is FLOAT or DOUBLE, then some of the bit patterns */
   /* may not correspond to representable values, but rather to NaNs. */
@@ -1361,7 +1361,7 @@ int ana_geneticfit(int narg, int ps[])
   /* calculate the distribution function for selecting members.
      member i gets a reproduction probability equal to
      distr[i+1] - distr[i] */
-  distr = malloc(nPopulation*sizeof(double));
+  distr = malloc(nPopulation*sizeof(Double));
   calculate_distribution(distr, deviation, rtoi, nPopulation, mu);
 
   if (vocal > 1) {
@@ -1389,17 +1389,17 @@ int ana_geneticfit(int narg, int ps[])
   crossmark = pcross? random_one()/pcross: LONG_MAX; /* bytes */
   mutatemark = pmutate? random_one()/pmutate: LONG_MAX; /* bits */
 
-  byte *child1 = malloc(size);
-  byte *child2 = malloc(size);
-  crossoversites = calloc(size*8, sizeof(int));
-  mutationsites = calloc(size*8, sizeof(int));
+  Byte *child1 = malloc(size);
+  Byte *child2 = malloc(size);
+  crossoversites = calloc(size*8, sizeof(Int));
+  mutationsites = calloc(size*8, sizeof(Int));
 
-  int mutatecount = 0;
-  int crossovercount = 0;
-  int offspringcount = 0;
+  Int mutatecount = 0;
+  Int crossovercount = 0;
+  Int offspringcount = 0;
 
   /* TODO: implement RESOLUTION argument, which says how many bytes
-     per parameter to fit, beginning with the most significant byte.
+     per parameter to fit, beginning with the most significant Byte.
      TODO: implement additional stop criteria other than just
      "number of generations"; at least something like "stop if
      quality unchanged for a fixed number of iterations" */
@@ -1434,14 +1434,14 @@ int ana_geneticfit(int narg, int ps[])
         ibit = crossmark;
         crossmark += random_one()/pcross;
         crossoversites[ibit]++;
-        w = ibit/8;             /* byte index */
+        w = ibit/8;             /* Byte index */
         k = ibit - 8*w;         /* bit index */
-        for (i = 0; i < w; i++) { /* swap before cross-over word */
+        for (i = 0; i < w; i++) { /* swap before cross-over Word */
           t1 = child1[i];
           child1[i] = child2[i];
           child2[i] = t1;
         } /* end of for (i = 0; ...) */
-        if (k) {                /* cross-over site is not on word boundary */
+        if (k) {                /* cross-over site is not on Word boundary */
           t1 = ((child1[w] & mask1[k]) | (child2[w] & mask2[k]));
           t2 = ((child2[w] & mask1[k]) | (child1[w] & mask2[k]));
           child1[w] = t1;
@@ -1451,12 +1451,12 @@ int ana_geneticfit(int narg, int ps[])
             || hasnan(child2, nPar, partype)) {
           /* we generated one or two NaNs from regular numbers: */
           /* undo the crossover */
-          for (i = 0; i < w; i++) { /* swap before cross-over word */
+          for (i = 0; i < w; i++) { /* swap before cross-over Word */
             t1 = child1[i];
             child1[i] = child2[i];
             child2[i] = t1;
           } /* end of for (i = 0; ...) */
-          if (k) {              /* cross-over site is not on word boundary */
+          if (k) {              /* cross-over site is not on Word boundary */
             t1 = ((child1[w] & mask1[k]) | (child2[w] & mask2[k]));
             t2 = ((child2[w] & mask1[k]) | (child1[w] & mask2[k]));
             child1[w] = t1;
@@ -1470,7 +1470,7 @@ int ana_geneticfit(int narg, int ps[])
             printgene(parent1, nPar, partype, 1, NULL);
             printf(" | ");
             printgene(parent2, nPar, partype, 1, NULL);
-            printf("\ncross-over byte %d bit %d\n", w, k);
+            printf("\ncross-over Byte %d bit %d\n", w, k);
             printf("           %d %d after   = ", i1, i2);
             printgene(child1, nPar, partype, 1, NULL);
             printf(" | ");
@@ -1486,7 +1486,7 @@ int ana_geneticfit(int narg, int ps[])
         ibit = mutatemark;
         mutatemark += random_one()/pmutate;
         mutationsites[ibit]++;
-        w = ibit/8;             /* byte index */
+        w = ibit/8;             /* Byte index */
         k = ibit - 8*w;         /* bit index */
         child1[w] ^= mask3[k]; /* flip bit */
         if (hasnan(child1, nPar, partype))
@@ -1498,7 +1498,7 @@ int ana_geneticfit(int narg, int ps[])
           if (vocal > 2) {
             printf("mutation #1 %d: before = ", i1);
             printgene(parent1, nPar, partype, 1, NULL);
-            printf("\nmutate byte %d bit %d\n", w, k);
+            printf("\nmutate Byte %d bit %d\n", w, k);
             printf("mutation #1 %d: after  = ", i1);
             printgene(child1, nPar, partype, 1, NULL);
             putchar('\n');
@@ -1510,7 +1510,7 @@ int ana_geneticfit(int narg, int ps[])
         ibit = mutatemark;
         mutatemark += random_one()/pmutate;
         mutationsites[ibit]++;
-        w = ibit/8;             /* byte index */
+        w = ibit/8;             /* Byte index */
         k = ibit - 8*w;         /* bit index */
         child2[w] ^= mask3[k]; /* flip bit */
         if (hasnan(child2, nPar, partype))
@@ -1522,7 +1522,7 @@ int ana_geneticfit(int narg, int ps[])
           if (vocal > 2) {
             printf("mutation #2 %d: before = ", i2);
             printgene(parent2, nPar, partype, 1, NULL);
-            printf("\nmutate byte %d bit %d\n", w, k);
+            printf("\nmutate Byte %d bit %d\n", w, k);
             printf("mutation #2 %d: after  = ", i2);
             printgene(child2, nPar, partype, 1, NULL);
             putchar('\n');
@@ -1558,7 +1558,7 @@ int ana_geneticfit(int narg, int ps[])
     deviation2 -= nPopulation;
     
     memcpy(genes, genes2, nPopulation*size);
-    memcpy(deviation, deviation2, nPopulation*sizeof(double));
+    memcpy(deviation, deviation2, nPopulation*sizeof(Double));
 
     indexxr_d(nPopulation, deviation, rtoi); /* get ranking */
     calculate_distribution(distr, deviation, rtoi, nPopulation, mu);
@@ -1580,7 +1580,7 @@ int ana_geneticfit(int narg, int ps[])
              deviation[rtoi[nPopulation/2]], deviation[rtoi[nPopulation - 1]],
              sum/nPopulation);
     }
-    /* memcpy(itor, rtoi, nPopulation*sizeof(int));
+    /* memcpy(itor, rtoi, nPopulation*sizeof(Int));
        invertPermutation(itor, nPopulation); */
   } /* end of while (generation--) */
   
@@ -1589,9 +1589,9 @@ int ana_geneticfit(int narg, int ps[])
          size);
   if (vocal) {
     printf("%4d offspring (probability %g)\n%4d cross-overs (probability %g per gene pair)\n%4d mutations (probability %g per bit)\n",
-           offspringcount, ((double) offspringcount)/(nPopulation*nGeneration),
-           crossovercount, ((double) crossovercount)/(nPopulation*nGeneration/2),
-           mutatecount, ((double) mutatecount)/(nPopulation*nGeneration*size*8));
+           offspringcount, ((Double) offspringcount)/(nPopulation*nGeneration),
+           crossovercount, ((Double) crossovercount)/(nPopulation*nGeneration/2),
+           mutatecount, ((Double) mutatecount)/(nPopulation*nGeneration*size*8));
     if (vocal > 1) {
       printf("cross-over site frequencies:\n");
       for (i = 0; i < size*8; i++)

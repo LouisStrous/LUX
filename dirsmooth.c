@@ -13,7 +13,7 @@ static char rcsid[] __attribute__ ((unused)) =
 #define CENTER	4
 #define DONE	5
 
-int sign(float x)
+Int sign(Float x)
 {
   if (x > 0)
     return 1;
@@ -23,7 +23,7 @@ int sign(float x)
     return 0;
 }
 /*--------------------------------------------------------------------*/
-int sgnclass(float x)
+Int sgnclass(Float x)
 {
   if (x > 0)
     return 2;
@@ -33,8 +33,8 @@ int sgnclass(float x)
     return 1;
 }
 /*--------------------------------------------------------------------*/
-int traverseElement(float xin, float yin, float vx, float vy,
-		    float *xout, float *yout)
+Int traverseElement(Float xin, Float yin, Float vx, Float vy,
+		    Float *xout, Float *yout)
 /* if you start at position (<xin>,<yin>), with 0 <= <xin>,<yin> <= 1,
    and move in the direction given by (<vx>,<vy>), then this routine
    determines which pixel boundary you cross (UP, DOWN, LEFT, RIGHT,
@@ -137,15 +137,15 @@ int traverseElement(float xin, float yin, float vx, float vy,
 }
 /*--------------------------------------------------------------------*/
 #define FACTOR	(0.886226925)	/* 0.5*sqrt(pi) */
-int ana_lic(int narg, int ps[])
+Int ana_lic(Int narg, Int ps[])
 /* Y = LIC(<data>,<vx>,<vy>)
    smooths 2D image <data> in the direction indicated by the
    angle <vx> and <vy>, over a distance indicated by the magnitude of vector
    <v>. */
 {
-  int	iq, nx, ny, ix, iy, c, index, rindex, count, twosided, normalize,
+  Int	iq, nx, ny, ix, iy, c, index, rindex, count, twosided, normalize,
     gaussian, iq0, di;
-  float	x1, y1, x2, y2, *vx0, *vy0, value, vx, vy, s, s0, ds, dslimit,
+  Float	x1, y1, x2, y2, *vx0, *vy0, value, vx, vy, s, s0, ds, dslimit,
     weight, ws;
   pointer	src, trgt, src0;
   loopInfo	srcinfo, trgtinfo;

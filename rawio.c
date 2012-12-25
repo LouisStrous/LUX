@@ -4,6 +4,7 @@
 #if HAVE_CONFIG_H
 #include "config.h"
 #endif
+#include "action.h"
 #include <stdio.h>
 #include <termios.h>		/* for struct termios, tcgetattr(), */
 				/* tcsetattr() */
@@ -12,10 +13,10 @@
 static char rcsid[] __attribute__ ((unused)) =
  "$Id: rawio.c,v 4.0 2001/02/07 20:37:04 strous Exp $";
 
-int	buffering = 1;
+Int	buffering = 1;
 static struct termios	entry_io_params; /* to save entry state */
 
-int rawIo(void)
+Int rawIo(void)
 /* sets input to raw (unbuffered) */
 {
   struct termios	io_params;
@@ -39,7 +40,7 @@ int rawIo(void)
   return 1;
 }
 /*----------------------------------------------------------------*/
-int cookedIo(void)
+Int cookedIo(void)
 /* sets input to buffered */
 {
   struct termios	io_params;
@@ -60,7 +61,7 @@ int cookedIo(void)
   return 1;
 }
 /*----------------------------------------------------------------*/
-int resetIo(void)
+Int resetIo(void)
 /* resets input to entry state */
 {
   if (tcsetattr(1, TCSANOW, &entry_io_params) < 0) {

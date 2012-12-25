@@ -2,12 +2,12 @@
 /* ANA routines dealing with file and terminal I/O. */
 
 /* ANA FZ file format:
-  byte     description
+  Byte     description
    0-3     .synch_pattern: magic number that identifies ANA FZ files
-           The value 0x5555aaaa is always written as an int, but it depends
-	   on the byte order of the machine whether byte 0 becomes 0x55
+           The value 0x5555aaaa is always written as an Int, but it depends
+	   on the Byte order of the machine whether Byte 0 becomes 0x55
 	   (MSB) or 0xaa (LSB).  This can therefore be used to check on
-	   the byte order of the source machine.
+	   the Byte order of the source machine.
    4       .subf: 0th bit: 1 if Rice compressed, 0 if plain
            7th bit: 1 if MSB first, 0 if LSB first.
    5       .source: an indication for the source of the data.  currently
@@ -15,14 +15,14 @@
    6       .nhb: number of header blocks of 512 bytes each
            (including the current block).  If the text header has less than
            256 characters, then it is stored in .txt; otherwise (nhb-1)
-	   additional 512-byte blocks follow the current data header.
+	   additional 512-Byte blocks follow the current data header.
    7       .datyp: the type of the data; 0 -> BYTE, 1 -> WORD, 2 -> LONG,
            3 -> FLOAT, 4 -> DOUBLE.
    8       .ndim: the number of dimensions in the data.
    9       .free1: unused.
   10-13    .cbytes[4]: used if Rice compression is applied.
   14-191   .free[178]: unused.
-  192-255  .dim[16]: the dimensions of the data in the byte order of the
+  192-255  .dim[16]: the dimensions of the data in the Byte order of the
            source machine.
   256-511  .txt[256]: text header.
 
@@ -54,7 +54,7 @@
 				/* malloc(), strtol(), realloc(), atol(), */
 				/* atof() */
 #include <ctype.h>		/* for tolower(), isspace(), isdigit() */
-#include <limits.h>		/* for INT_MAX */
+#include <limits.h>		/* for INT32_MAX */
 #include <float.h>		/* for FLT_MAX, DBL_MAX */
 #include <stdarg.h>		/* for va_list, va_start(), va_end() */
 #include <sys/types.h>		/* for stat(), opendir(), readdir(), */
@@ -79,53 +79,53 @@
 static char rcsid[] __attribute__ ((unused)) =
  "$Id: files.c,v 4.0 2001/02/07 20:37:00 strous Exp $";
 
-extern	int	noioctl, iformat, fformat, sformat, cformat, tformat,
+extern	Int	noioctl, iformat, fformat, sformat, cformat, tformat,
   noTrace;
-int	ana_swab(int, int *);
-int	swapl(int *, int);
-extern byte	line2[];
+Int	ana_swab(Int, Int *);
+Int	swapl(Int *, Int);
+extern Byte	line2[];
 extern char	expname[], batch;
-extern int	nest;	/* batch flag */
+extern Int	nest;	/* batch flag */
 extern FILE	*inputStream;
-extern int	 error_extra;
-int	type_ascii(int, int [], FILE *),
-  read_ascii(int, int [], FILE *, int), getNewLine(char *, char *, char),
-  redef_string(int, int);
-void	zerobytes(void *, int), endian(void *, int, int),
+extern Int	 error_extra;
+Int	type_ascii(Int, Int [], FILE *),
+  read_ascii(Int, Int [], FILE *, Int), getNewLine(char *, char *, char),
+  redef_string(Int, Int);
+void	zerobytes(void *, Int), endian(void *, Int, Int),
   fprintw(FILE *fp, char *string);
-extern	int scrat[];				/* scratch storage, also used 
+extern	Int scrat[];				/* scratch storage, also used 
 						 in anatest.c */
 /* some tables for lun type files */
 FILE	*ana_file[MAXFILES];
-int	ana_file_open[MAXFILES];	/* our own flag for each file */
+Int	ana_file_open[MAXFILES];	/* our own flag for each file */
 char	*ana_file_name[MAXFILES]; /* pointers to open file names */
-int	ana_rec_size[MAXFILES];		/*for associated variable files */
+Int	ana_rec_size[MAXFILES];		/*for associated variable files */
 /* items used by ASCII read routines */
-int	maxline = BUFSIZE;
+Int	maxline = BUFSIZE;
 char	expname[BUFSIZE];
 char	*str, *str2, *ulib_path; /* ulib_path global for ana_help
 				    LS 15sep92*/
-int	index_cnt = 0, line_cnt, left_cnt;
-extern int	crunch_slice;
-int	column = 0;
+Int	index_cnt = 0, line_cnt, left_cnt;
+extern Int	crunch_slice;
+Int	column = 0;
 
 static char	fits_head_malloc_flag = 0, *fitshead, *preamble;
-static int	runlengthflag = 0;
+static Int	runlengthflag = 0;
 
 char	*fmttok(char *);
 
-int	anacrunch(unsigned char *, short [], int, int, int, int),
-	anacrunch8(unsigned char *, byte [], int, int, int, int);
-int	anacrunchrun(unsigned char *, short [], int, int, int, int),
-	anacrunchrun8(unsigned char *, byte [], int, int, int, int);
+Int	anacrunch(unsigned char *, short [], Int, Int, Int, Int),
+	anacrunch8(unsigned char *, Byte [], Int, Int, Int, Int);
+Int	anacrunchrun(unsigned char *, short [], Int, Int, Int, Int),
+	anacrunchrun8(unsigned char *, Byte [], Int, Int, Int, Int);
 #if SIZEOF_LONG_LONG_INT == 8	/* 64-bit integers */
-int	anacrunch32(byte *, int [], int, int, int, int);
+Int	anacrunch32(Byte *, Int [], Int, Int, Int, Int);
 #endif
 
-int	byte_count;		/* also used by tape.c, which is only */
+Int	byte_count;		/* also used by tape.c, which is only */
 				/* included if HAVE_SYS_MTIO_H is defined */
 
-void read_a_number_fp(FILE *, scalar *, int *);
+void read_a_number_fp(FILE *, scalar *, Int *);
 
 #define ASK_MORE	0
 #define ERROR_EOF	1
@@ -148,7 +148,7 @@ char *expand_name(char *name, char *extension)
  */
 
 {
- int    n, n2, error = 0;
+ Int    n, n2, error = 0;
  char   *envname, *p;
 
 	/* first expand possible environment variable */
@@ -189,7 +189,7 @@ char *expand_name(char *name, char *extension)
  return expname;
 }
 /*------------------------------------------------------------------------- */
-int ana_setenv(int narg, int ps[])
+Int ana_setenv(Int narg, Int ps[])
 /* specify or display an environment variable; these are useful in file names.
    Uses POSIX routine putenv(char *string)
    LS 1apr94, 20jul2000 */
@@ -215,7 +215,7 @@ int ana_setenv(int narg, int ps[])
  return ANA_OK;
 }
 /*------------------------------------------------------------------------- */
-int ana_getenv(int narg, int ps[])
+Int ana_getenv(Int narg, Int ps[])
 /* get an environment variable; these are useful in file names. */
 /* Headers:
    <stdlib.h>: getenv()
@@ -223,7 +223,7 @@ int ana_getenv(int narg, int ps[])
 */
 {
  char	*p;
- int	n, result;
+ Int	n, result;
 
  if (symbol_class(*ps) != ANA_STRING)
    return cerror(NEED_STR, *ps);
@@ -237,7 +237,7 @@ int ana_getenv(int narg, int ps[])
  return result;
 }
 /*---------------------------------------------------------------------------*/
-int ana_spawn(int narg, int ps[])		/* execute a shell command */
+Int ana_spawn(Int narg, Int ps[])		/* execute a shell command */
  /* uses the system call to execute a shell command, but may not be the
  	shell you want! depends on local setup */
 /* Headers:
@@ -245,7 +245,7 @@ int ana_spawn(int narg, int ps[])		/* execute a shell command */
  */
 {
   char *p;
-  int	result;
+  Int	result;
 
   if (!symbolIsStringScalar(ps[0]))
     return cerror(NEED_STR, *ps);
@@ -256,7 +256,7 @@ int ana_spawn(int narg, int ps[])		/* execute a shell command */
   else return result == 0? 1: -1;
  }
 /*---------------------------------------------------------------------------*/
-int ana_spawn_f(int narg, int ps[])		/* execute a shell command */
+Int ana_spawn_f(Int narg, Int ps[])		/* execute a shell command */
  /* uses the system call to execute a shell command, but may not be the
  	shell you want! depends on local setup */
 /* Headers:
@@ -264,7 +264,7 @@ int ana_spawn_f(int narg, int ps[])		/* execute a shell command */
  */
 {
   char *p;
-  int	result;
+  Int	result;
 
   if (!symbolIsStringScalar(ps[0]))
     return cerror(NEED_STR, *ps);
@@ -274,7 +274,7 @@ int ana_spawn_f(int narg, int ps[])		/* execute a shell command */
   return result;
  }
 /*------------------------------------------------------------------------- */
-FILE *openPathFile(char *name, int mode)
+FILE *openPathFile(char *name, Int mode)
 /* If name starts with $, then expands environment variable and tries
   to open file with resulting name.  If name starts with /, then searches
   in named directory (full path name).  Else, searches for the named file in
@@ -296,7 +296,7 @@ FILE *openPathFile(char *name, int mode)
 {
   char	*copy, *p, *plist;
   FILE	*fin;
-  extern int	echo, trace, step, executeLevel, traceMode;
+  extern Int	echo, trace, step, executeLevel, traceMode;
 
   copy = strsave(name);
   if (mode & FIND_LOWER) {
@@ -308,7 +308,7 @@ FILE *openPathFile(char *name, int mode)
   }
   mode &= ~FIND_LOWER;
   p = copy;
-  while (isspace((byte) *p++));			/* skip spaces */
+  while (isspace((Byte) *p++));			/* skip spaces */
   switch (*--p) {
     case '$': case '~': case '/':
       plist = NULL;
@@ -369,7 +369,7 @@ FILE *openPathFile(char *name, int mode)
   return fin;
 }
 /*------------------------------------------------------------------------- */
-int ana_ulib(int narg, int ps[])
+Int ana_ulib(Int narg, Int ps[])
  /*set ulib path */
 /* Headers:
    <stdio.h>: printf()
@@ -390,21 +390,21 @@ int ana_ulib(int narg, int ps[])
  return ANA_OK;
 }
 /*------------------------------------------------------------------------- */
-int ana_type(int narg, int ps[])
+Int ana_type(Int narg, Int ps[])
  /* (stdin) printing */
 {
-  int	type_ascii(int, int [], FILE *);
+  Int	type_ascii(Int, Int [], FILE *);
 
   return type_ascii(narg, ps, stdout);
 }
 /*------------------------------------------------------------------------- */
-int ana_printf(int narg, int ps[])
+Int ana_printf(Int narg, Int ps[])
  /* file (stdin) reading and formatting */
 /* Headers:
    <stdio.h>: FILE
  */
 {
-  int	lun, col, result;
+  Int	lun, col, result;
   FILE	*fp;
 
   lun = int_arg(ps[0]);
@@ -424,14 +424,14 @@ int ana_printf(int narg, int ps[])
   return result;
  }
 /*------------------------------------------------------------------------- */
-int ana_printf_f(int narg, int ps[])
+Int ana_printf_f(Int narg, Int ps[])
  /* a function version that returns 1 if read OK */
 {
   return ana_printf(narg, ps) == ANA_OK? ANA_ONE: ANA_ZERO;
 }
 /*------------------------------------------------------------------------- */
-int format_width = 0, format_precision = 0;
-int format_check(char *format, char **next, int store)
+Int format_width = 0, format_precision = 0;
+Int format_check(char *format, char **next, Int store)
 /* checks whether a string is a valid output format string.
   Stores string in apropriate global variable (fformat, iformat, sformat)
   if legal.
@@ -453,8 +453,8 @@ int format_check(char *format, char **next, int store)
 {
  char	*p, *p2, *p3;
  static char	format_kinds[] = "diouxXeEfgGtTjs";
- int	n = 0, k;
- int	ana_delete(int, int []);
+ Int	n = 0, k;
+ Int	ana_delete(Int, Int []);
 
  if (next)
    *next = format;	/* defaults */
@@ -472,19 +472,19 @@ int format_check(char *format, char **next, int store)
    n += p - format;
    p2 = p++;			/* add prefix to size */
    p += strspn(p, "-+ 0#");	/* skip -+0# and space */
-   if (isdigit((byte) *p))		/* width */
+   if (isdigit((Byte) *p))		/* width */
      sscanf(p, "%d", &format_width);
    else
      format_width = -1;		/* not specified */
-   while (isdigit((byte) *p))
+   while (isdigit((Byte) *p))
      p++;			/* skip width */
    if (*p == '.') {
      p++;
-     if (isdigit((byte) *p))		/* precision */
+     if (isdigit((Byte) *p))		/* precision */
        sscanf(p, "%d", &format_precision);
      else
        format_precision = -1;	/* not specified */
-     while (isdigit((byte) *p))
+     while (isdigit((Byte) *p))
        p++;			/* skip precision */
    } else
      format_precision = -1;	/* not specified */
@@ -530,8 +530,8 @@ int format_check(char *format, char **next, int store)
  return k;
 }
 /*------------------------------------------------------------------------- */
-int input_format_check(char *format, char **next, char **widths, int *datatype,
-		       char *formatchar, char *suppress, int *number)
+Int input_format_check(char *format, char **next, char **widths, Int *datatype,
+		       char *formatchar, char *suppress, Int *number)
 /* checks whether a string is a valid input format string.  Returns pointer
  to just after the checked format in <*next>, if <next> is non-NULL.
  Returns character code of data type in <*formatchar>, or 0 if no data type
@@ -551,12 +551,12 @@ int input_format_check(char *format, char **next, char **widths, int *datatype,
    <stdlib.h>: strtol()
  */
 {
-  int	big, explicit;
+  Int	big, explicit;
   char	*p, *p2;
 
   /* skip initial whitespace: not all compilers handle it the same way */
   p = format;
-  while (*format && isspace((byte) *format))
+  while (*format && isspace((Byte) *format))
     format++;
   p2 = format;			/* possible start of explicit text */
   /* seek format entry */
@@ -591,7 +591,7 @@ int input_format_check(char *format, char **next, char **widths, int *datatype,
       break;
   }
   if (*format == '.')		/* precision - only useful for %t and %T */
-    while (isdigit((byte) *++format));
+    while (isdigit((Byte) *++format));
   big = 0;			/* modifier */
   switch (*format) {
     case 'h':
@@ -634,7 +634,7 @@ int input_format_check(char *format, char **next, char **widths, int *datatype,
   }
   p = ++format;			/* just after data type specification */
   /* look for repeat count */
-  while (isdigit((byte) *p))
+  while (isdigit((Byte) *p))
     p++;
   if (p != format && *p == '#')	 /* have a repeat count */
     *number *= strtol(format, &format, 10);
@@ -643,7 +643,7 @@ int input_format_check(char *format, char **next, char **widths, int *datatype,
   return explicit;
 }
 /*------------------------------------------------------------------------- */
-int ana_format_set(int narg, int ps[])
+Int ana_format_set(Int narg, Int ps[])
  /* check & set (multiple) print formats.  Allowed formats:
      [anything] % [digits] [.] [digits] {one of diouxXeEfgGsz} 
     d,i,o,u,x,X-types are put in !format_i; e,E,f,g,G-types in !format_f,
@@ -656,7 +656,7 @@ int ana_format_set(int narg, int ps[])
  */
 {
   char	*string, *fmt;
-  int	n, iq = 0;
+  Int	n, iq = 0;
   extern formatInfo	theFormat;
   pointer	p;
 
@@ -723,10 +723,10 @@ int ana_format_set(int narg, int ps[])
   return ANA_OK;
 }
 /*------------------------------------------------------------------------- */
-static int	pager = -1;
-extern int	page;		/* number of lines per page */
-static int	printwLines = 0; /* number of lines output by printw so far */
-void setPager(int offset)
+static Int	pager = -1;
+extern Int	page;		/* number of lines per page */
+static Int	printwLines = 0; /* number of lines output by printw so far */
+void setPager(Int offset)
      /* sets pager for printw and printwf */
 {
   pager = (printwLines + page - 2 + offset) % (page - 2);
@@ -754,7 +754,7 @@ void printwf(char *fmt, ...)
   printw(curScrat);
 }
 /*------------------------------------------------------------------------- */
-void type_ascii_one(int symbol, FILE *fp)
+void type_ascii_one(Int symbol, FILE *fp)
 /* prints one symbol's contents to a stream. */
 /* Headers:
    <stdio.h>: sprintf(), FILE
@@ -764,9 +764,9 @@ void type_ascii_one(int symbol, FILE *fp)
   scalar	number;
   extern char	*fmt_integer, *fmt_float, *fmt_complex, *fmt_string;
   extern formatInfo	theFormat;
-  int	i, n, j;
-  int	Sprintf_tok(char *, ...);
-  char	*nextformat(char *, int);
+  Int	i, n, j;
+  Int	Sprintf_tok(char *, ...);
+  char	*nextformat(char *, Int);
   pointer	ptr;
   listElem	*sptr;
 
@@ -776,13 +776,13 @@ void type_ascii_one(int symbol, FILE *fp)
     case ANA_SCALAR: case ANA_FIXED_NUMBER:
       switch (scalar_type(symbol)) {
 	case ANA_BYTE:
-	  number.l = (int) scalar_value(symbol).b;
+	  number.l = (Int) scalar_value(symbol).b;
 	  break;
 	case ANA_WORD:
-	  number.l = (int) scalar_value(symbol).w;
+	  number.l = (Int) scalar_value(symbol).w;
 	  break;
 	case ANA_LONG:
-	  number.l = (int) scalar_value(symbol).l;
+	  number.l = (Int) scalar_value(symbol).l;
 	  break;
 	case ANA_FLOAT:
 	  number.d = scalar_value(symbol).f;
@@ -794,7 +794,7 @@ void type_ascii_one(int symbol, FILE *fp)
       if (scalar_type(symbol) < ANA_FLOAT) { /* integer type */
 	sprintf(curScrat, fmt_integer, number.l);
 	fprintw(fp, curScrat);
-      } else { 			/* float type */
+      } else { 			/* Float type */
 	/* it may be a %j, %z, %t, or %T so we must use our own printer */
 	Sprintf(curScrat, fmt_float, number.d);
 	fprintw(fp, curScrat);
@@ -803,8 +803,8 @@ void type_ascii_one(int symbol, FILE *fp)
     case ANA_CSCALAR:
       ptr.cf = complex_scalar_data(symbol).cf;
       if (complex_scalar_type(symbol) == ANA_CFLOAT)
-	Sprintf(curScrat, fmt_complex, (double) ptr.cf->real,
-		(double) ptr.cf->imaginary);
+	Sprintf(curScrat, fmt_complex, (Double) ptr.cf->real,
+		(Double) ptr.cf->imaginary);
       else
 	Sprintf(curScrat, fmt_complex, ptr.cd->real, ptr.cd->imaginary);
       fprintw(fp, curScrat);
@@ -857,7 +857,7 @@ void type_ascii_one(int symbol, FILE *fp)
 	  while (j--) {
 	    if (!j && (theFormat.flags & FMT_MIX2))
 	      theFormat.spec_char[1] = '\0';
-	    Sprintf_tok(curScrat, (int) *ptr.b++);
+	    Sprintf_tok(curScrat, (Int) *ptr.b++);
 	    fprintw(fp, curScrat);
 	    if (j && (internalMode & 4))
 	      nextformat(NULL, 1);
@@ -868,7 +868,7 @@ void type_ascii_one(int symbol, FILE *fp)
 	  while (j--) {
 	    if (!j && (theFormat.flags & FMT_MIX2))
 	      theFormat.spec_char[1] = '\0';
-	    Sprintf_tok(curScrat, (int) *ptr.w++);
+	    Sprintf_tok(curScrat, (Int) *ptr.w++);
 	    fprintw(fp, curScrat);
 	    if (j && (internalMode & 4))
 	      nextformat(NULL, 1);
@@ -879,7 +879,7 @@ void type_ascii_one(int symbol, FILE *fp)
 	  while (j--) {
 	    if (!j && (theFormat.flags & FMT_MIX2))
 	      theFormat.spec_char[1] = '\0';
-	    Sprintf_tok(curScrat, (int) *ptr.l++);
+	    Sprintf_tok(curScrat, (Int) *ptr.l++);
 	    fprintw(fp, curScrat);
 	    if (j && (internalMode & 4))
 	      nextformat(NULL, 1);
@@ -890,7 +890,7 @@ void type_ascii_one(int symbol, FILE *fp)
 	  while (j--) {
 	    if (!j && (theFormat.flags & FMT_MIX2))
 	      theFormat.spec_char[1] = '\0';
-	    Sprintf_tok(curScrat, (double) *ptr.f++);
+	    Sprintf_tok(curScrat, (Double) *ptr.f++);
 	    fprintw(fp, curScrat);
 	    if (j && (internalMode & 4))
 	      nextformat(NULL, 1);
@@ -901,7 +901,7 @@ void type_ascii_one(int symbol, FILE *fp)
 	  while (j--) {
 	    if (!j && (theFormat.flags & FMT_MIX2))
 	      theFormat.spec_char[1] = '\0';
-	    Sprintf_tok(curScrat, (double) *ptr.d++);
+	    Sprintf_tok(curScrat, (Double) *ptr.d++);
 	    fprintw(fp, curScrat);
 	    if (j && (internalMode & 4))
 	      nextformat(NULL, 1);
@@ -926,10 +926,10 @@ void type_ascii_one(int symbol, FILE *fp)
     case ANA_SCAL_PTR:
       switch (scal_ptr_type(symbol)) {
 	case ANA_BYTE:
-	  number.l = (int) *scal_ptr_pointer(symbol).b;
+	  number.l = (Int) *scal_ptr_pointer(symbol).b;
 	  break;
 	case ANA_WORD:
-	  number.l = (int) *scal_ptr_pointer(symbol).w;
+	  number.l = (Int) *scal_ptr_pointer(symbol).w;
 	  break;
 	case ANA_LONG:
 	  number.l = *scal_ptr_pointer(symbol).l;
@@ -938,13 +938,13 @@ void type_ascii_one(int symbol, FILE *fp)
 	  number.f = *scal_ptr_pointer(symbol).f;
 	  break;
 	case ANA_DOUBLE:
-	  number.f = (float) *scal_ptr_pointer(symbol).d;
+	  number.f = (Float) *scal_ptr_pointer(symbol).d;
 	  break;
       }
       if (scal_ptr_type(symbol) < ANA_FLOAT) { /* integer type */
 	sprintf(curScrat, fmt_integer, number.l);
 	fprintw(fp, curScrat);
-      } else if (scal_ptr_type(symbol) <= ANA_DOUBLE) { /* float type */
+      } else if (scal_ptr_type(symbol) <= ANA_DOUBLE) { /* Float type */
 	Sprintf(curScrat, fmt_float, number.f);
 	fprintw(fp, curScrat);
       }
@@ -974,8 +974,8 @@ void type_ascii_one(int symbol, FILE *fp)
       switch (array_type(symbol)) {
 	case ANA_CFLOAT:
 	  while (n--) {
-	    Sprintf(curScrat, fmt_complex, (double) ptr.cf->real,
-		    (double) ptr.cf->imaginary);
+	    Sprintf(curScrat, fmt_complex, (Double) ptr.cf->real,
+		    (Double) ptr.cf->imaginary);
 	    fprintw(fp, curScrat);
 	    ptr.cf++;
 	    if (n && (internalMode & 4))
@@ -999,7 +999,7 @@ void type_ascii_one(int symbol, FILE *fp)
   }
 }
 /*------------------------------------------------------------------------- */
-char *nextformat(char *fmt, int mode)
+char *nextformat(char *fmt, Int mode)
 /* <fmt> non-NULL: install <fmt> as new format string. */
 /* always: selects next format entry from the currently installed format */
 /* string.  If <mode> is equal to FMT_INSTALL, then also install the */
@@ -1066,7 +1066,7 @@ char *nextformat(char *fmt, int mode)
   return theFormat.start;
 }
 /*------------------------------------------------------------------------- */
-int type_ascii(int narg, int ps[], FILE *fp)
+Int type_ascii(Int narg, Int ps[], FILE *fp)
 /* print the argument(s) in ASCII format to the file at <fp>.  If any
    one but the last argument starts with a C-style format (beginning
    with %) then such an argument is a format specification and the
@@ -1086,7 +1086,7 @@ int type_ascii(int narg, int ps[], FILE *fp)
    <stdio.h>: fputs(), fputc(), stdout, fflush(), FILE
  */
 {
-  int	i, iq, fmtsym;
+  Int	i, iq, fmtsym;
   char	*p = NULL;
   char	*fmttok(char *);
   extern formatInfo	theFormat;
@@ -1153,7 +1153,7 @@ int type_ascii(int narg, int ps[], FILE *fp)
   return ANA_OK;
 }
 /*------------------------------------------------------------------------- */
-int type_formatted_ascii(int narg, int ps[], FILE *fp)
+Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 /* print using a user-supplied format string.  Arguments are cast to
    the expected type.  If <fp> is equal to NULL, then prints into a
    string at <curScrat>. 13oct98 */
@@ -1164,10 +1164,10 @@ int type_formatted_ascii(int narg, int ps[], FILE *fp)
  */
 {
   char	*fmt, *thefmt, *save, haveTrailer, dofreefmt, *newfmt, *ptr;
-  int	iq, n, nn, iq0;
+  Int	iq, n, nn, iq0;
   pointer	p;
   extern formatInfo	theFormat;
-  int	Sprintf(char *, char *, ...);
+  Int	Sprintf(char *, char *, ...);
 
   iq = iq0 = ps[0];		/* the format symbol */
   if (symbol_class(iq0) == ANA_SCAL_PTR)
@@ -1272,13 +1272,13 @@ int type_formatted_ascii(int narg, int ps[], FILE *fp)
 	      case ANA_BYTE:
 		if (fp) 
 		  while (n--) {
-		    fprintf(fp, thefmt, (int) *p.b++);
+		    fprintf(fp, thefmt, (Int) *p.b++);
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2)))
 		      fputs(theFormat.plain, fp);
 		  }
 		else
 		  while (n--) {
-		    sprintf(curScrat, thefmt, (int) *p.b++);
+		    sprintf(curScrat, thefmt, (Int) *p.b++);
 		    curScrat += strlen(curScrat);
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2))) {
 		      strcpy(curScrat, theFormat.plain);
@@ -1289,13 +1289,13 @@ int type_formatted_ascii(int narg, int ps[], FILE *fp)
 	      case ANA_WORD:
 		if (fp) 
 		  while (n--) {
-		    fprintf(fp, thefmt, (int) *p.w++);
+		    fprintf(fp, thefmt, (Int) *p.w++);
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2)))
 		      fputs(theFormat.plain, fp);
 		  }
 		else
 		  while (n--) {
-		    sprintf(curScrat, thefmt, (int) *p.w++);
+		    sprintf(curScrat, thefmt, (Int) *p.w++);
 		    curScrat += strlen(curScrat);
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2))) {
 		      strcpy(curScrat, theFormat.plain);
@@ -1306,13 +1306,13 @@ int type_formatted_ascii(int narg, int ps[], FILE *fp)
 	      case ANA_LONG:
 		if (fp) 
 		  while (n--) {
-		    fprintf(fp, thefmt, (int) *p.l++);
+		    fprintf(fp, thefmt, (Int) *p.l++);
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2)))
 		      fputs(theFormat.plain, fp);
 		  }
 		else
 		  while (n--) {
-		    sprintf(curScrat, thefmt, (int) *p.l++);
+		    sprintf(curScrat, thefmt, (Int) *p.l++);
 		    curScrat += strlen(curScrat);
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2))) {
 		      strcpy(curScrat, theFormat.plain);
@@ -1323,13 +1323,13 @@ int type_formatted_ascii(int narg, int ps[], FILE *fp)
 	      case ANA_FLOAT:
 		if (fp) 
 		  while (n--) {
-		    fprintf(fp, thefmt, (int) *p.f++);
+		    fprintf(fp, thefmt, (Int) *p.f++);
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2)))
 		      fputs(theFormat.plain, fp);
 		  }
 		else
 		  while (n--) {
-		    sprintf(curScrat, thefmt, (int) *p.f++);
+		    sprintf(curScrat, thefmt, (Int) *p.f++);
 		    curScrat += strlen(curScrat);
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2))) {
 		      strcpy(curScrat, theFormat.plain);
@@ -1340,13 +1340,13 @@ int type_formatted_ascii(int narg, int ps[], FILE *fp)
 	      case ANA_DOUBLE:
 		if (fp) 
 		  while (n--) {
-		    fprintf(fp, thefmt, (int) *p.d++);
+		    fprintf(fp, thefmt, (Int) *p.d++);
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2)))
 		      fputs(theFormat.plain, fp);
 		  }
 		else
 		  while (n--) {
-		    sprintf(curScrat, thefmt, (int) *p.d++);
+		    sprintf(curScrat, thefmt, (Int) *p.d++);
 		    curScrat += strlen(curScrat);
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2))) {
 		      strcpy(curScrat, theFormat.plain);
@@ -1357,14 +1357,14 @@ int type_formatted_ascii(int narg, int ps[], FILE *fp)
 	      case ANA_CFLOAT:
 		if (fp)
 		  while (n--) {
-		    fprintf(fp, thefmt, (int) p.cf->real);
+		    fprintf(fp, thefmt, (Int) p.cf->real);
 		    p.cf++;
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2)))
 		      fputs(theFormat.plain, fp);
 		  }
 		else
 		  while (n--) {
-		    sprintf(curScrat, thefmt, (int) p.cf->real);
+		    sprintf(curScrat, thefmt, (Int) p.cf->real);
 		    p.cf++;
 		    curScrat += strlen(curScrat);
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2))) {
@@ -1376,7 +1376,7 @@ int type_formatted_ascii(int narg, int ps[], FILE *fp)
 	      case ANA_CDOUBLE:
 		if (fp)
 		  while (n--) {
-		    fprintf(fp, thefmt, (int) p.cd->real);
+		    fprintf(fp, thefmt, (Int) p.cd->real);
 		    p.cd++;
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2)))
 		      fputs(theFormat.plain, fp);
@@ -1404,13 +1404,13 @@ int type_formatted_ascii(int narg, int ps[], FILE *fp)
 	      case ANA_BYTE:
 		if (fp)
 		  while (n--) {
-		    fprintf(fp, thefmt, (double) *p.b++);
+		    fprintf(fp, thefmt, (Double) *p.b++);
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2)))
 		      fputs(theFormat.plain, fp);
 		  }
 		else
 		  while (n--) {
-		    sprintf(curScrat, thefmt, (double) *p.b++);
+		    sprintf(curScrat, thefmt, (Double) *p.b++);
 		    curScrat += strlen(curScrat);
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2))) {
 		      strcpy(curScrat, theFormat.plain);
@@ -1421,13 +1421,13 @@ int type_formatted_ascii(int narg, int ps[], FILE *fp)
 	      case ANA_WORD:
 		if (fp)
 		  while (n--) {
-		    fprintf(fp, thefmt, (double) *p.w++);
+		    fprintf(fp, thefmt, (Double) *p.w++);
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2)))
 		      fputs(theFormat.plain, fp);
 		  }
 		else
 		  while (n--) {
-		    sprintf(curScrat, thefmt, (double) *p.w++);
+		    sprintf(curScrat, thefmt, (Double) *p.w++);
 		    curScrat += strlen(curScrat);
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2))) {
 		      strcpy(curScrat, theFormat.plain);
@@ -1438,13 +1438,13 @@ int type_formatted_ascii(int narg, int ps[], FILE *fp)
 	      case ANA_LONG:
 		if (fp)
 		  while (n--) {
-		    fprintf(fp, thefmt, (double) *p.l++);
+		    fprintf(fp, thefmt, (Double) *p.l++);
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2)))
 		      fputs(theFormat.plain, fp);
 		  }
 		else
 		  while (n--) {
-		    sprintf(curScrat, thefmt, (double) *p.l++);
+		    sprintf(curScrat, thefmt, (Double) *p.l++);
 		    curScrat += strlen(curScrat);
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2))) {
 		      strcpy(curScrat, theFormat.plain);
@@ -1455,13 +1455,13 @@ int type_formatted_ascii(int narg, int ps[], FILE *fp)
 	      case ANA_FLOAT:
 		if (fp)
 		  while (n--) {
-		    fprintf(fp, thefmt, (double) *p.f++);
+		    fprintf(fp, thefmt, (Double) *p.f++);
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2)))
 		      fputs(theFormat.plain, fp);
 		  }
 		else
 		  while (n--) {
-		    sprintf(curScrat, thefmt, (double) *p.f++);
+		    sprintf(curScrat, thefmt, (Double) *p.f++);
 		    curScrat += strlen(curScrat);
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2))) {
 		      strcpy(curScrat, theFormat.plain);
@@ -1472,13 +1472,13 @@ int type_formatted_ascii(int narg, int ps[], FILE *fp)
 	      case ANA_DOUBLE:
 		if (fp)
 		  while (n--) {
-		    fprintf(fp, thefmt, (double) *p.d++);
+		    fprintf(fp, thefmt, (Double) *p.d++);
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2)))
 		      fputs(theFormat.plain, fp);
 		  }
 		else
 		  while (n--) {
-		    sprintf(curScrat, thefmt, (double) *p.d++);
+		    sprintf(curScrat, thefmt, (Double) *p.d++);
 		    curScrat += strlen(curScrat);
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2))) {
 		      strcpy(curScrat, theFormat.plain);
@@ -1489,14 +1489,14 @@ int type_formatted_ascii(int narg, int ps[], FILE *fp)
 	      case ANA_CFLOAT:
 		if (fp)
 		  while (n--) {
-		    fprintf(fp, thefmt, (double) p.cf->real);
+		    fprintf(fp, thefmt, (Double) p.cf->real);
 		    p.cf++;
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2)))
 		      fputs(theFormat.plain, fp);
 		  }
 		else
 		  while (n--) {
-		    sprintf(curScrat, thefmt, (double) p.cf->real);
+		    sprintf(curScrat, thefmt, (Double) p.cf->real);
 		    p.cf++;
 		    curScrat += strlen(curScrat);
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2))) {
@@ -1508,7 +1508,7 @@ int type_formatted_ascii(int narg, int ps[], FILE *fp)
 	      case ANA_CDOUBLE:
 		if (fp)
 		  while (n--) {
-		    fprintf(fp, thefmt, (double) p.cd->real);
+		    fprintf(fp, thefmt, (Double) p.cd->real);
 		    p.cd++;
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2)))
 		      fputs(theFormat.plain, fp);
@@ -1534,7 +1534,7 @@ int type_formatted_ascii(int narg, int ps[], FILE *fp)
 	    switch (symbol_type(iq)) {
 	      case ANA_BYTE:
 		while (n--) {
-		  Sprintf(curScrat, thefmt, (double) *p.b++);
+		  Sprintf(curScrat, thefmt, (Double) *p.b++);
 		  if (fp)
 		    fputs(curScrat, fp);
 		  else
@@ -1551,7 +1551,7 @@ int type_formatted_ascii(int narg, int ps[], FILE *fp)
 		break;
 	      case ANA_WORD:
 		while (n--) {
-		  Sprintf(curScrat, thefmt, (double) *p.w++);
+		  Sprintf(curScrat, thefmt, (Double) *p.w++);
 		  if (fp)
 		    fputs(curScrat, fp);
 		  else
@@ -1568,7 +1568,7 @@ int type_formatted_ascii(int narg, int ps[], FILE *fp)
 		break;
 	      case ANA_LONG:
 		while (n--) {
-		  Sprintf(curScrat, thefmt, (double) *p.l++);
+		  Sprintf(curScrat, thefmt, (Double) *p.l++);
 		  if (fp)
 		    fputs(curScrat, fp);
 		  else
@@ -1585,7 +1585,7 @@ int type_formatted_ascii(int narg, int ps[], FILE *fp)
 		break;
 	      case ANA_FLOAT:
 		while (n--) {
-		  Sprintf(curScrat, thefmt, (double) *p.f++);
+		  Sprintf(curScrat, thefmt, (Double) *p.f++);
 		  if (fp)
 		    fputs(curScrat, fp);
 		  else
@@ -1602,7 +1602,7 @@ int type_formatted_ascii(int narg, int ps[], FILE *fp)
 		break;
 	      case ANA_DOUBLE:
 		while (n--) {
-		  Sprintf(curScrat, thefmt, (double) *p.d++);
+		  Sprintf(curScrat, thefmt, (Double) *p.d++);
 		  if (fp)
 		    fputs(curScrat, fp);
 		  else
@@ -1623,7 +1623,7 @@ int type_formatted_ascii(int narg, int ps[], FILE *fp)
 	    switch (symbol_type(iq)) {
 	      case ANA_BYTE:
 		while (n--) {
-		  Sprintf(curScrat, thefmt, (double) *p.b++, (double) 0.0);
+		  Sprintf(curScrat, thefmt, (Double) *p.b++, (Double) 0.0);
 		  if (fp)
 		    fputs(curScrat, fp);
 		  else
@@ -1640,7 +1640,7 @@ int type_formatted_ascii(int narg, int ps[], FILE *fp)
 		break;
 	      case ANA_WORD:
 		while (n--) {
-		  Sprintf(curScrat, thefmt, (double) *p.w++, (double) 0.0);
+		  Sprintf(curScrat, thefmt, (Double) *p.w++, (Double) 0.0);
 		  if (fp)
 		    fputs(curScrat, fp);
 		  else
@@ -1657,7 +1657,7 @@ int type_formatted_ascii(int narg, int ps[], FILE *fp)
 		break;
 	      case ANA_LONG:
 		while (n--) {
-		  Sprintf(curScrat, thefmt, (double) *p.l++, (double) 0.0);
+		  Sprintf(curScrat, thefmt, (Double) *p.l++, (Double) 0.0);
 		  if (fp)
 		    fputs(curScrat, fp);
 		  else
@@ -1674,7 +1674,7 @@ int type_formatted_ascii(int narg, int ps[], FILE *fp)
 		break;
 	      case ANA_FLOAT:
 		while (n--) {
-		  Sprintf(curScrat, thefmt, (double) *p.f++, (double) 0.0);
+		  Sprintf(curScrat, thefmt, (Double) *p.f++, (Double) 0.0);
 		  if (fp)
 		    fputs(curScrat, fp);
 		  else
@@ -1691,7 +1691,7 @@ int type_formatted_ascii(int narg, int ps[], FILE *fp)
 		break;
 	      case ANA_DOUBLE:
 		while (n--) {
-		  Sprintf(curScrat, thefmt, (double) *p.d++, (double) 0.0);
+		  Sprintf(curScrat, thefmt, (Double) *p.d++, (Double) 0.0);
 		  if (fp)
 		    fputs(curScrat, fp);
 		  else
@@ -1708,8 +1708,8 @@ int type_formatted_ascii(int narg, int ps[], FILE *fp)
 		break;
 	      case ANA_CFLOAT:
 		while (n--) {
-		  Sprintf(curScrat, thefmt, (double) p.cf->real,
-			  (double) p.cf->imaginary);
+		  Sprintf(curScrat, thefmt, (Double) p.cf->real,
+			  (Double) p.cf->imaginary);
 		  p.cf++;
 		  if (fp)
 		    fputs(curScrat, fp);
@@ -1813,7 +1813,7 @@ int type_formatted_ascii(int narg, int ps[], FILE *fp)
   return ANA_ERROR;
 }
 /*------------------------------------------------------------------------- */
-int ana_fprint(int narg, int ps[])
+Int ana_fprint(Int narg, Int ps[])
  /* (stdout) printing */
 /* Headers:
    <stdio.h>: FILE, stdout
@@ -1825,13 +1825,13 @@ int ana_fprint(int narg, int ps[])
  return	type_formatted_ascii(narg, ps, fp);
 }
 /*------------------------------------------------------------------------- */
-int ana_fprintf(int narg, int ps[])
+Int ana_fprintf(Int narg, Int ps[])
  /* file (stdout) formatting and printing */
 /* Headers:
    <stdio.h>: FILE
  */
 {
- int	lun;
+ Int	lun;
  FILE	*fp;
 
  lun = int_arg( ps[0] );
@@ -1845,13 +1845,13 @@ int ana_fprintf(int narg, int ps[])
  return	type_formatted_ascii(narg - 1, &ps[1], fp);
 }
 /*------------------------------------------------------------------------- */
-int ana_close(int narg, int ps[]) /* close subroutine */		
+Int ana_close(Int narg, Int ps[]) /* close subroutine */		
 /* Headers:
    <stdio.h>: fclose()
    <stdlib.h>: free()
  */
 {
-  int	lun;
+  Int	lun;
 
   lun = int_arg(ps[0]);
   if (lun < 0 || lun >= MAXFILES)
@@ -1865,7 +1865,7 @@ int ana_close(int narg, int ps[]) /* close subroutine */
   return 1;
 }
 /*------------------------------------------------------------------------- */
-int open_file(int narg, int ps[], char *access, char function)
+Int open_file(Int narg, Int ps[], char *access, char function)
  /* generic file opening routine, called by OPENR, OPENW, OPENU routines
     and functions   LS 8jul92
     openu must open a file for reading and writing anywhere in the file.
@@ -1876,7 +1876,7 @@ int open_file(int narg, int ps[], char *access, char function)
  */
 {
  FILE	*fp;
- int	lun, result_sym;
+ Int	lun, result_sym;
  char	*name;
 
  if (function) {		/* function call */
@@ -1940,7 +1940,7 @@ int open_file(int narg, int ps[], char *access, char function)
  return (function)? result_sym: 1;
 }
 /*------------------------------------------------------------------------- */
-int ana_openr_f(int narg, int ps[])/* openr subroutine */
+Int ana_openr_f(Int narg, Int ps[])/* openr subroutine */
  /* intended mainly for reading ASCII files in old ANA, but may be useful
  for streams in general for UNIX version */
  /* associates a file (or a stream) with a lun */
@@ -1949,19 +1949,19 @@ int ana_openr_f(int narg, int ps[])/* openr subroutine */
   return open_file(narg, ps, "r", 1); 
 }
 /*------------------------------------------------------------------------- */
-int ana_openw_f(int narg, int ps[])/* openw subroutine */
+Int ana_openw_f(Int narg, Int ps[])/* openw subroutine */
  /* like openr but for (over)writing */
 {
   return open_file(narg, ps, "w", 1); 
 }
 /*------------------------------------------------------------------------- */
-int ana_openu_f(int narg, int ps[])/* openu subroutine */
+Int ana_openu_f(Int narg, Int ps[])/* openu subroutine */
 /* like openr but for updating */
 {
   return open_file(narg, ps, "u", 1); 
 }
 /*------------------------------------------------------------------------- */
-int ana_openr(int narg, int ps[])/* openr subroutine */		
+Int ana_openr(Int narg, Int ps[])/* openr subroutine */		
 /* intended mainly for reading ASCII files in old ANA, but may be useful
    for streams in general for UNIX version */
 /* associates a file (or a stream) with a lun */
@@ -1969,24 +1969,24 @@ int ana_openr(int narg, int ps[])/* openr subroutine */
   return open_file(narg, ps, "r", 0); 
 }
 /*------------------------------------------------------------------------- */
-int ana_openw(int narg, int ps[])/* openw subroutine */		
+Int ana_openw(Int narg, Int ps[])/* openw subroutine */		
 /* like openr but for output */
 {
   return open_file(narg, ps, "w", 0); 
 }
 /*------------------------------------------------------------------------- */
-int ana_openu(int narg, int ps[])/* openu subroutine */		
+Int ana_openu(Int narg, Int ps[])/* openu subroutine */		
 /* like openr but for updating */
 {
   return open_file(narg, ps, "u", 0); 
 }
 /*------------------------------------------------------------------------- */
-int ana_rewindf(int narg, int ps[]) /*rewind file subroutine */		
+Int ana_rewindf(Int narg, Int ps[]) /*rewind file subroutine */		
 /* Headers:
    <stdio.h>: fseek()
  */
 {
-  int	lun;
+  Int	lun;
 
   /* first arg. is the lun */
   lun = int_arg(ps[0]);
@@ -1998,25 +1998,25 @@ int ana_rewindf(int narg, int ps[]) /*rewind file subroutine */
   return 1;
 }
 /*------------------------------------------------------------------------- */
-int ana_read(int narg, int ps[])
+Int ana_read(Int narg, Int ps[])
  /* keyboard (stdin) or file (batch) reading and formatting */
 /* Headers:
    <stdio.h>: stdin
  */
 {
- int	read_ascii(int, int [], FILE *, int);
+ Int	read_ascii(Int, Int [], FILE *, Int);
 
  return read_ascii(narg, ps, batch? inputStream: stdin,
 		   (internalMode & 1)? ASK_MORE: TRUNCATE_EOF);
 }
 /*------------------------------------------------------------------------- */
-int readf(int narg, int ps[], int flag)
+Int readf(Int narg, Int ps[], Int flag)
  /* file (stdin) reading and formatting */
 /* Headers:
    <stdio.h>: FILE
  */
 {
-  int	lun;
+  Int	lun;
   FILE	*fp;
 
   lun = int_arg(ps[0]);
@@ -2028,13 +2028,13 @@ int readf(int narg, int ps[], int flag)
   return read_ascii(narg - 1, &ps[1], fp, flag);
 }
 /*------------------------------------------------------------------------- */
-int ana_readf(int narg, int ps[])
+Int ana_readf(Int narg, Int ps[])
 /* file (stdin) reading and formatting */
 {
   return readf(narg, ps, 1);
 }
 /*------------------------------------------------------------------------- */
-int ana_readf_f(int narg, int ps[])
+Int ana_readf_f(Int narg, Int ps[])
 /* a function version that returns 1 if read OK */
 {
   return readf(narg, ps, 0)? ANA_ONE: ANA_ZERO;
@@ -2054,7 +2054,7 @@ char *moreInput(FILE *fp, char *separators)
  */
 {
   char	*p;
-  int	c;
+  Int	c;
 
   c = nextchar(fp); /* first one */
   if (feof(fp))
@@ -2082,7 +2082,7 @@ char *moreInput(FILE *fp, char *separators)
   return curScrat;
 }
 /*------------------------------------------------------------------------- */
-int read_ascii(int narg, int ps[], FILE *fp, int flag)
+Int read_ascii(Int narg, Int ps[], FILE *fp, Int flag)
 /* read ascii stream, format and load into passed arguments
    called by ana_read and ana_readf
    flag: 0 -> no error messages (function)
@@ -2099,11 +2099,11 @@ int read_ascii(int narg, int ps[], FILE *fp, int flag)
    <stdlib.h>: realloc()
  */
 {
-  int	i, iq, n, c, type, nelem;
+  Int	i, iq, n, c, type, nelem;
   char	*p;
   scalar	value;
   pointer	pp;
-  void read_a_number_fp(FILE *, scalar *, int *);
+  void read_a_number_fp(FILE *, scalar *, Int *);
 
   index_cnt = 0;		/* keep track of the number of read elements */
   for (i = 0; i < narg; i++) {	/* loop over all arguments */
@@ -2120,7 +2120,7 @@ int read_ascii(int narg, int ps[], FILE *fp, int flag)
     } else 			/* a named variable: we must read something */
       switch (symbol_class(iq)) {
       case ANA_STRING:	/* looking for a string */
-	if (internalMode & 2)	{ /* /WORD: reading by word */
+	if (internalMode & 2)	{ /* /WORD: reading by Word */
 	  n = 0;
 	  p = curScrat;
 	  n = scratSize();	/* how much room we have at curScrat */
@@ -2166,13 +2166,13 @@ int read_ascii(int narg, int ps[], FILE *fp, int flag)
 	switch (type) {
 	  /* <iq> is returned as ANA_LONG or ANA_DOUBLE by redef_scalar() */
 	case ANA_BYTE:
-	  scalar_value(iq).b = (byte) value.l;
+	  scalar_value(iq).b = (Byte) value.l;
 	  break;
 	case ANA_WORD:
-	  scalar_value(iq).w = (word) value.l;
+	  scalar_value(iq).w = (Word) value.l;
 	  break;
 	case ANA_FLOAT:
-	  scalar_value(iq).f = (float) value.d;
+	  scalar_value(iq).f = (Float) value.d;
 	  break;
 	} /* end switch (type) */
 	break;
@@ -2187,7 +2187,7 @@ int read_ascii(int narg, int ps[], FILE *fp, int flag)
 	  scal_ptr_type(iq) = ANA_LONG;
 	  break;
 	case ANA_FLOAT:
-	  *scal_ptr_pointer(iq).f = (float) value.d;
+	  *scal_ptr_pointer(iq).f = (Float) value.d;
 	  scal_ptr_type(iq) = ANA_FLOAT;
 	  break;
 	case ANA_DOUBLE:
@@ -2211,57 +2211,57 @@ int read_ascii(int narg, int ps[], FILE *fp, int flag)
 	    case ANA_BYTE:
 	      switch (type) {
 	      case ANA_BYTE: case ANA_WORD: case ANA_LONG:
-		*pp.b++ = (byte) value.l;
+		*pp.b++ = (Byte) value.l;
 		break;
 	      case ANA_FLOAT: case ANA_DOUBLE:
-		*pp.b++ = (byte) value.d;
+		*pp.b++ = (Byte) value.d;
 		break;
 	      }
 	      break;
 	    case ANA_WORD:
 	      switch (type) {
 	      case ANA_BYTE: case ANA_WORD: case ANA_LONG:
-		*pp.w++ = (word) value.l;
+		*pp.w++ = (Word) value.l;
 		break;
 	      case ANA_FLOAT: case ANA_DOUBLE:
-		*pp.w++ = (word) value.d;
+		*pp.w++ = (Word) value.d;
 		break;
 	      }
 	      break;
 	    case ANA_LONG:
 	      switch (type) {
 	      case ANA_BYTE: case ANA_WORD: case ANA_LONG:
-		*pp.l++ = (int) value.l;
+		*pp.l++ = (Int) value.l;
 		break;
 	      case ANA_FLOAT: case ANA_DOUBLE:
-		*pp.l++ = (int) value.d;
+		*pp.l++ = (Int) value.d;
 		break;
 	      }
 	      break;
 	    case ANA_FLOAT:
 	      switch (type) {
 	      case ANA_BYTE: case ANA_WORD: case ANA_LONG:
-		*pp.f++ = (float) value.l;
+		*pp.f++ = (Float) value.l;
 		break;
 	      case ANA_FLOAT: case ANA_DOUBLE:
-		*pp.f++ = (float) value.d;
+		*pp.f++ = (Float) value.d;
 		break;
 	      }
 	      break;
 	    case ANA_DOUBLE:
 	      switch (type) {
 	      case ANA_BYTE: case ANA_WORD: case ANA_LONG:
-		*pp.d++ = (double) value.l;
+		*pp.d++ = (Double) value.l;
 		break;
 	      case ANA_FLOAT: case ANA_DOUBLE:
-		*pp.d++ = (double) value.d;
+		*pp.d++ = (Double) value.d;
 		break;
 	      }
 	      break;
 	    }	/* end else switch (array_type(iq)) */
 	  } /* end while (n--) */
 	} else {		/* a string array */
-	  if (internalMode & 2) { /* /WORD: reading by word */
+	  if (internalMode & 2) { /* /WORD: reading by Word */
 	    n = 0;
 	    p = curScrat;
 	    n = scratSize();	/* how much room we have at curScrat */
@@ -2304,7 +2304,7 @@ int read_ascii(int narg, int ps[], FILE *fp, int flag)
   return ANA_OK;
 }
 /*------------------------------------------------------------------------- */
-int gscanf(void **source, char *format, void *arg, int isString)
+Int gscanf(void **source, char *format, void *arg, Int isString)
 /* Headers:
    <string.h>: strlen(), strcpy(), strcat()
    <stdlib.h>: realloc()
@@ -2312,8 +2312,8 @@ int gscanf(void **source, char *format, void *arg, int isString)
  */
 {
   static char	*aformat = NULL;
-  static int	nformat = 0;
-  int	i;
+  static Int	nformat = 0;
+  Int	i;
 
   i = strlen(format) + 2;
   if (i > nformat) {
@@ -2349,8 +2349,8 @@ int gscanf(void **source, char *format, void *arg, int isString)
   return i;
 }
 /*------------------------------------------------------------------------- */
-int read_formatted_ascii(int narg, int ps[], void *ptr, int showerrors,
-			 int isString)
+Int read_formatted_ascii(Int narg, Int ps[], void *ptr, Int showerrors,
+			 Int isString)
 /* read from ascii source <ptr> according to a specified format string,
    which is taken from ps[0].  If <isString> is equal to 0, then <ptr> is
    interpreted as a FILE pointer to a stream from which input is to be
@@ -2375,13 +2375,13 @@ int read_formatted_ascii(int narg, int ps[], void *ptr, int showerrors,
  */
 {
   char	*fmt, *scr, *p, c, *ptr0;
-  int	type, string2, pr, i, len, nout = 0;
-  double	d, k, f, d2;
+  Int	type, string2, pr, i, len, nout = 0;
+  Double	d, k, f, d2;
   pointer	trgt;
   void	**ptr2;
   static char	*keyboard = NULL;
   extern formatInfo	theFormat;
-  int	ana_replace(int, int), to_scratch_array(int, int, int, int *);
+  Int	ana_replace(Int, Int), to_scratch_array(Int, Int, Int, Int *);
 
   if (!isString) {
     if ((FILE *) ptr == stdin) { /* reading from the keyboard */
@@ -2499,7 +2499,7 @@ int read_formatted_ascii(int narg, int ps[], void *ptr, int showerrors,
 	      anaerror("Reading of string arrays is not yet implemented", 0):
 		nout;
 	  if (theFormat.flags & FMT_SUPPRESS) {
-	    /* %*s or %*S or %*[...]: skip next whitespace-delimited word */
+	    /* %*s or %*S or %*[...]: skip next whitespace-delimited Word */
 	    /* (%*s) or to line end (%*S) or next scan set (%*[...]) */
 	    if (*theFormat.spec_char == '[') {
 	      if (theFormat.width > 0)
@@ -2591,7 +2591,7 @@ int read_formatted_ascii(int narg, int ps[], void *ptr, int showerrors,
 		    if (!gscanf(ptr2, "%*[^0-9]", NULL, string2))
 		      return
 			showerrors? anaerror("Expected a non-digit while looking for a time at character index %d in %s", 0, (char *) *ptr2 - ptr0, ptr0): nout;
-		  } else {	/* the last one: read a float */
+		  } else {	/* the last one: read a Float */
 		    if (!gscanf(ptr2, "%lf", &f, string2))
 		      return
 			showerrors? anaerror("Expected a (floating-point) number while looking for a time at character index %d in %s", 0, (char *) *ptr2 - ptr0, ptr0): nout;
@@ -2604,7 +2604,7 @@ int read_formatted_ascii(int narg, int ps[], void *ptr, int showerrors,
 		
 		if (!(theFormat.flags & FMT_SUPPRESS)) {
 		  if (type == ANA_FLOAT)
-		    *trgt.f = (float) d;
+		    *trgt.f = (Float) d;
 		  else
 		    *trgt.d = d;
 		}
@@ -2669,13 +2669,13 @@ int read_formatted_ascii(int narg, int ps[], void *ptr, int showerrors,
   return nout;
 }
 /*------------------------------------------------------------------------- */
-int ana_freadf(int narg, int ps[])
+Int ana_freadf(Int narg, Int ps[])
 /* FREADF,lun,format,var,... */
 /* Headers:
    <stdio.h>: FILE
 */
 {
-  int	lun;
+  Int	lun;
   FILE	*fp;
 
   lun = int_arg(*ps);
@@ -2692,13 +2692,13 @@ int ana_freadf(int narg, int ps[])
     return ANA_OK;
 }
 /*------------------------------------------------------------------------- */
-int ana_fread(int narg, int ps[])
+Int ana_fread(Int narg, Int ps[])
 /* FREAD,format,var,... */
 /* Headers:
    <stdio.h>: stdin
  */
 {
-  int	result, iq;
+  Int	result, iq;
 
   result = read_formatted_ascii(narg, ps, (void *) stdin, 1, 0);
   switch (result) {
@@ -2715,13 +2715,13 @@ int ana_fread(int narg, int ps[])
   return iq;
 }
 /*------------------------------------------------------------------------- */
-int ana_freadf_f(int narg, int ps[])
+Int ana_freadf_f(Int narg, Int ps[])
 /* FREADF(lun,format,var,...) */
 /* Headers:
    <stdio.h>: FILE
  */
 {
-  int	lun, result, iq;
+  Int	lun, result, iq;
   FILE	*fp;
 
   lun = int_arg(*ps);
@@ -2747,7 +2747,7 @@ int ana_freadf_f(int narg, int ps[])
   return iq;
 }
 /*------------------------------------------------------------------------- */
-int ana_assoc_input(int narg, int ps[])
+Int ana_assoc_input(Int narg, Int ps[])
      /* use an associated variable as a guide to reading a file 
 	syntax:  y = x(record_offset)
 	y = x(subsc)
@@ -2763,15 +2763,15 @@ int ana_assoc_input(int narg, int ps[])
    <stdio.h>: FILE, puts(), printf(), fseek(), fread()
  */
 {
-  int	iq, type, dfile, *file, dout = 0, lun, i, offset;
-  int	tally[8], ystep[8], rstep[8], *step, n, done, doff;
-  int	off[8], outdims[8], axes[8], *out;
-  int	len, nsym, baseOffset;
+  Int	iq, type, dfile, *file, dout = 0, lun, i, offset;
+  Int	tally[8], ystep[8], rstep[8], *step, n, done, doff;
+  Int	off[8], outdims[8], axes[8], *out;
+  Int	len, nsym, baseOffset;
   pointer	q;
   array	*h;
   FILE	*fp;
   char	warn = 0;
-  extern int	range_warn_flag;
+  extern Int	range_warn_flag;
   
   step = rstep;
   out = outdims;
@@ -2818,7 +2818,7 @@ int ana_assoc_input(int narg, int ps[])
 	    warn = 1;
 	  }
 	  len = subsc_ptr_end(iq); /* end */
-	  if (len == INT_MAX)
+	  if (len == INT32_MAX)
 	    len = file[i] - 1;	/* * -> until end */
 	  else if (len >= file[i]) {
 	    len = file[i] - 1;
@@ -2895,16 +2895,16 @@ int ana_assoc_input(int narg, int ps[])
   return iq;
 }
 /*------------------------------------------------------------------------- */
-int ana_assoc_output(int iq, int jq, int offsym, int axsym)
+Int ana_assoc_output(Int iq, Int jq, Int offsym, Int axsym)
  /* use an associated variable as a guide to writing into a file */
  /* iq is sym # of assoc var, jq is rhs sym with data */
 /* Headers:
    <stdio.h>: FILE, printf(), puts(), fwrite(), fseek(), perror()
  */
 {
- int	ddat, *dat, dfile, *file, lun, daxes, *axes, doff, *off, offset;
- int	i, dattype, assoctype, ystep[8], rstep[8], tally[8], done;
- int	efile, n, *step, baseOffset;
+ Int	ddat, *dat, dfile, *file, lun, daxes, *axes, doff, *off, offset;
+ Int	i, dattype, assoctype, ystep[8], rstep[8], tally[8], done;
+ Int	efile, n, *step, baseOffset;
  pointer	q;
  array	*h;
  FILE	*fp;
@@ -3018,7 +3018,7 @@ int ana_assoc_output(int iq, int jq, int offsym, int axsym)
  return 1;
 }
 /*------------------------------------------------------------------------- */
-FILE *fopenr_sym(int nsym)	/* internal utility */
+FILE *fopenr_sym(Int nsym)	/* internal utility */
  /* decode an ana string symbol and use as a file name to open a file for
  read, 1/17/99 */
 /* Headers:
@@ -3046,7 +3046,7 @@ FILE *fopenr_sym(int nsym)	/* internal utility */
 #define SYNCH_OK	0x5555aaaa
 #define SYNCH_REVERSE	0xaaaa5555
 #endif
-int ck_synch_hd(FILE *fin, fzHead *fh, int *wwflag)
+Int ck_synch_hd(FILE *fin, fzHead *fh, Int *wwflag)
 /* internal utility */
 /* reads the start of an fz file, checks for synch and a reasonable header,
    returns -1 if something amiss, used by several fz readers. */
@@ -3069,11 +3069,11 @@ int ck_synch_hd(FILE *fin, fzHead *fh, int *wwflag)
   } else
     *wwflag = 0;
   if (MSBfirst ^ *wwflag)
-    endian(fh->dim, fh->ndim*sizeof(int), ANA_LONG);
+    endian(fh->dim, fh->ndim*sizeof(Int), ANA_LONG);
   return 1; 
 }
 /*------------------------------------------------------------------------- */
-void fz_get_header(FILE *fin, int nsym, int n) /* internal utility */
+void fz_get_header(FILE *fin, Int nsym, Int n) /* internal utility */
 /* reads <n> blocks from stream <fin> into symbol <nsym>.  The first */
 /* block is 256 bytes, all successive blocks are 512 bytes.  If a \0 is found */
 /* in the read text, then the resulting string is terminated at that point. */
@@ -3099,7 +3099,7 @@ void fz_get_header(FILE *fin, int nsym, int n) /* internal utility */
     *q = '\0';			/* proper termination */
 }
  /*------------------------------------------------------------------------- */
-void fz_print_header(FILE *fin, int n) /* internal utility */
+void fz_print_header(FILE *fin, Int n) /* internal utility */
 /* reads <n> blocks from stream <fin> and prints them to the standard */
 /* output.  The first block is 256 bytes, all successive blocks are 512 */
 /* bytes.  If a \0 is found in the read text, then the printed text is */
@@ -3108,7 +3108,7 @@ void fz_print_header(FILE *fin, int n) /* internal utility */
    <stdio.h>: getc(), FILE, putchar(), fseek()
 */
 {
-  int	c;
+  Int	c;
 
   if (n)
     n = (n - 1)*512 + 256;
@@ -3125,7 +3125,7 @@ void fz_print_header(FILE *fin, int n) /* internal utility */
     fseek(fin, n, SEEK_CUR);
 }
 /*------------------------------------------------------------------------- */
-int ana_fzinspect(int narg, int ps[])		/* fzinspect subroutine */
+Int ana_fzinspect(Int narg, Int ps[])		/* fzinspect subroutine */
  /* return some info about an fz file */
  /* subr version, fzinspect(name, param, [header])
  where name is the file name, param is an I*4 array containing the following:
@@ -3139,12 +3139,12 @@ int ana_fzinspect(int narg, int ps[])		/* fzinspect subroutine */
    <sys/stat.h>: stat()
  */
 {
-  int	wwflag=0, *q1, i;
+  Int	wwflag=0, *q1, i;
   char	*name;
   fzHead	*fh;
   FILE	*fin;
   struct stat statbuf;
-  int	redef_array(int, int, int, int *);
+  Int	redef_array(Int, Int, Int, Int *);
 
   /* define the return variable param, a long vector with 11 elements */
   /* pre-load with error condition in case we have a problem reading the
@@ -3187,7 +3187,7 @@ int ana_fzinspect(int narg, int ps[])		/* fzinspect subroutine */
   return 1;
 }
 /*------------------------------------------------------------------------- */
-int fzhead(int narg, int ps[], int flag) /* fzhead subroutine */
+Int fzhead(Int narg, Int ps[], Int flag) /* fzhead subroutine */
  /* read header in fz files */
  /* PROCEDURE -- Called by: FZHEAD,'FILENAME' [,TEXT HEADER] */
  /* ANA_FUNCTION  -- Called by: FZHEAD('FILENAME' [,TEXT HEADER] */
@@ -3196,7 +3196,7 @@ int fzhead(int narg, int ps[], int flag) /* fzhead subroutine */
    <stdio.h>: FILE, fopen(), perror(), printf(), fclose()
  */
 {
- int	wwflag;
+ Int	wwflag;
  char	*name;
  fzHead	*fh;
  FILE	*fin;
@@ -3228,12 +3228,12 @@ int fzhead(int narg, int ps[], int flag) /* fzhead subroutine */
 }
 /*------------------------------------------------------------------------- */
 /* NOTE on files:
-   Ultrix machines (DECstations) have reversed byte order relative to
-   Irix machines (SGI).  Appropriate byte swapping is done when writing
-   to disk and tape, so that the files are byte for byte equal, whether
+   Ultrix machines (DECstations) have reversed Byte order relative to
+   Irix machines (SGI).  Appropriate Byte swapping is done when writing
+   to disk and tape, so that the files are Byte for Byte equal, whether
    written from a DEC or an SGI machine.   LS 10/8/92 */
 /*------------------------------------------------------------------------- */
-int fzread(int narg, int ps[], int flag) /* fzread subroutine */
+Int fzread(Int narg, Int ps[], Int flag) /* fzread subroutine */
  /* read standard f0 files, compressed or not */
  /* PROCEDURE -- Called by: FZREAD,VAR,'FILENAME' [,TEXT HEADER]*/
 /* Headers:
@@ -3242,25 +3242,25 @@ int fzread(int narg, int ps[], int flag) /* fzread subroutine */
    <stdlib.h>: malloc()
  */
 {
-  int	iq, n, nb, type, i, mq, nq, sbit, nelem, wwflag=0;
+  Int	iq, n, nb, type, i, mq, nq, sbit, nelem, wwflag=0;
   char	*p, *name;
   fzHead	*fh;
   pointer q1;
   FILE	*fin;
-  int	anadecrunch(byte *, word [], int, int, int),
-	anadecrunch8(byte *, byte [], int, int, int),
-	anadecrunchrun(byte *, word [], int, int, int),
-	anadecrunchrun8(byte *, byte [], int, int, int);
+  Int	anadecrunch(Byte *, Word [], Int, Int, Int),
+	anadecrunch8(Byte *, Byte [], Int, Int, Int),
+	anadecrunchrun(Byte *, Word [], Int, Int, Int),
+	anadecrunchrun8(Byte *, Byte [], Int, Int, Int);
 #if SIZEOF_LONG_LONG_INT == 8	/* 64-bit integers */
-  int	anadecrunch32(byte *, int [], int, int, int);
+  Int	anadecrunch32(Byte *, Int [], Int, Int, Int);
 #endif
  
   struct compresshead {
-    int     tsize, nblocks, bsize;
-    byte    slice_size, type; } ch;
+    Int     tsize, nblocks, bsize;
+    Byte    slice_size, type; } ch;
  
 #if WORDS_BIGENDIAN
-  union { int i;  byte b[4];} lmap;
+  union { Int i;  Byte b[4];} lmap;
 #endif
 
 	 /* first arg is the variable to load, second is name of file */
@@ -3316,12 +3316,12 @@ int fzread(int narg, int ps[], int flag) /* fzread subroutine */
     if (nq != 14 && !flag) 
       perror("error reading in compression header");
 #if WORDS_BIGENDIAN
-    endian(&ch.tsize, sizeof(int), ANA_LONG);
-    endian(&ch.nblocks, sizeof(int), ANA_LONG);
-    endian(&ch.bsize, sizeof(int), ANA_LONG);
+    endian(&ch.tsize, sizeof(Int), ANA_LONG);
+    endian(&ch.nblocks, sizeof(Int), ANA_LONG);
+    endian(&ch.bsize, sizeof(Int), ANA_LONG);
     for (i = 0; i < 4; i++)
       lmap.b[i] = fh->cbytes[i];
-    endian(&lmap.i, sizeof(int), ANA_LONG);
+    endian(&lmap.i, sizeof(Int), ANA_LONG);
 #endif
     mq = ch.tsize - 14;
     if (mq <= NSCRAT)
@@ -3349,20 +3349,20 @@ int fzread(int narg, int ps[], int flag) /* fzread subroutine */
       return flag? ANA_ERROR: anaerror("inconsisent compression type", 0);
     switch (ch.type) {
       case 0:
-	iq = anadecrunch((byte *) p, q1.w, sbit, ch.bsize, ch.nblocks);
+	iq = anadecrunch((Byte *) p, q1.w, sbit, ch.bsize, ch.nblocks);
 	break;
       case 1:
-	iq = anadecrunch8((byte *) p, q1.b, sbit, ch.bsize, ch.nblocks);
+	iq = anadecrunch8((Byte *) p, q1.b, sbit, ch.bsize, ch.nblocks);
 	break;
       case 2:
-	iq = anadecrunchrun((byte *) p, q1.w, sbit, ch.bsize, ch.nblocks);
+	iq = anadecrunchrun((Byte *) p, q1.w, sbit, ch.bsize, ch.nblocks);
 	break;
       case 3:
-	iq = anadecrunchrun8((byte *) p, q1.b, sbit, ch.bsize, ch.nblocks);
+	iq = anadecrunchrun8((Byte *) p, q1.b, sbit, ch.bsize, ch.nblocks);
 	break;
       case 4:
 #if SIZEOF_LONG_LONG_INT == 8	/* 64-bit integers */
-	iq = anadecrunch32((byte *) p, q1.l, sbit, ch.bsize, ch.nblocks);
+	iq = anadecrunch32((Byte *) p, q1.l, sbit, ch.bsize, ch.nblocks);
 #else
 	puts("32-bit decompression was not compiled into your version of ANA");
 	iq = ANA_ERROR;
@@ -3383,9 +3383,9 @@ int fzread(int narg, int ps[], int flag) /* fzread subroutine */
     if (type == ANA_STRING_ARRAY) {
       /* a string array */
       while (nelem--) {
-	fread(&mq, sizeof(int), 1, fin);
+	fread(&mq, sizeof(Int), 1, fin);
 	if (nq)
-	  endian(&mq, sizeof(int), ANA_LONG);
+	  endian(&mq, sizeof(Int), ANA_LONG);
 	if (mq) {
 	  *q1.sp = malloc(mq + 1);
 	  if (!*q1.sp) {
@@ -3413,7 +3413,7 @@ int fzread(int narg, int ps[], int flag) /* fzread subroutine */
   return 1;
 }
 /*------------------------------------------------------------------------- */
-int fzwrite(int narg, int ps[], int flag) /* fzwrite subroutine */      
+Int fzwrite(Int narg, Int ps[], Int flag) /* fzwrite subroutine */      
  /* write standard f0 files, uncompressed
     flag = 0: procedure   flag = 1: function */
  /* If you are storing an updated version of a big file and if something */
@@ -3431,7 +3431,7 @@ int fzwrite(int narg, int ps[], int flag) /* fzwrite subroutine */
    <stdlib.h>: malloc()
  */
 {
-  int	iq, n, nd, j, type, mq, i, sz;
+  Int	iq, n, nd, j, type, mq, i, sz;
   char	*name, *p, safe, *safename;
   fzHead	*fh;
   pointer q1, q2;
@@ -3442,7 +3442,7 @@ int fzwrite(int narg, int ps[], int flag) /* fzwrite subroutine */
   if (symbol_class(iq) != ANA_ARRAY)
     return (flag)? ANA_ERROR: cerror(NEED_ARR, iq);
   type = symbol_type(iq);
-  q1.l = (int *) array_data(iq);
+  q1.l = (Int *) array_data(iq);
   nd = array_num_dims(iq);
 			 /* second argument must be a string, file name */
   if (symbol_class(ps[1]) != ANA_STRING)
@@ -3487,13 +3487,13 @@ int fzwrite(int narg, int ps[], int flag) /* fzwrite subroutine */
   fh->datyp = type;
   fh->ndim = nd;
   n = array_size(iq)*ana_type_size[type];
-  memcpy(fh->dim, array_dims(iq), nd*sizeof(int));
+  memcpy(fh->dim, array_dims(iq), nd*sizeof(Int));
 #if WORDS_BIGENDIAN
-  endian(fh->dim, fh->ndim*sizeof(int), ANA_LONG);
+  endian(fh->dim, fh->ndim*sizeof(Int), ANA_LONG);
 #endif
 
   if (narg > 2) {			 /* have a header */
-    /* NOTE: the first 256 bytes of the first 512-byte block are used */
+    /* NOTE: the first 256 bytes of the first 512-Byte block are used */
     /* for other stuff, so only 256 bytes of header text can be */
     /* stored in the first block, and 512 bytes in all subsequent blocks */
     if (symbolIsStringScalar(ps[2]))  /* the header is a string */
@@ -3526,9 +3526,9 @@ int fzwrite(int narg, int ps[], int flag) /* fzwrite subroutine */
 	q2.sp++;
       }
     }
-    mq = (mq + 256) % 512;	/* how many in the last 512-byte block */
+    mq = (mq + 256) % 512;	/* how many in the last 512-Byte block */
     if (mq) {			/* we must pad until we get another full */
-				/* 512-byte block */
+				/* 512-Byte block */
       mq = 512 - mq;
       while (mq--)		/* pad */
 	putc('\0', fout);
@@ -3549,7 +3549,7 @@ int fzwrite(int narg, int ps[], int flag) /* fzwrite subroutine */
     n = array_size(iq);
     while (n--) {
       mq = *q1.sp? strlen(*q1.sp): 0;
-      fwrite(&mq, sizeof(int), 1, fout);
+      fwrite(&mq, sizeof(Int), 1, fout);
       if (mq)
 	fwrite(*q1.sp, 1, strlen(*q1.sp), fout);
       q1.sp++;
@@ -3590,12 +3590,12 @@ int fzwrite(int narg, int ps[], int flag) /* fzwrite subroutine */
   return ANA_ERROR;
 }
 /*------------------------------------------------------------------------- */
-int fcwrite(int, int [], int);
-int fcrunwrite(int narg, int ps[], int flag)/* fcrunwrite subroutine */
+Int fcwrite(Int, Int [], Int);
+Int fcrunwrite(Int narg, Int ps[], Int flag)/* fcrunwrite subroutine */
 /* write standard f0 files, run-length compressed format */
 /* flag: 0 -> procedure, 1 -> function.  LS 10nov99 */
 {
-  int	iq;
+  Int	iq;
 
   runlengthflag = 1;		/* flag run-length compression */
   iq = fcwrite(narg, ps, flag);
@@ -3603,7 +3603,7 @@ int fcrunwrite(int narg, int ps[], int flag)/* fcrunwrite subroutine */
   return iq;
 }
 /*------------------------------------------------------------------------- */
-int fcwrite(int narg, int ps[], int flag)/* fcwrite subroutine */	
+Int fcwrite(Int narg, Int ps[], Int flag)/* fcwrite subroutine */	
  /* write standard f0 files, compressed format */
  /* not done yet 12/11/91 */
  /* flag = 0: procedure  flag = 1: function   LS 1mar93 */
@@ -3614,11 +3614,11 @@ int fcwrite(int narg, int ps[], int flag)/* fcwrite subroutine */
    <string.h>: strlen()
  */
 {
- int	iq, n, nd, j, type, i, mq, nx, ny, limit, sz;
+ Int	iq, n, nd, j, type, i, mq, nx, ny, limit, sz;
  char	*name, *p;
  fzHead	*fh;
  pointer q1, q2;
- union { int i;  byte b[4];} lmap;
+ union { Int i;  Byte b[4];} lmap;
  FILE	*fout;
 					 /* first arg. must be an array */
  iq = ps[0];
@@ -3670,17 +3670,17 @@ int fcwrite(int narg, int ps[], int flag)/* fcwrite subroutine */
  fh->datyp = type;
  fh->ndim = nd;
  n = array_size(iq);
- memcpy(fh->dim, array_dims(iq), nd*sizeof(int));
+ memcpy(fh->dim, array_dims(iq), nd*sizeof(Int));
  nx = fh->dim[0];
 #if WORDS_BIGENDIAN
- endian(fh->dim, fh->ndim*sizeof(int), ANA_LONG);
+ endian(fh->dim, fh->ndim*sizeof(Int), ANA_LONG);
 #endif
  ny = n/nx;
  n = n * ana_type_size[type];
 
- /* now compress the array, must be a byte or short */
+ /* now compress the array, must be a Byte or short */
  limit = 2*n;
- q2.l = (int *) malloc(limit);	/* some room for mistakes */
+ q2.l = (Int *) malloc(limit);	/* some room for mistakes */
  switch (type) {
    case ANA_BYTE:
      if (runlengthflag)
@@ -3712,15 +3712,15 @@ int fcwrite(int narg, int ps[], int flag)/* fcwrite subroutine */
    goto fcwrite_1;
  }
  lmap.i = iq;			/* need to use this roundabout method because
-				 .cbytes is not aligned on an int boundary */
+				 .cbytes is not aligned on an Int boundary */
 #if WORDS_BIGENDIAN
- endian(&lmap.i, sizeof(int), ANA_LONG);
+ endian(&lmap.i, sizeof(Int), ANA_LONG);
 #endif
  for (i = 0; i < 4; i++)
    fh->cbytes[i] = lmap.b[i];
 
  if (narg > 2) {			 /* have a header */
-   /* NOTE: the first 256 bytes of the first 512-byte block are used */
+   /* NOTE: the first 256 bytes of the first 512-Byte block are used */
    /* for other stuff, so only 256 bytes of header text can be */
    /* stored in the first block, and 512 bytes in all subsequent blocks */
    if (symbolIsStringScalar(ps[2]))  /* the header is a string */
@@ -3754,9 +3754,9 @@ int fcwrite(int narg, int ps[], int flag)/* fcwrite subroutine */
        q2.sp++;
      }
    }
-   mq = (mq + 256) % 512;	/* how many in the last 512-byte block */
+   mq = (mq + 256) % 512;	/* how many in the last 512-Byte block */
    if (mq) {			/* we must pad until we get another full */
-				/* 512-byte block */
+				/* 512-Byte block */
      mq = 512 - mq;
      while (mq--)		/* pad */
        putc('\0', fout);
@@ -3788,45 +3788,45 @@ int fcwrite(int narg, int ps[], int flag)/* fcwrite subroutine */
  return ANA_ERROR;
 }
 /*------------------------------------------------------------------------- */
-int ana_fzread(int narg, int ps[])
+Int ana_fzread(Int narg, Int ps[])
  /* routine version */
 { return fzread(narg, ps, 0); }
 /*------------------------------------------------------------------------- */
-int ana_fzwrite(int narg, int ps[])
+Int ana_fzwrite(Int narg, Int ps[])
  /* routine version */
 { return fzwrite(narg, ps, 0); }
 /*------------------------------------------------------------------------- */
-int ana_fzhead(int narg, int ps[])
+Int ana_fzhead(Int narg, Int ps[])
  /* routine version */
 { return fzhead(narg, ps, 0); }
 /*------------------------------------------------------------------------- */
-int ana_fcwrite(int narg, int ps[])
+Int ana_fcwrite(Int narg, Int ps[])
  /* routine version */
 { return fcwrite(narg, ps, 0); }
 /*------------------------------------------------------------------------- */
-int ana_fcrunwrite(int narg, int ps[])
+Int ana_fcrunwrite(Int narg, Int ps[])
 { return fcrunwrite(narg, ps, 0); }
 /*------------------------------------------------------------------------- */
-int ana_fzread_f(int narg, int ps[])
+Int ana_fzread_f(Int narg, Int ps[])
  /* a function version that returns 1 if read OK */
  { return (fzread(narg, ps, 1) == 1)? 1: 4; }
 /*------------------------------------------------------------------------- */
-int ana_fzhead_f(int narg, int ps[])
+Int ana_fzhead_f(Int narg, Int ps[])
  /* a function version that returns 1 if read OK */
  { return (fzhead(narg, ps, 1) == 1)? 1: 4; }
 /*------------------------------------------------------------------------- */
-int ana_fzwrite_f(int narg, int ps[])
+Int ana_fzwrite_f(Int narg, Int ps[])
  /* function version */
 { return (fzwrite(narg, ps, 1) == 1)? 1: 4; }
 /*------------------------------------------------------------------------- */
-int ana_fcwrite_f(int narg, int ps[])
+Int ana_fcwrite_f(Int narg, Int ps[])
  /* function version */
 { return (fcwrite(narg, ps, 1) == 1)? 1: 4; }
 /*------------------------------------------------------------------------- */
-int ana_fcrunwrite_f(int narg, int ps[])
+Int ana_fcrunwrite_f(Int narg, Int ps[])
 { return (fcrunwrite(narg, ps, 1) == 1)? ANA_OK: ANA_ERROR; }
 /*------------------------------------------------------------------------- */
-int readu(int narg, int ps[], int flag)
+Int readu(Int narg, Int ps[], Int flag)
 /* read unformatted data from a file into a variable, which must be predefined.
    syntax: readu,lun,x [,y,...]
    LS 12may93 */
@@ -3835,7 +3835,7 @@ int readu(int narg, int ps[], int flag)
    <stdlib.h>: free()
  */
 {
- int	lun, n, iq, i;
+ Int	lun, n, iq, i;
  FILE	*fp;
  pointer	p;
  array	*h;
@@ -3861,7 +3861,7 @@ int readu(int narg, int ps[], int flag)
      case ANA_ARRAY:
        h = HEAD(iq);
        GET_SIZE(n, h->dims, h->ndim);
-       if ((int) symbol_type(iq) < ANA_TEMP_STRING)	/* numerical array */
+       if ((Int) symbol_type(iq) < ANA_TEMP_STRING)	/* numerical array */
 	 n *= ana_type_size[sym[iq].type];
        else str = 1;			/* string array */
        p.l = LPTR(h);  break;
@@ -3882,7 +3882,7 @@ int readu(int narg, int ps[], int flag)
   return 1;
 }
 /*------------------------------------------------------------------------- */
-int writeu(int narg, int ps[], int flag)
+Int writeu(Int narg, Int ps[], Int flag)
 /* write unformatted data from a variable into a file. 
    syntax: writeu,lun,x [,y,...]
    LS 12may93 */
@@ -3891,7 +3891,7 @@ int writeu(int narg, int ps[], int flag)
    <string.h>: strlen()
  */
 {
- int	lun, n, iq, i;
+ Int	lun, n, iq, i;
  FILE	*fp;
  pointer	p;
  array	*h;
@@ -3917,7 +3917,7 @@ int writeu(int narg, int ps[], int flag)
      case ANA_ARRAY:
        h = HEAD(iq);
        GET_SIZE(n, h->dims, h->ndim);
-       if ((int) symbol_type(iq) < ANA_TEMP_STRING)	/* numerical array */
+       if ((Int) symbol_type(iq) < ANA_TEMP_STRING)	/* numerical array */
 	 n *= ana_type_size[sym[iq].type];
        else str = 1;			/* string array */
        p.l = LPTR(h);  break;
@@ -3934,23 +3934,23 @@ int writeu(int narg, int ps[], int flag)
   return 1;
 }
 /*------------------------------------------------------------------------- */
-int ana_readu(int narg, int ps[])
+Int ana_readu(Int narg, Int ps[])
  /* subroutine version */
 { return readu(narg, ps, 0); }
 /*------------------------------------------------------------------------- */
-int ana_readu_f(int narg, int ps[])
+Int ana_readu_f(Int narg, Int ps[])
  /* function version */
 { return (readu(narg, ps, 1) == 1)? 1: 4; }
 /*------------------------------------------------------------------------- */
-int ana_writeu(int narg, int ps[])
+Int ana_writeu(Int narg, Int ps[])
  /* subroutine version */
 { return writeu(narg, ps, 0); }
 /*------------------------------------------------------------------------- */
-int ana_writeu_f(int narg, int ps[])
+Int ana_writeu_f(Int narg, Int ps[])
  /* function version */
 { return (writeu(narg, ps, 1) == 1)? 1: 4; }
 /*------------------------------------------------------------------------- */
-int ok_for_astore(int iq)
+Int ok_for_astore(Int iq)
 {
   switch (symbol_class(iq)) {
   case ANA_STRING: case ANA_SUBSC_PTR:
@@ -3963,23 +3963,23 @@ int ok_for_astore(int iq)
   }
 }
 /*------------------------------------------------------------------------- */
-void astore_one(FILE *fp, int iq)
+void astore_one(FILE *fp, Int iq)
 {
-  int n, sz, i;
+  Int n, sz, i;
   pointer p;
 
   fwrite(&sym[iq], sizeof(symTableEntry), 1, fp); /* the symbol */
   switch (symbol_class(iq)) {
   case ANA_ARRAY:
     n = symbol_memory(iq);
-    p.l = (int *) array_header(iq);
+    p.l = (Int *) array_header(iq);
     fwrite(p.b, 1, n, fp);
     if (isStringType(array_type(iq))) { /* string array */
       sz = array_size(iq);	/* number of elements */
       p.sp = array_data(iq); /* pointer to list of strings */
       while (sz--) {
 	n = *p.sp? strlen(*p.sp): 0; /* the length of the string */
-	fwrite(&n, sizeof(int), 1, fp); /* write it */
+	fwrite(&n, sizeof(Int), 1, fp); /* write it */
 	if (n)
 	  fwrite(*p.sp, 1, n, fp); /* write the string */
 	p.sp++;
@@ -4006,7 +4006,7 @@ void astore_one(FILE *fp, int iq)
   }
 }
 /*------------------------------------------------------------------------- */
-int astore(int narg, int ps[], int flag)
+Int astore(Int narg, Int ps[], Int flag)
 /* STORE,x1 [, x2, x3, ...], file
   stores arbitrary data <x1>, <x2>, etcetera in file <file>.  The names
   (if any) as well as the data are stored.  LS 11mar97 */
@@ -4017,7 +4017,7 @@ int astore(int narg, int ps[], int flag)
    <string.h>: strlen()
  */
 {
-  int	iq, i, intro[2], n;
+  Int	iq, i, intro[2], n;
   char	*file, *name;
   FILE	*fp;
 
@@ -4043,17 +4043,17 @@ int astore(int narg, int ps[], int flag)
   }
   intro[0] = 0x6666aaaa;	/* identification */
   intro[1] = narg;
-  fwrite(intro, sizeof(int), 2, fp);
+  fwrite(intro, sizeof(Int), 2, fp);
   for (i = 0; i < narg; i++) {
     iq = ps[i];
     if (iq < NAMED_END) {	/* a named variable */
       name = symbolProperName(iq);
       n = strlen(name) + 1;
-      fwrite(&n, sizeof(int), 1, fp); /* the name length */
+      fwrite(&n, sizeof(Int), 1, fp); /* the name length */
       fwrite(name, sizeof(char), n, fp); /* write the name */
     } else {			/* unnamed */
       n = 0;
-      fwrite(&n, sizeof(int), 1, fp);
+      fwrite(&n, sizeof(Int), 1, fp);
     }
     iq = transfer(iq);
     astore_one(fp, iq);
@@ -4062,20 +4062,20 @@ int astore(int narg, int ps[], int flag)
   return flag? ANA_ONE: 1;
 }
 /*------------------------------------------------------------------------- */
-int ana_astore(int narg, int ps[])
+Int ana_astore(Int narg, Int ps[])
 {
   return astore(narg, ps, 1);
 }
 /*------------------------------------------------------------------------- */
-int ana_astore_f(int narg, int ps[])
+Int ana_astore_f(Int narg, Int ps[])
 {
   return astore(narg, ps, 0);
 }
 /*------------------------------------------------------------------------- */
-int arestore_one(FILE* fp, int iq, int reverseOrder)
+Int arestore_one(FILE* fp, Int iq, Int reverseOrder)
 {
-  word hash, context;
-  int line, exec, n, j;
+  Word hash, context;
+  Int line, exec, n, j;
   pointer p;
 
   hash = sym[iq].xx;		/* save because they'll be overwritten */
@@ -4091,7 +4091,7 @@ int arestore_one(FILE* fp, int iq, int reverseOrder)
   switch (symbol_class(iq)) {
   case ANA_ARRAY:
     if (reverseOrder)
-      endian(&symbol_memory(iq), sizeof(int), ANA_LONG);
+      endian(&symbol_memory(iq), sizeof(Int), ANA_LONG);
     n = symbol_memory(iq);
     allocate(p.v, n, char);
     array_header(iq) = (array *) p.v;
@@ -4099,7 +4099,7 @@ int arestore_one(FILE* fp, int iq, int reverseOrder)
       return 1;
     n = array_num_dims(iq);
     if (reverseOrder) {
-      endian(array_dims(iq), n*sizeof(int), ANA_LONG);
+      endian(array_dims(iq), n*sizeof(Int), ANA_LONG);
       endian(array_data(iq), array_size(iq)*ana_type_size[array_type(iq)],
 	     array_type(iq));
     }
@@ -4108,10 +4108,10 @@ int arestore_one(FILE* fp, int iq, int reverseOrder)
       p.sp = array_data(iq);
       while (n--) {
 	/* read the size of the next string */
-	if (!fread(&j, sizeof(int), 1, fp))
+	if (!fread(&j, sizeof(Int), 1, fp))
 	  return 1;
 	if (reverseOrder)
-	  endian(&j, sizeof(int), ANA_LONG);
+	  endian(&j, sizeof(Int), ANA_LONG);
 	if (j) {
 	  *p.sp = malloc(j + 1); /* reserve space for the string */
 	  if (!*p.sp)
@@ -4128,7 +4128,7 @@ int arestore_one(FILE* fp, int iq, int reverseOrder)
   case ANA_STRING:
     n = symbol_memory(iq);
     if (reverseOrder)
-      endian(&n, sizeof(int), ANA_LONG);
+      endian(&n, sizeof(Int), ANA_LONG);
     allocate(p.s, n, char);
     string_value(iq) = p.s;
     if (!fread(p.b, n, 1, fp))
@@ -4137,24 +4137,24 @@ int arestore_one(FILE* fp, int iq, int reverseOrder)
   case ANA_FILEMAP:
     n = symbol_memory(iq);
     if (reverseOrder)
-      endian(&n, sizeof(int), ANA_LONG);
+      endian(&n, sizeof(Int), ANA_LONG);
     allocate(p.s, n, char);
     file_map_header(iq) = (array *) p.s;
     if (!fread(p.b, n, 1, fp))
       return 1;
     n = file_map_num_dims(iq);
-    endian(file_map_dims(iq), n*sizeof(int), ANA_LONG);
-    endian(&file_map_offset(iq), sizeof(int), ANA_LONG);
+    endian(file_map_dims(iq), n*sizeof(Int), ANA_LONG);
+    endian(&file_map_offset(iq), sizeof(Int), ANA_LONG);
     break;
   case ANA_CLIST:
-    if (!fread(&n, sizeof(int), 1, fp))
+    if (!fread(&n, sizeof(Int), 1, fp))
       return 1;
     if (reverseOrder)
-      endian(&n, sizeof(int), ANA_LONG);
-    allocate(p.w, n*sizeof(word), word);
+      endian(&n, sizeof(Int), ANA_LONG);
+    allocate(p.w, n*sizeof(Word), Word);
     clist_symbols(iq) = p.w;
     for (j = 0; j < n; j++) {
-      int iq2 = nextFreeTempVariable();
+      Int iq2 = nextFreeTempVariable();
       arestore_one(fp, iq2, reverseOrder);
       symbol_context(iq2) = iq;
       p.w[j] = iq2;
@@ -4164,7 +4164,7 @@ int arestore_one(FILE* fp, int iq, int reverseOrder)
   return 0;
 }
 /*------------------------------------------------------------------------- */
-int arestore(int narg, int ps[], int flag)
+Int arestore(Int narg, Int ps[], Int flag)
 /* ARESTORE [, x1, x2, x3, ...], file
   restores data <x1>, <x2>, etcetera from file <file>.
   if no data arguments are specified, then the whole contents of
@@ -4180,7 +4180,7 @@ int arestore(int narg, int ps[], int flag)
    <stdlib.h>: malloc(), free()
  */
 {
-  int	iq, i, intro[2], n, nvalue;
+  Int	iq, i, intro[2], n, nvalue;
   char	*file, *name, reverseOrder;
   FILE	*fp;
   
@@ -4197,11 +4197,11 @@ int arestore(int narg, int ps[], int flag)
     } else
       return ANA_ZERO;
   }
-  if (!fread(intro, 2*sizeof(int), 1, fp)) /* some error */
+  if (!fread(intro, 2*sizeof(Int), 1, fp)) /* some error */
     return flag? cerror(READ_ERR, 0): ANA_ZERO;
-  if (intro[0] == 0x6666aaaa)	/* native byte order */
+  if (intro[0] == 0x6666aaaa)	/* native Byte order */
     reverseOrder = 0;
-  else if (intro[0] == 0xaaaa6666) /* reversed byte order */
+  else if (intro[0] == 0xaaaa6666) /* reversed Byte order */
     reverseOrder = 1;
   else {			/* wrong magic number */
     fclose(fp);
@@ -4209,7 +4209,7 @@ int arestore(int narg, int ps[], int flag)
   }
   nvalue = intro[1];		/* number of variables in the file */
   if (reverseOrder)
-    endian((byte *) &nvalue, sizeof(int), ANA_LONG);
+    endian((Byte *) &nvalue, sizeof(Int), ANA_LONG);
   if (narg && narg < nvalue)
     nvalue = narg;		/* the number of variables to restore */
   if (narg)			/* all arguments must be named variables */
@@ -4219,10 +4219,10 @@ int arestore(int narg, int ps[], int flag)
 	return flag? anaerror("Need a named variable", ps[i]): ANA_ZERO;
       }
   for (i = 0; i < nvalue; i++) {
-    if (!fread(&n, sizeof(int), 1, fp))  /* size of name */
+    if (!fread(&n, sizeof(Int), 1, fp))  /* size of name */
       return flag? cerror(READ_ERR, 0): ANA_ZERO;
     if (reverseOrder)
-      endian(&n, sizeof(int), ANA_LONG);
+      endian(&n, sizeof(Int), ANA_LONG);
     if (!narg) {		/* reading all of them: restore original */
 				/* names */
       name = (char *) malloc(n);
@@ -4259,18 +4259,18 @@ int arestore(int narg, int ps[], int flag)
   return ANA_ONE;
 }
 /*------------------------------------------------------------------------- */
-int ana_arestore(int narg, int ps[])
+Int ana_arestore(Int narg, Int ps[])
 {
   return arestore(narg, ps, 1);
 }
 /*------------------------------------------------------------------------- */
-int ana_arestore_f(int narg, int ps[])
+Int ana_arestore_f(Int narg, Int ps[])
      /* function form of ana_restore */
 {
   return arestore(narg, ps, 0);
 }
 /*------------------------------------------------------------------------- */
-int fileptr(int narg, int ps[], char function)
+Int fileptr(Int narg, Int ps[], char function)
 /* shows or sets a file pointer. */
 /* FILEPTR,lun
      shows the position of the file pointer of the file opened on
@@ -4278,13 +4278,13 @@ int fileptr(int narg, int ps[], char function)
    FILEPTR,lun,offset
      sets the file pointer <offset> bytes from the start (if
      <offset> >= 0), or to <offset> bytes from the end (if
-     <offset> < 0).  FILEPTR,lun,-1 sets the pointer to the last byte in the
+     <offset> < 0).  FILEPTR,lun,-1 sets the pointer to the last Byte in the
      file.
    FILEPTR,lun [,offset] ,/START
      sets the file pointer to <offset> (default zero) bytes from the start.
    FILEPTR,lun [,offset] ,/EOF
      sets the file pointer to <offset> (default zero) bytes from the end-of-file
-     marker.  The last byte in the file is the target of FILEPTR,lun,1,/EOF.
+     marker.  The last Byte in the file is the target of FILEPTR,lun,1,/EOF.
    FILEPTR,lun [,offset] ,/ADVANCE
      advances the file pointer by <offset> (default zero) bytes.
  LS 11feb97 */
@@ -4292,8 +4292,8 @@ int fileptr(int narg, int ps[], char function)
    <stdio.h>: FILE, ftell(), printf(), fgetpos(), fseek(), fsetpos(), perror()
  */
 {
-  int	lun, n, now, iq;
-  long int	offset;
+  Int	lun, n, now, iq;
+  off_t	offset;
   FILE	*fp;
   fpos_t	save;
 
@@ -4355,24 +4355,24 @@ int fileptr(int narg, int ps[], char function)
   return function? ANA_ONE: 1;
 }
 /*------------------------------------------------------------------------- */
-int ana_fileptr(int narg, int ps[])
+Int ana_fileptr(Int narg, Int ps[])
 {
   return fileptr(narg, ps, (char) 0);
 }
 /*------------------------------------------------------------------------- */
-int ana_fileptr_f(int narg, int ps[])
+Int ana_fileptr_f(Int narg, Int ps[])
 {
   return fileptr(narg, ps, (char) 1);
 }
 /*------------------------------------------------------------------------- */
-int ana_dump_lun(int narg, int ps[])
+Int ana_dump_lun(Int narg, Int ps[])
 /* lists the files associated with all used logical units */
 /* LS 2mar97 */
 /* Headers:
    <stdio.h>: printf()
  */
 {
-  int	lun, n = 0;
+  Int	lun, n = 0;
 
   for (lun = 0; lun < MAXFILES; lun++)
   { if (!ana_file_open[lun])
@@ -4387,10 +4387,10 @@ int ana_dump_lun(int narg, int ps[])
   return 1;
 }
 /*------------------------------------------------------------------------- */
-int ana_get_lun(int narg, int ps[])
+Int ana_get_lun(Int narg, Int ps[])
 /* returns a free logical unit number */
 {
-  int	i, n;
+  Int	i, n;
 
   for (i = 0; i < MAXFILES; i++)
     if (!ana_file_open[i]) {
@@ -4402,7 +4402,7 @@ int ana_get_lun(int narg, int ps[])
   return anaerror("No free LUNs available", 0);
 }
 /*------------------------------------------------------------------------- */
-int ana_chdir(int narg, int ps[])
+Int ana_chdir(Int narg, Int ps[])
 /* CHDIR,name changes directory to <name>.  CHDIR shows the current
    directory.  LS 12aug97 */
 /* Headers:
@@ -4432,7 +4432,7 @@ int ana_chdir(int narg, int ps[])
   return 1;
 }
 /*------------------------------------------------------------------------- */
-int ana_filesize(int narg, int ps[])
+Int ana_filesize(Int narg, Int ps[])
 /* FILESIZE(file) returns the size (in bytes) of the file, or -1 if the */
 /* file cannot be opened for reading.  LS 10nov97 */
 /* Headers:
@@ -4440,7 +4440,7 @@ int ana_filesize(int narg, int ps[])
  */
 {
   FILE	*fp;
-  int	result;
+  Int	result;
 
   if (symbol_class(ps[0]) != ANA_STRING)
     return cerror(ILL_CLASS, ps[0]);
@@ -4455,7 +4455,7 @@ int ana_filesize(int narg, int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-int ana_freads(int narg, int ps[])
+Int ana_freads(Int narg, Int ps[])
      /* FREADS,<string>,<format>,<arg1>,... reads arguments from the */
      /* string under guidance of the <format>. */
 {
@@ -4465,12 +4465,12 @@ int ana_freads(int narg, int ps[])
 			      1, ANA_STRING) == ANA_ERROR? ANA_ERROR: ANA_OK;
 }
 /*------------------------------------------------------------------------- */
-int ana_freads_f(int narg, int ps[])
+Int ana_freads_f(Int narg, Int ps[])
      /* FREADS(<string>,<format>,<arg1>,...) reads arguments from the */
      /* string under guidance of the <format>.  Returns 0 if an error occurred,
 	1 otherwise.  LS 25jan99 */
 {
-  int	result, iq;
+  Int	result, iq;
 
   if (symbol_class(ps[0]) != ANA_STRING)
     return ANA_ZERO;
@@ -4489,7 +4489,7 @@ int ana_freads_f(int narg, int ps[])
   return iq;
 }
 /*------------------------------------------------------------------------- */
-int ana_file_to_fz(int narg, int ps[])
+Int ana_file_to_fz(Int narg, Int ps[])
 /* FILETOFZ,file,type,dims  transforms a regular file with unformatted */
 /* data to an uncompressed FZ file with the indicated type and dimensions, */
 /* but only if the size of the file is approriate for the specified */
@@ -4501,7 +4501,7 @@ int ana_file_to_fz(int narg, int ps[])
    <string.h>: memcpy()
  */
 {
-  int	i, nd, *dims, n, m, type, j;
+  Int	i, nd, *dims, n, m, type, j;
   FILE	*fp;
   fzHead	*fh;
 
@@ -4549,9 +4549,9 @@ int ana_file_to_fz(int narg, int ps[])
   fh->nhb = 1;			/*may be changed later */
   fh->datyp = type;
   fh->ndim = nd;
-  memcpy(fh->dim, dims, nd*sizeof(int));
+  memcpy(fh->dim, dims, nd*sizeof(Int));
   if (MSBfirst)
-    endian(fh->dim, fh->ndim*sizeof(int), ANA_LONG);
+    endian(fh->dim, fh->ndim*sizeof(Int), ANA_LONG);
   j = fwrite(fh, 1, 512 * fh->nhb, fp); /*write header */
   fclose(fp);
   if (j != 512 * fh->nhb) {
@@ -4576,7 +4576,7 @@ char *file_find(char *sdir, char *fname)
   DIR	*dirp;
   struct dirent *dp;
   struct stat	statbuf;
-  int	n, mq;
+  Int	n, mq;
   char	*sq, *s2, *s3;
 
   n = strlen(fname);
@@ -4646,7 +4646,7 @@ char *file_find(char *sdir, char *fname)
   return NULL;
 }
 /*------------------------------------------------------------------------- */
-int ana_findfile(int narg, int ps[])
+Int ana_findfile(Int narg, Int ps[])
 /* find a file given a starting path */
 /* Headers:
    <string.h>: strlen(), strchr(), printf(), NULL, strcpy()
@@ -4654,7 +4654,7 @@ int ana_findfile(int narg, int ps[])
  */
 {
   char	*startpath, *fname, *pq, *current_dir = ".";
-  int	ns, result_sym;
+  Int	ns, result_sym;
 
   /* first argment is a string with the start path */
   if (!symbolIsStringScalar(ps[0]))
@@ -4693,14 +4693,14 @@ int ana_findfile(int narg, int ps[])
    in POSIX (e.g., linux).  Under POSIX, basic behavior results if
    REG_EXTENDED is *not* selected, so we can define REG_BASIC to be
    equal to zero if it is not already defined.  LS 21sep98 */
-static int	nfiles = 0, max;
+static Int	nfiles = 0, max;
 static char	**p;
 #if HAVE_REGEX_H
 static regex_t	re;
 #ifndef REG_BASIC
 #define REG_BASIC	0
 #endif
-int ana_getmatchedfiles(int narg, int ps[])/* get all file names that match */
+Int ana_getmatchedfiles(Int narg, Int ps[])/* get all file names that match */
  /* call is:  strings = getmatchedfiles( expr, path, [maxfiles] ) */
  /* uses regular expression matches, not the more familiar shell wildcarding,
  this is more general but not as intuitive, it uses the Unix routines
@@ -4712,9 +4712,9 @@ int ana_getmatchedfiles(int narg, int ps[])/* get all file names that match */
    <stdio.h>: printf()
  */
 {
-  int	result_sym;
+  Int	result_sym;
   char	*s;
-  int	ana_getfiles(int, int []);
+  Int	ana_getfiles(Int, Int []);
 
   /* the first arg is the regular expression string */
   if (!symbolIsString(ps[0]))
@@ -4735,10 +4735,10 @@ int ana_getmatchedfiles(int narg, int ps[])/* get all file names that match */
 #endif
  /*------------------------------------------------------------------------- */
 #if HAVE_REGEX_H
-int ana_getmatchedfiles_r(int narg, int ps[])	/* also search subdir */
+Int ana_getmatchedfiles_r(Int narg, Int ps[])	/* also search subdir */
  /* call is:  strings = getmatchedfiles_r( expr, path, [maxfiles] ) */
 {
-  int	result_sym;
+  Int	result_sym;
 
   recursive_flag = 1;
   result_sym = ana_getmatchedfiles(narg, ps);
@@ -4748,7 +4748,7 @@ int ana_getmatchedfiles_r(int narg, int ps[])	/* also search subdir */
 #endif
  /*------------------------------------------------------------------------- */
 #if HAVE_REGEX_H
-int file_get(char *startpath)
+Int file_get(char *startpath)
 /* Headers:
    <sys/types.h>: stat(), opendir(), readdir(). regexec(), closedir()
    <sys/stat.h>: stat(), struct stat
@@ -4759,7 +4759,7 @@ int file_get(char *startpath)
    <stdlib.h>: malloc(), free()
  */
 {
-  int	mq, matches;
+  Int	mq, matches;
   char	*sq;
   struct stat	statbuf;
   DIR	*dirp;
@@ -4831,7 +4831,7 @@ int file_get(char *startpath)
 }
 #endif
  /*------------------------------------------------------------------------- */
-int directs_get(char *startpath)
+Int directs_get(char *startpath)
 /* Headers:
    <dirent.h>: DIR, struct dirent, opendir(), readdir(), closedir()
    <sys/types.h>: opendir(), readdir(), stat(), closedir()
@@ -4841,7 +4841,7 @@ int directs_get(char *startpath)
    <sys/stat.h>: stat()
  */
 {
-  int	mq;
+  Int	mq;
   char	*sq;
   struct stat statbuf;
   DIR	*dirp;
@@ -4899,11 +4899,11 @@ int directs_get(char *startpath)
 #if HAVE_REGEX_H
 /* ana_getfiles_r() calls ana_getfiles() which calls file_get() which uses */
 /* <regex.h> */
-int ana_getfiles_r(int narg, int ps[])	/* also search subdir */
+Int ana_getfiles_r(Int narg, Int ps[])	/* also search subdir */
  /* call is:  strings = getfiles_r( path, [maxfiles] ) */
 {
-  int	result_sym;
-  int	ana_getfiles(int, int []);
+  Int	result_sym;
+  Int	ana_getfiles(Int, Int []);
 
   recursive_flag = 1;
   result_sym = ana_getfiles(narg, ps);
@@ -4914,7 +4914,7 @@ int ana_getfiles_r(int narg, int ps[])	/* also search subdir */
 /*------------------------------------------------------------------------- */
 #if HAVE_REGEX_H
 /* ana_getfiles() calls file_get() which uses <regex.h> */
-int ana_getfiles(int narg, int ps[])
+Int ana_getfiles(Int narg, Int ps[])
 /* get all file names in directory */
 /* call is:  strings = getfiles( path, [maxfiles] ) */
 /* Headers:
@@ -4923,7 +4923,7 @@ int ana_getfiles(int narg, int ps[])
  */
 {
   char	*startpath;
-  int	result_sym, dim[1], mq, malloc_flag = 0, status;
+  Int	result_sym, dim[1], mq, malloc_flag = 0, status;
   char	**names;
 
   /* first argment is a string with the start path */
@@ -4937,8 +4937,8 @@ int ana_getfiles(int narg, int ps[])
     return ANA_ERROR;
   /* get space to store pointers to copies of names, use SCRAT if big enough */
   mq = max * sizeof (char *);
- /* printf("mq = %d, NSCRAT * sizeof(int) = %d\n", mq, NSCRAT * sizeof(int));*/
-  if (mq <= NSCRAT * sizeof(int))
+ /* printf("mq = %d, NSCRAT * sizeof(Int) = %d\n", mq, NSCRAT * sizeof(Int));*/
+  if (mq <= NSCRAT * sizeof(Int))
     names = (char **) scrat;
   else {
     malloc_flag = 1;
@@ -4979,7 +4979,7 @@ int ana_getfiles(int narg, int ps[])
 #if HAVE_REGEX_H
 /* ana_getdirectories() calls ana_getfiles() which calls file_get() which */
 /* uses <regex.h> */
-int ana_getdirectories(int narg, int ps[])
+Int ana_getdirectories(Int narg, Int ps[])
 /* get all subdirectories in directory */
 /* call is:  strings = getdirectories( path, [maxfiles] ) */
 {
@@ -4989,7 +4989,7 @@ int ana_getdirectories(int narg, int ps[])
 }
 #endif
 /*------------------------------------------------------------------------- */
-int ana_identify_file(int narg, int ps[])
+Int ana_identify_file(Int narg, Int ps[])
 /* tries to identify the type of a file based on the values of its
  first four bytes (its "magic number") LS 21sep98 */
 /* Headers:
@@ -4997,9 +4997,9 @@ int ana_identify_file(int narg, int ps[])
  */
 {
   char	*name;
-  byte	buf[4];
+  Byte	buf[4];
   FILE	*fp;
-  int	type, result;
+  Int	type, result;
 
   if (!symbolIsStringScalar(ps[0]))
     return cerror(NEED_STR, ps[0]);
@@ -5111,16 +5111,16 @@ void printw(char *string)
  */
 {
   char	*p, *pn, *p2, *p0;
-  int	n, a, keepws, toolong;
+  Int	n, a, keepws, toolong;
   extern char	*cl_eos;
-  extern int	uTermCol;
+  extern Int	uTermCol;
 
   n = strlen(string);
   p = string;
   /* if the first character is whitespace (but no newline), then we
    keep whitespace at the beginning of screen lines; otherwise we
    discard it. */
-  keepws = (isspace((byte) *p) && *p != '\n');
+  keepws = (isspace((Byte) *p) && *p != '\n');
   pn = strpbrk(p, "\n\r");	/* find next newline or return */
   while (n) {			/* while we have more characters to print */
     toolong = (n + column >= uTermCol);
@@ -5133,14 +5133,14 @@ void printw(char *string)
       /* we must break there */
       p2 = pn + 1;
       pn = strpbrk(p2, "\n\r");	/* next newline or return */
-    } else if (isspace((byte) p2[-1]) && keepws) {
+    } else if (isspace((Byte) p2[-1]) && keepws) {
       /* if <keepws> is set, then we only want breakpoints such that there
 	 is no whitespace directly before the breakpoint.  This is suitable
 	 for printing lists of numbers in formats with a fixed field width;
 	 they'll then line up nicely in columns, even if the screen width
 	 is not some simple multiple of the field width. */
       p2--;
-      while (p2 > p && isspace((byte) p2[-1]))
+      while (p2 > p && isspace((Byte) p2[-1]))
 	p2--;
       if (p2 == p)		/* the whole line is whitespace: use
 				   the original breakpoint. */
@@ -5156,10 +5156,10 @@ void printw(char *string)
 	&& *p2			/* not at end of string */
 	&& p2[-1] != '\n'	/* not just after a \n */
 	&& p2[-1] != '\r'	/* not just after a \r */
-	&& (!isspace((byte) *p2) /* not just before whitespace */
-	    || isspace((byte) p2[-1]))) { /* or just after whitespace */
+	&& (!isspace((Byte) *p2) /* not just before whitespace */
+	    || isspace((Byte) p2[-1]))) { /* or just after whitespace */
       p2--;
-      while ((isspace((byte) p2[-1]) || !isspace((byte) *p2))
+      while ((isspace((Byte) p2[-1]) || !isspace((Byte) *p2))
 	     && p2 > p)		/* seek a better place to break... */
 	p2--;			/* ... earlier in the line */
     }
@@ -5170,7 +5170,7 @@ void printw(char *string)
     if (!keepws && !column) 	/* we're not interested in whitespace;
 				   if we have any at the start of the line
 				   then we skip it. */
-      while (isspace((byte) *p) && *p != '\n') {
+      while (isspace((Byte) *p) && *p != '\n') {
 	p++;
 	n--;
       }
@@ -5246,7 +5246,7 @@ void printfw(char *format, ...)
   va_end(ap);
 }
 /*------------------------------------------------------------------------- */
-int ana_hex(int narg, int ps[])
+Int ana_hex(Int narg, Int ps[])
 /* a temporary routine that types arg in hex notation, until we have
    a fully formatted print */
 /* Headers:
@@ -5254,10 +5254,10 @@ int ana_hex(int narg, int ps[])
  */
 {
   FILE	*fp;
-  register int	nelem;
+  register Int	nelem;
   register union types_ptr p1;
-  register int	j;
-  int i,k,iq,jq,flag=0;
+  register Int	j;
+  Int i,k,iq,jq,flag=0;
   char	*ptr;
 
   fp = stdout;
@@ -5276,11 +5276,11 @@ int ana_hex(int narg, int ps[])
 	} flag=1; break;			/*end of scalar case */
       case ANA_SCAL_PTR:	/*scalar ptr case */
 	switch (sym[iq].type) {
-	  case 0: fprintf(fp, "      %#4x",*(byte *)sym[iq].spec.array.ptr); break;
+	  case 0: fprintf(fp, "      %#4x",*(Byte *)sym[iq].spec.array.ptr); break;
 	  case 1: fprintf(fp, "    %#6x",*(short *)sym[iq].spec.array.ptr); break;
-	  case 2: fprintf(fp, "%#10x",*(int *)sym[iq].spec.array.ptr); break;
-	  case 3: fprintf(fp, "%#10x",*(float *)sym[iq].spec.array.ptr); break;
-	  case 4: fprintf(fp, "%#20x",*(double *)sym[iq].spec.array.ptr); break;
+	  case 2: fprintf(fp, "%#10x",*(Int *)sym[iq].spec.array.ptr); break;
+	  case 3: fprintf(fp, "%#10x",*(Float *)sym[iq].spec.array.ptr); break;
+	  case 4: fprintf(fp, "%#20x",*(Double *)sym[iq].spec.array.ptr); break;
 	} flag=1; break;			/*end of scalar case */
       case ANA_STRING:		/*string */
 	ptr = (char *) sym[iq].spec.array.ptr;
@@ -5293,15 +5293,15 @@ int ana_hex(int narg, int ps[])
     if (flag) fprintf(fp, "\n");	flag=0;
     /*print entire array, number per line depends on type */
 	    switch (jq) {
-	      case 2:  p1.l = (int *)ptr; k=8; for (j=0;j<nelem;j++)
+	      case 2:  p1.l = (Int *)ptr; k=8; for (j=0;j<nelem;j++)
 	      { fprintf(fp, "%#10x",*p1.l++); if (j%8 == 7) fprintf(fp, "\n");}  break;
-	      case 3:  p1.f = (float *)ptr; k=6; for (j=0;j<nelem;j++)
+	      case 3:  p1.f = (Float *)ptr; k=6; for (j=0;j<nelem;j++)
 	      { fprintf(fp, "%#10x",*p1.f++); if (j%6 == 5) fprintf(fp, "\n");}  break;
-	      case 0:  p1.b = (byte *)ptr; k=8; for (j=0;j<nelem;j++)
+	      case 0:  p1.b = (Byte *)ptr; k=8; for (j=0;j<nelem;j++)
 	      { fprintf(fp, "      %#4x",*p1.b++); if (j%8 == 7) fprintf(fp, "\n");}  break;
 	      case 1:  p1.w = (short *)ptr; k=8; for (j=0;j<nelem;j++)
 	      { fprintf(fp, "    %#6x",*p1.w++); if (j%8 == 7) fprintf(fp, "\n");}  break;
-	      case 4:  p1.d = (double *)ptr; k=4; for (j=0;j<nelem;j++)
+	      case 4:  p1.d = (Double *)ptr; k=4; for (j=0;j<nelem;j++)
 	      { fprintf(fp, "%#20x",*p1.d++); if (j%4 == 3) fprintf(fp, "\n");}  break;
 	    } if ( nelem%k != 0 ) fprintf(fp, "\n"); break;	/*end of array class */
     }						/*end of class switch */
@@ -5311,7 +5311,7 @@ int ana_hex(int narg, int ps[])
 }							/*end of ana_type */
 /*------------------------------------------------------------------------- */
 #define	HEAD_LIMIT	100
-int fits_problems(int i)
+Int fits_problems(Int i)
 /* Headers:
    <stdio.h>: printf();
  */
@@ -5348,14 +5348,14 @@ int fits_problems(int i)
   return 1;
 }
 /*------------------------------------------------------------------------- */
-char *bigger_header(int n, char *head)
+char *bigger_header(Int n, char *head)
 /* Headers:
    <stdlib.h>: malloc(), free()
    <string.h>: memmove()
  */
 {
   /* we want 2880*n bytes */
-  int	nb;
+  Int	nb;
   char	*p;
   
   nb = n*2880; 
@@ -5374,7 +5374,7 @@ char *bigger_header(int n, char *head)
   return p;
 }
 /*------------------------------------------------------------------------- */
-int fits_fatality(FILE *fin)
+Int fits_fatality(FILE *fin)
 /* Headers:
    <stdio.h>: printf(), fclose()
    <stdlib.h>: free()
@@ -5387,9 +5387,9 @@ int fits_fatality(FILE *fin)
   return ANA_ZERO;	/* this is the zero symbol */
 }
 /*------------------------------------------------------------------------- */
-void apply_bscale_bzero_blank(byte *ptr, int nelem, float bscale, float bzero,
-			      float blank, float targetblank, int type0,
-			      int type)
+void apply_bscale_bzero_blank(Byte *ptr, Int nelem, Float bscale, Float bzero,
+			      Float blank, Float targetblank, Int type0,
+			      Int type)
 {
   pointer	p, q;
 
@@ -5520,12 +5520,12 @@ void apply_bscale_bzero_blank(byte *ptr, int nelem, float bscale, float bzero,
   }
 }
 /*------------------------------------------------------------------------- */
-int fits_read(int, int, int, int, int, int, int, int, float);
-int ana_fits_read_general(int narg, int ps[], int func)/* read fits files */
+Int fits_read(Int, Int, Int, Int, Int, Int, Int, Int, Float);
+Int ana_fits_read_general(Int narg, Int ps[], Int func)/* read fits files */
  /* status = fits_read(x, name, [h], [x2], [h2], [extvar_preamble]) */
 {
-  int	hsym = 0, mode, xhsym=0, xdsym =0;
-  float	targetblank = 0.0;
+  Int	hsym = 0, mode, xhsym=0, xdsym =0;
+  Float	targetblank = 0.0;
  /* uses fits_read, mode depends on arguments */
  /* mode mask uses bits to specify products to return
  1 bit: main header, 2 bit: main array, 4 bit: offset value
@@ -5560,20 +5560,20 @@ int ana_fits_read_general(int narg, int ps[], int func)/* read fits files */
     return mode;
 }
 /*------------------------------------------------------------------------- */
-int ana_fits_read(int narg, int ps[])
+Int ana_fits_read(Int narg, Int ps[])
 {
   return ana_fits_read_general(narg, ps, 0);
 }
 /*------------------------------------------------------------------------- */
-int ana_fits_read_f(int narg, int ps[])
+Int ana_fits_read_f(Int narg, Int ps[])
 {
   return ana_fits_read_general(narg, ps, 1);
 }
 /*------------------------------------------------------------------------- */
-int ana_fits_header_f(int narg, int ps[])/* read fits header */
+Int ana_fits_header_f(Int narg, Int ps[])/* read fits header */
 /* status = fits_header(name, [h], [h2], [extvar_preamble]) */
 {
-  int	hsym = 0, mode, xhsym = 0;
+  Int	hsym = 0, mode, xhsym = 0;
  /* uses fits_read, mode depends on arguments */
  /* mode mask described in ana_fits_read */
 
@@ -5595,10 +5595,10 @@ int ana_fits_header_f(int narg, int ps[])/* read fits header */
   return fits_read(mode, 0, ps[0], hsym, 0, 0, xhsym, 0, 0);
 }
 /*------------------------------------------------------------------------- */
-int ana_fits_xread_f(int narg, int ps[])/* read fits extension and headers */
+Int ana_fits_xread_f(Int narg, Int ps[])/* read fits extension and headers */
  /* status = fits_xread(x2, name, [h], [h2], [offset], [extvar_preamble]) */
 {
- int	hsym = 0, mode, xhsym = 0, offsetsym = 0;
+ Int	hsym = 0, mode, xhsym = 0, offsetsym = 0;
 
  /* uses fits_read, mode depends on arguments */
  /* mode mask described in ana_fits_read */
@@ -5624,13 +5624,13 @@ int ana_fits_xread_f(int narg, int ps[])/* read fits extension and headers */
  return fits_read(mode, 0, ps[1], hsym, offsetsym, 0, xhsym, ps[0], 0);
 }
 /*------------------------------------------------------------------------- */
-int	anadecrunchrun8(byte [], byte [], int, int, int),
-  anadecrunch8(byte *, byte [], int, int, int),
-  anadecrunchrun(byte *, short [], int, int, int),
-  anadecrunch(byte *, short [], int, int, int),
-  anadecrunch32(byte *, int [], int, int, int);
-int fits_read_compressed(int mode, int datasym, FILE *fp, int headersym,
-			 float targetblank)
+Int	anadecrunchrun8(Byte [], Byte [], Int, Int, Int),
+  anadecrunch8(Byte *, Byte [], Int, Int, Int),
+  anadecrunchrun(Byte *, short [], Int, Int, Int),
+  anadecrunch(Byte *, short [], Int, Int, Int),
+  anadecrunch32(Byte *, Int [], Int, Int, Int);
+Int fits_read_compressed(Int mode, Int datasym, FILE *fp, Int headersym,
+			 Float targetblank)
 /* reads data from an ANA Rice-compressed FITS file open on <fp>. */
 /* <mode> determines which data to return: &1 -> header in <headersym>; */
 /* &2 -> data in <datasym>. */
@@ -5641,9 +5641,9 @@ int fits_read_compressed(int mode, int datasym, FILE *fp, int headersym,
    <string.h>: strncmp(), memcpy()
  */
 {
-  int	ncbytes, type, ndim, dims[MAX_DIMS], i, nblock, ok, slice, nx, ny,
+  Int	ncbytes, type, ndim, dims[MAX_DIMS], i, nblock, ok, slice, nx, ny,
     type0;
-  float	bscale = 0.0, bzero = 0.0, blank = FLT_MAX, min, max;
+  Float	bscale = 0.0, bzero = 0.0, blank = FLT_MAX, min, max;
   char	*block, usescrat, *curblock, runlength;
   pointer	p;
 
@@ -5825,9 +5825,9 @@ int fits_read_compressed(int mode, int datasym, FILE *fp, int headersym,
       if (!(internalMode & 2)
 	  && (bscale || bzero)) {
 	if (isIntegerType(type)) {
-	  if ((bscale && bscale != (int) bscale)
-	      || (bzero != (int) bzero))
-	    /* we must upgrade the data type from integer to float */
+	  if ((bscale && bscale != (Int) bscale)
+	      || (bzero != (Int) bzero))
+	    /* we must upgrade the data type from integer to Float */
 	    type = ANA_FLOAT;
 	  else {
 	    if (!bscale)
@@ -5838,19 +5838,19 @@ int fits_read_compressed(int mode, int datasym, FILE *fp, int headersym,
 		max = 255*bscale + bzero;
 		break;
 	      case ANA_WORD:
-		min = SHRT_MIN*bscale + bzero;
-		max = SHRT_MAX*bscale + bzero;
+		min = INT16_MIN*bscale + bzero;
+		max = INT16_MAX*bscale + bzero;
 		break;
 	      case ANA_LONG:
-		min = INT_MIN*bscale + bzero;
-		max = INT_MAX*bscale + bzero;
+		min = INT32_MIN*bscale + bzero;
+		max = INT32_MAX*bscale + bzero;
 		break;
 	    }
 	    if (min >= 0 && max <= 255)
 	      type = ANA_BYTE;
-	    else if (min >= SHRT_MIN && max <= SHRT_MAX)
+	    else if (min >= INT16_MIN && max <= INT16_MAX)
 	      type = ANA_WORD;
-	    else if (min >= INT_MIN && max <= INT_MAX)
+	    else if (min >= INT32_MIN && max <= INT32_MAX)
 	      type = ANA_LONG;
 	    else
 	      type = ANA_FLOAT;
@@ -5882,7 +5882,7 @@ int fits_read_compressed(int mode, int datasym, FILE *fp, int headersym,
     } /* end of if (!fread) */
 
     if (internalMode & 1) {	/* decompress */
-      p.b = (byte *) block;
+      p.b = (Byte *) block;
       slice = p.b[12];
       ny = p.l[1];
       nx = p.l[2];
@@ -5939,10 +5939,10 @@ int fits_read_compressed(int mode, int datasym, FILE *fp, int headersym,
   return ok;
 }
 /*------------------------------------------------------------------------- */
-int	ana_replace(int, int), swapb(char [], int);
-void	swapd(char [], int);
-int fits_read(int mode, int dsym, int namsym, int hsym, int offsetsym,
-	      int xoffsetsym, int xhsym, int xdsym, float targetblank)
+Int	ana_replace(Int, Int), swapb(char [], Int);
+void	swapd(char [], Int);
+Int fits_read(Int mode, Int dsym, Int namsym, Int hsym, Int offsetsym,
+	      Int xoffsetsym, Int xhsym, Int xdsym, Float targetblank)
  /* internal, read fits files */
  /* returns status as sym # for 0, 1, or 2 */
 /* Headers:
@@ -5953,26 +5953,26 @@ int fits_read(int mode, int dsym, int namsym, int hsym, int offsetsym,
  */
 {
   static char	tforms[] = "IJAEDB";
-  static int	tform_sizes[] = { 2, 4, 1, 4, 8, 1};
+  static Int	tform_sizes[] = { 2, 4, 1, 4, 8, 1};
   FILE	*fin;
   char	*fitshead, line[80], *lptr, c, **p, *q, *ext_ptr, *sq, *p2, *qb;
-  int	n, simple_flag, bitpix_flag = 0, naxis_flag = 0, naxis_count;
-  int	bitpix, type, nlines, end_flag = 0, nhblks, lc, iq, id, new_sym;
-  int	maxdim, i, rsym = 1, nbsize, ext_flag=0, data_offset, npreamble;
-  int	fits_type, ndim_var, *dim_var, n_ext_rows, nrow_bytes, m;
-  int	xtension_found = 0, tfields, gcount, row_bytes,
+  Int	n, simple_flag, bitpix_flag = 0, naxis_flag = 0, naxis_count;
+  Int	bitpix, type, nlines, end_flag = 0, nhblks, lc, iq, id, new_sym;
+  Int	maxdim, i, rsym = 1, nbsize, ext_flag=0, data_offset, npreamble;
+  Int	fits_type, ndim_var, *dim_var, n_ext_rows, nrow_bytes, m;
+  Int	xtension_found = 0, tfields, gcount, row_bytes,
     dim[MAX_DIMS], type0;
-  int	ext_stuff_malloc_flag = 0;
-  float	bscale = 0.0, bzero = 0.0, blank = FLT_MAX, min, max;
+  Int	ext_stuff_malloc_flag = 0;
+  Float	bscale = 0.0, bzero = 0.0, blank = FLT_MAX, min, max;
   struct ext_params {
-    int	repeat;
-    int	type;
-    double	scale, zero;
+    Int	repeat;
+    Int	type;
+    Double	scale, zero;
     char	*lab;
   };
   struct ext_params *ext_stuff;
 #if LITTLEENDIAN
-  int	nb;
+  Int	nb;
 #endif
   
   /* first arg is the variable to load, second is name of file */
@@ -6017,7 +6017,7 @@ int fits_read(int mode, int dsym, int namsym, int hsym, int offsetsym,
 
   nhblks = 1;
   lc = 1;
-  zerobytes( dim, 8*sizeof(int));
+  zerobytes( dim, 8*sizeof(Int));
   maxdim = 0;
   while (1) {		/* outer loop to handle multiple header blocks */
     while (nlines--) {	/* 36 for a full header block, 35 for first */
@@ -6179,9 +6179,9 @@ int fits_read(int mode, int dsym, int namsym, int hsym, int offsetsym,
     if (!(internalMode & 2)	/* no /RAWVALUES */
 	&& (bscale || bzero)) {	/* and have BSCALE or BZERO */
       if (isIntegerType(type)) {
-	if ((bscale && bscale != (int) bscale)
-	    || (bzero != (int) bzero))
-	  /* we must upgrade the data type from integer to float */
+	if ((bscale && bscale != (Int) bscale)
+	    || (bzero != (Int) bzero))
+	  /* we must upgrade the data type from integer to Float */
 	  type = ANA_FLOAT;
 	else {
 	  if (!bscale)
@@ -6192,19 +6192,19 @@ int fits_read(int mode, int dsym, int namsym, int hsym, int offsetsym,
 	      max = 255*bscale + bzero;
 	      break;
 	    case ANA_WORD:
-	      min = SHRT_MIN*bscale + bzero;
-	      max = SHRT_MAX*bscale + bzero;
+	      min = INT16_MIN*bscale + bzero;
+	      max = INT16_MAX*bscale + bzero;
 	      break;
 	    case ANA_LONG:
-	      min = INT_MIN*bscale + bzero;
-	      max = INT_MAX*bscale + bzero;
+	      min = INT32_MIN*bscale + bzero;
+	      max = INT32_MAX*bscale + bzero;
 	      break;
 	  }
 	  if (min >= 0 && max <= 255)
 	    type = ANA_BYTE;
-	  else if (min >= SHRT_MIN && max <= SHRT_MAX)
+	  else if (min >= INT16_MIN && max <= INT16_MAX)
 	    type = ANA_WORD;
-	  else if (min >= INT_MIN && max <= INT_MAX)
+	  else if (min >= INT32_MIN && max <= INT32_MAX)
 	    type = ANA_LONG;
 	  else
 	  type = ANA_FLOAT;
@@ -6224,13 +6224,13 @@ int fits_read(int mode, int dsym, int namsym, int hsym, int offsetsym,
 	 little endian machines (like alpha's and pc's) */
 #if LITTLEENDIAN
       if (type == 1)  swapb((char *) q, nbsize);
-      if (type == 2 || type ==3)  swapl((int *) q, nbsize/4);
+      if (type == 2 || type ==3)  swapl((Int *) q, nbsize/4);
       if (type == 4)  swapd((char *) q, nbsize/8);
 #endif
     }
     /* now correct for BZERO, BSCALE, BLANK */
     if (!(internalMode & 2) && (bscale || bzero))
-      apply_bscale_bzero_blank((byte *) q, nbsize/ana_type_size[type0], bscale, bzero,
+      apply_bscale_bzero_blank((Byte *) q, nbsize/ana_type_size[type0], bscale, bzero,
 			       blank, targetblank, type0, type);
     /* ana_replace ordinarily yields some output when STEPping or TRACEing, */
     /* but here we don't want that: ensure that noTrace is non-zero */
@@ -6249,7 +6249,7 @@ int fits_read(int mode, int dsym, int namsym, int hsym, int offsetsym,
     nhblks = 0;
     fitshead = curScrat;		/* changed to curScrat -- LS 19may99 */
     lc = 0;
-    zerobytes( dim, 8*sizeof(int));
+    zerobytes( dim, 8*sizeof(Int));
     maxdim = bitpix_flag = naxis_flag = end_flag = 0;
     
     while (1) {
@@ -6412,7 +6412,7 @@ int fits_read(int mode, int dsym, int namsym, int hsym, int offsetsym,
       /* note, however, that these are normally I*1 (type 0) for binary tables */
 #if LITTLEENDIAN
       if (type == 1)  swapb(q, nbsize);
-      if (type == 2 || type ==3)  swapl((int *) q, nbsize/4);
+      if (type == 2 || type ==3)  swapl((Int *) q, nbsize/4);
       if (type == 4)  swapd((char *) q, nbsize/8);
 #endif
       noTrace++;
@@ -6426,7 +6426,7 @@ int fits_read(int mode, int dsym, int namsym, int hsym, int offsetsym,
   /* decode the extension (for binary tables) */
   if (mode & 0x40 && ext_flag) {
     /* can't do if no extension */
-    int	index, itype, ext_ptr_malloc_flag = 0;
+    Int	index, itype, ext_ptr_malloc_flag = 0;
     char	*loc;
     /* printf("lc = %d\n", lc); */
     lptr = fitshead;
@@ -6457,7 +6457,7 @@ int fits_read(int mode, int dsym, int namsym, int hsym, int offsetsym,
 	else {
 	  index = iq - 1;
 	  ext_stuff[index].repeat = id;
-	  loc = strchr(tforms, (int) line[0]);
+	  loc = strchr(tforms, (Int) line[0]);
 	  if (loc == NULL)
 	  { printf("unsupported extension column format %s\n", line);
 	    itype = -1;}	else	itype = loc - tforms;
@@ -6524,7 +6524,7 @@ int fits_read(int mode, int dsym, int namsym, int hsym, int offsetsym,
     row_bytes = 0;
     lptr = ext_ptr;
     for (index=0;index<=tfields-1;index++) {
-      int	sl;
+      Int	sl;
       char *ppq;
 
       /* construct the variable name */
@@ -6606,7 +6606,7 @@ int fits_read(int mode, int dsym, int namsym, int hsym, int offsetsym,
 #if LITTLEENDIAN
 	nb = nbsize * n_ext_rows;
 	if (fits_type == 0)  swapb(qb, nb);
-	if (fits_type == 1 || fits_type ==3)  swapl((int *) qb, nb/4);
+	if (fits_type == 1 || fits_type ==3)  swapl((Int *) qb, nb/4);
 	if (fits_type == 4)  swapd((char *) qb, nb/8);
 #endif
       }
@@ -6629,7 +6629,7 @@ int fits_read(int mode, int dsym, int namsym, int hsym, int offsetsym,
   return fits_fatality(fin);
 }
 /*------------------------------------------------------------------------- */
-int ana_fits_write_general(int narg, int ps[], int func)
+Int ana_fits_write_general(Int narg, Int ps[], Int func)
 /* FITS_WRITE,data,file [,header,slice] [,/VOCAL] */
 /* LS 18nov99 */
 /* Headers:
@@ -6641,7 +6641,7 @@ int ana_fits_write_general(int narg, int ps[], int func)
 {
   char	*file, runlength, *p;
   void	*data, *out;
-  int	*dims, ndim, headertype, nheader, slice, nlines, n, type,
+  Int	*dims, ndim, headertype, nheader, slice, nlines, n, type,
     nx, ny, limit, bitpix[] = {8,16,32,-32,-64}, i, size;
   pointer	header;
   FILE	*fp;
@@ -6710,7 +6710,7 @@ int ana_fits_write_general(int narg, int ps[], int func)
   /* upon exiting this routine, so we have two choices: (1) make a copy */
   /* of the data and swap that, or (2) swap the original data, write it to */
   /* the FITS file, and then swap the original data again.  We choose to */
-  /* be frugal with memory, so we go for the double swap.  LS 18nov99 */
+  /* be frugal with memory, so we go for the Double swap.  LS 18nov99 */
 #if !WORDS_BIGENDIAN
   endian(data, array_size(ps[0])*ana_type_size[type], type);
 #endif
@@ -6907,20 +6907,20 @@ int ana_fits_write_general(int narg, int ps[], int func)
   return ANA_OK;
 }
 /*------------------------------------------------------------------------- */
-int ana_fits_write(int narg, int ps[])
+Int ana_fits_write(Int narg, Int ps[])
 {
   return ana_fits_write_general(narg, ps, 0);
 }
 /*------------------------------------------------------------------------- */
-int ana_fits_write_f(int narg, int ps[])
+Int ana_fits_write_f(Int narg, Int ps[])
 {
   return ana_fits_write_general(narg, ps, 1);
 }
 /*------------------------------------------------------------------------- */
-int ana_fileread(int narg, int ps[])
+Int ana_fileread(Int narg, Int ps[])
  /* raw file read routine: fileread,lun,array,start,num,type */
  /* the file must be opened with a lun, the start position and num are in units
- of the byte size for the data type (types 0 to 4 for I*1,I*2,I*4,F*4,F*8); i.e.,
+ of the Byte size for the data type (types 0 to 4 for I*1,I*2,I*4,F*4,F*8); i.e.,
  if the type is 2 (I*4) then the file is read starting at address start*4 and
  num*4 bytes are read */
  /* if start is <0, then we just read from current position */
@@ -6929,9 +6929,9 @@ int ana_fileread(int narg, int ps[])
    <stdio.h>: FILE, fseek(), perror(), fread(), printf()
  */
 {
-  int	iq, lun, type, j, n, start, num, nd;
+  Int	iq, lun, type, j, n, start, num, nd;
   extern void	wait_sec();
-  extern int	byte_count;
+  extern Int	byte_count;
   char	*p;
   FILE	*fp;
 
@@ -6982,10 +6982,10 @@ int ana_fileread(int narg, int ps[])
   return ANA_OK;
 }
  /*------------------------------------------------------------------------- */
-int ana_filewrite(int narg, int ps[])
+Int ana_filewrite(Int narg, Int ps[])
  /* raw file write routine: filewrite,lun,array,[start] */
  /* the file must be opened with a lun, the start position and num are in units
- of the byte size for the data type (types 0 to 4 for I*1,I*2,I*4,F*4,F*8);
+ of the Byte size for the data type (types 0 to 4 for I*1,I*2,I*4,F*4,F*8);
  i.e., if the type is 2 (I*4) then we write starting at address start*4 and
  num*4 bytes are read */
  /* if there is no start argument, we just write from wherever the file
@@ -6994,7 +6994,7 @@ int ana_filewrite(int narg, int ps[])
    <stdio.h>: FILE, fseek(), perror(), fwrite(), printf()
  */
 {
-  int	iq, lun, type, j, start, num, typesize;
+  Int	iq, lun, type, j, start, num, typesize;
   char	*p;
   FILE	*fp;
 

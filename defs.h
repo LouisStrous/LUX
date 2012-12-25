@@ -102,8 +102,8 @@
 #define NL      10      /* new line */
 #define CR      13      /* carriage return */
 #define DEL_LN  21      /* delete line           (ctrl-U) */
-#define NEXTW   23      /* next word             (ctrl-W) */
-#define DELW    4       /* delete word           (ctrl-D) */
+#define NEXTW   23      /* next Word             (ctrl-W) */
+#define DELW    4       /* delete Word           (ctrl-D) */
 #define DELEOL  11      /* delete to end of line (ctrl-K) */
 #define CONTRL  27      /* control sequence indicator */
 
@@ -129,7 +129,7 @@
 
 /* macros */
 
-/* byte string macros */
+/* Byte string macros */
 #define bstrcpy(a, b) strcpy((char *) a, (char *) b)
 #define bstrlen(a)    strlen((char *) a)
 
@@ -148,7 +148,7 @@
 #define HEAD(SYM)		(struct ahead *) sym[SYM].spec.array.ptr
 
 /* LONG ptr to array data */
-#define LPTR(HEAD)		(int *)((char *) HEAD + sizeof(struct ahead))
+#define LPTR(HEAD)		(Int *)((char *) HEAD + sizeof(struct ahead))
 
 /* check that all array elements are nonnegative */
 #define CK_SGN(ARR, N, ARGN, SYM) \

@@ -171,7 +171,7 @@ char *mallocmap_to_text(void)
 }
 
 #if MALLOCMAP
-void dump_allocs(int max_count)
+void dump_allocs(Int max_count)
 {
   void *(*keep_malloc_hook)(size_t, const void *);
   void *(*keep_realloc_hook)(void *, size_t, const void *);
@@ -197,8 +197,8 @@ void dump_allocs(int max_count)
     iter = luxIter_next(iter);
   }
   iter = luxIter_create(map);
-  int i = 0;
-  int n = luxMap_key_count(map);
+  Int i = 0;
+  Int n = luxMap_key_count(map);
   if (max_count > 0)
     while (n > max_count) {
       iter = luxIter_next(iter);
@@ -209,7 +209,7 @@ void dump_allocs(int max_count)
     i++;
     printf("%2d: %9d %p ", i, luxIter_key_i(iter), luxIter_value_p(iter));
     unsigned char *p = luxIter_value_p(iter);
-    int j;
+    Int j;
     for (j = 0; j < 12; j++)
       putchar(isprint(p[j])? p[j]: '.');
     putchar(' ');
@@ -228,9 +228,9 @@ void dump_allocs(int max_count)
 }
 #endif
 
-int check_net_allocs(unsigned long expected)
+Int check_net_allocs(unsigned long expected)
 {
-  int bad = 0;
+  Int bad = 0;
 
   void *(*keep_malloc_hook)(size_t, const void *);
   void *(*keep_realloc_hook)(void *, size_t, const void *);

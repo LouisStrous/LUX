@@ -20,15 +20,15 @@
 static char rcsid[] __attribute__ ((unused)) =
  "$Id: fun2.c,v 4.0 2001/02/07 20:37:01 strous Exp $";
 
-extern int	nFixed;
-static	int	result_sym , type, detrend_flag;
+extern Int	nFixed;
+static	Int	result_sym , type, detrend_flag;
 static	char	templine[256];		/* a temp for output and istring */
-void	zerobytes(void *, int);
-int	f_decomp(float *, int, int), d_decomp(double *, int, int),
-  f_solve(float *, float *, int, int), d_solve(double *, double *, int, int),
-  ana_replace(int, int);
+void	zerobytes(void *, Int);
+Int	f_decomp(Float *, Int, Int), d_decomp(Double *, Int, Int),
+  f_solve(Float *, Float *, Int, Int), d_solve(Double *, Double *, Int, Int),
+  ana_replace(Int, Int);
 /*------------------------------------------------------------------------- */
-int ana_runsum(int narg, int ps[])
+Int ana_runsum(Int narg, Int ps[])
 /*generate a running sum
   syntax:  y = runsum(x [,axis,order])
   <axis> is the dimension along which summing is performed; for each of the
@@ -36,13 +36,13 @@ int ana_runsum(int narg, int ps[])
   summation order, such that n-th order summation is the reverse of the
   n-th order difference (see ana_differ).  If <axis> isn't specified,
   or is negative, then <x> is taken to be a 1D array and summation is
-  done with floating point or double-precision arithmetic.  Otherwise,
+  done with floating point or Double-precision arithmetic.  Otherwise,
   the result has the same type as <x>.  axis & order extension by LS 26nov92
-  implementation of 1D double-precision case LS 11feb2007 */
+  implementation of 1D Double-precision case LS 11feb2007 */
 {
  register pointer q1,q2,p;
- int	result_sym, iq, axis, m, n, i, j, done, *dims, ndim, tally[8], step[8];
- int	xdims[8], order, size;
+ Int	result_sym, iq, axis, m, n, i, j, done, *dims, ndim, tally[8], step[8];
+ Int	xdims[8], order, size;
  array	*h;
 
  if (narg > 2) order = int_arg(ps[2]); else order = -1;
@@ -50,7 +50,7 @@ int ana_runsum(int narg, int ps[])
  iq = ps[0];
  if (iq < 0) return iq;					/* error pass-thru */
  if (sym[iq].class == ANA_SCAL_PTR) iq = dereferenceScalPointer(iq);
-							/*float the input */
+							/*Float the input */
  type = sym[iq].type;
  if (axis == -1 && type < ANA_FLOAT) {
    iq = ana_float(1, ps);	/* pseudo-1D case */
@@ -75,7 +75,7 @@ int ana_runsum(int narg, int ps[])
      { puts("Runsum order too large for input array");
        return cerror(INCMP_ARG, ps[2]); }
      if (order == 0) order = 1;
-     memcpy(xdims, dims, sizeof(int)*ndim);		/* copy dims */
+     memcpy(xdims, dims, sizeof(Int)*ndim);		/* copy dims */
      result_sym = array_clone(iq, type);
      h = HEAD(result_sym);
      q2.l = LPTR(h);
@@ -123,19 +123,19 @@ int ana_runsum(int narg, int ps[])
  return result_sym;
 }						/*end of ana_runsum */
 /*------------------------------------------------------------------------- */
-int index_sdev(int narg, int ps[], int sq)
+Int index_sdev(Int narg, Int ps[], Int sq)
 /* calculates standard deviations or variances by class. */
 /* f(<x>, <classes> [, <weights>, /SAMPLE, /POPULATION, /DOUBLE]) */
 /* we assume that ps[0] and ps[1] are numerical arrays with the same number */
 /* of dimensions. */
 /* see at sdev() for more info. */
 {
-  int	type, offset, *indx, i, size, result, nElem, indices2,
+  Int	type, offset, *indx, i, size, result, nElem, indices2,
   	outType, haveWeights, shift;
   pointer	src, trgt, sum, weights, hist;
   scalar	temp;
   extern scalar	lastmin, lastmax;
-  int	minmax(int *, int, int);
+  Int	minmax(Int *, Int, Int);
 
   if (narg > 2 && ps[2]) {	/* have <weights> */
     if (!symbolIsNumericalArray(ps[2]) /* not a numerical array */
@@ -174,15 +174,15 @@ int index_sdev(int narg, int ps[], int sq)
     size += (offset = -lastmin.l);
   result = array_scratch(outType, 1, &size);
   trgt.l = array_data(result);
-  allocate(sum.b, size*ana_type_size[outType], byte);
+  allocate(sum.b, size*ana_type_size[outType], Byte);
   zerobytes(trgt.b, size*ana_type_size[outType]);
   zerobytes(sum.b, size*ana_type_size[outType]);
   trgt.b += offset*ana_type_size[outType];
   sum.b += offset*ana_type_size[outType];
   i = nElem;
   if (haveWeights) {
-    allocate(hist.d, size, double);
-    zerobytes(hist.d, size*sizeof(double));
+    allocate(hist.d, size, Double);
+    zerobytes(hist.d, size*sizeof(Double));
     hist.d += offset;
     switch (outType) {
       case ANA_FLOAT:
@@ -190,7 +190,7 @@ int index_sdev(int narg, int ps[], int sq)
 	  case ANA_BYTE:
 	    while (i--) {		/* first, get the sum */
 	      hist.f[*indx] += *weights.b;
-	      sum.f[*indx] += (float) *src.b++ * *weights.b++;
+	      sum.f[*indx] += (Float) *src.b++ * *weights.b++;
 	      indx++;
 	    }
 	    /* calculate the average */
@@ -202,14 +202,14 @@ int index_sdev(int narg, int ps[], int sq)
 	    weights.b -= nElem;
 	    /* now the squared deviations */
 	    while (nElem--) {
-	      temp.f = (float) *src.b++ - sum.f[*indx];
+	      temp.f = (Float) *src.b++ - sum.f[*indx];
 	      trgt.f[*indx++] += temp.f*temp.f* *weights.b++;
 	    }
 	    break;
 	  case ANA_WORD:
 	    while (i--) {		/* first, get the sum */
 	      hist.f[*indx] += *weights.w;
-	      sum.f[*indx] += (float) *src.w++ * *weights.w++;
+	      sum.f[*indx] += (Float) *src.w++ * *weights.w++;
 	      indx++;
 	    }
 	    /* calculate the average */
@@ -221,14 +221,14 @@ int index_sdev(int narg, int ps[], int sq)
 	    weights.w -= nElem;
 	    /* now the squared deviations */
 	    while (nElem--) {
-	      temp.f = (float) *src.w++ - sum.f[*indx];
+	      temp.f = (Float) *src.w++ - sum.f[*indx];
 	      trgt.f[*indx++] += temp.f*temp.f* *weights.w++;
 	    }
 	    break;
 	  case ANA_LONG:
 	    while (i--) {		/* first, get the sum */
 	      hist.f[*indx] += *weights.l;
-	      sum.f[*indx] += (float) *src.l++ * *weights.l++;
+	      sum.f[*indx] += (Float) *src.l++ * *weights.l++;
 	      indx++;
 	    }
 	    /* calculate the average */
@@ -240,14 +240,14 @@ int index_sdev(int narg, int ps[], int sq)
 	    weights.l -= nElem;
 	    /* now the squared deviations */
 	    while (nElem--) {
-	      temp.f = (float) *src.l++ - sum.f[*indx];
+	      temp.f = (Float) *src.l++ - sum.f[*indx];
 	      trgt.f[*indx++] += temp.f*temp.f* *weights.l++;
 	    }
 	    break;
 	  case ANA_FLOAT:
 	    while (i--) {		/* first, get the sum */
 	      hist.f[*indx] += *weights.f;
-	      sum.f[*indx] += (float) *src.f++ * *weights.f++;
+	      sum.f[*indx] += (Float) *src.f++ * *weights.f++;
 	      indx++;
 	    }
 	    /* calculate the average */
@@ -259,7 +259,7 @@ int index_sdev(int narg, int ps[], int sq)
 	    weights.f -= nElem;
 	    /* now the squared deviations */
 	    while (nElem--) {
-	      temp.f = (float) *src.f++ - sum.f[*indx];
+	      temp.f = (Float) *src.f++ - sum.f[*indx];
 	      trgt.f[*indx++] += temp.f*temp.f* *weights.f++;
 	    }
 	    break;
@@ -305,7 +305,7 @@ int index_sdev(int narg, int ps[], int sq)
 	  case ANA_BYTE:
 	    while (i--) {		/* first, get the sum */
 	      hist.d[*indx] += *weights.b;
-	      sum.d[*indx] += (double) *src.b++ * *weights.b++;
+	      sum.d[*indx] += (Double) *src.b++ * *weights.b++;
 	      indx++;
 	    }
 	    /* calculate the average */
@@ -317,14 +317,14 @@ int index_sdev(int narg, int ps[], int sq)
 	    weights.b -= nElem;
 	    /* now the squared deviations */
 	    while (nElem--) {
-	      temp.d = (double) *src.b++ - sum.d[*indx];
+	      temp.d = (Double) *src.b++ - sum.d[*indx];
 	      trgt.d[*indx++] += temp.d*temp.d* *weights.b++;
 	    }
 	    break;
 	  case ANA_WORD:
 	    while (i--) {		/* first, get the sum */
 	      hist.d[*indx] += *weights.w;
-	      sum.d[*indx] += (double) *src.w++ * *weights.w++;
+	      sum.d[*indx] += (Double) *src.w++ * *weights.w++;
 	      indx++;
 	    }
 	    /* calculate the average */
@@ -336,14 +336,14 @@ int index_sdev(int narg, int ps[], int sq)
 	    weights.w -= nElem;
 	    /* now the squared deviations */
 	    while (nElem--) {
-	      temp.d = (double) *src.w++ - sum.d[*indx];
+	      temp.d = (Double) *src.w++ - sum.d[*indx];
 	      trgt.d[*indx++] += temp.d*temp.d* *weights.w++;
 	    }
 	    break;
 	  case ANA_LONG:
 	    while (i--) {		/* first, get the sum */
 	      hist.d[*indx] += *weights.l;
-	      sum.d[*indx] += (double) *src.l++ * *weights.l++;
+	      sum.d[*indx] += (Double) *src.l++ * *weights.l++;
 	      indx++;
 	    }
 	    /* calculate the average */
@@ -355,14 +355,14 @@ int index_sdev(int narg, int ps[], int sq)
 	    weights.l -= nElem;
 	    /* now the squared deviations */
 	    while (nElem--) {
-	      temp.d = (double) *src.l++ - sum.d[*indx];
+	      temp.d = (Double) *src.l++ - sum.d[*indx];
 	      trgt.d[*indx++] += temp.d*temp.d* *weights.l++;
 	    }
 	    break;
 	  case ANA_FLOAT:
 	    while (i--) {		/* first, get the sum */
 	      hist.d[*indx] += *weights.f;
-	      sum.d[*indx] += (double) *src.f++ * *weights.f++;
+	      sum.d[*indx] += (Double) *src.f++ * *weights.f++;
 	      indx++;
 	    }
 	    /* calculate the average */
@@ -374,7 +374,7 @@ int index_sdev(int narg, int ps[], int sq)
 	    weights.f -= nElem;
 	    /* now the squared deviations */
 	    while (nElem--) {
-	      temp.d = (double) *src.f++ - sum.d[*indx];
+	      temp.d = (Double) *src.f++ - sum.d[*indx];
 	      trgt.d[*indx++] += temp.d*temp.d* *weights.f++;
 	    }
 	    break;
@@ -460,8 +460,8 @@ int index_sdev(int narg, int ps[], int sq)
     }
     free(hist.d - offset);
   } else {			/* no <weights>: each element counts once */
-    allocate(hist.l, size, int);
-    zerobytes(hist.l, size*sizeof(int));
+    allocate(hist.l, size, Int);
+    zerobytes(hist.l, size*sizeof(Int));
     hist.l += offset;
     switch (outType) {
       case ANA_FLOAT:
@@ -480,7 +480,7 @@ int index_sdev(int narg, int ps[], int sq)
 	    indx -= nElem;
 	    /* now the squared deviations */
 	    while (nElem--) {
-	      temp.f = (float) *src.b++ - sum.f[*indx];
+	      temp.f = (Float) *src.b++ - sum.f[*indx];
 	      trgt.f[*indx++] += temp.f*temp.f;
 	    }
 	    break;
@@ -498,7 +498,7 @@ int index_sdev(int narg, int ps[], int sq)
 	    indx -= nElem;
 	    /* now the squared deviations */
 	    while (nElem--) {
-	      temp.f = (float) *src.w++ - sum.f[*indx];
+	      temp.f = (Float) *src.w++ - sum.f[*indx];
 	      trgt.f[*indx++] += temp.f*temp.f;
 	    }
 	    break;
@@ -516,7 +516,7 @@ int index_sdev(int narg, int ps[], int sq)
 	    indx -= nElem;
 	    /* now the squared deviations */
 	    while (nElem--) {
-	      temp.f = (float) *src.l++ - sum.f[*indx];
+	      temp.f = (Float) *src.l++ - sum.f[*indx];
 	      trgt.f[*indx++] += temp.f*temp.f;
 	    }
 	    break;
@@ -588,7 +588,7 @@ int index_sdev(int narg, int ps[], int sq)
 	    indx -= nElem;
 	    /* now the squared deviations */
 	    while (nElem--) {
-	      temp.d = (double) *src.b++ - sum.d[*indx];
+	      temp.d = (Double) *src.b++ - sum.d[*indx];
 	      trgt.d[*indx++] += temp.d*temp.d;
 	    }
 	    break;
@@ -606,7 +606,7 @@ int index_sdev(int narg, int ps[], int sq)
 	    indx -= nElem;
 	    /* now the squared deviations */
 	    while (nElem--) {
-	      temp.d = (double) *src.w++ - sum.d[*indx];
+	      temp.d = (Double) *src.w++ - sum.d[*indx];
 	      trgt.d[*indx++] += temp.d*temp.d;
 	    }
 	    break;
@@ -624,14 +624,14 @@ int index_sdev(int narg, int ps[], int sq)
 	    indx -= nElem;
 	    /* now the squared deviations */
 	    while (nElem--) {
-	      temp.d = (double) *src.l++ - sum.d[*indx];
+	      temp.d = (Double) *src.l++ - sum.d[*indx];
 	      trgt.d[*indx++] += temp.d*temp.d;
 	    }
 	    break;
 	  case ANA_FLOAT:
 	    while (i--) {		/* first, get the sum */
 	      hist.l[*indx]++;
-	      sum.d[*indx] += (double) *src.f++;
+	      sum.d[*indx] += (Double) *src.f++;
 	      indx++;
 	    }
 	    /* calculate the average */
@@ -642,7 +642,7 @@ int index_sdev(int narg, int ps[], int sq)
 	    indx -= nElem;
 	    /* now the squared deviations */
 	    while (nElem--) {
-	      temp.d = (double) *src.f++ - sum.d[*indx];
+	      temp.d = (Double) *src.f++ - sum.d[*indx];
 	      trgt.d[*indx++] += temp.d*temp.d;
 	    }
 	    break;
@@ -682,9 +682,9 @@ int index_sdev(int narg, int ps[], int sq)
 	    indx -= nElem;
 	    /* now the squared deviations */
 	    while (nElem--) {
-	      temp.d = (double) src.cf->real - sum.cd[*indx].real;
+	      temp.d = (Double) src.cf->real - sum.cd[*indx].real;
 	      trgt.d[*indx] += temp.d*temp.d;
-	      temp.d = (double) src.cf->imaginary - sum.cd[*indx].imaginary;
+	      temp.d = (Double) src.cf->imaginary - sum.cd[*indx].imaginary;
 	      trgt.d[*indx++] += temp.d*temp.d;
 	      src.cf++;
 	    }
@@ -742,7 +742,7 @@ int index_sdev(int narg, int ps[], int sq)
   return result;
 }
 /*------------------------------------------------------------------------- */
-int ana_covariance(int narg, int ps[])
+Int ana_covariance(Int narg, Int ps[])
 /* f(<x> , <y> [, <mode>, WEIGHTS=<weights>, /SAMPLE, /POPULATION, /KEEPDIMS, */
 /*         /DOUBLE]) */
 /* Returns the covariance of <x> and <y>, which must be */
@@ -768,12 +768,12 @@ int ana_covariance(int narg, int ps[])
 /*    then the result is always DOUBLE. */
 /* LS 2011-04-15 */
 {
-  int	result, n, i, done, n2, save[MAX_DIMS], outtype, haveWeights;
+  Int	result, n, i, done, n2, save[MAX_DIMS], outtype, haveWeights;
   pointer	xsrc, ysrc, trgt, xsrc0, ysrc0, weight, weight0;
-  double	xmean, ymean, xtemp, ytemp, cov, nn;
+  Double	xmean, ymean, xtemp, ytemp, cov, nn;
   loopInfo	xsrcinfo, ysrcinfo, trgtinfo, winfo;
   extern scalar	lastmean;
-  extern int	lastsdev_sym, lastmean_sym;
+  extern Int	lastsdev_sym, lastmean_sym;
   
   /* return values by class? */
 #ifdef IMPLEMENT_LATER
@@ -871,21 +871,21 @@ int ana_covariance(int narg, int ps[])
 	do {
 	  xmean = 0.0;
           ymean = 0.0;
-	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(int));
+	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(Int));
 	  xsrc0 = xsrc;
           ysrc0 = ysrc;
 	  weight0 = weight;
 	  nn = 0;
 	  do {
-	    xmean += (double) *xsrc.b * *weight.b;
-            ymean += (double) *ysrc.b * *weight.b;
-	    nn += (double) *weight.b;
+	    xmean += (Double) *xsrc.b * *weight.b;
+            ymean += (Double) *ysrc.b * *weight.b;
+	    nn += (Double) *weight.b;
 	  }
 	  while (advanceLoop(&winfo, &weight), 
 		 advanceLoop(&ysrcinfo, &ysrc),
                  advanceLoop(&xsrcinfo, &xsrc) < xsrcinfo.naxes);
-	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(int));
-	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(int));
+	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(Int));
+	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(Int));
 	  xsrc = xsrc0;
           ysrc = ysrc0;
 	  weight = weight0;
@@ -893,8 +893,8 @@ int ana_covariance(int narg, int ps[])
           ymean /= (nn? nn: 1);
 	  cov = 0.0;
 	  do {
-	    xtemp = ((double) *xsrc.b - xmean);
-            ytemp = ((double) *ysrc.b - ymean);
+	    xtemp = ((Double) *xsrc.b - xmean);
+            ytemp = ((Double) *ysrc.b - ymean);
 	    cov += xtemp*ytemp* *weight.b;
 	  } while ((done = (advanceLoop(&winfo, &weight),
 			    advanceLoop(&ysrcinfo, &ysrc),
@@ -904,7 +904,7 @@ int ana_covariance(int narg, int ps[])
 	  cov /= nn;
 	  switch (outtype) {
 	    case ANA_FLOAT:
-	      *trgt.f++ = (float) cov;
+	      *trgt.f++ = (Float) cov;
 	      break;
 	    case ANA_DOUBLE:
 	      *trgt.d++ = cov;
@@ -916,21 +916,21 @@ int ana_covariance(int narg, int ps[])
 	do {
 	  xmean = 0.0;
           ymean = 0.0;
-	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(int));
+	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(Int));
 	  xsrc0 = xsrc;
           ysrc0 = ysrc;
 	  weight0 = weight;
 	  nn = 0;
 	  do {
-	    xmean += (double) *xsrc.w * *weight.w;
-            ymean += (double) *ysrc.w * *weight.w;
-	    nn += (double) *weight.w;
+	    xmean += (Double) *xsrc.w * *weight.w;
+            ymean += (Double) *ysrc.w * *weight.w;
+	    nn += (Double) *weight.w;
 	  }
 	  while (advanceLoop(&winfo, &weight),
 		 advanceLoop(&ysrcinfo, &ysrc),
                  advanceLoop(&xsrcinfo, &xsrc) < xsrcinfo.naxes);
-	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(int));
-	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(int));
+	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(Int));
+	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(Int));
 	  xsrc = xsrc0;
           ysrc = ysrc0;
 	  weight = weight0;
@@ -938,8 +938,8 @@ int ana_covariance(int narg, int ps[])
           ymean /= (nn? nn: 1);
 	  cov = 0.0;
 	  do {
-	    xtemp = ((double) *xsrc.w - xmean);
-            ytemp = ((double) *ysrc.w - ymean);
+	    xtemp = ((Double) *xsrc.w - xmean);
+            ytemp = ((Double) *ysrc.w - ymean);
 	    cov += xtemp*ytemp* *weight.w;
 	  } while ((done = (advanceLoop(&winfo, &weight),
 			    advanceLoop(&ysrcinfo, &ysrc),
@@ -949,7 +949,7 @@ int ana_covariance(int narg, int ps[])
 	  cov /= nn;
 	  switch (outtype) {
 	    case ANA_FLOAT:
-	      *trgt.f++ = (float) cov;
+	      *trgt.f++ = (Float) cov;
 	      break;
 	    case ANA_DOUBLE:
 	      *trgt.d++ = cov;
@@ -961,21 +961,21 @@ int ana_covariance(int narg, int ps[])
 	do {
 	  xmean = 0.0;
           ymean = 0.0;
-	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(int));
+	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(Int));
 	  xsrc0 = xsrc;
           ysrc0 = ysrc;
 	  weight0 = weight;
 	  nn = 0;
 	  do {
-	    xmean += (double) *xsrc.l * *weight.l;
-            ymean += (double) *ysrc.l * *weight.l;
-	    nn += (double) *weight.l;
+	    xmean += (Double) *xsrc.l * *weight.l;
+            ymean += (Double) *ysrc.l * *weight.l;
+	    nn += (Double) *weight.l;
 	  }
 	  while (advanceLoop(&winfo, &weight),
 		 advanceLoop(&ysrcinfo, &ysrc),
                  advanceLoop(&xsrcinfo, &xsrc) < xsrcinfo.naxes);
-	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(int));
-	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(int));
+	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(Int));
+	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(Int));
 	  xsrc = xsrc0;
           ysrc = ysrc0;
 	  weight = weight0;
@@ -983,8 +983,8 @@ int ana_covariance(int narg, int ps[])
           ymean /= (nn? nn: 1);
 	  cov = 0.0;
 	  do {
-	    xtemp = ((double) *xsrc.l - xmean);
-            ytemp = ((double) *ysrc.l - ymean);
+	    xtemp = ((Double) *xsrc.l - xmean);
+            ytemp = ((Double) *ysrc.l - ymean);
 	    cov += xtemp*ytemp* *weight.l;
 	  } while ((done = (advanceLoop(&winfo, &weight),
 			    advanceLoop(&ysrcinfo, &ysrc),
@@ -994,7 +994,7 @@ int ana_covariance(int narg, int ps[])
 	  cov /= nn;
 	  switch (outtype) {
 	    case ANA_FLOAT:
-	      *trgt.f++ = (float) cov;
+	      *trgt.f++ = (Float) cov;
 	      break;
 	    case ANA_DOUBLE:
 	      *trgt.d++ = cov;
@@ -1007,21 +1007,21 @@ int ana_covariance(int narg, int ps[])
 	do {
 	  xmean = 0.0;
           ymean = 0.0;
-	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(int));
+	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(Int));
 	  xsrc0 = xsrc;
           ysrc0 = ysrc;
 	  weight0 = weight;
 	  nn = 0;
 	  do {
-	    xmean += (double) *xsrc.f * *weight.f;
-            ymean += (double) *ysrc.f * *weight.f;
-	    nn += (double) *weight.f;
+	    xmean += (Double) *xsrc.f * *weight.f;
+            ymean += (Double) *ysrc.f * *weight.f;
+	    nn += (Double) *weight.f;
 	  }
 	  while (advanceLoop(&winfo, &weight),
 		 advanceLoop(&ysrcinfo, &ysrc),
                  advanceLoop(&xsrcinfo, &xsrc) < xsrcinfo.naxes);
-	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(int));
-	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(int));
+	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(Int));
+	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(Int));
 	  xsrc = xsrc0;
           ysrc = ysrc0;
 	  weight = weight0;
@@ -1029,8 +1029,8 @@ int ana_covariance(int narg, int ps[])
           ymean /= (nn? nn: 1);
 	  cov = 0.0;
 	  do {
-	    xtemp = ((double) *xsrc.f - xmean);
-            ytemp = ((double) *ysrc.f - ymean);
+	    xtemp = ((Double) *xsrc.f - xmean);
+            ytemp = ((Double) *ysrc.f - ymean);
 	    cov += xtemp*ytemp* *weight.f;
 	  } while ((done = (advanceLoop(&winfo, &weight),
 			    advanceLoop(&ysrcinfo, &ysrc),
@@ -1040,7 +1040,7 @@ int ana_covariance(int narg, int ps[])
 	  cov /= nn;
 	  switch (outtype) {
 	    case ANA_FLOAT:
-	      *trgt.f++ = (float) cov;
+	      *trgt.f++ = (Float) cov;
 	      break;
 	    case ANA_DOUBLE:
 	      *trgt.d++ = cov;
@@ -1053,21 +1053,21 @@ int ana_covariance(int narg, int ps[])
 	do {
 	  xmean = 0.0;
           ymean = 0.0;
-	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(int));
+	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(Int));
 	  xsrc0 = xsrc;
           ysrc0 = ysrc;
 	  weight0 = weight;
 	  nn = 0;
 	  do {
-	    xmean += (double) *xsrc.d * *weight.d;
-            ymean += (double) *ysrc.d * *weight.d;
-	    nn += (double) *weight.d;
+	    xmean += (Double) *xsrc.d * *weight.d;
+            ymean += (Double) *ysrc.d * *weight.d;
+	    nn += (Double) *weight.d;
 	  }
 	  while (advanceLoop(&winfo, &weight),
 		 advanceLoop(&ysrcinfo, &ysrc),
                  advanceLoop(&xsrcinfo, &xsrc) < xsrcinfo.naxes);
-	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(int));
-	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(int));
+	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(Int));
+	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(Int));
 	  xsrc = xsrc0;
           ysrc = ysrc0;
 	  weight = weight0;
@@ -1075,8 +1075,8 @@ int ana_covariance(int narg, int ps[])
           ymean /= (nn? nn: 1);
 	  cov = 0.0;
 	  do {
-	    xtemp = ((double) *xsrc.d - xmean);
-            ytemp = ((double) *ysrc.d - ymean);
+	    xtemp = ((Double) *xsrc.d - xmean);
+            ytemp = ((Double) *ysrc.d - ymean);
 	    cov += xtemp*ytemp* *weight.d;
 	  } while ((done = (advanceLoop(&winfo, &weight),
 			    advanceLoop(&ysrcinfo, &ysrc),
@@ -1102,30 +1102,30 @@ int ana_covariance(int narg, int ps[])
 	do {
 	  xmean = 0.0;
           ymean = 0.0;
-	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(int));
+	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(Int));
 	  xsrc0 = xsrc;
           ysrc0 = ysrc;
 	  do {
-	    xmean += (double) *xsrc.b;
-            ymean += (double) *ysrc.b;
+	    xmean += (Double) *xsrc.b;
+            ymean += (Double) *ysrc.b;
 	  } while (advanceLoop(&ysrcinfo, &ysrc),
 		   advanceLoop(&xsrcinfo, &xsrc) < xsrcinfo.naxes);
-	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(int));
-	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(int));
+	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(Int));
+	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(Int));
 	  xsrc = xsrc0;
           ysrc = ysrc0;
 	  xmean /= n;
           ymean /= n;
 	  cov = 0.0;
 	  do {
-	    xtemp = ((double) *xsrc.b - xmean);
-            ytemp = ((double) *ysrc.b - ymean);
+	    xtemp = ((Double) *xsrc.b - xmean);
+            ytemp = ((Double) *ysrc.b - ymean);
 	    cov += xtemp*ytemp;
 	  } while ((done = (advanceLoop(&ysrcinfo, &ysrc),
 			    advanceLoop(&xsrcinfo, &xsrc))) < xsrcinfo.naxes);
 	  switch (outtype) {
 	    case ANA_FLOAT:
-	      *trgt.f++ = (float) (cov/n2);
+	      *trgt.f++ = (Float) (cov/n2);
 	      break;
 	    case ANA_DOUBLE:
 	      *trgt.d++ = (cov/n2);
@@ -1137,30 +1137,30 @@ int ana_covariance(int narg, int ps[])
 	do {
 	  xmean = 0.0;
           ymean = 0.0;
-	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(int));
-	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(int));
+	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(Int));
+	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(Int));
 	  xsrc0 = xsrc;
           ysrc0 = ysrc;
 	  do {
-	    xmean += (double) *xsrc.w;
-            ymean += (double) *ysrc.w;
+	    xmean += (Double) *xsrc.w;
+            ymean += (Double) *ysrc.w;
 	  } while (advanceLoop(&ysrcinfo, &ysrc),
 		   advanceLoop(&xsrcinfo, &xsrc) < xsrcinfo.naxes);
-	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(int));
+	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(Int));
 	  xsrc = xsrc0;
           ysrc = ysrc0;
 	  xmean /= n;
           ymean /= n;
 	  cov = 0.0;
 	  do {
-	    xtemp = ((double) *xsrc.w - xmean);
-            ytemp = ((double) *ysrc.w - ymean);
+	    xtemp = ((Double) *xsrc.w - xmean);
+            ytemp = ((Double) *ysrc.w - ymean);
 	    cov += xtemp*ytemp;
 	  } while ((done = (advanceLoop(&ysrcinfo, &ysrc),
 			    advanceLoop(&xsrcinfo, &xsrc))) < xsrcinfo.naxes);
 	  switch (outtype) {
 	    case ANA_FLOAT:
-	      *trgt.f++ = (float) (cov/n2);
+	      *trgt.f++ = (Float) (cov/n2);
 	      break;
 	    case ANA_DOUBLE:
 	      *trgt.d++ = (cov/n2);
@@ -1172,30 +1172,30 @@ int ana_covariance(int narg, int ps[])
 	do {
 	  xmean = 0.0;
           ymean = 0.0;
-	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(int));
+	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(Int));
 	  xsrc0 = xsrc;
           ysrc0 = ysrc;
 	  do {
-	    xmean += (double) *xsrc.l;
-            ymean += (double) *ysrc.l;
+	    xmean += (Double) *xsrc.l;
+            ymean += (Double) *ysrc.l;
 	  } while (advanceLoop(&ysrcinfo, &ysrc),
 		   advanceLoop(&xsrcinfo, &xsrc) < xsrcinfo.naxes);
-	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(int));
-	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(int));
+	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(Int));
+	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(Int));
 	  xsrc = xsrc0;
           ysrc = ysrc0;
 	  xmean /= n;
           ymean /= n;
 	  cov = 0.0;
 	  do {
-	    xtemp = ((double) *xsrc.l - xmean);
-            ytemp = ((double) *ysrc.l - ymean);
+	    xtemp = ((Double) *xsrc.l - xmean);
+            ytemp = ((Double) *ysrc.l - ymean);
 	    cov += xtemp*ytemp;
 	  } while ((done = (advanceLoop(&ysrcinfo, &ysrc),
 			    advanceLoop(&xsrcinfo, &xsrc))) < xsrcinfo.naxes);
 	  switch (outtype) {
 	    case ANA_FLOAT:
-	      *trgt.f++ = (float) (cov/n2);
+	      *trgt.f++ = (Float) (cov/n2);
 	      break;
 	    case ANA_DOUBLE:
 	      *trgt.d++ = (cov/n2);
@@ -1207,30 +1207,30 @@ int ana_covariance(int narg, int ps[])
 	do {
 	  xmean = 0.0;
           ymean = 0.0;
-	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(int));
+	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(Int));
 	  xsrc0 = xsrc;
           ysrc0 = ysrc;
 	  do {
-	    xmean += (double) *xsrc.f;
-            ymean += (double) *ysrc.f;
+	    xmean += (Double) *xsrc.f;
+            ymean += (Double) *ysrc.f;
 	  } while (advanceLoop(&ysrcinfo, &ysrc),
 		   advanceLoop(&xsrcinfo, &xsrc) < xsrcinfo.naxes);
-	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(int));
-	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(int));
+	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(Int));
+	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(Int));
 	  xsrc = xsrc0;
           ysrc = ysrc0;
 	  xmean /= n;
           ymean /= n;
 	  cov = 0.0;
 	  do {
-	    xtemp = ((double) *xsrc.f - xmean);
-            ytemp = ((double) *ysrc.f - ymean);
+	    xtemp = ((Double) *xsrc.f - xmean);
+            ytemp = ((Double) *ysrc.f - ymean);
 	    cov += xtemp*ytemp;
 	  } while ((done = (advanceLoop(&ysrcinfo, &ysrc),
 			    advanceLoop(&xsrcinfo, &xsrc))) < xsrcinfo.naxes);
 	  switch (outtype) {
 	    case ANA_FLOAT:
-	      *trgt.f++ = (float) (cov/n2);
+	      *trgt.f++ = (Float) (cov/n2);
 	      break;
 	    case ANA_DOUBLE:
 	      *trgt.d++ = (cov/n2);
@@ -1242,24 +1242,24 @@ int ana_covariance(int narg, int ps[])
 	do {
 	  xmean = 0.0;
           ymean = 0.0;
-	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(int));
+	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(Int));
 	  xsrc0 = xsrc;
           ysrc0 = ysrc;
 	  do {
-	    xmean += (double) *xsrc.d;
-            ymean += (double) *ysrc.d;
+	    xmean += (Double) *xsrc.d;
+            ymean += (Double) *ysrc.d;
 	  } while (advanceLoop(&ysrcinfo, &ysrc),
 		   advanceLoop(&xsrcinfo, &xsrc) < xsrcinfo.naxes);
-	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(int));
-	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(int));
+	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(Int));
+	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(Int));
 	  xsrc = xsrc0;
           ysrc = ysrc0;
 	  xmean /= n;
           ymean /= n;
 	  cov = 0.0;
 	  do {
-	    xtemp = ((double) *xsrc.d - xmean);
-            ytemp = ((double) *ysrc.d - ymean);
+	    xtemp = ((Double) *xsrc.d - xmean);
+            ytemp = ((Double) *ysrc.d - ymean);
 	    cov += xtemp*ytemp;
 	  } while ((done = (advanceLoop(&ysrcinfo, &ysrc),
 			    advanceLoop(&xsrcinfo, &xsrc))) < xsrcinfo.naxes);
@@ -1281,7 +1281,7 @@ int ana_covariance(int narg, int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-int sdev(int narg, int ps[], int sq)
+Int sdev(Int narg, Int ps[], Int sq)
 /* f(<x> [, <mode>, WEIGHTS=<weights>, /SAMPLE, /POPULATION, /KEEPDIMS, */
 /*         /DOUBLE]) */
 /* with f = SDEV (sq = 1) or VARIANCE (sq = 0) */
@@ -1308,13 +1308,13 @@ int sdev(int narg, int ps[], int sq)
 /*    then the result is always DOUBLE. */
 /* LS 19 July 2000 */
 {
-  int	result, n, i, done, n2, save[MAX_DIMS], outtype, haveWeights;
+  Int	result, n, i, done, n2, save[MAX_DIMS], outtype, haveWeights;
   pointer	src, trgt, src0, trgt0, weight, weight0;
-  double	mean, sdev, temp, nn;
+  Double	mean, sdev, temp, nn;
   doubleComplex	cmean;
   loopInfo	srcinfo, trgtinfo, winfo;
   extern scalar	lastsdev, lastmean;
-  extern int	lastsdev_sym, lastmean_sym;
+  extern Int	lastsdev_sym, lastmean_sym;
   
   /* return values by class? */
   if (narg > 1 && ps[1] && symbolIsNumericalArray(ps[1])
@@ -1392,23 +1392,23 @@ int sdev(int narg, int ps[], int sq)
       case ANA_BYTE:
 	do {
 	  mean = 0.0;
-	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(int));
+	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(Int));
 	  src0 = src;
 	  weight0 = weight;
 	  nn = 0;
 	  do {
-	    mean += (double) *src.b * *weight.b;
-	    nn += (double) *weight.b;
+	    mean += (Double) *src.b * *weight.b;
+	    nn += (Double) *weight.b;
 	  }
 	  while (advanceLoop(&winfo, &weight),
 		 advanceLoop(&srcinfo, &src) < srcinfo.naxes);
-	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(int));
+	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(Int));
 	  src = src0;
 	  weight = weight0;
 	  mean /= (nn? nn: 1);
 	  sdev = 0.0;
 	  do {
-	    temp = ((double) *src.b - mean);
+	    temp = ((Double) *src.b - mean);
 	    sdev += temp*temp* *weight.b;
 	  } while ((done = (advanceLoop(&winfo, &weight),
 			    advanceLoop(&srcinfo, &src))) < srcinfo.naxes);
@@ -1417,7 +1417,7 @@ int sdev(int narg, int ps[], int sq)
 	  sdev /= nn;
 	  switch (outtype) {
 	    case ANA_FLOAT:
-	      *trgt.f++ = (float) sdev;
+	      *trgt.f++ = (Float) sdev;
 	      break;
 	    case ANA_DOUBLE:
 	      *trgt.d++ = sdev;
@@ -1428,23 +1428,23 @@ int sdev(int narg, int ps[], int sq)
       case ANA_WORD:
 	do {
 	  mean = 0.0;
-	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(int));
+	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(Int));
 	  src0 = src;
 	  weight0 = weight;
 	  nn = 0;
 	  do {
-	    mean += (double) *src.w * *weight.w;
-	    nn += (double) *weight.w;
+	    mean += (Double) *src.w * *weight.w;
+	    nn += (Double) *weight.w;
 	  }
 	  while (advanceLoop(&winfo, &weight),
 		 advanceLoop(&srcinfo, &src) < srcinfo.naxes);
-	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(int));
+	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(Int));
 	  src = src0;
 	  weight = weight0;
 	  mean /= (nn? nn: 1);
 	  sdev = 0.0;
 	  do {
-	    temp = ((double) *src.w - mean);
+	    temp = ((Double) *src.w - mean);
 	    sdev += temp*temp* *weight.w;
 	  } while ((done = (advanceLoop(&winfo, &weight),
 			    advanceLoop(&srcinfo, &src))) < srcinfo.naxes);
@@ -1453,7 +1453,7 @@ int sdev(int narg, int ps[], int sq)
 	  sdev /= nn;
 	  switch (outtype) {
 	    case ANA_FLOAT:
-	      *trgt.f++ = (float) sdev;
+	      *trgt.f++ = (Float) sdev;
 	      break;
 	    case ANA_DOUBLE:
 	      *trgt.d++ = sdev;
@@ -1464,23 +1464,23 @@ int sdev(int narg, int ps[], int sq)
       case ANA_LONG:
 	do {
 	  mean = 0.0;
-	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(int));
+	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(Int));
 	  src0 = src;
 	  weight0 = weight;
 	  nn = 0;
 	  do {
-	    mean += (double) *src.l * *weight.l;
-	    nn += (double) *weight.l;
+	    mean += (Double) *src.l * *weight.l;
+	    nn += (Double) *weight.l;
 	  }
 	  while (advanceLoop(&winfo, &weight),
 		 advanceLoop(&srcinfo, &src) < srcinfo.naxes);
-	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(int));
+	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(Int));
 	  src = src0;
 	  weight = weight0;
 	  mean /= (nn? nn: 1);
 	  sdev = 0.0;
 	  do {
-	    temp = ((double) *src.l - mean);
+	    temp = ((Double) *src.l - mean);
 	    sdev += temp*temp* *weight.l;
 	  } while ((done = (advanceLoop(&winfo, &weight),
 			    advanceLoop(&srcinfo, &src))) < srcinfo.naxes);
@@ -1489,7 +1489,7 @@ int sdev(int narg, int ps[], int sq)
 	  sdev /= nn;
 	  switch (outtype) {
 	    case ANA_FLOAT:
-	      *trgt.f++ = (float) sdev;
+	      *trgt.f++ = (Float) sdev;
 	      break;
 	    case ANA_DOUBLE:
 	      *trgt.d++ = sdev;
@@ -1500,23 +1500,23 @@ int sdev(int narg, int ps[], int sq)
       case ANA_FLOAT:
 	do {
 	  mean = 0.0;
-	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(int));
+	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(Int));
 	  src0 = src;
 	  weight0 = weight;
 	  nn = 0;
 	  do {
-	    mean += (double) *src.f * *weight.f;
-	    nn += (double) *weight.f;
+	    mean += (Double) *src.f * *weight.f;
+	    nn += (Double) *weight.f;
 	  }
 	  while (advanceLoop(&winfo, &weight),
 		 advanceLoop(&srcinfo, &src) < srcinfo.naxes);
-	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(int));
+	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(Int));
 	  src = src0;
 	  weight = weight0;
 	  mean /= (nn? nn: 1);
 	  sdev = 0.0;
 	  do {
-	    temp = ((double) *src.f - mean);
+	    temp = ((Double) *src.f - mean);
 	    sdev += temp*temp* *weight.f;
 	  } while ((done = (advanceLoop(&winfo, &weight),
 			    advanceLoop(&srcinfo, &src))) < srcinfo.naxes);
@@ -1525,7 +1525,7 @@ int sdev(int narg, int ps[], int sq)
 	  sdev /= nn;
 	  switch (outtype) {
 	    case ANA_FLOAT:
-	      *trgt.f++ = (float) sdev;
+	      *trgt.f++ = (Float) sdev;
 	      break;
 	    case ANA_DOUBLE:
 	      *trgt.d++ = sdev;
@@ -1536,23 +1536,23 @@ int sdev(int narg, int ps[], int sq)
       case ANA_DOUBLE:
 	do {
 	  mean = 0.0;
-	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(int));
+	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(Int));
 	  src0 = src;
 	  weight0 = weight;
 	  nn = 0;
 	  do {
-	    mean += (double) *src.d * *weight.d;
-	    nn += (double) *weight.d;
+	    mean += (Double) *src.d * *weight.d;
+	    nn += (Double) *weight.d;
 	  }
 	  while (advanceLoop(&winfo, &weight),
 		 advanceLoop(&srcinfo, &src) < srcinfo.naxes);
-	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(int));
+	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(Int));
 	  src = src0;
 	  weight = weight0;
 	  mean /= (nn? nn: 1);
 	  sdev = 0.0;
 	  do {
-	    temp = ((double) *src.d - mean);
+	    temp = ((Double) *src.d - mean);
 	    sdev += temp*temp* *weight.d;
 	  } while ((done = (advanceLoop(&winfo, &weight),
 			    advanceLoop(&srcinfo, &src))) < srcinfo.naxes);
@@ -1561,7 +1561,7 @@ int sdev(int narg, int ps[], int sq)
 	  sdev /= nn;
 	  switch (outtype) {
 	    case ANA_FLOAT:
-	      *trgt.f++ = (float) sdev;
+	      *trgt.f++ = (Float) sdev;
 	      break;
 	    case ANA_DOUBLE:
 	      *trgt.d++ = sdev;
@@ -1583,22 +1583,22 @@ int sdev(int narg, int ps[], int sq)
       case ANA_BYTE:
 	do {
 	  mean = 0.0;
-	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(int));
+	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(Int));
 	  src0 = src;
 	  do
-	    mean += (double) *src.b;
+	    mean += (Double) *src.b;
 	  while (advanceLoop(&srcinfo, &src) < srcinfo.naxes);
-	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(int));
+	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(Int));
 	  src = src0;
 	  mean /= n;
 	  sdev = 0.0;
 	  do {
-	    temp = ((double) *src.b - mean);
+	    temp = ((Double) *src.b - mean);
 	    sdev += temp*temp;
 	  } while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 	  switch (outtype) {
 	    case ANA_FLOAT:
-	      *trgt.f++ = (float) (sdev/n2);
+	      *trgt.f++ = (Float) (sdev/n2);
 	      break;
 	    case ANA_DOUBLE:
 	      *trgt.d++ = (sdev/n2);
@@ -1609,22 +1609,22 @@ int sdev(int narg, int ps[], int sq)
       case ANA_WORD:
 	do {
 	  mean = 0.0;
-	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(int));
+	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(Int));
 	  src0 = src;
 	  do
-	    mean += (double) *src.w;
+	    mean += (Double) *src.w;
 	  while (advanceLoop(&srcinfo, &src) < srcinfo.naxes);
-	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(int));
+	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(Int));
 	  src = src0;
 	  mean /= n;
 	  sdev = 0.0;
 	  do {
-	    temp = ((double) *src.w - mean);
+	    temp = ((Double) *src.w - mean);
 	    sdev += temp*temp;
 	  } while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 	  switch (outtype) {
 	    case ANA_FLOAT:
-	      *trgt.f++ = (float) (sdev/n2);
+	      *trgt.f++ = (Float) (sdev/n2);
 	      break;
 	    case ANA_DOUBLE:
 	      *trgt.d++ = (sdev/n2);
@@ -1635,22 +1635,22 @@ int sdev(int narg, int ps[], int sq)
       case ANA_LONG:
 	do {
 	  mean = 0.0;
-	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(int));
+	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(Int));
 	  src0 = src;
 	  do
-	    mean += (double) *src.l;
+	    mean += (Double) *src.l;
 	  while (advanceLoop(&srcinfo, &src) < srcinfo.naxes);
-	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(int));
+	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(Int));
 	  src = src0;
 	  mean /= n;
 	  sdev = 0.0;
 	  do {
-	    temp = ((double) *src.l - mean);
+	    temp = ((Double) *src.l - mean);
 	    sdev += temp*temp;
 	  } while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 	  switch (outtype) {
 	    case ANA_FLOAT:
-	      *trgt.f++ = (float) (sdev/n2);
+	      *trgt.f++ = (Float) (sdev/n2);
 	      break;
 	    case ANA_DOUBLE:
 	      *trgt.d++ = (sdev/n2);
@@ -1661,22 +1661,22 @@ int sdev(int narg, int ps[], int sq)
       case ANA_FLOAT:
 	do {
 	  mean = 0.0;
-	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(int));
+	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(Int));
 	  src0 = src;
 	  do
-	    mean += (double) *src.f;
+	    mean += (Double) *src.f;
 	  while (advanceLoop(&srcinfo, &src) < srcinfo.naxes);
-	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(int));
+	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(Int));
 	  src = src0;
 	  mean /= n;
 	  sdev = 0.0;
 	  do {
-	    temp = ((double) *src.f - mean);
+	    temp = ((Double) *src.f - mean);
 	    sdev += temp*temp;
 	  } while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 	  switch (outtype) {
 	    case ANA_FLOAT:
-	      *trgt.f++ = (float) (sdev/n2);
+	      *trgt.f++ = (Float) (sdev/n2);
 	      break;
 	    case ANA_DOUBLE:
 	      *trgt.d++ = (sdev/n2);
@@ -1687,17 +1687,17 @@ int sdev(int narg, int ps[], int sq)
       case ANA_DOUBLE:
 	do {
 	  mean = 0.0;
-	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(int));
+	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(Int));
 	  src0 = src;
 	  do
-	    mean += (double) *src.d;
+	    mean += (Double) *src.d;
 	  while (advanceLoop(&srcinfo, &src) < srcinfo.naxes);
-	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(int));
+	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(Int));
 	  src = src0;
 	  mean /= n;
 	  sdev = 0.0;
 	  do {
-	    temp = ((double) *src.d - mean);
+	    temp = ((Double) *src.d - mean);
 	    sdev += temp*temp;
 	  } while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 	  *trgt.d++ = sdev/n2;
@@ -1706,13 +1706,13 @@ int sdev(int narg, int ps[], int sq)
       case ANA_CFLOAT:
 	do {
 	  cmean.real = cmean.imaginary = 0.0;
-	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(int));
+	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(Int));
 	  src0 = src;
 	  do {
-	    cmean.real += (double) src.cf->real;
-	    cmean.imaginary += (double) src.cf->imaginary;
+	    cmean.real += (Double) src.cf->real;
+	    cmean.imaginary += (Double) src.cf->imaginary;
 	  } while (advanceLoop(&srcinfo, &src) < srcinfo.naxes);
-	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(int));
+	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(Int));
 	  src = src0;
 	  cmean.real /= n;
 	  cmean.imaginary /= n;
@@ -1725,7 +1725,7 @@ int sdev(int narg, int ps[], int sq)
 	  } while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 	  switch (outtype) {
 	    case ANA_FLOAT:
-	      *trgt.f++ = (float) (sdev/n2);
+	      *trgt.f++ = (Float) (sdev/n2);
 	      break;
 	    case ANA_DOUBLE:
 	      *trgt.d++ = (sdev/n2);
@@ -1736,13 +1736,13 @@ int sdev(int narg, int ps[], int sq)
       case ANA_CDOUBLE:
 	do {
 	  cmean.real = cmean.imaginary = 0.0;
-	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(int));
+	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(Int));
 	  src0 = src;
 	  do {
-	    cmean.real += (double) src.cd->real;
-	    cmean.imaginary += (double) src.cd->imaginary;
+	    cmean.real += (Double) src.cd->real;
+	    cmean.imaginary += (Double) src.cd->imaginary;
 	  } while (advanceLoop(&srcinfo, &src) < srcinfo.naxes);
-	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(int));
+	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(Int));
 	  src = src0;
 	  cmean.real /= n;
 	  cmean.imaginary /= n;
@@ -1824,13 +1824,13 @@ int sdev(int narg, int ps[], int sq)
   return result;
 }
 /*------------------------------------------------------------------------- */
-int ana_sdev(int narg, int ps[])
+Int ana_sdev(Int narg, Int ps[])
      /* return standard deviation */
 {
   return sdev(narg, ps, 1);
 }
 /*------------------------------------------------------------------------- */
-int ana_variance(int narg, int ps[])
+Int ana_variance(Int narg, Int ps[])
      /* returns variance */
 {
   return sdev(narg, ps, 0);
@@ -1886,14 +1886,14 @@ S₂ = 0 + (1 - 2)*(1 - 4/3)*2 = 2/3
 s = √(2/3/(3 - 1)) = √(1/3) = ⅓√3
  */
 /*------------------------------------------------------------------------- */
-int ana_swab(int narg, int ps[])
+Int ana_swab(Int narg, Int ps[])
 /*swap bytes in an array or even an scalar */
 /*this is a subroutine and swaps the input symbol (not a copy) */
 {
-  int	iq, n, nd, j;
+  Int	iq, n, nd, j;
   pointer q1;
   array	*h;
-  int	swapb(char *, int);
+  Int	swapb(char *, Int);
 
   while (narg--)
   { iq = *ps++;						/*just 1 argument */
@@ -1912,7 +1912,7 @@ int ana_swab(int narg, int ps[])
       case 4:						/*array case */
 	n = ana_type_size[type];
 	h = (array *) sym[iq].spec.array.ptr;
-	q1.l = (int *) ((char *)h + sizeof(array));
+	q1.l = (Int *) ((char *)h + sizeof(array));
 	nd = h->ndim;
 	for (j=0;j<nd;j++) n *= h->dims[j]; 		/*# of elements */
 	break;
@@ -1924,32 +1924,32 @@ int ana_swab(int narg, int ps[])
   return 1;
 }
 /*------------------------------------------------------------------------- */
-int ana_wait(int narg, int ps[])
+Int ana_wait(Int narg, Int ps[])
 /* wait the specified # of seconds (floating point) */
 {
-  float	xq;
+  Float	xq;
   struct timeval	tval;
 
   xq = float_arg(ps[0]);
   xq = MAX(0.0, xq);
-  tval.tv_sec = (unsigned int) xq;
+  tval.tv_sec = (uint32_t) xq;
   xq = (xq - tval.tv_sec) * 1.e6;
-  tval.tv_usec = (unsigned int) xq;
+  tval.tv_usec = (uint32_t) xq;
   select(0, NULL, NULL, NULL,&tval);
   return ANA_OK;
 }
 /*---------------------------------------------------------*/
-int ana_esmooth(int narg, int ps[])
+Int ana_esmooth(Int narg, Int ps[])
   /* Exponential Asymmetric Smoothing */
   /* Syntax: Y = ESMOOTH( X [, AXIS, ORDER] ) */
 {
-  int	iq, axis, result_sym, outtype, type, m, ndim, *dims, xdims[8],
+  Int	iq, axis, result_sym, outtype, type, m, ndim, *dims, xdims[8],
   	i, tally[8], n, step[8], done;
-  float	damping, width;
+  Float	damping, width;
   array	*h;
   pointer	src, trgt;
   scalar	sum, weight;
-  extern float	float_arg(int);
+  extern Float	float_arg(Int);
 
   if (narg > 2) { iq = ps[2];  axis = int_arg(ps[1]); }
   else { iq = ps[1];  axis = -1; }
@@ -1974,7 +1974,7 @@ int ana_esmooth(int narg, int ps[])
 	if (axis >= ndim) return cerror(ILL_DIM, ps[1]); }
       else
       { dims = &m;  ndim = 1;  axis = 0; }
-      memcpy(xdims, dims, sizeof(int)*ndim); /* copy dimensions */
+      memcpy(xdims, dims, sizeof(Int)*ndim); /* copy dimensions */
       result_sym = array_clone(iq, outtype);
       h = HEAD(result_sym);
       trgt.l = LPTR(h);
@@ -2015,14 +2015,14 @@ int ana_esmooth(int narg, int ps[])
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-void esmooth_asymmetric(double *srcdata, size_t srccount, size_t srcstride,
-			double width,
-			double *tgtdata, size_t tgtcount, size_t tgtstride)
+void esmooth_asymmetric(Double *srcdata, size_t srccount, size_t srcstride,
+			Double width,
+			Double *tgtdata, size_t tgtcount, size_t tgtstride)
 {
-  double damping = exp(-1.0/width);
-  double sum = 0.0;
-  double weight = 0.0;
-  int i;
+  Double damping = exp(-1.0/width);
+  Double sum = 0.0;
+  Double weight = 0.0;
+  Int i;
 
   assert(tgtcount >= srccount);
 
@@ -2044,14 +2044,14 @@ void esmooth_asymmetric(double *srcdata, size_t srccount, size_t srcstride,
 /* i>D*;i?D1;rD& */
 BIND(esmooth_asymmetric, v_sddsd_iDaD1rDq_012, f, ESMOOTH1, 1, 2, NULL);
 /*------------------------------------------------------------------------- */
-void esmooth_symmetric(double *srcdata, size_t srccount, size_t srcstride,
-		       double width,
-		       double *tgtdata, size_t tgtcount, size_t tgtstride)
+void esmooth_symmetric(Double *srcdata, size_t srccount, size_t srcstride,
+		       Double width,
+		       Double *tgtdata, size_t tgtcount, size_t tgtstride)
 {
-  double damping = exp(-1.0/width);
-  double sum = 0.0;
-  double weight = 0.0;
-  int i;
+  Double damping = exp(-1.0/width);
+  Double sum = 0.0;
+  Double weight = 0.0;
+  Int i;
 
   assert(tgtcount >= srccount);
 
@@ -2094,8 +2094,8 @@ void esmooth_symmetric(double *srcdata, size_t srccount, size_t srcstride,
 /* i>D*;i?D1;rD& */
 BIND(esmooth_symmetric, v_sddsd_iDaD1rDq_012, f, ESMOOTH2, 1, 2, NULL);
 /*------------------------------------------------------------------------- */
-void vargsmoothkernel(double width, int nx, int *n2, int *ng, double **gkern,
-		      double *gsum, double **partial)
+void vargsmoothkernel(Double width, Int nx, Int *n2, Int *ng, Double **gkern,
+		      Double *gsum, Double **partial)
 /* makes sure a gaussian kernel of FWHM <width> and kernel size at
  most <nx> is returned in <*gkern>.  The kernel size is returned in
  <*ng>, which is equal to 2*<*n2> + 1.  The sum of the kernel values
@@ -2108,11 +2108,11 @@ void vargsmoothkernel(double width, int nx, int *n2, int *ng, double **gkern,
  specifying an <nx> of zero.  Then the current kernel space is
  released.  LS 25apr97 */
 {
-  int	n, nm;
-  double	w, *pt3, *pt2;
-  double	xq, wq, dq;
-  static double	ow = 0.0;
-  static int	maxng = 0;
+  Int	n, nm;
+  Double	w, *pt3, *pt2;
+  Double	xq, wq, dq;
+  static Double	ow = 0.0;
+  static Int	maxng = 0;
 
   if (!nx) {			/* release kernel space */
     Free(*gkern);
@@ -2134,8 +2134,8 @@ void vargsmoothkernel(double width, int nx, int *n2, int *ng, double **gkern,
     /* now need to find memory for smoothing kernel */
     if (nm > maxng) {	/* bigger than available memory */
 				/* so get more */
-      *gkern = (double *) (*gkern? Realloc(*gkern, nm*sizeof(double)):
-			   Malloc(nm*sizeof(double)));
+      *gkern = (Double *) (*gkern? Realloc(*gkern, nm*sizeof(Double)):
+			   Malloc(nm*sizeof(Double)));
       maxng = nm; }		/* remember current size */
     *partial = *gkern + *ng;	/* partial sums */
     /* now get ready to calculate kernel values */
@@ -2162,7 +2162,7 @@ void vargsmoothkernel(double width, int nx, int *n2, int *ng, double **gkern,
   /* all done */
 }
 /*------------------------------------------------------------------------- */
-int ana_gsmooth(int narg, int ps[])
+Int ana_gsmooth(Int narg, Int ps[])
  /* smooth input array with a gaussian*/
  /* ps[0] is input array and ps[1] is fwhm width */
  /* Addition LS 13aug94:  user may supply kernel
@@ -2183,15 +2183,15 @@ int ana_gsmooth(int narg, int ps[])
 /* this way a smoothed version of a straight line is also a straight line. */
 /* LS 13aug97 */
 {
-  extern	int scrat[NSCRAT];
-  float	sum, *pt3, wq, sumg, xq;
-  int	n, nWidth;
+  extern	Int scrat[NSCRAT];
+  Float	sum, *pt3, wq, sumg, xq;
+  Int	n, nWidth;
   pointer	src, trgt, widths, gkern, pt1;
-  int	j, n2, ng, i2, i, ik, id, k;
-  int	iq, nx, mem = 0, dgkern;
-  float	width, gsum;
+  Int	j, n2, ng, i2, i, ik, id, k;
+  Int	iq, nx, mem = 0, dgkern;
+  Float	width, gsum;
   char	haveKernel = 0;
-  int	stride, result, loop, mode = 0;
+  Int	stride, result, loop, mode = 0;
   loopInfo	srcinfo, trgtinfo;
 
   iq = 0;
@@ -2262,15 +2262,15 @@ int ana_gsmooth(int narg, int ps[])
 	ng = 2 * n2 + 1;	/* total length */
 	if (mem) {
 	  if (ng > mem)
-	    gkern.f = (float *) realloc(gkern.f, (mem = ng)*sizeof(float));
-	} else if (ng*sizeof(float) <= NSCRAT)
-	  gkern.f = (float *) scrat;
+	    gkern.f = (Float *) realloc(gkern.f, (mem = ng)*sizeof(Float));
+	} else if (ng*sizeof(Float) <= NSCRAT)
+	  gkern.f = (Float *) scrat;
 	else {
 	  mem = ng;
-	  gkern.f = (float *) malloc(ng*sizeof(float));
+	  gkern.f = (Float *) malloc(ng*sizeof(Float));
 	}
 	n = ng;			/* number of kernel points to do */
-	wq = (float) (-n2);	/* first x */
+	wq = (Float) (-n2);	/* first x */
 	pt3 = gkern.f;		/* target */
 	gsum = 0.0;		/* initialize sum */
 	while (n--) {
@@ -2482,7 +2482,7 @@ int ana_gsmooth(int narg, int ps[])
 	    pt1.b = src.b;	/* pointer into source */
 	    n = i2;
 	    while (n--) {
-	      sum += (float) *pt1.b * *pt3;
+	      sum += (Float) *pt1.b * *pt3;
 	      pt1.b += stride;
 	      sumg += *pt3++;
 	    }
@@ -2503,7 +2503,7 @@ int ana_gsmooth(int narg, int ps[])
 	    pt3 = gkern.f;	/* pointer to start of kernel */
 	    n = ng;
 	    while (n--) {
-	      sum += (float) *pt1.b * *pt3++;
+	      sum += (Float) *pt1.b * *pt3++;
 	      pt1.b += stride;
 	    }
 	    *trgt.f = sum / gsum;
@@ -2540,7 +2540,7 @@ int ana_gsmooth(int narg, int ps[])
 	    pt3 = gkern.f + ik;	/* pointer into kernel */
 	    n = i2;
 	    while (n--) {
-	      sum += (float) *pt1.b * *pt3;
+	      sum += (Float) *pt1.b * *pt3;
 	      pt1.b += stride;
 	      sumg += *pt3++;
 	    }
@@ -2576,7 +2576,7 @@ int ana_gsmooth(int narg, int ps[])
 	    pt1.w = src.w;	/* pointer into source */
 	    n = i2;
 	    while (n--) {
-	      sum += (float) *pt1.w * *pt3;
+	      sum += (Float) *pt1.w * *pt3;
 	      pt1.w += stride;
 	      sumg += *pt3++;
 	    }
@@ -2597,7 +2597,7 @@ int ana_gsmooth(int narg, int ps[])
 	    pt3 = gkern.f;	/* pointer to start of kernel */
 	    n = ng;
 	    while (n--) {
-	      sum += (float) *pt1.w * *pt3++;
+	      sum += (Float) *pt1.w * *pt3++;
 	      pt1.w += stride;
 	    }
 	    *trgt.f = sum / gsum;
@@ -2634,7 +2634,7 @@ int ana_gsmooth(int narg, int ps[])
 	    pt3 = gkern.f + ik;	/* pointer into kernel */
 	    n = i2;
 	    while (n--) {
-	      sum += (float) *pt1.w * *pt3;
+	      sum += (Float) *pt1.w * *pt3;
 	      pt1.w += stride;
 	      sumg += *pt3++;
 	    }
@@ -2670,7 +2670,7 @@ int ana_gsmooth(int narg, int ps[])
 	    pt1.l = src.l;	/* pointer into source */
 	    n = i2;
 	    while (n--) {
-	      sum += (float) *pt1.l * *pt3;
+	      sum += (Float) *pt1.l * *pt3;
 	      pt1.l += stride;
 	      sumg += *pt3++;
 	    }
@@ -2691,7 +2691,7 @@ int ana_gsmooth(int narg, int ps[])
 	    pt3 = gkern.f;	/* pointer to start of kernel */
 	    n = ng;
 	    while (n--) {
-	      sum += (float) *pt1.l * *pt3++;
+	      sum += (Float) *pt1.l * *pt3++;
 	      pt1.l += stride;
 	    }
 	    *trgt.f = sum / gsum;
@@ -2728,7 +2728,7 @@ int ana_gsmooth(int narg, int ps[])
 	    pt3 = gkern.f + ik;	/* pointer into kernel */
 	    n = i2;
 	    while (n--) {
-	      sum += (float) *pt1.l * *pt3;
+	      sum += (Float) *pt1.l * *pt3;
 	      pt1.l += stride;
 	      sumg += *pt3++;
 	    }
@@ -2764,7 +2764,7 @@ int ana_gsmooth(int narg, int ps[])
 	    pt1.f = src.f;	/* pointer into source */
 	    n = i2;
 	    while (n--) {
-	      sum += (float) *pt1.f * *pt3;
+	      sum += (Float) *pt1.f * *pt3;
 	      pt1.f += stride;
 	      sumg += *pt3++;
 	    }
@@ -2785,7 +2785,7 @@ int ana_gsmooth(int narg, int ps[])
 	    pt3 = gkern.f;	/* pointer to start of kernel */
 	    n = ng;
 	    while (n--) {
-	      sum += (float) *pt1.f * *pt3++;
+	      sum += (Float) *pt1.f * *pt3++;
 	      pt1.f += stride;
 	    }
 	    *trgt.f = sum / gsum;
@@ -2822,7 +2822,7 @@ int ana_gsmooth(int narg, int ps[])
 	    pt3 = gkern.f + ik;	/* pointer into kernel */
 	    n = i2;
 	    while (n--) {
-	      sum += (float) *pt1.f * *pt3;
+	      sum += (Float) *pt1.f * *pt3;
 	      pt1.f += stride;
 	      sumg += *pt3++;
 	    }
@@ -2858,7 +2858,7 @@ int ana_gsmooth(int narg, int ps[])
 	    pt1.d = src.d;	/* pointer into source */
 	    n = i2;
 	    while (n--) {
-	      sum += (float) *pt1.d * *pt3;
+	      sum += (Float) *pt1.d * *pt3;
 	      pt1.d += stride;
 	      sumg += *pt3++;
 	    }
@@ -2879,7 +2879,7 @@ int ana_gsmooth(int narg, int ps[])
 	    pt3 = gkern.f;	/* pointer to start of kernel */
 	    n = ng;
 	    while (n--) {
-	      sum += (float) *pt1.d * *pt3++;
+	      sum += (Float) *pt1.d * *pt3++;
 	      pt1.d += stride;
 	    }
 	    *trgt.f = sum / gsum;
@@ -2916,7 +2916,7 @@ int ana_gsmooth(int narg, int ps[])
 	    pt3 = gkern.f + ik;	/* pointer into kernel */
 	    n = i2;
 	    while (n--) {
-	      sum += (float) *pt1.d * *pt3;
+	      sum += (Float) *pt1.d * *pt3;
 	      pt1.d += stride;
 	      sumg += *pt3++;
 	    }
@@ -2955,48 +2955,48 @@ int ana_gsmooth(int narg, int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-int ana_lower(narg,ps)					/*lower function */
+Int ana_lower(narg,ps)					/*lower function */
 /* convert all letters in a string to lower case */
-int narg,ps[];
+Int narg,ps[];
 {
-register  byte *p1, *p2;
-register  int  mq;
-int	result_sym;
+register  Byte *p1, *p2;
+register  Int  mq;
+Int	result_sym;
 if ( sym[ ps[0] ].class != 2 ) return cerror(NEED_STR, *ps);
 mq = sym[ps[0]].spec.array.bstore - 1;
 result_sym = string_scratch(mq);		/*for resultant string */
-p1 = (byte *) sym[ps[0] ].spec.array.ptr;
-p2 = (byte *) sym[result_sym].spec.array.ptr;
+p1 = (Byte *) sym[ps[0] ].spec.array.ptr;
+p2 = (Byte *) sym[result_sym].spec.array.ptr;
 while (mq--)
- *p2++ = isupper( (int) *p1 ) ? (byte) tolower( (int) *p1++) : *p1++;
+ *p2++ = isupper( (Int) *p1 ) ? (Byte) tolower( (Int) *p1++) : *p1++;
 *p2 = 0;					/*ending null */
 return result_sym;
 }
 /*------------------------------------------------------------------------- */
-int ana_upper(narg,ps)					/*upper function */
+Int ana_upper(narg,ps)					/*upper function */
 /* convert all letters in a string to upper case */
-int narg,ps[];
+Int narg,ps[];
 {
-register  byte *p1, *p2;
-register  int  mq;
-int	result_sym;
+register  Byte *p1, *p2;
+register  Int  mq;
+Int	result_sym;
 if ( sym[ ps[0] ].class != 2 ) return cerror(NEED_STR, *ps);
 mq = sym[ps[0]].spec.array.bstore - 1;
 result_sym = string_scratch(mq);		/*for resultant string */
-p1 = (byte *) sym[ps[0] ].spec.array.ptr;
-p2 = (byte *) sym[result_sym].spec.array.ptr;
+p1 = (Byte *) sym[ps[0] ].spec.array.ptr;
+p2 = (Byte *) sym[result_sym].spec.array.ptr;
 while (mq--)
- *p2++ = islower( (int) *p1 ) ? (byte) toupper( (int) *p1++) : *p1++;
+ *p2++ = islower( (Int) *p1 ) ? (Byte) toupper( (Int) *p1++) : *p1++;
 *p2 = 0;					/*ending null */
 return result_sym;
 }
 /*------------------------------------------------------------------------- */
-int ana_strpos(int narg, int ps[]) /*STRPOS function */
+Int ana_strpos(Int narg, Int ps[]) /*STRPOS function */
 /* returns index of sub string if found */
      /* added index - LS 11jun97 */
 {
   register char *p1, *p2, *p3;
-  int	result_sym, index;
+  Int	result_sym, index;
 
   if (symbol_class(ps[0]) != ANA_STRING)
     return cerror(NEED_STR, *ps);
@@ -3021,12 +3021,12 @@ int ana_strpos(int narg, int ps[]) /*STRPOS function */
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-int ana_strcount(narg,ps)				/*STRCOUNT function */
+Int ana_strcount(narg,ps)				/*STRCOUNT function */
 /*  count # of occurences of a substring  */
-int narg,ps[];
+Int narg,ps[];
 {
 register char *p1, *p2, *p3;
-int	result_sym, n;
+Int	result_sym, n;
 if ( sym[ ps[0] ].class != 2 ) return cerror(NEED_STR, ps[0]);
 if ( sym[ ps[1] ].class != 2 ) return cerror(NEED_STR, ps[1]);
 result_sym = scalar_scratch(2);		/*for resultant position */
@@ -3039,13 +3039,13 @@ sym[result_sym].spec.scalar.l = n;
 return result_sym;
 }
 /*------------------------------------------------------------------------- */
-int ana_strreplace(narg,ps)			/*STRREPLACE function */
+Int ana_strreplace(narg,ps)			/*STRREPLACE function */
 /* replace a substring nc times */
-int narg,ps[];
+Int narg,ps[];
 {
 register char *p1, *p2, *p3, *p4;
 char	*pq;
-int	result_sym, n, nc, nr, mq, ns;
+Int	result_sym, n, nc, nr, mq, ns;
 if ( sym[ ps[0] ].class != 2 ) return cerror(NEED_STR, ps[0]);
 if ( sym[ ps[1] ].class != 2 ) return cerror(NEED_STR, ps[1]);
 if ( sym[ ps[2] ].class != 2 ) return cerror(NEED_STR, ps[2]);
@@ -3082,13 +3082,13 @@ if (nc > 0) { while (nc--) { *p4++ = *p1++; } }
 return result_sym;
 }
 /*------------------------------------------------------------------------- */
-int ana_strpbrk(int narg, int ps[])
+Int ana_strpbrk(Int narg, Int ps[])
  /* returns a string from s1 starting with the first char from s2
  found in s1, if none found, an empty string */
 {
   char *p1, *p2, *p3, *p4;
-  int  mq, off;
-  int    result_sym;
+  Int  mq, off;
+  Int    result_sym;
 
   if (!symbolIsStringScalar(ps[0]))
     return cerror(NEED_STR, ps[0]);
@@ -3106,14 +3106,14 @@ int ana_strpbrk(int narg, int ps[])
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-int ana_strloc(narg,ps)					/*STRLOC function */
+Int ana_strloc(narg,ps)					/*STRLOC function */
 /* returns rest of source starting at object string
  */
-int narg,ps[];
+Int narg,ps[];
 {
 register char *p1, *p2, *p3;
-register  int  mq, off;
-int	result_sym;
+register  Int  mq, off;
+Int	result_sym;
 if ( sym[ ps[0] ].class != 2 ) return cerror(NEED_STR, ps[0]);
 if ( sym[ ps[1] ].class != 2 ) return cerror(NEED_STR, ps[1]);
 p1 = (char *) sym[ps[0] ].spec.array.ptr;
@@ -3128,14 +3128,14 @@ memcpy(p3, p1 + off, mq);
 return result_sym;
 }
 /*------------------------------------------------------------------------- */
-int ana_strskp(narg,ps)					/*STRSKP function */
+Int ana_strskp(narg,ps)					/*STRSKP function */
 /*  returns rest of source starting AFTER object string
  */
-int narg,ps[];
+Int narg,ps[];
 {
 register char *p1, *p2, *p3;
-register  int  mq, off;
-int	result_sym;
+register  Int  mq, off;
+Int	result_sym;
 if ( sym[ ps[0] ].class != 2 ) return cerror(NEED_STR, ps[0]);
 if ( sym[ ps[1] ].class != 2 ) return cerror(NEED_STR, ps[1]);
 p1 = (char *) sym[ps[0] ].spec.array.ptr;
@@ -3152,13 +3152,13 @@ if (mq != 0)  memcpy(p3, p1 + off, mq);
 return result_sym;
 }
 /*------------------------------------------------------------------------- */
-int ana_skipc(narg,ps)					/*SKIPC function */
+Int ana_skipc(narg,ps)					/*SKIPC function */
 /* skip over characters */
-int narg,ps[];
+Int narg,ps[];
 {
 register char *p1, *p2, *p3;
-int  mq, off;
-int	result_sym;
+Int  mq, off;
+Int	result_sym;
 if ( sym[ ps[0] ].class != 2 ) return cerror(NEED_STR, ps[0]);
 if ( sym[ ps[1] ].class != 2 ) return cerror(NEED_STR, ps[1]);
 p1 = (char *) sym[ps[0] ].spec.array.ptr;
@@ -3173,13 +3173,13 @@ if (mq != 0)  memcpy(p3, p1 + off, mq);
 return result_sym;
 }
 /*------------------------------------------------------------------------- */
-int ana_strsub(narg,ps)				/*STRSUB function */
+Int ana_strsub(narg,ps)				/*STRSUB function */
 /* return a substring */
-int narg,ps[];
+Int narg,ps[];
 {
 register char *p1, *p3;
-int  mq, off, len;
-int	result_sym;
+Int  mq, off, len;
+Int	result_sym;
 if ( sym[ ps[0] ].class != 2 ) return cerror(NEED_STR, ps[0]);
 p1 = (char *) sym[ps[0] ].spec.array.ptr;
 off = int_arg( ps[1] );
@@ -3194,13 +3194,13 @@ if (mq != 0)  memcpy(p3, p1 + off, mq);
 return result_sym;
 }
 /*------------------------------------------------------------------------- */
-int ana_strtrim(int narg, int ps[]) /*STRTRIM function */
+Int ana_strtrim(Int narg, Int ps[]) /*STRTRIM function */
 /* trim trailing blanks and tabs and any control chars */
      /* older version took off last OK char, too - fixed.  LS 7may97 */
 {
   register char *p1, *p2, *p3;
-  int  mq;
-  int	result_sym;
+  Int  mq;
+  Int	result_sym;
   
   if (symbol_class(ps[0]) != ANA_STRING)
     return cerror(NEED_STR, *ps);
@@ -3224,13 +3224,13 @@ int ana_strtrim(int narg, int ps[]) /*STRTRIM function */
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-int ana_istring(narg,ps)				/* ISTRING function */
+Int ana_istring(narg,ps)				/* ISTRING function */
 /* string in I format */
-int narg,ps[];
+Int narg,ps[];
 {
 char	s[6], *p3;
-int  iq, mq, n, k, mode;
-int	result_sym;
+Int  iq, mq, n, k, mode;
+Int	result_sym;
 iq = ps[0];
 switch (sym[iq].class)	{
 default: return cerror(NO_SCAL, iq);
@@ -3259,16 +3259,16 @@ memcpy(p3, templine, mq);
 return result_sym;
 }
 /*------------------------------------------------------------------------- */
-int ana_fstring(int narg, int ps[])			/* FSTRING function */
+Int ana_fstring(Int narg, Int ps[])			/* FSTRING function */
 /* string from scalar, C-format */
 /* syntax:  FSTRING(format, arg1, arg2, ...)
    the argument is modified to suit the data type expected by the format.
    LS 24apr93 */
 {
- extern	int	column;
+ extern	Int	column;
  char	*p3;
- int	col, mq;
- int	type_formatted_ascii(int, int [], FILE *);
+ Int	col, mq;
+ Int	type_formatted_ascii(Int, Int [], FILE *);
 
  col = column;
  column = 0;
@@ -3282,13 +3282,13 @@ int ana_fstring(int narg, int ps[])			/* FSTRING function */
  return result_sym;
 }
 /*------------------------------------------------------------------------- */
-int ana_string(int narg, int ps[])
+Int ana_string(Int narg, Int ps[])
  /* converts to ANA_STRING
    LS 24apr93 21sep98 8sep99 */
 {
   scalar	value;
   char	*p;
-  int	result, n, nel;
+  Int	result, n, nel;
   pointer	q;
   extern char	*fmt_integer, *fmt_float;
 
@@ -3325,7 +3325,7 @@ int ana_string(int narg, int ps[])
 	  break;
       }
       p = curScrat;
-      while (isspace((byte) *p)) /* skip initial whitespace */
+      while (isspace((Byte) *p)) /* skip initial whitespace */
 	p++;
       result = string_scratch(strlen(p));
       strcpy(string_value(result), p);
@@ -3362,10 +3362,10 @@ int ana_string(int narg, int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-int ana_strlen(int narg, int ps[])/*strlen function */
+Int ana_strlen(Int narg, Int ps[])/*strlen function */
 /* length, not counting null; duplicates num_elem but insists on string */
 {
-  int	result_sym, *l, n;
+  Int	result_sym, *l, n;
   pointer	p;
 
   switch (symbol_class(ps[0])) {
@@ -3391,13 +3391,13 @@ int ana_strlen(int narg, int ps[])/*strlen function */
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-int ana_decomp(int narg, int ps[])/*decomp routine */
+Int ana_decomp(Int narg, Int ps[])/*decomp routine */
 		/*replaces a square matrix with it's lu decomposition */
 {
-  int	iq, nd, nx;
+  Int	iq, nd, nx;
   array	*h;
   pointer q1;
-  int	ana_replace(int, int);
+  Int	ana_replace(Int, Int);
 
 if ( narg != 1 ) return cerror(WRNG_N_ARG, 0);
 iq = ps[0];
@@ -3411,8 +3411,8 @@ if  (sym[iq].type < 4 )  iq = ana_float(1, &iq);
 if (iq != ps[0] ) ana_replace(ps[0], iq);
 iq = ps[0];
 h = (array *) sym[iq].spec.array.ptr;
-q1.f = (float *) ((char *)h + sizeof(array));
-		/*could be either float or double, support both */
+q1.f = (Float *) ((char *)h + sizeof(array));
+		/*could be either Float or Double, support both */
 switch ( sym[iq].type ) {
 case 3:
   f_decomp( q1.f, nx, nx );	break;
@@ -3422,11 +3422,11 @@ case 4:
 return 1;
 }
 /*------------------------------------------------------------------------- */
-int ana_dsolve(narg,ps)					/*decomp routine */
+Int ana_dsolve(narg,ps)					/*decomp routine */
 		/*solves a linear system given lu decomp and rhs */
-int narg,ps[];
+Int narg,ps[];
 {
-int	iq, jq, nd, nx, toptype, j, outer;
+Int	iq, jq, nd, nx, toptype, j, outer;
 array	*h;
 pointer q1, q2;
 if ( narg != 2 ) return cerror(WRNG_N_ARG, 0);
@@ -3439,7 +3439,7 @@ if ( nd != 2 || nx != h->dims[1] ) return cerror(NEED_2D_SQ_ARR, iq);
 					/*must be 2-D and square */
 jq = ps[1];				/*rhs side (may be more than one)*/
 if (isFreeTemp(jq)) return cerror(RET_ARG_NO_ATOM, jq);
-toptype = toptype > (int) sym[jq].type ? toptype :  sym[iq].type;
+toptype = toptype > (Int) sym[jq].type ? toptype :  sym[iq].type;
 if (toptype < 3) toptype = 3;
 h = (array *) sym[jq].spec.array.ptr;
 nd = h->ndim;	if ( h->dims[0] != nx) return cerror(INCMP_LU_RHS, iq);
@@ -3454,11 +3454,11 @@ case 4:
 }
 if (jq != ps[1] ) ana_replace(ps[1], jq);	jq = ps[1];
 h = (array *) sym[iq].spec.array.ptr;
-q1.l = (int *) ((char *)h + sizeof(array));
+q1.l = (Int *) ((char *)h + sizeof(array));
 h = (array *) sym[jq].spec.array.ptr;
-q2.l = (int *) ((char *)h + sizeof(array));
+q2.l = (Int *) ((char *)h + sizeof(array));
 while (outer--) {
-		/*could be either float or double, support both */
+		/*could be either Float or Double, support both */
 switch ( toptype ) {
 case 3:
 f_solve( q1.f, q2.f, nx, nx ); q2.f += nx;	break;
@@ -3469,17 +3469,17 @@ d_solve( q1.d, q2.d, nx, nx ); q2.d += nx;	break;
 return 1;
 }
 /*------------------------------------------------------------------------- */
-int ana_pit(int narg, int ps[])	/*pit function */
+Int ana_pit(Int narg, Int ps[])	/*pit function */
 			/* polynomial fit, CALL IS C=PIT([X],Y,[NPOW])*/
 {
-  double	*a, *fbase, *cfbase;
+  Double	*a, *fbase, *cfbase;
   pointer qxbase,qybase;
-  int	npow, symx, symy, nd, nxq, outer, outerx, dim[2], cfsym;
-  int	j, toptype;
+  Int	npow, symx, symy, nd, nxq, outer, outerx, dim[2], cfsym;
+  Int	j, toptype;
   array	*h;
-  int	setxpit(int, int),
-    cana_pit(pointer *, pointer *, int, int, double *, double *, double *,
-	     int, int);
+  Int	setxpit(Int, Int),
+    cana_pit(pointer *, pointer *, Int, Int, Double *, Double *, Double *,
+	     Int, Int);
 
 /* depending on # of nargs, we may have to default x or npow, narg=2 case
 	is ambiguous until we get class */
@@ -3500,7 +3500,7 @@ default: return cerror(WRNG_N_ARG, 0);
 }
 if (npow < 1 || npow >10 ) return cerror(ILL_POWER, 0);	/*check power */
 CK_ARR(symy, -1);
-	/* if either y or x (if x specified) is double, do a double calc. */
+	/* if either y or x (if x specified) is Double, do a Double calc. */
 toptype = sym[symy].type < 3 ? 3 : sym[symy].type;
 h = (array *) sym[symy].spec.array.ptr;
 	/*array may be upgraded but y dimensions will be same, get now */
@@ -3508,7 +3508,7 @@ nd = h->ndim;	nxq = h->dims[0];	outer = 1;
 if (nd > 1) for(j=1;j<nd;j++) outer *= h->dims[j];
 					/* check x if specified */
 if (symx > 0) { CK_ARR(symx, -1); 
- toptype = (int) sym[symx].type > toptype ? sym[symx].type : toptype;
+ toptype = (Int) sym[symx].type > toptype ? sym[symx].type : toptype;
  h = (array *) sym[symx].spec.array.ptr;
 			/* a specified x must match y in some regards */
  nd = h->ndim;	if (h->dims[0] != nxq) return cerror(INCMP_DIMS, symy);
@@ -3526,18 +3526,18 @@ case 4:
  symy = ana_double( 1, &symy); symx = ana_double( 1, &symx); break;
 }
 h = (array *) sym[symy].spec.array.ptr;
-qybase.l = (int *) ((char *)h + sizeof(array));
+qybase.l = (Int *) ((char *)h + sizeof(array));
 h = (array *) sym[symx].spec.array.ptr;
-qxbase.l = (int *) ((char *)h + sizeof(array));
+qxbase.l = (Int *) ((char *)h + sizeof(array));
 			/* get the various matrices and vectors needed */
 dim[0] = npow + 1;	dim[1] = outer;
-if (outer > 1) cfsym = array_scratch(4, 2, dim);	/*always double */		
+if (outer > 1) cfsym = array_scratch(4, 2, dim);	/*always Double */		
 	else cfsym = array_scratch(4, 1, dim);
 h = (array *) sym[cfsym].spec.array.ptr;
-cfbase = (double*) ((char *)h + sizeof(array));
+cfbase = (Double*) ((char *)h + sizeof(array));
 							/*scratch array */
-allocate(fbase, nxq, double);
-allocate(a, (npow + 1)*(npow + 1), double);
+allocate(fbase, nxq, Double);
+allocate(a, (npow + 1)*(npow + 1), Double);
 	/*loop over the number of individual fits to do */
 while (outer--) { 
 	/* ready to start actual calculation, all done in cana_pit */
@@ -3548,18 +3548,18 @@ Free(a);  Free(fbase);
 return cfsym;
 }
 /*------------------------------------------------------------------------- */
-int cana_pit(pointer *qxbase, pointer *qybase, int nxq, int npow, double *a,
-	     double *cfbase, double *fbase, int toptype, int outerx)
+Int cana_pit(pointer *qxbase, pointer *qybase, Int nxq, Int npow, Double *a,
+	     Double *cfbase, Double *fbase, Int toptype, Int outerx)
 /* internal routine used by ana_pit, ana_trend, and ana_detrend */
 {
-double	sum, *f, *cf;
+Double	sum, *f, *cf;
 pointer qx,qy;
-int	i, n, ib, ie, k;
+Int	i, n, ib, ie, k;
 cf = cfbase;	f = fbase;	qy.l = qybase->l;  qx.l = qxbase->l;
 switch (toptype) {
 case 3:
 /*
-printf("float case\n");
+printf("Float case\n");
 for (k=0;k<nxq;k++) printf("k, x(k), y(k) %d %f %f\n",k,*(qx.f+k),*(qy.f+k));
 */
 n = nxq;  while (n--) *f++ = *qx.f++;
@@ -3580,7 +3580,7 @@ for (k=0;k <= (npow);k++) { sum = 0.0; f = fbase; n = nxq; qx.l = qxbase->l;
 qybase->f += nxq;  if (outerx != 1) qxbase->f += nxq; break;
 case 4:
 /*
-printf("double case\n");
+printf("Double case\n");
 for (k=0;k<nxq;k++) printf("k, x(k), y(k) %d %f %f\n",k,*(qx.d+k),*(qy.d+k));
 */
 n = nxq;  while (n--) *f++ = *qx.d++;
@@ -3608,49 +3608,49 @@ d_solve(a, cfbase, npow+1, npow+1);
 return 1;
 }
 /*------------------------------------------------------------------------- */
-int setxpit(int type, int n)	/* used by several routines to set up
+Int setxpit(Int type, Int n)	/* used by several routines to set up
 				   an x array */
 			/*consisting of {0,1/n,2/n,...,(n-1)/n} */
 			/* type must be 3 or 4 */
 {
   register pointer qx;
-  register float	del;
-  register double	ddel;
-  int	nsym, nx;
+  register Float	del;
+  register Double	ddel;
+  Int	nsym, nx;
   array	*h;
   nx = n;
   nsym = array_scratch(type, 1, &nx );
   h = (array *) sym[nsym].spec.array.ptr;
-  qx.d = (double *) ((char *)h + sizeof(array));
+  qx.d = (Double *) ((char *)h + sizeof(array));
   switch (type) {
   case 3:
     del = 1.0 / nx;  *qx.f = 0.0;  while (--nx) *(qx.f+1) = *qx.f++ + del; break;
   case 4:
     ddel = 1.0/ nx;  *qx.d = 0.0;  while (--nx) *(qx.d+1) = *qx.d++ + ddel; break;
   }
-  qx.l = (int *) ((char *)h + sizeof(array));
+  qx.l = (Int *) ((char *)h + sizeof(array));
   return nsym;
 }
 /*------------------------------------------------------------------------- */
-int ana_detrend(int narg, int ps[])/*detrend function */
+Int ana_detrend(Int narg, Int ps[])/*detrend function */
 	/* detrend using a polynomial fit, CALL IS DT=detrend(Y,[NPOW])*/
 {
-  int	ana_trend(int, int []);
+  Int	ana_trend(Int, Int []);
 			/* just call trend  with the detrend flag set */
   detrend_flag = 1;
   return ana_trend(narg, ps);
 }
 /*------------------------------------------------------------------------- */
-int ana_trend(int narg, int ps[]) /*trend function */
+Int ana_trend(Int narg, Int ps[]) /*trend function */
 	/* trend using a polynomial fit, CALL IS T=trend(Y,[NPOW])*/
 {
-  register double	*a;
-  double	*fbase, *cfbase;
+  register Double	*a;
+  Double	*fbase, *cfbase;
   pointer qxbase,qybase,qzbase;
-  int	npow, symx, symy, nd, nxq, outer;
-  int	toptype, result_sym;
-  int	cana_poly(double *cfbase, pointer *qxbase, int nxq, int npow,
-		  pointer *qzbase, int toptype);
+  Int	npow, symx, symy, nd, nxq, outer;
+  Int	toptype, result_sym;
+  Int	cana_poly(Double *cfbase, pointer *qxbase, Int nxq, Int npow,
+		  pointer *qzbase, Int toptype);
 
   /* second argument is optional, default is linear fit (npow = 1) */
   npow = 1;
@@ -3690,9 +3690,9 @@ int ana_trend(int narg, int ps[]) /*trend function */
   qzbase.l = array_data(result_sym);
 			/* get the various matrices and vectors needed */
 			/*unlike pit, the coeffs. are not in a symbol */
-  allocate(cfbase, npow + 1, double);
-  allocate(fbase, nxq, double);
-  allocate(a, (npow + 1)*(npow + 1), double);
+  allocate(cfbase, npow + 1, Double);
+  allocate(fbase, nxq, Double);
+  allocate(a, (npow + 1)*(npow + 1), Double);
 	/*loop over the number of individual fits to do */
   while (outer--)
 		/* get the poly fit coefficients, done in cana_pit */
@@ -3733,13 +3733,13 @@ int ana_trend(int narg, int ps[]) /*trend function */
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-int cana_poly(double *cfbase, pointer *qxbase, int nxq, int npow,
-	      pointer *qzbase, int toptype)
+Int cana_poly(Double *cfbase, pointer *qxbase, Int nxq, Int npow,
+	      pointer *qzbase, Int toptype)
 /* internal routine used by ana_trend, and ana_detrend */
 {
-double	sum, *cf, xq;
+Double	sum, *cf, xq;
 pointer qz,qx;
-int	n, m;
+Int	n, m;
 cf = cfbase;	qz.l = qzbase->l;  qx.l = qxbase->l;
 switch (toptype) {
 case 3:
@@ -3768,13 +3768,13 @@ qzbase->d += nxq; break;
 return 1;
 }
 /*------------------------------------------------------------------------- */
-int ana_poly(int narg, int ps[])
+Int ana_poly(Int narg, Int ps[])
  /* y = poly(x,c) */
  /* x: data values at which to evaluate the polynomials */
  /* c: coefficients of the polynomial */
 {
-  int result, ndata, ncoeff, datasym, coeffsym, i;
-  byte outtype;
+  Int result, ndata, ncoeff, datasym, coeffsym, i;
+  Byte outtype;
   pointer data, tgt, coeff;
 
   if (!symbolIsNumerical(ps[0])
@@ -3846,7 +3846,7 @@ int ana_poly(int narg, int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-int ana_strtok(int narg, int ps[])
+Int ana_strtok(Int narg, Int ps[])
 /* mimics the C strtok function.
  STRTOK( [<s1>,] <s2>)
  all specified arguments must be strings.  If <s1> is specified and not
@@ -3862,7 +3862,7 @@ int ana_strtok(int narg, int ps[])
  then an error is generated.  LS 19sep98 */
 {
   char	*s1, *s2, *s;
-  int	iq;
+  Int	iq;
   static char	*string = NULL;
 
   if (symbol_class(ps[0]) != ANA_STRING)
@@ -3901,10 +3901,10 @@ int ana_strtok(int narg, int ps[])
   return iq;
 }
 /*------------------------------------------------------------------------- */
-void ksmooth(loopInfo *srcinfo, loopInfo *trgtinfo, float *kernel, int nkernel)
+void ksmooth(loopInfo *srcinfo, loopInfo *trgtinfo, Float *kernel, Int nkernel)
 {
-  int	nx, n2, dataindex, kernelindex, di, ki, npoints, ncalc, np, i, stride;
-  float	sum, norm;
+  Int	nx, n2, dataindex, kernelindex, di, ki, npoints, ncalc, np, i, stride;
+  Float	sum, norm;
   pointer	src, trgt;
 
   src.v = srcinfo->data->v;
@@ -4451,13 +4451,13 @@ void ksmooth(loopInfo *srcinfo, loopInfo *trgtinfo, float *kernel, int nkernel)
   trgtinfo->data->v = trgt.v;
 }
 /*------------------------------------------------------------------------- */
-int ana_ksmooth(int narg, int ps[])
+Int ana_ksmooth(Int narg, Int ps[])
 /* y = KSMOOTH(x, kernel [, axis] [, /BALANCED]) */
 {
   loopInfo	srcinfo, trgtinfo;
   pointer	src, trgt;
-  int	result, iq, nkernel;
-  float	*kernel;
+  Int	result, iq, nkernel;
+  Float	*kernel;
 
   if (!symbolIsNumericalArray(ps[1])) /* <kernel> must be a numerical array */
     return cerror(NEED_NUM_ARR, ps[1]);
@@ -4486,15 +4486,15 @@ int ana_ksmooth(int narg, int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-int ana_crosscorr(int narg, int ps[])
+Int ana_crosscorr(Int narg, Int ps[])
 /* y = CROSSCORR(x1, x2 [,mode]) */
 /* returns the cross-correlation coefficient between <x1> and <x2>, */
 /* along the axis indicated by <mode> (if scalar), or as a function of */
 /* class as specified in <mode> (if an array of the same size as <x1> and */
 /* <x2>).  LS 8apr99 */
 {
-  int	type, outtype, i, iq1, iq2, result, n, save[MAX_DIMS], done;
-  double	meanx, meany, kx, ky, pxy, tempx, tempy;
+  Int	type, outtype, i, iq1, iq2, result, n, save[MAX_DIMS], done;
+  Double	meanx, meany, kx, ky, pxy, tempx, tempy;
   doubleComplex	cmeanx, cmeany, cpxy, ctempx, ctempy;
   pointer	src1, src2, src1save, src2save, trgt;
   loopInfo	srcinfo1, srcinfo2, trgtinfo;
@@ -4544,23 +4544,23 @@ int ana_crosscorr(int narg, int ps[])
     case ANA_BYTE:
       do {
 	meanx = meany = 0.0;
-	memcpy(save, srcinfo1.coords, srcinfo1.ndim*sizeof(int));
+	memcpy(save, srcinfo1.coords, srcinfo1.ndim*sizeof(Int));
 	src1save = src1;
 	src2save = src2;
 	do {
-	  meanx += (double) *src1.b;
-	  meany += (double) *src2.b;
+	  meanx += (Double) *src1.b;
+	  meany += (Double) *src2.b;
 	} while (advanceLoop(&srcinfo2, &src2),
 		 advanceLoop(&srcinfo1, &src1) < srcinfo1.naxes);
-	memcpy(srcinfo1.coords, save, srcinfo1.ndim*sizeof(int));
+	memcpy(srcinfo1.coords, save, srcinfo1.ndim*sizeof(Int));
 	src1 = src1save;
 	src2 = src2save;
 	meanx /= n;
 	meany /= n;
 	pxy = kx = ky = 0.0;
 	do {
-	  tempx = ((double) *src1.b - meanx);
-	  tempy = ((double) *src2.b - meany);
+	  tempx = ((Double) *src1.b - meanx);
+	  tempy = ((Double) *src2.b - meany);
 	  kx += tempx*tempx;
 	  ky += tempy*tempy;
 	  pxy += tempx*tempy;
@@ -4573,23 +4573,23 @@ int ana_crosscorr(int narg, int ps[])
     case ANA_WORD:
       do {
 	meanx = meany = 0.0;
-	memcpy(save, srcinfo1.coords, srcinfo1.ndim*sizeof(int));
+	memcpy(save, srcinfo1.coords, srcinfo1.ndim*sizeof(Int));
 	src1save = src1;
 	src2save = src2;
 	do {
-	  meanx += (double) *src1.w;
-	  meany += (double) *src2.w;
+	  meanx += (Double) *src1.w;
+	  meany += (Double) *src2.w;
 	} while (advanceLoop(&srcinfo2, &src2),
 		 advanceLoop(&srcinfo1, &src1) < srcinfo1.naxes);
-	memcpy(srcinfo1.coords, save, srcinfo1.ndim*sizeof(int));
+	memcpy(srcinfo1.coords, save, srcinfo1.ndim*sizeof(Int));
 	src1 = src1save;
 	src2 = src2save;
 	meanx /= n;
 	meany /= n;
 	pxy = kx = ky = 0.0;
 	do {
-	  tempx = ((double) *src1.w - meanx);
-	  tempy = ((double) *src2.w - meany);
+	  tempx = ((Double) *src1.w - meanx);
+	  tempy = ((Double) *src2.w - meany);
 	  kx += tempx*tempx;
 	  ky += tempy*tempy;
 	  pxy += tempx*tempy;
@@ -4602,23 +4602,23 @@ int ana_crosscorr(int narg, int ps[])
     case ANA_LONG:
       do {
 	meanx = meany = 0.0;
-	memcpy(save, srcinfo1.coords, srcinfo1.ndim*sizeof(int));
+	memcpy(save, srcinfo1.coords, srcinfo1.ndim*sizeof(Int));
 	src1save = src1;
 	src2save = src2;
 	do {
-	  meanx += (double) *src1.l;
-	  meany += (double) *src2.l;
+	  meanx += (Double) *src1.l;
+	  meany += (Double) *src2.l;
 	} while (advanceLoop(&srcinfo2, &src2),
 		 advanceLoop(&srcinfo1, &src1) < srcinfo1.naxes);
-	memcpy(srcinfo1.coords, save, srcinfo1.ndim*sizeof(int));
+	memcpy(srcinfo1.coords, save, srcinfo1.ndim*sizeof(Int));
 	src1 = src1save;
 	src2 = src2save;
 	meanx /= n;
 	meany /= n;
 	pxy = kx = ky = 0.0;
 	do {
-	  tempx = ((double) *src1.l - meanx);
-	  tempy = ((double) *src2.l - meany);
+	  tempx = ((Double) *src1.l - meanx);
+	  tempy = ((Double) *src2.l - meany);
 	  kx += tempx*tempx;
 	  ky += tempy*tempy;
 	  pxy += tempx*tempy;
@@ -4631,23 +4631,23 @@ int ana_crosscorr(int narg, int ps[])
     case ANA_FLOAT:
       do {
 	meanx = meany = 0.0;
-	memcpy(save, srcinfo1.coords, srcinfo1.ndim*sizeof(int));
+	memcpy(save, srcinfo1.coords, srcinfo1.ndim*sizeof(Int));
 	src1save = src1;
 	src2save = src2;
 	do {
-	  meanx += (double) *src1.f;
-	  meany += (double) *src2.f;
+	  meanx += (Double) *src1.f;
+	  meany += (Double) *src2.f;
 	} while (advanceLoop(&srcinfo2, &src2),
 		 advanceLoop(&srcinfo1, &src1) < srcinfo1.naxes);
-	memcpy(srcinfo1.coords, save, srcinfo1.ndim*sizeof(int));
+	memcpy(srcinfo1.coords, save, srcinfo1.ndim*sizeof(Int));
 	src1 = src1save;
 	src2 = src2save;
 	meanx /= n;
 	meany /= n;
 	pxy = kx = ky = 0.0;
 	do {
-	  tempx = ((double) *src1.f - meanx);
-	  tempy = ((double) *src2.f - meany);
+	  tempx = ((Double) *src1.f - meanx);
+	  tempy = ((Double) *src2.f - meany);
 	  kx += tempx*tempx;
 	  ky += tempy*tempy;
 	  pxy += tempx*tempy;
@@ -4660,23 +4660,23 @@ int ana_crosscorr(int narg, int ps[])
     case ANA_DOUBLE:
       do {
 	meanx = meany = 0.0;
-	memcpy(save, srcinfo1.coords, srcinfo1.ndim*sizeof(int));
+	memcpy(save, srcinfo1.coords, srcinfo1.ndim*sizeof(Int));
 	src1save = src1;
 	src2save = src2;
 	do {
-	  meanx += (double) *src1.d;
-	  meany += (double) *src2.d;
+	  meanx += (Double) *src1.d;
+	  meany += (Double) *src2.d;
 	} while (advanceLoop(&srcinfo2, &src2),
 		 advanceLoop(&srcinfo1, &src1) < srcinfo1.naxes);
-	memcpy(srcinfo1.coords, save, srcinfo1.ndim*sizeof(int));
+	memcpy(srcinfo1.coords, save, srcinfo1.ndim*sizeof(Int));
 	src1 = src1save;
 	src2 = src2save;
 	meanx /= n;
 	meany /= n;
 	pxy = kx = ky = 0.0;
 	do {
-	  tempx = ((double) *src1.d - meanx);
-	  tempy = ((double) *src2.d - meany);
+	  tempx = ((Double) *src1.d - meanx);
+	  tempy = ((Double) *src2.d - meany);
 	  kx += tempx*tempx;
 	  ky += tempy*tempy;
 	  pxy += tempx*tempy;
@@ -4689,17 +4689,17 @@ int ana_crosscorr(int narg, int ps[])
     case ANA_CFLOAT:
       do {
 	cmeanx.real = cmeanx.imaginary = cmeany.real = cmeany.imaginary = 0.0;
-	memcpy(save, srcinfo1.coords, srcinfo1.ndim*sizeof(int));
+	memcpy(save, srcinfo1.coords, srcinfo1.ndim*sizeof(Int));
 	src1save = src1;
 	src2save = src2;
 	do {
-	  cmeanx.real += (double) src1.cf->real;
-	  cmeanx.imaginary += (double) src1.cf->imaginary;
-	  cmeany.real += (double) src2.cf->real;
-	  cmeany.imaginary += (double) src2.cf->imaginary;
+	  cmeanx.real += (Double) src1.cf->real;
+	  cmeanx.imaginary += (Double) src1.cf->imaginary;
+	  cmeany.real += (Double) src2.cf->real;
+	  cmeany.imaginary += (Double) src2.cf->imaginary;
 	} while (advanceLoop(&srcinfo2, &src2),
 		 advanceLoop(&srcinfo1, &src1) < srcinfo1.naxes);
-	memcpy(srcinfo1.coords, save, srcinfo1.ndim*sizeof(int));
+	memcpy(srcinfo1.coords, save, srcinfo1.ndim*sizeof(Int));
 	src1 = src1save;
 	src2 = src2save;
 	cmeanx.real /= n;
@@ -4708,10 +4708,10 @@ int ana_crosscorr(int narg, int ps[])
 	cmeany.imaginary /= n;
 	cpxy.real = cpxy.imaginary = kx = ky = 0.0;
 	do {
-	  ctempx.real = ((double) src1.cf->real - cmeanx.real);
-	  ctempy.real = ((double) src2.cf->real - cmeany.real);
-	  ctempx.imaginary = ((double) src1.cf->imaginary - cmeanx.imaginary);
-	  ctempy.imaginary = ((double) src2.cf->imaginary - cmeany.imaginary);
+	  ctempx.real = ((Double) src1.cf->real - cmeanx.real);
+	  ctempy.real = ((Double) src2.cf->real - cmeany.real);
+	  ctempx.imaginary = ((Double) src1.cf->imaginary - cmeanx.imaginary);
+	  ctempy.imaginary = ((Double) src2.cf->imaginary - cmeany.imaginary);
 	  kx += ctempx.real*ctempx.real + ctempx.imaginary*ctempx.imaginary;
 	  ky += ctempy.real*ctempy.real + ctempy.imaginary*ctempy.imaginary;
 	  cpxy.real += ctempx.real*ctempy.real
@@ -4733,17 +4733,17 @@ int ana_crosscorr(int narg, int ps[])
     case ANA_CDOUBLE:
       do {
 	cmeanx.real = cmeanx.imaginary = cmeany.real = cmeany.imaginary = 0.0;
-	memcpy(save, srcinfo1.coords, srcinfo1.ndim*sizeof(int));
+	memcpy(save, srcinfo1.coords, srcinfo1.ndim*sizeof(Int));
 	src1save = src1;
 	src2save = src2;
 	do {
-	  cmeanx.real += (double) src1.cd->real;
-	  cmeanx.imaginary += (double) src1.cd->imaginary;
-	  cmeany.real += (double) src2.cd->real;
-	  cmeany.imaginary += (double) src2.cd->imaginary;
+	  cmeanx.real += (Double) src1.cd->real;
+	  cmeanx.imaginary += (Double) src1.cd->imaginary;
+	  cmeany.real += (Double) src2.cd->real;
+	  cmeany.imaginary += (Double) src2.cd->imaginary;
 	} while (advanceLoop(&srcinfo2, &src2),
 		 advanceLoop(&srcinfo1, &src1) < srcinfo1.naxes);
-	memcpy(srcinfo1.coords, save, srcinfo1.ndim*sizeof(int));
+	memcpy(srcinfo1.coords, save, srcinfo1.ndim*sizeof(Int));
 	src1 = src1save;
 	src2 = src2save;
 	cmeanx.real /= n;
@@ -4752,10 +4752,10 @@ int ana_crosscorr(int narg, int ps[])
 	cmeany.imaginary /= n;
 	cpxy.real = cpxy.imaginary = kx = ky = 0.0;
 	do {
-	  ctempx.real = ((double) src1.cd->real - cmeanx.real);
-	  ctempy.real = ((double) src2.cd->real - cmeany.real);
-	  ctempx.imaginary = ((double) src1.cd->imaginary - cmeanx.imaginary);
-	  ctempy.imaginary = ((double) src2.cd->imaginary - cmeany.imaginary);
+	  ctempx.real = ((Double) src1.cd->real - cmeanx.real);
+	  ctempy.real = ((Double) src2.cd->real - cmeany.real);
+	  ctempx.imaginary = ((Double) src1.cd->imaginary - cmeanx.imaginary);
+	  ctempy.imaginary = ((Double) src2.cd->imaginary - cmeany.imaginary);
 	  kx += ctempx.real*ctempx.real + ctempx.imaginary*ctempx.imaginary;
 	  ky += ctempy.real*ctempy.real + ctempy.imaginary*ctempy.imaginary;
 	  cpxy.real += ctempx.real*ctempy.real
@@ -4778,14 +4778,14 @@ int ana_crosscorr(int narg, int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-void wait_sec(float xq) /* for internal use */
+void wait_sec(Float xq) /* for internal use */
 {
   struct timeval	tval;
 
   xq = MAX(0.0, xq);
-  tval.tv_sec = (unsigned int) xq;
+  tval.tv_sec = (uint32_t) xq;
   xq = (xq - tval.tv_sec) * 1.e6;
-  tval.tv_usec = (unsigned int) xq;
+  tval.tv_usec = (uint32_t) xq;
   select(0, NULL, NULL, NULL,&tval);
 }
 /*------------------------------------------------------------------------- */

@@ -1,5 +1,5 @@
 /* HEADERS */
-#include <float.h>
+#include <Float.h>
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
@@ -9,15 +9,15 @@
 
 #define CURRENT		0	/* current coordinate system */
 #define ORIGINAL	1	/* original coordinate system */
-int	projCoords = CURRENT;
+Int	projCoords = CURRENT;
 
-int rotateProjection(float *projection, float ax, float ay, float az)
+Int rotateProjection(Float *projection, Float ax, Float ay, Float az)
 /* enter rotations over <ax> degrees along the X axis, <ay> degrees */
 /* along the Y axis, and <az> degrees along the Z axis, into projection */
 /* matrix <projection> */
 {
-  float	sx, sy, sz, rot[9], temp[12], *p, *q, *r, cx, cy, cz;
-  int	i, j;
+  Float	sx, sy, sz, rot[9], temp[12], *p, *q, *r, cx, cy, cz;
+  Int	i, j;
 
   /* first calculate sines and cosines */
   ax *= DEG;
@@ -84,27 +84,27 @@ int rotateProjection(float *projection, float ax, float ay, float az)
 }
 
 #define EPS (2)
-int approxeq(const double v1, const double v2)
+Int approxeq(const Double v1, const Double v2)
 {
-  const double d = fabs(v1 - v2);
+  const Double d = fabs(v1 - v2);
   return d <= EPS*DBL_EPSILON*fabs(v1) || d <= EPS*DBL_EPSILON*fabs(v2);
 }
-int approxeqf(const float v1, const float v2)
+Int approxeqf(const Float v1, const Float v2)
 {
-  const float d = fabs(v1 - v2);
+  const Float d = fabs(v1 - v2);
   return d <= EPS*FLT_EPSILON*fabs(v1) || d <= EPS*FLT_EPSILON*fabs(v2)
     || (fabs(v1) < EPS*FLT_EPSILON && fabs(v2) < EPS*FLT_EPSILON
 	&& d < EPS*FLT_EPSILON);
 }
 
-int main(void) {
-  float p[12];
+Int main(void) {
+  Float p[12];
   struct {
-    float p[12];
-    float ax;
-    float ay;
-    float az;
-    float q[12];
+    Float p[12];
+    Float ax;
+    Float ay;
+    Float az;
+    Float q[12];
   } tests[] = {
     { { 1, 0, 0, 0,
 	0, 1, 0, 0,
@@ -128,12 +128,12 @@ int main(void) {
 	1, 0, 0, 0,
 	0, 0, 1, 0 } },
   };
-  int i;
+  Int i;
 
   printf("%d tests\n", sizeof(tests)/sizeof(tests[0]));
   printf("FLT_EPSILON = %g\n", FLT_EPSILON);
   for (i = 0; i < sizeof(tests)/sizeof(tests[0]); i++) {
-    int j;
+    Int j;
     memcpy(p, tests[i].p, sizeof(tests[i].p));
     rotateProjection(p, tests[i].ax, tests[i].ay, tests[i].az);
     for (j = 0; j < 12; j++)

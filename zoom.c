@@ -22,7 +22,7 @@ static char rcsid[] __attribute__ ((unused)) =
 #define BLACK           1
 
 struct Menu {
-  int          n_items;		/* number of menu panes (including title) */
+  Int          n_items;		/* number of menu panes (including title) */
   char         **text;		/* pointer to item strings */
   Window       *window;		/* pointer to item windows */
 };
@@ -31,14 +31,14 @@ typedef        struct Menu     Menu;
 extern Display	*display;
 extern Menu	menu[MAXMENU];
 extern Window	menu_win[], win[];
-extern int	ht[], wd[];
-extern int	fontwidth;
+extern Int	ht[], wd[];
+extern Int	fontwidth;
 
-int	extractNumerical(pointer, pointer, int, int, int *, int *, int, int *),
-  ana_xerase(int, int []);
-void	paint_pane(int, int, int), delete_menu(int);
+Int	extractNumerical(pointer, pointer, Int, Int, Int *, Int *, Int, Int *),
+  ana_xerase(Int, Int []);
+void	paint_pane(Int, Int, Int), delete_menu(Int);
 /*--------------------------------------------------------------------------*/
-void value_string(char *trgt, pointer image, int type, int indx)
+void value_string(char *trgt, pointer image, Int type, Int indx)
 {
   switch (type) {
     case ANA_BYTE:
@@ -68,27 +68,27 @@ enum menuItems { ZOOM_TITLE, ZOOM_MAG, ZOOM_STD, ZOOM_TWO,
 
 #define ZOOM_PROFILE	-1
 
-float	zoom_xc = 0.0, zoom_yc = 0.0, zoom_mag = 0.0;
-double	zoom_clo = 0.0, zoom_chi = 0.0;
-int	zoom_frame = 0;
+Float	zoom_xc = 0.0, zoom_yc = 0.0, zoom_mag = 0.0;
+Double	zoom_clo = 0.0, zoom_chi = 0.0;
+Int	zoom_frame = 0;
 
-int ana_zoom(int narg, int ps[])
+Int ana_zoom(Int narg, Int ps[])
 /* ZOOM,image[,bitmap] */
 {
-  extern int	menu_setup_done, last_wid, threeColors;
+  extern Int	menu_setup_done, last_wid, threeColors;
   extern scalar	lastmin, lastmax;
-  int	createMenu(int num, int x, int y, int nItem, char **item),
-    menu_setup(void), ana_xport(int, int []),
-    tvraw(pointer data, int type, int nx, int ny, float x1, float x2,
-	  float y1, float y2, float sx, float sy, int wid, float *mag,
-	  int mode, double clo, double chi, byte *bitmap1, byte *bitmap2),
-    threecolors(float *, int);
-  int	i, ntext, ndim, *dims, wid, mid, x = 0, y = 0, selected, j, type,
+  Int	createMenu(Int num, Int x, Int y, Int nItem, char **item),
+    menu_setup(void), ana_xport(Int, Int []),
+    tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
+	  Float y1, Float y2, Float sx, Float sy, Int wid, Float *mag,
+	  Int mode, Double clo, Double chi, Byte *bitmap1, Byte *bitmap2),
+    threecolors(Float *, Int);
+  Int	i, ntext, ndim, *dims, wid, mid, x = 0, y = 0, selected, j, type,
     nx, ny, sx, sy, sx0, sy0, ww, hw, nframe, stride, profile = -1,
     step[MAX_DIMS], coords[2*MAX_DIMS], sdims[3],
     axes[2] = {0, 1}, follow = 0, play = 0, loop, offset, mousepos = 1;
-  int	minmax(int *data, int nelem, int type);
-  float	x1, x2, y1, y2, dx, dy, z, colorRange = 1.0;
+  Int	minmax(Int *data, Int nelem, Int type);
+  Float	x1, x2, y1, y2, dx, dy, z, colorRange = 1.0;
   pointer	data, image, bitmapdata1, bitmap1, bitmapdata2,
     bitmap2;
   char	**zoomText,
@@ -109,7 +109,7 @@ int ana_zoom(int narg, int ps[])
 		"Frame:         0",
 		"Value:          ",
 		"Quit            " };
-  char	*eventName(int), *readPane(int menuid, int menu_item, char *query);
+  char	*eventName(Int), *readPane(Int menuid, Int menu_item, char *query);
   XEvent	event;
 
   if (numerical(ps[0], &dims, &ndim, NULL, &data) < 0)
@@ -153,15 +153,15 @@ int ana_zoom(int narg, int ps[])
       || zoom_yc >= ny) {
     zoom_xc = 0.5*nx;
     zoom_yc = 0.5*ny;
-    zoom_mag = (int) ((2*sx)/nx);
-    i = (int) ((2*sy)/ny);
+    zoom_mag = (Int) ((2*sx)/nx);
+    i = (Int) ((2*sy)/ny);
     if (i < zoom_mag)
       zoom_mag = i;
     if (!zoom_mag)
     zoom_mag = 1.0;
   } else if (zoom_mag <= 0.0) {
-    zoom_mag = (int) ((2*sx)/nx);
-    i = (int) ((2*sy)/ny);
+    zoom_mag = (Int) ((2*sx)/nx);
+    i = (Int) ((2*sy)/ny);
     if (i < zoom_mag)
       zoom_mag = i;
     if (!zoom_mag)
@@ -503,7 +503,7 @@ int ana_zoom(int narg, int ps[])
 		  paint_pane(mid, ZOOM_MAG, WHITE);
 		  break;
 		case ZOOM_TWO:	/* zoom in/out by a factor of 2 */
-		  z = (float) event.xbutton.x/((float) fontwidth);
+		  z = (Float) event.xbutton.x/((Float) fontwidth);
 		  if (z < 10.5) {	/* zoom in */
 		    x1 = zoom_xc - sx/zoom_mag;
 		    x2 = zoom_xc + sx/zoom_mag;
@@ -576,24 +576,24 @@ int ana_zoom(int narg, int ps[])
 		    minmax(image.l, nx*ny, type);
 		    switch (type) {
 		      case ANA_BYTE:
-			zoom_clo = (double) lastmin.b;
-			zoom_chi = (double) lastmax.b;
+			zoom_clo = (Double) lastmin.b;
+			zoom_chi = (Double) lastmax.b;
 			break;
 		      case ANA_WORD:
-			zoom_clo = (double) lastmin.w;
-			zoom_chi = (double) lastmax.w;
+			zoom_clo = (Double) lastmin.w;
+			zoom_chi = (Double) lastmax.w;
 			break;
 		      case ANA_LONG:
-			zoom_clo = (double) lastmin.l;
-			zoom_chi = (double) lastmax.l;
+			zoom_clo = (Double) lastmin.l;
+			zoom_chi = (Double) lastmax.l;
 			break;
 		      case ANA_FLOAT:
-			zoom_clo = (double) lastmin.f;
-			zoom_chi = (double) lastmax.f;
+			zoom_clo = (Double) lastmin.f;
+			zoom_chi = (Double) lastmax.f;
 			break;
 		      case ANA_DOUBLE:
-			zoom_clo = (double) lastmin.d;
-			zoom_chi = (double) lastmax.d;
+			zoom_clo = (Double) lastmin.d;
+			zoom_chi = (Double) lastmax.d;
 			break;
 		    }
 		  } else
@@ -931,17 +931,17 @@ int ana_zoom(int narg, int ps[])
   } while (1);
 }
 /*--------------------------------------------------------------------------*/
-int tvzoom(int narg, int ps[])
+Int tvzoom(Int narg, Int ps[])
 {
-  int	*dims, ndim, axes[2] = {0, 1}, sdims[3], nx, ny, wid;
-  int	coords[4], offset, type, sx, sy, i, stride, step[2];
-  extern int	last_wid;
-  int	tvraw(pointer data, int type, int nx, int ny, float x1, float x2,
-	      float y1, float y2, float sx, float sy, int wid, float *mag,
-	      int mode, double clo, double chi, byte *bitmap1, byte *bitmap2);
+  Int	*dims, ndim, axes[2] = {0, 1}, sdims[3], nx, ny, wid;
+  Int	coords[4], offset, type, sx, sy, i, stride, step[2];
+  extern Int	last_wid;
+  Int	tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
+	      Float y1, Float y2, Float sx, Float sy, Int wid, Float *mag,
+	      Int mode, Double clo, Double chi, Byte *bitmap1, Byte *bitmap2);
 
   pointer	data, image, bitmapdata, bitmap;
-  float	x1, x2, y1, y2;
+  Float	x1, x2, y1, y2;
 
   if (numerical(ps[0], &dims, &ndim, NULL, &data) < 0)
     return ANA_ERROR;
@@ -974,15 +974,15 @@ int tvzoom(int narg, int ps[])
       || zoom_yc >= ny) {
     zoom_xc = 0.5*nx;
     zoom_yc = 0.5*ny;
-    zoom_mag = (int) ((2*sx)/nx);
-    i = (int) ((2*sy)/ny);
+    zoom_mag = (Int) ((2*sx)/nx);
+    i = (Int) ((2*sy)/ny);
     if (i < zoom_mag)
       zoom_mag = i;
     if (!zoom_mag)
     zoom_mag = 1.0;
   } else if (zoom_mag <= 0.0) {
-    zoom_mag = (int) ((2*sx)/nx);
-    i = (int) ((2*sy)/ny);
+    zoom_mag = (Int) ((2*sx)/nx);
+    i = (Int) ((2*sy)/ny);
     if (i < zoom_mag)
       zoom_mag = i;
     if (!zoom_mag)

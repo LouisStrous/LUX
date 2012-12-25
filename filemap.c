@@ -13,11 +13,11 @@ static char rcsid[] __attribute__ ((unused)) =
  "$Id: filemap.c,v 4.2 2001/02/08 19:36:43 strous Exp $";
 
 /*-------------------------------------------------------------------------*/
-int filemap(int type, int narg, int ps[])
+Int filemap(Int type, Int narg, Int ps[])
 /* Create a file map symbol (file array) and stores array structure,
    file name and offset */
 {
- int	iq, ndim, dims[8], mq, get_dims(int *, int *, int *);
+ Int	iq, ndim, dims[8], mq, get_dims(Int *, Int *, Int *);
  char	*p;
 
  iq = ps[1];				/* file name */
@@ -36,7 +36,7 @@ int filemap(int type, int narg, int ps[])
  symbol_context(iq) = -1;	/* ? */
  symbol_line(iq) = curLineNumber;
 					/* memory requirement */
- mq = sizeof(array) + sizeof(int)*(*ps != 0) + strlen(p) + 1;
+ mq = sizeof(array) + sizeof(Int)*(*ps != 0) + strlen(p) + 1;
  symbol_memory(iq) = mq;
 /* allocate((char *) file_map_header(iq), mq, char); */
  allocate(file_map_header(iq), mq, char); 
@@ -47,7 +47,7 @@ int filemap(int type, int narg, int ps[])
  if (internalMode & 2)		/* /SWAP */
    set_file_map_swap(iq);
  file_map_num_dims(iq) = ndim;
- memcpy(file_map_dims(iq), dims, ndim*sizeof(int)); /* copy dimensions */
+ memcpy(file_map_dims(iq), dims, ndim*sizeof(Int)); /* copy dimensions */
  if (*ps) {
    set_file_map_has_offset(iq);
    file_map_offset(iq) = int_arg(*ps);
@@ -56,40 +56,40 @@ int filemap(int type, int narg, int ps[])
  return iq;
 }
 /*-------------------------------------------------------------------------*/
-int bytfarr(int narg, int ps[])
+Int bytfarr(Int narg, Int ps[])
 /* Create a ANA_BYTE file array (file map) */
 { return filemap(ANA_BYTE, narg, ps); }
 /*-------------------------------------------------------------------------*/
-int intfarr(int narg, int ps[])
+Int intfarr(Int narg, Int ps[])
 /* Create a ANA_WORD file array (file map) */
 { return filemap(ANA_WORD, narg, ps); }
 /*-------------------------------------------------------------------------*/
-int lonfarr(int narg, int ps[])
+Int lonfarr(Int narg, Int ps[])
 /* Create a ANA_LONG file array (file map) */
 { return filemap(ANA_LONG, narg, ps); }
 /*-------------------------------------------------------------------------*/
-int fltfarr(int narg, int ps[])
+Int fltfarr(Int narg, Int ps[])
 /* Create a ANA_FLOAT file array (file map) */
 { return filemap(ANA_FLOAT, narg, ps); }
 /*-------------------------------------------------------------------------*/
-int dblfarr(int narg, int ps[])
+Int dblfarr(Int narg, Int ps[])
 /* Create a ANA_DOUBLE file array (file map) */
 { return filemap(ANA_DOUBLE, narg, ps); }
 /*-------------------------------------------------------------------------*/
-int cfltfarr(int narg, int ps[])
+Int cfltfarr(Int narg, Int ps[])
 /* Create a ANA_CFLOAT file array (file map) */
 { return filemap(ANA_CFLOAT, narg, ps); }
 /*-------------------------------------------------------------------------*/
-int cdblfarr(int narg, int ps[])
+Int cdblfarr(Int narg, Int ps[])
 /* Create a ANA_CDOUBLE file array (file map) */
 { return filemap(ANA_CDOUBLE, narg, ps); }
 /*-------------------------------------------------------------------------*/
-int ana_i_file_output(FILE *fp, pointer q, int assoctype,
- int offsym, int dsize, int fsize, int baseOffset)
+Int ana_i_file_output(FILE *fp, pointer q, Int assoctype,
+ Int offsym, Int dsize, Int fsize, Int baseOffset)
 /* use a file array as a guide to writing into a file, and an
  index array as a guide to the positions where to write */
 {
-  int	*qi, error = 0, size, dindx, i;
+  Int	*qi, error = 0, size, dindx, i;
   array	*h;
 
   if (sym[offsym].type != ANA_LONG)
@@ -131,14 +131,14 @@ int ana_i_file_output(FILE *fp, pointer q, int assoctype,
   return 1;
 }
 /*------------------------------------------------------------------------- */
-int ana_file_output(int iq, int jq, int offsym, int axsym)
+Int ana_file_output(Int iq, Int jq, Int offsym, Int axsym)
      /* use a file array as a guide to writing into a file */
      /* iq is sym # of file array, jq is rhs sym with data */
 {
- int    ddat, *dat, dfile, *file, daxes, *axes, doff, *off, offset;
- int    i, dattype, assoctype, ystep[MAX_DIMS], rstep[MAX_DIMS],
+ Int    ddat, *dat, dfile, *file, daxes, *axes, doff, *off, offset;
+ Int    i, dattype, assoctype, ystep[MAX_DIMS], rstep[MAX_DIMS],
 	tally[MAX_DIMS], done;
- int    efile, n, *step, baseOffset;
+ Int    efile, n, *step, baseOffset;
  pointer       q;
  FILE   *fp;
  char	*fname;
@@ -282,15 +282,15 @@ int ana_file_output(int iq, int jq, int offsym, int axsym)
  return 1;
 }
 /*------------------------------------------------------------------------- */
-int ana_fzarr(int narg, int ps[])
+Int ana_fzarr(Int narg, Int ps[])
 /* FZARR(name) returns a file array symbol appropriate for an */
 /* uncompressed FZ file. */
 {
   char	*name, *p;
-  int	wwflag, iq, mq;
+  Int	wwflag, iq, mq;
   FILE	*fp;
   fzHead	*fh;
-  int	ck_synch_hd(FILE *, fzHead *, char **, int *);
+  Int	ck_synch_hd(FILE *, fzHead *, char **, Int *);
 
   if (symbol_class(*ps) != ANA_STRING)
     return cerror(NEED_STR, *ps);
@@ -311,7 +311,7 @@ int ana_fzarr(int narg, int ps[])
   symbol_context(iq) = -1;	/* ? */
   symbol_line(iq) = curLineNumber;
 					/* memory requirement */
-  mq = sizeof(array) + sizeof(int) + strlen(name) + 1;
+  mq = sizeof(array) + sizeof(Int) + strlen(name) + 1;
   symbol_memory(iq) = mq;
   allocate(file_map_header(iq), mq, char); 
   if (internalMode & 1)
@@ -320,7 +320,7 @@ int ana_fzarr(int narg, int ps[])
   set_file_map_has_offset(iq);	/* offset will be specified */
 
    /* copy dimensions */
-  memcpy(file_map_dims(iq), fh->dim, fh->ndim*sizeof(int));
+  memcpy(file_map_dims(iq), fh->dim, fh->ndim*sizeof(Int));
   file_map_offset(iq) = 512*fh->nhb; /* offset */
   strcpy(file_map_file_name(iq), name); /* copy file name */
   return iq;

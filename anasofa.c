@@ -175,17 +175,17 @@ BIND(iauC2txy, v_dT8dp3_iDaT5rDp3p3q_0zzz1T5, f, IAUC2TXY, 5, 5, NULL)
    dimension (year, month, day).  Unexpected results may be given if
    illegal year, month, or day numbers are specified.  Dates before
    -4799-01-01 or after 1465073-02-28 are rejected. */
-int ana_iauCal2jd(int narg, int ps[])
+Int ana_iauCal2jd(Int narg, Int ps[])
 {
-  double djm0, djm;
+  Double djm0, djm;
   pointer *ptrs;
   loopInfo *infos;
-  int iq;
+  Int iq;
 
   if ((iq = standard_args(narg, ps, "i>L3*;r>L-3*", &ptrs, &infos)) < 0)
     return ANA_ERROR;
 
-  /* iauCal2jd(int iy, int im, int id, double *djm0, double *djm) */
+  /* iauCal2jd(Int iy, Int im, Int id, Double *djm0, Double *djm) */
   switch (infos[0].type) {
   case ANA_LONG:
     while (infos[1].nelem--) {
@@ -199,9 +199,9 @@ int ana_iauCal2jd(int narg, int ps[])
     break;
   case ANA_FLOAT:
     while (infos[1].nelem--) {
-      int day = floor(ptrs[0].f[2]);
-      double daypart = ptrs[0].f[2] - day;
-      if (iauCal2jd((int) ptrs[0].f[0], (int) ptrs[0].f[1], day, &djm0, &djm))
+      Int day = floor(ptrs[0].f[2]);
+      Double daypart = ptrs[0].f[2] - day;
+      if (iauCal2jd((Int) ptrs[0].f[0], (Int) ptrs[0].f[1], day, &djm0, &djm))
         *ptrs[1].f = 0;
       else
         *ptrs[1].f = djm0 + djm + daypart;
@@ -211,9 +211,9 @@ int ana_iauCal2jd(int narg, int ps[])
     break;
   case ANA_DOUBLE:
     while (infos[1].nelem--) {
-      int day = floor(ptrs[0].d[2]);
-      double daypart = ptrs[0].d[2] - day;
-      if (iauCal2jd((int) ptrs[0].d[0], (int) ptrs[0].d[1], day, &djm0, &djm))
+      Int day = floor(ptrs[0].d[2]);
+      Double daypart = ptrs[0].d[2] - day;
+      if (iauCal2jd((Int) ptrs[0].d[0], (Int) ptrs[0].d[1], day, &djm0, &djm))
         *ptrs[1].d = 0;
       else
         *ptrs[1].d = 2400000.5 + djm + daypart;
@@ -230,26 +230,26 @@ REGISTER(iauCal2jd, f, IAUCAL2JD, 1, 1, NULL);
 /*-----------------------------------------------------------------------*/
 /* IAUDAT(date) returns delta(AT) = TAI - UTC for the given UTC date
    ([year, month, day]) */
-int ana_iauDat(int narg, int ps[])
+Int ana_iauDat(Int narg, Int ps[])
 {
   pointer *ptrs;
   loopInfo *infos;
-  int iq;
+  Int iq;
 
   if (internalMode & 1) {       /* /VALID */
     time_t t;
-    int jdlo, jdhi, y, m, d;
-    double f, dt;
+    Int jdlo, jdhi, y, m, d;
+    Double f, dt;
 
     /* determine the last date of validity of the current implementation */
 
     jdlo = 2441318;         /* 1972-01-01 */
     t = time(NULL);
-    jdhi = (double) t/86400.0 + 2440587.5 + 10000;
+    jdhi = (Double) t/86400.0 + 2440587.5 + 10000;
     iauJd2cal(jdlo, 0.0, &y, &m, &d, &f);
     iauJd2cal(jdhi, 0.0, &y, &m, &d, &f);
     do {
-      int jd, s;
+      Int jd, s;
       jd = (jdhi + jdlo)/2;
       iauJd2cal(jd, 0.0, &y, &m, &d, &f);
       s = iauDat(y, m, d, f, &dt);
@@ -276,17 +276,17 @@ int ana_iauDat(int narg, int ps[])
       break;
     case ANA_FLOAT:
       while (infos[1].nelem--) {
-        int d = (int) floor(ptrs[0].f[2]);
-        double f = ptrs[0].f[2] - d;
-        iauDat((int) ptrs[0].f[0], (int) ptrs[0].f[1], d, f, ptrs[1].d++);
+        Int d = (Int) floor(ptrs[0].f[2]);
+        Double f = ptrs[0].f[2] - d;
+        iauDat((Int) ptrs[0].f[0], (Int) ptrs[0].f[1], d, f, ptrs[1].d++);
         ptrs[0].f += 3;
       }
       break;
     case ANA_DOUBLE:
       while (infos[1].nelem--) {
-        int d = (int) floor(ptrs[0].d[2]);
-        double f = ptrs[0].d[2] - d;
-        iauDat((int) ptrs[0].d[0], (int) ptrs[0].d[1], d, f, ptrs[1].d++);
+        Int d = (Int) floor(ptrs[0].d[2]);
+        Double f = ptrs[0].d[2] - d;
+        iauDat((Int) ptrs[0].d[0], (Int) ptrs[0].d[1], d, f, ptrs[1].d++);
         ptrs[0].d += 3;
       }
       break;
@@ -368,16 +368,16 @@ BIND(iauEpb, d_dd_iLarDq_0z_1, f, IAUEPB, 1, 1, NULL)
 
    Returns the Julian Date corresponding to Besselian epoch <bepoch>
    (e.g., 1957.3). */
-int ana_iauEpb2jd(int narg, int ps[])
+Int ana_iauEpb2jd(Int narg, Int ps[])
 {
   pointer *ptrs;
   loopInfo *infos;
-  int iq;
+  Int iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;rD&", &ptrs, &infos)) < 0)
     return ANA_ERROR;
   while (infos[0].nelem--) {
-    double djm0, djm;
+    Double djm0, djm;
     
     iauEpb2jd(*ptrs[0].d++, &djm0, &djm);
     *ptrs[1].d++ = djm0 + djm;
@@ -395,16 +395,16 @@ BIND(iauEpj, d_dd_iLarDq_0z_1, f, IAUEPJ, 1, 1, NULL)
 
    Returns the Julian Date corresponding to Julian epoch <bepoch>
    (e.g., 1957.3). */
-int ana_iauEpj2jd(int narg, int ps[])
+Int ana_iauEpj2jd(Int narg, Int ps[])
 {
   pointer *ptrs;
   loopInfo *infos;
-  int iq;
+  Int iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;rD*", &ptrs, &infos)) < 0)
     return ANA_ERROR;
   while (infos[0].nelem--) {
-    double djm0, djm;
+    Double djm0, djm;
     
     iauEpj2jd(*ptrs[0].d++, &djm0, &djm);
     *ptrs[1].d++ = djm0 + djm;
@@ -1035,7 +1035,7 @@ BIND(iauPxp, v_dT3d3_iD3DcqrDcq_0T2, f, IAUPXP, 2, 2, NULL)
    The rotation vector has the same direction as the Euler axis of
    matrix <r> and has its magnitude equal to the rotation angle in
    radians of the rotation matrix. */
-/* void iauRm2v(double r[3][3], double [3]) */
+/* void iauRm2v(Double r[3][3], Double [3]) */
 BIND(iauRm2v, v_dp3dp_iD33arDm3q_01, f, IAURM2V, 1, 1, NULL)
 /*-----------------------------------------------------------------------*/
 /* IAURXP(<r>, <p>)

@@ -17,15 +17,15 @@
 /* 3rd-degree polynomial evaluation (modulo) */
 #define mpol3(a0,a1,a2,a3,t,n) (fmod(a0 + t*(a1 + t*(a2 + t*a3)),n))
 
-static double	solar_stuff;
-void solar_physical(double jd, int select)
+static Double	solar_stuff;
+void solar_physical(Double jd, Int select)
 /* from J. Meeus: Astronomical Algorithms, Willman-Bell, ISBN 0-943396-35-2, */
 /* chapter 28 */
 /* /MODERN (internalMode & 2): corrections from P. Giles (Ph.D. thesis, */
 /* Stanford University) */
 {
-  double	l, m, e, c, T, o, l2, eps, x, y, k, i, theta, r, l0, theta0;
-  double	JDE(double);
+  Double	l, m, e, c, T, o, l2, eps, x, y, k, i, theta, r, l0, theta0;
+  Double	JDE(Double);
 
   i = ((internalMode & 2)? 7.16: 7.25)*DEG;
   k = (((internalMode & 2)? 73.49: 73 + 4.0/6) + 1.3958333*(jd - 2396758.0)/36525.0)*DEG;
@@ -81,10 +81,10 @@ void solar_physical(double jd, int select)
   }
 }
 /*------------------------------------------------------------------------*/
-int ana_solar_physical(int narg, int ps[], int select)
+Int ana_solar_physical(Int narg, Int ps[], Int select)
 /* LS < 1998 */
 {
-  int	n, result;
+  Int	n, result;
   pointer	src, trgt;
 
   /* get copy of ps[0] upgraded to ANA_FLOAT if necessary, return pointer
@@ -97,8 +97,8 @@ int ana_solar_physical(int narg, int ps[], int select)
   switch (symbol_type(result)) {
     case ANA_FLOAT:
       while (n--) {
-	solar_physical((double) *src.f++, select);
-	*trgt.f++ = (float) solar_stuff;
+	solar_physical((Double) *src.f++, select);
+	*trgt.f++ = (Float) solar_stuff;
       }
       break;
     case ANA_DOUBLE:
@@ -111,22 +111,22 @@ int ana_solar_physical(int narg, int ps[], int select)
   return result;
 }
 /*------------------------------------------------------------------------*/
-int ana_solar_p(int narg, int ps[])
+Int ana_solar_p(Int narg, Int ps[])
 {
   return ana_solar_physical(narg, ps, 0);
 }
 /*------------------------------------------------------------------------*/
-int ana_solar_b(int narg, int ps[])
+Int ana_solar_b(Int narg, Int ps[])
 {
   return ana_solar_physical(narg, ps, 1);
 }
 /*------------------------------------------------------------------------*/
-int ana_solar_l(int narg, int ps[])
+Int ana_solar_l(Int narg, Int ps[])
 {
   return ana_solar_physical(narg, ps, (internalMode & 1)? 4: 2);
 }
 /*------------------------------------------------------------------------*/
-int ana_solar_r(int narg, int ps[])
+Int ana_solar_r(Int narg, Int ps[])
 {
   return ana_solar_physical(narg, ps, 3);
 }

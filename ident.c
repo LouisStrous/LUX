@@ -11,11 +11,11 @@ char	*fmt_integer, *fmt_float, *fmt_string, *fmt_complex, *fmt_time;
 FILE	*outputStream;
 
 /*-------------------------------------------------------------------*/
-char *symbolProperName(int symbol)
+char *symbolProperName(Int symbol)
 /* returns the proper name of the symbol, if any, or NULL */
 {
   hashTableEntry	**hashTable, *hp;
-  int	hashValue;
+  Int	hashValue;
 
   if (symbol < 0 || symbol >= NAMED_END) /* out of range */
     return NULL;
@@ -46,7 +46,7 @@ char *symbolProperName(int symbol)
   return NULL;			/* did not find it */
 }
 /*---------------------------------------------------------------------*/
-int fmt_entry(formatInfo *fmi)
+Int fmt_entry(formatInfo *fmi)
 /* finds the next format entry in format string <fmi->current> and returns
    information in other members of <fmi>.  These members are:
 
@@ -82,7 +82,7 @@ int fmt_entry(formatInfo *fmi)
 
   */
 {
-  int	type, k;
+  Int	type, k;
   char	*p, *p2;
 
   if (!fmi->current || !*fmi->current) { /* no format */
@@ -120,7 +120,7 @@ int fmt_entry(formatInfo *fmi)
   type = FMT_PLAIN;		/* default */
   fmi->flags = 0;
   if (*p == '%' && p[1] != '%' && p[1] != ')') { /* a format specification */
-    byte done = 0;
+    Byte done = 0;
     p++;			/* skip the initial % */
     
     /* service any modifier */
@@ -157,7 +157,7 @@ int fmt_entry(formatInfo *fmi)
       }
     } while (!done);
 
-    if (isdigit((byte) *p))
+    if (isdigit((Byte) *p))
       fmi->width = strtol(p, &p, 10); /* find & skip the number */
     else
       fmi->width = -1;		/* no explicit width */
@@ -229,9 +229,9 @@ int fmt_entry(formatInfo *fmi)
 
     /* look for a repeat count */
     fmi->count = -1;		/* default */
-    if (isdigit((byte) *p)) {	/* maybe a repeat count */
+    if (isdigit((Byte) *p)) {	/* maybe a repeat count */
       p2 = p + 1;
-      while (isdigit((byte) *p2))
+      while (isdigit((Byte) *p2))
 	p2++;
       if (*p2 == '#') {		/* yes, a repeat count */
 	fmi->count = strtol(p, &p, 10);
@@ -267,7 +267,7 @@ int fmt_entry(formatInfo *fmi)
     if (fmi->group_count[fmi->active_group] == -1) {
       /* we don't have a repeat count for this grouping yet */
       fmi->group_count[fmi->active_group] = 1;/* default */
-      if (isdigit((byte) *p)) { /* may be a repeat count */
+      if (isdigit((Byte) *p)) { /* may be a repeat count */
 	p2 = p;
 	k = strtol(p2, &p2, 10);
 	if (*p2 == '#')  	/* yes, it's a repeat count */
@@ -347,7 +347,7 @@ char *fmttok(char *format)
   return fmi->start;
 }
 /*---------------------------------------------------------------------*/
-int Sprintf_general(char *str, char *format, va_list ap)
+Int Sprintf_general(char *str, char *format, va_list ap)
 /* prints the first argument into a string at <str> under guidance of
    the format specification in <format>.
    Only one argument is serviced, and only the first % entry is
@@ -355,8 +355,8 @@ int Sprintf_general(char *str, char *format, va_list ap)
 /* Sprintf does not attempt to write into <format>. */
 {
   static formatInfo	ownfmi, *fmi;
-  int	width, n;
-  double	d, d2;
+  Int	width, n;
+  Double	d, d2;
   char	*p;
   static char	tmp[20];
 
@@ -416,9 +416,9 @@ int Sprintf_general(char *str, char *format, va_list ap)
     break;
   case 'z':			/* complex number */
     /* for complex numbers, the real and imaginary parts must be specified
-       as separate (double) arguments */
-    d = va_arg(ap, double);	/* the real part */
-    d2 = va_arg(ap, double); /* the imaginary part */
+       as separate (Double) arguments */
+    d = va_arg(ap, Double);	/* the real part */
+    d2 = va_arg(ap, Double); /* the imaginary part */
     sprintf(str, tmp, d, d2, &n);
     if (n < width) {
       memmove(str + (width - n), str, n + 1);
@@ -438,14 +438,14 @@ int Sprintf_general(char *str, char *format, va_list ap)
   return n;
 }
 /*---------------------------------------------------------------------*/
-int Sprintf_tok(char *str, ...)
+Int Sprintf_tok(char *str, ...)
 /* prints the first argument into a string at <str> under guidance of
    the format specification currently installed through fmttok().
    Only one argument is serviced, and only the first % entry is
    recognized: everything else is printed as plain text.  LS 16nove98 */
 {
   va_list	ap;
-  int	n;
+  Int	n;
 
   va_start(ap, str);
   n = Sprintf_general(str, NULL, ap);
@@ -453,7 +453,7 @@ int Sprintf_tok(char *str, ...)
   return n;
 }
 /*---------------------------------------------------------------------*/
-int Sprintf(char *str, char *format, ...)
+Int Sprintf(char *str, char *format, ...)
 /* prints the first argument into a string at <str> under guidance of
    the format specification in <format>.
    Only one argument is serviced, and only the first % entry is
@@ -461,7 +461,7 @@ int Sprintf(char *str, char *format, ...)
 /* Sprintf does not attempt to write into <format>. */
 {
   va_list	ap;
-  int	n;
+  Int	n;
 
   va_start(ap, format);
   n = Sprintf_general(str, format, ap);
@@ -469,7 +469,7 @@ int Sprintf(char *str, char *format, ...)
   return n;
 }
 /*---------------------------------------------------------------------*/
-char *symbolIdent(int symbol, int mode)
+char *symbolIdent(Int symbol, Int mode)
 /* assembles a string identifying symbol <iq>, depending on <mode>, at
    curScrat, and returns curScrat. 
    modes:
@@ -491,7 +491,7 @@ char *symbolIdent(int symbol, int mode)
 {
   char	*save, *p, *scalarIndicator = "bw\0\0d", *name;
   scalar	number;
-  int	i, j, n, m;
+  Int	i, j, n, m;
   pointer	ptr;
   listElem	*sptr;
   enumElem	*eptr;
@@ -499,11 +499,11 @@ char *symbolIdent(int symbol, int mode)
   structElem	*se;
   structPtr	*spe;
   structPtrMember	*spm;
-  word	*arg;
-  extern int	fileLevel, errorSym;
+  Word	*arg;
+  extern Int	fileLevel, errorSym;
   extern char	*errorPtr;
-  static int	indent = 0;
-  int	identStruct(structElem *);
+  static Int	indent = 0;
+  Int	identStruct(structElem *);
   
   save = curScrat;
 
@@ -597,13 +597,13 @@ char *symbolIdent(int symbol, int mode)
     case ANA_SCALAR: case ANA_FIXED_NUMBER:
       switch (scalar_type(symbol)) {
 	case ANA_BYTE:
-	  number.l = (int) scalar_value(symbol).b;
+	  number.l = (Int) scalar_value(symbol).b;
 	  break;
 	case ANA_WORD:
-	  number.l = (int) scalar_value(symbol).w;
+	  number.l = (Int) scalar_value(symbol).w;
 	  break;
 	case ANA_LONG:
-	  number.l = (int) scalar_value(symbol).l;
+	  number.l = (Int) scalar_value(symbol).l;
 	  break;
 	case ANA_FLOAT:
 	  number.d = scalar_value(symbol).f;
@@ -638,10 +638,10 @@ char *symbolIdent(int symbol, int mode)
       ptr.cf = complex_scalar_data(symbol).cf;
       if (complex_scalar_type(symbol) == ANA_CFLOAT) {
 	if (ptr.cf->real == 0.0)
-	  sprintf(curScrat, "(%g", (double) ptr.cf->imaginary);
+	  sprintf(curScrat, "(%g", (Double) ptr.cf->imaginary);
 	else
-	  sprintf(curScrat, "(%g+%g", (double) ptr.cf->real,
-		  (double) ptr.cf->imaginary);
+	  sprintf(curScrat, "(%g+%g", (Double) ptr.cf->real,
+		  (Double) ptr.cf->imaginary);
       } else {
 	if (ptr.cd->real == 0.0)
 	  sprintf(curScrat, "(%g", ptr.cd->imaginary);
@@ -740,7 +740,7 @@ char *symbolIdent(int symbol, int mode)
       switch (array_type(symbol)) {
 	case ANA_BYTE:
 	  while (j--) {
-	    sprintf(curScrat, "%d", (int) *ptr.b++);
+	    sprintf(curScrat, "%d", (Int) *ptr.b++);
 	    curScrat += strlen(curScrat);
 	    if (j || i)
 	      strcpy(curScrat++, ",");
@@ -748,7 +748,7 @@ char *symbolIdent(int symbol, int mode)
 	  break;
 	case ANA_WORD:
 	  while (j--) {
-	    sprintf(curScrat, "%d", (int) *ptr.w++);
+	    sprintf(curScrat, "%d", (Int) *ptr.w++);
 	    curScrat += strlen(curScrat);
 	    if (j || i)
 	      strcpy(curScrat++, ",");
@@ -764,7 +764,7 @@ char *symbolIdent(int symbol, int mode)
 	  break;
 	case ANA_FLOAT:
 	  while (j--) {
-	    sprintf(curScrat, "%g", (double) *ptr.f++);
+	    sprintf(curScrat, "%g", (Double) *ptr.f++);
 	    curScrat += strlen(curScrat);
 	    if (j || i)
 	      strcpy(curScrat++, ",");
@@ -887,10 +887,10 @@ char *symbolIdent(int symbol, int mode)
     case ANA_SCAL_PTR:
       switch (scal_ptr_type(symbol)) {
 	case ANA_BYTE:
-	  number.l = (int) *scal_ptr_pointer(symbol).b;
+	  number.l = (Int) *scal_ptr_pointer(symbol).b;
 	  break;
 	case ANA_WORD:
-	  number.l = (int) *scal_ptr_pointer(symbol).w;
+	  number.l = (Int) *scal_ptr_pointer(symbol).w;
 	  break;
 	case ANA_LONG:
 	  number.l = *scal_ptr_pointer(symbol).l;
@@ -899,7 +899,7 @@ char *symbolIdent(int symbol, int mode)
 	  number.f = *scal_ptr_pointer(symbol).f;
 	  break;
 	case ANA_DOUBLE:
-	  number.f = (float) *scal_ptr_pointer(symbol).d;
+	  number.f = (Float) *scal_ptr_pointer(symbol).d;
 	  break;
 	case ANA_TEMP_STRING:
 	  strcpy(curScrat, scal_ptr_pointer(symbol).s);
@@ -908,7 +908,7 @@ char *symbolIdent(int symbol, int mode)
       }
       if (scal_ptr_type(symbol) < ANA_FLOAT) /* integer type */
 	sprintf(curScrat, "%d", number.l);
-      else if (scal_ptr_type(symbol) <= ANA_DOUBLE) /* float type */
+      else if (scal_ptr_type(symbol) <= ANA_DOUBLE) /* Float type */
 	sprintf(curScrat, "%g", number.f);
       break;
     case ANA_SUBSC_PTR:
@@ -1897,9 +1897,9 @@ char *symbolIdent(int symbol, int mode)
   return curScrat;
 }
 /*---------------------------------------------------------------------*/
-int identStruct(structElem *se)
+Int identStruct(structElem *se)
 {
-  int	n, nelem, ndim, *dims, ndim2, *dims2;
+  Int	n, nelem, ndim, *dims, ndim2, *dims2;
   char	*arrName[] = {
     "BYTARR", "INTARR", "LONARR", "FLTARR", "DBLARR", "STRARR",
     "STRARR", "STRARR", "CFLTARR", "CDBLARR"
@@ -1966,11 +1966,11 @@ int identStruct(structElem *se)
   return 1;
 }
 /*---------------------------------------------------------------------*/
-void dumpTree(int symbol)
+void dumpTree(Int symbol)
 {
-  int	kind, i, n, *l;
-  word	*ptr;
-  static int	indent = 0;
+  Int	kind, i, n, *l;
+  Word	*ptr;
+  static Int	indent = 0;
   extern char *binOpName[];
   char	*name, noName[] = "-", **sp;
   extractSec	*eptr;
@@ -2455,20 +2455,20 @@ void dumpTree(int symbol)
   return;
 }
 /*------------------------------------------------------------------------- */
-void dumpLine(int symbol)
+void dumpLine(Int symbol)
 {
   while (symbol_context(symbol) > 0)
     symbol = symbol_context(symbol);
   dumpTree(symbol);
 }
 /*------------------------------------------------------------------------- */
-int ana_list(int narg, int ps[])
+Int ana_list(Int narg, Int ps[])
 /* shows the definition of a user-defined subroutine, function,
    or block routine */
 /* LIST,symbol  or  LIST,'name'  lists the definition of the given symbol
  or of the routine with the given name.  */
 {
-  int	symbol;
+  Int	symbol;
   char	*name, *p;
 
   switch (symbol_class(ps[0])) {

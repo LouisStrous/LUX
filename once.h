@@ -7,7 +7,7 @@
    0x04 may appear at start of identifier A-Z ! $ #
    0x08 may appear in identifier after start A-Z _ 0-9 $
    0x10 may appear in number:  0-9 A-F O W X B . + -
-   0x20 first char of a double-char operator
+   0x20 first char of a Double-char operator
    0x40 may appear in a file name
 */
 
@@ -57,11 +57,11 @@ char		*symbolStack[SYMBOLSTACKSIZE];
 hashTableEntry	*varHashTable[HASHSIZE], *subrHashTable[HASHSIZE], 
 		*funcHashTable[HASHSIZE], *blockHashTable[HASHSIZE];
 symTableEntry	sym[NSYM];
-int		scrat[NSCRAT], curSymbol;
-word		listStack[NLIST];
-word		curContext = 0;
-int		ana_type_size[] =
-	{ sizeof(byte), sizeof(word), sizeof(int), sizeof(float),
-	  sizeof(double), sizeof(char), sizeof(char), sizeof(char *),
+Int		scrat[NSCRAT], curSymbol;
+Word		listStack[NLIST];
+Word		curContext = 0;
+Int		ana_type_size[] =
+	{ sizeof(Byte), sizeof(Word), sizeof(Int), sizeof(Float),
+	  sizeof(Double), sizeof(char), sizeof(char), sizeof(char *),
 	  sizeof(floatComplex), sizeof(doubleComplex) };
 char	*curScrat = (char *) scrat, *printString;

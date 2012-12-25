@@ -5,10 +5,10 @@
 #include <setjmp.h>
 
  /* parameters for the current image */
- int	nx, ny;
- static	int result_sym;
+ Int	nx, ny;
+ static	Int result_sym;
  static pointer q1;
- byte	*base;
+ Byte	*base;
  /*------------------------------------------------------------------------- */
 METHODDEF void input_init (compress_info_ptr cinfo)
 /* Initialize for input; return image size and component data. */
@@ -51,10 +51,10 @@ METHODDEF void c_ui_method_selection (compress_info_ptr cinfo)
   jselwjfif(cinfo);
 }
  /*------------------------------------------------------------------------- */
-int ana_write_jpeg_f(int narg, int ps[])
+Int ana_write_jpeg_f(Int narg, Int ps[])
 /* a function version that returns 1 if read OK */
 {
-  int	ana_write_jpeg(int, int []);
+  Int	ana_write_jpeg(Int, Int []);
 
   if (ana_write_jpeg(narg, ps) == ANA_OK) 
     return ANA_ONE;
@@ -62,14 +62,14 @@ int ana_write_jpeg_f(int narg, int ps[])
     return ANA_ZERO;
 }
  /*------------------------------------------------------------------------- */
-int ana_write_jpeg(int narg, int ps[])	/* jpeg write subroutine */
- /* 10/17/92, start with 2-D byte files */
+Int ana_write_jpeg(Int narg, Int ps[])	/* jpeg write subroutine */
+ /* 10/17/92, start with 2-D Byte files */
 {
  struct compress_info_struct cinfo;
  struct compress_methods_struct c_methods;
  struct external_methods_struct e_methods;
  char	*name;
- int	iq, nd, type, jqual;
+ Int	iq, nd, type, jqual;
 
  iq = ps[0];
  if (!symbolIsNumericalArray(iq))
@@ -78,7 +78,7 @@ int ana_write_jpeg(int narg, int ps[])	/* jpeg write subroutine */
  q1.l = array_data(iq);
  nd = array_num_dims(iq);
  if (nd != 2 || type != ANA_BYTE)
-  return anaerror("WRITE_JPEG only supports 2-D byte arrays\n", iq);
+  return anaerror("WRITE_JPEG only supports 2-D Byte arrays\n", iq);
 
 			 /* second argument must be a string, file name */
  if (!symbolIsString(ps[1]))
@@ -142,7 +142,7 @@ METHODDEF void
 METHODDEF void output_init (decompress_info_ptr cinfo)
 /* This routine should do any setup required */
 {
- int	dim[2], iq;
+ Int	dim[2], iq;
 
  nx = cinfo->image_width;		/* width in pixels */
  ny = cinfo->image_height;		/* height in pixels */
@@ -172,7 +172,7 @@ METHODDEF void output_init (decompress_info_ptr cinfo)
 }
  /*------------------------------------------------------------------------- */
 METHODDEF void
-put_color_map (decompress_info_ptr cinfo, int num_colors, JSAMPARRAY colormap)
+put_color_map (decompress_info_ptr cinfo, Int num_colors, JSAMPARRAY colormap)
 /* Write the color map */
 {
   /* You need not provide this routine if you always set cinfo->quantize_colors
@@ -183,7 +183,7 @@ put_color_map (decompress_info_ptr cinfo, int num_colors, JSAMPARRAY colormap)
 }
  /*------------------------------------------------------------------------- */
 METHODDEF void
-put_pixel_rows (decompress_info_ptr cinfo, int num_rows, JSAMPIMAGE pixel_data)
+put_pixel_rows (decompress_info_ptr cinfo, Int num_rows, JSAMPIMAGE pixel_data)
 /* Write some rows of output data */
 {
   /* This example shows how you might write full-color RGB data (3 components)
@@ -191,7 +191,7 @@ put_pixel_rows (decompress_info_ptr cinfo, int num_rows, JSAMPIMAGE pixel_data)
    */
  register JSAMPROW ptr0;
  register long col;
- register int row;
+ register Int row;
   
  /* printf("put_pixel_rows: num_rows, cinfo->image_width = %d, %d\n",
  	num_rows, cinfo->image_width); */
@@ -225,10 +225,10 @@ METHODDEF void d_ui_method_selection (decompress_info_ptr cinfo)
   cinfo->methods->output_term = output_term;
  }
  /*------------------------------------------------------------------------- */
-int ana_read_jpeg_f(int narg, int ps[])
+Int ana_read_jpeg_f(Int narg, Int ps[])
 /* a function version that returns 1 if read OK */
 {
-  int	ana_read_jpeg(int, int []);
+  Int	ana_read_jpeg(Int, Int []);
 
   if (ana_read_jpeg(narg, ps) == ANA_OK)
     return ANA_ONE;
@@ -236,8 +236,8 @@ int ana_read_jpeg_f(int narg, int ps[])
     return ANA_ZERO;
 }
  /*------------------------------------------------------------------------- */
-int ana_read_jpeg(int narg, int ps[])	/* jpeg read subroutine */
- /* 10/17/92, start with 2-D byte files */
+Int ana_read_jpeg(Int narg, Int ps[])	/* jpeg read subroutine */
+ /* 10/17/92, start with 2-D Byte files */
  {
  char	*name;
  struct decompress_info_struct cinfo;

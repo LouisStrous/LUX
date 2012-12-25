@@ -166,7 +166,7 @@
  * In that case you need only comment out these definitions.
  */
 
-typedef int boolean;
+typedef Int boolean;
 #undef FALSE			/* in case these macros already exist */
 #undef TRUE
 #define FALSE	0		/* values of boolean */
@@ -235,7 +235,7 @@ typedef int boolean;
  * The remaining definitions don't need to be hand-edited in most cases.
  * You may need to change these if you have a machine with unusual data
  * types; for example, "char" not 8 bits, "short" not 16 bits,
- * or "long" not 32 bits.  We don't care whether "int" is 16 or 32 bits,
+ * or "long" not 32 bits.  We don't care whether "Int" is 16 or 32 bits,
  * but it had better be at least 16.
  */
 
@@ -298,11 +298,11 @@ typedef unsigned short JSAMPLE;
 
 #else /* not HAVE_UNSIGNED_SHORT */
 
-/* If int is 32 bits this'll be horrendously inefficient storage-wise.
+/* If Int is 32 bits this'll be horrendously inefficient storage-wise.
  * But since we don't actually support 16-bit samples (ie lossless coding) yet,
  * I'm not going to worry about making a smarter definition ...
  */
-typedef unsigned int JSAMPLE;
+typedef uint32_t JSAMPLE;
 #define GETJSAMPLE(value)  (value)
 
 #endif /* HAVE_UNSIGNED_SHORT */
@@ -347,7 +347,7 @@ typedef short UINT8;
 #ifdef HAVE_UNSIGNED_SHORT
 typedef unsigned short UINT16;
 #else /* not HAVE_UNSIGNED_SHORT */
-typedef unsigned int UINT16;
+typedef uint32_t UINT16;
 #endif /* HAVE_UNSIGNED_SHORT */
 
 /* INT16 must hold at least the values -32768..32767. */

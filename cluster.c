@@ -14,18 +14,18 @@
 static char rcsid[] __attribute__ ((unused)) =
  "$Id: cluster.c,v 4.0 2001/02/07 20:36:57 strous Exp $";
 
-int	ana_replace(int, int);
-void	randomu(int seed, void *output, int number, int modulo);
+Int	ana_replace(Int, Int);
+void	randomu(Int seed, void *output, Int number, Int modulo);
 /*----------------------------------------------------------------*/
-int fptrCompare(const void *p1, const void *p2)
+Int fptrCompare(const void *p1, const void *p2)
      /* auxilliary function for qsort call in ana_cluster */
 {
-  if (**(double **) p1 < **(double **) p2) return -1;
-  if (**(double **) p1 > **(double **) p2) return 1;
+  if (**(Double **) p1 < **(Double **) p2) return -1;
+  if (**(Double **) p1 > **(Double **) p2) return 1;
   return 0;
 }
 /*----------------------------------------------------------------*/
-int ana_cluster(int narg, int ps[])
+Int ana_cluster(Int narg, Int ps[])
 /* CLUSTER, DATA [, CENTERS=c, INDEX=i, SIZE=sz, SAMPLE=s, PHANTOM=p,
    MAXIT=m, RMS=r, /UPDATE, /ITERATE, /VOCAL, /QUICK]
 
@@ -121,22 +121,22 @@ int ana_cluster(int narg, int ps[])
 /* point.  update the closest cluster center and the PDGV condition */
 /* until the closest cluster center has been found. */
 { 
-  void	random_unique(int seed, int *output, int number, int modulo);
-  int	iq, nClusters, nVectorDim, nVectors, i, j, *index, size, dataIndex;
-  float	*data, *dataPoint, n1, n2, f;
-  double	s, t, dMin2, d, *center, *center2, *group1, *group2,
+  void	random_unique(Int seed, Int *output, Int number, Int modulo);
+  Int	iq, nClusters, nVectorDim, nVectors, i, j, *index, size, dataIndex;
+  Float	*data, *dataPoint, n1, n2, f;
+  Double	s, t, dMin2, d, *center, *center2, *group1, *group2,
 	*dgv, *pdgv, *centroid, *fp, **findex, *firstCenter, *scrap,
 	*rmsptr;
-  int	nSample, *clusterSize, k, n, l, k2, m, dims[2], k0,
+  Int	nSample, *clusterSize, k, n, l, k2, m, dims[2], k0,
 	kBest, *dataDims, nDataDims, *clusterCtoO, *clusterOtoC, nChanged,
 	nIter, curO, phantom, newO, *iPtr, maxit, rms;
   char	gotIndex, gotSize, gotSample, update, gotCenter,
 	useIndex, iterate, *changed, *changedOld, vocal, ordered,
 	gotPhantom, recluster, quick, record, curChanged;
-  byte	indexType;
+  Byte	indexType;
   pointer	clusterNumber;
   FILE	*file;
-  int	nDistCal = 0, allDistCal = 0;
+  Int	nDistCal = 0, allDistCal = 0;
 
   /* 0. Initialization */
   if (ps[1] >= NAMED_END)	/* CENTERS is not a named variable */
@@ -148,7 +148,7 @@ int ana_cluster(int narg, int ps[])
   nDataDims = array_num_dims(iq); /* # data dimensions */
   nVectorDim = dataDims[0]; /* # dimensions in each data vector */
   nVectors = array_size(iq)/nVectorDim; /* # vectors */
-  data = (float *) array_data(iq); /* data points */
+  data = (Float *) array_data(iq); /* data points */
   if (narg >= 4 && ps[3]) {	/* SIZE */
     gotSize = 1;
     if (ps[3] >= NAMED_END)
@@ -196,7 +196,7 @@ int ana_cluster(int narg, int ps[])
   k = nVectors;
   if (gotSample && k > nSample && nSample > 1)
     k = nSample;
-  size = sizeof(double)*nVectorDim; /* size in bytes of one data point */
+  size = sizeof(Double)*nVectorDim; /* size in bytes of one data point */
   switch (symbol_class(ps[1])) { /* CENTERS class */
     case ANA_SCALAR:		/* the scalar denotes the number of */
       /* clusters to find.  Get random sample of data vectors to act */
@@ -210,7 +210,7 @@ int ana_cluster(int narg, int ps[])
       dims[0] = nVectorDim;	/* # dimensions per data point */
       dims[1] = nClusters;	/* # clusters */
       redef_array(ps[1], ANA_DOUBLE, 2, dims);
-      center = (double *) array_data(ps[1]); /* cluster centers */
+      center = (Double *) array_data(ps[1]); /* cluster centers */
 
       if (gotSample) {
 	if (nSample == 1) {
@@ -226,13 +226,13 @@ int ana_cluster(int narg, int ps[])
 	gotSample = 0;		/* sample selects all */
 
       /* get nClusters numbers up to value nSample */
-      clusterOtoC = malloc(nClusters*sizeof(int));
+      clusterOtoC = malloc(nClusters*sizeof(Int));
       if (!clusterOtoC)
 	return cerror(ALLOC_ERR, 0);
       random_unique(0, clusterOtoC, nClusters, nSample);
 
       if (gotSample) {
-	index = malloc(nSample*sizeof(int));
+	index = malloc(nSample*sizeof(Int));
 	if (!index) {
 	  free(clusterOtoC);
 	  return cerror(ALLOC_ERR, 0);
@@ -250,7 +250,7 @@ int ana_cluster(int narg, int ps[])
       for (i = 0; i < nClusters; i++) /* copy selected cluster centers */
 	for (k = 0; k < nVectorDim; k++)
 	  center[k + i*nVectorDim]
-	    = (double) data[k + clusterOtoC[i]*nVectorDim];
+	    = (Double) data[k + clusterOtoC[i]*nVectorDim];
 
       free(clusterOtoC);
       break;
@@ -267,7 +267,7 @@ int ana_cluster(int narg, int ps[])
 		     ps[1]);
       nClusters = array_size(ps[1])/nVectorDim; /* # clusters */
       ana_replace(ps[1], ana_double(1, &ps[1]));
-      center = (double *) array_data(ps[1]); /* data centers */
+      center = (Double *) array_data(ps[1]); /* data centers */
 
       if (gotSample) {
 	if (nSample == 1) {
@@ -283,7 +283,7 @@ int ana_cluster(int narg, int ps[])
 	gotSample = 0;
 
       if (gotSample) {
-	index = malloc(nSample*sizeof(int));
+	index = malloc(nSample*sizeof(Int));
 	if (!index)
 	  return cerror(ALLOC_ERR, 0);
 	random_unique(0, index, nSample, nVectors); /* get a sample */
@@ -307,14 +307,14 @@ int ana_cluster(int narg, int ps[])
     if (!gotSample		/* no SAMPLE */
 	&& symbol_class(ps[2]) == ANA_ARRAY /* INDEX is an array */
 	&& array_size(ps[2]) == nVectors /* an index for each data point */
-	&& (int) array_type(ps[2]) <= ANA_LONG) { /* integer data type */
+	&& (Int) array_type(ps[2]) <= ANA_LONG) { /* integer data type */
       indexType = array_type(ps[2]);	/* index data type */
       useIndex = 1;		/* default: useful indices */
-      clusterNumber.b = (byte *) array_data(ps[2]);
+      clusterNumber.b = (Byte *) array_data(ps[2]);
       switch (indexType) {
 	case ANA_BYTE:
 	  for (i = 0; i < nVectors; i++)
-	    if ((int) clusterNumber.b[i] >= nClusters) { /* index too large */
+	    if ((Int) clusterNumber.b[i] >= nClusters) { /* index too large */
 	      printf("CLUSTER - illegal index #%1d (%1d), ignore all\n",
 		     i, clusterNumber.b[i]);
 	      useIndex = 0;
@@ -345,17 +345,17 @@ int ana_cluster(int narg, int ps[])
     } /* end of if (symbol_class(ps[2]) == ANA_ARRAY && ...) */
   }
   if (!useIndex) {	/* no sufficient memory yet for cluster numbers */
-    if (nClusters - 1 <= UCHAR_MAX)	/* ANA_BYTE will do it */
+    if (nClusters - 1 <= UINT8_MAX)	/* ANA_BYTE will do it */
       indexType = ANA_BYTE;
-    else if (nClusters - 1 <= SHRT_MAX) /* ANA_WORD to store biggest index */
+    else if (nClusters - 1 <= INT16_MAX) /* ANA_WORD to store biggest index */
       indexType = ANA_WORD;
     else			/* need ANA_LONG */
       indexType = ANA_LONG;
     if (gotIndex && !gotSample)	{ /* have a variable, redefine */
       redef_array(ps[2], indexType , nDataDims - 1, dataDims + 1);
-      clusterNumber.b = (byte *) array_data(ps[2]);
+      clusterNumber.b = (Byte *) array_data(ps[2]);
     } else {			/* no variable, allocate */
-      clusterNumber.b = malloc(nSample*ana_type_size[indexType]*sizeof(byte));
+      clusterNumber.b = malloc(nSample*ana_type_size[indexType]*sizeof(Byte));
       if (!clusterNumber.b)
 	return cerror(ALLOC_ERR, 0);
     }
@@ -379,10 +379,10 @@ int ana_cluster(int narg, int ps[])
 
   /* 2. Determine direction of greatest variation (DGV) */
   /* use an algorithm of my own devising; basically a 2-cluster analysis */
-  dgv = malloc(nVectorDim*sizeof(double));
+  dgv = malloc(nVectorDim*sizeof(Double));
   if (!dgv)
     return cerror(ALLOC_ERR, 0);
-  center2 = malloc(nVectorDim*2*sizeof(double));
+  center2 = malloc(nVectorDim*2*sizeof(Double));
   if (!center2)
     return cerror(ALLOC_ERR, 0);
   /* the first and last cluster centers form the initial centers of */
@@ -454,8 +454,8 @@ int ana_cluster(int narg, int ps[])
   /* 3. Calculate projections of initial cluster centers on DGV (PDGV) */
   /* it is advantageous to have a sentinel on each end of the PDGV array
      with extreme values.  These extreme values must be small enough
-     that their squares can be represented by a variable of type double. */
-  pdgv = malloc((nClusters + 2)*sizeof(double));
+     that their squares can be represented by a variable of type Double. */
+  pdgv = malloc((nClusters + 2)*sizeof(Double));
   if (!pdgv)
     return cerror(ALLOC_ERR, 0);
   pdgv[0] = -0.9*sqrt(DBL_MAX);	/* sentinel */
@@ -470,18 +470,18 @@ int ana_cluster(int narg, int ps[])
 
   nChanged = 1;			/* non-zero to get iteration going */
   /* 4. Order cluster centers according to their PDGV */
-  findex = malloc(nClusters*sizeof(double *));
-  center2 = malloc(nClusters*nVectorDim*sizeof(double));
+  findex = malloc(nClusters*sizeof(Double *));
+  center2 = malloc(nClusters*nVectorDim*sizeof(Double));
   if (!findex || !center2)
     return cerror(ALLOC_ERR, 0);
   clusterSize = NULL;
   while (nChanged) {
     for (i = 0; i < nClusters; i++)
       findex[i] = pdgv + i;	/* current order */
-    qsort(findex, nClusters, sizeof(double *), fptrCompare); /* sort */
+    qsort(findex, nClusters, sizeof(Double *), fptrCompare); /* sort */
     for (i = 0; i < nClusters; i++) /* reorder PDGVs */
       center2[i] = *findex[i];
-    memcpy(pdgv, center2, nClusters*sizeof(double));
+    memcpy(pdgv, center2, nClusters*sizeof(Double));
     for (i = 0; i < nClusters; i++) /* reorder cluster centers */
       memcpy(center2 + i*nVectorDim, center + (findex[i] - pdgv)*nVectorDim,
 	     size);
@@ -493,9 +493,9 @@ int ana_cluster(int narg, int ps[])
     nChanged = 0;
     if (!gotCenter) {		/* we took a random sample */
       for (i = 1; i < nClusters; i++)
-	if (pdgv[i] == pdgv[i - 1]) { /* we may have a double */
+	if (pdgv[i] == pdgv[i - 1]) { /* we may have a Double */
 	  if (!nChanged) {	/* get some random indices */
-	    clusterSize = malloc(10*sizeof(int));
+	    clusterSize = malloc(10*sizeof(Int));
 	    if (!clusterSize)
 	      return cerror(ALLOC_ERR, 0);
 	  }
@@ -503,13 +503,13 @@ int ana_cluster(int narg, int ps[])
 	    randomu(0, clusterSize, 10, nVectors);
 	  for (k = 0; k < nVectorDim; k++)
 	    center[k + i*nVectorDim]
-	      = (double) data[k + clusterSize[nChanged % 10]*nVectorDim];
+	      = (Double) data[k + clusterSize[nChanged % 10]*nVectorDim];
 	  pdgv[i] = 0.0;
 	  for (j = 0; j < nVectorDim; j++)
 	    pdgv[i] += center[j + i*nVectorDim]*dgv[j];
 	  nChanged++; }
       if (nChanged && vocal)
-	printf("CLUSTER - got %1d new centers because of double data points\n",
+	printf("CLUSTER - got %1d new centers because of Double data points\n",
 	       nChanged);
     }
   } /* end while (nChanged) */
@@ -521,8 +521,8 @@ int ana_cluster(int narg, int ps[])
   /* then we need to remember the original order, so we can go from the */
   /* old to the new order and back, and can restore the original order */
   /* on exit */
-  clusterCtoO = malloc(nClusters*sizeof(int));
-  clusterOtoC = malloc(nClusters*sizeof(int));
+  clusterCtoO = malloc(nClusters*sizeof(Int));
+  clusterOtoC = malloc(nClusters*sizeof(Int));
   if (!clusterCtoO || !clusterOtoC)
     return cerror(ALLOC_ERR, 0);
   if (gotCenter)		/* save original order */
@@ -538,9 +538,9 @@ int ana_cluster(int narg, int ps[])
 
   if (gotSize) {		/* SIZE was specified by user */
     redef_array(ps[3], ANA_LONG, 1, &nClusters); /* get in shape */
-    clusterSize = (int *) array_data(ps[3]);
+    clusterSize = (Int *) array_data(ps[3]);
   } else {				/* no SIZE specified */
-    clusterSize = malloc(nClusters*sizeof(int)); /* so allocate some space */
+    clusterSize = malloc(nClusters*sizeof(Int)); /* so allocate some space */
     if (!clusterSize)
       return cerror(ALLOC_ERR, 0);
   }
@@ -575,7 +575,7 @@ int ana_cluster(int narg, int ps[])
 
   if (phantom) {		/* we added phantom members, so now */
     /* we must remember their positions so we can remove them afterwards */
-    firstCenter = malloc(nClusters*nVectorDim*sizeof(double));
+    firstCenter = malloc(nClusters*nVectorDim*sizeof(Double));
     if (!firstCenter)
       return cerror(ALLOC_ERR, 0);
     for (i = 0; i < nClusters; i++)
@@ -587,13 +587,13 @@ int ana_cluster(int narg, int ps[])
   if (update)			/* we're updating, so centroid = center */
     centroid = center;
   else {			/* not updating, so separate centroids */
-    centroid = malloc(nClusters*nVectorDim*sizeof(double));
+    centroid = malloc(nClusters*nVectorDim*sizeof(Double));
     if (!centroid)
       return cerror(ALLOC_ERR, 0);
     memcpy(centroid, center, nClusters*size);
   }
 
-  scrap = malloc(nVectorDim*sizeof(double)); /* scrap space */
+  scrap = malloc(nVectorDim*sizeof(Double)); /* scrap space */
 
   /* we want to count the number of changed points and keep track of */
   /* which clusters change */
@@ -644,7 +644,7 @@ int ana_cluster(int narg, int ps[])
 	/* 6. calculate the PDGV of the current data point */
 	s = 0.0;
 	for (j = 0; j < nVectorDim; j++)
-	  s += dgv[j]*((double) dataPoint[j]); /* s = PDGV */
+	  s += dgv[j]*((Double) dataPoint[j]); /* s = PDGV */
 	
 	/* 7. Find the closest cluster center according to PDGVs */
 	/* because of the sentinels at both ends of the PDGV array we
@@ -662,7 +662,7 @@ int ana_cluster(int narg, int ps[])
 	/* 8. Calculate total distance to that cluster center */
 	dMin2 = 0.0;
 	for (l = 0; l < nVectorDim; l++) {
-	  t = ((double) dataPoint[l] - center[l + k*nVectorDim]);
+	  t = ((Double) dataPoint[l] - center[l + k*nVectorDim]);
 	  dMin2 += t*t;
 	}
 
@@ -671,7 +671,7 @@ int ana_cluster(int narg, int ps[])
 	if (nIter == 1 && ordered && k != k0) { /* try the previous point */
 	  d = 0.0;
 	  for (l = 0; l < nVectorDim; l++) {
-	    t = ((double) dataPoint[l] - center[l + k0*nVectorDim]);
+	    t = ((Double) dataPoint[l] - center[l + k0*nVectorDim]);
 	    d += t*t;
 	  }
 	  if (d < dMin2) {
@@ -684,7 +684,7 @@ int ana_cluster(int narg, int ps[])
 	  k0 = clusterOtoC[curO];
 	  d = 0.0;
 	  for (l = 0; l < nVectorDim; l++) {
-	    t = ((double) dataPoint[l] - center[l + k0*nVectorDim]);
+	    t = ((Double) dataPoint[l] - center[l + k0*nVectorDim]);
 	    d += t*t;
 	  }
 	  if (d < dMin2) {
@@ -707,7 +707,7 @@ int ana_cluster(int narg, int ps[])
 	  /* k - 1, and keep updating the admissibility.  (dMin2 = dMin^2)*/
 	  d = 0.0;		/* initialize distance */
 	  for (m = 0; m < nVectorDim; m++) {
-	    t = ((double) dataPoint[m] - center[m + l*nVectorDim]);
+	    t = ((Double) dataPoint[m] - center[m + l*nVectorDim]);
 	    d += t*t;
 	  }
 
@@ -728,7 +728,7 @@ int ana_cluster(int narg, int ps[])
 	  /* k + 1, and keep updating the admissibility. */
 	  d = 0.0;		/* initialize distance */
 	  for (m = 0; m < nVectorDim; m++) {
-	    t = ((double) dataPoint[m] - center[m + l*nVectorDim]);
+	    t = ((Double) dataPoint[m] - center[m + l*nVectorDim]);
 	    d += t*t;
 	  }
 
@@ -768,7 +768,7 @@ int ana_cluster(int narg, int ps[])
 	  l = clusterSize[j]--;
 	  for (m = 0; m < nVectorDim; m++) /* update old centroid */
 	    centroid[m + j*nVectorDim]
-	      = (centroid[m + j*nVectorDim]*l - (double) dataPoint[m])/(l - 1);
+	      = (centroid[m + j*nVectorDim]*l - (Double) dataPoint[m])/(l - 1);
 	  if (update) {
 	    s = 0.0;		/* recalculate PDGVs */
 	    for (m = 0; m < nVectorDim; m++)
@@ -780,8 +780,8 @@ int ana_cluster(int narg, int ps[])
 		   && s < pdgv[k2 - 1]) /* need to go lower */
 	      k2--;
 	    if (k2 < j) {	/* reorder below j */
-	      n = sizeof(int)*(j - k2);
-	      memmove(pdgv + k2 + 1, pdgv + k2, sizeof(double)*(j - k2));
+	      n = sizeof(Int)*(j - k2);
+	      memmove(pdgv + k2 + 1, pdgv + k2, sizeof(Double)*(j - k2));
 	      pdgv[k2] = s;
 	      k0 = clusterSize[j];
 	      memmove(clusterSize + k2 + 1, clusterSize + k2, n);
@@ -807,8 +807,8 @@ int ana_cluster(int narg, int ps[])
 		     && s > pdgv[k2 + 1]) /* need to go higher */
 		k2++;
 	      if (k2 > j) {	/* reorder above j */
-		n = sizeof(int)*(k2 - j);
-		memmove(pdgv + j, pdgv + j + 1, sizeof(double)*(k2 - j));
+		n = sizeof(Int)*(k2 - j);
+		memmove(pdgv + j, pdgv + j + 1, sizeof(Double)*(k2 - j));
 		pdgv[k2] = s;
 		k0 = clusterSize[j];
 		memmove(clusterSize + j, clusterSize + j + 1, n);
@@ -839,7 +839,7 @@ int ana_cluster(int narg, int ps[])
 	  l = clusterSize[k]++;	/* add point to receiving cluster */
 	  for (m = 0; m < nVectorDim; m++) /* update centroid */
 	    centroid[m + k*nVectorDim]
-	      = (centroid[m + k*nVectorDim]*l + (double) dataPoint[m])/(l + 1);
+	      = (centroid[m + k*nVectorDim]*l + (Double) dataPoint[m])/(l + 1);
 	  if (update) {
 	    s = 0.0;		/* recalculate PDGV */
 	    for (m = 0; m < nVectorDim; m++)
@@ -851,8 +851,8 @@ int ana_cluster(int narg, int ps[])
 		   && s < pdgv[k2 - 1]) /* need to go lower */
 	      k2--;
 	    if (k2 < k) {	/* reorder below k */
-	      n = sizeof(int)*(k - k2);
-	      memmove(pdgv + k2 + 1, pdgv + k2, sizeof(double)*(k - k2));
+	      n = sizeof(Int)*(k - k2);
+	      memmove(pdgv + k2 + 1, pdgv + k2, sizeof(Double)*(k - k2));
 	      pdgv[k2] = s;
 	      k0 = clusterSize[k];
 	      memmove(clusterSize + k2 + 1, clusterSize + k2, n);
@@ -873,8 +873,8 @@ int ana_cluster(int narg, int ps[])
 		     && s > pdgv[k2 + 1]) /* need to go higher */
 		k2++;
 	      if (k2 > k) {	/* reorder above k */
-		n = sizeof(int)*(k2 - k);
-		memmove(pdgv + k, pdgv + k + 1, sizeof(double)*(k2 - k));
+		n = sizeof(Int)*(k2 - k);
+		memmove(pdgv + k, pdgv + k + 1, sizeof(Double)*(k2 - k));
 		pdgv[k2] = s;
 		k0 = clusterSize[k];
 		memmove(clusterSize + k, clusterSize + k + 1, n);
@@ -917,9 +917,9 @@ int ana_cluster(int narg, int ps[])
 
     if (record && iterate) {
       for (i = 0; i < nClusters; i++)
-	fwrite(centroid + clusterOtoC[i], sizeof(double), nVectorDim, file);
+	fwrite(centroid + clusterOtoC[i], sizeof(Double), nVectorDim, file);
       for (i = 0; i < nClusters; i++)
-	fwrite(clusterSize + clusterOtoC[i], sizeof(int), 1, file);
+	fwrite(clusterSize + clusterOtoC[i], sizeof(Int), 1, file);
     }
     
     /* remove phantom members, if any */
@@ -946,18 +946,18 @@ int ana_cluster(int narg, int ps[])
 	    k = 1; 		/* need to reorder */
 	}
 	if (k) {		/* reorder */
-	  findex = malloc(nClusters*sizeof(double *));
+	  findex = malloc(nClusters*sizeof(Double *));
 	  if (!findex)
 	    return cerror(ALLOC_ERR, 0);
 	  for (i = 0; i < nClusters; i++)
 	    findex[i] = pdgv + i; /* current order */
-	  qsort(findex, nClusters, sizeof(double *), fptrCompare); /* sort */
-	  center2 = malloc(nClusters*nVectorDim*sizeof(double));
+	  qsort(findex, nClusters, sizeof(Double *), fptrCompare); /* sort */
+	  center2 = malloc(nClusters*nVectorDim*sizeof(Double));
 	  if (!center2)
 	    return cerror(ALLOC_ERR, 0);
 	  for (i = 0; i < nClusters; i++) /* reorder PDGVs */
 	    center2[i] = *findex[i];
-	  memcpy(pdgv, center2, nClusters*sizeof(double));
+	  memcpy(pdgv, center2, nClusters*sizeof(Double));
 	  if (center != centroid) {
 	    for (i = 0; i < nClusters; i++) /* reorder cluster centers */
 	      memcpy(center2 + i*nVectorDim,
@@ -969,17 +969,17 @@ int ana_cluster(int narg, int ps[])
 		   centroid + (findex[i] - pdgv)*nVectorDim, size);
 	  memcpy(centroid, center2, size*nClusters);
 	  free(center2);
-	  iPtr = malloc(nClusters*sizeof(int));
+	  iPtr = malloc(nClusters*sizeof(Int));
 	  if (!iPtr)
 	    return cerror(ALLOC_ERR, 0);
 	  for (i = 0; i < nClusters; i++) /* reorder cluster sizes */
 	    iPtr[i] = clusterSize[findex[i] - pdgv];
-	  memcpy(clusterSize, iPtr, nClusters*sizeof(int));
+	  memcpy(clusterSize, iPtr, nClusters*sizeof(Int));
 	  for (i = 0; i < nClusters; i++) { /* reorder CtoO and OtoC */
 	    iPtr[i] = clusterCtoO[findex[i] - pdgv];
 	    clusterOtoC[iPtr[i]] = i;
 	  }
-	  memcpy(clusterCtoO, iPtr, nClusters*sizeof(int));
+	  memcpy(clusterCtoO, iPtr, nClusters*sizeof(Int));
 	  free(iPtr);
 	}
       }	/* end if (nChanged && iterate) */
@@ -999,7 +999,7 @@ int ana_cluster(int narg, int ps[])
       printf("CLUSTER - cycle %1d, reclustered %1d points in %1d clusters\n",
 	     nIter, nChanged, j);
       printf("distance calculations/element: %g (total %g)\n",
-	     (float) nDistCal/nSample, (float) allDistCal/nSample);
+	     (Float) nDistCal/nSample, (Float) allDistCal/nSample);
     }
     
     nDistCal = 0;
@@ -1027,7 +1027,7 @@ int ana_cluster(int narg, int ps[])
     fclose(file);
 
   /* restore the centers to their original order */
-  center2 = malloc(nClusters*nVectorDim*sizeof(double));
+  center2 = malloc(nClusters*nVectorDim*sizeof(Double));
   if (!center2)
     return cerror(ALLOC_ERR, 0);
   if (center != centroid && update) { /* updating */
@@ -1047,10 +1047,10 @@ int ana_cluster(int narg, int ps[])
     free(centroid);
 
   /* reorder the sizes */
-  index = malloc(nClusters*sizeof(int));
+  index = malloc(nClusters*sizeof(Int));
   if (!index)
     return cerror(ALLOC_ERR, 0);
-  memcpy(index, clusterSize, nClusters*sizeof(int));
+  memcpy(index, clusterSize, nClusters*sizeof(Int));
   for (i = 0; i < nClusters; i++)
     clusterSize[i] = index[clusterOtoC[i]];
   free(index);

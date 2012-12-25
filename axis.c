@@ -39,29 +39,29 @@
 static char rcsid[] __attribute__ ((unused)) =
 "$Id: axis.c,v 4.0 2001/02/07 20:36:57 strous Exp $";
 
-void setupDimensionLoop(loopInfo *info, int ndim, int const *dims, 
-                        enum Symboltype type, int naxes, int const *axes,
-                        pointer *data, int mode);
+void setupDimensionLoop(loopInfo *info, Int ndim, Int const *dims, 
+                        enum Symboltype type, Int naxes, Int const *axes,
+                        pointer *data, Int mode);
 void rearrangeDimensionLoop(loopInfo *info);
-int standardLoop(int data, int axisSym, int mode, int outType,
-		 loopInfo *src, pointer *srcptr, int *output, loopInfo *trgt,
+Int standardLoop(Int data, Int axisSym, Int mode, Int outType,
+		 loopInfo *src, pointer *srcptr, Int *output, loopInfo *trgt,
 		 pointer *trgtptr);
-int advanceLoop(loopInfo *info, pointer *ptr),
-  ana_convert(int, int [], int, int);
-int nextLoop(loopInfo *info), nextLoops(loopInfo *info1, loopInfo *info2);
-int dimensionLoopResult(loopInfo const *sinfo, loopInfo *tinfo, int type,
+Int advanceLoop(loopInfo *info, pointer *ptr),
+  ana_convert(Int, Int [], Int, Int);
+Int nextLoop(loopInfo *info), nextLoops(loopInfo *info1, loopInfo *info2);
+Int dimensionLoopResult(loopInfo const *sinfo, loopInfo *tinfo, Int type,
 			pointer *tptr);
-int standardLoop1(int source,
-                  int nAxes, int const * axes,
-                  int srcMode,
+Int standardLoop1(Int source,
+                  Int nAxes, Int const * axes,
+                  Int srcMode,
                   loopInfo *srcinf, pointer *srcptr,
-                  int nMore, int const * more,
-                  int nLess, int const * less,
-                  enum Symboltype tgtType, int tgtMode,
-                  int *target, 
+                  Int nMore, Int const * more,
+                  Int nLess, Int const * less,
+                  enum Symboltype tgtType, Int tgtMode,
+                  Int *target, 
                   loopInfo *tgtinf, pointer *tgtptr);
 /*-------------------------------------------------------------------------*/
-void setAxisMode(loopInfo *info, int mode) {
+void setAxisMode(loopInfo *info, Int mode) {
   if ((mode & SL_EACHBLOCK) == SL_EACHBLOCK)
     info->advanceaxis = info->naxes;
   else if (mode & SL_EACHROW)
@@ -75,10 +75,10 @@ void setAxisMode(loopInfo *info, int mode) {
   rearrangeDimensionLoop(info);
 }
 /*-------------------------------------------------------------------------*/
-int setAxes(loopInfo *info, int nAxes, int *axes, int mode)
+Int setAxes(loopInfo *info, Int nAxes, Int *axes, Int mode)
 {
-  int i;
-  int temp[MAX_DIMS];
+  Int i;
+  Int temp[MAX_DIMS];
 
   if (mode & SL_TAKEONED)	/* take data as 1D */
     nAxes = 0;			/* treat as 1D */
@@ -101,7 +101,7 @@ int setAxes(loopInfo *info, int nAxes, int *axes, int mode)
 	  || axes[i] >= info->ndim)	/* or too great */
 	return anaerror("Illegal axis %1d", -1, axes[i]);
     if (mode & SL_UNIQUEAXES) {	/* no axis must occur more than once */
-      zerobytes(temp, info->ndim*sizeof(int));
+      zerobytes(temp, info->ndim*sizeof(Int));
       for (i = 0; i < nAxes; i++)
 	if (temp[axes[i]]++)
 	  return anaerror("Axis %1d illegally specified more than once",
@@ -115,9 +115,9 @@ int setAxes(loopInfo *info, int nAxes, int *axes, int mode)
   return 0;
 }
 /*-------------------------------------------------------------------------*/
-void setupDimensionLoop(loopInfo *info, int ndim, int const *dims, 
-                        enum Symboltype type, int naxes, int const *axes,
-                        pointer *data, int mode)
+void setupDimensionLoop(loopInfo *info, Int ndim, Int const *dims, 
+                        enum Symboltype type, Int naxes, Int const *axes,
+                        pointer *data, Int mode)
 /* fills the loopInfo structure <info> with information
  suitable for looping through a dimensional structure.
  <ndim>: number of dimensions in the data
@@ -131,7 +131,7 @@ void setupDimensionLoop(loopInfo *info, int ndim, int const *dims,
  <mode>: flags indicating how to loop through the axes
 */
 {
-  int	i;
+  Int	i;
   size_t	size;
 
   /* first copy the arguments into the structure
@@ -141,7 +141,7 @@ void setupDimensionLoop(loopInfo *info, int ndim, int const *dims,
   info->ndim = ndim;
   /* the list of dimensions of the data: */
   if (ndim)
-    memmove(info->dims, dims, ndim*sizeof(int));
+    memmove(info->dims, dims, ndim*sizeof(Int));
   else				/* a scalar */
     info->dims[0] = 1;		/* need something reasonable here or else
 				   advanceLoop() won't work properly. */
@@ -151,14 +151,14 @@ void setupDimensionLoop(loopInfo *info, int ndim, int const *dims,
   size = 1;
   for (i = 0; i < info->ndim; i++)
     size *= info->dims[i];
-  /* the size is small enough to fit in an (ulint = unsigned long int),
+  /* the size is small enough to fit in an (ulint = unsigned int64_t),
      or else the array from which the dimensions were taken could not have
      been created through array_scratch() or array_clone(), but the size
-     may be too great to fit in a signed long int.  We may
+     may be too great to fit in a signed int64_t.  We may
      need to move from the very end of the array to the very beginning,
      so we must be able to use both positive and negative numbers with
      a magnitude equal to the number of elements; so the number of elements
-     must fit in a signed long int.  If it does not, then we emit a warning.
+     must fit in a signed int64_t.  If it does not, then we emit a warning.
      LS 2dec98 */
   if (size > LONG_MAX)
     printf("WARNING - array size (%lu elements) may be too great\n"
@@ -166,7 +166,7 @@ void setupDimensionLoop(loopInfo *info, int ndim, int const *dims,
   info->nelem = size;
   /* the list of dimensions along which should be looped */
   if (axes)
-    memmove(info->axes, axes, naxes*sizeof(int));
+    memmove(info->axes, axes, naxes*sizeof(Int));
   else
     for (i = 0; i < info->naxes; i++)
       info->axes[i] = i;		/* SL_ALLAXES was selected */
@@ -189,13 +189,13 @@ void setupDimensionLoop(loopInfo *info, int ndim, int const *dims,
   setAxisMode(info, mode);
 }
 /*-----------------------------------------------------------------------*/
-int advanceLoop(loopInfo *info, pointer *ptr)
+Int advanceLoop(loopInfo *info, pointer *ptr)
 /* advance coordinates; return index of first encountered incomplete
  axis.  I.e., if the array has 4 by 5 by 6 elements, then advancement
  from element (2,0,0) (to element (3,0,0)) yields 0, (3,0,0) yields 1,
  (3,4,0) yields 2, and (3,4,5) yields 3. */
 {
-  int	i, done;
+  Int	i, done;
 
   /* advance pointer */
   ptr->b += info->step[info->advanceaxis]*info->stride;
@@ -219,12 +219,12 @@ int advanceLoop(loopInfo *info, pointer *ptr)
   return done;
 }  
 /*-----------------------------------------------------------------------*/
-int loopIsAtStart(loopInfo const *info)
+Int loopIsAtStart(loopInfo const *info)
 /* returns 1 if all coordinates are equal to 0, and 0 otherwise.
    Can be used to test if the loop is back at the start again -- i.e.,
    has completed.  See also advanceLoop(). */
 {
-  int state = 1, i;
+  Int state = 1, i;
 
   for (i = 0; i < info->rndim; i++)
     state &= (info->coords[i] == 0);
@@ -249,7 +249,7 @@ void rearrangeDimensionLoop(loopInfo *info)
 	 within each group
 */
 {
-  int	axis, i, temp[MAX_DIMS], j, axisIndex, mode, axis2;
+  Int	axis, i, temp[MAX_DIMS], j, axisIndex, mode, axis2;
 
   axisIndex = info->axisindex;
   mode = info->mode;
@@ -261,16 +261,16 @@ void rearrangeDimensionLoop(loopInfo *info)
 	/* put desired axis at front; leave order of remaining axes */
 	/* get rearranged step sizes */
 	info->rsinglestep[0] = info->singlestep[axis];
-	memcpy(&info->rsinglestep[1], info->singlestep, axis*sizeof(int));
+	memcpy(&info->rsinglestep[1], info->singlestep, axis*sizeof(Int));
 	memcpy(&info->rsinglestep[axis + 1], &info->singlestep[axis + 1],
-	       (info->ndim - axis - 1)*sizeof(int));
+	       (info->ndim - axis - 1)*sizeof(Int));
 
 	/* get rearranged dimensions */
 	info->rndim = info->ndim;
 	info->rdims[0] = info->dims[axis];
-	memcpy(&info->rdims[1], info->dims, axis*sizeof(int));
+	memcpy(&info->rdims[1], info->dims, axis*sizeof(Int));
 	memcpy(&info->rdims[axis + 1], &info->dims[axis + 1],
-	       (info->ndim - axis - 1)*sizeof(int));
+	       (info->ndim - axis - 1)*sizeof(Int));
 
 	/* get mappings between original and rearranged axes */
 	info->raxes[0] = axis;
@@ -321,7 +321,7 @@ void rearrangeDimensionLoop(loopInfo *info)
 	/* the active axis goes first, then the remaining selected axes, */
 	/* and then the ones that were not selected; in ascending order */
 	/* within each group */
-	zerobytes(temp, info->ndim*sizeof(int));
+	zerobytes(temp, info->ndim*sizeof(Int));
 
 	info->rdims[0] = info->dims[axis];
 	temp[axis] = 1;
@@ -356,8 +356,8 @@ void rearrangeDimensionLoop(loopInfo *info)
   } else {
     if (info->naxes) {		/* do have axes */
       /* just keep the original order */
-      memcpy(info->rsinglestep, info->singlestep, info->ndim*sizeof(int));
-      memcpy(info->rdims, info->dims, info->ndim*sizeof(int));
+      memcpy(info->rsinglestep, info->singlestep, info->ndim*sizeof(Int));
+      memcpy(info->rdims, info->dims, info->ndim*sizeof(Int));
       info->rndim = info->ndim;
       for (i = 0; i < info->ndim; i++)
 	info->raxes[i] = info->iraxes[i] = i;
@@ -374,7 +374,7 @@ void rearrangeDimensionLoop(loopInfo *info)
   }
   
   /* prepare step sizes for use in advanceLoop() */
-  memcpy(info->step, info->rsinglestep, info->rndim*sizeof(int));
+  memcpy(info->step, info->rsinglestep, info->rndim*sizeof(Int));
   for (i = info->rndim - 1; i; i--)
     info->step[i] -= info->step[i - 1]*info->rdims[i - 1];
 
@@ -383,12 +383,12 @@ void rearrangeDimensionLoop(loopInfo *info)
   info->data->v = info->data0;	/* initialize pointer */
 }
 /*-----------------------------------------------------------------------*/
-void omitRedundantDimensions(int *ndim, int *dims, int *naxes, int *axes)
+void omitRedundantDimensions(Int *ndim, Int *dims, Int *naxes, Int *axes)
 {
   /* if we get rid of dimension <d>, then all axis numbers greater
      than or equal to <d> must be decremented by one */
-  int newAxisNr[MAX_DIMS];
-  int omitted = 0, i;
+  Int newAxisNr[MAX_DIMS];
+  Int omitted = 0, i;
 
   for (i = 0; i < *ndim; i++) {
     newAxisNr[i] = i - omitted;
@@ -408,10 +408,10 @@ void omitRedundantDimensions(int *ndim, int *dims, int *naxes, int *axes)
   }
 }
 /*-----------------------------------------------------------------------*/
-int dimensionLoopResult1(loopInfo const *sinfo,
-                         int tmode, enum Symboltype ttype,
-                         int nMore, int const * more,
-                         int nLess, int const * less,
+Int dimensionLoopResult1(loopInfo const *sinfo,
+                         Int tmode, enum Symboltype ttype,
+                         Int nMore, Int const * more,
+                         Int nLess, Int const * less,
                          loopInfo *tinfo, pointer *tptr)
 /* create an appropriate result symbol
    <sinfo>: contains information about the loops through the source
@@ -429,7 +429,7 @@ int dimensionLoopResult1(loopInfo const *sinfo,
    <tptr>: a pointer to a pointer to the target data
  */
 {
-  int	target, n, i, ndim, dims[MAX_DIMS], naxes, axes[MAX_DIMS], j;
+  Int	target, n, i, ndim, dims[MAX_DIMS], naxes, axes[MAX_DIMS], j;
   pointer	ptr;
 
   ndim = sinfo->ndim;		/* default */
@@ -519,12 +519,12 @@ int dimensionLoopResult1(loopInfo const *sinfo,
 	} /* end of if (mode & ... ) */
       } else {			/* assume all axes were specified */
 	ndim -= n;		/* adjust number of dimensions */
-	memcpy(dims, dims + n, ndim*sizeof(int)); /* move up by <n> */
+	memcpy(dims, dims + n, ndim*sizeof(Int)); /* move up by <n> */
       }
       naxes -= n;
       if (naxes < 0)
 	naxes = 0;
-      memcpy(axes, axes + n, naxes*sizeof(int));
+      memcpy(axes, axes + n, naxes*sizeof(Int));
       break;
     }
   }
@@ -532,7 +532,7 @@ int dimensionLoopResult1(loopInfo const *sinfo,
   /* create the output symbol */
   if (ndim) {		/* get an array */
     target = array_scratch(ttype, ndim, dims);
-    ptr.l = (int *) array_data(target);
+    ptr.l = (Int *) array_data(target);
   } else {			/* get a scalar */
     if (isStringType(ttype)) {
       target = string_scratch(0);
@@ -560,18 +560,18 @@ int dimensionLoopResult1(loopInfo const *sinfo,
   return target;
 }
 /*-----------------------------------------------------------------------*/
-int dimensionLoopResult(loopInfo const *sinfo, loopInfo *tinfo,
-                         int ttype, pointer *tptr)
+Int dimensionLoopResult(loopInfo const *sinfo, loopInfo *tinfo,
+                         Int ttype, pointer *tptr)
 {
   return dimensionLoopResult1(sinfo, sinfo->mode, ttype,
                               0, NULL, 0, NULL, tinfo, tptr);
 }
 /*-----------------------------------------------------------------------*/
-int standardLoop(int data, int axisSym, int mode, int outType,
-		 loopInfo *src, pointer *srcptr, int *output, 
+Int standardLoop(Int data, Int axisSym, Int mode, Int outType,
+		 loopInfo *src, pointer *srcptr, Int *output, 
 		 loopInfo *trgt, pointer *trgtptr)
 {
-  int i, nAxes;
+  Int i, nAxes;
   pointer axes;
 
   if (axisSym > 0) {		/* <axisSym> is a regular symbol */
@@ -590,15 +590,15 @@ int standardLoop(int data, int axisSym, int mode, int outType,
 /*-----------------------------------------------------------------------*/
 /* Like standardLoop but can produce a target like the source
    but with adjusted dimensions. LS 2011-07-22 */
-int standardLoopX(int source, int axisSym, int srcMode,
+Int standardLoopX(Int source, Int axisSym, Int srcMode,
                   loopInfo *srcinf, pointer *srcptr,
-                  int nMore, int const * more,
-                  int nLess, int const * less,
-                  enum Symboltype tgtType, int tgtMode,
-                  int *target,
+                  Int nMore, Int const * more,
+                  Int nLess, Int const * less,
+                  enum Symboltype tgtType, Int tgtMode,
+                  Int *target,
                   loopInfo *tgtinf, pointer *tgtptr)
 {
-  int i, nAxes;
+  Int i, nAxes;
   pointer axes;
 
   if (axisSym > 0) {		/* <axisSym> is a regular symbol */
@@ -610,14 +610,14 @@ int standardLoopX(int source, int axisSym, int srcMode,
     nAxes = 0;
     axes.l = NULL;
   }
-  int result = standardLoop1(source, nAxes, axes.l, srcMode,
+  Int result = standardLoop1(source, nAxes, axes.l, srcMode,
                              srcinf, srcptr, nMore, more, nLess, less,
                              tgtType, tgtMode, target, tgtinf, tgtptr);
   return result;
 }
 /*-----------------------------------------------------------------------*/
-int standardLoop0(int data, int nAxes, int *axes, int mode, int outType,
-		 loopInfo *src, pointer *srcptr, int *output, 
+Int standardLoop0(Int data, Int nAxes, Int *axes, Int mode, Int outType,
+		 loopInfo *src, pointer *srcptr, Int *output, 
 		 loopInfo *trgt, pointer *trgtptr)
 /* initiates a standard array loop.  advanceLoop() runs through the loop.
    <data>: source data symbol, must be numerical
@@ -687,7 +687,7 @@ int standardLoop0(int data, int nAxes, int *axes, int mode, int outType,
 	    considered to be a "row".  Implies SL_AXESBLOCK.
   */
 {
-  int	*dims, ndim, i, temp[MAX_DIMS];
+  Int	*dims, ndim, i, temp[MAX_DIMS];
 
 #if DEBUG_VOCAL
   debugout("in standardLoop()");
@@ -727,7 +727,7 @@ int standardLoop0(int data, int nAxes, int *axes, int mode, int outType,
 	  || axes[i] >= ndim)	/* or too great */
 	return anaerror("Illegal axis %1d", -1, axes[i]);
     if (mode & SL_UNIQUEAXES) {	/* no axis must occur more than once */
-      zerobytes(temp, ndim*sizeof(int));
+      zerobytes(temp, ndim*sizeof(Int));
       for (i = 0; i < nAxes; i++)
 	if (temp[axes[i]]++)
 	  return anaerror("Axis %1d illegally specified more than once",
@@ -787,14 +787,14 @@ int standardLoop0(int data, int nAxes, int *axes, int mode, int outType,
 }
 #undef DEBUG_VOCAL
 /*-----------------------------------------------------------------------*/
-int standardLoop1(int source,
-                  int nAxes, int const * axes,
-                  int srcMode,
+Int standardLoop1(Int source,
+                  Int nAxes, Int const * axes,
+                  Int srcMode,
                   loopInfo *srcinf, pointer *srcptr,
-                  int nMore, int const * more,
-                  int nLess, int const * less,
-                  enum Symboltype tgtType, int tgtMode,
-                  int *target, 
+                  Int nMore, Int const * more,
+                  Int nLess, Int const * less,
+                  enum Symboltype tgtType, Int tgtMode,
+                  Int *target, 
                   loopInfo *tgtinf, pointer *tgtptr)
 /* initiates a standard array loop.  advanceLoop() runs through the loop.
    <source> (in): source data symbol, must be numerical
@@ -935,8 +935,8 @@ int standardLoop1(int source,
 	    considered to be a "row".  Implies SL_AXESBLOCK.
   */
 {
-  int *dims;
-  int ndim, i, temp[MAX_DIMS];
+  Int *dims;
+  Int ndim, i, temp[MAX_DIMS];
 
   /* check if <source> is of proper class, and get some info about it */
   if (numerical_or_string(source, &dims, &ndim, NULL, srcptr) == ANA_ERROR)
@@ -963,7 +963,7 @@ int standardLoop1(int source,
 	  || axes[i] >= ndim)	/* or too great */
 	return anaerror("Illegal axis %1d", -1, axes[i]);
     if (srcMode & SL_UNIQUEAXES) { /* no axis must occur more than once */
-      zerobytes(temp, ndim*sizeof(int));
+      zerobytes(temp, ndim*sizeof(Int));
       for (i = 0; i < nAxes; i++)
 	if (temp[axes[i]]++)
 	  return anaerror("Axis %1d illegally specified more than once",
@@ -1006,7 +1006,7 @@ int standardLoop1(int source,
   return ANA_OK;
 }
 /*-----------------------------------------------------------------------*/
-int nextLoop(loopInfo *info)
+Int nextLoop(loopInfo *info)
 /* rearranges dimensions for a next loop through the array; returns 1
  if OK, 0 if we're beyond the last specified axis */
 {
@@ -1016,7 +1016,7 @@ int nextLoop(loopInfo *info)
   return ANA_OK;
 }
 /*-----------------------------------------------------------------------*/
-int nextLoops(loopInfo *info1, loopInfo *info2)
+Int nextLoops(loopInfo *info1, loopInfo *info2)
 /* rearranges dimensions for a next loop through the arrays; returns 1
  if OK, 0 if we're beyond the last specified axis */
 {
@@ -1028,14 +1028,14 @@ int nextLoops(loopInfo *info1, loopInfo *info2)
   return 1;
 }
 /*-----------------------------------------------------------------------*/
-void subdataLoop(int *range, loopInfo *src)
+void subdataLoop(Int *range, loopInfo *src)
 /* this routine selects less than the full source data set for treatment */
 /* by modifying src->step[] and src->rdims[] and src->data */
 /* <range> must contain the beginning and end of the range in each of
  the source coordinates.  This routine should only be used if
  no dimension compression has been applied. LS 30apr98 */
 {
-  int	i, offset;
+  Int	i, offset;
 
   offset = 0;
   for (i = 0; i < src->ndim; i++) {
@@ -1043,15 +1043,15 @@ void subdataLoop(int *range, loopInfo *src)
     src->rdims[src->raxes[i]] = range[2*i + 1] - range[2*i] + 1;
   }
   
-  memcpy(src->step, src->rsinglestep, src->ndim*sizeof(int));
+  memcpy(src->step, src->rsinglestep, src->ndim*sizeof(Int));
 
   for (i = src->ndim - 1; i > 0; i--)
     src->step[i] -= src->step[i - 1]*src->rdims[i - 1];
 
-  (*src->data).b = (byte *) src->data0 + offset*src->stride;
+  (*src->data).b = (Byte *) src->data0 + offset*src->stride;
 }
 /*--------------------------------------------------------------------*/
-void rearrangeEdgeLoop(loopInfo *src, loopInfo *trgt, int index)
+void rearrangeEdgeLoop(loopInfo *src, loopInfo *trgt, Int index)
 /* modifies <src> and <trgt> for walking along only the outer edges of the
    data set.  For this purpose, edge number <index> consists of all data
    points that have rearranged coordinate number <index>/2 equal to
@@ -1063,8 +1063,8 @@ void rearrangeEdgeLoop(loopInfo *src, loopInfo *trgt, int index)
    <trgt>->data0 point at the start of their respective data.  LS 23oct98
    LS 2feb99 */
 {
-  byte	back;
-  int	axis, trgtstride, i;
+  Byte	back;
+  Int	axis, trgtstride, i;
   pointer	*trgtdata;
   void	*trgtdata0;
 
@@ -1073,16 +1073,16 @@ void rearrangeEdgeLoop(loopInfo *src, loopInfo *trgt, int index)
   axis = src->axes[index];
     
   /* put target dimension in the back; get rearranged step sizes */
-  memcpy(src->rsinglestep, src->singlestep, axis*sizeof(int));
+  memcpy(src->rsinglestep, src->singlestep, axis*sizeof(Int));
   memcpy(src->rsinglestep + axis, src->singlestep + axis + 1,
-	 (src->ndim - axis - 1)*sizeof(int));
+	 (src->ndim - axis - 1)*sizeof(Int));
   src->rsinglestep[src->ndim - 1] = src->singlestep[axis];
     
   /* get rearranged dimensions */
   src->rndim = src->ndim;
-  memcpy(src->rdims, src->dims, axis*sizeof(int));
+  memcpy(src->rdims, src->dims, axis*sizeof(Int));
   memcpy(src->rdims + axis, src->dims + axis + 1,
-	 (src->ndim - axis - 1)*sizeof(int));
+	 (src->ndim - axis - 1)*sizeof(Int));
   src->rdims[src->ndim - 1] = src->dims[axis];
 
   /* get mappings between original and rearranged axes */
@@ -1095,11 +1095,11 @@ void rearrangeEdgeLoop(loopInfo *src, loopInfo *trgt, int index)
     src->iraxes[src->raxes[i]] = i;
   
   /* prepare step sizes for use in advanceLoop() */
-  memcpy(src->step, src->rsinglestep, src->rndim*sizeof(int));
+  memcpy(src->step, src->rsinglestep, src->rndim*sizeof(Int));
   for (i = src->rndim - 1; i; i--)
     src->step[i] -= src->step[i - 1]*src->rdims[i - 1];
   
-  zerobytes(src->coords, src->ndim*sizeof(int));
+  zerobytes(src->coords, src->ndim*sizeof(Int));
   src->data->b = src->data0;
 
   if (back) {
@@ -1126,8 +1126,8 @@ void rearrangeEdgeLoop(loopInfo *src, loopInfo *trgt, int index)
   }
 }
 /*--------------------------------------------------------------------*/
-int prepareDiagonals(int symbol, loopInfo *info, int part,
-		     int **offset, int **edge, int **rcoord, int **diagonal)
+Int prepareDiagonals(Int symbol, loopInfo *info, Int part,
+		     Int **offset, Int **edge, Int **rcoord, Int **diagonal)
 /* takes the numerical array <symbol> that specifies which connections
    to nearest neighbors to accept and calculates various associated
    numbers.  The target array dimensions are taken from <info>.
@@ -1178,7 +1178,7 @@ int prepareDiagonals(int symbol, loopInfo *info, int part,
    directions, then set <part> equal to 2.  Returns the number of
    offsets, or ANA_ERROR if an error occurred.  LS 10feb99 */
 {
-  int	i, j, *d, nDiagonal, nDoDim, n, n0, n1, n2, k;
+  Int	i, j, *d, nDiagonal, nDoDim, n, n0, n1, n2, k;
 
   if (symbol) {			/* have <diagonal> */
     if (symbol_class(symbol) != ANA_ARRAY)
@@ -1212,19 +1212,19 @@ int prepareDiagonals(int symbol, loopInfo *info, int part,
      LS 10feb99 */
 
   if (offset) {
-    *offset = (int *) malloc(n*sizeof(int)); /* offsets to elements to be 
+    *offset = (Int *) malloc(n*sizeof(Int)); /* offsets to elements to be 
 						investigated */
     if (!*offset)
       return cerror(ALLOC_ERR, 0);
   }
   if (edge) {
-    *edge = (int *) malloc(info->ndim*2*sizeof(int));
+    *edge = (Int *) malloc(info->ndim*2*sizeof(Int));
     if (!*edge)
       return cerror(ALLOC_ERR, 0);
-    zerobytes(*edge, info->ndim*2*sizeof(int));
+    zerobytes(*edge, info->ndim*2*sizeof(Int));
   }
   if (rcoord) {
-    *rcoord = (int *) malloc(n*info->ndim*sizeof(int));
+    *rcoord = (Int *) malloc(n*info->ndim*sizeof(Int));
     if (!*rcoord)
       return cerror(ALLOC_ERR, 0);
   }
@@ -1271,7 +1271,7 @@ int prepareDiagonals(int symbol, loopInfo *info, int part,
 	}
       }
       if (rcoord)
-	memcpy(*rcoord + k*info->ndim, info->coords, info->ndim*sizeof(int));
+	memcpy(*rcoord + k*info->ndim, info->coords, info->ndim*sizeof(Int));
       k++;
     }
     /* go to next direction. */
@@ -1288,11 +1288,11 @@ int prepareDiagonals(int symbol, loopInfo *info, int part,
     *diagonal = d;
 
   /* now that we have everything we need, we clean up */
-  zerobytes(info->coords, info->ndim*sizeof(int));
+  zerobytes(info->coords, info->ndim*sizeof(Int));
   return n;
 }
 /*--------------------------------------------------------------------*/
-int moveLoop(loopInfo *info, int index, int distance)
+Int moveLoop(loopInfo *info, Int index, Int distance)
 /* moves along rearranged axis number <index> over the indicated <distance>, */
 /* updating the coordinates and pointers in <info>.  <distance> may be
    negative and may have any magnitude.  If <index> points at a non-existent
@@ -1302,7 +1302,7 @@ int moveLoop(loopInfo *info, int index, int distance)
    Otherwise, returns the index of the last affected dimension.
    LS 9apr99 */
 {
-  int	i;
+  Int	i;
 
   if (index < 0)		/* illegal axis; don't do anything */
     return info->rndim;
@@ -1338,12 +1338,12 @@ int moveLoop(loopInfo *info, int index, int distance)
   return index;
 }
 /*--------------------------------------------------------------------*/
-void returnLoop(loopInfo *info, pointer *ptr, int index)
+void returnLoop(loopInfo *info, pointer *ptr, Int index)
 /* moves to the start of the rearranged axis indicated by <index>, */
 /* zeroing all rearranged coordinates up to and including that one and */
 /* adjusting the pointer accordingly.  LS 9apr99 */
 {
-  int	i;
+  Int	i;
   
   for (i = 0; i <= index; i++) {
     ptr->b -= info->coords[index]*info->rsinglestep[index]*info->stride;
@@ -1351,14 +1351,14 @@ void returnLoop(loopInfo *info, pointer *ptr, int index)
   }
 }
 /*--------------------------------------------------------------------*/
-static int numerical_or_string_choice(int data, int **dims, int *nDim, int *size, pointer *src, int string_is_ok)
+static Int numerical_or_string_choice(Int data, Int **dims, Int *nDim, Int *size, pointer *src, Int string_is_ok)
 /* checks that <data> is of numerical type and returns dimensional */
 /* information in <*dims>, <*nDim>, and <*size> (if these are non-zero), */
 /* and a pointer to the data in <*src>.  If <*dims> is non-null, then
    the user must have made sure it points at properly reserved memory
    space. LS 21apr97 */
 {
-  static int	one = 1;
+  static Int	one = 1;
 
   switch (symbol_class(data)) {
   default:
@@ -1410,7 +1410,7 @@ static int numerical_or_string_choice(int data, int **dims, int *nDim, int *size
   return 1;
 }
 /*---------------------------------------------------------------------*/
-int numerical(int data, int **dims, int *nDim, int *size, pointer *src)
+Int numerical(Int data, Int **dims, Int *nDim, Int *size, pointer *src)
 /* checks that <data> is of numerical type and returns dimensional */
 /* information in <*dims>, <*nDim>, and <*size> (if these are non-zero), */
 /* and a pointer to the data in <*src>.  If <*dims> is non-null, then
@@ -1420,7 +1420,7 @@ int numerical(int data, int **dims, int *nDim, int *size, pointer *src)
   return numerical_or_string_choice(data, dims, nDim, size, src, 0);
 }
 /*---------------------------------------------------------------------*/
-int numerical_or_string(int data, int **dims, int *nDim, int *size, pointer *src)
+Int numerical_or_string(Int data, Int **dims, Int *nDim, Int *size, pointer *src)
 /* checks that <data> is of numerical or string type and returns
    dimensional information in <*dims>, <*nDim>, and <*size> (if these
    are non-zero), and a pointer to the data in <*src>.  If <*dims> is
@@ -1430,9 +1430,9 @@ int numerical_or_string(int data, int **dims, int *nDim, int *size, pointer *src
   return numerical_or_string_choice(data, dims, nDim, size, src, 1);
 }
 /*--------------------------------------------------------------------*/
-void standard_redef_array(int iq, enum Symboltype type,
-			  int num_dims, int *dims, 
-			  int naxes, int *axes,
+void standard_redef_array(Int iq, enum Symboltype type,
+			  Int num_dims, Int *dims, 
+			  Int naxes, Int *axes,
 			  pointer *ptr, loopInfo *info)
 {
   redef_array(iq, type, num_dims, dims);
@@ -1539,21 +1539,21 @@ struct dims_spec {
 
 struct param_spec {
   enum param_spec_type { PS_INPUT, PS_OUTPUT, PS_RETURN } logical_type;
-  int is_optional;
+  Int is_optional;
   enum type_spec_limit_type { PS_EXACT, PS_LOWER_LIMIT } data_type_limit;
   enum Symboltype data_type;
   size_t num_dims_spec;
   struct dims_spec *dims_spec;
-  int ref_par;
-  int axis_par;
+  Int ref_par;
+  Int axis_par;
   enum remaining_dims_type { PS_ABSENT, PS_EQUAL_TO_REFERENCE, PS_ARBITRARY } remaining_dims;
-  int remaining_dims_equal_to_reference;
+  Int remaining_dims_equal_to_reference;
 };
 
 struct param_spec_list {
   size_t num_param_specs;
   struct param_spec *param_specs;
-  int return_param_index;
+  Int return_param_index;
 };
 
 void free_param_spec_list(struct param_spec_list *psl)
@@ -1576,8 +1576,8 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
   struct param_spec *ps = NULL;
   struct dims_spec *ds = NULL;
   size_t i, prev_ods_num_elem;
-  int return_param_index = -1;
-  int param_index;
+  Int return_param_index = -1;
+  Int param_index;
   char const *fmt0 = fmt;
 
   if (!fmt || !*fmt)
@@ -1716,7 +1716,7 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
       while (*fmt && !strchr("*?;&", *fmt)) { /* all dims */
         memset(&d_spec, '\0', sizeof(d_spec));
         while (*fmt && !strchr(",?*;&", *fmt)) { /* every dim */
-          int type = 0;
+          Int type = 0;
           size_t size = 0;
           switch (*fmt) {
           case '+':
@@ -1875,7 +1875,7 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
       j++;
   }
   /* check that the reference parameter does not point outside the list */
-  int n = psl->num_param_specs - (psl->return_param_index >= 0);
+  Int n = psl->num_param_specs - (psl->return_param_index >= 0);
   if (n) {
     for (i = 0; i < psl->num_param_specs; i++) {
       if (psl->param_specs[i].ref_par >= n) {
@@ -1895,15 +1895,15 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
   return NULL;
 }
 
-int standard_args(int narg, int ps[], char const *fmt, pointer **ptrs,
+Int standard_args(Int narg, Int ps[], char const *fmt, pointer **ptrs,
                   loopInfo **infos)
 {
-  int returnSym, *ref_dims, tgt_dims[MAX_DIMS], prev_ref_param, *final;
+  Int returnSym, *ref_dims, tgt_dims[MAX_DIMS], prev_ref_param, *final;
   struct param_spec *pspec;
   struct param_spec_list *psl;
   struct dims_spec *dims_spec;
   struct obstack o;
-  int param_ix, num_ref_dims;
+  Int param_ix, num_ref_dims;
   loopInfo li;
   pointer p;
   enum Symboltype type;
@@ -1917,10 +1917,10 @@ int standard_args(int narg, int ps[], char const *fmt, pointer **ptrs,
       *infos = NULL;
     return anaerror("Illegal standard arguments specification %s", 0, fmt);
   }
-  int num_in_out_params = psl->num_param_specs
+  Int num_in_out_params = psl->num_param_specs
     - (psl->return_param_index >= 0);
   /* determine mininum and maximum required number of arguments */
-  int nmin;
+  Int nmin;
   for (nmin = num_in_out_params; nmin > 0; nmin--)
     if (!psl->param_specs[nmin - 1].is_optional)
       break;
@@ -1935,19 +1935,19 @@ int standard_args(int narg, int ps[], char const *fmt, pointer **ptrs,
     *ptrs = malloc(psl->num_param_specs*sizeof(pointer));
   if (infos)
     *infos = malloc(psl->num_param_specs*sizeof(loopInfo));
-  final = calloc(psl->num_param_specs, sizeof(int));
+  final = calloc(psl->num_param_specs, sizeof(Int));
   
   obstack_init(&o);
   /* now we treat the parameters. */
   prev_ref_param = -1; /* < 0 indicates no reference parameter set yet */
   for (param_ix = 0; param_ix < psl->num_param_specs; param_ix++) {
-    int pspec_dims_ix; /* parameter dimension specification index */
-    int tgt_dims_ix;   /* target dimension index */
-    int ref_dims_ix;   /* reference dimension index */
-    int src_dims_ix;   /* input dimension index */
-    int *src_dims;        /* dimensions of input parameter */
-    int num_src_dims;      /* number of dimensions of input parameter */
-    int iq, d;
+    Int pspec_dims_ix; /* parameter dimension specification index */
+    Int tgt_dims_ix;   /* target dimension index */
+    Int ref_dims_ix;   /* reference dimension index */
+    Int src_dims_ix;   /* input dimension index */
+    Int *src_dims;        /* dimensions of input parameter */
+    Int num_src_dims;      /* number of dimensions of input parameter */
+    Int iq, d;
 
     pspec = &psl->param_specs[param_ix];
     dims_spec = pspec->dims_spec;
@@ -1956,7 +1956,7 @@ int standard_args(int narg, int ps[], char const *fmt, pointer **ptrs,
       src_dims = NULL;
       num_src_dims = 0;
     }
-    int ref_param = pspec->ref_par;
+    Int ref_param = pspec->ref_par;
     if (ref_param < 0)
       ref_param = (param_ix? param_ix - 1: 0);
     if (param_ix > 0            /* first parameter has no reference */
@@ -2044,7 +2044,7 @@ int standard_args(int narg, int ps[], char const *fmt, pointer **ptrs,
           switch (pspec->logical_type) {
           case PS_INPUT:
             {
-              int d = dims_spec[pspec_dims_ix].size_remove;
+              Int d = dims_spec[pspec_dims_ix].size_remove;
               if (d && ref_dims[ref_dims_ix] != d) {
                 returnSym = anaerror("Expected size %d for dimension %d "
                                      "but found %d", ps[param_ix],
@@ -2055,7 +2055,7 @@ int standard_args(int narg, int ps[], char const *fmt, pointer **ptrs,
             break;
           case PS_OUTPUT: case PS_RETURN:
             {
-              int d = dims_spec[pspec_dims_ix].size_remove;
+              Int d = dims_spec[pspec_dims_ix].size_remove;
               if (d && ref_dims[ref_dims_ix] != d) {
                 returnSym = anaerror("Expected size %d for dimension %d "
                                      "but found %d", ps[param_ix],
@@ -2086,7 +2086,7 @@ int standard_args(int narg, int ps[], char const *fmt, pointer **ptrs,
         switch (pspec->remaining_dims) {
         case PS_EQUAL_TO_REFERENCE:
           if (ref_dims && ref_dims_ix < num_ref_dims) {
-	    int expect = num_ref_dims + src_dims_ix - ref_dims_ix;
+	    Int expect = num_ref_dims + src_dims_ix - ref_dims_ix;
             if (expect != num_src_dims) {
               returnSym = anaerror("Expected %d dimensions but found %d",
                                    ps[param_ix],
@@ -2094,7 +2094,7 @@ int standard_args(int narg, int ps[], char const *fmt, pointer **ptrs,
                                    num_src_dims);
               goto error;
             }
-            int i, j;
+            Int i, j;
             for (i = ref_dims_ix, j = src_dims_ix; i < num_ref_dims; i++, j++)
               if (ref_dims[i] != src_dims[j]) {
                 returnSym = anaerror("Expected dimension %d equal to %d "
@@ -2145,7 +2145,7 @@ int standard_args(int narg, int ps[], char const *fmt, pointer **ptrs,
           if (ref_dims_ix < num_ref_dims) {
             /* append remaining dimensions from reference parameter*/
             size_t e = num_ref_dims - ref_dims_ix;
-            memcpy(tgt_dims + tgt_dims_ix, ref_dims + ref_dims_ix, e*sizeof(int));
+            memcpy(tgt_dims + tgt_dims_ix, ref_dims + ref_dims_ix, e*sizeof(Int));
             tgt_dims_ix += e;
             src_dims_ix += e;
             ref_dims_ix += e;
@@ -2161,7 +2161,7 @@ int standard_args(int narg, int ps[], char const *fmt, pointer **ptrs,
         }
 	if (pspec->axis_par > -2) {
 	  /* We have an axis parameter specified for this one. */
-	  int axis_param = pspec->axis_par;
+	  Int axis_param = pspec->axis_par;
 	  if (axis_param == -1) /* points at previous parameter */
 	    axis_param = param_ix - 1;
 
@@ -2181,7 +2181,7 @@ int standard_args(int narg, int ps[], char const *fmt, pointer **ptrs,
 				 axis_param + 1, param_ix + 1);
 	    goto error;
 	  }
-	  int aq = ps[axis_param];
+	  Int aq = ps[axis_param];
 	  if (!symbolIsNumerical(aq)) {
 	    returnSym = anaerror("Axis parameter %d is not numerical for"
 				 " parameter %d", 0,
@@ -2189,10 +2189,10 @@ int standard_args(int narg, int ps[], char const *fmt, pointer **ptrs,
 	    goto error;
 	  }
 	  aq = ana_long(1, &aq);
-	  int nAxes;
+	  Int nAxes;
 	  pointer axes;
 	  numerical(aq, NULL, NULL, &nAxes, &axes);
-	  int j;
+	  Int j;
 	  for (j = 0; j < nAxes; j++) {
 	    if (axes.l[j] < 0 || axes.l[j] >= tgt_dims_ix) {
 	      returnSym = anaerror("Axis %d out of bounds for"
@@ -2203,7 +2203,7 @@ int standard_args(int narg, int ps[], char const *fmt, pointer **ptrs,
 	    tgt_dims[axes.l[j]] = 0; /* flags removal.  Note: no check for
 				      duplicate axes */
 	  }
-	  int k;
+	  Int k;
 	  /* remove flagged dimensions */
 	  for (j = k = 0; j < tgt_dims_ix; j++) {
 	    if (tgt_dims[j])

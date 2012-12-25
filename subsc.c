@@ -11,15 +11,15 @@
 static char rcsid[] __attribute__ ((unused)) =
  "$Id: subsc.c,v 4.1 2001/02/08 19:36:43 strous Exp $";
 
-extern int	redim_warn_flag, range_warn_flag;
-int	ana_assoc_output(int iq, int jq, int offsym, int axsym),
-  ana_file_output(int iq, int jq, int offsym, int axsym),
-  ana_gmap(int narg, int ps[], int new), ana_assoc_input(int, int []),
-  simple_reverse(int *p1, int *p2, int n, int type), getBody(int),
-  string_sub(int, int []);
-void	convertPointer(scalar *, int, int);
+extern Int	redim_warn_flag, range_warn_flag;
+Int	ana_assoc_output(Int iq, Int jq, Int offsym, Int axsym),
+  ana_file_output(Int iq, Int jq, Int offsym, Int axsym),
+  ana_gmap(Int narg, Int ps[], Int new), ana_assoc_input(Int, Int []),
+  simple_reverse(Int *p1, Int *p2, Int n, Int type), getBody(Int),
+  string_sub(Int, Int []);
+void	convertPointer(scalar *, Int, Int);
 /*------------------------------------------------------------------------- */
-int ana_inserter(int narg, int ps[])
+Int ana_inserter(Int narg, Int ps[])
 /* syntax: insert,target,source [,origin]
    inserts <source> in <target>, starting at <target> coordinates
    <origin> (one or more).
@@ -29,7 +29,7 @@ int ana_inserter(int narg, int ps[])
 {
   loopInfo	trgtinfo;
   pointer	src, trgt;
-  int	*dims, ndim, i, offset[2*MAX_DIMS], doff, daxes, nelem;
+  Int	*dims, ndim, i, offset[2*MAX_DIMS], doff, daxes, nelem;
 
   switch (symbol_class(ps[0])) {
     case ANA_ASSOC:
@@ -216,13 +216,13 @@ int ana_inserter(int narg, int ps[])
   return ANA_OK;
 }
 /*------------------------------------------------------------------------- */
-int ana_smap(int narg, int ps[])
+Int ana_smap(Int narg, Int ps[])
  /* convert type (and class) to a string */
 {
-  register int n;
+  register Int n;
   register pointer q1,q3;
-  int	nsym, nd, j, n1;
-  int	result_sym, size;
+  Int	nsym, nd, j, n1;
+  Int	result_sym, size;
 
   nsym = ps[0];				/*only one argument */
   if (symbol_class(nsym) == ANA_STRING)
@@ -238,7 +238,7 @@ int ana_smap(int narg, int ps[])
       q1.l = &scalar_value(nsym).l;
       break;
     case ANA_ARRAY:			/*array */
-      q1.l = (int *) array_data(nsym);
+      q1.l = (Int *) array_data(nsym);
       nd = array_num_dims(nsym);
       n = array_size(nsym);
       break;
@@ -272,54 +272,54 @@ int ana_smap(int narg, int ps[])
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-int ana_bmap(int narg,int ps[])
-/* convert type to byte without changing memory contents */
+Int ana_bmap(Int narg,Int ps[])
+/* convert type to Byte without changing memory contents */
 {
   return ana_gmap(narg, ps, ANA_BYTE);
 }
 /*------------------------------------------------------------------------- */
-int ana_wmap(int narg, int ps[])
-/* convert type to byte without changing memory contents */
+Int ana_wmap(Int narg, Int ps[])
+/* convert type to Byte without changing memory contents */
 {
   return ana_gmap(narg, ps, ANA_WORD);
 }
 /*------------------------------------------------------------------------- */
-int ana_lmap(int narg, int ps[])
+Int ana_lmap(Int narg, Int ps[])
 /* convert type to long without changing memory contents */
 {
   return ana_gmap(narg, ps, ANA_LONG);
 }
 /*------------------------------------------------------------------------- */
-int ana_fmap(int narg, int ps[])
-/* convert type to float without changing memory contents */
+Int ana_fmap(Int narg, Int ps[])
+/* convert type to Float without changing memory contents */
 {
   return ana_gmap(narg, ps, ANA_FLOAT);
 }
 /*------------------------------------------------------------------------- */
-int ana_dmap(int narg, int ps[])
-/* convert type to double without changing memory contents */
+Int ana_dmap(Int narg, Int ps[])
+/* convert type to Double without changing memory contents */
 {
   return ana_gmap(narg, ps, ANA_DOUBLE);
 }
 /*------------------------------------------------------------------------- */
-int ana_cfmap(int narg, int ps[])
+Int ana_cfmap(Int narg, Int ps[])
 /* convert type to cfloat without changing memory contents */
 {
   return ana_gmap(narg, ps, ANA_CFLOAT);
 }
 /*------------------------------------------------------------------------- */
-int ana_cdmap(int narg, int ps[])
+Int ana_cdmap(Int narg, Int ps[])
 /* convert type to cdouble without changing memory contents */
 {
   return ana_gmap(narg, ps, ANA_CDOUBLE);
 }
 /*------------------------------------------------------------------------- */
-int ana_gmap(int narg, int ps[], int new)
+Int ana_gmap(Int narg, Int ps[], Int new)
                 /* general part for map routines */
 {
   register pointer q1,q3;
-  int	nsym, nd, n, nn;
-  int	result_sym, type;
+  Int	nsym, nd, n, nn;
+  Int	result_sym, type;
 
   nsym = ps[0];				/* only one argument */
   type = symbol_type(nsym);
@@ -399,19 +399,19 @@ int ana_gmap(int narg, int ps[], int new)
   return result_sym;
 }
  /*------------------------------------------------------------------------- */
-void rearr(int x[], int rear[], int nd)
+void rearr(Int x[], Int rear[], Int nd)
  /*rearrange subscript vectors */
 /* added rear[] and nd parameters and scratch[] variable declaration to make */
 /* ana_subsc_func recursive LS 30mar94 */
 {
-  static int scratch[MAX_DIMS];
-  int	k;
+  static Int scratch[MAX_DIMS];
+  Int	k;
   for (k=0;k<nd;k++) scratch[k] = x[ rear[k] ];
   for (k=0;k<nd;k++) x[k] = scratch[k];
 }
 /*------------------------------------------------------------------------- */
-#define rint(value) ((int) (value + ((value >= 0)? 0.5: -0.5)))
-int ana_reverse(int narg, int ps[])
+#define rint(value) ((Int) (value + ((value >= 0)? 0.5: -0.5)))
+Int ana_reverse(Int narg, Int ps[])
 /* y = REVERSE(x [, axes, center] [, /ZERO])
  reverse <x> in the indicated <axes>, around the specified <center>.
  if any elements would have to reverse into <y> from outside <x>, then
@@ -421,7 +421,7 @@ int ana_reverse(int narg, int ps[])
   loopInfo	srcinfo, trgtinfo;
   pointer	src, trgt, src2, trgt2, center;
   scalar	value;
-  int	result, stride, i, iq, w, n, inplace;
+  Int	result, stride, i, iq, w, n, inplace;
 
   if (symbolIsNumerical(ps[0])) {
     if (standardLoop(ps[0], (narg > 1 && ps[1])? ps[1]: 0, 
@@ -560,7 +560,7 @@ int ana_reverse(int narg, int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-int expandListArguments(int *narg, int *ps[], int list, int indx, int freeList)
+Int expandListArguments(Int *narg, Int *ps[], Int list, Int indx, Int freeList)
 /* put the elements of the LIST/STRUCT <list> into <*ps> at
    index <indx>, replacing the symbol currently at that position.
    Recursively replaces LIST/STRUCTs in the expanded parts of the
@@ -568,7 +568,7 @@ int expandListArguments(int *narg, int *ps[], int list, int indx, int freeList)
    elements.
    LS 14jun98 */
 {
-  int	n, i, nlist, j, iq, k;
+  Int	n, i, nlist, j, iq, k;
 
   nlist = 1;
   iq = -list;
@@ -583,13 +583,13 @@ int expandListArguments(int *narg, int *ps[], int list, int indx, int freeList)
 	*narg += n - 1;		/* minus one because the slot now occupied
 				 by <list> can be occupied by its first
 				 element instead */
-	*ps = realloc(*ps, *narg*sizeof(int)); /* more memory as needed */
+	*ps = realloc(*ps, *narg*sizeof(Int)); /* more memory as needed */
 	if (!*ps)		/* some allocation error occurred */
 	  return cerror(ALLOC_ERR, iq);
 	/* move the stuff that is after <list> to make room for the elements
 	   of <list> */
 	memmove(*ps + indx + n, *ps + indx + 1,
-		(*narg - indx - n)*sizeof(int));
+		(*narg - indx - n)*sizeof(Int));
 	/* now insert the elements of <iq> */
 	for (i = 0; i < n; i++) {
 	  k = (*ps)[indx + i] = clist_symbols(iq)[i];
@@ -611,10 +611,10 @@ int expandListArguments(int *narg, int *ps[], int list, int indx, int freeList)
       case ANA_LIST:
 	n = list_num_symbols(iq);
 	*narg += n - 1;
-	*ps = realloc(*ps, *narg*sizeof(int));
+	*ps = realloc(*ps, *narg*sizeof(Int));
 	if (!*ps)
 	  return cerror(ALLOC_ERR, iq);
-	memmove(*ps + indx + n, *ps + indx, (*narg - indx - n)*sizeof(int));
+	memmove(*ps + indx + n, *ps + indx, (*narg - indx - n)*sizeof(Int));
 	for (i = 0; i < n; i++) {
 	  k = (*ps)[indx + i] = list_symbol(iq, i);
 	  if (freeList
@@ -632,7 +632,7 @@ int expandListArguments(int *narg, int *ps[], int list, int indx, int freeList)
   return nlist;			/* done */
 }
  /*------------------------------------------------------------------------- */
-int treatListArguments(int *narg, int *ps[], int offset)
+Int treatListArguments(Int *narg, Int *ps[], Int offset)
 /* expands appropriate LIST/STRUCT arguments in the argument list */
 /* this routine takes argument list <*ps> and checks if any of the
    <*narg> arguments is a compact list with one element which is itself
@@ -649,7 +649,7 @@ int treatListArguments(int *narg, int *ps[], int offset)
    zapped, its temporary-variable elements get zapped, too, unless
    we assign them to a different context. */
 {
-  int	i, iq, n, i1, i2, list;
+  Int	i, iq, n, i1, i2, list;
 
   if (offset >= 0) {
     i1 = offset;
@@ -721,8 +721,8 @@ int treatListArguments(int *narg, int *ps[], int offset)
   return 1;
 }
 /*------------------------------------------------------------------------- */
-int expandListArguments_w(int *narg, word *ps[], int list, int indx,
-			  int freeList)
+Int expandListArguments_w(Int *narg, Word *ps[], Int list, Int indx,
+			  Int freeList)
 /* put the elements of the LIST/STRUCT <list> into <*ps> at
    index <indx>, replacing the symbol currently at that position.
    Recursively replaces LIST/STRUCTs in the expanded parts of the
@@ -730,7 +730,7 @@ int expandListArguments_w(int *narg, word *ps[], int list, int indx,
    elements.
    LS 14jun98 */
 {
-  int	n, i, nlist, j, iq, k;
+  Int	n, i, nlist, j, iq, k;
 
   nlist = 1;
   iq = -list;
@@ -745,13 +745,13 @@ int expandListArguments_w(int *narg, word *ps[], int list, int indx,
 	*narg += n - 1;		/* minus one because the slot now occupied
 				 by <list> can be occupied by its first
 				 element instead */
-	*ps = realloc(*ps, *narg*sizeof(word)); /* more memory as needed */
+	*ps = realloc(*ps, *narg*sizeof(Word)); /* more memory as needed */
 	if (!*ps)		/* some allocation error occurred */
 	  return cerror(ALLOC_ERR, iq);
 	/* move the stuff that is after <list> to make room for the elements
 	   of <list> */
 	memmove(*ps + indx + n, *ps + indx + 1,
-		(*narg - indx - n)*sizeof(word));
+		(*narg - indx - n)*sizeof(Word));
 	/* now insert the elements of <iq> */
 	for (i = 0; i < n; i++) {
 	  k = (*ps)[indx + i] = clist_symbols(iq)[i];
@@ -773,10 +773,10 @@ int expandListArguments_w(int *narg, word *ps[], int list, int indx,
       case ANA_LIST:
 	n = list_num_symbols(iq);
 	*narg += n - 1;
-	*ps = realloc(*ps, *narg*sizeof(word));
+	*ps = realloc(*ps, *narg*sizeof(Word));
 	if (!*ps)
 	  return cerror(ALLOC_ERR, iq);
-	memmove(*ps + indx + n, *ps + indx, (*narg - indx - n)*sizeof(word));
+	memmove(*ps + indx + n, *ps + indx, (*narg - indx - n)*sizeof(Word));
 	for (i = 0; i < n; i++) {
 	  k = (*ps)[indx + i] = list_symbol(iq, i);
 	  if (freeList
@@ -794,7 +794,7 @@ int expandListArguments_w(int *narg, word *ps[], int list, int indx,
   return nlist;			/* done */
 }
 /*------------------------------------------------------------------------- */
-int treatListArguments_w(int *narg, word *ps[], int offset)
+Int treatListArguments_w(Int *narg, Word *ps[], Int offset)
 /* expands appropriate LIST/STRUCT arguments in the argument list */
 /* this routine takes argument list <*ps> and checks if any of the
    <*narg> arguments is a compact list with one element which is itself
@@ -811,7 +811,7 @@ int treatListArguments_w(int *narg, word *ps[], int offset)
    zapped, its temporary-variable elements get zapped, too, unless
    we assign them to a different context. */
 {
-  int	i, iq, n, i1, i2, list;
+  Int	i, iq, n, i1, i2, list;
 
   if (offset >= 0) {
     i1 = offset;
@@ -887,24 +887,24 @@ int treatListArguments_w(int *narg, word *ps[], int offset)
 #define INNER	1
 #define OUTER	2
 
-int ana_subsc_func(int narg, int ps[])
+Int ana_subsc_func(Int narg, Int ps[])
 /* decipher and extract subscripted values from a symbol; supports arrays, */
 /* strings, associated variables, file maps, and function pointers. */
 /* rewritten LS 6aug96 */
 {
-  int	nsym, type, i, n, iq, ndim, *dims, start[MAX_DIMS], j, nsum,
+  Int	nsym, type, i, n, iq, ndim, *dims, start[MAX_DIMS], j, nsum,
 	size[MAX_DIMS], todim[MAX_DIMS], *index[MAX_DIMS], nelem, *iptr,
 	trgtndim, trgtdims[MAX_DIMS], fromdim[MAX_DIMS], one = 1, offset0,
 	stride[MAX_DIMS], offset, width, tally[MAX_DIMS], step[MAX_DIMS],
 	noutdim, ps2[MAX_DIMS], class, narr, combineType;
-  word	*ap;
+  Word	*ap;
   pointer	src, trgt;
   wideScalar	value, item;
-  byte	subsc_type[MAX_DIMS], sum[MAX_DIMS];
+  Byte	subsc_type[MAX_DIMS], sum[MAX_DIMS];
   listElem	*le;
   FILE	*fp = NULL;
-  int	ana_subsc_subgrid(int, int []);
-  int ana_endian(int, int []);
+  Int	ana_subsc_subgrid(Int, Int []);
+  Int ana_endian(Int, Int []);
 
   nsym = ps[--narg];
   /* now nsym is the source (subscripted) symbol and narg is the number
@@ -974,12 +974,12 @@ int ana_subsc_func(int narg, int ps[])
 	symbol_class(n) = ANA_INT_FUNC;
 	int_func_number(n) = iq;
       }
-      symbol_memory(n) = narg*sizeof(word);
+      symbol_memory(n) = narg*sizeof(Word);
       if (narg) {		/* arguments */
-	allocate(symbol_data(n), narg, word *);
+	allocate(symbol_data(n), narg, Word *);
 	ap = symbol_data(n);
 	while (narg--)
-	  *ap++ = *ps++;	/* ap is word* and ps is int*, so we cannot */
+	  *ap++ = *ps++;	/* ap is Word* and ps is Int*, so we cannot */
 				/* just use memcpy(). */
       }
       iq = eval(n);
@@ -1001,7 +1001,7 @@ int ana_subsc_func(int narg, int ps[])
       type = file_map_type(nsym);
       break;
     case ANA_ARRAY: case ANA_CARRAY:
-      src.l = (int *) array_data(nsym);
+      src.l = (Int *) array_data(nsym);
       ndim = array_num_dims(nsym);
       dims = array_dims(nsym);
       nelem = array_size(nsym);
@@ -1130,7 +1130,7 @@ int ana_subsc_func(int narg, int ps[])
 	  i = narg;
 	} else {		/* no /SEPARATE */
 	  if (n == 1) {		/* only one element: mimic scalar */
-	    start[i] = *(int *) array_data(iq);
+	    start[i] = *(Int *) array_data(iq);
 	    if (narg == 1)	/* single subscript only */
 	      width = nelem;
 	    else
@@ -1141,7 +1141,7 @@ int ana_subsc_func(int narg, int ps[])
 	    }
 	    subsc_type[i] = ANA_RANGE;
 	  } else {		/* multiple elements in this subscript */
-	    iptr = index[i] = (int *) array_data(iq);
+	    iptr = index[i] = (Int *) array_data(iq);
 	    if (narg == 1)	/* only a single subscript; addresses */
 				/* whole source array as if it were 1D */
 	      width = nelem;
@@ -1185,7 +1185,7 @@ int ana_subsc_func(int narg, int ps[])
 	    case ANA_ARRAY:
 	      j = ana_long(1, &j);	/* ensure LONG indices */
 	      n = size[i] = array_size(j);
-	      iptr = index[i] = (int *) array_data(j);
+	      iptr = index[i] = (Int *) array_data(j);
 	      while (n--) {	/* check if all subscripts are within range */
 		if (*iptr < 0 || *iptr >= dims[i]) {
 		  cerror(ILL_SUBSC, iq, *iptr, dims[i]);
@@ -1333,7 +1333,7 @@ int ana_subsc_func(int narg, int ps[])
       if (iq == ANA_ERROR)
 	goto ana_subsc_1;
       symbol_class(iq) = class;
-      n = size[0]*sizeof(word);
+      n = size[0]*sizeof(Word);
       ap = clist_symbols(iq) = malloc(n);
       if (!clist_symbols(iq)) {
 	cerror(ALLOC_ERR, iq);
@@ -1342,7 +1342,7 @@ int ana_subsc_func(int narg, int ps[])
       symbol_memory(iq) = n;
       switch (subsc_type[0]) {
 	case ANA_RANGE:
-	  memcpy(ap, clist_symbols(nsym) + start[0], size[0]*sizeof(word));
+	  memcpy(ap, clist_symbols(nsym) + start[0], size[0]*sizeof(Word));
 	  break;
 	case ANA_ARRAY:
 	  n = size[0];
@@ -1371,7 +1371,7 @@ int ana_subsc_func(int narg, int ps[])
 	if (iq == ANA_ERROR)
 	  goto ana_subsc_1;
 	symbol_class(iq) = class;
-	n = size[0]*sizeof(word);
+	n = size[0]*sizeof(Word);
 	ap = clist_symbols(iq) = malloc(n);
 	if (!clist_symbols(iq)) {
 	  cerror(ALLOC_ERR, iq);
@@ -1380,7 +1380,7 @@ int ana_subsc_func(int narg, int ps[])
 	symbol_memory(iq) = n;
 	switch (subsc_type[0]) {
 	  case ANA_RANGE:
-	    memcpy(ap, clist_symbols(nsym) + start[0], size[0]*sizeof(word));
+	    memcpy(ap, clist_symbols(nsym) + start[0], size[0]*sizeof(Word));
 	    break;
 	  case ANA_ARRAY:
 	    n = size[0];
@@ -1470,7 +1470,7 @@ int ana_subsc_func(int narg, int ps[])
       else			/* must be a range */
 	iq = array_scratch(type, 1, &size[n]);
       nelem = array_size(iq);
-      trgt.l = (int *) array_data(iq);
+      trgt.l = (Int *) array_data(iq);
     } else {
       iq = scalar_scratch(type);
       nelem = 1;
@@ -1610,7 +1610,7 @@ int ana_subsc_func(int narg, int ps[])
 	if (subsc_type[j] == ANA_ARRAY && size[j] > 1 && !sum[j]) {
 	  /* a multi-dimensional array was specified as a subscript */
 	  /* without summation; copy the dimensions to the output symbol */
-	  memcpy(trgtdims + n, array_dims(ps2[j]), step[j]*sizeof(int));
+	  memcpy(trgtdims + n, array_dims(ps2[j]), step[j]*sizeof(Int));
 	  n += step[j];
 	} else if (!sum[j])	/* simple argument: one dimension extra */
 	  trgtdims[n++] = size[j];
@@ -1618,7 +1618,7 @@ int ana_subsc_func(int narg, int ps[])
 	  trgtdims[n++] = 1;
       }	/* end of for (i = 0...) */
       iq = array_scratch(type, noutdim, trgtdims);
-      trgt.l = (int *) array_data(iq);
+      trgt.l = (Int *) array_data(iq);
     } /* end of if (noutdim) */
     else if (class == ANA_STRING_ARRAY) { /* string from string array */
       if (src.sp[start[0]]) {	/* non-null string */
@@ -1669,7 +1669,7 @@ int ana_subsc_func(int narg, int ps[])
 	for (i = 0; i < narg; i++)
 	  if (!sum[fromdim[i]])	/* and then the non-summed ones */
 	    stride[n++] = fromdim[i];
-	memcpy(fromdim, stride, narg*sizeof(int));
+	memcpy(fromdim, stride, narg*sizeof(Int));
       }
     }
     /* for ANA_ARRAY subscripts the offset is calculated for each index; */
@@ -1692,11 +1692,11 @@ int ana_subsc_func(int narg, int ps[])
       /* first the number of elements in each target dimension */
       for (i = 0; i < trgtndim; i++)
 	ps2[i] = size[fromdim[i]];
-      memcpy(size, ps2, trgtndim*sizeof(int));
+      memcpy(size, ps2, trgtndim*sizeof(Int));
       /* then the step sizes to go through each target dimension */
       for (i = 0; i < trgtndim; i++)
 	ps2[i] = stride[fromdim[i]];
-      memcpy(stride, ps2, trgtndim*sizeof(int));
+      memcpy(stride, ps2, trgtndim*sizeof(Int));
       /* then the subscript types */
       for (i = 0; i < trgtndim; i++)
 	ps2[i] = subsc_type[fromdim[i]];
@@ -1728,11 +1728,11 @@ int ana_subsc_func(int narg, int ps[])
       /* now <i> indicates the number of dimensions at the beginning */
       /* that can be treated as a single dimension.  We adjust the */
       /* info accordingly. */
-      memmove(step, step + i, (trgtndim - i)*sizeof(int));
-      memmove(size, size + i, (trgtndim - i)*sizeof(int));
-      memmove(stride, stride + i, (trgtndim - i)*sizeof(int));
+      memmove(step, step + i, (trgtndim - i)*sizeof(Int));
+      memmove(size, size + i, (trgtndim - i)*sizeof(Int));
+      memmove(stride, stride + i, (trgtndim - i)*sizeof(Int));
       memmove(subsc_type, subsc_type + i, trgtndim - i);
-      memmove(fromdim, fromdim + i, (trgtndim - i)*sizeof(int));
+      memmove(fromdim, fromdim + i, (trgtndim - i)*sizeof(Int));
       step[0] += width;
       trgtndim -= i;
     }
@@ -1911,9 +1911,9 @@ int ana_subsc_func(int narg, int ps[])
 	break;
     }
   }
-  int ana_endian(int, int *);
+  Int ana_endian(Int, Int *);
   if (class == ANA_FILEMAP && file_map_swap(nsym))
-    ana_endian(1, &iq);		/* byte swap */
+    ana_endian(1, &iq);		/* Byte swap */
   return iq;
 
   ana_subsc_1:
@@ -1922,13 +1922,13 @@ int ana_subsc_func(int narg, int ps[])
   return ANA_ERROR;
 }						/* end of ana_subsc */
  /*------------------------------------------------------------------------- */
-int string_sub(int narg, int ps[])
+Int string_sub(Int narg, Int ps[])
 /* subscripts for strings, called by ana_subc */
 /* the string is in ps[narg]; narg indicates the number of subscripts.
  LS 19aug98 */
 {
   /* this is a subset of cases for arrays since strings are 1-D */
-  int	iq, n, result_sym, ns, nsym, i;
+  Int	iq, n, result_sym, ns, nsym, i;
   char	*p, *q;
   pointer p2;
 
@@ -1939,7 +1939,7 @@ int string_sub(int narg, int ps[])
   n = string_size(nsym);
   iq = ps[0];			/* only one subscript */
   switch (symbol_class(iq)) {
-    case ANA_SCALAR:	/*a scalar, simple, get a long (int) version */
+    case ANA_SCALAR:	/*a scalar, simple, get a long (Int) version */
       i = int_arg(iq);
       if (i < 0)
 	i += n;	/* (*-expr) */
@@ -1963,7 +1963,7 @@ int string_sub(int narg, int ps[])
     case ANA_ARRAY:
       /* a string is created with length = # elements in array */
       iq = ana_long(1, &iq);	/* get a long version */
-      p2.l = (int *) array_data(iq);
+      p2.l = (Int *) array_data(iq);
       ns = array_size(iq);
       result_sym = string_scratch(ns);
       q = string_value(result_sym);
@@ -2012,12 +2012,12 @@ int string_sub(int narg, int ps[])
   return 1;
 }
  /*------------------------------------------------------------------------- */
-int ana_symclass(int narg, int ps[])
+Int ana_symclass(Int narg, Int ps[])
  /*return the class of the argument symbol */
  /* NOTE: scalar pointers (class 8) are returned as scalars (class 1)
     LS 13may92 */
 {
-  int	nsym, nd, result_sym;
+  Int	nsym, nd, result_sym;
 
   if (internalMode & 2)
     nsym = int_arg(ps[0]);
@@ -2034,11 +2034,11 @@ int ana_symclass(int narg, int ps[])
   return result_sym;
 }
  /*------------------------------------------------------------------------- */
-int ana_symdtype(narg,ps)
+Int ana_symdtype(narg,ps)
  /*return the type of the argument symbol */
-int narg,ps[];
+Int narg,ps[];
 {
-  int	nsym, result_sym;
+  Int	nsym, result_sym;
 
   nsym = ps[0];				/*the target symbol is the first */
   result_sym = scalar_scratch(2);
@@ -2046,12 +2046,12 @@ int narg,ps[];
   return result_sym;
 }
  /*------------------------------------------------------------------------- */
-int ana_num_elem(int narg, int ps[])
+Int ana_num_elem(Int narg, Int ps[])
 /* return the number of elements in the argument symbol, or the number
    contained within the specified dimensions.
    call:  NUM_ELEM(x [, dims]) */
 {
-  int	nsym, n, j, result_sym, *dims, *axes, naxes, ndim, temp;
+  Int	nsym, n, j, result_sym, *dims, *axes, naxes, ndim, temp;
 
   nsym = ps[0];				/*the target symbol is the first */
   result_sym = scalar_scratch(ANA_LONG);
@@ -2121,11 +2121,11 @@ int ana_num_elem(int narg, int ps[])
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-int ana_num_dimen(narg,ps)
+Int ana_num_dimen(narg,ps)
  /*return the number of dimensions in the argument symbol */
-int narg,ps[];
+Int narg,ps[];
 {
-  int	nsym, nd, result_sym;
+  Int	nsym, nd, result_sym;
 
   array	*h;
   nsym = ps[0];				/*the target symbol is the first */
@@ -2147,13 +2147,13 @@ int narg,ps[];
   return result_sym;
 }
  /*------------------------------------------------------------------------- */
-int ana_dimen(int narg, int ps[])
+Int ana_dimen(Int narg, Int ps[])
 /* DIMEN(x [,axes]) returns the indicated dimensions of <x>.  If <x> is */
 /* a scalar or a string, then a scalar 1 is returned.  If <x> has only */
 /* one dimension, then that is returned in a scalar.  If <axes> is not */
 /* specified, then all dimensions are returned.  LS 19may98 */
 {
-  int	nAxes, iq, *out, i, ndim, *dims;
+  Int	nAxes, iq, *out, i, ndim, *dims;
   pointer	axes;
 
   if (narg > 1) {		/* have <axes> */
@@ -2171,7 +2171,7 @@ int ana_dimen(int narg, int ps[])
 	  return cerror(ILL_AXIS, ps[1], axes.l[i]);
       if (nAxes > 1) {
 	iq = array_scratch(ANA_LONG, 1, &nAxes);
-	out = (int *) array_data(iq);
+	out = (Int *) array_data(iq);
 	while (nAxes--)
 	  *out++ = 1;
       } else {
@@ -2187,7 +2187,7 @@ int ana_dimen(int narg, int ps[])
 	  return cerror(ILL_AXIS, ps[1], axes.l[i]);
       if (nAxes > 1) {
 	iq = array_scratch(ANA_LONG, 1, &nAxes);
-	out = (int *) array_data(iq);
+	out = (Int *) array_data(iq);
 	while (nAxes--)
 	  *out++ = dims[*axes.l++];
       } else if (nAxes == 1) {
@@ -2196,7 +2196,7 @@ int ana_dimen(int narg, int ps[])
       } else {			/* return all dimensions */
 	if (ndim > 1) {
 	  iq = array_scratch(ANA_LONG, 1, &ndim);
-	  memcpy(array_data(iq), dims, ndim*sizeof(int));
+	  memcpy(array_data(iq), dims, ndim*sizeof(Int));
 	} else {
 	  iq = scalar_scratch(ANA_LONG);
 	  scalar_value(iq).l = dims[0];
@@ -2209,17 +2209,17 @@ int ana_dimen(int narg, int ps[])
   return iq;
 }
  /*------------------------------------------------------------------------- */
-int ana_redim_f(int narg, int ps[])
+Int ana_redim_f(Int narg, Int ps[])
  /* redimension an array, a function version, returns input symbol */
 {
-  int	result, n, *args;
-  int	ana_redim(int, int []);
+  Int	result, n, *args;
+  Int	ana_redim(Int, Int []);
 
-  args = Malloc(narg*sizeof(int));
+  args = Malloc(narg*sizeof(Int));
   if (!args)
     return ANA_ERROR;
   result = copySym(ps[0]);
-  memcpy(args, ps, narg*sizeof(int));
+  memcpy(args, ps, narg*sizeof(Int));
   args[0] = result;
   n = ana_redim(narg, args);
   Free(args);
@@ -2230,7 +2230,7 @@ int ana_redim_f(int narg, int ps[])
   return n;
 }
  /*------------------------------------------------------------------------- */
-int ana_redim(int narg, int ps[])
+Int ana_redim(Int narg, Int ps[])
      /* redimension an array */
      /* NOTE: my array_size() calculates the number of elements in an */
      /* array from the size of the allocated memory and this assumes that */
@@ -2240,8 +2240,8 @@ int ana_redim(int narg, int ps[])
      /* this behavior and I hope loose-fit memory does not cause problems */
      /* for me elsewhere.  LS 19may97 */
 {
-  extern int	redim_warn_flag;
-  int	oldSize, newSize, ndim, dims[MAX_DIMS], i, iq, nsym;
+  extern Int	redim_warn_flag;
+  Int	oldSize, newSize, ndim, dims[MAX_DIMS], i, iq, nsym;
   array	*data;
 
   nsym = ps[0];			/* the target symbol is the first */
@@ -2262,7 +2262,7 @@ int ana_redim(int narg, int ps[])
 	if (ndim + array_size(ps[i]) > MAX_DIMS)
 	  return anaerror("Too many dimensions specified", ps[i]);
 	iq = ana_long(1, &ps[i]);
-	memcpy(dims + ndim, array_data(iq), array_size(iq)*sizeof(int));
+	memcpy(dims + ndim, array_data(iq), array_size(iq)*sizeof(Int));
 	ndim += array_size(iq);
 	break;
       default:
@@ -2275,7 +2275,7 @@ int ana_redim(int narg, int ps[])
     return cerror(ARR_SMALL, nsym);
   else if (newSize < oldSize && redim_warn_flag)
     printf("WARNING: result from REDIM is smaller than original\n");
-  memcpy(array_dims(nsym), dims, ndim*sizeof(int));
+  memcpy(array_dims(nsym), dims, ndim*sizeof(Int));
   array_num_dims(nsym) = ndim;
   newSize = newSize*ana_type_size[array_type(nsym)] + sizeof(array);
   data = Realloc(array_header(nsym), newSize);
@@ -2286,11 +2286,11 @@ int ana_redim(int narg, int ps[])
   return 1;
 }
  /*------------------------------------------------------------------------- */
-int ana_concat_list(int narg, int ps[])
+Int ana_concat_list(Int narg, Int ps[])
 /* concatenation involving ANA_CLIST or ANA_LIST. LS 15jun98 */
 {
-  int	result, i, iq, nelem = 0, j, indx;
-  byte	isStruct = 0;
+  Int	result, i, iq, nelem = 0, j, indx;
+  Byte	isStruct = 0;
 
   if ((result = nextFreeTempVariable()) == ANA_ERROR)
     return ANA_ERROR;
@@ -2322,10 +2322,10 @@ int ana_concat_list(int narg, int ps[])
     symbol_memory(result) = nelem*sizeof(listElem);
   } else {
     symbol_class(result) = ANA_CLIST;
-    clist_symbols(result) = Malloc(nelem*sizeof(word));
+    clist_symbols(result) = Malloc(nelem*sizeof(Word));
     if (!clist_symbols(result))
       return cerror(ALLOC_ERR, 0);
-    symbol_memory(result) = nelem*sizeof(word);
+    symbol_memory(result) = nelem*sizeof(Word);
   }
 
   indx = 0;
@@ -2400,7 +2400,7 @@ int ana_concat_list(int narg, int ps[])
   return result;		/* everything OK */
 }
  /*------------------------------------------------------------------------- */
-int ana_concat(int narg, int ps[])
+Int ana_concat(Int narg, Int ps[])
  /* ana's concatenation function, insisted on by idl users, but works a bit
 	 differently
  there are 2 modes
@@ -2416,8 +2416,8 @@ int ana_concat(int narg, int ps[])
 /* allow concatenation of LISTs and STRUCTs LS 7feb95 */
 {
   pointer q1,q2;
-  int	nd, j, i, dim[MAX_DIMS], nundef = 0;
-  int	iq, nsym, mq, toptype = ANA_BYTE, topnd = 0, sflag = 0, n, nq;
+  Int	nd, j, i, dim[MAX_DIMS], nundef = 0;
+  Int	iq, nsym, mq, toptype = ANA_BYTE, topnd = 0, sflag = 0, n, nq;
   scalar	temp;
 
   if (narg <= 0)
@@ -2460,7 +2460,7 @@ int ana_concat(int narg, int ps[])
 					    /* dimensions */
 	  return cerror(N_DIMS_OVR, iq);
 	nd = array_num_dims(iq);
-	memcpy(dim, array_dims(iq), nd*sizeof(int));
+	memcpy(dim, array_dims(iq), nd*sizeof(Int));
 	dim[nd++] = 1;		/* extra dimension */
         nsym = array_scratch(array_type(iq), nd, dim);
         if (array_type(nsym) == ANA_STRING_ARRAY) { /* string array */
@@ -2536,7 +2536,7 @@ int ana_concat(int narg, int ps[])
             if (scalar_type(iq) != toptype)
               convertPointer(&temp, scalar_type(iq), toptype);
 	    memcpy(q2.b, &temp.b, n);
-            q2.b += n;		/* add the right byte count for each element */
+            q2.b += n;		/* add the right Byte count for each element */
             break;
 	  case ANA_CSCALAR:
 	    memcpy(q2.b, complex_scalar_data(iq).cf, n);
@@ -2581,7 +2581,7 @@ int ana_concat(int narg, int ps[])
 	    }
 	    nq += mq;		/* collect total in loose dimension */
 	  } else {		/* create result dimensions list */
-	    memcpy(dim, array_dims(iq), array_num_dims(iq)*sizeof(int));
+	    memcpy(dim, array_dims(iq), array_num_dims(iq)*sizeof(Int));
 	    /* we count the last dimension separately: all the others */
 	    /* must match, but the last one may vary between components */
 	    nq = (array_num_dims(iq) == topnd)? dim[topnd - 1]: 1;
@@ -2651,7 +2651,7 @@ int ana_concat(int narg, int ps[])
 	    switch (symbol_type(iq)) {
 	      case ANA_BYTE:
 		while (n--)
-		  *q2.w++ = (word) *q1.b++;
+		  *q2.w++ = (Word) *q1.b++;
 		break;
 	      case ANA_WORD:
 		while (n--)
@@ -2663,11 +2663,11 @@ int ana_concat(int narg, int ps[])
 	    switch (symbol_type(iq)) {
 	      case ANA_BYTE:
 		while (n--)
-		  *q2.l++ = (int) *q1.b++;
+		  *q2.l++ = (Int) *q1.b++;
 		break;
 	      case ANA_WORD:
 		while (n--)
-		  *q2.l++ = (int) *q1.w++;
+		  *q2.l++ = (Int) *q1.w++;
 		break;
 	      case ANA_LONG:
 		while (n--)
@@ -2679,15 +2679,15 @@ int ana_concat(int narg, int ps[])
 	    switch (symbol_type(iq)) {
 	      case ANA_BYTE:
 		while (n--)
-		  *q2.f++ = (float) *q1.b++;
+		  *q2.f++ = (Float) *q1.b++;
 		break;
 	      case ANA_WORD:
 		while (n--)
-		  *q2.f++ = (float) *q1.w++;
+		  *q2.f++ = (Float) *q1.w++;
 		break;
 	      case ANA_LONG:
 		while (n--)
-		  *q2.f++ = (float) *q1.l++;
+		  *q2.f++ = (Float) *q1.l++;
 		break;
 	      case ANA_FLOAT:
 		while (n--)
@@ -2699,19 +2699,19 @@ int ana_concat(int narg, int ps[])
 	    switch (symbol_type(iq)) {
 	      case ANA_BYTE:
 		while (n--)
-		  *q2.d++ = (double) *q1.b++;
+		  *q2.d++ = (Double) *q1.b++;
 		break;
 	      case ANA_WORD:
 		while (n--)
-		  *q2.d++ = (double) *q1.w++;
+		  *q2.d++ = (Double) *q1.w++;
 		break;
 	      case ANA_LONG:
 		while (n--)
-		  *q2.d++ = (double) *q1.l++;
+		  *q2.d++ = (Double) *q1.l++;
 		break;
 	      case ANA_FLOAT:
 		while (n--)
-		  *q2.d++ = (double) *q1.f++;
+		  *q2.d++ = (Double) *q1.f++;
 		break;
 	      case ANA_DOUBLE:
 		while (n--)
@@ -2814,29 +2814,29 @@ int ana_concat(int narg, int ps[])
   } /* end of if else 2-or-more args */
 }						/*end of ana_concat */
 /*------------------------------------------------------------------------- */
-int ana_isscalar(int narg, int ps[])
+Int ana_isscalar(Int narg, Int ps[])
 /* return 1 if symbol is a scalar, 0 otherwise */
 { return (sym[*ps].class == ANA_SCALAR)? 1: 4; }
 /*------------------------------------------------------------------------- */
-int ana_isarray(int narg, int ps[])
+Int ana_isarray(Int narg, Int ps[])
 /* return 1 if symbol is an array, 0 otherwise */
 { return (sym[*ps].class == ANA_ARRAY)? 1: 4; }
 /*------------------------------------------------------------------------- */
-int ana_isstring(int narg, int ps[])
+Int ana_isstring(Int narg, Int ps[])
 /* return 1 if symbol is a string, 0 otherwise */
 { return (sym[*ps].class == ANA_STRING)? 1: 4; }
 /*------------------------------------------------------------------------- */
-int ana_subsc_subgrid(int narg, int ps[])
+Int ana_subsc_subgrid(Int narg, Int ps[])
 /* like x(subsc,/inner) but with linear interpolation for fractional
    coordinates.  LS 19jun97 */
 /* the target (subscripted) symbol is in ps[narg]; narg indicates the
    number of subscripts.  This is somewhat non-standard use of ps/narg!
    LS 19aug98 */
 {
-  byte	class, type;
-  int	ndim, *dims, i, subsc[MAX_DIMS], nSubsc, iq, j, mid,
+  Byte	class, type;
+  Int	ndim, *dims, i, subsc[MAX_DIMS], nSubsc, iq, j, mid,
     stride[MAX_DIMS], index, tally[MAX_DIMS], step[2][MAX_DIMS];
-  float	*coord[MAX_DIMS], d[MAX_DIMS];
+  Float	*coord[MAX_DIMS], d[MAX_DIMS];
   scalar	value, cvalue;
   pointer	src, out;
 
@@ -2922,7 +2922,7 @@ int ana_subsc_subgrid(int narg, int ps[])
       else if (*coord[i] >= dims[i] - 1)
 	mid = dims[i] - 2;
       else
-	mid = (int) *coord[i];
+	mid = (Int) *coord[i];
       d[i] = mid + 1 - *coord[i]; /* interpolation distance */
       index += mid*stride[i];
       coord[i]++;
@@ -2934,7 +2934,7 @@ int ana_subsc_subgrid(int narg, int ps[])
     switch (type) {
       case ANA_BYTE:
 	do {
-	  cvalue.f = (float) src.b[index];
+	  cvalue.f = (Float) src.b[index];
 	  for (i = 0; i < ndim; i++)
 	    cvalue.f *= d[i];
 	  for (j = 0; j < ndim; j++) {
@@ -2950,7 +2950,7 @@ int ana_subsc_subgrid(int narg, int ps[])
 	break;
       case ANA_WORD:
 	do {
-	  cvalue.f = (float) src.w[index];
+	  cvalue.f = (Float) src.w[index];
 	  for (i = 0; i < ndim; i++)
 	    cvalue.f *= d[i];
 	  for (j = 0; j < ndim; j++) {
@@ -2966,7 +2966,7 @@ int ana_subsc_subgrid(int narg, int ps[])
 	break;
       case ANA_LONG:
 	do {
-	  cvalue.f = (float) src.l[index];
+	  cvalue.f = (Float) src.l[index];
 	  for (i = 0; i < ndim; i++)
 	    cvalue.f *= d[i];
 	  for (j = 0; j < ndim; j++) {
@@ -3017,8 +3017,8 @@ int ana_subsc_subgrid(int narg, int ps[])
   return iq;
 }
 /*------------------------------------------------------------------------- */
-int extractNumerical(pointer src, pointer trgt, int type, int ndim, int *dims,
-		     int *coords, int nAxes, int *axes)
+Int extractNumerical(pointer src, pointer trgt, Int type, Int ndim, Int *dims,
+		     Int *coords, Int nAxes, Int *axes)
 {
   loopInfo	info;
 
@@ -3034,7 +3034,7 @@ int extractNumerical(pointer src, pointer trgt, int type, int ndim, int *dims,
   return 1;
 }
 /*------------------------------------------------------------------------- */
-int ana_roll(int narg, int ps[])
+Int ana_roll(Int narg, Int ps[])
 /* ROLL(array, target) rearranges the dimensions of <array> according to */
 /* <target>.  If <target> is a scalar, then the dimensions list is shifted */
 /* cyclically over that number of elements.  If <target> is a numerical */
@@ -3046,7 +3046,7 @@ int ana_roll(int narg, int ps[])
 /* array).  If <target> is an array, then DIMEN(array)(target) is equal to */
 /* DIMEN(ROLL(array,target)).  LS 12sep2000 */
 {
-  int	nd, result, temp, iq, i;
+  Int	nd, result, temp, iq, i;
   loopInfo	srcinfo, trgtinfo;
   pointer	src, trgt;
 
@@ -3084,7 +3084,7 @@ int ana_roll(int narg, int ps[])
 		   &src, &result, &trgtinfo, &trgt) == ANA_ERROR)
     return ANA_ERROR;
 
-  memcpy(array_dims(result), srcinfo.rdims, nd*sizeof(int));
+  memcpy(array_dims(result), srcinfo.rdims, nd*sizeof(Int));
 
   if (temp)
     zap(iq);			/* no longer needed */

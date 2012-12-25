@@ -1,7 +1,7 @@
 #include <printf.h>
 #include <stdio.h>
 
-int main(void)
+Int main(void)
 {
   char *ffmts[] = {
     "%f", "%+f", "% f", "%+ f", "%-f", "%+-f", "%- f", "%+ -f",
@@ -60,7 +60,7 @@ int main(void)
     "%20.7J", "%+20.7J", "% 20.7J", "%+ 20.7J", "%-20.7J", "%+-20.7J", "%- 20.7J", "%+ -20.7J",
     "%020.7J", "%+020.7J", "% 020.7J", "%+ 020.7J", "%-020.7J", "%+-020.7J", "%- 020.7J", "%+ -020.7J",
   };
-  int i;
+  Int i;
 
   for (i = 0; i < sizeof(ffmts)/sizeof(*ffmts); i++) {
     printf("%2d %10s |", i, ffmts[i]);

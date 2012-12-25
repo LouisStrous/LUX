@@ -12,9 +12,9 @@
 #include <termio.h>    /* added termio and unistd to enable unbuffered */
 #include <unistd.h>    /* input -> history buffer etc.  LS 8may92 */
 #endif
- static	int	fd;	/* file number */
- static	int	open_flag=0, kilroy=0;
- extern int	*pscrat;
+ static	Int	fd;	/* file number */
+ static	Int	open_flag=0, kilroy=0;
+ extern Int	*pscrat;
  extern char	*expand_name(char *, char *);
  extern struct sym_desc	sym[];
 #if	NeXT
@@ -23,13 +23,13 @@
  static struct termio new_params, old_params;
 #endif
  /*------------------------------------------------------------------------- */
-int ana_op1cmd_send(int narg, int ps[])
+Int ana_op1cmd_send(Int narg, Int ps[])
  /* send commands to optical disk # 1.  Commands are changed to upper case.
    If a command ends with a digit, a colon : is added before send-off. 
    LS 17sep92 */
  /* modified 11/14/92 ras */
  {
- int	n, n2;
+ Int	n, n2;
  char	*buf, *p;
  
  buf = (char *) pscrat;
@@ -75,10 +75,10 @@ int ana_op1cmd_send(int narg, int ps[])
  allows user to do something else in the meantime */
  }
  /*------------------------------------------------------------------------- */
-int ana_op1cmd_check(int narg, int ps[])
+Int ana_op1cmd_check(Int narg, Int ps[])
  {
  /* this is a function, returns either 1 or 4 which are symbols for 1 or 0 */
- int	n, n2;
+ Int	n, n2;
  char	*buf;
  buf = (char *) pscrat;
  if (open_flag == 0) return 4;
@@ -109,9 +109,9 @@ int ana_op1cmd_check(int narg, int ps[])
  return 4;
  }
  /*------------------------------------------------------------------------- */
-int ana_op1read(int narg, int ps[])
+Int ana_op1read(Int narg, Int ps[])
  {
- int	n, result_sym, i, j;
+ Int	n, result_sym, i, j;
  char	*buf, *p;
  
  if (open_flag == 0) return -1;
@@ -132,7 +132,7 @@ int ana_op1read(int narg, int ps[])
  return result_sym;
  }
 /*------------------------------------------------------------------------- */
-int ana_op1cmd(int narg, int ps[])
+Int ana_op1cmd(Int narg, Int ps[])
  /* communication with optical disk drive # 1  */
  /*   Call:  OP1CMD,string */
  {
@@ -141,7 +141,7 @@ int ana_op1cmd(int narg, int ps[])
  return 1;
  }
 /*------------------------------------------------------------------------- */ 
-int ana_op1cmd_f(int narg, int ps[])
+Int ana_op1cmd_f(Int narg, Int ps[])
 /* function form of op1cmd; returns 0 or 1 to easily test success and
 to be compatible with older vms version */
  {

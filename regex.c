@@ -8,14 +8,14 @@
 #include <sys/types.h>
 #include <string.h>
 
-static int countMatches(char *text) {
-  int n = 1;
+static Int countMatches(char *text) {
+  Int n = 1;
   char *p = text;
 
   while (p = strchr(p, '(')) {
     if (p > text) {
-      int n = p - text;
-      int i = 1;
+      Int n = p - text;
+      Int i = 1;
 
       while (i <= n && text[n - i] == '\\')
 	i++;
@@ -38,12 +38,12 @@ If no <regex> is specified, then the last one is used again.
 
 */
 
-int ana_regex(int narg, int ps[]) {
+Int ana_regex(Int narg, Int ps[]) {
   char *text, *regex;
-  int result, flags, i;
+  Int result, flags, i;
   static regex_t preg;
   static regmatch_t *pmatch = NULL;
-  static int nmatch = 0;
+  static Int nmatch = 0;
 
   text = string_arg(ps[0]);
   if (!text)
@@ -58,7 +58,7 @@ int ana_regex(int narg, int ps[]) {
     regfree(&preg);		/* clean out previous one */
     result = regcomp(&preg, regex, REG_EXTENDED);
     if (result) {
-      int size;
+      Int size;
       char errbuf[256];
     
       size = regerror(result, &preg, errbuf, 256);
@@ -83,7 +83,7 @@ int ana_regex(int narg, int ps[]) {
       p = (char **) array_data(result);
       for (i = 0; i < nmatch; i++) {
 	if (pmatch[i].rm_so >= 0) {
-	  int len;
+	  Int len;
 	
 	  len = pmatch[i].rm_eo - pmatch[i].rm_so;
 	  *p = malloc(len + 1);
@@ -100,7 +100,7 @@ int ana_regex(int narg, int ps[]) {
       }
     } else {			/* nmatch == 1 */
       char *p;
-      int len;
+      Int len;
 	
       len = pmatch[0].rm_eo - pmatch[0].rm_so;
       result = string_scratch(len);

@@ -9,6 +9,7 @@
 /* END HEADERS */
 #include <errno.h>
 #include <ctype.h>
+#include "action.h"
 #include "calendar.h"
 #include "intmath.h"
 
@@ -23,14 +24,14 @@
     \param f a pointer to a function that calculates the calendar date
     from a Chronological Julian Day Number
  */
-static void CJDtoCal(double CJD, int *year, int *month, double *day,
-                     void (*f)(int, int *, int *, int *))
+static void CJDtoCal(Double CJD, Int *year, Int *month, Double *day,
+                     void (*f)(Int, Int *, Int *, Int *))
 {
   /* separate the CJD into a CJDN and a day fraction */
-  int CJDN = floor(CJD);
-  double dayfraction = CJD - CJDN;
+  Int CJDN = floor(CJD);
+  Double dayfraction = CJD - CJDN;
 
-  int iday;
+  Int iday;
   f(CJDN, year, month, &iday);  /* calculate the integer calendar date */
   *day = iday + dayfraction;
 }
@@ -44,13 +45,13 @@ static void CJDtoCal(double CJD, int *year, int *month, double *day,
     Julian Day Number from a calendar date
     \return the Chronological Julian Date
  */
-static double CaltoCJD(int year, int month, double day,
-                       int (*f)(int, int, int))
+static Double CaltoCJD(Int year, Int month, Double day,
+                       Int (*f)(Int, Int, Int))
 {
-  int d = floor(day);
-  double part = day - d;
-  int jd = f(year, month, d);
-  return (double) jd + part;
+  Int d = floor(day);
+  Double part = day - d;
+  Int jd = f(year, month, d);
+  return (Double) jd + part;
 }
 /*--------------------------------------------------------------------------*/
 /** Translates a Chronological Julian Day Number to a calendar date in
@@ -70,11 +71,11 @@ static double CaltoCJD(int year, int month, double day,
     text is stored in memory allocated by the routine.  Free the
     memory when you're done with it.
  */
-static char *CJDNto3S(int CJDN,
-                      void (*CJDNtoCal3)(int CJDN, int *year, int *month, int *day),
+static char *CJDNto3S(Int CJDN,
+                      void (*CJDNtoCal3)(Int CJDN, Int *year, Int *month, Int *day),
                       char const * const *monthnames)
 {
-  int year, month, day;
+  Int year, month, day;
   char *date;
 
   CJDNtoCal3(CJDN, &year, &month, &day);
@@ -103,11 +104,11 @@ static char *CJDNto3S(int CJDN,
     month.  Must have at least as many elements as there are months!
 
  */
-static void CJDNto3SA(int const *CJDN, char **date,
-                      void (*CJDNtoCal3A) (int const *, int *),
+static void CJDNto3SA(Int const *CJDN, char **date,
+                      void (*CJDNtoCal3A) (Int const *, Int *),
                       char const * const *monthnames)
 {
-  int datec[3];
+  Int datec[3];
 
   CJDNtoCal3A(CJDN, datec);
   if (asprintf(date, "%d %s %d", datec[0], monthnames[datec[1] - 1], datec[2])
@@ -131,12 +132,12 @@ static void CJDNto3SA(int const *CJDN, char **date,
     text is stored in memory allocated by the routine.  Free the
     memory when you're done with it.
  */
-static char *CJDto3S(double CJD,
-                     void (*CJDtoCal3)(double, int *, int *, double *),
+static char *CJDto3S(Double CJD,
+                     void (*CJDtoCal3)(Double, Int *, Int *, Double *),
                      char const * const *monthnames)
 {
-  int year, month;
-  double day;
+  Int year, month;
+  Double day;
   char *date;
 
   CJDtoCal3(CJD, &year, &month, &day);
@@ -164,15 +165,15 @@ static char *CJDto3S(double CJD,
     month.  Must have at least as many elements as there are months!
 
  */
-static void CJDto3SA(double const *CJD, char **date,
-                     void (*CJDtoCal3A) (double const *, double *),
+static void CJDto3SA(Double const *CJD, char **date,
+                     void (*CJDtoCal3A) (Double const *, Double *),
                      char const * const *monthnames)
 {
-  double datec[3];
+  Double datec[3];
 
   CJDtoCal3A(CJD, datec);
-  if (asprintf(date, "%g %s %d", datec[2], monthnames[(int) datec[1] - 1],
-               (int) datec[0]) < 0)
+  if (asprintf(date, "%g %s %d", datec[2], monthnames[(Int) datec[1] - 1],
+               (Int) datec[0]) < 0)
     *date = NULL;  
 }
 /*--------------------------------------------------------------------------*/
@@ -186,7 +187,7 @@ static void CJDto3SA(double const *CJD, char **date,
     \return a negative, zero, or positive value, depending on whether
     \p a compares less than, equal to, or greater than \p b.
  */
-static int stralnumtouppercmp(char const * const a, char const * const b)
+static Int stralnumtouppercmp(char const * const a, char const * const b)
 {
   char const *pa, *pb;
 
@@ -217,7 +218,7 @@ static int stralnumtouppercmp(char const * const a, char const * const b)
    \return the index into array \p names of the \p name if that name
    is found, and otherwise \p num_names.
  */
-static size_t find_name(char * const name, int num_names,
+static size_t find_name(char * const name, Int num_names,
                         char const * const *names)
 {
   size_t i;
@@ -247,11 +248,11 @@ static size_t find_name(char * const name, int num_names,
     \return the corresponding Chronological Julian Day Number, or 0 if
     no legal date was recognized in the input.
  */
-static int S3toCJDN(char const * date,
-                    int (*Cal3toCJDN) (int, int, int),
+static Int S3toCJDN(char const * date,
+                    Int (*Cal3toCJDN) (Int, Int, Int),
                     size_t nmonthnames, char const * const *monthnames)
 {
-  int year, month, day;
+  Int year, month, day;
   size_t i, n;
   char *monthname;
 
@@ -285,11 +286,11 @@ static int S3toCJDN(char const * date,
     \return the corresponding Chronological Julian Day Number, or 0 if
     no legal date was recognized in the input.
  */
-static void S3toCJDNA(char * const * date, int *CJDN,
-                      void (*Cal3toCJDNA) (int const *, int *),
+static void S3toCJDNA(char * const * date, Int *CJDN,
+                      void (*Cal3toCJDNA) (Int const *, Int *),
                       size_t nmonthnames, char const * const *monthnames)
 {
-  int datec[3];
+  Int datec[3];
   size_t i, n;
   char *monthname;
 
@@ -322,12 +323,12 @@ static void S3toCJDNA(char * const * date, int *CJDN,
     \return the corresponding Chronological Julian Day Number, or 0 if
     no legal date was recognized in the input.
  */
-static double S3toCJD(char const * date,
-                      double (*Cal3toCJD) (int, int, double),
+static Double S3toCJD(char const * date,
+                      Double (*Cal3toCJD) (Int, Int, Double),
                       size_t nmonthnames, char const * const *monthnames)
 {
-  int year, month;
-  double day;
+  Int year, month;
+  Double day;
   size_t i, n;
   char *monthname;
 
@@ -364,11 +365,11 @@ static double S3toCJD(char const * date,
     must be at least \p nmonthnames month names!
     
  */
-static void S3toCJDA(char * const *date, double *CJD,
-                     void (*Cal3AtoCJD) (double const *, double *),
+static void S3toCJDA(char * const *date, Double *CJD,
+                     void (*Cal3AtoCJD) (Double const *, Double *),
                      size_t nmonthnames, char const * const *monthnames)
 {
-  double datec[3];
+  Double datec[3];
   size_t i, n;
   char *monthname;
 
@@ -386,19 +387,19 @@ static void S3toCJDA(char * const *date, double *CJD,
     *CJD = 0;
 }
 /*--------------------------------------------------------------------------*/
-double CJD_now(void)
+Double CJD_now(void)
 {
   time_t t;
-  double cjd;
+  Double cjd;
   struct tm *bd;
 
   t = time(NULL);
   bd = localtime(&t);
-  cjd = (double) (t + bd->tm_gmtoff)/86400.0 + 2440588.0;
+  cjd = (Double) (t + bd->tm_gmtoff)/86400.0 + 2440588.0;
   return cjd;
 }
 /*--------------------------------------------------------------------------*/
-int CJDN_now(void)
+Int CJDN_now(void)
 {
   return floor(CJD_now());
 }
@@ -417,113 +418,113 @@ static char const * const Gregorian_Julian_monthnames[] = {
 /*--------------------------------------------------------------------------*/
 /** The Chronological Julian Day Number of the epoch of the Gregorian calendar */
 #define GREGORIAN_EPOCH (1721120)
-void CJDNtoGregorian(int CJDN, int *year, int *month, int *day)
+void CJDNtoGregorian(Int CJDN, Int *year, Int *month, Int *day)
 {
   /* This algorithm by Louis Strous
      (http://aa.quae.nl/en/reken/juliaansedag.html) */
-  int y3 = CJDN - GREGORIAN_EPOCH;
-  int x3 = alinequot(y3, 4, 3, 146097);
-  int y2 = alinequot(x3, 146097, 0, 4);
+  Int y3 = CJDN - GREGORIAN_EPOCH;
+  Int x3 = alinequot(y3, 4, 3, 146097);
+  Int y2 = alinequot(x3, 146097, 0, 4);
   y2 = y3 - y2;
-  int x2 = iaquot(y2*100 + 99, 36525);
-  int y1 = y2 - iaquot(36525*x2, 100);
-  int x1 = iaquot(5*y1 + 2, 153);
-  int c0 = iaquot(x1 + 2, 12);
+  Int x2 = iaquot(y2*100 + 99, 36525);
+  Int y1 = y2 - iaquot(36525*x2, 100);
+  Int x1 = iaquot(5*y1 + 2, 153);
+  Int c0 = iaquot(x1 + 2, 12);
   *year = 100*x3 + x2 + c0;
   *month = x1 - 12*c0 + 3;
   *day = y1 - iaquot(153*x1 - 3, 5);
 }
 /*--------------------------------------------------------------------------*/
-void CJDNtoGregorianA(int const *CJDN, int *date)
+void CJDNtoGregorianA(Int const *CJDN, Int *date)
 {
   CJDNtoGregorian(*CJDN, &date[0], &date[1], &date[2]);
 }
 /*--------------------------------------------------------------------------*/
-char *CJDNtoGregorianS(int CJDN)
+char *CJDNtoGregorianS(Int CJDN)
 {
   return CJDNto3S(CJDN, CJDNtoGregorian, Gregorian_Julian_monthnames);
 }
 /*--------------------------------------------------------------------------*/
-void CJDNtoGregorianSA(int const *CJDN, char **date)
+void CJDNtoGregorianSA(Int const *CJDN, char **date)
 {
   CJDNto3SA(CJDN, date, CJDNtoGregorianA, Gregorian_Julian_monthnames);
 }
 /*--------------------------------------------------------------------------*/
-void CJDtoGregorian(double CJD, int *year, int *month, double *day)
+void CJDtoGregorian(Double CJD, Int *year, Int *month, Double *day)
 {
   CJDtoCal(CJD, year, month, day, &CJDNtoGregorian);
 }
 /*--------------------------------------------------------------------------*/
-void CJDtoGregorianA(double const *CJD, double *date)
+void CJDtoGregorianA(Double const *CJD, Double *date)
 {
-  int year, month;
+  Int year, month;
   CJDtoGregorian(*CJD, &year, &month, &date[2]);
-  date[0] = (double) year;
-  date[1] = (double) month;
+  date[0] = (Double) year;
+  date[1] = (Double) month;
 }
 /*--------------------------------------------------------------------------*/
-char *CJDtoGregorianS(double CJD)
+char *CJDtoGregorianS(Double CJD)
 {
   return CJDto3S(CJD, CJDtoGregorian, Gregorian_Julian_monthnames);
 }
 /*--------------------------------------------------------------------------*/
-void CJDtoGregorianSA(double const *CJD, char **date)
+void CJDtoGregorianSA(Double const *CJD, char **date)
 {
   CJDto3SA(CJD, date, CJDtoGregorianA, Gregorian_Julian_monthnames);
 }
 /*--------------------------------------------------------------------------*/
-int GregoriantoCJDN(int year, int month, int day)
+Int GregoriantoCJDN(Int year, Int month, Int day)
 {
   /* This algorithm by Louis Strous
      (http://aa.quae.nl/en/reken/juliaansedag.html) */
-  int x1;
-  int c0 = iaquot(month - 3, 12);
-  int x4 = year + c0;
-  div_t d = adiv(x4, 100);
+  Int x1;
+  Int c0 = iaquot(month - 3, 12);
+  Int x4 = year + c0;
+  Div_t d = adiv(x4, 100);
   x1 = month - 12*c0 - 3;
-  int J1 = alinequot(d.quot, 146097, 0, 4);
-  int J2 = iaquot(d.rem*36525, 100);
-  int J3 = iaquot(x1*153 + 2, 5);
+  Int J1 = alinequot(d.quot, 146097, 0, 4);
+  Int J2 = iaquot(d.rem*36525, 100);
+  Int J3 = iaquot(x1*153 + 2, 5);
   return GREGORIAN_EPOCH - 1 + J1 + J2 + J3 + day;
 }
 /*--------------------------------------------------------------------------*/
-void GregoriantoCJDNA(int const *date, int *CJDN)
+void GregoriantoCJDNA(Int const *date, Int *CJDN)
 {
   *CJDN = GregoriantoCJDN(date[0], date[1], date[2]);
 }
 /*--------------------------------------------------------------------------*/
-int GregorianStoCJDN(char const * date)
+Int GregorianStoCJDN(char const * date)
 {
   return S3toCJDN(date, GregoriantoCJDN,
                   arraysize(Gregorian_Julian_monthnames),
                   Gregorian_Julian_monthnames);
 }
 /*--------------------------------------------------------------------------*/
-void GregorianStoCJDNA(char * const * date, int *CJDN)
+void GregorianStoCJDNA(char * const * date, Int *CJDN)
 {
   S3toCJDNA(date, CJDN, GregoriantoCJDNA,
             arraysize(Gregorian_Julian_monthnames),
             Gregorian_Julian_monthnames);
 }
 /*--------------------------------------------------------------------------*/
-double GregoriantoCJD(int year, int month, double day)
+Double GregoriantoCJD(Int year, Int month, Double day)
 {
   return CaltoCJD(year, month, day, GregoriantoCJDN);
 }
 /*--------------------------------------------------------------------------*/
-void GregoriantoCJDA(double const *date, double *CJD)
+void GregoriantoCJDA(Double const *date, Double *CJD)
 {
-  *CJD = GregoriantoCJD((int) date[0], (int) date[1], date[2]);
+  *CJD = GregoriantoCJD((Int) date[0], (Int) date[1], date[2]);
 }
 /*--------------------------------------------------------------------------*/
-double GregorianStoCJD(char const * date)
+Double GregorianStoCJD(char const * date)
 {
   return S3toCJD(date, GregoriantoCJD,
                  arraysize(Gregorian_Julian_monthnames),
                  Gregorian_Julian_monthnames);
 }
 /*--------------------------------------------------------------------------*/
-void GregorianStoCJDA(char * const * date, double *CJD)
+void GregorianStoCJDA(char * const * date, Double *CJD)
 {
   S3toCJDA(date, CJD, GregoriantoCJDA,
            arraysize(Gregorian_Julian_monthnames),
@@ -536,105 +537,105 @@ void GregorianStoCJDA(char * const * date, double *CJD)
 /*--------------------------------------------------------------------------*/
 /** The Chronological Julian Day Number of the epoch of the Julian calendar */
 #define JULIAN_EPOCH (1721118)
-void CJDNtoJulian(int CJDN, int *year, int *month, int *day)
+void CJDNtoJulian(Int CJDN, Int *year, Int *month, Int *day)
 {
   /* This algorithm by Louis Strous
      (http://aa.quae.nl/en/reken/juliaansedag.html) */
-  int y2 = CJDN - JULIAN_EPOCH;
-  int x2 = alinequot(y2, 4, 3, 1461);
-  int z2 = y2 - alinequot(x2, 1461, 0, 4);
-  int x1 = iaquot(5*z2 + 2, 153);
-  int c0 = iaquot(x1 + 2, 12);
+  Int y2 = CJDN - JULIAN_EPOCH;
+  Int x2 = alinequot(y2, 4, 3, 1461);
+  Int z2 = y2 - alinequot(x2, 1461, 0, 4);
+  Int x1 = iaquot(5*z2 + 2, 153);
+  Int c0 = iaquot(x1 + 2, 12);
   *year = x2 + c0;
   *month = x1 - 12*c0 + 3;
   *day = z2 - iaquot(153*x1 - 3, 5);
 }
 /*--------------------------------------------------------------------------*/
-void CJDNtoJulianA(int const *CJDN, int *date)
+void CJDNtoJulianA(Int const *CJDN, Int *date)
 {
   CJDNtoJulian(*CJDN, &date[0], &date[1], &date[2]);
 }
 /*--------------------------------------------------------------------------*/
-char *CJDNtoJulianS(int CJDN)
+char *CJDNtoJulianS(Int CJDN)
 {
   return CJDNto3S(CJDN, CJDNtoJulian, Gregorian_Julian_monthnames);
 }
 /*--------------------------------------------------------------------------*/
-void CJDNtoJulianSA(int const *CJDN, char **date)
+void CJDNtoJulianSA(Int const *CJDN, char **date)
 {
   CJDNto3SA(CJDN, date, CJDNtoJulianA, Gregorian_Julian_monthnames);
 }
 /*--------------------------------------------------------------------------*/
-void CJDtoJulian(double CJD, int *year, int *month, double *day)
+void CJDtoJulian(Double CJD, Int *year, Int *month, Double *day)
 {
   CJDtoCal(CJD, year, month, day, CJDNtoJulian);
 }
 /*--------------------------------------------------------------------------*/
-void CJDtoJulianA(double const *CJD, double *date)
+void CJDtoJulianA(Double const *CJD, Double *date)
 {
-  int year, month;
+  Int year, month;
   CJDtoJulian(*CJD, &year, &month, &date[2]);
-  date[0] = (double) year;
-  date[1] = (double) month;
+  date[0] = (Double) year;
+  date[1] = (Double) month;
 }
 /*--------------------------------------------------------------------------*/
-char *CJDtoJulianS(double CJD)
+char *CJDtoJulianS(Double CJD)
 {
   return CJDto3S(CJD, CJDtoJulian, Gregorian_Julian_monthnames);
 }
 /*--------------------------------------------------------------------------*/
-void CJDtoJulianSA(double const *CJD, char **date)
+void CJDtoJulianSA(Double const *CJD, char **date)
 {
   CJDto3SA(CJD, date, CJDtoJulianA, Gregorian_Julian_monthnames);
 }
 /*--------------------------------------------------------------------------*/
-int JuliantoCJDN(int year, int month, int day)
+Int JuliantoCJDN(Int year, Int month, Int day)
 {
   /* This algorithm by Louis Strous
      (http://aa.quae.nl/en/reken/juliaansedag.html) */
-  int c0 = iaquot(month - 3, 12);
-  int J1 = alinequot(year + c0, 1461, 0, 4);
-  int J2 = iaquot(month*153 - 1836*c0 - 457, 5);
+  Int c0 = iaquot(month - 3, 12);
+  Int J1 = alinequot(year + c0, 1461, 0, 4);
+  Int J2 = iaquot(month*153 - 1836*c0 - 457, 5);
   return J1 + J2 + day + JULIAN_EPOCH - 1;
 }
 /*--------------------------------------------------------------------------*/
-void JuliantoCJDNA(int const *date, int *CJDN)
+void JuliantoCJDNA(Int const *date, Int *CJDN)
 {
   *CJDN = JuliantoCJDN(date[0], date[1], date[2]);
 }
 /*--------------------------------------------------------------------------*/
-int JulianStoCJDN(char const *date)
+Int JulianStoCJDN(char const *date)
 {
   return S3toCJDN(date, JuliantoCJDN,
                   arraysize(Gregorian_Julian_monthnames),
                   Gregorian_Julian_monthnames);
 }
 /*--------------------------------------------------------------------------*/
-void JulianStoCJDNA(char * const *date, int *CJDN)
+void JulianStoCJDNA(char * const *date, Int *CJDN)
 {
   S3toCJDNA(date, CJDN, JuliantoCJDNA,
             arraysize(Gregorian_Julian_monthnames),
             Gregorian_Julian_monthnames);
 }
 /*--------------------------------------------------------------------------*/
-double JuliantoCJD(int year, int month, double day)
+Double JuliantoCJD(Int year, Int month, Double day)
 {
   return CaltoCJD(year, month, day, JuliantoCJDN);
 }
 /*--------------------------------------------------------------------------*/
-void JuliantoCJDA(double const *date, double *CJD)
+void JuliantoCJDA(Double const *date, Double *CJD)
 {
-  *CJD = JuliantoCJD((int) date[0], (int) date[1], date[2]);
+  *CJD = JuliantoCJD((Int) date[0], (Int) date[1], date[2]);
 }
 /*--------------------------------------------------------------------------*/
-double JulianStoCJD(char const *date)
+Double JulianStoCJD(char const *date)
 {
   return S3toCJD(date, JuliantoCJD,
                  arraysize(Gregorian_Julian_monthnames),
                  Gregorian_Julian_monthnames);
 }
 /*--------------------------------------------------------------------------*/
-void JulianStoCJDA(char * const *date, double *CJD)
+void JulianStoCJDA(char * const *date, Double *CJD)
 {
   S3toCJDA(date, CJD, JuliantoCJDA,
            arraysize(Gregorian_Julian_monthnames),
@@ -645,7 +646,7 @@ void JulianStoCJDA(char * const *date, double *CJD)
 /* COMMON CALENDAR */
 
 /*--------------------------------------------------------------------------*/
-void CJDNtoCommon(int CJDN, int *year, int *month, int *day)
+void CJDNtoCommon(Int CJDN, Int *year, Int *month, Int *day)
 {
   if (CJDN > 2299160)
     return CJDNtoGregorian(CJDN, year, month, day);
@@ -653,45 +654,45 @@ void CJDNtoCommon(int CJDN, int *year, int *month, int *day)
     return CJDNtoJulian(CJDN, year, month, day);
 }
 /*--------------------------------------------------------------------------*/
-void CJDNtoCommonA(int const *CJDN, int *date)
+void CJDNtoCommonA(Int const *CJDN, Int *date)
 {
   CJDNtoCommon(*CJDN, &date[0], &date[1], &date[2]);
 }
 /*--------------------------------------------------------------------------*/
-char *CJDNtoCommonS(int CJDN)
+char *CJDNtoCommonS(Int CJDN)
 {
   return CJDNto3S(CJDN, CJDNtoCommon, Gregorian_Julian_monthnames);
 }
 /*--------------------------------------------------------------------------*/
-void CJDNtoCommonSA(int const *CJDN, char **date)
+void CJDNtoCommonSA(Int const *CJDN, char **date)
 {
   CJDNto3SA(CJDN, date, CJDNtoCommonA, Gregorian_Julian_monthnames);
 }
 /*--------------------------------------------------------------------------*/
-void CJDtoCommon(double CJD, int *year, int *month, double *day)
+void CJDtoCommon(Double CJD, Int *year, Int *month, Double *day)
 {
   CJDtoCal(CJD, year, month, day, CJDNtoCommon);
 }
 /*--------------------------------------------------------------------------*/
-void CJDtoCommonA(double const *CJD, double *date)
+void CJDtoCommonA(Double const *CJD, Double *date)
 {
-  int year, month;
+  Int year, month;
   CJDtoCommon(*CJD, &year, &month, &date[2]);
-  date[0] = (double) year;
-  date[1] = (double) month;
+  date[0] = (Double) year;
+  date[1] = (Double) month;
 }
 /*--------------------------------------------------------------------------*/
-char *CJDtoCommonS(double CJD)
+char *CJDtoCommonS(Double CJD)
 {
   return CJDto3S(CJD, CJDtoCommon, Gregorian_Julian_monthnames);
 }
 /*--------------------------------------------------------------------------*/
-void CJDtoCommonSA(double const *CJD, char **date)
+void CJDtoCommonSA(Double const *CJD, char **date)
 {
   CJDto3SA(CJD, date, CJDtoCommonA, Gregorian_Julian_monthnames);
 }
 /*--------------------------------------------------------------------------*/
-int CommontoCJDN(int year, int month, int day)
+Int CommontoCJDN(Int year, Int month, Int day)
 {
   if (year > 1582
       || (year == 1582
@@ -702,43 +703,43 @@ int CommontoCJDN(int year, int month, int day)
     return JuliantoCJDN(year, month, day);
 }
 /*--------------------------------------------------------------------------*/
-void CommontoCJDNA(int const *date, int *CJDN)
+void CommontoCJDNA(Int const *date, Int *CJDN)
 {
   *CJDN = CommontoCJDN(date[0], date[1], date[2]);
 }
 /*--------------------------------------------------------------------------*/
-int CommonStoCJDN(char const *date)
+Int CommonStoCJDN(char const *date)
 {
   return S3toCJDN(date, CommontoCJDN,
                   arraysize(Gregorian_Julian_monthnames),
                   Gregorian_Julian_monthnames);
 }
 /*--------------------------------------------------------------------------*/
-void CommonStoCJDNA(char * const *date, int *CJDN)
+void CommonStoCJDNA(char * const *date, Int *CJDN)
 {
   S3toCJDNA(date, CJDN, CommontoCJDNA,
             arraysize(Gregorian_Julian_monthnames),
             Gregorian_Julian_monthnames);
 }
 /*--------------------------------------------------------------------------*/
-double CommontoCJD(int year, int month, double day)
+Double CommontoCJD(Int year, Int month, Double day)
 {
   return CaltoCJD(year, month, day, CommontoCJDN);
 }
 /*--------------------------------------------------------------------------*/
-void CommontoCJDA(double const *date, double *CJD)
+void CommontoCJDA(Double const *date, Double *CJD)
 {
-  *CJD = CommontoCJD((int) date[0], (int) date[1], date[2]);
+  *CJD = CommontoCJD((Int) date[0], (Int) date[1], date[2]);
 }
 /*--------------------------------------------------------------------------*/
-double CommonStoCJD(char const *date)
+Double CommonStoCJD(char const *date)
 {
   return S3toCJD(date, CommontoCJD,
                  arraysize(Gregorian_Julian_monthnames),
                  Gregorian_Julian_monthnames);
 }
 /*--------------------------------------------------------------------------*/
-void CommonStoCJDA(char * const *date, double *CJD)
+void CommonStoCJDA(char * const *date, Double *CJD)
 {
   S3toCJDA(date, CJD, CommontoCJDA,
            arraysize(Gregorian_Julian_monthnames),
@@ -749,7 +750,7 @@ void CommonStoCJDA(char * const *date, double *CJD)
 /* HEBREW CALENDAR */
 
 /*--------------------------------------------------------------------------*/
-static int	hebrewMonthStarts[][13] = {
+static Int	hebrewMonthStarts[][13] = {
   /* deficient ordinary year: */
   /*   30, 29, 29,  29,  30,  29,  30,  29,  30,  29,  30,  29 */
   { 0, 30, 59, 88, 117, 147, 176, 206, 235, 265, 294, 324, 353 },
@@ -778,10 +779,10 @@ static char const * const Hebrew_monthnames[] = {
   "Iyar", "Sivan", "Tammuz", "Av", "Elul"
 };
 /*--------------------------------------------------------------------------*/
-void CJDNtoHebrew(int CJDN, int *year, int *month, int *day)
+void CJDNtoHebrew(Int CJDN, Int *year, Int *month, Int *day)
 {
-  int	d, cjdn, cjdn0;
-  int	approx_year, loy, yearType, m;
+  Int	d, cjdn, cjdn0;
+  Int	approx_year, loy, yearType, m;
 
   d = CJDN - HEBREW_EPOCH;
   approx_year = floor(d*0.002737874608);
@@ -809,55 +810,55 @@ void CJDNtoHebrew(int CJDN, int *year, int *month, int *day)
   *day = d - hebrewMonthStarts[yearType][m] + 1;
 }
 /*--------------------------------------------------------------------------*/
-void CJDNtoHebrewA(int const *CJDN, int *date)
+void CJDNtoHebrewA(Int const *CJDN, Int *date)
 {
   CJDNtoHebrew(*CJDN, &date[0], &date[1], &date[2]);
 }
 /*--------------------------------------------------------------------------*/
-char *CJDNtoHebrewS(int CJDN)
+char *CJDNtoHebrewS(Int CJDN)
 {
   return CJDNto3S(CJDN, CJDNtoHebrew, Hebrew_monthnames);
 }
 /*--------------------------------------------------------------------------*/
-void CJDNtoHebrewSA(int const *CJDN, char **date)
+void CJDNtoHebrewSA(Int const *CJDN, char **date)
 {
   CJDNto3SA(CJDN, date, CJDNtoHebrewA, Hebrew_monthnames);
 }
 /*--------------------------------------------------------------------------*/
-void CJDtoHebrew(double CJD, int *year, int *month, double *day)
+void CJDtoHebrew(Double CJD, Int *year, Int *month, Double *day)
 {
   CJDtoCal(CJD, year, month, day, CJDNtoHebrew);
 }
 /*--------------------------------------------------------------------------*/
-void CJDtoHebrewA(double const *CJD, double *date)
+void CJDtoHebrewA(Double const *CJD, Double *date)
 {
-  int year, month;
+  Int year, month;
   CJDtoHebrew(*CJD, &year, &month, &date[2]);
-  date[0] = (double) year;
-  date[1] = (double) month;
+  date[0] = (Double) year;
+  date[1] = (Double) month;
 }
 /*--------------------------------------------------------------------------*/
-char *CJDtoHebrewS(double CJD)
+char *CJDtoHebrewS(Double CJD)
 {
   return CJDto3S(CJD, CJDtoHebrew, Hebrew_monthnames);
 }
 /*--------------------------------------------------------------------------*/
-void CJDtoHebrewSA(double const *CJD, char **date)
+void CJDtoHebrewSA(Double const *CJD, char **date)
 {
   CJDto3SA(CJD, date, CJDtoHebrewA, Hebrew_monthnames);
 }
 /*--------------------------------------------------------------------------*/
-static int tishri(int year)
+static Int tishri(Int year)
 /* returns the number of days between Tishri 1, A.M. 1 and Tishri 1, */
 /* A.M. <year>.  LS 2oct98 */
 {
-  static int	nLeap[] = {
+  static Int	nLeap[] = {
     0, 0, 0, 1, 1, 1, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6
   };
-  static int	isLeap[] = {
+  static Int	isLeap[] = {
     0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1
   };
-  int	n, leap, halakim, hours, dow, weeks, j;
+  Int	n, leap, halakim, hours, dow, weeks, j;
 
   year--;
   n = iaquot(year,19);		/* number of cycles of Meton */
@@ -892,9 +893,9 @@ static int tishri(int year)
   return weeks*7 + dow;
 }
 /*--------------------------------------------------------------------------*/
-int HebrewtoCJDN(int year, int month, int day)
+Int HebrewtoCJDN(Int year, Int month, Int day)
 {
-  int	n1, loy, yearType;
+  Int	n1, loy, yearType;
  
   n1 = tishri(year);
   loy = tishri(year + 1) - n1;
@@ -904,43 +905,43 @@ int HebrewtoCJDN(int year, int month, int day)
   return HEBREW_EPOCH + n1 + hebrewMonthStarts[yearType][month - 1] + day - 1;
 }
 /*--------------------------------------------------------------------------*/
-void HebrewtoCJDNA(int const *date, int *CJDN)
+void HebrewtoCJDNA(Int const *date, Int *CJDN)
 {
   *CJDN = HebrewtoCJDN(date[0], date[1], date[2]);
 }
 /*--------------------------------------------------------------------------*/
-int HebrewStoCJDN(char const *date)
+Int HebrewStoCJDN(char const *date)
 {
     return S3toCJDN(date, HebrewtoCJDN,
                   arraysize(Hebrew_monthnames),
                   Hebrew_monthnames);
 }
 /*--------------------------------------------------------------------------*/
-void HebrewStoCJDNA(char * const * date, int *CJDN)
+void HebrewStoCJDNA(char * const * date, Int *CJDN)
 {
   S3toCJDNA(date, CJDN, HebrewtoCJDNA,
             arraysize(Hebrew_monthnames),
             Hebrew_monthnames);
 }
 /*--------------------------------------------------------------------------*/
-double HebrewtoCJD(int year, int month, double day)
+Double HebrewtoCJD(Int year, Int month, Double day)
 {
   return CaltoCJD(year, month, day, HebrewtoCJDN);
 }
 /*--------------------------------------------------------------------------*/
-void HebrewtoCJDA(double const *date, double *CJD)
+void HebrewtoCJDA(Double const *date, Double *CJD)
 {
-  *CJD = HebrewtoCJD((int) date[0], (int) date[1], date[2]);
+  *CJD = HebrewtoCJD((Int) date[0], (Int) date[1], date[2]);
 }
 /*--------------------------------------------------------------------------*/
-double HebrewStoCJD(char const *date)
+Double HebrewStoCJD(char const *date)
 {
   return S3toCJD(date, HebrewtoCJD,
                  arraysize(Hebrew_monthnames),
                  Hebrew_monthnames);
 }
 /*--------------------------------------------------------------------------*/
-void HebrewStoCJDA(char * const *date, double *CJD)
+void HebrewStoCJDA(char * const *date, Double *CJD)
 {
   S3toCJDA(date, CJD, HebrewtoCJDA,
            arraysize(Hebrew_monthnames),
@@ -960,57 +961,57 @@ static char const *Islamic_monthnames[] = {
 };
 
 /*--------------------------------------------------------------------------*/
-void CJDNtoIslamic(int CJDN, int *year, int *month, int *day)
+void CJDNtoIslamic(Int CJDN, Int *year, Int *month, Int *day)
 {
   /* This algorithm by Louis Strous
      (http://aa.quae.nl/en/reken/juliaansedag.html) */
   /* "Alfonsine tables", s = 14, J₀ = 1948440 */
-  int y2 = CJDN - ISLAMIC_EPOCH;
+  Int y2 = CJDN - ISLAMIC_EPOCH;
   *year = alinequot(y2, 30, 10646, 10631);
-  int z2 = y2 - alinequot(*year, 10631, -10617, 30);
+  Int z2 = y2 - alinequot(*year, 10631, -10617, 30);
   *month = iaquot(11*z2 + 330, 325);
   *day = z2 - iaquot(325**month - 331, 11);
 }
 /*--------------------------------------------------------------------------*/
-void CJDNtoIslamicA(int const *CJDN, int *date)
+void CJDNtoIslamicA(Int const *CJDN, Int *date)
 {
   CJDNtoIslamic(*CJDN, &date[0], &date[1], &date[2]);
 }
 /*--------------------------------------------------------------------------*/
-char *CJDNtoIslamicS(int CJDN)
+char *CJDNtoIslamicS(Int CJDN)
 {
   return CJDNto3S(CJDN, CJDNtoIslamic, Islamic_monthnames);
 }
 /*--------------------------------------------------------------------------*/
-void CJDNtoIslamicSA(int const *CJDN, char **date)
+void CJDNtoIslamicSA(Int const *CJDN, char **date)
 {
   CJDNto3SA(CJDN, date, CJDNtoIslamicA, Islamic_monthnames);
 }
 /*--------------------------------------------------------------------------*/
-void CJDtoIslamic(double CJD, int *year, int *month, double *day)
+void CJDtoIslamic(Double CJD, Int *year, Int *month, Double *day)
 {
   CJDtoCal(CJD, year, month, day, CJDNtoIslamic);
 }
 /*--------------------------------------------------------------------------*/
-void CJDtoIslamicA(double const *CJD, double *date)
+void CJDtoIslamicA(Double const *CJD, Double *date)
 {
-  int year, month;
+  Int year, month;
   CJDtoIslamic(*CJD, &year, &month, &date[2]);
-  date[0] = (double) year;
-  date[1] = (double) month;
+  date[0] = (Double) year;
+  date[1] = (Double) month;
 }
 /*--------------------------------------------------------------------------*/
-char *CJDtoIslamicS(double CJD)
+char *CJDtoIslamicS(Double CJD)
 {
   return CJDto3S(CJD, CJDtoIslamic, Islamic_monthnames);
 }
 /*--------------------------------------------------------------------------*/
-void CJDtoIslamicSA(double const *CJD, char **date)
+void CJDtoIslamicSA(Double const *CJD, char **date)
 {
   CJDto3SA(CJD, date, CJDtoIslamicA, Islamic_monthnames);
 }
 /*--------------------------------------------------------------------------*/
-int IslamictoCJDN(int year, int month, int day)
+Int IslamictoCJDN(Int year, Int month, Int day)
 {
   /* This algorithm by Louis Strous
      (http://aa.quae.nl/en/reken/juliaansedag.html) */
@@ -1018,43 +1019,43 @@ int IslamictoCJDN(int year, int month, int day)
     + iaquot(325*month - 320, 11) + day + ISLAMIC_EPOCH - 1;
 }
 /*--------------------------------------------------------------------------*/
-void IslamictoCJDNA(int const *date, int *CJDN)
+void IslamictoCJDNA(Int const *date, Int *CJDN)
 {
   *CJDN = IslamictoCJDN(date[0], date[1], date[2]);
 }
 /*--------------------------------------------------------------------------*/
-int IslamicStoCJDN(char const *date)
+Int IslamicStoCJDN(char const *date)
 {
   return S3toCJDN(date, IslamictoCJDN,
                   arraysize(Islamic_monthnames),
                   Islamic_monthnames);
 }
 /*--------------------------------------------------------------------------*/
-void IslamicStoCJDNA(char * const *date, int *CJDN)
+void IslamicStoCJDNA(char * const *date, Int *CJDN)
 {
   S3toCJDNA(date, CJDN, IslamictoCJDNA,
             arraysize(Islamic_monthnames),
             Islamic_monthnames);
 }
 /*--------------------------------------------------------------------------*/
-double IslamictoCJD(int year, int month, double day)
+Double IslamictoCJD(Int year, Int month, Double day)
 {
   return CaltoCJD(year, month, day, IslamictoCJDN);
 }
 /*--------------------------------------------------------------------------*/
-void IslamictoCJDA(double const *date, double *CJD)
+void IslamictoCJDA(Double const *date, Double *CJD)
 {
-  *CJD = IslamictoCJD((int) date[0], (int) date[1], date[2]);
+  *CJD = IslamictoCJD((Int) date[0], (Int) date[1], date[2]);
 }
 /*--------------------------------------------------------------------------*/
-double IslamicStoCJD(char const *date)
+Double IslamicStoCJD(char const *date)
 {
   return S3toCJD(date, IslamictoCJD,
                  arraysize(Islamic_monthnames),
                  Islamic_monthnames);
 }
 /*--------------------------------------------------------------------------*/
-void IslamicStoCJDA(char * const *date, double *CJD)
+void IslamicStoCJDA(char * const *date, Double *CJD)
 {
   S3toCJDA(date, CJD, IslamictoCJDA,
            arraysize(Islamic_monthnames),
@@ -1073,101 +1074,101 @@ static char const *Egyptian_monthnames[] = {
 };
 
 /*--------------------------------------------------------------------------*/
-void CJDNtoEgyptian(int CJDN, int *year, int *month, int *day)
+void CJDNtoEgyptian(Int CJDN, Int *year, Int *month, Int *day)
 {
   /* This algorithm by Louis Strous
      (http://aa.quae.nl/en/reken/juliaansedag.html) */
   /* era of Nabonassar */
-  int y2 = CJDN - EGYPTIAN_EPOCH;
-  div_t d = adiv(y2, 365);
+  Int y2 = CJDN - EGYPTIAN_EPOCH;
+  Div_t d = adiv(y2, 365);
   *year = d.quot;
   d = adiv(d.rem, 30);
   *month = d.quot + 1;
   *day = d.rem + 1;
 }
 /*--------------------------------------------------------------------------*/
-void CJDNtoEgyptianA(int const *CJDN, int *date)
+void CJDNtoEgyptianA(Int const *CJDN, Int *date)
 {
   CJDNtoEgyptian(*CJDN, &date[0], &date[1], &date[2]);
 }
 /*--------------------------------------------------------------------------*/
-char *CJDNtoEgyptianS(int CJDN)
+char *CJDNtoEgyptianS(Int CJDN)
 {
   return CJDNto3S(CJDN, CJDNtoEgyptian, Egyptian_monthnames);
 }
 /*--------------------------------------------------------------------------*/
-void CJDNtoEgyptianSA(int const *CJDN, char **date)
+void CJDNtoEgyptianSA(Int const *CJDN, char **date)
 {
   CJDNto3SA(CJDN, date, CJDNtoEgyptianA, Egyptian_monthnames);
 }
 /*--------------------------------------------------------------------------*/
-void CJDtoEgyptian(double CJD, int *year, int *month, double *day)
+void CJDtoEgyptian(Double CJD, Int *year, Int *month, Double *day)
 {
   CJDtoCal(CJD, year, month, day, CJDNtoEgyptian);
 }
 /*--------------------------------------------------------------------------*/
-void CJDtoEgyptianA(double const *CJD, double *date)
+void CJDtoEgyptianA(Double const *CJD, Double *date)
 {
-  int year, month;
+  Int year, month;
   CJDtoEgyptian(*CJD, &year, &month, &date[2]);
-  date[0] = (double) year;
-  date[1] = (double) month;
+  date[0] = (Double) year;
+  date[1] = (Double) month;
 }
 /*--------------------------------------------------------------------------*/
-char *CJDtoEgyptianS(double CJD)
+char *CJDtoEgyptianS(Double CJD)
 {
   return CJDto3S(CJD, CJDtoEgyptian, Egyptian_monthnames);
 }
 /*--------------------------------------------------------------------------*/
-void CJDtoEgyptianSA(double const *CJD, char **date)
+void CJDtoEgyptianSA(Double const *CJD, char **date)
 {
   CJDto3SA(CJD, date, CJDtoEgyptianA, Egyptian_monthnames);
 }
 /*--------------------------------------------------------------------------*/
-int EgyptiantoCJDN(int year, int month, int day)
+Int EgyptiantoCJDN(Int year, Int month, Int day)
 {
   /* This algorithm by Louis Strous
      (http://aa.quae.nl/en/reken/juliaansedag.html) */
   return 365*year + 30*month + day + EGYPTIAN_EPOCH - 365 - 30 - 1;
 }
 /*--------------------------------------------------------------------------*/
-void EgyptiantoCJDNA(int const *date, int *CJDN)
+void EgyptiantoCJDNA(Int const *date, Int *CJDN)
 {
   *CJDN = EgyptiantoCJDN(date[0], date[1], date[2]);
 }
 /*--------------------------------------------------------------------------*/
-int EgyptianStoCJDN(char const *date)
+Int EgyptianStoCJDN(char const *date)
 {
   return S3toCJDN(date, EgyptiantoCJDN,
                   arraysize(Egyptian_monthnames),
                   Egyptian_monthnames);
 }
 /*--------------------------------------------------------------------------*/
-void EgyptianStoCJDNA(char * const *date, int *CJDN)
+void EgyptianStoCJDNA(char * const *date, Int *CJDN)
 {
   S3toCJDNA(date, CJDN, EgyptiantoCJDNA,
             arraysize(Egyptian_monthnames),
             Egyptian_monthnames);
 }
 /*--------------------------------------------------------------------------*/
-double EgyptiantoCJD(int year, int month, double day)
+Double EgyptiantoCJD(Int year, Int month, Double day)
 {
   return CaltoCJD(year, month, day, EgyptiantoCJDN);
 }
 /*--------------------------------------------------------------------------*/
-void EgyptiantoCJDA(double const *date, double *CJD)
+void EgyptiantoCJDA(Double const *date, Double *CJD)
 {
-  *CJD = EgyptiantoCJD((int) date[0], (int) date[1], date[2]);
+  *CJD = EgyptiantoCJD((Int) date[0], (Int) date[1], date[2]);
 }
 /*--------------------------------------------------------------------------*/
-double EgyptianStoCJD(char const *date)
+Double EgyptianStoCJD(char const *date)
 {
   return S3toCJD(date, EgyptiantoCJD,
                  arraysize(Egyptian_monthnames),
                  Egyptian_monthnames);
 }
 /*--------------------------------------------------------------------------*/
-void EgyptianStoCJDA(char * const *date, double *CJD)
+void EgyptianStoCJDA(char * const *date, Double *CJD)
 {
   S3toCJDA(date, CJD, EgyptiantoCJDA,
            arraysize(Egyptian_monthnames),
@@ -1178,32 +1179,32 @@ void EgyptianStoCJDA(char * const *date, double *CJD)
 /* JULIAN DAY */
 
 /*--------------------------------------------------------------------------*/
-double JDtoCJD(double JD)
+Double JDtoCJD(Double JD)
 {
   return JD + 0.5;
 }
 /*--------------------------------------------------------------------------*/
-void JDtoCJDA(double const *JD, double *CJD)
+void JDtoCJDA(Double const *JD, Double *CJD)
 {
   *CJD = JDtoCJD(*JD);
 }
 /*--------------------------------------------------------------------------*/
-double CJDtoJD(double CJD)
+Double CJDtoJD(Double CJD)
 {
   return CJD - 0.5;
 }
 /*--------------------------------------------------------------------------*/
-void CJDtoJDA(double const *CJD, double *JD)
+void CJDtoJDA(Double const *CJD, Double *JD)
 {
   *JD = CJDtoJD(*CJD);
 }
 /*--------------------------------------------------------------------------*/
-void CJDNtoCJDNA(int const *in, int *out)
+void CJDNtoCJDNA(Int const *in, Int *out)
 {
   *out = *in;
 }
 /*--------------------------------------------------------------------------*/
-void CJDtoCJDA(double const *in, double *out)
+void CJDtoCJDA(Double const *in, Double *out)
 {
   *out = *in;
 }
@@ -1212,9 +1213,9 @@ void CJDtoCJDA(double const *in, double *out)
 /* LUNAR CALENDAR */
 
 /*--------------------------------------------------------------------------*/
-double CJDtoLunar(double CJD)
+Double CJDtoLunar(Double CJD)
 {
-  double	k, CJD2;
+  Double	k, CJD2;
 
   k = floor((CJDtoJD(CJD) - 2451550.09765)/29.530588853) + 83017;
   CJD2 = LunartoCJD(k);
@@ -1222,14 +1223,14 @@ double CJDtoLunar(double CJD)
   return k;
 }
 /*--------------------------------------------------------------------------*/
-void CJDtoLunarA(double const *CJD, double *lunar)
+void CJDtoLunarA(Double const *CJD, Double *lunar)
 {
   *lunar = CJDtoLunar(*CJD);
 }
 /*--------------------------------------------------------------------------*/
-double LunartoCJD(double lunar)
+Double LunartoCJD(Double lunar)
 {
-  double	T, k;
+  Double	T, k;
 
   k = lunar - 83017;
   T = k/1236.85;
@@ -1237,7 +1238,7 @@ double LunartoCJD(double lunar)
     + T*T*(1.337e-4 + T*(-1.5e-7 + 7.3e-10*T));
 }
 /*--------------------------------------------------------------------------*/
-void LunartoCJDA(double const *lunar, double *CJD)
+void LunartoCJDA(Double const *lunar, Double *CJD)
 {
   *CJD = LunartoCJD(*lunar);
 }
@@ -1261,28 +1262,28 @@ static char const *Mayan_haab_names[] = {
 #define find_haab_name(s) find_name(s, arraysize(Mayan_haab_names), Mayan_haab_names)
 
 /*--------------------------------------------------------------------------*/
-void CJDNtoMayan(int CJDN, int *trecena, int *venteina,
-                 int *haab_day, int *haab_month,
-                 int *year_trecena, int *year_venteina)
+void CJDNtoMayan(Int CJDN, Int *trecena, Int *venteina,
+                 Int *haab_day, Int *haab_month,
+                 Int *year_trecena, Int *year_venteina)
 {
   *trecena = iamod(CJDN + 5, 13) + 1;
   *venteina = iamod(CJDN + 16, 20) + 1;
-  div_t d = adiv(CJDN + 65, 365);
+  Div_t d = adiv(CJDN + 65, 365);
   *haab_day = iamod(d.rem, 20);
   *haab_month = d.rem/20 + 1;
   *year_trecena = iamod(d.quot + 5, 13) + 1;
   *year_venteina = iamod(5*d.quot + 11, 20) + 1;
 }
 /*--------------------------------------------------------------------------*/
-void CJDNtoMayanA(int const *CJDN, int *date)
+void CJDNtoMayanA(Int const *CJDN, Int *date)
 {
   CJDNtoMayan(*CJDN, &date[0], &date[1], &date[2], &date[3], &date[4],
               &date[5]);
 }
 /*--------------------------------------------------------------------------*/
-char *CJDNtoMayanS(int CJDN)
+char *CJDNtoMayanS(Int CJDN)
 {
-  int trecena, venteina, haab_day, haab_month, year_trecena, year_venteina;
+  Int trecena, venteina, haab_day, haab_month, year_trecena, year_venteina;
   char *date;
 
   CJDNtoMayan(CJDN, &trecena, &venteina, &haab_day, &haab_month,
@@ -1295,9 +1296,9 @@ char *CJDNtoMayanS(int CJDN)
   return date;
 }
 /*--------------------------------------------------------------------------*/
-void CJDNtoMayanSA(int const *CJDN, char **date)
+void CJDNtoMayanSA(Int const *CJDN, char **date)
 {
-  int trecena, venteina, haab_day, haab_month, year_trecena, year_venteina;
+  Int trecena, venteina, haab_day, haab_month, year_trecena, year_venteina;
 
   CJDNtoMayan(*CJDN, &trecena, &venteina, &haab_day, &haab_month,
               &year_trecena, &year_venteina);
@@ -1308,24 +1309,24 @@ void CJDNtoMayanSA(int const *CJDN, char **date)
     *date = NULL;
 }
 /*--------------------------------------------------------------------------*/
-void CJDtoMayan(double CJD, int *trecena, int *venteina,
-                double *haab_day, int *haab_month,
-                int *year_trecena, int *year_venteina)
+void CJDtoMayan(Double CJD, Int *trecena, Int *venteina,
+                Double *haab_day, Int *haab_month,
+                Int *year_trecena, Int *year_venteina)
 {
-  int ihaab_day, CJDN;
-  double frac;
+  Int ihaab_day, CJDN;
+  Double frac;
 
-  CJDN = (int) floor(CJD);
+  CJDN = (Int) floor(CJD);
   frac = CJD - CJDN;
   CJDNtoMayan(CJDN, trecena, venteina, &ihaab_day, haab_month, year_trecena,
               year_venteina);
   *haab_day = ihaab_day + frac;
 }
 /*--------------------------------------------------------------------------*/
-void CJDtoMayanA(double const *CJD, double *date)
+void CJDtoMayanA(Double const *CJD, Double *date)
 {
-  int CJDN, datec[6];
-  double frac;
+  Int CJDN, datec[6];
+  Double frac;
 
   CJDN = floor(*CJD);
   frac = *CJD - CJDN;
@@ -1338,10 +1339,10 @@ void CJDtoMayanA(double const *CJD, double *date)
   date[5] = datec[5];
 }
 /*--------------------------------------------------------------------------*/
-char *CJDtoMayanS(double CJD)
+char *CJDtoMayanS(Double CJD)
 {
-  int trecena, venteina, haab_month, year_trecena, year_venteina;
-  double haab_day;
+  Int trecena, venteina, haab_month, year_trecena, year_venteina;
+  Double haab_day;
   char *date;
 
   CJDtoMayan(CJD, &trecena, &venteina, &haab_day, &haab_month, &year_trecena,
@@ -1354,18 +1355,18 @@ char *CJDtoMayanS(double CJD)
   return date;
 }
 /*--------------------------------------------------------------------------*/
-void CJDtoMayanSA(double const *CJD, char **date)
+void CJDtoMayanSA(Double const *CJD, char **date)
 {
   *date = CJDtoMayanS(*CJD);
 }
 /*--------------------------------------------------------------------------*/
-int MayantoCJDN(int trecena, int venteina, int haab_day, int haab_month,
-                int year_trecena, int year_venteina, int CJDN_upper)
+Int MayantoCJDN(Int trecena, Int venteina, Int haab_day, Int haab_month,
+                Int year_trecena, Int year_venteina, Int CJDN_upper)
 {
-  int do_tzolkin = (trecena && venteina);
-  int do_haab = (haab_month != 0);
-  int do_year = (year_trecena && year_venteina);
-  int haab, tzolkin, year, haab_year;
+  Int do_tzolkin = (trecena && venteina);
+  Int do_haab = (haab_month != 0);
+  Int do_year = (year_trecena && year_venteina);
+  Int haab, tzolkin, year, haab_year;
 
   if (do_tzolkin) {
     trecena = iamod(trecena - 6, 13);
@@ -1394,15 +1395,15 @@ int MayantoCJDN(int trecena, int venteina, int haab_day, int haab_month,
     return CJDN_upper - iamod(CJDN_upper - haab, 365);
   case 3:                       /* tzolkin & haab */
     {
-      int tzolkin_haab = iamod(365*tzolkin - 364*haab, 18980);
+      Int tzolkin_haab = iamod(365*tzolkin - 364*haab, 18980);
       return CJDN_upper - iamod(CJDN_upper - tzolkin_haab, 18980);
     }
   case 4:                       /* year */
     return CJDN_upper - iamod(CJDN_upper - haab_year, 18980);
   case 5:                       /* tzolkin & year */
     {
-      int CJDN_tzolkin = CJDN_upper - iamod(CJDN_upper - tzolkin, 260);
-      int CJDN_haab_year = CJDN_upper - iamod(CJDN_upper - haab_year, 18980);
+      Int CJDN_tzolkin = CJDN_upper - iamod(CJDN_upper - tzolkin, 260);
+      Int CJDN_haab_year = CJDN_upper - iamod(CJDN_upper - haab_year, 18980);
       /* now CJDN_tzolkin is the last matching tzolkin on/before
          CJDN_upper, and CJDN_haab_year is the last matching beginning of
          the haab year on/before CJDN_upper, but CJDN_tzolkin may
@@ -1411,16 +1412,16 @@ int MayantoCJDN(int trecena, int venteina, int haab_day, int haab_month,
     }
   case 6:                       /* haab & year */
     {
-      int CJDN_haab = CJDN_upper - iamod(CJDN_upper - haab, 365);
-      int CJDN_haab_year = CJDN_upper - iamod(CJDN_upper - haab_year, 18980);
+      Int CJDN_haab = CJDN_upper - iamod(CJDN_upper - haab, 365);
+      Int CJDN_haab_year = CJDN_upper - iamod(CJDN_upper - haab_year, 18980);
       return CJDN_haab + (18980-365)*iaquot(CJDN_haab - CJDN_haab_year, 365);
     }
   case 7:                       /* tzolkin & haab & year */
     {
-      int CJDN_tzolkin = CJDN_upper - iamod(CJDN_upper - tzolkin, 260);
-      int CJDN_haab_year = CJDN_upper - iamod(CJDN_upper - haab_year, 18980);
-      int CJDN = CJDN_tzolkin + (18980-260)*iaquot(CJDN_tzolkin - CJDN_haab_year, 260);
-      int CJDN_haab = CJDN_upper - iamod(CJDN_upper - haab, 365);
+      Int CJDN_tzolkin = CJDN_upper - iamod(CJDN_upper - tzolkin, 260);
+      Int CJDN_haab_year = CJDN_upper - iamod(CJDN_upper - haab_year, 18980);
+      Int CJDN = CJDN_tzolkin + (18980-260)*iaquot(CJDN_tzolkin - CJDN_haab_year, 260);
+      Int CJDN_haab = CJDN_upper - iamod(CJDN_upper - haab, 365);
       return CJDN == CJDN_haab? CJDN: 0;
     }
     break;
@@ -1428,24 +1429,24 @@ int MayantoCJDN(int trecena, int venteina, int haab_day, int haab_month,
   return 0;
 }
 /*--------------------------------------------------------------------------*/
-void MayantoCJDNA(int const *date, int *CJDN)
+void MayantoCJDNA(Int const *date, Int *CJDN)
 {
   *CJDN = MayantoCJDN(date[0], date[1], date[2], date[3], date[4], date[5],
                       date[6]);
 }
 /*--------------------------------------------------------------------------*/
-static void MayanSto(char const *date, int *CJDN, double *CJD)
+static void MayanSto(char const *date, Int *CJDN, Double *CJD)
 {
-  int n, nc, datepos, inumber;
-  double number, haab_day;
+  Int n, nc, datepos, inumber;
+  Double number, haab_day;
   char *name;
   size_t i;
-  int trecena, venteina = -1, haab_month = -1,
+  Int trecena, venteina = -1, haab_month = -1,
     trecena_year, venteina_year = -1;
   enum state {
     BUSY, OK, BAD
   } state = BUSY;
-  int CJDN_upper;
+  Int CJDN_upper;
   
   name = NULL;
   datepos = 0;
@@ -1542,44 +1543,44 @@ static void MayanSto(char const *date, int *CJDN, double *CJD)
                       trecena_year, venteina_year, CJDN_upper);
 }
 /*--------------------------------------------------------------------------*/
-int MayanStoCJDN(char const *date)
+Int MayanStoCJDN(char const *date)
 {
-  int CJDN;
+  Int CJDN;
 
   MayanSto(date, &CJDN, NULL);
   return CJDN;
 }
 /*--------------------------------------------------------------------------*/
-void MayanStoCJDNA(char * const *date, int *CJDN)
+void MayanStoCJDNA(char * const *date, Int *CJDN)
 {
   MayanSto(*date, CJDN, NULL);
 }
 /*--------------------------------------------------------------------------*/
-double MayantoCJD(int trecena, int venteina, double haab_day, int haab_month,
-                  int year_trecena, int year_venteina, int CJDN_upper)
+Double MayantoCJD(Int trecena, Int venteina, Double haab_day, Int haab_month,
+                  Int year_trecena, Int year_venteina, Int CJDN_upper)
 {
-  int ihaab_day = floor(haab_day);
-  double frac = haab_day - ihaab_day;
-  int CJDN = MayantoCJDN(trecena, venteina, ihaab_day, haab_month,
+  Int ihaab_day = floor(haab_day);
+  Double frac = haab_day - ihaab_day;
+  Int CJDN = MayantoCJDN(trecena, venteina, ihaab_day, haab_month,
                          year_trecena, year_venteina, CJDN_upper);
   return CJDN + frac;
 }
 /*--------------------------------------------------------------------------*/
-void MayantoCJDA(double const *date, double *CJD)
+void MayantoCJDA(Double const *date, Double *CJD)
 {
   *CJD = MayantoCJD(floor(date[0]), floor(date[1]), date[2], floor(date[3]),
                     floor(date[4]), floor(date[5]), floor(date[6]));
 }
 /*--------------------------------------------------------------------------*/
-double MayanStoCJD(char const *date)
+Double MayanStoCJD(char const *date)
 {
-  double CJD;
+  Double CJD;
   
   MayanSto(date, NULL, &CJD);
   return CJD;
 }
 /*--------------------------------------------------------------------------*/
-void MayanStoCJDA(char * const *date, double *CJD)
+void MayanStoCJDA(char * const *date, Double *CJD)
 {
   MayanSto(*date, NULL, CJD);
 }
@@ -1588,16 +1589,15 @@ void MayanStoCJDA(char * const *date, double *CJD)
 /* MAYAN LONG COUNT CALENDAR */
 
 #define LONGCOUNT_EPOCH (584283)
-static int longcount_periods[] = { 20, 20, 18, 20 };
+static Int longcount_periods[] = { 20, 20, 18, 20 };
 
-void CJDNtoLongCount(int CJDN, int *baktun, int *katun, int *tun, int *uinal,
-                     int *kin)
+void CJDNtoLongCount(Int CJDN, Int *baktun, Int *katun, Int *tun, Int *uinal,
+                     Int *kin)
 {
-  int d;
+  Int d;
 
   d = CJDN - LONGCOUNT_EPOCH;
-  div_t x;
-  x = adiv(d, longcount_periods[3]);
+  Div_t x = adiv(d, longcount_periods[3]);
   *kin = x.rem;
   x = adiv(x.quot, longcount_periods[2]);
   *uinal = x.rem;
@@ -1608,10 +1608,10 @@ void CJDNtoLongCount(int CJDN, int *baktun, int *katun, int *tun, int *uinal,
   *katun = x.rem;
 }
 /*--------------------------------------------------------------------------*/
-void CJDNtoLongCountA(int const *CJDN, int *longcount)
+void CJDNtoLongCountA(Int const *CJDN, Int *longcount)
 {
-  int i;
-  div_t x;
+  Int i;
+  Div_t x;
 
   x.quot = *CJDN;
   for (i = arraysize(longcount_periods) - 1; i >= 0; i--) {
@@ -1621,9 +1621,9 @@ void CJDNtoLongCountA(int const *CJDN, int *longcount)
   longcount[0] = x.quot;
 }
 /*--------------------------------------------------------------------------*/
-char *CJDNtoLongCountS(int CJDN)
+char *CJDNtoLongCountS(Int CJDN)
 {
-  int baktun, katun, tun, uinal, kin;
+  Int baktun, katun, tun, uinal, kin;
   char *date;
 
   CJDNtoLongCount(CJDN, &baktun, &katun, &tun, &uinal, &kin);
@@ -1632,21 +1632,21 @@ char *CJDNtoLongCountS(int CJDN)
   return date;
 }
 /*--------------------------------------------------------------------------*/
-void CJDNtoLongCountSA(int const *CJDN, char **date)
+void CJDNtoLongCountSA(Int const *CJDN, char **date)
 {
-  int baktun, katun, tun, uinal, kin;
+  Int baktun, katun, tun, uinal, kin;
 
   CJDNtoLongCount(*CJDN, &baktun, &katun, &tun, &uinal, &kin);
   if (asprintf(date, "%d.%d.%d.%d.%d", baktun, katun, tun, uinal, kin) < 0)
     *date = NULL;
 }
 /*--------------------------------------------------------------------------*/
-void CJDtoLongCount(double CJD, int *baktun, int *katun, int *tun, int *uinal,
-                    double *kin)
+void CJDtoLongCount(Double CJD, Int *baktun, Int *katun, Int *tun, Int *uinal,
+                    Double *kin)
 {
-  int d;
-  double frac;
-  div_t x;
+  Int d;
+  Double frac;
+  Div_t x;
 
   d = floor(CJD);
   frac = CJD - d;
@@ -1662,33 +1662,33 @@ void CJDtoLongCount(double CJD, int *baktun, int *katun, int *tun, int *uinal,
   *katun = x.rem;
 }
 /*--------------------------------------------------------------------------*/
-void CJDtoLongCountA(double const *CJD, double *longcount)
+void CJDtoLongCountA(Double const *CJD, Double *longcount)
 {
-  int i;
-  int d = floor(*CJD);
-  double frac = *CJD - d;
+  Int i;
+  Int d = floor(*CJD);
+  Double frac = *CJD - d;
   for (i = arraysize(longcount_periods) - 1; i >= 0; i--) {
-    div_t x = adiv(d, longcount_periods[i]);
+    Div_t x = adiv(d, longcount_periods[i]);
     d = x.quot;
     longcount[i + 1] = x.rem;
   }
   longcount[0] = d + frac;
 }
 /*--------------------------------------------------------------------------*/
-char *CJDtoLongCountS(double CJD)
+char *CJDtoLongCountS(Double CJD)
 {
   return CJDNtoLongCountS(floor(CJD));
 }
 /*--------------------------------------------------------------------------*/
-void CJDtoLongCountSA(double const *CJD, char **date)
+void CJDtoLongCountSA(Double const *CJD, char **date)
 {
-  int CJDN = floor(*CJD);
+  Int CJDN = floor(*CJD);
   CJDNtoLongCountSA(&CJDN, date);
 }
 /*--------------------------------------------------------------------------*/
-int LongCounttoCJDN(int baktun, int katun, int tun, int uinal, int kin)
+Int LongCounttoCJDN(Int baktun, Int katun, Int tun, Int uinal, Int kin)
 {
-  int d;
+  Int d;
 
   d = baktun;
   d = longcount_periods[0]*d + katun;
@@ -1698,15 +1698,15 @@ int LongCounttoCJDN(int baktun, int katun, int tun, int uinal, int kin)
   return d + LONGCOUNT_EPOCH;
 }
 /*--------------------------------------------------------------------------*/
-void LongCounttoCJDNA(int const *longcount, int *CJDN)
+void LongCounttoCJDNA(Int const *longcount, Int *CJDN)
 {
   *CJDN = LongCounttoCJDN(longcount[0], longcount[1], longcount[2],
                           longcount[3], longcount[4]);
 }
 /*--------------------------------------------------------------------------*/
-int LongCountStoCJDN(char const *date)
+Int LongCountStoCJDN(char const *date)
 {
-  int datec[5] = { 0, 0, 0, 0, 0 }, i, value;
+  Int datec[5] = { 0, 0, 0, 0, 0 }, i, value;
   char *p;
 
   p = (char *) date;
@@ -1724,34 +1724,34 @@ int LongCountStoCJDN(char const *date)
   return LongCounttoCJDN(datec[0], datec[1], datec[2], datec[3], datec[4]);
 }
 /*--------------------------------------------------------------------------*/
-void LongCountStoCJDNA(char * const *date, int *CJDN)
+void LongCountStoCJDNA(char * const *date, Int *CJDN)
 {
   *CJDN = LongCountStoCJDN(*date);
 }
 /*--------------------------------------------------------------------------*/
-double LongCounttoCJD(int baktun, int katun, int tun, int uinal, double kin)
+Double LongCounttoCJD(Int baktun, Int katun, Int tun, Int uinal, Double kin)
 {
-  int ikin = floor(kin);
-  double frac = kin - ikin;
+  Int ikin = floor(kin);
+  Double frac = kin - ikin;
   return LongCounttoCJDN(baktun, katun, tun, uinal, ikin) + frac;
 }
 /*--------------------------------------------------------------------------*/
-void LongCounttoCJDA(double const *date, double *CJD)
+void LongCounttoCJDA(Double const *date, Double *CJD)
 {
   *CJD = LongCounttoCJD(floor(date[0]), floor(date[1]), floor(date[2]),
                         floor(date[3]), date[4]);
 }
 /*--------------------------------------------------------------------------*/
-double LongCountStoCJD(char const *date)
+Double LongCountStoCJD(char const *date)
 {
   return LongCountStoCJDN(date);
 }
 /*--------------------------------------------------------------------------*/
-void LongCountStoCJDA(char * const * date, double *CJD)
+void LongCountStoCJDA(char * const * date, Double *CJD)
 {
-  int CJDN;
+  Int CJDN;
 
   LongCountStoCJDNA(date, &CJDN);
-  *CJD = (double) CJDN;
+  *CJD = (Double) CJDN;
 }
 /*--------------------------------------------------------------------------*/

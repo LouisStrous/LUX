@@ -9,16 +9,16 @@
 static char rcsid[] __attribute__ ((unused)) =
  "$Id: decomp.c,v 4.0 2001/02/07 20:36:58 strous Exp $";
 /*--------------------------------------------------------------------------*/
-int d_decomp(x, n, nd)
+Int d_decomp(x, n, nd)
 /*translated from fortran anadecomp.for which may be easier to follow since
 	it uses subscripts rather than the pointers used here */
 /*no pivoting in this version !, so diagonals must be != 0 */
-double	*x;
-int	n, nd;
+Double	*x;
+Int	n, nd;
 {
-register	double	sum1, sum2, *p1, *p2, *p3, *p4;
-double	*qd, *q2, *q1, div;
-int	nq, mq, lq, k;
+register	Double	sum1, sum2, *p1, *p2, *p3, *p4;
+Double	*qd, *q2, *q1, div;
+Int	nq, mq, lq, k;
 p1 = x;
 div = 1.0 / *p1; nq = n-1; while (nq--) { p1 += nd; *p1 *= div; }
 nq = n-1;	k = 1;		qd = x + 1 + nd; /*qd is diagonal ptr */
@@ -39,14 +39,14 @@ k++; qd += (nd + 1); }				/*end of outer loop */
 return 1;			/* added LS 5feb97 */
 }
 /*--------------------------------------------------------------------------*/
-int f_decomp(float *x, int n, int nd)
+Int f_decomp(Float *x, Int n, Int nd)
 /*translated from fortran anadecomp.for which may be easier to follow since
 	it uses subscripts rather than the pointers used here */
 /*no pivoting in this version !, so diagonals must be != 0 */
 {
-  register	float	sum1, sum2, *p1, *p2, *p3, *p4;
-  float		*qd, * q2, *q1, div;
-  int		nq, mq, lq, k;
+  register	Float	sum1, sum2, *p1, *p2, *p3, *p4;
+  Float		*qd, * q2, *q1, div;
+  Int		nq, mq, lq, k;
 
   p1 = x;
   div = 1.0/ *p1;
@@ -73,11 +73,11 @@ int f_decomp(float *x, int n, int nd)
 return 1;			/* added LS 5feb97 */
 }
 /*--------------------------------------------------------------------------*/
-int f_solve(float *a, float *b, int n, int nd)
+Int f_solve(Float *a, Float *b, Int n, Int nd)
 {
-  register	float	sum, *p1, *p2;
-  float		*qd, *q1;
-  int		nq, mq, k;
+  register	Float	sum, *p1, *p2;
+  Float		*qd, *q1;
+  Int		nq, mq, k;
 
 /*printf("in f_solve\n");*/
   p1 = a;	q1 = b;
@@ -99,13 +99,13 @@ int f_solve(float *a, float *b, int n, int nd)
 return 1;			/* added LS 5feb97 */
 }
 /*--------------------------------------------------------------------------*/
-int d_solve(a, b, n, nd)
-double	*a,*b;
-int	n, nd;
+Int d_solve(a, b, n, nd)
+Double	*a,*b;
+Int	n, nd;
 {
-register	double	sum, *p1, *p2;
-double	*qd, *q1;
-int	nq, mq, k;
+register	Double	sum, *p1, *p2;
+Double	*qd, *q1;
+Int	nq, mq, k;
 /*printf("in d_solve\n");*/
 p1 = a;	q1 = b; *q1++ /= *p1;
 nq = n-1;	k = 1;		qd = a + 1 + nd; /*qd is diagonal ptr */

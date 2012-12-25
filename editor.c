@@ -23,16 +23,16 @@ static char rcsid[] __attribute__ ((unused)) =
 char	line[BUFSIZE], tLine[BUFSIZE], recording = 0;
 FILE	*inputStream;
 char	*inputString;
-int	curLineNumber = 0, compileLevel = 0;
-static int	promptLength, show = 1;
-int	echo = 0;  /* flag: 1 -> echo lines even if not gotten from stdin */
-int	getStreamChar(void), getStringChar(void);
-int     (*getChar)(void) = getStreamChar, termCol, termRow, uTermCol, page;
+Int	curLineNumber = 0, compileLevel = 0;
+static Int	promptLength, show = 1;
+Int	echo = 0;  /* flag: 1 -> echo lines even if not gotten from stdin */
+Int	getStreamChar(void), getStringChar(void);
+Int     (*getChar)(void) = getStreamChar, termCol, termRow, uTermCol, page;
 void	rawIo(void), cookedIo(void);
-int	noPrompt = 0;
-static int	col = 0, row = 0, textWidth;
+Int	noPrompt = 0;
+static Int	col = 0, row = 0, textWidth;
 static char	*thePrompt;
-extern int	scrat[];
+extern Int	scrat[];
 extern char	*c_left, *c_right, *c_up, *c_down,
 	*cl_eos, *c_save, *c_restore, *k_backspace, *k_delete,
 	*k_insert, *k_left, *k_right, *k_up, *k_down;
@@ -49,14 +49,14 @@ void getTerminalSize(void)
     termCol = terminal.ws_col;	/* # columns on terminal */
     if (!termCol) {
       puts("Cannot determine the number of columns on your terminal: Assuming infinite.");
-      uTermCol = INT_MAX;
+      uTermCol = INT32_MAX;
     } else
       uTermCol = termCol - 1;	/* minus one so we don't get into trouble
 				   typing \n at the right edge of the screen */
     termRow = terminal.ws_row; /* # rows on terminal */
     if (!termRow) {
       puts("Cannot determine the number of lines on your terminal: Assuming infinite.");
-      page = INT_MAX;
+      page = INT32_MAX;
     } else
       page = termRow;
   }
@@ -72,10 +72,10 @@ void setPrompt(char *s)
   printf(c_restore);
 }
 /*----------------------------------------------------*/
-int getStringChar(void)
+Int getStringChar(void)
 /* gets the next input char from inputString, no control sequences */
 {
-  int	c;
+  Int	c;
 
   c = *inputString++;
   if (!c)
@@ -84,11 +84,11 @@ int getStringChar(void)
   return c;
 }
 /*----------------------------------------------------*/
-static int	code[] = { BKS, DEL, RAR, LAR, UAR, DAR, INS };
+static Int	code[] = { BKS, DEL, RAR, LAR, UAR, DAR, INS };
 static char	streamBuffer[10];
-static int	streamBufferDepth = 0, streamBufferIndex = 0;
+static Int	streamBufferDepth = 0, streamBufferIndex = 0;
 #define isSpecialChar(c)	((c < 0 || c >= 256)? 0: isSpecial[c])
-int getStreamChar(void)
+Int getStreamChar(void)
 /* gets the next input char from inputStream; translates control sequences */
 /* ASSUMES THAT ALL MULTI-BYTE KEY RETURNS (eg. for arrow keys) START */
 /* WITH ESC */
@@ -98,7 +98,7 @@ int getStreamChar(void)
      ESC chars		check for arrow keys, backspace, delete, insert
      C-X char		char + 0x400 */
 {
- int	c, n, n2, i, os, c3;
+ Int	c, n, n2, i, os, c3;
  char	*q;
 
  if (streamBufferIndex == streamBufferDepth) {
@@ -185,11 +185,11 @@ int getStreamChar(void)
    }
 }
 /*----------------------------------------------------*/
-void putChar(int ch)
+void putChar(Int ch)
 /* reciprocal of getChar(); outputs the characters that go with code <ch>.
    No complaints about weird codes. */
 {
- int	n;
+ Int	n;
 
  if (!show)
    return;
@@ -232,11 +232,11 @@ void putChar(int ch)
      return; }
 }
 /*----------------------------------------------------*/
-int keycode(char *p)
+Int keycode(char *p)
 /* returns the key sequence code for the string at <p> (same code as */
 /* in getStreamChar() ) */
 {
- int	n, n2, i;
+ Int	n, n2, i;
  char	*temp = p, *q;
 
  n = 1;
@@ -258,7 +258,7 @@ int keycode(char *p)
    }
 }
 /*----------------------------------------------------*/
-void cursor_goto(int rcol, int rrow)
+void cursor_goto(Int rcol, Int rrow)
 /* cursor is at (col, row) and goes to (rcol, rrow).  col and row */
 /* are updated  */
 {
@@ -282,7 +282,7 @@ void cursor_goto(int rcol, int rrow)
   row = rrow;
 }
 /*----------------------------------------------------*/
-void cursor_gofrom(int rcol, int rrow)
+void cursor_gofrom(Int rcol, Int rrow)
 /* cursor is at (rcol, rrow) and goes to (col, row). */
 {
   if (col != rcol) {
@@ -303,11 +303,11 @@ void cursor_gofrom(int rcol, int rrow)
   }
 }
 /*---------------------------------------------*/
-void out(char *p, int blank)
+void out(char *p, Int blank)
 /* redraw the line from position <p>.  If <black> is non-zero, then
    that many blanks are printed after the text. */
 {
-  int	n, size, newCol, newRow;
+  Int	n, size, newCol, newRow;
 
   newCol = col;
   newRow = row;
@@ -349,7 +349,7 @@ void out(char *p, int blank)
   cursor_gofrom(newCol, newRow);
 }
 /*----------------------------------------------------*/
-void outChar(int c)
+void outChar(Int c)
 {
   if (col++ == textWidth) {
     printf("-\n%*.*s", promptLength, promptLength, "->");
@@ -359,10 +359,10 @@ void outChar(int c)
   putchar(c);
 }
 /*----------------------------------------------------*/
-void advance(int num)
+void advance(Int num)
 /* move the cursor <num> positions forward in the line */
 {
-  int	oldCol, oldRow;
+  Int	oldCol, oldRow;
 
   oldCol = col;
   oldRow = row;
@@ -378,14 +378,14 @@ void advance(int num)
 }
 /*----------------------------------------------------*/
 char *nextEOW(char *p)
-/* returns pointer to next end-of-word */
-/* a word consists of a contiguous set of characters from the set
+/* returns pointer to next end-of-Word */
+/* a Word consists of a contiguous set of characters from the set
  ! # $ 0-9 A-Z _ a-z */
 {
   if (*p)
-  { while (*p && !isOrdinaryChar((byte) *p))
+  { while (*p && !isOrdinaryChar((Byte) *p))
       p++;
-    while (isOrdinaryChar((byte )*p))
+    while (isOrdinaryChar((Byte )*p))
       p++;
   }
   return p;
@@ -394,9 +394,9 @@ char *nextEOW(char *p)
 char *prevBOW(char *p, char *buf)
 {
   if (p > buf)
-  { while (p > buf && !isOrdinaryChar((byte) p[-1]))
+  { while (p > buf && !isOrdinaryChar((Byte) p[-1]))
       p--;
-    while (p > buf && isOrdinaryChar((byte) p[-1]))
+    while (p > buf && isOrdinaryChar((Byte) p[-1]))
       p--;
   }
   return p;
@@ -406,7 +406,7 @@ char *nextEOE(char *p, char *buf)
 /* returns a pointer to the next end-of-expression */ 
 {
   char	*q, *q2, inString = (char) 0;
-  int	n;
+  Int	n;
 
   if (!*p)
     return p;
@@ -421,8 +421,8 @@ char *nextEOE(char *p, char *buf)
     }
     q++; }
   if (!inString)
-    while (isWhiteSpace((byte) *p) ||
-	   (isSeparatorChar((byte) *p) && !strchr("\'([{}])", *p)))
+    while (isWhiteSpace((Byte) *p) ||
+	   (isSeparatorChar((Byte) *p) && !strchr("\'([{}])", *p)))
       p++;
   if (*p == '\'')
   { inString = (char) 1;
@@ -505,7 +505,7 @@ char *prevBOE(char *p, char *buf)
 /* returns a pointer to the previous beginning-of-expression */
 {
   char	*q, *q2, inString = (char) 0;
-  int	n;
+  Int	n;
 
   if (p == buf)			/* at start, so return right away */
     return p;
@@ -523,8 +523,8 @@ char *prevBOE(char *p, char *buf)
     q++; }
   if (!inString)		/* not inside a string; skip separators */
   { q2 = p;
-    while (p > buf && (isWhiteSpace((byte) *p)
-		       || (isSeparatorChar((byte) *p) && *p != '\'')))
+    while (p > buf && (isWhiteSpace((Byte) *p)
+		       || (isSeparatorChar((Byte) *p) && *p != '\'')))
       p--;
     if (q2 != p && *p == '\'')	/* and end of string: find beginning */
     { if (p > buf)
@@ -596,7 +596,7 @@ void close_groups(char *buf)
 /* close all open expressions */
 {
   char	*q, *end, inString = (char) 0;
-  int	npar = 0, nbrack = 0, nbrace = 0;
+  Int	npar = 0, nbrack = 0, nbrace = 0;
 
   q = buf;
   while (*q)			/* determine if we're inside a string */
@@ -667,11 +667,11 @@ void close_groups(char *buf)
     q--; }
 }
 /*----------------------------------------------------*/
-int strsame(char *str1, char *str2)
+Int strsame(char *str1, char *str2)
 /* returns the number of initial characters that are the same in */
 /* strings <str1> and <str2> */
 {
-  int	n = 0;
+  Int	n = 0;
 
   while (*str1++ == *str2++)
     n++;
@@ -679,27 +679,27 @@ int strsame(char *str1, char *str2)
 }
 /*----------------------------------------------------------------*/
 #define SEVERAL	1
-void completeWord(char *p, char *buffer, int show)
-/* tries to complete the word at *p depending on existing names */
+void completeWord(char *p, char *buffer, Int show)
+/* tries to complete the Word at *p depending on existing names */
 /* of variables and routines */
 {
   char	*p1, *p2, *p3, *q, *complete = NULL;
-  int	size, n, nRep, completeSize;
+  Int	size, n, nRep, completeSize;
   internalRoutine	*r;
   hashTableEntry	*he, **h, ***ht;
   static hashTableEntry	**hts[4] =
   { varHashTable, subrHashTable, funcHashTable, blockHashTable };
   static char *marker[4] =
   { "(b)", "(f)", "(s)", "" };
-  int	matchInternalName(char *name, internalRoutine *table, int size,
-			  int hi);
+  Int	matchInternalName(char *name, internalRoutine *table, Int size,
+			  Int hi);
   void	printwf(char *fmt, ...);
 
   if (!*buffer)			/* nothing to complete */
     return;
-  p1 = prevBOW(p, buffer);	/* previous beginning-of-word */
-  p2 = nextEOW(p1);		/* next end-of-word after that */
-  size = p2 - p1;		/* size of the word */
+  p1 = prevBOW(p, buffer);	/* previous beginning-of-Word */
+  p2 = nextEOW(p1);		/* next end-of-Word after that */
+  size = p2 - p1;		/* size of the Word */
   q = (char *) scrat;
   p3 = p1;
   for (n = 0; n < size; n++)	/* make uppercase for comparison */
@@ -789,7 +789,7 @@ void completeWord(char *p, char *buffer, int show)
       memcpy(p1 + completeSize, p1 + size,
 	     strlen(p1 + size) + 1);
     strncpy(p1 += size, complete + size, completeSize - size);
-    if (islower((byte) p1[-1])) { /* make completion lowercase, too */
+    if (islower((Byte) p1[-1])) { /* make completion lowercase, too */
       for (n = 0; n < completeSize - size; n++) {
 	*p1 = tolower(*p1);
 	p1++;
@@ -803,7 +803,7 @@ void help(void)
   char	*fmt = "%-16s %-7s %-7s %-7s %-11s %-7s\n";
 
   putchar('\n');
-  printf(fmt, "", "char", "word", "expr", "line", "command");
+  printf(fmt, "", "char", "Word", "expr", "line", "command");
   printf(fmt, "Move forward", "C-f", "ESC-f", "ESC C-f", "ESC-e, DOWN", "C-e");
   printf(fmt, "Move backward", "C-b", "ESC-b", "ESC C-b", "ESC-a, UP", "C-a");
   printf(fmt, "Delete forward", "C-d,DEL", "ESC-d", "ESC C-k", "ESC-k", "C-k");
@@ -811,7 +811,7 @@ void help(void)
 	 "C-x k");
   printf(fmt, "Transpose", "C-t", "ESC-t", "ESC C-t", "", "");
   puts("ESC-( inserts parentheses; ESC-[ brackets; ESC-{ braces.");
-  puts("ESC-) close open groups; ESC-w complete word; C-x RET quit.");
+  puts("ESC-) close open groups; ESC-w complete Word; C-x RET quit.");
   puts("ESC-h keyboard help; C-r find; ESC-% replace.");
   puts("C-n, C-p, UP, DOWN retrieve.");
   puts("INS insert/overwrite toggle; C-g join/replace toggle.");
@@ -823,7 +823,7 @@ void transpose(char *p1, char *p2, char *p3, char *p4)
 /* p3 and p4 (exclusive), shifting the text between p2 and */
 /* p3 (exclusive) accordingly. */
 {
-  int	n;
+  Int	n;
   char	*cscrat = (char *) scrat;
 
   n = p4 - p3;
@@ -836,11 +836,11 @@ void transpose(char *p1, char *p2, char *p3, char *p4)
 }
 /*----------------------------------------------------*/
 static char	historyLine[HISTORYSIZE][BUFSIZE];
-static int	historyIndex = 0;
+static Int	historyIndex = 0;
 /*----------------------------------------------------*/
 void inHistory(char *text)
 {
-  int prev = historyIndex - 1;
+  Int prev = historyIndex - 1;
   if (prev < 0)
     prev = HISTORYSIZE - 1;
   if (!historyLine[prev] || strcmp(historyLine[prev], text)) {
@@ -852,17 +852,17 @@ void inHistory(char *text)
   }
 }
 /*----------------------------------------------------*/
-int readHistory(void)
+Int readHistory(void)
 /* reads history from a history file (~/.ana-history) */
 {
   FILE	*fp;
-  int	i;
+  Int	i;
   char	*p;
 
   fp = Fopen(expand_name("~/.ana-history", NULL), "r");
   if (!fp)			/* no such file */
     return 0;
-  fread(&historyIndex, sizeof(int), 1, fp);
+  fread(&historyIndex, sizeof(Int), 1, fp);
   for (i = 0; i < HISTORYSIZE; i++) {
     fgets(p = historyLine[i], BUFSIZE - 1, fp);
     p += strlen(p);
@@ -873,30 +873,30 @@ int readHistory(void)
   return 1;
 }
 /*----------------------------------------------------*/
-int saveHistory(void)
+Int saveHistory(void)
 /* saves history in a history file (~/.ana-history) */
 {
   FILE	*fp;
-  int	i;
+  Int	i;
   char	*expand_name(char *, char *);
 
   fp = Fopen(expand_name("~/.ana-history", NULL), "w");
   if (!fp)
     return anaerror("Cannot open file ~/.ana-history to save input line history",
 		 0);
-  fwrite(&historyIndex, sizeof(int), 1, fp);
+  fwrite(&historyIndex, sizeof(Int), 1, fp);
   for (i = 0; i < HISTORYSIZE; i++)
     fprintf(fp, historyLine[i]? "%s\n": "\n", historyLine[i]);
   Fclose(fp);
   return 1;
 }
 /*----------------------------------------------------*/
-int charpending(void)
+Int charpending(void)
 /* returns 0 if the inputStream is stdin and no character is pending on */
 /* the input stream, and 1 otherwise. */
 {
   struct termios	io_params, old_io_params;
-  int	c;
+  Int	c;
 
   if (inputStream != stdin	/* not from standard input */
       || tcgetattr(1, &io_params) < 0) /* or couldn't get terminal */
@@ -914,10 +914,10 @@ int charpending(void)
   return (c >= 0)? 1: 0;
 }
 /*----------------------------------------------------*/
-int getNewLine(char *buffer, char *prompt, char historyFlag)
+Int getNewLine(char *buffer, char *prompt, char historyFlag)
 /* reads new line from keyboard into buffer; returns length
    (terminating null isn't included in count).
-   includes history buffer, word-by-word movement, search in
+   includes history buffer, Word-by-Word movement, search in
    the history buffer, search & replace.
    historyFlag determines whether the history buffer is enabled.
    If End-Of-File is reached on the input stream, then -1 is
@@ -927,9 +927,9 @@ int getNewLine(char *buffer, char *prompt, char historyFlag)
     closers[] = ")]}";
   char	*p, insertFlag = 1, joinFlag = 0, cc, changed = '\0',
 	*p2, *b1, *b2, *b3, *b4, finding = '\0';
-  int	size, c, n, indx, joinSize = 0, oldC, findIndex, n2,
+  Int	size, c, n, indx, joinSize = 0, oldC, findIndex, n2,
 	prevC;
-  void	Quit(int);
+  void	Quit(Int);
 
   if (noPrompt
       || (inputStream != stdin
@@ -1124,7 +1124,7 @@ int getNewLine(char *buffer, char *prompt, char historyFlag)
 	  out(buffer, 0);
 	  advance(p - buffer);
 	  break;
-	case CPW:		/* complete word */
+	case CPW:		/* complete Word */
 	  if (prevC == CPW)
 	    completeWord(p, buffer, 1);
 	  else {
@@ -1162,13 +1162,13 @@ int getNewLine(char *buffer, char *prompt, char historyFlag)
 	    }
 	  }
 	  break;
-	case DLW:		/* delete word forward */
+	case DLW:		/* delete Word forward */
 	  p2 = nextEOW(p);
 	  memmove(p, p2, strlen(p2) + 1);
 	  size -= p2 - p;
 	  out(p, p2 - p);
 	  break;
-	case BDW:		/* delete word backward */
+	case BDW:		/* delete Word backward */
 	  p2 = prevBOW(p, buffer);
 	  memmove(p2, p, strlen(p) + 1);
 	  size -= (n = p - p2);
@@ -1308,13 +1308,13 @@ int getNewLine(char *buffer, char *prompt, char historyFlag)
 	      advance(-1);
 	  }
 	  break;
-	case FWW:		/* forward word */
+	case FWW:		/* forward Word */
 	  p2 = nextEOW(p);
 	  if (show)
 	    advance(p2 - p);
 	  p = p2;
 	  break;
-	case BKW:		/* backward word */
+	case BKW:		/* backward Word */
 	  p2 = prevBOW(p, buffer);
 	  if (show)
 	    advance(p2 - p);

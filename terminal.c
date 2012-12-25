@@ -20,7 +20,7 @@ void dummyTerm(void)
   char	*termName[] = {
     "linux"
   };
-  int	nTerms = 1, i;
+  Int	nTerms = 1, i;
   char	*name, isPCterm = 0;
 
   name = getenv("TERM");
@@ -64,7 +64,7 @@ void dummyTerm(void)
 /*--------------------------------------------------------------------*/
 /* This routine reads the specifications from a user-generated file. */
 #define	nNames  (sizeof(names)/sizeof(char *))
-void manualTerm(int number)
+void manualTerm(Int number)
 {
   char *names[] = {
     "k_backspace", "k_delete", "k_right", "k_left", "k_up", "k_down",
@@ -80,7 +80,7 @@ void manualTerm(int number)
   extern char	*curScrat;
   char	*p, *name;
   FILE	*fp;
-  int	n, i;
+  Int	n, i;
 
   dummyTerm();			/* default; */
   p = getenv("ANADIR");
@@ -127,10 +127,10 @@ void manualTerm(int number)
     isSpecial[(unsigned char) special[i][0]] = 1;
 }
 /*--------------------------------------------------------------------*/
-int ana_manualterm(int narg, int ps[])
+Int ana_manualterm(Int narg, Int ps[])
 /* select a manual terminal specification */
 {
-  int	i;
+  Int	i;
 
   i = int_arg(ps[0]);
   if (i < 0)

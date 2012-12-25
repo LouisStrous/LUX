@@ -15,31 +15,31 @@
 static char rcsid[] __attribute__ ((unused)) =
  "$Id: execute.c,v 4.0 2001/02/07 20:36:59 strous Exp $";
 
-extern int	nFixed, traceMode;
+extern Int	nFixed, traceMode;
 
-int	nArg, currentEVB = 0, suppressMsg = 0;
-unsigned int internalMode;
-int	nExecuted = 0, executeLevel = 0, fileLevel = 0,
+Int	nArg, currentEVB = 0, suppressMsg = 0;
+uint32_t internalMode;
+Int	nExecuted = 0, executeLevel = 0, fileLevel = 0,
 	returnSym, noTrace = 0, curRoutineNum = 0;
 char	preserveKey;
 
 char	*currentRoutineName = NULL;
 
-int	ana_convert(int, int *, int, int), convertScalar(scalar *, int, int),
-	dereferenceScalPointer(int), eval(int),
+Int	ana_convert(Int, Int *, Int, Int), convertScalar(scalar *, Int, Int),
+	dereferenceScalPointer(Int), eval(Int),
 	nextCompileLevel(FILE *, char *);
-void	zap(int symbol), updateIndices(void);
-void pushExecutionLevel(int line, int target);
+void	zap(Int symbol), updateIndices(void);
+void pushExecutionLevel(Int line, Int target);
 void popExecutionLevel(void);
-void showExecutionLevel(int symbol);
+void showExecutionLevel(Int symbol);
 
 /*------------------------------------------------------------------*/
-void fixContext(int symbol, int context)
+void fixContext(Int symbol, Int context)
 /* change the context of embedded symbols (in ANA_RANGE, ANA_LIST, */
 /* ANA_CLIST, ANA_KEYWORD) to reflect embedding in <symbol>. */
 {
-  int	i, nElem;
-  word	*ptr;
+  Int	i, nElem;
+  Word	*ptr;
   listElem	*p;
 
   switch (symbol_class(symbol)) {
@@ -83,16 +83,16 @@ void fixContext(int symbol, int context)
   }
 }
 /*------------------------------------------------------------------*/
-int copyToSym(int target, int source)
+Int copyToSym(Int target, Int source)
 /* puts a copy of <source> (including any embedded symbols) in <target> */
 {
-  int	size, i;
+  Int	size, i;
   pointer	optr, ptr;
   char	zapIt = 0;
   listElem	*eptr, *oeptr;
-  int	copySym(int);
+  Int	copySym(Int);
   extractSec	*etrgt, *esrc;
-  void	embed(int target, int context), zap(int);
+  void	embed(Int target, Int context), zap(Int);
 
   if (source < 0)		/* some error */
     return source;
@@ -141,11 +141,11 @@ int copyToSym(int target, int source)
     case ANA_CLIST:
       size = clist_num_symbols(source);
       optr.w = clist_symbols(source);
-      allocate(clist_symbols(target), size, word);
+      allocate(clist_symbols(target), size, Word);
       symbol_memory(target) = symbol_memory(source);
       ptr.w = clist_symbols(target);
       while (size--) {
-	*ptr.w = (word) copySym(*optr.w++);
+	*ptr.w = (Word) copySym(*optr.w++);
 	embed(*ptr.w, target);
 	ptr.w++;
       }
@@ -153,7 +153,7 @@ int copyToSym(int target, int source)
     case ANA_CPLIST:
       size = clist_num_symbols(source);
       optr.w = clist_symbols(source);
-      allocate(clist_symbols(target), size, word);
+      allocate(clist_symbols(target), size, Word);
       symbol_memory(target) = symbol_memory(source);
       ptr.w = clist_symbols(target);
       while (size--) {
@@ -168,7 +168,7 @@ int copyToSym(int target, int source)
       symbol_memory(target) = symbol_memory(source);
       eptr = list_symbols(target);
       while (size--) {
-	eptr->value = (word) copySym(oeptr->value);
+	eptr->value = (Word) copySym(oeptr->value);
 	embed(eptr->value, target);
 	eptr->key = oeptr->key? strsave(oeptr->key): NULL;
 	eptr++;
@@ -228,7 +228,7 @@ int copyToSym(int target, int source)
 	etrgt->number = esrc->number;
 	switch (esrc->type) {
 	  case ANA_RANGE:
-	    etrgt->ptr.w = malloc(esrc->number*sizeof(word));
+	    etrgt->ptr.w = malloc(esrc->number*sizeof(Word));
 	    i = esrc->number;
 	    while (i--) {
 	      *etrgt->ptr.w = copySym(*esrc->ptr.w);
@@ -274,22 +274,22 @@ int copyToSym(int target, int source)
   return target;
 }
 /*------------------------------------------------------------------*/
-int copySym(int symbol)
+Int copySym(Int symbol)
 /* creates an exact copy of <symbol> in a new temporary variable */
 {
-  int	result;
+  Int	result;
 
   result = nextFreeTempVariable();
   return copyToSym(result, symbol);
 }
 /*------------------------------------------------------------------*/
 #if REALLY
-int extractReplace(int symbol)
+Int extractReplace(Int symbol)
 {
-  int	target, lhs, rhs, result, n;
-  word	*ptr;
+  Int	target, lhs, rhs, result, n;
+  Word	*ptr;
   char	findTarget = '\0', *name;
-  int	ana_replace(int, int);
+  Int	ana_replace(Int, Int);
 
   lhs = replace_lhs(symbol);
   if (symbol_class(lhs) == ANA_FUNC_PTR)
@@ -326,11 +326,11 @@ int extractReplace(int symbol)
       int_sub_routine_num(symbol) = ANA_INSERT_SUB;
       /* required argument list:  subscripts, source, target */
       /* current argument list: target subscripts */
-      int_sub_arguments(symbol) = ptr = realloc(ptr, (n + 1)*sizeof(word));
-      symbol_memory(symbol) = (n + 1)*sizeof(word);
+      int_sub_arguments(symbol) = ptr = realloc(ptr, (n + 1)*sizeof(Word));
+      symbol_memory(symbol) = (n + 1)*sizeof(Word);
       if (!ptr)
 	return ANA_ERROR;	/* some reallocation error */
-      memmove(ptr, ptr + 1, n*sizeof(word)); /* now: subscripts ... ... */
+      memmove(ptr, ptr + 1, n*sizeof(Word)); /* now: subscripts ... ... */
       ptr[n - 1] = rhs;		/* subscripts rhs ... */
       ptr[n] = target;		/* subscripts rhs target */
       extract_ptr(lhs) = NULL;	/* or else it will get zapped */
@@ -365,20 +365,20 @@ int extractReplace(int symbol)
 }
 #endif
 /*------------------------------------------------------------------*/
-int ana_replace(int lhs, int rhs)
+Int ana_replace(Int lhs, Int rhs)
      /* replaces <lhs> with <rhs> */
 {
-  int	lhsSize, rhsSize, namevar(int, int), result, i, n;
+  Int	lhsSize, rhsSize, namevar(Int, Int), result, i, n;
   char	takeOver = 0, *name;
-  extern int	trace, step, nBreakpoint;
+  extern Int	trace, step, nBreakpoint;
   extern breakpointInfo	breakpoint[];
-  branchInfo	checkTree(int, int);
-  int	oldPipeExec, oldPipeSym;
-  extern int	pipeExec, pipeSym, tempVariableIndex, nTempVariable,
+  branchInfo	checkTree(Int, Int);
+  Int	oldPipeExec, oldPipeSym;
+  extern Int	pipeExec, pipeSym, tempVariableIndex, nTempVariable,
     fformat, iformat, sformat, cformat;
   extern char	*fmt_float, *fmt_integer, *fmt_complex, *fmt_string;
   branchInfo	tree;
-  int	evalLhs(int), einsert(int, int);
+  Int	evalLhs(Int), einsert(Int, Int);
   void	updateIndices(void);
   
   if (lhs == ANA_ERROR)		/* e.g., when !XX = 3 is tried */
@@ -555,7 +555,7 @@ int ana_replace(int lhs, int rhs)
 #define ORKEY		-1001
 #define MODEKEY		-1002
 #define ZEROKEY		-1003
-int matchKey(word index, char **keys, int *var)
+Int matchKey(Word index, char **keys, Int *var)
 /* matches symbol[index] to the keyword list and returns index
   of matched key (or NOKEY) */
 /* if a key is preceded by a number, then the number is OR-ed into */
@@ -571,7 +571,7 @@ int matchKey(word index, char **keys, int *var)
 /* in which *var receives the index to the parameter list. */
 {
   char	*key, *theKey, modeKey, negate;
-  unsigned int	n, l, indx, theMode;
+  uint32_t	n, l, indx, theMode;
 
  if (symbol_class(index) != ANA_STRING)
    return anaerror("Non-string keyword??", index);
@@ -587,7 +587,7 @@ int matchKey(word index, char **keys, int *var)
        negate = 1;
        theKey++;
      }
-     if (isdigit((byte) *theKey)) {
+     if (isdigit((Byte) *theKey)) {
        modeKey = 1;
        theMode = strtol(theKey, &theKey, 10);
      }
@@ -629,12 +629,12 @@ int matchKey(word index, char **keys, int *var)
  return *var = NOKEY;
 }
 /*------------------------------------------------------------------*/
-int matchUserKey(char *name, int routineNum)
+Int matchUserKey(char *name, Int routineNum)
 /* matches name to the names of the arguments of user routine #routineNum */
 /* and returns the argument index of the matched key (or -1) */
 {
   char	**keys;
-  int	n, l, i;
+  Int	n, l, i;
 
   if (sym[routineNum].class != ANA_SUBROUTINE &&
       sym[routineNum].class != ANA_FUNCTION)
@@ -653,7 +653,7 @@ int matchUserKey(char *name, int routineNum)
 }
 /*------------------------------------------------------------------*/
 #define PRESERVE_KEY	1024
-int internal_routine(int symbol, internalRoutine *routine)
+Int internal_routine(Int symbol, internalRoutine *routine)
 /* execute an internal routine (subroutine or function) */
 /* keywords:  each internal function and routine has associated with it */
 /* a (possibly empty) list of keywords, associated with particular */
@@ -669,19 +669,19 @@ int internal_routine(int symbol, internalRoutine *routine)
 {
  /* sym[symbol].xx -> routine number
     sym[symbol].spec.array.ptr -> arguments
-    sym[symbol].spec.array.bstore/sizeof(word) -> # arguments  */
+    sym[symbol].spec.array.bstore/sizeof(Word) -> # arguments  */
 
-  /* evalArgs must be int* because it is passed on to individual */
-  /* routines (int ps[]) */
- int	nArg, nKeys = 0, i, maxArg, *evalArgs,
+  /* evalArgs must be Int* because it is passed on to individual */
+  /* routines (Int ps[]) */
+ Int	nArg, nKeys = 0, i, maxArg, *evalArgs,
 	routineNum, n, thisInternalMode = 0, ordinary = 0;
- byte	isSubroutine;
+ Byte	isSubroutine;
  keyList	*theKeyList;
- word	*arg;
+ Word	*arg;
  char	*name, suppressEval = 0, suppressUnused = 0;
  extern char	evalScalPtr;
- extern int	pipeExec;
- int	treatListArguments(int *, int *[], int);
+ extern Int	pipeExec;
+ Int	treatListArguments(Int *, Int *[], Int);
 
  nArg = int_sub_num_arguments(symbol); /* number of arguments */
  routineNum = int_sub_routine_num(symbol); /* routine number */
@@ -721,7 +721,7 @@ int internal_routine(int symbol, internalRoutine *routine)
  /* treat the arguments */
  if (nKeys? maxArg: (nArg + ordinary)) {/* arguments possible */
    i = nKeys? maxArg: (nArg + ordinary);
-   evalArgs = malloc(i*sizeof(int));
+   evalArgs = malloc(i*sizeof(Int));
    if (!evalArgs)
      return cerror(ALLOC_ERR, 0);
    if (!nKeys) {		/* default: no keys */
@@ -752,7 +752,7 @@ int internal_routine(int symbol, internalRoutine *routine)
        *--evalArgs = 0;
      maxArg = nArg + ordinary;	/* index of last specified argument */
    } else {			/* we've got some keys */
-     int	*keys;
+     Int	*keys;
 
      for (i = 0; i < maxArg; i++) /* default max number of allowed arguments */
 				  /* for this routine to zero */
@@ -761,7 +761,7 @@ int internal_routine(int symbol, internalRoutine *routine)
      arg -= nArg;		/* back to beginning of list */
 
      /* match the keywords with the routine's keyword list */
-     allocate(keys, nArg, int);	/* storage */
+     allocate(keys, nArg, Int);	/* storage */
      for (i = maxArg = 0; i < nArg; i++, arg++, keys++)
        if (symbol_class(*arg) == ANA_KEYWORD) {	/* a keyword */
 	 n = matchKey(keyword_name_symbol(*arg),
@@ -939,12 +939,12 @@ int internal_routine(int symbol, internalRoutine *routine)
  return i;
 }
 /*------------------------------------------------------------------*/
-int getBody(int routine)
+Int getBody(Int routine)
 /* finds and compiles body of uncompiled routine */
 {
  char	*name, isFunction;
- int	result;
- extern int	findBody, ignoreInput;
+ Int	result;
+ extern Int	findBody, ignoreInput;
  FILE	*fp;
 
  name = deferred_routine_filename(routine);
@@ -969,21 +969,21 @@ int getBody(int routine)
  return result;
 }
 /*------------------------------------------------------------------*/
-int usr_routine(int symbol)
+Int usr_routine(Int symbol)
 /* executes a user-defined subroutine, function or block routine */
 {
-  /* evalArg must be int* because unProtect expects that, because */
+  /* evalArg must be Int* because unProtect expects that, because */
   /* it does so in internal_routine because there it gets passed on */
-  /* to individual routines (int ps[]) */
- int	nPar, nStmnt, i, oldContext = curContext, n, routineNum, nKeys = 0,
+  /* to individual routines (Int ps[]) */
+ Int	nPar, nStmnt, i, oldContext = curContext, n, routineNum, nKeys = 0,
 	ordinary = 0, thisNArg, *evalArg, oldNArg, listSym = 0;
- word	*arg, *par, *list = NULL;
+ Word	*arg, *par, *list = NULL;
  char	type, *name, msg, isError,
    *routineTypeNames[] = { "FUNC", "SUBR", "BLOCK" };
  symTableEntry	*oldpars;
- extern int	returnSym, defined(int, int);
+ extern Int	returnSym, defined(Int, Int);
  extern char	evalScalPtr;
- void pushExecutionLevel(int, int), popExecutionLevel(void);
+ void pushExecutionLevel(Int, Int), popExecutionLevel(void);
  
  executeLevel++;
  fileLevel++;
@@ -1048,7 +1048,7 @@ int usr_routine(int symbol)
  msg = (traceMode & T_ROUTINEIO);
  if (msg) {
    currentRoutineName = symbolProperName(routineNum);
-   printf("Entering %s %s", routineTypeNames[(byte) type],
+   printf("Entering %s %s", routineTypeNames[(Byte) type],
 	  currentRoutineName);
    if (!type)
      putchar('(');
@@ -1092,7 +1092,7 @@ int usr_routine(int symbol)
      if (symbol_class(*arg++) == ANA_KEYWORD)
        nKeys++;
    arg -= thisNArg;		/* back to start of list */
-   evalArg = malloc(nPar*sizeof(int)); /* room for the evaluated parameters */
+   evalArg = malloc(nPar*sizeof(Int)); /* room for the evaluated parameters */
    if (nPar && !evalArg) {
      cerror(ALLOC_ERR, 0);
      goto usr_routine_1;
@@ -1139,7 +1139,7 @@ int usr_routine(int symbol)
 	   if (listSym == ANA_ERROR)
 	     goto usr_routine_2;
 	   symbol_class(listSym) = ANA_CPLIST;
-	   symbol_memory(listSym) = (thisNArg - nPar + 1)*sizeof(word);
+	   symbol_memory(listSym) = (thisNArg - nPar + 1)*sizeof(Word);
 	   list = malloc(symbol_memory(listSym));
 	   if (!list) {
 	     cerror(ALLOC_ERR, listSym);
@@ -1155,7 +1155,7 @@ int usr_routine(int symbol)
 	     anaerror("Argument #%d doubly defined", 0, ordinary);
 	     goto usr_routine_3;
 	   } /* end if (evalArg[ordinary]) */
-	   evalArg[ordinary] = eval((int) *arg++); /* assign value */
+	   evalArg[ordinary] = eval((Int) *arg++); /* assign value */
 	   if (evalArg[ordinary] == ANA_ERROR) /* some error */
 	     goto usr_routine_3;
 	   if (isFreeTemp(evalArg[ordinary]))
@@ -1299,7 +1299,7 @@ int usr_routine(int symbol)
  if (i != ANA_ERROR && i != LOOP_RETALL)
    i = 1;
  if (msg) {
-   printf("Leaving %s %s", routineTypeNames[(byte) type],
+   printf("Leaving %s %s", routineTypeNames[(Byte) type],
 	  currentRoutineName);
    putchar('\n');
  }
@@ -1325,15 +1325,15 @@ int usr_routine(int symbol)
  return ANA_ERROR;
 }
 /*------------------------------------------------------------------*/
-int ana_for(int nsym)
+Int ana_for(Int nsym)
 /* executes ANA FOR-statement */
 {
  pointer	counter;
  scalar		start, inc, end;
- int		hiType, n, temp, action;
- word		startSym, endSym, stepSym, counterSym;
+ Int		hiType, n, temp, action;
+ Word		startSym, endSym, stepSym, counterSym;
  char		forward;
- extern int	trace, step;
+ extern Int	trace, step;
 
 		/* find highest type of loop start, increment, and end */
  startSym = eval(for_start(nsym));
@@ -1660,33 +1660,33 @@ int ana_for(int nsym)
 #define ACTION_BREAKPOINT	1
 #define ACTION_TRACE	2
 #define ACTION_STEP	4
-float	CPUtime = 0.0;
-int execute(int symbol)
+Float	CPUtime = 0.0;
+Int execute(Int symbol)
      /* executes ANA_EVB <symbol>.  Returns -1 on error, 1 on success, */
      /* various negative numbers on breaks, returns, etc. */
 {
-  word	*ptr;
-  int	temp, temp2, temp3, n, c = 0, oldStep, go = 0, oldEVB, oldBreakpoint,
+  Word	*ptr;
+  Int	temp, temp2, temp3, n, c = 0, oldStep, go = 0, oldEVB, oldBreakpoint,
     action;
-  static int	atBreakpoint = 0;
-  extern int	trace, step, traceMode, findBody, nWatchVars,
+  static Int	atBreakpoint = 0;
+  extern Int	trace, step, traceMode, findBody, nWatchVars,
   		tempVariableIndex, nBreakpoint;
   extern char	reportBody, ignoreSymbols, debugLine, evalScalPtr;
   extern char	*currentInputFile;
   extern breakpointInfo	breakpoint[];
-  extern byte	disableNewline;
-  extern word	watchVars[];
-  byte	oldNL;
+  extern Byte	disableNewline;
+  extern Word	watchVars[];
+  Byte	oldNL;
   char	*name, *p, *oldRoutineName;
   FILE	*fp;
 #if DEBUG
   void checkTemps(void);
 #endif
-  float	newCPUtime;
-  int	showstats(int, int []), getNewLine(char *, char *, char),
-    ana_restart(int, int []), showError(int), insert(int, int []),
+  Float	newCPUtime;
+  Int	showstats(Int, Int []), getNewLine(char *, char *, char),
+    ana_restart(Int, Int []), showError(Int), insert(Int, Int []),
     nextFreeStackEntry(void);
-  void showExecutionLevel(int);
+  void showExecutionLevel(Int);
 
   curSymbol = symbol;		/* put in global so we know where an */
 				/* exception (interrupt) occurred, if any */
@@ -1769,7 +1769,7 @@ int execute(int symbol)
       if (traceMode & 127)
 	puts(symbolIdent(symbol, I_TRUNCATE | I_FILELEVEL));
       if (traceMode & T_CPUTIME) { /* CPUtime */
-	newCPUtime = (float) clock()/CLOCKS_PER_SEC;
+	newCPUtime = (Float) clock()/CLOCKS_PER_SEC;
 	printf("CPUtime: %10.2f\n", newCPUtime - CPUtime);
 	CPUtime = newCPUtime;
       }
@@ -2036,7 +2036,7 @@ int execute(int symbol)
 	noTrace--;
       break;
     case EVB_IF:
-      temp = evals((int) *ptr);			/* evaluate condition */
+      temp = evals((Int) *ptr);			/* evaluate condition */
       if (symbol_class(temp) != ANA_SCALAR) {
 	n = cerror(COND_NO_SCAL, symbol, "in IF-statement");
 	zapTemp(temp);
@@ -2080,7 +2080,7 @@ int execute(int symbol)
 	  continue;
 	} else if (n <= 0)
 	  break; 
-	temp3 = eval((int) temp2);		/* condition */
+	temp3 = eval((Int) temp2);		/* condition */
 	n = int_arg(temp3);
 	if (symbol_class(temp3) != ANA_SCALAR)
 	  n = ANA_ERROR;
@@ -2106,7 +2106,7 @@ int execute(int symbol)
 	  continue;
 	else if (n <= 0)
 	  break;
-	temp3 = eval((int) temp2);		/* condition */
+	temp3 = eval((Int) temp2);		/* condition */
 	n = int_arg(temp3);
 	if (symbol_class(temp3) != ANA_SCALAR)
 	  n = ANA_ERROR;
@@ -2128,7 +2128,7 @@ int execute(int symbol)
       if ((traceMode & T_LOOP) == 0)
 	noTrace++;
       while (1) {
-	temp3 = eval((int) temp2);		/* condition */
+	temp3 = eval((Int) temp2);		/* condition */
 	if (symbol_class(temp3) != ANA_SCALAR)
 	  n = 0;
 	else n = int_arg(temp3);
@@ -2229,13 +2229,13 @@ int execute(int symbol)
   return n;
 }
 /*------------------------------------------------------------------*/
-int ana_execute(int narg, int ps[])
+Int ana_execute(Int narg, Int ps[])
 /* execute a string as if it were typed at the keyboard */
 /* or execute the symbol indicated by number */
 /* keyword /MAIN (1) has the execution take place at the main level */
 {
-  int	n, oldContext;
-  int	compileString(char *);
+  Int	n, oldContext;
+  Int	compileString(char *);
 
   if (internalMode & 1)
   { oldContext = curContext;
@@ -2254,13 +2254,13 @@ int ana_execute(int narg, int ps[])
   return n;
 }
 /*------------------------------------------------------------------*/
-int compileString(char *string)
+Int compileString(char *string)
 /* compiles string <string> */
 {
   char	*oldInputString;
   extern char	*inputString;
-  extern int	executeLevel;
-  int	n;
+  extern Int	executeLevel;
+  Int	n;
 
   oldInputString = inputString;
   executeLevel++;
@@ -2275,12 +2275,12 @@ int compileString(char *string)
 #define INNER	1
 #define OUTER	2
 
-int insert(int narg, int ps[])
+Int insert(Int narg, Int ps[])
 /* an insertion statement with subscripted target */
 /* ps[0]..ps[narg-3]: subscripts; ps[narg - 2]: source;
    ps[narg - 1]: target */
 {
-  int	target, source, i, iq, start[MAX_DIMS], width, *dims,
+  Int	target, source, i, iq, start[MAX_DIMS], width, *dims,
 	ndim, nelem, type, size[MAX_DIMS], subsc_type[MAX_DIMS],
 	*index[MAX_DIMS], *iptr, j, n, class, srcNdim, *srcDims, srcNelem,
 	srcType, stride[MAX_DIMS], tally[MAX_DIMS], offset0, nmult,
@@ -2289,8 +2289,8 @@ int insert(int narg, int ps[])
   wideScalar	value;
   char	*name;
   FILE	*fp;
-  extern int	trace, step;
-  int	ana_assoc_output(int, int, int, int);
+  extern Int	trace, step;
+  Int	ana_assoc_output(Int, Int, Int, Int);
 
   target = ps[--narg];
   source = ps[--narg];
@@ -2362,7 +2362,7 @@ int insert(int narg, int ps[])
       dims = array_dims(target);
       nelem = array_size(target);
       type = array_type(target);
-      trgt.l = (int *) array_data(target);
+      trgt.l = (Int *) array_data(target);
       break;
   }
 
@@ -2406,7 +2406,7 @@ int insert(int narg, int ps[])
       srcDims = array_dims(source);
       srcNelem = array_size(source);
       srcType = array_type(source);
-      src.l = (int *) array_data(source);
+      src.l = (Int *) array_data(source);
       break;
   }
 
@@ -2457,7 +2457,7 @@ int insert(int narg, int ps[])
 	  iq = ana_long(1, &iq); /* get LONG indices */
 	  n = size[i] = array_size(iq); /* number of array elements */
 	  if (n == 1) {		/* only one element: mimic scalar */
-	    start[i] = *(int *) array_data(iq);
+	    start[i] = *(Int *) array_data(iq);
 	    if (narg == 1)	/* single subscript only */
 	      width = nelem;
 	    else
@@ -2466,7 +2466,7 @@ int insert(int narg, int ps[])
 	      return cerror(ILL_SUBSC, iq, start[i], width);
 	    subsc_type[i] = ANA_RANGE;
 	  } else {
-	    iptr = index[i] = (int *) array_data(iq);
+	    iptr = index[i] = (Int *) array_data(iq);
 	    if (narg == 1)	/* only a single subscript; addresses */
 				/* whole source array as if it were 1D */
 	      width = nelem;
@@ -2629,16 +2629,16 @@ int insert(int narg, int ps[])
 		  trgt.b[offset] = *src.b;
 		  break;
 		case ANA_WORD:
-		  trgt.b[offset] = (byte) *src.w;
+		  trgt.b[offset] = (Byte) *src.w;
 		  break;
 		case ANA_LONG:
-		  trgt.b[offset] = (byte) *src.l;
+		  trgt.b[offset] = (Byte) *src.l;
 		  break;
 		case ANA_FLOAT:
-		  trgt.b[offset] = (byte) *src.f;
+		  trgt.b[offset] = (Byte) *src.f;
 		  break;
 		case ANA_DOUBLE:
-		  trgt.b[offset] = (byte) *src.d;
+		  trgt.b[offset] = (Byte) *src.d;
 		  break;
 		case ANA_CFLOAT:
 		  trgt.b[offset] = sqrt(src.cf->real*src.cf->real
@@ -2653,19 +2653,19 @@ int insert(int narg, int ps[])
 	    case ANA_WORD:
 	      switch (srcType) {
 		case ANA_BYTE:
-		  trgt.w[offset] = (word) *src.b;
+		  trgt.w[offset] = (Word) *src.b;
 		  break;
 		case ANA_WORD:
 		  trgt.w[offset] = *src.w;
 		  break;
 		case ANA_LONG:
-		  trgt.w[offset] = (word) *src.l;
+		  trgt.w[offset] = (Word) *src.l;
 		  break;
 		case ANA_FLOAT:
-		  trgt.w[offset] = (word) *src.f;
+		  trgt.w[offset] = (Word) *src.f;
 		  break;
 		case ANA_DOUBLE:
-		  trgt.w[offset] = (word) *src.d;
+		  trgt.w[offset] = (Word) *src.d;
 		  break;
 		case ANA_CFLOAT:
 		  trgt.w[offset] = sqrt(src.cf->real*src.cf->real
@@ -2680,19 +2680,19 @@ int insert(int narg, int ps[])
 	    case ANA_LONG:
 	      switch (srcType) {
 		case ANA_BYTE:
-		  trgt.l[offset] = (int) *src.b;
+		  trgt.l[offset] = (Int) *src.b;
 		  break;
 		case ANA_WORD:
-		  trgt.l[offset] = (int) *src.w;
+		  trgt.l[offset] = (Int) *src.w;
 		  break;
 		case ANA_LONG:
 		  trgt.l[offset] = *src.l;
 		  break;
 		case ANA_FLOAT:
-		  trgt.l[offset] = (int) *src.f;
+		  trgt.l[offset] = (Int) *src.f;
 		  break;
 		case ANA_DOUBLE:
-		  trgt.l[offset] = (int) *src.d;
+		  trgt.l[offset] = (Int) *src.d;
 		  break;
 		case ANA_CFLOAT:
 		  trgt.l[offset] = sqrt(src.cf->real*src.cf->real
@@ -2707,19 +2707,19 @@ int insert(int narg, int ps[])
 	    case ANA_FLOAT:
 	      switch (srcType) {
 		case ANA_BYTE:
-		  trgt.f[offset] = (float) *src.b;
+		  trgt.f[offset] = (Float) *src.b;
 		  break;
 		case ANA_WORD:
-		  trgt.f[offset] = (float) *src.w;
+		  trgt.f[offset] = (Float) *src.w;
 		  break;
 		case ANA_LONG:
-		  trgt.f[offset] = (float) *src.l;
+		  trgt.f[offset] = (Float) *src.l;
 		  break;
 		case ANA_FLOAT:
 		  trgt.f[offset] = *src.f;
 		  break;
 		case ANA_DOUBLE:
-		  trgt.f[offset] = (float) *src.d;
+		  trgt.f[offset] = (Float) *src.d;
 		  break;
 		case ANA_CFLOAT:
 		  trgt.f[offset] = sqrt(src.cf->real*src.cf->real
@@ -2734,16 +2734,16 @@ int insert(int narg, int ps[])
 	    case ANA_DOUBLE:
 	      switch (srcType) {
 		case ANA_BYTE:
-		  trgt.d[offset] = (double) *src.b;
+		  trgt.d[offset] = (Double) *src.b;
 		  break;
 		case ANA_WORD:
-		  trgt.d[offset] = (double) *src.w;
+		  trgt.d[offset] = (Double) *src.w;
 		  break;
 		case ANA_LONG:
-		  trgt.d[offset] = (double) *src.l;
+		  trgt.d[offset] = (Double) *src.l;
 		  break;
 		case ANA_FLOAT:
-		  trgt.d[offset] = (double) *src.f;
+		  trgt.d[offset] = (Double) *src.f;
 		  break;
 		case ANA_DOUBLE:
 		  trgt.d[offset] = *src.d;
@@ -2761,15 +2761,15 @@ int insert(int narg, int ps[])
 	    case ANA_CFLOAT:
 	      switch (srcType) {
 		case ANA_BYTE:
-		  trgt.cf[offset].real = (float) *src.b;
+		  trgt.cf[offset].real = (Float) *src.b;
 		  trgt.cf[offset].imaginary = 0;
 		  break;
 		case ANA_WORD:
-		  trgt.cf[offset].real = (float) *src.w;
+		  trgt.cf[offset].real = (Float) *src.w;
 		  trgt.cf[offset].imaginary = 0;
 		  break;
 		case ANA_LONG:
-		  trgt.cf[offset].real = (float) *src.l;
+		  trgt.cf[offset].real = (Float) *src.l;
 		  trgt.cf[offset].imaginary = 0;
 		  break;
 		case ANA_FLOAT:
@@ -2777,7 +2777,7 @@ int insert(int narg, int ps[])
 		  trgt.cf[offset].imaginary = 0;
 		  break;
 		case ANA_DOUBLE:
-		  trgt.cf[offset].real = (float) *src.d;
+		  trgt.cf[offset].real = (Float) *src.d;
 		  trgt.cf[offset].imaginary = 0;
 		  break;
 		case ANA_CFLOAT:
@@ -2785,40 +2785,40 @@ int insert(int narg, int ps[])
 		  trgt.cf[offset].imaginary = src.cf->imaginary;
 		  break;
 		case ANA_CDOUBLE:
-		  trgt.cf[offset].real = (float) src.cd->real;
-		  trgt.cf[offset].imaginary = (float) src.cd->imaginary;
+		  trgt.cf[offset].real = (Float) src.cd->real;
+		  trgt.cf[offset].imaginary = (Float) src.cd->imaginary;
 		  break;
 	      }
 	      break;
 	    case ANA_CDOUBLE:
 	      switch (srcType) {
 		case ANA_BYTE:
-		  trgt.cd[offset].real = (double) *src.b;
+		  trgt.cd[offset].real = (Double) *src.b;
 		  trgt.cd[offset].imaginary = 0;
 		  break;
 		case ANA_WORD:
-		  trgt.cd[offset].real = (double) *src.w;
+		  trgt.cd[offset].real = (Double) *src.w;
 		  trgt.cd[offset].imaginary = 0;
 		  break;
 		case ANA_LONG:
-		  trgt.cd[offset].real = (double) *src.l;
+		  trgt.cd[offset].real = (Double) *src.l;
 		  trgt.cd[offset].imaginary = 0;
 		  break;
 		case ANA_FLOAT:
-		  trgt.cd[offset].real = (double) *src.f;
+		  trgt.cd[offset].real = (Double) *src.f;
 		  trgt.cd[offset].imaginary = 0;
 		  break;
 		case ANA_DOUBLE:
-		  trgt.cd[offset].real = (double) *src.d;
+		  trgt.cd[offset].real = (Double) *src.d;
 		  trgt.cd[offset].imaginary = 0;
 		  break;
 		case ANA_CFLOAT:
-		  trgt.cd[offset].real = (double) src.cf->real;
-		  trgt.cd[offset].imaginary = (double) src.cf->imaginary;
+		  trgt.cd[offset].real = (Double) src.cf->real;
+		  trgt.cd[offset].imaginary = (Double) src.cf->imaginary;
 		  break;
 		case ANA_CDOUBLE:
-		  trgt.cd[offset].real = (double) src.cd->real;
-		  trgt.cd[offset].imaginary = (double) src.cd->imaginary;
+		  trgt.cd[offset].real = (Double) src.cd->real;
+		  trgt.cd[offset].imaginary = (Double) src.cd->imaginary;
 		  break;
 	      }
 	      break;
@@ -2855,16 +2855,16 @@ int insert(int narg, int ps[])
 		  value.b = *src.b;
 		  break;
 		case ANA_WORD:
-		  value.b = (byte) *src.w;
+		  value.b = (Byte) *src.w;
 		  break;
 		case ANA_LONG:
-		  value.b = (byte) *src.l;
+		  value.b = (Byte) *src.l;
 		  break;
 		case ANA_FLOAT:
-		  value.b = (byte) *src.f;
+		  value.b = (Byte) *src.f;
 		  break;
 		case ANA_DOUBLE:
-		  value.b = (byte) *src.d;
+		  value.b = (Byte) *src.d;
 		  break;
 		case ANA_CFLOAT:
 		  value.b = sqrt(src.cf->real*src.cf->real
@@ -2879,19 +2879,19 @@ int insert(int narg, int ps[])
 	    case ANA_WORD:
 	      switch (srcType) {
 		case ANA_BYTE:
-		  value.w = (word) *src.b;
+		  value.w = (Word) *src.b;
 		  break;
 		case ANA_WORD:
 		  value.w = *src.w;
 		  break;
 		case ANA_LONG:
-		  value.w = (word) *src.l;
+		  value.w = (Word) *src.l;
 		  break;
 		case ANA_FLOAT:
-		  value.w = (word) *src.f;
+		  value.w = (Word) *src.f;
 		  break;
 		case ANA_DOUBLE:
-		  value.w = (word) *src.d;
+		  value.w = (Word) *src.d;
 		  break;
 		case ANA_CFLOAT:
 		  value.w = sqrt(src.cf->real*src.cf->real
@@ -2906,19 +2906,19 @@ int insert(int narg, int ps[])
 	    case ANA_LONG:
 	      switch (srcType) {
 		case ANA_BYTE:
-		  value.l = (int) *src.b;
+		  value.l = (Int) *src.b;
 		  break;
 		case ANA_WORD:
-		  value.l = (int) *src.w;
+		  value.l = (Int) *src.w;
 		  break;
 		case ANA_LONG:
 		  value.l = *src.l;
 		  break;
 		case ANA_FLOAT:
-		  value.l = (int) *src.f;
+		  value.l = (Int) *src.f;
 		  break;
 		case ANA_DOUBLE:
-		  value.l = (int) *src.d;
+		  value.l = (Int) *src.d;
 		  break;
 		case ANA_CFLOAT:
 		  value.l = sqrt(src.cf->real*src.cf->real
@@ -2933,19 +2933,19 @@ int insert(int narg, int ps[])
 	    case ANA_FLOAT:
 	      switch (srcType) {
 		case ANA_BYTE:
-		  value.f = (float) *src.b;
+		  value.f = (Float) *src.b;
 		  break;
 		case ANA_WORD:
-		  value.f = (float) *src.w;
+		  value.f = (Float) *src.w;
 		  break;
 		case ANA_LONG:
-		  value.f = (float) *src.l;
+		  value.f = (Float) *src.l;
 		  break;
 		case ANA_FLOAT:
 		  value.f = *src.f;
 		  break;
 		case ANA_DOUBLE:
-		  value.f = (float) *src.d;
+		  value.f = (Float) *src.d;
 		  break;
 		case ANA_CFLOAT:
 		  value.f = sqrt(src.cf->real*src.cf->real
@@ -2960,16 +2960,16 @@ int insert(int narg, int ps[])
 	    case ANA_DOUBLE:
 	      switch (srcType) {
 		case ANA_BYTE:
-		  value.d = (double) *src.b;
+		  value.d = (Double) *src.b;
 		  break;
 		case ANA_WORD:
-		  value.d = (double) *src.w;
+		  value.d = (Double) *src.w;
 		  break;
 		case ANA_LONG:
-		  value.d = (double) *src.l;
+		  value.d = (Double) *src.l;
 		  break;
 		case ANA_FLOAT:
-		  value.d = (double) *src.f;
+		  value.d = (Double) *src.f;
 		  break;
 		case ANA_DOUBLE:
 		  value.d = *src.d;
@@ -3169,16 +3169,16 @@ int insert(int narg, int ps[])
 		  trgt.b[offset] = *src.b;
 		  break;
 		case ANA_WORD:
-		  trgt.b[offset] = (byte) *src.w;
+		  trgt.b[offset] = (Byte) *src.w;
 		  break;
 		case ANA_LONG:
-		  trgt.b[offset] = (byte) *src.l;
+		  trgt.b[offset] = (Byte) *src.l;
 		  break;
 		case ANA_FLOAT:
-		  trgt.b[offset] = (byte) *src.f;
+		  trgt.b[offset] = (Byte) *src.f;
 		  break;
 		case ANA_DOUBLE:
-		  trgt.b[offset] = (byte) *src.d;
+		  trgt.b[offset] = (Byte) *src.d;
 		  break;
 		case ANA_CFLOAT:
 		  trgt.b[offset] = sqrt(src.cf->real*src.cf->real
@@ -3193,19 +3193,19 @@ int insert(int narg, int ps[])
 	    case ANA_WORD:
 	      switch (srcType) {
 		case ANA_BYTE:
-		  trgt.w[offset] = (word) *src.b;
+		  trgt.w[offset] = (Word) *src.b;
 		  break;
 		case ANA_WORD:
 		  trgt.w[offset] = *src.w;
 		  break;
 		case ANA_LONG:
-		  trgt.w[offset] = (word) *src.l;
+		  trgt.w[offset] = (Word) *src.l;
 		  break;
 		case ANA_FLOAT:
-		  trgt.w[offset] = (word) *src.f;
+		  trgt.w[offset] = (Word) *src.f;
 		  break;
 		case ANA_DOUBLE:
-		  trgt.w[offset] = (word) *src.d;
+		  trgt.w[offset] = (Word) *src.d;
 		  break;
 		case ANA_CFLOAT:
 		  trgt.w[offset] = sqrt(src.cf->real*src.cf->real
@@ -3220,19 +3220,19 @@ int insert(int narg, int ps[])
 	    case ANA_LONG:
 	      switch (srcType) {
 		case ANA_BYTE:
-		  trgt.l[offset] = (int) *src.b;
+		  trgt.l[offset] = (Int) *src.b;
 		  break;
 		case ANA_WORD:
-		  trgt.l[offset] = (int) *src.w;
+		  trgt.l[offset] = (Int) *src.w;
 		  break;
 		case ANA_LONG:
 		  trgt.l[offset] = *src.l;
 		  break;
 		case ANA_FLOAT:
-		  trgt.l[offset] = (int) *src.f;
+		  trgt.l[offset] = (Int) *src.f;
 		  break;
 		case ANA_DOUBLE:
-		  trgt.l[offset] = (int) *src.d;
+		  trgt.l[offset] = (Int) *src.d;
 		  break;
 		case ANA_CFLOAT:
 		  trgt.l[offset] = sqrt(src.cf->real*src.cf->real
@@ -3247,19 +3247,19 @@ int insert(int narg, int ps[])
 	    case ANA_FLOAT:
 	      switch (srcType) {
 		case ANA_BYTE:
-		  trgt.f[offset] = (float) *src.b;
+		  trgt.f[offset] = (Float) *src.b;
 		  break;
 		case ANA_WORD:
-		  trgt.f[offset] = (float) *src.w;
+		  trgt.f[offset] = (Float) *src.w;
 		  break;
 		case ANA_LONG:
-		  trgt.f[offset] = (float) *src.l;
+		  trgt.f[offset] = (Float) *src.l;
 		  break;
 		case ANA_FLOAT:
 		  trgt.f[offset] = *src.f;
 		  break;
 		case ANA_DOUBLE:
-		  trgt.f[offset] = (float) *src.d;
+		  trgt.f[offset] = (Float) *src.d;
 		  break;
 		case ANA_CFLOAT:
 		  trgt.f[offset] = sqrt(src.cf->real*src.cf->real
@@ -3274,16 +3274,16 @@ int insert(int narg, int ps[])
 	    case ANA_DOUBLE:
 	      switch (srcType) {
 		case ANA_BYTE:
-		  trgt.d[offset] = (double) *src.b;
+		  trgt.d[offset] = (Double) *src.b;
 		  break;
 		case ANA_WORD:
-		  trgt.d[offset] = (double) *src.w;
+		  trgt.d[offset] = (Double) *src.w;
 		  break;
 		case ANA_LONG:
-		  trgt.d[offset] = (double) *src.l;
+		  trgt.d[offset] = (Double) *src.l;
 		  break;
 		case ANA_FLOAT:
-		  trgt.d[offset] = (double) *src.f;
+		  trgt.d[offset] = (Double) *src.f;
 		  break;
 		case ANA_DOUBLE:
 		  trgt.d[offset] = *src.d;
@@ -3403,16 +3403,16 @@ int insert(int narg, int ps[])
 		  value.b = *src.b;
 		  break;
 		case ANA_WORD:
-		  value.b = (byte) *src.w;
+		  value.b = (Byte) *src.w;
 		  break;
 		case ANA_LONG:
-		  value.b = (byte) *src.l;
+		  value.b = (Byte) *src.l;
 		  break;
 		case ANA_FLOAT:
-		  value.b = (byte) *src.f;
+		  value.b = (Byte) *src.f;
 		  break;
 		case ANA_DOUBLE:
-		  value.b = (byte) *src.d;
+		  value.b = (Byte) *src.d;
 		  break;
 		case ANA_CFLOAT:
 		  value.b = sqrt(src.cf->real*src.cf->real
@@ -3427,19 +3427,19 @@ int insert(int narg, int ps[])
 	    case ANA_WORD:
 	      switch (srcType) {
 		case ANA_BYTE:
-		  value.w = (word) *src.b;
+		  value.w = (Word) *src.b;
 		  break;
 		case ANA_WORD:
 		  value.w = *src.w;
 		  break;
 		case ANA_LONG:
-		  value.w = (word) *src.l;
+		  value.w = (Word) *src.l;
 		  break;
 		case ANA_FLOAT:
-		  value.w = (word) *src.f;
+		  value.w = (Word) *src.f;
 		  break;
 		case ANA_DOUBLE:
-		  value.w = (word) *src.d;
+		  value.w = (Word) *src.d;
 		  break;
 		case ANA_CFLOAT:
 		  value.w = sqrt(src.cf->real*src.cf->real
@@ -3454,19 +3454,19 @@ int insert(int narg, int ps[])
 	    case ANA_LONG:
 	      switch (srcType) {
 		case ANA_BYTE:
-		  value.l = (int) *src.b;
+		  value.l = (Int) *src.b;
 		  break;
 		case ANA_WORD:
-		  value.l = (int) *src.w;
+		  value.l = (Int) *src.w;
 		  break;
 		case ANA_LONG:
 		  value.l = *src.l;
 		  break;
 		case ANA_FLOAT:
-		  value.l = (int) *src.f;
+		  value.l = (Int) *src.f;
 		  break;
 		case ANA_DOUBLE:
-		  value.l = (int) *src.d;
+		  value.l = (Int) *src.d;
 		  break;
 		case ANA_CFLOAT:
 		  value.l = sqrt(src.cf->real*src.cf->real
@@ -3481,19 +3481,19 @@ int insert(int narg, int ps[])
 	    case ANA_FLOAT:
 	      switch (srcType) {
 		case ANA_BYTE:
-		  value.f = (float) *src.b;
+		  value.f = (Float) *src.b;
 		  break;
 		case ANA_WORD:
-		  value.f = (float) *src.w;
+		  value.f = (Float) *src.w;
 		  break;
 		case ANA_LONG:
-		  value.f = (float) *src.l;
+		  value.f = (Float) *src.l;
 		  break;
 		case ANA_FLOAT:
 		  value.f = *src.f;
 		  break;
 		case ANA_DOUBLE:
-		  value.f = (float) *src.d;
+		  value.f = (Float) *src.d;
 		  break;
 		case ANA_CFLOAT:
 		  value.f = sqrt(src.cf->real*src.cf->real
@@ -3508,16 +3508,16 @@ int insert(int narg, int ps[])
 	    case ANA_DOUBLE:
 	      switch (srcType) {
 		case ANA_BYTE:
-		  value.d = (double) *src.b;
+		  value.d = (Double) *src.b;
 		  break;
 		case ANA_WORD:
-		  value.d = (double) *src.w;
+		  value.d = (Double) *src.w;
 		  break;
 		case ANA_LONG:
-		  value.d = (double) *src.l;
+		  value.d = (Double) *src.l;
 		  break;
 		case ANA_FLOAT:
-		  value.d = (double) *src.f;
+		  value.d = (Double) *src.f;
 		  break;
 		case ANA_DOUBLE:
 		  value.d = *src.d;
@@ -3619,24 +3619,24 @@ int insert(int narg, int ps[])
   return 1;
 }
 /*------------------------------------------------------------------*/
-int einsert(int lhs, int rhs)
+Int einsert(Int lhs, Int rhs)
 /* an insertion statement with subscripted target */
 /* lhs = an ANA_EXTRACT symbol; rhs is already evaluated */
 {
-  int	target, source, i, iq, start[MAX_DIMS], width, *dims,
+  Int	target, source, i, iq, start[MAX_DIMS], width, *dims,
     ndim, nelem, type, size[MAX_DIMS], subsc_type[MAX_DIMS],
     *index[MAX_DIMS], *iptr, j, n, class, srcNdim, *srcDims, srcNelem,
     srcType, stride[MAX_DIMS], tally[MAX_DIMS], offset0, nmult,
     tstep[MAX_DIMS], offset, onestep, unit, combineType, narg,
     oldInternalMode, *ps2, srcMult;
-  word	*ps;
+  Word	*ps;
   pointer	src, trgt;
   wideScalar	value;
   char	*name, keepps2;
   FILE	*fp;
-  extern int	trace, step, insert_subr;
-  int	ana_assoc_output(int, int, int, int),
-    treatListArguments(int *, int **, int);
+  extern Int	trace, step, insert_subr;
+  Int	ana_assoc_output(Int, Int, Int, Int),
+    treatListArguments(Int *, Int **, Int);
 
   target = extract_target(lhs);
   source = rhs;
@@ -3662,7 +3662,7 @@ int einsert(int lhs, int rhs)
   }
   oldInternalMode = internalMode;
   internalMode = 0;
-  ps2 = malloc((narg - nelem)*sizeof(int));
+  ps2 = malloc((narg - nelem)*sizeof(Int));
   j = 0;
   if (!ps2)
     return cerror(ALLOC_ERR, 0);
@@ -3744,7 +3744,7 @@ int einsert(int lhs, int rhs)
       dims = array_dims(target);
       nelem = array_size(target);
       type = array_type(target);
-      trgt.l = (int *) array_data(target);
+      trgt.l = (Int *) array_data(target);
       break;
   }
 
@@ -3797,7 +3797,7 @@ int einsert(int lhs, int rhs)
 	srcMult += (srcDims[i] > 1);
       srcNelem = array_size(source);
       srcType = array_type(source);
-      src.l = (int *) array_data(source);
+      src.l = (Int *) array_data(source);
       break;
   }
 
@@ -3861,7 +3861,7 @@ int einsert(int lhs, int rhs)
 	  iq = ana_long(1, &iq); /* get LONG indices */
 	  n = size[i] = array_size(iq); /* number of array elements */
 	  if (n == 1) {		/* only one element: mimic scalar */
-	    start[i] = *(int *) array_data(iq);
+	    start[i] = *(Int *) array_data(iq);
 	    if (narg == 1)	/* single subscript only */
 	      width = nelem;
 	    else
@@ -3872,7 +3872,7 @@ int einsert(int lhs, int rhs)
 	    }
 	    subsc_type[i] = ANA_RANGE;
 	  } else {
-	    iptr = index[i] = (int *) array_data(iq);
+	    iptr = index[i] = (Int *) array_data(iq);
 	    keepps2 = 1;	/* we should not delete until the end of
 				 the routine, or else our index data
 				 may be clobbered too soon */
@@ -4075,16 +4075,16 @@ int einsert(int lhs, int rhs)
 		  trgt.b[offset] = *src.b;
 		  break;
 		case ANA_WORD:
-		  trgt.b[offset] = (byte) *src.w;
+		  trgt.b[offset] = (Byte) *src.w;
 		  break;
 		case ANA_LONG:
-		  trgt.b[offset] = (byte) *src.l;
+		  trgt.b[offset] = (Byte) *src.l;
 		  break;
 		case ANA_FLOAT:
-		  trgt.b[offset] = (byte) *src.f;
+		  trgt.b[offset] = (Byte) *src.f;
 		  break;
 		case ANA_DOUBLE:
-		  trgt.b[offset] = (byte) *src.d;
+		  trgt.b[offset] = (Byte) *src.d;
 		  break;
 		case ANA_CFLOAT:
 		  trgt.b[offset] = sqrt(src.cf->real*src.cf->real
@@ -4099,19 +4099,19 @@ int einsert(int lhs, int rhs)
 	    case ANA_WORD:
 	      switch (srcType) {
 		case ANA_BYTE:
-		  trgt.w[offset] = (word) *src.b;
+		  trgt.w[offset] = (Word) *src.b;
 		  break;
 		case ANA_WORD:
 		  trgt.w[offset] = *src.w;
 		  break;
 		case ANA_LONG:
-		  trgt.w[offset] = (word) *src.l;
+		  trgt.w[offset] = (Word) *src.l;
 		  break;
 		case ANA_FLOAT:
-		  trgt.w[offset] = (word) *src.f;
+		  trgt.w[offset] = (Word) *src.f;
 		  break;
 		case ANA_DOUBLE:
-		  trgt.w[offset] = (word) *src.d;
+		  trgt.w[offset] = (Word) *src.d;
 		  break;
 		case ANA_CFLOAT:
 		  trgt.w[offset] = sqrt(src.cf->real*src.cf->real
@@ -4126,19 +4126,19 @@ int einsert(int lhs, int rhs)
 	    case ANA_LONG:
 	      switch (srcType) {
 		case ANA_BYTE:
-		  trgt.l[offset] = (int) *src.b;
+		  trgt.l[offset] = (Int) *src.b;
 		  break;
 		case ANA_WORD:
-		  trgt.l[offset] = (int) *src.w;
+		  trgt.l[offset] = (Int) *src.w;
 		  break;
 		case ANA_LONG:
 		  trgt.l[offset] = *src.l;
 		  break;
 		case ANA_FLOAT:
-		  trgt.l[offset] = (int) *src.f;
+		  trgt.l[offset] = (Int) *src.f;
 		  break;
 		case ANA_DOUBLE:
-		  trgt.l[offset] = (int) *src.d;
+		  trgt.l[offset] = (Int) *src.d;
 		  break;
 		case ANA_CFLOAT:
 		  trgt.l[offset] = sqrt(src.cf->real*src.cf->real
@@ -4153,19 +4153,19 @@ int einsert(int lhs, int rhs)
 	    case ANA_FLOAT:
 	      switch (srcType) {
 		case ANA_BYTE:
-		  trgt.f[offset] = (float) *src.b;
+		  trgt.f[offset] = (Float) *src.b;
 		  break;
 		case ANA_WORD:
-		  trgt.f[offset] = (float) *src.w;
+		  trgt.f[offset] = (Float) *src.w;
 		  break;
 		case ANA_LONG:
-		  trgt.f[offset] = (float) *src.l;
+		  trgt.f[offset] = (Float) *src.l;
 		  break;
 		case ANA_FLOAT:
 		  trgt.f[offset] = *src.f;
 		  break;
 		case ANA_DOUBLE:
-		  trgt.f[offset] = (float) *src.d;
+		  trgt.f[offset] = (Float) *src.d;
 		  break;
 		case ANA_CFLOAT:
 		  trgt.f[offset] = sqrt(src.cf->real*src.cf->real
@@ -4180,16 +4180,16 @@ int einsert(int lhs, int rhs)
 	    case ANA_DOUBLE:
 	      switch (srcType) {
 		case ANA_BYTE:
-		  trgt.d[offset] = (double) *src.b;
+		  trgt.d[offset] = (Double) *src.b;
 		  break;
 		case ANA_WORD:
-		  trgt.d[offset] = (double) *src.w;
+		  trgt.d[offset] = (Double) *src.w;
 		  break;
 		case ANA_LONG:
-		  trgt.d[offset] = (double) *src.l;
+		  trgt.d[offset] = (Double) *src.l;
 		  break;
 		case ANA_FLOAT:
-		  trgt.d[offset] = (double) *src.f;
+		  trgt.d[offset] = (Double) *src.f;
 		  break;
 		case ANA_DOUBLE:
 		  trgt.d[offset] = *src.d;
@@ -4207,15 +4207,15 @@ int einsert(int lhs, int rhs)
 	    case ANA_CFLOAT:
 	      switch (srcType) {
 		case ANA_BYTE:
-		  trgt.cf[offset].real = (float) *src.b;
+		  trgt.cf[offset].real = (Float) *src.b;
 		  trgt.cf[offset].imaginary = 0;
 		  break;
 		case ANA_WORD:
-		  trgt.cf[offset].real = (float) *src.w;
+		  trgt.cf[offset].real = (Float) *src.w;
 		  trgt.cf[offset].imaginary = 0;
 		  break;
 		case ANA_LONG:
-		  trgt.cf[offset].real = (float) *src.l;
+		  trgt.cf[offset].real = (Float) *src.l;
 		  trgt.cf[offset].imaginary = 0;
 		  break;
 		case ANA_FLOAT:
@@ -4223,7 +4223,7 @@ int einsert(int lhs, int rhs)
 		  trgt.cf[offset].imaginary = 0;
 		  break;
 		case ANA_DOUBLE:
-		  trgt.cf[offset].real = (float) *src.d;
+		  trgt.cf[offset].real = (Float) *src.d;
 		  trgt.cf[offset].imaginary = 0;
 		  break;
 		case ANA_CFLOAT:
@@ -4231,40 +4231,40 @@ int einsert(int lhs, int rhs)
 		  trgt.cf[offset].imaginary = src.cf->imaginary;
 		  break;
 		case ANA_CDOUBLE:
-		  trgt.cf[offset].real = (float) src.cd->real;
-		  trgt.cf[offset].imaginary = (float) src.cd->imaginary;
+		  trgt.cf[offset].real = (Float) src.cd->real;
+		  trgt.cf[offset].imaginary = (Float) src.cd->imaginary;
 		  break;
 	      }
 	      break;
 	    case ANA_CDOUBLE:
 	      switch (srcType) {
 		case ANA_BYTE:
-		  trgt.cd[offset].real = (double) *src.b;
+		  trgt.cd[offset].real = (Double) *src.b;
 		  trgt.cd[offset].imaginary = 0;
 		  break;
 		case ANA_WORD:
-		  trgt.cd[offset].real = (double) *src.w;
+		  trgt.cd[offset].real = (Double) *src.w;
 		  trgt.cd[offset].imaginary = 0;
 		  break;
 		case ANA_LONG:
-		  trgt.cd[offset].real = (double) *src.l;
+		  trgt.cd[offset].real = (Double) *src.l;
 		  trgt.cd[offset].imaginary = 0;
 		  break;
 		case ANA_FLOAT:
-		  trgt.cd[offset].real = (double) *src.f;
+		  trgt.cd[offset].real = (Double) *src.f;
 		  trgt.cd[offset].imaginary = 0;
 		  break;
 		case ANA_DOUBLE:
-		  trgt.cd[offset].real = (double) *src.d;
+		  trgt.cd[offset].real = (Double) *src.d;
 		  trgt.cd[offset].imaginary = 0;
 		  break;
 		case ANA_CFLOAT:
-		  trgt.cd[offset].real = (double) src.cf->real;
-		  trgt.cd[offset].imaginary = (double) src.cf->imaginary;
+		  trgt.cd[offset].real = (Double) src.cf->real;
+		  trgt.cd[offset].imaginary = (Double) src.cf->imaginary;
 		  break;
 		case ANA_CDOUBLE:
-		  trgt.cd[offset].real = (double) src.cd->real;
-		  trgt.cd[offset].imaginary = (double) src.cd->imaginary;
+		  trgt.cd[offset].real = (Double) src.cd->real;
+		  trgt.cd[offset].imaginary = (Double) src.cd->imaginary;
 		  break;
 	      }
 	      break;
@@ -4302,16 +4302,16 @@ int einsert(int lhs, int rhs)
 		  value.b = *src.b;
 		  break;
 		case ANA_WORD:
-		  value.b = (byte) *src.w;
+		  value.b = (Byte) *src.w;
 		  break;
 		case ANA_LONG:
-		  value.b = (byte) *src.l;
+		  value.b = (Byte) *src.l;
 		  break;
 		case ANA_FLOAT:
-		  value.b = (byte) *src.f;
+		  value.b = (Byte) *src.f;
 		  break;
 		case ANA_DOUBLE:
-		  value.b = (byte) *src.d;
+		  value.b = (Byte) *src.d;
 		  break;
 		case ANA_CFLOAT:
 		  value.b = sqrt(src.cf->real*src.cf->real
@@ -4326,19 +4326,19 @@ int einsert(int lhs, int rhs)
 	    case ANA_WORD:
 	      switch (srcType) {
 		case ANA_BYTE:
-		  value.w = (word) *src.b;
+		  value.w = (Word) *src.b;
 		  break;
 		case ANA_WORD:
 		  value.w = *src.w;
 		  break;
 		case ANA_LONG:
-		  value.w = (word) *src.l;
+		  value.w = (Word) *src.l;
 		  break;
 		case ANA_FLOAT:
-		  value.w = (word) *src.f;
+		  value.w = (Word) *src.f;
 		  break;
 		case ANA_DOUBLE:
-		  value.w = (word) *src.d;
+		  value.w = (Word) *src.d;
 		  break;
 		case ANA_CFLOAT:
 		  value.w = sqrt(src.cf->real*src.cf->real
@@ -4353,19 +4353,19 @@ int einsert(int lhs, int rhs)
 	    case ANA_LONG:
 	      switch (srcType) {
 		case ANA_BYTE:
-		  value.l = (int) *src.b;
+		  value.l = (Int) *src.b;
 		  break;
 		case ANA_WORD:
-		  value.l = (int) *src.w;
+		  value.l = (Int) *src.w;
 		  break;
 		case ANA_LONG:
 		  value.l = *src.l;
 		  break;
 		case ANA_FLOAT:
-		  value.l = (int) *src.f;
+		  value.l = (Int) *src.f;
 		  break;
 		case ANA_DOUBLE:
-		  value.l = (int) *src.d;
+		  value.l = (Int) *src.d;
 		  break;
 		case ANA_CFLOAT:
 		  value.l = sqrt(src.cf->real*src.cf->real
@@ -4380,19 +4380,19 @@ int einsert(int lhs, int rhs)
 	    case ANA_FLOAT:
 	      switch (srcType) {
 		case ANA_BYTE:
-		  value.f = (float) *src.b;
+		  value.f = (Float) *src.b;
 		  break;
 		case ANA_WORD:
-		  value.f = (float) *src.w;
+		  value.f = (Float) *src.w;
 		  break;
 		case ANA_LONG:
-		  value.f = (float) *src.l;
+		  value.f = (Float) *src.l;
 		  break;
 		case ANA_FLOAT:
 		  value.f = *src.f;
 		  break;
 		case ANA_DOUBLE:
-		  value.f = (float) *src.d;
+		  value.f = (Float) *src.d;
 		  break;
 		case ANA_CFLOAT:
 		  value.f = sqrt(src.cf->real*src.cf->real
@@ -4407,16 +4407,16 @@ int einsert(int lhs, int rhs)
 	    case ANA_DOUBLE:
 	      switch (srcType) {
 		case ANA_BYTE:
-		  value.d = (double) *src.b;
+		  value.d = (Double) *src.b;
 		  break;
 		case ANA_WORD:
-		  value.d = (double) *src.w;
+		  value.d = (Double) *src.w;
 		  break;
 		case ANA_LONG:
-		  value.d = (double) *src.l;
+		  value.d = (Double) *src.l;
 		  break;
 		case ANA_FLOAT:
-		  value.d = (double) *src.f;
+		  value.d = (Double) *src.f;
 		  break;
 		case ANA_DOUBLE:
 		  value.d = *src.d;
@@ -4632,16 +4632,16 @@ int einsert(int lhs, int rhs)
 		  trgt.b[offset] = *src.b;
 		  break;
 		case ANA_WORD:
-		  trgt.b[offset] = (byte) *src.w;
+		  trgt.b[offset] = (Byte) *src.w;
 		  break;
 		case ANA_LONG:
-		  trgt.b[offset] = (byte) *src.l;
+		  trgt.b[offset] = (Byte) *src.l;
 		  break;
 		case ANA_FLOAT:
-		  trgt.b[offset] = (byte) *src.f;
+		  trgt.b[offset] = (Byte) *src.f;
 		  break;
 		case ANA_DOUBLE:
-		  trgt.b[offset] = (byte) *src.d;
+		  trgt.b[offset] = (Byte) *src.d;
 		  break;
 		case ANA_CFLOAT:
 		  trgt.b[offset] = sqrt(src.cf->real*src.cf->real
@@ -4656,19 +4656,19 @@ int einsert(int lhs, int rhs)
 	    case ANA_WORD:
 	      switch (srcType) {
 		case ANA_BYTE:
-		  trgt.w[offset] = (word) *src.b;
+		  trgt.w[offset] = (Word) *src.b;
 		  break;
 		case ANA_WORD:
 		  trgt.w[offset] = *src.w;
 		  break;
 		case ANA_LONG:
-		  trgt.w[offset] = (word) *src.l;
+		  trgt.w[offset] = (Word) *src.l;
 		  break;
 		case ANA_FLOAT:
-		  trgt.w[offset] = (word) *src.f;
+		  trgt.w[offset] = (Word) *src.f;
 		  break;
 		case ANA_DOUBLE:
-		  trgt.w[offset] = (word) *src.d;
+		  trgt.w[offset] = (Word) *src.d;
 		  break;
 		case ANA_CFLOAT:
 		  trgt.w[offset] = sqrt(src.cf->real*src.cf->real
@@ -4683,19 +4683,19 @@ int einsert(int lhs, int rhs)
 	    case ANA_LONG:
 	      switch (srcType) {
 		case ANA_BYTE:
-		  trgt.l[offset] = (int) *src.b;
+		  trgt.l[offset] = (Int) *src.b;
 		  break;
 		case ANA_WORD:
-		  trgt.l[offset] = (int) *src.w;
+		  trgt.l[offset] = (Int) *src.w;
 		  break;
 		case ANA_LONG:
 		  trgt.l[offset] = *src.l;
 		  break;
 		case ANA_FLOAT:
-		  trgt.l[offset] = (int) *src.f;
+		  trgt.l[offset] = (Int) *src.f;
 		  break;
 		case ANA_DOUBLE:
-		  trgt.l[offset] = (int) *src.d;
+		  trgt.l[offset] = (Int) *src.d;
 		  break;
 		case ANA_CFLOAT:
 		  trgt.l[offset] = sqrt(src.cf->real*src.cf->real
@@ -4710,19 +4710,19 @@ int einsert(int lhs, int rhs)
 	    case ANA_FLOAT:
 	      switch (srcType) {
 		case ANA_BYTE:
-		  trgt.f[offset] = (float) *src.b;
+		  trgt.f[offset] = (Float) *src.b;
 		  break;
 		case ANA_WORD:
-		  trgt.f[offset] = (float) *src.w;
+		  trgt.f[offset] = (Float) *src.w;
 		  break;
 		case ANA_LONG:
-		  trgt.f[offset] = (float) *src.l;
+		  trgt.f[offset] = (Float) *src.l;
 		  break;
 		case ANA_FLOAT:
 		  trgt.f[offset] = *src.f;
 		  break;
 		case ANA_DOUBLE:
-		  trgt.f[offset] = (float) *src.d;
+		  trgt.f[offset] = (Float) *src.d;
 		  break;
 		case ANA_CFLOAT:
 		  trgt.f[offset] = sqrt(src.cf->real*src.cf->real
@@ -4737,16 +4737,16 @@ int einsert(int lhs, int rhs)
 	    case ANA_DOUBLE:
 	      switch (srcType) {
 		case ANA_BYTE:
-		  trgt.d[offset] = (double) *src.b;
+		  trgt.d[offset] = (Double) *src.b;
 		  break;
 		case ANA_WORD:
-		  trgt.d[offset] = (double) *src.w;
+		  trgt.d[offset] = (Double) *src.w;
 		  break;
 		case ANA_LONG:
-		  trgt.d[offset] = (double) *src.l;
+		  trgt.d[offset] = (Double) *src.l;
 		  break;
 		case ANA_FLOAT:
-		  trgt.d[offset] = (double) *src.f;
+		  trgt.d[offset] = (Double) *src.f;
 		  break;
 		case ANA_DOUBLE:
 		  trgt.d[offset] = *src.d;
@@ -4867,16 +4867,16 @@ int einsert(int lhs, int rhs)
 		  value.b = *src.b;
 		  break;
 		case ANA_WORD:
-		  value.b = (byte) *src.w;
+		  value.b = (Byte) *src.w;
 		  break;
 		case ANA_LONG:
-		  value.b = (byte) *src.l;
+		  value.b = (Byte) *src.l;
 		  break;
 		case ANA_FLOAT:
-		  value.b = (byte) *src.f;
+		  value.b = (Byte) *src.f;
 		  break;
 		case ANA_DOUBLE:
-		  value.b = (byte) *src.d;
+		  value.b = (Byte) *src.d;
 		  break;
 		case ANA_CFLOAT:
 		  value.b = sqrt(src.cf->real*src.cf->real
@@ -4891,19 +4891,19 @@ int einsert(int lhs, int rhs)
 	    case ANA_WORD:
 	      switch (srcType) {
 		case ANA_BYTE:
-		  value.w = (word) *src.b;
+		  value.w = (Word) *src.b;
 		  break;
 		case ANA_WORD:
 		  value.w = *src.w;
 		  break;
 		case ANA_LONG:
-		  value.w = (word) *src.l;
+		  value.w = (Word) *src.l;
 		  break;
 		case ANA_FLOAT:
-		  value.w = (word) *src.f;
+		  value.w = (Word) *src.f;
 		  break;
 		case ANA_DOUBLE:
-		  value.w = (word) *src.d;
+		  value.w = (Word) *src.d;
 		  break;
 		case ANA_CFLOAT:
 		  value.w = sqrt(src.cf->real*src.cf->real
@@ -4918,19 +4918,19 @@ int einsert(int lhs, int rhs)
 	    case ANA_LONG:
 	      switch (srcType) {
 		case ANA_BYTE:
-		  value.l = (int) *src.b;
+		  value.l = (Int) *src.b;
 		  break;
 		case ANA_WORD:
-		  value.l = (int) *src.w;
+		  value.l = (Int) *src.w;
 		  break;
 		case ANA_LONG:
 		  value.l = *src.l;
 		  break;
 		case ANA_FLOAT:
-		  value.l = (int) *src.f;
+		  value.l = (Int) *src.f;
 		  break;
 		case ANA_DOUBLE:
-		  value.l = (int) *src.d;
+		  value.l = (Int) *src.d;
 		  break;
 		case ANA_CFLOAT:
 		  value.l = sqrt(src.cf->real*src.cf->real
@@ -4945,19 +4945,19 @@ int einsert(int lhs, int rhs)
 	    case ANA_FLOAT:
 	      switch (srcType) {
 		case ANA_BYTE:
-		  value.f = (float) *src.b;
+		  value.f = (Float) *src.b;
 		  break;
 		case ANA_WORD:
-		  value.f = (float) *src.w;
+		  value.f = (Float) *src.w;
 		  break;
 		case ANA_LONG:
-		  value.f = (float) *src.l;
+		  value.f = (Float) *src.l;
 		  break;
 		case ANA_FLOAT:
 		  value.f = *src.f;
 		  break;
 		case ANA_DOUBLE:
-		  value.f = (float) *src.d;
+		  value.f = (Float) *src.d;
 		  break;
 		case ANA_CFLOAT:
 		  value.f = sqrt(src.cf->real*src.cf->real
@@ -4972,16 +4972,16 @@ int einsert(int lhs, int rhs)
 	    case ANA_DOUBLE:
 	      switch (srcType) {
 		case ANA_BYTE:
-		  value.d = (double) *src.b;
+		  value.d = (Double) *src.b;
 		  break;
 		case ANA_WORD:
-		  value.d = (double) *src.w;
+		  value.d = (Double) *src.w;
 		  break;
 		case ANA_LONG:
-		  value.d = (double) *src.l;
+		  value.d = (Double) *src.l;
 		  break;
 		case ANA_FLOAT:
-		  value.d = (double) *src.f;
+		  value.d = (Double) *src.f;
 		  break;
 		case ANA_DOUBLE:
 		  value.d = *src.d;
@@ -5092,10 +5092,10 @@ int einsert(int lhs, int rhs)
   return iq;
 }
 /*------------------------------------------------------------------*/
-int ana_test(int narg, int ps[])
+Int ana_test(Int narg, Int ps[])
 /* a test function */
 {
-  int	n, value, *edge, i, *offset;
+  Int	n, value, *edge, i, *offset;
   loopInfo	info;
   pointer	src;
 

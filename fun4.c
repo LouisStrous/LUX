@@ -14,27 +14,27 @@ static char rcsid[] __attribute__ ((unused)) =
 #define BI_CUBIC_SMOOTH	4
 #define BI_CUBIC	3
 
-extern	int	lastmin_sym, lastmax_sym;
+extern	Int	lastmin_sym, lastmax_sym;
 extern unsigned long	*pixels;
-int	maxregridsize = 2048, stretchmark, tvsmt, badmatch, stretch_clip = 19;
-int	islit, dstype, itmax = 20, sort_flag = 0;
-float	gwid, xoffset, yoffset, xyres;
-int	resample_type = BI_CUBIC_SMOOTH;
-void match_1(int *p1, int *p2, int nxa, int nxb, int nya, int nyb, int nx,
-	     int ny, float *gwx, float *gwy),
-  gwind0(float *gwx, float *gwy, float gwid, int nxa, int nxb, int nya,
-	 int nyb),
-  unbias(void *m1, void *m2, int nxa, int nxb, int nya, int nyb,
-	 int nxs, int nys, float *gx, float *gy, float *av1, float *av2,
-	 float *cx, float *cy, float *cxx, float *cxy, float *cyy,
-	 int idelx, int idely);
-float averag(void *m, int nxa, int nxb, int nya, int nyb, int nxs, int nys,
-	     int idx, int idy, float *gx, float *gy),
-  resid(int *m1, int *m2, int idx, int idy, int nxa, int nxb, int nya,
-	int nyb, int nxs, int nys, int ndmx, float *gx, float *gy,
-	float bs);
+Int	maxregridsize = 2048, stretchmark, tvsmt, badmatch, stretch_clip = 19;
+Int	islit, dstype, itmax = 20, sort_flag = 0;
+Float	gwid, xoffset, yoffset, xyres;
+Int	resample_type = BI_CUBIC_SMOOTH;
+void match_1(Int *p1, Int *p2, Int nxa, Int nxb, Int nya, Int nyb, Int nx,
+	     Int ny, Float *gwx, Float *gwy),
+  gwind0(Float *gwx, Float *gwy, Float gwid, Int nxa, Int nxb, Int nya,
+	 Int nyb),
+  unbias(void *m1, void *m2, Int nxa, Int nxb, Int nya, Int nyb,
+	 Int nxs, Int nys, Float *gx, Float *gy, Float *av1, Float *av2,
+	 Float *cx, Float *cy, Float *cxx, Float *cxy, Float *cyy,
+	 Int idelx, Int idely);
+Float averag(void *m, Int nxa, Int nxb, Int nya, Int nyb, Int nxs, Int nys,
+	     Int idx, Int idy, Float *gx, Float *gy),
+  resid(Int *m1, Int *m2, Int idx, Int idy, Int nxa, Int nxb, Int nya,
+	Int nyb, Int nxs, Int nys, Int ndmx, Float *gx, Float *gy,
+	Float bs);
 /*------------------------------------------------------------------------- */
-int ana_gridmatch(int narg, int ps[])/* gridmatch function */		
+Int ana_gridmatch(Int narg, Int ps[])/* gridmatch function */		
 /* the call is offsets = gridmatch(m1,m2,gx,gy,dx,dy,gwid,mode)
 	where	m1 = reference input image
 	m2 = image to compare with m1, m1 and m2 must be same size
@@ -46,10 +46,10 @@ int ana_gridmatch(int narg, int ps[])/* gridmatch function */
         is also returned in result (third "coordinate")  LS 14sep92
 */
 {
- int	type, nx, ny, nxg, nyg, dx, dy, dim[3];
- int	result_sym, nc, i1, i2, j1, j2, dx2, dy2, mode;
- int	*gx, *gy;
- float	*out, *gwx, *gwy;
+ Int	type, nx, ny, nxg, nyg, dx, dy, dim[3];
+ Int	result_sym, nc, i1, i2, j1, j2, dx2, dy2, mode;
+ Int	*gx, *gy;
+ Float	*out, *gwx, *gwy;
  pointer p1, p2;
 
  /* <m1> must be a 2D numerical array */
@@ -123,9 +123,9 @@ int ana_gridmatch(int narg, int ps[])/* gridmatch function */
  /* following converted from macro stretch.mar */
  /* try to use scratch for gaussian mask arrays (should work) */
  if ((nx + ny) <= NSCRAT)
-   gwx = (float *) scrat;
+   gwx = (Float *) scrat;
  else
-   gwx = (float *) malloc((nx + ny)*sizeof(float));
+   gwx = (Float *) malloc((nx + ny)*sizeof(Float));
  gwy = gwx + nx;
  nc = nxg*nyg;
  dx2 = dx/2;
@@ -160,19 +160,19 @@ int ana_gridmatch(int narg, int ps[])/* gridmatch function */
    if (mode != 0)
      *out++ = xyres;		/* addition LS 14sep92 */
  }
- if (gwx != (float *) scrat)
+ if (gwx != (Float *) scrat)
    free(gwx);			/* free space if it was allocated */
  return	result_sym;
 }
  /*------------------------------------------------------------------------- */
-void match_1(int *p1, int *p2, int nxa, int nxb, int nya, int nyb, int nx,
-	    int ny, float *gwx, float *gwy)
+void match_1(Int *p1, Int *p2, Int nxa, Int nxb, Int nya, Int nyb, Int nx,
+	    Int ny, Float *gwx, Float *gwy)
  /* note that xoffset and yoffset are zeroed before we get in here */
 {
-  int	idelx, idely, i, j, k, ndmx=1000, done[9];
-  int	di, dj, in, jn, iter, dd, badflag;
-  float	av1, av2, cx, cy,cxx,cxy,cyy, avdif, t, res[9], buf[9], t1, t2;
-  void	getmin(float *, float *, float *);
+  Int	idelx, idely, i, j, k, ndmx=1000, done[9];
+  Int	di, dj, in, jn, iter, dd, badflag;
+  Float	av1, av2, cx, cy,cxx,cxy,cyy, avdif, t, res[9], buf[9], t1, t2;
+  void	getmin(Float *, Float *, Float *);
 
   for (i = 0; i < 9; i++)
     done[i] = 0;
@@ -256,11 +256,11 @@ void match_1(int *p1, int *p2, int nxa, int nxb, int nya, int nyb, int nx,
   return;
 }
 /*------------------------------------------------------------------------- */
-void gwind0(float *gwx, float *gwy, float gwid, int nxa, int nxb, int nya,
-	    int nyb)
+void gwind0(Float *gwx, Float *gwy, Float gwid, Int nxa, Int nxb, Int nya,
+	    Int nyb)
 {
-  float	wid, xcen, ycen, xq;
-  int	i;
+  Float	wid, xcen, ycen, xq;
+  Int	i;
   
   wid = gwid*0.6005612;		/* from FWHM to decay scale */
   if (wid > 0) {
@@ -282,12 +282,12 @@ void gwind0(float *gwx, float *gwy, float gwid, int nxa, int nxb, int nya,
   }
 }
 /*------------------------------------------------------------------------- */
-void unbias(void *m1, void *m2, int nxa, int nxb, int nya, int nyb,
-	    int nxs, int nys, float *gx, float *gy, float *av1, float *av2,
-	    float *cx, float *cy, float *cxx, float *cxy, float *cyy,
-	    int idelx, int idely)
+void unbias(void *m1, void *m2, Int nxa, Int nxb, Int nya, Int nyb,
+	    Int nxs, Int nys, Float *gx, Float *gy, Float *av1, Float *av2,
+	    Float *cx, Float *cy, Float *cxx, Float *cxy, Float *cyy,
+	    Int idelx, Int idely)
 {
-  float	t0, t1, t2, t3, t4, t5;
+  Float	t0, t1, t2, t3, t4, t5;
 
   /*  find weighted means of m1 & m2 over the window 
       sets up quadratic fit to average of m2 as a fcn. of offsets */
@@ -306,13 +306,13 @@ void unbias(void *m1, void *m2, int nxa, int nxb, int nya, int nyb,
   *cxy = t5 + t0 - t1 - t3;
 }
 /*------------------------------------------------------------------------- */
-float averag(void *m, int nxa, int nxb, int nya, int nyb, int nxs, int nys,
-	     int idx, int idy, float *gx, float *gy)
+Float averag(void *m, Int nxa, Int nxb, Int nya, Int nyb, Int nxs, Int nys,
+	     Int idx, Int idy, Float *gx, Float *gy)
 /* finds weighted average of array m over the block defined */
 {
   pointer p;
-  int	nxc, nxd, nyc, nyd, i, j, jj;
-  float	sum, sumg, sumx, sumgx;
+  Int	nxc, nxd, nyc, nyd, i, j, jj;
+  Float	sum, sumg, sumx, sumgx;
 
   p.l = m; 
   /* fix limits so sum doesn't run off edge of image */
@@ -367,18 +367,18 @@ float averag(void *m, int nxa, int nxb, int nya, int nyb, int nxs, int nys,
   return sum/sumg;
 }
 /*------------------------------------------------------------------------- */
-float resid(int *m1, int *m2, int idx, int idy, int nxa, int nxb, int nya,
-	    int nyb, int nxs, int nys, int ndmx, float *gx, float *gy,
-	    float bs)
+Float resid(Int *m1, Int *m2, Int idx, Int idy, Int nxa, Int nxb, Int nya,
+	    Int nyb, Int nxs, Int nys, Int ndmx, Float *gx, Float *gy,
+	    Float bs)
 {
-  int     nxc, nxd, nyc, nyd, nx, ny;
+  Int     nxc, nxd, nyc, nyd, nx, ny;
   register	pointer   m1p, m2p;
-  register        float   *p1, *p2, *ps;
-  register        float   sum, sumx, t, ndmx2;
-  register        int     i, j;
-  float   sumg;
-  static  int     mxc, mxd, myc, myd;
-  static  float   gsum;
+  register        Float   *p1, *p2, *ps;
+  register        Float   sum, sumx, t, ndmx2;
+  register        Int     i, j;
+  Float   sumg;
+  static  Int     mxc, mxd, myc, myd;
+  static  Float   gsum;
 
   /*set up limits */
   nxc = nxa;
@@ -446,7 +446,7 @@ float resid(int *m1, int *m2, int idx, int idy, int nxa, int nxb, int nya,
 	p1 = ps;
 	sumx = 0.0;
         while (i) {
-	  t = ((float) *m1p.b++) - ((float) *m2p.b++);
+	  t = ((Float) *m1p.b++) - ((Float) *m2p.b++);
 	  t = t + bs;
 	  t = t*t;
 	  t = MIN(t, ndmx2);
@@ -465,7 +465,7 @@ float resid(int *m1, int *m2, int idx, int idy, int nxa, int nxb, int nya,
 	p1 = ps;
 	sumx = 0.0;
         while (i) {
-	  t = ((float) *m1p.w++) - ((float) *m2p.w++);
+	  t = ((Float) *m1p.w++) - ((Float) *m2p.w++);
 	  t = t + bs;
 	  t = t*t;
 	  t = MIN(t, ndmx2);
@@ -484,7 +484,7 @@ float resid(int *m1, int *m2, int idx, int idy, int nxa, int nxb, int nya,
 	p1 = ps;
 	sumx = 0.0;
         while (i) {
-	  t = ((float) *m1p.l++) - ((float) *m2p.l++);
+	  t = ((Float) *m1p.l++) - ((Float) *m2p.l++);
 	  t = t + bs;
 	  t = t*t;
 	  t = MIN(t, ndmx2);
@@ -503,7 +503,7 @@ float resid(int *m1, int *m2, int idx, int idy, int nxa, int nxb, int nya,
 	p1 = ps;
 	sumx = 0.0;
         while (i) {
-	  t = ((float) *m1p.f++) - ((float) *m2p.f++);
+	  t = ((Float) *m1p.f++) - ((Float) *m2p.f++);
 	  t = t + bs;
 	  t = t*t;
 	  t = MIN(t, ndmx2);
@@ -522,7 +522,7 @@ float resid(int *m1, int *m2, int idx, int idy, int nxa, int nxb, int nya,
 	p1 = ps;
 	sumx = 0.0;
         while (i) {
-	  t = ((float) *m1p.d++) - ((float) *m2p.d++);
+	  t = ((Float) *m1p.d++) - ((Float) *m2p.d++);
 	  t = t + bs;
 	  t = t*t;
 	  t = MIN(t, ndmx2);
@@ -540,18 +540,18 @@ float resid(int *m1, int *m2, int idx, int idy, int nxa, int nxb, int nya,
   return sum/sumg;
 }
 /*------------------------------------------------------------------------- */
-int ana_stretch(int narg, int ps[])/* stretch function */
+Int ana_stretch(Int narg, Int ps[])/* stretch function */
 /* the call is MS = STRETCH( M2, DELTA)
    where M2 is the original array to be destretched, MS is the result, and
    DELTA is a displacement grid as generated by GRIDMATCH */
 {
-  int	iq, type, n, m, nxg, nyg, result_sym, jy, j1, j2, nm1, nm2, mm1, mm2;
-  int	nxgm, nygm, ix, iy, i1, i2, i3, i4, j3, j4, jx;
-  float	xd, yd, xinc, yinc, y, x, xs, dy, dy1;
-  float	dx, dx1, dx0, dx2, dx3, dx4, fn, fm, xq;
-  float	w1, w2, w3, w4, xl, yl, c1, c2, c3, c4, b1, b2, b3, b4;
+  Int	iq, type, n, m, nxg, nyg, result_sym, jy, j1, j2, nm1, nm2, mm1, mm2;
+  Int	nxgm, nygm, ix, iy, i1, i2, i3, i4, j3, j4, jx;
+  Float	xd, yd, xinc, yinc, y, x, xs, dy, dy1;
+  Float	dx, dx1, dx0, dx2, dx3, dx4, fn, fm, xq;
+  Float	w1, w2, w3, w4, xl, yl, c1, c2, c3, c4, b1, b2, b3, b4;
   pointer base, out, bb;
-  float	*jpbase, *jbase, *xgbase;
+  Float	*jpbase, *jbase, *xgbase;
   
   iq = ps[0];			/* <image> */
   if (!symbolIsNumericalArray(iq) || array_num_dims(iq) != 2)
@@ -584,10 +584,10 @@ int ana_stretch(int narg, int ps[])/* stretch function */
   nygm = nyg - 1;
 	/* linearly interpolate the displacement grid values over array */
 	/* similar to regrid3 in inner part */
-  xd = (float) n/nxg;
+  xd = (Float) n/nxg;
   xinc = 1.0/xd;
   xs = xinc + (xd - 1.0)/(2.0*xd);
-  yd = (float) m/nyg;
+  yd = (Float) m/nyg;
   yinc = 1.0/yd;
   y = yinc + (yd - 1.0)/(2.0*yd);
   for (iy = 0; iy < m; iy++) {
@@ -624,10 +624,10 @@ int ana_stretch(int narg, int ps[])/* stretch function */
       i1 = 2*i1;
       i2 = 2*i2;
       xl = w1 * *(jbase+i1) + w2 * *(jbase+i2) + w3 * *(jpbase+i1)
-	+ w4 * *(jpbase+i2) + (float) ix;
+	+ w4 * *(jpbase+i2) + (Float) ix;
       i1 += 1;  i2 += 1;
       yl = w1 * *(jbase+i1) + w2 * *(jbase+i2) + w3 * *(jpbase+i1)
-	+ w4 * *(jpbase+i2) + (float) iy;
+	+ w4 * *(jpbase+i2) + (Float) iy;
       
       /* xl, yl is the place, now do a cubic interpolation for value */
       
@@ -696,8 +696,8 @@ int ana_stretch(int narg, int ps[])/* stretch function */
       switch (type) {
 	case ANA_BYTE:
 	  bb.b = base.b + iq;
-	  xq = b1*(c1*(float) *(bb.b) + c2* (float) *(bb.b + i2)
-		   + c3 * (float) *(bb.b+i3) + c4 * (float) *(bb.b+i4));
+	  xq = b1*(c1*(Float) *(bb.b) + c2* (Float) *(bb.b + i2)
+		   + c3 * (Float) *(bb.b+i3) + c4 * (Float) *(bb.b+i4));
 	  bb.b += j2;
 	  xq += b2*(c1 * *(bb.b) + c2 * *(bb.b+i2)
 		    + c3 * *(bb.b+i3) + c4 * *(bb.b+i4));
@@ -777,12 +777,12 @@ int ana_stretch(int narg, int ps[])/* stretch function */
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-void getmin(float *, float *, float *);
-int ana_getmin9(int narg, int ps[])/* getmin9 function */		
+void getmin(Float *, Float *, Float *);
+Int ana_getmin9(Int narg, Int ps[])/* getmin9 function */		
 /* local minimum for a 3x3 array */
 {
-  int	iq;
-  float	*p, x0, y0;
+  Int	iq;
+  Float	*p, x0, y0;
 					/*first arg must be a 3x3 array */
   iq = ps[0];
   if (symbol_class(iq) != ANA_ARRAY)
@@ -792,7 +792,7 @@ int ana_getmin9(int narg, int ps[])/* getmin9 function */
       || array_dims(iq)[1] != 3)
     return cerror(NEED_3x3_ARR, iq);
   iq = ana_float(1, &iq);	/* ensure FLOAT type */
-  p = (float *) array_data(iq);
+  p = (Float *) array_data(iq);
   getmin(p, &x0, &y0);
   if (redef_scalar(ps[1], 3, &x0) != 1)
     return cerror(ALLOC_ERR, ps[1]);
@@ -801,12 +801,12 @@ int ana_getmin9(int narg, int ps[])/* getmin9 function */
   return 1;
 }
 /*------------------------------------------------------------------------- */
-int	getmin2(float *, float *, float *);
-int ana_getmin2(int narg, int ps[])/* getmin2 function */		
+Int	getmin2(Float *, Float *, Float *);
+Int ana_getmin2(Int narg, Int ps[])/* getmin2 function */		
 /* local minimum for a 3x3 array */
 {
-  int	iq;
-  float	*p, x0, y0;
+  Int	iq;
+  Float	*p, x0, y0;
 					/*first arg must be a 3x3 array */
   iq = ps[0];
   if (symbol_class(iq) != ANA_ARRAY)
@@ -816,7 +816,7 @@ int ana_getmin2(int narg, int ps[])/* getmin2 function */
       || array_dims(iq)[1] != 3)
     return cerror(NEED_3x3_ARR, iq);
   iq = ana_float(1, &iq);	/* ensure FLOAT type */
-  p = (float *) array_data(iq);
+  p = (Float *) array_data(iq);
   getmin2(p, &x0, &y0);
   if (redef_scalar(ps[1], 3, &x0) != 1)
     return cerror(ALLOC_ERR, ps[1]);
@@ -825,12 +825,12 @@ int ana_getmin2(int narg, int ps[])/* getmin2 function */
   return 1;
 }
 /*------------------------------------------------------------------------- */
-int getminSYM(float *p, float *x0, float *y0)
+Int getminSYM(Float *p, Float *x0, Float *y0)
 /* return extremum of least-squares fit of quadratic surface to 3x3 grid */
 /* LS 21mar95 */
 {
-  float	f1, f2, f3, f4, f5, f6, f7, f8, f9;
-  float	dx, dy, dxx, dyy, dxy, d;
+  Float	f1, f2, f3, f4, f5, f6, f7, f8, f9;
+  Float	dx, dy, dxx, dyy, dxy, d;
 
   f1 = *p++;	f2 = *p++;	f3 = *p++;
   f4 = *p++;	f5 = *p++;	f6 = *p++;
@@ -846,10 +846,10 @@ int getminSYM(float *p, float *x0, float *y0)
   return 1;
 }
 /*------------------------------------------------------------------------- */
-void getmin(float *p, float *x0, float *y0)
+void getmin(Float *p, Float *x0, Float *y0)
 {
-  float	f11, f12, f13, f21, f22, f23, f31, f32, f33;
-  float	fx, fy, t, fxx, fyy, fxy;
+  Float	f11, f12, f13, f21, f22, f23, f31, f32, f33;
+  Float	fx, fy, t, fxx, fyy, fxy;
 				/* find the min, p points to a 3x3 array */
   f11 = *p++;	f21 = *p++;	f31 = *p++;
   f12 = *p++;	f22 = *p++;	f32 = *p++;
@@ -890,9 +890,9 @@ void getmin(float *p, float *x0, float *y0)
   }
 }
 /*------------------------------------------------------------------------- */
-int getmin2(float *p, float *x0, float *y0)
+Int getmin2(Float *p, Float *x0, Float *y0)
 {
-  float	a, b, c, d, e, det;
+  Float	a, b, c, d, e, det;
 
   a = (p[0] - 2*p[1] + p[2] + p[3] - 2*p[4] + p[5] + p[6] - 2*p[7] + p[8])/6;
   b = (p[0] + p[1] + p[2] - 2*(p[3] + p[4] + p[5]) + p[6] + p[7] + p[8])/6;
@@ -906,19 +906,19 @@ int getmin2(float *p, float *x0, float *y0)
   return 1;
 }
 /*------------------------------------------------------------------------- */
-int expandImage(int iq, float sx, float sy, int smt) /* expand function */
+Int expandImage(Int iq, Float sx, Float sy, Int smt) /* expand function */
 /* magnify (or even demagnify) an array */
 {
-  int	n, m, ns, ms, dim[2], j, i, inc, nc, result_sym, oldi, type, ns2;
-  float	zc1, zc2, z00, z01, z10, z11, xq;
-  float	stepx, stepy, yrun, xrun, xbase, q, p, fn;
+  Int	n, m, ns, ms, dim[2], j, i, inc, nc, result_sym, oldi, type, ns2;
+  Float	zc1, zc2, z00, z01, z10, z11, xq;
+  Float	stepx, stepy, yrun, xrun, xbase, q, p, fn;
   array	*h;
   pointer base, jbase, out, jout, nlast;
 				/* first argument must be a 2-D array */
   CK_ARR(iq, 1);
   type = sym[iq].type;
   h = (array *) sym[iq].spec.array.ptr;
-  base.l = (int *) ((char *)h + sizeof(array));
+  base.l = (Int *) ((char *)h + sizeof(array));
 					/* we want a 1 or 2-D array only */
   if ( h->ndim > 2 )
     return cerror(NEED_1D_2D_ARR, iq);
@@ -927,7 +927,7 @@ int expandImage(int iq, float sx, float sy, int smt) /* expand function */
     m = h->dims[1];
   else
     m = 1;
-  fn = (float) n;
+  fn = (Float) n;
 					/* get the magnification(s) */
 				/* make sure they're positive  LS 1jul94 */
   if (sx < 0)
@@ -946,7 +946,7 @@ int expandImage(int iq, float sx, float sy, int smt) /* expand function */
   dim[1] = ms;
   result_sym = array_scratch(type, h->ndim, dim);
   h = (array *) sym[result_sym].spec.array.ptr;
-  out.l = jout.l = (int *) ((char *)h + sizeof(array));
+  out.l = jout.l = (Int *) ((char *)h + sizeof(array));
 							/* setup the steps */
   stepx = 1.0 / sx;
   stepy = 1.0 /sy;
@@ -1095,10 +1095,10 @@ int expandImage(int iq, float sx, float sy, int smt) /* expand function */
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-int ana_expand(int narg, int ps[])
+Int ana_expand(Int narg, Int ps[])
 {
-  float	sx, sy;
-  int	smt;
+  Float	sx, sy;
+  Int	smt;
 
   sx = float_arg(ps[1]);
   if (narg > 2)
@@ -1124,11 +1124,11 @@ int ana_expand(int narg, int ps[])
 }
 /*------------------------------------------------------------------------- */
 /* some variables common to several routines */
-static int regridtypeflag, stretchmark_flag, regrid_type,
+static Int regridtypeflag, stretchmark_flag, regrid_type,
   nm1, mm1, nm2, mm2, n;
-static float	fnm1, fnm5, fmm1, fmm5, xl, yl;
+static Float	fnm1, fnm5, fmm1, fmm5, xl, yl;
 static pointer	base, out;
-int regrid_common(int, int []);
+Int regrid_common(Int, Int []);
 
 void bicubic_f(void)	/* internal routine for single pixel */
  {
@@ -1139,12 +1139,12 @@ void bicubic_f(void)	/* internal routine for single pixel */
       S.K. PARK & R.A. SCHOWENGERDT, COMP. VIS. & IM. PROC., VOL. 23,
       P. 258, 1983:  USES THEIR FORMULA WITH ALPHA = -0.5
 */
- int	i1, i2, i3, i4, j1, j2, j3, j4, iq;
- float	c1, c2, c3, c4, b1, b2, b3, b4, dx0, dx1, dx2, dx3, dx4, xq;
+ Int	i1, i2, i3, i4, j1, j2, j3, j4, iq;
+ Float	c1, c2, c3, c4, b1, b2, b3, b4, dx0, dx1, dx2, dx3, dx4, xq;
  pointer bb;
  /* the location is in xl, yl; base is the pointer to array; out is
  pointer to output; both are unions */
- i2 = (int) xl;		j2 = (int) yl;
+ i2 = (Int) xl;		j2 = (Int) yl;
  if ( i2 >= 1 && i2 < nm2 ) {		/* normal interior */
 	 dx0 = xl - i2; i1 = i2 - 1; i2 = 1; i3 = 2; i4 = 3;	 }
 	 else {				/* edge cases */
@@ -1215,7 +1215,7 @@ void bicubic_f(void)	/* internal routine for single pixel */
  xq += b3*(c1 * *(bb.b) + c2 * *(bb.b+i2)+ c3 * *(bb.b+i3) + c4 * *(bb.b+i4));
  bb.b += j4;
  xq += b4*(c1 * *(bb.b) + c2 * *(bb.b+i2)+ c3 * *(bb.b+i3) + c4 * *(bb.b+i4));
- /* byte arrays need to be range restricted, too many simple minds out there */
+ /* Byte arrays need to be range restricted, too many simple minds out there */
  xq = MAX( 0, MIN( 255, xq));
  /* also we need to round rather than truncate, taking that extra care */
  *out.b++ = rint(xq); break;
@@ -1270,14 +1270,14 @@ void bicubic_fc()	/* internal routine for single pixel */
   /* used by all (most?) routines that do bi-cubic interpolations, runs
      a little slower than the originals, perhaps because of the overhead
      in the call or other adjustments made */
-  int	i1, i2, i3, i4, j1, j2, j3, j4, iq;
-  float	c1, c2, c3, c4, b1, b2, b3, b4, dx0, dx1, dx2, dx3, dx4, xq;
+  Int	i1, i2, i3, i4, j1, j2, j3, j4, iq;
+  Float	c1, c2, c3, c4, b1, b2, b3, b4, dx0, dx1, dx2, dx3, dx4, xq;
   pointer bb;
 
   /* the location is in xl, yl; base is the pointer to array; out is
      pointer to output; both are unions */
-  i2 = (int) xl;
-  j2 = (int) yl;
+  i2 = (Int) xl;
+  j2 = (Int) yl;
   if (i2 >= 1 && i2 < nm2) {		/* normal interior */
     dx0 = xl - i2;		/* Bx */
     i1 = i2 - 1;
@@ -1399,7 +1399,7 @@ void bicubic_fc()	/* internal routine for single pixel */
       xq += b3*(c1*bb.b[0] + c2*bb.b[i2]+ c3*bb.b[i3] + c4*bb.b[i4]);
       bb.b += j4;
       xq += b4*(c1*bb.b[0] + c2*bb.b[i2]+ c3*bb.b[i3] + c4*bb.b[i4]);
-      /* byte arrays need to be range restricted, too many simple minds out there */
+      /* Byte arrays need to be range restricted, too many simple minds out there */
       xq = MAX( 0, MIN( 255, xq));
       /* also we need to round rather than truncate, taking that extra care */
       *out.b++ = rint(xq);
@@ -1454,44 +1454,44 @@ void bicubic_fc()	/* internal routine for single pixel */
   return;
 }
  /*------------------------------------------------------------------------- */
-int ana_regrid(narg,ps)				/* regrid function */
+Int ana_regrid(narg,ps)				/* regrid function */
  /* call is Y = REGRID( X, XG, YG, DX, DY) */
- int	narg, ps[];
+ Int	narg, ps[];
  {
  regridtypeflag = 0;	/* for a nearest neighbor regrid */
  return regrid_common(narg,ps);
  }
  /*------------------------------------------------------------------------- */
-int ana_regrid3(narg,ps)			/* regrid3 function */
+Int ana_regrid3(narg,ps)			/* regrid3 function */
  /* call is Y = REGRID3( X, XG, YG, DX, DY) */
  /* similar to regrid but uses bicubic interpolation rather than nearest
   neighbor for pixel value, still uses bilinear for grid, also uses stretch
   marks for boundaries */
- int	narg, ps[];
+ Int	narg, ps[];
  {
  regridtypeflag = 1;	/* for a bicubic with stretchmarks regrid */
  stretchmark_flag = 1;
  return regrid_common(narg,ps);
  }
  /*------------------------------------------------------------------------- */
-int ana_regrid3ns(narg,ps)			/* regrid3ns function */
+Int ana_regrid3ns(narg,ps)			/* regrid3ns function */
  /* call is Y = REGRID3( X, XG, YG, DX, DY) */
  /* similar to regrid but uses bicubic interpolation rather than nearest
   neighbor for pixel value, still uses bilinear for grid, without stretch
   marks for boundaries (hence the ns)*/
- int	narg, ps[];
+ Int	narg, ps[];
  {
  regridtypeflag = 1;	/* for a bicubic with stretchmarks regrid */
  stretchmark_flag = 0;
  return regrid_common(narg,ps);
  }
  /*------------------------------------------------------------------------- */
-int regrid_common(int narg, int ps[])/* with branches for type */
+Int regrid_common(Int narg, Int ps[])/* with branches for type */
 {
-  int	iq, nx, ny, m, ng, mg, ns, ms, ngrun, dim[2];
-  int	iprun, jrun, jprun, ig, ic, jc, result_sym;
-  int	i, j, ind;
-  float	fn, fm, yrun, ax, bx, cx, dx, ay, by, cy, dy, xq, beta, xinc, yinc,
+  Int	iq, nx, ny, m, ng, mg, ns, ms, ngrun, dim[2];
+  Int	iprun, jrun, jprun, ig, ic, jc, result_sym;
+  Int	i, j, ind;
+  Float	fn, fm, yrun, ax, bx, cx, dx, ay, by, cy, dy, xq, beta, xinc, yinc,
     xl0, yl0;
   pointer xgbase, ygbase, jpbase, jbase, ipbase;
 				 /* first argument must be a 2-D array */
@@ -1507,8 +1507,8 @@ int regrid_common(int narg, int ps[])/* with branches for type */
   m = array_dims(iq)[1];	/* data dimension in y coordinate */
   if (n < 2 || m < 2)
     return cerror(NEED_NTRV_2D_ARR, iq);
-  fn = (float) n;		/* float versions of data dimensions */
-  fm = (float) m;
+  fn = (Float) n;		/* Float versions of data dimensions */
+  fm = (Float) m;
 				 /* check xg and yg, must be the same size */
   if (!symbolIsNumericalArray(ps[1]))
     return cerror(NEED_NUM_ARR, ps[1]);
@@ -1550,7 +1550,7 @@ int regrid_common(int narg, int ps[])/* with branches for type */
   }
   result_sym = array_scratch(regrid_type, 2, dim);
   jpbase.l = array_data(result_sym); /* output */
-  yrun = 1.0/ (float) ms;
+  yrun = 1.0/ (Float) ms;
   i = ana_type_size[regrid_type];
   /* various increments, in bytes! */
   iprun = ns * i;		/* one grid cell row (in the output) */
@@ -1585,7 +1585,7 @@ int regrid_common(int narg, int ps[])/* with branches for type */
 				/* - gx[ix,iy+1] + gx[ix,iy] */
 	  dy = dy - by - cy;
 	  j++;			/* to next grid cell */
-	  xq = 1.0/(float) ns;	/* 1/x scale */
+	  xq = 1.0/(Float) ns;	/* 1/x scale */
 	  bx *= xq;		/* (gx[ix+1,iy]-gx[ix,iy])/scale_x */
 	  by *= xq;
 	  dx *= xq*yrun;
@@ -1613,7 +1613,7 @@ int regrid_common(int narg, int ps[])/* with branches for type */
 		  if (xl < 0 || xl >= fn || yl < 0 || yl >= fm)
 		    *out.b++ = 0;
 		  else
-		    *out.b++ = *(base.b + (int) xl + n * (int) yl);
+		    *out.b++ = *(base.b + (Int) xl + n * (Int) yl);
 		  xl += xinc;
 		  yl += yinc;
 		}
@@ -1623,7 +1623,7 @@ int regrid_common(int narg, int ps[])/* with branches for type */
 		  if (xl < 0 || xl >= fn || yl < 0 || yl >= fm)
 		    *out.w++ = 0;
 		  else
-		    *out.w++ = *(base.w + (int) xl + n * (int) yl);
+		    *out.w++ = *(base.w + (Int) xl + n * (Int) yl);
 		  xl += xinc;
 		  yl += yinc;
 		}
@@ -1633,7 +1633,7 @@ int regrid_common(int narg, int ps[])/* with branches for type */
 		  if (xl < 0 || xl >= fn || yl < 0 || yl >= fm)
 		    *out.l++ = 0;
 		  else
-		    *out.l++ = *(base.l + (int) xl + n * (int) yl);
+		    *out.l++ = *(base.l + (Int) xl + n * (Int) yl);
 		  xl += xinc;
 		  yl += yinc;
 		}
@@ -1643,7 +1643,7 @@ int regrid_common(int narg, int ps[])/* with branches for type */
 		  if (xl < 0 || xl >= fn || yl < 0 || yl >= fm)
 		    *out.f++ = 0;
 		  else
-		    *out.f++ = *(base.f + (int) xl + n * (int) yl);
+		    *out.f++ = *(base.f + (Int) xl + n * (Int) yl);
 		  xl += xinc;
 		  yl += yinc;
 		}
@@ -1653,7 +1653,7 @@ int regrid_common(int narg, int ps[])/* with branches for type */
 		  if (xl < 0 || xl >= fn || yl < 0 || yl >= fm)
 		    *out.d++ = 0;
 		  else
-		    *out.d++ = *(base.d + (int) xl + n * (int) yl);
+		    *out.d++ = *(base.d + (Int) xl + n * (Int) yl);
 		  xl += xinc;
 		  yl += yinc;
 		}
@@ -1702,7 +1702,7 @@ int regrid_common(int narg, int ps[])/* with branches for type */
 	  dx = dx - bx - cx;
 	  dy = dy - by - cy;
 	  j++;
-	  xq = 1.0/(float) ns;
+	  xq = 1.0/(Float) ns;
 	  bx *= xq;
 	  by *= xq;
 	  dx *= xq*yrun;
@@ -1758,20 +1758,20 @@ int regrid_common(int narg, int ps[])/* with branches for type */
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-int ana_compress(int narg, int ps[])
+Int ana_compress(Int narg, Int ps[])
 /* COMPRESS(data [, axes], factors) compresses the data array by the */
 /* integer <factors> in the indicated <axes>.  If no <axes> are */
 /* specified and <factors> contains a single value, then that value */
 /* is applied to all dimensions.  LS 30apr98 */
 /* Fixed overflow problem.  LS 19nov99 */
 {
-  int	iq, nFac, *factors, outDims[MAX_DIMS], i,
+  Int	iq, nFac, *factors, outDims[MAX_DIMS], i,
     n, offset, div[MAX_DIMS], range[2*MAX_DIMS], nel;
   pointer	src, trgt;
   char	allAxes;
   scalar	sum;
   loopInfo	srcinfo, trgtinfo, tmpinfo;
-  int	ana_indgen(int, int []);
+  Int	ana_indgen(Int, Int []);
 
   if (symbol_class(ps[0]) != ANA_ARRAY)
     return cerror(NEED_ARR, ps[0]); /* data not an array */
@@ -1789,7 +1789,7 @@ int ana_compress(int narg, int ps[])
     case ANA_ARRAY:
       iq = ana_long(1, &iq);	/* ensure LONG */
       nFac = array_size(iq);	/* number of factors */
-      factors = (int *) array_data(iq);	/* pointer to factors */
+      factors = (Int *) array_data(iq);	/* pointer to factors */
       break;
     default:
       return cerror(ILL_CLASS, narg > 2? ps[2]: ps[1]);	/* illegal */
@@ -1848,7 +1848,7 @@ int ana_compress(int narg, int ps[])
   subdataLoop(range, &srcinfo);	/* restrict treated part */
 
   /* create the output symbol */
-  memcpy(outDims, srcinfo.dims, srcinfo.ndim*sizeof(int));
+  memcpy(outDims, srcinfo.dims, srcinfo.ndim*sizeof(Int));
   if (allAxes)
     for (i = 0; i < srcinfo.ndim; i++) {
       outDims[i] = outDims[i]/factors[0];
@@ -1875,7 +1875,7 @@ int ana_compress(int narg, int ps[])
   /* set up for walk through subarea that gets compressed into a single */
   /* element */
   tmpinfo = srcinfo;
-  zerobytes(range, srcinfo.ndim*2*sizeof(int));
+  zerobytes(range, srcinfo.ndim*2*sizeof(Int));
   for (i = 0; i < srcinfo.ndim; i++)
     range[2*i + 1] = div[i] - 1;
   subdataLoop(range, &tmpinfo);
@@ -1886,10 +1886,10 @@ int ana_compress(int narg, int ps[])
       do {
 	sum.l = 0;
 	do
-	  sum.l += (int) src.b[offset];
+	  sum.l += (Int) src.b[offset];
 	while (advanceLoop(&tmpinfo, &src) < tmpinfo.rndim);
 	*trgt.b = sum.l/nel;
-	src.b = (byte *) tmpinfo.data0;
+	src.b = (Byte *) tmpinfo.data0;
 	n = advanceLoop(&trgtinfo, &trgt);
 	offset = 0;
 	for (i = 0; i < trgtinfo.ndim; i++)
@@ -1900,10 +1900,10 @@ int ana_compress(int narg, int ps[])
       do {
 	sum.l = 0;
 	do
-	  sum.l += (int) src.w[offset];
+	  sum.l += (Int) src.w[offset];
 	while (advanceLoop(&tmpinfo, &src) < tmpinfo.rndim);
 	*trgt.w = sum.l/nel;
-	src.w = (word *) tmpinfo.data0;
+	src.w = (Word *) tmpinfo.data0;
 	n = advanceLoop(&trgtinfo, &trgt);
 	offset = 0;
 	for (i = 0; i < trgtinfo.ndim; i++)
@@ -1917,7 +1917,7 @@ int ana_compress(int narg, int ps[])
 	  sum.l += src.l[offset];
 	while (advanceLoop(&tmpinfo, &src) < tmpinfo.rndim);
 	*trgt.l = sum.l/nel;
-	src.l = (int *) tmpinfo.data0;
+	src.l = (Int *) tmpinfo.data0;
 	n = advanceLoop(&trgtinfo, &trgt);
 	offset = 0;
 	for (i = 0; i < trgtinfo.ndim; i++)
@@ -1928,10 +1928,10 @@ int ana_compress(int narg, int ps[])
       do {
 	sum.d = 0;
 	do
-	  sum.d += (double) src.f[offset];
+	  sum.d += (Double) src.f[offset];
 	while (advanceLoop(&tmpinfo, &src) < tmpinfo.rndim);
 	*trgt.f = sum.d/nel;
-	src.f = (float *) tmpinfo.data0;
+	src.f = (Float *) tmpinfo.data0;
 	n = advanceLoop(&trgtinfo, &trgt);
 	offset = 0;
 	for (i = 0; i < trgtinfo.ndim; i++)
@@ -1945,7 +1945,7 @@ int ana_compress(int narg, int ps[])
 	  sum.d += src.d[offset];
 	while (advanceLoop(&tmpinfo, &src) < tmpinfo.rndim);
 	*trgt.d = sum.d/nel;
-	src.d = (double *) tmpinfo.data0;
+	src.d = (Double *) tmpinfo.data0;
 	n = advanceLoop(&trgtinfo, &trgt);
 	offset = 0;
 	for (i = 0; i < trgtinfo.ndim; i++)
@@ -1956,13 +1956,13 @@ int ana_compress(int narg, int ps[])
   return iq;
 }
 /*------------------------------------------------------------------------- */
-int ana_oldcompress(int narg, int ps[]) /* compress function */
+Int ana_oldcompress(Int narg, Int ps[]) /* compress function */
 /* compresses image data by an integer factor */
 /*  xc = compress(x, cx, [cy])  */
 {
-  int	n, iq, i, j, cx, cy, nx, ny, type, result_sym, dim[2], nd, nxx;
-  float	xq, fac;
-  double	dq, dfac;
+  Int	n, iq, i, j, cx, cy, nx, ny, type, result_sym, dim[2], nd, nxx;
+  Float	xq, fac;
+  Double	dq, dfac;
   array	*h;
   pointer q1, q2, p, base;
 
@@ -1970,7 +1970,7 @@ int ana_oldcompress(int narg, int ps[]) /* compress function */
   CK_ARR(iq, 1);
   type = sym[iq].type;
   h = (array *) sym[iq].spec.array.ptr;
-  q1.l = (int *) ((char *)h + sizeof(array));
+  q1.l = (Int *) ((char *)h + sizeof(array));
   nd = h->ndim;
   /* we want a 1 or 2-D array only */
   if ( nd > 2 ) return cerror(NEED_1D_2D_ARR, iq);
@@ -1984,8 +1984,8 @@ int ana_oldcompress(int narg, int ps[]) /* compress function */
   dim[0] = nx;	dim[1] = ny;	nxx = h->dims[0];
   result_sym = array_scratch(type, nd, dim);
   h = (array *) sym[result_sym].spec.array.ptr;
-  q2.l = (int *) ((char *)h + sizeof(array));
-  fac = 1.0 / ( (float) cx * (float) cy );
+  q2.l = (Int *) ((char *)h + sizeof(array));
+  fac = 1.0 / ( (Float) cx * (Float) cy );
   n = nxx - cx;					/* step bewteen lines */
   switch (type)
   { case ANA_BYTE:
@@ -1996,7 +1996,7 @@ int ana_oldcompress(int narg, int ps[]) /* compress function */
 	  for (j = 0; j < cy; j++)
 	  { for (i = 0; i < cx; i++) xq += *p.b++;
 	    p.b += n; }
-	  *q2.b++ = (byte) ( xq * fac );
+	  *q2.b++ = (Byte) ( xq * fac );
 	  base.b += cx; }
 	q1.b +=  nxx * cy; }
       break;
@@ -2018,7 +2018,7 @@ int ana_oldcompress(int narg, int ps[]) /* compress function */
 	{ p.l = base.l; xq = 0.0;  
 	  for (j=0;j<cy;j++)
 	  { for (i=0;i<cx;i++) xq += *p.l++; p.l += n; }
-	  *q2.l++ = (int) ( xq * fac );
+	  *q2.l++ = (Int) ( xq * fac );
 	  base.l += cx; }
 	q1.l +=  nxx * cy; }
       break;
@@ -2034,14 +2034,14 @@ int ana_oldcompress(int narg, int ps[]) /* compress function */
 	q1.f +=  nxx * cy; }
       break;
     case ANA_DOUBLE:
-      dfac = 1.0 / ( (double) cx * (double) cy );
+      dfac = 1.0 / ( (Double) cx * (Double) cy );
       while (ny--)
       {	base.d = q1.d;  iq = nx;
 	while (iq--)
 	{ p.d = base.d; dq = 0.0;
 	  for (j=0;j<cy;j++)
 	  { for (i=0;i<cx;i++) dq += *p.d++; p.d += n; }
-	  *q2.d++ = (double) ( dq * dfac );
+	  *q2.d++ = (Double) ( dq * dfac );
 	  base.d += cx; }
 	q1.d +=  nxx * cy; }
       break;
@@ -2049,23 +2049,23 @@ int ana_oldcompress(int narg, int ps[]) /* compress function */
   return result_sym;
 }
  /*------------------------------------------------------------------------- */
-int ana_sort(int narg, int ps[])
+Int ana_sort(Int narg, Int ps[])
 /*sort contents of a copy of an array */
 {
-  int	iq, type, result_sym, n, nloop, step;
+  Int	iq, type, result_sym, n, nloop, step;
   pointer	p;
   char	sortType;
 
-  /* SGI cc does not accept combination of (int, byte *) and (int, word *) */
+  /* SGI cc does not accept combination of (Int, Byte *) and (Int, Word *) */
   /* functions in one array of function pointers, not even if the function */
-  /* pointer array is defined as (int, void *). */
+  /* pointer array is defined as (Int, void *). */
   void	sort_b(), sort_w(), sort_l(), sort_f(), sort_d(), sort_s(),
   	shell_b(), shell_w(), shell_l(), shell_f(), shell_d(), shell_s();
-  static void (*sortFunc[])(int, void *) = {
+  static void (*sortFunc[])(Int, void *) = {
     sort_b, sort_w, sort_l, sort_f, sort_d, sort_s, 
     shell_b, shell_w, shell_l, shell_f, shell_d, shell_s
   };
-  int	ana_replace(int, int);
+  Int	ana_replace(Int, Int);
 
   iq = ps[0];
   if (!symbolIsArray(iq))
@@ -2114,21 +2114,21 @@ int ana_sort(int narg, int ps[])
   return result_sym;
 }
  /*------------------------------------------------------------------------- */
-int ana_index(int narg, int ps[])
+Int ana_index(Int narg, Int ps[])
  /* construct a sorted index table for an array */
  /* the index is returned as a long array of the same size */
  /* uses heap sort only */
 {
-  int	iq, type, result_sym, n, nloop, step1, step2, nloop2;
+  Int	iq, type, result_sym, n, nloop, step1, step2, nloop2;
   pointer	p, q;
-  /* SGI cc does not accept combination of (int, byte *) and (int, word *) */
+  /* SGI cc does not accept combination of (Int, Byte *) and (Int, Word *) */
   /* functions in one array of function pointers, not even if the function */
-  /* pointer array is defined as (int, void *). */
+  /* pointer array is defined as (Int, void *). */
   void	indexx_b(), indexx_w(), indexx_l(), indexx_f(), indexx_d(), indexx_s();
-  static void	(*indexFunc[])(int, void *, int []) = {
+  static void	(*indexFunc[])(Int, void *, Int []) = {
     indexx_b, indexx_w, indexx_l, indexx_f, indexx_d, indexx_s
   };
-  void invertPermutation(int *, int);
+  void invertPermutation(Int *, Int);
 
   iq = ps[0];
   if (symbol_class(iq) != ANA_ARRAY)
@@ -2136,12 +2136,12 @@ int ana_index(int narg, int ps[])
   type = symbol_type(iq);
   if (type >= ANA_CFLOAT)
     return cerror(ILL_TYPE, iq, typeName(type));
-  q.l = (int *) array_data(iq);
+  q.l = (Int *) array_data(iq);
   n = array_size(iq);
   if (n <= 1)			/* nothing to sort */
     return ANA_ZERO;
   result_sym = array_clone(iq, ANA_LONG);
-  p.l = (int *) array_data(result_sym);
+  p.l = (Int *) array_data(result_sym);
   if (internalMode & 1) {	/* along 0th dimension */
     nloop = n/array_dims(iq)[0];
     n = array_dims(iq)[0];
@@ -2149,13 +2149,13 @@ int ana_index(int narg, int ps[])
     nloop = 1;
   nloop2 = nloop;
   step1 = n*ana_type_size[type];
-  step2 = n*sizeof(int);
+  step2 = n*sizeof(Int);
   if (isStringType(type))
     type = ANA_TEMP_STRING;
   for ( ; nloop--; q.b += step1, p.b += step2)
     indexFunc[type](n, q.b, p.l);
   if (internalMode & 2) {	/* reverse index to get list of ranks */
-    p.l = (int *) array_data(result_sym); /* back to start of data */
+    p.l = (Int *) array_data(result_sym); /* back to start of data */
     /* we reverse the list by moving each number x to the position */
     /* indicated at p.l[x], and moving the old value at that */
     /* position in the same fashion until we've completed a cycle */
@@ -2171,20 +2171,20 @@ int ana_index(int narg, int ps[])
 }
  /*------------------------------------------------------------------------- */
 static char	*zoomtemp = "$ZOOM_TEMP";
-int zoomer2(byte *ain, int n, int m, int *symout, int *nx2, int *ny2,
-	    int sym_flag)
+Int zoomer2(Byte *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
+	    Int sym_flag)
 /* internal zoom2 */
-/* zoom a byte array by 2 */
+/* zoom a Byte array by 2 */
 /* requires the original address, some size info */
 /* creates a symbol $zoom_temp to allow re-use of memory for some calls */
 /* RAS */
 {
- int	ns, ms, dim[2], j, i, ns4, result_sym, leftover;
- byte	*pin, *pout, *poutbase, tmp;
- int	*p1, *p2, k;
+ Int	ns, ms, dim[2], j, i, ns4, result_sym, leftover;
+ Byte	*pin, *pout, *poutbase, tmp;
+ Int	*p1, *p2, k;
 #ifdef __alpha
  long	*p8;
- int	alpha_flag = 0;
+ Int	alpha_flag = 0;
 #endif
 
  pin = ain;
@@ -2224,7 +2224,7 @@ int zoomer2(byte *ain, int n, int m, int *symout, int *nx2, int *ny2,
  if (alpha_flag) {		/* this is a faster method if we have every
 				   row aligned I*4 */
    p8 = (long *) poutbase;
-   p1 = (int *) pin;
+   p1 = (Int *) pin;
    for (j = 0; j < m; j++) {
      for (i = 0; i < n/4; i++) {
        register unsigned long pix = (long) *p1++;
@@ -2280,7 +2280,7 @@ int zoomer2(byte *ain, int n, int m, int *symout, int *nx2, int *ny2,
  /*t2 = systime();*/
  /* now dupe the lines, this is why we wanted ns%4 = 0 */
  ns4 = ns/4;
- p1 = (int *) poutbase;
+ p1 = (Int *) poutbase;
  p2 = p1 + ns4;
  for (j = 0; j < m; j++) {
    for (i = 0; i < ns4; i++) {
@@ -2292,16 +2292,16 @@ int zoomer2(byte *ain, int n, int m, int *symout, int *nx2, int *ny2,
  return 1;
 }
 /*------------------------------------------------------------------------- */
-int zoomer3(byte *ain, int n, int m, int *symout, int *nx2, int *ny2,
-	    int sym_flag) /* internal zoom3 */
- /* zoom a byte array by 3 */
+Int zoomer3(Byte *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
+	    Int sym_flag) /* internal zoom3 */
+ /* zoom a Byte array by 3 */
  /* requires the original address, some size info */
  /* creates a symbol $zoom_temp to allow re-use of memory for some calls */
 /* RAS */
 {
-  int	ns, ms, dim[2], j, i, ns4, result_sym, leftover;
-  byte	*pin, *pout, *poutbase, tmp;
-  int	*p1, *p2, *p3, nst2, tmpint, k, nsd2;
+  Int	ns, ms, dim[2], j, i, ns4, result_sym, leftover;
+  Byte	*pin, *pout, *poutbase, tmp;
+  Int	*p1, *p2, *p3, nst2, tmpint, k, nsd2;
 
   pin = ain;
 				/* compute new ns and ms */
@@ -2350,7 +2350,7 @@ int zoomer3(byte *ain, int n, int m, int *symout, int *nx2, int *ny2,
   /* now dupe the lines, this is why we needed ns%4 = 0 */
   ns4 = ns/4;
   nsd2 = ns/2;
-  p1 = (int *) poutbase;
+  p1 = (Int *) poutbase;
   p2 = p1 + ns4;
   p3 = p2 + ns4;
   for (j = 0; j < m; j++) {
@@ -2366,16 +2366,16 @@ int zoomer3(byte *ain, int n, int m, int *symout, int *nx2, int *ny2,
   return 1;
 }
 /*------------------------------------------------------------------------- */
-int zoomer4(byte *ain, int n, int m, int *symout, int *nx2, int *ny2,
-	    int sym_flag) /* internal zoom4 */
-/* zoom a byte array by 4 */
+Int zoomer4(Byte *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
+	    Int sym_flag) /* internal zoom4 */
+/* zoom a Byte array by 4 */
 /* requires the original address, some size info */
 /* creates a symbol $zoom_temp to allow re-use of memory for some calls */
 /* RAS */
 {
-  int	ns, ms, dim[2], j, i, ns4, result_sym;
-  byte	*pin, *pout, *poutbase, tmp;
-  int	*p1, *p2, *p3, *p4, nst3, tmpint, nsd2;
+  Int	ns, ms, dim[2], j, i, ns4, result_sym;
+  Byte	*pin, *pout, *poutbase, tmp;
+  Int	*p1, *p2, *p3, *p4, nst3, tmpint, nsd2;
 
   pin = ain;
 				/* compute new ns and ms */
@@ -2417,7 +2417,7 @@ int zoomer4(byte *ain, int n, int m, int *symout, int *nx2, int *ny2,
   /* now dupe the lines, this is why we needed ns%4 = 0 */
   ns4 = ns/4;
   nsd2 = 3*ns4;
-  p1 = (int *) poutbase;
+  p1 = (Int *) poutbase;
   p2 = p1 + ns4;
   p3 = p2 + ns4;
   p4 = p3 + ns4;
@@ -2436,17 +2436,17 @@ int zoomer4(byte *ain, int n, int m, int *symout, int *nx2, int *ny2,
  return 1;
 }
 /*------------------------------------------------------------------------- */
-int zoomer8(byte *ain, int n, int m, int *symout, int *nx2, int *ny2,
-	    int sym_flag) /* internal zoom8 */
-/* zoom a byte array by 8 */
+Int zoomer8(Byte *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
+	    Int sym_flag) /* internal zoom8 */
+/* zoom a Byte array by 8 */
 /* requires the original address, some size info */
 /* creates a symbol $zoom_temp to allow re-use of memory for some calls */
 /* RAS */
 {
-  int	ns, ms, dim[2], j, i, result_sym;
-  byte	*pin, *poutbase;
-  union	{ byte	bb[4];   int  ii; } tmp;
-  int	*p1, *p2, delta;
+  Int	ns, ms, dim[2], j, i, result_sym;
+  Byte	*pin, *poutbase;
+  union	{ Byte	bb[4];   Int  ii; } tmp;
+  Int	*p1, *p2, delta;
 
   pin = ain;
 				/* compute new ns and ms */
@@ -2469,7 +2469,7 @@ int zoomer8(byte *ain, int n, int m, int *symout, int *nx2, int *ny2,
   }
   *symout = result_sym;
   poutbase = array_data(result_sym);
-  p1 = (int *) poutbase;
+  p1 = (Int *) poutbase;
   delta = 2*(n - 1);
   
   /*t1 = systime();*/
@@ -2505,17 +2505,17 @@ int zoomer8(byte *ain, int n, int m, int *symout, int *nx2, int *ny2,
   return 1;
 }
 /*------------------------------------------------------------------------- */
-int zoomer16(byte *ain, int n, int m, int *symout, int *nx2, int *ny2,
-	     int sym_flag) /* internal zoom16 */
-/* zoom a byte array by 16 */
+Int zoomer16(Byte *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
+	     Int sym_flag) /* internal zoom16 */
+/* zoom a Byte array by 16 */
 /* requires the original address, some size info */
 /* creates a symbol $zoom_temp to allow re-use of memory for some calls */
 /* RAS */
 {
-  int	ns, ms, dim[2], j, i, result_sym;
-  byte	*pin, *poutbase;
-  union	{ byte	bb[4];   int  ii; } tmp;
-  int	*p1, *p2, delta;
+  Int	ns, ms, dim[2], j, i, result_sym;
+  Byte	*pin, *poutbase;
+  union	{ Byte	bb[4];   Int  ii; } tmp;
+  Int	*p1, *p2, delta;
 
   pin = ain;
 				/* compute new ns and ms */
@@ -2538,7 +2538,7 @@ int zoomer16(byte *ain, int n, int m, int *symout, int *nx2, int *ny2,
   }
   *symout = result_sym;
   poutbase = array_data(result_sym);
-  p1 = (int *) poutbase;
+  p1 = (Int *) poutbase;
   delta = 4*(n - 1);
 
   /*t1 = systime();*/
@@ -2630,16 +2630,16 @@ int zoomer16(byte *ain, int n, int m, int *symout, int *nx2, int *ny2,
   return 1;
 }
 /*------------------------------------------------------------------------- */
-int compress2(byte *ain, int n, int m, int *symout, int *nx2, int *ny2,
-	      int sym_flag) /* internal compress2 */
-/* compress a byte array by 2 */
+Int compress2(Byte *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
+	      Int sym_flag) /* internal compress2 */
+/* compress a Byte array by 2 */
 /* requires the original address, some size info */
 /* creates a symbol $zoom_temp to allow re-use of memory for some calls */
 /* RAS */
 {
-  int	ns, ms, dim[2], result_sym;
-  byte	*pin, *pout, *poutbase, *p1, *p2;
-  int	nx, ny, xq, nskip;
+  Int	ns, ms, dim[2], result_sym;
+  Byte	*pin, *pout, *poutbase, *p1, *p2;
+  Int	nx, ny, xq, nskip;
 
   pin = ain;
 					/* compute new ns and ms */
@@ -2675,7 +2675,7 @@ int compress2(byte *ain, int n, int m, int *symout, int *nx2, int *ny2,
       xq += *p2++;
       xq += *p1++;
       xq += *p2++;
-      *pout++ = (byte) (xq/4);
+      *pout++ = (Byte) (xq/4);
     }
     p1 += nskip;
     p2 += nskip;
@@ -2683,16 +2683,16 @@ int compress2(byte *ain, int n, int m, int *symout, int *nx2, int *ny2,
   return 1;
 }
 /*------------------------------------------------------------------------- */
-int compress4(byte *ain, int n, int m, int *symout, int *nx2, int *ny2,
-	      int sym_flag) /* internal compress4 */
-/* compress a byte array by 4 */
+Int compress4(Byte *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
+	      Int sym_flag) /* internal compress4 */
+/* compress a Byte array by 4 */
 /* requires the original address, some size info */
 /* creates a symbol $zoom_temp to allow re-use of memory for some calls */
 /* RAS */
 {
- int	ns, ms, dim[2], result_sym;
- byte	*pin, *pout, *poutbase, *p1, *p2, *p3, *p4;
- int	nx, ny, xq, nskip;
+ Int	ns, ms, dim[2], result_sym;
+ Byte	*pin, *pout, *poutbase, *p1, *p2, *p3, *p4;
+ Int	nx, ny, xq, nskip;
 
  pin = ain;
 					/* compute new ns and ms */
@@ -2742,7 +2742,7 @@ int compress4(byte *ain, int n, int m, int *symout, int *nx2, int *ny2,
      xq += *p2++;
      xq += *p3++;
      xq += *p4++;
-     *pout++ = (byte) (xq/16);
+     *pout++ = (Byte) (xq/16);
    }
    p1 += nskip;
    p2 += nskip;
@@ -2752,15 +2752,15 @@ int compress4(byte *ain, int n, int m, int *symout, int *nx2, int *ny2,
  return 1;
 }
 /*------------------------------------------------------------------------- */
-void shift_bicubic(float dx, int nx, int ny, int inc, int dline,
-		   pointer base, pointer out, int type)
+void shift_bicubic(Float dx, Int nx, Int ny, Int inc, Int dline,
+		   pointer base, pointer out, Int type)
  /* internal routine for shift in one direction */
 {
-  int	i1, i2, i3, i4, k;
-  float	c1, c2, c3, c4, dx0, dx1, dx2, dx3, dx4;
-  double	cd1, cd2, cd3, cd4, ddx0, ddx1, ddx2, ddx3, ddx4;
-  int	nzone2, nzone3, nzone4, nz2;
-  int	nz3, nz4, rflag;
+  Int	i1, i2, i3, i4, k;
+  Float	c1, c2, c3, c4, dx0, dx1, dx2, dx3, dx4;
+  Double	cd1, cd2, cd3, cd4, ddx0, ddx1, ddx2, ddx3, ddx4;
+  Int	nzone2, nzone3, nzone4, nz2;
+  Int	nz3, nz4, rflag;
   
   nm1 = nx -1; rflag = 0;
   /* get the fraction shift and the integer shift */
@@ -2771,7 +2771,7 @@ void shift_bicubic(float dx, int nx, int ny, int inc, int dline,
     inc = - inc;
     dx = -dx;
   }
-  i2 = (int) dx;
+  i2 = (Int) dx;
   dx0 = dx - i2;
   
   /* 3 zones, zone 1 gone with reversal technique */
@@ -2810,7 +2810,7 @@ void shift_bicubic(float dx, int nx, int ny, int inc, int dline,
     
   } else {
     /* the F*8 case, use alternate coefficients */
-    ddx0 = (double) dx0;
+    ddx0 = (Double) dx0;
     ddx1 = 1.0 - ddx0;
     switch (resample_type) {
       case BI_CUBIC_SMOOTH:
@@ -2833,21 +2833,21 @@ void shift_bicubic(float dx, int nx, int ny, int inc, int dline,
   switch (type) {
     case ANA_BYTE:	/* I*1 image */
     {
-      float	z4, z1, z2, z3, yq;
-      byte	*p, *q;
+      Float	z4, z1, z2, z3, yq;
+      Byte	*p, *q;
       for (k=0;k<ny;k++) {
 	p = base.b + k*dline + rflag;
 	q = out.b + k*dline + rflag;
-	z1 = (float) *(p + i1);	z2 = (float) *(p + i2);
-	z3 = (float) *(p + i3);	z4 = (float) *(p + i4);
+	z1 = (Float) *(p + i1);	z2 = (Float) *(p + i2);
+	z3 = (Float) *(p + i3);	z4 = (Float) *(p + i4);
 	p = p + i4;
 	nz2 = nzone2;  nz3 = nzone3;  nz4 = nzone4;
 	
 	if (nz2) {
 	  yq = c1*z1 +c2*z2 + c3*z3 + c4*z4;
-	  /* byte arrays need to be range restricted */
+	  /* Byte arrays need to be range restricted */
 	  yq = MAX( 0, MIN( 255.0, yq));
-	  *q = (byte) yq;
+	  *q = (Byte) yq;
 	  q = q + inc;
 	  nz2--;
 	  while (nz2--) {
@@ -2856,7 +2856,7 @@ void shift_bicubic(float dx, int nx, int ny, int inc, int dline,
 	    z4 = *p;
 	    yq = c1*z1 +c2*z2 + c3*z3 + c4*z4;
 	    yq = MAX( 0, MIN( 255.0, yq));
-	    *q = (byte) yq;
+	    *q = (Byte) yq;
 	    q = q + inc;
 	  }
 	}
@@ -2864,23 +2864,23 @@ void shift_bicubic(float dx, int nx, int ny, int inc, int dline,
 	  z1 = z2;  z2 = z3;  z3 = z4;
 	  yq = c1*z1 +c2*z2 + c3*z3 + c4*z4;
 	  yq = MAX( 0, MIN( 255.0, yq));
-	  *q = (byte) yq;
+	  *q = (Byte) yq;
 	  q = q + inc;
 	}
 	z4 = MAX( 0, MIN( 255.0, z4));
-	while (nz4--) { *q = (byte) z4;  q = q + inc; }
+	while (nz4--) { *q = (Byte) z4;  q = q + inc; }
       }
     }
      break;
     case ANA_WORD:
     {
-      float	z4, z1, z2, z3, yq;
+      Float	z4, z1, z2, z3, yq;
       short	*p, *q;
       for (k=0;k<ny;k++) {
 	p = base.w + k*dline + rflag;
 	q = out.w  + k*dline + rflag;
-	z1 = (float) *(p + i1);	z2 = (float) *(p + i2);
-	z3 = (float) *(p + i3);	z4 = (float) *(p + i4);
+	z1 = (Float) *(p + i1);	z2 = (Float) *(p + i2);
+	z3 = (Float) *(p + i3);	z4 = (Float) *(p + i4);
 	p = p + i4;
 	nz2 = nzone2;  nz3 = nzone3;  nz4 = nzone4;
 	
@@ -2910,19 +2910,19 @@ void shift_bicubic(float dx, int nx, int ny, int inc, int dline,
      break;
     case ANA_LONG:
     {
-      float	z4, z1, z2, z3, yq;
-      int	*p, *q;
+      Float	z4, z1, z2, z3, yq;
+      Int	*p, *q;
       for (k=0;k<ny;k++) {
 	p = base.l + k*dline + rflag;
 	q = out.l  + k*dline + rflag;
-	z1 = (float) *(p + i1);	z2 = (float) *(p + i2);
-	z3 = (float) *(p + i3);	z4 = (float) *(p + i4);
+	z1 = (Float) *(p + i1);	z2 = (Float) *(p + i2);
+	z3 = (Float) *(p + i3);	z4 = (Float) *(p + i4);
 	p = p + i4;
 	nz2 = nzone2;  nz3 = nzone3;  nz4 = nzone4;
 	
 	if (nz2) {
 	  yq = c1*z1 +c2*z2 + c3*z3 + c4*z4;
-	  *q = (int) yq;
+	  *q = (Int) yq;
 	  q = q + inc;
 	  nz2--;
 	  while (nz2--) {
@@ -2930,24 +2930,24 @@ void shift_bicubic(float dx, int nx, int ny, int inc, int dline,
 	    z1 = z2;  z2 = z3;  z3 = z4;
 	    z4 = *p;
 	    yq = c1*z1 +c2*z2 + c3*z3 + c4*z4;
-	    *q = (int) yq;
+	    *q = (Int) yq;
 	    q = q + inc;
 	  }
 	}
 	if (nz3) {
 	  z1 = z2;  z2 = z3;  z3 = z4;
 	  yq = c1*z1 +c2*z2 + c3*z3 + c4*z4;
-	  *q = (int) yq;
+	  *q = (Int) yq;
 	  q = q + inc;
 	}
-	while (nz4--) { *q = (int) z4;  q = q + inc; }
+	while (nz4--) { *q = (Int) z4;  q = q + inc; }
       }
     }
      break;
     case ANA_FLOAT:	/* floating F*4 */
     {
-      float	z4, z1, z2, z3, yq;
-      float	*p, *q;
+      Float	z4, z1, z2, z3, yq;
+      Float	*p, *q;
       for (k=0;k<ny;k++) {
 	p = base.f + k*dline + rflag;
 	q = out.f + k*dline + rflag;
@@ -2981,10 +2981,10 @@ void shift_bicubic(float dx, int nx, int ny, int inc, int dline,
     }
      break;
      
-    case ANA_DOUBLE:	/* F*8, double precision */
+    case ANA_DOUBLE:	/* F*8, Double precision */
     {
-      double	z4, z1, z2, z3, yq;
-      double	*p, *q;
+      Double	z4, z1, z2, z3, yq;
+      Double	*p, *q;
       for (k=0;k<ny;k++) {
 	p = base.d + k*dline + rflag;
 	q = out.d + k*dline + rflag;
@@ -3020,17 +3020,17 @@ void shift_bicubic(float dx, int nx, int ny, int inc, int dline,
   } return;
 }
  /*------------------------------------------------------------------------- */
-int ana_shift3(int narg, int ps[])	/* shift3, bicubic image shift */
+Int ana_shift3(Int narg, Int ps[])	/* shift3, bicubic image shift */
  /* y = shift3(x, dx, dy) */
  /* the direction of the shift is such that a positive dx moves the image
  to the left (toward smaller x) and likewise in y. Hence the original (dx,dy)
  becomes (0,0). Note that this is the opposite of the direction for rotate3
  when it is used only for a shift */
 {
-  int	nx, ny, iq, nd, n, nb, result_sym;
-  float	dx, dy;
+  Int	nx, ny, iq, nd, n, nb, result_sym;
+  Float	dx, dy;
   pointer	base, out;
-  void	shift_bicubic(float, int, int, int, int, pointer, pointer, int);
+  void	shift_bicubic(Float, Int, Int, Int, Int, pointer, pointer, Int);
 
   iq = ps[0];
   if (!symbolIsNumericalArray(iq))
@@ -3072,8 +3072,8 @@ int ana_shift3(int narg, int ps[])	/* shift3, bicubic image shift */
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-void interpolate(void *srcv, int type, float xsrc, float ysrc, int nsx,
-		 int nsy, void *trgtv)
+void interpolate(void *srcv, Int type, Float xsrc, Float ysrc, Int nsx,
+		 Int nsy, void *trgtv)
 /* does bicubic interpolation. */
 /* <srcv>: pointer to source array */
 /* <type>: data type of source array, either ANA_FLOAT or ANA_DOUBLE */
@@ -3086,13 +3086,13 @@ void interpolate(void *srcv, int type, float xsrc, float ysrc, int nsx,
 /* LS 4 August 2000 */
 {
   pointer	src, trgt;
-  int	ix, iy, i;
-  float	px1, px2, px3, px4, py1, py2, py3, py4, bx, by, ax, ay;
+  Int	ix, iy, i;
+  Float	px1, px2, px3, px4, py1, py2, py3, py4, bx, by, ax, ay;
 
   src.v = srcv;
   trgt.v = trgtv;
-  ix = (int) xsrc;
-  iy = (int) ysrc;
+  ix = (Int) xsrc;
+  iy = (Int) ysrc;
   if (ix < 1)
     ix = 1;
   else if (ix > nsx - 3)
@@ -3169,12 +3169,12 @@ void interpolate(void *srcv, int type, float xsrc, float ysrc, int nsx,
   return;
 }
 /*------------------------------------------------------------------------- */
-int ana_regridls(int narg, int ps[])
+Int ana_regridls(Int narg, Int ps[])
 /* REGRIDLS(<data>,<gx>,<gy>,<nx>,<ny>) */
 {
-  int	type, nx, ny, result, dims[2], ngx, ngy, gx, gy, s, t, nsx, nsy,
+  Int	type, nx, ny, result, dims[2], ngx, ngy, gx, gy, s, t, nsx, nsy,
     step;
-  float	xsrc, ysrc, *gridx, *gridy, sx, sy, tx, ty, stx, sty, xsrc0, ysrc0;
+  Float	xsrc, ysrc, *gridx, *gridy, sx, sy, tx, ty, stx, sty, xsrc0, ysrc0;
   pointer	src, trgt;
 
   /* <data> */
@@ -3275,7 +3275,7 @@ int ana_regridls(int narg, int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-int bigger235(int x)
+Int bigger235(Int x)
 /* returns a number not less than <x> that can be expressed as */
 /* the product of integer powers of 2, 3, and 5 only.  For <x> less than */
 /* or equal to 6480, the result is guaranteed to be the smallest number */
@@ -3283,7 +3283,7 @@ int bigger235(int x)
 /* the smallest possible one.  LS 2 August 2000 */
 {
 
-  static int table[] = {
+  static Int table[] = {
     1, 2, 3, 4, 5, 6, 8, 9, 10, 12, 15, 16, 18, 20, 24, 25, 27, 30,
     32, 36, 40, 45, 48, 50, 54, 60, 64, 72, 75, 80, 81, 90, 96, 100,
     108, 120, 125, 128, 135, 144, 150, 160, 162, 180, 192, 200, 216,
@@ -3297,9 +3297,9 @@ int bigger235(int x)
     3645, 3750, 3840, 3888, 4000, 4050, 4096, 4320, 4374, 4500, 4608,
     4800, 4860, 5000, 5120, 5184, 5400, 5625, 5760, 5832, 6000, 6075,
     6144, 6250, 6400, 6480
-  }, n = sizeof(table)/sizeof(int);
-  int	ilo, ihi, imid;
-  int	fac = 1, fac2, x2;
+  }, n = sizeof(table)/sizeof(Int);
+  Int	ilo, ihi, imid;
+  Int	fac = 1, fac2, x2;
 
   if (x < 1)
     return 1;
@@ -3357,9 +3357,9 @@ int bigger235(int x)
   return x;
 }
 /*-------------------------------------------------------------------------*/
-int ana_bigger235(int narg, int ps[])
+Int ana_bigger235(Int narg, Int ps[])
 {
-  int	iq, *src, *trgt, n, result;
+  Int	iq, *src, *trgt, n, result;
 
   switch (symbol_class(ps[0])) {
     case ANA_ARRAY:
@@ -3386,22 +3386,22 @@ int ana_bigger235(int narg, int ps[])
   return result;
 }
 /*-------------------------------------------------------------------------*/
-int single_fft(pointer data, int n, int type, int back)
+Int single_fft(pointer data, Int n, Int type, Int back)
 /* type = ANA_FLOAT or ANA_DOUBLE */
 {
-  int gsl_fft(double *, int, int);
-  int gsl_fft_back(double *, int, int);
-  double *ddata;
+  Int gsl_fft(Double *, Int, Int);
+  Int gsl_fft_back(Double *, Int, Int);
+  Double *ddata;
   if (type == ANA_DOUBLE)
     ddata = data.d;
   else
-    ddata = malloc(n*sizeof(double));
+    ddata = malloc(n*sizeof(Double));
   if (back)
     gsl_fft_back(ddata, n, 1);
   else
     gsl_fft(ddata, n, 1);
   if (type != ANA_DOUBLE) {
-    int i;
+    Int i;
     for (i = 0; i < n; i++)
       data.f[i] = ddata[i];
     free(ddata);
@@ -3409,11 +3409,11 @@ int single_fft(pointer data, int n, int type, int back)
   return 0;
 }
 /*-------------------------------------------------------------------------*/
-int ana_cartesian_to_polar(int narg, int ps[])
+Int ana_cartesian_to_polar(Int narg, Int ps[])
 /* y = CTOP(x [, x0, y0]) */
 {
-  int	nx, ny, result, dims[2], r, rmax, n, az, type, step, i;
-  float	x0, y0, x, y, daz;
+  Int	nx, ny, result, dims[2], r, rmax, n, az, type, step, i;
+  Float	x0, y0, x, y, daz;
   pointer	src, trgt;
 
   /* <x> */
@@ -3440,7 +3440,7 @@ int ana_cartesian_to_polar(int narg, int ps[])
     return anaerror("No circles around (%g,%g) fall completely within the image",
 		 ps[0], x0, y0);
 
-  dims[0] = bigger235((int) ceil(rmax*TWOPI));	/* #pts for biggest circle */
+  dims[0] = bigger235((Int) ceil(rmax*TWOPI));	/* #pts for biggest circle */
   dims[1] = rmax + 1;
   result = array_scratch(type, 2, dims);
   if (result == ANA_ERROR)
@@ -3448,7 +3448,7 @@ int ana_cartesian_to_polar(int narg, int ps[])
   trgt.v = array_data(result);
 
   for (r = 0; r <= rmax; r++) {
-    n = bigger235((int) ceil(r*TWOPI));
+    n = bigger235((Int) ceil(r*TWOPI));
     daz = TWOPI/n;
     for (az = 0; az < n; az++) {
       x = x0 + r*cos(az*daz);
@@ -3480,13 +3480,13 @@ int ana_cartesian_to_polar(int narg, int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-int ana_polar_to_cartesian(int narg, int ps[])
+Int ana_polar_to_cartesian(Int narg, Int ps[])
 /* y = PTOC(x [, nx, ny, x0, y0]) */
 {
-  int	nx, ny, result, dims[2], type, step, ix, iy;
-  float	x0, y0, daz, dx, dy, az, r;
+  Int	nx, ny, result, dims[2], type, step, ix, iy;
+  Float	x0, y0, daz, dx, dy, az, r;
   pointer	src, trgt;
-  int	single_fft(pointer src, int n, int type, int backwards);
+  Int	single_fft(pointer src, Int n, Int type, Int backwards);
 
   /* <x> */
   if (!symbolIsNumericalArray(ps[0]) || array_num_dims(ps[0]) != 2)
@@ -3516,7 +3516,7 @@ int ana_polar_to_cartesian(int narg, int ps[])
       dx = ix - x0;
       dy = iy - y0;
       r = hypot(dx,dy);
-      az = ((int) floor(atan2(dy,dx)*daz + 0.5) + nx) % nx;
+      az = ((Int) floor(atan2(dy,dx)*daz + 0.5) + nx) % nx;
       if (r < ny)
 	interpolate(src.v, type, az, r, nx, ny, trgt.v);
       else

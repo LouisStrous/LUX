@@ -31,29 +31,29 @@
         unsigned char height_msb;
         unsigned char mask;
  } ;
- static void compress(int, FILE *, byte *, int), output(int),
-   cl_block(void), cl_hash(register int) /*, char_init()*/;
- static void char_out(int), flush_char(void);
+ static void compress(Int, FILE *, Byte *, Int), output(Int),
+   cl_block(void), cl_hash(register Int) /*, char_init()*/;
+ static void char_out(Int), flush_char(void);
 
-int	ana_gifwrite(int, int []);
+Int	ana_gifwrite(Int, Int []);
  /*------------------------------------------------------------------------- */
-int ana_gifwrite_f(narg, ps)
+Int ana_gifwrite_f(narg, ps)
  /* a function version that returns 1 if read OK */
- int	narg, ps[];
+ Int	narg, ps[];
  {
  if ( ana_gifwrite(narg, ps) == 1 ) return 1; else return 4;
  }
  /*------------------------------------------------------------------------- */
-int ana_gifwrite(narg,ps)      /* gifwrite subroutine */
+Int ana_gifwrite(narg,ps)      /* gifwrite subroutine */
  /* write a very plain gif file, 8 bit deep */
  /* call is gifwrite,array,file,[map] where map is the color map 
  and must be (3,256) I*1 in rgb triplets */
- int    narg, ps[];
+ Int    narg, ps[];
  {
  FILE	*fout;
- int    iq, nd, type, i;
- int    nx, ny, ncolmap;
- byte   codesize=8;
+ Int    iq, nd, type, i;
+ Int    nx, ny, ncolmap;
+ Byte   codesize=8;
  char   *p, *data, *colormap, *name;
  struct ahead   *h, *h2;
  struct GIFScreen gh = {"GIF87a", 0,0,0,0,247,0,0};
@@ -67,7 +67,7 @@ int ana_gifwrite(narg,ps)      /* gifwrite subroutine */
  data = ((char *)h + sizeof(struct ahead));
  nd = h->ndim;
  if ( nd != 2 || type != 0 )
-  { printf("GIFWRITE only supports 2-D byte arrays\n");
+  { printf("GIFWRITE only supports 2-D Byte arrays\n");
   return -1; }
                         /* second argument must be a string, file name */
  if ( sym[ ps[1] ].class != 2 ) return execute_error(70);
@@ -118,7 +118,7 @@ int ana_gifwrite(narg,ps)      /* gifwrite subroutine */
  /* our code size is 8 */
  putc(codesize, fout);
  /* could probably use anybody's lzw compressor here */
- compress(codesize+1, fout, (byte *) data, nx*ny);
+ compress(codesize+1, fout, (Byte *) data, nx*ny);
  
  putc(0, fout);
  putc(';', fout);
@@ -127,7 +127,7 @@ int ana_gifwrite(narg,ps)      /* gifwrite subroutine */
  }
  /*------------------------------------------------------------------------- */
  static unsigned long cur_accum = 0;
- static int           cur_bits = 0;
+ static Int           cur_bits = 0;
 
 #define min(a,b)        ((a>b) ? b : a)
 #define XV_BITS 12    /* BITS was already defined on some systems */
@@ -136,19 +136,19 @@ int ana_gifwrite(narg,ps)      /* gifwrite subroutine */
 
  typedef unsigned char   char_type;
  
- static int n_bits;                    /* number of bits/code */
- static int maxbits = XV_BITS;         /* user settable max # bits/code */
- static int maxcode;                   /* maximum code, given n_bits */
- static int maxmaxcode = 1 << XV_BITS; /* NEVER generate this */
+ static Int n_bits;                    /* number of bits/code */
+ static Int maxbits = XV_BITS;         /* user settable max # bits/code */
+ static Int maxcode;                   /* maximum code, given n_bits */
+ static Int maxmaxcode = 1 << XV_BITS; /* NEVER generate this */
 
 #define MAXCODE(n_bits)     ( (1 << (n_bits)) - 1)
 
- static  int      htab [HSIZE];
+ static  Int      htab [HSIZE];
  static  unsigned short codetab [HSIZE];
 #define HashTabOf(i)   htab[i]
 #define CodeTabOf(i)   codetab[i]
 
- static int hsize = HSIZE;            /* for dynamic table sizing */
+ static Int hsize = HSIZE;            /* for dynamic table sizing */
 
  /*
  * To save much memory, we overlay the table used by compress() with those
@@ -163,20 +163,20 @@ int ana_gifwrite(narg,ps)      /* gifwrite subroutine */
 #define tab_suffixof(i)        ((char_type *)(htab))[i]
 #define de_stack               ((char_type *)&tab_suffixof(1<<XV_BITS))
 
-static int free_ent = 0;       /* first unused entry */
+static Int free_ent = 0;       /* first unused entry */
 
  /*
  * block compression parameters -- after all codes are used up,
  * and compression rate changes, start over.
  */
- static int clear_flg = 0;
- static long int in_count = 1;            /* length of input */
- static long int out_count = 0;           /* # of codes output (for debugging) */
+ static Int clear_flg = 0;
+ static int64_t in_count = 1;            /* length of input */
+ static int64_t out_count = 0;           /* # of codes output (for debugging) */
 
  /*
  * compress stdin to stdout
  *
- * Algorithm:  use open addressing double hashing (no chaining) on the 
+ * Algorithm:  use open addressing Double hashing (no chaining) on the 
  * prefix code / next character combination.  We do a variant of Knuth's
  * algorithm D (vol. 3, sec. 6.4) along with G. Knott's relatively-prime
  * secondary probe.  Here, the modular division first probe is gives way
@@ -189,22 +189,22 @@ static int free_ent = 0;       /* first unused entry */
  * questions about this implementation to ames!jaw.
  */
 
- static int g_init_bits;
+ static Int g_init_bits;
  static FILE *g_outfile;
  
- static int ClearCode;
- static int EOFCode;
+ static Int ClearCode;
+ static Int EOFCode;
 
  /********************************************************/
-static void compress(int init_bits, FILE *outfile, byte *data, int len)
+static void compress(Int init_bits, FILE *outfile, Byte *data, Int len)
  {
   register long fcode;
-  register int i = 0;
-  register int c;
-  register int ent;
-  register int disp;
-  register int hsize_reg;
-  register int hshift;
+  register Int i = 0;
+  register Int c;
+  register Int ent;
+  register Int disp;
+  register Int hsize_reg;
+  register Int hshift;
 
   /*
    * Set up the globals:  g_init_bits - initial number of bits
@@ -246,7 +246,7 @@ static void compress(int init_bits, FILE *outfile, byte *data, int len)
   hshift = 8 - hshift;                /* set hash code range bound */
 
   hsize_reg = hsize;
-  cl_hash( (int) hsize_reg);            /* clear hash table */
+  cl_hash( (Int) hsize_reg);            /* clear hash table */
 
   output(ClearCode);
     
@@ -255,7 +255,7 @@ static void compress(int init_bits, FILE *outfile, byte *data, int len)
     in_count++;
 
     fcode = (long) ( ( (long) c << maxbits) + ent);
-    i = (((int) c << hshift) ^ ent);    /* xor hashing */
+    i = (((Int) c << hshift) ^ ent);    /* xor hashing */
 
     if ( HashTabOf (i) == fcode ) {
       ent = CodeTabOf (i);
@@ -322,7 +322,7 @@ static void compress(int init_bits, FILE *outfile, byte *data, int len)
                                   0x01FF, 0x03FF, 0x07FF, 0x0FFF,
                                   0x1FFF, 0x3FFF, 0x7FFF, 0xFFFF };
 
-static void output(int code)
+static void output(Int code)
  {
   cur_accum &= masks[cur_bits];
 
@@ -334,7 +334,7 @@ static void output(int code)
   cur_bits += n_bits;
 
   while( cur_bits >= 8 ) {
-    char_out( (unsigned int) (cur_accum & 0xff) );
+    char_out( (uint32_t) (cur_accum & 0xff) );
     cur_accum >>= 8;
     cur_bits -= 8;
   }
@@ -362,7 +362,7 @@ static void output(int code)
   if( code == EOFCode ) {
     /* At EOF, write the rest of the buffer */
     while( cur_bits > 0 ) {
-      char_out( (unsigned int)(cur_accum & 0xff) );
+      char_out( (uint32_t)(cur_accum & 0xff) );
       cur_accum >>= 8;
       cur_bits -= 8;
     }
@@ -382,16 +382,16 @@ static void cl_block(void)	/* table clear for block compress */
  {
   /* Clear out the hash table */
 
-  cl_hash ( (int) hsize );
+  cl_hash ( (Int) hsize );
   free_ent = ClearCode + 2;
   clear_flg = 1;
 
   output(ClearCode);
  }
  /********************************/
-static void cl_hash(register int hsize)          /* reset code table */
+static void cl_hash(register Int hsize)          /* reset code table */
  {
-  register int *htab_p = htab+hsize;
+  register Int *htab_p = htab+hsize;
   register long i;
   register long m1 = -1;
 
@@ -427,10 +427,10 @@ static void cl_hash(register int hsize)          /* reset code table */
  /*
  * Number of characters so far in this 'packet'
  */
-static int a_count;
+static Int a_count;
 
  /*
- * Set up the 'byte output' routine
+ * Set up the 'Byte output' routine
 static void char_init()
  {
         a_count = 0;
@@ -446,7 +446,7 @@ static void char_init()
  * Add a character to the end of the current packet, and if it is 254
  * characters, flush the packet to disk.
  */
-static void char_out(int c)
+static void char_out(Int c)
  {
   accum[ a_count++ ] = c;
   if( a_count >= 254 ) 

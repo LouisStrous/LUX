@@ -823,18 +823,29 @@ int ana_zerof(int narg, int ps[])
   }
 }
 /*------------------------------------------------------------------------- */
-int ana_indgen(int narg, int ps[])
+int indgen(int narg, int ps[], int isFunc)
 /* fills array elements with their element index or with the value of
  one of their coordinates */
+/* if called as function: INDGEN(<tgt> [, <axis>])
+   if called as subroutine: INDGEN, <tgt> [, <axis>] */
 {
   pointer	src, trgt;
   int	result;
   loopInfo	srcinfo, trgtinfo;
 
-  if (standardLoop(ps[0], narg > 1? ps[1]: 0,
-		   SL_UPGRADE | SL_AXISCOORD | SL_ONEAXIS,
-		   ANA_BYTE, &srcinfo, &src, &result, &trgtinfo, &trgt) < 0)
-    return ANA_ERROR;
+  if (isFunc) {
+    if (standardLoop(ps[0], narg > 1? ps[1]: 0,
+		     SL_UPGRADE | SL_AXISCOORD | SL_ONEAXIS,
+		     ANA_BYTE, &srcinfo, &src, &result, &trgtinfo, &trgt) < 0)
+      return ANA_ERROR;
+  } else {
+    if (standardLoop(ps[0], narg > 1? ps[1]: 0,
+		     SL_AXISCOORD | SL_ONEAXIS,
+		     ANA_BYTE, &srcinfo, &src, NULL, NULL, NULL) < 0)
+      return ANA_ERROR;
+    trgtinfo = srcinfo;
+    trgt = src;
+  }
 
   switch (symbol_type(ps[0])) {
     case ANA_BYTE:
@@ -877,6 +888,17 @@ int ana_indgen(int narg, int ps[])
   }
   return result;
 }
+/*------------------------------------------------------------------------- */
+int ana_indgen(int narg, int ps[])
+{
+  return indgen(narg, ps, 1);
+}
+/*------------------------------------------------------------------------- */
+int ana_indgen_s(int narg, int ps[])
+{
+  return indgen(narg, ps, 0);
+}
+REGISTER(indgen_s, s, INDGEN, 1, 2, "*");
 /*------------------------------------------------------------------------- */
 int ana_neg_func(int narg, int ps[])
      /*take the negative of something */

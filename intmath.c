@@ -35,13 +35,19 @@ int iamod(int numerator, int denominator)
 }
 
 /*
-  gy + t = qf + r (0 ≤ r < |q|)
-  y = q₁f + r₁
-   gq₁f + gr₁ + t = qf + r
-  gr₁ + t = q₂f + r₂
-   gq₁f + q₂f + r₂ = qf + r
-  q = gq₁ + q₂
-  r = r₂
+  y = ⌊(fx + t)/d⌋ (with all variables integer) has an intermediate
+  result fx + t which can be much greater in magnitude than x, and so
+  may be much too great to fit into a variable of the same type as x.
+
+  We can assume that |t| < |d|; otherwise we can calculate y′ = ⌊(fx +
+  t′)/d⌋ with y = y′ + ⌊t/d⌋ and t′ = t mod d.
+
+  We can assume that |f| < |d|; otherwise we can calculate y″ = ⌊(f″x
+  + t)/d⌋ with y = y″ + ⌊f/d⌋x and f″ = f mod d.
+
+  A type-size-independent workaround (for |t|, |f| < |d|) is y =
+  f⌊x/d⌋ + ⌊(f*(x mod d) + t)/d⌋, which has its intermediate result no
+  greater than fd.
  */
 
 div_t alinediv(int numerator, int factor, int addend, int denominator)

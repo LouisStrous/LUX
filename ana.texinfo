@@ -23023,7 +23023,8 @@ See also: @ref{NE}, @ref{EQ}, @ref{GE}, @ref{GT}, @ref{LE}
 
 Returns an index to the position in @code{@var{set}} of each member of
 @code{@var{target}}, or @code{-1} for the members of @code{@var{target}}
-that are not in @code{@var{set}}.
+that are not in @code{@var{set}}.  @code{@var{set}} must be sorted in
+ascending order.
 
 [2.10.199]
 

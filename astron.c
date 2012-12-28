@@ -746,7 +746,7 @@ Int gcd(Int a, Int b)
 Int ana_calendar(Int narg, Int ps[])
 {
   Int result, input_elem_per_date, output_elem_per_date, iq;
-  Int *dims, ndim;
+  Int *dims = NULL, ndim = 0;
   loopInfo tgtinfo, srcinfo;
   pointer src, tgt;
   /* enum Calendar_order fromorder, toorder; */
@@ -779,6 +779,12 @@ Int ana_calendar(Int narg, Int ps[])
     { 6, 7, CJDNtoMayanA,     CJDtoMayanA,     MayantoCJDNA,     MayantoCJDA,     CJDNtoMayanSA,     CJDtoMayanSA,     MayanStoCJDNA,     MayanStoCJDA },
     { 5, 5, CJDNtoLongCountA, CJDtoLongCountA, LongCounttoCJDNA, LongCounttoCJDA, CJDNtoLongCountSA, CJDtoLongCountSA, LongCountStoCJDNA, LongCountStoCJDA },
   };
+
+  /* initialize to zero */
+  memset(&srcinfo, 0, sizeof(srcinfo));
+  memset(&tgtinfo, 0, sizeof(tgtinfo));
+  src.v = NULL;
+  tgt.v = NULL;
 
   fromcalendar = extractbits(internalMode, CAL_CALENDAR_BASE,
 			     CAL_CALENDAR_BITS);

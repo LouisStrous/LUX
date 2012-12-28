@@ -151,16 +151,11 @@ void setupDimensionLoop(loopInfo *info, Int ndim, Int const *dims,
   size = 1;
   for (i = 0; i < info->ndim; i++)
     size *= info->dims[i];
-  /* the size is small enough to fit in an (ulint = unsigned int64_t),
-     or else the array from which the dimensions were taken could not have
-     been created through array_scratch() or array_clone(), but the size
-     may be too great to fit in a signed int64_t.  We may
-     need to move from the very end of the array to the very beginning,
-     so we must be able to use both positive and negative numbers with
-     a magnitude equal to the number of elements; so the number of elements
-     must fit in a signed int64_t.  If it does not, then we emit a warning.
-     LS 2dec98 */
-  if (size > LONG_MAX)
+  /* the size is small enough to fit in a (size_t), or else it would
+     not have been able to be created by array_scratch() or
+     array_clone(), but it may not be small enough to fit in an
+     (off_t). */
+  if (size > INT64_MAX/2)
     printf("WARNING - array size (%lu elements) may be too great\n"
            "for this operation!  Serious errors may occur!\n", size);
   info->nelem = size;
@@ -383,31 +378,6 @@ void rearrangeDimensionLoop(loopInfo *info)
   info->data->v = info->data0;	/* initialize pointer */
 }
 /*-----------------------------------------------------------------------*/
-void omitRedundantDimensions(Int *ndim, Int *dims, Int *naxes, Int *axes)
-{
-  /* if we get rid of dimension <d>, then all axis numbers greater
-     than or equal to <d> must be decremented by one */
-  Int newAxisNr[MAX_DIMS];
-  Int omitted = 0, i;
-
-  for (i = 0; i < *ndim; i++) {
-    newAxisNr[i] = i - omitted;
-    if (dims[i] == 1)
-      omitted++;
-  }
-  if (omitted) {
-    for (i = 0; i < *naxes; i++)
-      axes[i] = newAxisNr[axes[i]];
-    for (i = 0; i < *ndim - omitted; i++)
-      dims[i] = dims[newAxisNr[i]];
-    *ndim -= omitted;
-    *naxes -= omitted;
-    /* TODO: some of axes[i] may have gotten equal. Handle.
-       TODO: some of axes[i] may refer to now-omitted
-       dimensions.  Handle. */
-  }
-}
-/*-----------------------------------------------------------------------*/
 Int dimensionLoopResult1(loopInfo const *sinfo,
                          Int tmode, enum Symboltype ttype,
                          Int nMore, Int const * more,
@@ -429,11 +399,14 @@ Int dimensionLoopResult1(loopInfo const *sinfo,
    <tptr>: a pointer to a pointer to the target data
  */
 {
-  Int	target, n, i, ndim, dims[MAX_DIMS], naxes, axes[MAX_DIMS], j;
+  Int	target, n, i, ndim, dims[MAX_DIMS], naxes, axes[MAX_DIMS], j,
+    nOmitAxes = 0, omitAxes[MAX_DIMS];
   pointer	ptr;
 
   ndim = sinfo->ndim;		/* default */
   memcpy(dims, sinfo->dims, ndim*sizeof(*dims));
+  for (i = 0; i < ndim; i++)
+    omitAxes[i] = 0;
   naxes = sinfo->naxes;
   memcpy(axes, sinfo->axes, naxes*sizeof(*axes));
   /* it is assumed that 0 <= axes[i] < ndim for i = 0..naxes-1 */
@@ -450,17 +423,73 @@ Int dimensionLoopResult1(loopInfo const *sinfo,
         return anaerror("Reduction factor %d is not a divisor of dimension"
                         " %d size %d", -1, less[i], axes[i], dims[axes[i]]);
       dims[axes[i]] /= less[i];
+      if (dims[axes[i]] == 1 && less[i] > 1) /* this dimension becomes 1 */
+	omitAxes[nOmitAxes++] = i;
     }
+#if UNNEEDED
     for ( ; i < naxes; i++) {
       if (dims[axes[i]] % less[nLess - 1])
         return anaerror("Reduction factor %d is not a divisor of dimension"
                         " %d size %d", -1, less[nLess - 1], axes[i],
                         dims[axes[i]]);
       dims[axes[i]] /= less[nLess - 1];
+      if (dims[axes[i]] == 1 && less[i] > 1) /* this dimension becomes 1 */
+	omitAxes[nOmitAxes++] = i;
     }
-    if (!(tmode & SL_ONEDIMS))  /* remove dimensions equal to 1 */
-      omitRedundantDimensions(&ndim, dims, &naxes, axes);
+#endif
+    if (!(tmode & SL_ONEDIMS) && nOmitAxes) { 
+      /* remove dimensions corresponding to axes mentioned in omit[] */
+      Int retain[MAX_DIMS];
+      for (i = 0; i < ndim; i++)
+	retain[i] = 1;
+      for (i = 0; i < nOmitAxes; i++)
+	retain[axes[omitAxes[i]]] = 0;
+      /* now retain[i] says whether dimension i is to be retained.  If
+	 retain[] = { 0, 1, 0, 1 }, then new dimension 0 corresponds
+	 to old dimension 1, and new dimension 1 corresponds to old
+	 dimension 3 */
+      Int newIndexToOld[MAX_DIMS];
+      int j;
+      for (i = j = 0; i < ndim; i++)
+	if (retain[i])
+	  newIndexToOld[j++] = i;
+      /* update dims[] and ndim */
+      Int new[MAX_DIMS];
+      if (j) {
+	for (i = 0; i < j; i++)
+	  new[i] = dims[newIndexToOld[i]];
+	memcpy(dims, new, j*sizeof(*dims));
+	ndim = j;
+      } else {
+	/* there are no dimensions left; add a dimension equal to 1 */
+	dims[0] = 1;
+	ndim = 1;
+      }
+      /* update axes[] and naxes */
+      for (i = 0; i < naxes; i++)
+	retain[i] = 1;
+      for (i = 0; i < nOmitAxes; i++)
+	retain[omitAxes[i]] = 0;
+      /* now retain[i] says whether axis i is to be retained */
+      for (i = j = 0; i < naxes; i++)
+	if (retain[i])
+	  newIndexToOld[j++] = i;
+      if (j) {
+	for (i = 0; i < j; i++)
+	  new[i] = axes[newIndexToOld[i]];
+	memcpy(axes, new, j*sizeof(*axes));
+	naxes = j;
+      } else {
+	/* there are no axes left; add an axis equal to 0 */
+	axes[0] = 0;
+	naxes = 1;
+      }
+    }
   }
+
+  /* do things work out OK if nMore and nLess are nonzero at the same
+     time? */
+
   if (nMore && more) {
     if (nMore < 1)
       return anaerror("Illegal number %d of dimensions to add", -1, nMore);
@@ -483,8 +512,6 @@ Int dimensionLoopResult1(loopInfo const *sinfo,
     for (i = 0; i < nMore; i++)
       axes[i] = i;
     naxes += nMore;
-    if (!(tmode & SL_ONEDIMS))  /* remove dimensions equal to 1 */
-      omitRedundantDimensions(&ndim, dims, &naxes, axes);
   }
 
   if (!less && !more) {

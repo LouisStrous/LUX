@@ -750,64 +750,81 @@ void CommonStoCJDA(char * const *date, Double *CJD)
 /* HEBREW CALENDAR */
 
 /*--------------------------------------------------------------------------*/
-static Int	hebrewMonthStarts[][13] = {
-  /* deficient ordinary year: */
-  /*   30, 29, 29,  29,  30,  29,  30,  29,  30,  29,  30,  29 */
-  { 0, 30, 59, 88, 117, 147, 176, 206, 235, 265, 294, 324, 353 },
-  /* regular ordinary year: */
-  /*   30, 29, 30,  29,  30,  29,  30,  29,  30,  29,  30,  29 */
-  { 0, 30, 59, 89, 118, 148, 177, 207, 236, 266, 295, 325, 354 },
-  /* complete ordinary year: */
-  /*   30, 30, 30,  29,  30,  29,  30,  29,  30,  29,  30,  29 */
-  { 0, 30, 60, 90, 119, 149, 178, 208, 237, 267, 296, 326, 355 },
-  /* deficient leap year: */
-  /*   30, 29, 29,  29,  30,  59,  30,  29,  30,  29,  30,  29 */
-  { 0, 30, 59, 88, 117, 147, 206, 236, 265, 295, 324, 354, 383 },
-  /* regular leap year: */
-  /*   30, 29, 30,  29,  30,  59,  30,  29,  30,  29,  30,  29 */
-  { 0, 30, 59, 89, 118, 148, 207, 237, 266, 296, 325, 355, 384 },
-  /* complete leap year: */
-  /*   30, 30, 30,  29,  30,  59,  30,  29,  30,  29,  30,  29 */
-  { 0, 30, 60, 90, 119, 149, 208, 238, 267, 297, 326, 356, 385 }
-};
-
 /** The Chronological Julian Day Number of the epoch of the Hebrew calendar */
-#define HEBREW_EPOCH	(347997)
+#define HEBREW_EPOCH	(347998)
 
 static char const * const Hebrew_monthnames[] = {
   "Tishri", "Heshvan", "Kislev", "Tevet", "Shevat", "Adar", "Nisan",
   "Iyar", "Sivan", "Tammuz", "Av", "Elul"
 };
 /*--------------------------------------------------------------------------*/
-void CJDNtoHebrew(Int CJDN, Int *year, Int *month, Int *day)
+/* The Hebrew calendar year begins with day 1 of month 7 (= New Year)
+   and runs through the end of the next month 6.  The calculation year
+   begins with day 1 of month 1 preceding New Year, and runs until but
+   excluding the next day 1 of month 1.  The calculation year, month,
+   day begin at 0. */
+/*--------------------------------------------------------------------------*/
+void CJDNtoHebrew(Int CJDN, Int *year, Int *month, int *day)
 {
-  Int	d, cjdn, cjdn0;
-  Int	approx_year, loy, yearType, m;
+  Int Hebrew_cycm2rd(Int x1, Int x3);
 
-  d = CJDN - HEBREW_EPOCH;
-  approx_year = floor(d*0.002737874608);
-  cjdn = HebrewtoCJDN(approx_year, 1, 1);
-  if (cjdn < CJDN)
-    do {
-      cjdn0 = cjdn;
-      cjdn = HebrewtoCJDN(++approx_year, 1, 1);
-    } while (cjdn < CJDN);
-  else {
-    cjdn0 = cjdn;
-    do { 
-      cjdn = cjdn0;
-      cjdn0 = HebrewtoCJDN(--approx_year, 1, 1);
-    } while (cjdn0 > CJDN);
+  /* We keep track of the allowable values of CJDN, as the calculation
+     proceeds.  -2147483647 ≤ CJDN ≤ 2147483647 */
+
+  /* running day number since day 1 of month 1 preceding New Year of
+     year 1;  */
+  Int y4 = CJDN - HEBREW_EPOCH + 177;
+  /* -2147135826 ≤ CJDN ≤ 2147483647
+     -2147483647 ≤ y4 ≤ 2147135826*/
+
+  /* calculate the provisional running calculation month number,
+     disregarding the 2nd, 3rd and 4th delays.  The formula is
+     ⌊(25920y₄ + 13835)/765433⌋, but the intermediate value 25920y₄ +
+     13835 overflows already if |y₄| > INT32_MAX/25920 = 82850 days =
+     226 years, so we must use a roundabout calculation to get a
+     bigger range.  See
+     http://http://aa.quae.nl/en/reken/juliaansedag.html */
+  Div_t d1 = adiv(y4, 1447);
+  Int y1 = 49*d1.quot + (23*d1.quot + 25920*d1.rem + 13835)/765433;
+  /* -2147135826 ≤ CJDN ≤ 2147483647
+     -72708860 ≤ y1 ≤ 72720638 months */
+
+  /* try the next month first; then if the provisional calculation day
+     is negative, we know that we went one month too far.  If we try
+     the current month first and the provisional calculation day turns
+     out to be 29, then we don't know if it is really calculation day
+     29 of the current month (of 30 days) or calculation day 0 of the
+     next month (because the current month was 29 days). */
+  ++y1;
+
+  Int x1 = iaquot(19*y1 + 17, 235); /* provisional calculation year number */
+  /* -2147135826 ≤ CJDN ≤ 2147483647
+     -5878589 ≤ x1 ≤ 5879541 years */
+
+  Int x3 = y1 - iaquot(235*x1 + 1, 19); /* provisional calculation
+					   month number */
+  /* -2147135826 ≤ CJDN ≤ 2147483647
+     0 ≤ x3 ≤ 12 months */
+
+  /* calculate the running day number of the beginning of calculation
+     month x3 of calculation year x1 */
+  Int c4 = Hebrew_cycm2rd(x1, x3);
+
+  Int z4 = y4 - c4;		/* provisional calculation day */
+  if (z4 < 0) {			/* the provisional month was one too
+				   great after all */
+    --y1;
+    x1 = iaquot(19*y1 + 17, 235);
+    x3 = y1 - iaquot(235*x1 + 1, 19);
+    c4 = Hebrew_cycm2rd(x1, x3);
+    z4 = y4 - c4;
   }
-  loy = cjdn - cjdn0;		/* length of target year */
-  yearType = (loy > 365)*3 + (loy % 30) - 23;
-  d = CJDN - cjdn0;			/* day number in the year */
-  m = d/35;
-  while (m < 11 && hebrewMonthStarts[yearType][m + 1] < d)
-    m++;
-  *year = approx_year - 1;
-  *month = m + 1;
-  *day = d - hebrewMonthStarts[yearType][m] + 1;
+  /* translate from calculation year/month/day to calendar
+     year/month/day */
+  Int c0 = (12 - x3)/7;
+  *year = x1 + 1 - c0;
+  *month = x3 + 1;
+  *day = z4 + 1;
 }
 /*--------------------------------------------------------------------------*/
 void CJDNtoHebrewA(Int const *CJDN, Int *date)
@@ -848,61 +865,123 @@ void CJDtoHebrewSA(Double const *CJD, char **date)
   CJDto3SA(CJD, date, CJDtoHebrewA, Hebrew_monthnames);
 }
 /*--------------------------------------------------------------------------*/
-static Int tishri(Int year)
-/* returns the number of days between Tishri 1, A.M. 1 and Tishri 1, */
-/* A.M. <year>.  LS 2oct98 */
+Int tishri2(Int x1)
+/* returns the number of days between New Year (= the first day of
+   month Tishri) of calculation year 0 and New Year of calculation
+   year x₁, including the first two delays.  To avoid overflow in the
+   final result, we must have -5879541 ≤ x₁ ≤ 5879540 -- but this is
+   not checked.  LS 24dec2012 */
 {
-  static Int	nLeap[] = {
-    0, 0, 0, 1, 1, 1, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6
-  };
-  static Int	isLeap[] = {
-    0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1
-  };
-  Int	n, leap, halakim, hours, dow, weeks, j;
+  /* we keep track of the allowable range of x₁
+     -2147483647 ≤ x₁ ≤ 2147483647*/
 
-  year--;
-  n = iaquot(year,19);		/* number of cycles of Meton */
-  year -= n*19;			/* year within current cycle */
-  leap = nLeap[year];		/* number of leap days in current cycle */
+  /* calculate the running month number of calculation month 0 of
+     calculation year x₁; i.e., the number of months between
+     calculation month 0 of calculation year 0 and calculation month 0
+     of calculation year x₁ */
+  Int c1 = iaquot(235*x1 + 1, 19);
+  /* -2147483655 ≤ c₁ ≤ 2147483641
+     -173626338 ≤ x₁ ≤ 173626337 */
 
-  halakim = 595*n + 876*year - 287*leap + 204;
-  j = iaquot(halakim,1080);
-  hours = j + 16*n + 8*year + 13*leap + 5;
-  halakim -= 1080*j;
-  j = iaquot(hours,24);
-  dow = j + 6939*n + 354*year + 29*leap + 1;
-  hours -= 24*j;
-  weeks = iaquot(dow,7);
-  dow -= 7*weeks;
-  if (dow == 0 || dow == 3 || dow == 5)	/* dehiyyot 1 */
-    dow++;
-  else if (hours >= 18) {	/* dehiyyot 2 */
-    dow++;
-    if (dow == 7) {
-      weeks++;
-      dow = 0;
-    }
-    if (dow == 0 || dow == 3 || dow == 5) /* dehiyyot 1 */
-      dow++;
-  } else if (!isLeap[year] && dow == 2 && 1080*hours + halakim >= 9924)
-    dow += 2;
-  else if ((year == 0 || isLeap[year - 1])
-	   && dow == 1 && 1080*hours + halakim >= 16789)
-    dow++;
+  /* calculate the number of days between 1 Tishri A.M. 1 and the
+     first day of running month c₁, taking into account the first
+     delay.  The formula is ⌊(765433c₁ + 12084)/25920⌋ = 29c₁ +
+     ⌊(13753c₁ + 12084)/25920⌋, but the intermediate value 765433c₁ +
+     12084 overflows already if |c₁| > INT32_MAX/765433 ≈ 2805 months
+     ≈ 226 years, and intermediate value 13753c₁ + 12084 overflows
+     already if |c₁| > INT32_MAX/13753 ≈ 156146 months ≈ 12624 years,
+     which are much less than the repeat period of the calendar, which
+     is 8527680 months = 689472 years.  We use a roundabout
+     calculation to get a bigger range.  See
+     http://http://aa.quae.nl/en/reken/juliaansedag.html */
+  Div_t d = adiv(c1, 1095);
+  Int nu1 = 32336*d.quot + iaquot(15*d.quot + 765433*d.rem + 12084, 25920);
+  /* -2147483646 ≤ υ₁ ≤ 2147483646 
+     -72720638 ≤ c₁ ≤ 72720638
+     -5879541 ≤ x₁ ≤ 5879540 */
 
-  return weeks*7 + dow;
+  /* calculate the number of days between 1 Tishri A.M. 1 and the
+     first day of running month c₁, taking into account the first
+     and second delays. */
+  Int nu2 = nu1 + iaquot(6*iamod(nu1, 7), 7)%2;
+  /* -2147483646 ≤ υ₂ ≤ 2147483647 
+     -72720638 ≤ c₁ ≤ 72720638
+     -5879541 ≤ x₁ ≤ 5879540 */
+  return nu2;
 }
 /*--------------------------------------------------------------------------*/
-Int HebrewtoCJDN(Int year, Int month, Int day)
+Int Hebrew_cycm2rd(Int x1, Int x3)
+/* returns the running day number of the first day of Hebrew
+   calculation year <x1>, calculation month <x3>, relative to the
+   first day of calculation year 0, calculation month 0.  To avoid
+   overflow, we must have -5879540 ≤ x₁ ≤ 5879538 -- but this is not
+   checked. */
 {
-  Int	n1, loy, yearType;
- 
-  n1 = tishri(year);
-  loy = tishri(year + 1) - n1;
+  /* calculate the running day number (since New Year of calculation
+     year 0) of New Year of calculation year x₁ - 1, taking into
+     account only the first two delays */
+  Int nu2m = tishri2(x1 - 1);
+  Int nu2 = tishri2(x1);	/* likewise for year x₁ */
+  Int nu2p = tishri2(x1 + 1);	/* likewise for year x₁ + 1 */
+  Int nu2p2 = tishri2(x1 + 2);	/* likewise for year x₁ + 2 */
 
-  yearType = (loy > 365)*3 + (loy % 30) - 23;
+  /* calculate the length of year x₁ - 1, taking into account only the
+     first two delays */
+  Int L2m = nu2 - nu2m;
+  Int L2 = nu2p - nu2;		/* likewise for year x₁ */
+  Int L2p = nu2p2 - nu2p;	/* likewise for year x₁ + 1 */
 
-  return HEBREW_EPOCH + n1 + hebrewMonthStarts[yearType][month - 1] + day - 1;
+  /* calculate the effect of the third delay on the length of year x₁ */
+  Int v3 = (L2 == 356)? 2: 0;
+  Int v3p = (L2p == 356)? 2: 0;	/* likewise for year x₁ + 1 */
+
+  /* calculate the effect of the fourth delay on the length of year x₁ */
+  Int v4 = (L2m == 382);
+  Int v4p = (L2 == 382);	/* likewise for year x₁ + 1 */
+
+  /* calculate the running day number of New Year of calculation year x₁ */
+  Int c2 = nu2 + v3 + v4;
+  Int c2p = nu2p + v3p + v4p;	/* likewise for year x₁ + 1 */
+  Int L = c2p - c2;		/* the length of calculation year x₁ */
+
+  /* calculate the running day number within the calendar year of the
+     first day of calculation month x₃, assuming a regular year, and
+     assuming 0 ≤ x₃ ≤ 12 */
+  Int c3 = (384*x3 + 7)/13;
+
+  /* the lengths of calendar months 8 and 9 depend on the length of
+     the year */
+  if (x3 > 7)
+    c3 += ((L + 7)/2)%15;	/* adjustment for length of calendar month 8 */
+  if (x3 > 8)
+    c3 -= ((385 - L)/2)%15;	/* adjustment for length of calendar month 9 */
+
+  return c2 + c3;
+}
+/*--------------------------------------------------------------------------*/
+Int HebrewtoCJDN(int year, int month, int day)
+/* assumed: 1 ≤ month ≤ 13; -5879540 ≤ year ≤ 5879538 */
+{
+  /* The calendar year runs from calendar day 1 of calendar month 7 (=
+     New Year) through the last calendar day of calendar month 6.  The
+     calculation year runs from calendar day 1 of calendar month 1
+     through the last day of the last calendar month (12 or 13).  New
+     Year of a certain calendar year is the first day of the
+     calculation year with the same number.  The calculation year,
+     month, day start counting at 0.
+
+     Translate (calendar) year, month, day into calculation year,
+     calculation month, calculation day. */
+  Int c0 = (13 - month)/7;	/* assumption: 1 ≤ month ≤ 13  */
+  Int x1 = year - 1 + c0;	/* calculation year */
+  Int x3 = month - 1;		/* calculation month */
+  Int z4 = day - 1;		/* calculation day */
+  /* Calculate the running day number of the first day of calculation
+     year x₁, calculation month x₃, relative to calendar day 1 of
+     calendar month 1 preceding New Year (calendar day 1 of calendar
+     day 7) of year A.M. 1 */
+  Int rd = Hebrew_cycm2rd(x1, x3);
+  return rd + HEBREW_EPOCH - 177 + z4; /* CJDN */
 }
 /*--------------------------------------------------------------------------*/
 void HebrewtoCJDNA(Int const *date, Int *CJDN)
@@ -912,7 +991,7 @@ void HebrewtoCJDNA(Int const *date, Int *CJDN)
 /*--------------------------------------------------------------------------*/
 Int HebrewStoCJDN(char const *date)
 {
-    return S3toCJDN(date, HebrewtoCJDN,
+  return S3toCJDN(date, HebrewtoCJDN,
                   arraysize(Hebrew_monthnames),
                   Hebrew_monthnames);
 }

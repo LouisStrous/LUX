@@ -14796,15 +14796,15 @@ this calendar is 15 October 1582 (Gregorian), which followed directly
 after 4 October 1582 (Julian).
 @item /...ISLAMIC
 indicates the most widespread tabulated Islamic calendar.  The first day
-of this calendar corresponds to 16 July 622 (Julian).
+of this calendar corresponds to 16 July 622 in the Julian calendar.
 @item /...JULIAN
 indicates the Julian (proleptic) calendar.
 @item /...JD
 indicates the Julian day number system.  Julian day number 0 corresponds
-to 1 January -4712 (Julian).
+to 1 January -4712 in the Julian calendar.
 @item /...HEBREW
 indicates the Hebrew calendar.  The first day of this calendar
-corresponds to 6 October @minus{}3760.
+corresponds to 6 October @minus{}3760 in the Julian calendar.
 @item /...COMMON
 equals @code{/...GREGORIAN} from 15 October 1582 (Gregorian) on and
 @code{/...JULIAN} before then.
@@ -14814,14 +14814,14 @@ Year" by Munro Edmonson).  @code{/FROMMAYAN} is not available.
 @code{/TOMAYAN} implies @code{/TOTEXT}. 
 @item /...LONGCOUNT
 indicates the Olmec Long Count (according to Edmonson).  Long Count
-0.0.0.0.0 corresponds to 6 September -3113 (Julian).
+0.0.0.0.0 corresponds to 6 September -3113 in the Julian calendar.
 @code{/TOLONGCOUNT} implies @code{/TOTEXT}.  @code{/FROMLONGCOUNT}
 only works if the input is text.
 @item /...EGYPTIAN
 indicates the Egyptian calendar used in ancient astronomy (e.g., by
 Ptolemy in the Almagest), with strictly 365 days per year.  The year
 count is based on the era of Nabonassar (1 Thoth, year 1 = 26 February
-@minus{}746 Julian).
+@minus{}746 in the Julian calendar).
 @item /...LUNAR
 indicates a (fractional) count of New Moons since the first New Moon
 after Julian Day number 0.  The count is based on the mean motion of the
@@ -15133,25 +15133,26 @@ names, and lengths (in days) are listed in the following table
 
 @example
 Number  Month Name    Length
-  1         Tishri      30
-  2        Heshvan   29 or 30
-  3         Kislev   29 or 30
-  4          Tevet      29
-  5         Shevat      30
-  6           Adar      30
-           Adar II      29  (only present in leap years)
-  7          Nisan      30
-  8          Iyyar      29
-  9          Sivan      30
- 10         Tammuz      29
- 11             Av      30
- 12           Elul      29
+  1          Nisan      30
+  2          Iyyar      29
+  3          Sivan      30
+  4         Tammuz      29
+  5             Av      30
+  6           Elul      29
+  7         Tishri      30
+  8        Heshvan   29 or 30
+  9         Kislev   29 or 30
+ 10          Tevet      29
+ 11         Shevat      30
+ 12         Adar Ⅰ      30 (only present in leap years)
+12/13     Adar (Ⅱ)      29
 @end example
 
 Leap days may be inserted at the ends of the months of Heshvan and
-Kislev, and a leap month Adar II may be inserted at the end of the month
-of Adar (I).  This means that any given year may contain six different
-numbers of days, as listed in the following table
+Kislev, and a leap month Adar Ⅰ may be inserted just before month
+Adar, which in that case is renamed to Adar Ⅱ.  This means that any
+given year may contain six different numbers of days, as listed in the
+following table
 
 @example
   Days     Designation
@@ -15163,11 +15164,7 @@ numbers of days, as listed in the following table
    385     complete leap year
 @end example
 
-There are 7 leap years in a fixed cycle of 19 years.  The
-@code{CALENDAR} function treats Adar and Adar II as a single month,
-which has 30 days in a non-leap year and 59 days in a leap year.  This
-way, Nisan and later months always corresponds to the same month number,
-regardless of whether the year is a leap year or not.
+There are 7 leap years in a fixed cycle of 19 years.
 
 The epoch of the Hebrew calendar is sunset of 6 October @minus{}3760
 C.E., which was taken to be the date of the creation of the world.  The
@@ -15175,6 +15172,9 @@ Era of the Hebrew calendar is referred to as A.M. (= Anno Mundi).  The
 first noon after the epoch was the noon of 7 October @minus{}3760 C.E.,
 so the @code{CALENDAR} function equates 1 Tishri 1 A.M. with 7 October
 @minus{}3760 C.E.
+
+For transforming from Hebrew calendar dates, years from -5879540
+through 5878588 provide accurate results.
 
 @c -------------------------------------
 @node Julian Day Numbers, Egyptian Calendar, Hebrew Calendar, CALENDAR

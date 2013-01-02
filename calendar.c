@@ -768,14 +768,12 @@ void CJDNtoHebrew(Int CJDN, Int *year, Int *month, int *day)
 {
   Int Hebrew_cycm2rd(Int x1, Int x3);
 
-  /* We keep track of the allowable values of CJDN, as the calculation
-     proceeds.  -2147483647 ≤ CJDN ≤ 2147483647 */
-
   /* running day number since day 1 of month 1 preceding New Year of
-     year 1;  */
+     year 1 */
+  /* -2147483647 ≤ CJDN ≤ 2147483647 */
   Int y4 = CJDN - HEBREW_EPOCH + 177;
   /* -2147135826 ≤ CJDN ≤ 2147483647
-     -2147483647 ≤ y4 ≤ 2147135826*/
+     -2147483647 ≤ y₄ ≤ 2147135826 */
 
   /* calculate the provisional running calculation month number,
      disregarding the 2nd, 3rd and 4th delays.  The formula is
@@ -787,38 +785,42 @@ void CJDNtoHebrew(Int CJDN, Int *year, Int *month, int *day)
   Div_t d1 = adiv(y4, 1447);
   Int y1 = 49*d1.quot + (23*d1.quot + 25920*d1.rem + 13835)/765433;
   /* -2147135826 ≤ CJDN ≤ 2147483647
-     -72708860 ≤ y1 ≤ 72720638 months */
+     -2147483647 ≤ y₄ ≤ 2147135826
+     -72720640 ≤ y₁ ≤ 72708859 */
 
-  /* try the next month first; then if the provisional calculation day
-     is negative, we know that we went one month too far.  If we try
-     the current month first and the provisional calculation day turns
-     out to be 29, then we don't know if it is really calculation day
-     29 of the current month (of 30 days) or calculation day 0 of the
-     next month (because the current month was 29 days). */
-  ++y1;
+  /* The provisional running calculation month number might be correct
+     or one too small or one too great. */
 
   Int x1 = iaquot(19*y1 + 17, 235); /* provisional calculation year number */
-  /* -2147135826 ≤ CJDN ≤ 2147483647
-     -5878589 ≤ x1 ≤ 5879541 years */
-
+  /* -5879541 ≤ x₁ ≤ 5878588 */
   Int x3 = y1 - iaquot(235*x1 + 1, 19); /* provisional calculation
 					   month number */
-  /* -2147135826 ≤ CJDN ≤ 2147483647
-     0 ≤ x3 ≤ 12 months */
-
   /* calculate the running day number of the beginning of calculation
      month x3 of calculation year x1 */
   Int c4 = Hebrew_cycm2rd(x1, x3);
+  /* -5879539 ≤ x₁ ≤ 5878588 */
 
   Int z4 = y4 - c4;		/* provisional calculation day */
-  if (z4 < 0) {			/* the provisional month was one too
-				   great after all */
-    --y1;
-    x1 = iaquot(19*y1 + 17, 235);
-    x3 = y1 - iaquot(235*x1 + 1, 19);
-    c4 = Hebrew_cycm2rd(x1, x3);
-    z4 = y4 - c4;
-  }
+  if (z4 < 0 || z4 > 28) {	/* the month number may be wrong */
+    if (z4 < 0) {	 /* the provisional month was one too great */
+      --y1;
+      x1 = iaquot(19*y1 + 17, 235);
+      x3 = y1 - iaquot(235*x1 + 1, 19);
+      c4 = Hebrew_cycm2rd(x1, x3);
+      z4 = y4 - c4;
+    } else {			/* the provisional month may be one too small */
+      Int y1b = y1 + 1;
+      Int x1b = iaquot(19*y1b + 17, 235);
+      Int x3b = y1b - iaquot(235*x1b + 1, 19);
+      Int c4b = Hebrew_cycm2rd(x1b, x3b);
+      Int z4b = y4 - c4b;
+      if (z4b == 0) {		/* provisional month y1 was indeed one too small */
+	x1 = x1b;
+	x3 = x3b;
+	z4 = z4b;
+      }	/* else y1 was already correct after all */
+    }
+  } /* else y1 was already correct */
   /* translate from calculation year/month/day to calendar
      year/month/day */
   Int c0 = (12 - x3)/7;
@@ -869,19 +871,17 @@ Int tishri2(Int x1)
 /* returns the number of days between New Year (= the first day of
    month Tishri) of calculation year 0 and New Year of calculation
    year x₁, including the first two delays.  To avoid overflow in the
-   final result, we must have -5879541 ≤ x₁ ≤ 5879540 -- but this is
+   final result, we must have -5879540 ≤ x₁ ≤ 5879541 -- but this is
    not checked.  LS 24dec2012 */
 {
-  /* we keep track of the allowable range of x₁
-     -2147483647 ≤ x₁ ≤ 2147483647*/
-
   /* calculate the running month number of calculation month 0 of
      calculation year x₁; i.e., the number of months between
      calculation month 0 of calculation year 0 and calculation month 0
      of calculation year x₁ */
+  /* -2147483647 ≤ x₁ ≤ 2147483647 */
   Int c1 = iaquot(235*x1 + 1, 19);
-  /* -2147483655 ≤ c₁ ≤ 2147483641
-     -173626338 ≤ x₁ ≤ 173626337 */
+  /* -173626337 ≤ c₁ ≤ 173626337
+     -2147483642 ≤ x₁ ≤ 2147483641 */
 
   /* calculate the number of days between 1 Tishri A.M. 1 and the
      first day of running month c₁, taking into account the first
@@ -896,17 +896,18 @@ Int tishri2(Int x1)
      http://http://aa.quae.nl/en/reken/juliaansedag.html */
   Div_t d = adiv(c1, 1095);
   Int nu1 = 32336*d.quot + iaquot(15*d.quot + 765433*d.rem + 12084, 25920);
-  /* -2147483646 ≤ υ₁ ≤ 2147483646 
-     -72720638 ≤ c₁ ≤ 72720638
-     -5879541 ≤ x₁ ≤ 5879540 */
+  /* -2147483321 ≤ υ₁ ≤ 2147483646
+     -72720627 ≤ c₁ ≤ 72720638
+     -5879540 ≤ x₁ ≤ 5879541 */
 
   /* calculate the number of days between 1 Tishri A.M. 1 and the
      first day of running month c₁, taking into account the first
      and second delays. */
   Int nu2 = nu1 + iaquot(6*iamod(nu1, 7), 7)%2;
-  /* -2147483646 ≤ υ₂ ≤ 2147483647 
-     -72720638 ≤ c₁ ≤ 72720638
-     -5879541 ≤ x₁ ≤ 5879540 */
+  /* -2147483321 ≤ υ₂ ≤ 2147483647
+     -2147483321 ≤ υ₁ ≤ 2147483646
+     -72720627 ≤ c₁ ≤ 72720638
+     -5879540 ≤ x₁ ≤ 5879541 */
   return nu2;
 }
 /*--------------------------------------------------------------------------*/
@@ -914,16 +915,21 @@ Int Hebrew_cycm2rd(Int x1, Int x3)
 /* returns the running day number of the first day of Hebrew
    calculation year <x1>, calculation month <x3>, relative to the
    first day of calculation year 0, calculation month 0.  To avoid
-   overflow, we must have -5879540 ≤ x₁ ≤ 5879538 -- but this is not
+   overflow, we must have -5879539 ≤ x₁ ≤ 5879539 -- but this is not
    checked. */
 {
   /* calculate the running day number (since New Year of calculation
      year 0) of New Year of calculation year x₁ - 1, taking into
      account only the first two delays */
   Int nu2m = tishri2(x1 - 1);
+  /* -5879539 ≤ x₁ ≤ 5879541 */
   Int nu2 = tishri2(x1);	/* likewise for year x₁ */
+  /* -5879539 ≤ x₁ ≤ 5879541
+     -2147482937 ≤ υ₂ ≤ 2147482937 */
   Int nu2p = tishri2(x1 + 1);	/* likewise for year x₁ + 1 */
+  /* -5879539 ≤ x₁ ≤ 5879540 */
   Int nu2p2 = tishri2(x1 + 2);	/* likewise for year x₁ + 2 */
+  /* -5879539 ≤ x₁ ≤ 5879539 */
 
   /* calculate the length of year x₁ - 1, taking into account only the
      first two delays */
@@ -948,6 +954,7 @@ Int Hebrew_cycm2rd(Int x1, Int x3)
      first day of calculation month x₃, assuming a regular year, and
      assuming 0 ≤ x₃ ≤ 12 */
   Int c3 = (384*x3 + 7)/13;
+  /* 0 ≤ c₃ ≤ 355 */
 
   /* the lengths of calendar months 8 and 9 depend on the length of
      the year */
@@ -955,12 +962,15 @@ Int Hebrew_cycm2rd(Int x1, Int x3)
     c3 += ((L + 7)/2)%15;	/* adjustment for length of calendar month 8 */
   if (x3 > 8)
     c3 -= ((385 - L)/2)%15;	/* adjustment for length of calendar month 9 */
+  /* 0 ≤ c₃ ≤ 356 */
 
   return c2 + c3;
+  /* -2147482937 ≤ result ≤ 2147483293 */
 }
 /*--------------------------------------------------------------------------*/
 Int HebrewtoCJDN(int year, int month, int day)
-/* assumed: 1 ≤ month ≤ 13; -5879540 ≤ year ≤ 5879538 */
+/* assumed: 1 ≤ month ≤ 13; no overflow occurs for years between
+   -5879540 and 5878588, inclusive */
 {
   /* The calendar year runs from calendar day 1 of calendar month 7 (=
      New Year) through the last calendar day of calendar month 6.  The

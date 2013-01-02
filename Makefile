@@ -25,7 +25,7 @@ BRANCH = $(subst refs/heads/,,$(shell git symbolic-ref HEAD 2>/dev/null))
 ifeq ($(BRANCH),)
 BRANCH = "(unnamed branch)"
 endif
-TAG = $(shell git describe --exact-match HEAD 2>/dev/null)
+TAG = $(shell git describe --tags HEAD 2>/dev/null)
 ifeq ($(TAG),)
 TAG = $(shell git rev-parse HEAD)
 endif

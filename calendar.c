@@ -1170,7 +1170,7 @@ void CJDNtoEgyptian(Int CJDN, Int *year, Int *month, Int *day)
   /* era of Nabonassar */
   Int y2 = CJDN - EGYPTIAN_EPOCH;
   Div_t d = adiv(y2, 365);
-  *year = d.quot;
+  *year = d.quot + 1;
   d = adiv(d.rem, 30);
   *month = d.quot + 1;
   *day = d.rem + 1;

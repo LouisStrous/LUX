@@ -2914,7 +2914,10 @@ Int ana_siderealtime(Int narg, Int ps[])
 }
 /*--------------------------------------------------------------------------*/
 void VSOPtoFK5(Double T, Double *pos)
-/* transforms from VSOP polar coordinates to FK5 polar coordinates */
+/* transforms from VSOP polar coordinates to FK5 polar coordinates; T
+   is in Julian centuries since J2000.0; pos[] contains polar
+   coordinates (longitude, latitude, radius) in radians and AU,
+   relative to the VSOP dynamical ecliptic and equinox of date */
 {
   Double	ll, cll, sll;
   
@@ -2923,6 +2926,17 @@ void VSOPtoFK5(Double T, Double *pos)
   sll = sin(ll);
   pos[0] += -4.3793e-7 + 1.8985e-7*(cll + sll)*tan(pos[1]);
   pos[1] += 1.8985e-7*(cll - sll);
+}
+/*--------------------------------------------------------------------------*/
+void XYZ_VSOPtoFK5(Double T, Double *pos)
+/* transforms from VSOP cartesian coordinates (relative to the
+   dynamical ecliptic and equinox of the date) to FK5 cartesian
+   coordinates */
+{
+  Double tpos[3];
+  XYZtoLBR(pos, tpos);
+  VSOPtoFK5(T, tpos);
+  LBRtoXYZ(tpos, pos);
 }
 /*--------------------------------------------------------------------------*/
 #define EQUINOX_OF_DATE	DBL_MAX
@@ -3459,21 +3473,30 @@ void heliocentricXYZr(Double JDE, Int object, Double equinox, Double *pos,
       }
       if ((internalMode & S_BARE) == 0) {
 	if (internalMode & S_FK5) {
-	  if (vocal && J2000 != JDE)
-	    printf("ASTRON: precess ecliptic coordinates from J2000.0 to JD %1$.14g = %1$-#24.6J\n", JDE);
-	  XYZ_eclipticPrecession(pos, J2000, JDE); /* precess to equinox of date */
-	  VSOPtoFK5(10*T, pos);                    /* transform to FK5 */
-	  if (vocal) {
-	    printf("ASTRON: FK5 (%s) geometric heliocentric ecliptic coordinates, equinox/ecliptic of date (JD %2$.14g = %2$-#24.6J):\n", objectName(object), JDE);
-	    printLBRtoXYZ(pos);
+	  if (J2000 != JDE) {
+	    if (vocal)
+	      printf("ASTRON: precess ecliptic coordinates from J2000.0 to ecliptic of date (JD %1$.14g = %1$-#24.6J)\n", JDE);
+	    XYZ_eclipticPrecession(pos, J2000, JDE); /* precess to equinox of date */
+	    if (vocal)
+	      printXYZtoLBR(pos);
 	  }
-	  if (vocal && JDE != equinox)
-	    printf("ASTRON: precess ecliptic coordinates from JD %1$.14g = %1$-#24.6J to JD %2$.14g = %2$-#24.6J\n", JDE, equinox);
-	  XYZ_eclipticPrecession(pos, JDE, equinox); /* precess to desired equinox */
+	  XYZ_VSOPtoFK5(T, pos); /* transform to FK5 (must be equinox of date) */
+	  if (vocal) {
+	    printf("ASTRON: FK5 (%s) geometric heliocentric ecliptic coordinates, ecliptic of date (JD %2$.14g = %2$-#24.6J):\n", objectName(object), JDE);
+	    printXYZtoLBR(pos);
+	  }
+	  if (JDE != equinox) {
+	    if (vocal)
+	      printf("ASTRON: precess ecliptic coordinates from JD %1$.14g = %1$-#24.6J to JD %2$.14g = %2$-#24.6J\n", JDE, equinox);
+	    XYZ_eclipticPrecession(pos, JDE, equinox); /* precess to desired equinox */
+	    if (vocal)
+	      printXYZtoLBR(pos);
+	  }
 	} else {
-	  if (vocal && J2000 != equinox)
+	  if (J2000 != equinox) {
 	    printf("ASTRON: precess ecliptic coordinates from J2000.0 to JD %1$.14g = %1$-#24.6J\n", equinox);
-	  XYZ_eclipticPrecession(pos, J2000, equinox); /* precess to desired equinox */
+	    XYZ_eclipticPrecession(pos, J2000, equinox); /* precess to desired equinox */
+	  }
 	}
       }
       break;
@@ -3488,15 +3511,17 @@ void heliocentricXYZr(Double JDE, Int object, Double equinox, Double *pos,
       }
       if ((internalMode & S_BARE) == 0) {
 	if (internalMode & S_FK5) {
-	  VSOPtoFK5(10*T, pos);                    /* transform to FK5 */
+	  XYZ_VSOPtoFK5(T, pos); /* transform to FK5 */
 	  if (vocal) {
 	    printf("ASTRON: FK5 (%s) geometric heliocentric ecliptic coordinates, equinox/ecliptic of date (JD %2$.14g = %2$-#24.6J):\n", objectName(object), JDE);
-	    printLBRtoXYZ(pos);
+	    printXYZtoLBR(pos);
 	  }
 	}
-	if (vocal && JDE != equinox)
-	  printf("ASTRON: precess ecliptic coordinates from JD %1$.14g = %1$-#24.6J to JD %2$.14g = %2$-#24.6J\n", JDE, equinox);
-	XYZ_eclipticPrecession(pos, JDE, equinox); /* precess to desired equinox */
+	if (JDE != equinox) {
+	  if (vocal)
+	    printf("ASTRON: precess ecliptic coordinates from JD %1$.14g = %1$-#24.6J to JD %2$.14g = %2$-#24.6J\n", JDE, equinox);
+	  XYZ_eclipticPrecession(pos, JDE, equinox); /* precess to desired equinox */
+	}
       }
       break;
     default:

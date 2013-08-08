@@ -4714,7 +4714,7 @@ Int ana_getmatchedfiles(Int narg, Int ps[])/* get all file names that match */
 {
   Int	result_sym;
   char	*s;
-  Int	ana_getfiles(Int, Int []);
+  Int	ana_getfiles_m(Int, Int [], Int);
 
   /* the first arg is the regular expression string */
   if (!symbolIsString(ps[0]))
@@ -4726,9 +4726,7 @@ Int ana_getmatchedfiles(Int narg, Int ps[])/* get all file names that match */
     regfree(&re);
     return ANA_ERROR;
   }
-  match_flag = 1;
-  result_sym = ana_getfiles(narg - 1, &ps[1]);
-  match_flag = 0;
+  result_sym = ana_getfiles_m(narg - 1, &ps[1], 1);
   regfree(&re);
   return result_sym;
 }
@@ -4748,7 +4746,7 @@ Int ana_getmatchedfiles_r(Int narg, Int ps[])	/* also search subdir */
 #endif
  /*------------------------------------------------------------------------- */
 #if HAVE_REGEX_H
-Int file_get(char *startpath)
+Int file_get(char *startpath, int match_flag)
 /* Headers:
    <sys/types.h>: stat(), opendir(), readdir(). regexec(), closedir()
    <sys/stat.h>: stat(), struct stat
@@ -4809,7 +4807,7 @@ Int file_get(char *startpath)
       /* check if a directory */
       if (recursive_flag && (statbuf.st_mode & S_IFMT) == S_IFDIR) {
 	/* and call ourselves for the next level */
-	if (file_get(sq) != 1) {
+	if (file_get(sq, match_flag) != 1) {
 	  closedir(dirp);
 	  return ANA_ERROR;
 	}
@@ -4914,7 +4912,7 @@ Int ana_getfiles_r(Int narg, Int ps[])	/* also search subdir */
 /*------------------------------------------------------------------------- */
 #if HAVE_REGEX_H
 /* ana_getfiles() calls file_get() which uses <regex.h> */
-Int ana_getfiles(Int narg, Int ps[])
+Int ana_getfiles_m(Int narg, Int ps[], Int match_flag)
 /* get all file names in directory */
 /* call is:  strings = getfiles( path, [maxfiles] ) */
 /* Headers:
@@ -4950,7 +4948,7 @@ Int ana_getfiles(Int narg, Int ps[])
   p = names;
 
   if (get_type_flag == 0)
-    status = file_get(startpath);
+    status = file_get(startpath, match_flag);
   else
     status = directs_get(startpath);
   /* reset the flag to default here so we needn't do it in getdirectories */
@@ -4974,12 +4972,17 @@ Int ana_getfiles(Int narg, Int ps[])
     free(names);
   return result_sym;
 }
+ /*------------------------------------------------------------------------- */
+Int ana_getfiles(Int narg, Int ps[], Int match_flag)
+{
+  return ana_getfiles_m(narg, ps, 0:
+}
 #endif
  /*------------------------------------------------------------------------- */
 #if HAVE_REGEX_H
 /* ana_getdirectories() calls ana_getfiles() which calls file_get() which */
 /* uses <regex.h> */
-Int ana_getdirectories(Int narg, Int ps[])
+Int ana_getdirectories(Int narg, Int ps[], int match_flag)
 /* get all subdirectories in directory */
 /* call is:  strings = getdirectories( path, [maxfiles] ) */
 {

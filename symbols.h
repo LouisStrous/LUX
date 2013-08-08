@@ -1,6 +1,7 @@
 /* File symbols.h */
 /* Macro definitions that specify various parts of ANA symbols */
 /* $Id: symbols.h,v 4.1 2001/02/08 19:24:39 strous Exp $ */
+#include "types.h"
 #define array_data(symbol)	/* void * */ ((void *) (array_header(symbol) + 1))
 #define array_dims(symbol)	/* Int * */ ((Int *)(array_header(symbol)->dims))
 #define array_facts(symbol)	/* arrayFacts */ (array_header(symbol)->facts)

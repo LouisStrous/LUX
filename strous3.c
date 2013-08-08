@@ -160,7 +160,7 @@ Int ana_bisect(Int narg, Int ps[])
 	/* install table for cubic spline interpolation */
 	cubic_spline_tables(x.f, srcinfo.type, 1,
 			    src.f, srcinfo.type, step,
-			    srcinfo.rdims[0], 0,
+			    srcinfo.rdims[0], 0, 0,
 			    &cspl);
 
 	/* the cubic spline may dip below the lower of the surrounding
@@ -281,7 +281,7 @@ Int ana_bisect(Int narg, Int ps[])
 	/* install table for cubic spline interpolation */
 	cubic_spline_tables(x.d, srcinfo.type, 1,
 			    src.d, srcinfo.type, step,
-			    srcinfo.rdims[0], 0,
+			    srcinfo.rdims[0], 0, 0,
 			    &cspl);
 
 	/* the cubic spline may dip below the lower of the surrounding
@@ -480,7 +480,7 @@ Int ana_cspline_find(Int narg, Int ps[])
 	/* install table for cubic spline interpolation */
 	cubic_spline_tables(NULL, srcinfo.type, 1,
 			    src.f, srcinfo.type, step,
-			    srcinfo.rdims[0], 0,
+			    srcinfo.rdims[0], 0, 0,
 			    &cspl);
 	/* the levels are assumed to be sorted in ascending order */
 	do {
@@ -525,7 +525,7 @@ Int ana_cspline_find(Int narg, Int ps[])
 	/* install table for cubic spline interpolation */
 	cubic_spline_tables(NULL, srcinfo.type, 1,
 			    src.d, srcinfo.type, step,
-			    srcinfo.rdims[0], 0,
+			    srcinfo.rdims[0], 0, 0,
 			    &cspl);
 	/* the levels are assumed to be sorted in ascending order */
 	do {

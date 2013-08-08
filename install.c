@@ -299,7 +299,7 @@ internalRoutine	subroutine_table[] = {
    "0DEP:1DVI:2DEV:3IMG:4PLT:5RIM:6RPL:7X11:8TODVI:16TODEV:24TOIMG:32TOPLT:40TORIM:48TORPL:56TOX11" },
   { "CRUNCH",	3, 3, ana_crunch, 0 }, /* crunch.c */
   { "CRUNCHRUN",	3, 3, ana_crunchrun, 0 }, /* crunch.c */
-  { "CSPLINE_EXTR", 5, 8, ana_cubic_spline_extreme, "1KEEPDIMS:2PERIODIC::::POS:MINPOS:MINVAL:MAXPOS:MAXVAL" }, /* fun3.c */
+  { "CSPLINE_EXTR", 5, 8, ana_cubic_spline_extreme, "1KEEPDIMS:2PERIODIC:4AKIMA::::POS:MINPOS:MINVAL:MAXPOS:MAXVAL" }, /* fun3.c */
   { "D",	0, MAX_ARG, ana_dump, /* fun1.c */
     "+|36|1FIXED:2SYSTEM:4ZERO:8LOCAL:24CONTEXT:32FOLLOW:64FULL" },
   { "DECOMP",	1, 1, ana_decomp, 0 }, /* fun2.c */
@@ -899,7 +899,7 @@ internalRoutine function_table[] = {
     ":::WEIGHTS:*0SAMPLE:1POPULATION:2KEEPDIMS:4DOUBLE" }, /* fun2.c */
   { "CROSSCORR", 2, 3, ana_crosscorr, 0 }, /* fun2.c */
   { "CRUNCH",	3, 3, ana_crunch_f, 0 }, /* crunch.c */
-  { "CSPLINE",	0, 5, ana_cubic_spline, /* fun3.c */ "1KEEP:2PERIODIC:4GETDERIVATIVE" },
+  { "CSPLINE",	0, 5, ana_cubic_spline, /* fun3.c */ "1KEEP:2PERIODIC:4AKIMA:8GETDERIVATIVE" },
   { "CSPLINE_FIND", 2, 4, ana_cspline_find, ":::AXIS:INDEX" }, /* strous3.c */
   { "CTOP",	1, 3, ana_cartesian_to_polar, 0 }, /* fun4.c */
   { "DATE_FROM_TAI", 1, 2, ana_date_from_tai, 0 }, /* ephem.c */
@@ -950,7 +950,7 @@ internalRoutine function_table[] = {
   { "FIND_MAXLOC", 1, 3, ana_find_maxloc, /* strous2.c */ "::DIAGONAL:1DEGREE:2SUBGRID:4COORDS:8OLD" },
   { "FIND_MIN",	1, 3, ana_find_min, /* strous2.c */ "::DIAGONAL:1DEGREE:2SUBGRID" },
   { "FIND_MINLOC", 1, 3, ana_find_minloc, /* strous2.c */ "::DIAGONAL:1DEGREE:2SUBGRID:4COORDS" },
-  { "FIT",	3, 17, ana_generalfit, /* fit.c */ "|4|::START:STEP:LOWBOUND:HIGHBOUND:WEIGHTS:QTHRESH:PTHRESH:ITHRESH:DTHRESH:FAC:NITER:NSAME:ERR:FIT:TTHRESH:1VOCAL:4DOWN:8PCHI:16GAUSSIANS:32POWERFUNC:64ONEBYONE" },
+  { "FIT",	3, 17, ana_generalfit, /* fit.c */ "|4|::START:STEP:LOWBOUND:HIGHBOUND:WEIGHTS:QTHRESH:PTHRESH:ITHRESH:DTHRESH:FAC:NITER:NSAME:ERR:FIT:TTHRESH:1VOCAL:4DOWN:8PCHI:16GAUSSIANS:32POWERFUNC:64ONEBYONE:129VERR" },
 #if DEVELOP
   { "FIT2",	4, 11, ana_geneticfit, "X:Y:NPAR:FIT:WEIGHTS:MU:GENERATIONS:POPULATION:PCROSS:PMUTATE:VOCAL:1ELITE:2BYTE:4WORD:6LONG:8FLOAT:10DOUBLE" }, /* fit.c */
 #endif

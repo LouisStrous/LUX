@@ -3271,7 +3271,7 @@ void cleanup_cubic_spline_tables(csplineInfo *cspl) {
 /*------------------------------------------------------------------------- */
 Int cubic_spline_tables(void *xx, Int xType, Int xStep,
 			void *yy, Int yType, Int yStep,
-			Int nPoints, Byte periodic,
+			Int nPoints, Byte periodic, Byte akima,
 			csplineInfo *cspl)
 /* installs a cubic spline for later quick multiple interpolations */
 /* <xx> must point to the x coordinates, which are of ANA data type <xType> */
@@ -3285,8 +3285,11 @@ Int cubic_spline_tables(void *xx, Int xType, Int xStep,
   pointer xin, yin;
   Double *x, *y;
 
-  const gsl_interp_type *interp_type
-    = periodic? gsl_interp_cspline_periodic: gsl_interp_cspline;
+  const gsl_interp_type *interp_type;
+  if (akima)
+    interp_type = periodic? gsl_interp_akima_periodic: gsl_interp_akima;
+  else
+    interp_type = periodic? gsl_interp_cspline_periodic: gsl_interp_cspline;
 
   uint32_t minsize = gsl_interp_type_min_size(interp_type);
   if (nPoints < minsize) {
@@ -3398,13 +3401,18 @@ Double cspline_value(Double x, csplineInfo *cspl)
 {
   gsl_spline *s = cspl->spline;
 
-  if (x < s->x[0])
-    return s->y[0]
-      + (x - s->x[0])*(s->y[1] - s->y[0])/(s->x[1] - s->x[0]);
+  if (x < s->x[0]) {
+    double d1 = gsl_spline_eval_deriv(s, s->x[0], cspl->acc);
+    double d2 = gsl_spline_eval_deriv2(s, s->x[0], cspl->acc);
+    double dx = x - s->x[0];
+    return s->y[0] + dx*(d1 + dx*d2);
+  }
   if (x > s->x[s->size - 1]) {
-    Int n = s->size;
-    return s->y[n-1]
-      + (x - s->x[n-1])*(s->y[n-2] - s->y[n-1])/(s->x[n-2] - s->x[n-1]);
+    Int n = s->size - 1;
+    double d1 = gsl_spline_eval_deriv(s, s->x[n], cspl->acc);
+    double d2 = gsl_spline_eval_deriv2(s, s->x[n], cspl->acc);
+    double dx = x - s->x[n];
+    return s->y[n] + dx*(d1 + dx*d2);
   }
   return gsl_spline_eval(s, x, cspl->acc);
 }
@@ -3641,7 +3649,8 @@ Int ana_cubic_spline(Int narg, Int ps[])
   if (xTabSym) {		/* install new table */
     if (cubic_spline_tables(array_data(xTabSym), array_type(xTabSym), 1,
 			    array_data(yTabSym), array_type(yTabSym), 1,
-			    array_size(xTabSym), internalMode & 2, &cspl))
+			    array_size(xTabSym), internalMode & 2,
+			    internalMode & 4, &cspl))
       return ANA_ERROR;		/* some error */
     haveTable = 1;
   }
@@ -3675,7 +3684,7 @@ Int ana_cubic_spline(Int narg, Int ps[])
 	result_sym = cerror(ILL_TYPE, xNewSym);
     }
     if (result_sym != ANA_ERROR) { /* no error */
-      if (internalMode & 4) 	/* return the interpolated derivative */
+      if (internalMode & 8) 	/* return the interpolated derivative */
 	while (size--)
 	  *trgt.d++ = cspline_derivative(*src.d++, &cspl);
       else			/* return the interpolated value */
@@ -3804,6 +3813,7 @@ Int ana_cubic_spline_extreme(Int narg, Int ps[])
 	cubic_spline_tables(x.f, ANA_FLOAT, 1,
 			    y.f, ANA_FLOAT, step,
 			    yinfo.rdims[0], internalMode & 2? 1: 0,
+			    internalMode & 4? 1: 0,
 			    &cspl);
 
 	rightedge.f = y.f + step*(yinfo.rdims[0] - 1);
@@ -3894,6 +3904,7 @@ Int ana_cubic_spline_extreme(Int narg, Int ps[])
 	cubic_spline_tables(x.d, ANA_DOUBLE, 1,
 			    y.d, ANA_DOUBLE, step,
 			    yinfo.rdims[0], internalMode & 2? 1: 0,
+			    internalMode & 4? 1: 0,
 			    &cspl);
 
 	rightedge.d = y.d + step*(yinfo.rdims[0] - 1);

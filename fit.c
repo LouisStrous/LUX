@@ -99,7 +99,7 @@ Int ana_generalfit(Int narg, Int ps[])
   Double *yp, *xp, *start, *step, qThresh, *pThresh, fac, *lowbound, *hibound,
         *err, *par, qBest1, qBest2, *parBest1, *parBest2, *ran, qual, temp,
     dir, dThresh, qLast, mu, *meanShift, *weights, tThresh;
-  char  vocal, onebyone;
+  char  vocal, onebyone, vocal_err;
   void  randomn(Int seed, Double *output, Int number, char hasUniform);
   Double (*fitProfiles[2])(Double *, Int, Double *, Double *, Double *, Int) =
   { gaussians, powerfunc };
@@ -297,6 +297,7 @@ Int ana_generalfit(Int narg, Int ps[])
     tThresh = 3600;
 
   vocal = (internalMode & 1)? 1: 0; /* /VOCAL */
+  vocal_err = (internalMode & 129)? 1: 0; /* /VERR */
   if (internalMode & 4)         /* /DOWN */
     dir = 0.8;
   else
@@ -388,6 +389,7 @@ Int ana_generalfit(Int narg, Int ps[])
   mu = 0;
   onebyone = (internalMode & 64? 1: 0);
   nn = (onebyone? nPar: nIter);
+  int pr = 5;
   do {                          /* iterate */
     qLast = qBest2;
     if (onebyone)
@@ -451,16 +453,23 @@ Int ana_generalfit(Int narg, Int ps[])
         meanShift[j] = 0.0;
     }
     if (vocal) {
-      printf("%3d %10.5g: ", iter, qBest2);
+      double d = fabs(qLast - qBest2)/qLast; /* relative improvement */
+      if (d) {
+	pr = 2 - log10(d);
+	printf("\r%3d %#*.*g: ", iter, pr + 5, pr, qBest2);
+      } else
+	printf("\r%3d %#*.*g*: ", iter, pr + 5, pr, qBest2);
       n = 0;
       for (j = 0; j < nPar; j++)
         if (step[j]) {
-          printf("%10.4g", parBest2[j]);
+          printf("%#10.4g", parBest2[j]);
+	  if (vocal_err)
+	    printf("(%#8.2g)", err[j]);
           n++;
-          if (n == 20)          /* we show at most twenty */
+          if (n >= 14/(vocal_err? 2: 1)) /* we show at most twenty */
             break;
         }
-      putchar('\n');
+      printf("    ");
     }
     n = 0;
     if (pThresh) {
@@ -490,30 +499,42 @@ Int ana_generalfit(Int narg, Int ps[])
 	err[i] = 0;
       else {
 	Double h = fabs(step[i])*0.1;
-	par[i] = parBest2[i] + h;
-	if (fitSym) {
-	  j = eval(fitTemp);
-	  if (j < 0)
-	    goto generalfit_1;
-	  qualplus = double_arg(j);
-	  zapTemp(j);
-	} else
-	  qualplus = fitFunc(par, nPar, xp, yp, weights, nPoints);
-	par[i] = parBest2[i] - h;
-	if (fitSym) {
-	  j = eval(fitTemp);
-	  if (j < 0)
-	    goto generalfit_1;
-	  qualmin = double_arg(j);
-	  zapTemp(j);
-	} else
-	  qualmin = fitFunc(par, nPar, xp, yp, weights, nPoints);
+	Double r;
+	do {
+	  par[i] = parBest2[i] + h;
+	  if (fitSym) {
+	    j = eval(fitTemp);
+	    if (j < 0)
+	      goto generalfit_1;
+	    qualplus = double_arg(j);
+	    zapTemp(j);
+	  } else
+	    qualplus = fitFunc(par, nPar, xp, yp, weights, nPoints);
+	  par[i] = parBest2[i] - h;
+	  if (fitSym) {
+	    j = eval(fitTemp);
+	    if (j < 0)
+	      goto generalfit_1;
+	    qualmin = double_arg(j);
+	    zapTemp(j);
+	  } else
+	    qualmin = fitFunc(par, nPar, xp, yp, weights, nPoints);
+	  r = (qualplus + qualmin)/qBest2;
+	  if (r > 4) {
+	    h = h/sqrt(r);
+	  } else if (r < 3) {
+	    h *= sqrt(r);
+	  }
+	} while (r > 4 || r < 3);
 	err[i] = h*h/(qualplus + qualmin - 2*qBest2);
 	par[i] = parBest2[i];	/* restore */
       }
     }
   } else
     free(err);
+
+  if (vocal)
+    putchar('\n');
 
   if (narg > 14 && ps[14] && 0) {    /* have explicity ERROR; calculate */
                                 /* "standard" errors */

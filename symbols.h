@@ -203,13 +203,13 @@ Int	file_map_size(Int symbol);
 #define symbolIsNamed(iq)	/* Int */ (symbolProperName(iq) != NULL)
 #define symbolIsModifiable(iq)  /* Int */ (symbolIsNamed((iq)) && (iq) > nFixed)
 #define numericalSize(iq)	/* Int */ ((symbol_class(iq) == ANA_ARRAY)? array_size(iq): 1)
-#define isNumericalType(type)	/* Int */ (type <= ANA_DOUBLE || type >= ANA_CFLOAT)
-#define isStringType(type)	/* Int */ (type > ANA_DOUBLE && type < ANA_CFLOAT)
-#define isRealType(type)	/* Int */ (type <= ANA_DOUBLE)
-#define isComplexType(type)	/* Int */ (type >= ANA_CFLOAT)
-#define isIntegerType(type)	/* Int */ (type <= ANA_LONG)
-#define isFloatType(type)	/* Int */ (type == ANA_FLOAT || type == ANA_DOUBLE || type == ANA_CFLOAT || type == ANA_CDOUBLE)
-#define isLegalType(type)	/* Int */ (type >= ANA_BYTE && type <= ANA_CDOUBLE)
+#define isNumericalType(type)	/* Int */ ((type) <= ANA_DOUBLE || (type) >= ANA_CFLOAT)
+#define isStringType(type)	/* Int */ ((type) > ANA_DOUBLE && (type) < ANA_CFLOAT)
+#define isRealType(type)	/* Int */ ((type) <= ANA_DOUBLE)
+#define isComplexType(type)	/* Int */ ((type) >= ANA_CFLOAT)
+#define isIntegerType(type)	/* Int */ ((type) <= ANA_LONG)
+#define isFloatType(type)	/* Int */ ((type) == ANA_FLOAT || (type) == ANA_DOUBLE || (type) == ANA_CFLOAT || (type) == ANA_CDOUBLE)
+#define isLegalType(type)	/* Int */ ((type) >= ANA_BYTE && (type) <= ANA_CDOUBLE)
 /* highestType(type1,type2) returns the highest type among its arguments.
    If no complex data types are involved, then it is straightforward:
    Return whichever type is numerically greater.  If complex data types
@@ -217,8 +217,9 @@ Int	file_map_size(Int symbol);
    and type2 == ANA_DOUBLE: then the simple comparison would return
    ANA_CFLOAT, while we want ANA_CDOUBLE (i.e., ANA_DOUBLE promoted to
    a complex type). */
-#define highestType(type1,type2) /* Int */ ((type1 == ANA_CFLOAT && type2 == ANA_DOUBLE)? ANA_CDOUBLE: (type2 > type1)? type2: type1)
+#define highestType(type1,type2) /* Int */ (((type1) == ANA_CFLOAT && (type2) == ANA_DOUBLE)? ANA_CDOUBLE: ((type2) > (type1))? (type2): (type1))
+#define typeCmp(type1,type2) /* Int */ (((type1) == ANA_CFLOAT && (type2) == ANA_DOUBLE)? -1: ((type1) < (type2))? -1: ((type1) > (type2))? +1: 0)
 /* realType(type) returns <type> if it is real, or the corresponding real */
 /* type if it is complex. */
-#define realType(type)		/* Int */ ((type >= ANA_CFLOAT)? type + (ANA_FLOAT - ANA_CFLOAT): type)
+#define realType(type)		/* Int */ (((type) >= ANA_CFLOAT)? (type) + (ANA_FLOAT - ANA_CFLOAT): (type))
 #define complexMag2(x) ((x).real*(x).real + (x).imaginary*(x).imaginary)

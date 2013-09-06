@@ -411,6 +411,43 @@ void symdumpswitch(Int nsym, Int mode)
   return;
 }
 /*------------------------------------------------------------------------- */
+Int ana_dump_one(Int iq, Int full)
+{
+  Int	j;
+  char	*s, *save;
+
+  if (iq < 0 || iq >= NSYM)
+    return cerror(ILL_ARG, 0);
+  if (!symbol_class(iq))
+    return 0;
+
+  save = curScrat;
+
+  printwf("%3d ", iq);
+
+  s = symbolProperName(iq);
+  if (s) {			/* has its own name */
+    if (symbol_context(iq) > 0) { /* has a "parent" */
+      sprintf(curScrat, "%s", symbolProperName(symbol_context(iq)));
+      curScrat += strlen(curScrat);
+      strcpy(curScrat++, ".");
+    }
+    sprintf(curScrat, "%s", s);
+    curScrat += strlen(curScrat);
+  } else
+    strcpy(curScrat, "(unnamed)");
+
+  printwf("%-9s ", save);
+
+  curScrat = save;
+
+  j = full? 0: (I_TRUNCATE | I_LENGTH);
+  if (iq < EXE_START)
+    j |= I_VALUE;
+  symdumpswitch(iq, j);
+  return 0;
+}
+/*------------------------------------------------------------------------- */
 Int ana_dump(Int narg, Int ps[])
 /* show some info about symbols in list */
 /* internalMode:  1 fixed, 2 system, 4 zero, 8 local, 16 context */
@@ -420,75 +457,48 @@ Int ana_dump(Int narg, Int ps[])
    8 -> all local variables
    16 -> all variables of a specific context (in *ps) */
 {
- Int	i, mode, iq, context = -1, imode, j;
- char	*s, *save;
- extern Int	tempSym, nFixed;
- void	setPager(Int), resetPager(void);
+  Int	i, mode, imode, iq, context = -1;
+  void	setPager(Int), resetPager(void);
+  extern Int nFixed, tempSym;
 
- mode = 0;
- imode = internalMode;
- if (narg == 0) {
-   mode = 1;
-   narg = N_NAMED;
- }
- else if (imode & 16) {		/* /CONTEXT */
-   mode = 1;
-   narg = N_NAMED;
-   context = int_arg(*ps);
- }
- setPager(0);
- for (i = 0; i < narg; i++) {
-   iq = mode? i: ps[i];
-   if (iq < 0 || iq >= NSYM)
-     return cerror(ILL_ARG, 0);
-   if (!symbol_class(i))
-     continue;
-   if (mode) {
-     if (iq < nFixed) {
-       if ((imode & 1) == 0)	/* /FIXED */
-	 continue;
-     } else if (iq <= tempSym) {
-       if ((imode & 2) == 0)	/* /SYSTEM */
-	 continue;
-     } else if (symbol_context(iq) <= 0) {
-       if ((imode & 4) == 0)	/* /ZERO */
-	 continue;
-     } else if (symbol_context(iq) != context) {
-       if ((imode & 8) == 0)	/* /LOCAL */
-	 continue;
-     }
-   }
+  mode = 0;
+  imode = internalMode;
+  if (narg == 0) {
+    mode = 1;
+    narg = N_NAMED;
+  }
+  else if (imode & 16) {		/* /CONTEXT */
+    mode = 1;
+    narg = N_NAMED;
+    context = int_arg(*ps);
+  }
+  setPager(0);
+  for (i = 0; i < narg; i++) {
+    iq = mode? i: ps[i];
+    if (mode) {
+      if (iq < nFixed) {
+	if ((imode & 1) == 0)	/* /FIXED */
+	  continue;
+      } else if (iq <= tempSym) {
+	if ((imode & 2) == 0)	/* /SYSTEM */
+	  continue;
+      } else if (symbol_context(iq) <= 0) {
+	if ((imode & 4) == 0)	/* /ZERO */
+	  continue;
+      } else if (symbol_context(iq) != context) {
+	if ((imode & 8) == 0)	/* /LOCAL */
+	  continue;
+      }
+    }
+    if ((imode & 32) && iq > EXE_START) /* /FOLLOW -> evaluate */
+      iq = evals(iq);
 
-   if ((imode & 32) && iq > EXE_START) /* /FOLLOW -> evaluate */
-     iq = evals(iq);
-
-   save = curScrat;
-
-   printwf("%3d ", iq);
-
-   s = symbolProperName(iq);
-   if (s) {			/* has its own name */
-     if (symbol_context(iq) > 0) { /* has a "parent" */
-       sprintf(curScrat, "%s", symbolProperName(symbol_context(iq)));
-       curScrat += strlen(curScrat);
-       strcpy(curScrat++, ".");
-     }
-     sprintf(curScrat, "%s", s);
-     curScrat += strlen(curScrat);
-   } else
-     strcpy(curScrat, "(unnamed)");
-   
-   printwf("%-9s ", save);
-
-   curScrat = save;
-
-   j = (internalMode & 64)? 0: (I_TRUNCATE | I_LENGTH);
-   if (iq < EXE_START)
-     j |= I_VALUE;
-   symdumpswitch(iq, j);
- }						/*end of loop over args */
- resetPager();
- return 1;
+    iq = ana_dump_one(iq, (internalMode & 64)? 1: 0);
+    if (iq < 0)
+      return iq;
+  }						/*end of loop over args */
+  resetPager();
+  return 1;
 }							/*end of ana_dump */
 /*------------------------------------------------------------------------- */
 Int ana_zero(Int narg, Int ps[])

@@ -87,7 +87,7 @@ uint32_t random_bits(void)
 {
   static uint32_t	mask = 0x9, mask1 = 0x80000000;
   Int	n = 32;
-  uint32_t	result;
+  uint32_t	result = 0;
   
   while (n--) {
     if (currentBitSeed & mask1) {

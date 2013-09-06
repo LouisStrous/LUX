@@ -708,7 +708,7 @@ extern Int ana_abs(), ana_acos(), ana_arestore_f(), ana_arg(),
   ana_openw_f(), ana_orderfilter(), ana_pit(), ana_poly(), ana_pow(),
   ana_power(), ana_printf_f(), ana_psum(), ana_quantile(), ana_quit(),
   ana_random(), ana_randomb(), ana_randomd(), ana_randomn(),
-  ana_randomu(), ana_randome(), ana_readf_f(), ana_readkey(),
+  ana_randomu(), ana_randoml(), ana_readf_f(), ana_readkey(),
   ana_readkeyne(), ana_readu_f(), ana_real(), ana_redim_f(),
   ana_regrid(), ana_regrid3(), ana_regrid3ns(), ana_reorder(),
   ana_reverse(), ana_rfix(), ana_root3(), ana_runcum(), ana_runprod(),
@@ -1088,7 +1088,7 @@ internalRoutine function_table[] = {
     "%2%SEED:PERIOD:1UNIFORM:2NORMAL:3SAMPLE:4SHUFFLE:5BITS" },
   { "RANDOMB",	3, MAX_DIMS, ana_randomb, "%2%SEED:1LONG" }, /* random.c */
   { "RANDOMD",  3, MAX_DIMS, ana_randomd, "%1%SEED" }, /* random.c */
-  { "RANDOME",	3, MAX_DIMS, ana_randome, "%2%SEED:1DOUBLE" }, /* random.c */
+  { "RANDOML",	3, MAX_DIMS, ana_randoml, "%2%SEED:1DOUBLE" }, /* random.c */
   { "RANDOMN",	3, MAX_DIMS, ana_randomn, "%2%SEED" }, /* random.c */
   { "RANDOMU",	3, MAX_DIMS, ana_randomu, "%2%SEED:PERIOD" }, /* random.c */
   { "READF",	2, MAX_ARG, ana_readf_f, "1ASKMORE:2WORD" }, /* files.c */

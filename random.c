@@ -132,6 +132,26 @@ void randomu(Int seed, void *output, Int number, Int modulo)
      *fp++ = random_one();
  }
 }
+/*------------------------------------------------------------------------- */
+void randome(void *output, Int number)
+/* generates <number> exponentially distributed (with unit scale)
+   pseudo-random numbers and stores them in <output>, for which memory
+   must have been allocated by the user.  Both positive and negative
+   numbers are returned */
+{
+ Int	j;
+ Double	*fp;
+
+ fp = (Double *) output;
+ for (j = 0; j < number; j++) {
+   Double value = 2*random_one() - 1;
+   int negative = (value < 0);
+   if (value) {
+     *fp++ = log(fabs(value))*(negative? -1: 1);
+   } else
+     *fp++ = INFTY;
+ }
+}
 /*----------------------------------------------------------------------*/
 void random_unique(Int seed, Int *output, Int number, Int modulo)
 /* generates <number> uniformly distributed integer pseudo-random numbers */
@@ -339,6 +359,42 @@ Int ana_randomn(Int narg, Int ps[])
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
+Int ana_randome(Int narg, Int ps[])
+ /* create an exponential distribution of pseudo-random #'s, centered
+    at 0 with a given scale length */
+{
+  Double *p, scale;
+  Int	k;
+  Int	dims[8], *pd, j, result_sym, n;
+
+  scale = double_arg(*ps++);
+  --narg;
+  if (symbol_class(*ps) == ANA_ARRAY) {
+    if (narg > 1)
+      return anaerror("Dimension list must be either all scalars or one array",
+		      *ps);
+    k = ana_long(1, ps);
+    narg = array_size(k);
+    pd = array_data(k);
+  } else {
+    for (j = 0; j < narg; j++)
+      dims[j] = int_arg(ps[j]); /*get the dimensions */
+    pd = dims;
+  }
+  result_sym = array_scratch(ANA_DOUBLE, narg, pd);
+  if (result_sym == ANA_ERROR)
+    return ANA_ERROR;
+  p = array_data(result_sym);
+  n = array_size(result_sym);
+  randome(p, n);
+  while (n--) {
+    *p *= scale;
+    ++p;
+  }
+  return result_sym;
+}
+REGISTER(randome, f, RANDOME, 2, MAX_DIMS, 0);
+/*------------------------------------------------------------------------- */
 Int ana_randomb(Int narg, Int ps[])
 /* RANDOMB([SEED=seed,] dimens, [/LONG]) */
 /* returns a BYTE array of the indicated dimensions where each value */
@@ -387,10 +443,10 @@ Int ana_randomb(Int narg, Int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-Int ana_randome(Int narg, Int ps[])
-/* RANDOME([SEED=seed,] dimens) */
+Int ana_randoml(Int narg, Int ps[])
+/* RANDOML([SEED=seed,] dimens) */
 /* returns a FLOAT or DOUBLE (if /DOUBLE is set) array of the indicated */
-/* dimensions, filled with values drawn from an exponential distribution */
+/* dimensions, filled with values drawn from a logarithmic distribution */
 /* over all representable numbers.  LS 27aug2000 */
 {
   Int	dims[MAX_DIMS], ndim, iq, result, n;

@@ -86,6 +86,24 @@ Double powerfunc(Double *par, Int nPar, Double *x, Double *y, Double *w, Int nDa
   return sqrt(rms);
 }
 /*-----------------------------------------------------------------------*/
+void enforce_bounds(Double *par, Double *lowbound, Double *hibound, Int nPar)
+{
+  if (lowbound || hibound) {
+    int i;
+    for (i = 0; i < nPar; i++) {
+      if (lowbound && hibound
+	  && lowbound[i] > -INFTY && hibound[i] < INFTY) {
+	if (par[i] < lowbound[i] || par[i] > hibound[i])
+	  par[i] = fmod(par[i] - lowbound[i], hibound[i] - lowbound[i])
+	    + lowbound[i];
+      } else if (lowbound && lowbound[i] > -INFTY && par[i] < lowbound[i])
+	par[i] = lowbound[i];
+      else if (hibound && hibound[i] < INFTY && par[i] > hibound[i])
+	par[i] = hibound[i];
+    }
+  }
+}
+/*-----------------------------------------------------------------------*/
 Int ana_generalfit(Int narg, Int ps[])
 /* FIT([X,]Y,START,STEP[,LOWBOUND,HIGHBOUND][,WEIGHTS][,QTHRESH,PTHRESH,
    ITHRESH,DTHRESH][,FAC,NITER,NSAME][,ERR][,FIT][,TTHRESH][,/VOCAL,/DOWN,
@@ -100,7 +118,7 @@ Int ana_generalfit(Int narg, Int ps[])
         *err, *par, qBest1, qBest2, *parBest1, *parBest2, *ran, qual, temp,
     dir, dThresh, qLast, mu, *meanShift, *weights, tThresh;
   char  vocal, onebyone, vocal_err;
-  void  randomn(Int seed, Double *output, Int number, char hasUniform);
+  void  randome(Double *output, Int number);
   Double (*fitProfiles[2])(Double *, Int, Double *, Double *, Double *, Int) =
   { gaussians, powerfunc };
   Double (*fitFunc)(Double *, Int, Double *, Double *, Double *, Int);
@@ -220,6 +238,12 @@ Int ana_generalfit(Int narg, Int ps[])
   } else
     hibound = NULL;
 
+  if (lowbound && hibound) {
+    for (i = 0; i < nPar; i++)
+      if (hibound[i] <= lowbound[i])
+	return anaerror("High bound %g of parameter %d is not greater than low bound %g", ps[5], hibound[i], i + 1, lowbound[i]);
+  }
+
   if (narg >= 7 && (iq = ps[6])) { /* WEIGHTS */
     if (symbol_class(iq) != ANA_ARRAY)
       return cerror(NEED_ARR, iq);
@@ -297,7 +321,7 @@ Int ana_generalfit(Int narg, Int ps[])
     tThresh = 3600;
 
   vocal = (internalMode & 1)? 1: 0; /* /VOCAL */
-  vocal_err = (internalMode & 129)? 1: 0; /* /VERR */
+  vocal_err = ((internalMode & 129) == 129)? 1: 0; /* /VERR */
   if (internalMode & 4)         /* /DOWN */
     dir = 0.8;
   else
@@ -316,15 +340,7 @@ Int ana_generalfit(Int narg, Int ps[])
   memcpy(par, start, size);
     
   /* enforce upper and lower bounds */
-  if (lowbound) {
-    for (i = 0; i < nPar; i++)
-      if (par[i] < lowbound[i])
-        par[i] = lowbound[i]; }
-  if (hibound) {
-    for (i = 0; i < nPar; i++)
-      if (par[i] > hibound[i])
-        par[i] = hibound[i];
-  }
+  enforce_bounds(par, lowbound, hibound, nPar);
 
   if (fitSym) {                 /* prepare executable for user-defined */
                                 /* fit function */
@@ -350,6 +366,11 @@ Int ana_generalfit(Int narg, Int ps[])
 
   if (tThresh)
     starttime = time(0);
+  else
+    starttime = 0;
+
+  onebyone = (internalMode & 64? 1: 0);
+  /* internalMode is likely to change due to calling the user function */
 
   /* get initial fit quality */
   if (fitSym) {
@@ -387,36 +408,27 @@ Int ana_generalfit(Int narg, Int ps[])
   iter = 0;
   same = 0;
   mu = 0;
-  onebyone = (internalMode & 64? 1: 0);
-  nn = (onebyone? nPar: nIter);
-  int pr = 5;
+  Double qLag = 1.2*qBest2;
+  if (!qLag)
+    qLag = 1;
   do {                          /* iterate */
     qLast = qBest2;
+    nn = onebyone? nPar: nIter;
     if (onebyone)
-      randomn(0, ran, nPar, 0);
+      randome(ran, nPar);
     for (i = 0; i < nn; i++) {
       if (!onebyone)
-        randomn(0, ran, nPar, 0);       /* get random numbers */
+        randome(ran, nPar);       /* get random numbers */
       mu = 2 - mu/qLast;
       if (mu < 1)
         mu = 1;
       if (onebyone) {
-        par[i] = parBest2[i] + mu*meanShift[i] + err[i]*ran[i];
-        if (lowbound && par[i] < lowbound[i])
-          par[i] = lowbound[i];
-        if (hibound && par[i] > hibound[i])
-          par[i] = hibound[i];
+        par[i] = parBest1[i] + mu*meanShift[i] + err[i]*ran[i];
+	enforce_bounds(par, lowbound, hibound, nPar);
       } else {
         for (j = 0; j < nPar; j++) /* update parameters */
-          par[j] = parBest2[j] + mu*meanShift[j] + err[j]*ran[j];
-        if (lowbound)           /* enforce lower bounds */
-          for (j = 0; j < nPar; j++)
-            if (par[j] < lowbound[j])
-              par[j] = lowbound[j];
-        if (hibound)            /* enforce higher bounds */
-          for (j = 0; j < nPar; j++)
-            if (par[j] > hibound[j])
-              par[j] = hibound[j];
+          par[j] = parBest1[j] + mu*meanShift[j] + err[j]*ran[j];
+	enforce_bounds(par, lowbound, hibound, nPar);
       }
       if (fitSym) {
         j = eval(fitTemp);
@@ -429,36 +441,35 @@ Int ana_generalfit(Int narg, Int ps[])
       if (qual < qBest1) {      /* this one is better */
         qBest1 = qual;
         memcpy(parBest1, par, size);
+      } else {			/* restore parameter */
+	if (onebyone)
+	  par[i] = parBest1[i];
       }
     } /* end for (i = 0; i < nn; i++) */
     if (qBest1 < qBest2) {      /* this cycle yielded a better one */
       same = 0;
       for (j = 0; j < nPar; j++) {
-        temp = parBest1[j] - parBest2[j];
-        meanShift[j] = (meanShift[j]*fac + temp*(1 - fac));
-        err[j] = (err[j]*fac + 2*fabs(temp)*(1 - fac))/dir;
+	temp = parBest1[j] - parBest2[j];
+	if (temp) {		/* some improvement due to this parameter */
+	  meanShift[j] = meanShift[j]*fac + temp*(1 - fac);
+	  err[j] = (err[j]*fac + 2*fabs(temp)*(1 - fac))/dir;
+	} else {
+	  meanShift[j] = 0;
+	}
       }
       qBest2 = qBest1;
       memcpy(parBest2, parBest1, size);
-    } else
-      for (j = 0; j < nPar; j++)
-        meanShift[j] *= fac;
-    for (j = 0; j < nPar; j++)
-      err[j] *= dir;
+    } else {
+      for (j = 0; j < nPar; j++) {
+	meanShift[j] = 0;
+	err[j] *= dir;
+      }
+    }
     iter++;
     same++;
-    if (same == nSame - 1) {
-      memcpy(err, step, size);
-      for (j = 0; j < nPar; j++)
-        meanShift[j] = 0.0;
-    }
+    qLag = qLag*0.98 + qBest2*0.02;
     if (vocal) {
-      double d = fabs(qLast - qBest2)/qLast; /* relative improvement */
-      if (d) {
-	pr = 2 - log10(d);
-	printf("\r%3d %#*.*g: ", iter, pr + 5, pr, qBest2);
-      } else
-	printf("\r%3d %#*.*g*: ", iter, pr + 5, pr, qBest2);
+      printf("\r%3d %#9.4g(%#6.2f):", iter, qBest2, qBest2? qLag*0.99/qBest2 - 1: 0);
       n = 0;
       for (j = 0; j < nPar; j++)
         if (step[j]) {
@@ -469,7 +480,6 @@ Int ana_generalfit(Int narg, Int ps[])
           if (n >= 14/(vocal_err? 2: 1)) /* we show at most twenty */
             break;
         }
-      printf("    ");
     }
     n = 0;
     if (pThresh) {
@@ -484,207 +494,99 @@ Int ana_generalfit(Int narg, Int ps[])
        instead. */
   } while (qBest2 >= qThresh
            && (mu >= dThresh*fabs(qBest2) || !mu)
+	   && qBest2 < qLag*0.99
            && n < nPar
-           && iter < iThresh
+           && (!iThresh || iter < iThresh)
            && same <= nSame
            && (!tThresh || time(NULL) - starttime < tThresh));
   memcpy(par, parBest2, size);
   par[nPar] = qBest2;
 
-  if (narg > 14 && ps[14]) {
-    memcpy(par, parBest2, nPar*sizeof(*par));
-    Double qualplus, qualmin;
-    for (i = 0; i < nPar; i++) {
-      if (!step[i])
-	err[i] = 0;
-      else {
-	Double h = fabs(step[i])*0.1;
-	Double r;
-	do {
-	  par[i] = parBest2[i] + h;
-	  if (fitSym) {
-	    j = eval(fitTemp);
-	    if (j < 0)
-	      goto generalfit_1;
-	    qualplus = double_arg(j);
-	    zapTemp(j);
-	  } else
-	    qualplus = fitFunc(par, nPar, xp, yp, weights, nPoints);
-	  par[i] = parBest2[i] - h;
-	  if (fitSym) {
-	    j = eval(fitTemp);
-	    if (j < 0)
-	      goto generalfit_1;
-	    qualmin = double_arg(j);
-	    zapTemp(j);
-	  } else
-	    qualmin = fitFunc(par, nPar, xp, yp, weights, nPoints);
-	  r = (qualplus + qualmin)/qBest2;
-	  if (r > 4) {
-	    h = h/sqrt(r);
-	  } else if (r < 3) {
-	    h *= sqrt(r);
-	  }
-	} while (r > 4 || r < 3);
-	err[i] = h*h/(qualplus + qualmin - 2*qBest2);
+  /* presumably we're close to a local minimum now; home in */
+  Double qualplus, qualmin;
+  for (i = 0; i < nPar; i++) {
+    if (step[i]) {
+      Double h = fabs(step[i]);
+      Double r;
+      do {
+	par[i] = parBest2[i] + h;
+	if (fitSym) {
+	  j = eval(fitTemp);
+	  if (j < 0)
+	    goto generalfit_1;
+	  qualplus = double_arg(j);
+	  zapTemp(j);
+	} else
+	  qualplus = fitFunc(par, nPar, xp, yp, weights, nPoints);
+	par[i] = parBest2[i] - h;
+	if (fitSym) {
+	  j = eval(fitTemp);
+	  if (j < 0)
+	    goto generalfit_1;
+	  qualmin = double_arg(j);
+	  zapTemp(j);
+	} else
+	  qualmin = fitFunc(par, nPar, xp, yp, weights, nPoints);
+	r = qBest2? (qualplus + qualmin)/qBest2: 3.5;
+	h *= 12/(r*r - 4);
+      } while ((r > 5 || r < 3) && h < err[i]*1e6);
+      /* q² = a²(1 + ((x - b)/c)²) */
+      Double psi = (qualplus*qualplus - qualmin*qualmin)/4;
+      Double beta = qBest2*qBest2;
+      Double delta = (qualplus*qualplus + qualmin*qualmin)/2 - beta;
+      Double a2, b, c;
+      if (delta) {
+	a2 = beta - psi*psi/delta; /* a² */
+	if (a2 < 0) {
+	  a2 = 0;
+	  b = 0;
+	} else
+	  b = -h*psi/delta;
+	c = h*sqrt(a2/delta);
+      } else {
+	b = 0;
+	c = INFTY;
+      }
+      par[i] = parBest2[i] + b;
+      Double q;
+      if (fitSym) {
+	j = eval(fitTemp);
+	if (j < 0)
+	  goto generalfit_1;
+	q = double_arg(j);
+	zapTemp(j);
+      } else
+	q = fitFunc(par, nPar, xp, yp, weights, nPoints);
+      if (q < qBest2) {
+	parBest2[i] = par[i];
+	qBest2 = q;
+      } else {
 	par[i] = parBest2[i];	/* restore */
       }
-    }
-  } else
-    free(err);
-
-  if (vocal)
-    putchar('\n');
-
-  if (narg > 14 && ps[14] && 0) {    /* have explicity ERROR; calculate */
-                                /* "standard" errors */
-    if (!qBest2) {              /* the fit is perfect */
-      for (j = 0; j < nPar; j++)
-        err[j] = 0;             /* so all errors are zero */
-    } else for (i = 0; i < nPar; i++) {/* check all parameters */
-      Double    h, h0, hmax, hmin, qmax;
-
-      if (!step[i]) {           /* this parameter was kept fixed, */
-        err[i] = 0;             /* so we have no error estimate */
-        continue;               /* and can start with the next one */
-      }
-      if (vocal)
-        printf("%3d/%1d error estimate = ", i, nPar);
-      /* we define the "error" in a parameter as the average distance
-	 of that parameter from its "best" value at which the fit
-	 quality has increased by a factor of (n+1)/n where n is the
-	 number of data points.  We find the parameter values at which
-	 the higher error value occurs using bisecting.  First, we
-	 start from the best parameter value and go to higher values
-	 until we find a parameter value at which the error value is
-	 high enough.  Then we use bisecting to find the exact value
-	 of the parameter at which Double the error occurs.  Then we
-	 do the same thing going from the best value to lower values,
-	 and then the resulting error estimate for the parameter is
-	 the average of the distances going up and going down. */
-      Double qual2 = qBest2*(nPoints + 1)/nPoints;
-      h = fabs(step[i]);        /* first estimate: the step size */
-      do {
-        par[i] = parBest2[i] + h; /* best parameter value + error estimate */
-        /* calculate the quality */
-        if (fitSym) {
-          j = eval(fitTemp);
-          if (j < 0)            /* some error */
-            goto generalfit_1;
-          qual = double_arg(j);
-          zapTemp(j);
-        } else
-          qual = fitFunc(par, nPar, xp, yp, weights, nPoints);
-        if (qual < qual2)	/* not yet high enough */
-          h *= 2;
-      } while (qual < qual2 && h < FLT_MAX);
-      if (h >= FLT_MAX) {
-        err[i] = FLT_MAX;
-        par[i] = parBest2[i];
-        continue;
-      }
-      h0 = h;                   /* remember this one for going down */
-      /* now get ready for bisecting */
-      hmax = h;                 /* set the initial bisection bounds */
-      hmin = 0;
-      /* calculate the error offset at the upper bound */
-      par[i] = parBest2[i] + hmax;/* current upper bound */
-      if (fitSym) {
-        j = eval(fitTemp);
-        if (j < 0)                      /* some error */
-          goto generalfit_1;
-        qmax = double_arg(j);
-        zapTemp(j);
-      } else
-        qmax = fitFunc(par, nPar, xp, yp, weights, nPoints);
-      qmax = (qmax - qual2)/qBest2;
-      /* OK, now do the bisecting */
-      do {
-        h = 0.5*(hmin + hmax);  /* middle of current range */
-        par[i] = parBest2[i] + h;
-        /* calculate quality */
-        if (fitSym) {
-          j = eval(fitTemp);
-          if (j < 0)                    /* some error */
-            goto generalfit_1;
-          qual = double_arg(j);
-          zapTemp(j);
-        } else
-          qual = fitFunc(par, nPar, xp, yp, weights, nPoints);
-        qual = (qual - qual2)/qBest2;
-        if (qual > 0) {         /* we're too high */
-          hmax = h;
-          qmax = qual;
-        } else {
-          hmin = h;
-        }
-      } while (fabs(qual) > 1e-4);
-      err[i] = h;
-      /* now do the same thing going from the best parameter value */
-      /* to lower values */
-      h = h0;                   /* value we got from going up is probably */
-                                /* pretty good */
-      /* we bracket the location with Double the minimum error */
-      do {
-        par[i] = parBest2[i] - h; /* best parameter value - error estimate */
-        /* calculate the quality */
-        if (fitSym) {
-          j = eval(fitTemp);
-          if (j < 0)            /* some error */
-            goto generalfit_1;
-          qual = double_arg(j);
-          zapTemp(j);
-        } else
-          qual = fitFunc(par, nPar, xp, yp, weights, nPoints);
-        if (qual < qual2)	/* not yet high enough */
-          h *= 2;
-      } while (qual < qual2 && h < FLT_MAX);
-      if (h >= FLT_MAX) {
-        err[i] = FLT_MAX;
-        par[i] = parBest2[i];
-        continue;
-      }
-      /* now get ready for bisecting */
-      hmax = h;                 /* set the initial bisection bounds */
-      hmin = 0;
-      /* calculate the error offset at the upper bound */
-      par[i] = parBest2[i] - hmax;/* current lower bound */
-      if (fitSym) {
-        j = eval(fitTemp);
-        if (j < 0)                      /* some error */
-          goto generalfit_1;
-        qmax = double_arg(j);
-        zapTemp(j);
-      } else
-        qmax = fitFunc(par, nPar, xp, yp, weights, nPoints);
-      qmax = (qmax - qual2)/qBest2;
-      /* OK, now do the bisecting */
-      do {
-        h = 0.5*(hmin + hmax);  /* middle of current range */
-        par[i] = parBest2[i] - h;
-        /* calculate quality */
-        if (fitSym) {
-          j = eval(fitTemp);
-          if (j < 0)                    /* some error */
-            goto generalfit_1;
-          qual = double_arg(j);
-          zapTemp(j);
-        } else
-          qual = fitFunc(par, nPar, xp, yp, weights, nPoints);
-        qual = (qual - qual2)/qBest2;
-        if (qual > 0) {         /* we're too high */
-          hmax = h;
-          qmax = qual;
-        } else {
-          hmin = h;
-        }
-      } while (fabs(qual) > 1e-4);
-      err[i] = 0.5*(err[i] + h);
-      par[i] = parBest2[i];     /* restore */
-      if (vocal)
-        printf("%g\n", err[i]);
-    } /* end of for (i = 0; i < nPar; i++) */
+      err[i] = c*sqrt(3);
+    } else
+      err[i] = 0;
   }
+  par[nPar] = qBest2;
+
+  if (vocal) {
+    iter++;
+    if (vocal) {
+      printf("\r%3d %#9.4g(%#6.2f):", iter, qBest2, qBest2? qLag*0.99/qBest2 - 1: 0);
+      n = 0;
+      for (j = 0; j < nPar; j++)
+        if (step[j]) {
+          printf("%#10.4g", parBest2[j]);
+	  if (vocal_err)
+	    printf("(%#8.2g)", err[j]);
+          n++;
+          if (n >= 14/(vocal_err? 2: 1)) /* we show at most fourteen */
+            break;
+        }
+    }
+    printf(" \n");
+  }
+
   if (!xSym)
     zap(xTemp);
   if (fitSym) {
@@ -703,6 +605,8 @@ Int ana_generalfit(Int narg, Int ps[])
     symbol_context(xSym) = -compileLevel;
   if (weights && symbol_context(wSym) == 1)
     symbol_context(wSym) = -compileLevel;
+  if (narg <= 14 || !ps[14])
+    free(err);
   return fitPar;
 
   generalfit_1:
@@ -822,6 +726,8 @@ Int ana_generalfit2(Int narg, Int ps[])
 	|| numerical(d_par_sym, NULL, NULL, &nPar, NULL) < 0
 	|| numerical(d_step_sym, NULL, NULL, &nStep, NULL) < 0)
       return ANA_ERROR;
+    if (nStep == nPar - 1)
+      --nPar;			/* assume last element of START is quality */
     if (nStep != nPar) {
       result = anaerror("Number of elements (%d) in step argument is unequal to number of elements (%d) in parameters argument", ps[3], nStep, nPar);
       goto end;
@@ -838,7 +744,7 @@ Int ana_generalfit2(Int narg, Int ps[])
   if (narg > 6 && ps[6])	/* ITHRESH */
     ithresh = int_arg(ps[6]);
   if (ithresh <= 0)
-    ithresh = INT32_MAX;
+    ithresh = 10000;
   if (narg > 7 && ps[7])	/* STHRESH */
     sthresh = double_arg(ps[7]);
   if (narg > 8 && ps[8])	/* NITHRESH */
@@ -882,6 +788,10 @@ Int ana_generalfit2(Int narg, Int ps[])
   m_func.n = nPar;
   m_func.f = &fit2_func;
   m_func.params = (void *) afif;
+
+  par_v->size = nPar; /* GSL requires the par size to match the number
+			 of parameters, but we want to keep room for
+			 storing the quality */
 
   if (gsl_multimin_fminimizer_set(minimizer, &m_func, par_v, step_v)) {
     result = ANA_ERROR;
@@ -933,7 +843,6 @@ Int ana_generalfit2(Int narg, Int ps[])
 	   && (no_improvement_niter < nithresh 
 	       || no_improvement_niter == iter - 1));
   gsl_vector *best_par = gsl_multimin_fminimizer_x(minimizer);
-  Double best_min = gsl_multimin_fminimizer_minimum(minimizer);
 
   {
     Int n = best_par->size + 1;
@@ -941,41 +850,34 @@ Int ana_generalfit2(Int narg, Int ps[])
   }
   Double *tgt = array_data(result);
   memcpy(tgt, best_par->data, best_par->size*sizeof(Double));
-  tgt[best_par->size] = sqrt(best_min/nPoints);
+  Double best_min = ana_func_if_call(afif);
+  tgt[best_par->size] = best_min;
 
   if (errors) {
-    /*
-      q ≈ q₀ + ah²
-      a = (q - q₀)/h²
-      q₊ = q₀ + ah₊² = q₀ + (q - q₀)h₊²/h²
-      h₊² = h²(q₊ - q₀)/(q - q₀)
-     */
     Int i;
     for (i = 0; i < nPar; i++) {
       if (step_v->data[i]) {
-	Double hp, hm, q, qtgt, qeps;
+	Double h;
 	memcpy(par_v->data, best_par->data, nPar*sizeof(Double));
-	hp = step_v->data[i];
-	qtgt = best_min*(nPar + 1.0)/nPar;
-	qeps = best_min*1e-5;
+	h = step_v->data[i];
+	Double qualplus, qualmin, r;
 	do {
-	  par_v->data[i] = best_par->data[i] + hp;
-	  q = ana_func_if_call(afif);
-	  if (q == best_min)
-	    hp *= 2;
-	  else
-	    hp *= sqrt((qtgt - best_min)/(q - best_min));
-	} while (fabs(q - qtgt) > qeps);
-	hm = -hp;
-	do {
-	  par_v->data[i] = best_par->data[i] + hm;
-	  q = ana_func_if_call(afif);
-	  if (q == best_min)
-	    hm *= 2;
-	  else
-	    hm *= sqrt((qtgt - best_min)/(q - best_min));
-	} while (fabs(q - qtgt) > qeps);
-	errors[i] = (hp - hm)/2;
+	  par_v->data[i] = best_par->data[i] + h;
+	  qualplus = ana_func_if_call(afif);
+	  par_v->data[i] = best_par->data[i] - h;
+	  qualmin = ana_func_if_call(afif);
+	  r = (qualplus + qualmin)/best_min;
+	  if (r > 4)
+	    h /= sqrt(r);
+	  else if (r < 3)
+	    h *= sqrt(r);
+	} while ((r > 4 || r < 3) && h < errors[i]*1e6);
+	Double v = sqrt((qualplus + qualmin)/(2*best_min) - 1);
+	if (v)
+	  errors[i] = h/v;
+	else
+	  errors[i] = INFTY;
+	par_v->data[i] = best_par->data[i];
       } else
 	errors[i] = 0.0;
     }

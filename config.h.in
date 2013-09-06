@@ -1,78 +1,31 @@
-/* config.h.in.  Modified automatically by autoheader.  */
-/* This is a header file containing site-specific preprocessor macro
-   definitions for compiling the ANA program. LS 9mar99. */
-/* $Header: /usr/local/cvsroot/ana/config.h.in,v 4.0 2001/01/22 21:56:39 strous Exp $ */
+/* config.h.in.  Generated from configure.ac by autoheader.  */
 
-/* Define to empty if the keyword does not work.  */
-#undef const
+/* Name of package */
+#undef PACKAGE
 
-/* Define if you have the ANSI C header files.  */
-#undef STDC_HEADERS
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
 
-/* Define if your processor stores words with the most significant
-   byte first (like Motorola and SPARC, unlike Intel and VAX).  */
-#undef WORDS_BIGENDIAN
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
 
-/* The number of bytes in a long long int.  */
-#undef SIZEOF_LONG_LONG_INT
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
 
-/* The number of bytes in a unsigned char.  */
-#undef SIZEOF_UNSIGNED_CHAR
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
 
-/* The number of bytes in a unsigned short int.  */
-#undef SIZEOF_UNSIGNED_SHORT_INT
+/* Define to the home page for this package. */
+#undef PACKAGE_URL
 
-/* Define if you have the <regex.h> header file. */
-#undef HAVE_REGEX_H
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
 
-/* Define if you have the <sys/mtio.h> header file (non-POSIX). */
-#undef HAVE_SYS_MTIO_H
+/* Version number of package */
+#undef VERSION
 
-/* Define if you have the X11 library (-lX11).  */
-#undef HAVE_LIBX11
-
-/* Define if you have the Xt library (-lXt).  */
-#undef HAVE_LIBXT
-
-/* Define if you have the c library (-lc).  */
-#undef HAVE_LIBC
-
-/* Define if you have the jpeg library (-ljpeg).  */
-#undef HAVE_LIBJPEG
-
-/* Define if you have the m library (-lm).  */
-#undef HAVE_LIBM
-
-/* Define equal to (1.0/0.0) if you can divide 1.0 by 0.0 */
-#define INFTY FLT_MAX
-
-/* variable attributes are gcc specific.  LS 9mar99 */
-#ifndef __GNUC__
-#define __attribute__(x)
-#endif
-
-/* user-selectable packages */
-/* enable debugger routines */
-#undef DEBUG
-
-/* enable development routines */
-#undef DEVELOP
-
-/* enable Motif routines */
-#undef MOTIF
-
-/* include X11 stuff */
+/* Define if X11 is present */
 #undef X11
 
-/* include JPEG stuff */
-#if HAVE_LIBJPEG
-#define JPEG
-#endif
-
-/* bison debugging */
-#undef YYDEBUG
-
-/* platform identification */
-#define PLATFORM "(unknown)"
-
-
+/* Define to 1 if the X Window System is missing or not being used. */
+#undef X_DISPLAY_MISSING

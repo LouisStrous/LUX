@@ -3,14 +3,15 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
-#include "anaparser.h"
+
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <ctype.h>
-#include "editor.h"		/* for BUFSIZE */
+
+#include "anaparser.h"
 #include "dmalloc.h"
-static char rcsid[] __attribute__ ((unused)) =
- "$Id: site.c,v 4.0 2001/02/07 20:37:04 strous Exp $";
+#include "editor.h"		/* for BUFSIZE */
+#include "version.h"		/* for GIT_VERSION */
 
 extern Int	internalMode;
 void	printw(char *), printwf(char *, ...);
@@ -43,7 +44,7 @@ Int site(Int narg, Int ps[])
   
   setPager(0);
   if (!internalMode || internalMode == 255) {
-    printw("*** Welcome to " PACKAGE_STRING "\n");
+    printw("*** Welcome to " PACKAGE_NAME " " GIT_VERSION "\n");
     printw("Type \"HELP\" for assistance.\n");
 #if DEBUG
     printw("Warning: This version of ANA was compiled with the DEBUG option - This may make the program very slow!\n");

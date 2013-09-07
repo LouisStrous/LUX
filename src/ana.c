@@ -1,6 +1,9 @@
 #include <stdio.h>
+#include "types.h"
 
-int main(int argc, char **argv)
+Int main(Int argc, char **argv)
 {
-  puts("Hello!");
+  Int do_main(Int, char **);
+
+  return do_main(argc, argv);
 }

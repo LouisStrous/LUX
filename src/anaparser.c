@@ -4276,7 +4276,7 @@ void gehandler(const char *reason, const char *file, Int line, Int gsl_errno)
 }
 /*--------------------------------------------------------------*/
 char	*programName;
-Int main(Int argc, char *argv[])
+Int do_main(Int argc, char *argv[])
      /* main program */
 {
   Int	site(Int, Int []), readHistory(void);

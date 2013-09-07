@@ -51,7 +51,7 @@ POST_UNINSTALL = :
 bin_PROGRAMS = ana$(EXEEXT)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(top_srcdir)/../depcomp $(top_srcdir)/../ylwrap anaparser.c
+	$(top_srcdir)/depcomp $(top_srcdir)/ylwrap anaparser.c
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -62,7 +62,7 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_ana_OBJECTS = anaparser.$(OBJEXT) anacon.$(OBJEXT) \
+am_ana_OBJECTS = ana.$(OBJEXT) anaparser.$(OBJEXT) anacon.$(OBJEXT) \
 	topology.$(OBJEXT) contour.$(OBJEXT) crunch.$(OBJEXT) \
 	decomp.$(OBJEXT) editor.$(OBJEXT) ephem.$(OBJEXT) \
 	error.$(OBJEXT) eval.$(OBJEXT) execute.$(OBJEXT) fft.$(OBJEXT) \
@@ -89,7 +89,7 @@ am_ana_OBJECTS = anaparser.$(OBJEXT) anacon.$(OBJEXT) \
 ana_OBJECTS = $(am_ana_OBJECTS)
 ana_DEPENDENCIES = $(SOFADIR)/libsofa_c.a
 DEFAULT_INCLUDES = -I. -I$(top_builddir)
-depcomp = $(SHELL) $(top_srcdir)/../depcomp
+depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -99,7 +99,7 @@ LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 am__yacc_c2h = sed -e s/cc$$/hh/ -e s/cpp$$/hpp/ -e s/cxx$$/hxx/ \
 		   -e s/c++$$/h++/ -e s/c$$/h/
 YACCCOMPILE = $(YACC) $(AM_YFLAGS) $(YFLAGS)
-YLWRAP = $(top_srcdir)/../ylwrap
+YLWRAP = $(top_srcdir)/ylwrap
 SOURCES = $(ana_SOURCES)
 DIST_SOURCES = $(ana_SOURCES)
 am__can_run_installinfo = \
@@ -110,11 +110,11 @@ am__can_run_installinfo = \
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-ACLOCAL = ${SHELL} /home/strous/src/missing --run aclocal-1.12
+ACLOCAL = ${SHELL} /home/strous/src/ana/missing --run aclocal-1.12
 AMTAR = $${TAR-tar}
-AUTOCONF = ${SHELL} /home/strous/src/missing --run autoconf
-AUTOHEADER = ${SHELL} /home/strous/src/missing --run autoheader
-AUTOMAKE = ${SHELL} /home/strous/src/missing --run automake-1.12
+AUTOCONF = ${SHELL} /home/strous/src/ana/missing --run autoconf
+AUTOHEADER = ${SHELL} /home/strous/src/ana/missing --run autoheader
+AUTOMAKE = ${SHELL} /home/strous/src/ana/missing --run automake-1.12
 AWK = gawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
@@ -137,7 +137,7 @@ LDFLAGS =
 LIBOBJS = 
 LIBS = 
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /home/strous/src/missing --run makeinfo
+MAKEINFO = ${SHELL} /home/strous/src/ana/missing --run makeinfo
 MKDIR_P = /usr/bin/mkdir -p
 OBJEXT = o
 PACKAGE = ana
@@ -160,10 +160,10 @@ X_LIBS =
 X_PRE_LIBS = 
 YACC = bison -y
 YFLAGS = 
-abs_builddir = /home/strous/src/ana2/src
-abs_srcdir = /home/strous/src/ana2/src
-abs_top_builddir = /home/strous/src/ana2
-abs_top_srcdir = /home/strous/src/ana2
+abs_builddir = /home/strous/src/ana/src
+abs_srcdir = /home/strous/src/ana/src
+abs_top_builddir = /home/strous/src/ana
+abs_top_srcdir = /home/strous/src/ana
 ac_ct_CC = gcc
 am__include = include
 am__leading_dot = .
@@ -182,7 +182,7 @@ host_alias =
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /home/strous/src/install-sh
+install_sh = ${SHELL} /home/strous/src/ana/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
@@ -202,7 +202,7 @@ target_alias =
 top_build_prefix = ../
 top_builddir = ..
 top_srcdir = ..
-ana_SOURCES = anaparser.y anacon.c topology.c contour.c crunch.c \
+ana_SOURCES = ana.c anaparser.y anacon.c topology.c contour.c crunch.c \
 	decomp.c editor.c ephem.c error.c eval.c execute.c fft.c \
 	filemap.c fit.c files.c fun1.c fun2.c fun3.c fun4.c fun5.c \
 	fun6.c hersh.c ident.c install.c memck.c plots.c post.c \
@@ -308,6 +308,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 include ./$(DEPDIR)/Bytestack.Po
+include ./$(DEPDIR)/ana.Po
 include ./$(DEPDIR)/ana_func_if.Po
 include ./$(DEPDIR)/anacon.Po
 include ./$(DEPDIR)/anaparser.Po

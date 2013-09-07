@@ -50,8 +50,8 @@ POST_UNINSTALL = :
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
-	$(top_srcdir)/../install-sh $(top_srcdir)/../missing \
-	$(top_srcdir)/configure AUTHORS COPYING ChangeLog INSTALL NEWS
+	$(top_srcdir)/configure AUTHORS COPYING ChangeLog INSTALL NEWS \
+	depcomp install-sh missing ylwrap
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -127,11 +127,11 @@ distuninstallcheck_listfiles = find . -type f -print
 am__distuninstallcheck_listfiles = $(distuninstallcheck_listfiles) \
   | sed 's|^\./|$(prefix)/|' | grep -v '$(infodir)/dir$$'
 distcleancheck_listfiles = find . -type f -print
-ACLOCAL = ${SHELL} /home/strous/src/missing --run aclocal-1.12
+ACLOCAL = ${SHELL} /home/strous/src/ana/missing --run aclocal-1.12
 AMTAR = $${TAR-tar}
-AUTOCONF = ${SHELL} /home/strous/src/missing --run autoconf
-AUTOHEADER = ${SHELL} /home/strous/src/missing --run autoheader
-AUTOMAKE = ${SHELL} /home/strous/src/missing --run automake-1.12
+AUTOCONF = ${SHELL} /home/strous/src/ana/missing --run autoconf
+AUTOHEADER = ${SHELL} /home/strous/src/ana/missing --run autoheader
+AUTOMAKE = ${SHELL} /home/strous/src/ana/missing --run automake-1.12
 AWK = gawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
@@ -154,7 +154,7 @@ LDFLAGS =
 LIBOBJS = 
 LIBS = 
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /home/strous/src/missing --run makeinfo
+MAKEINFO = ${SHELL} /home/strous/src/ana/missing --run makeinfo
 MKDIR_P = /usr/bin/mkdir -p
 OBJEXT = o
 PACKAGE = ana
@@ -177,10 +177,10 @@ X_LIBS =
 X_PRE_LIBS = 
 YACC = bison -y
 YFLAGS = 
-abs_builddir = /home/strous/src/ana2
-abs_srcdir = /home/strous/src/ana2
-abs_top_builddir = /home/strous/src/ana2
-abs_top_srcdir = /home/strous/src/ana2
+abs_builddir = /home/strous/src/ana
+abs_srcdir = /home/strous/src/ana
+abs_top_builddir = /home/strous/src/ana
+abs_top_srcdir = /home/strous/src/ana
 ac_ct_CC = gcc
 am__include = include
 am__leading_dot = .
@@ -199,7 +199,7 @@ host_alias =
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /home/strous/src/install-sh
+install_sh = ${SHELL} /home/strous/src/ana/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale

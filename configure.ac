@@ -6,6 +6,7 @@ AC_INIT([ana], [5.0], [ana@quae.nl])
 AC_CONFIG_SRCDIR([src/ana.c])
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE
+PKG_CHECK_MODULES([CHECK],[check >= 0.9.4])
 
 # Checks for programs.
 AC_PROG_CC
@@ -23,5 +24,6 @@ AC_DEFINE([X11],[!defined(X_DISPLAY_MISSING)],[Define if X11 is present])
 # Checks for library functions.
 
 AC_CONFIG_FILES([Makefile
-                 src/Makefile])
+                 src/Makefile
+                 test/Makefile])
 AC_OUTPUT

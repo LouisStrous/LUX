@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "anaparser.h"
+#include "anadefs.h"
 #include "dmalloc.h"
 #include "editor.h"		/* for BUFSIZE */
 #include "version.h"		/* for GIT_VERSION */

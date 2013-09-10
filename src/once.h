@@ -1,4 +1,4 @@
-#include "anaparser.h"
+#include "anadefs.h"
 
 /* editorCharClass table */
 

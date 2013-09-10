@@ -1,6 +1,6 @@
 #define _GNU_SOURCE
 
-#include "anaparser.h"
+#include "anadefs.h"
 #include "error.h"
 #include "dmalloc.h"
 #include "bindings.h"

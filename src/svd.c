@@ -1,5 +1,5 @@
 #include <math.h>
-#include "anaparser.h"
+#include "anadefs.h"
 #include "action.h"
 
 /* The following algorithm is due to Bryant Marks */

@@ -6,7 +6,7 @@
 #include "config.h"
 #endif
 #include <math.h>
-#include "anaparser.h"
+#include "anadefs.h"
 #include "output.h"
 static char rcsid[] __attribute__ ((unused)) =
  "$Id: tense.c,v 4.0 2001/02/07 20:37:08 strous Exp $";

@@ -4,7 +4,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
-#include "anaparser.h"
+#include "anadefs.h"
 #include "vsop.h"
 
 #if DONOTIGNORE

@@ -2,7 +2,7 @@
 /* Ephemerides having to do with the appearance of the Sun as seen from */
 /* Earth.  LS 1997 */
 #include <math.h>
-#include "anaparser.h"
+#include "anadefs.h"
 #include "action.h"
 
 /* 2nd-degree polynomial evaluation */

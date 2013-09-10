@@ -8,7 +8,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
-#include "anaparser.h"
+#include "anadefs.h"
 static char rcsid[] __attribute__ ((unused)) =
  "$Id: sort.c,v 4.0 2001/02/07 20:37:04 strous Exp $";
 /*------------------------------------------------------------------------- */

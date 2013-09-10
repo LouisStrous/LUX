@@ -36,9 +36,6 @@
 #define obstack_chunk_alloc malloc
 #define obstack_chunk_free free
 
-static char rcsid[] __attribute__ ((unused)) =
-"$Id: axis.c,v 4.0 2001/02/07 20:36:57 strous Exp $";
-
 void setupDimensionLoop(loopInfo *info, Int ndim, Int const *dims, 
                         enum Symboltype type, Int naxes, Int const *axes,
                         pointer *data, Int mode);

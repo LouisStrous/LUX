@@ -15,9 +15,7 @@
 #include <errno.h>
 #include "action.h"
 #include "editorcharclass.h"
-#include "anaparser.c.tab.h"
-static char rcsid[] __attribute__ ((unused)) =
- "$Id: fun3.c,v 4.0 2001/02/07 20:37:01 strous Exp $";
+#include "anaparser.h"
 
 Int	ezffti(Int *, Float *), fade_xsize, fade_ysize, fade_dim[2];
 Int rffti(Int *, Float *);

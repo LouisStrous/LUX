@@ -12,12 +12,10 @@
 #include <stdint.h>
 #include <gsl/gsl_spline.h>
 #include "action.h"
-#include "anaparser.c.tab.h"
+#include "anaparser.h"
 #include "editor.h"
 #include "gsl/gsl_errno.h"
 #define YYERROR_VERBOSE
-static char rcsid[] __attribute__ ((unused)) =
- "$Id: anaparser.c,v 4.0 2001/02/07 20:36:54 strous Exp $";
 #define startList(x)	{ pushList(ANA_NEW_LIST); pushList(x); }
 				/* start a new list */
 extern Int	scrat[],	/* general-purpose scratch storage (once.h) */

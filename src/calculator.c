@@ -7,7 +7,7 @@
 #include <string.h>
 #include "editor.h"
 #include "action.h"
-#include "anaparser.c.tab.h"
+#include "anaparser.h"
 
 extern Int	ans;
 

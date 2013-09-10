@@ -109,7 +109,7 @@ Int site(Int narg, Int ps[])
   if (internalMode & 8)		/* /PACKAGES */
   {
     printw("****PACKAGES\n");
-#ifdef X11
+#if HAVE_LIBX11
     if (!hasInclude) printw("Packages: ");
     printw("X11 ");
     hasInclude = 1;
@@ -138,7 +138,7 @@ Int site(Int narg, Int ps[])
     printwf("Array dimensions: max %d\n", MAX_DIMS);
     printwf("User stack size (#STACK): %d variables\n", STACKSIZE);
     printwf("Debugging breakpoints: max %d\n", MAXDEBUG);
-#ifdef X11
+#if HAVE_LIBX11
     printwf("X ports: %d\n", MAXWINDOWS);
     printwf("X pixmaps: %d\n", MAXPIXMAPS);
     printwf("X color cells: max %d\n", MAXCOLORS);

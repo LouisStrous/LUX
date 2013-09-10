@@ -3,7 +3,7 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
-#ifdef X11
+#if HAVE_LIBX11
 #include <X11/Xlib.h>
 #else
 #define setup_x()	ANA_OK
@@ -1256,7 +1256,7 @@ Int tkplot(Float x, Float y, Int lineStyle, Int symStyle)
   Int	result, ix, iy;
   Int	symplot(Float, Float, Int, Int), 
   	postvec(Float, Float, Int);
-#ifdef X11
+#if HAVE_LIBX11
   Int	xwindow_plot(Int, Int, Int);
 #endif
 
@@ -1372,7 +1372,7 @@ Int tkplot(Float x, Float y, Int lineStyle, Int symStyle)
   }
   switch (lunplt) {
     case 0:			/* to screen */
-#ifdef X11
+#if HAVE_LIBX11
       ix = (Int) (xx[1]*xfac);
       iy = iyhigh - (Int) (yy[1]*yfac);
       xwindow_plot(ix, iy, lineStyle);
@@ -1411,18 +1411,18 @@ Int ana_pencolor(Int narg, Int ps[])
   static Float	red, green, blue;
   char	*pc;
   Float	*pf;
-#ifdef X11
+#if HAVE_LIBX11
   Int	getXcolor(char *colorname, XColor *color, Int alloc);
   Status	anaAllocNamedColor(char *, XColor **);
   extern Int	connect_flag;
 #endif
   Int	postcolorpen(Float red, Float green, Float blue);
-#ifdef X11
+#if HAVE_LIBX11
   XColor	color, *colorp;
 #endif
   
   if (lunplt == 0) {
-#ifdef X11
+#if HAVE_LIBX11
     if (setup_x() == ANA_ERROR)
       return ANA_ERROR;
 #endif
@@ -1433,7 +1433,7 @@ Int ana_pencolor(Int narg, Int ps[])
     switch (symbol_class(ps[0])) {
       case ANA_STRING:
 	pc = string_value(ps[0]);
-#ifdef X11
+#if HAVE_LIBX11
 	if (connect_flag) {
 	  /* get rgb values for this color name, if for X, also set */
 	  /* foreground */
@@ -1481,7 +1481,7 @@ Int ana_pencolor(Int narg, Int ps[])
 	red = *pf++;
 	green = *pf++;
 	blue = *pf++;
-#ifdef X11
+#if HAVE_LIBX11
 	if (xflag && !anaAllocNamedColor(pc, &colorp))
 	  return ANA_ERROR;
 #endif
@@ -1498,13 +1498,13 @@ Int ana_pencolor(Int narg, Int ps[])
 void set_cur_pen(void)
 /* set pen according to current_pen and current_gray */
 {
-#ifdef X11
+#if HAVE_LIBX11
   Int ana_xpen(Int, Float);
 #endif
   Int postpen(Int, Float);
   
   switch (lunplt) {
-#ifdef X11 
+#if HAVE_LIBX11 
     case 0:
       ana_xpen(current_pen, current_gray);
       return;
@@ -1516,14 +1516,14 @@ void set_cur_pen(void)
  /*------------------------------------------------------------------------*/
 Int set_pen(Int pen)
 {
-#ifdef X11
+#if HAVE_LIBX11
   Int ana_xpen(Int, Float);
 #endif
   Int postpen(Int, Float);
   
   switch (lunplt) {
     case 0:
-#ifdef X11 
+#if HAVE_LIBX11 
       return ana_xpen(pen, current_gray);
 #else
       return cerror(NO_X11, 0);
@@ -1537,7 +1537,7 @@ Int set_pen(Int pen)
 Int ana_erase(Int narg, Int ps[])
 {
   Int	postcopy(void), toscreen;
-#ifdef X11
+#if HAVE_LIBX11
   Int	ana_xerase(Int, Int []);
 #endif
 
@@ -1561,7 +1561,7 @@ Int ana_erase(Int narg, Int ps[])
   postYTop = -FLT_MAX;
   switch (lunplt) 
   { case 0:
-#ifdef X11
+#if HAVE_LIBX11
       return ana_xerase(narg, ps);
 #else
       return cerror(NO_X11, *ps);

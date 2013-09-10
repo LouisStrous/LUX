@@ -82,7 +82,7 @@ void convertWidePointer(wideScalar *, Int, Int);
 void	newStack(Int), push(Int), deleteStack(void);
 Int	pop(void);
         
-#ifdef X11
+#if HAVE_LIBX11
 Int	setup_x(void);
 #endif
 

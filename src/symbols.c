@@ -14,7 +14,7 @@
 #include "install.h"
 #include "action.h"
 #include "editor.h"		/* for BUFSIZE */
-#ifdef X11
+#if HAVE_LIBX11
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #endif
@@ -22,7 +22,7 @@ static char rcsid[] __attribute__ ((unused)) =
  "$Id: symbols.c,v 4.0 2001/02/07 20:37:05 strous Exp $";
 
 void	zerobytes(void *, Int), updateIndices(void), symdumpswitch(Int, Int);
-#ifdef X11
+#if HAVE_LIBX11
 void	xsynchronize(Int);
 #endif
 Int	installString(char *), fixContext(Int, Int), ana_replace(Int, Int);
@@ -2405,7 +2405,7 @@ Int ana_set(Int narg, Int ps[])
  governs aspects of the behaviour of various routines.  LS 11mar98 */
 {
   extern Int	setup;
-#ifdef X11
+#if HAVE_LIBX11
   char	*string;
   char	*visualNames[] = { "StaticGray", "StaticColor", "TrueColor",
 			   "GrayScale", "PseudoColor", "DirectColor",
@@ -2420,7 +2420,7 @@ Int ana_set(Int narg, Int ps[])
 
   if (narg) {
     if (*ps) {			/* VISUAL */
-#ifdef X11
+#if HAVE_LIBX11
       if (!symbolIsStringScalar(*ps))
 	return cerror(NEED_STR, *ps);
       string = string_value(*ps);
@@ -2468,7 +2468,7 @@ Int ana_set(Int narg, Int ps[])
 	puts("/YREVERSEIMG: Image origin in upper left-hand corner.");
       if (setup & 16)
 	puts("/OLDVERSION: Backward compatibility mode.");
-#ifdef X11
+#if HAVE_LIBX11
       if (setup & 32)
 	puts("/ZOOM: Automatic image zoom.");
 #endif
@@ -2482,7 +2482,7 @@ Int ana_set(Int narg, Int ps[])
       puts("No SETUP selections.");
   }
   allowPromptInInput = (setup & 256)? 1: 0;
-#ifdef X11
+#if HAVE_LIBX11
   if (internalMode & 2048)
     xsynchronize(setup & 512? 1: 0);
 #endif

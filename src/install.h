@@ -4,7 +4,7 @@
 #define NLIST                   2000 /* size of listStack[] */
 #define MAXFILES		10 /* number of logical units */
 #define MAXFMT			10 /* number of active levels in formats */
-#ifdef X11
+#if HAVE_LIBX11
 #define MAXWINDOWS		20 /* number of X ports */
 #define MAXPIXMAPS		20 /* number of X pixmaps */
 #define MAXCOLORS		200 /* max number of default color cells */

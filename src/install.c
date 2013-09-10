@@ -128,7 +128,7 @@ extern Int	ana_tape_status(), ana_rewind(), ana_weof(), ana_unload(),
 
 extern Int	ana_gifread(), ana_gifwrite();
 
-#if X11
+#if HAVE_LIBX11
 extern Int ana_menu(), ana_menu_hide(), ana_menu_item(),
   ana_menu_kill(), ana_menu_pop(), ana_menu_read(),
   ana_register_event(), ana_window(), ana_xcopy(),
@@ -286,7 +286,7 @@ internalRoutine	subroutine_table[] = {
   { "CLOSE",	1, 1, ana_close, 0 }, /* files.c */
   { "CLUSTER",	2, 8, ana_cluster, /* cluster.c */
     "|32|:CENTERS:INDEX:SIZE:SAMPLE:EMPTY:MAXIT:RMS:1UPDATE:2ITERATE:4VOCAL:8QUICK:16RECORD:32ORDERED" },
-#if X11
+#if HAVE_LIBX11
   { "COLORCOMPONENTS", 4, 4, ana_colorComponents, 0 }, /* color.c */
   { "COLORSTOGREY", 1, 1, ana_colorstogrey, 0 }, /* color.c */
 #endif
@@ -363,7 +363,7 @@ internalRoutine	subroutine_table[] = {
   { "GETMIN9",	3, 3, ana_getmin9, 0 }, /* fun4.c */
   { "GIFREAD",	2, 3, ana_gifread, 0 }, /* gifread_ana.c */
   { "GIFWRITE",	2, 3, ana_gifwrite, 0 }, /* gifwrite_ana.c */
-#if X11
+#if HAVE_LIBX11
   { "HAIRS",	0, 0, ana_xplace, 0 }, /* xport.c */
 #endif
   { "HELP",	0, 1, ana_help,	/* strous.c */
@@ -381,7 +381,7 @@ internalRoutine	subroutine_table[] = {
   { "LIMITS",	0, 4, ana_limits, 0 }, /* plots.c */
   { "LIST",	1, 1, ana_list, 0 }, /* ident.c */
   { "LONG",	1, MAX_ARG, ana_long_inplace, 0 }, /* symbols.c */
-#if X11
+#if HAVE_LIBX11
   { "MENU",	1, MAX_ARG, ana_menu, 0 }, /* menu.c */
   { "MENUHIDE",	1, 1, ana_menu_hide, 0 }, /* menu.c */
   { "MENUITEM",	3, 3, ana_menu_item, 0 }, /* menu.c */
@@ -407,7 +407,7 @@ internalRoutine	subroutine_table[] = {
   { "PEEK",	1, 2, peek, 0 }, /* strous.c */
   { "PEN",	0, 2, ana_pen, "WIDTH:COLOR:1STANDARDGRAY" }, /* plots.c */
   { "PENCOLOR", 0, 1, ana_pencolor, 0 }, /* plots.c */
-#if X11
+#if HAVE_LIBX11
   { "PIXELSTO8BIT", 3, 3, ana_pixelsto8bit, 0 }, /* color.c */
 #endif
   { "PLOT",	1, 15, ana_plot, /* plots.c */
@@ -453,12 +453,12 @@ internalRoutine	subroutine_table[] = {
   { "SCB",	3, 3, ana_scb, "1EVEN:2ODD" }, /* fun3.c */
   { "SET",	0, 1, ana_set,	/* symbols.c */
     "VISUAL:1SET:2RESET:4SHOWALLOC:8WHITEBACKGROUND:16ULIMCOORDS:32YREVERSEIMG:64OLDVERSION:128ZOOM:1024ALLOWPROMPTS:2048XSYNCHRONIZE:4096PARSESILENT" },
-#if X11
+#if HAVE_LIBX11
   { "SETBACKGROUND", 1, 2, ana_xsetbackground, 0 }, /* xport.c */
   { "SETBG",	1, 2, ana_xsetbackground, 0 }, /* xport.c */
 #endif
   { "SETENV",	1, 1, ana_setenv, 0 }, /* files.c */
-#if X11
+#if HAVE_LIBX11
   { "SETFG",	1, 2, ana_xsetforeground, 0 }, /* xport.c */
   { "SETFOREGROUND", 1, 2, ana_xsetforeground, 0 }, /* xport.c */
 #endif
@@ -474,7 +474,7 @@ internalRoutine	subroutine_table[] = {
 #if DEBUG
   { "SHOW_TEMPS", 0, 0, ana_show_temps, 0 }, /* symbols.c */
 #endif
-#if X11
+#if HAVE_LIBX11
   { "SHOW_VISUALS", 0, 0, ana_show_visuals, 0 }, /* xport.c */
 #endif
 #if HAVE_SYS_MTIO_H
@@ -501,7 +501,7 @@ internalRoutine	subroutine_table[] = {
   { "TAPWRT",	2, 2, ana_tapwrt, 0 }, /* tape.c */
 #endif
   { "TERMINAL", 1, 1, ana_manualterm, 0}, /* dummyterm.c */
-#if X11
+#if HAVE_LIBX11
   { "THREECOLORS", 0, 1, ana_threecolors, 0 }, /* xport.c */
 #endif
   { "TOLOOKUP",	3, 3, ana_tolookup, "1ONE" }, /* strous2.c */
@@ -510,7 +510,7 @@ internalRoutine	subroutine_table[] = {
 #if DEVELOP
   { "TRAJECTORY", 3, 7, ana_trajectory, 0 }, /* strous3.c */
 #endif
-#if X11
+#if HAVE_LIBX11
   { "TV",	1, 5, ana_xtv,	/* xport.c */
     ":X:Y:WINDOW:SCALE:0DEP:1DVI:2DEV:3IMG:4PLT:5RIM:6RPL:7X11:64SCREEN:128POSTSCRIPT:192PDEV:256PLOTWINDOW:512ZOOM:1024CENTER:16384BIT24" },
   { "TV3",	1, 7, ana_tv3, /* xport.c */
@@ -532,7 +532,7 @@ internalRoutine	subroutine_table[] = {
 #endif
   { "VERIFY",	0, 1, ana_verify, 0 }, /* install.c */
   { "WAIT",	1, 1, ana_wait, 0 }, /* fun2.c */
-#if X11
+#if HAVE_LIBX11
   { "WAIT_FOR_MENU", 0, 1, ana_wait_for_menu, 0 }, /* menu.c */
 #endif
 #if HAVE_SYS_MTIO_H
@@ -545,7 +545,7 @@ internalRoutine	subroutine_table[] = {
 #if DEBUG
   { "WHERE",	1, 1, ana_whereisAddress, "1CUT" }, /* debug.c */
 #endif
-#if X11
+#if HAVE_LIBX11
   { "WINDOW",	0, 6, ana_window, 0 }, /* plots.c */
 #endif
   { "WORD",	1, 1, ana_word_inplace, 0 }, /* symbols.c */
@@ -553,7 +553,7 @@ internalRoutine	subroutine_table[] = {
 #if HAVE_LIBJPEG
   { "WRITE_JPEG", 2, 4, ana_write_jpeg6b, 0 }, /* jpeg.c */
 #endif
-#if X11
+#if HAVE_LIBX11
   { "XANIMATE",	1, 6, ana_xanimate, ":::FR1:FR2:FRS:1TIME" }, /* xport.c */
   { "XCLOSE",	0, 0, ana_xclose, 0 }, /* xport.c */
   { "XCOPY",	2, 8, ana_xcopy, 0 }, /* xport.c */
@@ -658,7 +658,7 @@ internalRoutine	subroutine_table[] = {
   { "ZEROIFNOTDEFINED", 1, MAX_ARG, ana_zeroifnotdefined, 0}, /* motifextra.c */
 #endif
   { "ZERONANS",	1, MAX_ARG, ana_zapnan, "*%1%VALUE" }, /* fun1.c */
-#if X11
+#if HAVE_LIBX11
   { "ZOOM",	1, 3, ana_zoom, "1OLDCONTRAST" }, /* zoom.c */
 #endif
 };
@@ -750,7 +750,7 @@ extern Int	ana_project(), ana_bsmooth(), ana_compile(),
 
 extern Int	ana_gifread_f(), ana_gifwrite_f();
 
-#if X11
+#if HAVE_LIBX11
 extern Int	ana_check_menu(), ana_check_window(), ana_colorpixel(),
   ana_event_name(), ana_xlabelwidth(), ana_xquery_f(), ana_xexist();
 #endif
@@ -873,13 +873,13 @@ internalRoutine function_table[] = {
   { "CFLTARR",	1, MAX_ARG, cfltarr, 0 }, /* symbols.c */
   { "CFLTFARR", 3, MAX_DIMS + 1, cfltfarr, "%1%OFFSET:1READONLY:2SWAP" }, /* filemap.c */
   { "CFMAP",	1, 1, ana_cfmap, 0 }, /* subsc.c */
-#if X11
+#if HAVE_LIBX11
   { "CHECKMENU", 0, 1, ana_check_menu, 0 }, /* menu.c */
   { "CHECKWINDOW", 0, 1, ana_check_window, 0 }, /* xport.c */
 #endif
   { "CHI2",	2, 2, ana_chi_square, "*1COMPLEMENT:2LOG" }, /* fun1.c */
   { "CLASSNAME", 1, 1, ana_classname, 0 }, /* install.c */
-#if X11
+#if HAVE_LIBX11
   { "COLORPIXEL", 1, 1, ana_colorpixel, "*" }, /* xport.c */
 #endif
 #if DEVELOP
@@ -927,7 +927,7 @@ internalRoutine function_table[] = {
   { "ESEGMENT",	1, 4, ana_extreme_general, /* topology.c */ ":SIGN:DIAGONAL:THRESHOLD" },
   { "ESMOOTH",	1, 3, ana_esmooth, 0 }, /* fun2.c */
   { "EVAL",	1, 2, ana_eval, "1ALLNUMBER" }, /* fun3.c */
-#if X11
+#if HAVE_LIBX11
   { "EVENTNAME", 0, 1, ana_event_name, 0 }, /* menu.c */
 #endif
   { "EXP",	1, 1, ana_exp, "*" }, /* fun1.c */
@@ -1187,7 +1187,7 @@ internalRoutine function_table[] = {
   { "TRACE_DECODER", 3, 3, ana_trace_decoder, 0 }, /* trace_decoder_ana.c */
   { "TREND",	1, 2, ana_trend, "*" }, /* fun2.c */
   { "TRI_NAME_FROM_TAI", 1, 1, ana_tri_name_from_tai, 0 }, /* ephem.c */
-#if X11
+#if HAVE_LIBX11
   { "TVREAD",	1, 5, ana_xtvread, "1GREYSCALE" }, /* xport.c */
 #endif
   { "TYPENAME",	1, 1, ana_typeName, 0 }, /* install.c */
@@ -1203,7 +1203,7 @@ internalRoutine function_table[] = {
 #if HAVE_LIBJPEG
   { "WRITE_JPEG", 2, 4, ana_write_jpeg6b_f, 0 }, /* jpeg.c */
 #endif
-#if X11
+#if HAVE_LIBX11
   { "XEXIST",	1, 1, ana_xexist, 0 }, /* xport.c */
   { "XLABELWIDTH", 1, 1, ana_xlabelwidth, 0 }, /* xport.c */
 #if MOTIF
@@ -4027,11 +4027,11 @@ extern Int	irzf, ifzz, ndz, ndzs, resample_type, fstepz;
 extern Float	wzb, wzt, ticz, ticzr, zmin, zmax, defaultProjection[], dvz;
 #endif
 
-#if X11
+#if HAVE_LIBX11
 extern Int	text_menus, tvplanezoom;
 #endif
 
-#if X11
+#if HAVE_LIBX11
 extern Int ana_button, eventSource, xcoord, ycoord, ana_keycode, ana_keysym,
   last_menu, menu_item, ana_event, preventEventFlush, root_x, root_y,
   xerrors, last_wid, display_width, display_height, private_colormap,
@@ -4225,7 +4225,7 @@ void symbolInitialization(void)
  f_fix("#MIN_FLOAT", 	FLT_MIN);
  d_fix("#MIN_DOUBLE", 	DBL_MIN);
  l_fix("#MAX_DIMS",	MAX_DIMS);
-#ifdef X11
+#if HAVE_LIBX11
  l_fix("#NUM_WINDOWS",  MAXWINDOWS - 1);
  l_fix("#NUM_PIXMAPS",  MAXPIXMAPS - 1);
 #endif
@@ -4327,7 +4327,7 @@ void symbolInitialization(void)
  l_ptr("!BADMATCH",	&badmatch);
  l_ptr("!BB_UPDATE",	&updateBoundingBox);
  l_ptr("!BC",		&byte_count);
-#if X11
+#if HAVE_LIBX11
  l_ptr("!BUTTON",	&ana_button);
 #endif
  f_ptr("!BXB",		&postXBot);
@@ -4336,7 +4336,7 @@ void symbolInitialization(void)
  f_ptr("!BYT",		&postYTop);
  fnc_p("!CJD",		12);
  l_ptr("!COL",		&uTermCol);
-#if X11
+#if HAVE_LIBX11
  l_ptr("!COLORMAX",	&colormax);
  l_ptr("!COLORMIN",	&colormin);
 #endif
@@ -4365,13 +4365,13 @@ void symbolInitialization(void)
  l_ptr("!ERASE",	&ier);
  l_ptr("!ERROR_EXTRA",	&error_extra);
  l_ptr("!ERRNO",	&errno);
-#if X11
+#if HAVE_LIBX11
  l_ptr("!EVENTSOURCE",	&eventSource);
  l_ptr("!EVENTTYPE",	&ana_event);
 #endif
  l_ptr("!FFTDP", 	&fftdp);
  l_ptr("!FONT",		&ifont);
-#if X11
+#if HAVE_LIBX11
  l_ptr("!FOREGROUND_COLOR",	&foreground_pixel);
 #endif
  fformat = s_ptr("!FORMAT_F", strsave("%14.7g"));
@@ -4387,6 +4387,7 @@ void symbolInitialization(void)
  l_ptr("!FSTEPY",	&fstepy);
 #if DEVELOP
  l_ptr("!FSTEPZ",	&fstepz);
+#endif
  l_ptr("!FZ",		&ifz);
  l_ptr("!FZX",		&ifzx);
 #if DEVELOP
@@ -4397,16 +4398,16 @@ void symbolInitialization(void)
  l_ptr("!HISTMAX", 	&histmax);
  l_ptr("!IBLANK",	&iblank);
  l_ptr("!IORDER", 	&iorder);
-#if X11
+#if HAVE_LIBX11
  l_ptr("!IX",		&xcoord);
 #endif
  l_ptr("!IXHIGH",	&ixhigh);
-#if X11
+#if HAVE_LIBX11
  l_ptr("!IY",		&ycoord);
 #endif
  l_ptr("!IYHIGH",	&iyhigh);
  fnc_p("!JD",		11);
-#if X11			/* a non-X11 version of this is needed */
+#if HAVE_LIBX11			/* a non-X11 version of this is needed */
  l_ptr("!KB",		&kb);
  l_ptr("!KEYCODE",	&ana_keycode);
  l_ptr("!KEYSTATE",	&ana_keystate);
@@ -4421,13 +4422,13 @@ void symbolInitialization(void)
  l_ptr("!LASTMIN", 	&lastmin);
  l_ptr("!LASTMINLOC", 	&lastminloc);
  l_ptr("!LASTSDEV",	&lastsdev);
-#if X11
+#if HAVE_LIBX11
  l_ptr("!LAST_MENU",	&last_menu);
  f_ptr("!LUMPX",	&lumpx);
 #endif
  l_ptr("!MAXHISTSIZE", 	&maxhistsize);
  l_ptr("!MAXREGRIDSIZE", &maxregridsize);
-#if X11
+#if HAVE_LIBX11
  l_ptr("!MENU_ITEM",	&menu_item);
 #endif
  d_ptr("!MERITC",	&meritc);
@@ -4443,11 +4444,11 @@ void symbolInitialization(void)
  f_ptr("!MZT",		&zmax);
 #endif
  l_ptr("!NARG",		&nArg);
-#if X11
+#if HAVE_LIBX11
  l_ptr("!NCOLORCELLS",	&nColors);
 #endif
  l_ptr("!NEXECUTED",	&nExecuted);
-#if X11
+#if HAVE_LIBX11
  l_ptr("!NOEVENTFLUSH",	&preventEventFlush);
 #endif
  l_ptr("!PDEV", 	&lunplt);
@@ -4455,7 +4456,7 @@ void symbolInitialization(void)
  l_ptr("!PLTYP",	&ipltyp);
  f_ptr("!PLXERRB",	&xerrsize);
  f_ptr("!PLYERRB",	&yerrsize);
-#if X11
+#if HAVE_LIBX11
  l_ptr("!PRIVATE_COLORMAP", &private_colormap);
 #endif
  psfile = s_ptr("!PS_FILE", strsave("junk.eps"));
@@ -4467,7 +4468,7 @@ void symbolInitialization(void)
 #if DEVELOP
  l_ptr("!REGRID_TYPE",	&resample_type);
 #endif
-#if X11
+#if HAVE_LIBX11
  l_ptr("!ROOT_X",	&root_x);
  l_ptr("!ROOT_Y",	&root_y);
 #endif
@@ -4479,10 +4480,9 @@ void symbolInitialization(void)
 #endif
  l_ptr("!SCALEMAX", 	&scalemax);
  l_ptr("!SCALEMIN", 	&scalemin);
-#if X11
+#if HAVE_LIBX11
  l_ptr("!SCREEN_HEIGHT", &display_height);
  l_ptr("!SCREEN_WIDTH",	&display_width);
-#endif
 #endif
  l_ptr("!SORT_FLAG",	&sort_flag);
  f_ptr("!STARTX",	&startx);
@@ -4492,7 +4492,7 @@ void symbolInitialization(void)
  f_ptr("!SYMRATIO",	&symratio);
  f_ptr("!SYMSIZE",	&symsize);
  fnc_p("!SYSTIME",	10);
-#if X11
+#if HAVE_LIBX11
  l_ptr("!TEXTMENUS",	&text_menus); /* development of text menus */
 #endif
  f_ptr("!TICKX",	&ticx);
@@ -4504,20 +4504,20 @@ void symbolInitialization(void)
  f_ptr("!TICKZR",	&ticzr);
 #endif
  fnc_p("!TIME",		6);
-#if X11
+#if HAVE_LIBX11
  f_ptr("!TVIX",		&tvix);
  f_ptr("!TVIXB",	&tvixb);
  f_ptr("!TVIY",		&tviy);
  f_ptr("!TVIYB",	&tviyb);
  l_ptr("!TVPLANEZOOM",	&tvplanezoom); /* browser */
 #endif
-#if X11
+#if HAVE_LIBX11
  f_ptr("!TVSCALE",	&tvscale);
 #endif
  l_ptr("!TVSMT",	&tvsmt);
  l_ptr("!PROJECT",	&projectTk);
  f_ptr("!WIDTH",	&xfac);
-#if X11
+#if HAVE_LIBX11
  l_ptr("!WINDOW",	&last_wid);
 #endif
  f_ptr("!WXB", 		&wxb);
@@ -4530,18 +4530,18 @@ void symbolInitialization(void)
 #endif
  f_ptr("!XB",		&plims[0]);
  f_ptr("!XC",		&callig_xb);
-#if X11
+#if HAVE_LIBX11
  l_ptr("!XERRORS",	&xerrors);
  f_ptr("!XF",		&xhair);
  f_ptr("!XMENU",	&menu_x);
 #endif
  f_ptr("!XT",		&plims[1]);
-#if X11
+#if HAVE_LIBX11
  d_ptr("!XTIME",	&last_time);
 #endif
  f_ptr("!YB",		&plims[2]);
  f_ptr("!YC",		&callig_yb);
-#if X11
+#if HAVE_LIBX11
  f_ptr("!YF",		&yhair);
  f_ptr("!YMENU",	&menu_y);
 #endif
@@ -4550,7 +4550,7 @@ void symbolInitialization(void)
  l_ptr("!YYDEBUG",	&yydebug);
 #endif
  f_ptr("!ZB",		&plims[4]);
-#if X11
+#if HAVE_LIBX11
  l_ptr("!ZOOMFRAME",	&zoom_frame);
  d_ptr("!ZOOMHIGH",	&zoom_chi);
  d_ptr("!ZOOMLOW",	&zoom_clo);

@@ -10,7 +10,7 @@ static char rcsid[] __attribute__ ((unused)) =
 "$Id: coord.c,v 4.0 2001/02/07 20:36:58 strous Exp $";
 
 extern Float	xfac, yfac, wxt, wxb, wyt, wyb, xmin, xmax, ymin, ymax;
-#ifdef X11
+#if HAVE_LIBX11
 extern Float	tvix, tviy, tvixb, tviyb, tvscale;
 #endif
 extern Int	iorder, iyhigh, ipltyp;
@@ -58,7 +58,7 @@ Int coordTrf(Float *x, Float *y, Int from, Int to)
       if (y)
 	*y *= yfac;
       break;
-#ifdef X11
+#if HAVE_LIBX11
     case ANA_RIM:
       if (x) 
 	*x = tvix + *x * (tvixb - tvix);
@@ -131,7 +131,7 @@ Int coordTrf(Float *x, Float *y, Int from, Int to)
       if (y)
 	*y = yfac? *y/yfac: 0.0;
       break;
-#ifdef X11
+#if HAVE_LIBX11
     case ANA_RIM:
       if (x)
 	*x = (tvixb != tvix)? (*x - tvix)/(tvixb - tvix): 0.0;

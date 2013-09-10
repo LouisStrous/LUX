@@ -2580,7 +2580,7 @@ void scale(pointer data, Byte type, Int size, Double datalow, Double datahigh,
   Double	drange, dfac, doff;
   Float	ffac, foff;
   pointer	trgt;
-#ifdef X11
+#if HAVE_LIBX11
   extern Int	colorIndexType;
 #else
   Int	colorIndexType = ANA_BYTE;
@@ -2802,7 +2802,7 @@ Int ana_scale(Int narg, Int ps[])
   scalar	min, max;
   register	pointer q1, q2;
   Double	sd, qd;
-#ifdef X11
+#if HAVE_LIBX11
   extern Double	zoom_clo, zoom_chi;
   extern Int	threeColors;
   extern Int	colorIndexType, display_cells;
@@ -2827,7 +2827,7 @@ Int ana_scale(Int narg, Int ps[])
       scalemin = 0;
       scalemax = display_cells - 1;
     }
-#ifdef X11
+#if HAVE_LIBX11
     else if (threeColors) {
       scalemin = 0;
       scalemax = display_cells/3 - 1;
@@ -2842,7 +2842,7 @@ Int ana_scale(Int narg, Int ps[])
     if (narg == 2)
       return cerror(WRNG_N_ARG, 0);
     /* this is messier than the simple scale because of over/under flows */
-#ifdef X11
+#if HAVE_LIBX11
     if (narg == 1) {		/* have /ZOOM */
       min.d = zoom_clo;
       max.d = zoom_chi;
@@ -2863,7 +2863,7 @@ Int ana_scale(Int narg, Int ps[])
       sd = (Double) 255.999;
       qd = (Double) 0.0;
     } else
-#ifdef X11
+#if HAVE_LIBX11
       if (threeColors) {
 	sd = (Double) 84.999;
 	qd = (Double) 0.0;
@@ -2898,7 +2898,7 @@ Int ana_scalerange(Int narg, Int ps[])
   scalar	min, max;
   register	pointer q1, q2;
   Double	sd, qd, logrey, higrey;
-#ifdef X11
+#if HAVE_LIBX11
   extern Double	zoom_clo, zoom_chi;
   extern Int	threeColors;
   extern Int	colorIndexType, display_cells;
@@ -2931,7 +2931,7 @@ Int ana_scalerange(Int narg, Int ps[])
       scalemin = (Int) (logrey*(display_cells - 0.001));
       scalemax = (Int) (higrey*(display_cells - 0.001));
     }
-#ifdef X11
+#if HAVE_LIBX11
     else if (threeColors) {
       scalemin = (Int) ((display_cells/3 - 0.001)*logrey);
       scalemax = (Int) ((display_cells/3 - 0.001)*higrey);
@@ -2951,7 +2951,7 @@ Int ana_scalerange(Int narg, Int ps[])
     if (narg != 5)
       return cerror(WRNG_N_ARG, 0);
     /* this is messier than the simple scale because of over/under flows */
-#ifdef X11
+#if HAVE_LIBX11
     if (narg == 3) {		/* have /ZOOM */
       min.d = zoom_clo;
       max.d = zoom_chi;
@@ -2968,7 +2968,7 @@ Int ana_scalerange(Int narg, Int ps[])
       sd = (Double) (display_cells - 0.001)*higrey;
       qd = (Double) (display_cells - 0.001)*logrey;
     }
-#ifdef X11
+#if HAVE_LIBX11
     else if (threeColors) {
       qd = (Double) (display_cells/3 - 0.001)*logrey;
       sd = (Double) (display_cells/3 - 0.001)*higrey;
@@ -3098,13 +3098,13 @@ Int simple_scale(void *p1, Int n, Int type, void *p2)
   register	Int	xq;
   register	Float	fq;
   register	Double	dq;
-#ifdef X11
+#if HAVE_LIBX11
   extern Int	connect_flag, colorIndexType;
 #else
   Int	colorIndexType = ANA_BYTE;
 #endif
 
-#ifdef X11
+#if HAVE_LIBX11
   if (!connect_flag)
     setup_x();
 #endif
@@ -3226,7 +3226,7 @@ Int neutral(void *p, Int n)
 {
   Int	xq;
   pointer	pp;
-#ifdef X11
+#if HAVE_LIBX11
   extern Int	colorIndexType;
 #else
   Int	colorIndexType = ANA_BYTE;

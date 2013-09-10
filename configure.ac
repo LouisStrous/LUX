@@ -8,14 +8,20 @@ AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE
 PKG_CHECK_MODULES([CHECK],[check >= 0.9.4])
 
+AC_CANONICAL_HOST
+AC_DEFINE_UNQUOTED([PLATFORM], "${host}", [The canonical host type])
+
 # Checks for programs.
 AC_PROG_CC
 AC_PROG_RANLIB
 AC_PROG_YACC
 
 # Checks for libraries.
-AC_PATH_XTRA
-AC_DEFINE([X11],[!defined(X_DISPLAY_MISSING)],[Define if X11 is present])
+AC_CHECK_LIB(c, printf)
+AC_CHECK_LIB(m, sin)
+AC_CHECK_LIB(jpeg, jpeg_start_decompress)
+AC_CHECK_LIB(gsl, gsl_sf_bessel_J0)
+AC_CHECK_LIB(X11, XOpenDisplay)
 
 # Checks for header files.
 

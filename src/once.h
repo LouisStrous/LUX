@@ -1,3 +1,5 @@
+#include "anaparser.h"
+
 /* editorCharClass table */
 
 /* 0x00 whitespace

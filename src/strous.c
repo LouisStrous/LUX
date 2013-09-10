@@ -677,7 +677,7 @@ Int ana_help(Int narg, Int ps[])
   topic = narg? string_arg(*ps): "Top";
   if (!topic)
     return ANA_ERROR;
-  fp = fopen(expand_name("$ANADIR/ana.texinfo", ""), "r");
+  fp = fopen(expand_name("$ANADIR/../doc/ana.texinfo", ""), "r");
   if (!fp) {
     printf("File access error: %s\n", strerror(errno));
     return anaerror("Cannot open file %s for reading.", 0, expname);

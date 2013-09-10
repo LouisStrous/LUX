@@ -1,6 +1,21 @@
 /* config.h.  Generated from config.h.in by configure.  */
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
+/* Define to 1 if you have the `c' library (-lc). */
+#define HAVE_LIBC 1
+
+/* Define to 1 if you have the `gsl' library (-lgsl). */
+#define HAVE_LIBGSL 1
+
+/* Define to 1 if you have the `jpeg' library (-ljpeg). */
+#define HAVE_LIBJPEG 1
+
+/* Define to 1 if you have the `m' library (-lm). */
+#define HAVE_LIBM 1
+
+/* Define to 1 if you have the `X11' library (-lX11). */
+#define HAVE_LIBX11 1
+
 /* Name of package */
 #define PACKAGE "ana"
 
@@ -22,11 +37,8 @@
 /* Define to the version of this package. */
 #define PACKAGE_VERSION "5.0"
 
+/* The canonical host type */
+#define PLATFORM "x86_64-unknown-linux-gnu"
+
 /* Version number of package */
 #define VERSION "5.0"
-
-/* Define if X11 is present */
-#define X11 !defined(X_DISPLAY_MISSING)
-
-/* Define to 1 if the X Window System is missing or not being used. */
-/* #undef X_DISPLAY_MISSING */

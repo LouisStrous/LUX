@@ -1,5 +1,20 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
+/* Define to 1 if you have the `c' library (-lc). */
+#undef HAVE_LIBC
+
+/* Define to 1 if you have the `gsl' library (-lgsl). */
+#undef HAVE_LIBGSL
+
+/* Define to 1 if you have the `jpeg' library (-ljpeg). */
+#undef HAVE_LIBJPEG
+
+/* Define to 1 if you have the `m' library (-lm). */
+#undef HAVE_LIBM
+
+/* Define to 1 if you have the `X11' library (-lX11). */
+#undef HAVE_LIBX11
+
 /* Name of package */
 #undef PACKAGE
 
@@ -21,11 +36,8 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
+/* The canonical host type */
+#undef PLATFORM
+
 /* Version number of package */
 #undef VERSION
-
-/* Define if X11 is present */
-#undef X11
-
-/* Define to 1 if the X Window System is missing or not being used. */
-#undef X_DISPLAY_MISSING

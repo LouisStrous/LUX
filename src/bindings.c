@@ -1453,7 +1453,7 @@ Int ana_ivarl_copy_eachaxis_(Int narg, Int ps[], Int (*f)(Double *, size_t count
     }
     do {
       f(ptrs[iret].d, infos[iret].rdims[0], infos[iret].rsinglestep[0]);
-      ptrs[iret].d += infos[iret].rsinglestep[1];
+      ptrs[iret].d += infos[iret].rsinglestep[0]*infos[iret].rdims[0];
     } while (advanceLoop(&infos[iret], &ptrs[iret]) < infos[iret].rndim);
   }
   if (allaxes)

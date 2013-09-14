@@ -7844,7 +7844,7 @@ The pseudo-random number functions ANA offers are:
 @example
 RANDOMB( [SEED = @var{seed},] @var{dimensions})
 RANDOMD( [SEED = @var{seed},] @var{distribution}, @var{dimensions})
-RANDOME( [SEED = @var{seed},] @var{dimensions} [, /DOUBLE])
+RANDOME( @var{scale}, @var{dimensions})
 RANDOMU( [SEED = @var{seed}, PERIOD = @var{period},] @var{dimensions})
 RANDOMN( [SEED = @var{seed},] @var{dimensions})
 RANDOM( [SEED = @var{seed}, PERIOD = @var{period},] @var{dimensions}
@@ -24827,32 +24827,14 @@ See also: @ref{RANDOM}, @ref{Random Arrays}
 @node RANDOME, RANDOMN, RANDOMD, Internal Routines
 @subsection RANDOMN
 
-@code{RANDOME( [SEED=@var{seed},] [@var{dimensions}] [, /DOUBLE])}
+@code{RANDOME([LIMIT=@var{limit},] @var{scale}, @var{dimensions})}
 
-Returns a @code{FLOAT} or @code{DOUBLE} (if @code{/DOUBLE} is specified)
-array with the specified @code{@var{dimensions}}, filled with
-pseudo-random numbers exponentially distributed over all representable
-values.  Positive and negative values are equally likely, and the
-logarithms of the magnitudes of the returned numbers are uniformly
-distributed (in a statistical sense).
-
-@code{@var{seed}} specifies a seed for the random numbers, and must be
-non-zero.  The same seed generates the same sequence of pseudo-random
-numbers every time.  Different seeds generate different sequences.  If
-you specify a @code{@var{seed}} but no @code{@var{dimensions}}, then the
-seed is set and a scalar @code{1} is returned.
-
-The random numbers are generated as patterns of random bits from a
-primitive polynomial modulo 2 with a period of @code{2^31 - 1}, or about
-@code{2.1E9}.  These bit patterns are then reinterpreted as @code{FLOAT}
-or @code{DOUBLE} numbers, using the native encoding of such
-floating-point numbers.  Some bit patterns may not correspond to regular
-values, but rather to unrepresentable values.  Such bit patterns are not
-accepted.
-
-This method works on systems that comply with the IEEE 754-1985 standard
-for binary floating-point arithmetic, but may not work on systems that
-use some other encoding of floating-point numbers.
+Returns a @code{DOUBLE} array with the specified
+@code{@var{dimensions}}, filled with pseudo-random numbers
+exponentially distributed with the specified scale height
+@code{@var{scale}.  Positive and negative values are equally likely.
+If @code{@var{limit}} is specified and greater than 0, then only
+numbers whose magnitude is at least @code{@var{limit}} are returned.
 
 See also: @ref{RANDOM}, @ref{RANDOMB}, @ref{RANDOMU}, @ref{Random Arrays}
 

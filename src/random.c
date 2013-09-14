@@ -133,23 +133,49 @@ void randomu(Int seed, void *output, Int number, Int modulo)
  }
 }
 /*------------------------------------------------------------------------- */
-void randome(void *output, Int number)
+void randome(void *output, Int number, Double limit)
 /* generates <number> exponentially distributed (with unit scale)
    pseudo-random numbers and stores them in <output>, for which memory
    must have been allocated by the user.  Both positive and negative
-   numbers are returned */
+   numbers are returned.  If <limit> is greater than 0, then only
+   numbers whose magnitude is at least <limit> are returned */
 {
  Int	j;
- Double	*fp;
+ Double	*fp, value;
 
+ if (limit < 0)
+   limit = 0;
  fp = (Double *) output;
+ /* 
+    We want only numbers whose magnitude is at least |λ| = <limit>.
+    random_one() returns uniformly distributed pseudorandom numbers
+    ρ between 0 and 1.  -log(ρ) is exponentially distributed from 0
+    with scale 1.
+
+    Target distribution: f(x) = exp(λ-x) for x ≥ λ
+    ∫f(x)dx = -exp(λ-x)
+    ∫_λ^∞ f(x)dx = -exp(λ-∞) + exp(0) = 1
+    F(x) = ∫_-∞^x f(y)dy
+    x ≤ λ ⇒ F(x) = 0
+    x ≥ λ ⇒ F(x) = 1 - exp(λ-x)
+        y = 1 - exp(λ-x)
+        log(1 - y) = λ - x
+        x = λ - log(1 - y)
+    F(x) = y ⇒ F⁻¹(y) = λ - log(1 - y)
+    Transform T(u) = F⁻¹(u) = λ - log(1 - u)
+ */
  for (j = 0; j < number; j++) {
-   Double value = 2*random_one() - 1;
+   value = 2*random_one() - 1;	/* uniform between -1 and +1 */
    int negative = (value < 0);
-   if (value) {
-     *fp++ = log(fabs(value))*(negative? -1: 1);
-   } else
-     *fp++ = INFTY;
+   if (negative)
+     value = -value;		/* uniform between 0 and +1 */
+   if (value)
+     value = limit - log(value); /* exponential from <limit> */
+   else
+     value = INFTY;
+   if (negative)
+     value = - value;
+   *fp++ = value;
  }
 }
 /*----------------------------------------------------------------------*/
@@ -363,12 +389,14 @@ Int ana_randome(Int narg, Int ps[])
  /* create an exponential distribution of pseudo-random #'s, centered
     at 0 with a given scale length */
 {
-  Double *p, scale;
+  Double *p, scale, limit;
   Int	k;
   Int	dims[8], *pd, j, result_sym, n;
 
-  scale = double_arg(*ps++);
-  --narg;
+  limit = ps[0]? double_arg(ps[0]): 0;
+  scale = double_arg(ps[1]);
+  ps += 2;
+  narg -= 2;
   if (symbol_class(*ps) == ANA_ARRAY) {
     if (narg > 1)
       return anaerror("Dimension list must be either all scalars or one array",
@@ -386,14 +414,14 @@ Int ana_randome(Int narg, Int ps[])
     return ANA_ERROR;
   p = array_data(result_sym);
   n = array_size(result_sym);
-  randome(p, n);
+  randome(p, n, scale? limit/fabs(scale): 0);
   while (n--) {
     *p *= scale;
     ++p;
   }
   return result_sym;
 }
-REGISTER(randome, f, RANDOME, 2, MAX_DIMS, 0);
+REGISTER(randome, f, RANDOME, 3, MAX_DIMS, "%1%LIMIT:SCALE");
 /*------------------------------------------------------------------------- */
 Int ana_randomb(Int narg, Int ps[])
 /* RANDOMB([SEED=seed,] dimens, [/LONG]) */

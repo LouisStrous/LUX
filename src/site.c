@@ -44,7 +44,7 @@ Int site(Int narg, Int ps[])
   
   setPager(0);
   if (!internalMode || internalMode == 255) {
-    printw("*** Welcome to " PACKAGE_NAME " " GIT_VERSION "\n");
+    printw("*** Welcome to " PACKAGE_STRING " (" GIT_VERSION ")\n");
     printw("Type \"HELP\" for assistance.\n");
 #if DEBUG
     printw("Warning: This version of ANA was compiled with the DEBUG option - This may make the program very slow!\n");

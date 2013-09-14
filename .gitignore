@@ -1,4 +1,5 @@
 *.bck
+*.tar.gz
 *~
 Makefile
 Makefile.in
@@ -12,4 +13,4 @@ config.status
 config.sub
 configure
 configure.scan
-version.h
+test-driver

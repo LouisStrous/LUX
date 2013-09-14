@@ -1,11 +1,10 @@
 *.deps
 *.o
 .deps
+GITID
 Makefile
 Makefile.in
 ana
 libana.a
-sofa.h
-sofa/20101201/c/src/libsofa_c.a
-sofam.h
+maybe-GITID
 version.h

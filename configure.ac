@@ -3,6 +3,7 @@
 
 AC_PREREQ([2.68])
 AC_INIT([ana], [5.0], [ana@quae.nl])
+AC_LANG([C])
 AC_CONFIG_SRCDIR([src/ana.c])
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE
@@ -10,6 +11,8 @@ PKG_CHECK_MODULES([CHECK],[check >= 0.9.4])
 
 AC_CANONICAL_HOST
 AC_DEFINE_UNQUOTED([PLATFORM], "${host}", [The canonical host type])
+
+# Options
 
 # Checks for programs.
 AC_PROG_CC
@@ -30,6 +33,8 @@ AC_CHECK_LIB(X11, XOpenDisplay)
 # Checks for library functions.
 
 AC_CONFIG_FILES([Makefile
+                 sofa/Makefile
+                 sofa/src/Makefile
                  src/Makefile
                  test/Makefile])
 AC_OUTPUT

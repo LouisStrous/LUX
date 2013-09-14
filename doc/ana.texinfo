@@ -1,3 +1,4 @@
+
 \input texinfo @c -*-texinfo-*-
 @c %**start of header
 @setfilename ana.info
@@ -15,9 +16,9 @@
 @top ANA
 
 This text documents the ANA data processing language and program.  This
-edition is for ANA version 3.
+edition is for ANA version 5.
 
-@copyright{} 1995-2000 Louis Strous
+@copyright{} 1995-2013 Louis Strous
 
 Permission is granted to make and distribute verbatim copies of this
 manual provided the copyright notice and this permission notice are
@@ -1472,7 +1473,7 @@ use it @emph{completely at your own risk}.
 
 @heading COPYING
 
-This version is @copyright{} 1995-2000 Louis Strous.  You may copy,
+This version is @copyright{} 1995-2013 Louis Strous.  You may copy,
 modify and/or redistribute it under the conditions listed below. In the
 following, the term `software' includes the source files, header files,
 help and manual files, font files, make file, object files, executable

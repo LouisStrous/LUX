@@ -3676,11 +3676,11 @@ void ana_xminit(void) 	/* the motif initialization */
  XtToolkitInitialize();
  app_context = XtCreateApplicationContext();
  /* setting a widget name and class is good policy -- just to be safe. */
- XtDisplayInitialize(app_context, display, "lux", "Ana", NULL, 0,
+ XtDisplayInitialize(app_context, display, "lux", "Lux", NULL, 0,
 		     &argc, &argv);
  disp = display;		/* instead of replacing all "disp"s. */
  ana_widget_id[toplevel] =
-   XtAppCreateShell("lux", "Ana", applicationShellWidgetClass, disp, NULL, 0);
+   XtAppCreateShell("lux", "Lux", applicationShellWidgetClass, disp, NULL, 0);
 
  exit_button_text = XmStringCreateLtoR("interrupt motif",
 				       XmSTRING_DEFAULT_CHARSET);

@@ -638,7 +638,7 @@ Int ana_generalfit(Int narg, Int ps[])
   return j;
 }
 /*------------------------------------------------------------*/
-gsl_vector *gsl_vector_from_ana_symbol(Int iq, Int axis)
+gsl_vector *gsl_vector_from_lux_symbol(Int iq, Int axis)
 {
   gsl_vector *v;
   Int ndim, *dims, nelem, i;
@@ -771,8 +771,8 @@ Int ana_generalfit2(Int narg, Int ps[])
   if (nithresh <= 0)
     nithresh = INT32_MAX;
 
-  par_v = gsl_vector_from_ana_symbol(d_par_sym, -1);
-  step_v = gsl_vector_from_ana_symbol(d_step_sym, -1);
+  par_v = gsl_vector_from_lux_symbol(d_par_sym, -1);
+  step_v = gsl_vector_from_lux_symbol(d_step_sym, -1);
 
   afif = ana_func_if_alloc(string_value(ps[4]), 3);
   if (!afif) {

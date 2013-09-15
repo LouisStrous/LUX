@@ -57,7 +57,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
  extern	Int	ana_float();
  extern	char *find_sym_name();
  extern	Int	ana_type_size[];
- extern	Int	vfix_top, num_ana_subr, next_user_subr_num;
+ extern	Int	vfix_top, num_lux_subr, next_user_subr_num;
  extern	Float	float_arg();
  extern	Double	double_arg();
  static const Int extend_test[16] =   /* entry n is 2**(n-1) */

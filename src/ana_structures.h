@@ -45,5 +45,5 @@ void	color_not_available(void), font_not_available(void), ana_xminit(void),
 #define redef_strarr(sym, ndim, dim) redef_array(sym, ANA_STRING_ARRAY, ndim, dim)
 #define find_sym(string)	findVarName(string, 0)
 #define execute_string(string)	compileString(string)
-#define num_ana_subr		nSubroutine
-#define num_ana_func		nFunction
+#define num_lux_subr		nSubroutine
+#define num_lux_func		nFunction

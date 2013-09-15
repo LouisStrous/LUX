@@ -33,7 +33,7 @@ Int advanceLoop(loopInfo *, pointer *);
 
 struct obstack *registered_functions = NULL, *registered_subroutines = NULL;
 
-void register_ana_f(Int (*f)(Int, Int []), char *name, Int min_arg,
+void register_lux_f(Int (*f)(Int, Int []), char *name, Int min_arg,
                     Int max_arg, char *spec)
 {
   internalRoutine ir;
@@ -50,7 +50,7 @@ void register_ana_f(Int (*f)(Int, Int []), char *name, Int min_arg,
   obstack_grow(registered_functions, &ir, sizeof(ir));
 }
 /*-----------------------------------------------------------------------*/
-void register_ana_s(Int (*f)(Int, Int []), char *name, Int min_arg,
+void register_lux_s(Int (*f)(Int, Int []), char *name, Int min_arg,
                     Int max_arg, char * spec)
 {
   internalRoutine ir;

@@ -101,15 +101,15 @@ Int ana_v_dpT4_iD3arD3q_0111_f_(Int narg, Int ps[], void (*f)(Double *, Double *
 Int ana_v_dpdp3_iD3arDp3q_01_f_(Int narg, Int ps[], void (*f)(Double [3], Double [3][3]));
 Int ana_v_sddsd_iDaD1rDq_012_f_(Int narg, Int ps[], void (*f)(Double *, size_t, size_t, Double, Double *, size_t, size_t));
 
-void register_ana_f(Int (*f)(Int, Int []), char *name, Int min_arg,
+void register_lux_f(Int (*f)(Int, Int []), char *name, Int min_arg,
                    Int max_arg, char *spec);
-void register_ana_s(Int (*f)(Int, Int []), char *name, Int min_arg,
+void register_lux_s(Int (*f)(Int, Int []), char *name, Int min_arg,
                    Int max_arg, char *spec);
 
 #define REGISTER(func, fs, name, minarg, maxarg, fsspec)        \
-void register_ana_ ## func ## _ ## fs (void) __attribute__((constructor)); \
-void register_ana_ ## func ## _ ## fs (void) { \
-  register_ana_ ## fs( ana_ ## func, #name, minarg, maxarg, fsspec );    \
+void register_lux_ ## func ## _ ## fs (void) __attribute__((constructor)); \
+void register_lux_ ## func ## _ ## fs (void) { \
+  register_lux_ ## fs( ana_ ## func, #name, minarg, maxarg, fsspec );    \
 }
 
 #define BIND(func, type, fs, name, minarg, maxarg, fsspec)      \

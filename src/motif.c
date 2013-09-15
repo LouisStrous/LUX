@@ -1724,7 +1724,7 @@ Int ana_xmlistsubr(narg, ps) /*(list_widget)*/
  /* an lux subr, loads given list widget with internal subr names */
  Int     narg, ps[];
  {
- extern Int	num_ana_subr;
+ extern Int	num_lux_subr;
  extern	 struct	ana_subr_struct	ana_subr[];
  Int	i, list_widget;
  char		line[100];
@@ -1733,7 +1733,7 @@ Int ana_xmlistsubr(narg, ps) /*(list_widget)*/
  if ( get_widget_id( ps[0], &list_widget) != 1 ) return -1;
  
  /* load the subr names as items */
- for (i=0; i < num_ana_subr; i++ ) {
+ for (i=0; i < num_lux_subr; i++ ) {
   sprintf(line, "%s",ana_subr[i].name);
   ms = XmStringCreate(line, cset);
   XmListAddItemUnselected(ana_widget_id[list_widget], ms, 0);
@@ -1746,7 +1746,7 @@ Int ana_xmlistfunc(narg, ps) /*(list_widget)*/
  /* an lux subr, loads given list widget with internal func names */
  Int     narg, ps[];
  {
- extern Int	num_ana_func;
+ extern Int	num_lux_func;
  extern	 struct	ana_subr_struct	ana_func[];
  Int	i, list_widget;
  char		line[100];
@@ -1756,7 +1756,7 @@ Int ana_xmlistfunc(narg, ps) /*(list_widget)*/
  
  /* load the subr names as items */
  /* note that we skip over the specials, currently 9 of them */
- for (i=9; i < num_ana_func; i++ ) {
+ for (i=9; i < num_lux_func; i++ ) {
   sprintf(line, "%s", ana_func[i].name);
   ms = XmStringCreate(line, cset);
   XmListAddItemUnselected(ana_widget_id[list_widget], ms, 0);

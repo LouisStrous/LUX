@@ -4,6 +4,7 @@
 GITID
 Makefile
 Makefile.in
+TAGS
 ana
 libana.a
 maybe-GITID

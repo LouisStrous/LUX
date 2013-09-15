@@ -1,4 +1,4 @@
-/* This is file ana.c.
+/* This is file lux.c.
 
 Copyright 2013 Louis Strous
 

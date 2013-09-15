@@ -2418,7 +2418,7 @@ Int ana_concat_list(Int narg, Int ps[])
 }
  /*------------------------------------------------------------------------- */
 Int ana_concat(Int narg, Int ps[])
- /* ana's concatenation function, insisted on by idl users, but works a bit
+ /* lux's concatenation function, insisted on by idl users, but works a bit
 	 differently
  there are 2 modes
  mode 1 - has a single argument, we return a variable which has one extra

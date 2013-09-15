@@ -235,7 +235,7 @@ void loadcolortable(FILE *fin, Int nc, Int cmsym)
  Int	dim[8], ncolmap;
  struct ahead   *h;
  char	*colormap;
- /* we either load the color table into ana symbol cmsym or we just
+ /* we either load the color table into lux symbol cmsym or we just
  skip over the area in the file */
  ncolmap = 3*nc;
  if (cmsym) {

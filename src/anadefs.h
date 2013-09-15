@@ -230,7 +230,7 @@ enum binaryOps {
 
 /* data file types */
 
-#define FILE_TYPE_ANA_FZ	1 /* ana fz file */
+#define FILE_TYPE_ANA_FZ	1 /* lux fz file */
 #define FILE_TYPE_IDL_SAVE	2 /* IDL Save file */
 #define FILE_TYPE_GIF		3 /* GIF file */
 #define FILE_TYPE_ANA_ASTORE	4 /* LUX ASTORE file */

@@ -3035,7 +3035,7 @@ Int ana_assoc_output(Int iq, Int jq, Int offsym, Int axsym)
 }
 /*------------------------------------------------------------------------- */
 FILE *fopenr_sym(Int nsym)	/* internal utility */
- /* decode an ana string symbol and use as a file name to open a file for
+ /* decode an lux string symbol and use as a file name to open a file for
  read, 1/17/99 */
 /* Headers:
    <stdio.h>: FILE, NULL
@@ -6016,7 +6016,7 @@ Int fits_read(Int mode, Int dsym, Int namsym, Int hsym, Int offsetsym,
     q = (char *) malloc(81);
     memcpy(q, fitshead, 80);
     *(q+80) = '\0';
-    if (strstr(q, "ana rice compressed"))
+    if (strstr(q, "lux rice compressed"))
       simple_flag = 2;
     else {
       printf("Not a simple FITS file\n");
@@ -6054,7 +6054,7 @@ Int fits_read(Int mode, Int dsym, Int namsym, Int hsym, Int offsetsym,
 	  if (n >= 1) {
 	    bitpix_flag = 1;
 	    /*printf("found bitpix = %d\n", bitpix); */
-	    /* translate to ana type */
+	    /* translate to lux type */
 	    switch (bitpix) {
 	      case 8:   type = 0;  break;
 	      case 16:  type = 1;  break;
@@ -6160,7 +6160,7 @@ Int fits_read(Int mode, Int dsym, Int namsym, Int hsym, Int offsetsym,
   /* check if header is wanted */
   if (mode & 0x1) {
     lc--;			/* exclude the END record.  LS 14apr00 */
-    /* generate an ana string array for the header */
+    /* generate an lux string array for the header */
     if (to_scratch_array(hsym, ANA_STRING_ARRAY, 1, &lc) == ANA_ERROR) {
       fits_problems(9);
       return fits_fatality(fin);
@@ -6300,7 +6300,7 @@ Int fits_read(Int mode, Int dsym, Int namsym, Int hsym, Int offsetsym,
 	      n = sscanf(lptr+9,"%d", &bitpix);
 	      if (n >= 1) { bitpix_flag = 1;
 	      /* printf("found bitpix = %d\n", bitpix); */
-	      /* translate to ana type */
+	      /* translate to lux type */
 	      switch (bitpix) {
 		case 8:   type = 0;  break;
 		case 16:  type = 1;  break;
@@ -6390,7 +6390,7 @@ Int fits_read(Int mode, Int dsym, Int namsym, Int hsym, Int offsetsym,
       
     } else {
       /* printf("creating extension header array\n"); */
-      /* generate an ana string array for the header */
+      /* generate an lux string array for the header */
       if (to_scratch_array(xhsym, ANA_STRING_ARRAY, 1, &lc) == ANA_ERROR)
       { fits_problems(18); return fits_fatality(fin);}
       p = array_data(xhsym);
@@ -6518,7 +6518,7 @@ Int fits_read(Int mode, Int dsym, Int namsym, Int hsym, Int offsetsym,
       goto fits_read_1; }
       /* set nrow_bytes to dim[0] which we destroy below */
     nrow_bytes = dim[0];
-      /* make the ana variables, the last dim will be the number of rows. If the
+      /* make the lux variables, the last dim will be the number of rows. If the
 	 repeat in the tform is 1, then the array or strarr will be 1-D, otherwise
 	 it will be 2-D with repeat as the first dim */
       /* want to use dim for the constructed arrays, so save the binary table row

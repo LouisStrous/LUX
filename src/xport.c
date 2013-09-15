@@ -421,7 +421,7 @@ Int ana_xexist(Int narg, Int ps[])/* return 1 if window exists */
     if (win[wid] != 0)
       return ANA_ONE;
   }
-  /* no such, return an ana 0 */
+  /* no such, return an lux 0 */
   return ANA_ZERO;
 }
 /*--------------------------------------------------------------------------*/
@@ -645,10 +645,10 @@ Int ana_xcreat(Int wid, uint32_t height, uint32_t width, Int xpos,
      wd[wid] = width;
      ht[wid] = height;
      *window_name = '\0';
-     if (!wtitle || (wtitle && *wtitle != '-')) { /* need "ana xx" in title */
+     if (!wtitle || (wtitle && *wtitle != '-')) { /* need "lux xx" in title */
        sprintf( snum, "%d", wid);
        snum[2] = 0;
-       strcpy(window_name, "ana ");
+       strcpy(window_name, "lux ");
        strcat(window_name, snum);
      }
      if (wtitle) {		/* user specified window name */
@@ -659,10 +659,10 @@ Int ana_xcreat(Int wid, uint32_t height, uint32_t width, Int xpos,
        strncat(window_name, wtitle, 127 - strlen(window_name)); /* add title */
      }
      *icon_name = '\0';
-     if (!ititle || (ititle && *ititle != '-')) { /* need "ana xx" in title */
+     if (!ititle || (ititle && *ititle != '-')) { /* need "lux xx" in title */
        sprintf( snum, "%d", wid);
        snum[2] = 0;
-       strcpy(icon_name, "ana ");
+       strcpy(icon_name, "lux ");
        strcat(icon_name, snum);
      }
      if (ititle) {		/* user specified window name */
@@ -3420,7 +3420,7 @@ Int ana_xpurge(narg,ps)	/* just throw away any pending X events */
  }
  /*------------------------------------------------------------------------*/
 Int ana_xplace(Int narg, Int ps[])
- /* response to a key or button press in an ana window and note the
+ /* response to a key or button press in an lux window and note the
  time and position */
 {
  Int	i, cs, nc;

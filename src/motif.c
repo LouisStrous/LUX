@@ -17,12 +17,12 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
- /* ana interface for using motif widgets, the general plan is that most
- ana widgets will be dialogs that are children of a top level shell that
+ /* lux interface for using motif widgets, the general plan is that most
+ lux widgets will be dialogs that are children of a top level shell that
  contains a button to interrupt motif (to allow normal command entry).
  Other top level shells can also be supported but are not in the present
  program. The creation and destruction of lots of widgets means that a
- means of managing the ana data base must be developed */
+ means of managing the lux data base must be developed */
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -204,7 +204,7 @@ Int ana_xmgettopshell(narg, ps)
  }
  /*------------------------------------------------------------------------- */
 Int ana_xmmessage(narg, ps) /* (string,[font,color,ix,iy]) */
- /* a temporary widget, does not return a widget id, used as an ana subr */
+ /* a temporary widget, does not return a widget id, used as an lux subr */
  /* 5/29/95 disable the menu and resize */
  Int     narg, ps[];
  {
@@ -274,7 +274,7 @@ Int ana_xmmessage(narg, ps) /* (string,[font,color,ix,iy]) */
  /*------------------------------------------------------------------------- */
 Int ana_xmprompt(narg, ps)	/* see next line for args */
  /* (string, default, call_back, modal_flag, [font,color,ix,iy]) */
- /* a temporary widget, does not return a widget id, used as an ana subr */
+ /* a temporary widget, does not return a widget id, used as an lux subr */
  Int     narg, ps[];
  {
  Int	iq, nsym, modal_flag = 0, ix, iy;
@@ -318,7 +318,7 @@ Int ana_xmprompt(narg, ps)	/* see next line for args */
   if (setup_colors (ps[5] ) != 1) return -1; }	/* do colors based on bg */
  XtSetValues(XmSelectionBoxGetChild(dialog, XmDIALOG_TEXT), wargs, n);
  /* need to change the way prompt works so that more is done here in C,
- for the moment we use the same ana callback for OK and cancel, the
+ for the moment we use the same lux callback for OK and cancel, the
  user has to make sense of it if possible! Both destroy the widget. */
  XtAddCallback(dialog, XmNcancelCallback, selectionbox_cb, (XtPointer) nsym);
  XtAddCallback(dialog, XmNokCallback, selectionbox_cb, (XtPointer) nsym);
@@ -343,9 +343,9 @@ Int ana_xmprompt(narg, ps)	/* see next line for args */
  /*------------------------------------------------------------------------- */
 Int ana_xmcommand(narg, ps) /*see next line for args */
  /*(parent, callback, nvisible, [nmax, prompt,font,color])*/
- /* returns widget id, an ana function */
+ /* returns widget id, an lux function */
  /* creates a command widget, original intent is to experiment
- with this to develop a widget command interface for ana */
+ with this to develop a widget command interface for lux */
  Int     narg, ps[];
  {
  Int	iq, nsym, parent, nvisible, hmax = 100;
@@ -423,7 +423,7 @@ Int ana_xmdialog_board(narg, ps)	/* see next line for args */
  last arg. is now the resize_flag,   5/18/96 */
  /* 5/29/95,  added ix, iy for positioning on screen */
  /* create a dialog bulletin board widget, usually the main container */
- /* returns widget id, an ana function */
+ /* returns widget id, an lux function */
  Int     narg, ps[];
  {
  Int	dx, dy, parent, board, result_sym, iq, ix, iy, mx=0, my=0;
@@ -497,7 +497,7 @@ Int ana_xmdialog_form(narg, ps)	/* see next line for args */
  /* (parent, width, height, title, [ hspace, vspace, lr_margin, tb_margin) */
  /* 5/19/96 */
  /* create a dialog form widget, usually the main container */
- /* returns widget id, an ana function */
+ /* returns widget id, an lux function */
  Int     narg, ps[];
  {
  Int	dx, dy, parent, form, result_sym, iq, hs=0, vs=0, mx=0, my=0;
@@ -546,7 +546,7 @@ Int ana_xmtoplevel_form(narg, ps)	/* see next line for args */
  /* 12/26/97 */
  /* create a toplevel form widget, does not popup, returns the form
  widget created inside the toplevel */
- /* returns widget id, an ana function */
+ /* returns widget id, an lux function */
  /* similar to ana_xmdialog_form except that this is toplevel, do not use
  manage and unmanage, instead use popup and popdown */
  Int     narg, ps[];
@@ -579,7 +579,7 @@ Int ana_xmtoplevel_board(narg, ps)	/* see next line for args */
  /* 5/17/98 */
  /* create a toplevel board widget, does not popup, returns the form
  widget created inside the toplevel */
- /* returns widget id, an ana function */
+ /* returns widget id, an lux function */
  /* similar to ana_xmdialog_board except that this is toplevel, do not use
  manage and unmanage, instead use popup and popdown */
  Int     narg, ps[];
@@ -605,7 +605,7 @@ Int ana_xmtoplevel_board(narg, ps)	/* see next line for args */
  /*------------------------------------------------------------------------- */
 Int ana_xmboard(narg, ps)	/* (parent, [width, height, lr_margin, tb_margin]) */
  /* create a managed bulletin board widget */
- /* returns widget id, an ana function */
+ /* returns widget id, an lux function */
  Int     narg, ps[];
  {
  Int	dx=0, dy=0, parent, board, result_sym, mx=0, my=0;
@@ -635,7 +635,7 @@ Int ana_xmboard(narg, ps)	/* (parent, [width, height, lr_margin, tb_margin]) */
  }
  /*------------------------------------------------------------------------- */
 Int ana_xmform(narg, ps)	/* (parent, [width,height,hspace,vspace,mx,my]) */
- /* returns widget id, an ana function */
+ /* returns widget id, an lux function */
  Int     narg, ps[];
  {
  Int	dx=0, dy=0, parent, form, result_sym, hs=0, vs=0, mx=0, my=0;
@@ -671,7 +671,7 @@ Int ana_xmform(narg, ps)	/* (parent, [width,height,hspace,vspace,mx,my]) */
  /*------------------------------------------------------------------------- */
 Int ana_xmframe(narg, ps) /* (parent, [lr_margin, tb_margin, width, type]) */
  /* create a frame widget */
- /* returns widget id, an ana function */
+ /* returns widget id, an lux function */
  Int     narg, ps[];
  {
  Int	dx, parent, frame, result_sym, type, mx, my;
@@ -713,7 +713,7 @@ Int ana_xmseparator(narg, ps) /* (parent, [orient, margin, type]) */
  margin is width or height
  type is 1 for simple line, 0 for empty space, 2 for Double line, 3 for dotted
  line, 5 for etched line */
- /* returns widget id, an ana function */
+ /* returns widget id, an lux function */
  Int     narg, ps[];
  {
  Int	margin, parent, sep, result_sym, type=1, orient=0;
@@ -745,17 +745,17 @@ Int ana_xmseparator(narg, ps) /* (parent, [orient, margin, type]) */
  }
  /*------------------------------------------------------------------------- */
 Int ana_xmcolumns(narg, ps)	/* (parent, width, height, [ncolumns],[pack_flag]) */
- /* returns widget id, an ana function */
+ /* returns widget id, an lux function */
  Int     narg, ps[];
  { return rows_or_columns(narg, ps, 0); }
  /*------------------------------------------------------------------------- */
 Int ana_xmrows(narg, ps)	/* (parent, width, height, [nrows],[pack_flag]) */
- /* returns widget id, an ana function */
+ /* returns widget id, an lux function */
  Int     narg, ps[];
  { return rows_or_columns(narg, ps, 1); }
  /*------------------------------------------------------------------------- */
 Int rows_or_columns(narg, ps,mode)	/*(parent, width, height, [ncolumns],[p_flag]) */
- /* returns widget id, an ana function */
+ /* returns widget id, an lux function */
  Int     narg, ps[], mode;
  {
  Int	dx, dy, parent,rowcolumn, result_sym, ncol, p_flag = 0;
@@ -791,7 +791,7 @@ Int rows_or_columns(narg, ps,mode)	/*(parent, width, height, [ncolumns],[p_flag]
  /*------------------------------------------------------------------------- */
 Int ana_xmscrolledwindow(narg, ps)	/* (parent, width, height) */
  /* create a scrolled window */
- /* returns widget id, an ana function */
+ /* returns widget id, an lux function */
  Int     narg, ps[];
  {
  Int	dx, dy, parent, scroll, result_sym;
@@ -817,7 +817,7 @@ Int ana_xmscrolledwindow(narg, ps)	/* (parent, width, height) */
  /*------------------------------------------------------------------------- */
 Int ana_xmscrolledwindowapp(narg, ps)	/* (parent,hmargin,vmargin,space) */
  /* create a scrolled window, application controlled */
- /* returns widget id, an ana function */
+ /* returns widget id, an lux function */
  Int     narg, ps[];
  {
  Int	mx, my, parent, scroll, result_sym, space;
@@ -928,7 +928,7 @@ Int ana_xmscrollbarsetvalues(narg, ps)/*(widget,value,max,slidersize,dpage) */
  /*------------------------------------------------------------------------- */
 Int ana_xmdrawingarea(narg, ps)  /*(parent,ana_win,w,h,input_cb,resize_cb,ex_cb) */
  /* create a drawing window */
- /* returns widget id, an ana function */
+ /* returns widget id, an lux function */
  /* note that we can't get the window number until after the widgets
  are realized */
  Int     narg, ps[];
@@ -944,15 +944,15 @@ Int ana_xmdrawingarea(narg, ps)  /*(parent,ana_win,w,h,input_cb,resize_cb,ex_cb)
  if ( get_widget_id( ps[0], &parent) != 1 ) return -1;
  /* get the arguments */
  if (int_arg_stat(ps[1], &ana_win) != 1) return -1;
- /* we want the ana X window to be positive and in range */
- /* we do not currently allow a negative ana window which is supposed to be
+ /* we want the lux X window to be positive and in range */
+ /* we do not currently allow a negative lux window which is supposed to be
  a pixmap rather than a displayable window */
  if (ana_win<0 || ck_window(ana_win)<0 ) {
- 	printf("XMDRAWINGAREA - illegal ana X window number %d\n", ana_win);
+ 	printf("XMDRAWINGAREA - illegal lux X window number %d\n", ana_win);
 	return -1; }
  if (narg>2) { if (int_arg_stat(ps[2], &dx) != 1) return -1; }
  if (narg>3) { if (int_arg_stat(ps[3], &dy) != 1) return -1; }
- /* if the ana X window already exists, we have to delete it since the motif
+ /* if the lux X window already exists, we have to delete it since the motif
  widget will create a new X window */
  if ( win[ana_win] != 0 ) ana_xdelete(1, &ana_win);
  n = 0;
@@ -971,7 +971,7 @@ Int ana_xmdrawingarea(narg, ps)  /*(parent,ana_win,w,h,input_cb,resize_cb,ex_cb)
  s = (char *) sym[iq].spec.array.ptr;
  if (strlen(s) == 0 )  nsym = 0;  else	nsym = ana_execute_symbol(s,1);
  /* instead of just passing the execution symbol, we make a little
- array containing it and the ana X window # and pass the pointer */
+ array containing it and the lux X window # and pass the pointer */
  pt = (Int *) malloc(2*sizeof(Int));
  *pt = nsym;	*(pt+1) = ana_win;
  XtAddCallback(wdraw, XmNinputCallback, draw_in_callback, (XtPointer) pt);
@@ -983,7 +983,7 @@ Int ana_xmdrawingarea(narg, ps)  /*(parent,ana_win,w,h,input_cb,resize_cb,ex_cb)
  s = (char *) sym[iq].spec.array.ptr;
  if (strlen(s) == 0 )  nsym = 0;  else	nsym = ana_execute_symbol(s,1);
  /* instead of just passing the exection sysmbol, we make a little
- array containing it and the ana X window # and pass the pointer */
+ array containing it and the lux X window # and pass the pointer */
  pt = (Int *) malloc(2*sizeof(Int));
  *pt = nsym;	*(pt+1) = ana_win;
  XtAddCallback(wdraw, XmNresizeCallback, draw_re_callback, (XtPointer) pt);
@@ -995,7 +995,7 @@ Int ana_xmdrawingarea(narg, ps)  /*(parent,ana_win,w,h,input_cb,resize_cb,ex_cb)
  s = (char *) sym[iq].spec.array.ptr;
  if (strlen(s) == 0 )  nsym = 0;  else	nsym = ana_execute_symbol(s,1);
  /* instead of just passing the exection sysmbol, we make a little
- array containing it and the ana X window # and pass the pointer */
+ array containing it and the lux X window # and pass the pointer */
  pt = (Int *) malloc(2*sizeof(Int));
  *pt = nsym;	*(pt+1) = ana_win;
  XtAddCallback(wdraw, XmNexposeCallback, draw_ex_callback, (XtPointer) pt);
@@ -1016,7 +1016,7 @@ Int ana_xmdrawingarea(narg, ps)  /*(parent,ana_win,w,h,input_cb,resize_cb,ex_cb)
  }
  /*------------------------------------------------------------------------- */
 Int ana_xmdrawinglink(narg, ps)	/* (widget, ana_win) */
- /* link a drawing area widget to an ana window */
+ /* link a drawing area widget to an lux window */
  /* a subroutine */
  Int     narg, ps[];
  {
@@ -1046,7 +1046,7 @@ Int ana_xmdrawinglink(narg, ps)	/* (widget, ana_win) */
  setwat.backing_store = WhenMapped; /*note that Always screws up things
 					  not sure why yet */
  XChangeWindowAttributes(display, win[ana_win], valuemask, &setwat);
- /* set some of the ana parameters, assuming a window and not a pixmap
+ /* set some of the lux parameters, assuming a window and not a pixmap
  for early testing */
  ht[ana_win] = wat.width;	wd[ana_win] = wat.height;
  gc[ana_win] = XCreateGC(display, RootWindow(display,screen_num),
@@ -1066,7 +1066,7 @@ Int ana_xmdrawinglink(narg, ps)	/* (widget, ana_win) */
  }
  /*------------------------------------------------------------------------- */
 Int ana_xmtextfromfile(narg, ps)/*(parent, filename, [rows, cols, font,color])*/
- /* returns widget id, an ana function */
+ /* returns widget id, an lux function */
  Int     narg, ps[];
  {
  Int	iq, i, text, result_sym, parent, rows = 24, cols = 80;
@@ -1123,7 +1123,7 @@ Int ana_xmtextfromfile(narg, ps)/*(parent, filename, [rows, cols, font,color])*/
  /*------------------------------------------------------------------------- */
 Int ana_xmtext(narg, ps)/*(parent, rows, cols, [font,color])*/
  /* creates an empty text widget, scrollable */
- /* returns widget id, an ana function */
+ /* returns widget id, an lux function */
  /* note that the text widget is returned, to position this, you must
  use the scrolled text widget which is the parent of the returned one */
  Int     narg, ps[];
@@ -1162,7 +1162,7 @@ Int ana_xmtext(narg, ps)/*(parent, rows, cols, [font,color])*/
  /*------------------------------------------------------------------------- */
 Int ana_xmtextbox(narg, ps)/*(parent, rows, cols, [font,color])*/
  /* creates an empty text widget, not scrolled, write only, not editable */
- /* returns widget id, an ana function */
+ /* returns widget id, an lux function */
  Int     narg, ps[];
  {
  Int	text, result_sym, parent, rows = 24, cols = 80;
@@ -1626,7 +1626,7 @@ Int ana_xmtextfieldarray(narg, ps)  /* lots of arguments */
  /*------------------------------------------------------------------------- */
 Int ana_xmlistfromfile(narg, ps) /*(parent, callback, filename,
 	nvisible,[font,color])*/
- /* returns widget id, an ana function */
+ /* returns widget id, an lux function */
  Int     narg, ps[];
  {
  Int	iq, nsym, i, parent, nvisible;
@@ -1689,7 +1689,7 @@ Int ana_xmlistfromfile(narg, ps) /*(parent, callback, filename,
  }
  /*------------------------------------------------------------------------- */
 Int ana_xmaddfiletolist(narg, ps) /*(list_widget, filename)*/
- /* an ana function, returns error if file not readable */
+ /* an lux function, returns error if file not readable */
  Int     narg, ps[];
  {
  Int	iq, i, w;
@@ -1721,7 +1721,7 @@ Int ana_xmaddfiletolist(narg, ps) /*(list_widget, filename)*/
  }
  /*------------------------------------------------------------------------- */
 Int ana_xmlistsubr(narg, ps) /*(list_widget)*/
- /* an ana subr, loads given list widget with internal subr names */
+ /* an lux subr, loads given list widget with internal subr names */
  Int     narg, ps[];
  {
  extern Int	num_ana_subr;
@@ -1743,7 +1743,7 @@ Int ana_xmlistsubr(narg, ps) /*(list_widget)*/
  }
  /*------------------------------------------------------------------------- */
 Int ana_xmlistfunc(narg, ps) /*(list_widget)*/
- /* an ana subr, loads given list widget with internal func names */
+ /* an lux subr, loads given list widget with internal func names */
  Int     narg, ps[];
  {
  extern Int	num_ana_func;
@@ -1766,7 +1766,7 @@ Int ana_xmlistfunc(narg, ps) /*(list_widget)*/
  }
  /*------------------------------------------------------------------------- */
 Int ana_xmlist(narg, ps) /*(parent, callback, nvisible,[font,color, resize_flag])*/
- /* returns widget id, an ana function */
+ /* returns widget id, an lux function */
  /* creates an empty list, nvisible is the vertical size in lines,
  resize_flag chooses the list size policy (see below) */
  Int     narg, ps[];
@@ -1937,7 +1937,7 @@ Int ana_xmlabel(narg, ps)	/* (parent, label, [font, color, size_flag]) */
 Int ana_xmfileselect(narg, ps) /*(parent, title, ok_callback, (more on next line)
  [ok_label, help_callback, cancel_callback, font, button_font, color, dir,
  help_label, cancel_label] )*/
- /* returns widget id, an ana function */
+ /* returns widget id, an lux function */
  /* creates a file selection dialog, you get the file name from the
  callback routine
  10/3/95 add another paramter to be the directory mask */
@@ -3657,7 +3657,7 @@ void ana_xminit(void) 	/* the motif initialization */
  Screen	*screen;
  Int	argc = 1;
  Pixmap  icon_pixmap;
- char *argv = {"ana motif"};
+ char *argv = {"lux motif"};
  extern Int	connect_flag, depth;	/* from color.c */
  extern Display	*display;
  extern Visual	*visual;
@@ -3676,11 +3676,11 @@ void ana_xminit(void) 	/* the motif initialization */
  XtToolkitInitialize();
  app_context = XtCreateApplicationContext();
  /* setting a widget name and class is good policy -- just to be safe. */
- XtDisplayInitialize(app_context, display, "ana", "Ana", NULL, 0,
+ XtDisplayInitialize(app_context, display, "lux", "Ana", NULL, 0,
 		     &argc, &argv);
  disp = display;		/* instead of replacing all "disp"s. */
  ana_widget_id[toplevel] =
-   XtAppCreateShell("ana", "Ana", applicationShellWidgetClass, disp, NULL, 0);
+   XtAppCreateShell("lux", "Ana", applicationShellWidgetClass, disp, NULL, 0);
 
  exit_button_text = XmStringCreateLtoR("interrupt motif",
 				       XmSTRING_DEFAULT_CHARSET);
@@ -3761,7 +3761,7 @@ Int ana_xtloop(narg, ps)
  motif_flag = 1;
  if (narg>0) if (int_arg_stat(ps[0], &motif_flag) != 1) return -1;
  /* 8/26/94 changed again
- if motif_flag = 1 (!motif in ana) we just loop until someone resets !motif
+ if motif_flag = 1 (!motif in lux) we just loop until someone resets !motif
  if motif_flag = 0, we just check if anything pending
  if motif_flag = 2, we force a flush and update display and then do
  	anything pending
@@ -3969,7 +3969,7 @@ void radio_callback(w, ptq, state)
  XmToggleButtonCallbackStruct	*state;
  XtPointer	ptq;
  {
- /* 7/11/95, changed to callback ana routine for either state set on or off */
+ /* 7/11/95, changed to callback lux routine for either state set on or off */
  (void) ana_callback_execute( (Int) ptq);
  }
  /*------------------------------------------------------------------------- */
@@ -4024,7 +4024,7 @@ void draw_in_callback(w, ptq, call_data)
  KeySym	keysym;
  /*assume no key and no button down until we find different */
  ana_keycode = ana_button = ana_keysym = ana_keystate = 0;
- last_wid = *(ptq+1);	/* which ana X window the event occurred in */
+ last_wid = *(ptq+1);	/* which lux X window the event occurred in */
  /* check type of input */
  switch (report->xany.type) {
   case ButtonPress:
@@ -4066,13 +4066,13 @@ void draw_re_callback(w, ptq, call_data)
  static	Int	kilroy;
 
  /* this callback is particularly likely to cause re-entrant problems in the
- ana code because the ana call backs may do some limit checking and hence
+ lux code because the lux call backs may do some limit checking and hence
  re-size via ana_xmsize. This causes an immediate callback that gets here
- again. Hence we use a kilroy to ensure that the previous ana callback is
+ again. Hence we use a kilroy to ensure that the previous lux callback is
  done. If not, we just return. We could do other stuff as long as the
  ana_execute isn't done.
  */
- last_wid = *(ptq+1);	/* which ana X window the event occurred in */
+ last_wid = *(ptq+1);	/* which lux X window the event occurred in */
  /* the new size is not available in the call_data structure, so we
  just call set_defw in xport.c which gets the new size and sets a bunch
  of plot context parameters and last_wid*/
@@ -4108,13 +4108,13 @@ void draw_ex_callback(w, ptq, call_data)
  /* 5/28/96 - added, tried to handle expose events in the same callbacks
  that do re-sizing but problems */
  /* this callback is particularly likely to cause re-entrant problems in the
- ana code because the ana call backs may do some limit checking and hence
+ lux code because the lux call backs may do some limit checking and hence
  re-size via ana_xmsize. This causes an immediate callback that gets here
- again. Hence we use a kilroy to ensure that the previous ana callback is
+ again. Hence we use a kilroy to ensure that the previous lux callback is
  done. If not, we just return. We could do other stuff as long as the
  ana_execute isn't done.
  */
- last_wid = *(ptq+1);	/* which ana X window the event occurred in */
+ last_wid = *(ptq+1);	/* which lux X window the event occurred in */
  /*printf("expose from drawing area, kilroy = %d\n", kilroy);*/
  if (kilroy) return;
  kilroy = 1;
@@ -4135,10 +4135,10 @@ void textfield_which(w, ptq, state)
  /*------------------------------------------------------------------------- */
 void textfield_callback(w, ptq, call_data)
  /* used for XmNactivateCallback,  XmNlosingFocusCallback, and XmNFocusCallback
- but the ana symbol will generally be different for these 3 cases */
+ but the lux symbol will generally be different for these 3 cases */
  /* 9/14/96 added checking when either entering or leaving text field,
  note that the text contents are copied, might want to re-think this since it
- could also be read at the ana level, but if we always want to load it,
+ could also be read at the lux level, but if we always want to load it,
  it is more efficient to do it here */
  /* also note that we don't take advantage of the extra stuff available
  for some callbacks and just use XmAnyCallbackStruct */

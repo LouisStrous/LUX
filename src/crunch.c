@@ -58,7 +58,7 @@ void	swapl(void *, Int);
 Int ana_crunchrun(Int narg, Int ps[])		/* crunch subroutine */
  /* compress an array with imbedded run length encoding plus variable
  bit encoding */		
- /*  ana call is: crunchrun, IN, b ,OUT */
+ /*  lux call is: crunchrun, IN, b ,OUT */
  /* note that OUT must be predefined and limit is used to make certain we
  don't run out of space */
 {
@@ -81,7 +81,7 @@ Int ana_crunch_f(Int narg, Int ps[])
 /*--------------------------------------------------------------------------*/
 Int docrunch(Int narg, Int ps[], Int showerror)/* crunch subroutine */
  /* compress an array */		
- /*  ana call is: crunch, IN, b ,OUT */
+ /*  lux call is: crunch, IN, b ,OUT */
  /* note that OUT must be predefined and limit is used to make certain we
     don't run out of space */
 {

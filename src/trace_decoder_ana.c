@@ -17,7 +17,7 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-/* ana modules for decoding compressed TRACE images, this is separate from the
+/* lux modules for decoding compressed TRACE images, this is separate from the
    earlier test modules which are not needed for most distributions. Therefore
    some duplication of tables and such. The name of this file is  trace_decoder
    to avoid (too much) confusion with the standalone program trace_decode */

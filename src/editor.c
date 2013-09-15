@@ -870,13 +870,13 @@ void inHistory(char *text)
 }
 /*----------------------------------------------------*/
 Int readHistory(void)
-/* reads history from a history file (~/.ana-history) */
+/* reads history from a history file (~/.lux-history) */
 {
   FILE	*fp;
   Int	i;
   char	*p;
 
-  fp = Fopen(expand_name("~/.ana-history", NULL), "r");
+  fp = Fopen(expand_name("~/.lux-history", NULL), "r");
   if (!fp)			/* no such file */
     return 0;
   fread(&historyIndex, sizeof(Int), 1, fp);
@@ -891,15 +891,15 @@ Int readHistory(void)
 }
 /*----------------------------------------------------*/
 Int saveHistory(void)
-/* saves history in a history file (~/.ana-history) */
+/* saves history in a history file (~/.lux-history) */
 {
   FILE	*fp;
   Int	i;
   char	*expand_name(char *, char *);
 
-  fp = Fopen(expand_name("~/.ana-history", NULL), "w");
+  fp = Fopen(expand_name("~/.lux-history", NULL), "w");
   if (!fp)
-    return anaerror("Cannot open file ~/.ana-history to save input line history",
+    return anaerror("Cannot open file ~/.lux-history to save input line history",
 		 0);
   fwrite(&historyIndex, sizeof(Int), 1, fp);
   for (i = 0; i < HISTORYSIZE; i++)

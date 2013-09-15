@@ -19,7 +19,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 /* File fun1.c */
 /* Various LUX functions. */
-/*a collection of internal ana subroutines and functions */
+/*a collection of internal lux subroutines and functions */
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

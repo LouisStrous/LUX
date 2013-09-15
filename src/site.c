@@ -78,41 +78,14 @@ Int site(Int narg, Int ps[])
 	   "PURPOSE.  You use it COMPLETELY AT YOUR OWN RISK.\n\n");
   if (internalMode & 32)	/* /COPY */
     printw("****COPYING\n"
-	   "This program was written by Louis Strous and Richard Shine. "
-	   "This version (c) 1995-1999. "
-	   "You may make and redistribute as many copies as you like. "
-	   "If you modify the program before redistributing, then you "
-	   "must clearly mark the modified parts as such and include "
-	   "the name of the author of the modified parts.\n");
+	   "Copyright 2013 Louis Strous.\n"
+	   "This program is released under the GNU Public License version 3.\n"
+	   "See the file COPYING for details.\n"
+	   );
   if (internalMode & 64)	/* /BUGS */
     printw("****BUGS\n"
-	   "If you think you have found a bug in LUX, then please act as follows:\n"
-	   "1. Ensure that you have really found a bug, i.e. some part "
-	   "of LUX is not behaving as advertised in the manual, or causes "
-	   "fatal errors.\n"
-	   "2. If you don't have the latest version of LUX, then obtain "
-	   "the latest version from your original source or from the "
-	   "original authors (http://ana.lmsal.com), and check that the same"
-	   "bug is present in the latest version, too.\n"
-	   "3. Write a short LUX program that reproduces the bug.  The "
-	   "shorter the program is, the easier it is to fix the bug.\n"
-	   "4. Send a description of the bug, a copy of your LUX program "
-	   "(i.e., code written in the LUX language) that reproduces it,"
-	   " and the information about "
-	   "your version of LUX (displayed when LUX is started) "
-	   "to the author of the malfunctioning part "
-	   "of LUX, or to the original authors.  If you have a suggestion "
-	   "how the bug may be fixed, then send that, too.\n\n"
-	   "Useful additions to LUX (written either in C source code, or "
-	   "in the LUX language) may also be directed to the original "
-	   "authors of LUX for incorporation in future releases, at "
-	   "their discretion, under the same rules as this version of LUX.\n\n"
-	   "NOTE that the authors of LUX do not guarantee fixing any bugs "
-	   "(see INFO,/WARRANTY).  The speed of their reply (if any) "
-	   "depends on their mood, and on how much time they have "
-	   "available.\n\n"
-	   "You can reach the authors of LUX at email address"
-	   " ana@lmsal.com\n\n");
+	   "If you think you have found a bug in LUX, then please register\n"
+	   "the bug as an issue at http://github.com/LouisStrous/lux.\n");
 #ifdef __STDC__
   if (internalMode & 2) {	/* /TIME */
     printw("****COMPILATION TIME\n");

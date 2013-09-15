@@ -694,7 +694,7 @@ Int ana_help(Int narg, Int ps[])
   topic = narg? string_arg(*ps): "Top";
   if (!topic)
     return ANA_ERROR;
-  fp = fopen(expand_name("$ANADIR/../doc/ana.texinfo", ""), "r");
+  fp = fopen(expand_name("$ANADIR/../doc/lux.texi", ""), "r");
   if (!fp) {
     printf("File access error: %s\n", strerror(errno));
     return anaerror("Cannot open file %s for reading.", 0, expname);
@@ -727,7 +727,7 @@ Int ana_help(Int narg, Int ps[])
 	  *q++ = strsave(topic);
       }
     }
-    if (feof(fp)) {			/* no info in ana.texinfo */
+    if (feof(fp)) {			/* no info in lux.texi */
       fp = openPathFile(topic2, FIND_SUBR | FIND_LOWER); /* seek user-defined subroutine */
       if (!fp)
 	fp = openPathFile(topic2, FIND_FUNC | FIND_LOWER); /* seek user-defined function */

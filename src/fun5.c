@@ -17,7 +17,7 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-/* internal ana subroutines and functions */
+/* internal lux subroutines and functions */
 /* mostly fft related stuff and solar mappings */
  /*this is file fun5.c */
 #ifdef HAVE_CONFIG_H

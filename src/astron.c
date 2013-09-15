@@ -1,5 +1,23 @@
-/* File astron.c */
-/* ANA routines for calculating various astronomical ephemerides and */
+/* This is file astron.c.
+
+Copyright 2013 Louis Strous
+
+This file is part of LUX.
+
+LUX is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+LUX is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with LUX.  If not, see <http://www.gnu.org/licenses/>.
+*/
+/* LUX routines for calculating various astronomical ephemerides and */
 /* for transforming dates between various calendars */
 /* Formulas from "Astronomical Algorithms" */
 /* by Jean Meeus, Willmann-Bell, Inc. (1991) ("JM"), and from "Explanatory */
@@ -62,9 +80,6 @@
 #include "astrodat3.h"
 #include "calendar.h"
 #include "vsop.h"
-/* #include "astrodat.h" */
-static char rcsid[] __attribute__ ((unused)) =
- "$Id: astron.c,v 4.0 2001/02/07 20:36:57 strous Exp $";
 
 #define extractbits(value, base, bits) (((value) >> (base)) & ((1 << (bits)) - 1))
 

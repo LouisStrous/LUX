@@ -1,5 +1,24 @@
+/* This is file subsc.c.
+
+Copyright 2013 Louis Strous, Richard Shine
+
+This file is part of LUX.
+
+LUX is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+LUX is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with LUX.  If not, see <http://www.gnu.org/licenses/>.
+*/
 /* File subsc.c */
-/* ANA routines dealing with subscripts. */
+/* LUX routines dealing with subscripts. */
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -8,8 +27,6 @@
 #include "action.h"
 #include "install.h"
 #include <limits.h>
-static char rcsid[] __attribute__ ((unused)) =
- "$Id: subsc.c,v 4.1 2001/02/08 19:36:43 strous Exp $";
 
 extern Int	redim_warn_flag, range_warn_flag;
 Int	ana_assoc_output(Int iq, Int jq, Int offsym, Int axsym),
@@ -1288,7 +1305,7 @@ Int ana_subsc_func(Int narg, Int ps[])
   /* if we get here and the combination type is still not specified, */
   /* then we are sure not to have multi-dimensional arrays for any */
   /* of the subscripts, and then we'll assume that the user wants */
-  /* outer-style combination, compatible with ancient ANA practice */
+  /* outer-style combination, compatible with ancient LUX practice */
   /* from the days when only ranges or scalars could be used in */
   /* multiple-coordinate subscripts. */
   if (combineType == UNDEFINED)

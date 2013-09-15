@@ -1,5 +1,24 @@
+/* This is file sort.c.
+
+Copyright 2013 Louis Strous, Richard Shine
+
+This file is part of LUX.
+
+LUX is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+LUX is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with LUX.  If not, see <http://www.gnu.org/licenses/>.
+*/
 /* File sort.c */
-/* ANA sorting routines. */
+/* LUX sorting routines. */
 /* file sorts, various sort routines for different types of data */
  /* taken from Press etal */
 #ifdef HAVE_CONFIG_H
@@ -9,8 +28,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "anadefs.h"
-static char rcsid[] __attribute__ ((unused)) =
- "$Id: sort.c,v 4.0 2001/02/07 20:37:04 strous Exp $";
 /*------------------------------------------------------------------------- */
 #define ALN2I 1.442695022
 #define TINY 1.0e-5

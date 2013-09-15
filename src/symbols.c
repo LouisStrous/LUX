@@ -1,6 +1,23 @@
-/* File symbols.c */
-/* ANA routines dealing with the creation of ANA symbols. */
-/* $Id: symbols.c,v 4.0 2001/02/07 20:37:05 strous Exp $ */
+/* This is file symbols.c.
+
+Copyright 2013 Louis Strous, Richard Shine
+
+This file is part of LUX.
+
+LUX is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+LUX is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with LUX.  If not, see <http://www.gnu.org/licenses/>.
+*/
+/* LUX routines dealing with the creation of LUX symbols. */
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -18,8 +35,6 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #endif
-static char rcsid[] __attribute__ ((unused)) =
- "$Id: symbols.c,v 4.0 2001/02/07 20:37:05 strous Exp $";
 
 void	zerobytes(void *, Int), updateIndices(void), symdumpswitch(Int, Int);
 #if HAVE_LIBX11
@@ -2473,7 +2488,7 @@ Int ana_set(Int narg, Int ps[])
 	puts("/ZOOM: Automatic image zoom.");
 #endif
       if (setup & 256)
-	puts("/ALLOWPROMPTS: Allow ANA prompts at the beginning of input lines.");
+	puts("/ALLOWPROMPTS: Allow LUX prompts at the beginning of input lines.");
       if (setup & 512)
 	puts("/XSYNCHRONIZE: Graphics output occurs immediately.");
       if (setup & 1024)
@@ -2769,7 +2784,7 @@ Int stringpointer(char *name, Int type)
 }
 /*-------------------------------------------------------------------------*/
 Int ana_show_temps(Int narg, Int ps[])
-/* a routine for debugging ANA.  It shows the temporary variables that */
+/* a routine for debugging LUX.  It shows the temporary variables that */
 /* are currently defined.  LS 2mar97 */
 {
   Int	i;
@@ -2799,7 +2814,7 @@ Int routineContext(Int nsym)
 /*-------------------------------------------------------------------------*/
 /* NUMBERS
 
-   ANA interprets strings as explicit numbers as indicated below.
+   LUX interprets strings as explicit numbers as indicated below.
    Square brackets [] indicate optional parts; curly braces {}
    indicate a set of choices from which one must be chosen; a *
    indicates that zero or more (not necessarily equal) copies of the

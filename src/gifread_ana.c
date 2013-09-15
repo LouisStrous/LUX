@@ -1,3 +1,22 @@
+/* This is file gifread_ana.c.
+
+Copyright 2013 Louis Strous, Richard Shine
+
+This file is part of LUX.
+
+LUX is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+LUX is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with LUX.  If not, see <http://www.gnu.org/licenses/>.
+*/
 /* experimental gif reader, learning .... */
 #include <stdio.h>
 #include <stdlib.h>
@@ -232,7 +251,7 @@ void loadcolortable(FILE *fin, Int nc, Int cmsym)
  }
  /*------------------------------------------------------------------------- */
 void fatal(char *s)
- /* well, not really, in ANA we like to stick around */
+ /* well, not really, in LUX we like to stick around */
  {
         fprintf(stderr,"giftops: %s\n",s);
         quit = 1;	status = -1;

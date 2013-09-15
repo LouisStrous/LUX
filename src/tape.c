@@ -1,5 +1,24 @@
+/* This is file tape.c.
+
+Copyright 2013 Louis Strous, Richard Shine
+
+This file is part of LUX.
+
+LUX is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+LUX is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with LUX.  If not, see <http://www.gnu.org/licenses/>.
+*/
 /* File tape.c */
-/* ANA routines for tape I/O. */
+/* LUX routines for tape I/O. */
 #if HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -16,8 +35,6 @@
 /* ioctl() is generally defined in sys/ioctl.h or in unistd.h */
 #include <sys/ioctl.h>
 #include <unistd.h>
-static char rcsid[] __attribute__ ((unused)) =
- "$Id: tape.c,v 4.0 2001/02/07 20:37:05 strous Exp $";
 						/* tape things */
 struct  mtop    rew = {MTREW, 1 };
 struct  mtop    unl = {MTOFFL, 1 };

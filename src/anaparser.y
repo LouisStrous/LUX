@@ -1,9 +1,27 @@
-/* File anaparser.c */
-/* ANA parser specification (bison) and auxilliary routines */
+/* LUX parser specification (bison) and auxilliary routines */
 /* This parser is re-entrant and this feature is not supported by yacc. */
-/* Therefore either use bison or use the provided anaparser.c.tab.c. and */
-/* anaparser.c.tab.h.  LS 10nov97 */
+/* Therefore either use bison or use the provided anaparser.c and */
+/* anaparser.h.  LS 10nov97 */
 %{ 
+/* This is file anaparser.y.
+
+Copyright 2013 Louis Strous
+
+This file is part of LUX.
+
+LUX is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+LUX is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with LUX.  If not, see <http://www.gnu.org/licenses/>.
+*/
 #if HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -86,7 +104,7 @@ Int	yyerror(char *), yylex(YYSTYPE *);
 
 %%
 
-/* List of rules and actions that define ANA.  Routine yyparse() calls */
+/* List of rules and actions that define LUX.  Routine yyparse() calls */
 /* routine yylex() which gets and dissects user input and returns a */
 /* token (i.e. syntactic code, e.g. "ANA_STRING" or "NUMBER") directly, and */
 /* a semantic value (i.e. a pointer to the actual data) in variable *lvalp. */
@@ -94,7 +112,7 @@ Int	yyerror(char *), yylex(YYSTYPE *);
 /* patterns given below.  By repeated substitution according to the parser */
 /* description given below, yyparse() attempts to reduce the token list to */
 /* the topmost unit in the parser description, which indicates that the */
-/* input is valid ANA code.  When a parser pattern is recognized, then */
+/* input is valid LUX code.  When a parser pattern is recognized, then */
 /* the associated action (between {} to the right of the pattern) is */
 /* executed.  In the actions, $n stands for the semantic value of the n-th */
 /* item in the corresponding pattern, with n starting at 1.  For each */
@@ -105,7 +123,7 @@ Int	yyerror(char *), yylex(YYSTYPE *);
 /* BISON is mostly the same as YACC, except that BISON allows recursive
    parsers where YACC does not.*/
 
-lines:				/* an ANA parsing session */
+lines:				/* an LUX parsing session */
 next_line {			/* a statement or a newline */
   if (compileOnly && $1)	/* if we're just compiling (and not
 				   immediately executing, and the statement
@@ -126,7 +144,7 @@ next_line {			/* a statement or a newline */
 }
 ;
 
-next_line:			/* one complete ANA statement, or an */
+next_line:			/* one complete LUX statement, or an */
 				/* empty line */
   statement {			/* $1 > 0 indicates succesful execution.
 				   $1 < 0 indicates an error or a premature
@@ -159,7 +177,7 @@ next_line:			/* one complete ANA statement, or an */
 }	
 ;
 
-statement:			/* one ANA statement */
+statement:			/* one LUX statement */
   assignment			/* an assignment */
 | routine_execution		/* a subroutine call */
 | routine_definition		/* a subroutine definition */
@@ -866,8 +884,8 @@ Int	ignoreInput = 0,	/* nesting level of IGNORE-RESUME pairs */
 	calculatorMode = 0;	/* nonzero if in calculator mode
 				 (see calculator.c) */
 
-char	*ANAPrompts[] =	{	/* legal ANA prompts */
-  "ANA>", "mor>", "ign>", "dbg>", "clc>"
+char	*ANAPrompts[] =	{	/* legal LUX prompts */
+  "LUX>", "mor>", "ign>", "dbg>", "clc>"
 };
 #define N_ANAPROMPTS 5
 
@@ -949,12 +967,12 @@ void translateLine(void)
 
   p = line;			/* user input */
   tp = tLine;			/* translated input */
-  if (allowPromptInInput)	/* allow legal ANA prompts at the very
+  if (allowPromptInInput)	/* allow legal LUX prompts at the very
 				   beginning of input lines; i.e. ignore when
 				   encountered */
     for (i = 0; i < N_ANAPROMPTS; i++)
       if (!strncmp(p, ANAPrompts[i], strlen(ANAPrompts[i]))) {
-				/* found an ANA prompt */
+				/* found an LUX prompt */
 	p += strlen(ANAPrompts[i]);/* skip over it */
 	break;
       }
@@ -1056,7 +1074,7 @@ void Quit(Int result)
 }
 /*--------------------------------------------------------------*/
 /* NUMBERS
-   ANA allows specification of numbers of five types (ANA_BYTE, ANA_WORD, ANA_LONG,
+   LUX allows specification of numbers of five types (ANA_BYTE, ANA_WORD, ANA_LONG,
    ANA_FLOAT, ANA_DOUBLE) and three bases (8, 10, 16).  Numbers must always
    start with a decimal digit.
    Fractional (i.e. ANA_FLOAT or ANA_DOUBLE) numbers can only be specified
@@ -1169,7 +1187,7 @@ Int readIdentifier(YYSTYPE *lvalp)
    p++;				/* span identifier */
  c = *p;
  *p = '\0';			/* terminate string, but save clobbered char */
- if ((n = isKeyWord())) {	/* a standard ANA-language key Word */
+ if ((n = isKeyWord())) {	/* a standard LUX-language key Word */
    *p = c;			/* restore clobbered char */
    currentChar = p;		/* continue parsing beyond key Word */
    return n;			/* return keyword index */
@@ -1204,7 +1222,7 @@ Int yylex(YYSTYPE *lvalp)
  if (errorState)
    return ERRORSTATE;		/* if a syntax error occurred, then */
 				/* tell the parser so. */
- /* now determine the appropriate ANA prompt to use */
+ /* now determine the appropriate LUX prompt to use */
  if (ignoreInput)		/* we're within a nested IGNORE-RESUME pair */
    prompt = ANAPrompts[2];	/* ign> */
  else if (debugLine)		/* debugger line (execute()) */
@@ -1214,7 +1232,7 @@ Int yylex(YYSTYPE *lvalp)
  else if (calculatorMode)
    prompt = ANAPrompts[4];	/* clc> */
  else
-   prompt = ANAPrompts[0];	/* default, ANA> */
+   prompt = ANAPrompts[0];	/* default, LUX> */
  /* now get and treat the input */
  while (1) {			/* keep cycling */
    if (!*line) {		/* nothing more in current input line */
@@ -1262,7 +1280,7 @@ Int yylex(YYSTYPE *lvalp)
 	 else if (calculatorMode)
 	   prompt = ANAPrompts[4];	/* clc> */
 	 else
-	   prompt = ANAPrompts[0];	/* default, ANA> */
+	   prompt = ANAPrompts[0];	/* default, LUX> */
        }
        currentChar += 6;
      }
@@ -1572,7 +1590,7 @@ Int do_main(Int argc, char *argv[])
   programName = argv[0];
   getTerminalSize();
   getTermCaps();
-  site(0, NULL);		/* identify this version of ANA */
+  site(0, NULL);		/* identify this version of LUX */
   fflush(stdin);
   rawIo();			/* get keystrokes one by one */
   symbolInitialization();
@@ -1591,7 +1609,7 @@ Int do_main(Int argc, char *argv[])
     p += strlen(p);
   }
   /* now treat the command line "options" as if they were typed at */
-  /* the ANA> prompt */
+  /* the LUX> prompt */
   argc--;  argv++;
   while (argc--) {
     *p++ = ' ';

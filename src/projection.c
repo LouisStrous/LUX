@@ -1,5 +1,24 @@
+/* This is file projection.c.
+
+Copyright 2013 Louis Strous
+
+This file is part of LUX.
+
+LUX is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+LUX is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with LUX.  If not, see <http://www.gnu.org/licenses/>.
+*/
 /* File projection.c */
-/* ANA routines dealing with 2D projections of 3D objects. */
+/* LUX routines dealing with 2D projections of 3D objects. */
 /* This is file projection.c which contains code for 3D projections and */
 /* plots.  All projective stuff is done in homogeneous coordinates. */
 /* See "Fundamentals of Interactive Computer Graphics" by J.D. Foley */
@@ -11,8 +30,6 @@
 #include <stdlib.h>
 #include "install.h"
 #include "action.h"
-static char rcsid[] __attribute__ ((unused)) =
- "$Id: projection.c,v 4.4 2001/02/09 23:11:57 strous Exp $";
 
 Int	tkplot(Float, Float, Int, Int),
   createFullProjection(Float *matrix, Float *perspective, Float *oblique),

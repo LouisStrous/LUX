@@ -1,7 +1,27 @@
-/* This is file btree.c, part of the ANA distribution.  It contains */
-/* wrappers for binary tree management routines so that (1) we can hide */
-/* some global variables that are involved, and (2) we can take care */
-/* of the memory allocation bookkeeping for the user.  LS 20may99 */
+/* This is file btree.c.
+
+Copyright 2013 Louis Strous
+
+This file is part of LUX.
+
+LUX is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+LUX is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with LUX.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+/* This file contains wrappers for binary tree management routines so
+ that (1) we can hide some global variables that are involved, and (2)
+ we can take care of the memory allocation bookkeeping for the user.
+ LS 20may99 */
 
 /* Usage:
 

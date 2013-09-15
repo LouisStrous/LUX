@@ -1,5 +1,24 @@
+/* This is file contour.c.
+
+Copyright 2013 Louis Strous, Richard Shine
+
+This file is part of LUX.
+
+LUX is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+LUX is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with LUX.  If not, see <http://www.gnu.org/licenses/>.
+*/
 /* File contour.c */
-/* ANA's contouring routines. */
+/* LUX's contouring routines. */
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -8,8 +27,6 @@
 #include <math.h>
 #include <float.h>
 #include "action.h"
-static char rcsid[] __attribute__ ((unused)) =
- "$Id: contour.c,v 4.0 2001/02/07 20:36:58 strous Exp $";
 
 /* contour parameters and flags */
 extern	Int	current_pen, autocon, contour_mode, contour_box, 

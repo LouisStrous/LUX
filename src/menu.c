@@ -1,6 +1,23 @@
-/* File menu.c */
-/* ANA routines dealing with (X window) menus */
-/* Unix ANA */
+/* This is file menu.c.
+
+Copyright 2013 Louis Strous
+
+This file is part of LUX.
+
+LUX is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+LUX is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with LUX.  If not, see <http://www.gnu.org/licenses/>.
+*/
+/* LUX routines dealing with (X window) menus */
 /* file menu.c  LS  Started 17apr93.
    contains routines for creating and manipulating menus in windows */
 #ifdef HAVE_CONFIG_H
@@ -18,8 +35,6 @@
 #include "install.h"
 #include "action.h"
 #include "editor.h"
-static char rcsid[] __attribute__ ((unused)) =
- "$Id: menu.c,v 4.0 2001/02/07 20:37:03 strous Exp $";
 
 #define BLACK           1
 #define WHITE           0
@@ -934,7 +949,7 @@ Int ana_register_event(Int narg, Int ps[])
 #define XLOOP_MENU	-2
 #define XLOOP_NONE	-3
 Int ana_xloop(Int narg, Int ps[])
-     /* ANA interface to X window manager. */
+     /* LUX interface to X window manager. */
      /* waits for a registered event, returns event type in !EVENT_TYPE */
      /* important global variables:  button -> mouse button #; */
      /* ana_event -> event type;  xcoord, ycoord -> pointer position in */
@@ -976,11 +991,11 @@ Int ana_xloop(Int narg, Int ps[])
     j = XLOOP_NONE;
     status = 0;
     mask = 0;
-    /* figure out which ANA window or menu the event occurred in, if any */
-    /* results: status = 1 if in an ANA window or menu, then i = number */
+    /* figure out which LUX window or menu the event occurred in, if any */
+    /* results: status = 1 if in an LUX window or menu, then i = number */
     /* of the window or menu, j = XLOOP_WINDOW if a window, XLOOP_MENU */
     /* if a menu envelope, the item number if a menu item.  status = 0 */
-    /* if not in an ANA window or menu. */
+    /* if not in an LUX window or menu. */
     if (w) {
       for (i = 0; i < MAXWINDOWS; i++)
 	if (win[i] && w == win[i]) {
@@ -1026,7 +1041,7 @@ Int ana_xloop(Int narg, Int ps[])
 	  last_time = (Double) event.xbutton.time/1000.0;
 	  ana_keystate = event.xbutton.state;
 	  switch (j) {
-	    case XLOOP_WINDOW:	/* button press in an ANA window */
+	    case XLOOP_WINDOW:	/* button press in an LUX window */
 	      eventSource = i | X_WINDOW;
 	      xhair = event.xbutton.x;
 	      yhair = event.xbutton.y;
@@ -1035,9 +1050,9 @@ Int ana_xloop(Int narg, Int ps[])
 	      ycoord = (Int) yhair;
 	      coordTrf(&xhair, &yhair, ANA_DEV, ANA_DVI);
 	      break;
-	    case XLOOP_MENU:	/* button press in ANA menu envelope */
+	    case XLOOP_MENU:	/* button press in LUX menu envelope */
 	      return anaerror("?? button press in enveloping menu window?", 0);
-	    default:		/* button press in ANA menu item */
+	    default:		/* button press in LUX menu item */
 	      menu_x = (Float) event.xbutton.x / (Float) fontwidth;
 	      menu_y = (Float) event.xbutton.y / (Float) fontheight;
 	      eventSource = i | X_MENU;
@@ -1046,7 +1061,7 @@ Int ana_xloop(Int narg, Int ps[])
 	  }
 	}
 	if (j == X_WINDOW)
-	  set_defw(i);		/* set ANA window focus */
+	  set_defw(i);		/* set LUX window focus */
 	break;
       case KeyPress:
 	if (mask & X_KEYPRESS)
@@ -1063,14 +1078,14 @@ Int ana_xloop(Int narg, Int ps[])
 	  root_y = event.xkey.y_root;
 	  last_time = (Double) event.xkey.time/1000.0;
 	  switch (j) {
-	    case XLOOP_WINDOW:	/* key press in an ANA window */
+	    case XLOOP_WINDOW:	/* key press in an LUX window */
 	      eventSource = i | X_WINDOW;
 	      break;
-	    case XLOOP_MENU:	/* key press in ANA menu envelope */
+	    case XLOOP_MENU:	/* key press in LUX menu envelope */
 	      eventSource = i | X_MENU;
 	      last_menu = i;
 	      break;
-	    default:		/* key press in ANA menu item */
+	    default:		/* key press in LUX menu item */
 	      return anaerror("?? key press in menu item?", 0);
 	  }
 	}
@@ -1110,7 +1125,7 @@ Int ana_xloop(Int narg, Int ps[])
 	else
 	  status = 0;
 	switch (j) {
-	  case XLOOP_WINDOW:	/* entering an ANA window */
+	  case XLOOP_WINDOW:	/* entering an LUX window */
 	    if (status) {
 	      last_time = (Double) event.xcrossing.time/1000.0;
 	      eventSource = i | X_WINDOW;
@@ -1136,7 +1151,7 @@ Int ana_xloop(Int narg, Int ps[])
 	else
 	  status = 0;
 	switch (j) {
-	  case XLOOP_WINDOW:	/* leaving an ANA window */
+	  case XLOOP_WINDOW:	/* leaving an LUX window */
 	    if (status) {
 	      eventSource = i | X_WINDOW;
 	      last_time = (Double) event.xcrossing.time/1000.0;
@@ -1174,7 +1189,7 @@ Int ana_xloop(Int narg, Int ps[])
 }
  /*------------------------------------------------------------------------*/
 char *eventName(Int type)
-/* returns name of ANA X event */
+/* returns name of LUX X event */
 {
   static char	eventHashTable[] = {
     3, 6, 5, 7, 0, 1, 7, 2, 4

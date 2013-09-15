@@ -1,5 +1,24 @@
+/* This is file execute.c.
+
+Copyright 2013 Louis Strous
+
+This file is part of LUX.
+
+LUX is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+LUX is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with LUX.  If not, see <http://www.gnu.org/licenses/>.
+*/
 /* File execute.c */
-/* ANA statement executor and auxilliary routines. */
+/* LUX statement executor and auxilliary routines. */
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -12,8 +31,6 @@
 #include <ctype.h>
 #include "install.h"
 #include "action.h"
-static char rcsid[] __attribute__ ((unused)) =
- "$Id: execute.c,v 4.0 2001/02/07 20:36:59 strous Exp $";
 
 extern Int	nFixed, traceMode;
 
@@ -1326,7 +1343,7 @@ Int usr_routine(Int symbol)
 }
 /*------------------------------------------------------------------*/
 Int ana_for(Int nsym)
-/* executes ANA FOR-statement */
+/* executes LUX FOR-statement */
 {
  pointer	counter;
  scalar		start, inc, end;
@@ -1743,7 +1760,7 @@ Int execute(Int symbol)
 	      breakpoint[n].line = symbol_line(symbol); /* set first line */
 	  } else if (currentInputFile != NULL
 		     && !strcmp(currentInputFile, breakpoint[n].name))
-	    /* breakpoint in ANA code outside of routine or function */
+	    /* breakpoint in LUX code outside of routine or function */
 	    atBreakpoint = n + 1;
 	}
 	if (breakpoint[n].status & BR_EXIST)
@@ -1830,7 +1847,7 @@ Int execute(Int symbol)
 	      printw(" level, g: go until specific line number, x: exit");
 	      printw(" stepping, z: enter and execute a command,");
 	      printw(" q: abort execution, m: toggle status display,");
-	      printw(" r: restart ANA, w: where?, ?: this text\n");
+	      printw(" r: restart LUX, w: where?, ?: this text\n");
 	      break;
 	    case 'r':
 	      ana_restart(0, NULL);

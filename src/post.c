@@ -1,5 +1,24 @@
+/* This is file post.c.
+
+Copyright 2013 Louis Strous, Richard Shine
+
+This file is part of LUX.
+
+LUX is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+LUX is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with LUX.  If not, see <http://www.gnu.org/licenses/>.
+*/
 /* File post.c */
-/* ANA routines dealing with PostScript output. */
+/* LUX routines dealing with PostScript output. */
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -8,8 +27,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "action.h"
-static char rcsid[] __attribute__ ((unused)) =
- "$Id: post.c,v 4.0 2001/02/07 20:37:04 strous Exp $";
 
 #if DEBUG
 #define _Xdebug			/* to get synchronous X error messages */
@@ -52,7 +69,7 @@ Int postreset(Int landscape)
    ipost = 1;
    /* some preambles */
    fputs("%!PS-Adobe-1.0\n", postScriptFp);
-   fputs("%%Creator: ANA generated plot image\n", postScriptFp);
+   fputs("%%Creator: LUX generated plot image\n", postScriptFp);
    fputs("%%BoundingBox:  0000  0000  0600  0720\n", postScriptFp);
    fputs("%%EndComments\n", postScriptFp);
    fputs("/M {moveto} bind def /L {lineto} bind def\n", postScriptFp);

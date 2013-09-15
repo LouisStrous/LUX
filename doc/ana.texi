@@ -1,4 +1,3 @@
-
 \input texinfo @c -*-texinfo-*-
 @c %**start of header
 @setfilename ana.info
@@ -11,7 +10,7 @@
 @paragraphindent 0
 
 @ifinfo
-@node Top, Legalese, (dir), (dir)
+@node Top, Conventions, (dir), (dir)
 @comment  node-name,  next,  previous,  up
 @top ANA
 
@@ -20,9 +19,12 @@ edition is for ANA version 5.
 
 @copyright{} 1995-2013 Louis Strous
 
-Permission is granted to make and distribute verbatim copies of this
-manual provided the copyright notice and this permission notice are
-preserved on all copies.
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with no
+Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+copy of the license is included in the section entitled "GNU Free
+Documentation License".
 
 @end ifinfo
 
@@ -31,13 +33,12 @@ preserved on all copies.
 \centerline{Image Processing Package}
 \centerline{The Manual}
 \vskip 1ex
-\centerline{Louis H. Strous}
+\centerline{Louis Strous}
 \centerline{\today}
 \parindent 0pt
 @end tex
 
 @menu
-* Legalese::                    Terms and conditions for use and copying.
 * Conventions::                 Font conventions used in this manual.
 * Start & Stop::                Starting and stopping ANA.
 * Tutorial::                    The basics step by step.
@@ -53,6 +54,7 @@ preserved on all copies.
 * Environment::                 Environment variables for ANA.
 * History::                     The history of ANA.
 * Reference Manual::            Alphabetical list of ANA routines/functions.
+* GNU Free Documentation License:: The GNU Free Documentation License.
 * Concept Index::               Alphabetical list of concepts.
 
 @detailmenu
@@ -100,21 +102,21 @@ Data Input/Output Routines
 
 ANA Disk File Formats
 
-* ANA FZ File Format::          
-* ANA FITS File Format::        
-* ANA ASTORE File Format::      
+* ANA FZ File Format::
+* ANA FITS File Format::
+* ANA ASTORE File Format::
 
 Formatted Input/Output
 
-* Format Specifiers::           
-* Format Modifiers::            
-* Format Field Width::          
-* Format Precision::            
-* Format Grouping::             
-* Long output lines::           
-* In-Line Print Formats::       
-* Output Data Formats::         
-* Input Data Formats::          
+* Format Specifiers::
+* Format Modifiers::
+* Format Field Width::
+* Format Precision::
+* Format Grouping::
+* Long output lines::
+* In-Line Print Formats::
+* Output Data Formats::
+* Input Data Formats::
 
 Input Data Formats
 
@@ -147,7 +149,7 @@ Data Classes
 * Compact Lists::               A group of dissimilar values
 * Compact Pointer Lists::       A group of pointers to variables
 * Lists::                       A group of dissimilar values
-* Structures::                  
+* Structures::
 * Pointers::                    A pointer to another variable
 
 Scalars
@@ -252,12 +254,12 @@ Colors
 
 Widgets
 
-* Building Widgets::            
-* Managing Widgets::            
+* Building Widgets::
+* Managing Widgets::
 
 Building Widgets
 
-* Button Widgets::              
+* Button Widgets::
 
 Debugging
 
@@ -313,8 +315,8 @@ Array Creation
 
 Astronomy and Calendars
 
-* Astronomical Coordinate Calculations::  
-* Astronomical Time Scales::    
+* Astronomical Coordinate Calculations::
+* Astronomical Time Scales::
 
 Data Compression
 
@@ -374,14 +376,14 @@ Reference Manual
 
 Packages
 
-* debug::                       
-* develop::                     
-* jpeg::                        
-* motif::                       
-* regex_h::                     
-* sofa::                        
-* tape::                        
-* x11::                         
+* debug::
+* develop::
+* jpeg::
+* motif::
+* regex_h::
+* sofa::
+* tape::
+* x11::
 
 Read-Only Global Variables
 
@@ -437,22 +439,22 @@ Read-Write Global Variables
 * !AUTOCON::                    Automatic contour level selection
 * !BADMATCH::                   Number of bad matched in GRIDMATCH
 * !BB_UPDATE::                  Update plot bounding box
-* !BC::                         
+* !BC::
 * !BUTTON::                     Pointer button state
 * !BXB::                        Bounding box lower x
 * !BXT::                        Bounding box upper x
 * !BYB::                        Bounding box lower y
 * !BYT::                        Bounding box upper y
 * !COL::                        Number of columns on the terminal
-* !CONTOUR_BORDER::             
+* !CONTOUR_BORDER::
 * !CONTOUR_BOX::                Draw a small box at origin of contour plot
-* !CONTOUR_DASH_LEV::           
-* !CONTOUR_MODE::               
+* !CONTOUR_DASH_LEV::
+* !CONTOUR_MODE::
 * !CONTOUR_NLEV::               Number of counter levels
-* !CONTOUR_STYLE::              
-* !CONTOUR_TICKS::              
-* !CONTOUR_TICK_FAC::           
-* !CONTOUR_TICK_PEN::           
+* !CONTOUR_STYLE::
+* !CONTOUR_TICKS::
+* !CONTOUR_TICK_FAC::
+* !CONTOUR_TICK_PEN::
 * !CRATIO::                     Plot symbol aspect ratio
 * !CRUNCH_BITS::                Number of bits in last CRUNCH
 * !CRUNCH_BPP::                 Number of bits per element in last CRUNCH
@@ -460,11 +462,11 @@ Read-Write Global Variables
 * !DASHSIZE::                   Relative size of plot dashes
 * !DLABX::                      Plot x axis divisions
 * !DLABY::                      Plot y axis divisions
-* !DOT::                        
-* !DOTS::                       
+* !DOT::
+* !DOTS::
 * !ERASE::                      Automatic window erase on PLOT
 * !ERRNO::                      Last system error number
-* !ERROR_EXTRA::                
+* !ERROR_EXTRA::
 * !EVENTSOURCE::                Source window of event
 * !EVENTTYPE::                  Type of event
 * !FFTDP::                      Double precision FFTs
@@ -483,14 +485,14 @@ Read-Write Global Variables
 * !HEIGHT::                     Last window height
 * !HISTMIN::                    Last histogram minimum ordinate
 * !HISTMAX::                    Last histogram maximum ordinate
-* !IBLANK::                     
+* !IBLANK::
 * !IORDER::                     TV coordinate swap order
-* !ITMAX::                      
+* !ITMAX::
 * !IX::                         Last selected DEV x coordinate in window
-* !IXHIGH::                     
+* !IXHIGH::
 * !IY::                         Last selected DEV y coordinate in window
-* !IYHIGH::                     
-* !KB::                         
+* !IYHIGH::
+* !KB::
 * !KEYCODE::                    Code of pressed physical key
 * !KEYSTATE::                   State of modifier keys
 * !KEYSYM::                     Character code of pressed key
@@ -523,9 +525,9 @@ Read-Write Global Variables
 * !PLXERRB::                    Plot x error bar height
 * !PLYERRB::                    Plot y error bar width
 * !PS_FILE::                    PostScript output file
-* !RANGE_WARN_FLAG::            
-* !READ_COUNT::                 
-* !REDIM_WARN_FLAG::            
+* !RANGE_WARN_FLAG::
+* !READ_COUNT::
+* !REDIM_WARN_FLAG::
 * !ROOT_X::                     Last root window x
 * !ROOT_Y::                     Last root window y
 * !ROW::                        Number of lines on the terminal
@@ -540,11 +542,11 @@ Read-Write Global Variables
 * !STARTY::                     Data value of first major y tick mark
 * !STEPX::                      Data increment per major x tick mark
 * !STEPY::                      Data increment per major y tick mark
-* !STRETCHMARK::                
-* !STRETCH_CLIP::               
+* !STRETCHMARK::
+* !STRETCH_CLIP::
 * !SYMRATIO::                   Plot symbol aspect ratio
 * !SYMSIZE::                    Relative symbol size
-* !TAPEMESSAGES::               
+* !TAPEMESSAGES::
 * !TICKX::                      Plot x tick mark size
 * !TICKXR::                     Plot x secondary tick mark relative size
 * !TICKY::                      Plot y tick mark size
@@ -564,20 +566,20 @@ Read-Write Global Variables
 * !WYT::                        Plot window DEV upper y
 * !WZB::                        Plot window DEV lower z
 * !WZT::                        Plot window DEV upper z
-* !XB::                         
+* !XB::
 * !XC::                         Calligraphy current x
-* !XERRORS::                    
+* !XERRORS::
 * !XF::                         Last selected x coordinate in window
-* !XMENU::                      
+* !XMENU::
 * !XROOT::                      Last selected x coordinate in root window
-* !XT::                         
-* !XTIME::                      
-* !YB::                         
+* !XT::
+* !XTIME::
+* !YB::
 * !YC::                         Calligraphy current y
 * !YF::                         Last selected y coordinate in window
-* !YMENU::                      
+* !YMENU::
 * !YROOT::                      Last selected y coordinate in root window
-* !YT::                         
+* !YT::
 * !YYDEBUG::                    Select parser debugging
 * !ZOOMFRAME::                  Current ZOOM frame
 * !ZOOMHIGH::                   Upper limit of ZOOM contrast
@@ -680,10 +682,10 @@ Internal Functions and Subroutines
 * CLOSE::                       Close disk file
 * CLUSTER::                     Cluster analysis
 * COLORCOMPONENTS::             Derive RGB values
-* COLORPIXEL::                  
+* COLORPIXEL::
 * COLORSTOGREY::                Get greyscale values
 * COMPILE::                     Compile a string as ANA code
-* COMPILE_FILE::                
+* COMPILE_FILE::
 * COMPLEX::                     Convert to a complex data type
 * COMPRESS::                    Reduce the number of elements of an array
 * CONCAT::                      Concatenate scalars and/or arrays
@@ -697,10 +699,10 @@ Internal Functions and Subroutines
 * COSH::                        Hyperbolic cosine
 * CROSSCORR::                   Cross-correlation coefficient
 * CRUNCH::                      Data compression
-* CRUNCHRUN::                   
+* CRUNCHRUN::
 * CSPLINE::                     Interpolation using cubic splines
 * CSPLINE_EXTR::                Find extremes on cubic splines
-* CSPLINE_FIND::                
+* CSPLINE_FIND::
 * CTOP::                        Transform from Cartesian to polar coordinates
 * D::                           Dump information about an expression
 * DATE_FROM_TAI::               Date string from a TAI time
@@ -716,7 +718,7 @@ Internal Functions and Subroutines
 * DIAGNOSTIC::                  Write diagnostic output to a file
 * DIFFER::                      Running difference
 * DILATE::                      Binary image dilation operator
-* DILATEDIR::                   
+* DILATEDIR::
 * DIMEN::                       Return a dimension of an array
 * DISABLENEWLINE::              Tell ANA to ignore newlines
 * DISTARR::                     Distance array
@@ -741,7 +743,7 @@ Internal Functions and Subroutines
 * ERF::                         Error function
 * ERFC::                        Complementary error function
 * ERODE::                       Binary image erosion operator
-* ERODEDIR::                    
+* ERODEDIR::
 * ERROR::                       User-defined error with message
 * ESEGMENT::                    Extreme-based data segmentation
 * ESMOOTH::                     Asymmetrical exponential smoothing
@@ -765,6 +767,8 @@ Internal Functions and Subroutines
 * FCW::                         Write compressed data to an FZ file
 * FCWRITE::                     Write compressed data to an FZ file
 * FFT::                         Discrete Fast Fourier Transform
+* FFTB::
+* FFTEXPAND::
 * FFTSHIFT::                    Shifts data using Fourier interpolation
 * FILEPTR::                     Manipulate a file pointer
 * FILEREAD::                    Unformatted reading from a file
@@ -781,6 +785,7 @@ Internal Functions and Subroutines
 * FIND_MINLOC::                 Find the locations of local minima
 * FIT::                         Fit arbitrary function to data
 * FIT2::                        Fit arbitrary function to data
+* FIT3::
 * FIT3DCUBE::                   Ensure complete 3D plot fits on screen
 * FITS_HEADER::                 Read the header of a FITS file
 * FITS_KEY::                    Get a value from a FITS file header
@@ -828,163 +833,166 @@ Internal Functions and Subroutines
 * GT::                          Greater-than
 * HAIRS::                       User-selected position
 * HELP::                        Help
-* HEX::                         
+* HEX::
 * HILBERT::                     Hilbert transform
 * HIST::                        Histogram
 * HISTR::                       Normalized histogram
-* IAUBI00::                     
-* IAUBP00::                     
-* IAUBP06::                     
-* IAUBPN2XY::                   
-* IAUC2I00A::                   
-* IAUC2I00B::                   
-* IAUC2I06A::                   
-* IAUC2IBPN::                   
-* IAUC2IXY::                    
-* IAUC2IXYS::                   
-* IAUC2S::                      
-* IAUC2T00A::                   
-* IAUC2T00B::                   
-* IAUC2T06A::                   
-* IAUC2TCIO::                   
-* IAUC2TEQX::                   
-* IAUC2TPE::                    
-* IAUC2TXY::                    
-* IAUCAL2JD::                   
-* IAUDAT::                      
-* IAUDTDB::                     
-* IAUEE00::                     
-* IAUEE00A::                    
-* IAUEE00B::                    
-* IAUEE06A::                    
-* IAUEECT00::                   
-* IAUEFORM::                    
-* IAUEO06A::                    
-* IAUEORS::                     
-* IAUEPB::                      
-* IAUEPB2JD::                   
-* IAUEPJ::                      
-* IAUEPJ2JD::                   
-* IAUEPV00::                    
-* IAUEQEQ94::                   
-* IAUERA00::                    
-* IAUFAD03::                    
-* IAUFAE03::                    
-* IAUFAF03::                    
-* IAUFAJU03::                   
-* IAUFAL03::                    
-* IAUFALP03::                   
-* IAUFAMA03::                   
-* IAUFAME03::                   
-* IAUFANE03::                   
-* IAUFAOM03::                   
-* IAUFAPA03::                   
-* IAUFASA03::                   
-* IAUFAUR03::                   
-* IAUFAVE03::                   
-* IAUFK52H::                    
-* IAUFK5HIP::                   
-* IAUFK5HZ::                    
-* IAUFW2M::                     
-* IAUFW2XY::                    
-* IAUGC2GD::                    
-* IAUGC2GDE::                   
-* IAUGD2GC::                    
-* IAUGD2GCE::                   
-* IAUGMST06::                   
-* IAUGMST82::                   
-* IAUGST00A::                   
-* IAUGST00B::                   
-* IAUGST06::                    
-* IAUGST94::                    
-* IAUH2FK5::                    
-* IAUHFK5Z::                    
-* IAUIR::                       
-* IAUJD2CAL::                   
-* IAUNUM00A::                   
-* IAUNUM00B::                   
-* IAUNUM06A::                   
-* IAUNUMAT::                    
-* IAUNUT00A::                   
-* IAUNUT00B::                   
-* IAUNUT06A::                   
-* IAUNUT80::                    
-* IAUNUTM80::                   
-* IAUOBL06::                    
-* IAUOBL80::                    
-* IAUP06E::                     
-* IAUP2S::                      
-* IAUPAP::                      
-* IAUPAS::                      
-* IAUPB06::                     
-* IAUPDP::                      
-* IAUPFW06::                    
-* IAUPLAN94::                   
-* IAUPM::                       
-* IAUPMAT00::                   
-* IAUPMAT06::                   
-* IAUPMAT76::                   
-* IAUPN::                       
-* IAUPN00::                     
-* IAUPN00A::                    
-* IAUPN00B::                    
-* IAUPN06::                     
-* IAUPN06A::                    
-* IAUPNM00A::                   
-* IAUPNM00B::                   
-* IAUPNM06A::                   
-* IAUPNM80::                    
-* IAUPOM00::                    
-* IAUPR00::                     
-* IAUPREC76::                   
-* IAUPV2S::                     
-* IAUPVDPV::                    
-* IAUPVM::                      
-* IAUPVSTAR::                   
-* IAUPVXPV::                    
-* IAUPXP::                      
-* IAURM2V::                     
-* IAURV2M::                     
-* IAURX::                       
-* IAURXPV::                     
-* IAURY::                       
-* IAURZ::                       
-* IAUS00::                      
-* IAUS00A::                     
-* IAUS00B::                     
-* IAUS06::                      
-* IAUS06A::                     
-* IAUS2C::                      
-* IAUS2P::                      
-* IAUS2PV::                     
-* IAUSEPP::                     
-* IAUSEPS::                     
-* IAUSP00::                     
-* IAUSTARPM::                   
-* IAUSTARPV::                   
-* IAUTAITT::                    
-* IAUTAIUT1::                   
-* IAUTAIUTC::                   
-* IAUTCBTDB::                   
-* IAUTCGTT::                    
-* IAUTDBTCB::                   
-* IAUTDBTT::                    
-* IAUTR::                       
-* IAUTRXP::                     
-* IAUTRXPV::                    
-* IAUTTTAI::                    
-* IAUTTTCG::                    
-* IAUTTTDB::                    
-* IAUTTUT1::                    
-* IAUUT1TAI::                   
-* IAUUT1TT::                    
-* IAUUT1UTC::                   
-* IAUUTCTAI::                   
-* IAUUTCUT1::                   
-* IAUXY06::                     
-* IAUXYS00A::                   
-* IAUXYS00B::                   
-* IAUXYS06A::                   
+* IAUBI00::                     Frame bias vector
+* IAUBP00::                     Frame bias and precession, IAU2000
+* IAUBP06::                     Frame bias and precession, IAU2006
+* IAUBPN2XY::                   CIO x,y from bias-precession-nutation matrix
+* IAUC2I00A::                   CIO matrix, IAU2000A
+* IAUC2I00B::                   CIO matrix, IAU2000B
+* IAUC2I06A::                   CIO matrix, IAU2000A/2006
+* IAUC2IBPN::                   CIO matrix from BPN
+* IAUC2IXY::                    CIO matrix from CIP x,y
+* IAUC2IXYS::                   CIO matrix from CIP x,y, CIO s
+* IAUC2S::                      Cartesian to spherical coordinates
+* IAUC2T00A::                   C2T matrix from CIP xp,yp, IAU 2000A
+* IAUC2T00B::                   C2T matrix from CIP xp,yp, IAU 2000B
+* IAUC2T06A::                   C2T matrix from CIP xp,yp, IAU 2000A/2006
+* IAUC2TCIO::                   C2T matrix from C2I, ERA, POM
+* IAUC2TEQX::                   C2T matrix from BPN, GST, POM
+* IAUC2TPE::                    C2T matrix from nutation and polar coordinates
+* IAUC2TXY::                    C2T from CIP x,y and polar xp,yp
+* IAUCAL2JD::                   Julian Day Numbers from Gregorian Calendar dates
+* IAUDAT::                      TAI minus UTC
+* IAUDTDB::                     TDB minus TT
+* IAUEE00::                     Equation of Equinoxes from nutation, IAU 2000
+* IAUEE00A::                    Equation of Equinoxes, IAU 2000
+* IAUEE00B::                    Equation of Equinoxes, IAU 2000B
+* IAUEE06A::                    Equation of Equinoxes, IAU 2000A/2006
+* IAUEECT00::                   Equation of Equinoxes complementary terms
+* IAUEFORM::                    Earth reference ellipsoid
+* IAUEO06A::                    Equation of Origins, IAU 2000A/2006
+* IAUEORS::                     Equation of Origins from bias-precession-nutation and CIO s
+* IAUEPB::                      Julian Date to Besselian epoch
+* IAUEPB2JD::                   Besselian epoch to Julian Date
+* IAUEPJ::                      Julian Date to Julian epoch
+* IAUEPJ2JD::                   Julian epoch to Julian Date
+* IAUEPV00::                    Earth position and velocity
+* IAUEQEQ94::                   Equation of Equinoxes, IAU 1994
+* IAUERA00::                    ERA, IAU 2000
+* IAUFAD03::                    Mean elongation of Moon
+* IAUFAE03::                    Mean longitude of Earth
+* IAUFAF03::                    Mean longitude of Moon from ascending node
+* IAUFAJU03::                   Mean longitude of Jupiter
+* IAUFAL03::                    Mean anomaly of Moon
+* IAUFALP03::                   Mean anomaly of Sun
+* IAUFAMA03::                   Mean longitude of Mars
+* IAUFAME03::                   Mean longitude of Mercury
+* IAUFANE03::                   Mean longitude of Neptune
+* IAUFAOM03::                   Mean longitude of Moon's ascending node
+* IAUFAPA03::                   General accumulated precession in longitude
+* IAUFASA03::                   Mean longitude of Saturn
+* IAUFAUR03::                   Mean longitude of Uranus
+* IAUFAVE03::                   Mean longitude of Venus
+* IAUFK52H::                    FK5 J2000.0 star positions to Hipparcos
+* IAUFK5HIP::                   FK5 J2000.0 rotation and spin to Hipparcos
+* IAUFK5HZ::                    FK5 J2000.0 star positions to Hipparcos (zero proper motion)
+* IAUFW2M::                     Fukushima-Williams angles to rotation matrix
+* IAUFW2XY::                    CIP x,y from Fukushima-Williams angles
+* IAUGC2GD::                    Geodetic from geocentric coordinates
+* IAUGC2GDE::                   Geodetic from geocentric coordinates and ellipsoid
+* IAUGD2GC::                    Geocentric from geodetic coordinates
+* IAUGD2GCE::                   Geocentric from geodetic coordinates and ellipsoid
+* IAUGMST00::                   Greenwich mean sidereal time, IAU 2000
+* IAUGMST06::                   Greenwich mean sidereal time, IAU 2006
+* IAUGMST82::                   Greenwich mean sidereal time, IAU 1982
+* IAUGST00A::                   Greenwich apparent sidereal time, IAU 2000
+* IAUGST00B::                   Greenwich apparent sidereal time, IAU 2000B
+* IAUGST06::                    Greenwich apparent sidereal time, IAU 2006
+* IAUGST06A::                   Greenwich apparent sidereal time, IAU 2000/2006
+* IAUGST94::                    Greenwich apparent sidereal time, IAU 1982/1994
+* IAUH2FK5::                    Hipparcos to FK5 J2000.0 star positions
+* IAUHFK5Z::                    Hipparcos to FK5 J2000.0 star positions (zero proper motion)
+* IAUIR::                       Identity 3-by-3 matrix
+* IAUJD2CAL::                   Gregorian dates from Julian Day Numbers
+* IAUNUM00A::                   Nutation matrix, IAU 2000A
+* IAUNUM00B::                   Nutation matrix, IAU 2000B
+* IAUNUM06A::                   Nutation matrix, IAU 2000A/2006
+* IAUNUMAT::                    Nutation matrix from nutation components
+* IAUNUT00A::                   Nutation components, IAU 2000A
+* IAUNUT00B::                   Nutation components, IAU 2000B
+* IAUNUT06A::                   Nutation components, IAU 2000A/2006
+* IAUNUT80::                    Nutation components, IAU 1980
+* IAUNUTM80::                   Nutation matrix, IAU 1980
+* IAUOBL06::                    Mean obliquity of ecliptic, IAU 2006
+* IAUOBL80::                    Mean obliquity of ecliptic, IAU 1980
+* IAUP06E::                     Precession angles, IAU 2006
+* IAUP2S::                      Spherical from cartesian coordinates
+* IAUPAP::                      Position angle from cartesian coordinates
+* IAUPAS::                      Position angle from angular coordinates
+* IAUPB06::                     Precession Euler angles, IAU 2006
+* IAUPDP::                      Inner product of 3-vectors
+* IAUPFW06::                    Fukushima-Williams precession angles, IAU 2006
+* IAUPLAN94::                   Heliocentric planet position and velocity
+* IAUPM::                       Modulus of 3-vectors
+* IAUPMAT00::                   Precession matrix, IAU 2000
+* IAUPMAT06::                   Precession matrix, IAU 2006
+* IAUPMAT76::                   Precession matrix, IAU 1976
+* IAUPN::                       Modulus and unit vector from 3-vector
+* IAUPN00::                     Precession-nutation matrix from nutation components, IAU 2000
+* IAUPN00A::                    Precession-nutation matrix, IAU 2000A
+* IAUPN00B::                    Precession-nutation matrix from nutation components, IAU 2000B
+* IAUPN06::                     Precession-nutation matrix from nutation components, IAU 2006
+* IAUPN06A::                    Precession-nutation matrix, IAU 2000A/2006
+* IAUPNM00A::                   Precession-nutation matrix, IAU 2000A
+* IAUPNM00B::                   Precession-nutation matrix, IAU 2000B
+* IAUPNM06A::                   Precession-nutation matrix, IAU 2000A/2006
+* IAUPNM80::                    Precession-nutation matrix, IAU 1976/1980
+* IAUPOM00::                    Polar motion matrix, IAU 2000
+* IAUPR00::                     Precession rate, IAU 2000
+* IAUPREC76::                   Precession Euler angles, IAU 1976
+* IAUPV2S::                     Spherical from cartesian position/velocity coordinates
+* IAUPVDPV::                    Inner product of position/velocity vectors
+* IAUPVM::                      Modulus of position/velocity vectors
+* IAUPVSTAR::                   Catalog coordinates from position/velocity vectors
+* IAUPVXPV::                    Outer product of two position/velocity vectors
+* IAUPXP::                      Outer product of two 3-vectors
+* IAURM2V::                     Rotation vector from rotation matrix
+* IAURV2M::                     Rotation matrix from rotation vector
+* IAURX::                       Rotates 3-by-3 matrix about x axis
+* IAURXR::                      Multiplies two 3-by-3 matrices
+* IAURXPV::                     Product of 3-by-3 matrix and position/velocity vector
+* IAURY::                       Rotates 3-by-3 matrix about y axis
+* IAURZ::                       Rotates 3-by-3 matrix about z axis
+* IAUS00::                      CIO locator from CIP x,y, IAU 2000A
+* IAUS00A::                     CIO locator, IAU 2000A
+* IAUS00B::                     CIO locator, IAU 2000B
+* IAUS06::                      CIO locator from CIP x,y, IAU 2000A/2006
+* IAUS06A::                     CIO locator, IAU 2000A/2006
+* IAUS2C::                      Cartesian unit from spherical coordinates
+* IAUS2P::                      Cartesian from spherical coordinates
+* IAUS2PV::                     Cartesian position/velocity from spherical coordinates
+* IAUSEPP::                     Angular separation from cartesian coordinates
+* IAUSEPS::                     Angular separation from spherical coordinates
+* IAUSP00::                     TIO locator
+* IAUSTARPM::                   Update star catalog data for space motion
+* IAUSTARPV::                   Convert star catalog data to position/velocity vector
+* IAUTAITT::                    TAI to TT
+* IAUTAIUT1::                   TAI to UT1
+* IAUTAIUTC::                   TAI to UTC
+* IAUTCBTDB::                   TCB to TDB
+* IAUTCGTT::                    TCG to TT
+* IAUTDBTCB::                   TDB to TCB
+* IAUTDBTT::                    TDB to TT
+* IAUTR::                       Transpose a 3-by-3 matrix
+* IAUTRXP::                     Product of 3-vector and transposed 3-by-3 matrix
+* IAUTRXPV::                    Product of position/velocity vector and transposed 3-by-3 matrix
+* IAUTTTAI::                    TT to TAI
+* IAUTTTCG::                    TT to TCG
+* IAUTTTDB::                    TT to TDB
+* IAUTTUT1::                    TT to UT1
+* IAUUT1TAI::                   UT1 to TAI
+* IAUUT1TT::                    UT1 to TT
+* IAUUT1UTC::                   UT1 to UTC
+* IAUUTCTAI::                   UTC to TAI
+* IAUUTCUT1::                   UTC to UT1
+* IAUXY06::                     CIP x,y, IAU 2000A/2006
+* IAUXYS00A::                   CIP x,y, IAU 2000A
+* IAUXYS00B::                   CIP x,y, IAU 2000B
+* IAUXYS06A::                   CIP x,y and CIO locator, IAU 2000A/2006
 * IBETA::                       Incomplete beta function
 * IDLREAD::                     Read one variable from an IDL Save file
 * IDLRESTORE::                  Read all variables from an IDL Save file
@@ -1007,12 +1015,12 @@ Internal Functions and Subroutines
 * ISTRING::                     Convert to @code{STRING}
 * JPEGREAD::                    Read from a JPEG file
 * JPEGWRITE::                   Write as a JPEG file
-* KSMOOTH::                     
+* KSMOOTH::
 * LE::                          Less-than-or-equal-to
 * LEGENDRE::                    Associated Legendre polynomials
 * LIMITS::                      Manipulate plot coordinate ranges
 * LIST::                        List the definition of a user-defined routine
-* LLSQ::                        
+* LLSQ::
 * LMAP::                        Convert to @code{LONG} byte by byte
 * LOCAL_MAX::                   The value of a local maximum
 * LOCAL_MAXLOC::                The location of a local maximum
@@ -1031,9 +1039,10 @@ Internal Functions and Subroutines
 * LT::                          Less-than
 * MATCH::                       Match source values to target values
 * MAX::                         Maximum
-* MAXDIR::                      
+* MAXDIR::
 * MAXFILTER::                   Running maximum
 * MAXLOC::                      Location of maximum
+* MDIAGONAL::
 * MEAN::                        Mean value
 * MEDFILTER::                   Running median
 * MEDIAN::                      Median valuey
@@ -1048,8 +1057,9 @@ Internal Functions and Subroutines
 * MINFILTER::                   Running minimum
 * MINLOC::                      Location of minimum
 * MOD::                         Modulus
+* MPRODUCT::
 * MULTISIEVE::                  Determine locations of particular values
-* NAME::                        
+* NAME::
 * NCCHI2::                      Non-central chi-square function
 * NE::                          Not equal to
 * NEWALLOCS::                   Reports on recent memory allocation
@@ -1114,7 +1124,7 @@ Internal Functions and Subroutines
 * REGRID::                      Interpolate on a warped grid (nearest neighbor)
 * REGRID3::                     Interpolate on a warped grid (bicubic)
 * REGRID3NS::                   Interpolate on a warped grid (bicubic)
-* REORDER::                     
+* REORDER::
 * REPLACE::                     Replace some values with others
 * RESTART::                     Restart ANA
 * RESTORE::                     Retrieve data from an FZ file
@@ -1127,6 +1137,9 @@ Internal Functions and Subroutines
 * ROLL::                        Rearrange dimensions
 * ROOT3::                       Solve a cubic equation
 * RUNCUM::                      Running sum over a fixed width
+* RUNMAX::
+* RUNMIN::
+* RUNORD::
 * RUNPROD::                     Running product from the beginning
 * RUNSUM::                      Running sum from the beginning
 * S::                           Show information about variables
@@ -1135,7 +1148,7 @@ Internal Functions and Subroutines
 * SCALERANGE::                  Convert to @code{BYTE} suitable for display
 * SCANF::                       Read from file in ASCII format
 * SCB::                         Inverse sine-cosine transform
-* SCCOMPLEX::                   
+* SCCOMPLEX::
 * SDEV::                        Standard deviation
 * SEGMENT::                     Curvature-based image segmentation
 * SEGMENTDIR::                  Curvature-based linear image segmentation
@@ -1193,7 +1206,7 @@ Internal Functions and Subroutines
 * STRTOK::                      Find and return a token from a string
 * STRTOL::                      Read a number from a string
 * STRTRIM::                     Skip whitespace
-* STRUCT::                      
+* STRUCT::
 * STUDENT::                     Student's t distribution
 * SUBSHIFT::                    Calculate a subpixel shift
 * SUBSHIFTC::                   Calculate a subpixel shift
@@ -1201,6 +1214,7 @@ Internal Functions and Subroutines
 * SUN_D::                       Solar distance
 * SUN_P::                       Solar P angle
 * SUN_R::                       Solar radius
+* SVD::                         Singular Value Decomposition
 * SWAB::                        Swap bytes in pairs
 * SWAPB::                       Swap bytes in pairs
 * SWAPHALF::                    Swap array halfs
@@ -1229,16 +1243,17 @@ Internal Functions and Subroutines
 * TOLOOKUP::                    Condense using a lookup table
 * TOTAL::                       Return the total of parts of an array
 * TRACE::                       Trace execution of ANA code
-* TRACE_DECODER::               
+* TRACE_DECODER::
 * TRAJECTORY::                  Calculate particle trajectories
+* TRANSPOSE::
 * TREND::                       Determine polynomial trend in data
-* TRI_NAME_FROM_TAI::           
+* TRI_NAME_FROM_TAI::
 * TV::                          Display an image
 * TV3::                         Display an image and two bitmaps
 * TVLAB::                       Display a label
 * TVLCT::                       Load a color table
 * TVMAP::                       Display an array
-* TVPLANE::                     
+* TVPLANE::
 * TVRAW::                       Display an array without color mapping
 * TVREAD::                      Read an image into an array
 * TY::                          Print to screen
@@ -1246,11 +1261,12 @@ Internal Functions and Subroutines
 * TYPENAME::                    Name of a data type
 * ULIB::                        User library
 * UNLOAD::                      Unload a tape
+* UNMOD::
 * UPCASE::                      Convert a string to upper case
 * UPPER::                       Convert a string to upper case
 * VARIANCE::                    Variance
 * VARNAME::                     Return the name of a variable
-* VERIFY::                      
+* VERIFY::
 * VOIGT::                       Voigt function
 * WAIT::                        Wait
 * WAIT_FOR_MENU::               Wait for a menu selection
@@ -1262,26 +1278,26 @@ Internal Functions and Subroutines
 * WMAP::                        Convert to @code{WORD} byte by byte
 * WORD::                        Convert to @code{WORD} value by value
 * WRITEU::                      Write unformatted to a disk file
-* WRITE_JPEG::                  
+* WRITE_JPEG::
 * XANIMATE::                    Animate a set of images
 * XCLOSE::                      Close the X connection
 * XCOPY::                       Copy a part of an image
 * XCURSOR::                     Select a pointer type
 * XDELETE::                     Delete a window
-* XDRAWARC::                    
-* XDRAWLINE::                   
+* XDRAWARC::
+* XDRAWLINE::
 * XEVENT::                      Show information about pending X events
-* XEXIST::                      
+* XEXIST::
 * XFLUSH::                      Flush the X event queue
 * XFONT::                       Select a font for display
-* XINVERTARC::                  
-* XINVERTLINE::                 
+* XINVERTARC::
+* XINVERTLINE::
 * XLABEL::                      Display a label
 * XLABELWIDTH::                 Determine the width of a display label
 * XLOOP::                       X event loop
-* XMADDFILETOLIST::             
-* XMALIGNMENT::                 
-* XMARMCOLOR::                  
+* XMADDFILETOLIST::
+* XMALIGNMENT::
+* XMARMCOLOR::
 * XMARROW::                     Arrow widget
 * XMATTACH::                    Specify attachment of widgets
 * XMATTACH_RELATIVE::           Specify attachment of widgets
@@ -1295,93 +1311,93 @@ Internal Functions and Subroutines
 * XMCOLUMNS::                   Column widget
 * XMCOMMAND::                   Command widget
 * XMDESTROY::                   Destroy a widget
-* XMDIALOG_BOARD::              
-* XMDIALOG_FORM::               
-* XMDRAWINGAREA::               
-* XMDRAWINGLINK::               
-* XMFILEGETLIST::               
-* XMFILESELECT::                
+* XMDIALOG_BOARD::
+* XMDIALOG_FORM::
+* XMDRAWINGAREA::
+* XMDRAWINGLINK::
+* XMFILEGETLIST::
+* XMFILESELECT::
 * XMFONT::                      Sets a widget's font
 * XMFOREGROUNDCOLOR::           Sets a widget's foreground color
 * XMFORM::                      Form widget
 * XMFRAME::                     Frame widget
-* XMGETOPTIONSELECTION::        
-* XMGETPIXMAP::                 
-* XMGETWIDGETADDRESS::          
-* XMGETWIDGETPOSITION::         
-* XMGETWIDGETSIZE::             
-* XMHSCALE::                    
-* XMHSCROLLBAR::                
+* XMGETOPTIONSELECTION::
+* XMGETPIXMAP::
+* XMGETWIDGETADDRESS::
+* XMGETWIDGETPOSITION::
+* XMGETWIDGETSIZE::
+* XMHSCALE::
+* XMHSCROLLBAR::
 * XMLABEL::                     Label widget
-* XMLIST::                      
-* XMLISTADDITEM::               
-* XMLISTCOUNT::                 
-* XMLISTDELETEALL::             
-* XMLISTDELETEITEM::            
-* XMLISTFROMFILE::              
-* XMLISTFUNC::                  
-* XMLISTSELECT::                
-* XMLISTSUBR::                  
+* XMLIST::
+* XMLISTADDITEM::
+* XMLISTCOUNT::
+* XMLISTDELETEALL::
+* XMLISTDELETEITEM::
+* XMLISTFROMFILE::
+* XMLISTFUNC::
+* XMLISTSELECT::
+* XMLISTSUBR::
 * XMMENUBAR::                   Menu bar widget
 * XMMESSAGE::                   Message widget
-* XMOPTIONMENU::                
-* XMPIXMAPBUTTON::              
-* XMPIXMAPOPTIONMENU::          
+* XMOPTIONMENU::
+* XMPIXMAPBUTTON::
+* XMPIXMAPOPTIONMENU::
 * XMPOSITION::                  Set a widget's position and size
 * XMPROMPT::                    Prompt widget
 * XMPULLDOWNMENU::              Pull-down menu widget
-* XMQUERY::                     
+* XMQUERY::
 * XMRADIOBOX::                  Radio box widget
-* XMRAISE::                     
-* XMRESIZEPOLICY::              
+* XMRAISE::
+* XMRESIZEPOLICY::
 * XMROWS::                      Row widget
-* XMSCALEGETVALUE::             
-* XMSCALERESETLIMITS::          
-* XMSCALESETVALUE::             
-* XMSCROLLBARSETVALUES::        
-* XMSCROLLEDWINDOW::            
-* XMSCROLLEDWINDOWAPP::         
-* XMSELECTCOLOR::               
-* XMSENSITIVE::                 
+* XMSCALEGETVALUE::
+* XMSCALERESETLIMITS::
+* XMSCALESETVALUE::
+* XMSCROLLBARSETVALUES::
+* XMSCROLLEDWINDOW::
+* XMSCROLLEDWINDOWAPP::
+* XMSELECTCOLOR::
+* XMSENSITIVE::
 * XMSEPARATOR::                 Separator widget
-* XMSETCOLORS::                 
-* XMSETDIRECTORY::              
-* XMSETLABEL::                  
-* XMSETMARGINS::                
-* XMSETMNEMONIC::               
-* XMSETMODAL::                  
-* XMSETOPTIONSELECTION::        
-* XMSETPIXMAP::                 
-* XMSETTITLE::                  
-* XMSET_TEXT_OUTPUT::           
-* XMSIZE::                      
-* XMTEXT::                      
-* XMTEXTAPPEND::                
-* XMTEXTBOX::                   
-* XMTEXTERASE::                 
-* XMTEXTFIELD::                 
-* XMTEXTFIELDARRAY::            
-* XMTEXTFIELDGETSTRING::        
-* XMTEXTFIELDSETEDITABLE::      
-* XMTEXTFIELDSETMAXLENGTH::     
-* XMTEXTFIELDSETSTRING::        
-* XMTEXTFROMFILE::              
-* XMTEXTGETINSERTPOSITION::     
-* XMTEXTGETLASTPOSITION::       
-* XMTEXTGETSELECTION::          
-* XMTEXTGETSTRING::             
-* XMTEXTREPLACE::               
-* XMTEXTSETEDITABLE::           
-* XMTEXTSETPOSITION::           
-* XMTEXTSETROWCOLUMNSIZE::      
-* XMTEXTSETSTRING::             
-* XMTOGGLEGETSTATE::            
-* XMTOGGLESETSTATE::            
+* XMSETCOLORS::
+* XMSETDIRECTORY::
+* XMSETLABEL::
+* XMSETMARGINS::
+* XMSETMNEMONIC::
+* XMSETMODAL::
+* XMSETOPTIONSELECTION::
+* XMSETPIXMAP::
+* XMSETTITLE::
+* XMSET_TEXT_OUTPUT::
+* XMSIZE::
+* XMTEXT::
+* XMTEXTAPPEND::
+* XMTEXTBOX::
+* XMTEXTERASE::
+* XMTEXTFIELD::
+* XMTEXTFIELDARRAY::
+* XMTEXTFIELDGETSTRING::
+* XMTEXTFIELDSETEDITABLE::
+* XMTEXTFIELDSETMAXLENGTH::
+* XMTEXTFIELDSETSTRING::
+* XMTEXTFROMFILE::
+* XMTEXTGETINSERTPOSITION::
+* XMTEXTGETLASTPOSITION::
+* XMTEXTGETSELECTION::
+* XMTEXTGETSTRING::
+* XMTEXTREPLACE::
+* XMTEXTSETEDITABLE::
+* XMTEXTSETPOSITION::
+* XMTEXTSETROWCOLUMNSIZE::
+* XMTEXTSETSTRING::
+* XMTOGGLEGETSTATE::
+* XMTOGGLESETSTATE::
 * XMTOPLEVEL_BOARD::            Top level bulletin board widget
 * XMTOPLEVEL_FORM::             Top level form widget
 * XMTOPSHADOWCOLOR::            Set a widget's top shadow color
-* XMVSCALE::                    
-* XMVSCROLLBAR::                
+* XMVSCALE::
+* XMVSCROLLBAR::
 * XOPEN::                       Open the X connection
 * XOR::                         Exclusive or
 * XPLACE::                      User-selected position
@@ -1390,21 +1406,21 @@ Internal Functions and Subroutines
 * XQUERY::                      Determine the status of the pointer
 * XREGISTER::                   Register event types for capture
 * XSETACTION::                  Select copy type
-* XTLOOP::                      
-* XTMANAGE::                    
-* XTPARENT::                    
-* XTPOPDOWN::                   
-* XTPOPUP::                     
-* XTUNMANAGE::                  
+* XTLOOP::
+* XTMANAGE::
+* XTPARENT::
+* XTPOPDOWN::
+* XTPOPUP::
+* XTUNMANAGE::
 * XTV::                         Display an image
 * XTVREAD::                     Read an image into an array
-* XTWINDOW::                    
+* XTWINDOW::
 * XWIN::                        Create or rescale a window
 * XWINDOW::                     Create or rescale a window
 * XYMOV::                       Draw a line
 * ZAP::                         Completely remove a variable
 * ZERO::                        Zero a variable
-* ZEROIFNOTDEFINED::            
+* ZEROIFNOTDEFINED::
 * ZERONANS::                    Remove NaN values
 * ZINV::                        Zero-protected inverse
 * ZOOM::                        Image inspection using the pointer
@@ -1413,100 +1429,58 @@ Internal Functions and Subroutines
 
 CALENDAR
 
-* General Calendar Details::    
-* Common Calendar::             
-* Julian Calendar::             
-* Gregorian Calendar::          
-* Islamic Calendar::            
-* Hebrew Calendar::             
-* Julian Day Numbers::          
-* Egyptian Calendar::           
-* Mayan Tikal Calendar::        
-* Mayan Long Count::            
-* Lunar Calendar::              
-* Latin Calendar::              
-* Time Scales::                 
+* General Calendar Details::
+* Common Calendar::
+* Julian Calendar::
+* Gregorian Calendar::
+* Islamic Calendar::
+* Hebrew Calendar::
+* Julian Day Numbers::
+* Egyptian Calendar::
+* Mayan Tikal Calendar::
+* Mayan Long Count::
+* Lunar Calendar::
+* Latin Calendar::
+* Time Scales::
 
 CTOP
 
-* CTOP Details::                
+* CTOP Details::
 
 HILBERT
 
-* HILBERT Details::             
+* HILBERT Details::
 
 ORIENTATION
 
-* ORIENTATION details::         
+* ORIENTATION details::
 
 PLOT
 
-* Plot Styles::                 
-* PLOT Globals::                
+* Plot Styles::
+* PLOT Globals::
 
 REGRID
 
-* REGRID Details::              
+* REGRID Details::
 
 SC
 
-* SC Details::                  
+* SC Details::
 
 SCB
 
-* SCB Details::                 
+* SCB Details::
+
+SVD
+
+* SVD Applications::
 
 @end detailmenu
 @end menu
 
 @c ------------------------------------------------------------------
-@node Legalese, Conventions, Top, Top
-@comment  node-name,  next,  previous,  up
-@chapter Legalese
-
-@heading WARRANTY
-
-This program is distributed in the hope that it will be useful, but
-@emph{without any warranty}; without even the implied warranty of
-@emph{merchantability} or @emph{fitness for a particular purpose}.  You
-use it @emph{completely at your own risk}.
-
-@heading COPYING
-
-This version is @copyright{} 1995-2013 Louis Strous.  You may copy,
-modify and/or redistribute it under the conditions listed below. In the
-following, the term `software' includes the source files, header files,
-help and manual files, font files, make file, object files, executable
-file(s), standard ANA-language files and (other) auxilliary files that
-collectively constitute the `ANA' package.
-
-@heading MODIFICATION
-
-1. Any owner of a copy of this software may modify any part of it, but
-if the modified copy is subsequently redistributed, then all
-modification(s) must be clearly indicated as such (in comments
-appropriate for the modified file's type and purpose), including the
-name of the author(s) and the date of modification.  Any additions to
-the manual or help files must also clearly be indicated as
-such. However, both this message (generated by @code{INFO,/COPY}), the
-warranty message (generated by @code{INFO,/WARRANTY}), and the short
-message regarding copying and warranty that is displayed whenever the
-program is run must be preserved in all copies of the software.
-
-2. Any subsequent owner of a modified copy of this software may make
-additional modifications to any part of it, according to condition 1.
-
-@heading REDISTRIBUTION
-
-3. You may redistribute any number of copies of any part of this
-software to anybody in any way, but not for financial gain.  If you
-redistribute only part of the software, then you have to make sure that
-the author(s) of that part of the software are clearly indicated in that
-part, and that the new owner(s) have copies of this message and the
-warranty message.
-
-@c ------------------------------------------------------------------
-@node Conventions, Start & Stop, Legalese, Top
+@node Conventions, Start & Stop, Top, Top
 @comment  node-name,  next,  previous,  up
 @chapter Typographical Conventions
 
@@ -2792,9 +2766,9 @@ ANA supports several of its own disk file formats, which are discussed
 below.
 
 @menu
-* ANA FZ File Format::          
-* ANA FITS File Format::        
-* ANA ASTORE File Format::      
+* ANA FZ File Format::
+* ANA FITS File Format::
+* ANA ASTORE File Format::
 @end menu
 
 @c ------------------------------------------------------------------
@@ -3006,15 +2980,15 @@ See also: @ref{FPRINT}, @ref{FPRINTF}, @ref{FREAD}, @ref{FREADF},
 [3.2.320]
 @c ------------------------------------------------------------------
 @menu
-* Format Specifiers::           
-* Format Modifiers::            
-* Format Field Width::          
-* Format Precision::            
-* Format Grouping::             
-* Long output lines::           
-* In-Line Print Formats::       
-* Output Data Formats::         
-* Input Data Formats::          
+* Format Specifiers::
+* Format Modifiers::
+* Format Field Width::
+* Format Precision::
+* Format Grouping::
+* Long output lines::
+* In-Line Print Formats::
+* Output Data Formats::
+* Input Data Formats::
 @end menu
 
 @node Format Specifiers, Format Modifiers, Formatted Input/Output, Formatted Input/Output
@@ -3979,7 +3953,7 @@ below.
 * Compact Lists::               A group of dissimilar values
 * Compact Pointer Lists::       A group of pointers to variables
 * Lists::                       A group of dissimilar values
-* Structures::                  
+* Structures::
 * Pointers::                    A pointer to another variable
 @end menu
 
@@ -7328,8 +7302,8 @@ to the widgets, and then act accordingly).
 
 @c ------------------------------------------------------------------
 @menu
-* Building Widgets::            
-* Managing Widgets::            
+* Building Widgets::
+* Managing Widgets::
 @end menu
 
 @node Building Widgets, Managing Widgets, Widgets, Widgets
@@ -7363,7 +7337,7 @@ See also: @ref{XMMESSAGE}, @ref{XMPROMPT}, @ref{XMTOPLEVEL_BOARD}, and
 
 @c ------------------------------------------------------------------
 @menu
-* Button Widgets::              
+* Button Widgets::
 @end menu
 
 @node Button Widgets,  , Building Widgets, Building Widgets
@@ -7968,8 +7942,8 @@ See also: @ref{CALENDAR}
 
 @c ------------------------------------------------------------------
 @menu
-* Astronomical Coordinate Calculations::  
-* Astronomical Time Scales::    
+* Astronomical Coordinate Calculations::
+* Astronomical Time Scales::
 @end menu
 
 @node Astronomical Coordinate Calculations, Astronomical Time Scales, Astronomy and Calendars, Astronomy and Calendars
@@ -8040,7 +8014,7 @@ International Terrestrial Reference System:
 
 Various time scales used in astronomy are related as follows:
 
-@table @bullet
+@table @asis
 @item TAI
 physically realized
 @item offset; observed, nominally +32.184 seconds
@@ -10091,31 +10065,32 @@ ANADRIVE0="/dev/rmt/0n"
 ANA was originally designed to process data from the Solar Maximum
 Mission (SMM) satellite, which flew in the early 1980s.  It was
 implemented for the VAX VMS operating system in assembly code and a
-little bit of Fortran mostly by Richard Shine (of the Lockheed Palo Alto
-Research Laboratory [nowadays known as the Lockheed-Martin Advanced
-Technology Center] in Palo Alto, California.
+little bit of Fortran mostly by Richard Shine (of the then Lockheed
+Palo Alto Research Laboratory, nowadays known as the Lockheed Martin
+Solar & Astrophysics Laboratory) in Palo Alto, California.
 
 Around 1990, Richard Shine converted the assembly code to C code and
 ported ANA to SGI's Irix operating system.  At that time, Louis Strous
 at Utrecht University in the Netherlands took the Irix copy and ported
-it to Dec Ultrix.  Since that time, these two have continuously improved
-and expanded ANA.  In 1994, Louis rewrote ANA's parser and compiler,
-replacing the old parser with a new one, using GNU's bison parser
-generator.  The new parser and compiler allowed simple addition of new
-features to the language, such as keywords arguments and subscripting of
-expressions.
+it to Dec Ultrix.  Shine and Strous have mostly independently improved
+ANA since then, leading to divergent versions of ANA with a common
+subset of capabilities.
 
-Between 1994 and 1999, the Shine (ANA 1) and Strous (ANA 2) versions of
-ANA drifted apart somewhat, but in early 1999 Strous produced a version
-(ANA 3) that is supposed to be backwardly compatible with both the older
-Shine and Strous versions.  This manual describes the merged version
-(ANA 3).
+In 1994, Strous rewrote ANA's parser and compiler, replacing the old
+parser with a new one, using GNU's bison parser generator.  The new
+parser and compiler allowed simple addition of new features to the
+language, such as keywords arguments and subscripting of expressions.
 
-Both Strous and Shine currently work at the Lockheed-Martin Advanced
-Technology Center in Palo Alto, California.
+Between 1994 and 1999, the Shine and Strous versions of ANA drifted
+apart somewhat.  In early 1999, Strous produced a version (ANA 3) that
+is supposedly backwardly compatible with both the older Shine and
+Strous versions.  Since that time, the two versions have diverged
+again.
+
+This manual describes the Strous version.
 
 @c ------------------------------------------------------------------
-@node Reference Manual, Concept Index, History, Top
+@node Reference Manual, GNU Free Documentation License, History, Top
 @comment  node-name,  next,  previous,  up
 @chapter Reference Manual
 
@@ -10171,14 +10146,14 @@ See also: @ref{Installing ANA}
 
 @c ------------------------------------------------------------------
 @menu
-* debug::                       
-* develop::                     
-* jpeg::                        
-* motif::                       
-* regex_h::                     
-* sofa::                        
-* tape::                        
-* x11::                         
+* debug::
+* develop::
+* jpeg::
+* motif::
+* regex_h::
+* sofa::
+* tape::
+* x11::
 @end menu
 
 @node debug, develop, Packages, Packages
@@ -10803,22 +10778,22 @@ functions.
 * !AUTOCON::                    Automatic contour level selection
 * !BADMATCH::                   Number of bad matched in GRIDMATCH
 * !BB_UPDATE::                  Update plot bounding box
-* !BC::                         
+* !BC::
 * !BUTTON::                     Pointer button state
 * !BXB::                        Bounding box lower x
 * !BXT::                        Bounding box upper x
 * !BYB::                        Bounding box lower y
 * !BYT::                        Bounding box upper y
 * !COL::                        Number of columns on the terminal
-* !CONTOUR_BORDER::             
+* !CONTOUR_BORDER::
 * !CONTOUR_BOX::                Draw a small box at origin of contour plot
-* !CONTOUR_DASH_LEV::           
-* !CONTOUR_MODE::               
+* !CONTOUR_DASH_LEV::
+* !CONTOUR_MODE::
 * !CONTOUR_NLEV::               Number of counter levels
-* !CONTOUR_STYLE::              
-* !CONTOUR_TICKS::              
-* !CONTOUR_TICK_FAC::           
-* !CONTOUR_TICK_PEN::           
+* !CONTOUR_STYLE::
+* !CONTOUR_TICKS::
+* !CONTOUR_TICK_FAC::
+* !CONTOUR_TICK_PEN::
 * !CRATIO::                     Plot symbol aspect ratio
 * !CRUNCH_BITS::                Number of bits in last CRUNCH
 * !CRUNCH_BPP::                 Number of bits per element in last CRUNCH
@@ -10826,11 +10801,11 @@ functions.
 * !DASHSIZE::                   Relative size of plot dashes
 * !DLABX::                      Plot x axis divisions
 * !DLABY::                      Plot y axis divisions
-* !DOT::                        
-* !DOTS::                       
+* !DOT::
+* !DOTS::
 * !ERASE::                      Automatic window erase on PLOT
 * !ERRNO::                      Last system error number
-* !ERROR_EXTRA::                
+* !ERROR_EXTRA::
 * !EVENTSOURCE::                Source window of event
 * !EVENTTYPE::                  Type of event
 * !FFTDP::                      Double precision FFTs
@@ -10849,14 +10824,14 @@ functions.
 * !HEIGHT::                     Last window height
 * !HISTMIN::                    Last histogram minimum ordinate
 * !HISTMAX::                    Last histogram maximum ordinate
-* !IBLANK::                     
+* !IBLANK::
 * !IORDER::                     TV coordinate swap order
-* !ITMAX::                      
+* !ITMAX::
 * !IX::                         Last selected DEV x coordinate in window
-* !IXHIGH::                     
+* !IXHIGH::
 * !IY::                         Last selected DEV y coordinate in window
-* !IYHIGH::                     
-* !KB::                         
+* !IYHIGH::
+* !KB::
 * !KEYCODE::                    Code of pressed physical key
 * !KEYSTATE::                   State of modifier keys
 * !KEYSYM::                     Character code of pressed key
@@ -10889,9 +10864,9 @@ functions.
 * !PLXERRB::                    Plot x error bar height
 * !PLYERRB::                    Plot y error bar width
 * !PS_FILE::                    PostScript output file
-* !RANGE_WARN_FLAG::            
-* !READ_COUNT::                 
-* !REDIM_WARN_FLAG::            
+* !RANGE_WARN_FLAG::
+* !READ_COUNT::
+* !REDIM_WARN_FLAG::
 * !ROOT_X::                     Last root window x
 * !ROOT_Y::                     Last root window y
 * !ROW::                        Number of lines on the terminal
@@ -10906,11 +10881,11 @@ functions.
 * !STARTY::                     Data value of first major y tick mark
 * !STEPX::                      Data increment per major x tick mark
 * !STEPY::                      Data increment per major y tick mark
-* !STRETCHMARK::                
-* !STRETCH_CLIP::               
+* !STRETCHMARK::
+* !STRETCH_CLIP::
 * !SYMRATIO::                   Plot symbol aspect ratio
 * !SYMSIZE::                    Relative symbol size
-* !TAPEMESSAGES::               
+* !TAPEMESSAGES::
 * !TICKX::                      Plot x tick mark size
 * !TICKXR::                     Plot x secondary tick mark relative size
 * !TICKY::                      Plot y tick mark size
@@ -10930,20 +10905,20 @@ functions.
 * !WYT::                        Plot window DEV upper y
 * !WZB::                        Plot window DEV lower z
 * !WZT::                        Plot window DEV upper z
-* !XB::                         
+* !XB::
 * !XC::                         Calligraphy current x
-* !XERRORS::                    
+* !XERRORS::
 * !XF::                         Last selected x coordinate in window
-* !XMENU::                      
+* !XMENU::
 * !XROOT::                      Last selected x coordinate in root window
-* !XT::                         
-* !XTIME::                      
-* !YB::                         
+* !XT::
+* !XTIME::
+* !YB::
 * !YC::                         Calligraphy current y
 * !YF::                         Last selected y coordinate in window
-* !YMENU::                      
+* !YMENU::
 * !YROOT::                      Last selected y coordinate in root window
-* !YT::                         
+* !YT::
 * !YYDEBUG::                    Select parser debugging
 * !ZOOMFRAME::                  Current ZOOM frame
 * !ZOOMHIGH::                   Upper limit of ZOOM contrast
@@ -12726,10 +12701,10 @@ arguments.
 * CLOSE::                       Close disk file
 * CLUSTER::                     Cluster analysis
 * COLORCOMPONENTS::             Derive RGB values
-* COLORPIXEL::                  
+* COLORPIXEL::
 * COLORSTOGREY::                Get greyscale values
 * COMPILE::                     Compile a string as ANA code
-* COMPILE_FILE::                
+* COMPILE_FILE::
 * COMPLEX::                     Convert to a complex data type
 * COMPRESS::                    Reduce the number of elements of an array
 * CONCAT::                      Concatenate scalars and/or arrays
@@ -12743,10 +12718,10 @@ arguments.
 * COSH::                        Hyperbolic cosine
 * CROSSCORR::                   Cross-correlation coefficient
 * CRUNCH::                      Data compression
-* CRUNCHRUN::                   
+* CRUNCHRUN::
 * CSPLINE::                     Interpolation using cubic splines
 * CSPLINE_EXTR::                Find extremes on cubic splines
-* CSPLINE_FIND::                
+* CSPLINE_FIND::
 * CTOP::                        Transform from Cartesian to polar coordinates
 * D::                           Dump information about an expression
 * DATE_FROM_TAI::               Date string from a TAI time
@@ -12762,7 +12737,7 @@ arguments.
 * DIAGNOSTIC::                  Write diagnostic output to a file
 * DIFFER::                      Running difference
 * DILATE::                      Binary image dilation operator
-* DILATEDIR::                   
+* DILATEDIR::
 * DIMEN::                       Return a dimension of an array
 * DISABLENEWLINE::              Tell ANA to ignore newlines
 * DISTARR::                     Distance array
@@ -12787,7 +12762,7 @@ arguments.
 * ERF::                         Error function
 * ERFC::                        Complementary error function
 * ERODE::                       Binary image erosion operator
-* ERODEDIR::                    
+* ERODEDIR::
 * ERROR::                       User-defined error with message
 * ESEGMENT::                    Extreme-based data segmentation
 * ESMOOTH::                     Asymmetrical exponential smoothing
@@ -12811,8 +12786,8 @@ arguments.
 * FCW::                         Write compressed data to an FZ file
 * FCWRITE::                     Write compressed data to an FZ file
 * FFT::                         Discrete Fast Fourier Transform
-* FFTB::                        
-* FFTEXPAND::                   
+* FFTB::
+* FFTEXPAND::
 * FFTSHIFT::                    Shifts data using Fourier interpolation
 * FILEPTR::                     Manipulate a file pointer
 * FILEREAD::                    Unformatted reading from a file
@@ -12829,7 +12804,7 @@ arguments.
 * FIND_MINLOC::                 Find the locations of local minima
 * FIT::                         Fit arbitrary function to data
 * FIT2::                        Fit arbitrary function to data
-* FIT3::                        
+* FIT3::
 * FIT3DCUBE::                   Ensure complete 3D plot fits on screen
 * FITS_HEADER::                 Read the header of a FITS file
 * FITS_KEY::                    Get a value from a FITS file header
@@ -12877,7 +12852,7 @@ arguments.
 * GT::                          Greater-than
 * HAIRS::                       User-selected position
 * HELP::                        Help
-* HEX::                         
+* HEX::
 * HILBERT::                     Hilbert transform
 * HIST::                        Histogram
 * HISTR::                       Normalized histogram
@@ -13059,12 +13034,12 @@ arguments.
 * ISTRING::                     Convert to @code{STRING}
 * JPEGREAD::                    Read from a JPEG file
 * JPEGWRITE::                   Write as a JPEG file
-* KSMOOTH::                     
+* KSMOOTH::
 * LE::                          Less-than-or-equal-to
 * LEGENDRE::                    Associated Legendre polynomials
 * LIMITS::                      Manipulate plot coordinate ranges
 * LIST::                        List the definition of a user-defined routine
-* LLSQ::                        
+* LLSQ::
 * LMAP::                        Convert to @code{LONG} byte by byte
 * LOCAL_MAX::                   The value of a local maximum
 * LOCAL_MAXLOC::                The location of a local maximum
@@ -13083,10 +13058,10 @@ arguments.
 * LT::                          Less-than
 * MATCH::                       Match source values to target values
 * MAX::                         Maximum
-* MAXDIR::                      
+* MAXDIR::
 * MAXFILTER::                   Running maximum
 * MAXLOC::                      Location of maximum
-* MDIAGONAL::                   
+* MDIAGONAL::
 * MEAN::                        Mean value
 * MEDFILTER::                   Running median
 * MEDIAN::                      Median valuey
@@ -13101,9 +13076,9 @@ arguments.
 * MINFILTER::                   Running minimum
 * MINLOC::                      Location of minimum
 * MOD::                         Modulus
-* MPRODUCT::                    
+* MPRODUCT::
 * MULTISIEVE::                  Determine locations of particular values
-* NAME::                        
+* NAME::
 * NCCHI2::                      Non-central chi-square function
 * NE::                          Not equal to
 * NEWALLOCS::                   Reports on recent memory allocation
@@ -13168,7 +13143,7 @@ arguments.
 * REGRID::                      Interpolate on a warped grid (nearest neighbor)
 * REGRID3::                     Interpolate on a warped grid (bicubic)
 * REGRID3NS::                   Interpolate on a warped grid (bicubic)
-* REORDER::                     
+* REORDER::
 * REPLACE::                     Replace some values with others
 * RESTART::                     Restart ANA
 * RESTORE::                     Retrieve data from an FZ file
@@ -13181,9 +13156,9 @@ arguments.
 * ROLL::                        Rearrange dimensions
 * ROOT3::                       Solve a cubic equation
 * RUNCUM::                      Running sum over a fixed width
-* RUNMAX::                      
-* RUNMIN::                      
-* RUNORD::                      
+* RUNMAX::
+* RUNMIN::
+* RUNORD::
 * RUNPROD::                     Running product from the beginning
 * RUNSUM::                      Running sum from the beginning
 * S::                           Show information about variables
@@ -13192,7 +13167,7 @@ arguments.
 * SCALERANGE::                  Convert to @code{BYTE} suitable for display
 * SCANF::                       Read from file in ASCII format
 * SCB::                         Inverse sine-cosine transform
-* SCCOMPLEX::                   
+* SCCOMPLEX::
 * SDEV::                        Standard deviation
 * SEGMENT::                     Curvature-based image segmentation
 * SEGMENTDIR::                  Curvature-based linear image segmentation
@@ -13250,7 +13225,7 @@ arguments.
 * STRTOK::                      Find and return a token from a string
 * STRTOL::                      Read a number from a string
 * STRTRIM::                     Skip whitespace
-* STRUCT::                      
+* STRUCT::
 * STUDENT::                     Student's t distribution
 * SUBSHIFT::                    Calculate a subpixel shift
 * SUBSHIFTC::                   Calculate a subpixel shift
@@ -13287,17 +13262,17 @@ arguments.
 * TOLOOKUP::                    Condense using a lookup table
 * TOTAL::                       Return the total of parts of an array
 * TRACE::                       Trace execution of ANA code
-* TRACE_DECODER::               
+* TRACE_DECODER::
 * TRAJECTORY::                  Calculate particle trajectories
-* TRANSPOSE::                   
+* TRANSPOSE::
 * TREND::                       Determine polynomial trend in data
-* TRI_NAME_FROM_TAI::           
+* TRI_NAME_FROM_TAI::
 * TV::                          Display an image
 * TV3::                         Display an image and two bitmaps
 * TVLAB::                       Display a label
 * TVLCT::                       Load a color table
 * TVMAP::                       Display an array
-* TVPLANE::                     
+* TVPLANE::
 * TVRAW::                       Display an array without color mapping
 * TVREAD::                      Read an image into an array
 * TY::                          Print to screen
@@ -13305,12 +13280,12 @@ arguments.
 * TYPENAME::                    Name of a data type
 * ULIB::                        User library
 * UNLOAD::                      Unload a tape
-* UNMOD::                       
+* UNMOD::
 * UPCASE::                      Convert a string to upper case
 * UPPER::                       Convert a string to upper case
 * VARIANCE::                    Variance
 * VARNAME::                     Return the name of a variable
-* VERIFY::                      
+* VERIFY::
 * VOIGT::                       Voigt function
 * WAIT::                        Wait
 * WAIT_FOR_MENU::               Wait for a menu selection
@@ -13322,26 +13297,26 @@ arguments.
 * WMAP::                        Convert to @code{WORD} byte by byte
 * WORD::                        Convert to @code{WORD} value by value
 * WRITEU::                      Write unformatted to a disk file
-* WRITE_JPEG::                  
+* WRITE_JPEG::
 * XANIMATE::                    Animate a set of images
 * XCLOSE::                      Close the X connection
 * XCOPY::                       Copy a part of an image
 * XCURSOR::                     Select a pointer type
 * XDELETE::                     Delete a window
-* XDRAWARC::                    
-* XDRAWLINE::                   
+* XDRAWARC::
+* XDRAWLINE::
 * XEVENT::                      Show information about pending X events
-* XEXIST::                      
+* XEXIST::
 * XFLUSH::                      Flush the X event queue
 * XFONT::                       Select a font for display
-* XINVERTARC::                  
-* XINVERTLINE::                 
+* XINVERTARC::
+* XINVERTLINE::
 * XLABEL::                      Display a label
 * XLABELWIDTH::                 Determine the width of a display label
 * XLOOP::                       X event loop
-* XMADDFILETOLIST::             
-* XMALIGNMENT::                 
-* XMARMCOLOR::                  
+* XMADDFILETOLIST::
+* XMALIGNMENT::
+* XMARMCOLOR::
 * XMARROW::                     Arrow widget
 * XMATTACH::                    Specify attachment of widgets
 * XMATTACH_RELATIVE::           Specify attachment of widgets
@@ -13355,93 +13330,93 @@ arguments.
 * XMCOLUMNS::                   Column widget
 * XMCOMMAND::                   Command widget
 * XMDESTROY::                   Destroy a widget
-* XMDIALOG_BOARD::              
-* XMDIALOG_FORM::               
-* XMDRAWINGAREA::               
-* XMDRAWINGLINK::               
-* XMFILEGETLIST::               
-* XMFILESELECT::                
+* XMDIALOG_BOARD::
+* XMDIALOG_FORM::
+* XMDRAWINGAREA::
+* XMDRAWINGLINK::
+* XMFILEGETLIST::
+* XMFILESELECT::
 * XMFONT::                      Sets a widget's font
 * XMFOREGROUNDCOLOR::           Sets a widget's foreground color
 * XMFORM::                      Form widget
 * XMFRAME::                     Frame widget
-* XMGETOPTIONSELECTION::        
-* XMGETPIXMAP::                 
-* XMGETWIDGETADDRESS::          
-* XMGETWIDGETPOSITION::         
-* XMGETWIDGETSIZE::             
-* XMHSCALE::                    
-* XMHSCROLLBAR::                
+* XMGETOPTIONSELECTION::
+* XMGETPIXMAP::
+* XMGETWIDGETADDRESS::
+* XMGETWIDGETPOSITION::
+* XMGETWIDGETSIZE::
+* XMHSCALE::
+* XMHSCROLLBAR::
 * XMLABEL::                     Label widget
-* XMLIST::                      
-* XMLISTADDITEM::               
-* XMLISTCOUNT::                 
-* XMLISTDELETEALL::             
-* XMLISTDELETEITEM::            
-* XMLISTFROMFILE::              
-* XMLISTFUNC::                  
-* XMLISTSELECT::                
-* XMLISTSUBR::                  
+* XMLIST::
+* XMLISTADDITEM::
+* XMLISTCOUNT::
+* XMLISTDELETEALL::
+* XMLISTDELETEITEM::
+* XMLISTFROMFILE::
+* XMLISTFUNC::
+* XMLISTSELECT::
+* XMLISTSUBR::
 * XMMENUBAR::                   Menu bar widget
 * XMMESSAGE::                   Message widget
-* XMOPTIONMENU::                
-* XMPIXMAPBUTTON::              
-* XMPIXMAPOPTIONMENU::          
+* XMOPTIONMENU::
+* XMPIXMAPBUTTON::
+* XMPIXMAPOPTIONMENU::
 * XMPOSITION::                  Set a widget's position and size
 * XMPROMPT::                    Prompt widget
 * XMPULLDOWNMENU::              Pull-down menu widget
-* XMQUERY::                     
+* XMQUERY::
 * XMRADIOBOX::                  Radio box widget
-* XMRAISE::                     
-* XMRESIZEPOLICY::              
+* XMRAISE::
+* XMRESIZEPOLICY::
 * XMROWS::                      Row widget
-* XMSCALEGETVALUE::             
-* XMSCALERESETLIMITS::          
-* XMSCALESETVALUE::             
-* XMSCROLLBARSETVALUES::        
-* XMSCROLLEDWINDOW::            
-* XMSCROLLEDWINDOWAPP::         
-* XMSELECTCOLOR::               
-* XMSENSITIVE::                 
+* XMSCALEGETVALUE::
+* XMSCALERESETLIMITS::
+* XMSCALESETVALUE::
+* XMSCROLLBARSETVALUES::
+* XMSCROLLEDWINDOW::
+* XMSCROLLEDWINDOWAPP::
+* XMSELECTCOLOR::
+* XMSENSITIVE::
 * XMSEPARATOR::                 Separator widget
-* XMSETCOLORS::                 
-* XMSETDIRECTORY::              
-* XMSETLABEL::                  
-* XMSETMARGINS::                
-* XMSETMNEMONIC::               
-* XMSETMODAL::                  
-* XMSETOPTIONSELECTION::        
-* XMSETPIXMAP::                 
-* XMSETTITLE::                  
-* XMSET_TEXT_OUTPUT::           
-* XMSIZE::                      
-* XMTEXT::                      
-* XMTEXTAPPEND::                
-* XMTEXTBOX::                   
-* XMTEXTERASE::                 
-* XMTEXTFIELD::                 
-* XMTEXTFIELDARRAY::            
-* XMTEXTFIELDGETSTRING::        
-* XMTEXTFIELDSETEDITABLE::      
-* XMTEXTFIELDSETMAXLENGTH::     
-* XMTEXTFIELDSETSTRING::        
-* XMTEXTFROMFILE::              
-* XMTEXTGETINSERTPOSITION::     
-* XMTEXTGETLASTPOSITION::       
-* XMTEXTGETSELECTION::          
-* XMTEXTGETSTRING::             
-* XMTEXTREPLACE::               
-* XMTEXTSETEDITABLE::           
-* XMTEXTSETPOSITION::           
-* XMTEXTSETROWCOLUMNSIZE::      
-* XMTEXTSETSTRING::             
-* XMTOGGLEGETSTATE::            
-* XMTOGGLESETSTATE::            
+* XMSETCOLORS::
+* XMSETDIRECTORY::
+* XMSETLABEL::
+* XMSETMARGINS::
+* XMSETMNEMONIC::
+* XMSETMODAL::
+* XMSETOPTIONSELECTION::
+* XMSETPIXMAP::
+* XMSETTITLE::
+* XMSET_TEXT_OUTPUT::
+* XMSIZE::
+* XMTEXT::
+* XMTEXTAPPEND::
+* XMTEXTBOX::
+* XMTEXTERASE::
+* XMTEXTFIELD::
+* XMTEXTFIELDARRAY::
+* XMTEXTFIELDGETSTRING::
+* XMTEXTFIELDSETEDITABLE::
+* XMTEXTFIELDSETMAXLENGTH::
+* XMTEXTFIELDSETSTRING::
+* XMTEXTFROMFILE::
+* XMTEXTGETINSERTPOSITION::
+* XMTEXTGETLASTPOSITION::
+* XMTEXTGETSELECTION::
+* XMTEXTGETSTRING::
+* XMTEXTREPLACE::
+* XMTEXTSETEDITABLE::
+* XMTEXTSETPOSITION::
+* XMTEXTSETROWCOLUMNSIZE::
+* XMTEXTSETSTRING::
+* XMTOGGLEGETSTATE::
+* XMTOGGLESETSTATE::
 * XMTOPLEVEL_BOARD::            Top level bulletin board widget
 * XMTOPLEVEL_FORM::             Top level form widget
 * XMTOPSHADOWCOLOR::            Set a widget's top shadow color
-* XMVSCALE::                    
-* XMVSCROLLBAR::                
+* XMVSCALE::
+* XMVSCROLLBAR::
 * XOPEN::                       Open the X connection
 * XOR::                         Exclusive or
 * XPLACE::                      User-selected position
@@ -13450,21 +13425,21 @@ arguments.
 * XQUERY::                      Determine the status of the pointer
 * XREGISTER::                   Register event types for capture
 * XSETACTION::                  Select copy type
-* XTLOOP::                      
-* XTMANAGE::                    
-* XTPARENT::                    
-* XTPOPDOWN::                   
-* XTPOPUP::                     
-* XTUNMANAGE::                  
+* XTLOOP::
+* XTMANAGE::
+* XTPARENT::
+* XTPOPDOWN::
+* XTPOPUP::
+* XTUNMANAGE::
 * XTV::                         Display an image
 * XTVREAD::                     Read an image into an array
-* XTWINDOW::                    
+* XTWINDOW::
 * XWIN::                        Create or rescale a window
 * XWINDOW::                     Create or rescale a window
 * XYMOV::                       Draw a line
 * ZAP::                         Completely remove a variable
 * ZERO::                        Zero a variable
-* ZEROIFNOTDEFINED::            
+* ZEROIFNOTDEFINED::
 * ZERONANS::                    Remove NaN values
 * ZINV::                        Zero-protected inverse
 * ZOOM::                        Image inspection using the pointer
@@ -14924,19 +14899,19 @@ See also: @ref{!JD}, @ref{Astronomy and Calendars}
 [3.1.867]
 @c -------------------------------------
 @menu
-* General Calendar Details::    
-* Common Calendar::             
-* Julian Calendar::             
-* Gregorian Calendar::          
-* Islamic Calendar::            
-* Hebrew Calendar::             
-* Julian Day Numbers::          
-* Egyptian Calendar::           
-* Mayan Tikal Calendar::        
-* Mayan Long Count::            
-* Lunar Calendar::              
-* Latin Calendar::              
-* Time Scales::                 
+* General Calendar Details::
+* Common Calendar::
+* Julian Calendar::
+* Gregorian Calendar::
+* Islamic Calendar::
+* Hebrew Calendar::
+* Julian Day Numbers::
+* Egyptian Calendar::
+* Mayan Tikal Calendar::
+* Mayan Long Count::
+* Lunar Calendar::
+* Latin Calendar::
+* Time Scales::
 @end menu
 
 @node General Calendar Details, Common Calendar, CALENDAR, CALENDAR
@@ -16513,7 +16488,7 @@ See also: @ref{DIMEN}, @ref{FFT}, @ref{SIN}, @ref{#2PI}
 [3.2.169]
 @c -------------------------------------
 @menu
-* CTOP Details::                
+* CTOP Details::
 @end menu
 
 @node CTOP Details,  , CTOP, CTOP
@@ -17377,7 +17352,7 @@ See also: @ref{EXECUTE}
 See also: @ref{XREGISTER}, @ref{!EVENTTYPE}
 
 @c -------------------------------------
-@node EXECUTE, EXIT, EVENTNAME, Internal Routines
+@node EXECUTE, EXP, EVENTNAME, Internal Routines
 @subsection EXECUTE
 
 @code{EXECUTE, @var{string} [, /MAIN]}
@@ -19425,7 +19400,7 @@ See also: @ref{FFT}, @ref{SC}, @ref{SCB}
 [2.12.304]
 
 @menu
-* HILBERT Details::             
+* HILBERT Details::
 @end menu
 @c -------------------------------------
 @node HILBERT Details,  , HILBERT, HILBERT
@@ -22019,7 +21994,7 @@ same dimensions.  The result has those same dimensions, too.
 See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
-@node IAUUT1TT, IAUUT1UTC, IAUUT1TAI, Internal Routines
+@node IAUUT1TT
 @comment  node-name,  next,  previous,  up
 @subsection IAUUT1TT
 
@@ -23858,7 +23833,7 @@ Induces periodical display of the progress status.
 The returned orientations are ambiguous over 180 degrees.
 
 @menu
-* ORIENTATION details::         
+* ORIENTATION details::
 @end menu
 
 [2.12.1818]
@@ -24161,8 +24136,8 @@ See also: @ref{CALLIG}, @ref{OPLOT}, @ref{!PLTYP}, @ref{!PLXERRB},
 [3.2.241]
 @c -------------------------------------------------------------
 @menu
-* Plot Styles::                 
-* PLOT Globals::                
+* Plot Styles::
+* PLOT Globals::
 @end menu
 
 @node Plot Styles, PLOT Globals, PLOT, PLOT
@@ -24833,7 +24808,7 @@ See also: @ref{RANDOM}, @ref{Random Arrays}
 Returns a @code{DOUBLE} array with the specified
 @code{@var{dimensions}}, filled with pseudo-random numbers
 exponentially distributed with the specified scale height
-@code{@var{scale}.  Positive and negative values are equally likely.
+@code{@var{scale}}.  Positive and negative values are equally likely.
 If @code{@var{limit}} is specified and greater than 0, then only
 numbers whose magnitude is at least @code{@var{limit}} are returned.
 
@@ -25202,7 +25177,7 @@ See also: @ref{COMPRESS}, @ref{EXPAND}, @ref{REGRID3}, @ref{REGRID3NS}
 [3.2.96]
 @c -------------------------------------
 @menu
-* REGRID Details::              
+* REGRID Details::
 @end menu
 
 @node REGRID Details,  , REGRID, REGRID
@@ -25645,7 +25620,7 @@ See also: @ref{POWER}, @ref{FFT}, @ref{HILBERT}
 [2.12.301]
 
 @menu
-* SC Details::                  
+* SC Details::
 @end menu
 @c -------------------------------------
 @node SC Details,  , SC, SC
@@ -25772,7 +25747,7 @@ See also: @ref{POWER}, @ref{FFT}, @ref{HILBERT}
 [2.12.301]
 
 @menu
-* SCB Details::                 
+* SCB Details::
 @end menu
 @c -------------------------------------
 @node SCB Details,  , SCB, SCB
@@ -27092,7 +27067,7 @@ of @code{@var{U}}.
 See also: @ref{MDIAGONAL}, @ref{TRANSPOSE}
 
 @menu
-* SVD Applications::            
+* SVD Applications::
 @end menu
 
 @c -------------------------------------
@@ -30335,6 +30310,507 @@ See also: @ref{Combining Arrays}
 
 List concatenation function.  Combines the arguments into a list or
 compact list.
+
+@c --------------------------------------
+@node GNU Free Documentation License, Concept Index, Reference Manual, Top
+@comment  node-name,  next,  previous,  up
+@chapter GNU Free Documentation License
+
+@display
+Copyright @copyright{} 2000, 2001, 2002, 2007, 2008 Free Software Foundation, Inc.
+@uref{http://fsf.org/}
+
+Everyone is permitted to copy and distribute verbatim copies
+of this license document, but changing it is not allowed.
+@end display
+
+@enumerate 0
+@item
+PREAMBLE
+
+The purpose of this License is to make a manual, textbook, or other
+functional and useful document @dfn{free} in the sense of freedom: to
+assure everyone the effective freedom to copy and redistribute it,
+with or without modifying it, either commercially or noncommercially.
+Secondarily, this License preserves for the author and publisher a way
+to get credit for their work, while not being considered responsible
+for modifications made by others.
+
+This License is a kind of ``copyleft'', which means that derivative
+works of the document must themselves be free in the same sense.  It
+complements the GNU General Public License, which is a copyleft
+license designed for free software.
+
+We have designed this License in order to use it for manuals for free
+software, because free software needs free documentation: a free
+program should come with manuals providing the same freedoms that the
+software does.  But this License is not limited to software manuals;
+it can be used for any textual work, regardless of subject matter or
+whether it is published as a printed book.  We recommend this License
+principally for works whose purpose is instruction or reference.
+
+@item
+APPLICABILITY AND DEFINITIONS
+
+This License applies to any manual or other work, in any medium, that
+contains a notice placed by the copyright holder saying it can be
+distributed under the terms of this License.  Such a notice grants a
+world-wide, royalty-free license, unlimited in duration, to use that
+work under the conditions stated herein.  The ``Document'', below,
+refers to any such manual or work.  Any member of the public is a
+licensee, and is addressed as ``you''.  You accept the license if you
+copy, modify or distribute the work in a way requiring permission
+under copyright law.
+
+A ``Modified Version'' of the Document means any work containing the
+Document or a portion of it, either copied verbatim, or with
+modifications and/or translated into another language.
+
+A ``Secondary Section'' is a named appendix or a front-matter section
+of the Document that deals exclusively with the relationship of the
+publishers or authors of the Document to the Document's overall
+subject (or to related matters) and contains nothing that could fall
+directly within that overall subject.  (Thus, if the Document is in
+part a textbook of mathematics, a Secondary Section may not explain
+any mathematics.)  The relationship could be a matter of historical
+connection with the subject or with related matters, or of legal,
+commercial, philosophical, ethical or political position regarding
+them.
+
+The ``Invariant Sections'' are certain Secondary Sections whose titles
+are designated, as being those of Invariant Sections, in the notice
+that says that the Document is released under this License.  If a
+section does not fit the above definition of Secondary then it is not
+allowed to be designated as Invariant.  The Document may contain zero
+Invariant Sections.  If the Document does not identify any Invariant
+Sections then there are none.
+
+The ``Cover Texts'' are certain short passages of text that are listed,
+as Front-Cover Texts or Back-Cover Texts, in the notice that says that
+the Document is released under this License.  A Front-Cover Text may
+be at most 5 words, and a Back-Cover Text may be at most 25 words.
+
+A ``Transparent'' copy of the Document means a machine-readable copy,
+represented in a format whose specification is available to the
+general public, that is suitable for revising the document
+straightforwardly with generic text editors or (for images composed of
+pixels) generic paint programs or (for drawings) some widely available
+drawing editor, and that is suitable for input to text formatters or
+for automatic translation to a variety of formats suitable for input
+to text formatters.  A copy made in an otherwise Transparent file
+format whose markup, or absence of markup, has been arranged to thwart
+or discourage subsequent modification by readers is not Transparent.
+An image format is not Transparent if used for any substantial amount
+of text.  A copy that is not ``Transparent'' is called ``Opaque''.
+
+Examples of suitable formats for Transparent copies include plain
+ASCII without markup, Texinfo input format, La@TeX{} input
+format, SGML or XML using a publicly available
+DTD, and standard-conforming simple HTML,
+PostScript or PDF designed for human modification.  Examples
+of transparent image formats include PNG, XCF and
+JPG@.  Opaque formats include proprietary formats that can be
+read and edited only by proprietary word processors, SGML or
+XML for which the DTD and/or processing tools are
+not generally available, and the machine-generated HTML,
+PostScript or PDF produced by some word processors for
+output purposes only.
+
+The ``Title Page'' means, for a printed book, the title page itself,
+plus such following pages as are needed to hold, legibly, the material
+this License requires to appear in the title page.  For works in
+formats which do not have any title page as such, ``Title Page'' means
+the text near the most prominent appearance of the work's title,
+preceding the beginning of the body of the text.
+
+The ``publisher'' means any person or entity that distributes copies
+of the Document to the public.
+
+A section ``Entitled XYZ'' means a named subunit of the Document whose
+title either is precisely XYZ or contains XYZ in parentheses following
+text that translates XYZ in another language.  (Here XYZ stands for a
+specific section name mentioned below, such as ``Acknowledgements'',
+``Dedications'', ``Endorsements'', or ``History''.)  To ``Preserve the Title''
+of such a section when you modify the Document means that it remains a
+section ``Entitled XYZ'' according to this definition.
+
+The Document may include Warranty Disclaimers next to the notice which
+states that this License applies to the Document.  These Warranty
+Disclaimers are considered to be included by reference in this
+License, but only as regards disclaiming warranties: any other
+implication that these Warranty Disclaimers may have is void and has
+no effect on the meaning of this License.
+
+@item
+VERBATIM COPYING
+
+You may copy and distribute the Document in any medium, either
+commercially or noncommercially, provided that this License, the
+copyright notices, and the license notice saying this License applies
+to the Document are reproduced in all copies, and that you add no other
+conditions whatsoever to those of this License.  You may not use
+technical measures to obstruct or control the reading or further
+copying of the copies you make or distribute.  However, you may accept
+compensation in exchange for copies.  If you distribute a large enough
+number of copies you must also follow the conditions in section 3.
+
+You may also lend copies, under the same conditions stated above, and
+you may publicly display copies.
+
+@item
+COPYING IN QUANTITY
+
+If you publish printed copies (or copies in media that commonly have
+printed covers) of the Document, numbering more than 100, and the
+Document's license notice requires Cover Texts, you must enclose the
+copies in covers that carry, clearly and legibly, all these Cover
+Texts: Front-Cover Texts on the front cover, and Back-Cover Texts on
+the back cover.  Both covers must also clearly and legibly identify
+you as the publisher of these copies.  The front cover must present
+the full title with all words of the title equally prominent and
+visible.  You may add other material on the covers in addition.
+Copying with changes limited to the covers, as long as they preserve
+the title of the Document and satisfy these conditions, can be treated
+as verbatim copying in other respects.
+
+If the required texts for either cover are too voluminous to fit
+legibly, you should put the first ones listed (as many as fit
+reasonably) on the actual cover, and continue the rest onto adjacent
+pages.
+
+If you publish or distribute Opaque copies of the Document numbering
+more than 100, you must either include a machine-readable Transparent
+copy along with each Opaque copy, or state in or with each Opaque copy
+a computer-network location from which the general network-using
+public has access to download using public-standard network protocols
+a complete Transparent copy of the Document, free of added material.
+If you use the latter option, you must take reasonably prudent steps,
+when you begin distribution of Opaque copies in quantity, to ensure
+that this Transparent copy will remain thus accessible at the stated
+location until at least one year after the last time you distribute an
+Opaque copy (directly or through your agents or retailers) of that
+edition to the public.
+
+It is requested, but not required, that you contact the authors of the
+Document well before redistributing any large number of copies, to give
+them a chance to provide you with an updated version of the Document.
+
+@item
+MODIFICATIONS
+
+You may copy and distribute a Modified Version of the Document under
+the conditions of sections 2 and 3 above, provided that you release
+the Modified Version under precisely this License, with the Modified
+Version filling the role of the Document, thus licensing distribution
+and modification of the Modified Version to whoever possesses a copy
+of it.  In addition, you must do these things in the Modified Version:
+
+@enumerate A
+@item
+Use in the Title Page (and on the covers, if any) a title distinct
+from that of the Document, and from those of previous versions
+(which should, if there were any, be listed in the History section
+of the Document).  You may use the same title as a previous version
+if the original publisher of that version gives permission.
+
+@item
+List on the Title Page, as authors, one or more persons or entities
+responsible for authorship of the modifications in the Modified
+Version, together with at least five of the principal authors of the
+Document (all of its principal authors, if it has fewer than five),
+unless they release you from this requirement.
+
+@item
+State on the Title page the name of the publisher of the
+Modified Version, as the publisher.
+
+@item
+Preserve all the copyright notices of the Document.
+
+@item
+Add an appropriate copyright notice for your modifications
+adjacent to the other copyright notices.
+
+@item
+Include, immediately after the copyright notices, a license notice
+giving the public permission to use the Modified Version under the
+terms of this License, in the form shown in the Addendum below.
+
+@item
+Preserve in that license notice the full lists of Invariant Sections
+and required Cover Texts given in the Document's license notice.
+
+@item
+Include an unaltered copy of this License.
+
+@item
+Preserve the section Entitled ``History'', Preserve its Title, and add
+to it an item stating at least the title, year, new authors, and
+publisher of the Modified Version as given on the Title Page.  If
+there is no section Entitled ``History'' in the Document, create one
+stating the title, year, authors, and publisher of the Document as
+given on its Title Page, then add an item describing the Modified
+Version as stated in the previous sentence.
+
+@item
+Preserve the network location, if any, given in the Document for
+public access to a Transparent copy of the Document, and likewise
+the network locations given in the Document for previous versions
+it was based on.  These may be placed in the ``History'' section.
+You may omit a network location for a work that was published at
+least four years before the Document itself, or if the original
+publisher of the version it refers to gives permission.
+
+@item
+For any section Entitled ``Acknowledgements'' or ``Dedications'', Preserve
+the Title of the section, and preserve in the section all the
+substance and tone of each of the contributor acknowledgements and/or
+dedications given therein.
+
+@item
+Preserve all the Invariant Sections of the Document,
+unaltered in their text and in their titles.  Section numbers
+or the equivalent are not considered part of the section titles.
+
+@item
+Delete any section Entitled ``Endorsements''.  Such a section
+may not be included in the Modified Version.
+
+@item
+Do not retitle any existing section to be Entitled ``Endorsements'' or
+to conflict in title with any Invariant Section.
+
+@item
+Preserve any Warranty Disclaimers.
+@end enumerate
+
+If the Modified Version includes new front-matter sections or
+appendices that qualify as Secondary Sections and contain no material
+copied from the Document, you may at your option designate some or all
+of these sections as invariant.  To do this, add their titles to the
+list of Invariant Sections in the Modified Version's license notice.
+These titles must be distinct from any other section titles.
+
+You may add a section Entitled ``Endorsements'', provided it contains
+nothing but endorsements of your Modified Version by various
+parties---for example, statements of peer review or that the text has
+been approved by an organization as the authoritative definition of a
+standard.
+
+You may add a passage of up to five words as a Front-Cover Text, and a
+passage of up to 25 words as a Back-Cover Text, to the end of the list
+of Cover Texts in the Modified Version.  Only one passage of
+Front-Cover Text and one of Back-Cover Text may be added by (or
+through arrangements made by) any one entity.  If the Document already
+includes a cover text for the same cover, previously added by you or
+by arrangement made by the same entity you are acting on behalf of,
+you may not add another; but you may replace the old one, on explicit
+permission from the previous publisher that added the old one.
+
+The author(s) and publisher(s) of the Document do not by this License
+give permission to use their names for publicity for or to assert or
+imply endorsement of any Modified Version.
+
+@item
+COMBINING DOCUMENTS
+
+You may combine the Document with other documents released under this
+License, under the terms defined in section 4 above for modified
+versions, provided that you include in the combination all of the
+Invariant Sections of all of the original documents, unmodified, and
+list them all as Invariant Sections of your combined work in its
+license notice, and that you preserve all their Warranty Disclaimers.
+
+The combined work need only contain one copy of this License, and
+multiple identical Invariant Sections may be replaced with a single
+copy.  If there are multiple Invariant Sections with the same name but
+different contents, make the title of each such section unique by
+adding at the end of it, in parentheses, the name of the original
+author or publisher of that section if known, or else a unique number.
+Make the same adjustment to the section titles in the list of
+Invariant Sections in the license notice of the combined work.
+
+In the combination, you must combine any sections Entitled ``History''
+in the various original documents, forming one section Entitled
+``History''; likewise combine any sections Entitled ``Acknowledgements'',
+and any sections Entitled ``Dedications''.  You must delete all
+sections Entitled ``Endorsements.''
+
+@item
+COLLECTIONS OF DOCUMENTS
+
+You may make a collection consisting of the Document and other documents
+released under this License, and replace the individual copies of this
+License in the various documents with a single copy that is included in
+the collection, provided that you follow the rules of this License for
+verbatim copying of each of the documents in all other respects.
+
+You may extract a single document from such a collection, and distribute
+it individually under this License, provided you insert a copy of this
+License into the extracted document, and follow this License in all
+other respects regarding verbatim copying of that document.
+
+@item
+AGGREGATION WITH INDEPENDENT WORKS
+
+A compilation of the Document or its derivatives with other separate
+and independent documents or works, in or on a volume of a storage or
+distribution medium, is called an ``aggregate'' if the copyright
+resulting from the compilation is not used to limit the legal rights
+of the compilation's users beyond what the individual works permit.
+When the Document is included in an aggregate, this License does not
+apply to the other works in the aggregate which are not themselves
+derivative works of the Document.
+
+If the Cover Text requirement of section 3 is applicable to these
+copies of the Document, then if the Document is less than one half of
+the entire aggregate, the Document's Cover Texts may be placed on
+covers that bracket the Document within the aggregate, or the
+electronic equivalent of covers if the Document is in electronic form.
+Otherwise they must appear on printed covers that bracket the whole
+aggregate.
+
+@item
+TRANSLATION
+
+Translation is considered a kind of modification, so you may
+distribute translations of the Document under the terms of section 4.
+Replacing Invariant Sections with translations requires special
+permission from their copyright holders, but you may include
+translations of some or all Invariant Sections in addition to the
+original versions of these Invariant Sections.  You may include a
+translation of this License, and all the license notices in the
+Document, and any Warranty Disclaimers, provided that you also include
+the original English version of this License and the original versions
+of those notices and disclaimers.  In case of a disagreement between
+the translation and the original version of this License or a notice
+or disclaimer, the original version will prevail.
+
+If a section in the Document is Entitled ``Acknowledgements'',
+``Dedications'', or ``History'', the requirement (section 4) to Preserve
+its Title (section 1) will typically require changing the actual
+title.
+
+@item
+TERMINATION
+
+You may not copy, modify, sublicense, or distribute the Document
+except as expressly provided under this License.  Any attempt
+otherwise to copy, modify, sublicense, or distribute it is void, and
+will automatically terminate your rights under this License.
+
+However, if you cease all violation of this License, then your license
+from a particular copyright holder is reinstated (a) provisionally,
+unless and until the copyright holder explicitly and finally
+terminates your license, and (b) permanently, if the copyright holder
+fails to notify you of the violation by some reasonable means prior to
+60 days after the cessation.
+
+Moreover, your license from a particular copyright holder is
+reinstated permanently if the copyright holder notifies you of the
+violation by some reasonable means, this is the first time you have
+received notice of violation of this License (for any work) from that
+copyright holder, and you cure the violation prior to 30 days after
+your receipt of the notice.
+
+Termination of your rights under this section does not terminate the
+licenses of parties who have received copies or rights from you under
+this License.  If your rights have been terminated and not permanently
+reinstated, receipt of a copy of some or all of the same material does
+not give you any rights to use it.
+
+@item
+FUTURE REVISIONS OF THIS LICENSE
+
+The Free Software Foundation may publish new, revised versions
+of the GNU Free Documentation License from time to time.  Such new
+versions will be similar in spirit to the present version, but may
+differ in detail to address new problems or concerns.  See
+@uref{http://www.gnu.org/copyleft/}.
+
+Each version of the License is given a distinguishing version number.
+If the Document specifies that a particular numbered version of this
+License ``or any later version'' applies to it, you have the option of
+following the terms and conditions either of that specified version or
+of any later version that has been published (not as a draft) by the
+Free Software Foundation.  If the Document does not specify a version
+number of this License, you may choose any version ever published (not
+as a draft) by the Free Software Foundation.  If the Document
+specifies that a proxy can decide which future versions of this
+License can be used, that proxy's public statement of acceptance of a
+version permanently authorizes you to choose that version for the
+Document.
+
+@item
+RELICENSING
+
+``Massive Multiauthor Collaboration Site'' (or ``MMC Site'') means any
+World Wide Web server that publishes copyrightable works and also
+provides prominent facilities for anybody to edit those works.  A
+public wiki that anybody can edit is an example of such a server.  A
+``Massive Multiauthor Collaboration'' (or ``MMC'') contained in the
+site means any set of copyrightable works thus published on the MMC
+site.
+
+``CC-BY-SA'' means the Creative Commons Attribution-Share Alike 3.0
+license published by Creative Commons Corporation, a not-for-profit
+corporation with a principal place of business in San Francisco,
+California, as well as future copyleft versions of that license
+published by that same organization.
+
+``Incorporate'' means to publish or republish a Document, in whole or
+in part, as part of another Document.
+
+An MMC is ``eligible for relicensing'' if it is licensed under this
+License, and if all works that were first published under this License
+somewhere other than this MMC, and subsequently incorporated in whole
+or in part into the MMC, (1) had no cover texts or invariant sections,
+and (2) were thus incorporated prior to November 1, 2008.
+
+The operator of an MMC Site may republish an MMC contained in the site
+under CC-BY-SA on the same site at any time before August 1, 2009,
+provided the MMC is eligible for relicensing.
+
+@end enumerate
+
+@page
+@heading ADDENDUM: How to use this License for your documents
+
+To use this License in a document you have written, include a copy of
+the License in the document and put the following copyright and
+license notices just after the title page:
+
+@smallexample
+@group
+  Copyright (C)  @var{year}  @var{your name}.
+  Permission is granted to copy, distribute and/or modify this document
+  under the terms of the GNU Free Documentation License, Version 1.3
+  or any later version published by the Free Software Foundation;
+  with no Invariant Sections, no Front-Cover Texts, and no Back-Cover
+  Texts.  A copy of the license is included in the section entitled ``GNU
+  Free Documentation License''.
+@end group
+@end smallexample
+
+If you have Invariant Sections, Front-Cover Texts and Back-Cover Texts,
+replace the ``with@dots{}Texts.''@: line with this:
+
+@smallexample
+@group
+    with the Invariant Sections being @var{list their titles}, with
+    the Front-Cover Texts being @var{list}, and with the Back-Cover Texts
+    being @var{list}.
+@end group
+@end smallexample
+
+If you have Invariant Sections without Cover Texts, or some other
+combination of the three, merge those two alternatives to suit the
+situation.
+
+If your document contains nontrivial examples of program code, we
+recommend releasing these examples in parallel under your choice of
+free software license, such as the GNU General Public License,
+to permit their use in free software.
 
 @c --------------------------------------
 @node Concept Index,  , Reference Manual, Top

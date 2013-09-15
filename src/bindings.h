@@ -1,9 +1,28 @@
+/* This is file bindings.h.
+
+Copyright 2013 Louis Strous
+
+This file is part of LUX.
+
+LUX is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+LUX is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with LUX.  If not, see <http://www.gnu.org/licenses/>.
+*/
 #ifndef HAVE_BINDINGS_H
 #define HAVE_BINDINGS_H
 
 /* A number of binding functions that bind a particular C function
-   template to ANA and allow corresponding C functions to be quickly
-   mapped to corresponding ANA function/subroutines
+   template to LUX and allow corresponding C functions to be quickly
+   mapped to corresponding LUX function/subroutines
 */
 
 Int ana_d_dT4_iDaDarDq_0011_2_f_(Int narg, Int ps[], Double (*f)(Double, Double, Double, Double));

@@ -1,3 +1,11 @@
-Authors of ANA 5.0
-	ANA 5.0 is maintained by Louis Strous
-	It is a fork of an older version of ANA written by Richard A. Shine.
+The main author of this program is Louis Strous, currently a software
+engineer in Leiden, the Netherlands.  This program is a fork of the
+ANA program originally written by Richard A. Shine of the Lockheed
+Martin Solar & Astrophysics Laboratory (LMSAL) in Palo Alto,
+California.  Strous started using ANA in 1989, as a PhD student from
+Utrecht University in the Netherlands collaborating with LMSAL.
+Strous has improved it since 1990, also while working for the New
+Jersey Institute of Technology and the National Solar Observatory
+(1995 - 1998), and LMSAL (1998 - 2000).  The Strous and Shine versions
+of ANA drifted apart, especially after Strous moved back to the
+Netherlands at the end of 2000.

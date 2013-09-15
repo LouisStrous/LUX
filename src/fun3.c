@@ -1,5 +1,24 @@
+/* This is file fun3.c.
+
+Copyright 2013 Louis Strous, Richard Shine
+
+This file is part of LUX.
+
+LUX is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+LUX is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with LUX.  If not, see <http://www.gnu.org/licenses/>.
+*/
 /* File fun3.c */
-/* Various ANA functions. */
+/* Various LUX functions. */
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -43,7 +62,7 @@ Int evalString(char *expr, Int nmax)
 /* If instead of a second argument the keyword /ALLNUMBER is specified, */
 /* then all numbers are read from the string and put in an array. */
 /* All read numbers have no letter immediately preceding them.  Minus signs */
-/* are honored.  All valid ANA number styles are supported (including */
+/* are honored.  All valid LUX number styles are supported (including */
 /* type and base specifications, and fractional and exponentiated numbers). */
 /* If numbers are read, then any non-number is ignored. */
 /* LS 2may96 */
@@ -108,7 +127,7 @@ Int evalString(char *expr, Int nmax)
    return result;
  }
  /* If we get here then we're interpreting the complete line as an */
- /* ANA expression */
+ /* LUX expression */
  allocate(text, strlen(expr) + 7, char);
  strcpy(text, "!TEMP=");	/* we assign the evaluation result to !TEMP */
  strcat(text, expr);
@@ -3272,7 +3291,7 @@ Int cubic_spline_tables(void *xx, Int xType, Int xStep,
 			Int nPoints, Byte periodic, Byte akima,
 			csplineInfo *cspl)
 /* installs a cubic spline for later quick multiple interpolations */
-/* <xx> must point to the x coordinates, which are of ANA data type <xType> */
+/* <xx> must point to the x coordinates, which are of LUX data type <xType> */
 /* Each next <xStep>th element is taken.  Likewise for <yy>, <yType>, */
 /* and <yStep>.  <nPoints> is the number of data points that are installed. */
 /* The <xx> must be in ascending order!  If <periodic> is set, then

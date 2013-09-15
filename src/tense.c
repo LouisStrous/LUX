@@ -1,5 +1,24 @@
+/* This is file tense.c.
+
+Copyright 2013 Louis Strous, Richard Shine
+
+This file is part of LUX.
+
+LUX is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+LUX is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with LUX.  If not, see <http://www.gnu.org/licenses/>.
+*/
 /* File tense.c */
-/* ANA routines for interpolation along curves. */
+/* LUX routines for interpolation along curves. */
 /* tense.f -- translated by f2c (version of 28 March 1990  0:01:01). */
 
 #ifdef HAVE_CONFIG_H
@@ -8,8 +27,6 @@
 #include <math.h>
 #include "anadefs.h"
 #include "output.h"
-static char rcsid[] __attribute__ ((unused)) =
- "$Id: tense.c,v 4.0 2001/02/07 20:37:08 strous Exp $";
 
 Int curv1_(Int *n, Double *x, Double *y, Double *slp1, Double *slpn,
 	   Double *yp, Double *temp, Double *sigma, Double *xf, Double *yf,

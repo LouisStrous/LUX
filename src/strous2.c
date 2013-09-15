@@ -1,5 +1,24 @@
+/* This is file strous2.c.
+
+Copyright 2013 Louis Strous
+
+This file is part of LUX.
+
+LUX is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+LUX is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with LUX.  If not, see <http://www.gnu.org/licenses/>.
+*/
 /* File strous2.c */
-/* Various ANA routines by L. Strous. */
+/* Various LUX routines by L. Strous. */
 #if HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -11,8 +30,6 @@
 #include <float.h>
 #include "action.h"
 #include <unistd.h>		/* for sbrk() */
-static char rcsid[] __attribute__ ((unused)) =
- "$Id: strous2.c,v 4.0 2001/02/07 20:37:04 strous Exp $";
 
 Int	minmax(Int *, Int, Int), ana_convert(Int, Int [], Int, Int),
   copySym(Int), f_decomp(Float *, Int, Int), copyToSym(Int, Int),
@@ -1754,7 +1771,7 @@ Int ana_swaphalf(Int narg, Int ps[])
 /* related to old coordinate x_i according to */
 /* x_i' = (x_i + n_i/2) mod n_i  where n_i is the size of <d> in */
 /* dimension i.  Such swapping is useful in conjunction with */
-/* Fourier and Hartley transforms which (at least in ANA) return */
+/* Fourier and Hartley transforms which (at least in LUX) return */
 /* data such that wavevector 0 ends up in result element 0.  After */
 /* swapping with SWAPHALF, wavevector 0 is in the middle of the */
 /* array (at coordinates n_i/2) and the length of any wavevector */

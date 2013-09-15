@@ -1,3 +1,22 @@
+/* This is file anadefs.h.
+
+Copyright 2013 Louis Strous
+
+This file is part of LUX.
+
+LUX is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+LUX is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with LUX.  If not, see <http://www.gnu.org/licenses/>.
+*/
 #ifndef anaparser_h
 #define anaparser_h
 
@@ -214,7 +233,7 @@ enum binaryOps {
 #define FILE_TYPE_ANA_FZ	1 /* ana fz file */
 #define FILE_TYPE_IDL_SAVE	2 /* IDL Save file */
 #define FILE_TYPE_GIF		3 /* GIF file */
-#define FILE_TYPE_ANA_ASTORE	4 /* ANA ASTORE file */
+#define FILE_TYPE_ANA_ASTORE	4 /* LUX ASTORE file */
 #define FILE_TYPE_JPEG		5 /* JPEG file */
 #define FILE_TYPE_TIFF		6 /* TIFF file */
 #define FILE_TYPE_FITS		7 /* FITS file */

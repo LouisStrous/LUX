@@ -6,6 +6,8 @@ Makefile
 Makefile.in
 TAGS
 ana
+anaparser.c
+anaparser.h
 libana.a
 maybe-GITID
 version.h

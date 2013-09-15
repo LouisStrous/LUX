@@ -1,3 +1,22 @@
+/* This is file zoom.c.
+
+Copyright 2013 Louis Strous
+
+This file is part of LUX.
+
+LUX is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+LUX is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with LUX.  If not, see <http://www.gnu.org/licenses/>.
+*/
 /* File zoom.c */
 /* Image browser by L. Strous */
 #ifdef HAVE_CONFIG_H
@@ -9,9 +28,6 @@
 #include <math.h>
 #include "install.h"
 #include "action.h"
-static char rcsid[] __attribute__ ((unused)) =
- "$Id: zoom.c,v 4.0 2001/02/07 20:37:08 strous Exp $";
-
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>
@@ -308,7 +324,7 @@ Int ana_zoom(Int narg, Int ps[])
       }
 
       if (event.xany.window) {
-	if (event.xany.window == win[wid]) { /* current ANA window */
+	if (event.xany.window == win[wid]) { /* current LUX window */
 	  switch (event.type) {
 	    case MotionNotify:	/* pointer movement */
 	      /* remove all pointer motion events - we really only want the */

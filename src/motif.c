@@ -1,4 +1,22 @@
-/* file motif.c */
+/* This is file motif.c.
+
+Copyright 2013 Louis Strous, Richard Shine
+
+This file is part of LUX.
+
+LUX is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+LUX is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with LUX.  If not, see <http://www.gnu.org/licenses/>.
+*/
  /* ana interface for using motif widgets, the general plan is that most
  ana widgets will be dialogs that are children of a top level shell that
  contains a button to interrupt motif (to allow normal command entry).
@@ -3609,7 +3627,7 @@ Int ana_xmdestroy(narg, ps)
  }
  /*------------------------------------------------------------------------- */
 Int ana_xmset_text_output(narg, ps) /* assigns a widget text_output */
- /* this takes an already defined widget number in the ANA environment and
+ /* this takes an already defined widget number in the LUX environment and
  assigns it to the text_output widget used by wprint */
  Int     narg, ps[];
  {

@@ -1,3 +1,22 @@
+/* This is file install.c.
+
+Copyright 2013 Louis Strous, Richard Shine
+
+This file is part of LUX.
+
+LUX is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+LUX is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with LUX.  If not, see <http://www.gnu.org/licenses/>.
+*/
 /* File install.c */
 #if HAVE_CONFIG_H
 #include "config.h"
@@ -24,8 +43,6 @@
 
 #include "editorcharclass.h"
 #include "action.h"
-static char rcsid[] __attribute__ ((unused)) =
-"$Id: install.c,v 4.3 2001/02/09 23:11:56 strous Exp $";
 
 extern char		*symbolStack[];
 extern symTableEntry	sym[];
@@ -3163,14 +3180,14 @@ void exception(Int sig)
 	   c = IGNORE_SIG;
 	   break;
 	 case 'a': case 'A':
-	   Quit(1);		/* exit ANA completely */
+	   Quit(1);		/* exit LUX completely */
 	 case 'r': case 'R':
 	   saveHistory();
 	   ana_restart(0, NULL);
 	 case '?':
 	   printw("Options:  y - yes, quit;  t - start tracing;  ");
 	   printw("s - start stepping;  q - run quietly (no tracing or ");
-	   printw("stepping);  a - abort ANA;  r - restat ANA; ");
+	   printw("stepping);  a - abort LUX;  r - restat LUX; ");
 	   printw("? - show options.");
 	   break; }
      } while (c == '?');
@@ -3188,7 +3205,7 @@ void exception(Int sig)
      c = SIG_BREAK;
      break;
    case SIGCONT:
-     puts("Continuing ANA...");
+     puts("Continuing LUX...");
      rawIo();
      c = SIG_BREAK;
      break;
@@ -3350,7 +3367,7 @@ char *filetypeName(Int filetype)
 /* returns the name associated with a file type */
 {
   static char *filetypeNames[] = {
-    "Unknown", "ANA fz", "IDL Save", "GIF", "ANA Astore", "JPEG", "TIFF",
+    "Unknown", "LUX fz", "IDL Save", "GIF", "LUX Astore", "JPEG", "TIFF",
     "FITS", "PPM (raw)", "PPM (ascii)", "XPM", "X11 bitmap", "BMP",
     "Sun raster", "Iris RGB", "Targa (24 bit)", "PM"
   };
@@ -3898,7 +3915,7 @@ void convertScalar(scalar *target, Int nsym, Int type)
 }
 /*----------------------------------------------------------------*/
 Int ana_symbol_memory()
-/* returns the total of the memory allocated for each ANA symbol */
+/* returns the total of the memory allocated for each LUX symbol */
 /* - which is NOT the same as the total allocated memory. */
 /* Note:  some small stuff is not included. */
 {
@@ -4908,7 +4925,7 @@ Int ana_restart(Int narg, Int ps[])
   extern char	*programName;
   Int	saveHistory(void);
 
-  printf("\nRestarting ANA...\n\n");
+  printf("\nRestarting LUX...\n\n");
   saveHistory();
   execl(programName, programName, NULL);
   return 1;
@@ -5151,7 +5168,7 @@ Int ana_struct(Int narg, Int ps[])
 /*----------------------------------------------------------------*/
 Int ana_buffering(Int narg, Int ps[])
 /* BUFFERING [, <type>, /LINE, /CHAR ]
- shows or sets the kind of input buffering for ANA.
+ shows or sets the kind of input buffering for LUX.
  no arguments -> show current setting
  <type> == 2 or /PIPE -> by line & no prompts
  <type> == 1 or /LINE -> by line
@@ -5260,7 +5277,7 @@ Int installString(char *string)
 /*----------------------------------------------------------------*/
 /* we undefine malloc to ensure we pick up the regular version.
  memory allocated in installKeys() is not associated with any particular
- ANA symbol and would otherwise show up as an error in checkList.
+ LUX symbol and would otherwise show up as an error in checkList.
  LS 21sep98 */
 #undef malloc
 void installKeys(void *keys)

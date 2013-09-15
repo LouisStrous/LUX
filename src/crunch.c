@@ -1,3 +1,22 @@
+/* This is file crunch.c.
+
+Copyright 2013 Louis Strous, Richard Shine
+
+This file is part of LUX.
+
+LUX is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+LUX is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with LUX.  If not, see <http://www.gnu.org/licenses/>.
+*/
 /* crunch.c, begun 12/6/91 using fragments from earlier modules */
 #if HAVE_CONFIG_H
 #include "config.h"
@@ -117,7 +136,7 @@ Int docrunch(Int narg, Int ps[], Int showerror)/* crunch subroutine */
     iq = anacrunch32(q2.b, q1.l, slice, nx, outer, limit);
     break;
 #else
-    puts("32-bit compression was not compiled into your version of ANA.");
+    puts("32-bit compression was not compiled into your version of LUX.");
     iq = ANA_ERROR;
 #endif
   default:
@@ -203,7 +222,7 @@ Int ana_decrunch(Int narg, Int ps[])		/* decrunch subroutine */
     iq = anadecrunch32(q1.b, q2.l, slice, nx, outer);
     break;
 #else
-    puts("32-bit decompression was not compiled into your version of ANA.");
+    puts("32-bit decompression was not compiled into your version of LUX.");
     iq = ANA_ERROR;
 #endif
   default:

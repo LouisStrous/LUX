@@ -1,5 +1,24 @@
+/* This is file rawio.c.
+
+Copyright 2013 Louis Strous
+
+This file is part of LUX.
+
+LUX is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+LUX is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with LUX.  If not, see <http://www.gnu.org/licenses/>.
+*/
 /* File rawio.c */
-/* ANA routines for (de)selecting raw keyboard input. */
+/* LUX routines for (de)selecting raw keyboard input. */
 /* Author: Louis Strous */
 #if HAVE_CONFIG_H
 #include "config.h"
@@ -9,9 +28,6 @@
 #include <termios.h>		/* for struct termios, tcgetattr(), */
 				/* tcsetattr() */
 #include <unistd.h>
-
-static char rcsid[] __attribute__ ((unused)) =
- "$Id: rawio.c,v 4.0 2001/02/07 20:37:04 strous Exp $";
 
 Int	buffering = 1;
 static struct termios	entry_io_params; /* to save entry state */

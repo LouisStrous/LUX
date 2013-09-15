@@ -1,5 +1,24 @@
+/* This is file error.c.
+
+Copyright 2013 Louis Strous
+
+This file is part of LUX.
+
+LUX is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+LUX is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with LUX.  If not, see <http://www.gnu.org/licenses/>.
+*/
 /* File error.c */
-/* ANA routines for generating error messages. */
+/* LUX routines for generating error messages. */
 /* error.c - error messages */
 
 #if HAVE_CONFIG_H
@@ -9,8 +28,6 @@
 #include <string.h>
 #include <stdarg.h>
 #include "action.h"
-static char rcsid[] __attribute__ ((unused)) =
- "$Id: error.c,v 4.0 2001/02/07 20:36:59 strous Exp $";
 
 char	*errorMessages[] = {
 /* COND_NO_SCAL    0*/
@@ -225,7 +242,7 @@ char	*errorMessages[] = {
  "Need a real scalar or array here",
 #ifndef X11
 /* NO_X11 100 */
- "Sorry, this version of ANA was compiled without X Window support",
+ "Sorry, this version of LUX was compiled without X Window support",
 #endif
  "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""
  /* NEED_BYTE 118 */

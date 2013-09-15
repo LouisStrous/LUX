@@ -17,4 +17,9 @@
 # You should have received a copy of the GNU General Public License
 # along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 
-SUBDIRS = src
+info_TEXINFOS = ana.texi
+
+# makeinfo 5.1 has a bug in that it does not accept arguments greater
+# than 9 for @enumerate, but ana.texi uses such enumerations.  Until
+# that bug has been fixed, we ignore the error messages.
+MAKEINFOFLAGS = --force

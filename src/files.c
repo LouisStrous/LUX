@@ -1,9 +1,28 @@
-/* File files.c */
-/* ANA routines dealing with file and terminal I/O. */
+/* This is file files.c.
 
-/* ANA FZ file format:
+Copyright 2013 Louis Strous, Richard Shine
+
+This file is part of LUX.
+
+LUX is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+LUX is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with LUX.  If not, see <http://www.gnu.org/licenses/>.
+*/
+/* File files.c */
+/* LUX routines dealing with file and terminal I/O. */
+
+/* LUX FZ file format:
   Byte     description
-   0-3     .synch_pattern: magic number that identifies ANA FZ files
+   0-3     .synch_pattern: magic number that identifies LUX FZ files
            The value 0x5555aaaa is always written as an Int, but it depends
 	   on the Byte order of the machine whether Byte 0 becomes 0x55
 	   (MSB) or 0xaa (LSB).  This can therefore be used to check on
@@ -75,9 +94,6 @@
 
 #define FMT_INSTALL	1
 #define FMT_CLEANUP	2
-
-static char rcsid[] __attribute__ ((unused)) =
- "$Id: files.c,v 4.0 2001/02/07 20:37:00 strous Exp $";
 
 extern	Int	noioctl, iformat, fformat, sformat, cformat, tformat,
   noTrace;
@@ -648,7 +664,7 @@ Int ana_format_set(Int narg, Int ps[])
      [anything] % [digits] [.] [digits] {one of diouxXeEfgGsz} 
     d,i,o,u,x,X-types are put in !format_i; e,E,f,g,G-types in !format_f,
     s-type in !format_s, and z-type in !format_c
-    If no arguments to ANA call, then set to default values
+    If no arguments to LUX call, then set to default values
     LS 13jul92  16nov98 */
 /* Headers:
    <string.h>: strlen(), strcat(), strcpy()
@@ -1941,7 +1957,7 @@ Int open_file(Int narg, Int ps[], char *access, char function)
 }
 /*------------------------------------------------------------------------- */
 Int ana_openr_f(Int narg, Int ps[])/* openr subroutine */
- /* intended mainly for reading ASCII files in old ANA, but may be useful
+ /* intended mainly for reading ASCII files in old LUX, but may be useful
  for streams in general for UNIX version */
  /* associates a file (or a stream) with a lun */
  /* function version supporting environment variables LS 7jul92 */
@@ -1962,7 +1978,7 @@ Int ana_openu_f(Int narg, Int ps[])/* openu subroutine */
 }
 /*------------------------------------------------------------------------- */
 Int ana_openr(Int narg, Int ps[])/* openr subroutine */		
-/* intended mainly for reading ASCII files in old ANA, but may be useful
+/* intended mainly for reading ASCII files in old LUX, but may be useful
    for streams in general for UNIX version */
 /* associates a file (or a stream) with a lun */
 {
@@ -2360,13 +2376,13 @@ Int read_formatted_ascii(Int narg, Int ps[], void *ptr, Int showerrors,
    <showerrors> is unequal to zero are error messages displayed as well. */
 /* the format string is as in C, but with the following exceptions: */
 /* 1. C-formats %p and %n are not supported.
-   2. ANA format %20S (not available in C) reads the next 20 characters
-      up to a newline, whereas ANA and C format %s reads the next
+   2. LUX format %20S (not available in C) reads the next 20 characters
+      up to a newline, whereas LUX and C format %s reads the next
       20 characters up to a whitespace.
-   3. ANA formats %t and %T read numbers in sexagesimal (base-60) notation,
+   3. LUX formats %t and %T read numbers in sexagesimal (base-60) notation,
       for example hours-minutes-seconds.
-   4. ANA format %z reads a complex number
-   5. ANA postfix 6# indicates that the preceding format must be used
+   4. LUX format %z reads a complex number
+   5. LUX postfix 6# indicates that the preceding format must be used
       6 times and the result stored in an array (if not suppressed). */
 /* Headers:
    <stdio.h>: FILE, stdin, sprintf()
@@ -3364,7 +3380,7 @@ Int fzread(Int narg, Int ps[], Int flag) /* fzread subroutine */
 #if SIZEOF_LONG_LONG_INT == 8	/* 64-bit integers */
 	iq = anadecrunch32((Byte *) p, q1.l, sbit, ch.bsize, ch.nblocks);
 #else
-	puts("32-bit decompression was not compiled into your version of ANA");
+	puts("32-bit decompression was not compiled into your version of LUX");
 	iq = ANA_ERROR;
 #endif
 	break;
@@ -4681,7 +4697,7 @@ Int ana_findfile(Int narg, Int ps[])
   if (pq == NULL)
     return ANA_ZERO;		/* return symbol for 0 */
   /* NOTE: LHS changed "return 0" to "return ANA_ZERO" above because 0 should
-     not be used as a return value in LHS ANA. */
+     not be used as a return value in LHS LUX. */
   ns = strlen(pq);
   result_sym = string_scratch(ns);
   strcpy(string_value(result_sym), pq);
@@ -5076,11 +5092,11 @@ Int ana_identify_file(Int narg, Int ps[])
       if (buf[1] == 166 && buf[2] == 106 && buf[3] == 149)
 	type = FILE_TYPE_SUN_RAS;
       break;
-    case 102:			/* ANA astore file? */
+    case 102:			/* LUX astore file? */
       if (buf[1] == 102 && buf[2] == 170 && buf[3] == 170)
 	type = FILE_TYPE_ANA_ASTORE;
       break;
-    case 170:			/* ANA fz? */
+    case 170:			/* LUX fz? */
       if (buf[1] == 170 && buf[2] == 85 && buf[3] == 85)
 	type = FILE_TYPE_ANA_FZ;
       break;
@@ -5634,7 +5650,7 @@ Int	anadecrunchrun8(Byte [], Byte [], Int, Int, Int),
   anadecrunch32(Byte *, Int [], Int, Int, Int);
 Int fits_read_compressed(Int mode, Int datasym, FILE *fp, Int headersym,
 			 Float targetblank)
-/* reads data from an ANA Rice-compressed FITS file open on <fp>. */
+/* reads data from an LUX Rice-compressed FITS file open on <fp>. */
 /* <mode> determines which data to return: &1 -> header in <headersym>; */
 /* &2 -> data in <datasym>. */
 /* LS 18nov99 */
@@ -5652,7 +5668,7 @@ Int fits_read_compressed(Int mode, Int datasym, FILE *fp, Int headersym,
 
   /* header structure:
 
-     SIMPLE  =                    T / ANA Rice compressed
+     SIMPLE  =                    T / LUX Rice compressed
      BITPIX  =                    8
      NAXIS   =                    1
      NAXIS1  =               217750
@@ -5912,12 +5928,12 @@ Int fits_read_compressed(Int mode, Int datasym, FILE *fp, Int headersym,
 	  if (runlength) {
 	    if (!usescrat)
 	      free(block);
-	    puts("32-bit run-length decompression was not compiled into this version of ANA.");
+	    puts("32-bit run-length decompression was not compiled into this version of LUX.");
 	    return 0;
 	  } else
 	    ok = anadecrunch32(p.b, array_data(datasym), slice, nx, ny);
 #else
-	  puts("32-bit decompression was not compiled into this version of ANA.");
+	  puts("32-bit decompression was not compiled into this version of LUX.");
 	  if (!usescrat)
 	    free(block);
 	  return 0;
@@ -6737,7 +6753,7 @@ Int ana_fits_write_general(Int narg, Int ps[], Int func)
 	size = anacrunch32(out, data, slice, nx, ny, limit);
 	break;
 #else
-	puts("WARNING - no 32-bit compression was compiled into this version of ANA.\nWriting uncompressed data instead.");
+	puts("WARNING - no 32-bit compression was compiled into this version of LUX.\nWriting uncompressed data instead.");
 #endif
       default:			/* no compression */
 	free(out);
@@ -6762,7 +6778,7 @@ Int ana_fits_write_general(Int narg, Int ps[], Int func)
   nlines = 0;
   if (slice) {			/* we did compress */
     fprintf(fp, "%-8.8s= %20s / %-47s", "SIMPLE", "T",
-	    "ANA Rice compressed");
+	    "LUX Rice compressed");
     nlines++;
     fprintf(fp, "%-8.8s= %20d%50s", "BITPIX", 8, "");
     nlines++;
@@ -6789,7 +6805,7 @@ Int ana_fits_write_general(Int narg, Int ps[], Int func)
   } /* end of if (size != -1) */
   else {			/* we did not compress */
     fprintf(fp, "%-8.8s= %20s / %-47s", "SIMPLE", "T",
-	    "ANA-generated file");
+	    "LUX-generated file");
     nlines++;
     fprintf(fp, "%-8.8s= %20d%50s", "BITPIX", bitpix[type], "");
     nlines++;

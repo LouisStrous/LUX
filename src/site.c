@@ -1,5 +1,24 @@
+/* This is file site.c.
+
+Copyright 2013 Louis Strous
+
+This file is part of LUX.
+
+LUX is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+LUX is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with LUX.  If not, see <http://www.gnu.org/licenses/>.
+*/
 /* File site.c */
-/* ANA site and version identification routine. */
+/* LUX site and version identification routine. */
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -47,7 +66,7 @@ Int site(Int narg, Int ps[])
     printw("*** Welcome to " PACKAGE_STRING " (" GIT_VERSION ")\n");
     printw("Type \"HELP\" for assistance.\n");
 #if DEBUG
-    printw("Warning: This version of ANA was compiled with the DEBUG option - This may make the program very slow!\n");
+    printw("Warning: This version of LUX was compiled with the DEBUG option - This may make the program very slow!\n");
 #endif
   }
 
@@ -67,32 +86,32 @@ Int site(Int narg, Int ps[])
 	   "the name of the author of the modified parts.\n");
   if (internalMode & 64)	/* /BUGS */
     printw("****BUGS\n"
-	   "If you think you have found a bug in ANA, then please act as follows:\n"
+	   "If you think you have found a bug in LUX, then please act as follows:\n"
 	   "1. Ensure that you have really found a bug, i.e. some part "
-	   "of ANA is not behaving as advertised in the manual, or causes "
+	   "of LUX is not behaving as advertised in the manual, or causes "
 	   "fatal errors.\n"
-	   "2. If you don't have the latest version of ANA, then obtain "
+	   "2. If you don't have the latest version of LUX, then obtain "
 	   "the latest version from your original source or from the "
 	   "original authors (http://ana.lmsal.com), and check that the same"
 	   "bug is present in the latest version, too.\n"
-	   "3. Write a short ANA program that reproduces the bug.  The "
+	   "3. Write a short LUX program that reproduces the bug.  The "
 	   "shorter the program is, the easier it is to fix the bug.\n"
-	   "4. Send a description of the bug, a copy of your ANA program "
-	   "(i.e., code written in the ANA language) that reproduces it,"
+	   "4. Send a description of the bug, a copy of your LUX program "
+	   "(i.e., code written in the LUX language) that reproduces it,"
 	   " and the information about "
-	   "your version of ANA (displayed when ANA is started) "
+	   "your version of LUX (displayed when LUX is started) "
 	   "to the author of the malfunctioning part "
-	   "of ANA, or to the original authors.  If you have a suggestion "
+	   "of LUX, or to the original authors.  If you have a suggestion "
 	   "how the bug may be fixed, then send that, too.\n\n"
-	   "Useful additions to ANA (written either in C source code, or "
-	   "in the ANA language) may also be directed to the original "
-	   "authors of ANA for incorporation in future releases, at "
-	   "their discretion, under the same rules as this version of ANA.\n\n"
-	   "NOTE that the authors of ANA do not guarantee fixing any bugs "
+	   "Useful additions to LUX (written either in C source code, or "
+	   "in the LUX language) may also be directed to the original "
+	   "authors of LUX for incorporation in future releases, at "
+	   "their discretion, under the same rules as this version of LUX.\n\n"
+	   "NOTE that the authors of LUX do not guarantee fixing any bugs "
 	   "(see INFO,/WARRANTY).  The speed of their reply (if any) "
 	   "depends on their mood, and on how much time they have "
 	   "available.\n\n"
-	   "You can reach the authors of ANA at email address"
+	   "You can reach the authors of LUX at email address"
 	   " ana@lmsal.com\n\n");
 #ifdef __STDC__
   if (internalMode & 2) {	/* /TIME */

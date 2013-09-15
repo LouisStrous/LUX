@@ -1,3 +1,22 @@
+/* This is file ephem.c.
+
+Copyright 2013 Louis Strous, Richard Shine
+
+This file is part of LUX.
+
+LUX is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+LUX is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with LUX.  If not, see <http://www.gnu.org/licenses/>.
+*/
 /* file ephem, solar ephemeris routines */
 /* 10/23/97 - add Rick Bogart's timerep stuff, not fully used yet */
 #ifdef HAVE_CONFIG_H
@@ -7,8 +26,6 @@
 #include<string.h>
 #include <math.h>
 #include "action.h"
-static char rcsid[] __attribute__ ((unused)) =
- "$Id: ephem.c,v 4.0 2001/02/07 20:36:58 strous Exp $";
 
  typedef Double TIME;
  static	Int	m[]  =  {31,28,31,30,31,30,31,31,30,31,30,31};

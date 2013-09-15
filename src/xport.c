@@ -1,5 +1,24 @@
+/* This is file xport.c.
+
+Copyright 2013 Louis Strous, Richard Shine
+
+This file is part of LUX.
+
+LUX is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+LUX is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with LUX.  If not, see <http://www.gnu.org/licenses/>.
+*/
 /* File xport.c */
-/* ANA routines dealing with (X window) data windows. */
+/* LUX routines dealing with (X window) data windows. */
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -20,9 +39,6 @@
 #include "action.h"
  /*following is icon bitmap */
 #include "ana_bitmap.h"
-
-static char rcsid[] __attribute__ ((unused)) =
- "$Id: xport.c,v 4.1 2001/02/09 22:05:03 strous Exp $";
 
 #define BITMAPDEPTH     1
 #define TOO_SMALL       0
@@ -215,10 +231,10 @@ void xsynchronize(Int status)
      /* synchronization.  If set, all X events are treated in the order */
      /* in which the commands are specified.  If reset, then X events */
      /* are treated in the most efficient order -- in this case, error */
-     /* messages may appear a while after the ANA command that generates */
+     /* messages may appear a while after the LUX command that generates */
      /* them has (apparently) finished, but the overall execution */
      /* of X window commands is much faster. */
-     /* if you want to find out which ANA command generates an X window */
+     /* if you want to find out which LUX command generates an X window */
      /* error, then set this synchronization. */
 {
   if (setup_x() == ANA_ERROR)	/* make sure we're connected */
@@ -497,10 +513,10 @@ Int ck_window(Int wid)
 Int ck_events(void)         /* checks events for focus and size changes */
  /* updates the last_wid and any window sizes */
  /* will also change last_win to a window with a button or key pressed even
- if focus not changed; i.e., ANA's focus for a plot or tv can be changed
+ if focus not changed; i.e., LUX's focus for a plot or tv can be changed
  without changing the X focus
- also note that the ANA "focus" will always be the last ANA window and ignores
- other windows including the xterm (or whatever) that ANA is running in */
+ also note that the LUX "focus" will always be the last LUX window and ignores
+ other windows including the xterm (or whatever) that LUX is running in */
 {
    XEvent  report;
    Int     nev, i, j, iq;
@@ -544,7 +560,7 @@ Int ck_events(void)         /* checks events for focus and size changes */
        wq = 0;
        break;
      }
-     /* which ANA window ? */
+     /* which LUX window ? */
      if (wq != 0) {
        iq = -1;
        for (j=0;j<MAXWINDOWS;j++) {
@@ -553,9 +569,9 @@ Int ck_events(void)         /* checks events for focus and size changes */
 	   break;
 	 }
        }
-       if (iq == -1)		/* probably clicked in ANA menu    LS 1jun93 */
+       if (iq == -1)		/* probably clicked in LUX menu    LS 1jun93 */
 	 XPutBackEvent(display, &report);	/* save for later */
-       else {				/* clicked in ANA window */
+       else {				/* clicked in LUX window */
 	 if (report.type == ConfigureNotify) {
 	   wd[iq] = report.xconfigure.width;
 	   ht[iq] = report.xconfigure.height;
@@ -1153,7 +1169,7 @@ Int ana_xtv_general(Int narg, Int ps[], Int mode)
 /*------------------------------------------------------------------------*/
 Int ana_xtvraw(Int narg, Int ps[])
 /* scales non-ANA_BYTE arrays; displays on screen */
-/* NOTE: in older versions of ANA the coordinates of the image were
+/* NOTE: in older versions of LUX the coordinates of the image were
  counted from the upper left-hand corner of the screen, and the
  position specified for the image was that of the upper left-hand
  corner of the image.  We have now changed that so that the
@@ -3019,12 +3035,12 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
     XFlush(display);
     iq = ANA_OK;
   } else {			/* to postscript */
-    /* in older versions of ANA, when DVI coordinates were used to specify */
+    /* in older versions of LUX, when DVI coordinates were used to specify */
     /* positions in a postscript figure, they were exported to the file */
     /* without any additional transformations.  This meant that if the */
-    /* ANA window whose contents you were trying to copy to a postscript */
+    /* LUX window whose contents you were trying to copy to a postscript */
     /* file was not square, then the postscript figure would have an aspect */
-    /* ratio different from what you saw in the ANA window, and if you */
+    /* ratio different from what you saw in the LUX window, and if you */
     /* tried to combine images with lines, then the images would retain */
     /* their original aspect ratio while the line objects did not.  Here */
     /* we try to work things so that you get the same aspect ratio on */
@@ -3418,7 +3434,7 @@ Int ana_xplace(Int narg, Int ps[])
  if (ck_events() != ANA_OK)
    return ANA_ERROR;
 	/* wait for a button or key press */
-	/* changed to a loop because may catch event for an ANA menu */
+	/* changed to a loop because may catch event for an LUX menu */
 	/* LS 10jun93 */
  do {
    XMaskEvent(display, KeyPressMask | ButtonPressMask, &report);
@@ -3747,7 +3763,7 @@ Int xquery(Int narg, Int ps[])
 }
 /*------------------------------------------------------------------------*/
 Bool windowButtonPress(Display *display, XEvent *event, XPointer arg)
-/* returns True if the event is a ButtonPress in an ANA window,
+/* returns True if the event is a ButtonPress in an LUX window,
    False otherwise */
 {
   Int	i, num;

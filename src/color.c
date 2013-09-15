@@ -1,4 +1,22 @@
-/* This is file color.c which is part of the source code of ANA */
+/* This is file color.c.
+
+Copyright 2013 Louis Strous
+
+This file is part of LUX.
+
+LUX is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+LUX is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with LUX.  If not, see <http://www.gnu.org/licenses/>.
+*/
 /* This file contains routines dealing with X11 color maps and visuals. */
 /* Started 12 March 1999 by Louis Strous */
 #ifdef HAVE_CONFIG_H
@@ -50,9 +68,9 @@ Status	anaAllocNamedColor(char *, XColor **);
   <display_width>: the width (in pixels) of the display 
   <display_height>: the height (in pixels) of the display 
   <colorMap>: the current color map 
-  <colors>:   the colors allocated by ANA 
-  <nColorCells>: the total number of color cells currently allocated by ANA 
-  <nColors>:  the number of color cells assigned to ANA's color ramp
+  <colors>:   the colors allocated by LUX 
+  <nColorCells>: the total number of color cells currently allocated by LUX 
+  <nColors>:  the number of color cells assigned to LUX's color ramp
   <pixels>:   the pixel values corresponding to the allocated colors 
   <black_pixel>: the pixel value corresponding to black 
   <white_pixel>: the pixel value corresponding to white 
@@ -72,12 +90,12 @@ Status	anaAllocNamedColor(char *, XColor **);
   of our own channels, and they might then not be satisfied.
 
   Our desires are as follows: to allocate at least 64 color cells for
-  ANA's color ramp, and to have at least 32 cells available for
-  incidental colors and requests by applications other than ANA.  This
+  LUX's color ramp, and to have at least 32 cells available for
+  incidental colors and requests by applications other than LUX.  This
   requires that at least 96 color cells be currently available (i.e.,
   not yet allocated by other applications).  If at least 96 color
-  cells are available in the default colormap, then ANA allocates all
-  but 32 of the available colorcells in that map.  Otherwise, ANA
+  cells are available in the default colormap, then LUX allocates all
+  but 32 of the available colorcells in that map.  Otherwise, LUX
   creates a private colormap and allocates all of its color cells.
 
   The selected colormap is available through global variable
@@ -85,7 +103,7 @@ Status	anaAllocNamedColor(char *, XColor **);
   <private_colormap> is set to 1, otherwise to 0.  The current visual
   is available through global variable <visual>.  The total number of
   color cells in the current colormap is available in <display_cells>.
-  The number of color cells allocated by ANA at any given time is
+  The number of color cells allocated by LUX at any given time is
   equal to <nColorCells>.  This number increases when incidental
   colors are allocated.
 
@@ -93,7 +111,7 @@ Status	anaAllocNamedColor(char *, XColor **);
   are initially filled with a linear greyscale ramp.  All colorcells
   are read-write, which means they can be changed on the fly, and any
   changes will have immediate impact on any graphical material already
-  shown by ANA.
+  shown by LUX.
 
   Full color information is available through <colors>, which is an
   array of XColor structures.  Associated with each color is an index
@@ -352,7 +370,7 @@ Int setup_x_visual(Int desiredVisualClass)
 	(i*0xffff)/(nColors - 1);
       colors[i].flags = DoRed | DoGreen | DoBlue;
     } /* end of for (i) */
-    /* indicate that we are not using the remaining cells for ANA (yet) */
+    /* indicate that we are not using the remaining cells for LUX (yet) */
     for (i = nColors; i < display_cells; i++)
       colors[i].flags = 0;
     
@@ -387,7 +405,7 @@ Int setup_x_visual(Int desiredVisualClass)
     /* 6. set up a lookup table of fixed size into the colormap */
     /* our display routines are most portable if they do not need to worry */
     /* about the exact number of colorcells we got, so we use a lookup */
-    /* table from a fixed range of ANA pixel values (we take display_cells) */
+    /* table from a fixed range of LUX pixel values (we take display_cells) */
     /* into the underlying X11 pixel values */
     pixels = malloc(display_cells*sizeof(unsigned long));
     if (!pixels) {
@@ -695,8 +713,8 @@ XColor *anaFindBestRGB(XColor *color, Int mode)
 /* finds the color in the current colormap that has RGB values closest to */
 /* those in <color>, and returns a pointer to the associated color. */
 /* <mode> is the logical sum of: */
-/* FBRGB_RAMP -> check ANA's color ramp */
-/* FBRGB_INCIDENTAL -> check ANA's incidental colors */
+/* FBRGB_RAMP -> check LUX's color ramp */
+/* FBRGB_INCIDENTAL -> check LUX's incidental colors */
 /* LS 12mar99 */
 {
   uint32_t	i, best, i1, i2;
@@ -748,7 +766,7 @@ XColor *anaFindBestRGB(XColor *color, Int mode)
 /*-------------------------------------------------------------------------*/
 void storeColorTable(Float *red, Float *green, Float *blue, Int nelem,
 		     Int stretch)
-/* stores a new color table in ANA's color map. */
+/* stores a new color table in LUX's color map. */
 /* <red>: points at an array of red color intensities between 0 and 1 */
 /* <green>: points at an array of green color intensities between 0 and 1 */
 /* <blue>: points at an array of blue color intensities between 0 and 1 */

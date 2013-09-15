@@ -1,5 +1,24 @@
+/* This is file debug.c.
+
+Copyright 2013 Louis Strous
+
+This file is part of LUX.
+
+LUX is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+LUX is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with LUX.  If not, see <http://www.gnu.org/licenses/>.
+*/
 /* File debug.c */
-/* ANA routines for keeping a tab on memory allocation. */
+/* LUX routines for keeping a tab on memory allocation. */
 /* The routines Free(), Malloc(), Calloc(), and Realloc() can be
  put in place of the corresponding no-capital-letter forms to keep
  tabs on memory allocations and to check for consistency. */
@@ -16,8 +35,6 @@
 #include <signal.h>
 #include <string.h>
 #include <unistd.h>
-static char rcsid[] __attribute__ ((unused)) =
- "$Id: debug.c,v 4.0 2001/02/07 20:36:58 strous Exp $";
 
 #define MAXALLOC	20000
 #define FOUND		1
@@ -196,7 +213,7 @@ Int checkOneSymbol(Int symbol, Int limit)
 
 char	checkListOk = 0;
 Int checkList(Int narg, Int ps[])
-/* checks all allocation entries against the ANA symbol tables and
+/* checks all allocation entries against the LUX symbol tables and
    reports discrepancies.  NOTE: internal function and routine key lists
    are not regarded, so they result in spurious error messages.  These lists
    at present do not exceed 32 bytes in size, so a limit of 33 ought to take

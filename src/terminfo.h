@@ -1,3 +1,22 @@
+/* This is file terminfo.h.
+
+Copyright 2013 Louis Strous
+
+This file is part of LUX.
+
+LUX is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+LUX is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with LUX.  If not, see <http://www.gnu.org/licenses/>.
+*/
 enum boolean_caps {
   BOOL_CAP_bw, BOOL_CAP_am, BOOL_CAP_xsb, BOOL_CAP_xhp, BOOL_CAP_xenl,
   BOOL_CAP_eo, BOOL_CAP_gn, BOOL_CAP_hc, BOOL_CAP_km, BOOL_CAP_hs,

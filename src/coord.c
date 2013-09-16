@@ -32,11 +32,11 @@ extern Float	tvix, tviy, tvixb, tviyb, tvscale;
 #endif
 extern Int	iorder, iyhigh, ipltyp;
 
-Int	ana_replace(Int, Int);
+Int	lux_replace(Int, Int);
 
 /* A bunch of coordinate transformation routines */
-/* choices: ANA_DVI, ANA_DEV (xport), ANA_IMG, ANA_PLT (plot),
-   ANA_RIM, ANA_RPL */
+/* choices: LUX_DVI, LUX_DEV (xport), LUX_IMG, LUX_PLT (plot),
+   LUX_RIM, LUX_RPL */
 Int fromCoordinateSystem, toCoordinateSystem;
 /*---------------------------------------------------------------------*/
 Int coordMap(Float *x, Float *y)
@@ -61,22 +61,22 @@ Int coordTrf(Float *x, Float *y, Int from, Int to)
 
   if (from == to)
     return 1;
-  /* first, transform to ANA_DEV coordinate system */
+  /* first, transform to LUX_DEV coordinate system */
   switch (from) {
-    case ANA_DEV:
+    case LUX_DEV:
       break;
-    case ANA_DEP:
+    case LUX_DEP:
       if (!((x && *x < 1.0 && *x != 0.0) || (y && *y < 1.0 && *y != 0.0)))
 	break;
       /* else fall-thru */
-    case ANA_DVI:
+    case LUX_DVI:
       if (x) 
 	*x *= xfac;
       if (y)
 	*y *= yfac;
       break;
 #if HAVE_LIBX11
-    case ANA_RIM:
+    case LUX_RIM:
       if (x) 
 	*x = tvix + *x * (tvixb - tvix);
       if (y) {
@@ -86,11 +86,11 @@ Int coordTrf(Float *x, Float *y, Int from, Int to)
 	  *y = tviy + *y * (tviyb - tviy);
       }
       break;
-    case ANA_X11:
+    case LUX_X11:
       if (y)
 	*y = yfac - 1 - *y;
       break;
-    case ANA_IMG:
+    case LUX_IMG:
       if (x)
 	*x = tvix + *x*tvscale;
       if (y) {
@@ -101,7 +101,7 @@ Int coordTrf(Float *x, Float *y, Int from, Int to)
       }
       break;
 #endif
-    case ANA_PLT:
+    case LUX_PLT:
       if (x) {
 	if (ipltyp/2 % 2) {
 	  if (xmin && xmin != xmax)
@@ -129,7 +129,7 @@ Int coordTrf(Float *x, Float *y, Int from, Int to)
 	}
       }
       /* fall-thru */
-    case ANA_RPL:
+    case LUX_RPL:
       if (x)
 	*x = (*x * (wxt - wxb) + wxb)*xfac;
       if (y)
@@ -140,16 +140,16 @@ Int coordTrf(Float *x, Float *y, Int from, Int to)
   }
   /* then, transform to desired coordinate system */
   switch (to) {
-    case ANA_DEV:
+    case LUX_DEV:
       return 1;
-    case ANA_DVI: case 0:
+    case LUX_DVI: case 0:
       if (x)
 	*x = xfac? *x/xfac: 0.0;
       if (y)
 	*y = yfac? *y/yfac: 0.0;
       break;
 #if HAVE_LIBX11
-    case ANA_RIM:
+    case LUX_RIM:
       if (x)
 	*x = (tvixb != tvix)? (*x - tvix)/(tvixb - tvix): 0.0;
       if (y) {
@@ -159,7 +159,7 @@ Int coordTrf(Float *x, Float *y, Int from, Int to)
 	  *y = (tviyb != tviy)? (*y - tviy)/(tviyb - tviy): 0.0;
       }
       break;
-    case ANA_IMG:
+    case LUX_IMG:
       if (tvscale) {
 	if (x)
 	  *x = (*x - tvix)/tvscale;
@@ -176,12 +176,12 @@ Int coordTrf(Float *x, Float *y, Int from, Int to)
 	  *y = 0.0;
       }
       break;
-    case ANA_X11:
+    case LUX_X11:
       if (y)
 	*y = yfac - 1 - *y;
       break;
 #endif
-    case ANA_PLT:  case ANA_RPL:
+    case LUX_PLT:  case LUX_RPL:
       if (x) {
 	if (xfac && wxt != wxb)
 	  *x = (*x/xfac - wxb)/(wxt - wxb);
@@ -194,7 +194,7 @@ Int coordTrf(Float *x, Float *y, Int from, Int to)
 	else
 	  *y = 0.0;
       }
-      if (to == ANA_RPL)
+      if (to == LUX_RPL)
 	break;
       if (x) {
 	if (ipltyp/2 % 2)
@@ -215,7 +215,7 @@ Int coordTrf(Float *x, Float *y, Int from, Int to)
   return 1;
 }
 /*---------------------------------------------------------------------*/
-Int ana_coordtrf(Int narg, Int ps[])
+Int lux_coordtrf(Int narg, Int ps[])
 /* transform coordinates between various coordinate systems */
 /* syntax:  COORDTRF,xold,yold[,xnew,ynew] */
 /* specify the coordinate systems with keywords: */
@@ -227,30 +227,30 @@ Int ana_coordtrf(Int narg, Int ps[])
 
   from = (internalMode & 7);
   to = (internalMode/8 & 7);
-  iq = ana_float(1, ps);	/* Float xold */
+  iq = lux_float(1, ps);	/* Float xold */
   switch (symbol_class(iq)) {
-    case ANA_SCAL_PTR:
+    case LUX_SCAL_PTR:
       iq = dereferenceScalPointer(iq);
-    case ANA_SCALAR:
+    case LUX_SCALAR:
       xold = &scalar_value(iq).f;
       n = 1;
       break;
-    case ANA_ARRAY:
+    case LUX_ARRAY:
       n = array_size(iq);
       xold = (Float *) array_data(iq);
       break;
     default:
       return cerror(ILL_CLASS, iq);
   }
-  iq = ana_float(1, &ps[1]);	/* Float yold */
+  iq = lux_float(1, &ps[1]);	/* Float yold */
   switch (symbol_class(iq)) {
-    case ANA_SCAL_PTR:
+    case LUX_SCAL_PTR:
       iq = dereferenceScalPointer(iq);
-    case ANA_SCALAR:
+    case LUX_SCALAR:
       yold = &scalar_value(iq).f;
       n2 = 1;
       break;
-    case ANA_ARRAY:
+    case LUX_ARRAY:
       n2 = array_size(iq);
       yold = (Float *) array_data(iq);
       break;
@@ -260,18 +260,18 @@ Int ana_coordtrf(Int narg, Int ps[])
   if (n != n2)
     return cerror(INCMP_DIMS, iq);
   if (narg >= 3) {		/* xnew */
-    ana_replace(ps[2], iq);
+    lux_replace(ps[2], iq);
     iq = ps[2];
-    if (symbol_class(iq) == ANA_SCALAR)
+    if (symbol_class(iq) == LUX_SCALAR)
       xnew = &scalar_value(iq).f;
     else
       xnew = (Float *) array_data(iq);
   } else
     xnew = xold;
   if (narg >= 4) {		/* ynew */
-    ana_replace(ps[3], iq);
+    lux_replace(ps[3], iq);
     iq = ps[3];
-    if (symbol_class(iq) == ANA_SCALAR)
+    if (symbol_class(iq) == LUX_SCALAR)
       ynew = &scalar_value(iq).f;
     else
       ynew = (Float *) array_data(iq);

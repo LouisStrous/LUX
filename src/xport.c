@@ -38,7 +38,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <limits.h>
 #include "action.h"
  /*following is icon bitmap */
-#include "ana_bitmap.h"
+#include "lux_bitmap.h"
 
 #define BITMAPDEPTH     1
 #define TOO_SMALL       0
@@ -57,8 +57,8 @@ char    *display_name = NULL;
 Int     last_wid = 0;
 
 Double  last_time;
-Int     xcoord, ycoord, ana_button, ana_keycode, ana_keypress, root_x, root_y,
-	preventEventFlush = 0, ana_keystate, ana_keysym;
+Int     xcoord, ycoord, lux_button, lux_keycode, lux_keypress, root_x, root_y,
+	preventEventFlush = 0, lux_keystate, lux_keysym;
 uint32_t	kb;
 Float	xhair, yhair, tvscale = 1.0;
 Window  win[MAXWINDOWS];
@@ -91,7 +91,7 @@ Int	freeCellIndex, nFreeCells;
 
 #ifdef MOTIF
 #include <X11/Intrinsic.h>
-extern Widget	ana_widget_id[MAXWIDGETS];
+extern Widget	lux_widget_id[MAXWIDGETS];
 #endif
 
 /* revised color handling (LS 18jan94): */
@@ -113,7 +113,7 @@ Int xerr(Display *display, XErrorEvent *err)
   printwf("Request code: %1d (%1d)\n", err->request_code,
 	  err->minor_code);
   xerrors += 1;
-  return ANA_ERROR;
+  return LUX_ERROR;
 }
  /*--------------------------------------------------------------------------*/
 void eventType(Int type)
@@ -237,20 +237,20 @@ void xsynchronize(Int status)
      /* if you want to find out which LUX command generates an X window */
      /* error, then set this synchronization. */
 {
-  if (setup_x() == ANA_ERROR)	/* make sure we're connected */
+  if (setup_x() == LUX_ERROR)	/* make sure we're connected */
     return;
   XSynchronize(display, status? True: False);
   printf("X synchronization %sset.\n", status? "": "re");
 }
  /*--------------------------------------------------------------------------*/
-Int ana_show_visuals(Int narg, Int ps[])
+Int lux_show_visuals(Int narg, Int ps[])
 {
   XVisualInfo	*vInfo, vTemplate;
   extern char	*visualNames[];
   Int	nVisual, i, mask, j;
 
   if (!connect_flag && setup_x() < 0)
-    return ANA_ERROR;
+    return LUX_ERROR;
 
   mask = VisualScreenMask;
   vTemplate.screen = screen_num;
@@ -260,7 +260,7 @@ Int ana_show_visuals(Int narg, Int ps[])
     nVisual = 0;
   
   if (!nVisual)
-    return anaerror("No color representation is available", 0);
+    return luxerror("No color representation is available", 0);
 
   printf("%1d visuals available on this screen\n", nVisual);
   
@@ -287,7 +287,7 @@ Int ana_show_visuals(Int narg, Int ps[])
   return 1;
 }
 /*--------------------------------------------------------------------------*/
-Int ana_xclose(Int narg, Int ps[])
+Int lux_xclose(Int narg, Int ps[])
 /* close connection to window manager: close and destroy all windows, */
 /* pixmaps, color maps, etc.  LS 30jul96 */
 {
@@ -345,7 +345,7 @@ Int ck_area(Int wid, Int *xpos, Int *ypos, Int *width, Int *height)
  return 1;
 }
  /*--------------------------------------------------------------------------*/
-Int ana_xtvlct(Int narg, Int ps[])
+Int lux_xtvlct(Int narg, Int ps[])
 /* load color table, scaling to available range */
 /* expect 3 arrays for RGB */
 {
@@ -356,29 +356,29 @@ Int ana_xtvlct(Int narg, Int ps[])
   for (i = 0; i < 3; i++) {
     if (!symbolIsNumericalArray(ps[i]))
       return cerror(NEED_NUM_ARR, ps[i]);
-    iq = ana_float(1, ps + i);	/* convert to FLOAT if necessary */
+    iq = lux_float(1, ps + i);	/* convert to FLOAT if necessary */
     n = array_size(iq);
     if (n < nmin)
       nmin = n;
     p[i] = (Float *) array_data(iq);
   }
-  if (setup_x() == ANA_ERROR)
-    return ANA_ERROR;
+  if (setup_x() == LUX_ERROR)
+    return LUX_ERROR;
   storeColorTable(p[0], p[1], p[2], nmin, !(internalMode & 1));
-  return ANA_OK;
+  return LUX_OK;
 }
 /*--------------------------------------------------------------------------*/
-Int ana_xopen(Int narg, Int ps[])
+Int lux_xopen(Int narg, Int ps[])
 /* sets or changes the display name for x setup and/or sets or changes the */
 /* color map default.  LS 30jul96 */
 {
   extern Int	select_visual;
 
   if (narg && ps[0]) {			/* set display name */
-    if (symbol_class(ps[0]) != ANA_STRING)
+    if (symbol_class(ps[0]) != LUX_STRING)
       return cerror(NEED_STR, *ps);
     if (display_name)		/* may already be connected: disconnect old */
-      ana_xclose(0, NULL);
+      lux_xclose(0, NULL);
     if (string_size(ps[0]) == 0) /* empty string -> default ($DISPLAY) */
       display_name = NULL;
     else			/* explicit name */
@@ -387,45 +387,45 @@ Int ana_xopen(Int narg, Int ps[])
   switch (internalMode & 3) {
     case 1:			/* /PRIVATE_COLORS */
       if (private_colormap != 1)	
-	ana_xclose(0, NULL);	/* get rid of old */
+	lux_xclose(0, NULL);	/* get rid of old */
       private_colormap = 1;
       break;
     case 2: case 0:		/* /DEFAULT_COLORMAP */
       if (private_colormap != 0)
-	ana_xclose(0, NULL);	/* get rid of old */
+	lux_xclose(0, NULL);	/* get rid of old */
       private_colormap = 0; 
       break;
     default:
-      return anaerror("Illegal keyword combination", 0);
+      return luxerror("Illegal keyword combination", 0);
   }
   if (internalMode & 4) {	/* /SELECTVISUAL */
     if (connect_flag)
-      ana_xclose(0, NULL);
+      lux_xclose(0, NULL);
     select_visual = 1;
   } else
     select_visual = 0;
   return setup_x();
 }
 /*--------------------------------------------------------------------------*/
-Int ana_xexist(Int narg, Int ps[])/* return 1 if window exists */
+Int lux_xexist(Int narg, Int ps[])/* return 1 if window exists */
  /* argument is port # */
 {
   Int     wid;
 
   if (int_arg_stat(ps[0], &wid) != 1)
-    return ANA_ERROR;
+    return LUX_ERROR;
   if (wid < 0) {
     if (maps[-wid] != 0)
-      return ANA_ONE;
+      return LUX_ONE;
   } else {                                /* window case */
     if (win[wid] != 0)
-      return ANA_ONE;
+      return LUX_ONE;
   }
   /* no such, return an lux 0 */
-  return ANA_ZERO;
+  return LUX_ZERO;
 }
 /*--------------------------------------------------------------------------*/
-Int ana_xport(Int narg, Int ps[])	/* open a window or pixmap */
+Int lux_xport(Int narg, Int ps[])	/* open a window or pixmap */
  /* arguments are port #, width , height (default is 512x512) */
  /* position x, y, window title (<128 chars), icon title (<16 chars) */
  /* might be nice to have some commands to change things like the background
@@ -436,16 +436,16 @@ Int ana_xport(Int narg, Int ps[])	/* open a window or pixmap */
   Int     wid, mapid, xpos = 0, ypos = 0, pflag, n;
   uint32_t	width, height;
   char	*wtitle = NULL, *ititle = NULL;
-  Int	ck_window(Int), set_defw(Int), ana_xdelete(Int, Int []),
-    ana_xcreat(Int, uint32_t, uint32_t, Int, Int, Int, char *,
+  Int	ck_window(Int), set_defw(Int), lux_xdelete(Int, Int []),
+    lux_xcreat(Int, uint32_t, uint32_t, Int, Int, Int, char *,
 	       char *);
   
   if (narg > 0)
     wid = int_arg(ps[0]);
   else
     wid = last_wid;
-  if (ck_window(wid) != ANA_OK)
-    return ANA_ERROR;
+  if (ck_window(wid) != LUX_OK)
+    return LUX_ERROR;
 
   width = height = 512;
   pflag = 0;
@@ -464,7 +464,7 @@ Int ana_xport(Int narg, Int ps[])	/* open a window or pixmap */
   if (narg > 6)
     ititle = string_arg(ps[6]);
   if (ck_window(wid) != 1)
-    return ANA_ERROR;
+    return LUX_ERROR;
   if (wid < 0) {
 			 		 /* pixmap case */
     /* check if pixmap already created, if so and no size, just set last_wid */
@@ -474,7 +474,7 @@ Int ana_xport(Int narg, Int ps[])	/* open a window or pixmap */
 	set_defw(wid);
 	return 1;
       } else
-	ana_xdelete(1, ps);
+	lux_xdelete(1, ps);
     }
   } else {                                /* window case */
     /* check if window already created, if so and no size, just set last_wid */
@@ -490,11 +490,11 @@ Int ana_xport(Int narg, Int ps[])	/* open a window or pixmap */
 	  set_defw(wid);
 	  return 1;
       }
-      ana_xdelete(1,ps);
+      lux_xdelete(1,ps);
     }
   }
 		 /* if we get here, we now create the window or pixmap */
-  n = ana_xcreat(wid, height, width, xpos, ypos, pflag, wtitle, ititle);
+  n = lux_xcreat(wid, height, width, xpos, ypos, pflag, wtitle, ititle);
   if (n > 0)
     set_defw(wid);
   return n;
@@ -504,10 +504,10 @@ Int ck_window(Int wid)
 /* only checks if a window value is in allowed range */
 {
   if (wid >= MAXWINDOWS || wid <= -MAXPIXMAPS)
-    return anaerror("Illegal window or pixmap %1d; allowed range %1d -- %1d",
+    return luxerror("Illegal window or pixmap %1d; allowed range %1d -- %1d",
 		 0, wid, -MAXPIXMAPS+1, MAXWINDOWS-1);
   else
-    return ANA_OK;
+    return LUX_OK;
 }
  /*--------------------------------------------------------------------------*/
 Int ck_events(void)         /* checks events for focus and size changes */
@@ -524,7 +524,7 @@ Int ck_events(void)         /* checks events for focus and size changes */
    Int	set_defw(Int);
    
    if (setup_x() < 0)
-     return ANA_ERROR;
+     return LUX_ERROR;
    XFlush(display);
    nev = XPending(display);
    /* printf("number of events = %d\n",nev); */
@@ -610,7 +610,7 @@ Int set_defw(Int wid)
   return  1;
 }
 /*--------------------------------------------------------------------------*/
-Int ana_xcreat(Int wid, uint32_t height, uint32_t width, Int xpos,
+Int lux_xcreat(Int wid, uint32_t height, uint32_t width, Int xpos,
 	       Int ypos, Int pflag, char *wtitle, char *ititle)
  /* might be nice to have some commands to change things like the background
  color and pattern and cursor */
@@ -629,10 +629,10 @@ Int ana_xcreat(Int wid, uint32_t height, uint32_t width, Int xpos,
 
  /* start execution here */
  if (setup_x() < 0)
-   return ANA_ERROR;
+   return LUX_ERROR;
  
- if (ck_window(wid) != ANA_OK)
-   return ANA_ERROR;
+ if (ck_window(wid) != LUX_OK)
+   return LUX_ERROR;
 
  if (wid >= 0) {                 /* window case */
 #ifdef MOTIF
@@ -696,7 +696,7 @@ Int ana_xcreat(Int wid, uint32_t height, uint32_t width, Int xpos,
 			      ypos, width, height, border_width, depth,
 			      InputOutput, visual, valuemask, &attributes);
      if (!win[wid])
-       return anaerror("Could not create requested window", 0);
+       return luxerror("Could not create requested window", 0);
      icon_pixmap =
        XCreateBitmapFromData(display, win[wid], icon_bitmap_bits,
 			     icon_bitmap_width, icon_bitmap_height);
@@ -728,10 +728,10 @@ Int ana_xcreat(Int wid, uint32_t height, uint32_t width, Int xpos,
      /* a motif drawing area, if window not already created, return an error */
      
      /* assume we are using same display for X and motif */
-     if ((win[wid] = XtWindowOfObject(ana_widget_id[drawingareas[wid]])) == 0) 
-       return anaerror("cannot get window number from motif drawing area", 0);
+     if ((win[wid] = XtWindowOfObject(lux_widget_id[drawingareas[wid]])) == 0) 
+       return luxerror("cannot get window number from motif drawing area", 0);
      if (XGetWindowAttributes(display, win[wid], &wat) == False)
-       return anaerror("cannot get window attributes for motif drawing area", 0);
+       return luxerror("cannot get window attributes for motif drawing area", 0);
      ht[wid] = wat.width;
      wd[wid] = wat.height;
      valuemask = CWBackPixel;	/* was |= but valuemask was not yet defined */
@@ -780,21 +780,21 @@ Int ana_xcreat(Int wid, uint32_t height, uint32_t width, Int xpos,
  return 1;
 }
 /*--------------------------------------------------------------------------*/
-Int ana_xsetinputs(Int narg, Int ps[])		/* set the input mask */
+Int lux_xsetinputs(Int narg, Int ps[])		/* set the input mask */
 {
   Int	wid;
 
   if (ck_events() != 1)
-    return ANA_ERROR;
+    return LUX_ERROR;
   if (int_arg_stat(ps[0], &wid) != 1)
-    return ANA_ERROR;
+    return LUX_ERROR;
   if (ck_window(wid) != 1)
-    return ANA_ERROR;
+    return LUX_ERROR;
   XSelectInput(display, win[wid], KeyPressMask | ButtonPressMask);
   return 1;
 }
  /*-------------------------------------------------------------------------*/
-Int ana_xcursor(Int narg, Int ps[]) /* set the cursor */
+Int lux_xcursor(Int narg, Int ps[]) /* set the cursor */
 {
   Int    wid, iq;
   Cursor cursor;
@@ -807,34 +807,34 @@ Int ana_xcursor(Int narg, Int ps[]) /* set the cursor */
       || int_arg_stat(ps[0], &wid) != 1
       || int_arg_stat(ps[1], &iq) != 1
       || ck_window(wid) != 1)
-    return ANA_ERROR;
+    return LUX_ERROR;
   cursor = XCreateFontCursor(display, iq);
   if (narg > 2) {
     /* get foreground color */
-    if (symbol_class(ps[2]) != ANA_STRING)
+    if (symbol_class(ps[2]) != LUX_STRING)
       return cerror(NEED_STR, ps[2]);
     pc = string_value(ps[2]);
   } else
     pc = cfore_default;
   if (anaAllocNamedColor(pc, &cfore) != 1)
-    return anaerror("error in background color", 0);
+    return luxerror("error in background color", 0);
   if (narg > 3) {
     /* get background color */
-    if (symbol_class(ps[3]) != ANA_STRING)
+    if (symbol_class(ps[3]) != LUX_STRING)
       return cerror(NEED_STR, ps[3]);
     pc = string_value(ps[3]);
   } else
     pc = cback_default; 
   if (anaAllocNamedColor(pc, &cback) != 1)
-    return anaerror("error in background color", 0);
+    return luxerror("error in background color", 0);
   XRecolorCursor(display, cursor, cfore, cback);
   XDefineCursor(display, win[wid], cursor);
   XFreeCursor(display, cursor);
   XFlush(display);
-  return ANA_OK;
+  return LUX_OK;
 }
 /*--------------------------------------------------------------------------*/
-Int ana_xsetbackground(Int narg, Int ps[])/* set the background color */
+Int lux_xsetbackground(Int narg, Int ps[])/* set the background color */
  /* setbackground [, win#] , color */
 /* made first argument optional.  Also check that window/pixmap */
 /* really exists before attempting to change its background color */
@@ -852,27 +852,27 @@ Int ana_xsetbackground(Int narg, Int ps[])/* set the background color */
   else
     wid = int_arg(*ps++);
   if (ck_window(wid) != 1)
-    return ANA_ERROR;
+    return LUX_ERROR;
   if ((wid >= 0 && !win[wid]) || (wid < 0 && !maps[-wid]))
-    ana_xcreat(wid, 512, 512, 0, 0, 0, NULL, NULL); 
+    lux_xcreat(wid, 512, 512, 0, 0, 0, NULL, NULL); 
 
   /* try to figure out the color */
   switch (symbol_class(*ps)) {
-    case ANA_STRING:
+    case LUX_STRING:
       pc = string_value(*ps);
       if (anaAllocNamedColor(pc, &color) == 0)
 	goto setbg_1;
       break;
-    case ANA_ARRAY:
+    case LUX_ARRAY:
       if (symbolIsRealArray(*ps) && array_size(*ps) == 3) {
-	iq = ana_float(1, ps);	/* ensure FLOAT */
+	iq = lux_float(1, ps);	/* ensure FLOAT */
 	value = array_data(iq);
 	sprintf(pc = curScrat, "rgbi:%g/%g/%g", value[0], value[1], value[2]);
 	if (anaAllocNamedColor(pc, &color) == 0)
 	  goto setbg_1;
 	if (iq != *ps)
 	  zap(iq);		/* not needed anymore */
-      } else return anaerror("Need string or 3-element real array for color specification", 0);
+      } else return luxerror("Need string or 3-element real array for color specification", 0);
       break;
     default:
       return cerror(ILL_CLASS, *ps);
@@ -886,13 +886,13 @@ Int ana_xsetbackground(Int narg, Int ps[])/* set the background color */
     XSetWindowBackground(display,win[wid], color->pixel);
   }
   XFlush(display);
-  return ANA_OK;
+  return LUX_OK;
 
   setbg_1:
-  return anaerror("error in foreground color", 0);
+  return luxerror("error in foreground color", 0);
 }
 /*--------------------------------------------------------------------------*/
-Int ana_xsetforeground(Int narg, Int ps[])/* set the foreground color */
+Int lux_xsetforeground(Int narg, Int ps[])/* set the foreground color */
  /* setforeground [, win#] , color */
 /* made first argument optional.  Also check that window/pixmap */
 /* really exists before attempting to change its foreground color */
@@ -910,27 +910,27 @@ Int ana_xsetforeground(Int narg, Int ps[])/* set the foreground color */
   else
     wid = int_arg(*ps++);
   if (ck_window(wid) != 1)
-    return ANA_ERROR;
+    return LUX_ERROR;
   if ((wid >= 0 && !win[wid]) || (wid < 0 && !maps[-wid]))
-    ana_xcreat(wid, 512, 512, 0, 0, 0, NULL, NULL); 
+    lux_xcreat(wid, 512, 512, 0, 0, 0, NULL, NULL); 
 
   /* try to figure out the color */
   switch (symbol_class(*ps)) {
-    case ANA_STRING:
+    case LUX_STRING:
       pc = string_value(*ps);
       if (anaAllocNamedColor(pc, &color) == 0)
 	goto setfg_1;
       break;
-    case ANA_ARRAY:
+    case LUX_ARRAY:
       if (symbolIsRealArray(*ps) && array_size(*ps) == 3) {
-	iq = ana_float(1, ps);	/* ensure FLOAT */
+	iq = lux_float(1, ps);	/* ensure FLOAT */
 	value = array_data(iq);
 	sprintf(pc = curScrat, "rgbi:%g/%g/%g", value[0], value[1], value[2]);
 	if (anaAllocNamedColor(pc, &color) == 0)
 	  goto setfg_1;
 	if (iq != *ps)
 	  zap(iq);		/* not needed anymore */
-      } else return anaerror("Need string or 3-element real array for color specification", 0);
+      } else return luxerror("Need string or 3-element real array for color specification", 0);
       break;
     default:
       return cerror(ILL_CLASS, *ps);
@@ -942,13 +942,13 @@ Int ana_xsetforeground(Int narg, Int ps[])/* set the foreground color */
     XSetForeground(display, gc[wid], color->pixel);
   }
   XFlush(display);
-  return ANA_OK;
+  return LUX_OK;
 
   setfg_1:
-  return anaerror("error in foreground color", 0);
+  return luxerror("error in foreground color", 0);
 }
 /*--------------------------------------------------------------------------*/
-Int ana_xdelete(Int narg, Int ps[]) /* delete a window or a pixmap */
+Int lux_xdelete(Int narg, Int ps[]) /* delete a window or a pixmap */
 {
   Int    wid;
   
@@ -967,7 +967,7 @@ Int ana_xdelete(Int narg, Int ps[]) /* delete a window or a pixmap */
   return 1;
  }
  /*--------------------------------------------------------------------------*/
-Int ana_xerase(Int narg, Int ps[])
+Int lux_xerase(Int narg, Int ps[])
      /* erase a window */
      /* pixmap support added.  LS 8oct97 */
 {
@@ -1001,19 +1001,19 @@ Int ana_xerase(Int narg, Int ps[])
      return cerror(ILL_ARG_LIST, 0);
  }
  if (ck_window(wid) != 1)
-   return ANA_ERROR;
+   return LUX_ERROR;
 
  if (wid < 0) {			/* pixmap */
    if (!maps[-wid]) {
      last_wid = wid;
-     if (ana_xport(0, NULL) < 0)
-       return ANA_ERROR;
+     if (lux_xport(0, NULL) < 0)
+       return LUX_ERROR;
    }
  } else {			/* window */
    if (!win[wid]) {
      last_wid = wid;
-     if (ana_xport(0, NULL) < 0)
-       return ANA_ERROR;	/* window didn't exists */
+     if (lux_xport(0, NULL) < 0)
+       return LUX_ERROR;	/* window didn't exists */
    }
  }
 
@@ -1032,10 +1032,10 @@ Int ana_xerase(Int narg, Int ps[])
    w = x + w;
    h = y + h;
    cs = (internalMode & 7);
-   if ((setup & 4) && cs == ANA_DEV)
-     cs = ANA_X11;
-   coordTrf(&x, &y, cs, ANA_X11);
-   coordTrf(&w, &h, cs, ANA_X11);
+   if ((setup & 4) && cs == LUX_DEV)
+     cs = LUX_X11;
+   coordTrf(&x, &y, cs, LUX_X11);
+   coordTrf(&w, &h, cs, LUX_X11);
    xx = (Int) x;
    yx = (Int) y;
    wx = (Int) fabs(w - x);
@@ -1061,7 +1061,7 @@ Int ana_xerase(Int narg, Int ps[])
  return 1;
 }
  /*------------------------------------------------------------------------*/
-Int ana_xsetaction(Int narg, Int ps[])
+Int lux_xsetaction(Int narg, Int ps[])
 /* This routine associates a certain copy action with a window.
    Codes 1 and 2 select sprite action.  A sprite disappears
    without a trace if drawn for a second time.  LS 14apr93 */
@@ -1082,7 +1082,7 @@ Int ana_xsetaction(Int narg, Int ps[])
   if (ck_window(wid) != 1) return -1;
   code = function_code[code];
   /* does window exist? If not create a default size */
-  if ( win[wid] == 0 ) ana_xcreat(wid, 512, 512, 0, 0, 0, NULL, NULL);
+  if ( win[wid] == 0 ) lux_xcreat(wid, 512, 512, 0, 0, 0, NULL, NULL);
   if (wid >= 0)
     XSetFunction(display, gc[wid], code);
   else
@@ -1094,17 +1094,17 @@ Int reverseYImage(Int iq)
 /* returns a copy of 2D image <iq> reversed in the y direction */
 {
   Int	ps[2];
-  Int	ana_reverse(Int, Int *);
+  Int	lux_reverse(Int, Int *);
 
-  if (symbol_class(iq) != ANA_ARRAY
+  if (symbol_class(iq) != LUX_ARRAY
       || array_num_dims(iq) != 2)
     return cerror(NEED_2D_ARR, iq);
   ps[0] = iq;
-  ps[1] = ANA_ONE;
-  return ana_reverse(2, ps);
+  ps[1] = LUX_ONE;
+  return lux_reverse(2, ps);
 }
 /*------------------------------------------------------------------------*/
-Int ana_xtv_general(Int narg, Int ps[], Int mode)
+Int lux_xtv_general(Int narg, Int ps[], Int mode)
 {
   pointer	data;
   Int	type, nx, ny, wid;
@@ -1119,7 +1119,7 @@ Int ana_xtv_general(Int narg, Int ps[], Int mode)
 	|| isComplexType(array_type(ps[0]))
 	|| array_num_dims(ps[0]) != 3
 	|| array_dims(ps[0])[2] != 3)
-      return anaerror("Need 3D array with 3rd dimension = 3", ps[0]);
+      return luxerror("Need 3D array with 3rd dimension = 3", ps[0]);
   } else {
     mode &= ~TV_24;
     if (!symbolIsNumericalArray(ps[0]) /* <image> */
@@ -1167,8 +1167,8 @@ Int ana_xtv_general(Int narg, Int ps[], Int mode)
 	       mode, 0.0, 0.0, NULL, NULL);
 }
 /*------------------------------------------------------------------------*/
-Int ana_xtvraw(Int narg, Int ps[])
-/* scales non-ANA_BYTE arrays; displays on screen */
+Int lux_xtvraw(Int narg, Int ps[])
+/* scales non-LUX_BYTE arrays; displays on screen */
 /* NOTE: in older versions of LUX the coordinates of the image were
  counted from the upper left-hand corner of the screen, and the
  position specified for the image was that of the upper left-hand
@@ -1179,7 +1179,7 @@ Int ana_xtvraw(Int narg, Int ps[])
  XYMOV coordinates are now the same.  The old behavior is still
  available: execute SET,/ULIMCOORDS.  LS mar98 */
 {
-  return ana_xtv_general(narg, ps, TV_RAW);
+  return lux_xtv_general(narg, ps, TV_RAW);
 }
 /*------------------------------------------------------------------------*/
 Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
@@ -1210,7 +1210,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
     zoom_mag, zoom_xc, zoom_yc, zoom_clo, zoom_chi, wxb, wxt, wyb, wyt;
   extern Int	lunplt, bits_per_pixel;
   extern unsigned long	red_mask, green_mask, blue_mask;
-  Int	ana_threecolors(Int, Int []), checkCoordSys(Int, Int),
+  Int	lux_threecolors(Int, Int []), checkCoordSys(Int, Int),
     coordTrf(Float *, Float *, Int, Int),
     postgray(char *, Int, Int, Float, Float, Float, Float, Int),
     postcolor(char *, Int, Int, Float, Float, Float, Float, Int);
@@ -1227,7 +1227,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
       toscreen = lunplt? 0: 1;
       break;
     default:
-      return anaerror("Cannot specify /SCREEN and /POSTSCRIPT at the same time",
+      return luxerror("Cannot specify /SCREEN and /POSTSCRIPT at the same time",
 		   0);
   }
 
@@ -1261,7 +1261,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
     sy = (Int) syf;
     *mag = zoom_mag;		/* zoom scale */
     internalMode |= TV_CENTER;	/* zoom coordinates indicate image center */
-    internalMode = (internalMode & ~63) | ANA_DEV;
+    internalMode = (internalMode & ~63) | LUX_DEV;
 				/* zoom coordinates are in DEV */
     clo = zoom_clo;		/* zoom contrast */
     chi = zoom_chi;
@@ -1332,9 +1332,9 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
     i = (internalMode & 7);
     if (toscreen		/* displaying on screen */
 	&& (setup & 4)		/* X11 coordinates */
-	&& i == ANA_DEV)	/* have DEV coordinates */
-      i = ANA_X11;		/* interpret as X11 */
-    coordTrf(&sxf, &syf, i, ANA_DEV); /* transform to DEV */
+	&& i == LUX_DEV)	/* have DEV coordinates */
+      i = LUX_X11;		/* interpret as X11 */
+    coordTrf(&sxf, &syf, i, LUX_DEV); /* transform to DEV */
     sx = (Int) sxf;
     sy = (Int) syf;
     /* calculate coordinates of image's upper right-hand corner in X11
@@ -1360,7 +1360,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
     /* does window or pixmap exist?  If not, create to fit image */
     if ((wid >= 0 && win[wid] == 0)
 	|| (wid < 0 && maps[-wid] == 0)) {
-      ana_xcreat(wid, hq, wq, 0, 0, 0, NULL, NULL);
+      lux_xcreat(wid, hq, wq, 0, 0, 0, NULL, NULL);
     }
     if (!ck_area(wid, &sx, &sy, &nxx, &nyy)) {
       puts("The image falls completely outside the window");
@@ -1370,7 +1370,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
 
   if (mode & TV_24) {
     if (visualPrimariesAreLinked(visual->class) && toscreen)
-      return anaerror("The %s visual that you are using is incapable\nof displaying 3-component images.\n", 0, visualNames[visual->class]);
+      return luxerror("The %s visual that you are using is incapable\nof displaying 3-component images.\n", 0, visualNames[visual->class]);
     s = nx*ny;
   }
 
@@ -1386,7 +1386,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
       /* determine min/max */
       if (mode & TV_24) {		/* three bytes per pixel */
 	switch (type) {
-	  case ANA_BYTE:
+	  case LUX_BYTE:
 	    min.b = UINT8_MAX;
 	    max.b = 0;
 	    for (iy = y1; iy <= y2; iy++)
@@ -1415,7 +1415,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
 	      factor.f = 255/((Float) max.b - min.b);
 	    offset.f = (Float) min.b;
 	    break;
-	  case ANA_WORD:
+	  case LUX_WORD:
 	    min.w = INT16_MAX;
 	    max.w = -INT16_MAX;
 	    for (iy = y1; iy <= y2; iy++)
@@ -1444,7 +1444,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
 	      factor.f = 255/((Float) max.w - min.w);
 	    offset.f = (Float) min.w;
 	    break;
-	  case ANA_LONG:
+	  case LUX_LONG:
 	    min.l = INT32_MAX;
 	    max.l = -INT32_MAX;
 	    for (iy = y1; iy <= y2; iy++)
@@ -1473,7 +1473,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
 	      factor.f = 255/((Float) max.l - min.l);
 	    offset.f = (Float) min.l;
 	    break;
-	  case ANA_FLOAT:
+	  case LUX_FLOAT:
 	    min.f = FLT_MAX;
 	    max.f = -FLT_MAX;
 	    for (iy = y1; iy <= y2; iy++)
@@ -1502,7 +1502,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
 	      factor.f = 255/((Float) max.f - min.f);
 	    offset.f = (Float) min.f;
 	    break;
-	  case ANA_DOUBLE:
+	  case LUX_DOUBLE:
 	    min.d = DBL_MAX;
 	    max.d = -DBL_MAX;
 	    for (iy = y1; iy <= y2; iy++)
@@ -1534,7 +1534,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
 	}
       } else {			/* one Byte per pixel */
 	switch (type) {
-	  case ANA_BYTE:
+	  case LUX_BYTE:
 	    min.b = UINT8_MAX;
 	    max.b = 0;
 	    for (iy = y1; iy <= y2; iy++)
@@ -1553,7 +1553,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
 	      factor.f = ((Float) scalemax - scalemin)/((Float) max.b - min.b);
 	    offset.f = (Float) min.b;
 	    break;
-	  case ANA_WORD:
+	  case LUX_WORD:
 	    min.w = INT16_MAX;
 	    max.w = -INT16_MAX;
 	    for (iy = y1; iy <= y2; iy++)
@@ -1572,7 +1572,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
 	      factor.f = ((Float) scalemax - scalemin)/((Float) max.w - min.w);
 	    offset.f = (Float) min.w;
 	    break;
-	  case ANA_LONG:
+	  case LUX_LONG:
 	    min.l = INT32_MAX;
 	    max.l = -INT32_MAX;
 	    for (iy = y1; iy <= y2; iy++)
@@ -1591,7 +1591,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
 	      factor.f = ((Float) scalemax - scalemin)/((Float) max.l - min.l);
 	    offset.f = (Float) min.l;
 	    break;
-	  case ANA_FLOAT:
+	  case LUX_FLOAT:
 	    min.f = FLT_MAX;
 	    max.f = -FLT_MAX;
 	    for (iy = y1; iy <= y2; iy++)
@@ -1610,7 +1610,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
 	      factor.f = (scalemax - scalemin)/(max.f - min.f);
 	    offset.f = min.f;
 	    break;
-	  case ANA_DOUBLE:
+	  case LUX_DOUBLE:
 	    min.d = DBL_MAX;
 	    max.d = -DBL_MAX;
 	    for (iy = y1; iy <= y2; iy++)
@@ -1632,7 +1632,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
 	}
       }
     } else { 			/* have explicit contrast range */
-      if (type == ANA_DOUBLE) {
+      if (type == LUX_DOUBLE) {
 	if (threeColors)
 	  factor.d = (256/3)/(chi - clo);
 	else
@@ -1684,7 +1684,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
     if (setup & 4) {		/* "reversed" images */
       if (mode & TV_24) {	/* 24-bit colors */
 	switch (type) {
-	  case ANA_BYTE:
+	  case LUX_BYTE:
 	    for (iy = 0; iy < nyy; iy--)
 	      for (ix = 0; ix < nxx; ix++) {
 		xsrc = x1 + ix/magx;
@@ -1739,7 +1739,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
 		} /* end of switch (bpp) */
 	      }	/* end of for (ix...) */
 	    break;
-	  case ANA_WORD:
+	  case LUX_WORD:
 	    for (iy = 0; iy < nyy; iy--)
 	      for (ix = 0; ix < nxx; ix++) {
 		xsrc = x1 + ix/magx;
@@ -1794,7 +1794,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
 		} /* end of switch (bpp) */
 	      }	/* end of for (ix...) */
 	    break;
-	  case ANA_LONG:
+	  case LUX_LONG:
 	    for (iy = 0; iy < nyy; iy--)
 	      for (ix = 0; ix < nxx; ix++) {
 		xsrc = x1 + ix/magx;
@@ -1849,7 +1849,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
 		} /* end of switch (bpp) */
 	      }	/* end of for (ix...) */
 	    break;
-	  case ANA_FLOAT:
+	  case LUX_FLOAT:
 	    for (iy = 0; iy < nyy; iy--)
 	      for (ix = 0; ix < nxx; ix++) {
 		xsrc = x1 + ix/magx;
@@ -1904,7 +1904,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
 		} /* end of switch (bpp) */
 	      }	/* end of for (ix...) */
 	    break;
-	  case ANA_DOUBLE:
+	  case LUX_DOUBLE:
 	    for (iy = 0; iy < nyy; iy--)
 	      for (ix = 0; ix < nxx; ix++) {
 		xsrc = x1 + ix/magx;
@@ -1963,7 +1963,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
       }	/* end of if (mode & TV_24) */
       else if (threeColors) {	/* have three-color colortable */
 	switch (type) {
-	  case ANA_BYTE:
+	  case LUX_BYTE:
 	    for (iy = 0; iy < nyy; iy++)
 	      for (ix = 0; ix < nxx; ix++) {
 		xsrc = x1 + ix/magx;
@@ -1990,7 +1990,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
 		} /* end of switch (bpp) */
 	      }	/* end of for (ix...) */
 	    break;
-	  case ANA_WORD:
+	  case LUX_WORD:
 	    for (iy = 0; iy < nyy; iy++)
 	      for (ix = 0; ix < nxx; ix++) {
 		xsrc = x1 + ix/magx;
@@ -2017,7 +2017,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
 		} /* end of switch (bpp) */
 	      }	/* end of for (ix...) */
 	    break;
-	  case ANA_LONG:
+	  case LUX_LONG:
 	    for (iy = 0; iy < nyy; iy++)
 	      for (ix = 0; ix < nxx; ix++) {
 		xsrc = x1 + ix/magx;
@@ -2044,7 +2044,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
 		} /* end of switch (bpp) */
 	      }	/* end of for (ix...) */
 	    break;
-	  case ANA_FLOAT:
+	  case LUX_FLOAT:
 	    for (iy = 0; iy < nyy; iy++)
 	      for (ix = 0; ix < nxx; ix++) {
 		xsrc = x1 + ix/magx;
@@ -2071,7 +2071,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
 		} /* end of switch (bpp) */
 	      }	/* end of for (ix) */
 	    break;
-	  case ANA_DOUBLE:
+	  case LUX_DOUBLE:
 	    for (iy = 0; iy < nyy; iy++)
 	      for (ix = 0; ix < nxx; ix++) {
 		xsrc = x1 + ix/magx;
@@ -2101,7 +2101,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
 	} /* end of switch (type) */
       } /* end of if (mode & TV_24) else if (threeColors) */
       else switch (type) {	/* ordinary color table */
-	case ANA_BYTE:
+	case LUX_BYTE:
 	  for (iy = 0; iy < nyy; iy++)
 	    for (ix = 0; ix < nxx; ix++) {
 	      xsrc = x1 + ix/magx;
@@ -2125,7 +2125,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
 	      }	/* end of switch (bpp) */
 	    } /* end of for (ix) */
 	  break;
-	case ANA_WORD:
+	case LUX_WORD:
 	  for (iy = 0; iy < nyy; iy++)
 	    for (ix = 0; ix < nxx; ix++) {
 	      xsrc = x1 + ix/magx;
@@ -2149,7 +2149,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
 	      }	/* end of switch (bpp) */
 	    } /* end of for (ix) */
 	  break;
-	case ANA_LONG:
+	case LUX_LONG:
 	  for (iy = 0; iy < nyy; iy++)
 	    for (ix = 0; ix < nxx; ix++) {
 	      xsrc = x1 + ix/magx;
@@ -2173,7 +2173,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
 	      }	/* end of switch (bpp) */
 	    } /* end of for (ix) */
 	  break;
-	case ANA_FLOAT:
+	case LUX_FLOAT:
 	  for (iy = 0; iy < nyy; iy++)
 	    for (ix = 0; ix < nxx; ix++) {
 	      xsrc = x1 + ix/magx;
@@ -2197,7 +2197,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
 	      }	/* end of switch (bpp) */
 	    } /* end of for (ix) */
 	  break;
-	case ANA_DOUBLE:
+	case LUX_DOUBLE:
 	  for (iy = 0; iy < nyy; iy++)
 	    for (ix = 0; ix < nxx; ix++) {
 	      xsrc = x1 + ix/magx;
@@ -2226,7 +2226,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
     else {			/* standard image */
       if (mode & TV_24) {	/* 24-bit colors */
 	switch (type) {
-	  case ANA_BYTE:
+	  case LUX_BYTE:
 	    for (iy = nyy - 1; iy >= 0; iy--)
 	      for (ix = 0; ix < nxx; ix++) {
 		xsrc = x1 + ix/magx;
@@ -2281,7 +2281,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
 		} /* end of switch (bpp) */
 	      }	/* end of for (ix) */
 	    break;
-	  case ANA_WORD:
+	  case LUX_WORD:
 	    for (iy = nyy - 1; iy >= 0; iy--)
 	      for (ix = 0; ix < nxx; ix++) {
 		xsrc = x1 + ix/magx;
@@ -2336,7 +2336,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
 		} /* end of switch (bpp) */
 	      }	/* end of for (ix) */
 	    break;
-	  case ANA_LONG:
+	  case LUX_LONG:
 	    for (iy = nyy - 1; iy >= 0; iy--)
 	      for (ix = 0; ix < nxx; ix++) {
 		xsrc = x1 + ix/magx;
@@ -2391,7 +2391,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
 		} /* end of switch (bpp) */
 	      }	/* end of for (ix) */
 	    break;
-	  case ANA_FLOAT:
+	  case LUX_FLOAT:
 	    for (iy = nyy - 1; iy >= 0; iy--)
 	      for (ix = 0; ix < nxx; ix++) {
 		xsrc = x1 + ix/magx;
@@ -2446,7 +2446,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
 		} /* end of switch (bpp) */
 	      }	/* end of for (ix) */
 	    break;
-	  case ANA_DOUBLE:
+	  case LUX_DOUBLE:
 	    for (iy = nyy - 1; iy >= 0; iy--)
 	      for (ix = 0; ix < nxx; ix++) {
 		xsrc = x1 + ix/magx;
@@ -2505,7 +2505,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
       }	/* end of if (mode & TV_24) */
       else if (threeColors) {	/* have three-color colortable */
 	switch (type) {
-	  case ANA_BYTE:
+	  case LUX_BYTE:
 	    for (iy = nyy - 1; iy >= 0; iy--)
 	      for (ix = 0; ix < nxx; ix++) {
 		xsrc = x1 + ix/magx;
@@ -2532,7 +2532,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
 		} /* end of switch (bpp) */
 	      }	/* end of for (ix) */
 	    break;
-	  case ANA_WORD:
+	  case LUX_WORD:
 	    for (iy = nyy - 1; iy >= 0; iy--)
 	      for (ix = 0; ix < nxx; ix++) {
 		xsrc = x1 + ix/magx;
@@ -2559,7 +2559,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
 		} /* end of switch (bpp) */
 	      }	/* end of if (ix) */
 	    break;
-	  case ANA_LONG:
+	  case LUX_LONG:
 	    for (iy = nyy - 1; iy >= 0; iy--)
 	      for (ix = 0; ix < nxx; ix++) {
 		xsrc = x1 + ix/magx;
@@ -2586,7 +2586,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
 		} /* end of switch (bpp) */
 	      }	/* end of if (ix) */
 	    break;
-	  case ANA_FLOAT:
+	  case LUX_FLOAT:
 	    for (iy = nyy - 1; iy >= 0; iy--)
 	      for (ix = 0; ix < nxx; ix++) {
 		xsrc = x1 + ix/magx;
@@ -2613,7 +2613,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
 		} /* end of switch (bpp) */
 	      }	/* end of if (ix) */
 	    break;
-	  case ANA_DOUBLE:
+	  case LUX_DOUBLE:
 	    for (iy = nyy - 1; iy >= 0; iy--)
 	      for (ix = 0; ix < nxx; ix++) {
 		xsrc = x1 + ix/magx;
@@ -2643,7 +2643,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
 	} /* end of switch (type) */
       }	/* end of if (mode & TV_24) else if (threeColors) */
       else switch (type) {	/* ordinary color table */
-	case ANA_BYTE:
+	case LUX_BYTE:
 	  for (iy = nyy - 1; iy >= 0; iy--)
 	    for (ix = 0; ix < nxx; ix++) {
 	      xsrc = x1 + ix/magx;
@@ -2667,7 +2667,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
 	      }	/* end of switch (bpp) */
 	    } /* end of for (ix) */
 	  break;
-	case ANA_WORD:
+	case LUX_WORD:
 	  for (iy = nyy - 1; iy >= 0; iy--)
 	    for (ix = 0; ix < nxx; ix++) {
 	      xsrc = x1 + ix/magx;
@@ -2691,7 +2691,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
 	      }	/* end of switch (bpp) */
 	    } /* end of for (ix) */
 	  break;
-	case ANA_LONG:
+	case LUX_LONG:
 	  for (iy = nyy - 1; iy >= 0; iy--)
 	    for (ix = 0; ix < nxx; ix++) {
 	      xsrc = x1 + ix/magx;
@@ -2715,7 +2715,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
 	      }	/* end of switch (bpp) */
 	    } /* end of for (ix) */
 	  break;
-	case ANA_FLOAT:
+	case LUX_FLOAT:
 	  for (iy = nyy - 1; iy >= 0; iy--)
 	    for (ix = 0; ix < nxx; ix++) {
 	      xsrc = x1 + ix/magx;
@@ -2739,7 +2739,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
 	      }	/* end of switch (bpp) */
 	    } /* end of for (ix) */
 	  break;
-	case ANA_DOUBLE:
+	case LUX_DOUBLE:
 	  for (iy = nyy - 1; iy >= 0; iy--)
 	    for (ix = 0; ix < nxx; ix++) {
 	      xsrc = x1 + ix/magx;
@@ -3024,7 +3024,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
     xi = XCreateImage(display, visual, depth, ZPixmap, 0, (char *) image0.b,
 		      nxx, nyy, bpp, 0);
 /*    if (!XInitImage(xi))
-      return anaerror("Error initializing image", 0); */
+      return luxerror("Error initializing image", 0); */
     if (wid >= 0)		/* window */
       XPutImage(display, win[wid], gc[wid], xi, 0, 0, sx, sy, nxx, nyy);
     else			/* pixmap */
@@ -3033,7 +3033,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
     xi->data = NULL;
     XDestroyImage(xi);
     XFlush(display);
-    iq = ANA_OK;
+    iq = LUX_OK;
   } else {			/* to postscript */
     /* in older versions of LUX, when DVI coordinates were used to specify */
     /* positions in a postscript figure, they were exported to the file */
@@ -3062,7 +3062,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
   return iq;
 }
  /*------------------------------------------------------------------------*/
-Int ana_colorpixel(Int narg, Int ps[])
+Int lux_colorpixel(Int narg, Int ps[])
 /* maps color indices to pixel values */
 {
   pointer	p, q;
@@ -3076,24 +3076,24 @@ Int ana_colorpixel(Int narg, Int ps[])
 					tv,x,/post) */
   switch (bpp) {
     case 8:
-      type = ANA_BYTE;
+      type = LUX_BYTE;
       break;
     case 16:
-      type = ANA_WORD;
+      type = LUX_WORD;
       break;
     case 24:
-      type = ANA_LONG;
+      type = LUX_LONG;
       break;
     default:
-      return anaerror("Illegal bpp in ana_colorpixel()", 0);
+      return luxerror("Illegal bpp in lux_colorpixel()", 0);
   }
 
   switch (symbol_class(*ps)) {
-    case ANA_ARRAY:
+    case LUX_ARRAY:
       n = array_size(*ps);
       if (internalMode & TV_24) {
 	if (n % 3)
-	  return anaerror("Need multiple of 3 elements for 24-bit color treatment", *ps);
+	  return luxerror("Need multiple of 3 elements for 24-bit color treatment", *ps);
 	n /= 3;
 	if (array_dims(*ps)[array_num_dims(*ps) - 1] == 3)
 	  iq = array_scratch(type, array_num_dims(*ps) - 1, array_dims(*ps));
@@ -3108,9 +3108,9 @@ Int ana_colorpixel(Int narg, Int ps[])
       p.l = array_data(*ps);
       q.b = array_data(iq);
       break;
-    case ANA_SCALAR:
+    case LUX_SCALAR:
       if (internalMode & TV_24)
-	return anaerror("Need multiple of 3 elements for 24-bit color treatment",
+	return luxerror("Need multiple of 3 elements for 24-bit color treatment",
 		     *ps);
       n = 1;
       p.l = &scalar_value(*ps).l;
@@ -3125,54 +3125,54 @@ Int ana_colorpixel(Int narg, Int ps[])
     case 8:
       if (internalMode & TV_24)
 	switch (symbol_type(*ps)) {
-	  case ANA_BYTE:
+	  case LUX_BYTE:
 	    while (n--)
 	      *q.b++ = (pixels[(Int) *p.b] & red_mask)
 		| (pixels[(Int) p.b[n]] & green_mask)
 		| (pixels[(Int) p.b[2*n]] & blue_mask);
 	    break;
-	  case ANA_WORD:
+	  case LUX_WORD:
 	    while (n--)
 	      *q.b++ = (pixels[(Int) *p.w] & red_mask)
 		| (pixels[(Int) p.w[n]] & green_mask)
 		| (pixels[(Int) p.w[2*n]] & blue_mask);
 	    break;
-	  case ANA_LONG:
+	  case LUX_LONG:
 	    while (n--)
 	      *q.b++ = (pixels[(Int) *p.l] & red_mask)
 		| (pixels[(Int) p.l[n]] & green_mask)
 		| (pixels[(Int) p.l[2*n]] & blue_mask);
 	    break;
-	  case ANA_FLOAT:
+	  case LUX_FLOAT:
 	    while (n--)
 	      *q.b++ = (pixels[(Int) *p.f] & red_mask)
 		| (pixels[(Int) p.f[n]] & green_mask)
 		| (pixels[(Int) p.f[2*n]] & blue_mask);
 	    break;
-	  case ANA_DOUBLE:
+	  case LUX_DOUBLE:
 	    while (n--)
 	      *q.b++ = (pixels[(Int) *p.d] & red_mask)
 		| (pixels[(Int) p.d[n]] & green_mask)
 		| (pixels[(Int) p.d[2*n]] & blue_mask);
 	    break;
 	} else switch (symbol_type(*ps)) {
-	  case ANA_BYTE:
+	  case LUX_BYTE:
 	    while (n--)
 	      *q.b++ = pixels[(Int) *p.b++];
 	    break;
-	  case ANA_WORD:
+	  case LUX_WORD:
 	    while (n--)
 	      *q.b++ = pixels[(Int) ((Byte) *p.w++)];
 	    break;
-	  case ANA_LONG:
+	  case LUX_LONG:
 	    while (n--)
 	      *q.b++ = pixels[(Int) ((Byte) *p.l++)];
 	    break;
-	  case ANA_FLOAT:
+	  case LUX_FLOAT:
 	    while (n--)
 	      *q.b++ = pixels[(Int) ((Byte) *p.f++)];
 	    break;
-	  case ANA_DOUBLE:
+	  case LUX_DOUBLE:
 	    while (n--)
 	      *q.b++ = pixels[(Int) ((Byte) *p.d++)];
 	    break;
@@ -3181,54 +3181,54 @@ Int ana_colorpixel(Int narg, Int ps[])
     case 16:
       if (internalMode & TV_24)
 	switch (symbol_type(*ps)) {
-	  case ANA_BYTE:
+	  case LUX_BYTE:
 	    while (n--)
 	      *q.w++ = (pixels[(Int) *p.b] & red_mask)
 		| (pixels[(Int) p.b[n]] & green_mask)
 		| (pixels[(Int) p.b[2*n]] & blue_mask);
 	    break;
-	  case ANA_WORD:
+	  case LUX_WORD:
 	    while (n--)
 	      *q.w++ = (pixels[(Int) *p.w] & red_mask)
 		| (pixels[(Int) p.w[n]] & green_mask)
 		| (pixels[(Int) p.w[2*n]] & blue_mask);
 	    break;
-	  case ANA_LONG:
+	  case LUX_LONG:
 	    while (n--)
 	      *q.w++ = (pixels[(Int) *p.l] & red_mask)
 		| (pixels[(Int) p.l[n]] & green_mask)
 		| (pixels[(Int) p.l[2*n]] & blue_mask);
 	    break;
-	  case ANA_FLOAT:
+	  case LUX_FLOAT:
 	    while (n--)
 	      *q.w++ = (pixels[(Int) *p.f] & red_mask)
 		| (pixels[(Int) p.f[n]] & green_mask)
 		| (pixels[(Int) p.f[2*n]] & blue_mask);
 	    break;
-	  case ANA_DOUBLE:
+	  case LUX_DOUBLE:
 	    while (n--)
 	      *q.w++ = (pixels[(Int) *p.d] & red_mask)
 		| (pixels[(Int) p.d[n]] & green_mask)
 		| (pixels[(Int) p.d[2*n]] & blue_mask);
 	    break;
 	} else switch (symbol_type(*ps)) {
-	  case ANA_BYTE:
+	  case LUX_BYTE:
 	    while (n--)
 	      *q.w++ = pixels[(Int) *p.b++];
 	    break;
-	  case ANA_WORD:
+	  case LUX_WORD:
 	    while (n--)
 	      *q.w++ = pixels[(Int) ((Byte) *p.w++)];
 	    break;
-	  case ANA_LONG:
+	  case LUX_LONG:
 	    while (n--)
 	      *q.w++ = pixels[(Int) ((Byte) *p.l++)];
 	    break;
-	  case ANA_FLOAT:
+	  case LUX_FLOAT:
 	    while (n--)
 	      *q.w++ = pixels[(Int) ((Byte) *p.f++)];
 	    break;
-	  case ANA_DOUBLE:
+	  case LUX_DOUBLE:
 	    while (n--)
 	      *q.w++ = pixels[(Int) ((Byte) *p.d++)];
 	    break;
@@ -3237,54 +3237,54 @@ Int ana_colorpixel(Int narg, Int ps[])
     case 24:
       if (internalMode & TV_24)
 	switch (symbol_type(*ps)) {
-	  case ANA_BYTE:
+	  case LUX_BYTE:
 	    while (n--)
 	      *q.l++ = (pixels[(Int) *p.b] & red_mask)
 		| (pixels[(Int) p.b[n]] & green_mask)
 		| (pixels[(Int) p.b[2*n]] & blue_mask);
 	    break;
-	  case ANA_WORD:
+	  case LUX_WORD:
 	    while (n--)
 	      *q.l++ = (pixels[(Int) *p.w] & red_mask)
 		| (pixels[(Int) p.w[n]] & green_mask)
 		| (pixels[(Int) p.w[2*n]] & blue_mask);
 	    break;
-	  case ANA_LONG:
+	  case LUX_LONG:
 	    while (n--)
 	      *q.l++ = (pixels[(Int) *p.l] & red_mask)
 		| (pixels[(Int) p.l[n]] & green_mask)
 		| (pixels[(Int) p.l[2*n]] & blue_mask);
 	    break;
-	  case ANA_FLOAT:
+	  case LUX_FLOAT:
 	    while (n--)
 	      *q.l++ = (pixels[(Int) *p.f] & red_mask)
 		| (pixels[(Int) p.f[n]] & green_mask)
 		| (pixels[(Int) p.f[2*n]] & blue_mask);
 	    break;
-	  case ANA_DOUBLE:
+	  case LUX_DOUBLE:
 	    while (n--)
 	      *q.l++ = (pixels[(Int) *p.d] & red_mask)
 		| (pixels[(Int) p.d[n]] & green_mask)
 		| (pixels[(Int) p.d[2*n]] & blue_mask);
 	    break;
 	} else switch (symbol_type(*ps)) {
-	  case ANA_BYTE:
+	  case LUX_BYTE:
 	    while (n--)
 	      *q.l++ = pixels[(Int) *p.b++];
 	    break;
-	  case ANA_WORD:
+	  case LUX_WORD:
 	    while (n--)
 	      *q.l++ = pixels[(Int) ((Byte) *p.w++)];
 	    break;
-	  case ANA_LONG:
+	  case LUX_LONG:
 	    while (n--)
 	      *q.l++ = pixels[(Int) ((Byte) *p.l++)];
 	    break;
-	  case ANA_FLOAT:
+	  case LUX_FLOAT:
 	    while (n--)
 	      *q.l++ = pixels[(Int) ((Byte) *p.f++)];
 	    break;
-	  case ANA_DOUBLE:
+	  case LUX_DOUBLE:
 	    while (n--)
 	      *q.l++ = pixels[(Int) ((Byte) *p.d++)];
 	    break;
@@ -3294,21 +3294,21 @@ Int ana_colorpixel(Int narg, Int ps[])
   return iq;
 }
  /*------------------------------------------------------------------------*/
-Int ana_xtv(Int narg, Int ps[])
+Int lux_xtv(Int narg, Int ps[])
 /* displays an image, properly colored for the current color map, on screen.
    LS 18jan94 */
 {
-  return ana_xtv_general(narg, ps, (narg && symbol_type(ps[0]) == ANA_BYTE)? TV_MAP: 0);
+  return lux_xtv_general(narg, ps, (narg && symbol_type(ps[0]) == LUX_BYTE)? TV_MAP: 0);
 }
  /*------------------------------------------------------------------------*/
-Int ana_xtvmap(Int narg, Int ps[])
+Int lux_xtvmap(Int narg, Int ps[])
 /* displays an image of color indices, mapped to proper pixel values,
   on screen.  LS 18jan94 */
 {
-  return ana_xtv_general(narg, ps, TV_MAP);
+  return lux_xtv_general(narg, ps, TV_MAP);
 }
  /*------------------------------------------------------------------------*/
-Int ana_xcopy(Int narg, Int ps[])
+Int lux_xcopy(Int narg, Int ps[])
  /* 1/8/92 modified to treat negative numbers as pixmaps and 0 and >0 as
    displayed windows */
  /* needs lots of checking which isn't implemented yet */
@@ -3351,7 +3351,7 @@ Int ana_xcopy(Int narg, Int ps[])
  return 1;
  }
  /*------------------------------------------------------------------------*/
-Int ana_xevent(Int narg, Int ps[])
+Int lux_xevent(Int narg, Int ps[])
 {
  XEvent  report;
  Int     nev, i;
@@ -3405,7 +3405,7 @@ Int ana_xevent(Int narg, Int ps[])
  return 1;
  }
  /*------------------------------------------------------------------------*/
-Int ana_xpurge(narg,ps)	/* just throw away any pending X events */
+Int lux_xpurge(narg,ps)	/* just throw away any pending X events */
  Int narg, ps[];
  {
  XEvent  report;
@@ -3419,7 +3419,7 @@ Int ana_xpurge(narg,ps)	/* just throw away any pending X events */
  return 1;
  }
  /*------------------------------------------------------------------------*/
-Int ana_xplace(Int narg, Int ps[])
+Int lux_xplace(Int narg, Int ps[])
  /* response to a key or button press in an lux window and note the
  time and position */
 {
@@ -3427,12 +3427,12 @@ Int ana_xplace(Int narg, Int ps[])
  KeySym	keysym;
  char	buffer[16];
  Int	coordTrf(Float *, Float *, Int, Int);
- extern Int	ana_keysym, ana_keystate;
+ extern Int	lux_keysym, lux_keystate;
 
  XEvent  report;
 
- if (ck_events() != ANA_OK)
-   return ANA_ERROR;
+ if (ck_events() != LUX_OK)
+   return LUX_ERROR;
 	/* wait for a button or key press */
 	/* changed to a loop because may catch event for an LUX menu */
 	/* LS 10jun93 */
@@ -3447,37 +3447,37 @@ Int ana_xplace(Int narg, Int ps[])
      }
  } while (last_wid == -1);
 	 /* preset key and button to 0, only one of these will be set */
- ana_keycode = ana_keysym = ana_button = 0;
+ lux_keycode = lux_keysym = lux_button = 0;
  xhair = report.xbutton.x;
  yhair = report.xbutton.y;
- coordTrf(&xhair, &yhair, ANA_X11, ANA_DEV);
+ coordTrf(&xhair, &yhair, LUX_X11, LUX_DEV);
  xcoord = (Int) xhair;
  ycoord = (Int) yhair;
  cs = (internalMode & 7);
  if (!cs)
-   cs = ANA_DVI;
- coordTrf(&xhair, &yhair, ANA_DEV, cs);
+   cs = LUX_DVI;
+ coordTrf(&xhair, &yhair, LUX_DEV, cs);
  last_time = (Double) report.xbutton.time / 1000.0; /* time in seconds */
  switch (report.type) {
  case ButtonPress:
-   ana_button = report.xbutton.button;
-   ana_keystate = report.xbutton.state;
+   lux_button = report.xbutton.button;
+   lux_keystate = report.xbutton.state;
    break;
  case KeyPress:	/* keycode translation LS 1jun93 */
-   ana_keycode = report.xkey.keycode;
-   ana_keystate = report.xkey.state;
+   lux_keycode = report.xkey.keycode;
+   lux_keystate = report.xkey.state;
    nc = XLookupString(&(report.xkey), buffer, 15, &keysym, NULL);
    buffer[nc] = '\0';
-   ana_keysym = (Int) keysym;
+   lux_keysym = (Int) keysym;
    break;
  }
 	/* return parameters if they were arguments */
  switch (narg) {
  case 2:
-   if (redef_scalar(ps[1], ANA_LONG, &ycoord) != 1)
+   if (redef_scalar(ps[1], LUX_LONG, &ycoord) != 1)
      return cerror(ALLOC_ERR, ps[1]);
  case 1:
-   if (redef_scalar(ps[0], ANA_LONG, &xcoord) != 1)
+   if (redef_scalar(ps[0], LUX_LONG, &xcoord) != 1)
      return cerror(ALLOC_ERR, ps[0]);
  }
  return 1;
@@ -3488,17 +3488,17 @@ Int xwindow_plot(Int ix, Int iy, Int mode)
 /* added pixmap case - LS 8oct97 */
 /* added alternateDash - LS 16oct98 */
 {
- Int     wid, ana_xpen(Int, Float);
+ Int     wid, lux_xpen(Int, Float);
  extern Int	alternateDash, current_pen;
  extern Float	current_gray;
 
  wid = last_wid;
  if ((wid >= 0 && !win[wid]) || (wid < 0 && !maps[-wid]))
-   ana_xcreat(wid, 512, 512, 0, 0, 0, NULL, NULL); 
+   lux_xcreat(wid, 512, 512, 0, 0, 0, NULL, NULL); 
 
  if (mode == 0) {
    if (alternateDash)
-     ana_xpen(current_pen, (Float) 1 - current_gray);
+     lux_xpen(current_pen, (Float) 1 - current_gray);
    else {
      xold = ix;
      yold = iy;
@@ -3511,19 +3511,19 @@ Int xwindow_plot(Int ix, Int iy, Int mode)
  else				/* pixmap */
    XDrawLine(display, maps[-wid], gcmap[-wid], xold, yold, ix, iy);
  if (!mode)			/* we also have alternateDash */
-   ana_xpen(current_pen, current_gray);
+   lux_xpen(current_pen, current_gray);
  xold = ix;
  yold = iy;
  XFlush(display);
  return 1;
 }
  /*------------------------------------------------------------------------*/
-Int ana_xflush()
+Int lux_xflush()
  {
  XFlush(display);       return 1;
  }
  /*------------------------------------------------------------------------*/
-Int ana_xpen(Int pen, Float gray)
+Int lux_xpen(Int pen, Float gray)
 {
   Int	wid;
   extern Int	standardGray;
@@ -3540,7 +3540,7 @@ Int ana_xpen(Int pen, Float gray)
  wid = last_wid;
  /* does window exist? If not create a default size */
  if ((wid >= 0 && !win[wid]) || (wid < 0 && !maps[-wid]))
-   ana_xcreat(wid, 512, 512, 0, 0, 0, NULL, NULL);
+   lux_xcreat(wid, 512, 512, 0, 0, 0, NULL, NULL);
  XSetLineAttributes(display, gc[wid], pen, LineSolid, CapRound,
 		    JoinRound);
  if (gray < 0)
@@ -3557,7 +3557,7 @@ Int ana_xpen(Int pen, Float gray)
  return 1;
 }
  /*------------------------------------------------------------------------*/
-Int ana_xfont(narg, ps)
+Int lux_xfont(narg, ps)
                                         /* set font for a window */
  Int     narg, ps[];
  {
@@ -3571,14 +3571,14 @@ Int ana_xfont(narg, ps)
  wid = last_wid;
  if (narg > 1) wid = int_arg( ps[1]);
  /* does window exist? If not create a default size */
- if ( win[wid] == 0 ) ana_xcreat(wid, 512, 512, 0, 0, 0, NULL, NULL);
+ if ( win[wid] == 0 ) lux_xcreat(wid, 512, 512, 0, 0, 0, NULL, NULL);
  if ( (font_info[wid] = XLoadQueryFont(display, fontname)) == NULL)
   { printf("font does not exist: %s\n", fontname);  return -1; }
  XSetFont( display, gc[wid], font_info[wid]->fid);
  return 1;
  }
  /*------------------------------------------------------------------------*/
-Int ana_xlabel(narg, ps)
+Int lux_xlabel(narg, ps)
                                         /* user labels */
  Int     narg, ps[];
  {
@@ -3594,13 +3594,13 @@ Int ana_xlabel(narg, ps)
  wid = last_wid;
  if (narg > 3) { wid = int_arg( ps[3]);  last_wid = wid; }
  /* does window exist? If not create a default size */
- if ( win[wid] == 0 ) ana_xcreat(wid, 512, 512, 0, 0, 0, NULL, NULL);
+ if ( win[wid] == 0 ) lux_xcreat(wid, 512, 512, 0, 0, 0, NULL, NULL);
  XDrawString( display, win[wid], gc[wid], ix, iy, s, len);
  XFlush(display);
  return 1;
  }
  /*------------------------------------------------------------------------*/
-Int ana_xlabelwidth(narg, ps)
+Int lux_xlabelwidth(narg, ps)
                                         /* user label width */
  Int     narg, ps[];
  {
@@ -3638,20 +3638,20 @@ Int xlabelwidth(s)
  len = strlen(s);
  wid = last_wid;
  /* does window exist? If not create a default size */
- if ( win[wid] == 0 ) ana_xcreat(wid, 512, 512, 0, 0, 0, NULL, NULL);
+ if ( win[wid] == 0 ) lux_xcreat(wid, 512, 512, 0, 0, 0, NULL, NULL);
  return  XTextWidth(font_info[wid], s, len );
  }
  /*------------------------------------------------------------------------*/
-Int ana_xtvread(Int narg, Int ps[])
+Int lux_xtvread(Int narg, Int ps[])
 {
  /* read from an X window or pixmap and create a Byte array */
  Int  nx, ny, ix, iy, wid, result_sym, dim[2], w, hh, type;
  pointer    ptr;
  Drawable        *src;
- Int	ana_zerof(Int, Int *);
+ Int	lux_zerof(Int, Int *);
  extern Int	bits_per_pixel;
- Int ana_colorstogrey(Int, Int []);
- Int ana_delete(Int, Int []);
+ Int lux_colorstogrey(Int, Int []);
+ Int lux_delete(Int, Int []);
 
  /* the input arguments are all scalars */
  ck_events();
@@ -3687,26 +3687,26 @@ Int ana_xtvread(Int narg, Int ps[])
    hh = ht[wid];
  }
  if (*src == 0)
-   return anaerror("non-existent window in tvread: %d", 0, wid);
+   return luxerror("non-existent window in tvread: %d", 0, wid);
  nx = MIN(nx, w - ix);
  ny = MIN(ny, hh - iy);
  if (nx < 0 || ny < 0)
-   return anaerror("xtvread - off screen", 0);
+   return luxerror("xtvread - off screen", 0);
  dim[0] = nx;
  dim[1] = ny;
  switch (bits_per_pixel) {
    case 8:
-     type = ANA_BYTE;
+     type = LUX_BYTE;
      break;
    case 16:
-     type = ANA_WORD;
+     type = LUX_WORD;
      break;
    case 32:
-     type = ANA_LONG;
+     type = LUX_LONG;
      break;
  }
  result_sym = array_scratch(type, 2, dim);
- result_sym = ana_zerof(1, &result_sym);  /* zero it in case not filled */
+ result_sym = lux_zerof(1, &result_sym);  /* zero it in case not filled */
  ptr.b = array_data(result_sym);
  /* note that we create our own image and use XGetSubImage */
  xi = XCreateImage(display, visual, depth, ZPixmap, 0, (char *) ptr.b,
@@ -3716,17 +3716,17 @@ Int ana_xtvread(Int narg, Int ps[])
  XDestroyImage(xi);
  XFlush(display);
  if (internalMode & 1) {
-   Int ana_colorstogrey(Int narg, Int ps[]);
-   Int ana_delete(Int narg, Int ps[]);
-   if (ana_colorstogrey(1, &result_sym) != ANA_OK) {
-     ana_delete(1, &result_sym);
-     return ANA_ERROR;
+   Int lux_colorstogrey(Int narg, Int ps[]);
+   Int lux_delete(Int narg, Int ps[]);
+   if (lux_colorstogrey(1, &result_sym) != LUX_OK) {
+     lux_delete(1, &result_sym);
+     return LUX_ERROR;
    }
  }
  return reverseYImage(result_sym);
 }
 /*------------------------------------------------------------------------*/
-Int ana_xquery(Int narg, Int ps[])
+Int lux_xquery(Int narg, Int ps[])
 {
   Int	xquery(Int, Int []);
 
@@ -3734,12 +3734,12 @@ Int ana_xquery(Int narg, Int ps[])
   return 1;
 }
  /*------------------------------------------------------------------------*/
-Int ana_xquery_f(Int narg, Int ps[])
+Int lux_xquery_f(Int narg, Int ps[])
 {
  Int	result;
  Int	xquery(Int, Int []);
 
- result = scalar_scratch(ANA_LONG);
+ result = scalar_scratch(LUX_LONG);
  sym[result].spec.scalar.l = xquery(narg, ps);
  return result;
 }
@@ -3751,8 +3751,8 @@ Int xquery(Int narg, Int ps[])
   Window	qroot, qchild;
 
   wid = narg? int_arg(ps[0]): last_wid;
-  if (!win[wid] && ana_xport(1, &wid) == ANA_ERROR)
-    return ANA_ERROR;
+  if (!win[wid] && lux_xport(1, &wid) == LUX_ERROR)
+    return LUX_ERROR;
   XQueryPointer(display, win[wid], &qroot, &qchild, &root_x,
                 &root_y, &xcoord, &ycoord, &kb);
   /* Note:  status seems to always be True, even if the pointer isn't
@@ -3777,14 +3777,14 @@ Bool windowButtonPress(Display *display, XEvent *event, XPointer arg)
   return False;
 }
 /*------------------------------------------------------------------------*/
-Int ana_check_window(Int narg, Int ps[])
+Int lux_check_window(Int narg, Int ps[])
      /* checks event buffer for any pending window selections */
 {
   Int	num, w, i;
   XEvent	event;
   
   if (setup_x() < 0)
-    return ANA_ERROR;
+    return LUX_ERROR;
   if (narg >= 1) num = int_arg(*ps); else num = -1;
   if (XCheckIfEvent(display, &event, windowButtonPress,
 		    (XPointer) ((num < 0)? NULL: &num)))
@@ -3793,13 +3793,13 @@ Int ana_check_window(Int narg, Int ps[])
       if (win[i] == w) { last_wid = i;  break; }
     xcoord = event.xbutton.x;
     ycoord = event.xbutton.y;
-    ana_button = event.xbutton.button;
+    lux_button = event.xbutton.button;
     last_time = (Double) event.xbutton.time / 1000.0;
     return 1; }
   return 4;
 } 
 /*------------------------------------------------------------------------*/
-Int ana_xraise(Int narg, Int ps[]) /* raise (popup) a window */
+Int lux_xraise(Int narg, Int ps[]) /* raise (popup) a window */
 {
   Int    wid;
 
@@ -3809,13 +3809,13 @@ Int ana_xraise(Int narg, Int ps[]) /* raise (popup) a window */
   /* a no-op for a pixmap */
   if ( wid >= 0 )
   { if ( win[wid] == 0 )
-      return anaerror("No such window", ps[0]);
+      return luxerror("No such window", ps[0]);
     XRaiseWindow(display, win[wid]);
   }
   return 1;
 }
 /*------------------------------------------------------------------------*/
-Int ana_xanimate(Int narg, Int ps[])
+Int lux_xanimate(Int narg, Int ps[])
 /* XANIMATE,data [, x, y, FR1=fr1, FR2=fr2, FRSTEP=frstep] [, /TIME, */
 /* /REPEAT] */
 {
@@ -3825,13 +3825,13 @@ Int ana_xanimate(Int narg, Int ps[])
   struct timezone	tzp;
   pointer	data;
 
-  if (symbol_class(ps[0]) != ANA_ARRAY)
+  if (symbol_class(ps[0]) != LUX_ARRAY)
     return cerror(NEED_ARR, ps[0]);
   if (array_num_dims(ps[0]) < 3)
-    return anaerror("XANIMATE needs data with at least 3 dimensions", ps[0]);
+    return luxerror("XANIMATE needs data with at least 3 dimensions", ps[0]);
   wid = last_wid;		/* window */
   if (wid < 0)
-    return anaerror("XANIMATE does not work in pixmaps", ps[0]);
+    return luxerror("XANIMATE does not work in pixmaps", ps[0]);
   if (narg > 1 && ps[1])
     ix = int_arg(ps[1]);
   if (narg > 2 && ps[2])
@@ -3845,7 +3845,7 @@ Int ana_xanimate(Int narg, Int ps[])
   nny = ny = dims[1];
   nFrame = array_size(ps[0])/(nx*ny);
   if (fr1 < 0 || fr1 >= nFrame - 1)
-    return anaerror("Start frame number out of range: %1d vs. (0:%1d)",
+    return luxerror("Start frame number out of range: %1d vs. (0:%1d)",
 		 ps[3], fr1, 0, nFrame - 2);
   data.l = array_data(ps[0]);
   ix = 0;
@@ -3855,20 +3855,20 @@ Int ana_xanimate(Int narg, Int ps[])
   else
     fr2 = nFrame - 1;
   if (fr2 < fr1 || fr2 >= nFrame)
-    return anaerror("End frame number out of range: %1d vs. (%1d:%1d)",
+    return luxerror("End frame number out of range: %1d vs. (%1d:%1d)",
 		 ps[4], fr2, fr1 + 1, nFrame - 1);
   if (narg > 5 && ps[5])
     frs = int_arg(ps[5]);
   else
     frs = 1;
   if (frs < 1)
-    return anaerror("Illegal frame step size: %1d", ps[5], frs);
+    return luxerror("Illegal frame step size: %1d", ps[5], frs);
 
   /* does window exist?  If not create to fit image */
   if (win[wid] == 0)
-    ana_xcreat(wid, iy + ny, ix + nx, 0, 0, 0, NULL, NULL);
+    lux_xcreat(wid, iy + ny, ix + nx, 0, 0, 0, NULL, NULL);
   if (!ck_area(wid, &ix, &iy, &nnx, &nny))
-    return anaerror("XANIMATE - completely off window", 0);
+    return luxerror("XANIMATE - completely off window", 0);
 
   xi = XCreateImage(display, visual, 8, ZPixmap, 0, (char *) data.b, nx,
 		    ny*nFrame, 8, 0);
@@ -3894,21 +3894,21 @@ Int ana_xanimate(Int narg, Int ps[])
   return 1;
 }
 /*---------------------------------------------------------*/
-Int ana_xzoom(Int narg, Int ps[])
+Int lux_xzoom(Int narg, Int ps[])
 /* ZOOM,image [,x,y,window] */
 {
   XEvent	event;
   Int	wid, i, type, nx, ny;
   pointer	ptr;
 
-  if (symbol_class(ps[0]) != ANA_ARRAY)
+  if (symbol_class(ps[0]) != LUX_ARRAY)
     return cerror(NEED_ARR, ps[0]);
   ck_events();
   wid = last_wid;
   if (wid < 0)
-    return anaerror("Cannot use ZOOM on pixmaps", 0);
-  if (ana_xtv(narg, ps) < 0)	/* display image */
-    return ANA_ERROR;		/* some error */
+    return luxerror("Cannot use ZOOM on pixmaps", 0);
+  if (lux_xtv(narg, ps) < 0)	/* display image */
+    return LUX_ERROR;		/* some error */
   ptr.l = array_data(ps[0]);
   type = array_type(ps[0]);
   nx = *array_dims(ps[0]);	/* width */
@@ -3930,19 +3930,19 @@ Int ana_xzoom(Int narg, Int ps[])
       if (event.xmotion.x < nx && event.xmotion.y < ny) {
 	i = event.xmotion.x + event.xmotion.y*nx;
 	switch (type) {
-	case ANA_BYTE:
+	case LUX_BYTE:
 	  printf("%10d", ptr.b[i]);
 	  break;
-	case ANA_WORD:
+	case LUX_WORD:
 	  printf("%10d", ptr.w[i]);
 	  break;
-	case ANA_LONG:
+	case LUX_LONG:
 	  printf("%10d", ptr.l[i]);
 	  break;
-	case ANA_FLOAT:
+	case LUX_FLOAT:
 	  printf("%10f", ptr.f[i]);
 	  break;
-	case ANA_DOUBLE:
+	case LUX_DOUBLE:
 	  printf("%10g", ptr.d[i]);
 	  break;
 	}
@@ -3958,7 +3958,7 @@ Int ana_xzoom(Int narg, Int ps[])
 }
 /*---------------------------------------------------------*/
 Int tvplanezoom = 1;
-Int ana_xtvplane(Int narg, Int ps[])
+Int lux_xtvplane(Int narg, Int ps[])
  /* use negative zoom factors for compression, not real fast */
  /* 9/21/96 allow 2-D arrays also but verify that plane is 0 */
  /* tvplane, cube, in, ix,iy, window
@@ -3986,17 +3986,17 @@ Int ana_xtvplane(Int narg, Int ps[])
     compress4(Byte *, Int, Int, Int *, Int *, Int *, Int);
 
   if (ck_events() != 1)
-    return ANA_ERROR;
+    return LUX_ERROR;
   iq = ps[0];
   wid = last_wid;
   if (wid < 0)
-    return anaerror("TVPLANE - pixmaps (negative window #'s) not supported", 0);
-  if (symbol_class(iq) != ANA_ARRAY)
+    return luxerror("TVPLANE - pixmaps (negative window #'s) not supported", 0);
+  if (symbol_class(iq) != LUX_ARRAY)
     return cerror(NEED_ARR, iq);
   nd = array_num_dims(iq);
   if ((nd != 3 && nd != 2)
-      || array_type(iq) != ANA_BYTE)
-    return anaerror("TVPLANE - array must be 2-D or 3-D BYTE", iq);
+      || array_type(iq) != LUX_BYTE)
+    return luxerror("TVPLANE - array must be 2-D or 3-D BYTE", iq);
   nx = array_dims(iq)[0];
   ny = array_dims(iq)[1];
   if (nd == 3)
@@ -4007,7 +4007,7 @@ Int ana_xtvplane(Int narg, Int ps[])
   if (narg > 1)
     ip = int_arg(ps[1]);
   if (ip >= nz || ip < 0) 
-    return anaerror("TVPLANE - out of range plane (%d)", ps[1]);
+    return luxerror("TVPLANE - out of range plane (%d)", ps[1]);
   if (narg > 2)
     ix = int_arg(ps[2]);
   if (narg > 3)
@@ -4016,7 +4016,7 @@ Int ana_xtvplane(Int narg, Int ps[])
     wid = int_arg(ps[4]);
   /* does window exist? We must have a predefined window */
   if (win[wid] == 0)
-    return anaerror("TVPLANE - window must be pre-defined, %d\n", narg > 4? ps[4]: 0, wid);
+    return luxerror("TVPLANE - window must be pre-defined, %d\n", narg > 4? ps[4]: 0, wid);
 
   /* get pointer to the unzoomed image */
   ptr = (Byte *) array_data(iq) + ip*nx*ny;
@@ -4088,7 +4088,7 @@ Int ana_xtvplane(Int narg, Int ps[])
 	compress4(ptr, nx, ny, &zoom_sym, &ns, &ms, 0);
 	break;
       default:
-	return anaerror("TVPLANE - illegal zoom factor %1d; only -4,-2,1,2,3,4,8,16 allowed", 0, tvplanezoom);
+	return luxerror("TVPLANE - illegal zoom factor %1d; only -4,-2,1,2,3,4,8,16 allowed", 0, tvplanezoom);
     }
     /* get pointer to this now, assume that ns and ms are the proper
        dimension */
@@ -4127,7 +4127,7 @@ Int ana_xtvplane(Int narg, Int ps[])
   return 1;
 }
 /*---------------------------------------------------------*/
-Int ana_threecolors(Int narg, Int ps[])
+Int lux_threecolors(Int narg, Int ps[])
 /* installs color table with three domains */
 /* THREECOLORS,arg */
 /* the color table consists of a grey domain, a red domain, and a blue
@@ -4139,10 +4139,10 @@ Int ana_threecolors(Int narg, Int ps[])
   Float	fraction, *list;
   Int	threecolors(Float *, Int);
 
-  if (ck_events() != ANA_OK)
-    return ANA_ERROR;
+  if (ck_events() != LUX_OK)
+    return LUX_ERROR;
 
-  if (!narg || symbol_class(ps[0]) == ANA_SCALAR) {
+  if (!narg || symbol_class(ps[0]) == LUX_SCALAR) {
     if (narg)
       fraction = float_arg(ps[0]);
     else
@@ -4153,12 +4153,12 @@ Int ana_threecolors(Int narg, Int ps[])
   if (!symbolIsNumericalArray(ps[0]))
     return cerror(ILL_CLASS, ps[0]);
   if (array_size(ps[0]) != 9)
-    return anaerror("Need 9 elements in array", ps[0]);
-  list = array_data(ana_float(1, ps));
+    return luxerror("Need 9 elements in array", ps[0]);
+  list = array_data(lux_float(1, ps));
   return threecolors(list, 9);
 }
 /*---------------------------------------------------------*/
-Int ana_tv3(Int narg, Int ps[])
+Int lux_tv3(Int narg, Int ps[])
 /* TV3,<image>[,<bitmap1>,<bitmap2>] */
 {
   Int	iq, nx, ny, mode, i, wid;
@@ -4180,7 +4180,7 @@ Int ana_tv3(Int narg, Int ps[])
       bitmap1 = NULL;
     else if (symbolIsNumericalArray(ps[1])
 	     && array_size(ps[1]) == array_size(ps[0])) {
-      iq = ana_byte(1, &ps[1]);	/* ensure BYTE */
+      iq = lux_byte(1, &ps[1]);	/* ensure BYTE */
       bitmap1 = array_data(iq);
     } else
       return cerror(INCMP_ARG, ps[1]);
@@ -4192,7 +4192,7 @@ Int ana_tv3(Int narg, Int ps[])
       bitmap2 = NULL;
     else if (symbolIsNumericalArray(ps[2])
 	     && array_size(ps[2]) == array_size(ps[0])) {
-      iq = ana_byte(1, &ps[2]);
+      iq = lux_byte(1, &ps[2]);
       bitmap2 = array_data(iq);
     } else
       return cerror(INCMP_ARG, ps[2]);
@@ -4221,7 +4221,7 @@ Int ana_tv3(Int narg, Int ps[])
   }
 
   mode = internalMode;
-  internalMode = 0;		/* or it may interfere with ana_scale() which
+  internalMode = 0;		/* or it may interfere with lux_scale() which
 				   is called by tvraw() */
 
   if (narg > 6 && ps[6]) {	/* <scale> */
@@ -4234,7 +4234,7 @@ Int ana_tv3(Int narg, Int ps[])
     tvscale = 0.0;
 
   if (!threeColors)
-    ana_threecolors(0, NULL);
+    lux_threecolors(0, NULL);
   i = tvraw(data, array_type(ps[0]), array_dims(ps[0])[0],
 	    array_dims(ps[0])[1], 0, nx - 1, 0, ny - 1, fx, fy,
 	    wid, &tvscale, mode, 0.0, 0.0, bitmap1, bitmap2);
@@ -4242,7 +4242,7 @@ Int ana_tv3(Int narg, Int ps[])
 }
 /*---------------------------------------------------------*/
 Int invert_flag = 0;
-Int ana_xdrawline(Int narg, Int ps[])
+Int lux_xdrawline(Int narg, Int ps[])
 /* subroutine, call is xdrawline, x1, y1, x2, y2 where the arguments can
    be scalars or arrays but all must match in length */
 /* used for X window drawing with lower overhead than xymov calls */
@@ -4255,12 +4255,12 @@ Int ana_xdrawline(Int narg, Int ps[])
   wid = last_wid;
   if (narg > 4) {
     if (int_arg_stat(ps[4], &wid) != 1)
-      return ANA_ERROR;
+      return LUX_ERROR;
   }
   if (wid < 0 ) {
     dq = maps[-wid];
     if (dq == 0) {
-      ana_xcreat(wid, 512, 512, 0, 0, 0, NULL, NULL);
+      lux_xcreat(wid, 512, 512, 0, 0, 0, NULL, NULL);
       dq = maps[-wid];		/* added LS 22mar99 */
     } else
       set_defw(wid);
@@ -4268,7 +4268,7 @@ Int ana_xdrawline(Int narg, Int ps[])
   } else {
     dq = win[wid];
     if (dq == 0) {
-      ana_xcreat(wid, 512, 512, 0, 0, 0, NULL, NULL);
+      lux_xcreat(wid, 512, 512, 0, 0, 0, NULL, NULL);
       dq = win[wid];		/* added LS 22mar99 */
     } else
       set_defw(wid);
@@ -4278,14 +4278,14 @@ Int ana_xdrawline(Int narg, Int ps[])
      arguments in case any of them use the window limit symbols */
   /* the arguments can be scalars (class 1 or 8) or arrays (class 4), check
      first for not class 4 as first step */
-  if (symbol_class(ps[0]) != ANA_ARRAY) {
+  if (symbol_class(ps[0]) != LUX_ARRAY) {
     /* assume all scalars, int_arg_stat will complain if that doesn't happen,
        it will also handle the class 8 for us */
     if (int_arg_stat(ps[0], &ixs) != 1
 	|| int_arg_stat(ps[1], &iys) != 1
 	|| int_arg_stat(ps[2], &ix) != 1
 	|| int_arg_stat(ps[3], &iy) != 1)
-      return ANA_ERROR;
+      return LUX_ERROR;
     
     switch (invert_flag) {
       case 0:
@@ -4299,29 +4299,29 @@ Int ana_xdrawline(Int narg, Int ps[])
     /* here we expect 4 arrays of the same size */
     Int	*px1, *px2, *py1, *py2, n, nx, iq;
 
-    iq = ana_long(1, &ps[0]);
+    iq = lux_long(1, &ps[0]);
     nx = array_size(iq);
     px1 = array_data(iq);
 
-    if (symbol_class(ps[1]) != ANA_ARRAY)
+    if (symbol_class(ps[1]) != LUX_ARRAY)
       return cerror(NEED_ARR, ps[1]);
-    iq = ana_long(1, &ps[1]);
+    iq = lux_long(1, &ps[1]);
     n = array_size(iq);
     if (n != nx)
       return cerror(INCMP_ARG, ps[1]);
     py1 = array_data(iq);
     
-    if (symbol_class(ps[2]) != ANA_ARRAY)
+    if (symbol_class(ps[2]) != LUX_ARRAY)
       return cerror(INCMP_ARG, iq);
-    iq = ana_long(1, &ps[2]);
+    iq = lux_long(1, &ps[2]);
     n = array_size(iq);
     if (n != nx)
       return cerror(INCMP_ARG, ps[2]);
     px2 = array_data(iq);;
     
-    if (symbol_class(ps[3]) != ANA_ARRAY)
+    if (symbol_class(ps[3]) != LUX_ARRAY)
       return cerror(NEED_ARR, iq);
-    iq = ana_long(1, &ps[3]);
+    iq = lux_long(1, &ps[3]);
     n = array_size(iq);
     if (n != nx)
       return cerror(INCMP_ARG, ps[3]);
@@ -4340,33 +4340,33 @@ Int ana_xdrawline(Int narg, Int ps[])
 	break;
     }
   }
-  return ANA_OK;
+  return LUX_OK;
 }
 /*---------------------------------------------------------*/
-Int ana_xinvertline(Int narg, Int ps[])
+Int lux_xinvertline(Int narg, Int ps[])
 /* used for X window drawing with lower overhead than xymov calls */
 /* better for interactive graphics */
 {
   Int	iq;
 
   invert_flag = 1;
-  iq = ana_xdrawline(narg, ps);
+  iq = lux_xdrawline(narg, ps);
   invert_flag = 0;
   return iq;
 }
 /*------------------------------------------------------------------------*/
-Int ana_xinvertarc(Int narg, Int ps[])
+Int lux_xinvertarc(Int narg, Int ps[])
 {
   Int	iq;
-  Int	ana_xdrawarc(Int, Int []);
+  Int	lux_xdrawarc(Int, Int []);
 
   invert_flag = 1;
-  iq = ana_xdrawarc(narg, ps);
+  iq = lux_xdrawarc(narg, ps);
   invert_flag = 0;
   return iq;
 }
 /*------------------------------------------------------------------------*/
-Int ana_xdrawarc(Int narg, Int ps[])
+Int lux_xdrawarc(Int narg, Int ps[])
 /* subroutine, call is xdrawarc, x1, y1, w, h, [a1, a2, win] */
 {
   Int     wid, ixs, iys, w, h, xa1, xa2;
@@ -4376,18 +4376,18 @@ Int ana_xdrawarc(Int narg, Int ps[])
 
   wid = last_wid;
   if (narg > 6 && int_arg_stat(ps[6], &wid) != 1)
-    return ANA_ERROR;
+    return LUX_ERROR;
   if (wid < 0) {
     dq = maps[-wid];
     if (dq == 0)
-      ana_xcreat(wid, 512, 512, 0, 0, 0, NULL, NULL);
+      lux_xcreat(wid, 512, 512, 0, 0, 0, NULL, NULL);
     else
       set_defw(wid);
     gq = gcmap[-wid];
   } else {
     dq = win[wid];
     if (dq == 0)
-      ana_xcreat(wid, 512, 512, 0, 0, 0, NULL, NULL);
+      lux_xcreat(wid, 512, 512, 0, 0, 0, NULL, NULL);
     else
       set_defw(wid);
     gq = gc[wid];
@@ -4396,17 +4396,17 @@ Int ana_xdrawarc(Int narg, Int ps[])
      arguments in case any of them use the window limit symbols */
   /* assume all scalars, int_arg_stat will complain if that doesn't happen, it
      will also handle the class 8 for us */
-  if (int_arg_stat(ps[0], &ixs) != ANA_OK
-      || int_arg_stat(ps[1], &iys) != ANA_OK
-      || int_arg_stat(ps[2], &w) != ANA_OK
-      || int_arg_stat(ps[3], &h) != ANA_OK)
-    return ANA_ERROR;
+  if (int_arg_stat(ps[0], &ixs) != LUX_OK
+      || int_arg_stat(ps[1], &iys) != LUX_OK
+      || int_arg_stat(ps[2], &w) != LUX_OK
+      || int_arg_stat(ps[3], &h) != LUX_OK)
+    return LUX_ERROR;
   a1 = 0.0;
   a2 = 360.0;
-  if (narg > 4 && float_arg_stat(ps[4], &a1) != ANA_OK)
-    return ANA_ERROR;
-  if (narg > 5 && float_arg_stat(ps[5], &a2) != ANA_OK)
-    return ANA_ERROR;
+  if (narg > 4 && float_arg_stat(ps[4], &a1) != LUX_OK)
+    return LUX_ERROR;
+  if (narg > 5 && float_arg_stat(ps[5], &a2) != LUX_OK)
+    return LUX_ERROR;
   /* convert these fp angles into X units */
   xa1 = (Int) 64.*a1;
   xa2 = (Int) 64.*a2;
@@ -4419,6 +4419,6 @@ Int ana_xdrawarc(Int narg, Int ps[])
       XDrawArc(display, dq, gcnot, ixs, iys, w, h, xa1, xa2);
       break;
   }
-  return ANA_OK;
+  return LUX_OK;
 }
 /*---------------------------------------------------------*/

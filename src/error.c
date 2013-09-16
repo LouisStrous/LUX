@@ -80,8 +80,8 @@ char	*errorMessages[] = {
  "Subscript/index/coordinate out of range",
 /* INCMP_INNER_BC	18*/
  "Inner dimension Byte count is not a multiple of element length",
-/* ANA_SUB_ARG	19*/
- "(X) Impossible error in ana_sub_arg",
+/* LUX_SUB_ARG	19*/
+ "(X) Impossible error in lux_sub_arg",
 /* NEED_ARR	20*/
  "Need numerical array",
 /* N_DIMS_OVR	21*/
@@ -303,7 +303,7 @@ char *errorMessage(char *message, Int symbol, ...)
   return result;
 }
 /*-------------------------------------------------------------------*/
-Int anaerror(char *message, Int symbol, ...)
+Int luxerror(char *message, Int symbol, ...)
 /* displays error messages */
 {
   va_list	ap;
@@ -319,7 +319,7 @@ Int anaerror(char *message, Int symbol, ...)
     putchar('\n');
     errorPtr = NULL;
   }
-  return ANA_ERROR;
+  return LUX_ERROR;
 }
 /*-------------------------------------------------------------------*/
 Int cerror(Int message, Int symbol, ...)
@@ -328,10 +328,10 @@ Int cerror(Int message, Int symbol, ...)
   va_list	ap;
 
   if (message == -1) {
-    if (symbol_class(symbol) == ANA_UNUSED) { /* got zapped in the meantime */
+    if (symbol_class(symbol) == LUX_UNUSED) { /* got zapped in the meantime */
       errorPtr = NULL;
       errorSym = 0;
-      return ANA_ERROR;
+      return LUX_ERROR;
     }
     puts(symbolIdent(symbol, I_FILELEVEL | I_LINE | I_TRUNCATE | I_LENGTH));
     if (errorPtr) {
@@ -346,7 +346,7 @@ Int cerror(Int message, Int symbol, ...)
   } else {
     va_start(ap, symbol);
     if (message < 0 || message >= nErrorMessages)
-      return anaerror("Illegal Error Number (%d)", 0, message);
+      return luxerror("Illegal Error Number (%d)", 0, message);
     puts(verrorMessage(errorMessages[message], symbol, ap));
     va_end(ap);
     errorSym = symbol;
@@ -358,10 +358,10 @@ Int cerror(Int message, Int symbol, ...)
       errorPtr = NULL;
     }
   }
-  return ANA_ERROR;
+  return LUX_ERROR;
 }
 /*-------------------------------------------------------------------*/
-Int ana_error(Int narg, Int ps[])
+Int lux_error(Int narg, Int ps[])
 /* allows the user to generate an error message */
 /* syntax:  error [,format,symbol] [, /store, /restore] */
 {
@@ -377,7 +377,7 @@ Int ana_error(Int narg, Int ps[])
   }
   switch (internalMode & 3) {
     case 0:
-      return anaerror(format, symbol);
+      return luxerror(format, symbol);
   case 1:			/* /STORE */
     errorMessage(format, symbol);
     strcpy(storedErrorMessage, curScrat);
@@ -388,7 +388,7 @@ Int ana_error(Int narg, Int ps[])
     /* fall-thru */
   case 2:			/* /RESTORE */
     puts(storedErrorMessage);
-    return ANA_ERROR;
+    return LUX_ERROR;
   }
   return 1;			/* or some compilers complain */
 }

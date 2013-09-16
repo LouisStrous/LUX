@@ -1,4 +1,4 @@
-/* This is file anadefs.h.
+/* This is file luxdefs.h.
 
 Copyright 2013 Louis Strous
 
@@ -36,48 +36,48 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 	/* symbol classes */
 
 enum Symbolclass { 
-  ANA_UNUSED = 0,		/* 0: not used */
-  ANA_SCALAR,			/* 1: real scalar 17 */
-  ANA_STRING,			/* 2: string 'xx' */
-  ANA_RANGE,			/* 3: range  (1:2) */
-  ANA_ARRAY,			/* 4: numerical real or string array [1,2] */
-  ANA_TRANSFER,			/* 5: transfer symbol */
-  ANA_ASSOC,			/* 6: associated variable ASSOC */
-  ANA_FUNC_PTR,			/* 7: function pointer &SIN */
-  ANA_SCAL_PTR,			/* 8: scalar pointer !MXB */
-  ANA_SUBSC_PTR,		/* 9: subscript pointer (1:2) */
-  ANA_FILEMAP,			/* 10: file map FLTFARR */
-  ANA_CLIST,			/* 11: compact list { } */
-  ANA_LIST,			/* 12: list { } */
-  ANA_STRUCT,			/* 13: structure { } */
-  ANA_KEYWORD,			/* 14: keyword /FOO */
-  ANA_LIST_PTR,			/* 15: list member pointer .TAG */
-  ANA_PRE_RANGE,		/* 16: pre-range (1:3) */
-  ANA_PRE_CLIST,		/* 17: pre-compact-list { } */
-  ANA_PRE_LIST,			/* 18: pre-list { } */
-  ANA_ENUM,			/* 19: enumeration */
-  ANA_META,			/* 20: meta SYMBOL('string') */
-  ANA_CSCALAR,			/* 21: complex scalar */
-  ANA_CARRAY,			/* 22: complex array */
-  ANA_CPLIST,			/* 23: compact pointer list */
-  ANA_POINTER,			/* 24: pointer &X */
-  ANA_STRUCT_PTR,		/* 25: pointer to member(s) of a structure */
-  ANA_SUBROUTINE = 32,		/* 32: subroutine definition */
-  ANA_FUNCTION,			/* 33: function definition */
-  ANA_BLOCKROUTINE,		/* 34: block routine definition */
-  ANA_DEFERRED_SUBR,		/* 35: deferred subroutine definition */
-  ANA_DEFERRED_FUNC,		/* 36: deferred function definition */
-  ANA_DEFERRED_BLOCK,		/* 37: deferred block routine */
-  ANA_BIN_OP = 192,		/* 192: binary operation */
-  ANA_INT_FUNC,			/* 193: internal function call */
-  ANA_USR_FUNC,			/* 194: user-defined function call */
-  ANA_IF_OP,			/* 195: binary if-operation */
-  ANA_EXTRACT,			/* 196: extraction */
-  ANA_PRE_EXTRACT,		/* 197: pre-extraction */
-  ANA_EVB = 200,		/* 200: executable */
-  ANA_FIXED_NUMBER,		/* 201: fixed number */
-  ANA_FIXED_STRING,		/* 202: fixed string */
-  ANA_UNDEFINED = 255		/* 255: undefined */
+  LUX_UNUSED = 0,		/* 0: not used */
+  LUX_SCALAR,			/* 1: real scalar 17 */
+  LUX_STRING,			/* 2: string 'xx' */
+  LUX_RANGE,			/* 3: range  (1:2) */
+  LUX_ARRAY,			/* 4: numerical real or string array [1,2] */
+  LUX_TRANSFER,			/* 5: transfer symbol */
+  LUX_ASSOC,			/* 6: associated variable ASSOC */
+  LUX_FUNC_PTR,			/* 7: function pointer &SIN */
+  LUX_SCAL_PTR,			/* 8: scalar pointer !MXB */
+  LUX_SUBSC_PTR,		/* 9: subscript pointer (1:2) */
+  LUX_FILEMAP,			/* 10: file map FLTFARR */
+  LUX_CLIST,			/* 11: compact list { } */
+  LUX_LIST,			/* 12: list { } */
+  LUX_STRUCT,			/* 13: structure { } */
+  LUX_KEYWORD,			/* 14: keyword /FOO */
+  LUX_LIST_PTR,			/* 15: list member pointer .TAG */
+  LUX_PRE_RANGE,		/* 16: pre-range (1:3) */
+  LUX_PRE_CLIST,		/* 17: pre-compact-list { } */
+  LUX_PRE_LIST,			/* 18: pre-list { } */
+  LUX_ENUM,			/* 19: enumeration */
+  LUX_META,			/* 20: meta SYMBOL('string') */
+  LUX_CSCALAR,			/* 21: complex scalar */
+  LUX_CARRAY,			/* 22: complex array */
+  LUX_CPLIST,			/* 23: compact pointer list */
+  LUX_POINTER,			/* 24: pointer &X */
+  LUX_STRUCT_PTR,		/* 25: pointer to member(s) of a structure */
+  LUX_SUBROUTINE = 32,		/* 32: subroutine definition */
+  LUX_FUNCTION,			/* 33: function definition */
+  LUX_BLOCKROUTINE,		/* 34: block routine definition */
+  LUX_DEFERRED_SUBR,		/* 35: deferred subroutine definition */
+  LUX_DEFERRED_FUNC,		/* 36: deferred function definition */
+  LUX_DEFERRED_BLOCK,		/* 37: deferred block routine */
+  LUX_BIN_OP = 192,		/* 192: binary operation */
+  LUX_INT_FUNC,			/* 193: internal function call */
+  LUX_USR_FUNC,			/* 194: user-defined function call */
+  LUX_IF_OP,			/* 195: binary if-operation */
+  LUX_EXTRACT,			/* 196: extraction */
+  LUX_PRE_EXTRACT,		/* 197: pre-extraction */
+  LUX_EVB = 200,		/* 200: executable */
+  LUX_FIXED_NUMBER,		/* 201: fixed number */
+  LUX_FIXED_STRING,		/* 202: fixed string */
+  LUX_UNDEFINED = 255		/* 255: undefined */
 };
 
 /* note: do not change the relative order of these classes!  newSymbol */
@@ -85,20 +85,20 @@ enum Symbolclass {
 
 	/* symbol types */
 enum Symboltype {
-  ANA_BYTE,			/* 0: 1-Byte integers */
-  ANA_WORD,			/* 1: 2-Byte integers */
-  ANA_LONG,			/* 2: 4-Byte integers */
-  ANA_FLOAT,			/* 3: 4-Byte floats */
-  ANA_DOUBLE,			/* 4: 8-Byte floats */
-  ANA_TEMP_STRING,		/* 5: temporary strings */
-  ANA_LSTRING,			/* 6: literal strings */
-  ANA_STRING_ARRAY,		/* 7: string arrays */
-  ANA_CFLOAT,			/* 8: 8-Byte complex floats */
-  ANA_CDOUBLE,			/* 9: 16-Byte complex floats */
-  ANA_NO_SYMBOLTYPE,
+  LUX_BYTE,			/* 0: 1-Byte integers */
+  LUX_WORD,			/* 1: 2-Byte integers */
+  LUX_LONG,			/* 2: 4-Byte integers */
+  LUX_FLOAT,			/* 3: 4-Byte floats */
+  LUX_DOUBLE,			/* 4: 8-Byte floats */
+  LUX_TEMP_STRING,		/* 5: temporary strings */
+  LUX_LSTRING,			/* 6: literal strings */
+  LUX_STRING_ARRAY,		/* 7: string arrays */
+  LUX_CFLOAT,			/* 8: 8-Byte complex floats */
+  LUX_CDOUBLE,			/* 9: 16-Byte complex floats */
+  LUX_NO_SYMBOLTYPE,
 };
 
-	/* ANA_EVB classes */
+	/* LUX_EVB classes */
 
 enum EVBclasses {
   EVB_BLOCK = 1,		/* 1: statement block { } */
@@ -124,8 +124,8 @@ enum includeTypes {
 };
 
 /* special execution codes */
-#define ANA_ERROR	-1	/* error state */
-#define ANA_OK		1	/* OK state */
+#define LUX_ERROR	-1	/* error state */
+#define LUX_OK		1	/* OK state */
 #define LOOP_BREAK	-2	/* BREAK state */
 #define LOOP_CONTINUE	-3	/* CONTINUE state */
 #define LOOP_RETALL	-4	/* RETALL state */
@@ -160,36 +160,36 @@ enum fmtTypes {
 /* binary operation classes */
 /* don't change the order of these constants!  this order must
    correspond with the order in binOpName, binOpSign, binFunc* in
-   eval.c, and the positions of ANA_EQ, ANA_OR, and ANA_POW relative
+   eval.c, and the positions of LUX_EQ, LUX_OR, and LUX_POW relative
    to the (other) relational and logical operators must remain the
-   same.  All between ANA_EQ and ANA_OR accept ANA_FLOAT operands, all
-   between ANA_OR and ANA_POW do not. */
+   same.  All between LUX_EQ and LUX_OR accept LUX_FLOAT operands, all
+   between LUX_OR and LUX_POW do not. */
 
 enum binaryOps {
-  ANA_ADD,			/* 0: + */
-  ANA_SUB,			/* 1: - */
-  ANA_MUL,			/* 2: * */
-  ANA_DIV,			/* 3: / */
-  ANA_IDIV,			/* 4: \ */
-  ANA_MOD,			/* 5: %, MOD */
-  ANA_SMOD,			/* 6: SMOD */
-  ANA_MAX,			/* 7: > */
-  ANA_MIN,			/* 8: < */
-  ANA_EQ,			/* 9: EQ */
-  ANA_GT,			/* 10: GT */
-  ANA_GE,			/* 11: GE */
-  ANA_LT,			/* 12: LT */
-  ANA_LE,			/* 13: LE */
-  ANA_NE,			/* 14: NE */
-  ANA_OR,			/* 15: OR */
-  ANA_AND,			/* 16: AND */
-  ANA_XOR,			/* 17: XOR */
-  ANA_POW,			/* 18: ^ */
-  ANA_ANDIF,			/* 19: ANDIF */
-  ANA_ORIF			/* 20: ORIF */
+  LUX_ADD,			/* 0: + */
+  LUX_SUB,			/* 1: - */
+  LUX_MUL,			/* 2: * */
+  LUX_DIV,			/* 3: / */
+  LUX_IDIV,			/* 4: \ */
+  LUX_MOD,			/* 5: %, MOD */
+  LUX_SMOD,			/* 6: SMOD */
+  LUX_MAX,			/* 7: > */
+  LUX_MIN,			/* 8: < */
+  LUX_EQ,			/* 9: EQ */
+  LUX_GT,			/* 10: GT */
+  LUX_GE,			/* 11: GE */
+  LUX_LT,			/* 12: LT */
+  LUX_LE,			/* 13: LE */
+  LUX_NE,			/* 14: NE */
+  LUX_OR,			/* 15: OR */
+  LUX_AND,			/* 16: AND */
+  LUX_XOR,			/* 17: XOR */
+  LUX_POW,			/* 18: ^ */
+  LUX_ANDIF,			/* 19: ANDIF */
+  LUX_ORIF			/* 20: ORIF */
 };
 #define NUM_BIN_OP	19	/* note that this number does not */
-				/* count ANA_ANDIF and ANA_ORIF */
+				/* count LUX_ANDIF and LUX_ORIF */
 
  /* boundingBoxType (PLOT,BOUNDINGBOX=) stuff */
 #define BB_NONE		0	/* no bounding box */
@@ -205,22 +205,22 @@ enum binaryOps {
 #define CLEANUP_ERROR	8
 
  /* special parser symbol numbers */
-#define ANA_NEW_LIST	-32766	/* must be negative */
-#define ANA_EXTEND	-32755
-#define ANA_LIST_DELIM	-32754
-#define ANA_ZERO		4
-#define ANA_ONE		1
-#define ANA_MINUS_ONE	2
+#define LUX_NEW_LIST	-32766	/* must be negative */
+#define LUX_EXTEND	-32755
+#define LUX_LIST_DELIM	-32754
+#define LUX_ZERO		4
+#define LUX_ONE		1
+#define LUX_MINUS_ONE	2
 
-#define ANA_UNSPECIFIED	-9999
+#define LUX_UNSPECIFIED	-9999
 
  /* some special functions and routines */
-#define ANA_NEG_FUN	0
-#define ANA_SUBSC_FUN	1
-#define ANA_CONCAT_FUN	4
-#define ANA_POW_FUN	3
+#define LUX_NEG_FUN	0
+#define LUX_SUBSC_FUN	1
+#define LUX_CONCAT_FUN	4
+#define LUX_POW_FUN	3
 
-#define ANA_INSERT_SUB	0
+#define LUX_INSERT_SUB	0
 
  /* openPathFile options */
 #define FIND_SUBR	0
@@ -315,17 +315,17 @@ enum binaryOps {
 #define RAD	(180*M_1_PI)
 
 /* coordinate systems */
-#define ANA_DEP	0		/* ANA_DVI or ANA_DEV, depending on */
+#define LUX_DEP	0		/* LUX_DVI or LUX_DEV, depending on */
 				/* coordinate magnitudes */
-#define ANA_DVI	1		/* device-independent */
-#define ANA_DEV	2		/* device-dependent (xport) */
-#define ANA_IMG	3		/* image coordinates (tv) */
-#define ANA_PLT	4		/* plot coordinates */
-#define ANA_RIM	5		/* relative image coordinates */
-#define ANA_RPL	6		/* relative plot coordinates */
-#define ANA_X11	7		/* X coordinate system */
-#define ANA_XLOG	64		/* logarithmic X */
-#define ANA_YLOG	128		/* logarithmic Y */
+#define LUX_DVI	1		/* device-independent */
+#define LUX_DEV	2		/* device-dependent (xport) */
+#define LUX_IMG	3		/* image coordinates (tv) */
+#define LUX_PLT	4		/* plot coordinates */
+#define LUX_RIM	5		/* relative image coordinates */
+#define LUX_RPL	6		/* relative plot coordinates */
+#define LUX_X11	7		/* X coordinate system */
+#define LUX_XLOG	64		/* logarithmic X */
+#define LUX_YLOG	128		/* logarithmic Y */
 
 /* debug breakpoint modes */
 #define DEBUG_STEP	1
@@ -419,14 +419,14 @@ typedef struct {
 
 /* kinds of facts */
 enum {
-  ANA_NO_FACT, ANA_STAT_FACTS
+  LUX_NO_FACT, LUX_STAT_FACTS
 };
 
-#define ANA_ANY_FACT		(0xffffffff)
+#define LUX_ANY_FACT		(0xffffffff)
 
-#define ANA_STAT_FACTS_MINMAX	(1<<0)
-#define ANA_STAT_FACTS_TOTAL	(1<<1)
-#define ANA_STAT_FACTS_SDEV	(1<<2)
+#define LUX_STAT_FACTS_MINMAX	(1<<0)
+#define LUX_STAT_FACTS_TOTAL	(1<<1)
+#define LUX_STAT_FACTS_SDEV	(1<<2)
 
 typedef struct {
   Int min; Int max; Int minloc; Int maxloc; Double total; Double sdev;
@@ -669,7 +669,7 @@ typedef struct {
 Int	nextFreeTempVariable(void), nextFreeNamedVariable(void),
 	nextFreeExecutable(void), nextFreeTempExecutable(void),
 	dereferenceScalPointer(Int), findSym(Int, hashTableEntry *[], Int),
-	findInternalName(char *, Int), anaerror(char *, Int, ...),
+	findInternalName(char *, Int), luxerror(char *, Int, ...),
 	lookForName(char *, hashTableEntry *[], Int), execute(Int);
 char	*symName(Int, hashTableEntry *[]);
 
@@ -683,7 +683,7 @@ char	*symName(Int, hashTableEntry *[]);
 	{ if ((a = nextFreeTempExecutable()) < 0) return a; }
 #define isTemp(a)	(a >= TEMPS_START && a < TEMPS_END)
 #define isFreeTemp(a)	(isTemp(a) && symbol_context(a) == -compileLevel)
-#define scalPointer(a)	{ if (sym[a].class == ANA_SCAL_PTR)\
+#define scalPointer(a)	{ if (sym[a].class == LUX_SCAL_PTR)\
 			  a = dereferenceScalPointer(a); }
 #define findVar(index, context)	findSym(index, varHashTable, context)
 #define findSubr(index)		findSym(index, subrHashTable, 0)
@@ -723,7 +723,7 @@ extern char *symbolStack[];
 #define ABS(A)			(((A) >= 0)? (A): -(A))
 #define HEAD(SYM)		((array *) sym[SYM].spec.array.ptr)
 #define LPTR(HEAD)		((Int *)((char *) HEAD + sizeof(array)))
-#define CK_ARR(SYM, ARGN)	if (sym[SYM].class != ANA_ARRAY)\
+#define CK_ARR(SYM, ARGN)	if (sym[SYM].class != LUX_ARRAY)\
 				return cerror(NEED_ARR, SYM)
 #define CK_SGN(ARR, N, ARGN, SYM)\
 	for (i = 0; i < N; i++) \
@@ -739,48 +739,48 @@ extern char *symbolStack[];
 #define allocate(arg, size, type)\
    if (!(size)) arg = NULL; \
    else { if (!(arg = (void *) malloc((size)*sizeof(type))))\
-   return anaerror("Memory allocation error\n", 0); }
+   return luxerror("Memory allocation error\n", 0); }
 #define eallocate(arg, size, type)\
  (size? ((arg = (type *) Malloc((size)*sizeof(type)))? 1: 0): (arg = NULL, 0))
 #define GET_NUMERICAL(PTR, SIZE) \
   switch (sym[iq].class) \
-  { case ANA_SCALAR:    PTR.l = &sym[iq].spec.scalar.l;  SIZE = 1;  break;  \
-    case ANA_ARRAY:     h = HEAD(iq);  PTR.l = LPTR(h);  GET_SIZE(SIZE, h->dims, h->ndim);  \
+  { case LUX_SCALAR:    PTR.l = &sym[iq].spec.scalar.l;  SIZE = 1;  break;  \
+    case LUX_ARRAY:     h = HEAD(iq);  PTR.l = LPTR(h);  GET_SIZE(SIZE, h->dims, h->ndim);  \
       break; \
     default:        return cerror(ILL_CLASS, iq); }
 
 	/* multi-type macro */
 #define multiSwitch2(type, first, second) \
  switch (type) \
- { case ANA_BYTE:   first .b second ; break; \
-   case ANA_WORD:   first .w second ; break; \
-   case ANA_LONG:   first .l second ; break; \
-   case ANA_FLOAT:  first .f second ; break; \
-   case ANA_DOUBLE: first .d second ; break; }
+ { case LUX_BYTE:   first .b second ; break; \
+   case LUX_WORD:   first .w second ; break; \
+   case LUX_LONG:   first .l second ; break; \
+   case LUX_FLOAT:  first .f second ; break; \
+   case LUX_DOUBLE: first .d second ; break; }
 
 #define multiSwitch3(type, first, second, third) \
  switch (type) \
- { case ANA_BYTE:   first .b second .b third ; break; \
-   case ANA_WORD:   first .w second .w third ; break; \
-   case ANA_LONG:   first .l second .l third ; break; \
-   case ANA_FLOAT:  first .f second .f third ; break; \
-   case ANA_DOUBLE: first .d second .d third ; break; }
+ { case LUX_BYTE:   first .b second .b third ; break; \
+   case LUX_WORD:   first .w second .w third ; break; \
+   case LUX_LONG:   first .l second .l third ; break; \
+   case LUX_FLOAT:  first .f second .f third ; break; \
+   case LUX_DOUBLE: first .d second .d third ; break; }
 
 #define multiSwitch4(type, first, second, third, fourth) \
  switch (type) \
- { case ANA_BYTE:   first .b second .b third .b fourth ; break; \
-   case ANA_WORD:   first .w second .w third .b fourth ; break; \
-   case ANA_LONG:   first .l second .l third .b fourth ; break; \
-   case ANA_FLOAT:  first .f second .f third .b fourth ; break; \
-   case ANA_DOUBLE: first .d second .d third .b fourth ; break; }
+ { case LUX_BYTE:   first .b second .b third .b fourth ; break; \
+   case LUX_WORD:   first .w second .w third .b fourth ; break; \
+   case LUX_LONG:   first .l second .l third .b fourth ; break; \
+   case LUX_FLOAT:  first .f second .f third .b fourth ; break; \
+   case LUX_DOUBLE: first .d second .d third .b fourth ; break; }
 
 #define multiSwitch5(type, first, second, third, fourth, fifth) \
  switch (type) \
- { case ANA_BYTE:   first .b second .b third .b fourth .b fifth ; break; \
-   case ANA_WORD:   first .w second .w third .b fourth .b fifth ; break; \
-   case ANA_LONG:   first .l second .l third .b fourth .b fifth ; break; \
-   case ANA_FLOAT:  first .f second .f third .b fourth .b fifth ; break; \
-   case ANA_DOUBLE: first .d second .d third .b fourth .b fifth ; break; }
+ { case LUX_BYTE:   first .b second .b third .b fourth .b fifth ; break; \
+   case LUX_WORD:   first .w second .w third .b fourth .b fifth ; break; \
+   case LUX_LONG:   first .l second .l third .b fourth .b fifth ; break; \
+   case LUX_FLOAT:  first .f second .f third .b fourth .b fifth ; break; \
+   case LUX_DOUBLE: first .d second .d third .b fourth .b fifth ; break; }
 
 #include "output.h"
 

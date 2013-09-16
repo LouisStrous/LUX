@@ -19,18 +19,18 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 #define _GNU_SOURCE
 
-#include "anadefs.h"
+#include "luxdefs.h"
 #include "error.h"
 #include "dmalloc.h"
 #include "bindings.h"
 
 extern char		expname[], line[], *curScrat, *currentRoutineName;
 extern Word		listStack[],  curContext;
-extern Int		scrat[], ana_file_open[], errorSym,
+extern Int		scrat[], lux_file_open[], errorSym,
 			MSBfirst, suppressMsg;
-extern Int	ana_type_size[];
+extern Int	lux_type_size[];
 
-extern FILE		*inputStream, *ana_file[];
+extern FILE		*inputStream, *lux_file[];
 extern hashTableEntry	*varHashTable[], *subrHashTable[], *funcHashTable[],
 			*blockHashTable[];
 extern symTableEntry	sym[];
@@ -39,7 +39,7 @@ extern Int		nSubroutine, nFunction, curLineNumber, compileLevel,
 			ignoreInput, curSymbol, axisTally[];
 extern unsigned int     internalMode;
 extern struct boundsStruct	bounds;
-extern Int	(*ana_converts[10])(Int, Int []);
+extern Int	(*lux_converts[10])(Int, Int []);
 
 char 	*strsave(char *), *symbolIdent(Int, Int),
 	*symName(Int, hashTableEntry *[]), *string_arg(Int),
@@ -52,19 +52,19 @@ Int 	dereferenceScalPointer(Int), scalar_scratch(Int),
   array_scratch(Int, Int, Int []), int_arg(Int), array_clone(Int, Int),
   convertRange(Int), popTempVariable(Int), int_arg_stat(Int, Int *),
   findSym(Int, hashTableEntry *[], Int), findInternalName(char *, Int),
-  ana_float(Int, Int []), ana_long(Int, Int []), ana_byte(Int , Int []),
-  ana_word(Int, Int []), ana_double(Int, Int []), ana_cfloat(Int, Int []),
-  anaerror(char *, Int, ...), cerror(Int, Int, ...), copyEvalSym(Int),
+  lux_float(Int, Int []), lux_long(Int, Int []), lux_byte(Int , Int []),
+  lux_word(Int, Int []), lux_double(Int, Int []), lux_cfloat(Int, Int []),
+  luxerror(char *, Int, ...), cerror(Int, Int, ...), copyEvalSym(Int),
   getNumerical(Int, Int, Int *, pointer *, char, Int *, pointer *),
-  strccmp(char *, char *), eval(Int), evals(Int), ana_cdouble(Int, Int []),
+  strccmp(char *, char *), eval(Int), evals(Int), lux_cdouble(Int, Int []),
   strncasecmp_p(char *, char *, Int), strcasecmp_p(char *, char *),
-  stringpointer(char *, Int), routineContext(Int), ana_string(Int, Int []),
+  stringpointer(char *, Int), routineContext(Int), lux_string(Int, Int []),
   getSimpleNumerical(Int, pointer *, Int *), double_arg_stat(Int, Double *),
   numerical(Int, Int **, Int *, Int *, pointer *),
   numerical_or_string(Int, Int **, Int *, Int *, pointer *),
   findName(char *, hashTableEntry **, Int), to_scalar(Int, Int),
   to_scratch_array(Int, Int, Int, Int *), get_dims(Int *, Int *, Int *),
-  listNumElements(Int), ana_zero(Int, Int []),
+  listNumElements(Int), lux_zero(Int, Int []),
   cubic_spline_tables(void *, Int, Int, void *, Int, Int, Int,
 		      Byte, Byte, csplineInfo *), 
   numerical_clone(Int, enum Symboltype),

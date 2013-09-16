@@ -21,7 +21,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 /* Ephemerides having to do with the appearance of the Sun as seen from */
 /* Earth.  LS 1997 */
 #include <math.h>
-#include "anadefs.h"
+#include "luxdefs.h"
 #include "action.h"
 
 /* 2nd-degree polynomial evaluation */
@@ -100,27 +100,27 @@ void solar_physical(Double jd, Int select)
   }
 }
 /*------------------------------------------------------------------------*/
-Int ana_solar_physical(Int narg, Int ps[], Int select)
+Int lux_solar_physical(Int narg, Int ps[], Int select)
 /* LS < 1998 */
 {
   Int	n, result;
   pointer	src, trgt;
 
-  /* get copy of ps[0] upgraded to ANA_FLOAT if necessary, return pointer
+  /* get copy of ps[0] upgraded to LUX_FLOAT if necessary, return pointer
      in <src>, number of elements in <n>.  Also create garbage clone of
      (updated) <iq> and return pointer in <trgt>, symbol number in
      <result>. */
-  if (getNumerical(ps[0], ANA_FLOAT, &n, &src, GN_UPDATE | GN_UPGRADE,
+  if (getNumerical(ps[0], LUX_FLOAT, &n, &src, GN_UPDATE | GN_UPGRADE,
 		   &result, &trgt) < 0)
-    return ANA_ERROR;		/* some error */
+    return LUX_ERROR;		/* some error */
   switch (symbol_type(result)) {
-    case ANA_FLOAT:
+    case LUX_FLOAT:
       while (n--) {
 	solar_physical((Double) *src.f++, select);
 	*trgt.f++ = (Float) solar_stuff;
       }
       break;
-    case ANA_DOUBLE:
+    case LUX_DOUBLE:
       while (n--) {
 	solar_physical(*src.d++, select);
 	*trgt.d++ = solar_stuff;
@@ -130,24 +130,24 @@ Int ana_solar_physical(Int narg, Int ps[], Int select)
   return result;
 }
 /*------------------------------------------------------------------------*/
-Int ana_solar_p(Int narg, Int ps[])
+Int lux_solar_p(Int narg, Int ps[])
 {
-  return ana_solar_physical(narg, ps, 0);
+  return lux_solar_physical(narg, ps, 0);
 }
 /*------------------------------------------------------------------------*/
-Int ana_solar_b(Int narg, Int ps[])
+Int lux_solar_b(Int narg, Int ps[])
 {
-  return ana_solar_physical(narg, ps, 1);
+  return lux_solar_physical(narg, ps, 1);
 }
 /*------------------------------------------------------------------------*/
-Int ana_solar_l(Int narg, Int ps[])
+Int lux_solar_l(Int narg, Int ps[])
 {
-  return ana_solar_physical(narg, ps, (internalMode & 1)? 4: 2);
+  return lux_solar_physical(narg, ps, (internalMode & 1)? 4: 2);
 }
 /*------------------------------------------------------------------------*/
-Int ana_solar_r(Int narg, Int ps[])
+Int lux_solar_r(Int narg, Int ps[])
 {
-  return ana_solar_physical(narg, ps, 3);
+  return lux_solar_physical(narg, ps, 3);
 }
 /*------------------------------------------------------------------------*/
 

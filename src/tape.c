@@ -46,7 +46,7 @@ extern Int	byte_count;	/* defined in files.c */
 Int	tape_messages=1;
 static	Int	tape_fd[MAXTAPE], neof[MAXTAPE], neot[MAXTAPE];
 /*------------------------------------------------------------------------- */
-Int ana_tape_status(Int narg, Int ps[])/* print tape status */
+Int lux_tape_status(Int narg, Int ps[])/* print tape status */
 {
   Int   fd, j;
 
@@ -71,7 +71,7 @@ Int tape_setup(Int narg, Int ps[])		/* for internal use */
   tape_lun = int_arg( ps[0] );		/* get tape logical unit number */
   if (tape_lun < 0 || tape_lun > MAXTAPE) {
     printf("illegal tape unit specified\n");
-    return ANA_ERROR;
+    return LUX_ERROR;
   }
   if (tape_fd[tape_lun] == 0) {	/* new ? */
     neof[tape_lun] = neot[tape_lun] = 0;
@@ -98,7 +98,7 @@ Int tape_setup(Int narg, Int ps[])		/* for internal use */
   }
   if (tape_fd[tape_lun] < 0) {
     perror("tape_setup error");
-    return ANA_ERROR;
+    return LUX_ERROR;
   }
 
   return tape_fd[tape_lun];
@@ -115,19 +115,19 @@ Int check_tape_io(Int iq)
     io_status = 1;
   else
     io_status = errno;
-  return ANA_OK;
+  return LUX_OK;
 }
 /*------------------------------------------------------------------------- */
-Int ana_rewind(Int narg, Int ps[])/* rewind a tape drive */
+Int lux_rewind(Int narg, Int ps[])/* rewind a tape drive */
 {
   Int	fd;
 
   if ((fd = tape_setup(narg,ps)) < 0)
-    return ANA_ERROR;
+    return LUX_ERROR;
   return check_tape_io(ioctl(fd, MTIOCTOP, &rew));
 }
 /*------------------------------------------------------------------------- */
-Int ana_weof(narg,ps)				/* write an eof on tape drive */
+Int lux_weof(narg,ps)				/* write an eof on tape drive */
 Int	narg, ps[];
 {
 Int	fd;
@@ -135,12 +135,12 @@ if ( (fd = tape_setup(narg,ps)) < 0) return -1;;
 return check_tape_io( ioctl(fd, MTIOCTOP, &mtweof) );
 }
 /*------------------------------------------------------------------------- */
-Int ana_unload(Int narg, Int ps[])/* unload a tape drive */
+Int lux_unload(Int narg, Int ps[])/* unload a tape drive */
 {
   Int	fd;
 
   if ((fd = tape_setup(narg,ps)) < 0)
-    return ANA_ERROR;
+    return LUX_ERROR;
   if (ioctl(fd, MTIOCTOP, &unl))
     perror("tape unload");
   if (close(fd))
@@ -149,7 +149,7 @@ Int ana_unload(Int narg, Int ps[])/* unload a tape drive */
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int ana_skipr(narg,ps)				/* skip records */
+Int lux_skipr(narg,ps)				/* skip records */
 Int	narg, ps[];
 {
 Int	fd, nr;
@@ -164,7 +164,7 @@ tape_op.mt_op = MTBSR;	tape_op.mt_count = -nr;
 return check_tape_io( ioctl(fd, MTIOCTOP, &tape_op) );
 }
 /*------------------------------------------------------------------------- */
-Int ana_skipf(narg,ps)				/* skip records */
+Int lux_skipf(narg,ps)				/* skip records */
 Int	narg, ps[];
 {
 Int	fd, nf;
@@ -179,7 +179,7 @@ tape_op.mt_op = MTBSF;	tape_op.mt_count = -nf;
 return check_tape_io( ioctl(fd, MTIOCTOP, &tape_op) );
 }
 /*------------------------------------------------------------------------- */
-Int ana_taprd(Int narg, Int ps[])
+Int lux_taprd(Int narg, Int ps[])
 /* read tape record.  Modified LS 27mar98 to read records until the */
 /* requested number of bytes is read (or an error occurs) */
 {
@@ -187,15 +187,15 @@ Int ana_taprd(Int narg, Int ps[])
   pointer q1;
   
   if ( (fd = tape_setup(narg,ps)) < 0)
-    return ANA_ERROR;
+    return LUX_ERROR;
 				/* get the size of the input array to load */
   iq = ps[1];
-  if (symbol_class(iq) != ANA_ARRAY)
+  if (symbol_class(iq) != LUX_ARRAY)
     return cerror(NEED_ARR, iq);
 
   q1.l = (Int *) array_data(iq);
   type = array_type(iq);
-  n = cur = ana_type_size[type]*array_size(iq);
+  n = cur = lux_type_size[type]*array_size(iq);
   nread = 0;
   do {
     nbr = read(fd, q1.b, cur);
@@ -220,7 +220,7 @@ Int ana_taprd(Int narg, Int ps[])
   return 1;
 }
  /*------------------------------------------------------------------------- */
-Int ana_tapwrt(narg,ps)				/* read tape record */
+Int lux_tapwrt(narg,ps)				/* read tape record */
  Int	narg, ps[];
  {
  Int	fd, nbr, iq, j, nd, n, type;
@@ -234,7 +234,7 @@ Int ana_tapwrt(narg,ps)				/* read tape record */
  q1.l = (Int *) ((char *)h + sizeof(array));
  nd = h->ndim;
  type = sym[iq].type;
- n = ana_type_size[type]; errno = 0;
+ n = lux_type_size[type]; errno = 0;
  for(j=0;j<nd;j++) n *= h->dims[j];
 #if !WORDS_BIGENDIAN
  endian(q1.b, n, type);
@@ -250,7 +250,7 @@ Int ana_tapwrt(narg,ps)				/* read tape record */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_tapebufout(Int narg, Int ps[])			/* write tape record */
+Int lux_tapebufout(Int narg, Int ps[])			/* write tape record */
  /*the call is TAPEBUFOUT,tape#,array,[recsize,offset,len]
  the defaults for offset and len are just the whole array (or what is left of
  it if just offset is specified) and the default for recsize is 16384 bytes
@@ -271,7 +271,7 @@ Int ana_tapebufout(Int narg, Int ps[])			/* write tape record */
  q1.l = (Int *) ((char *)h + sizeof(array));
  nd = h->ndim;
  type = sym[iq].type;
- nb = n = ana_type_size[sym[iq].type];
+ nb = n = lux_type_size[sym[iq].type];
  errno = 0;
  for(j=0;j<nd;j++) n *= h->dims[j];
  recsize = 16384;  offset = 0;
@@ -311,7 +311,7 @@ Int ana_tapebufout(Int narg, Int ps[])			/* write tape record */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_tapebufin(Int narg, Int ps[])/* read tape record */
+Int lux_tapebufin(Int narg, Int ps[])/* read tape record */
  /*the call is TAPEBUFIN,tape#,array,[recsize,offset,len]
  the defaults for offset and len are just the whole array (or what is left of
  it if just offset is specified) and the default for recsize is 32768 bytes
@@ -327,14 +327,14 @@ Int ana_tapebufin(Int narg, Int ps[])/* read tape record */
 #endif
 
  if ((fd = tape_setup(narg,ps)) < 0)
-   return ANA_ERROR;
+   return LUX_ERROR;
 				 /* get the size of the input array to load */
  iq = ps[1];
- if (symbol_class(iq) != ANA_ARRAY)
+ if (symbol_class(iq) != LUX_ARRAY)
    return cerror(NEED_ARR, iq);
  q1.l = (Int *) array_data(iq);
  type = array_type(iq);
- nb = n = ana_type_size[type];
+ nb = n = lux_type_size[type];
  errno = 0;
  n *= array_size(iq);
  recsize = 32768;
@@ -347,7 +347,7 @@ Int ana_tapebufin(Int narg, Int ps[])/* read tape record */
  offset *= nb;		/* offset in bytes */
  if (offset > n) {
    printf("offset exceeds array size, %d %d\n", offset, n);
-   return ANA_ERROR;
+   return LUX_ERROR;
  }
  if (narg > 4) {
    len = int_arg(ps[4]);
@@ -356,7 +356,7 @@ Int ana_tapebufin(Int narg, Int ps[])/* read tape record */
  }
  if (n < 14) {
    printf("data size too small for a tape read/write, use >= 14, %d\n", n);
-   return ANA_ERROR;
+   return LUX_ERROR;
  }
 #if !WORDS_BIGENDIAN
  p = (char *) q1.b;
@@ -406,7 +406,7 @@ Int ana_tapebufin(Int narg, Int ps[])/* read tape record */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_wait_for_tape(narg,ps)				/* read tape record */
+Int lux_wait_for_tape(narg,ps)				/* read tape record */
 Int	narg, ps[];
 {
 /* a dummy version, we'll need this when we do asynchronous tape i/o */

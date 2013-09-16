@@ -137,10 +137,10 @@ char	*visualNames[] = { "StaticGray", "GrayScale", "StaticColor",
 
 Int setup_x_visual(Int desiredVisualClass)
 /* tries to open a connection to the X server and initializes a grey ramp */
-/* colormap.  Returns ANA_OK and sets connect_flag to 1 on success; */
-/* returns ANA_ERROR and sets connect_flag to 0 on failure.  If connect_flag */
+/* colormap.  Returns LUX_OK and sets connect_flag to 1 on success; */
+/* returns LUX_ERROR and sets connect_flag to 0 on failure.  If connect_flag */
 /* is equal to 1 on entry, then a connection is already established and the */
-/* routine returns ANA_OK immediately.  Sets some of the globals. */
+/* routine returns LUX_OK immediately.  Sets some of the globals. */
 /* LS 12mar99 */
 {
   extern Int	scalemin, scalemax;
@@ -152,12 +152,12 @@ Int setup_x_visual(Int desiredVisualClass)
   XVisualInfo	matchedVisual;
 
   if (connect_flag)		/* already did this earlier */
-    return ANA_OK;
+    return LUX_OK;
   
   /* 1. open the display */
   display = XOpenDisplay(display_name);
   if (!display)
-    return anaerror("Could not connect to X display \"%s\"", 0, display_name);
+    return luxerror("Could not connect to X display \"%s\"", 0, display_name);
 
   /* 2. set error handler */
   XSetErrorHandler(xerr);
@@ -180,7 +180,7 @@ Int setup_x_visual(Int desiredVisualClass)
   else if (desiredVisualClass >= 0) {
     if (!XMatchVisualInfo(display, screen_num, depth, desiredVisualClass,
 			  &matchedVisual))
-      return anaerror("No %s visual at depth %d is available on this screen.",
+      return luxerror("No %s visual at depth %d is available on this screen.",
 		   0, visualNames[desiredVisualClass], depth);
     visual = matchedVisual.visual;
     depth = matchedVisual.depth;
@@ -231,11 +231,11 @@ Int setup_x_visual(Int desiredVisualClass)
 
   /* we may need more than 8 bits to specify a color index */
   if (depth <= 8*sizeof(Byte))
-    colorIndexType = ANA_BYTE;
+    colorIndexType = LUX_BYTE;
   else if (depth <= 8*sizeof(Int))
-    colorIndexType = ANA_WORD;
+    colorIndexType = LUX_WORD;
   else if (depth <= 8*sizeof(int64_t))
-    colorIndexType = ANA_LONG;
+    colorIndexType = LUX_LONG;
 
   /* 5. get a colormap for the selected visual */
   /* for read-write colormaps, we first try to find enough color cells in */
@@ -252,7 +252,7 @@ Int setup_x_visual(Int desiredVisualClass)
   if (!pixels) {
     XCloseDisplay(display);
     connect_flag = 0;
-    return anaerror("Could not allocate memory for pixels in setup_x_visual()", 0);
+    return luxerror("Could not allocate memory for pixels in setup_x_visual()", 0);
   } /* end of if (!pixels) */
 
   switch (visual->class) {
@@ -310,7 +310,7 @@ Int setup_x_visual(Int desiredVisualClass)
 	XFreeColormap(display, colorMap);
 	XCloseDisplay(display);
 	free(pixels);
-	return ANA_ERROR;
+	return LUX_ERROR;
       }
       /* we may not want to get them all */
       XFreeColors(display, colorMap, pixels, display_cells, 0);
@@ -335,7 +335,7 @@ Int setup_x_visual(Int desiredVisualClass)
 	XCloseDisplay(display);
 	connect_flag = 0;
 	return
-	  anaerror("Could not allocate %d cells in private colormap for %s visual.", 0, nColorCells, visualNames[visual->class]);
+	  luxerror("Could not allocate %d cells in private colormap for %s visual.", 0, nColorCells, visualNames[visual->class]);
       }	/* end of if (!XAllocColorCells(...)) */
     } /* end of if (private_colormap) */
     else {
@@ -355,7 +355,7 @@ Int setup_x_visual(Int desiredVisualClass)
       XCloseDisplay(display);
       connect_flag = 0;
       return
-	anaerror("Could not allocate memory for XColor entries in setup_x()",
+	luxerror("Could not allocate memory for XColor entries in setup_x()",
 	      0);
     } /* end of (!colors) */
     
@@ -411,7 +411,7 @@ Int setup_x_visual(Int desiredVisualClass)
     if (!pixels) {
       XCloseDisplay(display);
       connect_flag = 0;
-      return anaerror("Could not allocate memory for pixels in setup_x()", 0);
+      return luxerror("Could not allocate memory for pixels in setup_x()", 0);
     } /* end of if (!pixels) */
     for (i = 0; i < display_cells; i++)
       pixels[i] = colors[(i*(nColors - 1))/(display_cells - 1)].pixel;
@@ -433,7 +433,7 @@ Int setup_x_visual(Int desiredVisualClass)
     if (!pixels) {
       XCloseDisplay(display);
       connect_flag = 0;
-      return anaerror("Could not allocate memory for pixels in setup_x()", 0);
+      return luxerror("Could not allocate memory for pixels in setup_x()", 0);
     } /* end of if (!pixels) */
     rgb.flags = DoRed | DoGreen | DoBlue;
     for (i = 0; i < display_cells; i++) {
@@ -450,7 +450,7 @@ Int setup_x_visual(Int desiredVisualClass)
       XCloseDisplay(display);
       connect_flag = 0;
       return
-	anaerror("Could not allocate memory for XColor entries in setup_x()",
+	luxerror("Could not allocate memory for XColor entries in setup_x()",
 	      0);
     } /* end of if (!colors) */
     XQueryColors(display, colorMap, colors, nColorCells);
@@ -460,7 +460,7 @@ Int setup_x_visual(Int desiredVisualClass)
   scalemin = 0;
   scalemax = display_cells - 1;
 
-  /* make a GC for drawing "not" lines in ana_xnotdraw */
+  /* make a GC for drawing "not" lines in lux_xnotdraw */
   /* we must create a window with the selected visual first, so the GC */
   /* applies to those visuals, too */
 
@@ -483,7 +483,7 @@ Int setup_x_visual(Int desiredVisualClass)
 
   wm_delete = XInternAtom(display, "WM_DELETE_WINDOW", False);
   
-  return ANA_OK;
+  return LUX_OK;
 }
 /*-------------------------------------------------------------------------*/
 Int setup_x(void)
@@ -523,7 +523,7 @@ Int selectVisual(void)
     nVisual = 0;
   
   if (!nVisual)
-    return anaerror("No color representation is available", 0);
+    return luxerror("No color representation is available", 0);
 
   printf("There are %1d visuals available on this screen\n", nVisual);
   
@@ -582,7 +582,7 @@ Int selectVisual(void)
   private_colormap = !(visual == DefaultVisual(display, screen_num));
 
   XFree(vInfo);
-  return ANA_OK;
+  return LUX_OK;
 }
 /*-------------------------------------------------------------------------*/
 Int nextFreeColorsIndex(void)
@@ -832,35 +832,35 @@ Int getXcolor(char *colorname, XColor *color, Int alloc)
 /* color in <color>, which must be predefined.  If <alloc> is non-zero, then */
 /* the color is placed in the current colormap.   Currently, no checks are */
 /* made to see if the new color duplicates already existing ones. */
-/* returns ANA_OK on success; ANA_ERROR on failure. */
+/* returns LUX_OK on success; LUX_ERROR on failure. */
 /* LS 12mar99 */
 {
   XColor	color2, *pcolor;
   extern Int	last_wid;
   extern GC	gc[], gcmap[];
-  Int	ana_xcreat(Int, uint32_t, uint32_t, Int, Int, Int, char *,
+  Int	lux_xcreat(Int, uint32_t, uint32_t, Int, Int, Int, char *,
 		   char *);
   extern Window	win[];
   extern Pixmap	maps[];
 
   if (alloc) {
-    if (anaAllocNamedColor(colorname, &pcolor) == ANA_ERROR)
-      return ANA_ERROR;
+    if (anaAllocNamedColor(colorname, &pcolor) == LUX_ERROR)
+      return LUX_ERROR;
     *color = *pcolor;
-    if (ck_window(last_wid) == ANA_ERROR)
-      return ANA_ERROR;
+    if (ck_window(last_wid) == LUX_ERROR)
+      return LUX_ERROR;
     if (last_wid < 0) {
       if (!maps[-last_wid]
-	  && ana_xcreat(last_wid, 512, 512, 0, 0, 0, NULL, NULL) == ANA_ERROR)
-	return ANA_ERROR;
+	  && lux_xcreat(last_wid, 512, 512, 0, 0, 0, NULL, NULL) == LUX_ERROR)
+	return LUX_ERROR;
       XSetForeground(display, gcmap[-last_wid], color->pixel);
     } else {
       if (!win[last_wid]
-	  && ana_xcreat(last_wid, 512, 512, 0, 0, 0, NULL, NULL) == ANA_ERROR)
-	return ANA_ERROR;
+	  && lux_xcreat(last_wid, 512, 512, 0, 0, 0, NULL, NULL) == LUX_ERROR)
+	return LUX_ERROR;
       XSetForeground(display, gc[last_wid], color->pixel);
     }
-    return ANA_OK;
+    return LUX_OK;
   } else
     return XLookupColor(display, colorMap, colorname, &color2, color);
 }
@@ -913,12 +913,12 @@ Int threecolors(Float *list, Int n)
 	  tlist[i] = list[i];
       break;
     default:
-      return anaerror("Wrong # arguments to threecolors()", 0);
+      return luxerror("Wrong # arguments to threecolors()", 0);
   }
 
   if (!n) {			/* uninstall */
     if (!threeColors)		/* nothing to do */
-      return ANA_OK;
+      return LUX_OK;
     factor = 65535.0/nColors;
     for (i = 0; i < nColors; i++)
       colors[i].red = colors[i].blue = colors[i].green = i*factor;
@@ -989,10 +989,10 @@ Int threecolors(Float *list, Int n)
   XStoreColors(display, colorMap, colors, nColors);
 
   XFlush(display);
-  return ANA_OK;
+  return LUX_OK;
 }
 /*---------------------------------------------------------*/
-Int ana_colorComponents(Int narg, Int ps[])
+Int lux_colorComponents(Int narg, Int ps[])
 /* colorcomponents,pixels,r,g,b */
 /* takes raw pixel values <pixels> and returns the relative red, green, */
 /* and blue components in <r>, <g>, and <b>, which range between 0 and 255. */
@@ -1007,9 +1007,9 @@ Int ana_colorComponents(Int narg, Int ps[])
   if (!symbolIsNumericalArray(ps[0]))
     return cerror(ILL_CLASS, ps[0]);
   if (!isIntegerType(array_type(ps[0])))
-    return anaerror("Can only decompose integer pixel values", ps[0]);
-  if (ana_type_size[array_type(ps[0])]*8 != bits_per_pixel)
-    return anaerror("Only arrays with %d bits per pixel are allowed with the current visual", ps[0], bits_per_pixel);
+    return luxerror("Can only decompose integer pixel values", ps[0]);
+  if (lux_type_size[array_type(ps[0])]*8 != bits_per_pixel)
+    return luxerror("Only arrays with %d bits per pixel are allowed with the current visual", ps[0], bits_per_pixel);
 
   if (!symbolIsNamed(ps[1]))
     return cerror(NEED_NAMED, ps[1]);
@@ -1020,9 +1020,9 @@ Int ana_colorComponents(Int narg, Int ps[])
 
   data = array_data(ps[0]);
   nelem = array_size(ps[0]);
-  to_scratch_array(ps[1], ANA_BYTE, array_num_dims(ps[0]), array_dims(ps[0]));
-  to_scratch_array(ps[2], ANA_BYTE, array_num_dims(ps[0]), array_dims(ps[0]));
-  to_scratch_array(ps[3], ANA_BYTE, array_num_dims(ps[0]), array_dims(ps[0]));
+  to_scratch_array(ps[1], LUX_BYTE, array_num_dims(ps[0]), array_dims(ps[0]));
+  to_scratch_array(ps[2], LUX_BYTE, array_num_dims(ps[0]), array_dims(ps[0]));
+  to_scratch_array(ps[3], LUX_BYTE, array_num_dims(ps[0]), array_dims(ps[0]));
   red = array_data(ps[1]);
   green = array_data(ps[2]);
   blue = array_data(ps[3]);
@@ -1078,18 +1078,18 @@ Int ana_colorComponents(Int narg, Int ps[])
     }
     break;
   }
-  return ANA_OK;
+  return LUX_OK;
 }
 /*---------------------------------------------------------*/
-Int ana_pixelsto8bit(Int narg, Int ps[])
+Int lux_pixelsto8bit(Int narg, Int ps[])
  /* pixelsto8bit,pixels,bits,colormap
     returns 8-bit pixel values in <bits> and a color map in <colormap>
     based on the pixel values in <pixels>.  
   */
 {
   Int result, ncolors, iq;
-  Int ana_tolookup(Int, Int *);
-  Int ana_byte_inplace(Int, Int *);
+  Int lux_tolookup(Int, Int *);
+  Int lux_byte_inplace(Int, Int *);
 
   if (!symbolIsNumericalArray(ps[0]))
     return cerror(ILL_CLASS, ps[0]);
@@ -1102,8 +1102,8 @@ Int ana_pixelsto8bit(Int narg, Int ps[])
   internalMode = 1;
   iq = ps[1];
   getFreeTempVariable(ps[1]);
-  result = ana_tolookup(narg, ps);
-  if (result == ANA_ERROR)
+  result = lux_tolookup(narg, ps);
+  if (result == LUX_ERROR)
     return result;
   ncolors = array_size(ps[1]);
   if (ncolors <= 256) {
@@ -1112,9 +1112,9 @@ Int ana_pixelsto8bit(Int narg, Int ps[])
     Byte *p, *q;
     Int *q1, step, *q2, *q3;
 
-    /* we can use the indices from tolookup if we convert them to ANA_BYTE */
-    if (ana_byte_inplace(1, ps + 2) == ANA_ERROR
-	|| redef_array(iq, ANA_BYTE, 2, dims) == ANA_ERROR)
+    /* we can use the indices from tolookup if we convert them to LUX_BYTE */
+    if (lux_byte_inplace(1, ps + 2) == LUX_ERROR
+	|| redef_array(iq, LUX_BYTE, 2, dims) == LUX_ERROR)
       goto error_1;
     q = array_data(iq);
     p = array_data(ps[1]);
@@ -1194,19 +1194,19 @@ Int ana_pixelsto8bit(Int narg, Int ps[])
       break;
     }
   } else {
-    return anaerror("More than 256 different colors!", 0);
+    return luxerror("More than 256 different colors!", 0);
   }
   zapTemp(ps[1]);	/* no longer needed */
   ps[1] = iq;
-  return ANA_OK;
+  return LUX_OK;
 
   error_1:
   zapTemp(ps[1]);
   ps[1] = iq;
-  return ANA_ERROR;
+  return LUX_ERROR;
 }
 /*---------------------------------------------------------*/
-Int ana_colorstogrey(Int narg, Int ps[])
+Int lux_colorstogrey(Int narg, Int ps[])
 /* colorstogrey,pixels
    takes raw pixel values and replaces them by the corresponding grey
    scale values, which range between 0 and 255.
@@ -1220,9 +1220,9 @@ Int ana_colorstogrey(Int narg, Int ps[])
   if (!symbolIsNumericalArray(ps[0]))
     return cerror(ILL_CLASS, ps[0]);
   if (!isIntegerType(array_type(ps[0])))
-    return anaerror("Can only decompose integer pixel values", ps[0]);
-  if (ana_type_size[array_type(ps[0])]*8 != bits_per_pixel)
-    return anaerror("Only arrays with %d bits per pixel are allowed with the current visual", ps[0], bits_per_pixel);
+    return luxerror("Can only decompose integer pixel values", ps[0]);
+  if (lux_type_size[array_type(ps[0])]*8 != bits_per_pixel)
+    return luxerror("Only arrays with %d bits per pixel are allowed with the current visual", ps[0], bits_per_pixel);
   data = array_data(ps[0]);
   nelem = array_size(ps[0]);
   step = bits_per_pixel/8;
@@ -1282,5 +1282,5 @@ Int ana_colorstogrey(Int narg, Int ps[])
     }
     break;
   }
-  return ANA_OK;
+  return LUX_OK;
 }

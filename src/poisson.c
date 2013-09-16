@@ -34,7 +34,7 @@ typedef struct {
   pointer *levels;
 } *Pyramid;
 
-Int ana_laplace2d(Int narg, Int ps[])
+Int lux_laplace2d(Int narg, Int ps[])
 /* LAPLACE(img) calculates the Laplacian of 2D <img> */
 {
   Int img, nx, ny, result, i, j;
@@ -45,8 +45,8 @@ Int ana_laplace2d(Int narg, Int ps[])
     return cerror(NEED_REAL_ARR, img);
   if (array_num_dims(img) != 2)
     return cerror(NEED_2D_ARR, img);
-  if (array_type(img) < ANA_FLOAT)
-    img = ana_float(1, &img);	/* get temp FLOAT version */
+  if (array_type(img) < LUX_FLOAT)
+    img = lux_float(1, &img);	/* get temp FLOAT version */
   nx = array_dims(img)[0];
   ny = array_dims(img)[1];
   src.f = array_data(img);
@@ -55,7 +55,7 @@ Int ana_laplace2d(Int narg, Int ps[])
   tgt.f = array_data(result);
 
   switch (array_type(img)) {
-  case ANA_FLOAT:
+  case LUX_FLOAT:
     /* top edge */
     /* top left corner */
     *tgt.f++ = src.f[1] + src.f[nx] - 4*src.f[0];
@@ -97,7 +97,7 @@ Int ana_laplace2d(Int narg, Int ps[])
     *tgt.f++ = src.f[-1] + src.f[-nx] - 4*src.f[0];
     src.f++;
     break;
-  case ANA_DOUBLE:
+  case LUX_DOUBLE:
     /* top edge */
     /* top left corner */
     *tgt.d++ = src.d[1] + src.d[nx] - 4*src.d[0];
@@ -151,7 +151,7 @@ Int gauss_seidel_2d2o(pointer b, pointer x, scalar sx, scalar sy, Int type,
   scalar s;
   
   switch (type) {
-  case ANA_FLOAT:
+  case LUX_FLOAT:
     /* initialization */
     s.f = 1/(2*(sx.f + sy.f));
     /* top left corner */
@@ -201,7 +201,7 @@ Int gauss_seidel_2d2o(pointer b, pointer x, scalar sx, scalar sy, Int type,
     x.f++;
     b.f++;
     break;
-  case ANA_DOUBLE:
+  case LUX_DOUBLE:
     /* initialization */
     s.d = 1/(2*(sx.d + sy.d));
     /* top left corner */
@@ -264,7 +264,7 @@ void restrict2(pointer b, pointer x, Int type, Int nx, Int ny, scalar sx,
   nx2 = nx/2;
   ny2 = ny/2;
   switch (type) {
-  case ANA_FLOAT:
+  case LUX_FLOAT:
     r0.f = malloc(nx*3*sizeof(*r0.f));
 
     r.f = r0.f + 2*nx;		/* bottom row of r.f */
@@ -437,9 +437,9 @@ void restrict(pointer x, Int type, Int nx, Int ny, pointer tgt)
   restrict2(x, x, type, nx, ny, dummy, dummy, 0, tgt);
 }
 
-Int ana_antilaplace2d(Int narg, Int ps[])
+Int lux_antilaplace2d(Int narg, Int ps[])
 {
-  Int img, result = ANA_ERROR, nx, ny, type, nx2, ny2, nlevel, i, nelem;
+  Int img, result = LUX_ERROR, nx, ny, type, nx2, ny2, nlevel, i, nelem;
   pointer src, tgt;
   Pyramid pyramid;
 
@@ -448,8 +448,8 @@ Int ana_antilaplace2d(Int narg, Int ps[])
     return cerror(NEED_REAL_ARR, img);
   if (array_num_dims(img) != 2)
     return cerror(NEED_2D_ARR, img);
-  if (array_type(img) < ANA_FLOAT)
-    img = ana_float(1, &img);	/* get temp FLOAT version */
+  if (array_type(img) < LUX_FLOAT)
+    img = lux_float(1, &img);	/* get temp FLOAT version */
   type = array_type(img);
   nx = array_dims(img)[0];
   ny = array_dims(img)[1];
@@ -470,10 +470,10 @@ Int ana_antilaplace2d(Int narg, Int ps[])
   ALLOCATE(pyramid->nx, nlevel);
   ALLOCATE(pyramid->ny, nlevel);
   switch (type) {
-  case ANA_FLOAT:
+  case LUX_FLOAT:
     ALLOCATE(pyramid->data.f, nelem);
     break;
-  case ANA_DOUBLE:
+  case LUX_DOUBLE:
     ALLOCATE(pyramid->data.d, nelem);
     break;
   }
@@ -487,7 +487,7 @@ Int ana_antilaplace2d(Int narg, Int ps[])
   ny2 = ny;
   pyramid->type = type;
   switch (type) {
-  case ANA_FLOAT:
+  case LUX_FLOAT:
     tgt.f = pyramid->data.f;
     memcpy(tgt.f, src.f, nx*ny*sizeof(*src.f));
     for (i = 0; i < nlevel; i++) { 
@@ -501,7 +501,7 @@ Int ana_antilaplace2d(Int narg, Int ps[])
 	ny2 /= 2;
     }
     break;
-  case ANA_DOUBLE:
+  case LUX_DOUBLE:
     tgt.d = pyramid->data.d;
     memcpy(tgt.d, src.d, nx*ny*sizeof(*src.d));
     for (i = 0; i < nlevel; i++) {
@@ -540,7 +540,7 @@ Int ana_antilaplace2d(Int narg, Int ps[])
     free(dims);
   }
   memcpy(array_data(result), pyramid->levels[0].f, 
-	 nx*ny*2*ana_type_size[type]);
+	 nx*ny*2*lux_type_size[type]);
   
  free_pyramid:
   free(pyramid->data.f);

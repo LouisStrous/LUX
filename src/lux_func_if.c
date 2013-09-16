@@ -1,4 +1,4 @@
-/* This is file ana_func_if.c.
+/* This is file lux_func_if.c.
 
 Copyright 2013 Louis Strous
 
@@ -19,27 +19,27 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include <errno.h>
 #include <math.h>
-#include "ana_func_if.h"
+#include "lux_func_if.h"
 
 /*
   An interface to allow a user-defined LUX function to be called as a
   C function.  Example for a user-defined function called MYFUNC that
   takes 2 parameters:
   
-  ana_func_if *afif = ana_func_if_alloc("MYFUNC", 2);
-  ana_func_if_set_param(afif, 0, par0);
-  ana_func_if_set_param(afif, 1, par1);
-  pointer p0 = ana_func_if_get_param_data(afif, 0);
-  pointer p1 = ana_func_if_get_param_data(afif, 1);
+  lux_func_if *afif = lux_func_if_alloc("MYFUNC", 2);
+  lux_func_if_set_param(afif, 0, par0);
+  lux_func_if_set_param(afif, 1, par1);
+  pointer p0 = lux_func_if_get_param_data(afif, 0);
+  pointer p1 = lux_func_if_get_param_data(afif, 1);
   
-  ana_func_if_call(afif);
+  lux_func_if_call(afif);
 
-  ana_func_if_free(afif);
+  lux_func_if_free(afif);
 */
 
-ana_func_if * ana_func_if_alloc(char const * const name, size_t num_params)
+lux_func_if * lux_func_if_alloc(char const * const name, size_t num_params)
 {
-  ana_func_if *afif = calloc(1, sizeof(ana_func_if));
+  lux_func_if *afif = calloc(1, sizeof(lux_func_if));
   if (!afif)
     return NULL;
   Int func_sym = stringpointer((char *) name, SP_USER_FUNC);
@@ -55,17 +55,17 @@ ana_func_if * ana_func_if_alloc(char const * const name, size_t num_params)
       goto error;
   }
   afif->func_sym = nextFreeTempExecutable();
-  symbol_class(afif->func_sym) = ANA_USR_FUNC;
+  symbol_class(afif->func_sym) = LUX_USR_FUNC;
   usr_func_arguments(afif->func_sym) = afif->param_syms;
   symbol_memory(afif->func_sym) = num_params*sizeof(Word);
   usr_func_number(afif->func_sym) = func_sym;
   return afif;
  error:
-  ana_func_if_free(afif);
+  lux_func_if_free(afif);
   return NULL;
 }
 
-void ana_func_if_free(ana_func_if * afif)
+void lux_func_if_free(lux_func_if * afif)
 {
   if (afif) {
     free(afif->param_data);
@@ -74,7 +74,7 @@ void ana_func_if_free(ana_func_if * afif)
   }
 }
 
-Int ana_func_if_set_param(ana_func_if *afif, size_t index, Int param)
+Int lux_func_if_set_param(lux_func_if *afif, size_t index, Int param)
 {
   if (!afif || index >= afif->num_params
       || !symbolIsNumerical(param)) {
@@ -86,7 +86,7 @@ Int ana_func_if_set_param(ana_func_if *afif, size_t index, Int param)
   return 0;
 }
 
-Int ana_func_if_get_param_sym(ana_func_if *afif, size_t index)
+Int lux_func_if_get_param_sym(lux_func_if *afif, size_t index)
 {
   if (index >= afif->num_params) {
     errno = EDOM;
@@ -95,7 +95,7 @@ Int ana_func_if_get_param_sym(ana_func_if *afif, size_t index)
   return afif->param_syms[index];
 }
 
-pointer ana_func_if_get_param_data(ana_func_if *afif, size_t index)
+pointer lux_func_if_get_param_data(lux_func_if *afif, size_t index)
 {
   if (index >= afif->num_params) {
     errno = EDOM;
@@ -106,7 +106,7 @@ pointer ana_func_if_get_param_data(ana_func_if *afif, size_t index)
   return afif->param_data[index];
 }
 
-Double ana_func_if_call(ana_func_if *afif)
+Double lux_func_if_call(lux_func_if *afif)
 {
   Int result_sym = eval(afif->func_sym);
   Double result = (result_sym < 0? NAN: double_arg(result_sym));

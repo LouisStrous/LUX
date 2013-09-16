@@ -1,4 +1,4 @@
-/* This is file ana_bitmap.h.
+/* This is file lux_bitmap.h.
 
 Copyright 2013 Louis Strous, Richard Shine
 

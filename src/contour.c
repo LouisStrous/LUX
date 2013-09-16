@@ -40,14 +40,14 @@ static	Float	xa, xb, ya, yb;
 static	Float	xsc, ysc;
 Int	tkplot(Float, Float, Int, Int);
 /*------------------------------------------------------------------------- */
-Int ana_contour(Int narg, Int ps[]) /* contour routine */		
+Int lux_contour(Int narg, Int ps[]) /* contour routine */		
 /* call is CONTOUR, image, nlev, xa, xb, ya, yb */
 {
   array	*h;
   Int	iq, i, nc, lineStyle, symStyle;
   Float	*pf, *cl, xmax, xmin, *pp, yq, xspace, xq;
   Int	anacon(Float *, Int, Int, Float *, Int, Int, Float, Float, Float,
-	       Float, Float), installString(char *), ana_replace(Int, Int),
+	       Float, Float), installString(char *), lux_replace(Int, Int),
 	box(void), ticks(void), fixPlotStyle(Int *, Int *);
   extern Int	tkCoordSys;
   extern Float	theDashSize;
@@ -55,7 +55,7 @@ Int ana_contour(Int narg, Int ps[]) /* contour routine */
 
   iq = ps[0];
   CK_ARR(iq, 1);
-  iq = ana_float(1, &iq);
+  iq = lux_float(1, &iq);
   h = (array *) sym[iq].spec.array.ptr;
   ny = 1; nx = h->dims[0]; if (h->ndim != 1) ny = h->dims[1];
   pf = (Float *) ((char *) h + sizeof( array ));
@@ -68,11 +68,11 @@ Int ana_contour(Int narg, Int ps[]) /* contour routine */
   /* if scalar, then = #levels.  if array, then store in $contours */
   if (narg > 1)
     switch (sym[ps[1]].class)
-    { case ANA_SCALAR:
+    { case LUX_SCALAR:
 	contour_nlev = int_arg( ps[1]);
 	break;
-      case ANA_ARRAY:
-	ana_replace(contour_sym, ps[1]);
+      case LUX_ARRAY:
+	lux_replace(contour_sym, ps[1]);
 	h = HEAD(contour_sym);
 	GET_SIZE(contour_nlev, h->dims, h->ndim);
 	gotLevels = 1;  break;
@@ -119,14 +119,14 @@ Int ana_contour(Int narg, Int ps[]) /* contour routine */
   } else {				/* not auto mode, check $contours */
     if ( sym[contour_sym].class != 4 )
       return cerror(BAD_CONTOURS, contour_sym);
-    iq = ana_float(1, &contour_sym);
+    iq = lux_float(1, &contour_sym);
     h = (array *) sym[iq].spec.array.ptr;
     if (h->ndim != 1) return cerror(BAD_CONTOURS, contour_sym);
     cl = (Float *) ((char *) h + sizeof( array ));
     contour_nlev = MIN(contour_nlev, h->dims[0]);  /* min of these used */
   }
   xsc = (xb - xa)/nx;	ysc = (yb - ya)/ny;
-  tkCoordSys = ANA_DVI;
+  tkCoordSys = LUX_DVI;
   /* do we want border and ticks? */
   if (contour_flag == 0)	{ /* set flag means none, set via tvcon */
     if (contour_border > 0) box();

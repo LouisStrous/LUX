@@ -34,7 +34,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 
 Int	to_scratch_array(Int, Int, Int, Int []);
 /*---------------------------------------------------------------------*/
-Int ana_bisect(Int narg, Int ps[])
+Int lux_bisect(Int narg, Int ps[])
 /* y = BISECT([x,] y, values [, AXIS=axis, POS=pos, WIDTH=width]) */
 /* calculates bisector positions */
 /* <axis> may only have a single dimension. */
@@ -76,29 +76,29 @@ Int ana_bisect(Int narg, Int ps[])
 
   if (standardLoop(ySym, (narg > 3 && ps[3])? ps[3]: 0,
 		   SL_COMPRESS | SL_ONEAXIS | SL_NEGONED | SL_SRCUPGRADE
-		   | SL_EACHROW | SL_AXISCOORD, ANA_FLOAT,
+		   | SL_EACHROW | SL_AXISCOORD, LUX_FLOAT,
 		   &srcinfo, &src, NULL, NULL, NULL) < 0) /* <data>, <axis> */
-    return ANA_ERROR;		/* some error */
+    return LUX_ERROR;		/* some error */
 
   if (xSym) {
     if (!symbolIsNumericalArray(xSym))
       return cerror(NEED_NUM_ARR, xSym);
     if (array_size(xSym) != srcinfo.rdims[0])
       return cerror(INCMP_ARG, ySym);
-    iq = ana_converts[srcinfo.type](1, &xSym);
+    iq = lux_converts[srcinfo.type](1, &xSym);
     x.f = array_data(iq);
   } else
     x.f = NULL;
 
   if (!symbolIsNumerical(vSym)) /* <levels> */
-    return ANA_ERROR;
-  iq = ana_converts[srcinfo.type](1, &vSym); /* ensure proper type */
+    return LUX_ERROR;
+  iq = lux_converts[srcinfo.type](1, &vSym); /* ensure proper type */
   numerical(iq, NULL, NULL, &nLev, &level);
 
   if (narg > 4 && ps[4]) { 	/* have <pos> */
     pos = int_arg(ps[4]);
     if (pos < 0 || pos >= srcinfo.rdims[0])
-      return anaerror("Index out of range", ps[4]);
+      return luxerror("Index out of range", ps[4]);
   } else				/* no <pos> */
     pos = -1;
 
@@ -111,8 +111,8 @@ Int ana_bisect(Int narg, Int ps[])
     result = array_scratch(srcinfo.type, srcinfo.ndim, outDims);
     if (narg > 5 && ps[5])	/* have <width> */
       if (to_scratch_array(ps[5], srcinfo.type, srcinfo.ndim, outDims)
-	  == ANA_ERROR)
-	return ANA_ERROR;
+	  == LUX_ERROR)
+	return LUX_ERROR;
   } else {
     if (srcinfo.ndim > 1) {
       memcpy(outDims, srcinfo.dims, srcinfo.raxes[0]*sizeof(Int));
@@ -121,28 +121,28 @@ Int ana_bisect(Int narg, Int ps[])
       result = array_scratch(srcinfo.type, srcinfo.ndim - 1, outDims);
       if (narg > 5 && ps[5])	/* have <width> */
 	if (to_scratch_array(ps[5], srcinfo.type, srcinfo.ndim, outDims)
-	    == ANA_ERROR)
-	  return ANA_ERROR;
+	    == LUX_ERROR)
+	  return LUX_ERROR;
     } else {			/* only one return value */
       result = scalar_scratch(srcinfo.type);
       if (narg > 5 && ps[5]) {	/* have <width> */
 	undefine(ps[5]);
-	symbol_class(ps[5]) = ANA_SCALAR;
+	symbol_class(ps[5]) = LUX_SCALAR;
 	scalar_type(ps[5]) = srcinfo.type;
       }	
     }
   }
   if (result < 0)
-    return ANA_ERROR;
+    return LUX_ERROR;
   switch (symbol_class(result)) {
-    case ANA_ARRAY:
+    case LUX_ARRAY:
       trgt.f = (Float *) array_data(result);
       if (narg > 5 && ps[5])
 	width.f = (Float *) array_data(ps[5]);
       else
 	width.f = NULL;
       break;
-    case ANA_SCALAR:
+    case LUX_SCALAR:
       trgt.f = &scalar_value(result).f;
       if (narg > 5 && ps[5])
 	width.f = &scalar_value(ps[5]).f;
@@ -155,7 +155,7 @@ Int ana_bisect(Int narg, Int ps[])
   
   /* now do the work */
   switch (srcinfo.type) {
-    case ANA_FLOAT:
+    case LUX_FLOAT:
       do {
 	rightedge.f = src.f + step*(srcinfo.rdims[0] - 1);
 	if (pos >= 0) {
@@ -276,7 +276,7 @@ Int ana_bisect(Int narg, Int ps[])
 	src.f += step*srcinfo.rdims[0];
       } while (advanceLoop(&srcinfo, &src) < srcinfo.rndim);
       break;
-    case ANA_DOUBLE:
+    case LUX_DOUBLE:
       do {
 	rightedge.d = src.d + step*(srcinfo.rdims[0] - 1);
 	if (pos >= 0) {
@@ -425,7 +425,7 @@ static Int cmp0(const void *a, const void *b)
   return 0;
 }
 /*---------------------------------------------------------------------*/
-Int ana_cspline_find(Int narg, Int ps[])
+Int lux_cspline_find(Int narg, Int ps[])
 /* z = CSPLINE_FIND(y, levels [, AXIS=axis, INDEX=index]) */
 /* locates positions where a certain value gets attained, using cubic
    splines
@@ -457,21 +457,21 @@ Int ana_cspline_find(Int narg, Int ps[])
   
   cspl = empty_cubic_spline();
 
-  if (standardLoop(ySym, (narg > 2 && ps[2])? ps[2]: ANA_ZERO,
+  if (standardLoop(ySym, (narg > 2 && ps[2])? ps[2]: LUX_ZERO,
 		   SL_NEGONED | SL_ONEAXIS | SL_SRCUPGRADE
-		   | SL_AXISCOORD, ANA_FLOAT,
+		   | SL_AXISCOORD, LUX_FLOAT,
 		   &srcinfo, &src, NULL, NULL, NULL) < 0) /* <data>, <axis> */
-    return ANA_ERROR;		/* some error */
+    return LUX_ERROR;		/* some error */
   
   if (!symbolIsNumerical(vSym)) /* <levels> */
-    return ANA_ERROR;
-  iq = ana_converts[srcinfo.type](1, &vSym); /* ensure proper type */
+    return LUX_ERROR;
+  iq = lux_converts[srcinfo.type](1, &vSym); /* ensure proper type */
 
   numerical(iq, NULL, NULL, &nLev, &level);
 
   if (narg > 3 && ps[3]) {	/* <index> */
-    if (to_scratch_array(ps[3], ANA_LONG, 1, &nLev) == ANA_ERROR)
-      return ANA_ERROR;
+    if (to_scratch_array(ps[3], LUX_LONG, 1, &nLev) == LUX_ERROR)
+      return LUX_ERROR;
     index = (Int *) array_data(ps[3]);
     memset(index, 0, srcinfo.ndim*sizeof(Int));
   } else
@@ -494,7 +494,7 @@ Int ana_cspline_find(Int narg, Int ps[])
 
   /* now do the work */
   switch (srcinfo.type) {
-    case ANA_FLOAT:
+    case LUX_FLOAT:
       do {
 	/* install table for cubic spline interpolation */
 	cubic_spline_tables(NULL, srcinfo.type, 1,
@@ -539,7 +539,7 @@ Int ana_cspline_find(Int narg, Int ps[])
 	} while ((i = advanceLoop(&srcinfo, &src)) == 0);
       } while (i < srcinfo.rndim);
       break;
-  case ANA_DOUBLE:
+  case LUX_DOUBLE:
       do {
 	/* install table for cubic spline interpolation */
 	cubic_spline_tables(NULL, srcinfo.type, 1,
@@ -612,7 +612,7 @@ Int ana_cspline_find(Int narg, Int ps[])
       if (srcinfo.ndim > 1)
 	Bytestack_push_var(NULL, srcinfo.ndim);
       Bytestack_push_var(NULL, n);
-      result = array_scratch(ANA_DOUBLE, (srcinfo.ndim > 1? 2: 1),
+      result = array_scratch(LUX_DOUBLE, (srcinfo.ndim > 1? 2: 1),
 			     (Int *) Bytestack_pop(NULL, bi));
       src.d = array_data(result);
       q.c = d;
@@ -638,7 +638,7 @@ Int ana_cspline_find(Int narg, Int ps[])
 	}
       }
     } else
-      result = ANA_MINUS_ONE;
+      result = LUX_MINUS_ONE;
   }
   
   Bytestack_delete(b);
@@ -654,7 +654,7 @@ Int ana_cspline_find(Int narg, Int ps[])
 #define SYNCH_OK	0x5555aaaa
 #define SYNCH_REVERSE	0xaaaa5555
 #endif
-Int ana_fitskey(Int narg, Int ps[])
+Int lux_fitskey(Int narg, Int ps[])
 /* FITSKEY(file, key) returns the value associated with the string <key> */
 /* in FITS file <file>.  If <file> is a string, then it is taken as the
    name of the FITS file.  If <file> is a scalar, then its (integer) value
@@ -676,33 +676,33 @@ Int ana_fitskey(Int narg, Int ps[])
   void	read_a_number(char **buf, scalar *value, Int *type);
 
   switch (symbol_class(ps[0])) {
-    case ANA_STRING:
+    case LUX_STRING:
       file = expand_name(string_value(ps[0]), NULL); /* full file name */
       fp = fopen(file, "r");
       if (!fp)
-	return ANA_ZERO;
+	return LUX_ZERO;
       mustclose = 1;		/* must close the file again when done */
       break;
-    case ANA_SCALAR:
+    case LUX_SCALAR:
       i = int_arg(ps[0]);
       if (i < 0 || i >= MAXFILES)
-	return ANA_ZERO;
-      fp = ana_file[i];
+	return LUX_ZERO;
+      fp = lux_file[i];
       if (!fp)
-	return ANA_ZERO;
+	return LUX_ZERO;
       ptr = ftell(fp);		/* current file pointer position */
       fseek(fp, 0, SEEK_SET);
       mustclose = 0;		/* leave file open when done */
       break;
     default:
-      return ANA_ZERO;
+      return LUX_ZERO;
   }
-  if (symbol_class(ps[1]) != ANA_STRING) { /* <key> must be a string */
+  if (symbol_class(ps[1]) != LUX_STRING) { /* <key> must be a string */
     if (mustclose)
       fclose(fp);
     else
       fseek(fp, ptr, SEEK_SET);
-    return ANA_ZERO;
+    return LUX_ZERO;
   }
   n = string_size(ps[1]);
   if (n > 8) {
@@ -710,7 +710,7 @@ Int ana_fitskey(Int narg, Int ps[])
       fclose(fp);
     else
       fseek(fp, ptr, SEEK_SET);
-    return ANA_ZERO;
+    return LUX_ZERO;
   }
 
   key = string_value(ps[1]);
@@ -750,7 +750,7 @@ Int ana_fitskey(Int narg, Int ps[])
     else
       fseek(fp, ptr, SEEK_SET);
     free(key2);
-    return ANA_ZERO;
+    return LUX_ZERO;
   }
   i = 0;
 
@@ -761,7 +761,7 @@ Int ana_fitskey(Int narg, Int ps[])
       else
 	fseek(fp, ptr, SEEK_SET);
       free(key2);
-      return ANA_ZERO;
+      return LUX_ZERO;
     }
     i++;
     scr = fgets(scr, 80, fp);
@@ -771,7 +771,7 @@ Int ana_fitskey(Int narg, Int ps[])
       else
 	fseek(fp, ptr, SEEK_SET);
       free(key2);
-      return ANA_ZERO;
+      return LUX_ZERO;
     }
   } while (strncmp(scr, "END ", 4) && strncmp(scr, key2, n2));
 
@@ -781,7 +781,7 @@ Int ana_fitskey(Int narg, Int ps[])
     fseek(fp, ptr, SEEK_SET);
   free(key2);
   if (!strncmp(scr, "END ", 4))	/* found end of header but not the keyword */
-    return ANA_ZERO;
+    return LUX_ZERO;
 
   /* The FITS rules say that a comment is introduced by a forward slash.
      String constants are enclosed in single quotes ('' inside a string refers
@@ -852,23 +852,23 @@ Int ana_fitskey(Int narg, Int ps[])
       read_a_number(&scr, &value, &type);
       iq = scalar_scratch(type);
       switch (type) {
-	case ANA_BYTE:
+	case LUX_BYTE:
 	  scalar_value(iq).b = (Byte) value.l;
 	  break;
-	case ANA_WORD:
+	case LUX_WORD:
 	  scalar_value(iq).w = (Word) value.l;
 	  break;
-	case ANA_LONG:
+	case LUX_LONG:
 	  scalar_value(iq).l = value.l;
 	  break;
-	case ANA_FLOAT:
+	case LUX_FLOAT:
 	  scalar_value(iq).f = (Float) value.d;
 	  break;
-	case ANA_CFLOAT:
+	case LUX_CFLOAT:
 	  complex_scalar_data(iq).cf->real = 0.0;
 	  complex_scalar_data(iq).cf->imaginary = (Float) value.d;
 	  break;
-	case ANA_CDOUBLE:
+	case LUX_CDOUBLE:
 	  complex_scalar_data(iq).cd->real = 0.0;
 	  complex_scalar_data(iq).cd->imaginary = value.d;
 	  break;
@@ -986,7 +986,7 @@ Int traverseElement(Float xin, Float yin, Float vx, Float vy,
 }
 /*--------------------------------------------------------------------*/
 #define FACTOR	(0.886226925)	/* 0.5*sqrt(pi) */
-Int ana_dir_smooth(Int narg, Int ps[])
+Int lux_dir_smooth(Int narg, Int ps[])
 /* Y = DSMOOTH(<data>,<vx>,<vy> [, /TWOSIDED, /ONESIDED, /BOXCAR, /GAUSSIAN,
                /NORMALIZE])
    smooths 2D image <data> in the direction indicated by the
@@ -1011,34 +1011,34 @@ LS 9nov98 */
   loopInfo	srcinfo, trgtinfo;
 
   iq0 = ps[0];			/* data */
-  if (symbol_class(iq0) != ANA_ARRAY /* not an array */
+  if (symbol_class(iq0) != LUX_ARRAY /* not an array */
       || array_num_dims(iq0) != 2) /* or doesn't have 2 dimensions */
     return cerror(NEED_2D_ARR, iq0);
-  iq0 = ana_float(1, &iq0);
+  iq0 = lux_float(1, &iq0);
   nx = array_dims(iq0)[0];
   ny = array_dims(iq0)[1];
 
   iq = ps[1];			/* vx */
-  if (symbol_class(iq) != ANA_ARRAY
+  if (symbol_class(iq) != LUX_ARRAY
       || array_num_dims(iq) != 2
       || array_dims(iq)[0] != nx
       || array_dims(iq)[1] != ny)
     return cerror(INCMP_ARG, iq);
-  iq = ana_float(1, &iq);
+  iq = lux_float(1, &iq);
   vx0 = array_data(iq);
 
   iq = ps[2];			/* vy */
-  if (symbol_class(iq) != ANA_ARRAY
+  if (symbol_class(iq) != LUX_ARRAY
       || array_num_dims(iq) != 2
       || array_dims(iq)[0] != nx
       || array_dims(iq)[1] != ny)
     return cerror(INCMP_ARG, iq);
-  iq = ana_float(1, &iq);
+  iq = lux_float(1, &iq);
   vy0 = array_data(iq);
 
   if (standardLoop(iq0, 0, SL_ALLAXES | SL_SAMEDIMS | SL_EXACT | SL_EACHCOORD,
-		   ANA_FLOAT, &srcinfo, &src, &iq, &trgtinfo, &trgt) < 0)
-    return ANA_ERROR;
+		   LUX_FLOAT, &srcinfo, &src, &iq, &trgtinfo, &trgt) < 0)
+    return LUX_ERROR;
   src0.f = src.f;
 
   twosided = ((internalMode & 1) == 0); /* /TWOSIDED */
@@ -1316,7 +1316,7 @@ LS 9nov98 */
   return iq;
 }
 /*--------------------------------------------------------------------*/
-Int ana_dir_smooth2(Int narg, Int ps[])
+Int lux_dir_smooth2(Int narg, Int ps[])
 /* Y = LSMOOTH(<data>,<vx>,<vy>)
    smooths 2D image <data> in the direction indicated by the
    angle <vx> and <vy>, over a distance indicated by the magnitude of vector
@@ -1330,34 +1330,34 @@ Int ana_dir_smooth2(Int narg, Int ps[])
   loopInfo	srcinfo, trgtinfo;
 
   iq0 = ps[0];			/* data */
-  if (symbol_class(iq0) != ANA_ARRAY /* not an array */
+  if (symbol_class(iq0) != LUX_ARRAY /* not an array */
       || array_num_dims(iq0) != 2) /* or doesn't have 2 dimensions */
     return cerror(NEED_2D_ARR, iq0);
-  iq0 = ana_float(1, &iq0);
+  iq0 = lux_float(1, &iq0);
   nx = array_dims(iq0)[0];
   ny = array_dims(iq0)[1];
 
   iq = ps[1];			/* vx */
-  if (symbol_class(iq) != ANA_ARRAY
+  if (symbol_class(iq) != LUX_ARRAY
       || array_num_dims(iq) != 2
       || array_dims(iq)[0] != nx
       || array_dims(iq)[1] != ny)
     return cerror(INCMP_ARG, iq);
-  iq = ana_float(1, &iq);
+  iq = lux_float(1, &iq);
   vx0 = array_data(iq);
 
   iq = ps[2];			/* vy */
-  if (symbol_class(iq) != ANA_ARRAY
+  if (symbol_class(iq) != LUX_ARRAY
       || array_num_dims(iq) != 2
       || array_dims(iq)[0] != nx
       || array_dims(iq)[1] != ny)
     return cerror(INCMP_ARG, iq);
-  iq = ana_float(1, &iq);
+  iq = lux_float(1, &iq);
   vy0 = array_data(iq);
 
   if (standardLoop(iq0, 0, SL_ALLAXES | SL_SAMEDIMS | SL_EXACT | SL_EACHCOORD,
-		   ANA_FLOAT, &srcinfo, &src, &iq, &trgtinfo, &trgt) < 0)
-    return ANA_ERROR;
+		   LUX_FLOAT, &srcinfo, &src, &iq, &trgtinfo, &trgt) < 0)
+    return LUX_ERROR;
   src0.f = src.f;
 
   twosided = ((internalMode & 1) == 0); /* /TWOSIDED */
@@ -1634,7 +1634,7 @@ Int ana_dir_smooth2(Int narg, Int ps[])
   return iq;
 }
 /*--------------------------------------------------------------------*/
-Int ana_trajectory(Int narg, Int ps[])
+Int lux_trajectory(Int narg, Int ps[])
 /* TRAJECTORY,<gx>,<gy>,<vx>,<vy>[,<n>][,<ox>,<oy>])
   Takes the positions indicated by <gx>,<gy> and advances them for <n>
   time steps according to the velocity field in <vx>,<vy>.  The first
@@ -1663,7 +1663,7 @@ Int ana_trajectory(Int narg, Int ps[])
     ngrid, type, dv;
   Float	x1, y1, x2, y2, vx, vy, s, s0, ds, dslimit, s1;
   pointer	gx, gy, vx0, vy0, ox, oy;
-  Int ana_convert(Int, Int [], Int, Int);
+  Int lux_convert(Int, Int [], Int, Int);
 
   /* we treat all arguments. */
   if (!symbolIsRealArray(ps[0]))/* <gx> must be a real array */
@@ -1688,9 +1688,9 @@ Int ana_trajectory(Int narg, Int ps[])
     /* ps[2] is <v>; it must have 3 dimensions and the first one
      must have 2 elements. */
     if (array_num_dims(ps[2]) != 3)
-      return anaerror("Need 3 dimensions here", ps[2]);
+      return luxerror("Need 3 dimensions here", ps[2]);
     if (array_dims(ps[2])[0] != 2)
-      return anaerror("Need 2 elements in first dimension here", ps[2]);
+      return luxerror("Need 2 elements in first dimension here", ps[2]);
     nx = array_dims(ps[2])[1];
     ny = array_dims(ps[2])[2];
   } else {
@@ -1714,13 +1714,13 @@ Int ana_trajectory(Int narg, Int ps[])
   /* check for <n> */
   if (narg == 7) {
     if (!symbolIsScalar(ps[4]))
-      return anaerror("Need a scalar here", ps[4]);
+      return luxerror("Need a scalar here", ps[4]);
     n = int_arg(ps[4]);
     if (n < 1)
       return cerror(ILL_ARG, ps[4]);
   } else if (narg == 6 && symbolIsScalar(ps[3])) {
     if (!symbolIsScalar(ps[3]))
-      return anaerror("Need a scalar here", ps[3]);
+      return luxerror("Need a scalar here", ps[3]);
     n = int_arg(ps[3]);
     if (n < 1)
       return cerror(ILL_ARG, ps[3]);
@@ -1740,38 +1740,38 @@ Int ana_trajectory(Int narg, Int ps[])
     to_scratch_array(ps[narg - 1], type, i, dims);
     oy.v = array_data(ps[narg - 1]);
   } else {			/* use <gx> and <gy> for <ox> and <oy> */
-    Int ana_convert(Int, Int [], Int, Int);
-    ana_convert(2, ps, type, 0);
+    Int lux_convert(Int, Int [], Int, Int);
+    lux_convert(2, ps, type, 0);
     ox.v = array_data(ps[0]);
     oy.v = array_data(ps[1]);
   }
 
   /* now we do any promotion to the highest type and get pointers to */
   /* the data */
-  iq = ana_converts[type](1, ps);
-  if (iq == ANA_ERROR)
-    return ANA_ERROR;
+  iq = lux_converts[type](1, ps);
+  if (iq == LUX_ERROR)
+    return LUX_ERROR;
   gx.v = array_data(iq);
-  iq = ana_converts[type](1, ps + 1);
-  if (iq == ANA_ERROR)
-    return ANA_ERROR;
+  iq = lux_converts[type](1, ps + 1);
+  if (iq == LUX_ERROR)
+    return LUX_ERROR;
   gy.v = array_data(iq);
   if (narg == 3 || narg == 5
       || (narg == 6 && symbolIsScalar(ps[3]))) { /* <v> */
-    iq = ana_converts[type](1, ps + 2);
-    if (iq == ANA_ERROR)
-      return ANA_ERROR;
+    iq = lux_converts[type](1, ps + 2);
+    if (iq == LUX_ERROR)
+      return LUX_ERROR;
     vx0.v = array_data(iq);
-    vy0.b = vx0.b + ana_type_size[type];
+    vy0.b = vx0.b + lux_type_size[type];
     dv = 2;
   } else {
-    iq = ana_converts[type](1, ps + 2);
-    if (iq == ANA_ERROR)
-      return ANA_ERROR;
+    iq = lux_converts[type](1, ps + 2);
+    if (iq == LUX_ERROR)
+      return LUX_ERROR;
     vx0.v = array_data(iq);
-    iq = ana_converts[type](1, ps + 3);
-    if (iq == ANA_ERROR)
-      return ANA_ERROR;
+    iq = lux_converts[type](1, ps + 3);
+    if (iq == LUX_ERROR)
+      return LUX_ERROR;
     vy0.v = array_data(iq);
     dv = 1;
   }
@@ -1796,31 +1796,31 @@ Int ana_trajectory(Int narg, Int ps[])
 	y1 = y2;
       } else {
 	switch (type) {
-	  case ANA_BYTE:
+	  case LUX_BYTE:
 	    ix = (Int) *gx.b;	/* x pixel coordinate */
 	    iy = (Int) *gy.b;	/* y pixel coordinate */
 	    x1 = (Double) *gx.b++ - ix;
 	    y1 = (Double) *gy.b++ - iy;
 	    break;
-	  case ANA_WORD:
+	  case LUX_WORD:
 	    ix = (Int) *gx.w;	/* x pixel coordinate */
 	    iy = (Int) *gy.w;	/* y pixel coordinate */
 	    x1 = (Double) *gx.w++ - ix;
 	    y1 = (Double) *gy.w++ - iy;
 	    break;
-	  case ANA_LONG:
+	  case LUX_LONG:
 	    ix = (Int) *gx.l;	/* x pixel coordinate */
 	    iy = (Int) *gy.l;	/* y pixel coordinate */
 	    x1 = (Double) *gx.l++ - ix;
 	    y1 = (Double) *gy.l++ - iy;
 	    break;
-	  case ANA_FLOAT:
+	  case LUX_FLOAT:
 	    ix = (Int) *gx.f;	/* x pixel coordinate */
 	    iy = (Int) *gy.f;	/* y pixel coordinate */
 	    x1 = (Double) *gx.f++ - ix;
 	    y1 = (Double) *gy.f++ - iy;
 	    break;
-	  case ANA_DOUBLE:
+	  case LUX_DOUBLE:
 	    ix = (Int) *gx.d;	/* x pixel coordinate */
 	    iy = (Int) *gy.d;	/* y pixel coordinate */
 	    x1 = (Double) *gx.d++ - ix;
@@ -1828,10 +1828,10 @@ Int ana_trajectory(Int narg, Int ps[])
 	    break;
 	}
 	if (ix < 0 || ix > nx - 1 || iy < 0 || iy > ny - 1) { /* out of range */
-	  zerobytes(ox.b, ana_type_size[type]);
-	  zerobytes(oy.b, ana_type_size[type]);
-	  ox.b += ana_type_size[type];
-	  oy.b += ana_type_size[type];
+	  zerobytes(ox.b, lux_type_size[type]);
+	  zerobytes(oy.b, lux_type_size[type]);
+	  ox.b += lux_type_size[type];
+	  oy.b += lux_type_size[type];
 	  continue;
 	}
       }
@@ -1839,23 +1839,23 @@ Int ana_trajectory(Int narg, Int ps[])
       index = ix + iy*nx;	/* index relative to data start */
     
       switch (type) {
-	case ANA_BYTE:
+	case LUX_BYTE:
 	  vx = (Double) vx0.b[index*dv]; /* x velocity */
 	  vy = (Double) vy0.b[index*dv]; /* y velocity */
 	  break;
-	case ANA_WORD:
+	case LUX_WORD:
 	  vx = (Double) vx0.w[index*dv]; /* x velocity */
 	  vy = (Double) vy0.w[index*dv]; /* y velocity */
 	  break;
-	case ANA_LONG:
+	case LUX_LONG:
 	  vx = (Double) vx0.l[index*dv]; /* x velocity */
 	  vy = (Double) vy0.l[index*dv]; /* y velocity */
 	  break;
-	case ANA_FLOAT:
+	case LUX_FLOAT:
 	  vx = (Double) vx0.f[index*dv]; /* x velocity */
 	  vy = (Double) vy0.f[index*dv]; /* y velocity */
 	  break;
-	case ANA_DOUBLE:
+	case LUX_DOUBLE:
 	  vx = (Double) vx0.d[index*dv]; /* x velocity */
 	  vy = (Double) vy0.d[index*dv]; /* y velocity */
 	  break;
@@ -1933,23 +1933,23 @@ Int ana_trajectory(Int narg, Int ps[])
 	index += di;
 	s += ds;
 	switch (type) {
-	  case ANA_BYTE:
+	  case LUX_BYTE:
 	    vx = (Double) vx0.b[index*dv];
 	    vy = (Double) vy0.b[index*dv];
 	    break;
-	  case ANA_WORD:
+	  case LUX_WORD:
 	    vx = (Double) vx0.w[index*dv];
 	    vy = (Double) vy0.w[index*dv];
 	    break;
-	  case ANA_LONG:
+	  case LUX_LONG:
 	    vx = (Double) vx0.l[index*dv];
 	    vy = (Double) vy0.l[index*dv];
 	    break;
-	  case ANA_FLOAT:
+	  case LUX_FLOAT:
 	    vx = (Double) vx0.f[index*dv];
 	    vy = (Double) vy0.f[index*dv];
 	    break;
-	  case ANA_DOUBLE:
+	  case LUX_DOUBLE:
 	    vx = (Double) vx0.d[index*dv];
 	    vy = (Double) vy0.d[index*dv];
 	    break;
@@ -1960,30 +1960,30 @@ Int ana_trajectory(Int narg, Int ps[])
       /* it a bit.  We adjust. */
 
       switch (type) {
-	case ANA_BYTE:
+	case LUX_BYTE:
 	  *ox.b++ = ix + x2;
 	  *oy.b++ = iy + y2;
 	  break;
-	case ANA_WORD:
+	case LUX_WORD:
 	  *ox.w++ = ix + x2;
 	  *oy.w++ = iy + y2;
 	  break;
-	case ANA_LONG:
+	case LUX_LONG:
 	  *ox.l++ = ix + x2;
 	  *oy.l++ = iy + y2;
 	  break;
-	case ANA_FLOAT:
+	case LUX_FLOAT:
 	  *ox.f++ = ix + x2;
 	  *oy.f++ = iy + y2;
 	  break;
-	case ANA_DOUBLE:
+	case LUX_DOUBLE:
 	  *ox.d++ = ix + x2;
 	  *oy.d++ = iy + y2;
 	  break;
       }
     } /* end of for (i = 0; i < n; i++) */
   } /* end of while (ngrid--) */
-  return ANA_OK;
+  return LUX_OK;
 }
 /*--------------------------------------------------------------------*/
 void legendre(Double x, Int lmax, Double *values)
@@ -2113,7 +2113,7 @@ void spherical_harmonics(Double x, Int lmax, Double *values)
   }
 }
 /*--------------------------------------------------------------------*/
-Int ana_legendre(Int narg, Int ps[])
+Int lux_legendre(Int narg, Int ps[])
 /* LEGENDRE(x, lmax) */
 {
   Double	x, *values;
@@ -2121,12 +2121,12 @@ Int ana_legendre(Int narg, Int ps[])
 
   x = double_arg(ps[0]);
   if (x < -1 || x > 1)
-    return anaerror("Illegal ordinate %g (not between -1 and +1)", ps[0], x);
+    return luxerror("Illegal ordinate %g (not between -1 and +1)", ps[0], x);
   lmax = int_arg(ps[1]);
   if (lmax < 0)
-    return anaerror("Illegal maximum order %d (must be nonnegative)", ps[1], lmax);
+    return luxerror("Illegal maximum order %d (must be nonnegative)", ps[1], lmax);
   n = ((lmax + 1)*(lmax + 2))/2;
-  out = array_scratch(ANA_DOUBLE, 1, &n);
+  out = array_scratch(LUX_DOUBLE, 1, &n);
   values = array_data(out);
   if (internalMode & 1)
     spherical_harmonics(x, lmax, values);
@@ -2135,7 +2135,7 @@ Int ana_legendre(Int narg, Int ps[])
   return out;
 }
 /*--------------------------------------------------------------------*/
-Int ana_enhanceimage(Int narg, Int ps[])
+Int lux_enhanceimage(Int narg, Int ps[])
 /* ENHANCEIMAGE(<x> [, <part>, <tgt>, /SYMMETRIC]) enhances an image
   <x>.  The first dimension of <x> is assumed to select between color
   channels.  <x> is assumed to contain BYTE values between 0 and 255,
@@ -2154,11 +2154,11 @@ Int ana_enhanceimage(Int narg, Int ps[])
 
   if (!symbolIsNumericalArray(ps[0]))
     return cerror(NEED_NUM_ARR, ps[0]);
-  if (symbol_type(ps[0]) != ANA_BYTE)
-    return anaerror("Need BYTE array", ps[0]);
+  if (symbol_type(ps[0]) != LUX_BYTE)
+    return luxerror("Need BYTE array", ps[0]);
   numerical(ps[0], &dims, &ndim, &nelem, &src);
   if (ndim < 2)
-    return anaerror("Need 2 or more dimensions", ps[0]);
+    return luxerror("Need 2 or more dimensions", ps[0]);
   part = (narg > 1 && ps[1])? float_arg(ps[1]): 1;
   target = (narg > 2 && ps[2])? float_arg(ps[2]): 100.0/256;
 
@@ -2169,8 +2169,8 @@ Int ana_enhanceimage(Int narg, Int ps[])
     free(hist);
     return cerror(ALLOC_ERR, 0);
   }
-  result = array_clone(ps[0], ANA_BYTE);
-  if (result == ANA_ERROR) {
+  result = array_clone(ps[0], LUX_BYTE);
+  if (result == LUX_ERROR) {
     free(hist);
     free(m);
     return result;
@@ -2218,12 +2218,12 @@ Int ana_enhanceimage(Int narg, Int ps[])
   return result;
 }
 /*--------------------------------------------------------------------*/
-Int ana_hamming(Int narg, Int ps[]) {
+Int lux_hamming(Int narg, Int ps[]) {
   Int nelem, nelem2, ndim, *dims, result, i, type, nr2isarray;
   pointer src, src2, tgt;
 
   if (!symbolIsNumerical(ps[0]))
-    return anaerror("Need a numerical argument", ps[0]);
+    return luxerror("Need a numerical argument", ps[0]);
   if (!symbolIsInteger(ps[0]))
     return cerror(NEED_INT_ARG, ps[0]);
   numerical(ps[0], &dims, &ndim, &nelem, &src);
@@ -2231,22 +2231,22 @@ Int ana_hamming(Int narg, Int ps[]) {
 
   if (narg >= 2) {
     if (!symbolIsNumerical(ps[1]))
-      return anaerror("Need a numerical argument", ps[1]);
+      return luxerror("Need a numerical argument", ps[1]);
     if (!symbolIsInteger(ps[1]))
       return cerror(NEED_INT_ARG, ps[1]);
     if (symbol_type(ps[1]) != type)
-      return anaerror("Data type is different from previous argument", ps[1]);
+      return luxerror("Data type is different from previous argument", ps[1]);
     numerical(ps[1], NULL, NULL, &nelem2, &src2);
     if (nelem2 != nelem && nelem2 != 1)
       return cerror(INCMP_ARG, ps[1]);
     nr2isarray = (nelem2 > 1);
   }
 
-  if (symbol_type(ps[0]) == ANA_SCALAR) {
-    result = scalar_scratch(ANA_LONG);
+  if (symbol_type(ps[0]) == LUX_SCALAR) {
+    result = scalar_scratch(LUX_LONG);
     tgt.l = &scalar_value(result).l;
   } else {
-    result = array_scratch(ANA_LONG, ndim, dims);
+    result = array_scratch(LUX_LONG, ndim, dims);
     tgt.l = array_data(result);
   }
 
@@ -2254,7 +2254,7 @@ Int ana_hamming(Int narg, Int ps[]) {
     for (i = 0; i < nelem; i++) {
       uint32_t dist = 0, val;
       switch (type) {
-      case ANA_BYTE:
+      case LUX_BYTE:
         val = *src.b++;
         while (val) {
           ++dist;
@@ -2262,7 +2262,7 @@ Int ana_hamming(Int narg, Int ps[]) {
         }
         *tgt.l++ = dist;
         break;
-      case ANA_WORD:
+      case LUX_WORD:
         val = *src.w++;
         while (val) {
           ++dist;
@@ -2270,7 +2270,7 @@ Int ana_hamming(Int narg, Int ps[]) {
         }
         *tgt.l++ = dist;
         break;
-      case ANA_LONG:
+      case LUX_LONG:
         val = *src.l++;
         while (val) {
           ++dist;
@@ -2284,7 +2284,7 @@ Int ana_hamming(Int narg, Int ps[]) {
     for (i = 0; i < nelem; i++) {
       uint32_t dist = 0, val;
       switch (type) {
-      case ANA_BYTE:
+      case LUX_BYTE:
         val = *src.b++ ^ *src2.b;
         if (nr2isarray)
           src2.b++;
@@ -2294,7 +2294,7 @@ Int ana_hamming(Int narg, Int ps[]) {
         }
         *tgt.l++ = dist;
         break;
-      case ANA_WORD:
+      case LUX_WORD:
         val = *src.w++ ^ *src2.w;
         if (nr2isarray)
           src2.w++;
@@ -2304,7 +2304,7 @@ Int ana_hamming(Int narg, Int ps[]) {
         }
         *tgt.l++ = dist;
         break;
-      case ANA_LONG:
+      case LUX_LONG:
         val = *src.l++ ^ *src2.l;
         if (nr2isarray)
           src2.l++;

@@ -154,7 +154,7 @@ static void rdct_spike(Word *start, Int ystride, Float *ws)
 #define ALN2I 1.442695022
 #define TINY 1.0e-5
 Int	despike_count = 0, cell_smooth_type = 1;
-Int ana_despike(Int narg, Int ps[])
+Int lux_despike(Int narg, Int ps[])
 /* despike function RAS */
 /* the call is x = despike(array, [frac, level, niter, cell_flag, rms]) */
 {
@@ -170,17 +170,17 @@ Int ana_despike(Int narg, Int ps[])
   lognb2 = (log((Double) 16)*ALN2I+TINY);
 
   if (narg > 1 && ps[1] && float_arg_stat(ps[1], &frac) != 1)
-    return ANA_ERROR;
+    return LUX_ERROR;
   if (narg > 2 && ps[2] && int_arg_stat(ps[2], &level) != 1)
-    return ANA_ERROR;
+    return LUX_ERROR;
   if (level > 15)
     level = 15;
   if (narg > 3 && ps[3] && int_arg_stat(ps[3], &niter) != 1)
-    return ANA_ERROR;
+    return LUX_ERROR;
   if (narg > 4 && ps[4] && int_arg_stat(ps[4], &cell_flag) != 1)
-    return ANA_ERROR;
+    return LUX_ERROR;
   if (narg > 5 && ps[5] && float_arg_stat(ps[5], &rms) != 1)
-    return ANA_ERROR;
+    return LUX_ERROR;
 
  if (cell_flag > 0)
    cell_flag_sign = 1;
@@ -199,17 +199,17 @@ Int ana_despike(Int narg, Int ps[])
    rms_flag = 0;
  /* get pointer to array, must be 2-D here */
  iq = ps[0];
- if (symbol_class(iq) != ANA_ARRAY)
+ if (symbol_class(iq) != LUX_ARRAY)
    return cerror(NEED_ARR, iq);
  type = array_type(iq);
- if (type != ANA_WORD)
-   return anaerror("Need WORD argument", iq); /* must be I*2 */
+ if (type != LUX_WORD)
+   return luxerror("Need WORD argument", iq); /* must be I*2 */
  if (array_num_dims(iq) != 2)
    return cerror(NEED_2D_ARR, iq);
  nx = array_dims(iq)[0];
  ny = array_dims(iq)[1];
  if (nx < 5 || ny < 5)
-   return anaerror("dimensions must be 5 or greater, nx, ny = %d %d\n", nx,ny);
+   return luxerror("dimensions must be 5 or greater, nx, ny = %d %d\n", nx,ny);
 
  /* the cell_flag is used to indicate that we destroy entire cells which
  are corrupted by cell_flag or more spikes, but this is intended only
@@ -245,7 +245,7 @@ Int ana_despike(Int narg, Int ps[])
  nyc = ny/8;
  niter = ABS(niter);
  if (niter > 20) 
-   return anaerror("DESPIKE - error, excessive # of iterations = %d\n", niter);
+   return luxerror("DESPIKE - error, excessive # of iterations = %d\n", niter);
 
  /* add internal iteration 10/8/98 */
  /* if there are 2 or more iterations, we need an extra array, we can't do the
@@ -510,7 +510,7 @@ Int ana_despike(Int narg, Int ps[])
  return result_sym;
 }
 /*------------------------------------------------------------------------- */
-Int ana_reorder(Int narg, Int ps[])/* reorder function */
+Int lux_reorder(Int narg, Int ps[])/* reorder function */
 /* the call is x = reorder(array, order)
    where array must be a 2-D array, returns the re-ordered result */
 /* reordering is reversals and transposes of a 2-D array, there are
@@ -520,7 +520,7 @@ Int ana_reorder(Int narg, Int ps[])/* reorder function */
   Byte   *p, *q, *ptr;
 
   if (int_arg_stat(ps[1], &iorder) != 1)
-    return ANA_ERROR;
+    return LUX_ERROR;
   /* get pointer to array, must be 2-D here */
   iq = ps[0];
   if (!symbolIsArray(iq))
@@ -543,11 +543,11 @@ Int ana_reorder(Int narg, Int ps[])/* reorder function */
   q = array_data(result_sym);
   p = (Byte *) ptr;
   if (iorder == 0)        /* no change, make a copy */
-    bcopy(p, q, nx*ny*ana_type_size[type]);
+    bcopy(p, q, nx*ny*lux_type_size[type]);
   else {
     /* outer switch for type, inners for orientation */
     switch (type) {
-      case ANA_BYTE:
+      case LUX_BYTE:
 	if (iorder < 4) {
 	  register  Byte *pp, *qq;
 	  register  Int  nn, mm, nxx, inc;
@@ -631,7 +631,7 @@ Int ana_reorder(Int narg, Int ps[])/* reorder function */
 	  }
 	}
 	break;
-      case ANA_WORD:
+      case LUX_WORD:
 	if (iorder < 4) {
 	  register  short *pp, *qq;
 	  register  Int  nn, mm, nxx, inc;
@@ -715,7 +715,7 @@ Int ana_reorder(Int narg, Int ps[])/* reorder function */
 	  }
 	}
 	break;
-      case ANA_LONG:
+      case LUX_LONG:
 	if (iorder < 4) {
 	  register  Int *pp, *qq;
 	  register  Int  nn, mm, nxx;
@@ -802,7 +802,7 @@ Int ana_reorder(Int narg, Int ps[])/* reorder function */
 	  }
 	}
 	break;
-      case ANA_FLOAT:
+      case LUX_FLOAT:
 	if (iorder < 4) {
 	  register  Float *pp, *qq;
 	  register  Int  nn, mm, nxx;
@@ -886,7 +886,7 @@ Int ana_reorder(Int narg, Int ps[])/* reorder function */
 	  }
 	}
 	break;
-      case ANA_DOUBLE:
+      case LUX_DOUBLE:
 	if (iorder < 4) {
 	  register  Double *pp, *qq;
 	  register  Int  nn, mm, nxx;

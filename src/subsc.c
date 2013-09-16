@@ -29,14 +29,14 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <limits.h>
 
 extern Int	redim_warn_flag, range_warn_flag;
-Int	ana_assoc_output(Int iq, Int jq, Int offsym, Int axsym),
-  ana_file_output(Int iq, Int jq, Int offsym, Int axsym),
-  ana_gmap(Int narg, Int ps[], Int new), ana_assoc_input(Int, Int []),
+Int	lux_assoc_output(Int iq, Int jq, Int offsym, Int axsym),
+  lux_file_output(Int iq, Int jq, Int offsym, Int axsym),
+  lux_gmap(Int narg, Int ps[], Int new), lux_assoc_input(Int, Int []),
   simple_reverse(Int *p1, Int *p2, Int n, Int type), getBody(Int),
   string_sub(Int, Int []);
 void	convertPointer(scalar *, Int, Int);
 /*------------------------------------------------------------------------- */
-Int ana_inserter(Int narg, Int ps[])
+Int lux_inserter(Int narg, Int ps[])
 /* syntax: insert,target,source [,origin]
    inserts <source> in <target>, starting at <target> coordinates
    <origin> (one or more).
@@ -49,36 +49,36 @@ Int ana_inserter(Int narg, Int ps[])
   Int	*dims, ndim, i, offset[2*MAX_DIMS], doff, daxes, nelem;
 
   switch (symbol_class(ps[0])) {
-    case ANA_ASSOC:
+    case LUX_ASSOC:
       doff = (narg > 2)? ps[2]: 0;
       daxes = (narg > 3)? ps[3]: 0;
-      return ana_assoc_output(ps[0], ps[1], doff, daxes);
-    case ANA_FILEMAP:
+      return lux_assoc_output(ps[0], ps[1], doff, daxes);
+    case LUX_FILEMAP:
       doff = (narg > 2)? ps[2]: 0;
       daxes = (narg > 3)? ps[3]: 0;
-      return ana_file_output(ps[0], ps[1], doff, daxes);
+      return lux_file_output(ps[0], ps[1], doff, daxes);
   }
 
   if (standardLoop(ps[0], 0,
 		   (narg == 3? SL_TAKEONED: SL_ALLAXES) | SL_EACHROW, 0,
-		   &trgtinfo, &trgt, NULL, NULL, NULL) == ANA_ERROR)
-    return ANA_ERROR;		/* something wrong with the target */
+		   &trgtinfo, &trgt, NULL, NULL, NULL) == LUX_ERROR)
+    return LUX_ERROR;		/* something wrong with the target */
 
-  if (numerical(ps[1], &dims, &ndim, &nelem, &src) == ANA_ERROR) /* source */
-    return ANA_ERROR;
+  if (numerical(ps[1], &dims, &ndim, &nelem, &src) == LUX_ERROR) /* source */
+    return LUX_ERROR;
 
   if (narg > 3) {
     if (trgtinfo.ndim != ndim)
       return cerror(INCMP_ARG, ps[1]);
     if (narg != ndim + 2)
-      return anaerror("Need one offset coordinate for each target dimension",
+      return luxerror("Need one offset coordinate for each target dimension",
 		   ps[2]);
     for (i = 0; i < ndim; i++)
       if (symbolIsRealScalar(ps[i + 2])) {
 	offset[2*i] = int_arg(ps[i + 2]);
 	offset[2*i + 1] = offset[2*i] + dims[i] - 1;
 	if (offset[2*i] < 0 || offset[2*i + 1] >= trgtinfo.dims[i])
-	  return anaerror("Source extends beyond target in dimension %d",
+	  return luxerror("Source extends beyond target in dimension %d",
 		       ps[i + 2], i);
       } else
 	return cerror(ILL_CLASS, ps[i + 2]);
@@ -87,7 +87,7 @@ Int ana_inserter(Int narg, Int ps[])
       offset[0] = int_arg(ps[2]);
       offset[1] = offset[0] + nelem - 1;
       if (offset[0] < 0 || offset[1] >= trgtinfo.nelem)
-	return anaerror("Source extends beyond target", ps[2]);
+	return luxerror("Source extends beyond target", ps[2]);
     } else
       return cerror(ILL_CLASS, ps[2]);
   }
@@ -96,25 +96,25 @@ Int ana_inserter(Int narg, Int ps[])
   do {
     nelem = trgtinfo.rdims[0];
     switch (trgtinfo.type) {
-      case ANA_BYTE:
+      case LUX_BYTE:
 	switch (symbol_type(ps[1])) {
-	  case ANA_BYTE:
+	  case LUX_BYTE:
 	    while (nelem--)
 	      *trgt.b++ = *src.b++;
 	    break;
-	  case ANA_WORD:
+	  case LUX_WORD:
 	    while (nelem--)
 	      *trgt.b++ = *src.w++;
 	    break;
-	  case ANA_LONG:
+	  case LUX_LONG:
 	    while (nelem--)
 	      *trgt.b++ = *src.l++;
 	    break;
-	  case ANA_FLOAT:
+	  case LUX_FLOAT:
 	    while (nelem--)
 	      *trgt.b++ = *src.f++;
 	    break;
-	  case ANA_DOUBLE:
+	  case LUX_DOUBLE:
 	    while (nelem--)
 	      *trgt.b++ = *src.d++;
 	    break;
@@ -122,25 +122,25 @@ Int ana_inserter(Int narg, Int ps[])
 	    return cerror(ILL_TYPE, ps[1]);
 	}
 	break;
-      case ANA_WORD:
+      case LUX_WORD:
 	switch (symbol_type(ps[1])) {
-	  case ANA_BYTE:
+	  case LUX_BYTE:
 	    while (nelem--)
 	      *trgt.w++ = *src.b++;
 	    break;
-	  case ANA_WORD:
+	  case LUX_WORD:
 	    while (nelem--)
 	      *trgt.w++ = *src.w++;
 	    break;
-	  case ANA_LONG:
+	  case LUX_LONG:
 	    while (nelem--)
 	      *trgt.w++ = *src.l++;
 	    break;
-	  case ANA_FLOAT:
+	  case LUX_FLOAT:
 	    while (nelem--)
 	      *trgt.w++ = *src.f++;
 	    break;
-	  case ANA_DOUBLE:
+	  case LUX_DOUBLE:
 	    while (nelem--)
 	      *trgt.w++ = *src.d++;
 	    break;
@@ -148,25 +148,25 @@ Int ana_inserter(Int narg, Int ps[])
 	    return cerror(ILL_TYPE, ps[1]);
 	}
 	break;
-      case ANA_LONG:
+      case LUX_LONG:
 	switch (symbol_type(ps[1])) {
-	  case ANA_BYTE:
+	  case LUX_BYTE:
 	    while (nelem--)
 	      *trgt.l++ = *src.b++;	    
 	    break;
-	  case ANA_WORD:
+	  case LUX_WORD:
 	    while (nelem--)
 	      *trgt.l++ = *src.w++;	    
 	    break;
-	  case ANA_LONG:
+	  case LUX_LONG:
 	    while (nelem--)
 	      *trgt.l++ = *src.l++;	    
 	    break;
-	  case ANA_FLOAT:
+	  case LUX_FLOAT:
 	    while (nelem--)
 	      *trgt.l++ = *src.f++;	    
 	    break;
-	  case ANA_DOUBLE:
+	  case LUX_DOUBLE:
 	    while (nelem--)
 	      *trgt.l++ = *src.d++;	    
 	    break;
@@ -174,25 +174,25 @@ Int ana_inserter(Int narg, Int ps[])
 	    return cerror(ILL_TYPE, ps[1]);
 	}
 	break;
-      case ANA_FLOAT:
+      case LUX_FLOAT:
 	switch (symbol_type(ps[1])) {
-	  case ANA_BYTE:
+	  case LUX_BYTE:
 	    while (nelem--)
 	      *trgt.f++ = *src.b++;	    
 	    break;
-	  case ANA_WORD:
+	  case LUX_WORD:
 	    while (nelem--)
 	      *trgt.f++ = *src.w++;	    
 	    break;
-	  case ANA_LONG:
+	  case LUX_LONG:
 	    while (nelem--)
 	      *trgt.f++ = *src.l++;	    
 	    break;
-	  case ANA_FLOAT:
+	  case LUX_FLOAT:
 	    while (nelem--)
 	      *trgt.f++ = *src.f++;	    
 	    break;
-	  case ANA_DOUBLE:
+	  case LUX_DOUBLE:
 	    while (nelem--)
 	      *trgt.f++ = *src.d++;	    
 	    break;
@@ -200,25 +200,25 @@ Int ana_inserter(Int narg, Int ps[])
 	    return cerror(ILL_TYPE, ps[1]);
 	}
 	break;
-      case ANA_DOUBLE:
+      case LUX_DOUBLE:
 	switch (symbol_type(ps[1])) {
-	  case ANA_BYTE:
+	  case LUX_BYTE:
 	    while (nelem--)
 	      *trgt.d++ = *src.b++;	    
 	    break;
-	  case ANA_WORD:
+	  case LUX_WORD:
 	    while (nelem--)
 	      *trgt.d++ = *src.w++;	    
 	    break;
-	  case ANA_LONG:
+	  case LUX_LONG:
 	    while (nelem--)
 	      *trgt.d++ = *src.l++;	    
 	    break;
-	  case ANA_FLOAT:
+	  case LUX_FLOAT:
 	    while (nelem--)
 	      *trgt.d++ = *src.f++;	    
 	    break;
-	  case ANA_DOUBLE:
+	  case LUX_DOUBLE:
 	    while (nelem--)
 	      *trgt.d++ = *src.d++;	    
 	    break;
@@ -230,10 +230,10 @@ Int ana_inserter(Int narg, Int ps[])
 	return cerror(ILL_TYPE, ps[0]);
     }
   } while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.rndim);
-  return ANA_OK;
+  return LUX_OK;
 }
 /*------------------------------------------------------------------------- */
-Int ana_smap(Int narg, Int ps[])
+Int lux_smap(Int narg, Int ps[])
  /* convert type (and class) to a string */
 {
   register Int n;
@@ -242,19 +242,19 @@ Int ana_smap(Int narg, Int ps[])
   Int	result_sym, size;
 
   nsym = ps[0];				/*only one argument */
-  if (symbol_class(nsym) == ANA_STRING)
+  if (symbol_class(nsym) == LUX_STRING)
     return nsym;		/*already a string */
   /*switch on the class */
   switch (symbol_class(nsym))
-  { case ANA_SCAL_PTR:		/*scalar ptr*/
+  { case LUX_SCAL_PTR:		/*scalar ptr*/
       n = 1;
       q1.b = scal_ptr_pointer(nsym).b;
       break;
-    case ANA_SCALAR:		/*scalar */
+    case LUX_SCALAR:		/*scalar */
       n = 1;
       q1.l = &scalar_value(nsym).l;
       break;
-    case ANA_ARRAY:			/*array */
+    case LUX_ARRAY:			/*array */
       q1.l = (Int *) array_data(nsym);
       nd = array_num_dims(nsym);
       n = array_size(nsym);
@@ -262,7 +262,7 @@ Int ana_smap(Int narg, Int ps[])
     default:
       return cerror(ILL_CLASS, nsym);
     }
-  n *= size = ana_type_size[symbol_type(nsym)];
+  n *= size = lux_type_size[symbol_type(nsym)];
   if (internalMode & 1)	/* /TRUNCATE */
   { j = 0;
     while (j < n && *q1.s)
@@ -271,7 +271,7 @@ Int ana_smap(Int narg, Int ps[])
     q1.s -= j;
     n = j; }
   else if (internalMode & 2 && nd > 1) /* /ARRAY */
-  { result_sym = array_scratch(ANA_TEMP_STRING, nd - 1, array_dims(nsym) + 1);
+  { result_sym = array_scratch(LUX_TEMP_STRING, nd - 1, array_dims(nsym) + 1);
     q3.sp = array_data(result_sym);
     n1 = array_dims(nsym)[0]*size;
     j = n/n1;
@@ -289,49 +289,49 @@ Int ana_smap(Int narg, Int ps[])
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-Int ana_bmap(Int narg,Int ps[])
+Int lux_bmap(Int narg,Int ps[])
 /* convert type to Byte without changing memory contents */
 {
-  return ana_gmap(narg, ps, ANA_BYTE);
+  return lux_gmap(narg, ps, LUX_BYTE);
 }
 /*------------------------------------------------------------------------- */
-Int ana_wmap(Int narg, Int ps[])
+Int lux_wmap(Int narg, Int ps[])
 /* convert type to Byte without changing memory contents */
 {
-  return ana_gmap(narg, ps, ANA_WORD);
+  return lux_gmap(narg, ps, LUX_WORD);
 }
 /*------------------------------------------------------------------------- */
-Int ana_lmap(Int narg, Int ps[])
+Int lux_lmap(Int narg, Int ps[])
 /* convert type to long without changing memory contents */
 {
-  return ana_gmap(narg, ps, ANA_LONG);
+  return lux_gmap(narg, ps, LUX_LONG);
 }
 /*------------------------------------------------------------------------- */
-Int ana_fmap(Int narg, Int ps[])
+Int lux_fmap(Int narg, Int ps[])
 /* convert type to Float without changing memory contents */
 {
-  return ana_gmap(narg, ps, ANA_FLOAT);
+  return lux_gmap(narg, ps, LUX_FLOAT);
 }
 /*------------------------------------------------------------------------- */
-Int ana_dmap(Int narg, Int ps[])
+Int lux_dmap(Int narg, Int ps[])
 /* convert type to Double without changing memory contents */
 {
-  return ana_gmap(narg, ps, ANA_DOUBLE);
+  return lux_gmap(narg, ps, LUX_DOUBLE);
 }
 /*------------------------------------------------------------------------- */
-Int ana_cfmap(Int narg, Int ps[])
+Int lux_cfmap(Int narg, Int ps[])
 /* convert type to cfloat without changing memory contents */
 {
-  return ana_gmap(narg, ps, ANA_CFLOAT);
+  return lux_gmap(narg, ps, LUX_CFLOAT);
 }
 /*------------------------------------------------------------------------- */
-Int ana_cdmap(Int narg, Int ps[])
+Int lux_cdmap(Int narg, Int ps[])
 /* convert type to cdouble without changing memory contents */
 {
-  return ana_gmap(narg, ps, ANA_CDOUBLE);
+  return lux_gmap(narg, ps, LUX_CDOUBLE);
 }
 /*------------------------------------------------------------------------- */
-Int ana_gmap(Int narg, Int ps[], Int new)
+Int lux_gmap(Int narg, Int ps[], Int new)
                 /* general part for map routines */
 {
   register pointer q1,q3;
@@ -346,50 +346,50 @@ Int ana_gmap(Int narg, Int ps[], Int new)
   nd = 0;
   /* switch on the class */
   switch (symbol_class(nsym)) {
-    case ANA_SCAL_PTR:
-      n = ana_type_size[type];
+    case LUX_SCAL_PTR:
+      n = lux_type_size[type];
       q1.b = scal_ptr_pointer(nsym).b;
       break;
-    case ANA_SCALAR:
-      n = ana_type_size[type];
+    case LUX_SCALAR:
+      n = lux_type_size[type];
       q1.l = &scalar_value(nsym).l;
       break;
-    case ANA_CSCALAR:
-      n = ana_type_size[type];
+    case LUX_CSCALAR:
+      n = lux_type_size[type];
       q1.cf = complex_scalar_data(nsym).cf;
       break;
-    case ANA_STRING:
+    case LUX_STRING:
       n = string_size(nsym);
       q1.s = string_value(nsym);
       break;
-    case ANA_ARRAY: case ANA_CARRAY:
+    case LUX_ARRAY: case LUX_CARRAY:
       nd = array_num_dims(nsym);
-      n = array_size(nsym)*ana_type_size[type];
+      n = array_size(nsym)*lux_type_size[type];
       q1.l = array_data(nsym);
       /* n must be a multiple of type size or the inner dimension is not
 	 compatible */
-      if ((array_dims(nsym)[0]*ana_type_size[type]) % ana_type_size[new])
-	return anaerror("Array dimension 0 is incompatible with desired type",
+      if ((array_dims(nsym)[0]*lux_type_size[type]) % lux_type_size[new])
+	return luxerror("Array dimension 0 is incompatible with desired type",
 		     ps[0]);
       break;
     default:
       return cerror(ILL_CLASS, nsym);
   }
 
-  if (n % ana_type_size[new])	/* the new data type does not evenly divide
+  if (n % lux_type_size[new])	/* the new data type does not evenly divide
 				   the old data size */
-    return anaerror("Data size is incompatible with desired type", ps[0]);
+    return luxerror("Data size is incompatible with desired type", ps[0]);
 
   /* n is # of bytes to transfer, get # of elements */
-  nn = n/ana_type_size[new];
+  nn = n/lux_type_size[new];
   if (nn <= 1) {		/* at most one, make scalar */
     result_sym = scalar_scratch(new);
     if (isComplexType(new)) {
       q3.cf = complex_scalar_data(result_sym).cf;
-      symbol_class(result_sym) = ANA_CSCALAR;
+      symbol_class(result_sym) = LUX_CSCALAR;
     } else {
       q3.l = &scalar_value(result_sym).l;
-      symbol_class(result_sym) = ANA_SCALAR;
+      symbol_class(result_sym) = LUX_SCALAR;
     }
   } else {
     if (nd == 0) {		/* input was not an array; output will be */
@@ -400,14 +400,14 @@ Int ana_gmap(Int narg, Int ps[], Int new)
       result_sym = array_clone(nsym, type);
       array_type(result_sym) = new;
       if (isComplexType(new))
-	symbol_class(result_sym) = ANA_CARRAY;
+	symbol_class(result_sym) = LUX_CARRAY;
       else
-	symbol_class(result_sym) = ANA_ARRAY;
+	symbol_class(result_sym) = LUX_ARRAY;
       
          /*already know that inner dim is a proper multiple so safe to
 		 do the following */
       array_dims(result_sym)[0] = 
-	(array_dims(result_sym)[0]*ana_type_size[type])/ana_type_size[new];
+	(array_dims(result_sym)[0]*lux_type_size[type])/lux_type_size[new];
     }
     q3.l = array_data(result_sym);
   }
@@ -419,7 +419,7 @@ Int ana_gmap(Int narg, Int ps[], Int new)
 void rearr(Int x[], Int rear[], Int nd)
  /*rearrange subscript vectors */
 /* added rear[] and nd parameters and scratch[] variable declaration to make */
-/* ana_subsc_func recursive LS 30mar94 */
+/* lux_subsc_func recursive LS 30mar94 */
 {
   static Int scratch[MAX_DIMS];
   Int	k;
@@ -428,7 +428,7 @@ void rearr(Int x[], Int rear[], Int nd)
 }
 /*------------------------------------------------------------------------- */
 #define rint(value) ((Int) (value + ((value >= 0)? 0.5: -0.5)))
-Int ana_reverse(Int narg, Int ps[])
+Int lux_reverse(Int narg, Int ps[])
 /* y = REVERSE(x [, axes, center] [, /ZERO])
  reverse <x> in the indicated <axes>, around the specified <center>.
  if any elements would have to reverse into <y> from outside <x>, then
@@ -445,15 +445,15 @@ Int ana_reverse(Int narg, Int ps[])
 		     ((narg > 1 && ps[1])? 0: SL_TAKEONED) |
 		     SL_UNIQUEAXES | SL_KEEPTYPE | SL_EACHROW,
 		     0, &srcinfo, &src, &result, &trgtinfo, &trgt)
-	== ANA_ERROR)
-      return ANA_ERROR;
+	== LUX_ERROR)
+      return LUX_ERROR;
     
     if (narg > 2 && ps[2]) {	/* <center> */
-      if (numerical(ps[2], NULL, NULL, &i, NULL) == ANA_ERROR)
-	return ANA_ERROR;
+      if (numerical(ps[2], NULL, NULL, &i, NULL) == LUX_ERROR)
+	return LUX_ERROR;
       if (i != srcinfo.naxes)
 	return cerror(INCMP_ARG, ps[2]); 
-      iq = ana_float(1, ps + 2);
+      iq = lux_float(1, ps + 2);
       numerical(iq, NULL, NULL, NULL, &center);
     } else
       center.v = NULL;
@@ -562,7 +562,7 @@ Int ana_reverse(Int narg, Int ps[])
     } while (nextLoops(&srcinfo, &trgtinfo));
   } else
     switch (symbol_class(ps[0])) {
-      case ANA_STRING:
+      case LUX_STRING:
 	src.s = string_value(ps[0]);
 	n = string_size(ps[0]);
 	result = string_scratch(n);
@@ -595,7 +595,7 @@ Int expandListArguments(Int *narg, Int *ps[], Int list, Int indx, Int freeList)
     else
       iq = (*ps)[indx + j];
     switch (symbol_class(iq)) {
-      case ANA_CLIST: case ANA_CPLIST:
+      case LUX_CLIST: case LUX_CPLIST:
 	n = clist_num_symbols(iq);
 	*narg += n - 1;		/* minus one because the slot now occupied
 				 by <list> can be occupied by its first
@@ -616,16 +616,16 @@ Int expandListArguments(Int *narg, Int *ps[], Int list, Int indx, Int freeList)
 	     alone because otherwise they are not zapped when their
 	     encompassing CLIST or LIST is. */
 	  if (freeList
-	      && symbol_class(k) != ANA_LIST
-	      && symbol_class(k) != ANA_CLIST
-	      && symbol_class(k) != ANA_CPLIST
+	      && symbol_class(k) != LUX_LIST
+	      && symbol_class(k) != LUX_CLIST
+	      && symbol_class(k) != LUX_CPLIST
 	      && symbol_context(k) == iq)
 	    symbol_context(k) = -compileLevel;
 	}
 	nlist += n - 1;
 	j--;
 	break;
-      case ANA_LIST:
+      case LUX_LIST:
 	n = list_num_symbols(iq);
 	*narg += n - 1;
 	*ps = realloc(*ps, *narg*sizeof(Int));
@@ -635,9 +635,9 @@ Int expandListArguments(Int *narg, Int *ps[], Int list, Int indx, Int freeList)
 	for (i = 0; i < n; i++) {
 	  k = (*ps)[indx + i] = list_symbol(iq, i);
 	  if (freeList
-	      && symbol_class(k) != ANA_LIST
-	      && symbol_class(k) != ANA_CLIST
-	      && symbol_class(k) != ANA_CPLIST
+	      && symbol_class(k) != LUX_LIST
+	      && symbol_class(k) != LUX_CLIST
+	      && symbol_class(k) != LUX_CPLIST
 	      && symbol_context(k) == iq)
 	    symbol_context(k) = -compileLevel;
 	}
@@ -678,14 +678,14 @@ Int treatListArguments(Int *narg, Int *ps[], Int offset)
   for (i = i1; i < *narg + i2; ) {	/* check all arguments */
     if ((*ps)[i])		/* there is an argument in this slot */
       switch (symbol_class((*ps)[i])) {
-	case ANA_CLIST: case ANA_CPLIST:
+	case LUX_CLIST: case LUX_CPLIST:
 	  if (clist_num_symbols((*ps)[i]) == 1) { /* one element -> may be
 						appropriate */
 	    list = (*ps)[i];
 	    iq = clist_symbols(list)[0];
 	    if (iq)		/* the one element is not empty */
 	      switch (symbol_class(iq)) {
-		case ANA_CLIST: case ANA_LIST: case ANA_CPLIST:
+		case LUX_CLIST: case LUX_LIST: case LUX_CPLIST:
 		  n = expandListArguments(narg, ps, iq, i, isFreeTemp(list));
 		  if (isFreeTemp(list))
 		    /* we must delete this <list> symbol because it is
@@ -706,13 +706,13 @@ Int treatListArguments(Int *narg, Int *ps[], Int offset)
 	  } else
 	    i++;
 	  break;
-	case ANA_LIST:
+	case LUX_LIST:
 	  if (list_num_symbols((*ps)[i]) == 1) {
 	    list = (*ps)[i];
 	    iq = list_symbol((*ps)[i], 0);
 	    if (iq)
 	      switch (symbol_class(iq)) {
-		case ANA_CLIST: case ANA_LIST: case ANA_CPLIST:
+		case LUX_CLIST: case LUX_LIST: case LUX_CPLIST:
 		  n = expandListArguments(narg, ps, iq, i, isFreeTemp(list));
 		  if (isFreeTemp(list))
 		    zap(list);
@@ -757,7 +757,7 @@ Int expandListArguments_w(Int *narg, Word *ps[], Int list, Int indx,
     else
       iq = (*ps)[indx + j];
     switch (symbol_class(iq)) {
-      case ANA_CLIST: case ANA_CPLIST:
+      case LUX_CLIST: case LUX_CPLIST:
 	n = clist_num_symbols(iq);
 	*narg += n - 1;		/* minus one because the slot now occupied
 				 by <list> can be occupied by its first
@@ -778,16 +778,16 @@ Int expandListArguments_w(Int *narg, Word *ps[], Int list, Int indx,
 	     alone because otherwise they are not zapped when their
 	     encompassing CLIST or LIST is. */
 	  if (freeList
-	      && symbol_class(k) != ANA_LIST
-	      && symbol_class(k) != ANA_CLIST
-	      && symbol_class(k) != ANA_CPLIST
+	      && symbol_class(k) != LUX_LIST
+	      && symbol_class(k) != LUX_CLIST
+	      && symbol_class(k) != LUX_CPLIST
 	      && symbol_context(k) == iq)
 	    symbol_context(k) = -compileLevel;
 	}
 	nlist += n - 1;
 	j--;
 	break;
-      case ANA_LIST:
+      case LUX_LIST:
 	n = list_num_symbols(iq);
 	*narg += n - 1;
 	*ps = realloc(*ps, *narg*sizeof(Word));
@@ -797,9 +797,9 @@ Int expandListArguments_w(Int *narg, Word *ps[], Int list, Int indx,
 	for (i = 0; i < n; i++) {
 	  k = (*ps)[indx + i] = list_symbol(iq, i);
 	  if (freeList
-	      && symbol_class(k) != ANA_LIST
-	      && symbol_class(k) != ANA_CLIST
-	      && symbol_class(k) != ANA_CPLIST
+	      && symbol_class(k) != LUX_LIST
+	      && symbol_class(k) != LUX_CLIST
+	      && symbol_class(k) != LUX_CPLIST
 	      && symbol_context(k) == iq)
 	    symbol_context(k) = -compileLevel;
 	}
@@ -840,14 +840,14 @@ Int treatListArguments_w(Int *narg, Word *ps[], Int offset)
   for (i = i1; i < *narg + i2; ) {	/* check all arguments */
     if ((*ps)[i])		/* there is an argument in this slot */
       switch (symbol_class((*ps)[i])) {
-	case ANA_CLIST: case ANA_CPLIST:
+	case LUX_CLIST: case LUX_CPLIST:
 	  if (clist_num_symbols((*ps)[i]) == 1) { /* one element -> may be
 						appropriate */
 	    list = (*ps)[i];
 	    iq = clist_symbols(list)[0];
 	    if (iq)		/* the one element is not empty */
 	      switch (symbol_class(iq)) {
-		case ANA_CLIST: case ANA_LIST: case ANA_CPLIST:
+		case LUX_CLIST: case LUX_LIST: case LUX_CPLIST:
 		  n = expandListArguments_w(narg, ps, iq, i, isFreeTemp(list));
 		  if (isFreeTemp(list))
 		    /* we must delete this <list> symbol because it is
@@ -868,13 +868,13 @@ Int treatListArguments_w(Int *narg, Word *ps[], Int offset)
 	  } else
 	    i++;
 	  break;
-	case ANA_LIST:
+	case LUX_LIST:
 	  if (list_num_symbols((*ps)[i]) == 1) {
 	    list = (*ps)[i];
 	    iq = list_symbol((*ps)[i], 0);
 	    if (iq)
 	      switch (symbol_class(iq)) {
-		case ANA_CLIST: case ANA_LIST: case ANA_CPLIST:
+		case LUX_CLIST: case LUX_LIST: case LUX_CPLIST:
 		  n = expandListArguments_w(narg, ps, iq, i, isFreeTemp(list));
 		  if (isFreeTemp(list))
 		    zap(list);
@@ -904,7 +904,7 @@ Int treatListArguments_w(Int *narg, Word *ps[], Int offset)
 #define INNER	1
 #define OUTER	2
 
-Int ana_subsc_func(Int narg, Int ps[])
+Int lux_subsc_func(Int narg, Int ps[])
 /* decipher and extract subscripted values from a symbol; supports arrays, */
 /* strings, associated variables, file maps, and function pointers. */
 /* rewritten LS 6aug96 */
@@ -920,75 +920,75 @@ Int ana_subsc_func(Int narg, Int ps[])
   Byte	subsc_type[MAX_DIMS], sum[MAX_DIMS];
   listElem	*le;
   FILE	*fp = NULL;
-  Int	ana_subsc_subgrid(Int, Int []);
-  Int ana_endian(Int, Int []);
+  Int	lux_subsc_subgrid(Int, Int []);
+  Int lux_endian(Int, Int []);
 
   nsym = ps[--narg];
   /* now nsym is the source (subscripted) symbol and narg is the number
    of subscripts.  The first argument is ps[0] */
 
-  /* we want to treat ANA_CLISTs and ANA_LISTs in the argument list
+  /* we want to treat LUX_CLISTs and LUX_LISTs in the argument list
    not as single arguments but as sets of arguments.  I.e.,
    FOO(arg1, arg2) = FOO(arg1, {{ arg2a, arg2b }}) = FOO( arg1, arg2a, arg2b)
    if arg2 = { arg2a, arg2b }.  We require two sets of braces to
    distinguish the case where the list is to be interpreted as a set of
    arguments and the case where the list is itself an argument.
    LS 14jun98 */
-  if (treatListArguments(&narg, &ps, 0) == ANA_ERROR) /* treat subscripts
+  if (treatListArguments(&narg, &ps, 0) == LUX_ERROR) /* treat subscripts
 						       but not target */
-    return ANA_ERROR;		/* some error */
+    return LUX_ERROR;		/* some error */
 
   if (internalMode & 8)		/* /SUBGRID */
-    return ana_subsc_subgrid(narg, ps);
+    return lux_subsc_subgrid(narg, ps);
 
   class = symbol_class(nsym);	/* source symbol class */
 
   switch (class) {		/* switch on source class */
     default:
       return cerror(SUBSC_NO_INDX, nsym);
-    case ANA_CLIST: case ANA_CPLIST:
+    case LUX_CLIST: case LUX_CPLIST:
       nelem = clist_num_symbols(nsym);
       ndim = 1;
       dims = &nelem;
       break;
-    case ANA_RANGE:
+    case LUX_RANGE:
       nelem = 2;
       ndim = 1;
       dims = &nelem;
       break;
-    case ANA_LIST:
+    case LUX_LIST:
       nelem = list_num_symbols(nsym);
       ndim = 1;
       dims = &nelem;
       break;
-    case ANA_ASSOC:		/*assoc. var. case */
+    case LUX_ASSOC:		/*assoc. var. case */
       /* assoc variables come here but are handed off to files.c */
-      iq = ana_assoc_input(narg, ps);
+      iq = lux_assoc_input(narg, ps);
       return iq;
-    case ANA_FUNC_PTR:		/*func. ptr. case */
+    case LUX_FUNC_PTR:		/*func. ptr. case */
       if ((iq = func_ptr_routine_num(nsym)) > 0) { /* user-defined */
-	if (symbol_class(iq) == ANA_DEFERRED_FUNC) {
+	if (symbol_class(iq) == LUX_DEFERRED_FUNC) {
 	  /* it's a deferred function, so its body has not yet been */
 	  /* compiled.  Do it now. */
 	  if (getBody(iq) < 0)	/* some error during compilation */
-	    return ANA_ERROR;
+	    return LUX_ERROR;
 	}
-	if (symbol_class(iq) != ANA_FUNCTION)
-	  return anaerror("Subscripted pointer to non-function!", nsym);
+	if (symbol_class(iq) != LUX_FUNCTION)
+	  return luxerror("Subscripted pointer to non-function!", nsym);
 	type = 1;		/* user-defined */
       } else {			/* internal function or routine */
 	iq = -iq;		/* get function number */
 	if (iq >= nFunction)
-	  return anaerror("Pointer to non-existent internal function!", nsym);
+	  return luxerror("Pointer to non-existent internal function!", nsym);
 	type = 0;		/* internal */
       }
       /* now create proper symbol to handle the situation */
       getFreeTempExecutable(n);
       if (type) {		/* a user-defined function */
-	symbol_class(n) = ANA_USR_FUNC;
+	symbol_class(n) = LUX_USR_FUNC;
 	usr_func_number(n) = iq;
       } else {			/* an internal function */
-	symbol_class(n) = ANA_INT_FUNC;
+	symbol_class(n) = LUX_INT_FUNC;
 	int_func_number(n) = iq;
       }
       symbol_memory(n) = narg*sizeof(Word);
@@ -1002,10 +1002,10 @@ Int ana_subsc_func(Int narg, Int ps[])
       iq = eval(n);
       zap(n);			/* delete temp executable */
       return iq;
-    case ANA_STRING:		/* string case */
+    case LUX_STRING:		/* string case */
       iq = string_sub(narg, ps);
       return iq;
-    case ANA_FILEMAP:
+    case LUX_FILEMAP:
       if ((fp = fopen(expand_name(file_map_file_name(nsym), NULL), "r"))
 	  == NULL) {
 	printf("File %s: ", expname);
@@ -1017,21 +1017,21 @@ Int ana_subsc_func(Int narg, Int ps[])
       nelem = file_map_size(nsym);
       type = file_map_type(nsym);
       break;
-    case ANA_ARRAY: case ANA_CARRAY:
+    case LUX_ARRAY: case LUX_CARRAY:
       src.l = (Int *) array_data(nsym);
       ndim = array_num_dims(nsym);
       dims = array_dims(nsym);
       nelem = array_size(nsym);
       type = symbol_type(nsym);
       break;
-    case ANA_CSCALAR:
+    case LUX_CSCALAR:
       src.cf = complex_scalar_data(nsym).cf;
       ndim = 1;
       dims = &one;
       nelem = 1;
       type = complex_scalar_type(nsym);
       break;
-    case ANA_SCALAR:
+    case LUX_SCALAR:
       src.l = &scalar_value(nsym).l;
       ndim = 1;
       dims = &one;
@@ -1050,14 +1050,14 @@ Int ana_subsc_func(Int narg, Int ps[])
 	  && narg > 1		/* and more than 1 subscript */
 	  && narg != ndim)) {	/* and # subscripts unequal to # dims */
     cerror(ILL_N_SUBSC, nsym);
-    goto ana_subsc_1;
+    goto lux_subsc_1;
   }
 
   /* only get here if source is a numerical or string array, a scalar, */
   /* a file map, or a list. */
 
-  if (class == ANA_ARRAY && type == ANA_STRING_ARRAY)
-    class = ANA_STRING_ARRAY;	/* distinguish numerical from string */
+  if (class == LUX_ARRAY && type == LUX_STRING_ARRAY)
+    class = LUX_STRING_ARRAY;	/* distinguish numerical from string */
 				/* arrays */
 
   if (narg == 1			/* one subscript */
@@ -1085,28 +1085,28 @@ Int ana_subsc_func(Int narg, Int ps[])
       combineType = OUTER;
       break;
     case 3:			/* both /INNER and /OUTER */
-      anaerror("Specified incompatible /INNER and /OUTER", 0);
-      goto ana_subsc_1;
+      luxerror("Specified incompatible /INNER and /OUTER", 0);
+      goto lux_subsc_1;
   }
 
   if ((internalMode & 64)	/* /SEPARATE */
       && (narg > 1		/* more than one argument */
 	  || !symbolIsNumericalArray(ps[0]) /* or not a numerical array */
 	  || array_size(ps[0]) > ndim)) { /* or wrong # dimensions */
-    anaerror("Improper subscript for /SEPARATE", ps[0]);
-    goto ana_subsc_1;
+    luxerror("Improper subscript for /SEPARATE", ps[0]);
+    goto lux_subsc_1;
   }
 
   nsum = narr = 0;
   /* check all subscripts for legality as far as possible */
   /* collect the number of elements covered by each subscript (size), */
   /* the start index (start), the redirection dimension (todim), */
-  /* the summation flag (sum), and the subscript type (ANA_ARRAY */
-  /* or ANA_RANGE) */
+  /* the summation flag (sum), and the subscript type (LUX_ARRAY */
+  /* or LUX_RANGE) */
   for (i = 0; i < narg; i++) { /* all subscripts */
     iq = ps[i];			/* next subscript */
     switch (symbol_class(iq)) {	/* subscript class */
-      case ANA_SCAL_PTR: case ANA_SCALAR:
+      case LUX_SCAL_PTR: case LUX_SCALAR:
 	start[i] = int_arg(iq);	/* start index (scalar value) */
 	if (narg == 1)		/* only a single subscript: address */
 				/* the array as if it were 1D */
@@ -1115,15 +1115,15 @@ Int ana_subsc_func(Int narg, Int ps[])
 	  width = dims[i];
 	if (start[i] < 0 || start[i] >= width) { /* check if within range */
 	  cerror(ILL_SUBSC, iq, start[i], width);
-	  goto ana_subsc_1;
+	  goto lux_subsc_1;
 	}
 	size[i] = 1;		/* size (1 element) */
 	todim[i] = -1;		/* no associated redirection dimension */
 	sum[i] = 0;		/* no summation */
-	subsc_type[i] = ANA_RANGE; /* subscript type */
+	subsc_type[i] = LUX_RANGE; /* subscript type */
 	break;
-      case ANA_ARRAY:
-	iq = ana_long(1, &iq);	/* get LONG indices */
+      case LUX_ARRAY:
+	iq = lux_long(1, &iq);	/* get LONG indices */
 	n = size[i] = array_size(iq); /* number of array elements */
 	if (internalMode & 64) { /* /SEPARATE */
 	  /* the elements of the current array are regarded as
@@ -1136,12 +1136,12 @@ Int ana_subsc_func(Int narg, Int ps[])
 	  for (i = 0; i < n; i++) {
 	    if (*iptr < 0 || *iptr >= dims[i]) { /* out of bounds */
 	      cerror(ILL_SUBSC, ps[1], *iptr, dims[i]);
-	      goto ana_subsc_1;
+	      goto lux_subsc_1;
 	    }
 	    start[i] = *iptr++;	/* start index */
 	    size[i] = 1;	/* range size */
 	    todim[i] = -1;	/* no associated redirection dimension */
-	    subsc_type[i] = ANA_RANGE; /* subscript type */
+	    subsc_type[i] = LUX_RANGE; /* subscript type */
 	  }
 	  narg = n;
 	  i = narg;
@@ -1154,9 +1154,9 @@ Int ana_subsc_func(Int narg, Int ps[])
 	      width = dims[i];
 	    if (start[i] < 0 || start[i] >= width) {
 	      cerror(ILL_SUBSC, iq, start[i], width);
-	      goto ana_subsc_1;
+	      goto lux_subsc_1;
 	    }
-	    subsc_type[i] = ANA_RANGE;
+	    subsc_type[i] = LUX_RANGE;
 	  } else {		/* multiple elements in this subscript */
 	    iptr = index[i] = (Int *) array_data(iq);
 	    if (narg == 1)	/* only a single subscript; addresses */
@@ -1167,11 +1167,11 @@ Int ana_subsc_func(Int narg, Int ps[])
 	    while (n--) {	/* check if all subscripts are within range */
 	      if (*iptr < 0 || *iptr >= width) {
 		cerror(ILL_SUBSC, iq, *iptr, width);
-		goto ana_subsc_1;
+		goto lux_subsc_1;
 	      }
 	      iptr++;
 	    }
-	    subsc_type[i] = ANA_ARRAY;
+	    subsc_type[i] = LUX_ARRAY;
 	    narr++;
 	    ps2[i] = iq;	/* index symbol number */
 	  }
@@ -1185,77 +1185,77 @@ Int ana_subsc_func(Int narg, Int ps[])
 	    combineType = INNER;
 	}
 	break;
-      case ANA_RANGE:
+      case LUX_RANGE:
 	if (!range_scalar(iq)) {
 	  /* check for nested ranges, e.g., ((3:4):>5). */
 	  j = iq;
-	  while (!range_scalar(j) && symbol_class(j) != ANA_ARRAY) {
-	    if (range_end(j) != ANA_ZERO) { /* invalid nested range */
+	  while (!range_scalar(j) && symbol_class(j) != LUX_ARRAY) {
+	    if (range_end(j) != LUX_ZERO) { /* invalid nested range */
 	      cerror(ILL_SUBSC_TYPE, iq);
-	      goto ana_subsc_1;
+	      goto lux_subsc_1;
 	    }
 	    j = range_start(j);
 	  }
 	  /* now take index information from symbol j and the redirection */
 	  /* information from symbol iq (which may be the same) */
 	  switch (symbol_class(j)) {
-	    case ANA_ARRAY:
-	      j = ana_long(1, &j);	/* ensure LONG indices */
+	    case LUX_ARRAY:
+	      j = lux_long(1, &j);	/* ensure LONG indices */
 	      n = size[i] = array_size(j);
 	      iptr = index[i] = (Int *) array_data(j);
 	      while (n--) {	/* check if all subscripts are within range */
 		if (*iptr < 0 || *iptr >= dims[i]) {
 		  cerror(ILL_SUBSC, iq, *iptr, dims[i]);
-		  goto ana_subsc_1;
+		  goto lux_subsc_1;
 		}
 		iptr++;
 	      }
 	      ps2[i] = j;	/* index symbol number */
-	      subsc_type[i] = ANA_ARRAY;
+	      subsc_type[i] = LUX_ARRAY;
 	      narr++;
 	      break;
-	    case ANA_RANGE:
+	    case LUX_RANGE:
 	      j = convertRange(j); /* convert to subscript pointer */
 	      start[i] = subsc_ptr_start(j);
 	      if (start[i] < 0)	/* count from end of range */
 		start[i] += dims[i];
 	      if (start[i] < 0 || start[i] >= dims[i]) { /* outside range */
 		cerror(RANGE_START, iq, start[i], dims[i]);
-		goto ana_subsc_1;
+		goto lux_subsc_1;
 	      }
 	      size[i] = subsc_ptr_end(j); /* endpoint */
 	      if (size[i] < 0)	/* count from end of range */
 		size[i] += dims[i];
 	      if (size[i] < start[i] || size[i] >= dims[i]) { /* outside */
 		cerror(RANGE_END, iq, size[i], dims[i]);
-		goto ana_subsc_1;
+		goto lux_subsc_1;
 	      }
 	      size[i] += 1 - start[i]; /* now we have the size */
-	      subsc_type[i] = ANA_RANGE;
+	      subsc_type[i] = LUX_RANGE;
 	      break;
 	  }
 	  j = range_redirect(iq); /* redirection symbol */
 	  if (j >= 0) {		/* -1: no symbol specified */
 	    j = eval(j);
-	    if (symbol_class(j) != ANA_SCALAR) { /* must be a scalar */
+	    if (symbol_class(j) != LUX_SCALAR) { /* must be a scalar */
 	      cerror(ILL_REARRANGE, iq);
-	      goto ana_subsc_1;
+	      goto lux_subsc_1;
 	    }
 	    j = int_arg(j);	/* use the integer part */
 	    if (j < 0) {	/* negative axes don't exist */
 	      cerror(ILL_REARRANGE, iq);
-	      goto ana_subsc_1;
+	      goto lux_subsc_1;
 	    }
 	  }
 	  if (j >= ndim) {	/* beyond range of dimensions */
 	    cerror(ILL_REARRANGE, iq);
-	    goto ana_subsc_1;
+	    goto lux_subsc_1;
 	  }
 	  todim[i] = j;		/* redirection, if any */
 	  sum[i] = range_sum(iq); /* summation, if any */
 	  if (sum[i])		/* this dimension is flagged for summation */
 	    nsum++;		/* count the number of summed dimensions */
-	  else if (subsc_type[i] == ANA_ARRAY
+	  else if (subsc_type[i] == LUX_ARRAY
 		   && combineType == UNDEFINED
 		   && array_num_dims(ps2[i]) > 1)
 	    /* with multi-dimensional arrays for subscripts, we */
@@ -1269,36 +1269,36 @@ Int ana_subsc_func(Int narg, Int ps[])
 	if (iq < 0)		/* some error occurred */
 	  return iq;
 	/* fall-thru */
-      case ANA_SUBSC_PTR:
+      case LUX_SUBSC_PTR:
 	start[i] = subsc_ptr_start(iq);
 	if (start[i] < 0)	/* count from end of range */
 	  start[i] += dims[i];
 	if (start[i] < 0 || start[i] >= dims[i]) {
 	  cerror(RANGE_START, iq, start[i], dims[i]);
-	  goto ana_subsc_1;
+	  goto lux_subsc_1;
 	}
 	size[i] = subsc_ptr_end(iq); /* endpoint */
 	if (size[i] < 0)	/* count from end of range */
 	  size[i] += dims[i];
 	if (size[i] < start[i] || size[i] >= dims[i]) {
 	  cerror(RANGE_END, iq, size[i], dims[i]);
-	  goto ana_subsc_1;
+	  goto lux_subsc_1;
 	}
 	size[i] += 1 - start[i]; /* now we have the size */
 	j = subsc_ptr_redirect(iq);
 	if (j > ndim) {
 	  cerror(ILL_REARRANGE, iq);
-	  goto ana_subsc_1;
+	  goto lux_subsc_1;
 	}
 	todim[i] = j;
 	sum[i] = subsc_ptr_sum(iq);
 	if (sum[i])
 	  nsum++;
-	subsc_type[i] = ANA_RANGE;
+	subsc_type[i] = LUX_RANGE;
 	break;
       default:			/* some unsupported class */
 	cerror(ILL_SUBSC_TYPE, iq);
-	goto ana_subsc_1;
+	goto lux_subsc_1;
       }
   }
 
@@ -1320,7 +1320,7 @@ Int ana_subsc_func(Int narg, Int ps[])
 	  size[i] = dims[i];
 	  todim[i] = -1;
 	  sum[i] = 0;
-	  subsc_type[i] = ANA_RANGE;
+	  subsc_type[i] = LUX_RANGE;
 	}
 	narg = ndim;
 	break;
@@ -1330,38 +1330,38 @@ Int ana_subsc_func(Int narg, Int ps[])
 	  size[i] = 1;
 	  todim[i] = -1;
 	  sum[i] = 0;
-	  subsc_type[i] = ANA_RANGE;
+	  subsc_type[i] = LUX_RANGE;
 	}
 	narg = ndim;
 	break;
       default:			/* none of the above: error */
 	cerror(ILL_N_SUBSC, ps[0]);
-	goto ana_subsc_1;
+	goto lux_subsc_1;
     }
 
   /* now we are ready to start the extraction */
 
   switch (class) {
-    case ANA_CLIST:
+    case LUX_CLIST:
       if (size[0] == 1) 	/* want only a single element */
 	return clist_symbols(nsym)[start[0]];
       /* else we return a CLIST with the indicated number of elements */
       iq = nextFreeTempVariable();
-      if (iq == ANA_ERROR)
-	goto ana_subsc_1;
+      if (iq == LUX_ERROR)
+	goto lux_subsc_1;
       symbol_class(iq) = class;
       n = size[0]*sizeof(Word);
       ap = clist_symbols(iq) = malloc(n);
       if (!clist_symbols(iq)) {
 	cerror(ALLOC_ERR, iq);
-	goto ana_subsc_1;
+	goto lux_subsc_1;
       }
       symbol_memory(iq) = n;
       switch (subsc_type[0]) {
-	case ANA_RANGE:
+	case LUX_RANGE:
 	  memcpy(ap, clist_symbols(nsym) + start[0], size[0]*sizeof(Word));
 	  break;
-	case ANA_ARRAY:
+	case LUX_ARRAY:
 	  n = size[0];
 	  iptr = index[0];
 	  while (n--)
@@ -1369,37 +1369,37 @@ Int ana_subsc_func(Int narg, Int ps[])
 	  break;
       }
       return iq;
-    case ANA_CPLIST:
+    case LUX_CPLIST:
       if (size[0] == 1) {
  	/* we want only a single element: if it is a named variable,
 	   then we make it a TRANSFER, otherwise we return it as is. */
 	n = clist_symbols(nsym)[start[0]];
 	if (symbolIsNamed(n)) {
 	  iq = nextFreeTempVariable();
-	  if (iq == ANA_ERROR)
-	    goto ana_subsc_1;
-	  symbol_class(iq) = ANA_TRANSFER;
+	  if (iq == LUX_ERROR)
+	    goto lux_subsc_1;
+	  symbol_class(iq) = LUX_TRANSFER;
 	  transfer_is_parameter(iq) = 0;
 	  transfer_target(iq) = n;
 	} else
 	  iq = n;
       } else {
 	iq = nextFreeTempVariable();
-	if (iq == ANA_ERROR)
-	  goto ana_subsc_1;
+	if (iq == LUX_ERROR)
+	  goto lux_subsc_1;
 	symbol_class(iq) = class;
 	n = size[0]*sizeof(Word);
 	ap = clist_symbols(iq) = malloc(n);
 	if (!clist_symbols(iq)) {
 	  cerror(ALLOC_ERR, iq);
-	  goto ana_subsc_1;
+	  goto lux_subsc_1;
 	}
 	symbol_memory(iq) = n;
 	switch (subsc_type[0]) {
-	  case ANA_RANGE:
+	  case LUX_RANGE:
 	    memcpy(ap, clist_symbols(nsym) + start[0], size[0]*sizeof(Word));
 	    break;
-	  case ANA_ARRAY:
+	  case LUX_ARRAY:
 	    n = size[0];
 	    iptr = index[0];
 	    while (n--)
@@ -1408,26 +1408,26 @@ Int ana_subsc_func(Int narg, Int ps[])
 	}
       }
       return iq;
-    case ANA_LIST:
+    case LUX_LIST:
       if (size[0] == 1) 	/* want only a single element */
 	return list_symbols(nsym)[start[0]].value;
       /* else we return a CLIST with the indicated number of elements */
       iq = nextFreeTempVariable();
-      if (iq == ANA_ERROR)
-	goto ana_subsc_1;
-      symbol_class(iq) = ANA_LIST;
+      if (iq == LUX_ERROR)
+	goto lux_subsc_1;
+      symbol_class(iq) = LUX_LIST;
       n = size[0]*sizeof(listElem);
       le = list_symbols(iq) = malloc(n);
       if (!list_symbols(iq)) {
 	cerror(ALLOC_ERR, iq);
-	goto ana_subsc_1;
+	goto lux_subsc_1;
       }
       symbol_memory(iq) = n;
       switch (subsc_type[0]) {
-	case ANA_RANGE:
+	case LUX_RANGE:
 	  memcpy(le, clist_symbols(nsym) + start[0], size[0]*sizeof(listElem));
 	  break;
-	case ANA_ARRAY:
+	case LUX_ARRAY:
 	  n = size[0];
 	  iptr = index[0];
 	  while (n--)
@@ -1435,7 +1435,7 @@ Int ana_subsc_func(Int narg, Int ps[])
 	  break;
       }
       return iq;
-    case ANA_RANGE:
+    case LUX_RANGE:
       if (size[0] == 1)
 	return start[0]? range_end(nsym): range_start(nsym);
       /* else we want both: return the range itself */
@@ -1458,20 +1458,20 @@ Int ana_subsc_func(Int narg, Int ps[])
 				/* subscripts and range starts */
     for (i = 0; i < narg; i++) {
       if (sum[i]) {
-	anaerror("Sorry, array summation not implemented for /INNER",
+	luxerror("Sorry, array summation not implemented for /INNER",
 	      ps[i + 1]);
-	goto ana_subsc_1;
+	goto lux_subsc_1;
       }
       if (todim[i] >= 0) {
-	anaerror("Sorry, redirection not implemented for /INNER",
+	luxerror("Sorry, redirection not implemented for /INNER",
 	      ps[i + 1]);
-	goto ana_subsc_1;
+	goto lux_subsc_1;
       }
       if (size[i] > 1) {	/* multiple elements */
 	if (n >= 0) {		/* already have an earlier multiple */
 	  if (size[i] != size[n]) { /* sizes do not agree */
 	    cerror(INCMP_DIMS, ps[i + 1]);
-	    goto ana_subsc_1;
+	    goto lux_subsc_1;
 	  }
 	}
         else
@@ -1481,7 +1481,7 @@ Int ana_subsc_func(Int narg, Int ps[])
 
     /* now create output symbol */
     if (n >= 0) {		/* output array */
-      if (subsc_type[n] == ANA_ARRAY)
+      if (subsc_type[n] == LUX_ARRAY)
 	iq = array_scratch(type, array_num_dims(ps[n]),
 			   array_dims(ps[n]));
       else			/* must be a range */
@@ -1494,27 +1494,27 @@ Int ana_subsc_func(Int narg, Int ps[])
       trgt.l = &scalar_value(iq).l;
     }
 
-    /* for ANA_ARRAY subscripts the offset is calculated for each index; */
-    /* for ANA_RANGE subscripts the offset is updated for each element */
+    /* for LUX_ARRAY subscripts the offset is calculated for each index; */
+    /* for LUX_RANGE subscripts the offset is updated for each element */
     offset0 = 0;
-    width = ana_type_size[type];
-    if ((nsum && class != ANA_FILEMAP) || class == ANA_STRING_ARRAY)
+    width = lux_type_size[type];
+    if ((nsum && class != LUX_FILEMAP) || class == LUX_STRING_ARRAY)
       n = 1;
     else
       n = width;
     for (i = 0; i < narg; i++) {
       stride[i] = n;
-      if (subsc_type[i] == ANA_RANGE)
+      if (subsc_type[i] == LUX_RANGE)
 	offset0 += start[i]*n;	/* update initial offset */
       n *= dims[i];
     }
 
     switch (class) {
-      case ANA_ARRAY: case ANA_SCALAR:
+      case LUX_ARRAY: case LUX_SCALAR:
 	for (j = 0; j < nelem; j++) {
 	  offset = offset0;
 	  for (i = 0; i < narg; i++)
-	    if (subsc_type[i] == ANA_ARRAY)
+	    if (subsc_type[i] == LUX_ARRAY)
 	      offset += index[i][j]*stride[i];
 	    else if (size[i] > 1) /* range */
 	      offset0 += stride[i];
@@ -1522,35 +1522,35 @@ Int ana_subsc_func(Int narg, Int ps[])
 	  trgt.b += width;
 	}
 	break;
-      case ANA_STRING_ARRAY:			/* string array */
+      case LUX_STRING_ARRAY:			/* string array */
 	for (j = 0; j < nelem; j++) {
 	  offset = offset0;
 	  for (i = 0; i < narg; i++)
-	    if (subsc_type[i] == ANA_ARRAY)
+	    if (subsc_type[i] == LUX_ARRAY)
 	      offset += index[i][j]*stride[i];
 	    else if (size[i] > 1) /* range */
 	      offset0 += stride[i];
 	  if (!(*trgt.sp = malloc(strlen(src.sp[offset]) + 1))) {
 	    cerror(ALLOC_ERR, 0);
-	    goto ana_subsc_1;
+	    goto lux_subsc_1;
 	  }
 	  strcpy(*trgt.sp++, src.sp[offset]);
 	}
 	break;
-      case ANA_FILEMAP:
+      case LUX_FILEMAP:
 	if (file_map_has_offset(nsym))
 	  offset0 += file_map_offset(nsym);
 	for (j = 0; j < nelem; j++) {
 	  offset = offset0;
 	  for (i = 0; i < narg; i++)
-	    if (subsc_type[i] == ANA_ARRAY)
+	    if (subsc_type[i] == LUX_ARRAY)
 	      offset += index[i][j]*stride[i];
 	    else if (size[i] > 1) /* range */
 	      offset0 += stride[i];
 	  if (fseek(fp, offset, SEEK_SET)) {
 	    perror("System message");
 	    cerror(POS_ERR, nsym);
-	    goto ana_subsc_1;
+	    goto lux_subsc_1;
 	  }
 	  if (fread(trgt.b, width, 1, fp) != 1) {
 	    if (feof(fp))
@@ -1558,7 +1558,7 @@ Int ana_subsc_func(Int narg, Int ps[])
 	    else
 	      perror("System message");
 	    cerror(READ_ERR, nsym);
-	    goto ana_subsc_1;
+	    goto lux_subsc_1;
 	  }
 	  trgt.b += width;
 	}
@@ -1577,14 +1577,14 @@ Int ana_subsc_func(Int narg, Int ps[])
     for (i = 0; i < narg; i++) { /* check all subscripts */
       if ((size[i] > 1 && !sum[i]) /* this dim yields more than one element */
 	  || todim[i] >= 0) {	/* or redirection */
-	if (subsc_type[i] == ANA_ARRAY) /* index subscript */
+	if (subsc_type[i] == LUX_ARRAY) /* index subscript */
 	  n = array_num_dims(ps2[i]); /* all array dims go to result */
 	else			/* range subscript */
 	  n = 1;		/* this subscript yields one dimension */
 	if (todim[i] >= 0) {	/* redirection specified for this dim */
 	  if (fromdim[todim[i]] >= 0) { /* source dimension already claimed */
 	    cerror(ILL_REARRANGE, ps[i + 1]);
-	    goto ana_subsc_1;
+	    goto lux_subsc_1;
 	  } /* end of if (fromdim[todim[i]] >= 0) */
 	  fromdim[todim[i]] = i; /* source of target dimension */
 	} /* end of if (todim[i] >= 0) */
@@ -1601,7 +1601,7 @@ Int ana_subsc_func(Int narg, Int ps[])
 	if (todim[i] >= 0) {	    /* redirection specified for this dim */
 	  if (fromdim[todim[i]] >= 0) {	/* target dimension already claimed */
 	    cerror(ILL_REARRANGE, ps[i + 1]);
-	    goto ana_subsc_1;
+	    goto lux_subsc_1;
 	  } /* end of if (fromdim[todim[i]] >= 0) */
 	  fromdim[todim[i]] = i; /* source of target dimension */
 	} /* end of if (todim[i] >= 0) */
@@ -1613,9 +1613,9 @@ Int ana_subsc_func(Int narg, Int ps[])
       }
       /* check that we haven't gotten too many dimensions */
       if (noutdim >= MAX_DIMS) {
-	anaerror("Too many dimensions in subscript return",
+	luxerror("Too many dimensions in subscript return",
 	      ps[i + 1]);
-	goto ana_subsc_1;
+	goto lux_subsc_1;
       } /* end of if (noutdim + n >= MAX_DIMS) */
     }
     
@@ -1624,7 +1624,7 @@ Int ana_subsc_func(Int narg, Int ps[])
     if (noutdim) {		/* need array: collect dimensions */
       for (i = 0; i < trgtndim; i++) {
 	j = fromdim[i];		/* (first) source dimension */
-	if (subsc_type[j] == ANA_ARRAY && size[j] > 1 && !sum[j]) {
+	if (subsc_type[j] == LUX_ARRAY && size[j] > 1 && !sum[j]) {
 	  /* a multi-dimensional array was specified as a subscript */
 	  /* without summation; copy the dimensions to the output symbol */
 	  memcpy(trgtdims + n, array_dims(ps2[j]), step[j]*sizeof(Int));
@@ -1637,7 +1637,7 @@ Int ana_subsc_func(Int narg, Int ps[])
       iq = array_scratch(type, noutdim, trgtdims);
       trgt.l = (Int *) array_data(iq);
     } /* end of if (noutdim) */
-    else if (class == ANA_STRING_ARRAY) { /* string from string array */
+    else if (class == LUX_STRING_ARRAY) { /* string from string array */
       if (src.sp[start[0]]) {	/* non-null string */
 	n = strlen(src.sp[start[0]]);
 	iq = string_scratch(n);
@@ -1689,17 +1689,17 @@ Int ana_subsc_func(Int narg, Int ps[])
 	memcpy(fromdim, stride, narg*sizeof(Int));
       }
     }
-    /* for ANA_ARRAY subscripts the offset is calculated for each index; */
-    /* for ANA_RANGE subscripts the offset is updated for each element */
+    /* for LUX_ARRAY subscripts the offset is calculated for each index; */
+    /* for LUX_RANGE subscripts the offset is updated for each element */
     offset0 = 0;		/* initial offset */
-    width = ana_type_size[type];
-    if ((nsum && class != ANA_FILEMAP) || class == ANA_STRING_ARRAY)
+    width = lux_type_size[type];
+    if ((nsum && class != LUX_FILEMAP) || class == LUX_STRING_ARRAY)
       n = 1;
     else
       n = width;
     for (i = 0; i < narg; i++) {
       stride[i] = n;		/* step size for each dimension */
-      if (subsc_type[i] == ANA_RANGE)
+      if (subsc_type[i] == LUX_RANGE)
 	offset0 += start[i]*n;	/* update initial offset */
       tally[i] = 0;		/* current coordinate */
       n *= dims[i];
@@ -1721,13 +1721,13 @@ Int ana_subsc_func(Int narg, Int ps[])
 	subsc_type[i] = ps2[i];
       /* now we calculate the step size for each target dimensions, */
       /* including a full complement of all earlier dimensions */
-      if (subsc_type[0] == ANA_RANGE)
+      if (subsc_type[0] == LUX_RANGE)
 	step[0] = stride[0];
       else
 	step[0] = 0;
       for (i = 1; i < trgtndim; i++)
-	step[i] = (subsc_type[i] == ANA_RANGE? stride[i]: 0)
-	  - (subsc_type[i - 1] == ANA_RANGE? size[i - 1]*stride[i - 1]: 0);
+	step[i] = (subsc_type[i] == LUX_RANGE? stride[i]: 0)
+	  - (subsc_type[i - 1] == LUX_RANGE? size[i - 1]*stride[i - 1]: 0);
     } /* end of if (trgtndim) */
     else			/* a scalar output */
       step[0] = width;
@@ -1738,7 +1738,7 @@ Int ana_subsc_func(Int narg, Int ps[])
       /* dimensions in the data */
       width *= size[0];
       for (i = 1; i < trgtndim; i++) {
-	if (step[i] || subsc_type[i] == ANA_ARRAY)
+	if (step[i] || subsc_type[i] == LUX_ARRAY)
 	  break;
 	width *= size[i];
       }
@@ -1755,36 +1755,36 @@ Int ana_subsc_func(Int narg, Int ps[])
     }
     
     switch (class) {
-      case ANA_ARRAY: case ANA_SCALAR:
-      case ANA_CARRAY: case ANA_CSCALAR:
+      case LUX_ARRAY: case LUX_SCALAR:
+      case LUX_CARRAY: case LUX_CSCALAR:
 	if (nsum) {		/* have summation flag(s) */
-	  zerobytes(&value.b, ana_type_size[ANA_CDOUBLE]); /* initialize */
+	  zerobytes(&value.b, lux_type_size[LUX_CDOUBLE]); /* initialize */
 	  do {
 	    offset = offset0;
-	    for (i = 0; i < trgtndim; i++) /* add ANA_ARRAY indices */
-	      if (subsc_type[i] == ANA_ARRAY)
+	    for (i = 0; i < trgtndim; i++) /* add LUX_ARRAY indices */
+	      if (subsc_type[i] == LUX_ARRAY)
 		offset += index[fromdim[i]][tally[i]]*stride[i];
 	    switch (type) {
-	      case ANA_BYTE:
+	      case LUX_BYTE:
 		value.b += src.b[offset];
 		break;
-	      case ANA_WORD:
+	      case LUX_WORD:
 		value.w += src.w[offset];
 		break;
-	      case ANA_LONG:
+	      case LUX_LONG:
 		value.l += src.l[offset];
 		break;
-	      case ANA_FLOAT:
+	      case LUX_FLOAT:
 		value.f += src.f[offset];
 		break;
-	      case ANA_DOUBLE:
+	      case LUX_DOUBLE:
 		value.d += src.d[offset];
 		break;
-	      case ANA_CFLOAT:
+	      case LUX_CFLOAT:
 		value.cf.real += src.cf[offset].real;
 		value.cf.imaginary += src.cf[offset].imaginary;
 		break;
-	      case ANA_CDOUBLE:
+	      case LUX_CDOUBLE:
 		value.cd.real += src.cd[offset].real;
 		value.cd.imaginary += src.cd[offset].imaginary;
 		break;
@@ -1792,7 +1792,7 @@ Int ana_subsc_func(Int narg, Int ps[])
 	    for (i = 0; i < trgtndim; i++) { /* update coordinates */
 	      if (i)
 		tally[i - 1] = 0;
-	      offset0 += step[i]; /* update for ANA_RANGE subscripts */
+	      offset0 += step[i]; /* update for LUX_RANGE subscripts */
 	      tally[i]++;
 	      if (tally[i] != size[i]) /* not yet done with this dimension */
 		break;
@@ -1806,26 +1806,26 @@ Int ana_subsc_func(Int narg, Int ps[])
 	} else			/* no summation: simple copy will do */
 	  do {
 	    offset = offset0;
-	    for (i = 0; i < trgtndim; i++) /* add ANA_ARRAY indices */
-	      if (subsc_type[i] == ANA_ARRAY)
+	    for (i = 0; i < trgtndim; i++) /* add LUX_ARRAY indices */
+	      if (subsc_type[i] == LUX_ARRAY)
 		offset += index[fromdim[i]][tally[i]]*stride[i];
 	    memcpy(trgt.b, src.b + offset, width);
 	    trgt.b += width;
 	    for (i = 0; i < trgtndim; i++) {
 	      if (i)
 		tally[i - 1] = 0;
-	      offset0 += step[i]; /* update for ANA_RANGE subscripts */
+	      offset0 += step[i]; /* update for LUX_RANGE subscripts */
 	      tally[i]++;
 	      if (tally[i] != size[i])
 		break;
 	    }
 	  } while (i != trgtndim);
 	break;
-      case ANA_STRING_ARRAY:			/* string array */
+      case LUX_STRING_ARRAY:			/* string array */
 	do
 	{ offset = offset0;
-	  for (i = 0; i < trgtndim; i++) /* add ANA_ARRAY indices */
-	    if (subsc_type[i] == ANA_ARRAY)
+	  for (i = 0; i < trgtndim; i++) /* add LUX_ARRAY indices */
+	    if (subsc_type[i] == LUX_ARRAY)
 	      offset += index[fromdim[i]][tally[i]]*stride[i];
 	  if (src.sp[offset])
 	    *trgt.sp++ = strsave(src.sp[offset]);
@@ -1834,26 +1834,26 @@ Int ana_subsc_func(Int narg, Int ps[])
 	  for (i = 0; i < trgtndim; i++)
 	  { if (i)
 	      tally[i - 1] = 0;
-	    offset0 += step[i];	/* update for ANA_RANGE subscripts */
+	    offset0 += step[i];	/* update for LUX_RANGE subscripts */
 	    tally[i]++;
 	    if (tally[i] != size[i])
 	      break; }
 	} while (i != trgtndim);
 	break;
-      case ANA_FILEMAP:
+      case LUX_FILEMAP:
 	if (file_map_has_offset(nsym))
 	  offset0 += file_map_offset(nsym);
 	if (nsum)		/* have summation flag(s) */
 	{ value.d = 0.0;	/* ASSUME THIS ZEROS FOR ALL DATA TYPES */
 	  do
 	  { offset = offset0;
-	    for (i = 0; i < narg; i++)	/* add ANA_ARRAY indices */
-	      if (subsc_type[i] == ANA_ARRAY)
+	    for (i = 0; i < narg; i++)	/* add LUX_ARRAY indices */
+	      if (subsc_type[i] == LUX_ARRAY)
 		offset += index[i][tally[i]]*stride[i];
 	    if (fseek(fp, offset, SEEK_SET)) {
 	      perror("System message");
 	      cerror(POS_ERR, nsym);
-	      goto ana_subsc_1;
+	      goto lux_subsc_1;
 	    }
 	    if (fread(&item.b, width, 1, fp) != 1) {
 	      if (feof(fp))
@@ -1861,29 +1861,29 @@ Int ana_subsc_func(Int narg, Int ps[])
 	      else
 		perror("System message");
 	      cerror(READ_ERR, iq);
-	      goto ana_subsc_1;
+	      goto lux_subsc_1;
 	    }
 	    switch (type) {
-	      case ANA_BYTE:
+	      case LUX_BYTE:
 		value.b += item.b;
 		break;
-	      case ANA_WORD:
+	      case LUX_WORD:
 		value.w += item.w;
 		break;
-	      case ANA_LONG:
+	      case LUX_LONG:
 		value.l += item.l;
 		break;
-	      case ANA_FLOAT:
+	      case LUX_FLOAT:
 		value.f += item.f;
 		break;
-	      case ANA_DOUBLE:
+	      case LUX_DOUBLE:
 		value.d += item.d;
 		break;
 	    }
 	    for (i = 0; i < trgtndim; i++) {
 	      if (i)
 		tally[i - 1] = 0;
-	      offset0 += step[i]; /* update for ANA_RANGE subscripts */
+	      offset0 += step[i]; /* update for LUX_RANGE subscripts */
 	      tally[i]++;
 	      if (tally[i] != size[i])
 		break;
@@ -1898,13 +1898,13 @@ Int ana_subsc_func(Int narg, Int ps[])
 	} else			/* no summation: simple copy will do */
 	  do {
 	    offset = offset0;
-	    for (i = 0; i < narg; i++)	/* add ANA_ARRAY indices */
-	      if (subsc_type[i] == ANA_ARRAY)
+	    for (i = 0; i < narg; i++)	/* add LUX_ARRAY indices */
+	      if (subsc_type[i] == LUX_ARRAY)
 		offset += index[i][tally[i]]*stride[i];
 	    if (fseek(fp, offset, SEEK_SET)) {
 	      perror("System message");
 	      cerror(POS_ERR, nsym);
-	      goto ana_subsc_1;
+	      goto lux_subsc_1;
 	    }
 	    if (fread(trgt.b, width, 1, fp) != 1) {
 	      if (feof(fp))
@@ -1912,13 +1912,13 @@ Int ana_subsc_func(Int narg, Int ps[])
 	      else
 		perror("System message");
 	      cerror(READ_ERR, nsym);
-	      goto ana_subsc_1;
+	      goto lux_subsc_1;
 	    }
 	    trgt.b += width;
 	    for (i = 0; i < trgtndim; i++) {
 	      if (i)
 		tally[i - 1] = 0;
-	      offset0 += step[i]; /* update for ANA_RANGE subscripts */
+	      offset0 += step[i]; /* update for LUX_RANGE subscripts */
 	      tally[i]++;
 	      if (tally[i] != size[i])
 		break;
@@ -1928,19 +1928,19 @@ Int ana_subsc_func(Int narg, Int ps[])
 	break;
     }
   }
-  Int ana_endian(Int, Int *);
-  if (class == ANA_FILEMAP && file_map_swap(nsym))
-    ana_endian(1, &iq);		/* Byte swap */
+  Int lux_endian(Int, Int *);
+  if (class == LUX_FILEMAP && file_map_swap(nsym))
+    lux_endian(1, &iq);		/* Byte swap */
   return iq;
 
-  ana_subsc_1:
+  lux_subsc_1:
   if (fp)
     fclose(fp);
-  return ANA_ERROR;
-}						/* end of ana_subsc */
+  return LUX_ERROR;
+}						/* end of lux_subsc */
  /*------------------------------------------------------------------------- */
 Int string_sub(Int narg, Int ps[])
-/* subscripts for strings, called by ana_subc */
+/* subscripts for strings, called by lux_subc */
 /* the string is in ps[narg]; narg indicates the number of subscripts.
  LS 19aug98 */
 {
@@ -1956,7 +1956,7 @@ Int string_sub(Int narg, Int ps[])
   n = string_size(nsym);
   iq = ps[0];			/* only one subscript */
   switch (symbol_class(iq)) {
-    case ANA_SCALAR:	/*a scalar, simple, get a long (Int) version */
+    case LUX_SCALAR:	/*a scalar, simple, get a long (Int) version */
       i = int_arg(iq);
       if (i < 0)
 	i += n;	/* (*-expr) */
@@ -1977,9 +1977,9 @@ Int string_sub(Int narg, Int ps[])
       *q++ = *(p + i);
       *q = 0;
       return result_sym;
-    case ANA_ARRAY:
+    case LUX_ARRAY:
       /* a string is created with length = # elements in array */
-      iq = ana_long(1, &iq);	/* get a long version */
+      iq = lux_long(1, &iq);	/* get a long version */
       p2.l = (Int *) array_data(iq);
       ns = array_size(iq);
       result_sym = string_scratch(ns);
@@ -1994,9 +1994,9 @@ Int string_sub(Int narg, Int ps[])
         *q++ = *( (p++) + i );
         ns--; }	*q = 0;
       return result_sym;
-    case ANA_RANGE:
+    case LUX_RANGE:
       iq = convertRange(iq);
-    case ANA_SUBSC_PTR:		/* not all aspects supported for strings */
+    case LUX_SUBSC_PTR:		/* not all aspects supported for strings */
       /* info is directly at .spec.array.ptr now. LS */
       i = subsc_ptr_start(iq);
       if (i < 0) i = n + i;
@@ -2029,7 +2029,7 @@ Int string_sub(Int narg, Int ps[])
   return 1;
 }
  /*------------------------------------------------------------------------- */
-Int ana_symclass(Int narg, Int ps[])
+Int lux_symclass(Int narg, Int ps[])
  /*return the class of the argument symbol */
  /* NOTE: scalar pointers (class 8) are returned as scalars (class 1)
     LS 13may92 */
@@ -2040,18 +2040,18 @@ Int ana_symclass(Int narg, Int ps[])
     nsym = int_arg(ps[0]);
   else
     nsym = (internalMode & 1)? eval(ps[0]): ps[0]; /* target symbol */
-  result_sym = scalar_scratch(ANA_LONG);
+  result_sym = scalar_scratch(LUX_LONG);
   if (nsym < 0 || nsym >= NSYM)
-    nd = ANA_UNUSED;
+    nd = LUX_UNUSED;
   else
     nd = symbol_class(nsym);
-  if (nd == ANA_SCAL_PTR)
-    nd = ANA_SCALAR;
+  if (nd == LUX_SCAL_PTR)
+    nd = LUX_SCALAR;
   scalar_value(result_sym).l = nd;
   return result_sym;
 }
  /*------------------------------------------------------------------------- */
-Int ana_symdtype(narg,ps)
+Int lux_symdtype(narg,ps)
  /*return the type of the argument symbol */
 Int narg,ps[];
 {
@@ -2063,7 +2063,7 @@ Int narg,ps[];
   return result_sym;
 }
  /*------------------------------------------------------------------------- */
-Int ana_num_elem(Int narg, Int ps[])
+Int lux_num_elem(Int narg, Int ps[])
 /* return the number of elements in the argument symbol, or the number
    contained within the specified dimensions.
    call:  NUM_ELEM(x [, dims]) */
@@ -2071,15 +2071,15 @@ Int ana_num_elem(Int narg, Int ps[])
   Int	nsym, n, j, result_sym, *dims, *axes, naxes, ndim, temp;
 
   nsym = ps[0];				/*the target symbol is the first */
-  result_sym = scalar_scratch(ANA_LONG);
+  result_sym = scalar_scratch(LUX_LONG);
   if (narg > 1) {		/* have <dims> */
-    temp = ana_long(1, ps + 1);	/* ensure LONG */
+    temp = lux_long(1, ps + 1);	/* ensure LONG */
     switch (symbol_class(temp)) {
-      case ANA_ARRAY:
+      case LUX_ARRAY:
 	axes = array_data(temp);
 	naxes = array_size(temp);
 	break;
-      case ANA_SCALAR:
+      case LUX_SCALAR:
 	axes = &scalar_value(temp).l;
 	naxes = 1;
 	break;
@@ -2090,7 +2090,7 @@ Int ana_num_elem(Int narg, Int ps[])
   } else
     naxes = 0;
   switch (symbol_class(nsym)) {	/*switch on class */
-    case ANA_ARRAY: case ANA_CARRAY:
+    case LUX_ARRAY: case LUX_CARRAY:
       if (naxes) {
 	n = 1;
 	dims = array_dims(nsym);
@@ -2103,7 +2103,7 @@ Int ana_num_elem(Int narg, Int ps[])
       } else
 	n = array_size(nsym);
       break;
-    case ANA_FILEMAP:
+    case LUX_FILEMAP:
       n = 1;
       dims = file_map_dims(nsym);
       ndim = file_map_num_dims(nsym);
@@ -2117,16 +2117,16 @@ Int ana_num_elem(Int narg, Int ps[])
 	for (j = 0; j < ndim; j++)
 	  n *= dims[j];
       break;
-    case ANA_STRING:
+    case LUX_STRING:
       n = string_size(nsym);	/*don't include the null */
       break;
-    case ANA_SCALAR: case ANA_SCAL_PTR: case ANA_CSCALAR:
+    case LUX_SCALAR: case LUX_SCAL_PTR: case LUX_CSCALAR:
       n = 1;			/*scalar, just return 1 */
       break;
-    case ANA_CLIST: case ANA_CPLIST:
+    case LUX_CLIST: case LUX_CPLIST:
       n = clist_num_symbols(nsym);
       break;
-    case ANA_LIST:
+    case LUX_LIST:
       n = list_num_symbols(nsym);
       break;
     default:
@@ -2138,7 +2138,7 @@ Int ana_num_elem(Int narg, Int ps[])
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-Int ana_num_dimen(narg,ps)
+Int lux_num_dimen(narg,ps)
  /*return the number of dimensions in the argument symbol */
 Int narg,ps[];
 {
@@ -2148,14 +2148,14 @@ Int narg,ps[];
   nsym = ps[0];				/*the target symbol is the first */
   result_sym = scalar_scratch(2);
   switch (sym[nsym].class)	{			/*switch on class */
-    case ANA_ARRAY: case ANA_FILEMAP:
+    case LUX_ARRAY: case LUX_FILEMAP:
         h = (array *) sym[nsym].spec.array.ptr;
         nd = h->ndim;
         break;
-      case ANA_STRING:
+      case LUX_STRING:
         nd = 1;					/*return 1 for strings */
         break;
-      case ANA_SCALAR: nd = 0;				/*scalar, just return 0 */
+      case LUX_SCALAR: nd = 0;				/*scalar, just return 0 */
         break;
       default:
 	return cerror(ILL_CLASS, nsym);
@@ -2164,7 +2164,7 @@ Int narg,ps[];
   return result_sym;
 }
  /*------------------------------------------------------------------------- */
-Int ana_dimen(Int narg, Int ps[])
+Int lux_dimen(Int narg, Int ps[])
 /* DIMEN(x [,axes]) returns the indicated dimensions of <x>.  If <x> is */
 /* a scalar or a string, then a scalar 1 is returned.  If <x> has only */
 /* one dimension, then that is returned in a scalar.  If <axes> is not */
@@ -2176,46 +2176,46 @@ Int ana_dimen(Int narg, Int ps[])
   if (narg > 1) {		/* have <axes> */
     if (!symbolIsNumerical(ps[1]))
       return cerror(ILL_TYPE, ps[1]);
-    iq = ana_long(1, ps + 1);
+    iq = lux_long(1, ps + 1);
     numerical(iq, NULL, NULL, &nAxes, &axes);
   } else
     nAxes = 0;
 
   switch (symbol_class(ps[0])) { /* <x> */
-    case ANA_SCAL_PTR: case ANA_SCALAR: case ANA_STRING:
+    case LUX_SCAL_PTR: case LUX_SCALAR: case LUX_STRING:
       for (i = 0; i < nAxes; i++)
 	if (axes.l[i] != 0)
 	  return cerror(ILL_AXIS, ps[1], axes.l[i]);
       if (nAxes > 1) {
-	iq = array_scratch(ANA_LONG, 1, &nAxes);
+	iq = array_scratch(LUX_LONG, 1, &nAxes);
 	out = (Int *) array_data(iq);
 	while (nAxes--)
 	  *out++ = 1;
       } else {
-	iq = scalar_scratch(ANA_LONG);
+	iq = scalar_scratch(LUX_LONG);
 	scalar_value(iq).l = 1;
       }
       break;
-    case ANA_ARRAY: case ANA_FILEMAP: case ANA_CARRAY:
+    case LUX_ARRAY: case LUX_FILEMAP: case LUX_CARRAY:
       ndim = array_num_dims(ps[0]);
       dims = array_dims(ps[0]);
       for (i = 0; i < nAxes; i++)
 	if (axes.l[i] < 0 || axes.l[i] >= ndim)
 	  return cerror(ILL_AXIS, ps[1], axes.l[i]);
       if (nAxes > 1) {
-	iq = array_scratch(ANA_LONG, 1, &nAxes);
+	iq = array_scratch(LUX_LONG, 1, &nAxes);
 	out = (Int *) array_data(iq);
 	while (nAxes--)
 	  *out++ = dims[*axes.l++];
       } else if (nAxes == 1) {
-	iq = scalar_scratch(ANA_LONG);
+	iq = scalar_scratch(LUX_LONG);
 	scalar_value(iq).l = dims[*axes.l];
       } else {			/* return all dimensions */
 	if (ndim > 1) {
-	  iq = array_scratch(ANA_LONG, 1, &ndim);
+	  iq = array_scratch(LUX_LONG, 1, &ndim);
 	  memcpy(array_data(iq), dims, ndim*sizeof(Int));
 	} else {
-	  iq = scalar_scratch(ANA_LONG);
+	  iq = scalar_scratch(LUX_LONG);
 	  scalar_value(iq).l = dims[0];
 	}
       }
@@ -2226,33 +2226,33 @@ Int ana_dimen(Int narg, Int ps[])
   return iq;
 }
  /*------------------------------------------------------------------------- */
-Int ana_redim_f(Int narg, Int ps[])
+Int lux_redim_f(Int narg, Int ps[])
  /* redimension an array, a function version, returns input symbol */
 {
   Int	result, n, *args;
-  Int	ana_redim(Int, Int []);
+  Int	lux_redim(Int, Int []);
 
   args = Malloc(narg*sizeof(Int));
   if (!args)
-    return ANA_ERROR;
+    return LUX_ERROR;
   result = copySym(ps[0]);
   memcpy(args, ps, narg*sizeof(Int));
   args[0] = result;
-  n = ana_redim(narg, args);
+  n = lux_redim(narg, args);
   Free(args);
-  if (n == ANA_ERROR)
+  if (n == LUX_ERROR)
     zap(result);
   else
     n = result;
   return n;
 }
  /*------------------------------------------------------------------------- */
-Int ana_redim(Int narg, Int ps[])
+Int lux_redim(Int narg, Int ps[])
      /* redimension an array */
      /* NOTE: my array_size() calculates the number of elements in an */
      /* array from the size of the allocated memory and this assumes that */
      /* the array memory size fits the array data perfectly.  Shine's */
-     /* version of ana_redim changed the dimensions without changing */
+     /* version of lux_redim changed the dimensions without changing */
      /* the amount of allocated memory accordingly.  I've now changed */
      /* this behavior and I hope loose-fit memory does not cause problems */
      /* for me elsewhere.  LS 19may97 */
@@ -2262,23 +2262,23 @@ Int ana_redim(Int narg, Int ps[])
   array	*data;
 
   nsym = ps[0];			/* the target symbol is the first */
-  if (symbol_class(nsym) != ANA_ARRAY) /* not an array */
+  if (symbol_class(nsym) != LUX_ARRAY) /* not an array */
     return cerror(NEED_ARR, nsym);
   /* get old size */
   oldSize = array_size(nsym);
   ndim = 0;
   for (i = 1; i < narg; i++)
     switch (symbol_class(ps[i])) {
-      case ANA_SCALAR:
+      case LUX_SCALAR:
 	if (ndim + 1> MAX_DIMS)
-	  return anaerror("Too many dimensions specified", ps[i]);
-	iq = ana_long(1, &ps[i]); /* ensure LONG */
+	  return luxerror("Too many dimensions specified", ps[i]);
+	iq = lux_long(1, &ps[i]); /* ensure LONG */
 	dims[ndim++] = scalar_value(iq).l;
 	break;
-      case ANA_ARRAY:
+      case LUX_ARRAY:
 	if (ndim + array_size(ps[i]) > MAX_DIMS)
-	  return anaerror("Too many dimensions specified", ps[i]);
-	iq = ana_long(1, &ps[i]);
+	  return luxerror("Too many dimensions specified", ps[i]);
+	iq = lux_long(1, &ps[i]);
 	memcpy(dims + ndim, array_data(iq), array_size(iq)*sizeof(Int));
 	ndim += array_size(iq);
 	break;
@@ -2294,35 +2294,35 @@ Int ana_redim(Int narg, Int ps[])
     printf("WARNING: result from REDIM is smaller than original\n");
   memcpy(array_dims(nsym), dims, ndim*sizeof(Int));
   array_num_dims(nsym) = ndim;
-  newSize = newSize*ana_type_size[array_type(nsym)] + sizeof(array);
+  newSize = newSize*lux_type_size[array_type(nsym)] + sizeof(array);
   data = Realloc(array_header(nsym), newSize);
   if (!data)
-    return anaerror("Resizing of array memory failed", nsym);
+    return luxerror("Resizing of array memory failed", nsym);
   array_header(nsym) = data;
   symbol_memory(nsym) = newSize;
   return 1;
 }
  /*------------------------------------------------------------------------- */
-Int ana_concat_list(Int narg, Int ps[])
-/* concatenation involving ANA_CLIST or ANA_LIST. LS 15jun98 */
+Int lux_concat_list(Int narg, Int ps[])
+/* concatenation involving LUX_CLIST or LUX_LIST. LS 15jun98 */
 {
   Int	result, i, iq, nelem = 0, j, indx;
   Byte	isStruct = 0;
 
-  if ((result = nextFreeTempVariable()) == ANA_ERROR)
-    return ANA_ERROR;
+  if ((result = nextFreeTempVariable()) == LUX_ERROR)
+    return LUX_ERROR;
 
   for (i = 0; i < narg; i++) {
     iq = ps[i];
     switch (symbol_class(iq)) {
-      case ANA_CLIST:
+      case LUX_CLIST:
 	nelem += clist_num_symbols(iq);
 	break;
-      case ANA_LIST:
+      case LUX_LIST:
 	nelem += list_num_symbols(iq);
 	isStruct = 1;
 	break;
-      case ANA_UNUSED: case ANA_UNDEFINED:
+      case LUX_UNUSED: case LUX_UNDEFINED:
 	break;
       default:
 	nelem++;
@@ -2331,14 +2331,14 @@ Int ana_concat_list(Int narg, Int ps[])
   }
   /* we now have the number of elements of the resulting STRUCT or LIST */
   
-  if (isStruct) {		/* result is an ANA_LIST */
-    symbol_class(result) = ANA_LIST;
+  if (isStruct) {		/* result is an LUX_LIST */
+    symbol_class(result) = LUX_LIST;
     list_symbols(result) = Malloc(nelem*sizeof(listElem));
     if (!list_symbols(result))
       return cerror(ALLOC_ERR, 0);
     symbol_memory(result) = nelem*sizeof(listElem);
   } else {
-    symbol_class(result) = ANA_CLIST;
+    symbol_class(result) = LUX_CLIST;
     clist_symbols(result) = Malloc(nelem*sizeof(Word));
     if (!clist_symbols(result))
       return cerror(ALLOC_ERR, 0);
@@ -2350,38 +2350,38 @@ Int ana_concat_list(Int narg, Int ps[])
     for (i = 0; i < narg; i++) {
       iq = ps[i];
       switch (symbol_class(iq)) {
-	case ANA_CLIST:
+	case LUX_CLIST:
 	  nelem = clist_num_symbols(iq);
 	  for (j = 0; j < nelem; j++) {
 	    list_key(result, indx) = NULL;
 	    list_symbol(result, indx) =
 	      copyEvalSym(clist_symbols(iq)[j]);
-	    if (list_symbol(result, indx) == ANA_ERROR)
-	      return ANA_ERROR;
+	    if (list_symbol(result, indx) == LUX_ERROR)
+	      return LUX_ERROR;
 	    embed(list_symbol(result, indx), result);
 	    indx++;
 	  }
 	  break;
-	case ANA_LIST:
+	case LUX_LIST:
 	  nelem = list_num_symbols(iq);
 	  for (j = 0; j < nelem; j++) {
 	    list_key(result, indx) =
 	      list_key(iq, j)? strsave(list_key(iq, j)): NULL;
 	    list_symbol(result, indx) =
 	      copyEvalSym(list_symbol(iq, j));
-	    if (list_symbol(result, indx) == ANA_ERROR)
-	      return ANA_ERROR;
+	    if (list_symbol(result, indx) == LUX_ERROR)
+	      return LUX_ERROR;
 	    embed(list_symbol(result, indx), result);
 	    indx++;
 	  }
 	  break;
-	case ANA_UNUSED: case ANA_UNDEFINED:
+	case LUX_UNUSED: case LUX_UNDEFINED:
 	  break;		/* ignore these */
 	default:
 	  list_key(result, indx) = NULL;
 	  list_symbol(result, indx) = copyEvalSym(iq);
-	  if (list_symbol(result, indx) == ANA_ERROR)
-	    return ANA_ERROR;
+	  if (list_symbol(result, indx) == LUX_ERROR)
+	    return LUX_ERROR;
 	  embed(list_symbol(result, indx), result);
 	  indx++;
 	  break;
@@ -2391,23 +2391,23 @@ Int ana_concat_list(Int narg, Int ps[])
     for (i = 0; i < narg; i++) {
       iq = ps[i];
       switch (symbol_class(iq)) {
-	case ANA_CLIST:
+	case LUX_CLIST:
 	  nelem = clist_num_symbols(iq);
 	  for (j = 0; j < nelem; j++) {
 	    clist_symbols(result)[indx] =
 	      copyEvalSym(clist_symbols(iq)[j]);
-	    if (clist_symbols(result)[indx] == ANA_ERROR)
-	      return ANA_ERROR;
+	    if (clist_symbols(result)[indx] == LUX_ERROR)
+	      return LUX_ERROR;
 	    embed(clist_symbols(result)[indx], result);
 	    indx++;
 	  }
 	  break;
-	case ANA_UNUSED: case ANA_UNDEFINED:
+	case LUX_UNUSED: case LUX_UNDEFINED:
 	  break;		/* ignore these */
 	default:
 	  clist_symbols(result)[indx] = copyEvalSym(iq);
-	  if (clist_symbols(result)[indx] == ANA_ERROR)
-	    return ANA_ERROR;
+	  if (clist_symbols(result)[indx] == LUX_ERROR)
+	    return LUX_ERROR;
 	  embed(clist_symbols(result)[indx], result);
 	  indx++;
 	  break;
@@ -2417,7 +2417,7 @@ Int ana_concat_list(Int narg, Int ps[])
   return result;		/* everything OK */
 }
  /*------------------------------------------------------------------------- */
-Int ana_concat(Int narg, Int ps[])
+Int lux_concat(Int narg, Int ps[])
  /* lux's concatenation function, insisted on by idl users, but works a bit
 	 differently
  there are 2 modes
@@ -2434,7 +2434,7 @@ Int ana_concat(Int narg, Int ps[])
 {
   pointer q1,q2;
   Int	nd, j, i, dim[MAX_DIMS], nundef = 0;
-  Int	iq, nsym, mq, toptype = ANA_BYTE, topnd = 0, sflag = 0, n, nq;
+  Int	iq, nsym, mq, toptype = LUX_BYTE, topnd = 0, sflag = 0, n, nq;
   scalar	temp;
 
   if (narg <= 0)
@@ -2443,34 +2443,34 @@ Int ana_concat(Int narg, Int ps[])
     if ((iq = ps[0]) <= 0)	/* some error */
       return iq;
     switch (symbol_class(iq)) {
-      case ANA_SCAL_PTR:
+      case LUX_SCAL_PTR:
 	iq = dereferenceScalPointer(iq);
 	/* fall-thru to SCALAR case */
-      case ANA_SCALAR:		/*scalar case */
+      case LUX_SCALAR:		/*scalar case */
 	/* create an array of length 1 */
         dim[0] = 1;
 	nsym = array_scratch(scalar_type(iq), 1, dim);
-	if (nsym == ANA_ERROR)
-	  return ANA_ERROR;
+	if (nsym == LUX_ERROR)
+	  return LUX_ERROR;
         memcpy(array_data(nsym),
 	       &scalar_value(iq).l,
-	       ana_type_size[scalar_type(iq)]);
+	       lux_type_size[scalar_type(iq)]);
         return nsym;
-      case ANA_CSCALAR:		/* complex scalar case LS 4aug98 */
+      case LUX_CSCALAR:		/* complex scalar case LS 4aug98 */
 	dim[0] = 1;
 	nsym = array_scratch(complex_scalar_type(iq), 1, dim);
-	if (nsym == ANA_ERROR)
-	  return ANA_ERROR;
+	if (nsym == LUX_ERROR)
+	  return LUX_ERROR;
 	memcpy(complex_array_data(nsym), complex_scalar_data(iq).cf,
-	       ana_type_size[complex_scalar_type(nsym)]);
+	       lux_type_size[complex_scalar_type(nsym)]);
 	return nsym;
-      case ANA_STRING:	/*string, turn into string array.  LS 21apr93 */
+      case LUX_STRING:	/*string, turn into string array.  LS 21apr93 */
         dim[0] = 1;
-	nsym = array_scratch(ANA_TEMP_STRING, 1, dim);
+	nsym = array_scratch(LUX_TEMP_STRING, 1, dim);
         q1.sp = (char **) array_data(nsym);
         *q1.sp = strsave(string_value(iq));
         return nsym;
-      case ANA_ARRAY: case ANA_CARRAY: /*array */
+      case LUX_ARRAY: case LUX_CARRAY: /*array */
 	/* make a copy with an additional dimension (of size 1) added */
 	
 	if (array_num_dims(iq) == MAX_DIMS) /* already at max number of */
@@ -2480,7 +2480,7 @@ Int ana_concat(Int narg, Int ps[])
 	memcpy(dim, array_dims(iq), nd*sizeof(Int));
 	dim[nd++] = 1;		/* extra dimension */
         nsym = array_scratch(array_type(iq), nd, dim);
-        if (array_type(nsym) == ANA_STRING_ARRAY) { /* string array */
+        if (array_type(nsym) == LUX_STRING_ARRAY) { /* string array */
 	  q1.v = array_data(iq);
 	  q2.v = array_data(nsym);
           n = array_size(iq);
@@ -2505,25 +2505,25 @@ Int ana_concat(Int narg, Int ps[])
       if ((iq = ps[i]) <= 0)	/* some error */
 	return iq;
       switch (symbol_class(iq))	{
-        case ANA_SCALAR: case ANA_SCAL_PTR: case ANA_CSCALAR: /*scalar case */
+        case LUX_SCALAR: case LUX_SCAL_PTR: case LUX_CSCALAR: /*scalar case */
           mq += 1;		/* one element */
 	  break;
-        case ANA_ARRAY: case ANA_CARRAY: /* array; real or complex */
+        case LUX_ARRAY: case LUX_CARRAY: /* array; real or complex */
 	  mq += array_size(iq);
           if (array_num_dims(iq) > topnd) /* max number of dimensions */
 	    topnd = array_num_dims(iq);
-          if (array_type(iq) == ANA_STRING_ARRAY)
+          if (array_type(iq) == LUX_STRING_ARRAY)
 	    sflag += 1;		/* string array */
           break;
-        case ANA_STRING:	/* string */
+        case LUX_STRING:	/* string */
           mq++;			/* one string */
           sflag++;		/* string flag */
           break;
-        case ANA_UNDEFINED:	/* undefined: ignore */
+        case LUX_UNDEFINED:	/* undefined: ignore */
 	  nundef++;
           break;
-	case ANA_CLIST: case ANA_LIST:	/* added LS 7feb95 */
-	  return ana_concat_list(narg, ps);
+	case LUX_CLIST: case LUX_LIST:	/* added LS 7feb95 */
+	  return lux_concat_list(narg, ps);
         default:
 	  return cerror(ILL_CLASS, iq);
       }
@@ -2535,34 +2535,34 @@ Int ana_concat(Int narg, Int ps[])
     if (sflag) {
       if (sflag + nundef < narg) /* some but not all were strings */
 	return cerror(ILL_CMB_S_NON_S, 0);
-      toptype = ANA_STRING_ARRAY;
+      toptype = LUX_STRING_ARRAY;
     }
     if (topnd == 0) {		/* no arrays */
       dim[0] = mq;
       nsym = array_scratch(toptype, 1, dim);
-      n = ana_type_size[toptype];
+      n = lux_type_size[toptype];
       q2.b = array_data(nsym);
       for (i = 0; i < narg; i++) {
         iq = ps[i];
         switch (symbol_class(iq)) {
-	  case ANA_SCAL_PTR:
+	  case LUX_SCAL_PTR:
 	    iq = dereferenceScalPointer(iq);
-	    /* fall-thru to ANA_SCALAR */
-	  case ANA_SCALAR:
-	    memcpy(&temp.b, &scalar_value(iq).b, ana_type_size[scalar_type(iq)]);
+	    /* fall-thru to LUX_SCALAR */
+	  case LUX_SCALAR:
+	    memcpy(&temp.b, &scalar_value(iq).b, lux_type_size[scalar_type(iq)]);
             if (scalar_type(iq) != toptype)
               convertPointer(&temp, scalar_type(iq), toptype);
 	    memcpy(q2.b, &temp.b, n);
             q2.b += n;		/* add the right Byte count for each element */
             break;
-	  case ANA_CSCALAR:
+	  case LUX_CSCALAR:
 	    memcpy(q2.b, complex_scalar_data(iq).cf, n);
 	    q2.b += n;
 	    break;
-          case ANA_STRING:
+          case LUX_STRING:
             *q2.sp++ = strsave(string_value(iq));
             break;
-          case ANA_UNDEFINED:	/* ignore */
+          case LUX_UNDEFINED:	/* ignore */
 	    break;
           default:		/*just in case */
 	    return cerror(ILL_CLASS, iq);
@@ -2581,7 +2581,7 @@ Int ana_concat(Int narg, Int ps[])
     for (i = 0; i < narg; i++) {
       iq = ps[i];
       switch (symbol_class(iq)) {
-	case ANA_ARRAY: case ANA_CARRAY:
+	case LUX_ARRAY: case LUX_CARRAY:
 	  if (array_num_dims(iq) < topnd - 1) /* not enough dimensions */
 	    return cerror(INCMP_DIMS, iq);
 	  if (n) {		/* have result dimensions list */
@@ -2606,7 +2606,7 @@ Int ana_concat(Int narg, Int ps[])
 				   /* loose dimension */
 	  }
 	  break;
-	case ANA_SCAL_PTR: case ANA_SCALAR: case ANA_STRING: case ANA_CSCALAR:
+	case LUX_SCAL_PTR: case LUX_SCALAR: case LUX_STRING: case LUX_CSCALAR:
 	  /* NOTE: there was a serious bug here that showed up in statements */
 	  /* such as X = [6, X] if X is an array: the resulting X would */
 	  /* have the same number of elements as the old one but the */
@@ -2619,7 +2619,7 @@ Int ana_concat(Int narg, Int ps[])
 	    n = 1;
 	  nq++;			/* count this one in the last dimension */
 	  break;
-	case ANA_UNDEFINED:	/* ignore */
+	case LUX_UNDEFINED:	/* ignore */
 	  break;
       }	/* switch (symbol_class(iq)) */
     } /* for (i = 0; ...) */
@@ -2632,137 +2632,137 @@ Int ana_concat(Int narg, Int ps[])
     /* now just load everybody in, converting type as necessary */
     for (i = 0; i < narg; i++) {
       iq = ps[i];
-      n = ana_type_size[symbol_type(iq)];
+      n = lux_type_size[symbol_type(iq)];
       switch (symbol_class(iq))	{
-        case ANA_SCALAR:	/*scalar case */
+        case LUX_SCALAR:	/*scalar case */
 	  q1.b = &scalar_value(iq).b;
 	  n = 1;
 	  break;
-	case ANA_SCAL_PTR:
+	case LUX_SCAL_PTR:
 	  q1.b = scal_ptr_pointer(iq).b;
 	  n = 1;
 	  break;
-        case ANA_ARRAY: case ANA_CARRAY: /* array */
+        case LUX_ARRAY: case LUX_CARRAY: /* array */
 	  n = array_size(iq);
 	  q1.b = array_data(iq);
           break;
-	case ANA_CSCALAR:
+	case LUX_CSCALAR:
 	  q1 = complex_scalar_data(iq);
 	  n = 1;
 	  break;
-        case ANA_STRING:	/* string */
+        case LUX_STRING:	/* string */
 	  n = 1;
 	  q1.s = string_value(iq);
 	  break;
-        case ANA_UNDEFINED:	/* ignore */
+        case LUX_UNDEFINED:	/* ignore */
 	  n = 0;
 	  break;
       }	/* switch (symbol_class(iq)) */
       if (n)
 	switch (toptype) {
-	  case ANA_BYTE:
+	  case LUX_BYTE:
 	    while (n--)
 	      *q2.b++ = *q1.b++;
 	    break;
-	  case ANA_WORD:
+	  case LUX_WORD:
 	    switch (symbol_type(iq)) {
-	      case ANA_BYTE:
+	      case LUX_BYTE:
 		while (n--)
 		  *q2.w++ = (Word) *q1.b++;
 		break;
-	      case ANA_WORD:
+	      case LUX_WORD:
 		while (n--)
 		  *q2.w++ = *q1.w++;
 		break;
 	    }
 	    break;
-	  case ANA_LONG:
+	  case LUX_LONG:
 	    switch (symbol_type(iq)) {
-	      case ANA_BYTE:
+	      case LUX_BYTE:
 		while (n--)
 		  *q2.l++ = (Int) *q1.b++;
 		break;
-	      case ANA_WORD:
+	      case LUX_WORD:
 		while (n--)
 		  *q2.l++ = (Int) *q1.w++;
 		break;
-	      case ANA_LONG:
+	      case LUX_LONG:
 		while (n--)
 		  *q2.l++ = *q1.l++;
 		break;
 	    }
 	    break;
-	  case ANA_FLOAT:
+	  case LUX_FLOAT:
 	    switch (symbol_type(iq)) {
-	      case ANA_BYTE:
+	      case LUX_BYTE:
 		while (n--)
 		  *q2.f++ = (Float) *q1.b++;
 		break;
-	      case ANA_WORD:
+	      case LUX_WORD:
 		while (n--)
 		  *q2.f++ = (Float) *q1.w++;
 		break;
-	      case ANA_LONG:
+	      case LUX_LONG:
 		while (n--)
 		  *q2.f++ = (Float) *q1.l++;
 		break;
-	      case ANA_FLOAT:
+	      case LUX_FLOAT:
 		while (n--)
 		  *q2.f++ = *q1.f++;
 		break;
 	    }
 	    break;
-	  case ANA_DOUBLE:
+	  case LUX_DOUBLE:
 	    switch (symbol_type(iq)) {
-	      case ANA_BYTE:
+	      case LUX_BYTE:
 		while (n--)
 		  *q2.d++ = (Double) *q1.b++;
 		break;
-	      case ANA_WORD:
+	      case LUX_WORD:
 		while (n--)
 		  *q2.d++ = (Double) *q1.w++;
 		break;
-	      case ANA_LONG:
+	      case LUX_LONG:
 		while (n--)
 		  *q2.d++ = (Double) *q1.l++;
 		break;
-	      case ANA_FLOAT:
+	      case LUX_FLOAT:
 		while (n--)
 		  *q2.d++ = (Double) *q1.f++;
 		break;
-	      case ANA_DOUBLE:
+	      case LUX_DOUBLE:
 		while (n--)
 		  *q2.d++ = *q1.d++;
 		break;
 	    }
 	    break;
-	  case ANA_CFLOAT:
+	  case LUX_CFLOAT:
 	    switch (symbol_type(iq)) {
-	      case ANA_BYTE:
+	      case LUX_BYTE:
 		while (n--) {
 		  q2.cf->real = *q1.b++;
 		  q2.cf++->imaginary = 0.0;
 		}
 		break;
-	      case ANA_WORD:
+	      case LUX_WORD:
 		while (n--) {
 		  q2.cf->real = *q1.w++;
 		  q2.cf++->imaginary = 0.0;
 		}
 		break;
-	      case ANA_LONG:
+	      case LUX_LONG:
 		while (n--) {
 		  q2.cf->real = *q1.l++;
 		  q2.cf++->imaginary = 0.0;
 		}
 		break;
-	      case ANA_FLOAT:
+	      case LUX_FLOAT:
 		while (n--) {
 		  q2.cf->real = *q1.f++;
 		  q2.cf++->imaginary = 0.0;
 		}
 		break;
-	      case ANA_CFLOAT:
+	      case LUX_CFLOAT:
 		while (n--) {
 		  q2.cf->real = q1.cf->real;
 		  q2.cf++->imaginary = q1.cf++->imaginary;
@@ -2770,45 +2770,45 @@ Int ana_concat(Int narg, Int ps[])
 		break;
 	    }
 	    break;
-	  case ANA_CDOUBLE:
+	  case LUX_CDOUBLE:
 	    switch (symbol_type(iq)) {
-	      case ANA_BYTE:
+	      case LUX_BYTE:
 		while (n--) {
 		  q2.cd->real = *q1.b++;
 		  q2.cd++->imaginary = 0.0;
 		}
 		break;
-	      case ANA_WORD:
+	      case LUX_WORD:
 		while (n--) {
 		  q2.cd->real = *q1.w++;
 		  q2.cd++->imaginary = 0.0;
 		}
 		break;
-	      case ANA_LONG:
+	      case LUX_LONG:
 		while (n--) {
 		  q2.cd->real = *q1.l++;
 		  q2.cd++->imaginary = 0.0;
 		}
 		break;
-	      case ANA_FLOAT:
+	      case LUX_FLOAT:
 		while (n--) {
 		  q2.cd->real = *q1.f++;
 		  q2.cd++->imaginary = 0.0;
 		}
 		break;
-	      case ANA_DOUBLE:
+	      case LUX_DOUBLE:
 		while (n--) {
 		  q2.cd->real = *q1.d++;
 		  q2.cd++->imaginary = 0.0;
 		}
 		break;
-	      case ANA_CFLOAT:
+	      case LUX_CFLOAT:
 		while (n--) {
 		  q2.cd->real = q1.cf->real;
 		  q2.cd++->imaginary = q1.cf++->imaginary;
 		}
 		break;
-	      case ANA_CDOUBLE:
+	      case LUX_CDOUBLE:
 		while (n--) {
 		  q2.cd->real = q1.cd->real;
 		  q2.cd++->imaginary = q1.cd++->imaginary;
@@ -2816,8 +2816,8 @@ Int ana_concat(Int narg, Int ps[])
 		break;
 	    }
 	    break;
-	  case ANA_TEMP_STRING: case ANA_LSTRING: case ANA_STRING_ARRAY:
-	    if (symbol_class(iq) == ANA_STRING) 
+	  case LUX_TEMP_STRING: case LUX_LSTRING: case LUX_STRING_ARRAY:
+	    if (symbol_class(iq) == LUX_STRING) 
 	      *q2.sp = strsave(q1.s);
 	    else 		/* string array */
 	      while (n--) {
@@ -2829,21 +2829,21 @@ Int ana_concat(Int narg, Int ps[])
     } /* for (i = 0; ...) */
     return nsym;
   } /* end of if else 2-or-more args */
-}						/*end of ana_concat */
+}						/*end of lux_concat */
 /*------------------------------------------------------------------------- */
-Int ana_isscalar(Int narg, Int ps[])
+Int lux_isscalar(Int narg, Int ps[])
 /* return 1 if symbol is a scalar, 0 otherwise */
-{ return (sym[*ps].class == ANA_SCALAR)? 1: 4; }
+{ return (sym[*ps].class == LUX_SCALAR)? 1: 4; }
 /*------------------------------------------------------------------------- */
-Int ana_isarray(Int narg, Int ps[])
+Int lux_isarray(Int narg, Int ps[])
 /* return 1 if symbol is an array, 0 otherwise */
-{ return (sym[*ps].class == ANA_ARRAY)? 1: 4; }
+{ return (sym[*ps].class == LUX_ARRAY)? 1: 4; }
 /*------------------------------------------------------------------------- */
-Int ana_isstring(Int narg, Int ps[])
+Int lux_isstring(Int narg, Int ps[])
 /* return 1 if symbol is a string, 0 otherwise */
-{ return (sym[*ps].class == ANA_STRING)? 1: 4; }
+{ return (sym[*ps].class == LUX_STRING)? 1: 4; }
 /*------------------------------------------------------------------------- */
-Int ana_subsc_subgrid(Int narg, Int ps[])
+Int lux_subsc_subgrid(Int narg, Int ps[])
 /* like x(subsc,/inner) but with linear interpolation for fractional
    coordinates.  LS 19jun97 */
 /* the target (subscripted) symbol is in ps[narg]; narg indicates the
@@ -2861,9 +2861,9 @@ Int ana_subsc_subgrid(Int narg, Int ps[])
   switch (class) {
     default:
       return cerror(ILL_CLASS, ps[narg]);
-    case ANA_ARRAY:		/* only numerical ANA_ARRAY is allowed */
+    case LUX_ARRAY:		/* only numerical LUX_ARRAY is allowed */
       type = array_type(ps[narg]);
-      if (type > ANA_DOUBLE)	/* string array */
+      if (type > LUX_DOUBLE)	/* string array */
 	return cerror(ILL_TYPE, ps[narg]);
       src.l = array_data(ps[narg]);
       ndim = array_num_dims(ps[narg]);
@@ -2872,31 +2872,31 @@ Int ana_subsc_subgrid(Int narg, Int ps[])
   }
 
   if (narg != ndim)
-    return anaerror("Incorrect number of subscripts", ps[narg]);
+    return luxerror("Incorrect number of subscripts", ps[narg]);
 
   for (i = 0; i < ndim; i++) { /* all subscripts */
     /* the subscripts must all be numerical with the same number
        of elements */
     iq = ps[i];
     switch (symbol_class(iq)) {
-      case ANA_ARRAY:
-	if (symbol_type(iq) > ANA_DOUBLE)
+      case LUX_ARRAY:
+	if (symbol_type(iq) > LUX_DOUBLE)
 	  return cerror(ILL_TYPE, iq);
 	if (i) {
 	  if (array_size(iq) != nSubsc)
 	    return cerror(INCMP_DIMS, iq);
 	} else
 	  nSubsc = array_size(iq);
-	subsc[i] = ana_float(1, &iq);
+	subsc[i] = lux_float(1, &iq);
 	coord[i] = array_data(subsc[i]);
 	break;
-      case ANA_SCALAR:
+      case LUX_SCALAR:
 	if (i) {
 	  if (nSubsc != 1)
 	    return cerror(INCMP_DIMS, iq);
 	} else
 	  nSubsc = 1;
-	subsc[i] = ana_float(1, &iq);
+	subsc[i] = lux_float(1, &iq);
 	coord[i] = &scalar_value(subsc[i]).f;
 	break;
       default:
@@ -2916,12 +2916,12 @@ Int ana_subsc_subgrid(Int narg, Int ps[])
 
   /* now create output symbol: FLOAT or DOUBLE, and with same dimensions
    as first subscript */
-  if (symbol_class(subsc[0]) == ANA_ARRAY) {
-    iq = array_scratch(type == ANA_DOUBLE? ANA_DOUBLE: ANA_FLOAT,
+  if (symbol_class(subsc[0]) == LUX_ARRAY) {
+    iq = array_scratch(type == LUX_DOUBLE? LUX_DOUBLE: LUX_FLOAT,
 		       array_num_dims(subsc[0]), array_dims(subsc[0]));
     out.f = array_data(iq);
   } else {
-    iq = scalar_scratch(type == ANA_DOUBLE? ANA_DOUBLE: ANA_FLOAT);
+    iq = scalar_scratch(type == LUX_DOUBLE? LUX_DOUBLE: LUX_FLOAT);
     out.f = &scalar_value(iq).f;
   }
 
@@ -2949,7 +2949,7 @@ Int ana_subsc_subgrid(Int narg, Int ps[])
 
     /* now do the interpolating */
     switch (type) {
-      case ANA_BYTE:
+      case LUX_BYTE:
 	do {
 	  cvalue.f = (Float) src.b[index];
 	  for (i = 0; i < ndim; i++)
@@ -2965,7 +2965,7 @@ Int ana_subsc_subgrid(Int narg, Int ps[])
 	} while (j < ndim);
 	*out.f++ = value.f;
 	break;
-      case ANA_WORD:
+      case LUX_WORD:
 	do {
 	  cvalue.f = (Float) src.w[index];
 	  for (i = 0; i < ndim; i++)
@@ -2981,7 +2981,7 @@ Int ana_subsc_subgrid(Int narg, Int ps[])
 	} while (j < ndim);
 	*out.f++ = value.f;
 	break;
-      case ANA_LONG:
+      case LUX_LONG:
 	do {
 	  cvalue.f = (Float) src.l[index];
 	  for (i = 0; i < ndim; i++)
@@ -2997,7 +2997,7 @@ Int ana_subsc_subgrid(Int narg, Int ps[])
 	} while (j < ndim);
 	*out.f++ = value.f;
 	break;
-      case ANA_FLOAT:
+      case LUX_FLOAT:
 	do {
 	  cvalue.f = src.f[index];
 	  for (i = 0; i < ndim; i++)
@@ -3013,7 +3013,7 @@ Int ana_subsc_subgrid(Int narg, Int ps[])
 	} while (j < ndim);
 	*out.f++ = value.f;
 	break;
-      case ANA_DOUBLE:
+      case LUX_DOUBLE:
 	do {
 	  cvalue.d = src.d[index];
 	  for (i = 0; i < ndim; i++)
@@ -3051,7 +3051,7 @@ Int extractNumerical(pointer src, pointer trgt, Int type, Int ndim, Int *dims,
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int ana_roll(Int narg, Int ps[])
+Int lux_roll(Int narg, Int ps[])
 /* ROLL(array, target) rearranges the dimensions of <array> according to */
 /* <target>.  If <target> is a scalar, then the dimensions list is shifted */
 /* cyclically over that number of elements.  If <target> is a numerical */
@@ -3079,7 +3079,7 @@ Int ana_roll(Int narg, Int ps[])
     if (result > nd)
       result -= (result/nd)*nd;
     /* we must construct an array containing the target list of dimensions */
-    iq = array_scratch(ANA_LONG, 1, &nd);
+    iq = array_scratch(LUX_LONG, 1, &nd);
     src.l = array_data(iq);
     for (i = 0; i < nd; i++) {
       *src.l = i + result;
@@ -3098,8 +3098,8 @@ Int ana_roll(Int narg, Int ps[])
     return cerror(ILL_CLASS, ps[1]);
 
   if (standardLoop(ps[0], iq, SL_KEEPTYPE | SL_AXESBLOCK, 0, &srcinfo,
-		   &src, &result, &trgtinfo, &trgt) == ANA_ERROR)
-    return ANA_ERROR;
+		   &src, &result, &trgtinfo, &trgt) == LUX_ERROR)
+    return LUX_ERROR;
 
   memcpy(array_dims(result), srcinfo.rdims, nd*sizeof(Int));
 

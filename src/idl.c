@@ -22,7 +22,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdio.h>
 #include "action.h"
 
-Int ana_idlrestore(Int narg, Int ps[])
+Int lux_idlrestore(Int narg, Int ps[])
 /* IDLRESTORE,<filename> restores all variables from the IDL Save file
    with name <filename>.  Supports scalars, strings, and numerical arrays
    LS 18sep98 */
@@ -36,7 +36,7 @@ Int ana_idlrestore(Int narg, Int ps[])
   scalar	value;
   pointer	pp, data;
 
-  if (!symbol_class(ps[0]) == ANA_STRING)
+  if (!symbol_class(ps[0]) == LUX_STRING)
     return cerror(NEED_STR, ps[0]);
 
   /* open the file */
@@ -47,7 +47,7 @@ Int ana_idlrestore(Int narg, Int ps[])
   fread(bytes, 1, 4, fp);
   if (ferror(fp) || feof(fp)) {
     fclose(fp);
-    return anaerror("Could not check file %s for IDL Save format", ps[0],
+    return luxerror("Could not check file %s for IDL Save format", ps[0],
 		 expname);
   }
 
@@ -56,7 +56,7 @@ Int ana_idlrestore(Int narg, Int ps[])
       || bytes[2] != 0
       || bytes[3] != 4) {
     fclose(fp);
-    return anaerror("File %s does not appear to be an IDL Save file", ps[0],
+    return luxerror("File %s does not appear to be an IDL Save file", ps[0],
 		 expname);
   }
 
@@ -68,7 +68,7 @@ Int ana_idlrestore(Int narg, Int ps[])
   fseek(fp, 4, SEEK_CUR);	/* skip one Int */
   fread(ints, 4, 1, fp);	/* read one Int */
 #if !LITTLEENDIAN
-  endian(ints, 4, ANA_LONG);
+  endian(ints, 4, LUX_LONG);
 #endif
   fseek(fp, ints[0], SEEK_SET);	/* go to the indicated offset */
 
@@ -77,7 +77,7 @@ Int ana_idlrestore(Int narg, Int ps[])
   do {
     fread(ints, 4, 2, fp);	/* read 2 ints */
 #if !LITTLEENDIAN
-    endian(ints, 8, ANA_LONG);
+    endian(ints, 8, LUX_LONG);
 #endif
     if (ints[0] == 14) {
       fseek(fp, ints[1], SEEK_SET);
@@ -87,14 +87,14 @@ Int ana_idlrestore(Int narg, Int ps[])
       if (!nread)
 	printf("IDLRESTORE - No variables found in IDL Save file \"%s\"??\n",
 	       expname);
-      return ANA_OK;
+      return LUX_OK;
     }
 
     nread++;
     
     fread(ints, 4, 3, fp);	/* read 3 ints */
 #if !LITTLEENDIAN
-    endian(ints, 12, ANA_LONG);
+    endian(ints, 12, LUX_LONG);
 #endif
     
     n = ints[2];		/* size of name */
@@ -112,7 +112,7 @@ Int ana_idlrestore(Int narg, Int ps[])
 
     fread(ints, 4, 3, fp);
 #if !LITTLEENDIAN
-    endian(ints, 12, ANA_LONG);
+    endian(ints, 12, LUX_LONG);
 #endif
     if (ints[1] == 20) {	/* array */
       type = ints[0];
@@ -120,7 +120,7 @@ Int ana_idlrestore(Int narg, Int ps[])
       fseek(fp, 12, SEEK_CUR);
       fread(ints, 4, 1, fp);
 #if !LITTLEENDIAN
-      endian(ints, 4, ANA_LONG);
+      endian(ints, 4, LUX_LONG);
 #endif
       ndim = ints[0];		/* number of dimensions */
 
@@ -128,7 +128,7 @@ Int ana_idlrestore(Int narg, Int ps[])
 
       fread(dims, 4, 8, fp);	/* read dimensions */
 #if !LITTLEENDIAN
-      endian(dims, 4*ndim, ANA_LONG);
+      endian(dims, 4*ndim, LUX_LONG);
 #endif
 
       redef_array(var, type - 1, ndim, dims);
@@ -150,20 +150,20 @@ Int ana_idlrestore(Int narg, Int ps[])
 	  while (n--) {
 	    fread(pp.b, 4, 1, fp);
 #if !LITTLEENDIAN
-	    endian(pp.b, 4, ANA_LONG);
+	    endian(pp.b, 4, LUX_LONG);
 #endif
 	    *data.w++ = *pp.l;
 	  }
 	  break;
 	case 3:	case 4: case 5:	/* long, Float, Double */
-	  fread(data.b, ana_type_size[type - 1], n, fp);
+	  fread(data.b, lux_type_size[type - 1], n, fp);
 #if !LITTLEENDIAN
-	  endian(data.b, ana_type_size[type - 1]*n, ANA_LONG);
+	  endian(data.b, lux_type_size[type - 1]*n, LUX_LONG);
 #endif
 	  break;
 	default:
 	  fclose(fp);
-	  return anaerror("Unsupported data type %d in IDL Save file %s\n", ps[0],
+	  return luxerror("Unsupported data type %d in IDL Save file %s\n", ps[0],
 		       type, expname);
       }
     } else {			/* assume scalar or string */
@@ -171,44 +171,44 @@ Int ana_idlrestore(Int narg, Int ps[])
 	case 1:			/* Byte */
 	  fread(pp.b, 1, 4, fp);
 #if !LITTLEENDIAN
-	  endian(pp.b, 4, ANA_LONG);
+	  endian(pp.b, 4, LUX_LONG);
 #endif	
 	  value.b = value.l;
-	  redef_scalar(var, ANA_BYTE, &value.b);
+	  redef_scalar(var, LUX_BYTE, &value.b);
 	  break;
 	case 2:			/* Word */
 	  fread(pp.b, 1, 4, fp); /* words are stored as ints */
 #if !LITTLEENDIAN
-	  endian(pp.b, 4, ANA_LONG);
+	  endian(pp.b, 4, LUX_LONG);
 #endif
 	  value.w = value.l;
-	  redef_scalar(var, ANA_WORD, &value.w);
+	  redef_scalar(var, LUX_WORD, &value.w);
 	  break;
 	case 3:			/* long */
 	  fread(pp.b, 1, 4, fp);
 #if !LITTLEENDIAN
-	  endian(pp.b, 4, ANA_LONG);
+	  endian(pp.b, 4, LUX_LONG);
 #endif
-	  redef_scalar(var, ANA_LONG, &value.l);
+	  redef_scalar(var, LUX_LONG, &value.l);
 	  break;
 	case 4:			/* Float */
 	  fread(pp.b, 1, 4, fp);
 #if !LITTLEENDIAN
-	  endian(pp.b, 4, ANA_FLOAT);
+	  endian(pp.b, 4, LUX_FLOAT);
 #endif
-	  redef_scalar(var, ANA_FLOAT, &value.f);
+	  redef_scalar(var, LUX_FLOAT, &value.f);
 	  break;
 	case 5:			/* Double */
 	  fread(pp.b, 1, 8, fp);
 #if !LITTLEENDIAN
-	  endian(pp.b, 8, ANA_DOUBLE);
+	  endian(pp.b, 8, LUX_DOUBLE);
 #endif
-	  redef_scalar(var, ANA_DOUBLE, &value.d);
+	  redef_scalar(var, LUX_DOUBLE, &value.d);
 	  break;
 	case 7:			/* string */
 	  fread(ints, 4, 2, fp);
 #if !LITTLEENDIAN
-	  endian(ints, 4, ANA_LONG);
+	  endian(ints, 4, LUX_LONG);
 #endif
 	  redef_string(var, ints[0]);
 	  p = string_value(var);
@@ -220,17 +220,17 @@ Int ana_idlrestore(Int narg, Int ps[])
 	  break;
 	default:
 	  fclose(fp);
-	  return anaerror("Unsupported data type %d in IDL Save file %s\n", ps[0],
+	  return luxerror("Unsupported data type %d in IDL Save file %s\n", ps[0],
 		       type, expname);
       }
     }	  
   } while (1);
 }
 /*-----------------------------------------------------------------------*/
-Int ana_idlread_f(Int narg, Int ps[])
+Int lux_idlread_f(Int narg, Int ps[])
 /* IDLREAD(<var>, <filename>) restores the first variable from the IDL
    Save file with name <filename> into <var>.  Supports scalars, strings,
-   and numerical arrays.  Returns ANA_ONE on success, ANA_ZERO on failure.
+   and numerical arrays.  Returns LUX_ONE on success, LUX_ZERO on failure.
    LS 18sep98 */
 {
   Byte	bytes[8];
@@ -242,18 +242,18 @@ Int ana_idlread_f(Int narg, Int ps[])
   scalar	value;
   pointer	pp, data;
 
-  if (!symbol_class(ps[1]) == ANA_STRING)
+  if (!symbol_class(ps[1]) == LUX_STRING)
     return cerror(NEED_STR, ps[1]);
 
   /* open the file */
   fp = fopen(expand_name(string_value(ps[1]), NULL), "r");
   if (!fp)
-    return ANA_ZERO;
+    return LUX_ZERO;
   
   fread(bytes, 1, 4, fp);
   if (ferror(fp) || feof(fp)) {
     fclose(fp);
-    return ANA_ZERO;
+    return LUX_ZERO;
   }
 
   if (bytes[0] != 83
@@ -261,7 +261,7 @@ Int ana_idlread_f(Int narg, Int ps[])
       || bytes[2] != 0
       || bytes[3] != 4) {
     fclose(fp);
-    return ANA_ZERO;
+    return LUX_ZERO;
   }
 
   /* we now assume that the file is in fact an IDL save file and do not
@@ -272,28 +272,28 @@ Int ana_idlread_f(Int narg, Int ps[])
   fseek(fp, 4, SEEK_CUR);	/* skip one Int */
   fread(ints, 4, 1, fp);	/* read one Int */
 #if LITTLEENDIAN
-  endian(ints, 4, ANA_LONG);
+  endian(ints, 4, LUX_LONG);
 #endif
   fseek(fp, ints[0], SEEK_SET);	/* go to the indicated offset */
   
   do {
     fread(ints, 4, 2, fp);	/* read 2 ints */
 #if LITTLEENDIAN
-    endian(ints, 8, ANA_LONG);
+    endian(ints, 8, LUX_LONG);
 #endif
     if (ints[0] == 14) {
       fseek(fp, ints[1], SEEK_SET);
       continue;
     } else if (ints[0] != 2) {	/* all done, but we didn't read anything */
       fclose(fp);
-      return ANA_ZERO;		/* so some error must have occurred */
+      return LUX_ZERO;		/* so some error must have occurred */
     }
     break;
   } while (1);
     
   fread(ints, 4, 3, fp);	/* read 3 ints */
 #if LITTLEENDIAN
-  endian(ints, 12, ANA_LONG);
+  endian(ints, 12, LUX_LONG);
 #endif
     
   n = ints[2];			/* size of name */
@@ -308,7 +308,7 @@ Int ana_idlread_f(Int narg, Int ps[])
 
   fread(ints, 4, 3, fp);
 #if LITTLEENDIAN
-  endian(ints, 12, ANA_LONG);
+  endian(ints, 12, LUX_LONG);
 #endif
   if (ints[1] == 20) {		/* array */
     type = ints[0];
@@ -316,7 +316,7 @@ Int ana_idlread_f(Int narg, Int ps[])
     fseek(fp, 12, SEEK_CUR);
     fread(ints, 4, 1, fp);
 #if LITTLEENDIAN
-    endian(ints, 4, ANA_LONG);
+    endian(ints, 4, LUX_LONG);
 #endif
     ndim = ints[0];		/* number of dimensions */
 
@@ -324,7 +324,7 @@ Int ana_idlread_f(Int narg, Int ps[])
 
     fread(dims, 4, 8, fp);	/* read dimensions */
 #if LITTLEENDIAN
-    endian(dims, 4*ndim, ANA_LONG);
+    endian(dims, 4*ndim, LUX_LONG);
 #endif
 
     redef_array(var, type - 1, ndim, dims);
@@ -343,77 +343,77 @@ Int ana_idlread_f(Int narg, Int ps[])
 	while (n--) {
 	  fread(pp.b, 4, 1, fp);
 #if LITTLEENDIAN
-	  endian(pp.b, 4, ANA_LONG);
+	  endian(pp.b, 4, LUX_LONG);
 #endif
 	  *data.w++ = *pp.l;
 	}
 	break;
       case 3: case 4: case 5:	/* long, Float, Double */
-	fread(data.b, ana_type_size[type - 1], n, fp);
+	fread(data.b, lux_type_size[type - 1], n, fp);
 #if LITTLEENDIAN
-	endian(data.b, ana_type_size[type - 1]*n, ANA_LONG);
+	endian(data.b, lux_type_size[type - 1]*n, LUX_LONG);
 #endif
 	break;
       default:
 	fclose(fp);
-	return ANA_ZERO;
+	return LUX_ZERO;
     }
   } else {			/* assume scalar or string */
     switch (ints[0]) {
       case 1:			/* Byte */
 	fread(pp.b, 1, 4, fp);
 #if LITTLEENDIAN
-	endian(pp.b, 4, ANA_LONG);
+	endian(pp.b, 4, LUX_LONG);
 #endif	
 	value.b = value.l;
-	redef_scalar(var, ANA_BYTE, &value.b);
+	redef_scalar(var, LUX_BYTE, &value.b);
 	break;
       case 2:			/* Word */
 	fread(pp.b, 1, 4, fp);	/* words are stored as ints */
 #if LITTLEENDIAN
-	endian(pp.b, 4, ANA_LONG);
+	endian(pp.b, 4, LUX_LONG);
 #endif
 	value.w = value.l;
-	redef_scalar(var, ANA_WORD, &value.w);
+	redef_scalar(var, LUX_WORD, &value.w);
 	break;
       case 3:			/* long */
 	fread(pp.b, 1, 4, fp);
 #if LITTLEENDIAN
-	endian(pp.b, 4, ANA_LONG);
+	endian(pp.b, 4, LUX_LONG);
 #endif
-	redef_scalar(var, ANA_LONG, &value.l);
+	redef_scalar(var, LUX_LONG, &value.l);
 	break;
       case 4:			/* Float */
 	fread(pp.b, 1, 4, fp);
 #if LITTLEENDIAN
-	endian(pp.b, 4, ANA_FLOAT);
+	endian(pp.b, 4, LUX_FLOAT);
 #endif
-	redef_scalar(var, ANA_FLOAT, &value.f);
+	redef_scalar(var, LUX_FLOAT, &value.f);
 	break;
       case 5:			/* Double */
 	fread(pp.b, 1, 8, fp);
 #if LITTLEENDIAN
-	endian(pp.b, 8, ANA_DOUBLE);
+	endian(pp.b, 8, LUX_DOUBLE);
 #endif
-	redef_scalar(var, ANA_DOUBLE, &value.d);
+	redef_scalar(var, LUX_DOUBLE, &value.d);
 	break;
       case 7:			/* string */
 	redef_string(var, ints[2]);
 	p = string_value(var);
 	fread(ints, 4, 2, fp);
 #if LITTLEENDIAN
-	endian(ints + 1, 4, ANA_LONG);
+	endian(ints + 1, 4, LUX_LONG);
 #endif
 	fread(p, 1, ints[1], fp);
 	p[ints[1]] = '\0';	/* terminate string */
 	break;
       default:
 	fclose(fp);
-	return ANA_ZERO;
+	return LUX_ZERO;
     }
   }	  
 
   fclose(fp);
-  return ANA_ONE;
+  return LUX_ONE;
 }
 /*-----------------------------------------------------------------------*/

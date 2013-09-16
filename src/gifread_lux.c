@@ -23,7 +23,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <string.h>
 #include <errno.h>
 #include <math.h>
-#include "ana_structures.h"
+#include "lux_structures.h"
  extern struct sym_desc sym[];
  struct GIFScreen {
         char id[6];
@@ -65,18 +65,18 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
  static	Int	quit = 0, status = 1, gcmflag;
  static Int	nxs, nys;
 
-Int	ana_gifread(Int, Int []);
+Int	lux_gifread(Int, Int []);
 void	process(Int, unsigned char **);
 
  /*------------------------------------------------------------------------- */
-Int ana_gifread_f(narg, ps)
+Int lux_gifread_f(narg, ps)
  /* a function version that returns 1 if read OK */
  Int	narg, ps[];
  {
- if ( ana_gifread(narg, ps) == 1 ) return 1; else return 4;
+ if ( lux_gifread(narg, ps) == 1 ) return 1; else return 4;
  }
  /*------------------------------------------------------------------------- */
-Int ana_gifread(Int narg, Int ps[])       /* gifread subroutine */
+Int lux_gifread(Int narg, Int ps[])       /* gifread subroutine */
  /* read a "simple" gif file, 8 bit deep */
  /* call is gifread,array,file,map where map is the color map, if
  map not in argument list, you don't get it! */

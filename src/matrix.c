@@ -28,24 +28,24 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "errno.h"
 #include <gsl/gsl_linalg.h>
 
-Int ana_matrix_product(Int narg, Int ps[])
+Int lux_matrix_product(Int narg, Int ps[])
 {
   pointer *ptrs;
   loopInfo *infos;
   Int iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;i>D*;rD1", &ptrs, &infos)) < 0)
-    return ANA_ERROR;
+    return LUX_ERROR;
 
   Int *dims1, *dims2;
   if (infos[0].ndim >= 2)
     dims1 = infos[0].dims;
   else
-    return anaerror("Need at least 2 dimensions", ps[0]);
+    return luxerror("Need at least 2 dimensions", ps[0]);
   if (infos[1].ndim >= 2)
     dims2 = infos[1].dims;
   else
-    return anaerror("Need at least 2 dimensions", ps[1]);
+    return luxerror("Need at least 2 dimensions", ps[1]);
   
   /* the elements are stored in column-major order */
   /* dimsX[0] = number of columns
@@ -53,13 +53,13 @@ Int ana_matrix_product(Int narg, Int ps[])
      the number of columns of argument 1 must equal the number of rows
      of argument 2 */
   if (dims1[0] != dims2[1])
-    return anaerror("The number of columns (now %d) of the 1st argument must equal the number of rows (now %d) of the 2nd argument", ps[1], dims1[0], dims2[1]);
+    return luxerror("The number of columns (now %d) of the 1st argument must equal the number of rows (now %d) of the 2nd argument", ps[1], dims1[0], dims2[1]);
 
   Int i, *tdims, tndim;
   if (internalMode & 1) {	/* /OUTER */
     tndim = infos[0].ndim + infos[1].ndim - 2;
     if (tndim > MAX_DIMS)
-      return anaerror("Result would have %d dimensions, "
+      return luxerror("Result would have %d dimensions, "
 		      "but at most %d are allowed",
 		      ps[1], tndim, MAX_DIMS);
     tdims = malloc(tndim*sizeof(Int));
@@ -70,12 +70,12 @@ Int ana_matrix_product(Int narg, Int ps[])
     tndim = infos[0].ndim;
     tdims = malloc(tndim*sizeof(Int));
     if (infos[1].ndim != infos[0].ndim) {
-      iq = anaerror("Needs the same number of dimensions as the previous argument", ps[1]);
+      iq = luxerror("Needs the same number of dimensions as the previous argument", ps[1]);
       goto error_1;
     }
     for (i = 2; i < infos[0].ndim; i++)
       if (dims1[i] != dims2[i]) {
-	iq = anaerror("The dimensions beyond the first two must be the same as in the previous argument", ps[1]);
+	iq = luxerror("The dimensions beyond the first two must be the same as in the previous argument", ps[1]);
 	goto error_1;
       }
     memcpy(tdims + 2, infos[0].dims + 2, (infos[0].ndim - 2)*sizeof(Int));
@@ -83,7 +83,7 @@ Int ana_matrix_product(Int narg, Int ps[])
   tdims[0] = dims2[0];
   tdims[1] = dims1[1];
 
-  standard_redef_array(iq, ANA_DOUBLE, tndim, tdims, 0, NULL,
+  standard_redef_array(iq, LUX_DOUBLE, tndim, tdims, 0, NULL,
 		       &ptrs[2], &infos[2]);
   free(tdims);
   setAxes(&infos[0], 2, NULL, SL_EACHBLOCK);
@@ -231,31 +231,31 @@ Int singular_value_decomposition(Double *a_in, size_t ncol, size_t nrow,
    If Sd is the square matrix with the values of S2 on its diagnonal,
    then A = U2 # Sd # transpose(V2).
 */
-Int ana_svd(Int narg, Int ps[])
+Int lux_svd(Int narg, Int ps[])
 {
   pointer *ptrs;
   loopInfo *infos;
   Int iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;oD&;oD1;oD1", &ptrs, &infos)) < 0)
-    return ANA_ERROR;
+    return LUX_ERROR;
   if (infos[0].ndim < 2)
-    return anaerror("Need at least two dimensions", ps[0]);
+    return luxerror("Need at least two dimensions", ps[0]);
   Int dims[MAX_DIMS];
   memcpy(dims, infos[0].dims, infos[0].ndim*sizeof(Int));
   if (infos[0].dims[0] <= infos[0].dims[1]) {
     dims[1] = dims[0];		/* # columns */
-    standard_redef_array(ps[2], ANA_DOUBLE, infos[0].ndim - 1, dims + 1,
+    standard_redef_array(ps[2], LUX_DOUBLE, infos[0].ndim - 1, dims + 1,
 			 0, NULL, &ptrs[2], &infos[2]); /* S (vector) */
-    standard_redef_array(ps[3], ANA_DOUBLE, infos[0].ndim, dims, 0, NULL,
+    standard_redef_array(ps[3], LUX_DOUBLE, infos[0].ndim, dims, 0, NULL,
 			 &ptrs[3], &infos[3]); /* Vt */
   } else {
-    standard_redef_array(ps[3], ANA_DOUBLE, infos[0].ndim, infos[0].dims,
+    standard_redef_array(ps[3], LUX_DOUBLE, infos[0].ndim, infos[0].dims,
 			 0, NULL, &ptrs[3], &infos[3]); /* Vt */
     dims[0] = dims[1];					/* # rows */
-    standard_redef_array(ps[2], ANA_DOUBLE, infos[0].ndim - 1, dims + 1,
+    standard_redef_array(ps[2], LUX_DOUBLE, infos[0].ndim - 1, dims + 1,
 			 0, NULL, &ptrs[2], &infos[2]); /* S (vector) */
-    standard_redef_array(ps[1], ANA_DOUBLE, infos[0].ndim, dims, 0, NULL,
+    standard_redef_array(ps[1], LUX_DOUBLE, infos[0].ndim, dims, 0, NULL,
 			 &ptrs[1], &infos[1]);
   }
   setAxes(&infos[0], 2, NULL, SL_EACHBLOCK);
@@ -266,7 +266,7 @@ Int ana_svd(Int narg, Int ps[])
     if (singular_value_decomposition(ptrs[0].d, infos[0].dims[0], /* # cols */
 				     infos[0].dims[1],		/* # rows */
 				     ptrs[1].d, ptrs[2].d, ptrs[3].d))
-      return anaerror("SVD decomposition failed", ps[0]);
+      return luxerror("SVD decomposition failed", ps[0]);
     ptrs[0].d += infos[0].singlestep[2];
     ptrs[1].d += infos[1].singlestep[2];
     ptrs[2].d += infos[2].singlestep[1];
@@ -275,7 +275,7 @@ Int ana_svd(Int narg, Int ps[])
 	   advanceLoop(&infos[1], &ptrs[1]),
 	   advanceLoop(&infos[2], &ptrs[2]),
 	   advanceLoop(&infos[3], &ptrs[3]) < infos[3].ndim);
-  return ANA_OK;
+  return LUX_OK;
 }
 REGISTER(svd, s, SVD, 4, 4, NULL);
 /*--------------------------------------------------------------------*/
@@ -293,21 +293,21 @@ Int matrix_transpose(Double *in, Double *out, size_t in_ncol, size_t in_nrow)
   return 0;
 }
 /*--------------------------------------------------------------------*/
-Int ana_transpose_matrix(Int narg, Int ps[])
+Int lux_transpose_matrix(Int narg, Int ps[])
 {
   pointer *ptrs;
   loopInfo *infos;
   Int iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;rD1", &ptrs, &infos)) < 0)
-    return ANA_ERROR;
+    return LUX_ERROR;
   if (infos[0].ndim < 2)
-    return anaerror("Need at least 2 dimensions", ps[0]);
+    return luxerror("Need at least 2 dimensions", ps[0]);
   Int *dims = malloc(infos[0].ndim*sizeof(Int));
   dims[0] = infos[0].dims[1];
   dims[1] = infos[0].dims[0];
   memcpy(dims + 2, infos[0].dims + 2, (infos[0].ndim - 2)*sizeof(Int));
-  standard_redef_array(iq, ANA_DOUBLE, infos[0].ndim, dims, 0, NULL,
+  standard_redef_array(iq, LUX_DOUBLE, infos[0].ndim, dims, 0, NULL,
 		       &ptrs[1], &infos[1]);
   dims[0] = 0;
   dims[1] = 1;
@@ -325,18 +325,18 @@ Int ana_transpose_matrix(Int narg, Int ps[])
 }
 REGISTER(transpose_matrix, f, TRANSPOSE, 1, 1, NULL);
 /*--------------------------------------------------------------------*/
-Int ana_diagonal_matrix(Int narg, Int ps[])
+Int lux_diagonal_matrix(Int narg, Int ps[])
 {
   pointer *ptrs;
   loopInfo *infos;
   Int iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;rD1", &ptrs, &infos)) < 0)
-    return ANA_ERROR;
+    return LUX_ERROR;
   Int dims[2];
   dims[0] = dims[1] = infos[0].nelem;
-  standard_redef_array(iq, ANA_DOUBLE, 2, dims, 0, NULL, &ptrs[1], &infos[1]);
-  ana_zero(1, &iq);
+  standard_redef_array(iq, LUX_DOUBLE, 2, dims, 0, NULL, &ptrs[1], &infos[1]);
+  lux_zero(1, &iq);
   Int i;
   for (i = 0; i < infos[0].nelem; i++)
     ptrs[1].d[i + i*infos[0].nelem] = ptrs[0].d[i];

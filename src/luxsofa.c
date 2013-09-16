@@ -194,7 +194,7 @@ BIND(iauC2txy, v_dT8dp3_iDaT5rDp3p3q_0zzz1T5, f, IAUC2TXY, 5, 5, NULL)
    dimension (year, month, day).  Unexpected results may be given if
    illegal year, month, or day numbers are specified.  Dates before
    -4799-01-01 or after 1465073-02-28 are rejected. */
-Int ana_iauCal2jd(Int narg, Int ps[])
+Int lux_iauCal2jd(Int narg, Int ps[])
 {
   Double djm0, djm;
   pointer *ptrs;
@@ -202,11 +202,11 @@ Int ana_iauCal2jd(Int narg, Int ps[])
   Int iq;
 
   if ((iq = standard_args(narg, ps, "i>L3*;r>L-3*", &ptrs, &infos)) < 0)
-    return ANA_ERROR;
+    return LUX_ERROR;
 
   /* iauCal2jd(Int iy, Int im, Int id, Double *djm0, Double *djm) */
   switch (infos[0].type) {
-  case ANA_LONG:
+  case LUX_LONG:
     while (infos[1].nelem--) {
       if (iauCal2jd(ptrs[0].l[0], ptrs[0].l[1], ptrs[0].l[2], &djm0, &djm))
         *ptrs[1].l = 0;
@@ -216,7 +216,7 @@ Int ana_iauCal2jd(Int narg, Int ps[])
       ptrs[1].l++;
     }
     break;
-  case ANA_FLOAT:
+  case LUX_FLOAT:
     while (infos[1].nelem--) {
       Int day = floor(ptrs[0].f[2]);
       Double daypart = ptrs[0].f[2] - day;
@@ -228,7 +228,7 @@ Int ana_iauCal2jd(Int narg, Int ps[])
       ptrs[1].f++;
     }
     break;
-  case ANA_DOUBLE:
+  case LUX_DOUBLE:
     while (infos[1].nelem--) {
       Int day = floor(ptrs[0].d[2]);
       Double daypart = ptrs[0].d[2] - day;
@@ -249,7 +249,7 @@ REGISTER(iauCal2jd, f, IAUCAL2JD, 1, 1, NULL);
 /*-----------------------------------------------------------------------*/
 /* IAUDAT(date) returns delta(AT) = TAI - UTC for the given UTC date
    ([year, month, day]) */
-Int ana_iauDat(Int narg, Int ps[])
+Int lux_iauDat(Int narg, Int ps[])
 {
   pointer *ptrs;
   loopInfo *infos;
@@ -278,22 +278,22 @@ Int ana_iauDat(Int narg, Int ps[])
         jdlo = jd;
       }
     } while (jdhi - jdlo > 1);
-    iq = scalar_scratch(ANA_LONG);
+    iq = scalar_scratch(LUX_LONG);
     scalar_value(iq).l = jdlo;
     return iq;
   } else {
     if (narg < 1)
-      return anaerror("Need 1 argument", 0);
+      return luxerror("Need 1 argument", 0);
     if ((iq = standard_args(narg, ps, "i>L3*;rD-3*", &ptrs, &infos)) < 0)
-      return ANA_ERROR;
+      return LUX_ERROR;
     switch (infos[0].type) {
-    case ANA_LONG:
+    case LUX_LONG:
       while (infos[1].nelem--) {
         iauDat(ptrs[0].l[0], ptrs[0].l[1], ptrs[0].l[2], 0.0, ptrs[1].d++);
         ptrs[0].l += 3;
       }
       break;
-    case ANA_FLOAT:
+    case LUX_FLOAT:
       while (infos[1].nelem--) {
         Int d = (Int) floor(ptrs[0].f[2]);
         Double f = ptrs[0].f[2] - d;
@@ -301,7 +301,7 @@ Int ana_iauDat(Int narg, Int ps[])
         ptrs[0].f += 3;
       }
       break;
-    case ANA_DOUBLE:
+    case LUX_DOUBLE:
       while (infos[1].nelem--) {
         Int d = (Int) floor(ptrs[0].d[2]);
         Double f = ptrs[0].d[2] - d;
@@ -387,14 +387,14 @@ BIND(iauEpb, d_dd_iLarDq_0z_1, f, IAUEPB, 1, 1, NULL)
 
    Returns the Julian Date corresponding to Besselian epoch <bepoch>
    (e.g., 1957.3). */
-Int ana_iauEpb2jd(Int narg, Int ps[])
+Int lux_iauEpb2jd(Int narg, Int ps[])
 {
   pointer *ptrs;
   loopInfo *infos;
   Int iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;rD&", &ptrs, &infos)) < 0)
-    return ANA_ERROR;
+    return LUX_ERROR;
   while (infos[0].nelem--) {
     Double djm0, djm;
     
@@ -414,14 +414,14 @@ BIND(iauEpj, d_dd_iLarDq_0z_1, f, IAUEPJ, 1, 1, NULL)
 
    Returns the Julian Date corresponding to Julian epoch <bepoch>
    (e.g., 1957.3). */
-Int ana_iauEpj2jd(Int narg, Int ps[])
+Int lux_iauEpj2jd(Int narg, Int ps[])
 {
   pointer *ptrs;
   loopInfo *infos;
   Int iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;rD*", &ptrs, &infos)) < 0)
-    return ANA_ERROR;
+    return LUX_ERROR;
   while (infos[0].nelem--) {
     Double djm0, djm;
     

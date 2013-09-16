@@ -146,7 +146,7 @@ void manualTerm(Int number)
     isSpecial[(unsigned char) special[i][0]] = 1;
 }
 /*--------------------------------------------------------------------*/
-Int ana_manualterm(Int narg, Int ps[])
+Int lux_manualterm(Int narg, Int ps[])
 /* select a manual terminal specification */
 {
   Int	i;
@@ -155,7 +155,7 @@ Int ana_manualterm(Int narg, Int ps[])
   if (i < 0)
     i = 0;
   manualTerm(i);
-  return ANA_OK;
+  return LUX_OK;
 }
 /*--------------------------------------------------------------------*/
 

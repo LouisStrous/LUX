@@ -21,7 +21,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #if HAVE_CONFIG_H
 #include "config.h"
 #endif
-#include "ana_structures.h"
+#include "lux_structures.h"
  /* 2/4/96, finished adding a 32 bit crunch/decrunch which is especially
  useful for recording darks and flats at La Palma since these are sums of
  50 or more 10 bit images and can easily exceed the positive range of
@@ -55,7 +55,7 @@ Int anacrunch32(Byte *, Int *, Int, Int, Int, Int),
 void	swapl(void *, Int);
 
  /*--------------------------------------------------------------------------*/
-Int ana_crunchrun(Int narg, Int ps[])		/* crunch subroutine */
+Int lux_crunchrun(Int narg, Int ps[])		/* crunch subroutine */
  /* compress an array with imbedded run length encoding plus variable
  bit encoding */		
  /*  lux call is: crunchrun, IN, b ,OUT */
@@ -69,12 +69,12 @@ Int ana_crunchrun(Int narg, Int ps[])		/* crunch subroutine */
   return iq;
 }
 /*--------------------------------------------------------------------------*/
-Int ana_crunch(Int narg, Int ps[])
+Int lux_crunch(Int narg, Int ps[])
 {
   return docrunch(narg, ps, 1);
 }
 /*--------------------------------------------------------------------------*/
-Int ana_crunch_f(Int narg, Int ps[])
+Int lux_crunch_f(Int narg, Int ps[])
 {
   return docrunch(narg, ps, 0);
 }
@@ -93,8 +93,8 @@ Int docrunch(Int narg, Int ps[], Int showerror)/* crunch subroutine */
   if (!symbolIsNumericalArray(iq))
     return cerror(NEED_ARR, iq);
   type = array_type(iq);
-  if (type > ANA_LONG)
-    return anaerror("crunch only accepts I*1,2,4 arrays", iq);
+  if (type > LUX_LONG)
+    return luxerror("crunch only accepts I*1,2,4 arrays", iq);
   q1.l = array_data(iq);
   nx = array_dims(iq)[0];
   outer = array_size(iq)/nx;
@@ -106,7 +106,7 @@ Int docrunch(Int narg, Int ps[], Int showerror)/* crunch subroutine */
     return cerror(NEED_ARR, iq);
   q2.l = array_data(iq);
   n = array_size(iq);
-  limit = n*ana_type_size[array_type(iq)]; /* use to avoid overflows */
+  limit = n*lux_type_size[array_type(iq)]; /* use to avoid overflows */
   /* the types in the compress structure are non-inuitive for historical
      reasons:	ctype 0		I*2 without run length
      ctype 1		I*1 without run length
@@ -137,26 +137,26 @@ Int docrunch(Int narg, Int ps[], Int showerror)/* crunch subroutine */
     break;
 #else
     puts("32-bit compression was not compiled into your version of LUX.");
-    iq = ANA_ERROR;
+    iq = LUX_ERROR;
 #endif
   default:
-    return anaerror("CRUNCH - Impossible error", 0);
+    return luxerror("CRUNCH - Impossible error", 0);
   }
   if (iq < 0) {
     crunch_bpp = 0.0;
     crunch_bits = 0;
     return showerror?
-      anaerror("not enough space allocated (%d bytes) for compressed array",
-	    ps[2]): ANA_ZERO;
+      luxerror("not enough space allocated (%d bytes) for compressed array",
+	    ps[2]): LUX_ZERO;
   }
   /* printf("crunch used %d bytes out of %d available\n",iq, limit);*/
   crunch_bpp = 8.0 * iq / (nx * outer);
   crunch_bits = 8 * iq;
   /* printf("bits/pixel = %g\n", crunch_bpp);*/
-  return ANA_OK;
+  return LUX_OK;
 }
  /*--------------------------------------------------------------------------*/
-Int ana_decrunch(Int narg, Int ps[])		/* decrunch subroutine */
+Int lux_decrunch(Int narg, Int ps[])		/* decrunch subroutine */
  /* decompress an array */		
  /*  decrunch, IN, OUT */
 {
@@ -223,11 +223,11 @@ Int ana_decrunch(Int narg, Int ps[])		/* decrunch subroutine */
     break;
 #else
     puts("32-bit decompression was not compiled into your version of LUX.");
-    iq = ANA_ERROR;
+    iq = LUX_ERROR;
 #endif
   default:
     printf("DECRUNCH: illegal compression type %d\n", ctype);
-    iq = ANA_ERROR;
+    iq = LUX_ERROR;
     break;
   }
   return iq;
@@ -274,7 +274,7 @@ Int anacrunch32(Byte *x, Int array[], Int slice, Int nx, Int ny, Int limit)
 
   /* begin execution */
   if (limit < 25)
-    return anaerror("limit (%d) too small in crunch32", 0, limit);
+    return luxerror("limit (%d) too small in crunch32", 0, limit);
 
   limit = limit - 24;	/* need 14 for header and some margin since
 			   we don't check all times */
@@ -396,7 +396,7 @@ Int anacrunch(Byte *x, short array[], Int slice, Int nx, Int ny, Int limit)
   union { Int i; short w; unsigned char b[4]; } y;
   /* begin execution */
   if (limit < 25)
-    return anaerror("limit (%d) too small in crunch", 0, limit);
+    return luxerror("limit (%d) too small in crunch", 0, limit);
   limit = limit - 24;	/* need 14 for header and some margin since
 			   we don't check all times */
   mask=1; for (i=0;i<slice;i++) mask=2*mask;
@@ -510,7 +510,7 @@ Int anacrunch8(Byte *x, Byte array[], Int slice, Int nx, Int ny, Int limit)
   union { Int i; short w; unsigned char b[4]; } y;
   /* begin execution */
   if (limit < 25)
-    return anaerror("limit (%d) too small in crunch8", 0, limit);
+    return luxerror("limit (%d) too small in crunch8", 0, limit);
   limit = limit - 24;	/* need 14 for header and some margin since
 			   we don't check all times */
   mask=1; for (i=0;i<slice;i++) mask=2*mask;
@@ -1035,7 +1035,7 @@ Int anacrunchrun(Byte *x, short array[], Int slice, Int nx, Int ny, Int limit)
   union { Int i; short w; unsigned char b[4]; } y;
   /* begin execution */
   if (limit < 25)
-    return anaerror("limit (%d) too small in crunchrun", 0, limit);
+    return luxerror("limit (%d) too small in crunchrun", 0, limit);
   limit = limit - 24;	/* some margin since we don't check all times */
   mask=1; for (i=0;i<slice;i++) mask=2*mask;
   mask=mask-1; /* no inline expon. in C */
@@ -1210,7 +1210,7 @@ Int anacrunchrun8(Byte *x, Byte array[], Int slice, Int nx, Int ny, Int limit)
   union { Int i; short w; unsigned char b[4]; } y;
   /* begin execution */
   if (limit < 25)
-    return anaerror("limit (%d) too small in crunchrun8", 0, limit);
+    return luxerror("limit (%d) too small in crunchrun8", 0, limit);
   limit = limit - 24;	/* some margin since we don't check all times */
   mask=1; for (i=0;i<slice;i++) mask=2*mask;
   mask=mask-1; /* no inline expon. in C */

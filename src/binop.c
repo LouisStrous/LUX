@@ -38,10 +38,10 @@ Int evalBinOp(Int lhs, Int rhs,
   Int ldims[MAX_DIMS], rdims[MAX_DIMS], lndims, rndims;
   Int topType, ltype, rtype;
 
-  if (numerical(lhs, ldims, &lndims, NULL, &lp) == ANA_ERROR)
-    return ANA_ERROR;
-  if (numerical(rhs, rdims, &rndims, NULL, &rp) == ANA_ERROR)
-    return ANA_ERROR;
+  if (numerical(lhs, ldims, &lndims, NULL, &lp) == LUX_ERROR)
+    return LUX_ERROR;
+  if (numerical(rhs, rdims, &rndims, NULL, &rp) == LUX_ERROR)
+    return LUX_ERROR;
   ltype = symbol_type(lhs);
   rtype = symbol_type(rhs);
   topType = (ltype > rtype)? ltype: rtype;
@@ -100,16 +100,16 @@ Int evalBinOp(Int lhs, Int rhs,
     action[nAction++] = ORDINARY;
   }
   if (!nAction) {		/* plain binary operation, no implicit dims */
-    if (ana_type_size[ltype] == ana_type_size[topType] /* lhs type OK */
+    if (lux_type_size[ltype] == lux_type_size[topType] /* lhs type OK */
 	&& (lhs == bigOne || !bigOne) /* lhs is big enough */
 	&& (isFreeTemp(lhs) || (!pipeExec && pipeSym == lhs))) /* and free */
       result = lhs;		/* use lhs to store result */
-    else if (ana_type_size[rtype] == ana_type_size[topType]
+    else if (lux_type_size[rtype] == lux_type_size[topType]
 	     && (rhs == bigOne || !bigOne)
 	     && (isFreeTemp(rhs) || (!pipeExec && pipeSym == rhs)))
       result = rhs;		/* use rhs to store result */
     else if ((result = array_clone(bigOne? bigOne: lhs, topType)) < 0)
-      return ANA_ERROR;		/* could not generate output symbol */
+      return LUX_ERROR;		/* could not generate output symbol */
     tp.l = array_data(result);	/* output data */
     array_type(result) = topType;
     {
@@ -128,16 +128,16 @@ Int evalBinOp(Int lhs, Int rhs,
     nRepeat = 1;
     for (i = 0; i < nAction; i++)
       nRepeat *= nRepeats[i];
-    if (ana_type_size[ltype] == ana_type_size[topType] /* lhs type OK */
+    if (lux_type_size[ltype] == lux_type_size[topType] /* lhs type OK */
 	&& array_size(lhs) == nRepeat /* and has correct size */
 	&& (isFreeTemp(lhs) || (!pipeExec && pipeSym == lhs))) /* and free */
       result = lhs;		/* use lhs to store the result */
-    else if (ana_type_size[rtype] == ana_type_size[topType]
+    else if (lux_type_size[rtype] == lux_type_size[topType]
 	     && array_size(rhs) == nRepeat
 	     && (isFreeTemp(rhs) || (!pipeExec && pipeSym == rhs)))
       result = rhs;		/* use rhs to store the result */
     else if ((result = array_scratch(topType, 1, &nRepeat)) < 0)
-      return ANA_ERROR;		/* could not create output symbol */
+      return LUX_ERROR;		/* could not create output symbol */
 
     /* if the result symbol was created from scratch, then it has
      only a single dimension, which may not be correct.  We put in
@@ -156,8 +156,8 @@ Int evalBinOp(Int lhs, Int rhs,
     /* the result data pointer */
     tp.l = array_data(result);
     /* now deduce step sizes */
-    *nCumulR = rStride = ana_type_size[rhsType];
-    *nCumulL = lStride = ana_type_size[lhsType];
+    *nCumulR = rStride = lux_type_size[rhsType];
+    *nCumulL = lStride = lux_type_size[lhsType];
 
     for (i = 1; i < nAction; i++) { /* cumulative sizes */
       switch (action[i - 1]) {
@@ -225,7 +225,7 @@ Int evalBinOp(Int lhs, Int rhs,
     array_type(result) = topType; /* in case we use one of the operands */
     /* for result and the type of the operand */
     /* is different from the type of the result */
-    /* (e.g. ANA_LONG -> ANA_FLOAT) */
+    /* (e.g. LUX_LONG -> LUX_FLOAT) */
     return result;
   }
 }

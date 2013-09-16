@@ -31,7 +31,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <limits.h>             /* for LONG_MAX */
 #include <time.h>               /* for difftime */
 #include "action.h"
-#include "ana_func_if.h"
+#include "lux_func_if.h"
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_multimin.h>
 #include <limits.h>
@@ -121,7 +121,7 @@ void enforce_bounds(Double *par, Double *lowbound, Double *hibound, Int nPar)
   }
 }
 /*-----------------------------------------------------------------------*/
-Int ana_generalfit(Int narg, Int ps[])
+Int lux_generalfit(Int narg, Int ps[])
 /* FIT([X,]Y,START,STEP[,LOWBOUND,HIGHBOUND][,WEIGHTS][,QTHRESH,PTHRESH,
    ITHRESH,DTHRESH][,FAC,NITER,NSAME][,ERR][,FIT][,TTHRESH][,/VOCAL,/DOWN,
    /PCHI][/GAUSSIANS,/POWERFUNC]) */
@@ -141,19 +141,19 @@ Int ana_generalfit(Int narg, Int ps[])
   Double (*fitFunc)(Double *, Int, Double *, Double *, Double *, Int);
   extern Int    nFixed;
   Word  fitPar, fitArg[4];
-  Int   ana_indgen(Int, Int []), eval(Int);
+  Int   lux_indgen(Int, Int []), eval(Int);
   void  zap(Int);
   time_t starttime;
   
   /* check input variables */
   if (narg >= 15 && (iq = ps[15])) { /* FIT */
-    if (symbol_class(iq) != ANA_STRING)
+    if (symbol_class(iq) != LUX_STRING)
       return cerror(NEED_STR, iq);
     n = SP_USER_FUNC;
     fitSym = stringpointer(string_value(iq), n);
     if (fitSym < 0)             /* internal routine rather than user-defined */
       return
-        anaerror("Sorry, fitting to internal routines is not yet implemented",
+        luxerror("Sorry, fitting to internal routines is not yet implemented",
               iq);
   } else
     fitSym = 0;
@@ -161,7 +161,7 @@ Int ana_generalfit(Int narg, Int ps[])
   i = (internalMode/16 & 3);    /* fit function */
   if (i) {
     if (fitSym)
-      return anaerror("Multiple fit functions specified", fitSym);
+      return luxerror("Multiple fit functions specified", fitSym);
     i--;
   }
   fitFunc = fitProfiles[i];     /* fit function */
@@ -173,48 +173,48 @@ Int ana_generalfit(Int narg, Int ps[])
     ySym = ps[0];
     xSym = 0;
   }
-  if (symbol_class(ySym) != ANA_ARRAY)
+  if (symbol_class(ySym) != LUX_ARRAY)
     return cerror(NEED_ARR, ySym);
-  ySym = ana_double(1, &ySym);  /* ensure ANA_DOUBLE */
+  ySym = lux_double(1, &ySym);  /* ensure LUX_DOUBLE */
   nPoints = array_size(ySym);   /* number of data points */
   yp = (Double *) array_data(ySym); /* pointer to data */
 
   if (xSym)                     /* X */
     switch (symbol_class(xSym)) {
-      case ANA_SCALAR:
+      case LUX_SCALAR:
         if (!fitSym)
-          return anaerror("Need array in standard fit", xSym);
+          return luxerror("Need array in standard fit", xSym);
         /* fall-thru to next case */
-      case ANA_ARRAY:
+      case LUX_ARRAY:
         if (!fitSym) {
           n = array_size(xSym);
           if (n != nPoints)
             return cerror(INCMP_ARG, ySym);
         }
-        xSym = ana_double(1, &xSym);
+        xSym = lux_double(1, &xSym);
         xTemp = xSym;
-        if (symbol_class(xSym) == ANA_ARRAY)
+        if (symbol_class(xSym) == LUX_ARRAY)
           xp = (Double *) array_data(xSym);
         break;
       default:
         return cerror(ILL_CLASS, xSym);
     }
   else {
-    xTemp = ana_indgen(1, &ySym);
+    xTemp = lux_indgen(1, &ySym);
     xp = (Double *) array_data(xTemp);
   }
 
   iq = ps[2];                   /* START: initial parameter values */
-  if (symbol_class(iq) != ANA_ARRAY)
+  if (symbol_class(iq) != LUX_ARRAY)
     return cerror(NEED_ARR, iq);
-  iq = ana_double(1, &iq);
+  iq = lux_double(1, &iq);
   nPar = array_size(iq);
   start = (Double *) array_data(iq);
   
   iq = ps[3];                   /* STEP: initial parameter step sizes */
-  if (symbol_class(iq) != ANA_ARRAY)
+  if (symbol_class(iq) != LUX_ARRAY)
     return cerror(NEED_ARR, iq);
-  iq = ana_double(1, &iq);
+  iq = lux_double(1, &iq);
   n = array_size(iq);
   if (n == nPar - 1)            /* assume last element of START is quality */
     nPar--;
@@ -224,19 +224,19 @@ Int ana_generalfit(Int narg, Int ps[])
     switch (i) {                /* check for proper number of arguments */
       case 0:                   /* gaussians */
         if ((nPar - 1) % 3 != 0)
-          return anaerror("Need one plus a multiple of three parameters for gaussian fits", ps[3]);
+          return luxerror("Need one plus a multiple of three parameters for gaussian fits", ps[3]);
         break;
       case 1:                   /* power function */
         if (nPar != 5)
-          return anaerror("Need five parameters for power-function fits", ps[3]);
+          return luxerror("Need five parameters for power-function fits", ps[3]);
         break;
     }
   step = (Double *) array_data(iq);
 
   if (narg >= 5 && (iq = ps[4])) { /* LOWBOUND: lower bound on parameters */
-    if (symbol_class(iq) != ANA_ARRAY)
+    if (symbol_class(iq) != LUX_ARRAY)
       return cerror(NEED_ARR, iq);
-    iq = ana_double(1, &iq);
+    iq = lux_double(1, &iq);
     n = array_size(iq);
     if (n != nPar)
       return cerror(INCMP_ARG, ps[4]);
@@ -245,9 +245,9 @@ Int ana_generalfit(Int narg, Int ps[])
     lowbound = NULL;
 
   if (narg >= 6 && (iq = ps[5])) { /* HIGHBOUND: upper bound on parameters */
-    if (symbol_class(iq) != ANA_ARRAY)
+    if (symbol_class(iq) != LUX_ARRAY)
       return cerror(NEED_ARR, iq);
-    iq = ana_double(1, &iq);
+    iq = lux_double(1, &iq);
     n = array_size(iq);
     if (n != nPar)
       return cerror(INCMP_ARG, ps[5]);
@@ -258,13 +258,13 @@ Int ana_generalfit(Int narg, Int ps[])
   if (lowbound && hibound) {
     for (i = 0; i < nPar; i++)
       if (hibound[i] <= lowbound[i])
-	return anaerror("High bound %g of parameter %d is not greater than low bound %g", ps[5], hibound[i], i + 1, lowbound[i]);
+	return luxerror("High bound %g of parameter %d is not greater than low bound %g", ps[5], hibound[i], i + 1, lowbound[i]);
   }
 
   if (narg >= 7 && (iq = ps[6])) { /* WEIGHTS */
-    if (symbol_class(iq) != ANA_ARRAY)
+    if (symbol_class(iq) != LUX_ARRAY)
       return cerror(NEED_ARR, iq);
-    wSym = ana_double(1, &iq);
+    wSym = lux_double(1, &iq);
     n = array_size(wSym);
     if (n != nPoints)
       return cerror(INCMP_ARG, ps[6]);
@@ -278,9 +278,9 @@ Int ana_generalfit(Int narg, Int ps[])
     qThresh = 0.0;
 
   if (narg >= 9 && (iq = ps[8])) { /* PTHRESH: parameter change threshold */
-    if (symbol_class(iq) != ANA_ARRAY)
+    if (symbol_class(iq) != LUX_ARRAY)
       return cerror(NEED_ARR, iq);
-    iq = ana_double(1, &iq);
+    iq = lux_double(1, &iq);
     n = array_size(iq);
     if (n != nPar)
       return cerror(INCMP_ARG, ps[8]);
@@ -321,10 +321,10 @@ Int ana_generalfit(Int narg, Int ps[])
     if (ps[14] < nFixed || ps[14] >= NAMED_END) {
       if (xSym)
         free(xp);
-      return anaerror("Need named output variable", ps[14]);
+      return luxerror("Need named output variable", ps[14]);
     }
     i = nPar;
-    redef_array(ps[14], ANA_DOUBLE, 1, &i);
+    redef_array(ps[14], LUX_DOUBLE, 1, &i);
     err = (Double *) array_data(ps[14]);
   } else {
     err = malloc(nPar*sizeof(Double));
@@ -348,7 +348,7 @@ Int ana_generalfit(Int narg, Int ps[])
                                    /* applicable) */
 
   i = nPar + 1;
-  fitPar = array_scratch(ANA_DOUBLE, 1, &i); /* fit parameters */
+  fitPar = array_scratch(LUX_DOUBLE, 1, &i); /* fit parameters */
   par = (Double *) array_data(fitPar);
 
   size = nPar*sizeof(Double);
@@ -375,7 +375,7 @@ Int ana_generalfit(Int narg, Int ps[])
     if (weights)
       fitArg[3] = wSym;
     fitTemp = nextFreeTempExecutable();
-    symbol_class(fitTemp) = ANA_USR_FUNC;
+    symbol_class(fitTemp) = LUX_USR_FUNC;
     usr_func_arguments(fitTemp) = fitArg;
     symbol_memory(fitTemp) = (weights? 4: 3)*sizeof(Word);
     usr_func_number(fitTemp) = fitSym;
@@ -607,7 +607,7 @@ Int ana_generalfit(Int narg, Int ps[])
   if (!xSym)
     zap(xTemp);
   if (fitSym) {
-    symbol_class(fitTemp) = ANA_SCALAR;
+    symbol_class(fitTemp) = LUX_SCALAR;
     zap(fitTemp);
   }
   free(parBest1);
@@ -644,7 +644,7 @@ gsl_vector *gsl_vector_from_lux_symbol(Int iq, Int axis)
   Int ndim, *dims, nelem, i;
   pointer data;
 
-  iq = ana_double(1, &iq);
+  iq = lux_double(1, &iq);
   if (numerical(iq, &dims, &ndim, &nelem, &data) < 0
       || axis >= ndim) {
     errno = EDOM;
@@ -671,10 +671,10 @@ gsl_vector *gsl_vector_from_lux_symbol(Int iq, Int axis)
 /*------------------------------------------------------------*/
 Double fit2_func(const gsl_vector *a, void *p)
 {
-  ana_func_if *afif = (ana_func_if *) p;
-  pointer par = ana_func_if_get_param_data(afif, 0);
+  lux_func_if *afif = (lux_func_if *) p;
+  pointer par = lux_func_if_get_param_data(afif, 0);
   memcpy(par.d, a->data, a->size*sizeof(Double));
-  Double result = ana_func_if_call(afif);
+  Double result = lux_func_if_call(afif);
   if (isnan(result))
     return GSL_NAN;
   return result;
@@ -712,11 +712,11 @@ Double fit2_func(const gsl_vector *a, void *p)
   times the number of parameters.  0 means "no limit".
 
 */
-Int ana_generalfit2(Int narg, Int ps[])
+Int lux_generalfit2(Int narg, Int ps[])
 {
   Int nPar, nPoints, result, ithresh = 0, nithresh;
   gsl_multimin_fminimizer *minimizer = NULL;
-  ana_func_if *afif = NULL;
+  lux_func_if *afif = NULL;
   gsl_vector *par_v = NULL, *step_v = NULL;
   Int d_step_sym, d_par_sym, d_x_sym, d_y_sym;
   Double *errors = NULL, sthresh = 0;
@@ -726,27 +726,27 @@ Int ana_generalfit2(Int narg, Int ps[])
   {
     Int nx, *dims, ndim, nStep;
 
-    d_x_sym = ana_double(1, &ps[0]);	/* X */
+    d_x_sym = lux_double(1, &ps[0]);	/* X */
     if (isFreeTemp(d_x_sym))
       symbol_context(d_x_sym) = 1;     /* avoid premature deletion */
-    d_y_sym = ana_double(1, &ps[1]);	/* Y */
+    d_y_sym = lux_double(1, &ps[1]);	/* Y */
     if (isFreeTemp(d_y_sym))
       symbol_context(d_y_sym) = 1;
-    d_par_sym = ana_double(1, &ps[2]); /* PAR */
+    d_par_sym = lux_double(1, &ps[2]); /* PAR */
     if (isFreeTemp(d_par_sym))
       symbol_context(d_par_sym) = 1;	/* avoid premature deletion */
-    d_step_sym = ana_double(1, &ps[3]); /* STEP */
+    d_step_sym = lux_double(1, &ps[3]); /* STEP */
     if (isFreeTemp(d_step_sym))
       symbol_context(d_step_sym) = 1;
     if (numerical(d_x_sym, &dims, &ndim, &nx, NULL) < 0 /* X */
 	|| numerical(d_y_sym, NULL, NULL, &nPoints, NULL) < 0 /* Y */
 	|| numerical(d_par_sym, NULL, NULL, &nPar, NULL) < 0
 	|| numerical(d_step_sym, NULL, NULL, &nStep, NULL) < 0)
-      return ANA_ERROR;
+      return LUX_ERROR;
     if (nStep == nPar - 1)
       --nPar;			/* assume last element of START is quality */
     if (nStep != nPar) {
-      result = anaerror("Number of elements (%d) in step argument is unequal to number of elements (%d) in parameters argument", ps[3], nStep, nPar);
+      result = luxerror("Number of elements (%d) in step argument is unequal to number of elements (%d) in parameters argument", ps[3], nStep, nPar);
       goto end;
     }
   }
@@ -755,7 +755,7 @@ Int ana_generalfit2(Int narg, Int ps[])
     goto end;
   }
   if (narg > 5 && ps[5]) {	/* ERR */
-    redef_array(ps[5], ANA_DOUBLE, 1, &nPar);
+    redef_array(ps[5], LUX_DOUBLE, 1, &nPar);
     errors = (Double *) array_data(ps[5]);
   }
   if (narg > 6 && ps[6])	/* ITHRESH */
@@ -774,30 +774,30 @@ Int ana_generalfit2(Int narg, Int ps[])
   par_v = gsl_vector_from_lux_symbol(d_par_sym, -1);
   step_v = gsl_vector_from_lux_symbol(d_step_sym, -1);
 
-  afif = ana_func_if_alloc(string_value(ps[4]), 3);
+  afif = lux_func_if_alloc(string_value(ps[4]), 3);
   if (!afif) {
     switch (errno) {
     case EDOM:
-      result = anaerror("Cannot fit to internal routine", ps[4]);
+      result = luxerror("Cannot fit to internal routine", ps[4]);
       break;
     case ENOMEM:
       result = cerror(ALLOC_ERR, 0);
       break;
     default:
-      result = anaerror("Unhandled error %d", 0, errno);
+      result = luxerror("Unhandled error %d", 0, errno);
       break;
     }
     goto end;
   }
 
-  ana_func_if_set_param(afif, 0, d_par_sym);		 /* par */
-  ana_func_if_set_param(afif, 1, d_x_sym);		 /* x */
-  ana_func_if_set_param(afif, 2, d_y_sym);		 /* y */
+  lux_func_if_set_param(afif, 0, d_par_sym);		 /* par */
+  lux_func_if_set_param(afif, 1, d_x_sym);		 /* x */
+  lux_func_if_set_param(afif, 2, d_y_sym);		 /* y */
 
   minimizer = gsl_multimin_fminimizer_alloc(gsl_multimin_fminimizer_nmsimplex2,
 					    nPar);
   if (!minimizer) {
-    result = anaerror("Unable to allocate memory for minimizer", 0);
+    result = luxerror("Unable to allocate memory for minimizer", 0);
     goto end;
   }
 
@@ -811,7 +811,7 @@ Int ana_generalfit2(Int narg, Int ps[])
 			 storing the quality */
 
   if (gsl_multimin_fminimizer_set(minimizer, &m_func, par_v, step_v)) {
-    result = ANA_ERROR;
+    result = LUX_ERROR;
     goto end;
   }
 
@@ -863,11 +863,11 @@ Int ana_generalfit2(Int narg, Int ps[])
 
   {
     Int n = best_par->size + 1;
-    result = array_scratch(ANA_DOUBLE, 1, &n);
+    result = array_scratch(LUX_DOUBLE, 1, &n);
   }
   Double *tgt = array_data(result);
   memcpy(tgt, best_par->data, best_par->size*sizeof(Double));
-  Double best_min = ana_func_if_call(afif);
+  Double best_min = lux_func_if_call(afif);
   tgt[best_par->size] = best_min;
 
   if (errors) {
@@ -880,9 +880,9 @@ Int ana_generalfit2(Int narg, Int ps[])
 	Double qualplus, qualmin, r;
 	do {
 	  par_v->data[i] = best_par->data[i] + h;
-	  qualplus = ana_func_if_call(afif);
+	  qualplus = lux_func_if_call(afif);
 	  par_v->data[i] = best_par->data[i] - h;
-	  qualmin = ana_func_if_call(afif);
+	  qualmin = lux_func_if_call(afif);
 	  r = (qualplus + qualmin)/best_min;
 	  if (r > 4)
 	    h /= sqrt(r);
@@ -904,7 +904,7 @@ Int ana_generalfit2(Int narg, Int ps[])
   gsl_vector_free(par_v);
   gsl_vector_free(step_v);
   gsl_multimin_fminimizer_free(minimizer);
-  ana_func_if_free(afif);
+  lux_func_if_free(afif);
   if (symbol_context(d_par_sym) == 1)
     symbol_context(d_par_sym) = -compileLevel; /* so it is deleted when appropriate */
   if (symbol_context(d_x_sym) == 1)
@@ -929,13 +929,13 @@ typedef union {
 void denan(Byte *data, Int size, Int partype)
 /* <data> = start of data
    <size> = size of data, in bytes
-   <partpe> = data type (ANA_BYTE ... ANA_FLOAT) */
+   <partpe> = data type (LUX_BYTE ... LUX_FLOAT) */
 {
   uscalar p;
   Int i;
 
   switch (partype) {
-  case ANA_FLOAT:
+  case LUX_FLOAT:
     p.f = (Float *) data;
     for (i = 0; i < size/sizeof(Float); i++) {
       while (isnan(*p.f)) {
@@ -946,7 +946,7 @@ void denan(Byte *data, Int size, Int partype)
       p.f++;
     }
     break;
-  case ANA_DOUBLE:
+  case LUX_DOUBLE:
     p.d = (Double *) data;
     for (i = 0; i < size/sizeof(Double); i++) {
       while (isnan(*p.d)) {
@@ -972,27 +972,27 @@ void printgene(Byte *gene, Int nPar, Int partype, Int showbits,
     if (j)
       putchar(' ');
     switch (partype) {
-    case ANA_BYTE:
+    case LUX_BYTE:
       printf("%u", p.b[j]);
       break;
-    case ANA_WORD:
+    case LUX_WORD:
       printf("%u", p.w[j]);
       break;
-    case ANA_LONG:
+    case LUX_LONG:
       printf("%u", p.l[j]);
       break;
-    case ANA_FLOAT:
+    case LUX_FLOAT:
       printf("%g", p.f[j]);
       break;
-    case ANA_DOUBLE:
+    case LUX_DOUBLE:
       printf("%g", p.d[j]);
       break;
     }
     if (showbits) {
       Int i;
-      Byte *b = gene + ana_type_size[partype]*j;
+      Byte *b = gene + lux_type_size[partype]*j;
       printf(" {");
-      for (i = ana_type_size[partype] - 1; i >= 0; i--)
+      for (i = lux_type_size[partype] - 1; i >= 0; i--)
         printf("%02x", b[i]);
       printf("}");
     }
@@ -1013,14 +1013,14 @@ Int hasnan(Byte *gene, Int nPar, Int partype) {
   uscalar p;
 
   switch (partype) {
-  case ANA_FLOAT:
+  case LUX_FLOAT:
     p.f = (Float *) gene;
     for (i = 0; i < nPar; i++) {
       if (isnan(*p.f++))
         return 1;
     }
     break;
-  case ANA_DOUBLE:
+  case LUX_DOUBLE:
     p.d = (Double *) gene;
     for (i = 0; i < nPar; i++) {
       if (isnan(*p.d++))
@@ -1086,7 +1086,7 @@ void calculate_distribution(Double *distr, Double *deviation, Int *rtoi,
   }
 }
 
-Int ana_geneticfit(Int narg, Int ps[])
+Int lux_geneticfit(Int narg, Int ps[])
 /* FIT2(x,y,START,fit [,mu,ngenerations,population,pcross,pmutate,vocal]
         [,/ELITE,/BYTE,/WORD,/LONG,/FLOAT,/DOUBLE]) */
 {
@@ -1119,34 +1119,34 @@ Int ana_geneticfit(Int narg, Int ps[])
   fitSym = stringpointer(string_value(iq), SP_USER_FUNC);
   if (fitSym < 0)
     return
-      anaerror("Sorry, fitting to interal functions is not yet implemented",
+      luxerror("Sorry, fitting to interal functions is not yet implemented",
             iq);
 
   if (symbolIsScalar(ps[2])) {
     nPar = int_arg(ps[2]);      /* nPar */
     if (nPar < 1)
-      return anaerror("A positive value is required for the number of parameters",
+      return luxerror("A positive value is required for the number of parameters",
                       ps[2]);
     start = NULL;
     switch (internalMode/2 & 7) {
     case 1:
-      partype = ANA_BYTE;
+      partype = LUX_BYTE;
       break;
     case 2: default:
-      partype = ANA_WORD;
+      partype = LUX_WORD;
       break;
     case 3:
-      partype = ANA_LONG;
+      partype = LUX_LONG;
       break;
     case 4:
-      partype = ANA_FLOAT;
+      partype = LUX_FLOAT;
       break;
     case 5:
-      partype = ANA_DOUBLE;
+      partype = LUX_DOUBLE;
       break;
     }
   } else if (symbolIsArray(ps[2])) { /* start values */
-    Int iq = ana_double(1, &ps[2]);
+    Int iq = lux_double(1, &ps[2]);
     nPar = array_size(iq);
     start = (Double *) array_data(iq);
     partype = symbol_type(iq);
@@ -1181,8 +1181,8 @@ Int ana_geneticfit(Int narg, Int ps[])
     if (nPopulation < 1)
       nPopulation = 1;
     /* we make sure that the population fills a number of ints exactly */
-    if (partype < ANA_LONG)
-      nPopulation += (nPopulation % (sizeof(Int)/ana_type_size[partype]));
+    if (partype < LUX_LONG)
+      nPopulation += (nPopulation % (sizeof(Int)/lux_type_size[partype]));
   } else
     nPopulation = 100;
 
@@ -1198,7 +1198,7 @@ Int ana_geneticfit(Int narg, Int ps[])
 
   if (!symbolIsNumericalArray(ps[0])) /* x */
     return cerror(NEED_NUM_ARR, ps[0]);
-  xSym = ana_double(1, ps);
+  xSym = lux_double(1, ps);
   if (isFreeTemp(xSym))
     symbol_context(xSym) = 1;   /* so it doesn't get prematurely deleted */
   nPoints = array_size(xSym);
@@ -1207,15 +1207,15 @@ Int ana_geneticfit(Int narg, Int ps[])
     return cerror(NEED_NUM_ARR, ps[1]);
   if (array_size(ps[1]) != nPoints)
     return cerror(INCMP_ARG, ps[1]);
-  ySym = ana_double(1, ps + 1);
+  ySym = lux_double(1, ps + 1);
   if (isFreeTemp(ySym))
     symbol_context(ySym) = 1;
 
   if (narg > 4 && (iq = ps[4])) { /* weights */
     Int n;
-    if (symbol_class(iq) != ANA_ARRAY)
+    if (symbol_class(iq) != LUX_ARRAY)
       return cerror(NEED_ARR, iq);
-    wSym = ana_double(1, &iq);
+    wSym = lux_double(1, &iq);
     n = array_size(wSym);
     if (n != nPoints)
       return cerror(INCMP_ARG, iq);
@@ -1235,7 +1235,7 @@ Int ana_geneticfit(Int narg, Int ps[])
   fitPar = array_scratch(partype, 1, &nPar);
   symbol_context(fitPar) = 1;   /* so it doesn't get prematurely deleted */
   par = array_data(fitPar);
-  typesize = ana_type_size[partype];
+  typesize = lux_type_size[partype];
   size = nPar*typesize;
 
   fitArg[0] = fitPar;
@@ -1244,7 +1244,7 @@ Int ana_geneticfit(Int narg, Int ps[])
   if (weights)
     fitArg[3] = wSym;
   fitTemp = nextFreeTempExecutable();
-  symbol_class(fitTemp) = ANA_USR_FUNC;
+  symbol_class(fitTemp) = LUX_USR_FUNC;
   usr_func_arguments(fitTemp) = fitArg;
   symbol_memory(fitTemp) = (weights? 4: 3)*sizeof(Word);
   usr_func_number(fitTemp) = fitSym;
@@ -1283,7 +1283,7 @@ Int ana_geneticfit(Int narg, Int ps[])
   for (i = 0; i < nPopulation; i++) {
     memcpy(par, genes + i*size, size);
     j = eval(fitTemp);          /* get deviation ("distance from goal") */
-    if (j == ANA_ERROR)         /* some error occurred */
+    if (j == LUX_ERROR)         /* some error occurred */
       goto geneticfit_1;
     deviation[i] = fabs(double_arg(j)); /* distance from goal */
     if (vocal) {
@@ -1479,13 +1479,13 @@ Int ana_geneticfit(Int narg, Int ps[])
       if (changed) { /* TODO: only reevaluate for the changed child, not both */
         memcpy(par, child1, size);
         j = eval(fitTemp);
-        if (j == ANA_ERROR)
+        if (j == LUX_ERROR)
           goto geneticfit_3;
         *deviation2++ = double_arg(j);
         zapTemp(j);
         memcpy(par, child2, size);
         j = eval(fitTemp);
-        if (j == ANA_ERROR)
+        if (j == LUX_ERROR)
           goto geneticfit_3;
         *deviation2++ = double_arg(j);
         zapTemp(j);
@@ -1578,6 +1578,6 @@ Int ana_geneticfit(Int narg, Int ps[])
     symbol_context(xSym) = -compileLevel;
   if (weights && symbol_context(wSym) == 1)
     symbol_context(wSym) = -compileLevel;
-  result = ANA_ERROR;
+  result = LUX_ERROR;
   goto geneticfit_2;
 }

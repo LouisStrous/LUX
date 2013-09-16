@@ -55,7 +55,7 @@ Int postreset(Int landscape)
  extern Int	psfile, updateBoundingBox;
 
  if (ipost == 0) {	/* check if already started up */
-   if (symbol_type(psfile) == ANA_TEMP_STRING)
+   if (symbol_type(psfile) == LUX_TEMP_STRING)
      fname = string_value(psfile);
    if (fname)
      fname = expand_name(fname, NULL);
@@ -64,7 +64,7 @@ Int postreset(Int landscape)
    postScriptFp = Fopen(fname, "w+");
    if (!postScriptFp) {
      printf("Can't open postscript file %s\n", fname? fname: "junk.eps");
-     return ANA_ERROR;
+     return LUX_ERROR;
    }
    ipost = 1;
    /* some preambles */
@@ -90,8 +90,8 @@ Int postreset(Int landscape)
 /*------------------------------------------------------------------------*/
 Int postpen(Int pen, Float gray)
 {
-  if (postreset(landscape) == ANA_ERROR) /* start up if not already */
-    return ANA_ERROR;
+  if (postreset(landscape) == LUX_ERROR) /* start up if not already */
+    return LUX_ERROR;
   if (nline) {
     fputs("\n", postScriptFp);
     fputs("S\n", postScriptFp);
@@ -121,8 +121,8 @@ Int postcolorpen(Float red, Float green, Float blue)
 /*------------------------------------------------------------------------*/
 Int postvec(Float xin, Float yin, Int mode)
 {
-  if (postreset(landscape) == ANA_ERROR) /* start up if not already */
-    return ANA_ERROR;
+  if (postreset(landscape) == LUX_ERROR) /* start up if not already */
+    return LUX_ERROR;
   xq = MAX(0, xin);
   xq = MIN(xq, 0.9998);
   yq = MAX(0, yin);
@@ -168,8 +168,8 @@ Int postcopy()
   if (!ipost) {			/* if the output file is not yet opened, */
 	/* then we don't need to generate an empty page with "showpage". */
 	/* LS 24oct95 */
-    if (postreset(landscape) == ANA_ERROR)/* start up if not already */
-      return ANA_ERROR;
+    if (postreset(landscape) == LUX_ERROR)/* start up if not already */
+      return LUX_ERROR;
   } else {
     fputs("\n", postScriptFp);
     icnt = 0;
@@ -186,8 +186,8 @@ Int postcopy()
 /*------------------------------------------------------------------------*/
 Int postrawout(char *s)
 {
-  if (postreset(landscape) == ANA_ERROR) /* start up if not already */
-    return ANA_ERROR;
+  if (postreset(landscape) == LUX_ERROR) /* start up if not already */
+    return LUX_ERROR;
   if (nline) {
     fputs(" stroke\n", postScriptFp);
     nline = icnt = 0;
@@ -207,14 +207,14 @@ Int postgray(char *barray, Int nx, Int ny, Float xbot, Float xtop, Float ybot,
     matrx[i] = 0;
   if (xbot > xtop || ybot > ytop) {
     printf("illegal image window\n");
-    return ANA_ERROR;
+    return LUX_ERROR;
   }
 
   /* ought to change !iorder stuff so that for !iorder = 0 the image on */
   /* paper is oriented the same was as on screen  LS 19jan95 */
 
-  if (postreset(landscape) == ANA_ERROR) /* start up if not already */
-    return ANA_ERROR;
+  if (postreset(landscape) == LUX_ERROR) /* start up if not already */
+    return LUX_ERROR;
   if (nline) {
     fputs(" stroke\n", postScriptFp);
     nline = icnt = 0;
@@ -307,14 +307,14 @@ Int postcolor(char *barray, Int nx, Int ny, Float xbot, Float xtop, Float ybot,
     matrx[i] = 0;
   if (xbot > xtop || ybot > ytop) {
     printf("illegal image window\n");
-    return ANA_ERROR;
+    return LUX_ERROR;
   }
 
   /* ought to change !iorder stuff so that for !iorder = 0 the image on */
   /* paper is oriented the same was as on screen  LS 19jan95 */
 
-  if (postreset(landscape) == ANA_ERROR) /* start up if not already */
-    return ANA_ERROR;
+  if (postreset(landscape) == LUX_ERROR) /* start up if not already */
+    return LUX_ERROR;
   if (nline) {
     fputs(" stroke\n", postScriptFp);
     nline = icnt = 0;
@@ -392,7 +392,7 @@ Int postcolor(char *barray, Int nx, Int ny, Float xbot, Float xtop, Float ybot,
     postYBot = ybot;
   if (ytop > postYTop)
     postYTop = ytop;
-  return ANA_OK;
+  return LUX_OK;
 }
 /*------------------------------------------------------------------------*/
 Int postrelease(Int narg, Int ps[])

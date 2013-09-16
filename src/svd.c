@@ -18,7 +18,7 @@ You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include <math.h>
-#include "anadefs.h"
+#include "luxdefs.h"
 #include "action.h"
 
 /* The following algorithm is due to Bryant Marks */
@@ -109,7 +109,7 @@ void SVD(Double *W, Double *Z, Int nRow, Int nCol)
 #endif
 }
 
-Int ana_svd(Int narg, Int ps[])
+Int lux_svd(Int narg, Int ps[])
 /* calculates the singular value decomposition of matrix A, such that */
 /* A = U S V' */
 /* SVD,A,U,S,V */
@@ -120,12 +120,12 @@ Int ana_svd(Int narg, Int ps[])
 
 /*  void SVD(Double *W, Double *Z, Int nRow, Int nCol) */
 
-  if (symbol_class(ps[0]) != ANA_ARRAY
+  if (symbol_class(ps[0]) != LUX_ARRAY
       || array_num_dims(ps[0]) != 2)
     return cerror(NEED_2D_ARR, ps[0]);
   d = array_dims(ps[0]);
   if (d[0] > d[1])
-    return anaerror("#columns > #rows in input matrix in SVD", ps[0]);
+    return luxerror("#columns > #rows in input matrix in SVD", ps[0]);
   a = (Double *) Malloc(d[0]*(d[1] + d[0])*sizeof(Double));
   if (!a)
     return cerror(ALLOC_ERR, 0);
@@ -133,27 +133,27 @@ Int ana_svd(Int narg, Int ps[])
   n = d[0]*d[1];
   src = array_data(ps[0]);
   switch (symbol_type(ps[0])) {
-    case ANA_BYTE:
+    case LUX_BYTE:
       while (n--)
 	*a++ = (Double) *src.b++;
       a -= n;
       break;
-    case ANA_WORD:
+    case LUX_WORD:
       while (n--)
 	*a++ = (Double) *src.w++;
       a -= n;
       break;
-    case ANA_LONG:
+    case LUX_LONG:
       while (n--)
 	*a++ = (Double) *src.l++;
       a -= n;
       break;
-    case ANA_FLOAT:
+    case LUX_FLOAT:
       while (n--)
 	*a++ = (Double) *src.f++;
       a -= n;
       break;
-    case ANA_DOUBLE:
+    case LUX_DOUBLE:
       while (n--)
 	*a++ = (Double) *src.d++;
       a -= n;
@@ -163,19 +163,19 @@ Int ana_svd(Int narg, Int ps[])
 
   if (ps[1])
     undefine(ps[1]);
-  ps[1] = array_scratch(ANA_DOUBLE, 2, d);
+  ps[1] = array_scratch(LUX_DOUBLE, 2, d);
   n = d[0]*d[1];
   memcpy(array_data(ps[1]), a, d[0]*d[1]);
 
   if (ps[2])
     undefine(ps[2]);
-  ps[2] = array_scratch(ANA_DOUBLE, 1, d + 1);
+  ps[2] = array_scratch(LUX_DOUBLE, 1, d + 1);
   memcpy(array_data(ps[2]), z, d[1]);
 
   if (ps[3])
     undefine(ps[3]);
   d[1] = d[0];
-  ps[3] = array_scratch(ANA_DOUBLE, 2, d);
+  ps[3] = array_scratch(LUX_DOUBLE, 2, d);
   memcpy(array_data(ps[3]), a + n, d[0]*d[0]);
   
   Free(a);

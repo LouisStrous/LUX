@@ -23,7 +23,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
-#include "anadefs.h"
+#include "luxdefs.h"
 #include "vsop.h"
 
 #if DONOTIGNORE

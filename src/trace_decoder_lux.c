@@ -39,7 +39,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include  <sys/stat.h>
 #include <strings.h>		/* for bzero */
 #include <string.h>		/* for memmove */
-#include "ana_structures.h"
+#include "lux_structures.h"
  /* for SGI only (?) */
 #if __sgi
 #include  <sys/types.h>
@@ -54,9 +54,9 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
  extern	struct sym_list		*subr_sym_list[];
  extern	Int	temp_base;
  extern	Int	edb_context;
- extern	Int	ana_float();
+ extern	Int	lux_float();
  extern	char *find_sym_name();
- extern	Int	ana_type_size[];
+ extern	Int	lux_type_size[];
  extern	Int	vfix_top, num_lux_subr, next_user_subr_num;
  extern	Float	float_arg();
  extern	Double	double_arg();
@@ -633,7 +633,7 @@ Int trace_scan(x, limit)
  /* a sanity check, limit the size */
  if ( (nx*ny) > 1048576) {
    printf("data size too large, must stop\n");
-   return ANA_ZERO;
+   return LUX_ZERO;
    }
 
  /* now get memory for the DCT result */
@@ -1101,7 +1101,7 @@ Int preload_q()
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_trace_decoder(narg,ps)	/* initial TRACE decompresser */
+Int lux_trace_decoder(narg,ps)	/* initial TRACE decompresser */
  /* image = trace_decoder(qt, ht, buf) */
  Int	narg, ps[];
  {
@@ -1126,7 +1126,7 @@ Int ana_trace_decoder(narg,ps)	/* initial TRACE decompresser */
  h = (struct ahead *) sym[iq].spec.array.ptr;
  buf = (Byte *) ((char *)h + sizeof(struct ahead));
  nd = h->ndim;
- limit = ana_type_size[sym[iq].type];
+ limit = lux_type_size[sym[iq].type];
  for (j=0;j<nd;j++) limit *= h->dims[j]; 		/* # of bytes */
  /* printf("limit = %d\n", limit); */
 
@@ -1174,7 +1174,7 @@ Int ana_trace_decoder(narg,ps)	/* initial TRACE decompresser */
  /* printf("qt[0] = %d, bcorrect = %d\n",qt[0], bcorrect); */
  /* and scan and decode */
  stat = trace_scan(buf, limit); /* dct setup in trace_scan */
- if (stat != 1) { printf("problem with trace_scan\n"); return ANA_ZERO; }
+ if (stat != 1) { printf("problem with trace_scan\n"); return LUX_ZERO; }
  if (n_unexpected)
    printf("restarts = %d, unexpected = %d\n", n_restarts_found, n_unexpected);
  
@@ -1201,7 +1201,7 @@ Int ana_trace_decoder(narg,ps)	/* initial TRACE decompresser */
 
  sym[i].spec.array.bstore = 128*nblocks + sizeof( struct ahead );
  stat = rdct(image, nx, ny, nblocks, qt, dct);
- if (stat != 1) { printf("problem with rdct\n"); return ANA_ZERO; }
+ if (stat != 1) { printf("problem with rdct\n"); return LUX_ZERO; }
 
  /* free(dct); */
  

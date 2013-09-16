@@ -57,7 +57,7 @@ If no <regex> is specified, then the last one is used again.
 
 */
 
-Int ana_regex(Int narg, Int ps[]) {
+Int lux_regex(Int narg, Int ps[]) {
   char *text, *regex;
   Int result, flags, i;
   static regex_t preg;
@@ -81,7 +81,7 @@ Int ana_regex(Int narg, Int ps[]) {
       char errbuf[256];
     
       size = regerror(result, &preg, errbuf, 256);
-      return anaerror("REGEX error: %s", -1, errbuf);
+      return luxerror("REGEX error: %s", -1, errbuf);
     }
     nmatch = countMatches(regex);
     pmatch = realloc(pmatch, nmatch*sizeof(regmatch_t));
@@ -90,15 +90,15 @@ Int ana_regex(Int narg, Int ps[]) {
       return cerror(ALLOC_ERR, -1);
     }
   } else if (!nmatch)
-    return anaerror("No regular expression was specified earlier", -1);
+    return luxerror("No regular expression was specified earlier", -1);
   result = regexec(&preg, text, nmatch, pmatch, 0);
   if (result) 			/* no match */
-    result = ANA_ZERO;
+    result = LUX_ZERO;
   else 
     if (nmatch > 1) {
       char **p;
 
-      result = array_scratch(ANA_STRING_ARRAY, 1, &nmatch);
+      result = array_scratch(LUX_STRING_ARRAY, 1, &nmatch);
       p = (char **) array_data(result);
       for (i = 0; i < nmatch; i++) {
 	if (pmatch[i].rm_so >= 0) {
@@ -123,8 +123,8 @@ Int ana_regex(Int narg, Int ps[]) {
 	
       len = pmatch[0].rm_eo - pmatch[0].rm_so;
       result = string_scratch(len);
-      if (result == ANA_ERROR)
-	return ANA_ERROR;
+      if (result == LUX_ERROR)
+	return LUX_ERROR;
       p = string_value(result);
       memcpy(p, text + pmatch[0].rm_so, len);
       p[len] = '\0';

@@ -34,7 +34,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <errno.h>
 #include "action.h"
 #include "editorcharclass.h"
-#include "anaparser.h"
+#include "luxparser.h"
 
 Int	ezffti(Int *, Float *), fade_xsize, fade_ysize, fade_dim[2];
 Int rffti(Int *, Float *);
@@ -85,7 +85,7 @@ Int evalString(char *expr, Int nmax)
    save = currentChar;		/* remember what we were interpreting before */
    currentChar = expr;
    n = 0;
-   type = ANA_BYTE;
+   type = LUX_BYTE;
    while (n < nmax) {
      while (!isNumberChar((Byte) *currentChar)
 	    && *currentChar) /* seek digit */
@@ -105,8 +105,8 @@ Int evalString(char *expr, Int nmax)
      n++;
    }
    if (n) {			/* got some numbers */
-     size = ana_type_size[type];
-     if (n == 1) {		/* only a single number: use ANA_SCALAR */
+     size = lux_type_size[type];
+     if (n == 1) {		/* only a single number: use LUX_SCALAR */
        result = scalar_scratch(type);
        p.b = &scalar_value(result).b + size; 
      } else {
@@ -122,7 +122,7 @@ Int evalString(char *expr, Int nmax)
        zap(temp);
      }
    } else
-     result = ANA_ZERO;		/* nothing found; return 0 */
+     result = LUX_ZERO;		/* nothing found; return 0 */
    currentChar = save;
    return result;
  }
@@ -133,10 +133,10 @@ Int evalString(char *expr, Int nmax)
  strcat(text, expr);
  result = compileString(text);
  free(text);
- return (result > 0)? copySym(tempSym): ANA_ERROR;
+ return (result > 0)? copySym(tempSym): LUX_ERROR;
 }
 /*------------------------------------------------------------------------- */
-Int ana_eval(Int narg, Int ps[])
+Int lux_eval(Int narg, Int ps[])
 /* evaluates a string argument.  If there is a single argument and that
    argument is a single name, then we seek the number of the symbol that
    has that name and return the number, if any.  Otherwise we return the
@@ -145,12 +145,12 @@ Int ana_eval(Int narg, Int ps[])
   Int	nmax, result;
   char	*expr, *p1, *p2, *p3, c;
   
-  if (symbol_class(*ps) != ANA_STRING)
+  if (symbol_class(*ps) != LUX_STRING)
     return *ps;
   if (narg > 1) {		/* read numbers */
     nmax = int_arg(ps[1]);
     if (nmax < 1)
-      return anaerror("Cannot read a negative number of values", ps[1]);
+      return luxerror("Cannot read a negative number of values", ps[1]);
   } else
     nmax = INT32_MAX;
   if (narg == 1 || internalMode & 1) /* /ALLNUMBER */
@@ -186,7 +186,7 @@ Int ana_eval(Int narg, Int ps[])
 				   and create it if necessary */
 	result = findVarName(p1, 0);
       free(p1);			/* don't need it anymore */
-      if (result != ANA_ERROR)
+      if (result != LUX_ERROR)
 	return result;
     }
   } 
@@ -196,7 +196,7 @@ Int ana_eval(Int narg, Int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-Int ana_tense(Int narg, Int ps[])			/* tense function */ 
+Int lux_tense(Int narg, Int ps[])			/* tense function */ 
 /* splines under tension */
 /* THE CALL IS  YF=TENSE(X,Y,XF,[SIGMA],[DLHS,DRHS]) */
 {
@@ -210,11 +210,11 @@ Int ana_tense(Int narg, Int ps[])			/* tense function */
 					/* first 3 args must be 1-D vectors */
   for (i=0;i<3;i++) {
     iq = ps[i];
-    if ( sym[iq].class != ANA_ARRAY ) return cerror(NEED_ARR, ps[i]);
+    if ( sym[iq].class != LUX_ARRAY ) return cerror(NEED_ARR, ps[i]);
     h = (array *) sym[iq].spec.array.ptr;
     if ( h->ndim != 1) return cerror(NEED_1D_ARR, ps[i]); 	/* ck if 1-D */
     /* Double each one */
-    iq = ana_double(1, &iq);
+    iq = lux_double(1, &iq);
     h = (array *) sym[iq].spec.array.ptr;
     len[i] = h->dims[0];
     p[i].l = (Int *) ((char *)h + sizeof(array));
@@ -240,7 +240,7 @@ Int ana_tense(Int narg, Int ps[])			/* tense function */
   if ( iq == 1) return result_sym; else return -1;
 }
 /*------------------------------------------------------------------------- */
-Int ana_tense_curve(Int narg, Int ps[])/* tense_curve function */
+Int lux_tense_curve(Int narg, Int ps[])/* tense_curve function */
 /* splines under tension */
 /* THE CALL IS  XY=TENSE_CURVE(X,Y,XS,[SIGMA],[DLHS,DRHS]) */
 {
@@ -269,7 +269,7 @@ if ( sym[iq].class != 4 ) return cerror(NEED_ARR, ps[i]);
 h = (array *) sym[iq].spec.array.ptr;
 if ( h->ndim != 1) return cerror(NEED_1D_ARR, ps[i]); 	/* ck if 1-D */
 						/* Double each one */
-iq = ana_double(1, &iq);
+iq = lux_double(1, &iq);
 h = (array *) sym[iq].spec.array.ptr;
 len[i] = h->dims[0];
 p[i].l = (Int *) ((char *)h + sizeof(array));
@@ -294,7 +294,7 @@ free( st);
 if ( iq == 1) return result_sym; else return -1;
 }
 /*------------------------------------------------------------------------- */
-Int ana_tense_loop(Int narg, Int ps[])/* tense_loop function */		
+Int lux_tense_loop(Int narg, Int ps[])/* tense_loop function */		
 /* generates spline under tension for any closed (x,y) curve */
 /* THE CALL IS  XY=TENSE_LOOP(X,Y,XS,[SIGMA]) */
 {
@@ -322,7 +322,7 @@ if ( sym[iq].class != 4 ) return cerror(NEED_ARR, ps[i]);
 h = (array *) sym[iq].spec.array.ptr;
 if ( h->ndim != 1) return cerror(NEED_1D_ARR, ps[i]); 	/* ck if 1-D */
 						/* Double each one */
-iq = ana_double(1, &iq);
+iq = lux_double(1, &iq);
 h = (array *) sym[iq].spec.array.ptr;
 len[i] = h->dims[0];
 p[i].l = (Int *) ((char *)h + sizeof(array));
@@ -346,7 +346,7 @@ free( st);
 if ( iq == 1) return result_sym; else return -1;
 }
 /*------------------------------------------------------------------------- */
-Int ana_sc(Int narg, Int ps[])	/* sc routine */		
+Int lux_sc(Int narg, Int ps[])	/* sc routine */		
 /* sine-cosine style FFT --  sc, x, s, c */
 {
   Int	iq, nd, outer, n, mq, dim[MAX_DIMS], type, jq, nn;
@@ -361,9 +361,9 @@ Int ana_sc(Int narg, Int ps[])	/* sc routine */
     return cerror(NEED_ARR, ps[0]);
   /*Float the input */
   if (fftdp == 0)		/* single precision */
-    iq = ana_float(1, ps);
+    iq = lux_float(1, ps);
   else				/* Double precision */
-    iq = ana_double(1, ps);
+    iq = lux_double(1, ps);
 
   q1.l = array_data(iq);
 
@@ -372,7 +372,7 @@ Int ana_sc(Int narg, Int ps[])	/* sc routine */
   n = array_dims(iq)[0];
   outer = array_size(iq)/n;
   memcpy(dim + 1, array_dims(iq)+ 1, (nd - 1)*sizeof(Int));
-  mq = array_size(iq)*ana_type_size[array_type(iq)];
+  mq = array_size(iq)*lux_type_size[array_type(iq)];
 
 	/* scratch storage is needed, can we use the last one setup ? */
   if (nold != n || fftdp != fftdpold || mq > mqold) {/* set up work space */
@@ -395,24 +395,24 @@ Int ana_sc(Int narg, Int ps[])	/* sc routine */
   dim[0] = nn;
   iq = ps[1];
   jq = ps[2];
-  type = (fftdp? ANA_DOUBLE: ANA_FLOAT);
+  type = (fftdp? LUX_DOUBLE: LUX_FLOAT);
   if (redef_array(iq, type, nd, dim) != 1
       || redef_array(jq, type, nd, dim) != 1)
-    return ANA_ERROR;
+    return LUX_ERROR;
 					/* get addresses */
   q2.l = array_data(iq);		/* <s> */
   q3.l = array_data(jq);		/* <c> */
 					/* loop over the outer dimensions */
   while (outer--) {
     switch (type) {
-      case ANA_FLOAT:
+      case LUX_FLOAT:
 	ezfftf(&n, q1.f, q3.f, q3.f + 1, q2.f + 1, work.f);
 	*q2.f = 0.0;		/* zero-frequency sine always equal to 0 */
 	q1.f += n;
 	q2.f += nn;
 	q3.f += nn;
 	break;
-      case ANA_DOUBLE:
+      case LUX_DOUBLE:
 	ezfftfd(&n, q1.d, q3.d, q3.d + 1, q2.d + 1, work.d);
 	*q2.d = 0.0;		/* zero-frequency sine always equal to 0 */
 	q1.d += n;
@@ -638,17 +638,17 @@ Int gsl_fft_expand(Double *sdata, size_t scount, size_t sstride,
   return 0;
 }
 /*------------------------------------------------------------------------- */
-Int ana_fft_expand(Int narg, Int ps[])
+Int lux_fft_expand(Int narg, Int ps[])
 {
   pointer *ptrs;
   loopInfo *infos;
   Int iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;i>D1;rD1", &ptrs, &infos)) < 0)
-    return ANA_ERROR;
+    return LUX_ERROR;
   Double factor = *ptrs[1].d;
   if (factor <= 0)
-    return anaerror("Need positive expansion factor", ps[1]);
+    return luxerror("Need positive expansion factor", ps[1]);
   
   Int ndim = infos[0].ndim;
   Int *dims = malloc(ndim*sizeof(Int));
@@ -656,7 +656,7 @@ Int ana_fft_expand(Int narg, Int ps[])
     return cerror(ALLOC_ERR, 0);
   memcpy(dims, infos[0].dims, ndim*sizeof(Int));
   dims[0] = (Int) (dims[0]*factor + 0.5);
-  standard_redef_array(iq, ANA_DOUBLE, ndim, dims, 0, NULL,
+  standard_redef_array(iq, LUX_DOUBLE, ndim, dims, 0, NULL,
 		       &ptrs[2], &infos[2]);
   free(dims);
   setAxes(&infos[0], 1, NULL, SL_EACHBLOCK);
@@ -676,7 +676,7 @@ REGISTER(fft_expand, f, FFTEXPAND, 2, 2, NULL);
 //#define SQRTHALF	M_SQRT1_2
 //#define SQRTWO		M_SQRT2
 /*------------------------------------------------------------------------- */
-Int ana_real(Int narg, Int ps[])
+Int lux_real(Int narg, Int ps[])
 /* returns the real part of the argument.  LS 17nov98 */
 {
   Int	iq, outtype, result, n;
@@ -687,23 +687,23 @@ Int ana_real(Int narg, Int ps[])
   if (!isComplexType(symbol_type(ps[0])))
     return ps[0];		/* nothing to do */
 
-  outtype = (symbol_type(ps[0]) == ANA_CFLOAT)? ANA_FLOAT: ANA_DOUBLE;
+  outtype = (symbol_type(ps[0]) == LUX_CFLOAT)? LUX_FLOAT: LUX_DOUBLE;
   
   iq = ps[0];
   switch (symbol_class(iq)) {
-    case ANA_SCAL_PTR:
+    case LUX_SCAL_PTR:
       value.cf = scal_ptr_pointer(iq).cf;
       result = scalar_scratch(outtype);
       trgt.b = &scalar_value(result).b;
       n = 1;
       break;
-    case ANA_CSCALAR:
+    case LUX_CSCALAR:
       value.cf = complex_scalar_data(iq).cf;
       result = scalar_scratch(outtype);
       trgt.b = &scalar_value(result).b;
       n = 1;
       break;
-    case ANA_CARRAY:
+    case LUX_CARRAY:
       value.v = array_data(iq);
       result = array_clone(iq, outtype);
       trgt.v = array_data(result);
@@ -712,11 +712,11 @@ Int ana_real(Int narg, Int ps[])
   }
 
   switch (outtype) {
-    case ANA_FLOAT:
+    case LUX_FLOAT:
       while (n--)
 	*trgt.f++ = value.cf++->real;
       break;
-    case ANA_DOUBLE:
+    case LUX_DOUBLE:
       while (n--)
 	*trgt.d++ = value.cd++->real;
       break;
@@ -724,7 +724,7 @@ Int ana_real(Int narg, Int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-Int ana_imaginary(Int narg, Int ps[])
+Int lux_imaginary(Int narg, Int ps[])
 /* returns the imaginary part of the argument.  LS 17nov98 */
 {
   Int	iq, outtype, result, n;
@@ -733,25 +733,25 @@ Int ana_imaginary(Int narg, Int ps[])
   if (!symbolIsNumerical(ps[0]))
     return cerror(ILL_CLASS, ps[0]);
   if (!isComplexType(symbol_type(ps[0])))
-    return ana_zero(1, &ps[0]);	/* no imaginary part */
+    return lux_zero(1, &ps[0]);	/* no imaginary part */
 
-  outtype = (symbol_type(ps[0]) == ANA_CFLOAT)? ANA_FLOAT: ANA_DOUBLE;
+  outtype = (symbol_type(ps[0]) == LUX_CFLOAT)? LUX_FLOAT: LUX_DOUBLE;
   
   iq = ps[0];
   switch (symbol_class(iq)) {
-    case ANA_SCAL_PTR:
+    case LUX_SCAL_PTR:
       value.cf = scal_ptr_pointer(iq).cf;
       result = scalar_scratch(outtype);
       trgt.b = &scalar_value(result).b;
       n = 1;
       break;
-    case ANA_CSCALAR:
+    case LUX_CSCALAR:
       value.cf = complex_scalar_data(iq).cf;
       result = scalar_scratch(outtype);
       trgt.b = &scalar_value(result).b;
       n = 1;
       break;
-    case ANA_CARRAY:
+    case LUX_CARRAY:
       value.v = array_data(iq);
       result = array_clone(iq, outtype);
       trgt.v = array_data(result);
@@ -760,11 +760,11 @@ Int ana_imaginary(Int narg, Int ps[])
   }
 
   switch (outtype) {
-    case ANA_FLOAT:
+    case LUX_FLOAT:
       while (n--)
 	*trgt.f++ = value.cf++->imaginary;
       break;
-    case ANA_DOUBLE:
+    case LUX_DOUBLE:
       while (n--)
 	*trgt.d++ = value.cd++->imaginary;
       break;
@@ -772,7 +772,7 @@ Int ana_imaginary(Int narg, Int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-Int ana_arg(Int narg, Int ps[])
+Int lux_arg(Int narg, Int ps[])
 /* returns the complex argument of the argument.  LS 17nov98 */
 {
   Int	iq, outtype, result, type, n;
@@ -782,30 +782,30 @@ Int ana_arg(Int narg, Int ps[])
     return cerror(ILL_CLASS, ps[0]);
 
   type = symbol_type(ps[0]);
-  outtype = (type == ANA_DOUBLE || symbol_type(ps[0]) == ANA_CDOUBLE)?
-    ANA_DOUBLE: ANA_FLOAT;
+  outtype = (type == LUX_DOUBLE || symbol_type(ps[0]) == LUX_CDOUBLE)?
+    LUX_DOUBLE: LUX_FLOAT;
   
   iq = ps[0];
   switch (symbol_class(iq)) {
-    case ANA_SCAL_PTR:
+    case LUX_SCAL_PTR:
       value.cf = scal_ptr_pointer(iq).cf;
       result = scalar_scratch(outtype);
       trgt.b = &scalar_value(result).b;
       n = 1;
       break;
-    case ANA_SCALAR:
+    case LUX_SCALAR:
       value.b = &scalar_value(iq).b;
       result = scalar_scratch(outtype);
       trgt.b = &scalar_value(result).b;
       n = 1;
       break;
-    case ANA_CSCALAR:
+    case LUX_CSCALAR:
       value.cf = complex_scalar_data(iq).cf;
       result = scalar_scratch(outtype);
       trgt.b = &scalar_value(result).b;
       n = 1;
       break;
-    case ANA_CARRAY: case ANA_ARRAY:
+    case LUX_CARRAY: case LUX_ARRAY:
       value.v = array_data(iq);
       result = array_clone(iq, outtype);
       trgt.v = array_data(result);
@@ -814,25 +814,25 @@ Int ana_arg(Int narg, Int ps[])
   }
 
   switch (outtype) {
-    case ANA_FLOAT:
+    case LUX_FLOAT:
       switch (type) {
-	case ANA_BYTE:
+	case LUX_BYTE:
 	  while (n--)
 	    *trgt.f++ = 0.0;
 	  break;
-	case ANA_WORD:
+	case LUX_WORD:
 	  while (n--)
 	    *trgt.f++ = (*value.w++ >= 0)? 0.0: M_PI;
 	  break;
-	case ANA_LONG:
+	case LUX_LONG:
 	  while (n--)
 	    *trgt.f++ = (*value.l++ >= 0)? 0.0: M_PI;
 	  break;
-	case ANA_FLOAT:
+	case LUX_FLOAT:
 	  while (n--)
 	    *trgt.f++ = (*value.f++ >= 0)? 0.0: M_PI;
 	  break;
-	case ANA_CFLOAT:
+	case LUX_CFLOAT:
 	  while (n--) {
 	    *trgt.f++ = atan2(value.cf->imaginary, value.cf->real);
 	    value.cf++;
@@ -840,29 +840,29 @@ Int ana_arg(Int narg, Int ps[])
 	  break;
       }
       break;
-    case ANA_DOUBLE:
+    case LUX_DOUBLE:
       switch (type) {
-	case ANA_BYTE:
+	case LUX_BYTE:
 	  while (n--)
 	    *trgt.d++ = 0.0;
 	  break;
-	case ANA_WORD:
+	case LUX_WORD:
 	  while (n--)
 	    *trgt.d++ = (*value.w++ >= 0)? 0.0: M_PI;
 	  break;
-	case ANA_LONG:
+	case LUX_LONG:
 	  while (n--)
 	    *trgt.d++ = (*value.l++ >= 0)? 0.0: M_PI;
 	  break;
-	case ANA_FLOAT:
+	case LUX_FLOAT:
 	  while (n--)
 	    *trgt.d++ = (*value.f++ >= 0)? 0.0: M_PI;
 	  break;
-	case ANA_DOUBLE:
+	case LUX_DOUBLE:
 	  while (n--)
 	    *trgt.d++ = (*value.d++ >= 0)? 0.0: M_PI;
 	  break;
-	case ANA_CDOUBLE:
+	case LUX_CDOUBLE:
 	  while (n--) {
 	    *trgt.d++ = atan2(value.cd->imaginary, value.cd->real);
 	    value.cd++;
@@ -874,15 +874,15 @@ Int ana_arg(Int narg, Int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-Int ana_complex(Int narg, Int ps[])
+Int lux_complex(Int narg, Int ps[])
 /* returns a complex version of the argument */
 {
   if (!symbolIsNumerical(ps[0]))
     return cerror(ILL_CLASS, ps[0]);
   if (isComplexType(symbol_type(ps[0])))
     return ps[0];		/* already done */
-  return (symbol_type(ps[0]) == ANA_DOUBLE)?
-    ana_cdouble(1, ps): ana_cfloat(1, ps);
+  return (symbol_type(ps[0]) == LUX_DOUBLE)?
+    lux_cdouble(1, ps): lux_cfloat(1, ps);
 }
 /*------------------------------------------------------------------------- */
 Int fftshift(Int narg, Int ps[], Int subroutine)
@@ -894,7 +894,7 @@ Int fftshift(Int narg, Int ps[], Int subroutine)
   scalar	v, factor;
   Int	rfftb(Int *, Float *, Float *), rfftf(Int *, Float *, Float *),
     rfftbd(Int *, Double *, Double *), rfftfd(Int *, Double *, Double *),
-    rffti(Int *, Float *), rfftid(Int *, Double *), ana_indgen(Int, Int *);
+    rffti(Int *, Float *), rfftid(Int *, Double *), lux_indgen(Int, Int *);
   loopInfo	srcinfo, trgtinfo;
 
   iq = ps[0];			/* <data> */
@@ -904,10 +904,10 @@ Int fftshift(Int narg, Int ps[], Int subroutine)
   if (subroutine) {
     type = symbol_type(iq);
     switch (type) {
-      case ANA_FLOAT:
+      case LUX_FLOAT:
 	fftdp = 0;
 	break;
-      case ANA_DOUBLE:
+      case LUX_DOUBLE:
 	fftdp = 1;
 	break;
       default:
@@ -916,20 +916,20 @@ Int fftshift(Int narg, Int ps[], Int subroutine)
   } else {
     /*Float the input */
     if (fftdp == 0) {		/* single precision */
-      iq = ana_float(1, ps);
-      type = ANA_FLOAT;
+      iq = lux_float(1, ps);
+      type = LUX_FLOAT;
     } else {			/* Double precision */
-      iq = ana_double(1, ps);
-      type = ANA_DOUBLE;
+      iq = lux_double(1, ps);
+      type = LUX_DOUBLE;
     }
   }
 
-  jq = ana_indgen(1, &ps[1]);	/* axes */
+  jq = lux_indgen(1, &ps[1]);	/* axes */
   
   if (subroutine) {
     if (standardLoop(iq, jq, SL_EACHROW, type,
 		     &srcinfo, &src, NULL, NULL, NULL) < 0)
-      return ANA_ERROR;
+      return LUX_ERROR;
     trgtinfo = srcinfo;
     trgt = src;
     trgtinfo.data = &trgt;
@@ -939,12 +939,12 @@ Int fftshift(Int narg, Int ps[], Int subroutine)
     if (standardLoop(iq, jq, SL_EACHROW, type,
 		     &srcinfo, &src, &result, &trgtinfo, &trgt) < 0)
       /* restore dimensional structure of iq, if necessary */
-      return ANA_ERROR;
+      return LUX_ERROR;
   }
 
-  if (numerical(ps[1], NULL, NULL, &ndist, NULL) == ANA_ERROR)
-    return ANA_ERROR;
-  numerical(((type == ANA_FLOAT)? ana_float: ana_double)(1, &ps[1]),
+  if (numerical(ps[1], NULL, NULL, &ndist, NULL) == LUX_ERROR)
+    return LUX_ERROR;
+  numerical(((type == LUX_FLOAT)? lux_float: lux_double)(1, &ps[1]),
 	    NULL, NULL, NULL, &dist);
 
   trgt0 = trgt;
@@ -960,7 +960,7 @@ Int fftshift(Int narg, Int ps[], Int subroutine)
       mq = mq/2;
     work.l = (Int *) realloc(work.l, mq);
     /* get space to store phase numbers */
-    j = (n/2)*ana_type_size[type];
+    j = (n/2)*lux_type_size[type];
     sines.f = malloc(j);
     cosines.f = malloc(j);
     if (!work.l || !sines.f || !cosines.f) {
@@ -974,7 +974,7 @@ Int fftshift(Int narg, Int ps[], Int subroutine)
     else
       rfftid(&n, work.d);
 
-    tmp.f = otmp.f = realloc(otmp.b, n*ana_type_size[type]);
+    tmp.f = otmp.f = realloc(otmp.b, n*lux_type_size[type]);
     if (tmp.f == NULL) {
       if (!subroutine)
 	zap(result);
@@ -990,7 +990,7 @@ Int fftshift(Int narg, Int ps[], Int subroutine)
     step = srcinfo.step[0];
 
     switch (type) {
-      case ANA_FLOAT:
+      case LUX_FLOAT:
 	if (*dist.f) {
 	  /* now calculate the phase factors */
 	  v.f = 2*M_PI*(*dist.f)/n;
@@ -1033,7 +1033,7 @@ Int fftshift(Int narg, Int ps[], Int subroutine)
 	  memcpy(trgt0.f, src0.f, array_size(iq)*sizeof(type));
 	dist.f++;
 	break;
-      case ANA_DOUBLE:
+      case LUX_DOUBLE:
 	if (*dist.d) {
 	  /* now calculate the phase factors */
 	  v.d = 2*M_PI*(*dist.d)/n;
@@ -1085,20 +1085,20 @@ Int fftshift(Int narg, Int ps[], Int subroutine)
   free(work.f);
   free(sines.f);
   free(cosines.f);
-  return subroutine? ANA_OK: result;
+  return subroutine? LUX_OK: result;
 }
 /*------------------------------------------------------------------------- */
-Int ana_fftshift(Int narg, Int ps[])
+Int lux_fftshift(Int narg, Int ps[])
 {
   return fftshift(narg, ps, 1);
 }
 /*------------------------------------------------------------------------- */
-Int ana_fftshift_f(Int narg, Int ps[])
+Int lux_fftshift_f(Int narg, Int ps[])
 {
   return fftshift(narg, ps, 0);
 }
 /*------------------------------------------------------------------------- */
-Int ana_power(Int narg, Int ps[])
+Int lux_power(Int narg, Int ps[])
 /* power function: POWER(data [,axis, /POWER, /SHAPE]) */
 {
   Int	iq, n, mq, type, j, jq, outDims[MAX_DIMS], result, step;
@@ -1115,22 +1115,22 @@ Int ana_power(Int narg, Int ps[])
 
   /*Float the input */
   if (fftdp == 0) {		/* single precision */
-    iq = ana_float(1, ps);
-    type = ANA_FLOAT;
+    iq = lux_float(1, ps);
+    type = LUX_FLOAT;
   } else {			/* Double precision */
-    iq = ana_double(1, ps);
-    type = ANA_DOUBLE;
+    iq = lux_double(1, ps);
+    type = LUX_DOUBLE;
   }
 
   if (narg > 1 && ps[1]) 	/* have <axis> */
     jq = ps[1];
   else				/* take the first axis */
-    jq = (internalMode & 4)? SL_TAKEONED: ANA_ZERO;
+    jq = (internalMode & 4)? SL_TAKEONED: LUX_ZERO;
   
   
   if (standardLoop(iq, jq, SL_EACHROW | SL_ONEAXIS, type,
 		   &srcinfo, &src, NULL, NULL, NULL) < 0)
-    return ANA_ERROR;
+    return LUX_ERROR;
   src0 = src;
 
   /* get result symbol */
@@ -1158,7 +1158,7 @@ Int ana_power(Int narg, Int ps[])
     else
       rfftid(&n, work.d);
 
-    tmp.f = otmp.f = realloc(otmp.b, n*ana_type_size[type]);
+    tmp.f = otmp.f = realloc(otmp.b, n*lux_type_size[type]);
     if (tmp.f == NULL) {
       zap(result);
       result = cerror(ALLOC_ERR, 0);
@@ -1167,7 +1167,7 @@ Int ana_power(Int narg, Int ps[])
 
     step = srcinfo.step[0];
     switch (type) {
-      case ANA_FLOAT:
+      case LUX_FLOAT:
 	factor.f = 2.0/n;
 	do {
 	  for (j = 0; j < n; j++) {
@@ -1200,7 +1200,7 @@ Int ana_power(Int narg, Int ps[])
 	  tmp.f = otmp.f;
 	} while (advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
-      case ANA_DOUBLE:
+      case LUX_DOUBLE:
 	factor.d = 2.0/n;
 	do {
 	  for (j = 0; j < n; j++) {
@@ -1242,7 +1242,7 @@ Int ana_power(Int narg, Int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-Int ana_scb(Int narg, Int ps[])	/* scb routine */		
+Int lux_scb(Int narg, Int ps[])	/* scb routine */		
 /* backwards sine-cosine style FFT --  scb, x, s, c */
 {
   Int	iq, nd, outer, nx, n, mq, dim[8], type, j, jq, outer2, nx2;
@@ -1255,15 +1255,15 @@ Int ana_scb(Int narg, Int ps[])	/* scb routine */
   iq = ps[1];
   jq = ps[2];
 					/* s and c must be arrays */
-  if (symbol_class(iq) != ANA_ARRAY
-      || symbol_class(jq) != ANA_ARRAY)
+  if (symbol_class(iq) != LUX_ARRAY
+      || symbol_class(jq) != LUX_ARRAY)
     return cerror(NEED_ARR, 0);
   if (!fftdp) {
-    iq = ana_float(1, &iq);
-    jq = ana_float(1, &jq);
+    iq = lux_float(1, &iq);
+    jq = lux_float(1, &jq);
   } else {
-    iq = ana_double(1, &iq);
-    jq = ana_double(1, &jq);
+    iq = lux_double(1, &iq);
+    jq = lux_double(1, &jq);
   }
 			/* s and c must have similar structures */
   q2.l = array_data(iq);
@@ -1277,11 +1277,11 @@ Int ana_scb(Int narg, Int ps[])	/* scb routine */
 
   /* the inner dimensions must agree and the product of the outers */
   if (nx != nx2 || outer != outer2)
-    return anaerror("SCB - sine and cosine arrays don't match", ps[1]);
+    return luxerror("SCB - sine and cosine arrays don't match", ps[1]);
   n = (nx - 1)*2;
 
   /* Because of the way the sine and cosine coefficients are stored by */
-  /* ana_sc, the results for an even number of data points have the */
+  /* lux_sc, the results for an even number of data points have the */
   /* same number of elements as the results for the next higher odd */
   /* number of data points.  If the number of data points is even, then */
   /* the highest sine component is equal to zero.  If the number of */
@@ -1290,7 +1290,7 @@ Int ana_scb(Int narg, Int ps[])	/* scb routine */
   /* to be just right for that.  Because also the user can specify */
   /* arbitrary values for the sine and cosine components, there really */
   /* is no way for us to figure out for sure if any given call to */
-  /* ana_scb is supposed to return an even or an odd number of data points. */
+  /* lux_scb is supposed to return an even or an odd number of data points. */
   /* We shall adopt the following rules:  if the user specified /ODD or */
   /* /EVEN, then we take that hint.  If the user specified neither /ODD */
   /* nor /EVEN, then we inspect the highest sine component (or components */
@@ -1330,7 +1330,7 @@ Int ana_scb(Int narg, Int ps[])	/* scb routine */
       break;
   }
 
-  mq = array_size(iq)*ana_type_size[iq];
+  mq = array_size(iq)*lux_type_size[iq];
   /* scratch storage is needed, can we use the last one setup ? */
   if (nold != n || fftdp != fftdpold || mq > mqold) {/* set up work space */
     if (nold)
@@ -1351,21 +1351,21 @@ Int ana_scb(Int narg, Int ps[])	/* scb routine */
   /* configure the output array */
   dim[0] = n;
   iq = ps[0];
-  type = fftdp? ANA_DOUBLE: ANA_FLOAT;
+  type = fftdp? LUX_DOUBLE: LUX_FLOAT;
   if (redef_array(iq, type, nd, dim) != 1)
-    return ANA_ERROR;
+    return LUX_ERROR;
 					/* get addresse */
   q1.l = array_data(iq);
   /* loop over the outer dimensions */
   while (outer--) {
     switch (type) {
-      case ANA_FLOAT:
+      case LUX_FLOAT:
 	ezfftb(&n, q1.f, q3.f, q3.f + 1, q2.f + 1, work.f);
 	q1.f += n;
 	q2.f += nx;
 	q3.f += nx;
 	break;
-      case ANA_DOUBLE:
+      case LUX_DOUBLE:
 	ezfftbd(&n, q1.d, q3.d, q3.d + 1, q2.d + 1, work.d);
 	q1.d += n;
 	q2.d += nx;
@@ -1376,29 +1376,29 @@ Int ana_scb(Int narg, Int ps[])	/* scb routine */
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int ana_histr(Int narg, Int ps[]) /* histr function */		
+Int lux_histr(Int narg, Int ps[]) /* histr function */		
 /* running sum histogram, normalized to 1.0 */
 {
   Int	iq, n, nd, j, type, size, nRepeat;
   Float	sum, fac;
   array	*h;
   pointer q1, q2;
-  Int	ana_hist(Int, Int []);
+  Int	lux_hist(Int, Int []);
 
 					/* first get a normal histogram */
-  if ( (iq = ana_hist(narg,ps) ) <= 0 ) return iq;
+  if ( (iq = lux_hist(narg,ps) ) <= 0 ) return iq;
 /* the returned symbol should be a long array, convert in place to a Float,
 	this depends on Float and long (Int) being 32 bits! */
 			/* check for some impossible errors */
-  if ( sym[iq].class != ANA_ARRAY ) {
+  if ( sym[iq].class != LUX_ARRAY ) {
     return cerror(IMPOSSIBLE, iq);}
   type = sym[iq].type;
-  if (type != ANA_LONG ) return cerror(IMPOSSIBLE, iq);
+  if (type != LUX_LONG ) return cerror(IMPOSSIBLE, iq);
   h = (array *) sym[iq].spec.array.ptr;
   q1.l = (Int *) ((char *)h + sizeof(array));
   nd = h->ndim;	n = 1;
   for(j=0;j<nd;j++) n *= h->dims[j];
-  sym[iq].type = ANA_FLOAT;		/* change to Float */
+  sym[iq].type = LUX_FLOAT;		/* change to Float */
   if (internalMode & 1)		/* along each 0th dimension */
   { size = h->dims[0];  nRepeat = n/size; }
   else
@@ -1434,7 +1434,7 @@ Int findint(Int current, Int *value, Int nValue)
   return -low - 1;
 }
 /*------------------------------------------------------------------------- */
-Int ana_hist_dense(Int narg, Int ps[])
+Int lux_hist_dense(Int narg, Int ps[])
 /* returns compact histogram for widely spaced data values. */
 /* HIST(x,l) returns list of present data values in <l> and corresponding */
 /* histogram as return value.  LS 18feb98 */
@@ -1444,8 +1444,8 @@ Int ana_hist_dense(Int narg, Int ps[])
   pointer	src;
   Int	findint(Int, Int *, Int);
 
-  if (numerical(ps[0], NULL, NULL, &nData, &src) == ANA_ERROR)
-    return ANA_ERROR;
+  if (numerical(ps[0], NULL, NULL, &nData, &src) == LUX_ERROR)
+    return LUX_ERROR;
   nStore = 512;
   avalue = (char *) malloc(nStore*sizeof(Int) + sizeof(array));
   afreq = (char *) malloc(nStore*sizeof(Int) + sizeof(array));
@@ -1457,19 +1457,19 @@ Int ana_hist_dense(Int narg, Int ps[])
   nValue = 0;
   while (nData--) {
     switch (symbol_type(ps[0])) {
-    case ANA_BYTE:
+    case LUX_BYTE:
       x = (Int) *src.b++;
       break;
-    case ANA_WORD:
+    case LUX_WORD:
       x = (Int) *src.w++;
       break;
-    case ANA_LONG:
+    case LUX_LONG:
       x = (Int) *src.l++;
       break;
-    case ANA_FLOAT:
+    case LUX_FLOAT:
       x = (Int) *src.f++;
       break;
-    case ANA_DOUBLE:
+    case LUX_DOUBLE:
       x = (Int) *src.d++;
       break;
     }
@@ -1499,8 +1499,8 @@ Int ana_hist_dense(Int narg, Int ps[])
     return cerror(ALLOC_ERR, 0);
 
   getFreeTempVariable(result);
-  symbol_class(result) = ANA_ARRAY;
-  array_type(result) = ANA_LONG;
+  symbol_class(result) = LUX_ARRAY;
+  array_type(result) = LUX_LONG;
   array_header(result) = (array *) afreq;
   array_num_dims(result) = 1;
   *array_dims(result) = nValue;
@@ -1509,8 +1509,8 @@ Int ana_hist_dense(Int narg, Int ps[])
   array_header(result)->facts = NULL;
   symbol_memory(result) = nValue*sizeof(Int) + sizeof(array);
 
-  symbol_class(ps[1]) = ANA_ARRAY;
-  array_type(ps[1]) = ANA_LONG;
+  symbol_class(ps[1]) = LUX_ARRAY;
+  array_type(ps[1]) = LUX_LONG;
   array_header(ps[1]) = (array *) avalue;
   array_num_dims(ps[1]) = 1;
   *array_dims(ps[1]) = nValue;
@@ -1522,7 +1522,7 @@ Int ana_hist_dense(Int narg, Int ps[])
   return result;
 }  
 /*------------------------------------------------------------------------- */
-Int ana_hist(Int narg, Int ps[]) /* histogram function */
+Int lux_hist(Int narg, Int ps[]) /* histogram function */
 				 /* (frequency distribution) */
 /* general histogram function */
 /* keyword /FIRST produces a histogram of all elements along the 0th */
@@ -1535,21 +1535,21 @@ Int ana_hist(Int narg, Int ps[]) /* histogram function */
   	ndim, axis, one = 1, size;
   array	*h;
   pointer q1, q2;
-  Int	ana_zero(Int, Int []);
+  Int	lux_zero(Int, Int []);
   void convertWidePointer(wideScalar *, Int, Int);
 
   if (narg == 2)
-    return ana_hist_dense(narg, ps);
+    return lux_hist_dense(narg, ps);
   iq = ps[0];
   switch (symbol_class(iq))
-  { case ANA_ARRAY:
+  { case LUX_ARRAY:
       type = array_type(iq);
       q1.l = array_data(iq);
       n = array_size(iq);
       dims = array_dims(iq);
       ndim = array_num_dims(iq);
       break;
-    case ANA_SCALAR:
+    case LUX_SCALAR:
       type = scalar_type(iq);
       q1.l = &scalar_value(iq).l;
       n = 1;
@@ -1562,8 +1562,8 @@ Int ana_hist(Int narg, Int ps[]) /* histogram function */
   /* always need the range */
   minmax( q1.l, n, type);
   /* get long (Int) versions of min and max */
-  convertPointer(&lastmin, type, ANA_LONG);
-  convertPointer(&lastmax, type, ANA_LONG);
+  convertPointer(&lastmin, type, LUX_LONG);
+  convertPointer(&lastmax, type, LUX_LONG);
   /* create a long array for results */
   histmin = lastmin.l;
   histmax = lastmax.l;
@@ -1587,14 +1587,14 @@ Int ana_hist(Int narg, Int ps[]) /* histogram function */
       maxhistsize = range;
     } else
       if (!(internalMode & 2)) /* no /IGNORELIMIT or /INCREASELIMIT */
-	return ANA_ERROR;
+	return LUX_ERROR;
   }
   axis = internalMode & 1;
   if (axis)
   { size = *dims;
     nRepeat = n/size;
     one = nRepeat*range;
-    result_sym = array_scratch(ANA_LONG, 1, &one);
+    result_sym = array_scratch(LUX_LONG, 1, &one);
     h = HEAD(result_sym);
     h->dims[0] = range;
     if (ndim > 1) memcpy(&h->dims[1], &dims[1], sizeof(Int)*(ndim - 1));
@@ -1606,24 +1606,24 @@ Int ana_hist(Int narg, Int ps[]) /* histogram function */
     result_sym = array_scratch(2, 1, &one);
     h = HEAD(result_sym); }
   q2.l = (Int *) ((char *)h + sizeof(array));
-  ana_zero( 1, &result_sym);		/* need to zero initially */
+  lux_zero( 1, &result_sym);		/* need to zero initially */
   /* now accumulate the distribution */
   while (nRepeat--)
   { n = size;
     switch (type)
-    { case ANA_BYTE:
+    { case LUX_BYTE:
 	while (n--)
 	{ i = *q1.b++ - histmin;  q2.l[i]++; }  break;
-      case ANA_WORD:
+      case LUX_WORD:
 	while (n--)
 	{ i = *q1.w++ - histmin;  q2.l[i]++; }  break;
-      case ANA_LONG:
+      case LUX_LONG:
 	while (n--)
 	{ i = *q1.l++ - histmin;  q2.l[i]++; }  break;
-      case ANA_FLOAT:
+      case LUX_FLOAT:
 	while (n--)
 	{ i = *q1.f++ - histmin;  q2.l[i]++; }  break;
-      case ANA_DOUBLE:
+      case LUX_DOUBLE:
 	while (n--)
 	{ i = *q1.d++ - histmin;  q2.l[i]++; }  break;
       }
@@ -1631,7 +1631,7 @@ Int ana_hist(Int narg, Int ps[]) /* histogram function */
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-Int ana_sieve(Int narg, Int ps[])
+Int lux_sieve(Int narg, Int ps[])
 /* X=SIEVE(array,condition), where condition is normally a logical array
    array and condition must both be arrays and condition must be at least
    as long as array 
@@ -1640,7 +1640,7 @@ Int ana_sieve(Int narg, Int ps[])
    12may92 LS:
    if <condition> does not contain non-zero elements, then a scalar -1 is
    returned.  alternate use: X=SIEVE(condition) yields the same as
-   X=SIEVE(ANA_LONG(INDGEN(condition)),condition) */ 
+   X=SIEVE(LUX_LONG(INDGEN(condition)),condition) */ 
 {
   Int	iq, n, nc, cnt, *p, type, typec, result_sym;
   pointer q1, q2, q3;
@@ -1648,18 +1648,18 @@ Int ana_sieve(Int narg, Int ps[])
   iq = ps[0];
   if (iq < 0)
     return iq;			/* pass-thru errors */
-  if (symbol_class(iq) == ANA_SCAL_PTR)
+  if (symbol_class(iq) == LUX_SCAL_PTR)
     iq = dereferenceScalPointer(iq);
   if (narg == 2) 			/* two-argument case */
 					/* first arg must be an array */
   { switch (symbol_class(iq))
-    { case ANA_SCAL_PTR:
+    { case LUX_SCAL_PTR:
 	iq = dereferenceScalPointer(iq);
-      case ANA_SCALAR:
+      case LUX_SCALAR:
 	q1.l = &scalar_value(iq).l;
 	n = 1;
 	break;
-      case ANA_ARRAY:
+      case LUX_ARRAY:
 	q1.l = (Int *) array_data(iq);
 	n = array_size(iq);
 	break;
@@ -1670,11 +1670,11 @@ Int ana_sieve(Int narg, Int ps[])
     iq = ps[1]; }
 
   switch (symbol_class(iq))
-  { case ANA_SCALAR:
+  { case LUX_SCALAR:
       nc = 1;			/*scalar case */
       p = &scalar_value(iq).l;
       break;
-    case ANA_ARRAY:		/*array case */
+    case LUX_ARRAY:		/*array case */
       p = (Int *) array_data(iq);
       nc = array_size(iq);
       break; }
@@ -1683,34 +1683,34 @@ Int ana_sieve(Int narg, Int ps[])
   /* use the min of size of array and conditional */
   if (narg == 1)
   { n = nc;
-    type = ANA_LONG; }
+    type = LUX_LONG; }
   else
     n = n <= nc ? n : nc;
   nc = n;
   cnt = 0;
   q3.l = p;
   switch (typec)
-  { case ANA_BYTE:
+  { case LUX_BYTE:
       while (nc--)
 	if (*q3.b++)
 	  cnt++;
       break;
-    case ANA_WORD:
+    case LUX_WORD:
       while (nc--)
 	if (*q3.w++)
 	  cnt++;
       break;
-    case ANA_LONG:
+    case LUX_LONG:
       while (nc--)
 	if (*q3.l++)
 	  cnt++;
       break;
-    case ANA_FLOAT:
+    case LUX_FLOAT:
       while (nc--)
 	if (*q3.f++)
 	  cnt++;
       break;
-    case ANA_DOUBLE:
+    case LUX_DOUBLE:
       while (nc--)
 	if (*q3.d++)
 	  cnt++;
@@ -1718,7 +1718,7 @@ Int ana_sieve(Int narg, Int ps[])
   q3.l = p;
  /* if count is zero, then no boolean TRUEs; return a scalar -1.  LS 12may92*/
   if (cnt == 0)
-  { result_sym = scalar_scratch(ANA_LONG);
+  { result_sym = scalar_scratch(LUX_LONG);
     scalar_value(result_sym).l = -1;
     return result_sym; }
   result_sym = array_scratch(type, 1, &cnt); /*for the result */
@@ -1727,31 +1727,31 @@ Int ana_sieve(Int narg, Int ps[])
   if (narg == 1)		/* one-argument case      LS 12may92 */
   { n = 0;			/* use as indgen counter */
     switch (typec)
-    { case ANA_BYTE:
+    { case LUX_BYTE:
 	while (nc--)
 	{ if (*q3.b++)
 	    *q2.l++ = n;
 	  n++; }
 	break;
-      case ANA_WORD:
+      case LUX_WORD:
 	while (nc--)
 	{ if (*q3.w++)
 	    *q2.l++ = n;
 	  n++; }
 	break;
-      case ANA_LONG:
+      case LUX_LONG:
 	while (nc--)
 	{ if (*q3.l++)
 	    *q2.l++ = n;
 	  n++; }
 	break;
-      case ANA_FLOAT:
+      case LUX_FLOAT:
 	while (nc--)
 	{ if (*q3.f++)
 	    *q2.l++ = n;
 	  n++; }
 	break;
-      case ANA_DOUBLE:
+      case LUX_DOUBLE:
 	while (nc--)
 	{ if (*q3.d++)
 	    *q2.l++ = n;
@@ -1761,165 +1761,165 @@ Int ana_sieve(Int narg, Int ps[])
   else				/* two-argument case */
     /* this is a 25 case situation */
     switch (typec) {
-    case ANA_BYTE:
+    case LUX_BYTE:
       switch (type)
-      { case ANA_BYTE:
+      { case LUX_BYTE:
 	  while (nc--)
 	  { if (*q3.b++)
 	      *q2.b++ = *q1.b;
 	    q1.b++; }
 	  break;
-	case ANA_WORD:
+	case LUX_WORD:
 	  while (nc--)
 	  { if (*q3.b++)
 	      *q2.w++ = *q1.w;
 	    q1.w++; }
 	  break;
-	case ANA_LONG:
+	case LUX_LONG:
 	  while (nc--)
 	  { if (*q3.b++)
 	      *q2.l++ = *q1.l;
 	    q1.l++; }
 	  break;
-	case ANA_FLOAT:
+	case LUX_FLOAT:
 	  while (nc--)
 	  { if (*q3.b++)
 	      *q2.f++ = *q1.f;
 	    q1.f++; }
 	  break;
-	case ANA_DOUBLE:
+	case LUX_DOUBLE:
 	  while (nc--)
 	  { if (*q3.b++)
 	      *q2.d++ = *q1.d;
 	    q1.d++; }
 	  break; }
       break;
-    case ANA_WORD:
+    case LUX_WORD:
       switch (type)
-      { case ANA_BYTE:
+      { case LUX_BYTE:
 	  while (nc--)
 	  { if (*q3.w++)
 	      *q2.b++ = *q1.b;
 	    q1.b++; }
 	  break;
-	case ANA_WORD:
+	case LUX_WORD:
 	  while (nc--)
 	  { if (*q3.w++)
 	      *q2.w++ = *q1.w;
 	    q1.w++; }
 	  break;
-	case ANA_LONG:
+	case LUX_LONG:
 	  while (nc--)
 	  { if (*q3.w++)
 	      *q2.l++ = *q1.l;
 	    q1.l++; }
 	  break;
-	case ANA_FLOAT:
+	case LUX_FLOAT:
 	  while (nc--)
 	  { if (*q3.w++)
 	      *q2.f++ = *q1.f;
 	    q1.f++; }
 	  break;
-	case ANA_DOUBLE:
+	case LUX_DOUBLE:
 	  while (nc--)
 	  { if (*q3.w++)
 	      *q2.d++ = *q1.d;
 	    q1.d++; }
 	  break; }
       break;
-    case ANA_LONG:
+    case LUX_LONG:
       switch (type) 
-      { case ANA_BYTE:
+      { case LUX_BYTE:
 	  while (nc--)
 	  { if (*q3.l++)
 	      *q2.b++ = *q1.b;
 	    q1.b++; }
 	  break;
-	case ANA_WORD:
+	case LUX_WORD:
 	  while (nc--)
 	  { if (*q3.l++)
 	      *q2.w++ = *q1.w;
 	    q1.w++; }
 	  break;
-	case ANA_LONG:
+	case LUX_LONG:
 	  while (nc--)
 	  { if (*q3.l++)
 	      *q2.l++ = *q1.l;
 	    q1.l++; }
 	  break;
-	case ANA_FLOAT:
+	case LUX_FLOAT:
 	  while (nc--)
 	  { if (*q3.l++)
 	      *q2.f++ = *q1.f;
 	    q1.f++; }
 	  break;
-	case ANA_DOUBLE:
+	case LUX_DOUBLE:
 	  while (nc--)
 	  { if (*q3.l++)
 	      *q2.d++ = *q1.d;
 	    q1.d++; }
 	  break; }
       break;
-    case ANA_FLOAT:
+    case LUX_FLOAT:
       switch (type) 
-      { case ANA_BYTE:
+      { case LUX_BYTE:
 	  while (nc--)
 	  { if (*q3.f++)
 	      *q2.b++ = *q1.b;
 	    q1.b++; }
 	  break;
-	case ANA_WORD:
+	case LUX_WORD:
 	  while (nc--)
 	  { if (*q3.f++)
 	      *q2.w++ = *q1.w;
 	    q1.w++; }
 	  break;
-	case ANA_LONG:
+	case LUX_LONG:
 	  while (nc--)
 	  { if (*q3.f++)
 	      *q2.l++ = *q1.l;
 	    q1.l++; }
 	  break;
-	case ANA_FLOAT:
+	case LUX_FLOAT:
 	  while (nc--)
 	  { if (*q3.f++)
 	      *q2.f++ = *q1.f;
 	    q1.f++; }
 	  break;
-	case ANA_DOUBLE:
+	case LUX_DOUBLE:
 	  while (nc--)
 	  { if (*q3.f++)
 	      *q2.d++ = *q1.d;
 	    q1.d++; }
 	  break; }
       break;
-    case ANA_DOUBLE:
+    case LUX_DOUBLE:
       switch (type) 
-      { case ANA_BYTE:
+      { case LUX_BYTE:
 	  while (nc--)
 	  { if (*q3.d++)
 	      *q2.b++ = *q1.b;
 	    q1.b++; }
 	  break;
-	case ANA_WORD:
+	case LUX_WORD:
 	  while (nc--)
 	  { if (*q3.d++)
 	      *q2.w++ = *q1.w;
 	    q1.w++; }
 	  break;
-	case ANA_LONG:
+	case LUX_LONG:
 	  while (nc--)
 	  { if (*q3.d++)
 	      *q2.l++ = *q1.l;
 	    q1.l++; }
 	  break;
-	case ANA_FLOAT:
+	case LUX_FLOAT:
 	  while (nc--)
 	  { if (*q3.d++)
 	      *q2.f++ = *q1.f;
 	    q1.f++; }
 	  break;
-	case ANA_DOUBLE:
+	case LUX_DOUBLE:
 	  while (nc--)
 	  { if (*q3.d++)
 	      *q2.d++ = *q1.d;
@@ -1929,7 +1929,7 @@ Int ana_sieve(Int narg, Int ps[])
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-Int ana_maxf(Int narg, Int ps[])
+Int lux_maxf(Int narg, Int ps[])
 				/* finds the max element in an array */
 {
   Int	maxormin(Int, Int [], Int);
@@ -1947,31 +1947,31 @@ Int index_maxormin(Int source, Int indices, Int code)
   src.l = array_data(source);
   nElem = array_size(source);
   type = array_type(source);
-  indices2 = ana_long(1, &indices);
+  indices2 = lux_long(1, &indices);
   indx = array_data(indices2);
   nIndx = array_size(indices2);
   if (nIndx != nElem)
     return cerror(INCMP_ARR, indices);
   /* find min and max of indices so we can create a result array of the */
   /* correct size */
-  minmax(indx, nIndx, ANA_LONG);
+  minmax(indx, nIndx, LUX_LONG);
   /* use offset so we can treat negative indices */
   size = lastmax.l + 1;
   offset = 0;
   if (lastmin.l < 0)
     size += (offset = -lastmin.l);
-  result = array_scratch(code < 2? type: ANA_LONG, 1, &size);
+  result = array_scratch(code < 2? type: LUX_LONG, 1, &size);
   /* make trgt.b point to the element associated with index zero */
-  trgt.b = (Byte *) array_data(result) + offset*ana_type_size[array_type(result)];
+  trgt.b = (Byte *) array_data(result) + offset*lux_type_size[array_type(result)];
   /* Initialize result to zero */
-  zerobytes(array_data(result), size*ana_type_size[array_type(result)]);
+  zerobytes(array_data(result), size*lux_type_size[array_type(result)]);
   /* use "any" as an array of flags indicating if any number has been */
   /* put in the corresponding result element so far */
   allocate(any, size, char);
   zerobytes(any, size);		/* initialize to empty */
   any += offset;		/* in case of negative indices */
   switch (type) {
-    case ANA_BYTE:
+    case LUX_BYTE:
       for (i = 0; i < nIndx; i++)
 	switch (code) {
 	  case 0: /* maxf */
@@ -2016,7 +2016,7 @@ Int index_maxormin(Int source, Int indices, Int code)
 	    break;
 	}
       break;
-    case ANA_WORD:
+    case LUX_WORD:
       for (i = 0; i < nIndx; i++)
 	switch (code) {
 	  case 0: /* maxf */
@@ -2061,7 +2061,7 @@ Int index_maxormin(Int source, Int indices, Int code)
 	    break;
 	}
       break;
-    case ANA_LONG:
+    case LUX_LONG:
       for (i = 0; i < nIndx; i++)
 	switch (code) {
 	  case 0: /* maxf */
@@ -2106,7 +2106,7 @@ Int index_maxormin(Int source, Int indices, Int code)
 	    break;
 	}
       break;
-    case ANA_FLOAT:
+    case LUX_FLOAT:
       for (i = 0; i < nIndx; i++)
 	switch (code) {
 	  case 0: /* maxf */
@@ -2151,7 +2151,7 @@ Int index_maxormin(Int source, Int indices, Int code)
 	    break;
 	}
       break;
-    case ANA_DOUBLE:
+    case LUX_DOUBLE:
       for (i = 0; i < nIndx; i++)
 	switch (code) {
 	  case 0: /* maxf */
@@ -2196,7 +2196,7 @@ Int index_maxormin(Int source, Int indices, Int code)
 	    break;
 	}
       break;
-    case ANA_CFLOAT:
+    case LUX_CFLOAT:
       for (i = 0; i < nIndx; i++)
 	switch (code) {
 	  case 0: /* maxf */
@@ -2241,7 +2241,7 @@ Int index_maxormin(Int source, Int indices, Int code)
 	    break;
 	}
       break;
-    case ANA_CDOUBLE:
+    case LUX_CDOUBLE:
       for (i = 0; i < nIndx; i++)
 	switch (code) {
 	  case 0: /* maxf */
@@ -2313,20 +2313,20 @@ Int maxormin(Int narg, Int ps[], Int code)
 
   mode = SL_UNIQUEAXES | SL_COMPRESSALL | SL_AXESBLOCK;
   if (code & 2)			/* seek location */
-    mode |= SL_EXACT;		/* output must be exactly ANA_LONG */
+    mode |= SL_EXACT;		/* output must be exactly LUX_LONG */
   else
     mode |= SL_KEEPTYPE;	/* output must be same type as input */
   if (internalMode & 1)		/* /KEEPDIMS */
     mode |= SL_ONEDIMS;
 
-  if (standardLoop(ps[0], narg > 1? ps[1]: 0, mode, ANA_LONG, &srcinfo,
-		   &src, &result, &trgtinfo, &trgt) == ANA_ERROR)
-    return ANA_ERROR;
+  if (standardLoop(ps[0], narg > 1? ps[1]: 0, mode, LUX_LONG, &srcinfo,
+		   &src, &result, &trgtinfo, &trgt) == LUX_ERROR)
+    return LUX_ERROR;
 
   n1 = srcinfo.naxes? srcinfo.naxes: 1;
 
   switch (srcinfo.type) {
-    case ANA_BYTE:
+    case LUX_BYTE:
       do {
 	/* take first value as initial values */
 	memcpy(&min, src.b, srcinfo.stride);
@@ -2357,7 +2357,7 @@ Int maxormin(Int narg, Int ps[], Int code)
 	}
       } while (n < srcinfo.rndim);
       break;
-    case ANA_WORD:
+    case LUX_WORD:
       do {
 	/* take first value as initial values */
 	memcpy(&min, src.w, srcinfo.stride);
@@ -2388,7 +2388,7 @@ Int maxormin(Int narg, Int ps[], Int code)
 	}
       } while (n < srcinfo.rndim);
       break;
-    case ANA_LONG:
+    case LUX_LONG:
       do {
 	/* take first value as initial values */
 	memcpy(&min, src.l, srcinfo.stride);
@@ -2419,7 +2419,7 @@ Int maxormin(Int narg, Int ps[], Int code)
 	}
       } while (n < srcinfo.rndim);
       break;
-    case ANA_FLOAT:
+    case LUX_FLOAT:
       do {
 	/* take first value as initial values */
 	memcpy(&min, src.f, srcinfo.stride);
@@ -2450,7 +2450,7 @@ Int maxormin(Int narg, Int ps[], Int code)
 	}
       } while (n < srcinfo.rndim);
       break;
-    case ANA_DOUBLE:
+    case LUX_DOUBLE:
       do {
 	/* take first value as initial values */
 	memcpy(&min, src.d, srcinfo.stride);
@@ -2481,7 +2481,7 @@ Int maxormin(Int narg, Int ps[], Int code)
 	}
       } while (n < srcinfo.rndim);
       break;
-    case ANA_CFLOAT:
+    case LUX_CFLOAT:
       /* we compare based on the absolute value */
       do {
 	/* take first value as initial values */
@@ -2517,7 +2517,7 @@ Int maxormin(Int narg, Int ps[], Int code)
       max.f = sqrt(max.f);
       min.f = sqrt(min.f);
       break;
-    case ANA_CDOUBLE:
+    case LUX_CDOUBLE:
       /* we compare based on the absolute value */
       do {
 	/* take first value as initial values */
@@ -2566,20 +2566,20 @@ Int maxormin(Int narg, Int ps[], Int code)
   return result;
 }
 /*------------------------------------------------------------------------- */
-Int ana_minf(Int narg, Int ps[])
+Int lux_minf(Int narg, Int ps[])
 				/* finds the min element in an array */
 {
   return maxormin(narg, ps, 1);
 }
 /*------------------------------------------------------------------------- */
-Int ana_minloc(narg,ps)
+Int lux_minloc(narg,ps)
 				/* finds the min element in an array */
 Int	narg, ps[];
 {
 return maxormin(narg, ps, 3);
 }
 /*------------------------------------------------------------------------- */
-Int ana_maxloc(narg,ps)
+Int lux_maxloc(narg,ps)
 				/* finds the max element in an array */
 Int	narg, ps[];
 {
@@ -2600,7 +2600,7 @@ void scale(pointer data, Byte type, Int size, Double datalow, Double datahigh,
 #if HAVE_LIBX11
   extern Int	colorIndexType;
 #else
-  Int	colorIndexType = ANA_BYTE;
+  Int	colorIndexType = LUX_BYTE;
 #endif
 
   trgt.b = dest;
@@ -2612,11 +2612,11 @@ void scale(pointer data, Byte type, Int size, Double datalow, Double datahigh,
   dfac = (trgthigh - trgtlow)/drange;
 
   switch (type) {
-    case ANA_BYTE:
+    case LUX_BYTE:
       ffac = (Float) dfac;
       foff = trgtlow - datalow*ffac;
       switch (colorIndexType) {
-	case ANA_BYTE:
+	case LUX_BYTE:
 	  while (size--) {
 	    if (*data.b < datalow)
 	      *trgt.b++ = trgtlow;
@@ -2627,7 +2627,7 @@ void scale(pointer data, Byte type, Int size, Double datalow, Double datahigh,
 	    data.b++;
 	  }
 	  break;
-	case ANA_WORD:
+	case LUX_WORD:
 	  while (size--) {
 	    if (*data.b < datalow)
 	      *trgt.w++ = trgtlow;
@@ -2638,7 +2638,7 @@ void scale(pointer data, Byte type, Int size, Double datalow, Double datahigh,
 	    data.b++;
 	  }
 	  break;
-	case ANA_LONG:
+	case LUX_LONG:
 	  while (size--) {
 	    if (*data.b < datalow)
 	      *trgt.l++ = trgtlow;
@@ -2651,11 +2651,11 @@ void scale(pointer data, Byte type, Int size, Double datalow, Double datahigh,
 	  break;
       }
       break;
-    case ANA_WORD:
+    case LUX_WORD:
       ffac = (Float) dfac;
       foff = trgtlow - datalow*ffac;
       switch (colorIndexType) {
-	case ANA_BYTE:
+	case LUX_BYTE:
 	  while (size--) {
 	    if (*data.w < datalow)
 	      *trgt.b++ = trgtlow;
@@ -2666,7 +2666,7 @@ void scale(pointer data, Byte type, Int size, Double datalow, Double datahigh,
 	    data.w++;
 	  }
 	  break;
-	case ANA_WORD:
+	case LUX_WORD:
 	  while (size--) {
 	    if (*data.w < datalow)
 	      *trgt.w++ = trgtlow;
@@ -2677,7 +2677,7 @@ void scale(pointer data, Byte type, Int size, Double datalow, Double datahigh,
 	    data.w++;
 	  }
 	  break;
-	case ANA_LONG:
+	case LUX_LONG:
 	  while (size--) {
 	    if (*data.w < datalow)
 	      *trgt.l++ = trgtlow;
@@ -2690,11 +2690,11 @@ void scale(pointer data, Byte type, Int size, Double datalow, Double datahigh,
 	  break;
       }
       break;
-    case ANA_LONG:
+    case LUX_LONG:
       ffac = (Float) dfac;
       foff = trgtlow - datalow*ffac;
       switch (colorIndexType) {
-	case ANA_BYTE:
+	case LUX_BYTE:
 	  while (size--) {
 	    if (*data.l < datalow)
 	      *trgt.b++ = trgtlow;
@@ -2705,7 +2705,7 @@ void scale(pointer data, Byte type, Int size, Double datalow, Double datahigh,
 	    data.l++;
 	  }
 	  break;
-	case ANA_WORD:
+	case LUX_WORD:
 	  while (size--) {
 	    if (*data.l < datalow)
 	      *trgt.w++ = trgtlow;
@@ -2716,7 +2716,7 @@ void scale(pointer data, Byte type, Int size, Double datalow, Double datahigh,
 	    data.l++;
 	  }
 	  break;
-	case ANA_LONG:
+	case LUX_LONG:
 	  while (size--) {
 	    if (*data.l < datalow)
 	      *trgt.l++ = trgtlow;
@@ -2729,11 +2729,11 @@ void scale(pointer data, Byte type, Int size, Double datalow, Double datahigh,
 	  break;
       }
       break;
-    case ANA_FLOAT:
+    case LUX_FLOAT:
       ffac = (Float) dfac;
       foff = trgtlow - datalow*ffac;
       switch (colorIndexType) {
-	case ANA_BYTE:
+	case LUX_BYTE:
 	  while (size--) {
 	    if (*data.f < datalow)
 	      *trgt.b++ = trgtlow;
@@ -2744,7 +2744,7 @@ void scale(pointer data, Byte type, Int size, Double datalow, Double datahigh,
 	    data.f++;
 	  }
 	  break;
-	case ANA_WORD:
+	case LUX_WORD:
 	  while (size--) {
 	    if (*data.f < datalow)
 	      *trgt.w++ = trgtlow;
@@ -2755,7 +2755,7 @@ void scale(pointer data, Byte type, Int size, Double datalow, Double datahigh,
 	    data.f++;
 	  }
 	  break;
-	case ANA_LONG:
+	case LUX_LONG:
 	  while (size--) {
 	    if (*data.f < datalow)
 	      *trgt.l++ = trgtlow;
@@ -2768,10 +2768,10 @@ void scale(pointer data, Byte type, Int size, Double datalow, Double datahigh,
 	  break;
       }
       break;
-    case ANA_DOUBLE:
+    case LUX_DOUBLE:
       doff = trgtlow - datalow*dfac;
       switch (colorIndexType) {
-	case ANA_BYTE:
+	case LUX_BYTE:
 	  while (size--) {
 	    if (*data.d < datalow)
 	      *trgt.b++ = trgtlow;
@@ -2782,7 +2782,7 @@ void scale(pointer data, Byte type, Int size, Double datalow, Double datahigh,
 	    data.d++;
 	  }
 	  break;
-	case ANA_WORD:
+	case LUX_WORD:
 	  while (size--) {
 	    if (*data.d < datalow)
 	      *trgt.b++ = trgtlow;
@@ -2793,7 +2793,7 @@ void scale(pointer data, Byte type, Int size, Double datalow, Double datahigh,
 	    data.d++;
 	  }
 	  break;
-	case ANA_LONG:
+	case LUX_LONG:
 	  while (size--) {
 	    if (*data.d < datalow)
 	      *trgt.b++ = trgtlow;
@@ -2809,7 +2809,7 @@ void scale(pointer data, Byte type, Int size, Double datalow, Double datahigh,
   }
 }
 /*------------------------------------------------------------------------- */
-Int ana_scale(Int narg, Int ps[])
+Int lux_scale(Int narg, Int ps[])
 /* scale an array to the range (!scalemin,!scalemax) and put into an array */
 /* of the smallest data type that can fit any allowed color cell index  */
 /* add keyword /FULLRANGE: scale between 0 and the greatest color */
@@ -2824,11 +2824,11 @@ Int ana_scale(Int narg, Int ps[])
   extern Int	threeColors;
   extern Int	colorIndexType, display_cells;
 #else
-  Int	colorIndexType = ANA_BYTE, display_cells = 256;
+  Int	colorIndexType = LUX_BYTE, display_cells = 256;
 #endif
 
   iq = ps[0];
-  if (symbol_class(iq) != ANA_ARRAY)
+  if (symbol_class(iq) != LUX_ARRAY)
     return cerror(NEED_ARR, iq);
   type = array_type(iq);
   q1.l = array_data(iq);
@@ -2865,7 +2865,7 @@ Int ana_scale(Int narg, Int ps[])
       max.d = zoom_chi;
     } else
 #endif
-      if (type == ANA_DOUBLE) { /* array is Double, get input as Double */
+      if (type == LUX_DOUBLE) { /* array is Double, get input as Double */
 	min.d = double_arg(ps[1]);
 	max.d = double_arg(ps[2]);
       } else {
@@ -2895,7 +2895,7 @@ Int ana_scale(Int narg, Int ps[])
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-Int ana_scalerange(Int narg, Int ps[])
+Int lux_scalerange(Int narg, Int ps[])
 /* scale an array and put in BYTE result 
    SCALERANGE(<data>, <lowgrey>, <higrey> [, <lowvalue>, <hivalue>, /BYTE,
               /ZOOM])
@@ -2920,11 +2920,11 @@ Int ana_scalerange(Int narg, Int ps[])
   extern Int	threeColors;
   extern Int	colorIndexType, display_cells;
 #else
-  Int	colorIndexType = ANA_BYTE, display_cells = 256;
+  Int	colorIndexType = LUX_BYTE, display_cells = 256;
 #endif
 
   iq = ps[0];
-  if (symbol_class(iq) != ANA_ARRAY)
+  if (symbol_class(iq) != LUX_ARRAY)
     return cerror(NEED_ARR, iq);
   logrey = double_arg(ps[1]);
   higrey = double_arg(ps[2]);
@@ -2974,7 +2974,7 @@ Int ana_scalerange(Int narg, Int ps[])
       max.d = zoom_chi;
     } else
 #endif
-      if (type == ANA_DOUBLE) { /* array is Double, get input as Double */
+      if (type == LUX_DOUBLE) { /* array is Double, get input as Double */
 	min.d = double_arg(ps[3]);
 	max.d = double_arg(ps[4]);
       } else {
@@ -3016,7 +3016,7 @@ Int minmax(Int *p, Int n, Int type)
   nc = n - 1;
   minloc = maxloc = (Byte *) p;
   switch (type) {
-    case ANA_BYTE:
+    case LUX_BYTE:
       min.b = max.b = *q.b++;
       while (nc--) {
 	if (*q.b > max.b) {
@@ -3030,9 +3030,9 @@ Int minmax(Int *p, Int n, Int type)
       }
       lastmin.b = min.b;
       lastmax.b = max.b;
-      scalar_type(lastmin_sym) = scalar_type(lastmax_sym) = ANA_BYTE;
+      scalar_type(lastmin_sym) = scalar_type(lastmax_sym) = LUX_BYTE;
       break;
-    case ANA_WORD:
+    case LUX_WORD:
       min.w = max.w = *q.w++;
       while (nc--) {
 	if (*q.w > max.w) {
@@ -3046,9 +3046,9 @@ Int minmax(Int *p, Int n, Int type)
       }
       lastmin.w = min.w;
       lastmax.w = max.w;
-      scalar_type(lastmin_sym) = scalar_type(lastmax_sym) = ANA_WORD;
+      scalar_type(lastmin_sym) = scalar_type(lastmax_sym) = LUX_WORD;
       break;
-    case ANA_LONG:
+    case LUX_LONG:
       min.l = max.l = *q.l++;
       while (nc--) {
 	if (*q.l > max.l) {
@@ -3062,9 +3062,9 @@ Int minmax(Int *p, Int n, Int type)
       }
       lastmin.l = min.l;
       lastmax.l = max.l;
-      scalar_type(lastmin_sym) = scalar_type(lastmax_sym) = ANA_LONG;
+      scalar_type(lastmin_sym) = scalar_type(lastmax_sym) = LUX_LONG;
       break;
-    case ANA_FLOAT:
+    case LUX_FLOAT:
       min.f = max.f = *q.f++;
       while (nc--) {
 	if (*q.f > max.f) {
@@ -3078,9 +3078,9 @@ Int minmax(Int *p, Int n, Int type)
       }
       lastmin.f = min.f;
       lastmax.f = max.f;
-      scalar_type(lastmin_sym) = scalar_type(lastmax_sym) = ANA_FLOAT;
+      scalar_type(lastmin_sym) = scalar_type(lastmax_sym) = LUX_FLOAT;
       break;
-    case ANA_DOUBLE:
+    case LUX_DOUBLE:
       min.d = max.d = *q.d++;
       while (nc--) {
 	if (*q.d > max.d) {
@@ -3094,11 +3094,11 @@ Int minmax(Int *p, Int n, Int type)
       }
       lastmin.d = min.d;
       lastmax.d = max.d;
-      scalar_type(lastmin_sym) = scalar_type(lastmax_sym) = ANA_DOUBLE;
+      scalar_type(lastmin_sym) = scalar_type(lastmax_sym) = LUX_DOUBLE;
       break;
     }						/* end of type switch */
-  lastmaxloc = ((Byte *) maxloc - (Byte *) p) / ana_type_size[type];
-  lastminloc = ((Byte *) minloc - (Byte *) p) / ana_type_size[type];
+  lastmaxloc = ((Byte *) maxloc - (Byte *) p) / lux_type_size[type];
+  lastminloc = ((Byte *) minloc - (Byte *) p) / lux_type_size[type];
   return 1;
 }
 /*------------------------------------------------------------------------- */
@@ -3118,7 +3118,7 @@ Int simple_scale(void *p1, Int n, Int type, void *p2)
 #if HAVE_LIBX11
   extern Int	connect_flag, colorIndexType;
 #else
-  Int	colorIndexType = ANA_BYTE;
+  Int	colorIndexType = LUX_BYTE;
 #endif
 
 #if HAVE_LIBX11
@@ -3128,49 +3128,49 @@ Int simple_scale(void *p1, Int n, Int type, void *p2)
   q1.l = p1;
   q2.l = p2;
   switch (type) {
-    case ANA_BYTE:
+    case LUX_BYTE:
       min.b = lastmin.b;
       range.l = lastmax.b - min.b;
       xq = (Int) (scalemax - scalemin);
       if (range.l == 0)
 	return neutral(p2, n);
       switch (colorIndexType) {
-	case ANA_BYTE:
+	case LUX_BYTE:
 	  while (n--)
 	    *q2.b++ = (xq*(*q1.b++ - min.b))/range.l + scalemin;
 	  break;
-	case ANA_WORD:
+	case LUX_WORD:
 	  while (n--)
 	    *q2.w++ = (xq*(*q1.b++ - min.b))/range.l + scalemin;
 	  break;
-	case ANA_LONG:
+	case LUX_LONG:
 	  while (n--)
 	    *q2.l++ = (xq*(*q1.b++ - min.b))/range.l + scalemin;
 	  break;
       }
       break;
-    case ANA_WORD:
+    case LUX_WORD:
       min.w = lastmin.w;
       range.l = lastmax.w - min.w;
       xq = (Int) (scalemax - scalemin);	
       if (range.l == 0)
 	return neutral(p2, n);
       switch (colorIndexType) {
-	case ANA_BYTE:
+	case LUX_BYTE:
 	  while (n--)
 	    *q2.b++ = (xq*(*q1.w++ - min.w))/range.l + scalemin;
 	  break;
-	case ANA_WORD:
+	case LUX_WORD:
 	  while (n--)
 	    *q2.w++ = (xq*(*q1.w++ - min.w))/range.l + scalemin;
 	  break;
-	case ANA_LONG:
+	case LUX_LONG:
 	  while (n--)
 	    *q2.l++ = (xq*(*q1.w++ - min.w))/range.l + scalemin;
 	  break;
       }
       break;
-    case ANA_LONG:
+    case LUX_LONG:
       /* to avoid possible range problems, calculation is done in fp */
       min.l = lastmin.l;
       range.l = lastmax.l - min.l;
@@ -3178,64 +3178,64 @@ Int simple_scale(void *p1, Int n, Int type, void *p2)
 	return neutral(p2, n);
       fq = (Float) (scalemax - scalemin)/(Float) range.l;
       switch (colorIndexType) {
-	case ANA_BYTE:
+	case LUX_BYTE:
 	  while (n--)
 	    *q2.b++ = (fq*(*q1.l++ - min.l)) + scalemin;
 	  break;
-	case ANA_WORD:
+	case LUX_WORD:
 	  while (n--)
 	    *q2.w++ = (fq*(*q1.l++ - min.l)) + scalemin;
 	  break;
-	case ANA_LONG:
+	case LUX_LONG:
 	  while (n--)
 	    *q2.l++ = (fq*(*q1.l++ - min.l)) + scalemin;
 	  break;
       }
       break;
-    case ANA_FLOAT:
+    case LUX_FLOAT:
       min.f = lastmin.f;
       range.f = lastmax.f - min.f;	
       if (range.f == 0)
 	return neutral(p2, n);
       fq = (Float) (scalemax-scalemin)/range.f;
       switch (colorIndexType) {
-	case ANA_BYTE:
+	case LUX_BYTE:
 	  while (n--)
 	    *q2.b++ = (fq*(*q1.f++ - min.f)) + scalemin;
 	  break;
-	case ANA_WORD:
+	case LUX_WORD:
 	  while (n--)
 	    *q2.w++ = (fq*(*q1.f++ - min.f)) + scalemin;
 	  break;
-	case ANA_LONG:
+	case LUX_LONG:
 	  while (n--)
 	    *q2.l++ = (fq*(*q1.f++ - min.f)) + scalemin;
 	  break;
       }
       break;
-    case ANA_DOUBLE:
+    case LUX_DOUBLE:
       min.d = lastmin.d;
       range.d = lastmax.d - min.d;	
       if (range.d == 0)
 	return neutral(p2, n );
       dq = (Double) (scalemax - scalemin)/range.d;
       switch (colorIndexType) {
-	case ANA_BYTE:
+	case LUX_BYTE:
 	  while (n--)
 	    *q2.b++ = (dq*(*q1.d++ - min.d)) + scalemin;
 	  break;
-	case ANA_WORD:
+	case LUX_WORD:
 	  while (n--)
 	    *q2.w++ = (dq*(*q1.d++ - min.d)) + scalemin;
 	  break;
-	case ANA_LONG:
+	case LUX_LONG:
 	  while (n--)
 	    *q2.l++ = (dq*(*q1.d++ - min.d)) + scalemin;
 	  break;
       }
       break;
   }
-  return ANA_OK;
+  return LUX_OK;
 }
 /*------------------------------------------------------------------------- */
 Int neutral(void *p, Int n)
@@ -3246,26 +3246,26 @@ Int neutral(void *p, Int n)
 #if HAVE_LIBX11
   extern Int	colorIndexType;
 #else
-  Int	colorIndexType = ANA_BYTE;
+  Int	colorIndexType = LUX_BYTE;
 #endif
 
   pp.b = p;
   xq = (scalemax - scalemin)/2;
   switch (colorIndexType) {
-    case ANA_BYTE:
+    case LUX_BYTE:
       while (n--)
 	*pp.b++ = xq;
       break;
-    case ANA_WORD:
+    case LUX_WORD:
       while (n--)
 	*pp.w++ = xq;
       break;
-    case ANA_LONG:
+    case LUX_LONG:
       while (n--)
 	*pp.l++ = xq;
       break;
   }
-  return ANA_OK;
+  return LUX_OK;
 }
 /*------------------------------------------------------------------------- */
 const csplineInfo empty_cubic_spline(void) {
@@ -3310,7 +3310,7 @@ Int cubic_spline_tables(void *xx, Int xType, Int xStep,
 
   uint32_t minsize = gsl_interp_type_min_size(interp_type);
   if (nPoints < minsize) {
-    anaerror("Have %d data points but need at least %d for this interpolation",
+    luxerror("Have %d data points but need at least %d for this interpolation",
 	     0, nPoints, minsize);
     return 1;
   }
@@ -3329,31 +3329,31 @@ Int cubic_spline_tables(void *xx, Int xType, Int xStep,
   if (xx) {			/* have x */
     n = nPoints;
     switch (xType) {
-    case ANA_BYTE:
+    case LUX_BYTE:
       while (n--) {
 	*x++ = (Double) *xin.b;
 	xin.b += xStep;
       }
       break;
-    case ANA_WORD:
+    case LUX_WORD:
       while (n--) {
 	*x++ = (Double) *xin.w;
 	xin.w += xStep;
       }
       break;
-    case ANA_LONG:
+    case LUX_LONG:
       while (n--) {
 	*x++ = (Double) *xin.l;
 	xin.l += xStep;
       }
       break;
-    case ANA_FLOAT:
+    case LUX_FLOAT:
       while (n--) {
 	*x++ = (Double) *xin.f;
 	xin.f += xStep;
       }
       break;
-    case ANA_DOUBLE:
+    case LUX_DOUBLE:
       while (n--) {
 	*x++ = *xin.d;
 	xin.d += xStep;
@@ -3371,31 +3371,31 @@ Int cubic_spline_tables(void *xx, Int xType, Int xStep,
   if (yy) {			/* have y */
     n = nPoints;
     switch (yType) {
-    case ANA_BYTE:
+    case LUX_BYTE:
       while (n--) {
 	*y++ = (Double) *yin.b;
 	yin.b += yStep;
       }
       break;
-    case ANA_WORD:
+    case LUX_WORD:
       while (n--) {
 	*y++ = (Double) *yin.w;
 	yin.w += yStep;
       }
       break;
-    case ANA_LONG:
+    case LUX_LONG:
       while (n--) {
 	*y++ = (Double) *yin.l;
 	yin.l += yStep;
       }
       break;
-    case ANA_FLOAT:
+    case LUX_FLOAT:
       while (n--) {
 	*y++ = (Double) *yin.f;
 	yin.f += yStep;
       }
       break;
-    case ANA_DOUBLE:
+    case LUX_DOUBLE:
       while (n--) {
 	*y++ = *yin.d;
 	yin.d += yStep;
@@ -3611,7 +3611,7 @@ void find_cspline_extremes(Double x1, Double x2, Double *minpos, Double *min,
   }
 }
 /*------------------------------------------------------------------------- */
-Int ana_cubic_spline(Int narg, Int ps[])
+Int lux_cubic_spline(Int narg, Int ps[])
 /* Cubic spline interpolation along the first dimension of an array.
    ynew = CSPLINE(xtab, ytab [, xnew] [, /KEEP, /PERIODIC, /GETDERIVATIVE])
      interpolates in the table of <ytab> versus <xtab> (must be in
@@ -3638,7 +3638,7 @@ Int ana_cubic_spline(Int narg, Int ps[])
   static csplineInfo	cspl = { NULL, NULL, NULL, NULL };
   Int	xNewSym, xTabSym, yTabSym, size, oldType, result_sym;
   pointer	src, trgt;
-  Int	ana_convert(Int, Int [], Int, Int);
+  Int	lux_convert(Int, Int [], Int, Int);
 
   /* first check on all the arguments */
   if (!narg) { 			/* CSPLINE(): clean-up */
@@ -3655,10 +3655,10 @@ Int ana_cubic_spline(Int narg, Int ps[])
     xNewSym = *ps++;
 
   if (xNewSym && !haveTable && !xTabSym)
-    return anaerror("Need table to interpolate from", xNewSym);
-  if (xTabSym && symbol_class(xTabSym) != ANA_ARRAY)
+    return luxerror("Need table to interpolate from", xNewSym);
+  if (xTabSym && symbol_class(xTabSym) != LUX_ARRAY)
     return cerror(NEED_ARR, xTabSym);
-  if (yTabSym && symbol_class(yTabSym) != ANA_ARRAY)
+  if (yTabSym && symbol_class(yTabSym) != LUX_ARRAY)
     return cerror(NEED_ARR, yTabSym);
   if (xTabSym && array_size(xTabSym) != array_size(yTabSym))
     return cerror(INCMP_ARR, yTabSym);
@@ -3668,39 +3668,39 @@ Int ana_cubic_spline(Int narg, Int ps[])
 			    array_data(yTabSym), array_type(yTabSym), 1,
 			    array_size(xTabSym), internalMode & 2,
 			    internalMode & 4, &cspl))
-      return ANA_ERROR;		/* some error */
+      return LUX_ERROR;		/* some error */
     haveTable = 1;
   }
 
-  result_sym = ANA_ONE;
+  result_sym = LUX_ONE;
   if (xNewSym) {		/* do interpolation */
     oldType = symbol_type(xNewSym);
     switch (symbol_class(xNewSym)) {
-      case ANA_SCAL_PTR:
+      case LUX_SCAL_PTR:
 	xNewSym = dereferenceScalPointer(xNewSym); /* fall-thru */
-      case ANA_SCALAR:
-	if (oldType != ANA_DOUBLE)
-	  xNewSym = ana_convert(1, &xNewSym, ANA_DOUBLE, 1);
+      case LUX_SCALAR:
+	if (oldType != LUX_DOUBLE)
+	  xNewSym = lux_convert(1, &xNewSym, LUX_DOUBLE, 1);
 	src.b = &scalar_value(xNewSym).b;
 	size = 1;
-	result_sym = scalar_scratch(ANA_DOUBLE);
+	result_sym = scalar_scratch(LUX_DOUBLE);
 	trgt.b = &scalar_value(result_sym).b;
 	break;
-      case ANA_ARRAY:
-	if (oldType <= ANA_DOUBLE) { /* not a string array */
-	  if (oldType != ANA_DOUBLE)
-	    xNewSym = ana_convert(1, &xNewSym, ANA_DOUBLE, 1);
+      case LUX_ARRAY:
+	if (oldType <= LUX_DOUBLE) { /* not a string array */
+	  if (oldType != LUX_DOUBLE)
+	    xNewSym = lux_convert(1, &xNewSym, LUX_DOUBLE, 1);
 	  src.b = (Byte *) array_data(xNewSym);
 	  size = array_size(xNewSym);
 	} else
 	  return cerror(ILL_TYPE, xNewSym);
-	result_sym = array_clone(xNewSym, ANA_DOUBLE);
+	result_sym = array_clone(xNewSym, LUX_DOUBLE);
 	trgt.b = (Byte *) array_data(result_sym);
 	break;
       default:
 	result_sym = cerror(ILL_TYPE, xNewSym);
     }
-    if (result_sym != ANA_ERROR) { /* no error */
+    if (result_sym != LUX_ERROR) { /* no error */
       if (internalMode & 8) 	/* return the interpolated derivative */
 	while (size--)
 	  *trgt.d++ = cspline_derivative(*src.d++, &cspl);
@@ -3717,7 +3717,7 @@ Int ana_cubic_spline(Int narg, Int ps[])
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-Int ana_cubic_spline_extreme(Int narg, Int ps[])
+Int lux_cubic_spline_extreme(Int narg, Int ps[])
 /* CSPLINE_EXTREME, <x>, <y> [, <axis>, POS=<pos>, MINPOS=<minpos>,
    MINVAL=<min>, MAXPOS=<maxpos>, MAXVAL=<max>, /KEEPDIMS, /PERIODIC]
  */
@@ -3736,21 +3736,21 @@ Int ana_cubic_spline_extreme(Int narg, Int ps[])
   mode = SL_COMPRESS | SL_ONEAXIS | SL_NEGONED | SL_EACHROW | SL_AXISCOORD
     | SL_SRCUPGRADE;
 
-  if (standardLoop(ps[1], (narg > 2 && ps[2])? ps[2]: ANA_ZERO, mode,
-		   ANA_FLOAT, &yinfo, &y, NULL, NULL, NULL) == ANA_ERROR)
-    return ANA_ERROR;
+  if (standardLoop(ps[1], (narg > 2 && ps[2])? ps[2]: LUX_ZERO, mode,
+		   LUX_FLOAT, &yinfo, &y, NULL, NULL, NULL) == LUX_ERROR)
+    return LUX_ERROR;
 
   /* <x> must have one element for each element of <y> along the indicated
      <axis>. */
   if (array_size(ps[0]) != yinfo.rdims[0])
     return cerror(INCMP_ARG, ps[1]);
-  iq = ana_converts[yinfo.type](1, &ps[0]);
+  iq = lux_converts[yinfo.type](1, &ps[0]);
   x.f = array_data(iq);
   
   if (narg > 3 && ps[3]) { 	/* have <pos> */
     pos = int_arg(ps[3]);
     if (pos < 0 || pos >= yinfo.rdims[0])
-      return anaerror("Index out of range", ps[3]);
+      return luxerror("Index out of range", ps[3]);
   } else				/* no <pos> */
     pos = -1;
 
@@ -3770,7 +3770,7 @@ Int ana_cubic_spline_extreme(Int narg, Int ps[])
 
   if (narg > 4 && ps[4]) {	/* <minpos> */
     if (!symbolIsNamed(ps[4]))
-      return anaerror("Need named variable here", ps[4]);
+      return luxerror("Need named variable here", ps[4]);
     if (ndim) {
       to_scratch_array(ps[4], yinfo.type, ndim, dims);
       minpos.f = array_data(ps[4]);
@@ -3783,7 +3783,7 @@ Int ana_cubic_spline_extreme(Int narg, Int ps[])
 
   if (narg > 5 && ps[5]) {	/* <min> */
     if (!symbolIsNamed(ps[5]))
-      return anaerror("Need named variable here", ps[5]);
+      return luxerror("Need named variable here", ps[5]);
     if (ndim) {
       to_scratch_array(ps[5], yinfo.type, ndim, dims);
       min.f = array_data(ps[5]);
@@ -3796,7 +3796,7 @@ Int ana_cubic_spline_extreme(Int narg, Int ps[])
 
   if (narg > 6 && ps[6]) {	/* <maxpos> */
     if (!symbolIsNamed(ps[6]))
-      return anaerror("Need named variable here", ps[6]);
+      return luxerror("Need named variable here", ps[6]);
     if (ndim) {
       to_scratch_array(ps[6], yinfo.type, ndim, dims);
       maxpos.f = array_data(ps[6]);
@@ -3809,7 +3809,7 @@ Int ana_cubic_spline_extreme(Int narg, Int ps[])
 
   if (narg > 7 && ps[7]) {	/* <max> */
     if (!symbolIsNamed(ps[7]))
-      return anaerror("Need named variable here", ps[7]);
+      return luxerror("Need named variable here", ps[7]);
     if (ndim) {
       to_scratch_array(ps[7], yinfo.type, ndim, dims);
       max.f = array_data(ps[7]);
@@ -3824,11 +3824,11 @@ Int ana_cubic_spline_extreme(Int narg, Int ps[])
   
   /* now do the work */
   switch (yinfo.type) {
-    case ANA_FLOAT:
+    case LUX_FLOAT:
       do {
 	/* install table for cubic spline interpolation */
-	cubic_spline_tables(x.f, ANA_FLOAT, 1,
-			    y.f, ANA_FLOAT, step,
+	cubic_spline_tables(x.f, LUX_FLOAT, 1,
+			    y.f, LUX_FLOAT, step,
 			    yinfo.rdims[0], internalMode & 2? 1: 0,
 			    internalMode & 4? 1: 0,
 			    &cspl);
@@ -3915,11 +3915,11 @@ Int ana_cubic_spline_extreme(Int narg, Int ps[])
         y.f += step*yinfo.rdims[0];
       } while (advanceLoop(&yinfo, &y) < yinfo.rndim);
       break;
-    case ANA_DOUBLE:
+    case LUX_DOUBLE:
       do {
 	/* install table for cubic spline interpolation */
-	cubic_spline_tables(x.d, ANA_DOUBLE, 1,
-			    y.d, ANA_DOUBLE, step,
+	cubic_spline_tables(x.d, LUX_DOUBLE, 1,
+			    y.d, LUX_DOUBLE, step,
 			    yinfo.rdims[0], internalMode & 2? 1: 0,
 			    internalMode & 4? 1: 0,
 			    &cspl);
@@ -4010,26 +4010,26 @@ Int ana_cubic_spline_extreme(Int narg, Int ps[])
   default:
     break;
   }
-  return ANA_OK;
+  return LUX_OK;
 }
 /*------------------------------------------------------------------------- */
-Int ana_strtol(Int narg, Int ps[])
+Int lux_strtol(Int narg, Int ps[])
 /* corresponds to C strtol */
 {
   char	*string;
   Int	base, number, result;
 
-  if (symbol_class(ps[0]) != ANA_STRING)
+  if (symbol_class(ps[0]) != LUX_STRING)
     return cerror(NEED_STR, ps[0]);
   string = string_arg(ps[0]);
   if (narg > 1) {
-    if (symbol_class(ps[1]) != ANA_SCALAR)
+    if (symbol_class(ps[1]) != LUX_SCALAR)
       return cerror(NEED_SCAL, ps[1]);
     base = int_arg(ps[1]);
   } else
     base = 10;
   number = strtol(string, NULL, base);
-  result = scalar_scratch(ANA_LONG);
+  result = scalar_scratch(LUX_LONG);
   scalar_value(result).l = number;
   return result;
 }
@@ -4041,7 +4041,7 @@ uint32_t bitmask[] = {
 static uint32_t bits[16] = {
   1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768
 };
-Int ana_extract_bits_f(Int narg, Int ps[])/* get a bit field from data */
+Int lux_extract_bits_f(Int narg, Int ps[])/* get a bit field from data */
 /* call is xint = extract_bits(array, start, width) */
 /* if width is < 0, then abs(width) is used for width and the sign
    is extended */
@@ -4050,13 +4050,13 @@ Int ana_extract_bits_f(Int narg, Int ps[])/* get a bit field from data */
   Int	extract_bits(Int, Int [], Int *);
 
   if (extract_bits(narg, ps, &value) != 1)
-    return ANA_ERROR;
-  result_sym = scalar_scratch(ANA_WORD);
+    return LUX_ERROR;
+  result_sym = scalar_scratch(LUX_WORD);
   scalar_value(result_sym).w = (short) value;
   return result_sym;
 }
 /*------------------------------------------------------------------------ */
-Int ana_extract_bits(Int narg, Int ps[])/* get a bit field from data */
+Int lux_extract_bits(Int narg, Int ps[])/* get a bit field from data */
 /* call is extract_bits, result, array, start, width */
 /* if width is < 0, then abs(width) is used for width and the sign
    is extended */
@@ -4066,8 +4066,8 @@ Int ana_extract_bits(Int narg, Int ps[])/* get a bit field from data */
 
   result_sym = ps[0];
   if (extract_bits(narg - 1, &ps[1], &value) != 1)
-    return ANA_ERROR;
-  return redef_scalar(result_sym, ANA_WORD, &value);
+    return LUX_ERROR;
+  return redef_scalar(result_sym, LUX_WORD, &value);
 }
 /*------------------------------------------------------------------------ */
 Int extract_bits(Int narg, Int ps[], Int *value)/* internal routine */
@@ -4076,14 +4076,14 @@ Int extract_bits(Int narg, Int ps[], Int *value)/* internal routine */
   pointer	q;
   
   iq = ps[0];
-  if (numerical(iq, NULL, NULL, &n, &q) == ANA_ERROR)
-    return ANA_ERROR;
+  if (numerical(iq, NULL, NULL, &n, &q) == LUX_ERROR)
+    return LUX_ERROR;
   type = symbol_type(iq);
-  n = n * ana_type_size[type];	/* now the # of bytes */
+  n = n * lux_type_size[type];	/* now the # of bytes */
   if (int_arg_stat(ps[1], &start) != 1)
-    return ANA_ERROR;
+    return LUX_ERROR;
   if (int_arg_stat(ps[2], &width) != 1)
-    return ANA_ERROR;
+    return LUX_ERROR;
   /* check for sign extension */
   if (width < 0) {
     width = -width;
@@ -4091,7 +4091,7 @@ Int extract_bits(Int narg, Int ps[], Int *value)/* internal routine */
   } else
     sign_flag = 0;
   if (start + width > 8*n)	/* added LS 12feb99 */
-    return anaerror("Extracting bits beyond the end of the data", ps[2]);
+    return luxerror("Extracting bits beyond the end of the data", ps[2]);
   /* start is a bit count, get the I*2 index */
   j = start/16;
   iq = (Int) q.w[j];
@@ -4103,10 +4103,10 @@ Int extract_bits(Int narg, Int ps[], Int *value)/* internal routine */
       /* the top bit of the bit field is set, so need to extend it */
       iq = iq | ( 0xffffffff - bitmask[width]);
   *value = iq;
-  return ANA_OK;
+  return LUX_OK;
 }
 /*------------------------------------------------------------------------- */
-Int ana_fade_init(Int narg, Int ps[])
+Int lux_fade_init(Int narg, Int ps[])
 /* initializes a fade (or dissolve) between 2 Byte arrays, the actual
    fade result is obtained with the subroutine fade
    call is: fade_init, x1, x2 */
@@ -4118,7 +4118,7 @@ Int ana_fade_init(Int narg, Int ps[])
   iq = ps[0];
   if (!symbolIsNumericalArray(iq) || array_num_dims(iq) != 2)
     return cerror(NEED_2D_ARR, iq);
-  if (array_type(iq) != ANA_BYTE)
+  if (array_type(iq) != LUX_BYTE)
     return cerror(NEED_BYTE, iq);
   p1 = array_data(iq);
   fade_xsize = array_dims(iq)[0];
@@ -4129,7 +4129,7 @@ Int ana_fade_init(Int narg, Int ps[])
   iq = ps[1];
   if (!symbolIsNumericalArray(iq) || array_num_dims(iq) != 2)
     return cerror(NEED_2D_ARR, iq);
-  if (array_type(iq) != ANA_BYTE)
+  if (array_type(iq) != LUX_BYTE)
     return cerror(NEED_BYTE, iq);
   if (array_dims(iq)[0] != fade_xsize || array_dims(iq)[1] != fade_ysize)
     return cerror(INCMP_ARG, iq);
@@ -4153,10 +4153,10 @@ Int ana_fade_init(Int narg, Int ps[])
     *q2++ = ( (short) *p1++);
     }
   */
-  return ANA_OK;
+  return LUX_OK;
 }
 /*------------------------------------------------------------------------- */
-Int ana_fade(Int narg, Int ps[])
+Int lux_fade(Int narg, Int ps[])
  /* does a fade (or dissolve) between 2 Byte arrays, must be initialized
  with fade_init
  call is: fade, weight, result - where n is from 0 to 256 and represents
@@ -4167,16 +4167,16 @@ Int ana_fade(Int narg, Int ps[])
   Word	*q1, *q2, wt;
   Int	weight, n, iq;
 
-  if (int_arg_stat(ps[0], &weight) != ANA_OK) return ANA_ERROR;
+  if (int_arg_stat(ps[0], &weight) != LUX_OK) return LUX_ERROR;
   wt = (Word) weight;
   iq = ps[1];
-  if (redef_array(iq, 0, 2, fade_dim) != ANA_OK) return ANA_ERROR;
+  if (redef_array(iq, 0, 2, fade_dim) != LUX_OK) return LUX_ERROR;
 
   p1 = array_data(iq);
   n = fade_xsize * fade_ysize;	q1 = fade1;	q2 = fade2;
   while (n--) { 
     *p1++ = (Byte) (( wt * *q2++ + *q1++) >> 8);
   }
-  return ANA_OK;
+  return LUX_OK;
 }
 /*------------------------------------------------------------------------- */

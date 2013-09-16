@@ -70,18 +70,18 @@ METHODDEF void c_ui_method_selection (compress_info_ptr cinfo)
   jselwjfif(cinfo);
 }
  /*------------------------------------------------------------------------- */
-Int ana_write_jpeg_f(Int narg, Int ps[])
+Int lux_write_jpeg_f(Int narg, Int ps[])
 /* a function version that returns 1 if read OK */
 {
-  Int	ana_write_jpeg(Int, Int []);
+  Int	lux_write_jpeg(Int, Int []);
 
-  if (ana_write_jpeg(narg, ps) == ANA_OK) 
-    return ANA_ONE;
+  if (lux_write_jpeg(narg, ps) == LUX_OK) 
+    return LUX_ONE;
   else
-    return ANA_ZERO;
+    return LUX_ZERO;
 }
  /*------------------------------------------------------------------------- */
-Int ana_write_jpeg(Int narg, Int ps[])	/* jpeg write subroutine */
+Int lux_write_jpeg(Int narg, Int ps[])	/* jpeg write subroutine */
  /* 10/17/92, start with 2-D Byte files */
 {
  struct compress_info_struct cinfo;
@@ -96,8 +96,8 @@ Int ana_write_jpeg(Int narg, Int ps[])	/* jpeg write subroutine */
  type = array_type(iq);
  q1.l = array_data(iq);
  nd = array_num_dims(iq);
- if (nd != 2 || type != ANA_BYTE)
-  return anaerror("WRITE_JPEG only supports 2-D Byte arrays\n", iq);
+ if (nd != 2 || type != LUX_BYTE)
+  return luxerror("WRITE_JPEG only supports 2-D Byte arrays\n", iq);
 
 			 /* second argument must be a string, file name */
  if (!symbolIsString(ps[1]))
@@ -128,12 +128,12 @@ Int ana_write_jpeg(Int narg, Int ps[])	/* jpeg write subroutine */
     for some system and may need to be omitted in others */
  if ((cinfo.output_file = fopen(name, "wb")) == NULL) {
    fprintf(stderr, "can't open %s\n", name);
-   return ANA_ERROR;
+   return LUX_ERROR;
  }
  /* Here we go! */
  jpeg_compress(&cinfo);
  fclose(cinfo.output_file);
- return ANA_OK;
+ return LUX_OK;
 }
  /*------------------------------------------------------------------------- */
  /* These static variables are needed by the error routines. */
@@ -182,8 +182,8 @@ METHODDEF void output_init (decompress_info_ptr cinfo)
 
  */
 						 /* create the output array */
- iq = result_sym;	/* result_sym was determined by ana_read_jpeg */
- if (redef_array(iq, ANA_BYTE, 2, dim) != 1) {
+ iq = result_sym;	/* result_sym was determined by lux_read_jpeg */
+ if (redef_array(iq, LUX_BYTE, 2, dim) != 1) {
    ERREXIT(cinfo->emethods, "can't create result array");
  }
  q1.l = array_data(iq);
@@ -244,18 +244,18 @@ METHODDEF void d_ui_method_selection (decompress_info_ptr cinfo)
   cinfo->methods->output_term = output_term;
  }
  /*------------------------------------------------------------------------- */
-Int ana_read_jpeg_f(Int narg, Int ps[])
+Int lux_read_jpeg_f(Int narg, Int ps[])
 /* a function version that returns 1 if read OK */
 {
-  Int	ana_read_jpeg(Int, Int []);
+  Int	lux_read_jpeg(Int, Int []);
 
-  if (ana_read_jpeg(narg, ps) == ANA_OK)
-    return ANA_ONE;
+  if (lux_read_jpeg(narg, ps) == LUX_OK)
+    return LUX_ONE;
   else
-    return ANA_ZERO;
+    return LUX_ZERO;
 }
  /*------------------------------------------------------------------------- */
-Int ana_read_jpeg(Int narg, Int ps[])	/* jpeg read subroutine */
+Int lux_read_jpeg(Int narg, Int ps[])	/* jpeg read subroutine */
  /* 10/17/92, start with 2-D Byte files */
  {
  char	*name;
@@ -269,7 +269,7 @@ Int ana_read_jpeg(Int narg, Int ps[])	/* jpeg read subroutine */
  name = string_value(ps[1]);
  if ((cinfo.input_file = fopen(name, "rb")) == NULL) {
    fprintf(stderr, "can't open %s\n", name);
-   return ANA_ERROR;
+   return LUX_ERROR;
  }
  result_sym = ps[0];	/* result, created in out */
  cinfo.output_file = NULL;	/* if no actual output file involved */
@@ -293,7 +293,7 @@ Int ana_read_jpeg(Int narg, Int ps[])	/* jpeg read subroutine */
      */
    printf("error in JPEG code\n");
    fclose(cinfo.input_file);
-   return ANA_ERROR;
+   return LUX_ERROR;
  }
  jselmemmgr(&e_methods);	/* select std memory allocation routines */
 
@@ -314,5 +314,5 @@ Int ana_read_jpeg(Int narg, Int ps[])	/* jpeg read subroutine */
   /* Here we go! */
  jpeg_decompress(&cinfo);
  fclose(cinfo.input_file);
- return ANA_OK;			/* indicate success */
+ return LUX_OK;			/* indicate success */
 }

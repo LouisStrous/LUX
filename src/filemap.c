@@ -38,7 +38,7 @@ Int filemap(Int type, Int narg, Int ps[])
  char	*p;
 
  iq = ps[1];				/* file name */
- if (symbol_class(iq) != ANA_STRING)
+ if (symbol_class(iq) != LUX_STRING)
    return cerror(NEED_STR, iq);
  p = expand_name(string_value(iq), "");
  iq = ps[2];				/* dimensions */
@@ -48,7 +48,7 @@ Int filemap(Int type, Int narg, Int ps[])
  if (get_dims(&ndim, &ps[2], dims) != 1)
    return -1;			/* some error in dims*/
  getFreeTempVariable(iq);
- symbol_class(iq) = ANA_FILEMAP;
+ symbol_class(iq) = LUX_FILEMAP;
  file_map_type(iq) = type;
  symbol_context(iq) = -1;	/* ? */
  symbol_line(iq) = curLineNumber;
@@ -74,34 +74,34 @@ Int filemap(Int type, Int narg, Int ps[])
 }
 /*-------------------------------------------------------------------------*/
 Int bytfarr(Int narg, Int ps[])
-/* Create a ANA_BYTE file array (file map) */
-{ return filemap(ANA_BYTE, narg, ps); }
+/* Create a LUX_BYTE file array (file map) */
+{ return filemap(LUX_BYTE, narg, ps); }
 /*-------------------------------------------------------------------------*/
 Int intfarr(Int narg, Int ps[])
-/* Create a ANA_WORD file array (file map) */
-{ return filemap(ANA_WORD, narg, ps); }
+/* Create a LUX_WORD file array (file map) */
+{ return filemap(LUX_WORD, narg, ps); }
 /*-------------------------------------------------------------------------*/
 Int lonfarr(Int narg, Int ps[])
-/* Create a ANA_LONG file array (file map) */
-{ return filemap(ANA_LONG, narg, ps); }
+/* Create a LUX_LONG file array (file map) */
+{ return filemap(LUX_LONG, narg, ps); }
 /*-------------------------------------------------------------------------*/
 Int fltfarr(Int narg, Int ps[])
-/* Create a ANA_FLOAT file array (file map) */
-{ return filemap(ANA_FLOAT, narg, ps); }
+/* Create a LUX_FLOAT file array (file map) */
+{ return filemap(LUX_FLOAT, narg, ps); }
 /*-------------------------------------------------------------------------*/
 Int dblfarr(Int narg, Int ps[])
-/* Create a ANA_DOUBLE file array (file map) */
-{ return filemap(ANA_DOUBLE, narg, ps); }
+/* Create a LUX_DOUBLE file array (file map) */
+{ return filemap(LUX_DOUBLE, narg, ps); }
 /*-------------------------------------------------------------------------*/
 Int cfltfarr(Int narg, Int ps[])
-/* Create a ANA_CFLOAT file array (file map) */
-{ return filemap(ANA_CFLOAT, narg, ps); }
+/* Create a LUX_CFLOAT file array (file map) */
+{ return filemap(LUX_CFLOAT, narg, ps); }
 /*-------------------------------------------------------------------------*/
 Int cdblfarr(Int narg, Int ps[])
-/* Create a ANA_CDOUBLE file array (file map) */
-{ return filemap(ANA_CDOUBLE, narg, ps); }
+/* Create a LUX_CDOUBLE file array (file map) */
+{ return filemap(LUX_CDOUBLE, narg, ps); }
 /*-------------------------------------------------------------------------*/
-Int ana_i_file_output(FILE *fp, pointer q, Int assoctype,
+Int lux_i_file_output(FILE *fp, pointer q, Int assoctype,
  Int offsym, Int dsize, Int fsize, Int baseOffset)
 /* use a file array as a guide to writing into a file, and an
  index array as a guide to the positions where to write */
@@ -109,16 +109,16 @@ Int ana_i_file_output(FILE *fp, pointer q, Int assoctype,
   Int	*qi, error = 0, size, dindx, i;
   array	*h;
 
-  if (sym[offsym].type != ANA_LONG)
-    offsym = ana_long(1, &offsym);
+  if (sym[offsym].type != LUX_LONG)
+    offsym = lux_long(1, &offsym);
   switch (sym[offsym].class)
-  { case ANA_SCAL_PTR:
+  { case LUX_SCAL_PTR:
       offsym = dereferenceScalPointer(offsym);
-    case ANA_SCALAR:
+    case LUX_SCALAR:
       qi = &sym[offsym].spec.scalar.l;
       dindx = 1;
       break;
-    case ANA_ARRAY:
+    case LUX_ARRAY:
       h = HEAD(offsym);
       GET_SIZE(dindx, h->dims, h->ndim);
       qi = LPTR(h);
@@ -130,7 +130,7 @@ Int ana_i_file_output(FILE *fp, pointer q, Int assoctype,
   { fclose(fp);
     printf("Need as many indices as data elements\n");
     return cerror(INCMP_ARR, offsym); }
-  size = ana_type_size[assoctype];
+  size = lux_type_size[assoctype];
   while (dindx--)
   { if (*qi < 0 || *qi >= fsize)
       error++;
@@ -148,7 +148,7 @@ Int ana_i_file_output(FILE *fp, pointer q, Int assoctype,
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int ana_file_output(Int iq, Int jq, Int offsym, Int axsym)
+Int lux_file_output(Int iq, Int jq, Int offsym, Int axsym)
      /* use a file array as a guide to writing into a file */
      /* iq is sym # of file array, jq is rhs sym with data */
 {
@@ -161,19 +161,19 @@ Int ana_file_output(Int iq, Int jq, Int offsym, Int axsym)
  char	*fname;
 
  if (file_map_readonly(iq))
-   return anaerror("File array is read-only", iq);
+   return luxerror("File array is read-only", iq);
  step = rstep;
  assoctype = file_map_type(iq);
  dattype = symbol_type(jq);
  if (assoctype != dattype) 	/* make proper type */
-   jq = ana_converts[assoctype](1, &jq);
+   jq = lux_converts[assoctype](1, &jq);
  switch (symbol_class(jq)) {
-   case ANA_SCAL_PTR: case ANA_SCALAR:
+   case LUX_SCAL_PTR: case LUX_SCALAR:
      done = ddat = 1;
      dat = &done;
      q.l = &scalar_value(iq).l;
      break;
-   case ANA_ARRAY:
+   case LUX_ARRAY:
      ddat = array_num_dims(jq);
      dat = array_dims(jq);
      q.l = array_data(jq);
@@ -205,7 +205,7 @@ Int ana_file_output(Int iq, Int jq, Int offsym, Int axsym)
    ddat = n;
    GET_SIZE(n, file, dfile);
    dfile = n;
-   return ana_i_file_output(fp, q, assoctype, offsym, ddat, dfile,
+   return lux_i_file_output(fp, q, assoctype, offsym, ddat, dfile,
 			     baseOffset);
  }
  if (!offsym) {
@@ -246,7 +246,7 @@ Int ana_file_output(Int iq, Int jq, Int offsym, Int axsym)
  n = *ystep = 1;
  for (i = 1; i < dfile; i++)
    ystep[i] = (n *= file[i - 1]);
- n = ana_type_size[assoctype];
+ n = lux_type_size[assoctype];
  if (doff) {
    offset = 0;
    for (i = 0; i < doff; i++)
@@ -299,7 +299,7 @@ Int ana_file_output(Int iq, Int jq, Int offsym, Int axsym)
  return 1;
 }
 /*------------------------------------------------------------------------- */
-Int ana_fzarr(Int narg, Int ps[])
+Int lux_fzarr(Int narg, Int ps[])
 /* FZARR(name) returns a file array symbol appropriate for an */
 /* uncompressed FZ file. */
 {
@@ -309,7 +309,7 @@ Int ana_fzarr(Int narg, Int ps[])
   fzHead	*fh;
   Int	ck_synch_hd(FILE *, fzHead *, char **, Int *);
 
-  if (symbol_class(*ps) != ANA_STRING)
+  if (symbol_class(*ps) != LUX_STRING)
     return cerror(NEED_STR, *ps);
   name = string_value(*ps);
   fp = Fopen(expand_name(name, NULL), "r");
@@ -317,13 +317,13 @@ Int ana_fzarr(Int narg, Int ps[])
     return cerror(ERR_OPEN, 0);
   fh = (fzHead *) scrat;
   if (ck_synch_hd(fp, fh, &p, &wwflag) < 0)
-    return ANA_ERROR;
+    return LUX_ERROR;
   fclose(fp);
   if (fh->subf % 128 == 1)	/* compressed data */
-    return anaerror("FZARR cannot deal with compressed data", 0);
+    return luxerror("FZARR cannot deal with compressed data", 0);
 
   getFreeTempVariable(iq);
-  symbol_class(iq) = ANA_FILEMAP;
+  symbol_class(iq) = LUX_FILEMAP;
   file_map_type(iq) = fh->datyp;
   symbol_context(iq) = -1;	/* ? */
   symbol_line(iq) = curLineNumber;

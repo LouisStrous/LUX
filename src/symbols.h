@@ -27,7 +27,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #define array_header(symbol)	/* array * */ (sym[symbol].spec.array.ptr)
 #define array_num_dims(symbol)	/* Byte */ (array_header(symbol)->ndim)
 #define array_num_facts(symbol)	/* Byte */ (array_header(symbol)->nfacts)
-#define array_size(symbol)	/* Int */ ((sym[symbol].spec.array.bstore - sizeof(array))/ana_type_size[array_type(symbol)])
+#define array_size(symbol)	/* Int */ ((sym[symbol].spec.array.bstore - sizeof(array))/lux_type_size[array_type(symbol)])
 #define array_type(symbol)	/* Byte */ (sym[symbol].type)
 #define assoc_dims(symbol)	/* Int * */(((array *) sym[symbol].spec.array.ptr)->dims)
 #define assoc_lun(symbol)	/* Byte */(((array *) sym[symbol].spec.array.ptr)->c1)
@@ -50,7 +50,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #define complex_array_dims(symbol) /* Int * */(array_header(symbol)->dims)
 #define complex_array_header(symbol) /* array * */(sym[symbol].spec.array.ptr)
 #define complex_array_num_dims(symbol) /* Int */(array_header(symbol)->ndim)
-#define complex_array_size(symbol) /* Int */((symbol_memory(symbol) - sizeof(array))/ana_type_size[complex_array_type(symbol)])
+#define complex_array_size(symbol) /* Int */((symbol_memory(symbol) - sizeof(array))/lux_type_size[complex_array_type(symbol)])
 #define complex_array_type(symbol) /* Byte */(sym[symbol].type)
 #define complex_scalar_type(symbol) /* Byte */(sym[symbol].type)
 #define complex_scalar_data(symbol) /* pointer */sym[symbol].spec.pointer
@@ -94,7 +94,7 @@ Int	file_map_size(Int symbol);
 #define for_start(symbol)	/* Word */(sym[symbol].spec.evb.args[1])
 #define for_step(symbol)	/* Word */(sym[symbol].spec.evb.args[3])
 #define func_ptr_routine_num(symbol) /* Word; negative if internal */(sym[symbol].spec.evb.args[0])
-#define func_ptr_type(symbol)	/* Word */(sym[symbol].type) /* either ANA_FUNCTION or ANA_SUBROUTINE */
+#define func_ptr_type(symbol)	/* Word */(sym[symbol].type) /* either LUX_FUNCTION or LUX_SUBROUTINE */
 #define if_condition(symbol)	/* Word */(sym[symbol].spec.evb.args[0])
 #define if_false_body(symbol)	/* Word */(sym[symbol].spec.evb.args[2])
 #define if_true_body(symbol)	/* Word */(sym[symbol].spec.evb.args[1])
@@ -199,48 +199,48 @@ Int	file_map_size(Int symbol);
 #define usr_sub_arguments(symbol) /* Word * */(sym[symbol].spec.wlist.ptr)
 #define usr_sub_num_arguments(symbol) /* Int */(sym[symbol].spec.wlist.bstore/sizeof(Word))
 #define usr_sub_routine_num(symbol) /* Word */(sym[symbol].xx)
-#define usr_sub_is_deferred(symbol) /* Int */(symbol_class(usr_sub_routine_num(symbol)) == ANA_STRING)
+#define usr_sub_is_deferred(symbol) /* Int */(symbol_class(usr_sub_routine_num(symbol)) == LUX_STRING)
 #define while_do_body(symbol)	/* Word */(sym[symbol].spec.evb.args[1])
 #define while_do_condition(symbol) /* Word */(sym[symbol].spec.evb.args[0])
 
 
-#define symbolIsArray(iq)	/* Int */ (symbol_class(iq) == ANA_ARRAY || symbol_class(iq) == ANA_CARRAY)
+#define symbolIsArray(iq)	/* Int */ (symbol_class(iq) == LUX_ARRAY || symbol_class(iq) == LUX_CARRAY)
 #define symbolIsNumericalArray(iq)	/* Int */ (symbolIsArray(iq) && symbolIsNumerical(iq))
-#define symbolIsStringArray(iq)	/* Int */ (symbol_class(iq) == ANA_ARRAY && symbol_type(iq) == ANA_STRING_ARRAY)
-#define symbolIsRealArray(iq)	/* Int */ (symbol_class(iq) == ANA_ARRAY && symbol_type(iq) <= ANA_DOUBLE)
-#define symbolIsRealScalar(iq)	/* Int */ ((symbol_class(iq) == ANA_SCALAR || symbol_class(iq) == ANA_SCAL_PTR) && isRealType(symbol_type(iq)))
-#define symbolIsComplexArray(iq) /* Int */ (symbol_class(iq) == ANA_CARRAY)
-#define symbolIsComplexScalar(iq) /* Int */ (symbol_class(iq) == ANA_CSCALAR || (symbol_class(iq) == ANA_SCAL_PTR && isComplexType(symbol_type(iq))))
+#define symbolIsStringArray(iq)	/* Int */ (symbol_class(iq) == LUX_ARRAY && symbol_type(iq) == LUX_STRING_ARRAY)
+#define symbolIsRealArray(iq)	/* Int */ (symbol_class(iq) == LUX_ARRAY && symbol_type(iq) <= LUX_DOUBLE)
+#define symbolIsRealScalar(iq)	/* Int */ ((symbol_class(iq) == LUX_SCALAR || symbol_class(iq) == LUX_SCAL_PTR) && isRealType(symbol_type(iq)))
+#define symbolIsComplexArray(iq) /* Int */ (symbol_class(iq) == LUX_CARRAY)
+#define symbolIsComplexScalar(iq) /* Int */ (symbol_class(iq) == LUX_CSCALAR || (symbol_class(iq) == LUX_SCAL_PTR && isComplexType(symbol_type(iq))))
 #define symbolIsNumerical(iq)	/* Int */ ((symbolIsArray(iq) || symbolIsScalar(iq)) && isNumericalType(symbol_type(iq)))
 #define symbolIsReal(iq)        /* Int */ (symbolIsNumerical(iq) && isRealType(symbol_type(iq)))
 #define symbolIsInteger(iq)     /* Int */ (symbolIsNumerical(iq) && isIntegerType(symbol_type(iq)))
 #define symbolIsComplex(iq)     /* Int */ (symbolIsNumerical(iq) && isComplexType(symbol_type(iq)))
 #define symbolIsString(iq)      /* Int */ (symbolIsStringScalar(iq) || symbolIsStringArray(iq))
-#define symbolIsStringScalar(iq) /* Int */ (symbol_class(iq) == ANA_STRING)
-#define symbolIsScalar(iq)		/* Int */ (symbol_class(iq) == ANA_SCALAR || symbol_class(iq) == ANA_SCAL_PTR || symbol_class(iq) == ANA_CSCALAR)
-#define symbolIsUnitaryExpression(iq) /* Int */ (symbol_class(iq) < ANA_SUBROUTINE)
+#define symbolIsStringScalar(iq) /* Int */ (symbol_class(iq) == LUX_STRING)
+#define symbolIsScalar(iq)		/* Int */ (symbol_class(iq) == LUX_SCALAR || symbol_class(iq) == LUX_SCAL_PTR || symbol_class(iq) == LUX_CSCALAR)
+#define symbolIsUnitaryExpression(iq) /* Int */ (symbol_class(iq) < LUX_SUBROUTINE)
 #define symbolIsNamed(iq)	/* Int */ (symbolProperName(iq) != NULL)
 #define symbolIsModifiable(iq)  /* Int */ (symbolIsNamed((iq)) && (iq) > nFixed)
-#define numericalSize(iq)	/* Int */ ((symbol_class(iq) == ANA_ARRAY)? array_size(iq): 1)
-#define isNumericalType(type)	/* Int */ ((type) <= ANA_DOUBLE || (type) >= ANA_CFLOAT)
-#define isStringType(type)	/* Int */ ((type) > ANA_DOUBLE && (type) < ANA_CFLOAT)
-#define isRealType(type)	/* Int */ ((type) <= ANA_DOUBLE)
-#define isComplexType(type)	/* Int */ ((type) >= ANA_CFLOAT)
-#define isIntegerType(type)	/* Int */ ((type) <= ANA_LONG)
-#define isFloatType(type)	/* Int */ ((type) == ANA_FLOAT || (type) == ANA_DOUBLE || (type) == ANA_CFLOAT || (type) == ANA_CDOUBLE)
-#define isLegalType(type)	/* Int */ ((type) >= ANA_BYTE && (type) <= ANA_CDOUBLE)
+#define numericalSize(iq)	/* Int */ ((symbol_class(iq) == LUX_ARRAY)? array_size(iq): 1)
+#define isNumericalType(type)	/* Int */ ((type) <= LUX_DOUBLE || (type) >= LUX_CFLOAT)
+#define isStringType(type)	/* Int */ ((type) > LUX_DOUBLE && (type) < LUX_CFLOAT)
+#define isRealType(type)	/* Int */ ((type) <= LUX_DOUBLE)
+#define isComplexType(type)	/* Int */ ((type) >= LUX_CFLOAT)
+#define isIntegerType(type)	/* Int */ ((type) <= LUX_LONG)
+#define isFloatType(type)	/* Int */ ((type) == LUX_FLOAT || (type) == LUX_DOUBLE || (type) == LUX_CFLOAT || (type) == LUX_CDOUBLE)
+#define isLegalType(type)	/* Int */ ((type) >= LUX_BYTE && (type) <= LUX_CDOUBLE)
 /* highestType(type1,type2) returns the highest type among its arguments.
    If no complex data types are involved, then it is straightforward:
    Return whichever type is numerically greater.  If complex data types
-   are involved, then the same trick will do, except if type1 == ANA_CFLOAT
-   and type2 == ANA_DOUBLE: then the simple comparison would return
-   ANA_CFLOAT, while we want ANA_CDOUBLE (i.e., ANA_DOUBLE promoted to
+   are involved, then the same trick will do, except if type1 == LUX_CFLOAT
+   and type2 == LUX_DOUBLE: then the simple comparison would return
+   LUX_CFLOAT, while we want LUX_CDOUBLE (i.e., LUX_DOUBLE promoted to
    a complex type). */
-#define highestType(type1,type2) /* Int */ (((type1) == ANA_CFLOAT && (type2) == ANA_DOUBLE)? ANA_CDOUBLE: ((type2) > (type1))? (type2): (type1))
-#define typeCmp(type1,type2) /* Int */ (((type1) == ANA_CFLOAT && (type2) == ANA_DOUBLE)? -1: ((type1) < (type2))? -1: ((type1) > (type2))? +1: 0)
+#define highestType(type1,type2) /* Int */ (((type1) == LUX_CFLOAT && (type2) == LUX_DOUBLE)? LUX_CDOUBLE: ((type2) > (type1))? (type2): (type1))
+#define typeCmp(type1,type2) /* Int */ (((type1) == LUX_CFLOAT && (type2) == LUX_DOUBLE)? -1: ((type1) < (type2))? -1: ((type1) > (type2))? +1: 0)
 /* realType(type) returns <type> if it is real, or the corresponding real */
 /* type if it is complex. */
-#define realType(type)		/* Int */ (((type) >= ANA_CFLOAT)? (type) + (ANA_FLOAT - ANA_CFLOAT): (type))
+#define realType(type)		/* Int */ (((type) >= LUX_CFLOAT)? (type) + (LUX_FLOAT - LUX_CFLOAT): (type))
 #define complexMag2(x) ((x).real*(x).real + (x).imaginary*(x).imaginary)
 
 #define INFTY (1.0/0.0)

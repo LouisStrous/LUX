@@ -25,14 +25,14 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 Int	motif_input_flag = 0;
 
 /*-------------------------------------------*/
-Int ana_zeroifnotdefined(Int narg, Int ps[])
+Int lux_zeroifnotdefined(Int narg, Int ps[])
 /* assigns zero to the argument if the argument is undefined.
  (should replace by DEFAULT,arg,0 instead) */
 {
   while (narg--) {
-    if (symbol_class(*ps) == ANA_UNDEFINED) {
-      symbol_class(*ps) = ANA_SCALAR;
-      scalar_type(*ps) = ANA_LONG;
+    if (symbol_class(*ps) == LUX_UNDEFINED) {
+      symbol_class(*ps) = LUX_SCALAR;
+      scalar_type(*ps) = LUX_LONG;
       scalar_value(*ps).l = 0;
     }
     ps++;
@@ -40,13 +40,13 @@ Int ana_zeroifnotdefined(Int narg, Int ps[])
   return 1;
 }
 /*-------------------------------------------*/
-Int ana_compile_file(Int narg, Int ps[])
+Int lux_compile_file(Int narg, Int ps[])
 /* COMPILE_FILE compiles the contents of a file at the top level */
 {
   FILE	*fp;
   Int	result, nextCompileLevel(FILE *, char *);
   
-  if (symbol_class(ps[0]) != ANA_STRING)
+  if (symbol_class(ps[0]) != LUX_STRING)
     return cerror(NEED_STR, ps[0]);
 
   fp = openPathFile(string_value(ps[0]), FIND_SUBR);

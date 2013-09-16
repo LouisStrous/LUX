@@ -39,13 +39,13 @@ char *symbolProperName(Int symbol)
   if (symbol < 0 || symbol >= NAMED_END) /* out of range */
     return NULL;
   switch (symbol_class(symbol)) {
-    case ANA_SUBROUTINE: case ANA_DEFERRED_SUBR:
+    case LUX_SUBROUTINE: case LUX_DEFERRED_SUBR:
       hashTable = subrHashTable;
       break;
-    case ANA_FUNCTION: case ANA_DEFERRED_FUNC:
+    case LUX_FUNCTION: case LUX_DEFERRED_FUNC:
       hashTable = funcHashTable;
       break;
-    case ANA_BLOCKROUTINE: case ANA_DEFERRED_BLOCK:
+    case LUX_BLOCKROUTINE: case LUX_DEFERRED_BLOCK:
       hashTable = blockHashTable;
       break;
     default:			/* must be a regular variable */
@@ -389,7 +389,7 @@ Int Sprintf_general(char *str, char *format, va_list ap)
   width = fmi->width;
 
   if (fmi->type == FMT_ERROR)	/* some error */
-    return ANA_ERROR;
+    return LUX_ERROR;
   
   /* first we initialize */
   switch (*fmi->spec_char) {
@@ -526,7 +526,7 @@ char *symbolIdent(Int symbol, Int mode)
   
   save = curScrat;
 
-  if (symbol == ANA_ERROR) {	/* the error symbol: should not occur here */
+  if (symbol == LUX_ERROR) {	/* the error symbol: should not occur here */
     strcpy(curScrat, "(error)");
     return curScrat;
   }
@@ -575,8 +575,8 @@ char *symbolIdent(Int symbol, Int mode)
     mode &= ~I_FILELEVEL;
   
   switch (symbol_class(symbol)) {
-    case ANA_SUBROUTINE: case ANA_FUNCTION: case ANA_BLOCKROUTINE:
-    case ANA_DEFERRED_SUBR: case ANA_DEFERRED_FUNC: case ANA_DEFERRED_BLOCK:
+    case LUX_SUBROUTINE: case LUX_FUNCTION: case LUX_BLOCKROUTINE:
+    case LUX_DEFERRED_SUBR: case LUX_DEFERRED_FUNC: case LUX_DEFERRED_BLOCK:
       i = (mode & I_ROUTINE);
       break;
     default:
@@ -591,7 +591,7 @@ char *symbolIdent(Int symbol, Int mode)
     p = symbolProperName(symbol); /* get symbol's name at curScrat */
     if (p) { 			/* have a name */
       strcpy(curScrat, p);
-      if (symbol_class(symbol) == ANA_UNDEFINED) /* undefined symbol */
+      if (symbol_class(symbol) == LUX_UNDEFINED) /* undefined symbol */
 	strcat(curScrat, "?"); /* add ? to indicate no value */
       curScrat = save;
       return curScrat;
@@ -603,7 +603,7 @@ char *symbolIdent(Int symbol, Int mode)
      the value after all */
   i = symbol;
   j = 0;
-  while (symbol_class(i) == ANA_POINTER || symbol_class(i) == ANA_TRANSFER) {
+  while (symbol_class(i) == LUX_POINTER || symbol_class(i) == LUX_TRANSFER) {
     j = i;
     i = transfer_target(i);
   }
@@ -613,30 +613,30 @@ char *symbolIdent(Int symbol, Int mode)
     symbol = i;
   
   switch (symbol_class(symbol)) {
-    case ANA_SCALAR: case ANA_FIXED_NUMBER:
+    case LUX_SCALAR: case LUX_FIXED_NUMBER:
       switch (scalar_type(symbol)) {
-	case ANA_BYTE:
+	case LUX_BYTE:
 	  number.l = (Int) scalar_value(symbol).b;
 	  break;
-	case ANA_WORD:
+	case LUX_WORD:
 	  number.l = (Int) scalar_value(symbol).w;
 	  break;
-	case ANA_LONG:
+	case LUX_LONG:
 	  number.l = (Int) scalar_value(symbol).l;
 	  break;
-	case ANA_FLOAT:
+	case LUX_FLOAT:
 	  number.d = scalar_value(symbol).f;
 	  break;
-	case ANA_DOUBLE:
+	case LUX_DOUBLE:
 	  number.d = scalar_value(symbol).d;
 	  break;
       }
-      if (scalar_type(symbol) < ANA_FLOAT) /* integer type */
+      if (scalar_type(symbol) < LUX_FLOAT) /* integer type */
 	sprintf(curScrat, "%d%c", number.l,
 		scalarIndicator[scalar_type(symbol)]);
       else {
 	sprintf(curScrat, "%g", number.d);
-	if (scalar_type(symbol) == ANA_FLOAT) {
+	if (scalar_type(symbol) == LUX_FLOAT) {
 	  p = strchr(curScrat, '.');
 	  if (!p) {		/* none yet: add one */
 	    p = curScrat + strlen(curScrat);
@@ -653,9 +653,9 @@ char *symbolIdent(Int symbol, Int mode)
 	}
       }
       break;
-    case ANA_CSCALAR:		/* complex number */
+    case LUX_CSCALAR:		/* complex number */
       ptr.cf = complex_scalar_data(symbol).cf;
-      if (complex_scalar_type(symbol) == ANA_CFLOAT) {
+      if (complex_scalar_type(symbol) == LUX_CFLOAT) {
 	if (ptr.cf->real == 0.0)
 	  sprintf(curScrat, "(%g", (Double) ptr.cf->imaginary);
 	else
@@ -675,7 +675,7 @@ char *symbolIdent(Int symbol, Int mode)
 	 complex nature of the number.  LS 16nov98 */
       p = strchr(curScrat, 'e');
       if (p) {
-	if (complex_scalar_type(symbol) == ANA_CDOUBLE) {
+	if (complex_scalar_type(symbol) == LUX_CDOUBLE) {
 	  *p = 'd';
 	  p = strchr(p + 1, 'e');
 	  if (p)
@@ -683,14 +683,14 @@ char *symbolIdent(Int symbol, Int mode)
 	}
       } else {
 	/* add one at the end */
-	if (complex_scalar_type(symbol) == ANA_CFLOAT)
+	if (complex_scalar_type(symbol) == LUX_CFLOAT)
 	  strcat(curScrat, "e");
 	else
 	  strcat(curScrat, "d");
       }
       strcat(curScrat, "i)");	/* indicate complex number */
       break;
-    case ANA_STRING:
+    case LUX_STRING:
       if ((mode & I_TRUNCATE) 
 	  && string_size(symbol) > 20) { /* truncate */
 	sprintf(curScrat, "'%.17s...'", string_value(symbol));
@@ -701,7 +701,7 @@ char *symbolIdent(Int symbol, Int mode)
 	sprintf(curScrat, " (%1d#)", string_size(symbol));
       }
       break;
-    case ANA_RANGE: case ANA_PRE_RANGE:
+    case LUX_RANGE: case LUX_PRE_RANGE:
       strcpy(curScrat++, "(");
       i = range_start(symbol);
       if (i == -1)		/* (*) */
@@ -715,7 +715,7 @@ char *symbolIdent(Int symbol, Int mode)
 	symbolIdent(i, mode);
 	curScrat += strlen(curScrat);
 	i = range_end(symbol);
-	if (i != ANA_ZERO) {	/* really have a range end */
+	if (i != LUX_ZERO) {	/* really have a range end */
 	  strcpy(curScrat++, ":");
 	  if (i < 0) {		/* * ... */
 	    if (i == -1) {	/* just * */
@@ -744,7 +744,7 @@ char *symbolIdent(Int symbol, Int mode)
       }
       strcpy(curScrat, ")");
       break;
-    case ANA_ARRAY:
+    case LUX_ARRAY:
       strcpy(curScrat++, "[");
       n = array_size(symbol);
       if ((mode & I_TRUNCATE)
@@ -757,7 +757,7 @@ char *symbolIdent(Int symbol, Int mode)
       }
       ptr.b = array_data(symbol);
       switch (array_type(symbol)) {
-	case ANA_BYTE:
+	case LUX_BYTE:
 	  while (j--) {
 	    sprintf(curScrat, "%d", (Int) *ptr.b++);
 	    curScrat += strlen(curScrat);
@@ -765,7 +765,7 @@ char *symbolIdent(Int symbol, Int mode)
 	      strcpy(curScrat++, ",");
 	  }
 	  break;
-	case ANA_WORD:
+	case LUX_WORD:
 	  while (j--) {
 	    sprintf(curScrat, "%d", (Int) *ptr.w++);
 	    curScrat += strlen(curScrat);
@@ -773,7 +773,7 @@ char *symbolIdent(Int symbol, Int mode)
 	      strcpy(curScrat++, ",");
 	  }
 	  break;
-	case ANA_LONG:
+	case LUX_LONG:
 	  while (j--) {
 	    sprintf(curScrat, "%d", *ptr.l++);
 	    curScrat += strlen(curScrat);
@@ -781,7 +781,7 @@ char *symbolIdent(Int symbol, Int mode)
 	      strcpy(curScrat++, ",");
 	  }
 	  break;
-	case ANA_FLOAT:
+	case LUX_FLOAT:
 	  while (j--) {
 	    sprintf(curScrat, "%g", (Double) *ptr.f++);
 	    curScrat += strlen(curScrat);
@@ -789,7 +789,7 @@ char *symbolIdent(Int symbol, Int mode)
 	      strcpy(curScrat++, ",");
 	  }
 	  break;
-	case ANA_DOUBLE:
+	case LUX_DOUBLE:
 	  while (j--) {
 	    sprintf(curScrat, "%g", *ptr.d++);
 	    curScrat += strlen(curScrat);
@@ -797,7 +797,7 @@ char *symbolIdent(Int symbol, Int mode)
 	      strcpy(curScrat++, ",");
 	  }
 	  break;
-	case ANA_STRING_ARRAY:
+	case LUX_STRING_ARRAY:
 	  if ((mode & I_TRUNCATE)) {
 	    while (j--) {
 	      if (*ptr.sp) {
@@ -846,28 +846,28 @@ char *symbolIdent(Int symbol, Int mode)
 	strcpy(curScrat++, "#)");
       }
       break;
-    case ANA_POINTER: case ANA_TRANSFER:
+    case LUX_POINTER: case LUX_TRANSFER:
       /* if we get here then this is a pointer to nothing */
       p = symbolProperName(symbol);
       strcpy(curScrat, p? p: "(unnamed)");
       break;
-    case ANA_ASSOC:
+    case LUX_ASSOC:
       sprintf(curScrat, "ASSOC(%1d,", assoc_lun(symbol));
       curScrat += strlen(curScrat);
       switch (assoc_type(symbol)) {
-	case ANA_BYTE:
+	case LUX_BYTE:
 	  strcpy(curScrat, "BYTARR(");
 	  break;
-	case ANA_WORD:
+	case LUX_WORD:
 	  strcpy(curScrat, "INTARR(");
 	  break;
-	case ANA_LONG:
+	case LUX_LONG:
 	  strcpy(curScrat, "LONARR(");
 	  break;
-	case ANA_FLOAT:
+	case LUX_FLOAT:
 	  strcpy(curScrat, "FLTARR(");
 	  break;
-	case ANA_DOUBLE:
+	case LUX_DOUBLE:
 	  strcpy(curScrat, "DBLARR(");
 	  break;
       }
@@ -887,50 +887,50 @@ char *symbolIdent(Int symbol, Int mode)
       }
       strcpy(curScrat, ")");
       break;
-    case ANA_FUNC_PTR:
+    case LUX_FUNC_PTR:
       strcpy(curScrat++, "&");
       n = func_ptr_routine_num(symbol);
       if (n < 0) {		/* internal function/routine */
 	n = -n;
 	switch (func_ptr_type(symbol)) {
-	  case ANA_SUBROUTINE:
+	  case LUX_SUBROUTINE:
 	    strcpy(curScrat, subroutine[n].name);
 	    break;
-	  case ANA_FUNCTION:
+	  case LUX_FUNCTION:
 	    strcpy(curScrat, function[n].name);
 	    break;
 	}
       } else			/* user-defined function/routine */
 	symbolIdent(n, mode);	/* is put at curScratch */
       break;
-    case ANA_SCAL_PTR:
+    case LUX_SCAL_PTR:
       switch (scal_ptr_type(symbol)) {
-	case ANA_BYTE:
+	case LUX_BYTE:
 	  number.l = (Int) *scal_ptr_pointer(symbol).b;
 	  break;
-	case ANA_WORD:
+	case LUX_WORD:
 	  number.l = (Int) *scal_ptr_pointer(symbol).w;
 	  break;
-	case ANA_LONG:
+	case LUX_LONG:
 	  number.l = *scal_ptr_pointer(symbol).l;
 	  break;
-	case ANA_FLOAT:
+	case LUX_FLOAT:
 	  number.f = *scal_ptr_pointer(symbol).f;
 	  break;
-	case ANA_DOUBLE:
+	case LUX_DOUBLE:
 	  number.f = (Float) *scal_ptr_pointer(symbol).d;
 	  break;
-	case ANA_TEMP_STRING:
+	case LUX_TEMP_STRING:
 	  strcpy(curScrat, scal_ptr_pointer(symbol).s);
 	  curScrat += strlen(curScrat);
 	  break;
       }
-      if (scal_ptr_type(symbol) < ANA_FLOAT) /* integer type */
+      if (scal_ptr_type(symbol) < LUX_FLOAT) /* integer type */
 	sprintf(curScrat, "%d", number.l);
-      else if (scal_ptr_type(symbol) <= ANA_DOUBLE) /* Float type */
+      else if (scal_ptr_type(symbol) <= LUX_DOUBLE) /* Float type */
 	sprintf(curScrat, "%g", number.f);
       break;
-    case ANA_SUBSC_PTR:
+    case LUX_SUBSC_PTR:
       if (subsc_ptr_start(symbol) == -1) /* (*) */
 	strcpy(curScrat++, "*");
       else {
@@ -960,21 +960,21 @@ char *symbolIdent(Int symbol, Int mode)
 	}
       }
       break;
-    case ANA_FILEMAP:
+    case LUX_FILEMAP:
       switch (file_map_type(symbol)) {
-	case ANA_BYTE:
+	case LUX_BYTE:
 	  strcpy(curScrat, "BYTFARR(");
 	  break;
-	case ANA_WORD:
+	case LUX_WORD:
 	  strcpy(curScrat, "INTFARR(");
 	  break;
-	case ANA_LONG:
+	case LUX_LONG:
 	  strcpy(curScrat, "LONFARR(");
 	  break;
-	case ANA_FLOAT:
+	case LUX_FLOAT:
 	  strcpy(curScrat, "FLTFARR(");
 	  break;
-	case ANA_DOUBLE:
+	case LUX_DOUBLE:
 	  strcpy(curScrat, "DBLFARR(");
 	  break;
       }
@@ -999,7 +999,7 @@ char *symbolIdent(Int symbol, Int mode)
       }
       strcpy(curScrat, ")");
       break;
-    case ANA_CLIST: case ANA_PRE_CLIST: case ANA_CPLIST:
+    case LUX_CLIST: case LUX_PRE_CLIST: case LUX_CPLIST:
       strcpy(curScrat++, "{");
       n = clist_num_symbols(symbol);
       ptr.w = clist_symbols(symbol);
@@ -1016,7 +1016,7 @@ char *symbolIdent(Int symbol, Int mode)
 	i = 0;
       }
       m = mode & I_SINGLEMODE;
-      if (symbol_class(symbol) == ANA_CPLIST)
+      if (symbol_class(symbol) == LUX_CPLIST)
 	/* for CPLIST, show names if possible */
 	m &= ~I_VALUE;
       while (j--) {
@@ -1033,7 +1033,7 @@ char *symbolIdent(Int symbol, Int mode)
       if (i && (mode & I_LENGTH))
 	sprintf(curScrat, " (%1d#)", n);
       break;
-    case ANA_LIST: case ANA_PRE_LIST:
+    case LUX_LIST: case LUX_PRE_LIST:
       strcpy(curScrat++, "{");
       n = list_num_symbols(symbol);
       sptr = list_symbols(symbol);
@@ -1068,8 +1068,8 @@ char *symbolIdent(Int symbol, Int mode)
       if (i && (mode & I_LENGTH))
 	sprintf(curScrat, " (%1d#)", n);
       break;
-    case ANA_KEYWORD:
-      if (keyword_value(symbol) == ANA_ONE)
+    case LUX_KEYWORD:
+      if (keyword_value(symbol) == LUX_ONE)
 	sprintf(curScrat, "/%s", keyword_name(symbol));
       else {
 	sprintf(curScrat, "%s=", keyword_name(symbol));
@@ -1077,7 +1077,7 @@ char *symbolIdent(Int symbol, Int mode)
 	symbolIdent(keyword_value(symbol), mode & I_SINGLEMODE);
       }
       break;
-    case ANA_LIST_PTR:
+    case LUX_LIST_PTR:
       symbolIdent(list_ptr_target(symbol), mode & I_SINGLEMODE);
       curScrat += strlen(curScrat);
       if (list_ptr_target(symbol) < 0) /* numerical tag */
@@ -1085,7 +1085,7 @@ char *symbolIdent(Int symbol, Int mode)
       else
 	sprintf(curScrat, ".%s", list_ptr_tag_string(symbol));
       break;
-    case ANA_ENUM:
+    case LUX_ENUM:
       n = enum_num_elements(symbol);
       strcpy(curScrat++, "{");
       eptr = enum_list(symbol);
@@ -1113,10 +1113,10 @@ char *symbolIdent(Int symbol, Int mode)
       }
       strcpy(curScrat, "}");
       break;
-    case ANA_META:
+    case LUX_META:
       sprintf(curScrat, "SYMBOL('%s')", string_value(meta_target(symbol)));
       break;
-    case ANA_CARRAY:
+    case LUX_CARRAY:
       ptr.cf = array_data(symbol);
       n = array_size(symbol);
       strcpy(curScrat++, "[");
@@ -1129,7 +1129,7 @@ char *symbolIdent(Int symbol, Int mode)
 	i = 0;
       }
       switch (array_type(symbol)) {
-	case ANA_CFLOAT:
+	case LUX_CFLOAT:
 	  while (j--) {
 	    sprintf(curScrat, "(%g%+-1gi)", ptr.cf->real, ptr.cf->imaginary);
 	    curScrat += strlen(curScrat);
@@ -1138,7 +1138,7 @@ char *symbolIdent(Int symbol, Int mode)
 	    ptr.cf++;
 	  }
 	  break;
-	case ANA_CDOUBLE:
+	case LUX_CDOUBLE:
 	  while (j--) {
 	    sprintf(curScrat, "(%g%+-1gi)", ptr.cd->real, ptr.cd->imaginary);
 	    curScrat += strlen(curScrat);
@@ -1158,16 +1158,16 @@ char *symbolIdent(Int symbol, Int mode)
       }
       strcpy(curScrat, "]");
       break;
-    case ANA_SUBROUTINE: case ANA_FUNCTION: case ANA_BLOCKROUTINE:
-    case ANA_DEFERRED_SUBR: case ANA_DEFERRED_FUNC: case ANA_DEFERRED_BLOCK:
+    case LUX_SUBROUTINE: case LUX_FUNCTION: case LUX_BLOCKROUTINE:
+    case LUX_DEFERRED_SUBR: case LUX_DEFERRED_FUNC: case LUX_DEFERRED_BLOCK:
       switch (symbol_class(symbol)) {
-	case ANA_SUBROUTINE: case ANA_DEFERRED_SUBR:
+	case LUX_SUBROUTINE: case LUX_DEFERRED_SUBR:
 	  name = "SUBR";
 	  break;
-	case ANA_FUNCTION: case ANA_DEFERRED_FUNC:
+	case LUX_FUNCTION: case LUX_DEFERRED_FUNC:
 	  name = "FUNC";
 	  break;
-	case ANA_BLOCKROUTINE: case ANA_DEFERRED_BLOCK:
+	case LUX_BLOCKROUTINE: case LUX_DEFERRED_BLOCK:
 	  name = "BLOCK";
 	  break;
       }
@@ -1176,9 +1176,9 @@ char *symbolIdent(Int symbol, Int mode)
       p = symbolProperName(symbol);
       strcpy(curScrat, p? p: "(unnamed)");
       curScrat += strlen(curScrat);
-      if (symbol_class(symbol) == ANA_DEFERRED_SUBR
-	  || symbol_class(symbol) == ANA_DEFERRED_FUNC
-	  || symbol_class(symbol) == ANA_DEFERRED_BLOCK) {
+      if (symbol_class(symbol) == LUX_DEFERRED_SUBR
+	  || symbol_class(symbol) == LUX_DEFERRED_FUNC
+	  || symbol_class(symbol) == LUX_DEFERRED_BLOCK) {
 	sprintf(curScrat, " (deferred, file \"%s\") END%s",
 		deferred_routine_filename(symbol), name);
 	curScrat += strlen(curScrat);
@@ -1190,11 +1190,11 @@ char *symbolIdent(Int symbol, Int mode)
 	break;
       }
       n = routine_num_parameters(symbol);
-      if (symbol_class(symbol) == ANA_FUNCTION)
+      if (symbol_class(symbol) == LUX_FUNCTION)
 	strcpy(curScrat++, "(");
       if (n) {			/* have parameters */
 	ptr.sp = routine_parameter_names(symbol);
-	if (symbol_class(symbol) == ANA_SUBROUTINE)
+	if (symbol_class(symbol) == LUX_SUBROUTINE)
 	  strcpy(curScrat++, ",");
 	while (n--) {
 	  sprintf(curScrat, "%s", *ptr.sp++);
@@ -1203,7 +1203,7 @@ char *symbolIdent(Int symbol, Int mode)
 	    strcpy(curScrat++, ",");
 	}
       }
-      if (symbol_class(symbol) == ANA_FUNCTION)
+      if (symbol_class(symbol) == LUX_FUNCTION)
 	strcpy(curScrat++, ")");
       if (mode & I_NL) {
 	indent += 2;
@@ -1255,19 +1255,19 @@ char *symbolIdent(Int symbol, Int mode)
       }	else
 	strcpy(curScrat++, " ");
       break;
-    case ANA_BIN_OP: case ANA_IF_OP:
+    case LUX_BIN_OP: case LUX_IF_OP:
       strcpy(curScrat++, "(");
       symbolIdent(bin_op_lhs(symbol), mode & I_SINGLEMODE);
       curScrat += strlen(curScrat);
       switch (bin_op_type(symbol)) {
-      case ANA_ADD: case ANA_SUB: case ANA_MUL: case ANA_DIV:
-      case ANA_POW: case ANA_MOD: case ANA_MAX: case ANA_MIN:
-      case ANA_IDIV:
+      case LUX_ADD: case LUX_SUB: case LUX_MUL: case LUX_DIV:
+      case LUX_POW: case LUX_MOD: case LUX_MAX: case LUX_MIN:
+      case LUX_IDIV:
 	strcpy(curScrat, binOpSign[bin_op_type(symbol)]);
 	break;
-      case ANA_EQ: case ANA_LE: case ANA_LT: case ANA_GT:
-      case ANA_NE: case ANA_AND: case ANA_OR: case ANA_XOR:
-      case ANA_ANDIF: case ANA_ORIF: case ANA_GE: case ANA_SMOD:
+      case LUX_EQ: case LUX_LE: case LUX_LT: case LUX_GT:
+      case LUX_NE: case LUX_AND: case LUX_OR: case LUX_XOR:
+      case LUX_ANDIF: case LUX_ORIF: case LUX_GE: case LUX_SMOD:
 	sprintf(curScrat, " %s ", binOpSign[bin_op_type(symbol)]);
 	break;
       }
@@ -1276,7 +1276,7 @@ char *symbolIdent(Int symbol, Int mode)
       curScrat += strlen(curScrat);
       strcpy(curScrat, ")");
       break;
-    case ANA_INT_FUNC:
+    case LUX_INT_FUNC:
       n = 0;
       switch (int_func_number(symbol)) {
 	case 0:			/* unary_negative */
@@ -1389,7 +1389,7 @@ char *symbolIdent(Int symbol, Int mode)
 	strcpy(curScrat++, ")");
       }
       break;
-    case ANA_USR_FUNC:
+    case LUX_USR_FUNC:
       p = symbolProperName(usr_func_number(symbol));
       sprintf(curScrat, "%s(", p? p: "(unnamed)");
       curScrat += strlen(curScrat);
@@ -1403,11 +1403,11 @@ char *symbolIdent(Int symbol, Int mode)
       }
       strcpy(curScrat++, ")");
       break;
-    case ANA_EXTRACT: case ANA_PRE_EXTRACT:
-      if (symbol_class(symbol) == ANA_EXTRACT) {
+    case LUX_EXTRACT: case LUX_PRE_EXTRACT:
+      if (symbol_class(symbol) == LUX_EXTRACT) {
 	if (extract_target(symbol) > 0) { /* target is regular symbol */
 	  switch (symbol_class(extract_target(symbol))) {
-	    case ANA_FUNCTION:
+	    case LUX_FUNCTION:
 	      strcpy(curScrat, symbolProperName(extract_target(symbol)));
 	      break;
 	    default:
@@ -1419,7 +1419,7 @@ char *symbolIdent(Int symbol, Int mode)
 	curScrat += strlen(curScrat);
 	sec = extract_ptr(symbol);
 	n = extract_num_sec(symbol);
-      } else {			/* an ANA_PRE_EXTRACT symbol */
+      } else {			/* an LUX_PRE_EXTRACT symbol */
 	strcpy(curScrat, pre_extract_name(symbol));
 	sec = pre_extract_ptr(symbol);
 	n = pre_extract_num_sec(symbol);
@@ -1432,7 +1432,7 @@ char *symbolIdent(Int symbol, Int mode)
       while (n--) {
 	i = sec->number;
 	switch (sec->type) {
-	  case ANA_RANGE:
+	  case LUX_RANGE:
 	    strcpy(curScrat++, "(");
 	    ptr.w = sec->ptr.w;
 	    while (i--) {
@@ -1443,7 +1443,7 @@ char *symbolIdent(Int symbol, Int mode)
 	    }
 	    strcpy(curScrat++, ")");
 	    break;
-	  case ANA_LIST:
+	  case LUX_LIST:
 	    ptr.sp = sec->ptr.sp;
 	    while (i--) {
 	      strcpy(curScrat++, ".");
@@ -1455,7 +1455,7 @@ char *symbolIdent(Int symbol, Int mode)
 	sec++;
       }
       break;
-    case ANA_EVB:
+    case LUX_EVB:
       n = evb_num_elements(symbol);
       ptr.w = evb_args(symbol);
       switch (evb_type(symbol)) {
@@ -1584,7 +1584,7 @@ char *symbolIdent(Int symbol, Int mode)
 	  strcpy(curScrat++, ",");
 	  symbolIdent(for_end(symbol), mode & I_SINGLEMODE);
 	  curScrat += strlen(curScrat);
-	  if (for_step(symbol) != ANA_ONE) {
+	  if (for_step(symbol) != LUX_ONE) {
 	    strcpy(curScrat++, ",");
 	    symbolIdent(for_step(symbol), mode & I_SINGLEMODE);
 	    curScrat += strlen(curScrat);
@@ -1604,7 +1604,7 @@ char *symbolIdent(Int symbol, Int mode)
 	  strcpy(curScrat, "RUN,");
 	  curScrat += strlen(curScrat);
 	  n = usr_code_routine_num(symbol);
-	  if (symbol_class(n) == ANA_STRING)  /* unevaluated name */
+	  if (symbol_class(n) == LUX_STRING)  /* unevaluated name */
 	    strcpy(curScrat, string_value(n));
 	  else {
 	    p = symbolProperName(usr_code_routine_num(symbol));
@@ -1625,7 +1625,7 @@ char *symbolIdent(Int symbol, Int mode)
 	  break;
 	case EVB_INT_SUB:
 	  switch (int_sub_routine_num(symbol)) {
-	    case ANA_INSERT_SUB: /* INSERT */
+	    case LUX_INSERT_SUB: /* INSERT */
 	      n = int_sub_num_arguments(symbol) - 2;
 	      ptr.w = int_sub_arguments(symbol);
 	      symbolIdent(ptr.w[n + 1], mode & I_SINGLEMODE);
@@ -1655,7 +1655,7 @@ char *symbolIdent(Int symbol, Int mode)
 	  }
 	  break;
 	case EVB_USR_SUB:
-	  if (usr_sub_is_deferred(symbol))  /* call to an ANA_DEFERRED_SUBR */
+	  if (usr_sub_is_deferred(symbol))  /* call to an LUX_DEFERRED_SUBR */
 	    strcpy(curScrat, string_value(usr_sub_routine_num(symbol)));
 	  else {
 	    p = symbolProperName(usr_sub_routine_num(symbol));
@@ -1856,11 +1856,11 @@ char *symbolIdent(Int symbol, Int mode)
 	  break;
       }
       break;
-    case ANA_STRUCT:
+    case LUX_STRUCT:
       se = struct_elements(symbol);
       identStruct(se);
       break;
-    case ANA_STRUCT_PTR:
+    case LUX_STRUCT_PTR:
       spe = struct_ptr_elements(symbol);
       n = struct_ptr_n_elements(symbol);
       symbolIdent(struct_ptr_target(symbol), mode);
@@ -1873,14 +1873,14 @@ char *symbolIdent(Int symbol, Int mode)
 	  spm = spe->member;
 	  while (i--) {
 	    switch (spm->type) {
-	      case ANA_SCALAR:
+	      case LUX_SCALAR:
 		sprintf(curScrat, "%1d", spm->data.scalar.value);
 		break;
-	      case ANA_RANGE:
+	      case LUX_RANGE:
 		sprintf(curScrat, "%1d:%1d", spm->data.range.start,
 			spm->data.range.end);
 		break;
-	      case ANA_ARRAY:
+	      case LUX_ARRAY:
 		strcpy(curScrat++, "[");
 		j = spm->data.array.n_elem;
 		if ((mode & I_TRUNCATE) && j > 3)
@@ -1902,7 +1902,7 @@ char *symbolIdent(Int symbol, Int mode)
 	spe++;
       }
       break;
-    case ANA_UNDEFINED:
+    case LUX_UNDEFINED:
       p = symbolProperName(symbol);
       sprintf(curScrat, "%s?", p? p: "(unnamed)");
       break;
@@ -1944,11 +1944,11 @@ Int identStruct(structElem *se)
 	curScrat += strlen(curScrat);
 	if (ndim2) {
 	  dims2 = se->u.regular.spec.singular.dims;
-	  if (se->u.regular.type == ANA_TEMP_STRING) {
+	  if (se->u.regular.type == LUX_TEMP_STRING) {
 	    sprintf(curScrat, "SIZE=%1d,1", *dims2++);
 	    curScrat += strlen(curScrat);
 	    ndim2 = 0;
-	  } else if (se->u.regular.type == ANA_STRING_ARRAY) {
+	  } else if (se->u.regular.type == LUX_STRING_ARRAY) {
 	    sprintf(curScrat, "SIZE=%1d", *dims2++);
 	    curScrat += strlen(curScrat);
 	    if (ndim2 > 1)
@@ -2007,18 +2007,18 @@ void dumpTree(Int symbol)
   default:
       printf(" type %1d\n", symbol_type(symbol));
       return;
-    case ANA_SCALAR: case ANA_SCAL_PTR: case ANA_ARRAY:
-    case ANA_STRING: case ANA_SUBSC_PTR:
+    case LUX_SCALAR: case LUX_SCAL_PTR: case LUX_ARRAY:
+    case LUX_STRING: case LUX_SUBSC_PTR:
       puts(symbolIdent(symbol, I_VALUE | I_TRUNCATE));
       return;
-    case ANA_POINTER: case ANA_TRANSFER:
+    case LUX_POINTER: case LUX_TRANSFER:
       printf("target: %1d\n", transfer_target(symbol));
       indent++;
       dumpTree(transfer_target(symbol));
       indent--;
       return;
-    case ANA_PRE_EXTRACT: case ANA_EXTRACT:
-      if (symbol_class(symbol) == ANA_PRE_EXTRACT) {
+    case LUX_PRE_EXTRACT: case LUX_EXTRACT:
+      if (symbol_class(symbol) == LUX_PRE_EXTRACT) {
 	printf("target: %s\n", pre_extract_name(symbol));
 	eptr = pre_extract_ptr(symbol);
 	n = pre_extract_num_sec(symbol);
@@ -2035,13 +2035,13 @@ void dumpTree(Int symbol)
       while (n--) {
 	i = eptr->number;
 	switch (eptr->type) {
-	  case ANA_RANGE:
+	  case LUX_RANGE:
 	    printf("range:\n");
 	    ptr = eptr->ptr.w;
 	    while (i--)
 	      dumpTree(*ptr++);
 	    break;
-	  case ANA_LIST:
+	  case LUX_LIST:
 	    printf("tags:\n");
 	    sp = eptr->ptr.sp;
 	    while (i--)
@@ -2052,7 +2052,7 @@ void dumpTree(Int symbol)
       }
       indent--;
       break;
-    case ANA_SUBROUTINE: case ANA_FUNCTION: case ANA_BLOCKROUTINE:
+    case LUX_SUBROUTINE: case LUX_FUNCTION: case LUX_BLOCKROUTINE:
       printf(" parameters: ");
       n = routine_num_parameters(symbol);
       if (!n)
@@ -2087,7 +2087,7 @@ void dumpTree(Int symbol)
       }
       indent--;
       return;
-    case ANA_RANGE:
+    case LUX_RANGE:
       printf("start: %1d, end: %1d, sum: %1d, redirect: %1d\n",
 	     range_start(symbol), range_end(symbol), range_sum(symbol),
 	     range_redirect(symbol));
@@ -2105,7 +2105,7 @@ void dumpTree(Int symbol)
 	dumpTree(n);
       indent--;
       return;
-    case ANA_LIST:
+    case LUX_LIST:
       printf("key - value: ");
       n = list_num_symbols(symbol);
       for (i = 0; i < n; i++)
@@ -2116,7 +2116,7 @@ void dumpTree(Int symbol)
 	dumpTree(list_symbol(symbol, i));
       indent--;
       return;
-    case ANA_CLIST:
+    case LUX_CLIST:
       printf("elements: ");
       n = clist_num_symbols(symbol);
       ptr = clist_symbols(symbol);
@@ -2129,7 +2129,7 @@ void dumpTree(Int symbol)
 	dumpTree(*ptr++);
       indent--;
       return;
-    case ANA_KEYWORD:
+    case LUX_KEYWORD:
       printf("name: %1d, value: %1d\n", keyword_name_symbol(symbol),
 	   keyword_value(symbol));
       indent++;
@@ -2137,7 +2137,7 @@ void dumpTree(Int symbol)
       dumpTree(keyword_value(symbol));
       indent--;
       return;
-    case ANA_FILEMAP:
+    case LUX_FILEMAP:
       printf("type: %s, file: %s, dimensions:",
 	     typeName(file_map_type(symbol)),
 	     file_map_file_name(symbol));
@@ -2147,7 +2147,7 @@ void dumpTree(Int symbol)
 	printf(" %1d", *l++);
       putchar('\n');
       return;
-    case ANA_ASSOC:
+    case LUX_ASSOC:
       printf("lun: %1d, dimensions:", assoc_lun(symbol));
       n = assoc_num_dims(symbol);
       l = assoc_dims(symbol);
@@ -2155,23 +2155,23 @@ void dumpTree(Int symbol)
 	printf(" %1d", *l++);
       putchar('\n');
       return;
-    case ANA_ENUM:
+    case LUX_ENUM:
       printf("type: %s, key - value: %s\n", typeName(enum_type(symbol)),
 	     symbolIdent(symbol, I_VALUE));
       return;
-    case ANA_UNDEFINED:
+    case LUX_UNDEFINED:
       putchar('\n');
       return;
-    case ANA_META:
+    case LUX_META:
       printf("number: %1d\n", meta_target(symbol));
       indent++;
       dumpTree(meta_target(symbol));
       indent--;
       return;
-    case ANA_FUNC_PTR:
+    case LUX_FUNC_PTR:
       n = func_ptr_routine_num(symbol);
       if (n < 0) {
-	if (func_ptr_type(symbol) == ANA_FUNCTION)
+	if (func_ptr_type(symbol) == LUX_FUNCTION)
 	  printf("internal function: %s\n", function[-n].name);
 	else
 	  printf("internal subroutine: %s\n", subroutine[-n].name);
@@ -2182,7 +2182,7 @@ void dumpTree(Int symbol)
 	indent--;
       }
       return;
-    case ANA_PRE_LIST:
+    case LUX_PRE_LIST:
       printf("key - element: ");
       n = pre_list_num_symbols(symbol);
       for (i = 0; i < n; i++)
@@ -2194,7 +2194,7 @@ void dumpTree(Int symbol)
 	dumpTree(pre_list_symbol(symbol, i));
       indent--;
       return;
-    case ANA_PRE_CLIST:
+    case LUX_PRE_CLIST:
       printf("elements:");
       n = pre_clist_num_symbols(symbol);
       ptr = pre_clist_symbols(symbol);
@@ -2207,7 +2207,7 @@ void dumpTree(Int symbol)
 	dumpTree(*ptr++);
       indent--;
       return;
-    case ANA_PRE_RANGE:
+    case LUX_PRE_RANGE:
       printf("start: %1d, end: %1d, sum: %1d, redirect: %1d\n",
 	     pre_range_start(symbol), pre_range_end(symbol),
 	     pre_range_sum(symbol), pre_range_redirect(symbol));
@@ -2224,7 +2224,7 @@ void dumpTree(Int symbol)
 	dumpTree(n);
       indent--;
       return;
-    case ANA_LIST_PTR:
+    case LUX_LIST_PTR:
       n = list_ptr_target(symbol);
       printf("target: %1d, tag: ", n < 0? -n: n);
       if (n < 0) {
@@ -2237,7 +2237,7 @@ void dumpTree(Int symbol)
       dumpTree(n);
       indent--;
       return;
-    case ANA_INT_FUNC:
+    case LUX_INT_FUNC:
       printf("function: %s, arguments:",
 	     function[int_func_number(symbol)].name);
       n = int_func_num_arguments(symbol);
@@ -2255,7 +2255,7 @@ void dumpTree(Int symbol)
 	dumpTree(*ptr++);
       indent--;
       return;
-    case ANA_USR_FUNC:
+    case LUX_USR_FUNC:
       printf("function: %1d (%s), arguments:", usr_func_number(symbol),
 	     symbolProperName(usr_func_number(symbol)));
       n = usr_func_num_arguments(symbol);
@@ -2274,7 +2274,7 @@ void dumpTree(Int symbol)
 	dumpTree(*ptr++);
       indent--;
       return;
-    case ANA_IF_OP: case ANA_BIN_OP:
+    case LUX_IF_OP: case LUX_BIN_OP:
       printf("%s, lhs: %1d, rhs: %1d\n",
 	     binOpName[bin_op_type(symbol)], bin_op_lhs(symbol),
 	     bin_op_rhs(symbol));
@@ -2283,7 +2283,7 @@ void dumpTree(Int symbol)
       dumpTree(bin_op_rhs(symbol));
       indent--;
       return;
-    case ANA_EVB:
+    case LUX_EVB:
       kind = evb_type(symbol);
       switch (kind) {
 	case EVB_REPLACE:
@@ -2481,7 +2481,7 @@ void dumpLine(Int symbol)
   dumpTree(symbol);
 }
 /*------------------------------------------------------------------------- */
-Int ana_list(Int narg, Int ps[])
+Int lux_list(Int narg, Int ps[])
 /* shows the definition of a user-defined subroutine, function,
    or block routine */
 /* LIST,symbol  or  LIST,'name'  lists the definition of the given symbol
@@ -2491,10 +2491,10 @@ Int ana_list(Int narg, Int ps[])
   char	*name, *p;
 
   switch (symbol_class(ps[0])) {
-    case ANA_SCALAR:
+    case LUX_SCALAR:
       symbol = int_arg(ps[0]);
       break;
-    case ANA_STRING:
+    case LUX_STRING:
       name = p = strsave(string_value(ps[0]));
       while (*p) {
 	*p = toupper(*p);
@@ -2509,7 +2509,7 @@ Int ana_list(Int narg, Int ps[])
 	symbol = lookForName(name, blockHashTable, 0);
       free(name);
       if (symbol < 0)
-	return anaerror("Could not find the symbol", ps[0]);
+	return luxerror("Could not find the symbol", ps[0]);
       break;
     default:
       return cerror(ILL_CLASS, ps[0]);
@@ -2517,6 +2517,6 @@ Int ana_list(Int narg, Int ps[])
   setPager(0);
   printw(symbolIdent(symbol, I_ROUTINE | I_NL));
   resetPager();
-  return ANA_ONE;
+  return LUX_ONE;
 }
 /*------------------------------------------------------------------------- */

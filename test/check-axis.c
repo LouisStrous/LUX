@@ -21,19 +21,19 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdlib.h>		/* for EXIT_SUCCESS, EXIT_FAILURE */
 
 #include "config.h"
-#include "anaparser.h"
+#include "luxparser.h"
 #include "action.h"
 #include "axis.h"
 
 START_TEST(first_axis)
 {
   int dims[] = { 3, 4 };
-  Int iq = array_scratch(ANA_LONG, 2, dims);
-  iq = ana_indgen(1, &iq);
+  Int iq = array_scratch(LUX_LONG, 2, dims);
+  iq = lux_indgen(1, &iq);
   ck_assert_msg(iq > 0, "Cannot create array");
   loopInfo srci;
   pointer srcp;
-  ck_assert_int_eq(standardLoop(iq, 0, SL_ALLAXES, ANA_LONG, &srci, &srcp, NULL, NULL, NULL), ANA_OK);
+  ck_assert_int_eq(standardLoop(iq, 0, SL_ALLAXES, LUX_LONG, &srci, &srcp, NULL, NULL, NULL), LUX_OK);
   ck_assert_int_eq(srci.ndim, sizeof(dims)/sizeof(*dims));
   ck_assert_int_eq(srci.nelem, dims[0]*dims[1]);
   int i;
@@ -71,17 +71,17 @@ END_TEST
 START_TEST(second_axis)
 {
   int dims[] = { 3, 4 };
-  Int iq = array_scratch(ANA_LONG, 2, dims);
-  iq = ana_indgen(1, &iq);
+  Int iq = array_scratch(LUX_LONG, 2, dims);
+  iq = lux_indgen(1, &iq);
   ck_assert_msg(iq > 0, "Cannot create array");
   int one =  1;
-  Int axes = array_scratch(ANA_LONG, 1, &one);
+  Int axes = array_scratch(LUX_LONG, 1, &one);
   pointer axesp;
   axesp.v = array_data(axes);
   *axesp.l = 1;
   loopInfo srci;
   pointer srcp;
-  ck_assert_int_eq(standardLoop(iq, axes, 0, ANA_LONG, &srci, &srcp, NULL, NULL, NULL), ANA_OK);
+  ck_assert_int_eq(standardLoop(iq, axes, 0, LUX_LONG, &srci, &srcp, NULL, NULL, NULL), LUX_OK);
   ck_assert_int_eq(srci.ndim, sizeof(dims)/sizeof(*dims));
   ck_assert_int_eq(srci.nelem, dims[0]*dims[1]);
   int i;
@@ -119,12 +119,12 @@ END_TEST
 START_TEST(first_then_second_axis)
 {
   int dims[] = { 3, 4 };
-  Int iq = array_scratch(ANA_LONG, 2, dims);
-  iq = ana_indgen(1, &iq);
+  Int iq = array_scratch(LUX_LONG, 2, dims);
+  iq = lux_indgen(1, &iq);
   ck_assert_msg(iq > 0, "Cannot create array");
   loopInfo srci;
   pointer srcp;
-  ck_assert_int_eq(standardLoop(iq, 0, SL_ALLAXES, ANA_LONG, &srci, &srcp, NULL, NULL, NULL), ANA_OK);
+  ck_assert_int_eq(standardLoop(iq, 0, SL_ALLAXES, LUX_LONG, &srci, &srcp, NULL, NULL, NULL), LUX_OK);
   ck_assert_int_eq(srci.ndim, sizeof(dims)/sizeof(*dims));
   ck_assert_int_eq(srci.nelem, dims[0]*dims[1]);
   int i;
@@ -194,12 +194,12 @@ END_TEST
 START_TEST(first_axis_eachrow)
 {
   int dims[] = { 3, 4 };
-  Int iq = array_scratch(ANA_LONG, 2, dims);
-  iq = ana_indgen(1, &iq);
+  Int iq = array_scratch(LUX_LONG, 2, dims);
+  iq = lux_indgen(1, &iq);
   ck_assert_msg(iq > 0, "Cannot create array");
   loopInfo srci;
   pointer srcp;
-  ck_assert_int_eq(standardLoop(iq, 0, SL_ALLAXES | SL_EACHROW, ANA_LONG, &srci, &srcp, NULL, NULL, NULL), ANA_OK);
+  ck_assert_int_eq(standardLoop(iq, 0, SL_ALLAXES | SL_EACHROW, LUX_LONG, &srci, &srcp, NULL, NULL, NULL), LUX_OK);
   ck_assert_int_eq(srci.ndim, sizeof(dims)/sizeof(*dims));
   ck_assert_int_eq(srci.nelem, dims[0]*dims[1]);
   int i;
@@ -239,17 +239,17 @@ END_TEST
 START_TEST(second_axis_eachrow)
 {
   int dims[] = { 3, 4 };
-  Int iq = array_scratch(ANA_LONG, 2, dims);
-  iq = ana_indgen(1, &iq);
+  Int iq = array_scratch(LUX_LONG, 2, dims);
+  iq = lux_indgen(1, &iq);
   ck_assert_msg(iq > 0, "Cannot create array");
   int one =  1;
-  Int axes = array_scratch(ANA_LONG, 1, &one);
+  Int axes = array_scratch(LUX_LONG, 1, &one);
   pointer axesp;
   axesp.v = array_data(axes);
   *axesp.l = 1;
   loopInfo srci;
   pointer srcp;
-  ck_assert_int_eq(standardLoop(iq, axes, SL_EACHROW, ANA_LONG, &srci, &srcp, NULL, NULL, NULL), ANA_OK);
+  ck_assert_int_eq(standardLoop(iq, axes, SL_EACHROW, LUX_LONG, &srci, &srcp, NULL, NULL, NULL), LUX_OK);
   ck_assert_int_eq(srci.ndim, sizeof(dims)/sizeof(*dims));
   ck_assert_int_eq(srci.nelem, dims[0]*dims[1]);
   int i;
@@ -288,12 +288,12 @@ END_TEST
 START_TEST(first_then_second_axis_eachrow)
 {
   int dims[] = { 3, 4 };
-  Int iq = array_scratch(ANA_LONG, 2, dims);
-  iq = ana_indgen(1, &iq);
+  Int iq = array_scratch(LUX_LONG, 2, dims);
+  iq = lux_indgen(1, &iq);
   ck_assert_msg(iq > 0, "Cannot create array");
   loopInfo srci;
   pointer srcp;
-  ck_assert_int_eq(standardLoop(iq, 0, SL_ALLAXES | SL_EACHROW, ANA_LONG, &srci, &srcp, NULL, NULL, NULL), ANA_OK);
+  ck_assert_int_eq(standardLoop(iq, 0, SL_ALLAXES | SL_EACHROW, LUX_LONG, &srci, &srcp, NULL, NULL, NULL), LUX_OK);
   ck_assert_int_eq(srci.ndim, sizeof(dims)/sizeof(*dims));
   ck_assert_int_eq(srci.nelem, dims[0]*dims[1]);
   int i;
@@ -385,7 +385,7 @@ START_TEST(simple_args)
   ck_assert_int_eq(ps.remaining_dims,       PS_ABSENT);
   ck_assert_int_eq(ps.logical_type,         PS_INPUT );
   ck_assert_int_eq(ps.data_type_limit,      PS_EXACT );
-  ck_assert_int_eq(ps.data_type,            ANA_LONG );
+  ck_assert_int_eq(ps.data_type,            LUX_LONG );
   free_param_spec_list(psl);
 
   psl = parse_standard_arg_fmt("o>D");
@@ -400,7 +400,7 @@ START_TEST(simple_args)
   ck_assert_int_eq(ps.remaining_dims,       PS_ABSENT     );
   ck_assert_int_eq(ps.logical_type,         PS_OUTPUT     );
   ck_assert_int_eq(ps.data_type_limit,      PS_LOWER_LIMIT);
-  ck_assert_int_eq(ps.data_type,            ANA_DOUBLE    );
+  ck_assert_int_eq(ps.data_type,            LUX_DOUBLE    );
   free_param_spec_list(psl);
 
   psl = parse_standard_arg_fmt("rS");
@@ -415,7 +415,7 @@ START_TEST(simple_args)
   ck_assert_int_eq(ps.remaining_dims,       PS_ABSENT      );
   ck_assert_int_eq(ps.logical_type,         PS_RETURN      );
   ck_assert_int_eq(ps.data_type_limit,      PS_EXACT       );
-  ck_assert_int_eq(ps.data_type,            ANA_TEMP_STRING);
+  ck_assert_int_eq(ps.data_type,            LUX_TEMP_STRING);
   free_param_spec_list(psl);
 }
 END_TEST

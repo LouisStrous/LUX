@@ -17,7 +17,7 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "anadefs.h"
+#include "luxdefs.h"
 
 /* editorCharClass table */
 
@@ -81,7 +81,7 @@ symTableEntry	sym[NSYM];
 Int		scrat[NSCRAT], curSymbol;
 Word		listStack[NLIST];
 Word		curContext = 0;
-Int		ana_type_size[] =
+Int		lux_type_size[] =
 	{ sizeof(Byte), sizeof(Word), sizeof(Int), sizeof(Float),
 	  sizeof(Double), sizeof(char), sizeof(char), sizeof(char *),
 	  sizeof(floatComplex), sizeof(doubleComplex) };

@@ -1,4 +1,4 @@
-/* This is file ana_func_if.h.
+/* This is file lux_func_if.h.
 
 Copyright 2013 Louis Strous
 
@@ -25,11 +25,11 @@ typedef struct {
   size_t num_params;
   Word *param_syms;
   pointer *param_data;
-} ana_func_if;
+} lux_func_if;
 
-ana_func_if * ana_func_if_alloc(char const * const name, size_t num_params);
-void ana_func_if_free(ana_func_if *);
-Int ana_func_if_set_param(ana_func_if *, size_t index, Int param);
-Int ana_func_if_get_param_sym(ana_func_if *, size_t index);
-pointer ana_func_if_get_param_data(ana_func_if *, size_t index);
-Double ana_func_if_call(ana_func_if *);
+lux_func_if * lux_func_if_alloc(char const * const name, size_t num_params);
+void lux_func_if_free(lux_func_if *);
+Int lux_func_if_set_param(lux_func_if *, size_t index, Int param);
+Int lux_func_if_get_param_sym(lux_func_if *, size_t index);
+pointer lux_func_if_get_param_data(lux_func_if *, size_t index);
+Double lux_func_if_call(lux_func_if *);

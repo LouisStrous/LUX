@@ -63,7 +63,7 @@ Int	nAlloc = 0;
 
 extern Int	setup, curLineNumber, nExecuted;
 Int	checkChain(void), findAddress(void *, struct allocItem **),
-  addressToSymbol(void *), ana_dump(Int, Int []);
+  addressToSymbol(void *), lux_dump(Int, Int []);
 
 char	*evbName(Int);
 
@@ -110,20 +110,20 @@ Int checkOneSymbol(Int symbol, Int limit)
    }
 
   switch (symbol_class(symbol)) {
-    case ANA_STRING: case ANA_ARRAY: case ANA_CARRAY: case ANA_CSCALAR:
-    case ANA_CPLIST: case ANA_LIST: case ANA_CLIST: case ANA_PRE_CLIST:
-    case ANA_INT_FUNC:
+    case LUX_STRING: case LUX_ARRAY: case LUX_CARRAY: case LUX_CSCALAR:
+    case LUX_CPLIST: case LUX_LIST: case LUX_CLIST: case LUX_PRE_CLIST:
+    case LUX_INT_FUNC:
       regular = 1;
       break;
-    case ANA_SCALAR: case ANA_UNUSED: case ANA_UNDEFINED: case ANA_FUNC_PTR:
-    case ANA_ENUM: case ANA_TRANSFER: case ANA_POINTER: case ANA_KEYWORD:
-    case ANA_PRE_RANGE: case ANA_BIN_OP: case ANA_IF_OP: case ANA_RANGE:
+    case LUX_SCALAR: case LUX_UNUSED: case LUX_UNDEFINED: case LUX_FUNC_PTR:
+    case LUX_ENUM: case LUX_TRANSFER: case LUX_POINTER: case LUX_KEYWORD:
+    case LUX_PRE_RANGE: case LUX_BIN_OP: case LUX_IF_OP: case LUX_RANGE:
       break;
-    case ANA_SCAL_PTR:
-      if (scal_ptr_type(symbol) == ANA_TEMP_STRING)
+    case LUX_SCAL_PTR:
+      if (scal_ptr_type(symbol) == LUX_TEMP_STRING)
 	 regular = 1;
       break;
-    case ANA_SUBROUTINE: case ANA_FUNCTION: case ANA_BLOCKROUTINE:
+    case LUX_SUBROUTINE: case LUX_FUNCTION: case LUX_BLOCKROUTINE:
       if (routine_num_parameters(symbol) != 0
 	  && !checkListMessage(routine_parameter_names(symbol),
 			       routine_num_parameters(symbol)*sizeof(char *),
@@ -132,8 +132,8 @@ Int checkOneSymbol(Int symbol, Int limit)
       if (!checkListMessage(routine_parameters(symbol), (routine_num_parameters(symbol) + routine_num_statements(symbol))*sizeof(Word), limit, symbol, "routine_parameters"))
 	ok = 0;
       break;
-    case ANA_EXTRACT: case ANA_PRE_EXTRACT:
-      if (symbol_class(symbol) == ANA_EXTRACT) {
+    case LUX_EXTRACT: case LUX_PRE_EXTRACT:
+      if (symbol_class(symbol) == LUX_EXTRACT) {
 	if (!checkListMessage(extract_ptr(symbol), symbol_memory(symbol),
 			      limit, symbol, "extract_ptr"))
 	  ok = 0;
@@ -155,12 +155,12 @@ Int checkOneSymbol(Int symbol, Int limit)
       }
       while (n--) {
 	switch (eptr->type) {
-	  case ANA_RANGE:
+	  case LUX_RANGE:
 	    if (!checkListMessage(eptr->ptr.w, eptr->number*sizeof(Word),
 				  limit, symbol, "eptr->ptr.w"))
 	      ok = 0;
 	    break;
-	  case ANA_LIST:
+	  case LUX_LIST:
 	    if (!checkListMessage(eptr->ptr.sp, eptr->number*sizeof(char *),
 				  limit, symbol, "eptr->ptr.sp"))
 	      ok = 0;
@@ -178,7 +178,7 @@ Int checkOneSymbol(Int symbol, Int limit)
 	eptr++;
       }
       break;
-    case ANA_EVB:
+    case LUX_EVB:
       switch (evb_type(symbol)) {
 	case EVB_INT_SUB: case EVB_USR_SUB: case EVB_CASE: case EVB_NCASE:
 	case EVB_BLOCK: case EVB_INSERT: case EVB_FILE:
@@ -576,28 +576,28 @@ Int checkChain(void)
   while (ai->next) {
     count++;
     if (ai == ai->next) {
-      anaerror("Unending loop in forward allocList at number %1d (%1d)",
+      luxerror("Unending loop in forward allocList at number %1d (%1d)",
 	    0, count, (ai - allocList)/sizeof(struct allocItem));
       return -1;
     }
     ai = ai->next;
   }
   if (count != nAlloc) {
-    anaerror("Number of forward allocation units %1d is unequal to target %1d",
+    luxerror("Number of forward allocation units %1d is unequal to target %1d",
 	  count, nAlloc);
     return -1;
   }
   while (ai->prev) {
     count--;
     if (ai == ai->prev) {
-      anaerror("Unending loop in backward allocList at number %1d (%1d)",
+      luxerror("Unending loop in backward allocList at number %1d (%1d)",
 	    0, count, (ai - allocList)/sizeof(struct allocItem));
       return -1;
     }
     ai = ai->prev;
   }
   if (count > 1) {
-    anaerror("Number of backward allocation units %1d is unequal to target %1d",
+    luxerror("Number of backward allocation units %1d is unequal to target %1d",
 	  nAlloc - count + 1, nAlloc);
     return -1;
   }
@@ -630,7 +630,7 @@ Int findWorm(void)
   return suspect;
 }
 /*-----------------------------------------------------------------------*/
-Int ana_whereisAddress(Int narg, Int ps[])
+Int lux_whereisAddress(Int narg, Int ps[])
 /* returns information on memory at a given address */
 {
   Int	address, where, cut;
@@ -679,15 +679,15 @@ Int addressToSymbol(void *address)
 
   for (iq = NAMED_START; iq < NAMED_END; iq++) {
     switch (sym[iq].class) {
-      case ANA_SCALAR: case ANA_SCAL_PTR:
+      case LUX_SCALAR: case LUX_SCAL_PTR:
 	break;
-      case ANA_STRING:
+      case LUX_STRING:
 	if (address == sym[iq].spec.array.ptr)
 	  symbol = iq;
 	break;
-      case ANA_ARRAY:
+      case LUX_ARRAY:
 	h = HEAD(iq);
-	if (sym[iq].type == ANA_TEMP_STRING)	/* a string array */
+	if (sym[iq].type == LUX_TEMP_STRING)	/* a string array */
 	{ ptr.sp = (char **) string_value(iq);
 	  GET_SIZE(n, h->dims, h->ndim);
 	  for (j = 0; j < n; j++)
@@ -704,14 +704,14 @@ Int addressToSymbol(void *address)
   }
   if (symbol < 0) for (iq = TEMPS_START; iq < TEMPS_END; iq++)
   { switch (sym[iq].class)
-    { case ANA_SCALAR: case ANA_SCAL_PTR:
+    { case LUX_SCALAR: case LUX_SCAL_PTR:
 	break;
-      case ANA_STRING:
+      case LUX_STRING:
 	if (address == sym[iq].spec.array.ptr) symbol = iq;
 	break;
-      case ANA_ARRAY:
+      case LUX_ARRAY:
 	h = HEAD(iq);
-	if (sym[iq].type == ANA_TEMP_STRING)	/* a string array */
+	if (sym[iq].type == LUX_TEMP_STRING)	/* a string array */
 	{ ptr.sp = (char **) string_value(iq);
 	  GET_SIZE(n, h->dims, h->ndim);
 	  for (j = 0; j < n; j++)
@@ -728,11 +728,11 @@ Int addressToSymbol(void *address)
   }
   if (symbol < 0)
     printf("Address %p not found in checked symbols.\n", address);
-  else ana_dump(1, &symbol);
+  else lux_dump(1, &symbol);
   return symbol;
 }
 /*-----------------------------------------------------------------------*/
-Int ana_newallocs(Int narg, Int ps[])
+Int lux_newallocs(Int narg, Int ps[])
      /* NEWALLOCS reports on new allocations since the last call to */
      /* NEWALLOCS.  LS 11dec97 */
 {
@@ -741,11 +741,11 @@ Int ana_newallocs(Int narg, Int ps[])
   Int	count, i;
 
   if (narg) {
-    if (symbol_class(ps[0]) != ANA_SCALAR)
+    if (symbol_class(ps[0]) != LUX_SCALAR)
       return cerror(NEED_SCAL, ps[0]);
     count = int_arg(ps[0]);
     if (count <= 0)
-      return anaerror("Need nonnegative scalar", ps[0]);
+      return luxerror("Need nonnegative scalar", ps[0]);
   } else count = 0;
 
   if (!baseCount && (internalMode & 1) == 0) {
@@ -807,14 +807,14 @@ Int squeeze(void)
   return 1;
 }
 /*-----------------------------------------------------------------------*/
-Int ana_squeeze(Int narg, Int ps[])
+Int lux_squeeze(Int narg, Int ps[])
 {
   struct allocItem	*ai;
   Int	iq, dim, *p;
   array	*h;
   
   dim = nAlloc*2;
-  iq = array_scratch(ANA_LONG, 1, &dim);
+  iq = array_scratch(LUX_LONG, 1, &dim);
   h = HEAD(iq);
   h->ndim = 2;
   h->dims[0] = 2;

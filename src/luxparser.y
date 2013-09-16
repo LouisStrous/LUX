@@ -3,7 +3,7 @@
 /* Therefore either use bison or use the provided anaparser.c and */
 /* anaparser.h.  LS 10nov97 */
 %{ 
-/* This is file anaparser.y.
+/* This is file luxparser.c.
 
 Copyright 2013 Louis Strous
 
@@ -30,7 +30,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdint.h>
 #include <gsl/gsl_spline.h>
 #include "action.h"
-#include "anaparser.h"
+#include "luxparser.h"
 #include "editor.h"
 #include "gsl/gsl_errno.h"
 #define YYERROR_VERBOSE

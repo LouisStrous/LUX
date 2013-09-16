@@ -26,10 +26,10 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 #include "action.h"
 
-Int	ana_replace(Int, Int);
+Int	lux_replace(Int, Int);
 /*--------------------------------------------------------------------*/
 #define SQRT3	1.7320508075688772935
-Int ana_orientation(Int narg, Int ps[])
+Int lux_orientation(Int narg, Int ps[])
 /* determine local orientation in a two- or three-dimensional data array */
 /* Syntax: ORIENTATION,data,widths[,orientation,values,wavenumber, */
 /*                                  grid,order] */
@@ -79,64 +79,64 @@ Int ana_orientation(Int narg, Int ps[])
   else
     getWave = 0;
   if (!getVec && !getVal && !getWave)
-    return anaerror("No output symbols specified - nothing to calculate", 0);
-  if (symbol_class(*ps) != ANA_ARRAY) /* DATA */
+    return luxerror("No output symbols specified - nothing to calculate", 0);
+  if (symbol_class(*ps) != LUX_ARRAY) /* DATA */
     return cerror(NEED_ARR, *ps);
   ndim = array_num_dims(*ps);
   if (ndim != 2 && ndim != 3)
-    return anaerror("Need 2D or 3D array", *ps);
+    return luxerror("Need 2D or 3D array", *ps);
   dims = array_dims(*ps);
-  iq = ana_float(1, ps);
+  iq = lux_float(1, ps);
   data = (Float *) array_data(iq);
-  if (symbol_class(ps[1]) != ANA_ARRAY) /* WIDTHS */
+  if (symbol_class(ps[1]) != LUX_ARRAY) /* WIDTHS */
     return cerror(NEED_ARR, ps[1]);
   d = array_size(ps[1]);
   if (d != ndim)
-    return anaerror("Need %1d smooth widths", ps[1], ndim);
-  iq = ana_float(1, &ps[1]);
+    return luxerror("Need %1d smooth widths", ps[1], ndim);
+  iq = lux_float(1, &ps[1]);
   widths = (Float *) array_data(iq);
   for (i = 0; i < ndim; i++)
     if (widths[i] < 0)
-      return anaerror("Need nonnegative smoothing widths", ps[1]);
+      return luxerror("Need nonnegative smoothing widths", ps[1]);
   if (narg > 5 && ps[5]) {	/* GRID */
-    iq = ana_long(1, &ps[5]);
+    iq = lux_long(1, &ps[5]);
     if (array_size(iq) != ndim)
-      return anaerror("Need %1d output cube dimensions", ps[5], ndim);
+      return luxerror("Need %1d output cube dimensions", ps[5], ndim);
     grid = (Int *) array_data(iq);
     memcpy(grid2, grid, ndim*sizeof(Float));
     if (grid[0] == 0)
       grid2[0] = dims[0];
     else if (grid[0] < 0 || grid[0] > dims[0])
-      return anaerror("Illegal output cube x dimension: %d", ps[5], grid[0]);
+      return luxerror("Illegal output cube x dimension: %d", ps[5], grid[0]);
     if (grid[1] == 0)
       grid2[1] = dims[1];
     else if (grid[1] < 0 || grid[1] > dims[1])
-      return anaerror("Illegal output cube y dimension: %d", ps[5], grid[1]);
+      return luxerror("Illegal output cube y dimension: %d", ps[5], grid[1]);
     if (ndim == 3) {
       if (grid[2] == 0)
 	grid2[2] = dims[2];
       else if (grid[2] < 0 || grid[2] > dims[2])
-	return anaerror("Illegal output cube y dimension: %d", ps[5], grid[2]);
+	return luxerror("Illegal output cube y dimension: %d", ps[5], grid[2]);
     }
   } else
     memcpy(grid2, dims, ndim*sizeof(Float));
   if (narg > 6 && ps[6]) {	/* ASPECT */
-    if (symbol_class(ps[6]) != ANA_ARRAY)
+    if (symbol_class(ps[6]) != LUX_ARRAY)
       return cerror(NEED_ARR, ps[6]);
     if (array_size(ps[6]) != ndim)
-      return anaerror("Need %1d aspect sizes", ps[6], ndim);
-    aspect = (Float *) array_data(ana_float(1, ps + 6));
+      return luxerror("Need %1d aspect sizes", ps[6], ndim);
+    aspect = (Float *) array_data(lux_float(1, ps + 6));
   } else
     aspect = NULL;
   if (narg > 7 && ps[7]) {	/* ORDER: discrete derivative accuracy */
     order = int_arg(ps[7]);
     if (order < 1 || order > 4)
-      return anaerror("Approximation order must be between 1 and 4", ps[7]);
+      return luxerror("Approximation order must be between 1 and 4", ps[7]);
   } else
     order = 4;
   if (dims[0] < order || dims[1] < order
       || (ndim == 3 && dims[2] < order))
-    return anaerror("Array dimensions must exceed approximation order", ps[0]);
+    return luxerror("Array dimensions must exceed approximation order", ps[0]);
 
   parallel = !(internalMode & 4);
 
@@ -219,40 +219,40 @@ Int ana_orientation(Int narg, Int ps[])
   memcpy(odims + 1, grid2, ndim*sizeof(Int));
   if (getVal) {
     odims[0] = ndim;
-    if ((values = array_scratch(ANA_FLOAT, ndim + 1, odims)) < 0) {
+    if ((values = array_scratch(LUX_FLOAT, ndim + 1, odims)) < 0) {
       free(smooth1);
       free(smooth2);
       if (ndim == 3)
 	free(smooth3);
-      return ANA_ERROR;
+      return LUX_ERROR;
     }
     out = (Float *) array_data(values);
   }
   if (getVec) {
     if (ndim == 3) {
       odims[0] = ndim;
-      if ((vector = array_scratch(ANA_FLOAT, ndim + 1, odims)) < 0) {
+      if ((vector = array_scratch(LUX_FLOAT, ndim + 1, odims)) < 0) {
 	free(smooth1);
 	free(smooth2);
 	free(smooth3);
-	return ANA_ERROR;
+	return LUX_ERROR;
       }
     } else {
-      if ((vector = array_scratch(ANA_FLOAT, ndim, odims + 1)) < 0) {
+      if ((vector = array_scratch(LUX_FLOAT, ndim, odims + 1)) < 0) {
 	free(smooth1);
 	free(smooth2);
-	return ANA_ERROR;
+	return LUX_ERROR;
       }
     }
     comp = (Float *) array_data(vector);
   }
   if (getWave) {
-    if ((wavenum = array_scratch(ANA_FLOAT, ndim, odims + 1)) < 0) {
+    if ((wavenum = array_scratch(LUX_FLOAT, ndim, odims + 1)) < 0) {
       free(smooth1);
       free(smooth2);
       if (ndim == 3)
 	free(smooth3);
-      return ANA_ERROR;
+      return LUX_ERROR;
     }
     wave = (Float *) array_data(wavenum);
   }
@@ -589,11 +589,11 @@ Int ana_orientation(Int narg, Int ps[])
   if (vocal)
     printf("\n");
   if (getVec)
-    ana_replace(ps[2], vector);
+    lux_replace(ps[2], vector);
   if (getVal)
-    ana_replace(ps[3], values);
+    lux_replace(ps[3], values);
   if (getWave)
-    ana_replace(ps[4], wavenum);
+    lux_replace(ps[4], wavenum);
   free(smooth1);
   free(smooth2);
   if (ndim == 3)
@@ -601,7 +601,7 @@ Int ana_orientation(Int narg, Int ps[])
   return 1;
 }
 
-Int ana_root3(Int narg, Int ps[])
+Int lux_root3(Int narg, Int ps[])
 {
   Float	c0, c1, c2, q, r, s, c, ang, *p;
   Int	iq;
@@ -627,7 +627,7 @@ Int ana_root3(Int narg, Int ps[])
   c1 = r + q;
   c2 = r - q;
   iq = 3;
-  iq = array_scratch(ANA_FLOAT, 1, &iq);
+  iq = array_scratch(LUX_FLOAT, 1, &iq);
   p = (Float *) LPTR(HEAD(iq));
   *p++ = c0;  *p++ = c1;  *p++ = c2;
   return iq;

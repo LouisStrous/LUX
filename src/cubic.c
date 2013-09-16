@@ -18,7 +18,7 @@ You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 /*------------------------------------------------------------------------- */
-Int ana_cubic_spline(Int narg, Int ps[])
+Int lux_cubic_spline(Int narg, Int ps[])
 /* Cubic spline interpolation along the first dimension of an array.
    ynew = CSPLINE(xtab, ytab [, xnew][, d1, d2][,/keep])
      interpolates in the table of <ytab> versus <xtab> (must be in
@@ -52,7 +52,7 @@ Int ana_cubic_spline(Int narg, Int ps[])
     { Free(xTable.b);
       Free(yTable.b);
       Free(der2.b); }
-    return ANA_ONE; }
+    return LUX_ONE; }
   if (narg >= 2)		/* have <xtab> and <ytab> */
   { xTabSym = *ps++;
     yTabSym = *ps++; }
@@ -63,10 +63,10 @@ Int ana_cubic_spline(Int narg, Int ps[])
     d2Sym = *ps++; }
 
   if (xNewSym && !haveTable && !xTabSym)
-    return anaerror("Need table to interpolate from", xNewSym);
-  if (xTabSym && symbol_class(xTabSym) != ANA_ARRAY)
+    return luxerror("Need table to interpolate from", xNewSym);
+  if (xTabSym && symbol_class(xTabSym) != LUX_ARRAY)
     return cerror(NEED_ARR, xTabSym);
-  if (yTabSym && symbol_class(yTabSym) != ANA_ARRAY)
+  if (yTabSym && symbol_class(yTabSym) != LUX_ARRAY)
     return cerror(NEED_ARR, yTabSym);
   if (xTabSym && array_size(xTabSym) != array_size(yTabSym))
     return cerror(INCMP_ARR, yTabSym);
@@ -81,8 +81,8 @@ Int ana_cubic_spline(Int narg, Int ps[])
   { nPoints = array_size(xTabSym);
     oldType = (array_type(xTabSym) > array_type(yTabSym))?
       array_type(xTabSym): array_type(yTabSym);
-    type = (oldType < ANA_FLOAT)? ANA_FLOAT: oldType;
-    size = ana_type_size[type]*nPoints;
+    type = (oldType < LUX_FLOAT)? LUX_FLOAT: oldType;
+    size = lux_type_size[type]*nPoints;
     xTable.b = (Byte *) Malloc(size);
     yTable.b = (Byte *) Malloc(size);
     der2.b = (Byte *) Malloc(size);
@@ -94,9 +94,9 @@ Int ana_cubic_spline(Int narg, Int ps[])
       src.b = array_data(xTabSym);
       trgt = xTable;
       switch (type)
-      { case ANA_FLOAT:
+      { case LUX_FLOAT:
 	  switch (oldType)
-	  { case ANA_BYTE:
+	  { case LUX_BYTE:
 	      while (n--)
 		*trgt.f++ = (Float) *src.b++;
 	      src.b = array_data(yTabSym);
@@ -104,7 +104,7 @@ Int ana_cubic_spline(Int narg, Int ps[])
 	      while (n--)
 		*trgt.f++ = (Float) *src.b++;
 	      break;
-	    case ANA_WORD:
+	    case LUX_WORD:
 	      while (n--)
 		*trgt.f++ = (Float) *src.w++;
 	      src.b = array_data(yTabSym);
@@ -112,7 +112,7 @@ Int ana_cubic_spline(Int narg, Int ps[])
 	      while (n--)
 		*trgt.f++ = (Float) *src.w++;
 	      break;
-	    case ANA_LONG:
+	    case LUX_LONG:
 	      while (n--)
 		*trgt.f++ = (Float) *src.l++;
 	      src.b = array_data(yTabSym);
@@ -121,9 +121,9 @@ Int ana_cubic_spline(Int narg, Int ps[])
 		*trgt.f++ = (Float) *src.l++;
 	      break; }
 	  break;
-	case ANA_DOUBLE:
+	case LUX_DOUBLE:
 	  switch (oldType)
-	  { case ANA_BYTE:
+	  { case LUX_BYTE:
 	      while (n--)
 		*trgt.d++ = (Double) *src.b++;
 	      src.b = array_data(yTabSym);
@@ -131,7 +131,7 @@ Int ana_cubic_spline(Int narg, Int ps[])
 	      while (n--)
 		*trgt.d++ = (Double) *src.b++;
 	      break;
-	    case ANA_WORD:
+	    case LUX_WORD:
 	      while (n--)
 		*trgt.d++ = (Double) *src.w++;
 	      src.b = array_data(yTabSym);
@@ -139,7 +139,7 @@ Int ana_cubic_spline(Int narg, Int ps[])
 	      while (n--)
 		*trgt.d++ = (Double) *src.w++;
 	      break;
-	    case ANA_LONG:
+	    case LUX_LONG:
 	      while (n--)
 		*trgt.d++ = (Double) *src.l++;
 	      src.b = array_data(yTabSym);
@@ -147,7 +147,7 @@ Int ana_cubic_spline(Int narg, Int ps[])
 	      while (n--)
 		*trgt.d++ = (Double) *src.l++;
 	      break; 
-	    case ANA_FLOAT:
+	    case LUX_FLOAT:
 	      while (n--)
 		*trgt.d++ = (Double) *src.f++;
 	      src.b = array_data(yTabSym);
@@ -158,7 +158,7 @@ Int ana_cubic_spline(Int narg, Int ps[])
 	  break; }
     }
     /* for now we force natural cubic splines */
-    if (type == ANA_FLOAT)
+    if (type == LUX_FLOAT)
       der2.f[0] = der2.f[nPoints - 1] = 0.0;
     else
       der2.d[0] = der2.d[nPoints - 1] = 0.0;
@@ -166,7 +166,7 @@ Int ana_cubic_spline(Int narg, Int ps[])
     src = xTable;
     trgt = yTable;
     switch (type)
-    { case ANA_FLOAT:
+    { case LUX_FLOAT:
 	*p.f++ = 0.0;		/*  point zero */
 	*q.f++ = 1.0;
 	a = (src.f[1] - src.f[0])/6.0;
@@ -189,5 +189,5 @@ Int ana_cubic_spline(Int narg, Int ps[])
       }
     haveTable = 1; }
   
-  return ANA_ONE;
+  return LUX_ONE;
 }

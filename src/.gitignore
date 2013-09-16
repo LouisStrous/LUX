@@ -5,9 +5,9 @@ GITID
 Makefile
 Makefile.in
 TAGS
-ana
-anaparser.c
-anaparser.h
-libana.a
+liblux.a
+lux
+luxparser.c
+luxparser.h
 maybe-GITID
 version.h

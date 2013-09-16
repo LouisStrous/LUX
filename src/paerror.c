@@ -18,7 +18,7 @@ You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include <stdio.h>
-#include "ana_structures.h"
+#include "lux_structures.h"
 
 Int execute_error(n)		/* handle errors */
  Int n;
@@ -64,7 +64,7 @@ Int execute_error(n)		/* handle errors */
  case 35: printf("subscript out of range\n"); break;
  case 36: printf("too many subscripts\n"); break;
  case 37: printf("invalid rearrange attempted\n"); break;
- case 38: printf("(X)impossible error in ana_sub_arg\n"); break;
+ case 38: printf("(X)impossible error in lux_sub_arg\n"); break;
  case 39: printf("illegal subscript type\n"); break;
  case 40: printf("(X)scalar_scratch_copy got a non-scalar\n"); break;
  case 41: printf("undefined subroutine\n"); break;

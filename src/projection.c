@@ -33,7 +33,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 
 Int	tkplot(Float, Float, Int, Int),
   createFullProjection(Float *matrix, Float *perspective, Float *oblique),
-  ana_erase(Int, Int []);
+  lux_erase(Int, Int []);
 
 /* A general projection matrix P has 4 by 4 elements, and includes scaling, */
 /* rotation, translation, and a perspective transformation. */
@@ -224,7 +224,7 @@ Int multiplyProjection(Float *projection, Float *matrix)
   return 1;
 }
 /*-----------------------------------------------------------------------*/
-Int ana_projection(Int narg, Int ps[])
+Int lux_projection(Int narg, Int ps[])
 /* change the projection parameters.  The three transformations */
 /* translation, rotation, and scaling must be added into the projection */
 /* matrix in the opposite order from the one in which they are to be */
@@ -257,9 +257,9 @@ Int ana_projection(Int narg, Int ps[])
   }
   projCoords = (internalMode & 2)? ORIGINAL: CURRENT;
   if (narg-- && (iq = *ps++)) {		/* matrix */
-    if (symbol_class(iq) != ANA_ARRAY)
+    if (symbol_class(iq) != LUX_ARRAY)
       return cerror(NEED_ARR, iq);
-    iq = ana_float(1, &iq);	/* ensure FLOAT */
+    iq = lux_float(1, &iq);	/* ensure FLOAT */
     n = array_size(iq);
     q = (Float *) array_data(iq);
     if (setProjection(projectMatrix, q, n) < 0)
@@ -272,9 +272,9 @@ Int ana_projection(Int narg, Int ps[])
           0 0 0  1                   */
   if (narg && (iq = *ps++)) {		/* translation */
     narg--;
-    if (symbol_class(iq) != ANA_ARRAY)
+    if (symbol_class(iq) != LUX_ARRAY)
       return cerror(NEED_ARR, iq);
-    iq = ana_float(1, &iq);
+    iq = lux_float(1, &iq);
     n = array_size(iq);
     if (n != 3)
       return cerror(NEED_3_ARR, iq);
@@ -299,9 +299,9 @@ Int ana_projection(Int narg, Int ps[])
      in all cases,  new = R . old */
   if (narg && (iq = *ps++)) {	/* rotation */
     narg--; 
-    if (symbol_class(iq) != ANA_ARRAY)
+    if (symbol_class(iq) != LUX_ARRAY)
       return cerror(NEED_ARR, iq);
-    iq = ana_float(1, &iq);
+    iq = lux_float(1, &iq);
     n = array_size(iq);
     if (n != 3)
       return cerror(NEED_3_ARR, iq);
@@ -315,9 +315,9 @@ Int ana_projection(Int narg, Int ps[])
         0  0  0 1 */
   if (narg && (iq = *ps++)) {	/* scaling */
     narg--;
-    if (symbol_class(iq) != ANA_ARRAY)
+    if (symbol_class(iq) != LUX_ARRAY)
       return cerror(NEED_ARR, iq);
-    iq = ana_float(1, &iq);
+    iq = lux_float(1, &iq);
     n = array_size(iq);
     if (n != 3)
       return cerror(NEED_3_ARR, iq);
@@ -337,9 +337,9 @@ Int ana_projection(Int narg, Int ps[])
   }
   if (narg && (iq = *ps++)) {	/* perspective projection */
     narg--;
-    if (symbol_class(iq) == ANA_ARRAY) {
+    if (symbol_class(iq) == LUX_ARRAY) {
       /* must have three elements:  (x, y, z) */
-      iq = ana_float(1, &iq);
+      iq = lux_float(1, &iq);
       n = array_size(iq);
       if (n != 3)
 	return cerror(NEED_3_ARR, ps[-1]);
@@ -359,9 +359,9 @@ Int ana_projection(Int narg, Int ps[])
   }
   if (narg && (iq = *ps++)) {	/* oblique projection */
     narg--;
-    if (symbol_class(iq) != ANA_ARRAY)
+    if (symbol_class(iq) != LUX_ARRAY)
       return cerror(NEED_ARR, iq);
-    iq = ana_float(1, &iq);
+    iq = lux_float(1, &iq);
     n = array_size(iq);
     if (n != 2)
       return cerror(NEED_2_ARR, ps[-1]);
@@ -488,7 +488,7 @@ Int project(Float x, Float y, Float z)
   return 1;
 }
 /*---------------------------------------------------------------------*/
-Int ana_project(Int narg, Int ps[])
+Int lux_project(Int narg, Int ps[])
 /* development routine.  uses project to project a 3-element vector */
 /* using the current projection matrix */
 {
@@ -496,14 +496,14 @@ Int ana_project(Int narg, Int ps[])
   Float	*p, *p2;
 
   iq = *ps;
-  if (symbol_class(iq) != ANA_ARRAY)
+  if (symbol_class(iq) != LUX_ARRAY)
     return cerror(NEED_ARR, iq);
-  iq = ana_float(1, &iq);
+  iq = lux_float(1, &iq);
   n = array_size(iq);
   if (n % 3)
-    return anaerror("Need multiple of three elements", *ps);
+    return luxerror("Need multiple of three elements", *ps);
   p = (Float *) array_data(iq);
-  result = array_clone(iq, ANA_FLOAT);
+  result = array_clone(iq, LUX_FLOAT);
   p2 = (Float *) array_data(result);
   createFullProjection(projectMatrix, currentPerspective, currentOblique);
   n /= 3;
@@ -526,7 +526,7 @@ Int tkproj(Float x, Float y, Float z, Int mode)
   return 1;
 }
 /*---------------------------------------------------------------------*/
-Int ana_fitUnitCube(Int narg, Int ps[])
+Int lux_fitUnitCube(Int narg, Int ps[])
 /* scales and translates the projection so that the projected unit cube */
 /* fits nicely on the screen */
 {
@@ -635,7 +635,7 @@ Int axis(Float ds, Float t, Float tr, Float v, Float dv, Int nt,
   if (dv != 0.0) {
     useProjection = 1;
     /*    if (nlabel(v, 0, 0, flip? 4: 2, 0) < 0)
-	  return ANA_ERROR; */
+	  return LUX_ERROR; */
     useProjection = 0;
   }
   tkplot(xp, yp, 0, 0);		/* back to axis */
@@ -652,7 +652,7 @@ Int axis(Float ds, Float t, Float tr, Float v, Float dv, Int nt,
 	v += dv*nt;
 	useProjection = 1;
 	/* if (nlabel(v, s, 0, flip? 4: 2, 0) < 0)
-	   return ANA_ERROR; */
+	   return LUX_ERROR; */
 	useProjection = 0;
       }
     }
@@ -661,7 +661,7 @@ Int axis(Float ds, Float t, Float tr, Float v, Float dv, Int nt,
   return 1;
 }
 /*---------------------------------------------------------------------*/
-Int ana_plot3d(Int narg, Int ps[])
+Int lux_plot3d(Int narg, Int ps[])
 /* development routine. */
 {
   Int	iq, nx, ny, i, ixlog, iylog, izlog;
@@ -678,9 +678,9 @@ Int ana_plot3d(Int narg, Int ps[])
 
   hide = (internalMode & 1);	/* hidden-line removal? */
   iq = *ps;			/* data */
-  if (symbol_class(iq) != ANA_ARRAY)
+  if (symbol_class(iq) != LUX_ARRAY)
     return cerror(NEED_ARR, iq);
-  iq = ana_float(1, &iq);
+  iq = lux_float(1, &iq);
   if (array_num_dims(iq) != 2)
     return cerror(NEED_2D_ARR, *ps);
   nx = array_dims(iq)[0];
@@ -746,11 +746,11 @@ Int ana_plot3d(Int narg, Int ps[])
   else
     setl(&zmax, &zmin, &ndz, &dvz, izlog, wzb, wzt);
   if (ier)
-    ana_erase(0, 0);		/* erase screen */
+    lux_erase(0, 0);		/* erase screen */
   /* we draw all three axes by using routine axis, which draws an x axis. */
   /* by manipulating the projection matrix, we get the y and z axes through */
   /* the same routine.*/
-  tkCoordSys = ANA_DVI;
+  tkCoordSys = LUX_DVI;
   createFullProjection(projectMatrix, currentPerspective, currentOblique);
   memcpy(p3d, currentProjection, 16*sizeof(Float));
 
@@ -952,7 +952,7 @@ Int scanPolygon(Int *x1, Int *x2, Int *y, char code)
     case POLY_INIT:		/* initialize new polygon */
       nVertex = *x1;		/* number of vertices */
       if (nVertex < 1)
-	return anaerror("Less than one vertex in polygon!", 0);
+	return luxerror("Less than one vertex in polygon!", 0);
       allocate(vertex, nVertex + 2, Vertex); /* room for coordinates */
       for (i = 0; i < nVertex; i++) {
 	vertex[i + 1].x = x2[i];
@@ -1047,7 +1047,7 @@ Int scanPolygon(Int *x1, Int *x2, Int *y, char code)
   return 1;
 }
 /*---------------------------------------------------------------------*/
-Int ana_inPolygon(Int narg, Int ps[])
+Int lux_inPolygon(Int narg, Int ps[])
 /* returns indices to all (integer-coordinate) points inside an */
 /* integer-coordinate polygon.  Syntax: I = INPOLYGON(XVERTEX,YVERTEX) */
 /* IN DEVELOPMENT */
@@ -1055,15 +1055,15 @@ Int ana_inPolygon(Int narg, Int ps[])
   Int	iq, nx, ny, *x, *y;
 
   iq = ps[0];			/* x coordinate of the vertices */
-  if (symbol_class(iq) != ANA_ARRAY)
+  if (symbol_class(iq) != LUX_ARRAY)
     return cerror(NEED_ARR, iq);
-  iq = ana_long(1, &iq);	/* make integer */
+  iq = lux_long(1, &iq);	/* make integer */
   nx = array_size(iq);
   x = (Int *) array_data(iq);
   iq = ps[1];			/* y coordinate of the vertices */
-  if (symbol_class(iq) != ANA_ARRAY)
+  if (symbol_class(iq) != LUX_ARRAY)
     return cerror(NEED_ARR, iq);
-  iq = ana_long(1, &iq);
+  iq = lux_long(1, &iq);
   ny = array_size(iq);
   y = (Int *) array_data(iq);
   if (nx != ny)
@@ -1167,10 +1167,10 @@ Int hiddenLine(Float x, Float y, Int mode)
     nDrawnFree--;
   } /* end of if (mode & (HL_NEW | HL_NEW_AREA)) */
 
-  return ANA_OK;
+  return LUX_OK;
 }
 /*---------------------------------------------------------------------*/
-Int ana_projectmap(Int narg, Int ps[])
+Int lux_projectmap(Int narg, Int ps[])
 /* PROJECTIMAGE(map, h [, HDIST=delta, ANGLE=angle, MAG=mag, XMAP=xmap, */
 /*              YMAP=ymap, SIZE=n]) */
 /* returns an array of size <n(0)> by <n(1)> elements (or <n> by <n> if */
@@ -1213,13 +1213,13 @@ Int ana_projectmap(Int narg, Int ps[])
       nx = ny = int_arg(ps[7]);
     else if (symbolIsRealArray(ps[7])) {
       if (array_size(ps[7]) >= 2) {
-	result = ana_long(1, &ps[7]);
+	result = lux_long(1, &ps[7]);
 	nx = ((Int *) array_data(result))[0];
 	ny = ((Int *) array_data(result))[1];
 	if (result != ps[7])
 	  zap(result);
       } else if (array_size(ps[7]) == 1) {
-	result = ana_long(1, &ps[7]);
+	result = lux_long(1, &ps[7]);
 	nx = ny = ((Int *) array_data(result))[0];
 	if (result != ps[7])
 	  zap(result);
@@ -1230,7 +1230,7 @@ Int ana_projectmap(Int narg, Int ps[])
   dims[0] = nx;
   dims[1] = ny;
 
-  stride = ana_type_size[array_type(ps[0])];
+  stride = lux_type_size[array_type(ps[0])];
   result = array_scratch(array_type(ps[0]), 2, dims);
   trgt.v = array_data(result);
   zerobytes(trgt.v, array_size(result)*stride);

@@ -40,7 +40,7 @@ void	zerobytes(void *, Int), updateIndices(void), symdumpswitch(Int, Int);
 #if HAVE_LIBX11
 void	xsynchronize(Int);
 #endif
-Int	installString(char *), fixContext(Int, Int), ana_replace(Int, Int);
+Int	installString(char *), fixContext(Int, Int), lux_replace(Int, Int);
 char *fmttok(char *);
 Int Sprintf_tok(char *, ...);
 /*-----------------------------------------------------*/
@@ -74,7 +74,7 @@ Int structPtrTarget(Int symbol)
     return cerror(BAD_STRUCT_KEY, symbol);
   base = transfer(base);
   switch (symbol_class(base)) {	/* what kind of envelope? */
-    case ANA_RANGE:
+    case LUX_RANGE:
       /* if the indicated range start or end contains a (*-...) entry,
        then the negative of its value is returned */
       if (index < 0 || index > 1) /* bad label */
@@ -83,11 +83,11 @@ Int structPtrTarget(Int symbol)
       if (n < 0)
 	n = -n;
       return n;
-    case ANA_CLIST:
+    case LUX_CLIST:
       if (index < 0 || index >= clist_num_symbols(base))
 	return cerror(BAD_STRUCT_KEY, symbol);
       return clist_symbols(base)[index];
-    case ANA_LIST:
+    case LUX_LIST:
       if (index < 0) {		/* need to match the key */
 	for (i = 0; i < (n = list_num_symbols(base)); i++) {
 	  if (!strcmp(key, list_key(base,i)))
@@ -99,8 +99,8 @@ Int structPtrTarget(Int symbol)
       if (index < 0 || index >= n)
 	return cerror(BAD_STRUCT_KEY, symbol);
       return list_symbol(base,index);
-    case ANA_SUBROUTINE:
-    case ANA_FUNCTION:
+    case LUX_SUBROUTINE:
+    case LUX_FUNCTION:
       if (index < 0) {		/* need to match the key */
 	i = installString(key);
 	n = findVar(i, base);
@@ -110,7 +110,7 @@ Int structPtrTarget(Int symbol)
 	return cerror(BAD_STRUCT_KEY, symbol);
       return transfer(n);
     default:
-      return anaerror("Pointer to non-embedding variable.", symbol);
+      return luxerror("Pointer to non-embedding variable.", symbol);
   }
 }
 /*-----------------------------------------------------*/
@@ -118,23 +118,23 @@ Int transfer(Int symbol)
 /* if symbol is a TRANSFER or POINTER, return symbol number of */
 /* ultimate target */
 {
-  while (symbol_class(symbol) == ANA_POINTER
-	 || symbol_class(symbol) == ANA_TRANSFER) {
+  while (symbol_class(symbol) == LUX_POINTER
+	 || symbol_class(symbol) == LUX_TRANSFER) {
     if (transfer_target(symbol) == symbol) {
-      symbol_class(symbol) = ANA_UNDEFINED;
+      symbol_class(symbol) = LUX_UNDEFINED;
       printf("WARNING - pointer %s points at itself: make undefined\n",
 	     symbolIdent(symbol, I_PARENT));
       return symbol;
     }
     symbol = transfer_target(symbol);
-    if (symbol_class(symbol) == ANA_UNUSED)
+    if (symbol_class(symbol) == LUX_UNUSED)
       symbol = 0;
   }
   return symbol;
 }
 /*-----------------------------------------------------*/
-Int ana_convert(Int, Int [], Int, Int);
-Int ana_convertsym(Int narg, Int ps[])
+Int lux_convert(Int, Int [], Int, Int);
+Int lux_convertsym(Int narg, Int ps[])
      /* Y = CONVERT(X, TYPE) returns a copy of X converted to data type */
      /* TYPE (according to #TYPE).  LS 1aug97 */
 {
@@ -142,17 +142,17 @@ Int ana_convertsym(Int narg, Int ps[])
 
   iq = ps[0];
   switch (symbol_class(ps[1])) {
-    case ANA_SCAL_PTR:
+    case LUX_SCAL_PTR:
       iq = dereferenceScalPointer(iq);
-    case ANA_SCALAR:
+    case LUX_SCALAR:
       type = int_arg(iq);
       break;
     default:
       return cerror(ILL_CLASS, ps[0]);
   }
-  if (type < ANA_BYTE || type > ANA_DOUBLE)
+  if (type < LUX_BYTE || type > LUX_DOUBLE)
     return cerror(ILL_TYPE, ps[1]);
-  return ana_convert(1, ps, type, 1);
+  return lux_convert(1, ps, type, 1);
 }
 /*-----------------------------------------------------*/
 Int scalar_scratch(Int type)
@@ -163,14 +163,14 @@ Int scalar_scratch(Int type)
  getFreeTempVariable(n);
  symbol_type(n) = type;
  symbol_line(n) = curLineNumber;
- if (type >= ANA_CFLOAT) {
-   complex_scalar_memory(n) = ana_type_size[type];
+ if (type >= LUX_CFLOAT) {
+   complex_scalar_memory(n) = lux_type_size[type];
    complex_scalar_data(n).f = malloc(complex_scalar_memory(n));
    if (!complex_scalar_data(n).f)
      return cerror(ALLOC_ERR, n);
-   symbol_class(n) = ANA_CSCALAR;
+   symbol_class(n) = LUX_CSCALAR;
  } else
-   symbol_class(n) = ANA_SCALAR;
+   symbol_class(n) = LUX_SCALAR;
  return n;
 }
 /*-----------------------------------------------------*/
@@ -180,7 +180,7 @@ Int scalar_scratch_copy(Int nsym)
  Int	n;
 
  getFreeTempVariable(n);
- sym[n].class = ANA_SCALAR;
+ sym[n].class = LUX_SCALAR;
  sym[n].type = sym[nsym].type;
  sym[n].line = curLineNumber;
  memcpy(&sym[n].spec.scalar.b, &sym[nsym].spec.scalar.b, sizeof(Double));
@@ -194,8 +194,8 @@ Int string_scratch(Int size)
  Int	n;
 
  getFreeTempVariable(n);
- sym[n].class = ANA_STRING;
- sym[n].type = ANA_TEMP_STRING;
+ sym[n].class = LUX_STRING;
+ sym[n].type = LUX_TEMP_STRING;
  sym[n].line = curLineNumber;
  if (size >= 0)
  { allocate(string_value(n), size + 1, char);
@@ -208,8 +208,8 @@ Int string_scratch(Int size)
 /*-----------------------------------------------------*/
 Int to_scratch_array(Int n, Int type, Int ndim, Int dims[])
 /* modifies symbol <n> to an array of the specified type and dimensions */
-/* if the type is ANA_TEMP_STRING or ANA_LSTRING, then the new */
-/* array gets type ANA_STRING_ARRAY.  LS 28mar98 */
+/* if the type is LUX_TEMP_STRING or LUX_LSTRING, then the new */
+/* array gets type LUX_STRING_ARRAY.  LS 28mar98 */
 {
  size_t	size, i;
  Float	fsize;
@@ -217,10 +217,10 @@ Int to_scratch_array(Int n, Int type, Int ndim, Int dims[])
  pointer	ptr;
  
  if (isStringType(type))
-   type = ANA_STRING_ARRAY;
+   type = LUX_STRING_ARRAY;
  if (!isLegalType(type))
    return cerror(ILL_TYPE, n, typeName(type));
- size = ana_type_size[type];
+ size = lux_type_size[type];
  /* we calculate the number of bytes requested for the data.
     This number may be greater than can be represented in an integer of
     type size_t -- which is the widest integer type available on the
@@ -232,16 +232,16 @@ Int to_scratch_array(Int n, Int type, Int ndim, Int dims[])
  fsize = size;
  for (i = 0; i < ndim; i++) {
    if (dims[i] <= 0)
-     return anaerror("Illegal dimension size, %1d", 0, dims[i]);
+     return luxerror("Illegal dimension size, %1d", 0, dims[i]);
    fsize *= dims[i];
    size *= dims[i];
  }
  size += sizeof(array);
  fsize += sizeof(array);
  if (fabs(((Float) size)/fsize - 1) > 1e-3 || size > INT32_MAX)
-   return anaerror("The number of bytes requested for the array\n(about %g) is too great", 0, fsize);
+   return luxerror("The number of bytes requested for the array\n(about %g) is too great", 0, fsize);
  undefine(n);
- symbol_class(n) = isComplexType(type)? ANA_CARRAY: ANA_ARRAY;
+ symbol_class(n) = isComplexType(type)? LUX_CARRAY: LUX_ARRAY;
  array_type(n) = type;
  symbol_line(n) = curLineNumber;
  if (!(ptr.v = malloc(size))) {
@@ -254,7 +254,7 @@ Int to_scratch_array(Int n, Int type, Int ndim, Int dims[])
  memcpy(array_dims(n), dims, ndim*sizeof(Int));
  h->c1 = h->c2 = h->nfacts = 0;
  h->facts = NULL;
- zerobytes(array_data(n), array_size(n)*ana_type_size[type]);
+ zerobytes(array_data(n), array_size(n)*lux_type_size[type]);
  return n;
 } 
 /*-----------------------------------------------------*/
@@ -262,14 +262,14 @@ Int to_scalar(Int nsym, Int type)
 /* turns symbol <nsym> into a scalar or cscalar of the given <type> */
 {
   undefine(nsym);
-  symbol_class(nsym) = isRealType(type)? ANA_SCALAR: ANA_CSCALAR;
+  symbol_class(nsym) = isRealType(type)? LUX_SCALAR: LUX_CSCALAR;
   symbol_type(nsym) = type;
   if (isComplexType(type)) {
-    complex_scalar_data(nsym).cf = malloc(ana_type_size[type]);
+    complex_scalar_data(nsym).cf = malloc(lux_type_size[type]);
     if (!complex_scalar_data(nsym).cf)
       return cerror(ALLOC_ERR, 0);
   }
-  return ANA_OK;
+  return LUX_OK;
 }
 /*-----------------------------------------------------*/
 Int array_scratch(Int type, Int ndim, Int dims[])
@@ -293,14 +293,14 @@ Int array_clone(Int symbol, Int type)
  extern Int	pipeSym, pipeExec;
 
  size = ((symbol_memory(symbol) - sizeof(array))
-	 / ana_type_size[array_type(symbol)]) * ana_type_size[type]
+	 / lux_type_size[array_type(symbol)]) * lux_type_size[type]
    + sizeof(array);
- if (ana_type_size[type] > ana_type_size[array_type(symbol)]) {
+ if (lux_type_size[type] > lux_type_size[array_type(symbol)]) {
    fsize = ((Float) (symbol_memory(symbol) - sizeof(array))
-	    / ana_type_size[array_type(symbol)]) * ana_type_size[type]
+	    / lux_type_size[array_type(symbol)]) * lux_type_size[type]
      + sizeof(array);
    if (fsize != (Float) size)
-     return anaerror("The number of bytes requested for the array\n(about %g) is too great", 0, fsize);
+     return luxerror("The number of bytes requested for the array\n(about %g) is too great", 0, fsize);
  }
  if (!pipeExec
      && pipeSym 
@@ -311,7 +311,7 @@ Int array_clone(Int symbol, Int type)
  } else {
    getFreeTempVariable(n);
    symbol_class(n) = ((isRealType(type) || isStringType(type))?
-		      ANA_ARRAY: ANA_CARRAY);
+		      LUX_ARRAY: LUX_CARRAY);
    symbol_line(n) = curLineNumber;
    if (!(ptr = malloc(size))) {
      printf("requested %1d bytes in array_clone\n", size);
@@ -332,71 +332,71 @@ Int array_clone(Int symbol, Int type)
 /*-----------------------------------------------------*/
 Int numerical_clone(Int iq, enum Symboltype type) {
   switch (symbol_class(iq)) {
-  case ANA_ARRAY:
+  case LUX_ARRAY:
     return array_clone(iq, type);
-  case ANA_SCALAR:
+  case LUX_SCALAR:
     return scalar_scratch(type);
   default:
-    return anaerror("Need numerical argument", iq);
+    return luxerror("Need numerical argument", iq);
   }
 }
 /*-----------------------------------------------------*/
 Int dereferenceScalPointer(Int nsym)
-/* returns an ordinary ANA_SCALAR for a ANA_SCAL_PTR.  NOTE: assumes that
+/* returns an ordinary LUX_SCALAR for a LUX_SCAL_PTR.  NOTE: assumes that
  <nsym> is a SCAL_PTR!  LS 31jul98 */
 {
  Int	n, type;
  pointer	ptr;
 
  type = scal_ptr_type(nsym);
- if (type == ANA_TEMP_STRING)
+ if (type == LUX_TEMP_STRING)
    n = string_scratch(string_size(nsym));
  else if (isFreeTemp(nsym))
    n = nsym;
  else
    n = nextFreeTempVariable();
  switch (type) {
-   case ANA_TEMP_STRING:
+   case LUX_TEMP_STRING:
      break;
-   case ANA_CFLOAT: case ANA_CDOUBLE:
-     symbol_class(n) = ANA_CSCALAR;
+   case LUX_CFLOAT: case LUX_CDOUBLE:
+     symbol_class(n) = LUX_CSCALAR;
      complex_scalar_type(n) = type;
-     complex_scalar_memory(n) = ana_type_size[type];
+     complex_scalar_memory(n) = lux_type_size[type];
      complex_scalar_data(n).f = malloc(complex_scalar_memory(n));
      if (!complex_scalar_data(n).f)
        return cerror(ALLOC_ERR, n);
      break;
    default:
-     symbol_class(n) = ANA_SCALAR;
+     symbol_class(n) = LUX_SCALAR;
      scalar_type(n) = type;
      break;
  }
  ptr = scal_ptr_pointer(nsym);
  switch (scal_ptr_type(nsym)) {
-   case ANA_BYTE:
+   case LUX_BYTE:
      scalar_value(n).b = *ptr.b;
      break;
-   case ANA_WORD:
+   case LUX_WORD:
      scalar_value(n).w = *ptr.w;
      break;
-   case ANA_LONG:
+   case LUX_LONG:
      scalar_value(n).l = *ptr.l;
      break;
-   case ANA_FLOAT:
+   case LUX_FLOAT:
      scalar_value(n).f = *ptr.f;
      break;
-   case ANA_DOUBLE:
+   case LUX_DOUBLE:
      scalar_value(n).d = *ptr.d;
      break;
-   case ANA_CFLOAT:
+   case LUX_CFLOAT:
      complex_scalar_data(n).cf->real = ptr.cf->real;
      complex_scalar_data(n).cf->imaginary = ptr.cf->imaginary;
      break;
-   case ANA_CDOUBLE:
+   case LUX_CDOUBLE:
      complex_scalar_data(n).cd->real = ptr.cd->real;
      complex_scalar_data(n).cd->imaginary = ptr.cd->imaginary;
      break;
-   case ANA_TEMP_STRING:
+   case LUX_TEMP_STRING:
      string_value(n) = strsave(ptr.s);
      break;
    default:
@@ -426,22 +426,22 @@ Int int_arg(Int nsym)
    cerror(ILL_SYM, 0, nsym, "int_arg");
    return 0;
  }
- if (symbol_class(nsym) == ANA_SCAL_PTR)
+ if (symbol_class(nsym) == LUX_SCAL_PTR)
    nsym = dereferenceScalPointer(nsym);
- if (symbol_class(nsym) != ANA_SCALAR) {
+ if (symbol_class(nsym) != LUX_SCALAR) {
    cerror(NO_SCAL, nsym);
    return 0;
  }
  switch (scalar_type(nsym)) {
-   case ANA_BYTE:
+   case LUX_BYTE:
      return (Int) scalar_value(nsym).b;
-   case ANA_WORD:
+   case LUX_WORD:
      return (Int) scalar_value(nsym).w;
-   case ANA_LONG:
+   case LUX_LONG:
      return (Int) scalar_value(nsym).l;
-   case ANA_FLOAT:
+   case LUX_FLOAT:
      return (Int) scalar_value(nsym).f;
-   case ANA_DOUBLE:
+   case LUX_DOUBLE:
      return (Int) scalar_value(nsym).d;
    default:
      return cerror(ILL_TYPE, nsym);
@@ -453,24 +453,24 @@ Int int_arg_stat(Int nsym, Int *value)
 {
  if (nsym < 0 || nsym >= NSYM) 
    return cerror(ILL_SYM, 0, nsym, "int_arg_stat");
- if (symbol_class(nsym) == ANA_SCAL_PTR)
+ if (symbol_class(nsym) == LUX_SCAL_PTR)
    nsym = dereferenceScalPointer(nsym);
- if (symbol_class(nsym) != ANA_SCALAR)
+ if (symbol_class(nsym) != LUX_SCALAR)
    return cerror(NO_SCAL, nsym);
  switch (scalar_type(nsym))
- { case ANA_BYTE:
+ { case LUX_BYTE:
      *value = (Int) scalar_value(nsym).b;
      break;
-   case ANA_WORD:
+   case LUX_WORD:
      *value = (Int) scalar_value(nsym).w;
      break;
-   case ANA_LONG:
+   case LUX_LONG:
      *value = (Int) scalar_value(nsym).l;
      break;
-   case ANA_FLOAT:
+   case LUX_FLOAT:
      *value = (Int) scalar_value(nsym).f;
      break;
-   case ANA_DOUBLE:
+   case LUX_DOUBLE:
      *value = (Int) scalar_value(nsym).d;
      break; }
  return 1;			/* everything OK */
@@ -482,18 +482,18 @@ Float float_arg(Int nsym)
  if (nsym < 0 || nsym >= NSYM) 
  { cerror(ILL_SYM, 0, nsym, "float_arg");
    return 0; }
- if (sym[nsym].class == ANA_SCAL_PTR) nsym = dereferenceScalPointer(nsym);
- if (sym[nsym].class != ANA_SCALAR) { cerror(NO_SCAL, nsym);  return 0.0; }
+ if (sym[nsym].class == LUX_SCAL_PTR) nsym = dereferenceScalPointer(nsym);
+ if (sym[nsym].class != LUX_SCALAR) { cerror(NO_SCAL, nsym);  return 0.0; }
  switch (scalar_type(nsym))
- { case ANA_BYTE:
+ { case LUX_BYTE:
      return (Float) scalar_value(nsym).b;
-   case ANA_WORD:
+   case LUX_WORD:
      return (Float) scalar_value(nsym).w;
-   case ANA_LONG:
+   case LUX_LONG:
      return (Float) scalar_value(nsym).l;
-   case ANA_FLOAT:
+   case LUX_FLOAT:
      return (Float) scalar_value(nsym).f;
-   case ANA_DOUBLE:
+   case LUX_DOUBLE:
      return (Float) scalar_value(nsym).d;
    default:
      return cerror(ILL_TYPE, nsym); }
@@ -504,48 +504,48 @@ Int float_arg_stat(Int nsym, Float *value)
 {
  if (nsym < 0 || nsym >= NSYM) 
    return cerror(ILL_SYM, 0, nsym, "int_arg_stat");
- if (symbol_class(nsym) == ANA_SCAL_PTR)
+ if (symbol_class(nsym) == LUX_SCAL_PTR)
    nsym = dereferenceScalPointer(nsym);
- if (symbol_class(nsym) != ANA_SCALAR)
+ if (symbol_class(nsym) != LUX_SCALAR)
    return cerror(NO_SCAL, nsym);
  switch (scalar_type(nsym)) {
-   case ANA_BYTE:
+   case LUX_BYTE:
      *value = (Float) scalar_value(nsym).b;
      break;
-   case ANA_WORD:
+   case LUX_WORD:
      *value = (Float) scalar_value(nsym).w;
      break;
-   case ANA_LONG:
+   case LUX_LONG:
      *value = (Float) scalar_value(nsym).l;
      break;
-   case ANA_FLOAT:
+   case LUX_FLOAT:
      *value = (Float) scalar_value(nsym).f;
      break;
-   case ANA_DOUBLE:
+   case LUX_DOUBLE:
      *value = (Float) scalar_value(nsym).d;
      break;
  }
- return ANA_OK;			/* everything OK */
+ return LUX_OK;			/* everything OK */
 }  
 /*-----------------------------------------------------*/
 Double double_arg(Int nsym)
-/* returns the Double value of a ANA_DOUBLE scalar symbol */
+/* returns the Double value of a LUX_DOUBLE scalar symbol */
 {
  if (nsym < 0 || nsym >= NSYM) 
  { cerror(ILL_SYM, 0, nsym, "double_arg");
    return 0; }
- if (sym[nsym].class == ANA_SCAL_PTR) nsym = dereferenceScalPointer(nsym);
- if (sym[nsym].class != ANA_SCALAR) { cerror(NO_SCAL, nsym);  return 0.0; }
+ if (sym[nsym].class == LUX_SCAL_PTR) nsym = dereferenceScalPointer(nsym);
+ if (sym[nsym].class != LUX_SCALAR) { cerror(NO_SCAL, nsym);  return 0.0; }
  switch (scalar_type(nsym))
- { case ANA_BYTE:
+ { case LUX_BYTE:
      return (Double) scalar_value(nsym).b;
-   case ANA_WORD:
+   case LUX_WORD:
      return (Double) scalar_value(nsym).w;
-   case ANA_LONG:
+   case LUX_LONG:
      return (Double) scalar_value(nsym).l;
-   case ANA_FLOAT:
+   case LUX_FLOAT:
      return (Double) scalar_value(nsym).f;
-   case ANA_DOUBLE:
+   case LUX_DOUBLE:
      return (Double) scalar_value(nsym).d;
    default:
      return cerror(ILL_TYPE, nsym); }
@@ -556,28 +556,28 @@ Int double_arg_stat(Int nsym, Double *value)
 {
  if (nsym < 0 || nsym >= NSYM) 
    return cerror(ILL_SYM, 0, nsym, "int_arg_stat");
- if (symbol_class(nsym) == ANA_SCAL_PTR)
+ if (symbol_class(nsym) == LUX_SCAL_PTR)
    nsym = dereferenceScalPointer(nsym);
- if (symbol_class(nsym) != ANA_SCALAR)
+ if (symbol_class(nsym) != LUX_SCALAR)
    return cerror(NO_SCAL, nsym);
  switch (scalar_type(nsym)) {
-   case ANA_BYTE:
+   case LUX_BYTE:
      *value = (Double) scalar_value(nsym).b;
      break;
-   case ANA_WORD:
+   case LUX_WORD:
      *value = (Double) scalar_value(nsym).w;
      break;
-   case ANA_LONG:
+   case LUX_LONG:
      *value = (Double) scalar_value(nsym).l;
      break;
-   case ANA_FLOAT:
+   case LUX_FLOAT:
      *value = (Double) scalar_value(nsym).f;
      break;
-   case ANA_DOUBLE:
+   case LUX_DOUBLE:
      *value = (Double) scalar_value(nsym).d;
      break;
  }
- return ANA_OK;			/* everything OK */
+ return LUX_OK;			/* everything OK */
 }  
 /*-----------------------------------------------------*/
 char *string_arg(Int nsym)
@@ -586,34 +586,34 @@ char *string_arg(Int nsym)
  if (nsym < 0 || nsym >= NSYM) 
  { cerror(ILL_SYM, 0, nsym, "string_arg");
    return 0; }
- if (sym[nsym].class == ANA_SCAL_PTR) nsym = dereferenceScalPointer(nsym);
- if (sym[nsym].class != ANA_STRING) { cerror(NEED_STR, nsym);  return NULL; }
+ if (sym[nsym].class == LUX_SCAL_PTR) nsym = dereferenceScalPointer(nsym);
+ if (sym[nsym].class != LUX_STRING) { cerror(NEED_STR, nsym);  return NULL; }
  return string_value(nsym);
 }
 /*-----------------------------------------------------*/
-Int ana_byte(Int narg, Int ps[])
-/* returns a ANA_BYTE version of the argument */
+Int lux_byte(Int narg, Int ps[])
+/* returns a LUX_BYTE version of the argument */
 {
-  return ana_convert(narg, ps, ANA_BYTE, 1);
+  return lux_convert(narg, ps, LUX_BYTE, 1);
 }
 /*-----------------------------------------------------*/
-Int ana_word(Int narg, Int ps[])
-/* returns a ANA_WORD version of the argument */
+Int lux_word(Int narg, Int ps[])
+/* returns a LUX_WORD version of the argument */
 {
-  return ana_convert(narg, ps, ANA_WORD, 1);
+  return lux_convert(narg, ps, LUX_WORD, 1);
 }
 /*-----------------------------------------------------*/
-Int ana_long(Int narg, Int ps[])
-/* returns a ANA_LONG version of the argument */
+Int lux_long(Int narg, Int ps[])
+/* returns a LUX_LONG version of the argument */
 {
-  return ana_convert(narg, ps, ANA_LONG, 1);
+  return lux_convert(narg, ps, LUX_LONG, 1);
 }
 /*-----------------------------------------------------*/
-Int ana_floor(Int narg, Int ps[])
-/* returns a ANA_LONG version of the argument */
+Int lux_floor(Int narg, Int ps[])
+/* returns a LUX_LONG version of the argument */
 /* each Float number is transformed into the next lower integer */
-/* compare ana_long(), where each Float number is transformed into the */
-/* next integer closer to zero, and ana_rfix(), where each Float is */
+/* compare lux_long(), where each Float number is transformed into the */
+/* next integer closer to zero, and lux_rfix(), where each Float is */
 /* transformed into the closest integer.  LS 24may96 */
 {
  Int	iq, result, n, temp, size, type;
@@ -624,52 +624,52 @@ Int ana_floor(Int narg, Int ps[])
  if (!symbolIsNumerical(iq)	/* not numerical */
      && !symbolIsStringScalar(iq))	/* and not a string either */
    return cerror(ILL_CLASS, iq); /* reject */
- if (symbol_type(iq) == ANA_LONG) /* if it's already BYTE then we're done */
+ if (symbol_type(iq) == LUX_LONG) /* if it's already BYTE then we're done */
    return iq;
  temp = (isFreeTemp(iq))? 1: 0;
  type = symbol_type(iq);	/* gotta store now because "result" may */
 				/* be same symbol as "iq" */
  switch (symbol_class(iq)) {
-   case ANA_SCAL_PTR:		/* transform to scalar */
+   case LUX_SCAL_PTR:		/* transform to scalar */
      iq = dereferenceScalPointer(iq);
      temp = (isFreeTemp(iq))? 1: 0;
-   case ANA_SCALAR:
+   case LUX_SCALAR:
      if (temp)			/* can use iq to store the result */
        result = iq;
      else			/* need new scalar */
-       result = scalar_scratch(ANA_LONG);
+       result = scalar_scratch(LUX_LONG);
      trgt.b = &scalar_value(result).b;
      src.b = &scalar_value(iq).b;
      n = 1;
      break;
-   case ANA_STRING:
+   case LUX_STRING:
      if (temp)
        result = iq; 
      else
-       result = scalar_scratch(ANA_LONG);
+       result = scalar_scratch(LUX_LONG);
      value = (Int) floor(atof((char *) string_value(iq))); /* convert */
      if (temp) {
        free(string_value(iq));	/* change string to scalar: free up memory */
-       symbol_class(result) = ANA_SCALAR;
-       scalar_type(result) = ANA_LONG;
+       symbol_class(result) = LUX_SCALAR;
+       scalar_type(result) = LUX_LONG;
      }
      scalar_value(result).l = value;
      return result;
-   case ANA_CSCALAR:
-     result = scalar_scratch(ANA_LONG);
+   case LUX_CSCALAR:
+     result = scalar_scratch(LUX_LONG);
      temp = 0;
      n = 1;
      trgt.b = &scalar_value(result).b;
      src.cf = complex_scalar_data(iq).cf;
      break;
-   case ANA_ARRAY:
+   case LUX_ARRAY:
      /* we can use the input symbol if it is free and if
 	it has at least as much memory as we need */
      if (temp
-	 && (Int) array_type(iq) >= ANA_LONG)
+	 && (Int) array_type(iq) >= LUX_LONG)
        result = iq;
      else {
-       result = array_clone(iq, ANA_LONG);
+       result = array_clone(iq, LUX_LONG);
        temp = 0;
      }
      n = array_size(result);
@@ -682,52 +682,52 @@ Int ana_floor(Int narg, Int ps[])
 	/* convert */
  size = n;
  switch (type) {
-   case ANA_BYTE:
+   case LUX_BYTE:
      while (n--)
        *trgt.l++ = (Int) *src.b++;
      break;
-   case ANA_WORD:
+   case LUX_WORD:
      while (n--)
        *trgt.l++ = (Int) *src.w++;
      break;
-   case ANA_LONG:
+   case LUX_LONG:
      while (n--)
        *trgt.l++ = (Int) *src.l++;
      break;
-   case ANA_FLOAT:
+   case LUX_FLOAT:
      while (n--)
        *trgt.l++ = (Int) floor(*src.f++);
      break;
-   case ANA_DOUBLE:
+   case LUX_DOUBLE:
      while (n--)
        *trgt.l++ = (Int) floor(*src.d++);
      break;
-   case ANA_CFLOAT:
+   case LUX_CFLOAT:
      while (n--)
        *trgt.l++ = (Int) floor(src.cf++->real);
      break;
-   case ANA_CDOUBLE:
+   case LUX_CDOUBLE:
      while (n--)
        *trgt.l++ = (Int) floor(src.cd++->real);
      break;
  }
  if (temp			/* we used input symbol to store results */
-     && symbol_class(iq) == ANA_ARRAY /* it's an array */
-     && array_type(iq) > ANA_LONG) { /* and bigger than we needed */
+     && symbol_class(iq) == LUX_ARRAY /* it's an array */
+     && array_type(iq) > LUX_LONG) { /* and bigger than we needed */
    symbol_memory(iq) = sizeof(array) + size*sizeof(Int);
    symbol_data(iq) = (array *) realloc(symbol_data(iq), symbol_memory(iq));
    if (!symbol_data(iq))	/* reallocation failed */
-     return anaerror("Realloc() failed in ana_floor", 0);
+     return luxerror("Realloc() failed in lux_floor", 0);
  }
- symbol_type(result) = ANA_LONG;
+ symbol_type(result) = LUX_LONG;
  return result;
 }
 /*-----------------------------------------------------*/
-Int ana_ceil(Int narg, Int ps[])
-/* returns a ANA_LONG version of the argument */
+Int lux_ceil(Int narg, Int ps[])
+/* returns a LUX_LONG version of the argument */
 /* each Float number is transformed into the next higher integer */
-/* compare ana_long(), where each Float number is transformed into the */
-/* next integer closer to zero, and ana_rfix(), where each Float is */
+/* compare lux_long(), where each Float number is transformed into the */
+/* next integer closer to zero, and lux_rfix(), where each Float is */
 /* transformed into the closest integer.  LS 24may96 */
 {
  Int	iq, result, n, temp, size, type;
@@ -738,52 +738,52 @@ Int ana_ceil(Int narg, Int ps[])
  if (!symbolIsNumerical(iq)	/* not numerical */
      && !symbolIsStringScalar(iq))	/* and not a string either */
    return cerror(ILL_CLASS, iq); /* reject */
- if (symbol_type(iq) == ANA_LONG) /* if it's already BYTE then we're done */
+ if (symbol_type(iq) == LUX_LONG) /* if it's already BYTE then we're done */
    return iq;
  temp = (isFreeTemp(iq))? 1: 0;
  type = symbol_type(iq);	/* gotta store now because "result" may */
 				/* be same symbol as "iq" */
  switch (symbol_class(iq)) {
-   case ANA_SCAL_PTR:		/* transform to scalar */
+   case LUX_SCAL_PTR:		/* transform to scalar */
      iq = dereferenceScalPointer(iq);
      temp = (isFreeTemp(iq))? 1: 0;
-   case ANA_SCALAR:
+   case LUX_SCALAR:
      if (temp)			/* can use iq to store the result */
        result = iq;
      else			/* need new scalar */
-       result = scalar_scratch(ANA_LONG);
+       result = scalar_scratch(LUX_LONG);
      trgt.b = &scalar_value(result).b;
      src.b = &scalar_value(iq).b;
      n = 1;
      break;
-   case ANA_STRING:
+   case LUX_STRING:
      if (temp)
        result = iq; 
      else
-       result = scalar_scratch(ANA_LONG);
+       result = scalar_scratch(LUX_LONG);
      value = (Int) ceil(atof((char *) string_value(iq))); /* convert */
      if (temp) {
        free(string_value(iq));	/* change string to scalar: free up memory */
-       symbol_class(result) = ANA_SCALAR;
-       scalar_type(result) = ANA_LONG;
+       symbol_class(result) = LUX_SCALAR;
+       scalar_type(result) = LUX_LONG;
      }
      scalar_value(result).l = value;
      return result;
-   case ANA_CSCALAR:
-     result = scalar_scratch(ANA_LONG);
+   case LUX_CSCALAR:
+     result = scalar_scratch(LUX_LONG);
      temp = 0;
      n = 1;
      trgt.b = &scalar_value(result).b;
      src.cf = complex_scalar_data(iq).cf;
      break;
-   case ANA_ARRAY:
+   case LUX_ARRAY:
      /* we can use the input symbol if it is free and if
 	it has at least as much memory as we need */
      if (temp
-	 && (Int) array_type(iq) >= ANA_LONG)
+	 && (Int) array_type(iq) >= LUX_LONG)
        result = iq;
      else {
-       result = array_clone(iq, ANA_LONG);
+       result = array_clone(iq, LUX_LONG);
        temp = 0;
      }
      n = array_size(result);
@@ -796,80 +796,80 @@ Int ana_ceil(Int narg, Int ps[])
 	/* convert */
  size = n;
  switch (type) {
-   case ANA_BYTE:
+   case LUX_BYTE:
      while (n--)
        *trgt.l++ = (Int) *src.b++;
      break;
-   case ANA_WORD:
+   case LUX_WORD:
      while (n--)
        *trgt.l++ = (Int) *src.w++;
      break;
-   case ANA_LONG:
+   case LUX_LONG:
      while (n--)
        *trgt.l++ = (Int) *src.l++;
      break;
-   case ANA_FLOAT:
+   case LUX_FLOAT:
      while (n--)
        *trgt.l++ = (Int) ceil(*src.f++);
      break;
-   case ANA_DOUBLE:
+   case LUX_DOUBLE:
      while (n--)
        *trgt.l++ = (Int) ceil(*src.d++);
      break;
-   case ANA_CFLOAT:
+   case LUX_CFLOAT:
      while (n--)
        *trgt.l++ = (Int) ceil(src.cf++->real);
      break;
-   case ANA_CDOUBLE:
+   case LUX_CDOUBLE:
      while (n--)
        *trgt.l++ = (Int) ceil(src.cd++->real);
      break;
  }
  if (temp			/* we used input symbol to store results */
-     && symbol_class(iq) == ANA_ARRAY /* it's an array */
-     && array_type(iq) > ANA_LONG) { /* and bigger than we needed */
+     && symbol_class(iq) == LUX_ARRAY /* it's an array */
+     && array_type(iq) > LUX_LONG) { /* and bigger than we needed */
    symbol_memory(iq) = sizeof(array) + size*sizeof(Int);
    symbol_data(iq) = (array *) realloc(symbol_data(iq), symbol_memory(iq));
    if (!symbol_data(iq))	/* reallocation failed */
-     return anaerror("Realloc() failed in ana_floor", 0);
+     return luxerror("Realloc() failed in lux_floor", 0);
  }
- symbol_type(result) = ANA_LONG;
+ symbol_type(result) = LUX_LONG;
  return result;
 }
 /*-----------------------------------------------------*/
-Int ana_float(Int narg, Int ps[])
-/* returns a ANA_FLOAT version of the argument */
+Int lux_float(Int narg, Int ps[])
+/* returns a LUX_FLOAT version of the argument */
 {
-  return ana_convert(narg, ps, ANA_FLOAT, 1);
+  return lux_convert(narg, ps, LUX_FLOAT, 1);
 }
 /*-----------------------------------------------------*/
-Int ana_double(Int narg, Int ps[])
-/* returns a ANA_DOUBLE version of the argument */
+Int lux_double(Int narg, Int ps[])
+/* returns a LUX_DOUBLE version of the argument */
 {
-  return ana_convert(narg, ps, ANA_DOUBLE, 1);
+  return lux_convert(narg, ps, LUX_DOUBLE, 1);
 }
 /*-----------------------------------------------------*/
-Int ana_cfloat(Int narg, Int ps[])
-/* returns an ANA_CFLOAT version of the argument */
+Int lux_cfloat(Int narg, Int ps[])
+/* returns an LUX_CFLOAT version of the argument */
 {
-  return ana_convert(narg, ps, ANA_CFLOAT, 1);
+  return lux_convert(narg, ps, LUX_CFLOAT, 1);
 }
 /*-----------------------------------------------------*/
-Int ana_cdouble(Int narg, Int ps[])
-/* returns an ANA_CDOUBLE version of the argument */
+Int lux_cdouble(Int narg, Int ps[])
+/* returns an LUX_CDOUBLE version of the argument */
 {
-  return ana_convert(narg, ps, ANA_CDOUBLE, 1);
+  return lux_convert(narg, ps, LUX_CDOUBLE, 1);
 }
 /*-----------------------------------------------------*/
 extern Int	nFixed;
-Int ana_convert(Int narg, Int ps[], Int totype, Int isFunc)
+Int lux_convert(Int narg, Int ps[], Int totype, Int isFunc)
 /* converts ps[0] to data type <totype>. */
 /* we use this function in one of two modes: function mode (isFunc != 0)
    or subroutine mode (isFunc = 0).  In function mode, there can be
    only a single argument, so then <narg> == 1.  In that case,
    we generate a copy of ps[0] with data type <totype>, which may
-   be one of ANA_BYTE ... ANA_DOUBLE ANA_CFLOAT ANA_CDOUBLE
-   ANA_TEMP_STRING.  If ps[0] is a temporary variable, then we use it
+   be one of LUX_BYTE ... LUX_DOUBLE LUX_CFLOAT LUX_CDOUBLE
+   LUX_TEMP_STRING.  If ps[0] is a temporary variable, then we use it
    to store the results in, too.  In subroutine mode, each of the
    arguments must be a named, writeable symbol, and we convert each
    of them in-place.  LS 16dec99 */
@@ -890,7 +890,7 @@ Int ana_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	&& !symbolIsStringArray(iq))	/* and not a string array either */
       return cerror(ILL_CLASS, iq); /* reject */
     if (!isFunc && (!symbolIsNamed(iq) || iq <= nFixed))
-      return anaerror("Cannot modify symbol", iq);
+      return luxerror("Cannot modify symbol", iq);
     if (symbol_type(iq) == totype) { /* if it's already of the desired type */
 				     /* then we're done */
       if (isFunc)
@@ -898,15 +898,15 @@ Int ana_convert(Int narg, Int ps[], Int totype, Int isFunc)
       continue;
     }
     type = symbol_type(iq);
-    srcstep = ana_type_size[type];
-    trgtstep = ana_type_size[totype];
+    srcstep = lux_type_size[type];
+    trgtstep = lux_type_size[totype];
     if (!isFunc || isFreeTemp(iq))
       result = iq;
     else {
       getFreeTempVariable(result);
     }
     switch (symbol_class(iq)) {	/* source */
-      case ANA_SCALAR:
+      case LUX_SCALAR:
 	if (isComplexType(totype)) {
 	  value = scalar_value(iq);
 	  src.b = &value.b;
@@ -915,35 +915,35 @@ Int ana_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	  if (!complex_scalar_data(result).cf)
 	    return cerror(ALLOC_ERR, 0);
 	  trgt.cf = complex_scalar_data(result).cf;
-	  symbol_class(result) = ANA_CSCALAR;
+	  symbol_class(result) = LUX_CSCALAR;
 	} else if (isStringType(totype)) {
 	  src.b = &scalar_value(iq).b;
 	  switch (type) {
-	    case ANA_BYTE:
+	    case LUX_BYTE:
 	      fmttok(fmt_integer);
 	      Sprintf_tok(curScrat, (Int) *src.b);
 	      break;
-	    case ANA_WORD:
+	    case LUX_WORD:
 	      fmttok(fmt_integer);
 	      Sprintf_tok(curScrat, (Int) *src.w);
 	      break;
-	    case ANA_LONG:
+	    case LUX_LONG:
 	      fmttok(fmt_integer);
 	      Sprintf_tok(curScrat, (Int) *src.l);
 	      break;
-	    case ANA_FLOAT:
+	    case LUX_FLOAT:
 	      fmttok(fmt_float);
 	      Sprintf_tok(curScrat, (Double) *src.f);
 	      break;
-	    case ANA_DOUBLE:
+	    case LUX_DOUBLE:
 	      fmttok(fmt_float);
 	      Sprintf_tok(curScrat, (Double) *src.d);
 	      break;
 	  }
 	  size = strlen(curScrat) + 1;
 	  symbol_memory(result) = size;
-	  symbol_class(result) = ANA_STRING;
-	  symbol_type(result) = ANA_TEMP_STRING;
+	  symbol_class(result) = LUX_STRING;
+	  symbol_type(result) = LUX_TEMP_STRING;
 	  string_value(result) = malloc(size);
 	  if (!string_value(result))
 	    return cerror(ALLOC_ERR, 0);
@@ -952,13 +952,13 @@ Int ana_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	    return result;
 	  continue;
 	} else {
-	  symbol_class(result) = ANA_SCALAR;
+	  symbol_class(result) = LUX_SCALAR;
 	  src.b = &scalar_value(iq).b;
 	  trgt.b = &scalar_value(result).b;
 	}
 	n = 1;
 	break;
-      case ANA_STRING:
+      case LUX_STRING:
 	if (isIntegerType(totype))
 	  value.l = atol(string_value(iq));
 	else if (isRealType(totype))
@@ -970,10 +970,10 @@ Int ana_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	if (result == iq)
 	  free(string_value(iq)); /* change string to scalar: free up memory */
 	if (isRealType(totype)) {
-	  symbol_class(result) = ANA_SCALAR;
+	  symbol_class(result) = LUX_SCALAR;
 	  trgt.b = &scalar_value(result).b;
 	} else {			/* complex output */
-	  symbol_class(result) = ANA_CSCALAR;
+	  symbol_class(result) = LUX_CSCALAR;
 	  complex_scalar_data(result).cf = malloc(trgtstep);
 	  if (!complex_scalar_data(result).cf)
 	    return cerror(ALLOC_ERR, 0);
@@ -983,26 +983,26 @@ Int ana_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	  trgt.cf = complex_scalar_data(result).cf;
 	}
 	switch (totype) {
-	  case ANA_BYTE:
+	  case LUX_BYTE:
 	    *trgt.b = value.l;
 	    break;
-	  case ANA_WORD:
+	  case LUX_WORD:
 	    *trgt.w = value.l;
 	    break;
-	  case ANA_LONG:
+	  case LUX_LONG:
 	    *trgt.l = value.l;
 	    break;
-	  case ANA_FLOAT:
+	  case LUX_FLOAT:
 	    *trgt.f = value.d;
 	    break;
-	  case ANA_DOUBLE:
+	  case LUX_DOUBLE:
 	    *trgt.d = value.d;
 	    break;
-	  case ANA_CFLOAT:
+	  case LUX_CFLOAT:
 	    trgt.cf->real = value.d;
 	    trgt.cf->imaginary = 0.0;
 	    break;
-	  case ANA_CDOUBLE:
+	  case LUX_CDOUBLE:
 	    trgt.cd->real = value.d;
 	    trgt.cd->imaginary = 0.0;
 	    break;
@@ -1011,33 +1011,33 @@ Int ana_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	if (isFunc)
 	  return result;
 	continue;
-      case ANA_CSCALAR:
+      case LUX_CSCALAR:
 	if (isRealType(totype)) {	/* to a real type */
 	  switch (type) {
-	    case ANA_CFLOAT:
+	    case LUX_CFLOAT:
 	      value.d = complex_scalar_data(iq).cf->real;
 	      break;
-	    case ANA_CDOUBLE:
+	    case LUX_CDOUBLE:
 	      value.d = complex_scalar_data(iq).cd->real;
 	      break;
 	  }
 	  if (result == iq)
 	    free(complex_scalar_data(iq).cf);
-	  symbol_class(result) = ANA_SCALAR;
+	  symbol_class(result) = LUX_SCALAR;
 	  switch (totype) {
-	    case ANA_BYTE:
+	    case LUX_BYTE:
 	      scalar_value(result).b = (Byte) value.d;
 	      break;
-	    case ANA_WORD:
+	    case LUX_WORD:
 	      scalar_value(result).w = (Word) value.d;
 	      break;
-	    case ANA_LONG:
+	    case LUX_LONG:
 	      scalar_value(result).l = (Int) value.d;
 	      break;
-	    case ANA_FLOAT:
+	    case LUX_FLOAT:
 	      scalar_value(result).f = (Float) value.d;
 	      break;
-	    case ANA_DOUBLE:
+	    case LUX_DOUBLE:
 	      scalar_value(result).d = (Double) value.d;
 	      break;
 	  }
@@ -1047,23 +1047,23 @@ Int ana_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	  continue;
 	} else if (isStringType(totype)) { /* to a string */
 	  switch (type) {
-	    case ANA_BYTE:
+	    case LUX_BYTE:
 	      fmttok(fmt_integer);
 	      Sprintf_tok(curScrat, (Int) *src.b);
 	      break;
-	    case ANA_WORD:
+	    case LUX_WORD:
 	      fmttok(fmt_integer);
 	      Sprintf_tok(curScrat, (Int) *src.w);
 	      break;
-	    case ANA_LONG:
+	    case LUX_LONG:
 	      fmttok(fmt_integer);
 	      Sprintf_tok(curScrat, (Int) *src.l);
 	      break;
-	    case ANA_FLOAT:
+	    case LUX_FLOAT:
 	      fmttok(fmt_float);
 	      Sprintf_tok(curScrat, (Double) *src.f);
 	      break;
-	    case ANA_DOUBLE:
+	    case LUX_DOUBLE:
 	      fmttok(fmt_float);
 	      Sprintf_tok(curScrat, (Double) *src.d);
 	      break;
@@ -1072,8 +1072,8 @@ Int ana_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	    free(complex_scalar_data(result).cf);
 	  size = strlen(curScrat) + 1;
 	  symbol_memory(result) = size;
-	  symbol_class(result) = ANA_STRING;
-	  symbol_type(result) = ANA_TEMP_STRING;
+	  symbol_class(result) = LUX_STRING;
+	  symbol_type(result) = LUX_TEMP_STRING;
 	  string_value(result) = malloc(size);
 	  if (!string_value(result))
 	    return cerror(ALLOC_ERR, 0);
@@ -1096,11 +1096,11 @@ Int ana_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	  symbol_memory(result) = trgtstep;
 	  src.cf = complex_scalar_data(iq).cf;
 	  trgt.cf = complex_scalar_data(result).cf;
-	  symbol_class(result) = ANA_CSCALAR;
+	  symbol_class(result) = LUX_CSCALAR;
 	  n = 1;
 	}
 	break;
-      case ANA_ARRAY: case ANA_CARRAY:
+      case LUX_ARRAY: case LUX_CARRAY:
 	n = array_size(iq);
 	size = n*trgtstep + sizeof(array); /* new size requirement */
 	/* if the new size is greater than the old one, then we must */
@@ -1124,9 +1124,9 @@ Int ana_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	src.v = array_data(iq);
 	trgt.v = array_data(result);
 	if (isComplexType(totype))
-	  symbol_class(result) = ANA_CARRAY;
+	  symbol_class(result) = LUX_CARRAY;
 	else
-	  symbol_class(result) = ANA_ARRAY;
+	  symbol_class(result) = LUX_ARRAY;
 	break;
       default:
 	return cerror(ILL_CLASS, iq);
@@ -1143,37 +1143,37 @@ Int ana_convert(Int narg, Int ps[], Int totype, Int isFunc)
     
     /* convert */
     switch (type) {		/* source type */
-      case ANA_BYTE:
+      case LUX_BYTE:
 	switch (totype) {		/* target type */
-	  case ANA_WORD:
+	  case LUX_WORD:
 	    while (n--) {
 	      *trgt.w = (Word) *src.b;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_LONG:
+	  case LUX_LONG:
 	    while (n--) {
 	      *trgt.l = (Int) *src.b;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_FLOAT:
+	  case LUX_FLOAT:
 	    while (n--) {
 	      *trgt.f = (Float) *src.b;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_DOUBLE:
+	  case LUX_DOUBLE:
 	    while (n--) {
 	      *trgt.d = (Double) *src.b;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_CFLOAT:
+	  case LUX_CFLOAT:
 	    while (n--) {
 	      trgt.cf->real = (Float) *src.b;
 	      trgt.cf->imaginary = 0.0;
@@ -1181,7 +1181,7 @@ Int ana_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_CDOUBLE:
+	  case LUX_CDOUBLE:
 	    while (n--) {
 	      trgt.cd->real = (Double) *src.b;
 	      trgt.cd->imaginary = 0.0;
@@ -1189,7 +1189,7 @@ Int ana_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_STRING_ARRAY:
+	  case LUX_STRING_ARRAY:
 	    fmttok(fmt_integer);
 	    while (n--) {
 	      Sprintf_tok(curScrat, (Int) *src.b);
@@ -1204,37 +1204,37 @@ Int ana_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	    break;
 	}
 	break;
-      case ANA_WORD:
+      case LUX_WORD:
 	switch (totype) {		/* target type */
-	  case ANA_BYTE:
+	  case LUX_BYTE:
 	    while (n--) {
 	      *trgt.b = (Word) *src.w;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_LONG:
+	  case LUX_LONG:
 	    while (n--) {
 	      *trgt.l = (Word) *src.w;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_FLOAT:
+	  case LUX_FLOAT:
 	    while (n--) {
 	      *trgt.f = (Word) *src.w;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_DOUBLE:
+	  case LUX_DOUBLE:
 	    while (n--) {
 	      *trgt.d = (Word) *src.w;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_CFLOAT:
+	  case LUX_CFLOAT:
 	    while (n--) {
 	      trgt.cf->real = (Float) *src.w;
 	      trgt.cf->imaginary = 0.0;
@@ -1242,7 +1242,7 @@ Int ana_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_CDOUBLE:
+	  case LUX_CDOUBLE:
 	    while (n--) {
 	      trgt.cd->real = (Double) *src.w;
 	      trgt.cd->imaginary = 0.0;
@@ -1250,7 +1250,7 @@ Int ana_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_STRING_ARRAY:
+	  case LUX_STRING_ARRAY:
 	    fmttok(fmt_integer);
 	    while (n--) {
 	      Sprintf_tok(curScrat, (Int) *src.w);
@@ -1265,37 +1265,37 @@ Int ana_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	    break;
 	}
 	break;
-      case ANA_LONG:
+      case LUX_LONG:
 	switch (totype) {		/* target type */
-	  case ANA_BYTE:
+	  case LUX_BYTE:
 	    while (n--) {
 	      *trgt.b = (Int) *src.l;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_WORD:
+	  case LUX_WORD:
 	    while (n--) {
 	      *trgt.w = (Int) *src.l;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_FLOAT:
+	  case LUX_FLOAT:
 	    while (n--) {
 	      *trgt.f = (Int) *src.l;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_DOUBLE:
+	  case LUX_DOUBLE:
 	    while (n--) {
 	      *trgt.d = (Int) *src.l;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_CFLOAT:
+	  case LUX_CFLOAT:
 	    while (n--) {
 	      trgt.cf->real = (Float) *src.l;
 	      trgt.cf->imaginary = 0.0;
@@ -1303,7 +1303,7 @@ Int ana_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_CDOUBLE:
+	  case LUX_CDOUBLE:
 	    while (n--) {
 	      trgt.cd->real = (Double) *src.l;
 	      trgt.cd->imaginary = 0.0;
@@ -1311,7 +1311,7 @@ Int ana_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_STRING_ARRAY:
+	  case LUX_STRING_ARRAY:
 	    fmttok(fmt_integer);
 	    while (n--) {
 	      Sprintf_tok(curScrat, (Int) *src.l);
@@ -1326,37 +1326,37 @@ Int ana_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	    break;
 	}
 	break;
-      case ANA_FLOAT:
+      case LUX_FLOAT:
 	switch (totype) {		/* target type */
-	  case ANA_BYTE:
+	  case LUX_BYTE:
 	    while (n--) {
 	      *trgt.b = (Float) *src.f;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_WORD:
+	  case LUX_WORD:
 	    while (n--) {
 	      *trgt.w = (Float) *src.f;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_LONG:
+	  case LUX_LONG:
 	    while (n--) {
 	      *trgt.l = (Float) *src.f;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_DOUBLE:
+	  case LUX_DOUBLE:
 	    while (n--) {
 	      *trgt.d = (Float) *src.f;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_CFLOAT:
+	  case LUX_CFLOAT:
 	    while (n--) {
 	      trgt.cf->real = (Float) *src.f;
 	      trgt.cf->imaginary = 0.0;
@@ -1364,7 +1364,7 @@ Int ana_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_CDOUBLE:
+	  case LUX_CDOUBLE:
 	    while (n--) {
 	      trgt.cd->real = (Double) *src.f;
 	      trgt.cd->imaginary = 0.0;
@@ -1372,7 +1372,7 @@ Int ana_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_STRING_ARRAY:
+	  case LUX_STRING_ARRAY:
 	    fmttok(fmt_float);
 	    while (n--) {
 	      Sprintf_tok(curScrat, (Double) *src.f);
@@ -1387,37 +1387,37 @@ Int ana_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	    break;
 	}
 	break;
-      case ANA_DOUBLE:
+      case LUX_DOUBLE:
 	switch (totype) {		/* target type */
-	  case ANA_BYTE:
+	  case LUX_BYTE:
 	    while (n--) {
 	      *trgt.b = (Double) *src.d;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_WORD:
+	  case LUX_WORD:
 	    while (n--) {
 	      *trgt.w = (Double) *src.d;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_LONG:
+	  case LUX_LONG:
 	    while (n--) {
 	      *trgt.l = (Double) *src.d;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_FLOAT:
+	  case LUX_FLOAT:
 	    while (n--) {
 	      *trgt.f = (Double) *src.d;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_CFLOAT:
+	  case LUX_CFLOAT:
 	    while (n--) {
 	      trgt.cf->real = (Float) *src.d;
 	      trgt.cf->imaginary = 0.0;
@@ -1425,7 +1425,7 @@ Int ana_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_CDOUBLE:
+	  case LUX_CDOUBLE:
 	    while (n--) {
 	      trgt.cd->real = (Double) *src.d;
 	      trgt.cd->imaginary = 0.0;
@@ -1433,7 +1433,7 @@ Int ana_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_STRING_ARRAY:
+	  case LUX_STRING_ARRAY:
 	    fmttok(fmt_float);
 	    while (n--) {
 	      Sprintf_tok(curScrat, (Double) *src.d);
@@ -1448,44 +1448,44 @@ Int ana_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	    break;
 	}
 	break;
-      case ANA_CFLOAT:
+      case LUX_CFLOAT:
 	switch (totype) {
-	  case ANA_BYTE:
+	  case LUX_BYTE:
 	    while (n--) {
 	      *trgt.b = (Byte) src.cf->real;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_WORD:
+	  case LUX_WORD:
 	    while (n--) {
 	      *trgt.w = (Word) src.cf->real;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_LONG:
+	  case LUX_LONG:
 	    while (n--) {
 	      *trgt.l = (Int) src.cf->real;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_FLOAT:
+	  case LUX_FLOAT:
 	    while (n--) {
 	      *trgt.f = (Float) src.cf->real;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_DOUBLE:
+	  case LUX_DOUBLE:
 	    while (n--) {
 	      *trgt.d = (Double) src.cf->real;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_CDOUBLE:
+	  case LUX_CDOUBLE:
 	    while (n--) {
 	      trgt.cd->imaginary = src.cf->imaginary;
 	      trgt.cd->real = src.cf->real;
@@ -1493,7 +1493,7 @@ Int ana_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_STRING_ARRAY:
+	  case LUX_STRING_ARRAY:
 	    while (n--) {
 	      Sprintf(curScrat, fmt_complex, (Double) src.cf->real,
 		      (Double) src.cf->imaginary);
@@ -1508,44 +1508,44 @@ Int ana_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	    break;
 	}
 	break;
-      case ANA_CDOUBLE:
+      case LUX_CDOUBLE:
 	switch (totype) {
-	  case ANA_BYTE:
+	  case LUX_BYTE:
 	    while (n--) {
 	      *trgt.b = (Byte) src.cd->real;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_WORD:
+	  case LUX_WORD:
 	    while (n--) {
 	      *trgt.w = (Word) src.cd->real;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_LONG:
+	  case LUX_LONG:
 	    while (n--) {
 	      *trgt.l = (Int) src.cd->real;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_FLOAT:
+	  case LUX_FLOAT:
 	    while (n--) {
 	      *trgt.f = (Float) src.cd->real;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_DOUBLE:
+	  case LUX_DOUBLE:
 	    while (n--) {
 	      *trgt.d = (Double) src.cd->real;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_CFLOAT:
+	  case LUX_CFLOAT:
 	    while (n--) {
 	      trgt.cf->imaginary = src.cd->imaginary;
 	      trgt.cf->real = src.cd->real;
@@ -1553,7 +1553,7 @@ Int ana_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_STRING_ARRAY:
+	  case LUX_STRING_ARRAY:
 	    while (n--) {
 	      Sprintf(curScrat, fmt_complex, (Double) src.cd->real,
 		      (Double) src.cd->imaginary);
@@ -1568,9 +1568,9 @@ Int ana_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	    break;
 	}
 	break;
-      case ANA_STRING_ARRAY:	/* from string array */
+      case LUX_STRING_ARRAY:	/* from string array */
 	switch (totype) {
-	  case ANA_BYTE:
+	  case LUX_BYTE:
 	    while (n--) {
 	      value.b = atol(*src.sp);
 	      if (iq == result && *src.sp)
@@ -1580,7 +1580,7 @@ Int ana_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_WORD:
+	  case LUX_WORD:
 	    while (n--) {
 	      value.w = atol(*src.sp);
 	      if (iq == result && *src.sp)
@@ -1590,7 +1590,7 @@ Int ana_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_LONG:
+	  case LUX_LONG:
 	    while (n--) {
 	      value.l = atol(*src.sp);
 	      if (iq == result && *src.sp)
@@ -1600,7 +1600,7 @@ Int ana_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_FLOAT:
+	  case LUX_FLOAT:
 	    while (n--) {
 	      value.f = atof(*src.sp);
 	      if (iq == result && *src.sp)
@@ -1610,7 +1610,7 @@ Int ana_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_DOUBLE:
+	  case LUX_DOUBLE:
 	    while (n--) {
 	      value.d = atof(*src.sp);
 	      if (iq == result && *src.sp)
@@ -1620,16 +1620,16 @@ Int ana_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_CFLOAT:
+	  case LUX_CFLOAT:
 	    while (n--) {
 	      read_a_number(src.sp, &value, &temp);
 	      if (iq == result && *src.sp)
 		free(*src.sp);
 	      switch (temp) {
-		case ANA_LONG:
+		case LUX_LONG:
 		  trgt.cf->real = value.l;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  trgt.cf->real = value.d;
 		  break;
 	      }
@@ -1638,16 +1638,16 @@ Int ana_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	      src.b += srcstep;
 	    }
 	    break;
-	  case ANA_CDOUBLE:
+	  case LUX_CDOUBLE:
 	    while (n--) {
 	      read_a_number(src.sp, &value, &temp);
 	      if (iq == result && *src.sp)
 		free(*src.sp);
 	      switch (temp) {
-		case ANA_LONG:
+		case LUX_LONG:
 		  trgt.cd->real = value.l;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  trgt.cd->real = value.d;
 		  break;
 	      }
@@ -1678,55 +1678,55 @@ Int ana_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	break;
     }
   }
-  return isFunc? result: ANA_OK;
+  return isFunc? result: LUX_OK;
 }
 /*-----------------------------------------------------*/
-Int ana_byte_inplace(Int narg, Int ps[])
-/* BYTE,x  converts <x> to ANA_BYTE. */
+Int lux_byte_inplace(Int narg, Int ps[])
+/* BYTE,x  converts <x> to LUX_BYTE. */
 {
-  return ana_convert(narg, ps, ANA_BYTE, 0);
+  return lux_convert(narg, ps, LUX_BYTE, 0);
 }
 /*-----------------------------------------------------*/
-Int ana_word_inplace(Int narg, Int ps[])
-/* WORD,x  converts <x> to ANA_WORD. */
+Int lux_word_inplace(Int narg, Int ps[])
+/* WORD,x  converts <x> to LUX_WORD. */
 {
-  return ana_convert(narg, ps, ANA_WORD, 0);
+  return lux_convert(narg, ps, LUX_WORD, 0);
 }
 /*-----------------------------------------------------*/
-Int ana_long_inplace(Int narg, Int ps[])
-/* LONG,x  converts <x> to ANA_LONG. */
+Int lux_long_inplace(Int narg, Int ps[])
+/* LONG,x  converts <x> to LUX_LONG. */
 {
-  return ana_convert(narg, ps, ANA_LONG, 0);
+  return lux_convert(narg, ps, LUX_LONG, 0);
 }
 /*-----------------------------------------------------*/
-Int ana_float_inplace(Int narg, Int ps[])
-/* FLOAT,x  converts <x> to ANA_FLOAT. */
+Int lux_float_inplace(Int narg, Int ps[])
+/* FLOAT,x  converts <x> to LUX_FLOAT. */
 {
-  return ana_convert(narg, ps, ANA_FLOAT, 0);
+  return lux_convert(narg, ps, LUX_FLOAT, 0);
 }
 /*-----------------------------------------------------*/
-Int ana_double_inplace(Int narg, Int ps[])
-/* DOUBLE,x  converts <x> to ANA_DOUBLE. */
+Int lux_double_inplace(Int narg, Int ps[])
+/* DOUBLE,x  converts <x> to LUX_DOUBLE. */
 {
-  return ana_convert(narg, ps, ANA_DOUBLE, 0);
+  return lux_convert(narg, ps, LUX_DOUBLE, 0);
 }
 /*-----------------------------------------------------*/
-Int ana_cfloat_inplace(Int narg, Int ps[])
-/* CFLOAT,x  converts <x> to ANA_CFLOAT. */
+Int lux_cfloat_inplace(Int narg, Int ps[])
+/* CFLOAT,x  converts <x> to LUX_CFLOAT. */
 {
-  return ana_convert(narg, ps, ANA_CFLOAT, 0);
+  return lux_convert(narg, ps, LUX_CFLOAT, 0);
 }
 /*-----------------------------------------------------*/
-Int ana_cdouble_inplace(Int narg, Int ps[])
-/* CDOUBLE,x  converts <x> to ANA_CDOUBLE. */
+Int lux_cdouble_inplace(Int narg, Int ps[])
+/* CDOUBLE,x  converts <x> to LUX_CDOUBLE. */
 {
-  return ana_convert(narg, ps, ANA_CDOUBLE, 0);
+  return lux_convert(narg, ps, LUX_CDOUBLE, 0);
 }
 /*-----------------------------------------------------*/
-Int ana_string_inplace(Int narg, Int ps[])
+Int lux_string_inplace(Int narg, Int ps[])
 /* STRING,x  converts <x> into a string form. */
 {
-  return ana_convert(narg, ps, ANA_STRING_ARRAY, 0);
+  return lux_convert(narg, ps, LUX_STRING_ARRAY, 0);
 }
 /*-----------------------------------------------------*/
 Int get_dims(Int *num, Int *arg, Int *dims)
@@ -1739,10 +1739,10 @@ Int get_dims(Int *num, Int *arg, Int *dims)
  n = *num;
  while (n--) {
    iq = *arg++;
-   if (symbol_class(iq) == ANA_ARRAY) {
+   if (symbol_class(iq) == LUX_ARRAY) {
      if (*num != 1)
        return cerror(ONLY_1_IF_ARR, iq);
-     iq = ana_long(1, &iq);	/* ensure LONG */
+     iq = lux_long(1, &iq);	/* ensure LONG */
      size = array_size(iq);
      if (size > MAX_DIMS)
        return cerror(N_DIMS_OVR, arg[-1]);
@@ -1759,21 +1759,21 @@ Int get_dims(Int *num, Int *arg, Int *dims)
 }
 /*-----------------------------------------------------*/
 Int create_sub_ptr(Int nsym, char *p, Int index)
-/* creates a ANA_SCAL_PTR symbol pointing at the element with
+/* creates a LUX_SCAL_PTR symbol pointing at the element with
   index <index> in the array <p> with the data type
   of symbol <nsym> */
 {
  Int	iq;
 
  getFreeTempVariable(iq);
- sym[iq].class = ANA_SCAL_PTR;
+ sym[iq].class = LUX_SCAL_PTR;
  sym[iq].type = sym[nsym].type;
  sym[iq].line = curLineNumber;
- sym[iq].spec.general.ptr = p + index*ana_type_size[sym[nsym].type];
+ sym[iq].spec.general.ptr = p + index*lux_type_size[sym[nsym].type];
  return iq;
 }
 /*-----------------------------------------------------*/
-Int ana_array_convert(pointer *q1, pointer *q2, Int type1, Int type2, Int n)
+Int lux_array_convert(pointer *q1, pointer *q2, Int type1, Int type2, Int n)
  /* more general conversion, converts data starting at q1 of type1 to type2
          data starting at q2, n count */
  /* note that indices are bumped even when count is one */
@@ -1826,52 +1826,52 @@ Int redef_scalar(Int nsym, Int ntype, void *val)
   value = (wideScalar *) val;
 
   undefine(nsym);
-  symbol_class(nsym) = ANA_SCALAR;
+  symbol_class(nsym) = LUX_SCALAR;
   symbol_type(nsym) = ntype;
   switch (ntype) {
-    case ANA_BYTE:
+    case LUX_BYTE:
       scalar_value(nsym).b = value? value->b: 0;
       break;
-    case ANA_WORD:
+    case LUX_WORD:
       scalar_value(nsym).w = value? value->w: 0;
       break;
-    case ANA_LONG:
+    case LUX_LONG:
       scalar_value(nsym).l = value? value->l: 0;
       break;
-    case ANA_FLOAT:
+    case LUX_FLOAT:
       scalar_value(nsym).f = value? value->f: 0.0;
       break;
-    case ANA_DOUBLE:
+    case LUX_DOUBLE:
       scalar_value(nsym).d = value? value->d: 0.0;
       break;
-    case ANA_CFLOAT:
-      complex_scalar_memory(nsym) = ana_type_size[ANA_CFLOAT];
+    case LUX_CFLOAT:
+      complex_scalar_memory(nsym) = lux_type_size[LUX_CFLOAT];
       complex_scalar_data(nsym).cf = malloc(complex_scalar_memory(nsym));
       if (!complex_scalar_data(nsym).cf)
 	return cerror(ALLOC_ERR, nsym);
-      symbol_class(nsym) = ANA_CSCALAR;
+      symbol_class(nsym) = LUX_CSCALAR;
       complex_scalar_data(nsym).cf->real = value? value->cf.real: 0.0;
       complex_scalar_data(nsym).cf->imaginary = value? value->cf.imaginary: 0.0;
       break;
-    case ANA_CDOUBLE:
-      complex_scalar_memory(nsym) = ana_type_size[ANA_CDOUBLE];
+    case LUX_CDOUBLE:
+      complex_scalar_memory(nsym) = lux_type_size[LUX_CDOUBLE];
       complex_scalar_data(nsym).cd = malloc(complex_scalar_memory(nsym));
       if (!complex_scalar_data(nsym).cd)
 	return cerror(ALLOC_ERR, nsym);
-      symbol_class(nsym) = ANA_CSCALAR;
+      symbol_class(nsym) = LUX_CSCALAR;
       complex_scalar_data(nsym).cd->real = value? value->cd.real: 0.0;
       complex_scalar_data(nsym).cd->imaginary = value? value->cd.imaginary: 0.0;
       break;
   }
-  return ANA_OK;
+  return LUX_OK;
 }
 /*-----------------------------------------------------*/
 Int redef_string(Int nsym, Int len)
 /* redefine symbol nsym to be a string with length len (excluding \0) */
 {
  undefine(nsym);
- sym[nsym].class = ANA_STRING;
- sym[nsym].type = ANA_TEMP_STRING;
+ sym[nsym].class = LUX_STRING;
+ sym[nsym].type = LUX_TEMP_STRING;
  allocate(string_value(nsym), len + 1, char);
  sym[nsym].spec.array.bstore = len + 1;
  return 1;
@@ -1891,30 +1891,30 @@ Int redef_array(Int nsym, Int ntype, Int ndim, Int *dims)
     return cerror(ILL_DIM, 0);
   if (!ndim) {
     undefine(nsym);
-    symbol_class(nsym) = ANA_SCALAR;
+    symbol_class(nsym) = LUX_SCALAR;
     scalar_type(nsym) = ntype;
     return 1;
   }
-  mq = ana_type_size[ntype];
+  mq = lux_type_size[ntype];
   for (j = 0; j < ndim; j++)
     mq *= dims[j];
   mq += sizeof(array); /*total memory required including header */
   /* before deleting, check the current size and use it if it matches,
   this avoids a lot of mallocing in loops */
-  if (symbol_class(nsym) != ANA_ARRAY
+  if (symbol_class(nsym) != LUX_ARRAY
       || mq != symbol_memory(nsym)) {
     undefine(nsym);
     symbol_memory(nsym) = mq;
     allocate(symbol_data(nsym), mq, char);
   }
-  symbol_class(nsym) = ANA_ARRAY;
+  symbol_class(nsym) = LUX_ARRAY;
   array_type(nsym) = ntype;
   h = array_header(nsym);
   h->ndim = ndim;
   h->c1 = 0; h->c2 = 0; h->nfacts = 0;
   memcpy(h->dims, dims, ndim*sizeof(Int));
   h->facts = NULL;                      /* no known facts */
-  if (ntype == ANA_STRING_ARRAY) {
+  if (ntype == LUX_STRING_ARRAY) {
     /* a string array: set all elements to NULL */
     mq = array_size(nsym);
     p.sp = array_data(nsym);
@@ -1949,8 +1949,8 @@ Int bytarr(Int narg, Int ps[])
  Int	dims[MAX_DIMS];
 
  if (get_dims(&narg, ps, dims) != 1)
-   return ANA_ERROR;
- return array_scratch(ANA_BYTE, narg, dims);
+   return LUX_ERROR;
+ return array_scratch(LUX_BYTE, narg, dims);
 }
 /*-----------------------------------------------------*/
 Int intarr(Int narg, Int ps[])
@@ -1959,8 +1959,8 @@ Int intarr(Int narg, Int ps[])
  Int	dims[MAX_DIMS];
 
  if (get_dims(&narg, ps, dims) != 1)
-   return ANA_ERROR;
- return array_scratch(ANA_WORD, narg, dims);
+   return LUX_ERROR;
+ return array_scratch(LUX_WORD, narg, dims);
 }
 /*-----------------------------------------------------*/
 Int lonarr(Int narg, Int ps[])
@@ -1969,8 +1969,8 @@ Int lonarr(Int narg, Int ps[])
  Int	dims[MAX_DIMS];
 
  if (get_dims(&narg, ps, dims) != 1)
-   return ANA_ERROR;
- return array_scratch(ANA_LONG, narg, dims);
+   return LUX_ERROR;
+ return array_scratch(LUX_LONG, narg, dims);
 }
 /*-----------------------------------------------------*/
 Int fltarr(Int narg, Int ps[])
@@ -1979,8 +1979,8 @@ Int fltarr(Int narg, Int ps[])
  Int	dims[MAX_DIMS];
 
  if (get_dims(&narg, ps, dims) != 1)
-   return ANA_ERROR;
- return array_scratch(ANA_FLOAT, narg, dims);
+   return LUX_ERROR;
+ return array_scratch(LUX_FLOAT, narg, dims);
 }
 /*-----------------------------------------------------*/
 Int dblarr(Int narg, Int ps[])
@@ -1989,8 +1989,8 @@ Int dblarr(Int narg, Int ps[])
  Int	dims[MAX_DIMS];
 
  if (get_dims(&narg, ps, dims) != 1)
-   return ANA_ERROR;
- return array_scratch(ANA_DOUBLE, narg, dims);
+   return LUX_ERROR;
+ return array_scratch(LUX_DOUBLE, narg, dims);
 }
 /*-----------------------------------------------------*/
 Int cfltarr(Int narg, Int ps[])
@@ -1999,8 +1999,8 @@ Int cfltarr(Int narg, Int ps[])
   Int	dims[MAX_DIMS];
 
   if (get_dims(&narg, ps, dims) != 1)
-    return ANA_ERROR;
-  return array_scratch(ANA_CFLOAT, narg, dims);
+    return LUX_ERROR;
+  return array_scratch(LUX_CFLOAT, narg, dims);
 }
 /*-----------------------------------------------------*/
 Int cdblarr(Int narg, Int ps[])
@@ -2009,8 +2009,8 @@ Int cdblarr(Int narg, Int ps[])
   Int	dims[MAX_DIMS];
 
   if (get_dims(&narg, ps, dims) != 1)
-    return ANA_ERROR;
-  return array_scratch(ANA_CDOUBLE, narg, dims);
+    return LUX_ERROR;
+  return array_scratch(LUX_CDOUBLE, narg, dims);
 }
 /*-----------------------------------------------------*/
 Int strarr(Int narg, Int ps[])
@@ -2021,12 +2021,12 @@ Int strarr(Int narg, Int ps[])
 
  size = ps[0]? int_arg(ps[0]): 0;
  if (size < 0)
-   return anaerror("Illegal negative string size", ps[0]);
+   return luxerror("Illegal negative string size", ps[0]);
  ps++;
  narg--;
  if (get_dims(&narg, ps, dims) != 1)
-   return ANA_ERROR;
- iq = array_scratch(ANA_STRING_ARRAY, narg, dims);
+   return LUX_ERROR;
+ iq = array_scratch(LUX_STRING_ARRAY, narg, dims);
  if (size) {			/* fill with specified size of whitespace */
    ptr = array_data(iq);
    n = array_size(iq);
@@ -2050,7 +2050,7 @@ Int show_routine(internalRoutine *table, Int tableLength, Int narg, Int ps[])
  keyList	*keys;
 
  if (internalMode & 1)		/* /PARAMETERS */
- { if (symbol_class(*ps) != ANA_STRING)
+ { if (symbol_class(*ps) != LUX_STRING)
      return cerror(NEED_STR, *ps);
    p = name = strsave(string_arg(*ps));
    while (*p)
@@ -2094,17 +2094,17 @@ Int show_routine(internalRoutine *table, Int tableLength, Int narg, Int ps[])
  return 1;
 }
 /*-----------------------------------------------------*/
-Int ana_show_subr(Int narg, Int ps[])
+Int lux_show_subr(Int narg, Int ps[])
 {
  return show_routine(subroutine, nSubroutine, narg, ps);
 }
 /*-----------------------------------------------------*/
-Int ana_show_func(Int narg, Int ps[])
+Int lux_show_func(Int narg, Int ps[])
 {
  return show_routine(function, nFunction, narg, ps);
 }
 /*-----------------------------------------------------*/
-Int ana_switch(Int narg, Int ps[])
+Int lux_switch(Int narg, Int ps[])
 /* switches identity of two symbols.  We cannot just swap the names
    because then the connection between a particular name and a
    particular symbol number is broken.  We must swap the values instead.
@@ -2152,7 +2152,7 @@ Int ana_switch(Int narg, Int ps[])
  return 1;
 } 
 /*-----------------------------------------------------*/
-Int ana_array(Int narg, Int ps[])
+Int lux_array(Int narg, Int ps[])
 /* create an array of the specified type and dimensions */
 {
  Int	dims[MAX_DIMS], type;
@@ -2162,13 +2162,13 @@ Int ana_array(Int narg, Int ps[])
  if (!isLegalType(type))
    return cerror(ILL_TYPE, 0, type);
  if (isStringType(type))
-   type = ANA_STRING_ARRAY;
+   type = LUX_STRING_ARRAY;
  if (get_dims(&narg, ps + 1, dims) != 1)
-   return ANA_ERROR;
+   return LUX_ERROR;
  return array_scratch(type, narg, dims);
 }
 /*-----------------------------------------------------*/
-Int ana_assoc(Int narg, Int ps[])
+Int lux_assoc(Int narg, Int ps[])
 /* returns an associated variable.
   syntax: assoc(lun, array [, offset]) */
 {
@@ -2179,7 +2179,7 @@ Int ana_assoc(Int narg, Int ps[])
  iq = ps[1];
  CK_ARR(iq, 2);
  getFreeTempVariable(result);
- sym[result].class = ANA_ASSOC;
+ sym[result].class = LUX_ASSOC;
  sym[result].type = sym[iq].type;
  sym[result].line = curLineNumber;
  h = HEAD(iq);
@@ -2200,7 +2200,7 @@ Int ana_assoc(Int narg, Int ps[])
  return result;
 }
 /*-----------------------------------------------------*/
-Int ana_rfix(Int narg, Int ps[])
+Int lux_rfix(Int narg, Int ps[])
 /* returns an I*4 version of the argument, rounded to the nearest
  integer if necessary */
 {
@@ -2210,32 +2210,32 @@ Int ana_rfix(Int narg, Int ps[])
  array	*h;
 
  nsym = *ps;
- if ((type = sym[nsym].type) == ANA_LONG) return nsym; /* already of proper type */
+ if ((type = sym[nsym].type) == LUX_LONG) return nsym; /* already of proper type */
  switch (sym[nsym].class)
- { case ANA_SCALAR:
+ { case LUX_SCALAR:
      src.l = &sym[nsym].spec.scalar.l;  size = 1;
-     result = scalar_scratch(ANA_LONG);  trgt = &sym[result].spec.scalar.l;  break;
-   case ANA_STRING:
-     result = scalar_scratch(ANA_LONG);  type = ANA_DOUBLE;
+     result = scalar_scratch(LUX_LONG);  trgt = &sym[result].spec.scalar.l;  break;
+   case LUX_STRING:
+     result = scalar_scratch(LUX_LONG);  type = LUX_DOUBLE;
      temp = atof((char *) sym[nsym].spec.array.ptr);  src.d = &temp;
      size = 1;  trgt = &sym[result].spec.scalar.l;  break;
-   case ANA_ARRAY:
-     result = array_clone(nsym, ANA_LONG);  h = HEAD(nsym);
+   case LUX_ARRAY:
+     result = array_clone(nsym, LUX_LONG);  h = HEAD(nsym);
      GET_SIZE(size, h->dims, h->ndim);  src.l = LPTR(h);
      trgt = LPTR(HEAD(result));  break;
    default: return cerror(ILL_CLASS, nsym); }
  		/* now convert */
  switch (type)
- { case ANA_BYTE:
+ { case LUX_BYTE:
      while (size--) *trgt++ = (Int) *src.b++;  break;
-   case ANA_WORD:
+   case LUX_WORD:
      while (size--) *trgt++ = (Int) *src.w++;  break;
-   case ANA_FLOAT:
+   case LUX_FLOAT:
      while (size--)
      { *trgt++ = (Int) (*src.f + ((*src.f >= 0)? 0.5: -0.5));
        src.f++; }
      break;
-   case ANA_DOUBLE:
+   case LUX_DOUBLE:
      while (size--)
      {*trgt++ = (Int) (*src.d + ((*src.d >= 0)? 0.5: -0.5));
       src.d++; }
@@ -2243,7 +2243,7 @@ Int ana_rfix(Int narg, Int ps[])
  return result;
 }
 /*-----------------------------------------------------*/
-Int ana_echo(Int narg, Int ps[])
+Int lux_echo(Int narg, Int ps[])
 /* turn on echoing of input lines from non-keyboard sources */
 {
  extern Int	echo;
@@ -2252,7 +2252,7 @@ Int ana_echo(Int narg, Int ps[])
  return 1;
 }
 /*-----------------------------------------------------*/
-Int ana_noecho(Int narg, Int ps[])
+Int lux_noecho(Int narg, Int ps[])
 /* turn on echoing of input lines from non-keyboard sources */
 {
  extern Int	echo;
@@ -2261,7 +2261,7 @@ Int ana_noecho(Int narg, Int ps[])
  return 1;
 }
 /*-----------------------------------------------------*/
-Int ana_batch(Int narg, Int ps[])
+Int lux_batch(Int narg, Int ps[])
 /* turn on/off batch mode */
 {
  extern char	batch;
@@ -2273,7 +2273,7 @@ Int ana_batch(Int narg, Int ps[])
 /*-----------------------------------------------------*/
 FILE	*recordFile = NULL;
 extern char	recording;
-Int ana_record(Int narg, Int ps[])
+Int lux_record(Int narg, Int ps[])
  /* start/stop recording. */
  /* Syntax:  RECORD [,file] [,/RESET,/INPUT,/OUTPUT] */
 {
@@ -2327,7 +2327,7 @@ Int ana_record(Int narg, Int ps[])
 }
 /*-------------------------------------------------------------------------*/
 Int step = 0;
-Int ana_step(Int narg, Int ps[])
+Int lux_step(Int narg, Int ps[])
 {
   Int	i = 1;
 
@@ -2337,7 +2337,7 @@ Int ana_step(Int narg, Int ps[])
   return 1;
 }
 /*-------------------------------------------------------------------------*/
-Int ana_varname(Int narg, Int ps[])
+Int lux_varname(Int narg, Int ps[])
 /* returns the name of the variable */
 {
   char	*name;
@@ -2360,22 +2360,22 @@ Int namevar(Int symbol, Int safe)
   char	*name;
   Int	iq, context;
 
-  if (symbol_class(symbol) != ANA_STRING)
+  if (symbol_class(symbol) != LUX_STRING)
     return cerror(NEED_STR, symbol);
   name = string_value(symbol);
   strcpy(line, name);
   if (!isalpha((Byte) *name) && *name != '$' && *name != '!')
-    return anaerror("Illegal symbol name: %s", symbol, name);
+    return luxerror("Illegal symbol name: %s", symbol, name);
   for (name = line; *name; name++)
   { if (!isalnum((Byte) *name))
-    return anaerror("Illegal symbol name: %s", symbol, name);
+    return luxerror("Illegal symbol name: %s", symbol, name);
     *name = toupper(*name); }
   safe = safe & 3;
   context = (safe >= 2)? 0: curContext;
   iq = lookForVarName(line, context); /* seek symbol */
   if (iq < 0)
   { if ((safe & 1) == 0 || ((safe & 1) == 1 && context))
-      return anaerror("Could not find variable %s %s %s\n", 0, line,
+      return luxerror("Could not find variable %s %s %s\n", 0, line,
                    context? "in": "at",
 		   context? varName(context): "main level");
     if ((safe & 1) == 1)	/* create at main level */
@@ -2415,7 +2415,7 @@ void checkErrno(void)
 }
 /*-------------------------------------------------------------------------*/
 char	allowPromptInInput = 1; /* default */
-Int ana_set(Int narg, Int ps[])
+Int lux_set(Int narg, Int ps[])
 /* SET[,/SHOWALLOC,/WHITEBACKGROUND,/INVIMCOORDS,/SET,/RESET,/ZOOM]
  governs aspects of the behaviour of various routines.  LS 11mar98 */
 {
@@ -2447,20 +2447,20 @@ Int ana_set(Int narg, Int ps[])
 	for (i = 0; i < 12; i++)
 	  printf("%s ", visualNames[i]);
 	putchar('\n');
-	return anaerror("Invalid visual", *ps);
+	return luxerror("Invalid visual", *ps);
       }
       i = visualClassCode[i % 6];
       if (connect_flag) {
 	if (i == visual->class)
-	  return ANA_OK;	/* already use the selected visual class */
+	  return LUX_OK;	/* already use the selected visual class */
 	else
-	  return anaerror("Already using a %s visual.", 0,
+	  return luxerror("Already using a %s visual.", 0,
 		       visualNames[visual->class]);
       }
-      if (setup_x_visual(i) == ANA_ERROR)
-	return ANA_ERROR;
+      if (setup_x_visual(i) == LUX_ERROR)
+	return LUX_ERROR;
 #else
-      return anaerror("Need X11 package to set the visual", 0);
+      return luxerror("Need X11 package to set the visual", 0);
 #endif      
     }
   }
@@ -2501,7 +2501,7 @@ Int ana_set(Int narg, Int ps[])
   if (internalMode & 2048)
     xsynchronize(setup & 512? 1: 0);
 #endif
-  return ANA_ONE;
+  return LUX_ONE;
 }
 /*-------------------------------------------------------------------------*/
 void zapTemp(Int symbol)
@@ -2525,18 +2525,18 @@ Int copyEvalSym(Int source)
   if (result != source) zapTemp(source);
   if (isFreeTemp(result)) return result;
   target = nextFreeTempVariable();
-  symbol_class(target) = ANA_UNDEFINED; /* else may get trouble when */
+  symbol_class(target) = LUX_UNDEFINED; /* else may get trouble when */
 				  /* updateIndices() is called in */
-				  /* ana_replace() */
+				  /* lux_replace() */
   if (target < 0) return -1;	/* some error */
-  if (ana_replace(target, result) < 0)
+  if (lux_replace(target, result) < 0)
     return -1;			/* some error */
   return target;
 }
 /*-------------------------------------------------------------------------*/
-Int (*ana_converts[10])(Int, Int []) = {
-  ana_byte, ana_word, ana_long, ana_float, ana_double, ana_string,
-  ana_string, ana_string, ana_cfloat, ana_cdouble
+Int (*lux_converts[10])(Int, Int []) = {
+  lux_byte, lux_word, lux_long, lux_float, lux_double, lux_string,
+  lux_string, lux_string, lux_cfloat, lux_cdouble
 };
 Int getNumerical(Int iq, Int minType, Int *n, pointer *src, char mode,
 		 Int *result, pointer *trgt)
@@ -2568,19 +2568,19 @@ Int getNumerical(Int iq, Int minType, Int *n, pointer *src, char mode,
   if (!symbolIsNumerical(iq))
     return cerror(ILL_CLASS, iq);
 
-  if (symbol_class(iq) == ANA_SCAL_PTR)
+  if (symbol_class(iq) == LUX_SCAL_PTR)
     iq = dereferenceScalPointer(iq);
 
   type = symbol_type(iq);
   if (((mode & GN_UPGRADE) && type < minType)
       || ((mode & GN_EXACT) && type != minType)) {
     if (mode & GN_UPDATE)
-      iq = ana_converts[minType](1, &iq);
+      iq = lux_converts[minType](1, &iq);
     type = minType;
   }
 
   switch (symbol_class(iq)) {
-    case ANA_SCALAR:
+    case LUX_SCALAR:
       (*src).b = &scalar_value(iq).b;
       *n = 1;
       if (trgt) {
@@ -2589,7 +2589,7 @@ Int getNumerical(Int iq, Int minType, Int *n, pointer *src, char mode,
       } else if (result)
 	*result = iq;
       break;
-    case ANA_ARRAY: case ANA_CARRAY:
+    case LUX_ARRAY: case LUX_CARRAY:
       (*src).b = (Byte *) array_data(iq);
       *n = array_size(iq);
       if (trgt) {
@@ -2598,7 +2598,7 @@ Int getNumerical(Int iq, Int minType, Int *n, pointer *src, char mode,
       } else if (result)
 	*result = iq;
       break;
-    case ANA_CSCALAR:
+    case LUX_CSCALAR:
       (*src).cf = complex_scalar_data(iq).cf;
       *n = 1;
       if (trgt) {
@@ -2620,13 +2620,13 @@ Int getSimpleNumerical(Int iq, pointer *data, Int *nelem)
    <*nelem>, and nothing in <*data>.  LS 14apr97 */
 {
   switch (symbol_class(iq)) {
-    case ANA_SCAL_PTR:
+    case LUX_SCAL_PTR:
       iq = dereferenceScalPointer(iq);
-    case ANA_SCALAR:
+    case LUX_SCALAR:
       (*data).b = &scalar_value(iq).b;
       *nelem = 1;
       break;
-    case ANA_ARRAY:
+    case LUX_ARRAY:
       (*data).l = array_data(iq);
       *nelem = array_size(iq);
       break;
@@ -2649,7 +2649,7 @@ Int file_map_size(Int symbol)
   return size;
 }
 /*-------------------------------------------------------------------------*/
-Int ana_pointer(Int narg, Int ps[])
+Int lux_pointer(Int narg, Int ps[])
 /* POINTER,pointer,target [,/FUNCTION, /SUBROUTINE, /INTERNAL, /MAIN] */
 /* makes named variable */
 /* <pointer> point at named variable <target>.  If <pointer> is a pointer */
@@ -2661,15 +2661,15 @@ Int ana_pointer(Int narg, Int ps[])
   char	*name, *name2, *p;
   
   if (ps[0] >= TEMPS_START)
-    return anaerror("Intended pointer is not a named variable", ps[0]);
-  if (symbol_class(ps[0]) != ANA_POINTER)
+    return luxerror("Intended pointer is not a named variable", ps[0]);
+  if (symbol_class(ps[0]) != LUX_POINTER)
   { undefine(ps[0]);
-    symbol_class(ps[0]) = ANA_POINTER;
+    symbol_class(ps[0]) = LUX_POINTER;
     transfer_is_parameter(ps[0]) = 0;
     transfer_temp_param(ps[0]) = 0; }
   iq = eval(ps[1]);
   if (internalMode)		/* target must be a string variable */
-  { if (symbol_class(iq) != ANA_STRING)
+  { if (symbol_class(iq) != LUX_STRING)
       return cerror(NEED_STR, ps[1]);
     name = string_arg(iq);
     p = name2 = strsave(name);
@@ -2683,10 +2683,10 @@ Int ana_pointer(Int narg, Int ps[])
 		    (internalMode & 8)? 0: curContext);
       Free(name2);
       if (iq < 0)
-	return ANA_ERROR;
+	return LUX_ERROR;
     case 0:			/* variable */
       if (iq >= TEMPS_START)
-	return anaerror("Expression does not reduce to a named variable", ps[1]);
+	return luxerror("Expression does not reduce to a named variable", ps[1]);
       transfer_target(ps[0]) = iq;
       break;
     case 1:			/* function */
@@ -2695,23 +2695,23 @@ Int ana_pointer(Int narg, Int ps[])
       { iq = findInternalName(name2, (internalMode & 1)? 0: 1);
 	Free(name2);
 	if (iq < 0)
-	  return ANA_ERROR;
-	symbol_class(ps[0]) = ANA_FUNC_PTR;
+	  return LUX_ERROR;
+	symbol_class(ps[0]) = LUX_FUNC_PTR;
 	func_ptr_routine_num(ps[0]) = -iq;
-	func_ptr_type(ps[0]) = (internalMode & 1)? ANA_FUNCTION:
-	ANA_SUBROUTINE; }
+	func_ptr_type(ps[0]) = (internalMode & 1)? LUX_FUNCTION:
+	LUX_SUBROUTINE; }
       else
       { iq = findName(name2, internalMode == 1? funcHashTable: subrHashTable,
 		      0);
 	Free(name2);
 	if (iq < 0)		/* some error occurred */
 	  return iq;
-	symbol_class(ps[0]) = ANA_FUNC_PTR;
+	symbol_class(ps[0]) = LUX_FUNC_PTR;
 	symbol_class(iq) =
-	  (internalMode == 1)? ANA_DEFERRED_FUNC: ANA_DEFERRED_SUBR;
+	  (internalMode == 1)? LUX_DEFERRED_FUNC: LUX_DEFERRED_SUBR;
 	deferred_routine_filename(iq) = strsave(name);
 	if (iq >= TEMPS_START)
-	  return anaerror("Pointer target is not a named variable", ps[1]);
+	  return luxerror("Pointer target is not a named variable", ps[1]);
 	transfer_target(ps[0]) = iq; }
       break;
     default:
@@ -2719,7 +2719,7 @@ Int ana_pointer(Int narg, Int ps[])
   return 1;
 }
 /*-------------------------------------------------------------------------*/
-Int ana_symbol(Int narg, Int ps[])
+Int lux_symbol(Int narg, Int ps[])
 /* SYMBOL('name') returns the variable with the <name> in the current */
 /* context, or if not found and if at the main level, then creates */
 /* such a variable and returns it.  SYMBOL('name',/MAIN) checks */
@@ -2783,7 +2783,7 @@ Int stringpointer(char *name, Int type)
   return -1;			/* not found */
 }
 /*-------------------------------------------------------------------------*/
-Int ana_show_temps(Int narg, Int ps[])
+Int lux_show_temps(Int narg, Int ps[])
 /* a routine for debugging LUX.  It shows the temporary variables that */
 /* are currently defined.  LS 2mar97 */
 {
@@ -2791,7 +2791,7 @@ Int ana_show_temps(Int narg, Int ps[])
 
   setPager(0);
   for (i = TEMPS_START; i < TEMPS_END; i++) {
-    if (symbol_class(i) != ANA_UNUSED) {	/* defined */
+    if (symbol_class(i) != LUX_UNUSED) {	/* defined */
       printf("%4d [%5d] ", i, symbol_context(i));
       symdumpswitch(i, I_TRUNCATE | I_LENGTH);
     }
@@ -2806,8 +2806,8 @@ Int routineContext(Int nsym)
 {
   while (symbol_context(nsym))
   { nsym = symbol_context(nsym);
-    if (symbol_class(nsym) == ANA_SUBROUTINE
-	|| symbol_class(nsym) == ANA_FUNCTION)
+    if (symbol_class(nsym) == LUX_SUBROUTINE
+	|| symbol_class(nsym) == LUX_FUNCTION)
       return nsym; }
   return 0;
 }
@@ -2863,13 +2863,13 @@ void read_a_number(char **buf, scalar *value, Int *type)
    the value (transformed to real) is returned in value.d.
    So, the union member that the value is in does not necessarily correspond
    exactly to the <*type>: e.g., a BYTE number gets its value returned
-   in value->l and *type set to ANA_BYTE.  LS 17sep98 */
+   in value->l and *type set to LUX_BYTE.  LS 17sep98 */
 {
   Int	base = 10, kind, sign;
   char	*p, *numstart, c, ce, *p2;
 
   p = *buf;
-  *type = ANA_LONG;		/* default */
+  *type = LUX_LONG;		/* default */
   /* skip whitespace */
   while (!isdigit((Int) *p) && !strchr("+-.", (Int) *p))
     p++;
@@ -2998,15 +2998,15 @@ void read_a_number(char **buf, scalar *value, Int *type)
       if (kind == 'D' || kind == 'E') {
 	c = *++p;		/* next one could be an I */
 	if (toupper(c) == 'I') { /* imaginary */
-	  *type = (kind == 'D')? ANA_CDOUBLE: ANA_CFLOAT;
+	  *type = (kind == 'D')? LUX_CDOUBLE: LUX_CFLOAT;
 	  p++;			/* skip */
 	} else 
-	  *type = (kind == 'D')? ANA_DOUBLE: ANA_FLOAT;
+	  *type = (kind == 'D')? LUX_DOUBLE: LUX_FLOAT;
       } else if (kind == 'I') {
-	*type = ANA_CFLOAT;
+	*type = LUX_CFLOAT;
 	p++;
       } else
-	*type = ANA_FLOAT;
+	*type = LUX_FLOAT;
       value->d *= sign;	/* put the sign back on it */
       *buf = p;
       return;
@@ -3027,13 +3027,13 @@ void read_a_number(char **buf, scalar *value, Int *type)
       /*          ^ we are here */
       kind = toupper(*p);
       p2 = NULL;
-      *type = ANA_FLOAT;	/* default */
+      *type = LUX_FLOAT;	/* default */
       if (kind == 'D' || kind == 'E') {
 	if (kind == 'D') {
 	  ce = *p;
 	  *p = 'E';		/* temporarily, so atof can read it */
 	  p2 = p;
-	  *type = ANA_DOUBLE;
+	  *type = LUX_DOUBLE;
 	}
 	p++;
 	/* ddd.[ddd]{DE}|[[{+-}ddd][I] */
@@ -3058,7 +3058,7 @@ void read_a_number(char **buf, scalar *value, Int *type)
       if (p2)
 	*p2 = ce;
       if (kind == 'I') {
-	*type = (*type == ANA_DOUBLE)? ANA_CDOUBLE: ANA_CFLOAT;
+	*type = (*type == LUX_DOUBLE)? LUX_CDOUBLE: LUX_CFLOAT;
 	p++;			/* skip the I */
       }
       *buf = p;
@@ -3082,24 +3082,24 @@ void read_a_number(char **buf, scalar *value, Int *type)
   *p = c;
   switch (kind) {
     case 'B':
-      *type = ANA_BYTE;
+      *type = LUX_BYTE;
       p++;
       break;
     case 'W':
-      *type = ANA_WORD;
+      *type = LUX_WORD;
       p++;
       break;
     case 'L':
-      *type = ANA_LONG;
+      *type = LUX_LONG;
       p++;
       break;
     case 'I':
       value->d = value->l;
-      *type = ANA_CFLOAT;
+      *type = LUX_CFLOAT;
       p++;
       break;
     default:
-      *type = ANA_LONG;		/* default */
+      *type = LUX_LONG;		/* default */
       break;
   }
   *buf = p;
@@ -3116,13 +3116,13 @@ void read_a_number_fp(FILE *fp, scalar *value, Int *type)
    the value (transformed to real) is returned in value.d.
    So, the union member that the value is in does not necessarily correspond
    exactly to the <*type>: e.g., a BYTE number gets its value returned
-   in value->l and *type set to ANA_BYTE.  LS 17sep98 */
+   in value->l and *type set to LUX_BYTE.  LS 17sep98 */
 /* Fixed reading of numbers with exponents.  LS 11jul2000 */
 {
   Int	base = 10, kind, sign, ch;
   char	*p, *numstart;
 
-  *type = ANA_LONG;		/* default */
+  *type = LUX_LONG;		/* default */
   /* skip non-digits, non-signs */
   while ((ch = nextchar(fp)) != EOF && !isdigit(ch) && !strchr("+-", ch));
   if (ch == EOF) {		/* end of file; return LONG 0 */
@@ -3224,13 +3224,13 @@ void read_a_number_fp(FILE *fp, scalar *value, Int *type)
       kind = toupper(*p);
       if (kind == 'D' || kind == 'E') {
 	if (toupper(ch) == 'I') { /* imaginary */
-	  *type = (kind == 'D')? ANA_CDOUBLE: ANA_CFLOAT;
+	  *type = (kind == 'D')? LUX_CDOUBLE: LUX_CFLOAT;
 	} else 
-	  *type = (kind == 'D')? ANA_DOUBLE: ANA_FLOAT;
+	  *type = (kind == 'D')? LUX_DOUBLE: LUX_FLOAT;
       } else if (kind == 'I') {
-	*type = ANA_CFLOAT;
+	*type = LUX_CFLOAT;
       } else
-	*type = ANA_FLOAT;
+	*type = LUX_FLOAT;
       value->d *= sign;	/* put the sign back on it */
       return;
     case '.': case 'D': case 'E':
@@ -3240,11 +3240,11 @@ void read_a_number_fp(FILE *fp, scalar *value, Int *type)
 	while (isdigit((Int) p[-1]));
       }
       kind = toupper(p[-1]);
-      *type = ANA_FLOAT;	/* default */
+      *type = LUX_FLOAT;	/* default */
       if (kind == 'D' || kind == 'E') {
 	if (kind == 'D') {
 	  p[-1] = 'E';		/* so atof can read it */
-	  *type = ANA_DOUBLE;
+	  *type = LUX_DOUBLE;
 	}
 	ch = nextchar(fp);
 	if (ch == '+' || ch == '-') /* a signed exponent */
@@ -3259,7 +3259,7 @@ void read_a_number_fp(FILE *fp, scalar *value, Int *type)
       *p = '\0';		/* temporary end */
       value->d = atof(numstart)*sign;
       if (kind == 'I') {
-	*type = (*type == ANA_DOUBLE)? ANA_CDOUBLE: ANA_CFLOAT;
+	*type = (*type == LUX_DOUBLE)? LUX_CDOUBLE: LUX_CFLOAT;
       }
       /* the last character we read was not part of the number. */
       /* if it is not a newline, then we put it back in the stream. */
@@ -3285,20 +3285,20 @@ void read_a_number_fp(FILE *fp, scalar *value, Int *type)
   value->l = strtoul(numstart, NULL, base)*sign;
   switch (kind) {
     case 'B':
-      *type = ANA_BYTE;
+      *type = LUX_BYTE;
       break;
     case 'W':
-      *type = ANA_WORD;
+      *type = LUX_WORD;
       break;
     case 'L':
-      *type = ANA_LONG;
+      *type = LUX_LONG;
       break;
     case 'I':
       value->d = value->l;
-      *type = ANA_CFLOAT;
+      *type = LUX_CFLOAT;
       break;
     default:
-      *type = ANA_LONG;		/* default */
+      *type = LUX_LONG;		/* default */
       break;
   }
 }
@@ -3341,7 +3341,7 @@ void *setFacts(Int symbol, Int type, Int flag)
     return NULL;
   
   if (array_facts(symbol)) {
-    facts = seekFacts(symbol, type, ANA_ANY_FACT);
+    facts = seekFacts(symbol, type, LUX_ANY_FACT);
     if (facts) {		/* it exists already */
       facts->type |= flag;
       return facts;
@@ -3374,7 +3374,7 @@ void deleteFacts(Int symbol, Int type)
     return;
   
   if (array_facts(symbol)) {
-    facts = seekFacts(symbol, type, ANA_ANY_FACT);
+    facts = seekFacts(symbol, type, LUX_ANY_FACT);
     if (facts) {
       nf = array_num_facts(symbol);
       n = nf + (array_facts(symbol) - facts) - 1;

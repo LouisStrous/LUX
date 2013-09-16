@@ -25,7 +25,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #if HAVE_LIBX11
 #include <X11/Xlib.h>
 #else
-#define setup_x()	ANA_OK
+#define setup_x()	LUX_OK
 #endif
 #include <float.h>
 #include <stdio.h>
@@ -69,7 +69,7 @@ Int	useProjection = 0, oldLineStyle = 0;
 static Float	zero = 0.0, one = 0.99999999;
 Float	*plotWindow[4] = { &wxb, &wxt, &wyb, &wyt }, 
 	*screenWindow[4] = { &zero, &one, &zero, &one };
-Int	tkCoordSys = ANA_DEP;
+Int	tkCoordSys = LUX_DEP;
 extern Int	projectTk;
 extern Float	*projectMatrix;
 Int	createFullProjection(Float *, Float *, Float *), 
@@ -111,16 +111,16 @@ Int fixPlotStyle(Int *symbol, Int *line)
   /* first, see what the specified types are */
   if (*symbol >= -9 && *symbol <= 29)
     sym = types[*symbol + 9];
-  else if (*symbol == ANA_UNSPECIFIED)
+  else if (*symbol == LUX_UNSPECIFIED)
     sym = NONE;
   else
-    return anaerror("Specified symbol style %d is illegal\n", 0, *symbol);
+    return luxerror("Specified symbol style %d is illegal\n", 0, *symbol);
   if (*line >= -9 && *line <= 29)
     lin = types[*line + 9];
-  else if (*line == ANA_UNSPECIFIED)
+  else if (*line == LUX_UNSPECIFIED)
     lin = NONE;
   else
-    return anaerror("Specified line style %d is illegal\n", 0, *line);
+    return luxerror("Specified line style %d is illegal\n", 0, *line);
   /* then, check for legal combinations and put in standard format */
   switch (sym) {
     case POSSYM:
@@ -210,12 +210,12 @@ Int fixPlotStyle(Int *symbol, Int *line)
   }
   if (!ok)
     return
-      anaerror("Illegal combination of symbol type (%d) and line style (%d)\n", 
+      luxerror("Illegal combination of symbol type (%d) and line style (%d)\n", 
 	    0, *symbol, *line);
   return 1;
 }
  /*------------------------------------------------------------------------- */
-Int ana_plot(Int narg, Int ps[]) /* plot routine */
+Int lux_plot(Int narg, Int ps[]) /* plot routine */
  /* plots data */
 {
   Int	oldIer = ier, n;
@@ -223,26 +223,26 @@ Int ana_plot(Int narg, Int ps[]) /* plot routine */
 				     Int, Int, Int), labels(void);
 
   ier = (internalMode & 64)? 0: ier; /* /KEEP: erase before plotting? */
-  n = ((lunplt != 0 || setup_x() == ANA_OK)
-       && (preplot(narg, ps) == ANA_OK)
-       && (plotxy(q1.f, q2.f, q3.f, q4.f, nelem, dq3, dq4) == ANA_OK)
-       //       && (labels() == ANA_OK)
+  n = ((lunplt != 0 || setup_x() == LUX_OK)
+       && (preplot(narg, ps) == LUX_OK)
+       && (plotxy(q1.f, q2.f, q3.f, q4.f, nelem, dq3, dq4) == LUX_OK)
+       //       && (labels() == LUX_OK)
     );
   ier = oldIer;
-  return n? 1: ANA_ERROR; 
+  return n? 1: LUX_ERROR; 
 }
  /*------------------------------------------------------------------------- */
-Int ana_oplot(Int narg, Int ps[]) /* oplot routine */
+Int lux_oplot(Int narg, Int ps[]) /* oplot routine */
  /* over plot data */
 {
   Int	preplot(Int, Int []),
     oplotx(Float [], Float [], Float [], Float [], Int, Int, Int);
 
-  if ((lunplt == 0 && setup_x() != ANA_OK)
+  if ((lunplt == 0 && setup_x() != LUX_OK)
       || preplot(narg, ps) != 1
       || fixPlotStyle(&symStyle, &lineStyle) < 0
       || oplotx(q1.f, q2.f, q3.f, q4.f, nelem, dq3, dq4) != 1)
-    return ANA_ERROR;
+    return LUX_ERROR;
   return 1; 
 }
  /*------------------------------------------------------------------------- */
@@ -250,14 +250,14 @@ Int preplot(Int narg, Int ps[])
  /* used by plot and oplot to setup */
 {
   Int	i, iq, freePos = 1, xfmtsym, yfmtsym;
-  Int	ana_indgen(Int, Int []);
+  Int	lux_indgen(Int, Int []);
   extern Int	curRoutineNum;
   char	*keyName(internalRoutine *, Int, Int);
 
   /* loop through the args and check what we have */
   xsym = ysym = ytitlesym = xtitlesym = titlesym = isym = exsym = eysym = 
     xfmtsym = yfmtsym = 0;
-  symStyle = lineStyle = ANA_UNSPECIFIED;
+  symStyle = lineStyle = LUX_UNSPECIFIED;
   numarrays = numscalars = numstrings = 0;
   theDashSize = dashsize;
   for (i = 0; i < narg; i++) {
@@ -268,7 +268,7 @@ Int preplot(Int narg, Int ps[])
       continue; 		/* enables switch treatment */
     }
     switch (symbol_class(iq)) {
-      case ANA_SCALAR:
+      case LUX_SCALAR:
 	if (freePos)
 	  switch (numscalars) {
 	    case 0:
@@ -312,7 +312,7 @@ Int preplot(Int narg, Int ps[])
 	  }
 	numscalars++;
 	break;
-      case ANA_STRING:
+      case LUX_STRING:
 	if (freePos)
 	  switch (numstrings) {
 	  case 0:
@@ -358,7 +358,7 @@ Int preplot(Int narg, Int ps[])
 	  }
 	numstrings++;
 	break;
-      case ANA_ARRAY:
+      case LUX_ARRAY:
 	if (freePos)
 	  switch (numarrays) {
 	    case 0:
@@ -415,14 +415,14 @@ Int preplot(Int narg, Int ps[])
       return cerror(ILL_ARG_LIST, 0);
     }
     ysym = xsym;		/* only one array, gen an x array */
-    ysym = ana_float(1, &ysym);
+    ysym = lux_float(1, &ysym);
     xsym = array_clone(ysym, sym[ysym].type);
-    xsym = ana_indgen(1, &xsym); /* x specified */
+    xsym = lux_indgen(1, &xsym); /* x specified */
   }
-  xsym = ana_float(1, &xsym);
+  xsym = lux_float(1, &xsym);
   nx = array_size(xsym);
   q1.f = (Float *) array_data(xsym);
-  ysym = ana_float(1, &ysym);
+  ysym = lux_float(1, &ysym);
   ny = array_size(ysym);
   q2.f = (Float *) array_data(ysym);
   nelem = MIN(nx, ny);		/* we use the smaller number of elements */
@@ -433,7 +433,7 @@ Int preplot(Int narg, Int ps[])
       dq3 = nelem;
     else
       return cerror(INCMP_ARG, exsym);
-    exsym = ana_float(1, &exsym);
+    exsym = lux_float(1, &exsym);
     q3.f = (Float *) array_data(exsym);
   } else
     q3.f = NULL;		/* no error bars */
@@ -444,12 +444,12 @@ Int preplot(Int narg, Int ps[])
       dq4 = nelem;
     else
       return cerror(INCMP_ARG, eysym);
-    eysym = ana_float(1, &eysym);
+    eysym = lux_float(1, &eysym);
     q4.f = (Float *) array_data(eysym);
   } else
     q4.f = NULL;		/* no error bars */
   if (isym) {			/* line breaks specified */
-    isym = ana_long(1, &isym);
+    isym = lux_long(1, &isym);
     nbreak = array_size(isym);
     qi = (Int *) array_data(isym);
   } else {
@@ -496,7 +496,7 @@ Int plotxy(Float xx[], Float yy[], Float ex[], Float ey[], Int n, Int dx,
 		   Int irf, Int f, Float wb, Float wt, Float plim_min,
 		   Float plim_max, Float *start, Float *step, Float *end,
 		   Float *stepdvi);
-  Int ana_erase(Int, Int []);
+  Int lux_erase(Int, Int []);
   Int oplotx(Float [], Float [], Float [], Float [], Int, Int, Int);
 
   iylog = ipltyp % 2;
@@ -595,7 +595,7 @@ Int plotxy(Float xx[], Float yy[], Float ex[], Float ey[], Int n, Int dx,
       || ymin < -FLT_MAX || ymax > FLT_MAX
       || xmin > FLT_MAX || xmax < -FLT_MAX
       || ymin > FLT_MAX || ymax < -FLT_MAX)
-    anaerror("Infinity in plot coordinates", 0);
+    luxerror("Infinity in plot coordinates", 0);
 
   ndlabx = MAX(ndlabx, 1);	/* # minor divisions per major division */
   ndlaby = MAX(ndlaby, 1);
@@ -603,9 +603,9 @@ Int plotxy(Float xx[], Float yy[], Float ex[], Float ey[], Int n, Int dx,
 	     plims[0], plims[1], &startx, &stepx, &endx, &stepxdvi);
   setupticks(&ymin, &ymax, ndlaby, fstepy, iylog, iryf, ifz, wyb, wyt,
 	     plims[2], plims[3], &starty, &stepy, &endy, &stepydvi);
-  tkCoordSys = calligCoordSys = ANA_DVI;
+  tkCoordSys = calligCoordSys = LUX_DVI;
   if (ier)
-    ana_erase(0, &ilabx);	/* ilabx is dummy argument */
+    lux_erase(0, &ilabx);	/* ilabx is dummy argument */
 
   /* draw the plot window */
   /* if !PLTYP >= 4, then only draw the left and bottom parts */
@@ -770,12 +770,12 @@ Int plotxy(Float xx[], Float yy[], Float ex[], Float ey[], Int n, Int dx,
     i = updateBoundingBox;
     updateBoundingBox = 0;
     if (fixPlotStyle(&symStyle, &lineStyle) < 0)
-      return ANA_ERROR;
+      return LUX_ERROR;
     j = oplotx(xx, yy, ex, ey, n, dx, dy);
     updateBoundingBox = i;
     return j;
   }
-  return ANA_OK;
+  return LUX_OK;
 }
 /*------------------------------------------------------------------------- */
 Int positionClassWindow(Float x, Float y, Float **w)
@@ -948,12 +948,12 @@ Int oplotx(Float x[], Float y[], Float ex[], Float ey[], Int n, Int dx,
   oldLineStyle = 0;		/* force clean start for dashed lines */
   fromCoordinateSystem = (internalMode & 7);
   if (!fromCoordinateSystem)
-    fromCoordinateSystem = ANA_PLT;
-  toCoordinateSystem = calligCoordSys = tkCoordSys = ANA_DVI;
-  /*  set_cur_pen(); */  /* interferes with ana_pencolor(). LS 1apr99 */
+    fromCoordinateSystem = LUX_PLT;
+  toCoordinateSystem = calligCoordSys = tkCoordSys = LUX_DVI;
+  /*  set_cur_pen(); */  /* interferes with lux_pencolor(). LS 1apr99 */
   /* get scale and first set of coordinates
     all plot points must lie between physical limits of plot */
-  /* first transform to ANA_DVI coords (including logarithms if required) */
+  /* first transform to LUX_DVI coords (including logarithms if required) */
   /* and then clip all parts sticking beyond the plot window */
   *xx = x[0];
   *yy = y[0];
@@ -1369,7 +1369,7 @@ Int tkplot(Float x, Float y, Int lineStyle, Int symStyle)
     return result;
   }
   if (!depth) {		     /* don't do this in recursively called tkplot */
-    coordTrf(&x, &y, tkCoordSys, ANA_DVI);
+    coordTrf(&x, &y, tkCoordSys, LUX_DVI);
 #ifdef DEVELOP
     if (useProjection || projectTk) {
       Int	project(Float, Float, Float);
@@ -1475,7 +1475,7 @@ Int tkplot(Float x, Float y, Int lineStyle, Int symStyle)
   return 1;
 }
  /*------------------------------------------------------------------------*/
-Int ana_pen(Int narg, Int ps[])
+Int lux_pen(Int narg, Int ps[])
 /* PEN, width, currentgray */
 /* sets or displays the pen width and color */
 {
@@ -1491,7 +1491,7 @@ Int ana_pen(Int narg, Int ps[])
   return 1;
 }
 /*------------------------------------------------------------------------*/
-Int ana_pencolor(Int narg, Int ps[])
+Int lux_pencolor(Int narg, Int ps[])
 /* sets or displays the current pen color. */
 {
   Int	iq, nx, xflag, n, nred, ngreen, nblue;
@@ -1511,22 +1511,22 @@ Int ana_pencolor(Int narg, Int ps[])
   
   if (lunplt == 0) {
 #if HAVE_LIBX11
-    if (setup_x() == ANA_ERROR)
-      return ANA_ERROR;
+    if (setup_x() == LUX_ERROR)
+      return LUX_ERROR;
 #endif
     xflag = 1;
   } else
     xflag =0;
   if (narg) {
     switch (symbol_class(ps[0])) {
-      case ANA_STRING:
+      case LUX_STRING:
 	pc = string_value(ps[0]);
 #if HAVE_LIBX11
 	if (connect_flag) {
 	  /* get rgb values for this color name, if for X, also set */
 	  /* foreground */
 	  if (getXcolor(pc, &color, xflag) != 1)
-	    return ANA_ERROR;
+	    return LUX_ERROR;
 	  red = color.red;
 	  green = color.green;
 	  blue = color.blue;
@@ -1535,33 +1535,33 @@ Int ana_pencolor(Int narg, Int ps[])
 #endif
 	if (!strncasecmp(pc, "rgbi:", 5)) { /* an RGBI specification */
 	  if (sscanf(pc + 5, "%f/%f/%f", &red, &green, &blue) != 3)
-	    return anaerror("Unrecognized color specification", ps[0]);
+	    return luxerror("Unrecognized color specification", ps[0]);
 	  if (red < 0 || red > 1 || green < 0 || green > 1 || blue < 0
 	      || blue > 1)
-	    return anaerror("Illegal color specification", ps[0]);
+	    return luxerror("Illegal color specification", ps[0]);
 	} else if (!strncasecmp(pc, "rgb:", 4)) { /* an RGB specification */
 	  if (sscanf(pc + 4, "%x%n/%x%n/%x%n", &ired, &nred, &igreen, &ngreen,
 		     &iblue, &nblue) != 3
 	      || nred < 1 || ngreen - nred < 2 || nblue - ngreen < 2
 	      || nred > 4 || ngreen - nred > 5 || nblue - ngreen > 5)
-	    return anaerror("Unrecognized color specification", ps[0]);
+	    return luxerror("Unrecognized color specification", ps[0]);
 	  red = (ired << ((4 - nred)*4))/65535.0;
 	  green = (igreen << ((5 + nred - ngreen)*4))/65535.0;
 	  blue = (iblue << ((5 + ngreen - nblue)*4))/65535.0;
 	} else
-	  return anaerror("Unrecognized color specification", ps[0]);
+	  return luxerror("Unrecognized color specification", ps[0]);
 	break;
-      case ANA_ARRAY:
-	iq = ana_float(1, ps);	/* ensure that it is FLOAT */
+      case LUX_ARRAY:
+	iq = lux_float(1, ps);	/* ensure that it is FLOAT */
 	nx = array_dims(iq)[0];
 	if (nx < 3)
-	  return anaerror("PENCOLOR requires a string naming a color\nor an array of 3 RGB values between 0.0 and 1.0", ps[0]);
+	  return luxerror("PENCOLOR requires a string naming a color\nor an array of 3 RGB values between 0.0 and 1.0", ps[0]);
 	pf = array_data(iq);
 	/* check first */
 	n = 3;
 	while (n--) {
 	  if (*pf > 1.0 || *pf < 0.0)
-	    return anaerror("PENCOLOR requires a string naming a color\nor an array of 3 RGB values between 0.0 and 1.0", ps[0]);
+	    return luxerror("PENCOLOR requires a string naming a color\nor an array of 3 RGB values between 0.0 and 1.0", ps[0]);
 	 pf++;
 	}
 	/* now set the values */
@@ -1583,14 +1583,14 @@ void set_cur_pen(void)
 /* set pen according to current_pen and current_gray */
 {
 #if HAVE_LIBX11
-  Int ana_xpen(Int, Float);
+  Int lux_xpen(Int, Float);
 #endif
   Int postpen(Int, Float);
   
   switch (lunplt) {
 #if HAVE_LIBX11 
     case 0:
-      ana_xpen(current_pen, current_gray);
+      lux_xpen(current_pen, current_gray);
       return;
 #endif
     default:
@@ -1601,28 +1601,28 @@ void set_cur_pen(void)
 Int set_pen(Int pen)
 {
 #if HAVE_LIBX11
-  Int ana_xpen(Int, Float);
+  Int lux_xpen(Int, Float);
 #endif
   Int postpen(Int, Float);
   
   switch (lunplt) {
     case 0:
 #if HAVE_LIBX11 
-      return ana_xpen(pen, current_gray);
+      return lux_xpen(pen, current_gray);
 #else
       return cerror(NO_X11, 0);
 #endif
     case 1:
       return postpen(pen, current_gray);
   }
-  return anaerror("Illegal plot device (%1d)!", 0, lunplt);
+  return luxerror("Illegal plot device (%1d)!", 0, lunplt);
 }
  /*------------------------------------------------------------------------*/
-Int ana_erase(Int narg, Int ps[])
+Int lux_erase(Int narg, Int ps[])
 {
   Int	postcopy(void), toscreen;
 #if HAVE_LIBX11
-  Int	ana_xerase(Int, Int []);
+  Int	lux_xerase(Int, Int []);
 #endif
 
   toscreen = (internalMode & 192);
@@ -1646,17 +1646,17 @@ Int ana_erase(Int narg, Int ps[])
   switch (lunplt) 
   { case 0:
 #if HAVE_LIBX11
-      return ana_xerase(narg, ps);
+      return lux_xerase(narg, ps);
 #else
       return cerror(NO_X11, *ps);
 #endif
     case 1:
       return postcopy();
     }
-  return anaerror("Illegal plot device (%1d)!", 0, lunplt);
+  return luxerror("Illegal plot device (%1d)!", 0, lunplt);
 }
  /*------------------------------------------------------------------------- */
-Int ana_limits(Int narg, Int ps[]) /*set or examine limits */
+Int lux_limits(Int narg, Int ps[]) /*set or examine limits */
 {
   if (narg == 0)
   { printf("current plot range x axis %f to %f\n", plims[0], plims[1]);
@@ -1678,7 +1678,7 @@ Int ana_limits(Int narg, Int ps[]) /*set or examine limits */
  return 1;
 }
  /*------------------------------------------------------------------------- */
-Int ana_window(Int narg, Int ps[]) /*set or examine window */
+Int lux_window(Int narg, Int ps[]) /*set or examine window */
 {
   Float	tmp;
 #ifdef DEVELOP
@@ -1723,7 +1723,7 @@ Int ana_window(Int narg, Int ps[]) /*set or examine window */
   return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_pdev(Int narg, Int ps[])
+Int lux_pdev(Int narg, Int ps[])
 {
   Int	postreset(Int);
   extern Float	postXBot, postYBot, postXTop, postYTop;
@@ -1819,7 +1819,7 @@ Int symplot(Float x, Float y, Int symStyle, Int lineStyle)
  
   xp = callig_xb;
   yp = callig_yb; /* addition LS 7oct93 */
-  coordTrf(&x, &y, tkCoordSys, ANA_DVI); /* transform to ANA_DVI  LS 28jul94 */
+  coordTrf(&x, &y, tkCoordSys, LUX_DVI); /* transform to LUX_DVI  LS 28jul94 */
   ns = symStyle;
   if (symStyle == 0)         /* the -1 dot case or an error */
   { tkplot(x, y, 0, 0);
@@ -1979,7 +1979,7 @@ Int symplot(Float x, Float y, Int symStyle, Int lineStyle)
     { thing[0] = (char) (ns + 48);
       thing[1] = 0;
       if (callig(thing, x - 0.005, y - 0.005, fsized, 0.0, 3, 1) < 0)
-	return ANA_ERROR;
+	return LUX_ERROR;
     }
   }
   ifirstflag = 0;
@@ -1992,7 +1992,7 @@ Int symplot(Float x, Float y, Int symStyle, Int lineStyle)
   return 1;
 }
  /*------------------------------------------------------------------------- */
-Int ana_xymov(Int narg, Int ps[])			/* xymov routine */
+Int lux_xymov(Int narg, Int ps[])			/* xymov routine */
  /* subroutine, call is xymov(x, y, [mode, BREAKS=breaks], /boundingbox) */
 {
  /* the x, y, and mode arguments can be scalars or vectors in various
@@ -2005,7 +2005,7 @@ Int ana_xymov(Int narg, Int ps[])			/* xymov routine */
   extern Int	tkCoordSys, ifirstflag;
   char	moveFirst;
 
-  mode = ANA_UNSPECIFIED;
+  mode = LUX_UNSPECIFIED;
   mp = &mode;
   dm = 0;
   nm = 1;
@@ -2015,16 +2015,16 @@ Int ana_xymov(Int narg, Int ps[])			/* xymov routine */
   iq = ps[0];
   ifirstflag = 1;
   switch (symbol_class(iq)) {
-    case ANA_SCAL_PTR:
+    case LUX_SCAL_PTR:
       iq = dereferenceScalPointer(iq);
-    case ANA_SCALAR:
+    case LUX_SCALAR:
       nx = 1;
-      iq = ana_float(1, &iq); 
+      iq = lux_float(1, &iq); 
       dx = 0;
       x = &scalar_value(iq).f;
       break;
-    case ANA_ARRAY:
-      iq = ana_float(1, &iq);
+    case LUX_ARRAY:
+      iq = lux_float(1, &iq);
       nelem = array_size(iq);
       nd = array_num_dims(iq);
       nx = nelem;
@@ -2040,16 +2040,16 @@ Int ana_xymov(Int narg, Int ps[])			/* xymov routine */
 		 /* y, could be scalar or array */
   iq = ps[1];
   switch (symbol_class(iq)) {
-    case ANA_SCAL_PTR:
+    case LUX_SCAL_PTR:
       iq = dereferenceScalPointer(iq);
-    case ANA_SCALAR:
+    case LUX_SCALAR:
       ny = 1; 
-      iq = ana_float(1, &iq);
+      iq = lux_float(1, &iq);
       dy = 0;
       y = &scalar_value(iq).f;
       break;
-    case ANA_ARRAY:
-      iq = ana_float(1, &iq);
+    case LUX_ARRAY:
+      iq = lux_float(1, &iq);
       nd = array_num_dims(iq);
       nelem = array_size(iq);
       ny = nelem;
@@ -2070,16 +2070,16 @@ Int ana_xymov(Int narg, Int ps[])			/* xymov routine */
   if (narg > 2 && ps[2]) {
     iq = ps[2];
     switch (symbol_class(iq)) {
-      case ANA_SCAL_PTR:
+      case LUX_SCAL_PTR:
 	iq = dereferenceScalPointer(iq);
-      case ANA_SCALAR:
+      case LUX_SCALAR:
 	nm = 1; 
-	iq = ana_long(1, &iq);
+	iq = lux_long(1, &iq);
 	dm = 0;
 	mp = &scalar_value(iq).l;
 	break;
-      case ANA_ARRAY:
-	iq = ana_long(1, &iq);
+      case LUX_ARRAY:
+	iq = lux_long(1, &iq);
 	nd = array_num_dims(iq);
 	nm = array_size(iq);
 	if (nm)
@@ -2099,15 +2099,15 @@ Int ana_xymov(Int narg, Int ps[])			/* xymov routine */
   if (narg > 3 && ps[3]) {	/* line breaks */
     iq = ps[3];
     switch (symbol_class(iq)) {
-    case ANA_SCAL_PTR:
+    case LUX_SCAL_PTR:
       iq = dereferenceScalPointer(iq);
-    case ANA_SCALAR:
+    case LUX_SCALAR:
       nbreak = 1;
-      iq = ana_long(1, &iq);
+      iq = lux_long(1, &iq);
       qi = &scalar_value(iq).l;
       break;
-    case ANA_ARRAY:
-      iq = ana_long(1, &iq);
+    case LUX_ARRAY:
+      iq = lux_long(1, &iq);
       nbreak = array_size(iq);
       qi = array_data(iq);
       break;
@@ -2140,7 +2140,7 @@ Int ana_xymov(Int narg, Int ps[])			/* xymov routine */
   xc = *x; 
   yc = *y;
   mode = *mp;
-  line = ANA_UNSPECIFIED;
+  line = LUX_UNSPECIFIED;
   fixPlotStyle(&mode, &line);
   if (moveFirst && line > 0) {
     tkplot(xc, yc, 0, 0);
@@ -2160,7 +2160,7 @@ Int ana_xymov(Int narg, Int ps[])			/* xymov routine */
     xc = *x;
     yc = *y;
     if (dm) {
-      line = ANA_UNSPECIFIED;
+      line = LUX_UNSPECIFIED;
       mode = *mp;
       if (!nelem &&		/* last point */
 	  (!mode || !mp[-dm]))	/* only draw a line if both edges ask for
@@ -2191,11 +2191,11 @@ Int ana_xymov(Int narg, Int ps[])			/* xymov routine */
   return 1;
 }
  /*------------------------------------------------------------------------- */
-Int ana_postimage(Int narg, Int ps[])			/* postimage routine */
+Int lux_postimage(Int narg, Int ps[])			/* postimage routine */
  /* subroutine, call is postimage(image, x0, x1, y0, y1) */
 {
   extern	Int	scalemax, scalemin;
-  Int	ana_scale(Int, Int *), postgray(char *, Int, Int, Float, Float, Float, 
+  Int	lux_scale(Int, Int *), postgray(char *, Int, Int, Float, Float, Float, 
 					Float, Int);
   Float	x0, x1, y0, y1;
   Int	iq, nd, nx, ny, s1, s2;
@@ -2208,13 +2208,13 @@ Int ana_postimage(Int narg, Int ps[])			/* postimage routine */
   y1 = wyt;
   iq = ps[0];
   CK_ARR(iq, 0);
-  if (sym[iq].type != ANA_BYTE )
+  if (sym[iq].type != LUX_BYTE )
  /* scale using (0, 255) for scalemax and scalemin */
   { s1 = scalemin;
     s2 = scalemax;
     scalemin = 0;
     scalemax = 255;
-    iq = ana_scale(1, &ps[0]);
+    iq = lux_scale(1, &ps[0]);
     scalemin = s1;
     scalemax = s2;	}
   h = (array *) sym[iq].spec.array.ptr;
@@ -2237,7 +2237,7 @@ Int ana_postimage(Int narg, Int ps[])			/* postimage routine */
   return postgray(ptr, nx, ny, x0, x1, y0, y1, iorder);
 }
  /*------------------------------------------------------------------------- */
-Int ana_postraw(Int narg, Int ps[])			/* postraw routine */
+Int lux_postraw(Int narg, Int ps[])			/* postraw routine */
  /* subroutine, call is postraw(string) */
 {
   Int	iq;

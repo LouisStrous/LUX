@@ -24,7 +24,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "install.h"
 #include <ctype.h> /* for toupper(11) isdigit(3) */
 #include <errno.h> /* for errno(2) */
-#include <error.h> /* for anaerror(58) */
+#include <error.h> /* for luxerror(58) */
 #include <float.h> /* for FLT_MAX(2) DBL_MAX(2) DBL_MIN(1) FLT_MIN(1) */
 #include <limits.h> /* for UINT8_MAX(3) INT32_MAX(1) INT16_MAX(1) INT16_MIN(1) INT32_MIN(1) */
 #include <malloc.h> /* for malloc(25) free(18) realloc(4) */
@@ -56,8 +56,8 @@ extern Int		nExecuted;
 /* extern internalRoutine	subroutine[], function[]; */
 internalRoutine *subroutine, *function;
 
-Int	anaerror(char *, Int, ...), lookForName(char *, hashTableEntry *[], Int),
-	newSymbol(Int, ...), ana_setup(), rawIo(void), cookedIo(void);
+Int	luxerror(char *, Int, ...), lookForName(char *, hashTableEntry *[], Int),
+	newSymbol(Int, ...), lux_setup(), rawIo(void), cookedIo(void);
 void	installKeys(void *keys), zerobytes(void *, Int);
 char	*strsave(char *), *symName(Int, hashTableEntry *[]), *className(Int),
 	*typeName(Int);
@@ -76,7 +76,7 @@ Int	symbolStackIndex = 0, tempVariableIndex = TEMPS_START,
 	nNamedVariable = 0, nSymbolStack = 0, executableIndex = EXE_START,
 	nExecutable = 0, tempExecutableIndex = TEMP_EXE_START,
 	nTempExecutable, zapContext = 0, installString(char *),
-	ana_verify(Int, Int []), eval_func, insert_subr;
+	lux_verify(Int, Int []), eval_func, insert_subr;
 
 Int	markStack[MSSIZE], markIndex = 0;
 
@@ -87,115 +87,115 @@ extern Int	compileLevel, curLineNumber;
 static char	installing = 1;
 
 /*----------------------------------------------------------------*/ 
-extern Int ana_area(), ana_area2(), ana_array_statistics(),
-  ana_atomize(), ana_batch(), ana_callig(), ana_close(),
-  ana_contour(), ana_coordmap(), ana_crunch(),
-  ana_cubic_spline_extreme(), ana_debug(), ana_decomp(),
-  ana_decrunch(), ana_default(), ana_delete(), ana_distr(),
-  ana_dsolve(), ana_dump(), ana_dump_stack(), ana_echo(),
-  ana_noecho(), ana_endian(), ana_erase(), ana_execute(),
-  ana_fcwrite(), ana_fileptr(), ana_fileread(), ana_filewrite(),
-  ana_format_set(), ana_fprint(), ana_fprintf(), ana_fzread(),
-  ana_fzwrite(), ana_fzhead(), ana_getmin9(), ana_help(), ana_hex(),
-  ana_inserter(), ana_limits(), ana_noop(), ana_openr(), ana_openu(),
-  ana_openw(), ana_oplot(), ana_pdev(), ana_pen(), ana_plot(),
-  ana_pointer(), ana_printf(), ana_pop(), ana_postimage(),
-  ana_postraw(), postrelease(), ana_push(), ana_quit(), ana_read(),
-  ana_readarr(), ana_readf(), ana_readu(), ana_record(), ana_redim(),
-  ana_redirect_diagnostic(), ana_arestore(), ana_rewindf(), ana_sc(),
-  ana_scb(), ana_setenv(), ana_show(), ana_show_func(),
-  ana_show_subr(), ana_spawn(), ana_step(), ana_swab(), ana_switch(),
-  ana_type(), ana_trace(), ana_ulib(), ana_wait(), ana_zap(),
-  ana_zero(), showstats(), ana_writeu(), ana_system(), ana_freadf(),
-  ana_orientation(), ana_error(), site(), ana_set(), ana_tolookup(),
-  ana_coordtrf(), ana_fread(), ana_dump_lun(), ana_cluster(),
-  ana_astore(), ana_fzinspect(), ana_multisieve(), ana_crunchrun(),
-  ana_swaphalf(), ana_chdir(), ana_replace_values(),
-  ana_freads(), ana_one(), ana_disableNewline(), ana_enableNewline(),
-  ana_shift(), ana_file_to_fz(), ana_zapnan(),
-  ana_buffering(), ana_pencolor(), ana_idlrestore(), ana_list(),
-  ana_extract_bits(), ana_fftshift(), ana_manualterm(), ana_watch(),
-  ana_fcrunwrite(), ana_fits_read(), ana_fits_write(), ana_subshift(),
-  ana_subshiftc(), ana_byte_inplace(), ana_word_inplace(),
-  ana_long_inplace(), ana_float_inplace(), ana_double_inplace(),
-  ana_cfloat_inplace(), ana_cdouble_inplace(), ana_string_inplace(),
-  ana_fade(), ana_fade_init();
+extern Int lux_area(), lux_area2(), lux_array_statistics(),
+  lux_atomize(), lux_batch(), lux_callig(), lux_close(),
+  lux_contour(), lux_coordmap(), lux_crunch(),
+  lux_cubic_spline_extreme(), lux_debug(), lux_decomp(),
+  lux_decrunch(), lux_default(), lux_delete(), lux_distr(),
+  lux_dsolve(), lux_dump(), lux_dump_stack(), lux_echo(),
+  lux_noecho(), lux_endian(), lux_erase(), lux_execute(),
+  lux_fcwrite(), lux_fileptr(), lux_fileread(), lux_filewrite(),
+  lux_format_set(), lux_fprint(), lux_fprintf(), lux_fzread(),
+  lux_fzwrite(), lux_fzhead(), lux_getmin9(), lux_help(), lux_hex(),
+  lux_inserter(), lux_limits(), lux_noop(), lux_openr(), lux_openu(),
+  lux_openw(), lux_oplot(), lux_pdev(), lux_pen(), lux_plot(),
+  lux_pointer(), lux_printf(), lux_pop(), lux_postimage(),
+  lux_postraw(), postrelease(), lux_push(), lux_quit(), lux_read(),
+  lux_readarr(), lux_readf(), lux_readu(), lux_record(), lux_redim(),
+  lux_redirect_diagnostic(), lux_arestore(), lux_rewindf(), lux_sc(),
+  lux_scb(), lux_setenv(), lux_show(), lux_show_func(),
+  lux_show_subr(), lux_spawn(), lux_step(), lux_swab(), lux_switch(),
+  lux_type(), lux_trace(), lux_ulib(), lux_wait(), lux_zap(),
+  lux_zero(), showstats(), lux_writeu(), lux_system(), lux_freadf(),
+  lux_orientation(), lux_error(), site(), lux_set(), lux_tolookup(),
+  lux_coordtrf(), lux_fread(), lux_dump_lun(), lux_cluster(),
+  lux_astore(), lux_fzinspect(), lux_multisieve(), lux_crunchrun(),
+  lux_swaphalf(), lux_chdir(), lux_replace_values(),
+  lux_freads(), lux_one(), lux_disableNewline(), lux_enableNewline(),
+  lux_shift(), lux_file_to_fz(), lux_zapnan(),
+  lux_buffering(), lux_pencolor(), lux_idlrestore(), lux_list(),
+  lux_extract_bits(), lux_fftshift(), lux_manualterm(), lux_watch(),
+  lux_fcrunwrite(), lux_fits_read(), lux_fits_write(), lux_subshift(),
+  lux_subshiftc(), lux_byte_inplace(), lux_word_inplace(),
+  lux_long_inplace(), lux_float_inplace(), lux_double_inplace(),
+  lux_cfloat_inplace(), lux_cdouble_inplace(), lux_string_inplace(),
+  lux_fade(), lux_fade_init();
 
-Int	ana_name();
+Int	lux_name();
 
 #if DEVELOP
-extern Int ana_fitUnitCube(), ana_projection(), ana_plot3d(),
-  ana_trajectory(), ana_getmin2(), ana_projectmap();
+extern Int lux_fitUnitCube(), lux_projection(), lux_plot3d(),
+  lux_trajectory(), lux_getmin2(), lux_projectmap();
 #endif
 
 #if DEBUG
-extern Int	checkList(), ana_whereisAddress(), ana_show_temps(),
-		ana_newallocs(), show_files();
+extern Int	checkList(), lux_whereisAddress(), lux_show_temps(),
+		lux_newallocs(), show_files();
 #endif
 
 #if HAVE_LIBJPEG
-extern Int	ana_read_jpeg6b(), ana_write_jpeg6b();
+extern Int	lux_read_jpeg6b(), lux_write_jpeg6b();
 #endif
 
 #if HAVE_SYS_MTIO_H
-extern Int	ana_tape_status(), ana_rewind(), ana_weof(), ana_unload(),
-  ana_skipr(), ana_skipf(), ana_taprd(), ana_tapwrt(), ana_tapebufin(),
-  ana_tapebufout(), ana_wait_for_tape();
+extern Int	lux_tape_status(), lux_rewind(), lux_weof(), lux_unload(),
+  lux_skipr(), lux_skipf(), lux_taprd(), lux_tapwrt(), lux_tapebufin(),
+  lux_tapebufout(), lux_wait_for_tape();
 #endif
 
-extern Int	ana_gifread(), ana_gifwrite();
+extern Int	lux_gifread(), lux_gifwrite();
 
 #if HAVE_LIBX11
-extern Int ana_menu(), ana_menu_hide(), ana_menu_item(),
-  ana_menu_kill(), ana_menu_pop(), ana_menu_read(),
-  ana_register_event(), ana_window(), ana_xcopy(),
-  ana_xdelete(), ana_xdrawline(), ana_xevent(), ana_xflush(),
-  ana_xfont(),
-  ana_xlabel(), ana_xloop(), ana_xopen(), ana_xplace(),
-  ana_xport(), ana_xpurge(), ana_xquery(), ana_xsetaction(),
-  ana_xsetbackground(), ana_xsetforeground(), ana_xtv(),
-  ana_xtvlct(), ana_xtvmap(), ana_xtvraw(), ana_xtvread(),
-  ana_xymov(), ana_wait_for_menu(), ana_xclose(), ana_xraise(),
-  ana_xcursor(), ana_xanimate(), ana_xzoom(), ana_show_visuals(),
-  ana_zoom(), ana_xtvplane(), ana_threecolors(), ana_tv3(),
-  ana_xinvertline(), ana_xinvertarc(), ana_xdrawarc(), ana_colorComponents(),
-  ana_colorstogrey(), ana_pixelsto8bit();
+extern Int lux_menu(), lux_menu_hide(), lux_menu_item(),
+  lux_menu_kill(), lux_menu_pop(), lux_menu_read(),
+  lux_register_event(), lux_window(), lux_xcopy(),
+  lux_xdelete(), lux_xdrawline(), lux_xevent(), lux_xflush(),
+  lux_xfont(),
+  lux_xlabel(), lux_xloop(), lux_xopen(), lux_xplace(),
+  lux_xport(), lux_xpurge(), lux_xquery(), lux_xsetaction(),
+  lux_xsetbackground(), lux_xsetforeground(), lux_xtv(),
+  lux_xtvlct(), lux_xtvmap(), lux_xtvraw(), lux_xtvread(),
+  lux_xymov(), lux_wait_for_menu(), lux_xclose(), lux_xraise(),
+  lux_xcursor(), lux_xanimate(), lux_xzoom(), lux_show_visuals(),
+  lux_zoom(), lux_xtvplane(), lux_threecolors(), lux_tv3(),
+  lux_xinvertline(), lux_xinvertarc(), lux_xdrawarc(), lux_colorComponents(),
+  lux_colorstogrey(), lux_pixelsto8bit();
 #endif
 
 #if MOTIF
-extern Int ana_xmalignment(), ana_xmarmcolor(), ana_xmattach(),
-  ana_xmattach_relative(), ana_xmbackgroundcolor(),
-  ana_xmbordercolor(), ana_xmborderwidth(), ana_xmbottomshadowcolor(),
-  ana_xmdestroy(), ana_xmdrawinglink(), ana_xmfont(),
-  ana_xmforegroundcolor(), ana_xmgetpixmap(), ana_xmgetwidgetsize(),
-  ana_xmlistadditem(), ana_xmlistdeleteall(), ana_xmlistdeleteitem(),
-  ana_xmlistfunc(), ana_xmlistselect(), ana_xmlistsubr(),
-  ana_xmmessage(), ana_xmposition(), ana_xmprompt(),
-  ana_xmscaleresetlimits(), ana_xmscalesetvalue(),
-  ana_xmselectcolor(), ana_xmsensitive(), ana_xmsetcolors(),
-  ana_xmsetlabel(), ana_xmsetmargins(), ana_xmsetmnemonic(),
-  ana_xmsetmodal(), ana_xmsetoptionselection(), ana_xmsetpixmap(),
-  ana_xmtextappend(), ana_xmtexterase(), ana_xmtextfieldseteditable(),
-  ana_xmtextfieldsetstring(), ana_xmtextseteditable(),
-  ana_xmtextsetposition(), ana_xmtextsetrowcolumnsize(),
-  ana_xmtextsetstring(), ana_xmtogglesetstate(),
-  ana_xmtopshadowcolor(), ana_xtloop(), ana_xtmanage(),
-  ana_xtunmanage(), ana_xmquery(), ana_xmscrollbarsetvalues(),
-  ana_xmsetdirectory(), ana_xmsettitle(), ana_xmset_text_output(),
-  ana_xmsize(), ana_xmtextfieldsetmaxlength(), ana_xtpopup(),
-  ana_xtpopdown(), ana_xmraise(), ana_xmresizepolicy(), ana_xmtextreplace(),
-  ana_xmgetwidgetposition(), ana_xminfo();
+extern Int lux_xmalignment(), lux_xmarmcolor(), lux_xmattach(),
+  lux_xmattach_relative(), lux_xmbackgroundcolor(),
+  lux_xmbordercolor(), lux_xmborderwidth(), lux_xmbottomshadowcolor(),
+  lux_xmdestroy(), lux_xmdrawinglink(), lux_xmfont(),
+  lux_xmforegroundcolor(), lux_xmgetpixmap(), lux_xmgetwidgetsize(),
+  lux_xmlistadditem(), lux_xmlistdeleteall(), lux_xmlistdeleteitem(),
+  lux_xmlistfunc(), lux_xmlistselect(), lux_xmlistsubr(),
+  lux_xmmessage(), lux_xmposition(), lux_xmprompt(),
+  lux_xmscaleresetlimits(), lux_xmscalesetvalue(),
+  lux_xmselectcolor(), lux_xmsensitive(), lux_xmsetcolors(),
+  lux_xmsetlabel(), lux_xmsetmargins(), lux_xmsetmnemonic(),
+  lux_xmsetmodal(), lux_xmsetoptionselection(), lux_xmsetpixmap(),
+  lux_xmtextappend(), lux_xmtexterase(), lux_xmtextfieldseteditable(),
+  lux_xmtextfieldsetstring(), lux_xmtextseteditable(),
+  lux_xmtextsetposition(), lux_xmtextsetrowcolumnsize(),
+  lux_xmtextsetstring(), lux_xmtogglesetstate(),
+  lux_xmtopshadowcolor(), lux_xtloop(), lux_xtmanage(),
+  lux_xtunmanage(), lux_xmquery(), lux_xmscrollbarsetvalues(),
+  lux_xmsetdirectory(), lux_xmsettitle(), lux_xmset_text_output(),
+  lux_xmsize(), lux_xmtextfieldsetmaxlength(), lux_xtpopup(),
+  lux_xtpopdown(), lux_xmraise(), lux_xmresizepolicy(), lux_xmtextreplace(),
+  lux_xmgetwidgetposition(), lux_xminfo();
 #endif
 
-extern Int ana_readorbits(), ana_showorbits();
+extern Int lux_readorbits(), lux_showorbits();
 
 extern Int	peek();
-extern Int	ana_breakpoint();
+extern Int	lux_breakpoint();
 extern Int	insert();
-Int	ana_restart(Int, Int []);
+Int	lux_restart(Int, Int []);
 
 #if MOTIF
-Int	ana_zeroifnotdefined(), ana_compile_file();	/* browser */
+Int	lux_zeroifnotdefined(), lux_compile_file();	/* browser */
 #endif
 
 #define MAX_ARG	100
@@ -275,1016 +275,1016 @@ Int	ana_zeroifnotdefined(), ana_compile_file();	/* browser */
 internalRoutine	subroutine_table[] = {
   { "%INSERT",	3, MAX_ARG, insert, /* execute.c */
     "1INNER:2OUTER:4ONEDIM:8SKIPSPACE:16ZERO:32ALL:64SEPARATE" },
-  { "AREA",	1, 4, ana_area, ":SEED:NUMBERS:DIAGONAL" }, /* topology.c */
-  { "AREA2",	2, 6, ana_area2, /* toplogy.c */
+  { "AREA",	1, 4, lux_area, ":SEED:NUMBERS:DIAGONAL" }, /* topology.c */
+  { "AREA2",	2, 6, lux_area2, /* toplogy.c */
     "::SEED:NUMBERS:DIAGONAL:SIGN" },
-  { "ARESTORE",	1, MAX_ARG, ana_arestore, 0 }, /* files.c */
-  { "ARRAY_STATISTICS", 4, 7, ana_array_statistics, 0, }, /* fun1.c */
-  { "ASTORE",	2, MAX_ARG, ana_astore, 0 }, /* files.c */
-  { "ATOMIZE", 	1, 1, ana_atomize, "1TREE:2LINE" }, /* strous.c */
-  { "BATCH",	0, 1, ana_batch, "1QUIT" }, /* symbols.c */
-  { "BREAKPOINT", 0, 1, ana_breakpoint, /* install.c */
+  { "ARESTORE",	1, MAX_ARG, lux_arestore, 0 }, /* files.c */
+  { "ARRAY_STATISTICS", 4, 7, lux_array_statistics, 0, }, /* fun1.c */
+  { "ASTORE",	2, MAX_ARG, lux_astore, 0 }, /* files.c */
+  { "ATOMIZE", 	1, 1, lux_atomize, "1TREE:2LINE" }, /* strous.c */
+  { "BATCH",	0, 1, lux_batch, "1QUIT" }, /* symbols.c */
+  { "BREAKPOINT", 0, 1, lux_breakpoint, /* install.c */
     "0SET:1ENABLE:2DISABLE:3DELETE:4LIST:8VARIABLE" },
-  { "BUFFERING", 0, 1, ana_buffering, "0CHAR:1LINE:2PIPE" }, /* install.c */
-  { "BYTE",	1, MAX_ARG, ana_byte_inplace, 0, }, /* symbols.c */
-  { "C",	1, 7, ana_callig, /* hersh.c */
+  { "BUFFERING", 0, 1, lux_buffering, "0CHAR:1LINE:2PIPE" }, /* install.c */
+  { "BYTE",	1, MAX_ARG, lux_byte_inplace, 0, }, /* symbols.c */
+  { "C",	1, 7, lux_callig, /* hersh.c */
     "0DEP:1DVI:2DEV:3IMG:4PLT:5RIM:6RPL" },
 #if CALCULATOR
-  { "CALCULATOR",	0, 0, ana_calculator, 0 }, /* calculator.c */
+  { "CALCULATOR",	0, 0, lux_calculator, 0 }, /* calculator.c */
 #endif
-  { "CALLIG",	1, 7, ana_callig, /* hersh.c */
+  { "CALLIG",	1, 7, lux_callig, /* hersh.c */
     "0DEP:1DVI:2DEV:3IMG:4PLT:5RIM:6RPL" },
-  { "CDOUBLE",	1, MAX_ARG, ana_cdouble_inplace, 0 }, /* symbols.c */
-  { "CFLOAT",	1, MAX_ARG, ana_cfloat_inplace, 0 }, /* symbols.c */
-  { "CHDIR",	0, 1, ana_chdir, "1SHOW" }, /* files.c */
+  { "CDOUBLE",	1, MAX_ARG, lux_cdouble_inplace, 0 }, /* symbols.c */
+  { "CFLOAT",	1, MAX_ARG, lux_cfloat_inplace, 0 }, /* symbols.c */
+  { "CHDIR",	0, 1, lux_chdir, "1SHOW" }, /* files.c */
 #if DEBUG
   { "CHECKLIST", 0, 1, checkList, 0 }, /* debug.c */
 #endif
-  { "CLOSE",	1, 1, ana_close, 0 }, /* files.c */
-  { "CLUSTER",	2, 8, ana_cluster, /* cluster.c */
+  { "CLOSE",	1, 1, lux_close, 0 }, /* files.c */
+  { "CLUSTER",	2, 8, lux_cluster, /* cluster.c */
     "|32|:CENTERS:INDEX:SIZE:SAMPLE:EMPTY:MAXIT:RMS:1UPDATE:2ITERATE:4VOCAL:8QUICK:16RECORD:32ORDERED" },
 #if HAVE_LIBX11
-  { "COLORCOMPONENTS", 4, 4, ana_colorComponents, 0 }, /* color.c */
-  { "COLORSTOGREY", 1, 1, ana_colorstogrey, 0 }, /* color.c */
+  { "COLORCOMPONENTS", 4, 4, lux_colorComponents, 0 }, /* color.c */
+  { "COLORSTOGREY", 1, 1, lux_colorstogrey, 0 }, /* color.c */
 #endif
 #if MOTIF
-  { "COMPILE_FILE", 1, 1, ana_compile_file, 0 }, /* motifextra.c */
+  { "COMPILE_FILE", 1, 1, lux_compile_file, 0 }, /* motifextra.c */
 #endif
-  { "CONTOUR",	1, 6, ana_contour, /* contour.c */
+  { "CONTOUR",	1, 6, lux_contour, /* contour.c */
     "IMAGE:LEVELS:XMIN:XMAX:YMIN:YMAX:STYLE:DASHSIZE:1AUTOCONTOUR:2USERCONTOUR" },
-  { "COORDTRF",	2, 4, ana_coordtrf, /* coord.c */
+  { "COORDTRF",	2, 4, lux_coordtrf, /* coord.c */
    "0DEP:1DVI:2DEV:3IMG:4PLT:5RIM:6RPL:7X11:8TODVI:16TODEV:24TOIMG:32TOPLT:40TORIM:48TORPL:56TOX11" },
-  { "CRUNCH",	3, 3, ana_crunch, 0 }, /* crunch.c */
-  { "CRUNCHRUN",	3, 3, ana_crunchrun, 0 }, /* crunch.c */
-  { "CSPLINE_EXTR", 5, 8, ana_cubic_spline_extreme, "1KEEPDIMS:2PERIODIC:4AKIMA::::POS:MINPOS:MINVAL:MAXPOS:MAXVAL" }, /* fun3.c */
-  { "D",	0, MAX_ARG, ana_dump, /* fun1.c */
+  { "CRUNCH",	3, 3, lux_crunch, 0 }, /* crunch.c */
+  { "CRUNCHRUN",	3, 3, lux_crunchrun, 0 }, /* crunch.c */
+  { "CSPLINE_EXTR", 5, 8, lux_cubic_spline_extreme, "1KEEPDIMS:2PERIODIC:4AKIMA::::POS:MINPOS:MINVAL:MAXPOS:MAXVAL" }, /* fun3.c */
+  { "D",	0, MAX_ARG, lux_dump, /* fun1.c */
     "+|36|1FIXED:2SYSTEM:4ZERO:8LOCAL:24CONTEXT:32FOLLOW:64FULL" },
-  { "DECOMP",	1, 1, ana_decomp, 0 }, /* fun2.c */
-  { "DECRUNCH",	2, 2, ana_decrunch, 0 }, /* crunch.c */
-  { "DEFAULT",	2, MAX_ARG, ana_default, "+" }, /* strous.c */
-  { "DELETE", 	1, MAX_ARG, ana_delete, "+1POINTER" }, /* fun1.c */
-  { "DIAGNOSTIC", 0, 1, ana_redirect_diagnostic, 0 }, /* strous.c */
-  { "DISTR",	3, 3, ana_distr, 0 }, /* strous.c */
-  { "DOUB",	1, MAX_ARG, ana_double_inplace, 0 }, /* symbols.c */
-  { "DOUBLE",	1, MAX_ARG, ana_double_inplace, 0 }, /* symbols.c */
-  { "DSOLVE",	2, 2, ana_dsolve, 0 }, /* fun2.c */
-  { "DUMP", 	0, MAX_ARG, ana_dump, /* fun1.c */
+  { "DECOMP",	1, 1, lux_decomp, 0 }, /* fun2.c */
+  { "DECRUNCH",	2, 2, lux_decrunch, 0 }, /* crunch.c */
+  { "DEFAULT",	2, MAX_ARG, lux_default, "+" }, /* strous.c */
+  { "DELETE", 	1, MAX_ARG, lux_delete, "+1POINTER" }, /* fun1.c */
+  { "DIAGNOSTIC", 0, 1, lux_redirect_diagnostic, 0 }, /* strous.c */
+  { "DISTR",	3, 3, lux_distr, 0 }, /* strous.c */
+  { "DOUB",	1, MAX_ARG, lux_double_inplace, 0 }, /* symbols.c */
+  { "DOUBLE",	1, MAX_ARG, lux_double_inplace, 0 }, /* symbols.c */
+  { "DSOLVE",	2, 2, lux_dsolve, 0 }, /* fun2.c */
+  { "DUMP", 	0, MAX_ARG, lux_dump, /* fun1.c */
     "+|36|1FIXED:2SYSTEM:4ZERO:8LOCAL:24CONTEXT:32FOLLOW:64FULL" },
-  { "DUMP_LUN",	0, 0, ana_dump_lun, 0 }, /* files.c */
-  { "DUMP_STACK", 0, 0, ana_dump_stack, 0 }, /* strous.c */
-  { "ECHO",	0, 1, ana_echo, 0 }, /* symbols.c */
-  { "ENDIAN",	1, 1, ana_endian, 0 }, /* strous.c */
-  { "ERASE",	0, 5, ana_erase, /* plots.c */
+  { "DUMP_LUN",	0, 0, lux_dump_lun, 0 }, /* files.c */
+  { "DUMP_STACK", 0, 0, lux_dump_stack, 0 }, /* strous.c */
+  { "ECHO",	0, 1, lux_echo, 0 }, /* symbols.c */
+  { "ENDIAN",	1, 1, lux_endian, 0 }, /* strous.c */
+  { "ERASE",	0, 5, lux_erase, /* plots.c */
     "0DEP:1DVI:2DEV:3IMG:4PLT:5RIM:6RPL:7X11:64SCREEN:128POSTSCRIPT:192PDEV" },
-  { "ERROR",	0, 2, ana_error, "1STORE:2RESTORE" }, /* error.c */
-  { "EXECUTE",	1, 1, ana_execute, "1MAIN" }, /* execute.c */
-  { "EXIT",	0, 1, ana_quit, 0 }, /* fun1.c */
-  { "EXTRACT_BITS", 4, 4, ana_extract_bits, 0 }, /* fun3.c */
-  { "F0H",	1, 2, ana_fzhead, 0 }, /* files.c */
-  { "F0HEAD",	1, 2, ana_fzhead, 0 }, /* files.c */
-  { "F0R",	2, 3, ana_fzread, "|1|1PRINTHEADER" }, /* files.c */
-  { "F0READ",	2, 3, ana_fzread, "|1|1PRINTHEADER" }, /* files.c */
-  { "F0W",	2, 3, ana_fzwrite, 0 }, /* files.c */
-  { "F0WRITE",	2, 3, ana_fzwrite, 0 }, /* files.c */
-  { "FADE",	2, 2, ana_fade, 0 }, /* fun3.c */
-  { "FADE_INIT", 2, 2, ana_fade_init, 0 }, /* fun3.c */
-  { "FCRUNWRITE", 2, 3, ana_fcrunwrite, 0 }, /* files.c */
-  { "FCRW",	2, 3, ana_fcrunwrite, 0 }, /* files.c */
-  { "FCW",	2, 3, ana_fcwrite, "1RUNLENGTH" }, /* files.c */
-  { "FCWRITE",	2, 3, ana_fcwrite, "1RUNLENGTH" }, /* files.c */
-  { "FFTSHIFT",	2, 2, ana_fftshift, 0 }, /* fun3.c */
-  { "FILEPTR",	1, 2, ana_fileptr, "1START:2EOF:4ADVANCE" }, /* files.c */
-  { "FILEREAD", 5, 5, ana_fileread, 0 }, /* files.c */
-  { "FILETOFZ",	3, 3, ana_file_to_fz, 0 }, /* files.c */
-  { "FILEWRITE", 2, 3, ana_filewrite, 0 }, /* files.c */
+  { "ERROR",	0, 2, lux_error, "1STORE:2RESTORE" }, /* error.c */
+  { "EXECUTE",	1, 1, lux_execute, "1MAIN" }, /* execute.c */
+  { "EXIT",	0, 1, lux_quit, 0 }, /* fun1.c */
+  { "EXTRACT_BITS", 4, 4, lux_extract_bits, 0 }, /* fun3.c */
+  { "F0H",	1, 2, lux_fzhead, 0 }, /* files.c */
+  { "F0HEAD",	1, 2, lux_fzhead, 0 }, /* files.c */
+  { "F0R",	2, 3, lux_fzread, "|1|1PRINTHEADER" }, /* files.c */
+  { "F0READ",	2, 3, lux_fzread, "|1|1PRINTHEADER" }, /* files.c */
+  { "F0W",	2, 3, lux_fzwrite, 0 }, /* files.c */
+  { "F0WRITE",	2, 3, lux_fzwrite, 0 }, /* files.c */
+  { "FADE",	2, 2, lux_fade, 0 }, /* fun3.c */
+  { "FADE_INIT", 2, 2, lux_fade_init, 0 }, /* fun3.c */
+  { "FCRUNWRITE", 2, 3, lux_fcrunwrite, 0 }, /* files.c */
+  { "FCRW",	2, 3, lux_fcrunwrite, 0 }, /* files.c */
+  { "FCW",	2, 3, lux_fcwrite, "1RUNLENGTH" }, /* files.c */
+  { "FCWRITE",	2, 3, lux_fcwrite, "1RUNLENGTH" }, /* files.c */
+  { "FFTSHIFT",	2, 2, lux_fftshift, 0 }, /* fun3.c */
+  { "FILEPTR",	1, 2, lux_fileptr, "1START:2EOF:4ADVANCE" }, /* files.c */
+  { "FILEREAD", 5, 5, lux_fileread, 0 }, /* files.c */
+  { "FILETOFZ",	3, 3, lux_file_to_fz, 0 }, /* files.c */
+  { "FILEWRITE", 2, 3, lux_filewrite, 0 }, /* files.c */
 #if DEVELOP
-  { "FIT3DCUBE", 0, 0, ana_fitUnitCube, 0 }, /* projection.c */
+  { "FIT3DCUBE", 0, 0, lux_fitUnitCube, 0 }, /* projection.c */
 #endif
-  { "FITS_READ", 2, 7, ana_fits_read, "|1|1TRANSLATE:2RAWVALUES::::::BLANK" }, /* files.c */
-  { "FITS_WRITE", 2, 4, ana_fits_write, "1VOCAL" }, /* files.c */
-  { "FIX",	1, MAX_ARG, ana_long_inplace, 0 }, /* symbols.c */
-  { "FLOAT",	1, MAX_ARG, ana_float_inplace, 0 }, /* symbols.c */
-  { "FORMAT_SET", 0, 1, ana_format_set, 0 }, /* files.c */
-  { "FPRINT",	1, MAX_ARG, ana_fprint, "1ELEMENT" }, /* files.c */
-  { "FPRINTF",	2, MAX_ARG, ana_fprintf, "1ELEMENT" }, /* files.c */
-  { "FREAD",	2, MAX_ARG, ana_fread, "1COUNTSPACES" }, /* files.c */
-  { "FREADF",	3, MAX_ARG, ana_freadf, "1COUNTSPACES" }, /* files.c */
-  { "FREADS",	2, MAX_ARG, ana_freads, "1COUNTSPACES" }, /* files.c */
-  { "FZH",	1, 2, ana_fzhead, 0 }, /* files.c */
-  { "FZHEAD",	1, 2, ana_fzhead, 0 }, /* files.c */
-  { "FZINSPECT", 2, 3, ana_fzinspect, 0 }, /* files.c */
-  { "FZR",	2, 3, ana_fzread, "|1|1PRINTHEADER" }, /* files.c */
-  { "FZREAD",	2, 3, ana_fzread, "|1|1PRINTHEADER" }, /* files.c */
-  { "FZW",	2, 3, ana_fzwrite, "1SAFE" }, /* files.c */
-  { "FZWRITE",	2, 3, ana_fzwrite, "1SAFE" }, /* files.c */
-  { "GETMIN9",	3, 3, ana_getmin9, 0 }, /* fun4.c */
-  { "GIFREAD",	2, 3, ana_gifread, 0 }, /* gifread_ana.c */
-  { "GIFWRITE",	2, 3, ana_gifwrite, 0 }, /* gifwrite_ana.c */
+  { "FITS_READ", 2, 7, lux_fits_read, "|1|1TRANSLATE:2RAWVALUES::::::BLANK" }, /* files.c */
+  { "FITS_WRITE", 2, 4, lux_fits_write, "1VOCAL" }, /* files.c */
+  { "FIX",	1, MAX_ARG, lux_long_inplace, 0 }, /* symbols.c */
+  { "FLOAT",	1, MAX_ARG, lux_float_inplace, 0 }, /* symbols.c */
+  { "FORMAT_SET", 0, 1, lux_format_set, 0 }, /* files.c */
+  { "FPRINT",	1, MAX_ARG, lux_fprint, "1ELEMENT" }, /* files.c */
+  { "FPRINTF",	2, MAX_ARG, lux_fprintf, "1ELEMENT" }, /* files.c */
+  { "FREAD",	2, MAX_ARG, lux_fread, "1COUNTSPACES" }, /* files.c */
+  { "FREADF",	3, MAX_ARG, lux_freadf, "1COUNTSPACES" }, /* files.c */
+  { "FREADS",	2, MAX_ARG, lux_freads, "1COUNTSPACES" }, /* files.c */
+  { "FZH",	1, 2, lux_fzhead, 0 }, /* files.c */
+  { "FZHEAD",	1, 2, lux_fzhead, 0 }, /* files.c */
+  { "FZINSPECT", 2, 3, lux_fzinspect, 0 }, /* files.c */
+  { "FZR",	2, 3, lux_fzread, "|1|1PRINTHEADER" }, /* files.c */
+  { "FZREAD",	2, 3, lux_fzread, "|1|1PRINTHEADER" }, /* files.c */
+  { "FZW",	2, 3, lux_fzwrite, "1SAFE" }, /* files.c */
+  { "FZWRITE",	2, 3, lux_fzwrite, "1SAFE" }, /* files.c */
+  { "GETMIN9",	3, 3, lux_getmin9, 0 }, /* fun4.c */
+  { "GIFREAD",	2, 3, lux_gifread, 0 }, /* gifread_ana.c */
+  { "GIFWRITE",	2, 3, lux_gifwrite, 0 }, /* gifwrite_ana.c */
 #if HAVE_LIBX11
-  { "HAIRS",	0, 0, ana_xplace, 0 }, /* xport.c */
+  { "HAIRS",	0, 0, lux_xplace, 0 }, /* xport.c */
 #endif
-  { "HELP",	0, 1, ana_help,	/* strous.c */
+  { "HELP",	0, 1, lux_help,	/* strous.c */
     "|30|1EXACT:2ROUTINE:4TREE:8SUBROUTINE:16FUNCTION:32LIST::PAGE" },
-  { "HEX",	1, MAX_ARG, ana_hex, 0 }, /* files.c */
-  { "IDLRESTORE", 1, 1, ana_idlrestore, 0 }, /* idl.c */
+  { "HEX",	1, MAX_ARG, lux_hex, 0 }, /* files.c */
+  { "IDLRESTORE", 1, 1, lux_idlrestore, 0 }, /* idl.c */
   { "INFO",	0, 0, site, /* site.c */
     "1TABLE:2TIME:4PLATFORM:8PACKAGES:16WARRANTY:32COPY:64BUGS:128KEYS:255ALL" },
-  { "INSERT", 	2, 4, ana_inserter, 0 }, /* subsc.c */
-  { "INT",	1, MAX_ARG, ana_word_inplace, 0 }, /* symbols.c */
+  { "INSERT", 	2, 4, lux_inserter, 0 }, /* subsc.c */
+  { "INT",	1, MAX_ARG, lux_word_inplace, 0 }, /* symbols.c */
 #if HAVE_LIBJPEG
-  { "JPEGREAD", 2, 4, ana_read_jpeg6b, ":::SHRINK:1GREYSCALE" }, /* jpeg.c */
-  { "JPEGWRITE", 2, 4, ana_write_jpeg6b, 0 },/* jpeg.c */
+  { "JPEGREAD", 2, 4, lux_read_jpeg6b, ":::SHRINK:1GREYSCALE" }, /* jpeg.c */
+  { "JPEGWRITE", 2, 4, lux_write_jpeg6b, 0 },/* jpeg.c */
 #endif
-  { "LIMITS",	0, 4, ana_limits, 0 }, /* plots.c */
-  { "LIST",	1, 1, ana_list, 0 }, /* ident.c */
-  { "LONG",	1, MAX_ARG, ana_long_inplace, 0 }, /* symbols.c */
+  { "LIMITS",	0, 4, lux_limits, 0 }, /* plots.c */
+  { "LIST",	1, 1, lux_list, 0 }, /* ident.c */
+  { "LONG",	1, MAX_ARG, lux_long_inplace, 0 }, /* symbols.c */
 #if HAVE_LIBX11
-  { "MENU",	1, MAX_ARG, ana_menu, 0 }, /* menu.c */
-  { "MENUHIDE",	1, 1, ana_menu_hide, 0 }, /* menu.c */
-  { "MENUITEM",	3, 3, ana_menu_item, 0 }, /* menu.c */
-  { "MENUPOP",	1, MAX_ARG, ana_menu_pop, 0 }, /* menu.c */
-  { "MENUREAD",	4, 4, ana_menu_read, 0 }, /* menu.c */
-  { "MENUZAP",	1, 1, ana_menu_kill, 0 }, /* menu.c */
+  { "MENU",	1, MAX_ARG, lux_menu, 0 }, /* menu.c */
+  { "MENUHIDE",	1, 1, lux_menu_hide, 0 }, /* menu.c */
+  { "MENUITEM",	3, 3, lux_menu_item, 0 }, /* menu.c */
+  { "MENUPOP",	1, MAX_ARG, lux_menu_pop, 0 }, /* menu.c */
+  { "MENUREAD",	4, 4, lux_menu_read, 0 }, /* menu.c */
+  { "MENUZAP",	1, 1, lux_menu_kill, 0 }, /* menu.c */
 #endif
-  { "MULTISIEVE", 4, 4, ana_multisieve, 0 }, /* strous2.c */
+  { "MULTISIEVE", 4, 4, lux_multisieve, 0 }, /* strous2.c */
 #if DEBUG
-  { "NEWALLOCS", 0, 1, ana_newallocs, "1RESET" }, /* debug.c */
+  { "NEWALLOCS", 0, 1, lux_newallocs, "1RESET" }, /* debug.c */
 #endif
-  { "NOECHO",	0, 0, ana_noecho, 0 }, /* symbols.c */
-  { "NOOP",	0, 0, ana_noop, 0 }, /* strous2.c */
-  { "ONE",	1, 1, ana_one, 0 }, /* fun1.c */
-  { "OPENR",	2, 2, ana_openr, "1GET_LUN" }, /* files.c */
-  { "OPENU",	2, 2, ana_openu, "1GET_LUN" }, /* files.c */
-  { "OPENW",	2, 2, ana_openw, "1GET_LUN" }, /* files.c */
-  { "OPLOT",	1, 13, ana_oplot, /* plots.c */
+  { "NOECHO",	0, 0, lux_noecho, 0 }, /* symbols.c */
+  { "NOOP",	0, 0, lux_noop, 0 }, /* strous2.c */
+  { "ONE",	1, 1, lux_one, 0 }, /* fun1.c */
+  { "OPENR",	2, 2, lux_openr, "1GET_LUN" }, /* files.c */
+  { "OPENU",	2, 2, lux_openu, "1GET_LUN" }, /* files.c */
+  { "OPENW",	2, 2, lux_openw, "1GET_LUN" }, /* files.c */
+  { "OPLOT",	1, 13, lux_oplot, /* plots.c */
     "1DVI:2DEV:3IMG:4PLT:5RIM:6RPL:128WHOLE:256CLIPBARS:XDATA:YDATA:SYMBOL:LINE:XTITLE:YTITLE:TITLE:DASHSIZE:XERRORS:YERRORS:BREAKS:XBARSIZE:YBARSIZE" },
-  { "ORIENTATION", 3, 8, ana_orientation, /* orientation.c */
+  { "ORIENTATION", 3, 8, lux_orientation, /* orientation.c */
   "1VOCAL:2GETJ:0PARALLEL:4PERPENDICULAR:::ORIENTATION:VALUES:WAVENUMBER:GRID:ASPECT:ORDER" },
-  { "PDEV",	0, 1, ana_pdev, 0 }, /* plots.c */
+  { "PDEV",	0, 1, lux_pdev, 0 }, /* plots.c */
   { "PEEK",	1, 2, peek, 0 }, /* strous.c */
-  { "PEN",	0, 2, ana_pen, "WIDTH:COLOR:1STANDARDGRAY" }, /* plots.c */
-  { "PENCOLOR", 0, 1, ana_pencolor, 0 }, /* plots.c */
+  { "PEN",	0, 2, lux_pen, "WIDTH:COLOR:1STANDARDGRAY" }, /* plots.c */
+  { "PENCOLOR", 0, 1, lux_pencolor, 0 }, /* plots.c */
 #if HAVE_LIBX11
-  { "PIXELSTO8BIT", 3, 3, ana_pixelsto8bit, 0 }, /* color.c */
+  { "PIXELSTO8BIT", 3, 3, lux_pixelsto8bit, 0 }, /* color.c */
 #endif
-  { "PLOT",	1, 15, ana_plot, /* plots.c */
+  { "PLOT",	1, 15, lux_plot, /* plots.c */
     "1DVI:2DEV:3IMG:4PLT:5RIM:6RPL:64KEEP:128WHOLE:256CLIPBARS:1024LII:1280LIO:1536LOI:1792LOO:XDATA:YDATA:SYMBOL:LINE:XTITLE:YTITLE:TITLE:DASHSIZE:XERRORS:YERRORS:BREAKS:XBARSIZE:YBARSIZE:XFMT:YFMT" },
 #if DEVELOP
-  { "PLOT3D",	1, 1, ana_plot3d, "1HIDE:2CUBE" }, /* projection.c */
+  { "PLOT3D",	1, 1, lux_plot3d, "1HIDE:2CUBE" }, /* projection.c */
 #endif
-  { "POINTER",	2, 2, ana_pointer, /* symbols.c */
+  { "POINTER",	2, 2, lux_pointer, /* symbols.c */
     "+:1FUNCTION:2SUBROUTINE:4INTERNAL:8MAIN" },
-  { "POP",	1, MAX_ARG, ana_pop, "%1%NUM" }, /* strous.c */
-  { "POSTIMAGE", 1, 5, ana_postimage, 0 }, /* plots.c */
-  { "POSTRAW",	1, 1, ana_postraw, 0 }, /* plots.c */
+  { "POP",	1, MAX_ARG, lux_pop, "%1%NUM" }, /* strous.c */
+  { "POSTIMAGE", 1, 5, lux_postimage, 0 }, /* plots.c */
+  { "POSTRAW",	1, 1, lux_postraw, 0 }, /* plots.c */
   { "POSTREL",	0, 4, postrelease, 0 }, /* plots.c */
   { "POSTRELEASE", 0, 4, postrelease, 0 }, /* plots.c */
-  { "PRINT", 	1, MAX_ARG, ana_type, "1JOIN:2RAW:4SEPARATE" }, /* files.c */
-  { "PRINTF",	1, MAX_ARG, ana_printf, "1JOIN:2RAW:4SEPARATE" }, /* files.c */
+  { "PRINT", 	1, MAX_ARG, lux_type, "1JOIN:2RAW:4SEPARATE" }, /* files.c */
+  { "PRINTF",	1, MAX_ARG, lux_printf, "1JOIN:2RAW:4SEPARATE" }, /* files.c */
 #if DEVELOP
-  { "PROJECTION", 0, MAX_ARG, ana_projection, /* projection.c */
+  { "PROJECTION", 0, MAX_ARG, lux_projection, /* projection.c */
 	"1RESET:2ORIGINAL::TRANSLATE:ROTATE:SCALE:PERSPECTIVE:OBLIQUE" },
 #endif
-  { "PUSH",	1, MAX_ARG, ana_push, 0 }, /* strous.c */
-  { "QUIT", 	0, 1, ana_quit, 0 }, /* fun1.c */
-  { "READ",	1, MAX_ARG, ana_read, "1ASKMORE:2WORD:4FLUSH" }, /* files.c */
-  { "READARR",	1, 1, ana_readarr, 0 }, /* strous.c */
-  { "READF",	2, MAX_ARG, ana_readf, "1ASKMORE:2WORD" }, /* files.c */
-  { "READORBITS", 0, 1, ana_readorbits, "1LIST:2REPLACE" }, /* astron.c */
-  { "READU",	2, MAX_ARG, ana_readu, 0 }, /* files.c */
+  { "PUSH",	1, MAX_ARG, lux_push, 0 }, /* strous.c */
+  { "QUIT", 	0, 1, lux_quit, 0 }, /* fun1.c */
+  { "READ",	1, MAX_ARG, lux_read, "1ASKMORE:2WORD:4FLUSH" }, /* files.c */
+  { "READARR",	1, 1, lux_readarr, 0 }, /* strous.c */
+  { "READF",	2, MAX_ARG, lux_readf, "1ASKMORE:2WORD" }, /* files.c */
+  { "READORBITS", 0, 1, lux_readorbits, "1LIST:2REPLACE" }, /* astron.c */
+  { "READU",	2, MAX_ARG, lux_readu, 0 }, /* files.c */
 #if HAVE_LIBJPEG
-  { "READ_JPEG", 2, 4, ana_read_jpeg6b, ":::SHRINK:1GREYSCALE" }, /* jpeg.c */
+  { "READ_JPEG", 2, 4, lux_read_jpeg6b, ":::SHRINK:1GREYSCALE" }, /* jpeg.c */
 #endif
-  { "RECORD",	0, 1, ana_record, "1INPUT:2OUTPUT:4RESET" }, /* symbols.c */
-  { "REDIM", 	2, 9, ana_redim, 0 }, /* subsc.c */
-  { "REPLACE",	3, 3, ana_replace_values, 0 }, /* strous2.c */
-  { "RESTART",	0, 0, ana_restart, 0 }, /* install.c */
-  { "RESTORE",	2, 3, ana_fzread, "1PRINTHEADER" }, /* files.c */
+  { "RECORD",	0, 1, lux_record, "1INPUT:2OUTPUT:4RESET" }, /* symbols.c */
+  { "REDIM", 	2, 9, lux_redim, 0 }, /* subsc.c */
+  { "REPLACE",	3, 3, lux_replace_values, 0 }, /* strous2.c */
+  { "RESTART",	0, 0, lux_restart, 0 }, /* install.c */
+  { "RESTORE",	2, 3, lux_fzread, "1PRINTHEADER" }, /* files.c */
 #if HAVE_SYS_MTIO_H
-  { "REWIND",	1, 1, ana_rewind, 0 }, /* tape.c */
+  { "REWIND",	1, 1, lux_rewind, 0 }, /* tape.c */
 #endif
-  { "REWINDF",	1, 1, ana_rewindf, 0 }, /* files.c */
-  { "S",	0, 1, ana_show, 0 }, /* fun1.c */
-  { "SC",	3, 3, ana_sc, 0 }, /* fun3.c */
-  { "SCANF",	2, MAX_ARG, ana_freadf, "+1COUNTSPACES" }, /* files.c */
-  { "SCB",	3, 3, ana_scb, "1EVEN:2ODD" }, /* fun3.c */
-  { "SET",	0, 1, ana_set,	/* symbols.c */
+  { "REWINDF",	1, 1, lux_rewindf, 0 }, /* files.c */
+  { "S",	0, 1, lux_show, 0 }, /* fun1.c */
+  { "SC",	3, 3, lux_sc, 0 }, /* fun3.c */
+  { "SCANF",	2, MAX_ARG, lux_freadf, "+1COUNTSPACES" }, /* files.c */
+  { "SCB",	3, 3, lux_scb, "1EVEN:2ODD" }, /* fun3.c */
+  { "SET",	0, 1, lux_set,	/* symbols.c */
     "VISUAL:1SET:2RESET:4SHOWALLOC:8WHITEBACKGROUND:16ULIMCOORDS:32YREVERSEIMG:64OLDVERSION:128ZOOM:1024ALLOWPROMPTS:2048XSYNCHRONIZE:4096PARSESILENT" },
 #if HAVE_LIBX11
-  { "SETBACKGROUND", 1, 2, ana_xsetbackground, 0 }, /* xport.c */
-  { "SETBG",	1, 2, ana_xsetbackground, 0 }, /* xport.c */
+  { "SETBACKGROUND", 1, 2, lux_xsetbackground, 0 }, /* xport.c */
+  { "SETBG",	1, 2, lux_xsetbackground, 0 }, /* xport.c */
 #endif
-  { "SETENV",	1, 1, ana_setenv, 0 }, /* files.c */
+  { "SETENV",	1, 1, lux_setenv, 0 }, /* files.c */
 #if HAVE_LIBX11
-  { "SETFG",	1, 2, ana_xsetforeground, 0 }, /* xport.c */
-  { "SETFOREGROUND", 1, 2, ana_xsetforeground, 0 }, /* xport.c */
+  { "SETFG",	1, 2, lux_xsetforeground, 0 }, /* xport.c */
+  { "SETFOREGROUND", 1, 2, lux_xsetforeground, 0 }, /* xport.c */
 #endif
-  { "SHIFT",	1, 4, ana_shift, ":::BLANK:1TRANSLATE" }, /* strous2.c */
-  { "SHOW", 	0, 1, ana_show, 0 }, /* fun1.c */
-  { "SHOWORBITS", 0, 0, ana_showorbits, 0 }, /* astron.c */
+  { "SHIFT",	1, 4, lux_shift, ":::BLANK:1TRANSLATE" }, /* strous2.c */
+  { "SHOW", 	0, 1, lux_show, 0 }, /* fun1.c */
+  { "SHOWORBITS", 0, 0, lux_showorbits, 0 }, /* astron.c */
   { "SHOWSTATS", 0, 0, showstats, 0 }, /* strous2.c */
 #if DEBUG
   { "SHOW_FILES", 0, 0, show_files, 0 }, /* debug.c */
 #endif
-  { "SHOW_FUNC", 0, 1, ana_show_func, "1PARAMETERS" }, /* symbols.c */
-  { "SHOW_SUBR", 0, 1, ana_show_subr, "1PARAMETERS" }, /* symbols.c */
+  { "SHOW_FUNC", 0, 1, lux_show_func, "1PARAMETERS" }, /* symbols.c */
+  { "SHOW_SUBR", 0, 1, lux_show_subr, "1PARAMETERS" }, /* symbols.c */
 #if DEBUG
-  { "SHOW_TEMPS", 0, 0, ana_show_temps, 0 }, /* symbols.c */
+  { "SHOW_TEMPS", 0, 0, lux_show_temps, 0 }, /* symbols.c */
 #endif
 #if HAVE_LIBX11
-  { "SHOW_VISUALS", 0, 0, ana_show_visuals, 0 }, /* xport.c */
+  { "SHOW_VISUALS", 0, 0, lux_show_visuals, 0 }, /* xport.c */
 #endif
 #if HAVE_SYS_MTIO_H
-  { "SKIPF",	1, 2, ana_skipf, 0 }, /* tape.c */
-  { "SKIPR",	1, 2, ana_skipr, 0 }, /* tape.c */
+  { "SKIPF",	1, 2, lux_skipf, 0 }, /* tape.c */
+  { "SKIPR",	1, 2, lux_skipr, 0 }, /* tape.c */
 #endif
-  { "SPAWN", 	1, 1, ana_spawn, "1SILENT" }, /* files.c */
-  { "SSCANF",	2, MAX_ARG, ana_freads, "1COUNTSPACES" }, /* files.c */
-  { "STEP",	0, 1, ana_step, 0 }, /* symbols.c */
-  { "STORE",	2, 3, ana_fzwrite, "1SAFE" }, /* files.c */
-  { "STRING",	1, MAX_ARG, ana_string_inplace, 0 }, /* symbols.c */
-  { "SUBSHIFT",	4, 4, ana_subshift, 0 }, /* fun5.c */
-  { "SUBSHIFTC", 4, 5, ana_subshiftc, 0 }, /* fun5.c */
-  { "SWAB",	1, MAX_ARG, ana_swab, 0 }, /* fun2.c */
-  { "SWAPB",	1, MAX_ARG, ana_swab, 0 }, /* fun2.c */
-  { "SWAPHALF",	1, 1, ana_swaphalf, 0 }, /* strous2.c */
-  { "SWITCH",	2, 2, ana_switch, 0 }, /* symbols.c */
-  { "T", 	1, MAX_ARG, ana_type, "1JOIN:2RAW:4SEPARATE" }, /* files.c */
+  { "SPAWN", 	1, 1, lux_spawn, "1SILENT" }, /* files.c */
+  { "SSCANF",	2, MAX_ARG, lux_freads, "1COUNTSPACES" }, /* files.c */
+  { "STEP",	0, 1, lux_step, 0 }, /* symbols.c */
+  { "STORE",	2, 3, lux_fzwrite, "1SAFE" }, /* files.c */
+  { "STRING",	1, MAX_ARG, lux_string_inplace, 0 }, /* symbols.c */
+  { "SUBSHIFT",	4, 4, lux_subshift, 0 }, /* fun5.c */
+  { "SUBSHIFTC", 4, 5, lux_subshiftc, 0 }, /* fun5.c */
+  { "SWAB",	1, MAX_ARG, lux_swab, 0 }, /* fun2.c */
+  { "SWAPB",	1, MAX_ARG, lux_swab, 0 }, /* fun2.c */
+  { "SWAPHALF",	1, 1, lux_swaphalf, 0 }, /* strous2.c */
+  { "SWITCH",	2, 2, lux_switch, 0 }, /* symbols.c */
+  { "T", 	1, MAX_ARG, lux_type, "1JOIN:2RAW:4SEPARATE" }, /* files.c */
 #if HAVE_SYS_MTIO_H
-  { "TAPEBUFIN", 2, 5, ana_tapebufin, 0 }, /* tape.c */
-  { "TAPEBUFOUT", 2, 5, ana_tapebufout, 0 }, /* tape.c */
-  { "TAPE_STATUS", 0, 0, ana_tape_status, 0 }, /* tape.c */
-  { "TAPRD",	2, 2, ana_taprd, 0 }, /* tape.c */
-  { "TAPWRT",	2, 2, ana_tapwrt, 0 }, /* tape.c */
+  { "TAPEBUFIN", 2, 5, lux_tapebufin, 0 }, /* tape.c */
+  { "TAPEBUFOUT", 2, 5, lux_tapebufout, 0 }, /* tape.c */
+  { "TAPE_STATUS", 0, 0, lux_tape_status, 0 }, /* tape.c */
+  { "TAPRD",	2, 2, lux_taprd, 0 }, /* tape.c */
+  { "TAPWRT",	2, 2, lux_tapwrt, 0 }, /* tape.c */
 #endif
-  { "TERMINAL", 1, 1, ana_manualterm, 0}, /* dummyterm.c */
+  { "TERMINAL", 1, 1, lux_manualterm, 0}, /* dummyterm.c */
 #if HAVE_LIBX11
-  { "THREECOLORS", 0, 1, ana_threecolors, 0 }, /* xport.c */
+  { "THREECOLORS", 0, 1, lux_threecolors, 0 }, /* xport.c */
 #endif
-  { "TOLOOKUP",	3, 3, ana_tolookup, "1ONE" }, /* strous2.c */
-  { "TRACE",	0, 1, ana_trace, /* install.c */
+  { "TOLOOKUP",	3, 3, lux_tolookup, "1ONE" }, /* strous2.c */
+  { "TRACE",	0, 1, lux_trace, /* install.c */
     "1FILE:2LOOP:4BRACES:8ROUTINE:143ALL:16SHOWSTATS:32CPUTIME:64SHOWEXEC:128ENTER" },
 #if DEVELOP
-  { "TRAJECTORY", 3, 7, ana_trajectory, 0 }, /* strous3.c */
+  { "TRAJECTORY", 3, 7, lux_trajectory, 0 }, /* strous3.c */
 #endif
 #if HAVE_LIBX11
-  { "TV",	1, 5, ana_xtv,	/* xport.c */
+  { "TV",	1, 5, lux_xtv,	/* xport.c */
     ":X:Y:WINDOW:SCALE:0DEP:1DVI:2DEV:3IMG:4PLT:5RIM:6RPL:7X11:64SCREEN:128POSTSCRIPT:192PDEV:256PLOTWINDOW:512ZOOM:1024CENTER:16384BIT24" },
-  { "TV3",	1, 7, ana_tv3, /* xport.c */
+  { "TV3",	1, 7, lux_tv3, /* xport.c */
     ":TWO:THREE:X:Y:WINDOW:SCALE:0DEP:1DVI:2DEV:3IMG:4PLT:5RIM:6RPL:7X11:64SCREEN:128POSTSCRIPT:192PDEV:256PLOTWINDOW:512ZOOM:1024CENTER" },
-  { "TVLAB",	3, 4, ana_xlabel, 0 }, /* xport.c */
-  { "TVLCT",	3, 3, ana_xtvlct, "1FIXEDSIZE" }, /* xport.c */
-  { "TVMAP",	1, 5, ana_xtvmap, /* xport.c */
+  { "TVLAB",	3, 4, lux_xlabel, 0 }, /* xport.c */
+  { "TVLCT",	3, 3, lux_xtvlct, "1FIXEDSIZE" }, /* xport.c */
+  { "TVMAP",	1, 5, lux_xtvmap, /* xport.c */
     ":::WINDOW:SCALE:0DEP:1DVI:2DEV:3IMG:4PLT:5RIM:6RPL:7X11:64SCREEN:128POSTSCRIPT:192PDEV:256PLOTWINDOW:512ZOOM" },
-  { "TVPLANE",	1, 5, ana_xtvplane, 0 }, /* xport.c */
-  { "TVRAW",	1, 5, ana_xtvraw, /* xport.c */
+  { "TVPLANE",	1, 5, lux_xtvplane, 0 }, /* xport.c */
+  { "TVRAW",	1, 5, lux_xtvraw, /* xport.c */
     ":::WINDOW:SCALE:0DEP:1DVI:2DEV:3IMG:4PLT:5RIM:6RPL:7X11:64SCREEN:128POSTSCRIPT:192PDEV:256PLOTWINDOW:512ZOOM" },
-  { "TVREAD",	0, 5, ana_xtvread, "1GREYSCALE" }, /* xport.c */
+  { "TVREAD",	0, 5, lux_xtvread, "1GREYSCALE" }, /* xport.c */
 #endif
-  { "TY",	1, MAX_ARG, ana_type, "1JOIN:2RAW:4SEPARATE" }, /* files.c */
-  { "TYPE", 	1, MAX_ARG, ana_type, "1JOIN:2RAW:4SEPARATE" }, /* files.c */
-  { "ULIB", 	0, 1, ana_ulib, 0 }, /* files.c */
+  { "TY",	1, MAX_ARG, lux_type, "1JOIN:2RAW:4SEPARATE" }, /* files.c */
+  { "TYPE", 	1, MAX_ARG, lux_type, "1JOIN:2RAW:4SEPARATE" }, /* files.c */
+  { "ULIB", 	0, 1, lux_ulib, 0 }, /* files.c */
 #if HAVE_SYS_MTIO_H
-  { "UNLOAD",	1, 1, ana_unload, 0 }, /* tape.c */
+  { "UNLOAD",	1, 1, lux_unload, 0 }, /* tape.c */
 #endif
-  { "VERIFY",	0, 1, ana_verify, 0 }, /* install.c */
-  { "WAIT",	1, 1, ana_wait, 0 }, /* fun2.c */
+  { "VERIFY",	0, 1, lux_verify, 0 }, /* install.c */
+  { "WAIT",	1, 1, lux_wait, 0 }, /* fun2.c */
 #if HAVE_LIBX11
-  { "WAIT_FOR_MENU", 0, 1, ana_wait_for_menu, 0 }, /* menu.c */
+  { "WAIT_FOR_MENU", 0, 1, lux_wait_for_menu, 0 }, /* menu.c */
 #endif
 #if HAVE_SYS_MTIO_H
-  { "WAIT_FOR_TAPE", 1, 1, ana_wait_for_tape, 0 }, /* tape.c */
+  { "WAIT_FOR_TAPE", 1, 1, lux_wait_for_tape, 0 }, /* tape.c */
 #endif
-  { "WATCH",	1, 1, ana_watch, "1DELETE:2LIST" }, /* install.c */
+  { "WATCH",	1, 1, lux_watch, "1DELETE:2LIST" }, /* install.c */
 #if HAVE_SYS_MTIO_H
-  { "WEOF",	1, 1, ana_weof, 0 }, /* tape.c */
+  { "WEOF",	1, 1, lux_weof, 0 }, /* tape.c */
 #endif
 #if DEBUG
-  { "WHERE",	1, 1, ana_whereisAddress, "1CUT" }, /* debug.c */
+  { "WHERE",	1, 1, lux_whereisAddress, "1CUT" }, /* debug.c */
 #endif
 #if HAVE_LIBX11
-  { "WINDOW",	0, 6, ana_window, 0 }, /* plots.c */
+  { "WINDOW",	0, 6, lux_window, 0 }, /* plots.c */
 #endif
-  { "WORD",	1, 1, ana_word_inplace, 0 }, /* symbols.c */
-  { "WRITEU",	2, MAX_ARG, ana_writeu, 0 }, /* files.c */
+  { "WORD",	1, 1, lux_word_inplace, 0 }, /* symbols.c */
+  { "WRITEU",	2, MAX_ARG, lux_writeu, 0 }, /* files.c */
 #if HAVE_LIBJPEG
-  { "WRITE_JPEG", 2, 4, ana_write_jpeg6b, 0 }, /* jpeg.c */
+  { "WRITE_JPEG", 2, 4, lux_write_jpeg6b, 0 }, /* jpeg.c */
 #endif
 #if HAVE_LIBX11
-  { "XANIMATE",	1, 6, ana_xanimate, ":::FR1:FR2:FRS:1TIME" }, /* xport.c */
-  { "XCLOSE",	0, 0, ana_xclose, 0 }, /* xport.c */
-  { "XCOPY",	2, 8, ana_xcopy, 0 }, /* xport.c */
-  { "XCURSOR",	2, 4, ana_xcursor, 0 }, /* xport.c */
-  { "XDELETE",	1, 1, ana_xdelete, 0 }, /* xport.c */
-  { "XDRAWARC",	4, 7, ana_xdrawarc, 0 }, /* xport.c */
-  { "XDRAWLINE", 4, 5, ana_xdrawline, 0 }, /* xport.c */
-  { "XEVENT",	0, 0, ana_xevent, 0 }, /* xport.c */
-  { "XFLUSH",	0, 0, ana_xflush, 0 }, /* xport.c */
-  { "XFONT",	1, 2, ana_xfont, 0 }, /* xport.c */
-  { "XINVERTARC", 4, 7, ana_xinvertarc, 0 }, /* xport.c */
-  { "XINVERTLINE", 4, 5, ana_xinvertline, 0 }, /* xport.c */
-  { "XLABEL",	3, 4, ana_xlabel, 0 }, /* xport.c */
-  { "XLOOP",	0, 1, ana_xloop, 0 }, /* menu.c */
+  { "XANIMATE",	1, 6, lux_xanimate, ":::FR1:FR2:FRS:1TIME" }, /* xport.c */
+  { "XCLOSE",	0, 0, lux_xclose, 0 }, /* xport.c */
+  { "XCOPY",	2, 8, lux_xcopy, 0 }, /* xport.c */
+  { "XCURSOR",	2, 4, lux_xcursor, 0 }, /* xport.c */
+  { "XDELETE",	1, 1, lux_xdelete, 0 }, /* xport.c */
+  { "XDRAWARC",	4, 7, lux_xdrawarc, 0 }, /* xport.c */
+  { "XDRAWLINE", 4, 5, lux_xdrawline, 0 }, /* xport.c */
+  { "XEVENT",	0, 0, lux_xevent, 0 }, /* xport.c */
+  { "XFLUSH",	0, 0, lux_xflush, 0 }, /* xport.c */
+  { "XFONT",	1, 2, lux_xfont, 0 }, /* xport.c */
+  { "XINVERTARC", 4, 7, lux_xinvertarc, 0 }, /* xport.c */
+  { "XINVERTLINE", 4, 5, lux_xinvertline, 0 }, /* xport.c */
+  { "XLABEL",	3, 4, lux_xlabel, 0 }, /* xport.c */
+  { "XLOOP",	0, 1, lux_xloop, 0 }, /* menu.c */
 #if MOTIF
-  { "XMALIGNMENT", 2, 2, ana_xmalignment, 0 }, /* motif.c */
-  { "XMARMCOLOR", 2, 2, ana_xmarmcolor, 0 }, /* motif.c */
-  { "XMATTACH",	6, 6, ana_xmattach, 0 }, /* motif.c */
-  { "XMATTACH_RELATIVE", 5, 5, ana_xmattach_relative, 0 }, /* motif.c */
-  { "XMBACKGROUNDCOLOR", 2, 2, ana_xmbackgroundcolor, 0 }, /* motif.c */
-  { "XMBORDERCOLOR", 2, 2, ana_xmbordercolor, 0 }, /* motif.c */
-  { "XMBORDERWIDTH", 2, 2, ana_xmborderwidth, 0 }, /* motif.c */
-  { "XMBOTTOMSHADOWCOLOR", 2, 2, ana_xmbottomshadowcolor, 0 }, /* motif.c */
-  { "XMDESTROY", 1, 1, ana_xmdestroy, 0 }, /* motif.c */
-  { "XMDRAWINGLINK", 2, 2, ana_xmdrawinglink, 0 }, /* motif.c */
-  { "XMFONT",	2, 2, ana_xmfont, 0 }, /* motif.c */
-  { "XMFOREGROUNDCOLOR", 2, 2, ana_xmforegroundcolor, 0 }, /* motif.c */
-  { "XMGETPIXMAP", 2, 2, ana_xmgetpixmap, 0 }, /* motif.c */
-  { "XMGETWIDGETPOSITION", 3, 3, ana_xmgetwidgetposition, 0 }, /* motif.c */
-  { "XMGETWIDGETSIZE", 3, 3, ana_xmgetwidgetsize, 0 }, /* motif.c */
-  { "XMINFO",	1, 1, ana_xminfo, 0 }, /* motif.c */
-  { "XMLISTADDITEM", 2, 3, ana_xmlistadditem, 0 }, /* motif.c */
-  { "XMLISTDELETEALL", 1, 1, ana_xmlistdeleteall, 0 }, /* motif.c */
-  { "XMLISTDELETEITEM", 2, 2, ana_xmlistdeleteitem, 0 }, /* motif.c */
-  { "XMLISTFUNC", 1, 1, ana_xmlistfunc, 0 }, /* motif.c */
-  { "XMLISTSELECT", 2, 3, ana_xmlistselect, 0 }, /* motif.c */
-  { "XMLISTSUBR", 1, 1, ana_xmlistsubr, 0 }, /* motif.c */
-  { "XMMESSAGE", 1, 5, ana_xmmessage, 0 }, /* motif.c */
-  { "XMPOSITION", 3, 5, ana_xmposition, 0 }, /* motif.c */
-  { "XMPROMPT",	3, 8, ana_xmprompt, 0 }, /* motif.c */
-  { "XMQUERY",	1, 1, ana_xmquery, 0 }, /* motif.c */
-  { "XMRAISE",	1, 1, ana_xmraise, 0 },  /* motif.c */
-  { "XMRESIZEPOLICY",	2, 2, ana_xmresizepolicy, 0 }, /* motif.c */
-  { "XMSCALERESETLIMITS", 3, 4, ana_xmscaleresetlimits, 0 }, /* motif.c */
-  { "XMSCALESETVALUE", 2, 2, ana_xmscalesetvalue, 0 }, /* motif.c */
-  { "XMSCROLLBARSETVALUES", 1, 5, ana_xmscrollbarsetvalues, 0 }, /* motif.c */
-  { "XMSELECTCOLOR", 2, 2, ana_xmselectcolor, 0 }, /* motif.c */
-  { "XMSENSITIVE", 2, 2, ana_xmsensitive, 0 }, /* motif.c */
-  { "XMSETCOLORS", 2, 2, ana_xmsetcolors, 0 }, /* motif.c */
-  { "XMSETDIRECTORY", 2, 2, ana_xmsetdirectory, 0 }, /* motif.c */
-  { "XMSETLABEL", 2, 2, ana_xmsetlabel, 0 }, /* motif.c */
-  { "XMSETMARGINS", 3, 3, ana_xmsetmargins, 0 }, /* motif.c */
-  { "XMSETMNEMONIC", 2, 2, ana_xmsetmnemonic, 0 }, /* motif.c */
-  { "XMSETMODAL", 2, 2, ana_xmsetmodal, 0 }, /* motif.c */
-  { "XMSETOPTIONSELECTION", 2, 2, ana_xmsetoptionselection, 0 }, /* motif.c */
-  { "XMSETPIXMAP", 2, 2, ana_xmsetpixmap, 0 }, /* motif.c */
-  { "XMSETTITLE", 2, 2, ana_xmsettitle, 0 }, /* motif.c */
-  { "XMSET_TEXT_OUTPUT", 1, 1, ana_xmset_text_output, 0 }, /* motif.c */
-  { "XMSIZE",	3, 3, ana_xmsize, 0 }, /* motif.c */
-  { "XMTEXTAPPEND", 2, 3, ana_xmtextappend, 0 }, /* motif.c */
-  { "XMTEXTERASE", 1, 1, ana_xmtexterase, 0 }, /* motif.c */
-  { "XMTEXTFIELDSETEDITABLE", 2, 2, ana_xmtextfieldseteditable, 0 }, /* motif.c */
-  { "XMTEXTFIELDSETMAXLENGTH", 2, 2, ana_xmtextfieldsetmaxlength, 0 }, /* motif.c */
-  { "XMTEXTFIELDSETSTRING", 2, 3, ana_xmtextfieldsetstring, 0 }, /* motif.c */
-  { "XMTEXTREPLACE",	3, 4, ana_xmtextreplace, 0 }, /* motif.c */
-  { "XMTEXTSETEDITABLE", 2, 2, ana_xmtextseteditable, 0 }, /* motif.c */
-  { "XMTEXTSETPOSITION", 2, 2, ana_xmtextsetposition, 0 }, /* motif.c */
-  { "XMTEXTSETROWCOLUMNSIZE", 3, 3, ana_xmtextsetrowcolumnsize, 0 }, /* motif.c */
-  { "XMTEXTSETSTRING", 2, 2, ana_xmtextsetstring, 0 }, /* motif.c */
-  { "XMTOGGLESETSTATE", 2, 3, ana_xmtogglesetstate, 0 }, /* motif.c */
-  { "XMTOPSHADOWCOLOR", 2, 2, ana_xmtopshadowcolor, 0 }, /* motif.c */
+  { "XMALIGNMENT", 2, 2, lux_xmalignment, 0 }, /* motif.c */
+  { "XMARMCOLOR", 2, 2, lux_xmarmcolor, 0 }, /* motif.c */
+  { "XMATTACH",	6, 6, lux_xmattach, 0 }, /* motif.c */
+  { "XMATTACH_RELATIVE", 5, 5, lux_xmattach_relative, 0 }, /* motif.c */
+  { "XMBACKGROUNDCOLOR", 2, 2, lux_xmbackgroundcolor, 0 }, /* motif.c */
+  { "XMBORDERCOLOR", 2, 2, lux_xmbordercolor, 0 }, /* motif.c */
+  { "XMBORDERWIDTH", 2, 2, lux_xmborderwidth, 0 }, /* motif.c */
+  { "XMBOTTOMSHADOWCOLOR", 2, 2, lux_xmbottomshadowcolor, 0 }, /* motif.c */
+  { "XMDESTROY", 1, 1, lux_xmdestroy, 0 }, /* motif.c */
+  { "XMDRAWINGLINK", 2, 2, lux_xmdrawinglink, 0 }, /* motif.c */
+  { "XMFONT",	2, 2, lux_xmfont, 0 }, /* motif.c */
+  { "XMFOREGROUNDCOLOR", 2, 2, lux_xmforegroundcolor, 0 }, /* motif.c */
+  { "XMGETPIXMAP", 2, 2, lux_xmgetpixmap, 0 }, /* motif.c */
+  { "XMGETWIDGETPOSITION", 3, 3, lux_xmgetwidgetposition, 0 }, /* motif.c */
+  { "XMGETWIDGETSIZE", 3, 3, lux_xmgetwidgetsize, 0 }, /* motif.c */
+  { "XMINFO",	1, 1, lux_xminfo, 0 }, /* motif.c */
+  { "XMLISTADDITEM", 2, 3, lux_xmlistadditem, 0 }, /* motif.c */
+  { "XMLISTDELETEALL", 1, 1, lux_xmlistdeleteall, 0 }, /* motif.c */
+  { "XMLISTDELETEITEM", 2, 2, lux_xmlistdeleteitem, 0 }, /* motif.c */
+  { "XMLISTFUNC", 1, 1, lux_xmlistfunc, 0 }, /* motif.c */
+  { "XMLISTSELECT", 2, 3, lux_xmlistselect, 0 }, /* motif.c */
+  { "XMLISTSUBR", 1, 1, lux_xmlistsubr, 0 }, /* motif.c */
+  { "XMMESSAGE", 1, 5, lux_xmmessage, 0 }, /* motif.c */
+  { "XMPOSITION", 3, 5, lux_xmposition, 0 }, /* motif.c */
+  { "XMPROMPT",	3, 8, lux_xmprompt, 0 }, /* motif.c */
+  { "XMQUERY",	1, 1, lux_xmquery, 0 }, /* motif.c */
+  { "XMRAISE",	1, 1, lux_xmraise, 0 },  /* motif.c */
+  { "XMRESIZEPOLICY",	2, 2, lux_xmresizepolicy, 0 }, /* motif.c */
+  { "XMSCALERESETLIMITS", 3, 4, lux_xmscaleresetlimits, 0 }, /* motif.c */
+  { "XMSCALESETVALUE", 2, 2, lux_xmscalesetvalue, 0 }, /* motif.c */
+  { "XMSCROLLBARSETVALUES", 1, 5, lux_xmscrollbarsetvalues, 0 }, /* motif.c */
+  { "XMSELECTCOLOR", 2, 2, lux_xmselectcolor, 0 }, /* motif.c */
+  { "XMSENSITIVE", 2, 2, lux_xmsensitive, 0 }, /* motif.c */
+  { "XMSETCOLORS", 2, 2, lux_xmsetcolors, 0 }, /* motif.c */
+  { "XMSETDIRECTORY", 2, 2, lux_xmsetdirectory, 0 }, /* motif.c */
+  { "XMSETLABEL", 2, 2, lux_xmsetlabel, 0 }, /* motif.c */
+  { "XMSETMARGINS", 3, 3, lux_xmsetmargins, 0 }, /* motif.c */
+  { "XMSETMNEMONIC", 2, 2, lux_xmsetmnemonic, 0 }, /* motif.c */
+  { "XMSETMODAL", 2, 2, lux_xmsetmodal, 0 }, /* motif.c */
+  { "XMSETOPTIONSELECTION", 2, 2, lux_xmsetoptionselection, 0 }, /* motif.c */
+  { "XMSETPIXMAP", 2, 2, lux_xmsetpixmap, 0 }, /* motif.c */
+  { "XMSETTITLE", 2, 2, lux_xmsettitle, 0 }, /* motif.c */
+  { "XMSET_TEXT_OUTPUT", 1, 1, lux_xmset_text_output, 0 }, /* motif.c */
+  { "XMSIZE",	3, 3, lux_xmsize, 0 }, /* motif.c */
+  { "XMTEXTAPPEND", 2, 3, lux_xmtextappend, 0 }, /* motif.c */
+  { "XMTEXTERASE", 1, 1, lux_xmtexterase, 0 }, /* motif.c */
+  { "XMTEXTFIELDSETEDITABLE", 2, 2, lux_xmtextfieldseteditable, 0 }, /* motif.c */
+  { "XMTEXTFIELDSETMAXLENGTH", 2, 2, lux_xmtextfieldsetmaxlength, 0 }, /* motif.c */
+  { "XMTEXTFIELDSETSTRING", 2, 3, lux_xmtextfieldsetstring, 0 }, /* motif.c */
+  { "XMTEXTREPLACE",	3, 4, lux_xmtextreplace, 0 }, /* motif.c */
+  { "XMTEXTSETEDITABLE", 2, 2, lux_xmtextseteditable, 0 }, /* motif.c */
+  { "XMTEXTSETPOSITION", 2, 2, lux_xmtextsetposition, 0 }, /* motif.c */
+  { "XMTEXTSETROWCOLUMNSIZE", 3, 3, lux_xmtextsetrowcolumnsize, 0 }, /* motif.c */
+  { "XMTEXTSETSTRING", 2, 2, lux_xmtextsetstring, 0 }, /* motif.c */
+  { "XMTOGGLESETSTATE", 2, 3, lux_xmtogglesetstate, 0 }, /* motif.c */
+  { "XMTOPSHADOWCOLOR", 2, 2, lux_xmtopshadowcolor, 0 }, /* motif.c */
 #endif
-  { "XOPEN",	0, 1, ana_xopen, /* xport.c */
+  { "XOPEN",	0, 1, lux_xopen, /* xport.c */
     "1PRIVATE_COLORMAP:2DEFAULT_COLORMAP:4SELECTVISUAL" },
-  { "XPLACE",	0, 2, ana_xplace, /* xport.c */
+  { "XPLACE",	0, 2, lux_xplace, /* xport.c */
     "1DVI:2DEV:3IMG:4PLT:5RIM:6RPL:7X11" },
-  { "XPORT",	0, 7, ana_xport, 0 }, /* xport.c */
-  { "XPURGE",	0, 0, ana_xpurge, 0 }, /* xport.c */
-  { "XQUERY",	0, 1, ana_xquery, 0 }, /* xport.c */
-  { "XRAISE",	1, 1, ana_xraise, 0 }, /* xport.c */
-  { "XREGISTER", 0, 3, ana_register_event , /* menu.c */
+  { "XPORT",	0, 7, lux_xport, 0 }, /* xport.c */
+  { "XPURGE",	0, 0, lux_xpurge, 0 }, /* xport.c */
+  { "XQUERY",	0, 1, lux_xquery, 0 }, /* xport.c */
+  { "XRAISE",	1, 1, lux_xraise, 0 }, /* xport.c */
+  { "XREGISTER", 0, 3, lux_register_event , /* menu.c */
     "1KEYPRESS:4BUTTONPRESS:8BUTTONRELEASE:16POINTERMOTION:32ENTERWINDOW:64LEAVEWINDOW:127ALLEVENTS:128ALLWINDOWS:256ALLMENUS:512DESELECT::WINDOW:MENU" },
-  { "XSETACTION", 0, 2, ana_xsetaction, 0 }, /* xport.c */
+  { "XSETACTION", 0, 2, lux_xsetaction, 0 }, /* xport.c */
 #if MOTIF
-  { "XTLOOP",	0, 1, ana_xtloop, 0 }, /* motif.c */
-  { "XTMANAGE",	1, 1, ana_xtmanage, 0 }, /* motif.c */
-  { "XTPOPDOWN", 1, 1, ana_xtpopdown, 0 }, /* motif.c */
-  { "XTPOPUP",	1, 1, ana_xtpopup, 0 },	/* motif.c */
-  { "XTUNMANAGE", 1, 1, ana_xtunmanage, 0 }, /* motif.c */
+  { "XTLOOP",	0, 1, lux_xtloop, 0 }, /* motif.c */
+  { "XTMANAGE",	1, 1, lux_xtmanage, 0 }, /* motif.c */
+  { "XTPOPDOWN", 1, 1, lux_xtpopdown, 0 }, /* motif.c */
+  { "XTPOPUP",	1, 1, lux_xtpopup, 0 },	/* motif.c */
+  { "XTUNMANAGE", 1, 1, lux_xtunmanage, 0 }, /* motif.c */
 #endif
-  { "XTV",	1, 4, ana_xtv,  /* xport.c */
+  { "XTV",	1, 4, lux_xtv,  /* xport.c */
     ":::WINDOW:SCALE:0DEP:1DVI:2DEV:3IMG:4PLT:5RIM:6RPL:7X11:64SCREEN:128POSTSCRIPT:192PDEV:256PLOTWINDOW:512ZOOM" },
-  { "XTVREAD",	0, 5, ana_xtvread, "1GREYSCALE" }, /* xport.c */
-  { "XWIN",	0, 7, ana_xport, 0 }, /* xport.c */
-  { "XWINDOW",	0, 7, ana_xport, 0 }, /* xport.c */
-  { "XYMOV",	2, 4, ana_xymov, /* plots.c */
+  { "XTVREAD",	0, 5, lux_xtvread, "1GREYSCALE" }, /* xport.c */
+  { "XWIN",	0, 7, lux_xport, 0 }, /* xport.c */
+  { "XWINDOW",	0, 7, lux_xport, 0 }, /* xport.c */
+  { "XYMOV",	2, 4, lux_xymov, /* plots.c */
     "|192|:::BREAKS:0DEP:1DVI:2DEV:3IMG:4PLT:5RIM:6RPL:7X11:64BOUNDINGBOX:128MOVEFIRST:256ALTDASH" },
 #endif
-  { "ZAP",	1, MAX_ARG, ana_zap, "+1POINTER" }, /* strous2.c */
-  { "ZERO", 	1, MAX_ARG, ana_zero, 0 }, /* fun1.c */
+  { "ZAP",	1, MAX_ARG, lux_zap, "+1POINTER" }, /* strous2.c */
+  { "ZERO", 	1, MAX_ARG, lux_zero, 0 }, /* fun1.c */
 #if MOTIF
-  { "ZEROIFNOTDEFINED", 1, MAX_ARG, ana_zeroifnotdefined, 0}, /* motifextra.c */
+  { "ZEROIFNOTDEFINED", 1, MAX_ARG, lux_zeroifnotdefined, 0}, /* motifextra.c */
 #endif
-  { "ZERONANS",	1, MAX_ARG, ana_zapnan, "*%1%VALUE" }, /* fun1.c */
+  { "ZERONANS",	1, MAX_ARG, lux_zapnan, "*%1%VALUE" }, /* fun1.c */
 #if HAVE_LIBX11
-  { "ZOOM",	1, 3, ana_zoom, "1OLDCONTRAST" }, /* zoom.c */
+  { "ZOOM",	1, 3, lux_zoom, "1OLDCONTRAST" }, /* zoom.c */
 #endif
 };
 Int nSubroutine = sizeof(subroutine_table)/sizeof(internalRoutine);
 
-extern Int ana_abs(), ana_acos(), ana_arestore_f(), ana_arg(),
-  ana_array(), ana_asin(), ana_assoc(), ana_astore_f(), ana_atan(),
-  ana_atan2(), ana_basin(), ana_basin2(), ana_beta(), ana_bisect(),
-  ana_bmap(), bytarr(), ana_byte(), bytfarr(), ana_cbrt(), cdblarr(),
-  cdblfarr(), ana_cdmap(), ana_cdouble(), ana_ceil(), ana_cfloat(),
-  ana_cfmap(), cfltarr(), cfltfarr(), ana_chi_square(),
-  ana_classname(), ana_complex(), ana_complexsquare(), ana_compress(),
-  ana_concat(), ana_conjugate(), ana_convertsym(), ana_cos(),
-  ana_cosh(), ana_cputime(), ana_crosscorr(), ana_crunch_f(),
-  ana_ctime(), ana_cubic_spline(), ana_date(), ana_date_from_tai(),
-  dblarr(), dblfarr(), ana_defined(), ana_delete(), ana_despike(),
-  ana_detrend(), ana_differ(), ana_dilate(), ana_dilate_dir(),
-  ana_dimen(), ana_dir_smooth(), ana_dir_smooth2(), ana_distarr(),
-  ana_distr_f(), ana_dmap(), ana_double(), ana_equivalence(),
-  ana_erf(), ana_erfc(), ana_erode(), ana_erode_dir(), ana_esmooth(),
-  ana_eval(), ana_exp(), ana_expand(), ana_expm1(),
-  ana_extract_bits_f(), ana_extreme_general(), ana_f_ratio(),
-  ana_fcwrite_f(), ana_fftshift_f(), ana_fileptr_f(),
-  ana_filesize(), ana_filetype_name(), ana_find(), ana_find2(), ana_findfile(),
-  ana_find_max(), ana_find_maxloc(), ana_find_min(),
-  ana_find_minloc(), ana_fitskey(), ana_fits_header_f(),
-  ana_fits_read_f(), ana_fits_xread_f(), ana_float(), ana_floor(),
-  fltarr(), fltfarr(), ana_fmap(), ana_freadf_f(), ana_freads_f(),
-  ana_fstring(), ana_fzarr(), ana_fzhead_f(), ana_fzread_f(),
-  ana_fzwrite_f(), ana_gamma(), ana_generalfit(), ana_get_lun(),
-  ana_getenv(), ana_gridmatch(), ana_gsmooth(), ana_hamming(), ana_hilbert(),
-  ana_hist(), ana_histr(), ana_identify_file(), ana_idlread_f(),
-  ana_imaginary(), ana_incomplete_beta(), ana_incomplete_gamma(),
-  ana_index(), ana_indgen(), ana_inpolygon(), intarr(), intfarr(),
-  ana_isarray(), ana_isnan(), ana_isscalar(), ana_isstring(),
-  ana_istring(), ana_j0(), ana_j1(), ana_jd(), ana_jn(), ana_cjd(),
-  ana_ksmooth(), ana_laplace2d(), ana_lmap(), ana_local_maxf(),
-  ana_local_maxloc(),
-  ana_local_minf(), ana_local_minloc(), ana_log(), ana_log10(),
-  ana_log1p(), lonarr(), lonfarr(), ana_long(), ana_lower(),
-  ana_lsq(), ana_lsq2(), ana_match(), ana_max_dir(),
-  ana_maxf(), ana_maxfilter(), ana_maxloc(), ana_mean(),
-  ana_medfilter(), ana_median(), ana_memory(), ana_minf(),
-  ana_minfilter(), ana_minloc(), ana_neg_func(),
-  ana_noncentral_chi_square(), ana_not(), ana_num_dimen(),
-  ana_num_elem(), ana_onef(), ana_openr_f(), ana_openu_f(),
-  ana_openw_f(), ana_orderfilter(), ana_pit(), ana_poly(), ana_pow(),
-  ana_power(), ana_printf_f(), ana_psum(), ana_quantile(), ana_quit(),
-  ana_random(), ana_randomb(), ana_randomd(), ana_randomn(),
-  ana_randomu(), ana_randoml(), ana_readf_f(), ana_readkey(),
-  ana_readkeyne(), ana_readu_f(), ana_real(), ana_redim_f(),
-  ana_regrid(), ana_regrid3(), ana_regrid3ns(), ana_reorder(),
-  ana_reverse(), ana_rfix(), ana_root3(), ana_runcum(), ana_runprod(),
-  ana_runsum(), ana_scale(), ana_scalerange(),
-  ana_sdev(), ana_segment(), ana_segment_dir(), ana_sgn(),
-  ana_shift_f(), ana_sieve(), ana_sin(), ana_sinh(), ana_skipc(),
-  ana_smap(), ana_smooth(), ana_solar_b(), ana_solar_l(),
-  ana_solar_p(), ana_solar_r(), ana_sort(), ana_spawn_f(), ana_sqrt(),
-  strarr(), ana_strcount(), ana_stretch(), ana_string(), ana_strlen(),
-  ana_strloc(), ana_strpos(), ana_strreplace(), ana_strskp(),
-  ana_strsub(), ana_strtok(), ana_strtol(), ana_strtrim(),
-  ana_struct(), ana_student(), ana_subsc_func(), ana_sun_b(),
-  ana_sun_d(), ana_sun_p(), ana_sun_r(), ana_symbol(),
-  ana_symbol_memory(), ana_symbol_number(), ana_symclass(),
-  ana_symdtype(), ana_systime(), ana_table(), ana_tai_from_date(),
-  ana_tan(), ana_tanh(), ana_temp(), ana_tense(), ana_tense_curve(),
-  ana_tense_loop(), ana_time(), ana_total(), ana_trace_decoder(),
-  ana_trend(), ana_tri_name_from_tai(), ana_typeName(), ana_upper(),
-  ana_variance(), ana_varname(), ana_voigt(), ana_wait_for_menu(),
-  ana_wmap(), ana_word(), ana_y0(), ana_y1(), ana_yn(),
-  ana_zapnan_f(), ana_zerof(), ana_zinv(), ana_fcrunwrite_f(),
-  ana_strpbrk(), ana_shift3(), ana_area_connect(), ana_legendre(),
-  ana_cartesian_to_polar(), ana_polar_to_cartesian(), ana_roll(),
-  ana_siderealtime(), ana_asinh(),
-  ana_acosh(), ana_atanh(), ana_astrf(), ana_antilaplace2d(),
-  ana_cspline_find(), ana_covariance();
+extern Int lux_abs(), lux_acos(), lux_arestore_f(), lux_arg(),
+  lux_array(), lux_asin(), lux_assoc(), lux_astore_f(), lux_atan(),
+  lux_atan2(), lux_basin(), lux_basin2(), lux_beta(), lux_bisect(),
+  lux_bmap(), bytarr(), lux_byte(), bytfarr(), lux_cbrt(), cdblarr(),
+  cdblfarr(), lux_cdmap(), lux_cdouble(), lux_ceil(), lux_cfloat(),
+  lux_cfmap(), cfltarr(), cfltfarr(), lux_chi_square(),
+  lux_classname(), lux_complex(), lux_complexsquare(), lux_compress(),
+  lux_concat(), lux_conjugate(), lux_convertsym(), lux_cos(),
+  lux_cosh(), lux_cputime(), lux_crosscorr(), lux_crunch_f(),
+  lux_ctime(), lux_cubic_spline(), lux_date(), lux_date_from_tai(),
+  dblarr(), dblfarr(), lux_defined(), lux_delete(), lux_despike(),
+  lux_detrend(), lux_differ(), lux_dilate(), lux_dilate_dir(),
+  lux_dimen(), lux_dir_smooth(), lux_dir_smooth2(), lux_distarr(),
+  lux_distr_f(), lux_dmap(), lux_double(), lux_equivalence(),
+  lux_erf(), lux_erfc(), lux_erode(), lux_erode_dir(), lux_esmooth(),
+  lux_eval(), lux_exp(), lux_expand(), lux_expm1(),
+  lux_extract_bits_f(), lux_extreme_general(), lux_f_ratio(),
+  lux_fcwrite_f(), lux_fftshift_f(), lux_fileptr_f(),
+  lux_filesize(), lux_filetype_name(), lux_find(), lux_find2(), lux_findfile(),
+  lux_find_max(), lux_find_maxloc(), lux_find_min(),
+  lux_find_minloc(), lux_fitskey(), lux_fits_header_f(),
+  lux_fits_read_f(), lux_fits_xread_f(), lux_float(), lux_floor(),
+  fltarr(), fltfarr(), lux_fmap(), lux_freadf_f(), lux_freads_f(),
+  lux_fstring(), lux_fzarr(), lux_fzhead_f(), lux_fzread_f(),
+  lux_fzwrite_f(), lux_gamma(), lux_generalfit(), lux_get_lun(),
+  lux_getenv(), lux_gridmatch(), lux_gsmooth(), lux_hamming(), lux_hilbert(),
+  lux_hist(), lux_histr(), lux_identify_file(), lux_idlread_f(),
+  lux_imaginary(), lux_incomplete_beta(), lux_incomplete_gamma(),
+  lux_index(), lux_indgen(), lux_inpolygon(), intarr(), intfarr(),
+  lux_isarray(), lux_isnan(), lux_isscalar(), lux_isstring(),
+  lux_istring(), lux_j0(), lux_j1(), lux_jd(), lux_jn(), lux_cjd(),
+  lux_ksmooth(), lux_laplace2d(), lux_lmap(), lux_local_maxf(),
+  lux_local_maxloc(),
+  lux_local_minf(), lux_local_minloc(), lux_log(), lux_log10(),
+  lux_log1p(), lonarr(), lonfarr(), lux_long(), lux_lower(),
+  lux_lsq(), lux_lsq2(), lux_match(), lux_max_dir(),
+  lux_maxf(), lux_maxfilter(), lux_maxloc(), lux_mean(),
+  lux_medfilter(), lux_median(), lux_memory(), lux_minf(),
+  lux_minfilter(), lux_minloc(), lux_neg_func(),
+  lux_noncentral_chi_square(), lux_not(), lux_num_dimen(),
+  lux_num_elem(), lux_onef(), lux_openr_f(), lux_openu_f(),
+  lux_openw_f(), lux_orderfilter(), lux_pit(), lux_poly(), lux_pow(),
+  lux_power(), lux_printf_f(), lux_psum(), lux_quantile(), lux_quit(),
+  lux_random(), lux_randomb(), lux_randomd(), lux_randomn(),
+  lux_randomu(), lux_randoml(), lux_readf_f(), lux_readkey(),
+  lux_readkeyne(), lux_readu_f(), lux_real(), lux_redim_f(),
+  lux_regrid(), lux_regrid3(), lux_regrid3ns(), lux_reorder(),
+  lux_reverse(), lux_rfix(), lux_root3(), lux_runcum(), lux_runprod(),
+  lux_runsum(), lux_scale(), lux_scalerange(),
+  lux_sdev(), lux_segment(), lux_segment_dir(), lux_sgn(),
+  lux_shift_f(), lux_sieve(), lux_sin(), lux_sinh(), lux_skipc(),
+  lux_smap(), lux_smooth(), lux_solar_b(), lux_solar_l(),
+  lux_solar_p(), lux_solar_r(), lux_sort(), lux_spawn_f(), lux_sqrt(),
+  strarr(), lux_strcount(), lux_stretch(), lux_string(), lux_strlen(),
+  lux_strloc(), lux_strpos(), lux_strreplace(), lux_strskp(),
+  lux_strsub(), lux_strtok(), lux_strtol(), lux_strtrim(),
+  lux_struct(), lux_student(), lux_subsc_func(), lux_sun_b(),
+  lux_sun_d(), lux_sun_p(), lux_sun_r(), lux_symbol(),
+  lux_symbol_memory(), lux_symbol_number(), lux_symclass(),
+  lux_symdtype(), lux_systime(), lux_table(), lux_tai_from_date(),
+  lux_tan(), lux_tanh(), lux_temp(), lux_tense(), lux_tense_curve(),
+  lux_tense_loop(), lux_time(), lux_total(), lux_trace_decoder(),
+  lux_trend(), lux_tri_name_from_tai(), lux_typeName(), lux_upper(),
+  lux_variance(), lux_varname(), lux_voigt(), lux_wait_for_menu(),
+  lux_wmap(), lux_word(), lux_y0(), lux_y1(), lux_yn(),
+  lux_zapnan_f(), lux_zerof(), lux_zinv(), lux_fcrunwrite_f(),
+  lux_strpbrk(), lux_shift3(), lux_area_connect(), lux_legendre(),
+  lux_cartesian_to_polar(), lux_polar_to_cartesian(), lux_roll(),
+  lux_siderealtime(), lux_asinh(),
+  lux_acosh(), lux_atanh(), lux_astrf(), lux_antilaplace2d(),
+  lux_cspline_find(), lux_covariance();
 
 #if HAVE_REGEX_H
-extern Int ana_getdirectories(), ana_getfiles(), ana_getfiles_r(),
-  ana_getmatchedfiles(), ana_getmatchedfiles_r(), ana_regex();
+extern Int lux_getdirectories(), lux_getfiles(), lux_getfiles_r(),
+  lux_getmatchedfiles(), lux_getmatchedfiles_r(), lux_regex();
 #endif
 
 #if DEVELOP
-extern Int	ana_project(), ana_bsmooth(), ana_compile(),
-  ana_bessel_i0(), ana_bessel_i1(), ana_bessel_k0(), ana_bessel_k1(),
-  ana_bessel_kn(), ana_regridls(), ana_bigger235(),
-  ana_geneticfit();
+extern Int	lux_project(), lux_bsmooth(), lux_compile(),
+  lux_bessel_i0(), lux_bessel_i1(), lux_bessel_k0(), lux_bessel_k1(),
+  lux_bessel_kn(), lux_regridls(), lux_bigger235(),
+  lux_geneticfit();
 #endif
 
-extern Int	ana_gifread_f(), ana_gifwrite_f();
+extern Int	lux_gifread_f(), lux_gifwrite_f();
 
 #if HAVE_LIBX11
-extern Int	ana_check_menu(), ana_check_window(), ana_colorpixel(),
-  ana_event_name(), ana_xlabelwidth(), ana_xquery_f(), ana_xexist();
+extern Int	lux_check_menu(), lux_check_window(), lux_colorpixel(),
+  lux_event_name(), lux_xlabelwidth(), lux_xquery_f(), lux_xexist();
 #endif
 
-extern Int ana_calendar(), ana_EasterDate(), /* ana_orbitalElement(), */
-  ana_astropos(), ana_precess(), ana_constellation(),
-  ana_constellationname(), ana_enhanceimage();
+extern Int lux_calendar(), lux_EasterDate(), /* lux_orbitalElement(), */
+  lux_astropos(), lux_precess(), lux_constellation(),
+  lux_constellationname(), lux_enhanceimage();
 
 #if MOTIF
 
-extern Int ana_xmarrow(), ana_xmboard(), ana_xmbutton(),
-  ana_xmcheckbox(), ana_xmcolumns(), ana_xmcommand(),
-  ana_xmdialog_board(), ana_xmdrawingarea(), ana_xmfileselect(),
-  ana_xmform(), ana_xmframe(), ana_xmgetoptionselection(),
-  ana_xmgetwidgetaddress(), ana_xmhscale(), ana_xmlabel(),
-  ana_xmlist(), ana_xmlistcount(), ana_xmlistfromfile(),
-  ana_xmmenubar(), ana_xmoptionmenu(), ana_xmpixmapbutton(),
-  ana_xmpulldownmenu(), ana_xmradiobox(), ana_xmrows(),
-  ana_xmscalegetvalue(), ana_xmscrolledwindow(), ana_xmseparator(),
-  ana_xmtext(), ana_xmtextbox(), ana_xmtextfield(),
-  ana_xmtextfieldarray(), ana_xmtextfieldgetstring(),
-  ana_xmtextfromfile(), ana_xmtextgetstring(), ana_xmtogglegetstate(),
-  ana_xmvscale(), ana_xtparent(), ana_xtwindow(), ana_xmdialog_form(),
-  ana_xmaddfiletolist(), ana_xmtoplevel_form(),
-  ana_xmtoplevel_board(), ana_xmpixmapoptionmenu(), ana_xmscrolledwindowapp(),
-  ana_xmfilegetlist(), ana_xmhscrollbar(), ana_xmtextgetinsertposition(),
-  ana_xmtextgetlastposition(), ana_xmtextgetselection(), ana_xmvscrollbar();
+extern Int lux_xmarrow(), lux_xmboard(), lux_xmbutton(),
+  lux_xmcheckbox(), lux_xmcolumns(), lux_xmcommand(),
+  lux_xmdialog_board(), lux_xmdrawingarea(), lux_xmfileselect(),
+  lux_xmform(), lux_xmframe(), lux_xmgetoptionselection(),
+  lux_xmgetwidgetaddress(), lux_xmhscale(), lux_xmlabel(),
+  lux_xmlist(), lux_xmlistcount(), lux_xmlistfromfile(),
+  lux_xmmenubar(), lux_xmoptionmenu(), lux_xmpixmapbutton(),
+  lux_xmpulldownmenu(), lux_xmradiobox(), lux_xmrows(),
+  lux_xmscalegetvalue(), lux_xmscrolledwindow(), lux_xmseparator(),
+  lux_xmtext(), lux_xmtextbox(), lux_xmtextfield(),
+  lux_xmtextfieldarray(), lux_xmtextfieldgetstring(),
+  lux_xmtextfromfile(), lux_xmtextgetstring(), lux_xmtogglegetstate(),
+  lux_xmvscale(), lux_xtparent(), lux_xtwindow(), lux_xmdialog_form(),
+  lux_xmaddfiletolist(), lux_xmtoplevel_form(),
+  lux_xmtoplevel_board(), lux_xmpixmapoptionmenu(), lux_xmscrolledwindowapp(),
+  lux_xmfilegetlist(), lux_xmhscrollbar(), lux_xmtextgetinsertposition(),
+  lux_xmtextgetlastposition(), lux_xmtextgetselection(), lux_xmvscrollbar();
 
 #endif
 
 #if HAVE_LIBJPEG
-extern Int ana_read_jpeg6b_f(), ana_write_jpeg6b_f();
+extern Int lux_read_jpeg6b_f(), lux_write_jpeg6b_f();
 #endif
 
-extern Int	vargsmooth(), ana_test();
+extern Int	vargsmooth(), lux_test();
 
 internalRoutine function_table[] = {
-  { "%A_UNARY_NEGATIVE", 1, 1, ana_neg_func, "*" },	/* fun1.c */
-  { "%B_SUBSCRIPT", 1, MAX_ARG, ana_subsc_func, /* subsc.c */ "1INNER:2OUTER:4ZERO:8SUBGRID:16KEEPDIMS:32ALL:64SEPARATE" },
-  { "%C_CPUTIME", 0, 0, ana_cputime, 0 }, /* fun1.c */
-  { "%D_POWER",	2, 2, ana_pow, "*" }, /* fun1.c */
-  { "%E_CONCAT", 1, MAX_ARG, ana_concat, "1SLOPPY" }, /* subsc.c */
-  { "%F_CTIME", 0, 0, ana_ctime, 0 }, /* fun1.c */
-  { "%G_TIME", 	0, 0, ana_time, 0 }, /* fun1.c */
-  { "%H_DATE", 	0, 0, ana_date, 0 }, /* fun1.c */
-  { "%I_READKEY", 0, 0, ana_readkey, 0 }, /* strous.c */
-  { "%J_READKEYNE", 0, 0, ana_readkeyne, 0 }, /* strous.c */
-  { "%K_SYSTIME", 0, 0, ana_systime, 0 }, /* fun1.c */
-  { "%L_JD",	0, 0, ana_jd, 0 }, /* fun1.c */
-  { "%M_CJD",   0, 0, ana_cjd, 0 },                /* fun1.c */
-  { "ABS",	1, 1, ana_abs, "*" }, /* fun1.c */
-  { "ACOS",	1, 1, ana_acos, "*" }, /* fun1.c */
-  { "ACOSH",	1, 1, ana_acosh, "*" }, /* fun1.c */
-  { "ALOG",	1, 1, ana_log, "*" }, /* fun1.c */
-  { "ALOG10",	1, 1, ana_log10, "*" }, /* fun1.c */
-  { "ANTILAPLACE2D", 2, 2, ana_antilaplace2d, 0 }, /* poisson.c */
-  { "AREACONNECT", 2, 3, ana_area_connect, "::COMPACT:1RAW" }, /* topology.c */
-  { "ARESTORE",	1, MAX_ARG, ana_arestore_f, 0 }, /* files.c */
-  { "ARG",	1, 1, ana_arg, 0 }, /* fun3.c */
-  { "ARRAY",	1, MAX_DIMS + 1, ana_array, 0 }, /* symbols.c */
-  { "ASIN",	1, 1, ana_asin, "*" }, /* fun1.c */
-  { "ASINH",	1, 1, ana_asinh, "*" }, /* fun1.c */
-  { "ASSOC",	2, 3, ana_assoc, "::OFFSET" }, /* symbols.c */
-  { "ASTORE",	2, MAX_ARG, ana_astore_f, 0 }, /* files.c */
-  { "ASTRF",	1, 2, ana_astrf, "1FROMEQUATORIAL:2FROMECLIPTICAL:4FROMGALACTIC:8TOEQUATORIAL:16TOECLIPTICAL:32TOGALACTIC:64JULIAN:128BESSELIAN" }, /* astron.c */
-  { "ASTRON",	2, 7, ana_astropos, /* astron.c */ ":::OBSERVER:EQUINOX:ELEMENTS:TOLERANCE:1ECLIPTICAL:2EQUATORIAL:3HORIZONTAL:4ELONGATION:8XYZ:16LIGHTTIME:32DATE:64TDT:256ABERRATION:512NUTATION:2832APPARENT:1024QELEMENTS:2048FK5:8192CONJSPREAD:16384PLANETOCENTRIC:32768KEEPDIMENSIONS:65536VOCAL:~131072VSOP87A:131072VSOP87C:262144BARE" },
-  { "ATAN",	1, 1, ana_atan, "*" }, /* fun1.c */
-  { "ATAN2",	2, 2, ana_atan2, "*" }, /* fun1.c */
-  { "ATANH",	1, 1, ana_atanh, "*" }, /* fun1.c */
-  { "ATOL",	1, 2, ana_strtol, 0 }, /* fun3.c */
-  { "BASIN",	1, 2, ana_basin2, /* strous.c */ "*1NUMBER:2SINK:4DIFFERENCE" },
+  { "%A_UNARY_NEGATIVE", 1, 1, lux_neg_func, "*" },	/* fun1.c */
+  { "%B_SUBSCRIPT", 1, MAX_ARG, lux_subsc_func, /* subsc.c */ "1INNER:2OUTER:4ZERO:8SUBGRID:16KEEPDIMS:32ALL:64SEPARATE" },
+  { "%C_CPUTIME", 0, 0, lux_cputime, 0 }, /* fun1.c */
+  { "%D_POWER",	2, 2, lux_pow, "*" }, /* fun1.c */
+  { "%E_CONCAT", 1, MAX_ARG, lux_concat, "1SLOPPY" }, /* subsc.c */
+  { "%F_CTIME", 0, 0, lux_ctime, 0 }, /* fun1.c */
+  { "%G_TIME", 	0, 0, lux_time, 0 }, /* fun1.c */
+  { "%H_DATE", 	0, 0, lux_date, 0 }, /* fun1.c */
+  { "%I_READKEY", 0, 0, lux_readkey, 0 }, /* strous.c */
+  { "%J_READKEYNE", 0, 0, lux_readkeyne, 0 }, /* strous.c */
+  { "%K_SYSTIME", 0, 0, lux_systime, 0 }, /* fun1.c */
+  { "%L_JD",	0, 0, lux_jd, 0 }, /* fun1.c */
+  { "%M_CJD",   0, 0, lux_cjd, 0 },                /* fun1.c */
+  { "ABS",	1, 1, lux_abs, "*" }, /* fun1.c */
+  { "ACOS",	1, 1, lux_acos, "*" }, /* fun1.c */
+  { "ACOSH",	1, 1, lux_acosh, "*" }, /* fun1.c */
+  { "ALOG",	1, 1, lux_log, "*" }, /* fun1.c */
+  { "ALOG10",	1, 1, lux_log10, "*" }, /* fun1.c */
+  { "ANTILAPLACE2D", 2, 2, lux_antilaplace2d, 0 }, /* poisson.c */
+  { "AREACONNECT", 2, 3, lux_area_connect, "::COMPACT:1RAW" }, /* topology.c */
+  { "ARESTORE",	1, MAX_ARG, lux_arestore_f, 0 }, /* files.c */
+  { "ARG",	1, 1, lux_arg, 0 }, /* fun3.c */
+  { "ARRAY",	1, MAX_DIMS + 1, lux_array, 0 }, /* symbols.c */
+  { "ASIN",	1, 1, lux_asin, "*" }, /* fun1.c */
+  { "ASINH",	1, 1, lux_asinh, "*" }, /* fun1.c */
+  { "ASSOC",	2, 3, lux_assoc, "::OFFSET" }, /* symbols.c */
+  { "ASTORE",	2, MAX_ARG, lux_astore_f, 0 }, /* files.c */
+  { "ASTRF",	1, 2, lux_astrf, "1FROMEQUATORIAL:2FROMECLIPTICAL:4FROMGALACTIC:8TOEQUATORIAL:16TOECLIPTICAL:32TOGALACTIC:64JULIAN:128BESSELIAN" }, /* astron.c */
+  { "ASTRON",	2, 7, lux_astropos, /* astron.c */ ":::OBSERVER:EQUINOX:ELEMENTS:TOLERANCE:1ECLIPTICAL:2EQUATORIAL:3HORIZONTAL:4ELONGATION:8XYZ:16LIGHTTIME:32DATE:64TDT:256ABERRATION:512NUTATION:2832APPARENT:1024QELEMENTS:2048FK5:8192CONJSPREAD:16384PLANETOCENTRIC:32768KEEPDIMENSIONS:65536VOCAL:~131072VSOP87A:131072VSOP87C:262144BARE" },
+  { "ATAN",	1, 1, lux_atan, "*" }, /* fun1.c */
+  { "ATAN2",	2, 2, lux_atan2, "*" }, /* fun1.c */
+  { "ATANH",	1, 1, lux_atanh, "*" }, /* fun1.c */
+  { "ATOL",	1, 2, lux_strtol, 0 }, /* fun3.c */
+  { "BASIN",	1, 2, lux_basin2, /* strous.c */ "*1NUMBER:2SINK:4DIFFERENCE" },
 #if DEVELOP
-  { "BESSEL_I0",  1, 1, ana_bessel_i0, "*1DEFLATE" }, /* fun1.c */
-  { "BESSEL_I1",  1, 1, ana_bessel_i1, "*" }, /* fun1.c */
+  { "BESSEL_I0",  1, 1, lux_bessel_i0, "*1DEFLATE" }, /* fun1.c */
+  { "BESSEL_I1",  1, 1, lux_bessel_i1, "*" }, /* fun1.c */
 #endif
-  { "BESSEL_J0", 1, 1, ana_j0, "*" }, /* fun1.c */
-  { "BESSEL_J1", 1, 1, ana_j1, "*" }, /* fun1.c */
-  { "BESSEL_JN", 2, 2, ana_jn, "*" }, /* fun1.c */
+  { "BESSEL_J0", 1, 1, lux_j0, "*" }, /* fun1.c */
+  { "BESSEL_J1", 1, 1, lux_j1, "*" }, /* fun1.c */
+  { "BESSEL_JN", 2, 2, lux_jn, "*" }, /* fun1.c */
 #if DEVELOP
-  { "BESSEL_K0", 1, 1, ana_bessel_k0, "*" }, /* fun1.c */
-  { "BESSEL_K1", 1, 1, ana_bessel_k1, "*" }, /* fun1.c */
-  { "BESSEL_KN", 2, 2, ana_bessel_kn, "*" }, /* fun1.c */
+  { "BESSEL_K0", 1, 1, lux_bessel_k0, "*" }, /* fun1.c */
+  { "BESSEL_K1", 1, 1, lux_bessel_k1, "*" }, /* fun1.c */
+  { "BESSEL_KN", 2, 2, lux_bessel_kn, "*" }, /* fun1.c */
 #endif
-  { "BESSEL_Y0", 1, 1, ana_y0, "*" }, /* fun1.c */
-  { "BESSEL_Y1", 1, 1, ana_y1, "*" }, /* fun1.c */
-  { "BESSEL_YN", 2, 2, ana_yn, "*" }, /* fun1.c */
-  { "BETA",	2, 2, ana_beta, "*1LOG" }, /* fun1.c */
+  { "BESSEL_Y0", 1, 1, lux_y0, "*" }, /* fun1.c */
+  { "BESSEL_Y1", 1, 1, lux_y1, "*" }, /* fun1.c */
+  { "BESSEL_YN", 2, 2, lux_yn, "*" }, /* fun1.c */
+  { "BETA",	2, 2, lux_beta, "*1LOG" }, /* fun1.c */
 #if DEVELOP
-  { "BI0",	1, 1, ana_bessel_i0, "*1DEFLATE" }, /* fun1.c */
-  { "BI1",	1, 1, ana_bessel_i1, "*" }, /* fun1.c */
-  { "BIGGER235", 1, 1, ana_bigger235, "*" }, /* fun4.c */
+  { "BI0",	1, 1, lux_bessel_i0, "*1DEFLATE" }, /* fun1.c */
+  { "BI1",	1, 1, lux_bessel_i1, "*" }, /* fun1.c */
+  { "BIGGER235", 1, 1, lux_bigger235, "*" }, /* fun4.c */
 #endif
-  { "BISECT",	2, 6, ana_bisect, ":::AXIS:POS:WIDTH" }, /* strous3.c */
-  { "BJ0",	1, 1, ana_j0, "*" }, /* fun1.c */
-  { "BJ1",	1, 1, ana_j1, "*" }, /* fun1.c */
-  { "BJN",	2, 2, ana_jn, "*" }, /* fun1.c */
+  { "BISECT",	2, 6, lux_bisect, ":::AXIS:POS:WIDTH" }, /* strous3.c */
+  { "BJ0",	1, 1, lux_j0, "*" }, /* fun1.c */
+  { "BJ1",	1, 1, lux_j1, "*" }, /* fun1.c */
+  { "BJN",	2, 2, lux_jn, "*" }, /* fun1.c */
 #if DEVELOP
-  { "BK0",	1, 1, ana_bessel_k0, "*" }, /* fun1.c */
-  { "BK1",	1, 1, ana_bessel_k1, "*" }, /* fun1.c */
-  { "BKN",	2, 2, ana_bessel_kn, "*" }, /* fun1.c */
+  { "BK0",	1, 1, lux_bessel_k0, "*" }, /* fun1.c */
+  { "BK1",	1, 1, lux_bessel_k1, "*" }, /* fun1.c */
+  { "BKN",	2, 2, lux_bessel_kn, "*" }, /* fun1.c */
 #endif
-  { "BMAP",	1, 1, ana_bmap, "*" }, /* subsc.c */
+  { "BMAP",	1, 1, lux_bmap, "*" }, /* subsc.c */
 #if DEVELOP
-  { "BSMOOTH",	1, 3, ana_bsmooth, 0 }, /* strous.c */
+  { "BSMOOTH",	1, 3, lux_bsmooth, 0 }, /* strous.c */
 #endif
-  { "BY0",	1, 1, ana_y0, "*" }, /* fun1.c */
-  { "BY1",	1, 1, ana_y1, "*" }, /* fun1.c */
-  { "BYN",	2, 2, ana_yn, "*" }, /* fun1.c */
+  { "BY0",	1, 1, lux_y0, "*" }, /* fun1.c */
+  { "BY1",	1, 1, lux_y1, "*" }, /* fun1.c */
+  { "BYN",	2, 2, lux_yn, "*" }, /* fun1.c */
   { "BYTARR",	1, MAX_DIMS, bytarr, 0 }, /* symbols.c */
-  { "BYTE",	1, 1, ana_byte, "*" }, /* symbols.c */
+  { "BYTE",	1, 1, lux_byte, "*" }, /* symbols.c */
   { "BYTFARR",	3, MAX_DIMS + 1, bytfarr, "%1%OFFSET:1READONLY:2SWAP" }, /* filemap.c */
-  { "CALENDAR",	1, 1, ana_calendar, /* astron.c */ "1FROMCOMMON:2FROMGREGORIAN:3FROMISLAMIC:4FROMJULIAN:5FROMHEBREW:6FROMEGYPTIAN:7FROMJD:8FROMCJD:9FROMLUNAR:10FROMMAYAN:11FROMLONGCOUNT:12FROMLATIN:16TOCOMMON:32TOGREGORIAN:48TOISLAMIC:64TOJULIAN:80TOHEBREW:96TOEGYPTIAN:112TOJD:128TOCJD:144TOLUNAR:160TOMAYAN:176TOLONGCOUNT:192TOLATIN:0TONUMERIC:256TOLONG:512TODOUBLE:768TOTEXT:0FROMUTC:1024FROMTAI:2048FROMTT:3072FROMLT:0TOUTC:4096TOTAI:8192TOTT:12288TOLT:0FROMYMD:16384FROMDMY:0TOYMD:32768TODMY" },
-  { "CBRT",	1, 1, ana_cbrt, "*" }, /* fun1.c */
+  { "CALENDAR",	1, 1, lux_calendar, /* astron.c */ "1FROMCOMMON:2FROMGREGORIAN:3FROMISLAMIC:4FROMJULIAN:5FROMHEBREW:6FROMEGYPTIAN:7FROMJD:8FROMCJD:9FROMLUNAR:10FROMMAYAN:11FROMLONGCOUNT:12FROMLATIN:16TOCOMMON:32TOGREGORIAN:48TOISLAMIC:64TOJULIAN:80TOHEBREW:96TOEGYPTIAN:112TOJD:128TOCJD:144TOLUNAR:160TOMAYAN:176TOLONGCOUNT:192TOLATIN:0TONUMERIC:256TOLONG:512TODOUBLE:768TOTEXT:0FROMUTC:1024FROMTAI:2048FROMTT:3072FROMLT:0TOUTC:4096TOTAI:8192TOTT:12288TOLT:0FROMYMD:16384FROMDMY:0TOYMD:32768TODMY" },
+  { "CBRT",	1, 1, lux_cbrt, "*" }, /* fun1.c */
   { "CDBLARR",	1, MAX_ARG, cdblarr, 0 }, /* symbols.c */
   { "CDBLFARR", 3, MAX_DIMS + 1, cdblfarr, "%1%OFFSET:1READONLY:2SWAP" }, /* filemap.c */
-  { "CDMAP",	1, 1, ana_cdmap, 0 }, /* subsc.c */
-  { "CDOUBLE",	1, 1, ana_cdouble, "*" }, /* fun1.c */
-  { "CEIL",	1, 1, ana_ceil, "*" }, /* symbols.c */
-  { "CFLOAT",	1, 1, ana_cfloat, "*" }, /* fun1.c */
+  { "CDMAP",	1, 1, lux_cdmap, 0 }, /* subsc.c */
+  { "CDOUBLE",	1, 1, lux_cdouble, "*" }, /* fun1.c */
+  { "CEIL",	1, 1, lux_ceil, "*" }, /* symbols.c */
+  { "CFLOAT",	1, 1, lux_cfloat, "*" }, /* fun1.c */
   { "CFLTARR",	1, MAX_ARG, cfltarr, 0 }, /* symbols.c */
   { "CFLTFARR", 3, MAX_DIMS + 1, cfltfarr, "%1%OFFSET:1READONLY:2SWAP" }, /* filemap.c */
-  { "CFMAP",	1, 1, ana_cfmap, 0 }, /* subsc.c */
+  { "CFMAP",	1, 1, lux_cfmap, 0 }, /* subsc.c */
 #if HAVE_LIBX11
-  { "CHECKMENU", 0, 1, ana_check_menu, 0 }, /* menu.c */
-  { "CHECKWINDOW", 0, 1, ana_check_window, 0 }, /* xport.c */
+  { "CHECKMENU", 0, 1, lux_check_menu, 0 }, /* menu.c */
+  { "CHECKWINDOW", 0, 1, lux_check_window, 0 }, /* xport.c */
 #endif
-  { "CHI2",	2, 2, ana_chi_square, "*1COMPLEMENT:2LOG" }, /* fun1.c */
-  { "CLASSNAME", 1, 1, ana_classname, 0 }, /* install.c */
+  { "CHI2",	2, 2, lux_chi_square, "*1COMPLEMENT:2LOG" }, /* fun1.c */
+  { "CLASSNAME", 1, 1, lux_classname, 0 }, /* install.c */
 #if HAVE_LIBX11
-  { "COLORPIXEL", 1, 1, ana_colorpixel, "*" }, /* xport.c */
+  { "COLORPIXEL", 1, 1, lux_colorpixel, "*" }, /* xport.c */
 #endif
 #if DEVELOP
-  { "COMPILE",	1, 1, ana_compile, 0 }, /* install.c */
+  { "COMPILE",	1, 1, lux_compile, 0 }, /* install.c */
 #endif
-  { "COMPLEX",	1, 1, ana_complex, 0 },	/* fun3.c */
-  { "COMPLEXSQUARE", 1, 1, ana_complexsquare, 0 }, /* fun1.c */
-  { "COMPRESS",	2, 3, ana_compress, 0 }, /* fun4.c */
-  { "CONCAT",	1, MAX_ARG, ana_concat, "1SLOPPY" }, /* subsc.c */
-  { "CONJUGATE", 1, 1, ana_conjugate, "*" }, /* fun1.c */
-  { "CONSTELLATION", 1, 2, ana_constellation, "1JULIAN:2BESSELIAN:4VOCAL" }, /* astron.c */
-  { "CONSTELLATIONNAME", 1, 1, ana_constellationname, 0 }, /* astron.c */
-  { "CONVERT",	2, 2, ana_convertsym, "*" }, /* symbols.c */
-  { "COS",	1, 1, ana_cos, "*" }, /* fun1.c */
-  { "COSH",	1, 1, ana_cosh, "*" }, /* fun1.c */
-  { "COVARIANCE", 2, 4, ana_covariance,
+  { "COMPLEX",	1, 1, lux_complex, 0 },	/* fun3.c */
+  { "COMPLEXSQUARE", 1, 1, lux_complexsquare, 0 }, /* fun1.c */
+  { "COMPRESS",	2, 3, lux_compress, 0 }, /* fun4.c */
+  { "CONCAT",	1, MAX_ARG, lux_concat, "1SLOPPY" }, /* subsc.c */
+  { "CONJUGATE", 1, 1, lux_conjugate, "*" }, /* fun1.c */
+  { "CONSTELLATION", 1, 2, lux_constellation, "1JULIAN:2BESSELIAN:4VOCAL" }, /* astron.c */
+  { "CONSTELLATIONNAME", 1, 1, lux_constellationname, 0 }, /* astron.c */
+  { "CONVERT",	2, 2, lux_convertsym, "*" }, /* symbols.c */
+  { "COS",	1, 1, lux_cos, "*" }, /* fun1.c */
+  { "COSH",	1, 1, lux_cosh, "*" }, /* fun1.c */
+  { "COVARIANCE", 2, 4, lux_covariance,
     ":::WEIGHTS:*0SAMPLE:1POPULATION:2KEEPDIMS:4DOUBLE" }, /* fun2.c */
-  { "CROSSCORR", 2, 3, ana_crosscorr, 0 }, /* fun2.c */
-  { "CRUNCH",	3, 3, ana_crunch_f, 0 }, /* crunch.c */
-  { "CSPLINE",	0, 5, ana_cubic_spline, /* fun3.c */ "1KEEP:2PERIODIC:4AKIMA:8GETDERIVATIVE" },
-  { "CSPLINE_FIND", 2, 4, ana_cspline_find, ":::AXIS:INDEX" }, /* strous3.c */
-  { "CTOP",	1, 3, ana_cartesian_to_polar, 0 }, /* fun4.c */
-  { "DATE_FROM_TAI", 1, 2, ana_date_from_tai, 0 }, /* ephem.c */
+  { "CROSSCORR", 2, 3, lux_crosscorr, 0 }, /* fun2.c */
+  { "CRUNCH",	3, 3, lux_crunch_f, 0 }, /* crunch.c */
+  { "CSPLINE",	0, 5, lux_cubic_spline, /* fun3.c */ "1KEEP:2PERIODIC:4AKIMA:8GETDERIVATIVE" },
+  { "CSPLINE_FIND", 2, 4, lux_cspline_find, ":::AXIS:INDEX" }, /* strous3.c */
+  { "CTOP",	1, 3, lux_cartesian_to_polar, 0 }, /* fun4.c */
+  { "DATE_FROM_TAI", 1, 2, lux_date_from_tai, 0 }, /* ephem.c */
   { "DBLARR",	1, MAX_DIMS, dblarr, 0 }, /* symbols.c */
   { "DBLFARR",	3, MAX_DIMS + 1, dblfarr, /* filemap.c */ "%1%OFFSET:1READONLY:2SWAP" },
-  { "DEFINED",	1, 1, ana_defined, "+1TARGET" }, /* fun1.c */
-  { "DESPIKE",  1, 6, ana_despike, ":FRAC:LEVEL:NITER:SPIKES:RMS" }, /* fun6.c */
-  { "DETREND",	1, 2, ana_detrend, "*" }, /* fun2.c */
-  { "DIFFER",	1, 3, ana_differ, "*1CENTRAL:2CIRCULAR" }, /* strous.c */
-  { "DILATE",	1, 1, ana_dilate, 0 }, /* fun5.c */
-  { "DIMEN",	1, 2, ana_dimen, 0 }, /* subsc.c */
-  { "DISTARR",	1, 3, ana_distarr, 0 }, /* strous2.c */
-  { "DISTR",	2, 2, ana_distr_f, /* strous.c */ "2IGNORELIMIT:4INCREASELIMIT" },
-  { "DMAP",	1, 1, ana_dmap, 0 }, /* subsc.c */
-  { "DOUB",	1, 1, ana_double, "*" }, /* symbols.c */
-  { "DOUBLE",	1, 1, ana_double, "*" }, /* symbols.c */
-  { "DSMOOTH",	3, 3, ana_dir_smooth, "0TWOSIDED:0BOXCAR:1ONESIDED:2GAUSSIAN:4TOTAL:8STRAIGHT" }, /* strous3.c */
-  { "DSUM",	1, 4, ana_total, "|1|::POWER:WEIGHTS:2KEEPDIMS" }, /* fun1.c */
-  { "EASTERDATE", 1, 1, ana_EasterDate, 0 }, /* astron.c */
-  { "ENHANCEIMAGE", 1, 3, ana_enhanceimage, ":PART:TARGET:1SYMMETRIC" }, /* strous3.c */
-  { "EQUIVALENCE", 2, 2, ana_equivalence, 0 }, /* strous2.c */
-  { "ERF",	1, 1, ana_erf, "*" }, /* fun1.c */
-  { "ERFC",	1, 1, ana_erfc, "*" }, /* fun1.c */
-  { "ERODE",	1, 1, ana_erode, "1ZEROEDGE" }, /* fun5.c */
-  { "ESEGMENT",	1, 4, ana_extreme_general, /* topology.c */ ":SIGN:DIAGONAL:THRESHOLD" },
-  { "ESMOOTH",	1, 3, ana_esmooth, 0 }, /* fun2.c */
-  { "EVAL",	1, 2, ana_eval, "1ALLNUMBER" }, /* fun3.c */
+  { "DEFINED",	1, 1, lux_defined, "+1TARGET" }, /* fun1.c */
+  { "DESPIKE",  1, 6, lux_despike, ":FRAC:LEVEL:NITER:SPIKES:RMS" }, /* fun6.c */
+  { "DETREND",	1, 2, lux_detrend, "*" }, /* fun2.c */
+  { "DIFFER",	1, 3, lux_differ, "*1CENTRAL:2CIRCULAR" }, /* strous.c */
+  { "DILATE",	1, 1, lux_dilate, 0 }, /* fun5.c */
+  { "DIMEN",	1, 2, lux_dimen, 0 }, /* subsc.c */
+  { "DISTARR",	1, 3, lux_distarr, 0 }, /* strous2.c */
+  { "DISTR",	2, 2, lux_distr_f, /* strous.c */ "2IGNORELIMIT:4INCREASELIMIT" },
+  { "DMAP",	1, 1, lux_dmap, 0 }, /* subsc.c */
+  { "DOUB",	1, 1, lux_double, "*" }, /* symbols.c */
+  { "DOUBLE",	1, 1, lux_double, "*" }, /* symbols.c */
+  { "DSMOOTH",	3, 3, lux_dir_smooth, "0TWOSIDED:0BOXCAR:1ONESIDED:2GAUSSIAN:4TOTAL:8STRAIGHT" }, /* strous3.c */
+  { "DSUM",	1, 4, lux_total, "|1|::POWER:WEIGHTS:2KEEPDIMS" }, /* fun1.c */
+  { "EASTERDATE", 1, 1, lux_EasterDate, 0 }, /* astron.c */
+  { "ENHANCEIMAGE", 1, 3, lux_enhanceimage, ":PART:TARGET:1SYMMETRIC" }, /* strous3.c */
+  { "EQUIVALENCE", 2, 2, lux_equivalence, 0 }, /* strous2.c */
+  { "ERF",	1, 1, lux_erf, "*" }, /* fun1.c */
+  { "ERFC",	1, 1, lux_erfc, "*" }, /* fun1.c */
+  { "ERODE",	1, 1, lux_erode, "1ZEROEDGE" }, /* fun5.c */
+  { "ESEGMENT",	1, 4, lux_extreme_general, /* topology.c */ ":SIGN:DIAGONAL:THRESHOLD" },
+  { "ESMOOTH",	1, 3, lux_esmooth, 0 }, /* fun2.c */
+  { "EVAL",	1, 2, lux_eval, "1ALLNUMBER" }, /* fun3.c */
 #if HAVE_LIBX11
-  { "EVENTNAME", 0, 1, ana_event_name, 0 }, /* menu.c */
+  { "EVENTNAME", 0, 1, lux_event_name, 0 }, /* menu.c */
 #endif
-  { "EXP",	1, 1, ana_exp, "*" }, /* fun1.c */
-  { "EXPAND",	2, 4, ana_expand, "1SMOOTH:2NEAREST" }, /* fun4.c */
-  { "EXPM1",	1, 1, ana_expm1, "*" }, /* fun1.c */
-  { "EXTRACT_BITS", 3, 3, ana_extract_bits_f, 0 }, /* fun3.c */
-  { "FCRUNWRITE", 2, 3, ana_fcrunwrite_f, 0 }, /* files.c */
-  { "FCRW",	2, 3, ana_fcrunwrite_f, 0 }, /* files.c */
-  { "FCW",	2, 3, ana_fcwrite_f, "1RUNLENGTH" }, /* files.c */
-  { "FCWRITE",	2, 3, ana_fcwrite_f, "1RUNLENGTH" }, /* files.c */
-  { "FFTSHIFT",	2, 2, ana_fftshift_f, 0 }, /* fun3.c */
-  { "FILEPTR",	1, 2, ana_fileptr_f, "1START:2EOF:4ADVANCE" }, /* files.c */
-  { "FILESIZE",	1, 1, ana_filesize, 0 }, /* files.c */
-  { "FILETYPE",	1, 1, ana_identify_file, 0 }, /* files.c */
-  { "FILETYPENAME", 1, 1, ana_filetype_name, 0 }, /* install.c */
-  { "FIND",	2, 4, ana_find,	/* strous.c */ "0EXACT:1INDEX_GE:2VALUE_GE:4FIRST" },
-  { "FIND2",    2, 2, ana_find2, "0EXACT" },    /* strous.c */
-  { "FINDFILE",	2, 2, ana_findfile, 0 }, /* files.c */
-  { "FIND_MAX",	1, 3, ana_find_max, /* strous2.c */ "::DIAGONAL:1DEGREE:2SUBGRID" },
-  { "FIND_MAXLOC", 1, 3, ana_find_maxloc, /* strous2.c */ "::DIAGONAL:1DEGREE:2SUBGRID:4COORDS:8OLD" },
-  { "FIND_MIN",	1, 3, ana_find_min, /* strous2.c */ "::DIAGONAL:1DEGREE:2SUBGRID" },
-  { "FIND_MINLOC", 1, 3, ana_find_minloc, /* strous2.c */ "::DIAGONAL:1DEGREE:2SUBGRID:4COORDS" },
-  { "FIT",	3, 17, ana_generalfit, /* fit.c */ "|4|::START:STEP:LOWBOUND:HIGHBOUND:WEIGHTS:QTHRESH:PTHRESH:ITHRESH:DTHRESH:FAC:NITER:NSAME:ERR:FIT:TTHRESH:1VOCAL:4DOWN:8PCHI:16GAUSSIANS:32POWERFUNC:64ONEBYONE:129VERR" },
+  { "EXP",	1, 1, lux_exp, "*" }, /* fun1.c */
+  { "EXPAND",	2, 4, lux_expand, "1SMOOTH:2NEAREST" }, /* fun4.c */
+  { "EXPM1",	1, 1, lux_expm1, "*" }, /* fun1.c */
+  { "EXTRACT_BITS", 3, 3, lux_extract_bits_f, 0 }, /* fun3.c */
+  { "FCRUNWRITE", 2, 3, lux_fcrunwrite_f, 0 }, /* files.c */
+  { "FCRW",	2, 3, lux_fcrunwrite_f, 0 }, /* files.c */
+  { "FCW",	2, 3, lux_fcwrite_f, "1RUNLENGTH" }, /* files.c */
+  { "FCWRITE",	2, 3, lux_fcwrite_f, "1RUNLENGTH" }, /* files.c */
+  { "FFTSHIFT",	2, 2, lux_fftshift_f, 0 }, /* fun3.c */
+  { "FILEPTR",	1, 2, lux_fileptr_f, "1START:2EOF:4ADVANCE" }, /* files.c */
+  { "FILESIZE",	1, 1, lux_filesize, 0 }, /* files.c */
+  { "FILETYPE",	1, 1, lux_identify_file, 0 }, /* files.c */
+  { "FILETYPENAME", 1, 1, lux_filetype_name, 0 }, /* install.c */
+  { "FIND",	2, 4, lux_find,	/* strous.c */ "0EXACT:1INDEX_GE:2VALUE_GE:4FIRST" },
+  { "FIND2",    2, 2, lux_find2, "0EXACT" },    /* strous.c */
+  { "FINDFILE",	2, 2, lux_findfile, 0 }, /* files.c */
+  { "FIND_MAX",	1, 3, lux_find_max, /* strous2.c */ "::DIAGONAL:1DEGREE:2SUBGRID" },
+  { "FIND_MAXLOC", 1, 3, lux_find_maxloc, /* strous2.c */ "::DIAGONAL:1DEGREE:2SUBGRID:4COORDS:8OLD" },
+  { "FIND_MIN",	1, 3, lux_find_min, /* strous2.c */ "::DIAGONAL:1DEGREE:2SUBGRID" },
+  { "FIND_MINLOC", 1, 3, lux_find_minloc, /* strous2.c */ "::DIAGONAL:1DEGREE:2SUBGRID:4COORDS" },
+  { "FIT",	3, 17, lux_generalfit, /* fit.c */ "|4|::START:STEP:LOWBOUND:HIGHBOUND:WEIGHTS:QTHRESH:PTHRESH:ITHRESH:DTHRESH:FAC:NITER:NSAME:ERR:FIT:TTHRESH:1VOCAL:4DOWN:8PCHI:16GAUSSIANS:32POWERFUNC:64ONEBYONE:129VERR" },
 #if DEVELOP
-  { "FIT2",	4, 11, ana_geneticfit, "X:Y:NPAR:FIT:WEIGHTS:MU:GENERATIONS:POPULATION:PCROSS:PMUTATE:VOCAL:1ELITE:2BYTE:4WORD:6LONG:8FLOAT:10DOUBLE" }, /* fit.c */
+  { "FIT2",	4, 11, lux_geneticfit, "X:Y:NPAR:FIT:WEIGHTS:MU:GENERATIONS:POPULATION:PCROSS:PMUTATE:VOCAL:1ELITE:2BYTE:4WORD:6LONG:8FLOAT:10DOUBLE" }, /* fit.c */
 #endif
-  { "FITS_HEADER", 1, 4, ana_fits_header_f, 0 }, /* files.c */
-  { "FITS_KEY",	2, 2, ana_fitskey, "1COMMENT" }, /* strous3.c */
-  { "FITS_READ", 2, 7, ana_fits_read_f, "|1|1TRANSLATE:2RAWVALUES::::::BLANK" }, /* files.c */
-  { "FITS_XREAD", 2, 6, ana_fits_xread_f, 0 }, /* files.c */
-  { "FIX",	1, 1, ana_long, "*" }, /* symbols.c */
-  { "FLOAT",	1, 1, ana_float, "*" }, /* symbols.c */
-  { "FLOOR",	1, 1, ana_floor, "*" }, /* symbols.c */
+  { "FITS_HEADER", 1, 4, lux_fits_header_f, 0 }, /* files.c */
+  { "FITS_KEY",	2, 2, lux_fitskey, "1COMMENT" }, /* strous3.c */
+  { "FITS_READ", 2, 7, lux_fits_read_f, "|1|1TRANSLATE:2RAWVALUES::::::BLANK" }, /* files.c */
+  { "FITS_XREAD", 2, 6, lux_fits_xread_f, 0 }, /* files.c */
+  { "FIX",	1, 1, lux_long, "*" }, /* symbols.c */
+  { "FLOAT",	1, 1, lux_float, "*" }, /* symbols.c */
+  { "FLOOR",	1, 1, lux_floor, "*" }, /* symbols.c */
   { "FLTARR",	1, MAX_DIMS, fltarr, 0 }, /* symbols.c */
   { "FLTFARR",	3, MAX_DIMS + 1, fltfarr, /* filemap.c */ "%1%OFFSET:1READONLY:2SWAP" },
-  { "FMAP",	1, 1, ana_fmap, 0 }, /* subsc.c */
-  { "FRATIO",	3, 3, ana_f_ratio, "*1COMPLEMENT:2LOG" }, /* fun1.c */
-  { "FREADF",	2, MAX_ARG, ana_freadf_f, "|1|1EOF" }, /* files.c */
-  { "FREADS",	3, MAX_ARG, ana_freads_f, "1COUNTSPACES" }, /* files.c */
-  { "FSTRING",	1, MAX_ARG, ana_fstring, "1SKIP_UNDEFINED" }, /* fun2.c */
-  { "FSUM",	1, 4, ana_total, "::POWER:WEIGHTS:1DOUBLE:2KEEPDIMS" }, /* fun1.c */
-  { "FZARR",	1, 1, ana_fzarr, "1READONLY" }, /* filemap.c */
-  { "FZH",	1, 2, ana_fzhead_f, 0 }, /* files.c */
-  { "FZHEAD",	1, 2, ana_fzhead_f, 0 }, /* files.c */
-  { "FZR",	2, 3, ana_fzread_f, "|1|1PRINTHEADER" }, /* files.c */
-  { "FZREAD",	2, 3, ana_fzread_f, "|1|1PRINTHEADER" }, /* files.c */
-  { "FZW",	2, 3, ana_fzwrite_f, 0 }, /* files.c */
-  { "FZWRITE",	2, 3, ana_fzwrite_f, 0 }, /* files.c */
-  { "GAMMA",	1, 1, ana_gamma, "*1LOG" }, /* fun1.c */
+  { "FMAP",	1, 1, lux_fmap, 0 }, /* subsc.c */
+  { "FRATIO",	3, 3, lux_f_ratio, "*1COMPLEMENT:2LOG" }, /* fun1.c */
+  { "FREADF",	2, MAX_ARG, lux_freadf_f, "|1|1EOF" }, /* files.c */
+  { "FREADS",	3, MAX_ARG, lux_freads_f, "1COUNTSPACES" }, /* files.c */
+  { "FSTRING",	1, MAX_ARG, lux_fstring, "1SKIP_UNDEFINED" }, /* fun2.c */
+  { "FSUM",	1, 4, lux_total, "::POWER:WEIGHTS:1DOUBLE:2KEEPDIMS" }, /* fun1.c */
+  { "FZARR",	1, 1, lux_fzarr, "1READONLY" }, /* filemap.c */
+  { "FZH",	1, 2, lux_fzhead_f, 0 }, /* files.c */
+  { "FZHEAD",	1, 2, lux_fzhead_f, 0 }, /* files.c */
+  { "FZR",	2, 3, lux_fzread_f, "|1|1PRINTHEADER" }, /* files.c */
+  { "FZREAD",	2, 3, lux_fzread_f, "|1|1PRINTHEADER" }, /* files.c */
+  { "FZW",	2, 3, lux_fzwrite_f, 0 }, /* files.c */
+  { "FZWRITE",	2, 3, lux_fzwrite_f, 0 }, /* files.c */
+  { "GAMMA",	1, 1, lux_gamma, "*1LOG" }, /* fun1.c */
 #if HAVE_REGEX_H
-  { "GETDIRECTORIES", 1, 2, ana_getdirectories, 0 }, /* files.c */
-  { "GETDIRECTS", 1, 2, ana_getdirectories, 0 }, /* files.c */
+  { "GETDIRECTORIES", 1, 2, lux_getdirectories, 0 }, /* files.c */
+  { "GETDIRECTS", 1, 2, lux_getdirectories, 0 }, /* files.c */
 #endif
-  { "GETENV",	1, 1, ana_getenv, 0 }, /* files.c */
+  { "GETENV",	1, 1, lux_getenv, 0 }, /* files.c */
 #if HAVE_REGEX_H
-  { "GETFILES", 1, 2, ana_getfiles, 0 }, /* files.c */
-  { "GETFILES_R", 1, 2, ana_getfiles_r, 0 }, /* files.c */
-  { "GETMATCHEDFILES", 2, 3, ana_getmatchedfiles, 0 }, /* files.c */
-  { "GETMATCHEDFILES_R", 2, 3, ana_getmatchedfiles_r, 0 }, /* files.c */
+  { "GETFILES", 1, 2, lux_getfiles, 0 }, /* files.c */
+  { "GETFILES_R", 1, 2, lux_getfiles_r, 0 }, /* files.c */
+  { "GETMATCHEDFILES", 2, 3, lux_getmatchedfiles, 0 }, /* files.c */
+  { "GETMATCHEDFILES_R", 2, 3, lux_getmatchedfiles_r, 0 }, /* files.c */
 #endif
-  { "GET_LUN",	0, 0, ana_get_lun, 0 }, /* files.c */
-  { "GIFREAD",	2, 3, ana_gifread_f, 0 }, /* gifread_ana.c */
-  { "GIFWRITE",	2, 3, ana_gifwrite_f, 0 }, /* gifwrite_ana.c */
-  { "GRIDMATCH", 7, 8, ana_gridmatch, "1VOCAL" }, /* fun4.c */
-  { "GSMOOTH",	1, 4, ana_gsmooth, /* fun2.c */
+  { "GET_LUN",	0, 0, lux_get_lun, 0 }, /* files.c */
+  { "GIFREAD",	2, 3, lux_gifread_f, 0 }, /* gifread_ana.c */
+  { "GIFWRITE",	2, 3, lux_gifwrite_f, 0 }, /* gifwrite_ana.c */
+  { "GRIDMATCH", 7, 8, lux_gridmatch, "1VOCAL" }, /* fun4.c */
+  { "GSMOOTH",	1, 4, lux_gsmooth, /* fun2.c */
     ":::KERNEL:1NORMALIZE:2FULLNORM:4BALANCED:8ALL" },
-  { "HAMMING",  1, 2, ana_hamming, 0 }, /* strous3.c */
-  { "HIST",	1, 2, ana_hist, /* fun3.c */
+  { "HAMMING",  1, 2, lux_hamming, 0 }, /* strous3.c */
+  { "HIST",	1, 2, lux_hist, /* fun3.c */
     "1FIRST:2IGNORELIMIT:4INCREASELIMIT:8SILENT" },
-  { "HISTR",	1, 1, ana_histr, /* fun3.c */
+  { "HISTR",	1, 1, lux_histr, /* fun3.c */
     "1FIRST:2IGNORELIMIT:4INCREASELIMIT:8SILENT" },
-  { "IBETA",	3, 3, ana_incomplete_beta, "*1COMPLEMENT:2LOG" }, /* fun1.c */
-  { "IDLREAD",	2, 2, ana_idlread_f, 0 }, /* strous3.c */
-  { "IGAMMA",	2, 2, ana_incomplete_gamma, "*1COMPLEMENT:2LOG" }, /* fun1.c */
-  { "IMAGINARY", 1, 1, ana_imaginary, 0 }, /* fun3.c */
-  { "INDEX",	1, 1, ana_index, "*1AXIS:2RANK" }, /* fun4.c */
-  { "INDGEN",	1, 2, ana_indgen, "*" }, /* fun1.c */
-  { "INPOLYGON", 4, 4, ana_inpolygon, 0 }, /* topology.c */
-  { "INT",	1, 1, ana_word, "*" }, /* symbols.c */
+  { "IBETA",	3, 3, lux_incomplete_beta, "*1COMPLEMENT:2LOG" }, /* fun1.c */
+  { "IDLREAD",	2, 2, lux_idlread_f, 0 }, /* strous3.c */
+  { "IGAMMA",	2, 2, lux_incomplete_gamma, "*1COMPLEMENT:2LOG" }, /* fun1.c */
+  { "IMAGINARY", 1, 1, lux_imaginary, 0 }, /* fun3.c */
+  { "INDEX",	1, 1, lux_index, "*1AXIS:2RANK" }, /* fun4.c */
+  { "INDGEN",	1, 2, lux_indgen, "*" }, /* fun1.c */
+  { "INPOLYGON", 4, 4, lux_inpolygon, 0 }, /* topology.c */
+  { "INT",	1, 1, lux_word, "*" }, /* symbols.c */
   { "INTARR",	1, MAX_DIMS, intarr, 0 }, /* symbols.c */
   { "INTFARR",	3, MAX_DIMS + 1, intfarr, /* filemap.c */
     "%1%OFFSET:1READONLY:2SWAP" },
-  { "ISARRAY",	1, 1, ana_isarray, 0 }, /* subsc.c */
-  { "ISNAN",	1, 1, ana_isnan, 0 }, /* fun1.c; needs IEEE isnan! */
-  { "ISSCALAR",	1, 1, ana_isscalar, 0 }, /* subsc.c */
-  { "ISSTRING",	1, 1, ana_isstring, 0 }, /* subsc.c */
-  { "IST",	1, 3, ana_istring, 0 }, /* fun2.c */
-  { "ISTRING",	1, 3, ana_istring, 0 }, /* fun2.c */
+  { "ISARRAY",	1, 1, lux_isarray, 0 }, /* subsc.c */
+  { "ISNAN",	1, 1, lux_isnan, 0 }, /* fun1.c; needs IEEE isnan! */
+  { "ISSCALAR",	1, 1, lux_isscalar, 0 }, /* subsc.c */
+  { "ISSTRING",	1, 1, lux_isstring, 0 }, /* subsc.c */
+  { "IST",	1, 3, lux_istring, 0 }, /* fun2.c */
+  { "ISTRING",	1, 3, lux_istring, 0 }, /* fun2.c */
 #if HAVE_LIBJPEG
-  { "JPEGREAD",	2, 4, ana_read_jpeg6b_f, ":::SHRINK:1GREYSCALE" }, /* jpeg.c */
-  { "JPEGWRITE", 2, 4, ana_write_jpeg6b_f, 0 }, /* jpeg.c */
+  { "JPEGREAD",	2, 4, lux_read_jpeg6b_f, ":::SHRINK:1GREYSCALE" }, /* jpeg.c */
+  { "JPEGWRITE", 2, 4, lux_write_jpeg6b_f, 0 }, /* jpeg.c */
 #endif
-  { "KSMOOTH",	2, 3, ana_ksmooth, "1BALANCED" }, /* fun2.c */
-  { "LAPLACE2D",	1, 1, ana_laplace2d, 0 }, /* poisson.c */
-  { "LEGENDRE", 2, 2, ana_legendre, "1NORMALIZE" }, /* strous3.c */
-  { "LLSQ",	2, 9, ana_lsq2,	/* strous2.c */
+  { "KSMOOTH",	2, 3, lux_ksmooth, "1BALANCED" }, /* fun2.c */
+  { "LAPLACE2D",	1, 1, lux_laplace2d, 0 }, /* poisson.c */
+  { "LEGENDRE", 2, 2, lux_legendre, "1NORMALIZE" }, /* strous3.c */
+  { "LLSQ",	2, 9, lux_lsq2,	/* strous2.c */
     ":::FWHM:WEIGHTS:COV:ERR:CHISQ:1FORMAL:2REDUCE" },
-  { "LMAP",	1, 1, ana_lmap, 0 }, /* subsc.c */
-  { "LOCAL_MAX", 2, 2, ana_local_maxf, /* strous.c */
+  { "LMAP",	1, 1, lux_lmap, 0 }, /* subsc.c */
+  { "LOCAL_MAX", 2, 2, lux_local_maxf, /* strous.c */
     "3SUBGRID:2BOUND" },
-  { "LOCAL_MAXLOC", 2, 2, ana_local_maxloc, /* strous.c */
+  { "LOCAL_MAXLOC", 2, 2, lux_local_maxloc, /* strous.c */
     "3SUBGRID:2BOUND:4RELATIVE" },
-  { "LOCAL_MIN", 2, 2, ana_local_minf, /* strous.c */
+  { "LOCAL_MIN", 2, 2, lux_local_minf, /* strous.c */
     "3SUBGRID:2BOUND" },
-  { "LOCAL_MINLOC", 2, 2, ana_local_minloc, /* strous.c */
+  { "LOCAL_MINLOC", 2, 2, lux_local_minloc, /* strous.c */
     "3SUBGRID:2BOUND:4RELATIVE" },
-  { "LOG",	1, 1, ana_log, "*" }, /* fun1.c */
-  { "LOG10",	1, 1, ana_log10, "*" }, /* fun1.c */
-  { "LOG1P",	1, 1, ana_log1p, "*" }, /* fun1.c */
+  { "LOG",	1, 1, lux_log, "*" }, /* fun1.c */
+  { "LOG10",	1, 1, lux_log10, "*" }, /* fun1.c */
+  { "LOG1P",	1, 1, lux_log1p, "*" }, /* fun1.c */
   { "LONARR",	1, MAX_DIMS, lonarr, 0 }, /* symbols.c */
   { "LONFARR",	3, MAX_DIMS+1, lonfarr, /* filemap.c */
     "%1%OFFSET:1READONLY:2SWAP" },
-  { "LONG",	1, 1, ana_long, "*" }, /* symbols.c */
-  { "LOWCASE",	1, 1, ana_lower, 0 }, /* fun2.c */
-  { "LOWER",	1, 1, ana_lower, 0 }, /* fun2.c */
-  { "LSMOOTH",	3, 3, ana_dir_smooth2, /* strous3.c */
+  { "LONG",	1, 1, lux_long, "*" }, /* symbols.c */
+  { "LOWCASE",	1, 1, lux_lower, 0 }, /* fun2.c */
+  { "LOWER",	1, 1, lux_lower, 0 }, /* fun2.c */
+  { "LSMOOTH",	3, 3, lux_dir_smooth2, /* strous3.c */
     "0TWOSIDED:0BOXCAR:1ONESIDED:2GAUSSIAN:4NORMALIZE:8STRAIGHT" },
-  { "LSQ",	2, 6, ana_lsq,	/* strous2.c */
+  { "LSQ",	2, 6, lux_lsq,	/* strous2.c */
     "::WEIGHTS:COV:ERR:CHISQ:1FORMAL:2REDUCE" },
-  { "MATCH",	2, 2, ana_match, 0 }, /* strous.c */
-  { "MAX",	1, 2, ana_maxf, "1KEEPDIMS" }, /* fun3.c */
-  { "MAXDIR",	2, 3, ana_max_dir, 0 },	/* topology.c */
-  { "MAXFILTER", 1, 3, ana_maxfilter, 0 }, /* strous2.c */
-  { "MAXLOC",	1, 2, ana_maxloc, "1KEEPDIMS" }, /* fun3.c */
-  { "MEAN", 	1, 4, ana_mean, "::POWER:WEIGHTS:1DOUBLE:2KEEPDIMS:4FLOAT" }, /* fun1.c */
-  { "MEDFILTER", 1, 4, ana_medfilter, "%1%" }, /* strous2.c */
-  { "MEDIAN",	1, 3, ana_median, "%1%" }, /* strous2.c */
-  { "MEMORY",	0, 0, ana_memory, 0 }, /* memck.c */
-  { "MIN",	1, 2, ana_minf, "1KEEPDIMS" }, /* fun3.c */
-  { "MINFILTER", 1, 3, ana_minfilter, 0 }, /* strous2.c */
-  { "MINLOC",	1, 2, ana_minloc, "1KEEPDIMS" }, /* fun3.c */
-  { "NCCHI2",	3, 3, ana_noncentral_chi_square, 0 }, /* fun1.c */
-  { "NOT",	1, 1, ana_not, "*" }, /* strous.c */
-  { "NUM_DIM",	1, 1, ana_num_dimen, 0 }, /* subsc.c */
-  { "NUM_ELEM", 1, 2, ana_num_elem, 0 }, /* subsc.c */
-  { "ONE",	1, 1, ana_onef, 0 }, /* fun1.c */
-  { "OPENR",	2, 2, ana_openr_f, "1GET_LUN" }, /* files.c */
-  { "OPENU",	2, 2, ana_openu_f, "1GET_LUN" }, /* files.c */
-  { "OPENW",	2, 2, ana_openw_f, "1GET_LUN" }, /* files.c */
-  /* { "ORBITELEM",	3, 3, ana_orbitalElement, 0, */
-  { "ORDFILTER", 1, 4, ana_orderfilter, /* strous2.c */
+  { "MATCH",	2, 2, lux_match, 0 }, /* strous.c */
+  { "MAX",	1, 2, lux_maxf, "1KEEPDIMS" }, /* fun3.c */
+  { "MAXDIR",	2, 3, lux_max_dir, 0 },	/* topology.c */
+  { "MAXFILTER", 1, 3, lux_maxfilter, 0 }, /* strous2.c */
+  { "MAXLOC",	1, 2, lux_maxloc, "1KEEPDIMS" }, /* fun3.c */
+  { "MEAN", 	1, 4, lux_mean, "::POWER:WEIGHTS:1DOUBLE:2KEEPDIMS:4FLOAT" }, /* fun1.c */
+  { "MEDFILTER", 1, 4, lux_medfilter, "%1%" }, /* strous2.c */
+  { "MEDIAN",	1, 3, lux_median, "%1%" }, /* strous2.c */
+  { "MEMORY",	0, 0, lux_memory, 0 }, /* memck.c */
+  { "MIN",	1, 2, lux_minf, "1KEEPDIMS" }, /* fun3.c */
+  { "MINFILTER", 1, 3, lux_minfilter, 0 }, /* strous2.c */
+  { "MINLOC",	1, 2, lux_minloc, "1KEEPDIMS" }, /* fun3.c */
+  { "NCCHI2",	3, 3, lux_noncentral_chi_square, 0 }, /* fun1.c */
+  { "NOT",	1, 1, lux_not, "*" }, /* strous.c */
+  { "NUM_DIM",	1, 1, lux_num_dimen, 0 }, /* subsc.c */
+  { "NUM_ELEM", 1, 2, lux_num_elem, 0 }, /* subsc.c */
+  { "ONE",	1, 1, lux_onef, 0 }, /* fun1.c */
+  { "OPENR",	2, 2, lux_openr_f, "1GET_LUN" }, /* files.c */
+  { "OPENU",	2, 2, lux_openu_f, "1GET_LUN" }, /* files.c */
+  { "OPENW",	2, 2, lux_openw_f, "1GET_LUN" }, /* files.c */
+  /* { "ORBITELEM",	3, 3, lux_orbitalElement, 0, */
+  { "ORDFILTER", 1, 4, lux_orderfilter, /* strous2.c */
     "%1%ORDER:1MEDIAN:2MINIMUM:3MAXIMUM" },
-  { "PIT",	1, 3, ana_pit, 0 }, /* fun2.c */
-  { "POLATE",	3, 3, ana_table, 0 }, /* strous.c */
-  { "POLY",	2, 2, ana_poly, "*" }, /* fun2.c */
-  { "POWER",	1, 2, ana_power, "1POWER:2SHAPE:4ONEDIM" }, /* fun3.c */
-  { "PRECESS",	3, 3, ana_precess, "1JULIAN:2BESSELIAN" }, /* astron.c */
-  { "PRINTF",	1, MAX_ARG, ana_printf_f, 0 }, /* files.c */
+  { "PIT",	1, 3, lux_pit, 0 }, /* fun2.c */
+  { "POLATE",	3, 3, lux_table, 0 }, /* strous.c */
+  { "POLY",	2, 2, lux_poly, "*" }, /* fun2.c */
+  { "POWER",	1, 2, lux_power, "1POWER:2SHAPE:4ONEDIM" }, /* fun3.c */
+  { "PRECESS",	3, 3, lux_precess, "1JULIAN:2BESSELIAN" }, /* astron.c */
+  { "PRINTF",	1, MAX_ARG, lux_printf_f, 0 }, /* files.c */
 #if DEVELOP
-  { "PROJECT",	1, 1, ana_project, 0 }, /* projection.c */
-  { "PROJECTMAP", 2, 8, ana_projectmap, "::HDIST:ANGLE:MAG:XMAP:YMAP:SIZE" }, /* projection.c */
+  { "PROJECT",	1, 1, lux_project, 0 }, /* projection.c */
+  { "PROJECTMAP", 2, 8, lux_projectmap, "::HDIST:ANGLE:MAG:XMAP:YMAP:SIZE" }, /* projection.c */
 #endif
-  { "PSUM",	2, 4, ana_psum, /* strous2.c */
+  { "PSUM",	2, 4, lux_psum, /* strous2.c */
     "1ONEDIM:2VNORMALIZE:4CNORMALIZE:8SINGLE" },
-  { "PTOC",	1, 5, ana_polar_to_cartesian, 0 }, /* fun4.c */
-  { "QUANTILE",	2, 3, ana_quantile, 0 }, /* strous2.c */
-  { "RANDOM",	1, MAX_DIMS, ana_random, /* random.c */
+  { "PTOC",	1, 5, lux_polar_to_cartesian, 0 }, /* fun4.c */
+  { "QUANTILE",	2, 3, lux_quantile, 0 }, /* strous2.c */
+  { "RANDOM",	1, MAX_DIMS, lux_random, /* random.c */
     "%2%SEED:PERIOD:1UNIFORM:2NORMAL:3SAMPLE:4SHUFFLE:5BITS" },
-  { "RANDOMB",	3, MAX_DIMS, ana_randomb, "%2%SEED:1LONG" }, /* random.c */
-  { "RANDOMD",  3, MAX_DIMS, ana_randomd, "%1%SEED" }, /* random.c */
-  { "RANDOML",	3, MAX_DIMS, ana_randoml, "%2%SEED:1DOUBLE" }, /* random.c */
-  { "RANDOMN",	3, MAX_DIMS, ana_randomn, "%2%SEED" }, /* random.c */
-  { "RANDOMU",	3, MAX_DIMS, ana_randomu, "%2%SEED:PERIOD" }, /* random.c */
-  { "READF",	2, MAX_ARG, ana_readf_f, "1ASKMORE:2WORD" }, /* files.c */
-  { "READU",	2, MAX_ARG, ana_readu_f, 0 }, /* files.c */
+  { "RANDOMB",	3, MAX_DIMS, lux_randomb, "%2%SEED:1LONG" }, /* random.c */
+  { "RANDOMD",  3, MAX_DIMS, lux_randomd, "%1%SEED" }, /* random.c */
+  { "RANDOML",	3, MAX_DIMS, lux_randoml, "%2%SEED:1DOUBLE" }, /* random.c */
+  { "RANDOMN",	3, MAX_DIMS, lux_randomn, "%2%SEED" }, /* random.c */
+  { "RANDOMU",	3, MAX_DIMS, lux_randomu, "%2%SEED:PERIOD" }, /* random.c */
+  { "READF",	2, MAX_ARG, lux_readf_f, "1ASKMORE:2WORD" }, /* files.c */
+  { "READU",	2, MAX_ARG, lux_readu_f, 0 }, /* files.c */
 #if HAVE_LIBJPEG
-  { "READ_JPEG", 2, 4, ana_read_jpeg6b_f, ":::SHRINK:1GREYSCALE" }, /* jpeg.c */
+  { "READ_JPEG", 2, 4, lux_read_jpeg6b_f, ":::SHRINK:1GREYSCALE" }, /* jpeg.c */
 #endif
-  { "REAL",	1, 1, ana_real, 0 }, /* fun3.c */
-  { "REDIM",	2, 9, ana_redim_f, 0 }, /* subsc.c */
+  { "REAL",	1, 1, lux_real, 0 }, /* fun3.c */
+  { "REDIM",	2, 9, lux_redim_f, 0 }, /* subsc.c */
 #if HAVE_REGEX_H
-  { "REGEX",	1, 2, ana_regex, "1CASE" }, /* regex.c */
+  { "REGEX",	1, 2, lux_regex, "1CASE" }, /* regex.c */
 #endif
-  { "REGRID",	5, 5, ana_regrid, 0 }, /* fun4.c */
-  { "REGRID3",	5, 5, ana_regrid3, 0 }, /* fun4.c */
-  { "REGRID3NS", 5, 5, ana_regrid3ns, 0 }, /* fun4.c */
+  { "REGRID",	5, 5, lux_regrid, 0 }, /* fun4.c */
+  { "REGRID3",	5, 5, lux_regrid3, 0 }, /* fun4.c */
+  { "REGRID3NS", 5, 5, lux_regrid3ns, 0 }, /* fun4.c */
 #if DEVELOP
-  { "REGRIDLS", 5, 5, ana_regridls, 0 }, /* fun4.c */
+  { "REGRIDLS", 5, 5, lux_regridls, 0 }, /* fun4.c */
 #endif
-  { "REORDER",	2, 2, ana_reorder, 0 },	/* fun6.c */
-  { "RESTORE",	2, 3, ana_fzread_f, "1PRINTHEADER" }, /* files.c */
-  { "REVERSE",	1, MAX_ARG, ana_reverse, "1ZERO" }, /* subsc.c */
-  { "RFIX",	1, 1, ana_rfix, "*" }, /* symbols.c */
-  { "ROLL",	2, 2, ana_roll, 0 }, /* subsc.c */
-  { "ROOT3",	3, 3, ana_root3, 0 }, /* orientation.c */
-  { "RUNCUM",	1, 3, ana_runcum, "*1PARTIAL_WIDTH:2VARSUM" }, /* strous.c */
-  { "RUNPROD",	1, 2, ana_runprod, "*" }, /* strous2.c */
-  { "RUNSUM",	1, 3, ana_runsum, "*" }, /* fun2.c */
-  { "SCALE",	1, 3, ana_scale, "*1FULLRANGE:2ZOOM" }, /* fun3.c */
-  { "SCALERANGE", 3, 5, ana_scalerange, "*1FULLRANGE:2ZOOM" }, /* fun3.c */
-  { "SCANF",	2, MAX_ARG, ana_freadf_f, "|1|1EOF" }, /* files.c */
-  { "SDEV",	1, 3, ana_sdev, /* fun2.c */
+  { "REORDER",	2, 2, lux_reorder, 0 },	/* fun6.c */
+  { "RESTORE",	2, 3, lux_fzread_f, "1PRINTHEADER" }, /* files.c */
+  { "REVERSE",	1, MAX_ARG, lux_reverse, "1ZERO" }, /* subsc.c */
+  { "RFIX",	1, 1, lux_rfix, "*" }, /* symbols.c */
+  { "ROLL",	2, 2, lux_roll, 0 }, /* subsc.c */
+  { "ROOT3",	3, 3, lux_root3, 0 }, /* orientation.c */
+  { "RUNCUM",	1, 3, lux_runcum, "*1PARTIAL_WIDTH:2VARSUM" }, /* strous.c */
+  { "RUNPROD",	1, 2, lux_runprod, "*" }, /* strous2.c */
+  { "RUNSUM",	1, 3, lux_runsum, "*" }, /* fun2.c */
+  { "SCALE",	1, 3, lux_scale, "*1FULLRANGE:2ZOOM" }, /* fun3.c */
+  { "SCALERANGE", 3, 5, lux_scalerange, "*1FULLRANGE:2ZOOM" }, /* fun3.c */
+  { "SCANF",	2, MAX_ARG, lux_freadf_f, "|1|1EOF" }, /* files.c */
+  { "SDEV",	1, 3, lux_sdev, /* fun2.c */
     "::WEIGHTS:*0SAMPLE:1POPULATION:2KEEPDIMS:4DOUBLE" },
-  { "SEGMENT",	1, 3, ana_segment, ":SIGN:DIAGONAL:1DEGREE" }, /* topology.c */
-  { "SEGMENTDIR", 2, 3, ana_segment_dir, "::SIGN" }, /* topology.c */
-  { "SGN",	1, 1, ana_sgn, "*" }, /* fun1.c */
-  { "SHIFT",	1, 4, ana_shift_f, ":::BLANK:1TRANSLATE" }, /* strous2.c */
-  { "SHIFT3",	2, 3, ana_shift3, 0 }, /* fun4.c */
-  { "SIDEREALTIME", 1, 1, ana_siderealtime, "1ATZEROTIME" }, /* astron.c */
-  { "SIEVE",	1, 2, ana_sieve, 0 }, /* fun3.c */
-  { "SIN", 	1, 1, ana_sin, "*" }, /* fun1.c */
-  { "SINH",	1, 1, ana_sinh, "*" }, /* fun1.c */
-  { "SKIPC",	2, 2, ana_skipc, 0 }, /* fun2.c */
-  { "SMAP",	1, 1, ana_smap, "1TRUNCATE:2ARRAY" }, /* subsc.c */
-  { "SMOOTH",	1, 3, ana_smooth, "1PARTIAL_WIDTH:4ALL" }, /* strous.c */
-  { "SOLAR_B",	1, 1, ana_solar_b, "*2MODERN" }, /* ephem2.c */
-  { "SOLAR_L",	1, 1, ana_solar_l, "*1FULL:2MODERN" }, /* ephem2.c */
-  { "SOLAR_P",	1, 1, ana_solar_p, "*2MODERN" }, /* ephem2.c */
-  { "SOLAR_R",	1, 1, ana_solar_r, "*" }, /* ephem2.c */
-  { "SORT",	1, 1, ana_sort, "*1HEAP:2SHELL:4AXIS" }, /* fun4.c */
-  { "SPAWN",	1, 1, ana_spawn_f, 0 }, /* files.c */
-  { "SPRINTF",	1, MAX_ARG, ana_fstring, "1SKIP_UNDEFINED" }, /* fun2.c */
-  { "SQRT",	1, 1, ana_sqrt, "*" }, /* fun1.c */
-  { "SSCANF",	3, MAX_ARG, ana_freads_f, "1COUNTSPACES" }, /* files.c */
-  { "STORE",	2, 3, ana_fzwrite_f, "1SAFE" }, /* files.c */
-  { "STR",	1, MAX_ARG, ana_string, 0 }, /* fun2.c */
+  { "SEGMENT",	1, 3, lux_segment, ":SIGN:DIAGONAL:1DEGREE" }, /* topology.c */
+  { "SEGMENTDIR", 2, 3, lux_segment_dir, "::SIGN" }, /* topology.c */
+  { "SGN",	1, 1, lux_sgn, "*" }, /* fun1.c */
+  { "SHIFT",	1, 4, lux_shift_f, ":::BLANK:1TRANSLATE" }, /* strous2.c */
+  { "SHIFT3",	2, 3, lux_shift3, 0 }, /* fun4.c */
+  { "SIDEREALTIME", 1, 1, lux_siderealtime, "1ATZEROTIME" }, /* astron.c */
+  { "SIEVE",	1, 2, lux_sieve, 0 }, /* fun3.c */
+  { "SIN", 	1, 1, lux_sin, "*" }, /* fun1.c */
+  { "SINH",	1, 1, lux_sinh, "*" }, /* fun1.c */
+  { "SKIPC",	2, 2, lux_skipc, 0 }, /* fun2.c */
+  { "SMAP",	1, 1, lux_smap, "1TRUNCATE:2ARRAY" }, /* subsc.c */
+  { "SMOOTH",	1, 3, lux_smooth, "1PARTIAL_WIDTH:4ALL" }, /* strous.c */
+  { "SOLAR_B",	1, 1, lux_solar_b, "*2MODERN" }, /* ephem2.c */
+  { "SOLAR_L",	1, 1, lux_solar_l, "*1FULL:2MODERN" }, /* ephem2.c */
+  { "SOLAR_P",	1, 1, lux_solar_p, "*2MODERN" }, /* ephem2.c */
+  { "SOLAR_R",	1, 1, lux_solar_r, "*" }, /* ephem2.c */
+  { "SORT",	1, 1, lux_sort, "*1HEAP:2SHELL:4AXIS" }, /* fun4.c */
+  { "SPAWN",	1, 1, lux_spawn_f, 0 }, /* files.c */
+  { "SPRINTF",	1, MAX_ARG, lux_fstring, "1SKIP_UNDEFINED" }, /* fun2.c */
+  { "SQRT",	1, 1, lux_sqrt, "*" }, /* fun1.c */
+  { "SSCANF",	3, MAX_ARG, lux_freads_f, "1COUNTSPACES" }, /* files.c */
+  { "STORE",	2, 3, lux_fzwrite_f, "1SAFE" }, /* files.c */
+  { "STR",	1, MAX_ARG, lux_string, 0 }, /* fun2.c */
   { "STRARR",	2, 1 + MAX_DIMS, strarr, "%1%SIZE" }, /* symbols.c */
-  { "STRCOUNT",	2, 2, ana_strcount, 0 }, /* fun2.c */
-  { "STRETCH",	2, 2, ana_stretch, 0 }, /* fun4.c */
-  { "STRING",	1, MAX_ARG, ana_string, 0 }, /* fun2.c */
-  { "STRLEN",	1, 1, ana_strlen, 0 }, /* fun2.c */
-  { "STRLOC",	2, 2, ana_strloc, 0 }, /* fun2.c */
-  { "STRPBRK",	2, 2, ana_strpbrk, 0 },	/* fun2.c */
-  { "STRPOS",	2, 3, ana_strpos, 0 }, /* fun2.c */
-  { "STRR",	3, 4, ana_strreplace, 0 }, /* fun2.c */
-  { "STRREPLACE", 3, 4, ana_strreplace, 0 }, /* fun2.c */
-  { "STRSKP",	2, 2, ana_strskp, 0 }, /* fun2.c */
-  { "STRSUB",	3, 3, ana_strsub, 0 }, /* fun2.c */
-  { "STRTOK",	1, 2, ana_strtok, "1SKIP_FINAL_DELIM" }, /* fun2.c */
-  { "STRTOL",	1, 2, ana_strtol, 0 }, /* fun3.c */
-  { "STRTRIM",	1, 1, ana_strtrim, 0 }, /* fun2.c */
+  { "STRCOUNT",	2, 2, lux_strcount, 0 }, /* fun2.c */
+  { "STRETCH",	2, 2, lux_stretch, 0 }, /* fun4.c */
+  { "STRING",	1, MAX_ARG, lux_string, 0 }, /* fun2.c */
+  { "STRLEN",	1, 1, lux_strlen, 0 }, /* fun2.c */
+  { "STRLOC",	2, 2, lux_strloc, 0 }, /* fun2.c */
+  { "STRPBRK",	2, 2, lux_strpbrk, 0 },	/* fun2.c */
+  { "STRPOS",	2, 3, lux_strpos, 0 }, /* fun2.c */
+  { "STRR",	3, 4, lux_strreplace, 0 }, /* fun2.c */
+  { "STRREPLACE", 3, 4, lux_strreplace, 0 }, /* fun2.c */
+  { "STRSKP",	2, 2, lux_strskp, 0 }, /* fun2.c */
+  { "STRSUB",	3, 3, lux_strsub, 0 }, /* fun2.c */
+  { "STRTOK",	1, 2, lux_strtok, "1SKIP_FINAL_DELIM" }, /* fun2.c */
+  { "STRTOL",	1, 2, lux_strtol, 0 }, /* fun3.c */
+  { "STRTRIM",	1, 1, lux_strtrim, 0 }, /* fun2.c */
 #if DEVELOP
-  { "STRUCT",	2, MAX_ARG, ana_struct, 0 }, /* install.c */
+  { "STRUCT",	2, MAX_ARG, lux_struct, 0 }, /* install.c */
 #endif
-  { "STUDENT",	2, 2, ana_student, "*1COMPLEMENT:2LOG" }, /* fun1.c */
-  { "SUN_B",	2, 2, ana_sun_b, 0 }, /* ephem.c */
-  { "SUN_D",	2, 2, ana_sun_d, 0 }, /* ephem.c */
-  { "SUN_P",	2, 2, ana_sun_p, 0 }, /* ephem.c */
-  { "SUN_R",	2, 2, ana_sun_r, 0 }, /* ephem.c */
-  { "SYMBOL",	1, 1, ana_symbol, "1MAIN" }, /* symbols.c */
-  { "SYMCLASS",	1, 1, ana_symclass, "+|1|1FOLLOW:2NUMBER" }, /* subsc.c */
-  { "SYMDTYPE",	1, 1, ana_symdtype, 0 }, /* subsc.c */
-  { "SYMMEM",	0, 0, ana_symbol_memory, 0 }, /* install.c */
-  { "SYMNUM",	1, 1, ana_symbol_number, 0 }, /* install.c */
-  { "TABLE",	3, 4, ana_table, "|2|1ALL:2MIDDLE" }, /* strous.c */
-  { "TAI_FROM_DATE", 5, 5, ana_tai_from_date, 0 }, /* ephem.c */
-  { "TAN", 	1, 1, ana_tan, "*" }, /* fun1.c */
-  { "TANH", 	1, 1, ana_tanh, "*" }, /* fun1.c */
-  { "TEMPORARY", 1, 1, ana_temp, 0 }, /* strous2.c */
-  { "TENSE",	3, 6, ana_tense, 0 }, /* fun3.c */
-  { "TENSE_CURVE", 3, 6, ana_tense_curve, 0 }, /* fun3.c */
-  { "TENSE_LOOP", 3, 4, ana_tense_loop, 0 }, /* fun3.c */
+  { "STUDENT",	2, 2, lux_student, "*1COMPLEMENT:2LOG" }, /* fun1.c */
+  { "SUN_B",	2, 2, lux_sun_b, 0 }, /* ephem.c */
+  { "SUN_D",	2, 2, lux_sun_d, 0 }, /* ephem.c */
+  { "SUN_P",	2, 2, lux_sun_p, 0 }, /* ephem.c */
+  { "SUN_R",	2, 2, lux_sun_r, 0 }, /* ephem.c */
+  { "SYMBOL",	1, 1, lux_symbol, "1MAIN" }, /* symbols.c */
+  { "SYMCLASS",	1, 1, lux_symclass, "+|1|1FOLLOW:2NUMBER" }, /* subsc.c */
+  { "SYMDTYPE",	1, 1, lux_symdtype, 0 }, /* subsc.c */
+  { "SYMMEM",	0, 0, lux_symbol_memory, 0 }, /* install.c */
+  { "SYMNUM",	1, 1, lux_symbol_number, 0 }, /* install.c */
+  { "TABLE",	3, 4, lux_table, "|2|1ALL:2MIDDLE" }, /* strous.c */
+  { "TAI_FROM_DATE", 5, 5, lux_tai_from_date, 0 }, /* ephem.c */
+  { "TAN", 	1, 1, lux_tan, "*" }, /* fun1.c */
+  { "TANH", 	1, 1, lux_tanh, "*" }, /* fun1.c */
+  { "TEMPORARY", 1, 1, lux_temp, 0 }, /* strous2.c */
+  { "TENSE",	3, 6, lux_tense, 0 }, /* fun3.c */
+  { "TENSE_CURVE", 3, 6, lux_tense_curve, 0 }, /* fun3.c */
+  { "TENSE_LOOP", 3, 4, lux_tense_loop, 0 }, /* fun3.c */
 #if DEVELOP
-  { "TEST",	2, 3, ana_test, 0 }, /* execute.c */
+  { "TEST",	2, 3, lux_test, 0 }, /* execute.c */
 #endif
-  { "TOTAL", 	1, 4, ana_total, "::POWER:WEIGHTS:1DOUBLE:2KEEPDIMS:4FLOAT" }, /* fun1.c */
-  { "TRACE_DECODER", 3, 3, ana_trace_decoder, 0 }, /* trace_decoder_ana.c */
-  { "TREND",	1, 2, ana_trend, "*" }, /* fun2.c */
-  { "TRI_NAME_FROM_TAI", 1, 1, ana_tri_name_from_tai, 0 }, /* ephem.c */
+  { "TOTAL", 	1, 4, lux_total, "::POWER:WEIGHTS:1DOUBLE:2KEEPDIMS:4FLOAT" }, /* fun1.c */
+  { "TRACE_DECODER", 3, 3, lux_trace_decoder, 0 }, /* trace_decoder_ana.c */
+  { "TREND",	1, 2, lux_trend, "*" }, /* fun2.c */
+  { "TRI_NAME_FROM_TAI", 1, 1, lux_tri_name_from_tai, 0 }, /* ephem.c */
 #if HAVE_LIBX11
-  { "TVREAD",	1, 5, ana_xtvread, "1GREYSCALE" }, /* xport.c */
+  { "TVREAD",	1, 5, lux_xtvread, "1GREYSCALE" }, /* xport.c */
 #endif
-  { "TYPENAME",	1, 1, ana_typeName, 0 }, /* install.c */
-  { "UPCASE",	1, 1, ana_upper, 0 }, /* fun2.c */
-  { "UPPER",	1, 1, ana_upper, 0 }, /* fun2.c */
-  { "VARIANCE", 1, 3, ana_variance, /* fun2.c */
+  { "TYPENAME",	1, 1, lux_typeName, 0 }, /* install.c */
+  { "UPCASE",	1, 1, lux_upper, 0 }, /* fun2.c */
+  { "UPPER",	1, 1, lux_upper, 0 }, /* fun2.c */
+  { "VARIANCE", 1, 3, lux_variance, /* fun2.c */
     "::WEIGHTS:*0SAMPLE:1POPULATION:2KEEPDIMS:4DOUBLE" },
-  { "VARNAME",	1, 1, ana_varname, 0 }, /* symbols.c */
-  { "VOIGT",	2, 2, ana_voigt, "*" }, /* fun1.c */
-  { "WMAP",	1, 1, ana_wmap, 0 }, /* subsc.c */
-  { "WORD",	1, 1, ana_word, "*" }, /* symbols.c */
-  { "WRITEU",	2, MAX_ARG, ana_writeu, 0 }, /* files.c */
+  { "VARNAME",	1, 1, lux_varname, 0 }, /* symbols.c */
+  { "VOIGT",	2, 2, lux_voigt, "*" }, /* fun1.c */
+  { "WMAP",	1, 1, lux_wmap, 0 }, /* subsc.c */
+  { "WORD",	1, 1, lux_word, "*" }, /* symbols.c */
+  { "WRITEU",	2, MAX_ARG, lux_writeu, 0 }, /* files.c */
 #if HAVE_LIBJPEG
-  { "WRITE_JPEG", 2, 4, ana_write_jpeg6b_f, 0 }, /* jpeg.c */
+  { "WRITE_JPEG", 2, 4, lux_write_jpeg6b_f, 0 }, /* jpeg.c */
 #endif
 #if HAVE_LIBX11
-  { "XEXIST",	1, 1, ana_xexist, 0 }, /* xport.c */
-  { "XLABELWIDTH", 1, 1, ana_xlabelwidth, 0 }, /* xport.c */
+  { "XEXIST",	1, 1, lux_xexist, 0 }, /* xport.c */
+  { "XLABELWIDTH", 1, 1, lux_xlabelwidth, 0 }, /* xport.c */
 #if MOTIF
-  { "XMADDFILETOLIST", 2, 2, ana_xmaddfiletolist, 0 }, /* motif.c */
-  { "XMARROW",	3, 4, ana_xmarrow, 0 }, /* motif.c */
-  { "XMBOARD",	1, 5, ana_xmboard, 0 }, /* motif.c */
-  { "XMBUTTON",	3, 5, ana_xmbutton, 0 }, /* motif.c */
-  { "XMCHECKBOX", 5, 32, ana_xmcheckbox, 0 }, /* motif.c */
-  { "XMCOLUMNS", 3, 5, ana_xmcolumns, 0 }, /* motif.c */
-  { "XMCOMMAND", 3, 7, ana_xmcommand, 0 }, /* motif.c */
-  { "XMDIALOG_BOARD", 4, 9, ana_xmdialog_board, 0 }, /* motif.c */
-  { "XMDIALOG_FORM", 4, 8, ana_xmdialog_form, 0 }, /* motif.c */
-  { "XMDRAWINGAREA", 2, 7, ana_xmdrawingarea, 0 }, /* motif.c */
-  { "XMFILEGETLIST",	1, 1, ana_xmfilegetlist, 0 }, /* motif.c */
-  { "XMFILESELECT", 3, 12, ana_xmfileselect, 0 }, /* motif.c */
-  { "XMFORM",	1, 7, ana_xmform, 0 }, /* motif.c */
-  { "XMFRAME",	1, 5, ana_xmframe, 0 }, /* motif.c */
-  { "XMGETOPTIONSELECTION", 1, 1, ana_xmgetoptionselection, 0 }, /* motif.c */
-  { "XMGETWIDGETADDRESS", 1, 1, ana_xmgetwidgetaddress, 0 }, /* motif.c */
-  { "XMHSCALE",	5, 8, ana_xmhscale, 0 }, /* motif.c */
-  { "XMHSCROLLBAR",	5, 6, ana_xmhscrollbar, 0 }, /* motif.c */
-  { "XMLABEL",	2, 5, ana_xmlabel, 0 }, /* motif.c */
-  { "XMLIST",	3, 6, ana_xmlist, 0 }, /* motif.c */
-  { "XMLISTCOUNT", 1, 1, ana_xmlistcount, 0 }, /* motif.c */
-  { "XMLISTFROMFILE", 4, 6, ana_xmlistfromfile, 0 }, /* motif.c */
-  { "XMMENUBAR", 4, 32, ana_xmmenubar, 0 }, /* motif.c */
-  { "XMOPTIONMENU", 6, 50, ana_xmoptionmenu, 0 }, /* motif.c */
-  { "XMPIXMAPBUTTON", 3, 3, ana_xmpixmapbutton, 0 }, /* motif.c */
-  { "XMPIXMAPOPTIONMENU", 6, 32, ana_xmpixmapoptionmenu, 0 }, /* motif.c */
-  { "XMPULLDOWNMENU", 6, 32, ana_xmpulldownmenu, 0 }, /* motif.c */
-  { "XMRADIOBOX", 5, 32, ana_xmradiobox, 0 }, /* motif.c */
-  { "XMROWS",	3, 5, ana_xmrows, 0 }, /* motif.c */
-  { "XMSCALEGETVALUE", 1, 1, ana_xmscalegetvalue, 0 }, /* motif.c */
-  { "XMSCROLLEDWINDOW", 3, 3, ana_xmscrolledwindow, 0 }, /* motif.c */
-  { "XMSCROLLEDWINDOWAPP", 1, 4, ana_xmscrolledwindowapp, 0 }, /* motif.c */
-  { "XMSEPARATOR", 1, 4, ana_xmseparator, 0 }, /* motif.c */
-  { "XMTEXT",	1, 5, ana_xmtext, 0 }, /* motif.c */
-  { "XMTEXTBOX", 1, 5, ana_xmtextbox, 0 }, /* motif.c */
-  { "XMTEXTFIELD", 4, 8, ana_xmtextfield, 0 }, /* motif.c */
-  { "XMTEXTFIELDARRAY", 9, 40, ana_xmtextfieldarray, 0 }, /* motif.c */
-  { "XMTEXTFIELDGETSTRING", 1, 1, ana_xmtextfieldgetstring, 0 }, /* motif.c */
-  { "XMTEXTFROMFILE", 2, 6, ana_xmtextfromfile, 0 }, /* motif.c */
-  { "XMTEXTGETINSERTPOSITION", 1, 1, ana_xmtextgetinsertposition, 0 }, /* motif.c */
-  { "XMTEXTGETLASTPOSITION",	1, 1, ana_xmtextgetlastposition, 0 }, /* motif.c */
-  { "XMTEXTGETSELECTION",	1, 3, ana_xmtextgetselection, 0 }, /* motif.c */
-  { "XMTEXTGETSTRING", 1, 1, ana_xmtextgetstring, 0 }, /* motif.c */
-  { "XMTOGGLEGETSTATE", 1, 1, ana_xmtogglegetstate, 0 }, /* motif.c */
-  { "XMTOPLEVEL_BOARD", 3, 5, ana_xmtoplevel_board, 0 }, /* motif.c */
-  { "XMTOPLEVEL_FORM", 3, 7, ana_xmtoplevel_form, 0 }, /* motif.c */
-  { "XMVSCALE",	5, 8, ana_xmvscale, 0 }, /* motif.c */
-  { "XMVSCROLLBAR",	5, 6, ana_xmvscrollbar, 0 }, /* motif.c */
+  { "XMADDFILETOLIST", 2, 2, lux_xmaddfiletolist, 0 }, /* motif.c */
+  { "XMARROW",	3, 4, lux_xmarrow, 0 }, /* motif.c */
+  { "XMBOARD",	1, 5, lux_xmboard, 0 }, /* motif.c */
+  { "XMBUTTON",	3, 5, lux_xmbutton, 0 }, /* motif.c */
+  { "XMCHECKBOX", 5, 32, lux_xmcheckbox, 0 }, /* motif.c */
+  { "XMCOLUMNS", 3, 5, lux_xmcolumns, 0 }, /* motif.c */
+  { "XMCOMMAND", 3, 7, lux_xmcommand, 0 }, /* motif.c */
+  { "XMDIALOG_BOARD", 4, 9, lux_xmdialog_board, 0 }, /* motif.c */
+  { "XMDIALOG_FORM", 4, 8, lux_xmdialog_form, 0 }, /* motif.c */
+  { "XMDRAWINGAREA", 2, 7, lux_xmdrawingarea, 0 }, /* motif.c */
+  { "XMFILEGETLIST",	1, 1, lux_xmfilegetlist, 0 }, /* motif.c */
+  { "XMFILESELECT", 3, 12, lux_xmfileselect, 0 }, /* motif.c */
+  { "XMFORM",	1, 7, lux_xmform, 0 }, /* motif.c */
+  { "XMFRAME",	1, 5, lux_xmframe, 0 }, /* motif.c */
+  { "XMGETOPTIONSELECTION", 1, 1, lux_xmgetoptionselection, 0 }, /* motif.c */
+  { "XMGETWIDGETADDRESS", 1, 1, lux_xmgetwidgetaddress, 0 }, /* motif.c */
+  { "XMHSCALE",	5, 8, lux_xmhscale, 0 }, /* motif.c */
+  { "XMHSCROLLBAR",	5, 6, lux_xmhscrollbar, 0 }, /* motif.c */
+  { "XMLABEL",	2, 5, lux_xmlabel, 0 }, /* motif.c */
+  { "XMLIST",	3, 6, lux_xmlist, 0 }, /* motif.c */
+  { "XMLISTCOUNT", 1, 1, lux_xmlistcount, 0 }, /* motif.c */
+  { "XMLISTFROMFILE", 4, 6, lux_xmlistfromfile, 0 }, /* motif.c */
+  { "XMMENUBAR", 4, 32, lux_xmmenubar, 0 }, /* motif.c */
+  { "XMOPTIONMENU", 6, 50, lux_xmoptionmenu, 0 }, /* motif.c */
+  { "XMPIXMAPBUTTON", 3, 3, lux_xmpixmapbutton, 0 }, /* motif.c */
+  { "XMPIXMAPOPTIONMENU", 6, 32, lux_xmpixmapoptionmenu, 0 }, /* motif.c */
+  { "XMPULLDOWNMENU", 6, 32, lux_xmpulldownmenu, 0 }, /* motif.c */
+  { "XMRADIOBOX", 5, 32, lux_xmradiobox, 0 }, /* motif.c */
+  { "XMROWS",	3, 5, lux_xmrows, 0 }, /* motif.c */
+  { "XMSCALEGETVALUE", 1, 1, lux_xmscalegetvalue, 0 }, /* motif.c */
+  { "XMSCROLLEDWINDOW", 3, 3, lux_xmscrolledwindow, 0 }, /* motif.c */
+  { "XMSCROLLEDWINDOWAPP", 1, 4, lux_xmscrolledwindowapp, 0 }, /* motif.c */
+  { "XMSEPARATOR", 1, 4, lux_xmseparator, 0 }, /* motif.c */
+  { "XMTEXT",	1, 5, lux_xmtext, 0 }, /* motif.c */
+  { "XMTEXTBOX", 1, 5, lux_xmtextbox, 0 }, /* motif.c */
+  { "XMTEXTFIELD", 4, 8, lux_xmtextfield, 0 }, /* motif.c */
+  { "XMTEXTFIELDARRAY", 9, 40, lux_xmtextfieldarray, 0 }, /* motif.c */
+  { "XMTEXTFIELDGETSTRING", 1, 1, lux_xmtextfieldgetstring, 0 }, /* motif.c */
+  { "XMTEXTFROMFILE", 2, 6, lux_xmtextfromfile, 0 }, /* motif.c */
+  { "XMTEXTGETINSERTPOSITION", 1, 1, lux_xmtextgetinsertposition, 0 }, /* motif.c */
+  { "XMTEXTGETLASTPOSITION",	1, 1, lux_xmtextgetlastposition, 0 }, /* motif.c */
+  { "XMTEXTGETSELECTION",	1, 3, lux_xmtextgetselection, 0 }, /* motif.c */
+  { "XMTEXTGETSTRING", 1, 1, lux_xmtextgetstring, 0 }, /* motif.c */
+  { "XMTOGGLEGETSTATE", 1, 1, lux_xmtogglegetstate, 0 }, /* motif.c */
+  { "XMTOPLEVEL_BOARD", 3, 5, lux_xmtoplevel_board, 0 }, /* motif.c */
+  { "XMTOPLEVEL_FORM", 3, 7, lux_xmtoplevel_form, 0 }, /* motif.c */
+  { "XMVSCALE",	5, 8, lux_xmvscale, 0 }, /* motif.c */
+  { "XMVSCROLLBAR",	5, 6, lux_xmvscrollbar, 0 }, /* motif.c */
 #endif
-  { "XQUERY",	0, 1, ana_xquery_f, 0 }, /* xport.c */
+  { "XQUERY",	0, 1, lux_xquery_f, 0 }, /* xport.c */
 #if MOTIF
-  { "XTPARENT",	1, 1, ana_xtparent, 0 }, /* motif.c */
+  { "XTPARENT",	1, 1, lux_xtparent, 0 }, /* motif.c */
 #endif
-  { "XTVREAD",	1, 5, ana_xtvread, "1GREYSCALE" }, /* xport.c */
+  { "XTVREAD",	1, 5, lux_xtvread, "1GREYSCALE" }, /* xport.c */
 #if MOTIF
-  { "XTWINDOW",	1, 1, ana_xtwindow, 0 }, /* motif.c */
+  { "XTWINDOW",	1, 1, lux_xtwindow, 0 }, /* motif.c */
 #endif
 #endif
-  { "ZERO", 	1, 1, ana_zerof, "*" }, /* fun1.c */
-  { "ZERONANS",	1, 2, ana_zapnan_f, "*%1%VALUE" }, /* fun1.c */
-  { "ZINV",	1, 1, ana_zinv, "*" }, /* strous.c */
+  { "ZERO", 	1, 1, lux_zerof, "*" }, /* fun1.c */
+  { "ZERONANS",	1, 2, lux_zapnan_f, "*%1%VALUE" }, /* fun1.c */
+  { "ZINV",	1, 1, lux_zinv, "*" }, /* strous.c */
 };
 Int nFunction = sizeof(function_table)/sizeof(internalRoutine);
 /*----------------------------------------------------------------*/
@@ -1304,20 +1304,20 @@ void undefine(Int symbol)
   if (symbol < 0 || symbol > NSYM)
     cerror(ILL_SYM, 0, symbol, "undefine");
   if (symbol < nFixed && !restart) {
-    anaerror("Constant of nature cannot be deleted!\n", symbol);
+    luxerror("Constant of nature cannot be deleted!\n", symbol);
     return;
   }
   switch (symbol_class(symbol)) {
-    case ANA_SCALAR: case ANA_POINTER: case ANA_TRANSFER:
-    case ANA_UNDEFINED: case ANA_UNUSED: case ANA_FUNC_PTR:
-    case ANA_DEFERRED_SUBR: case ANA_DEFERRED_FUNC: case ANA_DEFERRED_BLOCK:
+    case LUX_SCALAR: case LUX_POINTER: case LUX_TRANSFER:
+    case LUX_UNDEFINED: case LUX_UNUSED: case LUX_FUNC_PTR:
+    case LUX_DEFERRED_SUBR: case LUX_DEFERRED_FUNC: case LUX_DEFERRED_BLOCK:
       break;
-    case ANA_SCAL_PTR:
-      if (symbol_type(symbol) == ANA_TEMP_STRING) {
+    case LUX_SCAL_PTR:
+      if (symbol_type(symbol) == LUX_TEMP_STRING) {
 	free(scal_ptr_pointer(symbol).s);
       }
       break;
-    case ANA_ARRAY:
+    case LUX_ARRAY:
       if (isStringType(array_type(symbol))) { /* a string array */
 	/* must free the components' memory */
 	p2.sp = array_data(symbol);
@@ -1327,16 +1327,16 @@ void undefine(Int symbol)
       }
       /* fall through to generic case to take care of remaining */
       /* array memory. */
-    case ANA_STRING: case ANA_SUBSC_PTR: case ANA_FILEMAP:
-    case ANA_ASSOC: case ANA_CSCALAR: case ANA_CARRAY: case ANA_STRUCT:
+    case LUX_STRING: case LUX_SUBSC_PTR: case LUX_FILEMAP:
+    case LUX_ASSOC: case LUX_CSCALAR: case LUX_CARRAY: case LUX_STRUCT:
       hasMem = 1;
       break;
-    case ANA_META:
+    case LUX_META:
       if (symbol_context(k = meta_target(symbol)) == symbol
 	  || (zapContext > 0 && symbol_context(k) == zapContext))
 	zap(k);
       break;
-    case ANA_RANGE: case ANA_PRE_RANGE:
+    case LUX_RANGE: case LUX_PRE_RANGE:
       k = range_start(symbol);
       if (k < 0)
 	k = -k;
@@ -1354,13 +1354,13 @@ void undefine(Int symbol)
 		    || (zapContext > 0 && symbol_context(k) == zapContext)))
 	zap(k);
       break;
-    case ANA_LIST_PTR:
+    case LUX_LIST_PTR:
       n = list_ptr_target(symbol);
       if (n > 0) 		/* string key */
 	free(list_ptr_tag_string(symbol));
       hasMem = 0;
       break;
-    case ANA_LIST: case ANA_PRE_LIST:
+    case LUX_LIST: case LUX_PRE_LIST:
       p = list_symbols(symbol);
       n = list_num_symbols(symbol);
       while (n--) {
@@ -1373,7 +1373,7 @@ void undefine(Int symbol)
       }
       hasMem = 1;
       break;
-    case ANA_CLIST: case ANA_PRE_CLIST: case ANA_CPLIST:
+    case LUX_CLIST: case LUX_PRE_CLIST: case LUX_CPLIST:
       ptr = clist_symbols(symbol);
       n = clist_num_symbols(symbol);
       while (n--)
@@ -1382,7 +1382,7 @@ void undefine(Int symbol)
 	  zap(k);
       hasMem = 1;
       break;
-    case ANA_KEYWORD:
+    case LUX_KEYWORD:
       if (symbol_context(k = keyword_name_symbol(symbol)) == symbol
 	  || (zapContext > 0 && symbol_context(k) == zapContext))
 	zap(k);
@@ -1391,7 +1391,7 @@ void undefine(Int symbol)
 	  && k > tempSym)
 	zap(k);
       break;
-    case ANA_SUBROUTINE: case ANA_FUNCTION: case ANA_BLOCKROUTINE:
+    case LUX_SUBROUTINE: case LUX_FUNCTION: case LUX_BLOCKROUTINE:
       oldZapContext = zapContext;
       zapContext = symbol;
       ptr = routine_parameters(symbol);
@@ -1412,8 +1412,8 @@ void undefine(Int symbol)
 	free(routine_parameters(symbol));
       zapContext = oldZapContext;
       break;
-    case ANA_EXTRACT: case ANA_PRE_EXTRACT:
-      if (symbol_class(symbol) == ANA_EXTRACT) {
+    case LUX_EXTRACT: case LUX_PRE_EXTRACT:
+      if (symbol_class(symbol) == LUX_EXTRACT) {
 	n = extract_target(symbol);
 	if (n > 0		/* an expression */
 	    && symbol_context(n) == symbol)
@@ -1429,7 +1429,7 @@ void undefine(Int symbol)
 	while (n--) {
 	  i = eptr->number;
 	  switch (eptr->type) {
-	    case ANA_RANGE:
+	    case LUX_RANGE:
 	      p2.w = eptr->ptr.w;
 	      while (i--) {
 		if (symbol_context(*p2.w) == symbol
@@ -1439,7 +1439,7 @@ void undefine(Int symbol)
 	      }
 	      free(eptr->ptr.w);
 	      break;
-	    case ANA_LIST:
+	    case LUX_LIST:
 	      p2.sp = eptr->ptr.sp;
 	      while (i--)
 		free(*p2.sp++);
@@ -1452,10 +1452,10 @@ void undefine(Int symbol)
       }	/* end of if (n) */
       hasMem = 0;
       break;
-    case ANA_EVB: case ANA_INT_FUNC: case ANA_USR_FUNC:
+    case LUX_EVB: case LUX_INT_FUNC: case LUX_USR_FUNC:
       n = 0;
       k = symbol_class(symbol);
-      if (k == ANA_EVB)
+      if (k == LUX_EVB)
 	k = evb_type(symbol);
       switch (k) {
 	case EVB_RETURN:
@@ -1477,13 +1477,13 @@ void undefine(Int symbol)
 	  hasMem = 1;
 	  break;
 	case EVB_USR_SUB:
-	  if (symbol_class(usr_sub_routine_num(symbol)) == ANA_STRING)
+	  if (symbol_class(usr_sub_routine_num(symbol)) == LUX_STRING)
 	    /* the subroutine has not yet been sought; it's name is
 	       stored in the usr_sub_routine_num symbol. */
 	    zap(usr_sub_routine_num(symbol));
 	  /* fall through to the below case */
-	case EVB_INT_SUB: case EVB_INSERT: case ANA_INT_FUNC: case
-	ANA_USR_FUNC: case EVB_CASE: case EVB_NCASE: case EVB_BLOCK:
+	case EVB_INT_SUB: case EVB_INSERT: case LUX_INT_FUNC: case
+	LUX_USR_FUNC: case EVB_CASE: case EVB_NCASE: case EVB_BLOCK:
 	  n = symbol_memory(symbol)/sizeof(Word);
 	  ptr = symbol_data(symbol);
 	  while (n--)
@@ -1506,7 +1506,7 @@ void undefine(Int symbol)
 	    zap(k);
       }
       break;
-    case ANA_BIN_OP: case ANA_IF_OP:
+    case LUX_BIN_OP: case LUX_IF_OP:
       if (symbol_context(k = bin_op_lhs(symbol)) == symbol
 	  || (zapContext > 0 && symbol_context(k) == zapContext))
 	zap(k);
@@ -1523,7 +1523,7 @@ void undefine(Int symbol)
     free(symbol_data(symbol));
     symbol_memory(symbol) = 0;
   }
-  symbol_class(symbol) = ANA_UNDEFINED;
+  symbol_class(symbol) = LUX_UNDEFINED;
   undefined_par(symbol) = 0;	/* used in usr_routine() (with value 1) */
 				/* to indicate unspecified parameters */
 				/* of user-defined routines. */
@@ -1545,7 +1545,7 @@ void zap(Int nsym)
    cerror(ILL_SYM, 0, nsym, "zap");
  if (!nsym)
    return;
- if (symbol_class(nsym) == ANA_UNUSED)
+ if (symbol_class(nsym) == LUX_UNUSED)
    return;
  if (nsym < NAMED_START || nsym >= NAMED_END)
    name = noName;
@@ -1557,13 +1557,13 @@ void zap(Int nsym)
  hashValue = sym[nsym].xx - 1;
  if (*name != '[' && hashValue >= 0) { /* has name */
    switch (symbol_class(nsym)) {
-     case ANA_SUBROUTINE: case ANA_DEFERRED_SUBR:
+     case LUX_SUBROUTINE: case LUX_DEFERRED_SUBR:
        hashTable = subrHashTable;
        break;
-     case ANA_FUNCTION: case ANA_DEFERRED_FUNC:
+     case LUX_FUNCTION: case LUX_DEFERRED_FUNC:
        hashTable = funcHashTable;
        break;
-     case ANA_BLOCKROUTINE: case ANA_DEFERRED_BLOCK:
+     case LUX_BLOCKROUTINE: case LUX_DEFERRED_BLOCK:
        hashTable = blockHashTable;
        break;
      default:
@@ -1587,24 +1587,24 @@ void zap(Int nsym)
      hp = hp->next;
    }
    if (oldHp)
-     anaerror("Symbol name not found in tables??", nsym);
+     luxerror("Symbol name not found in tables??", nsym);
  }
  undefine(nsym);
- symbol_class(nsym) = ANA_UNUSED;
+ symbol_class(nsym) = LUX_UNUSED;
  symbol_context(nsym) = 0;
  if (nsym >= EXE_START && nsym < EXE_END) {
    nExecutable--;
    if (nsym < executableIndex)
      executableIndex = nsym;
    while (executableIndex > EXE_START
-	  && symbol_class(executableIndex - 1) == ANA_UNUSED)
+	  && symbol_class(executableIndex - 1) == LUX_UNUSED)
      executableIndex--;
  } else if (nsym >= NAMED_START && nsym < NAMED_END) {
    nNamedVariable--;
    if (nsym < nNamedVariable)
      namedVariableIndex = nsym;
    while (namedVariableIndex > NAMED_START
-	  && symbol_class(namedVariableIndex - 1) == ANA_UNUSED)
+	  && symbol_class(namedVariableIndex - 1) == LUX_UNUSED)
      namedVariableIndex--;
  } else if (nsym >= TEMPS_START && nsym < TEMPS_END) {
    if (nsym < tempVariableIndex)
@@ -1637,19 +1637,19 @@ void cleanUp(Int context, Int which)
   if (context > 0)
   { if (which & CLEANUP_VARS)
     { for (i = TEMPS_START; i < tempVariableIndex; i++)
-	if (symbol_class(i) != ANA_UNUSED
+	if (symbol_class(i) != LUX_UNUSED
 	    && comp? symbol_context(i) <= 0: symbol_context(i) == context)
 	  zap(i);
       while (tempVariableIndex > TEMPS_START
-	     && symbol_class(tempVariableIndex - 1) == ANA_UNUSED)
+	     && symbol_class(tempVariableIndex - 1) == LUX_UNUSED)
 	tempVariableIndex--; }
     if (which & CLEANUP_EDBS)
     { for (i = curTEIndex; i < tempExecutableIndex; i++)
-	if (symbol_class(i) != ANA_UNUSED
+	if (symbol_class(i) != LUX_UNUSED
 	    && comp? symbol_context(i) <= 0: symbol_context(i) == context)
 	  zap(i);
       while (tempExecutableIndex > TEMP_EXE_START
-	     && symbol_class(tempExecutableIndex - 1) == ANA_UNUSED)
+	     && symbol_class(tempExecutableIndex - 1) == LUX_UNUSED)
 	tempExecutableIndex--; }
   }
   if (which & CLEANUP_ERROR)
@@ -1663,38 +1663,38 @@ void cleanUp(Int context, Int which)
 /*----------------------------------------------------------------*/
 void cleanUpRoutine(Int context, char keepBase)
 /* completely removes all traces of the routine with the given context */
-/* keeps the ANA_SUBROUTINE, ANA_FUNCTION, or ANA_BLOCKROUTINE symbol */
+/* keeps the LUX_SUBROUTINE, LUX_FUNCTION, or LUX_BLOCKROUTINE symbol */
 /* itself if keepBase is unequal to zero.  If keepBase is unequal to
- zero, then an ANA_DEFERRED_SUBR is transformed into an (empty)
- ANA_SUBR, ANA_DEFERRED_FUNC into an ANA_FUNC, and ANA_DEFERRED_BLOCK
- into an ANA_BLOCK.  LS 19feb97 21may99 */
+ zero, then an LUX_DEFERRED_SUBR is transformed into an (empty)
+ LUX_SUBR, LUX_DEFERRED_FUNC into an LUX_FUNC, and LUX_DEFERRED_BLOCK
+ into an LUX_BLOCK.  LS 19feb97 21may99 */
 {
   char	mem;
   Int	n;
   Word	*ptr;
 
   if (context < nFixed || context >= NAMED_END) {
-    anaerror("Illegal routine or function specified", context);
+    luxerror("Illegal routine or function specified", context);
     return;
   }
   if (keepBase) {
     switch (symbol_class(context)) {
-      case ANA_DEFERRED_SUBR:
-	symbol_class(context) = ANA_SUBROUTINE;
+      case LUX_DEFERRED_SUBR:
+	symbol_class(context) = LUX_SUBROUTINE;
 	routine_num_parameters(context) = 0;
 	routine_num_statements(context) = 0;
 	break;
-      case ANA_DEFERRED_FUNC:
-	symbol_class(context) = ANA_FUNCTION;
+      case LUX_DEFERRED_FUNC:
+	symbol_class(context) = LUX_FUNCTION;
 	routine_num_parameters(context) = 0;
 	routine_num_statements(context) = 0;
 	break;
-      case ANA_DEFERRED_BLOCK:
-	symbol_class(context) = ANA_BLOCKROUTINE;
+      case LUX_DEFERRED_BLOCK:
+	symbol_class(context) = LUX_BLOCKROUTINE;
 	routine_num_parameters(context) = 0;
 	routine_num_statements(context) = 0;
 	break;	
-      case ANA_SUBROUTINE: case ANA_FUNCTION: case ANA_BLOCKROUTINE:
+      case LUX_SUBROUTINE: case LUX_FUNCTION: case LUX_BLOCKROUTINE:
 	n = routine_num_parameters(context);
 	mem = n? 1: 0;
 	ptr = routine_parameters(context);
@@ -1726,10 +1726,10 @@ void updateIndices(void)
 /* possible */
 {
   while (tempVariableIndex > TEMPS_START
-	 && symbol_class(tempVariableIndex - 1) == ANA_UNUSED)
+	 && symbol_class(tempVariableIndex - 1) == LUX_UNUSED)
     tempVariableIndex--;
   while (tempExecutableIndex > TEMP_EXE_START
-	 && symbol_class(tempExecutableIndex - 1) == ANA_UNUSED)
+	 && symbol_class(tempExecutableIndex - 1) == LUX_UNUSED)
     tempExecutableIndex--;
 }
 /*----------------------------------------------------------------*/
@@ -1742,7 +1742,7 @@ Int nextFreeStackEntry(void)
     if (++symbolStackIndex == SYMBOLSTACKSIZE)
       symbolStackIndex = 0;
     if (symbolStackIndex == oldIndex)
-      return anaerror("Symbol stack full", 0);
+      return luxerror("Symbol stack full", 0);
   }
   nSymbolStack++;
   return symbolStackIndex;
@@ -1759,7 +1759,7 @@ Int nextFreeNamedVariable(void)
   while (sym[namedVariableIndex].class) {
     if (++namedVariableIndex == NAMED_END) namedVariableIndex = NAMED_START;
     if (namedVariableIndex == oldIndex)    /* nothing free */
-      return anaerror("Too many named variables - symbol table full", 0);
+      return luxerror("Too many named variables - symbol table full", 0);
   }
   sym[namedVariableIndex].exec = nExecuted;
   sym[namedVariableIndex].context = -compileLevel;
@@ -1775,7 +1775,7 @@ Int nextFreeTempVariable(void)
 
  while (sym[tempVariableIndex].class)
    if (++tempVariableIndex == TEMPS_END) {
-     return anaerror("Too many temp variables - symbol table full", 0);
+     return luxerror("Too many temp variables - symbol table full", 0);
    }
  sym[tempVariableIndex].exec = nExecuted;
  sym[tempVariableIndex].context = -compileLevel;
@@ -1792,7 +1792,7 @@ Int nextFreeTempExecutable(void)
 
   while (sym[tempExecutableIndex].class) {
     if (++tempExecutableIndex == EXE_END) 
-      return anaerror("Too many temporary executables - symbol table full", 0);
+      return luxerror("Too many temporary executables - symbol table full", 0);
   }
   sym[tempExecutableIndex].exec = nExecuted;
   sym[tempExecutableIndex].context = -compileLevel;
@@ -1813,7 +1813,7 @@ Int nextFreeExecutable(void)
     if (++executableIndex == EXE_END)
       executableIndex = EXE_START;
     if (executableIndex == oldIndex)    /* nothing free */
-      return anaerror("Too many permanent executables - symbol table full", 0);
+      return luxerror("Too many permanent executables - symbol table full", 0);
   }
   sym[executableIndex].exec = nExecuted;
   sym[executableIndex].context = -compileLevel;
@@ -1830,7 +1830,7 @@ Int nextFreeUndefined(void)
 
   n = nextFreeTempVariable();
   if (n < 0) return n;		/* some error */
-  sym[n].class = ANA_UNDEFINED;
+  sym[n].class = LUX_UNDEFINED;
   sym[n].context = -compileLevel;
   return n;
 }
@@ -1842,7 +1842,7 @@ void pushList(Word symNum)
    *listStackItem++ = symNum;
    return;
  }
- anaerror("Too many elements (%d) in list; list stack full\n", 0,
+ luxerror("Too many elements (%d) in list; list stack full\n", 0,
        listStackItem - listStack);
 }
 /*----------------------------------------------------------------*/
@@ -1851,7 +1851,7 @@ Word popList(void)
 {
  if (listStackItem > listStack)
    return *--listStackItem;
- return anaerror("Attempt to read from empty list stack\n", 0);
+ return luxerror("Attempt to read from empty list stack\n", 0);
 }
 /*----------------------------------------------------------------*/
 Int moveList(Int n)
@@ -1861,7 +1861,7 @@ Int moveList(Int n)
   { memcpy(listStack + 1, listStack, n*sizeof(Word));
     listStackItem++;
     return 1; }
-  return anaerror("Too many elements (%d) in list; list stack full\n", 0,
+  return luxerror("Too many elements (%d) in list; list stack full\n", 0,
 	       listStackItem - listStack);
 }
 /*----------------------------------------------------------------*/
@@ -1877,14 +1877,14 @@ void swapList(Int n1, Int n2)
 /*----------------------------------------------------------------*/
 Int stackListLength(void)
 /* returns the number of elements in the topmost list in the stack */
-/* assumes that all lists are delimited by ANA_NEW_LIST */
+/* assumes that all lists are delimited by LUX_NEW_LIST */
 {
  Word	*i = listStackItem - 1;
  Int	n = 0;
 
  if (i < listStack)
    return -1;		/* no list in stack */
- while (i >= listStack && *i != ANA_NEW_LIST) {
+ while (i >= listStack && *i != LUX_NEW_LIST) {
    i--;
    n++;
  }
@@ -1897,7 +1897,7 @@ void dupList(void)
   Int	n, n2;
 
   n = n2 = stackListLength();
-  pushList(ANA_NEW_LIST);
+  pushList(LUX_NEW_LIST);
   while (n2--)
     pushList(listStackItem[-n-1]);
 }
@@ -1937,7 +1937,7 @@ Int installStruct(Int base, Int key)
     n = findVar(base, curContext); /* force variable */
   else				/* found something already, remove name */
     freeString(base);
-  return newSymbol(ANA_LIST_PTR, n, key);
+  return newSymbol(LUX_LIST_PTR, n, key);
 }
 /*----------------------------------------------------------------*/
 Int copyElement(Int symbol, char *key)
@@ -1946,11 +1946,11 @@ Int copyElement(Int symbol, char *key)
 /* not be a temporary, to prevent its premature deletion. */
 {
   Int	n;
-  Int	ana_replace(Int, Int);
+  Int	lux_replace(Int, Int);
 
   if ((n = installString(key)) < 0) return n;
   if ((n = findVar(n, 0)) < 0) return n;
-  if (ana_replace(n, symbol) < 0) return -1;
+  if (lux_replace(n, symbol) < 0) return -1;
   return n;
 }
 /*----------------------------------------------------------------*/
@@ -1962,13 +1962,13 @@ Int findTarget(char *name, Int *type, Int allowSubr)
    through a structure tag -- e.g., MYFUNC.VAR -- but not when looking for
    a possible target of a subscript)
    Returns in <*type> an identifier of the type of target that was found: the
-   variable's class for a named variable, ANA_FUNCTION for a
-   user-defined function, ANA_SUBROUTINE for a user-defined subroutine,
-   ANA_INT_FUNC for a built-in function, or
-   ANA_ERROR if no target was found.  The function's return value
+   variable's class for a named variable, LUX_FUNCTION for a
+   user-defined function, LUX_SUBROUTINE for a user-defined subroutine,
+   LUX_INT_FUNC for a built-in function, or
+   LUX_ERROR if no target was found.  The function's return value
    identifies the particular found target: the symbol number if it's a
    named variable or user-defined function, the appropriate index to
-   the function[] array if it's a built-in function, or ANA_ERROR if
+   the function[] array if it's a built-in function, or LUX_ERROR if
    no target was found.  The symbolStack[] entry is removed.
    LS 26dec98 */
 {
@@ -1985,27 +1985,27 @@ Int findTarget(char *name, Int *type, Int allowSubr)
   if (*name == '$' || *name == '!' || *name == '#') {
     /* it's not an existing named variable, yet starts with $ ! or #,
        so it cannot be a function either. */
-    *type = ANA_ERROR;
-    return anaerror("Subscripted variable %s is undefined", 0, name);
+    *type = LUX_ERROR;
+    return luxerror("Subscripted variable %s is undefined", 0, name);
   }
   /* seek a user-defined function */
   result = lookForName(name, funcHashTable, 0);
   if (result >= 0) {
-    *type = ANA_FUNCTION;	/* a user-defined function */
+    *type = LUX_FUNCTION;	/* a user-defined function */
     return result;
   }
   if (allowSubr) {
     /* seek a user-defined subroutine */
     result = lookForName(name, subrHashTable, 0);
     if (result >= 0) {
-      *type = ANA_SUBROUTINE;
+      *type = LUX_SUBROUTINE;
       return result;
     }
   }
   /* seek a built-in function */
   result = findInternalName(name, 0);
   if (result >= 0) {
-    *type = ANA_INT_FUNC;	/* an internal function */
+    *type = LUX_INT_FUNC;	/* an internal function */
     return result;
   }
   /* not a built-in function either.  Try to compile a
@@ -2017,54 +2017,54 @@ Int findTarget(char *name, Int *type, Int allowSubr)
     fclose(fp);
     result = lookForName(name, funcHashTable, 0); /* seek again */
     if (result < 0) {
-      *type = ANA_ERROR;
-      return anaerror("Compiled file %s but function %s still is not compiled",
+      *type = LUX_ERROR;
+      return luxerror("Compiled file %s but function %s still is not compiled",
 		   0, expname, name);
     } else {
-      *type = ANA_FUNCTION;
+      *type = LUX_FUNCTION;
       return result;
     }
   }
   /* we did not find the target anywhere */
-  *type = ANA_ERROR;
-  return ANA_ERROR;
+  *type = LUX_ERROR;
+  return LUX_ERROR;
 }
 /*----------------------------------------------------------------*/
 Int newSymbol(Int kind, ...)
 /* returns index to symbol table for a new symbol.
    arguments depend on kind:
-     (ANA_SCALAR, type)
-     (ANA_FIXED_NUMBER, type)
-     (ANA_FIXED_STRING, symbolStackIndex)
-     (ANA_RANGE, range_start, range_end)
-     (ANA_EVB, EVB_REPLACE, lhs, rhs)
-     (ANA_EVB, EVB_FOR, loopVar, start, end, step, statement)
-     (ANA_EVB, EVB_WHILE_DO, condition, statement)
-     (ANA_EVB, EVB_DO_WHILE, statement, condition)
-     (ANA_EVB, EVB_IF, condition, true_statement, false_statement)
-     (ANA_EVB, EVB_CASE)
-     (ANA_EVB, EVB_NCASE)
-     (ANA_EVB, EVB_INT_SUB)
-     (ANA_EVB, EVB_USR_SUB)
-     (ANA_EVB, EVB_BLOCK)
-     (ANA_EVB, EVB_INSERT, target)
-     (ANA_EVB, EVB_RETURN, expr)
-     (ANA_EVB, EVB_FILE)
-     (ANA_INT_FUNC, funcNr)
-     (ANA_BIN_OP, opNr, arg2, arg1)
-     (ANA_IF_OP, opNr, arg2, arg1)
-     (ANA_KEYWORD, param, expr)
-     (ANA_CLIST)
-     (ANA_LIST)
-     (ANA_LIST_PTR, struct, key)
-     (ANA_POINTER, target)
-     (ANA_SUBROUTINE, name)
-     (ANA_FUNCTION, name)
-     (ANA_BLOCKROUTINE, name)
-     (ANA_SUBSC_PTR)
-     (ANA_META, expr)
-     (ANA_EXTRACT)
-     (ANA_STRUCT_PTR)
+     (LUX_SCALAR, type)
+     (LUX_FIXED_NUMBER, type)
+     (LUX_FIXED_STRING, symbolStackIndex)
+     (LUX_RANGE, range_start, range_end)
+     (LUX_EVB, EVB_REPLACE, lhs, rhs)
+     (LUX_EVB, EVB_FOR, loopVar, start, end, step, statement)
+     (LUX_EVB, EVB_WHILE_DO, condition, statement)
+     (LUX_EVB, EVB_DO_WHILE, statement, condition)
+     (LUX_EVB, EVB_IF, condition, true_statement, false_statement)
+     (LUX_EVB, EVB_CASE)
+     (LUX_EVB, EVB_NCASE)
+     (LUX_EVB, EVB_INT_SUB)
+     (LUX_EVB, EVB_USR_SUB)
+     (LUX_EVB, EVB_BLOCK)
+     (LUX_EVB, EVB_INSERT, target)
+     (LUX_EVB, EVB_RETURN, expr)
+     (LUX_EVB, EVB_FILE)
+     (LUX_INT_FUNC, funcNr)
+     (LUX_BIN_OP, opNr, arg2, arg1)
+     (LUX_IF_OP, opNr, arg2, arg1)
+     (LUX_KEYWORD, param, expr)
+     (LUX_CLIST)
+     (LUX_LIST)
+     (LUX_LIST_PTR, struct, key)
+     (LUX_POINTER, target)
+     (LUX_SUBROUTINE, name)
+     (LUX_FUNCTION, name)
+     (LUX_BLOCKROUTINE, name)
+     (LUX_SUBSC_PTR)
+     (LUX_META, expr)
+     (LUX_EXTRACT)
+     (LUX_STRUCT_PTR)
 */
 {
   Int		n, i, narg, isStruct, isScalarRange, j, target, depth;
@@ -2087,7 +2087,7 @@ Int newSymbol(Int kind, ...)
   va_start(ap, kind);
   n = -1;
   if (!ignoreSymbols) {		/* really need a new symbol.  what kind? */
-    if (kind >= ANA_BIN_OP) {
+    if (kind >= LUX_BIN_OP) {
 				/* executable */
       if (keepEVB)
 	n = nextFreeExecutable();
@@ -2095,57 +2095,57 @@ Int newSymbol(Int kind, ...)
 	n = nextFreeTempExecutable();
       if (n < 0) {
 	va_end(ap);
-	return ANA_ERROR;	/* didn't work */
+	return LUX_ERROR;	/* didn't work */
       }
       symbol_class(n) = kind; 
       if (keepEVB)
 	symbol_context(n) = curContext;
-    } else if (kind < ANA_SUBROUTINE) {	/* named variable */
+    } else if (kind < LUX_SUBROUTINE) {	/* named variable */
       if (keepEVB)
 	n = nextFreeNamedVariable();
       else
 	n = nextFreeTempVariable();
       if (n < 0) {
 	va_end(ap);
-	return ANA_ERROR;
+	return LUX_ERROR;
       }
       symbol_class(n) = kind;
       if (keepEVB)
 	symbol_context(n) = curContext;
     }
     switch (kind) {
-      case ANA_SCALAR:
+      case LUX_SCALAR:
 	scalar_type(n) = va_arg(ap, Int);
 	break;
-      case ANA_FIXED_NUMBER:
+      case LUX_FIXED_NUMBER:
 	/* same as an ordinary scalar, but in EDB symbol space, so that it */
 	/* doesn't get overwritten as "just another temp" (i.e. isFreeTemp() */
 	/* returns 0).  otherwise, get problems e.g. in a for-loop, where */
 	/* temp numbers are used more than once.  */
 	symbol_type(n) = va_arg(ap, Int);
-	if (symbol_type(n) >= ANA_CFLOAT) { /* a complex scalar */
-	  symbol_class(n) = ANA_CSCALAR;
-	  complex_scalar_memory(n) = ana_type_size[symbol_type(n)];
+	if (symbol_type(n) >= LUX_CFLOAT) { /* a complex scalar */
+	  symbol_class(n) = LUX_CSCALAR;
+	  complex_scalar_memory(n) = lux_type_size[symbol_type(n)];
 	  complex_scalar_data(n).f = malloc(complex_scalar_memory(n));
 	  if (!complex_scalar_data(n).f)
 	    return cerror(ALLOC_ERR, n);
 	} else
-	  symbol_class(n) = ANA_SCALAR;
+	  symbol_class(n) = LUX_SCALAR;
 	break;
-      case ANA_FIXED_STRING:
+      case LUX_FIXED_STRING:
 	/* a literal string */
-	symbol_class(n) = ANA_STRING;
-	string_type(n) = ANA_LSTRING;
+	symbol_class(n) = LUX_STRING;
+	string_type(n) = LUX_LSTRING;
 	string_value(n) = symbolStack[i = va_arg(ap, Int)];
 	symbol_memory(n) = strlen(symbolStack[i]) + 1; /* count \0 */
 	unlinkString(i);		/* free position in stack */
 	break;
-      case ANA_STRUCT_PTR:
-	symbol_class(n) = ANA_STRUCT_PTR;
+      case LUX_STRUCT_PTR:
+	symbol_class(n) = LUX_STRUCT_PTR;
 	symbol_memory(n) = sizeof(structPtr);
 	struct_ptr_elements(n) = malloc(symbol_memory(n));
 	break;
-      case ANA_EXTRACT:
+      case LUX_EXTRACT:
 	target = popList();
 	if (target > 0) {	/* regular symbol */
 	  extract_target(n) = target;
@@ -2155,7 +2155,7 @@ Int newSymbol(Int kind, ...)
 	  embed(target, n);
 	} else {
 	  i = -target;
-	  symbol_class(n) = ANA_PRE_EXTRACT;
+	  symbol_class(n) = LUX_PRE_EXTRACT;
 	  symbol_memory(n) = sizeof(preExtract);
 	  symbol_data(n) = malloc(sizeof(preExtract));
 	  pre_extract_name(n) = symbolStack[i];
@@ -2171,15 +2171,15 @@ Int newSymbol(Int kind, ...)
 	if (!depth)
 	  popList();
 	while (depth--) {
-	  ptr--;		/* skip the (potential) ANA_NEW_LIST */
+	  ptr--;		/* skip the (potential) LUX_NEW_LIST */
 	  eptr--;		/* go to previous entry */
 	  eptr->type = popList(); /* the type of the current list;
-				    either ANA_RANGE or ANA_LIST */
+				    either LUX_RANGE or LUX_LIST */
 	  eptr->number = stackListLength(); /* the number of entries in this
 					      one */
 	  i = eptr->number;
 	  switch (eptr->type) {
-	    case ANA_RANGE:
+	    case LUX_RANGE:
 	      eptr->ptr.w = malloc(i*sizeof(Word));
 	      p.w = eptr->ptr.w + i; /* start at the end */
 	      while (i--) {
@@ -2187,7 +2187,7 @@ Int newSymbol(Int kind, ...)
 		embed(*p.w, n);
 	      }
 	      break;
-	    case ANA_LIST:
+	    case LUX_LIST:
 	      eptr->ptr.sp = malloc(i*sizeof(char *));
 	      p.sp = eptr->ptr.sp + i; /* start at the end */
 	      while (i--) {
@@ -2198,15 +2198,15 @@ Int newSymbol(Int kind, ...)
 	      }
 	      break;
 	  }
-	  popList();		/* remove the ANA_NEW_LIST */
+	  popList();		/* remove the LUX_NEW_LIST */
 	}
 	break;
-      case ANA_META:		/* a meta symbol, i.e. a string expression */
+      case LUX_META:		/* a meta symbol, i.e. a string expression */
 				/* which points at a symbol */
 	meta_target(n) = va_arg(ap, Int);
 	embed(meta_target(n), n);
 	break;
-      case ANA_RANGE:  /* a range */
+      case LUX_RANGE:  /* a range */
 	isScalarRange = 1;
 	/* range start: */
 	i = va_arg(ap, Int);
@@ -2214,7 +2214,7 @@ Int newSymbol(Int kind, ...)
 	if (i < 0)
 	  i = -i;
 	embed(i, n);
-	if (symbol_class(i) != ANA_SCALAR)
+	if (symbol_class(i) != LUX_SCALAR)
 	  isScalarRange = 0;
 	/* range end: */
 	i = va_arg(ap, Int);
@@ -2222,13 +2222,13 @@ Int newSymbol(Int kind, ...)
 	if (i < 0)
 	  i = -i;
 	embed(i, n);
-	if (symbol_class(i) != ANA_SCALAR)
+	if (symbol_class(i) != LUX_SCALAR)
 	  isScalarRange = 0;
 	range_sum(n) = 0; /* default summation flag */
 	range_redirect(n) = -1; /* redirection flag */
 	range_scalar(n) = isScalarRange;
 	break;
-      case ANA_PRE_RANGE:
+      case LUX_PRE_RANGE:
 	isScalarRange = 1;
 	/* pre_range start: */
 	i = va_arg(ap, Int);
@@ -2236,7 +2236,7 @@ Int newSymbol(Int kind, ...)
 	if (i < 0)
 	  i = -i;
 	embed(i, n);
-	if (symbol_class(i) != ANA_SCALAR)
+	if (symbol_class(i) != LUX_SCALAR)
 	  isScalarRange = 0;
 	/* pre_range end: */
 	i = va_arg(ap, Int);
@@ -2244,13 +2244,13 @@ Int newSymbol(Int kind, ...)
 	if (i < 0)
 	  i = -i;
 	embed(i, n);
-	if (symbol_class(i) != ANA_SCALAR)
+	if (symbol_class(i) != LUX_SCALAR)
 	  isScalarRange = 0;
 	pre_range_sum(n) = 0; /* default summation flag */
 	pre_range_redirect(n) = -1; /* redirection flag */
 	pre_range_scalar(n) = isScalarRange;
 	break;
-      case ANA_LIST_PTR:		/* pointer to a struct element */
+      case LUX_LIST_PTR:		/* pointer to a struct element */
 	list_ptr_target(n) = va_arg(ap, Int); /* the struct */
 	if ((i = va_arg(ap, Int)) >= 0) { /* non-numerical key */
 	  list_ptr_tag_string(n) = symbolStack[i]; /* key */
@@ -2268,7 +2268,7 @@ Int newSymbol(Int kind, ...)
 	 list_ptr_tag_number(n) = j;
        }
 	break;
-      case ANA_LIST: case ANA_PRE_LIST: /* includes LISTs */
+      case LUX_LIST: case LUX_PRE_LIST: /* includes LISTs */
 	narg = stackListLength()/2; /* # of name-value pairs */
 	isStruct = 0;
 	arg = listStackItem - 2;
@@ -2285,7 +2285,7 @@ Int newSymbol(Int kind, ...)
 	  i = narg*(sizeof(listElem));
 	  if (!(list_symbols(n) = (listElem *) malloc(i))) {
 	    va_end(ap); 
-	    return anaerror("Could not allocate memory for a struct", 0);
+	    return luxerror("Could not allocate memory for a struct", 0);
 	  }
 	  symbol_memory(n) = i;
 	  p = list_symbols(n);
@@ -2300,11 +2300,11 @@ Int newSymbol(Int kind, ...)
 	    p--;
 	  }
 	} else {		/* must be a list */
-	  symbol_class(n) = ANA_PRE_CLIST;
+	  symbol_class(n) = LUX_PRE_CLIST;
 	  if (narg) {
 	    if (!(arg = (Word *) malloc(narg*sizeof(Word)))) {
 	      va_end(ap); 
-	      return anaerror("Could not allocate memory for a list", 0);
+	      return luxerror("Could not allocate memory for a list", 0);
 	    }
 	  } else
 	    arg = NULL;
@@ -2317,9 +2317,9 @@ Int newSymbol(Int kind, ...)
 	    popList();
 	  }
 	}
-	popList();				/* pop ANA_NEW_LIST */
+	popList();				/* pop LUX_NEW_LIST */
 	break;
-      case ANA_SUBSC_PTR:	/* subscript pointer */
+      case LUX_SUBSC_PTR:	/* subscript pointer */
 	if (!(symbol_data(n) = (Int *) malloc(4*sizeof(Int)))) {
 	  va_end(ap);
 	  printf("newSymbol: ");
@@ -2327,7 +2327,7 @@ Int newSymbol(Int kind, ...)
 	}
 	symbol_memory(n) = 4*sizeof(Int);
 	break;
-      case ANA_POINTER:
+      case LUX_POINTER:
 	transfer_is_parameter(n) = 0;	/* not a formal argument in a */
 					/* user-defined function or routine */
 	narg = va_arg(ap, Int);
@@ -2337,19 +2337,19 @@ Int newSymbol(Int kind, ...)
 	if (i < 0)
 	  i = lookForBlock(narg);
 	if (i >= 0) {		/* found a routine */
-	  symbol_class(n) = ANA_FUNC_PTR;
+	  symbol_class(n) = LUX_FUNC_PTR;
 	  func_ptr_routine_num(n) = i;
 	  unlinkString(narg);
 	  return n;
 	}
 	i = findInternalSubr(narg);
-	kind = ANA_SUBROUTINE;
+	kind = LUX_SUBROUTINE;
 	if (i < 0) {
 	  i = findInternalFunc(narg);
-	  kind = ANA_FUNCTION;
+	  kind = LUX_FUNCTION;
 	}
 	if (i >= 0) {		/* found an internal routine */
-	  symbol_class(n) = ANA_FUNC_PTR;
+	  symbol_class(n) = LUX_FUNC_PTR;
 	  func_ptr_routine_num(n) = -i;
 	  func_ptr_type(n) = kind;
 	  unlinkString(narg);
@@ -2360,13 +2360,13 @@ Int newSymbol(Int kind, ...)
 	  return i;		/* some error */
 	transfer_target(n) = i;
 	break;
-      case ANA_KEYWORD:
-	keyword_name_symbol(n) = newSymbol(ANA_FIXED_STRING, va_arg(ap, Int));
+      case LUX_KEYWORD:
+	keyword_name_symbol(n) = newSymbol(LUX_FIXED_STRING, va_arg(ap, Int));
 	embed(keyword_name_symbol(n), n);
 	keyword_value(n) = va_arg(ap, Int);
 	embed(keyword_value(n), n);
 	break;
-      case ANA_SUBROUTINE: case ANA_FUNCTION: case ANA_BLOCKROUTINE:
+      case LUX_SUBROUTINE: case LUX_FUNCTION: case LUX_BLOCKROUTINE:
        /* define these routines in two passes: first, define all
 	  parameters, and then parse the statements when the
 	  parameters are already known */
@@ -2384,25 +2384,25 @@ Int newSymbol(Int kind, ...)
 				/* in symbolStack[] */
 	  switch (kind)	{	/* first see if the routine is already */
 				/* defined */
-	    case ANA_SUBROUTINE:
+	    case LUX_SUBROUTINE:
 	      n = lookForSubr(n);
 	      break;
-	    case ANA_FUNCTION:
+	    case LUX_FUNCTION:
 	      n = lookForFunc(n);
 	      break;
-	    case ANA_BLOCKROUTINE:
+	    case LUX_BLOCKROUTINE:
 	      n = lookForBlock(n);
 	      break;
 	  }
 	  if (n == -1)		/* the routine is not yet defined */
 	    switch (kind) {	/* so allocate a symbol for it */
-	      case ANA_SUBROUTINE:
+	      case LUX_SUBROUTINE:
 		n = findSubr(i);
 		break;
-	      case ANA_FUNCTION:
+	      case LUX_FUNCTION:
 		n = findFunc(i);
 		break;
-	      case ANA_BLOCKROUTINE:
+	      case LUX_BLOCKROUTINE:
 		n = findBlock(i);
 		break;
 	    }
@@ -2415,14 +2415,14 @@ Int newSymbol(Int kind, ...)
 	  if (n == -1) {	/* couldn't get new symbol */
 	    va_end(ap);
 	    reportBody = 0;
-	    return ANA_ERROR; 	/* pass on the error */
+	    return LUX_ERROR; 	/* pass on the error */
 	  }
 	  symbol_class(n) = kind;
 
-	  if (kind != ANA_BLOCKROUTINE) { /* has parameters */
+	  if (kind != LUX_BLOCKROUTINE) { /* has parameters */
 	    nArg = stackListLength();	/* # parameters */
 	    if (!reportBody) {	/* we're compiling the body */
-	      if (listStackItem[-1] == ANA_EXTEND) { /* extended parameter */
+	      if (listStackItem[-1] == LUX_EXTEND) { /* extended parameter */
 		routine_has_extended_param(n) = 1;
 		nArg--;
 	      } else
@@ -2430,7 +2430,7 @@ Int newSymbol(Int kind, ...)
 	      if (nArg > UINT8_MAX) { /* too many parameters */
 		va_end(ap);
 		reportBody = 0;
-		return anaerror("More than %1d parameters specified\n", n,
+		return luxerror("More than %1d parameters specified\n", n,
 			     UINT8_MAX);
 	      }
 	      routine_num_parameters(n) = nArg;
@@ -2440,14 +2440,14 @@ Int newSymbol(Int kind, ...)
 				/* could not allocate room for parameters */
 		va_end(ap);
 		reportBody = 0;
-		return anaerror("Routine-definition memory-allocation error", 0);
+		return luxerror("Routine-definition memory-allocation error", 0);
 	      }
 	    } else		/* deferred compilation */
-	      symbol_class(n) = (kind == ANA_SUBROUTINE)?
-		ANA_DEFERRED_SUBR: ANA_DEFERRED_FUNC;
+	      symbol_class(n) = (kind == LUX_SUBROUTINE)?
+		LUX_DEFERRED_SUBR: LUX_DEFERRED_FUNC;
 	  } else {		/* a block routine, which has no parametrs */
 	    if (reportBody)
-	      symbol_class(n) = ANA_DEFERRED_BLOCK;
+	      symbol_class(n) = LUX_DEFERRED_BLOCK;
 	    routine_num_parameters(n) = nArg = 0;
 	    routine_has_extended_param(n) = 0;
 	  }
@@ -2458,18 +2458,18 @@ Int newSymbol(Int kind, ...)
 	    }
 	    arg = routine_parameters(n) + nArg;
 	    /* now save parameters (start at back) */
-	    if (kind != ANA_BLOCKROUTINE) {
+	    if (kind != LUX_BLOCKROUTINE) {
 	      if (nArg &&
 		  !eallocate(routine_parameter_names(n), nArg, char *)) {
 		/* could not allocate memory to store the parameter names */
 		va_end(ap); 
-		return anaerror("Memory allocation error", 0);
+		return luxerror("Memory allocation error", 0);
 	      }
 	      key = routine_parameter_names(n) + nArg;
 	      while (nArg--) {
 		*--arg = findVar(popList(), n); /* parameter's symbol # */
 		*--key = varName(*arg); /* parameter's name */
-		symbol_class(*arg) = ANA_POINTER;
+		symbol_class(*arg) = LUX_POINTER;
 		transfer_target(*arg) = 0;
 		transfer_temp_param(*arg) = 0;
 		transfer_is_parameter(*arg) = 1;
@@ -2481,11 +2481,11 @@ Int newSymbol(Int kind, ...)
 	     /* variables in SUBRs and FUNCs are local to that particular */
 	     /* SUBR or FUNC, whereas variables in BLOCKs are local to the */
 	     /* embedding SUBR or FUNC or main level. */
-	    if (kind != ANA_BLOCKROUTINE)
+	    if (kind != LUX_BLOCKROUTINE)
 	      curContext = n;	/* make current function or subroutine
 				   the current context */
 	  } else {		/* not compiling the body */
-	    if (kind != ANA_BLOCKROUTINE) {
+	    if (kind != LUX_BLOCKROUTINE) {
 	      while (nArg--) {	/* discard the parameters */
 		i = popList();
 		freeString(i);
@@ -2509,7 +2509,7 @@ Int newSymbol(Int kind, ...)
 	    nStatement = 0;
 	  routine_num_statements(n) = nStatement;
 	  if (!nStatement
-	      && (!compileOnly || symbol_class(n) != ANA_BLOCKROUTINE)) {
+	      && (!compileOnly || symbol_class(n) != LUX_BLOCKROUTINE)) {
 	    /* can't have empty routines or functions
 	       except for an empty block routine in VERIFY if the verified
 	       file contains only a definition for a subroutine or
@@ -2517,9 +2517,9 @@ Int newSymbol(Int kind, ...)
 	    va_end(ap);
 	    curContext = oldContext;
 	    ignoreSymbols = 0;
-	    return anaerror("No statements in user routine or function", 0);
+	    return luxerror("No statements in user routine or function", 0);
 	  }
-	  if (kind == ANA_BLOCKROUTINE) { /* allocate space for the */
+	  if (kind == LUX_BLOCKROUTINE) { /* allocate space for the */
 	    /* statements (since there are no parameters, this is at */
 	    /* the beginning of the combined parameters+statements list) */
 	    if (nStatement &&
@@ -2529,7 +2529,7 @@ Int newSymbol(Int kind, ...)
 	      curContext = oldContext;	/* restore context */
 	      ignoreSymbols = 0;
 	      return
-		anaerror("Allocation error in 2nd pass of routine definition",
+		luxerror("Allocation error in 2nd pass of routine definition",
 		      0);
 	    }
 	    nArg = 0;		/* no parameters to a block routine */
@@ -2549,7 +2549,7 @@ Int newSymbol(Int kind, ...)
 	      curContext = oldContext;	/* restore context */
 	      ignoreSymbols = 0;
 	      return
-		anaerror("Allocation error in 2nd pass of routine definition",
+		luxerror("Allocation error in 2nd pass of routine definition",
 		      0);
 	    }
 	  }
@@ -2573,8 +2573,8 @@ Int newSymbol(Int kind, ...)
 	  return 0;
 	}
       }
-      case ANA_EVB: case ANA_INT_FUNC: case ANA_USR_FUNC:
-	if (kind == ANA_EVB) {
+      case LUX_EVB: case LUX_INT_FUNC: case LUX_USR_FUNC:
+	if (kind == LUX_EVB) {
 	  kind = va_arg(ap, Int);
 	  symbol_type(n) = kind;
 	}
@@ -2607,14 +2607,14 @@ Int newSymbol(Int kind, ...)
 	    i = 0;		/* no more items to retrieve */
 	    break;
 	  case EVB_INT_SUB: case EVB_USR_SUB: case EVB_INSERT:
-	  case ANA_INT_FUNC: case ANA_USR_FUNC:
+	  case LUX_INT_FUNC: case LUX_USR_FUNC:
 	    sym[n].xx = va_arg(ap, Int); /* routine number (SUB) or target */
 	  case EVB_CASE: case EVB_NCASE: case EVB_BLOCK: 
 	    i = stackListLength();		/* # of expr and statements */
 	    if (i) {			/* only if there are any elements */
 	      if (!(arg = (Word *) malloc(i*sizeof(Word)))) {
 		va_end(ap);
-		return anaerror("Could not allocate memory for stacked elements",
+		return luxerror("Could not allocate memory for stacked elements",
 			     0);
 	      }
 	      symbol_data(n) = arg; /* the elements */
@@ -2627,7 +2627,7 @@ Int newSymbol(Int kind, ...)
 	      }
 	    } else
 	      symbol_memory(n) = 0; /* no args */
-	    popList();		/* pop ANA_NEW_LIST marker */
+	    popList();		/* pop LUX_NEW_LIST marker */
 	    i = 0;		/* no more items to retrieve */
 	    break;
 	}
@@ -2644,7 +2644,7 @@ Int newSymbol(Int kind, ...)
 	  }
 	}
 	break;
-      case ANA_BIN_OP: case ANA_IF_OP:
+      case LUX_BIN_OP: case LUX_IF_OP:
 	bin_op_type(n) = va_arg(ap, Int);
 	bin_op_lhs(n) = va_arg(ap, Int);
 	embed(bin_op_lhs(n), n);
@@ -2654,17 +2654,17 @@ Int newSymbol(Int kind, ...)
     }
   } else {			/* reportBody & in definition */
     switch (kind) {
-      case ANA_FIXED_STRING:
+      case LUX_FIXED_STRING:
 	i = va_arg(ap, Int);	/* index to symbolStack */
 	freeString(i);
 	break;
-      case ANA_LIST_PTR:
+      case LUX_LIST_PTR:
 	i = va_arg(ap, Int);	/* struct number */
 	i = va_arg(ap, Int);	/* key */
 	if (i >= 0)		/* non-numerical key */
 	  freeString(i); 
 	break;
-      case ANA_LIST:  case ANA_PRE_LIST:
+      case LUX_LIST:  case LUX_PRE_LIST:
 	narg = stackListLength()/2;
 	while (narg--) {
 	  popList();		/* value */
@@ -2673,11 +2673,11 @@ Int newSymbol(Int kind, ...)
 	    freeString(i);
 	}
 	break;
-      case ANA_KEYWORD:
+      case LUX_KEYWORD:
 	i = va_arg(ap, Int);
 	freeString(i);
 	break;
-      case ANA_SUBROUTINE: case ANA_FUNCTION: case ANA_BLOCKROUTINE:
+      case LUX_SUBROUTINE: case LUX_FUNCTION: case LUX_BLOCKROUTINE:
 	/* when we get here, a symbol has already been reserved for the */
 	/* routine, and the parameters have been ignored.  we only need to */
 	/* get rid of the routine body. */
@@ -2693,7 +2693,7 @@ Int newSymbol(Int kind, ...)
 	ignoreSymbols = 0;	/* no longer ignore symbols, if we were */
 				/* doing that. */
 	return 0;
-      case ANA_EXTRACT:
+      case LUX_EXTRACT:
 	target = popList();
 	if (target > 0) {	/* regular symbol */
 	  depth = popList();
@@ -2712,11 +2712,11 @@ Int newSymbol(Int kind, ...)
 					      one */
 	  while (i--)
 	    popList();
-	  popList();		/* remove the ANA_NEW_LIST */
+	  popList();		/* remove the LUX_NEW_LIST */
 	}
 	break;
-      case ANA_EVB: case ANA_INT_FUNC: case ANA_USR_FUNC:
-	if (kind == ANA_EVB)
+      case LUX_EVB: case LUX_INT_FUNC: case LUX_USR_FUNC:
+	if (kind == LUX_EVB)
 	  kind = va_arg(ap, Int);
 	switch (kind) {
 	  case EVB_FILE:
@@ -2724,7 +2724,7 @@ Int newSymbol(Int kind, ...)
 	    freeString(i);
 	    break;
 	  case EVB_INT_SUB: case EVB_USR_SUB: case EVB_INSERT:
-	  case ANA_INT_FUNC: case ANA_USR_FUNC:
+	  case LUX_INT_FUNC: case LUX_USR_FUNC:
 	  case EVB_NCASE: case EVB_CASE: case EVB_BLOCK:
 	    i = stackListLength();
 	    while (i--)
@@ -2861,9 +2861,9 @@ Int nextCompileLevel(FILE *fp, char *fileName)
  n = n? -1: 1;
  if (n < 0) {
    if (fp)
-     anaerror("*** error in file %s", 0, name);
+     luxerror("*** error in file %s", 0, name);
    else
-     anaerror("*** error in execution string \"%s\"", 0, inputString);
+     luxerror("*** error in execution string \"%s\"", 0, inputString);
  }
  /* if (fp) 
    free(name); */
@@ -2890,12 +2890,12 @@ Int compile(char *string)
   n = installString(compileName);
   oldInstalling = installing;
   installing = 1;
-  nsym = newSymbol(ANA_BLOCKROUTINE, n);
+  nsym = newSymbol(LUX_BLOCKROUTINE, n);
   installing = oldInstalling;
   curContext = nsym;
   n = nextCompileLevel(NULL, NULL);
   if (n < 0
-      || newSymbol(ANA_BLOCKROUTINE, -nsym - 1) < 0) { /* some error */
+      || newSymbol(LUX_BLOCKROUTINE, -nsym - 1) < 0) { /* some error */
     zap(nsym);
     return n;
   } else {
@@ -2912,13 +2912,13 @@ Int compile(char *string)
 }
 /*----------------------------------------------------------------*/
 #if DEVELOP
-Int ana_compile(Int narg, Int ps[])
+Int lux_compile(Int narg, Int ps[])
 {
   char	*string;
   Int	result, value;
 
   string = string_arg(*ps);
-  result = scalar_scratch(ANA_LONG);
+  result = scalar_scratch(LUX_LONG);
   if (string)
   { value = compile(string);
     scalar_value(result).l = value; }
@@ -2940,30 +2940,30 @@ Int newBlockSymbol(Int index)
     return 0;
   }
   if ((n = lookForVar(index, curContext)) >= 0) { /* blockroutine pointer? */
-    if (sym[n].class == ANA_FUNC_PTR) {
+    if (sym[n].class == LUX_FUNC_PTR) {
       if (func_ptr_routine_num(n) > 0) { /* user-defined */
-	if (sym[n = func_ptr_routine_num(n)].class == ANA_BLOCKROUTINE) {
+	if (sym[n = func_ptr_routine_num(n)].class == LUX_BLOCKROUTINE) {
 	  freeString(index);
-	  return newSymbol(ANA_EVB, EVB_USR_CODE, n);
+	  return newSymbol(LUX_EVB, EVB_USR_CODE, n);
 	}
       } else
-	return anaerror("Func/subr pointer does not point at executable block routine!", n);
+	return luxerror("Func/subr pointer does not point at executable block routine!", n);
     }
   }
   n = lookForBlock(index);
   if (n < 0) {			/* block not yet defined */
     n = nextFreeTempVariable();
     if (n < 0)
-      return ANA_ERROR;
-    symbol_class(n) = ANA_STRING;
+      return LUX_ERROR;
+    symbol_class(n) = LUX_STRING;
     string_value(n) = symbolStack[index];
     unlinkString(index);
     symbol_memory(n) = strlen(string_value(n)) + 1;
-    result = newSymbol(ANA_EVB, EVB_USR_CODE, n);
+    result = newSymbol(LUX_EVB, EVB_USR_CODE, n);
     symbol_context(usr_code_routine_num(result)) = result;
   } else {
     n = findBlock(index);
-    result = newSymbol(ANA_EVB, EVB_USR_CODE, n);
+    result = newSymbol(LUX_EVB, EVB_USR_CODE, n);
   }
   return result;
 }
@@ -2973,7 +2973,7 @@ Int newSubrSymbol(Int index)
   and user-defined subroutines.  if not found, then searches for an
   appropriate file to find a definition.  if such a file is found,
   then installs name as new subroutine in user-defined subroutine list,
-  and a new symbol with appropriate class (ANA_EVB) and type (EVB_INT_SUB 
+  and a new symbol with appropriate class (LUX_EVB) and type (EVB_INT_SUB 
   or EVB_USR_SUB) is returned.  if such a file is not found, then
   an error is generated. */
 {
@@ -2990,20 +2990,20 @@ Int newSubrSymbol(Int index)
  if (ignoreInput && findBody > 0) { /* not compiling this */
    freeString(index);		/* remove name from stack */
    /* take care of deleting arguments: */
-   return newSymbol(ANA_EVB, EVB_INT_SUB, 0);
+   return newSymbol(LUX_EVB, EVB_INT_SUB, 0);
  }
  if (findBody < 0)		/* we're at the end of the definition
 				   of a deferred routine */
    findBody = -findBody;
  n = lookForVar(index, curContext); /* look for variable */
- if (n >= 0 && symbol_class(n) == ANA_FUNC_PTR) { /* maybe subr pointer */
+ if (n >= 0 && symbol_class(n) == LUX_FUNC_PTR) { /* maybe subr pointer */
    freeString(index);		/* remove name from stacke */
    if (func_ptr_routine_num(n) < 0) {	/* internal routine/function */
-     if (func_ptr_type(n) == ANA_SUBROUTINE)
-       return newSymbol(ANA_EVB, EVB_INT_SUB, -sym[n].spec.evb.args[0]);
+     if (func_ptr_type(n) == LUX_SUBROUTINE)
+       return newSymbol(LUX_EVB, EVB_INT_SUB, -sym[n].spec.evb.args[0]);
    } else {
      n = func_ptr_routine_num(n); /* user-defined routine */
-     return newSymbol(ANA_EVB, EVB_USR_SUB, n);
+     return newSymbol(LUX_EVB, EVB_USR_SUB, n);
    }
  }
  /* no subroutine pointer */
@@ -3011,17 +3011,17 @@ Int newSubrSymbol(Int index)
  if (n < 0) {			/* none found */
    if ((n = findInternalSym(index, 1)) >= 0) { /* internal routine */
      freeString(index);
-     return newSymbol(ANA_EVB, EVB_INT_SUB, n);
+     return newSymbol(LUX_EVB, EVB_INT_SUB, n);
    } else {			/* no internal: assume user-defined */
-     n = newSymbol(ANA_FIXED_STRING, index);
-     i = newSymbol(ANA_EVB, EVB_USR_SUB, n);
+     n = newSymbol(LUX_FIXED_STRING, index);
+     i = newSymbol(LUX_EVB, EVB_USR_SUB, n);
      symbol_context(n) = i;
      return i;
    }
  }
 				/* user-defined routine */
  freeString(index);
- return newSymbol(ANA_EVB, EVB_USR_SUB, n);
+ return newSymbol(LUX_EVB, EVB_USR_SUB, n);
 }
 /*----------------------------------------------------------------*/
 Int lookForName(char *name, hashTableEntry *hashTable[], Int context)
@@ -3102,13 +3102,13 @@ char *symbolName(Int symbol)
     return "(error)";
   }
   switch (symbol_class(symbol)) {
-    case ANA_SUBROUTINE: case ANA_DEFERRED_SUBR:
+    case LUX_SUBROUTINE: case LUX_DEFERRED_SUBR:
       hashTable = subrHashTable;
       break;
-    case ANA_FUNCTION: case ANA_DEFERRED_FUNC:
+    case LUX_FUNCTION: case LUX_DEFERRED_FUNC:
       hashTable = funcHashTable;
       break;
-    case ANA_BLOCKROUTINE: case ANA_DEFERRED_BLOCK:
+    case LUX_BLOCKROUTINE: case LUX_DEFERRED_BLOCK:
       hashTable = blockHashTable;
       break;
     default:
@@ -3183,7 +3183,7 @@ void exception(Int sig)
 	   Quit(1);		/* exit LUX completely */
 	 case 'r': case 'R':
 	   saveHistory();
-	   ana_restart(0, NULL);
+	   lux_restart(0, NULL);
 	 case '?':
 	   printw("Options:  y - yes, quit;  t - start tracing;  ");
 	   printw("s - start stepping;  q - run quietly (no tracing or ");
@@ -3215,7 +3215,7 @@ void exception(Int sig)
  }
  checkErrno();
  if (signal(sig, exception) == SIG_ERR)
-   anaerror("Could not reinstall exception handler", 0);
+   luxerror("Could not reinstall exception handler", 0);
  if (c == SIG_BREAK) {
    curContext = executeLevel = statementDepth = 0;
    cleanUp(-compileLevel, CLEANUP_ALL);
@@ -3234,9 +3234,9 @@ char *typeName(Int type)
   };
   Int	index;
 
-  if (type == ANA_UNDEFINED)
+  if (type == LUX_UNDEFINED)
     index = 10;			/* undefined */
-  else if (type < 0 || type > ANA_CDOUBLE)
+  else if (type < 0 || type > LUX_CDOUBLE)
     index = 11;			/* unknown */
   else
     index = type;		/* OK */
@@ -3249,48 +3249,48 @@ char *className(Int class)
   static struct classInfo {
     Byte number; char *name;
   } classes[] = {
-    { ANA_UNUSED, "not used" },
-    { ANA_SCALAR, "scalar" },
-    { ANA_STRING, "string" },
-    { ANA_RANGE, "range" },
-    { ANA_ARRAY, "array" },
-    { ANA_POINTER, "pointer" },
-    { ANA_ASSOC, "associated variable" },
-    { ANA_FUNC_PTR, "function pointer" },
-    { ANA_SCAL_PTR, "scalar pointer" },
-    { ANA_SUBSC_PTR, "subscript pointer" },
-    { ANA_FILEMAP, "file array" },
-    { ANA_CLIST, "compact list" },
-    { ANA_LIST, "list" },
-    { ANA_STRUCT, "structure" },
-    { ANA_KEYWORD, "keyword" },
-    { ANA_LIST_PTR, "list pointer" },
-    { ANA_PRE_RANGE, "pre-range" },
-    { ANA_PRE_CLIST, "pre-compact-list" },
-    { ANA_PRE_LIST, "pre-list" },
-    { ANA_ENUM, "enumeration constant" },
-    { ANA_META, "SYMBOL call" },
-    { ANA_CSCALAR, "complex scalar" },
-    { ANA_CARRAY, "complex array" },
-    { ANA_CPLIST, "compact pointer list" },
-    { ANA_TRANSFER, "transfer symbol" },
-    { ANA_STRUCT_PTR, "struct pointer" },
-    { ANA_SUBROUTINE, "subroutine" },
-    { ANA_FUNCTION, "function" },
-    { ANA_BLOCKROUTINE, "block routine" },
-    { ANA_DEFERRED_SUBR, "deferred subroutine" },
-    { ANA_DEFERRED_FUNC, "deferred function" }, 
-    { ANA_DEFERRED_BLOCK, "deferred block routine" },
-    { ANA_BIN_OP, "binary operation" },
-    { ANA_INT_FUNC, "internal function call" },
-    { ANA_USR_FUNC, "user function call" },
-    { ANA_IF_OP, "if-operation" },
-    { ANA_EXTRACT, "extraction" },
-    { ANA_PRE_EXTRACT, "pre-extraction" },
-    { ANA_EVB, "executable" },
-    { ANA_FIXED_NUMBER, "fixed number" },
-    { ANA_FIXED_STRING, "fixed string" },
-    { ANA_UNDEFINED, "undefined" },
+    { LUX_UNUSED, "not used" },
+    { LUX_SCALAR, "scalar" },
+    { LUX_STRING, "string" },
+    { LUX_RANGE, "range" },
+    { LUX_ARRAY, "array" },
+    { LUX_POINTER, "pointer" },
+    { LUX_ASSOC, "associated variable" },
+    { LUX_FUNC_PTR, "function pointer" },
+    { LUX_SCAL_PTR, "scalar pointer" },
+    { LUX_SUBSC_PTR, "subscript pointer" },
+    { LUX_FILEMAP, "file array" },
+    { LUX_CLIST, "compact list" },
+    { LUX_LIST, "list" },
+    { LUX_STRUCT, "structure" },
+    { LUX_KEYWORD, "keyword" },
+    { LUX_LIST_PTR, "list pointer" },
+    { LUX_PRE_RANGE, "pre-range" },
+    { LUX_PRE_CLIST, "pre-compact-list" },
+    { LUX_PRE_LIST, "pre-list" },
+    { LUX_ENUM, "enumeration constant" },
+    { LUX_META, "SYMBOL call" },
+    { LUX_CSCALAR, "complex scalar" },
+    { LUX_CARRAY, "complex array" },
+    { LUX_CPLIST, "compact pointer list" },
+    { LUX_TRANSFER, "transfer symbol" },
+    { LUX_STRUCT_PTR, "struct pointer" },
+    { LUX_SUBROUTINE, "subroutine" },
+    { LUX_FUNCTION, "function" },
+    { LUX_BLOCKROUTINE, "block routine" },
+    { LUX_DEFERRED_SUBR, "deferred subroutine" },
+    { LUX_DEFERRED_FUNC, "deferred function" }, 
+    { LUX_DEFERRED_BLOCK, "deferred block routine" },
+    { LUX_BIN_OP, "binary operation" },
+    { LUX_INT_FUNC, "internal function call" },
+    { LUX_USR_FUNC, "user function call" },
+    { LUX_IF_OP, "if-operation" },
+    { LUX_EXTRACT, "extraction" },
+    { LUX_PRE_EXTRACT, "pre-extraction" },
+    { LUX_EVB, "executable" },
+    { LUX_FIXED_NUMBER, "fixed number" },
+    { LUX_FIXED_STRING, "fixed string" },
+    { LUX_UNDEFINED, "undefined" },
     { 0, "unknown" }
   };
 
@@ -3315,7 +3315,7 @@ char *className(Int class)
  return classes[hash].name;
 }
 /*----------------------------------------------------------------*/
-Int ana_classname(Int narg, Int ps[])
+Int lux_classname(Int narg, Int ps[])
      /* returns name associated with class number */
 {
   Int	class, result;
@@ -3323,14 +3323,14 @@ Int ana_classname(Int narg, Int ps[])
 
   class = int_arg(*ps);
   getFreeTempVariable(result);
-  sym[result].class = ANA_STRING;
-  string_type(result) = ANA_TEMP_STRING;
+  sym[result].class = LUX_STRING;
+  string_type(result) = LUX_TEMP_STRING;
   name = string_value(result) = strsave(className(class));
   symbol_memory(result) = strlen(name) + 1;
   return result;
 }
 /*----------------------------------------------------------------*/
-Int ana_typeName(Int narg, Int ps[])
+Int lux_typeName(Int narg, Int ps[])
      /* returns name associated with type number */
 {
   Int	type, result;
@@ -3338,8 +3338,8 @@ Int ana_typeName(Int narg, Int ps[])
 
   if ((type = int_arg(*ps)) < 0) return -1;
   getFreeTempVariable(result);
-  sym[result].class = ANA_STRING;
-  string_type(result) = ANA_TEMP_STRING;
+  sym[result].class = LUX_STRING;
+  string_type(result) = LUX_TEMP_STRING;
   name = string_value(result) = strsave(typeName(type));
   symbol_memory(result) = strlen(name) + 1;
   return result;
@@ -3377,7 +3377,7 @@ char *filetypeName(Int filetype)
   return filetypeNames[filetype];
 }
 /*----------------------------------------------------------------*/
-Int ana_filetype_name(Int narg, Int ps[])
+Int lux_filetype_name(Int narg, Int ps[])
 {
   char	*name;
   Int	result;
@@ -3399,21 +3399,21 @@ void fixedValue(char *name, Int type, ...)
  iq = installString(name);
  n = findVar(iq, 0);
  switch (type) {
-   case ANA_LSTRING:
-     symbol_class(n) = ANA_STRING;
-     string_type(n) = ANA_LSTRING;
+   case LUX_LSTRING:
+     symbol_class(n) = LUX_STRING;
+     string_type(n) = LUX_LSTRING;
      string_value(n) = va_arg(ap, char *);
      symbol_memory(n) = strlen(string_value(n)) + 1;
      break;
-   case ANA_CFLOAT: case ANA_CDOUBLE:
-     complex_scalar_data(n).cf = malloc(ana_type_size[type]);
+   case LUX_CFLOAT: case LUX_CDOUBLE:
+     complex_scalar_data(n).cf = malloc(lux_type_size[type]);
      if (!complex_scalar_data(n).cf)
        puts("WARNING - memory allocation error in symbol initialization");
-     complex_scalar_memory(n) = ana_type_size[type];
-     symbol_class(n) = ANA_CSCALAR;
+     complex_scalar_memory(n) = lux_type_size[type];
+     symbol_class(n) = LUX_CSCALAR;
      complex_scalar_type(n) = type;
      p.cf = complex_scalar_data(n).cf;
-     if (type == ANA_CFLOAT) {
+     if (type == LUX_CFLOAT) {
        p.cf->real = (Float) va_arg(ap, Double);
        p.cf->imaginary = (Float) va_arg(ap, Double);
        p.cf++;
@@ -3424,16 +3424,16 @@ void fixedValue(char *name, Int type, ...)
      }
      break;
    default:
-     symbol_class(n) = ANA_SCALAR;
+     symbol_class(n) = LUX_SCALAR;
      scalar_type(n) = type;
      switch (type) {
-       case ANA_LONG:
+       case LUX_LONG:
 	 scalar_value(n).l = va_arg(ap, Int);
 	 break;
-       case ANA_FLOAT:
+       case LUX_FLOAT:
 	 scalar_value(n).f = (Float) va_arg(ap, Double);
 	 break;
-       case ANA_DOUBLE:
+       case LUX_DOUBLE:
 	 scalar_value(n).d = va_arg(ap, Double);
 	 break;
      }
@@ -3449,86 +3449,86 @@ Int installSysFunc(char *name, Int number)
 
  iq = installString(name);
  n = findVar(iq,0);
- sym[n].class = ANA_FUNC_PTR;
+ sym[n].class = LUX_FUNC_PTR;
  func_ptr_routine_num(n) = -number;
- func_ptr_type(n) = ANA_FUNCTION;
+ func_ptr_type(n) = LUX_FUNCTION;
  return n;
 }
 /*----------------------------------------------------------------*/
 Int installPointer(char *name, Int type, void *ptr)
-/* install a ANA_SCAL_PTR system variable */
+/* install a LUX_SCAL_PTR system variable */
 { 
  Int	n, iq;
  
  iq = installString(name);
  n = findVar(iq, 0);
- sym[n].class = ANA_SCAL_PTR;
+ sym[n].class = LUX_SCAL_PTR;
  scal_ptr_type(n) = type;
  scal_ptr_pointer(n).l = (Int *) ptr;
- if (type == ANA_TEMP_STRING)
+ if (type == LUX_TEMP_STRING)
    symbol_memory(n) = strlen(ptr) + 1;
  return n;
 }
 /*----------------------------------------------------------------*/
 Int convertRange(Int range)
-/* convert a ANA_RANGE symbol to a ANA_SUBSC_PTR symbol. */
+/* convert a LUX_RANGE symbol to a LUX_SUBSC_PTR symbol. */
 /* elements:  #1:  range start */
 /*            #2:  range end */
 /*            #3:  summation flag (0 or 1) */
 /*            #4:  redirection flag (symbol, MINUSONE if none) */
 /*            for #1 and #2, if the symbol is > 0, then count from the */
 /*            start of the list/array; otherwise from one beyond the last */
-/*            element of the list/array.  if #2 == ANA_ZERO, then only one */
+/*            element of the list/array.  if #2 == LUX_ZERO, then only one */
 /*            element is requested. */
 {
   Int	subsc, eval(Int), j1, j2;
   
-  if ((subsc = newSymbol(ANA_SUBSC_PTR)) < 0) return -1;
+  if ((subsc = newSymbol(LUX_SUBSC_PTR)) < 0) return -1;
   j1 = range_start(range);
-  if (j1 == -ANA_ONE)		/* (*) */
+  if (j1 == -LUX_ONE)		/* (*) */
   { subsc_ptr_start(subsc) = 0;
     subsc_ptr_end(subsc) = -1; }
   else 
   { if (j1 >= 0)		/* (X:...) */
     { j2 = int_arg(eval(j1));
       if (j2 < 0)
-	return anaerror("Illegal range start", range_start(range)); }
+	return luxerror("Illegal range start", range_start(range)); }
     else			/* (*-X:...) */
     { j2 = -int_arg(eval(-j1));
       if (-j2 <= 0)
-	return anaerror("Illegal range start", range_start(range)); }
+	return luxerror("Illegal range start", range_start(range)); }
     subsc_ptr_start(subsc) = j2;
 
     j1 = range_end(range);
-    if (j1 == ANA_ZERO)		/* (X) */
+    if (j1 == LUX_ZERO)		/* (X) */
       subsc_ptr_end(subsc) = subsc_ptr_start(subsc);
-    else if (j1 == -ANA_ONE)	/* (...:*) */
+    else if (j1 == -LUX_ONE)	/* (...:*) */
       subsc_ptr_end(subsc) = -1;
     else
     { if (j1 >= 0)		/* (...:Y) */
       { j2 = int_arg(eval(j1));
 	if (j2 < 0)
-	  return anaerror("Illegal range end", range_end(range)); }
+	  return luxerror("Illegal range end", range_end(range)); }
       else			/* (...:*-Y) */
       { j2 = -int_arg(eval(-j1));
 	if (-j2 <= 0)
-	  return anaerror("Illegal range end", range_end(range)); }
+	  return luxerror("Illegal range end", range_end(range)); }
       subsc_ptr_end(subsc) = j2; }
   }
 
   if (subsc_ptr_start(subsc) > subsc_ptr_end(subsc) &&
       ((subsc_ptr_start(subsc) >= 0 && subsc_ptr_end(subsc) >= 0) ||
        (subsc_ptr_start(subsc) < 0 && subsc_ptr_end(subsc) < 0)))
-  { return anaerror("Range end < range start", range_end(range)); }
+  { return luxerror("Range end < range start", range_end(range)); }
 
   if ((subsc_ptr_sum(subsc) = range_sum(range)) < 0 ||
       subsc_ptr_sum(subsc) > 1)
-  { return anaerror("Illegal range summation flag??", range_sum(range)); }
+  { return luxerror("Illegal range summation flag??", range_sum(range)); }
   if (range_redirect(range) == -1) subsc_ptr_redirect(subsc) = -1;
   else if ((subsc_ptr_redirect(subsc) =
 	    int_arg(eval(range_redirect(range)))) < 0 ||
 	   subsc_ptr_redirect(subsc) >= MAX_DIMS)
-  { return anaerror("Illegal range redirection", range_redirect(range)); }
+  { return luxerror("Illegal range redirection", range_redirect(range)); }
   return subsc;
 }
 /*----------------------------------------------------------------*/
@@ -3536,82 +3536,82 @@ void convertPointer(scalar *target, Int inType, Int outType)
 /* converts value in target from inType to outType */
 {
   switch (outType) {
-  case ANA_BYTE:
+  case LUX_BYTE:
     switch (inType) {
-    case ANA_WORD:
+    case LUX_WORD:
       (*target).b = (Byte) (*target).w;
       break;
-    case ANA_LONG:
+    case LUX_LONG:
       (*target).b = (Byte) (*target).l;
       break;
-    case ANA_FLOAT:
+    case LUX_FLOAT:
       (*target).b = (Byte) (*target).f;
       break;
-    case ANA_DOUBLE:
+    case LUX_DOUBLE:
       (*target).b = (Byte) (*target).d;
       break;
     }
     break;
-  case ANA_WORD:
+  case LUX_WORD:
     switch (inType) {
-    case ANA_BYTE:
+    case LUX_BYTE:
       (*target).w = (Word) (*target).b;
       break;
-    case ANA_LONG:
+    case LUX_LONG:
       (*target).w = (Word) (*target).l;
       break;
-    case ANA_FLOAT:
+    case LUX_FLOAT:
       (*target).w = (Word) (*target).f;
       break;
-    case ANA_DOUBLE:
+    case LUX_DOUBLE:
       (*target).w = (Word) (*target).d;
       break;
     }
     break;
-  case ANA_LONG:
+  case LUX_LONG:
     switch (inType) {
-    case ANA_BYTE:
+    case LUX_BYTE:
       (*target).l = (Int) (*target).b;
       break;
-    case ANA_WORD:
+    case LUX_WORD:
       (*target).l = (Int) (*target).w;
       break;
-    case ANA_FLOAT:
+    case LUX_FLOAT:
       (*target).l = (Int) (*target).f;
       break;
-    case ANA_DOUBLE:
+    case LUX_DOUBLE:
       (*target).l = (Int) (*target).d;
       break;
     }
     break;
-  case ANA_FLOAT:
+  case LUX_FLOAT:
     switch (inType) {
-    case ANA_BYTE:
+    case LUX_BYTE:
       (*target).f = (Float) (*target).b;
       break;
-    case ANA_WORD:
+    case LUX_WORD:
       (*target).f = (Float) (*target).w;
       break;
-    case ANA_LONG:
+    case LUX_LONG:
       (*target).f = (Float) (*target).l;
       break;
-    case ANA_DOUBLE:
+    case LUX_DOUBLE:
       (*target).f = (Float) (*target).d;
       break;
     }
     break;
-  case ANA_DOUBLE:
+  case LUX_DOUBLE:
     switch (inType) {
-    case ANA_BYTE:
+    case LUX_BYTE:
       (*target).d = (Double) (*target).b;
       break;
-    case ANA_WORD:
+    case LUX_WORD:
       (*target).d = (Double) (*target).w;
       break;
-    case ANA_LONG:
+    case LUX_LONG:
       (*target).d = (Double) (*target).l;
       break;
-    case ANA_FLOAT:
+    case LUX_FLOAT:
       (*target).d = (Double) (*target).f;
       break;
     }
@@ -3623,184 +3623,184 @@ void convertWidePointer(wideScalar *target, Int inType, Int outType)
 /* converts value in <target> from <inType> to <outType> */
 {
   switch (inType) {
-    case ANA_BYTE:
+    case LUX_BYTE:
       switch (outType) {
-	case ANA_BYTE:
+	case LUX_BYTE:
 	  break;
-	case ANA_WORD:
+	case LUX_WORD:
 	  target->w = (Word) target->b;
 	  break;
-	case ANA_LONG:
+	case LUX_LONG:
 	  target->l = (Int) target->b;
 	  break;
-	case ANA_FLOAT:
+	case LUX_FLOAT:
 	  target->f = (Float) target->b;
 	  break;
-	case ANA_DOUBLE:
+	case LUX_DOUBLE:
 	  target->d = (Double) target->b;
 	  break;
-	case ANA_CFLOAT:
+	case LUX_CFLOAT:
 	  target->cf.real = (Float) target->b;
 	  target->cf.imaginary = 0.0;
 	  break;
-	case ANA_CDOUBLE:
+	case LUX_CDOUBLE:
 	  target->cd.real = (Double) target->b;
 	  target->cd.imaginary = 0.0;
 	  break;
       }
       break;
-    case ANA_WORD:
+    case LUX_WORD:
       switch (outType) {
-	case ANA_BYTE:
+	case LUX_BYTE:
 	  target->b = (Byte) target->w;
 	  break;
-	case ANA_WORD:
+	case LUX_WORD:
 	  break;
-	case ANA_LONG:
+	case LUX_LONG:
 	  target->l = (Int) target->w;
 	  break;
-	case ANA_FLOAT:
+	case LUX_FLOAT:
 	  target->f = (Float) target->w;
 	  break;
-	case ANA_DOUBLE:
+	case LUX_DOUBLE:
 	  target->d = (Double) target->w;
 	  break;
-	case ANA_CFLOAT:
+	case LUX_CFLOAT:
 	  target->cf.real = (Float) target->w;
 	  target->cf.imaginary = 0.0;
 	  break;
-	case ANA_CDOUBLE:
+	case LUX_CDOUBLE:
 	  target->cd.real = (Double) target->w;
 	  target->cd.imaginary = 0.0;
 	  break;
       }
       break;
-    case ANA_LONG:
+    case LUX_LONG:
       switch (outType) {
-	case ANA_BYTE:
+	case LUX_BYTE:
 	  target->b = (Byte) target->l;
 	  break;
 	  break;
-	case ANA_WORD:
+	case LUX_WORD:
 	  target->w = (Word) target->l;
 	  break;
-	case ANA_LONG:
+	case LUX_LONG:
 	  break;
-	case ANA_FLOAT:
+	case LUX_FLOAT:
 	  target->f = (Float) target->l;
 	  break;
-	case ANA_DOUBLE:
+	case LUX_DOUBLE:
 	  target->d = (Double) target->l;
 	  break;
-	case ANA_CFLOAT:
+	case LUX_CFLOAT:
 	  target->cf.real = (Float) target->l;
 	  target->cf.imaginary = 0.0;
 	  break;
-	case ANA_CDOUBLE:
+	case LUX_CDOUBLE:
 	  target->cd.real = (Double) target->l;
 	  target->cd.imaginary = 0.0;
 	  break;
       }
       break;
-    case ANA_FLOAT:
+    case LUX_FLOAT:
       switch (outType) {
-	case ANA_BYTE:
+	case LUX_BYTE:
 	  target->b = (Byte) target->f;
 	  break;
-	case ANA_WORD:
+	case LUX_WORD:
 	  target->w = (Word) target->f;
 	  break;
-	case ANA_LONG:
+	case LUX_LONG:
 	  target->l = (Int) target->f;
 	  break;
-	case ANA_FLOAT:
+	case LUX_FLOAT:
 	  break;
-	case ANA_DOUBLE:
+	case LUX_DOUBLE:
 	  target->d = (Double) target->f;
 	  break;
-	case ANA_CFLOAT:
+	case LUX_CFLOAT:
 	  target->cf.real = (Float) target->f;
 	  target->cf.imaginary = 0.0;
 	  break;
-	case ANA_CDOUBLE:
+	case LUX_CDOUBLE:
 	  target->cd.real = (Double) target->f;
 	  target->cd.imaginary = 0.0;
 	  break;
       }
       break;
-    case ANA_DOUBLE:
+    case LUX_DOUBLE:
       switch (outType) {
-	case ANA_BYTE:
+	case LUX_BYTE:
 	  target->b = (Byte) target->d;
 	  break;
-	case ANA_WORD:
+	case LUX_WORD:
 	  target->w = (Word) target->d;
 	  break;
-	case ANA_LONG:
+	case LUX_LONG:
 	  target->l = (Int) target->d;
 	  break;
-	case ANA_FLOAT:
+	case LUX_FLOAT:
 	  target->f = (Float) target->d;
 	  break;
-	case ANA_DOUBLE:
+	case LUX_DOUBLE:
 	  break;
-	case ANA_CFLOAT:
+	case LUX_CFLOAT:
 	  target->cf.real = (Float) target->d;
 	  target->cf.imaginary = 0.0;
 	  break;
-	case ANA_CDOUBLE:
+	case LUX_CDOUBLE:
 	  target->cd.real = (Double) target->d;
 	  target->cd.imaginary = 0.0;
 	  break;
       }
       break;
-    case ANA_CFLOAT:
+    case LUX_CFLOAT:
       switch (outType) {
-	case ANA_BYTE:
+	case LUX_BYTE:
 	  target->b = (Byte) target->cf.real;
 	  break;
-	case ANA_WORD:
+	case LUX_WORD:
 	  target->w = (Word) target->cf.real;
 	  break;
-	case ANA_LONG:
+	case LUX_LONG:
 	  target->l = (Int) target->cf.real;
 	  break;
-	case ANA_FLOAT:
+	case LUX_FLOAT:
 	  target->f = (Float) target->cf.real;
 	  break;
-	case ANA_DOUBLE:
+	case LUX_DOUBLE:
 	  target->d = (Double) target->cf.real;
 	  break;
-	case ANA_CFLOAT:
+	case LUX_CFLOAT:
 	  break;
-	case ANA_CDOUBLE:
+	case LUX_CDOUBLE:
 	  target->cd.real = (Double) target->cf.real;
 	  target->cd.imaginary = (Double) target->cf.imaginary;
 	  break;
       }
       break;
-    case ANA_CDOUBLE:
+    case LUX_CDOUBLE:
       switch (outType) {
-	case ANA_BYTE:
+	case LUX_BYTE:
 	  target->b = (Byte) target->cd.real;
 	  break;
-	case ANA_WORD:
+	case LUX_WORD:
 	  target->w = (Word) target->cd.real;
 	  break;
-	case ANA_LONG:
+	case LUX_LONG:
 	  target->l = (Int) target->cd.real;
 	  break;
-	case ANA_FLOAT:
+	case LUX_FLOAT:
 	  target->f = (Float) target->cd.real;
 	  break;
-	case ANA_DOUBLE:
+	case LUX_DOUBLE:
 	  target->d = (Double) target->cd.real;
 	  break;
-	case ANA_CFLOAT:
+	case LUX_CFLOAT:
 	  target->cf.real = (Float) target->cd.real;
 	  target->cf.imaginary = (Float) target->cd.imaginary;
 	  break;
-	case ANA_CDOUBLE:
+	case LUX_CDOUBLE:
 	  break;
       }
       break;
@@ -3816,97 +3816,97 @@ void convertScalar(scalar *target, Int nsym, Int type)
  n = scalar_type(nsym);
  ptr.b = &scalar_value(nsym).b;
  switch (type) {
- case ANA_BYTE:
+ case LUX_BYTE:
    switch (n) {
-   case ANA_BYTE:
+   case LUX_BYTE:
      (*target).b = (Byte) *ptr.b;
      break;
-   case ANA_WORD:
+   case LUX_WORD:
      (*target).b = (Byte) *ptr.w;
      break;
-   case ANA_LONG:
+   case LUX_LONG:
      (*target).b = (Byte) *ptr.l;
      break;
-   case ANA_FLOAT:
+   case LUX_FLOAT:
      (*target).b = (Byte) *ptr.f;
      break;
-   case ANA_DOUBLE:
+   case LUX_DOUBLE:
      (*target).b = (Byte) *ptr.d;
      break;
    }
    break;
- case ANA_WORD:
+ case LUX_WORD:
    switch (n) {
-   case ANA_BYTE:
+   case LUX_BYTE:
      (*target).w = (Word) *ptr.b;
      break;
-   case ANA_WORD:
+   case LUX_WORD:
      (*target).w = (Word) *ptr.w;
      break;
-   case ANA_LONG:
+   case LUX_LONG:
      (*target).w = (Word) *ptr.l;
      break;
-   case ANA_FLOAT:
+   case LUX_FLOAT:
      (*target).w = (Word) *ptr.f;
      break;
-   case ANA_DOUBLE:
+   case LUX_DOUBLE:
      (*target).w = (Word) *ptr.d;
      break;
    }
    break;
- case ANA_LONG:
+ case LUX_LONG:
    switch (n) {
-   case ANA_BYTE:
+   case LUX_BYTE:
      (*target).l = (Int) *ptr.b;
      break;
-   case ANA_WORD:
+   case LUX_WORD:
      (*target).l = (Int) *ptr.w;
      break;
-   case ANA_LONG:
+   case LUX_LONG:
      (*target).l = (Int) *ptr.l;
      break;
-   case ANA_FLOAT:
+   case LUX_FLOAT:
      (*target).l = (Int) *ptr.f;
      break;
-   case ANA_DOUBLE:
+   case LUX_DOUBLE:
      (*target).l = (Int) *ptr.d;
      break;
    }
    break;
- case ANA_FLOAT:
+ case LUX_FLOAT:
    switch (n) {
-   case ANA_BYTE:
+   case LUX_BYTE:
      (*target).f = (Float) *ptr.b;
      break;
-   case ANA_WORD:
+   case LUX_WORD:
      (*target).f = (Float) *ptr.w;
      break;
-   case ANA_LONG:
+   case LUX_LONG:
      (*target).f = (Float) *ptr.l;
      break;
-   case ANA_FLOAT:
+   case LUX_FLOAT:
      (*target).f = (Float) *ptr.f;
      break;
-   case ANA_DOUBLE:
+   case LUX_DOUBLE:
      (*target).f = (Float) *ptr.d;
      break;
    }
    break;
- case ANA_DOUBLE:
+ case LUX_DOUBLE:
    switch (n) {
-   case ANA_BYTE:
+   case LUX_BYTE:
      (*target).d = (Double) *ptr.b;
      break;
-   case ANA_WORD:
+   case LUX_WORD:
      (*target).d = (Double) *ptr.w;
      break;
-   case ANA_LONG:
+   case LUX_LONG:
      (*target).d = (Double) *ptr.l;
      break;
-   case ANA_FLOAT:
+   case LUX_FLOAT:
      (*target).d = (Double) *ptr.f;
      break;
-   case ANA_DOUBLE:
+   case LUX_DOUBLE:
      (*target).d = (Double) *ptr.d;
      break;
    }
@@ -3914,7 +3914,7 @@ void convertScalar(scalar *target, Int nsym, Int type)
  }
 }
 /*----------------------------------------------------------------*/
-Int ana_symbol_memory()
+Int lux_symbol_memory()
 /* returns the total of the memory allocated for each LUX symbol */
 /* - which is NOT the same as the total allocated memory. */
 /* Note:  some small stuff is not included. */
@@ -3923,7 +3923,7 @@ Int ana_symbol_memory()
 
  for (i = 0; i < NSYM; i++)
  { switch (sym[i].class)
-   { case ANA_EVB:
+   { case LUX_EVB:
        switch (sym[i].type)
        { default:
 	   break;
@@ -3931,24 +3931,24 @@ Int ana_symbol_memory()
 	 case EVB_USR_SUB: case EVB_INSERT:
 	   mem += symbol_memory(i);  break; }
        break;
-     case ANA_STRING: case ANA_LIST: case ANA_SUBSC_PTR: case ANA_INT_FUNC:
-     case ANA_USR_FUNC: case ANA_ARRAY:
+     case LUX_STRING: case LUX_LIST: case LUX_SUBSC_PTR: case LUX_INT_FUNC:
+     case LUX_USR_FUNC: case LUX_ARRAY:
        mem += symbol_memory(i);  break;
-     case ANA_LIST_PTR:
+     case LUX_LIST_PTR:
        if (list_ptr_target(i) > 0)
 	 mem += strlen(list_ptr_tag_string(i)) + 1;
        break;
-     case ANA_SUBROUTINE: case ANA_FUNCTION: case ANA_BLOCKROUTINE:
+     case LUX_SUBROUTINE: case LUX_FUNCTION: case LUX_BLOCKROUTINE:
        mem += routine_num_parameters(i)*(sizeof(char *) + sizeof(Word))
 	 + routine_num_statements(i)*sizeof(Word);
        break; }
  }
- i = scalar_scratch(ANA_LONG);
+ i = scalar_scratch(LUX_LONG);
  scalar_value(i).l = mem;
  return i;
 }
 /*----------------------------------------------------------------*/
-Int ana_trace(Int narg, Int ps[])
+Int lux_trace(Int narg, Int ps[])
 /* activates/deactivates trace facility */
 {
   extern Float	CPUtime;
@@ -3963,7 +3963,7 @@ Int ana_trace(Int narg, Int ps[])
 				/* /ENTER, /ROUTINE, /BRACES, /LOOP, /FILE */
   if (trace < 0) {
     trace = 0;
-    return anaerror("Negative Trace Level", ps[0]);
+    return luxerror("Negative Trace Level", ps[0]);
   }
   if (trace) {
     printf("Tracing activated at level %1d\n", trace);
@@ -3993,17 +3993,17 @@ Int ana_trace(Int narg, Int ps[])
   return 1;
 }
 /*----------------------------------------------------------------*/
-#define b_fix(name, value) { fixedValue(name, ANA_BYTE, value);  nFixed++; }
-#define l_fix(name, value) { fixedValue(name, ANA_LONG, value);  nFixed++; }
-#define f_fix(name, value) { fixedValue(name, ANA_FLOAT, value);  nFixed++; }
-#define d_fix(name, value) { fixedValue(name, ANA_DOUBLE, value);  nFixed++; }
-#define s_fix(name, value) { fixedValue(name, ANA_LSTRING, value);  nFixed++; }
-#define cf_fix(name, re, im) { fixedValue(name, ANA_CFLOAT, re, im); nFixed++; }
-#define cd_fix(name, re, im) { fixedValue(name, ANA_DFLOAT, re, im); nFixed++; }
-#define l_ptr(name, value) installPointer(name, ANA_LONG, value)
-#define f_ptr(name, value) installPointer(name, ANA_FLOAT, value)
-#define d_ptr(name, value) installPointer(name, ANA_DOUBLE, value)
-#define s_ptr(name, value) installPointer(name, ANA_TEMP_STRING, value)
+#define b_fix(name, value) { fixedValue(name, LUX_BYTE, value);  nFixed++; }
+#define l_fix(name, value) { fixedValue(name, LUX_LONG, value);  nFixed++; }
+#define f_fix(name, value) { fixedValue(name, LUX_FLOAT, value);  nFixed++; }
+#define d_fix(name, value) { fixedValue(name, LUX_DOUBLE, value);  nFixed++; }
+#define s_fix(name, value) { fixedValue(name, LUX_LSTRING, value);  nFixed++; }
+#define cf_fix(name, re, im) { fixedValue(name, LUX_CFLOAT, re, im); nFixed++; }
+#define cd_fix(name, re, im) { fixedValue(name, LUX_DFLOAT, re, im); nFixed++; }
+#define l_ptr(name, value) installPointer(name, LUX_LONG, value)
+#define f_ptr(name, value) installPointer(name, LUX_FLOAT, value)
+#define d_ptr(name, value) installPointer(name, LUX_DOUBLE, value)
+#define s_ptr(name, value) installPointer(name, LUX_TEMP_STRING, value)
 #define fnc_p(name, value) installSysFunc(name, value)
 
 char	*defaultRedirect = "diagnostic.ana";
@@ -4049,10 +4049,10 @@ extern Int	text_menus, tvplanezoom;
 #endif
 
 #if HAVE_LIBX11
-extern Int ana_button, eventSource, xcoord, ycoord, ana_keycode, ana_keysym,
-  last_menu, menu_item, ana_event, preventEventFlush, root_x, root_y,
+extern Int lux_button, eventSource, xcoord, ycoord, lux_keycode, lux_keysym,
+  last_menu, menu_item, lux_event, preventEventFlush, root_x, root_y,
   xerrors, last_wid, display_width, display_height, private_colormap,
-  zoom_frame, foreground_pixel, nColors, colormin, colormax, ana_keystate;
+  zoom_frame, foreground_pixel, nColors, colormin, colormax, lux_keystate;
 
 extern Float	tviy, tviyb, tvix, tvixb, xhair, yhair, menu_x, menu_y,
 		tvscale, zoom_xc, zoom_yc, zoom_mag, lumpx;
@@ -4066,41 +4066,41 @@ extern Int	motif_flag;
 char	*firstbreak;		/* for memck.c */
 
 enumElem	classesStruct[] = {
-  { "SCALAR", ANA_SCALAR },
-  { "STRING", ANA_STRING },
-  { "RANGE", ANA_RANGE },
-  { "ARRAY", ANA_ARRAY },
-  { "POINTER", ANA_POINTER },
-  { "ASSOC", ANA_ASSOC },
-  { "FUNC_PTR", ANA_FUNC_PTR },
-  { "SCAL_PTR", ANA_SCAL_PTR },
-  { "SUBSC_PTR", ANA_SUBSC_PTR },
-  { "FILEMAP", ANA_FILEMAP },
-  { "CLIST", ANA_CLIST },
-  { "LIST", ANA_LIST },
-  { "KEYWORD", ANA_KEYWORD },
-  { "LIST_PTR", ANA_LIST_PTR },
-  { "CPLIST", ANA_CPLIST },
-  { "SUBROUTINE", ANA_SUBROUTINE },
-  { "FUNCTION", ANA_FUNCTION },
-  { "BLOCKROUTINE", ANA_BLOCKROUTINE },
-  { "EVB", ANA_EVB },
-  { "UNDEFINED", ANA_UNDEFINED }
+  { "SCALAR", LUX_SCALAR },
+  { "STRING", LUX_STRING },
+  { "RANGE", LUX_RANGE },
+  { "ARRAY", LUX_ARRAY },
+  { "POINTER", LUX_POINTER },
+  { "ASSOC", LUX_ASSOC },
+  { "FUNC_PTR", LUX_FUNC_PTR },
+  { "SCAL_PTR", LUX_SCAL_PTR },
+  { "SUBSC_PTR", LUX_SUBSC_PTR },
+  { "FILEMAP", LUX_FILEMAP },
+  { "CLIST", LUX_CLIST },
+  { "LIST", LUX_LIST },
+  { "KEYWORD", LUX_KEYWORD },
+  { "LIST_PTR", LUX_LIST_PTR },
+  { "CPLIST", LUX_CPLIST },
+  { "SUBROUTINE", LUX_SUBROUTINE },
+  { "FUNCTION", LUX_FUNCTION },
+  { "BLOCKROUTINE", LUX_BLOCKROUTINE },
+  { "EVB", LUX_EVB },
+  { "UNDEFINED", LUX_UNDEFINED }
 };
 
 enumElem	typesStruct[] = {
-  { "BYTE", ANA_BYTE },
-  { "WORD", ANA_WORD },
-  { "LONG", ANA_LONG },
-  { "FLOAT", ANA_FLOAT },
-  { "DOUBLE", ANA_DOUBLE },
-  { "STRING", ANA_TEMP_STRING },
-  { "CFLOAT", ANA_CFLOAT },
-  { "CDOUBLE", ANA_CDOUBLE },
-  { "UNDEFINED", ANA_UNDEFINED }
+  { "BYTE", LUX_BYTE },
+  { "WORD", LUX_WORD },
+  { "LONG", LUX_LONG },
+  { "FLOAT", LUX_FLOAT },
+  { "DOUBLE", LUX_DOUBLE },
+  { "STRING", LUX_TEMP_STRING },
+  { "CFLOAT", LUX_CFLOAT },
+  { "CDOUBLE", LUX_CDOUBLE },
+  { "UNDEFINED", LUX_UNDEFINED }
 };
 
-enumElem	eventStruct[] =	{ /* see ana_register_event in menu.c */
+enumElem	eventStruct[] =	{ /* see lux_register_event in menu.c */
   { "KEYPRESS", 1 },
   { "BUTTONPRESS", 4 },
   { "BUTTONRELEASE", 8 },
@@ -4146,7 +4146,7 @@ struct boundsStruct	bounds = {
  { UINT8_MAX, INT16_MAX, INT32_MAX, FLT_MAX, DBL_MAX }
 };
 
-Int	ANA_MATMUL_FUN;
+Int	LUX_MATMUL_FUN;
 
 internalRoutine *subroutine, *function;
 
@@ -4177,7 +4177,7 @@ void symbolInitialization(void)
      || signal(SIGSEGV, exception) == SIG_ERR
      || signal(SIGCONT, exception) == SIG_ERR
      || signal(SIGTRAP, exception) == SIG_ERR)
-   anaerror("Could not install exception handlers", 0);
+   luxerror("Could not install exception handlers", 0);
 
  extern struct obstack *registered_subroutines;
  Int registered_subroutines_size
@@ -4211,17 +4211,17 @@ void symbolInitialization(void)
  qsort(function, nFunction, sizeof(internalRoutine), ircmp);
  for (i = 0; i < nSubroutine; i++) {
    if (i && !strcmp(subroutine[i].name, subroutine[i - 1].name))
-     anaerror("Internal subroutine name %s is used for multiple routines!",
+     luxerror("Internal subroutine name %s is used for multiple routines!",
               0, subroutine[i].name);
    installKeys(&subroutine[i].keys);
  }
  for (i = 0; i < nFunction; i++) {
    if (i && !strcmp(function[i].name, function[i - 1].name))
-     anaerror("Internal function name %s is used for multiple routines!",
+     luxerror("Internal function name %s is used for multiple routines!",
               0, function[i].name);
    installKeys(&function[i].keys);
  }
- ANA_MATMUL_FUN = findInternalName("MPRODUCT", 0);
+ LUX_MATMUL_FUN = findInternalName("MPRODUCT", 0);
  inputStream = stdin;
  outputStream = stdout;
  l_fix("#ZERO", 	0);
@@ -4266,40 +4266,40 @@ void symbolInitialization(void)
 
  iq = installString("#CLASS");
  stackSym = findVar(iq, 0);	/* stackSym is a dummy variable */
- sym[stackSym].class = ANA_ENUM;
- enum_type(stackSym) = ANA_LONG;
+ sym[stackSym].class = LUX_ENUM;
+ enum_type(stackSym) = LUX_LONG;
  enum_list(stackSym) = classesStruct;
  symbol_memory(stackSym) = sizeof(classesStruct);
  nFixed++;
 
  iq = installString("#COORDSYS");
  stackSym = findVar(iq, 0);
- symbol_class(stackSym) = ANA_ENUM;
- enum_type(stackSym) = ANA_LONG;
+ symbol_class(stackSym) = LUX_ENUM;
+ enum_type(stackSym) = LUX_LONG;
  enum_list(stackSym) = coordSysStruct;
  symbol_memory(stackSym) = sizeof(coordSysStruct);
  nFixed++;
 
  iq = installString("#EVENT");
  stackSym = findVar(iq, 0);
- sym[stackSym].class = ANA_ENUM;
- enum_type(stackSym) = ANA_LONG;
+ sym[stackSym].class = LUX_ENUM;
+ enum_type(stackSym) = LUX_LONG;
  enum_list(stackSym) = eventStruct;
  symbol_memory(stackSym) = sizeof(eventStruct);
  nFixed++;
 
  iq = installString("#FILETYPE");
  stackSym = findVar(iq, 0);
- sym[stackSym].class = ANA_ENUM;
- enum_type(stackSym) = ANA_LONG;
+ sym[stackSym].class = LUX_ENUM;
+ enum_type(stackSym) = LUX_LONG;
  enum_list(stackSym) = filetypeStruct;
  symbol_memory(stackSym) = sizeof(filetypeStruct);
  nFixed++;
 
  iq = installString("#TYPE");
  stackSym = findVar(iq, 0);
- sym[stackSym].class = ANA_ENUM;
- enum_type(stackSym) = ANA_LONG;
+ sym[stackSym].class = LUX_ENUM;
+ enum_type(stackSym) = LUX_LONG;
  enum_list(stackSym) = typesStruct;
  symbol_memory(stackSym) = sizeof(typesStruct);
  nFixed++;
@@ -4307,8 +4307,8 @@ void symbolInitialization(void)
 #if DEVELOP
  iq = installString("#P3D");
  projectSym = findVar(iq, 0);
- sym[projectSym].class = ANA_ARRAY;
- array_type(projectSym) = ANA_FLOAT;
+ sym[projectSym].class = LUX_ARRAY;
+ array_type(projectSym) = LUX_FLOAT;
  symbol_memory(projectSym) =
    sizeof(array) + 16*sizeof(Float);
  eallocate(p, i, char);
@@ -4322,15 +4322,15 @@ void symbolInitialization(void)
 
  iq = installString("#STACK");
  stackSym = findVar(iq, 0);
- sym[stackSym].class = ANA_CLIST;
+ sym[stackSym].class = LUX_CLIST;
  clist_symbols(stackSym) = stackPointer;
  symbol_memory(stackSym) = 0;	/* or it will get deallocated sometime */
  nFixed++;
 
  iq = findVarName("#TYPESIZE", 0);
- i = 10;			/* ana_type_size[] # elements! */
- to_scratch_array(iq, ANA_LONG, 1, &i);
- memcpy(array_data(iq), ana_type_size, i*sizeof(Int));
+ i = 10;			/* lux_type_size[] # elements! */
+ to_scratch_array(iq, LUX_LONG, 1, &i);
+ memcpy(array_data(iq), lux_type_size, i*sizeof(Int));
 
  /* s_fix("#NL",		"\n"); */
  l_ptr("#COL",		&termCol);
@@ -4345,7 +4345,7 @@ void symbolInitialization(void)
  l_ptr("!BB_UPDATE",	&updateBoundingBox);
  l_ptr("!BC",		&byte_count);
 #if HAVE_LIBX11
- l_ptr("!BUTTON",	&ana_button);
+ l_ptr("!BUTTON",	&lux_button);
 #endif
  f_ptr("!BXB",		&postXBot);
  f_ptr("!BXT",		&postXTop);
@@ -4384,7 +4384,7 @@ void symbolInitialization(void)
  l_ptr("!ERRNO",	&errno);
 #if HAVE_LIBX11
  l_ptr("!EVENTSOURCE",	&eventSource);
- l_ptr("!EVENTTYPE",	&ana_event);
+ l_ptr("!EVENTTYPE",	&lux_event);
 #endif
  l_ptr("!FFTDP", 	&fftdp);
  l_ptr("!FONT",		&ifont);
@@ -4426,9 +4426,9 @@ void symbolInitialization(void)
  fnc_p("!JD",		11);
 #if HAVE_LIBX11			/* a non-X11 version of this is needed */
  l_ptr("!KB",		&kb);
- l_ptr("!KEYCODE",	&ana_keycode);
- l_ptr("!KEYSTATE",	&ana_keystate);
- l_ptr("!KEYSYM",	&ana_keysym);
+ l_ptr("!KEYCODE",	&lux_keycode);
+ l_ptr("!KEYSTATE",	&lux_keystate);
+ l_ptr("!KEYSYM",	&lux_keysym);
 #endif
  l_ptr("!LABX",		&ilabx);
  l_ptr("!LABY",		&ilaby);
@@ -4586,8 +4586,8 @@ void symbolInitialization(void)
 	   in  EVAL(string) */
  iq = installString("!TEMP");
  tempSym = findVar(iq, 0);
- sym[tempSym].class = ANA_SCALAR;
- scalar_type(tempSym) = ANA_LONG;
+ sym[tempSym].class = LUX_SCALAR;
+ scalar_type(tempSym) = LUX_LONG;
  scalar_value(tempSym).l = 0;
  lastmax_sym = lookForVarName("!LASTMAX", 0);
  lastmin_sym = lookForVarName("!LASTMIN", 0);
@@ -4665,7 +4665,7 @@ Int strcasecmp_p(char *s1, char *s2)
 /*----------------------------------------------------------------*/
 Int	nBreakpoint = 0;
 breakpointInfo	breakpoint[NBREAKPOINTS];
-Int ana_breakpoint(Int narg, Int ps[])
+Int lux_breakpoint(Int narg, Int ps[])
 /* BREAKPOINT,string[,/SET,/VARIABLE] */
 /* BREAKPOINT,n[,/DISABLE,/ENABLE,/DELETE] */
 /* BREAKPOINT,/LIST */
@@ -4679,14 +4679,14 @@ Int ana_breakpoint(Int narg, Int ps[])
     switch (internalMode & 3) {
       case 0:
 	switch (symbol_class(ps[0])) {
-	  case ANA_STRING:	/* /SET */
+	  case LUX_STRING:	/* /SET */
 	    s = string_arg(ps[0]);
 	    if (!s)		/* empty string */
 	      return -1;
 	    if (nBreakpoint == NBREAKPOINTS) {
 	      printf("Maximum number of breakpoints (%1d) has been reached\n",
 		     NBREAKPOINTS);
-	      return anaerror("New breakpoint has been rejected.", ps[0]);
+	      return luxerror("New breakpoint has been rejected.", ps[0]);
 	    }
 	    /* seek an empty breakpoint slot */
 	    while (breakpoint[curBreakpoint].status & BP_DEFINED)
@@ -4700,7 +4700,7 @@ Int ana_breakpoint(Int narg, Int ps[])
 	    else {
 	      if (!isdigit((Byte) *p))
 		return
-		  anaerror("Illegal breakpoint line number specification (%s)",
+		  luxerror("Illegal breakpoint line number specification (%s)",
 			ps[0], p);
 	      breakpoint[curBreakpoint].line = atol(p);
 	    }
@@ -4717,13 +4717,13 @@ Int ana_breakpoint(Int narg, Int ps[])
 	    break;
 	  default:
 	    return cerror(ILL_CLASS, ps[0]);
-	  case ANA_SCALAR:		/* /ENABLE */
+	  case LUX_SCALAR:		/* /ENABLE */
 	    n = int_arg(ps[0]);
 
 	    if (n < 0 || n >= NBREAKPOINTS)
-	      return anaerror("Illegal breakpoint number", ps[0]);
+	      return luxerror("Illegal breakpoint number", ps[0]);
 	    if (!(breakpoint[n].status & 1))
-	      return anaerror("Non-existent breakpoint", ps[0]);
+	      return luxerror("Non-existent breakpoint", ps[0]);
 	    breakpoint[n].status |= BP_ENABLED; /* enable */
 	    break;
 	}
@@ -4731,25 +4731,25 @@ Int ana_breakpoint(Int narg, Int ps[])
       case 1:			/* /ENABLE */
 	n = int_arg(ps[0]);
 	if (n < 0 || n >= NBREAKPOINTS)
-	  return anaerror("Illegal breakpoint number", ps[0]);
+	  return luxerror("Illegal breakpoint number", ps[0]);
 	if (!(breakpoint[n].status & BP_DEFINED))
-	  return anaerror("Non-existent breakpoint", ps[0]);
+	  return luxerror("Non-existent breakpoint", ps[0]);
 	breakpoint[n].status |= BP_ENABLED; /* enable */
 	break;
       case 2:			/* /DISABLE */
 	n = int_arg(ps[0]);
 	if (n < 0 || n >= NBREAKPOINTS)
-	  return anaerror("Illegal breakpoint number", ps[0]);
+	  return luxerror("Illegal breakpoint number", ps[0]);
 	if (!(breakpoint[n].status & BP_DEFINED))
-	  return anaerror("Non-existent breakpoint", ps[0]);
+	  return luxerror("Non-existent breakpoint", ps[0]);
 	breakpoint[n].status &= ~BP_ENABLED; /* disable */
 	break;
       case 3:			/* /DELETE */
 	n = int_arg(ps[0]);
 	if (n < 0 || n >= NBREAKPOINTS)
-	  return anaerror("Illegal breakpoint number", ps[0]);
+	  return luxerror("Illegal breakpoint number", ps[0]);
 	if (!(breakpoint[n].status & BP_DEFINED))
-	  return anaerror("Non-existent breakpoint", ps[0]);
+	  return luxerror("Non-existent breakpoint", ps[0]);
 	free(breakpoint[n].name);
 	breakpoint[n].status = 0; /* delete */
 	nBreakpoint--;
@@ -4778,7 +4778,7 @@ Int ana_breakpoint(Int narg, Int ps[])
 /*----------------------------------------------------------------*/
 Word	watchVars[NWATCHVARS];
 Int	nWatchVars = 0;
-Int ana_watch(Int narg, Int ps[])
+Int lux_watch(Int narg, Int ps[])
 /* WATCH,<variable>[,/DELETE,/LIST] */
 {
   static Int	curWatchVar = 0;
@@ -4786,7 +4786,7 @@ Int ana_watch(Int narg, Int ps[])
 
   if (narg) {
     if (!symbolIsNamed(ps[0]))
-      return anaerror("Need a named variable", ps[0]);
+      return luxerror("Need a named variable", ps[0]);
     if (internalMode & 1) {	/* /DELETE */
       for (i = 0; i < NWATCHVARS; i++) {
 	if (watchVars[i] == ps[0]) {
@@ -4800,7 +4800,7 @@ Int ana_watch(Int narg, Int ps[])
 	       symbolProperName(ps[0]));
     } else {			/* install */
       if (nWatchVars == NWATCHVARS - 1)
-	return anaerror("Maximum number of watched variables is already reached",
+	return luxerror("Maximum number of watched variables is already reached",
 		     ps[0]);
       while (watchVars[curWatchVar])
 	curWatchVar++;
@@ -4819,15 +4819,15 @@ Int ana_watch(Int narg, Int ps[])
 	printw(symbolProperName(watchVars[i]));
       }
   }
-  return ANA_OK;
+  return LUX_OK;
 }
 /*----------------------------------------------------------------*/
-Int ana_symbol_number(Int narg, Int ps[])
+Int lux_symbol_number(Int narg, Int ps[])
      /* returns the symbol number of the argument */
 {
   Int	result;
   
-  result = scalar_scratch(ANA_LONG);
+  result = scalar_scratch(LUX_LONG);
   sym[result].spec.scalar.l = *ps;
   return result;
 }
@@ -4835,7 +4835,7 @@ Int ana_symbol_number(Int narg, Int ps[])
 void mark(Int symbol)
 {
   if (markIndex == MSSIZE - 1)
-  { anaerror("mark: WARNING - Too many temps marked", symbol);
+  { luxerror("mark: WARNING - Too many temps marked", symbol);
     return; }
   markStack[markIndex++] = symbol;
 }
@@ -4843,7 +4843,7 @@ void mark(Int symbol)
 void pegMark(void)
 {
   if (markIndex == MSSIZE - 1)
-  { anaerror("pegMark: WARNING - Too many temps marked", -1);
+  { luxerror("pegMark: WARNING - Too many temps marked", -1);
     return; }
   markStack[markIndex++] = -1;
 }
@@ -4851,7 +4851,7 @@ void pegMark(void)
 void pegParse(void)
 {
   if (markIndex == MSSIZE - 1)
-  { anaerror("pegParse: WARNING - Too many temps marked", -1);
+  { luxerror("pegParse: WARNING - Too many temps marked", -1);
     return; }
   markStack[markIndex++] = -2;
 }
@@ -4864,14 +4864,14 @@ void zapParseTemps(void)
     zapTemp(iq);
   markIndex++;			/* retain -2 on mark stack */
   if (iq != -2)
-  { anaerror("zapParseTemps: WARNING - Not at parse level", -1);
+  { luxerror("zapParseTemps: WARNING - Not at parse level", -1);
     return; }
 }
 /*----------------------------------------------------------------*/
 void removeParseMarker(void)
 {
   if (markIndex < 1 || markStack[markIndex - 1] != -2)
-  { anaerror("removeParseMarker: WARNING - Not at parse level", -1);
+  { luxerror("removeParseMarker: WARNING - Not at parse level", -1);
     return; }
   markIndex--;
 }
@@ -4905,14 +4905,14 @@ void checkTemps(void)
 
   n = 0;
   for (i = TEMPS_START; i < TEMPS_END; i++)
-    if (symbol_class(i) != ANA_UNUSED)
+    if (symbol_class(i) != LUX_UNUSED)
       n++;
   if (n != nTempVariable)
     printf("WARNING - %1d temps expected, %1d found\n",
 	   nTempVariable, n);
   n = 0;
   for (i = TEMP_EXE_START; i < TEMP_EXE_END; i++)
-    if (symbol_class(i) != ANA_UNUSED)
+    if (symbol_class(i) != LUX_UNUSED)
       n++;
   if (n != nTempExecutable)
     printf("WARNING - %1d temp executables expected, %1d found\n",
@@ -4920,7 +4920,7 @@ void checkTemps(void)
 }
 /*----------------------------------------------------------------*/
 #include <unistd.h>
-Int ana_restart(Int narg, Int ps[])
+Int lux_restart(Int narg, Int ps[])
 {
   extern char	*programName;
   Int	saveHistory(void);
@@ -4949,43 +4949,43 @@ Int structSize(Int symbol, Int *nstruct, Int *nbyte)
   listElem	*l;
 
   switch (symbol_class(symbol)) {
-    case ANA_SCALAR: case ANA_CSCALAR:
-      *nbyte = ana_type_size[symbol_type(symbol)];
+    case LUX_SCALAR: case LUX_CSCALAR:
+      *nbyte = lux_type_size[symbol_type(symbol)];
       *nstruct = 1;
       return 1;
-    case ANA_STRING:
+    case LUX_STRING:
       *nbyte = string_size(symbol);
       *nstruct = 1;
       return 1;
-    case ANA_ARRAY: case ANA_CARRAY:
-      *nbyte = array_size(symbol)*ana_type_size[array_type(symbol)];
+    case LUX_ARRAY: case LUX_CARRAY:
+      *nbyte = array_size(symbol)*lux_type_size[array_type(symbol)];
       *nstruct = 1;
       return 1;
-    case ANA_CLIST:
+    case LUX_CLIST:
       p.w = clist_symbols(symbol);
       n = clist_num_symbols(symbol);
       *nbyte = 0;
       *nstruct = 1;		/* one extra for the struct info */
       while (n--) {
-	if (structSize(*p.w++, &ns, &nb) == ANA_ERROR)
-	  return ANA_ERROR;
+	if (structSize(*p.w++, &ns, &nb) == LUX_ERROR)
+	  return LUX_ERROR;
 	*nbyte += nb;
 	*nstruct += ns;
       }
       return 1;
-    case ANA_LIST:
+    case LUX_LIST:
       l = list_symbols(symbol);
       n = list_num_symbols(symbol);
       *nbyte = 0;
       *nstruct = 1;		/* one extra for the struct info */
       while (n--) {
-	if (structSize(l++->value, &ns, &nb) == ANA_ERROR)
-	  return ANA_ERROR;
+	if (structSize(l++->value, &ns, &nb) == LUX_ERROR)
+	  return LUX_ERROR;
 	*nbyte += nb;
 	*nstruct += ns;
       }
       return 1;
-    case ANA_STRUCT:
+    case LUX_STRUCT:
       *nstruct = struct_num_all_elements(symbol);
       *nbyte = struct_total_size(symbol);
       return 1;
@@ -5004,20 +5004,20 @@ Int makeStruct(Int symbol, char *tag, structElem **se, char *data,
   listElem	*le;
 
   if (descend) {
-    return ANA_OK;
+    return LUX_OK;
   } else {
     (*se)->u.regular.tag = tag? strsave(tag): NULL;
     (*se)->u.regular.offset = *offset; /* Byte offset from start */
     switch (symbol_class(symbol)) {
-      case ANA_SCALAR: case ANA_CSCALAR:
+      case LUX_SCALAR: case LUX_CSCALAR:
 	(*se)->u.regular.type = scalar_type(symbol); /* data type */
 	(*se)->u.regular.spec.singular.ndim = 0; /* 0 -> scalar */
 	/* copy the value into the structure */
-	size = ana_type_size[scalar_type(symbol)];/* bytes per value */
+	size = lux_type_size[scalar_type(symbol)];/* bytes per value */
 	memcpy(data + *offset, &scalar_value(symbol).b, size);
 	break;
-      case ANA_STRING:
-	(*se)->u.regular.type = ANA_TEMP_STRING; /* data type */
+      case LUX_STRING:
+	(*se)->u.regular.type = LUX_TEMP_STRING; /* data type */
 	(*se)->u.regular.spec.singular.ndim = 1; /* strings always have 1 */
 	if (!((*se)->u.regular.spec.singular.dims = malloc(sizeof(Int))))
 	  return cerror(ALLOC_ERR, 0);
@@ -5025,16 +5025,16 @@ Int makeStruct(Int symbol, char *tag, structElem **se, char *data,
 	(*se)->u.regular.spec.singular.dims[0] = size; /* first dimension */
 	memcpy(data + *offset, string_value(symbol), size); /* copy value */
 	break;
-      case ANA_ARRAY: case ANA_CARRAY:
+      case LUX_ARRAY: case LUX_CARRAY:
 	(*se)->u.regular.type = array_type(symbol);
 	ndim = array_num_dims(symbol);
-	if (array_type(symbol) == ANA_STRING_ARRAY)
+	if (array_type(symbol) == LUX_STRING_ARRAY)
 	  ndim++;		/* add one for string arrays to hold the */
 				/* length of the strings */
 	(*se)->u.regular.spec.singular.ndim = ndim;
 	if (!((*se)->u.regular.spec.singular.dims = malloc(ndim*sizeof(Int))))
 	  return cerror(ALLOC_ERR, 0);
-	if (array_type(symbol) == ANA_STRING_ARRAY) {
+	if (array_type(symbol) == LUX_STRING_ARRAY) {
 	  (*se)->u.regular.spec.singular.dims[0] =
 	    strlen(*(char **) array_data(symbol)); /* take length of first */
 						   /* one for all */
@@ -5043,17 +5043,17 @@ Int makeStruct(Int symbol, char *tag, structElem **se, char *data,
 	} else
 	  memcpy((*se)->u.regular.spec.singular.dims,
 		 array_dims(symbol), array_num_dims(symbol)*sizeof(Int));
-	size = ana_type_size[array_type(symbol)]*array_size(symbol);
+	size = lux_type_size[array_type(symbol)]*array_size(symbol);
 	memcpy(data + *offset, array_data(symbol), size); /* copy values */
 	break;
-      case ANA_CLIST:
+      case LUX_CLIST:
 	arg = clist_symbols(symbol);
 	n = clist_num_symbols(symbol);
 	offset0 = *offset;
 	se0 = *se;
 	while (n--)
-	  if (makeStruct(*arg++, NULL, se, data, offset, 0) == ANA_ERROR)
-	    return ANA_ERROR;
+	  if (makeStruct(*arg++, NULL, se, data, offset, 0) == LUX_ERROR)
+	    return LUX_ERROR;
 	arg = clist_symbols(symbol);
 	n = clist_num_symbols(symbol);
 	*offset = offset0;
@@ -5061,14 +5061,14 @@ Int makeStruct(Int symbol, char *tag, structElem **se, char *data,
 	while (n--)
 	  makeStruct(*arg++, NULL, se, data, offset, 1);
 	break;
-      case ANA_LIST:
+      case LUX_LIST:
 	le = list_symbols(symbol);
 	n = list_num_symbols(symbol);
 	offset0 = *offset;
 	se0 = *se;
 	while (n--) {
-	  if (makeStruct(le->value, le->key, se, data, offset, 0) == ANA_ERROR)
-	    return ANA_ERROR;
+	  if (makeStruct(le->value, le->key, se, data, offset, 0) == LUX_ERROR)
+	    return LUX_ERROR;
 	  le++;
 	}
 	le = list_symbols(symbol);
@@ -5080,17 +5080,17 @@ Int makeStruct(Int symbol, char *tag, structElem **se, char *data,
 	  le++;
 	}
 	break;
-      case ANA_STRUCT:
+      case LUX_STRUCT:
 	/* CONTINUE HERE */
 	break;
     }
     *offset += size;
     (*se)++;
   }
-  return ANA_OK;
+  return LUX_OK;
 }
 /*----------------------------------------------------------------*/
-Int ana_struct(Int narg, Int ps[])
+Int lux_struct(Int narg, Int ps[])
 /* definition of a structure.  Structures can contain values of all
    numerical and string types, with individual dimensional structures
    for each component.  Each element of a structure covers a specific
@@ -5108,22 +5108,22 @@ Int ana_struct(Int narg, Int ps[])
   pointer	data;
   structElem	*se;
   
-  if (structSize(ps[0], &nstruct, &size) == ANA_ERROR) /* check
+  if (structSize(ps[0], &nstruct, &size) == LUX_ERROR) /* check
 							  specification */
-    return ANA_ERROR;
+    return LUX_ERROR;
   nstruct++;			/* one extra for the top-level description */
   ndim = narg - 1;
-  if (get_dims(&ndim, ps + 1, dims) == ANA_ERROR) /* read dimensions */
-    return ANA_ERROR;
+  if (get_dims(&ndim, ps + 1, dims) == LUX_ERROR) /* read dimensions */
+    return LUX_ERROR;
   /* calculate the number of repetitions of the outer structure */
   n = 1;
   for (i = 0; i < ndim; i++)
     n *= dims[i];
 
   result = nextFreeTempVariable();
-  if (result == ANA_ERROR)
-    return ANA_ERROR;
-  symbol_class(result) = ANA_STRUCT;
+  if (result == LUX_ERROR)
+    return LUX_ERROR;
+  symbol_class(result) = LUX_STRUCT;
   symbol_memory(result) = sizeof(Int) /* to store the number of elements */
     + nstruct*sizeof(structElem) /* to store the structure information */
     + size*n;			/* to store the data values */
@@ -5137,17 +5137,17 @@ Int ana_struct(Int narg, Int ps[])
 
   /* we must fill in the first descriptor */
   switch (symbol_class(ps[0])) {
-    case ANA_SCALAR: case ANA_CSCALAR: case ANA_STRING: case ANA_ARRAY:
-    case ANA_CARRAY:
+    case LUX_SCALAR: case LUX_CSCALAR: case LUX_STRING: case LUX_ARRAY:
+    case LUX_CARRAY:
       n = 1;
       break;
-    case ANA_CLIST:
+    case LUX_CLIST:
       n = clist_num_symbols(ps[0]);
       break;
-    case ANA_LIST:
+    case LUX_LIST:
       n = list_num_symbols(ps[0]);
       break;
-    case ANA_STRUCT:
+    case LUX_STRUCT:
       n = struct_num_top_elements(ps[0]);
       break;
   }  
@@ -5161,12 +5161,12 @@ Int ana_struct(Int narg, Int ps[])
   offset = 0;
 
   /* now recursively fill in the deeper ones */
-  if (makeStruct(ps[0], NULL, &se, data.v, &offset, 0) == ANA_ERROR)
-    return ANA_ERROR;
+  if (makeStruct(ps[0], NULL, &se, data.v, &offset, 0) == LUX_ERROR)
+    return LUX_ERROR;
   return result;
 }
 /*----------------------------------------------------------------*/
-Int ana_buffering(Int narg, Int ps[])
+Int lux_buffering(Int narg, Int ps[])
 /* BUFFERING [, <type>, /LINE, /CHAR ]
  shows or sets the kind of input buffering for LUX.
  no arguments -> show current setting
@@ -5181,14 +5181,14 @@ Int ana_buffering(Int narg, Int ps[])
   if (!narg && !internalMode) {
     printf("%s currently reads %sbuffered input.\n", programName,
 	   buffering? "": "un");
-    return ANA_OK;
+    return LUX_OK;
   }
   if (narg)
     newBuf = int_arg(ps[0]);
   else
     newBuf = internalMode;
   if (newBuf < 0 || newBuf > 2)
-    return anaerror("Illegal buffering type specification", 0);
+    return luxerror("Illegal buffering type specification", 0);
   noPrompt = (newBuf == 2);
   newBuf &= ~2;
   if (newBuf ^ buffering) {
@@ -5199,7 +5199,7 @@ Int ana_buffering(Int narg, Int ps[])
   }
   printf("%s now reads %sbuffered input.\n", programName,
 	 buffering? "": "un");
-  return ANA_OK;
+  return LUX_OK;
 }
 /*----------------------------------------------------------------*/
 Int translateEscapes(char *p)
@@ -5255,12 +5255,12 @@ Int installString(char *string)
  extern Int	yydebug;
 #endif
 
- if ((index = nextFreeStackEntry()) == ANA_ERROR)
-   return ANA_ERROR;		/* error */
+ if ((index = nextFreeStackEntry()) == LUX_ERROR)
+   return LUX_ERROR;		/* error */
  n = strlen(string) + 1;
  p = malloc(n);
  if (!p)
-   return anaerror("Could not allocate %d bytes for string %s", 0, n, string);
+   return luxerror("Could not allocate %d bytes for string %s", 0, n, string);
  strcpy(p, string);
  p0 = p;
 
@@ -5308,7 +5308,7 @@ void installKeys(void *keys)
  /* ANSI C does not allow string constants to be modified, so we */
  /* make a copy of the string and modify that */
  if (!(copy = (char *) malloc(strlen(*(char **) keys) + 1))) {
-   anaerror("Memory allocation error in installKeys [%s]", 0, (char *) keys);
+   luxerror("Memory allocation error in installKeys [%s]", 0, (char *) keys);
    return;
  }
  strcpy(copy, *(char **) keys);
@@ -5320,7 +5320,7 @@ void installKeys(void *keys)
    }
  if (!(result = (char **) malloc((n + 1)*sizeof(char *)))
      || !(theKeyList = (keyList *) malloc(sizeof(keyList)))) {
-   anaerror("Memory allocation error in installKeys [%s].", 0, (char *) keys);
+   luxerror("Memory allocation error in installKeys [%s].", 0, (char *) keys);
    return;
  }
  theKeyList->keys = result;
@@ -5392,7 +5392,7 @@ Int findName(char *name, hashTableEntry *hashTable[], Int context)
  }
 		/* wasn't defined yet;  install if not !xxx */
  if (*name == '!' && !installing)
-   return anaerror("Non-existent system variable %s", 0, name);
+   return luxerror("Non-existent system variable %s", 0, name);
  hp = (hashTableEntry *) malloc(sizeof(hashTableEntry));
  if (!hp)
    return cerror(ALLOC_ERR, 0);
@@ -5407,13 +5407,13 @@ Int findName(char *name, hashTableEntry *hashTable[], Int context)
  hp->symNum = i;
  hp->next = NULL;
  sym[i].xx = hashValue + 1;
- symbol_class(i) = ANA_UNDEFINED;
+ symbol_class(i) = LUX_UNDEFINED;
  sym[i].context = context;
  sym[i].line = curLineNumber;
  return i;
 }
 /*----------------------------------------------------------------*/
-Int ana_verify(Int narg, Int ps[])
+Int lux_verify(Int narg, Int ps[])
 /* verifies that all referenced subroutines, functions, and files
    actually exist */
 {
@@ -5430,7 +5430,7 @@ Int ana_verify(Int narg, Int ps[])
     if (!fp) {
       printf("Cannot open file %s\n", name);
       perror("System message");
-      return ANA_ERROR;
+      return LUX_ERROR;
     }
     compileOnly++;
     executeLevel++;
@@ -5439,15 +5439,15 @@ Int ana_verify(Int narg, Int ps[])
     n = installString(compileName);
     oldInstalling = installing;
     installing = 1;
-    nsym = newSymbol(ANA_BLOCKROUTINE, n);
+    nsym = newSymbol(LUX_BLOCKROUTINE, n);
     installing = oldInstalling;
     curContext = nsym;
     n = nextCompileLevel(fp, expname);
     fclose(fp);
     if (n < 0
-	|| newSymbol(ANA_BLOCKROUTINE, -nsym - 1) < 0) { /* some error */
+	|| newSymbol(LUX_BLOCKROUTINE, -nsym - 1) < 0) { /* some error */
       zap(nsym);
-      return ANA_OK;
+      return LUX_OK;
     } else {
       n = installString(compileName);
       result = newBlockSymbol(n);
@@ -5459,7 +5459,7 @@ Int ana_verify(Int narg, Int ps[])
 
   for (i = EXE_START; i < TEMP_EXE_END; i++) {
     switch (symbol_class(i)) {
-      case ANA_EVB:
+      case LUX_EVB:
 	switch (evb_type(i)) {
 	  case EVB_FILE:
 	    name = file_name(i);
@@ -5480,7 +5480,7 @@ Int ana_verify(Int narg, Int ps[])
 	    break;
 	  case EVB_USR_SUB:
 	    n = usr_sub_routine_num(i);
-	    if (symbol_class(n) == ANA_STRING) {
+	    if (symbol_class(n) == LUX_STRING) {
 	      /* routine name was not yet evaluated */
 	      name = string_value(n);
 	      if ((n = lookForName(name, subrHashTable, 0)) < 0) {
@@ -5500,7 +5500,7 @@ Int ana_verify(Int narg, Int ps[])
 	    break;
 	  case EVB_USR_CODE:
 	    n = usr_code_routine_num(i);
-	    if (symbol_class(n) == ANA_STRING) {
+	    if (symbol_class(n) == LUX_STRING) {
 	      /* routine name was not yet evaluated */
 	      name = string_value(n);
 	      if ((n = lookForName(name, blockHashTable, curContext)) < 0) {
@@ -5521,7 +5521,7 @@ Int ana_verify(Int narg, Int ps[])
     zap(nsym);
     compileOnly--;
   }
-  return ANA_OK;
+  return LUX_OK;
 }
 /*----------------------------------------------------------------*/
 compileInfo *nextFreeCompileInfo(void)
@@ -5585,13 +5585,13 @@ void showExecutionLevel(Int symbol)
       target = e_info[i].target;
       if (target > 0) {	/* something user-defined */
 	switch (symbol_class(target)) {
-	  case ANA_SUBROUTINE:
+	  case LUX_SUBROUTINE:
 	    printf("subr");
 	    break;
-	  case ANA_FUNCTION:
+	  case LUX_FUNCTION:
 	    printf("func");
 	    break;
-	  case ANA_BLOCKROUTINE:
+	  case LUX_BLOCKROUTINE:
 	    printf("block");
 	    break;
 	  default:

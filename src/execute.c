@@ -42,7 +42,7 @@ char	preserveKey;
 
 char	*currentRoutineName = NULL;
 
-Int	ana_convert(Int, Int *, Int, Int), convertScalar(scalar *, Int, Int),
+Int	lux_convert(Int, Int *, Int, Int), convertScalar(scalar *, Int, Int),
 	dereferenceScalPointer(Int), eval(Int),
 	nextCompileLevel(FILE *, char *);
 void	zap(Int symbol), updateIndices(void);
@@ -52,15 +52,15 @@ void showExecutionLevel(Int symbol);
 
 /*------------------------------------------------------------------*/
 void fixContext(Int symbol, Int context)
-/* change the context of embedded symbols (in ANA_RANGE, ANA_LIST, */
-/* ANA_CLIST, ANA_KEYWORD) to reflect embedding in <symbol>. */
+/* change the context of embedded symbols (in LUX_RANGE, LUX_LIST, */
+/* LUX_CLIST, LUX_KEYWORD) to reflect embedding in <symbol>. */
 {
   Int	i, nElem;
   Word	*ptr;
   listElem	*p;
 
   switch (symbol_class(symbol)) {
-    case ANA_RANGE:
+    case LUX_RANGE:
       i = range_start(symbol);
       if (i < 0)
 	i = -i;
@@ -75,14 +75,14 @@ void fixContext(Int symbol, Int context)
       if (i > 0 && symbol_context(i) == symbol)
 	symbol_context(i) = context;
       break;
-    case ANA_CLIST:
+    case LUX_CLIST:
       ptr = clist_symbols(symbol);
       nElem = clist_num_symbols(symbol);
       while (nElem--)
 	if (symbol_context(i = *ptr++) == symbol)
 	  symbol_context(i) = context;
       break;
-    case ANA_LIST:
+    case LUX_LIST:
       p = list_symbols(symbol);
       nElem = list_num_symbols(symbol);
       while (nElem--) {
@@ -91,7 +91,7 @@ void fixContext(Int symbol, Int context)
 	p++;
       }
       break;
-    case ANA_KEYWORD:
+    case LUX_KEYWORD:
       if (symbol_context(i = keyword_name_symbol(symbol)) == symbol)
 	symbol_context(i) = context;
       if (symbol_context(i = keyword_value(symbol)) == symbol)
@@ -113,7 +113,7 @@ Int copyToSym(Int target, Int source)
 
   if (source < 0)		/* some error */
     return source;
-  if (symbol_class(source) == ANA_SCAL_PTR) {
+  if (symbol_class(source) == LUX_SCAL_PTR) {
     source = dereferenceScalPointer(source);
     zapIt = 1;
   }
@@ -121,29 +121,29 @@ Int copyToSym(Int target, Int source)
   symbol_type(target) = symbol_type(source);
   /* target symbol keeps its old context and line number */
   switch (symbol_class(source)) {
-    case ANA_SCAL_PTR:
-      if (scal_ptr_type(source) == ANA_TEMP_STRING) {
+    case LUX_SCAL_PTR:
+      if (scal_ptr_type(source) == LUX_TEMP_STRING) {
 	target = string_scratch(strlen(scal_ptr_pointer(source).s));
 	strcpy(string_value(target), scal_ptr_pointer(source).s);
       } else {			/* numerical */
 	memcpy(&scalar_value(target), scal_ptr_pointer(source).b,
 	       sizeof(scalar));
-	symbol_class(target) = ANA_SCALAR;
+	symbol_class(target) = LUX_SCALAR;
       }
       break;
-    case ANA_SCALAR: 
+    case LUX_SCALAR: 
       memcpy(&scalar_value(target), &scalar_value(source),
 	     sizeof(scalar_value(source)));
       break;
-    case ANA_STRING: case ANA_FILEMAP: case ANA_ASSOC:
+    case LUX_STRING: case LUX_FILEMAP: case LUX_ASSOC:
       size = symbol_memory(source);
       allocate(symbol_data(target), size, char);
       memcpy(symbol_data(target), symbol_data(source), size);
       symbol_memory(target) = size;
-      if (symbol_class(source) == ANA_STRING)
-	string_type(target) = ANA_TEMP_STRING;
+      if (symbol_class(source) == LUX_STRING)
+	string_type(target) = LUX_TEMP_STRING;
       break;
-    case ANA_RANGE:
+    case LUX_RANGE:
       range_start(target) = (range_start(source) >= 0)?
 	copySym(range_start(source)): -copySym(-range_start(source));
       range_end(target) = (range_end(source) >= 0)?
@@ -155,7 +155,7 @@ Int copyToSym(Int target, Int source)
       embed(range_end(target), target);
       embed(range_redirect(target), target);
       break;
-    case ANA_CLIST:
+    case LUX_CLIST:
       size = clist_num_symbols(source);
       optr.w = clist_symbols(source);
       allocate(clist_symbols(target), size, Word);
@@ -167,7 +167,7 @@ Int copyToSym(Int target, Int source)
 	ptr.w++;
       }
       break;
-    case ANA_CPLIST:
+    case LUX_CPLIST:
       size = clist_num_symbols(source);
       optr.w = clist_symbols(source);
       allocate(clist_symbols(target), size, Word);
@@ -178,7 +178,7 @@ Int copyToSym(Int target, Int source)
 	ptr.w++;
       }
       break;
-    case ANA_LIST:
+    case LUX_LIST:
       size = list_num_symbols(source);
       oeptr = list_symbols(source);
       allocate(list_symbols(target), size, listElem);
@@ -192,21 +192,21 @@ Int copyToSym(Int target, Int source)
 	oeptr++;
       }
       break;
-    case ANA_STRUCT:
+    case LUX_STRUCT:
       size = symbol_memory(source);
       symbol_data(target) = malloc(size);
       if (!symbol_data(target))
 	return cerror(ALLOC_ERR, 0);
       memcpy(symbol_data(target), symbol_data(source), size);
       break;
-    case ANA_ARRAY:
+    case LUX_ARRAY:
       size = symbol_memory(source);
       if (!(array_header(target) = (array *) malloc(size)))
 	return cerror(ALLOC_ERR, target);
       symbol_memory(target) = size;
       memcpy(array_header(target), array_header(source), sizeof(array));
       size = array_size(source);
-      if (array_type(source) == ANA_STRING_ARRAY) { 
+      if (array_type(source) == LUX_STRING_ARRAY) { 
         ptr.sp = (char **) array_data(target);
 	optr.sp = (char **) array_data(source);
 	while (size--) {
@@ -219,10 +219,10 @@ Int copyToSym(Int target, Int source)
 	}
       } else {			/* numerical array */
 	memcpy(array_data(target), array_data(source),
-	       size*ana_type_size[array_type(source)]);
+	       size*lux_type_size[array_type(source)]);
       }
       break;
-    case ANA_CSCALAR: case ANA_CARRAY: /* complex scalar or array */
+    case LUX_CSCALAR: case LUX_CARRAY: /* complex scalar or array */
       size = symbol_memory(source);
       complex_scalar_data(target).f = malloc(size);
       if (!complex_scalar_data(target).f)
@@ -231,7 +231,7 @@ Int copyToSym(Int target, Int source)
       memcpy(complex_scalar_data(target).f, complex_scalar_data(source).f,
 	     size);
       break;
-    case ANA_EXTRACT:
+    case LUX_EXTRACT:
       extract_target(target) = extract_target(source);
       symbol_memory(target) = symbol_memory(source);
       etrgt = malloc(symbol_memory(target));
@@ -244,7 +244,7 @@ Int copyToSym(Int target, Int source)
 	etrgt->type = esrc->type;
 	etrgt->number = esrc->number;
 	switch (esrc->type) {
-	  case ANA_RANGE:
+	  case LUX_RANGE:
 	    etrgt->ptr.w = malloc(esrc->number*sizeof(Word));
 	    i = esrc->number;
 	    while (i--) {
@@ -254,7 +254,7 @@ Int copyToSym(Int target, Int source)
 	      esrc->ptr.w++;
 	    }
 	    break;
-	  case ANA_LIST:
+	  case LUX_LIST:
 	    etrgt->ptr.sp = malloc(esrc->number*sizeof(char *));
 	    i = esrc->number;
 	    while (i--) {
@@ -268,16 +268,16 @@ Int copyToSym(Int target, Int source)
 	etrgt++;
       }
       break;
-    case ANA_TRANSFER:
+    case LUX_TRANSFER:
       transfer_target(target) = transfer_target(source);
       transfer_is_parameter(target) = 0;
       transfer_temp_param(target) = 0;
       break;
-    case ANA_FUNC_PTR:
+    case LUX_FUNC_PTR:
       func_ptr_routine_num(target) = func_ptr_routine_num(source);
       func_ptr_type(target) = func_ptr_type(source);
       break;
-    case ANA_UNDEFINED:
+    case LUX_UNDEFINED:
       break;
     default:
       printf("copyToSym - Sorry, class %d (%s) not yet implemented\n",
@@ -306,11 +306,11 @@ Int extractReplace(Int symbol)
   Int	target, lhs, rhs, result, n;
   Word	*ptr;
   char	findTarget = '\0', *name;
-  Int	ana_replace(Int, Int);
+  Int	lux_replace(Int, Int);
 
   lhs = replace_lhs(symbol);
-  if (symbol_class(lhs) == ANA_FUNC_PTR)
-    return anaerror("Assignments to function pointers are illegal", lhs);
+  if (symbol_class(lhs) == LUX_FUNC_PTR)
+    return luxerror("Assignments to function pointers are illegal", lhs);
   rhs = replace_rhs(symbol);
   /*  ptr = extract_ptr(lhs); */
   n = extract_num_arg(lhs);
@@ -327,26 +327,26 @@ Int extractReplace(Int symbol)
       return cerror(ILL_SUBSC_LHS, lhs);
     zap(target);		/* not needed anymore */
     target = result;
-  } else if (symbol_class(target) == ANA_EXTRACT)
-    return anaerror("Only one subscript/tag allowed on left-hand side of assignment.", symbol);
+  } else if (symbol_class(target) == LUX_EXTRACT)
+    return luxerror("Only one subscript/tag allowed on left-hand side of assignment.", symbol);
 
   /* we assume that the syntax specification assures that target is a
      named variable */
 
   switch (extract_type(lhs)) {
-    case ANA_RANGE:
+    case LUX_RANGE:
       /* we have:  symbol: EVB_REPLACE lhs rhs
 	 we want to get:  symbol: EVB_INSERT (target, subscripts, rhs) */
       /* we replace the extraction by a regular insertion */
-      symbol_class(symbol) = ANA_EVB;
+      symbol_class(symbol) = LUX_EVB;
       evb_type(symbol) = EVB_INT_SUB;
-      int_sub_routine_num(symbol) = ANA_INSERT_SUB;
+      int_sub_routine_num(symbol) = LUX_INSERT_SUB;
       /* required argument list:  subscripts, source, target */
       /* current argument list: target subscripts */
       int_sub_arguments(symbol) = ptr = realloc(ptr, (n + 1)*sizeof(Word));
       symbol_memory(symbol) = (n + 1)*sizeof(Word);
       if (!ptr)
-	return ANA_ERROR;	/* some reallocation error */
+	return LUX_ERROR;	/* some reallocation error */
       memmove(ptr, ptr + 1, n*sizeof(Word)); /* now: subscripts ... ... */
       ptr[n - 1] = rhs;		/* subscripts rhs ... */
       ptr[n] = target;		/* subscripts rhs target */
@@ -355,12 +355,12 @@ Int extractReplace(Int symbol)
       zap(lhs);			/* not needed anymore */
       suppressMsg++;
       return execute(symbol);
-    case ANA_LIST:
-      /* have:  symbol: EVB_REPLACE lhs(ANA_EXTRACT) rhs */
-      /* want:  symbol: EVB_REPLACE lhs(ANA_LIST_PTR) rhs */
-      symbol_class(lhs) = ANA_LIST_PTR;
+    case LUX_LIST:
+      /* have:  symbol: EVB_REPLACE lhs(LUX_EXTRACT) rhs */
+      /* want:  symbol: EVB_REPLACE lhs(LUX_LIST_PTR) rhs */
+      symbol_class(lhs) = LUX_LIST_PTR;
       result = ptr[1];		/* tag symbol */
-      if (symbol_class(ptr[1]) == ANA_SCALAR) {
+      if (symbol_class(ptr[1]) == LUX_SCALAR) {
 	list_ptr_target(lhs) = -target;
 	list_ptr_tag_number(lhs) = int_arg(result);
 	zap(result);		/* don't need this one anymore */
@@ -375,14 +375,14 @@ Int extractReplace(Int symbol)
 	zap(result);
       }
       suppressMsg++;
-      return ana_replace(lhs, rhs);
+      return lux_replace(lhs, rhs);
     default:
       return cerror(ILL_SUBSC_LHS, lhs);
   }
 }
 #endif
 /*------------------------------------------------------------------*/
-Int ana_replace(Int lhs, Int rhs)
+Int lux_replace(Int lhs, Int rhs)
      /* replaces <lhs> with <rhs> */
 {
   Int	lhsSize, rhsSize, namevar(Int, Int), result, i, n;
@@ -398,14 +398,14 @@ Int ana_replace(Int lhs, Int rhs)
   Int	evalLhs(Int), einsert(Int, Int);
   void	updateIndices(void);
   
-  if (lhs == ANA_ERROR)		/* e.g., when !XX = 3 is tried */
-    return anaerror("Illegal variable", 0);
+  if (lhs == LUX_ERROR)		/* e.g., when !XX = 3 is tried */
+    return luxerror("Illegal variable", 0);
   if (lhs < nFixed)
-    return anaerror("Cannot modify %s", 0, varName(lhs));
+    return luxerror("Cannot modify %s", 0, varName(lhs));
   lhsSize = lhs;
   lhs = evalLhs(lhs);
-  if (lhs == ANA_ERROR)
-    return ANA_ERROR;
+  if (lhs == LUX_ERROR)
+    return LUX_ERROR;
 
   if (nBreakpoint) {		/* have breakpoints: check for /VAR ones */
     i = 0;
@@ -423,26 +423,26 @@ Int ana_replace(Int lhs, Int rhs)
     }
   }
 
-  if (symbol_class(lhs) == ANA_EXTRACT
-      || symbol_class(lhs) == ANA_PRE_EXTRACT) {
+  if (symbol_class(lhs) == LUX_EXTRACT
+      || symbol_class(lhs) == LUX_PRE_EXTRACT) {
     rhs = eval(rhs);
-    if (rhs == ANA_ERROR)
-      return ANA_ERROR;
+    if (rhs == LUX_ERROR)
+      return LUX_ERROR;
     result = einsert(lhs, rhs);
     zapTemp(rhs);
     return result;
   }
   
   oldPipeExec = pipeExec;	/* save because there may be nested */
-				/* invocations of ana_replace */
+				/* invocations of lux_replace */
   oldPipeSym = pipeSym;
   tree = checkTree(lhs, rhs);	/* check potential replacement status */
-  if ((symbol_class(lhs) != ANA_ARRAY
-       && symbol_class(lhs) != ANA_CARRAY)
+  if ((symbol_class(lhs) != LUX_ARRAY
+       && symbol_class(lhs) != LUX_CARRAY)
       || symbol_memory(lhs) != tree.size) {
     if (!tree.containLHS &&
-	(symbol_class(lhs) == ANA_ARRAY
-	 || symbol_class(lhs) == ANA_CARRAY))
+	(symbol_class(lhs) == LUX_ARRAY
+	 || symbol_class(lhs) == LUX_CARRAY))
       undefine(lhs);
     pipeExec = pipeSym = 0;
   } else {			/* piping OK */
@@ -454,7 +454,7 @@ Int ana_replace(Int lhs, Int rhs)
   pipeExec = oldPipeExec;	/* restore */
   pipeSym = oldPipeSym;
   if (rhs < 0)			/* some error */
-    return ANA_ERROR;
+    return LUX_ERROR;
   if ((trace > executeLevel && !noTrace && (traceMode & 127))
       || step > executeLevel) {
 				/* print replacement info */
@@ -472,17 +472,17 @@ Int ana_replace(Int lhs, Int rhs)
   if (lhs == rhs)		/* done already */
     return 1;
 				/* Treat LHS SCAL_PTRs separately */
-  if (symbol_class(lhs) == ANA_SCAL_PTR) {
+  if (symbol_class(lhs) == LUX_SCAL_PTR) {
     switch (symbol_class(rhs)) {
       default:
-	return anaerror("Cannot assign non-scalar non-string value to %s\n",
+	return luxerror("Cannot assign non-scalar non-string value to %s\n",
 		     0, varName(lhs));
-      case ANA_STRING:
+      case LUX_STRING:
 	/* if the lhs is a string pointer, then remove the string */
-	if (scal_ptr_type(lhs) == ANA_TEMP_STRING
+	if (scal_ptr_type(lhs) == LUX_TEMP_STRING
 	    && symbol_memory(lhs))
 	  free(scal_ptr_pointer(lhs).s);
-	scal_ptr_type(lhs) = ANA_TEMP_STRING;
+	scal_ptr_type(lhs) = LUX_TEMP_STRING;
 	if (isFreeTemp(rhs)) {	/* just take over */
 	  scal_ptr_pointer(lhs).s = string_value(rhs);
 	  symbol_memory(rhs) = 0; /* or may get zapped */
@@ -501,22 +501,22 @@ Int ana_replace(Int lhs, Int rhs)
 	    fmt_complex = scal_ptr_pointer(lhs).s;
 	}
 	break;
-      case ANA_SCALAR:
-	rhs = ana_convert(1, &rhs, scal_ptr_type(lhs), 1);
+      case LUX_SCALAR:
+	rhs = lux_convert(1, &rhs, scal_ptr_type(lhs), 1);
 	switch (scal_ptr_type(lhs)) {
-	  case ANA_BYTE:
+	  case LUX_BYTE:
 	    *scal_ptr_pointer(lhs).b = scalar_value(rhs).b;
 	    break;
-	  case ANA_WORD:
+	  case LUX_WORD:
 	    *scal_ptr_pointer(lhs).w = scalar_value(rhs).w;
 	    break;
-	  case ANA_LONG:
+	  case LUX_LONG:
 	    *scal_ptr_pointer(lhs).l = scalar_value(rhs).l;
 	    break;
-	  case ANA_FLOAT:
+	  case LUX_FLOAT:
 	    *scal_ptr_pointer(lhs).f = scalar_value(rhs).f;
 	    break;
-	  case ANA_DOUBLE:
+	  case LUX_DOUBLE:
 	    *scal_ptr_pointer(lhs).d = scalar_value(rhs).d;
 	    break;
 	}
@@ -527,11 +527,11 @@ Int ana_replace(Int lhs, Int rhs)
 
   /* Determine memory allocations of rhs */
   switch (symbol_class(rhs)) {
-    case ANA_SCALAR: case ANA_SCAL_PTR: case ANA_UNDEFINED:
-    case ANA_UNUSED: case ANA_TRANSFER:
+    case LUX_SCALAR: case LUX_SCAL_PTR: case LUX_UNDEFINED:
+    case LUX_UNUSED: case LUX_TRANSFER:
       rhsSize = 0;		/* no extra memory allocated for these */
       break;
-    case ANA_RANGE:
+    case LUX_RANGE:
       rhsSize = 1;		/* this one has extra memory allocated */
       break;
     default:
@@ -542,16 +542,16 @@ Int ana_replace(Int lhs, Int rhs)
     undefine(lhs);
     fixContext(rhs, lhs);
     memcpy(&symbol_extra(lhs), &symbol_extra(rhs), sizeof(symbol_extra(rhs)));
-    if (symbol_class(rhs) == ANA_TRANSFER) {
-      symbol_class(lhs) = ANA_TRANSFER;
+    if (symbol_class(rhs) == LUX_TRANSFER) {
+      symbol_class(lhs) = LUX_TRANSFER;
       transfer_is_parameter(lhs) = 0;
       transfer_temp_param(lhs) = 0;
     } else
       symbol_class(lhs) = symbol_class(rhs);
     symbol_type(lhs) =
-      (symbol_class(rhs) == ANA_STRING)? ANA_TEMP_STRING: symbol_type(rhs);
+      (symbol_class(rhs) == LUX_STRING)? LUX_TEMP_STRING: symbol_type(rhs);
     if (isFreeTemp(rhs)) {
-      symbol_class(rhs) = ANA_UNUSED; /* or linked variables get zapped */
+      symbol_class(rhs) = LUX_UNUSED; /* or linked variables get zapped */
       symbol_memory(rhs) = 0;	/* or memory gets deallocated */
       if (rhs < tempVariableIndex)
 	tempVariableIndex = rhs;
@@ -590,8 +590,8 @@ Int matchKey(Word index, char **keys, Int *var)
   char	*key, *theKey, modeKey, negate;
   uint32_t	n, l, indx, theMode;
 
- if (symbol_class(index) != ANA_STRING)
-   return anaerror("Non-string keyword??", index);
+ if (symbol_class(index) != LUX_STRING)
+   return luxerror("Non-string keyword??", index);
  key = string_value(index);
  l = strlen(key);
  if (keys) {			/* there is a key list */
@@ -653,9 +653,9 @@ Int matchUserKey(char *name, Int routineNum)
   char	**keys;
   Int	n, l, i;
 
-  if (sym[routineNum].class != ANA_SUBROUTINE &&
-      sym[routineNum].class != ANA_FUNCTION)
-    return anaerror("Matching keyword to non-routine??", routineNum);
+  if (sym[routineNum].class != LUX_SUBROUTINE &&
+      sym[routineNum].class != LUX_FUNCTION)
+    return luxerror("Matching keyword to non-routine??", routineNum);
   l = strlen(name);
   keys = routine_parameter_names(routineNum);
   n = routine_num_parameters(routineNum);
@@ -718,18 +718,18 @@ Int internal_routine(Int symbol, internalRoutine *routine)
  /* how many keyword arguments? */
  if (theKeyList) {		/* routine has keys */
    for (i = 0; i < nArg; i++)
-     if (symbol_class(*arg++) == ANA_KEYWORD)
+     if (symbol_class(*arg++) == LUX_KEYWORD)
        nKeys++;
  } else {			/* routine has no keys */
    for (i = 0; i < nArg; i++)
-     if (symbol_class(*arg++) == ANA_KEYWORD)
-       return anaerror("No keywords allowed with routine %s", symbol,
+     if (symbol_class(*arg++) == LUX_KEYWORD)
+       return luxerror("No keywords allowed with routine %s", symbol,
 		    routine[routineNum].name);
  }
 
 		/* legal number of arguments? */
  if (nArg - nKeys > routine[routineNum].maxArg)
-   return anaerror("Too many arguments to %s %s: found %d,"
+   return luxerror("Too many arguments to %s %s: found %d,"
                    " cannot accept more than %d",
                    symbol, isSubroutine? "subroutine": "function",
                    routine[routineNum].name, nArg - nKeys,
@@ -746,13 +746,13 @@ Int internal_routine(Int symbol, internalRoutine *routine)
      for (i = nArg; i; i--) {
        --arg;
        n = (suppressEval? *arg: eval(*arg)); /* next earlier argument */
-       if (!n) {	/* 0 -> probably an ANA_TRANSFER to a non-existent */
-			/* symbol;  make ANA_UNDEFINED instead */
-	 if (symbol_class(*arg) == ANA_TRANSFER /* a TRANSFER */
+       if (!n) {	/* 0 -> probably an LUX_TRANSFER to a non-existent */
+			/* symbol;  make LUX_UNDEFINED instead */
+	 if (symbol_class(*arg) == LUX_TRANSFER /* a TRANSFER */
 	     && symbol_context(*arg)) {	/* we're inside a routine */
-	   symbol_class(*arg) = ANA_UNDEFINED; /* make UNDEFINED instead */
+	   symbol_class(*arg) = LUX_UNDEFINED; /* make UNDEFINED instead */
 	   n = *arg;		/* and use */
-	 } else {		/* cannot have an ANA_TRANSFER to symbol 0 */
+	 } else {		/* cannot have an LUX_TRANSFER to symbol 0 */
 				/* at the main execution level */
 	   free(evalArgs - i - ordinary);
 	   return cerror(ILL_CLASS, *arg);
@@ -760,7 +760,7 @@ Int internal_routine(Int symbol, internalRoutine *routine)
        }
        if (n < 0) {		/* some error */
 	 free(evalArgs - i - ordinary);
-	 return ANA_ERROR;
+	 return LUX_ERROR;
        }
        *--evalArgs = n;		/* store resulting symbol */
      }
@@ -780,7 +780,7 @@ Int internal_routine(Int symbol, internalRoutine *routine)
      /* match the keywords with the routine's keyword list */
      allocate(keys, nArg, Int);	/* storage */
      for (i = maxArg = 0; i < nArg; i++, arg++, keys++)
-       if (symbol_class(*arg) == ANA_KEYWORD) {	/* a keyword */
+       if (symbol_class(*arg) == LUX_KEYWORD) {	/* a keyword */
 	 n = matchKey(keyword_name_symbol(*arg),
 		      theKeyList? theKeyList->keys: NULL, keys); /* match */
 	 /* if a key is found, we want to store the nonnegative index */
@@ -791,7 +791,7 @@ Int internal_routine(Int symbol, internalRoutine *routine)
 	   free(keys - i);
 	   free(evalArgs);
 	   name = string_value(keyword_name_symbol(*arg));
-	   return anaerror("Nonexistent keyword: %s", 0, name);
+	   return luxerror("Nonexistent keyword: %s", 0, name);
 	 } else if (n == MODEKEY) /* MODE keyword */
 	   internalMode = int_arg(eval(keyword_value(*arg)));
          else if (n != ORKEY) {	/* not a mode (number) keyword */
@@ -801,7 +801,7 @@ Int internal_routine(Int symbol, internalRoutine *routine)
 	     *keys |= PRESERVE_KEY;
 	 }
 	 if (n == ZEROKEY) 	/* substitute zero value */
-	   keyword_value(*arg) = ANA_ZERO;
+	   keyword_value(*arg) = LUX_ZERO;
        } else			/* no keyword, but we do have an argument */
 	 *keys = 0;
      if (maxArg < nArg - nKeys + ordinary) /* ?? */
@@ -816,7 +816,7 @@ Int internal_routine(Int symbol, internalRoutine *routine)
 	 keys++;
 	 continue;
        }
-       if (symbol_class(*arg) == ANA_KEYWORD) {	/* a keyword associated with */
+       if (symbol_class(*arg) == LUX_KEYWORD) {	/* a keyword associated with */
 						/* a variable */
 	 if (*keys & PRESERVE_KEY) {		/* preserve keyword value */
 	   *keys &= ~PRESERVE_KEY; /* remove flag */
@@ -826,16 +826,16 @@ Int internal_routine(Int symbol, internalRoutine *routine)
 	 if (evalArgs[*keys]) {	/* already a value at indicated position */
 	   free(keys - i + ordinary);
 	   free(evalArgs);
-	   return anaerror("Parameter #%d (%s) doubly defined", 0, *keys,
+	   return luxerror("Parameter #%d (%s) doubly defined", 0, *keys,
 			keyName(subroutine, routineNum, *keys));
 	 }
 	 n = keyword_value(*arg); /* keyword value */
 	 if (!suppressEval && !preserveKey)
 	   n = eval(n);		/* do evaluate */
-	 if (!n) {		/* probably a ANA_TRANSFER to a non-existent */
-				/* symbol;  make ANA_UNDEFINED instead */
-	   if (symbol_class(*arg) == ANA_TRANSFER && symbol_context(*arg)) {
-	     symbol_class(*arg) = ANA_UNDEFINED;
+	 if (!n) {		/* probably a LUX_TRANSFER to a non-existent */
+				/* symbol;  make LUX_UNDEFINED instead */
+	   if (symbol_class(*arg) == LUX_TRANSFER && symbol_context(*arg)) {
+	     symbol_class(*arg) = LUX_UNDEFINED;
 	     n = *arg;		/* use it */
 	   } else {		/* should never get here */
 	     puts("Strange argument in internal function??");
@@ -850,7 +850,7 @@ Int internal_routine(Int symbol, internalRoutine *routine)
 				      /* value at indicated position */
 	 free(keys - i + ordinary);
 	 free(evalArgs);
-	 return anaerror("Argument #%d doubly defined", 0, ordinary);
+	 return luxerror("Argument #%d doubly defined", 0, ordinary);
        } else 			/* no keyword: just evaluate if allowed */
 	 evalArgs[ordinary++] = suppressEval? *arg: eval(*arg);
        keys++;			/* next */
@@ -862,23 +862,23 @@ Int internal_routine(Int symbol, internalRoutine *routine)
 				/* only mode keywords are allowed */
      arg -= nArg;
      for (i = 0; i < nArg; i++, arg++)
-       if (symbol_class(*arg) == ANA_KEYWORD) {
+       if (symbol_class(*arg) == LUX_KEYWORD) {
 	 switch (matchKey(keyword_name_symbol(*arg),
 			  theKeyList? theKeyList->keys: NULL, &n)) {
 	   case NOKEY:
 	     name = string_value(keyword_name_symbol(*arg));
-	     return anaerror("Nonexistent keyword: %s", 0, name);
+	     return luxerror("Nonexistent keyword: %s", 0, name);
 	   case MODEKEY:		/* replace internalMode value */
 	     internalMode = int_arg(eval(keyword_value(*arg)));
 	     break;
 	   case ORKEY:		/* dealt with inside matchKey() */
 	     break;
 	   default:
-	     return anaerror("This %s only accepts mode keywords", *arg,
+	     return luxerror("This %s only accepts mode keywords", *arg,
 			  isSubroutine? "subroutine": "function");
 	 }
        } else 			/* no keyword -> illegal */
-	 return anaerror("This %s only accepts mode keywords", *arg,
+	 return luxerror("This %s only accepts mode keywords", *arg,
 		      isSubroutine? "subroutine": "function");
    }
    thisInternalMode = internalMode; /* internalMode may be modified during */
@@ -891,14 +891,14 @@ Int internal_routine(Int symbol, internalRoutine *routine)
  for (i = 0; i < maxArg; i++)
    if (evalArgs[i] < 0) { 	/* yes: some error */
      free(evalArgs);
-     return ANA_ERROR;
+     return LUX_ERROR;
    }
  
  switch (routineNum) {
-   case ANA_SUBSC_FUN:
+   case LUX_SUBSC_FUN:
      n = -1;
      break;
-   case ANA_INSERT_SUB:
+   case LUX_INSERT_SUB:
      n = -2;
      break;
    default:
@@ -908,16 +908,16 @@ Int internal_routine(Int symbol, internalRoutine *routine)
  if (!suppressEval		/* we're not suppressing evaluation */
      && evalArgs		/* and we do have some arguments */
 				/* then expand. */
-     && treatListArguments(&maxArg, &evalArgs, n) == ANA_ERROR) {
+     && treatListArguments(&maxArg, &evalArgs, n) == LUX_ERROR) {
    free(evalArgs);
-   return ANA_ERROR;
+   return LUX_ERROR;
  }
 
 		/* legal number of arguments? */
  if (maxArg < routine[routineNum].minArg
      || maxArg > routine[routineNum].maxArg) {
    free(evalArgs);
-   return anaerror("Illegal number of arguments to %s %s:"
+   return luxerror("Illegal number of arguments to %s %s:"
                    "found %d, accept between %d and %d",
                    symbol, isSubroutine? "subroutine": "function",
                    routine[routineNum].name, maxArg,
@@ -929,7 +929,7 @@ Int internal_routine(Int symbol, internalRoutine *routine)
  /* accordingly. */
  if (suppressUnused)
    for (i = maxArg - 1; i >= 0; i--) {
-     if (evalArgs[i] && symbol_class(evalArgs[i]) == ANA_UNDEFINED
+     if (evalArgs[i] && symbol_class(evalArgs[i]) == LUX_UNDEFINED
 	 && undefined_par(evalArgs[i]))
        evalArgs[i] = 0;
      if (i == maxArg - 1)	/* last one */
@@ -965,12 +965,12 @@ Int getBody(Int routine)
  FILE	*fp;
 
  name = deferred_routine_filename(routine);
- isFunction = (symbol_class(routine) == ANA_DEFERRED_FUNC);
+ isFunction = (symbol_class(routine) == LUX_DEFERRED_FUNC);
  if (!(fp = openPathFile(name, (isFunction? FIND_FUNC: FIND_SUBR) | FIND_LOWER)))
    if (isFunction)
      fp = openPathFile(name, FIND_SUBR | FIND_LOWER); 
  if (!fp)
-   return anaerror("Could not open file %s.", 0,
+   return luxerror("Could not open file %s.", 0,
 		deferred_routine_filename(routine));
  findBody = routine;
  ignoreInput++;
@@ -979,7 +979,7 @@ Int getBody(Int routine)
  ignoreInput--;
  fclose(fp);
  if (!routine_num_statements(routine))
-   return anaerror("Read file %s but %s %s still not compiled.\n", 0,
+   return luxerror("Read file %s but %s %s still not compiled.\n", 0,
 	 deferred_routine_filename(routine),
 		isFunction? "function": "subroutine",
 		symbolProperName(routine));
@@ -1007,47 +1007,47 @@ Int usr_routine(Int symbol)
  if ((traceMode & T_ROUTINE) == 0)
    noTrace++;
  routineNum = usr_routine_num(symbol); /* routine number */
- if (symbol_class(routineNum) == ANA_FUNC_PTR) {
+ if (symbol_class(routineNum) == LUX_FUNC_PTR) {
    /* must point at user-defined */
    if (func_ptr_type(routineNum) <= 0) { /* internal routine?? */
      executeLevel--;		/* restore */
      fileLevel--;		/* restore */
      if ((traceMode & T_ROUTINE) == 0)
        noTrace--;		/* restore */
-     return anaerror("Trying to execute a non-user-routine!", symbol);
+     return luxerror("Trying to execute a non-user-routine!", symbol);
    }
  }
  switch (symbol_class(routineNum)) {
-   case ANA_FUNCTION:
+   case LUX_FUNCTION:
      type = 0;			/* a function */
      break;
-   case ANA_SUBROUTINE:
+   case LUX_SUBROUTINE:
      type = 1;			/* a subroutine */
      break;
-   case ANA_BLOCKROUTINE:	/* a block routine */
+   case LUX_BLOCKROUTINE:	/* a block routine */
      type = 2;
      break;
-   case ANA_DEFERRED_SUBR:
+   case LUX_DEFERRED_SUBR:
      if (getBody(routineNum) < 0) { /* compilation failed */
        if ((traceMode & T_ROUTINE) == 0) 
 	 noTrace--;		/* restore */
-       return ANA_ERROR;
+       return LUX_ERROR;
      }
      type = 1;
      break;
-   case ANA_DEFERRED_FUNC:
+   case LUX_DEFERRED_FUNC:
      if (getBody(routineNum) < 0) { /* compilation failed */
        if ((traceMode & T_ROUTINE) == 0) 
 	 noTrace--;		/* restore */       
-       return ANA_ERROR;
+       return LUX_ERROR;
      }
      type = 0;
      break;
-   case ANA_DEFERRED_BLOCK:
+   case LUX_DEFERRED_BLOCK:
      if (getBody(routineNum) < 0) { /* compilation failed */
        if ((traceMode & T_ROUTINE) == 0) 
 	 noTrace--;		/* restore */       
-       return ANA_ERROR;
+       return LUX_ERROR;
      }
      type = 2;
      break;
@@ -1056,7 +1056,7 @@ Int usr_routine(Int symbol)
      fileLevel--;		/* restore */
      if ((traceMode & T_ROUTINE) == 0)
        noTrace--;		/* restore */
-     return anaerror("Trying to execute a non-routine!", symbol);
+     return luxerror("Trying to execute a non-routine!", symbol);
  }
  nStmnt = routine_num_statements(routineNum);
  par = routine_parameters(routineNum);
@@ -1089,14 +1089,14 @@ Int usr_routine(Int symbol)
 	/* "arguments" are actual arguments; "parameters" formal arguments */
  evalArg = NULL;
  thisNArg = 0;
- if (symbol_class(routineNum) != ANA_BLOCKROUTINE) { /* subroutine/ function */
+ if (symbol_class(routineNum) != LUX_BLOCKROUTINE) { /* subroutine/ function */
    thisNArg = usr_routine_num_arguments(symbol); /* number of arguments in */
 						 /* the call */
    /* cannot use real nArg yet because it may be changed during evaluation */
    /* of the arguments */
    if (thisNArg > nPar
        && !routine_has_extended_param(routineNum)) { /* # args > # params */
-     anaerror("Too many arguments specified in %s %s\n", 0,
+     luxerror("Too many arguments specified in %s %s\n", 0,
 	   type? "subroutine": "function",
 	   type? subrName(routineNum): funcName(routineNum));
      goto usr_routine_1;
@@ -1106,7 +1106,7 @@ Int usr_routine(Int symbol)
    /* and only then linking them to the routine's formal parameters, */
    /* we can allow recursion during calculation of the parameters */
    for (i = 0; i < thisNArg; i++) /* count the number of keyword assignments */
-     if (symbol_class(*arg++) == ANA_KEYWORD)
+     if (symbol_class(*arg++) == LUX_KEYWORD)
        nKeys++;
    arg -= thisNArg;		/* back to start of list */
    evalArg = malloc(nPar*sizeof(Int)); /* room for the evaluated parameters */
@@ -1121,22 +1121,22 @@ Int usr_routine(Int symbol)
 				/* ( = positional ) arguments */
    if (thisNArg) {		/* arguments were specified */
      for (i = 0; i < thisNArg; i++) {
-       if (symbol_class(*arg) == ANA_KEYWORD) { /* a keyword assignment */
+       if (symbol_class(*arg) == LUX_KEYWORD) { /* a keyword assignment */
 	 n = keyword_name_symbol(*arg);	/* the keyword string symbol */
 	 name = string_value(n); /* keyword name */
 	 n = matchUserKey(name, routineNum); /* does the keyword name */
 	 /* match the name of one of the routine's parameters? */
 	 if (n == NOKEY) {	/* no match: illegal keyword */
-	   anaerror("Nonexistent keyword: %s\n", *arg, name);
+	   luxerror("Nonexistent keyword: %s\n", *arg, name);
 	   goto usr_routine_2;
 	 } /* end if (n == NOKEY) */
 	 if (evalArg[n < 0? -n - 1: n]) { /* keyword param already defined */
-	   anaerror("Argument #%d doubly defined", 0, n < 0? -n - 1: n);
+	   luxerror("Argument #%d doubly defined", 0, n < 0? -n - 1: n);
 	   goto usr_routine_2;
 	 } /* end if (evalArg[n < 0? -n -1: n]) */
 	 if (n >= 0) {		/* keyword is recognized as is */
 	   evalArg[n] = eval(keyword_value(*arg++)); /* assign value */
-	   if (evalArg[n] == ANA_ERROR)	/* some error */
+	   if (evalArg[n] == LUX_ERROR)	/* some error */
 	     goto usr_routine_2;
 	   if (isFreeTemp(evalArg[n])) /* if the argument is a temporary */
 	     /* symbol, then give it the routine's context so it isn't */
@@ -1146,16 +1146,16 @@ Int usr_routine(Int symbol)
 				/* initial NO */
 	   if (keyword_value(*arg++) != 1)
 	     puts("Ignored value on NO.. keyword");
-	   evalArg[-n - 1] = ANA_ZERO;
+	   evalArg[-n - 1] = LUX_ZERO;
 	 } /* end if (n >= 0) else */
        } else {			/* a positional assignment (ie, no keyword) */
 	 if (ordinary == nPar - 1 && thisNArg > nPar) {
 	   /* at end of ordinary argument list, and still have arguments:
 	    must be an extended argument */
 	   listSym = nextFreeTempVariable();
-	   if (listSym == ANA_ERROR)
+	   if (listSym == LUX_ERROR)
 	     goto usr_routine_2;
-	   symbol_class(listSym) = ANA_CPLIST;
+	   symbol_class(listSym) = LUX_CPLIST;
 	   symbol_memory(listSym) = (thisNArg - nPar + 1)*sizeof(Word);
 	   list = malloc(symbol_memory(listSym));
 	   if (!list) {
@@ -1169,11 +1169,11 @@ Int usr_routine(Int symbol)
 	 if (ordinary < nPar - 1 || !list) {
 	   if (evalArg[ordinary]) { /* the current positional parameter */
 	     /* already has a (keyword-specified) value assigned to it */
-	     anaerror("Argument #%d doubly defined", 0, ordinary);
+	     luxerror("Argument #%d doubly defined", 0, ordinary);
 	     goto usr_routine_3;
 	   } /* end if (evalArg[ordinary]) */
 	   evalArg[ordinary] = eval((Int) *arg++); /* assign value */
-	   if (evalArg[ordinary] == ANA_ERROR) /* some error */
+	   if (evalArg[ordinary] == LUX_ERROR) /* some error */
 	     goto usr_routine_3;
 	   if (isFreeTemp(evalArg[ordinary]))
 	     symbol_context(evalArg[ordinary]) = routineNum;
@@ -1184,10 +1184,10 @@ Int usr_routine(Int symbol)
 	   list++;
 	 }
 	 ordinary++;
-       } /* end if (symbol_class(*arg) == ANA_KEYWORD) */
+       } /* end if (symbol_class(*arg) == LUX_KEYWORD) */
      } /* end for (i = 0; i < thisNArg; i++) */
    } /* end if (thisNArg) */
- } /* end if (symbol_class(routineNum != ANA_BLOCKROUTINE) */
+ } /* end if (symbol_class(routineNum != LUX_BLOCKROUTINE) */
  
  /* did an error occur during evaluation of the arguments? */
  isError = 0;
@@ -1240,9 +1240,9 @@ Int usr_routine(Int symbol)
    
    for (i = 0; i < nPar; i++) {
      if (evalArg[i]) {		/* have an argument */
-       if (symbol_class(*par) != ANA_TRANSFER) {
+       if (symbol_class(*par) != LUX_TRANSFER) {
 	 undefine(*par);
-	 symbol_class(*par) = ANA_TRANSFER;
+	 symbol_class(*par) = LUX_TRANSFER;
 	 transfer_is_parameter(*par) = 1;
 	 transfer_temp_param(*par) = 0;
        }
@@ -1250,7 +1250,7 @@ Int usr_routine(Int symbol)
 	 /* if we use a pointer to the fixed number, then we cannot */
 	 /* modify the parameter inside the routine. */
 	 undefine(*par);
-	 ana_replace(*par++, evalArg[i]);
+	 lux_replace(*par++, evalArg[i]);
        } else
 	 transfer_target(*par++) = evalArg[i];
      } else {
@@ -1260,7 +1260,7 @@ Int usr_routine(Int symbol)
        par++;
      }
    }
-   if (symbol_class(routineNum) != ANA_BLOCKROUTINE)
+   if (symbol_class(routineNum) != LUX_BLOCKROUTINE)
      curContext = routineNum;
  } else {
    evalArg = 0;
@@ -1285,7 +1285,7 @@ Int usr_routine(Int symbol)
  /* restore old value of !NARG */
  nArg = oldNArg;
 
- if (i == ANA_ERROR)
+ if (i == LUX_ERROR)
    cerror(-1, symbol);
 
  for (n = 0; n < thisNArg; n++) /* zap temp arguments */
@@ -1293,7 +1293,7 @@ Int usr_routine(Int symbol)
      zap(evalArg[n]);
  par = routine_parameters(routineNum);
  for (n = 0; n < nPar; n++) {	/* make parameters point at #0 again */
-   if (symbol_class(*par) == ANA_TRANSFER
+   if (symbol_class(*par) == LUX_TRANSFER
        && transfer_temp_param(*par))
      zap(transfer_target(*par)); /* remove temp that has been */
      /* created to accomodate values for dangling or unspecified parameters */
@@ -1313,7 +1313,7 @@ Int usr_routine(Int symbol)
  fileLevel--;
  if ((traceMode & T_ROUTINE) == 0)
    noTrace--;
- if (i != ANA_ERROR && i != LOOP_RETALL)
+ if (i != LUX_ERROR && i != LOOP_RETALL)
    i = 1;
  if (msg) {
    printf("Leaving %s %s", routineTypeNames[(Byte) type],
@@ -1325,7 +1325,7 @@ Int usr_routine(Int symbol)
  i = returnSym;
  returnSym = 0;
  if (!i)
-   return anaerror("No value returned from user function %s", symbol,
+   return luxerror("No value returned from user function %s", symbol,
 		currentRoutineName);
  return i;
 
@@ -1339,10 +1339,10 @@ Int usr_routine(Int symbol)
  if ((traceMode & T_ROUTINE) == 0)
    noTrace--;
  popExecutionLevel();
- return ANA_ERROR;
+ return LUX_ERROR;
 }
 /*------------------------------------------------------------------*/
-Int ana_for(Int nsym)
+Int lux_for(Int nsym)
 /* executes LUX FOR-statement */
 {
  pointer	counter;
@@ -1355,41 +1355,41 @@ Int ana_for(Int nsym)
 		/* find highest type of loop start, increment, and end */
  startSym = eval(for_start(nsym));
  switch (symbol_class(startSym)) {
-   case ANA_SCAL_PTR: case ANA_SCALAR:
+   case LUX_SCAL_PTR: case LUX_SCALAR:
      break;
    default:
      zapTemp(startSym);
-     return anaerror("For-loop initializer must be scalar!", nsym);
+     return luxerror("For-loop initializer must be scalar!", nsym);
  }
  endSym = eval(for_end(nsym));
  switch (symbol_class(endSym)) {
-   case ANA_SCAL_PTR: case ANA_SCALAR:
+   case LUX_SCAL_PTR: case LUX_SCALAR:
      break;
    default:
      zapTemp(startSym);
      zapTemp(endSym);
-     return anaerror("For-loop end marker must be scalar!", nsym);
+     return luxerror("For-loop end marker must be scalar!", nsym);
  }
  stepSym = eval(for_step(nsym));
  switch (symbol_class(stepSym)) {
-   case ANA_SCAL_PTR: case ANA_SCALAR:
+   case LUX_SCAL_PTR: case LUX_SCALAR:
      break;
    default:
      zapTemp(startSym);
      zapTemp(endSym);
      zapTemp(stepSym);
-     return anaerror("For-loop step must be scalar!", nsym);
+     return luxerror("For-loop step must be scalar!", nsym);
  }
  hiType = symbol_type(startSym);
  if ((n = symbol_type(endSym)) > hiType)
    hiType = n;
- if (for_step(nsym) != ANA_ONE 
+ if (for_step(nsym) != LUX_ONE 
      && (n = symbol_type(stepSym)) > hiType)
    hiType = n;
  counterSym = for_loop_symbol(nsym); /* loop counter */
  undefine(counterSym);		/* loop counter */
  symbol_type(counterSym) = hiType;	/* give loop counter proper type */
- symbol_class(counterSym) = ANA_SCALAR;
+ symbol_class(counterSym) = LUX_SCALAR;
  counter.b = &scalar_value(counterSym).b;
  convertScalar(&start, startSym, hiType); /* and start, increment, end */
  convertScalar(&end, endSym, hiType);
@@ -1398,74 +1398,74 @@ Int ana_for(Int nsym)
  zapTemp(endSym);
  zapTemp(stepSym);
  switch (hiType) {
-   case ANA_BYTE:
+   case LUX_BYTE:
      forward = 1;
      break;
-   case ANA_WORD:
+   case LUX_WORD:
      forward = (inc.w >= 0)? 1: 0;
      break;
-   case ANA_LONG:
+   case LUX_LONG:
      forward = (inc.l >= 0)? 1: 0;
      break;
-   case ANA_FLOAT:
+   case LUX_FLOAT:
      forward = (inc.f >= 0)? 1: 0;
      break;
-   case ANA_DOUBLE:
+   case LUX_DOUBLE:
      forward = (inc.d >= 0)? 1: 0;
      break;
  }     
  temp = for_body(nsym);		/* body */
  /* initialize counter with start value */
  switch (hiType) {
-   case ANA_BYTE:
+   case LUX_BYTE:
      *counter.b = start.b;
      break;
-   case ANA_WORD:
+   case LUX_WORD:
      *counter.w = start.w;
      break;
-   case ANA_LONG:
+   case LUX_LONG:
      *counter.l = start.l;
      break;
-   case ANA_FLOAT:
+   case LUX_FLOAT:
      *counter.f = start.f;
      break;
-   case ANA_DOUBLE:
+   case LUX_DOUBLE:
      *counter.d = start.d;
      break;
  }
  /* check if the end criterion is already met (n = 0) or not (n = 1) */
  if (forward)
    switch (hiType) {
-     case ANA_BYTE:
+     case LUX_BYTE:
      n = *counter.b > end.b? 0: 1;
      break;
-   case ANA_WORD:
+   case LUX_WORD:
      n = *counter.w > end.w? 0: 1;
      break;
-   case ANA_LONG:
+   case LUX_LONG:
      n = *counter.l > end.l? 0: 1;
      break;
-   case ANA_FLOAT:
+   case LUX_FLOAT:
      n = *counter.f > end.f? 0: 1;
      break;
-   case ANA_DOUBLE:
+   case LUX_DOUBLE:
      n = *counter.d > end.d? 0: 1;
      break;
    }
  else switch (hiType) {
-   case ANA_BYTE:
+   case LUX_BYTE:
      n = *counter.b < end.b? 0: 1;
      break;
-   case ANA_WORD:
+   case LUX_WORD:
      n = *counter.w < end.w? 0: 1;
      break;
-   case ANA_LONG:
+   case LUX_LONG:
      n = *counter.l < end.l? 0: 1;
      break;
-   case ANA_FLOAT:
+   case LUX_FLOAT:
      n = *counter.f < end.f? 0: 1;
      break;
-   case ANA_DOUBLE:
+   case LUX_DOUBLE:
      n = *counter.d < end.d? 0: 1;
      break;
  }
@@ -1475,7 +1475,7 @@ Int ana_for(Int nsym)
 	   || step > executeLevel);
 
  switch (hiType) {
-   case ANA_BYTE:
+   case LUX_BYTE:
      if (action)
        while (n) {
 	 printf("FOR-loop: ");	/* show for-loop status */
@@ -1486,10 +1486,10 @@ Int ana_for(Int nsym)
 	   case LOOP_BREAK:
 	     n = 0;
 	     continue;
-	   case ANA_ERROR:
+	   case LUX_ERROR:
 	     printf("(counter %s = %1d)", symbolIdent(counterSym, 0),
 		    *counter.b);
-	     return ANA_ERROR;
+	     return LUX_ERROR;
 	   case LOOP_RETALL: case LOOP_RETURN:
 	     return n;
 	 }
@@ -1503,10 +1503,10 @@ Int ana_for(Int nsym)
 	   case LOOP_BREAK:
 	     n = 0;
 	     continue;
-	   case ANA_ERROR:
+	   case LUX_ERROR:
 	     printf("(counter %s = %1d)", symbolIdent(counterSym, 0),
 		    *counter.b);
-	     return ANA_ERROR;
+	     return LUX_ERROR;
 	   case LOOP_RETALL: case LOOP_RETURN:
 	     return n;
 	 }
@@ -1514,7 +1514,7 @@ Int ana_for(Int nsym)
 	 n = forward? (*counter.b > end.b? 0: 1): (*counter.b < end.b? 0: 1);
        }
      break;
-   case ANA_WORD:
+   case LUX_WORD:
      if (action)
        while (n) {
 	 printf("FOR-loop: ");	/* show for-loop status */
@@ -1525,10 +1525,10 @@ Int ana_for(Int nsym)
 	   case LOOP_BREAK:
 	     n = 0;
 	     continue;
-	   case ANA_ERROR:
+	   case LUX_ERROR:
 	     printf("(counter %s = %1d)", symbolIdent(counterSym, 0),
 		    *counter.w);
-	     return ANA_ERROR;
+	     return LUX_ERROR;
 	   case LOOP_RETALL: case LOOP_RETURN:
 	     return n;
 	 }
@@ -1542,10 +1542,10 @@ Int ana_for(Int nsym)
 	   case LOOP_BREAK:
 	     n = 0;
 	     continue;
-	   case ANA_ERROR:
+	   case LUX_ERROR:
 	     printf("(counter %s = %1d)", symbolIdent(counterSym, 0),
 		    *counter.w);
-	     return ANA_ERROR;
+	     return LUX_ERROR;
 	   case LOOP_RETALL: case LOOP_RETURN:
 	     return n;
 	 }
@@ -1553,7 +1553,7 @@ Int ana_for(Int nsym)
 	 n = forward? (*counter.w > end.w? 0: 1): (*counter.w < end.w? 0: 1);
        }
      break;
-   case ANA_LONG:
+   case LUX_LONG:
      if (action)
        while (n) {
 	 printf("FOR-loop: ");	/* show for-loop status */
@@ -1564,10 +1564,10 @@ Int ana_for(Int nsym)
 	   case LOOP_BREAK:
 	     n = 0;
 	     continue;
-	   case ANA_ERROR:
+	   case LUX_ERROR:
 	     printf("(counter %s = %1d)", symbolIdent(counterSym, 0),
 		    *counter.l);
-	     return ANA_ERROR;
+	     return LUX_ERROR;
 	   case LOOP_RETALL: case LOOP_RETURN:
 	     return n;
 	 }
@@ -1581,10 +1581,10 @@ Int ana_for(Int nsym)
 	   case LOOP_BREAK:
 	     n = 0;
 	     continue;
-	   case ANA_ERROR:
+	   case LUX_ERROR:
 	     printf("(counter %s = %1d)", symbolIdent(counterSym, 0),
 		    *counter.l);
-	     return ANA_ERROR;
+	     return LUX_ERROR;
 	   case LOOP_RETALL: case LOOP_RETURN:
 	     return n;
 	 }
@@ -1592,7 +1592,7 @@ Int ana_for(Int nsym)
 	 n = forward? (*counter.l > end.l? 0: 1): (*counter.l < end.l? 0: 1);
        }
      break;
-   case ANA_FLOAT:
+   case LUX_FLOAT:
      if (action)
        while (n) {
 	 printf("FOR-loop: ");	/* show for-loop status */
@@ -1603,10 +1603,10 @@ Int ana_for(Int nsym)
 	   case LOOP_BREAK:
 	     n = 0;
 	     continue;
-	   case ANA_ERROR:
+	   case LUX_ERROR:
 	     printf("(counter %s = %1g)", symbolIdent(counterSym, 0),
 		    *counter.f);
-	     return ANA_ERROR;
+	     return LUX_ERROR;
 	   case LOOP_RETALL: case LOOP_RETURN:
 	     return n;
 	 }
@@ -1620,10 +1620,10 @@ Int ana_for(Int nsym)
 	   case LOOP_BREAK:
 	     n = 0;
 	     continue;
-	   case ANA_ERROR:
+	   case LUX_ERROR:
 	     printf("(counter %s = %1g)", symbolIdent(counterSym, 0),
 		    *counter.f);
-	     return ANA_ERROR;
+	     return LUX_ERROR;
 	   case LOOP_RETALL: case LOOP_RETURN:
 	     return n;
 	 }
@@ -1631,7 +1631,7 @@ Int ana_for(Int nsym)
 	 n = forward? (*counter.f > end.f? 0: 1): (*counter.f < end.f? 0: 1);
        }
      break;
-   case ANA_DOUBLE:
+   case LUX_DOUBLE:
      if (action)
        while (n) {
 	 printf("FOR-loop: ");	/* show for-loop status */
@@ -1642,10 +1642,10 @@ Int ana_for(Int nsym)
 	   case LOOP_BREAK:
 	     n = 0;
 	     continue;
-	   case ANA_ERROR:
+	   case LUX_ERROR:
 	     printf("(counter %s = %1g)", symbolIdent(counterSym, 0),
 		    *counter.d);
-	     return ANA_ERROR;
+	     return LUX_ERROR;
 	   case LOOP_RETALL: case LOOP_RETURN:
 	     return n;
 	 }
@@ -1659,10 +1659,10 @@ Int ana_for(Int nsym)
 	   case LOOP_BREAK:
 	     n = 0;
 	     continue;
-	   case ANA_ERROR:
+	   case LUX_ERROR:
 	     printf("(counter %s = %1g)", symbolIdent(counterSym, 0),
 		    *counter.d);
-	     return ANA_ERROR;
+	     return LUX_ERROR;
 	   case LOOP_RETALL: case LOOP_RETURN:
 	     return n;
 	 }
@@ -1679,7 +1679,7 @@ Int ana_for(Int nsym)
 #define ACTION_STEP	4
 Float	CPUtime = 0.0;
 Int execute(Int symbol)
-     /* executes ANA_EVB <symbol>.  Returns -1 on error, 1 on success, */
+     /* executes LUX_EVB <symbol>.  Returns -1 on error, 1 on success, */
      /* various negative numbers on breaks, returns, etc. */
 {
   Word	*ptr;
@@ -1701,7 +1701,7 @@ Int execute(Int symbol)
 #endif
   Float	newCPUtime;
   Int	showstats(Int, Int []), getNewLine(char *, char *, char),
-    ana_restart(Int, Int []), showError(Int), insert(Int, Int []),
+    lux_restart(Int, Int []), showError(Int), insert(Int, Int []),
     nextFreeStackEntry(void);
   void showExecutionLevel(Int);
 
@@ -1713,7 +1713,7 @@ Int execute(Int symbol)
 	  && !compileLevel	/* and not compiling a file */
 	  && !executeLevel) {	/* and not inside a statement */
 	puts("RETALL - at top level already"); /* at top level already */
-	return ANA_OK;
+	return LUX_OK;
       }
     }
     return symbol;
@@ -1850,7 +1850,7 @@ Int execute(Int symbol)
 	      printw(" r: restart LUX, w: where?, ?: this text\n");
 	      break;
 	    case 'r':
-	      ana_restart(0, NULL);
+	      lux_restart(0, NULL);
 	      break;
 	    case 'x':		/* stop stepping */
 	      step = 0;
@@ -1860,7 +1860,7 @@ Int execute(Int symbol)
 	      puts("Aborting this calculation");
 	      step = 0;
 	      go = 0; 
-	      return ANA_ERROR;
+	      return LUX_ERROR;
 	  } /* end of switch (c) */
 	} /* end of while (c == '?') */
       }	/* end of if (action & ...) */
@@ -1875,12 +1875,12 @@ Int execute(Int symbol)
   pegMark();
   switch (evb_type(symbol)) {
     default:
-      n = anaerror("Sorry, ANA_EVB type %d is not recognized\n",
+      n = luxerror("Sorry, LUX_EVB type %d is not recognized\n",
 		symbol, evb_type(symbol));
       break;
     case EVB_REPLACE:		/* assignment */
       nExecuted++;
-      n = ana_replace(replace_lhs(symbol), replace_rhs(symbol));
+      n = lux_replace(replace_lhs(symbol), replace_rhs(symbol));
       break;
     case EVB_INT_SUB:		/* internal subroutine */
       nExecuted++;
@@ -1892,7 +1892,7 @@ Int execute(Int symbol)
       break;
     case EVB_USR_SUB:		/* subroutine call */
       temp = usr_sub_routine_num(symbol);
-      if (symbol_class(temp) == ANA_STRING) {
+      if (symbol_class(temp) == LUX_STRING) {
 	/* routine name was not yet evaluated */
 	name = string_value(temp);
 	if ((n = lookForName(name, subrHashTable, 0)) < 0) {
@@ -1905,12 +1905,12 @@ Int execute(Int symbol)
 	    fclose(fp);
 	    n = lookForName(name, subrHashTable, 0);
 	    if (n < 0) {
-	      n = anaerror("File %s found but subroutine still is not compiled",
+	      n = luxerror("File %s found but subroutine still is not compiled",
 			0, name);
 	      break;
 	    }
 	  } else {
-	    n = anaerror("Subroutine %s not found", symbol, name);
+	    n = luxerror("Subroutine %s not found", symbol, name);
 	    break;
 	  }
 	  zap(temp);		/* don't need it anymore */
@@ -1927,13 +1927,13 @@ Int execute(Int symbol)
       /* fall-thru to EVB_USR_CODE case */
     case EVB_USR_CODE:
       temp = usr_code_routine_num(symbol);
-      if (symbol_class(temp) == ANA_STRING) {
+      if (symbol_class(temp) == LUX_STRING) {
 	/* routine name was not yet evaluated */
 	name = string_value(temp);
 	if ((n = lookForName(name, blockHashTable, curContext)) < 0) {
 	  /* not compiled */
 	  p = curContext? symbolProperName(curContext): "(main)";
-	  n = anaerror("Block routine %s not found in %s\n", symbol, name,
+	  n = luxerror("Block routine %s not found in %s\n", symbol, name,
 		    p? p: "(unnamed)");
 	  zap(temp);
 	  break;
@@ -1995,13 +1995,13 @@ Int execute(Int symbol)
 	fp = openPathFile(name, FIND_EITHER);
       }
       if (!fp) {
-	n = anaerror("Cannot open file %s", symbol, name);
+	n = luxerror("Cannot open file %s", symbol, name);
         perror("System message");
 	break;
       }
       if (p) {	/* seek specific routine */
 	if ((findBody = nextFreeStackEntry()) < 0) {	/* error */
-	  n = ANA_ERROR;
+	  n = LUX_ERROR;
 	  break;
 	}
 	symbolStack[findBody] = p;
@@ -2047,32 +2047,32 @@ Int execute(Int symbol)
       executeLevel++;
       if ((traceMode & T_LOOP) == 0)
 	noTrace++;
-      n = ana_for(symbol);
+      n = lux_for(symbol);
       executeLevel--;
       if ((traceMode & T_LOOP) == 0)
 	noTrace--;
       break;
     case EVB_IF:
       temp = evals((Int) *ptr);			/* evaluate condition */
-      if (symbol_class(temp) != ANA_SCALAR) {
+      if (symbol_class(temp) != LUX_SCALAR) {
 	n = cerror(COND_NO_SCAL, symbol, "in IF-statement");
 	zapTemp(temp);
 	break;
       }
       switch (scalar_type(temp)) {
-      case ANA_BYTE:
+      case LUX_BYTE:
 	n = scalar_value(temp).b? 1: 0;
 	break;
-      case ANA_WORD:
+      case LUX_WORD:
 	n = scalar_value(temp).w? 1: 0;
 	break;
-      case ANA_LONG:
+      case LUX_LONG:
 	n = scalar_value(temp).l? 1: 0;
 	break;
-      case ANA_FLOAT:
+      case LUX_FLOAT:
 	n = scalar_value(temp).f? 1: 0;
 	break;
-      case ANA_DOUBLE:
+      case LUX_DOUBLE:
 	n = scalar_value(temp).d? 1: 0;
 	break;
       }
@@ -2099,8 +2099,8 @@ Int execute(Int symbol)
 	  break; 
 	temp3 = eval((Int) temp2);		/* condition */
 	n = int_arg(temp3);
-	if (symbol_class(temp3) != ANA_SCALAR)
-	  n = ANA_ERROR;
+	if (symbol_class(temp3) != LUX_SCALAR)
+	  n = LUX_ERROR;
 	zapTemp(temp3);
 	if (n < 0) break;
       }
@@ -2125,8 +2125,8 @@ Int execute(Int symbol)
 	  break;
 	temp3 = eval((Int) temp2);		/* condition */
 	n = int_arg(temp3);
-	if (symbol_class(temp3) != ANA_SCALAR)
-	  n = ANA_ERROR;
+	if (symbol_class(temp3) != LUX_SCALAR)
+	  n = LUX_ERROR;
 	zapTemp(temp3);
 	if (n < 0)
 	  break;
@@ -2135,7 +2135,7 @@ Int execute(Int symbol)
       executeLevel--;
       if ((traceMode & T_LOOP) == 0)
 	noTrace--;
-      if (n != ANA_ERROR)
+      if (n != LUX_ERROR)
 	n = 1;
       break;
     case EVB_WHILE_DO:
@@ -2146,7 +2146,7 @@ Int execute(Int symbol)
 	noTrace++;
       while (1) {
 	temp3 = eval((Int) temp2);		/* condition */
-	if (symbol_class(temp3) != ANA_SCALAR)
+	if (symbol_class(temp3) != LUX_SCALAR)
 	  n = 0;
 	else n = int_arg(temp3);
 	zapTemp(temp3);
@@ -2160,24 +2160,24 @@ Int execute(Int symbol)
       executeLevel--;
       if ((traceMode & T_LOOP) == 0)
 	noTrace--;
-      if (n != ANA_ERROR)
+      if (n != LUX_ERROR)
 	n = 1;
       break;
     case EVB_RETURN:
       n = *ptr? eval(*ptr): 0;
       nExecuted++;
       switch (symbol_class(curContext)) {
-	case ANA_SUBROUTINE:
+	case LUX_SUBROUTINE:
 	  if (n)
-	    n = anaerror("No value may be RETURNed in subroutine %s", 0,
+	    n = luxerror("No value may be RETURNed in subroutine %s", 0,
 		      subrName(curContext));
 	  else
 	    n = LOOP_RETURN;
 	  break;
-	case ANA_FUNCTION:
+	case LUX_FUNCTION:
 	  returnSym = n;
 	  if (!n)
-	    n = anaerror("No value RETURNed in function %s", 0,
+	    n = luxerror("No value RETURNed in function %s", 0,
 		      funcName(curContext));
 	  else {
 	    /* if return symbol is not a temporary, then must return an */
@@ -2198,19 +2198,19 @@ Int execute(Int symbol)
 	    }
 	  }
 	  break;
-	case ANA_BLOCKROUTINE:
-	  n = anaerror("No RETURN allowed in block %s", 0,
+	case LUX_BLOCKROUTINE:
+	  n = luxerror("No RETURN allowed in block %s", 0,
 		    blockName(curContext));
 	  break;
 	default:
 	  n = -7;
 	  break; }
       if (n == -7)
-	n = anaerror("No RETURN possible from main execution level", 0);
+	n = luxerror("No RETURN possible from main execution level", 0);
       else if (n > 0)
 	zapTemp(n);
   }
-  if (n == ANA_ERROR)		/* some error */
+  if (n == LUX_ERROR)		/* some error */
     cerror(-1, symbol);
   if (symbol_context(symbol) == -compileLevel)
     zap(symbol);
@@ -2222,12 +2222,12 @@ Int execute(Int symbol)
   /* so the used part of that list is compact. */
   if (returnSym && isFreeTemp(returnSym)) {
     temp3 = returnSym;
-    while (temp3 > TEMPS_START && symbol_class(temp3 - 1) == ANA_UNUSED)
+    while (temp3 > TEMPS_START && symbol_class(temp3 - 1) == LUX_UNUSED)
       temp3--;
     if (temp3 < returnSym) {
       sym[temp3] = sym[returnSym];
       fixContext(temp3, temp3);
-      sym[returnSym].class = ANA_UNUSED;
+      sym[returnSym].class = LUX_UNUSED;
       tempVariableIndex = temp3 + 1;
       returnSym = temp3;
     }
@@ -2246,7 +2246,7 @@ Int execute(Int symbol)
   return n;
 }
 /*------------------------------------------------------------------*/
-Int ana_execute(Int narg, Int ps[])
+Int lux_execute(Int narg, Int ps[])
 /* execute a string as if it were typed at the keyboard */
 /* or execute the symbol indicated by number */
 /* keyword /MAIN (1) has the execution take place at the main level */
@@ -2258,10 +2258,10 @@ Int ana_execute(Int narg, Int ps[])
   { oldContext = curContext;
     curContext = 0; }
   switch (symbol_class(*ps))
-  { case ANA_STRING:
+  { case LUX_STRING:
       n = compileString(string_arg(*ps));
       break;
-    case ANA_SCAL_PTR: case ANA_SCALAR:
+    case LUX_SCAL_PTR: case LUX_SCALAR:
       n = execute(int_arg(*ps));
       break;
     default:
@@ -2307,7 +2307,7 @@ Int insert(Int narg, Int ps[])
   char	*name;
   FILE	*fp;
   extern Int	trace, step;
-  Int	ana_assoc_output(Int, Int, Int, Int);
+  Int	lux_assoc_output(Int, Int, Int, Int);
 
   target = ps[--narg];
   source = ps[--narg];
@@ -2320,7 +2320,7 @@ Int insert(Int narg, Int ps[])
   target = transfer(target);
   class = symbol_class(target);
 
-  offset0 = 0;			/* so it can be updated for ANA_FILEMAPs */
+  offset0 = 0;			/* so it can be updated for LUX_FILEMAPs */
 
   switch (internalMode & 3) {
     case 0:
@@ -2333,29 +2333,29 @@ Int insert(Int narg, Int ps[])
       combineType = OUTER;
       break;
     case 3:
-      return anaerror("Specified incompatible /INNER and /OUTER", 0);
+      return luxerror("Specified incompatible /INNER and /OUTER", 0);
   }
 
   switch (class) {
     default:
       return cerror(SUBSC_NO_INDX, target);
-    case ANA_STRING:
+    case LUX_STRING:
       ndim = 1;
       nelem = string_size(target);
       dims = &nelem;
       trgt.s = string_value(target);
       type = string_type(target);
       break;
-    case ANA_ASSOC:
+    case LUX_ASSOC:
       ndim = assoc_num_dims(target);
       dims = assoc_dims(target);
       nelem = 1;
       for (i = 0; i < ndim; i++)
 	nelem *= dims[i];
       break;
-    case ANA_FILEMAP:
+    case LUX_FILEMAP:
       if (file_map_readonly(target))
-	return anaerror("File array is read-only", target);
+	return luxerror("File array is read-only", target);
       ndim = file_map_num_dims(target);
       dims = file_map_dims(target);
       nelem = file_map_size(target);
@@ -2374,7 +2374,7 @@ Int insert(Int narg, Int ps[])
       }
       offset0 = file_map_has_offset(target)? file_map_offset(target): 0;
       break;
-    case ANA_ARRAY: case ANA_CARRAY:
+    case LUX_ARRAY: case LUX_CARRAY:
       ndim = array_num_dims(target);
       dims = array_dims(target);
       nelem = array_size(target);
@@ -2383,7 +2383,7 @@ Int insert(Int narg, Int ps[])
       break;
   }
 
-  unit = ana_type_size[type];
+  unit = lux_type_size[type];
 
   if (narg > ndim)
     return cerror(N_DIMS_OVR, target);
@@ -2391,34 +2391,34 @@ Int insert(Int narg, Int ps[])
   switch (symbol_class(source)) {
     default:
       return cerror(ILL_CLASS, source);
-    case ANA_SCAL_PTR:
+    case LUX_SCAL_PTR:
       source = dereferenceScalPointer(source);
       /* fall-thru */
-    case ANA_SCALAR:
+    case LUX_SCALAR:
       srcNdim = 1;
       srcNelem = 1;
       srcDims = &srcNelem;
       srcType = scalar_type(source);
       src.l = &scalar_value(source).l;
       break;
-    case ANA_CSCALAR:
+    case LUX_CSCALAR:
       srcNdim = 1;
       srcNelem = 1;
       srcDims = &srcNelem;
       srcType = complex_scalar_type(source);
       src.cf = complex_scalar_data(source).cf;
       break;
-    case ANA_STRING:
+    case LUX_STRING:
       srcNdim = 1;
-      if (class == ANA_ARRAY)	/* insert string in string array */
+      if (class == LUX_ARRAY)	/* insert string in string array */
 	srcNelem = 1;
       else			/* insert string in string */
 	srcNelem = string_size(source);
       srcDims = &srcNelem;
-      srcType = ANA_TEMP_STRING;
+      srcType = LUX_TEMP_STRING;
       src.s = string_value(source);
       break;
-    case ANA_ARRAY: case ANA_CARRAY:
+    case LUX_ARRAY: case LUX_CARRAY:
       srcNdim = array_num_dims(source);
       srcDims = array_dims(source);
       srcNelem = array_size(source);
@@ -2428,11 +2428,11 @@ Int insert(Int narg, Int ps[])
   }
 
   /* get info about all subscripts */
-  /* start[i] = start index (for ANA_RANGE subscripts) */
+  /* start[i] = start index (for LUX_RANGE subscripts) */
   /* size[i] = number of indices */
-  /* index[i] = pointer to list of indices (for ANA_ARRAY subscripts) */
-  /* subsc_type[i] = type of subscript: ANA_RANGE (scalar or range) or */
-  /*           ANA_ARRAY (array of indices) */
+  /* index[i] = pointer to list of indices (for LUX_ARRAY subscripts) */
+  /* subsc_type[i] = type of subscript: LUX_RANGE (scalar or range) or */
+  /*           LUX_ARRAY (array of indices) */
 
   if (internalMode & 64) {	/* /SEPARATE */
     /* treat the elements of the single subscript (a numerical array) */
@@ -2440,8 +2440,8 @@ Int insert(Int narg, Int ps[])
     if (narg != 1		/* but not exactly one subscript */
 	|| !symbolIsNumericalArray(ps[0]) /* or it's not a numerical array */
 	|| array_size(ps[0]) > ndim) /* or it has too many elements */
-      return anaerror("Wrong subscript for /SEPARATE", ps[0]);
-    iq = ana_long(1, ps);	/* ensure LONG */
+      return luxerror("Wrong subscript for /SEPARATE", ps[0]);
+    iq = lux_long(1, ps);	/* ensure LONG */
     narg = array_size(iq);
     iptr = array_data(iq);
     for (i = 0; i < narg; i++) {
@@ -2449,7 +2449,7 @@ Int insert(Int narg, Int ps[])
       if (start[i] < 0 || start[i] >= dims[i]) /* illegal subscript value */
 	return cerror(ILL_SUBSC, ps[0], start[i], dims[i]);
       size[i] = 1;
-      subsc_type[i] = ANA_RANGE;
+      subsc_type[i] = LUX_RANGE;
     }
     nmult = 0;			/* no multiple-element subscripts */
   } else {			/* no /SEPARATE */
@@ -2457,7 +2457,7 @@ Int insert(Int narg, Int ps[])
     for (i = 0; i < narg; i++) { /* all subscripts */
       iq = ps[i];		/* next subscript */
       switch (symbol_class(iq)) { /* subscript class */
-	case ANA_SCALAR:
+	case LUX_SCALAR:
 	  start[i] = int_arg(iq); /* start index (scalar value) */
 	  if (narg == 1		/* only a single subscript */
 	      && (internalMode & 48) == 0) /* no /ALL or /ZERO keywords */
@@ -2468,10 +2468,10 @@ Int insert(Int narg, Int ps[])
 	  if (start[i] < 0 || start[i] >= width) /* check if within range */
 	    return cerror(ILL_SUBSC, iq, start[i], width);
 	  size[i] = 1;		/* size (1 element) */
-	  subsc_type[i] = ANA_RANGE; /* subscript type */
+	  subsc_type[i] = LUX_RANGE; /* subscript type */
 	  break;
-	case ANA_ARRAY:
-	  iq = ana_long(1, &iq); /* get LONG indices */
+	case LUX_ARRAY:
+	  iq = lux_long(1, &iq); /* get LONG indices */
 	  n = size[i] = array_size(iq); /* number of array elements */
 	  if (n == 1) {		/* only one element: mimic scalar */
 	    start[i] = *(Int *) array_data(iq);
@@ -2481,7 +2481,7 @@ Int insert(Int narg, Int ps[])
 	      width = dims[i];
 	    if (start[i] < 0 || start[i] >= width)
 	      return cerror(ILL_SUBSC, iq, start[i], width);
-	    subsc_type[i] = ANA_RANGE;
+	    subsc_type[i] = LUX_RANGE;
 	  } else {
 	    iptr = index[i] = (Int *) array_data(iq);
 	    if (narg == 1)	/* only a single subscript; addresses */
@@ -2497,10 +2497,10 @@ Int insert(Int narg, Int ps[])
 	    nmult++;
 	    if (combineType == UNDEFINED && array_num_dims(iq) > 1)
 	      combineType = INNER;
-	    subsc_type[i] = ANA_ARRAY;
+	    subsc_type[i] = LUX_ARRAY;
 	  }
 	  break;
-	case ANA_RANGE:
+	case LUX_RANGE:
 	  if (!range_scalar(iq))
 	    return cerror(ILL_CLASS, iq);
 	  /* get here if scalar range */
@@ -2508,7 +2508,7 @@ Int insert(Int narg, Int ps[])
 	  if (iq < 0)		/* some error occurred */
 	    return iq;
 	  /* fall-thru */
-	case ANA_SUBSC_PTR:
+	case LUX_SUBSC_PTR:
 	  start[i] = subsc_ptr_start(iq);
 	  if (start[i] < 0)	/* count from end of range */
 	    start[i] += dims[i];
@@ -2521,10 +2521,10 @@ Int insert(Int narg, Int ps[])
 	    return cerror(RANGE_END, iq, size[i], dims[i]);
 	  size[i] += 1 - start[i]; /* now we have the size */
 	  if (subsc_ptr_redirect(iq) >= 0)
-	    return anaerror("No redirection allowed on insert target", target);
+	    return luxerror("No redirection allowed on insert target", target);
 	  if (subsc_ptr_sum(iq))
-	    return anaerror("No summation allowed on insert target", target);
-	  subsc_type[i] = ANA_RANGE;
+	    return luxerror("No summation allowed on insert target", target);
+	  subsc_type[i] = LUX_RANGE;
 	  if (size[i] > 1)
 	    nmult++;
 	  break;
@@ -2535,18 +2535,18 @@ Int insert(Int narg, Int ps[])
   }
     
   switch (class) {
-    case ANA_ASSOC:
+    case LUX_ASSOC:
       /* only a list of scalars is allowed here */
       if (nmult)
 	return cerror(ILL_SUBSC_LHS, target);
       if (narg > 1) {		/* more than one subscript */
-	i = array_scratch(ANA_LONG, 1, &narg);
+	i = array_scratch(LUX_LONG, 1, &narg);
 	memcpy(array_data(i), start, narg);
 	offset = -1;
       } else {
 	i = start[0];
 	offset = -3; }
-      n = ana_assoc_output(target, source, i, offset);
+      n = lux_assoc_output(target, source, i, offset);
       return target;
   }
   
@@ -2561,12 +2561,12 @@ Int insert(Int narg, Int ps[])
   if (isStringType(type) ^ isStringType(srcType))
     return cerror(INCMP_ARG, source);
 
-  if (class == ANA_ARRAY && isStringType(type)) /* string array */
-    type = ANA_STRING_ARRAY;	/* distinguish string array from string */
-  if (symbol_class(source) == ANA_ARRAY && isStringType(srcType))
-    srcType = ANA_STRING_ARRAY;
+  if (class == LUX_ARRAY && isStringType(type)) /* string array */
+    type = LUX_STRING_ARRAY;	/* distinguish string array from string */
+  if (symbol_class(source) == LUX_ARRAY && isStringType(srcType))
+    srcType = LUX_STRING_ARRAY;
 
-  onestep = ana_type_size[srcType];
+  onestep = lux_type_size[srcType];
     
   switch (internalMode & 48) {
     case 0:			/* none */
@@ -2577,7 +2577,7 @@ Int insert(Int narg, Int ps[])
       for (i = narg; i < ndim; i++) {
 	start[i] = 0;
 	size[i] = 1;
-	subsc_type[i] = ANA_RANGE;
+	subsc_type[i] = LUX_RANGE;
       }
       narg = ndim;
       break;
@@ -2587,12 +2587,12 @@ Int insert(Int narg, Int ps[])
 	size[i] = dims[i];
 	if (size[i] > 1)
 	  nmult++;
-	subsc_type[i] = ANA_RANGE;
+	subsc_type[i] = LUX_RANGE;
       }
       narg = ndim;
       break;
     default:
-      return anaerror("Specified incompatible /ZERO and /ALL", 0);
+      return luxerror("Specified incompatible /ZERO and /ALL", 0);
   }
 
   if (trace > executeLevel || step > executeLevel) { /* output some info */
@@ -2626,214 +2626,214 @@ Int insert(Int narg, Int ps[])
     else if (size[0] != srcNelem)
       return cerror(INCMP_ARG, source);
 
-    n = (class == ANA_FILEMAP)? unit: 1;
+    n = (class == LUX_FILEMAP)? unit: 1;
     for (i = 0; i < narg; i++) {
       stride[i] = n;
       n *= dims[i];
     }
 
     switch (class) {
-      case ANA_ARRAY: case ANA_CARRAY:
+      case LUX_ARRAY: case LUX_CARRAY:
 	for (j = 0; j < size[0]; j++) {
 	  offset = 0;
 	  for (i = 0; i < narg; i++)
-	    offset += ((subsc_type[i] == ANA_ARRAY)? index[i][j]: start[i]++)
+	    offset += ((subsc_type[i] == LUX_ARRAY)? index[i][j]: start[i]++)
 	      * stride[i];
 	  switch (type) {
-	    case ANA_BYTE: case ANA_TEMP_STRING:
+	    case LUX_BYTE: case LUX_TEMP_STRING:
 	      switch (srcType) {
-		case ANA_BYTE: case ANA_TEMP_STRING:
+		case LUX_BYTE: case LUX_TEMP_STRING:
 		  trgt.b[offset] = *src.b;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  trgt.b[offset] = (Byte) *src.w;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  trgt.b[offset] = (Byte) *src.l;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  trgt.b[offset] = (Byte) *src.f;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  trgt.b[offset] = (Byte) *src.d;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  trgt.b[offset] = sqrt(src.cf->real*src.cf->real
 					+ src.cf->imaginary*src.cf->imaginary);
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  trgt.b[offset] = sqrt(src.cd->real*src.cd->real
 					+ src.cd->imaginary*src.cd->imaginary);
 		  break;
 	      }
 	      break;
-	    case ANA_WORD:
+	    case LUX_WORD:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  trgt.w[offset] = (Word) *src.b;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  trgt.w[offset] = *src.w;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  trgt.w[offset] = (Word) *src.l;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  trgt.w[offset] = (Word) *src.f;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  trgt.w[offset] = (Word) *src.d;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  trgt.w[offset] = sqrt(src.cf->real*src.cf->real
 					+ src.cf->imaginary*src.cf->imaginary);
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  trgt.w[offset] = sqrt(src.cd->real*src.cd->real
 					+ src.cd->imaginary*src.cd->imaginary);
 		  break;
 	      }
 	      break;
-	    case ANA_LONG:
+	    case LUX_LONG:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  trgt.l[offset] = (Int) *src.b;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  trgt.l[offset] = (Int) *src.w;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  trgt.l[offset] = *src.l;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  trgt.l[offset] = (Int) *src.f;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  trgt.l[offset] = (Int) *src.d;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  trgt.l[offset] = sqrt(src.cf->real*src.cf->real
 					+ src.cf->imaginary*src.cf->imaginary);
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  trgt.l[offset] = sqrt(src.cd->real*src.cd->real
 					+ src.cd->imaginary*src.cd->imaginary);
 		  break;
 	      }
 	      break;
-	    case ANA_FLOAT:
+	    case LUX_FLOAT:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  trgt.f[offset] = (Float) *src.b;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  trgt.f[offset] = (Float) *src.w;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  trgt.f[offset] = (Float) *src.l;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  trgt.f[offset] = *src.f;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  trgt.f[offset] = (Float) *src.d;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  trgt.f[offset] = sqrt(src.cf->real*src.cf->real
 					+ src.cf->imaginary*src.cf->imaginary);
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  trgt.f[offset] = sqrt(src.cd->real*src.cd->real
 					+ src.cd->imaginary*src.cd->imaginary);
 		  break;
 	      }
 	      break;
-	    case ANA_DOUBLE:
+	    case LUX_DOUBLE:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  trgt.d[offset] = (Double) *src.b;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  trgt.d[offset] = (Double) *src.w;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  trgt.d[offset] = (Double) *src.l;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  trgt.d[offset] = (Double) *src.f;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  trgt.d[offset] = *src.d;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  trgt.d[offset] = sqrt(src.cf->real*src.cf->real
 					+ src.cf->imaginary*src.cf->imaginary);
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  trgt.d[offset] = sqrt(src.cd->real*src.cd->real
 					+ src.cd->imaginary*src.cd->imaginary);
 		  break;
 	      }
 	      break;
-	    case ANA_CFLOAT:
+	    case LUX_CFLOAT:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  trgt.cf[offset].real = (Float) *src.b;
 		  trgt.cf[offset].imaginary = 0;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  trgt.cf[offset].real = (Float) *src.w;
 		  trgt.cf[offset].imaginary = 0;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  trgt.cf[offset].real = (Float) *src.l;
 		  trgt.cf[offset].imaginary = 0;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  trgt.cf[offset].real = *src.f;
 		  trgt.cf[offset].imaginary = 0;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  trgt.cf[offset].real = (Float) *src.d;
 		  trgt.cf[offset].imaginary = 0;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  trgt.cf[offset].real = src.cf->real;
 		  trgt.cf[offset].imaginary = src.cf->imaginary;
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  trgt.cf[offset].real = (Float) src.cd->real;
 		  trgt.cf[offset].imaginary = (Float) src.cd->imaginary;
 		  break;
 	      }
 	      break;
-	    case ANA_CDOUBLE:
+	    case LUX_CDOUBLE:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  trgt.cd[offset].real = (Double) *src.b;
 		  trgt.cd[offset].imaginary = 0;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  trgt.cd[offset].real = (Double) *src.w;
 		  trgt.cd[offset].imaginary = 0;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  trgt.cd[offset].real = (Double) *src.l;
 		  trgt.cd[offset].imaginary = 0;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  trgt.cd[offset].real = (Double) *src.f;
 		  trgt.cd[offset].imaginary = 0;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  trgt.cd[offset].real = (Double) *src.d;
 		  trgt.cd[offset].imaginary = 0;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  trgt.cd[offset].real = (Double) src.cf->real;
 		  trgt.cd[offset].imaginary = (Double) src.cf->imaginary;
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  trgt.cd[offset].real = (Double) src.cd->real;
 		  trgt.cd[offset].imaginary = (Double) src.cd->imaginary;
 		  break;
@@ -2846,7 +2846,7 @@ Int insert(Int narg, Int ps[])
 		case 999:		/* string array */
 		  trgt.sp[offset] = strsave(*src.sp);
 		  break;
-		case ANA_TEMP_STRING: /* string */
+		case LUX_TEMP_STRING: /* string */
 		  trgt.sp[offset] = strsave(src.s);
 		  break;
 	      }
@@ -2855,179 +2855,179 @@ Int insert(Int narg, Int ps[])
 	  src.b += onestep;
 	}
 	break;
-      case ANA_FILEMAP:
+      case LUX_FILEMAP:
 	for (j = 0; j < size[0]; j++) {
 	  offset = offset0;
 	  for (i = 0; i < narg; i++)
-	    offset += ((subsc_type[i] == ANA_ARRAY)? index[i][j]: start[i]++)
+	    offset += ((subsc_type[i] == LUX_ARRAY)? index[i][j]: start[i]++)
 	      * stride[i];
 	  if (fseek(fp, offset, SEEK_SET)) {
 	    fclose(fp);
 	    return cerror(POS_ERR, target);
 	  }
 	  switch (type) {
-	    case ANA_BYTE: case ANA_TEMP_STRING:
+	    case LUX_BYTE: case LUX_TEMP_STRING:
 	      switch (srcType) {
-		case ANA_BYTE: case ANA_TEMP_STRING:
+		case LUX_BYTE: case LUX_TEMP_STRING:
 		  value.b = *src.b;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  value.b = (Byte) *src.w;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  value.b = (Byte) *src.l;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  value.b = (Byte) *src.f;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  value.b = (Byte) *src.d;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  value.b = sqrt(src.cf->real*src.cf->real
 				 + src.cf->imaginary*src.cf->imaginary);
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  value.b = sqrt(src.cd->real*src.cd->real
 				 + src.cd->imaginary*src.cd->imaginary);
 		  break;
 	      }
 	      break;
-	    case ANA_WORD:
+	    case LUX_WORD:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  value.w = (Word) *src.b;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  value.w = *src.w;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  value.w = (Word) *src.l;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  value.w = (Word) *src.f;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  value.w = (Word) *src.d;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  value.w = sqrt(src.cf->real*src.cf->real
 				 + src.cf->imaginary*src.cf->imaginary);
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  value.w = sqrt(src.cd->real*src.cd->real
 				 + src.cd->imaginary*src.cd->imaginary);
 		  break;
 	      }
 	      break;
-	    case ANA_LONG:
+	    case LUX_LONG:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  value.l = (Int) *src.b;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  value.l = (Int) *src.w;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  value.l = *src.l;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  value.l = (Int) *src.f;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  value.l = (Int) *src.d;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  value.l = sqrt(src.cf->real*src.cf->real
 				 + src.cf->imaginary*src.cf->imaginary);
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  value.l = sqrt(src.cd->real*src.cd->real
 				 + src.cd->imaginary*src.cd->imaginary);
 		  break;
 	      }
 	      break;
-	    case ANA_FLOAT:
+	    case LUX_FLOAT:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  value.f = (Float) *src.b;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  value.f = (Float) *src.w;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  value.f = (Float) *src.l;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  value.f = *src.f;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  value.f = (Float) *src.d;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  value.f = sqrt(src.cf->real*src.cf->real
 				 + src.cf->imaginary*src.cf->imaginary);
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  value.f = sqrt(src.cd->real*src.cd->real
 				 + src.cd->imaginary*src.cd->imaginary);
 		  break;
 	      }
 	      break;
-	    case ANA_DOUBLE:
+	    case LUX_DOUBLE:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  value.d = (Double) *src.b;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  value.d = (Double) *src.w;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  value.d = (Double) *src.l;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  value.d = (Double) *src.f;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  value.d = *src.d;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  value.f = sqrt(src.cf->real*src.cf->real
 				 + src.cf->imaginary*src.cf->imaginary);
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  value.d = sqrt(src.cd->real*src.cd->real
 				 + src.cd->imaginary*src.cd->imaginary);
 		  break;
 	      }
 	      break;
-	    case ANA_CFLOAT:
+	    case LUX_CFLOAT:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  value.cf.real = *src.b;
 		  value.cf.imaginary = 0;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  value.cf.real = *src.w;
 		  value.cf.imaginary = 0;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  value.cf.real = *src.l;
 		  value.cf.imaginary = 0;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  value.cf.real = *src.f;
 		  value.cf.imaginary = 0;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  value.cf.real = *src.d;
 		  value.cf.imaginary = 0;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  value.cf.real = src.cf->real;
 		  value.cf.imaginary = src.cf->imaginary;
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  value.cf.real = src.cd->real;
 		  value.cf.imaginary = src.cd->imaginary;
 		  break;
@@ -3065,9 +3065,9 @@ Int insert(Int narg, Int ps[])
 	for (i = 0; i < narg; i++) { /* all subscripts */
 	  if (size[i] > 1) {
 	    if (j >= srcNdim)
-	      return anaerror("Too many non-scalar subscripts", target);
+	      return luxerror("Too many non-scalar subscripts", target);
 	    if (size[i] != srcDims[j])
-	      return anaerror("Subscript size incompatible with source dimension",
+	      return luxerror("Subscript size incompatible with source dimension",
 			   target);
 	    j++;
 	  } /* end of if (size[i]...) */
@@ -3075,7 +3075,7 @@ Int insert(Int narg, Int ps[])
       } else {			/* scalar subscripts matter */
 	for (i = 0; i < narg; i++) {
 	  if (size[i] > 1 && size[i] != srcDims[i])
-	    return anaerror("Subscript size incompatible with source dimension",
+	    return luxerror("Subscript size incompatible with source dimension",
 			 target);
 	  if (size[i] > 1)
 	    j++;		/* all OK */
@@ -3111,33 +3111,33 @@ Int insert(Int narg, Int ps[])
 	n *= dims[i];
       }
       if (offset + srcNelem > nelem)
-	return anaerror("Source extends beyond target boundaries", source);
+	return luxerror("Source extends beyond target boundaries", source);
       start[0] = offset;
       dims = &nelem;
       ndim = 1;
       narg = 1;
       size[0] = srcNelem;
     } else if (j != srcNdim && srcNelem > 1)
-      return anaerror("Too few non-scalar subscripts", target);
+      return luxerror("Too few non-scalar subscripts", target);
 
     if (srcNelem == 1)
       onestep = 0;
 
     /* now do the insertion */
-    /* for ANA_ARRAY subscripts the offset is calculated for each index */
-    /* for ANA_RANGE subscripts the offset is updated for each element */
+    /* for LUX_ARRAY subscripts the offset is calculated for each index */
+    /* for LUX_RANGE subscripts the offset is updated for each element */
 
-    n = (class == ANA_FILEMAP)? unit: 1;
+    n = (class == LUX_FILEMAP)? unit: 1;
 
     if (!j && ndim == 1 && srcNdim == 1 && type == srcType &&
 	(srcNelem > 1 || size[0] == 1)) {
 				/* in this case we do a fast insert */
       offset0 += start[0]*unit;
       switch (class) {
-	case ANA_ARRAY: case ANA_CARRAY:
+	case LUX_ARRAY: case LUX_CARRAY:
 	  memcpy(trgt.b + offset0, src.b, srcNelem*unit);
 	  break;
-	case ANA_FILEMAP:
+	case LUX_FILEMAP:
 	  if (fseek(fp, offset0, SEEK_SET)) {
 	    fclose(fp);
 	    if (ferror(fp))
@@ -3152,241 +3152,241 @@ Int insert(Int narg, Int ps[])
 	  fclose(fp);
 	  break;
       }
-      return ANA_OK;
+      return LUX_OK;
     }
 
     for (i = 0; i < narg; i++) {
       stride[i] = n;
       tally[i] = 0;
-      if (subsc_type[i] == ANA_RANGE)
+      if (subsc_type[i] == LUX_RANGE)
 	offset0 += start[i]*n;
       n *= dims[i];
     }
     
-    if (subsc_type[0] == ANA_RANGE) /* ?? */
+    if (subsc_type[0] == LUX_RANGE) /* ?? */
       tstep[0] = stride[0];
     else
       tstep[0] = 0;
     
     for (i = 1; i < narg; i++)
-      tstep[i] = (subsc_type[i] == ANA_RANGE? stride[i]: 0)
-	- (subsc_type[i - 1] == ANA_RANGE? size[i - 1]*stride[i - 1]: 0);
+      tstep[i] = (subsc_type[i] == LUX_RANGE? stride[i]: 0)
+	- (subsc_type[i - 1] == LUX_RANGE? size[i - 1]*stride[i - 1]: 0);
     
     switch (class) {
-      case ANA_ARRAY: case ANA_CARRAY:
+      case LUX_ARRAY: case LUX_CARRAY:
 	do {
 	  offset = offset0;
 	  for (i = 0; i < narg; i++)
-	    if (subsc_type[i] == ANA_ARRAY)
+	    if (subsc_type[i] == LUX_ARRAY)
 	      offset += index[i][tally[i]]*stride[i];
 	  switch (type) {
-	    case ANA_BYTE: case ANA_TEMP_STRING:
+	    case LUX_BYTE: case LUX_TEMP_STRING:
 	      switch (srcType) {
-		case ANA_BYTE: case ANA_TEMP_STRING:
+		case LUX_BYTE: case LUX_TEMP_STRING:
 		  trgt.b[offset] = *src.b;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  trgt.b[offset] = (Byte) *src.w;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  trgt.b[offset] = (Byte) *src.l;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  trgt.b[offset] = (Byte) *src.f;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  trgt.b[offset] = (Byte) *src.d;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  trgt.b[offset] = sqrt(src.cf->real*src.cf->real
 					+ src.cf->imaginary*src.cf->imaginary);
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  trgt.b[offset] = sqrt(src.cd->real*src.cd->real
 					+ src.cd->imaginary*src.cd->imaginary);
 		  break;
 	      }
 	      break;
-	    case ANA_WORD:
+	    case LUX_WORD:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  trgt.w[offset] = (Word) *src.b;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  trgt.w[offset] = *src.w;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  trgt.w[offset] = (Word) *src.l;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  trgt.w[offset] = (Word) *src.f;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  trgt.w[offset] = (Word) *src.d;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  trgt.w[offset] = sqrt(src.cf->real*src.cf->real
 					+ src.cf->imaginary*src.cf->imaginary);
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  trgt.w[offset] = sqrt(src.cd->real*src.cd->real
 					+ src.cd->imaginary*src.cd->imaginary);
 		  break;
 	      }
 	      break;
-	    case ANA_LONG:
+	    case LUX_LONG:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  trgt.l[offset] = (Int) *src.b;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  trgt.l[offset] = (Int) *src.w;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  trgt.l[offset] = *src.l;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  trgt.l[offset] = (Int) *src.f;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  trgt.l[offset] = (Int) *src.d;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  trgt.l[offset] = sqrt(src.cf->real*src.cf->real
 					+ src.cf->imaginary*src.cf->imaginary);
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  trgt.l[offset] = sqrt(src.cd->real*src.cd->real
 					+ src.cd->imaginary*src.cd->imaginary);
 		  break;
 	      }
 	      break;
-	    case ANA_FLOAT:
+	    case LUX_FLOAT:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  trgt.f[offset] = (Float) *src.b;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  trgt.f[offset] = (Float) *src.w;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  trgt.f[offset] = (Float) *src.l;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  trgt.f[offset] = *src.f;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  trgt.f[offset] = (Float) *src.d;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  trgt.f[offset] = sqrt(src.cf->real*src.cf->real
 					+ src.cf->imaginary*src.cf->imaginary);
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  trgt.f[offset] = sqrt(src.cd->real*src.cd->real
 					+ src.cd->imaginary*src.cd->imaginary);
 		  break;
 	      }
 	      break;
-	    case ANA_DOUBLE:
+	    case LUX_DOUBLE:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  trgt.d[offset] = (Double) *src.b;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  trgt.d[offset] = (Double) *src.w;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  trgt.d[offset] = (Double) *src.l;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  trgt.d[offset] = (Double) *src.f;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  trgt.d[offset] = *src.d;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  trgt.d[offset] = sqrt(src.cf->real*src.cf->real
 					+ src.cf->imaginary*src.cf->imaginary);
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  trgt.d[offset] = sqrt(src.cd->real*src.cd->real
 					+ src.cd->imaginary*src.cd->imaginary);
 		  break;
 	      }
 	      break;
-	    case ANA_CFLOAT:
+	    case LUX_CFLOAT:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  trgt.cf[offset].real = *src.b;
 		  trgt.cf[offset].imaginary = 0;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  trgt.cf[offset].real = *src.w;
 		  trgt.cf[offset].imaginary = 0;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  trgt.cf[offset].real = *src.l;
 		  trgt.cf[offset].imaginary = 0;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  trgt.cf[offset].real = *src.f;
 		  trgt.cf[offset].imaginary = 0;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  trgt.cf[offset].real = *src.d;
 		  trgt.cf[offset].imaginary = 0;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  trgt.cf[offset].real = src.cf->real;
 		  trgt.cf[offset].imaginary = src.cf->imaginary;
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  trgt.cf[offset].real = src.cd->real;
 		  trgt.cf[offset].imaginary = src.cd->imaginary;
 		  break;
 	      }
 	      break;
-	    case ANA_CDOUBLE:
+	    case LUX_CDOUBLE:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  trgt.cd[offset].real = *src.b;
 		  trgt.cd[offset].imaginary = 0;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  trgt.cd[offset].real = *src.w;
 		  trgt.cd[offset].imaginary = 0;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  trgt.cd[offset].real = *src.l;
 		  trgt.cd[offset].imaginary = 0;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  trgt.cd[offset].real = *src.f;
 		  trgt.cd[offset].imaginary = 0;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  trgt.cd[offset].real = *src.d;
 		  trgt.cd[offset].imaginary = 0;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  trgt.cd[offset].real = src.cf->real;
 		  trgt.cd[offset].imaginary = src.cf->imaginary;
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  trgt.cd[offset].real = src.cd->real;
 		  trgt.cd[offset].imaginary = src.cd->imaginary;
 		  break;
 	      }
 	      break;
-	    case ANA_STRING_ARRAY: /* string array */
+	    case LUX_STRING_ARRAY: /* string array */
 	      if (trgt.sp[offset])	/* already a string there */
 		free(trgt.sp[offset]);
 	      switch (srcType) {
-		case ANA_STRING_ARRAY: /* string array */
+		case LUX_STRING_ARRAY: /* string array */
 		  trgt.sp[offset] = strsave(*src.sp);
 		  break;
-		case ANA_TEMP_STRING: /* string */
+		case LUX_TEMP_STRING: /* string */
 		  trgt.sp[offset] = strsave(src.s);
 		  break;
 	      }
@@ -3396,218 +3396,218 @@ Int insert(Int narg, Int ps[])
 	  for (i = 0; i < narg; i++) {
 	    if (i)
 	      tally[i - 1] = 0;
-	    offset0 += tstep[i]; /* update for ANA_RANGE subscripts */
+	    offset0 += tstep[i]; /* update for LUX_RANGE subscripts */
 	    tally[i]++;
 	    if (tally[i] != size[i])
 	      break;
 	  }
 	} while (i != narg);
 	break;
-      case ANA_FILEMAP:
+      case LUX_FILEMAP:
 	do {
 	  offset = offset0;
 	  for (i = 0; i < narg; i++)
-	    if (subsc_type[i] == ANA_ARRAY)
+	    if (subsc_type[i] == LUX_ARRAY)
 	      offset += index[i][tally[i]]*stride[i];
 	  if (fseek(fp, offset, SEEK_SET)) {
 	    fclose(fp);
 	    return cerror(POS_ERR, target);
 	  }
 	  switch (type) {
-	    case ANA_BYTE: case ANA_TEMP_STRING:
+	    case LUX_BYTE: case LUX_TEMP_STRING:
 	      switch (srcType) {
-		case ANA_BYTE: case ANA_TEMP_STRING:
+		case LUX_BYTE: case LUX_TEMP_STRING:
 		  value.b = *src.b;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  value.b = (Byte) *src.w;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  value.b = (Byte) *src.l;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  value.b = (Byte) *src.f;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  value.b = (Byte) *src.d;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  value.b = sqrt(src.cf->real*src.cf->real
 				 + src.cf->imaginary*src.cf->imaginary);
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  value.b = sqrt(src.cd->real*src.cd->real
 				 + src.cd->imaginary*src.cd->imaginary);
 		  break;
 	      }
 	      break;
-	    case ANA_WORD:
+	    case LUX_WORD:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  value.w = (Word) *src.b;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  value.w = *src.w;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  value.w = (Word) *src.l;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  value.w = (Word) *src.f;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  value.w = (Word) *src.d;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  value.w = sqrt(src.cf->real*src.cf->real
 				 + src.cf->imaginary*src.cf->imaginary);
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  value.w = sqrt(src.cd->real*src.cd->real
 				 + src.cd->imaginary*src.cd->imaginary);
 		  break;
 	      }
 	      break;
-	    case ANA_LONG:
+	    case LUX_LONG:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  value.l = (Int) *src.b;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  value.l = (Int) *src.w;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  value.l = *src.l;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  value.l = (Int) *src.f;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  value.l = (Int) *src.d;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  value.l = sqrt(src.cf->real*src.cf->real
 				 + src.cf->imaginary*src.cf->imaginary);
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  value.l = sqrt(src.cd->real*src.cd->real
 				 + src.cd->imaginary*src.cd->imaginary);
 		  break;
 	      }
 	      break;
-	    case ANA_FLOAT:
+	    case LUX_FLOAT:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  value.f = (Float) *src.b;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  value.f = (Float) *src.w;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  value.f = (Float) *src.l;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  value.f = *src.f;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  value.f = (Float) *src.d;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  value.f = sqrt(src.cf->real*src.cf->real
 				 + src.cf->imaginary*src.cf->imaginary);
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  value.f = sqrt(src.cd->real*src.cd->real
 				 + src.cd->imaginary*src.cd->imaginary);
 		  break;
 	      }
 	      break;
-	    case ANA_DOUBLE:
+	    case LUX_DOUBLE:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  value.d = (Double) *src.b;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  value.d = (Double) *src.w;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  value.d = (Double) *src.l;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  value.d = (Double) *src.f;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  value.d = *src.d;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  value.d = sqrt(src.cf->real*src.cf->real
 				 + src.cf->imaginary*src.cf->imaginary);
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  value.d = sqrt(src.cd->real*src.cd->real
 				 + src.cd->imaginary*src.cd->imaginary);
 		  break;
 	      }
 	      break;
-	    case ANA_CFLOAT:
+	    case LUX_CFLOAT:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  value.cf.real = *src.b;
 		  value.cf.imaginary = 0;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  value.cf.real = *src.w;
 		  value.cf.imaginary = 0;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  value.cf.real = *src.l;
 		  value.cf.imaginary = 0;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  value.cf.real = *src.f;
 		  value.cf.imaginary = 0;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  value.cf.real = *src.d;
 		  value.cf.imaginary = 0;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  value.cf.real = src.cf->real;
 		  value.cf.imaginary = src.cf->imaginary;
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  value.cf.real = src.cd->real;
 		  value.cf.imaginary = src.cd->imaginary;
 		  break;
 	      }
 	      break;
-	    case ANA_CDOUBLE:
+	    case LUX_CDOUBLE:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  value.cd.real = *src.b;
 		  value.cd.imaginary = 0;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  value.cd.real = *src.w;
 		  value.cd.imaginary = 0;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  value.cd.real = *src.l;
 		  value.cd.imaginary = 0;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  value.cd.real = *src.f;
 		  value.cd.imaginary = 0;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  value.cd.real = *src.d;
 		  value.cd.imaginary = 0;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  value.cd.real = src.cf->real;
 		  value.cd.imaginary = src.cf->imaginary;
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  value.cd.real = src.cd->real;
 		  value.cd.imaginary = src.cd->imaginary;
 		  break;
@@ -3623,7 +3623,7 @@ Int insert(Int narg, Int ps[])
 	  for (i = 0; i < narg; i++) {
 	    if (i)
 	      tally[i - 1] = 0;
-	    offset0 += tstep[i]; /* update for ANA_RANGE subscripts */
+	    offset0 += tstep[i]; /* update for LUX_RANGE subscripts */
 	    tally[i]++;
 	    if (tally[i] != size[i])
 	      break;
@@ -3638,7 +3638,7 @@ Int insert(Int narg, Int ps[])
 /*------------------------------------------------------------------*/
 Int einsert(Int lhs, Int rhs)
 /* an insertion statement with subscripted target */
-/* lhs = an ANA_EXTRACT symbol; rhs is already evaluated */
+/* lhs = an LUX_EXTRACT symbol; rhs is already evaluated */
 {
   Int	target, source, i, iq, start[MAX_DIMS], width, *dims,
     ndim, nelem, type, size[MAX_DIMS], subsc_type[MAX_DIMS],
@@ -3652,13 +3652,13 @@ Int einsert(Int lhs, Int rhs)
   char	*name, keepps2;
   FILE	*fp;
   extern Int	trace, step, insert_subr;
-  Int	ana_assoc_output(Int, Int, Int, Int),
+  Int	lux_assoc_output(Int, Int, Int, Int),
     treatListArguments(Int *, Int **, Int);
 
   target = extract_target(lhs);
   source = rhs;
   /* we assume there is exactly one set of subscripts and that it is of
-     ANA_RANGE type */
+     LUX_RANGE type */
   ps = extract_ptr(lhs)->ptr.w;
   narg = extract_ptr(lhs)->number;
   if (narg > MAX_DIMS)
@@ -3669,12 +3669,12 @@ Int einsert(Int lhs, Int rhs)
   /* check if target is transfer symbol, and resolve if so */
   class = symbol_class(target);
 
-  offset0 = 0;			/* so it can be updated for ANA_FILEMAPs */
+  offset0 = 0;			/* so it can be updated for LUX_FILEMAPs */
 
   /* first we look for any keywords */
   nelem = 0;
   for (i = 0; i < narg; i++) {
-    if (symbol_class(ps[i]) == ANA_KEYWORD)
+    if (symbol_class(ps[i]) == LUX_KEYWORD)
       nelem++;
   }
   oldInternalMode = internalMode;
@@ -3685,20 +3685,20 @@ Int einsert(Int lhs, Int rhs)
     return cerror(ALLOC_ERR, 0);
   keepps2 = 0;
   for (i = 0; i < narg; i++) {
-    if (symbol_class(ps[i]) == ANA_KEYWORD) {
+    if (symbol_class(ps[i]) == LUX_KEYWORD) {
       n = matchKey(keyword_name_symbol(ps[i]),
 		   ((keyList *) subroutine[insert_subr].keys)->keys, &iq);
       if (n != ORKEY) {
 	internalMode = oldInternalMode;
-	return anaerror("Illegal keyword %s", 0, keyword_name(ps[i]));
+	return luxerror("Illegal keyword %s", 0, keyword_name(ps[i]));
       }
     } else
       ps2[j++] = eval(ps[i]);
   }
   narg -= nelem;		/* number of non-keyword arguments */
-  if (treatListArguments(&narg, &ps2, 0) == ANA_ERROR) {
+  if (treatListArguments(&narg, &ps2, 0) == LUX_ERROR) {
     free(ps2);
-    return ANA_ERROR;
+    return LUX_ERROR;
   }
 
   switch (internalMode & 3) {
@@ -3713,30 +3713,30 @@ Int einsert(Int lhs, Int rhs)
       break;
     case 3:
       free(ps2);
-      return anaerror("Specified incompatible /INNER and /OUTER", 0);
+      return luxerror("Specified incompatible /INNER and /OUTER", 0);
   }
 
   switch (class) {
     default:
       free(ps2);
       return cerror(SUBSC_NO_INDX, target);
-    case ANA_STRING:
+    case LUX_STRING:
       ndim = 1;
       nelem = string_size(target);
       dims = &nelem;
       trgt.s = string_value(target);
       type = string_type(target);
       break;
-    case ANA_ASSOC:
+    case LUX_ASSOC:
       ndim = assoc_num_dims(target);
       dims = assoc_dims(target);
       nelem = 1;
       for (i = 0; i < ndim; i++)
 	nelem *= dims[i];
       break;
-    case ANA_FILEMAP:
+    case LUX_FILEMAP:
       if (file_map_readonly(target))
-	return anaerror("File array is read-only", target);
+	return luxerror("File array is read-only", target);
       ndim = file_map_num_dims(target);
       dims = file_map_dims(target);
       nelem = file_map_size(target);
@@ -3756,7 +3756,7 @@ Int einsert(Int lhs, Int rhs)
       }
       offset0 = file_map_has_offset(target)? file_map_offset(target): 0;
       break;
-    case ANA_ARRAY: case ANA_CARRAY:
+    case LUX_ARRAY: case LUX_CARRAY:
       ndim = array_num_dims(target);
       dims = array_dims(target);
       nelem = array_size(target);
@@ -3765,7 +3765,7 @@ Int einsert(Int lhs, Int rhs)
       break;
   }
 
-  unit = ana_type_size[type];
+  unit = lux_type_size[type];
 
   if (narg > ndim) {
     free(ps2);
@@ -3776,10 +3776,10 @@ Int einsert(Int lhs, Int rhs)
     default:
       free(ps2);
       return cerror(ILL_CLASS, source);
-    case ANA_SCAL_PTR:
+    case LUX_SCAL_PTR:
       source = dereferenceScalPointer(source);
       /* fall-thru */
-    case ANA_SCALAR:
+    case LUX_SCALAR:
       srcNdim = 1;
       srcNelem = 1;
       srcDims = &srcNelem;
@@ -3787,7 +3787,7 @@ Int einsert(Int lhs, Int rhs)
       srcType = scalar_type(source);
       src.l = &scalar_value(source).l;
       break;
-    case ANA_CSCALAR:
+    case LUX_CSCALAR:
       srcNdim = 1;
       srcNelem = 1;
       srcDims = &srcNelem;
@@ -3795,18 +3795,18 @@ Int einsert(Int lhs, Int rhs)
       srcType = complex_scalar_type(source);
       src.cf = complex_scalar_data(source).cf;
       break;
-    case ANA_STRING:
+    case LUX_STRING:
       srcNdim = 1;
-      if (class == ANA_ARRAY)	/* insert string in string array */
+      if (class == LUX_ARRAY)	/* insert string in string array */
 	srcNelem = 1;
       else			/* insert string in string */
 	srcNelem = string_size(source);
       srcDims = &srcNelem;
       srcMult = (srcNelem > 1);
-      srcType = ANA_TEMP_STRING;
+      srcType = LUX_TEMP_STRING;
       src.s = string_value(source);
       break;
-    case ANA_ARRAY: case ANA_CARRAY:
+    case LUX_ARRAY: case LUX_CARRAY:
       srcNdim = array_num_dims(source);
       srcDims = array_dims(source);
       srcMult = 0;
@@ -3819,11 +3819,11 @@ Int einsert(Int lhs, Int rhs)
   }
 
   /* get info about all subscripts */
-  /* start[i] = start index (for ANA_RANGE subscripts) */
+  /* start[i] = start index (for LUX_RANGE subscripts) */
   /* size[i] = number of indices */
-  /* index[i] = pointer to list of indices (for ANA_ARRAY subscripts) */
-  /* subsc_type[i] = type of subscript: ANA_RANGE (scalar or range) or */
-  /*           ANA_ARRAY (array of indices) */
+  /* index[i] = pointer to list of indices (for LUX_ARRAY subscripts) */
+  /* subsc_type[i] = type of subscript: LUX_RANGE (scalar or range) or */
+  /*           LUX_ARRAY (array of indices) */
 
   pegMark();			/* because we use eval() below, and eval()
 				   does not mark temporaries in which final
@@ -3836,10 +3836,10 @@ Int einsert(Int lhs, Int rhs)
     if (narg != 1		/* but not exactly one subscript */
 	|| !symbolIsNumericalArray(ps2[0]) /* or it's not a numerical array */
 	|| array_size(ps2[0]) > ndim) /* or it has too many elements */
-      iq = anaerror("Wrong subscript for /SEPARATE", ps2[0]);
-    if (iq != ANA_ERROR) {
+      iq = luxerror("Wrong subscript for /SEPARATE", ps2[0]);
+    if (iq != LUX_ERROR) {
       iq = ps2[0];
-      iq = ana_long(1, &iq);	/* ensure LONG */
+      iq = lux_long(1, &iq);	/* ensure LONG */
       narg = array_size(iq);
       iptr = array_data(iq);
       for (i = 0; i < narg; i++) {
@@ -3849,7 +3849,7 @@ Int einsert(Int lhs, Int rhs)
 	  break;
 	}
 	size[i] = 1;
-	subsc_type[i] = ANA_RANGE;
+	subsc_type[i] = LUX_RANGE;
       }
       nmult = 0;		/* no multiple-element subscripts */
     }
@@ -3859,7 +3859,7 @@ Int einsert(Int lhs, Int rhs)
       iq = ps2[i];		/* next subscript */
       mark(iq);
       switch (symbol_class(iq)) { /* subscript class */
-	case ANA_SCALAR:
+	case LUX_SCALAR:
 	  start[i] = int_arg(iq); /* start index (scalar value) */
 	  if (narg == 1		/* only a single subscript */
 	      && (internalMode & 48) == 0) /* no /ALL or /ZERO keywords */
@@ -3872,10 +3872,10 @@ Int einsert(Int lhs, Int rhs)
 	    break;
 	  }
 	  size[i] = 1;		/* size (1 element) */
-	  subsc_type[i] = ANA_RANGE; /* subscript type */
+	  subsc_type[i] = LUX_RANGE; /* subscript type */
 	  break;
-	case ANA_ARRAY:
-	  iq = ana_long(1, &iq); /* get LONG indices */
+	case LUX_ARRAY:
+	  iq = lux_long(1, &iq); /* get LONG indices */
 	  n = size[i] = array_size(iq); /* number of array elements */
 	  if (n == 1) {		/* only one element: mimic scalar */
 	    start[i] = *(Int *) array_data(iq);
@@ -3887,7 +3887,7 @@ Int einsert(Int lhs, Int rhs)
 	      iq = cerror(ILL_SUBSC, iq, start[i], width);
 	      break;
 	    }
-	    subsc_type[i] = ANA_RANGE;
+	    subsc_type[i] = LUX_RANGE;
 	  } else {
 	    iptr = index[i] = (Int *) array_data(iq);
 	    keepps2 = 1;	/* we should not delete until the end of
@@ -3905,15 +3905,15 @@ Int einsert(Int lhs, Int rhs)
 	      }
 	      iptr++;
 	    }
-	    if (iq == ANA_ERROR)
+	    if (iq == LUX_ERROR)
 	      break;
 	    nmult++;
 	    if (combineType == UNDEFINED && array_num_dims(iq) > 1)
 	      combineType = INNER;
-	    subsc_type[i] = ANA_ARRAY;
+	    subsc_type[i] = LUX_ARRAY;
 	  }
 	  break;
-	case ANA_RANGE:
+	case LUX_RANGE:
 	  if (!range_scalar(iq)) {
 	    iq = cerror(ILL_CLASS, iq);
 	    break;
@@ -3923,7 +3923,7 @@ Int einsert(Int lhs, Int rhs)
 	  if (iq < 0)		/* some error occurred */
 	    break;
 	  /* fall-thru */
-	case ANA_SUBSC_PTR:
+	case LUX_SUBSC_PTR:
 	  start[i] = subsc_ptr_start(iq);
 	  if (start[i] < 0)	/* count from end of range */
 	    start[i] += dims[i];
@@ -3940,14 +3940,14 @@ Int einsert(Int lhs, Int rhs)
 	  }
 	  size[i] += 1 - start[i]; /* now we have the size */
 	  if (subsc_ptr_redirect(iq) >= 0) {
-	    iq = anaerror("No redirection allowed on insert target", target);
+	    iq = luxerror("No redirection allowed on insert target", target);
 	    break;
 	  }
 	  if (subsc_ptr_sum(iq)) {
-	    iq = anaerror("No summation allowed on insert target", target);
+	    iq = luxerror("No summation allowed on insert target", target);
 	    break;
 	  }
-	  subsc_type[i] = ANA_RANGE;
+	  subsc_type[i] = LUX_RANGE;
 	  if (size[i] > 1)
 	    nmult++;
 	  break;
@@ -3958,29 +3958,29 @@ Int einsert(Int lhs, Int rhs)
     }
   }
 
-  if (!keepps2 || iq == ANA_ERROR) {
+  if (!keepps2 || iq == LUX_ERROR) {
     free(ps2);
     zapMarked();
   }
-  if (iq == ANA_ERROR)		/* some error */
-    return ANA_ERROR;
+  if (iq == LUX_ERROR)		/* some error */
+    return LUX_ERROR;
 
   switch (class) {
-    case ANA_ASSOC:
+    case LUX_ASSOC:
       /* only a list of scalars is allowed here */
       if (nmult) {
 	iq = cerror(ILL_SUBSC_LHS, target);
 	goto einsert_1;
       }
       if (narg > 1) {		/* more than one subscript */
-	i = array_scratch(ANA_LONG, 1, &narg);
+	i = array_scratch(LUX_LONG, 1, &narg);
 	memcpy(array_data(i), start, narg);
 	offset = -1;
       } else {
 	i = start[0];
 	offset = -3;
       }
-      n = ana_assoc_output(target, source, i, offset);
+      n = lux_assoc_output(target, source, i, offset);
       iq = target;
       goto einsert_1;
   }
@@ -3998,12 +3998,12 @@ Int einsert(Int lhs, Int rhs)
     goto einsert_1;
   }
 
-  if (class == ANA_ARRAY && isStringType(type)) /* string array */
-    type = ANA_STRING_ARRAY;	/* distinguish string array from string */
-  if (symbol_class(source) == ANA_ARRAY && isStringType(srcType))
-    srcType = ANA_STRING_ARRAY;
+  if (class == LUX_ARRAY && isStringType(type)) /* string array */
+    type = LUX_STRING_ARRAY;	/* distinguish string array from string */
+  if (symbol_class(source) == LUX_ARRAY && isStringType(srcType))
+    srcType = LUX_STRING_ARRAY;
 
-  onestep = ana_type_size[srcType];
+  onestep = lux_type_size[srcType];
     
   switch (internalMode & 48) {
     case 0:			/* none */
@@ -4016,7 +4016,7 @@ Int einsert(Int lhs, Int rhs)
       for (i = narg; i < ndim; i++) {
 	start[i] = 0;
 	size[i] = 1;
-	subsc_type[i] = ANA_RANGE;
+	subsc_type[i] = LUX_RANGE;
       }
       narg = ndim;
       break;
@@ -4026,12 +4026,12 @@ Int einsert(Int lhs, Int rhs)
 	size[i] = dims[i];
 	if (size[i] > 1)
 	  nmult++;
-	subsc_type[i] = ANA_RANGE;
+	subsc_type[i] = LUX_RANGE;
       }
       narg = ndim;
       break;
     default:
-      iq = anaerror("Specified incompatible /ZERO and /ALL", 0);
+      iq = luxerror("Specified incompatible /ZERO and /ALL", 0);
       goto einsert_1;
   }
 
@@ -4072,214 +4072,214 @@ Int einsert(Int lhs, Int rhs)
       goto einsert_1;
     }
 
-    n = (class == ANA_FILEMAP)? unit: 1;
+    n = (class == LUX_FILEMAP)? unit: 1;
     for (i = 0; i < narg; i++) {
       stride[i] = n;
       n *= dims[i];
     }
 
     switch (class) {
-      case ANA_ARRAY: case ANA_CARRAY:
+      case LUX_ARRAY: case LUX_CARRAY:
 	for (j = 0; j < size[0]; j++) {
 	  offset = 0;
 	  for (i = 0; i < narg; i++)
-	    offset += ((subsc_type[i] == ANA_ARRAY)? index[i][j]: start[i]++)
+	    offset += ((subsc_type[i] == LUX_ARRAY)? index[i][j]: start[i]++)
 	      * stride[i];
 	  switch (type) {
-	    case ANA_BYTE: case ANA_TEMP_STRING:
+	    case LUX_BYTE: case LUX_TEMP_STRING:
 	      switch (srcType) {
-		case ANA_BYTE: case ANA_TEMP_STRING:
+		case LUX_BYTE: case LUX_TEMP_STRING:
 		  trgt.b[offset] = *src.b;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  trgt.b[offset] = (Byte) *src.w;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  trgt.b[offset] = (Byte) *src.l;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  trgt.b[offset] = (Byte) *src.f;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  trgt.b[offset] = (Byte) *src.d;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  trgt.b[offset] = sqrt(src.cf->real*src.cf->real
 					+ src.cf->imaginary*src.cf->imaginary);
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  trgt.b[offset] = sqrt(src.cd->real*src.cd->real
 					+ src.cd->imaginary*src.cd->imaginary);
 		  break;
 	      }
 	      break;
-	    case ANA_WORD:
+	    case LUX_WORD:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  trgt.w[offset] = (Word) *src.b;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  trgt.w[offset] = *src.w;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  trgt.w[offset] = (Word) *src.l;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  trgt.w[offset] = (Word) *src.f;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  trgt.w[offset] = (Word) *src.d;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  trgt.w[offset] = sqrt(src.cf->real*src.cf->real
 					+ src.cf->imaginary*src.cf->imaginary);
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  trgt.w[offset] = sqrt(src.cd->real*src.cd->real
 					+ src.cd->imaginary*src.cd->imaginary);
 		  break;
 	      }
 	      break;
-	    case ANA_LONG:
+	    case LUX_LONG:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  trgt.l[offset] = (Int) *src.b;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  trgt.l[offset] = (Int) *src.w;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  trgt.l[offset] = *src.l;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  trgt.l[offset] = (Int) *src.f;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  trgt.l[offset] = (Int) *src.d;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  trgt.l[offset] = sqrt(src.cf->real*src.cf->real
 					+ src.cf->imaginary*src.cf->imaginary);
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  trgt.l[offset] = sqrt(src.cd->real*src.cd->real
 					+ src.cd->imaginary*src.cd->imaginary);
 		  break;
 	      }
 	      break;
-	    case ANA_FLOAT:
+	    case LUX_FLOAT:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  trgt.f[offset] = (Float) *src.b;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  trgt.f[offset] = (Float) *src.w;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  trgt.f[offset] = (Float) *src.l;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  trgt.f[offset] = *src.f;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  trgt.f[offset] = (Float) *src.d;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  trgt.f[offset] = sqrt(src.cf->real*src.cf->real
 					+ src.cf->imaginary*src.cf->imaginary);
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  trgt.f[offset] = sqrt(src.cd->real*src.cd->real
 					+ src.cd->imaginary*src.cd->imaginary);
 		  break;
 	      }
 	      break;
-	    case ANA_DOUBLE:
+	    case LUX_DOUBLE:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  trgt.d[offset] = (Double) *src.b;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  trgt.d[offset] = (Double) *src.w;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  trgt.d[offset] = (Double) *src.l;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  trgt.d[offset] = (Double) *src.f;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  trgt.d[offset] = *src.d;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  trgt.d[offset] = sqrt(src.cf->real*src.cf->real
 					+ src.cf->imaginary*src.cf->imaginary);
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  trgt.d[offset] = sqrt(src.cd->real*src.cd->real
 					+ src.cd->imaginary*src.cd->imaginary);
 		  break;
 	      }
 	      break;
-	    case ANA_CFLOAT:
+	    case LUX_CFLOAT:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  trgt.cf[offset].real = (Float) *src.b;
 		  trgt.cf[offset].imaginary = 0;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  trgt.cf[offset].real = (Float) *src.w;
 		  trgt.cf[offset].imaginary = 0;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  trgt.cf[offset].real = (Float) *src.l;
 		  trgt.cf[offset].imaginary = 0;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  trgt.cf[offset].real = *src.f;
 		  trgt.cf[offset].imaginary = 0;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  trgt.cf[offset].real = (Float) *src.d;
 		  trgt.cf[offset].imaginary = 0;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  trgt.cf[offset].real = src.cf->real;
 		  trgt.cf[offset].imaginary = src.cf->imaginary;
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  trgt.cf[offset].real = (Float) src.cd->real;
 		  trgt.cf[offset].imaginary = (Float) src.cd->imaginary;
 		  break;
 	      }
 	      break;
-	    case ANA_CDOUBLE:
+	    case LUX_CDOUBLE:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  trgt.cd[offset].real = (Double) *src.b;
 		  trgt.cd[offset].imaginary = 0;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  trgt.cd[offset].real = (Double) *src.w;
 		  trgt.cd[offset].imaginary = 0;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  trgt.cd[offset].real = (Double) *src.l;
 		  trgt.cd[offset].imaginary = 0;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  trgt.cd[offset].real = (Double) *src.f;
 		  trgt.cd[offset].imaginary = 0;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  trgt.cd[offset].real = (Double) *src.d;
 		  trgt.cd[offset].imaginary = 0;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  trgt.cd[offset].real = (Double) src.cf->real;
 		  trgt.cd[offset].imaginary = (Double) src.cf->imaginary;
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  trgt.cd[offset].real = (Double) src.cd->real;
 		  trgt.cd[offset].imaginary = (Double) src.cd->imaginary;
 		  break;
@@ -4292,7 +4292,7 @@ Int einsert(Int lhs, Int rhs)
 		case 999:		/* string array */
 		  trgt.sp[offset] = strsave(*src.sp);
 		  break;
-		case ANA_TEMP_STRING: /* string */
+		case LUX_TEMP_STRING: /* string */
 		  trgt.sp[offset] = strsave(src.s);
 		  break;
 	      }
@@ -4301,11 +4301,11 @@ Int einsert(Int lhs, Int rhs)
 	  src.b += onestep;
 	}
 	break;
-      case ANA_FILEMAP:
+      case LUX_FILEMAP:
 	for (j = 0; j < size[0]; j++) {
 	  offset = offset0;
 	  for (i = 0; i < narg; i++)
-	    offset += ((subsc_type[i] == ANA_ARRAY)? index[i][j]: start[i]++)
+	    offset += ((subsc_type[i] == LUX_ARRAY)? index[i][j]: start[i]++)
 	      * stride[i];
 	  if (fseek(fp, offset, SEEK_SET)) {
 	    fclose(fp);
@@ -4313,168 +4313,168 @@ Int einsert(Int lhs, Int rhs)
 	    goto einsert_1;
 	  }
 	  switch (type) {
-	    case ANA_BYTE: case ANA_TEMP_STRING:
+	    case LUX_BYTE: case LUX_TEMP_STRING:
 	      switch (srcType) {
-		case ANA_BYTE: case ANA_TEMP_STRING:
+		case LUX_BYTE: case LUX_TEMP_STRING:
 		  value.b = *src.b;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  value.b = (Byte) *src.w;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  value.b = (Byte) *src.l;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  value.b = (Byte) *src.f;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  value.b = (Byte) *src.d;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  value.b = sqrt(src.cf->real*src.cf->real
 				 + src.cf->imaginary*src.cf->imaginary);
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  value.b = sqrt(src.cd->real*src.cd->real
 				 + src.cd->imaginary*src.cd->imaginary);
 		  break;
 	      }
 	      break;
-	    case ANA_WORD:
+	    case LUX_WORD:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  value.w = (Word) *src.b;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  value.w = *src.w;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  value.w = (Word) *src.l;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  value.w = (Word) *src.f;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  value.w = (Word) *src.d;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  value.w = sqrt(src.cf->real*src.cf->real
 				 + src.cf->imaginary*src.cf->imaginary);
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  value.w = sqrt(src.cd->real*src.cd->real
 				 + src.cd->imaginary*src.cd->imaginary);
 		  break;
 	      }
 	      break;
-	    case ANA_LONG:
+	    case LUX_LONG:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  value.l = (Int) *src.b;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  value.l = (Int) *src.w;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  value.l = *src.l;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  value.l = (Int) *src.f;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  value.l = (Int) *src.d;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  value.l = sqrt(src.cf->real*src.cf->real
 				 + src.cf->imaginary*src.cf->imaginary);
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  value.l = sqrt(src.cd->real*src.cd->real
 				 + src.cd->imaginary*src.cd->imaginary);
 		  break;
 	      }
 	      break;
-	    case ANA_FLOAT:
+	    case LUX_FLOAT:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  value.f = (Float) *src.b;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  value.f = (Float) *src.w;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  value.f = (Float) *src.l;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  value.f = *src.f;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  value.f = (Float) *src.d;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  value.f = sqrt(src.cf->real*src.cf->real
 				 + src.cf->imaginary*src.cf->imaginary);
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  value.f = sqrt(src.cd->real*src.cd->real
 				 + src.cd->imaginary*src.cd->imaginary);
 		  break;
 	      }
 	      break;
-	    case ANA_DOUBLE:
+	    case LUX_DOUBLE:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  value.d = (Double) *src.b;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  value.d = (Double) *src.w;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  value.d = (Double) *src.l;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  value.d = (Double) *src.f;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  value.d = *src.d;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  value.f = sqrt(src.cf->real*src.cf->real
 				 + src.cf->imaginary*src.cf->imaginary);
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  value.d = sqrt(src.cd->real*src.cd->real
 				 + src.cd->imaginary*src.cd->imaginary);
 		  break;
 	      }
 	      break;
-	    case ANA_CFLOAT:
+	    case LUX_CFLOAT:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  value.cf.real = *src.b;
 		  value.cf.imaginary = 0;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  value.cf.real = *src.w;
 		  value.cf.imaginary = 0;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  value.cf.real = *src.l;
 		  value.cf.imaginary = 0;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  value.cf.real = *src.f;
 		  value.cf.imaginary = 0;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  value.cf.real = *src.d;
 		  value.cf.imaginary = 0;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  value.cf.real = src.cf->real;
 		  value.cf.imaginary = src.cf->imaginary;
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  value.cf.real = src.cd->real;
 		  value.cf.imaginary = src.cd->imaginary;
 		  break;
@@ -4515,11 +4515,11 @@ Int einsert(Int lhs, Int rhs)
 	for (i = 0; i < narg; i++) { /* all subscripts */
 	  if (size[i] > 1) {
 	    if (j >= srcNdim) {
-	      iq = anaerror("Too many multi-element subscripts", target);
+	      iq = luxerror("Too many multi-element subscripts", target);
 	      goto einsert_1;
 	    }
 	    if (size[i] != srcDims[j]) {
-	      iq = anaerror("Subscript size incompatible with source dimension",
+	      iq = luxerror("Subscript size incompatible with source dimension",
 			 target);
 	      goto einsert_1;
 	    }
@@ -4529,7 +4529,7 @@ Int einsert(Int lhs, Int rhs)
       } else {			/* scalar subscripts matter */
 	for (i = 0; i < narg; i++) {
 	  if (size[i] > 1 && size[i] != srcDims[i]) {
-	    iq = anaerror("Subscript size incompatible with source dimension",
+	    iq = luxerror("Subscript size incompatible with source dimension",
 		       target);
 	    goto einsert_1;
 	  }
@@ -4567,7 +4567,7 @@ Int einsert(Int lhs, Int rhs)
 	n *= dims[i];
       }
       if (offset + srcNelem > nelem) {
-	iq = anaerror("Source extends beyond target boundaries", source);
+	iq = luxerror("Source extends beyond target boundaries", source);
 	goto einsert_1;
       }
       start[0] = offset;
@@ -4576,7 +4576,7 @@ Int einsert(Int lhs, Int rhs)
       narg = 1;
       size[0] = srcNelem;
     } else if (j != srcMult && srcNelem > 1) {
-      iq = anaerror("Too few multi-element subscripts", target);
+      iq = luxerror("Too few multi-element subscripts", target);
       goto einsert_1;
     }
 
@@ -4584,20 +4584,20 @@ Int einsert(Int lhs, Int rhs)
       onestep = 0;
 
     /* now do the insertion */
-    /* for ANA_ARRAY subscripts the offset is calculated for each index */
-    /* for ANA_RANGE subscripts the offset is updated for each element */
+    /* for LUX_ARRAY subscripts the offset is calculated for each index */
+    /* for LUX_RANGE subscripts the offset is updated for each element */
 
-    n = (class == ANA_FILEMAP)? unit: 1;
+    n = (class == LUX_FILEMAP)? unit: 1;
 
     if (!j && ndim == 1 && srcNdim == 1 && type == srcType &&
 	!isStringType(type) && (srcNelem > 1 || size[0] == 1)) {
 				/* in this case we do a fast insert */
       offset0 += start[0]*unit;
       switch (class) {
-	case ANA_ARRAY: case ANA_CARRAY:
+	case LUX_ARRAY: case LUX_CARRAY:
 	  memcpy(trgt.b + offset0, src.b, srcNelem*unit);
 	  break;
-	case ANA_FILEMAP:
+	case LUX_FILEMAP:
 	  if (fseek(fp, offset0, SEEK_SET)) {
 	    fclose(fp);
 	    if (ferror(fp))
@@ -4614,242 +4614,242 @@ Int einsert(Int lhs, Int rhs)
 	  fclose(fp);
 	  break;
       }
-      iq = ANA_OK;
+      iq = LUX_OK;
       goto einsert_1;
     }
 
     for (i = 0; i < narg; i++) {
       stride[i] = n;
       tally[i] = 0;
-      if (subsc_type[i] == ANA_RANGE)
+      if (subsc_type[i] == LUX_RANGE)
 	offset0 += start[i]*n;
       n *= dims[i];
     }
     
-    if (subsc_type[0] == ANA_RANGE) /* ?? */
+    if (subsc_type[0] == LUX_RANGE) /* ?? */
       tstep[0] = stride[0];
     else
       tstep[0] = 0;
     
     for (i = 1; i < narg; i++)
-      tstep[i] = (subsc_type[i] == ANA_RANGE? stride[i]: 0)
-	- (subsc_type[i - 1] == ANA_RANGE? size[i - 1]*stride[i - 1]: 0);
+      tstep[i] = (subsc_type[i] == LUX_RANGE? stride[i]: 0)
+	- (subsc_type[i - 1] == LUX_RANGE? size[i - 1]*stride[i - 1]: 0);
     
     switch (class) {
-      case ANA_ARRAY: case ANA_CARRAY:
+      case LUX_ARRAY: case LUX_CARRAY:
 	do {
 	  offset = offset0;
 	  for (i = 0; i < narg; i++)
-	    if (subsc_type[i] == ANA_ARRAY)
+	    if (subsc_type[i] == LUX_ARRAY)
 	      offset += index[i][tally[i]]*stride[i];
 	  switch (type) {
-	    case ANA_BYTE: case ANA_TEMP_STRING:
+	    case LUX_BYTE: case LUX_TEMP_STRING:
 	      switch (srcType) {
-		case ANA_BYTE: case ANA_TEMP_STRING:
+		case LUX_BYTE: case LUX_TEMP_STRING:
 		  trgt.b[offset] = *src.b;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  trgt.b[offset] = (Byte) *src.w;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  trgt.b[offset] = (Byte) *src.l;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  trgt.b[offset] = (Byte) *src.f;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  trgt.b[offset] = (Byte) *src.d;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  trgt.b[offset] = sqrt(src.cf->real*src.cf->real
 					+ src.cf->imaginary*src.cf->imaginary);
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  trgt.b[offset] = sqrt(src.cd->real*src.cd->real
 					+ src.cd->imaginary*src.cd->imaginary);
 		  break;
 	      }
 	      break;
-	    case ANA_WORD:
+	    case LUX_WORD:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  trgt.w[offset] = (Word) *src.b;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  trgt.w[offset] = *src.w;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  trgt.w[offset] = (Word) *src.l;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  trgt.w[offset] = (Word) *src.f;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  trgt.w[offset] = (Word) *src.d;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  trgt.w[offset] = sqrt(src.cf->real*src.cf->real
 					+ src.cf->imaginary*src.cf->imaginary);
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  trgt.w[offset] = sqrt(src.cd->real*src.cd->real
 					+ src.cd->imaginary*src.cd->imaginary);
 		  break;
 	      }
 	      break;
-	    case ANA_LONG:
+	    case LUX_LONG:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  trgt.l[offset] = (Int) *src.b;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  trgt.l[offset] = (Int) *src.w;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  trgt.l[offset] = *src.l;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  trgt.l[offset] = (Int) *src.f;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  trgt.l[offset] = (Int) *src.d;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  trgt.l[offset] = sqrt(src.cf->real*src.cf->real
 					+ src.cf->imaginary*src.cf->imaginary);
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  trgt.l[offset] = sqrt(src.cd->real*src.cd->real
 					+ src.cd->imaginary*src.cd->imaginary);
 		  break;
 	      }
 	      break;
-	    case ANA_FLOAT:
+	    case LUX_FLOAT:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  trgt.f[offset] = (Float) *src.b;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  trgt.f[offset] = (Float) *src.w;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  trgt.f[offset] = (Float) *src.l;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  trgt.f[offset] = *src.f;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  trgt.f[offset] = (Float) *src.d;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  trgt.f[offset] = sqrt(src.cf->real*src.cf->real
 					+ src.cf->imaginary*src.cf->imaginary);
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  trgt.f[offset] = sqrt(src.cd->real*src.cd->real
 					+ src.cd->imaginary*src.cd->imaginary);
 		  break;
 	      }
 	      break;
-	    case ANA_DOUBLE:
+	    case LUX_DOUBLE:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  trgt.d[offset] = (Double) *src.b;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  trgt.d[offset] = (Double) *src.w;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  trgt.d[offset] = (Double) *src.l;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  trgt.d[offset] = (Double) *src.f;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  trgt.d[offset] = *src.d;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  trgt.d[offset] = sqrt(src.cf->real*src.cf->real
 					+ src.cf->imaginary*src.cf->imaginary);
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  trgt.d[offset] = sqrt(src.cd->real*src.cd->real
 					+ src.cd->imaginary*src.cd->imaginary);
 		  break;
 	      }
 	      break;
-	    case ANA_CFLOAT:
+	    case LUX_CFLOAT:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  trgt.cf[offset].real = *src.b;
 		  trgt.cf[offset].imaginary = 0;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  trgt.cf[offset].real = *src.w;
 		  trgt.cf[offset].imaginary = 0;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  trgt.cf[offset].real = *src.l;
 		  trgt.cf[offset].imaginary = 0;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  trgt.cf[offset].real = *src.f;
 		  trgt.cf[offset].imaginary = 0;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  trgt.cf[offset].real = *src.d;
 		  trgt.cf[offset].imaginary = 0;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  trgt.cf[offset].real = src.cf->real;
 		  trgt.cf[offset].imaginary = src.cf->imaginary;
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  trgt.cf[offset].real = src.cd->real;
 		  trgt.cf[offset].imaginary = src.cd->imaginary;
 		  break;
 	      }
 	      break;
-	    case ANA_CDOUBLE:
+	    case LUX_CDOUBLE:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  trgt.cd[offset].real = *src.b;
 		  trgt.cd[offset].imaginary = 0;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  trgt.cd[offset].real = *src.w;
 		  trgt.cd[offset].imaginary = 0;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  trgt.cd[offset].real = *src.l;
 		  trgt.cd[offset].imaginary = 0;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  trgt.cd[offset].real = *src.f;
 		  trgt.cd[offset].imaginary = 0;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  trgt.cd[offset].real = *src.d;
 		  trgt.cd[offset].imaginary = 0;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  trgt.cd[offset].real = src.cf->real;
 		  trgt.cd[offset].imaginary = src.cf->imaginary;
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  trgt.cd[offset].real = src.cd->real;
 		  trgt.cd[offset].imaginary = src.cd->imaginary;
 		  break;
 	      }
 	      break;
-	    case ANA_STRING_ARRAY: /* string array */
+	    case LUX_STRING_ARRAY: /* string array */
 	      if (trgt.sp[offset])	/* already a string there */
 		free(trgt.sp[offset]);
 	      switch (srcType) {
-		case ANA_STRING_ARRAY: /* string array */
+		case LUX_STRING_ARRAY: /* string array */
 		  trgt.sp[offset] = strsave(*src.sp);
 		  break;
-		case ANA_TEMP_STRING: /* string */
+		case LUX_TEMP_STRING: /* string */
 		  trgt.sp[offset] = strsave(src.s);
 		  break;
 	      }
@@ -4859,18 +4859,18 @@ Int einsert(Int lhs, Int rhs)
 	  for (i = 0; i < narg; i++) {
 	    if (i)
 	      tally[i - 1] = 0;
-	    offset0 += tstep[i]; /* update for ANA_RANGE subscripts */
+	    offset0 += tstep[i]; /* update for LUX_RANGE subscripts */
 	    tally[i]++;
 	    if (tally[i] != size[i])
 	      break;
 	  }
 	} while (i != narg);
 	break;
-      case ANA_FILEMAP:
+      case LUX_FILEMAP:
 	do {
 	  offset = offset0;
 	  for (i = 0; i < narg; i++)
-	    if (subsc_type[i] == ANA_ARRAY)
+	    if (subsc_type[i] == LUX_ARRAY)
 	      offset += index[i][tally[i]]*stride[i];
 	  if (fseek(fp, offset, SEEK_SET)) {
 	    fclose(fp);
@@ -4878,200 +4878,200 @@ Int einsert(Int lhs, Int rhs)
 	    goto einsert_1;
 	  }
 	  switch (type) {
-	    case ANA_BYTE: case ANA_TEMP_STRING:
+	    case LUX_BYTE: case LUX_TEMP_STRING:
 	      switch (srcType) {
-		case ANA_BYTE: case ANA_TEMP_STRING:
+		case LUX_BYTE: case LUX_TEMP_STRING:
 		  value.b = *src.b;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  value.b = (Byte) *src.w;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  value.b = (Byte) *src.l;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  value.b = (Byte) *src.f;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  value.b = (Byte) *src.d;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  value.b = sqrt(src.cf->real*src.cf->real
 				 + src.cf->imaginary*src.cf->imaginary);
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  value.b = sqrt(src.cd->real*src.cd->real
 				 + src.cd->imaginary*src.cd->imaginary);
 		  break;
 	      }
 	      break;
-	    case ANA_WORD:
+	    case LUX_WORD:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  value.w = (Word) *src.b;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  value.w = *src.w;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  value.w = (Word) *src.l;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  value.w = (Word) *src.f;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  value.w = (Word) *src.d;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  value.w = sqrt(src.cf->real*src.cf->real
 				 + src.cf->imaginary*src.cf->imaginary);
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  value.w = sqrt(src.cd->real*src.cd->real
 				 + src.cd->imaginary*src.cd->imaginary);
 		  break;
 	      }
 	      break;
-	    case ANA_LONG:
+	    case LUX_LONG:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  value.l = (Int) *src.b;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  value.l = (Int) *src.w;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  value.l = *src.l;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  value.l = (Int) *src.f;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  value.l = (Int) *src.d;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  value.l = sqrt(src.cf->real*src.cf->real
 				 + src.cf->imaginary*src.cf->imaginary);
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  value.l = sqrt(src.cd->real*src.cd->real
 				 + src.cd->imaginary*src.cd->imaginary);
 		  break;
 	      }
 	      break;
-	    case ANA_FLOAT:
+	    case LUX_FLOAT:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  value.f = (Float) *src.b;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  value.f = (Float) *src.w;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  value.f = (Float) *src.l;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  value.f = *src.f;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  value.f = (Float) *src.d;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  value.f = sqrt(src.cf->real*src.cf->real
 				 + src.cf->imaginary*src.cf->imaginary);
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  value.f = sqrt(src.cd->real*src.cd->real
 				 + src.cd->imaginary*src.cd->imaginary);
 		  break;
 	      }
 	      break;
-	    case ANA_DOUBLE:
+	    case LUX_DOUBLE:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  value.d = (Double) *src.b;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  value.d = (Double) *src.w;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  value.d = (Double) *src.l;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  value.d = (Double) *src.f;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  value.d = *src.d;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  value.d = sqrt(src.cf->real*src.cf->real
 				 + src.cf->imaginary*src.cf->imaginary);
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  value.d = sqrt(src.cd->real*src.cd->real
 				 + src.cd->imaginary*src.cd->imaginary);
 		  break;
 	      }
 	      break;
-	    case ANA_CFLOAT:
+	    case LUX_CFLOAT:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  value.cf.real = *src.b;
 		  value.cf.imaginary = 0;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  value.cf.real = *src.w;
 		  value.cf.imaginary = 0;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  value.cf.real = *src.l;
 		  value.cf.imaginary = 0;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  value.cf.real = *src.f;
 		  value.cf.imaginary = 0;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  value.cf.real = *src.d;
 		  value.cf.imaginary = 0;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  value.cf.real = src.cf->real;
 		  value.cf.imaginary = src.cf->imaginary;
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  value.cf.real = src.cd->real;
 		  value.cf.imaginary = src.cd->imaginary;
 		  break;
 	      }
 	      break;
-	    case ANA_CDOUBLE:
+	    case LUX_CDOUBLE:
 	      switch (srcType) {
-		case ANA_BYTE:
+		case LUX_BYTE:
 		  value.cd.real = *src.b;
 		  value.cd.imaginary = 0;
 		  break;
-		case ANA_WORD:
+		case LUX_WORD:
 		  value.cd.real = *src.w;
 		  value.cd.imaginary = 0;
 		  break;
-		case ANA_LONG:
+		case LUX_LONG:
 		  value.cd.real = *src.l;
 		  value.cd.imaginary = 0;
 		  break;
-		case ANA_FLOAT:
+		case LUX_FLOAT:
 		  value.cd.real = *src.f;
 		  value.cd.imaginary = 0;
 		  break;
-		case ANA_DOUBLE:
+		case LUX_DOUBLE:
 		  value.cd.real = *src.d;
 		  value.cd.imaginary = 0;
 		  break;
-		case ANA_CFLOAT:
+		case LUX_CFLOAT:
 		  value.cd.real = src.cf->real;
 		  value.cd.imaginary = src.cf->imaginary;
 		  break;
-		case ANA_CDOUBLE:
+		case LUX_CDOUBLE:
 		  value.cd.real = src.cd->real;
 		  value.cd.imaginary = src.cd->imaginary;
 		  break;
@@ -5088,7 +5088,7 @@ Int einsert(Int lhs, Int rhs)
 	  for (i = 0; i < narg; i++) {
 	    if (i)
 	      tally[i - 1] = 0;
-	    offset0 += tstep[i]; /* update for ANA_RANGE subscripts */
+	    offset0 += tstep[i]; /* update for LUX_RANGE subscripts */
 	    tally[i]++;
 	    if (tally[i] != size[i])
 	      break;
@@ -5098,7 +5098,7 @@ Int einsert(Int lhs, Int rhs)
 	break;
       }
   }
-  iq = ANA_OK;
+  iq = LUX_OK;
   /* fall through */
 
   einsert_1:
@@ -5109,24 +5109,24 @@ Int einsert(Int lhs, Int rhs)
   return iq;
 }
 /*------------------------------------------------------------------*/
-Int ana_test(Int narg, Int ps[])
+Int lux_test(Int narg, Int ps[])
 /* a test function */
 {
   Int	n, value, *edge, i, *offset;
   loopInfo	info;
   pointer	src;
 
-  if (symbol_type(ps[0]) != ANA_LONG)
-    return anaerror("Accepts only LONG arrays", ps[0]);
+  if (symbol_type(ps[0]) != LUX_LONG)
+    return luxerror("Accepts only LONG arrays", ps[0]);
   if (standardLoop(ps[0], 0, SL_ALLAXES | SL_EACHCOORD, 0, &info, &src, NULL,
 		   NULL, NULL) < 0)
-    return ANA_ERROR;
+    return LUX_ERROR;
   value = int_arg(ps[1]);
 
   n = prepareDiagonals(narg > 2? ps[2]: 0, &info, 2, &offset, &edge,
 		       NULL, NULL);
-  if (n == ANA_ERROR)
-    return ANA_ERROR;
+  if (n == LUX_ERROR)
+    return LUX_ERROR;
   
   /* set the edges to zero */
   for (i = 0; i < 2*info.ndim; i++) {
@@ -5139,5 +5139,5 @@ Int ana_test(Int narg, Int ps[])
   }
 
   free(edge);
-  return ANA_OK;
+  return LUX_OK;
 }

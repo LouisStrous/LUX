@@ -55,7 +55,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <strings.h>		/* for bzero(), bcopy() */
 
-#include "ana_structures.h"	/* for RAS FITS stuff */
+#include "lux_structures.h"	/* for RAS FITS stuff */
 #include <stdio.h>		/* for printf(), puts(), FILE, fopen(), */
 				/* sscanf(), vsprintf(), sprintf(), fputs(), */
 				/* fputc(), stdout, fflush(), fprintf(), */
@@ -97,7 +97,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 
 extern	Int	noioctl, iformat, fformat, sformat, cformat, tformat,
   noTrace;
-Int	ana_swab(Int, Int *);
+Int	lux_swab(Int, Int *);
 Int	swapl(Int *, Int);
 extern Byte	line2[];
 extern char	expname[], batch;
@@ -112,14 +112,14 @@ void	zerobytes(void *, Int), endian(void *, Int, Int),
 extern	Int scrat[];				/* scratch storage, also used 
 						 in anatest.c */
 /* some tables for lun type files */
-FILE	*ana_file[MAXFILES];
-Int	ana_file_open[MAXFILES];	/* our own flag for each file */
-char	*ana_file_name[MAXFILES]; /* pointers to open file names */
-Int	ana_rec_size[MAXFILES];		/*for associated variable files */
+FILE	*lux_file[MAXFILES];
+Int	lux_file_open[MAXFILES];	/* our own flag for each file */
+char	*lux_file_name[MAXFILES]; /* pointers to open file names */
+Int	lux_rec_size[MAXFILES];		/*for associated variable files */
 /* items used by ASCII read routines */
 Int	maxline = BUFSIZE;
 char	expname[BUFSIZE];
-char	*str, *str2, *ulib_path; /* ulib_path global for ana_help
+char	*str, *str2, *ulib_path; /* ulib_path global for lux_help
 				    LS 15sep92*/
 Int	index_cnt = 0, line_cnt, left_cnt;
 extern Int	crunch_slice;
@@ -205,7 +205,7 @@ char *expand_name(char *name, char *extension)
  return expname;
 }
 /*------------------------------------------------------------------------- */
-Int ana_setenv(Int narg, Int ps[])
+Int lux_setenv(Int narg, Int ps[])
 /* specify or display an environment variable; these are useful in file names.
    Uses POSIX routine putenv(char *string)
    LS 1apr94, 20jul2000 */
@@ -217,21 +217,21 @@ Int ana_setenv(Int narg, Int ps[])
 {
  char	*p, *p2;
 
- if (symbol_class(*ps) != ANA_STRING)
+ if (symbol_class(*ps) != LUX_STRING)
    return cerror(NEED_STR, *ps);
  p = string_value(*ps);
  if ((p2 = strchr(p, '=')) == NULL) { /* no "=" -> display translation */
    puts(getenv(p));
-   return ANA_OK;
+   return LUX_OK;
  }
  if (putenv(strsave(p)))
    /* we must use strsave because only the pointer argument to putenv() is
       really remembered. LS 2dec98 */
-   return anaerror("Could not add %s to environment", *ps, p);
- return ANA_OK;
+   return luxerror("Could not add %s to environment", *ps, p);
+ return LUX_OK;
 }
 /*------------------------------------------------------------------------- */
-Int ana_getenv(Int narg, Int ps[])
+Int lux_getenv(Int narg, Int ps[])
 /* get an environment variable; these are useful in file names. */
 /* Headers:
    <stdlib.h>: getenv()
@@ -241,7 +241,7 @@ Int ana_getenv(Int narg, Int ps[])
  char	*p;
  Int	n, result;
 
- if (symbol_class(*ps) != ANA_STRING)
+ if (symbol_class(*ps) != LUX_STRING)
    return cerror(NEED_STR, *ps);
  p = getenv(string_value(*ps));
  n = p? strlen(p): 0;
@@ -253,7 +253,7 @@ Int ana_getenv(Int narg, Int ps[])
  return result;
 }
 /*---------------------------------------------------------------------------*/
-Int ana_spawn(Int narg, Int ps[])		/* execute a shell command */
+Int lux_spawn(Int narg, Int ps[])		/* execute a shell command */
  /* uses the system call to execute a shell command, but may not be the
  	shell you want! depends on local setup */
 /* Headers:
@@ -272,7 +272,7 @@ Int ana_spawn(Int narg, Int ps[])		/* execute a shell command */
   else return result == 0? 1: -1;
  }
 /*---------------------------------------------------------------------------*/
-Int ana_spawn_f(Int narg, Int ps[])		/* execute a shell command */
+Int lux_spawn_f(Int narg, Int ps[])		/* execute a shell command */
  /* uses the system call to execute a shell command, but may not be the
  	shell you want! depends on local setup */
 /* Headers:
@@ -285,7 +285,7 @@ Int ana_spawn_f(Int narg, Int ps[])		/* execute a shell command */
   if (!symbolIsStringScalar(ps[0]))
     return cerror(NEED_STR, *ps);
   p = string_value(ps[0]);
-  result = scalar_scratch(ANA_LONG);
+  result = scalar_scratch(LUX_LONG);
   scalar_value(result).l = system(p);
   return result;
  }
@@ -294,8 +294,8 @@ FILE *openPathFile(char *name, Int mode)
 /* If name starts with $, then expands environment variable and tries
   to open file with resulting name.  If name starts with /, then searches
   in named directory (full path name).  Else, searches for the named file in
-  the directories listed in ANA_PATH (if set), and in ulib (if set), and
-  in the current directory (if ANA_PATH nor ulib are set).
+  the directories listed in LUX_PATH (if set), and in ulib (if set), and
+  in the current directory (if LUX_PATH nor ulib are set).
   Returns file pointer to found and opened file, or zero.
   mode = FIND_SUBR: find routine (.ana); FIND_FUNC: function (_f.ana);
   FIND_EITHER: either; else don't add extension.  If FIND_LOWER is also
@@ -331,7 +331,7 @@ FILE *openPathFile(char *name, Int mode)
       break;
     default:
       *curScrat = '\0';
-      p = getenv("ANA_PATH");
+      p = getenv("LUX_PATH");
       if (p) {
 	strcpy(curScrat, p);
       }
@@ -385,7 +385,7 @@ FILE *openPathFile(char *name, Int mode)
   return fin;
 }
 /*------------------------------------------------------------------------- */
-Int ana_ulib(Int narg, Int ps[])
+Int lux_ulib(Int narg, Int ps[])
  /*set ulib path */
 /* Headers:
    <stdio.h>: printf()
@@ -394,19 +394,19 @@ Int ana_ulib(Int narg, Int ps[])
 {
  if (narg == 0) {
    printf("current ulib path: %s\n", ulib_path);
-   return ANA_OK;
+   return LUX_OK;
  }
 
  /* printf("ulib_path = %d\n", ulib_path);*/
  if (ulib_path != NULL)
    free(ulib_path);
- if (symbol_class(ps[0]) != ANA_STRING )
+ if (symbol_class(ps[0]) != LUX_STRING )
    return cerror(NEED_STR, *ps);
  ulib_path = strsave(string_value(ps[0]));
- return ANA_OK;
+ return LUX_OK;
 }
 /*------------------------------------------------------------------------- */
-Int ana_type(Int narg, Int ps[])
+Int lux_type(Int narg, Int ps[])
  /* (stdin) printing */
 {
   Int	type_ascii(Int, Int [], FILE *);
@@ -414,7 +414,7 @@ Int ana_type(Int narg, Int ps[])
   return type_ascii(narg, ps, stdout);
 }
 /*------------------------------------------------------------------------- */
-Int ana_printf(Int narg, Int ps[])
+Int lux_printf(Int narg, Int ps[])
  /* file (stdin) reading and formatting */
 /* Headers:
    <stdio.h>: FILE
@@ -426,11 +426,11 @@ Int ana_printf(Int narg, Int ps[])
   lun = int_arg(ps[0]);
   if (lun < 0 || lun >= MAXFILES)
     return cerror(ILL_LUN, *ps);
-  if (ana_file_open[lun] == 0)
+  if (lux_file_open[lun] == 0)
     return cerror(LUN_CLOSED, *ps);
-  if (ana_file_open[lun] != 2)
+  if (lux_file_open[lun] != 2)
     return cerror(READ_ONLY, *ps);
-  fp = ana_file[lun];
+  fp = lux_file[lun];
   /* column is changed by type_ascii. store it (screen column) and the
      screen width, and put in our own values. */
   col = column;  column = 0;
@@ -440,10 +440,10 @@ Int ana_printf(Int narg, Int ps[])
   return result;
  }
 /*------------------------------------------------------------------------- */
-Int ana_printf_f(Int narg, Int ps[])
+Int lux_printf_f(Int narg, Int ps[])
  /* a function version that returns 1 if read OK */
 {
-  return ana_printf(narg, ps) == ANA_OK? ANA_ONE: ANA_ZERO;
+  return lux_printf(narg, ps) == LUX_OK? LUX_ONE: LUX_ZERO;
 }
 /*------------------------------------------------------------------------- */
 Int format_width = 0, format_precision = 0;
@@ -470,7 +470,7 @@ Int format_check(char *format, char **next, Int store)
  char	*p, *p2, *p3;
  static char	format_kinds[] = "diouxXeEfgGtTjs";
  Int	n = 0, k;
- Int	ana_delete(Int, Int []);
+ Int	lux_delete(Int, Int []);
 
  if (next)
    *next = format;	/* defaults */
@@ -517,26 +517,26 @@ Int format_check(char *format, char **next, Int store)
  if (store) {
    n = n + p - p2;
    if (isIntegerFormat(k)) {	/* integer type */
-     ana_delete(1, &iformat);
-     symbol_class(iformat) = ANA_SCAL_PTR;
-     scal_ptr_type(iformat) = ANA_TEMP_STRING;
+     lux_delete(1, &iformat);
+     symbol_class(iformat) = LUX_SCAL_PTR;
+     scal_ptr_type(iformat) = LUX_TEMP_STRING;
      scal_ptr_pointer(iformat).b = malloc(n + 1);
      symbol_memory(iformat) = n + 1;
      strncpy(p = scal_ptr_pointer(iformat).s, format, n);
      p[n] = '\0';
    } else if (isFloatFormat(k)) { /* floating point kind */
-     ana_delete(1, &fformat);
-     symbol_class(fformat) = ANA_SCAL_PTR;
-     scal_ptr_type(fformat) = ANA_TEMP_STRING;
+     lux_delete(1, &fformat);
+     symbol_class(fformat) = LUX_SCAL_PTR;
+     scal_ptr_type(fformat) = LUX_TEMP_STRING;
      scal_ptr_pointer(fformat).b = Malloc(n + 1);
      symbol_memory(fformat) = n + 1;
      strncpy(p = scal_ptr_pointer(fformat).s, format, n);
      p[n] = '\0';
    } else {			/* string kind */
-     ana_delete(1, &sformat);
-     ana_delete(1, &sformat);
-     symbol_class(sformat) = ANA_SCAL_PTR;
-     scal_ptr_type(sformat) = ANA_TEMP_STRING;
+     lux_delete(1, &sformat);
+     lux_delete(1, &sformat);
+     symbol_class(sformat) = LUX_SCAL_PTR;
+     scal_ptr_type(sformat) = LUX_TEMP_STRING;
      scal_ptr_pointer(sformat).b = malloc(n + 1);
      symbol_memory(sformat) = n + 1;
      strncpy(p = scal_ptr_pointer(sformat).s, format, n);
@@ -553,7 +553,7 @@ Int input_format_check(char *format, char **next, char **widths, Int *datatype,
  Returns character code of data type in <*formatchar>, or 0 if no data type
  is present.  Returns suppression flag (1 for suppression, 0 for no
  suppression) in <*suppress>.  Returns requested data value type
- (ANA_LONG etc) in <*datatype>, and the number of repeats in <*number>.
+ (LUX_LONG etc) in <*datatype>, and the number of repeats in <*number>.
  Returns a positive number if all is OK (1 plus the number of chars of
  explicit text before the actual format entry), -1 if an illegal format
  is found, and 0 if explicit text but no data type specification is found. 
@@ -626,26 +626,26 @@ Int input_format_check(char *format, char **next, char **widths, Int *datatype,
   *formatchar = *format;
   switch (*format) {		/* data type */
     case 'd': case 'i': case 'o': case 'x': /* integer */
-      *datatype = (big == 1)? ANA_WORD: ANA_LONG;
+      *datatype = (big == 1)? LUX_WORD: LUX_LONG;
       break;
     case 'e': case 'f': case 'g': case 't': case 'T': /* floating point */
-      *datatype = (big == 3)? ANA_DOUBLE: ANA_FLOAT;
+      *datatype = (big == 3)? LUX_DOUBLE: LUX_FLOAT;
       break;
     case 'c':
-      *datatype = ANA_BYTE;
+      *datatype = LUX_BYTE;
       break;
     case 's': case 'S':
-      *datatype = ANA_TEMP_STRING;
+      *datatype = LUX_TEMP_STRING;
       break;
     case '[':
-      *datatype = ANA_TEMP_STRING;
+      *datatype = LUX_TEMP_STRING;
       if (*++format == ']')
 	format++;
       while (*format != ']')
 	format++;
       break;
     default:			/* illegal type */
-      *datatype = ANA_ERROR;
+      *datatype = LUX_ERROR;
       return -1;
   }
   p = ++format;			/* just after data type specification */
@@ -659,7 +659,7 @@ Int input_format_check(char *format, char **next, char **widths, Int *datatype,
   return explicit;
 }
 /*------------------------------------------------------------------------- */
-Int ana_format_set(Int narg, Int ps[])
+Int lux_format_set(Int narg, Int ps[])
  /* check & set (multiple) print formats.  Allowed formats:
      [anything] % [digits] [.] [digits] {one of diouxXeEfgGsz} 
     d,i,o,u,x,X-types are put in !format_i; e,E,f,g,G-types in !format_f,
@@ -677,15 +677,15 @@ Int ana_format_set(Int narg, Int ps[])
   pointer	p;
 
   if (narg) {
-    if (symbol_class(ps[0]) != ANA_STRING)
+    if (symbol_class(ps[0]) != LUX_STRING)
       return cerror(NEED_STR, ps[0]);
     string = string_value(ps[0]);
     fmt = fmttok(string);
     if (!fmt)
-      return anaerror("Illegal format string", ps[0]);
+      return luxerror("Illegal format string", ps[0]);
     while (fmt) {
       if (theFormat.count >= 0)
-	return anaerror("Repeat counts not allowed in FORMAT_SET", ps[0]);
+	return luxerror("Repeat counts not allowed in FORMAT_SET", ps[0]);
       switch (theFormat.type) {
       case FMT_INTEGER:
 	iq = iformat;
@@ -701,7 +701,7 @@ Int ana_format_set(Int narg, Int ps[])
 	break;
       case FMT_PLAIN:
 	if (!iq)
-	  return anaerror("Illegal format string", ps[0]);
+	  return luxerror("Illegal format string", ps[0]);
 	/* else we add it to the last one */
 	p = scal_ptr_pointer(iq);
 	n = strlen(fmt) + 1;
@@ -736,7 +736,7 @@ Int ana_format_set(Int narg, Int ps[])
     strcpy(p.s, "%14.7z");
     symbol_memory(cformat) = 7;
   }
-  return ANA_OK;
+  return LUX_OK;
 }
 /*------------------------------------------------------------------------- */
 static Int	pager = -1;
@@ -789,25 +789,25 @@ void type_ascii_one(Int symbol, FILE *fp)
   symbol = transfer(symbol);
 
   switch (symbol_class(symbol)) {
-    case ANA_SCALAR: case ANA_FIXED_NUMBER:
+    case LUX_SCALAR: case LUX_FIXED_NUMBER:
       switch (scalar_type(symbol)) {
-	case ANA_BYTE:
+	case LUX_BYTE:
 	  number.l = (Int) scalar_value(symbol).b;
 	  break;
-	case ANA_WORD:
+	case LUX_WORD:
 	  number.l = (Int) scalar_value(symbol).w;
 	  break;
-	case ANA_LONG:
+	case LUX_LONG:
 	  number.l = (Int) scalar_value(symbol).l;
 	  break;
-	case ANA_FLOAT:
+	case LUX_FLOAT:
 	  number.d = scalar_value(symbol).f;
 	  break;
-	case ANA_DOUBLE:
+	case LUX_DOUBLE:
 	  number.d = scalar_value(symbol).d;
 	  break;
       }
-      if (scalar_type(symbol) < ANA_FLOAT) { /* integer type */
+      if (scalar_type(symbol) < LUX_FLOAT) { /* integer type */
 	sprintf(curScrat, fmt_integer, number.l);
 	fprintw(fp, curScrat);
       } else { 			/* Float type */
@@ -816,20 +816,20 @@ void type_ascii_one(Int symbol, FILE *fp)
 	fprintw(fp, curScrat);
       }
       break;
-    case ANA_CSCALAR:
+    case LUX_CSCALAR:
       ptr.cf = complex_scalar_data(symbol).cf;
-      if (complex_scalar_type(symbol) == ANA_CFLOAT)
+      if (complex_scalar_type(symbol) == LUX_CFLOAT)
 	Sprintf(curScrat, fmt_complex, (Double) ptr.cf->real,
 		(Double) ptr.cf->imaginary);
       else
 	Sprintf(curScrat, fmt_complex, ptr.cd->real, ptr.cd->imaginary);
       fprintw(fp, curScrat);
       break;
-    case ANA_STRING:
+    case LUX_STRING:
       sprintf(curScrat, fmt_string, string_value(symbol));
       fprintw(fp, curScrat);
       break;
-    case ANA_RANGE:
+    case LUX_RANGE:
       fprintw(fp, "(");
       i = range_start(symbol);
       if (i == -1)		/* (*) */
@@ -841,7 +841,7 @@ void type_ascii_one(Int symbol, FILE *fp)
 	}
 	type_ascii_one(i, fp);
 	i = range_end(symbol);
-	if (i != ANA_ZERO) {	/* really have a range end */
+	if (i != LUX_ZERO) {	/* really have a range end */
 	  fprintw(fp, ":");
 	  if (i < 0) {		/* * ... */
 	    if (i == -1) {	/* just * */
@@ -864,11 +864,11 @@ void type_ascii_one(Int symbol, FILE *fp)
       }
       fprintw(fp, ")");
       break;
-    case ANA_ARRAY:
+    case LUX_ARRAY:
       j = array_size(symbol);
       ptr.b = array_data(symbol);
       switch (array_type(symbol)) {
-	case ANA_BYTE:
+	case LUX_BYTE:
 	  fmttok(fmt_integer);
 	  while (j--) {
 	    if (!j && (theFormat.flags & FMT_MIX2))
@@ -879,7 +879,7 @@ void type_ascii_one(Int symbol, FILE *fp)
 	      nextformat(NULL, 1);
 	  }
 	  break;
-	case ANA_WORD:
+	case LUX_WORD:
 	  fmttok(fmt_integer);
 	  while (j--) {
 	    if (!j && (theFormat.flags & FMT_MIX2))
@@ -890,7 +890,7 @@ void type_ascii_one(Int symbol, FILE *fp)
 	      nextformat(NULL, 1);
 	  }
 	  break;
-	case ANA_LONG:
+	case LUX_LONG:
 	  fmttok(fmt_integer);
 	  while (j--) {
 	    if (!j && (theFormat.flags & FMT_MIX2))
@@ -901,7 +901,7 @@ void type_ascii_one(Int symbol, FILE *fp)
 	      nextformat(NULL, 1);
 	  }
 	  break;
-	case ANA_FLOAT:
+	case LUX_FLOAT:
 	  fmttok(fmt_float);
 	  while (j--) {
 	    if (!j && (theFormat.flags & FMT_MIX2))
@@ -912,7 +912,7 @@ void type_ascii_one(Int symbol, FILE *fp)
 	      nextformat(NULL, 1);
 	  }
 	  break;
-	case ANA_DOUBLE:
+	case LUX_DOUBLE:
 	  fmttok(fmt_float);
 	  while (j--) {
 	    if (!j && (theFormat.flags & FMT_MIX2))
@@ -923,7 +923,7 @@ void type_ascii_one(Int symbol, FILE *fp)
 	      nextformat(NULL, 1);
 	  }
 	  break;
-	case ANA_STRING_ARRAY:
+	case LUX_STRING_ARRAY:
 	  fmttok(fmt_string);
 	  while (j--) {
 	    if (!j && (theFormat.flags & FMT_MIX2))
@@ -939,33 +939,33 @@ void type_ascii_one(Int symbol, FILE *fp)
 	  }
       }
       break;
-    case ANA_SCAL_PTR:
+    case LUX_SCAL_PTR:
       switch (scal_ptr_type(symbol)) {
-	case ANA_BYTE:
+	case LUX_BYTE:
 	  number.l = (Int) *scal_ptr_pointer(symbol).b;
 	  break;
-	case ANA_WORD:
+	case LUX_WORD:
 	  number.l = (Int) *scal_ptr_pointer(symbol).w;
 	  break;
-	case ANA_LONG:
+	case LUX_LONG:
 	  number.l = *scal_ptr_pointer(symbol).l;
 	  break;
-	case ANA_FLOAT:
+	case LUX_FLOAT:
 	  number.f = *scal_ptr_pointer(symbol).f;
 	  break;
-	case ANA_DOUBLE:
+	case LUX_DOUBLE:
 	  number.f = (Float) *scal_ptr_pointer(symbol).d;
 	  break;
       }
-      if (scal_ptr_type(symbol) < ANA_FLOAT) { /* integer type */
+      if (scal_ptr_type(symbol) < LUX_FLOAT) { /* integer type */
 	sprintf(curScrat, fmt_integer, number.l);
 	fprintw(fp, curScrat);
-      } else if (scal_ptr_type(symbol) <= ANA_DOUBLE) { /* Float type */
+      } else if (scal_ptr_type(symbol) <= LUX_DOUBLE) { /* Float type */
 	Sprintf(curScrat, fmt_float, number.f);
 	fprintw(fp, curScrat);
       }
       break;
-    case ANA_CLIST: case ANA_PRE_CLIST: case ANA_CPLIST:
+    case LUX_CLIST: case LUX_PRE_CLIST: case LUX_CPLIST:
       n = clist_num_symbols(symbol);
       ptr.w = clist_symbols(symbol);
       while (n--) {
@@ -974,7 +974,7 @@ void type_ascii_one(Int symbol, FILE *fp)
 	  nextformat(NULL, 1);
       }
       break;
-    case ANA_LIST: case ANA_PRE_LIST:
+    case LUX_LIST: case LUX_PRE_LIST:
       n = list_num_symbols(symbol);
       sptr = list_symbols(symbol);
       while (n--) {
@@ -984,11 +984,11 @@ void type_ascii_one(Int symbol, FILE *fp)
 	  nextformat(NULL, 1);
       }
       break;
-    case ANA_CARRAY:
+    case LUX_CARRAY:
       ptr.cf = array_data(symbol);
       n = array_size(symbol);
       switch (array_type(symbol)) {
-	case ANA_CFLOAT:
+	case LUX_CFLOAT:
 	  while (n--) {
 	    Sprintf(curScrat, fmt_complex, (Double) ptr.cf->real,
 		    (Double) ptr.cf->imaginary);
@@ -998,7 +998,7 @@ void type_ascii_one(Int symbol, FILE *fp)
 	      nextformat(NULL, 1);
 	  }
 	  break;
-	case ANA_CDOUBLE:
+	case LUX_CDOUBLE:
 	  while (n--) {
 	    Sprintf(curScrat, fmt_complex, ptr.cd->real, ptr.cd->imaginary);
 	    fprintw(fp, curScrat);
@@ -1111,11 +1111,11 @@ Int type_ascii(Int narg, Int ps[], FILE *fp)
   theFormat.start = theFormat.next = NULL;
   for (i = 0; i < narg; i++) {
     iq = ps[i];
-    if (symbol_class(iq) == ANA_SCAL_PTR)
+    if (symbol_class(iq) == LUX_SCAL_PTR)
       iq = dereferenceScalPointer(iq);
     if (iq < 0)
       return cerror(ILL_CLASS, 0);
-    if (symbol_class(iq) == ANA_STRING /* it's a string */
+    if (symbol_class(iq) == LUX_STRING /* it's a string */
 	&& i < narg - 1) {	/* and not the last argument */
       fmtsym = iq;
       p = string_value(iq);
@@ -1153,9 +1153,9 @@ Int type_ascii(Int narg, Int ps[], FILE *fp)
 	  fputs(theFormat.start, fp);
 	break;
       case FMT_ERROR:
-	return anaerror("Illegal format", fmtsym);
+	return luxerror("Illegal format", fmtsym);
       default:
-	return anaerror("Format expects more arguments", fmtsym);
+	return luxerror("Format expects more arguments", fmtsym);
     }
   }
   if ((internalMode & 1) == 0) { /* no /JOIN */
@@ -1166,7 +1166,7 @@ Int type_ascii(Int narg, Int ps[], FILE *fp)
     fflush(fp);
 
   nextformat(NULL, FMT_CLEANUP);
-  return ANA_OK;
+  return LUX_OK;
 }
 /*------------------------------------------------------------------------- */
 Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
@@ -1186,21 +1186,21 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
   Int	Sprintf(char *, char *, ...);
 
   iq = iq0 = ps[0];		/* the format symbol */
-  if (symbol_class(iq0) == ANA_SCAL_PTR)
+  if (symbol_class(iq0) == LUX_SCAL_PTR)
     iq = dereferenceScalPointer(iq0);
-  if (symbol_class(iq) != ANA_STRING)
+  if (symbol_class(iq) != LUX_STRING)
     return cerror(NEED_STR, iq0);
   if (narg == 1) {		/* only one symbol: just print it */
     if (fp)
       fputs(string_value(iq), fp);
     else			/* into curScrat */
       strcpy(curScrat, string_value(iq));
-    return ANA_OK;
+    return LUX_OK;
   }
 
   thefmt = fmt = fmttok(string_value(iq)); /* install format */
   if (!fmt)
-    return anaerror("Illegal format string", iq0);
+    return luxerror("Illegal format string", iq0);
   dofreefmt = 0;
 
   if (!fp)
@@ -1221,38 +1221,38 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 	if (fmt)
 	  thefmt = fmt;
 	else if (theFormat.type == FMT_ERROR) {
-	  anaerror("Illegal format string", iq0);
-	  goto ana_type_ascii2;
+	  luxerror("Illegal format string", iq0);
+	  goto lux_type_ascii2;
 	} else if (!thefmt)	/* no more format strings but still more */
 				/* arguments: re-use the last one, if */
 				/* present */
-	  goto ana_type_ascii1;
+	  goto lux_type_ascii1;
       }
     } else {
       iq = *++ps;
       narg--;
       switch (symbol_class(iq)) {
-	case ANA_SCAL_PTR:
+	case LUX_SCAL_PTR:
 	  iq = dereferenceScalPointer(iq);
-	case ANA_SCALAR:
+	case LUX_SCALAR:
 	  n = 1;
 	  p.l = &scalar_value(iq).l;
 	  break;
-	case ANA_ARRAY:
+	case LUX_ARRAY:
 	  n = array_size(iq);
 	  p.l = array_data(iq);
 	  break;
-	case ANA_CSCALAR:
+	case LUX_CSCALAR:
 	  n = 1;
 	  p.cf = complex_scalar_data(iq).cf;
 	  break;
-	case ANA_STRING:
+	case LUX_STRING:
 	  n = 1;
 	  p.s = string_value(iq);
 	  break;
 	default:
 	  cerror(ILL_CLASS, *ps);
-	  goto ana_type_ascii2;
+	  goto lux_type_ascii2;
       }
 
       if (internalMode & 1) {
@@ -1285,7 +1285,7 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 	switch (theFormat.type) {
 	  case FMT_INTEGER:
 	    switch (symbol_type(iq)) {
-	      case ANA_BYTE:
+	      case LUX_BYTE:
 		if (fp) 
 		  while (n--) {
 		    fprintf(fp, thefmt, (Int) *p.b++);
@@ -1302,7 +1302,7 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 		    }
 		  }
 		break;
-	      case ANA_WORD:
+	      case LUX_WORD:
 		if (fp) 
 		  while (n--) {
 		    fprintf(fp, thefmt, (Int) *p.w++);
@@ -1319,7 +1319,7 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 		    }
 		  }
 		break;
-	      case ANA_LONG:
+	      case LUX_LONG:
 		if (fp) 
 		  while (n--) {
 		    fprintf(fp, thefmt, (Int) *p.l++);
@@ -1336,7 +1336,7 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 		    }
 		  }
 		break;
-	      case ANA_FLOAT:
+	      case LUX_FLOAT:
 		if (fp) 
 		  while (n--) {
 		    fprintf(fp, thefmt, (Int) *p.f++);
@@ -1353,7 +1353,7 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 		    }
 		  }
 		break;
-	      case ANA_DOUBLE:
+	      case LUX_DOUBLE:
 		if (fp) 
 		  while (n--) {
 		    fprintf(fp, thefmt, (Int) *p.d++);
@@ -1370,7 +1370,7 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 		    }
 		  }
 		break;
-	      case ANA_CFLOAT:
+	      case LUX_CFLOAT:
 		if (fp)
 		  while (n--) {
 		    fprintf(fp, thefmt, (Int) p.cf->real);
@@ -1389,7 +1389,7 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 		    }
 		  }
 		break;
-	      case ANA_CDOUBLE:
+	      case LUX_CDOUBLE:
 		if (fp)
 		  while (n--) {
 		    fprintf(fp, thefmt, (Int) p.cd->real);
@@ -1408,8 +1408,8 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 		    }
 		  }
 		break;		    
-	      case ANA_STRING_ARRAY: case ANA_TEMP_STRING:
-	      case ANA_LSTRING:
+	      case LUX_STRING_ARRAY: case LUX_TEMP_STRING:
+	      case LUX_LSTRING:
 		/* string arguments with numerical formats ->
 		   don't print anything */
 		break;
@@ -1417,7 +1417,7 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 	    break;
 	  case FMT_FLOAT:
 	    switch (symbol_type(iq)) {
-	      case ANA_BYTE:
+	      case LUX_BYTE:
 		if (fp)
 		  while (n--) {
 		    fprintf(fp, thefmt, (Double) *p.b++);
@@ -1434,7 +1434,7 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 		    }
 		  }
 		break;
-	      case ANA_WORD:
+	      case LUX_WORD:
 		if (fp)
 		  while (n--) {
 		    fprintf(fp, thefmt, (Double) *p.w++);
@@ -1451,7 +1451,7 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 		    }
 		  }
 		break;
-	      case ANA_LONG:
+	      case LUX_LONG:
 		if (fp)
 		  while (n--) {
 		    fprintf(fp, thefmt, (Double) *p.l++);
@@ -1468,7 +1468,7 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 		    }
 		  }
 		break;
-	      case ANA_FLOAT:
+	      case LUX_FLOAT:
 		if (fp)
 		  while (n--) {
 		    fprintf(fp, thefmt, (Double) *p.f++);
@@ -1485,7 +1485,7 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 		    }
 		  }
 		break;
-	      case ANA_DOUBLE:
+	      case LUX_DOUBLE:
 		if (fp)
 		  while (n--) {
 		    fprintf(fp, thefmt, (Double) *p.d++);
@@ -1502,7 +1502,7 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 		    }
 		  }
 		break;
-	      case ANA_CFLOAT:
+	      case LUX_CFLOAT:
 		if (fp)
 		  while (n--) {
 		    fprintf(fp, thefmt, (Double) p.cf->real);
@@ -1521,7 +1521,7 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 		    }
 		  }
 		break;
-	      case ANA_CDOUBLE:
+	      case LUX_CDOUBLE:
 		if (fp)
 		  while (n--) {
 		    fprintf(fp, thefmt, (Double) p.cd->real);
@@ -1540,15 +1540,15 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 		    }
 		  }
 		break;		    
-	      case ANA_STRING_ARRAY: case ANA_TEMP_STRING:
-	      case ANA_LSTRING:
+	      case LUX_STRING_ARRAY: case LUX_TEMP_STRING:
+	      case LUX_LSTRING:
 		/* don't print strings with numerical formats */
 		break;
 	    }
 	    break;
 	  case FMT_TIME: case FMT_DATE:
 	    switch (symbol_type(iq)) {
-	      case ANA_BYTE:
+	      case LUX_BYTE:
 		while (n--) {
 		  Sprintf(curScrat, thefmt, (Double) *p.b++);
 		  if (fp)
@@ -1565,7 +1565,7 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 		  }
 		}
 		break;
-	      case ANA_WORD:
+	      case LUX_WORD:
 		while (n--) {
 		  Sprintf(curScrat, thefmt, (Double) *p.w++);
 		  if (fp)
@@ -1582,7 +1582,7 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 		  }
 		}
 		break;
-	      case ANA_LONG:
+	      case LUX_LONG:
 		while (n--) {
 		  Sprintf(curScrat, thefmt, (Double) *p.l++);
 		  if (fp)
@@ -1599,7 +1599,7 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 		  }
 		}
 		break;
-	      case ANA_FLOAT:
+	      case LUX_FLOAT:
 		while (n--) {
 		  Sprintf(curScrat, thefmt, (Double) *p.f++);
 		  if (fp)
@@ -1616,7 +1616,7 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 		  }
 		}
 		break;
-	      case ANA_DOUBLE:
+	      case LUX_DOUBLE:
 		while (n--) {
 		  Sprintf(curScrat, thefmt, (Double) *p.d++);
 		  if (fp)
@@ -1637,7 +1637,7 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 	    break;
 	  case FMT_COMPLEX:
 	    switch (symbol_type(iq)) {
-	      case ANA_BYTE:
+	      case LUX_BYTE:
 		while (n--) {
 		  Sprintf(curScrat, thefmt, (Double) *p.b++, (Double) 0.0);
 		  if (fp)
@@ -1654,7 +1654,7 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 		  }
 		}
 		break;
-	      case ANA_WORD:
+	      case LUX_WORD:
 		while (n--) {
 		  Sprintf(curScrat, thefmt, (Double) *p.w++, (Double) 0.0);
 		  if (fp)
@@ -1671,7 +1671,7 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 		  }
 		}
 		break;
-	      case ANA_LONG:
+	      case LUX_LONG:
 		while (n--) {
 		  Sprintf(curScrat, thefmt, (Double) *p.l++, (Double) 0.0);
 		  if (fp)
@@ -1688,7 +1688,7 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 		  }
 		}
 		break;
-	      case ANA_FLOAT:
+	      case LUX_FLOAT:
 		while (n--) {
 		  Sprintf(curScrat, thefmt, (Double) *p.f++, (Double) 0.0);
 		  if (fp)
@@ -1705,7 +1705,7 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 		  }
 		}
 		break;
-	      case ANA_DOUBLE:
+	      case LUX_DOUBLE:
 		while (n--) {
 		  Sprintf(curScrat, thefmt, (Double) *p.d++, (Double) 0.0);
 		  if (fp)
@@ -1722,7 +1722,7 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 		  }
 		}
 		break;
-	      case ANA_CFLOAT:
+	      case LUX_CFLOAT:
 		while (n--) {
 		  Sprintf(curScrat, thefmt, (Double) p.cf->real,
 			  (Double) p.cf->imaginary);
@@ -1741,7 +1741,7 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 		  }
 		}
 		break;
-	      case ANA_CDOUBLE:
+	      case LUX_CDOUBLE:
 		while (n--) {
 		  Sprintf(curScrat, thefmt, p.cd->real, p.cd->imaginary);
 		  p.cd++;
@@ -1759,15 +1759,15 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 		  }
 		}
 		break;
-	      case ANA_STRING_ARRAY: case ANA_TEMP_STRING:
-	      case ANA_LSTRING:
+	      case LUX_STRING_ARRAY: case LUX_TEMP_STRING:
+	      case LUX_LSTRING:
 		/* don't print strings with numerical arguments */
 		break;
 	    }
 	    break;
 	  case FMT_STRING:
 	    switch (symbol_type(iq)) {
-	      case ANA_STRING_ARRAY:
+	      case LUX_STRING_ARRAY:
 		if (fp)
 		  while (n--) {
 		    fprintf(fp, thefmt, *p.sp++);
@@ -1784,7 +1784,7 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 		    }
 		  }
 		break;
-	      case ANA_TEMP_STRING: case ANA_LSTRING:
+	      case LUX_TEMP_STRING: case LUX_LSTRING:
 		if (fp) {
 		  fprintf(fp, thefmt, p.s);
 		  if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2)))
@@ -1814,22 +1814,22 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 	}
 	n = 1;
       }	/* end of while (nn--) */
-    } /* end of if (theFormat.type == ANA_UNUSED) */
-  } /* end of if (narg || theFormat.type == ANA_UNUSED) */
+    } /* end of if (theFormat.type == LUX_UNUSED) */
+  } /* end of if (narg || theFormat.type == LUX_UNUSED) */
   
-  ana_type_ascii1:
+  lux_type_ascii1:
   if (fp == stdout)
     fflush(stdout);
   else if (!fp)
     curScrat = save;
-  return ANA_OK;
-  ana_type_ascii2:
+  return LUX_OK;
+  lux_type_ascii2:
   if (!fp)
     curScrat = save;
-  return ANA_ERROR;
+  return LUX_ERROR;
 }
 /*------------------------------------------------------------------------- */
-Int ana_fprint(Int narg, Int ps[])
+Int lux_fprint(Int narg, Int ps[])
  /* (stdout) printing */
 /* Headers:
    <stdio.h>: FILE, stdout
@@ -1841,7 +1841,7 @@ Int ana_fprint(Int narg, Int ps[])
  return	type_formatted_ascii(narg, ps, fp);
 }
 /*------------------------------------------------------------------------- */
-Int ana_fprintf(Int narg, Int ps[])
+Int lux_fprintf(Int narg, Int ps[])
  /* file (stdout) formatting and printing */
 /* Headers:
    <stdio.h>: FILE
@@ -1853,15 +1853,15 @@ Int ana_fprintf(Int narg, Int ps[])
  lun = int_arg( ps[0] );
  if (lun < 0 || lun >= MAXFILES)
    return cerror(ILL_LUN, *ps);
- if (ana_file_open[lun] == 0)
+ if (lux_file_open[lun] == 0)
    return cerror(LUN_CLOSED, *ps);
- if (ana_file_open[lun] != 2)
+ if (lux_file_open[lun] != 2)
    return cerror(READ_ONLY, *ps);
- fp = ana_file[lun];
+ fp = lux_file[lun];
  return	type_formatted_ascii(narg - 1, &ps[1], fp);
 }
 /*------------------------------------------------------------------------- */
-Int ana_close(Int narg, Int ps[]) /* close subroutine */		
+Int lux_close(Int narg, Int ps[]) /* close subroutine */		
 /* Headers:
    <stdio.h>: fclose()
    <stdlib.h>: free()
@@ -1872,11 +1872,11 @@ Int ana_close(Int narg, Int ps[]) /* close subroutine */
   lun = int_arg(ps[0]);
   if (lun < 0 || lun >= MAXFILES)
     return cerror(ILL_LUN, *ps);
-  if (ana_file_open[lun]) {
-    fclose(ana_file[lun]);
-    ana_file[lun] = NULL;
-    ana_file_open[lun] = 0;
-    free(ana_file_name[lun]);
+  if (lux_file_open[lun]) {
+    fclose(lux_file[lun]);
+    lux_file[lun] = NULL;
+    lux_file_open[lun] = 0;
+    free(lux_file_name[lun]);
   }
   return 1;
 }
@@ -1896,28 +1896,28 @@ Int open_file(Int narg, Int ps[], char *access, char function)
  char	*name;
 
  if (function) {		/* function call */
-   result_sym = scalar_scratch(ANA_LONG);
+   result_sym = scalar_scratch(LUX_LONG);
    scalar_value(result_sym).l = 0; /* default: error */
  }
  if (internalMode & 1) {	/* /GET_LUN */
    for (lun = 0; lun < MAXFILES; lun++)
-     if (!ana_file_open[lun])
+     if (!lux_file_open[lun])
        break;
    if (lun == MAXFILES)
-     return anaerror("No logical unit free", 0);
+     return luxerror("No logical unit free", 0);
    undefine(*ps);		/* clear old value of lun and put in new */
-   symbol_class(*ps) = ANA_SCALAR;
-   scalar_type(*ps) = ANA_LONG;
+   symbol_class(*ps) = LUX_SCALAR;
+   scalar_type(*ps) = LUX_LONG;
    scalar_value(*ps).l = lun;
  } else {
    lun = int_arg(ps[0]);
    if (lun < 0 || lun >= MAXFILES)
      return (function)? result_sym: cerror(ILL_LUN, *ps);
-   if (ana_file_open[lun])
+   if (lux_file_open[lun])
      return (function? result_sym: cerror(USED_LUN, *ps));
  }
  /* file name is second, must be a string */
- if (symbol_class(ps[1]) != ANA_STRING)
+ if (symbol_class(ps[1]) != LUX_STRING)
    return (function)? result_sym: cerror(NEED_STR, ps[1]);
  name = string_value(ps[1]);
  if (!strcmp(access, "u")) {	/* open the file for update */
@@ -1948,15 +1948,15 @@ Int open_file(Int narg, Int ps[], char *access, char function)
      return cerror(ERR_OPEN, 0);
    }
  }
- ana_file[lun] = fp;
- ana_file_open[lun] = (*access == 'r')? 1: 2; /* read-only or read-write */
- ana_file_name[lun] = strsave(expname);
+ lux_file[lun] = fp;
+ lux_file_open[lun] = (*access == 'r')? 1: 2; /* read-only or read-write */
+ lux_file_name[lun] = strsave(expname);
  if (function)
    scalar_value(result_sym).l = 1; /* success */
  return (function)? result_sym: 1;
 }
 /*------------------------------------------------------------------------- */
-Int ana_openr_f(Int narg, Int ps[])/* openr subroutine */
+Int lux_openr_f(Int narg, Int ps[])/* openr subroutine */
  /* intended mainly for reading ASCII files in old LUX, but may be useful
  for streams in general for UNIX version */
  /* associates a file (or a stream) with a lun */
@@ -1965,19 +1965,19 @@ Int ana_openr_f(Int narg, Int ps[])/* openr subroutine */
   return open_file(narg, ps, "r", 1); 
 }
 /*------------------------------------------------------------------------- */
-Int ana_openw_f(Int narg, Int ps[])/* openw subroutine */
+Int lux_openw_f(Int narg, Int ps[])/* openw subroutine */
  /* like openr but for (over)writing */
 {
   return open_file(narg, ps, "w", 1); 
 }
 /*------------------------------------------------------------------------- */
-Int ana_openu_f(Int narg, Int ps[])/* openu subroutine */
+Int lux_openu_f(Int narg, Int ps[])/* openu subroutine */
 /* like openr but for updating */
 {
   return open_file(narg, ps, "u", 1); 
 }
 /*------------------------------------------------------------------------- */
-Int ana_openr(Int narg, Int ps[])/* openr subroutine */		
+Int lux_openr(Int narg, Int ps[])/* openr subroutine */		
 /* intended mainly for reading ASCII files in old LUX, but may be useful
    for streams in general for UNIX version */
 /* associates a file (or a stream) with a lun */
@@ -1985,19 +1985,19 @@ Int ana_openr(Int narg, Int ps[])/* openr subroutine */
   return open_file(narg, ps, "r", 0); 
 }
 /*------------------------------------------------------------------------- */
-Int ana_openw(Int narg, Int ps[])/* openw subroutine */		
+Int lux_openw(Int narg, Int ps[])/* openw subroutine */		
 /* like openr but for output */
 {
   return open_file(narg, ps, "w", 0); 
 }
 /*------------------------------------------------------------------------- */
-Int ana_openu(Int narg, Int ps[])/* openu subroutine */		
+Int lux_openu(Int narg, Int ps[])/* openu subroutine */		
 /* like openr but for updating */
 {
   return open_file(narg, ps, "u", 0); 
 }
 /*------------------------------------------------------------------------- */
-Int ana_rewindf(Int narg, Int ps[]) /*rewind file subroutine */		
+Int lux_rewindf(Int narg, Int ps[]) /*rewind file subroutine */		
 /* Headers:
    <stdio.h>: fseek()
  */
@@ -2008,13 +2008,13 @@ Int ana_rewindf(Int narg, Int ps[]) /*rewind file subroutine */
   lun = int_arg(ps[0]);
   if (lun < 0 || lun >= MAXFILES)
     return cerror(ILL_LUN, *ps);
-  if (!ana_file_open[lun])
+  if (!lux_file_open[lun])
     return cerror(LUN_CLOSED, *ps);
-  fseek(ana_file[lun], 0, SEEK_SET);	/* rewind it */
+  fseek(lux_file[lun], 0, SEEK_SET);	/* rewind it */
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int ana_read(Int narg, Int ps[])
+Int lux_read(Int narg, Int ps[])
  /* keyboard (stdin) or file (batch) reading and formatting */
 /* Headers:
    <stdio.h>: stdin
@@ -2038,22 +2038,22 @@ Int readf(Int narg, Int ps[], Int flag)
   lun = int_arg(ps[0]);
   if (lun < 0 || lun >= MAXFILES)
     return flag? cerror(ILL_LUN, *ps): 0;
-  if (ana_file_open[lun] == 0)
+  if (lux_file_open[lun] == 0)
     return flag? cerror(LUN_CLOSED, *ps): 0;
-  fp = ana_file[lun];
+  fp = lux_file[lun];
   return read_ascii(narg - 1, &ps[1], fp, flag);
 }
 /*------------------------------------------------------------------------- */
-Int ana_readf(Int narg, Int ps[])
+Int lux_readf(Int narg, Int ps[])
 /* file (stdin) reading and formatting */
 {
   return readf(narg, ps, 1);
 }
 /*------------------------------------------------------------------------- */
-Int ana_readf_f(Int narg, Int ps[])
+Int lux_readf_f(Int narg, Int ps[])
 /* a function version that returns 1 if read OK */
 {
-  return readf(narg, ps, 0)? ANA_ONE: ANA_ZERO;
+  return readf(narg, ps, 0)? LUX_ONE: LUX_ZERO;
 }
 /*------------------------------------------------------------------------- */
 char *moreInput(FILE *fp, char *separators)
@@ -2100,7 +2100,7 @@ char *moreInput(FILE *fp, char *separators)
 /*------------------------------------------------------------------------- */
 Int read_ascii(Int narg, Int ps[], FILE *fp, Int flag)
 /* read ascii stream, format and load into passed arguments
-   called by ana_read and ana_readf
+   called by lux_read and lux_readf
    flag: 0 -> no error messages (function)
    internalMode & 2 -> /WORD read strings by words (whitespace-separated)
                        else read by line
@@ -2127,15 +2127,15 @@ Int read_ascii(Int narg, Int ps[], FILE *fp, Int flag)
     if (!symbolIsNamed(iq)) {	/* an expression of some sort; must be
 				   a string, which we display if we're
 				   reading from standard input */
-      if (symbol_class(iq) == ANA_STRING) {
+      if (symbol_class(iq) == LUX_STRING) {
 	if (fp == stdin)
 	  puts(string_value(iq));
       } else
 	return flag?
-	  anaerror("Cannot read a value into an unnamed symbol", iq): 0;
+	  luxerror("Cannot read a value into an unnamed symbol", iq): 0;
     } else 			/* a named variable: we must read something */
       switch (symbol_class(iq)) {
-      case ANA_STRING:	/* looking for a string */
+      case LUX_STRING:	/* looking for a string */
 	if (internalMode & 2)	{ /* /WORD: reading by Word */
 	  n = 0;
 	  p = curScrat;
@@ -2143,7 +2143,7 @@ Int read_ascii(Int narg, Int ps[], FILE *fp, Int flag)
 	  /* first we skip any whitespace */
 	  while ((c = nextchar(fp)) != EOF && isspace(c));
 	  if (c == EOF) 	/* reached the end of the file */
-	    return flag? anaerror("Encountered EOF", 0): 0;
+	    return flag? luxerror("Encountered EOF", 0): 0;
 	  /* the last one wasn't whitespace, so we push that one */
 	  /* back */
 	  unnextchar(c, fp);
@@ -2161,7 +2161,7 @@ Int read_ascii(Int narg, Int ps[], FILE *fp, Int flag)
 	  string_value(iq)[n] = '\0';	/* terminate */
 	} else {		/* reading by line */
 	  if (!nextline(curScrat, scratSize(), fp)) /* some error or EOF */
-	    return flag? anaerror("Encountered EOF", 0): 0;
+	    return flag? luxerror("Encountered EOF", 0): 0;
 	  /* if the line ends with a newline, then this is included */
 	  /* in the read string; however, there need not be a newline */
 	  /* in the input */
@@ -2173,46 +2173,46 @@ Int read_ascii(Int narg, Int ps[], FILE *fp, Int flag)
 	}
 	index_cnt++;
 	break;
-      case ANA_SCALAR: case ANA_UNDEFINED: /* read scalar */
+      case LUX_SCALAR: case LUX_UNDEFINED: /* read scalar */
 	if (fp != stdin && feof(fp))
-	  return flag? anaerror("Encounterd EOF", 0): 0;
+	  return flag? luxerror("Encounterd EOF", 0): 0;
 	read_a_number_fp(fp, &value, &type);
 	index_cnt++;
 	redef_scalar(iq, type, &value);
 	switch (type) {
-	  /* <iq> is returned as ANA_LONG or ANA_DOUBLE by redef_scalar() */
-	case ANA_BYTE:
+	  /* <iq> is returned as LUX_LONG or LUX_DOUBLE by redef_scalar() */
+	case LUX_BYTE:
 	  scalar_value(iq).b = (Byte) value.l;
 	  break;
-	case ANA_WORD:
+	case LUX_WORD:
 	  scalar_value(iq).w = (Word) value.l;
 	  break;
-	case ANA_FLOAT:
+	case LUX_FLOAT:
 	  scalar_value(iq).f = (Float) value.d;
 	  break;
 	} /* end switch (type) */
 	break;
-      case ANA_SCAL_PTR:
+      case LUX_SCAL_PTR:
 	if (feof(fp))
-	  return flag? anaerror("Encounterd EOF", 0): 0;
+	  return flag? luxerror("Encounterd EOF", 0): 0;
 	read_a_number_fp(fp, &value, &type);
 	index_cnt++;
 	switch (type) {
-	case ANA_BYTE: case ANA_WORD: case ANA_LONG:
+	case LUX_BYTE: case LUX_WORD: case LUX_LONG:
 	  *scal_ptr_pointer(iq).l = value.l;
-	  scal_ptr_type(iq) = ANA_LONG;
+	  scal_ptr_type(iq) = LUX_LONG;
 	  break;
-	case ANA_FLOAT:
+	case LUX_FLOAT:
 	  *scal_ptr_pointer(iq).f = (Float) value.d;
-	  scal_ptr_type(iq) = ANA_FLOAT;
+	  scal_ptr_type(iq) = LUX_FLOAT;
 	  break;
-	case ANA_DOUBLE:
+	case LUX_DOUBLE:
 	  *scal_ptr_pointer(iq).d = value.d;
-	  scal_ptr_type(iq) = ANA_DOUBLE;
+	  scal_ptr_type(iq) = LUX_DOUBLE;
 	  break;
 	} /* end switch (type) */
 	break;
-      case ANA_ARRAY:
+      case LUX_ARRAY:
 	nelem = array_size(iq);
 	pp.b = array_data(iq);
 	if (isNumericalType(array_type(iq))) {
@@ -2220,56 +2220,56 @@ Int read_ascii(Int narg, Int ps[], FILE *fp, Int flag)
 	    /* for some strange reason feof(stdin) can return non-zero */
 	    /* under ordinary circumstances, so we exclude it here */
 	    if (fp != stdin && feof(fp))
-	      return flag? anaerror("Encounterd EOF", 0): 0;
+	      return flag? luxerror("Encounterd EOF", 0): 0;
 	    read_a_number_fp(fp, &value, &type);
 	    index_cnt++;
 	    switch (array_type(iq)) {
-	    case ANA_BYTE:
+	    case LUX_BYTE:
 	      switch (type) {
-	      case ANA_BYTE: case ANA_WORD: case ANA_LONG:
+	      case LUX_BYTE: case LUX_WORD: case LUX_LONG:
 		*pp.b++ = (Byte) value.l;
 		break;
-	      case ANA_FLOAT: case ANA_DOUBLE:
+	      case LUX_FLOAT: case LUX_DOUBLE:
 		*pp.b++ = (Byte) value.d;
 		break;
 	      }
 	      break;
-	    case ANA_WORD:
+	    case LUX_WORD:
 	      switch (type) {
-	      case ANA_BYTE: case ANA_WORD: case ANA_LONG:
+	      case LUX_BYTE: case LUX_WORD: case LUX_LONG:
 		*pp.w++ = (Word) value.l;
 		break;
-	      case ANA_FLOAT: case ANA_DOUBLE:
+	      case LUX_FLOAT: case LUX_DOUBLE:
 		*pp.w++ = (Word) value.d;
 		break;
 	      }
 	      break;
-	    case ANA_LONG:
+	    case LUX_LONG:
 	      switch (type) {
-	      case ANA_BYTE: case ANA_WORD: case ANA_LONG:
+	      case LUX_BYTE: case LUX_WORD: case LUX_LONG:
 		*pp.l++ = (Int) value.l;
 		break;
-	      case ANA_FLOAT: case ANA_DOUBLE:
+	      case LUX_FLOAT: case LUX_DOUBLE:
 		*pp.l++ = (Int) value.d;
 		break;
 	      }
 	      break;
-	    case ANA_FLOAT:
+	    case LUX_FLOAT:
 	      switch (type) {
-	      case ANA_BYTE: case ANA_WORD: case ANA_LONG:
+	      case LUX_BYTE: case LUX_WORD: case LUX_LONG:
 		*pp.f++ = (Float) value.l;
 		break;
-	      case ANA_FLOAT: case ANA_DOUBLE:
+	      case LUX_FLOAT: case LUX_DOUBLE:
 		*pp.f++ = (Float) value.d;
 		break;
 	      }
 	      break;
-	    case ANA_DOUBLE:
+	    case LUX_DOUBLE:
 	      switch (type) {
-	      case ANA_BYTE: case ANA_WORD: case ANA_LONG:
+	      case LUX_BYTE: case LUX_WORD: case LUX_LONG:
 		*pp.d++ = (Double) value.l;
 		break;
-	      case ANA_FLOAT: case ANA_DOUBLE:
+	      case LUX_FLOAT: case LUX_DOUBLE:
 		*pp.d++ = (Double) value.d;
 		break;
 	      }
@@ -2284,7 +2284,7 @@ Int read_ascii(Int narg, Int ps[], FILE *fp, Int flag)
 	    /* first we skip any whitespace */
 	    while ((c = nextchar(fp)) != EOF && isspace(c));
 	    if (c == EOF) 	/* reached the end of the file */
-	      return flag? anaerror("Encountered EOF", 0): 0;
+	      return flag? luxerror("Encountered EOF", 0): 0;
 	    /* then we read non-whitespace characters until the next
 	       whitespace */
 	    while (n && (c = nextchar(fp)) != EOF && !isspace(c)) {
@@ -2300,7 +2300,7 @@ Int read_ascii(Int narg, Int ps[], FILE *fp, Int flag)
 	    pp.sp++;
 	  } else {		/* reading by line */
 	    if (!nextline(curScrat, scratSize(), fp))
-	      return flag? anaerror("Encounterd EOF", 0): 0;
+	      return flag? luxerror("Encounterd EOF", 0): 0;
 	    /* if the buffer was big enough then we read a newline and
 	       must remove it.  If the buffer was too small, then there
 	       won't be a newline */
@@ -2317,7 +2317,7 @@ Int read_ascii(Int narg, Int ps[], FILE *fp, Int flag)
 	return flag? cerror(ILL_CLASS, 0): 0;
       }
   }
-  return ANA_OK;
+  return LUX_OK;
 }
 /*------------------------------------------------------------------------- */
 Int gscanf(void **source, char *format, void *arg, Int isString)
@@ -2372,7 +2372,7 @@ Int read_formatted_ascii(Int narg, Int ps[], void *ptr, Int showerrors,
    interpreted as a FILE pointer to a stream from which input is to be
    read.  If <isString> is unequal to 0, then <ptr> is interpreted as a
    char pointer to the start of a string from which input is to be
-   read.  If an error occurs, then ANA_ERROR is returned.  Only if
+   read.  If an error occurs, then LUX_ERROR is returned.  Only if
    <showerrors> is unequal to zero are error messages displayed as well. */
 /* the format string is as in C, but with the following exceptions: */
 /* 1. C-formats %p and %n are not supported.
@@ -2397,7 +2397,7 @@ Int read_formatted_ascii(Int narg, Int ps[], void *ptr, Int showerrors,
   void	**ptr2;
   static char	*keyboard = NULL;
   extern formatInfo	theFormat;
-  Int	ana_replace(Int, Int), to_scratch_array(Int, Int, Int, Int *);
+  Int	lux_replace(Int, Int), to_scratch_array(Int, Int, Int, Int *);
 
   if (!isString) {
     if ((FILE *) ptr == stdin) { /* reading from the keyboard */
@@ -2416,14 +2416,14 @@ Int read_formatted_ascii(Int narg, Int ps[], void *ptr, Int showerrors,
 
   fmt = string_arg(*ps++);	/* format string */
   if (!fmt)
-    return ANA_ERROR;		/* no format string */
+    return LUX_ERROR;		/* no format string */
   narg--;			/* number of target arguments */
   scr = curScrat;
 
   fmt = fmttok(fmt);		/* install format string and determine
 				   its first token */
   if (!fmt)
-    return anaerror("Illegal format string", ps[-1]);
+    return luxerror("Illegal format string", ps[-1]);
 
   while (fmt) {
     /* The ANSI C manual (K&R 2nd edition) specifies that whitespace
@@ -2440,7 +2440,7 @@ Int read_formatted_ascii(Int narg, Int ps[], void *ptr, Int showerrors,
 	&& ((theFormat.flags & FMT_SUPPRESS) == 0) /* and not suppressing */
 	&& theFormat.type != FMT_PLAIN) { /* and not plain text */
       if (showerrors)
-	return anaerror("Too few arguments to service all format string entries",
+	return luxerror("Too few arguments to service all format string entries",
 		     0);
       else
 	return nout;
@@ -2450,21 +2450,21 @@ Int read_formatted_ascii(Int narg, Int ps[], void *ptr, Int showerrors,
       /* have some data to read */
       switch (theFormat.type) {
 	case FMT_STRING:
-	  type = ANA_TEMP_STRING;
+	  type = LUX_TEMP_STRING;
 	  break;
 	default:
 	  if (showerrors)
-	    return anaerror("Illegal format %s", 0, fmt);
+	    return luxerror("Illegal format %s", 0, fmt);
 	  else
 	    return nout;
 	case FMT_INTEGER:
-	  type = (theFormat.flags & FMT_SMALL)? ANA_WORD: ANA_LONG;
+	  type = (theFormat.flags & FMT_SMALL)? LUX_WORD: LUX_LONG;
 	  break;
 	case FMT_FLOAT: case FMT_TIME:
-	  type = (theFormat.flags & FMT_BIG)? ANA_DOUBLE: ANA_FLOAT;
+	  type = (theFormat.flags & FMT_BIG)? LUX_DOUBLE: LUX_FLOAT;
 	  break;
 	case FMT_COMPLEX:
-	  type = (theFormat.flags & FMT_BIG)? ANA_CDOUBLE: ANA_CFLOAT;
+	  type = (theFormat.flags & FMT_BIG)? LUX_CDOUBLE: LUX_CFLOAT;
 	  break;
       }	    
 
@@ -2472,10 +2472,10 @@ Int read_formatted_ascii(Int narg, Int ps[], void *ptr, Int showerrors,
       if (!(theFormat.flags & FMT_SUPPRESS)) {
 	/* have some data to read */
 	if (theFormat.count > 1) {		/* we need an array */
-	  if (type == ANA_TEMP_STRING) {
+	  if (type == LUX_TEMP_STRING) {
 	    if (showerrors)
 	      return
-		anaerror("Formatted read of string arrays not yet implemented!",
+		luxerror("Formatted read of string arrays not yet implemented!",
 		      0);
 	    else
 	      return nout;
@@ -2483,23 +2483,23 @@ Int read_formatted_ascii(Int narg, Int ps[], void *ptr, Int showerrors,
 	  to_scratch_array(*ps, type, 1, &theFormat.count);
 	  trgt.l = array_data(*ps);
 	} else {		/* only one item */
-	  if (type == ANA_TEMP_STRING) {
+	  if (type == LUX_TEMP_STRING) {
 	    undefine(*ps);
-	    symbol_class(*ps) = ANA_STRING;
-	    string_type(*ps) = ANA_TEMP_STRING;
+	    symbol_class(*ps) = LUX_STRING;
+	    string_type(*ps) = LUX_TEMP_STRING;
 	    symbol_memory(*ps) = 1;
 	    string_value(*ps) = malloc(1);
 	    trgt.s = string_value(*ps);
 	  } else if (isComplexType(type)) {
 	    undefine(*ps);
-	    symbol_class(*ps) = ANA_CSCALAR;
+	    symbol_class(*ps) = LUX_CSCALAR;
 	    complex_scalar_type(*ps) = type;
-	    complex_scalar_memory(*ps) = ana_type_size[type];
+	    complex_scalar_memory(*ps) = lux_type_size[type];
 	    complex_scalar_data(*ps).cf = malloc(complex_scalar_memory(*ps));
 	    trgt.cf = complex_scalar_data(*ps).cf;
 	  } else {
 	    undefine(*ps);
-	    symbol_class(*ps) = ANA_SCALAR;
+	    symbol_class(*ps) = LUX_SCALAR;
 	    scalar_type(*ps) = type;
 	    trgt.l = &scalar_value(*ps).l;
 	  }
@@ -2509,10 +2509,10 @@ Int read_formatted_ascii(Int narg, Int ps[], void *ptr, Int showerrors,
 
     if (theFormat.type != FMT_PLAIN)
       switch (type) {
-	case ANA_TEMP_STRING:	/* a string */
+	case LUX_TEMP_STRING:	/* a string */
 	  if (theFormat.count > 1)
 	    return showerrors? 
-	      anaerror("Reading of string arrays is not yet implemented", 0):
+	      luxerror("Reading of string arrays is not yet implemented", 0):
 		nout;
 	  if (theFormat.flags & FMT_SUPPRESS) {
 	    /* %*s or %*S or %*[...]: skip next whitespace-delimited Word */
@@ -2598,7 +2598,7 @@ Int read_formatted_ascii(Int narg, Int ps[], void *ptr, Int showerrors,
 		  if (pr) {	/* not the last one: read an integer */
 		    if (!gscanf(ptr2, "%d", &i, string2))
 		      return
-			showerrors? anaerror("Expected a digit while looking for a time at character index %d in %s", 0, (char *) *ptr2 - ptr0, ptr0): nout;
+			showerrors? luxerror("Expected a digit while looking for a time at character index %d in %s", 0, (char *) *ptr2 - ptr0, ptr0): nout;
 		    d += i*k;
 		    if (i < 0)
 		      k = -k;
@@ -2606,11 +2606,11 @@ Int read_formatted_ascii(Int narg, Int ps[], void *ptr, Int showerrors,
 		    /* skip the separator: anything except digits */
 		    if (!gscanf(ptr2, "%*[^0-9]", NULL, string2))
 		      return
-			showerrors? anaerror("Expected a non-digit while looking for a time at character index %d in %s", 0, (char *) *ptr2 - ptr0, ptr0): nout;
+			showerrors? luxerror("Expected a non-digit while looking for a time at character index %d in %s", 0, (char *) *ptr2 - ptr0, ptr0): nout;
 		  } else {	/* the last one: read a Float */
 		    if (!gscanf(ptr2, "%lf", &f, string2))
 		      return
-			showerrors? anaerror("Expected a (floating-point) number while looking for a time at character index %d in %s", 0, (char *) *ptr2 - ptr0, ptr0): nout;
+			showerrors? luxerror("Expected a (floating-point) number while looking for a time at character index %d in %s", 0, (char *) *ptr2 - ptr0, ptr0): nout;
 		    d += f*k;
 		  }
 		}
@@ -2619,7 +2619,7 @@ Int read_formatted_ascii(Int narg, Int ps[], void *ptr, Int showerrors,
 		  d *= 15;	/* from hours to degrees */
 		
 		if (!(theFormat.flags & FMT_SUPPRESS)) {
-		  if (type == ANA_FLOAT)
+		  if (type == LUX_FLOAT)
 		    *trgt.f = (Float) d;
 		  else
 		    *trgt.d = d;
@@ -2636,10 +2636,10 @@ Int read_formatted_ascii(Int narg, Int ps[], void *ptr, Int showerrors,
 					 absent so we substitute 0 */
 		    d = d2 = 0.0;
 		  else
-		    return showerrors? anaerror("Unexpected input", 0): nout;
+		    return showerrors? luxerror("Unexpected input", 0): nout;
 		}
 		if (!(theFormat.flags & FMT_SUPPRESS)) {
-		  if (type == ANA_CFLOAT) {
+		  if (type == LUX_CFLOAT) {
 		    trgt.cf->real = d;
 		    trgt.cf->imaginary = d2;
 		  } else {
@@ -2652,10 +2652,10 @@ Int read_formatted_ascii(Int narg, Int ps[], void *ptr, Int showerrors,
 		if (!gscanf(ptr2, theFormat.current,
 			    (theFormat.flags & FMT_SUPPRESS)? NULL: trgt.b,
 			    string2))
-		  return showerrors? anaerror("Expected a number at character index %d in %s", 0, (char *) *ptr2 - ptr0, ptr0): nout;
+		  return showerrors? luxerror("Expected a number at character index %d in %s", 0, (char *) *ptr2 - ptr0, ptr0): nout;
 		break;
 	    } /* end of switch (type) */
-	    trgt.b += ana_type_size[type];
+	    trgt.b += lux_type_size[type];
 	  } /* end of while (theFormat.count--) */
 	  break;
       } /* end of switch (type) */
@@ -2667,7 +2667,7 @@ Int read_formatted_ascii(Int narg, Int ps[], void *ptr, Int showerrors,
 	  && !theFormat.only_whitespace) {
 	/* text did not match */
 	if (showerrors)
-	  return anaerror("Input did not match explicit text '%s'", 0,
+	  return luxerror("Input did not match explicit text '%s'", 0,
 		       theFormat.plain);
 	else
 	  return nout;
@@ -2685,7 +2685,7 @@ Int read_formatted_ascii(Int narg, Int ps[], void *ptr, Int showerrors,
   return nout;
 }
 /*------------------------------------------------------------------------- */
-Int ana_freadf(Int narg, Int ps[])
+Int lux_freadf(Int narg, Int ps[])
 /* FREADF,lun,format,var,... */
 /* Headers:
    <stdio.h>: FILE
@@ -2697,18 +2697,18 @@ Int ana_freadf(Int narg, Int ps[])
   lun = int_arg(*ps);
   if (lun < 0 || lun >= MAXFILES)
     return cerror(ILL_LUN, *ps);
-  if (ana_file_open[lun] == 0)
+  if (lux_file_open[lun] == 0)
     return cerror(LUN_CLOSED, *ps);
-  if (ana_file_open[lun] != 1)
+  if (lux_file_open[lun] != 1)
     return cerror(WRITE_ONLY, *ps);
-  fp = ana_file[lun];
-  if (read_formatted_ascii(narg - 1, &ps[1], (void *) fp, 1, 0) == ANA_ERROR)
-    return anaerror("Error reading file %s", 0, ana_file_name[lun]);
+  fp = lux_file[lun];
+  if (read_formatted_ascii(narg - 1, &ps[1], (void *) fp, 1, 0) == LUX_ERROR)
+    return luxerror("Error reading file %s", 0, lux_file_name[lun]);
   else 
-    return ANA_OK;
+    return LUX_OK;
 }
 /*------------------------------------------------------------------------- */
-Int ana_fread(Int narg, Int ps[])
+Int lux_fread(Int narg, Int ps[])
 /* FREAD,format,var,... */
 /* Headers:
    <stdio.h>: stdin
@@ -2718,20 +2718,20 @@ Int ana_fread(Int narg, Int ps[])
 
   result = read_formatted_ascii(narg, ps, (void *) stdin, 1, 0);
   switch (result) {
-    case ANA_ERROR: case 0:
-      anaerror("Error reading from standard input", 0);
-      return ANA_ZERO;
+    case LUX_ERROR: case 0:
+      luxerror("Error reading from standard input", 0);
+      return LUX_ZERO;
     case 1:
-      return ANA_ONE;
+      return LUX_ONE;
     default:
-      iq = scalar_scratch(ANA_LONG);
+      iq = scalar_scratch(LUX_LONG);
       scalar_value(iq).l = result;
       break;
   }
   return iq;
 }
 /*------------------------------------------------------------------------- */
-Int ana_freadf_f(Int narg, Int ps[])
+Int lux_freadf_f(Int narg, Int ps[])
 /* FREADF(lun,format,var,...) */
 /* Headers:
    <stdio.h>: FILE
@@ -2743,27 +2743,27 @@ Int ana_freadf_f(Int narg, Int ps[])
   lun = int_arg(*ps);
   if (lun < 0 || lun >= MAXFILES)
     return cerror(ILL_LUN, *ps);
-  if (ana_file_open[lun] == 0)
+  if (lux_file_open[lun] == 0)
     return cerror(LUN_CLOSED, *ps);
-  if (ana_file_open[lun] != 1)
+  if (lux_file_open[lun] != 1)
     return cerror(WRITE_ONLY, *ps);
-  fp = ana_file[lun];
+  fp = lux_file[lun];
   result = read_formatted_ascii(narg - 1, &ps[1], (void *) fp, 0, 0);
   switch (result) {
-    case ANA_ERROR: case 0:
-      anaerror("Error reading from file %s", 0, ana_file_name[lun]);
-      return ANA_ZERO;
+    case LUX_ERROR: case 0:
+      luxerror("Error reading from file %s", 0, lux_file_name[lun]);
+      return LUX_ZERO;
     case 1:
-      return ANA_ONE;
+      return LUX_ONE;
     default:
-      iq = scalar_scratch(ANA_LONG);
+      iq = scalar_scratch(LUX_LONG);
       scalar_value(iq).l = result;
       break;
   }
   return iq;
 }
 /*------------------------------------------------------------------------- */
-Int ana_assoc_input(Int narg, Int ps[])
+Int lux_assoc_input(Int narg, Int ps[])
      /* use an associated variable as a guide to reading a file 
 	syntax:  y = x(record_offset)
 	y = x(subsc)
@@ -2793,14 +2793,14 @@ Int ana_assoc_input(Int narg, Int ps[])
   out = outdims;
   offset = 0;
   nsym = iq = ps[narg];		/* assoc var */
-  if (symbol_class(iq) != ANA_ASSOC)
+  if (symbol_class(iq) != LUX_ASSOC)
     return cerror(ILL_CLASS, iq);
   lun = assoc_lun(iq);
   if (lun < 0 || lun >= MAXFILES)
     return cerror(ILL_LUN, iq);
-  if (ana_file_open[lun] == 0)
+  if (lux_file_open[lun] == 0)
     return cerror(LUN_CLOSED, iq);
-  fp = ana_file[lun];
+  fp = lux_file[lun];
   type = assoc_type(iq);
   dfile = assoc_num_dims(iq);	/* #dims in file */
   file = assoc_dims(iq);	/* file dims */
@@ -2822,9 +2822,9 @@ Int ana_assoc_input(Int narg, Int ps[])
     for (i = 0; i < dfile; i++) { /* other args */
       iq = ps[i];		/* next argument */
       switch (symbol_class(iq)) {
-	case ANA_RANGE:		/* a range subscript */
+	case LUX_RANGE:		/* a range subscript */
 	  iq = convertRange(iq);
-	case ANA_SUBSC_PTR:	/* a complex subscript */
+	case LUX_SUBSC_PTR:	/* a complex subscript */
 	  off[i] = subsc_ptr_start(iq);
 	  if (off[i] >= file[i]) {
 	    off[i] = file[i] - 1;
@@ -2854,7 +2854,7 @@ Int ana_assoc_input(Int narg, Int ps[])
 	    axes[dout] = i;	/* acessed axes */
 	  dout++;
 	  break;
-	case ANA_SCALAR: case ANA_SCAL_PTR:
+	case LUX_SCALAR: case LUX_SCAL_PTR:
 	  off[i] = int_arg(iq);
 	  if (off[i] >= file[i] || off[i] < 0) /* bad index */
 	    return cerror(SUBSC_RANGE, iq);
@@ -2883,7 +2883,7 @@ Int ana_assoc_input(Int narg, Int ps[])
 				/* set up step sizes etc. */
   for (i = 0; i < dout; i++) tally[i] = 1;
   n = *ystep = 1; for (i = 1; i < doff; i++) ystep[i] = (n *= file[i - 1]);
-  n = ana_type_size[type]; 
+  n = lux_type_size[type]; 
   for (i = 0; i < doff; i++) offset += off[i]*ystep[i];  offset *= n;
   for (i = 0; i < dout; i++) step[i] = ystep[axes[i]]*n;
   for (i = dout - 1; i; i--) step[i] -= step[i - 1]*out[i - 1];
@@ -2911,7 +2911,7 @@ Int ana_assoc_input(Int narg, Int ps[])
   return iq;
 }
 /*------------------------------------------------------------------------- */
-Int ana_assoc_output(Int iq, Int jq, Int offsym, Int axsym)
+Int lux_assoc_output(Int iq, Int jq, Int offsym, Int axsym)
  /* use an associated variable as a guide to writing into a file */
  /* iq is sym # of assoc var, jq is rhs sym with data */
 /* Headers:
@@ -2930,19 +2930,19 @@ Int ana_assoc_output(Int iq, Int jq, Int offsym, Int axsym)
  dattype = sym[jq].type;
  if (assoctype != dattype)			/* make proper type */
  { switch (assoctype)
-   { case ANA_BYTE:  jq = ana_byte(1, &jq);  break;
-     case ANA_WORD:  jq = ana_word(1, &jq);  break;
-     case ANA_LONG:  jq = ana_long(1, &jq);  break;
-     case ANA_FLOAT: jq = ana_float(1, &jq); break;
-     case ANA_DOUBLE: jq = ana_double(1, &jq); break; }
+   { case LUX_BYTE:  jq = lux_byte(1, &jq);  break;
+     case LUX_WORD:  jq = lux_word(1, &jq);  break;
+     case LUX_LONG:  jq = lux_long(1, &jq);  break;
+     case LUX_FLOAT: jq = lux_float(1, &jq); break;
+     case LUX_DOUBLE: jq = lux_double(1, &jq); break; }
  }
  switch (sym[jq].class)
- { case ANA_SCAL_PTR: case ANA_SCALAR:
+ { case LUX_SCAL_PTR: case LUX_SCALAR:
      done = ddat = 1;
      dat = &done;
      q.l = &sym[jq].spec.scalar.l;
      break;
-   case ANA_ARRAY:
+   case LUX_ARRAY:
      h = HEAD(jq);					/* data */
      ddat = h->ndim;
      dat = h->dims;
@@ -2954,18 +2954,18 @@ Int ana_assoc_output(Int iq, Int jq, Int offsym, Int axsym)
  file = h->dims;
  lun = h->c1;
  if (lun < 0 || lun > MAXFILES) return cerror(ILL_LUN, 0);
- if (ana_file_open[lun] == 0) return cerror(LUN_CLOSED, 0);
- if (ana_file_open[lun] != 2) return cerror(READ_ONLY, 0);
- fp = ana_file[lun];
+ if (lux_file_open[lun] == 0) return cerror(LUN_CLOSED, 0);
+ if (lux_file_open[lun] != 2) return cerror(READ_ONLY, 0);
+ fp = lux_file[lun];
  baseOffset = assoc_has_offset(iq)? assoc_offset(iq): 0;
-					  /* ANA_ASSOC call, e.g. header */
+					  /* LUX_ASSOC call, e.g. header */
  if (ddat > dfile + 1)
  { printf("Source has too many dimensions for associated file structure");
    return cerror(INCMP_DIMS, jq); }
  if (!offsym && axsym >= 0) { offset = 0;  doff = 0; }
  else
  { if (axsym == -1)
-   { if (sym[offsym].class == ANA_ARRAY)		/* coordinate offset */
+   { if (sym[offsym].class == LUX_ARRAY)		/* coordinate offset */
      { h = HEAD(offsym);
        GET_SIZE(doff, h->dims, h->ndim);		/* #offset elements */
        if (doff < dfile || doff > dfile + 1)
@@ -2997,7 +2997,7 @@ Int ana_assoc_output(Int iq, Int jq, Int offsym, Int axsym)
  for (i = 0; i < ddat; i++) tally[i] = 1; 
  n = *ystep = 1; 
  for (i = 1; i < dfile; i++) ystep[i] = (n *= file[i - 1]);
- n = ana_type_size[assoctype];
+ n = lux_type_size[assoctype];
  if (doff)
  { offset = 0;
    for (i = 0; i < doff; i++) offset += off[i]*ystep[i]; }
@@ -3080,12 +3080,12 @@ Int ck_synch_hd(FILE *fin, fzHead *fh, Int *wwflag)
       printf("File does not have F0 magic number, but %x\n",
 	     fh->synch_pattern);
       fclose(fin);
-      return ANA_ERROR;
+      return LUX_ERROR;
     }
   } else
     *wwflag = 0;
   if (MSBfirst ^ *wwflag)
-    endian(fh->dim, fh->ndim*sizeof(Int), ANA_LONG);
+    endian(fh->dim, fh->ndim*sizeof(Int), LUX_LONG);
   return 1; 
 }
 /*------------------------------------------------------------------------- */
@@ -3141,7 +3141,7 @@ void fz_print_header(FILE *fin, Int n) /* internal utility */
     fseek(fin, n, SEEK_CUR);
 }
 /*------------------------------------------------------------------------- */
-Int ana_fzinspect(Int narg, Int ps[])		/* fzinspect subroutine */
+Int lux_fzinspect(Int narg, Int ps[])		/* fzinspect subroutine */
  /* return some info about an fz file */
  /* subr version, fzinspect(name, param, [header])
  where name is the file name, param is an I*4 array containing the following:
@@ -3172,7 +3172,7 @@ Int ana_fzinspect(Int narg, Int ps[])		/* fzinspect subroutine */
   q1[0] = -1;
   for (i = 1; i < 11; i++)
     q1[i] = 0;
-  if (symbol_class(ps[0]) != ANA_STRING)
+  if (symbol_class(ps[0]) != LUX_STRING)
     return cerror(NEED_STR, ps[0]);
   name = string_value(ps[0]);
 						 /* try to open the file */
@@ -3206,7 +3206,7 @@ Int ana_fzinspect(Int narg, Int ps[])		/* fzinspect subroutine */
 Int fzhead(Int narg, Int ps[], Int flag) /* fzhead subroutine */
  /* read header in fz files */
  /* PROCEDURE -- Called by: FZHEAD,'FILENAME' [,TEXT HEADER] */
- /* ANA_FUNCTION  -- Called by: FZHEAD('FILENAME' [,TEXT HEADER] */
+ /* LUX_FUNCTION  -- Called by: FZHEAD('FILENAME' [,TEXT HEADER] */
  /* flag = 0: procedure   flag = 1: function */
 /* Headers:
    <stdio.h>: FILE, fopen(), perror(), printf(), fclose()
@@ -3223,7 +3223,7 @@ Int fzhead(Int narg, Int ps[], Int flag) /* fzhead subroutine */
 						 /* try to open the file */
  if ((fin = fopen(expand_name(name, NULL),"r")) == NULL) {
    if (flag)
-     return ANA_ERROR;
+     return LUX_ERROR;
    else {
      perror("System Message");
      printf("%s: ", expname);
@@ -3233,7 +3233,7 @@ Int fzhead(Int narg, Int ps[], Int flag) /* fzhead subroutine */
 				 /* use scrat to read in header block */
  fh = (fzHead *) scrat;
  if (ck_synch_hd(fin, fh, &wwflag) < 0)
-   return ANA_ERROR;
+   return LUX_ERROR;
  
  if (narg > 1)
    fz_get_header(fin, ps[1], fh->nhb);
@@ -3280,13 +3280,13 @@ Int fzread(Int narg, Int ps[], Int flag) /* fzread subroutine */
 #endif
 
 	 /* first arg is the variable to load, second is name of file */
-  if (symbol_class(ps[1]) != ANA_STRING)
-    return (flag)? ANA_ERROR: cerror(NEED_STR, ps[1]);
+  if (symbol_class(ps[1]) != LUX_STRING)
+    return (flag)? LUX_ERROR: cerror(NEED_STR, ps[1]);
   name = string_value(ps[1]);
 						 /* try to open the file */
   if ((fin = fopen(expand_name(name, NULL), "r")) == NULL) {
     if (flag)
-      return ANA_ERROR;
+      return LUX_ERROR;
     else {
       perror("System Message");
       printf("%s: ", expname);
@@ -3298,7 +3298,7 @@ Int fzread(Int narg, Int ps[], Int flag) /* fzread subroutine */
   fh = (fzHead *) scrat;
 
   if (ck_synch_hd(fin, fh, &wwflag) < 0)
-    return ANA_ERROR;
+    return LUX_ERROR;
 
   type = fh->datyp;		/* data type */
 
@@ -3306,7 +3306,7 @@ Int fzread(Int narg, Int ps[], Int flag) /* fzread subroutine */
   nelem = 1;
   for (i = 0; i < fh->ndim; i++)
     nelem *= fh->dim[i];
-  nb = nelem * ana_type_size[type]; /* data size */
+  nb = nelem * lux_type_size[type]; /* data size */
 			 /* if a header requested, create and load */
   if (narg > 2)
     fz_get_header(fin, ps[2], fh->nhb);
@@ -3321,7 +3321,7 @@ Int fzread(Int narg, Int ps[], Int flag) /* fzread subroutine */
   iq = ps[0];
   if (redef_array(iq, type, fh->ndim, fh->dim) != 1) {
     fclose(fin);
-    return ANA_ERROR;
+    return LUX_ERROR;
   }
  
   q1.l = array_data(iq);
@@ -3332,12 +3332,12 @@ Int fzread(Int narg, Int ps[], Int flag) /* fzread subroutine */
     if (nq != 14 && !flag) 
       perror("error reading in compression header");
 #if WORDS_BIGENDIAN
-    endian(&ch.tsize, sizeof(Int), ANA_LONG);
-    endian(&ch.nblocks, sizeof(Int), ANA_LONG);
-    endian(&ch.bsize, sizeof(Int), ANA_LONG);
+    endian(&ch.tsize, sizeof(Int), LUX_LONG);
+    endian(&ch.nblocks, sizeof(Int), LUX_LONG);
+    endian(&ch.bsize, sizeof(Int), LUX_LONG);
     for (i = 0; i < 4; i++)
       lmap.b[i] = fh->cbytes[i];
-    endian(&lmap.i, sizeof(Int), ANA_LONG);
+    endian(&lmap.i, sizeof(Int), LUX_LONG);
 #endif
     mq = ch.tsize - 14;
     if (mq <= NSCRAT)
@@ -3362,7 +3362,7 @@ Int fzread(Int narg, Int ps[], Int flag) /* fzread subroutine */
 	printf("correcting to %d, hope this is right!\n", ch.nblocks); }
     /* some consistency checks */
     if (ch.type % 2 == type)
-      return flag? ANA_ERROR: anaerror("inconsisent compression type", 0);
+      return flag? LUX_ERROR: luxerror("inconsisent compression type", 0);
     switch (ch.type) {
       case 0:
 	iq = anadecrunch((Byte *) p, q1.w, sbit, ch.bsize, ch.nblocks);
@@ -3381,7 +3381,7 @@ Int fzread(Int narg, Int ps[], Int flag) /* fzread subroutine */
 	iq = anadecrunch32((Byte *) p, q1.l, sbit, ch.bsize, ch.nblocks);
 #else
 	puts("32-bit decompression was not compiled into your version of LUX");
-	iq = ANA_ERROR;
+	iq = LUX_ERROR;
 #endif
 	break;
       default:
@@ -3392,21 +3392,21 @@ Int fzread(Int narg, Int ps[], Int flag) /* fzread subroutine */
     }
     if (iq != 1) {
       fclose(fin);
-      return ANA_ERROR;
+      return LUX_ERROR;
     }
   } else {			/* non-compression case */
     nq = (((fh->subf >> 7) & 1) ^ MSBfirst);
-    if (type == ANA_STRING_ARRAY) {
+    if (type == LUX_STRING_ARRAY) {
       /* a string array */
       while (nelem--) {
 	fread(&mq, sizeof(Int), 1, fin);
 	if (nq)
-	  endian(&mq, sizeof(Int), ANA_LONG);
+	  endian(&mq, sizeof(Int), LUX_LONG);
 	if (mq) {
 	  *q1.sp = malloc(mq + 1);
 	  if (!*q1.sp) {
 	    fclose(fin);
-	    return flag? ANA_ERROR: cerror(ALLOC_ERR, 0);
+	    return flag? LUX_ERROR: cerror(ALLOC_ERR, 0);
 	  }
 	  fread(*q1.sp, 1, mq, fin);
 	  (*q1.sp)[mq] = '\0';	/* terminate */
@@ -3418,7 +3418,7 @@ Int fzread(Int narg, Int ps[], Int flag) /* fzread subroutine */
       /* just read into the array */
       if (fread(q1.l, 1, nb, fin) != nb) {
 	fclose(fin);
-	return flag? ANA_ERROR: cerror(READ_EOF, 0);
+	return flag? LUX_ERROR: cerror(READ_EOF, 0);
       }
       if (nq)
 	endian(q1.b, nb, type);	/* swap bytes */
@@ -3455,14 +3455,14 @@ Int fzwrite(Int narg, Int ps[], Int flag) /* fzwrite subroutine */
   static char	*safeFile = "Safe_file";
 					 /* first arg. must be an array */
   iq = ps[0];
-  if (symbol_class(iq) != ANA_ARRAY)
-    return (flag)? ANA_ERROR: cerror(NEED_ARR, iq);
+  if (symbol_class(iq) != LUX_ARRAY)
+    return (flag)? LUX_ERROR: cerror(NEED_ARR, iq);
   type = symbol_type(iq);
   q1.l = (Int *) array_data(iq);
   nd = array_num_dims(iq);
 			 /* second argument must be a string, file name */
-  if (symbol_class(ps[1]) != ANA_STRING)
-    return flag? ANA_ERROR: cerror(NEED_STR, ps[1]);
+  if (symbol_class(ps[1]) != LUX_STRING)
+    return flag? LUX_ERROR: cerror(NEED_STR, ps[1]);
 
   name = expand_name(string_value(ps[1]), NULL); /* target file */
   safe = internalMode & 1;
@@ -3482,7 +3482,7 @@ Int fzwrite(Int narg, Int ps[], Int flag) /* fzwrite subroutine */
 						 /* try to open the file */
   if ((fout = fopen(name, "w")) == NULL) {
     if (flag)
-      return ANA_ERROR;
+      return LUX_ERROR;
     else {
       perror("System Message"); 
       printf("%s: ", name);
@@ -3502,10 +3502,10 @@ Int fzwrite(Int narg, Int ps[], Int flag) /* fzwrite subroutine */
   fh->nhb = 1;			/*may be changed later */
   fh->datyp = type;
   fh->ndim = nd;
-  n = array_size(iq)*ana_type_size[type];
+  n = array_size(iq)*lux_type_size[type];
   memcpy(fh->dim, array_dims(iq), nd*sizeof(Int));
 #if WORDS_BIGENDIAN
-  endian(fh->dim, fh->ndim*sizeof(Int), ANA_LONG);
+  endian(fh->dim, fh->ndim*sizeof(Int), LUX_LONG);
 #endif
 
   if (narg > 2) {			 /* have a header */
@@ -3550,7 +3550,7 @@ Int fzwrite(Int narg, Int ps[], Int flag) /* fzwrite subroutine */
 	putc('\0', fout);
     } else {			/* no string: illegal */
       fclose(fout);
-      return flag? ANA_ERROR: cerror(NEED_STR, ps[2]);
+      return flag? LUX_ERROR: cerror(NEED_STR, ps[2]);
     }
   } else {			/* no header */
     fh->nhb = 1;
@@ -3559,7 +3559,7 @@ Int fzwrite(Int narg, Int ps[], Int flag) /* fzwrite subroutine */
       goto fzwrite_1;
   }
   
-  if (type == ANA_STRING_ARRAY) {
+  if (type == LUX_STRING_ARRAY) {
     /* a string array is special: we write for each string in succession
        the string size and then the string itself.  LS 22jan99 */
     n = array_size(iq);
@@ -3576,7 +3576,7 @@ Int fzwrite(Int narg, Int ps[], Int flag) /* fzwrite subroutine */
       fclose(fout);
       if (safe)
 	remove(name);
-      return ANA_ERROR;
+      return LUX_ERROR;
     }
   } else {
     j = fwrite(q1.l, 1, n, fout);	/* write data */
@@ -3587,7 +3587,7 @@ Int fzwrite(Int narg, Int ps[], Int flag) /* fzwrite subroutine */
       fclose(fout);
       if (safe)
 	remove(name);
-      return ANA_ERROR;
+      return LUX_ERROR;
     }
   }
   fclose(fout);
@@ -3595,7 +3595,7 @@ Int fzwrite(Int narg, Int ps[], Int flag) /* fzwrite subroutine */
     if (rename(name, expand_name(string_value(ps[1]), NULL)) < 0)
       perror("System message:");
   }
-  return ANA_OK;
+  return LUX_OK;
 
   fzwrite_1:
   if (!flag)
@@ -3603,7 +3603,7 @@ Int fzwrite(Int narg, Int ps[], Int flag) /* fzwrite subroutine */
   fclose(fout);
   if (safe)
     remove(name);
-  return ANA_ERROR;
+  return LUX_ERROR;
 }
 /*------------------------------------------------------------------------- */
 Int fcwrite(Int, Int [], Int);
@@ -3638,15 +3638,15 @@ Int fcwrite(Int narg, Int ps[], Int flag)/* fcwrite subroutine */
  FILE	*fout;
 					 /* first arg. must be an array */
  iq = ps[0];
- if (symbol_class(iq) != ANA_ARRAY)
-   return (flag)? ANA_ERROR: cerror(NEED_ARR, *ps);
+ if (symbol_class(iq) != LUX_ARRAY)
+   return (flag)? LUX_ERROR: cerror(NEED_ARR, *ps);
  type = array_type(iq);
- if (type != ANA_BYTE && type != ANA_WORD) {
+ if (type != LUX_BYTE && type != LUX_WORD) {
    if (!flag) {
      puts("FCWRITE - Need I*1 or I*2 argument"); 
      return cerror(ILL_TYPE, iq, typeName(symbol_type(iq)));
    } else
-     return ANA_ERROR;
+     return LUX_ERROR;
  }
  q1.l = array_data(iq);
  nd = array_num_dims(iq);
@@ -3655,16 +3655,16 @@ Int fcwrite(Int narg, Int ps[], Int flag)/* fcwrite subroutine */
    runlengthflag = 1;
 
 			 /* second argument must be a string, file name */
- if (symbol_class(ps[1]) != ANA_STRING) {
+ if (symbol_class(ps[1]) != LUX_STRING) {
    runlengthflag = 0;
-   return flag? ANA_ERROR: cerror(NEED_STR, ps[1]);
+   return flag? LUX_ERROR: cerror(NEED_STR, ps[1]);
  }
  name = string_value(ps[1]);
 						 /* try to open the file */
  if ((fout = fopen(expand_name(name, NULL), "w")) == NULL) {
    runlengthflag = 0;
    if (flag)
-     return ANA_ERROR;
+     return LUX_ERROR;
    else {
      perror("System Message");
      printf("%s: ", expname);
@@ -3689,36 +3689,36 @@ Int fcwrite(Int narg, Int ps[], Int flag)/* fcwrite subroutine */
  memcpy(fh->dim, array_dims(iq), nd*sizeof(Int));
  nx = fh->dim[0];
 #if WORDS_BIGENDIAN
- endian(fh->dim, fh->ndim*sizeof(Int), ANA_LONG);
+ endian(fh->dim, fh->ndim*sizeof(Int), LUX_LONG);
 #endif
  ny = n/nx;
- n = n * ana_type_size[type];
+ n = n * lux_type_size[type];
 
  /* now compress the array, must be a Byte or short */
  limit = 2*n;
  q2.l = (Int *) malloc(limit);	/* some room for mistakes */
  switch (type) {
-   case ANA_BYTE:
+   case LUX_BYTE:
      if (runlengthflag)
        iq = anacrunchrun8(q2.b, q1.b, crunch_slice, nx, ny, limit);
      else
        iq = anacrunch8(q2.b, q1.b, crunch_slice, nx, ny, limit);
      break;
-   case ANA_WORD:
+   case LUX_WORD:
      if (runlengthflag)
        iq = anacrunchrun(q2.b, q1.w, crunch_slice, nx, ny, limit);
      else
        iq = anacrunch(q2.b, q1.w, crunch_slice, nx, ny, limit);
      break;
 #if SIZEOF_LONG_LONG_INT == 8
-   case ANA_LONG:
+   case LUX_LONG:
      if (!runlengthflag)
        iq = anacrunch32(q2.b, q1.l, crunch_slice, nx, ny, limit);
      /* else fall-through to default: we don't have a 32-bit crunchrun */
 #endif
    default:
      runlengthflag = 0;
-     return flag? ANA_ERROR: cerror(IMPOSSIBLE, 0);
+     return flag? LUX_ERROR: cerror(IMPOSSIBLE, 0);
  }
  q1.l = q2.l;			/* compressed data */
  if (iq < 0) {
@@ -3730,7 +3730,7 @@ Int fcwrite(Int narg, Int ps[], Int flag)/* fcwrite subroutine */
  lmap.i = iq;			/* need to use this roundabout method because
 				 .cbytes is not aligned on an Int boundary */
 #if WORDS_BIGENDIAN
- endian(&lmap.i, sizeof(Int), ANA_LONG);
+ endian(&lmap.i, sizeof(Int), LUX_LONG);
 #endif
  for (i = 0; i < 4; i++)
    fh->cbytes[i] = lmap.b[i];
@@ -3779,7 +3779,7 @@ Int fcwrite(Int narg, Int ps[], Int flag)/* fcwrite subroutine */
    } else {			/* no string: illegal */
      fclose(fout);
      runlengthflag = 0;
-     return flag? ANA_ERROR: cerror(NEED_STR, ps[2]);
+     return flag? LUX_ERROR: cerror(NEED_STR, ps[2]);
    }
  } else {			/* no header */
    fh->nhb = 1;
@@ -3793,7 +3793,7 @@ Int fcwrite(Int narg, Int ps[], Int flag)/* fcwrite subroutine */
  free(q1.l);
  fclose(fout);
  runlengthflag = 0;
- return	ANA_OK;
+ return	LUX_OK;
 
   fcwrite_1:
  free(q1.l);
@@ -3801,46 +3801,46 @@ Int fcwrite(Int narg, Int ps[], Int flag)/* fcwrite subroutine */
  if (!flag)
    cerror(WRITE_ERR, 0);
  fclose(fout);
- return ANA_ERROR;
+ return LUX_ERROR;
 }
 /*------------------------------------------------------------------------- */
-Int ana_fzread(Int narg, Int ps[])
+Int lux_fzread(Int narg, Int ps[])
  /* routine version */
 { return fzread(narg, ps, 0); }
 /*------------------------------------------------------------------------- */
-Int ana_fzwrite(Int narg, Int ps[])
+Int lux_fzwrite(Int narg, Int ps[])
  /* routine version */
 { return fzwrite(narg, ps, 0); }
 /*------------------------------------------------------------------------- */
-Int ana_fzhead(Int narg, Int ps[])
+Int lux_fzhead(Int narg, Int ps[])
  /* routine version */
 { return fzhead(narg, ps, 0); }
 /*------------------------------------------------------------------------- */
-Int ana_fcwrite(Int narg, Int ps[])
+Int lux_fcwrite(Int narg, Int ps[])
  /* routine version */
 { return fcwrite(narg, ps, 0); }
 /*------------------------------------------------------------------------- */
-Int ana_fcrunwrite(Int narg, Int ps[])
+Int lux_fcrunwrite(Int narg, Int ps[])
 { return fcrunwrite(narg, ps, 0); }
 /*------------------------------------------------------------------------- */
-Int ana_fzread_f(Int narg, Int ps[])
+Int lux_fzread_f(Int narg, Int ps[])
  /* a function version that returns 1 if read OK */
  { return (fzread(narg, ps, 1) == 1)? 1: 4; }
 /*------------------------------------------------------------------------- */
-Int ana_fzhead_f(Int narg, Int ps[])
+Int lux_fzhead_f(Int narg, Int ps[])
  /* a function version that returns 1 if read OK */
  { return (fzhead(narg, ps, 1) == 1)? 1: 4; }
 /*------------------------------------------------------------------------- */
-Int ana_fzwrite_f(Int narg, Int ps[])
+Int lux_fzwrite_f(Int narg, Int ps[])
  /* function version */
 { return (fzwrite(narg, ps, 1) == 1)? 1: 4; }
 /*------------------------------------------------------------------------- */
-Int ana_fcwrite_f(Int narg, Int ps[])
+Int lux_fcwrite_f(Int narg, Int ps[])
  /* function version */
 { return (fcwrite(narg, ps, 1) == 1)? 1: 4; }
 /*------------------------------------------------------------------------- */
-Int ana_fcrunwrite_f(Int narg, Int ps[])
-{ return (fcrunwrite(narg, ps, 1) == 1)? ANA_OK: ANA_ERROR; }
+Int lux_fcrunwrite_f(Int narg, Int ps[])
+{ return (fcrunwrite(narg, ps, 1) == 1)? LUX_OK: LUX_ERROR; }
 /*------------------------------------------------------------------------- */
 Int readu(Int narg, Int ps[], Int flag)
 /* read unformatted data from a file into a variable, which must be predefined.
@@ -3860,25 +3860,25 @@ Int readu(Int narg, Int ps[], Int flag)
  lun = int_arg(*ps++);
  if (lun < 0 || lun >= MAXFILES)
  { if (flag) return 0; else return cerror(ILL_LUN, ps[-1]); }
- if (!ana_file_open[lun])
+ if (!lux_file_open[lun])
  { if (flag) return 0; else return cerror(LUN_CLOSED, ps[-1]); }
- fp = ana_file[lun];
+ fp = lux_file[lun];
  narg--;
  while (narg--)
  { iq = *ps++;				/* next variable */
    str = 0;
    switch (sym[iq].class)
-   { case ANA_SCALAR:
-       n = ana_type_size[sym[iq].type];
+   { case LUX_SCALAR:
+       n = lux_type_size[sym[iq].type];
        p.b = &sym[iq].spec.scalar.b;  break;
-     case ANA_STRING:
+     case LUX_STRING:
        n = sym[iq].spec.array.bstore - 1;
        p.s = sym[iq].spec.name.ptr;  break;
-     case ANA_ARRAY:
+     case LUX_ARRAY:
        h = HEAD(iq);
        GET_SIZE(n, h->dims, h->ndim);
-       if ((Int) symbol_type(iq) < ANA_TEMP_STRING)	/* numerical array */
-	 n *= ana_type_size[sym[iq].type];
+       if ((Int) symbol_type(iq) < LUX_TEMP_STRING)	/* numerical array */
+	 n *= lux_type_size[sym[iq].type];
        else str = 1;			/* string array */
        p.l = LPTR(h);  break;
      default:
@@ -3916,25 +3916,25 @@ Int writeu(Int narg, Int ps[], Int flag)
  lun = int_arg(*ps++);
  if (lun < 0 || lun >= MAXFILES)
  { if (!flag) return cerror(ILL_LUN, ps[-1]); else return 0; }
- if (!ana_file_open[lun])
+ if (!lux_file_open[lun])
  { if (!flag) return cerror(LUN_CLOSED, ps[-1]); else return 0; }
- fp = ana_file[lun];
+ fp = lux_file[lun];
  narg--;
  while (narg--)
  { iq = *ps++;				/* next variable */
    str = 0;
    switch (sym[iq].class)
-   { case ANA_SCALAR:
-       n = ana_type_size[sym[iq].type];
+   { case LUX_SCALAR:
+       n = lux_type_size[sym[iq].type];
        p.b = &sym[iq].spec.scalar.b;  break;
-     case ANA_STRING:
+     case LUX_STRING:
        n = sym[iq].spec.array.bstore - 1;
        p.s = sym[iq].spec.name.ptr;  break;
-     case ANA_ARRAY:
+     case LUX_ARRAY:
        h = HEAD(iq);
        GET_SIZE(n, h->dims, h->ndim);
-       if ((Int) symbol_type(iq) < ANA_TEMP_STRING)	/* numerical array */
-	 n *= ana_type_size[sym[iq].type];
+       if ((Int) symbol_type(iq) < LUX_TEMP_STRING)	/* numerical array */
+	 n *= lux_type_size[sym[iq].type];
        else str = 1;			/* string array */
        p.l = LPTR(h);  break;
      default:
@@ -3950,29 +3950,29 @@ Int writeu(Int narg, Int ps[], Int flag)
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int ana_readu(Int narg, Int ps[])
+Int lux_readu(Int narg, Int ps[])
  /* subroutine version */
 { return readu(narg, ps, 0); }
 /*------------------------------------------------------------------------- */
-Int ana_readu_f(Int narg, Int ps[])
+Int lux_readu_f(Int narg, Int ps[])
  /* function version */
 { return (readu(narg, ps, 1) == 1)? 1: 4; }
 /*------------------------------------------------------------------------- */
-Int ana_writeu(Int narg, Int ps[])
+Int lux_writeu(Int narg, Int ps[])
  /* subroutine version */
 { return writeu(narg, ps, 0); }
 /*------------------------------------------------------------------------- */
-Int ana_writeu_f(Int narg, Int ps[])
+Int lux_writeu_f(Int narg, Int ps[])
  /* function version */
 { return (writeu(narg, ps, 1) == 1)? 1: 4; }
 /*------------------------------------------------------------------------- */
 Int ok_for_astore(Int iq)
 {
   switch (symbol_class(iq)) {
-  case ANA_STRING: case ANA_SUBSC_PTR:
-  case ANA_FILEMAP: case ANA_ASSOC:
-  case ANA_SCALAR: case ANA_UNDEFINED:
-  case ANA_ARRAY: case ANA_CLIST:
+  case LUX_STRING: case LUX_SUBSC_PTR:
+  case LUX_FILEMAP: case LUX_ASSOC:
+  case LUX_SCALAR: case LUX_UNDEFINED:
+  case LUX_ARRAY: case LUX_CLIST:
     return 1;
   default:
     return 0;
@@ -3986,7 +3986,7 @@ void astore_one(FILE *fp, Int iq)
 
   fwrite(&sym[iq], sizeof(symTableEntry), 1, fp); /* the symbol */
   switch (symbol_class(iq)) {
-  case ANA_ARRAY:
+  case LUX_ARRAY:
     n = symbol_memory(iq);
     p.l = (Int *) array_header(iq);
     fwrite(p.b, 1, n, fp);
@@ -4002,17 +4002,17 @@ void astore_one(FILE *fp, Int iq)
       }
     }
     break;
-  case ANA_STRING:
+  case LUX_STRING:
     n = symbol_memory(iq);
     p.s = string_value(iq);
     fwrite(p.b, 1, n, fp);
     break;
-  case ANA_FILEMAP:
+  case LUX_FILEMAP:
     n = symbol_memory(iq);
     p.s = (char *) file_map_header(iq);
     fwrite(p.b, 1, n, fp);
     break;
-  case ANA_CLIST:
+  case LUX_CLIST:
     n = clist_num_symbols(iq);
     p.w = clist_symbols(iq);
     fwrite(&n, 1, sizeof(n), fp);
@@ -4038,14 +4038,14 @@ Int astore(Int narg, Int ps[], Int flag)
   FILE	*fp;
 
   iq = ps[narg - 1];		/* file name */
-  if (symbol_class(iq) != ANA_STRING)
-    return flag? cerror(NEED_STR, iq): ANA_ZERO;
+  if (symbol_class(iq) != LUX_STRING)
+    return flag? cerror(NEED_STR, iq): LUX_ZERO;
   file = string_arg(iq);
   --narg;
   for (i = 0; i < narg; i++) { /* all data arguments */
     iq = ps[i];
     if (!ok_for_astore(iq))
-      return flag? cerror(ILL_CLASS, iq): ANA_ZERO;
+      return flag? cerror(ILL_CLASS, iq): LUX_ZERO;
   }
   /* all arguments are OK for storing */
   fp = fopen(expand_name(file, NULL), "w");
@@ -4055,7 +4055,7 @@ Int astore(Int narg, Int ps[], Int flag)
       printf("(%s)", expname);
       return cerror(ERR_OPEN, iq);
     } else
-      return ANA_ZERO;
+      return LUX_ZERO;
   }
   intro[0] = 0x6666aaaa;	/* identification */
   intro[1] = narg;
@@ -4075,15 +4075,15 @@ Int astore(Int narg, Int ps[], Int flag)
     astore_one(fp, iq);
   }
   fclose(fp);
-  return flag? ANA_ONE: 1;
+  return flag? LUX_ONE: 1;
 }
 /*------------------------------------------------------------------------- */
-Int ana_astore(Int narg, Int ps[])
+Int lux_astore(Int narg, Int ps[])
 {
   return astore(narg, ps, 1);
 }
 /*------------------------------------------------------------------------- */
-Int ana_astore_f(Int narg, Int ps[])
+Int lux_astore_f(Int narg, Int ps[])
 {
   return astore(narg, ps, 0);
 }
@@ -4105,9 +4105,9 @@ Int arestore_one(FILE* fp, Int iq, Int reverseOrder)
   symbol_context(iq) = context;
   sym[iq].exec = exec;
   switch (symbol_class(iq)) {
-  case ANA_ARRAY:
+  case LUX_ARRAY:
     if (reverseOrder)
-      endian(&symbol_memory(iq), sizeof(Int), ANA_LONG);
+      endian(&symbol_memory(iq), sizeof(Int), LUX_LONG);
     n = symbol_memory(iq);
     allocate(p.v, n, char);
     array_header(iq) = (array *) p.v;
@@ -4115,8 +4115,8 @@ Int arestore_one(FILE* fp, Int iq, Int reverseOrder)
       return 1;
     n = array_num_dims(iq);
     if (reverseOrder) {
-      endian(array_dims(iq), n*sizeof(Int), ANA_LONG);
-      endian(array_data(iq), array_size(iq)*ana_type_size[array_type(iq)],
+      endian(array_dims(iq), n*sizeof(Int), LUX_LONG);
+      endian(array_data(iq), array_size(iq)*lux_type_size[array_type(iq)],
 	     array_type(iq));
     }
     if (isStringType(symbol_type(iq))) { /* a string array */
@@ -4127,7 +4127,7 @@ Int arestore_one(FILE* fp, Int iq, Int reverseOrder)
 	if (!fread(&j, sizeof(Int), 1, fp))
 	  return 1;
 	if (reverseOrder)
-	  endian(&j, sizeof(Int), ANA_LONG);
+	  endian(&j, sizeof(Int), LUX_LONG);
 	if (j) {
 	  *p.sp = malloc(j + 1); /* reserve space for the string */
 	  if (!*p.sp)
@@ -4141,32 +4141,32 @@ Int arestore_one(FILE* fp, Int iq, Int reverseOrder)
       }
     }
     break;
-  case ANA_STRING:
+  case LUX_STRING:
     n = symbol_memory(iq);
     if (reverseOrder)
-      endian(&n, sizeof(Int), ANA_LONG);
+      endian(&n, sizeof(Int), LUX_LONG);
     allocate(p.s, n, char);
     string_value(iq) = p.s;
     if (!fread(p.b, n, 1, fp))
       return 1;
     break;
-  case ANA_FILEMAP:
+  case LUX_FILEMAP:
     n = symbol_memory(iq);
     if (reverseOrder)
-      endian(&n, sizeof(Int), ANA_LONG);
+      endian(&n, sizeof(Int), LUX_LONG);
     allocate(p.s, n, char);
     file_map_header(iq) = (array *) p.s;
     if (!fread(p.b, n, 1, fp))
       return 1;
     n = file_map_num_dims(iq);
-    endian(file_map_dims(iq), n*sizeof(Int), ANA_LONG);
-    endian(&file_map_offset(iq), sizeof(Int), ANA_LONG);
+    endian(file_map_dims(iq), n*sizeof(Int), LUX_LONG);
+    endian(&file_map_offset(iq), sizeof(Int), LUX_LONG);
     break;
-  case ANA_CLIST:
+  case LUX_CLIST:
     if (!fread(&n, sizeof(Int), 1, fp))
       return 1;
     if (reverseOrder)
-      endian(&n, sizeof(Int), ANA_LONG);
+      endian(&n, sizeof(Int), LUX_LONG);
     allocate(p.w, n*sizeof(Word), Word);
     clist_symbols(iq) = p.w;
     for (j = 0; j < n; j++) {
@@ -4201,8 +4201,8 @@ Int arestore(Int narg, Int ps[], Int flag)
   FILE	*fp;
   
   iq = ps[narg - 1];		/* file name */
-  if (symbol_class(iq) != ANA_STRING) /* filename is not a string */
-    return flag? cerror(NEED_STR, iq): ANA_ZERO;
+  if (symbol_class(iq) != LUX_STRING) /* filename is not a string */
+    return flag? cerror(NEED_STR, iq): LUX_ZERO;
   file = string_arg(iq);
   --narg;
   fp = openPathFile(file, 0);
@@ -4211,53 +4211,53 @@ Int arestore(Int narg, Int ps[], Int flag)
       perror("System message:");
       return cerror(ERR_OPEN, iq);
     } else
-      return ANA_ZERO;
+      return LUX_ZERO;
   }
   if (!fread(intro, 2*sizeof(Int), 1, fp)) /* some error */
-    return flag? cerror(READ_ERR, 0): ANA_ZERO;
+    return flag? cerror(READ_ERR, 0): LUX_ZERO;
   if (intro[0] == 0x6666aaaa)	/* native Byte order */
     reverseOrder = 0;
   else if (intro[0] == 0xaaaa6666) /* reversed Byte order */
     reverseOrder = 1;
   else {			/* wrong magic number */
     fclose(fp);
-    return flag? anaerror("Not ASTORE file format", iq): ANA_ZERO;
+    return flag? luxerror("Not ASTORE file format", iq): LUX_ZERO;
   }
   nvalue = intro[1];		/* number of variables in the file */
   if (reverseOrder)
-    endian((Byte *) &nvalue, sizeof(Int), ANA_LONG);
+    endian((Byte *) &nvalue, sizeof(Int), LUX_LONG);
   if (narg && narg < nvalue)
     nvalue = narg;		/* the number of variables to restore */
   if (narg)			/* all arguments must be named variables */
     for (i = 0; i < nvalue; i++)
       if (ps[i] >= NAMED_END) {	/* not a named variable */
 	fclose(fp);
-	return flag? anaerror("Need a named variable", ps[i]): ANA_ZERO;
+	return flag? luxerror("Need a named variable", ps[i]): LUX_ZERO;
       }
   for (i = 0; i < nvalue; i++) {
     if (!fread(&n, sizeof(Int), 1, fp))  /* size of name */
-      return flag? cerror(READ_ERR, 0): ANA_ZERO;
+      return flag? cerror(READ_ERR, 0): LUX_ZERO;
     if (reverseOrder)
-      endian(&n, sizeof(Int), ANA_LONG);
+      endian(&n, sizeof(Int), LUX_LONG);
     if (!narg) {		/* reading all of them: restore original */
 				/* names */
       name = (char *) malloc(n);
       if (!fread(name, n, 1, fp)) { /* reading the name failed */
 	free(name);
-	return flag? cerror(READ_ERR, 0): ANA_ZERO;
+	return flag? cerror(READ_ERR, 0): LUX_ZERO;
       }
       if ((iq = findVarName(name, curContext)) < 0) { /* could not get
 							 variable */
 	fclose(fp);
 	free(name);
-	return flag? ANA_ERROR: ANA_ZERO;
+	return flag? LUX_ERROR: LUX_ZERO;
       }
       free(name);
     } else {			/* assign value to the next argument */
       /* skip the name */
       if (fseek(fp, n, SEEK_CUR)) { /* some file positioning error */
 	fclose(fp);
-	return flag? ANA_ERROR: ANA_ZERO;
+	return flag? LUX_ERROR: LUX_ZERO;
       }
       iq = ps[i];
     }
@@ -4265,23 +4265,23 @@ Int arestore(Int narg, Int ps[], Int flag)
     if (arestore_one(fp, iq, curContext)) {
       switch (errno) {
       case ENOMEM:
-	return flag? cerror(ALLOC_ERR, 0): ANA_ZERO;
+	return flag? cerror(ALLOC_ERR, 0): LUX_ZERO;
       default:
-	return flag? cerror(READ_ERR, 0): ANA_ZERO;
+	return flag? cerror(READ_ERR, 0): LUX_ZERO;
       }
     }
   }
   fclose(fp);
-  return ANA_ONE;
+  return LUX_ONE;
 }
 /*------------------------------------------------------------------------- */
-Int ana_arestore(Int narg, Int ps[])
+Int lux_arestore(Int narg, Int ps[])
 {
   return arestore(narg, ps, 1);
 }
 /*------------------------------------------------------------------------- */
-Int ana_arestore_f(Int narg, Int ps[])
-     /* function form of ana_restore */
+Int lux_arestore_f(Int narg, Int ps[])
+     /* function form of lux_restore */
 {
   return arestore(narg, ps, 0);
 }
@@ -4315,13 +4315,13 @@ Int fileptr(Int narg, Int ps[], char function)
 
   lun = int_arg(*ps++);		/* logical unit */
   if (lun < 0 || lun >= MAXFILES) /* illegal unit number */
-    return function? ANA_ZERO: cerror(ILL_LUN, ps[-1]);
-  if (!ana_file_open[lun])	/* no file open on unit */
-    return function? ANA_ZERO: cerror(LUN_CLOSED, ps[-1]);
-  fp = ana_file[lun];
+    return function? LUX_ZERO: cerror(ILL_LUN, ps[-1]);
+  if (!lux_file_open[lun])	/* no file open on unit */
+    return function? LUX_ZERO: cerror(LUN_CLOSED, ps[-1]);
+  fp = lux_file[lun];
   if (narg == 1 && internalMode == 0) { /* show file pointer */
     if (function) {
-      iq = scalar_scratch(ANA_LONG);
+      iq = scalar_scratch(LUX_LONG);
       scalar_value(iq).l = ftell(fp);
       return iq;
     }
@@ -4338,7 +4338,7 @@ Int fileptr(Int narg, Int ps[], char function)
   switch (internalMode & 7) {
     case 0:			/* none */
       if (offset < -n)
-	return function? ANA_ZERO: anaerror("Illegal file offset value", *ps);
+	return function? LUX_ZERO: luxerror("Illegal file offset value", *ps);
       if (offset >= 0)
 	offset = offset - now;
       else if (offset < 0)
@@ -4346,42 +4346,42 @@ Int fileptr(Int narg, Int ps[], char function)
       break;
     case 1:			/* /START */
       if (offset < 0)
-       return function? ANA_ZERO: anaerror("Illegal file offset value", *ps);
+       return function? LUX_ZERO: luxerror("Illegal file offset value", *ps);
       offset = offset - now;
       break;
     case 2:			/* /EOF */
       if (offset < -n)
-	return function? ANA_ZERO:  anaerror("Illegal file offset value", *ps);
+	return function? LUX_ZERO:  luxerror("Illegal file offset value", *ps);
       offset = n + offset - now;
       break;
     case 4:			/* /ADVANCE */
       if (offset + now < 0)
-	return function? ANA_ZERO: anaerror("Illegal file offset value", *ps);
+	return function? LUX_ZERO: luxerror("Illegal file offset value", *ps);
       break;
     default:
-      return function? ANA_ZERO: cerror(INCMP_KEYWORD, -1);
+      return function? LUX_ZERO: cerror(INCMP_KEYWORD, -1);
   }
   n = fseek(fp, offset, SEEK_CUR);
   if (n) {
     if (function)
-      return ANA_ZERO;
+      return LUX_ZERO;
     perror("System message");
-    return ANA_ERROR;
+    return LUX_ERROR;
   }
-  return function? ANA_ONE: 1;
+  return function? LUX_ONE: 1;
 }
 /*------------------------------------------------------------------------- */
-Int ana_fileptr(Int narg, Int ps[])
+Int lux_fileptr(Int narg, Int ps[])
 {
   return fileptr(narg, ps, (char) 0);
 }
 /*------------------------------------------------------------------------- */
-Int ana_fileptr_f(Int narg, Int ps[])
+Int lux_fileptr_f(Int narg, Int ps[])
 {
   return fileptr(narg, ps, (char) 1);
 }
 /*------------------------------------------------------------------------- */
-Int ana_dump_lun(Int narg, Int ps[])
+Int lux_dump_lun(Int narg, Int ps[])
 /* lists the files associated with all used logical units */
 /* LS 2mar97 */
 /* Headers:
@@ -4391,34 +4391,34 @@ Int ana_dump_lun(Int narg, Int ps[])
   Int	lun, n = 0;
 
   for (lun = 0; lun < MAXFILES; lun++)
-  { if (!ana_file_open[lun])
+  { if (!lux_file_open[lun])
       continue;
     if (!n)
       printf("lun type file\n");
     n++;
-    printf("%3d %4s %s\n", lun, ana_file_open[lun] == 1? "r": "w/u",
-	   ana_file_name[lun]); }
+    printf("%3d %4s %s\n", lun, lux_file_open[lun] == 1? "r": "w/u",
+	   lux_file_name[lun]); }
   if (!n)
     printf("No files open.\n");
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int ana_get_lun(Int narg, Int ps[])
+Int lux_get_lun(Int narg, Int ps[])
 /* returns a free logical unit number */
 {
   Int	i, n;
 
   for (i = 0; i < MAXFILES; i++)
-    if (!ana_file_open[i]) {
-      n = scalar_scratch(ANA_LONG);
+    if (!lux_file_open[i]) {
+      n = scalar_scratch(LUX_LONG);
       scalar_value(n).l = i;
       return n; 
     }
   /* if we get here then there were no free luns */
-  return anaerror("No free LUNs available", 0);
+  return luxerror("No free LUNs available", 0);
 }
 /*------------------------------------------------------------------------- */
-Int ana_chdir(Int narg, Int ps[])
+Int lux_chdir(Int narg, Int ps[])
 /* CHDIR,name changes directory to <name>.  CHDIR shows the current
    directory.  LS 12aug97 */
 /* Headers:
@@ -4429,26 +4429,26 @@ Int ana_chdir(Int narg, Int ps[])
   char	*name;
 
   if (narg) {
-    if (symbol_class(ps[0]) != ANA_STRING)
+    if (symbol_class(ps[0]) != LUX_STRING)
       return cerror(NEED_STR, ps[0]);
     name = expand_name(string_value(ps[0]), NULL);
     if (chdir(name)) {		/* didn't work */
       perror("CHDIR");
-      return ANA_ERROR;
+      return LUX_ERROR;
     }
   }
   if (!narg || internalMode & 1) { /* show current */
     name = getcwd((char *) scrat, NSCRAT);
     if (name == NULL) { /* something went wrong */
       perror("CHDIR");
-      return ANA_ERROR;
+      return LUX_ERROR;
     }
     printf("Current working directory: %s\n", name);
   }
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int ana_filesize(Int narg, Int ps[])
+Int lux_filesize(Int narg, Int ps[])
 /* FILESIZE(file) returns the size (in bytes) of the file, or -1 if the */
 /* file cannot be opened for reading.  LS 10nov97 */
 /* Headers:
@@ -4458,10 +4458,10 @@ Int ana_filesize(Int narg, Int ps[])
   FILE	*fp;
   Int	result;
 
-  if (symbol_class(ps[0]) != ANA_STRING)
+  if (symbol_class(ps[0]) != LUX_STRING)
     return cerror(ILL_CLASS, ps[0]);
   fp = fopen(expand_name(string_arg(ps[0]), NULL), "r");
-  result = scalar_scratch(ANA_LONG);
+  result = scalar_scratch(LUX_LONG);
   if (fp) {
     fseek(fp, 0, SEEK_END);
     scalar_value(result).l = ftell(fp);
@@ -4471,41 +4471,41 @@ Int ana_filesize(Int narg, Int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-Int ana_freads(Int narg, Int ps[])
+Int lux_freads(Int narg, Int ps[])
      /* FREADS,<string>,<format>,<arg1>,... reads arguments from the */
      /* string under guidance of the <format>. */
 {
-  if (symbol_class(ps[0]) != ANA_STRING)
+  if (symbol_class(ps[0]) != LUX_STRING)
     return cerror(ILL_CLASS, ps[0]);
   return read_formatted_ascii(narg - 1, &ps[1], (void *) string_value(ps[0]),
-			      1, ANA_STRING) == ANA_ERROR? ANA_ERROR: ANA_OK;
+			      1, LUX_STRING) == LUX_ERROR? LUX_ERROR: LUX_OK;
 }
 /*------------------------------------------------------------------------- */
-Int ana_freads_f(Int narg, Int ps[])
+Int lux_freads_f(Int narg, Int ps[])
      /* FREADS(<string>,<format>,<arg1>,...) reads arguments from the */
      /* string under guidance of the <format>.  Returns 0 if an error occurred,
 	1 otherwise.  LS 25jan99 */
 {
   Int	result, iq;
 
-  if (symbol_class(ps[0]) != ANA_STRING)
-    return ANA_ZERO;
+  if (symbol_class(ps[0]) != LUX_STRING)
+    return LUX_ZERO;
   result = read_formatted_ascii(narg - 1, &ps[1], (void *) string_value(ps[0]),
-				0, ANA_STRING);
+				0, LUX_STRING);
   switch (result) {
-    case ANA_ERROR: case 0:
-      return ANA_ZERO;
+    case LUX_ERROR: case 0:
+      return LUX_ZERO;
     case 1:
-      return ANA_ONE;
+      return LUX_ONE;
     default:
-      iq = scalar_scratch(ANA_LONG);
+      iq = scalar_scratch(LUX_LONG);
       scalar_value(iq).l = result;
       break;
   }
   return iq;
 }
 /*------------------------------------------------------------------------- */
-Int ana_file_to_fz(Int narg, Int ps[])
+Int lux_file_to_fz(Int narg, Int ps[])
 /* FILETOFZ,file,type,dims  transforms a regular file with unformatted */
 /* data to an uncompressed FZ file with the indicated type and dimensions, */
 /* but only if the size of the file is approriate for the specified */
@@ -4521,19 +4521,19 @@ Int ana_file_to_fz(Int narg, Int ps[])
   FILE	*fp;
   fzHead	*fh;
 
-  if (symbol_class(ps[0]) != ANA_STRING)
+  if (symbol_class(ps[0]) != LUX_STRING)
     return cerror(NEED_STR, ps[0]);
   type = int_arg(ps[1]);
-  if (type < ANA_BYTE || type > ANA_DOUBLE)
+  if (type < LUX_BYTE || type > LUX_DOUBLE)
     return cerror(ILL_TYPE, ps[1]);
   switch (symbol_class(ps[2])) {
-    case ANA_ARRAY:
-      n = ana_long(1, &ps[2]);
+    case LUX_ARRAY:
+      n = lux_long(1, &ps[2]);
       nd = array_size(n);
       dims = array_data(n);
       break;
-    case ANA_SCALAR:
-      n = ana_long(1, &ps[2]);
+    case LUX_SCALAR:
+      n = lux_long(1, &ps[2]);
       nd = 1;
       dims = &scalar_value(n).l;
       break;
@@ -4551,11 +4551,11 @@ Int ana_file_to_fz(Int narg, Int ps[])
   fseek(fp, 0, SEEK_SET);
   n -= 512;			/* minus header length */
   
-  m = ana_type_size[type];	/* get desired size */
+  m = lux_type_size[type];	/* get desired size */
   for (i = 0; i < nd; i++)
     m *= dims[i];
   if (n < m)
-    return anaerror("File too small for desired type and dimensions", 0);
+    return luxerror("File too small for desired type and dimensions", 0);
 
   fh = (fzHead *) scrat;
   zerobytes(fh, 512);		/*zero it first */
@@ -4567,7 +4567,7 @@ Int ana_file_to_fz(Int narg, Int ps[])
   fh->ndim = nd;
   memcpy(fh->dim, dims, nd*sizeof(Int));
   if (MSBfirst)
-    endian(fh->dim, fh->ndim*sizeof(Int), ANA_LONG);
+    endian(fh->dim, fh->ndim*sizeof(Int), LUX_LONG);
   j = fwrite(fh, 1, 512 * fh->nhb, fp); /*write header */
   fclose(fp);
   if (j != 512 * fh->nhb) {
@@ -4662,7 +4662,7 @@ char *file_find(char *sdir, char *fname)
   return NULL;
 }
 /*------------------------------------------------------------------------- */
-Int ana_findfile(Int narg, Int ps[])
+Int lux_findfile(Int narg, Int ps[])
 /* find a file given a starting path */
 /* Headers:
    <string.h>: strlen(), strchr(), printf(), NULL, strcpy()
@@ -4695,8 +4695,8 @@ Int ana_findfile(Int narg, Int ps[])
   pq = file_find(startpath, fname);
   /* pq will have the entire path+name if it was found */
   if (pq == NULL)
-    return ANA_ZERO;		/* return symbol for 0 */
-  /* NOTE: LHS changed "return 0" to "return ANA_ZERO" above because 0 should
+    return LUX_ZERO;		/* return symbol for 0 */
+  /* NOTE: LHS changed "return 0" to "return LUX_ZERO" above because 0 should
      not be used as a return value in LHS LUX. */
   ns = strlen(pq);
   result_sym = string_scratch(ns);
@@ -4716,7 +4716,7 @@ static regex_t	re;
 #ifndef REG_BASIC
 #define REG_BASIC	0
 #endif
-Int ana_getmatchedfiles(Int narg, Int ps[])/* get all file names that match */
+Int lux_getmatchedfiles(Int narg, Int ps[])/* get all file names that match */
  /* call is:  strings = getmatchedfiles( expr, path, [maxfiles] ) */
  /* uses regular expression matches, not the more familiar shell wildcarding,
  this is more general but not as intuitive, it uses the Unix routines
@@ -4730,7 +4730,7 @@ Int ana_getmatchedfiles(Int narg, Int ps[])/* get all file names that match */
 {
   Int	result_sym;
   char	*s;
-  Int	ana_getfiles_m(Int, Int [], Int);
+  Int	lux_getfiles_m(Int, Int [], Int);
 
   /* the first arg is the regular expression string */
   if (!symbolIsString(ps[0]))
@@ -4740,22 +4740,22 @@ Int ana_getmatchedfiles(Int narg, Int ps[])/* get all file names that match */
   if (regcomp(&re, s, REG_BASIC | REG_NOSUB)) {
     printf("GETMATCHEDFILES - error in regular expression: %s\n", s);
     regfree(&re);
-    return ANA_ERROR;
+    return LUX_ERROR;
   }
-  result_sym = ana_getfiles_m(narg - 1, &ps[1], 1);
+  result_sym = lux_getfiles_m(narg - 1, &ps[1], 1);
   regfree(&re);
   return result_sym;
 }
 #endif
  /*------------------------------------------------------------------------- */
 #if HAVE_REGEX_H
-Int ana_getmatchedfiles_r(Int narg, Int ps[])	/* also search subdir */
+Int lux_getmatchedfiles_r(Int narg, Int ps[])	/* also search subdir */
  /* call is:  strings = getmatchedfiles_r( expr, path, [maxfiles] ) */
 {
   Int	result_sym;
 
   recursive_flag = 1;
-  result_sym = ana_getmatchedfiles(narg, ps);
+  result_sym = lux_getmatchedfiles(narg, ps);
   recursive_flag = 0;
   return result_sym;
 }
@@ -4825,7 +4825,7 @@ Int file_get(char *startpath, int match_flag)
 	/* and call ourselves for the next level */
 	if (file_get(sq, match_flag) != 1) {
 	  closedir(dirp);
-	  return ANA_ERROR;
+	  return LUX_ERROR;
 	}
       } else if (matches && (statbuf.st_mode & S_IFMT) == S_IFREG) {
 	nfiles++;
@@ -4911,24 +4911,24 @@ Int directs_get(char *startpath)
 }
  /*------------------------------------------------------------------------- */
 #if HAVE_REGEX_H
-/* ana_getfiles_r() calls ana_getfiles() which calls file_get() which uses */
+/* lux_getfiles_r() calls lux_getfiles() which calls file_get() which uses */
 /* <regex.h> */
-Int ana_getfiles_r(Int narg, Int ps[])	/* also search subdir */
+Int lux_getfiles_r(Int narg, Int ps[])	/* also search subdir */
  /* call is:  strings = getfiles_r( path, [maxfiles] ) */
 {
   Int	result_sym;
-  Int	ana_getfiles(Int, Int []);
+  Int	lux_getfiles(Int, Int []);
 
   recursive_flag = 1;
-  result_sym = ana_getfiles(narg, ps);
+  result_sym = lux_getfiles(narg, ps);
   recursive_flag = 0;
   return result_sym;
 }
 #endif
 /*------------------------------------------------------------------------- */
 #if HAVE_REGEX_H
-/* ana_getfiles() calls file_get() which uses <regex.h> */
-Int ana_getfiles_m(Int narg, Int ps[], Int match_flag)
+/* lux_getfiles() calls file_get() which uses <regex.h> */
+Int lux_getfiles_m(Int narg, Int ps[], Int match_flag)
 /* get all file names in directory */
 /* call is:  strings = getfiles( path, [maxfiles] ) */
 /* Headers:
@@ -4948,7 +4948,7 @@ Int ana_getfiles_m(Int narg, Int ps[], Int match_flag)
   /* the second optional arg. is the max # of files to find */
   max = 100;
   if (narg > 1 && int_arg_stat(ps[1], &max) != 1)
-    return ANA_ERROR;
+    return LUX_ERROR;
   /* get space to store pointers to copies of names, use SCRAT if big enough */
   mq = max * sizeof (char *);
  /* printf("mq = %d, NSCRAT * sizeof(Int) = %d\n", mq, NSCRAT * sizeof(Int));*/
@@ -4958,7 +4958,7 @@ Int ana_getfiles_m(Int narg, Int ps[], Int match_flag)
     malloc_flag = 1;
     printf("too big for SCRAT\n");
     if ((names = (char **) malloc(mq)) == NULL)
-      return anaerror("GETFILES - malloc failure for names array pointer, max = %d\n", max);
+      return luxerror("GETFILES - malloc failure for names array pointer, max = %d\n", max);
   }
 
   p = names;
@@ -4974,10 +4974,10 @@ Int ana_getfiles_m(Int narg, Int ps[], Int match_flag)
     /* printf("nfiles = %d\n", nfiles); */
     if (nfiles <= 0) {
       printf("GETFILES - no files found\n");
-      return ANA_ZERO;		/* changed 0 to ANA_ZERO, LS 21jan99 */
+      return LUX_ZERO;		/* changed 0 to LUX_ZERO, LS 21jan99 */
     }
     *dim = nfiles;
-    result_sym = array_scratch(ANA_STRING_ARRAY, 1, dim);
+    result_sym = array_scratch(LUX_STRING_ARRAY, 1, dim);
     p = array_data(result_sym);
     while (nfiles--)
       *p++ = *names++;
@@ -4989,26 +4989,26 @@ Int ana_getfiles_m(Int narg, Int ps[], Int match_flag)
   return result_sym;
 }
  /*------------------------------------------------------------------------- */
-Int ana_getfiles(Int narg, Int ps[], Int match_flag)
+Int lux_getfiles(Int narg, Int ps[], Int match_flag)
 {
-  return ana_getfiles_m(narg, ps, 0:
+  return lux_getfiles_m(narg, ps, 0:
 }
 #endif
  /*------------------------------------------------------------------------- */
 #if HAVE_REGEX_H
-/* ana_getdirectories() calls ana_getfiles() which calls file_get() which */
+/* lux_getdirectories() calls lux_getfiles() which calls file_get() which */
 /* uses <regex.h> */
-Int ana_getdirectories(Int narg, Int ps[], int match_flag)
+Int lux_getdirectories(Int narg, Int ps[], int match_flag)
 /* get all subdirectories in directory */
 /* call is:  strings = getdirectories( path, [maxfiles] ) */
 {
   /* very similar to getfiles, just set a flag here */
   get_type_flag = 1;
-  return ana_getfiles(narg, ps);
+  return lux_getfiles(narg, ps);
 }
 #endif
 /*------------------------------------------------------------------------- */
-Int ana_identify_file(Int narg, Int ps[])
+Int lux_identify_file(Int narg, Int ps[])
 /* tries to identify the type of a file based on the values of its
  first four bytes (its "magic number") LS 21sep98 */
 /* Headers:
@@ -5028,7 +5028,7 @@ Int ana_identify_file(Int narg, Int ps[])
     return cerror(ERR_OPEN, ps[0]);
   fread(buf, 1, 4, fp);
   if (ferror(fp) || feof(fp))
-    return anaerror("Could not read 4 bytes from file %s\n", ps[0], expname);
+    return luxerror("Could not read 4 bytes from file %s\n", ps[0], expname);
 
   type = 0;
   switch (buf[0]) {
@@ -5109,14 +5109,14 @@ Int ana_identify_file(Int narg, Int ps[])
   fclose(fp);
 
   if (type) {
-    result = scalar_scratch(ANA_LONG);
+    result = scalar_scratch(LUX_LONG);
     scalar_value(result).l = type;
     return result;
   }
   
   printf("File %s has an unknown file type\n", expname);
   printf("Magic numbers: %d-%d-%d-%d\n", buf[0], buf[1], buf[2], buf[3]);
-  return ANA_ZERO;
+  return LUX_ZERO;
 }
 /*------------------------------------------------------------------------- */
 void printw(char *string)
@@ -5265,7 +5265,7 @@ void printfw(char *format, ...)
   va_end(ap);
 }
 /*------------------------------------------------------------------------- */
-Int ana_hex(Int narg, Int ps[])
+Int lux_hex(Int narg, Int ps[])
 /* a temporary routine that types arg in hex notation, until we have
    a fully formatted print */
 /* Headers:
@@ -5282,10 +5282,10 @@ Int ana_hex(Int narg, Int ps[])
   fp = stdout;
   for (i=0;i<narg;i++) {
     iq = ps[i];
-    if (iq <=0 ) return ANA_ERROR;
+    if (iq <=0 ) return LUX_ERROR;
     switch (sym[iq].class)	{		
-      case ANA_UNDEFINED: return cerror(ILL_CLASS, iq);
-      case ANA_SCALAR:		/*scalar case */
+      case LUX_UNDEFINED: return cerror(ILL_CLASS, iq);
+      case LUX_SCALAR:		/*scalar case */
 	switch (sym[iq].type) {
 	  case 0: fprintf(fp, "      %#4x",sym[iq].spec.scalar.b); break;
 	  case 1: fprintf(fp, "    %#6x",sym[iq].spec.scalar.w); break;
@@ -5293,7 +5293,7 @@ Int ana_hex(Int narg, Int ps[])
 	  case 3: fprintf(fp, "%#10x",sym[iq].spec.scalar.f); break;
 	  case 4: fprintf(fp, "%#20x",sym[iq].spec.scalar.d); break;
 	} flag=1; break;			/*end of scalar case */
-      case ANA_SCAL_PTR:	/*scalar ptr case */
+      case LUX_SCAL_PTR:	/*scalar ptr case */
 	switch (sym[iq].type) {
 	  case 0: fprintf(fp, "      %#4x",*(Byte *)sym[iq].spec.array.ptr); break;
 	  case 1: fprintf(fp, "    %#6x",*(short *)sym[iq].spec.array.ptr); break;
@@ -5301,11 +5301,11 @@ Int ana_hex(Int narg, Int ps[])
 	  case 3: fprintf(fp, "%#10x",*(Float *)sym[iq].spec.array.ptr); break;
 	  case 4: fprintf(fp, "%#20x",*(Double *)sym[iq].spec.array.ptr); break;
 	} flag=1; break;			/*end of scalar case */
-      case ANA_STRING:		/*string */
+      case LUX_STRING:		/*string */
 	ptr = (char *) sym[iq].spec.array.ptr;
 	if ( sym[iq].spec.array.bstore < 3) fprintf(fp, "%.1s",ptr); else
 	  fprintf(fp, "%s",ptr); flag=1; break;
-      case ANA_ARRAY:		/*array case */
+      case LUX_ARRAY:		/*array case */
     nelem = array_size(iq);
     ptr = array_data(iq);
     jq = sym[iq].type;
@@ -5327,7 +5327,7 @@ Int ana_hex(Int narg, Int ps[])
   }						/*end of loop over args */
   if (flag) fprintf(fp, "\n");
   return 1;
-}							/*end of ana_type */
+}							/*end of lux_type */
 /*------------------------------------------------------------------------- */
 #define	HEAD_LIMIT	100
 Int fits_problems(Int i)
@@ -5403,7 +5403,7 @@ Int fits_fatality(FILE *fin)
   if (fits_head_malloc_flag)
     free(fitshead);
   fclose(fin);
-  return ANA_ZERO;	/* this is the zero symbol */
+  return LUX_ZERO;	/* this is the zero symbol */
 }
 /*------------------------------------------------------------------------- */
 void apply_bscale_bzero_blank(Byte *ptr, Int nelem, Float bscale, Float bzero,
@@ -5416,28 +5416,28 @@ void apply_bscale_bzero_blank(Byte *ptr, Int nelem, Float bscale, Float bzero,
     /* we must adjust the values for BSCALE, BZERO, and BLANK */
     if (!bscale)
       bscale = 1.0;
-    q.b = ptr + ana_type_size[type]*(nelem - 1); /* final data */
-    p.b = ptr + ana_type_size[type0]*(nelem - 1); /* raw data */
+    q.b = ptr + lux_type_size[type]*(nelem - 1); /* final data */
+    p.b = ptr + lux_type_size[type0]*(nelem - 1); /* raw data */
     /* we must start at the end so that we don't overwrite data that */
     /* we still need */
     switch (type) {
-      case ANA_BYTE:
+      case LUX_BYTE:
 	switch (type0) {
-	  case ANA_BYTE:
+	  case LUX_BYTE:
 	    while (nelem--) {
 	      *q.b = (*p.b == blank)? targetblank: *p.b * bscale + bzero;
 	      q.b--;
 	      p.b--;
 	    }
 	    break;
-	  case ANA_WORD:
+	  case LUX_WORD:
 	    while (nelem--) {
 	      *q.b = (*p.w == blank)? targetblank: *p.w * bscale + bzero;
 	      q.b--;
 	      p.w--;
 	    }
 	    break;
-	  case ANA_LONG:
+	  case LUX_LONG:
 	    while (nelem--) {
 	      *q.b = (*p.l == blank)? targetblank: *p.l * bscale + bzero;
 	      q.b--;
@@ -5446,23 +5446,23 @@ void apply_bscale_bzero_blank(Byte *ptr, Int nelem, Float bscale, Float bzero,
 	    break;
 	}
 	break;
-      case ANA_WORD:
+      case LUX_WORD:
 	switch (type0) {
-	  case ANA_BYTE:
+	  case LUX_BYTE:
 	    while (nelem--) {
 	      *q.w = (*p.b == blank)? targetblank: *p.b * bscale + bzero;
 	      q.w--;
 	      p.b--;
 	    }
 	    break;
-	  case ANA_WORD:
+	  case LUX_WORD:
 	    while (nelem--) {
 	      *q.w = (*p.w == blank)? targetblank: *p.w * bscale + bzero;
 	      q.w--;
 	      p.w--;
 	    }
 	    break;
-	  case ANA_LONG:
+	  case LUX_LONG:
 	    while (nelem--) {
 	      *q.w = (*p.l == blank)? targetblank: *p.l * bscale + bzero;
 	      q.w--;
@@ -5471,23 +5471,23 @@ void apply_bscale_bzero_blank(Byte *ptr, Int nelem, Float bscale, Float bzero,
 	    break;
 	}
 	break;
-      case ANA_LONG:
+      case LUX_LONG:
 	switch (type0) {
-	  case ANA_BYTE:
+	  case LUX_BYTE:
 	    while (nelem--) {
 	      *q.l = (*p.b == blank)? targetblank: *p.b * bscale + bzero;
 	      q.l--;
 	      p.b--;
 	    }
 	    break;
-	  case ANA_WORD:
+	  case LUX_WORD:
 	    while (nelem--) {
 	      *q.l = (*p.w == blank)? targetblank: *p.w * bscale + bzero;
 	      q.l--;
 	      p.w--;
 	    }
 	    break;
-	  case ANA_LONG:
+	  case LUX_LONG:
 	    while (nelem--) {
 	      *q.l = (*p.l == blank)? targetblank: *p.l * bscale + bzero;
 	      q.l--;
@@ -5496,30 +5496,30 @@ void apply_bscale_bzero_blank(Byte *ptr, Int nelem, Float bscale, Float bzero,
 	    break;
 	}
 	break;
-      case ANA_FLOAT:
+      case LUX_FLOAT:
 	switch (type0) {
-	  case ANA_BYTE:
+	  case LUX_BYTE:
 	    while (nelem--) {
 	      *q.f = (*p.b == blank)? targetblank: *p.b * bscale + bzero;
 	      q.f--;
 	      p.b--;
 	    }
 	    break;
-	  case ANA_WORD:
+	  case LUX_WORD:
 	    while (nelem--) {
 	      *q.f = (*p.w == blank)? targetblank: *p.w * bscale + bzero;
 	      q.f--;
 	      p.w--;
 	    }
 	    break;
-	  case ANA_LONG:
+	  case LUX_LONG:
 	    while (nelem--) {
 	      *q.f = (*p.l == blank)? targetblank: *p.l * bscale + bzero;
 	      q.f--;
 	      p.l--;
 	    }
 	    break;
-	  case ANA_FLOAT:
+	  case LUX_FLOAT:
 	    while (nelem--) {
 	      *q.f = *p.f * bscale + bzero;
 	      q.f--;
@@ -5528,7 +5528,7 @@ void apply_bscale_bzero_blank(Byte *ptr, Int nelem, Float bscale, Float bzero,
 	    break;
 	}
 	break;
-      case ANA_DOUBLE:
+      case LUX_DOUBLE:
 	while (nelem--) {
 	  *q.d = *p.d * bscale + bzero;
 	  q.d--;
@@ -5540,7 +5540,7 @@ void apply_bscale_bzero_blank(Byte *ptr, Int nelem, Float bscale, Float bzero,
 }
 /*------------------------------------------------------------------------- */
 Int fits_read(Int, Int, Int, Int, Int, Int, Int, Int, Float);
-Int ana_fits_read_general(Int narg, Int ps[], Int func)/* read fits files */
+Int lux_fits_read_general(Int narg, Int ps[], Int func)/* read fits files */
  /* status = fits_read(x, name, [h], [x2], [h2], [extvar_preamble]) */
 {
   Int	hsym = 0, mode, xhsym=0, xdsym =0;
@@ -5567,34 +5567,34 @@ Int ana_fits_read_general(Int narg, Int ps[], Int func)/* read fits files */
   if (narg >= 6) {
     mode = mode + 64; 
     if (!symbolIsStringScalar(ps[5]))
-      return func? ANA_ZERO: cerror(NEED_STR, ps[5]);
+      return func? LUX_ZERO: cerror(NEED_STR, ps[5]);
     preamble = string_value(ps[5]);
   }
   if (narg >= 7)
     targetblank = float_arg(ps[6]);
   mode = fits_read(mode, ps[0], ps[1], hsym, 0, 0, xhsym, xdsym, targetblank);
   if (func)
-    return (mode == ANA_ERROR)? ANA_ZERO: ANA_ONE;
+    return (mode == LUX_ERROR)? LUX_ZERO: LUX_ONE;
   else
     return mode;
 }
 /*------------------------------------------------------------------------- */
-Int ana_fits_read(Int narg, Int ps[])
+Int lux_fits_read(Int narg, Int ps[])
 {
-  return ana_fits_read_general(narg, ps, 0);
+  return lux_fits_read_general(narg, ps, 0);
 }
 /*------------------------------------------------------------------------- */
-Int ana_fits_read_f(Int narg, Int ps[])
+Int lux_fits_read_f(Int narg, Int ps[])
 {
-  return ana_fits_read_general(narg, ps, 1);
+  return lux_fits_read_general(narg, ps, 1);
 }
 /*------------------------------------------------------------------------- */
-Int ana_fits_header_f(Int narg, Int ps[])/* read fits header */
+Int lux_fits_header_f(Int narg, Int ps[])/* read fits header */
 /* status = fits_header(name, [h], [h2], [extvar_preamble]) */
 {
   Int	hsym = 0, mode, xhsym = 0;
  /* uses fits_read, mode depends on arguments */
- /* mode mask described in ana_fits_read */
+ /* mode mask described in lux_fits_read */
 
   mode = 0;
   if (narg >= 2) {
@@ -5614,13 +5614,13 @@ Int ana_fits_header_f(Int narg, Int ps[])/* read fits header */
   return fits_read(mode, 0, ps[0], hsym, 0, 0, xhsym, 0, 0);
 }
 /*------------------------------------------------------------------------- */
-Int ana_fits_xread_f(Int narg, Int ps[])/* read fits extension and headers */
+Int lux_fits_xread_f(Int narg, Int ps[])/* read fits extension and headers */
  /* status = fits_xread(x2, name, [h], [h2], [offset], [extvar_preamble]) */
 {
  Int	hsym = 0, mode, xhsym = 0, offsetsym = 0;
 
  /* uses fits_read, mode depends on arguments */
- /* mode mask described in ana_fits_read */
+ /* mode mask described in lux_fits_read */
  mode = 32;
  if (narg >= 3) {
    mode = mode + 1;
@@ -5714,19 +5714,19 @@ Int fits_read_compressed(Int mode, Int datasym, FILE *fp, Int headersym,
   
   switch (type) {
     case 8:
-      type = ANA_BYTE;
+      type = LUX_BYTE;
       break;
     case 16:
-      type = ANA_WORD;
+      type = LUX_WORD;
       break;
     case 32:
-      type = ANA_LONG;
+      type = LUX_LONG;
       break;
     case -32:
-      type = ANA_FLOAT;
+      type = LUX_FLOAT;
       break;
     case -64:
-      type = ANA_DOUBLE;
+      type = LUX_DOUBLE;
       break;
     default:
       return 0;
@@ -5761,7 +5761,7 @@ Int fits_read_compressed(Int mode, Int datasym, FILE *fp, Int headersym,
 
   } else {			/* don't uncompress */
     dims[0] = ncbytes;
-    type = ANA_BYTE;
+    type = LUX_BYTE;
     ndim = 1;
   }
 
@@ -5818,7 +5818,7 @@ Int fits_read_compressed(Int mode, Int datasym, FILE *fp, Int headersym,
   /* we found the end of the FITS header. */
   if (mode & 1) {		/* want the header */
     nx = i;			/* number of lines */
-    if (redef_array(headersym, ANA_STRING_ARRAY, 1, &nx) != ANA_OK)
+    if (redef_array(headersym, LUX_STRING_ARRAY, 1, &nx) != LUX_OK)
       return 0;
     p.sp = array_data(headersym);
     curblock = block;
@@ -5838,7 +5838,7 @@ Int fits_read_compressed(Int mode, Int datasym, FILE *fp, Int headersym,
       /* If the data in the file (before application of BSCALE and BZERO */
       /* but after decompression) are of an integer type but BSCALE or */
       /* BZERO are not integer values, then the final result will be */
-      /* ANA_FLOAT.  If BSCALE and BZERO are integers, then the final result */
+      /* LUX_FLOAT.  If BSCALE and BZERO are integers, then the final result */
       /* will be an integer of a sufficiently large type that any possible */
       /* value from the file, corrected for BZERO and BSCALE, can fit in it. */
       if (!(internalMode & 2)
@@ -5847,37 +5847,37 @@ Int fits_read_compressed(Int mode, Int datasym, FILE *fp, Int headersym,
 	  if ((bscale && bscale != (Int) bscale)
 	      || (bzero != (Int) bzero))
 	    /* we must upgrade the data type from integer to Float */
-	    type = ANA_FLOAT;
+	    type = LUX_FLOAT;
 	  else {
 	    if (!bscale)
 	      bscale = 1.0;
 	    switch (type) {
-	      case ANA_BYTE:
+	      case LUX_BYTE:
 		min = bzero;
 		max = 255*bscale + bzero;
 		break;
-	      case ANA_WORD:
+	      case LUX_WORD:
 		min = INT16_MIN*bscale + bzero;
 		max = INT16_MAX*bscale + bzero;
 		break;
-	      case ANA_LONG:
+	      case LUX_LONG:
 		min = INT32_MIN*bscale + bzero;
 		max = INT32_MAX*bscale + bzero;
 		break;
 	    }
 	    if (min >= 0 && max <= 255)
-	      type = ANA_BYTE;
+	      type = LUX_BYTE;
 	    else if (min >= INT16_MIN && max <= INT16_MAX)
-	      type = ANA_WORD;
+	      type = LUX_WORD;
 	    else if (min >= INT32_MIN && max <= INT32_MAX)
-	      type = ANA_LONG;
+	      type = LUX_LONG;
 	    else
-	      type = ANA_FLOAT;
+	      type = LUX_FLOAT;
 	  }
 	}
       }
     }
-    if (redef_array(datasym, type, ndim, dims) != ANA_OK)
+    if (redef_array(datasym, type, ndim, dims) != LUX_OK)
       return 0;
     if (internalMode & 1) {	/* want to decompress */
       if (scratSize() >= ncbytes) {
@@ -5913,17 +5913,17 @@ Int fits_read_compressed(Int mode, Int datasym, FILE *fp, Int headersym,
       swapl(&ny, 1);
 #endif
       switch (type0) {
-	case ANA_BYTE:
+	case LUX_BYTE:
 	  ok = runlength?
 	    anadecrunchrun8(p.b, array_data(datasym), slice, nx, ny):
 	      anadecrunch8(p.b, array_data(datasym), slice, nx, ny);
 	  break;
-	case ANA_WORD:
+	case LUX_WORD:
 	  ok = runlength?
 	    anadecrunchrun(p.b, array_data(datasym), slice, nx, ny):
 	      anadecrunch(p.b, array_data(datasym), slice, nx, ny);
 	  break;
-	case ANA_LONG:
+	case LUX_LONG:
 #if SIZEOF_LONG_LONG_INT == 8	/* 64-bit integers */
 	  if (runlength) {
 	    if (!usescrat)
@@ -5958,7 +5958,7 @@ Int fits_read_compressed(Int mode, Int datasym, FILE *fp, Int headersym,
   return ok;
 }
 /*------------------------------------------------------------------------- */
-Int	ana_replace(Int, Int), swapb(char [], Int);
+Int	lux_replace(Int, Int), swapb(char [], Int);
 void	swapd(char [], Int);
 Int fits_read(Int mode, Int dsym, Int namsym, Int hsym, Int offsetsym,
 	      Int xoffsetsym, Int xhsym, Int xdsym, Float targetblank)
@@ -5996,7 +5996,7 @@ Int fits_read(Int mode, Int dsym, Int namsym, Int hsym, Int offsetsym,
   
   /* first arg is the variable to load, second is name of file */
   if ((fin = fopenr_sym(namsym)) == NULL)
-    return ANA_ZERO;
+    return LUX_ZERO;
   /* use scrat to read in header block of 2880 bytes, we implicitly assume
      scrat is large enough for at least one, beyond that we check */
   fitshead = curScrat;		/* changed to curScrat - LS 19may99 */
@@ -6136,7 +6136,7 @@ Int fits_read(Int mode, Int dsym, Int namsym, Int hsym, Int offsetsym,
   data_offset = nhblks * 2880;
   /*for (i=0;i<maxdim;i++) printf("dim%d = %d\n", i, dim[i]); */
   /* compute size of data array */
-  nbsize = ana_type_size[type];
+  nbsize = lux_type_size[type];
   for (i=0;i<maxdim;i++) nbsize = nbsize*dim[i];
   /* printf("nbsize = %d\n", nbsize);*/
   /* if an extension, figure out where */
@@ -6161,7 +6161,7 @@ Int fits_read(Int mode, Int dsym, Int namsym, Int hsym, Int offsetsym,
   if (mode & 0x1) {
     lc--;			/* exclude the END record.  LS 14apr00 */
     /* generate an lux string array for the header */
-    if (to_scratch_array(hsym, ANA_STRING_ARRAY, 1, &lc) == ANA_ERROR) {
+    if (to_scratch_array(hsym, LUX_STRING_ARRAY, 1, &lc) == LUX_ERROR) {
       fits_problems(9);
       return fits_fatality(fin);
     }
@@ -6191,7 +6191,7 @@ Int fits_read(Int mode, Int dsym, Int namsym, Int hsym, Int offsetsym,
       /* If the data in the file (before application of BSCALE and BZERO */
       /* but after decompression) are of an integer type but BSCALE or */
       /* BZERO are not integer values, then the final result will be */
-      /* ANA_FLOAT.  If BSCALE and BZERO are integers, then the final result */
+      /* LUX_FLOAT.  If BSCALE and BZERO are integers, then the final result */
       /* will be an integer of a sufficiently large type that any possible */
       /* value from the file, corrected for BZERO and BSCALE, can fit in it. */
       /* LS 28jan00 */
@@ -6201,32 +6201,32 @@ Int fits_read(Int mode, Int dsym, Int namsym, Int hsym, Int offsetsym,
 	if ((bscale && bscale != (Int) bscale)
 	    || (bzero != (Int) bzero))
 	  /* we must upgrade the data type from integer to Float */
-	  type = ANA_FLOAT;
+	  type = LUX_FLOAT;
 	else {
 	  if (!bscale)
 	    bscale = 1.0;
 	  switch (type) {
-	    case ANA_BYTE:
+	    case LUX_BYTE:
 	      min = bzero;
 	      max = 255*bscale + bzero;
 	      break;
-	    case ANA_WORD:
+	    case LUX_WORD:
 	      min = INT16_MIN*bscale + bzero;
 	      max = INT16_MAX*bscale + bzero;
 	      break;
-	    case ANA_LONG:
+	    case LUX_LONG:
 	      min = INT32_MIN*bscale + bzero;
 	      max = INT32_MAX*bscale + bzero;
 	      break;
 	  }
 	  if (min >= 0 && max <= 255)
-	    type = ANA_BYTE;
+	    type = LUX_BYTE;
 	  else if (min >= INT16_MIN && max <= INT16_MAX)
-	    type = ANA_WORD;
+	    type = LUX_WORD;
 	  else if (min >= INT32_MIN && max <= INT32_MAX)
-	    type = ANA_LONG;
+	    type = LUX_LONG;
 	  else
-	  type = ANA_FLOAT;
+	  type = LUX_FLOAT;
 	}
       } 
     }
@@ -6249,12 +6249,12 @@ Int fits_read(Int mode, Int dsym, Int namsym, Int hsym, Int offsetsym,
     }
     /* now correct for BZERO, BSCALE, BLANK */
     if (!(internalMode & 2) && (bscale || bzero))
-      apply_bscale_bzero_blank((Byte *) q, nbsize/ana_type_size[type0], bscale, bzero,
+      apply_bscale_bzero_blank((Byte *) q, nbsize/lux_type_size[type0], bscale, bzero,
 			       blank, targetblank, type0, type);
-    /* ana_replace ordinarily yields some output when STEPping or TRACEing, */
+    /* lux_replace ordinarily yields some output when STEPping or TRACEing, */
     /* but here we don't want that: ensure that noTrace is non-zero */
     noTrace++;
-    if ( ana_replace(dsym, iq) != 1 )
+    if ( lux_replace(dsym, iq) != 1 )
     { fits_problems(10); noTrace--; return fits_fatality(fin);}
     noTrace--;
   }
@@ -6376,10 +6376,10 @@ Int fits_read(Int mode, Int dsym, Int namsym, Int hsym, Int offsetsym,
     /* printf("nhblks = %d, maxdim = %d\n", nhblks, maxdim); */
     /* for (i=0;i<maxdim;i++) printf("extension: dim%d = %d\n", i, dim[i]); */
     /* compute size of data array */
-    nbsize = ana_type_size[type];
+    nbsize = lux_type_size[type];
     for (i=0;i<maxdim;i++) nbsize = nbsize*dim[i];
     /* printf("extension: nbsize = %d\n", nbsize); */
-    n_ext_rows = nbsize/dim[0]/ana_type_size[type];
+    n_ext_rows = nbsize/dim[0]/lux_type_size[type];
   }
   
   /* check if we want the extension header */
@@ -6391,7 +6391,7 @@ Int fits_read(Int mode, Int dsym, Int namsym, Int hsym, Int offsetsym,
     } else {
       /* printf("creating extension header array\n"); */
       /* generate an lux string array for the header */
-      if (to_scratch_array(xhsym, ANA_STRING_ARRAY, 1, &lc) == ANA_ERROR)
+      if (to_scratch_array(xhsym, LUX_STRING_ARRAY, 1, &lc) == LUX_ERROR)
       { fits_problems(18); return fits_fatality(fin);}
       p = array_data(xhsym);
       n = lc;
@@ -6435,7 +6435,7 @@ Int fits_read(Int mode, Int dsym, Int namsym, Int hsym, Int offsetsym,
       if (type == 4)  swapd((char *) q, nbsize/8);
 #endif
       noTrace++;
-      if ( ana_replace(xdsym, iq) != 1 )
+      if ( lux_replace(xdsym, iq) != 1 )
       { fits_problems(19); noTrace--; return fits_fatality(fin);}
       noTrace--;
       
@@ -6648,7 +6648,7 @@ Int fits_read(Int mode, Int dsym, Int namsym, Int hsym, Int offsetsym,
   return fits_fatality(fin);
 }
 /*------------------------------------------------------------------------- */
-Int ana_fits_write_general(Int narg, Int ps[], Int func)
+Int lux_fits_write_general(Int narg, Int ps[], Int func)
 /* FITS_WRITE,data,file [,header,slice] [,/VOCAL] */
 /* LS 18nov99 */
 /* Headers:
@@ -6666,9 +6666,9 @@ Int ana_fits_write_general(Int narg, Int ps[], Int func)
   FILE	*fp;
 
   if (!symbolIsNumericalArray(ps[0]) || symbolIsComplexArray(ps[0]))
-    return func? ANA_ZERO: cerror(ILL_CLASS, ps[0]);
+    return func? LUX_ZERO: cerror(ILL_CLASS, ps[0]);
   if (!symbolIsStringScalar(ps[1]))
-    return func? ANA_ZERO: cerror(ILL_CLASS, ps[1]);
+    return func? LUX_ZERO: cerror(ILL_CLASS, ps[1]);
 
   /* the data */
   data = array_data(ps[0]);
@@ -6679,12 +6679,12 @@ Int ana_fits_write_general(Int narg, Int ps[], Int func)
   if (narg > 2 && ps[2]) {	/* header */
     if (symbolIsStringArray(ps[2])) {
       header.sp = array_data(ps[2]);
-      headertype = ANA_STRING_ARRAY;
+      headertype = LUX_STRING_ARRAY;
       nheader = array_size(ps[2]);
     } else if (symbolIsStringScalar(ps[2])) {
       header.s = string_value(ps[2]);
-      headertype = ANA_TEMP_STRING;
-    } else return func? ANA_ZERO: cerror(ILL_CLASS, ps[2]);
+      headertype = LUX_TEMP_STRING;
+    } else return func? LUX_ZERO: cerror(ILL_CLASS, ps[2]);
   } else
     headertype = 0;		/* no header specified */
 
@@ -6698,7 +6698,7 @@ Int ana_fits_write_general(Int narg, Int ps[], Int func)
   } else
     slice = 0;
 
-  if (slice > 8*ana_type_size[type]) {
+  if (slice > 8*lux_type_size[type]) {
     printf("Compression parameter %1d is too large for current data type.\n",
 	   slice);
     puts("Writing to disk without compression.");
@@ -6709,19 +6709,19 @@ Int ana_fits_write_general(Int narg, Int ps[], Int func)
   file = string_value(ps[1]);
   fp = fopen(file, "w");
   if (!fp)
-    return func? ANA_ZERO: cerror(ERR_OPEN, ps[1]);
+    return func? LUX_ZERO: cerror(ERR_OPEN, ps[1]);
 
   nx = dims[0];
   ny = array_size(ps[0])/nx;
 
   if (slice) {
     /* prepare room for the compressed data */
-    limit = array_size(ps[0])*ana_type_size[type]*2;
+    limit = array_size(ps[0])*lux_type_size[type]*2;
     if (limit < 25)
       limit = 25;			/* limit imposed by crunch */
     out = malloc(limit);
     if (!out)
-      return func? ANA_ZERO: cerror(ALLOC_ERR, 0);
+      return func? LUX_ZERO: cerror(ALLOC_ERR, 0);
   }
 
   /* FITS data is always bigendian, so we should swap bytes on littleendian */
@@ -6731,21 +6731,21 @@ Int ana_fits_write_general(Int narg, Int ps[], Int func)
   /* the FITS file, and then swap the original data again.  We choose to */
   /* be frugal with memory, so we go for the Double swap.  LS 18nov99 */
 #if !WORDS_BIGENDIAN
-  endian(data, array_size(ps[0])*ana_type_size[type], type);
+  endian(data, array_size(ps[0])*lux_type_size[type], type);
 #endif
 
   if (slice) {
     switch (type) {
-      case ANA_BYTE:
+      case LUX_BYTE:
 	size = runlength? anacrunchrun8(out, data, slice, nx, ny, limit):
 	  anacrunch8(out, data, slice, nx, ny, limit);
 	break;
-      case ANA_WORD:
+      case LUX_WORD:
 	size = runlength? anacrunchrun(out, data, slice, nx, ny, limit):
 	  anacrunch(out, data, slice, nx, ny, limit);
 	break;
 #if SIZEOF_LONG_LONG_INT == 8	/* 64-bit integers */
-      case ANA_LONG:
+      case LUX_LONG:
 	if (runlength) {
 	  puts("WARNING - no compression with run-length encoding is currently\navailable for 32-bit data.  Using compression without RLE instead.");
 	  runlength = 0;
@@ -6772,7 +6772,7 @@ Int ana_fits_write_general(Int narg, Int ps[], Int func)
   }
 
   if (size == -1)
-    size = array_size(ps[0])*ana_type_size[type];
+    size = array_size(ps[0])*lux_type_size[type];
 
   /* write the FITS header */
   nlines = 0;
@@ -6824,7 +6824,7 @@ Int ana_fits_write_general(Int narg, Int ps[], Int func)
   /* header into 70-character parts and write each one to the FITS file */
   /* after a COMMENT = key. */
   switch (headertype) {
-    case ANA_TEMP_STRING:
+    case LUX_TEMP_STRING:
       if (strlen(header.s) > 9 && header.s[8] == '=') {
 	/* assume a FITS header */
 	p = header.s;
@@ -6861,7 +6861,7 @@ Int ana_fits_write_general(Int narg, Int ps[], Int func)
 	nlines++;
       }
       break;
-    case ANA_STRING_ARRAY:
+    case LUX_STRING_ARRAY:
       if (strlen(header.sp[0]) > 9 && header.sp[0][8] == '=') {
 	/* we assume a FITS header */
 	n = nheader;
@@ -6923,20 +6923,20 @@ Int ana_fits_write_general(Int narg, Int ps[], Int func)
   fclose(fp);
   if (out != data)
     free(out);
-  return ANA_OK;
+  return LUX_OK;
 }
 /*------------------------------------------------------------------------- */
-Int ana_fits_write(Int narg, Int ps[])
+Int lux_fits_write(Int narg, Int ps[])
 {
-  return ana_fits_write_general(narg, ps, 0);
+  return lux_fits_write_general(narg, ps, 0);
 }
 /*------------------------------------------------------------------------- */
-Int ana_fits_write_f(Int narg, Int ps[])
+Int lux_fits_write_f(Int narg, Int ps[])
 {
-  return ana_fits_write_general(narg, ps, 1);
+  return lux_fits_write_general(narg, ps, 1);
 }
 /*------------------------------------------------------------------------- */
-Int ana_fileread(Int narg, Int ps[])
+Int lux_fileread(Int narg, Int ps[])
  /* raw file read routine: fileread,lun,array,start,num,type */
  /* the file must be opened with a lun, the start position and num are in units
  of the Byte size for the data type (types 0 to 4 for I*1,I*2,I*4,F*4,F*8); i.e.,
@@ -6954,34 +6954,34 @@ Int ana_fileread(Int narg, Int ps[])
   char	*p;
   FILE	*fp;
 
-  if (int_arg_stat(ps[0], &lun) != ANA_OK)
-    return ANA_ERROR;
+  if (int_arg_stat(ps[0], &lun) != LUX_OK)
+    return LUX_ERROR;
   if (lun < 0 || lun >= MAXFILES)
     return cerror(ILL_LUN, ps[0]);
-  if (ana_file_open[lun] == 0)
+  if (lux_file_open[lun] == 0)
     return cerror(LUN_CLOSED, ps[0]);
-  fp = ana_file[lun];
-  if (int_arg_stat(ps[2], &start) != ANA_OK
-      || int_arg_stat(ps[3], &num) != ANA_OK
-      || int_arg_stat(ps[4], &type) != ANA_OK)
-    return ANA_ERROR;
-  if (type < ANA_BYTE || type > ANA_DOUBLE)
+  fp = lux_file[lun];
+  if (int_arg_stat(ps[2], &start) != LUX_OK
+      || int_arg_stat(ps[3], &num) != LUX_OK
+      || int_arg_stat(ps[4], &type) != LUX_OK)
+    return LUX_ERROR;
+  if (type < LUX_BYTE || type > LUX_DOUBLE)
     return cerror(ILL_TYPE, ps[4]);
   iq = ps[1];
   nd = 1;
-  if (redef_array(iq, type, nd, &num) != ANA_OK)
-    return ANA_ERROR;
+  if (redef_array(iq, type, nd, &num) != LUX_OK)
+    return LUX_ERROR;
  
   p = (char *) array_data(iq);
 
-  n = ana_type_size[type];
+  n = lux_type_size[type];
   /* the starting offset is */
   if (start >=0) {
     j = n * start;
  /*printf("j,n,recn = %d %d %d\n", j,n,recn);*/
     if (fseek(fp, j, 0) == -1) {
       perror("fileread");
-      return ANA_ERROR;
+      return LUX_ERROR;
     }
   }
   /* now read the file */
@@ -6998,10 +6998,10 @@ Int ana_fileread(Int narg, Int ps[])
       printf("still short after 2 tries, got %d bytes\n", j);
   }
   byte_count = j;
-  return ANA_OK;
+  return LUX_OK;
 }
  /*------------------------------------------------------------------------- */
-Int ana_filewrite(Int narg, Int ps[])
+Int lux_filewrite(Int narg, Int ps[])
  /* raw file write routine: filewrite,lun,array,[start] */
  /* the file must be opened with a lun, the start position and num are in units
  of the Byte size for the data type (types 0 to 4 for I*1,I*2,I*4,F*4,F*8);
@@ -7017,47 +7017,47 @@ Int ana_filewrite(Int narg, Int ps[])
   char	*p;
   FILE	*fp;
 
-  if (int_arg_stat(ps[0], &lun) != ANA_OK)
-    return ANA_ERROR;
+  if (int_arg_stat(ps[0], &lun) != LUX_OK)
+    return LUX_ERROR;
   if (lun < 0 || lun >= MAXFILES)
     return cerror(ILL_LUN, ps[0]);
-  if (ana_file_open[lun] == 0)
+  if (lux_file_open[lun] == 0)
     return cerror(LUN_CLOSED, ps[0]);
-  fp = ana_file[lun];
+  fp = lux_file[lun];
   iq = ps[1]; 
   type = symbol_type(iq);
   switch (symbol_class(iq)) {
-    case ANA_SCAL_PTR:
+    case LUX_SCAL_PTR:
       iq = class8_to_1(iq);	/*scalar ptr case */
-    case ANA_SCALAR:
+    case LUX_SCALAR:
       p = (char *) &scalar_value(iq).l;	/*scalar case */
-      typesize = num = ana_type_size[type];
+      typesize = num = lux_type_size[type];
       break;
-    case ANA_STRING:		/*string */
+    case LUX_STRING:		/*string */
       p = (char *) string_value(iq);
       typesize = 1;
       num = string_size(iq);	/*don't include the null */
       break;
-    case ANA_ARRAY:		/*array case */
+    case LUX_ARRAY:		/*array case */
       p = (char *) array_data(iq);
-      typesize = num = ana_type_size[type];
+      typesize = num = lux_type_size[type];
       num = array_size(iq);
       break;
     default:
       return cerror(ILL_CLASS, iq);
   }
   if (num <= 0)
-    return ANA_ERROR;
+    return LUX_ERROR;
   start = -1;
-  if (narg > 2 && int_arg_stat(ps[2], &start) == ANA_ERROR)
-    return ANA_ERROR;
+  if (narg > 2 && int_arg_stat(ps[2], &start) == LUX_ERROR)
+    return LUX_ERROR;
   /* the starting offset is */
   if (start >= 0) {
     j = typesize * start;
     /*printf("j,n,start = %d %d %d\n", j,n, start);*/
     if (fseek(fp, j, 0) == -1) {
       perror("filewrite"); 
-      return ANA_ERROR;
+      return LUX_ERROR;
     }
   } 
   /* now write the file */
@@ -7066,7 +7066,7 @@ Int ana_filewrite(Int narg, Int ps[])
       return cerror(WRITE_ERR, 0);
     printf("only got %d bytes in writefile, expected %d\n",j,num);
   }
-  return ANA_OK;
+  return LUX_OK;
 }
 /*------------------------------------------------------------------------- */
 

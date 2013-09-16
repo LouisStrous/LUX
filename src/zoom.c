@@ -51,25 +51,25 @@ extern Int	ht[], wd[];
 extern Int	fontwidth;
 
 Int	extractNumerical(pointer, pointer, Int, Int, Int *, Int *, Int, Int *),
-  ana_xerase(Int, Int []);
+  lux_xerase(Int, Int []);
 void	paint_pane(Int, Int, Int), delete_menu(Int);
 /*--------------------------------------------------------------------------*/
 void value_string(char *trgt, pointer image, Int type, Int indx)
 {
   switch (type) {
-    case ANA_BYTE:
+    case LUX_BYTE:
       sprintf(trgt, "Value:% 10d", image.b[indx]);
       break;
-    case ANA_WORD:
+    case LUX_WORD:
       sprintf(trgt, "Value:% 10d", image.w[indx]);
       break;
-    case ANA_LONG:
+    case LUX_LONG:
       sprintf(trgt, "Value:% 10d", image.l[indx]);
       break;
-    case ANA_FLOAT:
+    case LUX_FLOAT:
       sprintf(trgt, "Value:% #9.4g", image.f[indx]);
       break;
-    case ANA_DOUBLE:
+    case LUX_DOUBLE:
       sprintf(trgt, "Value:% #9.4g", image.d[indx]);
       break;
   }	/* end of switch (type) */
@@ -88,13 +88,13 @@ Float	zoom_xc = 0.0, zoom_yc = 0.0, zoom_mag = 0.0;
 Double	zoom_clo = 0.0, zoom_chi = 0.0;
 Int	zoom_frame = 0;
 
-Int ana_zoom(Int narg, Int ps[])
+Int lux_zoom(Int narg, Int ps[])
 /* ZOOM,image[,bitmap] */
 {
   extern Int	menu_setup_done, last_wid, threeColors;
   extern scalar	lastmin, lastmax;
   Int	createMenu(Int num, Int x, Int y, Int nItem, char **item),
-    menu_setup(void), ana_xport(Int, Int []),
+    menu_setup(void), lux_xport(Int, Int []),
     tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
 	  Float y1, Float y2, Float sx, Float sy, Int wid, Float *mag,
 	  Int mode, Double clo, Double chi, Byte *bitmap1, Byte *bitmap2),
@@ -129,9 +129,9 @@ Int ana_zoom(Int narg, Int ps[])
   XEvent	event;
 
   if (numerical(ps[0], &dims, &ndim, NULL, &data) < 0)
-    return ANA_ERROR;
+    return LUX_ERROR;
   if (ndim < 2)
-    return anaerror("Need at least two dimensions", ps[0]);
+    return luxerror("Need at least two dimensions", ps[0]);
   ntext = sizeof(text)/sizeof(char *);
   wid = last_wid;
   type = array_type(ps[0]);
@@ -140,7 +140,7 @@ Int ana_zoom(Int narg, Int ps[])
     if (!symbolIsNumericalArray(ps[1])
 	|| array_size(ps[1]) != array_size(ps[0]))
       return cerror(INCMP_ARG, ps[1]);
-    bitmapdata1.v = array_data(ana_byte(1, &ps[1]));
+    bitmapdata1.v = array_data(lux_byte(1, &ps[1]));
   } else
     bitmapdata1.v = NULL;
 
@@ -148,7 +148,7 @@ Int ana_zoom(Int narg, Int ps[])
     if (!symbolIsNumericalArray(ps[2])
 	|| array_size(ps[2]) != array_size(ps[0]))
       return cerror(INCMP_ARG, ps[2]);
-    bitmapdata2.v = array_data(ana_byte(1, &ps[2]));
+    bitmapdata2.v = array_data(lux_byte(1, &ps[2]));
   } else
     bitmapdata2.v = NULL;
 
@@ -214,7 +214,7 @@ Int ana_zoom(Int narg, Int ps[])
   /* prepare internalMode for tvraw() */
   internalMode = TV_CENTER;
 
-  stride = ana_type_size[type];
+  stride = lux_type_size[type];
   image.b = malloc(nx*ny*stride);
   bitmap1.b = bitmapdata1.v? malloc(nx*ny): NULL;
   bitmap2.b = bitmapdata2.v? malloc(nx*ny): NULL;
@@ -236,19 +236,19 @@ Int ana_zoom(Int narg, Int ps[])
       offset += coords[2*i]*step[i];
   if (extractNumerical(data, image, type, ndim, dims, coords, 2, axes) < 0
       || (bitmap1.b
-	  && extractNumerical(bitmapdata1, bitmap1, ANA_BYTE, ndim, dims,
+	  && extractNumerical(bitmapdata1, bitmap1, LUX_BYTE, ndim, dims,
 			      coords, 2, axes) < 0)
       || (bitmap2.b
-	  && extractNumerical(bitmapdata2, bitmap2, ANA_BYTE, ndim, dims,
+	  && extractNumerical(bitmapdata2, bitmap2, LUX_BYTE, ndim, dims,
 			      coords, 2, axes) < 0)) {
     free(image.b);
     free(bitmap1.b);		/* it's OK to free something if it is
 				   equal to NULL, so we do not have to
 				   check if bitmap1.b is NULL here. */
     free(bitmap2.b);
-    return ANA_ERROR;
+    return LUX_ERROR;
   }
-  ana_xport(0, NULL);
+  lux_xport(0, NULL);
   if ((bitmap1.b || bitmap2.b)
       && !threeColors) {	/* must install three-colors color table */
     z = 1.0;
@@ -256,26 +256,26 @@ Int ana_zoom(Int narg, Int ps[])
   }
   if (tvraw(image, type, nx, ny, x1, x2 - 1, y1, y2 - 1,
 	    sx, sy, wid, &zoom_mag, 0, zoom_clo, zoom_chi,
-	    bitmap1.b, bitmap2.b) == ANA_ERROR) {
+	    bitmap1.b, bitmap2.b) == LUX_ERROR) {
     free(image.b);
     free(bitmap1.b);
     free(bitmap2.b);
-    return ANA_ERROR;
+    return LUX_ERROR;
   }
   ww = wd[wid];
   hw = ht[wid];
 
-  if (!menu_setup_done && menu_setup() != ANA_OK) {
+  if (!menu_setup_done && menu_setup() != LUX_OK) {
     free(image.b);
     free(bitmap1.b);
     free(bitmap2.b);
-    return ANA_ERROR;
+    return LUX_ERROR;
   }
   for (mid = 0; mid < MAXMENU; mid++)
     if (!menu_win[mid])
       break;
   if (mid == MAXMENU)
-    return anaerror("No more menus available", 0);
+    return luxerror("No more menus available", 0);
   zoomText = (char **) Malloc(ntext*sizeof(char *));
   if (!zoomText)
     return cerror(ALLOC_ERR, 0);
@@ -284,11 +284,11 @@ Int ana_zoom(Int narg, Int ps[])
     if (!zoomText[i])
       return cerror(ALLOC_ERR, 0);
   }
-  if (createMenu(mid, 0, 0, ntext, zoomText) == ANA_ERROR) {
+  if (createMenu(mid, 0, 0, ntext, zoomText) == LUX_ERROR) {
     free(image.b);
     free(bitmap1.b);
     free(bitmap2.b);
-    return ANA_ERROR;
+    return LUX_ERROR;
   }
   for (i = 0; i < ntext; i++)
     free(zoomText[i]);
@@ -394,7 +394,7 @@ Int ana_zoom(Int narg, Int ps[])
 		    free(image.b);
 		    free(bitmap1.b);
 		    free(bitmap2.b);
-		    return ANA_ERROR;
+		    return LUX_ERROR;
 		  }
 		}
 	      }		
@@ -424,7 +424,7 @@ Int ana_zoom(Int narg, Int ps[])
 		    free(image.b);
 		    free(bitmap1.b);
 		    free(bitmap2.b);
-		    return ANA_ERROR;
+		    return LUX_ERROR;
 		  }
 		  sprintf(menu[mid].text[ZOOM_RECENTER], "Recenter        ");
 		  paint_pane(mid, ZOOM_RECENTER, WHITE);
@@ -493,7 +493,7 @@ Int ana_zoom(Int narg, Int ps[])
 		    free(image.b);
 		    free(bitmap1.b);
 		    free(bitmap2.b);
-		    return ANA_ERROR;
+		    return LUX_ERROR;
 		  }
 		  sprintf(menu[mid].text[ZOOM_MAG], "Magnify: %7.2f",
 			  zoom_mag);
@@ -512,7 +512,7 @@ Int ana_zoom(Int narg, Int ps[])
 		    free(image.b);
 		    free(bitmap1.b);
 		    free(bitmap2.b);
-		    return ANA_ERROR;
+		    return LUX_ERROR;
 		  }
 		  sprintf(menu[mid].text[ZOOM_MAG], "Magnify: %7.2f",
 			  zoom_mag);
@@ -558,7 +558,7 @@ Int ana_zoom(Int narg, Int ps[])
 		    free(image.b);
 		    free(bitmap1.b);
 		    free(bitmap2.b);
-		    return ANA_ERROR;
+		    return LUX_ERROR;
 		  }
 		  break;
 		case ZOOM_RECENTER:
@@ -591,23 +591,23 @@ Int ana_zoom(Int narg, Int ps[])
 		  if (i < 8) {	/* take from current image */
 		    minmax(image.l, nx*ny, type);
 		    switch (type) {
-		      case ANA_BYTE:
+		      case LUX_BYTE:
 			zoom_clo = (Double) lastmin.b;
 			zoom_chi = (Double) lastmax.b;
 			break;
-		      case ANA_WORD:
+		      case LUX_WORD:
 			zoom_clo = (Double) lastmin.w;
 			zoom_chi = (Double) lastmax.w;
 			break;
-		      case ANA_LONG:
+		      case LUX_LONG:
 			zoom_clo = (Double) lastmin.l;
 			zoom_chi = (Double) lastmax.l;
 			break;
-		      case ANA_FLOAT:
+		      case LUX_FLOAT:
 			zoom_clo = (Double) lastmin.f;
 			zoom_chi = (Double) lastmax.f;
 			break;
-		      case ANA_DOUBLE:
+		      case LUX_DOUBLE:
 			zoom_clo = (Double) lastmin.d;
 			zoom_chi = (Double) lastmax.d;
 			break;
@@ -623,7 +623,7 @@ Int ana_zoom(Int narg, Int ps[])
 		    free(image.b);
 		    free(bitmap1.b);
 		    free(bitmap2.b);
-		    return ANA_ERROR;
+		    return LUX_ERROR;
 		  }
 		  break;
 		case ZOOM_CVALUES:
@@ -642,7 +642,7 @@ Int ana_zoom(Int narg, Int ps[])
 		    free(image.b);
 		    free(bitmap1.b);
 		    free(bitmap2.b);
-		    return ANA_ERROR;
+		    return LUX_ERROR;
 		  }
 		  break;
 		case ZOOM_THREE:
@@ -685,17 +685,17 @@ Int ana_zoom(Int narg, Int ps[])
 		  if (extractNumerical(data, image, type, ndim, dims, coords,
 				       2, axes) < 0
 		      || (bitmapdata1.v
-			  && extractNumerical(bitmapdata1, bitmap1, ANA_BYTE,
+			  && extractNumerical(bitmapdata1, bitmap1, LUX_BYTE,
 					      ndim, dims, coords, 2, axes)
 			  < 0)
 		      || (bitmapdata2.v
-			  && extractNumerical(bitmapdata2, bitmap2, ANA_BYTE,
+			  && extractNumerical(bitmapdata2, bitmap2, LUX_BYTE,
 					      ndim, dims, coords, 2, axes)
 			  < 0)) {
 		    free(image.b);
 		    free(bitmap1.b);
 		    free(bitmap2.b);
-		    return ANA_ERROR;
+		    return LUX_ERROR;
 		  }
 		  if (tvraw(image, type, nx, ny, x1, x2 - 1, y1, y2 - 1,
 			    sx, sy, wid, &zoom_mag, TV_CENTER, zoom_clo,
@@ -703,7 +703,7 @@ Int ana_zoom(Int narg, Int ps[])
 		    free(image.b);
 		    free(bitmap1.b);
 		    free(bitmap2.b);
-		    return ANA_ERROR;
+		    return LUX_ERROR;
 		  }
 		  sprintf(menu[mid].text[ZOOM_FRAME], "Frame:  %8d",
 			  zoom_frame);
@@ -816,17 +816,17 @@ Int ana_zoom(Int narg, Int ps[])
 		    if (extractNumerical(data, image, type, ndim, dims,
 					 coords, 2, axes) < 0
 			|| (bitmapdata1.v
-			    && extractNumerical(bitmapdata1, bitmap1, ANA_BYTE,
+			    && extractNumerical(bitmapdata1, bitmap1, LUX_BYTE,
 						ndim, dims, coords, 2, axes)
 			    < 0)
 			|| (bitmapdata2.v
-			    && extractNumerical(bitmapdata2, bitmap2, ANA_BYTE,
+			    && extractNumerical(bitmapdata2, bitmap2, LUX_BYTE,
 						ndim, dims, coords, 2, axes)
 			    < 0)) {
 		      free(image.b);
 		      free(bitmap1.b);
 		      free(bitmap2.b);
-		      return ANA_ERROR;
+		      return LUX_ERROR;
 		    }
 		    if (tvraw(image, type, nx, ny, x1, x2 - 1, y1, y2 - 1,
 			    sx, sy, wid, &zoom_mag, TV_CENTER, zoom_clo,
@@ -835,7 +835,7 @@ Int ana_zoom(Int narg, Int ps[])
 		      free(image.b);
 		      free(bitmap1.b);
 		      free(bitmap2.b);
-		      return ANA_ERROR;
+		      return LUX_ERROR;
 		    }
 		    sprintf(menu[mid].text[ZOOM_FRAME], "Frame:  %8d",
 			    zoom_frame);
@@ -914,15 +914,15 @@ Int ana_zoom(Int narg, Int ps[])
       if (extractNumerical(data, image, type, ndim, dims,
 			   coords, 2, axes) < 0
 	  || (bitmapdata1.v
-	      && extractNumerical(bitmapdata1, bitmap1, ANA_BYTE,
+	      && extractNumerical(bitmapdata1, bitmap1, LUX_BYTE,
 				  ndim, dims, coords, 2, axes) < 0)
 	  || (bitmapdata2.v
-	      && extractNumerical(bitmapdata2, bitmap2, ANA_BYTE,
+	      && extractNumerical(bitmapdata2, bitmap2, LUX_BYTE,
 				  ndim, dims, coords, 2, axes) < 0)) {
 	free(image.b);
 	free(bitmap1.b);
 	free(bitmap2.b);
-	return ANA_ERROR;
+	return LUX_ERROR;
       }
       if (tvraw(image, type, nx, ny, x1, x2 - 1, y1, y2 - 1, sx, sy,
 		wid, &zoom_mag, TV_CENTER, zoom_clo, zoom_chi, bitmap1.b,
@@ -930,7 +930,7 @@ Int ana_zoom(Int narg, Int ps[])
 	free(image.b);
 	free(bitmap1.b);
 	free(bitmap2.b);
-	return ANA_ERROR;
+	return LUX_ERROR;
       }
       if (play) {
 	sprintf(menu[mid].text[ZOOM_FRAME], "Frame:  %8d", zoom_frame);
@@ -960,7 +960,7 @@ Int tvzoom(Int narg, Int ps[])
   Float	x1, x2, y1, y2;
 
   if (numerical(ps[0], &dims, &ndim, NULL, &data) < 0)
-    return ANA_ERROR;
+    return LUX_ERROR;
   if (ndim != 2)
     return cerror(NEED_2D_ARR, ps[0]);
   type = array_type(ps[0]);
@@ -968,11 +968,11 @@ Int tvzoom(Int narg, Int ps[])
   wid = last_wid;
 
   if (narg > 1 && ps[1]) {
-    if (symbol_class(ps[1]) != ANA_ARRAY
+    if (symbol_class(ps[1]) != LUX_ARRAY
 	|| array_size(ps[1]) != array_size(ps[0])
 	|| !isNumericalType(array_type(ps[1])))
       return cerror(INCMP_ARG, ps[1]);
-    bitmapdata.v = array_data(ana_byte(1, &ps[1]));
+    bitmapdata.v = array_data(lux_byte(1, &ps[1]));
   } else
     bitmapdata.v = NULL;
 
@@ -1025,7 +1025,7 @@ Int tvzoom(Int narg, Int ps[])
   else if (y2 > ny)
     y2 = ny;
   
-  stride = ana_type_size[type];
+  stride = lux_type_size[type];
   image.b = malloc(nx*ny*stride);
   bitmap.b = bitmapdata.v? malloc(nx*ny): NULL;
   coords[0] = 0;
@@ -1041,21 +1041,21 @@ Int tvzoom(Int narg, Int ps[])
       offset += coords[2*i]*step[i];
   if (extractNumerical(data, image, type, ndim, dims, coords, 2, axes) < 0
       || (bitmap.b
-	  && extractNumerical(bitmapdata, bitmap, ANA_BYTE, ndim, dims,
+	  && extractNumerical(bitmapdata, bitmap, LUX_BYTE, ndim, dims,
 			      coords, 2, axes) < 0)) {
     free(image.b);
     free(bitmap.b);		/* it's OK to free something if it is
 				   equal to NULL, so we do not have to
 				   check if bitmap.b is NULL here. */
-    return ANA_ERROR;
+    return LUX_ERROR;
   }
   if (tvraw(image, type, nx, ny, x1, x2 - 1, y1, y2 - 1,
 	    sx, sy, wid, &zoom_mag, TV_CENTER, zoom_clo, zoom_chi,
-	    bitmap.b, NULL) == ANA_ERROR) {
+	    bitmap.b, NULL) == LUX_ERROR) {
     free(image.b);
     free(bitmap.b);
-    return ANA_ERROR;
+    return LUX_ERROR;
   }
-  return ANA_OK;
+  return LUX_OK;
 }
 /*--------------------------------------------------------------------------*/

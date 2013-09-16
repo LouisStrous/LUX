@@ -64,7 +64,7 @@ Int standardLoop(Int data, Int axisSym, Int mode, Int outType,
 		 loopInfo *src, pointer *srcptr, Int *output, loopInfo *trgt,
 		 pointer *trgtptr);
 Int advanceLoop(loopInfo *info, pointer *ptr),
-  ana_convert(Int, Int [], Int, Int);
+  lux_convert(Int, Int [], Int, Int);
 Int nextLoop(loopInfo *info), nextLoops(loopInfo *info1, loopInfo *info2);
 Int dimensionLoopResult(loopInfo const *sinfo, loopInfo *tinfo, Int type,
 			pointer *tptr);
@@ -109,19 +109,19 @@ Int setAxes(loopInfo *info, Int nAxes, Int *axes, Int mode)
   
   if ((mode & SL_ONEAXIS)	/* only one axis allowed */
       && nAxes > 1)		/* and more than one selected */
-    return anaerror("Only one axis allowed", -1);
+    return luxerror("Only one axis allowed", -1);
 
   /* check the specified axes for legality */
   if (nAxes && axes) {
     for (i = 0; i < nAxes; i++) /* check all specified axes */
       if (axes[i] < 0		/* axis is negative */
 	  || axes[i] >= info->ndim)	/* or too great */
-	return anaerror("Illegal axis %1d", -1, axes[i]);
+	return luxerror("Illegal axis %1d", -1, axes[i]);
     if (mode & SL_UNIQUEAXES) {	/* no axis must occur more than once */
       zerobytes(temp, info->ndim*sizeof(Int));
       for (i = 0; i < nAxes; i++)
 	if (temp[axes[i]]++)
-	  return anaerror("Axis %1d illegally specified more than once",
+	  return luxerror("Axis %1d illegally specified more than once",
 			  -1, axes[i]);
     }
   }
@@ -182,7 +182,7 @@ void setupDimensionLoop(loopInfo *info, Int ndim, Int const *dims,
   else
     for (i = 0; i < info->naxes; i++)
       info->axes[i] = i;		/* SL_ALLAXES was selected */
-  /* the type of data: ANA_BYTE, ..., ANA_DOUBLE */
+  /* the type of data: LUX_BYTE, ..., LUX_DOUBLE */
   info->type = type;
   /* a pointer to a pointer to the data */
   info->data = data;
@@ -196,7 +196,7 @@ void setupDimensionLoop(loopInfo *info, Int ndim, Int const *dims,
   for (i = 0; i < info->ndim - 1; i++)
     info->singlestep[i + 1] = info->singlestep[i]*info->dims[i];
   /* the number of bytes per data element: */
-  info->stride = ana_type_size[type];
+  info->stride = lux_type_size[type];
 
   setAxisMode(info, mode);
 }
@@ -430,14 +430,14 @@ Int dimensionLoopResult1(loopInfo const *sinfo,
 
   if (nLess && less) {
     if (nLess < 1 || nLess > naxes)
-      return anaerror("Illegal number %d of dimensions to reduce:"
+      return luxerror("Illegal number %d of dimensions to reduce:"
                       " expected 1..%d", -1, nLess, naxes);
     for (i = 0; i < nLess; i++) {
       if (less[i] < 1)
-        return anaerror("Illegal reduction factor %d for axis %d",
+        return luxerror("Illegal reduction factor %d for axis %d",
                         -1, less[i], i);
       if (dims[axes[i]] % less[i])
-        return anaerror("Reduction factor %d is not a divisor of dimension"
+        return luxerror("Reduction factor %d is not a divisor of dimension"
                         " %d size %d", -1, less[i], axes[i], dims[axes[i]]);
       dims[axes[i]] /= less[i];
       if (dims[axes[i]] == 1 && less[i] > 1) /* this dimension becomes 1 */
@@ -446,7 +446,7 @@ Int dimensionLoopResult1(loopInfo const *sinfo,
 #if UNNEEDED
     for ( ; i < naxes; i++) {
       if (dims[axes[i]] % less[nLess - 1])
-        return anaerror("Reduction factor %d is not a divisor of dimension"
+        return luxerror("Reduction factor %d is not a divisor of dimension"
                         " %d size %d", -1, less[nLess - 1], axes[i],
                         dims[axes[i]]);
       dims[axes[i]] /= less[nLess - 1];
@@ -509,16 +509,16 @@ Int dimensionLoopResult1(loopInfo const *sinfo,
 
   if (nMore && more) {
     if (nMore < 1)
-      return anaerror("Illegal number %d of dimensions to add", -1, nMore);
+      return luxerror("Illegal number %d of dimensions to add", -1, nMore);
     if (nMore + ndim > MAX_DIMS)
-      return anaerror("Requested total number of dimensions %d "
+      return luxerror("Requested total number of dimensions %d "
                     "exceeds allowed maximum %d", -1, nMore + ndim, MAX_DIMS);
     if (nMore + naxes > MAX_DIMS)
-      return anaerror("Total number of axes %d after growing "
+      return luxerror("Total number of axes %d after growing "
                     "exceeds allowed maximum %d", nMore + naxes, MAX_DIMS);
     for (i = 0; i < nMore; i++)
       if (more[i] < 1)
-        return anaerror("Illegal size %d requested for new dimension %d", -1,
+        return luxerror("Illegal size %d requested for new dimension %d", -1,
                       more[i], i);
     memmove(dims + nMore, dims, ndim*sizeof(*dims));
     memcpy(dims, more, nMore*sizeof(*dims));
@@ -620,8 +620,8 @@ Int standardLoop(Int data, Int axisSym, Int mode, Int outType,
 
   if (axisSym > 0) {		/* <axisSym> is a regular symbol */
     if (!symbolIsNumerical(axisSym))
-      return anaerror("Need a numerical argument", axisSym); /* <axisSym> was not numerical */
-    i = ana_long(1, &axisSym);	/* get a LONG copy */
+      return luxerror("Need a numerical argument", axisSym); /* <axisSym> was not numerical */
+    i = lux_long(1, &axisSym);	/* get a LONG copy */
     numerical(i, NULL, NULL, &nAxes, &axes); /* get info */
   } else {
     nAxes = 0;
@@ -647,8 +647,8 @@ Int standardLoopX(Int source, Int axisSym, Int srcMode,
 
   if (axisSym > 0) {		/* <axisSym> is a regular symbol */
     if (!symbolIsNumerical(axisSym))
-      return anaerror("Need a numerical argument", axisSym); /* <axisSym> was not numerical */
-    i = ana_long(1, &axisSym);	/* get a LONG copy */
+      return luxerror("Need a numerical argument", axisSym); /* <axisSym> was not numerical */
+    i = lux_long(1, &axisSym);	/* get a LONG copy */
     numerical(i, NULL, NULL, &nAxes, &axes); /* get info */
   } else {
     nAxes = 0;
@@ -738,8 +738,8 @@ Int standardLoop0(Int data, Int nAxes, Int *axes, Int mode, Int outType,
   debugout("checking <data>");
 #endif
   /* check if <data> is of proper class, and get some info about it */
-  if (numerical(data, &dims, &ndim, NULL, srcptr) == ANA_ERROR)
-    return ANA_ERROR;		/* some error */
+  if (numerical(data, &dims, &ndim, NULL, srcptr) == LUX_ERROR)
+    return LUX_ERROR;		/* some error */
   
 #if DEBUG_VOCAL
   debugout("treating SL_TAKEONED, SL_ALLAXES");
@@ -759,7 +759,7 @@ Int standardLoop0(Int data, Int nAxes, Int *axes, Int mode, Int outType,
 #endif
   if ((mode & SL_ONEAXIS)	/* only one axis allowed */
       && nAxes > 1)		/* and more than one selected */
-    return anaerror("Only one axis allowed", -1);
+    return luxerror("Only one axis allowed", -1);
 
 #if DEBUG_VOCAL
   debugout("checking axes for legality");
@@ -769,12 +769,12 @@ Int standardLoop0(Int data, Int nAxes, Int *axes, Int mode, Int outType,
     for (i = 0; i < nAxes; i++) /* check all specified axes */
       if (axes[i] < 0		/* axis is negative */
 	  || axes[i] >= ndim)	/* or too great */
-	return anaerror("Illegal axis %1d", -1, axes[i]);
+	return luxerror("Illegal axis %1d", -1, axes[i]);
     if (mode & SL_UNIQUEAXES) {	/* no axis must occur more than once */
       zerobytes(temp, ndim*sizeof(Int));
       for (i = 0; i < nAxes; i++)
 	if (temp[axes[i]]++)
-	  return anaerror("Axis %1d illegally specified more than once",
+	  return luxerror("Axis %1d illegally specified more than once",
 			  -1, axes[i]);
     }
   }
@@ -786,7 +786,7 @@ Int standardLoop0(Int data, Int nAxes, Int *axes, Int mode, Int outType,
 #endif
   if ((mode & SL_SRCUPGRADE)	/* upgrade source if necessary */
       && (symbol_type(data) < outType))	{ /* source needs upgrading */
-    data = ana_convert(1, &data, outType, 1); /* upgrade */
+    data = lux_convert(1, &data, outType, 1); /* upgrade */
     numerical(data, NULL, NULL, NULL, srcptr);
   }
 
@@ -811,9 +811,9 @@ Int standardLoop0(Int data, Int nAxes, Int *axes, Int mode, Int outType,
       trgt->type = outType;	/* take specified output type */
 	
     *output = dimensionLoopResult(src, trgt, trgt->type, trgtptr);
-    if (*output == ANA_ERROR)
+    if (*output == LUX_ERROR)
       /* but didn't get one */
-      return ANA_ERROR;
+      return LUX_ERROR;
   }
   
 #if DEBUG_VOCAL
@@ -827,7 +827,7 @@ Int standardLoop0(Int data, Int nAxes, Int *axes, Int mode, Int outType,
   debugout("exiting standardLoop()");
 #endif
 
-  return ANA_OK;
+  return LUX_OK;
 }
 #undef DEBUG_VOCAL
 /*-----------------------------------------------------------------------*/
@@ -983,8 +983,8 @@ Int standardLoop1(Int source,
   Int ndim, i, temp[MAX_DIMS];
 
   /* check if <source> is of proper class, and get some info about it */
-  if (numerical_or_string(source, &dims, &ndim, NULL, srcptr) == ANA_ERROR)
-    return ANA_ERROR;		/* some error */
+  if (numerical_or_string(source, &dims, &ndim, NULL, srcptr) == LUX_ERROR)
+    return LUX_ERROR;		/* some error */
   
   if (srcMode & SL_TAKEONED)	/* take data as 1D */
     nAxes = 0;			/* treat as 1D */
@@ -998,19 +998,19 @@ Int standardLoop1(Int source,
   
   if ((srcMode & SL_ONEAXIS)	/* only one axis allowed */
       && nAxes > 1)		/* and more than one selected */
-    return anaerror("Only one axis allowed", -1);
+    return luxerror("Only one axis allowed", -1);
 
   /* check the specified axes for legality */
   if (nAxes && axes) {
     for (i = 0; i < nAxes; i++) /* check all specified axes */
       if (axes[i] < 0		/* axis is negative */
 	  || axes[i] >= ndim)	/* or too great */
-	return anaerror("Illegal axis %1d", -1, axes[i]);
+	return luxerror("Illegal axis %1d", -1, axes[i]);
     if (srcMode & SL_UNIQUEAXES) { /* no axis must occur more than once */
       zerobytes(temp, ndim*sizeof(Int));
       for (i = 0; i < nAxes; i++)
 	if (temp[axes[i]]++)
-	  return anaerror("Axis %1d illegally specified more than once",
+	  return luxerror("Axis %1d illegally specified more than once",
 			  -1, axes[i]);
     }
   }
@@ -1019,7 +1019,7 @@ Int standardLoop1(Int source,
     
   if ((srcMode & SL_SRCUPGRADE)	/* upgrade source if necessary */
       && (symbol_type(source) < tgtType))	{ /* source needs upgrading */
-    source = ana_convert(1, &source, tgtType, 1); /* upgrade */
+    source = lux_convert(1, &source, tgtType, 1); /* upgrade */
     numerical_or_string(source, NULL, NULL, NULL, srcptr);
   }
 
@@ -1037,9 +1037,9 @@ Int standardLoop1(Int source,
     *target = dimensionLoopResult1(srcinf, tgtMode, tgtinf->type, 
                                    nMore, more, nLess, less, tgtinf,
                                    tgtptr);
-    if (*target == ANA_ERROR)
+    if (*target == LUX_ERROR)
       /* but didn't get one */
-      return ANA_ERROR;
+      return LUX_ERROR;
   }
   
   if (srcMode & SL_TAKEONED) { /* mimic 1D array */
@@ -1047,7 +1047,7 @@ Int standardLoop1(Int source,
     srcinf->ndim = srcinf->rndim = 1;
   }
 
-  return ANA_OK;
+  return LUX_OK;
 }
 /*-----------------------------------------------------------------------*/
 Int nextLoop(loopInfo *info)
@@ -1057,7 +1057,7 @@ Int nextLoop(loopInfo *info)
   if (++(info->axisindex) >= info->naxes)
     return 0;
   rearrangeDimensionLoop(info);
-  return ANA_OK;
+  return LUX_OK;
 }
 /*-----------------------------------------------------------------------*/
 Int nextLoops(loopInfo *info1, loopInfo *info2)
@@ -1220,16 +1220,16 @@ Int prepareDiagonals(Int symbol, loopInfo *info, Int part,
    set <part> equal to 1; if you want to service all allowed
    directions but do not distinguish between diametrically opposite
    directions, then set <part> equal to 2.  Returns the number of
-   offsets, or ANA_ERROR if an error occurred.  LS 10feb99 */
+   offsets, or LUX_ERROR if an error occurred.  LS 10feb99 */
 {
   Int	i, j, *d, nDiagonal, nDoDim, n, n0, n1, n2, k;
 
   if (symbol) {			/* have <diagonal> */
-    if (symbol_class(symbol) != ANA_ARRAY)
+    if (symbol_class(symbol) != LUX_ARRAY)
       return cerror(NEED_ARR, symbol);
     if (array_size(symbol) != info->ndim)
       return cerror(INCMP_ARG, symbol);
-    i = ana_long(1, &symbol);	/* ensure LONG */
+    i = lux_long(1, &symbol);	/* ensure LONG */
     d = array_data(i);
     nDiagonal = nDoDim = 0;
     for (i = 0; i < info->ndim; i++)
@@ -1406,11 +1406,11 @@ static Int numerical_or_string_choice(Int data, Int **dims, Int *nDim, Int *size
 
   switch (symbol_class(data)) {
   default:
-      return ANA_ERROR;         /* no message, because not always wanted */
-  case ANA_SCAL_PTR:
+      return LUX_ERROR;         /* no message, because not always wanted */
+  case LUX_SCAL_PTR:
     data = dereferenceScalPointer(data);
     /* fall-thru */
-  case ANA_SCALAR:
+  case LUX_SCALAR:
     if (dims) 
       *dims = &one;
     if (nDim)
@@ -1420,7 +1420,7 @@ static Int numerical_or_string_choice(Int data, Int **dims, Int *nDim, Int *size
     if (src)
       (*src).l = &scalar_value(data).l;
     break;
-  case ANA_CSCALAR:
+  case LUX_CSCALAR:
     if (dims)
       *dims = &one;
     if (nDim)
@@ -1430,7 +1430,7 @@ static Int numerical_or_string_choice(Int data, Int **dims, Int *nDim, Int *size
     if (src)
       (*src).cf = complex_scalar_data(data).cf;
     break;
-  case ANA_STRING:
+  case LUX_STRING:
     if (dims)
       *dims = &one;
     if (nDim)
@@ -1440,7 +1440,7 @@ static Int numerical_or_string_choice(Int data, Int **dims, Int *nDim, Int *size
     if (src)
       (*src).sp = &string_value(data);
     break;
-  case ANA_ARRAY: case ANA_CARRAY:
+  case LUX_ARRAY: case LUX_CARRAY:
     if (dims)
       *dims = array_dims(data);
     if (nDim)
@@ -1621,7 +1621,7 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
         p_spec.logical_type = PS_RETURN;
         if (return_param_index >= 0) {
           /* already had a return parameter */
-          anaerror("Specified multiple return parameters", 0);
+          luxerror("Specified multiple return parameters", 0);
           errno = EINVAL;
           goto error;
         } else
@@ -1629,7 +1629,7 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
         break;
       default:
         /* illegal parameter kind specification */
-        anaerror("Illegal parameter kind %d specified", 0, *fmt);
+        luxerror("Illegal parameter kind %d specified", 0, *fmt);
         errno = EINVAL;
         goto error;
       } /* end of switch (*fmt) */
@@ -1649,31 +1649,31 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
       /* optional data type specification */
       switch (*fmt) {
       case 'B':
-        p_spec.data_type = ANA_BYTE;
+        p_spec.data_type = LUX_BYTE;
         fmt++;
         break;
       case 'W':
-        p_spec.data_type = ANA_WORD;
+        p_spec.data_type = LUX_WORD;
         fmt++;
         break;
       case 'L':
-        p_spec.data_type = ANA_LONG;
+        p_spec.data_type = LUX_LONG;
         fmt++;
         break;
       case 'F':
-        p_spec.data_type = ANA_FLOAT;
+        p_spec.data_type = LUX_FLOAT;
         fmt++;
         break;
       case 'D':
-        p_spec.data_type = ANA_DOUBLE;
+        p_spec.data_type = LUX_DOUBLE;
         fmt++;
         break;
       case 'S':
-        p_spec.data_type = ANA_TEMP_STRING;
+        p_spec.data_type = LUX_TEMP_STRING;
         fmt++;
         break;
       default:
-        p_spec.data_type = ANA_NO_SYMBOLTYPE;
+        p_spec.data_type = LUX_NO_SYMBOLTYPE;
         break;
       } /* end of switch (*fmt) */
       
@@ -1687,7 +1687,7 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
           char *p;
           p_spec.ref_par = strtol(fmt, &p, 10);
         } else {
-          anaerror("Expected a digit or minus sign after [ in"
+          luxerror("Expected a digit or minus sign after [ in"
                    " reference parameter specification but found %c", 0, *fmt);
           errno = EINVAL;
           goto error;
@@ -1695,7 +1695,7 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
         if (*fmt == ']')
           fmt++;
         else {
-          anaerror("Expected ] instead of %c at end of reference "
+          luxerror("Expected ] instead of %c at end of reference "
                    "parameter specification", 0, *fmt);
           errno = EINVAL;
           goto error;
@@ -1703,7 +1703,7 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
       }
       if (*fmt == '{') {   /* optional axis parameter specification */
 	if (p_spec.logical_type == PS_INPUT) {
-	  anaerror("Axis parameter illegally specified for input parameter",
+	  luxerror("Axis parameter illegally specified for input parameter",
 		   0, fmt);
 	  errno = EINVAL;
 	  goto error;
@@ -1715,7 +1715,7 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
           char *p;
           p_spec.axis_par = strtol(fmt, &p, 10);
         } else {
-          anaerror("Expected a digit or minus sign after { in"
+          luxerror("Expected a digit or minus sign after { in"
                    " reference parameter specification but found %c", 0, *fmt);
           errno = EINVAL;
           goto error;
@@ -1723,7 +1723,7 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
         if (*fmt == '}')
           fmt++;
         else {
-          anaerror("Expected } instead of %c at end of reference "
+          luxerror("Expected } instead of %c at end of reference "
                    "parameter specification", 0, *fmt);
           errno = EINVAL;
           goto error;
@@ -1766,7 +1766,7 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
               d_spec.size_add = size;
               d_spec.type |= type;
             } else {
-              anaerror("Illegal combination of multiple types for dimension; parameter specification #%d: %s", 0, param_index + 1, fmt0);
+              luxerror("Illegal combination of multiple types for dimension; parameter specification #%d: %s", 0, param_index + 1, fmt0);
               errno = EINVAL;
               goto error;
             }
@@ -1776,7 +1776,7 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
               d_spec.size_remove = size;
               d_spec.type |= type;
             } else {
-              anaerror("Illegal combination of multiple types for dimension; parameter specification #%d: %s", 0, param_index + 1, fmt0);
+              luxerror("Illegal combination of multiple types for dimension; parameter specification #%d: %s", 0, param_index + 1, fmt0);
               errno = EINVAL;
               goto error;
             }
@@ -1786,7 +1786,7 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
               d_spec.size_add = size;
               d_spec.type = type;
             } else {
-              anaerror("Illegal combination of multiple types for dimension; parameter specification #%d: %s", 0, param_index + 1, fmt0);
+              luxerror("Illegal combination of multiple types for dimension; parameter specification #%d: %s", 0, param_index + 1, fmt0);
               errno = EINVAL;
               goto error;
             }
@@ -1812,7 +1812,7 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
       if (*fmt == '?') {        /* optional argument */
         if (p_spec.logical_type == PS_RETURN) {
           /* return parameter cannot be optional */
-          anaerror("Return parameter was illegally specified as optional", 0);
+          luxerror("Return parameter was illegally specified as optional", 0);
           errno = EINVAL;
           goto error;
         } else
@@ -1822,7 +1822,7 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
         p_spec.is_optional = 0;
 
       if (*fmt && *fmt != ';') {
-        anaerror("Expected ; instead of %c at end of parameter "
+        luxerror("Expected ; instead of %c at end of parameter "
                  "specification", 0, *fmt);
         errno = EINVAL;
         goto error;
@@ -1839,7 +1839,7 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
       fmt++;
     else if (*fmt) {
       /* unexpected character */
-      anaerror("Expected ; instead of %c at end of parameter specification",
+      luxerror("Expected ; instead of %c at end of parameter specification",
                0, *fmt);
       errno = EINVAL;
       goto error;
@@ -1897,7 +1897,7 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
     for (i = 0; i < psl->num_param_specs; i++) {
       if (psl->param_specs[i].ref_par >= n) {
         errno = EINVAL;
-        anaerror("Reference parameter %d for parameter %d points outside of the list (size %d)", 0, psl->param_specs[i].ref_par + 1, i + 1, n);
+        luxerror("Reference parameter %d for parameter %d points outside of the list (size %d)", 0, psl->param_specs[i].ref_par + 1, i + 1, n);
         goto error;
       }
     }
@@ -1925,14 +1925,14 @@ Int standard_args(Int narg, Int ps[], char const *fmt, pointer **ptrs,
   pointer p;
   enum Symboltype type;
 
-  returnSym = ANA_ONE;
+  returnSym = LUX_ONE;
   psl = parse_standard_arg_fmt(fmt);
   if (!psl) {
     if (ptrs)
       *ptrs = NULL;
     if (infos)
       *infos = NULL;
-    return anaerror("Illegal standard arguments specification %s", 0, fmt);
+    return luxerror("Illegal standard arguments specification %s", 0, fmt);
   }
   Int num_in_out_params = psl->num_param_specs
     - (psl->return_param_index >= 0);
@@ -1946,7 +1946,7 @@ Int standard_args(Int narg, Int ps[], char const *fmt, pointer **ptrs,
       *ptrs = NULL;
     if (infos)
       *infos = NULL;
-    return anaerror("Standard arguments specification asks for between %d and %d input/output arguments but %d are specified (%s)", 0, nmin, num_in_out_params, narg, fmt);
+    return luxerror("Standard arguments specification asks for between %d and %d input/output arguments but %d are specified (%s)", 0, nmin, num_in_out_params, narg, fmt);
   }
   if (ptrs)
     *ptrs = malloc(psl->num_param_specs*sizeof(pointer));
@@ -1985,21 +1985,21 @@ Int standard_args(Int narg, Int ps[], char const *fmt, pointer **ptrs,
       switch (psl->param_specs[ref_param].logical_type) {
       case PS_INPUT:
         if (numerical(ps[ref_param], &ref_dims, &num_ref_dims, NULL, NULL) < 0) {
-          returnSym = anaerror("Reference parameter %d must be an array",
+          returnSym = luxerror("Reference parameter %d must be an array",
                                ps[param_ix], ref_param + 1);
           goto error;
         }
         break;
       case PS_OUTPUT: case PS_RETURN:
         if (!final[ref_param]) {
-          returnSym = anaerror("Illegal forward output/return reference "
+          returnSym = luxerror("Illegal forward output/return reference "
                                "parameter %d for parameter %d", 0,
                                ref_param + 1, param_ix + 1);
           goto error;
         }
         if (numerical(final[ref_param], &ref_dims, &num_ref_dims, NULL, NULL)
             < 0) {
-          returnSym = anaerror("Reference parameter %d must be an array",
+          returnSym = luxerror("Reference parameter %d must be an array",
                                final[param_ix], ref_param + 1);
           goto error;
         }
@@ -2020,7 +2020,7 @@ Int standard_args(Int narg, Int ps[], char const *fmt, pointer **ptrs,
           if (pspec->logical_type == PS_INPUT
               && src_dims[src_dims_ix]
               != dims_spec[pspec_dims_ix].size_add) {
-            returnSym = anaerror("Expected size %d for dimension %d "
+            returnSym = luxerror("Expected size %d for dimension %d "
                                  "but found %d", ps[param_ix],
                                  dims_spec[pspec_dims_ix].size_add,
                                  src_dims_ix, src_dims[src_dims_ix]);
@@ -2033,7 +2033,7 @@ Int standard_args(Int narg, Int ps[], char const *fmt, pointer **ptrs,
           break;
         case DS_COPY_REF:       /* copy from reference */
           if (src_dims_ix >= num_ref_dims) {
-            returnSym = anaerror("Requested copying dimension %d from the reference parameter which has only %d dimensions", ps[param_ix], src_dims_ix, num_ref_dims);
+            returnSym = luxerror("Requested copying dimension %d from the reference parameter which has only %d dimensions", ps[param_ix], src_dims_ix, num_ref_dims);
             goto error;
           }
           tgt_dims[tgt_dims_ix++] = ref_dims[ref_dims_ix++];
@@ -2044,7 +2044,7 @@ Int standard_args(Int narg, Int ps[], char const *fmt, pointer **ptrs,
           switch (pspec->logical_type) {
           case PS_INPUT:
             if (src_dims[src_dims_ix] != d) {
-              returnSym = anaerror("Expected size %d for dimension %d "
+              returnSym = luxerror("Expected size %d for dimension %d "
                                    "but found %d", ps[param_ix],
                                    d, src_dims_ix, src_dims[src_dims_ix]);
               goto error;
@@ -2063,7 +2063,7 @@ Int standard_args(Int narg, Int ps[], char const *fmt, pointer **ptrs,
             {
               Int d = dims_spec[pspec_dims_ix].size_remove;
               if (d && ref_dims[ref_dims_ix] != d) {
-                returnSym = anaerror("Expected size %d for dimension %d "
+                returnSym = luxerror("Expected size %d for dimension %d "
                                      "but found %d", ps[param_ix],
                                      d, ref_dims_ix, ref_dims[ref_dims_ix]);
                 goto error;
@@ -2074,7 +2074,7 @@ Int standard_args(Int narg, Int ps[], char const *fmt, pointer **ptrs,
             {
               Int d = dims_spec[pspec_dims_ix].size_remove;
               if (d && ref_dims[ref_dims_ix] != d) {
-                returnSym = anaerror("Expected size %d for dimension %d "
+                returnSym = luxerror("Expected size %d for dimension %d "
                                      "but found %d", ps[param_ix],
                                      d, ref_dims_ix, ref_dims[ref_dims_ix]);
                 goto error;
@@ -2091,7 +2091,7 @@ Int standard_args(Int narg, Int ps[], char const *fmt, pointer **ptrs,
           ref_dims_ix++;
           break;
         default:
-          returnSym = anaerror("Dimension specification type %d "
+          returnSym = luxerror("Dimension specification type %d "
                                "not implemented yet", ps[param_ix],
                                dims_spec[pspec_dims_ix].type);
           goto error;
@@ -2105,7 +2105,7 @@ Int standard_args(Int narg, Int ps[], char const *fmt, pointer **ptrs,
           if (ref_dims && ref_dims_ix < num_ref_dims) {
 	    Int expect = num_ref_dims + src_dims_ix - ref_dims_ix;
             if (expect != num_src_dims) {
-              returnSym = anaerror("Expected %d dimensions but found %d",
+              returnSym = luxerror("Expected %d dimensions but found %d",
                                    ps[param_ix],
                                    num_ref_dims + src_dims_ix - ref_dims_ix,
                                    num_src_dims);
@@ -2114,13 +2114,13 @@ Int standard_args(Int narg, Int ps[], char const *fmt, pointer **ptrs,
             Int i, j;
             for (i = ref_dims_ix, j = src_dims_ix; i < num_ref_dims; i++, j++)
               if (ref_dims[i] != src_dims[j]) {
-                returnSym = anaerror("Expected dimension %d equal to %d "
+                returnSym = luxerror("Expected dimension %d equal to %d "
                                      "but found %d", ps[param_ix], i + 1,
                                      ref_dims[i], src_dims[j]);
                 goto error;
               }
           } else {
-            returnSym = anaerror("Dimensions of parameter %d required to be "
+            returnSym = luxerror("Dimensions of parameter %d required to be "
                                  "equal to those of the reference, but no "
                                  "reference is available",
                                  ps[param_ix], param_ix + 1);
@@ -2133,7 +2133,7 @@ Int standard_args(Int narg, Int ps[], char const *fmt, pointer **ptrs,
           if (!pspec_dims_ix) {     /* had no dimensions */
             /* assume dimension equal to 1 */
             if (src_dims[src_dims_ix] != 1) {
-              returnSym = anaerror("Expected dimension %d equal to 1 "
+              returnSym = luxerror("Expected dimension %d equal to 1 "
                                    "but found %d", ps[param_ix],
                                    src_dims_ix + 1, src_dims[src_dims_ix]);
               goto error;
@@ -2141,7 +2141,7 @@ Int standard_args(Int narg, Int ps[], char const *fmt, pointer **ptrs,
               src_dims_ix++;
           }
           if (src_dims_ix < num_src_dims) {
-            returnSym = anaerror("Specification (parameter %d) says %d dimensions but source has %d dimensions",
+            returnSym = luxerror("Specification (parameter %d) says %d dimensions but source has %d dimensions",
                                  ps[param_ix], param_ix, src_dims_ix, num_src_dims);
             goto error;
           }
@@ -2154,7 +2154,7 @@ Int standard_args(Int narg, Int ps[], char const *fmt, pointer **ptrs,
             || (pspec->data_type_limit == PS_EXACT
                 && type != pspec->data_type))
           type = pspec->data_type;
-        iq = ana_convert(1, &iq, type, 1);
+        iq = lux_convert(1, &iq, type, 1);
         break;
       case PS_OUTPUT: case PS_RETURN:
         switch (pspec->remaining_dims) {
@@ -2169,7 +2169,7 @@ Int standard_args(Int narg, Int ps[], char const *fmt, pointer **ptrs,
           }
           break;
         case PS_ARBITRARY:
-          returnSym = anaerror("'Arbitrary' remaining dimensions makes no "
+          returnSym = luxerror("'Arbitrary' remaining dimensions makes no "
                                "sense for an output or return parameter "
                                " (number %d)", 0, param_ix + 1);
           goto error;
@@ -2183,36 +2183,36 @@ Int standard_args(Int narg, Int ps[], char const *fmt, pointer **ptrs,
 	    axis_param = param_ix - 1;
 
 	  if (axis_param < 0 || axis_param >= narg) {
-	    returnSym = anaerror("Axis parameter %d for parameter %d is "
+	    returnSym = luxerror("Axis parameter %d for parameter %d is "
 				 "out of bounds", 0, axis_param, param_ix + 1);
 	    goto error;
 	  }
 	  if (axis_param == param_ix) {
-	    returnSym = anaerror("Parameter %d cannot be its own axis"
+	    returnSym = luxerror("Parameter %d cannot be its own axis"
 				 " parameter", 0, param_ix + 1);
 	    goto error;
 	  }
 	  if (!final[axis_param]) {
-	    returnSym = anaerror("Illegal forward output/return axis "
+	    returnSym = luxerror("Illegal forward output/return axis "
 				 "parameter %d for parameter %d", 0,
 				 axis_param + 1, param_ix + 1);
 	    goto error;
 	  }
 	  Int aq = ps[axis_param];
 	  if (!symbolIsNumerical(aq)) {
-	    returnSym = anaerror("Axis parameter %d is not numerical for"
+	    returnSym = luxerror("Axis parameter %d is not numerical for"
 				 " parameter %d", 0,
 				 axis_param + 1, param_ix + 1);
 	    goto error;
 	  }
-	  aq = ana_long(1, &aq);
+	  aq = lux_long(1, &aq);
 	  Int nAxes;
 	  pointer axes;
 	  numerical(aq, NULL, NULL, &nAxes, &axes);
 	  Int j;
 	  for (j = 0; j < nAxes; j++) {
 	    if (axes.l[j] < 0 || axes.l[j] >= tgt_dims_ix) {
-	      returnSym = anaerror("Axis %d out of bounds for"
+	      returnSym = luxerror("Axis %d out of bounds for"
 				   " parameter %d", 0,
 				   axes.l[j], param_ix + 1);
 	      goto error;
@@ -2247,7 +2247,7 @@ Int standard_args(Int narg, Int ps[], char const *fmt, pointer **ptrs,
         } else {
           iq = ps[param_ix];
           type = symbol_type(iq);
-          if (symbol_class(iq) == ANA_UNUSED
+          if (symbol_class(iq) == LUX_UNUSED
               || ((pspec->data_type_limit == PS_LOWER_LIMIT
                    && type < pspec->data_type)
                   || (pspec->data_type_limit == PS_EXACT

@@ -39,7 +39,7 @@ Int cerror(Int, Int, ...);
 #define ILL_ARG_LIST	16
 #define SUBSC_RANGE	17
 #define INCMP_INNER_BC	18
-#define ANA_SUB_ARG	19
+#define LUX_SUB_ARG	19
 #define NEED_ARR	20
 #define N_DIMS_OVR	21
 #define DUPL_INDX	22

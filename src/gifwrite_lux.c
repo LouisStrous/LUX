@@ -26,7 +26,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <errno.h>
 #include <math.h>
 #include <strings.h>		/* for bzero */
-#include "ana_structures.h"
+#include "lux_structures.h"
  extern struct sym_desc sym[];
  struct GIFScreen {
         char id[6];
@@ -54,16 +54,16 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
    cl_block(void), cl_hash(register Int) /*, char_init()*/;
  static void char_out(Int), flush_char(void);
 
-Int	ana_gifwrite(Int, Int []);
+Int	lux_gifwrite(Int, Int []);
  /*------------------------------------------------------------------------- */
-Int ana_gifwrite_f(narg, ps)
+Int lux_gifwrite_f(narg, ps)
  /* a function version that returns 1 if read OK */
  Int	narg, ps[];
  {
- if ( ana_gifwrite(narg, ps) == 1 ) return 1; else return 4;
+ if ( lux_gifwrite(narg, ps) == 1 ) return 1; else return 4;
  }
  /*------------------------------------------------------------------------- */
-Int ana_gifwrite(narg,ps)      /* gifwrite subroutine */
+Int lux_gifwrite(narg,ps)      /* gifwrite subroutine */
  /* write a very plain gif file, 8 bit deep */
  /* call is gifwrite,array,file,[map] where map is the color map 
  and must be (3,256) I*1 in rgb triplets */

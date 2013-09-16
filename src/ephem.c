@@ -323,7 +323,7 @@ void sprint_time (char *out, TIME t, char *zone, Int precision)
  seconds from the string */
  }
  /*--------------------------------------------------------------------------*/
-Int ana_tai_from_date(narg,ps)			/* returns TAI */
+Int lux_tai_from_date(narg,ps)			/* returns TAI */
  /* call is tai =  tai_from_date(year, doy, hour, minute, second) */
  /* may want to upgrade to accept strings using Rick's routines */
  Int	narg, ps[];
@@ -339,7 +339,7 @@ Int ana_tai_from_date(narg,ps)			/* returns TAI */
  return result_sym;
  }
  /*--------------------------------------------------------------------------*/
-Int ana_date_from_tai(narg,ps)			/* returns date string */
+Int lux_date_from_tai(narg,ps)			/* returns date string */
  /* call is s =  date_from_tai(tai) */
  Int	narg, ps[];
  {
@@ -356,7 +356,7 @@ Int ana_date_from_tai(narg,ps)			/* returns date string */
  return result_sym;
  }
  /*--------------------------------------------------------------------------*/
-Int ana_tri_name_from_tai(narg,ps)		/* returns date string */
+Int lux_tri_name_from_tai(narg,ps)		/* returns date string */
  /* call is s =  tri_name_tai(tai) */
  Int	narg, ps[];
  {
@@ -381,14 +381,14 @@ Int ana_tri_name_from_tai(narg,ps)		/* returns date string */
  }
  /*--------------------------------------------------------------------------*/
 Int ephem_setup(Int, Int []);
-Int ana_sun_b(Int narg, Int ps[])/* sun_b function */
+Int lux_sun_b(Int narg, Int ps[])/* sun_b function */
  /* returns solar B angle, b = sun_b(day_of_year, year) */
 {
   choice = 0;
   return ephem_setup(narg,ps);
 }
  /*--------------------------------------------------------------------------*/
-Int ana_sun_r(narg,ps)				/* sun_r function */
+Int lux_sun_r(narg,ps)				/* sun_r function */
  /* returns solar radius, r = sun_r(day_of_year, year) */
  Int	narg, ps[];
  {
@@ -396,7 +396,7 @@ Int ana_sun_r(narg,ps)				/* sun_r function */
  return	ephem_setup(narg,ps);
  }
  /*--------------------------------------------------------------------------*/
-Int ana_sun_d(narg,ps)				/* sun_d function */
+Int lux_sun_d(narg,ps)				/* sun_d function */
  /* returns solar d angle, d = sun_d(day_of_year, year) */
  Int	narg, ps[];
  {
@@ -404,7 +404,7 @@ Int ana_sun_d(narg,ps)				/* sun_d function */
  return	ephem_setup(narg,ps);
  }
  /*--------------------------------------------------------------------------*/
-Int ana_sun_p(narg,ps)				/* sun_p function */
+Int lux_sun_p(narg,ps)				/* sun_p function */
  /* returns solar P angle, p = sun_p(day_of_year, year) */
  Int	narg, ps[];
  {
@@ -423,7 +423,7 @@ Int ephem_setup(narg,ps)
 
  /* first arg is the day, can be scalar or array */
  nsym= ps[0];
- nsym = ana_float(1, &nsym);
+ nsym = lux_float(1, &nsym);
  /*switch on the class */
  switch (sym[nsym].class)	{
  case 8:							/*scalar ptr*/

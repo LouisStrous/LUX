@@ -128,7 +128,7 @@ void randomu(Int seed, void *output, Int number, Int modulo)
 /* sequence.  a positive value indicates a mere change of seed.  a zero */
 /* value indicates that the current random sequence is continued. */
 /* if <modulo> is zero, then <output> is considered (Float *) and the */
-/* generated random sequence is ANA_DOUBLE.  if <modulo> is positive, then */
+/* generated random sequence is LUX_DOUBLE.  if <modulo> is positive, then */
 /* <output> is considered (Int *) and the generated random sequence */
 /* runs between 0 and <modulo> - 1 (inclusive) */
 {
@@ -213,7 +213,7 @@ void random_unique(Int seed, Int *output, Int number, Int modulo)
   Int	m, t;
 
   if (number > modulo) {	/* both are assumed positive */
-    anaerror("random_unique: asked %1d unique numbers modulo %1d: Impossible",
+    luxerror("random_unique: asked %1d unique numbers modulo %1d: Impossible",
 	  0, number, modulo);
     return;
   }
@@ -287,7 +287,7 @@ void randomn(Int seed, Double *output, Int number, char hasUniform)
   }
 }  
 /*----------------------------------------------------------------------*/
-Int ana_randomu(Int narg, Int ps[])
+Int lux_randomu(Int narg, Int ps[])
  /*create an array of random elements in the [0,1.0] range (exclusive) */
 {
  Double *p;
@@ -304,7 +304,7 @@ Int ana_randomu(Int narg, Int ps[])
  narg--;
  if (!narg) {			/* no more arguments */
    random_init(seed);		/* just reinitialize */
-   return ANA_ONE;
+   return LUX_ONE;
  }
  if (*ps)
    cycle = int_arg(*ps);
@@ -312,11 +312,11 @@ Int ana_randomu(Int narg, Int ps[])
    cycle = 0;
  ps++;
  narg--;
- if (symbol_class(*ps) == ANA_ARRAY) {
+ if (symbol_class(*ps) == LUX_ARRAY) {
    if (narg > 1)
-     return anaerror("Dimension list must be either all scalars or one array",
+     return luxerror("Dimension list must be either all scalars or one array",
 		  *ps);
-   k = ana_long(1, ps);
+   k = lux_long(1, ps);
    narg = array_size(k);
    pd = array_data(k);
  } else {
@@ -324,16 +324,16 @@ Int ana_randomu(Int narg, Int ps[])
      dims[j] = int_arg(ps[j]); /*get the dimensions */
    pd = dims;
  }
- result_sym = array_scratch(cycle? ANA_LONG: ANA_DOUBLE, narg, pd);
- if (result_sym == ANA_ERROR)
-   return ANA_ERROR;
+ result_sym = array_scratch(cycle? LUX_LONG: LUX_DOUBLE, narg, pd);
+ if (result_sym == LUX_ERROR)
+   return LUX_ERROR;
  p = array_data(result_sym);
  n = array_size(result_sym);
  randomu(seed, p, n, cycle);
  return result_sym;
 }
 /*------------------------------------------------------------------------- */
-Int ana_randomd(Int narg, Int ps[])
+Int lux_randomd(Int narg, Int ps[])
 /* RANDOMD([seed,]distr,dimens) generates a LONG array with dimensions */
 /* <dimens> with each number drawn at random from the range 0 through */
 /* <NUM_ELEM(distr) - 1> (inclusive) according to the distribution */
@@ -351,17 +351,17 @@ Int ana_randomd(Int narg, Int ps[])
 
   if (!symbolIsNumericalArray(ps[1])) /* distr */
     return cerror(NEED_ARR, ps[1]);
-  result = ana_double(1, ps + 1); /* ensure DOUBLE */
+  result = lux_double(1, ps + 1); /* ensure DOUBLE */
   distr = array_data(result);
   modulus = array_size(result);
   if (distr[0] < 0.0 || distr[modulus - 1] != 1.0)
-    return anaerror("Illegal probability distribution specified", ps[1]);
+    return luxerror("Illegal probability distribution specified", ps[1]);
 
   if (symbolIsNumericalArray(ps[2])) { /* dimensions */
     if (narg > 3)
-      return anaerror("Dimension list must be either all scalars or one array",
+      return luxerror("Dimension list must be either all scalars or one array",
 		   ps[2]);
-    result = ana_long(1, ps + 2);
+    result = lux_long(1, ps + 2);
     pd = array_data(result);
     n = array_size(result);
   } else {
@@ -371,9 +371,9 @@ Int ana_randomd(Int narg, Int ps[])
     pd = dims;
   }
 
-  result = array_scratch(ANA_LONG, n, pd);
-  if (result == ANA_ERROR)
-    return ANA_ERROR;
+  result = array_scratch(LUX_LONG, n, pd);
+  if (result == LUX_ERROR)
+    return LUX_ERROR;
   pd = array_data(result);
   n = array_size(result);
   while (n--)
@@ -381,7 +381,7 @@ Int ana_randomd(Int narg, Int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-Int ana_randomn(Int narg, Int ps[])
+Int lux_randomn(Int narg, Int ps[])
  /*create a normal distribution of pseudo-random #'s, centered at 0 with */
  /* a width of 1.0
  uses Box-Muller transformation, given 2 uniformly random #'s (0 to 1 range)
@@ -395,16 +395,16 @@ Int ana_randomn(Int narg, Int ps[])
   Int	result_sym;
 
   /* first get a uniform distribution */
-  result_sym = ana_randomu(narg,ps);
-  if (result_sym == ANA_ERROR	/* an error occurred */
-      || result_sym == ANA_ONE)	/* we just initialized with a specific seed */
+  result_sym = lux_randomu(narg,ps);
+  if (result_sym == LUX_ERROR	/* an error occurred */
+      || result_sym == LUX_ONE)	/* we just initialized with a specific seed */
     return result_sym;
   /* then apply Box-Muller transformation */
   randomn(0, (Double *) array_data(result_sym), array_size(result_sym), 1);
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-Int ana_randome(Int narg, Int ps[])
+Int lux_randome(Int narg, Int ps[])
  /* create an exponential distribution of pseudo-random #'s, centered
     at 0 with a given scale length */
 {
@@ -416,11 +416,11 @@ Int ana_randome(Int narg, Int ps[])
   scale = double_arg(ps[1]);
   ps += 2;
   narg -= 2;
-  if (symbol_class(*ps) == ANA_ARRAY) {
+  if (symbol_class(*ps) == LUX_ARRAY) {
     if (narg > 1)
-      return anaerror("Dimension list must be either all scalars or one array",
+      return luxerror("Dimension list must be either all scalars or one array",
 		      *ps);
-    k = ana_long(1, ps);
+    k = lux_long(1, ps);
     narg = array_size(k);
     pd = array_data(k);
   } else {
@@ -428,9 +428,9 @@ Int ana_randome(Int narg, Int ps[])
       dims[j] = int_arg(ps[j]); /*get the dimensions */
     pd = dims;
   }
-  result_sym = array_scratch(ANA_DOUBLE, narg, pd);
-  if (result_sym == ANA_ERROR)
-    return ANA_ERROR;
+  result_sym = array_scratch(LUX_DOUBLE, narg, pd);
+  if (result_sym == LUX_ERROR)
+    return LUX_ERROR;
   p = array_data(result_sym);
   n = array_size(result_sym);
   randome(p, n, scale? limit/fabs(scale): 0);
@@ -442,7 +442,7 @@ Int ana_randome(Int narg, Int ps[])
 }
 REGISTER(randome, f, RANDOME, 3, MAX_DIMS, "%1%LIMIT:SCALE");
 /*------------------------------------------------------------------------- */
-Int ana_randomb(Int narg, Int ps[])
+Int lux_randomb(Int narg, Int ps[])
 /* RANDOMB([SEED=seed,] dimens, [/LONG]) */
 /* returns a BYTE array of the indicated dimensions where each value */
 /* is either a 0 or a 1. LS 21jul98 */
@@ -458,13 +458,13 @@ Int ana_randomb(Int narg, Int ps[])
   ndim = 0;			/* initialize total number of dimensions */
   while (narg--) {		/* treat all dimension symbols */
     switch (symbol_class(*ps)) {
-      case ANA_SCALAR:
+      case LUX_SCALAR:
 	dims[ndim++] = int_arg(*ps); /* add a single dimension */
 	break;
-      case ANA_ARRAY:
+      case LUX_ARRAY:
 	if (ndim + array_size(*ps) > MAX_DIMS)
-	  return anaerror("Too many dimensions specified", 0);
-	iq = ana_long(1, ps);	/* ensure LONG dimensions */
+	  return luxerror("Too many dimensions specified", 0);
+	iq = lux_long(1, ps);	/* ensure LONG dimensions */
 	memcpy(dims + ndim, array_data(iq), array_size(iq)*sizeof(Int));
 	ndim += array_size(iq);
 	break;
@@ -474,9 +474,9 @@ Int ana_randomb(Int narg, Int ps[])
     ps++;			/* go to next argument */
   }
 
-  result = array_scratch((internalMode & 1)? ANA_LONG: ANA_BYTE, ndim, dims);
-  if (result == ANA_ERROR)	/* some error? */
-    return ANA_ERROR;
+  result = array_scratch((internalMode & 1)? LUX_LONG: LUX_BYTE, ndim, dims);
+  if (result == LUX_ERROR)	/* some error? */
+    return LUX_ERROR;
   p.l = array_data(result);	/* pointer to result data */
 
   n = array_size(result);	/* number of bits to get */
@@ -490,7 +490,7 @@ Int ana_randomb(Int narg, Int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-Int ana_randoml(Int narg, Int ps[])
+Int lux_randoml(Int narg, Int ps[])
 /* RANDOML([SEED=seed,] dimens) */
 /* returns a FLOAT or DOUBLE (if /DOUBLE is set) array of the indicated */
 /* dimensions, filled with values drawn from a logarithmic distribution */
@@ -508,13 +508,13 @@ Int ana_randoml(Int narg, Int ps[])
   ndim = 0;			/* initialize total number of dimensions */
   while (narg--) {		/* treat all dimension symbols */
     switch (symbol_class(*ps)) {
-      case ANA_SCALAR:
+      case LUX_SCALAR:
 	dims[ndim++] = int_arg(*ps); /* add a single dimension */
 	break;
-      case ANA_ARRAY:
+      case LUX_ARRAY:
 	if (ndim + array_size(*ps) > MAX_DIMS)
-	  return anaerror("Too many dimensions specified", 0);
-	iq = ana_long(1, ps);	/* ensure LONG dimensions */
+	  return luxerror("Too many dimensions specified", 0);
+	iq = lux_long(1, ps);	/* ensure LONG dimensions */
 	memcpy(dims + ndim, array_data(iq), array_size(iq)*sizeof(Int));
 	ndim += array_size(iq);
 	break;
@@ -524,16 +524,16 @@ Int ana_randoml(Int narg, Int ps[])
     ps++;			/* go to next argument */
   }
 
-  type = (internalMode & 1)? ANA_DOUBLE: ANA_FLOAT;
+  type = (internalMode & 1)? LUX_DOUBLE: LUX_FLOAT;
 
   result = array_scratch(type, ndim, dims);
-  if (result == ANA_ERROR)	/* some error? */
-    return ANA_ERROR;
+  if (result == LUX_ERROR)	/* some error? */
+    return LUX_ERROR;
   p.v = array_data(result);	/* pointer to result data */
 
   /* we generate random bits by the Int-full, so we do a loop over */
   /* the number of Int-fulls in the array */
-  n = array_size(result)*ana_type_size[type]/sizeof(Int);
+  n = array_size(result)*lux_type_size[type]/sizeof(Int);
   /* some of the generated bit patterns do not correspond to representable */
   /* numbers but rather to NaNs.  We must replace those with representable */
   /* numbers.  We use a single scheme for both FLOAT and DOUBLE numbers, */
@@ -552,37 +552,37 @@ Int ana_randoml(Int narg, Int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-Int ana_random(Int narg, Int ps[])
+Int lux_random(Int narg, Int ps[])
 /* General pseudo-random-number generating routine.  Switches select the */
 /* distribution of the numbers.  General Syntax: */
 /*   Y = RANDOM([SEED=seed, PERIOD=period,] dimens */
 /*              [,/UNIFORM,/NORMAL,/SAMPLE,/BITS]) */
 /* Subcases: */
 /*   Y = RANDOM([SEED=seed,] dimens [,/UNIFORM]) */
-/*       generates a ANA_FLOAT array with dimensions <dimens>, containing */
+/*       generates a LUX_FLOAT array with dimensions <dimens>, containing */
 /*       numbers uniformly distributed between 0 and 1 (exclusive) */
 /*   Y = RANDOM([SEED=seed,] PERIOD=period, dimens [,/UNIFORM]) */
-/*       generates a ANA_LONG array with dimensions <dimens>, containing */
+/*       generates a LUX_LONG array with dimensions <dimens>, containing */
 /*       numbers uniformly distributed between 0 and <period> - 1 */
 /*       (inclusive), where any number may occur more than once. */
 /*   Y = RANDOM([SEED=seed,] PERIOD=period, dimens, /SAMPLE) */
-/*       generates a ANA_LONG array with dimensions <dimens>, containing */
+/*       generates a LUX_LONG array with dimensions <dimens>, containing */
 /*       numbers uniformly distributed between 0 and <period> - 1 */
 /*       (inclusive), but any number occurs at most once.  The number */
 /*       of elements must not be larger than <period>.  The numbers are */
 /*       ordered in ascending order. */
 /*   Y = RANDOM([SEED=seed,] PERIOD=period, dimens, /SHUFFLE) */
-/*       generates a ANA_LONG array with dimensions <dimens>, containing */
+/*       generates a LUX_LONG array with dimensions <dimens>, containing */
 /*       numbers uniformly distributed between 0 and <period> - 1 */
 /*       (inclusive), but any number occurs at most once.  The number */
 /*       of elements must not be larger than <period>.  The numbers are */
 /*       in random order. */
 /*   Y = RANDOM([SEED=seed,] dimens, /NORMAL) */
-/*       generates a ANA_FLOAT array with dimensions <dimens>, containing */
+/*       generates a LUX_FLOAT array with dimensions <dimens>, containing */
 /*       numbers normally distributed with zero mean and unit standard */
 /*       deviation. */
 /*   Y = RANDOM([SEED=seed,] dimens, /BITS) */
-/*       generates an ANA_BYTE array with dimensions <dimens>, containing */
+/*       generates an LUX_BYTE array with dimensions <dimens>, containing */
 /*       either a 0 or a 1, drawn at random with equal probability.  */
 {
   Int	result, ndim, dims[MAX_DIMS], iq, i, period, seed;
@@ -606,16 +606,16 @@ Int ana_random(Int narg, Int ps[])
   if (narg > 2)			/* dimensions were specified */
     for (i = 2; i < narg; i++) {
       switch (symbol_class(ps[i])) {
-	case ANA_ARRAY:
+	case LUX_ARRAY:
 	  if (ndim + array_size(ps[i]) > MAX_DIMS)
-	    return anaerror("Too many dimensions", 0);
-	  iq = ana_long(1, &ps[i]); /* ensure LONG dimensions */
+	    return luxerror("Too many dimensions", 0);
+	  iq = lux_long(1, &ps[i]); /* ensure LONG dimensions */
 	  memcpy(dims + ndim, array_data(iq), ndim*sizeof(Int));
 	  ndim += array_size(iq);
 	  break;
-	case ANA_SCALAR:
+	case LUX_SCALAR:
 	  if (ndim == MAX_DIMS)
-	    return anaerror("Too many dimensions", 0);
+	    return luxerror("Too many dimensions", 0);
           if (!symbolIsScalar(ps[i]))
             return cerror(NEED_SCAL, ps[i]);
 	  dims[ndim++] = int_arg(ps[i]);
@@ -627,7 +627,7 @@ Int ana_random(Int narg, Int ps[])
       }	/* end of switch (symbol_class(ps[i])) */
     } /* end of for (i = 2; i < narg; i++) */
   else				/* no dimensions specified */
-    return ANA_ONE;		/* we're done already */
+    return LUX_ONE;		/* we're done already */
 
   switch (internalMode) {
     case 1:			/* /UNIFORM */
@@ -635,31 +635,31 @@ Int ana_random(Int narg, Int ps[])
         if (!symbolIsScalar(ps[1]))
           return cerror(NEED_SCAL, ps[1]);
 	period = int_arg(ps[1]);
-	result = array_scratch(ANA_LONG, ndim, dims);
-	if (result == ANA_ERROR)
-	  return ANA_ERROR;
+	result = array_scratch(LUX_LONG, ndim, dims);
+	if (result == LUX_ERROR)
+	  return LUX_ERROR;
 	randomu(seed, (Int *) array_data(result), array_size(result),
 		period);
       } else {			/* no PERIOD, so get FLOATs */
-	result = array_scratch(ANA_DOUBLE, ndim, dims);
+	result = array_scratch(LUX_DOUBLE, ndim, dims);
 	randomu(seed, (Double *) array_data(result), array_size(result), 0);
       }
       break;
     case 2:			/* /NORMAL */
       if (narg > 1 && ps[1])	/* PERIOD specified - illegal */
-	return anaerror("RANDOM - no PERIOD allowed with /NORMAL", ps[1]);
-      result = array_scratch(ANA_DOUBLE, ndim, dims);
-      if (result == ANA_ERROR)
-	return ANA_ERROR;
+	return luxerror("RANDOM - no PERIOD allowed with /NORMAL", ps[1]);
+      result = array_scratch(LUX_DOUBLE, ndim, dims);
+      if (result == LUX_ERROR)
+	return LUX_ERROR;
       randomn(seed, (Double *) array_data(result), array_size(result), 0);
       break;
     case 3: case 4:			/* /SAMPLE, /SHUFFLE */
       if (narg < 1 || !ps[1])	/* PERIOD absent, but is required */
-	return anaerror("RANDOM - need PERIOD with /SAMPLE", 0);
+	return luxerror("RANDOM - need PERIOD with /SAMPLE", 0);
       period = int_arg(ps[1]);	/* PERIOD */
-      result = array_scratch(ANA_LONG, ndim, dims);
-      if (result == ANA_ERROR)
-	return ANA_ERROR;
+      result = array_scratch(LUX_LONG, ndim, dims);
+      if (result == LUX_ERROR)
+	return LUX_ERROR;
       if (internalMode == 3)
 	random_unique(seed, (Int *) array_data(result), array_size(result),
 		      period);
@@ -669,17 +669,17 @@ Int ana_random(Int narg, Int ps[])
       break;
     case 5:			/* /BITS */
       if (narg > 1 && ps[1])	/* PERIOD specified - illegal */
-	return anaerror("RANDOM - no PERIOD allowed with /BITS", ps[1]);
-      result = array_scratch(ANA_BYTE, ndim, dims);
-      if (result == ANA_ERROR)
-	return ANA_ERROR;
+	return luxerror("RANDOM - no PERIOD allowed with /BITS", ps[1]);
+      result = array_scratch(LUX_BYTE, ndim, dims);
+      if (result == LUX_ERROR)
+	return LUX_ERROR;
       iq = array_size(result);
       p = array_data(result);
       while (iq--)
 	*p++ = random_bit();
       break;
     default:			/* unknown or illegal combination */
-      return anaerror("RANDOM - unknown distribution (%1d)", internalMode);
+      return luxerror("RANDOM - unknown distribution (%1d)", internalMode);
   }
   return result;
 }

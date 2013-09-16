@@ -25,7 +25,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "config.h"
 #endif
 #include <math.h>
-#include "anadefs.h"
+#include "luxdefs.h"
 #include "output.h"
 
 Int curv1_(Int *n, Double *x, Double *y, Double *slp1, Double *slpn,
@@ -54,7 +54,7 @@ Int curv1_(Int *n, Double *x, Double *y, Double *slp1, Double *slpn,
 
 
 /* --	generates spline under tension for monotonic x */
-/* --	NOTE THAT THIS IS A ANA_FUNCTION IN ORDER TO RETURN SUCCESS OR 
+/* --	NOTE THAT THIS IS A LUX_FUNCTION IN ORDER TO RETURN SUCCESS OR 
 FAILURE */
     /* Parameter adjustments */
     --yf;
@@ -91,7 +91,7 @@ L10:
 	if (delx2 <= 0.) {
 	    goto L990;
 	}
-/* ANA_ERROR, EXIT */
+/* LUX_ERROR, EXIT */
 	dels = sigmap * delx2;
 	if (dels > dx2) {
 	    dx2 = dels;
@@ -206,7 +206,7 @@ L240:
     ret_val = 1;
     return ret_val;
 L990:
-/* ANA_ERROR */
+/* LUX_ERROR */
     printf("independent vector not monotonically increasing\n");
     ret_val = 0;
     return ret_val;
@@ -242,7 +242,7 @@ Int kurv1_(Int *n, Double *x, Double *y, Double *slp1, Double *slpn,
 
 
 /* --	generates spline under tension for any open (x,y) curve */
-/* --	NOTE THAT THIS IS A ANA_FUNCTION IN ORDER TO RETURN SUCCESS OR 
+/* --	NOTE THAT THIS IS A LUX_FUNCTION IN ORDER TO RETURN SUCCESS OR 
 FAILURE */
     /* Parameter adjustments */
     --ys;
@@ -472,7 +472,7 @@ Int kurvp1_(Int *n, Double *x, Double *y, Double *xp, Double *yp,
 
 /* --	generates spline under tension for any closed loop (x,y) 
 curve */
-/* --	NOTE THAT THIS IS A ANA_FUNCTION IN ORDER TO RETURN SUCCESS OR 
+/* --	NOTE THAT THIS IS A LUX_FUNCTION IN ORDER TO RETURN SUCCESS OR 
 FAILURE */
     /* Parameter adjustments */
     --ys;

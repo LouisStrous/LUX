@@ -27,7 +27,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "anadefs.h"
+#include "luxdefs.h"
 #include "dmalloc.h"
 #include "editor.h"		/* for BUFSIZE */
 #include "version.h"		/* for GIT_VERSION */

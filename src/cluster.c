@@ -30,18 +30,18 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <float.h>		/* for DBL_MAX */
 #include "action.h"
 
-Int	ana_replace(Int, Int);
+Int	lux_replace(Int, Int);
 void	randomu(Int seed, void *output, Int number, Int modulo);
 /*----------------------------------------------------------------*/
 Int fptrCompare(const void *p1, const void *p2)
-     /* auxilliary function for qsort call in ana_cluster */
+     /* auxilliary function for qsort call in lux_cluster */
 {
   if (**(Double **) p1 < **(Double **) p2) return -1;
   if (**(Double **) p1 > **(Double **) p2) return 1;
   return 0;
 }
 /*----------------------------------------------------------------*/
-Int ana_cluster(Int narg, Int ps[])
+Int lux_cluster(Int narg, Int ps[])
 /* CLUSTER, DATA [, CENTERS=c, INDEX=i, SIZE=sz, SAMPLE=s, PHANTOM=p,
    MAXIT=m, RMS=r, /UPDATE, /ITERATE, /VOCAL, /QUICK]
 
@@ -156,9 +156,9 @@ Int ana_cluster(Int narg, Int ps[])
 
   /* 0. Initialization */
   if (ps[1] >= NAMED_END)	/* CENTERS is not a named variable */
-    return anaerror("Argument must be a named variable", ps[1]);
-  iq = ana_float(1, ps);	/* the data (ensure ANA_FLOAT) */
-  if (symbol_class(iq) != ANA_ARRAY) /* data is not an array */
+    return luxerror("Argument must be a named variable", ps[1]);
+  iq = lux_float(1, ps);	/* the data (ensure LUX_FLOAT) */
+  if (symbol_class(iq) != LUX_ARRAY) /* data is not an array */
     return cerror(NEED_ARR, *ps);
   dataDims = array_dims(iq);	/* data dimensions */
   nDataDims = array_num_dims(iq); /* # data dimensions */
@@ -168,7 +168,7 @@ Int ana_cluster(Int narg, Int ps[])
   if (narg >= 4 && ps[3]) {	/* SIZE */
     gotSize = 1;
     if (ps[3] >= NAMED_END)
-      return anaerror("Output argument must be a named variable", ps[3]);
+      return luxerror("Output argument must be a named variable", ps[3]);
   } else
     gotSize = 0;
   if (narg >= 5 && ps[4]) {	/* SAMPLE */
@@ -181,8 +181,8 @@ Int ana_cluster(Int narg, Int ps[])
     gotPhantom = 1;
     phantom = int_arg(ps[5]);
     if (phantom < 0)
-      return anaerror("Number of phantom members must be >= 0", ps[5]);
-    else if (ps[5] == ANA_ONE)	/* /PHANTOM */
+      return luxerror("Number of phantom members must be >= 0", ps[5]);
+    else if (ps[5] == LUX_ONE)	/* /PHANTOM */
       phantom = 10; 		/* default number */
   } else {
     gotPhantom = 0;
@@ -196,13 +196,13 @@ Int ana_cluster(Int narg, Int ps[])
   if (narg >= 7 && ps[6]) {	/* MAXIT */
     maxit = int_arg(ps[6]);
     if (maxit <= 0)
-      return anaerror("Maximum number of iterations must be positive", ps[6]);
+      return luxerror("Maximum number of iterations must be positive", ps[6]);
   } else
     maxit = 0;
 
   if (narg >= 8 && ps[7]) {	/* RMS */
     if (ps[7] >= NAMED_END)
-      return anaerror("Output argument must be a named variable", ps[7]);
+      return luxerror("Output argument must be a named variable", ps[7]);
     rms = ps[7];
   } else
     rms = 0;
@@ -214,18 +214,18 @@ Int ana_cluster(Int narg, Int ps[])
     k = nSample;
   size = sizeof(Double)*nVectorDim; /* size in bytes of one data point */
   switch (symbol_class(ps[1])) { /* CENTERS class */
-    case ANA_SCALAR:		/* the scalar denotes the number of */
+    case LUX_SCALAR:		/* the scalar denotes the number of */
       /* clusters to find.  Get random sample of data vectors to act */
       /* as (initial) cluster centers */
       gotCenter = 0;		/* signal that the user did not specify */
 				/* cluster centers */
       nClusters = int_arg(ps[1]); /* # clusters to find */
       if (nClusters < 2 || nClusters >= k) /* wrong number requested */
-	return anaerror("Number of clusters must lie between 2 and %1d",
+	return luxerror("Number of clusters must lie between 2 and %1d",
 		     ps[1], k);
       dims[0] = nVectorDim;	/* # dimensions per data point */
       dims[1] = nClusters;	/* # clusters */
-      redef_array(ps[1], ANA_DOUBLE, 2, dims);
+      redef_array(ps[1], LUX_DOUBLE, 2, dims);
       center = (Double *) array_data(ps[1]); /* cluster centers */
 
       if (gotSample) {
@@ -270,19 +270,19 @@ Int ana_cluster(Int narg, Int ps[])
 
       free(clusterOtoC);
       break;
-    case ANA_ARRAY:			/* the array contains the initial */
+    case LUX_ARRAY:			/* the array contains the initial */
       /* cluster centers.  The first dimension counts the dimensions */
       /* of each cluster center. */
       gotCenter = 1;		/* signal that the user specified */
 				/* cluster centers */
       if (array_num_dims(ps[1]) < 2) /* only one cluster center */
-	return anaerror("Finding just one cluster is silly!", ps[1]);
+	return luxerror("Finding just one cluster is silly!", ps[1]);
       if (array_dims(ps[1])[0] != nVectorDim) /* wrong # dimensions */
 					      /* per data point */
-	return anaerror("First dimension of DATA and CENTERS do not match",
+	return luxerror("First dimension of DATA and CENTERS do not match",
 		     ps[1]);
       nClusters = array_size(ps[1])/nVectorDim; /* # clusters */
-      ana_replace(ps[1], ana_double(1, &ps[1]));
+      lux_replace(ps[1], lux_double(1, &ps[1]));
       center = (Double *) array_data(ps[1]); /* data centers */
 
       if (gotSample) {
@@ -319,16 +319,16 @@ Int ana_cluster(Int narg, Int ps[])
     /* nClusters - 1, then we assume it to hold cluster numbers to update. */
     useIndex = 0;
     if (ps[2] >= NAMED_END)	/* INDEX is not a named variable */
-      return anaerror("Argument must be a named variable", ps[2]);
+      return luxerror("Argument must be a named variable", ps[2]);
     if (!gotSample		/* no SAMPLE */
-	&& symbol_class(ps[2]) == ANA_ARRAY /* INDEX is an array */
+	&& symbol_class(ps[2]) == LUX_ARRAY /* INDEX is an array */
 	&& array_size(ps[2]) == nVectors /* an index for each data point */
-	&& (Int) array_type(ps[2]) <= ANA_LONG) { /* integer data type */
+	&& (Int) array_type(ps[2]) <= LUX_LONG) { /* integer data type */
       indexType = array_type(ps[2]);	/* index data type */
       useIndex = 1;		/* default: useful indices */
       clusterNumber.b = (Byte *) array_data(ps[2]);
       switch (indexType) {
-	case ANA_BYTE:
+	case LUX_BYTE:
 	  for (i = 0; i < nVectors; i++)
 	    if ((Int) clusterNumber.b[i] >= nClusters) { /* index too large */
 	      printf("CLUSTER - illegal index #%1d (%1d), ignore all\n",
@@ -337,7 +337,7 @@ Int ana_cluster(Int narg, Int ps[])
 	      break;
 	    }
 	  break;
-	case ANA_WORD:
+	case LUX_WORD:
 	  for (i = 0; i < nClusters; i++)
 	    if (clusterNumber.w[i] < 0 /* index too small */
 		|| clusterNumber.w[i] >= nClusters) { /* index too large */
@@ -347,7 +347,7 @@ Int ana_cluster(Int narg, Int ps[])
 	      break;
 	    }
 	  break;
-	case ANA_LONG:
+	case LUX_LONG:
 	  for (i = 0; i < nClusters; i++)
 	    if (clusterNumber.l[i] < 0 /* index too small */
 		|| clusterNumber.l[i] >= nClusters) { /* index too large */
@@ -358,20 +358,20 @@ Int ana_cluster(Int narg, Int ps[])
 	    }
 	  break;
       }
-    } /* end of if (symbol_class(ps[2]) == ANA_ARRAY && ...) */
+    } /* end of if (symbol_class(ps[2]) == LUX_ARRAY && ...) */
   }
   if (!useIndex) {	/* no sufficient memory yet for cluster numbers */
-    if (nClusters - 1 <= UINT8_MAX)	/* ANA_BYTE will do it */
-      indexType = ANA_BYTE;
-    else if (nClusters - 1 <= INT16_MAX) /* ANA_WORD to store biggest index */
-      indexType = ANA_WORD;
-    else			/* need ANA_LONG */
-      indexType = ANA_LONG;
+    if (nClusters - 1 <= UINT8_MAX)	/* LUX_BYTE will do it */
+      indexType = LUX_BYTE;
+    else if (nClusters - 1 <= INT16_MAX) /* LUX_WORD to store biggest index */
+      indexType = LUX_WORD;
+    else			/* need LUX_LONG */
+      indexType = LUX_LONG;
     if (gotIndex && !gotSample)	{ /* have a variable, redefine */
       redef_array(ps[2], indexType , nDataDims - 1, dataDims + 1);
       clusterNumber.b = (Byte *) array_data(ps[2]);
     } else {			/* no variable, allocate */
-      clusterNumber.b = malloc(nSample*ana_type_size[indexType]*sizeof(Byte));
+      clusterNumber.b = malloc(nSample*lux_type_size[indexType]*sizeof(Byte));
       if (!clusterNumber.b)
 	return cerror(ALLOC_ERR, 0);
     }
@@ -387,7 +387,7 @@ Int ana_cluster(Int narg, Int ps[])
   if (record) {
     file = fopen("cluster.out", "w");
     if (!file)
-      return anaerror("Could not open file cluster.out for writing", 0); }
+      return luxerror("Could not open file cluster.out for writing", 0); }
   
 
   if (useIndex && !gotPhantom)
@@ -553,7 +553,7 @@ Int ana_cluster(Int narg, Int ps[])
   free(findex);
 
   if (gotSize) {		/* SIZE was specified by user */
-    redef_array(ps[3], ANA_LONG, 1, &nClusters); /* get in shape */
+    redef_array(ps[3], LUX_LONG, 1, &nClusters); /* get in shape */
     clusterSize = (Int *) array_data(ps[3]);
   } else {				/* no SIZE specified */
     clusterSize = malloc(nClusters*sizeof(Int)); /* so allocate some space */
@@ -566,19 +566,19 @@ Int ana_cluster(Int narg, Int ps[])
       && (update || gotSize)	/* going to update cluster centers */
       && !gotPhantom) {		/* user did not ask for phantom clusters */
     switch (indexType) {
-      case ANA_BYTE:
+      case LUX_BYTE:
 	for (i = 0; i < nSample; i++) {
 	  j = clusterOtoC[clusterNumber.b[i]];
 	  clusterSize[j]++;
 	}
 	break;
-      case ANA_WORD:
+      case LUX_WORD:
 	for (i = 0; i < nSample; i++) {
 	  j = clusterOtoC[clusterNumber.w[i]];
 	  clusterSize[j]++;
 	}
 	break;
-      case ANA_LONG:
+      case LUX_LONG:
 	for (i = 0; i < nSample; i++) {
 	  j = clusterOtoC[clusterNumber.l[i]];
 	  clusterSize[j]++;
@@ -622,7 +622,7 @@ Int ana_cluster(Int narg, Int ps[])
 				/* the first iteration */
 
   if (rms) {
-    redef_array(rms, ANA_DOUBLE, 1, &nClusters);
+    redef_array(rms, LUX_DOUBLE, 1, &nClusters);
     rmsptr = array_data(rms);
   }
 
@@ -640,19 +640,19 @@ Int ana_cluster(Int narg, Int ps[])
       changed[i] = 0;		/* no clusters changed yet */
     nChanged = 0;		/* no data points changed yet */
     if (rms)
-      zerobytes(rmsptr, nClusters*ana_type_size[ANA_DOUBLE]);
+      zerobytes(rmsptr, nClusters*lux_type_size[LUX_DOUBLE]);
     for (i = 0; i < nSample; i++) { /* treat all selected data points */
       dataIndex = gotSample? index[i]: i;
       dataPoint = data + dataIndex*nVectorDim; /* current data point */
       if (useIndex)		/* get old cluster number */
 	switch (indexType) {
-	  case ANA_BYTE:
+	  case LUX_BYTE:
 	    curO = *clusterNumber.b;
 	    break;
-	  case ANA_WORD:
+	  case LUX_WORD:
 	    curO = *clusterNumber.w;
 	    break;
-	  case ANA_LONG:
+	  case LUX_LONG:
 	    curO = *clusterNumber.l;
 	    break;
 	}
@@ -916,13 +916,13 @@ Int ana_cluster(Int narg, Int ps[])
 	newO = curO;
       
       switch (indexType) {	/* save cluster number */
-	case ANA_BYTE:
+	case LUX_BYTE:
 	  *clusterNumber.b++ = newO;
 	  break;
-	case ANA_WORD:
+	case LUX_WORD:
 	  *clusterNumber.w++ = newO;
 	  break;
-	case ANA_LONG:
+	case LUX_LONG:
 	  *clusterNumber.l++ = newO;
 	  break;
       }
@@ -1021,7 +1021,7 @@ Int ana_cluster(Int narg, Int ps[])
     nDistCal = 0;
     
 				/* reinitialize for a next iteration */
-    clusterNumber.b -= nSample*ana_type_size[indexType];
+    clusterNumber.b -= nSample*lux_type_size[indexType];
     if (iterate && nChanged) {
       if (useIndex)
 	memcpy(changedOld, changed, nClusters);
@@ -1102,6 +1102,6 @@ Int ana_cluster(Int narg, Int ps[])
   free(scrap);
   if (!gotIndex || gotSample)
     free(clusterNumber.b);
-  return ANA_OK;
+  return LUX_OK;
 }
 /*----------------------------------------------------------------*/

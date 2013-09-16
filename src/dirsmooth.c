@@ -154,7 +154,7 @@ Int traverseElement(Float xin, Float yin, Float vx, Float vy,
 }
 /*--------------------------------------------------------------------*/
 #define FACTOR	(0.886226925)	/* 0.5*sqrt(pi) */
-Int ana_lic(Int narg, Int ps[])
+Int lux_lic(Int narg, Int ps[])
 /* Y = LIC(<data>,<vx>,<vy>)
    smooths 2D image <data> in the direction indicated by the
    angle <vx> and <vy>, over a distance indicated by the magnitude of vector
@@ -168,34 +168,34 @@ Int ana_lic(Int narg, Int ps[])
   loopInfo	srcinfo, trgtinfo;
 
   iq0 = ps[0];			/* data */
-  if (symbol_class(iq0) != ANA_ARRAY /* not an array */
+  if (symbol_class(iq0) != LUX_ARRAY /* not an array */
       || array_num_dims(iq0) != 2) /* or doesn't have 2 dimensions */
     return cerror(NEED_2D_ARR, iq0);
-  iq0 = ana_float(1, &iq0);
+  iq0 = lux_float(1, &iq0);
   nx = array_dims(iq0)[0];
   ny = array_dims(iq0)[1];
 
   iq = ps[1];			/* vx */
-  if (symbol_class(iq) != ANA_ARRAY
+  if (symbol_class(iq) != LUX_ARRAY
       || array_num_dims(iq) != 2
       || array_dims(iq)[0] != nx
       || array_dims(iq)[1] != ny)
     return cerror(INCMP_ARG, iq);
-  iq = ana_float(1, &iq);
+  iq = lux_float(1, &iq);
   vx0 = array_data(iq);
 
   iq = ps[2];			/* vy */
-  if (symbol_class(iq) != ANA_ARRAY
+  if (symbol_class(iq) != LUX_ARRAY
       || array_num_dims(iq) != 2
       || array_dims(iq)[0] != nx
       || array_dims(iq)[1] != ny)
     return cerror(INCMP_ARG, iq);
-  iq = ana_float(1, &iq);
+  iq = lux_float(1, &iq);
   vy0 = array_data(iq);
 
   if (standardLoop(iq0, 0, SL_ALLAXES | SL_SAMEDIMS | SL_EXACT | SL_EACHCOORD,
-		   ANA_FLOAT, &srcinfo, &src, &iq, &trgtinfo, &trgt) < 0)
-    return ANA_ERROR;
+		   LUX_FLOAT, &srcinfo, &src, &iq, &trgtinfo, &trgt) < 0)
+    return LUX_ERROR;
   src0.f = src.f;
 
   twosided = ((internalMode & 1) == 0); /* /TWOSIDED */

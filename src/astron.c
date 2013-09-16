@@ -758,7 +758,7 @@ Int gcd(Int a, Int b)
   return b;
 }
 /*--------------------------------------------------------------------------*/
-Int ana_calendar(Int narg, Int ps[])
+Int lux_calendar(Int narg, Int ps[])
 {
   Int result, input_elem_per_date, output_elem_per_date, iq;
   Int *dims = NULL, ndim = 0;
@@ -847,13 +847,13 @@ Int ana_calendar(Int narg, Int ps[])
        input type is floating point, then promote to DOUBLE. */
     type = symbol_type(iq);
     if (isIntegerType(type)) {
-      iq = ana_long(1, &iq);
-      inputtype = ANA_LONG;
+      iq = lux_long(1, &iq);
+      inputtype = LUX_LONG;
     } else if (isFloatType(type)) {
-      iq = ana_double(1, &iq);
-      inputtype = ANA_DOUBLE;
+      iq = lux_double(1, &iq);
+      inputtype = LUX_DOUBLE;
     } else                        /* must be text type */
-      inputtype = ANA_STRING_ARRAY;
+      inputtype = LUX_STRING_ARRAY;
   }
 
   /* number of input elements expected per calendar date */
@@ -862,7 +862,7 @@ Int ana_calendar(Int narg, Int ps[])
     input_elem_per_date = 1; /* strings have all elements of a date in a single string */
 
   if (dims[0] % input_elem_per_date)
-    return anaerror("Incompatible first dimension: expected a multiple "
+    return luxerror("Incompatible first dimension: expected a multiple "
                     "of %d but found %d", ps[0], input_elem_per_date,
                     dims[0]);
   
@@ -900,14 +900,14 @@ Int ana_calendar(Int narg, Int ps[])
      If CaltoCJDN is NULL and the number of input elements per date
      is not equal to 1, then work with a DOUBLE copy of the input
      symbol. */
-  if (inputtype == ANA_LONG) {
+  if (inputtype == LUX_LONG) {
     if (CaltoCJDN && fromtime == totime)
-      internaltype = ANA_LONG;
+      internaltype = LUX_LONG;
     else {
-      internaltype = ANA_DOUBLE;
+      internaltype = LUX_DOUBLE;
       if (input_elem_per_date != 1) {
-        iq = ana_double(1, &iq);
-        inputtype = ANA_DOUBLE;
+        iq = lux_double(1, &iq);
+        inputtype = LUX_DOUBLE;
       }
     }
   }
@@ -918,15 +918,15 @@ Int ana_calendar(Int narg, Int ps[])
      is not equal to 1, then work with a LONG ("floor") copy of the
      input symbol. */
   
-  else if (inputtype == ANA_DOUBLE) {
+  else if (inputtype == LUX_DOUBLE) {
     if (CaltoCJD || fromtime != totime)
-      internaltype = ANA_DOUBLE;
+      internaltype = LUX_DOUBLE;
     else {
-      internaltype = ANA_LONG;
+      internaltype = LUX_LONG;
       if (input_elem_per_date != 1) {
-        Int ana_floor(Int, Int *);
-        iq = ana_floor(1, &iq);
-        inputtype = ANA_LONG;
+        Int lux_floor(Int, Int *);
+        iq = lux_floor(1, &iq);
+        inputtype = LUX_LONG;
       }
     }
   }
@@ -935,9 +935,9 @@ Int ana_calendar(Int narg, Int ps[])
      depends on the output kind. */
   else {
     if (outputkind == CAL_DOUBLE)
-      internaltype = ANA_DOUBLE;
+      internaltype = LUX_DOUBLE;
     else
-      internaltype = ANA_LONG;
+      internaltype = LUX_LONG;
     input_elem_per_date = 1; /* all input elements in a single text value */
   }
   
@@ -949,12 +949,12 @@ Int ana_calendar(Int narg, Int ps[])
      text.
   */
   if (outputkind == CAL_TEXT) {
-    outputtype = ANA_STRING_ARRAY;
+    outputtype = LUX_STRING_ARRAY;
     output_elem_per_date = 1;   /* all date components in a single text value */
-  } else if (outputkind == CAL_LONG || internaltype == ANA_LONG)
-    outputtype = CJDNtoCal? ANA_LONG: ANA_DOUBLE;
-  else if (outputkind == CAL_DOUBLE || internaltype == ANA_DOUBLE)
-    outputtype = CJDtoCal? ANA_DOUBLE: ANA_LONG;
+  } else if (outputkind == CAL_LONG || internaltype == LUX_LONG)
+    outputtype = CJDNtoCal? LUX_LONG: LUX_DOUBLE;
+  else if (outputkind == CAL_DOUBLE || internaltype == LUX_DOUBLE)
+    outputtype = CJDtoCal? LUX_DOUBLE: LUX_LONG;
   else                          /* should not happen */
     outputtype = internaltype;
 
@@ -974,7 +974,7 @@ Int ana_calendar(Int narg, Int ps[])
       }
     }
     
-    if (standardLoopX(iq, ANA_ZERO,
+    if (standardLoopX(iq, LUX_ZERO,
                       SL_AXISCOORD
                       | SL_EACHROW,
                       &srcinfo, &src,
@@ -985,7 +985,7 @@ Int ana_calendar(Int narg, Int ps[])
                       | SL_EACHROW,
                       &result,
                       &tgtinfo, &tgt) < 0)
-      return ANA_ERROR;
+      return LUX_ERROR;
   }
 
   if (srcinfo.rdims[0] != input_elem_per_date) {
@@ -1014,23 +1014,23 @@ Int ana_calendar(Int narg, Int ps[])
      at least one of the translations (to LONG/DOUBLE) is available,
      and are prepared to handle the case where only one is
      available. */
-  if (inputtype == ANA_STRING_ARRAY && !CalStoCJD)
-    return anaerror("Translating from STRING is not supported for this calendar", ps[0]);
+  if (inputtype == LUX_STRING_ARRAY && !CalStoCJD)
+    return luxerror("Translating from STRING is not supported for this calendar", ps[0]);
 
   /* complain if the desired type of translation is not available.  We
      don't need to check for numerical types, because we demand that
      at least one of the translations (from LONG/DOUBLE) is available,
      and are prepared to handle the case where only one is
      available. */
-  if (outputtype == ANA_STRING_ARRAY)
+  if (outputtype == LUX_STRING_ARRAY)
     switch (internaltype) {
-    case ANA_LONG:
+    case LUX_LONG:
       if (!CJDNtoCalS)
-        return anaerror("Translating CJDN to STRING is not supported for this calendar", ps[0]);
+        return luxerror("Translating CJDN to STRING is not supported for this calendar", ps[0]);
       break;
-    case ANA_DOUBLE:
+    case LUX_DOUBLE:
       if (!CJDtoCalS)
-        return anaerror("Translating CJD to STRING is not supported for this calendar", ps[0]);
+        return luxerror("Translating CJD to STRING is not supported for this calendar", ps[0]);
       break;
     default:
       break;
@@ -1042,13 +1042,13 @@ Int ana_calendar(Int narg, Int ps[])
 
     /* translate input to CJD or CJDN */
     switch (internaltype) {
-    case ANA_LONG:              /* translate to CJDN */
+    case LUX_LONG:              /* translate to CJDN */
       switch (inputtype) {
-      case ANA_LONG:
+      case LUX_LONG:
         CaltoCJDN(src.l, &timestamp.l);
         src.l += input_elem_per_date;
         break;
-      case ANA_DOUBLE: /* only cases with one element per date reach here */
+      case LUX_DOUBLE: /* only cases with one element per date reach here */
         assert(input_elem_per_date == 1);
         temp.l = (Int) floor(*src.d); /* translate from DOUBLE to LONG */
         CaltoCJDN(&temp.l, &timestamp.l); /* use LONG translation */
@@ -1058,19 +1058,19 @@ Int ana_calendar(Int narg, Int ps[])
         break;
       }
       break;
-    case ANA_DOUBLE:            /* translate to CJD */
+    case LUX_DOUBLE:            /* translate to CJD */
       switch (inputtype) {
-      case ANA_LONG: /* only cases with one element per date reach here */
+      case LUX_LONG: /* only cases with one element per date reach here */
         assert(input_elem_per_date == 1);
         temp.d = (Double) *src.l; /* translate from LONG to DOUBLE */
         CaltoCJD(&temp.d, &timestamp.d); /* use DOUBLE translation */
         src.l += input_elem_per_date;
         break;
-      case ANA_DOUBLE:
+      case LUX_DOUBLE:
         CaltoCJD(src.d, &timestamp.d);
         src.d += input_elem_per_date;
         break;
-      case ANA_STRING_ARRAY: case ANA_LSTRING:
+      case LUX_STRING_ARRAY: case LUX_LSTRING:
         CalStoCJD(src.sp, &timestamp.d);
         src.sp += input_elem_per_date;
         break;
@@ -1114,19 +1114,19 @@ Int ana_calendar(Int narg, Int ps[])
 
     /* translate CJD or CJDN to output */
     switch (internaltype) {
-    case ANA_LONG:
+    case LUX_LONG:
       switch (outputtype) {
-      case ANA_LONG:
+      case LUX_LONG:
         CJDNtoCal(&timestamp.l, tgt.l);
         tgt.l += output_elem_per_date;
         break;
-      case ANA_DOUBLE: /* only cases with one element per date reach here */
+      case LUX_DOUBLE: /* only cases with one element per date reach here */
         assert(output_elem_per_date == 1);
         temp.d = (Double) timestamp.l; /* translate from LONG to DOUBLE */
         CJDtoCal(&temp.d, tgt.d);      /* use DOUBLE translation */
         tgt.d += output_elem_per_date;
         break;
-      case ANA_STRING_ARRAY:
+      case LUX_STRING_ARRAY:
         CJDNtoCalS(&timestamp.l, tgt.sp);
         tgt.sp += output_elem_per_date;
         break;
@@ -1134,18 +1134,18 @@ Int ana_calendar(Int narg, Int ps[])
         break;
       }
       break;
-    case ANA_DOUBLE:
+    case LUX_DOUBLE:
       switch (outputtype) {
-      case ANA_LONG:
+      case LUX_LONG:
         temp.l = (Int) floor(timestamp.d); /* translate from DOUBLE to LONG */
         CJDNtoCal(&temp.l, tgt.l);         /* use LONG translation */
         tgt.l += output_elem_per_date;
         break;
-      case ANA_DOUBLE:
+      case LUX_DOUBLE:
         CJDtoCal(&timestamp.d, tgt.d);
         tgt.d += output_elem_per_date;
         break;
-      case ANA_STRING_ARRAY:
+      case LUX_STRING_ARRAY:
         CJDtoCalS(&timestamp.d, tgt.sp);
         tgt.sp += output_elem_per_date;
         break;
@@ -1159,12 +1159,12 @@ Int ana_calendar(Int narg, Int ps[])
   } while (advanceLoop(&tgtinfo, &tgt), 
 	   advanceLoop(&srcinfo, &src) < srcinfo.rndim);
   if (!loopIsAtStart(&tgtinfo))
-    return anaerror("Source loop is finished but target loop is not!", ps[0]);
+    return luxerror("Source loop is finished but target loop is not!", ps[0]);
 
   return result;
 }
 /*--------------------------------------------------------------------------*/
-Int ana_calendar_OLD(Int narg, Int ps[])
+Int lux_calendar_OLD(Int narg, Int ps[])
      /* general calendar conversion routine */
      /* syntax: DATE2 = CALENDAR(DATE1, /FROMCALENDAR, /TOCALENDAR) */
      /* "/FROMCALENDAR":  /FROMCOMMON /FROMGREGORIAN /FROMISLAMIC */
@@ -1197,22 +1197,22 @@ Int ana_calendar_OLD(Int narg, Int ps[])
     return *ps;			/* no conversion */
   iq = *ps;
   switch (symbol_class(iq)) {
-  case ANA_SCALAR:
+  case LUX_SCALAR:
     n = 1;
     nRepeat = 1;
     ndim = 1;
     dims = &n;
     type = scalar_type(iq);
-    if (type < ANA_LONG) {
-      iq = ana_long(1, ps);
-      type = ANA_LONG;
-    } else if (type == ANA_FLOAT) {
-      iq = ana_double(1, ps);
-      type = ANA_DOUBLE;
+    if (type < LUX_LONG) {
+      iq = lux_long(1, ps);
+      type = LUX_LONG;
+    } else if (type == LUX_FLOAT) {
+      iq = lux_double(1, ps);
+      type = LUX_DOUBLE;
     }
     data.b = &scalar_value(iq).b;
     break;
-  case ANA_ARRAY:
+  case LUX_ARRAY:
     nRepeat = array_size(iq);
     ndim = array_num_dims(iq);
     dims = array_dims(iq);
@@ -1223,21 +1223,21 @@ Int ana_calendar_OLD(Int narg, Int ps[])
       nRepeat /= 3;
     }
     type = array_type(iq);
-    if (type < ANA_LONG) {
-      iq = ana_long(1, ps);
-      type = ANA_LONG;
-    } else if (type == ANA_FLOAT) {
-      iq = ana_double(1, ps);
-      type = ANA_DOUBLE;
+    if (type < LUX_LONG) {
+      iq = lux_long(1, ps);
+      type = LUX_LONG;
+    } else if (type == LUX_FLOAT) {
+      iq = lux_double(1, ps);
+      type = LUX_DOUBLE;
     }
     data.l = (Int *) array_data(iq);
     break;
-  case ANA_STRING:
+  case LUX_STRING:
     nRepeat = 1;
     n = 1;
     ndim = 1;
     dims = &n;
-    type = ANA_STRING_ARRAY;
+    type = LUX_STRING_ARRAY;
     data.sp = &string_value(iq);
     break;
   default:
@@ -1249,10 +1249,10 @@ Int ana_calendar_OLD(Int narg, Int ps[])
     /* if the first dimension has 3 elements or if it is a string
        array, then we assume it is in the common calendar; otherwise
        we assume it is measured in Julian Days */
-    if (type != ANA_STRING_ARRAY) {
+    if (type != LUX_STRING_ARRAY) {
       if (n == 3)
         fromcalendar = cal = CAL_COMMON;
-      else if (type == ANA_DOUBLE)
+      else if (type == LUX_DOUBLE)
         fromcalendar = cal = CAL_JD;
       else
         fromcalendar = cal = CAL_CJD;
@@ -1271,21 +1271,21 @@ Int ana_calendar_OLD(Int narg, Int ps[])
   outtype = type;               /* default */
   if (fromcalendar == CAL_LUNAR || tocalendar == CAL_LUNAR
       || fromcalendar == CAL_JD || tocalendar == CAL_JD 
-      || type == ANA_STRING_ARRAY)
-    outtype = ANA_DOUBLE;
+      || type == LUX_STRING_ARRAY)
+    outtype = LUX_DOUBLE;
 
-  /* if outtype == ANA_LONG, then JD.l contains CJDN values
-     if outtype == ANA_DOUBLE, then JD.d contains JD values
+  /* if outtype == LUX_LONG, then JD.l contains CJDN values
+     if outtype == LUX_DOUBLE, then JD.d contains JD values
      CJDN = floor(JD + 0.5) */
 
   /* temporary space for JDs */
   switch (outtype) {
-  case ANA_LONG:
+  case LUX_LONG:
     JD.l = (Int *) malloc(nRepeat*sizeof(Int));
     if (!JD.l)
       return cerror(ALLOC_ERR, *ps);
     break;
-  case ANA_DOUBLE: case ANA_TEMP_STRING:
+  case LUX_DOUBLE: case LUX_TEMP_STRING:
     JD.d = (Double *) malloc(nRepeat*sizeof(Double));
     if (!JD.d)
       return cerror(ALLOC_ERR, *ps);
@@ -1294,8 +1294,8 @@ Int ana_calendar_OLD(Int narg, Int ps[])
     return cerror(ILL_CLASS, ps[0]);
   }
 
-  if (type == ANA_STRING_ARRAY) {
-    assert(outtype == ANA_DOUBLE);
+  if (type == LUX_STRING_ARRAY) {
+    assert(outtype == LUX_DOUBLE);
     switch (cal) {
     case CAL_COMMON: case CAL_DEFAULT: case CAL_GREGORIAN: case CAL_JULIAN:
       for (i = 0; i < nRepeat; i++) {
@@ -1329,7 +1329,7 @@ Int ana_calendar_OLD(Int narg, Int ps[])
       }
       break;
     default:
-      return anaerror("Cannot parse text-based dates in this calendar", *ps);
+      return luxerror("Cannot parse text-based dates in this calendar", *ps);
     }
     cal = CAL_JD;               /* signify that translation to JD is complete */
   } else switch (cal) {		/* from calendar */
@@ -1337,54 +1337,54 @@ Int ana_calendar_OLD(Int narg, Int ps[])
     case CAL_HEBREW: case CAL_EGYPTIAN:
       if (n != 3)
 	return
-	  anaerror("Need 3 numbers (year, month, day) per calendar date!", *ps);
+	  luxerror("Need 3 numbers (year, month, day) per calendar date!", *ps);
       break;
     case CAL_JD:		/* from Julian Day */
-      assert(outtype == ANA_DOUBLE);
+      assert(outtype == LUX_DOUBLE);
       switch (type) {
-      case ANA_LONG:
+      case LUX_LONG:
         for (i = 0; i < nRepeat; i++)
           JD.d[i] = data.l[i];
         break;
-      case ANA_DOUBLE:
+      case LUX_DOUBLE:
         memcpy(JD.d, data.d, nRepeat*sizeof(*JD.d));
         break;
       }
       break;
     case CAL_CJD:		/* from Chronological Julian Day */
       switch (outtype) {
-      case ANA_LONG:
+      case LUX_LONG:
         switch (type) {
-        case ANA_LONG:
+        case LUX_LONG:
           memcpy(JD.l, data.l, nRepeat*sizeof(*JD.l));
           break;
-        case ANA_DOUBLE:
+        case LUX_DOUBLE:
           /* from JD to CJDN */
           for (i = 0; i < nRepeat; i++)
             JD.l[i] = floor(JDtoCJD(data.d[i]));
           break;
         }
         break;
-      case ANA_DOUBLE:
+      case LUX_DOUBLE:
         switch (type) {
-        case ANA_LONG:
+        case LUX_LONG:
           for (i = 0; i < nRepeat; i++)
             JD.d[i] = CJDtoJD((Double) data.l[i]);
           break;
-        case ANA_DOUBLE:
+        case LUX_DOUBLE:
           memcpy(JD.d, data.d, nRepeat*sizeof(*JD.d));
           break;
         }
       }
       break;
     case CAL_LUNAR:		/* from lunar calendar */
-      assert(outtype == ANA_DOUBLE);
+      assert(outtype == LUX_DOUBLE);
       switch (type) {
-      case ANA_LONG:
+      case LUX_LONG:
         for (i = 0; i < nRepeat; i++)
           JD.d[i] = lunarToJD((Double) data.l[i]);
         break;
-      case ANA_DOUBLE:
+      case LUX_DOUBLE:
         for (i = 0; i < nRepeat; i++)
           JD.d[i] = lunarToJD(data.d[i]);
         break;
@@ -1393,22 +1393,22 @@ Int ana_calendar_OLD(Int narg, Int ps[])
       break;
     default:
       switch (type) {
-      case ANA_LONG:
+      case LUX_LONG:
         free(JD.l);
         break;
-      case ANA_DOUBLE:
+      case LUX_DOUBLE:
         free(JD.d);
         break;
       }
-      return anaerror("Illegal source calendar specification (%1d)", 0, cal);
+      return luxerror("Illegal source calendar specification (%1d)", 0, cal);
     }
 
   /* go from FROM_CALENDAR to Julian Date */
   if (cal != CAL_JD)		/* not done yet, calculate Julian date */
     switch (outtype) {
-    case ANA_LONG:              /* convert to CJDN */
+    case LUX_LONG:              /* convert to CJDN */
       switch (type) {
-      case ANA_LONG:
+      case LUX_LONG:
         switch (fromorder) {
         case CAL_YMD:
           for (i = 0; i < nRepeat; i++)
@@ -1422,7 +1422,7 @@ Int ana_calendar_OLD(Int narg, Int ps[])
           break;
         }
         break;
-      case ANA_DOUBLE:
+      case LUX_DOUBLE:
         switch (fromorder) {
         case CAL_YMD:
           for (i = 0; i < nRepeat; i++)
@@ -1438,9 +1438,9 @@ Int ana_calendar_OLD(Int narg, Int ps[])
         break;
       }
       break;
-    case ANA_DOUBLE:            /* convert to JD */
+    case LUX_DOUBLE:            /* convert to JD */
       switch (type) {
-      case ANA_LONG:
+      case LUX_LONG:
         switch (fromorder) {
         case CAL_YMD:
           for (i = 0; i < nRepeat; i++)
@@ -1454,7 +1454,7 @@ Int ana_calendar_OLD(Int narg, Int ps[])
           break;
         }
         break;
-      case ANA_DOUBLE:
+      case LUX_DOUBLE:
         switch (fromorder) {
         case CAL_YMD:
           for (i = 0; i < nRepeat; i++)
@@ -1473,7 +1473,7 @@ Int ana_calendar_OLD(Int narg, Int ps[])
     }
 
   switch (outtype) {
-  case ANA_DOUBLE:
+  case LUX_DOUBLE:
     /* now do any required time base translation */
     if (fromtime != totime) {	/* we need some conversion */
       /* we go through TAI, which is a uniform time base */
@@ -1499,7 +1499,7 @@ Int ana_calendar_OLD(Int narg, Int ps[])
 	break;
       }
       break;
-    case ANA_LONG:                /* no time translation */
+    case LUX_LONG:                /* no time translation */
       break;
     }
   }
@@ -1515,7 +1515,7 @@ Int ana_calendar_OLD(Int narg, Int ps[])
       if (nRepeat > 1) {
         num_newDims = construct_output_dims(dims, ndim, n,
                                             newDims, MAX_DIMS, 1);
-        iq = array_scratch(ANA_TEMP_STRING, num_newDims, newDims);
+        iq = array_scratch(LUX_TEMP_STRING, num_newDims, newDims);
         data.sp = (char **) array_data(iq);
       } else {
         iq = string_scratch(-1);
@@ -1529,13 +1529,13 @@ Int ana_calendar_OLD(Int narg, Int ps[])
       data.d = (Double *) array_data(iq);
     }
     for (i = 0; i < nRepeat; i++) {
-      if (outtype == ANA_DOUBLE)
+      if (outtype == LUX_DOUBLE)
         CJDtoDate(JD.d[i], &year, &month, &day, CAL_COMMON);
       else
         CJDNtoDate(JD.l[i], &year, &month, &iday, CAL_COMMON);
       switch (output) {
       case 999 /* CAL_ISOTEXT */:
-        if (outtype == ANA_DOUBLE) {
+        if (outtype == LUX_DOUBLE) {
           sec = (day - (Int) day)*86400;
           min = sec/60;
           sec = sec % 60;
@@ -1550,7 +1550,7 @@ Int ana_calendar_OLD(Int narg, Int ps[])
       case CAL_TEXT:
         switch (toorder) {
         case CAL_YMD:
-          if (outtype == ANA_DOUBLE)
+          if (outtype == LUX_DOUBLE)
             sprintf(line, "%1d %s %1d", year,
                     GregorianMonths[month - 1], (Int) day);
           else
@@ -1558,7 +1558,7 @@ Int ana_calendar_OLD(Int narg, Int ps[])
                     GregorianMonths[month - 1], iday);
           break;
         case CAL_DMY:
-          if (outtype == ANA_DOUBLE)
+          if (outtype == LUX_DOUBLE)
             sprintf(line, "%1d %s %1d", (Int) day,
                     GregorianMonths[month - 1], year);
           else
@@ -1571,7 +1571,7 @@ Int ana_calendar_OLD(Int narg, Int ps[])
       case CAL_NUMERIC:
         switch (toorder) {
         case CAL_YMD:
-          if (outtype == ANA_DOUBLE) {
+          if (outtype == LUX_DOUBLE) {
             *data.d++ = year;
             *data.d++ = month;
             *data.d++ = day;
@@ -1582,7 +1582,7 @@ Int ana_calendar_OLD(Int narg, Int ps[])
           }
           break;
         case CAL_DMY:
-          if (outtype == ANA_DOUBLE) {
+          if (outtype == LUX_DOUBLE) {
             *data.d++ = day;
             *data.d++ = month;
             *data.d++ = year;
@@ -1600,7 +1600,7 @@ Int ana_calendar_OLD(Int narg, Int ps[])
       free(JD.l);
     if (output != CAL_NUMERIC)
       free(line);
-    if (symbol_class(iq) == ANA_STRING)
+    if (symbol_class(iq) == LUX_STRING)
       symbol_memory(iq) = strlen(string_value(iq)) + 1;
     return iq;
   case CAL_GREGORIAN: case CAL_JULIAN: /* to Gregorian */
@@ -1619,7 +1619,7 @@ Int ana_calendar_OLD(Int narg, Int ps[])
     if (nRepeat > 1) {
       num_newDims = construct_output_dims(dims, ndim, n,
                                           newDims, MAX_DIMS, 1);
-      iq = array_scratch(ANA_TEMP_STRING, num_newDims, newDims);
+      iq = array_scratch(LUX_TEMP_STRING, num_newDims, newDims);
       data.sp = (char **) array_data(iq);
     } else {
       iq = string_scratch(-1);
@@ -1629,7 +1629,7 @@ Int ana_calendar_OLD(Int narg, Int ps[])
       char	*p = curScrat, type = 0;
       Int	l;
 
-      if (outtype == ANA_DOUBLE) {
+      if (outtype == LUX_DOUBLE) {
         CJDtoDate(JD.d[i], &year, &month, &day, CAL_COMMON);
         iday = (Int) day;
       } else
@@ -1707,12 +1707,12 @@ Int ana_calendar_OLD(Int narg, Int ps[])
     }
     if (!isFree)
       free(JD.l);
-    if (symbol_class(iq) == ANA_STRING)
+    if (symbol_class(iq) == LUX_STRING)
       symbol_memory(iq) = strlen(data.sp[-1]) + 1;
     return iq;
     break;
   case CAL_JD:		/* /TOJD */
-    assert(outtype == ANA_DOUBLE);
+    assert(outtype == LUX_DOUBLE);
     if (nRepeat == 1) {	/* need scalar */
       iq = scalar_scratch(outtype);
       data.d = &scalar_value(iq).d;
@@ -1727,7 +1727,7 @@ Int ana_calendar_OLD(Int narg, Int ps[])
       free(JD.l);
     return iq;
   case CAL_CJD:		/* /TOCJD */
-    assert(outtype == ANA_LONG);
+    assert(outtype == LUX_LONG);
     if (nRepeat == 1) {	/* need scalar */
       iq = scalar_scratch(outtype);
       data.l = &scalar_value(iq).l;
@@ -1742,14 +1742,14 @@ Int ana_calendar_OLD(Int narg, Int ps[])
       free(JD.l);
     return iq;
   case CAL_LUNAR:
-    assert(outtype == ANA_DOUBLE);
+    assert(outtype == LUX_DOUBLE);
     if (nRepeat == 1) {	/* need scalar */
-      iq = scalar_scratch(ANA_DOUBLE);
+      iq = scalar_scratch(LUX_DOUBLE);
       data.d = &scalar_value(iq).d;
     } else {			/* need array */
       num_newDims = construct_output_dims(dims, ndim, n,
                                           newDims, MAX_DIMS, 1);
-      iq = array_scratch(ANA_DOUBLE, num_newDims, newDims);
+      iq = array_scratch(LUX_DOUBLE, num_newDims, newDims);
       data.d = (Double *) array_data(iq);
     }
     for (i = 0; i < nRepeat; i++)
@@ -1761,7 +1761,7 @@ Int ana_calendar_OLD(Int narg, Int ps[])
     if (nRepeat > 1) {
       num_newDims = construct_output_dims(dims, ndim, n,
                                           newDims, MAX_DIMS, 1);
-      iq = array_scratch(ANA_TEMP_STRING, num_newDims, newDims);
+      iq = array_scratch(LUX_TEMP_STRING, num_newDims, newDims);
       data.sp = (char **) array_data(iq);
     } else {
       iq = string_scratch(-1);
@@ -1769,7 +1769,7 @@ Int ana_calendar_OLD(Int narg, Int ps[])
     }
     allocate(line, 80, char);
     for (i = 0; i < nRepeat; i++) {
-      if (outtype == ANA_DOUBLE)
+      if (outtype == LUX_DOUBLE)
         d = floor(JDtoCJD(JD.d[i]));
       else
         d = JD.l[i];
@@ -1788,7 +1788,7 @@ Int ana_calendar_OLD(Int narg, Int ps[])
     if (nRepeat > 1) {
       num_newDims = construct_output_dims(dims, ndim, n,
                                           newDims, MAX_DIMS, 1);
-      iq = array_scratch(ANA_TEMP_STRING, num_newDims, newDims);
+      iq = array_scratch(LUX_TEMP_STRING, num_newDims, newDims);
       data.sp = (char **) array_data(iq);
     } else {
       iq = string_scratch(-1);
@@ -1798,7 +1798,7 @@ Int ana_calendar_OLD(Int narg, Int ps[])
     for (i = 0; i < nRepeat; i++) {
       Int n;
 
-      if (outtype == ANA_DOUBLE)
+      if (outtype == LUX_DOUBLE)
         d = floor(JDtoCJD(JD.d[i]) - 584283);
       else
         d = JD.l[i] - 584283;
@@ -1824,13 +1824,13 @@ Int ana_calendar_OLD(Int narg, Int ps[])
   default:
     if (!isFree)
       free(JD.l);
-    return anaerror("Illegal target calendar specification (%1d)", 0, cal);
+    return luxerror("Illegal target calendar specification (%1d)", 0, cal);
   }
   if (output != CAL_NUMERIC) {
     if (nRepeat > 1) {
       num_newDims = construct_output_dims(dims, ndim, n,
                                           newDims, MAX_DIMS, 1);
-      iq = array_scratch(ANA_TEMP_STRING, num_newDims, newDims);
+      iq = array_scratch(LUX_TEMP_STRING, num_newDims, newDims);
       data.sp = (char **) array_data(iq);
     } else {
       iq = string_scratch(-1);
@@ -1844,14 +1844,14 @@ Int ana_calendar_OLD(Int narg, Int ps[])
     data.d = (Double *) array_data(iq);
   }
   for (i = 0; i < nRepeat; i++) {
-    if (outtype == ANA_DOUBLE) {
+    if (outtype == LUX_DOUBLE) {
       CJDtoDate(JD.d[i], &year, &month, &day, tocalendar);
       iday = (Int) day;
     } else
       CJDNtoDate(JD.l[i], &year, &month, &iday, tocalendar);
     switch (output) {
     case 999 /* CAL_ISOTEXT */:
-      if (outtype == ANA_DOUBLE) {
+      if (outtype == LUX_DOUBLE) {
         sec = (day - (Int) day)*86400;
         min = sec/60;
         sec = sec % 60;
@@ -1878,7 +1878,7 @@ Int ana_calendar_OLD(Int narg, Int ps[])
       break;
     case CAL_NUMERIC:
       switch (outtype) {
-      case ANA_DOUBLE:
+      case LUX_DOUBLE:
         switch (toorder) {
         case CAL_YMD:
           *data.d++ = year;
@@ -1892,7 +1892,7 @@ Int ana_calendar_OLD(Int narg, Int ps[])
           break;
         }
         break;
-      case ANA_LONG:
+      case LUX_LONG:
         switch (toorder) {
         case CAL_YMD:
           *data.l++ = year;
@@ -1914,12 +1914,12 @@ Int ana_calendar_OLD(Int narg, Int ps[])
     free(JD.l);
   if (output != CAL_NUMERIC)
     free(line);
-  if (symbol_class(iq) == ANA_STRING)
+  if (symbol_class(iq) == LUX_STRING)
     symbol_memory(iq) = strlen(string_value(iq)) + 1;
   return iq;
 }
 /*--------------------------------------------------------------------------*/
-Int ana_EasterDate(Int narg, Int ps[])
+Int lux_EasterDate(Int narg, Int ps[])
      /* returns dates of Easter in the common calendar (Gregorian-Julian). */
      /* syntax:  X = EASTERDATE(YEARS), where YEARS is an array.  X will */
      /* have three elements in its first dimension, in the order year, */
@@ -1928,13 +1928,13 @@ Int ana_EasterDate(Int narg, Int ps[])
   Int	*year, nYear, iq, *dims, nDim, newDims[MAX_DIMS], *ptr, month, day;
 
   switch (symbol_class(*ps))
-  { case ANA_SCALAR:
-      iq = ana_long(1, ps);	/* make ANA_LONG */
+  { case LUX_SCALAR:
+      iq = lux_long(1, ps);	/* make LUX_LONG */
       year = &scalar_value(iq).l;
       nYear = 1;  nDim = 0;
       break;
-    case ANA_ARRAY:
-      iq = ana_long(1, ps);
+    case LUX_ARRAY:
+      iq = lux_long(1, ps);
       year = (Int *) array_data(iq);
       nYear = array_size(iq);  dims = array_dims(iq);
       nDim = array_num_dims(iq);
@@ -1944,7 +1944,7 @@ Int ana_EasterDate(Int narg, Int ps[])
   /* create result */
   *newDims = 3;
   if (nDim) memcpy(newDims + 1, dims, nDim);
-  iq = array_scratch(ANA_LONG, nDim + 1, newDims);
+  iq = array_scratch(LUX_LONG, nDim + 1, newDims);
   ptr = (Int *) array_data(iq);
   while (nYear--)
   { if (EasterDate(*year, &month, &day) < 0)
@@ -2296,7 +2296,7 @@ void precessEquatorial(Double *ra, Double *dec, Double JDfrom, Double JDto)
   *dec = asin(C);
 }
 /*--------------------------------------------------------------------------*/
-Int ana_precess(Int narg, Int ps[])
+Int lux_precess(Int narg, Int ps[])
 /* PRECESS(coords, JDfrom, JDto) precesses the equatorial coordinates
    <coords> from the equinox of <JDfrom> to <JDto>, both measured in
    Julian Days.  <coords>(0,*) is taken to contain right ascensions
@@ -2318,10 +2318,10 @@ Int ana_precess(Int narg, Int ps[])
     JDfrom = (JDfrom - 2000.0)*365.25 + J2000;
     JDto = (JDto - 2000.0)*365.25 + J2000;
   }
-  outtype = (symbol_type(ps[0]) > ANA_FLOAT)? ANA_DOUBLE: ANA_FLOAT;
-  n = standardLoop(ps[0], ANA_ZERO, SL_AXISCOORD | SL_SRCUPGRADE,
+  outtype = (symbol_type(ps[0]) > LUX_FLOAT)? LUX_DOUBLE: LUX_FLOAT;
+  n = standardLoop(ps[0], LUX_ZERO, SL_AXISCOORD | SL_SRCUPGRADE,
 		   outtype, &srcinfo, &src, &result, &tgtinfo, &tgt);
-  if (n == ANA_ERROR)
+  if (n == LUX_ERROR)
     return n;
   if (srcinfo.ndim < 1) {
     zap(result);
@@ -2329,11 +2329,11 @@ Int ana_precess(Int narg, Int ps[])
   }
   if (srcinfo.dims[0] < 2) {
     zap(result);
-    return anaerror("Need at least 2 elements in the first dimension", ps[0]);
+    return luxerror("Need at least 2 elements in the first dimension", ps[0]);
   }
   
   switch (symbol_type(ps[0])) {
-  case ANA_BYTE:
+  case LUX_BYTE:
     do {
       alpha = *src.b*DEG;
       advanceLoop(&srcinfo, &src);
@@ -2350,7 +2350,7 @@ Int ana_precess(Int narg, Int ps[])
       } while (!done);
     } while (done < srcinfo.rndim);
     break;
-  case ANA_WORD:
+  case LUX_WORD:
     do {
       alpha = *src.w*DEG;
       advanceLoop(&srcinfo, &src);
@@ -2367,7 +2367,7 @@ Int ana_precess(Int narg, Int ps[])
       } while (!done);
     } while (done < srcinfo.rndim);
     break;
-  case ANA_LONG:
+  case LUX_LONG:
     do {
       alpha = *src.l*DEG;
       advanceLoop(&srcinfo, &src);
@@ -2384,7 +2384,7 @@ Int ana_precess(Int narg, Int ps[])
       } while (!done);
     } while (done < srcinfo.rndim);
     break;
-  case ANA_FLOAT:
+  case LUX_FLOAT:
     do {
       alpha = *src.f*DEG;
       advanceLoop(&srcinfo, &src);
@@ -2401,7 +2401,7 @@ Int ana_precess(Int narg, Int ps[])
       } while (!done);
     } while (done < srcinfo.rndim);
     break;
-  case ANA_DOUBLE:
+  case LUX_DOUBLE:
     do {
       alpha = *src.d*DEG;
       advanceLoop(&srcinfo, &src);
@@ -2447,7 +2447,7 @@ Int constellation(Double alpha, Double delta)
 }
 /*--------------------------------------------------------------------------*/
 #define B1875 (2405889.25855047) /* from SOFA Epb2jd routine */
-Int ana_constellation(Int narg, Int ps[])
+Int lux_constellation(Int narg, Int ps[])
 /* CONSTELLATION(coords [, equinox, /JULIAN, /BESSELIAN]) returns the
    constellation of each set of <coords> relative to the given <equinox>.
    <coords>(0,*) are right ascensions measured in degrees.
@@ -2476,9 +2476,9 @@ Int ana_constellation(Int narg, Int ps[])
     equinox = J2000;
   vocal = internalMode & 4;
 
-  n = standardLoop(ps[0], ANA_ZERO, SL_AXISCOORD | SL_COMPRESS,
-		   ANA_BYTE, &srcinfo, &src, &result, &tgtinfo, &tgt);
-  if (n == ANA_ERROR)
+  n = standardLoop(ps[0], LUX_ZERO, SL_AXISCOORD | SL_COMPRESS,
+		   LUX_BYTE, &srcinfo, &src, &result, &tgtinfo, &tgt);
+  if (n == LUX_ERROR)
     return n;
   if (srcinfo.ndim < 1) {
     zap(result);
@@ -2486,11 +2486,11 @@ Int ana_constellation(Int narg, Int ps[])
   }
   if (srcinfo.dims[0] < 2) {
     zap(result);
-    return anaerror("Need at least 2 elements in the first dimension", ps[0]);
+    return luxerror("Need at least 2 elements in the first dimension", ps[0]);
   }
 
   switch (symbol_type(ps[0])) {
-  case ANA_BYTE:
+  case LUX_BYTE:
     do {
       alpha = *src.b*DEG;
       advanceLoop(&srcinfo, &src);
@@ -2513,7 +2513,7 @@ Int ana_constellation(Int narg, Int ps[])
       advanceLoop(&tgtinfo, &tgt);
     } while (done < srcinfo.rndim);
     break;
-  case ANA_WORD:
+  case LUX_WORD:
     do {
       alpha = *src.w*DEG;
       advanceLoop(&srcinfo, &src);
@@ -2536,7 +2536,7 @@ Int ana_constellation(Int narg, Int ps[])
       advanceLoop(&tgtinfo, &tgt);
     } while (done < srcinfo.rndim);
     break;
-  case ANA_LONG:
+  case LUX_LONG:
     do {
       alpha = *src.l*DEG;
       advanceLoop(&srcinfo, &src);
@@ -2559,7 +2559,7 @@ Int ana_constellation(Int narg, Int ps[])
       advanceLoop(&tgtinfo, &tgt);
     } while (done < srcinfo.rndim);
     break;
-  case ANA_FLOAT:
+  case LUX_FLOAT:
     do {
       alpha = *src.f*DEG;
       advanceLoop(&srcinfo, &src);
@@ -2582,7 +2582,7 @@ Int ana_constellation(Int narg, Int ps[])
       advanceLoop(&tgtinfo, &tgt);
     } while (done < srcinfo.rndim);
     break;
-  case ANA_DOUBLE:
+  case LUX_DOUBLE:
     do {
       alpha = *src.d*DEG;
       advanceLoop(&srcinfo, &src);
@@ -2609,7 +2609,7 @@ Int ana_constellation(Int narg, Int ps[])
   return result;
 }
 /*--------------------------------------------------------------------------*/
-Int ana_constellationname(Int narg, Int ps[]) 
+Int lux_constellationname(Int narg, Int ps[]) 
 /* CONSTELLATIONNAME(<index>) returns the official abbreviation of the
    name of the constellation with the given <index> (may be an array),
    as returned by function CONSTELLATION.  LS 2004may03
@@ -2619,10 +2619,10 @@ Int ana_constellationname(Int narg, Int ps[])
   pointer src;
   char **tgt;
 
-  if (numerical(ps[0], NULL, NULL, &n, &src) == ANA_ERROR)
-    return ANA_ERROR;
+  if (numerical(ps[0], NULL, NULL, &n, &src) == LUX_ERROR)
+    return LUX_ERROR;
   if (n > 1) {
-    result = array_clone(ps[0], ANA_STRING_ARRAY);
+    result = array_clone(ps[0], LUX_STRING_ARRAY);
     tgt = array_data(result);
   } else {
     result = string_scratch(0);
@@ -2630,7 +2630,7 @@ Int ana_constellationname(Int narg, Int ps[])
   }
   nc = sizeof(constellation_names)/sizeof(char *);
   switch (symbol_type(ps[0])) {
-  case ANA_BYTE:
+  case LUX_BYTE:
     while (n--) {
       if (*src.b >= nc)
 	*tgt = strdup("***");
@@ -2640,7 +2640,7 @@ Int ana_constellationname(Int narg, Int ps[])
       src.b++;
     }
     break;
-  case ANA_WORD:
+  case LUX_WORD:
     while (n--) {
       if (*src.w < 0 || *src.w >= nc)
 	*tgt = strdup("***");
@@ -2650,7 +2650,7 @@ Int ana_constellationname(Int narg, Int ps[])
       src.w++;
     }
     break;
-  case ANA_LONG:
+  case LUX_LONG:
     while (n--) {
       if (*src.l < 0 || *src.l >= nc)
 	*tgt = strdup("***");
@@ -2660,7 +2660,7 @@ Int ana_constellationname(Int narg, Int ps[])
       src.l++;
     }
     break;
-  case ANA_FLOAT:
+  case LUX_FLOAT:
     while (n--) {
       if (*src.f < 0 || *src.f >= nc)
 	*tgt = strdup("***");
@@ -2670,7 +2670,7 @@ Int ana_constellationname(Int narg, Int ps[])
       src.f++;
     }
     break;
-  case ANA_DOUBLE:
+  case LUX_DOUBLE:
     while (n--) {
       if (*src.d < 0 || *src.d >= nc)
 	*tgt = strdup("***");
@@ -2872,7 +2872,7 @@ Double siderealTime(Double JD, Double *dPsi, Double ceps)
   return c;  
 }
 /*--------------------------------------------------------------------------*/
-Int ana_siderealtime(Int narg, Int ps[]) 
+Int lux_siderealtime(Int narg, Int ps[]) 
 /* SIDEREALTIME(<jd>) returns the mean sidereal time at the indicated */
 /* julian dates, in hours */
 /* LS 31mar2002 */
@@ -2882,18 +2882,18 @@ Int ana_siderealtime(Int narg, Int ps[])
   Double dPsi, cdPsi, sdPsi, dEps, epsilon;
 
   switch (symbol_class(ps[0])) {
-  case ANA_SCALAR:
-    iq = ana_double(1, ps);
+  case LUX_SCALAR:
+    iq = lux_double(1, ps);
     jd = &scalar_value(iq).d;
     n = 1;
-    result = scalar_scratch(ANA_DOUBLE);
+    result = scalar_scratch(LUX_DOUBLE);
     out = &scalar_value(result).d;
     break;
-  case ANA_ARRAY:
-    iq = ana_double(1, ps);
+  case LUX_ARRAY:
+    iq = lux_double(1, ps);
     jd = (Double *) array_data(iq);
     n = array_size(iq);
-    result = array_clone(iq, ANA_DOUBLE);
+    result = array_clone(iq, LUX_DOUBLE);
     out = (Double *) array_data(result);
     break;
   default:
@@ -3002,11 +3002,11 @@ Int readExtra(char *file, char mode)
     file = defaultFile;
   fp = fopen(expand_name(file, NULL), "r");
   if (!fp)
-    return anaerror("Could not open orbital data file \"%s\".", 0, file);
+    return luxerror("Could not open orbital data file \"%s\".", 0, file);
   while ((c = getc(fp)) == '=') {	/* comment lines */
     ungetc(' ', fp);
     if (!fgets(orbitLine, 256, fp))
-      return anaerror("Read error/unexpected data end in file %s", 0, file);
+      return luxerror("Read error/unexpected data end in file %s", 0, file);
     if (mode & 1)	/* /LIST */
       printf(orbitLine);
   }
@@ -3103,7 +3103,7 @@ Int readExtra(char *file, char mode)
 	break;
       default:
 	fclose(fp);
-	return anaerror("Illegal equinox specification \"%c\" in orbital data file \"%s\".", 0, c, file);
+	return luxerror("Illegal equinox specification \"%c\" in orbital data file \"%s\".", 0, c, file);
     }
     if (extraOrbits[indx].equinox <= 1) { /* read year */
       fscanf(fp, "%lf", &equinox);
@@ -3140,7 +3140,7 @@ Int readExtra(char *file, char mode)
 	    break;
 	  default:
 	    fclose(fp);
-	    return anaerror("Illegal data format specification \"%c\" in orbital data file \"%s\".", 0, c, file);
+	    return luxerror("Illegal data format specification \"%c\" in orbital data file \"%s\".", 0, c, file);
 	}
       }
     }
@@ -3184,7 +3184,7 @@ Int readExtra(char *file, char mode)
       if (e == 1) {	/* parabolic orbit */
 	if (format == 'A') {
 	  fclose(fp);
-	  return anaerror("Parablic orbit has undefined semimajor axis", 0);
+	  return luxerror("Parablic orbit has undefined semimajor axis", 0);
 	}
 	extraOrbits[indx].orbits[rec].n =
 	  a? 0.03649116245/(a*sqrt(a)): 0.0; /* n rad/d */
@@ -3221,7 +3221,7 @@ Int readExtra(char *file, char mode)
     } /* end of for (rec,...) */
   } /* end of for (indx,...) */
   if (ferror(fp))
-    return anaerror("Read error in orbital data file \"%s\".", 0, file);
+    return luxerror("Read error in orbital data file \"%s\".", 0, file);
   fclose(fp);
 
   indx += nmore;
@@ -3238,7 +3238,7 @@ Int readExtra(char *file, char mode)
   return 1;
 }
 /*--------------------------------------------------------------------------*/
-Int ana_readorbits(Int narg, Int ps[])
+Int lux_readorbits(Int narg, Int ps[])
 /* READORBITS [,<file>,/LIST,/REPLACE] reads orbital information from <file>.
  Lists comments if /LIST is specified.  Replace preread data (if any)
  if /REPLACE is specified, else merges */
@@ -3263,7 +3263,7 @@ void showExtra(void)
     puts("No auxilliary orbits have been read.");
 }
 /*--------------------------------------------------------------------------*/
-Int ana_showorbits(Int narg, Int ps[])
+Int lux_showorbits(Int narg, Int ps[])
 {
   showExtra();
   return 1;
@@ -3328,13 +3328,13 @@ Int extraHeliocentric(Double JDE, Int object, Double *equinox,
   struct extraInfo	*pp;
   struct orbitParams	*qq;
   
-  if (!nExtraObj && readExtra(NULL, 0) == ANA_ERROR)
-    return anaerror("Error reading orbital data.", 0);
+  if (!nExtraObj && readExtra(NULL, 0) == LUX_ERROR)
+    return luxerror("Error reading orbital data.", 0);
   
   /* first see if the object number is known */
   i = findint(object, extraIDs, nExtraObj);
   if (i < 0)
-    return anaerror("No orbital data for object %d.", 0, object);
+    return luxerror("No orbital data for object %d.", 0, object);
 
   /* OK, it is known.  Now find the ephemerides time closest to T */
   pp = extraOrbits + i;		/* data for ith object in file */
@@ -3425,7 +3425,7 @@ void extraElementsHeliocentric(Double JDE, Double *equinox, Double *f,
 	break;
       case 1:			/* default */
 	if (e == 1) {
-	  anaerror("Parabolic orbits have an infinite semimajor axis", 0);
+	  luxerror("Parabolic orbits have an infinite semimajor axis", 0);
 	  for (ii = 0; ii < 3; ii++)
 	    f[ii] = 0.0;
 	  *r = 0.0;
@@ -3540,7 +3540,7 @@ void heliocentricXYZr(Double JDE, Int object, Double equinox, Double *pos,
       }
       break;
     default:
-      anaerror("Illegal VSOP model type", 0);
+      luxerror("Illegal VSOP model type", 0);
       pos[0] = pos[1] = pos[2] = *r = 0.0;
       return;
     }
@@ -3635,7 +3635,7 @@ void heliocentricXYZr(Double JDE, Int object, Double equinox, Double *pos,
     break;
   case -1:			/* ELEMENTS object - if defined */
     if (!haveExtraElements) {
-      anaerror("Illegal object number %1d", 0, object);
+      luxerror("Illegal object number %1d", 0, object);
       for (i = 0; i < 3; i++)
 	pos[i] = 0.0;
       *r = 0.0;
@@ -3654,7 +3654,7 @@ void heliocentricXYZr(Double JDE, Int object, Double equinox, Double *pos,
     break;
   default:
     if (extraHeliocentric(JDE, object, &standardEquinox, pos, r)
-	== ANA_ERROR) {		/* cartesian */
+	== LUX_ERROR) {		/* cartesian */
       for (i = 0; i < 3; i++)
 	pos[i] = 0.0;
       *r = 0.0;
@@ -3750,7 +3750,7 @@ void galtoeq(Double *pos, Double equinox, char forward)
   }
 }
 /*--------------------------------------------------------------------------*/
-Int ana_astrf(Int narg, Int ps[], Int forward) {
+Int lux_astrf(Int narg, Int ps[], Int forward) {
 /* ASTRF(<coords>[, <equinox>, /JULIAN, /BESSELIAN]
    [, /FROMEQUATORIAL, /FROMECLIPTICAL, /FROMGALACTIC]
    [, /TOEQUATORIAL, /TOECLIPTICAL, /TOGALACTIC])
@@ -3786,12 +3786,12 @@ Int ana_astrf(Int narg, Int ps[], Int forward) {
     to = 2;			/* ecliptical */
   if (from == to)
     return ps[0];		/* nothing to do */
-  if (standardLoop(ps[0], ANA_ZERO, SL_UPGRADE | SL_AXISCOORD | SL_EACHROW,
-		   ANA_FLOAT, &srcinfo, &src, &result, &tgtinfo, &tgt)
-      == ANA_ERROR)
-    return ANA_ERROR;
+  if (standardLoop(ps[0], LUX_ZERO, SL_UPGRADE | SL_AXISCOORD | SL_EACHROW,
+		   LUX_FLOAT, &srcinfo, &src, &result, &tgtinfo, &tgt)
+      == LUX_ERROR)
+    return LUX_ERROR;
   if (srcinfo.ndim < 1 || srcinfo.dims[0] < 2)
-    return anaerror("Need at least two elements in first dimension", -1);
+    return luxerror("Need at least two elements in first dimension", -1);
   if (narg > 1) {
     equinox = double_arg(ps[1]);
     if (internalMode & 128)	/* /BESSELIAN to /JULIAN */
@@ -3805,21 +3805,21 @@ Int ana_astrf(Int narg, Int ps[], Int forward) {
   seps = sin(epsilon);
   do {
     switch (tgtinfo.type) {
-    case ANA_FLOAT:
+    case LUX_FLOAT:
       switch (srcinfo.type) {
-      case ANA_BYTE:
+      case LUX_BYTE:
 	pos[0] = (Double) src.b[0]*DEG;
 	pos[1] = (Double) src.b[1]*DEG;
 	break;
-      case ANA_WORD:
+      case LUX_WORD:
 	pos[0] = (Double) src.w[0]*DEG;
 	pos[1] = (Double) src.w[1]*DEG;
 	break;
-      case ANA_LONG:
+      case LUX_LONG:
 	pos[0] = (Double) src.l[0]*DEG;
 	pos[1] = (Double) src.l[1]*DEG;
 	break;
-      case ANA_FLOAT:
+      case LUX_FLOAT:
 	pos[0] = (Double) src.f[0]*DEG;
 	pos[1] = (Double) src.f[1]*DEG;
 	break;
@@ -3845,25 +3845,25 @@ Int ana_astrf(Int narg, Int ps[], Int forward) {
       tgt.f[0] = (Float) pos[0]*RAD;
       tgt.f[1] = (Float) pos[1]*RAD;
       break;
-    case ANA_DOUBLE:
+    case LUX_DOUBLE:
       switch (srcinfo.type) {
-      case ANA_BYTE:
+      case LUX_BYTE:
 	pos[0] = (Double) src.b[0]*DEG;
 	pos[1] = (Double) src.b[1]*DEG;
 	break;
-      case ANA_WORD:
+      case LUX_WORD:
 	pos[0] = (Double) src.w[0]*DEG;
 	pos[1] = (Double) src.w[1]*DEG;
 	break;
-      case ANA_LONG:
+      case LUX_LONG:
 	pos[0] = (Double) src.l[0]*DEG;
 	pos[1] = (Double) src.l[1]*DEG;
 	break;
-      case ANA_FLOAT:
+      case LUX_FLOAT:
 	pos[0] = (Double) src.f[0]*DEG;
 	pos[1] = (Double) src.f[1]*DEG;
 	break;
-      case ANA_DOUBLE:
+      case LUX_DOUBLE:
 	pos[0] = src.d[0]*DEG;
 	pos[1] = src.d[1]*DEG;
 	break;
@@ -4019,7 +4019,7 @@ void printHBRtoXYZ(Double *lbr)
   printf(" X = %.10g, Y = %.10g, Z = %.10g\n", xyz[0], xyz[1], xyz[2]);
 }
 /*--------------------------------------------------------------------------*/
-Int ana_astropos(Int narg, Int ps[])
+Int lux_astropos(Int narg, Int ps[])
      /* returns the positions of a set of heavenly bodies at a specific */
      /* set of times, for equinox 2000.0 */
      /* Syntax: X = ASTRON(JDs, OBJECTS [, OBJECT0, OBSERVER=OBSERVER, */
@@ -4073,13 +4073,13 @@ Int ana_astropos(Int narg, Int ps[])
   if (!iq)
     return cerror(ILL_ARG, iq);
   switch (symbol_class(iq)) {
-    case ANA_SCALAR:
-      iq = ana_double(1, &iq);
+    case LUX_SCALAR:
+      iq = lux_double(1, &iq);
       JD = &scalar_value(iq).d;
       nJD = 1;
       break;
-    case ANA_ARRAY:
-      iq = ana_double(1, &iq);
+    case LUX_ARRAY:
+      iq = lux_double(1, &iq);
       JD = (Double *) array_data(iq);
       nJD = array_size(iq);
       break;
@@ -4090,18 +4090,18 @@ Int ana_astropos(Int narg, Int ps[])
   iq = ps[1];			/* objects */
   if (!iq) {
     if (narg > 5 && ps[5])
-      iq = ANA_MINUS_ONE;	/* specified elements */
+      iq = LUX_MINUS_ONE;	/* specified elements */
     else
       return cerror(ILL_ARG, ps[1]);
   }
   switch (symbol_class(iq)) {
-    case ANA_SCALAR:
-      iq = ana_long(1, &iq);
+    case LUX_SCALAR:
+      iq = lux_long(1, &iq);
       object = &scalar_value(iq).l;
       nObjects = 1;
       break;
-    case ANA_ARRAY:
-      iq = ana_long(1, &iq);
+    case LUX_ARRAY:
+      iq = lux_long(1, &iq);
       object = (Int *) array_data(iq);
       nObjects = array_size(iq);
       break;
@@ -4115,21 +4115,21 @@ Int ana_astropos(Int narg, Int ps[])
     object0 = EARTH;		/* no object0: use Earth */
   if (object0 != EARTH) {	/* not relative to Earth */
     if (coordSystem != S_ECLIPTICAL && coordSystem != S_EQUATORIAL)
-      return anaerror("Non-ecliptic/non-equatorial coordinates are only returned relative to the Earth", 0);
+      return luxerror("Non-ecliptic/non-equatorial coordinates are only returned relative to the Earth", 0);
   }
 
   if (narg > 3 && ps[3]) {	/* OBSERVER */
-    if (symbol_class(ps[3]) != ANA_ARRAY
+    if (symbol_class(ps[3]) != LUX_ARRAY
 	|| array_size(ps[3]) != 3)
       return
-	anaerror("OBSERVER must be a three-element array (lat/[deg], lon/[deg], h/[m])", ps[3]);
-    iq = ana_double(1, ps + 3);
+	luxerror("OBSERVER must be a three-element array (lat/[deg], lon/[deg], h/[m])", ps[3]);
+    iq = lux_double(1, ps + 3);
     f = (Double *) array_data(iq);
     latitude = f[0];		/* in degrees */
     longitude = f[1];		/* in degrees */
     height = f[2];		/* in meters above mean sea level */
     if (latitude < -90 || latitude > 90)
-      return anaerror("Illegal latitude: %14.6g; must be between -90 and +90 degrees", ps[3], latitude);
+      return luxerror("Illegal latitude: %14.6g; must be between -90 and +90 degrees", ps[3], latitude);
     latitude *= DEG;
     longitude *= DEG;
     geocentricCoords(latitude, height, &rcp, &rsp);
@@ -4138,7 +4138,7 @@ Int ana_astropos(Int narg, Int ps[])
   } else {			/* assume planetocentric */
     latitude = S_PLANETOCENTRIC;
     if (coordSystem == S_HORIZONTAL)
-      return anaerror("Need OBSERVER to return horizontal coordinates", 0);
+      return luxerror("Need OBSERVER to return horizontal coordinates", 0);
     /* avoid compiler warnings about possibly uninitialized variables */
     longitude = 0;
     clat = 1;
@@ -4148,12 +4148,12 @@ Int ana_astropos(Int narg, Int ps[])
   if (narg > 4 && ps[4]) { 	/* EQUINOX */
 				/* equinox date (JDE) */
     if (internalMode & S_DATE)
-      return anaerror("Multiple equinoxes specified", ps[4]);
+      return luxerror("Multiple equinoxes specified", ps[4]);
     switch (symbol_class(ps[4])) {
-      case ANA_SCALAR:		/* assume Julian year */
+      case LUX_SCALAR:		/* assume Julian year */
 	equinox = (double_arg(ps[4]) - 2000.0)*365.25 + J2000;
 	break;
-      case ANA_STRING:
+      case LUX_STRING:
 	string = string_value(ps[4]);
 	equinox = atof(string + 1); /* year */
 	switch (toupper(*string)) {
@@ -4163,7 +4163,7 @@ Int ana_astropos(Int narg, Int ps[])
 	    equinox = 0.99997860193253*equinox + 0.0413818359375;
 	    break;
 	  default:
-	    return anaerror("Illegal EQUINOX specification", ps[4]);
+	    return luxerror("Illegal EQUINOX specification", ps[4]);
 	}
 	equinox = (equinox - 2000.0)*365.25 + J2000;
 	break;
@@ -4177,10 +4177,10 @@ Int ana_astropos(Int narg, Int ps[])
     /* elements: equinox epoch a e i node peri M absmag
               or equinox epoch q e i node peri Tperi absmag /QELEMENTS */
     j = ps[5];
-    if (symbol_class(j) != ANA_ARRAY
+    if (symbol_class(j) != LUX_ARRAY
 	|| array_size(j) != 9)
-      return anaerror("Need a 9-element array with ELEMENTS", j);
-    j = ana_double(1, &j);
+      return luxerror("Need a 9-element array with ELEMENTS", j);
+    j = lux_double(1, &j);
     memcpy(extraElements, array_data(j), 9*sizeof(Double));
     haveExtraElements = (internalMode & S_QELEMENTS)? 6: 5; /* 5->A, 6->Q */
   } else haveExtraElements = 0;		/* none */
@@ -4193,7 +4193,7 @@ Int ana_astropos(Int narg, Int ps[])
     dims[nDims++] = nObjects;
   if (nJD > 1 || internalMode & S_KEEPDIMS)
     dims[nDims++] = nJD;
-  result = array_scratch(ANA_DOUBLE, nDims, dims);
+  result = array_scratch(LUX_DOUBLE, nDims, dims);
   f = f0 = (Double *) array_data(result);
   
   tdt = internalMode & S_TDT;	/* time is specified in TDT rather than UT */

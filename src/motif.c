@@ -27,7 +27,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "config.h"
 #endif
 #include <stdio.h>
-#include "ana_structures.h"
+#include "lux_structures.h"
 #include "install.h"
 #include <stdarg.h>
 #include <X11/Xlib.h>
@@ -65,7 +65,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <Xm/FileSB.h>
 #include <sys/stat.h>
  /*following is icon bitmap, currently same as in xport but want to change */
-#include "ana_bitmap.h"
+#include "lux_bitmap.h"
 
  extern	struct sym_desc sym[];
 
@@ -74,15 +74,15 @@ extern Colormap	colorMap;	/* from color.c */
  /* functions */
  void activateCB();
  void browse_callback(), button_callback(), quit_callback(), scale_callback();
- void textfield_callback(), ana_callback_execute(), radio_which();
+ void textfield_callback(), lux_callback_execute(), radio_which();
  void radio_callback(), textfield_which(), menu_which(), scroll_callback();
  void selectionbox_cb(), command_callback(), fselect_callback();
- void fhelp_callback(), fcancel_callback(), ana_xminit(), bcancel_callback();
+ void fhelp_callback(), fcancel_callback(), lux_xminit(), bcancel_callback();
  void wprint(char *, ...), draw_in_callback(), draw_re_callback(), draw_ex_callback();
  void color_not_available(), font_not_available();
 void destroy_cb(Widget, XtPointer, void *);		/* LS 20jan99 */
  Widget PostDialog(Widget parent, Int dialog_type, char *msg);
- Widget	ana_command_widget;
+ Widget	lux_command_widget;
  
 /*#define MAXWIDGETS       4000 */
 /*#define MAXPIXMAPS       20*/
@@ -95,8 +95,8 @@ Int ck_widget_count(void);
  static	Int	nlist, n_widgets = 0, toplevel;
  static XtAppContext   app_context;
  static	XEvent	event;
- Widget	ana_widget_id[MAXWIDGETS], text_output;
- static	Pixmap	ana_pixmap_id[MAXPIXMAPS];
+ Widget	lux_widget_id[MAXWIDGETS], text_output;
+ static	Pixmap	lux_pixmap_id[MAXPIXMAPS];
  static	char	*list_item = {"$LIST_ITEM"};
  static	char	*selected_file = {"$SELECTED_FILE"};
  static	char	*command_item = {"$COMMAND_LINE"};
@@ -190,20 +190,20 @@ Widget xmtoplevel_board(width, height, title, mx, my)
  return board;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmgettopshell(narg, ps)
+Int lux_xmgettopshell(narg, ps)
  /* top = xmgettopshell (widget) */
  Int     narg, ps[];
  {
  Int	w;
  Widget wg;
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
- wg = ana_widget_id[w];
+ wg = lux_widget_id[w];
  while (wg && !XtIsWMShell(wg))  wg = XtParent(wg);
 
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmmessage(narg, ps) /* (string,[font,color,ix,iy]) */
+Int lux_xmmessage(narg, ps) /* (string,[font,color,ix,iy]) */
  /* a temporary widget, does not return a widget id, used as an lux subr */
  /* 5/29/95 disable the menu and resize */
  Int     narg, ps[];
@@ -218,7 +218,7 @@ Int ana_xmmessage(narg, ps) /* (string,[font,color,ix,iy]) */
  iq = ps[0];
  if (sym[iq].class != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
- parent = ana_widget_id[toplevel];
+ parent = lux_widget_id[toplevel];
  n = 0;
  dialog = XmCreateMessageDialog(parent, "dialog", NULL, 0);
  text = XmStringCreateLtoR(s, cset);
@@ -272,7 +272,7 @@ Int ana_xmmessage(narg, ps) /* (string,[font,color,ix,iy]) */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmprompt(narg, ps)	/* see next line for args */
+Int lux_xmprompt(narg, ps)	/* see next line for args */
  /* (string, default, call_back, modal_flag, [font,color,ix,iy]) */
  /* a temporary widget, does not return a widget id, used as an lux subr */
  Int     narg, ps[];
@@ -292,8 +292,8 @@ Int ana_xmprompt(narg, ps)	/* see next line for args */
  iq = ps[2];
  if (sym[iq].class != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
- if (strlen(s) == 0 )  nsym = 0;  else	nsym = ana_execute_symbol(s,1);
- parent = ana_widget_id[toplevel];
+ if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
+ parent = lux_widget_id[toplevel];
  n = 0;
  dialog = XmCreatePromptDialog(parent, "prompt", NULL, 0);
  if (narg > 3)  if (int_arg_stat(ps[3], &modal_flag) != 1) return -1;
@@ -341,7 +341,7 @@ Int ana_xmprompt(narg, ps)	/* see next line for args */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmcommand(narg, ps) /*see next line for args */
+Int lux_xmcommand(narg, ps) /*see next line for args */
  /*(parent, callback, nvisible, [nmax, prompt,font,color])*/
  /* returns widget id, an lux function */
  /* creates a command widget, original intent is to experiment
@@ -361,7 +361,7 @@ Int ana_xmcommand(narg, ps) /*see next line for args */
  iq = ps[1];
  if (sym[iq].class != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
- if (strlen(s) == 0 )  nsym = 0;  else	nsym = ana_execute_symbol(s,1);
+ if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
  if (int_arg_stat(ps[2], &nvisible) != 1) return -1;
  if (narg > 3) { if (int_arg_stat(ps[3], &hmax) != 1) return -1; }
  
@@ -380,9 +380,9 @@ Int ana_xmcommand(narg, ps) /*see next line for args */
  /* these have to set some of the children widgets, not the command widget */
  if (ck_widget_count() < 0) return -1;
  command = n_widgets++;
- ana_widget_id[command] = XmCreateCommand(ana_widget_id[parent],
+ lux_widget_id[command] = XmCreateCommand(lux_widget_id[parent],
  	"command",wargs, n);
- XtAddCallback(ana_widget_id[command], XmNcommandEnteredCallback,
+ XtAddCallback(lux_widget_id[command], XmNcommandEnteredCallback,
                 command_callback, (XtPointer) nsym);
  /* now the optional font and color */
  /* these have to set some of the children widgets, not the command widget */
@@ -395,28 +395,28 @@ Int ana_xmcommand(narg, ps) /*see next line for args */
   if (setup_colors (ps[6] ) != 1) return -1; }	/* do colors based on bg */
  /* if n is still 0, no color or font, so skip the following section */
  if (n != 0) {
- wg = XmCommandGetChild(ana_widget_id[command], XmDIALOG_COMMAND_TEXT);
+ wg = XmCommandGetChild(lux_widget_id[command], XmDIALOG_COMMAND_TEXT);
  XtSetValues(wg, wargs, n);
- wg = XmCommandGetChild(ana_widget_id[command], XmDIALOG_HISTORY_LIST);
+ wg = XmCommandGetChild(lux_widget_id[command], XmDIALOG_HISTORY_LIST);
  XtSetValues(wg, wargs, n);
  /* the prompt label just gets the font, so re-do the font args */
  n = 0;
  if (narg > 5) {
   if (set_fontlist( ps[5] ) != 1) return -1; /* gets fontlist from string */
-  wg = XmCommandGetChild(ana_widget_id[command], XmDIALOG_PROMPT_LABEL);
+  wg = XmCommandGetChild(lux_widget_id[command], XmDIALOG_PROMPT_LABEL);
   XtSetValues(wg, wargs, n);
  }
  }
  /* now that everybody is ready */
 
- XtManageChild(ana_widget_id[command]);
+ XtManageChild(lux_widget_id[command]);
  XmStringFree(prompt);
  result_sym = scalar_scratch(2);		/*for widget id */
  sym[result_sym].spec.scalar.l = command;
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmdialog_board(narg, ps)	/* see next line for args */
+Int lux_xmdialog_board(narg, ps)	/* see next line for args */
  /* (parent, width, height, title, [ix, iy, lr_margin, tb_margin,
  resize_flag]) */
  /* note that the close_flag idea didn't work, code for it commented out, the
@@ -474,8 +474,8 @@ Int ana_xmdialog_board(narg, ps)	/* see next line for args */
  }
  if (ck_widget_count() < 0) return -1;
  board = n_widgets++;
- ana_widget_id[board] = wb =
- 	XmCreateBulletinBoardDialog(ana_widget_id[parent], "board",wargs, n);
+ lux_widget_id[board] = wb =
+ 	XmCreateBulletinBoardDialog(lux_widget_id[parent], "board",wargs, n);
  
  /* this didn't work
  if (narg > 8) {
@@ -493,7 +493,7 @@ Int ana_xmdialog_board(narg, ps)	/* see next line for args */
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmdialog_form(narg, ps)	/* see next line for args */
+Int lux_xmdialog_form(narg, ps)	/* see next line for args */
  /* (parent, width, height, title, [ hspace, vspace, lr_margin, tb_margin) */
  /* 5/19/96 */
  /* create a dialog form widget, usually the main container */
@@ -532,8 +532,8 @@ Int ana_xmdialog_form(narg, ps)	/* see next line for args */
  XtSetArg(wargs[n], XmNverticalSpacing, vs); n++;
  if (ck_widget_count() < 0) return -1;
  form = n_widgets++;
- ana_widget_id[form] = wb =
- 	XmCreateFormDialog(ana_widget_id[parent], "form",wargs, n);
+ lux_widget_id[form] = wb =
+ 	XmCreateFormDialog(lux_widget_id[parent], "form",wargs, n);
  
  XmStringFree(title);
  result_sym = scalar_scratch(2);		/*for widget id */
@@ -541,13 +541,13 @@ Int ana_xmdialog_form(narg, ps)	/* see next line for args */
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmtoplevel_form(narg, ps)	/* see next line for args */
+Int lux_xmtoplevel_form(narg, ps)	/* see next line for args */
  /* (width, height, title, [ hspace, vspace, lr_margin, tb_margin) */
  /* 12/26/97 */
  /* create a toplevel form widget, does not popup, returns the form
  widget created inside the toplevel */
  /* returns widget id, an lux function */
- /* similar to ana_xmdialog_form except that this is toplevel, do not use
+ /* similar to lux_xmdialog_form except that this is toplevel, do not use
  manage and unmanage, instead use popup and popdown */
  Int     narg, ps[];
  {
@@ -567,20 +567,20 @@ Int ana_xmtoplevel_form(narg, ps)	/* see next line for args */
  if (narg > 4) { if (int_arg_stat(ps[4], &vs) != 1) return -1; }
  if (ck_widget_count() < 0) return -1;
  form = n_widgets++;
- ana_widget_id[form] = xmtoplevel_form(dx, dy, s, hs, vs, mx, my);
+ lux_widget_id[form] = xmtoplevel_form(dx, dy, s, hs, vs, mx, my);
  
  result_sym = scalar_scratch(2);		/*for widget id */
  sym[result_sym].spec.scalar.l = form;
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmtoplevel_board(narg, ps)	/* see next line for args */
+Int lux_xmtoplevel_board(narg, ps)	/* see next line for args */
  /* (width, height, title, [lr_margin, tb_margin]) */
  /* 5/17/98 */
  /* create a toplevel board widget, does not popup, returns the form
  widget created inside the toplevel */
  /* returns widget id, an lux function */
- /* similar to ana_xmdialog_board except that this is toplevel, do not use
+ /* similar to lux_xmdialog_board except that this is toplevel, do not use
  manage and unmanage, instead use popup and popdown */
  Int     narg, ps[];
  {
@@ -597,13 +597,13 @@ Int ana_xmtoplevel_board(narg, ps)	/* see next line for args */
  if (narg > 4) { if (int_arg_stat(ps[4], &my) != 1) return -1; }
  if (ck_widget_count() < 0) return -1;
  board = n_widgets++;
- ana_widget_id[board] = xmtoplevel_board(dx, dy, s, mx, my);
+ lux_widget_id[board] = xmtoplevel_board(dx, dy, s, mx, my);
  result_sym = scalar_scratch(2);		/*for widget id */
  sym[result_sym].spec.scalar.l = board;
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmboard(narg, ps)	/* (parent, [width, height, lr_margin, tb_margin]) */
+Int lux_xmboard(narg, ps)	/* (parent, [width, height, lr_margin, tb_margin]) */
  /* create a managed bulletin board widget */
  /* returns widget id, an lux function */
  Int     narg, ps[];
@@ -626,15 +626,15 @@ Int ana_xmboard(narg, ps)	/* (parent, [width, height, lr_margin, tb_margin]) */
  XtSetArg(wargs[n], XmNmarginHeight, my); n++;
  if (ck_widget_count() < 0) return -1;
  board = n_widgets++;
- ana_widget_id[board] =
- 	XmCreateBulletinBoard(ana_widget_id[parent], "board",wargs, n);
- XtManageChild(ana_widget_id[board]);
+ lux_widget_id[board] =
+ 	XmCreateBulletinBoard(lux_widget_id[parent], "board",wargs, n);
+ XtManageChild(lux_widget_id[board]);
  result_sym = scalar_scratch(2);		/*for widget id */
  sym[result_sym].spec.scalar.l = board;
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmform(narg, ps)	/* (parent, [width,height,hspace,vspace,mx,my]) */
+Int lux_xmform(narg, ps)	/* (parent, [width,height,hspace,vspace,mx,my]) */
  /* returns widget id, an lux function */
  Int     narg, ps[];
  {
@@ -662,14 +662,14 @@ Int ana_xmform(narg, ps)	/* (parent, [width,height,hspace,vspace,mx,my]) */
  XtSetArg(wargs[n], XmNmarginHeight, my); n++;
  if (ck_widget_count() < 0) return -1;
  form = n_widgets++;
- ana_widget_id[form] = XmCreateForm(ana_widget_id[parent], "form",wargs, n);
- XtManageChild(ana_widget_id[form]);
+ lux_widget_id[form] = XmCreateForm(lux_widget_id[parent], "form",wargs, n);
+ XtManageChild(lux_widget_id[form]);
  result_sym = scalar_scratch(2);		/*for widget id */
  sym[result_sym].spec.scalar.l = form;
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmframe(narg, ps) /* (parent, [lr_margin, tb_margin, width, type]) */
+Int lux_xmframe(narg, ps) /* (parent, [lr_margin, tb_margin, width, type]) */
  /* create a frame widget */
  /* returns widget id, an lux function */
  Int     narg, ps[];
@@ -700,15 +700,15 @@ Int ana_xmframe(narg, ps) /* (parent, [lr_margin, tb_margin, width, type]) */
  }
  if (ck_widget_count() < 0) return -1;
  frame = n_widgets++;
- ana_widget_id[frame] =
- 	XmCreateFrame(ana_widget_id[parent], "frame",wargs, n);
- XtManageChild(ana_widget_id[frame]);
+ lux_widget_id[frame] =
+ 	XmCreateFrame(lux_widget_id[parent], "frame",wargs, n);
+ XtManageChild(lux_widget_id[frame]);
  result_sym = scalar_scratch(2);		/*for widget id */
  sym[result_sym].spec.scalar.l = frame;
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmseparator(narg, ps) /* (parent, [orient, margin, type]) */
+Int lux_xmseparator(narg, ps) /* (parent, [orient, margin, type]) */
  /* orient = 0 for horozontal, otherwise vertical
  margin is width or height
  type is 1 for simple line, 0 for empty space, 2 for Double line, 3 for dotted
@@ -736,20 +736,20 @@ Int ana_xmseparator(narg, ps) /* (parent, [orient, margin, type]) */
  }
  if (ck_widget_count() < 0) return -1;
  sep = n_widgets++;
- ana_widget_id[sep] =
- 	XmCreateSeparator(ana_widget_id[parent], "separator",wargs, n);
- XtManageChild(ana_widget_id[sep]);
+ lux_widget_id[sep] =
+ 	XmCreateSeparator(lux_widget_id[parent], "separator",wargs, n);
+ XtManageChild(lux_widget_id[sep]);
  result_sym = scalar_scratch(2);		/*for widget id */
  sym[result_sym].spec.scalar.l = sep;
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmcolumns(narg, ps)	/* (parent, width, height, [ncolumns],[pack_flag]) */
+Int lux_xmcolumns(narg, ps)	/* (parent, width, height, [ncolumns],[pack_flag]) */
  /* returns widget id, an lux function */
  Int     narg, ps[];
  { return rows_or_columns(narg, ps, 0); }
  /*------------------------------------------------------------------------- */
-Int ana_xmrows(narg, ps)	/* (parent, width, height, [nrows],[pack_flag]) */
+Int lux_xmrows(narg, ps)	/* (parent, width, height, [nrows],[pack_flag]) */
  /* returns widget id, an lux function */
  Int     narg, ps[];
  { return rows_or_columns(narg, ps, 1); }
@@ -781,15 +781,15 @@ Int rows_or_columns(narg, ps,mode)	/*(parent, width, height, [ncolumns],[p_flag]
  if (narg > 3) { XtSetArg(wargs[n], XmNnumColumns, ncol); n++; }
  if (ck_widget_count() < 0) return -1;
  rowcolumn = n_widgets++;
- ana_widget_id[rowcolumn] =
- 	XmCreateRowColumn(ana_widget_id[parent], "rowcolumn",wargs, n);
- XtManageChild(ana_widget_id[rowcolumn]);
+ lux_widget_id[rowcolumn] =
+ 	XmCreateRowColumn(lux_widget_id[parent], "rowcolumn",wargs, n);
+ XtManageChild(lux_widget_id[rowcolumn]);
  result_sym = scalar_scratch(2);		/*for widget id */
  sym[result_sym].spec.scalar.l = rowcolumn;
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmscrolledwindow(narg, ps)	/* (parent, width, height) */
+Int lux_xmscrolledwindow(narg, ps)	/* (parent, width, height) */
  /* create a scrolled window */
  /* returns widget id, an lux function */
  Int     narg, ps[];
@@ -807,15 +807,15 @@ Int ana_xmscrolledwindow(narg, ps)	/* (parent, width, height) */
  XtSetArg(wargs[n], XmNscrollingPolicy, XmAUTOMATIC); n++;
  if (ck_widget_count() < 0) return -1;
  scroll = n_widgets++;
- ana_widget_id[scroll] =
- 	XmCreateScrolledWindow(ana_widget_id[parent], "scroll",wargs, n);
- XtManageChild(ana_widget_id[scroll]);
+ lux_widget_id[scroll] =
+ 	XmCreateScrolledWindow(lux_widget_id[parent], "scroll",wargs, n);
+ XtManageChild(lux_widget_id[scroll]);
  result_sym = scalar_scratch(2);		/*for widget id */
  sym[result_sym].spec.scalar.l = scroll;
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmscrolledwindowapp(narg, ps)	/* (parent,hmargin,vmargin,space) */
+Int lux_xmscrolledwindowapp(narg, ps)	/* (parent,hmargin,vmargin,space) */
  /* create a scrolled window, application controlled */
  /* returns widget id, an lux function */
  Int     narg, ps[];
@@ -836,29 +836,29 @@ Int ana_xmscrolledwindowapp(narg, ps)	/* (parent,hmargin,vmargin,space) */
 	XtSetArg(wargs[n], XmNspacing, space); n++; }
  if (ck_widget_count() < 0) return -1;
  scroll = n_widgets++;
- ana_widget_id[scroll] =
- 	XmCreateScrolledWindow(ana_widget_id[parent], "scroll",wargs, n);
- XtManageChild(ana_widget_id[scroll]);
+ lux_widget_id[scroll] =
+ 	XmCreateScrolledWindow(lux_widget_id[parent], "scroll",wargs, n);
+ XtManageChild(lux_widget_id[scroll]);
  result_sym = scalar_scratch(2);		/*for widget id */
  sym[result_sym].spec.scalar.l = scroll;
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmhscrollbar(narg, ps)/*(parent,max,slidersize,dpage,callback,[drag]) */
+Int lux_xmhscrollbar(narg, ps)/*(parent,max,slidersize,dpage,callback,[drag]) */
  /* creates a horizontal scroll widget, returns widget id */
  Int     narg, ps[];
  {
- return ana_int_xmscrollbar(narg, ps, 1);	/* the 1 indicates horizontal */
+ return lux_int_xmscrollbar(narg, ps, 1);	/* the 1 indicates horizontal */
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmvscrollbar(narg, ps)/*(parent,max,slidersize,dpage,callback,[drag]) */
+Int lux_xmvscrollbar(narg, ps)/*(parent,max,slidersize,dpage,callback,[drag]) */
  /* creates a vertical scroll widget, returns widget id */
  Int     narg, ps[];
  {
- return ana_int_xmscrollbar(narg, ps, 0);	/* the 0 indicates vertical */
+ return lux_int_xmscrollbar(narg, ps, 0);	/* the 0 indicates vertical */
  }
  /*------------------------------------------------------------------------- */
-Int ana_int_xmscrollbar(narg, ps, mode)  /* internal, mode = 1 for horizontal */
+Int lux_int_xmscrollbar(narg, ps, mode)  /* internal, mode = 1 for horizontal */
  /*(parent,max,slidersize,dpage,callback,[drag]) */
  /* note that the default increment of 1 is used since the max can always
  be set so that 1 is the single step size, of course, we may change this
@@ -880,7 +880,7 @@ Int ana_int_xmscrollbar(narg, ps, mode)  /* internal, mode = 1 for horizontal */
  iq = ps[4];
  if (sym[iq].class != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
- if (strlen(s) == 0 )  nsym = 0;  else	nsym = ana_execute_symbol(s,1);
+ if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
  if (narg > 5) if (int_arg_stat(ps[5], &drag_flag) != 1) return -1;
  n = 0;
  XtSetArg(wargs[n], XmNmaximum, max); n++;
@@ -890,12 +890,12 @@ Int ana_int_xmscrollbar(narg, ps, mode)  /* internal, mode = 1 for horizontal */
  	XtSetArg(wargs[n], XmNorientation, XmVERTICAL); } ; n++;
  if (ck_widget_count() < 0) return -1;
  scroll = n_widgets++;
- ana_widget_id[scroll] = XmCreateScrollBar(ana_widget_id[w], "scroll", wargs, n);
- XtManageChild(ana_widget_id[scroll]);
- XtAddCallback(ana_widget_id[scroll], XmNvalueChangedCallback,
+ lux_widget_id[scroll] = XmCreateScrollBar(lux_widget_id[w], "scroll", wargs, n);
+ XtManageChild(lux_widget_id[scroll]);
+ XtAddCallback(lux_widget_id[scroll], XmNvalueChangedCallback,
                 scroll_callback, (XtPointer) nsym);
  if (drag_flag != 0) {
- XtAddCallback(ana_widget_id[scroll], XmNdragCallback,
+ XtAddCallback(lux_widget_id[scroll], XmNdragCallback,
                 scroll_callback, (XtPointer) nsym);
 	}
  result_sym = scalar_scratch(2);		/*for widget id */
@@ -903,7 +903,7 @@ Int ana_int_xmscrollbar(narg, ps, mode)  /* internal, mode = 1 for horizontal */
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmscrollbarsetvalues(narg, ps)/*(widget,value,max,slidersize,dpage) */
+Int lux_xmscrollbarsetvalues(narg, ps)/*(widget,value,max,slidersize,dpage) */
  /* changes the slider size and range (and dpage) */
  /* if a value is 0 or < 0, we assume it isn't supposed to be changed */
  Int     narg, ps[];
@@ -922,11 +922,11 @@ Int ana_xmscrollbarsetvalues(narg, ps)/*(widget,value,max,slidersize,dpage) */
  if (slidersize>0)	{  XtSetArg(wargs[n], XmNsliderSize, slidersize); n++; }
  if (dpage>0)		{ XtSetArg(wargs[n], XmNpageIncrement, dpage); n++; }
  
- if (n>0)	XtSetValues(ana_widget_id[w], wargs, n);
+ if (n>0)	XtSetValues(lux_widget_id[w], wargs, n);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmdrawingarea(narg, ps)  /*(parent,ana_win,w,h,input_cb,resize_cb,ex_cb) */
+Int lux_xmdrawingarea(narg, ps)  /*(parent,lux_win,w,h,input_cb,resize_cb,ex_cb) */
  /* create a drawing window */
  /* returns widget id, an lux function */
  /* note that we can't get the window number until after the widgets
@@ -934,7 +934,7 @@ Int ana_xmdrawingarea(narg, ps)  /*(parent,ana_win,w,h,input_cb,resize_cb,ex_cb)
  Int     narg, ps[];
  {
  Widget	wdraw;
- Int	dx=0, dy=0, parent, draw, result_sym, iq, ana_win, nsym;
+ Int	dx=0, dy=0, parent, draw, result_sym, iq, lux_win, nsym;
  char	*s;
  extern	Int	drawingareas[];
  extern	Int	ck_window();
@@ -943,37 +943,37 @@ Int ana_xmdrawingarea(narg, ps)  /*(parent,ana_win,w,h,input_cb,resize_cb,ex_cb)
  /* get parent widget */
  if ( get_widget_id( ps[0], &parent) != 1 ) return -1;
  /* get the arguments */
- if (int_arg_stat(ps[1], &ana_win) != 1) return -1;
+ if (int_arg_stat(ps[1], &lux_win) != 1) return -1;
  /* we want the lux X window to be positive and in range */
  /* we do not currently allow a negative lux window which is supposed to be
  a pixmap rather than a displayable window */
- if (ana_win<0 || ck_window(ana_win)<0 ) {
- 	printf("XMDRAWINGAREA - illegal lux X window number %d\n", ana_win);
+ if (lux_win<0 || ck_window(lux_win)<0 ) {
+ 	printf("XMDRAWINGAREA - illegal lux X window number %d\n", lux_win);
 	return -1; }
  if (narg>2) { if (int_arg_stat(ps[2], &dx) != 1) return -1; }
  if (narg>3) { if (int_arg_stat(ps[3], &dy) != 1) return -1; }
  /* if the lux X window already exists, we have to delete it since the motif
  widget will create a new X window */
- if ( win[ana_win] != 0 ) ana_xdelete(1, &ana_win);
+ if ( win[lux_win] != 0 ) lux_xdelete(1, &lux_win);
  n = 0;
  XtSetArg(wargs[n], XmNwidth, dx); n++;
  XtSetArg(wargs[n], XmNheight, dy); n++;
  XtSetArg(wargs[n], XmNresizePolicy, XmRESIZE_ANY); n++;
  if (ck_widget_count() < 0) return -1;
  draw = n_widgets++;
- ana_widget_id[draw] = wdraw =
- 	XmCreateDrawingArea(ana_widget_id[parent], "draw",wargs, n);
+ lux_widget_id[draw] = wdraw =
+ 	XmCreateDrawingArea(lux_widget_id[parent], "draw",wargs, n);
  /* callbacks (if any), first the input callback */
  if (narg>4) {
  Int	*pt;
  iq = ps[4];
  if (sym[iq].class != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
- if (strlen(s) == 0 )  nsym = 0;  else	nsym = ana_execute_symbol(s,1);
+ if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
  /* instead of just passing the execution symbol, we make a little
  array containing it and the lux X window # and pass the pointer */
  pt = (Int *) malloc(2*sizeof(Int));
- *pt = nsym;	*(pt+1) = ana_win;
+ *pt = nsym;	*(pt+1) = lux_win;
  XtAddCallback(wdraw, XmNinputCallback, draw_in_callback, (XtPointer) pt);
  }
  if (narg>5) {
@@ -981,11 +981,11 @@ Int ana_xmdrawingarea(narg, ps)  /*(parent,ana_win,w,h,input_cb,resize_cb,ex_cb)
  iq = ps[5];
  if (sym[iq].class != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
- if (strlen(s) == 0 )  nsym = 0;  else	nsym = ana_execute_symbol(s,1);
+ if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
  /* instead of just passing the exection sysmbol, we make a little
  array containing it and the lux X window # and pass the pointer */
  pt = (Int *) malloc(2*sizeof(Int));
- *pt = nsym;	*(pt+1) = ana_win;
+ *pt = nsym;	*(pt+1) = lux_win;
  XtAddCallback(wdraw, XmNresizeCallback, draw_re_callback, (XtPointer) pt);
  }
  if (narg>6) {
@@ -993,17 +993,17 @@ Int ana_xmdrawingarea(narg, ps)  /*(parent,ana_win,w,h,input_cb,resize_cb,ex_cb)
  iq = ps[6];
  if (sym[iq].class != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
- if (strlen(s) == 0 )  nsym = 0;  else	nsym = ana_execute_symbol(s,1);
+ if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
  /* instead of just passing the exection sysmbol, we make a little
  array containing it and the lux X window # and pass the pointer */
  pt = (Int *) malloc(2*sizeof(Int));
- *pt = nsym;	*(pt+1) = ana_win;
+ *pt = nsym;	*(pt+1) = lux_win;
  XtAddCallback(wdraw, XmNexposeCallback, draw_ex_callback, (XtPointer) pt);
  }
- XtManageChild(ana_widget_id[draw]);
+ XtManageChild(lux_widget_id[draw]);
 
  result_sym = scalar_scratch(2);		/*for widget id */
- sym[result_sym].spec.scalar.l = drawingareas[ana_win] = draw;
+ sym[result_sym].spec.scalar.l = drawingareas[lux_win] = draw;
 #ifdef DEPRECATED
  printf("created widget %d, %d\n", draw, (uint32_t) wdraw);
 #endif
@@ -1011,11 +1011,11 @@ Int ana_xmdrawingarea(narg, ps)  /*(parent,ana_win,w,h,input_cb,resize_cb,ex_cb)
  area is managed, the final setups of the window are therefore deferred until
  the first access via the xport.c routines. In there, the normal checking
  will find that this is a new window associated with a drawing area in
- ana_xcreat */
+ lux_xcreat */
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmdrawinglink(narg, ps)	/* (widget, ana_win) */
+Int lux_xmdrawinglink(narg, ps)	/* (widget, lux_win) */
  /* link a drawing area widget to an lux window */
  /* a subroutine */
  Int     narg, ps[];
@@ -1029,43 +1029,43 @@ Int ana_xmdrawinglink(narg, ps)	/* (widget, ana_win) */
  Bool	status;
  XWindowAttributes	wat;
  XSetWindowAttributes	setwat;
- Int	ana_win, screen_num;
+ Int	lux_win, screen_num;
  if (ck_motif() != 1) return -1;
  /* get widget */
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
  /* get the arguments */
- if (int_arg_stat(ps[1], &ana_win) != 1) return -1;
- display = XtDisplay(ana_widget_id[w]);
+ if (int_arg_stat(ps[1], &lux_win) != 1) return -1;
+ display = XtDisplay(lux_widget_id[w]);
  screen_num = DefaultScreen(display);
- win[ana_win] = XtWindowOfObject(ana_widget_id[w]);
- printf("win[ana_win] = %ld\n", win[ana_win]);
- status = XGetWindowAttributes(display, win[ana_win], &wat);
+ win[lux_win] = XtWindowOfObject(lux_widget_id[w]);
+ printf("win[lux_win] = %ld\n", win[lux_win]);
+ status = XGetWindowAttributes(display, win[lux_win], &wat);
  valuemask |= CWBackPixel;
  setwat.background_pixel = WhitePixel(display, screen_num);
  valuemask |= CWBackingStore;
  setwat.backing_store = WhenMapped; /*note that Always screws up things
 					  not sure why yet */
- XChangeWindowAttributes(display, win[ana_win], valuemask, &setwat);
+ XChangeWindowAttributes(display, win[lux_win], valuemask, &setwat);
  /* set some of the lux parameters, assuming a window and not a pixmap
  for early testing */
- ht[ana_win] = wat.width;	wd[ana_win] = wat.height;
- gc[ana_win] = XCreateGC(display, RootWindow(display,screen_num),
+ ht[lux_win] = wat.width;	wd[lux_win] = wat.height;
+ gc[lux_win] = XCreateGC(display, RootWindow(display,screen_num),
  	0,NULL);
- XSetForeground(display, gc[ana_win], BlackPixel(display, screen_num));
+ XSetForeground(display, gc[lux_win], BlackPixel(display, screen_num));
 
- XSelectInput( display, win[ana_win], ExposureMask | KeyPressMask | 
+ XSelectInput( display, win[lux_win], ExposureMask | KeyPressMask | 
     ButtonPressMask | StructureNotifyMask | FocusChangeMask );
  /*
  cursor = XCreateFontCursor(display, XC_crosshair);
- XDefineCursor(display, win[ana_win], cursor);
+ XDefineCursor(display, win[lux_win], cursor);
  XFreeCursor(display, cursor);
  */
- /*printf("win[ana_win] = %d, ht[ana_win] = %d, wd[ana_win] = %d\n",
- 	win[ana_win], ht[ana_win], wd[ana_win]); */
+ /*printf("win[lux_win] = %d, ht[lux_win] = %d, wd[lux_win] = %d\n",
+ 	win[lux_win], ht[lux_win], wd[lux_win]); */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmtextfromfile(narg, ps)/*(parent, filename, [rows, cols, font,color])*/
+Int lux_xmtextfromfile(narg, ps)/*(parent, filename, [rows, cols, font,color])*/
  /* returns widget id, an lux function */
  Int     narg, ps[];
  {
@@ -1111,17 +1111,17 @@ Int ana_xmtextfromfile(narg, ps)/*(parent, filename, [rows, cols, font,color])*/
  XtSetArg(wargs[n], XmNresizable, TRUE); n++;
  if (ck_widget_count() < 0) return -1;
  text = n_widgets++;
- ana_widget_id[text] = XmCreateScrolledText(ana_widget_id[parent],
+ lux_widget_id[text] = XmCreateScrolledText(lux_widget_id[parent],
  	"text",wargs, n);
- XmTextSetString(ana_widget_id[text], buffer);
+ XmTextSetString(lux_widget_id[text], buffer);
  XtFree(buffer);
- XtManageChild(ana_widget_id[text]);
+ XtManageChild(lux_widget_id[text]);
  result_sym = scalar_scratch(2);		/*for widget id */
  sym[result_sym].spec.scalar.l = text;
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmtext(narg, ps)/*(parent, rows, cols, [font,color])*/
+Int lux_xmtext(narg, ps)/*(parent, rows, cols, [font,color])*/
  /* creates an empty text widget, scrollable */
  /* returns widget id, an lux function */
  /* note that the text widget is returned, to position this, you must
@@ -1152,15 +1152,15 @@ Int ana_xmtext(narg, ps)/*(parent, rows, cols, [font,color])*/
  XtSetArg(wargs[n], XmNeditMode, XmMULTI_LINE_EDIT); n++;
  if (ck_widget_count() < 0) return -1;
  text = n_widgets++;
- ana_widget_id[text] = XmCreateScrolledText(ana_widget_id[parent],
+ lux_widget_id[text] = XmCreateScrolledText(lux_widget_id[parent],
  	"text",wargs, n);
- XtManageChild(ana_widget_id[text]);
+ XtManageChild(lux_widget_id[text]);
  result_sym = scalar_scratch(2);		/*for widget id */
  sym[result_sym].spec.scalar.l = text;
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmtextbox(narg, ps)/*(parent, rows, cols, [font,color])*/
+Int lux_xmtextbox(narg, ps)/*(parent, rows, cols, [font,color])*/
  /* creates an empty text widget, not scrolled, write only, not editable */
  /* returns widget id, an lux function */
  Int     narg, ps[];
@@ -1187,15 +1187,15 @@ Int ana_xmtextbox(narg, ps)/*(parent, rows, cols, [font,color])*/
  XtSetArg(wargs[n], XmNcursorPositionVisible, False); n++;
  if (ck_widget_count() < 0) return -1;
  text = n_widgets++;
- ana_widget_id[text] = XmCreateText(ana_widget_id[parent],
+ lux_widget_id[text] = XmCreateText(lux_widget_id[parent],
  	"text",wargs, n);
- XtManageChild(ana_widget_id[text]);
+ XtManageChild(lux_widget_id[text]);
  result_sym = scalar_scratch(2);		/*for widget id */
  sym[result_sym].spec.scalar.l = text;
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmtextappend(narg, ps)	/* (widget_id, string, [lf_flag]) */
+Int lux_xmtextappend(narg, ps)	/* (widget_id, string, [lf_flag]) */
  /* adds string to the text widget, this is a subroutine */
  /* if lf_flag is present and ne 0, then a line feed is included */
  Int     narg, ps[];
@@ -1207,22 +1207,22 @@ Int ana_xmtextappend(narg, ps)	/* (widget_id, string, [lf_flag]) */
  iq = ps[1];
  if (sym[iq].class != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
- i = XmTextGetLastPosition(ana_widget_id[w]);
+ i = XmTextGetLastPosition(lux_widget_id[w]);
  if (narg > 2) if (int_arg_stat(ps[2], &lflag) != 1) return -1;
- if (lflag == 0) XmTextInsert(ana_widget_id[w], i, s); else {
+ if (lflag == 0) XmTextInsert(lux_widget_id[w], i, s); else {
  /* you want a line feed too !, more complicated */
  mq = sym[iq].spec.array.bstore;	/* includes null */
  s2 = (char *) malloc(mq+1);			/* for the copy */
  bcopy(s, s2, mq-1);
  *(s2 + mq-1) = 10;
  *(s2 + mq) = 0;
- XmTextInsert(ana_widget_id[w], i, s2);
+ XmTextInsert(lux_widget_id[w], i, s2);
  free(s2);
  }
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmtextgetstring(narg, ps) /* (widget) */
+Int lux_xmtextgetstring(narg, ps) /* (widget) */
  /* gets a copy of the text contents as a string */
  Int     narg, ps[];
  {
@@ -1231,7 +1231,7 @@ Int ana_xmtextgetstring(narg, ps) /* (widget) */
  if (ck_motif() != 1) return -1;
  if (get_widget_id(ps[0], &w) != 1) return -1;
  
- pt = XmTextGetString(ana_widget_id[w]);
+ pt = XmTextGetString(lux_widget_id[w]);
  mq = strlen(pt);
  result_sym = string_scratch(mq);		/*for resultant string */
  s = (char *) sym[result_sym].spec.array.ptr;
@@ -1242,7 +1242,7 @@ Int ana_xmtextgetstring(narg, ps) /* (widget) */
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmtextsetstring(narg, ps) /* (widget, value) */
+Int lux_xmtextsetstring(narg, ps) /* (widget, value) */
  Int     narg, ps[];
  {
  Int	w, iq;
@@ -1254,11 +1254,11 @@ Int ana_xmtextsetstring(narg, ps) /* (widget, value) */
  if (sym[iq].class != 2) return execute_error(70);
  s = (char *) sym[iq].spec.array.ptr;
  
- XmTextSetString(ana_widget_id[w], s);
+ XmTextSetString(lux_widget_id[w], s);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmtextsetposition(narg, ps) /* (widget, position) */
+Int lux_xmtextsetposition(narg, ps) /* (widget, position) */
  Int     narg, ps[];
  {
  Int	w, i;
@@ -1266,37 +1266,37 @@ Int ana_xmtextsetposition(narg, ps) /* (widget, position) */
  if (get_widget_id(ps[0], &w) != 1) return -1;
  if (int_arg_stat(ps[1], &i) != 1) return -1;
  
- XmTextSetInsertionPosition(ana_widget_id[w], (XmTextPosition) i);
+ XmTextSetInsertionPosition(lux_widget_id[w], (XmTextPosition) i);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmtextgetlastposition(narg, ps) /* (widget) */
+Int lux_xmtextgetlastposition(narg, ps) /* (widget) */
  Int     narg, ps[];
  {
  Int	w, i, result_sym;
   if (ck_motif() != 1) return -1;
  if (get_widget_id(ps[0], &w) != 1) return -1;
  
- i = XmTextGetLastPosition(ana_widget_id[w]);
+ i = XmTextGetLastPosition(lux_widget_id[w]);
  result_sym = scalar_scratch(2);		/*for position */
  sym[result_sym].spec.scalar.l = i;
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmtextgetinsertposition(narg, ps) /* (widget) */
+Int lux_xmtextgetinsertposition(narg, ps) /* (widget) */
  Int     narg, ps[];
  {
  Int	w, i, result_sym;
   if (ck_motif() != 1) return -1;
  if (get_widget_id(ps[0], &w) != 1) return -1;
  
- i = XmTextGetInsertionPosition(ana_widget_id[w]);
+ i = XmTextGetInsertionPosition(lux_widget_id[w]);
  result_sym = scalar_scratch(2);		/*for position */
  sym[result_sym].spec.scalar.l = i;
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmtextgetselection(narg, ps) /* (widget, [left, right]) */
+Int lux_xmtextgetselection(narg, ps) /* (widget, [left, right]) */
  /* returns the primary selection as a string, optionally returns the
  position */
  Int     narg, ps[];
@@ -1307,7 +1307,7 @@ Int ana_xmtextgetselection(narg, ps) /* (widget, [left, right]) */
  if (ck_motif() != 1) return -1;
  if (get_widget_id(ps[0], &w) != 1) return -1;
  
- pt = XmTextGetSelection(ana_widget_id[w]);
+ pt = XmTextGetSelection(lux_widget_id[w]);
  mq = strlen(pt);
  result_sym = string_scratch(mq);		/*for resultant string */
  s = (char *) sym[result_sym].spec.array.ptr;
@@ -1321,7 +1321,7 @@ Int ana_xmtextgetselection(narg, ps) /* (widget, [left, right]) */
  XmTextPosition	right;
  Int	i1, i2;
  if (narg !=3) execute_error(55);
- XmTextGetSelectionPosition (ana_widget_id[w], &left, &right);
+ XmTextGetSelectionPosition (lux_widget_id[w], &left, &right);
  i1 = (Int) left;
  i2 = (Int) right;
  redef_scalar(ps[1], 2, &i1);
@@ -1330,7 +1330,7 @@ Int ana_xmtextgetselection(narg, ps) /* (widget, [left, right]) */
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmtextreplace(narg, ps) /* (widget, i1, i2, s) */
+Int lux_xmtextreplace(narg, ps) /* (widget, i1, i2, s) */
  Int     narg, ps[];
  {
  Int	w, iq, i1, i2;
@@ -1344,22 +1344,22 @@ Int ana_xmtextreplace(narg, ps) /* (widget, i1, i2, s) */
    if (sym[iq].class != 2) { return execute_error(70); }
    s = (char *) sym[iq].spec.array.ptr;
  } else s = NULL;
- XmTextReplace(ana_widget_id[w],(XmTextPosition) i1,(XmTextPosition) i2, s);
+ XmTextReplace(lux_widget_id[w],(XmTextPosition) i1,(XmTextPosition) i2, s);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmtexterase(narg, ps)	/* (widget_id) */
+Int lux_xmtexterase(narg, ps)	/* (widget_id) */
  /* erases all the text in a text widget */
  Int     narg, ps[];
  {
  Int	w;
  char *s = {""};
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
- XmTextSetString(ana_widget_id[w], s);
+ XmTextSetString(lux_widget_id[w], s);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmtextfield(narg, ps) /* (parent, text, length, callback, ... see next line
+Int lux_xmtextfield(narg, ps) /* (parent, text, length, callback, ... see next line
 	[font, color, lostfocus_callback, gotfocus_callback]) */
  /* creates a textfield widget, returns widget id */
  /* 9/14/96 added the optional focus callbacks */
@@ -1379,7 +1379,7 @@ Int ana_xmtextfield(narg, ps) /* (parent, text, length, callback, ... see next l
  iq = ps[3];
  if (sym[iq].class != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
- if (strlen(s) == 0 )  nsym = 0;  else	nsym = ana_execute_symbol(s,1);
+ if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
 
  n = 0;
  XtSetArg(wargs[n], XmNmaxLength, length); n++;
@@ -1392,36 +1392,36 @@ Int ana_xmtextfield(narg, ps) /* (parent, text, length, callback, ... see next l
   
  if (ck_widget_count() < 0) return -1;
  textfield = n_widgets++;
- ana_widget_id[textfield] =
- 	XmCreateTextField(ana_widget_id[w], "textfield", wargs, n);
- if (nsym) XtAddCallback(ana_widget_id[textfield], XmNactivateCallback,
+ lux_widget_id[textfield] =
+ 	XmCreateTextField(lux_widget_id[w], "textfield", wargs, n);
+ if (nsym) XtAddCallback(lux_widget_id[textfield], XmNactivateCallback,
                 textfield_callback, (XtPointer) nsym);
  /* check for optional callbacks */
  if (narg > 6) {
  iq = ps[6];
  if (sym[iq].class != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
- if (strlen(s) == 0 )  nsym = 0;  else	nsym = ana_execute_symbol(s,1);
- if (nsym) XtAddCallback(ana_widget_id[textfield], XmNlosingFocusCallback,
+ if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
+ if (nsym) XtAddCallback(lux_widget_id[textfield], XmNlosingFocusCallback,
 	textfield_callback, (XtPointer) nsym);
  }
  if (narg > 7) {
  iq = ps[7];
  if (sym[iq].class != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
- if (strlen(s) == 0 )  nsym = 0;  else	nsym = ana_execute_symbol(s,1);
- if (nsym) XtAddCallback(ana_widget_id[textfield], XmNfocusCallback,
+ if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
+ if (nsym) XtAddCallback(lux_widget_id[textfield], XmNfocusCallback,
 	textfield_callback, (XtPointer) nsym);
  }
 
- XmTextSetString(ana_widget_id[textfield], ls);
- XtManageChild(ana_widget_id[textfield]);
+ XmTextSetString(lux_widget_id[textfield], ls);
+ XtManageChild(lux_widget_id[textfield]);
  result_sym = scalar_scratch(2);		/*for widget id */
  sym[result_sym].spec.scalar.l = textfield;
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmtextfieldsetstring(narg, ps) /* (widget, string, [cursor]) */
+Int lux_xmtextfieldsetstring(narg, ps) /* (widget, string, [cursor]) */
  Int     narg, ps[];
  {
  Int	w, iq, cflag=0, n;
@@ -1433,18 +1433,18 @@ Int ana_xmtextfieldsetstring(narg, ps) /* (widget, string, [cursor]) */
  if (sym[iq].class != 2) return execute_error(70);
  s = (char *) sym[iq].spec.array.ptr;
  
- XmTextFieldSetString(ana_widget_id[w], s);
+ XmTextFieldSetString(lux_widget_id[w], s);
  /* set the cursor at the end if cursor argument is not 0 */
  if (narg > 2) { if (int_arg_stat(ps[2], &cflag) != 1) return -1;
  if (cflag !=0) {
  n = sym[iq].spec.array.bstore - 1;
- XmTextFieldSetInsertionPosition(ana_widget_id[w], (XmTextPosition) n);
+ XmTextFieldSetInsertionPosition(lux_widget_id[w], (XmTextPosition) n);
  }
  }
   return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmtextfieldseteditable(narg, ps) /* (widget, value) */
+Int lux_xmtextfieldseteditable(narg, ps) /* (widget, value) */
  Int     narg, ps[];
  {
  Int	w, iq;
@@ -1453,12 +1453,12 @@ Int ana_xmtextfieldseteditable(narg, ps) /* (widget, value) */
  /* get the condition */
  if (int_arg_stat(ps[1], &iq) != 1) return -1;
  
- if (iq != 0) XmTextFieldSetEditable(ana_widget_id[w], True);  else
- 	XmTextFieldSetEditable(ana_widget_id[w], False);
+ if (iq != 0) XmTextFieldSetEditable(lux_widget_id[w], True);  else
+ 	XmTextFieldSetEditable(lux_widget_id[w], False);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmtextfieldsetmaxlength(narg, ps) /* (widget, value) */
+Int lux_xmtextfieldsetmaxlength(narg, ps) /* (widget, value) */
  Int     narg, ps[];
  {
  Int	w, iq;
@@ -1467,11 +1467,11 @@ Int ana_xmtextfieldsetmaxlength(narg, ps) /* (widget, value) */
  /* get the condition */
  if (int_arg_stat(ps[1], &iq) != 1) return -1;
  
- XmTextFieldSetMaxLength(ana_widget_id[w], iq);
+ XmTextFieldSetMaxLength(lux_widget_id[w], iq);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmtextseteditable(narg, ps) /* (widget, value) */
+Int lux_xmtextseteditable(narg, ps) /* (widget, value) */
  Int     narg, ps[];
  {
  Int	w, iq;
@@ -1480,12 +1480,12 @@ Int ana_xmtextseteditable(narg, ps) /* (widget, value) */
  /* get the condition */
  if (int_arg_stat(ps[1], &iq) != 1) return -1;
  
- if (iq != 0) XmTextSetEditable(ana_widget_id[w], True);  else
- 	XmTextSetEditable(ana_widget_id[w], False);
+ if (iq != 0) XmTextSetEditable(lux_widget_id[w], True);  else
+ 	XmTextSetEditable(lux_widget_id[w], False);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmtextfieldgetstring(narg, ps) /* (widget) */
+Int lux_xmtextfieldgetstring(narg, ps) /* (widget) */
  Int     narg, ps[];
  {
  Int	w, mq, result_sym;
@@ -1493,7 +1493,7 @@ Int ana_xmtextfieldgetstring(narg, ps) /* (widget) */
  if (ck_motif() != 1) return -1;
  if (get_widget_id(ps[0], &w) != 1) return -1;
  
- pt = XmTextFieldGetString(ana_widget_id[w]);
+ pt = XmTextFieldGetString(lux_widget_id[w]);
  mq = strlen(pt);
  result_sym = string_scratch(mq);		/*for resultant string */
  s = (char *) sym[result_sym].spec.array.ptr;
@@ -1504,7 +1504,7 @@ Int ana_xmtextfieldgetstring(narg, ps) /* (widget) */
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmtextfieldarray(narg, ps)  /* lots of arguments */
+Int lux_xmtextfieldarray(narg, ps)  /* lots of arguments */
  /* (parent,callback,font,color,nxl,nxm,nxt,ny,l1,[l2, l3 ...], [len]) */
  /* nxl is horiz. size of labels, nxm is margin, nxt is horiz. text size */
  /* the font and color preceed the labels to allow easier parsing, if
@@ -1543,12 +1543,12 @@ Int ana_xmtextfieldarray(narg, ps)  /* lots of arguments */
  iq = ps[1];
  if (sym[iq].class != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
- if (strlen(s) == 0 )  nsym = 0;  else	nsym = ana_execute_symbol(s,1);
+ if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
 
  /* before getting the labels, create a board widget as a container, we
  pass back this ID as first element in returned array */
  n = 0;
- wg = XmCreateBulletinBoard(ana_widget_id[w], "board",wargs, n);
+ wg = XmCreateBulletinBoard(lux_widget_id[w], "board",wargs, n);
  
  i = narg - 8;	j = 8;
  /* i is the count of labels, we are going to store the widget id's of the
@@ -1560,7 +1560,7 @@ Int ana_xmtextfieldarray(narg, ps)  /* lots of arguments */
  wids = (Int *) ((char *)h + sizeof(struct ahead));
  if (ck_widget_count() < 0) return -1;
  text = n_widgets++;
- ana_widget_id[text] = wg;
+ lux_widget_id[text] = wg;
  *wids++ = text;
  iy = 10;	/* set top y to default board margin */
  ix = nxm;	ix2 = nxl + 2*nxm;
@@ -1603,28 +1603,28 @@ Int ana_xmtextfieldarray(narg, ps)  /* lots of arguments */
  XtSetArg(wargs[n], XmNmaxLength, length); n++;
  XtSetArg(wargs[n], XmNwidth, nxt); n++;
  XtSetArg(wargs[n], XmNheight, ny); n++;
- ana_widget_id[text] =
+ lux_widget_id[text] =
  	XmCreateTextField(wg, "textfield", wargs, n);
- XtManageChild(ana_widget_id[text]);
+ XtManageChild(lux_widget_id[text]);
  
  n = n -4;	iy += ny;
 
  /* call backs, 2 of them, one sets the textfield number */
  /* note that the textfield_which call back is activate, valuechanged
  didn't prove very useful */
- /*XtAddCallback(ana_widget_id[text], XmNvalueChangedCallback,
+ /*XtAddCallback(lux_widget_id[text], XmNvalueChangedCallback,
  textfield_which, k); */
- XtAddCallback(ana_widget_id[text], XmNactivateCallback, textfield_which,
+ XtAddCallback(lux_widget_id[text], XmNactivateCallback, textfield_which,
  	(XtPointer) k);
  k++;
- XtAddCallback(ana_widget_id[text], XmNactivateCallback,
+ XtAddCallback(lux_widget_id[text], XmNactivateCallback,
                 textfield_callback, (XtPointer) nsym);
  }
  XtManageChild(wg);
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmlistfromfile(narg, ps) /*(parent, callback, filename,
+Int lux_xmlistfromfile(narg, ps) /*(parent, callback, filename,
 	nvisible,[font,color])*/
  /* returns widget id, an lux function */
  Int     narg, ps[];
@@ -1643,7 +1643,7 @@ Int ana_xmlistfromfile(narg, ps) /*(parent, callback, filename,
  iq = ps[1];
  if (sym[iq].class != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
- if (strlen(s) == 0 )  nsym = 0;  else	nsym = ana_execute_symbol(s,1);
+ if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
  /* printf("nsym for call back = %d\n", nsym); */
  /* open the file */
  iq = ps[2];
@@ -1667,7 +1667,7 @@ Int ana_xmlistfromfile(narg, ps) /*(parent, callback, filename,
   if (setup_colors (ps[5] ) != 1) return -1; }	/* do colors based on bg */
  if (ck_widget_count() < 0) return -1;
  list = n_widgets++;
- ana_widget_id[list] = XmCreateScrolledList(ana_widget_id[parent],
+ lux_widget_id[list] = XmCreateScrolledList(lux_widget_id[parent],
  	"list",wargs, n);
  /* load the lines as items */
  while ( fgets(line, 200, fin) != NULL) {
@@ -1675,20 +1675,20 @@ Int ana_xmlistfromfile(narg, ps) /*(parent, callback, filename,
   p = line;	i = 200;
   while ( i--) { if (*p++ == '\n') { *(p-1) = 0; break; } }
   ms = XmStringCreate(line, cset);
-  XmListAddItemUnselected(ana_widget_id[list], ms, 0);
+  XmListAddItemUnselected(lux_widget_id[list], ms, 0);
   XmStringFree(ms);
   nlist++;
  }
  fclose(fin);
- XtManageChild(ana_widget_id[list]);
- XtAddCallback(ana_widget_id[list], XmNbrowseSelectionCallback,
+ XtManageChild(lux_widget_id[list]);
+ XtAddCallback(lux_widget_id[list], XmNbrowseSelectionCallback,
                 browse_callback, (XtPointer) nsym);
  result_sym = scalar_scratch(2);		/*for widget id */
  sym[result_sym].spec.scalar.l = list;
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmaddfiletolist(narg, ps) /*(list_widget, filename)*/
+Int lux_xmaddfiletolist(narg, ps) /*(list_widget, filename)*/
  /* an lux function, returns error if file not readable */
  Int     narg, ps[];
  {
@@ -1713,19 +1713,19 @@ Int ana_xmaddfiletolist(narg, ps) /*(list_widget, filename)*/
   p = line;	i = 200;
   while ( i--) { if (*p++ == '\n') { *(p-1) = 0; break; } }
   ms = XmStringCreate(line, cset);
-  XmListAddItemUnselected(ana_widget_id[w], ms, 0);
+  XmListAddItemUnselected(lux_widget_id[w], ms, 0);
   XmStringFree(ms);
  }
  fclose(fin);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmlistsubr(narg, ps) /*(list_widget)*/
+Int lux_xmlistsubr(narg, ps) /*(list_widget)*/
  /* an lux subr, loads given list widget with internal subr names */
  Int     narg, ps[];
  {
  extern Int	num_lux_subr;
- extern	 struct	ana_subr_struct	ana_subr[];
+ extern	 struct	lux_subr_struct	lux_subr[];
  Int	i, list_widget;
  char		line[100];
  XmString	ms;
@@ -1734,20 +1734,20 @@ Int ana_xmlistsubr(narg, ps) /*(list_widget)*/
  
  /* load the subr names as items */
  for (i=0; i < num_lux_subr; i++ ) {
-  sprintf(line, "%s",ana_subr[i].name);
+  sprintf(line, "%s",lux_subr[i].name);
   ms = XmStringCreate(line, cset);
-  XmListAddItemUnselected(ana_widget_id[list_widget], ms, 0);
+  XmListAddItemUnselected(lux_widget_id[list_widget], ms, 0);
   XmStringFree(ms);
  }
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmlistfunc(narg, ps) /*(list_widget)*/
+Int lux_xmlistfunc(narg, ps) /*(list_widget)*/
  /* an lux subr, loads given list widget with internal func names */
  Int     narg, ps[];
  {
  extern Int	num_lux_func;
- extern	 struct	ana_subr_struct	ana_func[];
+ extern	 struct	lux_subr_struct	lux_func[];
  Int	i, list_widget;
  char		line[100];
  XmString	ms;
@@ -1757,15 +1757,15 @@ Int ana_xmlistfunc(narg, ps) /*(list_widget)*/
  /* load the subr names as items */
  /* note that we skip over the specials, currently 9 of them */
  for (i=9; i < num_lux_func; i++ ) {
-  sprintf(line, "%s", ana_func[i].name);
+  sprintf(line, "%s", lux_func[i].name);
   ms = XmStringCreate(line, cset);
-  XmListAddItemUnselected(ana_widget_id[list_widget], ms, 0);
+  XmListAddItemUnselected(lux_widget_id[list_widget], ms, 0);
   XmStringFree(ms);
  }
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmlist(narg, ps) /*(parent, callback, nvisible,[font,color, resize_flag])*/
+Int lux_xmlist(narg, ps) /*(parent, callback, nvisible,[font,color, resize_flag])*/
  /* returns widget id, an lux function */
  /* creates an empty list, nvisible is the vertical size in lines,
  resize_flag chooses the list size policy (see below) */
@@ -1782,7 +1782,7 @@ Int ana_xmlist(narg, ps) /*(parent, callback, nvisible,[font,color, resize_flag]
  iq = ps[1];
  if (sym[iq].class != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
- if (strlen(s) == 0 )  nsym = 0;  else	nsym = ana_execute_symbol(s,1);
+ if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
  /* printf("nsym for call back = %d\n", nsym);*/
  if (int_arg_stat(ps[2], &nvisible) != 1) return -1;
  
@@ -1803,17 +1803,17 @@ Int ana_xmlist(narg, ps) /*(parent, callback, nvisible,[font,color, resize_flag]
  }
  if (ck_widget_count() < 0) return -1;
  list = n_widgets++;
- ana_widget_id[list] = XmCreateScrolledList(ana_widget_id[parent],
+ lux_widget_id[list] = XmCreateScrolledList(lux_widget_id[parent],
  	"list",wargs, n);
- XtManageChild(ana_widget_id[list]);
- XtAddCallback(ana_widget_id[list], XmNbrowseSelectionCallback,
+ XtManageChild(lux_widget_id[list]);
+ XtAddCallback(lux_widget_id[list], XmNbrowseSelectionCallback,
                 browse_callback, (XtPointer) nsym);
  result_sym = scalar_scratch(2);		/*for widget id */
  sym[result_sym].spec.scalar.l = list;
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmlistadditem(narg, ps)	/* (widget_id, string, [position]) */
+Int lux_xmlistadditem(narg, ps)	/* (widget_id, string, [position]) */
  /* adds string to the list widget, this is a subroutine */
  Int     narg, ps[];
  {
@@ -1829,35 +1829,35 @@ Int ana_xmlistadditem(narg, ps)	/* (widget_id, string, [position]) */
  if (narg > 2) {
  	if (int_arg_stat(ps[2], & i) != 1) return -1; }
  ms = XmStringCreate(s, cset);
- XmListAddItemUnselected(ana_widget_id[w], ms, i);
+ XmListAddItemUnselected(lux_widget_id[w], ms, i);
  /* also make this the last visible item */
  /* note that XmListAddItemUnselected doesn't return a status */
  XmStringFree(ms);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmlistdeleteitem(narg, ps)	/* (widget_id, position) */
+Int lux_xmlistdeleteitem(narg, ps)	/* (widget_id, position) */
  /* delete the input position from list, this is a subroutine */
  Int     narg, ps[];
  {
  Int	i, w;
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
  if (int_arg_stat(ps[1], & i) != 1) return -1;
- XmListDeletePos(ana_widget_id[w], i);
+ XmListDeletePos(lux_widget_id[w], i);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmlistdeleteall(narg, ps)	/* (widget_id) */
+Int lux_xmlistdeleteall(narg, ps)	/* (widget_id) */
  /* delete all items in a list, this is a subroutine */
  Int     narg, ps[];
  {
  Int	w;
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
- XmListDeleteAllItems(ana_widget_id[w]);
+ XmListDeleteAllItems(lux_widget_id[w]);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmlistcount(narg, ps)	/* (widget_id) */
+Int lux_xmlistcount(narg, ps)	/* (widget_id) */
  /* get the count in a list, a function which returns count */
  Int     narg, ps[];
  {
@@ -1865,13 +1865,13 @@ Int ana_xmlistcount(narg, ps)	/* (widget_id) */
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
  n = 0;
  XtSetArg(wargs[n], XmNitemCount, &i); n++;
- XtGetValues(ana_widget_id[w], wargs, n);
+ XtGetValues(lux_widget_id[w], wargs, n);
  result_sym = scalar_scratch(2);
  sym[result_sym].spec.scalar.l = i;
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmlistselect(narg, ps)	/* (widget_id, position, cb_flag) */
+Int lux_xmlistselect(narg, ps)	/* (widget_id, position, cb_flag) */
  /* selects position in list and callback is notified if cb_flag > 0
  if the cb_flag is 2, then position is not set */
  Int     narg, ps[];
@@ -1881,14 +1881,14 @@ Int ana_xmlistselect(narg, ps)	/* (widget_id, position, cb_flag) */
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
  if (int_arg_stat(ps[1], &i) != 1) return -1;
  if (narg > 2) if (int_arg_stat(ps[2], &cb_flag) != 1) return -1;
- wg = ana_widget_id[w];
+ wg = lux_widget_id[w];
  XmListDeselectAllItems(wg);
  if (cb_flag != 2) XmListSetPos(wg, i);
  if (cb_flag > 0) XmListSelectPos(wg, i, True);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmlabel(narg, ps)	/* (parent, label, [font, color, size_flag]) */
+Int lux_xmlabel(narg, ps)	/* (parent, label, [font, color, size_flag]) */
  /* creates a label widget, returns widget id */
  /* 7/26/96 size_flag added, sets XmNrecomputeSize to true/false (1/0) */
  Int     narg, ps[];
@@ -1926,15 +1926,15 @@ Int ana_xmlabel(narg, ps)	/* (parent, label, [font, color, size_flag]) */
  	} else {	XtSetArg(wargs[n], XmNrecomputeSize, True); n++; }
  if (ck_widget_count() < 0) return -1;
  label = n_widgets++;
- ana_widget_id[label] = XmCreateLabel(ana_widget_id[w], "label", wargs, n);
- XtManageChild(ana_widget_id[label]);
+ lux_widget_id[label] = XmCreateLabel(lux_widget_id[w], "label", wargs, n);
+ XtManageChild(lux_widget_id[label]);
  XmStringFree(ms);
  result_sym = scalar_scratch(2);		/*for widget id */
  sym[result_sym].spec.scalar.l = label;
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmfileselect(narg, ps) /*(parent, title, ok_callback, (more on next line)
+Int lux_xmfileselect(narg, ps) /*(parent, title, ok_callback, (more on next line)
  [ok_label, help_callback, cancel_callback, font, button_font, color, dir,
  help_label, cancel_label] )*/
  /* returns widget id, an lux function */
@@ -1962,7 +1962,7 @@ Int ana_xmfileselect(narg, ps) /*(parent, title, ok_callback, (more on next line
  iq = ps[2];
  if (sym[iq].class != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
- if (strlen(s) == 0 )  nsym = 0;  else	nsym = ana_execute_symbol(s,1);
+ if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
  n = 0;
  XtSetArg(wargs[n], XmNdialogTitle, title); n++;
  /* now the optional font and color, but font only good for children (below) */
@@ -1978,7 +1978,7 @@ Int ana_xmfileselect(narg, ps) /*(parent, title, ok_callback, (more on next line
  XtSetArg(wargs[n], XmNdirectory, directory); n++;
  }
  dialog =
- ana_widget_id[fselect] = XmCreateFileSelectionDialog(ana_widget_id[parent],
+ lux_widget_id[fselect] = XmCreateFileSelectionDialog(lux_widget_id[parent],
  	"fselect",wargs, n);
  XmStringFree(title);
  if (narg > 9) XmStringFree(directory);
@@ -2006,12 +2006,12 @@ Int ana_xmfileselect(narg, ps) /*(parent, title, ok_callback, (more on next line
  iq = ps[4];
  if (sym[iq].class != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
- if (strlen(s) == 0 )  nsym_help = 0; else nsym_help = ana_execute_symbol(s,1);
+ if (strlen(s) == 0 )  nsym_help = 0; else nsym_help = lux_execute_symbol(s,1);
  if (narg > 5) {
  iq = ps[5];
  if (sym[iq].class != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
- if (strlen(s) == 0) nsym_cancel = 0; else nsym_cancel=ana_execute_symbol(s,1);
+ if (strlen(s) == 0) nsym_cancel = 0; else nsym_cancel=lux_execute_symbol(s,1);
  
  /* need to set fonts, colors for children */
  n = 0;
@@ -2047,13 +2047,13 @@ Int ana_xmfileselect(narg, ps) /*(parent, title, ok_callback, (more on next line
  XtUnmanageChild(XmFileSelectionBoxGetChild(dialog, XmDIALOG_CANCEL_BUTTON));
   else
  XtAddCallback(dialog,XmNcancelCallback,fcancel_callback,(XtPointer)nsym_cancel);
- XtManageChild(ana_widget_id[fselect]);
+ XtManageChild(lux_widget_id[fselect]);
  result_sym = scalar_scratch(2);		/*for widget id */
  sym[result_sym].spec.scalar.l = fselect;
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmfilegetlist(narg, ps)	/* (widget_id) */
+Int lux_xmfilegetlist(narg, ps)	/* (widget_id) */
  /* get the files in a file selection widget, puts them in a string array
  strarr = xmfilegetlist(widget)  where widget must be a file selection widget */
  Int     narg, ps[];
@@ -2066,7 +2066,7 @@ Int ana_xmfilegetlist(narg, ps)	/* (widget_id) */
  n = 0;
  XtSetArg(wargs[n], XmNfileListItems, &names); n++;
  XtSetArg(wargs[n], XmNfileListItemCount, &fcount); n++;
- XtGetValues(ana_widget_id[w], wargs, n);
+ XtGetValues(lux_widget_id[w], wargs, n);
  dim[0] = fcount;
  result_sym = strarr_scratch(1, dim);
  q = (char **)((char *)sym[result_sym].spec.array.ptr+sizeof(struct ahead));
@@ -2163,7 +2163,7 @@ Int setup_colors(Int nsym)
     return 1;
 
  /* now let motif choose the others */
-  XmGetColors(XtScreen(ana_widget_id[toplevel]), colorMap, color->pixel,
+  XmGetColors(XtScreen(lux_widget_id[toplevel]), colorMap, color->pixel,
  	&fc, &ts, &bs, &sc);
 
   /* update colors[] database.  If the pixel value already exists, then */
@@ -2184,7 +2184,7 @@ Int setup_colors(Int nsym)
   return 1; 
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmbutton(narg, ps) /* (parent, label, callback, [font,color]) */
+Int lux_xmbutton(narg, ps) /* (parent, label, callback, [font,color]) */
  /* creates a button widget, returns widget id */
  Int     narg, ps[];
  {
@@ -2203,7 +2203,7 @@ Int ana_xmbutton(narg, ps) /* (parent, label, callback, [font,color]) */
  iq = ps[2];
  if (sym[iq].class != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
- if (strlen(s) == 0 )  nsym = 0;  else	nsym = ana_execute_symbol(s,1);
+ if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
 
  n = 0;
  /* now the optional font and color */
@@ -2215,17 +2215,17 @@ Int ana_xmbutton(narg, ps) /* (parent, label, callback, [font,color]) */
  XtSetArg(wargs[n], XmNlabelString, ms); n++;
  if (ck_widget_count() < 0) return -1;
  push = n_widgets++;
- ana_widget_id[push] = XmCreatePushButton(ana_widget_id[w], s, wargs, n);
- XtManageChild(ana_widget_id[push]);
+ lux_widget_id[push] = XmCreatePushButton(lux_widget_id[w], s, wargs, n);
+ XtManageChild(lux_widget_id[push]);
  XmStringFree(ms);
- XtAddCallback(ana_widget_id[push], XmNactivateCallback,
+ XtAddCallback(lux_widget_id[push], XmNactivateCallback,
                 button_callback, (XtPointer) nsym);
  result_sym = scalar_scratch(2);		/*for widget id */
  sym[result_sym].spec.scalar.l = push;
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmgetpixmap(narg, ps) /* (id, pixmap_file) */
+Int lux_xmgetpixmap(narg, ps) /* (id, pixmap_file) */
  /* reads a pixmap (bitmap) file and associates it with id, the
  maximum number of pixmaps is  MAXPIXMAPS with id's from 0 to MAXPIXMAPS-1 */
  Int     narg, ps[];
@@ -2244,17 +2244,17 @@ Int ana_xmgetpixmap(narg, ps) /* (id, pixmap_file) */
  if (sym[iq].class != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  /* use fg and bg from toplevel */
- XtVaGetValues (ana_widget_id[toplevel],
+ XtVaGetValues (lux_widget_id[toplevel],
   XmNforeground, &fg,
   XmNbackground, &bg,
   NULL);
- ana_pixmap_id[id] = XmGetPixmap(XtScreen(ana_widget_id[toplevel]), s, fg, bg);
- if ( ana_pixmap_id[id] == 0) { printf("error reading pixmap file %s\n", s);
+ lux_pixmap_id[id] = XmGetPixmap(XtScreen(lux_widget_id[toplevel]), s, fg, bg);
+ if ( lux_pixmap_id[id] == 0) { printf("error reading pixmap file %s\n", s);
 	return -1;	}
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmsetpixmap(narg, ps) /* (widget, pixmap_file) */
+Int lux_xmsetpixmap(narg, ps) /* (widget, pixmap_file) */
  Int     narg, ps[];
  {
  Pixmap	pixmap;
@@ -2268,22 +2268,22 @@ Int ana_xmsetpixmap(narg, ps) /* (widget, pixmap_file) */
  if (sym[iq].class != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  /* use fg and bg from parent */
- XtVaGetValues (ana_widget_id[w],
+ XtVaGetValues (lux_widget_id[w],
   XmNforeground, &fg,
   XmNbackground, &bg,
   NULL);
- pixmap = XmGetPixmap(XtScreen(ana_widget_id[toplevel]), s, fg, bg);
+ pixmap = XmGetPixmap(XtScreen(lux_widget_id[toplevel]), s, fg, bg);
  if ( pixmap == 0) { printf("error reading pixmap file %s\n", s);
 	return -1;	}
  
  n = 0;
  XtSetArg(wargs[n], XmNlabelType, XmPIXMAP); n++;
  XtSetArg(wargs[n], XmNlabelPixmap, pixmap); n++;
- XtSetValues(ana_widget_id[w], wargs, n);
+ XtSetValues(lux_widget_id[w], wargs, n);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmpixmapbutton(narg, ps) /* (parent, pixmap_file, callback) */
+Int lux_xmpixmapbutton(narg, ps) /* (parent, pixmap_file, callback) */
  /* creates a button widget, returns widget id */
  Int     narg, ps[];
  {
@@ -2299,11 +2299,11 @@ Int ana_xmpixmapbutton(narg, ps) /* (parent, pixmap_file, callback) */
  if (sym[iq].class != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  /* use fg and bg from parent */
- XtVaGetValues (ana_widget_id[w],
+ XtVaGetValues (lux_widget_id[w],
   XmNforeground, &fg,
   XmNbackground, &bg,
   NULL);
- pixmap = XmGetPixmap(XtScreen(ana_widget_id[toplevel]), s, fg, bg);
+ pixmap = XmGetPixmap(XtScreen(lux_widget_id[toplevel]), s, fg, bg);
  if ( pixmap == 0) { printf("error reading pixmap file %s\n", s);
 	return -1;	}
   
@@ -2311,23 +2311,23 @@ Int ana_xmpixmapbutton(narg, ps) /* (parent, pixmap_file, callback) */
  iq = ps[2];
  if (sym[iq].class != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
- if (strlen(s) == 0 )  nsym = 0;  else	nsym = ana_execute_symbol(s,1);
+ if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
 
  n = 0;
  XtSetArg(wargs[n], XmNlabelType, XmPIXMAP); n++;
  XtSetArg(wargs[n], XmNlabelPixmap, pixmap); n++;
  if (ck_widget_count() < 0) return -1;
  push = n_widgets++;
- ana_widget_id[push] = XmCreatePushButton(ana_widget_id[w], "button", wargs, n);
- XtManageChild(ana_widget_id[push]);
- XtAddCallback(ana_widget_id[push], XmNactivateCallback,
+ lux_widget_id[push] = XmCreatePushButton(lux_widget_id[w], "button", wargs, n);
+ XtManageChild(lux_widget_id[push]);
+ XtAddCallback(lux_widget_id[push], XmNactivateCallback,
                 button_callback, (XtPointer) nsym);
  result_sym = scalar_scratch(2);		/*for widget id */
  sym[result_sym].spec.scalar.l = push;
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmradiobox(narg, ps) /* (parent,callback,font,color,l1,[l2, l3 ...]) */
+Int lux_xmradiobox(narg, ps) /* (parent,callback,font,color,l1,[l2, l3 ...]) */
  /* creates a simple radio box widget, returns array of widget id's for
  toggles and the container widget as the first value */
  /* the font and color preceed the labels to allow easier parsing, if
@@ -2348,7 +2348,7 @@ Int ana_xmradiobox(narg, ps) /* (parent,callback,font,color,l1,[l2, l3 ...]) */
  iq = ps[1];
  if (sym[iq].class != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
- if (strlen(s) == 0 )  nsym = 0;  else	nsym = ana_execute_symbol(s,1);
+ if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
 
  /* check the last arg., if not a string, we try to use it as the number of
  columns */
@@ -2368,7 +2368,7 @@ Int ana_xmradiobox(narg, ps) /* (parent,callback,font,color,l1,[l2, l3 ...]) */
  n = 0;
  if ( radiobox == 0 ) XtSetArg(wargs[n], XmNradioBehavior, False); n++;
  XtSetArg(wargs[n], XmNnumColumns, ncolumns); n++;
- wg = XmCreateRadioBox(ana_widget_id[w], "radio_box",wargs,n);
+ wg = XmCreateRadioBox(lux_widget_id[w], "radio_box",wargs,n);
  
  /* now the semi-optional font and color */
  n = 0;	/* be careful, n is bumped by set_fontlist and setup_colors
@@ -2385,7 +2385,7 @@ Int ana_xmradiobox(narg, ps) /* (parent,callback,font,color,l1,[l2, l3 ...]) */
  wids = (Int *) ((char *)h + sizeof(struct ahead));
  if (ck_widget_count() < 0) return -1;
  radio = n_widgets++;
- ana_widget_id[radio] = wg;
+ lux_widget_id[radio] = wg;
  *wids++ = radio;
  while (i--) {
  /* get label string */
@@ -2396,19 +2396,19 @@ Int ana_xmradiobox(narg, ps) /* (parent,callback,font,color,l1,[l2, l3 ...]) */
  radio = n_widgets++;
  *wids++ = radio;
  /* note that each of these use the font and color set above */
- ana_widget_id[radio] = XtCreateManagedWidget( s, xmToggleButtonGadgetClass, wg,
+ lux_widget_id[radio] = XtCreateManagedWidget( s, xmToggleButtonGadgetClass, wg,
  	wargs, n);
- XtAddCallback(ana_widget_id[radio], XmNvalueChangedCallback, radio_which,
+ XtAddCallback(lux_widget_id[radio], XmNvalueChangedCallback, radio_which,
  	(XtPointer) k);
  k++;
- XtAddCallback(ana_widget_id[radio], XmNvalueChangedCallback, radio_callback,
+ XtAddCallback(lux_widget_id[radio], XmNvalueChangedCallback, radio_callback,
  	(XtPointer) nsym);
  }
  XtManageChild(wg);
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmtogglegetstate(narg, ps) /* (widget) */
+Int lux_xmtogglegetstate(narg, ps) /* (widget) */
  Int     narg, ps[];
  {
  Int	w, result_sym, iq;
@@ -2416,13 +2416,13 @@ Int ana_xmtogglegetstate(narg, ps) /* (widget) */
  if (get_widget_id(ps[0], &w) != 1) return -1;
  result_sym = scalar_scratch(2);		/* state */
  iq = 0;
- if ( XmToggleButtonGadgetGetState(ana_widget_id[w]) ) iq = 1;
+ if ( XmToggleButtonGadgetGetState(lux_widget_id[w]) ) iq = 1;
  result_sym = scalar_scratch(2);		/* state */
  sym[result_sym].spec.scalar.l = iq;
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmtogglesetstate(narg, ps) /* (widget, state, [notify]) */
+Int lux_xmtogglesetstate(narg, ps) /* (widget, state, [notify]) */
  /* this is a subroutine call, state is 0 or non-zero for True/False */
  /* added a notify option, default is to notify which means the callback
     gets executed */
@@ -2436,13 +2436,13 @@ Int ana_xmtogglesetstate(narg, ps) /* (widget, state, [notify]) */
  if (iq) state = True; else state = False;
  if (narg > 2) { if (int_arg_stat(ps[2], &iq) != 1) return -1;
   if (iq) notify = True; else notify = False; }
- XmToggleButtonGadgetSetState(ana_widget_id[w], state, notify);
+ XmToggleButtonGadgetSetState(lux_widget_id[w], state, notify);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmcheckbox(narg, ps) /* (parent,callback,font,color,l1,[l2, l3 ...]) */
+Int lux_xmcheckbox(narg, ps) /* (parent,callback,font,color,l1,[l2, l3 ...]) */
  /* this works very much like a radio box except for a few details, so
- we just set a flag here and call ana_xmradiobox(narg, ps) */
+ we just set a flag here and call lux_xmradiobox(narg, ps) */
  /* note that there is no management of which buttons are set at this level */
  /* the user will have to keep track of that from the callbacks or by
  using the getstate call */
@@ -2450,12 +2450,12 @@ Int ana_xmcheckbox(narg, ps) /* (parent,callback,font,color,l1,[l2, l3 ...]) */
  {
  Int	iq;
  radiobox = 0;
- iq = ana_xmradiobox(narg, ps);
+ iq = lux_xmradiobox(narg, ps);
  radiobox = 1; /* reset default */
  return iq;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmpixmapoptionmenu(narg, ps) /* (parent,callback,font,color,s,p1,[p2 ...]) */
+Int lux_xmpixmapoptionmenu(narg, ps) /* (parent,callback,font,color,s,p1,[p2 ...]) */
  /* creates a simple option menu widget that uses pixmaps for the button
  labels, all items must be pixmaps, s is the title for this option */
  /* based on original xmoptionmenu, the arguments p1, p2, ... are
@@ -2481,7 +2481,7 @@ Int ana_xmpixmapoptionmenu(narg, ps) /* (parent,callback,font,color,s,p1,[p2 ...
  iq = ps[1];
  if (sym[iq].class != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
- if (strlen(s) == 0 )  nsym = 0;  else	nsym = ana_execute_symbol(s,1);
+ if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
 
  /* now the semi-optional font and color */
  n = 0;	/* be careful, n is bumped by set_fontlist and setup_colors
@@ -2491,10 +2491,10 @@ Int ana_xmpixmapoptionmenu(narg, ps) /* (parent,callback,font,color,s,p1,[p2 ...
  if (setup_colors(ps[3] ) != 1) return -1; /* do colors based on bg */
 
  /* create the pulldown menu, this is not the widget passed back */
- optionsubmenu = XmCreatePulldownMenu(ana_widget_id[w], "optionsubmenu",wargs,n);
+ optionsubmenu = XmCreatePulldownMenu(lux_widget_id[w], "optionsubmenu",wargs,n);
 
  /* use fg and bg from parent */
- XtVaGetValues (ana_widget_id[w],
+ XtVaGetValues (lux_widget_id[w],
   XmNforeground, &fg,
   XmNbackground, &bg,
   NULL);
@@ -2532,7 +2532,7 @@ Int ana_xmpixmapoptionmenu(narg, ps) /* (parent,callback,font,color,s,p1,[p2 ...
  /* setup for pixmap buttons */
  n = 0;
  XtSetArg(wargs[n], XmNlabelType, XmPIXMAP); n++;
- pixmap = XmGetPixmap(XtScreen(ana_widget_id[toplevel]), s, fg, bg);
+ pixmap = XmGetPixmap(XtScreen(lux_widget_id[toplevel]), s, fg, bg);
  if ( pixmap == 0) { printf("error reading pixmap file %s\n", s);
 	return -1;	}
  XtSetArg(wargs[n], XmNlabelPixmap, pixmap); n++;
@@ -2540,17 +2540,17 @@ Int ana_xmpixmapoptionmenu(narg, ps) /* (parent,callback,font,color,s,p1,[p2 ...
  option = n_widgets++;
  /* note that each of these use the font and color set above */
  
- ana_widget_id[option] = XtCreateManagedWidget( s, xmPushButtonGadgetClass, wg,
+ lux_widget_id[option] = XtCreateManagedWidget( s, xmPushButtonGadgetClass, wg,
  	wargs, n);
  
- XtAddCallback(ana_widget_id[option], XmNactivateCallback, menu_which,
+ XtAddCallback(lux_widget_id[option], XmNactivateCallback, menu_which,
  	(XtPointer) k);
  k++;
- XtAddCallback(ana_widget_id[option], XmNactivateCallback, button_callback,
+ XtAddCallback(lux_widget_id[option], XmNactivateCallback, button_callback,
  	(XtPointer) nsym);
  wids[k] = option;  /* first one is k=1, k=0 element set later */
- /* printf("k, option, ana_widget_id[option] = %d %d %d\n",k,
- 	option, ana_widget_id[option] ); */
+ /* printf("k, option, lux_widget_id[option] = %d %d %d\n",k,
+ 	option, lux_widget_id[option] ); */
  }
  /* get option label */
  n = 0;
@@ -2563,11 +2563,11 @@ Int ana_xmpixmapoptionmenu(narg, ps) /* (parent,callback,font,color,s,p1,[p2 ...
  ms = XmStringCreateLtoR(s, cset);
  XtSetArg(wargs[n], XmNlabelString, ms); n++;
  XtSetArg(wargs[n], XmNsubMenuId, optionsubmenu); n++;
- XtSetArg(wargs[n], XmNmenuHistory, ana_widget_id[wids[dmenu+1]]); n++;
- woption = XmCreateOptionMenu(ana_widget_id[w],"option_menu", wargs, n);
+ XtSetArg(wargs[n], XmNmenuHistory, lux_widget_id[wids[dmenu+1]]); n++;
+ woption = XmCreateOptionMenu(lux_widget_id[w],"option_menu", wargs, n);
  if (ck_widget_count() < 0) return -1;
  option = n_widgets++;
- ana_widget_id[option] = woption;
+ lux_widget_id[option] = woption;
  *wids = option;
  /* now we can get the internally created widgets and set their fonts */
  /* for the pixmap version, we only do this for the label gadget but
@@ -2575,17 +2575,17 @@ Int ana_xmpixmapoptionmenu(narg, ps) /* (parent,callback,font,color,s,p1,[p2 ...
  wg = XmOptionButtonGadget(woption);
  /* XtSetValues(wg, wargs, n); */
  if (ck_widget_count() < 0) return -1;
- k++; option = n_widgets++; ana_widget_id[option] =wg; wids[k] = option;
+ k++; option = n_widgets++; lux_widget_id[option] =wg; wids[k] = option;
  wg = XmOptionLabelGadget(woption);
  XtSetValues(wg, wargs, n);
  if (ck_widget_count() < 0) return -1;
- k++; option = n_widgets++; ana_widget_id[option] =wg; wids[k] = option;
+ k++; option = n_widgets++; lux_widget_id[option] =wg; wids[k] = option;
  XtManageChild(woption);
  XmStringFree(ms);
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmoptionmenu(narg, ps) /* (parent,callback,font,color,s,l1,[l2 ...]) */
+Int lux_xmoptionmenu(narg, ps) /* (parent,callback,font,color,s,l1,[l2 ...]) */
  /* creates a simple option menu widget, s is the title for this option */
  /* the font and color preceed the labels to allow easier parsing, if
  these are null strings or scalars, you get the defaults, the option label
@@ -2608,7 +2608,7 @@ Int ana_xmoptionmenu(narg, ps) /* (parent,callback,font,color,s,l1,[l2 ...]) */
  iq = ps[1];
  if (sym[iq].class != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
- if (strlen(s) == 0 )  nsym = 0;  else	nsym = ana_execute_symbol(s,1);
+ if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
 
   /* now the semi-optional font and color */
  n = 0;	/* be careful, n is bumped by set_fontlist and setup_colors
@@ -2618,7 +2618,7 @@ Int ana_xmoptionmenu(narg, ps) /* (parent,callback,font,color,s,l1,[l2 ...]) */
  if (setup_colors (ps[3] ) != 1) return -1; /* do colors based on bg */
 
  /* create the pulldown menu, this is not the widget passed back */
- optionsubmenu = XmCreatePulldownMenu(ana_widget_id[w], "optionsubmenu",wargs,n);
+ optionsubmenu = XmCreatePulldownMenu(lux_widget_id[w], "optionsubmenu",wargs,n);
 
  /* check the last arg., if not a string, we try to use it as the number of
  the menu item to use as the default */
@@ -2661,9 +2661,9 @@ Int ana_xmoptionmenu(narg, ps) /* (parent,callback,font,color,s,l1,[l2 ...]) */
  XtAddCallback(wg, XmNactivateCallback, button_callback, (XtPointer) nsym);
  k++;
  wids[k] = option;  /* first one is k=1, k=0 element set later */
- /* printf("k, option, ana_widget_id[option] = %d %d %d\n",k,
- 	option, ana_widget_id[option] ); */
- ana_widget_id[option] = wg;
+ /* printf("k, option, lux_widget_id[option] = %d %d %d\n",k,
+ 	option, lux_widget_id[option] ); */
+ lux_widget_id[option] = wg;
  }
  /* get option label */
  iq = ps[4];
@@ -2675,11 +2675,11 @@ Int ana_xmoptionmenu(narg, ps) /* (parent,callback,font,color,s,l1,[l2 ...]) */
  entire widget area, not desired. No way to just do the button! */
  XtSetArg(wargs[n], XmNlabelString, ms); n++;
  XtSetArg(wargs[n], XmNsubMenuId, optionsubmenu); n++;
- XtSetArg(wargs[n], XmNmenuHistory, ana_widget_id[wids[dmenu+1]]); n++;
- woption = XmCreateOptionMenu(ana_widget_id[w],"option_menu", wargs, n);
+ XtSetArg(wargs[n], XmNmenuHistory, lux_widget_id[wids[dmenu+1]]); n++;
+ woption = XmCreateOptionMenu(lux_widget_id[w],"option_menu", wargs, n);
  if (ck_widget_count() < 0) return -1;
  option = n_widgets++;
- ana_widget_id[option] = woption;
+ lux_widget_id[option] = woption;
  *wids = option;
  /* now we can get the internally created widgets and set their fonts, we
  can't set their colors unfortunately */
@@ -2688,19 +2688,19 @@ Int ana_xmoptionmenu(narg, ps) /* (parent,callback,font,color,s,l1,[l2 ...]) */
  wg = XmOptionButtonGadget(woption);
  XtSetValues(wg, wargs, n);
  if (ck_widget_count() < 0) return -1;
- k++; option = n_widgets++; ana_widget_id[option] =wg; wids[k] = option;
+ k++; option = n_widgets++; lux_widget_id[option] =wg; wids[k] = option;
  n = 0;
  if (set_fontlist( ps[2] ) != 1) return -1; /* gets fontlist from string */
  wg = XmOptionLabelGadget(woption);
  XtSetValues(wg, wargs, n);
  if (ck_widget_count() < 0) return -1;
- k++; option = n_widgets++; ana_widget_id[option] =wg; wids[k] = option;
+ k++; option = n_widgets++; lux_widget_id[option] =wg; wids[k] = option;
  XtManageChild(woption);
  XmStringFree(ms);
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmgetoptionselection(narg, ps)
+Int lux_xmgetoptionselection(narg, ps)
  /* arg is row/column widget from an option menu */
  Int     narg, ps[];
  {
@@ -2710,14 +2710,14 @@ Int ana_xmgetoptionselection(narg, ps)
  if (ck_widget_count() < 0) return -1;
  wm = n_widgets++; 
  n = 0;
- XtSetArg(wargs[n], XmNmenuHistory, &ana_widget_id[wm]); n++;
- XtGetValues(ana_widget_id[w], wargs, n);
+ XtSetArg(wargs[n], XmNmenuHistory, &lux_widget_id[wm]); n++;
+ XtGetValues(lux_widget_id[w], wargs, n);
  result_sym = scalar_scratch(2);		/*for widget id */
  sym[result_sym].spec.scalar.l = wm;
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmsetoptionselection(narg, ps)
+Int lux_xmsetoptionselection(narg, ps)
  /* 2 args, row/column widget from an option menu and widget for the
  menu item it should be set to */
  Int     narg, ps[];
@@ -2726,12 +2726,12 @@ Int ana_xmsetoptionselection(narg, ps)
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
  if ( get_widget_id( ps[1], &wm) != 1 ) return -1;
  n = 0;
- XtSetArg(wargs[n], XmNmenuHistory, ana_widget_id[wm]); n++;
- XtSetValues(ana_widget_id[w], wargs, n);
+ XtSetArg(wargs[n], XmNmenuHistory, lux_widget_id[wm]); n++;
+ XtSetValues(lux_widget_id[w], wargs, n);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmmenubar(narg, ps) /* (parent,font,color,l1,[l2 ...]) */
+Int lux_xmmenubar(narg, ps) /* (parent,font,color,l1,[l2 ...]) */
  /* creates a menu bar widget, you will need pulldowns to attach */
  /* the font and color preceed the labels to allow easier parsing, if
  these are null strings or scalars, you get the defaults
@@ -2756,8 +2756,8 @@ Int ana_xmmenubar(narg, ps) /* (parent,font,color,l1,[l2 ...]) */
  n = 0;	/* be careful, n is bumped by set_fontlist and setup_colors
  	and is then then used for each of the toggle buttons */
  if (setup_colors (ps[2] ) != 1) return -1; /* do colors based on bg */
- menu_bar = XmCreateMenuBar(ana_widget_id[w], "menu_bar",wargs,n);
- ana_widget_id[menu] = menu_bar;
+ menu_bar = XmCreateMenuBar(lux_widget_id[w], "menu_bar",wargs,n);
+ lux_widget_id[menu] = menu_bar;
 
 
  /* now the semi-optional font and color for the cascade buttons */
@@ -2782,7 +2782,7 @@ Int ana_xmmenubar(narg, ps) /* (parent,font,color,l1,[l2 ...]) */
  ms = XmStringCreateLtoR(s, cset);
  /* note that each of these use the font and color set above, plus label */
  XtSetArg(wargs[n], XmNlabelString, ms);
- wg = ana_widget_id[menu] = XmCreateCascadeButton(menu_bar, "menu", wargs, n+1);
+ wg = lux_widget_id[menu] = XmCreateCascadeButton(menu_bar, "menu", wargs, n+1);
  XtManageChild(wg);
  XmStringFree(ms);
  wids[k++] = menu;
@@ -2795,7 +2795,7 @@ Int ana_xmmenubar(narg, ps) /* (parent,font,color,l1,[l2 ...]) */
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmpulldownmenu(narg, ps) /* (parent,casc,callback,font,color,l1,[l2 ...]) */
+Int lux_xmpulldownmenu(narg, ps) /* (parent,casc,callback,font,color,l1,[l2 ...]) */
  /* creates a pulldown menu widget, you first need a menubar to attach to,
  the parent must be a menubar widget, the casc is the cascade button
  widget id that this pulldown is attached to, these are the addition
@@ -2826,23 +2826,23 @@ Int ana_xmpulldownmenu(narg, ps) /* (parent,casc,callback,font,color,l1,[l2 ...]
  iq = ps[2];
  if (sym[iq].class != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
- if (strlen(s) == 0 )  nsym = 0;  else	nsym = ana_execute_symbol(s,1);
+ if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
  /* create the pulldown menu */
  n = 0;
  XtSetArg(wargs[n], XmNtearOffModel, XmTEAR_OFF_ENABLED); n++;
  /* turns out the color has to be defined here */
  if (setup_colors (ps[4] ) != 1) return -1; /* do colors based on bg */
- pull_down = XmCreatePulldownMenu(ana_widget_id[w], "pulldown",wargs,n);
+ pull_down = XmCreatePulldownMenu(lux_widget_id[w], "pulldown",wargs,n);
  if (ck_widget_count() < 0) return -1;
  wc  = n_widgets++;
- ana_widget_id[wc] = pull_down;
+ lux_widget_id[wc] = pull_down;
  /* set the XmNsubMenuId for the cascade button widget */
- if (!XtIsSubclass(ana_widget_id[c_button], xmCascadeButtonWidgetClass) &&
- 	!XtIsSubclass(ana_widget_id[c_button], xmCascadeButtonGadgetClass))
+ if (!XtIsSubclass(lux_widget_id[c_button], xmCascadeButtonWidgetClass) &&
+ 	!XtIsSubclass(lux_widget_id[c_button], xmCascadeButtonGadgetClass))
 	{ printf("XMPULLDOWNMENU, cascade widget not a cascade!\n");
 	return -1;}
  XtSetArg(wargs[0], XmNsubMenuId, pull_down);
- XtSetValues(ana_widget_id[c_button], wargs, 1);
+ XtSetValues(lux_widget_id[c_button], wargs, 1);
 
  /* now the semi-optional font for the push buttons */
  n = 0;	/* be careful, n is bumped by set_fontlist
@@ -2878,25 +2878,25 @@ Int ana_xmpulldownmenu(narg, ps) /* (parent,casc,callback,font,color,l1,[l2 ...]
  k++;
  if (ck_widget_count() < 0) return -1;
  wc  = n_widgets++;
- ana_widget_id[wc] = wg;
+ lux_widget_id[wc] = wg;
  wids[k] = wc;
  }
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmgetwidgetaddress(narg, ps)
+Int lux_xmgetwidgetaddress(narg, ps)
  /* (widget) */
  Int     narg, ps[];
  {
  Int	w, result_sym, wm;
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
- wm = (Int) ana_widget_id[w]; 
+ wm = (Int) lux_widget_id[w]; 
  result_sym = scalar_scratch(2);		/*for widget id */
  sym[result_sym].spec.scalar.l = wm;
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmarrow(narg, ps) /* (parent, direction, callback, [color]) */
+Int lux_xmarrow(narg, ps) /* (parent, direction, callback, [color]) */
  /* creates an arrow widget, returns widget id */
  Int     narg, ps[];
  {
@@ -2911,7 +2911,7 @@ Int ana_xmarrow(narg, ps) /* (parent, direction, callback, [color]) */
  iq = ps[2];
  if (sym[iq].class != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
- if (strlen(s) == 0 )  nsym = 0;  else	nsym = ana_execute_symbol(s,1);
+ if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
 
  n = 0;
  switch (mode) {
@@ -2926,30 +2926,30 @@ Int ana_xmarrow(narg, ps) /* (parent, direction, callback, [color]) */
   if (setup_colors (ps[3] ) != 1) return -1; }	/* do colors based on bg */
  if (ck_widget_count() < 0) return -1;
  arrow = n_widgets++;
- ana_widget_id[arrow] = XmCreateArrowButton(ana_widget_id[w], s, wargs, n);
- XtManageChild(ana_widget_id[arrow]);
- XtAddCallback(ana_widget_id[arrow], XmNactivateCallback,
+ lux_widget_id[arrow] = XmCreateArrowButton(lux_widget_id[w], s, wargs, n);
+ XtManageChild(lux_widget_id[arrow]);
+ XtAddCallback(lux_widget_id[arrow], XmNactivateCallback,
                 button_callback, (XtPointer) nsym);
  result_sym = scalar_scratch(2);		/*for widget id */
  sym[result_sym].spec.scalar.l = arrow;
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmhscale(narg, ps)/*(parent,min,max,dshift,callback,[show,size,drag]) */
+Int lux_xmhscale(narg, ps)/*(parent,min,max,dshift,callback,[show,size,drag]) */
  /* creates a horizontal scale widget, returns widget id */
  Int     narg, ps[];
  {
- return ana_int_xmscale(narg, ps, 1);	/* the 1 indicates horizontal */
+ return lux_int_xmscale(narg, ps, 1);	/* the 1 indicates horizontal */
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmvscale(narg, ps)/*(parent,min,max,dshift,callback,[show,size,drag]) */
+Int lux_xmvscale(narg, ps)/*(parent,min,max,dshift,callback,[show,size,drag]) */
  /* creates a vertical scale widget, returns widget id */
  Int     narg, ps[];
  {
- return ana_int_xmscale(narg, ps, 0);	/* the 0 indicates vertical */
+ return lux_int_xmscale(narg, ps, 0);	/* the 0 indicates vertical */
  }
  /*------------------------------------------------------------------------- */
-Int ana_int_xmscale(narg, ps, mode)	/* internal, mode = 1 for horizontal */
+Int lux_int_xmscale(narg, ps, mode)	/* internal, mode = 1 for horizontal */
  Int     narg, ps[], mode;
  {
  Int	iq, nsym, w, scale, result_sym, min, max, dshift, show, size;
@@ -2967,7 +2967,7 @@ Int ana_int_xmscale(narg, ps, mode)	/* internal, mode = 1 for horizontal */
  iq = ps[4];
  if (sym[iq].class != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
- if (strlen(s) == 0 )  nsym = 0;  else	nsym = ana_execute_symbol(s,1);
+ if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
  show = 1;	size = 0;
  if (narg > 5) if (int_arg_stat(ps[5], &show) != 1) return -1;
  if (narg > 6) if (int_arg_stat(ps[6], &size) != 1) return -1;
@@ -2985,12 +2985,12 @@ Int ana_int_xmscale(narg, ps, mode)	/* internal, mode = 1 for horizontal */
   } else { XtSetArg(wargs[n], XmNprocessingDirection, XmMAX_ON_TOP); } n++;
  if (ck_widget_count() < 0) return -1;
  scale = n_widgets++;
- ana_widget_id[scale] = XmCreateScale(ana_widget_id[w], "scale", wargs, n);
- XtManageChild(ana_widget_id[scale]);
- XtAddCallback(ana_widget_id[scale], XmNvalueChangedCallback,
+ lux_widget_id[scale] = XmCreateScale(lux_widget_id[w], "scale", wargs, n);
+ XtManageChild(lux_widget_id[scale]);
+ XtAddCallback(lux_widget_id[scale], XmNvalueChangedCallback,
                 scale_callback, (XtPointer) nsym);
  if (drag_flag != 0) {
- XtAddCallback(ana_widget_id[scale], XmNdragCallback,
+ XtAddCallback(lux_widget_id[scale], XmNdragCallback,
                 scale_callback, (XtPointer) nsym);
 	}
  result_sym = scalar_scratch(2);		/*for widget id */
@@ -2998,7 +2998,7 @@ Int ana_int_xmscale(narg, ps, mode)	/* internal, mode = 1 for horizontal */
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmscalesetvalue(narg, ps) /* (widget, value) */
+Int lux_xmscalesetvalue(narg, ps) /* (widget, value) */
  Int     narg, ps[];
  {
  Int	w, value;
@@ -3006,24 +3006,24 @@ Int ana_xmscalesetvalue(narg, ps) /* (widget, value) */
  if (get_widget_id(ps[0], &w) != 1) return -1;
  if (int_arg_stat(ps[1], &value) != 1) return -1;
  
- XmScaleSetValue(ana_widget_id[w], value);
+ XmScaleSetValue(lux_widget_id[w], value);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmscalegetvalue(narg, ps) /* (widget) */
+Int lux_xmscalegetvalue(narg, ps) /* (widget) */
  Int     narg, ps[];
  {
  Int	w, result_sym, value;
   if (ck_motif() != 1) return -1;
  if (get_widget_id(ps[0], &w) != 1) return -1;
  
- XmScaleGetValue(ana_widget_id[w], &value);
+ XmScaleGetValue(lux_widget_id[w], &value);
  result_sym = scalar_scratch(2);		/* for returned value */
  sym[result_sym].spec.scalar.l = value;
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmscaleresetlimits(narg, ps) /* (widget, min, max,[dshift]) */
+Int lux_xmscaleresetlimits(narg, ps) /* (widget, min, max,[dshift]) */
  Int     narg, ps[];
  {
  Int	w, min, max, dshift;
@@ -3035,17 +3035,17 @@ Int ana_xmscaleresetlimits(narg, ps) /* (widget, min, max,[dshift]) */
  /* get decimal shift, optional */
  if (narg>3)  { if (int_arg_stat(ps[3], &dshift) != 1) return -1; }
  
- XtUnmanageChild(ana_widget_id[w]);
+ XtUnmanageChild(lux_widget_id[w]);
  n = 0;
  XtSetArg(wargs[n], XmNminimum, min); n++;
  XtSetArg(wargs[n], XmNmaximum, max); n++;
  if (narg>3)  { XtSetArg(wargs[n], XmNdecimalPoints, dshift); n++; }
- XtSetValues(ana_widget_id[w], wargs, n);
- XtManageChild(ana_widget_id[w]);
+ XtSetValues(lux_widget_id[w], wargs, n);
+ XtManageChild(lux_widget_id[w]);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmattach(narg, ps)
+Int lux_xmattach(narg, ps)
  /* (widget, ref_widget, left, right, top, bottom) */
  /* top, etc are 1 for attachment on that side and 0 for no change */
  /* -1 for attach opposite */
@@ -3071,7 +3071,7 @@ Int ana_xmattach(narg, ps)
    if (attach[3]) { XtSetArg(wargs[n], XmNbottomAttachment, XmATTACH_FORM); n++;}
    if (attach[2]) { XtSetArg(wargs[n], XmNtopAttachment, XmATTACH_FORM); n++; }
  /* printf("in attach, mark 3, w1,n = %d %d\n", w1, n); */
-   if (n != 0 ) XtSetValues(ana_widget_id[w1], wargs, n);
+   if (n != 0 ) XtSetValues(lux_widget_id[w1], wargs, n);
  /* printf("in attach, mark 4\n"); */
   } else {
   /* assuming we are attaching to a sibling widget */
@@ -3080,31 +3080,31 @@ Int ana_xmattach(narg, ps)
 	XtSetArg(wargs[n], XmNtopAttachment, XmATTACH_OPPOSITE_WIDGET); n++;
    	} else {
 	XtSetArg(wargs[n], XmNtopAttachment, XmATTACH_WIDGET); n++; }
-   	XtSetArg(wargs[n], XmNtopWidget, ana_widget_id[w2]); n++; }
+   	XtSetArg(wargs[n], XmNtopWidget, lux_widget_id[w2]); n++; }
    if (attach[1]) {
    	if (attach[1] < 0) {
 	XtSetArg(wargs[n], XmNrightAttachment, XmATTACH_OPPOSITE_WIDGET); n++;
    	} else {
 	XtSetArg(wargs[n], XmNrightAttachment, XmATTACH_WIDGET); n++; }
-   	XtSetArg(wargs[n], XmNrightWidget, ana_widget_id[w2]); n++; }
+   	XtSetArg(wargs[n], XmNrightWidget, lux_widget_id[w2]); n++; }
    if (attach[3]) {
    	if (attach[3] < 0) {
 	XtSetArg(wargs[n], XmNbottomAttachment, XmATTACH_OPPOSITE_WIDGET); n++;
    	} else {
 	XtSetArg(wargs[n], XmNbottomAttachment, XmATTACH_WIDGET); n++; }
-   	XtSetArg(wargs[n], XmNbottomWidget, ana_widget_id[w2]); n++; }
+   	XtSetArg(wargs[n], XmNbottomWidget, lux_widget_id[w2]); n++; }
    if (attach[0]) {
    	if (attach[0] < 0) {
 	XtSetArg(wargs[n], XmNleftAttachment, XmATTACH_OPPOSITE_WIDGET); n++;
    	} else {
 	XtSetArg(wargs[n], XmNleftAttachment, XmATTACH_WIDGET); n++; }
-   	XtSetArg(wargs[n], XmNleftWidget, ana_widget_id[w2]); n++; }
-   if (n != 0 ) XtSetValues(ana_widget_id[w1], wargs, n);
+   	XtSetArg(wargs[n], XmNleftWidget, lux_widget_id[w2]); n++; }
+   if (n != 0 ) XtSetValues(lux_widget_id[w1], wargs, n);
    }
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmattach_relative(narg, ps)
+Int lux_xmattach_relative(narg, ps)
  /* (widget, left, right, top, bottom) */
  /* top, etc are relative positions (in percent) for attachment on that side */
  /* the parent should be a form widget */
@@ -3125,11 +3125,11 @@ Int ana_xmattach_relative(narg, ps)
  XtSetArg(wargs[n], XmNbottomPosition, attach[3]); n++;
  XtSetArg(wargs[n], XmNtopAttachment, XmATTACH_POSITION); n++;
  XtSetArg(wargs[n], XmNtopPosition, attach[2]); n++;
- XtSetValues(ana_widget_id[w1], wargs, n);
+ XtSetValues(lux_widget_id[w1], wargs, n);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmposition(narg, ps) /* (widget, x, y, [sx, sy]) */
+Int lux_xmposition(narg, ps) /* (widget, x, y, [sx, sy]) */
  /* note that (x,y) position is not set if values are negative */
  Int     narg, ps[];
  {
@@ -3147,11 +3147,11 @@ Int ana_xmposition(narg, ps) /* (widget, x, y, [sx, sy]) */
  if (y >= 0) { XtSetArg(wargs[n], XmNy, y); n++; }
  if (narg > 3)  { XtSetArg(wargs[n], XmNwidth, dx); n++; }
  if (narg > 4)  { XtSetArg(wargs[n], XmNheight, dy); n++; }
- XtSetValues(ana_widget_id[w1], wargs, n);
+ XtSetValues(lux_widget_id[w1], wargs, n);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmsize(narg, ps) /* (widget, sx, sy) */
+Int lux_xmsize(narg, ps) /* (widget, sx, sy) */
  /* just reset the sizes */
  Int     narg, ps[];
  {
@@ -3164,11 +3164,11 @@ Int ana_xmsize(narg, ps) /* (widget, sx, sy) */
  n = 0;
  if (dx > 0) { XtSetArg(wargs[n], XmNwidth, dx); n++; }
  if (dy > 0) { XtSetArg(wargs[n], XmNheight, dy); n++; }
- XtSetValues(ana_widget_id[w1], wargs, n);
+ XtSetValues(lux_widget_id[w1], wargs, n);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmresizepolicy(narg, ps) /* (widget, flag) */
+Int lux_xmresizepolicy(narg, ps) /* (widget, flag) */
  /* 3 policies available, 0 = none, 1 = grow only, 2 = any */
  Int     narg, ps[];
  {
@@ -3184,11 +3184,11 @@ Int ana_xmresizepolicy(narg, ps) /* (widget, flag) */
  default: XtSetArg(wargs[n], XmNresizePolicy, XmRESIZE_ANY); break;
  }
  n++;
- XtSetValues(ana_widget_id[w1], wargs, n);
+ XtSetValues(lux_widget_id[w1], wargs, n);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmsetmodal(narg, ps) /* (widget, modal_flag) */
+Int lux_xmsetmodal(narg, ps) /* (widget, modal_flag) */
  /* use with care, 0 sets modeless (turns off modal), 1 makes the widget
  modal */
  Int     narg, ps[];
@@ -3204,11 +3204,11 @@ Int ana_xmsetmodal(narg, ps) /* (widget, modal_flag) */
   { XtSetArg(wargs[n], XmNdialogStyle, XmDIALOG_FULL_APPLICATION_MODAL); n++;}
   else
   { XtSetArg(wargs[n], XmNdialogStyle, XmDIALOG_MODELESS); n++;}
- XtSetValues(ana_widget_id[w1], wargs, n);
+ XtSetValues(lux_widget_id[w1], wargs, n);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmsetdirectory(narg, ps) /* (widget, directory_path) */
+Int lux_xmsetdirectory(narg, ps) /* (widget, directory_path) */
  /* can only be used for file select widgets */
  Int     narg, ps[];
  {
@@ -3218,7 +3218,7 @@ Int ana_xmsetdirectory(narg, ps) /* (widget, directory_path) */
  if (ck_motif() != 1) return -1;
  /* get the arguments */
  if (get_widget_id(ps[0], &w1) != 1) return -1;
- if (!XtIsSubclass(ana_widget_id[w1], xmFileSelectionBoxWidgetClass))
+ if (!XtIsSubclass(lux_widget_id[w1], xmFileSelectionBoxWidgetClass))
 	{ printf("XMSETDIRECTORY, widget not a file selection box!\n");
 	return -1;}
  if (sym[ps[1]].class != 2) { return execute_error(70); }
@@ -3226,11 +3226,11 @@ Int ana_xmsetdirectory(narg, ps) /* (widget, directory_path) */
  directory = XmStringCreateSimple(s);
  n = 0;
  XtSetArg(wargs[n], XmNdirectory, directory); n++;
- XtSetValues(ana_widget_id[w1], wargs, n);
+ XtSetValues(lux_widget_id[w1], wargs, n);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmborderwidth(narg, ps) /* (widget, width) */
+Int lux_xmborderwidth(narg, ps) /* (widget, width) */
  /* manipulate the border */
  Int     narg, ps[];
  {
@@ -3242,11 +3242,11 @@ Int ana_xmborderwidth(narg, ps) /* (widget, width) */
  
  n = 0;
  XtSetArg(wargs[n], XmNborderWidth, wq); n++;
- XtSetValues(ana_widget_id[w1], wargs, n);
+ XtSetValues(lux_widget_id[w1], wargs, n);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmgetwidgetsize(narg, ps)
+Int lux_xmgetwidgetsize(narg, ps)
  /* a subroutine; i.e, xmgetwidgetsize, widget, dx, dy  returns dx, dy */
  Int     narg, ps[];
  {
@@ -3255,14 +3255,14 @@ Int ana_xmgetwidgetsize(narg, ps)
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
  XtSetArg(wargs[0], XmNwidth, &dx);
  XtSetArg(wargs[1], XmNheight, &dy);
- XtGetValues(ana_widget_id[w], wargs, 2);
+ XtGetValues(lux_widget_id[w], wargs, 2);
  dxx = (Int) dx;	dyy = (Int) dy;
  redef_scalar(ps[1], 2, &dxx);
  redef_scalar(ps[2], 2, &dyy);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmgetwidgetposition(narg, ps)
+Int lux_xmgetwidgetposition(narg, ps)
  /* a subroutine; i.e, xmgetwidgetposition, widget, x, y  returns x, y */
  Int     narg, ps[];
  {
@@ -3271,14 +3271,14 @@ Int ana_xmgetwidgetposition(narg, ps)
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
  XtSetArg(wargs[0], XmNx, &dx);
  XtSetArg(wargs[1], XmNy, &dy);
- XtGetValues(ana_widget_id[w], wargs, 2);
+ XtGetValues(lux_widget_id[w], wargs, 2);
  dxx = (Int) dx;	dyy = (Int) dy;
  redef_scalar(ps[1], 2, &dxx);
  redef_scalar(ps[2], 2, &dyy);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmalignment(narg, ps) /* (widget, mode) */
+Int lux_xmalignment(narg, ps) /* (widget, mode) */
  /* makes sense for label and button widgets or their parents */
  Int     narg, ps[];
  {
@@ -3296,11 +3296,11 @@ Int ana_xmalignment(narg, ps) /* (widget, mode) */
  case 2: XtSetArg(wargs[n], XmNalignment, XmALIGNMENT_END); break;
  }
  n++;
- XtSetValues(ana_widget_id[w], wargs, n);
+ XtSetValues(lux_widget_id[w], wargs, n);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmsensitive(narg, ps) /* (widget, mode) */
+Int lux_xmsensitive(narg, ps) /* (widget, mode) */
  /* use to make labels or button insensitive or sensitive */
  /* this doesn't make sense for all types of widgets */
  Int     narg, ps[];
@@ -3314,11 +3314,11 @@ Int ana_xmsensitive(narg, ps) /* (widget, mode) */
  n = 1;
  if (mode != 0) XtSetArg(wargs[n], XmNsensitive, True); else
  	XtSetArg(wargs[n], XmNsensitive, False);
- XtSetValues(ana_widget_id[w], wargs, n);
+ XtSetValues(lux_widget_id[w], wargs, n);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmfont(narg, ps) /* (widget, font_string) */
+Int lux_xmfont(narg, ps) /* (widget, font_string) */
  Int     narg, ps[];
  {
  Int	w, iq;
@@ -3337,11 +3337,11 @@ Int ana_xmfont(narg, ps) /* (widget, font_string) */
  n = 0;
  fontlist = XmFontListCreate(font, cset);
  XtSetArg(wargs[n], XmNfontList, fontlist); n++;
- XtSetValues(ana_widget_id[w], wargs, n);
+ XtSetValues(lux_widget_id[w], wargs, n);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmsetlabel(narg, ps) /* (widget, string) */
+Int lux_xmsetlabel(narg, ps) /* (widget, string) */
  Int     narg, ps[];
  {
  Int	w, iq;
@@ -3356,12 +3356,12 @@ Int ana_xmsetlabel(narg, ps) /* (widget, string) */
  ms = XmStringCreateLtoR(s, cset);
  n = 0;
  XtSetArg(wargs[n], XmNlabelString, ms); n++;
- XtSetValues(ana_widget_id[w], wargs, n);
+ XtSetValues(lux_widget_id[w], wargs, n);
  XmStringFree(ms);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmsettitle(narg, ps) /* (widget, string) */
+Int lux_xmsettitle(narg, ps) /* (widget, string) */
  Int     narg, ps[];
  {
  Int	w, iq;
@@ -3376,12 +3376,12 @@ Int ana_xmsettitle(narg, ps) /* (widget, string) */
  title = XmStringCreateLtoR(s, cset);
  n = 0;
  XtSetArg(wargs[n], XmNdialogTitle, title); n++;
- XtSetValues(ana_widget_id[w], wargs, n);
+ XtSetValues(lux_widget_id[w], wargs, n);
  XmStringFree(title);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmsetmnemonic(narg, ps) /* (widget, string) */
+Int lux_xmsetmnemonic(narg, ps) /* (widget, string) */
  /* string should be a single character, we take only the first if not */
  Int     narg, ps[];
  {
@@ -3395,11 +3395,11 @@ Int ana_xmsetmnemonic(narg, ps) /* (widget, string) */
  s = (char *) sym[iq].spec.array.ptr;
  n = 0;
  XtSetArg(wargs[n], XmNmnemonic, *s); n++;
- XtSetValues(ana_widget_id[w], wargs, n);
+ XtSetValues(lux_widget_id[w], wargs, n);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmsetmargins(narg, ps) /* (widget, xm, ym) */
+Int lux_xmsetmargins(narg, ps) /* (widget, xm, ym) */
  Int     narg, ps[];
  {
  Int	w, xm, ym;
@@ -3410,11 +3410,11 @@ Int ana_xmsetmargins(narg, ps) /* (widget, xm, ym) */
  n = 0;
  XtSetArg(wargs[n], XmNmarginWidth, xm); n++;
  XtSetArg(wargs[n], XmNmarginHeight, ym); n++;
- XtSetValues(ana_widget_id[w], wargs, n);
+ XtSetValues(lux_widget_id[w], wargs, n);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmtextsetrowcolumnsize(narg, ps) /* (widget, rows, columns) */
+Int lux_xmtextsetrowcolumnsize(narg, ps) /* (widget, rows, columns) */
  /* reset the number of rows and columns for a text image */
  Int     narg, ps[];
  {
@@ -3427,35 +3427,35 @@ Int ana_xmtextsetrowcolumnsize(narg, ps) /* (widget, rows, columns) */
  n = 0;
  XtSetArg(wargs[n], XmNrows, rows); n++;
  XtSetArg(wargs[n], XmNcolumns, cols); n++;
- XtSetValues(ana_widget_id[w], wargs, n);
+ XtSetValues(lux_widget_id[w], wargs, n);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmforegroundcolor(narg, ps) /* (widget, color) */
+Int lux_xmforegroundcolor(narg, ps) /* (widget, color) */
  Int     narg, ps[];
  { return colorset(narg, ps, 1); }
  /*------------------------------------------------------------------------- */
-Int ana_xmbackgroundcolor(narg, ps) /* (widget, color) */
+Int lux_xmbackgroundcolor(narg, ps) /* (widget, color) */
  Int     narg, ps[];
  { return colorset(narg, ps, 0); }
  /*------------------------------------------------------------------------- */
-Int ana_xmtopshadowcolor(narg, ps) /* (widget, color) */
+Int lux_xmtopshadowcolor(narg, ps) /* (widget, color) */
  Int     narg, ps[];
  { return colorset(narg, ps, 2); }
  /*------------------------------------------------------------------------- */
-Int ana_xmbottomshadowcolor(narg, ps) /* (widget, color) */
+Int lux_xmbottomshadowcolor(narg, ps) /* (widget, color) */
  Int     narg, ps[];
  { return colorset(narg, ps, 3); }
  /*------------------------------------------------------------------------- */
-Int ana_xmselectcolor(narg, ps) /* (widget, color) */
+Int lux_xmselectcolor(narg, ps) /* (widget, color) */
  Int     narg, ps[];
  { return colorset(narg, ps, 4); }
  /*------------------------------------------------------------------------- */
-Int ana_xmarmcolor(narg, ps) /* (widget, color) */
+Int lux_xmarmcolor(narg, ps) /* (widget, color) */
  Int     narg, ps[];
  { return colorset(narg, ps, 5); }
  /*------------------------------------------------------------------------- */
-Int ana_xmbordercolor(narg, ps) /* (widget, color) */
+Int lux_xmbordercolor(narg, ps) /* (widget, color) */
  Int     narg, ps[];
  { return colorset(narg, ps, 6); }
  /*------------------------------------------------------------------------- */
@@ -3490,11 +3490,11 @@ Int colorset(narg, ps, mode) /* internal routine */
  default: return execute_error(3);
  }
  n++;
- XtSetValues(ana_widget_id[w], wargs, n);
+ XtSetValues(lux_widget_id[w], wargs, n);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmsetcolors(narg, ps) /* (widget, bg_color) */
+Int lux_xmsetcolors(narg, ps) /* (widget, bg_color) */
  Int     narg, ps[];
  /* given a new background color for a widget, set it and an "appropiate"
  set of the other colors */
@@ -3506,11 +3506,11 @@ Int ana_xmsetcolors(narg, ps) /* (widget, bg_color) */
  iq = ps[1];
  n = 0;
  setup_colors (iq);
- XtSetValues(ana_widget_id[w], wargs, n);
+ XtSetValues(lux_widget_id[w], wargs, n);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmquery(narg, ps) /* (widget) */
+Int lux_xmquery(narg, ps) /* (widget) */
  Int     narg, ps[];
  /* a subroutine, gets pointer location in this widget and for root window */
  {
@@ -3521,7 +3521,7 @@ Int ana_xmquery(narg, ps) /* (widget) */
  extern  uint32_t    kb;
 
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
- win = XtWindowOfObject(ana_widget_id[w]);
+ win = XtWindowOfObject(lux_widget_id[w]);
  if (win == 0) {
  printf("XTWINDOW: no such window, invalid object or object not yet realized\n");
  return -1; }
@@ -3531,7 +3531,7 @@ Int ana_xmquery(narg, ps) /* (widget) */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmraise(narg, ps) /* (widget) */
+Int lux_xmraise(narg, ps) /* (widget) */
  Int     narg, ps[];
  /* a subroutine, gets window for this widget and does a xraise on it */
  {
@@ -3539,7 +3539,7 @@ Int ana_xmraise(narg, ps) /* (widget) */
  Window win;
 
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
- win = XtWindowOfObject(ana_widget_id[w]);
+ win = XtWindowOfObject(lux_widget_id[w]);
  if (win == 0) {
  printf("XTWINDOW: no such window, invalid object or object not yet realized\n");
  return -1; }
@@ -3547,7 +3547,7 @@ Int ana_xmraise(narg, ps) /* (widget) */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xtparent(narg, ps)
+Int lux_xtparent(narg, ps)
  /* (widget) */
  Int     narg, ps[];
  {
@@ -3555,20 +3555,20 @@ Int ana_xtparent(narg, ps)
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
  if (ck_widget_count() < 0) return -1;
  parent = n_widgets++;
- ana_widget_id[parent] = XtParent(ana_widget_id[w]);
+ lux_widget_id[parent] = XtParent(lux_widget_id[w]);
  result_sym = scalar_scratch(2);		/*for widget id */
  sym[result_sym].spec.scalar.l = parent;
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xtwindow(narg, ps)
+Int lux_xtwindow(narg, ps)
  /* (widget) */
  Int     narg, ps[];
  {
  Int	w, result_sym;
  Window wid;
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
- wid = XtWindowOfObject(ana_widget_id[w]);
+ wid = XtWindowOfObject(lux_widget_id[w]);
  if (wid == 0) {
  printf("XTWINDOW: no such window, invalid object or object not yet realized\n");
  return -1; }
@@ -3577,63 +3577,63 @@ Int ana_xtwindow(narg, ps)
  return result_sym;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xtmanage(narg, ps)
+Int lux_xtmanage(narg, ps)
  /* (widget) */
  Int     narg, ps[];
  {
  Int	w;
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
- XtManageChild(ana_widget_id[w]);
+ XtManageChild(lux_widget_id[w]);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xtunmanage(narg, ps)
+Int lux_xtunmanage(narg, ps)
  /* (widget) */
  Int     narg, ps[];
  {
  Int	w;
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
- XtUnmanageChild(ana_widget_id[w]);
+ XtUnmanageChild(lux_widget_id[w]);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xtpopup(narg, ps)
+Int lux_xtpopup(narg, ps)
  /* xtpopup, widget */
  Int     narg, ps[];
  {
  Int	w;
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
- XtPopup(xmgettopshell(ana_widget_id[w]), XtGrabNone);
+ XtPopup(xmgettopshell(lux_widget_id[w]), XtGrabNone);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xtpopdown(narg, ps)
+Int lux_xtpopdown(narg, ps)
  /* xtpopdown, widget */
  Int     narg, ps[];
  {
  Int	w;
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
- XtPopdown(xmgettopshell(ana_widget_id[w]));
+ XtPopdown(xmgettopshell(lux_widget_id[w]));
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmdestroy(narg, ps)
+Int lux_xmdestroy(narg, ps)
  Int     narg, ps[];
  {
  Int	w;
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
- XtDestroyWidget(ana_widget_id[w]);
+ XtDestroyWidget(lux_widget_id[w]);
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xmset_text_output(narg, ps) /* assigns a widget text_output */
+Int lux_xmset_text_output(narg, ps) /* assigns a widget text_output */
  /* this takes an already defined widget number in the LUX environment and
  assigns it to the text_output widget used by wprint */
  Int     narg, ps[];
  {
  Int	w;
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
- text_output = ana_widget_id[w];
+ text_output = lux_widget_id[w];
  return 1;
  }
  /*------------------------------------------------------------------------- */
@@ -3650,7 +3650,7 @@ Int get_widget_id( nsym, w)
  return 1;
  }
  /*------------------------------------------------------------------------- */
-void ana_xminit(void) 	/* the motif initialization */
+void lux_xminit(void) 	/* the motif initialization */
 {
  extern	Int	display_width, display_height;
  Widget   exit_button;
@@ -3679,7 +3679,7 @@ void ana_xminit(void) 	/* the motif initialization */
  XtDisplayInitialize(app_context, display, "lux", "Lux", NULL, 0,
 		     &argc, &argv);
  disp = display;		/* instead of replacing all "disp"s. */
- ana_widget_id[toplevel] =
+ lux_widget_id[toplevel] =
    XtAppCreateShell("lux", "Lux", applicationShellWidgetClass, disp, NULL, 0);
 
  exit_button_text = XmStringCreateLtoR("interrupt motif",
@@ -3701,7 +3701,7 @@ void ana_xminit(void) 	/* the motif initialization */
 
 
  /* XtSetArg (wargs[n],XmNiconic, True);	n++; */
- XtSetValues(ana_widget_id[toplevel], wargs, n);
+ XtSetValues(lux_widget_id[toplevel], wargs, n);
 
  n=0;
  if ((font =
@@ -3716,22 +3716,22 @@ void ana_xminit(void) 	/* the motif initialization */
  XtSetArg(wargs[n],XmNheight, 50);	n++;
 
  exit_button = XtCreateManagedWidget("exit_button", xmPushButtonWidgetClass,
-				     ana_widget_id[toplevel], wargs, n);
+				     lux_widget_id[toplevel], wargs, n);
  XtAddCallback(exit_button, XmNactivateCallback, quit_callback, NULL);
  XmStringFree(exit_button_text);
  /* put in a particular place */
- screen = XtScreen(ana_widget_id[toplevel]);
+ screen = XtScreen(lux_widget_id[toplevel]);
  display_width = WidthOfScreen(screen);
  display_height = HeightOfScreen(screen);
  n = 0;
  XtSetArg(wargs[n], XmNx, (Position) (display_width-200)); n++;
  XtSetArg(wargs[n], XmNy, (Position) 10); n++;
- XtSetValues(ana_widget_id[toplevel], wargs, n);
+ XtSetValues(lux_widget_id[toplevel], wargs, n);
 }
  /*------------------------------------------------------------------------- */
 Int ck_motif()
  {
- if (motif_init_flag == 0) { ana_xminit(); motif_init_flag = 1; }
+ if (motif_init_flag == 0) { lux_xminit(); motif_init_flag = 1; }
  return 1;
  }
  /*------------------------------------------------------------------------- */
@@ -3747,13 +3747,13 @@ Int ck_widget_count()
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int ana_xtloop(narg, ps)
+Int lux_xtloop(narg, ps)
  Int     narg, ps[];
  {
  extern Int	ck_events();
  /* have we been realized ? */
  if ( motif_realized_flag != 1) {
-	XtRealizeWidget(ana_widget_id[toplevel]);
+	XtRealizeWidget(lux_widget_id[toplevel]);
 	motif_realized_flag = 1; }
 
  /* 6/13/95, accepts a single argument and sets !motif to the value */
@@ -3780,7 +3780,7 @@ Int ana_xtloop(narg, ps)
   } break;
  case 2:
   XFlush(disp);
-  XmUpdateDisplay(ana_widget_id[toplevel]);
+  XmUpdateDisplay(lux_widget_id[toplevel]);
  case 0:
   /* while (XtAppPending(app_context) != NULL) { */
   while (XtAppPending(app_context) & XtIMXEvent) {
@@ -3827,7 +3827,7 @@ void browse_callback(w, ptq, call_data)
  result_position = find_sym(list_item_position);
  redef_scalar(result_position, 2, &call_data->item_position);
  XtFree(text);
- (void) ana_callback_execute( (Int) ptq);
+ (void) lux_callback_execute( (Int) ptq);
  }
  /*------------------------------------------------------------------------- */
 void fselect_callback(w, ptq, call_data)
@@ -3853,7 +3853,7 @@ void fselect_callback(w, ptq, call_data)
  while (mq--) *p++ = *s++;	*p = 0;			/*load it */
  XtFree(filename);
 
- (void) ana_callback_execute( (Int) ptq);
+ (void) lux_callback_execute( (Int) ptq);
  }
  /*------------------------------------------------------------------------- */
 void fhelp_callback(w, ptq, call_data)
@@ -3872,7 +3872,7 @@ void fhelp_callback(w, ptq, call_data)
  p = (char *) sym[result_string].spec.array.ptr;	s = filename;
  while (mq--) *p++ = *s++;	*p = 0;			/*load it */
  XtFree(filename);
- (void) ana_callback_execute( (Int) ptq);
+ (void) lux_callback_execute( (Int) ptq);
  }
  /*------------------------------------------------------------------------- */
 void fcancel_callback(w, ptq, call_data)
@@ -3880,7 +3880,7 @@ void fcancel_callback(w, ptq, call_data)
  XmFileSelectionBoxCallbackStruct *call_data;
  XtPointer	ptq;
  {
- (void) ana_callback_execute( (Int) ptq);
+ (void) lux_callback_execute( (Int) ptq);
  }
  /*------------------------------------------------------------------------- */
 void bcancel_callback(w, ptq, call_data)
@@ -3888,7 +3888,7 @@ void bcancel_callback(w, ptq, call_data)
  XmAnyCallbackStruct *call_data;
  XtPointer	ptq;
  {
- (void) ana_callback_execute( (Int) ptq);
+ (void) lux_callback_execute( (Int) ptq);
  }
  /*------------------------------------------------------------------------- */
 void command_callback(w, ptq, call_data)
@@ -3913,10 +3913,10 @@ void command_callback(w, ptq, call_data)
  p = (char *) sym[result_string].spec.array.ptr;	s = text;
  while (mq--) *p++ = *s++;	*p = 0;			/*load it */
 
- (void) ana_callback_execute( (Int) ptq);
+ (void) lux_callback_execute( (Int) ptq);
  }
  /*------------------------------------------------------------------------- */
-void ana_callback_execute(nsym)
+void lux_callback_execute(nsym)
  Int nsym;
  {
  Int iq;
@@ -3929,7 +3929,7 @@ void button_callback(w, ptq, call_data)
  caddr_t	call_data;
  XtPointer	ptq;
  {
- (void) ana_callback_execute( (Int) ptq);
+ (void) lux_callback_execute( (Int) ptq);
  }
  /*------------------------------------------------------------------------- */
 void selectionbox_cb(w, ptq, call_data)
@@ -3947,7 +3947,7 @@ void selectionbox_cb(w, ptq, call_data)
  p = (char *) sym[result_string].spec.array.ptr;	s = text;
  while (mq--) *p++ = *s++;	*p = 0;			/*load it */
  XtFree(text);
- (void) ana_callback_execute( (Int) ptq);
+ (void) lux_callback_execute( (Int) ptq);
  zap(run_block_number((Int) ptq)); /* get rid of callback - LS 20jan99 */
  }
  /*------------------------------------------------------------------------- */
@@ -3970,7 +3970,7 @@ void radio_callback(w, ptq, state)
  XtPointer	ptq;
  {
  /* 7/11/95, changed to callback lux routine for either state set on or off */
- (void) ana_callback_execute( (Int) ptq);
+ (void) lux_callback_execute( (Int) ptq);
  }
  /*------------------------------------------------------------------------- */
 void menu_which(w, ptq, state)
@@ -3994,7 +3994,7 @@ void scale_callback(w, ptq, call_data)
  if ( call_data != (XmScaleCallbackStruct *) NULL)
   {
   redef_scalar(find_sym(scale_value), 2, &call_data->value);
- (void) ana_callback_execute( (Int) ptq);
+ (void) lux_callback_execute( (Int) ptq);
   }
  }
  /*------------------------------------------------------------------------- */
@@ -4007,7 +4007,7 @@ void scroll_callback(w, ptq, call_data)
  if ( call_data != (XmScaleCallbackStruct *) NULL)
   {
   redef_scalar(find_sym(scroll_value), 2, &call_data->value);
- (void) ana_callback_execute( (Int) ptq);
+ (void) lux_callback_execute( (Int) ptq);
   }
  }
  /*------------------------------------------------------------------------- */
@@ -4016,42 +4016,42 @@ void draw_in_callback(w, ptq, call_data)
  XmDrawingAreaCallbackStruct *call_data;
  Int	*ptq;
  {
- extern	Int	ana_keycode, ana_button, last_wid, xcoord, ycoord;
- extern	Int	root_x, root_y, ana_keystate, ana_keysym;
+ extern	Int	lux_keycode, lux_button, last_wid, xcoord, ycoord;
+ extern	Int	root_x, root_y, lux_keystate, lux_keysym;
  Int	nc;
  XEvent  *report = call_data->event;
  char	buffer[16];
  KeySym	keysym;
  /*assume no key and no button down until we find different */
- ana_keycode = ana_button = ana_keysym = ana_keystate = 0;
+ lux_keycode = lux_button = lux_keysym = lux_keystate = 0;
  last_wid = *(ptq+1);	/* which lux X window the event occurred in */
  /* check type of input */
  switch (report->xany.type) {
   case ButtonPress:
-    ana_button = report->xbutton.button;
+    lux_button = report->xbutton.button;
   case ButtonRelease:
     xcoord = report->xbutton.x;
     ycoord = report->xbutton.y;
     root_x = report->xbutton.x_root;
     root_y = report->xbutton.y_root;
-    ana_keystate = report->xbutton.state;
+    lux_keystate = report->xbutton.state;
     break;
   case KeyPress:
-    ana_keycode = report->xkey.keycode;
+    lux_keycode = report->xkey.keycode;
     /* note that keycode can be used to distinquish between press and release */
   case KeyRelease:
     xcoord = report->xkey.x;
     ycoord = report->xkey.y;
     root_x = report->xkey.x_root;
     root_y = report->xkey.y_root;
-    ana_keystate = report->xkey.state;
+    lux_keystate = report->xkey.state;
     nc = XLookupString(&(report->xkey), buffer, 15, &keysym, NULL);
     buffer[nc] = '\0';
     /*printf("nc = %d, string = %s\n", nc, buffer);*/
-    ana_keysym = (Int) keysym;
+    lux_keysym = (Int) keysym;
     break;
  }
- (void) ana_callback_execute( *ptq);
+ (void) lux_callback_execute( *ptq);
  }
  /*------------------------------------------------------------------------- */
 void draw_re_callback(w, ptq, call_data)
@@ -4067,10 +4067,10 @@ void draw_re_callback(w, ptq, call_data)
 
  /* this callback is particularly likely to cause re-entrant problems in the
  lux code because the lux call backs may do some limit checking and hence
- re-size via ana_xmsize. This causes an immediate callback that gets here
+ re-size via lux_xmsize. This causes an immediate callback that gets here
  again. Hence we use a kilroy to ensure that the previous lux callback is
  done. If not, we just return. We could do other stuff as long as the
- ana_execute isn't done.
+ lux_execute isn't done.
  */
  last_wid = *(ptq+1);	/* which lux X window the event occurred in */
  /* the new size is not available in the call_data structure, so we
@@ -4093,7 +4093,7 @@ void draw_re_callback(w, ptq, call_data)
  xfac = yfac = MIN( xfac, yfac);
  if (kilroy) return;
  kilroy = 1;
- (void) ana_callback_execute( *ptq);
+ (void) lux_callback_execute( *ptq);
  kilroy = 0;
  }
  /*------------------------------------------------------------------------- */
@@ -4109,16 +4109,16 @@ void draw_ex_callback(w, ptq, call_data)
  that do re-sizing but problems */
  /* this callback is particularly likely to cause re-entrant problems in the
  lux code because the lux call backs may do some limit checking and hence
- re-size via ana_xmsize. This causes an immediate callback that gets here
+ re-size via lux_xmsize. This causes an immediate callback that gets here
  again. Hence we use a kilroy to ensure that the previous lux callback is
  done. If not, we just return. We could do other stuff as long as the
- ana_execute isn't done.
+ lux_execute isn't done.
  */
  last_wid = *(ptq+1);	/* which lux X window the event occurred in */
  /*printf("expose from drawing area, kilroy = %d\n", kilroy);*/
  if (kilroy) return;
  kilroy = 1;
- (void) ana_callback_execute( *ptq);
+ (void) lux_callback_execute( *ptq);
  kilroy = 0;
  }
  /*------------------------------------------------------------------------- */
@@ -4156,7 +4156,7 @@ void textfield_callback(w, ptq, call_data)
  p = (char *) sym[result_string].spec.array.ptr;	s = text;
  while (mq--) *p++ = *s++;	*p = 0;			/*load it */
  XtFree(text);
- (void) ana_callback_execute( (Int) ptq);
+ (void) lux_callback_execute( (Int) ptq);
  }
  /*------------------------------------------------------------------------- */
 void quit_callback(w, client_data, call_data)
@@ -4188,7 +4188,7 @@ void motif_command_callback(Widget w, XtPointer ptq,
    motif_flag = 0;		/* turn off xtloop */
 }
 /*------------------------------------------------------------------------- */
-Int ana_motif_input(narg, ps) /* get our commands via motif widget */
+Int lux_motif_input(narg, ps) /* get our commands via motif widget */
  /* when called, command input is allowed via a command widget,
  somewhat complicated because of multi-line commands, we want to lock out
  other motif callbacks in the middle of same */
@@ -4223,10 +4223,10 @@ Int ana_motif_input(narg, ps) /* get our commands via motif widget */
  XtSetArg(wargs[n], XmNwidth, width);	n++;
  prompt = XmStringCreateSimple( "command line");
  XtSetArg(wargs[n], XmNpromptString, prompt); n++;
- commandw = XmCreateCommand(ana_widget_id[parent], "command",wargs, n);
+ commandw = XmCreateCommand(lux_widget_id[parent], "command",wargs, n);
  if (ck_widget_count() < 0) return -1;
- iq = n_widgets++;	wids[0] = iq;	ana_widget_id[iq] = commandw;
- ana_command_widget = commandw;
+ iq = n_widgets++;	wids[0] = iq;	lux_widget_id[iq] = commandw;
+ lux_command_widget = commandw;
  XtAddCallback(commandw, XmNcommandEnteredCallback,
                 (XtCallbackProc) motif_command_callback, 0);
  /* now the optional font and color */
@@ -4241,18 +4241,18 @@ Int ana_motif_input(narg, ps) /* get our commands via motif widget */
  /* if n is still 0, no color or font */
  wg = XmCommandGetChild(commandw, XmDIALOG_COMMAND_TEXT);
  if (ck_widget_count() < 0) return -1;
- iq = n_widgets++;	wids[1] = iq;	ana_widget_id[iq] = wg;
+ iq = n_widgets++;	wids[1] = iq;	lux_widget_id[iq] = wg;
 
  if (n != 0) { XtSetValues(wg, wargs, n); }
  wg = XmCommandGetChild(commandw, XmDIALOG_HISTORY_LIST);
  if (ck_widget_count() < 0) return -1;
- iq = n_widgets++;	wids[3] = iq;	ana_widget_id[iq] = wg;
+ iq = n_widgets++;	wids[3] = iq;	lux_widget_id[iq] = wg;
  if (n != 0) { XtSetValues(wg, wargs, n); }
  /* the prompt label just gets the font, so re-do the font args */
  n = 0;
  wg = XmCommandGetChild(commandw, XmDIALOG_PROMPT_LABEL);
  if (ck_widget_count() < 0) return -1;
- iq = n_widgets++;	wids[2] = iq;	ana_widget_id[iq] = wg;
+ iq = n_widgets++;	wids[2] = iq;	lux_widget_id[iq] = wg;
  if (narg > 4) {
   if (set_fontlist( ps[4] ) != 1) return -1; /* gets fontlist from string */
   XtSetValues(wg, wargs, n);
@@ -4277,7 +4277,7 @@ void wprint(char *fmt, ...)
  XmTextInsert(text_output, i, msgbuf);
 }
  /*------------------------------------------------------------------------- */
-Int ana_test_wprint(narg,ps)
+Int lux_test_wprint(narg,ps)
  Int	narg,ps[];
  {
  wprint("a test of wprint\n");
@@ -4310,7 +4310,7 @@ void xminfo(Int w)
   XtSetArg(wargs[n], XmNmaxHeight, &maxheight); n++;
   XtSetArg(wargs[n], XmNbaseWidth, &basewidth); n++;
   XtSetArg(wargs[n], XmNbaseHeight, &baseheight); n++;
-  XtGetValues(ana_widget_id[w], wargs, n);
+  XtGetValues(lux_widget_id[w], wargs, n);
   printf("Widget %d out of: %d\n", w, n_widgets);
   printf("XmNwidth     : %u\n", width);
   printf("XmNheight    : %u\n", height);
@@ -4346,14 +4346,14 @@ void xminfo(Int w)
     printf("%d\n", baseheight);
 }
 /*------------------------------------------------------------------------- */
-Int ana_xminfo(Int narg, Int ps[])
+Int lux_xminfo(Int narg, Int ps[])
 {
   Int	w;
   Int	minwidth, maxwidth, minheight, maxheight, basewidth, baseheight;
   Dimension	width, height;
 
-  if (get_widget_id(ps[0], &w) == ANA_ERROR)
-    return ANA_ERROR;
+  if (get_widget_id(ps[0], &w) == LUX_ERROR)
+    return LUX_ERROR;
 
   if (w < 0 || w >= n_widgets) {
     printf("Invalid widget number %d; valid range 0 through %d\n",
@@ -4369,7 +4369,7 @@ Int ana_xminfo(Int narg, Int ps[])
   XtSetArg(wargs[n], XmNmaxHeight, &maxheight); n++;
   XtSetArg(wargs[n], XmNbaseWidth, &basewidth); n++;
   XtSetArg(wargs[n], XmNbaseHeight, &baseheight); n++;
-  XtGetValues(ana_widget_id[w], wargs, n);
+  XtGetValues(lux_widget_id[w], wargs, n);
   printf("Widget %d out of: %d\n", w, n_widgets);
   printf("XmNwidth     : %u\n", width);
   printf("XmNheight    : %u\n", height);
@@ -4403,6 +4403,6 @@ Int ana_xminfo(Int narg, Int ps[])
     printf("Unspecified\n");
   else
     printf("%d\n", baseheight);
-  return ANA_OK;
+  return LUX_OK;
 }
 /*------------------------------------------------------------------------- */

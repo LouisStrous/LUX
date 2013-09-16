@@ -34,7 +34,7 @@ static Double	a1, a2, a3,a4,a5, a6, a7, a8, a9 ,a10, a11, a12, a13, a14, a15;
 extern Int	badmatch;
 Double	meritc;
 /*------------------------------------------------------------------------- */
-Int ana_subshift(Int narg, Int ps[]) /* LCT for a cell  */
+Int lux_subshift(Int narg, Int ps[]) /* LCT for a cell  */
      /* wants 2 arrays, already F*8 and extracted, both the same size */
      /* returns the shift */
 {
@@ -43,33 +43,33 @@ Int ana_subshift(Int narg, Int ps[]) /* LCT for a cell  */
   void	subshift(Double *, Double *, Int, Int);
 
   iq = ps[0];
-  if (symbol_class(iq) != ANA_ARRAY
+  if (symbol_class(iq) != LUX_ARRAY
       || array_num_dims(iq) != 2)
     return cerror(NEED_2D_ARR, iq);
-  iq = ana_double(1, &iq);
+  iq = lux_double(1, &iq);
   x1 = (Double *) array_data(iq);
   d = array_dims(iq);
   jq = ps[1];
-  if (symbol_class(jq) != ANA_ARRAY
+  if (symbol_class(jq) != LUX_ARRAY
       || array_num_dims(jq) != 2)
     return cerror(NEED_2D_ARR, jq);
   if (d[0] != array_dims(jq)[0]
       || d[1] != array_dims(jq)[1])
     return cerror(INCMP_DIMS, jq);
-  jq = ana_double(1, &jq);
+  jq = lux_double(1, &jq);
   x2 = (Double *) array_data(jq);
   
   subshift(x1, x2, d[0], d[1]);
 
   /* expect result in xoff and yoff */
-  if (redef_scalar(ps[2], ANA_DOUBLE, &xoff) != 1)
+  if (redef_scalar(ps[2], LUX_DOUBLE, &xoff) != 1)
     return -1;
-  if (redef_scalar(ps[3], ANA_DOUBLE, &yoff) != 1)
+  if (redef_scalar(ps[3], LUX_DOUBLE, &yoff) != 1)
     return -1;
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int ana_subshiftc(Int narg, Int ps[]) /* LCT for a cell, sym version */
+Int lux_subshiftc(Int narg, Int ps[]) /* LCT for a cell, sym version */
  /* subshiftc, s1b, s2b, xoff, yoff, mask  */
  /* 3/4/97 added apodizer array, optional */
  /* wants 2 or 3 arrays, already F*8 and extracted, both the same size */
@@ -97,11 +97,11 @@ Int ana_subshiftc(Int narg, Int ps[]) /* LCT for a cell, sym version */
       return cerror(NEED_2D_ARR, kq);
     if (array_dims(kq)[0] != nx - 1 || array_dims(kq)[1] != ny - 1)
       return cerror(INCMP_ARG, kq);
-    kq = ana_double(1, &kq);
+    kq = lux_double(1, &kq);
     msk = array_data(kq);
   }
-  iq = ana_double(1, &iq);
-  jq = ana_double(1, &jq);
+  iq = lux_double(1, &iq);
+  jq = lux_double(1, &jq);
   x1 = array_data(iq);
   x2 = array_data(jq);
 
@@ -114,11 +114,11 @@ Int ana_subshiftc(Int narg, Int ps[]) /* LCT for a cell, sym version */
       break;
   }
   /* expect result in xoff and yoff */
-  if (redef_scalar( ps[2], 4, &xoff) != ANA_OK)
-    return ANA_ERROR;
-  if (redef_scalar( ps[3], 4, &yoff) != ANA_OK)
-    return ANA_ERROR;
-  return ANA_OK;
+  if (redef_scalar( ps[2], 4, &xoff) != LUX_OK)
+    return LUX_ERROR;
+  if (redef_scalar( ps[3], 4, &yoff) != LUX_OK)
+    return LUX_ERROR;
+  return LUX_OK;
 }
 /*------------------------------------------------------------------------- */
 Double mert(Double sx, Double sy)
@@ -939,7 +939,7 @@ Double  subshiftc_apod(xa, xb, gg, nx, ny)
  return mertc(sxz, syz);
  }
  /*------------------------------------------------------------------------- */
-Int ana_dilate(Int narg, Int ps[])
+Int lux_dilate(Int narg, Int ps[])
 /* dilates a 2D image.  LS 9nov98 */
 {
   Int	nx, ny, result, type, n;
@@ -955,14 +955,14 @@ Int ana_dilate(Int narg, Int ps[])
   data.b = array_data(ps[0]);
 
   type = array_type(ps[0]);
-  if (type >= ANA_FLOAT)
-    type = ANA_LONG;
+  if (type >= LUX_FLOAT)
+    type = LUX_LONG;
   result = array_clone(ps[0], type);
   out.b = array_data(result);
 
   switch (type) {
-    case ANA_BYTE:
-      memcpy(out.b, data.b, nx*ana_type_size[type]); /* top row: just copy */
+    case LUX_BYTE:
+      memcpy(out.b, data.b, nx*lux_type_size[type]); /* top row: just copy */
       ny -= 2;
       out.b += nx;
       data.b += nx;
@@ -977,10 +977,10 @@ Int ana_dilate(Int narg, Int ps[])
 	}
 	*out.b++ = *data.b++;	/* right edge: just copy */
       }
-      memcpy(out.b, data.b, nx*ana_type_size[type]); /* top row: just copy */
+      memcpy(out.b, data.b, nx*lux_type_size[type]); /* top row: just copy */
       break;
-    case ANA_WORD:
-      memcpy(out.w, data.w, nx*ana_type_size[type]); /* top row: just copy */
+    case LUX_WORD:
+      memcpy(out.w, data.w, nx*lux_type_size[type]); /* top row: just copy */
       ny -= 2;
       out.w += nx;
       data.w += nx;
@@ -995,10 +995,10 @@ Int ana_dilate(Int narg, Int ps[])
 	}
 	*out.w++ = *data.w++;	/* right edge: just copy */
       }
-      memcpy(out.w, data.w, nx*ana_type_size[type]); /* top row: just copy */
+      memcpy(out.w, data.w, nx*lux_type_size[type]); /* top row: just copy */
       break;
-    case ANA_LONG:
-      memcpy(out.l, data.l, nx*ana_type_size[type]); /* top row: just copy */
+    case LUX_LONG:
+      memcpy(out.l, data.l, nx*lux_type_size[type]); /* top row: just copy */
       ny -= 2;
       out.l += nx;
       data.l += nx;
@@ -1013,9 +1013,9 @@ Int ana_dilate(Int narg, Int ps[])
 	}
 	*out.l++ = *data.l++;	/* right edge: just copy */
       }
-      memcpy(out.l, data.l, nx*ana_type_size[type]); /* top row: just copy */
+      memcpy(out.l, data.l, nx*lux_type_size[type]); /* top row: just copy */
       break;
-    case ANA_FLOAT:
+    case LUX_FLOAT:
       n = nx;
       while (n--)
 	*out.l++ = (*data.f++ != 0);
@@ -1035,7 +1035,7 @@ Int ana_dilate(Int narg, Int ps[])
       while (n--)
 	*out.l++ = (*data.f++ != 0);
       break;
-    case ANA_DOUBLE:
+    case LUX_DOUBLE:
       n = nx;
       while (n--)
 	*out.l++ = (*data.d++ != 0);
@@ -1059,7 +1059,7 @@ Int ana_dilate(Int narg, Int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-Int ana_erode(Int narg, Int ps[])
+Int lux_erode(Int narg, Int ps[])
 /* erodes a 2D image.  LS 9nov98, 9may2000 */
 {
   Int	nx, ny, result, type, n;
@@ -1076,15 +1076,15 @@ Int ana_erode(Int narg, Int ps[])
   data.b = array_data(ps[0]);
 
   type = array_type(ps[0]);
-  if (type >= ANA_FLOAT)
-    type = ANA_LONG;
+  if (type >= LUX_FLOAT)
+    type = LUX_LONG;
   result = array_clone(ps[0], type);
   out.b = array_data(result);
 
   zeroedge = (internalMode & 1); /* /ZEROEDGE */
 
   switch (type) {
-    case ANA_BYTE:
+    case LUX_BYTE:
       n = nx;
       if (zeroedge) {
 	while (n--)
@@ -1115,7 +1115,7 @@ Int ana_erode(Int narg, Int ps[])
 	while (n--)
 	  *out.b++ = (*data.b++ != 0);
       break;
-    case ANA_WORD:
+    case LUX_WORD:
       n = nx;
       if (zeroedge) {
 	while (n--)
@@ -1146,7 +1146,7 @@ Int ana_erode(Int narg, Int ps[])
 	while (n--)
 	  *out.w++ = (*data.w++ != 0);
       break;
-    case ANA_LONG:
+    case LUX_LONG:
       n = nx;
       if (zeroedge) {
 	while (n--)
@@ -1177,7 +1177,7 @@ Int ana_erode(Int narg, Int ps[])
 	while (n--)
 	  *out.l++ = (*data.l++ != 0);
       break;
-    case ANA_FLOAT:
+    case LUX_FLOAT:
       n = nx;
       if (zeroedge) {
 	while (n--)
@@ -1208,7 +1208,7 @@ Int ana_erode(Int narg, Int ps[])
 	while (n--)
 	  *out.l++ = (*data.f++ != 0);
       break;
-    case ANA_DOUBLE:
+    case LUX_DOUBLE:
       n = nx;
       if (zeroedge) {
 	while (n--)

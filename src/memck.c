@@ -32,7 +32,7 @@ void	*sbrk(Int);
 #endif
 
 /*-------------------------------------------------------------------*/
-Int ana_memstat(Int narg, Int ps[])
+Int lux_memstat(Int narg, Int ps[])
 /* returns some info on memory usage */
 {
  char		*p;
@@ -44,7 +44,7 @@ Int ana_memstat(Int narg, Int ps[])
  return 1;
 }
 /*-------------------------------------------------------------------*/
-Int ana_memory(Int narg, Int ps[])
+Int lux_memory(Int narg, Int ps[])
      /* returns size of allocated memory */
 {
   Int	result;
@@ -52,7 +52,7 @@ Int ana_memory(Int narg, Int ps[])
   extern char	*firstbreak;
 
   p = sbrk(0);
-  result = scalar_scratch(ANA_LONG);
+  result = scalar_scratch(LUX_LONG);
   sym[result].spec.scalar.l = p - firstbreak;
   return result;
 }

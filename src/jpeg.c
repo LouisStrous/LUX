@@ -60,10 +60,10 @@ Int read_jpeg6b(Int narg, Int ps[], Int isFunc)
   JSAMPLE	*image;
 
   if (!symbolIsStringScalar(ps[1]))
-    return isFunc? ANA_ERROR: cerror(NEED_STR, ps[1]);
+    return isFunc? LUX_ERROR: cerror(NEED_STR, ps[1]);
   filename = string_value(ps[1]);
   if (!(infile = fopen(filename, "rb")))
-    return isFunc? ANA_ERROR: cerror(ERR_OPEN, ps[1]);
+    return isFunc? LUX_ERROR: cerror(ERR_OPEN, ps[1]);
 
   /* 1. initialize */
   cinfo.err = jpeg_std_error(&jerr.pub);/* default error handler */
@@ -73,7 +73,7 @@ Int read_jpeg6b(Int narg, Int ps[], Int isFunc)
     /* an appropriate message was displayed by the error handler */
     jpeg_destroy_decompress(&cinfo);
     fclose(infile);
-    return ANA_ERROR;
+    return LUX_ERROR;
   }
 
   jpeg_create_decompress(&cinfo); /* decompression structure */
@@ -116,7 +116,7 @@ Int read_jpeg6b(Int narg, Int ps[], Int isFunc)
     dims[i++] = cinfo.output_components;
   dims[i++] = cinfo.output_width;
   dims[i++] = cinfo.output_height;
-  if (to_scratch_array(*ps, ANA_BYTE, i, dims) == ANA_ERROR)
+  if (to_scratch_array(*ps, LUX_BYTE, i, dims) == LUX_ERROR)
     goto read_jpeg6b_1;
   image = (JSAMPLE *) array_data(*ps);
   stride = cinfo.output_width*cinfo.output_components;
@@ -169,17 +169,17 @@ Int read_jpeg6b(Int narg, Int ps[], Int isFunc)
   fclose(infile);
   jpeg_destroy_decompress(&cinfo);
 
-  return ANA_OK;
+  return LUX_OK;
 }
 /*--------------------------------------------------------------------------*/
-Int ana_read_jpeg6b(Int narg, Int ps[])
+Int lux_read_jpeg6b(Int narg, Int ps[])
 {
   return read_jpeg6b(narg, ps, 0);
 }
 /*--------------------------------------------------------------------------*/
-Int ana_read_jpeg6b_f(Int narg, Int ps[])
+Int lux_read_jpeg6b_f(Int narg, Int ps[])
 {
-  return (read_jpeg6b(narg, ps, 1) == ANA_OK)? ANA_ONE: ANA_ZERO;
+  return (read_jpeg6b(narg, ps, 1) == LUX_OK)? LUX_ONE: LUX_ZERO;
 }
 /*--------------------------------------------------------------------------*/
 Int write_jpeg6b(Int narg, Int ps[], Int isFunc)
@@ -195,29 +195,29 @@ Int write_jpeg6b(Int narg, Int ps[], Int isFunc)
 
   /* get image info */
   if (!symbolIsNumericalArray(ps[0]))
-    return isFunc? ANA_ERROR: cerror(NEED_NUM_ARR, ps[0]);
+    return isFunc? LUX_ERROR: cerror(NEED_NUM_ARR, ps[0]);
   nd = array_num_dims(ps[0]);
   if (nd < 2 || nd > 3)
-    return isFunc? ANA_ERROR: cerror(ILL_NUM_DIM, ps[0]);
+    return isFunc? LUX_ERROR: cerror(ILL_NUM_DIM, ps[0]);
   if (nd == 3 && array_dims(ps[0])[0] != 3)
-    return isFunc? ANA_ERROR: anaerror("When saving an RGB image, the first dimension must have 3 elements", ps[0]);
-  if (array_type(ps[0]) != ANA_BYTE)
-    return isFunc? ANA_ERROR: anaerror("Only JPEG compression of BYTE arrays is supported", ps[0]);
+    return isFunc? LUX_ERROR: luxerror("When saving an RGB image, the first dimension must have 3 elements", ps[0]);
+  if (array_type(ps[0]) != LUX_BYTE)
+    return isFunc? LUX_ERROR: luxerror("Only JPEG compression of BYTE arrays is supported", ps[0]);
   nx = array_dims(ps[0])[0 + (nd == 3)];
   ny = array_dims(ps[0])[1 + (nd == 3)];
 
   if (narg > 2 && ps[2]) {	/* have a <header> */
     if (!symbolIsStringScalar(ps[2]))
-      return isFunc? ANA_ERROR: cerror(NEED_STR, ps[2]);
+      return isFunc? LUX_ERROR: cerror(NEED_STR, ps[2]);
     header = string_value(ps[2]);
   } else
     header = NULL;
 
   if (!symbolIsStringScalar(ps[1]))
-    return isFunc? ANA_ERROR: cerror(NEED_STR, ps[1]);
+    return isFunc? LUX_ERROR: cerror(NEED_STR, ps[1]);
   outfile = fopen(string_value(ps[1]), "wb");
   if (!outfile)
-    return isFunc? ANA_ERROR: cerror(ERR_OPEN, ps[1]);
+    return isFunc? LUX_ERROR: cerror(ERR_OPEN, ps[1]);
 
   /* 1. initialize */
   cinfo.err = jpeg_std_error(&jerr.pub); /* default error handler */
@@ -227,7 +227,7 @@ Int write_jpeg6b(Int narg, Int ps[], Int isFunc)
     /* an appropriate message was displayed by the error handler */
     jpeg_destroy_compress(&cinfo);
     fclose(outfile);
-    return ANA_ERROR;
+    return LUX_ERROR;
   }
   
   jpeg_create_compress(&cinfo);	/* compression structure */
@@ -279,16 +279,16 @@ Int write_jpeg6b(Int narg, Int ps[], Int isFunc)
   jpeg_destroy_compress(&cinfo);
   fclose(outfile);
 
-  return ANA_OK;
+  return LUX_OK;
 }
 /*--------------------------------------------------------------------------*/
-Int ana_write_jpeg6b(Int narg, Int ps[])
+Int lux_write_jpeg6b(Int narg, Int ps[])
 {
   return write_jpeg6b(narg, ps, 0);
 }
 /*--------------------------------------------------------------------------*/
-Int ana_write_jpeg6b_f(Int narg, Int ps[])
+Int lux_write_jpeg6b_f(Int narg, Int ps[])
 {
-  return (write_jpeg6b(narg, ps, 1) == ANA_OK)? ANA_ONE: ANA_ZERO;
+  return (write_jpeg6b(narg, ps, 1) == LUX_OK)? LUX_ONE: LUX_ZERO;
 }
 /*--------------------------------------------------------------------------*/

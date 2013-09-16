@@ -899,7 +899,7 @@ Int saveHistory(void)
 
   fp = Fopen(expand_name("~/.lux-history", NULL), "w");
   if (!fp)
-    return anaerror("Cannot open file ~/.lux-history to save input line history",
+    return luxerror("Cannot open file ~/.lux-history to save input line history",
 		 0);
   fwrite(&historyIndex, sizeof(Int), 1, fp);
   for (i = 0; i < HISTORYSIZE; i++)

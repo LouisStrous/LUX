@@ -45,7 +45,7 @@ Float	st, ct, x, y, nct, nst, angle, callig_ratio = 1.0;
 Float	float_arg(Int);
 Int	calligCoordSys, current_font = 1;
 /*------------------------------------------------------------------------- */
-Int ana_callig(Int narg, Int ps[])
+Int lux_callig(Int narg, Int ps[])
 /* draws Hershy character sets */
 {
   Int	iq;
@@ -57,7 +57,7 @@ Int ana_callig(Int narg, Int ps[])
   penDown = 1;
 					/* first arg must be a string */
   iq = ps[0];
-  if (symbol_class(iq) != ANA_STRING)
+  if (symbol_class(iq) != LUX_STRING)
     return cerror(NEED_STR, *ps);
   s = string_value(iq);
 					/* the rest are scalars */
@@ -74,7 +74,7 @@ Int ana_callig(Int narg, Int ps[])
   if (narg > 6 && ps[6])
     penDown = int_arg(ps[6]);
   calligCoordSys = (internalMode & 7);
-  tkCoordSys = ANA_DVI;
+  tkCoordSys = LUX_DVI;
   /*  set_cur_pen(); */   /*interferes with plot colors */
   iq = callig2(s);
   return iq;
@@ -329,28 +329,28 @@ void drawlatex(char **text)
 }
 /*------------------------------------------------------------------------- */
 Int callig2(char *s)
-/* called by either ana_callig or callig, finishes the job */
+/* called by either lux_callig or callig, finishes the job */
 {
   Int	ic;
   Float	angle, xq;
   Int	coordTrf(Float *, Float *, Int, Int), fontchange(Int), hcom(char **),
     draw(Int), empty(void);
 					/* setup context */
-  coordTrf(&callig_xb, &callig_yb, calligCoordSys, ANA_DVI);
+  coordTrf(&callig_xb, &callig_yb, calligCoordSys, LUX_DVI);
   angle = theta*0.017453293;
   xq= size/1024.;
   nct = ct = cos(angle)*xq;
   nst = st = sin(angle)*xq;
 					/* setup font */
   if (fontchange(ifont) < 0)
-    return ANA_ERROR;	/* propagate errors */
+    return LUX_ERROR;	/* propagate errors */
   dx = dy = 0; 
   while ((ic = *s++) != 0) {		/* decode string */
 	/* either a command or a char. to draw */
     switch (ic) {
       case '$':
 	if (hcom( &s) != 1)
-	  return ANA_ERROR;
+	  return LUX_ERROR;
 	break;
       case '`': case '^': case '_': case '{': case '}':
 	s--;
@@ -358,7 +358,7 @@ Int callig2(char *s)
 	break;
       default:
 	if (draw(ic) != 1)
-	  return ANA_ERROR;
+	  return LUX_ERROR;
 	break;
     }
   }
@@ -554,14 +554,14 @@ Int fontchange(Int font)
   if ((fin = fopen(name,"r")) == NULL) {
     printf("font file %s not found, default to font 3\n",name);
     if (font == 3)
-      return anaerror("can't find font003 file\n", 0);
+      return luxerror("can't find font003 file\n", 0);
     return fontchange(3);
   }
 					/* read in file */
   fscanf(fin, "%d", &n);
   n = n/2;
   if ((p = (Byte *) malloc(n)) == NULL)
-    return ANA_ERROR;
+    return LUX_ERROR;
   fontptr[font] = p;
   while (n--) {
     fscanf(fin, "%2x", &iq);

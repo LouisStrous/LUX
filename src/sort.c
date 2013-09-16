@@ -27,7 +27,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
-#include "anadefs.h"
+#include "luxdefs.h"
 /*------------------------------------------------------------------------- */
 #define ALN2I 1.442695022
 #define TINY 1.0e-5

@@ -27,6 +27,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <math.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <limits.h>
 #include "action.h"
 
 #define	VSPACE	14.0
@@ -538,7 +539,7 @@ Int fontchange(Int font)
 {
   Int	n, iq;
   Byte	*p;
-  char	name[300];
+  char	name1[PATH_MAX], *name2;
   FILE	*fin;
   
   font = MAX(font, 3);
@@ -550,11 +551,25 @@ Int fontchange(Int font)
     return 1;
   }
   /* new font, get font file name */
-  sprintf(name, expand_name("$ANADIR/fonts/font%03d.hex0", NULL), font);
-  if ((fin = fopen(name,"r")) == NULL) {
-    printf("font file %s not found, default to font 3\n",name);
+  {
+    char *locations[] = {
+      "$LUXFONTSDIR",
+      "/usr/local/share/lux",
+      "/usr/share/lux",
+    };
+    int i;
+    fin = NULL;
+    for (i = 0; i < sizeof(locations)/sizeof(locations[0]); ++i) {
+      sprintf(name1, "%s/font%03d.hex0", locations[i], font);
+      name2 = expand_name(name1, NULL);
+      if (fin = fopen(name2, "r"))
+        break;
+    }
+  }
+  if (!fin) {
     if (font == 3)
       return luxerror("can't find font003 file\n", 0);
+    printf("font file %s not found, default to font 3\n", name2);
     return fontchange(3);
   }
 					/* read in file */

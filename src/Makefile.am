@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 
+SUBDIRS = fonts
+
 AM_CPPFLAGS = -I$(top_srcdir)/sofa/src
 
 noinst_LIBRARIES = liblux.a

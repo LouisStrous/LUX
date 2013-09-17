@@ -36,6 +36,7 @@ AC_CONFIG_FILES([Makefile
                  sofa/Makefile
                  sofa/src/Makefile
                  src/Makefile
+                 src/fonts/Makefile
                  doc/Makefile
                  test/Makefile])
 AC_OUTPUT

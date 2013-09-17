@@ -199,9 +199,6 @@ char *expand_name(char *name, char *extension)
    { if (strlen(expname) + strlen(extension) >= BUFSIZE) error = 1;
      else strcat(expname, extension); }
  }
- if (error == 1) printf("expanded file name is too long: %s\n", expname);
- else if (error == 2) 
-   printf("no translation for environment string %s\n", expname);
  return expname;
 }
 /*------------------------------------------------------------------------- */

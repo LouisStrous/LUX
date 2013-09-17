@@ -679,364 +679,59 @@ Int lux_find2(Int narg, Int ps[])
 /*------------------------------------------------------------------------- */
 #include <errno.h>
 Int lux_help(Int narg, Int ps[])
-/* HELP,'topic' */
 {
-  char	*topic, *topic2, line[256], *next, table, menu = 0, nl = 0,
-	example = 0, *menuitems, *menuitems0, *p, temp[10], c2, *p2, **q;
-  char	*matches[10];
-  Int	n, item, menucount = 0, menucount0 = 0, isItem = 0, i,
-	getNewLine(char *, char *, char);
-  FILE	*fp;
-  void	setPager(Int), resetPager(void);
-  extern Int	column;
-  
-  q = matches;
-  topic = narg? string_arg(*ps): "Top";
-  if (!topic)
-    return LUX_ERROR;
-  fp = fopen(expand_name("$ANADIR/../doc/lux.texi", ""), "r");
-  if (!fp) {
-    printf("File access error: %s\n", strerror(errno));
-    return luxerror("Cannot open file %s for reading.", 0, expname);
-  }
-  menuitems = menuitems0 = curScrat + 1000;
-  *menuitems0 = '\0';
-  while (1) {
-    n = strlen(topic);
-    allocate(topic2, n + 1, char);
+  char *topic = narg? string_arg(*ps): "Top";
+  char cmd[300];
+  char topic2[300];
+  if (strlen(topic) > 270)
+    return luxerror("Help topic is too long: '%s'", 0, topic);
+  sprintf(cmd, "info --file lux --node=\"%s\" 2>/dev/null", topic);
+  int result = system(cmd);
+  if (result) {
+    /* could not find the topic; try uppercase instead */
     strcpy(topic2, topic);
-    topic = topic2;
-    while (*topic) {
-      *topic = toupper(*topic);
-      topic++;
+    char *p = topic2;
+    while (*p) {
+      *p = toupper(*p);
+      ++p;
     }
-    while (fgets(line, 256, fp) != NULL) { /* read next line */
-      if (strncmp(line, "@node ", 6)) /* must start with @node */
-	continue;
-      topic = line + 6;
-      while (isspace((Byte) *topic))	/* skip whitespace, if any */
-	topic++;
-      next = topic;
-      while (*next && *next != ',')
-	next++;
-      *next = '\0';
-      if (!strcasecmp_p(topic, topic2)) /* topic must match */
-	break;
-      if (strcasestr(topic, topic2)) { /* have a partial match */
-	if (q < matches + 9)
-	  *q++ = strsave(topic);
-      }
+    if (strcmp(topic, topic2)) { /* topic wasn't uppercase already */
+      sprintf(cmd, "info --file lux --node=\"%s\" 2>/dev/null", topic2);
+      result = system(cmd);
     }
-    if (feof(fp)) {			/* no info in lux.texi */
-      fp = openPathFile(topic2, FIND_SUBR | FIND_LOWER); /* seek user-defined subroutine */
-      if (!fp)
-	fp = openPathFile(topic2, FIND_FUNC | FIND_LOWER); /* seek user-defined function */
-      if (!fp) {
-	printwf("No information on topic %s.\n", topic2);
-	if (q > matches) {
-	  printwf("Some partial matches:\n");
-	  n = q - matches;
-	  for (i = 0; i < n; i++) {
-	    printwf(" %s\n", matches[i]);
-	    free(matches[i]);
-	  }
-	}
-      } else {			/* found user-defined routine */
-	setPager(0);
-	topic = fgets(line, 256, fp);
-	printw(topic);
-	while (fgets(topic, 256, fp) && *topic == ';')
-	  printw(topic + 1);
-	resetPager();
-	fclose(fp);
-      }
-      free(topic2);
-      return LUX_ONE;
+  }
+  if (result) {
+    /* could not find the topic; try an index search */
+    sprintf(cmd, "info --file lux --index-search=\"%s\" 2>/dev/null", topic);
+    result = system(cmd);
+  }
+  if (result && strcmp(topic, topic2)) {
+    /* try uppercase */
+    sprintf(cmd, "info --file lux --index-search=\"%s\" 2>/dev/null", topic2);
+    result = system(cmd);
+  }
+  if (result) {
+    /* could not find the topic in the manual; look for a user-defined
+       subroutine or function */
+    FILE *fp = openPathFile(topic, FIND_SUBR | FIND_LOWER); /* seek user-defined subroutine */
+    if (!fp)
+      fp = openPathFile(topic, FIND_FUNC | FIND_LOWER); /* seek user-defined function */
+    if (!fp) {
+      printwf("No information on topic '%s'.\n"
+              "Try HELP without a topic, then search for the topic\n"
+              " using Ctrl-S %s.\n", topic, topic);
+    } else {
+      setPager(0);
+      topic = fgets(line, 256, fp);
+      printw(topic);
+      while (fgets(topic, 256, fp) && *topic == ';')
+        printw(topic + 1);
+      resetPager();
+      fclose(fp);
+      result = 0;
     }
-    free(topic2);
-				/* found proper node */
-    strcpy(menuitems, topic);	/* add node name to "history" list */
-    strcat(menuitems, ":");
-    topic = menuitems;
-    menuitems += strlen(menuitems);
-    if (++menucount0 == 11) {	/* reached history limit */
-      topic2 = strchr(menuitems0, ':');
-      memmove(menuitems0, topic2 + 1, strlen(topic2));
-      menuitems += (menuitems0 - topic2) - 1;
-      topic += (menuitems0 - topic2) - 1;
-      menucount0--; }
-    setPager(0);
-    printwf("-------------------------------------------\n");
-    topic = line + strlen(line) + 1; /* "next" node */
-    topic2 = strchr(topic, ','); /* end of node name */
-    *topic2 = '\0';
-    p = menuitems;
-    p2 = topic;			/* beginning of "next" node name */
-    while (isspace((Byte) *p2))
-      p2++;
-    if (*p2) {			/* we really have a node name here */
-      printwf("Next: [%1d:] %s; ", ++menucount, p2);
-      strcpy(p, p2);
-      p += strlen(p2);
-      *p++ = ':';
-      *p = '\0';
-    }
-    topic = topic2 + 1;		/* beginning of "previous" node */
-    topic2 = strchr(topic, ',');
-    *topic2 = '\0';
-    p2 = topic;
-    while (isspace((Byte) *p2))
-      p2++;
-    if (*p2 && *p2 != '(') {
-      printwf("Prev: [%1d:] %s; ", ++menucount, p2);
-      strcpy(p, p2);
-      p += strlen(p2);
-      *p++ = ':';
-      *p = '\0';
-    }
-    topic = topic2 + 1;		/* beginning of "up" node */
-    topic2 = strchr(topic, '\n');
-    *topic2 = '\0';
-    p2 = topic;
-    while (isspace((Byte) *p2))
-      p2++;
-    if (*p2 && *p2 != '(') {
-      printwf("Up: [%1d:] %s;", ++menucount, p2);
-      strcpy(p, p2);
-      p += strlen(p2);
-      *p++ = ':';
-      *p = '\0';
-    }
-    printw("\n");
-    while (fgets(line, NSCRAT, fp) != NULL)
-    { if (!strncmp(line, "@node ", 6))
-	break;
-      topic = next = line;
-      if ((next = strchr(next, '\n')))
-	*next = ' ';
-      next = topic;
-      while (isspace((Byte) *next))
-	next++;
-      if (!*next)		/* end of line: whitespace only */
-	*topic = '\0';
-      if (*topic == '*' && menu) /* menu item */
-      { printwf("[%1d:] %s", ++menucount, line);
-	column = 0;		/* or we get an empy line in between */
-	nl = 0;
-	strcpy(p, line + 2);	/* copy to menu item bank */
-	p = strchr(p, ':');	/* ASSUMES : FOLLOWS EACH MENU ITEM! */
-	*++p = '\0';		/* temporary(?) string end just after : */
-	*line = 0; }
-      while (*topic)
-      { switch (*topic)
-	{ default:
-	    break;
-	  case '@':
-	    if (topic[1] && !isalnum((Byte) topic[1])) { /* escape sequence */
-	      next = topic + 1;
-	      if (*next == '@')	{ /* @@ -> @ */
-		memmove(topic, next, strlen(next) + 1);
-		topic = next++;
-		break;
-	      } else {		/* @x -> x */
-		memmove(topic, next, strlen(next) + 1);
-		topic = next;
-		break;
-	      }
-	    } else
-	      next = strpbrk(topic, " \n\t{");
-	    if (!next)
-	      next = topic + strlen(topic);
-	    else
-	      *next++ = '\0';
-	    if (!strcmp(topic, "@c")
-		|| !strcmp(topic, "@comment")
-		|| !strcmp(topic, "@cindex"))
-	    { *topic-- = 0;		/* treat as a comment: skip */
-	      break; }
-	    if (!strcmp(topic, "@minus"))
-	    { *topic = '-';
-	      memmove(topic + 1, next, strlen(next) + 1);
-	      next = topic + 1;
-	      break; }
-	    if (!strcmp(topic, "@var"))
-	    { *topic++ = '<';
-	      memmove(topic, next, strlen(next) + 1);
-	      next = strchr(topic, '}');
-	      if (!next)
-	      { next = topic + strlen(topic);
-		strcpy(next, ">"); }
-	      else
-		*next = '>';
-	      topic = next;
-	      break; }
-	    if (!strcmp(topic, "@ref")
-		|| !strcmp(topic, "@pxref")
-		|| !strcmp(topic, "@xref")) /* a reference */
-	    { sprintf(temp, "[%1d:] ", ++menucount);
-	      topic2 = strchr(next, '}');
-	      if (!topic2)
-		topic2 = next + strlen(next);
-	      c2 = *topic2;
-	      *topic2 = '\0';
-	      strcat(p, next);
-	      strcat(p, ":");	/* ensure a : follows */
-	      p += strlen(p);
-	      *topic2 = c2;
-	      memmove(next + (strlen(temp) - strlen(topic - 1)), next,
-		      strlen(next) + 1);
-	      next += strlen(temp) - strlen(topic);
-	      memmove(topic, temp, strlen(temp));
-	      topic += strlen(temp) - 1;
-	      break; }
-	    if (!strcmp(topic, "@item")) /* some sort of table */
-	    { if (column)
-		printw("\n");	/* go to fresh line */
-	      switch (table) {
-		case 1:		/* ordinary table */
-		  memcpy(topic, next, strlen(next) + 1);
-		  topic--;
-		  isItem = 1;
-		  break;
-		case 2:		/* enumerate */
-		  printwf("%2d --- ", item++);
-		  memcpy(topic, next, strlen(next) + 1);
-		  topic--;
-		  break;
-		case 3:		/* itemize */
-		  printw("--- ");
-		  topic = next + strlen(next) - 1; /* end-of-line */
-		  strcpy(line, " ");
-		  break; }
-	      break; }
-	    if (!strcmp(topic, "@menu"))
-	    { menu = 1;
-	      if (column)
-		printw("\n");
-	      printw("Subtopics:\n");
-	      *topic-- = 0;
-	      nl = 0;
-	      break; }
-	    if (!strcmp(topic, "@example"))
-	    { example = 3;
-	      *topic-- = 0;
-	      break; }
-	    if (!strcmp(topic, "@end"))
-	    { if (example)
-		example = 1;
-	    else 
-	      menu = 0;
-	      *topic-- = 0;
-	      break; }
-	    if (!strcmp(topic, "@table"))
-	    { table = 1;	/* an ordinary table */
-	      *topic-- = 0;
-	      break; }
-	    if (!strcmp(topic, "@need")) {
-	      *topic-- = 0;
-	      break;
-	    }
-	    if (!strcmp(topic, "@enumerate"))
-	    { table = 2;	/* enumeration */
-	      while (*next && isspace((Byte) *next))
-		next++;
-	      item = *next? atol(next): 1;  /* note: may be a letter, too! */
-	      *topic-- = 0;
-	      break; }
-	    if (!strcmp(topic, "@itemize"))
-	    { table = 3;	/* itemization */
-	      *topic-- = 0;
-	      break; }
-	    if (!strcmp(topic, "@bye")) {
-	      /* make topic point just before NULL to indicate end of help */
-	      topic += strlen(topic) - 1;
-	      fseek(fp, 0, SEEK_END); /* to end of file */
-	      break;
-	    }
-	    memmove(topic, next, strlen(next) + 1); /* skip */
-	    topic--;
-	    break;
-	  case '{': case '}':
-	    memmove(topic, topic + 1, strlen(topic)); /* skip */
-	    topic--;
-	    break;
-	  }
-	topic++;
-      }
-      if (isItem) {
-	strcpy(topic, " --- ");
-	isItem = 0;
-      }
-      if (example)
-      { switch (example)
-	{ case 2:
-	    printw(line);
-	    break;
-	  case 3:
-	    example = 2;
-	    break;
-	  case 1:
-	    example = 0;
-	    break; }
-	printw("\n");
-	nl++; }
-      else if (*line)
-      { printw(line);
-	nl = 0; }
-      else
-      { if (column)
-	  printw("\n");
-	if (!nl)
-	{ printw("\n");
-	  nl++; }
-      }
-    }
-    printwf("Enter topic ");
-    if (menucount)
-      printwf("number or ");
-    printwf("name (RETURN for exit, 0 for back):\n");
-    getNewLine(line, "tpc:", (char) 0);
-    topic2 = line;
-    while (*topic2 && isspace((Byte) *topic2))
-      topic2++;
-    if (isdigit((Byte) *topic2)) {
-      item = atol(line);
-      if (item > 0 && item <= menucount) /* item selected */
-      { example = menu = nl = 0;
-	topic = menuitems;
-	while (--item)		/* seek proper item */
-	  topic = strchr(topic, ':') + 1;
-	p = strchr(topic, ':');
-	*p = '\0'; }		/* break off after desired topic */
-      else if (!item)	{	/* go back to previous */
-	if (topic2 > menuitems0)
-	  topic2 = menuitems - 2;
-	while (topic2 > menuitems0 && *topic2 != ':')
-	  topic2--;
-	if (*topic2 == ':') { /* a previous one exists */
-	  *topic2 = '\0';
-	  while (topic2 > menuitems0 && *topic2 != ':')
-	    topic2--;
-	  if (*topic2 == ':')
-	    topic2++;
-	  menuitems = topic2;
-	  topic = menuitems;
-	} else {
-	  strcpy(menuitems0, "Top");
-	  topic = menuitems = menuitems0;
-	}
-      }
-      else
-	break;
-    }
-    else if (*topic2)
-      topic = topic2;
-    else
-      break;
-    menucount = 0;
-    rewind(fp); }
-  resetPager();
-  return LUX_ONE;
+  }
+  return result? LUX_ERROR: LUX_OK;
 }
 /*------------------------------------------------------------------------- */
 void endian(void *pp, Int n, Int type)

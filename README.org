@@ -1,43 +1,51 @@
-* ANA
+* LUX
 
-* SOFA
+  LUX is a program for (numerical) data processing.
 
-  The current project makes use of the "Standards of Fundamental
-  Astronomy (SOFA)" Library for ANSI C, obtained from
-  http://www.iausofa.org/index.html.
+* Third Party Software used in LUX
 
-  That library comes complete with its own "makefile", which is not
-  suitable for including in an autoconfiscated project such as the
-  current one.  The SOFA sources were adapted as follows for inclusion
-  into the current project:
+  LUX includes the third party software packages mentioned below.
 
-  1. Change into the "sofa" subdirectory of the current project's main
-     directory:
+** FFTPACK
 
-     cd sofa
+** SOFA
 
-  2. Extract the sofa sources from the tarball:
+   LUX includes the "Standards of Fundamental Astronomy (SOFA)"
+   Library for ANSI C, obtained from
+   http://www.iausofa.org/index.html.
 
-     tar xzf Location_of_Tarball/sofa_c-20120301_a.tar.gz
+   That library comes complete with its own "makefile", which is not
+   suitable for including in an autoconfiscated project such as the
+   current one.  The SOFA sources were adapted as follows for inclusion
+   into the current project:
 
-     This yields a subdirectory "sofa" in the current directory, which
-     is itself also called "sofa" (i.e., the new subdirectory is
-     "sofa/sofa" relative to the project's main directory).
+   1. Change into the "sofa" subdirectory of the current project's main
+      directory:
 
-  3. Locate the "c" subdirectory in the extracted sources (it is
-     several directory levels down) and copy its contents into the
-     current directory:
+      cd sofa
 
-     cp -r sofa/20120301_a/c/* .
+   2. Extract the sofa sources from the tarball:
 
-  4. Remove the extracted directory, as it is not needed anymore:
+      tar xzf Location_of_Tarball/sofa_c-20120301_a.tar.gz
 
-     rm -rf sofa
+      This yields a subdirectory "sofa" in the current directory, which
+      is itself also called "sofa" (i.e., the new subdirectory is
+      "sofa/sofa" relative to the project's main directory).
 
-  5. Rename SOFA's original "makefile" so it is not run and causes no
-     trouble:
+   3. Locate the "c" subdirectory in the extracted sources (it is
+      several directory levels down) and copy its contents into the
+      current directory:
 
-     mv src/makefile src/original-makefile
+      cp -r sofa/20120301_a/c/* .
 
-  6. Create our own "src/Makefile.am" that builds "libsofa_c.a" from
-     the SOFA *.c and *.h files in the "src" subdirectory.
+   4. Remove the extracted directory, as it is not needed anymore:
+
+      rm -rf sofa
+
+   5. Rename SOFA's original "makefile" so it is not run and causes no
+      trouble:
+
+      mv src/makefile src/original-makefile
+
+   6. Create our own "src/Makefile.am" that builds "libsofa_c.a" from
+      the SOFA *.c and *.h files in the "src" subdirectory.

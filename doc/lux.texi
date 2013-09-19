@@ -69,17 +69,10 @@ Starting and Stopping LUX.
 
 Input/Output
 
-* Terminal Type::               How LUX figures what kind of terminal you use
 * Command Input::               Typing commands at the keyboard
 * Data I/O Routines::           Getting data in or out of LUX
 * Formatted Input/Output::      I/O according to specific formats
 * Escape Codes::                How to specify non-printable characters
-
-Terminal Type
-
-* Terminfo::                    How to use the terminfo database
-* Termcap::                     How to use the termcap database
-* Dummyterm::                   How to use the dummyterm method
 
 Command Line Input
 
@@ -1235,7 +1228,6 @@ Internal Functions and Subroutines
 * TENSE::                       Interpolate using splines under tension
 * TENSE_CURVE::                 Interpolate using splines under tension
 * TENSE_LOOP::                  Interpolate using splines under tension
-* TERMINAL::                    Specify terminal capabilities
 * THREECOLORS::                 Install the "three-colors" color table
 * TOLOOKUP::                    Condense using a lookup table
 * TOTAL::                       Return the total of parts of an array
@@ -1876,7 +1868,6 @@ LUX accepts input from the keyboard, disk files, and tape files, and
 provides output to the screen, disk files, and tape files.
 
 @menu
-* Terminal Type::               How LUX figures what kind of terminal you use
 * Command Input::               Typing commands at the keyboard
 * Data I/O Routines::           Getting data in or out of LUX
 * Formatted Input/Output::      I/O according to specific formats
@@ -1884,238 +1875,7 @@ provides output to the screen, disk files, and tape files.
 @end menu
 
 @c ------------------------------------------------------------------
-@node Terminal Type, Command Input, Input/Output, Input/Output
-@comment  node-name,  next,  previous,  up
-@section Terminal Type
-
-@cindex Terminal type
-
-There are a great many terminal models with a great variety in what they
-communicate to applications such as LUX when the user presses a
-particular key, and in what byte or sequence of bytes must be sent to
-the terminal to achieve a desired result (such as moving the cursor one
-position to the right).  The standard set of letters, digits,
-punctuation symbols, and basic control characters is treated the same by
-all terminals, but most special keys that deal with movement of the
-cursor, such as the arrow keys (up arrow, down arrow, left arrow, right
-arrow), and also special-function keys such as the backspace, delete,
-and insert keys generate input to applications that varies greatly from
-terminal model to model.
-
-For example, on a vt100 terminal, pressing the right arrow key generates
-three bytes of input, with values 27 ("escape"), 79 ("O"), and 66 ("B"),
-in that order.  For brevity, we may write this sequence as "\EOB" where
-the \E stands for the value 27.  On a Hewlett-Packard model 2622 the
-right arrow key yields "\EC", and on a Perkin Elmer 7000 series it
-generates "\E!W".  If we assume that only "\EOB" stands for "right arrow
-key", then we'll not recognize the right-arrow keys on the HP 2622 or PE
-7000.  Also, there is no guarantee that, on some other model, the
-sequence "\EOB" might not stand for a key other than the right-arrow
-key.  We need a way to determine which model terminal the user is
-working on, and what key sequences are associated with keys of interest
-to us.
-
-These considerations are only important for the following special keys
-that LUX tries to recognize: backspace, delete, the arrow keys, and the
-insert key.  All other keys that LUX recognizes should work on any
-terminal.  The functions of the delete and arrow keys are also available
-in LUX through specific control commands that should work on any
-terminal, so even if your terminal is not recognized by LUX you should
-have almost all of its capabilities available to you.
-
-There are several ways in which you can inform LUX of the proper values
-associated with these special keys.  You can have LUX read the
-@code{terminfo} or @code{termcap} databases, or you can specify your
-very own values or default to vt100-style behavior (the @code{dummyterm}
-style).  These are discussed in turn below.
-
-Under ideal circumstances, the @code{terminfo} method would suffice.
-However, the authors have found that the information extracted from the
-@code{terminfo} database does not accurately describe the behavior of
-some of the terminals they use, which are supposedly of very common
-types (@code{xterm, linux}).  For this reason, the other methods have
-been made available, too, and the @code{dummyterm} method is used by
-default (@ref{Configure}).
-
-[3.1.291]
-@c ------------------------------------------------------------------
-@menu
-* Terminfo::                    How to use the terminfo database
-* Termcap::                     How to use the termcap database
-* Dummyterm::                   How to use the dummyterm method
-@end menu
-
-@node Terminfo, Termcap, Terminal Type, Terminal Type
-@comment  node-name,  next,  previous,  up
-@subsection Terminfo
-
-@cindex terminfo
-
-The @code{terminfo} database contains descriptions of the capabilities
-of many terminal models, and your system probably has a copy of it.
-Programs such as LUX can access the database to determine the
-capabilities of any terminal that is included in the database.  The
-terminal type whose information is extracted is read from the
-@code{TERM} environment variable.
-
-There are several ways in which things can fail, so that some or all of
-the keys behave in unexpected ways:
-
-@enumerate
-@item
-@code{TERM} is not set.
-@item
-The @code{terminfo} database is not found.  LUX looks for the
-@code{terminfo} database at the location contained in the
-@code{TERMINFO} environment variable.  If that variable is not set, then
-LUX looks in @file{/usr/lib/terminfo}.
-@item
-The terminal indicated by your @code{TERM} is not contained in the
-@code{terminfo} database.
-@item
-The database entry for the terminal model indicated by @code{TERM} is
-not suitable for your terminal, either because @code{TERM} has the wrong
-value, or because the associated database entry is wrong.  In this case,
-you may get unexpected results when you press particular keys.  You then
-have two options: (1) finding out what the correct value for @code{TERM}
-is for your terminal and setting @code{TERM} to that value, or (2)
-writing a database entry suitable for your terminal, adding that to the
-database, and setting @code{TERM} so it refers to that new entry.
-Neither of these options may be easy.  Talk to your system manager.
-@end enumerate
-
-If the desired entry cannot be found, then the @code{dummyterm} method
-is used instead (@ref{Dummyterm}).
-
-[3.1.291]
-@c ------------------------------------------------------------------
-@node Termcap, Dummyterm, Terminfo, Terminal Type
-@comment  node-name,  next,  previous,  up
-@subsection Termcap
-
-@cindex termcap
-
-The @code{termcap} database contains descriptions of the capabilities of
-many terminal models, and your system probably has a copy of it.
-Programs such as LUX can access the database to determine the
-capabilities of any terminal that is included in the database.  The
-terminal type whose information is extracted is read from the
-@code{TERM} environment variable.
-
-The @code{termcap} database is a predecessor of @code{terminfo} and if
-both are available then @code{terminfo} should be preferred
-(@ref{Terminfo}).
-
-The include files and object code libraries required for compilation of
-the routines that access the @code{termcap} database vary from system to
-system.  If they are not where LUX expects them to be, then you will not
-be able to compile termcap support into LUX.
-
-There are several ways in which things can fail, so that some or all of
-the keys behave in unexpected ways:
-@enumerate
-@item
-@code{TERM} is not set.
-@item
-The @code{termcap} database is not found.  LUX looks for the
-@code{termcap} database in a standard place, usually
-@file{/usr/share/lib/termcap}.
-@item
-The terminal indicated by your @code{TERM} is not contained in the
-@code{termcap} database.
-@item
-The database entry for the terminal model indicated by @code{TERM} is
-not suitable for your terminal, either because @code{TERM} has the wrong
-value, or because the associated database entry is wrong.  In this case,
-you may get unexpected results when you press particular keys.  You then
-have two options: (1) finding out what the correct value for @code{TERM}
-is for your terminal and setting @code{TERM} to that value, or (2)
-writing a database entry suitable for your terminal, adding that to the
-database, and setting @code{TERM} so it refers to that new entry.
-Neither of these options may be easy.  Talk to your system manager.
-@end enumerate
-If the desired entry cannot be located, then the @code{dummyterm} method
-is used instead (@ref{Dummyterm}).
-
-[3.1.291]
-@c ------------------------------------------------------------------
-@node Dummyterm,  , Termcap, Terminal Type
-@comment  node-name,  next,  previous,  up
-@subsection Dummyterm
-
-@cindex dummyterm
-
-LUX's @code{dummyterm} style assumes by default that your terminal is a
-vt100-style terminal, which is a very common type.  There are two
-sub-flavors, which differ in their treatment of the backspace and delete
-keys.  If the @code{TERM} environment variable is equal to @code{linux},
-then the PC-style treatment of the backspace and delete keys is used,
-and otherwise the workstation-style treatment.
-
-You can override one or more of the defaults by supplying appropriate
-definitions in a terminal file.  The default terminal file is
-@file{$LUXDIR/terminal}.  If that file exists, then LUX tries to read
-descriptions of special keys from it.  One key description is read from
-each line in the file.  The descriptions consist of a name that
-identifies the key, an equal sign (@code{=}), and the value to associate
-with the key.  All characters, including whitespace, are significant.
-The recognized key names and their meaning are listed below.  Those that
-start with @code{c_} are associated with byte sequences that yield some
-desired action, and those that start with @code{k_} are associated with
-byte sequences that are generated when the corresponding keys are
-pressed.
-
-@table @code
-@item k_backspace
-The byte sequence returned when the backspace key is pressed.
-@item k_delete
-The byte sequence returned when the delete key is pressed.
-@item k_right
-The byte sequence returned when the right arrow key is pressed.
-@item k_left
-The byte sequence returned when the left arrow key is pressed.
-@item k_up
-The byte sequence returned when the up arrow key is pressed.
-@item k_down
-The byte sequence returned when the down arrow key is pressed.
-@item k_insert
-The byte sequence returned when the insert key is pressed.
-@item c_right
-The byte sequence that makes the cursor move one position to the right.
-@item c_left
-The byte sequence that makes the cursor move one position to the left.
-@item c_up
-The byte sequence that makes the cursor move one position up.
-@item c_down
-The byte sequence that makes the cursor move one position down.
-@item c_save
-The byte sequence that saves the current cursor position.
-@item c_restore
-The byte sequence that restores the cursor to the last saved position.
-@item cl_eos
-The byte sequence that clears the screen from the current cursor
-position until the end of the screen.
-@end table
-
-If any other name is encountered, then the current line is silently
-ignored.  You do not need to specify a value for every one of these
-names; those you leave unspecified will receive their default vt100
-values.  If you specify a name more than once, then the last definition
-is the one that will be used.  In specifying the values associated with
-the names, you can use the standard escape codes (@ref{Escape Codes}).
-
-For example, if your terminal generates the byte codes 27, 91 (=
-@code{[}), 67 (= @code{C}) when the right arrow key is pressed, then you
-could enter one of the following lines into @file{$LUXDIR/terminal} to
-explicitly specify this:
-@example
-k_right=\33\133\103
-k_right=\33[C
-@end example
-
-[3.1.291]
-@c ------------------------------------------------------------------
-@node Command Input, Data I/O Routines, Terminal Type, Input/Output
+@node Command Input, Data I/O Routines, Input/Output, Input/Output
 @comment  node-name,  next,  previous,  up
 @section Command Line Input
 

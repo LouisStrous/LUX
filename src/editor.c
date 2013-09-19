@@ -105,7 +105,7 @@ static Int	code[] = { BKS, DEL, RAR, LAR, UAR, DAR, INS };
 static char	streamBuffer[10];
 static Int	streamBufferDepth = 0, streamBufferIndex = 0;
 #define isSpecialChar(c)	((c < 0 || c >= 256)? 0: isSpecial[c])
-Int getStreamChar(void)
+int getStreamChar(void)
 /* gets the next input char from inputStream; translates control sequences */
 /* ASSUMES THAT ALL MULTI-BYTE KEY RETURNS (eg. for arrow keys) START */
 /* WITH ESC */
@@ -115,91 +115,66 @@ Int getStreamChar(void)
      ESC chars		check for arrow keys, backspace, delete, insert
      C-X char		char + 0x400 */
 {
- Int	c, n, n2, i, os, c3;
- char	*q;
+  static char buf[10];
+  static int buf_used = 0;
 
- if (streamBufferIndex == streamBufferDepth) {
-   if (!inputStream)
-     return EOF;
-   streamBuffer[streamBufferDepth++] = c = c3 = getc(inputStream);
- } else
-   c = c3 = streamBuffer[streamBufferIndex];
+  if (!inputStream)
+    return EOF;
+  int c;
+  if (buf_used) { /* we still have characters in the buffer */
+    c = buf[0];
+  } else {
+    c = getc(inputStream);
+    if (buf_used == sizeof(buf)) { /* no room for more */
+      return c;
+    }
+    buf[buf_used] = c;
+    ++buf_used;
+  }
+  if (isSpecialChar(c)) {
+    int i;
+    for (i = 0; i < sizeof(special)/sizeof(special[0]); ++i) {
+      char *q = special[i];
+      if (!q)
+        continue;
+      size_t nq = strlen(q);
+      size_t n = (nq < buf_used? nq: buf_used);
+      int ok;
+      while ((ok = !strncmp(buf, q, n)) && n < nq) {
+        /* partial match; get another character */
+        if (buf_used == sizeof(buf)) /* no room for more */
+          break;
+        buf[buf_used] = getc(inputStream);
+        ++buf_used;
+        n = (nq < buf_used? nq: buf_used);
+      }
+      if (ok) {
+        /* found a match */
+        buf_used = 0;
+        return code[i];
+      }
+    }
+    /* the input did not match any of the special sequences. */
+  }
+  memmove(buf, buf + 1, buf_used - 1);
+  --buf_used;
 
- n = 1;
- if (isSpecialChar(c))		/* need to check agains keystroke sequences */
-   for (i = 0; i < 7; i++) {	/* seven of them */
-     q = special[i];		/* keystroke sequence */
-     if (!q)
-       continue;
-     n2 = strlen(q);
-     while (!strncmp(streamBuffer + streamBufferIndex, q, n) && n < n2) {
-				/* partial match but read text is still
-				   too short */
-       os = streamBufferIndex;
-       streamBufferIndex = streamBufferDepth;
-       c3 = getStreamChar();		/* get more characters */
-       streamBufferIndex = os;
-       n++;
-     }
-     if (!strncmp(streamBuffer + streamBufferIndex, q, n)) { /* exact match */
-       /* setPrompt(row? "->": thePrompt); */
-       if (!streamBufferIndex)
-	 streamBufferDepth = 0;
-       else {
-	 streamBuffer[streamBufferIndex] = code[i];
-	 streamBufferDepth -= n - 1;
-       }
-       return code[i];
-     }     
-   }
-
- /* no match with special keystroke sequences */
- switch (c) {
-   case '\030':			/* C-X */
-     /* setPrompt("C-X>"); */
-     streamBufferIndex++;
-     c = getStreamChar();	/* get one more char */
-     streamBufferIndex--;
-     c = (c < 256? toupper(c): c) | 0x400;
-     if (streamBufferDepth == 2)  /* last one */
-       streamBufferDepth = streamBufferIndex = 0;
-     else {
-       streamBufferDepth--;
-       streamBuffer[streamBufferIndex] = c;
-     }
-     /* setPrompt(row? "->": thePrompt); */
-     return c;
-   case ESC:			/* ESC */
-     /* setPrompt("ESC>"); */
-     if (n == 1) {		/* get next char */
-       streamBufferIndex++;
-       c = getStreamChar();
-     } else if (n > 2)
-       c = streamBuffer[streamBufferIndex + 1];
-     else
-       c = c3;
-     c = (c < 256? toupper(c): c) | 0x200;
-     if (streamBufferDepth == 2)
-       streamBufferDepth = streamBufferIndex = 0;
-     else if (!streamBufferIndex) { /* last one */
-       streamBufferDepth -= 2;
-       if (n - 2)
-	 memcpy(streamBuffer, streamBuffer + 2, n - 2);
-     } else {
-       streamBufferDepth--;
-       streamBuffer[streamBufferIndex] = c;
-       if (n - 2)
-	 memcpy(streamBuffer + streamBufferIndex + 1,
-		streamBuffer + streamBufferIndex + 2,
-		n - 2);
-     }
-     /* setPrompt(row? "->": thePrompt); */
-     return c;
-   default:
-     if (streamBufferDepth == 1)
-       streamBufferDepth = streamBufferIndex = 0;
-     return c;
-   }
+  /* no match with special keystroke sequences */
+  switch (c) {
+  case '\030':			/* C-X */
+    /* setPrompt("C-X>"); */
+    c = getStreamChar(); /* get one more char */
+    c = (c < 256? toupper(c): c) | 0x400;
+    /* setPrompt(row? "->": thePrompt); */
+    break;
+  case ESC:			/* ESC */
+    /* setPrompt("ESC>"); */
+    c = getStreamChar();
+    c = (c < 256? toupper(c): c) | 0x200;
+    /* setPrompt(row? "->": thePrompt); */
+    break;
+  }
+  return c;
 }
 /*----------------------------------------------------*/
 void putChar(Int ch)

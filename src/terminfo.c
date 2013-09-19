@@ -50,17 +50,25 @@ void getTermCaps(void)
   /* order: c_left, k_left, c_down, k_down, c_up, k_up, c_right, k_right, */
   /* cl_eos, k_backspace, k_delete, k_insert, c_save, c_restore */
   Int	terminfos[] = {
-    STR_CAP_cub1, STR_CAP_kcub1, STR_CAP_cud1, STR_CAP_kcud1,
-    STR_CAP_cuu1, STR_CAP_kcuu1, STR_CAP_cuf1, STR_CAP_kcuf1,
-    STR_CAP_ed, STR_CAP_kbs, STR_CAP_kdch1, STR_CAP_kich1,
-    STR_CAP_sc, STR_CAP_rc
+    STR_CAP_cub1,               /* move left one space */
+    STR_CAP_kcub1,              /* left-arrow key */
+    STR_CAP_cud1,               /* down one line */
+    STR_CAP_kcud1,              /* down-arrow key */
+    STR_CAP_cuu1,               /* up one line */
+    STR_CAP_kcuu1,              /* up-arrow key */
+    STR_CAP_cuf1,   /* non-destructive space (move right one space) */
+    STR_CAP_kcuf1,              /* right-arrow key */
+    STR_CAP_ed,                 /* clear to end of screen */
+    STR_CAP_kbs,                /* backspace key */
+    STR_CAP_kdch1,              /* delete-character key */
+    STR_CAP_kich1,              /* insert-character key */
+    STR_CAP_sc,                 /* save current cursor position */
+    STR_CAP_rc    /* restore cursor to position of last save_cursor */
   };
   char	**capabilities[] = {
     &c_left, &k_left, &c_down, &k_down, &c_up, &k_up, &c_right, &k_right,
     &cl_eos, &k_backspace, &k_delete, &k_insert, &c_save, &c_restore
   };
-  char	termcaps[] =
-    "le:kI:do:kd:up:ku:nd:kr:cd:kb:kD:kI:sc:rc";
   
   /* determine the terminal type */
   term = getenv("TERM");
@@ -138,108 +146,70 @@ void getTermCaps(void)
 	fclose(fp);
       }
     }
-  } else if ((fp = fopen("/etc/termcap", "r"))) {
-    /* didn't find terminfo file, but did find termcap file */
-    /* we assume that each entry in the termcap file starts with */
-    /* a line that has no tab at its beginning.  Items on such a */
-    /* first line are separated by | and the last one ends with a :. */
-    /* All items except the last one are terminal names with which */
-    /* TERM is to be compared. */
-    /* subsequent lines start with a tab and a colon : and have */
-    /* capabilities listed separated by colons :.  Backslashes at */
-    /* the end of a line are used as a continuation character */
-    /* it is assumed that no line exceeds 256 characters! */
-
-    found = 0;
-    while (!found) {
-      if (fgets(buf, 256, fp) == NULL) {
-	fclose(fp);
-	fp = NULL;
-	break;
-      }
-      switch (buf[0]) {
-	case '#': case '\t':	/* comment or continuation line; skip */
-	  continue;
-	default:		/* first line of entry */
-	  p = strtok(buf, "|");
-	  while (p) {
-	    n = strlen(p);
-	    if (p[n - 1] == '\\') /* continuation character */
-	      p[--n] = '\0';
-	    if (p[n - 1] == ':') /* this item is the verbose description;
-				    skip */
-	      p = NULL;
-	    else if (strcmp(p, term))
-	      p = strtok(NULL, "|");
-	    else {		/* we found it */
-	      found = 1;
-	      break;
-	    }
-	  }
-	  break;
-      }	/* end of switch (buf[0]) */
-    } /* end of while (!found) */
-
-    if (found)			/* found it */
-      while (1) {
-	if (fgets(buf, 256, fp) == NULL
-	    || buf[0] != '\t') {	/* no more lines in this entry */
-	  fclose(fp);
-	  fp = NULL;
-	  break;
-	}
-	p = strtok(buf + 1, ":");
-	while (p) {
-	  if (p[2] == '=') {	/* capability is not a boolean */
-	    p[2] = '\0';
-	    if ((q = strstr(termcaps, p))) { /* found one */
-	      i = (q - termcaps)/3;
-	      *capabilities[i] = strsave(p + 2);
-	    }
-	  } else if (strcmp(p, "bs"))
-	    *capabilities[9] = "\010"; /* standard backspace */
-	  p = strtok(NULL, ":");
-	}
-      }
-    
-  } /* end of if (fp) else */
-  
+  }
   if (!fp) {
     printf("WARNING - could not open terminfo file for terminal \"%s\"",
 	   term);
-    printf("and did not find appropriate entry in termcap file \"/etc/termcap\".\n");
     puts("(Check TERM and TERMINFO environment variables and file permissions.)");
     puts("Assuming vt100-like PC terminal.");
   } 
   
-  if (!c_left)
+  if (!c_left) {
+    printf("terminfo 'auto_left_margin' not set for %s; using default\n", term);
     c_left = "\033[D";
-  if (!k_left)
+  }
+  if (!k_left) {
+    printf("terminfo 'key_left' not set for %s; using default\n", term);
     k_left = "\033[D";
-  if (!c_down)
+  }
+  if (!c_down) {
+    printf("terminfo 'cursor_down' not set for %s; using default\n", term);
     c_down = "\033[B";
-  if (!k_down)
+  }
+  if (!k_down) {
+    printf("terminfo 'key_down' not set for %s; using default\n", term);
     k_down = "\033[B";
-  if (!c_up)
+  }
+  if (!c_up) {
+    printf("terminfo 'cursor_up' not set for %s; using default\n", term);
     c_up = "\033[A";
-  if (!k_up)
+  }
+  if (!k_up) {
+    printf("terminfo 'key_up' not set for %s; using default\n", term);
     k_up = "\033[A";
-  if (!c_right)
+  }
+  if (!c_right) {
+    printf("terminfo 'cursor_right' not set for %s; using default\n", term);
     c_right = "\033[C";
-  if (!k_right)
+  }
+  if (!k_right) {
+    printf("terminfo 'key_right' not set for %s; using default\n", term);
     k_right = "\033[C";
-  if (!cl_eos)
+  }
+  if (!cl_eos) {
+    printf("terminfo 'clr_eos' not set for %s; using default\n", term);
     cl_eos = "\033[J";
-  if (!k_backspace)
+  }
+  if (!k_backspace) {
+    printf("terminfo 'key_backspace' not set for %s; using default\n", term);
     k_backspace = "\177";
-  if (!k_delete)
+  }
+  if (!k_delete) {
+    printf("terminfo 'key_dc' not set for %s; using default\n", term);
     k_delete = "\033[3~";
-  if (!k_insert)
+  }
+  if (!k_insert) {
+    printf("terminfo 'key_ic' not set for %s; using default\n", term);
     k_insert = "\033[2~";
-  if (!c_save)
+  }
+  if (!c_save) {
+    printf("terminfo 'save_cursor' not set for %s; using default\n", term);
     c_save = "\0337";
-  if (!c_restore)
+  }
+  if (!c_restore) {
+    printf("terminfo 'restore_cursor' not set for %s; using default\n", term);
     c_restore = "\0338";
+  }
 
   special[0] = k_backspace;
   special[1] = k_delete;
@@ -256,6 +226,13 @@ void getTermCaps(void)
 
   free(cap_strings);
   free(cap_offsets);
+
+  printf("\nA");
+  printf("%s%sB", c_right, c_right);
+  printf("%sC", c_up);
+  printf("%s%sD", c_left, c_left);
+  printf("%s%sE", c_down, c_right);
+  printf("\n\n\n");
 }
 /*----------------------------------------------------*/
 /* ensure that regular malloc is used and not our debug malloc,

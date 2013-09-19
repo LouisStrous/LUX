@@ -11,4 +11,8 @@
 *.toc
 *.tp
 *.vr
+lux.t2p
+mdate-sh
+stamp-vti
 texinfo.tex
+version.texi

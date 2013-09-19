@@ -517,7 +517,6 @@ internalRoutine	subroutine_table[] = {
   { "TAPRD",	2, 2, lux_taprd, 0 }, /* tape.c */
   { "TAPWRT",	2, 2, lux_tapwrt, 0 }, /* tape.c */
 #endif
-  { "TERMINAL", 1, 1, lux_manualterm, 0}, /* dummyterm.c */
 #if HAVE_LIBX11
   { "THREECOLORS", 0, 1, lux_threecolors, 0 }, /* xport.c */
 #endif

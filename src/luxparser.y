@@ -34,13 +34,13 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "editor.h"
 #include "gsl/gsl_errno.h"
 #define YYERROR_VERBOSE
-#define startList(x)	{ pushList(ANA_NEW_LIST); pushList(x); }
+#define startList(x)	{ pushList(LUX_NEW_LIST); pushList(x); }
 				/* start a new list */
 extern Int	scrat[],	/* general-purpose scratch storage (once.h) */
 		compileLevel,	/* number of nested open input files */
 		executeLevel,	/* number of nested execution items */
 		symbolStackIndex, /* next free slot in symbol stack */
-  setup, ANA_MATMUL_FUN;
+  setup, LUX_MATMUL_FUN;
 extern char	*symbolStack[],	/* stack of not-yet parsed symbols */
 		line[],		/* raw user input */
 		tLine[];	/* translated user input */
@@ -68,7 +68,7 @@ Int	stackListLength(void),	/* return length of list at top of stack */
 	installSubsc(Int),
 	addSubsc(Int, Int, Int), newSubrSymbol(Int),
 	newSymbol(Int, ...), newBlockSymbol(Int), copySym(Int),
-	anaerror(char *, Int, ...);
+	luxerror(char *, Int, ...);
 Int	statementDepth = 0, keepEVB = 0;
 Int	yyerror(char *), yylex(YYSTYPE *);
 %}
@@ -106,7 +106,7 @@ Int	yyerror(char *), yylex(YYSTYPE *);
 
 /* List of rules and actions that define LUX.  Routine yyparse() calls */
 /* routine yylex() which gets and dissects user input and returns a */
-/* token (i.e. syntactic code, e.g. "ANA_STRING" or "NUMBER") directly, and */
+/* token (i.e. syntactic code, e.g. "LUX_STRING" or "NUMBER") directly, and */
 /* a semantic value (i.e. a pointer to the actual data) in variable *lvalp. */
 /* yyparse() then tries to match the syntactic code to the list of parser */
 /* patterns given below.  By repeated substitution according to the parser */
@@ -184,7 +184,7 @@ statement:			/* one LUX statement */
 | selection			/* a selection statement */
 | loop				/* a loop statement */
 | RETURN opt_arg {		/* a RETURN statement */
-  $$ = newSymbol(ANA_EVB, EVB_RETURN, $2);
+  $$ = newSymbol(LUX_EVB, EVB_RETURN, $2);
 }
 | begingroup { disableNewline++; } statement_list endgroup {
   /* a statement block */
@@ -192,19 +192,19 @@ statement:			/* one LUX statement */
      the disableNewline++ statement ensures that no newlines are recognized
      while the statement block is assembled. */
   if ($3 >= 0)			/* statement list is OK */
-    $$ = newSymbol(ANA_EVB, EVB_BLOCK);
+    $$ = newSymbol(LUX_EVB, EVB_BLOCK);
   else				/* statement list had some error */
-    $$ = ANA_ERROR;
+    $$ = LUX_ERROR;
   statementDepth--;		/* was incremented by statement_list */
   disableNewline--;		/* back to initial */
 }
 | BREAK			{ $$ = LOOP_BREAK; }	/* a BREAK statement */
 | CONTINUE		{ $$ = LOOP_CONTINUE; } /* a CONTINUE statement */
 | INCLUDE {			/* a @file statement */
-  $$ = newSymbol(ANA_EVB, EVB_FILE, $1, FILE_INCLUDE);
+  $$ = newSymbol(LUX_EVB, EVB_FILE, $1, FILE_INCLUDE);
 }
 | REPORT {			/* a @@file statement */
-  $$ = newSymbol(ANA_EVB, EVB_FILE, $1, FILE_REPORT);
+  $$ = newSymbol(LUX_EVB, EVB_FILE, $1, FILE_REPORT);
 }
 | RETALL		{ $$ = LOOP_RETALL; }	/* a RETALL statement */
 | RUN ',' var		{ $$ = newBlockSymbol($3); } /* a RUN statement */
@@ -232,15 +232,15 @@ endgroup:
 
 assignment:			/* an assignment statement */
   lhs '=' expr {		/* simple assignment */
-  $$ = newSymbol(ANA_EVB, EVB_REPLACE, $1, $3);
+  $$ = newSymbol(LUX_EVB, EVB_REPLACE, $1, $3);
 }
 | lhs op_assign expr {		/* an operator-assignment (e.g. X += 2) */
-  if (symbol_class($1) == ANA_EXTRACT)
-    $$ = newSymbol(ANA_EVB, EVB_REPLACE, copySym($1),
-		   newSymbol(ANA_BIN_OP, $2, $1, $3));
+  if (symbol_class($1) == LUX_EXTRACT)
+    $$ = newSymbol(LUX_EVB, EVB_REPLACE, copySym($1),
+		   newSymbol(LUX_BIN_OP, $2, $1, $3));
   else
-    $$ = newSymbol(ANA_EVB, EVB_REPLACE, $1,
-		   newSymbol(ANA_BIN_OP, $2, $1, $3));
+    $$ = newSymbol(LUX_EVB, EVB_REPLACE, $1,
+		   newSymbol(LUX_BIN_OP, $2, $1, $3));
 }
 ;
 
@@ -251,24 +251,24 @@ tag_list:
 
 member_spec:
 /* $$ counts the number of separate element extraction lists */
-  '(' subsc_list ')'	{ pushList(ANA_RANGE);  $$ = 1; }
+  '(' subsc_list ')'	{ pushList(LUX_RANGE);  $$ = 1; }
 | '(' subsc_list error {
   if ((setup & 1024) == 0)
     puts("Unbalanced ()");
   yyerrok;
-  pushList(ANA_RANGE);
+  pushList(LUX_RANGE);
   $$ = 1;
 }
-| tag_list		{ pushList(ANA_LIST);  $$ = 1; }
-| member_spec '(' subsc_list ')' { pushList(ANA_RANGE);  $$ = $1 + 1; }
+| tag_list		{ pushList(LUX_LIST);  $$ = 1; }
+| member_spec '(' subsc_list ')' { pushList(LUX_RANGE);  $$ = $1 + 1; }
 | member_spec '(' subsc_list error {
   if ((setup & 1024) == 0)
     puts("Unbalanced ()");
   yyerrok;
-  pushList(ANA_RANGE);
+  pushList(LUX_RANGE);
   $$ = $1 + 1;
 }
-| member_spec tag_list	{ pushList(ANA_LIST);  $$ = $1 + 1; }
+| member_spec tag_list	{ pushList(LUX_LIST);  $$ = $1 + 1; }
 ;
 
 lhs:				/* an expression that can be used as
@@ -276,7 +276,7 @@ lhs:				/* an expression that can be used as
 var member_spec {
   pushList($2);			/* the number of element extraction lists */
   pushList(-$1);		/* minus indicates "var" */
-  $$ = newSymbol(ANA_EXTRACT);
+  $$ = newSymbol(LUX_EXTRACT);
 }
 | var			{ $$ = findVar($1, curContext); }
 ;
@@ -290,10 +290,10 @@ var:				/* a general variable; C_ID is a common
 
 struct_list:			/* a list of structure elements */
   struct_element {
-    pushList(ANA_NEW_LIST);	/* the stack contents is now:
-				   key expr ANA_NEW_LIST */
+    pushList(LUX_NEW_LIST);	/* the stack contents is now:
+				   key expr LUX_NEW_LIST */
     swapList(1, 2);		/* reverse stack contents to: */
-    swapList(2, 3);		/* ANA_NEW_LIST key expr */
+    swapList(2, 3);		/* LUX_NEW_LIST key expr */
 }
 
 | struct_list ',' struct_element
@@ -313,21 +313,21 @@ struct_element:			/* a structure element: KEY:VALUE or VALUE */
 expr:				/* a general expression */
   NUMBER			/* a number */
 | STR {				/* a string */
-  $$ = newSymbol(ANA_FIXED_STRING, $1);
+  $$ = newSymbol(LUX_FIXED_STRING, $1);
 }
 | lhs
 | var '(' ')' {			/* a function call without any arguments */
   startList(0);			/* no arguments */
   pushList(-$1);
-  $$ = newSymbol(ANA_EXTRACT);
+  $$ = newSymbol(LUX_EXTRACT);
 }
 | expr member_spec {	/* expressions may be subscripted */
   pushList($2);			/* the number of element extraction lists */
   pushList($1);			/* the expression */
-  $$ = newSymbol(ANA_EXTRACT);
+  $$ = newSymbol(LUX_EXTRACT);
 }
 | '&' var {		/* a variable or function/routine pointer */
-  $$ = newSymbol(ANA_POINTER, $2);
+  $$ = newSymbol(LUX_POINTER, $2);
 }
 | '(' range ')'	{		/* a range expression */
   $$ = $2;
@@ -339,17 +339,17 @@ expr:				/* a general expression */
   $$ = $2;
 }
 | '{' struct_list '}' {		/* a structure */
-  $$ = newSymbol(ANA_PRE_LIST);
+  $$ = newSymbol(LUX_PRE_LIST);
 }
 | '{' struct_list error {
   if ((setup & 1024) == 0)
     puts("Unbalanced {}");
   yyerrok;
-  $$ = newSymbol(ANA_PRE_LIST);
+  $$ = newSymbol(LUX_PRE_LIST);
 }
 | '{' '}' {			/* an empty list */
-  pushList(ANA_NEW_LIST);
-  $$ = newSymbol(ANA_PRE_LIST);
+  pushList(LUX_NEW_LIST);
+  $$ = newSymbol(LUX_PRE_LIST);
 }
 | '(' expr ')' {
   $$ = $2;
@@ -361,94 +361,94 @@ expr:				/* a general expression */
   $$ = $2;
 }
 | '[' expr_list ']' {		/* concatenation */
-  $$ = newSymbol(ANA_INT_FUNC, ANA_CONCAT_FUN);
+  $$ = newSymbol(LUX_INT_FUNC, LUX_CONCAT_FUN);
 }
 | '[' expr_list error {
   if ((setup & 1024) == 0)
     puts("Unbalanced []");
-  $$ = newSymbol(ANA_INT_FUNC, ANA_CONCAT_FUN);
+  $$ = newSymbol(LUX_INT_FUNC, LUX_CONCAT_FUN);
   yyerrok;
 }
 /* note: if you express the following binary operations as expr bin_op expr
    with bin_op selecting between the various operators, then the rules of
    precedence don't work out the way you want.  LS 15sep98 */
 | expr '+' expr {
-  $$ = newSymbol(ANA_BIN_OP, ANA_ADD, $1, $3);
+  $$ = newSymbol(LUX_BIN_OP, LUX_ADD, $1, $3);
 }
 | expr '-' expr {
-  $$ = newSymbol(ANA_BIN_OP, ANA_SUB, $1, $3);
+  $$ = newSymbol(LUX_BIN_OP, LUX_SUB, $1, $3);
 }
 | expr '*' expr {
-  $$ = newSymbol(ANA_BIN_OP, ANA_MUL, $1, $3);
+  $$ = newSymbol(LUX_BIN_OP, LUX_MUL, $1, $3);
 }
 | expr '/' expr {
-  $$ = newSymbol(ANA_BIN_OP, ANA_DIV, $1, $3);
+  $$ = newSymbol(LUX_BIN_OP, LUX_DIV, $1, $3);
 }
 | expr '\\' expr {
-  $$ = newSymbol(ANA_BIN_OP, ANA_IDIV, $1, $3);
+  $$ = newSymbol(LUX_BIN_OP, LUX_IDIV, $1, $3);
 }
 | expr '%' expr {
-  $$ = newSymbol(ANA_BIN_OP, ANA_MOD, $1, $3);
+  $$ = newSymbol(LUX_BIN_OP, LUX_MOD, $1, $3);
 }
 | expr SMOD expr {
-  $$ = newSymbol(ANA_BIN_OP, ANA_SMOD, $1, $3);
+  $$ = newSymbol(LUX_BIN_OP, LUX_SMOD, $1, $3);
 }
 | expr '^' expr {
-  $$ = newSymbol(ANA_BIN_OP, ANA_POW, $1, $3);
+  $$ = newSymbol(LUX_BIN_OP, LUX_POW, $1, $3);
 }
 | expr '>' expr {
-  $$ = newSymbol(ANA_BIN_OP, ANA_MAX, $1, $3);
+  $$ = newSymbol(LUX_BIN_OP, LUX_MAX, $1, $3);
 }
 | expr '<' expr {
-  $$ = newSymbol(ANA_BIN_OP, ANA_MIN, $1, $3);
+  $$ = newSymbol(LUX_BIN_OP, LUX_MIN, $1, $3);
 }
 | expr EQ expr {
-  $$ = newSymbol(ANA_BIN_OP, ANA_EQ, $1, $3);
+  $$ = newSymbol(LUX_BIN_OP, LUX_EQ, $1, $3);
 }
 | expr NE expr {
-  $$ = newSymbol(ANA_BIN_OP, ANA_NE, $1, $3);
+  $$ = newSymbol(LUX_BIN_OP, LUX_NE, $1, $3);
 }
 | expr GE expr {
-  $$ = newSymbol(ANA_BIN_OP, ANA_GE, $1, $3);
+  $$ = newSymbol(LUX_BIN_OP, LUX_GE, $1, $3);
 }
 | expr GT expr {
-  $$ = newSymbol(ANA_BIN_OP, ANA_GT, $1, $3);
+  $$ = newSymbol(LUX_BIN_OP, LUX_GT, $1, $3);
 }
 | expr LT expr {
-  $$ = newSymbol(ANA_BIN_OP, ANA_LT, $1, $3);
+  $$ = newSymbol(LUX_BIN_OP, LUX_LT, $1, $3);
 }
 | expr LE expr {
-  $$ = newSymbol(ANA_BIN_OP, ANA_LE, $1, $3);
+  $$ = newSymbol(LUX_BIN_OP, LUX_LE, $1, $3);
 }
 | expr AND expr {
-  $$ = newSymbol(ANA_BIN_OP, ANA_AND, $1, $3);
+  $$ = newSymbol(LUX_BIN_OP, LUX_AND, $1, $3);
 }
 | expr OR expr {
-  $$ = newSymbol(ANA_BIN_OP, ANA_OR, $1, $3);
+  $$ = newSymbol(LUX_BIN_OP, LUX_OR, $1, $3);
 }
 | expr XOR expr {
-  $$ = newSymbol(ANA_BIN_OP, ANA_XOR, $1, $3);
+  $$ = newSymbol(LUX_BIN_OP, LUX_XOR, $1, $3);
 }
 | expr '&' expr {		/* testing & for AND */
-  $$ = newSymbol(ANA_BIN_OP, ANA_AND, $1, $3);
+  $$ = newSymbol(LUX_BIN_OP, LUX_AND, $1, $3);
 }
 | expr '|' expr {		/* testing | for OR */
-  $$ = newSymbol(ANA_BIN_OP, ANA_OR, $1, $3);
+  $$ = newSymbol(LUX_BIN_OP, LUX_OR, $1, $3);
 }
 | expr ANDIF expr {		/* conditional and */
-  $$ = newSymbol(ANA_IF_OP, ANA_ANDIF, $1, $3);
+  $$ = newSymbol(LUX_IF_OP, LUX_ANDIF, $1, $3);
 }
 | expr ORIF expr {		/* conditional or */
-  $$ = newSymbol(ANA_IF_OP, ANA_ORIF, $1, $3);
+  $$ = newSymbol(LUX_IF_OP, LUX_ORIF, $1, $3);
 }
 | expr '#' expr {		/* matrix multiplication */
   startList($1);
   pushList($3);
-  $$ = newSymbol(ANA_INT_FUNC, ANA_MATMUL_FUN);
+  $$ = newSymbol(LUX_INT_FUNC, LUX_MATMUL_FUN);
 }
 | '-' expr %prec UMINUS {
   startList($2);
-  $$ = newSymbol(ANA_INT_FUNC, ANA_NEG_FUN);
+  $$ = newSymbol(LUX_INT_FUNC, LUX_NEG_FUN);
 }
 | '+' expr %prec UMINUS {
   $$ = $2;
@@ -468,28 +468,28 @@ range:				/* a range variable */
 /* single may be * or * - expr; the first indicates all elements in the */
 /* current dimension, the second a specific single element. */
 expr ':' expr {
-  $$ = newSymbol(ANA_PRE_RANGE, $1, $3);
+  $$ = newSymbol(LUX_PRE_RANGE, $1, $3);
 }
 | expr ':' '*' '-' expr {
-  $$ = newSymbol(ANA_PRE_RANGE, $1, -$5);
+  $$ = newSymbol(LUX_PRE_RANGE, $1, -$5);
 }
 | expr ':' '*' {
-  $$ = newSymbol(ANA_PRE_RANGE, $1, -ANA_ONE);
+  $$ = newSymbol(LUX_PRE_RANGE, $1, -LUX_ONE);
 }
 | '*' '-' expr ':' expr {
-  $$ = newSymbol(ANA_PRE_RANGE, -$3, $5);
+  $$ = newSymbol(LUX_PRE_RANGE, -$3, $5);
 }
 | '*' '-' expr ':' '*' '-' expr {
-  $$ = newSymbol(ANA_PRE_RANGE, -$3, -$7);
+  $$ = newSymbol(LUX_PRE_RANGE, -$3, -$7);
 }
 | '*' '-' expr ':' '*' {
-  $$ = newSymbol(ANA_PRE_RANGE, -$3, -ANA_ONE);
+  $$ = newSymbol(LUX_PRE_RANGE, -$3, -LUX_ONE);
 }
 | '*' '-' expr {
-  $$ = newSymbol(ANA_PRE_RANGE, -$3, ANA_ZERO);
+  $$ = newSymbol(LUX_PRE_RANGE, -$3, LUX_ZERO);
 }
 | '*' {
-  $$ = newSymbol(ANA_PRE_RANGE, -ANA_ONE, ANA_ZERO);
+  $$ = newSymbol(LUX_PRE_RANGE, -LUX_ONE, LUX_ZERO);
 }
 ;
 	
@@ -512,22 +512,22 @@ range
 }
 
 | '+' {
-  $$ = newSymbol(ANA_PRE_RANGE, ANA_ZERO, -ANA_ONE);
+  $$ = newSymbol(LUX_PRE_RANGE, LUX_ZERO, -LUX_ONE);
   sym[$$].spec.evb.args[2] = 1;
 }
 
 | '>' expr {
-  $$ = newSymbol(ANA_PRE_RANGE, ANA_ZERO, -ANA_ONE);
+  $$ = newSymbol(LUX_PRE_RANGE, LUX_ZERO, -LUX_ONE);
   sym[$$].spec.evb.args[3] = $2;
 }
 
 | expr ':' '>' expr {
-  $$ = newSymbol(ANA_PRE_RANGE, $1, ANA_ZERO);
+  $$ = newSymbol(LUX_PRE_RANGE, $1, LUX_ZERO);
   sym[$$].spec.evb.args[3] = $4;
 }
 
 | expr ':' '+' {
-  $$ = newSymbol(ANA_PRE_RANGE, $1, ANA_ZERO);
+  $$ = newSymbol(LUX_PRE_RANGE, $1, LUX_ZERO);
   sym[$$].spec.evb.args[2] = 1;
 }
 ;
@@ -555,19 +555,19 @@ subsc_or_key {
 op_assign:			/* assignments like A += B -> A = A + B */
 
 PLUSIS {
-  $$ = ANA_ADD;
+  $$ = LUX_ADD;
 }
 
 | MINUSIS {
-  $$ = ANA_SUB;
+  $$ = LUX_SUB;
 }
 
 | TIMESIS {
-  $$ = ANA_MUL;
+  $$ = LUX_MUL;
 }
 
 | DIVIDEIS {
-  $$ = ANA_DIV;
+  $$ = LUX_DIV;
 }
 ;
 
@@ -582,7 +582,7 @@ s_arglist:			/* argument list for a subroutine */
 
 ',' arglist
 | /* empty */ {
-  pushList(ANA_NEW_LIST);
+  pushList(LUX_NEW_LIST);
 }
 ;
 
@@ -606,11 +606,11 @@ C_ID
 key:				/* a key specification; /KEY is KEY=1 */
 				/* and /NOKEY is KEY=0 */
 key_param '=' expr {
-  $$ = newSymbol(ANA_KEYWORD, $1, $3);
+  $$ = newSymbol(LUX_KEYWORD, $1, $3);
 }
 
 | '/' key_param	{
-  $$ = newSymbol(ANA_KEYWORD, $2, ANA_ONE);
+  $$ = newSymbol(LUX_KEYWORD, $2, LUX_ONE);
 }
 ;
 
@@ -626,9 +626,9 @@ routine_definition:		/* definition of subroutine, function, */
 SUBR {
   disableNewline++;
 } C_ID f_paramlist {
-  $$ = newSymbol(ANA_SUBROUTINE, $3);
+  $$ = newSymbol(LUX_SUBROUTINE, $3);
 } statement_list endsubr {
-  $$ = newSymbol(ANA_SUBROUTINE, -$5 - 1);
+  $$ = newSymbol(LUX_SUBROUTINE, -$5 - 1);
   statementDepth--;
   disableNewline--;
 }
@@ -636,9 +636,9 @@ SUBR {
 | FUNC {
   disableNewline++;
 } C_ID f_paramlist {
-  $$ = newSymbol(ANA_FUNCTION, $3);
+  $$ = newSymbol(LUX_FUNCTION, $3);
 } statement_list endfunc {
-  $$ = newSymbol(ANA_FUNCTION, -$5 - 1);
+  $$ = newSymbol(LUX_FUNCTION, -$5 - 1);
   statementDepth--;
   disableNewline--;
 }
@@ -646,9 +646,9 @@ SUBR {
 | BLOCK {
   disableNewline++;
 } C_ID {
-  $$ = newSymbol(ANA_BLOCKROUTINE, $3);
+  $$ = newSymbol(LUX_BLOCKROUTINE, $3);
 } statement_list endblock {
-  $$ = newSymbol(ANA_BLOCKROUTINE, -$4 - 1);
+  $$ = newSymbol(LUX_BLOCKROUTINE, -$4 - 1);
   statementDepth--;
   disableNewline--;
 }
@@ -671,7 +671,7 @@ paramlist2:
 paramlist
 
 | paramlist ',' ELLIPSIS {
-  pushList(ANA_EXTEND);
+  pushList(LUX_EXTEND);
 }
 ;
 
@@ -679,7 +679,7 @@ paramlist
 s_paramlist:			/* a list of parameters for definitions */
 				/* of subroutines */
 /* empty */ {
-  pushList(ANA_NEW_LIST);
+  pushList(LUX_NEW_LIST);
 }
 
 | ',' paramlist2
@@ -705,8 +705,8 @@ statement {
 
 | statement_list statement {
   pushList($2);
-  if ($2 == ANA_ERROR)
-    $$ = ANA_ERROR;
+  if ($2 == LUX_ERROR)
+    $$ = LUX_ERROR;
 }
 ;
 
@@ -714,7 +714,7 @@ f_paramlist:			/* a list of parameters for a function */
 				/* definition; either FUNC F() or */
 				/* FUNC F(x,y) or FUNC F,x,y */
 '(' ')'	{			/* empty list */
-  pushList(ANA_NEW_LIST);
+  pushList(LUX_NEW_LIST);
 }
 
 | '(' paramlist2 ')'
@@ -729,14 +729,14 @@ IF {
 } expr opt_then {
   disableNewline--;
 } statement opt_else {
-  $$ = newSymbol(ANA_EVB, EVB_IF, $3, $6, $7);
+  $$ = newSymbol(LUX_EVB, EVB_IF, $3, $6, $7);
 }
 
 | CASE {
   disableNewline++;
 } case_list opt_case_else ENDCASE {
   pushList($4);
-  $$ = newSymbol(ANA_EVB, EVB_CASE);
+  $$ = newSymbol(LUX_EVB, EVB_CASE);
   disableNewline--;
 }
 
@@ -746,7 +746,7 @@ IF {
   pushList($5);
   pushList($3);
   statementDepth--;
-  $$ = newSymbol(ANA_EVB, EVB_NCASE);
+  $$ = newSymbol(LUX_EVB, EVB_NCASE);
   disableNewline--;
 }
 ;
@@ -810,7 +810,7 @@ FOR {
   disableNewline--;
 } statement {
   $$ = findVar($3, curContext);
-  $$ = newSymbol(ANA_EVB, EVB_FOR, $$, $5, $7, $8, $11);
+  $$ = newSymbol(LUX_EVB, EVB_FOR, $$, $5, $7, $8, $11);
 }
 
 | REPEAT {
@@ -818,7 +818,7 @@ FOR {
 } statement UNTIL {
   disableNewline--;
 } expr {
-  $$ = newSymbol(ANA_EVB, EVB_REPEAT, $3, $6);
+  $$ = newSymbol(LUX_EVB, EVB_REPEAT, $3, $6);
 }
 
 | DO {
@@ -826,7 +826,7 @@ FOR {
 } statement WHILE {
   disableNewline--;
 } expr {
-  $$ = newSymbol(ANA_EVB, EVB_DO_WHILE, $3, $6);
+  $$ = newSymbol(LUX_EVB, EVB_DO_WHILE, $3, $6);
 }
 
 | WHILE {
@@ -834,14 +834,14 @@ FOR {
 } expr {
   disableNewline--;
 } opt_do statement {
-  $$ = newSymbol(ANA_EVB, EVB_WHILE_DO, $3, $6);
+  $$ = newSymbol(LUX_EVB, EVB_WHILE_DO, $3, $6);
 }
 ;
 
 opt_step:			/* optional STEP for FOR statement */
 
 /* empty */ {
-  $$ = ANA_ONE;
+  $$ = LUX_ONE;
 }
 
 | ',' expr {
@@ -941,10 +941,10 @@ Int yyerror(char *s)
    printf("in file %s\n", curCompileInfo->name);
  printf("in line %d: \"%s\"\n", curLineNumber, line);
  if (!oldChar) {
-   anaerror("Error just before end of line", 0);
+   luxerror("Error just before end of line", 0);
    *line = '\0';
  } else
-   anaerror("Error just before \"%s\"", 0, currentChar); 
+   luxerror("Error just before \"%s\"", 0, currentChar); 
  return 0;
 }
 /*--------------------------------------------------------------*/
@@ -1074,25 +1074,25 @@ void Quit(Int result)
 }
 /*--------------------------------------------------------------*/
 /* NUMBERS
-   LUX allows specification of numbers of five types (ANA_BYTE, ANA_WORD, ANA_LONG,
-   ANA_FLOAT, ANA_DOUBLE) and three bases (8, 10, 16).  Numbers must always
+   LUX allows specification of numbers of five types (LUX_BYTE, LUX_WORD, LUX_LONG,
+   LUX_FLOAT, LUX_DOUBLE) and three bases (8, 10, 16).  Numbers must always
    start with a decimal digit.
-   Fractional (i.e. ANA_FLOAT or ANA_DOUBLE) numbers can only be specified
+   Fractional (i.e. LUX_FLOAT or LUX_DOUBLE) numbers can only be specified
    in base 10.  In integer numbers, a base specifier (if any) precedes
    a type specifier (if any).  By default, integers are in base 10 and
-   of type ANA_LONG.
+   of type LUX_LONG.
    Octal numbers are followed by an O.  Hexadecimal numbers are either
-   preceded by 0X or followed by an X.  A final B indicates a ANA_BYTE number,
-   a final W a ANA_WORD, and a final L a ANA_LONG number.
-   A general ANA_FLOAT looks like this:  1.23E+4
+   preceded by 0X or followed by an X.  A final B indicates a LUX_BYTE number,
+   a final W a LUX_WORD, and a final L a LUX_LONG number.
+   A general LUX_FLOAT looks like this:  1.23E+4
    Either the decimal point or the exponent indicator E must be present.
-   A plus sign is optional in the exponent.  A general ANA_DOUBLE looks like
-   a general ANA_FLOAT, except that a D is used instead of an E.  The exponent
+   A plus sign is optional in the exponent.  A general LUX_DOUBLE looks like
+   a general LUX_FLOAT, except that a D is used instead of an E.  The exponent
    indicator D must be present.
-   Some examples:  0X1AB = 1AXB = ANA_BYTE hex 1A = ANA_BYTE 26
-                   0X1ABL = 1ABXL = ANA_LONG hex 1AB = ANA_LONG 427
-                   2E = 2. = ANA_FLOAT 2
-                   2EX = 0X2E = ANA_LONG hex 2E = ANA_LONG 46
+   Some examples:  0X1AB = 1AXB = LUX_BYTE hex 1A = LUX_BYTE 26
+                   0X1ABL = 1ABXL = LUX_LONG hex 1AB = LUX_LONG 427
+                   2E = 2. = LUX_FLOAT 2
+                   2EX = 0X2E = LUX_LONG hex 2E = LUX_LONG 46
 */
 /*--------------------------------------------------------------*/
 Int readNumber(YYSTYPE *lvalp)
@@ -1105,32 +1105,32 @@ Int readNumber(YYSTYPE *lvalp)
 
   read_a_number(&currentChar, &v, &type);
   if (!ignoreInput) {		/* we're not ignoring stuff */
-    if ((*lvalp = newSymbol(ANA_FIXED_NUMBER, type)) < 0) /* could not get */
+    if ((*lvalp = newSymbol(LUX_FIXED_NUMBER, type)) < 0) /* could not get */
 				/* a new symbol for the number */
-      return ANA_ERROR;		/* return error indication */
+      return LUX_ERROR;		/* return error indication */
     if (*lvalp)
       switch(type) {		/* non-zero return value (??) */
 				/* insert value of proper type */
-	case ANA_BYTE:
+	case LUX_BYTE:
 	  scalar_value(*lvalp).b = (Byte) v.l;
 	  break;
-	case ANA_WORD:
+	case LUX_WORD:
 	  scalar_value(*lvalp).w = (Word) v.l;
 	  break;
-	case ANA_LONG:
+	case LUX_LONG:
 	  scalar_value(*lvalp).l = v.l;
 	  break;
-	case ANA_FLOAT:
+	case LUX_FLOAT:
 	  scalar_value(*lvalp).f = (Float) v.d;
 	  break;
-	case ANA_DOUBLE:
+	case LUX_DOUBLE:
 	  scalar_value(*lvalp).d = v.d;
 	  break;
-	case ANA_CFLOAT:
+	case LUX_CFLOAT:
 	  complex_scalar_data(*lvalp).cf->real = 0.0;
 	  complex_scalar_data(*lvalp).cf->imaginary = v.d;
 	  break;
-	case ANA_CDOUBLE:
+	case LUX_CDOUBLE:
 	  complex_scalar_data(*lvalp).cd->real = 0.0;
 	  complex_scalar_data(*lvalp).cd->imaginary = v.d;
 	  break;
@@ -1199,7 +1199,7 @@ Int readIdentifier(YYSTYPE *lvalp)
    n = isNextChar((Byte) *currentChar)? C_ID: S_ID;
    currentChar = p;		/* continue parse beyond string */
    if (*lvalp < 0)
-     return ANA_ERROR;		/* some error occurred */
+     return LUX_ERROR;		/* some error occurred */
    return n;			/* return "special identifier" token */
  } else {			/* we are ignoring stuff, don't save */
    currentChar = p;		/* so continue parse beyond string */
@@ -1572,7 +1572,7 @@ Int calc_error(char *s)
 /*--------------------------------------------------------------*/
 void gehandler(const char *reason, const char *file, Int line, Int gsl_errno)
 {
-  anaerror("GSL error %d (%s line %d): %s", 0, gsl_errno, file, line, reason);
+  luxerror("GSL error %d (%s line %d): %s", 0, gsl_errno, file, line, reason);
 }
 /*--------------------------------------------------------------*/
 char	*programName;

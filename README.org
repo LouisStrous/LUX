@@ -1,6 +1,7 @@
 * LUX
 
-  LUX is a program for (numerical) data processing.
+  LUX is a program for (numerical) data processing and image
+  processing.
 
 * Third Party Software used in LUX
 
@@ -8,16 +9,30 @@
 
 ** FFTPACK
 
+   The LUX source code includes some Fast Fourier Transform routines
+   based on FFTPACK version 4 by Paul N. Swarztrauber (April 1985),
+   copied from the Netlib CDROM (2nd edition), translated from Fortran
+   to C using f2c, with manual cleanup by Louis Strous (15 June 1998).
+
+   LUX also uses (through linking, not in the form of source code)
+   Fast Fourier Transform routines from the GNU Scientific Library
+   (GSL), which routines are themselves also based on FFTPACK.  The
+   direct use of FFTPACK source code is being phased out, in favor of
+   the routines from GSL.
+
 ** SOFA
 
-   LUX includes the "Standards of Fundamental Astronomy (SOFA)"
-   Library for ANSI C, obtained from
-   http://www.iausofa.org/index.html.
+   LUX includes source code from the "Standards of Fundamental
+   Astronomy (SOFA)" Library for ANSI C, obtained from
+   http://www.iausofa.org/index.html.  LUX uses routines and
+   computations derived by the author of LUX from software provided by
+   SOFA under license to the author of LUX.  LUX does not itself
+   constitute software provided by and/or endorsed by SOFA.
 
-   That library comes complete with its own "makefile", which is not
-   suitable for including in an autoconfiscated project such as the
-   current one.  The SOFA sources were adapted as follows for inclusion
-   into the current project:
+   The SOFA library comes complete with its own "makefile", which is
+   not suitable for including in an autoconfiscated project such as
+   LUX.  The SOFA sources were adapted as follows for inclusion into
+   the current project:
 
    1. Change into the "sofa" subdirectory of the current project's main
       directory:
@@ -49,3 +64,10 @@
 
    6. Create our own "src/Makefile.am" that builds "libsofa_c.a" from
       the SOFA *.c and *.h files in the "src" subdirectory.
+
+   Many SOFA routines are bound to LUX subroutines or functions.  The
+   names of the LUX subroutines or functions bound to SOFA routines
+   are the same as the names of the SOFA routines, but with the "iau"
+   prefix removed to comply with the SOFA license.
+
+

@@ -76,16 +76,7 @@ Input/Output
 
 Command Line Input
 
-* Prompts::                     Text at the start of command lines
-* Cursor Movement::             Moving the cursor across the command line
-* Text Deletion::               Deleting part of the command line
-* Transposition::               Transposing text on the command line
-* Text Retrieval::              Retrieving text from the history buffer
-* Find & Replace::              Substituting text in the command line
-* Word Completion::             Completing partial names
-* Insert/Overwrite::            Toggling insert/overwrite mode
-* Help Mode::                   Getting an on-line key code overview
-* Key Code Overview::           Alphabetical list of key codes
+* Key Code Overview::
 
 Data Input/Output Routines
 
@@ -1487,7 +1478,7 @@ with the shift key.  The following special key names are used in the LUX
 Manual: 
 
 @table @kbd
-@item RET
+@item Return
 The key marked "Return" or "Enter", which signals completion of the
 input.
 @item SPC
@@ -1495,25 +1486,25 @@ The "space" bar, which generates a single whitespace.
 @item TAB
 The key marked "Tab", which advances the cursor to the next tab
 position.
-@item BKS
+@item Backspace
 The key marked "Backspace", which rubs out the character before the
 cursor, and moves all text below and after the cursor back by one
 position.
-@item DEL
+@item Delete
 The key marked "Del" or "Delete", which rubs out the character under the
 cursor, and moves all text after the cursor back by one position.
 @item ESC
 The key marked "Esc" or "Escape", which is used as introduction to
 multi-key editor sequences.
-@item DOWNARROW
+@item Downarrow
 The down-arrow key.
-@item UPARROW
+@item Uparrow
 The up-arrow key.
-@item RIGHTARROW
+@item Rightarrow
 The right-arrow key.
-@item LEFTARROW
+@item Leftarrow
 The left-arrow key.
-@item INSERT
+@item Insert
 The key marked "Insert", which toggles between insert and overwrite
 mode.
 @end table
@@ -1577,8 +1568,7 @@ The @code{T} command is a synonym of @code{TYPE} (@ref{TYPE}) and
 LUX has executed your command and is waiting for the next one.
 
 You end an LUX session by entering the @code{QUIT} command (@ref{QUIT}),
-or the equivalent @code{EXIT} command (@ref{EXIT}), or by typing @kbd{C-x
-RET.}
+or the equivalent @code{EXIT} command (@ref{EXIT});
 
 If you want some initialization commands to be executed automatically
 when LUX starts up, then put those commands in file @file{.luxinit} in
@@ -1901,525 +1891,109 @@ your input.
 On input, any non-printable characters that are not recognized as
 editing commands (for instance tabs) are treated as whitespace.
 
-In the following subsections, editing of several different kinds of
-pieces of text is discussed.  These different kinds are:
-@table @asis
-@item command line
-includes all of the text that would be passed on to LUX's interpreter if
-you were to press the @kbd{RET} key at that moment.
-@item screen line
-one line of text on the screen, between a prompt on the left-hand side
-and (possibly) a continuation character on the right-hand side, that is
-part of the current command line.  A command line may span several
-screen lines.
-@item expression
-An expression consists of a quoted string (between @kbd{''}) or text
-between balanced sets of parentheses @kbd{()}, square brackets @kbd{[]},
-or curly braces @kbd{@{@}}, or a word, or a number.  For these purposes,
-a number is a contiguous string of characters from the set @kbd{0-9 A-F a-f
-O W X B o w x b . + -}.
-@item word
-A word consists of a contiguous string of characters from the set @kbd{!
-# $ 0-9 A-Z _ a-z}.  Words include all variable, subroutine, and
-function names.
-@item character
-a single character.
-@end table
-
-If you type a closing parenthesis @code{)}, bracket @code{]}, or brace
-@code{@}}, then the cursor briefly moves to the matching opening
-delimiter to indicate which one matches.
-
 @c ------------------------------------------------------------------
 @menu
-* Prompts::                     Text at the start of command lines
-* Cursor Movement::             Moving the cursor across the command line
-* Text Deletion::               Deleting part of the command line
-* Transposition::               Transposing text on the command line
-* Text Retrieval::              Retrieving text from the history buffer
-* Find & Replace::              Substituting text in the command line
-* Word Completion::             Completing partial names
-* Insert/Overwrite::            Toggling insert/overwrite mode
-* Help Mode::                   Getting an on-line key code overview
-* Key Code Overview::           Alphabetical list of key codes
+* Key Code Overview::
 @end menu
 
-@node Prompts, Cursor Movement, Command Input, Command Input
-@comment  node-name,  next,  previous,  up
-@subsection Prompts
-
-@cindex LUX prompts
-@cindex Prompts in LUX
-
-During command line input, the leftmost four columns of the screen are
-reserved for the display of prompts, which convey information about the
-status of the input.  The following prompts may appear:
-
-@table @code
-@item LUX>
-The main prompt.  You can now edit the command line.
-@item  ->
-The continuation prompt.  The current command line is too long to fit on
-a single line on the screen, and the current screen line is a
-continuation of the previous one.
-@item mor>
-The "more" prompt.  The current line becomes part of the definition of
-an as yet unfinished LUX syntax structure, such as a function or
-subroutine definition.
-@item ins>
-A temporary prompt that indicates you just selected "insert" mode.
-@item ovw>
-A temporary prompt that indicates you just selected "overwrite" mode.
-@item fnd>
-A temporary prompt that indicates you are to enter some text to search
-for in the history buffer.  (See key @kbd{C-r}.)
-@item F&R>
-A temporary prompt that indicates you are to enter some find-and-replace
-text.  (See key @kbd{ESC-%}.)
-@item FUL>
-A prompt that indicates that the command line buffer is full and no more
-text can be inserted.
-@item hlp>
-A prompt that indicates the program is in help mode.
-@item dat>
-A prompt that indicates LUX is waiting for you to enter some data
-values.  Used with the @code{FREAD} and @code{FREADF} commands
-(@ref{FREAD}, @ref{FREADF}).
-@item E-w>
-A prompt that indicates the program is in word completion mode.  (See
-key @kbd{ESC-w}.)
-@item clc>
-A prompt that indicates that LUX is in calculator mode (@ref{CALCULATOR}).
-@end table
-
-NOTE: The @kbd{C-X>}, @kbd{ESC>}, and @kbd{E-[>} prompts have been
-retracted starting with LUX 3.1.176 because their display made editing
-very slow on some systems.
-
-[3.1.176]
-@c ------------------------------------------------------------------
-@node Cursor Movement, Text Deletion, Prompts, Command Input
-@comment  node-name,  next,  previous,  up
-@subsection Cursor Movement on the Command Line
-
-@cindex Cursor movement
-@cindex Moving the cursor
-@cindex Text cursor movement
-
-The following key sequences move the cursor across the command line
-without affecting the contents of the command line:
-
-@need 800
-By character:
-
-@table @kbd
-@item C-b, LEFTARROW
-Move the cursor to the previous character on the command line, if possible.
-@item C-f, RIGHTARROW
-Move the cursor to the next character on the command line, if possible.
-@end table
-
-@need 800
-By word:
-
-@table @kbd
-@item ESC-f
-Move the cursor to the next end-of-word, if possible, or else to the end
-of the command line.
-@item ESC-b
-Move the cursor to the previous beginning-of-word, if possible, or else
-to the beginning of the command line.
-@end table
-
-@need 800
-By expression:
-
-@table @kbd
-@item ESC C-f
-Move the cursor to the next end-of-expression, if possible, or else to
-the end of the command line.
-@item ESC C-b
-Move the cursor to the previous beginning-of-expression, if possible, or
-else to the beginning of the command line.
-@end table
-
-@need 800
-By screen line:
-
-@table @kbd
-@item UPARROW
-Move the cursor up one screen line, if possible.  Otherwise, retrieve
-the previous (older) line from the history buffer (@ref{Text
-Retrieval}). 
-@item DOWNARROW
-Move the cursor down one screen line, if possible.  Otherwise, retrieve
-the next (younger) line from the history buffer (@ref{Text Retrieval}).
-@item ESC-a
-Move the cursor to the beginning of the current screen line.  If the
-cursor is already at the beginning of the current screen line, then move
-it to the beginning of the previous screen line, if any.
-@item ESC-e
-Move the cursor to the end of the current screen line.  If the cursor is
-already at the end of the current screen line, then move it to the end
-of the next screen line, if any.
-@end table
-
-@need 800
-By command line:
-
-@table @kbd
-@item C-a
-Move the cursor to the beginning of the command line.
-@item C-e
-Move the cursor to the end of the command line.
-@end table
-
-@c ------------------------------------------------------------------
-@node Text Deletion, Transposition, Cursor Movement, Command Input
-@comment  node-name,  next,  previous,  up
-@subsection Text Deletion in the Command Line
-
-@cindex Text deletion
-@cindex Deleting command line text
-
-The following key sequences delete part or all of the text on the
-command line:
-
-@need 800
-By character:
-
-@table @kbd
-@item DEL, C-d
-Delete the character under the cursor and move the text behind the
-deleted character one position back.
-@item BKS
-Delete the character before the cursor and move the text behind the
-deleted character one position back.
-@end table
-
-@need 800
-By word:
-
-@table @kbd
-@item ESC-d
-Delete text up to the next word end.
-@item ESC-DEL
-Delete text up to the previous word beginning. 
-@end table
-
-@need 800
-By expression:
-@table @kbd
-@item ESC C-k
-Delete text up to the next expression end.
-@item ESC-BKS
-Delete text up to the previous expression beginning.
-@end table
-
-@need 800
-By screen line:
-
-@table @kbd
-@item ESC-k
-Delete the part of the current screen line at and behind the cursor.
-@item C-x DEL
-Delete the part of the current screen line before the cursor.
-@end table
-
-@need 800
-By command line:
-
-@table @kbd
-@item C-k
-Delete the part of the command line at and behind the cursor.
-@item C-x k
-Delete the part of the command line before the cursor.
-@end table
-
-@c ------------------------------------------------------------------
-@node Transposition, Text Retrieval, Text Deletion, Command Input
-@comment  node-name,  next,  previous,  up
-@subsection Text Transposition in the Command Line
-
-@cindex Text transposition
-@cindex Transposition of command line text
-
-The following key sequences transpose text units in the command line.
-
-@table @kbd
-@item C-t
-Transposes the character under the cursor with the preceding one and
-moves the cursor one character forward. 
-@item ESC-t
-Transposes the word starting at the previous beginning-of-word and the
-next one and positions the cursor after the affected text.  In other
-words: If the cursor is at or before the start of the first word on the
-command line, then transposes the first two words on the command line.
-If the cursor is at the start of a word other than the first word, then
-transposes that word and the previous one.  If the cursor is between two
-words, then transposes those two words.  Otherwise, transposes the
-current word and the next one.
-@item ESC C-t
-Transposes the expression at the previous beginning-of-expression and
-the next one and positions the cursor after the affected text, similar
-to the way words are transposed by @kbd{ESC-t}.
-@end table
-
-@c ------------------------------------------------------------------
-@node Text Retrieval, Find & Replace, Transposition, Command Input
-@comment  node-name,  next,  previous,  up
-@subsection Text Retrieval in the Command Line
-
-@cindex Text retrieval in LUX input
-@cindex Retrieving history buffer text
-@cindex History buffer text retrieval
-@cindex History file
-
-The following key sequences retrieve text from LUX's history buffer
-which contains a limited number of previously entered command lines.
-
-@table @kbd
-@item C-n, DOWNARROW
-Retrieve the next (later) command line from the history buffer, relative
-to the last retrieved line, or relative to the current line if no lines
-were yet retrieved.  The command line that you were working on is
-temporarily stored (with any modifications you made) in the history
-buffer at the position following the last completed command line and may
-be retrieved for further modification, but is lost if you retrieve and
-modify another line.  Any retrieved line is copied and only the copy is
-modified: the original of the retrieved line remains unchanged in the
-history buffer.
-
-@kbd{DOWNARROW} does retrieval only if the cursor is already at the
-bottom of the command line.
-
-@item C-p, UPARROW
-Similar to @kbd{C-n}, but retrieves the previous (earlier) command line
-from the history buffer.
-
-@item C-r
-Find a string in the history buffer and retrieve the line containing it.
-After pressing @kbd{C-r}, the @code{Fnd>} prompt is displayed.  Enter
-the text that you wish to search for and then press @kbd{RET}.  The most
-recent line in the history buffer (before the currently displayed
-command line) that contains the text you supplied is retrieved.  If you
-press @kbd{C-r} again before you change the retrieved line, then the
-next most recent line containing the search text is retrieved, etcetera.
-If the search text does not appear in the current history buffer, then
-the command line is restored to what it was when you pressed @kbd{C-r}
-the first time.
-
-@item C-g
-Toggles replacing and appending to the current command line with the
-results of a command line retrieval.  By default, the old contents of
-the command line are replaced with the results of a line retrieval.
-After pressing @kbd{C-g} once, the results of a line retrieval are
-appended to the current command line.  For example, if the previous
-command line was @kbd{alphabet} and the current one is @kbd{good } then
-if you press @kbd{C-g} and then @kbd{C-p} (previous line), then the
-command line reads "@code{good alphabet}".  The toggle status reverts to
-"replace" when you accept the current command line.
-@end table
-
-LUX's history buffer is saved in file @file{~/.lux-history} just before
-the end of the LUX session (whether this end is intentional or after an
-interrupt), and reloaded at the start of each next LUX session, so the
-history buffer is remembered between sessions.
-
-@c ------------------------------------------------------------------
-@node Find & Replace, Word Completion, Text Retrieval, Command Input
-@comment  node-name,  next,  previous,  up
-@subsection Finding & Replacing Text in the Command Line
-
-@cindex Find & Replace in LUX input
-@cindex Substituting command line text
-@cindex Replacing command line text
-
-The key sequence @kbd{ESC-%} initiates a find & replace on the text
-currently on the command line.  After typing @kbd{ESC-%}, the @code{F&R>}
-prompt appears.  At that prompt, enter a delimiting character that does
-not appear in the search or replace text, then the search text (i.e.,
-the text to be replaced), then the delimiting character again, and then
-the replace text (i.e., the text by which the search text is to be
-replaced).
-
-For instance, to replace all occurrences of @kbd{xp} in the current
-command line by @kbd{y3}, type @kbd{ESC-%} and then @kbd{/xp/y3}.  Instead
-of the slash character (@kbd{/}), any other character besides @kbd{x},
-@kbd{p}, @kbd{y}, and @kbd{3} could also have been used.
-
-@c ------------------------------------------------------------------
-@node Word Completion, Insert/Overwrite, Find & Replace, Command Input
-@comment  node-name,  next,  previous,  up
-@subsection Word Completion in the Command Line
-
-@cindex Word completion in LUX input
-
-The key sequence @kbd{ESC-w} compares the word the cursor is in with all
-names of internal and user-defined subroutines, functions, block
-routines, and variables, and lengthens the word on the command line to
-the longest initial string that they all share.  If you type @kbd{ESC-w}
-again (without other intermediate keystrokes) then a list of all matches
-is displayed, with internal functions marked by final parentheses
-@kbd{()}, internal functions by a final comma @kbd{,}, user-defined
-subroutines by final @kbd{(s)}, user-defined functions by @kbd{(f)},
-user-defined block routines by final @kbd{(b)}, and variables by absence
-of a final marker.
-
-For instance, assume that the words @code{MYVAR}, @code{MYFUNC},
-@code{MYSUBR}, @code{MYBLOCK}, and @code{MYFUNNEL} are defined as,
-respectively, a variable, a function, a subroutine, a blockroutine, and
-a variable, and that you have just typed @kbd{myv} and pressed
-@kbd{ESC-w}.  Then @kbd{myv} is completed to @kbd{myvar}, because there
-is no ambiguity with the other names.  In this situation, @kbd{myf}
-would be completed only to @kbd{myfun}, because the next character could
-be either an @kbd{n} (@kbd{myfunnel}) or a @kbd{c} (@kbd{myfunc}).  An
-extra press of @kbd{ESC-w} would display the list of partial matches:
-
-@example
-MYFUNNEL MYFUNC()
-@end example
-
-Word completion cannot take into account the function of the word in LUX
-(i.e., whether it is supposed to be a variable, or a subroutine,
-etcetera), because the line you type is only interpreted after you
-finish it by typing the @kbd{RET} key.
-
-@c ------------------------------------------------------------------
-@node Insert/Overwrite, Help Mode, Word Completion, Command Input
-@comment  node-name,  next,  previous,  up
-@subsection Inserting in or Overwriting the Command Line
-
-@cindex Insert mode in LUX input
-@cindex Overwrite mode in LUX input
-
-The @kbd{INSERT} key toggles between insert and overwrite mode.  In
-insert mode, a typed character is inserted between the character
-currently below the character and the previous character.  The text
-behind the insertion point is moved one position forward.  In overwrite
-mode, a typed character replaces the character under the cursor, and the
-cursor moves one position to the right.
-
-Here are some key combinations that produce more than one character:
-@table @kbd
-@item ESC-(
-Produces a pair of parentheses, @code{()}.  In insert mode, the cursor
-is positioned between the parentheses.  In overstrike mode, the cursor
-is positioned after the parentheses.
-@item ESC-[
-Produces a pair of square brackets, @code{[]}.  In insert mode, the cursor
-is positioned between the brackets.  In overstrike mode, the cursor
-is positioned after the brackets.
-@item ESC-@{
-Produces a pair of curly braces, @code{@{@}}.  In insert mode, the cursor
-is positioned between the braces.  In overstrike mode, the cursor
-is positioned after the braces.
-@end table
-
-@c ------------------------------------------------------------------
-@node Help Mode, Key Code Overview, Insert/Overwrite, Command Input
-@comment  node-name,  next,  previous,  up
-@subsection Help Mode
-
-@cindex Help mode for keystrokes
-@cindex Keystroke help mode
-
-@kbd{ESC-h} enters the program into help mode, indicated by the
-@code{hlp>} prompt.  This help mode currently shows a list of the
-special key sequences in LUX.
-
-@c ------------------------------------------------------------------
-@node Key Code Overview,  , Help Mode, Command Input
+@node Key Code Overview,  , Command Input, Command Input
 @comment  node-name,  next,  previous,  up
 @subsection Key Code Overview
 
 @cindex Key code overview
 @cindex Keystroke overview
 
-Here's an alphabetic listing of keys that have special meaning during
-command line input.  @kbd{C-g}, @kbd{ESC-[}, @kbd{ESC-w}, and
-@kbd{ESC-@{} have a meaning which is significantly different from that
-in Emacs.
+LUX makes use of the GNU readline library for reading lines at the
+keyboard.  Here are some of the special keystrokes that are
+recognized.
 
 @table @kbd
-@item BKS
+@item Backspace
 Delete the character before the cursor.
-@item DEL
+@item Delete
 Delete the character under the cursor.
-@item DOWNARROW
-Down one screen line, or retrieve next line from history buffer.
-@item INSERT
+@item Downarrow
+Retrieve next line from history buffer.
+@item Insert
 Toggles between insert and overwrite mode.
-@item LEFTARROW
+@item Leftarrow
 To previous character.
-@item RIGHTARROW
+@item Rightarrow
 To next character.
-@item UPARROW
-Up one screen line, or retrieve previous line from history buffer.
+@item Uparrow
+Retrieve previous line from history buffer.
 @item C-a
 To beginning of command line.
 @item C-b
 To previous character.
+@item C-d
+Delete the current character.
 @item C-e
 To end of command line.
 @item C-f
 To next character.
-@item C-g
-Toggle between replacing (default) and appending retrieved lines to the
-current command line. 
 @item C-k
-Delete the command line behind the cursor.
+Kill the text from the current position to the end of the line.
+@item C-l
+Clear the screen, reprinting the current line at the top.
 @item C-n
 Retrieve the next line from the history buffer.
 @item C-p
 Retrieve the previous line from the history buffer.
 @item C-r
+Retrieve a line with a particular string in it from the history
+buffer, going backwards.  Terminate the search with @kbd{Escape} or
+@kbd{C-J} (to accept the found line and allow it to be edited), or
+@kbd{Return} (to accept the found line and execute it) or @kbd{C-g}
+(to abandon the search and restore the previous line).
+@item C-s
 Retrieve a line with a particular string in it from the history buffer,
-going backwards.
+going forwards.  Terminate the search with @kbd{Escape} or
+@kbd{C-J} (to accept the found line and allow it to be edited), or
+@kbd{Return} (to accept the found line and execute it) or @kbd{C-g}
+(to abandon the search and restore the previous line).
 @item C-t
 Transpose characters.
-@item C-x DEL
-Delete the screen line part before the cursor.
-@item C-x k
-Delete the command line before the cursor.
-@item ESC-BKS
-Delete an expression backward.
-@item ESC-DEL
-Delete a word backward.
-@item ESC-%
-Find and replace text.
-@item ESC-(
-Insert a pair of parentheses.
-@item ESC-[
-Insert a pair of square brackets.
-@item ESC-@{
-Insert a pair of curly braces.
-@item ESC-a
-To previous beginning-of-screen-line.
-@item ESC-b
+@item C-u
+Delete the command line part before the cursor.
+@item C-x Delete
+Delete the command line part before the cursor.
+@item C-w
+Kill from the current position to the previous whitespace.
+@item C-y
+Yank the most recently killed text back into the line.
+@item C__ or C-x C-u
+Incremental undo.
+@item M-Delete
+Kill from the cursor to the previous start-of-word.
+@item M-b
 To previous beginning-of-word.
-@item ESC-d
-Delete a word forward.
-@item ESC-e
-To next end-of-screen-line.
-@item ESC-f
+@item M-c
+Capitalize the current (or following) word.
+@item M-d
+Kill from the current position to the next end-of-word.
+@item M-f
 To next end-of-word.
-@item ESC-h
-Help.
-@item ESC-k
-Delete the screen line part after the cursor.
-@item ESC-t
+@item M-l
+Downcase the current (or following) word.
+@item M-n
+Non-incremental search forward in the history lines.
+@item M-p
+Non-incremental search back in the history lines.
+@item M-r
+Undo all changes made to this line.
+@item M-t
 Transpose words.
-@item ESC-w
-Complete a word.
-@item ESC C-b
-Move to the previous beginning-of-expression.
-@item ESC C-f
-Move to the next end-of-expression.
-@item ESC C-k
-Delete an expression forward.
-@item ESC C-t
-Transpose expressions.
+@item M-u
+Upcase the current (or following) word.
+@item M-y
+Rotate the kill-ring and yank the new topmost element.  This only has
+effect just after @kbd{C-y} or @kbd{M-y}.
+@item M-<
+Move to the first line in the history.  Note that LUX retains only a
+limited number of history lines (currently 100).
+@item M->
+Move to the last line in the history.
 @end table
 
 @c ------------------------------------------------------------------
@@ -2450,7 +2024,7 @@ the two most-used data byte orders.
 * Tape File I/O::               Data from/to tape files
 @end menu
 
-@node Keyboard/Screen I/O,  , Data I/O Routines, Data I/O Routines
+@node Keyboard/Screen I/O, Disk File I/O, Data I/O Routines, Data I/O Routines
 @comment  node-name,  next,  previous,  up
 @subsection Keyboard/Screen Input/Output
 
@@ -5138,7 +4712,7 @@ yields @code{'file-second-007'}.  The two arguments @code{'second'} and
 @code{7} must be enclosed in curly braces.
 
 @c ------------------------------------------------------------------
-@node Multiple Subscripts,  , Lists of Subscripts, Subscripts
+@node Multiple Subscripts, Fractional Subscripts, Lists of Subscripts, Subscripts
 @comment  node-name,  next,  previous,  up
 @subsubsection Multiple Subscripts
 
@@ -5213,7 +4787,7 @@ instance, if @code{x} is an array with 3 by 2 by 5 by 3 elements, then
 
 [2.11.248]
 @c ------------------------------------------------------------------
-@node Fractional Subscripts,  , Multiple Subscripts, Subscripts
+@node Fractional Subscripts, Expression Subscripts, Multiple Subscripts, Subscripts
 @comment  node-name,  next,  previous,  up
 @subsubsection Fractional Subscripts
 
@@ -6003,7 +5577,7 @@ non-zero.  The statement @code{@var{statement}} is always executed at least
 once, even if the condition @code{@var{expr}} is true to begin with.
 
 @c ------------------------------------------------------------------
-@node WHILE-DO Statement,  , REPEAT Statement, Statements
+@node WHILE-DO Statement, DO-WHILE Statement, REPEAT Statement, Statements
 @comment  node-name,  next,  previous,  up
 @section WHILE-DO Statement
 
@@ -6269,7 +5843,7 @@ parameters.  See @ref{Extended Parameter Lists} for details.
 
 [2.13.178]
 @c ------------------------------------------------------------------
-@node Extended Parameter Lists,  , Subroutine Call, Statements
+@node Extended Parameter Lists, Function Definition, Subroutine Call, Statements
 @comment  node-name,  next,  previous,  up
 @section Extended Parameter Lists
 
@@ -7338,8 +6912,7 @@ LUX mimics a regular calculator if you enter calculator mode using the
 @code{CALCULATOR} command.  You can only enter this mode from the main
 execution level (i.e., not from inside a subroutine or function).  This
 mode is indicated by the @code{clc>} prompt, and you can leave it again
-by issuing a @code{RETURN} command, or by exiting LUX altogether using
-the @code{C-x RET} key sequence.
+by issuing a @code{RETURN} command.
 
 In calculator mode, you modify the value of variable @code{$} by issuing
 calculator commands.  The value must be a numerical scalar or array, or

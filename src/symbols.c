@@ -3449,7 +3449,7 @@ Int nextchar(FILE *fp) {
   /* data input buffer is used, with all command line editing except */
   /* history buffer stuff enabled.  This can be used as an alternative */
   /* for fgetc(). LS 29mar2001 */
-  Int getNewLine(char *, char *, char);
+  Int getNewLine(char *, size_t, char *, char);
 
   if (fp == stdin) {
     if (!keyboard.ptr) {
@@ -3461,10 +3461,9 @@ Int nextchar(FILE *fp) {
       if (keyboard.ptr == keyboard.buffer) /* we must ask for more */
 	while (!*keyboard.ptr) {
 	  FILE *is;
-          Int getNewLine(char *, char *, char);
 	  is = inputStream;
 	  inputStream = stdin;
-	  getNewLine(keyboard.buffer, "dat>", 0);
+	  getNewLine(keyboard.buffer, BUFSIZE, "dat>", 0);
 	  inputStream = is;
 	  keyboard.ptr = keyboard.buffer;
 	}

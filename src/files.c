@@ -105,7 +105,8 @@ extern Int	nest;	/* batch flag */
 extern FILE	*inputStream;
 extern Int	 error_extra;
 Int	type_ascii(Int, Int [], FILE *),
-  read_ascii(Int, Int [], FILE *, Int), getNewLine(char *, char *, char),
+  read_ascii(Int, Int [], FILE *, Int),
+  getNewLine(char *, size_t, char *, char),
   redef_string(Int, Int);
 void	zerobytes(void *, Int), endian(void *, Int, Int),
   fprintw(FILE *fp, char *string);
@@ -2403,7 +2404,7 @@ Int read_formatted_ascii(Int narg, Int ps[], void *ptr, Int showerrors,
 	if (!keyboard)
 	  return showerrors? cerror(ALLOC_ERR, 0): 0;
       }
-      getNewLine(keyboard, "dat>", 0); /* read a line from the keyboard */
+      getNewLine(keyboard, BUFSIZE, "dat>", 0); /* read a line from the keyboard */
       ptr = keyboard;
       isString = 1;
     }

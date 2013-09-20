@@ -45,7 +45,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #define BIG_ENOUGH      1
 #define WHITE_BACKGR	2
 
-Int	getNewLine(char *, char *, char), coordTrf(Float *, Float *, Int, Int),
+Int	coordTrf(Float *, Float *, Int, Int),
   checkCoordSys(Int mode, Int defaultmode);
 
 Int	setup_x(void), anaAllocNamedColor(char *, XColor **);

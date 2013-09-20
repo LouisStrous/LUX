@@ -511,7 +511,7 @@ Int selectVisual(void)
 {
   XVisualInfo	*vInfo, vTemplate;
   Int	nVisual, i, mask, j;
-  Int	getNewLine(char *, char *, char);
+  Int	getNewLine(char *, size_t, char *, char);
   uint32_t	r, x;
   char	*name;
 
@@ -566,7 +566,7 @@ Int selectVisual(void)
 
   printf("Your selection:\n");
   do {
-    getNewLine(curScrat, "  ?>", 0);
+    getNewLine(curScrat, NSCRAT, "  ?>", 0);
     visualClass = atol(curScrat);
     if (visualClass < 1 || visualClass > nVisual)
       printf("Selection %1d is invalid.  Select between 1 and %1d (inclusive).\n",

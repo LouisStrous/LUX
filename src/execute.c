@@ -1700,7 +1700,7 @@ Int execute(Int symbol)
   void checkTemps(void);
 #endif
   Float	newCPUtime;
-  Int	showstats(Int, Int []), getNewLine(char *, char *, char),
+  Int	showstats(Int, Int []), getNewLine(char *, size_t, char *, char),
     lux_restart(Int, Int []), showError(Int), insert(Int, Int []),
     nextFreeStackEntry(void);
   void showExecutionLevel(Int);
@@ -1816,7 +1816,7 @@ Int execute(Int symbol)
 	      step = executeLevel;
 	      break;
 	    case 'g':		/* go on until on/after a specific line# */
-	      getNewLine((char *) scrat, "> go to line?", 0);
+	      getNewLine((char *) scrat, NSCRAT, "> go to line?", 0);
 	      go = atoi((char *) scrat);
 	      break;
 	    case 'm':		/* toggle showstats() */

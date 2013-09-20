@@ -359,23 +359,13 @@ Int lux_distr_f(Int narg, Int ps[])
 }
 /*------------------------------------------------------------------------- */
 Int readkey(Int mode)
-/* returns the code for the next pressed key and echos that key */
-/* escape sequence  ESC char           yields  char + 0x200
-                    ESC [ char         yields  char + 0x100
-                    ESC [ number char  yields  char + 0x300 + number * 0x10000
-   E.g. (on a VT100-compatible terminal):  
-    key       F1 sh-F1 ctrl-F1 up sh-up insert
-    code/256 369  3441    6513 65 41329  35697
-    hex     0171  0D71    1971 41  A171   8B71
-   LS 22may92 */
 {
  Int	ch, result_sym;
- void	putChar(Int);
  
- ch = getchar();
+ ch = rl_getc(stdin);
  result_sym = scalar_scratch(LUX_LONG);
  sym[result_sym].spec.scalar.l = ch;
- if (mode) { putChar(ch);  putchar('\n'); }
+ if (mode) { putchar(ch);  putchar('\n'); }
  return result_sym;
 }
 /*------------------------------------------------------------------------- */
@@ -400,14 +390,14 @@ Int lux_readarr(Int narg, Int ps[])
  FILE	*tp, *is;
  char	*p, *pt, lastchar, token[32], line[BUFSIZE];
  Int	arrs=0, i, iq, maxtype = LUX_LONG, *iptr, 
-	getNewLine(char *, char *, char), redef_array(Int, Int, Int, Int *);
+   getNewLine(char *, size_t, char *, char), redef_array(Int, Int, Int, Int *);
  Float	*fptr;
 
  iq = ps[0];						/* target */
  tp = Tmpfile();					/* temporary storage */
  is = inputStream;
  inputStream = stdin;
- i = getNewLine((char *) line, "arr>", 0);  /* read line */
+ i = getNewLine((char *) line, BUFSIZE, "arr>", 0);  /* read line */
  inputStream = is;
  if (i > 0)
  { p = line; lastchar = *p;

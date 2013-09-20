@@ -28,11 +28,9 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
-#include <gsl/gsl_spline.h>
 #include "action.h"
 #include "luxparser.h"
 #include "editor.h"
-#include "gsl/gsl_errno.h"
 #define YYERROR_VERBOSE
 #define startList(x)	{ pushList(LUX_NEW_LIST); pushList(x); }
 				/* start a new list */
@@ -1216,7 +1214,7 @@ Int yylex(YYSTYPE *lvalp)
  static Int	len = 0;
  extern char	recording, *currentInputFile;
  extern Int	curLineNumber;	/* current line number */
- Int	getNewLine(char *buffer, char *prompt, char historyFlag),
+ Int	getNewLine(char *buffer, size_t bufsize, char *prompt, char historyFlag),
    showstats(Int narg, Int ps[]), installString(char *);
 
  if (errorState)
@@ -1239,7 +1237,7 @@ Int yylex(YYSTYPE *lvalp)
      while (!*line) {		/* try until there's something to do */
        if (len < 0)		/* EOF reached */
 	 putchar('\r');		/* ensure cursor is at left */
-       len = getNewLine(line, prompt, inHistoryBuffer);	/* read new line; */
+       len = getNewLine(line, BUFSIZE, prompt, inHistoryBuffer);	/* read new line; */
 	                        /* the length (excluding final \0) into len */
        curLineNumber++;		/* update current line number */
        if (len < 0) {		/* found end of file (EOF) */
@@ -1589,12 +1587,11 @@ Int do_main(Int argc, char *argv[])
 
   programName = argv[0];
   getTerminalSize();
-  getTermCaps();
   site(0, NULL);		/* identify this version of LUX */
   fflush(stdin);
-  rawIo();			/* get keystrokes one by one */
   symbolInitialization();
   readHistory();
+  stifle_history(100);          /* limit history buffer to 100 lines */
   *line = '\0';			/* start with an empty line */
   p = line;
 
@@ -1620,7 +1617,7 @@ Int do_main(Int argc, char *argv[])
   }
   if (*line) {
     printf("%s%s\n", ANAPrompts[0], line);
-    inHistory(line + 1);
+    add_history(line + 1);
     translateLine();
     currentChar = tLine;
   }

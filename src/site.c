@@ -64,7 +64,12 @@ Int site(Int narg, Int ps[])
   setPager(0);
   if (!internalMode || internalMode == 255) {
     printw("*** Welcome to " PACKAGE_STRING " (" GIT_VERSION ")\n");
-    printw("Type \"HELP\" for assistance.\n");
+    printw("Copyright 2013 Louis Strous.\n"
+           "This program comes with ABSOLUTELY NO WARRANTY; "
+           "for details type ‘info,/warranty’.  "
+           "This is free software, and you are welcome to redistribute "
+           "it under certain conditions; type ‘info,/copy’ for details.\n"
+           "Type ‘help’ for assistance.\n");
 #if DEBUG
     printw("Warning: This version of LUX was compiled with the DEBUG option - This may make the program very slow!\n");
 #endif
@@ -72,32 +77,32 @@ Int site(Int narg, Int ps[])
 
   if (internalMode & 16)	/* /WARRANTY */
     printw("****WARRANTY\n"
-	   "This program is distributed in the hope that it will be "
-	   "useful, but WITHOUT ANY WARRANTY; without even the implied "
-	   "warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR "
-	   "PURPOSE.  You use it COMPLETELY AT YOUR OWN RISK.\n\n");
+           "This program is distributed in the hope that it will be useful, "
+           "but WITHOUT ANY WARRANTY; without even the implied warranty of "
+           "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the "
+           "GNU General Public License for more details.\n\n"
+           "You should have received a copy of the GNU General Public License\n "
+           "along with this program.  If not, see <http://www.gnu.org/licenses/>.\n");
   if (internalMode & 32)	/* /COPY */
     printw("****COPYING\n"
-	   "Copyright 2013 Louis Strous.\n"
-	   "This program is released under the GNU Public License version 3.\n"
-	   "See the file COPYING for details.\n"
-	   );
+           "This program is free software: you can redistribute it and/or modify "
+           "it under the terms of the GNU General Public License as published by "
+           "the Free Software Foundation, either version 3 of the License, or "
+           "(at your option) any later version.\n");
   if (internalMode & 64)	/* /BUGS */
     printw("****BUGS\n"
-	   "If you think you have found a bug in LUX, then please register\n"
-	   "the bug as an issue at http://github.com/LouisStrous/lux.\n");
+	   "If you think you have found a bug in LUX, then please report\n"
+	   "it to lux@quae.nl.\n");
 #ifdef __STDC__
   if (internalMode & 2) {	/* /TIME */
     printw("****COMPILATION TIME\n");
     printw("This version was compiled on " __DATE__ ", " __TIME__ "\n");
   }
 #endif
-#if 0
   if (internalMode & 4) {	/* /PLATFORM */
     printw("****PLATFORM\n");
     printw("Platform: " PLATFORM "\n");
   }
-#endif
   if (internalMode & 8)		/* /PACKAGES */
   {
     printw("****PACKAGES\n");

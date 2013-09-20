@@ -63,7 +63,7 @@ Int site(Int narg, Int ps[])
   
   setPager(0);
   if (!internalMode || internalMode == 255) {
-    printw("*** Welcome to " PACKAGE_STRING " (" GIT_VERSION ")\n");
+    printw("*** Welcome to " PACKAGE_STRING "\n");
     printw("Copyright 2013 Louis Strous.\n"
            "This program comes with ABSOLUTELY NO WARRANTY; "
            "for details type ‘info,/warranty’.  "
@@ -91,8 +91,9 @@ Int site(Int narg, Int ps[])
            "(at your option) any later version.\n");
   if (internalMode & 64)	/* /BUGS */
     printw("****BUGS\n"
-	   "If you think you have found a bug in LUX, then please report\n"
-	   "it to lux@quae.nl.\n");
+	   "If you think you have found a bug in LUX, then please report "
+	   "it to lux@quae.nl.  Please mention the revision ID: "
+           GIT_VERSION "\n");
 #ifdef __STDC__
   if (internalMode & 2) {	/* /TIME */
     printw("****COMPILATION TIME\n");

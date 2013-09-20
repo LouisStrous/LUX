@@ -2306,10 +2306,10 @@ Int lux_record(Int narg, Int ps[])
     if (file) {			/* a file is specified */
       if (recordFile)		/* already recording something */
 	fclose(recordFile);
-      recordFile = fopen(expand_name(file, ".ana"), "a");  /* open new file */
+      recordFile = fopen(expand_name(file, ".lux"), "a");  /* open new file */
     } else {
       if (!recordFile)
-	recordFile = fopen("record.ana", "a");
+	recordFile = fopen("record.lux", "a");
     }
     recording |= mode;
     switch (recording) {

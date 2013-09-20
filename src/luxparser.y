@@ -1598,11 +1598,11 @@ Int do_main(Int argc, char *argv[])
   void gehandler(const char *, const char *, Int, Int);
 
   gsl_set_error_handler(&gehandler);
-  /* seek .anainit in home directory */
-  fp = fopen(expand_name("~/.anainit", NULL), "r");
+  /* seek .luxinit in home directory */
+  fp = fopen(expand_name("~/.luxinit", NULL), "r");
   if (fp) {
     fclose(fp);
-    strcpy(p, "@~/.anainit");
+    strcpy(p, "@~/.luxinit");
     p += strlen(p);
   }
   /* now treat the command line "options" as if they were typed at */

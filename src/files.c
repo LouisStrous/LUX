@@ -295,7 +295,7 @@ FILE *openPathFile(char *name, Int mode)
   the directories listed in LUX_PATH (if set), and in ulib (if set), and
   in the current directory (if LUX_PATH nor ulib are set).
   Returns file pointer to found and opened file, or zero.
-  mode = FIND_SUBR: find routine (.ana); FIND_FUNC: function (_f.ana);
+  mode = FIND_SUBR: find routine (.lux); FIND_FUNC: function (_f.lux);
   FIND_EITHER: either; else don't add extension.  If FIND_LOWER is also
   set, then the name is transformed to lower case before the file is
   sought.
@@ -361,14 +361,14 @@ FILE *openPathFile(char *name, Int mode)
       strcpy(expname, curScrat);
       if (mode == 0 || mode == 2) {		/* routine */
 	if (!strchr(strrchr(curScrat, '/'), '.'))
-	  strcat(curScrat, ".ana");
+	  strcat(curScrat, ".lux");
 	fin = fopen(curScrat, "r");
       }
       if (fin == NULL && mode >= 1) {		/* function */
 	if (mode == 2)
 	  strcpy(curScrat, expname);	/* delete extension */
 	if (!strchr(strrchr(curScrat, '/'), '.'))
-	  strcat(curScrat, "_f.ana");
+	  strcat(curScrat, "_f.lux");
                                                 /* add new one */
         fin = fopen(curScrat, "r");
       }

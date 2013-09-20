@@ -4005,7 +4005,7 @@ Int lux_trace(Int narg, Int ps[])
 #define s_ptr(name, value) installPointer(name, LUX_TEMP_STRING, value)
 #define fnc_p(name, value) installSysFunc(name, value)
 
-char	*defaultRedirect = "diagnostic.ana";
+char	*defaultRedirect = "diagnostic.lux";
 
 Int range_warn_flag = 0, redim_warn_flag = 0, error_extra = 0,
   maxhistsize = 20000, histmin, histmax, lastmaxloc, lastminloc,

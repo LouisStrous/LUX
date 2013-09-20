@@ -1658,7 +1658,7 @@ Inclusion}): The command
  @example
   @@file
  @end example
-makes LUX read commands from file @file{file.ana}.  However, if the file
+makes LUX read commands from file @file{file.lux}.  However, if the file
 contains a command that requests user input, then such input is read
 from the keyboard by default.  You can instruct LUX to read such input
 from the file, too, by issuing the @code{BATCH} command (@ref{BATCH}).
@@ -4851,7 +4851,7 @@ If the function name in a function call is not one of the names of a
 built-in function or of an already defined user-defined function, then
 LUX tries to find a file that contains a definition for the as yet
 undefined function.  LUX looks for a file with the same name as the
-function, in lower-case letters, and with the @file{_f.ana} suffix
+function, in lower-case letters, and with the @file{_f.lux} suffix
 added.  LUX looks for this file in the current directory, in the
 directory, if any, that was specified using @code{ULIB} (@ref{ULIB}),
 and in the directories which are listed, separated by colons (@kbd{:}),
@@ -5817,7 +5817,7 @@ If during execution a user-defined subroutine turns out not to have been
 compiled yet, then LUX tries to find a file that contains a definition
 for that subroutine.  LUX looks for a file with the same name as the
 subroutine, transformed to all lower-case letters, and with the
-@file{.ana} suffix added.  LUX looks for this file in the directories
+@file{.lux} suffix added.  LUX looks for this file in the directories
 which are listed, separated by colons (@kbd{:}) in the environment
 variable @code{LUX_PATH} (@ref{Environment}), and in the directory, if
 any, that was specified using @code{ULIB} (@ref{ULIB}).  If such a file
@@ -6074,7 +6074,7 @@ including the file as follows:
 @end example
 
 If the filename @code{@var{file}} has no extension (i.e., no period in it),
-then @file{.ana} is added to it.  If the file with the extension is not
+then @file{.lux} is added to it.  If the file with the extension is not
 found, then the file without the extension is tried.
 
 A special form of file inclusion is selected by typing two at-signs

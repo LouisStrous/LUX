@@ -86,7 +86,7 @@ Int saveHistory(void)
 }
 /*----------------------------------------------------*/
 Int getNewLine(char *buffer, size_t bufsize, char *prompt, char historyFlag)
-/* reads new line from keyboard into buffer; returns length
+/* reads new line from keyboard or file into buffer; returns length
    (terminating null isn't included in count).
    includes history buffer, Word-by-Word movement, search in
    the history buffer, search & replace.
@@ -95,20 +95,30 @@ Int getNewLine(char *buffer, size_t bufsize, char *prompt, char historyFlag)
    returned. */
 {
   static char *line = 0;
-  if (line)
-    free(line);
-  line = readline(prompt);
-  if (historyFlag && line && *line)
-    add_history(line);
   if (line) {
-    size_t n = strlen(line);
-    strncpy(buffer, line, bufsize);
-    if (n >= bufsize) {
-      buffer[bufsize - 1] = '\0';
-      n = bufsize - 1;
-    }
-    return n;
+    free(line);
+    line = 0;
   }
-  return -1;
+  int n;
+  if (inputStream == stdin) {
+    line = readline(prompt);
+    if (historyFlag && line && *line)
+      add_history(line);
+    n = strlen(line);
+  } else {                      /* read from a file */
+    size_t nbuf = 0;
+    n = getline(&line, &nbuf, inputStream);
+    if (n > 0)
+      --n; /* don't count terminating null, so the outcome is the same
+              as for strlen() */
+  }
+  if (n < 0)                    /* end of file */
+    return n;
+  strncpy(buffer, line, bufsize);
+  if (n >= bufsize) {
+    buffer[bufsize - 1] = '\0';
+    n = bufsize - 1;
+  }
+  return n;
 }
 /*----------------------------------------------------*/

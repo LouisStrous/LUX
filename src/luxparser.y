@@ -166,7 +166,7 @@ next_line:			/* one complete LUX statement, or an */
     YYABORT;
   }
 }
-| NEWLINE {	/* a newline; newlines are only passeed to the parser by
+| NEWLINE {	/* a newline; newlines are only passed to the parser by
 		   yylex() if disableNewline is equal to 0 */
     if (debugLine)		/* if this is a dbg> line then we quit after
 				   the first line */

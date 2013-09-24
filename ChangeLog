@@ -1,2 +1,13 @@
-ChangeLog of ANA
-	
+-*- org-mode -*-
+
+Change Log of LUX
+
+- <2013-09-23 Mon> lux@quae.nl v1.0.1
+  - Fix reading commands from file; got broken during recent
+    replacement of home-grown command line editor for GNU readline.
+  - Make bindings to SOFA routines work again; stopped working after
+    switching to linking most object files (except lux.o containing
+    the main entry point) into liblux.a before linking lux.o and
+    liblux.a into the final lux executable.  Fixed by linking all
+    object files directly into the LUX binary.  Also keeping liblux.a,
+    because that makes building the unit test binaries easier.

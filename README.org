@@ -1,7 +1,8 @@
 * LUX
 
   LUX is a program for (numerical) data processing and image
-  processing.
+  processing.  See http://lux.quae.nl for its packaged source code
+  distribution and for the on-line LUX manual.
 
 * Third Party Software used in LUX
 

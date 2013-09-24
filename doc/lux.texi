@@ -1120,8 +1120,8 @@ Internal Functions and Subroutines
 * SHOWORBITS::                  Show information on read orbital data
 * SHOWSTATS::                   Show information about the LUX session
 * SHOW_FILES::                  Show info on all open files
-* SHOW_FUNC::                   Show information about an LUX function
-* SHOW_SUBR::                   Show information about an LUX subroutine
+* SHOW_FUNC::                   Show information about a LUX function
+* SHOW_SUBR::                   Show information about a LUX subroutine
 * SHOW_TEMPS::                  Show information about temporary variables
 * SHOW_VISUALS::                Show available color display schemes
 * SIDEREALTIME::                The mean sidereal time
@@ -1548,7 +1548,7 @@ above.
 @cindex Start-up file
 
 (To install LUX on your computer system, see @ref{Installing LUX}).  You
-begin an LUX session by typing at the keyboard the name of the program
+begin a LUX session by typing at the keyboard the name of the program
 on your system (probably @kbd{lux}).  After some initialization and a
 greeting message, the main LUX prompt appears:
 @example
@@ -1567,7 +1567,7 @@ The @code{T} command is a synonym of @code{TYPE} (@ref{TYPE}) and
 @code{PRINT} (@ref{PRINT}), and displays its arguments on the screen.
 LUX has executed your command and is waiting for the next one.
 
-You end an LUX session by entering the @code{QUIT} command (@ref{QUIT}),
+You end a LUX session by entering the @code{QUIT} command (@ref{QUIT}),
 or the equivalent @code{EXIT} command (@ref{EXIT});
 
 If you want some initialization commands to be executed automatically
@@ -6163,7 +6163,7 @@ the middle of a literal text string (between quotes (@code{'} or
 @code{"}); @ref{Strings}) or a number (@ref{Scalars}); or in the middle
 of a reserved keyword such as @code{IF} or @code{REPEAT} (@ref{Reserved
 Keywords}).  In all other places in LUX files, newlines are allowed.
-So, in an LUX file, it is OK to have @code{T,SIN ( 5.3} on one line and
+So, in a LUX file, it is OK to have @code{T,SIN ( 5.3} on one line and
 @code{)} on the next line to form a complete command.
 
 When LUX reads input from the keyboard, then it assumes for the most
@@ -6267,7 +6267,7 @@ should be displayed.
 @cindex RIM coordinates
 @cindex X11 coordinates
 
-In plotting data or displaying images in an LUX window on your screen,
+In plotting data or displaying images in a LUX window on your screen,
 you can select from various coordinate systems.  These coordinate
 systems are listed below.
 
@@ -6414,7 +6414,7 @@ cursor -- is in).  For example, if you run LUX on a system where only a
 single color map can be active at any given time, and if LUX is using a
 private color map, then the terminal window (in which you type LUX
 commands) and LUX windows and widgets cannot all be shown with the
-correct colors at the same time.  If you move the pointer into an LUX
+correct colors at the same time.  If you move the pointer into a LUX
 window, then all LUX windows will be shown with the correct colors, and
 if you move the pointer outside of all LUX windows, then the terminal
 window and screen background will be shown with the correct colors.
@@ -6553,7 +6553,7 @@ applications (such as LUX) running at the time.  If LUX finds that not
 enough color cells remain in the default color map, then it requests its
 own private color map (@ref{Colors}).
 
-When you display an image in an LUX window using the @code{TV} routine,
+When you display an image in a LUX window using the @code{TV} routine,
 then three transformations are performed to translate an image value
 into a color: First the data value is scaled linearly to a @code{BYTE}
 index into the available color range, using the @code{SCALE} function.
@@ -6918,7 +6918,7 @@ In calculator mode, you modify the value of variable @code{$} by issuing
 calculator commands.  The value must be a numerical scalar or array, or
 a string.  After each command has been completed, the current value of
 @code{$} is displayed.  Each command is ended by a newline and consists
-of an LUX expression or simple assignment implicitly or explicitly
+of a LUX expression or simple assignment implicitly or explicitly
 containing @code{$} as an operand.  This variable is an implicit operand
 in the following cases: binary operations where the first operand is
 missing, simple assignments where the left-hand side is missing, and
@@ -10372,7 +10372,7 @@ See also: @ref{TAPRD}, @ref{TAPWRT}
 
 This @code{LONG} variable holds the source of the last event caught by
 @code{XLOOP}.  It is equal to the number of the source window or menu
-plus @code{#EVENT.WINDOW} (256) if the event occurred inside an LUX
+plus @code{#EVENT.WINDOW} (256) if the event occurred inside a LUX
 window, or plus @code{#EVENT.MENU} (512) if the event occurred inside an
 LUX menu.
 
@@ -10566,7 +10566,7 @@ See also: @ref{GRIDMATCH}
 @node !IX, !IXHIGH, !ITMAX, Read-Write Global Vars
 @subsection !IX
  
-@code{DEV} X coordinate of the last position selected in an LUX window.
+@code{DEV} X coordinate of the last position selected in a LUX window.
  
 See also: @ref{CHECKWINDOW}, @ref{!IY}, @ref{Screen Coordinates},
 @ref{!XF}, @ref{XPLACE}, @ref{XQUERY}
@@ -10582,7 +10582,7 @@ See also: @ref{!IX}, @ref{!IYHIGH}, @ref{XPORT}
 @node !IY, !IYHIGH, !IXHIGH, Read-Write Global Vars
 @subsection !IY
 
-@code{DEV} Y coordinate of the last position selected in an LUX window.
+@code{DEV} Y coordinate of the last position selected in a LUX window.
 
 See also: @ref{CHECKWINDOW}, @ref{!IX}, @ref{Screen Coordinates},
 @ref{XPLACE}, @ref{XQUERY}, @ref{!YF}
@@ -11153,7 +11153,7 @@ See also: @ref{SCALE}, @ref{!SCALEMAX}
 @subsection !SCREEN_HEIGHT
 
  The height of the whole screen, in pixels.  This variable is only
-up-to-date if an LUX window has been opened or if a connection to the X
+up-to-date if a LUX window has been opened or if a connection to the X
 server has been established by @code{XOPEN}.
 
 See also: @ref{!SCREEN_WIDTH}, @ref{XOPEN}, @ref{XPORT}
@@ -11163,7 +11163,7 @@ See also: @ref{!SCREEN_WIDTH}, @ref{XOPEN}, @ref{XPORT}
 @subsection !SCREEN_WIDTH
 
 The width of the whole screen, in pixels.  This variable is only
-up-to-date if an LUX window has been opened or if a connection to the X
+up-to-date if a LUX window has been opened or if a connection to the X
 server has been established by @code{XOPEN}.
 
 See also: @ref{!SCREEN_HEIGHT}, @ref{XOPEN}, @ref{XPORT}
@@ -12328,8 +12328,8 @@ arguments.
 * SHOWORBITS::                  Show information on read orbital data
 * SHOWSTATS::                   Show information about the LUX session
 * SHOW_FILES::                  Show info on all open files
-* SHOW_FUNC::                   Show information about an LUX function
-* SHOW_SUBR::                   Show information about an LUX subroutine
+* SHOW_FUNC::                   Show information about a LUX function
+* SHOW_SUBR::                   Show information about a LUX subroutine
 * SHOW_TEMPS::                  Show information about temporary variables
 * SHOW_VISUALS::                Show available color display schemes
 * SIDEREALTIME::                The mean sidereal time
@@ -14342,7 +14342,7 @@ statements other than assignments and @code{RETURN} can be executed.
 
 Each newline ends a command.  The result of each command replaces the
 current value.  The following commands are supported: a numerical value;
-an LUX expression; a binary operator followed by an expression (the
+a LUX expression; a binary operator followed by an expression (the
 current value is taken for the first operand); the name of a
 single-argument function (the current value is taken for the operand);
 an equal sign followed by an expression; or the @code{RETURN} command,
@@ -17188,7 +17188,7 @@ See also: @ref{Astronomical Coordinate Calculations}
 @code{ERASE [, @var{window}, @var{x}, @var{y}, @var{w}, @var{h}] [,
 /DEV, /DVI, /IMG, /PLT, /RIM, /RPL] [, /SCREEN, /POSTSCRIPT]}
 
-Erases (part of) an LUX window (if @code{/SCREEN} is specified or
+Erases (part of) a LUX window (if @code{/SCREEN} is specified or
 @code{!PDEV} is equal to zero), or starts a new page in the Postscript
 output file with name @code{!PS_FILE} (if @code{@var{/POSTSCRIPT}} is
 specified or @code{!PDEV} is equal to 1).
@@ -22431,7 +22431,7 @@ black and that of the Postscript file white.
 In particular, if @code{SET,/WHITEBACKGROUND} is set, then a gray value
 of 0 or less corresponds in LUX windows to white and a gray value of 1
 or more to black.  If @code{SET,/WHITEBACKGROUND} is not set, then a
-gray value of 0 or less corresponds to black in an LUX window and a gray
+gray value of 0 or less corresponds to black in a LUX window and a gray
 value of 1 or more to white.
 
 A pen change affects output to the Postscript file as well as output in
@@ -25345,7 +25345,7 @@ There may be more than one visual for your screen of the class you
 specify.  In that case, one is selected according to unspecified rules.
 
 If a connection to the X server was already established (e.g., if you
-already opened an LUX window), then a visual has already been selected.
+already opened a LUX window), then a visual has already been selected.
 It is an error to call @code{SET} if a visual is already active that
 does not match @code{@var{visual}}.  If you wish to change to a
 different visual class, then you must first explicitly close the current
@@ -28526,7 +28526,7 @@ widget ID.
 
 @code{XMDRAWINGLINK, @var{widget}, @var{window}}
 
-@code{[@ref{motif} package]} Links a drawing area widget to an LUX window.
+@code{[@ref{motif} package]} Links a drawing area widget to a LUX window.
 
 [2.14.2]
 @c -------------------------------------
@@ -29640,7 +29640,7 @@ See also: @ref{AND}, @ref{OR}
 
 @code{XPLACE [, @var{x}, @var{y}] [, /DEV, /DVI, IMG, /PLT, /RIM, /RPL]}
 
-@code{[@ref{x11}]} Waits for a key or mouse button press in an LUX window.
+@code{[@ref{x11}]} Waits for a key or mouse button press in a LUX window.
 Returns the number of the pressed mouse button in @code{!BUTTON}, mouse
 coordinates in @code{!IX}, @code{!IY} (in @code{DEV} coordinates), and
 @code{!XF}, @code{!YF} (in the specified coordinate system, which

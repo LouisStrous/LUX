@@ -47,7 +47,7 @@ Int lux_i_ddidp3_iDaL1rDp3p2q_0z12_f_(Int narg, Int ps[], Int (*f)(Double, Doubl
 Int lux_i_dp3dpT6_iD23aoDm2m3aDcT5_0T6_s_(Int narg, Int ps[], Int (*f)(Double [2][3], Double *, Double *, Double *, Double *, Double *, Double *));
 Int lux_i_dpiT3dp_iDaiLiLrDq_00T3_f_(Int narg, Int ps[], Int (*f)(Double *, Int, Int, Int, Double *));
 Int lux_i_dpiidp_iDaLrDq_00T2_f_(Int narg, Int ps[], Int (*f)(Double *, Int, Int, Double *));
-Int lux_i_idT3dp_iL1D3arDcq_10002_f_(Int narg, Int ps[], Int (*f)(Int, Double, Double, Double, Double *));
+Int lux_i_idT3dp_iD3aL1rDq_10002_f_(Int narg, Int ps[], Int (*f)(Int, Double, Double, Double, Double *));
 Int lux_i_idpT4_iL1D3arDcq_0T222_f_(Int narg, Int ps[], Int (*f)(Int, Double *, Double *, Double *, Double *));
 Int lux_i_idpdp_iLarDp2q_011_f_(Int narg, Int ps[], Int (*f)(Int, Double *, Double *));
 Int lux_i_sd_iDaLa_000_s_(Int narg, Int ps[], Int (*f)(Double *, size_t, size_t));

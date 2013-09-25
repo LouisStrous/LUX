@@ -173,13 +173,13 @@ Int lux_i_idpT4_iL1D3arDcq_0T222_f_(Int narg, Int ps[], Int (*f)(Int, Double *, 
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-Int lux_i_idT3dp_iL1D3arDcq_10002_f_(Int narg, Int ps[], Int (*f)(Int, Double, Double, Double, Double *))
+Int lux_i_idT3dp_iD3aL1rDq_10002_f_(Int narg, Int ps[], Int (*f)(Int, Double, Double, Double, Double *))
 {
   pointer *ptrs;
   loopInfo *infos;
   Int iq;
 
-  if ((iq = standard_args(narg, ps, "iL1;i>D3*;rD[-]&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "i>D3*;iL1;rD&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   size_t nelem = infos[0].nelem/3;
   while (nelem--) {

@@ -637,7 +637,7 @@ BIND(iauGc2gde, v_dT3d3_iD3aD1D1rD3q_120333, f, GC2GDE, 3, 3, NULL)
    Returns geocentric coordinates (x, y, z) corresponding to geodetic
    coordinates <eph> (elongation, phi, height) for the specified
    reference ellipsoid <ellid> */
-BIND(iauGd2gc, i_idT3dp_iL1D3arDcq_10002, f, GD2GC, 2, 2, NULL)
+BIND(iauGd2gc, i_idT3dp_iD3aL1rDq_10002, f, GD2GC, 2, 2, NULL)
 /*-----------------------------------------------------------------------*/
 /* GD2GCE(<eph>, <a>, <f>)
 

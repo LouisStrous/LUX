@@ -3304,6 +3304,37 @@ void kepler(Double m, Double e, Double v_factor, Double *v, Double *rf)
   }
 }
 /*--------------------------------------------------------------------------*/
+Double kepler_v(Double m, Double e)
+/* solves Kepler's equation for mean anomaly <m> (in radians) and
+ eccentricity <e>.  Returns the corresponding true anomaly.  */
+{
+  Double	E, de, p;
+
+  if (fabs(e) < 1) {		/* elliptical orbit */
+    m = fmod(m, TWOPI);
+    E = m;
+    do {
+      p = 1 - e*cos(E);
+      de = (m + e*sin(E) - E)/p;
+      E += de;
+    } while (fabs(de) > 1e3*DBL_EPSILON);
+    return 2*atan(sqrt(abs((1+e)/(1-e)))*tan(E/2)); /* true anomaly */
+  } else if (fabs(e) > 1) {	/* hyperbolic orbit */
+    E = m/e;
+    do {
+      p = E;
+      E = asinh((m + E)/e);
+    } while (E != p);
+    return 2*atan(sqrt(abs((1+e)/(1-e)))*tanh(E/2));
+  } else {			/* parabolic orbit */
+    E = m/2;
+    e = cbrt(E + sqrt(E*E + 1));
+    p = e - 1.0/e;
+    return 2*atan(p);
+  }
+}
+BIND(kepler_v, d_dd_iDaD1rDq_01_2, f, KEPLER, 2, 2, NULL);
+/*--------------------------------------------------------------------------*/
 Double interpolate_angle(Double a1, Double a2, Double f)
      /* interpolates between angles <a1> and <a2> (measured in
 	radians) at fraction <f> from <a1> to <a2>, taking into

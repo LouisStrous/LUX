@@ -1054,6 +1054,32 @@ Int lux_d_dd_iDarDq_0z_1_f_(Int narg, Int ps[], Double (*f)(Double, Double))
   return iq;
 }
 /*-----------------------------------------------------------------------*/
+/** Bind a C function \p f to a LUX function with one at-least-Double
+    array input parameter, one scalar at-least-Double scalar input
+    parameter, and a Double array return parameter with the same
+    dimensions as the first parameter.  Function \p f is called for
+    each element of the first parameter.
+
+    Standard arguments <tt>"i>D*;i>D1;rD&"</tt>.
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+Int lux_d_dd_iDaD1rDq_01_2_f_(Int narg, Int ps[], Double (*f)(Double, Double))
+{
+  pointer *ptrs;
+  loopInfo *infos;
+  Int iq;
+
+  if ((iq = standard_args(narg, ps, "i>D*;i>D1;rD&", &ptrs, &infos)) < 0)
+    return LUX_ERROR;
+  while (infos[0].nelem--)
+    *ptrs[2].d++ = f(*ptrs[0].d++, *ptrs[1].d);
+  return iq;
+}
+/*-----------------------------------------------------------------------*/
 Int lux_i_dT5dp_iD3aD1D1rD3q_120003_f_(Int narg, Int ps[], Int (*f)(Double, Double, Double, Double, Double, Double *))
 {
   pointer *ptrs;

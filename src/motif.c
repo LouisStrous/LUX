@@ -65,7 +65,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <Xm/FileSB.h>
 #include <sys/stat.h>
  /*following is icon bitmap, currently same as in xport but want to change */
-#include "lux_bitmap.h"
+#include "lux_bitmap.xbm"
 
  extern	struct sym_desc sym[];
 

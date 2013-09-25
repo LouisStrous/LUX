@@ -38,7 +38,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <limits.h>
 #include "action.h"
  /*following is icon bitmap */
-#include "lux_bitmap.h"
+#include "lux_bitmap.xbm"
 
 #define BITMAPDEPTH     1
 #define TOO_SMALL       0

@@ -17,6 +17,56 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
+
+/** \file bindings.c Functions and macros for binding LUX functions
+    and subroutines to C (library) functions.
+
+    This file defines many binding functions.  The name of a binding
+    functions is built up as follows:
+
+    \verbatim
+    <name> = ‘lux_’<returntype>‘_’<paramtypes>‘_’<stdargspec>‘_’<ptrspec>‘_’<sf>‘_’
+    \endverbatim
+
+    where
+    - \c <returntype> = an encoding of the return type of the bound C
+      function.
+    - \c <paramtypes> = concatenated encoding of the parameter types
+      of the bound C function.
+    - \c <stdargspec> = an encoding of the arguments type
+      specification in the most elaborate call to standard_args() for
+      this binding.  The encoding is obtained from the arguments type
+      specification by:
+      - removing ‘>’, ‘;’, and all but the first ‘i’, all but the
+        first ‘o’, and all but the first ‘r’
+      - changing ‘&’ to ‘q’, ‘+’ to ‘p’, ‘-’ to ‘m’, ‘*’ to ‘a’
+      - changing ‘[...]’ to ‘c’, ‘{...}’ to ‘x’
+      A repeat of a particular unit (from a variable type
+      specification like ‘D’ to up to but not including the next one;
+      for a repeat count of at least 3, or if the abbreviated version
+      is shorter than the full version) is indicated by appending ‘T’
+      and the repeat count.  For example, ‘DqDqDqDq’ gets abbreviated
+      to ‘DqT4’.
+    - <ptrspec> = the concatenation of the pointer index that is used
+      for each of the bound function's parameters.  If the bound
+      function's return value is stored using a pointer/info index,
+      then that pointer index is concatenated at the end, after ‘_’.
+      If a particular bound function's parameter does not depend on a
+      pointer/info index, then ‘z’ is specified for it.  3 or more
+      adjacent indices are replaced by <first-index>‘T’<last-index>.
+    - <sf> = ‘s’ if the binding is to an LUX function, ‘s’ if to an
+      LUX subroutine.
+
+    For the encodings in \c <returntype> and \c <paramtypes>, \c void
+    is encoded as ‘v’, \c Double as ‘d’, \c Int as ‘i’, <tt>Double
+    *</tt> as ‘dp’, <tt>Double (*)[3][4]</tt> as ‘dp34’.  The encoding
+    ‘sd’ refers to three adjacent parameters <tt>Double *data, size_t
+    count, size_t stride</tt> that describe a \c Double vector slice.
+    A repeat of a particular parameter type (for a repeat count of at
+    least 3) is indicated by appending \c T and the repeat count.  For
+    example, <tt>Double, Double, Double</tt> is encoded as ‘dT3’.
+
+*/
 #include "luxdefs.h"
 #include "error.h"
 #include <math.h>
@@ -67,57 +117,18 @@ void register_lux_s(Int (*f)(Int, Int []), char *name, Int min_arg,
   obstack_grow(registered_subroutines, &ir, sizeof(ir));
 }
 /*-----------------------------------------------------------------------*/
-/*
-  The name of the binding functions is built up as follows:
+/** Bind a C function \p f to a LUX function with 3 scalar
+    at-least-Double input parameters and a scalar Double return
+    parameter prefixing two dimensions equal to 3.  Function \p f is
+    called once.
 
-  lux_<boundfuncspec>_<stdargspec>_<ptrspec>_<sf>_
+    Standard arguments <tt>"i>D;i>D;i>D;rD+3,+3"</tt>.
 
-  <boundfuncspec> = an encoding of the declaration of the bound C
-  function, consisting of <returntype>_<paramtypes>.
-
-  <returntype> = an encoding of the return type of the bound C
-  function.
-
-  <paramtypes> = concatenated encoding of the parameter types of the
-  bound C function.
-
-  For the encodings in <returntype> and <paramtypes>, 'void' is
-  encoded as 'v', 'Double' as 'd', 'Int' as 'i', 'Double *' as 'dp',
-  'Double (*)[3][4]' as 'dp34'.  The encoding 'sd' refers to three
-  adjacent parameters (Double *data, size_t count, size_t stride) that
-  describe a 'Double' vector slice.  A repeat of a particular
-  parameter type (for a repeat count of at least 3) is indicated by
-  appending 'T' and the repeat count.  For example, (Double, Double,
-  Double) is encoded as dT3.
-
-  <stdargspec> = an encoding of the arguments type specification in
-  the most elaborate call to standard_args for this binding.  The
-  encoding is obtained from the arguments type specification by:
-
-  - removing '>', ';', and all but the first 'i', all but the
-    first 'o', and all but the first 'r'
-  - changing '&' to 'q', '+' to 'p', '-' to 'm', '*' to 'a'
-  - changing '[...]' to 'c', '{...}' to 'x'
-
-  A repeat of a particular unit (from a variable type specification
-  like 'D' to up to but not including the next one; for a repeat count
-  of at least 3, or if the abbreviated version is shorter than the
-  full version) is indicated by appending 'T' and the repeat count.
-  For example, 'DqDqDqDq' gets abbreviated to 'DqT4'.
-
-  <ptrspec> = the concatenation of the pointer index that is used for
-  each of the bound function's parameters.  If the bound function's
-  return value is stored using a pointer/info index, then that pointer
-  index is concatenated at the end, after '_'.  If a particular bound
-  function's parameter does not depend on a pointer/info index, then
-  'z' is specified for it.  3 or more adjacent indices are replaced by
-  <first-index>T<last-index>.
-
-  <sf> = 's' if the binding is to an LUX function, 's' if to an LUX
-  subroutine.
-
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
  */
-/*-----------------------------------------------------------------------*/
 Int lux_v_dT3dp3_iDT3rDp3p3_0T3_f_(Int narg, Int ps[], void (*f)(Double, Double, Double, Double (*)[3]))
 {
   pointer *ptrs;
@@ -130,6 +141,21 @@ Int lux_v_dT3dp3_iDT3rDp3p3_0T3_f_(Int narg, Int ps[], void (*f)(Double, Double,
   return iq;
 }
 /*-----------------------------------------------------------------------*/
+/** Bind C function \p f to a LUX function with one scalar Int input
+    parameter, one Double array input parameter with 3 elements in its
+    first dimension and arbitrary other dimensions, and a Double
+    return symbol with the same dimensions as the 2nd input parameter.
+
+    Standard arguments <tt>"iL1;i>D3*;rD[-]&"</tt>
+
+    Function \p f is called once per 3 elements of both the 2nd input
+    parameter and the return symbol.
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
 Int lux_i_idpT4_iL1D3arDcq_0T222_f_(Int narg, Int ps[], Int (*f)(Int, Double *, Double *, Double *, Double *))
 {
   pointer *ptrs;

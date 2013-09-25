@@ -18,28 +18,27 @@ You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/* LUX routines for dealing with individual dimensions of arrays. */
-/* We put all information relevant to going through a dimensional
-   structure in a struct so we can have several different loops
-   going at once. */
-/* Louis Strous 16jul98 */
+/** \file axis.c LUX routines for dealing with individual dimensions
+    of arrays. We put all information relevant to going through a
+    dimensional structure in a struct so we can have several different
+    loops going at once.
 
-/*
-   Often one wants to go through an array along one particular dimension,
-   or in succession along several dimensions.  The routines in this file
-   allow the user to set up and perform such a traversal fairly easily.
+    Often one wants to go through an array along one particular
+    dimension, or in succession along several dimensions.  The
+    routines in this file allow the user to set up and perform such a
+    traversal fairly easily.
 
-   Most of the time, the user will want to use routine standardLoop(),
-   which stores information about the array to be traversed, arranges
-   for its traversal along the axis or axes specified by the user (if any),
-   and generates an appropriate output symbol, if desired.
+    Most of the time, the user will want to use routine
+    standardLoop(), which stores information about the array to be
+    traversed, arranges for its traversal along the axis or axes
+    specified by the user (if any), and generates an appropriate
+    output symbol, if desired.
 
-   The tricky bit of standardLoop() is that the user must specify
-   the location of a pointer for use in traversing the array.  This
-   pointer will be updated by routine advanceLoop()
-   appropriate for the dimensional structure of the array and the axis
-   along which the array is traversed.  See at standardLoop() for more
-   info.
+    The tricky bit of standardLoop() is that the user must specify the
+    location of a pointer for use in traversing the array.  This
+    pointer will be updated by routine advanceLoop() appropriate for
+    the dimensional structure of the array and the axis along which
+    the array is traversed.  See at standardLoop() for more info.
 */
 
 #ifdef HAVE_CONFIG_H
@@ -611,6 +610,87 @@ Int dimensionLoopResult(loopInfo const *sinfo, loopInfo *tinfo,
                               0, NULL, 0, NULL, tinfo, tptr);
 }
 /*-----------------------------------------------------------------------*/
+/** Initiates a standard array loop.  advanceLoop() runs through the loop.
+
+    @param data source data symbol, must be numerical
+
+    @param axes a pointer to the list of axes to treat
+
+    @param nAxes the number of axes to treat
+
+    @param mode flags that indicate desired action; see below
+
+    @param outType desired data type for output symbol
+
+    @param src returns loop info for \p data
+
+    @param srcptr pointer to a pointer to the data in \p data
+
+    @param output returns created output symbol, if unequal to \c
+    NULL on entry
+
+    @param trgt returns loop info for \p output, if that is unequal
+    to \c NULL on entry
+
+    @param trgtptr pointer to a pointer to the data in the output symbol
+
+   \p mode flags:
+
+   - about the axes:
+     - \c SL_ALLAXES: same as specifying all dimensions of \p data in
+       ascending order in \p axes; the values of \p axes and \p nAxes
+       are ignored.
+     - \c SL_TAKEONED: take the \p data as one-dimensional; the values of
+       \p axes and \p nAxes are ignored
+
+   - about specified axes:
+     - \c SL_NEGONED: if the user supplies a single axis and that axis
+       is negative, then \p data is treated as if it were
+       one-dimensional (yet containing all of its data elements)
+     - \c SL_ONEAXIS:  only a single axis is allowed
+     - \c SL_UNIQUEAXES: all specified axes must be unique (no duplicates)
+
+   - about the input \p data:
+     - \c SL_SRCUPGRADE: use a copy of \p data that is upgraded to \p
+       outType if necessary
+
+   - about the output symbol, if any:
+     - \c SL_EXACT: must get exactly the data type indicated by \p
+       outType (DEFAULT)
+     - \c SL_UPGRADE: must get the data type of \p data or \p outType,
+       whichever is greater
+     - \c SL_KEEPTYPE: same type as input symbol
+     - \c SL_ONEDIMS: omitted dimensions are not really removed but
+       rather set to 1
+     - \c SL_SAMEDIMS: gets the same dimensions as \p data (DEFAULT)
+     - \c SL_COMPRESS: gets the same dimensions as \p data, except
+       that the currently selected axis is omitted.  if no dimensions
+       are left, a scalar is returned
+     - \c SL_COMPRESSALL: must have the same dimensions as \p data,
+       except that all selected axes are omitted.  if no dimensions
+       are left, a scalar is retuned
+
+   - about the desired axis order and coordinate availability:
+     - \c SL_EACHCOORD: the currently selected axis goes first; the
+       remaining axes come later, in their original order; the user
+       gets access to all coordinates (DEFAULT)
+     - \c SL_AXISCOORD: the currently selected axis goes first; the
+       user gets access only to the coordinate along the indicated
+       axis; remaining axes come later, lumped together as much as
+       possible for faster execution
+     - \c SL_AXESBLOCK: all specified axes go first in the specified
+       order; the remaining axes come later, in their original order;
+       the user gets access to all coordinates.  Implies \c
+       SL_UNIQUEAXES.
+
+   - about the coordinate treatment:
+     - \c SL_EACHROW: the data is advanced one row at a time; the user
+       must take care of advancing the data pointer to the beginning
+       of the next row
+     - \c SL_EACHBLOCK: like \c SL_EACHROW, but all selected axes
+       together are considered to be a "row".  Implies \c
+       SL_AXESBLOCK.
+*/
 Int standardLoop(Int data, Int axisSym, Int mode, Int outType,
 		 loopInfo *src, pointer *srcptr, Int *output, 
 		 loopInfo *trgt, pointer *trgtptr)
@@ -663,73 +743,6 @@ Int standardLoopX(Int source, Int axisSym, Int srcMode,
 Int standardLoop0(Int data, Int nAxes, Int *axes, Int mode, Int outType,
 		 loopInfo *src, pointer *srcptr, Int *output, 
 		 loopInfo *trgt, pointer *trgtptr)
-/* initiates a standard array loop.  advanceLoop() runs through the loop.
-   <data>: source data symbol, must be numerical
-   <axes>: a pointer to the list of axes to treat
-   <nAxes>: the number of axes to treat
-   <mode>: flags that indicate desired action; see below
-   <outType>: desired data type for output symbol
-   <src>:  returns loop info for <data>
-   <srcptr>: pointer to a pointer to the data in <data>
-   <output>: returns created output symbol, if unequal to NULL on entry
-   <trgt>: returns loop info for <output>, if <output> is unequal to NULL
-           on entry
-   <trgtptr>: pointer to a pointer to the data in the output symbol
-
-   <mode> flags:
-
-   about the axes:
-   SL_ALLAXES: same as specifying all dimensions of <data> in ascending order
-           in <axes>; the values of <axes> and <nAxes> are ignored.
-   SL_TAKEONED: take the <data> as one-dimensional; the values of <axes>
-           and <nAxes> are ignored
-
-   about specified axes:
-   SL_NEGONED:  if the user supplies a single axis and that axis is negative,
-           then <data> is treated as if it were one-dimensional (yet
-	   containing all of its data elements)
-   SL_ONEAXIS:  only a single axis is allowed
-   SL_UNIQUEAXES: all specified axes must be unique (no duplicates)
-
-   about the input <data>:
-   SL_SRCUPGRADE: use a copy of <data> which is upgraded to <outType> if
-           necessary
-
-   about the output symbol, if any:
-   SL_EXACT: must get exactly the data type indicated by <outType> (DEFAULT)
-   SL_UPGRADE: must get the data type of <data> or <outType>, whichever is
-           greater
-   SL_KEEPTYPE: same type as input symbol
-
-   SL_ONEDIMS: omitted dimensions are not really removed but rather set to 1
-
-   SL_SAMEDIMS: gets the same dimensions as <data> (DEFAULT)
-   SL_COMPRESS: gets the same dimensions as <data>, except that
-           the currently selected axis is omitted.  if no dimensions
-           are left, a scalar is returned
-   SL_COMPRESSALL: must have the same dimensions as <data>, except that
-           all selected axes are omitted.  if no dimensions are left,
-           a scalar is retuned
-
-   about the desired axis order and coordinate availability:
-   SL_EACHCOORD: the currently selected axis goes first; the remaining
-           axes come later, in their original order; the user gets
-	   access to all coordinates (DEFAULT)
-   SL_AXISCOORD: the currently selected axis goes first; the user gets access
-	    only to the coordinate along the indicated axis; remaining axes
-	    come later, lumped together as much as possible for faster
-	    execution
-   SL_AXESBLOCK: all specified axes go first in the specified order;
-	    the remaining axes come later, in their original order; the user
-	    gets access to all coordinates.  Implies SL_UNIQUEAXES.
-
-   about the coordinate treatment:
-   SL_EACHROW: the data is advanced one row at a time; the user must
-	    take care of advancing the data pointer to the beginning of
-	    the next row   
-   SL_EACHBLOCK: like SL_EACHROW, but all selected axes together are
-	    considered to be a "row".  Implies SL_AXESBLOCK.
-  */
 {
   Int	*dims, ndim, i, temp[MAX_DIMS];
 
@@ -1484,95 +1497,6 @@ void standard_redef_array(Int iq, enum Symboltype type,
   setupDimensionLoop(info, num_dims, dims, type, naxes, axes, ptr, info->mode);
 }
 /*--------------------------------------------------------------------*/
-/*
-   <params-spec> = <param-spec>[;<param-spec>]*
-   <param-spec> = {'i'|'o'|'r'}['?'][<type-spec>][<dims-spec>]
-   <type-spec> = {['>']{'B'|'W'|'L'|'F'|'D'}}|'S'
-   <dims-spec> = ['['<ref-par>']']<dim-spec>[,<dim-spec>]*['*'|'&']
-   <dim-spec> = [{'+'NUMBER|'-'|'-'NUMBER|'='|'='NUMBER|':'}]*
-
-   <dims-spec> = ['['<ref-par>']']['{'<axis-par>'}']<dim-spec>[,<dim-spec>]*['*'|'&']
-
-   Some of the characteristics of a parameter may depend on those of a
-   reference parameter.  That reference parameter is the very first
-   parameter (parameter 0) unless [<ref-par>] is specified at the
-   beginning of the <dims-spec>.
-
-   param-spec:
-   i = input parameter.
-
-   o = output parameter.  An error is declared if this is not a named
-   parameter.
-
-   r = return value.  There can be at most one of these in the
-   params-spec (for functions only).
-
-   ? = optional parameter
-
-   type-spec:
-
-   > = type should be at least equal to the indicated type.
-   B W L F D S : type = BYTE, WORD, LONG, FLOAT, DOUBLE, STRING.
-
-   For input parameters, a copy is created with the indicated
-   (minimum) type if the input parameter does not meet the condition,
-   and further processing is based on that copy.  For output
-   parameters, an array is created with the indicate type, unless '>'
-   is specified and the reference parameter has a greater type, in
-   which case that type is used.
-
-   ref-par:
-
-     If absent, then 0 is taken for it (i.e., the first parameter)
-
-     If a number, then the indicated parameter is taken for it
-
-     If '-', then the previous parameter is taken for it
-
-   axis-par:
-
-     The specified parameter is expected to indicate one or more
-     unique axes to remove from the current parameter, which must be
-     of type 'r' or 'o'.
-
-     If a number, then the indicated parameter is taken for it
-
-     If '-', then the previous parameter is taken for it
-
-     The removal of dimensions is done, and the axis numbers apply,
-     only after all the other dimension specifications have been
-     processed.
-
-   dim-spec:
-
-   NUMBER = the current dimension has the specified size.  For input
-     parameters, an error is declared if the dimension does not have
-     the specified size.
-
-   +NUMBER = for output or return parameters, a new dimension with the
-     specified size is inserted here
-
-   = = for output or return parameters, the current dimension is taken
-     from the reference parameter
-
-   =NUMBER = for output or return parameters, the current dimension is
-     taken from the reference parameter, and must be equal to the
-     specified number.  An error is declared if the reference
-     parameter's dimension does not have the indicated size
-
-   - = the corresponding dimension from the reference parameter is
-     skipped
-
-   : = for input parameters, accept the current dimension
-
-   & = the remaining dimensions must be equal to those of the
-     reference parameter
-
-   * = the remaining dimensions are unrestricted
-
-   Both a +NUMBER and a -NUMBER may be given in the same dim_spec.
-  */
-/*--------------------------------------------------------------------*/
 void free_param_spec_list(struct param_spec_list *psl)
 {
   if (psl) {
@@ -1912,6 +1836,124 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
   return NULL;
 }
 
+/** Prepares for looping through input and output variables based on a
+    standard arguments specification.
+
+    @param [in] narg the number of arguments in \p ps
+    @param [in] ps the array of arguments
+    @param [in] fmt the arguments specification in standard format (see below)
+    @param [out] ptrs a pointer to a list of pointers, one for each
+      argument and possibly one for the return symbol
+    @param [out] infos a pointer to a list of loop information
+      structures, one for each argument and possibly one for the
+      return symbol
+
+    @return the return symbol, or -1 if an error occurred.
+
+    The standard format is schematically as follows, where something
+    between quotes ‘’ stands for that literal character, something
+    between non-literal square brackets [] is optional, something
+    between non-literal curly braces {} is a group of alternatives, a
+    non-literal pipe symbol | separates alternatives, and a
+    non-literal asterisk * indicates repetition zero or more times:
+
+    \verbatim
+    <format> = <param-spec>[;<param-spec>]*
+    <param-spec> = {‘i’|‘o’|‘r’}[‘?’][<type-spec>][<dims-spec>]
+    <type-spec> = {[‘>’]{‘B’|‘W’|‘L’|‘F’|‘D’}}|‘S’
+    <dims-spec> = [‘[’<ref-par>‘]’][‘{’<axis-par>‘}’]<dim-spec>[,<dim-spec>]*[‘*’|‘&’]
+    <dim-spec> = [{‘+’NUMBER|‘-’|‘-’NUMBER|‘=’|‘=’NUMBER|‘:’}]*
+    \endverbatim
+
+    In words,
+    - the format consists of one or more parameter specifications
+      separated by semicolons ‘;’.
+    - each parameter specification begins with an ‘i’, ‘o’, or ‘r’,
+      optionally followed by a question mark ‘?’, followed by a type
+      specification and a dimensions specification.
+    - a type specification consists of an ‘S’, or else of an optional
+      greater-than sign ‘>’ followed by one of ‘B’, ‘W’, ‘L’, ‘F’, or
+      ‘D’.
+    - a dimensions specification consists of a optional reference
+      parameter number between square brackets ‘[]’, followed by an
+      optional axis parameter number between curly braces ‘{}’,
+      followed by one or more dimension specifications separated by
+      commas ‘,’, optionally followed by an asterisk ‘*’ or ampersand
+      ‘&’.
+    - a dimension specification consists of a minus sign ‘-’, an
+      equals sign ‘=’, a colon ‘:’, or a number preceded by a plus
+      sign ‘+’, a minus sign ‘-’, or an equals sign ‘=’; followed by
+      any number of additional instances of the preceding.
+
+    Some of the characteristics of a parameter may depend on those of
+    a reference parameter.  That reference parameter is the very first
+    parameter (parameter \c ps[0]) unless a different reference
+    parameters is specified at the beginning of the dimension
+    specification.
+
+    For the parameter specification \c param-spec:
+    - ‘i’ = input parameter.
+    - ‘o’ = output parameter.  An error is declared if this is not a
+      named parameter.
+    - ‘r’ = return value.  For functions, there must be exactly one of
+      these in the parameters specification.  Subroutines must not
+      have one of these.
+    - ‘?’ = optional parameter.
+
+    For the type specification \c type-spec:
+    - ‘>’ = the type should be at least equal to the indicated type.
+    - ‘B’ = LUX_BYTE
+    - ‘W’ = LUX_WORD
+    - ‘L’ = LUX_LONG
+    - ‘F’ = LUX_FLOAT
+    - ‘D’ = LUX_DOUBLE
+    - ‘S’ = LUX_STRING
+
+    For input parameters, a copy is created with the indicated
+    (minimum) type if the input parameter does not meet the condition,
+    and further processing is based on that copy.  For output
+    parameters, an array is created with the indicate type, unless ‘>’
+    is specified and the reference parameter has a greater type, in
+    which case that type is used.
+
+    For the reference parameter \c ref-par:
+    - If absent, then 0 is taken for it (i.e., the first parameter).
+    - If a number, then the indicated parameter is taken for it.
+    - If ‘-’, then the previous parameter is taken for it.
+
+    For the axis parameter \c axis-par:
+    - The specified parameter is expected to indicate one or more
+      unique axes to remove from the current parameter, which must be
+      of type ‘r’ or ‘o’.
+    - If a number, then the indicated parameter is taken for it.
+    - If ‘-’, then the previous parameter is taken for it.
+
+    The removal of dimensions is done, and the axis numbers apply,
+    only after all the other dimension specifications have been
+    processed.
+
+    For the dimension specification \c dim-spec:
+    - NUMBER = the current dimension has the specified size.  For
+      input parameters, an error is declared if the dimension does not
+      have the specified size.
+    - ‘+’NUMBER = for output or return parameters, a new dimension with
+      the specified size is inserted here.
+    - ‘=’ = for output or return parameters, the current dimension is
+      taken from the reference parameter.
+    - ‘=’NUMBER = for output or return parameters, the current dimension
+      is taken from the reference parameter, and must be equal to the
+      specified number.  An error is declared if the reference
+      parameter's dimension does not have the indicated size
+    - ‘-’ = the corresponding dimension from the reference parameter is
+      skipped.
+    - ‘:’ = for input parameters, accept the current dimension.
+    - ‘&’ = the remaining dimensions must be equal to those of the
+      reference parameter.
+    - ‘*’ = the remaining dimensions are unrestricted.
+
+    Both a ‘+’NUMBER and a ‘-’NUMBER may be given in the same
+    dimension specification \c dim_spec.
+  */
 Int standard_args(Int narg, Int ps[], char const *fmt, pointer **ptrs,
                   loopInfo **infos)
 {

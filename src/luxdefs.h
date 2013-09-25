@@ -17,8 +17,11 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef anaparser_h
-#define anaparser_h
+#ifndef INCLUDED_LUXDEFS_H
+#define INCLUDED_LUXDEFS_H
+
+/** \file luxdefs.h Definitions of enumerations and fixed compiler
+    constants. */
 
 #ifndef MAX_DIMS
 #include "install.h"
@@ -35,49 +38,50 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 
 	/* symbol classes */
 
+/** \enum Symbolclass LUX symbol classes. */
 enum Symbolclass { 
-  LUX_UNUSED = 0,		/* 0: not used */
-  LUX_SCALAR,			/* 1: real scalar 17 */
-  LUX_STRING,			/* 2: string 'xx' */
-  LUX_RANGE,			/* 3: range  (1:2) */
-  LUX_ARRAY,			/* 4: numerical real or string array [1,2] */
-  LUX_TRANSFER,			/* 5: transfer symbol */
-  LUX_ASSOC,			/* 6: associated variable ASSOC */
-  LUX_FUNC_PTR,			/* 7: function pointer &SIN */
-  LUX_SCAL_PTR,			/* 8: scalar pointer !MXB */
-  LUX_SUBSC_PTR,		/* 9: subscript pointer (1:2) */
-  LUX_FILEMAP,			/* 10: file map FLTFARR */
-  LUX_CLIST,			/* 11: compact list { } */
-  LUX_LIST,			/* 12: list { } */
-  LUX_STRUCT,			/* 13: structure { } */
-  LUX_KEYWORD,			/* 14: keyword /FOO */
-  LUX_LIST_PTR,			/* 15: list member pointer .TAG */
-  LUX_PRE_RANGE,		/* 16: pre-range (1:3) */
-  LUX_PRE_CLIST,		/* 17: pre-compact-list { } */
-  LUX_PRE_LIST,			/* 18: pre-list { } */
-  LUX_ENUM,			/* 19: enumeration */
-  LUX_META,			/* 20: meta SYMBOL('string') */
-  LUX_CSCALAR,			/* 21: complex scalar */
-  LUX_CARRAY,			/* 22: complex array */
-  LUX_CPLIST,			/* 23: compact pointer list */
-  LUX_POINTER,			/* 24: pointer &X */
-  LUX_STRUCT_PTR,		/* 25: pointer to member(s) of a structure */
-  LUX_SUBROUTINE = 32,		/* 32: subroutine definition */
-  LUX_FUNCTION,			/* 33: function definition */
-  LUX_BLOCKROUTINE,		/* 34: block routine definition */
-  LUX_DEFERRED_SUBR,		/* 35: deferred subroutine definition */
-  LUX_DEFERRED_FUNC,		/* 36: deferred function definition */
-  LUX_DEFERRED_BLOCK,		/* 37: deferred block routine */
-  LUX_BIN_OP = 192,		/* 192: binary operation */
-  LUX_INT_FUNC,			/* 193: internal function call */
-  LUX_USR_FUNC,			/* 194: user-defined function call */
-  LUX_IF_OP,			/* 195: binary if-operation */
-  LUX_EXTRACT,			/* 196: extraction */
-  LUX_PRE_EXTRACT,		/* 197: pre-extraction */
-  LUX_EVB = 200,		/* 200: executable */
-  LUX_FIXED_NUMBER,		/* 201: fixed number */
-  LUX_FIXED_STRING,		/* 202: fixed string */
-  LUX_UNDEFINED = 255		/* 255: undefined */
+  LUX_UNUSED = 0,		/*!< (0) symbol with no assigned class */
+  LUX_SCALAR,			/*!< (1) a real scalar, e.g. \c 17 */
+  LUX_STRING,			/*!< (2) a text string, e.g. \c 'x' */
+  LUX_RANGE,			/*!< (3) a range, e.g. \c (1:2) */
+  LUX_ARRAY,			/*!< (4) a numerical real or string array, e.g. \c [1,2] */
+  LUX_TRANSFER,			/*!< (5) a transfer symbol, a symbol that points at another symbol */
+  LUX_ASSOC,			/*!< (6) an associated variable (\c ASSOC) */
+  LUX_FUNC_PTR,			/*!< (7) a function pointer, e.g. \c &SIN */
+  LUX_SCAL_PTR,			/*!< (8) a scalar pointer, e.g. \c !MXB */
+  LUX_SUBSC_PTR,		/*!< (9) a subscript pointer, e.g. \c (1:2) */
+  LUX_FILEMAP,			/*!< (10) a file map (e.g., \c FLTFARR) */
+  LUX_CLIST,			/*!< (11) a compact list (e.g., \c {}) */
+  LUX_LIST,			/*!< (12) a list (e.g., \c {}) */
+  LUX_STRUCT,			/*!< (13) a structure (e.g., \c {}) */
+  LUX_KEYWORD,			/*!< (14) a keyword (e.g., \c /FOO) */
+  LUX_LIST_PTR,			/*!< (15) a list member pointer (e.g., \c .TAG) */
+  LUX_PRE_RANGE,		/*!< (16) a pre-range (e.g., \c (1:3)) */
+  LUX_PRE_CLIST,		/*!< (17) a pre-compact-list (\c {}) */
+  LUX_PRE_LIST,			/*!< (18) a pre-list (\c {}) */
+  LUX_ENUM,			/*!< (19) an enumeration */
+  LUX_META,			/*!< (20) a meta (e.g., \c SYMBOL('string')) */
+  LUX_CSCALAR,			/*!< (21) a complex scalar */
+  LUX_CARRAY,			/*!< (22) a complex array */
+  LUX_CPLIST,			/*!< (23) a compact pointer list */
+  LUX_POINTER,			/*!< (24) a pointer (e.g., \c &X) */
+  LUX_STRUCT_PTR,		/*!< (25) a pointer to member(s) of a structure */
+  LUX_SUBROUTINE = 32,		/*!< (32) a subroutine definition */
+  LUX_FUNCTION,			/*!< (33) a function definition */
+  LUX_BLOCKROUTINE,		/*!< (34) a block routine definition */
+  LUX_DEFERRED_SUBR,		/*!< (35) a deferred subroutine definition */
+  LUX_DEFERRED_FUNC,		/*!< (36) a deferred function definition */
+  LUX_DEFERRED_BLOCK,		/*!< (37) a deferred block routine */
+  LUX_BIN_OP = 192,		/*!< (192) a binary operation */
+  LUX_INT_FUNC,			/*!< (193) an internal function call */
+  LUX_USR_FUNC,			/*!< (194) a user-defined function call */
+  LUX_IF_OP,			/*!< (195) a binary if-operation */
+  LUX_EXTRACT,			/*!< (196) an extraction operation */
+  LUX_PRE_EXTRACT,		/*!< (197) a pre-extraction operation */
+  LUX_EVB = 200,		/*!< (200) an executable */
+  LUX_FIXED_NUMBER,		/*!< (201) a fixed number */
+  LUX_FIXED_STRING,		/*!< (202) a fixed string */
+  LUX_UNDEFINED = 255		/*!< (255) an undefined symbol */
 };
 
 /* note: do not change the relative order of these classes!  newSymbol */
@@ -341,27 +345,27 @@ enum binaryOps {
 #define GN_EXACT	4	/* output exactly <minType> */
 
 /* startStandardLoop() stuff */
-#define SL_SAMEDIMS	0	/* 0x0 output needs same dimensions as input */
-#define SL_COMPRESS	1	/* 0x1 output lacks first dimension from axis */
-#define SL_COMPRESSALL	2	/* 0x2 output lacks all dimensions from axis */
+#define SL_SAMEDIMS	0	/*!< 0x0 output needs same dimensions as input */
+#define SL_COMPRESS	1	/*!< 0x1 output lacks first dimension from axis */
+#define SL_COMPRESSALL	2	/*!< 0x2 output lacks all dimensions from axis */
 
-#define SL_EXACT	0*(1<<2) /* 0x0 output type is exactly as specified */
-#define SL_UPGRADE	1*(1<<2) /* 0x4 output type is upgraded if necessary */
-#define SL_KEEPTYPE	2*(1<<2) /* 0x8 output type equal to input type */
+#define SL_EXACT	0*(1<<2) /*!< 0x0 output type is exactly as specified */
+#define SL_UPGRADE	1*(1<<2) /*!< 0x4 output type is upgraded if necessary */
+#define SL_KEEPTYPE	2*(1<<2) /*!< 0x8 output type equal to input type */
 
-#define SL_EACHCOORD	0*(1<<4) /* 0x0 need all coordinates */
-#define SL_AXISCOORD	(1<<4)	/* 0x10 need only coordinate along specified axis */
-#define SL_EACHROW	(1<<5)	/* 0x20 treat row by row */
-#define SL_UNIQUEAXES	(1<<6)	/* 0x40 all axes must be unique */
-#define SL_ONEAXIS	(1<<7)	/* 0x80 at most one axis */
-#define SL_AXESBLOCK	((1<<8) | SL_UNIQUEAXES) /* 0x140 treat selected axes
+#define SL_EACHCOORD	0*(1<<4) /*!< 0x0 need all coordinates */
+#define SL_AXISCOORD	(1<<4)	/*!< 0x10 need only coordinate along specified axis */
+#define SL_EACHROW	(1<<5)	/*!< 0x20 treat row by row */
+#define SL_UNIQUEAXES	(1<<6)	/*!< 0x40 all axes must be unique */
+#define SL_ONEAXIS	(1<<7)	/*!< 0x80 at most one axis */
+#define SL_AXESBLOCK	((1<<8) | SL_UNIQUEAXES) /*!< 0x140 treat selected axes
 				   as a block, includes SL_UNIQUEAXES */
-#define SL_ONEDIMS	(1<<9)	/* 0x200 "compressed" dimensions replaced by 1s */
-#define SL_SRCUPGRADE	(1<<10)	/* 0x400 upgrade source data type if necessary */
-#define SL_NEGONED	(1<<11)	/* 0x800 negative axis argument -> treat as 1D */
-#define SL_EACHBLOCK	((1<<12) | SL_AXESBLOCK) /* 0x1140 treat all axes at once */
-#define SL_ALLAXES	(1<<13)	/* 0x2000 select all axes for treatment */
-#define SL_TAKEONED	(1<<14)	/* 0x4000 treat ax 1D array */
+#define SL_ONEDIMS	(1<<9)	/*!< 0x200 "compressed" dimensions replaced by 1s */
+#define SL_SRCUPGRADE	(1<<10)	/*!< 0x400 upgrade source data type if necessary */
+#define SL_NEGONED	(1<<11)	/*!< 0x800 negative axis argument -> treat as 1D */
+#define SL_EACHBLOCK	((1<<12) | SL_AXESBLOCK) /*!< 0x1140 treat all axes at once */
+#define SL_ALLAXES	(1<<13)	/*!< 0x2000 select all axes for treatment */
+#define SL_TAKEONED	(1<<14)	/*!< 0x4000 treat ax 1D array */
 
 /* stringpointer() stuff */
 #define SP_VAR		1

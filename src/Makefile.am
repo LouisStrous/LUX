@@ -32,7 +32,7 @@ lux_LDADD = $(top_builddir)/sofa/src/libsofa_c.a
 # build library, too; makes building test binaries easier
 noinst_LIBRARIES = liblux.a
 liblux_a_SOURCES = $(nonmain_sources)
-liblix_a_LIBADD = $(top_builddir)/sofa/src/libsofa_c.a
+liblux_a_LIBADD = $(top_builddir)/sofa/src/libsofa_c.a
 
 site.o: version.h
 

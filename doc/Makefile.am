@@ -23,3 +23,18 @@ info_TEXINFOS = lux.texi
 # than 9 for @enumerate, but lux.texi uses such enumerations.  Until
 # that bug has been fixed, we ignore the error messages.
 MAKEINFOFLAGS = --force
+
+if HAVE_DOXYGEN
+
+doxy: doxyfile.stamp
+
+doxyfile.stamp: $(top_builddir)/src/liblux.a
+	$(DOXYGEN) Doxyfile
+	touch doxyfile.stamp
+
+CLEANFILES = doxyfile.stamp
+
+all-local: doxyfile.stamp
+clean-local:
+	rm -rf $(top_builddir)/doc/doxy
+endif

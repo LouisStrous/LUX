@@ -337,6 +337,7 @@ char *readPane(Int menu_num, Int item_num, char *query)
       case '\n':
 	*current = '\0';
 	break;
+#if FIXKEYCODES
       case '\b': case DEL:
 	if (current > answer) {
 	  memmove(current - 1, current, strlen(current - 1));
@@ -351,6 +352,7 @@ char *readPane(Int menu_num, Int item_num, char *query)
 	if (current[1])
 	  current++;
 	break;
+#endif
     }
   }
   XSetWindowBackground(display, menu[menu_num].window[item_num - 1],

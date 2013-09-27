@@ -887,8 +887,6 @@ char	*ANAPrompts[] =	{	/* legal LUX prompts */
 };
 #define N_ANAPROMPTS 5
 
-Int	rawIo(void),		/* selects untreated key-by-key input */
-  cookedIo(void);		/* selects treated line-by-line input */
 extern char	line[],		/* raw user input */
 	tLine[];		/* translated user input */
 void	symbolInitialization(void);
@@ -1064,7 +1062,6 @@ void Quit(Int result)
 {
   Int	saveHistory(void);
 
-  cookedIo();			/* back to line-by-line input */
   saveHistory();
   printf("\nCPUtime: %g seconds\n", ((Float) clock())/CLOCKS_PER_SEC);
   puts("Quitting... Bye!");	/* farewell message */

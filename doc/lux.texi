@@ -637,7 +637,6 @@ Internal Functions and Subroutines
 * BPN2XY::                      CIO x,y from bias-precession-nutation matrix
 * BREAKPOINT::                  Manipulate breakpoints
 * BSMOOTH::                     Binary smoothing
-* BUFFERING::                   Input/output buffering modes
 * BY0::                         Bessel Y_0 function
 * BY1::                         Bessel Y_1 function
 * BYN::                         Bessel Y_n function
@@ -8052,8 +8051,6 @@ To read from a disk file (FZ format).
 These routines deal with the interaction between the user and the program.
 
 @table @asis
-@item @ref{BUFFERING}
-Set the input buffering mode.
 @item @ref{FORMAT_SET}
 To display or set a format for ASCII output.
 @item @ref{FPRINT}
@@ -8763,8 +8760,6 @@ from their data contents.
 @table @asis
 @item @ref{BATCH}
 Specify running in batch mode.
-@item @ref{BUFFERING}
-Set the input buffering mode.
 @item @ref{CALCULATOR}
 Entering calculator mode.
 @item @ref{COMPILE}
@@ -11845,7 +11840,6 @@ arguments.
 * BPN2XY::                      CIO x,y from bias-precession-nutation matrix
 * BREAKPOINT::                  Manipulate breakpoints
 * BSMOOTH::                     Binary smoothing
-* BUFFERING::                   Input/output buffering modes
 * BY0::                         Bessel Y_0 function
 * BY1::                         Bessel Y_1 function
 * BYN::                         Bessel Y_n function
@@ -13873,7 +13867,7 @@ all indicated changes have been made to the breakpoint list.
 
 See also: @ref{Debug Routines}
 @c -------------------------------------
-@node BSMOOTH, BUFFERING, BREAKPOINT, Internal Routines
+@node BSMOOTH, BY0, BREAKPOINT, Internal Routines
 @subsection BSMOOTH
 @findex BSMOOTH
 
@@ -13887,29 +13881,7 @@ smoothing filter is approximately Gaussian with a FWHM of
 
 See also: @ref{Smoothing}
 @c -------------------------------------
-@node BUFFERING, BY0, BSMOOTH, Internal Routines
-@comment  node-name,  next,  previous,  up
-@subsection BUFFERING
-@findex BUFFERING
-
-@code{BUFFERING [, @var{type}, /CHAR, /LINE, /PIPE]}
-
-Displays or sets LUX's input buffering mode.  If no arguments or
-keywords are specified, then the current input buffering mode is
-described.  If @code{type} is equal to zero, or if @code{code} is not
-specified but if @code{/CHAR} is, then no input buffering is set, LUX
-receives each character immediately when it is typed, and all of LUX's
-command line editing commands are available.
-
-If @code{type} is unequal to zero, or if @code{type} is not specified
-but @code{/LINE} is, then input is buffered and only passed on to LUX
-when the user enters a newline (usually the @kbd{Return} or @kbd{Enter}
-key).  In this case, LUX's command line editing commands (such as
-@kbd{C-a}) are not honored.
-
-See also: @ref{Running}, @ref{User I/O}
-@c -------------------------------------
-@node BY0, BY1, BUFFERING, Internal Routines
+@node BY0, BY1, BSMOOTH, Internal Routines
 @subsection BY0
 @findex BY0
 

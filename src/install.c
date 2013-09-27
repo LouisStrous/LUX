@@ -57,7 +57,7 @@ extern Int		nExecuted;
 internalRoutine *subroutine, *function;
 
 Int	luxerror(char *, Int, ...), lookForName(char *, hashTableEntry *[], Int),
-	newSymbol(Int, ...), lux_setup(), rawIo(void), cookedIo(void);
+	newSymbol(Int, ...), lux_setup();
 void	installKeys(void *keys), zerobytes(void *, Int);
 char	*strsave(char *), *symName(Int, hashTableEntry *[]), *className(Int),
 	*typeName(Int);
@@ -113,7 +113,7 @@ extern Int lux_area(), lux_area2(), lux_array_statistics(),
   lux_swaphalf(), lux_chdir(), lux_replace_values(),
   lux_freads(), lux_one(), lux_disableNewline(), lux_enableNewline(),
   lux_shift(), lux_file_to_fz(), lux_zapnan(),
-  lux_buffering(), lux_pencolor(), lux_idlrestore(), lux_list(),
+  lux_pencolor(), lux_idlrestore(), lux_list(),
   lux_extract_bits(), lux_fftshift(), lux_manualterm(), lux_watch(),
   lux_fcrunwrite(), lux_fits_read(), lux_fits_write(), lux_subshift(),
   lux_subshiftc(), lux_byte_inplace(), lux_word_inplace(),
@@ -285,7 +285,6 @@ internalRoutine	subroutine_table[] = {
   { "BATCH",	0, 1, lux_batch, "1QUIT" }, /* symbols.c */
   { "BREAKPOINT", 0, 1, lux_breakpoint, /* install.c */
     "0SET:1ENABLE:2DISABLE:3DELETE:4LIST:8VARIABLE" },
-  { "BUFFERING", 0, 1, lux_buffering, "0CHAR:1LINE:2PIPE" }, /* install.c */
   { "BYTE",	1, MAX_ARG, lux_byte_inplace, 0, }, /* symbols.c */
   { "C",	1, 7, lux_callig, /* hersh.c */
     "0DEP:1DVI:2DEV:3IMG:4PLT:5RIM:6RPL" },
@@ -3205,7 +3204,6 @@ void exception(Int sig)
      break;
    case SIGCONT:
      puts("Continuing LUX...");
-     rawIo();
      c = SIG_BREAK;
      break;
    default:
@@ -5163,42 +5161,6 @@ Int lux_struct(Int narg, Int ps[])
   if (makeStruct(ps[0], NULL, &se, data.v, &offset, 0) == LUX_ERROR)
     return LUX_ERROR;
   return result;
-}
-/*----------------------------------------------------------------*/
-Int lux_buffering(Int narg, Int ps[])
-/* BUFFERING [, <type>, /LINE, /CHAR ]
- shows or sets the kind of input buffering for LUX.
- no arguments -> show current setting
- <type> == 2 or /PIPE -> by line & no prompts
- <type> == 1 or /LINE -> by line
- <type> == 0 or /CHAR -> by char */
-{
-  extern Int	buffering, noPrompt;
-  extern char	*programName;
-  Int	newBuf;
-
-  if (!narg && !internalMode) {
-    printf("%s currently reads %sbuffered input.\n", programName,
-	   buffering? "": "un");
-    return LUX_OK;
-  }
-  if (narg)
-    newBuf = int_arg(ps[0]);
-  else
-    newBuf = internalMode;
-  if (newBuf < 0 || newBuf > 2)
-    return luxerror("Illegal buffering type specification", 0);
-  noPrompt = (newBuf == 2);
-  newBuf &= ~2;
-  if (newBuf ^ buffering) {
-    if (newBuf)
-      cookedIo();
-    else
-      rawIo();
-  }
-  printf("%s now reads %sbuffered input.\n", programName,
-	 buffering? "": "un");
-  return LUX_OK;
 }
 /*----------------------------------------------------------------*/
 Int translateEscapes(char *p)

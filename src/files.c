@@ -5121,11 +5121,6 @@ void printw(char *string)
 /* prints the string to the screen, but tries to break the line outside
    of alphanumerical words.  Added printwLines which counts the number
    of lines (newlines) printed so far by printw.  LS 12jul95 15oct98 */
-/* Headers:
-   <string.h>: strlen(), strpbrk()
-   <ctype.h>: isspace()
-   <stdio.h>: printf(), fputs(), fflush(), getchar()
- */
 {
   char	*p, *pn, *p2, *p0;
   Int	n, a, keepws, toolong;
@@ -5209,7 +5204,7 @@ void printw(char *string)
     if (!column && printwLines % (page - 2) == pager) {
       printf(":: Press RET for next line, any other key for next page...");
       fflush(stdout);
-      a = getchar();
+      a = getSingleStdinChar();
       printf("\r%s\r", cl_eos);	/* clear the line */
       if (a == '\n')
 	setPager(1);

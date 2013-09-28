@@ -29,6 +29,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <time.h>
 #include <math.h>
 #include <ctype.h>
+#include "editor.h"
 #include "install.h"
 #include "action.h"
 
@@ -1801,7 +1802,7 @@ Int execute(Int symbol)
 	c = '?';
 	while (c == '?') {
 	  printf(">%1d?", executeLevel);
-	  c = getchar();	/* get user command */
+	  c = getSingleStdinChar();	/* get user command */
 	  printf("%c\r", c);	/* echo user command */
 	  fflush(stdout);	/* ensure that it is displayed */
 	  switch (c) {

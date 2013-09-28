@@ -26,5 +26,6 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 
 #define HISTORYBUFFER	1	/* in calls to getNewLine */
 
+int getSingleStdinChar(void);
 
 #endif

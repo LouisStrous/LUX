@@ -61,6 +61,14 @@ int getStreamChar(void)
   return rl_getc(inputStream);
 }
 /*----------------------------------------------------*/
+int getSingleStdinChar(void)
+{
+  rl_prep_terminal(0);          /* prepare for input one char at a time */
+  int c = rl_getc(stdin);
+  rl_deprep_terminal();         /* restore old situation */
+  return c;
+}
+/*----------------------------------------------------*/
 int getStringChar(void)
 /* gets the next input char from inputString, no control sequences */
 {

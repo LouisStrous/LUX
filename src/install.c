@@ -41,6 +41,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <obstack.h>
 /* clock() on mips-sgi-irix64-6.2 is in unistd.h rather than in ANSI time.h */
 
+#include "editor.h"
 #include "editorcharclass.h"
 #include "action.h"
 
@@ -3156,7 +3157,7 @@ void exception(Int sig)
    case SIGINT:
      puts("Interrupt - quit current calculation? (type ? for help)");
      do {
-       c = getchar();
+       c = getSingleStdinChar();
        switch (c) {
 	 case 'y': case 'Y':
 	   c = SIG_BREAK;
@@ -3185,7 +3186,7 @@ void exception(Int sig)
 	 case '?':
 	   printw("Options:  y - yes, quit;  t - start tracing;  ");
 	   printw("s - start stepping;  q - run quietly (no tracing or ");
-	   printw("stepping);  a - abort LUX;  r - restat LUX; ");
+	   printw("stepping);  a - abort LUX;  r - restart LUX; ");
 	   printw("? - show options.");
 	   break; }
      } while (c == '?');
@@ -3197,7 +3198,7 @@ void exception(Int sig)
    case SIGSEGV:
      printf("Segmentation fault: You wrote in an off-limits memory location\n"
 	    "- quit?\n");
-     c = getchar();
+     c = getSingleStdinChar();
      if (c == 'y' || c == 'Y')
        Quit(2);
      c = SIG_BREAK;

@@ -22,6 +22,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #if HAVE_CONFIG_H
 #include "config.h"
 #endif
+#include <errno.h>
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
@@ -84,13 +85,22 @@ int getStringChar(void)
 Int readHistory(void)
 /* reads history from a history file (~/.lux-history) */
 {
-  return read_history("~/.lux-history");
+  int result = read_history(expand_name("~/.lux-history", NULL));
+  if (result                    /* a problem */
+      && result != ENOENT)      /* except "no such file" */
+    luxerror("A problem reading command line history from ~/.lux-history: %s",
+             0, strerror(result));
+  return result;
 }
 /*----------------------------------------------------*/
 Int saveHistory(void)
 /* saves history in a history file (~/.lux-history) */
 {
-  return write_history("~/.lux-history");
+  int result = write_history(expand_name("~/.lux-history", NULL));
+  if (result)
+    luxerror("A problem writing command line history to ~/.lux-history: %s",
+             0, strerror(result));
+  return result;
 }
 /*----------------------------------------------------*/
 Int getNewLine(char *buffer, size_t bufsize, char *prompt, char historyFlag)

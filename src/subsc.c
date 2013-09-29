@@ -3046,7 +3046,7 @@ Int extractNumerical(pointer src, pointer trgt, Int type, Int ndim, Int *dims,
 
   do {
     memcpy(trgt.b, src.b, info.stride);
-    trgt.b += info.stride;
+    src.b += info.stride;
   } while (advanceLoop(&info, &trgt) < info.rndim);
   return 1;
 }

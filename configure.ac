@@ -33,6 +33,7 @@ AC_CHECK_LIB(readline, readline)
 # Checks for typedefs, structures, and compiler characteristics.
 
 # Checks for library functions.
+AC_CHECK_FUNCS([clock_gettime])
 
 AC_CONFIG_FILES([Makefile
                  sofa/Makefile

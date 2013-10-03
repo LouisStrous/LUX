@@ -184,9 +184,21 @@ Int lux_cputime(void)
      /*returns an cpu time in seconds */
 {
   Int	i;
+  Double value;
 
-  i = scalar_scratch(LUX_FLOAT);
-  scalar_value(i).f = ((Float) clock())/CLOCKS_PER_SEC;
+  i = scalar_scratch(LUX_DOUBLE);
+#if HAVE_CLOCK_GETTIME
+  struct timespec tp;
+  int bad = clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &tp);
+  if (!bad) {
+    value = tp.tv_sec + tp.tv_nsec/1e9;
+  } else {             /* no hi-res clock, use old method after all */
+    value = ((Double) clock())/CLOCKS_PER_SEC;
+  }
+#else
+  value = ((Double) clock())/CLOCKS_PER_SEC;
+#endif
+  scalar_value(i).d = value;
   return i;
 }
 /*------------------------------------------------------------------------- */

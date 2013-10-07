@@ -1279,6 +1279,8 @@ Int yylex(YYSTYPE *lvalp)
        }
        currentChar += 6;
      }
+     while (isspace(*currentChar))
+       ++currentChar;
    }
 
    if (ignoreInput && !findBody) { /* ignoring input and not looking for */

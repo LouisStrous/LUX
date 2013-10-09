@@ -67,7 +67,7 @@ Int 	dereferenceScalPointer(Int), scalar_scratch(Int),
   listNumElements(Int), lux_zero(Int, Int []),
   cubic_spline_tables(void *, Int, Int, void *, Int, Int, Int,
 		      Byte, Byte, csplineInfo *), 
-  numerical_clone(Int, enum Symboltype),
+  numerical_clone(Int, Symboltype),
   redef_array(Int, Int, Int, Int *), string_scratch(Int),
   transferAll(Int symbol), transfer(Int), copySym(Int),
   scalar_scratch_copy(Int), redef_scalar(Int, Int, void *),
@@ -84,7 +84,7 @@ Int	standardLoop(Int, Int, Int, Int, loopInfo *, pointer *, Int *,
   prepareDiagonals(Int, loopInfo *, Int, Int **, Int **, Int **, Int **),
   moveLoop(loopInfo *, Int, Int),
   standardLoopX(Int, Int, Int, loopInfo *, pointer *, Int, Int const *,
-                Int, Int const *, enum Symboltype, Int, Int *, loopInfo *,
+                Int, Int const *, Symboltype, Int, Int *, loopInfo *,
                 pointer *),
   loopIsAtStart(loopInfo const *), setAxes(loopInfo *, Int, Int *, Int),
   standard_args(Int, Int [], char const *, pointer **, loopInfo **);
@@ -94,7 +94,7 @@ void	subdataLoop(Int *, loopInfo *), addVerify(char *, char),
   *setFacts(Int symbol, Int type, Int flag),
   deleteFacts(Int symbol, Int type), returnLoop(loopInfo *, pointer *, Int),
   setAxisMode(loopInfo *, Int mode),
-  standard_redef_array(Int, enum Symboltype, Int, Int *, Int, Int *, pointer *,
+  standard_redef_array(Int, Symboltype, Int, Int *, Int, Int *, pointer *,
 		       loopInfo *);
 void convertWidePointer(wideScalar *, Int, Int);
 
@@ -122,7 +122,7 @@ void	clearToPopTempVariable(Int), pushTempVariable(Int), printw(char *),
 const csplineInfo empty_cubic_spline(void);
 
 void setupDimensionLoop(loopInfo *info, Int ndim, Int const *dims, 
-                        enum Symboltype type, Int naxes, Int const *axes,
+                        Symboltype type, Int naxes, Int const *axes,
                         pointer *data, Int mode),
   rearrangeDimensionLoop(loopInfo *), endian(void *, Int, Int),
   rearrangeEdgeLoop(loopInfo *, loopInfo *, Int);

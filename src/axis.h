@@ -32,7 +32,7 @@ struct param_spec {
   enum param_spec_type { PS_INPUT, PS_OUTPUT, PS_RETURN } logical_type;
   Int is_optional;
   enum type_spec_limit_type { PS_EXACT, PS_LOWER_LIMIT } data_type_limit;
-  enum Symboltype data_type;
+  Symboltype data_type;
   size_t num_dims_spec;
   struct dims_spec *dims_spec;
   Int ref_par;

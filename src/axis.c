@@ -56,7 +56,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #define obstack_chunk_free free
 
 void setupDimensionLoop(loopInfo *info, Int ndim, Int const *dims, 
-                        enum Symboltype type, Int naxes, Int const *axes,
+                        Symboltype type, Int naxes, Int const *axes,
                         pointer *data, Int mode);
 void rearrangeDimensionLoop(loopInfo *info);
 Int standardLoop(Int data, Int axisSym, Int mode, Int outType,
@@ -73,7 +73,7 @@ Int standardLoop1(Int source,
                   loopInfo *srcinf, pointer *srcptr,
                   Int nMore, Int const * more,
                   Int nLess, Int const * less,
-                  enum Symboltype tgtType, Int tgtMode,
+                  Symboltype tgtType, Int tgtMode,
                   Int *target, 
                   loopInfo *tgtinf, pointer *tgtptr);
 /*-------------------------------------------------------------------------*/
@@ -132,7 +132,7 @@ Int setAxes(loopInfo *info, Int nAxes, Int *axes, Int mode)
 }
 /*-------------------------------------------------------------------------*/
 void setupDimensionLoop(loopInfo *info, Int ndim, Int const *dims, 
-                        enum Symboltype type, Int naxes, Int const *axes,
+                        Symboltype type, Int naxes, Int const *axes,
                         pointer *data, Int mode)
 /* fills the loopInfo structure <info> with information
  suitable for looping through a dimensional structure.
@@ -395,7 +395,7 @@ void rearrangeDimensionLoop(loopInfo *info)
 }
 /*-----------------------------------------------------------------------*/
 Int dimensionLoopResult1(loopInfo const *sinfo,
-                         Int tmode, enum Symboltype ttype,
+                         Int tmode, Symboltype ttype,
                          Int nMore, Int const * more,
                          Int nLess, Int const * less,
                          loopInfo *tinfo, pointer *tptr)
@@ -718,7 +718,7 @@ Int standardLoopX(Int source, Int axisSym, Int srcMode,
                   loopInfo *srcinf, pointer *srcptr,
                   Int nMore, Int const * more,
                   Int nLess, Int const * less,
-                  enum Symboltype tgtType, Int tgtMode,
+                  Symboltype tgtType, Int tgtMode,
                   Int *target,
                   loopInfo *tgtinf, pointer *tgtptr)
 {
@@ -850,7 +850,7 @@ Int standardLoop1(Int source,
                   loopInfo *srcinf, pointer *srcptr,
                   Int nMore, Int const * more,
                   Int nLess, Int const * less,
-                  enum Symboltype tgtType, Int tgtMode,
+                  Symboltype tgtType, Int tgtMode,
                   Int *target, 
                   loopInfo *tgtinf, pointer *tgtptr)
 /* initiates a standard array loop.  advanceLoop() runs through the loop.
@@ -1487,7 +1487,7 @@ Int numerical_or_string(Int data, Int **dims, Int *nDim, Int *size, pointer *src
   return numerical_or_string_choice(data, dims, nDim, size, src, 1);
 }
 /*--------------------------------------------------------------------*/
-void standard_redef_array(Int iq, enum Symboltype type,
+void standard_redef_array(Int iq, Symboltype type,
 			  Int num_dims, Int *dims, 
 			  Int naxes, Int *axes,
 			  pointer *ptr, loopInfo *info)
@@ -1965,7 +1965,7 @@ Int standard_args(Int narg, Int ps[], char const *fmt, pointer **ptrs,
   Int param_ix, num_ref_dims;
   loopInfo li;
   pointer p;
-  enum Symboltype type;
+  Symboltype type;
 
   returnSym = LUX_ONE;
   psl = parse_standard_arg_fmt(fmt);

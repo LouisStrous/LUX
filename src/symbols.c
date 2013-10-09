@@ -330,7 +330,7 @@ Int array_clone(Int symbol, Int type)
  return n; 
 }
 /*-----------------------------------------------------*/
-Int numerical_clone(Int iq, enum Symboltype type) {
+Int numerical_clone(Int iq, Symboltype type) {
   switch (symbol_class(iq)) {
   case LUX_ARRAY:
     return array_clone(iq, type);
@@ -1924,7 +1924,7 @@ Int redef_array(Int nsym, Int ntype, Int ndim, Int *dims)
   return 1;
 }
 /*-----------------------------------------------------*/
-Int redef_array_extra_dims(Int tgt, Int src, enum Symboltype type, Int ndim, Int *dims)
+Int redef_array_extra_dims(Int tgt, Int src, Symboltype type, Int ndim, Int *dims)
 {
   Int *srcdims, srcndim;
   Int tgtdims[MAX_DIMS];

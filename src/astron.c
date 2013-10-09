@@ -767,7 +767,7 @@ Int lux_calendar(Int narg, Int ps[])
   /* enum Calendar_order fromorder, toorder; */
   enum Calendar fromcalendar, tocalendar;
   enum Calendar_timescale fromtime, totime;
-  enum Symboltype inputtype, internaltype, outputtype;
+  Symboltype inputtype, internaltype, outputtype;
   enum Calendar_outputtype outputkind;
   static struct {
     Int to_elements_per_date;   /* translating to calendar date */
@@ -841,7 +841,7 @@ Int lux_calendar(Int narg, Int ps[])
 
   iq = ps[0];
   {
-    enum Symboltype type;
+    Symboltype type;
 
     /* if the input type is integer, then promote to LONG.  If the
        input type is floating point, then promote to DOUBLE. */

@@ -17,35 +17,42 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-/* LUX routines for calculating various astronomical ephemerides and */
-/* for transforming dates between various calendars */
-/* Formulas from "Astronomical Algorithms" */
-/* by Jean Meeus, Willmann-Bell, Inc. (1991) ("JM"), and from "Explanatory */
-/* Supplement to the Astronomical Almanac", edited by P. K. Seidelmann, */
-/* University Science Books (1992) ("ES"). */
 
-/* Note on time systems: 
-   UTC = "Universal Coordinated Time": basis of everyday time; local
+/** \file astron.c LUX routines for calculating various astronomical
+   ephemerides and for transforming dates between various calendars.
+
+   Includes formulas from "Astronomical Algorithms" by Jean Meeus,
+   Willmann-Bell, Inc. (1991) ("JM"), from "Explanatory Supplement to
+   the Astronomical Almanac", edited by P. K. Seidelmann, University
+   Science Books (1992) ("ES").
+
+   Note on time systems:
+
+   - UTC = "Universal Coordinated Time": basis of everyday time; local
          official time is commonly equal to UTC plus a fixed amount,
-	 usually an integer number of hours.  UTC differs from TAI
-	 by an integral number of seconds.  UTC days may differ
-	 in length from 86400 seconds because of leap seconds that
-	 are inserted irregularly and infrequently to keep time in step
-	 with the Earth's rotation.
-   UT1 = "Universal Time 1": time sequence linked to the Earth's rotation
-         by (slight) variation of the length of its second.  UTC leap
-	 seconds are inserted such that UT1 never differs more than
-	 0.9 seconds from UTC.
-   TAI = "International Atomic Time": a time sequence without regards
-         to the Earth's rotation, without leap seconds.
-   TDT = "Terrestrial Dynamical Time": a time sequence introduced as
-         independent variable in calculations of planetary motion.
-	 It is currently defined equal to TAI + 32.184 seconds.
-   GMT = "Greenwich Mean Time": historically, the official time of
+         usually an integer number of hours.  UTC differs from TAI by
+         an integral number of seconds.  UTC days may differ in length
+         from 86400 seconds because of leap seconds that are inserted
+         irregularly and infrequently to keep time in step with the
+         Earth's rotation.
+
+   - UT1 = "Universal Time 1": time sequence linked to the Earth's
+         rotation by (slight) variation of the length of its second.
+         UTC leap seconds are inserted such that UT1 never differs
+         more than 0.9 seconds from UTC.
+
+   - TAI = "International Atomic Time": a time sequence without
+         regards to the Earth's rotation, without leap seconds.
+
+   - TDT = "Terrestrial Dynamical Time": a time sequence introduced as
+         independent variable in calculations of planetary motion.  It
+         is currently defined equal to TAI + 32.184 seconds.
+
+   - GMT = "Greenwich Mean Time": historically, the official time of
          Great Britain.  Currently used as a synonym of UTC.
 
-   UTC leap seconds are introduced such that the sequence of UTC second
-   markers is 23:59:59 23:59:60 00:00:00.
+   UTC leap seconds are introduced such that the sequence of UTC
+   second markers is 23:59:59 23:59:60 00:00:00.
 
    The return format of time() in <time.h> is left unspecified in the
    2nd edition of Kernighan & Richie's C manual, but SVr4, SVID,
@@ -61,8 +68,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
    therefore seems to me that the return value of time() is in fact
    not equal to the number of elapsed seconds since 0 UTC on 1 January
    1970, but rather equal to the number of elapsed *non-leap* seconds
-   since 0 UT on 1 January 1970.    LS 24sep98
-   */
+   since 0 UT on 1 January 1970.
+*/
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -3304,30 +3311,125 @@ void kepler(Double m, Double e, Double v_factor, Double *v, Double *rf)
   }
 }
 /*--------------------------------------------------------------------------*/
-Double kepler_v(Double m, Double e)
-/* solves Kepler's equation for mean anomaly <m> (in radians) and
- eccentricity <e>.  Returns the corresponding true anomaly.  */
-{
-  Double	E, de, p;
+/** \brief Solves Kepler's equation.
 
-  if (fabs(e) < 1) {		/* elliptical orbit */
-    m = fmod(m, TWOPI);
-    E = m;
+    \param[in] M - the mean anomaly, in radians.  Its value is unrestricted.
+    \param[in] e - the eccentricity.  Its value is unrestricted.
+    \return the eccentric anomaly, in radians.
+
+    Kepler's equation is <tt>E = M + e*sin(E)</tt>, which we need to
+    solve for \c E, given \c M and \c e.
+
+    The solution is found through iteration.  Each iteration yields a
+    correction to the previous one.  When the magnitude of the double
+    precision correction is less than \c FLT_EPSILON and no longer
+    decreases, then the solution is assumed to have been found.
+
+    The number of needed iterations and the needed CPU time depend on
+    the initial estimate.  I've tested several algorithms for the
+    initial estimate of the eccentric anomaly \c E for the elliptical
+    case (|\p e| < 1):
+
+    1. <tt>E = M</tt>
+    2. <tt>E = π</tt>
+    3. <tt>E = M + e*(1 + ½e²)*√M*√(2π - M)/(2√π)</tt>
+    4. <tt>E = M + e*(1 + ⅕e²)*√M*√(2π - M)/(2√π)</tt>
+    5. <tt>E = M (|M-π|≤eπ) ∨ E = π (|M-π|>eπ)</tt>
+
+    The 3rd through 5th algorithms were devised by Louis Strous.  In
+    all of these cases, the mean anomaly \c M is first reduced to the
+    interval from 0 to 2π.
+
+    I determined the CPU time taken by 1 million calls of this
+    function (limited to calculating the eccentric anomaly only), with
+    each of the algorithms for the initial estimate, for all
+    eccentricities \p e from 0 to 0.99 in steps of 0.01, and for all
+    mean anomalies \p M from 0 to 1.98π in steps of 0.02π.
+
+    Once the eccentric anomaly \c E has been found, then the residual
+    error can be calculated from
+
+    <tt>Δ = E - e*sin(E) - M</tt>
+
+    These residuals were visually indistinguishable from each other
+    for all five algorithms.  Their maximum magnitude was 1.8e-10 in
+    these tests.
+
+    The minimum, maximum, average, and standard deviation of the CPU
+    time (in ns) per call of this function were, for the various
+    algorithms:
+
+    Alg.   Min   Max  Mean  Median St.Dev.
+    1 (M)   60 42323   478    451   656
+    2 (π)   27  2034   416    395   115
+    3 (S½)  72   923   415    398    95
+    4 (S⅕)  74   984   416    402    92
+    5 (1∨2) 24  1056   391    372   117
+
+    The CPU time was usually especially low or high for <tt>M mod ½π =
+    0</tt> and/or for <tt>e = 0</tt>.  The statistics excluding those
+    cases were:
+
+    Alg.   Min   Max  Mean  Median St.Dev.
+    1 (M)  158 42323   476    450   667
+    2 (π)  189  1172   423    397   101
+    3 (S½) 189   923   420    399    84
+    4 (S⅕) 191   984   421    402    80
+    5 (1∨2)157   879   396    373    96
+
+    Algorithm 1 performs worst for \c e just below 1 and <tt>M</tt>
+    near 0 and 2π.
+
+    Algorithm 2 performs worst for \c e just below 1 and <tt>M =
+    0</tt>, and for <tt>|M - ½πe| = 0</tt>.
+
+    Algorithms 3 - 5 have no regions of <tt>e</tt>-<tt>M</tt> space
+    where they perform particularly bad.
+
+    I've chosen to use algorithm 5, which gave the lowest average and
+    median CPU times in these tests.
+
+*/
+Double kepler_v(Double M, Double e)
+{
+  Double	E, de, p, f;
+  static Double prev_e = 0, prev_f = 1;
+
+  e = fabs(e);
+  if (e == prev_e) {
+    f = prev_f;
+  } else {
+    f = sqrt(abs((1+e)/(1-e)));
+    prev_f = f;
+    prev_e = e;
+  }
+  if (e < 1) {     /* elliptical orbit */
+    M = fmod(M, TWOPI);        /* between -π and +π */
+    Double l = e*M_PI;
+    Double d = M - M_PI;
+    if (d > l || d < -l)
+      E = M;
+    else
+      E = M_PI;
+    Double prev_fde, fde;
+    fde = 2*M_PI;
     do {
       p = 1 - e*cos(E);
-      de = (m + e*sin(E) - E)/p;
+      prev_fde = fde;
+      de = (M + e*sin(E) - E)/p;
       E += de;
-    } while (fabs(de) > 1e3*DBL_EPSILON);
-    return 2*atan(sqrt(abs((1+e)/(1-e)))*tan(E/2)); /* true anomaly */
+      fde = fabs(de);
+    } while (fde && (fde < prev_fde || fde > FLT_EPSILON));
+    return 2*atan(f*tan(E/2));  /* true anomaly */
   } else if (fabs(e) > 1) {	/* hyperbolic orbit */
-    E = m/e;
+    E = M/e;
     do {
       p = E;
-      E = asinh((m + E)/e);
+      E = asinh((M + E)/e);
     } while (E != p);
-    return 2*atan(sqrt(abs((1+e)/(1-e)))*tanh(E/2));
+    return 2*atan(f*tanh(E/2));
   } else {			/* parabolic orbit */
-    E = m/2;
+    E = M/2;
     e = cbrt(E + sqrt(E*E + 1));
     p = e - 1.0/e;
     return 2*atan(p);

@@ -910,6 +910,7 @@ Internal Functions and Subroutines
 * JD2CAL::                      Gregorian dates from Julian Day Numbers
 * JPEGREAD::                    Read from a JPEG file
 * JPEGWRITE::                   Write as a JPEG file
+* KEPLER::                      Solve Kepler's equation
 * KSMOOTH::
 * LE::                          Less-than-or-equal-to
 * LEGENDRE::                    Associated Legendre polynomials
@@ -12113,6 +12114,7 @@ arguments.
 * JD2CAL::                      Gregorian dates from Julian Day Numbers
 * JPEGREAD::                    Read from a JPEG file
 * JPEGWRITE::                   Write as a JPEG file
+* KEPLER::                      Solve Kepler's equation
 * KSMOOTH::
 * LE::                          Less-than-or-equal-to
 * LEGENDRE::                    Associated Legendre polynomials
@@ -20561,7 +20563,7 @@ See also: @ref{JPEGWRITE}, @ref{FZREAD}, @ref{GIFREAD}
 
 [3.2.401]
 @c -------------------------------------
-@node JPEGWRITE, KSMOOTH, JPEGREAD, Internal Routines
+@node JPEGWRITE, KEPLER, JPEGREAD, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection JPEGWRITE
 @findex JPEGWRITE
@@ -20588,7 +20590,19 @@ See also: @ref{JPEGREAD}, @ref{FCWRITE}, @ref{FZWRITE}, @ref{GIFWRITE}
 
 [3.2.401]
 @c -------------------------------------
-@node KSMOOTH, LE, JPEGWRITE, Internal Routines
+@node KEPLER, KSMOOTH, JPEGWRITE, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection KEPLER
+@findex KEPLER
+
+@code{@var{nu} = KEPLER(@var{M}, @var{e})}
+
+Solves Kepler's equation to return the true anomaly @code{@var{nu}}
+given the mean anomaly @code{@var{M}} and eccentricity @code{@var{e}},
+which may have any values.
+
+@c -------------------------------------
+@node KSMOOTH, LE, KEPLER, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection KSMOOTH
 @findex KSMOOTH

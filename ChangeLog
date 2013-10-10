@@ -2,12 +2,13 @@
 
 Change Log of LUX
 
-- <2013-10-10 Thu> lux@quae.nl
+- <2013-10-10 Thu> lux@quae.nl v1.0.2
   - Replace "ANA" bitmap by new "LUX" bitmap.
   - Make !CPUTIME return higher resolution results, if supported by
     the system.
   - Introduce new KEPLER function to solve Kepler's equation.
-  - Fix MEDFILTER, ORDFILTER functions.
+  - Fix MEDFILTER, ORDFILTER functions, which were broken on 64-bit
+    systems.
 - <2013-09-23 Mon> lux@quae.nl v1.0.1
   - Fix reading commands from file; got broken during recent
     replacement of home-grown command line editor for GNU readline.

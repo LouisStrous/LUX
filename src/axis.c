@@ -131,21 +131,22 @@ Int setAxes(loopInfo *info, Int nAxes, Int *axes, Int mode)
   return 0;
 }
 /*-------------------------------------------------------------------------*/
+/** Gather information for looping through a LUX array.
+
+    \param[in,out] info a pointer to the \c loopInfo structure in
+    which the information is gathered.
+    \param[in] ndim  the number of dimensions
+    \param[in] dims  the array of dimensions
+    \param[in] type  the LUX data type of the array elements
+    \param[in] naxes the number of axes to loop along
+    \param[in] axes  the array of axes to loop along
+    \param[in] data  a pointer to a \c pointer to the data
+    \param[in] mode flags that indicate how to loop through the axes,
+    as for \c standardLoop()
+ */
 void setupDimensionLoop(loopInfo *info, Int ndim, Int const *dims, 
                         Symboltype type, Int naxes, Int const *axes,
                         pointer *data, Int mode)
-/* fills the loopInfo structure <info> with information
- suitable for looping through a dimensional structure.
- <ndim>: number of dimensions in the data
- <dims>: pointer to the list of dimensions in the data
- <type>: data type of the data
- <naxes>: number of axes specified to loop through; 0 means treat the
-         data as if it is 1D
- <axes>: pointer to the list of axes to loop through; NULL means assume
-          a list of all axes in ascending order
- <data>: pointer to a pointer to the data
- <mode>: flags indicating how to loop through the axes
-*/
 {
   Int	i;
   size_t	size;
@@ -200,6 +201,15 @@ void setupDimensionLoop(loopInfo *info, Int ndim, Int const *dims,
   setAxisMode(info, mode);
 }
 /*-----------------------------------------------------------------------*/
+/** Advance along a loop.  The coordinates and the pointer to the data
+    are advanced, taking into account the dimensional structure of the
+    data and the configured axes.
+
+    \param[in,out] info the loop information
+    \param[in,out] ptr  a pointer to the data
+    \return the index of the first loop axis that is not yet
+    completely traversed.
+ */
 Int advanceLoop(loopInfo *info, pointer *ptr)
 /* advance coordinates; return index of first encountered incomplete
  axis.  I.e., if the array has 4 by 5 by 6 elements, then advancement
@@ -214,7 +224,7 @@ Int advanceLoop(loopInfo *info, pointer *ptr)
   if (info->advanceaxis >= info->rndim)	/* already done */
     done = info->rndim;
   else {
-    done = 0;			/* default: not done yet */
+    done = info->advanceaxis;   /* default: not done yet */
 
     /* update coordinates */
     for (i = info->advanceaxis; i < info->rndim; i++) {
@@ -612,27 +622,27 @@ Int dimensionLoopResult(loopInfo const *sinfo, loopInfo *tinfo,
 /*-----------------------------------------------------------------------*/
 /** Initiates a standard array loop.  advanceLoop() runs through the loop.
 
-    @param data source data symbol, must be numerical
+    \param data source data symbol, must be numerical
 
-    @param axes a pointer to the list of axes to treat
+    \param axes a pointer to the list of axes to treat
 
-    @param nAxes the number of axes to treat
+    \param nAxes the number of axes to treat
 
-    @param mode flags that indicate desired action; see below
+    \param mode flags that indicate desired action; see below
 
-    @param outType desired data type for output symbol
+    \param outType desired data type for output symbol
 
-    @param src returns loop info for \p data
+    \param src returns loop info for \p data
 
-    @param srcptr pointer to a pointer to the data in \p data
+    \param srcptr pointer to a pointer to the data in \p data
 
-    @param output returns created output symbol, if unequal to \c
+    \param output returns created output symbol, if unequal to \c
     NULL on entry
 
-    @param trgt returns loop info for \p output, if that is unequal
+    \param trgt returns loop info for \p output, if that is unequal
     to \c NULL on entry
 
-    @param trgtptr pointer to a pointer to the data in the output symbol
+    \param trgtptr pointer to a pointer to the data in the output symbol
 
    \p mode flags:
 
@@ -1839,16 +1849,16 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
 /** Prepares for looping through input and output variables based on a
     standard arguments specification.
 
-    @param [in] narg the number of arguments in \p ps
-    @param [in] ps the array of arguments
-    @param [in] fmt the arguments specification in standard format (see below)
-    @param [out] ptrs a pointer to a list of pointers, one for each
+    \param [in] narg the number of arguments in \p ps
+    \param [in] ps the array of arguments
+    \param [in] fmt the arguments specification in standard format (see below)
+    \param [out] ptrs a pointer to a list of pointers, one for each
       argument and possibly one for the return symbol
-    @param [out] infos a pointer to a list of loop information
+    \param [out] infos a pointer to a list of loop information
       structures, one for each argument and possibly one for the
       return symbol
 
-    @return the return symbol, or -1 if an error occurred.
+    \return the return symbol, or -1 if an error occurred.
 
     The standard format is schematically as follows, where something
     between quotes ‘’ stands for that literal character, something

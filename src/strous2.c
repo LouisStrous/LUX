@@ -468,12 +468,11 @@ Int lux_tolookup(Int narg, Int ps[])
 }
 /*---------------------------------------------------------*/
 pointer	src;
-Int	type;
+Symboltype type;
 Int mcmp(const void *x1, const void *x2)
 /* auxilliary for lux_medianfilter */
 {
   extern pointer	src;
-  extern Int	type;
   scalar	d1, d2;
 
   switch (type)
@@ -502,8 +501,6 @@ Int mcmp(const void *x1, const void *x2)
 /*---------------------------------------------------------*/
 Int cmp(const void *x1, const void *x2)
 {
-  extern Int	type;
-
   switch (type) {
     case LUX_BYTE:
       return *(Byte *) x1 < *(Byte *) x2? -1:
@@ -645,7 +642,7 @@ Int lux_orderfilter(Int narg, Int ps[])
   /* now we do the actual filtering */
   do {
     memcpy(index, offset, nelem*sizeof(Int));
-    qsort(index, nelem, sizeof(Int *), mcmp);
+    qsort(index, nelem, sizeof(*index), mcmp);
     switch (type) {
       case LUX_BYTE:
 	*trgt.b = src.b[index[med]];

@@ -22734,8 +22734,8 @@ to 1.
 The number of minor tick marks per major (labeled) tick mark on the x
 and y axes if these are linear axes.
 @item !FONT
-Determines the font to use for the plot labels.  Defaults to 6 (bold
-roman serif).
+Determines the font to use for the plot labels.  Defaults to 3 (roman
+sans serif).
 @item !FZ, !FZX
 If set to zero, then make the x (@code{!FZX}) and y (@code{!FZ}) axes
 start not higher than at 0 -- unless appropriate explicit plot limits

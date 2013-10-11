@@ -57,7 +57,7 @@ Float	current_gray = 1, startx, stepx, starty, stepy;
  /* contents of VMS common plots follows */
 Int	ilabx = 1, ilaby = 1, irxf = 1, iryf = 1, ndx, fstepx = 0, fstepy = 0;
 Int	nd, ipltyp, ifz = 0, ifzx = 1, ndxs, ndys, ier = 1;
-Int	ifont = 6, ndlabx = 2, ndlaby = 2, iblank = 1, ndot = 1, ifirstflag;
+Int	ifont = 3, ndlabx = 2, ndlaby = 2, iblank = 1, ndot = 1, ifirstflag;
 Float	xmin, xmax, ymin, ymax;
 Float	wxb = 0.15, wxt = 0.9, wyb = 0.1, wyt = 0.7;
 Float	ticx = 0.01, ticy = 0.01, plims[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0}, 

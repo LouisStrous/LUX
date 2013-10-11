@@ -39,7 +39,7 @@ site.o: version.h
 # store "git describe" output in version.h if the output has changed
 version.h: FORCE
 	@git describe --tags --dirty | sed 's/^\(.*\)/"\1"/' > maybe-GITID
-	@diff -q -N GITID maybe-GITID || { mv maybe-GITID GITID; echo -n "#define GIT_VERSION " > version.h; cat GITID >> version.h; }
+	@diff -q -N GITID maybe-GITID && rm maybe-GITID || { mv maybe-GITID GITID; echo -n "#define GIT_VERSION " > version.h; cat GITID >> version.h; }
 FORCE:
 
 CLEANFILES = maybe-GITID GITID version.h

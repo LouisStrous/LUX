@@ -453,7 +453,12 @@ Int setup_x_visual(Int desiredVisualClass)
 	luxerror("Could not allocate memory for XColor entries in setup_x()",
 	      0);
     } /* end of if (!colors) */
-    XQueryColors(display, colorMap, colors, nColorCells);
+    for (i = 0; i < nColorCells; ++i) {
+      XColor thisone = colors[i];
+      thisone.pixel = pixels[i];
+      XQueryColor(display, colorMap, &thisone);
+      colors[i] = thisone;
+    }
   } /* end of if (visualIsRW(visual->class)) else */
 
   /* 7. set various defaults */

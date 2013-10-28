@@ -54,7 +54,7 @@ Int lux_bisect(Int narg, Int ps[])
 {
   Int	result, iq, pos, nLev, outDims[MAX_DIMS], step,
     lev, xSym, ySym, vSym, il, ir;
-  Double	xl, xr, min, minpos, max, maxpos, x1l, x2l, x1r, x2r;
+  double	xl, xr, min, minpos, max, maxpos, x1l, x2l, x1r, x2r;
   pointer	src, trgt, level, ptr, rightedge, left, width, x;
   csplineInfo	cspl;
   loopInfo	srcinfo;
@@ -136,9 +136,9 @@ Int lux_bisect(Int narg, Int ps[])
     return LUX_ERROR;
   switch (symbol_class(result)) {
     case LUX_ARRAY:
-      trgt.f = (Float *) array_data(result);
+      trgt.f = (float *) array_data(result);
       if (narg > 5 && ps[5])
-	width.f = (Float *) array_data(ps[5]);
+	width.f = (float *) array_data(ps[5]);
       else
 	width.f = NULL;
       break;
@@ -406,7 +406,7 @@ Int lux_bisect(Int narg, Int ps[])
 /*---------------------------------------------------------------------*/
 static Int cmp0(const void *a, const void *b)
 {
-  struct c { Double v; Int l; } aa, bb;
+  struct c { double v; Int l; } aa, bb;
   Int d;
   
   aa = *(struct c *) a;
@@ -415,7 +415,7 @@ static Int cmp0(const void *a, const void *b)
   if (d)
     return d;
   else {
-    Double dl;
+    double dl;
     dl = aa.v - bb.v;
     if (dl < 0)
       return -1;
@@ -446,7 +446,7 @@ Int lux_cspline_find(Int narg, Int ps[])
   csplineInfo	cspl;
   loopInfo	srcinfo;
   Bytestack b;
-  struct c { Double v; Int l; Int c; } *c;
+  struct c { double v; Int l; Int c; } *c;
   Int csize;
 
   ySym = ps[0];		/* <y> */
@@ -483,7 +483,7 @@ Int lux_cspline_find(Int narg, Int ps[])
   step = srcinfo.rsinglestep[0];
 
   /* we'll store the data as follows on the Byte stack:
-     1. the found location in the target dimension (Double)
+     1. the found location in the target dimension (double)
      2. the index of the level of which this is the location (Int)
      3. the (one or more) coordinates of the location (Int) */
   {
@@ -507,7 +507,7 @@ Int lux_cspline_find(Int narg, Int ps[])
 	    for (lev = 0; lev < nLev && *src.f > level.f[lev]; lev++) ;
 	    /* now level.f[lev - 1] <= *src.f < level.f[lev] */
 	  } else {
-	    Double z;
+	    double z;
 
 	    if (lev > 0 && *src.f < level.f[lev - 1]) {
 	      /* passed a target level going down: determine &
@@ -552,7 +552,7 @@ Int lux_cspline_find(Int narg, Int ps[])
 	    for (lev = 0; lev < nLev && *src.d > level.d[lev]; lev++) ;
 	    /* now level.d[lev - 1] <= *src.d < level.d[lev] */
 	  } else {
-	    Double z;
+	    double z;
 
 	    if (lev > 0 && *src.d < level.d[lev - 1]) {
 	      /* passed a target level going down: determine &
@@ -862,11 +862,11 @@ Int lux_fitskey(Int narg, Int ps[])
 	  scalar_value(iq).l = value.l;
 	  break;
 	case LUX_FLOAT:
-	  scalar_value(iq).f = (Float) value.d;
+	  scalar_value(iq).f = (float) value.d;
 	  break;
 	case LUX_CFLOAT:
 	  complex_scalar_data(iq).cf->real = 0.0;
-	  complex_scalar_data(iq).cf->imaginary = (Float) value.d;
+	  complex_scalar_data(iq).cf->imaginary = (float) value.d;
 	  break;
 	case LUX_CDOUBLE:
 	  complex_scalar_data(iq).cd->real = 0.0;
@@ -889,7 +889,7 @@ Int lux_fitskey(Int narg, Int ps[])
 #define CENTER	4
 #define DONE	5
 
-Int sign(Float x)
+Int sign(float x)
 {
   if (x > 0)
     return 1;
@@ -899,7 +899,7 @@ Int sign(Float x)
     return 0;
 }
 /*--------------------------------------------------------------------*/
-Int sgnclass(Float x)
+Int sgnclass(float x)
 {
   if (x > 0)
     return 2;
@@ -909,8 +909,8 @@ Int sgnclass(Float x)
     return 1;
 }
 /*--------------------------------------------------------------------*/
-Int traverseElement(Float xin, Float yin, Float vx, Float vy,
-		    Float *xout, Float *yout)
+Int traverseElement(float xin, float yin, float vx, float vy,
+		    float *xout, float *yout)
 /* if you start at position (<xin>,<yin>), with 0 <= <xin>,<yin> <= 1,
    and move in the direction given by (<vx>,<vy>), then this routine
    determines which pixel boundary you cross (UP, DOWN, LEFT, RIGHT,
@@ -1005,7 +1005,7 @@ LS 9nov98 */
 {
   Int	iq, nx, ny, ix, iy, c, index, rindex, count, twosided, total,
     gaussian, iq0, di, straight;
-  Float	x1, y1, x2, y2, *vx0, *vy0, value, vx, vy, s, s0, ds, dslimit,
+  float	x1, y1, x2, y2, *vx0, *vy0, value, vx, vy, s, s0, ds, dslimit,
     weight, ws, s1;
   pointer	src, trgt, src0;
   loopInfo	srcinfo, trgtinfo;
@@ -1324,7 +1324,7 @@ Int lux_dir_smooth2(Int narg, Int ps[])
 {
   Int	iq, nx, ny, ix, iy, c, index, rindex, count, twosided, normalize,
     gaussian, iq0, di, straight;
-  Float	x1, y1, x2, y2, *vx0, *vy0, vx, vy, s, s0, ds, dslimit,
+  float	x1, y1, x2, y2, *vx0, *vy0, vx, vy, s, s0, ds, dslimit,
     weight, ws, s1, norm;
   pointer	src, trgt, src0;
   loopInfo	srcinfo, trgtinfo;
@@ -1365,7 +1365,7 @@ Int lux_dir_smooth2(Int narg, Int ps[])
   gaussian = (internalMode & 2)? 1: 0; /* /GAUSSIAN */
   straight = (internalMode & 8);
 
-  zerobytes(trgt.f, array_size(iq)*sizeof(Float)); /* set to zero */
+  zerobytes(trgt.f, array_size(iq)*sizeof(float)); /* set to zero */
 
   if (!gaussian) {		/* boxcar */
     if (!normalize)
@@ -1661,7 +1661,7 @@ Int lux_trajectory(Int narg, Int ps[])
 {
   Int	iq, nx, ny, ix, iy, c, index, di, n, i, dims[MAX_DIMS],
     ngrid, type, dv;
-  Float	x1, y1, x2, y2, vx, vy, s, s0, ds, dslimit, s1;
+  float	x1, y1, x2, y2, vx, vy, s, s0, ds, dslimit, s1;
   pointer	gx, gy, vx0, vy0, ox, oy;
   Int lux_convert(Int, Int [], Int, Int);
 
@@ -1799,32 +1799,32 @@ Int lux_trajectory(Int narg, Int ps[])
 	  case LUX_BYTE:
 	    ix = (Int) *gx.b;	/* x pixel coordinate */
 	    iy = (Int) *gy.b;	/* y pixel coordinate */
-	    x1 = (Double) *gx.b++ - ix;
-	    y1 = (Double) *gy.b++ - iy;
+	    x1 = (double) *gx.b++ - ix;
+	    y1 = (double) *gy.b++ - iy;
 	    break;
 	  case LUX_WORD:
 	    ix = (Int) *gx.w;	/* x pixel coordinate */
 	    iy = (Int) *gy.w;	/* y pixel coordinate */
-	    x1 = (Double) *gx.w++ - ix;
-	    y1 = (Double) *gy.w++ - iy;
+	    x1 = (double) *gx.w++ - ix;
+	    y1 = (double) *gy.w++ - iy;
 	    break;
 	  case LUX_LONG:
 	    ix = (Int) *gx.l;	/* x pixel coordinate */
 	    iy = (Int) *gy.l;	/* y pixel coordinate */
-	    x1 = (Double) *gx.l++ - ix;
-	    y1 = (Double) *gy.l++ - iy;
+	    x1 = (double) *gx.l++ - ix;
+	    y1 = (double) *gy.l++ - iy;
 	    break;
 	  case LUX_FLOAT:
 	    ix = (Int) *gx.f;	/* x pixel coordinate */
 	    iy = (Int) *gy.f;	/* y pixel coordinate */
-	    x1 = (Double) *gx.f++ - ix;
-	    y1 = (Double) *gy.f++ - iy;
+	    x1 = (double) *gx.f++ - ix;
+	    y1 = (double) *gy.f++ - iy;
 	    break;
 	  case LUX_DOUBLE:
 	    ix = (Int) *gx.d;	/* x pixel coordinate */
 	    iy = (Int) *gy.d;	/* y pixel coordinate */
-	    x1 = (Double) *gx.d++ - ix;
-	    y1 = (Double) *gy.d++ - iy;
+	    x1 = (double) *gx.d++ - ix;
+	    y1 = (double) *gy.d++ - iy;
 	    break;
 	}
 	if (ix < 0 || ix > nx - 1 || iy < 0 || iy > ny - 1) { /* out of range */
@@ -1840,24 +1840,24 @@ Int lux_trajectory(Int narg, Int ps[])
     
       switch (type) {
 	case LUX_BYTE:
-	  vx = (Double) vx0.b[index*dv]; /* x velocity */
-	  vy = (Double) vy0.b[index*dv]; /* y velocity */
+	  vx = (double) vx0.b[index*dv]; /* x velocity */
+	  vy = (double) vy0.b[index*dv]; /* y velocity */
 	  break;
 	case LUX_WORD:
-	  vx = (Double) vx0.w[index*dv]; /* x velocity */
-	  vy = (Double) vy0.w[index*dv]; /* y velocity */
+	  vx = (double) vx0.w[index*dv]; /* x velocity */
+	  vy = (double) vy0.w[index*dv]; /* y velocity */
 	  break;
 	case LUX_LONG:
-	  vx = (Double) vx0.l[index*dv]; /* x velocity */
-	  vy = (Double) vy0.l[index*dv]; /* y velocity */
+	  vx = (double) vx0.l[index*dv]; /* x velocity */
+	  vy = (double) vy0.l[index*dv]; /* y velocity */
 	  break;
 	case LUX_FLOAT:
-	  vx = (Double) vx0.f[index*dv]; /* x velocity */
-	  vy = (Double) vy0.f[index*dv]; /* y velocity */
+	  vx = (double) vx0.f[index*dv]; /* x velocity */
+	  vy = (double) vy0.f[index*dv]; /* y velocity */
 	  break;
 	case LUX_DOUBLE:
-	  vx = (Double) vx0.d[index*dv]; /* x velocity */
-	  vy = (Double) vy0.d[index*dv]; /* y velocity */
+	  vx = (double) vx0.d[index*dv]; /* x velocity */
+	  vy = (double) vy0.d[index*dv]; /* y velocity */
 	  break;
       }
     
@@ -1934,24 +1934,24 @@ Int lux_trajectory(Int narg, Int ps[])
 	s += ds;
 	switch (type) {
 	  case LUX_BYTE:
-	    vx = (Double) vx0.b[index*dv];
-	    vy = (Double) vy0.b[index*dv];
+	    vx = (double) vx0.b[index*dv];
+	    vy = (double) vy0.b[index*dv];
 	    break;
 	  case LUX_WORD:
-	    vx = (Double) vx0.w[index*dv];
-	    vy = (Double) vy0.w[index*dv];
+	    vx = (double) vx0.w[index*dv];
+	    vy = (double) vy0.w[index*dv];
 	    break;
 	  case LUX_LONG:
-	    vx = (Double) vx0.l[index*dv];
-	    vy = (Double) vy0.l[index*dv];
+	    vx = (double) vx0.l[index*dv];
+	    vy = (double) vy0.l[index*dv];
 	    break;
 	  case LUX_FLOAT:
-	    vx = (Double) vx0.f[index*dv];
-	    vy = (Double) vy0.f[index*dv];
+	    vx = (double) vx0.f[index*dv];
+	    vy = (double) vy0.f[index*dv];
 	    break;
 	  case LUX_DOUBLE:
-	    vx = (Double) vx0.d[index*dv];
-	    vy = (Double) vy0.d[index*dv];
+	    vx = (double) vx0.d[index*dv];
+	    vy = (double) vy0.d[index*dv];
 	    break;
 	}
       } /* end of while (s < s0) */
@@ -1986,7 +1986,7 @@ Int lux_trajectory(Int narg, Int ps[])
   return LUX_OK;
 }
 /*--------------------------------------------------------------------*/
-void legendre(Double x, Int lmax, Double *values)
+void legendre(double x, Int lmax, double *values)
 /* calculates the values of the associate Legendre polynomials */
 /* P_l^m(x) at ordinate <x> for all <l> from 0 through <lmax> and all <m> */
 /* from 0 through <l> */
@@ -2000,9 +2000,9 @@ void legendre(Double x, Int lmax, Double *values)
 /* P_{m+1}^m = x (2 m + 1) P_m^m */
 {
   Int	l, m, j1, j2, j3, j4;
-  Double	z, *p, v1, v2;
+  double	z, *p, v1, v2;
 
-  zerobytes(values, (lmax + 1)*(lmax + 2)*sizeof(Double)/2);
+  zerobytes(values, (lmax + 1)*(lmax + 2)*sizeof(double)/2);
 
   p = values;
   z = sqrt(1 - x*x);
@@ -2047,7 +2047,7 @@ void legendre(Double x, Int lmax, Double *values)
   }
 }
 /*--------------------------------------------------------------------*/
-void spherical_harmonics(Double x, Int lmax, Double *values)
+void spherical_harmonics(double x, Int lmax, double *values)
 /* calculates the values of the normalized associate Legendre polynomials */
 /* y_l^m(x) at ordinate <x> for all <l> from 0 through <lmax> and all <m> */
 /* from 0 through <l>.  The normalization is such that */
@@ -2059,7 +2059,7 @@ void spherical_harmonics(Double x, Int lmax, Double *values)
 /* NOTE: doesn't seem quite OK yet */
 {
   Int	l, m, j4;
-  Double	z, *p, v1, v2, w1, w2, w3, w4, w5, w6;
+  double	z, *p, v1, v2, w1, w2, w3, w4, w5, w6;
 
   p = values;
   z = sqrt(1 - x*x);
@@ -2116,7 +2116,7 @@ void spherical_harmonics(Double x, Int lmax, Double *values)
 Int lux_legendre(Int narg, Int ps[])
 /* LEGENDRE(x, lmax) */
 {
-  Double	x, *values;
+  double	x, *values;
   Int	lmax, out, n;
 
   x = double_arg(ps[0]);
@@ -2148,9 +2148,9 @@ Int lux_enhanceimage(Int narg, Int ps[])
 {
   pointer src, tgt;
   Int ndim, *dims, nhist, *hist, nelem, i, result;
-  Float target, part;
-  Float a, b;
-  Float *m;
+  float target, part;
+  float a, b;
+  float *m;
 
   if (!symbolIsNumericalArray(ps[0]))
     return cerror(NEED_NUM_ARR, ps[0]);
@@ -2190,9 +2190,9 @@ Int lux_enhanceimage(Int narg, Int ps[])
   b = 1 - a;
   m[0] = 1.0;
   for (i = 1; i < nhist; i++) {	/* calculate adjustment factors */
-    Float q;
+    float q;
 
-    q = (Float) hist[i]*dims[0]/nelem;
+    q = (float) hist[i]*dims[0]/nelem;
     m[i] = q*(a*q + b)/i*nhist;
     if (m[i] < 1 && !(internalMode & 1))
       m[i] = 1;
@@ -2320,25 +2320,25 @@ Int lux_hamming(Int narg, Int ps[]) {
   return result;
 }
 /*--------------------------------------------------------------------*/
-Double vhypot(Int n, Double arg1, Double arg2, ...)
+double vhypot(Int n, double arg1, double arg2, ...)
 {
-  Double arg = hypot(arg1, arg2);
+  double arg = hypot(arg1, arg2);
   if (n < 3)
     return arg;
   va_list ap;
   va_start(ap, arg2);
   n -= 2;
   while (n--)
-    arg = hypot(arg, va_arg(ap, Double));
+    arg = hypot(arg, va_arg(ap, double));
   va_end(ap);
   return arg;
 }
 /*--------------------------------------------------------------------*/
-Double hypota(Int n, Double *x)
+double hypota(Int n, double *x)
 {
   if (n < 1)
     return 0.0;
-  Double arg = *x++;
+  double arg = *x++;
   while (--n)
     arg = hypot(arg, *x++);
   return arg;
@@ -2346,11 +2346,11 @@ Double hypota(Int n, Double *x)
 /*--------------------------------------------------------------------*/
 Int compare_doubles(const void *a, const void *b)
 {
-  const Double *da = (const Double *) a;
-  const Double *db = (const Double *) b;
+  const double *da = (const double *) a;
+  const double *db = (const double *) b;
   return (*da > *db) - (*da < *db);
 }
-Int runord_d(Double *data, Int n, Int width, Int ord, Double *result)
+Int runord_d(double *data, Int n, Int width, Int ord, double *result)
 {
   Int i;
   
@@ -2358,7 +2358,7 @@ Int runord_d(Double *data, Int n, Int width, Int ord, Double *result)
     errno = EDOM;
     return -1;
   }
-  Double *temp = malloc(width*sizeof(Double));
+  double *temp = malloc(width*sizeof(double));
   if (!temp) {
     errno = ENOMEM;
     return -1;
@@ -2371,8 +2371,8 @@ Int runord_d(Double *data, Int n, Int width, Int ord, Double *result)
     ord = width - 1;
   Int o = width/2;
   for (i = 0; i < n - width; i++) {
-    memcpy(temp, data + i, width*sizeof(Double));
-    qsort(temp, width, sizeof(Double), compare_doubles);
+    memcpy(temp, data + i, width*sizeof(double));
+    qsort(temp, width, sizeof(double), compare_doubles);
     result[o + i] = temp[ord];
   }
   for ( ; i < n - o; i++)
@@ -2384,13 +2384,13 @@ Int runord_d(Double *data, Int n, Int width, Int ord, Double *result)
 }
 BIND(runord_d, i_dpiT3dp_iDaiLiLrDq_00T3, f, RUNORD, 3, 3, NULL);
 /*--------------------------------------------------------------------*/
-Int runmax_d(Double *data, Int n, Int width, Double *result)
+Int runmax_d(double *data, Int n, Int width, double *result)
 {
   return runord_d(data, n, width, width - 1, result);
 }
 BIND(runmax_d, i_dpiidp_iDaLrDq_00T2, f, RUNMAX, 2, 2, NULL);
 /*--------------------------------------------------------------------*/
-Int runmin_d(Double *data, Int n, Int width, Double *result)
+Int runmin_d(double *data, Int n, Int width, double *result)
 {
   return runord_d(data, n, width, 0, result);
 }
@@ -2400,16 +2400,16 @@ BIND(runmin_d, i_dpiidp_iDaLrDq_00T2, f, RUNMIN, 2, 2, NULL);
   Returns <x> such that <x> = <cur> (mod <period) and
   <average> - <period>/2 <= <x> - <prev> < <average> + <period>/2
  */
-Double unmod(Double cur, Double prev, Double period, Double average)
+double unmod(double cur, double prev, double period, double average)
 {
   if (!period)
     return cur;
   return cur + period*ceil((prev - cur + average)/period - 0.5);
 }
 /*--------------------------------------------------------------------*/
-Int unmod_slice_d(Double *srcptr, size_t srccount, size_t srcstride,
-                  Double period, Double average,
-                  Double *tgtptr, size_t tgtcount, size_t tgtstride)
+Int unmod_slice_d(double *srcptr, size_t srccount, size_t srcstride,
+                  double period, double average,
+                  double *tgtptr, size_t tgtcount, size_t tgtstride)
 {
   Int i;
 
@@ -2429,9 +2429,9 @@ Int unmod_slice_d(Double *srcptr, size_t srccount, size_t srcstride,
 }
 BIND(unmod_slice_d, i_sdddsd_iDaLDDrDq_000T333, f, UNMOD, 2, 4, ":AXIS:PERIOD:AVERAGE");
 /*--------------------------------------------------------------------*/
-Double hypot_stride(Double *data, size_t count, size_t stride)
+double hypot_stride(double *data, size_t count, size_t stride)
 {
-  Double result = 0.0;
+  double result = 0.0;
   while (count-- > 0) {
     result = hypot(result, *data);
     data += stride;

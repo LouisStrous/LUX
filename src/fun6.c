@@ -23,19 +23,19 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "action.h"
 
  /*------------------------------------------------------------------------- */
-static void rdct_spike(Word *start, Int ystride, Float *ws)
+static void rdct_spike(Word *start, Int ystride, float *ws)
  /* does reverse dct for one cell, specialize for a spike smooth */
 {
-  Float	tmp0, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7;
-  Float	tmp10, tmp11, tmp12, tmp13;
-  Float	z5, z11, z13, z10, z12;
+  float	tmp0, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7;
+  float	tmp10, tmp11, tmp12, tmp13;
+  float	z5, z11, z13, z10, z12;
 
   /* no de-zag and de-quantize here */
   /* Pass 1: process columns. */
   /* we don't check for columns of zeroes since this usually uses full
      precision */
 {
-  register Float *wsptr = ws;
+  register float *wsptr = ws;
   Int	nq = 8;
 
   while (nq--) {
@@ -94,7 +94,7 @@ static void rdct_spike(Word *start, Int ystride, Float *ws)
 
   /* Pass 2: process rows. */
 {
-  register Float *wsptr;
+  register float *wsptr;
   register short *elemptr;
   Int	nq = 8;
   
@@ -163,11 +163,11 @@ Int lux_despike(Int narg, Int ps[])
   Int	nxc, nyc, cell_flag_sign, niter=1, rms_flag_sign, rms_flag;
   Int	sign_flag, bad_flag, bb_flag, save_niter, ntotal, dim[2];
   Byte	*cell_status;
-  Float	frac = 0.25, fsum, cfrac, tq, rms=0.0, fdif;
+  float	frac = 0.25, fsum, cfrac, tq, rms=0.0, fdif;
   Word	*p, *q, *ptr, *p1, *p2, *p3, *out, *out2;
   Word	arr[16], *pps, *ss;
 
-  lognb2 = (log((Double) 16)*ALN2I+TINY);
+  lognb2 = (log((double) 16)*ALN2I+TINY);
 
   if (narg > 1 && ps[1] && float_arg_stat(ps[1], &frac) != 1)
     return LUX_ERROR;
@@ -281,10 +281,10 @@ Int lux_despike(Int narg, Int ps[])
  p3 = p2 + nx;
  while (n--) {
   /* add the 8 */
-  tq = (cfrac * (Float) *p);
+  tq = (cfrac * (float) *p);
   sum = *p1 + *(p1+1) + *(p1+2) + *p2 + *(p2+2) + *p3 + *(p3+1) + *(p3+2);
   p1++;  p2++;  p3++;
-  fsum = (Float) sum * 0.125;
+  fsum = (float) sum * 0.125;
   /* now the test */
   if ( fsum <= tq) {  /* we have a bady, zap it */
     nc++;
@@ -350,7 +350,7 @@ Int lux_despike(Int narg, Int ps[])
 
  if (bb_flag) {
   Int badcells = 0;
-  Float	dc[9], ws[64], *pf;
+  float	dc[9], ws[64], *pf;
   Int 	i, ix, jx, ic, stride = nx - 8, ii, jj, istart,k;
   Int	ioff[3], joff[3];
   for (i=0;i<cell_count;i++) {
@@ -374,7 +374,7 @@ Int lux_despike(Int narg, Int ps[])
       nc = 8;
       /* get the checkerboard metric */
       while (nc--) { m = 4; while(m--) {
-      	fsum += (Float) *q++; fsum += (Float) *q++;
+      	fsum += (float) *q++; fsum += (float) *q++;
 	fdif = fdif + *ps1 - *ps2;
 	ps1 += 2;	ps2 += 2;
       	}
@@ -410,7 +410,7 @@ Int lux_despike(Int narg, Int ps[])
       k = ii + jj*3;
       fsum = 0.0;
       nc = 8;
-      while (nc--) { m = 8; while(m--) fsum += (Float) *q++; q += stride; }
+      while (nc--) { m = 8; while(m--) fsum += (float) *q++; q += stride; }
       dc[k] = fsum*0.015625; /* that's 1/64 */
       dc[4] += dc[k];
       }
@@ -804,16 +804,16 @@ Int lux_reorder(Int narg, Int ps[])/* reorder function */
 	break;
       case LUX_FLOAT:
 	if (iorder < 4) {
-	  register  Float *pp, *qq;
+	  register  float *pp, *qq;
 	  register  Int  nn, mm, nxx;
 
 	  nxx = nx;
 	  mm = ny;
-	  qq = (Float *) q;
+	  qq = (float *) q;
 
 	  switch (iorder) {
 	    case 1:		/* reverse in x */
-	      pp = (Float *) p + nx;
+	      pp = (float *) p + nx;
 	      inc = 2*nx;
 	      while (mm--) {
 		nn = nxx;
@@ -825,7 +825,7 @@ Int lux_reorder(Int narg, Int ps[])/* reorder function */
 	      }
 	      break;
 	    case 2:		/* just reverse in y */
-	      pp = (Float *) p + nx * ny - nx;
+	      pp = (float *) p + nx * ny - nx;
 	      inc = -2*nx;
 	      while (mm--) {
 		nn = nxx;
@@ -837,7 +837,7 @@ Int lux_reorder(Int narg, Int ps[])/* reorder function */
 	      }
 	      break;
 	    case 3:		/* reverse in x and y */
-	      pp = (Float *) p + nx*ny;
+	      pp = (float *) p + nx*ny;
 	      while (mm--) {
 		nn = nxx;
 		while (nn) {
@@ -848,29 +848,29 @@ Int lux_reorder(Int narg, Int ps[])/* reorder function */
 	      break;
 	  } 
 	} else {
-	  register  Float *pp, *qq;
+	  register  float *pp, *qq;
 	  register  Int  nn, mm, nyy;
 	  
 	  mm = ny;
-	  qq = (Float *) q;
+	  qq = (float *) q;
 	  switch (iorder) {
 	    case 4:		/* transpose in x and y */
-	      pp = (Float *) p;
+	      pp = (float *) p;
 	      inc = -nx*ny + 1;
 	      nyy = ny;
 	      break;
 	    case 5:		/* transpose plus reverse in y */
-	      pp = (Float *) p +nx*ny - ny;
+	      pp = (float *) p +nx*ny - ny;
 	      inc = nx*ny + 1;
 	      nyy = -ny;
 	      break;
 	    case 6:		/* transpose plus reverse in x */
-	      pp = (Float *) p + ny - 1;
+	      pp = (float *) p + ny - 1;
 	      inc = -nx*ny - 1;
 	      nyy = ny;
 	      break;
 	    case 7:		/* transpose plus reverse in x,y */
-	      pp = (Float *) p + ny*nx - 1;
+	      pp = (float *) p + ny*nx - 1;
 	      inc = nx*ny - 1;
 	      nyy = -ny;
 	      break;
@@ -888,16 +888,16 @@ Int lux_reorder(Int narg, Int ps[])/* reorder function */
 	break;
       case LUX_DOUBLE:
 	if (iorder < 4) {
-	  register  Double *pp, *qq;
+	  register  double *pp, *qq;
 	  register  Int  nn, mm, nxx;
 
 	  nxx = nx;
 	  mm = ny;
-	  qq = (Double *) q;
+	  qq = (double *) q;
 
 	  switch (iorder) {
 	    case 1:		/* reverse in x */
-	      pp = (Double *) p + nx;
+	      pp = (double *) p + nx;
 	      inc = 2*nx;
 	      while (mm--) {
 		nn = nxx;
@@ -909,7 +909,7 @@ Int lux_reorder(Int narg, Int ps[])/* reorder function */
 	      }
 	      break;
 	    case 2:		/* just reverse in y */
-	      pp = (Double *) p + nx * ny - nx;
+	      pp = (double *) p + nx * ny - nx;
 	      inc = -2*nx;
 	      while (mm--) {
 		nn = nxx;
@@ -921,7 +921,7 @@ Int lux_reorder(Int narg, Int ps[])/* reorder function */
 	      }
 	      break;
 	    case 3:		/* reverse in x and y */
-	      pp = (Double *) p + nx*ny;
+	      pp = (double *) p + nx*ny;
 	      while (mm--) {
 		nn = nxx;
 		while (nn) {
@@ -932,29 +932,29 @@ Int lux_reorder(Int narg, Int ps[])/* reorder function */
 	      break;
 	  } 
 	} else {
-	  register  Double *pp, *qq;
+	  register  double *pp, *qq;
 	  register  Int  nn, mm, nyy;
 	  
 	  mm = ny;
-	  qq = (Double *) q;
+	  qq = (double *) q;
 	  switch (iorder) {
 	    case 4:		/* transpose in x and y */
-	      pp = (Double *) p;
+	      pp = (double *) p;
 	      inc = -nx*ny + 1;
 	      nyy = ny;
 	      break;
 	    case 5:		/* transpose plus reverse in y */
-	      pp = (Double *) p +nx*ny - ny;
+	      pp = (double *) p +nx*ny - ny;
 	      inc = nx*ny + 1;
 	      nyy = -ny;
 	      break;
 	    case 6:		/* transpose plus reverse in x */
-	      pp = (Double *) p + ny - 1;
+	      pp = (double *) p + ny - 1;
 	      inc = -nx*ny - 1;
 	      nyy = ny;
 	      break;
 	    case 7:		/* transpose plus reverse in x,y */
-	      pp = (Double *) p + ny*nx - 1;
+	      pp = (double *) p + ny*nx - 1;
 	      inc = nx*ny - 1;
 	      nyy = -ny;
 	      break;

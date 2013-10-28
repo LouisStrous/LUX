@@ -44,7 +44,7 @@ void random_init(Int seed)
   gsl_rng_set(rng, s);
 }
 /*------------------------------------------------------------------------- */
-Double random_one(void)
+double random_one(void)
 /* Returns a single uniformly distributed pseudo-random number */
 /* between 0 and 1 (exclusive). */
 {
@@ -53,7 +53,7 @@ Double random_one(void)
   return gsl_rng_uniform(rng);
 }
 /*------------------------------------------------------------------------- */
-Int locate_value(Double value, Double *values, Int nElem)
+Int locate_value(double value, double *values, Int nElem)
 {
   Int	ilo, ihi, imid;
 
@@ -74,13 +74,13 @@ Int locate_value(Double value, Double *values, Int nElem)
   return ihi;
 }
 
-Int random_distributed(Int modulus, Double *distr)
+Int random_distributed(Int modulus, double *distr)
 /* returns a random number between 0 and <modulus - 1> drawn according */
 /* to the distribution function <distr>, which must have at least */
 /* <modulus> elements, with distr[0] == 0 and distr[modulus - 1] <= 1, */
 /* and no element smaller than the previous one.  LS 25aug2000 */
 {
-  Double r;
+  double r;
 
   r = random_one();
   return locate_value(r, distr, modulus);
@@ -127,13 +127,13 @@ void randomu(Int seed, void *output, Int number, Int modulo)
 /* a negative value indicates complete reinitialization of the random */
 /* sequence.  a positive value indicates a mere change of seed.  a zero */
 /* value indicates that the current random sequence is continued. */
-/* if <modulo> is zero, then <output> is considered (Float *) and the */
+/* if <modulo> is zero, then <output> is considered (float *) and the */
 /* generated random sequence is LUX_DOUBLE.  if <modulo> is positive, then */
 /* <output> is considered (Int *) and the generated random sequence */
 /* runs between 0 and <modulo> - 1 (inclusive) */
 {
  Int	j;
- Double	*fp;
+ double	*fp;
  Int	*ip;
 
  /* check if we are initializing */
@@ -146,13 +146,13 @@ void randomu(Int seed, void *output, Int number, Int modulo)
    for (j = 0; j < number; j++)
      *ip++ = (Int) (random_one()*modulo);
  } else { /* floating point */
-   fp = (Double *) output;
+   fp = (double *) output;
    for (j = 0; j < number; j++)
      *fp++ = random_one();
  }
 }
 /*------------------------------------------------------------------------- */
-void randome(void *output, Int number, Double limit)
+void randome(void *output, Int number, double limit)
 /* generates <number> exponentially distributed (with unit scale)
    pseudo-random numbers and stores them in <output>, for which memory
    must have been allocated by the user.  Both positive and negative
@@ -160,11 +160,11 @@ void randome(void *output, Int number, Double limit)
    numbers whose magnitude is at least <limit> are returned */
 {
  Int	j;
- Double	*fp, value;
+ double	*fp, value;
 
  if (limit < 0)
    limit = 0;
- fp = (Double *) output;
+ fp = (double *) output;
  /* 
     We want only numbers whose magnitude is at least |λ| = <limit>.
     random_one() returns uniformly distributed pseudorandom numbers
@@ -257,7 +257,7 @@ void random_unique_shuffle(Int seed, Int *output, Int number, Int modulo)
   }
 }
 /*----------------------------------------------------------------------*/
-void randomn(Int seed, Double *output, Int number, char hasUniform)
+void randomn(Int seed, double *output, Int number, char hasUniform)
 /* returns <number> pseudo-random numbers following the standard */
 /* normal distribution (mean zero, standard deviation one), using the */
 /* Box-Muller transformation.  Sufficient memory for the numbers */
@@ -267,7 +267,7 @@ void randomn(Int seed, Double *output, Int number, char hasUniform)
 /* otherwise they are generated in this routine.  LS 25oct95 */
 {
   Int	n, i;
-  Double	r, a, extra[2];
+  double	r, a, extra[2];
 
   n = number%2;
   if (!hasUniform)
@@ -290,7 +290,7 @@ void randomn(Int seed, Double *output, Int number, char hasUniform)
 Int lux_randomu(Int narg, Int ps[])
  /*create an array of random elements in the [0,1.0] range (exclusive) */
 {
- Double *p;
+ double *p;
  Int	k, seed, cycle;
  Int	dims[8], *pd, j, result_sym, n;
 
@@ -342,7 +342,7 @@ Int lux_randomd(Int narg, Int ps[])
 /* <distr(*-1)> must be equal to one.  LS 25aug2000 */
 {
   Int	result, dims[MAX_DIMS], *pd, n, j, modulus, seed;
-  Double	*distr;
+  double	*distr;
 
   if (*ps) {			/* seed */
     seed = int_arg(ps[0]);
@@ -400,7 +400,7 @@ Int lux_randomn(Int narg, Int ps[])
       || result_sym == LUX_ONE)	/* we just initialized with a specific seed */
     return result_sym;
   /* then apply Box-Muller transformation */
-  randomn(0, (Double *) array_data(result_sym), array_size(result_sym), 1);
+  randomn(0, (double *) array_data(result_sym), array_size(result_sym), 1);
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
@@ -408,7 +408,7 @@ Int lux_randome(Int narg, Int ps[])
  /* create an exponential distribution of pseudo-random #'s, centered
     at 0 with a given scale length */
 {
-  Double *p, scale, limit;
+  double *p, scale, limit;
   Int	k;
   Int	dims[8], *pd, j, result_sym, n;
 
@@ -642,7 +642,7 @@ Int lux_random(Int narg, Int ps[])
 		period);
       } else {			/* no PERIOD, so get FLOATs */
 	result = array_scratch(LUX_DOUBLE, ndim, dims);
-	randomu(seed, (Double *) array_data(result), array_size(result), 0);
+	randomu(seed, (double *) array_data(result), array_size(result), 0);
       }
       break;
     case 2:			/* /NORMAL */
@@ -651,7 +651,7 @@ Int lux_random(Int narg, Int ps[])
       result = array_scratch(LUX_DOUBLE, ndim, dims);
       if (result == LUX_ERROR)
 	return LUX_ERROR;
-      randomn(seed, (Double *) array_data(result), array_size(result), 0);
+      randomn(seed, (double *) array_data(result), array_size(result), 0);
       break;
     case 3: case 4:			/* /SAMPLE, /SHUFFLE */
       if (narg < 1 || !ps[1])	/* PERIOD absent, but is required */

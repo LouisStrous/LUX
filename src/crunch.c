@@ -31,11 +31,11 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
  caused rare errors in output that might have gone unnoticed for a while,
  not sure how long the sunbow vesrion had this bug, the umbra version was
  OK, bug marked in crunch32 below */
-/* union types_ptr { Byte *b; short *w; Int *l; Float *f; Double *d;}; */
+/* union types_ptr { Byte *b; short *w; Int *l; float *f; double *d;}; */
 /* commented out because already defined in .h file - LS 30apr97 */
 Byte bits[8]={1,2,4,8,16,32,64,128};
 Int	crunch_bits;
-Float	crunch_bpp;
+float	crunch_bpp;
 Int	crunch_slice = 5;
 static Int	crunch_run_flag=0;
 

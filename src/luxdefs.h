@@ -153,11 +153,11 @@ typedef enum {
   FMT_ERROR,                    /*!< (0) illegal format */
   FMT_PLAIN,                    /*!< (1) plain text format */
   FMT_INTEGER,                  /*!< (2) integer format */
-  FMT_FLOAT,                    /*!< (3) Float format */
+  FMT_FLOAT,                    /*!< (3) float format */
   FMT_TIME,                     /*!< (4) time format */
   FMT_DATE,                     /*!< (5) date format */
   FMT_STRING,                   /*!< (6) string format */
-  FMT_COMPLEX,                  /*!< (7) complex Float format */
+  FMT_COMPLEX,                  /*!< (7) complex float format */
   FMT_EMPTY                     /*!< (8) empty format */
 } fmtType;
 
@@ -382,12 +382,12 @@ typedef enum {
 
 /** \struct a single-precision complex number */
 typedef struct {
-  Float real; Float imaginary;
+  float real; float imaginary;
 } floatComplex;
 
 /** \struct a double-precision complex number */
 typedef struct {
-  Double real; Double imaginary;
+  double real; double imaginary;
 } doubleComplex;
 
 /** \union a union of pointers to a complex number */
@@ -397,19 +397,19 @@ typedef union {
   
 /** \union a union of scalar values */
 typedef union {
-  Byte b; Word w; Int l; Float f; Double d; char *s; char **sp;
+  Byte b; Word w; Int l; float f; double d; char *s; char **sp;
 } scalar;
 
 /* wideScalar is equal to scalar plus the complex data types; we have */
 /* separate scalar and wideScalars because wideScalar is wider, which is */
 /* not always desirable. */
 typedef union {
-  Byte b; Word w; Int l; Float f; Double d; floatComplex cf;
+  Byte b; Word w; Int l; float f; double d; floatComplex cf;
   doubleComplex cd; char *s; char **sp;
 } wideScalar;
 
 typedef union pointerUnion {
-  Byte *b; Word *w; Int *l; Float *f; Double *d; char *s;
+  Byte *b; Word *w; Int *l; float *f; double *d; char *s;
   char **sp; void *v; floatComplex *cf; doubleComplex *cd;
 } pointer;
 
@@ -438,33 +438,33 @@ enum {
 #define LUX_STAT_FACTS_SDEV     (1<<2)
 
 typedef struct {
-  Int min; Int max; Int minloc; Int maxloc; Double total; Double sdev;
+  Int min; Int max; Int minloc; Int maxloc; double total; double sdev;
 } statFacts_b;
 
 typedef struct {
-  Word min; Word max; Int minloc; Int maxloc; Double total; Double sdev;
+  Word min; Word max; Int minloc; Int maxloc; double total; double sdev;
 } statFacts_w;
 
 typedef struct {
-  Int min; Int max; Int minloc; Int maxloc; Double total; Double sdev;
+  Int min; Int max; Int minloc; Int maxloc; double total; double sdev;
 } statFacts_l;
 
 typedef struct {
-  Float min; Float max; Int minloc; Int maxloc; Double total; Double sdev;
+  float min; float max; Int minloc; Int maxloc; double total; double sdev;
 } statFacts_f;
 
 typedef struct {
-  Double min; Double max; Int minloc; Int maxloc; Double total; Double sdev;
+  double min; double max; Int minloc; Int maxloc; double total; double sdev;
 } statFacts_d;
 
 typedef struct {
   floatComplex min; floatComplex max; Int minloc; Int maxloc;
-  doubleComplex total; Double sdev;
+  doubleComplex total; double sdev;
 } statFacts_cf;
 
 typedef struct {
   doubleComplex min; doubleComplex max; Int minloc; Int maxloc;
-  doubleComplex total; Double sdev;
+  doubleComplex total; double sdev;
 } statFacts_cd;
 
 typedef union {
@@ -490,8 +490,8 @@ typedef struct arrayStruct {
 } array;
 
 struct boundsStruct {
-  struct { Byte b; Word w; Int l; Float f; Double d; } min;
-  struct { Byte b; Word w; Int l; Float f; Double d; } max;
+  struct { Byte b; Word w; Int l; float f; double d; } min;
+  struct { Byte b; Word w; Int l; float f; double d; } max;
 };
 
 typedef struct structElemStruct {
@@ -592,7 +592,7 @@ typedef struct {
 } branchInfo;
 
 typedef struct {
-  gsl_spline *spline; gsl_interp_accel *acc; Double *x; Double *y;
+  gsl_spline *spline; gsl_interp_accel *acc; double *x; double *y;
 } csplineInfo;
 
 /** \struct axis loop information */

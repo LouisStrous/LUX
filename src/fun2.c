@@ -41,8 +41,8 @@ extern Int	nFixed;
 static	Int	result_sym , type, detrend_flag;
 static	char	templine[256];		/* a temp for output and istring */
 void	zerobytes(void *, Int);
-Int	f_decomp(Float *, Int, Int), d_decomp(Double *, Int, Int),
-  f_solve(Float *, Float *, Int, Int), d_solve(Double *, Double *, Int, Int),
+Int	f_decomp(float *, Int, Int), d_decomp(double *, Int, Int),
+  f_solve(float *, float *, Int, Int), d_solve(double *, double *, Int, Int),
   lux_replace(Int, Int);
 /*------------------------------------------------------------------------- */
 Int lux_runsum(Int narg, Int ps[])
@@ -53,9 +53,9 @@ Int lux_runsum(Int narg, Int ps[])
   summation order, such that n-th order summation is the reverse of the
   n-th order difference (see lux_differ).  If <axis> isn't specified,
   or is negative, then <x> is taken to be a 1D array and summation is
-  done with floating point or Double-precision arithmetic.  Otherwise,
+  done with floating point or double-precision arithmetic.  Otherwise,
   the result has the same type as <x>.  axis & order extension by LS 26nov92
-  implementation of 1D Double-precision case LS 11feb2007 */
+  implementation of 1D double-precision case LS 11feb2007 */
 {
  register pointer q1,q2,p;
  Int	result_sym, iq, axis, m, n, i, j, done, *dims, ndim, tally[8], step[8];
@@ -67,7 +67,7 @@ Int lux_runsum(Int narg, Int ps[])
  iq = ps[0];
  if (iq < 0) return iq;					/* error pass-thru */
  if (sym[iq].class == LUX_SCAL_PTR) iq = dereferenceScalPointer(iq);
-							/*Float the input */
+							/*float the input */
  type = sym[iq].type;
  if (axis == -1 && type < LUX_FLOAT) {
    iq = lux_float(1, ps);	/* pseudo-1D case */
@@ -198,8 +198,8 @@ Int index_sdev(Int narg, Int ps[], Int sq)
   sum.b += offset*lux_type_size[outType];
   i = nElem;
   if (haveWeights) {
-    allocate(hist.d, size, Double);
-    zerobytes(hist.d, size*sizeof(Double));
+    allocate(hist.d, size, double);
+    zerobytes(hist.d, size*sizeof(double));
     hist.d += offset;
     switch (outType) {
       case LUX_FLOAT:
@@ -207,7 +207,7 @@ Int index_sdev(Int narg, Int ps[], Int sq)
 	  case LUX_BYTE:
 	    while (i--) {		/* first, get the sum */
 	      hist.f[*indx] += *weights.b;
-	      sum.f[*indx] += (Float) *src.b++ * *weights.b++;
+	      sum.f[*indx] += (float) *src.b++ * *weights.b++;
 	      indx++;
 	    }
 	    /* calculate the average */
@@ -219,14 +219,14 @@ Int index_sdev(Int narg, Int ps[], Int sq)
 	    weights.b -= nElem;
 	    /* now the squared deviations */
 	    while (nElem--) {
-	      temp.f = (Float) *src.b++ - sum.f[*indx];
+	      temp.f = (float) *src.b++ - sum.f[*indx];
 	      trgt.f[*indx++] += temp.f*temp.f* *weights.b++;
 	    }
 	    break;
 	  case LUX_WORD:
 	    while (i--) {		/* first, get the sum */
 	      hist.f[*indx] += *weights.w;
-	      sum.f[*indx] += (Float) *src.w++ * *weights.w++;
+	      sum.f[*indx] += (float) *src.w++ * *weights.w++;
 	      indx++;
 	    }
 	    /* calculate the average */
@@ -238,14 +238,14 @@ Int index_sdev(Int narg, Int ps[], Int sq)
 	    weights.w -= nElem;
 	    /* now the squared deviations */
 	    while (nElem--) {
-	      temp.f = (Float) *src.w++ - sum.f[*indx];
+	      temp.f = (float) *src.w++ - sum.f[*indx];
 	      trgt.f[*indx++] += temp.f*temp.f* *weights.w++;
 	    }
 	    break;
 	  case LUX_LONG:
 	    while (i--) {		/* first, get the sum */
 	      hist.f[*indx] += *weights.l;
-	      sum.f[*indx] += (Float) *src.l++ * *weights.l++;
+	      sum.f[*indx] += (float) *src.l++ * *weights.l++;
 	      indx++;
 	    }
 	    /* calculate the average */
@@ -257,14 +257,14 @@ Int index_sdev(Int narg, Int ps[], Int sq)
 	    weights.l -= nElem;
 	    /* now the squared deviations */
 	    while (nElem--) {
-	      temp.f = (Float) *src.l++ - sum.f[*indx];
+	      temp.f = (float) *src.l++ - sum.f[*indx];
 	      trgt.f[*indx++] += temp.f*temp.f* *weights.l++;
 	    }
 	    break;
 	  case LUX_FLOAT:
 	    while (i--) {		/* first, get the sum */
 	      hist.f[*indx] += *weights.f;
-	      sum.f[*indx] += (Float) *src.f++ * *weights.f++;
+	      sum.f[*indx] += (float) *src.f++ * *weights.f++;
 	      indx++;
 	    }
 	    /* calculate the average */
@@ -276,7 +276,7 @@ Int index_sdev(Int narg, Int ps[], Int sq)
 	    weights.f -= nElem;
 	    /* now the squared deviations */
 	    while (nElem--) {
-	      temp.f = (Float) *src.f++ - sum.f[*indx];
+	      temp.f = (float) *src.f++ - sum.f[*indx];
 	      trgt.f[*indx++] += temp.f*temp.f* *weights.f++;
 	    }
 	    break;
@@ -322,7 +322,7 @@ Int index_sdev(Int narg, Int ps[], Int sq)
 	  case LUX_BYTE:
 	    while (i--) {		/* first, get the sum */
 	      hist.d[*indx] += *weights.b;
-	      sum.d[*indx] += (Double) *src.b++ * *weights.b++;
+	      sum.d[*indx] += (double) *src.b++ * *weights.b++;
 	      indx++;
 	    }
 	    /* calculate the average */
@@ -334,14 +334,14 @@ Int index_sdev(Int narg, Int ps[], Int sq)
 	    weights.b -= nElem;
 	    /* now the squared deviations */
 	    while (nElem--) {
-	      temp.d = (Double) *src.b++ - sum.d[*indx];
+	      temp.d = (double) *src.b++ - sum.d[*indx];
 	      trgt.d[*indx++] += temp.d*temp.d* *weights.b++;
 	    }
 	    break;
 	  case LUX_WORD:
 	    while (i--) {		/* first, get the sum */
 	      hist.d[*indx] += *weights.w;
-	      sum.d[*indx] += (Double) *src.w++ * *weights.w++;
+	      sum.d[*indx] += (double) *src.w++ * *weights.w++;
 	      indx++;
 	    }
 	    /* calculate the average */
@@ -353,14 +353,14 @@ Int index_sdev(Int narg, Int ps[], Int sq)
 	    weights.w -= nElem;
 	    /* now the squared deviations */
 	    while (nElem--) {
-	      temp.d = (Double) *src.w++ - sum.d[*indx];
+	      temp.d = (double) *src.w++ - sum.d[*indx];
 	      trgt.d[*indx++] += temp.d*temp.d* *weights.w++;
 	    }
 	    break;
 	  case LUX_LONG:
 	    while (i--) {		/* first, get the sum */
 	      hist.d[*indx] += *weights.l;
-	      sum.d[*indx] += (Double) *src.l++ * *weights.l++;
+	      sum.d[*indx] += (double) *src.l++ * *weights.l++;
 	      indx++;
 	    }
 	    /* calculate the average */
@@ -372,14 +372,14 @@ Int index_sdev(Int narg, Int ps[], Int sq)
 	    weights.l -= nElem;
 	    /* now the squared deviations */
 	    while (nElem--) {
-	      temp.d = (Double) *src.l++ - sum.d[*indx];
+	      temp.d = (double) *src.l++ - sum.d[*indx];
 	      trgt.d[*indx++] += temp.d*temp.d* *weights.l++;
 	    }
 	    break;
 	  case LUX_FLOAT:
 	    while (i--) {		/* first, get the sum */
 	      hist.d[*indx] += *weights.f;
-	      sum.d[*indx] += (Double) *src.f++ * *weights.f++;
+	      sum.d[*indx] += (double) *src.f++ * *weights.f++;
 	      indx++;
 	    }
 	    /* calculate the average */
@@ -391,7 +391,7 @@ Int index_sdev(Int narg, Int ps[], Int sq)
 	    weights.f -= nElem;
 	    /* now the squared deviations */
 	    while (nElem--) {
-	      temp.d = (Double) *src.f++ - sum.d[*indx];
+	      temp.d = (double) *src.f++ - sum.d[*indx];
 	      trgt.d[*indx++] += temp.d*temp.d* *weights.f++;
 	    }
 	    break;
@@ -497,7 +497,7 @@ Int index_sdev(Int narg, Int ps[], Int sq)
 	    indx -= nElem;
 	    /* now the squared deviations */
 	    while (nElem--) {
-	      temp.f = (Float) *src.b++ - sum.f[*indx];
+	      temp.f = (float) *src.b++ - sum.f[*indx];
 	      trgt.f[*indx++] += temp.f*temp.f;
 	    }
 	    break;
@@ -515,7 +515,7 @@ Int index_sdev(Int narg, Int ps[], Int sq)
 	    indx -= nElem;
 	    /* now the squared deviations */
 	    while (nElem--) {
-	      temp.f = (Float) *src.w++ - sum.f[*indx];
+	      temp.f = (float) *src.w++ - sum.f[*indx];
 	      trgt.f[*indx++] += temp.f*temp.f;
 	    }
 	    break;
@@ -533,7 +533,7 @@ Int index_sdev(Int narg, Int ps[], Int sq)
 	    indx -= nElem;
 	    /* now the squared deviations */
 	    while (nElem--) {
-	      temp.f = (Float) *src.l++ - sum.f[*indx];
+	      temp.f = (float) *src.l++ - sum.f[*indx];
 	      trgt.f[*indx++] += temp.f*temp.f;
 	    }
 	    break;
@@ -605,7 +605,7 @@ Int index_sdev(Int narg, Int ps[], Int sq)
 	    indx -= nElem;
 	    /* now the squared deviations */
 	    while (nElem--) {
-	      temp.d = (Double) *src.b++ - sum.d[*indx];
+	      temp.d = (double) *src.b++ - sum.d[*indx];
 	      trgt.d[*indx++] += temp.d*temp.d;
 	    }
 	    break;
@@ -623,7 +623,7 @@ Int index_sdev(Int narg, Int ps[], Int sq)
 	    indx -= nElem;
 	    /* now the squared deviations */
 	    while (nElem--) {
-	      temp.d = (Double) *src.w++ - sum.d[*indx];
+	      temp.d = (double) *src.w++ - sum.d[*indx];
 	      trgt.d[*indx++] += temp.d*temp.d;
 	    }
 	    break;
@@ -641,14 +641,14 @@ Int index_sdev(Int narg, Int ps[], Int sq)
 	    indx -= nElem;
 	    /* now the squared deviations */
 	    while (nElem--) {
-	      temp.d = (Double) *src.l++ - sum.d[*indx];
+	      temp.d = (double) *src.l++ - sum.d[*indx];
 	      trgt.d[*indx++] += temp.d*temp.d;
 	    }
 	    break;
 	  case LUX_FLOAT:
 	    while (i--) {		/* first, get the sum */
 	      hist.l[*indx]++;
-	      sum.d[*indx] += (Double) *src.f++;
+	      sum.d[*indx] += (double) *src.f++;
 	      indx++;
 	    }
 	    /* calculate the average */
@@ -659,7 +659,7 @@ Int index_sdev(Int narg, Int ps[], Int sq)
 	    indx -= nElem;
 	    /* now the squared deviations */
 	    while (nElem--) {
-	      temp.d = (Double) *src.f++ - sum.d[*indx];
+	      temp.d = (double) *src.f++ - sum.d[*indx];
 	      trgt.d[*indx++] += temp.d*temp.d;
 	    }
 	    break;
@@ -699,9 +699,9 @@ Int index_sdev(Int narg, Int ps[], Int sq)
 	    indx -= nElem;
 	    /* now the squared deviations */
 	    while (nElem--) {
-	      temp.d = (Double) src.cf->real - sum.cd[*indx].real;
+	      temp.d = (double) src.cf->real - sum.cd[*indx].real;
 	      trgt.d[*indx] += temp.d*temp.d;
-	      temp.d = (Double) src.cf->imaginary - sum.cd[*indx].imaginary;
+	      temp.d = (double) src.cf->imaginary - sum.cd[*indx].imaginary;
 	      trgt.d[*indx++] += temp.d*temp.d;
 	      src.cf++;
 	    }
@@ -787,7 +787,7 @@ Int lux_covariance(Int narg, Int ps[])
 {
   Int	result, n, i, done, n2, save[MAX_DIMS], outtype, haveWeights;
   pointer	xsrc, ysrc, trgt, xsrc0, ysrc0, weight, weight0;
-  Double	xmean, ymean, xtemp, ytemp, cov, nn;
+  double	xmean, ymean, xtemp, ytemp, cov, nn;
   loopInfo	xsrcinfo, ysrcinfo, trgtinfo, winfo;
   extern scalar	lastmean;
   extern Int	lastsdev_sym, lastmean_sym;
@@ -894,9 +894,9 @@ Int lux_covariance(Int narg, Int ps[])
 	  weight0 = weight;
 	  nn = 0;
 	  do {
-	    xmean += (Double) *xsrc.b * *weight.b;
-            ymean += (Double) *ysrc.b * *weight.b;
-	    nn += (Double) *weight.b;
+	    xmean += (double) *xsrc.b * *weight.b;
+            ymean += (double) *ysrc.b * *weight.b;
+	    nn += (double) *weight.b;
 	  }
 	  while (advanceLoop(&winfo, &weight), 
 		 advanceLoop(&ysrcinfo, &ysrc),
@@ -910,8 +910,8 @@ Int lux_covariance(Int narg, Int ps[])
           ymean /= (nn? nn: 1);
 	  cov = 0.0;
 	  do {
-	    xtemp = ((Double) *xsrc.b - xmean);
-            ytemp = ((Double) *ysrc.b - ymean);
+	    xtemp = ((double) *xsrc.b - xmean);
+            ytemp = ((double) *ysrc.b - ymean);
 	    cov += xtemp*ytemp* *weight.b;
 	  } while ((done = (advanceLoop(&winfo, &weight),
 			    advanceLoop(&ysrcinfo, &ysrc),
@@ -921,7 +921,7 @@ Int lux_covariance(Int narg, Int ps[])
 	  cov /= nn;
 	  switch (outtype) {
 	    case LUX_FLOAT:
-	      *trgt.f++ = (Float) cov;
+	      *trgt.f++ = (float) cov;
 	      break;
 	    case LUX_DOUBLE:
 	      *trgt.d++ = cov;
@@ -939,9 +939,9 @@ Int lux_covariance(Int narg, Int ps[])
 	  weight0 = weight;
 	  nn = 0;
 	  do {
-	    xmean += (Double) *xsrc.w * *weight.w;
-            ymean += (Double) *ysrc.w * *weight.w;
-	    nn += (Double) *weight.w;
+	    xmean += (double) *xsrc.w * *weight.w;
+            ymean += (double) *ysrc.w * *weight.w;
+	    nn += (double) *weight.w;
 	  }
 	  while (advanceLoop(&winfo, &weight),
 		 advanceLoop(&ysrcinfo, &ysrc),
@@ -955,8 +955,8 @@ Int lux_covariance(Int narg, Int ps[])
           ymean /= (nn? nn: 1);
 	  cov = 0.0;
 	  do {
-	    xtemp = ((Double) *xsrc.w - xmean);
-            ytemp = ((Double) *ysrc.w - ymean);
+	    xtemp = ((double) *xsrc.w - xmean);
+            ytemp = ((double) *ysrc.w - ymean);
 	    cov += xtemp*ytemp* *weight.w;
 	  } while ((done = (advanceLoop(&winfo, &weight),
 			    advanceLoop(&ysrcinfo, &ysrc),
@@ -966,7 +966,7 @@ Int lux_covariance(Int narg, Int ps[])
 	  cov /= nn;
 	  switch (outtype) {
 	    case LUX_FLOAT:
-	      *trgt.f++ = (Float) cov;
+	      *trgt.f++ = (float) cov;
 	      break;
 	    case LUX_DOUBLE:
 	      *trgt.d++ = cov;
@@ -984,9 +984,9 @@ Int lux_covariance(Int narg, Int ps[])
 	  weight0 = weight;
 	  nn = 0;
 	  do {
-	    xmean += (Double) *xsrc.l * *weight.l;
-            ymean += (Double) *ysrc.l * *weight.l;
-	    nn += (Double) *weight.l;
+	    xmean += (double) *xsrc.l * *weight.l;
+            ymean += (double) *ysrc.l * *weight.l;
+	    nn += (double) *weight.l;
 	  }
 	  while (advanceLoop(&winfo, &weight),
 		 advanceLoop(&ysrcinfo, &ysrc),
@@ -1000,8 +1000,8 @@ Int lux_covariance(Int narg, Int ps[])
           ymean /= (nn? nn: 1);
 	  cov = 0.0;
 	  do {
-	    xtemp = ((Double) *xsrc.l - xmean);
-            ytemp = ((Double) *ysrc.l - ymean);
+	    xtemp = ((double) *xsrc.l - xmean);
+            ytemp = ((double) *ysrc.l - ymean);
 	    cov += xtemp*ytemp* *weight.l;
 	  } while ((done = (advanceLoop(&winfo, &weight),
 			    advanceLoop(&ysrcinfo, &ysrc),
@@ -1011,7 +1011,7 @@ Int lux_covariance(Int narg, Int ps[])
 	  cov /= nn;
 	  switch (outtype) {
 	    case LUX_FLOAT:
-	      *trgt.f++ = (Float) cov;
+	      *trgt.f++ = (float) cov;
 	      break;
 	    case LUX_DOUBLE:
 	      *trgt.d++ = cov;
@@ -1030,9 +1030,9 @@ Int lux_covariance(Int narg, Int ps[])
 	  weight0 = weight;
 	  nn = 0;
 	  do {
-	    xmean += (Double) *xsrc.f * *weight.f;
-            ymean += (Double) *ysrc.f * *weight.f;
-	    nn += (Double) *weight.f;
+	    xmean += (double) *xsrc.f * *weight.f;
+            ymean += (double) *ysrc.f * *weight.f;
+	    nn += (double) *weight.f;
 	  }
 	  while (advanceLoop(&winfo, &weight),
 		 advanceLoop(&ysrcinfo, &ysrc),
@@ -1046,8 +1046,8 @@ Int lux_covariance(Int narg, Int ps[])
           ymean /= (nn? nn: 1);
 	  cov = 0.0;
 	  do {
-	    xtemp = ((Double) *xsrc.f - xmean);
-            ytemp = ((Double) *ysrc.f - ymean);
+	    xtemp = ((double) *xsrc.f - xmean);
+            ytemp = ((double) *ysrc.f - ymean);
 	    cov += xtemp*ytemp* *weight.f;
 	  } while ((done = (advanceLoop(&winfo, &weight),
 			    advanceLoop(&ysrcinfo, &ysrc),
@@ -1057,7 +1057,7 @@ Int lux_covariance(Int narg, Int ps[])
 	  cov /= nn;
 	  switch (outtype) {
 	    case LUX_FLOAT:
-	      *trgt.f++ = (Float) cov;
+	      *trgt.f++ = (float) cov;
 	      break;
 	    case LUX_DOUBLE:
 	      *trgt.d++ = cov;
@@ -1076,9 +1076,9 @@ Int lux_covariance(Int narg, Int ps[])
 	  weight0 = weight;
 	  nn = 0;
 	  do {
-	    xmean += (Double) *xsrc.d * *weight.d;
-            ymean += (Double) *ysrc.d * *weight.d;
-	    nn += (Double) *weight.d;
+	    xmean += (double) *xsrc.d * *weight.d;
+            ymean += (double) *ysrc.d * *weight.d;
+	    nn += (double) *weight.d;
 	  }
 	  while (advanceLoop(&winfo, &weight),
 		 advanceLoop(&ysrcinfo, &ysrc),
@@ -1092,8 +1092,8 @@ Int lux_covariance(Int narg, Int ps[])
           ymean /= (nn? nn: 1);
 	  cov = 0.0;
 	  do {
-	    xtemp = ((Double) *xsrc.d - xmean);
-            ytemp = ((Double) *ysrc.d - ymean);
+	    xtemp = ((double) *xsrc.d - xmean);
+            ytemp = ((double) *ysrc.d - ymean);
 	    cov += xtemp*ytemp* *weight.d;
 	  } while ((done = (advanceLoop(&winfo, &weight),
 			    advanceLoop(&ysrcinfo, &ysrc),
@@ -1123,8 +1123,8 @@ Int lux_covariance(Int narg, Int ps[])
 	  xsrc0 = xsrc;
           ysrc0 = ysrc;
 	  do {
-	    xmean += (Double) *xsrc.b;
-            ymean += (Double) *ysrc.b;
+	    xmean += (double) *xsrc.b;
+            ymean += (double) *ysrc.b;
 	  } while (advanceLoop(&ysrcinfo, &ysrc),
 		   advanceLoop(&xsrcinfo, &xsrc) < xsrcinfo.naxes);
 	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(Int));
@@ -1135,14 +1135,14 @@ Int lux_covariance(Int narg, Int ps[])
           ymean /= n;
 	  cov = 0.0;
 	  do {
-	    xtemp = ((Double) *xsrc.b - xmean);
-            ytemp = ((Double) *ysrc.b - ymean);
+	    xtemp = ((double) *xsrc.b - xmean);
+            ytemp = ((double) *ysrc.b - ymean);
 	    cov += xtemp*ytemp;
 	  } while ((done = (advanceLoop(&ysrcinfo, &ysrc),
 			    advanceLoop(&xsrcinfo, &xsrc))) < xsrcinfo.naxes);
 	  switch (outtype) {
 	    case LUX_FLOAT:
-	      *trgt.f++ = (Float) (cov/n2);
+	      *trgt.f++ = (float) (cov/n2);
 	      break;
 	    case LUX_DOUBLE:
 	      *trgt.d++ = (cov/n2);
@@ -1159,8 +1159,8 @@ Int lux_covariance(Int narg, Int ps[])
 	  xsrc0 = xsrc;
           ysrc0 = ysrc;
 	  do {
-	    xmean += (Double) *xsrc.w;
-            ymean += (Double) *ysrc.w;
+	    xmean += (double) *xsrc.w;
+            ymean += (double) *ysrc.w;
 	  } while (advanceLoop(&ysrcinfo, &ysrc),
 		   advanceLoop(&xsrcinfo, &xsrc) < xsrcinfo.naxes);
 	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(Int));
@@ -1170,14 +1170,14 @@ Int lux_covariance(Int narg, Int ps[])
           ymean /= n;
 	  cov = 0.0;
 	  do {
-	    xtemp = ((Double) *xsrc.w - xmean);
-            ytemp = ((Double) *ysrc.w - ymean);
+	    xtemp = ((double) *xsrc.w - xmean);
+            ytemp = ((double) *ysrc.w - ymean);
 	    cov += xtemp*ytemp;
 	  } while ((done = (advanceLoop(&ysrcinfo, &ysrc),
 			    advanceLoop(&xsrcinfo, &xsrc))) < xsrcinfo.naxes);
 	  switch (outtype) {
 	    case LUX_FLOAT:
-	      *trgt.f++ = (Float) (cov/n2);
+	      *trgt.f++ = (float) (cov/n2);
 	      break;
 	    case LUX_DOUBLE:
 	      *trgt.d++ = (cov/n2);
@@ -1193,8 +1193,8 @@ Int lux_covariance(Int narg, Int ps[])
 	  xsrc0 = xsrc;
           ysrc0 = ysrc;
 	  do {
-	    xmean += (Double) *xsrc.l;
-            ymean += (Double) *ysrc.l;
+	    xmean += (double) *xsrc.l;
+            ymean += (double) *ysrc.l;
 	  } while (advanceLoop(&ysrcinfo, &ysrc),
 		   advanceLoop(&xsrcinfo, &xsrc) < xsrcinfo.naxes);
 	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(Int));
@@ -1205,14 +1205,14 @@ Int lux_covariance(Int narg, Int ps[])
           ymean /= n;
 	  cov = 0.0;
 	  do {
-	    xtemp = ((Double) *xsrc.l - xmean);
-            ytemp = ((Double) *ysrc.l - ymean);
+	    xtemp = ((double) *xsrc.l - xmean);
+            ytemp = ((double) *ysrc.l - ymean);
 	    cov += xtemp*ytemp;
 	  } while ((done = (advanceLoop(&ysrcinfo, &ysrc),
 			    advanceLoop(&xsrcinfo, &xsrc))) < xsrcinfo.naxes);
 	  switch (outtype) {
 	    case LUX_FLOAT:
-	      *trgt.f++ = (Float) (cov/n2);
+	      *trgt.f++ = (float) (cov/n2);
 	      break;
 	    case LUX_DOUBLE:
 	      *trgt.d++ = (cov/n2);
@@ -1228,8 +1228,8 @@ Int lux_covariance(Int narg, Int ps[])
 	  xsrc0 = xsrc;
           ysrc0 = ysrc;
 	  do {
-	    xmean += (Double) *xsrc.f;
-            ymean += (Double) *ysrc.f;
+	    xmean += (double) *xsrc.f;
+            ymean += (double) *ysrc.f;
 	  } while (advanceLoop(&ysrcinfo, &ysrc),
 		   advanceLoop(&xsrcinfo, &xsrc) < xsrcinfo.naxes);
 	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(Int));
@@ -1240,14 +1240,14 @@ Int lux_covariance(Int narg, Int ps[])
           ymean /= n;
 	  cov = 0.0;
 	  do {
-	    xtemp = ((Double) *xsrc.f - xmean);
-            ytemp = ((Double) *ysrc.f - ymean);
+	    xtemp = ((double) *xsrc.f - xmean);
+            ytemp = ((double) *ysrc.f - ymean);
 	    cov += xtemp*ytemp;
 	  } while ((done = (advanceLoop(&ysrcinfo, &ysrc),
 			    advanceLoop(&xsrcinfo, &xsrc))) < xsrcinfo.naxes);
 	  switch (outtype) {
 	    case LUX_FLOAT:
-	      *trgt.f++ = (Float) (cov/n2);
+	      *trgt.f++ = (float) (cov/n2);
 	      break;
 	    case LUX_DOUBLE:
 	      *trgt.d++ = (cov/n2);
@@ -1263,8 +1263,8 @@ Int lux_covariance(Int narg, Int ps[])
 	  xsrc0 = xsrc;
           ysrc0 = ysrc;
 	  do {
-	    xmean += (Double) *xsrc.d;
-            ymean += (Double) *ysrc.d;
+	    xmean += (double) *xsrc.d;
+            ymean += (double) *ysrc.d;
 	  } while (advanceLoop(&ysrcinfo, &ysrc),
 		   advanceLoop(&xsrcinfo, &xsrc) < xsrcinfo.naxes);
 	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(Int));
@@ -1275,8 +1275,8 @@ Int lux_covariance(Int narg, Int ps[])
           ymean /= n;
 	  cov = 0.0;
 	  do {
-	    xtemp = ((Double) *xsrc.d - xmean);
-            ytemp = ((Double) *ysrc.d - ymean);
+	    xtemp = ((double) *xsrc.d - xmean);
+            ytemp = ((double) *ysrc.d - ymean);
 	    cov += xtemp*ytemp;
 	  } while ((done = (advanceLoop(&ysrcinfo, &ysrc),
 			    advanceLoop(&xsrcinfo, &xsrc))) < xsrcinfo.naxes);
@@ -1327,7 +1327,7 @@ Int sdev(Int narg, Int ps[], Int sq)
 {
   Int	result, n, i, done, n2, save[MAX_DIMS], outtype, haveWeights;
   pointer	src, trgt, src0, trgt0, weight, weight0;
-  Double	mean, sdev, temp, nn;
+  double	mean, sdev, temp, nn;
   doubleComplex	cmean;
   loopInfo	srcinfo, trgtinfo, winfo;
   extern scalar	lastsdev, lastmean;
@@ -1414,8 +1414,8 @@ Int sdev(Int narg, Int ps[], Int sq)
 	  weight0 = weight;
 	  nn = 0;
 	  do {
-	    mean += (Double) *src.b * *weight.b;
-	    nn += (Double) *weight.b;
+	    mean += (double) *src.b * *weight.b;
+	    nn += (double) *weight.b;
 	  }
 	  while (advanceLoop(&winfo, &weight),
 		 advanceLoop(&srcinfo, &src) < srcinfo.naxes);
@@ -1425,7 +1425,7 @@ Int sdev(Int narg, Int ps[], Int sq)
 	  mean /= (nn? nn: 1);
 	  sdev = 0.0;
 	  do {
-	    temp = ((Double) *src.b - mean);
+	    temp = ((double) *src.b - mean);
 	    sdev += temp*temp* *weight.b;
 	  } while ((done = (advanceLoop(&winfo, &weight),
 			    advanceLoop(&srcinfo, &src))) < srcinfo.naxes);
@@ -1434,7 +1434,7 @@ Int sdev(Int narg, Int ps[], Int sq)
 	  sdev /= nn;
 	  switch (outtype) {
 	    case LUX_FLOAT:
-	      *trgt.f++ = (Float) sdev;
+	      *trgt.f++ = (float) sdev;
 	      break;
 	    case LUX_DOUBLE:
 	      *trgt.d++ = sdev;
@@ -1450,8 +1450,8 @@ Int sdev(Int narg, Int ps[], Int sq)
 	  weight0 = weight;
 	  nn = 0;
 	  do {
-	    mean += (Double) *src.w * *weight.w;
-	    nn += (Double) *weight.w;
+	    mean += (double) *src.w * *weight.w;
+	    nn += (double) *weight.w;
 	  }
 	  while (advanceLoop(&winfo, &weight),
 		 advanceLoop(&srcinfo, &src) < srcinfo.naxes);
@@ -1461,7 +1461,7 @@ Int sdev(Int narg, Int ps[], Int sq)
 	  mean /= (nn? nn: 1);
 	  sdev = 0.0;
 	  do {
-	    temp = ((Double) *src.w - mean);
+	    temp = ((double) *src.w - mean);
 	    sdev += temp*temp* *weight.w;
 	  } while ((done = (advanceLoop(&winfo, &weight),
 			    advanceLoop(&srcinfo, &src))) < srcinfo.naxes);
@@ -1470,7 +1470,7 @@ Int sdev(Int narg, Int ps[], Int sq)
 	  sdev /= nn;
 	  switch (outtype) {
 	    case LUX_FLOAT:
-	      *trgt.f++ = (Float) sdev;
+	      *trgt.f++ = (float) sdev;
 	      break;
 	    case LUX_DOUBLE:
 	      *trgt.d++ = sdev;
@@ -1486,8 +1486,8 @@ Int sdev(Int narg, Int ps[], Int sq)
 	  weight0 = weight;
 	  nn = 0;
 	  do {
-	    mean += (Double) *src.l * *weight.l;
-	    nn += (Double) *weight.l;
+	    mean += (double) *src.l * *weight.l;
+	    nn += (double) *weight.l;
 	  }
 	  while (advanceLoop(&winfo, &weight),
 		 advanceLoop(&srcinfo, &src) < srcinfo.naxes);
@@ -1497,7 +1497,7 @@ Int sdev(Int narg, Int ps[], Int sq)
 	  mean /= (nn? nn: 1);
 	  sdev = 0.0;
 	  do {
-	    temp = ((Double) *src.l - mean);
+	    temp = ((double) *src.l - mean);
 	    sdev += temp*temp* *weight.l;
 	  } while ((done = (advanceLoop(&winfo, &weight),
 			    advanceLoop(&srcinfo, &src))) < srcinfo.naxes);
@@ -1506,7 +1506,7 @@ Int sdev(Int narg, Int ps[], Int sq)
 	  sdev /= nn;
 	  switch (outtype) {
 	    case LUX_FLOAT:
-	      *trgt.f++ = (Float) sdev;
+	      *trgt.f++ = (float) sdev;
 	      break;
 	    case LUX_DOUBLE:
 	      *trgt.d++ = sdev;
@@ -1522,8 +1522,8 @@ Int sdev(Int narg, Int ps[], Int sq)
 	  weight0 = weight;
 	  nn = 0;
 	  do {
-	    mean += (Double) *src.f * *weight.f;
-	    nn += (Double) *weight.f;
+	    mean += (double) *src.f * *weight.f;
+	    nn += (double) *weight.f;
 	  }
 	  while (advanceLoop(&winfo, &weight),
 		 advanceLoop(&srcinfo, &src) < srcinfo.naxes);
@@ -1533,7 +1533,7 @@ Int sdev(Int narg, Int ps[], Int sq)
 	  mean /= (nn? nn: 1);
 	  sdev = 0.0;
 	  do {
-	    temp = ((Double) *src.f - mean);
+	    temp = ((double) *src.f - mean);
 	    sdev += temp*temp* *weight.f;
 	  } while ((done = (advanceLoop(&winfo, &weight),
 			    advanceLoop(&srcinfo, &src))) < srcinfo.naxes);
@@ -1542,7 +1542,7 @@ Int sdev(Int narg, Int ps[], Int sq)
 	  sdev /= nn;
 	  switch (outtype) {
 	    case LUX_FLOAT:
-	      *trgt.f++ = (Float) sdev;
+	      *trgt.f++ = (float) sdev;
 	      break;
 	    case LUX_DOUBLE:
 	      *trgt.d++ = sdev;
@@ -1558,8 +1558,8 @@ Int sdev(Int narg, Int ps[], Int sq)
 	  weight0 = weight;
 	  nn = 0;
 	  do {
-	    mean += (Double) *src.d * *weight.d;
-	    nn += (Double) *weight.d;
+	    mean += (double) *src.d * *weight.d;
+	    nn += (double) *weight.d;
 	  }
 	  while (advanceLoop(&winfo, &weight),
 		 advanceLoop(&srcinfo, &src) < srcinfo.naxes);
@@ -1569,7 +1569,7 @@ Int sdev(Int narg, Int ps[], Int sq)
 	  mean /= (nn? nn: 1);
 	  sdev = 0.0;
 	  do {
-	    temp = ((Double) *src.d - mean);
+	    temp = ((double) *src.d - mean);
 	    sdev += temp*temp* *weight.d;
 	  } while ((done = (advanceLoop(&winfo, &weight),
 			    advanceLoop(&srcinfo, &src))) < srcinfo.naxes);
@@ -1578,7 +1578,7 @@ Int sdev(Int narg, Int ps[], Int sq)
 	  sdev /= nn;
 	  switch (outtype) {
 	    case LUX_FLOAT:
-	      *trgt.f++ = (Float) sdev;
+	      *trgt.f++ = (float) sdev;
 	      break;
 	    case LUX_DOUBLE:
 	      *trgt.d++ = sdev;
@@ -1603,19 +1603,19 @@ Int sdev(Int narg, Int ps[], Int sq)
 	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(Int));
 	  src0 = src;
 	  do
-	    mean += (Double) *src.b;
+	    mean += (double) *src.b;
 	  while (advanceLoop(&srcinfo, &src) < srcinfo.naxes);
 	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(Int));
 	  src = src0;
 	  mean /= n;
 	  sdev = 0.0;
 	  do {
-	    temp = ((Double) *src.b - mean);
+	    temp = ((double) *src.b - mean);
 	    sdev += temp*temp;
 	  } while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 	  switch (outtype) {
 	    case LUX_FLOAT:
-	      *trgt.f++ = (Float) (sdev/n2);
+	      *trgt.f++ = (float) (sdev/n2);
 	      break;
 	    case LUX_DOUBLE:
 	      *trgt.d++ = (sdev/n2);
@@ -1629,19 +1629,19 @@ Int sdev(Int narg, Int ps[], Int sq)
 	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(Int));
 	  src0 = src;
 	  do
-	    mean += (Double) *src.w;
+	    mean += (double) *src.w;
 	  while (advanceLoop(&srcinfo, &src) < srcinfo.naxes);
 	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(Int));
 	  src = src0;
 	  mean /= n;
 	  sdev = 0.0;
 	  do {
-	    temp = ((Double) *src.w - mean);
+	    temp = ((double) *src.w - mean);
 	    sdev += temp*temp;
 	  } while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 	  switch (outtype) {
 	    case LUX_FLOAT:
-	      *trgt.f++ = (Float) (sdev/n2);
+	      *trgt.f++ = (float) (sdev/n2);
 	      break;
 	    case LUX_DOUBLE:
 	      *trgt.d++ = (sdev/n2);
@@ -1655,19 +1655,19 @@ Int sdev(Int narg, Int ps[], Int sq)
 	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(Int));
 	  src0 = src;
 	  do
-	    mean += (Double) *src.l;
+	    mean += (double) *src.l;
 	  while (advanceLoop(&srcinfo, &src) < srcinfo.naxes);
 	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(Int));
 	  src = src0;
 	  mean /= n;
 	  sdev = 0.0;
 	  do {
-	    temp = ((Double) *src.l - mean);
+	    temp = ((double) *src.l - mean);
 	    sdev += temp*temp;
 	  } while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 	  switch (outtype) {
 	    case LUX_FLOAT:
-	      *trgt.f++ = (Float) (sdev/n2);
+	      *trgt.f++ = (float) (sdev/n2);
 	      break;
 	    case LUX_DOUBLE:
 	      *trgt.d++ = (sdev/n2);
@@ -1681,19 +1681,19 @@ Int sdev(Int narg, Int ps[], Int sq)
 	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(Int));
 	  src0 = src;
 	  do
-	    mean += (Double) *src.f;
+	    mean += (double) *src.f;
 	  while (advanceLoop(&srcinfo, &src) < srcinfo.naxes);
 	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(Int));
 	  src = src0;
 	  mean /= n;
 	  sdev = 0.0;
 	  do {
-	    temp = ((Double) *src.f - mean);
+	    temp = ((double) *src.f - mean);
 	    sdev += temp*temp;
 	  } while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 	  switch (outtype) {
 	    case LUX_FLOAT:
-	      *trgt.f++ = (Float) (sdev/n2);
+	      *trgt.f++ = (float) (sdev/n2);
 	      break;
 	    case LUX_DOUBLE:
 	      *trgt.d++ = (sdev/n2);
@@ -1707,14 +1707,14 @@ Int sdev(Int narg, Int ps[], Int sq)
 	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(Int));
 	  src0 = src;
 	  do
-	    mean += (Double) *src.d;
+	    mean += (double) *src.d;
 	  while (advanceLoop(&srcinfo, &src) < srcinfo.naxes);
 	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(Int));
 	  src = src0;
 	  mean /= n;
 	  sdev = 0.0;
 	  do {
-	    temp = ((Double) *src.d - mean);
+	    temp = ((double) *src.d - mean);
 	    sdev += temp*temp;
 	  } while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 	  *trgt.d++ = sdev/n2;
@@ -1726,8 +1726,8 @@ Int sdev(Int narg, Int ps[], Int sq)
 	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(Int));
 	  src0 = src;
 	  do {
-	    cmean.real += (Double) src.cf->real;
-	    cmean.imaginary += (Double) src.cf->imaginary;
+	    cmean.real += (double) src.cf->real;
+	    cmean.imaginary += (double) src.cf->imaginary;
 	  } while (advanceLoop(&srcinfo, &src) < srcinfo.naxes);
 	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(Int));
 	  src = src0;
@@ -1742,7 +1742,7 @@ Int sdev(Int narg, Int ps[], Int sq)
 	  } while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 	  switch (outtype) {
 	    case LUX_FLOAT:
-	      *trgt.f++ = (Float) (sdev/n2);
+	      *trgt.f++ = (float) (sdev/n2);
 	      break;
 	    case LUX_DOUBLE:
 	      *trgt.d++ = (sdev/n2);
@@ -1756,8 +1756,8 @@ Int sdev(Int narg, Int ps[], Int sq)
 	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(Int));
 	  src0 = src;
 	  do {
-	    cmean.real += (Double) src.cd->real;
-	    cmean.imaginary += (Double) src.cd->imaginary;
+	    cmean.real += (double) src.cd->real;
+	    cmean.imaginary += (double) src.cd->imaginary;
 	  } while (advanceLoop(&srcinfo, &src) < srcinfo.naxes);
 	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(Int));
 	  src = src0;
@@ -1944,7 +1944,7 @@ Int lux_swab(Int narg, Int ps[])
 Int lux_wait(Int narg, Int ps[])
 /* wait the specified # of seconds (floating point) */
 {
-  Float	xq;
+  float	xq;
   struct timeval	tval;
 
   xq = float_arg(ps[0]);
@@ -1962,11 +1962,11 @@ Int lux_esmooth(Int narg, Int ps[])
 {
   Int	iq, axis, result_sym, outtype, type, m, ndim, *dims, xdims[8],
   	i, tally[8], n, step[8], done;
-  Float	damping, width;
+  float	damping, width;
   array	*h;
   pointer	src, trgt;
   scalar	sum, weight;
-  extern Float	float_arg(Int);
+  extern float	float_arg(Int);
 
   if (narg > 2) { iq = ps[2];  axis = int_arg(ps[1]); }
   else { iq = ps[1];  axis = -1; }
@@ -2032,13 +2032,13 @@ Int lux_esmooth(Int narg, Int ps[])
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-void esmooth_asymmetric(Double *srcdata, size_t srccount, size_t srcstride,
-			Double width,
-			Double *tgtdata, size_t tgtcount, size_t tgtstride)
+void esmooth_asymmetric(double *srcdata, size_t srccount, size_t srcstride,
+			double width,
+			double *tgtdata, size_t tgtcount, size_t tgtstride)
 {
-  Double damping = exp(-1.0/width);
-  Double sum = 0.0;
-  Double weight = 0.0;
+  double damping = exp(-1.0/width);
+  double sum = 0.0;
+  double weight = 0.0;
   Int i;
 
   assert(tgtcount >= srccount);
@@ -2061,13 +2061,13 @@ void esmooth_asymmetric(Double *srcdata, size_t srccount, size_t srcstride,
 /* i>D*;i?D1;rD& */
 BIND(esmooth_asymmetric, v_sddsd_iDaD1rDq_012, f, ESMOOTH1, 1, 2, NULL);
 /*------------------------------------------------------------------------- */
-void esmooth_symmetric(Double *srcdata, size_t srccount, size_t srcstride,
-		       Double width,
-		       Double *tgtdata, size_t tgtcount, size_t tgtstride)
+void esmooth_symmetric(double *srcdata, size_t srccount, size_t srcstride,
+		       double width,
+		       double *tgtdata, size_t tgtcount, size_t tgtstride)
 {
-  Double damping = exp(-1.0/width);
-  Double sum = 0.0;
-  Double weight = 0.0;
+  double damping = exp(-1.0/width);
+  double sum = 0.0;
+  double weight = 0.0;
   Int i;
 
   assert(tgtcount >= srccount);
@@ -2111,8 +2111,8 @@ void esmooth_symmetric(Double *srcdata, size_t srccount, size_t srcstride,
 /* i>D*;i?D1;rD& */
 BIND(esmooth_symmetric, v_sddsd_iDaD1rDq_012, f, ESMOOTH2, 1, 2, NULL);
 /*------------------------------------------------------------------------- */
-void vargsmoothkernel(Double width, Int nx, Int *n2, Int *ng, Double **gkern,
-		      Double *gsum, Double **partial)
+void vargsmoothkernel(double width, Int nx, Int *n2, Int *ng, double **gkern,
+		      double *gsum, double **partial)
 /* makes sure a gaussian kernel of FWHM <width> and kernel size at
  most <nx> is returned in <*gkern>.  The kernel size is returned in
  <*ng>, which is equal to 2*<*n2> + 1.  The sum of the kernel values
@@ -2126,9 +2126,9 @@ void vargsmoothkernel(Double width, Int nx, Int *n2, Int *ng, Double **gkern,
  released.  LS 25apr97 */
 {
   Int	n, nm;
-  Double	w, *pt3, *pt2;
-  Double	xq, wq, dq;
-  static Double	ow = 0.0;
+  double	w, *pt3, *pt2;
+  double	xq, wq, dq;
+  static double	ow = 0.0;
   static Int	maxng = 0;
 
   if (!nx) {			/* release kernel space */
@@ -2151,8 +2151,8 @@ void vargsmoothkernel(Double width, Int nx, Int *n2, Int *ng, Double **gkern,
     /* now need to find memory for smoothing kernel */
     if (nm > maxng) {	/* bigger than available memory */
 				/* so get more */
-      *gkern = (Double *) (*gkern? Realloc(*gkern, nm*sizeof(Double)):
-			   Malloc(nm*sizeof(Double)));
+      *gkern = (double *) (*gkern? Realloc(*gkern, nm*sizeof(double)):
+			   Malloc(nm*sizeof(double)));
       maxng = nm; }		/* remember current size */
     *partial = *gkern + *ng;	/* partial sums */
     /* now get ready to calculate kernel values */
@@ -2201,12 +2201,12 @@ Int lux_gsmooth(Int narg, Int ps[])
 /* LS 13aug97 */
 {
   extern	Int scrat[NSCRAT];
-  Float	sum, *pt3, wq, sumg, xq;
+  float	sum, *pt3, wq, sumg, xq;
   Int	n, nWidth;
   pointer	src, trgt, widths, gkern, pt1;
   Int	j, n2, ng, i2, i, ik, id, k;
   Int	iq, nx, mem = 0, dgkern;
-  Float	width, gsum;
+  float	width, gsum;
   char	haveKernel = 0;
   Int	stride, result, loop, mode = 0;
   loopInfo	srcinfo, trgtinfo;
@@ -2279,15 +2279,15 @@ Int lux_gsmooth(Int narg, Int ps[])
 	ng = 2 * n2 + 1;	/* total length */
 	if (mem) {
 	  if (ng > mem)
-	    gkern.f = (Float *) realloc(gkern.f, (mem = ng)*sizeof(Float));
-	} else if (ng*sizeof(Float) <= NSCRAT)
-	  gkern.f = (Float *) scrat;
+	    gkern.f = (float *) realloc(gkern.f, (mem = ng)*sizeof(float));
+	} else if (ng*sizeof(float) <= NSCRAT)
+	  gkern.f = (float *) scrat;
 	else {
 	  mem = ng;
-	  gkern.f = (Float *) malloc(ng*sizeof(Float));
+	  gkern.f = (float *) malloc(ng*sizeof(float));
 	}
 	n = ng;			/* number of kernel points to do */
-	wq = (Float) (-n2);	/* first x */
+	wq = (float) (-n2);	/* first x */
 	pt3 = gkern.f;		/* target */
 	gsum = 0.0;		/* initialize sum */
 	while (n--) {
@@ -2499,7 +2499,7 @@ Int lux_gsmooth(Int narg, Int ps[])
 	    pt1.b = src.b;	/* pointer into source */
 	    n = i2;
 	    while (n--) {
-	      sum += (Float) *pt1.b * *pt3;
+	      sum += (float) *pt1.b * *pt3;
 	      pt1.b += stride;
 	      sumg += *pt3++;
 	    }
@@ -2520,7 +2520,7 @@ Int lux_gsmooth(Int narg, Int ps[])
 	    pt3 = gkern.f;	/* pointer to start of kernel */
 	    n = ng;
 	    while (n--) {
-	      sum += (Float) *pt1.b * *pt3++;
+	      sum += (float) *pt1.b * *pt3++;
 	      pt1.b += stride;
 	    }
 	    *trgt.f = sum / gsum;
@@ -2557,7 +2557,7 @@ Int lux_gsmooth(Int narg, Int ps[])
 	    pt3 = gkern.f + ik;	/* pointer into kernel */
 	    n = i2;
 	    while (n--) {
-	      sum += (Float) *pt1.b * *pt3;
+	      sum += (float) *pt1.b * *pt3;
 	      pt1.b += stride;
 	      sumg += *pt3++;
 	    }
@@ -2593,7 +2593,7 @@ Int lux_gsmooth(Int narg, Int ps[])
 	    pt1.w = src.w;	/* pointer into source */
 	    n = i2;
 	    while (n--) {
-	      sum += (Float) *pt1.w * *pt3;
+	      sum += (float) *pt1.w * *pt3;
 	      pt1.w += stride;
 	      sumg += *pt3++;
 	    }
@@ -2614,7 +2614,7 @@ Int lux_gsmooth(Int narg, Int ps[])
 	    pt3 = gkern.f;	/* pointer to start of kernel */
 	    n = ng;
 	    while (n--) {
-	      sum += (Float) *pt1.w * *pt3++;
+	      sum += (float) *pt1.w * *pt3++;
 	      pt1.w += stride;
 	    }
 	    *trgt.f = sum / gsum;
@@ -2651,7 +2651,7 @@ Int lux_gsmooth(Int narg, Int ps[])
 	    pt3 = gkern.f + ik;	/* pointer into kernel */
 	    n = i2;
 	    while (n--) {
-	      sum += (Float) *pt1.w * *pt3;
+	      sum += (float) *pt1.w * *pt3;
 	      pt1.w += stride;
 	      sumg += *pt3++;
 	    }
@@ -2687,7 +2687,7 @@ Int lux_gsmooth(Int narg, Int ps[])
 	    pt1.l = src.l;	/* pointer into source */
 	    n = i2;
 	    while (n--) {
-	      sum += (Float) *pt1.l * *pt3;
+	      sum += (float) *pt1.l * *pt3;
 	      pt1.l += stride;
 	      sumg += *pt3++;
 	    }
@@ -2708,7 +2708,7 @@ Int lux_gsmooth(Int narg, Int ps[])
 	    pt3 = gkern.f;	/* pointer to start of kernel */
 	    n = ng;
 	    while (n--) {
-	      sum += (Float) *pt1.l * *pt3++;
+	      sum += (float) *pt1.l * *pt3++;
 	      pt1.l += stride;
 	    }
 	    *trgt.f = sum / gsum;
@@ -2745,7 +2745,7 @@ Int lux_gsmooth(Int narg, Int ps[])
 	    pt3 = gkern.f + ik;	/* pointer into kernel */
 	    n = i2;
 	    while (n--) {
-	      sum += (Float) *pt1.l * *pt3;
+	      sum += (float) *pt1.l * *pt3;
 	      pt1.l += stride;
 	      sumg += *pt3++;
 	    }
@@ -2781,7 +2781,7 @@ Int lux_gsmooth(Int narg, Int ps[])
 	    pt1.f = src.f;	/* pointer into source */
 	    n = i2;
 	    while (n--) {
-	      sum += (Float) *pt1.f * *pt3;
+	      sum += (float) *pt1.f * *pt3;
 	      pt1.f += stride;
 	      sumg += *pt3++;
 	    }
@@ -2802,7 +2802,7 @@ Int lux_gsmooth(Int narg, Int ps[])
 	    pt3 = gkern.f;	/* pointer to start of kernel */
 	    n = ng;
 	    while (n--) {
-	      sum += (Float) *pt1.f * *pt3++;
+	      sum += (float) *pt1.f * *pt3++;
 	      pt1.f += stride;
 	    }
 	    *trgt.f = sum / gsum;
@@ -2839,7 +2839,7 @@ Int lux_gsmooth(Int narg, Int ps[])
 	    pt3 = gkern.f + ik;	/* pointer into kernel */
 	    n = i2;
 	    while (n--) {
-	      sum += (Float) *pt1.f * *pt3;
+	      sum += (float) *pt1.f * *pt3;
 	      pt1.f += stride;
 	      sumg += *pt3++;
 	    }
@@ -2875,7 +2875,7 @@ Int lux_gsmooth(Int narg, Int ps[])
 	    pt1.d = src.d;	/* pointer into source */
 	    n = i2;
 	    while (n--) {
-	      sum += (Float) *pt1.d * *pt3;
+	      sum += (float) *pt1.d * *pt3;
 	      pt1.d += stride;
 	      sumg += *pt3++;
 	    }
@@ -2896,7 +2896,7 @@ Int lux_gsmooth(Int narg, Int ps[])
 	    pt3 = gkern.f;	/* pointer to start of kernel */
 	    n = ng;
 	    while (n--) {
-	      sum += (Float) *pt1.d * *pt3++;
+	      sum += (float) *pt1.d * *pt3++;
 	      pt1.d += stride;
 	    }
 	    *trgt.f = sum / gsum;
@@ -2933,7 +2933,7 @@ Int lux_gsmooth(Int narg, Int ps[])
 	    pt3 = gkern.f + ik;	/* pointer into kernel */
 	    n = i2;
 	    while (n--) {
-	      sum += (Float) *pt1.d * *pt3;
+	      sum += (float) *pt1.d * *pt3;
 	      pt1.d += stride;
 	      sumg += *pt3++;
 	    }
@@ -3428,8 +3428,8 @@ if  (sym[iq].type < 4 )  iq = lux_float(1, &iq);
 if (iq != ps[0] ) lux_replace(ps[0], iq);
 iq = ps[0];
 h = (array *) sym[iq].spec.array.ptr;
-q1.f = (Float *) ((char *)h + sizeof(array));
-		/*could be either Float or Double, support both */
+q1.f = (float *) ((char *)h + sizeof(array));
+		/*could be either float or double, support both */
 switch ( sym[iq].type ) {
 case 3:
   f_decomp( q1.f, nx, nx );	break;
@@ -3475,7 +3475,7 @@ q1.l = (Int *) ((char *)h + sizeof(array));
 h = (array *) sym[jq].spec.array.ptr;
 q2.l = (Int *) ((char *)h + sizeof(array));
 while (outer--) {
-		/*could be either Float or Double, support both */
+		/*could be either float or double, support both */
 switch ( toptype ) {
 case 3:
 f_solve( q1.f, q2.f, nx, nx ); q2.f += nx;	break;
@@ -3489,13 +3489,13 @@ return 1;
 Int lux_pit(Int narg, Int ps[])	/*pit function */
 			/* polynomial fit, CALL IS C=PIT([X],Y,[NPOW])*/
 {
-  Double	*a, *fbase, *cfbase;
+  double	*a, *fbase, *cfbase;
   pointer qxbase,qybase;
   Int	npow, symx, symy, nd, nxq, outer, outerx, dim[2], cfsym;
   Int	j, toptype;
   array	*h;
   Int	setxpit(Int, Int),
-    clux_pit(pointer *, pointer *, Int, Int, Double *, Double *, Double *,
+    clux_pit(pointer *, pointer *, Int, Int, double *, double *, double *,
 	     Int, Int);
 
 /* depending on # of nargs, we may have to default x or npow, narg=2 case
@@ -3517,7 +3517,7 @@ default: return cerror(WRNG_N_ARG, 0);
 }
 if (npow < 1 || npow >10 ) return cerror(ILL_POWER, 0);	/*check power */
 CK_ARR(symy, -1);
-	/* if either y or x (if x specified) is Double, do a Double calc. */
+	/* if either y or x (if x specified) is double, do a double calc. */
 toptype = sym[symy].type < 3 ? 3 : sym[symy].type;
 h = (array *) sym[symy].spec.array.ptr;
 	/*array may be upgraded but y dimensions will be same, get now */
@@ -3548,13 +3548,13 @@ h = (array *) sym[symx].spec.array.ptr;
 qxbase.l = (Int *) ((char *)h + sizeof(array));
 			/* get the various matrices and vectors needed */
 dim[0] = npow + 1;	dim[1] = outer;
-if (outer > 1) cfsym = array_scratch(4, 2, dim);	/*always Double */		
+if (outer > 1) cfsym = array_scratch(4, 2, dim);	/*always double */		
 	else cfsym = array_scratch(4, 1, dim);
 h = (array *) sym[cfsym].spec.array.ptr;
-cfbase = (Double*) ((char *)h + sizeof(array));
+cfbase = (double*) ((char *)h + sizeof(array));
 							/*scratch array */
-allocate(fbase, nxq, Double);
-allocate(a, (npow + 1)*(npow + 1), Double);
+allocate(fbase, nxq, double);
+allocate(a, (npow + 1)*(npow + 1), double);
 	/*loop over the number of individual fits to do */
 while (outer--) { 
 	/* ready to start actual calculation, all done in clux_pit */
@@ -3565,18 +3565,18 @@ Free(a);  Free(fbase);
 return cfsym;
 }
 /*------------------------------------------------------------------------- */
-Int clux_pit(pointer *qxbase, pointer *qybase, Int nxq, Int npow, Double *a,
-	     Double *cfbase, Double *fbase, Int toptype, Int outerx)
+Int clux_pit(pointer *qxbase, pointer *qybase, Int nxq, Int npow, double *a,
+	     double *cfbase, double *fbase, Int toptype, Int outerx)
 /* internal routine used by lux_pit, lux_trend, and lux_detrend */
 {
-Double	sum, *f, *cf;
+double	sum, *f, *cf;
 pointer qx,qy;
 Int	i, n, ib, ie, k;
 cf = cfbase;	f = fbase;	qy.l = qybase->l;  qx.l = qxbase->l;
 switch (toptype) {
 case 3:
 /*
-printf("Float case\n");
+printf("float case\n");
 for (k=0;k<nxq;k++) printf("k, x(k), y(k) %d %f %f\n",k,*(qx.f+k),*(qy.f+k));
 */
 n = nxq;  while (n--) *f++ = *qx.f++;
@@ -3597,7 +3597,7 @@ for (k=0;k <= (npow);k++) { sum = 0.0; f = fbase; n = nxq; qx.l = qxbase->l;
 qybase->f += nxq;  if (outerx != 1) qxbase->f += nxq; break;
 case 4:
 /*
-printf("Double case\n");
+printf("double case\n");
 for (k=0;k<nxq;k++) printf("k, x(k), y(k) %d %f %f\n",k,*(qx.d+k),*(qy.d+k));
 */
 n = nxq;  while (n--) *f++ = *qx.d++;
@@ -3631,14 +3631,14 @@ Int setxpit(Int type, Int n)	/* used by several routines to set up
 			/* type must be 3 or 4 */
 {
   register pointer qx;
-  register Float	del;
-  register Double	ddel;
+  register float	del;
+  register double	ddel;
   Int	nsym, nx;
   array	*h;
   nx = n;
   nsym = array_scratch(type, 1, &nx );
   h = (array *) sym[nsym].spec.array.ptr;
-  qx.d = (Double *) ((char *)h + sizeof(array));
+  qx.d = (double *) ((char *)h + sizeof(array));
   switch (type) {
   case 3:
     del = 1.0 / nx;  *qx.f = 0.0;  while (--nx) *(qx.f+1) = *qx.f++ + del; break;
@@ -3661,12 +3661,12 @@ Int lux_detrend(Int narg, Int ps[])/*detrend function */
 Int lux_trend(Int narg, Int ps[]) /*trend function */
 	/* trend using a polynomial fit, CALL IS T=trend(Y,[NPOW])*/
 {
-  register Double	*a;
-  Double	*fbase, *cfbase;
+  register double	*a;
+  double	*fbase, *cfbase;
   pointer qxbase,qybase,qzbase;
   Int	npow, symx, symy, nd, nxq, outer;
   Int	toptype, result_sym;
-  Int	clux_poly(Double *cfbase, pointer *qxbase, Int nxq, Int npow,
+  Int	clux_poly(double *cfbase, pointer *qxbase, Int nxq, Int npow,
 		  pointer *qzbase, Int toptype);
 
   /* second argument is optional, default is linear fit (npow = 1) */
@@ -3707,9 +3707,9 @@ Int lux_trend(Int narg, Int ps[]) /*trend function */
   qzbase.l = array_data(result_sym);
 			/* get the various matrices and vectors needed */
 			/*unlike pit, the coeffs. are not in a symbol */
-  allocate(cfbase, npow + 1, Double);
-  allocate(fbase, nxq, Double);
-  allocate(a, (npow + 1)*(npow + 1), Double);
+  allocate(cfbase, npow + 1, double);
+  allocate(fbase, nxq, double);
+  allocate(a, (npow + 1)*(npow + 1), double);
 	/*loop over the number of individual fits to do */
   while (outer--)
 		/* get the poly fit coefficients, done in clux_pit */
@@ -3750,11 +3750,11 @@ Int lux_trend(Int narg, Int ps[]) /*trend function */
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-Int clux_poly(Double *cfbase, pointer *qxbase, Int nxq, Int npow,
+Int clux_poly(double *cfbase, pointer *qxbase, Int nxq, Int npow,
 	      pointer *qzbase, Int toptype)
 /* internal routine used by lux_trend, and lux_detrend */
 {
-Double	sum, *cf, xq;
+double	sum, *cf, xq;
 pointer qz,qx;
 Int	n, m;
 cf = cfbase;	qz.l = qzbase->l;  qx.l = qxbase->l;
@@ -3918,10 +3918,10 @@ Int lux_strtok(Int narg, Int ps[])
   return iq;
 }
 /*------------------------------------------------------------------------- */
-void ksmooth(loopInfo *srcinfo, loopInfo *trgtinfo, Float *kernel, Int nkernel)
+void ksmooth(loopInfo *srcinfo, loopInfo *trgtinfo, float *kernel, Int nkernel)
 {
   Int	nx, n2, dataindex, kernelindex, di, ki, npoints, ncalc, np, i, stride;
-  Float	sum, norm;
+  float	sum, norm;
   pointer	src, trgt;
 
   src.v = srcinfo->data->v;
@@ -4474,7 +4474,7 @@ Int lux_ksmooth(Int narg, Int ps[])
   loopInfo	srcinfo, trgtinfo;
   pointer	src, trgt;
   Int	result, iq, nkernel;
-  Float	*kernel;
+  float	*kernel;
 
   if (!symbolIsNumericalArray(ps[1])) /* <kernel> must be a numerical array */
     return cerror(NEED_NUM_ARR, ps[1]);
@@ -4511,7 +4511,7 @@ Int lux_crosscorr(Int narg, Int ps[])
 /* <x2>).  LS 8apr99 */
 {
   Int	type, outtype, i, iq1, iq2, result, n, save[MAX_DIMS], done;
-  Double	meanx, meany, kx, ky, pxy, tempx, tempy;
+  double	meanx, meany, kx, ky, pxy, tempx, tempy;
   doubleComplex	cmeanx, cmeany, cpxy, ctempx, ctempy;
   pointer	src1, src2, src1save, src2save, trgt;
   loopInfo	srcinfo1, srcinfo2, trgtinfo;
@@ -4565,8 +4565,8 @@ Int lux_crosscorr(Int narg, Int ps[])
 	src1save = src1;
 	src2save = src2;
 	do {
-	  meanx += (Double) *src1.b;
-	  meany += (Double) *src2.b;
+	  meanx += (double) *src1.b;
+	  meany += (double) *src2.b;
 	} while (advanceLoop(&srcinfo2, &src2),
 		 advanceLoop(&srcinfo1, &src1) < srcinfo1.naxes);
 	memcpy(srcinfo1.coords, save, srcinfo1.ndim*sizeof(Int));
@@ -4576,8 +4576,8 @@ Int lux_crosscorr(Int narg, Int ps[])
 	meany /= n;
 	pxy = kx = ky = 0.0;
 	do {
-	  tempx = ((Double) *src1.b - meanx);
-	  tempy = ((Double) *src2.b - meany);
+	  tempx = ((double) *src1.b - meanx);
+	  tempy = ((double) *src2.b - meany);
 	  kx += tempx*tempx;
 	  ky += tempy*tempy;
 	  pxy += tempx*tempy;
@@ -4594,8 +4594,8 @@ Int lux_crosscorr(Int narg, Int ps[])
 	src1save = src1;
 	src2save = src2;
 	do {
-	  meanx += (Double) *src1.w;
-	  meany += (Double) *src2.w;
+	  meanx += (double) *src1.w;
+	  meany += (double) *src2.w;
 	} while (advanceLoop(&srcinfo2, &src2),
 		 advanceLoop(&srcinfo1, &src1) < srcinfo1.naxes);
 	memcpy(srcinfo1.coords, save, srcinfo1.ndim*sizeof(Int));
@@ -4605,8 +4605,8 @@ Int lux_crosscorr(Int narg, Int ps[])
 	meany /= n;
 	pxy = kx = ky = 0.0;
 	do {
-	  tempx = ((Double) *src1.w - meanx);
-	  tempy = ((Double) *src2.w - meany);
+	  tempx = ((double) *src1.w - meanx);
+	  tempy = ((double) *src2.w - meany);
 	  kx += tempx*tempx;
 	  ky += tempy*tempy;
 	  pxy += tempx*tempy;
@@ -4623,8 +4623,8 @@ Int lux_crosscorr(Int narg, Int ps[])
 	src1save = src1;
 	src2save = src2;
 	do {
-	  meanx += (Double) *src1.l;
-	  meany += (Double) *src2.l;
+	  meanx += (double) *src1.l;
+	  meany += (double) *src2.l;
 	} while (advanceLoop(&srcinfo2, &src2),
 		 advanceLoop(&srcinfo1, &src1) < srcinfo1.naxes);
 	memcpy(srcinfo1.coords, save, srcinfo1.ndim*sizeof(Int));
@@ -4634,8 +4634,8 @@ Int lux_crosscorr(Int narg, Int ps[])
 	meany /= n;
 	pxy = kx = ky = 0.0;
 	do {
-	  tempx = ((Double) *src1.l - meanx);
-	  tempy = ((Double) *src2.l - meany);
+	  tempx = ((double) *src1.l - meanx);
+	  tempy = ((double) *src2.l - meany);
 	  kx += tempx*tempx;
 	  ky += tempy*tempy;
 	  pxy += tempx*tempy;
@@ -4652,8 +4652,8 @@ Int lux_crosscorr(Int narg, Int ps[])
 	src1save = src1;
 	src2save = src2;
 	do {
-	  meanx += (Double) *src1.f;
-	  meany += (Double) *src2.f;
+	  meanx += (double) *src1.f;
+	  meany += (double) *src2.f;
 	} while (advanceLoop(&srcinfo2, &src2),
 		 advanceLoop(&srcinfo1, &src1) < srcinfo1.naxes);
 	memcpy(srcinfo1.coords, save, srcinfo1.ndim*sizeof(Int));
@@ -4663,8 +4663,8 @@ Int lux_crosscorr(Int narg, Int ps[])
 	meany /= n;
 	pxy = kx = ky = 0.0;
 	do {
-	  tempx = ((Double) *src1.f - meanx);
-	  tempy = ((Double) *src2.f - meany);
+	  tempx = ((double) *src1.f - meanx);
+	  tempy = ((double) *src2.f - meany);
 	  kx += tempx*tempx;
 	  ky += tempy*tempy;
 	  pxy += tempx*tempy;
@@ -4681,8 +4681,8 @@ Int lux_crosscorr(Int narg, Int ps[])
 	src1save = src1;
 	src2save = src2;
 	do {
-	  meanx += (Double) *src1.d;
-	  meany += (Double) *src2.d;
+	  meanx += (double) *src1.d;
+	  meany += (double) *src2.d;
 	} while (advanceLoop(&srcinfo2, &src2),
 		 advanceLoop(&srcinfo1, &src1) < srcinfo1.naxes);
 	memcpy(srcinfo1.coords, save, srcinfo1.ndim*sizeof(Int));
@@ -4692,8 +4692,8 @@ Int lux_crosscorr(Int narg, Int ps[])
 	meany /= n;
 	pxy = kx = ky = 0.0;
 	do {
-	  tempx = ((Double) *src1.d - meanx);
-	  tempy = ((Double) *src2.d - meany);
+	  tempx = ((double) *src1.d - meanx);
+	  tempy = ((double) *src2.d - meany);
 	  kx += tempx*tempx;
 	  ky += tempy*tempy;
 	  pxy += tempx*tempy;
@@ -4710,10 +4710,10 @@ Int lux_crosscorr(Int narg, Int ps[])
 	src1save = src1;
 	src2save = src2;
 	do {
-	  cmeanx.real += (Double) src1.cf->real;
-	  cmeanx.imaginary += (Double) src1.cf->imaginary;
-	  cmeany.real += (Double) src2.cf->real;
-	  cmeany.imaginary += (Double) src2.cf->imaginary;
+	  cmeanx.real += (double) src1.cf->real;
+	  cmeanx.imaginary += (double) src1.cf->imaginary;
+	  cmeany.real += (double) src2.cf->real;
+	  cmeany.imaginary += (double) src2.cf->imaginary;
 	} while (advanceLoop(&srcinfo2, &src2),
 		 advanceLoop(&srcinfo1, &src1) < srcinfo1.naxes);
 	memcpy(srcinfo1.coords, save, srcinfo1.ndim*sizeof(Int));
@@ -4725,10 +4725,10 @@ Int lux_crosscorr(Int narg, Int ps[])
 	cmeany.imaginary /= n;
 	cpxy.real = cpxy.imaginary = kx = ky = 0.0;
 	do {
-	  ctempx.real = ((Double) src1.cf->real - cmeanx.real);
-	  ctempy.real = ((Double) src2.cf->real - cmeany.real);
-	  ctempx.imaginary = ((Double) src1.cf->imaginary - cmeanx.imaginary);
-	  ctempy.imaginary = ((Double) src2.cf->imaginary - cmeany.imaginary);
+	  ctempx.real = ((double) src1.cf->real - cmeanx.real);
+	  ctempy.real = ((double) src2.cf->real - cmeany.real);
+	  ctempx.imaginary = ((double) src1.cf->imaginary - cmeanx.imaginary);
+	  ctempy.imaginary = ((double) src2.cf->imaginary - cmeany.imaginary);
 	  kx += ctempx.real*ctempx.real + ctempx.imaginary*ctempx.imaginary;
 	  ky += ctempy.real*ctempy.real + ctempy.imaginary*ctempy.imaginary;
 	  cpxy.real += ctempx.real*ctempy.real
@@ -4754,10 +4754,10 @@ Int lux_crosscorr(Int narg, Int ps[])
 	src1save = src1;
 	src2save = src2;
 	do {
-	  cmeanx.real += (Double) src1.cd->real;
-	  cmeanx.imaginary += (Double) src1.cd->imaginary;
-	  cmeany.real += (Double) src2.cd->real;
-	  cmeany.imaginary += (Double) src2.cd->imaginary;
+	  cmeanx.real += (double) src1.cd->real;
+	  cmeanx.imaginary += (double) src1.cd->imaginary;
+	  cmeany.real += (double) src2.cd->real;
+	  cmeany.imaginary += (double) src2.cd->imaginary;
 	} while (advanceLoop(&srcinfo2, &src2),
 		 advanceLoop(&srcinfo1, &src1) < srcinfo1.naxes);
 	memcpy(srcinfo1.coords, save, srcinfo1.ndim*sizeof(Int));
@@ -4769,10 +4769,10 @@ Int lux_crosscorr(Int narg, Int ps[])
 	cmeany.imaginary /= n;
 	cpxy.real = cpxy.imaginary = kx = ky = 0.0;
 	do {
-	  ctempx.real = ((Double) src1.cd->real - cmeanx.real);
-	  ctempy.real = ((Double) src2.cd->real - cmeany.real);
-	  ctempx.imaginary = ((Double) src1.cd->imaginary - cmeanx.imaginary);
-	  ctempy.imaginary = ((Double) src2.cd->imaginary - cmeany.imaginary);
+	  ctempx.real = ((double) src1.cd->real - cmeanx.real);
+	  ctempy.real = ((double) src2.cd->real - cmeany.real);
+	  ctempx.imaginary = ((double) src1.cd->imaginary - cmeanx.imaginary);
+	  ctempy.imaginary = ((double) src2.cd->imaginary - cmeany.imaginary);
 	  kx += ctempx.real*ctempx.real + ctempx.imaginary*ctempx.imaginary;
 	  ky += ctempy.real*ctempy.real + ctempy.imaginary*ctempy.imaginary;
 	  cpxy.real += ctempx.real*ctempy.real
@@ -4795,7 +4795,7 @@ Int lux_crosscorr(Int narg, Int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-void wait_sec(Float xq) /* for internal use */
+void wait_sec(float xq) /* for internal use */
 {
   struct timeval	tval;
 

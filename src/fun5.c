@@ -28,26 +28,26 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "install.h"
 #include "action.h"
 
-static Double	subdx, subdy;
-static Double	xoff, yoff;
-static Double	a1, a2, a3,a4,a5, a6, a7, a8, a9 ,a10, a11, a12, a13, a14, a15;
+static double	subdx, subdy;
+static double	xoff, yoff;
+static double	a1, a2, a3,a4,a5, a6, a7, a8, a9 ,a10, a11, a12, a13, a14, a15;
 extern Int	badmatch;
-Double	meritc;
+double	meritc;
 /*------------------------------------------------------------------------- */
 Int lux_subshift(Int narg, Int ps[]) /* LCT for a cell  */
      /* wants 2 arrays, already F*8 and extracted, both the same size */
      /* returns the shift */
 {
   Int		iq, jq, *d;
-  Double	*x1, *x2;
-  void	subshift(Double *, Double *, Int, Int);
+  double	*x1, *x2;
+  void	subshift(double *, double *, Int, Int);
 
   iq = ps[0];
   if (symbol_class(iq) != LUX_ARRAY
       || array_num_dims(iq) != 2)
     return cerror(NEED_2D_ARR, iq);
   iq = lux_double(1, &iq);
-  x1 = (Double *) array_data(iq);
+  x1 = (double *) array_data(iq);
   d = array_dims(iq);
   jq = ps[1];
   if (symbol_class(jq) != LUX_ARRAY
@@ -57,7 +57,7 @@ Int lux_subshift(Int narg, Int ps[]) /* LCT for a cell  */
       || d[1] != array_dims(jq)[1])
     return cerror(INCMP_DIMS, jq);
   jq = lux_double(1, &jq);
-  x2 = (Double *) array_data(jq);
+  x2 = (double *) array_data(jq);
   
   subshift(x1, x2, d[0], d[1]);
 
@@ -76,10 +76,10 @@ Int lux_subshiftc(Int narg, Int ps[]) /* LCT for a cell, sym version */
  /* returns the shift */
 {
   Int	iq, jq, kq;
-  Double	*x1, *x2, *msk;
+  double	*x1, *x2, *msk;
   Int	nx, ny;
-  Double	subshiftc(Double *, Double *, Int, Int),
-    subshiftc_apod(Double *, Double *, Double *, Int, Int);
+  double	subshiftc(double *, double *, Int, Int),
+    subshiftc_apod(double *, double *, double *, Int, Int);
 
   iq = ps[0];
   jq = ps[1];
@@ -121,9 +121,9 @@ Int lux_subshiftc(Int narg, Int ps[]) /* LCT for a cell, sym version */
   return LUX_OK;
 }
 /*------------------------------------------------------------------------- */
-Double mert(Double sx, Double sy)
+double mert(double sx, double sy)
  {
- Double	w0, w1,w2,w3,mq;
+ double	w0, w1,w2,w3,mq;
  w0 = (1-sx)*(1-sy);
  w1 = sx*(1-sy);
  w2 = sy*(1-sx);
@@ -134,17 +134,17 @@ Double mert(Double sx, Double sy)
  return mq;
  }
  /*------------------------------------------------------------------------- */
-Double mertc(sx,sy)
- Double sx,sy;
+double mertc(sx,sy)
+ double sx,sy;
  {
- Double	xq;
+ double	xq;
  xq = a1 + sx*sx*a2 + sy*sy*a3 + sx*sx*sy*sy*a4 + sx*a5 + sy*a6 + sx*sy*a7 + sx*sx*sy*a9 + sx*sy*sy*a10;
  return xq;
  }
  /*------------------------------------------------------------------------- */
-Double sxvalue(Double sy)
+double sxvalue(double sy)
  {
- Double	syc, c1, c2, xq;
+ double	syc, c1, c2, xq;
  syc = 1 - sy;
  c1 = syc*syc*(a5-2.0*a1) +syc*sy*(a7-2.0*a6+a8) +sy*sy*(a10-2.0*a3) +syc*(a12-a11) +sy*(a14-a13);
  c2 = syc*syc*(a1+a2-a5) +sy*sy*(a3+a4-a10) +syc*sy*(a6-a7-a8+a9);
@@ -166,9 +166,9 @@ Double sxvalue(Double sy)
  return xq;
  }
  /*------------------------------------------------------------------------- */
-Double syvalue(Double sx)
+double syvalue(double sx)
  {
- Double	sxc, c1, c2, xq;
+ double	sxc, c1, c2, xq;
  sxc = 1 - sx;
  c1 = sxc*sxc*(a6-2.0*a1) +sx*sx*(a9-2.0*a2) +sxc*sx*(a7-2.0*a5+a8) +sxc*(a13-a11) +sx*(a14-a12);
  c2 =  sxc*sxc*(a1+a3-a6) +sx*sx*(a2+a4-a9) +sxc*sx*(a5-a7-a8+a10);
@@ -195,7 +195,7 @@ void getsxsy(void)
  /* iterate to the min (if any), loading results in globals subdx and subdy */
  /* seed with syz = 0.5 */
  Int	n;
- Double	sxz, syz;
+ double	sxz, syz;
  syz=sxz=.5;
  n = 11;
  while (n--) {
@@ -229,17 +229,17 @@ void getsxsy(void)
 void  subshift(x, r, nx, ny)
  /* q is the reference cell (old m1), r is the one we interpolate (old m2) */
  /* we assume that the arrays have already been converted to F*8 */
- Double	*r, *x;
+ double	*r, *x;
  Int     nx, ny;
  {
  Int     nxs;
- Double  sum, cs0, cs1, cs2, cs3, t2, t1, t0, t3;
- Double  parts[5][5], xx[3][3], xdx[3][2], xdy[2][3], xmmpp[2][2], xppmm[2][2]; 
- Double  partsdx[5][3], partsdy[3][5], partsppmm[3][3], partsmmpp[3][3];
- Double  cmm,c0m,cpm,cm0,c00,cp0,cmp,c0p,cpp,sumxx;
- Double	 qbest, qcur, outside, qd;
+ double  sum, cs0, cs1, cs2, cs3, t2, t1, t0, t3;
+ double  parts[5][5], xx[3][3], xdx[3][2], xdy[2][3], xmmpp[2][2], xppmm[2][2]; 
+ double  partsdx[5][3], partsdy[3][5], partsppmm[3][3], partsmmpp[3][3];
+ double  cmm,c0m,cpm,cm0,c00,cp0,cmp,c0p,cpp,sumxx;
+ double	 qbest, qcur, outside, qd;
  Int     i, j, nxm2, nym2, ii, jj, mflag;
- Double	*rp, *rp2, *row, *rowq, *qp;
+ double	*rp, *rp2, *row, *rowq, *qp;
 
  nxs = nx;
  nxm2 = nx - 2;
@@ -711,9 +711,9 @@ void  subshift(x, r, nx, ny)
  return;
  }
  /*------------------------------------------------------------------------- */
-Double sxvaluec(Double sy)
+double sxvaluec(double sy)
  {
- Double c1, c2, xq;
+ double c1, c2, xq;
  /* 3/4/97 changed a7+a8 to just a7 */
  c1 = a5 + sy*a7 + sy*sy*a10;
  c2 =  a2 + sy*sy*a4 +sy*a9;
@@ -734,9 +734,9 @@ Double sxvaluec(Double sy)
  return xq;
  }
  /*------------------------------------------------------------------------- */
-Double syvaluec(Double sx)
+double syvaluec(double sx)
  {
- Double	c1, c2, xq;
+ double	c1, c2, xq;
  /* 3/4/97 changed a7+a8 to just a7 */
  c1 = a6 + sx*a7 + sx*sx*a9;
  c2 =  a3 + sx*sx*a4 +sx*a10;
@@ -757,16 +757,16 @@ Double syvaluec(Double sx)
  return xq;
  }
  /*------------------------------------------------------------------------- */
-Double  subshiftc(xa, xb, nx, ny)
+double  subshiftc(xa, xb, nx, ny)
  /* we assume that the arrays have already been converted to F*8 */
- Double	*xa, *xb;
+ double	*xa, *xb;
  Int     nx, ny;
  {
  Int     nxs;
- Double  t2, t1, t4, t3, d1, d2, d3, d4, sxz, syz;
- Double	 x0, x1, x2, x3, y0, y1, y2, y3;
+ double  t2, t1, t4, t3, d1, d2, d3, d4, sxz, syz;
+ double	 x0, x1, x2, x3, y0, y1, y2, y3;
  Int     i, j, n, stride;
- Double	*xpa1, *xpa2, *xpb1, *xpb2;
+ double	*xpa1, *xpa2, *xpb1, *xpb2;
 
  nxs = nx;
  stride = nxs - nx;
@@ -845,18 +845,18 @@ Double  subshiftc(xa, xb, nx, ny)
  return mertc(sxz, syz);
  }
 /*------------------------------------------------------------------------- */
-Double  subshiftc_apod(xa, xb, gg, nx, ny)
+double  subshiftc_apod(xa, xb, gg, nx, ny)
  /* this version includes an apodizing function already prepared in gg
  which must be dimensioned (nx-1) by (ny-1) */
  /* we assume that the arrays have already been converted to F*8 */
- Double	*xa, *xb, *gg;
+ double	*xa, *xb, *gg;
  Int     nx, ny;
  {
  Int     nxs;
- Double  t2, t1, t4, t3, d1, d2, d3, d4, sxz, syz;
- Double	 x0, x1, x2, x3, y0, y1, y2, y3, gapod;
+ double  t2, t1, t4, t3, d1, d2, d3, d4, sxz, syz;
+ double	 x0, x1, x2, x3, y0, y1, y2, y3, gapod;
  Int     i, j, n, stride;
- Double	*xpa1, *xpa2, *xpb1, *xpb2, xq;
+ double	*xpa1, *xpa2, *xpb1, *xpb2, xq;
 
  nxs = nx;
  stride = nxs - nx;

@@ -196,7 +196,7 @@ BIND(iauC2txy, v_dT8dp3_iDaT5rDp3p3q_0zzz1T5, f, C2TXY, 5, 5, NULL)
    -4799-01-01 or after 1465073-02-28 are rejected. */
 Int lux_iauCal2jd(Int narg, Int ps[])
 {
-  Double djm0, djm;
+  double djm0, djm;
   pointer *ptrs;
   loopInfo *infos;
   Int iq;
@@ -204,7 +204,7 @@ Int lux_iauCal2jd(Int narg, Int ps[])
   if ((iq = standard_args(narg, ps, "i>L3*;r>L-3*", &ptrs, &infos)) < 0)
     return LUX_ERROR;
 
-  /* iauCal2jd(Int iy, Int im, Int id, Double *djm0, Double *djm) */
+  /* iauCal2jd(Int iy, Int im, Int id, double *djm0, double *djm) */
   switch (infos[0].type) {
   case LUX_LONG:
     while (infos[1].nelem--) {
@@ -219,7 +219,7 @@ Int lux_iauCal2jd(Int narg, Int ps[])
   case LUX_FLOAT:
     while (infos[1].nelem--) {
       Int day = floor(ptrs[0].f[2]);
-      Double daypart = ptrs[0].f[2] - day;
+      double daypart = ptrs[0].f[2] - day;
       if (iauCal2jd((Int) ptrs[0].f[0], (Int) ptrs[0].f[1], day, &djm0, &djm))
         *ptrs[1].f = 0;
       else
@@ -231,7 +231,7 @@ Int lux_iauCal2jd(Int narg, Int ps[])
   case LUX_DOUBLE:
     while (infos[1].nelem--) {
       Int day = floor(ptrs[0].d[2]);
-      Double daypart = ptrs[0].d[2] - day;
+      double daypart = ptrs[0].d[2] - day;
       if (iauCal2jd((Int) ptrs[0].d[0], (Int) ptrs[0].d[1], day, &djm0, &djm))
         *ptrs[1].d = 0;
       else
@@ -258,13 +258,13 @@ Int lux_iauDat(Int narg, Int ps[])
   if (internalMode & 1) {       /* /VALID */
     time_t t;
     Int jdlo, jdhi, y, m, d;
-    Double f, dt;
+    double f, dt;
 
     /* determine the last date of validity of the current implementation */
 
     jdlo = 2441318;         /* 1972-01-01 */
     t = time(NULL);
-    jdhi = (Double) t/86400.0 + 2440587.5 + 10000;
+    jdhi = (double) t/86400.0 + 2440587.5 + 10000;
     iauJd2cal(jdlo, 0.0, &y, &m, &d, &f);
     iauJd2cal(jdhi, 0.0, &y, &m, &d, &f);
     do {
@@ -296,7 +296,7 @@ Int lux_iauDat(Int narg, Int ps[])
     case LUX_FLOAT:
       while (infos[1].nelem--) {
         Int d = (Int) floor(ptrs[0].f[2]);
-        Double f = ptrs[0].f[2] - d;
+        double f = ptrs[0].f[2] - d;
         iauDat((Int) ptrs[0].f[0], (Int) ptrs[0].f[1], d, f, ptrs[1].d++);
         ptrs[0].f += 3;
       }
@@ -304,7 +304,7 @@ Int lux_iauDat(Int narg, Int ps[])
     case LUX_DOUBLE:
       while (infos[1].nelem--) {
         Int d = (Int) floor(ptrs[0].d[2]);
-        Double f = ptrs[0].d[2] - d;
+        double f = ptrs[0].d[2] - d;
         iauDat((Int) ptrs[0].d[0], (Int) ptrs[0].d[1], d, f, ptrs[1].d++);
         ptrs[0].d += 3;
       }
@@ -396,7 +396,7 @@ Int lux_iauEpb2jd(Int narg, Int ps[])
   if ((iq = standard_args(narg, ps, "i>D*;rD&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   while (infos[0].nelem--) {
-    Double djm0, djm;
+    double djm0, djm;
     
     iauEpb2jd(*ptrs[0].d++, &djm0, &djm);
     *ptrs[1].d++ = djm0 + djm;
@@ -423,7 +423,7 @@ Int lux_iauEpj2jd(Int narg, Int ps[])
   if ((iq = standard_args(narg, ps, "i>D*;rD*", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   while (infos[0].nelem--) {
-    Double djm0, djm;
+    double djm0, djm;
     
     iauEpj2jd(*ptrs[0].d++, &djm0, &djm);
     *ptrs[1].d++ = djm0 + djm;
@@ -1054,7 +1054,7 @@ BIND(iauPxp, v_dT3d3_iD3DcqrDcq_0T2, f, PXP, 2, 2, NULL)
    The rotation vector has the same direction as the Euler axis of
    matrix <r> and has its magnitude equal to the rotation angle in
    radians of the rotation matrix. */
-/* void iauRm2v(Double r[3][3], Double [3]) */
+/* void iauRm2v(double r[3][3], double [3]) */
 BIND(iauRm2v, v_dp3dp_iD33arDm3q_01, f, RM2V, 1, 1, NULL)
 /*-----------------------------------------------------------------------*/
 /* RXP(<r>, <p>)

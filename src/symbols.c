@@ -183,7 +183,7 @@ Int scalar_scratch_copy(Int nsym)
  sym[n].class = LUX_SCALAR;
  sym[n].type = sym[nsym].type;
  sym[n].line = curLineNumber;
- memcpy(&sym[n].spec.scalar.b, &sym[nsym].spec.scalar.b, sizeof(Double));
+ memcpy(&sym[n].spec.scalar.b, &sym[nsym].spec.scalar.b, sizeof(double));
  return n;
 }
 /*-----------------------------------------------------*/
@@ -212,7 +212,7 @@ Int to_scratch_array(Int n, Int type, Int ndim, Int dims[])
 /* array gets type LUX_STRING_ARRAY.  LS 28mar98 */
 {
  size_t	size, i;
- Float	fsize;
+ float	fsize;
  array	*h;
  pointer	ptr;
  
@@ -238,7 +238,7 @@ Int to_scratch_array(Int n, Int type, Int ndim, Int dims[])
  }
  size += sizeof(array);
  fsize += sizeof(array);
- if (fabs(((Float) size)/fsize - 1) > 1e-3 || size > INT32_MAX)
+ if (fabs(((float) size)/fsize - 1) > 1e-3 || size > INT32_MAX)
    return luxerror("The number of bytes requested for the array\n(about %g) is too great", 0, fsize);
  undefine(n);
  symbol_class(n) = isComplexType(type)? LUX_CARRAY: LUX_ARRAY;
@@ -287,7 +287,7 @@ Int array_clone(Int symbol, Int type)
   with the same structure as <symbol> */
 {
  Int	n, size;
- Float	fsize;
+ float	fsize;
  array	*h, *hOld;
  void	*ptr;
  extern Int	pipeSym, pipeExec;
@@ -296,10 +296,10 @@ Int array_clone(Int symbol, Int type)
 	 / lux_type_size[array_type(symbol)]) * lux_type_size[type]
    + sizeof(array);
  if (lux_type_size[type] > lux_type_size[array_type(symbol)]) {
-   fsize = ((Float) (symbol_memory(symbol) - sizeof(array))
+   fsize = ((float) (symbol_memory(symbol) - sizeof(array))
 	    / lux_type_size[array_type(symbol)]) * lux_type_size[type]
      + sizeof(array);
-   if (fsize != (Float) size)
+   if (fsize != (float) size)
      return luxerror("The number of bytes requested for the array\n(about %g) is too great", 0, fsize);
  }
  if (!pipeExec
@@ -476,8 +476,8 @@ Int int_arg_stat(Int nsym, Int *value)
  return 1;			/* everything OK */
 }  
 /*-----------------------------------------------------*/
-Float float_arg(Int nsym)
-/* returns the Float value of a scalar symbol */
+float float_arg(Int nsym)
+/* returns the float value of a scalar symbol */
 {
  if (nsym < 0 || nsym >= NSYM) 
  { cerror(ILL_SYM, 0, nsym, "float_arg");
@@ -486,21 +486,21 @@ Float float_arg(Int nsym)
  if (sym[nsym].class != LUX_SCALAR) { cerror(NO_SCAL, nsym);  return 0.0; }
  switch (scalar_type(nsym))
  { case LUX_BYTE:
-     return (Float) scalar_value(nsym).b;
+     return (float) scalar_value(nsym).b;
    case LUX_WORD:
-     return (Float) scalar_value(nsym).w;
+     return (float) scalar_value(nsym).w;
    case LUX_LONG:
-     return (Float) scalar_value(nsym).l;
+     return (float) scalar_value(nsym).l;
    case LUX_FLOAT:
-     return (Float) scalar_value(nsym).f;
+     return (float) scalar_value(nsym).f;
    case LUX_DOUBLE:
-     return (Float) scalar_value(nsym).d;
+     return (float) scalar_value(nsym).d;
    default:
      return cerror(ILL_TYPE, nsym); }
 }
 /*-----------------------------------------------------*/
-Int float_arg_stat(Int nsym, Float *value)
-/* returns Float value of symbol <nsym>, if any, or an error */
+Int float_arg_stat(Int nsym, float *value)
+/* returns float value of symbol <nsym>, if any, or an error */
 {
  if (nsym < 0 || nsym >= NSYM) 
    return cerror(ILL_SYM, 0, nsym, "int_arg_stat");
@@ -510,26 +510,26 @@ Int float_arg_stat(Int nsym, Float *value)
    return cerror(NO_SCAL, nsym);
  switch (scalar_type(nsym)) {
    case LUX_BYTE:
-     *value = (Float) scalar_value(nsym).b;
+     *value = (float) scalar_value(nsym).b;
      break;
    case LUX_WORD:
-     *value = (Float) scalar_value(nsym).w;
+     *value = (float) scalar_value(nsym).w;
      break;
    case LUX_LONG:
-     *value = (Float) scalar_value(nsym).l;
+     *value = (float) scalar_value(nsym).l;
      break;
    case LUX_FLOAT:
-     *value = (Float) scalar_value(nsym).f;
+     *value = (float) scalar_value(nsym).f;
      break;
    case LUX_DOUBLE:
-     *value = (Float) scalar_value(nsym).d;
+     *value = (float) scalar_value(nsym).d;
      break;
  }
  return LUX_OK;			/* everything OK */
 }  
 /*-----------------------------------------------------*/
-Double double_arg(Int nsym)
-/* returns the Double value of a LUX_DOUBLE scalar symbol */
+double double_arg(Int nsym)
+/* returns the double value of a LUX_DOUBLE scalar symbol */
 {
  if (nsym < 0 || nsym >= NSYM) 
  { cerror(ILL_SYM, 0, nsym, "double_arg");
@@ -538,21 +538,21 @@ Double double_arg(Int nsym)
  if (sym[nsym].class != LUX_SCALAR) { cerror(NO_SCAL, nsym);  return 0.0; }
  switch (scalar_type(nsym))
  { case LUX_BYTE:
-     return (Double) scalar_value(nsym).b;
+     return (double) scalar_value(nsym).b;
    case LUX_WORD:
-     return (Double) scalar_value(nsym).w;
+     return (double) scalar_value(nsym).w;
    case LUX_LONG:
-     return (Double) scalar_value(nsym).l;
+     return (double) scalar_value(nsym).l;
    case LUX_FLOAT:
-     return (Double) scalar_value(nsym).f;
+     return (double) scalar_value(nsym).f;
    case LUX_DOUBLE:
-     return (Double) scalar_value(nsym).d;
+     return (double) scalar_value(nsym).d;
    default:
      return cerror(ILL_TYPE, nsym); }
 }
 /*-----------------------------------------------------*/
-Int double_arg_stat(Int nsym, Double *value)
-/* returns Double value of symbol <nsym>, if any, or an error */
+Int double_arg_stat(Int nsym, double *value)
+/* returns double value of symbol <nsym>, if any, or an error */
 {
  if (nsym < 0 || nsym >= NSYM) 
    return cerror(ILL_SYM, 0, nsym, "int_arg_stat");
@@ -562,19 +562,19 @@ Int double_arg_stat(Int nsym, Double *value)
    return cerror(NO_SCAL, nsym);
  switch (scalar_type(nsym)) {
    case LUX_BYTE:
-     *value = (Double) scalar_value(nsym).b;
+     *value = (double) scalar_value(nsym).b;
      break;
    case LUX_WORD:
-     *value = (Double) scalar_value(nsym).w;
+     *value = (double) scalar_value(nsym).w;
      break;
    case LUX_LONG:
-     *value = (Double) scalar_value(nsym).l;
+     *value = (double) scalar_value(nsym).l;
      break;
    case LUX_FLOAT:
-     *value = (Double) scalar_value(nsym).f;
+     *value = (double) scalar_value(nsym).f;
      break;
    case LUX_DOUBLE:
-     *value = (Double) scalar_value(nsym).d;
+     *value = (double) scalar_value(nsym).d;
      break;
  }
  return LUX_OK;			/* everything OK */
@@ -611,9 +611,9 @@ Int lux_long(Int narg, Int ps[])
 /*-----------------------------------------------------*/
 Int lux_floor(Int narg, Int ps[])
 /* returns a LUX_LONG version of the argument */
-/* each Float number is transformed into the next lower integer */
-/* compare lux_long(), where each Float number is transformed into the */
-/* next integer closer to zero, and lux_rfix(), where each Float is */
+/* each float number is transformed into the next lower integer */
+/* compare lux_long(), where each float number is transformed into the */
+/* next integer closer to zero, and lux_rfix(), where each float is */
 /* transformed into the closest integer.  LS 24may96 */
 {
  Int	iq, result, n, temp, size, type;
@@ -725,9 +725,9 @@ Int lux_floor(Int narg, Int ps[])
 /*-----------------------------------------------------*/
 Int lux_ceil(Int narg, Int ps[])
 /* returns a LUX_LONG version of the argument */
-/* each Float number is transformed into the next higher integer */
-/* compare lux_long(), where each Float number is transformed into the */
-/* next integer closer to zero, and lux_rfix(), where each Float is */
+/* each float number is transformed into the next higher integer */
+/* compare lux_long(), where each float number is transformed into the */
+/* next integer closer to zero, and lux_rfix(), where each float is */
 /* transformed into the closest integer.  LS 24may96 */
 {
  Int	iq, result, n, temp, size, type;
@@ -933,11 +933,11 @@ Int lux_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	      break;
 	    case LUX_FLOAT:
 	      fmttok(fmt_float);
-	      Sprintf_tok(curScrat, (Double) *src.f);
+	      Sprintf_tok(curScrat, (double) *src.f);
 	      break;
 	    case LUX_DOUBLE:
 	      fmttok(fmt_float);
-	      Sprintf_tok(curScrat, (Double) *src.d);
+	      Sprintf_tok(curScrat, (double) *src.d);
 	      break;
 	  }
 	  size = strlen(curScrat) + 1;
@@ -1035,10 +1035,10 @@ Int lux_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	      scalar_value(result).l = (Int) value.d;
 	      break;
 	    case LUX_FLOAT:
-	      scalar_value(result).f = (Float) value.d;
+	      scalar_value(result).f = (float) value.d;
 	      break;
 	    case LUX_DOUBLE:
-	      scalar_value(result).d = (Double) value.d;
+	      scalar_value(result).d = (double) value.d;
 	      break;
 	  }
 	  scalar_type(result) = totype;
@@ -1061,11 +1061,11 @@ Int lux_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	      break;
 	    case LUX_FLOAT:
 	      fmttok(fmt_float);
-	      Sprintf_tok(curScrat, (Double) *src.f);
+	      Sprintf_tok(curScrat, (double) *src.f);
 	      break;
 	    case LUX_DOUBLE:
 	      fmttok(fmt_float);
-	      Sprintf_tok(curScrat, (Double) *src.d);
+	      Sprintf_tok(curScrat, (double) *src.d);
 	      break;
 	  }
 	  if (result == iq)
@@ -1161,21 +1161,21 @@ Int lux_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	    break;
 	  case LUX_FLOAT:
 	    while (n--) {
-	      *trgt.f = (Float) *src.b;
+	      *trgt.f = (float) *src.b;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case LUX_DOUBLE:
 	    while (n--) {
-	      *trgt.d = (Double) *src.b;
+	      *trgt.d = (double) *src.b;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case LUX_CFLOAT:
 	    while (n--) {
-	      trgt.cf->real = (Float) *src.b;
+	      trgt.cf->real = (float) *src.b;
 	      trgt.cf->imaginary = 0.0;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
@@ -1183,7 +1183,7 @@ Int lux_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	    break;
 	  case LUX_CDOUBLE:
 	    while (n--) {
-	      trgt.cd->real = (Double) *src.b;
+	      trgt.cd->real = (double) *src.b;
 	      trgt.cd->imaginary = 0.0;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
@@ -1236,7 +1236,7 @@ Int lux_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	    break;
 	  case LUX_CFLOAT:
 	    while (n--) {
-	      trgt.cf->real = (Float) *src.w;
+	      trgt.cf->real = (float) *src.w;
 	      trgt.cf->imaginary = 0.0;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
@@ -1244,7 +1244,7 @@ Int lux_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	    break;
 	  case LUX_CDOUBLE:
 	    while (n--) {
-	      trgt.cd->real = (Double) *src.w;
+	      trgt.cd->real = (double) *src.w;
 	      trgt.cd->imaginary = 0.0;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
@@ -1297,7 +1297,7 @@ Int lux_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	    break;
 	  case LUX_CFLOAT:
 	    while (n--) {
-	      trgt.cf->real = (Float) *src.l;
+	      trgt.cf->real = (float) *src.l;
 	      trgt.cf->imaginary = 0.0;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
@@ -1305,7 +1305,7 @@ Int lux_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	    break;
 	  case LUX_CDOUBLE:
 	    while (n--) {
-	      trgt.cd->real = (Double) *src.l;
+	      trgt.cd->real = (double) *src.l;
 	      trgt.cd->imaginary = 0.0;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
@@ -1330,35 +1330,35 @@ Int lux_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	switch (totype) {		/* target type */
 	  case LUX_BYTE:
 	    while (n--) {
-	      *trgt.b = (Float) *src.f;
+	      *trgt.b = (float) *src.f;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case LUX_WORD:
 	    while (n--) {
-	      *trgt.w = (Float) *src.f;
+	      *trgt.w = (float) *src.f;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case LUX_LONG:
 	    while (n--) {
-	      *trgt.l = (Float) *src.f;
+	      *trgt.l = (float) *src.f;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case LUX_DOUBLE:
 	    while (n--) {
-	      *trgt.d = (Float) *src.f;
+	      *trgt.d = (float) *src.f;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case LUX_CFLOAT:
 	    while (n--) {
-	      trgt.cf->real = (Float) *src.f;
+	      trgt.cf->real = (float) *src.f;
 	      trgt.cf->imaginary = 0.0;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
@@ -1366,7 +1366,7 @@ Int lux_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	    break;
 	  case LUX_CDOUBLE:
 	    while (n--) {
-	      trgt.cd->real = (Double) *src.f;
+	      trgt.cd->real = (double) *src.f;
 	      trgt.cd->imaginary = 0.0;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
@@ -1375,7 +1375,7 @@ Int lux_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	  case LUX_STRING_ARRAY:
 	    fmttok(fmt_float);
 	    while (n--) {
-	      Sprintf_tok(curScrat, (Double) *src.f);
+	      Sprintf_tok(curScrat, (double) *src.f);
 	      temp = strlen(curScrat) + 1;
 	      *trgt.sp = malloc(temp);
 	      if (!*trgt.sp)
@@ -1391,35 +1391,35 @@ Int lux_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	switch (totype) {		/* target type */
 	  case LUX_BYTE:
 	    while (n--) {
-	      *trgt.b = (Double) *src.d;
+	      *trgt.b = (double) *src.d;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case LUX_WORD:
 	    while (n--) {
-	      *trgt.w = (Double) *src.d;
+	      *trgt.w = (double) *src.d;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case LUX_LONG:
 	    while (n--) {
-	      *trgt.l = (Double) *src.d;
+	      *trgt.l = (double) *src.d;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case LUX_FLOAT:
 	    while (n--) {
-	      *trgt.f = (Double) *src.d;
+	      *trgt.f = (double) *src.d;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case LUX_CFLOAT:
 	    while (n--) {
-	      trgt.cf->real = (Float) *src.d;
+	      trgt.cf->real = (float) *src.d;
 	      trgt.cf->imaginary = 0.0;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
@@ -1427,7 +1427,7 @@ Int lux_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	    break;
 	  case LUX_CDOUBLE:
 	    while (n--) {
-	      trgt.cd->real = (Double) *src.d;
+	      trgt.cd->real = (double) *src.d;
 	      trgt.cd->imaginary = 0.0;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
@@ -1436,7 +1436,7 @@ Int lux_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	  case LUX_STRING_ARRAY:
 	    fmttok(fmt_float);
 	    while (n--) {
-	      Sprintf_tok(curScrat, (Double) *src.d);
+	      Sprintf_tok(curScrat, (double) *src.d);
 	      temp = strlen(curScrat) + 1;
 	      *trgt.sp = malloc(temp);
 	      if (!*trgt.sp)
@@ -1473,14 +1473,14 @@ Int lux_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	    break;
 	  case LUX_FLOAT:
 	    while (n--) {
-	      *trgt.f = (Float) src.cf->real;
+	      *trgt.f = (float) src.cf->real;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case LUX_DOUBLE:
 	    while (n--) {
-	      *trgt.d = (Double) src.cf->real;
+	      *trgt.d = (double) src.cf->real;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
@@ -1495,8 +1495,8 @@ Int lux_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	    break;
 	  case LUX_STRING_ARRAY:
 	    while (n--) {
-	      Sprintf(curScrat, fmt_complex, (Double) src.cf->real,
-		      (Double) src.cf->imaginary);
+	      Sprintf(curScrat, fmt_complex, (double) src.cf->real,
+		      (double) src.cf->imaginary);
 	      temp = strlen(curScrat) + 1;
 	      *trgt.sp = malloc(temp);
 	      if (!*trgt.sp)
@@ -1533,14 +1533,14 @@ Int lux_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	    break;
 	  case LUX_FLOAT:
 	    while (n--) {
-	      *trgt.f = (Float) src.cd->real;
+	      *trgt.f = (float) src.cd->real;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case LUX_DOUBLE:
 	    while (n--) {
-	      *trgt.d = (Double) src.cd->real;
+	      *trgt.d = (double) src.cd->real;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
@@ -1555,8 +1555,8 @@ Int lux_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	    break;
 	  case LUX_STRING_ARRAY:
 	    while (n--) {
-	      Sprintf(curScrat, fmt_complex, (Double) src.cd->real,
-		      (Double) src.cd->imaginary);
+	      Sprintf(curScrat, fmt_complex, (double) src.cd->real,
+		      (double) src.cd->imaginary);
 	      temp = strlen(curScrat) + 1;
 	      *trgt.sp = malloc(temp);
 	      if (!*trgt.sp)
@@ -1802,17 +1802,17 @@ Int lux_array_convert(pointer *q1, pointer *q2, Int type1, Int type2, Int n)
          }      break;
    case 3: switch (type1) {
          case 3: while (n) { *q2->f++ =  (*q1->f++);n--;} break;
-         case 2: while (n) { *q2->f++ = (Float) (*q1->l++);n--;} break;
-         case 1: while (n) { *q2->f++ = (Float) (*q1->w++);n--;} break;
-         case 0: while (n) { *q2->f++ = (Float) (*q1->b++);n--;} break;
-         case 4: while (n) { *q2->f++ = (Float) (*q1->d++);n--;} break;
+         case 2: while (n) { *q2->f++ = (float) (*q1->l++);n--;} break;
+         case 1: while (n) { *q2->f++ = (float) (*q1->w++);n--;} break;
+         case 0: while (n) { *q2->f++ = (float) (*q1->b++);n--;} break;
+         case 4: while (n) { *q2->f++ = (float) (*q1->d++);n--;} break;
          }      break;
    case 4: switch (type1) {
          case 4: while (n) { *q2->d++ =  (*q1->d++);n--;} break;
-         case 3: while (n) { *q2->d++ = (Double) (*q1->f++);n--;} break;
-         case 2: while (n) { *q2->d++ = (Double) (*q1->l++);n--;} break;
-         case 1: while (n) { *q2->d++ = (Double) (*q1->w++);n--;} break;
-         case 0: while (n) { *q2->d++ = (Double) (*q1->b++);n--;} break;
+         case 3: while (n) { *q2->d++ = (double) (*q1->f++);n--;} break;
+         case 2: while (n) { *q2->d++ = (double) (*q1->l++);n--;} break;
+         case 1: while (n) { *q2->d++ = (double) (*q1->w++);n--;} break;
+         case 0: while (n) { *q2->d++ = (double) (*q1->b++);n--;} break;
          }      break;
   }
  return 1;
@@ -2206,7 +2206,7 @@ Int lux_rfix(Int narg, Int ps[])
 {
  Int	nsym, type, size, *trgt, i, result;
  pointer	src;
- Double	temp;
+ double	temp;
  array	*h;
 
  nsym = *ps;
@@ -2967,7 +2967,7 @@ void read_a_number(char **buf, scalar *value, Int *type)
 	/* ddd{SH}ddd|{DE}[I] */
 	/* ddd{SH}ddd|I */
 	/*           ^ we are here */
-	if (*p == '.') {	/* a Float number: the last entry */
+	if (*p == '.') {	/* a float number: the last entry */
 	  p++;
 	  while (isdigit((Int) *p)) /* find the rest */
 	    p++;
@@ -3200,7 +3200,7 @@ void read_a_number_fp(FILE *fp, scalar *value, Int *type)
 	    return;
 	  }
 	}
-	if (ch == '.') {	/* a Float number: the last entry */
+	if (ch == '.') {	/* a float number: the last entry */
 	  do
 	    *p++ = nextchar(fp);
 	  while (isdigit((Int) p[-1])); /* find the rest */

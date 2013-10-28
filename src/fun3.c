@@ -36,13 +36,13 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "editorcharclass.h"
 #include "luxparser.h"
 
-Int	ezffti(Int *, Float *), fade_xsize, fade_ysize, fade_dim[2];
-Int rffti(Int *, Float *);
-Int rfftb(Int *, Float *, Float *);
-Int rfftf(Int *, Float *, Float *);
-Int rfftid(Int *, Double *);
-Int rfftbd(Int *, Double *, Double *);
-Int rfftfd(Int *, Double *, Double *);
+Int	ezffti(Int *, float *), fade_xsize, fade_ysize, fade_dim[2];
+Int rffti(Int *, float *);
+Int rfftb(Int *, float *, float *);
+Int rfftf(Int *, float *, float *);
+Int rfftid(Int *, double *);
+Int rfftbd(Int *, double *, double *);
+Int rfftfd(Int *, double *, double *);
 Word	*fade1, *fade2;
 extern Int	scalemax, scalemin, lastmaxloc, lastminloc, maxhistsize,
   histmin, histmax, fftdp, lastmax_sym, lastmin_sym, errno;
@@ -201,11 +201,11 @@ Int lux_tense(Int narg, Int ps[])			/* tense function */
 /* THE CALL IS  YF=TENSE(X,Y,XF,[SIGMA],[DLHS,DRHS]) */
 {
   Int	i, iq, len[3], n, result_sym, nf;
-  Double	sigma, der_left, der_right, *st, *yf;
+  double	sigma, der_left, der_right, *st, *yf;
   pointer p[3];
   array	*h;
-  Int	curv1_(Int *n, Double *x, Double *y, Double *slp1, Double *slpn,
-	   Double *yp, Double *temp, Double *sigma, Double *xf, Double *yf,
+  Int	curv1_(Int *n, double *x, double *y, double *slp1, double *slpn,
+	   double *yp, double *temp, double *sigma, double *xf, double *yf,
 	   Int *nf);
 					/* first 3 args must be 1-D vectors */
   for (i=0;i<3;i++) {
@@ -213,7 +213,7 @@ Int lux_tense(Int narg, Int ps[])			/* tense function */
     if ( sym[iq].class != LUX_ARRAY ) return cerror(NEED_ARR, ps[i]);
     h = (array *) sym[iq].spec.array.ptr;
     if ( h->ndim != 1) return cerror(NEED_1D_ARR, ps[i]); 	/* ck if 1-D */
-    /* Double each one */
+    /* double each one */
     iq = lux_double(1, &iq);
     h = (array *) sym[iq].spec.array.ptr;
     len[i] = h->dims[0];
@@ -228,10 +228,10 @@ Int lux_tense(Int narg, Int ps[])			/* tense function */
   if (narg > 5) der_right = double_arg( ps[5] );
   result_sym = array_clone(ps[2], 4);
   h = (array *) sym[result_sym].spec.array.ptr;
-  yf = (Double *) ((char *)h + sizeof(array));
+  yf = (double *) ((char *)h + sizeof(array));
   nf = len[2];
-  /* scratch storage for 2 Double arrays */
-  st = (Double *) malloc( 16 * n );
+  /* scratch storage for 2 double arrays */
+  st = (double *) malloc( 16 * n );
   /*printf("n = %d\n", n);*/
   iq = curv1_(&n, p[0].d, p[1].d, &der_left, &der_right, st, (st+n), &sigma,
 	      p[2].d, yf, &nf);
@@ -255,12 +255,12 @@ Int lux_tense_curve(Int narg, Int ps[])/* tense_curve function */
   the curve
 */
   Int	i, iq, len[3], n, result_sym, dim[2], nf;
-  Double	sigma, der_left, der_right, *st, *yf, *xf;
+  double	sigma, der_left, der_right, *st, *yf, *xf;
   pointer p[3];
   array	*h;
-  Int	kurv1_(Int *n, Double *x, Double *y, Double *slp1, Double *slpn,
-	   Double *xp, Double *yp, Double *temp, Double *sigma, Double *t,
-	   Double *xs, Double *ys, Int *nf);
+  Int	kurv1_(Int *n, double *x, double *y, double *slp1, double *slpn,
+	   double *xp, double *yp, double *temp, double *sigma, double *t,
+	   double *xs, double *ys, Int *nf);
 
 				/* first 3 args must be 1-D vectors */
 for (i=0;i<3;i++) {
@@ -268,7 +268,7 @@ iq = ps[i];
 if ( sym[iq].class != 4 ) return cerror(NEED_ARR, ps[i]);
 h = (array *) sym[iq].spec.array.ptr;
 if ( h->ndim != 1) return cerror(NEED_1D_ARR, ps[i]); 	/* ck if 1-D */
-						/* Double each one */
+						/* double each one */
 iq = lux_double(1, &iq);
 h = (array *) sym[iq].spec.array.ptr;
 len[i] = h->dims[0];
@@ -284,10 +284,10 @@ sigma = - sigma;
 dim[0] = nf = len[2];	dim[1] = 2;
 result_sym = array_scratch(4, 2, dim);
 h = (array *) sym[result_sym].spec.array.ptr;
-xf = (Double *) ((char *)h + sizeof(array));
+xf = (double *) ((char *)h + sizeof(array));
 yf = xf + nf;
-				/* scratch storage for 3 Double arrays */
-st = (Double *) malloc( 24 * n );
+				/* scratch storage for 3 double arrays */
+st = (double *) malloc( 24 * n );
 iq = kurv1_( &n, p[0].d, p[1].d, &der_left, &der_right, st,(st+n),(st+n+n), 
 	&sigma, p[2].d, xf, yf, &nf);
 free( st);
@@ -309,11 +309,11 @@ Int lux_tense_loop(Int narg, Int ps[])/* tense_loop function */
     the curve
     */
   Int	i, iq, len[3], n, result_sym, dim[2], nf;
-  Double	sigma, *st, *yf, *xf;
+  double	sigma, *st, *yf, *xf;
   pointer p[3];
   array	*h;
-  Int kurvp1_(Int *n, Double *x, Double *y, Double *xp, Double *yp,
-	      Double *temp, Double *sigma, Double *t, Double *xs, Double *ys,
+  Int kurvp1_(Int *n, double *x, double *y, double *xp, double *yp,
+	      double *temp, double *sigma, double *t, double *xs, double *ys,
 	      Int *nf);
 					/* first 3 args must be 1-D vectors */
 for (i=0;i<3;i++) {
@@ -321,7 +321,7 @@ iq = ps[i];
 if ( sym[iq].class != 4 ) return cerror(NEED_ARR, ps[i]);
 h = (array *) sym[iq].spec.array.ptr;
 if ( h->ndim != 1) return cerror(NEED_1D_ARR, ps[i]); 	/* ck if 1-D */
-						/* Double each one */
+						/* double each one */
 iq = lux_double(1, &iq);
 h = (array *) sym[iq].spec.array.ptr;
 len[i] = h->dims[0];
@@ -335,11 +335,11 @@ sigma = - sigma;
 dim[0] = nf = len[2];	dim[1] = 2;
 result_sym = array_scratch(4, 2, dim);
 h = (array *) sym[result_sym].spec.array.ptr;
-xf = (Double *) ((char *)h + sizeof(array));
+xf = (double *) ((char *)h + sizeof(array));
 yf = xf + nf;
-				/* scratch storage for 3 Double arrays */
+				/* scratch storage for 3 double arrays */
 				/* one of which is 2*nf long */
-st = (Double *) malloc( 32 * n );
+st = (double *) malloc( 32 * n );
 iq = kurvp1_( &n, p[0].d, p[1].d, st,(st+n),(st+n+n), 
 	&sigma, p[2].d, xf, yf, &nf);
 free( st);
@@ -351,18 +351,18 @@ Int lux_sc(Int narg, Int ps[])	/* sc routine */
 {
   Int	iq, nd, outer, n, mq, dim[MAX_DIMS], type, jq, nn;
   pointer	q1,q2,q3;
-  Int	ezffti(Int *n, Float *wsave), ezfftid(Int *n, Double *wsave),
-    ezfftf(Int *n, Float *r, Float *azero, Float *a, Float *b, Float *wsave),
-    ezfftfd(Int *n, Double *r, Double *azero, Double *a, Double *b,
-	    Double *wsave);
+  Int	ezffti(Int *n, float *wsave), ezfftid(Int *n, double *wsave),
+    ezfftf(Int *n, float *r, float *azero, float *a, float *b, float *wsave),
+    ezfftfd(Int *n, double *r, double *azero, double *a, double *b,
+	    double *wsave);
 
   iq = ps[0];
   if (!symbolIsArray(iq))
     return cerror(NEED_ARR, ps[0]);
-  /*Float the input */
+  /*float the input */
   if (fftdp == 0)		/* single precision */
     iq = lux_float(1, ps);
-  else				/* Double precision */
+  else				/* double precision */
     iq = lux_double(1, ps);
 
   q1.l = array_data(iq);
@@ -432,7 +432,7 @@ static gsl_fft_real_workspace* rwork = NULL;
 static Int nrwork = -1;
 static gsl_fft_halfcomplex_wavetable* hwave = NULL;
 static Int nhwave = -1;
-static Double *ffttemp = NULL;
+static double *ffttemp = NULL;
 static Int nffttemp = -1;
 
 gsl_fft_real_wavetable *update_rwave(Int n)
@@ -486,11 +486,11 @@ void clear_rwork(void)
   nrwork = -1;
 }
 /*------------------------------------------------------------------------- */
-Double *update_ffttemp(Int n)
+double *update_ffttemp(Int n)
 {
   if (n != nffttemp) {
     free(ffttemp);
-    ffttemp = malloc(n*sizeof(Double));
+    ffttemp = malloc(n*sizeof(double));
     nffttemp = ffttemp? n: -1;
   }
   return ffttemp;
@@ -503,20 +503,20 @@ void clear_ffttemp(void)
   nffttemp = -1;
 }
 /*------------------------------------------------------------------------- */
-Int gsl_fft(Double *data, size_t n, size_t stride)
+Int gsl_fft(double *data, size_t n, size_t stride)
 {
   if (!update_rwave(n) || !update_rwork(n))
     return 1;
   
   Int result = gsl_fft_real_transform(data, stride, n, rwave, rwork);
   if (internalMode & 2) {	/* /AMPLITUDES */
-    Double factor1 = 1.0/n;
+    double factor1 = 1.0/n;
     /* average */
     *data *= factor1;
     data += stride;
     /* non-Nyquist non-zero frequencies */
     Int i;
-    Double factor2 = 2.0/n;
+    double factor2 = 2.0/n;
     /* 5 -> 3; 6 -> 3; 7 -> 4 */
     for (i = 1; i <= (n + 1)/2; i += 2) {
       *data *= factor2;
@@ -531,19 +531,19 @@ Int gsl_fft(Double *data, size_t n, size_t stride)
 BIND(gsl_fft, i_sd_iDaLarDq_000, f, FFT, 1, 2, "1ALLAXES:2AMPLITUDES");
 BIND(gsl_fft, i_sd_iDaLa_000, s, FFT, 1, 2, "1ALLAXES:2AMPLITUDES");
 /*------------------------------------------------------------------------- */
-Int gsl_fft_back(Double *data, size_t n, size_t stride)
+Int gsl_fft_back(double *data, size_t n, size_t stride)
 {
   if (!update_hwave(n) || !update_rwork(n))
     return 1;
 
   if (internalMode & 2) {	/* /AMPLITUDES */
-    Double factor1 = n;
+    double factor1 = n;
     /* average */
     *data *= factor1;
     data += stride;
     /* non-Nyquist non-zero frequencies */
     Int i;
-    Double factor2 = n/2.0;
+    double factor2 = n/2.0;
     /* 5 -> 3; 6 -> 3; 7 -> 4 */
     for (i = 1; i <= (n + 1)/2; i += 2) {
       *data *= factor2;
@@ -558,7 +558,7 @@ Int gsl_fft_back(Double *data, size_t n, size_t stride)
 BIND(gsl_fft_back, i_sd_iDaLarDq_000, f, FFTB, 1, 2, "1ALLAXES:2AMPLITUDES");
 BIND(gsl_fft_back, i_sd_iDaLa_000, s, FFTB, 1, 2, "1ALLAXES:2AMPLITUDES");
 /*------------------------------------------------------------------------- */
-Int hilbert(Double *data, size_t n, size_t stride)
+Int hilbert(double *data, size_t n, size_t stride)
 {
   if (!update_rwave(n) || !update_hwave(n) || !update_rwork(n))
     return 1;
@@ -569,7 +569,7 @@ Int hilbert(Double *data, size_t n, size_t stride)
   Int i;
   for (i = 1; i < n - 1; i+= 2) {
     /* advance phase by 90 degrees */
-    Double t = data[i*stride];
+    double t = data[i*stride];
     data[i*stride] = -data[(i + 1)*stride];
     data[(i + 1)*stride] = t;
   }
@@ -578,15 +578,15 @@ Int hilbert(Double *data, size_t n, size_t stride)
 BIND(hilbert, i_sd_iDaLarDq_000, f, HILBERT, 1, 2, "1ALLAXES");
 BIND(hilbert, i_sd_iDaLa_000, s, HILBERT, 1, 2, "1ALLAXES");
 /*------------------------------------------------------------------------- */
-Int gsl_fft_expand(Double *sdata, size_t scount, size_t sstride,
-		   Double *tdata, size_t tcount, size_t tstride)
+Int gsl_fft_expand(double *sdata, size_t scount, size_t sstride,
+		   double *tdata, size_t tcount, size_t tstride)
 {
   if (!update_rwave(scount) || !update_hwave(tcount))
     return 1;
   
   Int i, result;
-  Double *sdata2 = sdata;
-  Double *tdata2 = tdata;
+  double *sdata2 = sdata;
+  double *tdata2 = tdata;
   if (tcount >= scount) {
     /* copy source to target, append zeros, forward fft of copied source data,
        then backward fft including appended zeros */
@@ -610,12 +610,12 @@ Int gsl_fft_expand(Double *sdata, size_t scount, size_t sstride,
   } else {
     /* copy source to temporary storage, forward fft, then backward fft
        for target size, then copy to target */
-    Double *temp = malloc(tcount*sizeof(Double));
+    double *temp = malloc(tcount*sizeof(double));
     if (!temp) {
       errno = ENOMEM;
       return 1;
     }
-    Double *temp2 = temp;
+    double *temp2 = temp;
     for (i = 0; i < scount; i++) {
       *temp2++ = *sdata2;
       sdata2 += sstride;
@@ -646,7 +646,7 @@ Int lux_fft_expand(Int narg, Int ps[])
 
   if ((iq = standard_args(narg, ps, "i>D*;i>D1;rD1", &ptrs, &infos)) < 0)
     return LUX_ERROR;
-  Double factor = *ptrs[1].d;
+  double factor = *ptrs[1].d;
   if (factor <= 0)
     return luxerror("Need positive expansion factor", ps[1]);
   
@@ -892,9 +892,9 @@ Int fftshift(Int narg, Int ps[], Int subroutine)
   pointer	src, trgt, work, tmp, otmp, src0, trgt0, dist,
     sines, cosines;
   scalar	v, factor;
-  Int	rfftb(Int *, Float *, Float *), rfftf(Int *, Float *, Float *),
-    rfftbd(Int *, Double *, Double *), rfftfd(Int *, Double *, Double *),
-    rffti(Int *, Float *), rfftid(Int *, Double *), lux_indgen(Int, Int *);
+  Int	rfftb(Int *, float *, float *), rfftf(Int *, float *, float *),
+    rfftbd(Int *, double *, double *), rfftfd(Int *, double *, double *),
+    rffti(Int *, float *), rfftid(Int *, double *), lux_indgen(Int, Int *);
   loopInfo	srcinfo, trgtinfo;
 
   iq = ps[0];			/* <data> */
@@ -914,11 +914,11 @@ Int fftshift(Int narg, Int ps[], Int subroutine)
 	return cerror(ILL_TYPE, iq);
     }
   } else {
-    /*Float the input */
+    /*float the input */
     if (fftdp == 0) {		/* single precision */
       iq = lux_float(1, ps);
       type = LUX_FLOAT;
-    } else {			/* Double precision */
+    } else {			/* double precision */
       iq = lux_double(1, ps);
       type = LUX_DOUBLE;
     }
@@ -1104,20 +1104,20 @@ Int lux_power(Int narg, Int ps[])
   Int	iq, n, mq, type, j, jq, outDims[MAX_DIMS], result, step;
   pointer	src, trgt, work, tmp, otmp, src0, trgt0;
   scalar	factor;
-  Int	rfftb(Int *, Float *, Float *), rfftf(Int *, Float *, Float *),
-    rfftbd(Int *, Double *, Double *), rfftfd(Int *, Double *, Double *),
-    rffti(Int *, Float *), rfftid(Int *, Double *);
+  Int	rfftb(Int *, float *, float *), rfftf(Int *, float *, float *),
+    rfftbd(Int *, double *, double *), rfftfd(Int *, double *, double *),
+    rffti(Int *, float *), rfftid(Int *, double *);
   loopInfo	srcinfo;
 
   iq = ps[0];
   if (!symbolIsArray(iq))
     return cerror(NEED_ARR, ps[0]);
 
-  /*Float the input */
+  /*float the input */
   if (fftdp == 0) {		/* single precision */
     iq = lux_float(1, ps);
     type = LUX_FLOAT;
-  } else {			/* Double precision */
+  } else {			/* double precision */
     iq = lux_double(1, ps);
     type = LUX_DOUBLE;
   }
@@ -1247,10 +1247,10 @@ Int lux_scb(Int narg, Int ps[])	/* scb routine */
 {
   Int	iq, nd, outer, nx, n, mq, dim[8], type, j, jq, outer2, nx2;
   pointer	q1,q2,q3;
-  Int	ezffti(Int *n, Float *wsave), ezfftid(Int *n, Double *wsave),
-    ezfftb(Int *n, Float *r, Float *azero, Float *a, Float *b, Float *wsave),
-    ezfftbd(Int *n, Double *r, Double *azero, Double *a, Double *b,
-	    Double *wsave);
+  Int	ezffti(Int *n, float *wsave), ezfftid(Int *n, double *wsave),
+    ezfftb(Int *n, float *r, float *azero, float *a, float *b, float *wsave),
+    ezfftbd(Int *n, double *r, double *azero, double *a, double *b,
+	    double *wsave);
 
   iq = ps[1];
   jq = ps[2];
@@ -1380,15 +1380,15 @@ Int lux_histr(Int narg, Int ps[]) /* histr function */
 /* running sum histogram, normalized to 1.0 */
 {
   Int	iq, n, nd, j, type, size, nRepeat;
-  Float	sum, fac;
+  float	sum, fac;
   array	*h;
   pointer q1, q2;
   Int	lux_hist(Int, Int []);
 
 					/* first get a normal histogram */
   if ( (iq = lux_hist(narg,ps) ) <= 0 ) return iq;
-/* the returned symbol should be a long array, convert in place to a Float,
-	this depends on Float and long (Int) being 32 bits! */
+/* the returned symbol should be a long array, convert in place to a float,
+	this depends on float and long (Int) being 32 bits! */
 			/* check for some impossible errors */
   if ( sym[iq].class != LUX_ARRAY ) {
     return cerror(IMPOSSIBLE, iq);}
@@ -1398,14 +1398,14 @@ Int lux_histr(Int narg, Int ps[]) /* histr function */
   q1.l = (Int *) ((char *)h + sizeof(array));
   nd = h->ndim;	n = 1;
   for(j=0;j<nd;j++) n *= h->dims[j];
-  sym[iq].type = LUX_FLOAT;		/* change to Float */
+  sym[iq].type = LUX_FLOAT;		/* change to float */
   if (internalMode & 1)		/* along each 0th dimension */
   { size = h->dims[0];  nRepeat = n/size; }
   else
   { size = n;  nRepeat = 1; }
   while (nRepeat--)
   { sum = 0.0;  j = size;  q2.f = q1.f;
-    while (j--) { sum += (Float) *q2.l; *q2.f++ = sum; }
+    while (j--) { sum += (float) *q2.l; *q2.f++ = sum; }
     fac = 1.0 / sum;  j = size;  q2.f = q1.f;
     while (j--) { *q2.f = fac *  *q2.f; q2.f++; }
     q1.f = q2.f; }
@@ -1679,7 +1679,7 @@ Int lux_sieve(Int narg, Int ps[])
       nc = array_size(iq);
       break; }
   typec = symbol_type(iq);
-  /* unlike the VMS code, we do a Double pass, first to get the count */
+  /* unlike the VMS code, we do a double pass, first to get the count */
   /* use the min of size of array and conditional */
   if (narg == 1)
   { n = nc;
@@ -2300,7 +2300,7 @@ Int maxormin(Int narg, Int ps[], Int code)
   loopInfo	srcinfo, trgtinfo;
   pointer	src, trgt;
   scalar	min, max;
-  Double	value;
+  double	value;
   extern scalar	lastmin, lastmax;
   extern Int	lastminloc, lastmaxloc;
   extern Int	lastmin_sym, lastmax_sym;
@@ -2424,14 +2424,14 @@ Int maxormin(Int narg, Int ps[], Int code)
 	/* take first value as initial values */
 	memcpy(&min, src.f, srcinfo.stride);
 	memcpy(&max, src.f, srcinfo.stride);
-	minloc = maxloc = src.f - (Float *) srcinfo.data0;
+	minloc = maxloc = src.f - (float *) srcinfo.data0;
 	do {
 	  if (*src.f > max.f) {
 	    max.f = *src.f;
-	    maxloc = src.f - (Float *) srcinfo.data0;
+	    maxloc = src.f - (float *) srcinfo.data0;
 	  } else if (*src.f < min.f) {
 	    min.f = *src.f;
-	    minloc = src.f - (Float *) srcinfo.data0;
+	    minloc = src.f - (float *) srcinfo.data0;
 	  }
 	} while ((n = advanceLoop(&srcinfo, &src)) < n1);
 	switch (code) {
@@ -2455,14 +2455,14 @@ Int maxormin(Int narg, Int ps[], Int code)
 	/* take first value as initial values */
 	memcpy(&min, src.d, srcinfo.stride);
 	memcpy(&max, src.d, srcinfo.stride);
-	minloc = maxloc = src.d - (Double *) srcinfo.data0;
+	minloc = maxloc = src.d - (double *) srcinfo.data0;
 	do {
 	  if (*src.d > max.d) {
 	    max.d = *src.d;
-	    maxloc = src.d - (Double *) srcinfo.data0;
+	    maxloc = src.d - (double *) srcinfo.data0;
 	  } else if (*src.d < min.d) {
 	    min.d = *src.d;
-	    minloc = src.d - (Double *) srcinfo.data0;
+	    minloc = src.d - (double *) srcinfo.data0;
 	  }
 	} while ((n = advanceLoop(&srcinfo, &src)) < n1);
 	switch (code) {
@@ -2586,16 +2586,16 @@ Int	narg, ps[];
 return maxormin(narg, ps, 2);
 }
 /*------------------------------------------------------------------------- */
-void scale(pointer data, Byte type, Int size, Double datalow, Double datahigh,
-	   void *dest, Double trgtlow, Double trgthigh)
+void scale(pointer data, Byte type, Int size, double datalow, double datahigh,
+	   void *dest, double trgtlow, double trgthigh)
 /* returns a copy of the data at <data>, linearly transformed such that
  <datalow> maps to <trgtlow> and <datahigh> to <trgthigh>.  Data that falls
  outside of this range is mapped to the nearest valid result. 
  LS 20sep98 */
 /* <trgt> is assumed to point to data of type <colorIndexType>.  LS 23mar99 */
 {
-  Double	drange, dfac, doff;
-  Float	ffac, foff;
+  double	drange, dfac, doff;
+  float	ffac, foff;
   pointer	trgt;
 #if HAVE_LIBX11
   extern Int	colorIndexType;
@@ -2613,7 +2613,7 @@ void scale(pointer data, Byte type, Int size, Double datalow, Double datahigh,
 
   switch (type) {
     case LUX_BYTE:
-      ffac = (Float) dfac;
+      ffac = (float) dfac;
       foff = trgtlow - datalow*ffac;
       switch (colorIndexType) {
 	case LUX_BYTE:
@@ -2652,7 +2652,7 @@ void scale(pointer data, Byte type, Int size, Double datalow, Double datahigh,
       }
       break;
     case LUX_WORD:
-      ffac = (Float) dfac;
+      ffac = (float) dfac;
       foff = trgtlow - datalow*ffac;
       switch (colorIndexType) {
 	case LUX_BYTE:
@@ -2691,7 +2691,7 @@ void scale(pointer data, Byte type, Int size, Double datalow, Double datahigh,
       }
       break;
     case LUX_LONG:
-      ffac = (Float) dfac;
+      ffac = (float) dfac;
       foff = trgtlow - datalow*ffac;
       switch (colorIndexType) {
 	case LUX_BYTE:
@@ -2730,7 +2730,7 @@ void scale(pointer data, Byte type, Int size, Double datalow, Double datahigh,
       }
       break;
     case LUX_FLOAT:
-      ffac = (Float) dfac;
+      ffac = (float) dfac;
       foff = trgtlow - datalow*ffac;
       switch (colorIndexType) {
 	case LUX_BYTE:
@@ -2818,9 +2818,9 @@ Int lux_scale(Int narg, Int ps[])
   Int	iq, type, result_sym, n, oldScalemin, oldScalemax;
   scalar	min, max;
   register	pointer q1, q2;
-  Double	sd, qd;
+  double	sd, qd;
 #if HAVE_LIBX11
-  extern Double	zoom_clo, zoom_chi;
+  extern double	zoom_clo, zoom_chi;
   extern Int	threeColors;
   extern Int	colorIndexType, display_cells;
 #else
@@ -2865,7 +2865,7 @@ Int lux_scale(Int narg, Int ps[])
       max.d = zoom_chi;
     } else
 #endif
-      if (type == LUX_DOUBLE) { /* array is Double, get input as Double */
+      if (type == LUX_DOUBLE) { /* array is double, get input as double */
 	min.d = double_arg(ps[1]);
 	max.d = double_arg(ps[2]);
       } else {
@@ -2877,18 +2877,18 @@ Int lux_scale(Int narg, Int ps[])
       return result_sym;
     }
     if (internalMode & 1) {	/* /BYTE */
-      sd = (Double) 255.999;
-      qd = (Double) 0.0;
+      sd = (double) 255.999;
+      qd = (double) 0.0;
     } else
 #if HAVE_LIBX11
       if (threeColors) {
-	sd = (Double) 84.999;
-	qd = (Double) 0.0;
+	sd = (double) 84.999;
+	qd = (double) 0.0;
       } else
 #endif
       {
-	sd = (Double) scalemax + 0.999;
-	qd = (Double) scalemin;
+	sd = (double) scalemax + 0.999;
+	qd = (double) scalemin;
       }
     scale(q1, type, n, min.d, max.d, q2.b, qd, sd);
   }
@@ -2914,9 +2914,9 @@ Int lux_scalerange(Int narg, Int ps[])
   Int	iq, type, result_sym, n, oldScalemin, oldScalemax;
   scalar	min, max;
   register	pointer q1, q2;
-  Double	sd, qd, logrey, higrey;
+  double	sd, qd, logrey, higrey;
 #if HAVE_LIBX11
-  extern Double	zoom_clo, zoom_chi;
+  extern double	zoom_clo, zoom_chi;
   extern Int	threeColors;
   extern Int	colorIndexType, display_cells;
 #else
@@ -2974,7 +2974,7 @@ Int lux_scalerange(Int narg, Int ps[])
       max.d = zoom_chi;
     } else
 #endif
-      if (type == LUX_DOUBLE) { /* array is Double, get input as Double */
+      if (type == LUX_DOUBLE) { /* array is double, get input as double */
 	min.d = double_arg(ps[3]);
 	max.d = double_arg(ps[4]);
       } else {
@@ -2982,13 +2982,13 @@ Int lux_scalerange(Int narg, Int ps[])
 	max.d = float_arg(ps[4]);
       }
     if (internalMode & 1) {	/* /BYTE */
-      sd = (Double) (display_cells - 0.001)*higrey;
-      qd = (Double) (display_cells - 0.001)*logrey;
+      sd = (double) (display_cells - 0.001)*higrey;
+      qd = (double) (display_cells - 0.001)*logrey;
     }
 #if HAVE_LIBX11
     else if (threeColors) {
-      qd = (Double) (display_cells/3 - 0.001)*logrey;
-      sd = (Double) (display_cells/3 - 0.001)*higrey;
+      qd = (double) (display_cells/3 - 0.001)*logrey;
+      sd = (double) (display_cells/3 - 0.001)*higrey;
     }
 #endif
     else {
@@ -3113,8 +3113,8 @@ Int simple_scale(void *p1, Int n, Int type, void *p2)
   register	pointer q1, q2;
   register	scalar	range, min;
   register	Int	xq;
-  register	Float	fq;
-  register	Double	dq;
+  register	float	fq;
+  register	double	dq;
 #if HAVE_LIBX11
   extern Int	connect_flag, colorIndexType;
 #else
@@ -3176,7 +3176,7 @@ Int simple_scale(void *p1, Int n, Int type, void *p2)
       range.l = lastmax.l - min.l;
       if (range.l == 0)
 	return neutral(p2, n);
-      fq = (Float) (scalemax - scalemin)/(Float) range.l;
+      fq = (float) (scalemax - scalemin)/(float) range.l;
       switch (colorIndexType) {
 	case LUX_BYTE:
 	  while (n--)
@@ -3197,7 +3197,7 @@ Int simple_scale(void *p1, Int n, Int type, void *p2)
       range.f = lastmax.f - min.f;	
       if (range.f == 0)
 	return neutral(p2, n);
-      fq = (Float) (scalemax-scalemin)/range.f;
+      fq = (float) (scalemax-scalemin)/range.f;
       switch (colorIndexType) {
 	case LUX_BYTE:
 	  while (n--)
@@ -3218,7 +3218,7 @@ Int simple_scale(void *p1, Int n, Int type, void *p2)
       range.d = lastmax.d - min.d;	
       if (range.d == 0)
 	return neutral(p2, n );
-      dq = (Double) (scalemax - scalemin)/range.d;
+      dq = (double) (scalemax - scalemin)/range.d;
       switch (colorIndexType) {
 	case LUX_BYTE:
 	  while (n--)
@@ -3300,7 +3300,7 @@ Int cubic_spline_tables(void *xx, Int xType, Int xStep,
 {
   Int	n;
   pointer xin, yin;
-  Double *x, *y;
+  double *x, *y;
 
   const gsl_interp_type *interp_type;
   if (akima)
@@ -3320,8 +3320,8 @@ Int cubic_spline_tables(void *xx, Int xType, Int xStep,
     
   cspl->acc = gsl_interp_accel_alloc();
 
-  x = cspl->x = malloc(nPoints*sizeof(Double));
-  y = cspl->y = malloc(nPoints*sizeof(Double));
+  x = cspl->x = malloc(nPoints*sizeof(double));
+  y = cspl->y = malloc(nPoints*sizeof(double));
   xin.b = (Byte *) xx;
   yin.b = (Byte *) yy;
 
@@ -3331,25 +3331,25 @@ Int cubic_spline_tables(void *xx, Int xType, Int xStep,
     switch (xType) {
     case LUX_BYTE:
       while (n--) {
-	*x++ = (Double) *xin.b;
+	*x++ = (double) *xin.b;
 	xin.b += xStep;
       }
       break;
     case LUX_WORD:
       while (n--) {
-	*x++ = (Double) *xin.w;
+	*x++ = (double) *xin.w;
 	xin.w += xStep;
       }
       break;
     case LUX_LONG:
       while (n--) {
-	*x++ = (Double) *xin.l;
+	*x++ = (double) *xin.l;
 	xin.l += xStep;
       }
       break;
     case LUX_FLOAT:
       while (n--) {
-	*x++ = (Double) *xin.f;
+	*x++ = (double) *xin.f;
 	xin.f += xStep;
       }
       break;
@@ -3363,7 +3363,7 @@ Int cubic_spline_tables(void *xx, Int xType, Int xStep,
     x -= nPoints;
   } else {			/* no x: use indgen */
     for (n = 0; n < nPoints; n++)
-      *x++ = (Double) n;
+      *x++ = (double) n;
     x -= nPoints;
   }
 
@@ -3373,25 +3373,25 @@ Int cubic_spline_tables(void *xx, Int xType, Int xStep,
     switch (yType) {
     case LUX_BYTE:
       while (n--) {
-	*y++ = (Double) *yin.b;
+	*y++ = (double) *yin.b;
 	yin.b += yStep;
       }
       break;
     case LUX_WORD:
       while (n--) {
-	*y++ = (Double) *yin.w;
+	*y++ = (double) *yin.w;
 	yin.w += yStep;
       }
       break;
     case LUX_LONG:
       while (n--) {
-	*y++ = (Double) *yin.l;
+	*y++ = (double) *yin.l;
 	yin.l += yStep;
       }
       break;
     case LUX_FLOAT:
       while (n--) {
-	*y++ = (Double) *yin.f;
+	*y++ = (double) *yin.f;
 	yin.f += yStep;
       }
       break;
@@ -3405,14 +3405,14 @@ Int cubic_spline_tables(void *xx, Int xType, Int xStep,
     y -= nPoints;
   } else {			/* no y: use indgen */
     for (n = 0; n < nPoints; n++)
-      *y++ = (Double) n;
+      *y++ = (double) n;
     y -= nPoints;
   }
   gsl_spline_init(cspl->spline, cspl->x, cspl->y, nPoints);
   return 0;
 }
 /*------------------------------------------------------------------------- */
-Double cspline_value(Double x, csplineInfo *cspl)
+double cspline_value(double x, csplineInfo *cspl)
 /* interpolate using cubic splines.   Assumes <cspl> contains the required */
 /* information about the cubic spline (installed with cubic_spline_tables() */
 {
@@ -3434,7 +3434,7 @@ Double cspline_value(Double x, csplineInfo *cspl)
   return gsl_spline_eval(s, x, cspl->acc);
 }
 /*------------------------------------------------------------------------- */
-Double cspline_derivative(Double x, csplineInfo *cspl)
+double cspline_derivative(double x, csplineInfo *cspl)
 /* returns the derivative of a cubic spline at position <x>.  Assumes that */
 /* the required information about the spline is available in <cspl> */
 /* (installed with cubic_spline_tables). */
@@ -3450,7 +3450,7 @@ Double cspline_derivative(Double x, csplineInfo *cspl)
   return gsl_spline_eval_deriv(cspl->spline, x, cspl->acc);
 }
 /*------------------------------------------------------------------------- */
-void cspline_value_and_derivative(Double x, Double *v, Double *d,
+void cspline_value_and_derivative(double x, double *v, double *d,
 				  csplineInfo *cspl)
 /* returns interpolated value and derivative using cubic splines. LS 9may98 */
 {
@@ -3458,7 +3458,7 @@ void cspline_value_and_derivative(Double x, Double *v, Double *d,
   gsl_spline_eval_deriv_e(cspl->spline, x, cspl->acc, d);
 }
 /*------------------------------------------------------------------------- */
-Double cspline_second_derivative(Double x, csplineInfo *cspl)
+double cspline_second_derivative(double x, csplineInfo *cspl)
 /* returns the value of the second derivative of the spline indicated by
  <cspl> at position <x>.  LS 11may98 */
 {
@@ -3466,14 +3466,14 @@ Double cspline_second_derivative(Double x, csplineInfo *cspl)
 }
 /*------------------------------------------------------------------------- */
 #define LIMIT	40
-Double find_cspline_value(Double value, Double x1, Double x2,
+double find_cspline_value(double value, double x1, double x2,
 			  csplineInfo *cspl)
 /* seeks and returns that value of the coordinate between <x1> and <x2> */
 /* at which the specified <value> occurs, using cubic spline interpolation */
 /* <x1> must be smaller than <x2>. */
 /* LS 9may98 */
 {
-  Double	v1, v2, vc, dt, x, tiny, dtnr, dx;
+  double	v1, v2, vc, dt, x, tiny, dtnr, dx;
   Int	i, slow;
 
   tiny = 2*DBL_EPSILON;
@@ -3516,8 +3516,8 @@ Double find_cspline_value(Double value, Double x1, Double x2,
   return x;
 }
 /*------------------------------------------------------------------------- */
-void find_cspline_extremes(Double x1, Double x2, Double *minpos, Double *min,
-			   Double *maxpos, Double *max, csplineInfo *cspl)
+void find_cspline_extremes(double x1, double x2, double *minpos, double *min,
+			   double *maxpos, double *max, csplineInfo *cspl)
 /* determines the position and values of extremes between positions <x1>
  and <x2>, using cubic spline interpolation.  <x1> must be smaller that
  <x2>.  The found positions and values are returned through the
@@ -3525,7 +3525,7 @@ void find_cspline_extremes(Double x1, Double x2, Double *minpos, Double *min,
  extreme of a fixed sign exist between <x1> and <x2>, then it
  is undefined which one is returned.  LS 11may98 */
 {
-  Double	v1, v2, dt, x, tiny, dtnr, vc, dx, xx1, xx2;
+  double	v1, v2, dt, x, tiny, dtnr, vc, dx, xx1, xx2;
   Int	i, slow, sgn;
 
   tiny = 2*DBL_EPSILON;
@@ -3723,7 +3723,7 @@ Int lux_cubic_spline_extreme(Int narg, Int ps[])
  */
 {
   Int	iq, dims[MAX_DIMS], ndim, step, pos, i, mode;
-  Double	thisextpos, thisext, x1, x2;
+  double	thisextpos, thisext, x1, x2;
   loopInfo	yinfo;
   pointer	y, x, minpos, min, maxpos, max, rightedge, ptr, q;
   csplineInfo	cspl;

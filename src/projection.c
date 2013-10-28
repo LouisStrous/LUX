@@ -31,8 +31,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "install.h"
 #include "action.h"
 
-Int	tkplot(Float, Float, Int, Int),
-  createFullProjection(Float *matrix, Float *perspective, Float *oblique),
+Int	tkplot(float, float, Int, Int),
+  createFullProjection(float *matrix, float *perspective, float *oblique),
   lux_erase(Int, Int []);
 
 /* A general projection matrix P has 4 by 4 elements, and includes scaling, */
@@ -41,12 +41,12 @@ Int	tkplot(Float, Float, Int, Int),
 /* arbitrary non-zero k.  The projection of X according to matrix P is */
 /* PX in homogeneous coordinates. */
 
-Float	defaultProjection[16] = 
+float	defaultProjection[16] = 
 { 1.0, 0.0, 0.0, 0.0,
   0.0, 1.0, 0.0, 0.0,
   0.0, 0.0, 1.0, 0.0,
   0.0, 0.0, 0.0, 1.0 };
-Float	perspective[3] = { 0.5, 0.5, 0.0 }, oblique[2], projection[16],
+float	perspective[3] = { 0.5, 0.5, 0.0 }, oblique[2], projection[16],
   projectMatrix[16] = 
 { 1.0, 0.0, 0.0, 0.0,
   0.0, 1.0, 0.0, 0.0,
@@ -56,28 +56,28 @@ Float	perspective[3] = { 0.5, 0.5, 0.0 }, oblique[2], projection[16],
 /* (they tend to refer to address 0x0), but no trouble with external */
 /* declarations of pointers to arrays, so we define pointers to the */
 /* above arrays and refer to those in external declarations.  LS 13jul94 */
-Float	*currentOblique = oblique, *currentProjection = projection,
+float	*currentOblique = oblique, *currentProjection = projection,
 	*currentPerspective = perspective;
 extern Int	projectSym, iorder, iyhigh, ipltyp;
-extern Float	xmin, xmax, ymin, ymax, xfac, yfac, wxb, wxt, wyb, wyt,
+extern float	xmin, xmax, ymin, ymax, xfac, yfac, wxb, wxt, wyb, wyt,
   *p3d;
 extern char	useProjection;
-Float	zmin, zmax, irzf = 1, dvz, wzb, wzt = 1, ticzr = 0.5, ticz = 0.01;
+float	zmin, zmax, irzf = 1, dvz, wzb, wzt = 1, ticzr = 0.5, ticz = 0.01;
 Int	ifzz = 1, ndlabz = 2, ndz = 8, ndzs, ilabz = 1, fstepz = 0;
 #define CURRENT		0	/* current coordinate system */
 #define ORIGINAL	1	/* original coordinate system */
 Int	projCoords = CURRENT;
 /*-----------------------------------------------------------------------*/
-Int setProjection(Float *projection, Float *matrix, Int size)
+Int setProjection(float *projection, float *matrix, Int size)
      /* copy user-supplied matrix to current projection matrix. */
      /* The user-supplied matrix may have 12 or 16 elements. */
 {
   switch (size) {
     case 16:
-      memcpy(projection, matrix, 16*sizeof(Float));
+      memcpy(projection, matrix, 16*sizeof(float));
       break;
     case 12:
-      memcpy(projection, matrix, 12*sizeof(Float));
+      memcpy(projection, matrix, 12*sizeof(float));
       break;
     default:
       return -1;
@@ -85,11 +85,11 @@ Int setProjection(Float *projection, Float *matrix, Int size)
   return 1;
 }
 /*-----------------------------------------------------------------------*/
-Int translateProjection(Float *projection, Float tx, Float ty, Float tz)
+Int translateProjection(float *projection, float tx, float ty, float tz)
 /* enter a translation over (tx,ty,tz) into projection matrix <projection> */
 {
   Int	i;
-  Float	t;
+  float	t;
 
   if (projCoords == CURRENT)
     for (i = 0; i < 3; i++) {
@@ -106,12 +106,12 @@ Int translateProjection(Float *projection, Float tx, Float ty, Float tz)
   return 1;
 }
 /*-----------------------------------------------------------------------*/
-Int rotateProjection(Float *projection, Float ax, Float ay, Float az)
+Int rotateProjection(float *projection, float ax, float ay, float az)
 /* enter rotations over <ax> degrees along the X axis, <ay> degrees */
 /* along the Y axis, and <az> degrees along the Z axis, into projection */
 /* matrix <projection> */
 {
-  Float	sx, sy, sz, rot[9], temp[12], *p, *q, *r, cx, cy, cz;
+  float	sx, sy, sz, rot[9], temp[12], *p, *q, *r, cx, cy, cz;
   Int	i, j;
 
   /* first calculate sines and cosines */
@@ -178,7 +178,7 @@ Int rotateProjection(Float *projection, Float ax, Float ay, Float az)
   return 1;
 }
 /*-----------------------------------------------------------------------*/
-Int scaleProjection(Float *projection, Float sx, Float sy, Float sz)
+Int scaleProjection(float *projection, float sx, float sy, float sz)
 /* enter scalings with factor <sx> along the X axis, <sy> along the Y axis, */
 /* and <sz> along the Z axis into projection matrix <projection> */
 {
@@ -201,10 +201,10 @@ Int scaleProjection(Float *projection, Float sx, Float sy, Float sz)
   return 1;
 }
 /*-----------------------------------------------------------------------*/
-Int multiplyProjection(Float *projection, Float *matrix)
+Int multiplyProjection(float *projection, float *matrix)
 /* multiply projection <matrix> into projection matrix <projection> */
 {
-  Float	result[16], *p = projection, *q = matrix, *r = result;
+  float	result[16], *p = projection, *q = matrix, *r = result;
   Int	i, j, k;
 
   for (k = 0; k < 4; k++) {
@@ -220,7 +220,7 @@ Int multiplyProjection(Float *projection, Float *matrix)
     }
     q -= 19;
   }
-  memcpy(projection, result, 16*sizeof(Float));
+  memcpy(projection, result, 16*sizeof(float));
   return 1;
 }
 /*-----------------------------------------------------------------------*/
@@ -247,7 +247,7 @@ Int lux_projection(Int narg, Int ps[])
 /* calculate M.T. */
 {
   Int	iq, n;
-  Float	*arg, *q;
+  float	*arg, *q;
 
   if (internalMode & 1)	{	/* /RESET: reset to default */
     memcpy(projectMatrix, defaultProjection, sizeof(defaultProjection));
@@ -261,7 +261,7 @@ Int lux_projection(Int narg, Int ps[])
       return cerror(NEED_ARR, iq);
     iq = lux_float(1, &iq);	/* ensure FLOAT */
     n = array_size(iq);
-    q = (Float *) array_data(iq);
+    q = (float *) array_data(iq);
     if (setProjection(projectMatrix, q, n) < 0)
       return cerror(NEED_4x4_ARR, iq);
   }
@@ -278,7 +278,7 @@ Int lux_projection(Int narg, Int ps[])
     n = array_size(iq);
     if (n != 3)
       return cerror(NEED_3_ARR, iq);
-    arg = (Float *) array_data(iq);
+    arg = (float *) array_data(iq);
     translateProjection(projectMatrix, arg[0], arg[1], arg[2]);
   }    
   /* rotation over angle a1 around the x axis:
@@ -305,7 +305,7 @@ Int lux_projection(Int narg, Int ps[])
     n = array_size(iq);
     if (n != 3)
       return cerror(NEED_3_ARR, iq);
-    q = arg = (Float *) array_data(iq);
+    q = arg = (float *) array_data(iq);
     rotateProjection(projectMatrix, q[0], q[1], q[2]);
   }
   /* scaling with factors [s1, s2, s3]:
@@ -321,7 +321,7 @@ Int lux_projection(Int narg, Int ps[])
     n = array_size(iq);
     if (n != 3)
       return cerror(NEED_3_ARR, iq);
-    arg = (Float *) array_data(iq);
+    arg = (float *) array_data(iq);
     scaleProjection(projectMatrix, arg[0], arg[1], arg[2]);
   }
   /* selection of projection method.  Choice:  perspective or oblique */
@@ -343,8 +343,8 @@ Int lux_projection(Int narg, Int ps[])
       n = array_size(iq);
       if (n != 3)
 	return cerror(NEED_3_ARR, ps[-1]);
-      arg = (Float *) array_data(iq);
-      memcpy(currentPerspective, arg, 3*sizeof(Float));
+      arg = (float *) array_data(iq);
+      memcpy(currentPerspective, arg, 3*sizeof(float));
     } else
       /* only distance of eye to projection plane */
       currentPerspective[2] = float_arg(iq);
@@ -365,18 +365,18 @@ Int lux_projection(Int narg, Int ps[])
     n = array_size(iq);
     if (n != 2)
       return cerror(NEED_2_ARR, ps[-1]);
-    arg = (Float *) array_data(iq);
-    memcpy(currentOblique, arg, 2*sizeof(Float));
+    arg = (float *) array_data(iq);
+    memcpy(currentOblique, arg, 2*sizeof(float));
     /* reset perspective */
     currentPerspective[0] = currentPerspective[1] = 0.5;
     currentPerspective[2] = 0.0; /* i.e. off */
   }
   createFullProjection(projectMatrix, currentPerspective, currentOblique);
-  memcpy(p3d, currentProjection, 16*sizeof(Float));
+  memcpy(p3d, currentProjection, 16*sizeof(float));
   return 1;
 }
 /*---------------------------------------------------------------------*/
-Int createFullProjection(Float *matrix, Float *perspective, Float *oblique)
+Int createFullProjection(float *matrix, float *perspective, float *oblique)
 /* combine rotation/scale/translation matrix with perspective, obliquity, */
 /* and put in currentProjection.  perspective and obliquity determination */
 /* may be done only once for each projection, but rotations, scalings, */
@@ -384,10 +384,10 @@ Int createFullProjection(Float *matrix, Float *perspective, Float *oblique)
   /* we leave the z coordinate intact;  the projected point has z = 0, */
   /* and the original z coordinate is needed in z-buffer algorithms */
 {
-  Float	*p1, *p2, c;
+  float	*p1, *p2, c;
   Int	i;
 
-  memcpy(currentProjection, matrix, 16*sizeof(Float));
+  memcpy(currentProjection, matrix, 16*sizeof(float));
   /* perspective transformation */
   /*   1 0 -xc/p 0
        0 1 -yc/p 0
@@ -431,11 +431,11 @@ Int createFullProjection(Float *matrix, Float *perspective, Float *oblique)
   return 1;
 }
 /*---------------------------------------------------------------------*/
-Float	projected[4];
-Int transform(Float x, Float y, Float z)
+float	projected[4];
+Int transform(float x, float y, float z)
 /* transforms point (x,y,z,1) according to the current projection matrix */
 {
-  Float	*pm, *p;
+  float	*pm, *p;
   Int	i;
 
   p = projected;
@@ -449,10 +449,10 @@ Int transform(Float x, Float y, Float z)
   return 1;
 }
 /*---------------------------------------------------------------------*/
-Int transform4(Float x, Float y, Float z, Float t)
+Int transform4(float x, float y, float z, float t)
 /* transforms point (x,y,z,t) according to the current projection matrix */
 {
-  Float	*pm, *p;
+  float	*pm, *p;
   Int	i;
 
   p = projected;
@@ -466,11 +466,11 @@ Int transform4(Float x, Float y, Float z, Float t)
   return 1;
 }
 /*---------------------------------------------------------------------*/
-Int project(Float x, Float y, Float z)
+Int project(float x, float y, float z)
 /* projects point (x,y,z) according to the current projection matrix */
 /* and transforms from homogeneous to ordinary coordinates */
 {
-  Float	*pm, *p;
+  float	*pm, *p;
   Int	i;
 
   p = projected;
@@ -493,7 +493,7 @@ Int lux_project(Int narg, Int ps[])
 /* using the current projection matrix */
 {
   Int	iq, n, result;
-  Float	*p, *p2;
+  float	*p, *p2;
 
   iq = *ps;
   if (symbol_class(iq) != LUX_ARRAY)
@@ -502,22 +502,22 @@ Int lux_project(Int narg, Int ps[])
   n = array_size(iq);
   if (n % 3)
     return luxerror("Need multiple of three elements", *ps);
-  p = (Float *) array_data(iq);
+  p = (float *) array_data(iq);
   result = array_clone(iq, LUX_FLOAT);
-  p2 = (Float *) array_data(result);
+  p2 = (float *) array_data(result);
   createFullProjection(projectMatrix, currentPerspective, currentOblique);
   n /= 3;
   memcpy(p3d, currentProjection, 16*sizeof(Int));
   while (n--) {
     project(*p, p[1], p[2]);
-    memcpy(p2, projected, 3*sizeof(Float));
+    memcpy(p2, projected, 3*sizeof(float));
     p += 3;
     p2 += 3;
   };
   return result;
 }
 /*---------------------------------------------------------------------*/
-Int tkproj(Float x, Float y, Float z, Int mode)
+Int tkproj(float x, float y, float z, Int mode)
 /* projects the point and draws a line to the projection
    mode: 0 -> move but don't draw; 1 -> draw */
 {
@@ -530,7 +530,7 @@ Int lux_fitUnitCube(Int narg, Int ps[])
 /* scales and translates the projection so that the projected unit cube */
 /* fits nicely on the screen */
 {
-  Float	minx, maxx, miny, maxy, s, sy;
+  float	minx, maxx, miny, maxy, s, sy;
 
   createFullProjection(projectMatrix, currentPerspective, currentOblique);
   project(0, 0, 0);
@@ -613,7 +613,7 @@ Int lux_fitUnitCube(Int narg, Int ps[])
   return 1;
 }
 /*---------------------------------------------------------------------*/
-Int axis(Float ds, Float t, Float tr, Float v, Float dv, Int nt,
+Int axis(float ds, float t, float tr, float v, float dv, Int nt,
 	 Int nd, Int flip)
 /* draws an x-axis in the current 3D projection, starting at the origin,
    consisting of <nd> divisions of length <ds> each, with major ticks
@@ -625,7 +625,7 @@ Int axis(Float ds, Float t, Float tr, Float v, Float dv, Int nt,
    This really isn't necessary, unless one end of the axis is much closer to
    the eye than the other end.  This will be changed at some point. */
 {
-  Float	s = 0, xp, yp;
+  float	s = 0, xp, yp;
   Int	i;
 
   tkproj(0, 0, 0, 0);
@@ -665,15 +665,15 @@ Int lux_plot3d(Int narg, Int ps[])
 /* development routine. */
 {
   Int	iq, nx, ny, i, ixlog, iylog, izlog;
-  Float	*src, x, y, *p1, *p2;
+  float	*src, x, y, *p1, *p2;
   extern Int	ier, ipltyp, ifz, ifzx, ndlabx, ndlaby, irxf, iryf, ndxs,
     ndys, ndx, nd, ilabx, ilaby, tkCoordSys;
-  extern Float	plims[], xmin, ymin, xmax, ymax, dv, dvx, wxb, wxt, wyb, wyt,
+  extern float	plims[], xmin, ymin, xmax, ymax, dv, dvx, wxb, wxt, wyb, wyt,
     ticx, ticy, ticxr, ticyr;
-  Int	setl(Float *, Float *, Int *, Float *, Int, Float, Float);
-  Int	sform(Float, Float);
-  Int	mm(Float *, Int, Float *, Float *);
-  Float	thisProjection[16], bbb[4], btb[4], btt[4], dx, dy, dz;
+  Int	setl(float *, float *, Int *, float *, Int, float, float);
+  Int	sform(float, float);
+  Int	mm(float *, Int, float *, float *);
+  float	thisProjection[16], bbb[4], btb[4], btt[4], dx, dy, dz;
   char	hide;
 
   hide = (internalMode & 1);	/* hidden-line removal? */
@@ -685,7 +685,7 @@ Int lux_plot3d(Int narg, Int ps[])
     return cerror(NEED_2D_ARR, *ps);
   nx = array_dims(iq)[0];
   ny = array_dims(iq)[1];
-  src = (Float *) array_data(iq);
+  src = (float *) array_data(iq);
   /* determine data cube boundaries */
   ixlog = ipltyp % 2;
   iylog = (ipltyp/2) % 2;
@@ -727,21 +727,21 @@ Int lux_plot3d(Int narg, Int ps[])
     nd = 8;
     if (ndys > 0)
       nd = ndys;		/* # divisions on axis */
-    dv = (ymax - ymin)/(Float) nd; /* data per division */
+    dv = (ymax - ymin)/(float) nd; /* data per division */
   } else
     setl(&ymax, &ymin, &nd, &dv, iylog, wyb, wyt);
   if (!irxf && !ixlog) {
     ndx = 8;
     if (ndxs > 0)
       ndx = ndxs;		/* # divisions on axis */
-    dvx = (xmax - xmin)/(Float) ndx; /* data per division */
+    dvx = (xmax - xmin)/(float) ndx; /* data per division */
   } else
     setl(&xmax, &xmin, &ndx, &dvx, ixlog, wxb, wxt);
   if (!irzf && !izlog) {
     ndz = 8;
     if (ndzs > 0)
       ndz = ndzs;		/* # divisions on axis */
-    dvz = (zmax - zmin)/(Float) ndz; /* data per division */
+    dvz = (zmax - zmin)/(float) ndz; /* data per division */
   }
   else
     setl(&zmax, &zmin, &ndz, &dvz, izlog, wzb, wzt);
@@ -752,7 +752,7 @@ Int lux_plot3d(Int narg, Int ps[])
   /* the same routine.*/
   tkCoordSys = LUX_DVI;
   createFullProjection(projectMatrix, currentPerspective, currentOblique);
-  memcpy(p3d, currentProjection, 16*sizeof(Float));
+  memcpy(p3d, currentProjection, 16*sizeof(float));
 
   if (internalMode & 2) {	/* /CUBE */
     /* for debugging purposes: draw unit cube */
@@ -785,19 +785,19 @@ Int lux_plot3d(Int narg, Int ps[])
   if (ilabx && ticx) {
     transform(wxb, wyb, wzb);
     i = 1;
-    memcpy(bbb, projected, 4*sizeof(Float));
+    memcpy(bbb, projected, 4*sizeof(float));
   }
   if (ilaby && ticy) {
     transform(wxb, wyt, wzb);
     i = 1;
-    memcpy(btb, projected, 4*sizeof(Float));
+    memcpy(btb, projected, 4*sizeof(float));
   }
   if (ilabz && ticz) {
     transform(wxb, wyt, wzt);
     i = 1;
-    memcpy(btt, projected, 4*sizeof(Float));
+    memcpy(btt, projected, 4*sizeof(float));
   }
-  memcpy(thisProjection, currentProjection, 16*sizeof(Float));
+  memcpy(thisProjection, currentProjection, 16*sizeof(float));
   /* draw x axis */
   if (!ilabx || !ticx) {	/* just a line */
     tkproj(wxb, wyb, wzb, 0);
@@ -908,7 +908,7 @@ struct vertexStruct
   Int	y;			/* vertex y coordinate */
   char	type;			/* vertex type in polygon */
   char  dir;			/* edge direction */
-  Float	slope; };		/* edge slope */
+  float	slope; };		/* edge slope */
 typedef struct vertexStruct	Vertex;
 
 enum { VERTEX_TOP, VERTEX_FLAT_TOP, VERTEX_SIDE, VERTEX_FLAT_BOTTOM,
@@ -944,7 +944,7 @@ Int scanPolygon(Int *x1, Int *x2, Int *y, char code)
   static Vertex	*vertex, **yIndex, **activeVertex;
   static Int	nVertex, currentY, nActivePoints, currentVertex;
   static char	newY;
-  static Float	*activeX;
+  static float	*activeX;
   Int	i, j;
   Vertex	*p;
 
@@ -1002,7 +1002,7 @@ Int scanPolygon(Int *x1, Int *x2, Int *y, char code)
 	yIndex[i] = vertex + i + 1;
       qsort(yIndex, nVertex, sizeof(Vertex *), comparePtrs);
       /* now *yIndex[0] has the lowest y value */
-      allocate(activeX, nVertex - 1, Float);
+      allocate(activeX, nVertex - 1, float);
       allocate(activeVertex, nVertex - 1, Vertex *);
       currentVertex = 0;
       currentY = yIndex[currentVertex]->y;
@@ -1073,9 +1073,9 @@ Int lux_inPolygon(Int narg, Int ps[])
 }
 #endif
 /*---------------------------------------------------------------------*/
-Int tkhide(Float x, Float y, Float z, Int mode)
+Int tkhide(float x, float y, float z, Int mode)
 {
-  Int	hiddenLine(Float, Float, Int);
+  Int	hiddenLine(float, float, Int);
 
   project(x, y, z);
   return hiddenLine(projected[0], projected[1], mode);
@@ -1089,18 +1089,18 @@ Int tkhide(Float x, Float y, Float z, Int mode)
    edges of the areas that have already been drawn, and update those
    edges each time we draw outside them.  */
 typedef struct {
-  Float	x;			/* x coordinate of first end of segment */
-  Float y;			/* y coordinate of first end of segment */
-  Float dx;			/* difference in x to second end */
-  Float dy;			/* difference in y to second end */
+  float	x;			/* x coordinate of first end of segment */
+  float y;			/* y coordinate of first end of segment */
+  float dx;			/* difference in x to second end */
+  float dy;			/* difference in y to second end */
   Byte status;
 } lineSegment;
 
 typedef struct {
-  Float xmin;			/* least x coordinate */
-  Float xmax;			/* greatest x coordinate */
-  Float ymin;			/* least y coordinate */
-  Float ymax;			/* greatest y coordinate */
+  float xmin;			/* least x coordinate */
+  float xmax;			/* greatest x coordinate */
+  float ymin;			/* least y coordinate */
+  float ymax;			/* greatest y coordinate */
   Int	nTopSegment;		/* number of segments in top boundary */
   Int	nBottomSegment;		/* number of segments in bottom boundary */
   Int	nTopFree;		/* allocated number of top segments */
@@ -1118,7 +1118,7 @@ typedef struct {
 #define	HL_DRAWN_BLOCK		10
 #define HL_SEGMENT_BLOCK	100
 
-Int hiddenLine(Float x, Float y, Int mode)
+Int hiddenLine(float x, float y, Int mode)
 {
   static drawnArea	*area = NULL; /* pointer to drawn areas */
   static Int	nDrawnFree,	/* number of areas for which memory is
@@ -1186,7 +1186,7 @@ Int lux_projectmap(Int narg, Int ps[])
   pointer	src, trgt;
   Int	imx, imy, xmap, ymap, result, dims[2], i, j, index, stride, sx, sy,
     u2, v2, nx, ny;
-  Double h, delta, angle, mag, c, s, bigdelta, c1, c2, c3, c4, c5, c6, c7,
+  double h, delta, angle, mag, c, s, bigdelta, c1, c2, c3, c4, c5, c6, c7,
     x, y, d, u, v, dd, du, dv;
 
   if (!symbolIsRealArray(ps[0]) || array_num_dims(ps[0]) != 2)

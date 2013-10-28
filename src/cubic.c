@@ -42,7 +42,7 @@ Int lux_cubic_spline(Int narg, Int ps[])
   Int	xNewSym = 0, xTabSym = 0, yTabSym, d1Sym = 0, d2Sym, size,
 	oldType, n;
   pointer	src, trgt, p, q;
-  Float	a, b, c, x;
+  float	a, b, c, x;
   static Int	nPoints, type;
   static pointer	xTable, yTable, der2;
 
@@ -98,62 +98,62 @@ Int lux_cubic_spline(Int narg, Int ps[])
 	  switch (oldType)
 	  { case LUX_BYTE:
 	      while (n--)
-		*trgt.f++ = (Float) *src.b++;
+		*trgt.f++ = (float) *src.b++;
 	      src.b = array_data(yTabSym);
 	      trgt = yTable;
 	      while (n--)
-		*trgt.f++ = (Float) *src.b++;
+		*trgt.f++ = (float) *src.b++;
 	      break;
 	    case LUX_WORD:
 	      while (n--)
-		*trgt.f++ = (Float) *src.w++;
+		*trgt.f++ = (float) *src.w++;
 	      src.b = array_data(yTabSym);
 	      trgt = yTable;
 	      while (n--)
-		*trgt.f++ = (Float) *src.w++;
+		*trgt.f++ = (float) *src.w++;
 	      break;
 	    case LUX_LONG:
 	      while (n--)
-		*trgt.f++ = (Float) *src.l++;
+		*trgt.f++ = (float) *src.l++;
 	      src.b = array_data(yTabSym);
 	      trgt = yTable;
 	      while (n--)
-		*trgt.f++ = (Float) *src.l++;
+		*trgt.f++ = (float) *src.l++;
 	      break; }
 	  break;
 	case LUX_DOUBLE:
 	  switch (oldType)
 	  { case LUX_BYTE:
 	      while (n--)
-		*trgt.d++ = (Double) *src.b++;
+		*trgt.d++ = (double) *src.b++;
 	      src.b = array_data(yTabSym);
 	      trgt = yTable;
 	      while (n--)
-		*trgt.d++ = (Double) *src.b++;
+		*trgt.d++ = (double) *src.b++;
 	      break;
 	    case LUX_WORD:
 	      while (n--)
-		*trgt.d++ = (Double) *src.w++;
+		*trgt.d++ = (double) *src.w++;
 	      src.b = array_data(yTabSym);
 	      trgt = yTable;
 	      while (n--)
-		*trgt.d++ = (Double) *src.w++;
+		*trgt.d++ = (double) *src.w++;
 	      break;
 	    case LUX_LONG:
 	      while (n--)
-		*trgt.d++ = (Double) *src.l++;
+		*trgt.d++ = (double) *src.l++;
 	      src.b = array_data(yTabSym);
 	      trgt = yTable;
 	      while (n--)
-		*trgt.d++ = (Double) *src.l++;
+		*trgt.d++ = (double) *src.l++;
 	      break; 
 	    case LUX_FLOAT:
 	      while (n--)
-		*trgt.d++ = (Double) *src.f++;
+		*trgt.d++ = (double) *src.f++;
 	      src.b = array_data(yTabSym);
 	      trgt = yTable;
 	      while (n--)
-		*trgt.d++ = (Double) *src.f++;
+		*trgt.d++ = (double) *src.f++;
 	      break; }
 	  break; }
     }

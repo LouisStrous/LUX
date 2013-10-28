@@ -808,7 +808,7 @@ void type_ascii_one(Int symbol, FILE *fp)
       if (scalar_type(symbol) < LUX_FLOAT) { /* integer type */
 	sprintf(curScrat, fmt_integer, number.l);
 	fprintw(fp, curScrat);
-      } else { 			/* Float type */
+      } else { 			/* float type */
 	/* it may be a %j, %z, %t, or %T so we must use our own printer */
 	Sprintf(curScrat, fmt_float, number.d);
 	fprintw(fp, curScrat);
@@ -817,8 +817,8 @@ void type_ascii_one(Int symbol, FILE *fp)
     case LUX_CSCALAR:
       ptr.cf = complex_scalar_data(symbol).cf;
       if (complex_scalar_type(symbol) == LUX_CFLOAT)
-	Sprintf(curScrat, fmt_complex, (Double) ptr.cf->real,
-		(Double) ptr.cf->imaginary);
+	Sprintf(curScrat, fmt_complex, (double) ptr.cf->real,
+		(double) ptr.cf->imaginary);
       else
 	Sprintf(curScrat, fmt_complex, ptr.cd->real, ptr.cd->imaginary);
       fprintw(fp, curScrat);
@@ -904,7 +904,7 @@ void type_ascii_one(Int symbol, FILE *fp)
 	  while (j--) {
 	    if (!j && (theFormat.flags & FMT_MIX2))
 	      theFormat.spec_char[1] = '\0';
-	    Sprintf_tok(curScrat, (Double) *ptr.f++);
+	    Sprintf_tok(curScrat, (double) *ptr.f++);
 	    fprintw(fp, curScrat);
 	    if (j && (internalMode & 4))
 	      nextformat(NULL, 1);
@@ -915,7 +915,7 @@ void type_ascii_one(Int symbol, FILE *fp)
 	  while (j--) {
 	    if (!j && (theFormat.flags & FMT_MIX2))
 	      theFormat.spec_char[1] = '\0';
-	    Sprintf_tok(curScrat, (Double) *ptr.d++);
+	    Sprintf_tok(curScrat, (double) *ptr.d++);
 	    fprintw(fp, curScrat);
 	    if (j && (internalMode & 4))
 	      nextformat(NULL, 1);
@@ -952,13 +952,13 @@ void type_ascii_one(Int symbol, FILE *fp)
 	  number.f = *scal_ptr_pointer(symbol).f;
 	  break;
 	case LUX_DOUBLE:
-	  number.f = (Float) *scal_ptr_pointer(symbol).d;
+	  number.f = (float) *scal_ptr_pointer(symbol).d;
 	  break;
       }
       if (scal_ptr_type(symbol) < LUX_FLOAT) { /* integer type */
 	sprintf(curScrat, fmt_integer, number.l);
 	fprintw(fp, curScrat);
-      } else if (scal_ptr_type(symbol) <= LUX_DOUBLE) { /* Float type */
+      } else if (scal_ptr_type(symbol) <= LUX_DOUBLE) { /* float type */
 	Sprintf(curScrat, fmt_float, number.f);
 	fprintw(fp, curScrat);
       }
@@ -988,8 +988,8 @@ void type_ascii_one(Int symbol, FILE *fp)
       switch (array_type(symbol)) {
 	case LUX_CFLOAT:
 	  while (n--) {
-	    Sprintf(curScrat, fmt_complex, (Double) ptr.cf->real,
-		    (Double) ptr.cf->imaginary);
+	    Sprintf(curScrat, fmt_complex, (double) ptr.cf->real,
+		    (double) ptr.cf->imaginary);
 	    fprintw(fp, curScrat);
 	    ptr.cf++;
 	    if (n && (internalMode & 4))
@@ -1418,13 +1418,13 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 	      case LUX_BYTE:
 		if (fp)
 		  while (n--) {
-		    fprintf(fp, thefmt, (Double) *p.b++);
+		    fprintf(fp, thefmt, (double) *p.b++);
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2)))
 		      fputs(theFormat.plain, fp);
 		  }
 		else
 		  while (n--) {
-		    sprintf(curScrat, thefmt, (Double) *p.b++);
+		    sprintf(curScrat, thefmt, (double) *p.b++);
 		    curScrat += strlen(curScrat);
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2))) {
 		      strcpy(curScrat, theFormat.plain);
@@ -1435,13 +1435,13 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 	      case LUX_WORD:
 		if (fp)
 		  while (n--) {
-		    fprintf(fp, thefmt, (Double) *p.w++);
+		    fprintf(fp, thefmt, (double) *p.w++);
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2)))
 		      fputs(theFormat.plain, fp);
 		  }
 		else
 		  while (n--) {
-		    sprintf(curScrat, thefmt, (Double) *p.w++);
+		    sprintf(curScrat, thefmt, (double) *p.w++);
 		    curScrat += strlen(curScrat);
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2))) {
 		      strcpy(curScrat, theFormat.plain);
@@ -1452,13 +1452,13 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 	      case LUX_LONG:
 		if (fp)
 		  while (n--) {
-		    fprintf(fp, thefmt, (Double) *p.l++);
+		    fprintf(fp, thefmt, (double) *p.l++);
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2)))
 		      fputs(theFormat.plain, fp);
 		  }
 		else
 		  while (n--) {
-		    sprintf(curScrat, thefmt, (Double) *p.l++);
+		    sprintf(curScrat, thefmt, (double) *p.l++);
 		    curScrat += strlen(curScrat);
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2))) {
 		      strcpy(curScrat, theFormat.plain);
@@ -1469,13 +1469,13 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 	      case LUX_FLOAT:
 		if (fp)
 		  while (n--) {
-		    fprintf(fp, thefmt, (Double) *p.f++);
+		    fprintf(fp, thefmt, (double) *p.f++);
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2)))
 		      fputs(theFormat.plain, fp);
 		  }
 		else
 		  while (n--) {
-		    sprintf(curScrat, thefmt, (Double) *p.f++);
+		    sprintf(curScrat, thefmt, (double) *p.f++);
 		    curScrat += strlen(curScrat);
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2))) {
 		      strcpy(curScrat, theFormat.plain);
@@ -1486,13 +1486,13 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 	      case LUX_DOUBLE:
 		if (fp)
 		  while (n--) {
-		    fprintf(fp, thefmt, (Double) *p.d++);
+		    fprintf(fp, thefmt, (double) *p.d++);
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2)))
 		      fputs(theFormat.plain, fp);
 		  }
 		else
 		  while (n--) {
-		    sprintf(curScrat, thefmt, (Double) *p.d++);
+		    sprintf(curScrat, thefmt, (double) *p.d++);
 		    curScrat += strlen(curScrat);
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2))) {
 		      strcpy(curScrat, theFormat.plain);
@@ -1503,14 +1503,14 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 	      case LUX_CFLOAT:
 		if (fp)
 		  while (n--) {
-		    fprintf(fp, thefmt, (Double) p.cf->real);
+		    fprintf(fp, thefmt, (double) p.cf->real);
 		    p.cf++;
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2)))
 		      fputs(theFormat.plain, fp);
 		  }
 		else
 		  while (n--) {
-		    sprintf(curScrat, thefmt, (Double) p.cf->real);
+		    sprintf(curScrat, thefmt, (double) p.cf->real);
 		    p.cf++;
 		    curScrat += strlen(curScrat);
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2))) {
@@ -1522,7 +1522,7 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 	      case LUX_CDOUBLE:
 		if (fp)
 		  while (n--) {
-		    fprintf(fp, thefmt, (Double) p.cd->real);
+		    fprintf(fp, thefmt, (double) p.cd->real);
 		    p.cd++;
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2)))
 		      fputs(theFormat.plain, fp);
@@ -1548,7 +1548,7 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 	    switch (symbol_type(iq)) {
 	      case LUX_BYTE:
 		while (n--) {
-		  Sprintf(curScrat, thefmt, (Double) *p.b++);
+		  Sprintf(curScrat, thefmt, (double) *p.b++);
 		  if (fp)
 		    fputs(curScrat, fp);
 		  else
@@ -1565,7 +1565,7 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 		break;
 	      case LUX_WORD:
 		while (n--) {
-		  Sprintf(curScrat, thefmt, (Double) *p.w++);
+		  Sprintf(curScrat, thefmt, (double) *p.w++);
 		  if (fp)
 		    fputs(curScrat, fp);
 		  else
@@ -1582,7 +1582,7 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 		break;
 	      case LUX_LONG:
 		while (n--) {
-		  Sprintf(curScrat, thefmt, (Double) *p.l++);
+		  Sprintf(curScrat, thefmt, (double) *p.l++);
 		  if (fp)
 		    fputs(curScrat, fp);
 		  else
@@ -1599,7 +1599,7 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 		break;
 	      case LUX_FLOAT:
 		while (n--) {
-		  Sprintf(curScrat, thefmt, (Double) *p.f++);
+		  Sprintf(curScrat, thefmt, (double) *p.f++);
 		  if (fp)
 		    fputs(curScrat, fp);
 		  else
@@ -1616,7 +1616,7 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 		break;
 	      case LUX_DOUBLE:
 		while (n--) {
-		  Sprintf(curScrat, thefmt, (Double) *p.d++);
+		  Sprintf(curScrat, thefmt, (double) *p.d++);
 		  if (fp)
 		    fputs(curScrat, fp);
 		  else
@@ -1637,7 +1637,7 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 	    switch (symbol_type(iq)) {
 	      case LUX_BYTE:
 		while (n--) {
-		  Sprintf(curScrat, thefmt, (Double) *p.b++, (Double) 0.0);
+		  Sprintf(curScrat, thefmt, (double) *p.b++, (double) 0.0);
 		  if (fp)
 		    fputs(curScrat, fp);
 		  else
@@ -1654,7 +1654,7 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 		break;
 	      case LUX_WORD:
 		while (n--) {
-		  Sprintf(curScrat, thefmt, (Double) *p.w++, (Double) 0.0);
+		  Sprintf(curScrat, thefmt, (double) *p.w++, (double) 0.0);
 		  if (fp)
 		    fputs(curScrat, fp);
 		  else
@@ -1671,7 +1671,7 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 		break;
 	      case LUX_LONG:
 		while (n--) {
-		  Sprintf(curScrat, thefmt, (Double) *p.l++, (Double) 0.0);
+		  Sprintf(curScrat, thefmt, (double) *p.l++, (double) 0.0);
 		  if (fp)
 		    fputs(curScrat, fp);
 		  else
@@ -1688,7 +1688,7 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 		break;
 	      case LUX_FLOAT:
 		while (n--) {
-		  Sprintf(curScrat, thefmt, (Double) *p.f++, (Double) 0.0);
+		  Sprintf(curScrat, thefmt, (double) *p.f++, (double) 0.0);
 		  if (fp)
 		    fputs(curScrat, fp);
 		  else
@@ -1705,7 +1705,7 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 		break;
 	      case LUX_DOUBLE:
 		while (n--) {
-		  Sprintf(curScrat, thefmt, (Double) *p.d++, (Double) 0.0);
+		  Sprintf(curScrat, thefmt, (double) *p.d++, (double) 0.0);
 		  if (fp)
 		    fputs(curScrat, fp);
 		  else
@@ -1722,8 +1722,8 @@ Int type_formatted_ascii(Int narg, Int ps[], FILE *fp)
 		break;
 	      case LUX_CFLOAT:
 		while (n--) {
-		  Sprintf(curScrat, thefmt, (Double) p.cf->real,
-			  (Double) p.cf->imaginary);
+		  Sprintf(curScrat, thefmt, (double) p.cf->real,
+			  (double) p.cf->imaginary);
 		  p.cf++;
 		  if (fp)
 		    fputs(curScrat, fp);
@@ -2186,7 +2186,7 @@ Int read_ascii(Int narg, Int ps[], FILE *fp, Int flag)
 	  scalar_value(iq).w = (Word) value.l;
 	  break;
 	case LUX_FLOAT:
-	  scalar_value(iq).f = (Float) value.d;
+	  scalar_value(iq).f = (float) value.d;
 	  break;
 	} /* end switch (type) */
 	break;
@@ -2201,7 +2201,7 @@ Int read_ascii(Int narg, Int ps[], FILE *fp, Int flag)
 	  scal_ptr_type(iq) = LUX_LONG;
 	  break;
 	case LUX_FLOAT:
-	  *scal_ptr_pointer(iq).f = (Float) value.d;
+	  *scal_ptr_pointer(iq).f = (float) value.d;
 	  scal_ptr_type(iq) = LUX_FLOAT;
 	  break;
 	case LUX_DOUBLE:
@@ -2255,20 +2255,20 @@ Int read_ascii(Int narg, Int ps[], FILE *fp, Int flag)
 	    case LUX_FLOAT:
 	      switch (type) {
 	      case LUX_BYTE: case LUX_WORD: case LUX_LONG:
-		*pp.f++ = (Float) value.l;
+		*pp.f++ = (float) value.l;
 		break;
 	      case LUX_FLOAT: case LUX_DOUBLE:
-		*pp.f++ = (Float) value.d;
+		*pp.f++ = (float) value.d;
 		break;
 	      }
 	      break;
 	    case LUX_DOUBLE:
 	      switch (type) {
 	      case LUX_BYTE: case LUX_WORD: case LUX_LONG:
-		*pp.d++ = (Double) value.l;
+		*pp.d++ = (double) value.l;
 		break;
 	      case LUX_FLOAT: case LUX_DOUBLE:
-		*pp.d++ = (Double) value.d;
+		*pp.d++ = (double) value.d;
 		break;
 	      }
 	      break;
@@ -2390,7 +2390,7 @@ Int read_formatted_ascii(Int narg, Int ps[], void *ptr, Int showerrors,
 {
   char	*fmt, *scr, *p, c, *ptr0;
   Int	type, string2, pr, i, len, nout = 0;
-  Double	d, k, f, d2;
+  double	d, k, f, d2;
   pointer	trgt;
   void	**ptr2;
   static char	*keyboard = NULL;
@@ -2605,7 +2605,7 @@ Int read_formatted_ascii(Int narg, Int ps[], void *ptr, Int showerrors,
 		    if (!gscanf(ptr2, "%*[^0-9]", NULL, string2))
 		      return
 			showerrors? luxerror("Expected a non-digit while looking for a time at character index %d in %s", 0, (char *) *ptr2 - ptr0, ptr0): nout;
-		  } else {	/* the last one: read a Float */
+		  } else {	/* the last one: read a float */
 		    if (!gscanf(ptr2, "%lf", &f, string2))
 		      return
 			showerrors? luxerror("Expected a (floating-point) number while looking for a time at character index %d in %s", 0, (char *) *ptr2 - ptr0, ptr0): nout;
@@ -2618,7 +2618,7 @@ Int read_formatted_ascii(Int narg, Int ps[], void *ptr, Int showerrors,
 		
 		if (!(theFormat.flags & FMT_SUPPRESS)) {
 		  if (type == LUX_FLOAT)
-		    *trgt.f = (Float) d;
+		    *trgt.f = (float) d;
 		  else
 		    *trgt.d = d;
 		}
@@ -5291,8 +5291,8 @@ Int lux_hex(Int narg, Int ps[])
 	  case 0: fprintf(fp, "      %#4x",*(Byte *)sym[iq].spec.array.ptr); break;
 	  case 1: fprintf(fp, "    %#6x",*(short *)sym[iq].spec.array.ptr); break;
 	  case 2: fprintf(fp, "%#10x",*(Int *)sym[iq].spec.array.ptr); break;
-	  case 3: fprintf(fp, "%#10x",*(Float *)sym[iq].spec.array.ptr); break;
-	  case 4: fprintf(fp, "%#20x",*(Double *)sym[iq].spec.array.ptr); break;
+	  case 3: fprintf(fp, "%#10x",*(float *)sym[iq].spec.array.ptr); break;
+	  case 4: fprintf(fp, "%#20x",*(double *)sym[iq].spec.array.ptr); break;
 	} flag=1; break;			/*end of scalar case */
       case LUX_STRING:		/*string */
 	ptr = (char *) sym[iq].spec.array.ptr;
@@ -5307,13 +5307,13 @@ Int lux_hex(Int narg, Int ps[])
 	    switch (jq) {
 	      case 2:  p1.l = (Int *)ptr; k=8; for (j=0;j<nelem;j++)
 	      { fprintf(fp, "%#10x",*p1.l++); if (j%8 == 7) fprintf(fp, "\n");}  break;
-	      case 3:  p1.f = (Float *)ptr; k=6; for (j=0;j<nelem;j++)
+	      case 3:  p1.f = (float *)ptr; k=6; for (j=0;j<nelem;j++)
 	      { fprintf(fp, "%#10x",*p1.f++); if (j%6 == 5) fprintf(fp, "\n");}  break;
 	      case 0:  p1.b = (Byte *)ptr; k=8; for (j=0;j<nelem;j++)
 	      { fprintf(fp, "      %#4x",*p1.b++); if (j%8 == 7) fprintf(fp, "\n");}  break;
 	      case 1:  p1.w = (short *)ptr; k=8; for (j=0;j<nelem;j++)
 	      { fprintf(fp, "    %#6x",*p1.w++); if (j%8 == 7) fprintf(fp, "\n");}  break;
-	      case 4:  p1.d = (Double *)ptr; k=4; for (j=0;j<nelem;j++)
+	      case 4:  p1.d = (double *)ptr; k=4; for (j=0;j<nelem;j++)
 	      { fprintf(fp, "%#20x",*p1.d++); if (j%4 == 3) fprintf(fp, "\n");}  break;
 	    } if ( nelem%k != 0 ) fprintf(fp, "\n"); break;	/*end of array class */
     }						/*end of class switch */
@@ -5399,8 +5399,8 @@ Int fits_fatality(FILE *fin)
   return LUX_ZERO;	/* this is the zero symbol */
 }
 /*------------------------------------------------------------------------- */
-void apply_bscale_bzero_blank(Byte *ptr, Int nelem, Float bscale, Float bzero,
-			      Float blank, Float targetblank, Int type0,
+void apply_bscale_bzero_blank(Byte *ptr, Int nelem, float bscale, float bzero,
+			      float blank, float targetblank, Int type0,
 			      Int type)
 {
   pointer	p, q;
@@ -5532,12 +5532,12 @@ void apply_bscale_bzero_blank(Byte *ptr, Int nelem, Float bscale, Float bzero,
   }
 }
 /*------------------------------------------------------------------------- */
-Int fits_read(Int, Int, Int, Int, Int, Int, Int, Int, Float);
+Int fits_read(Int, Int, Int, Int, Int, Int, Int, Int, float);
 Int lux_fits_read_general(Int narg, Int ps[], Int func)/* read fits files */
  /* status = fits_read(x, name, [h], [x2], [h2], [extvar_preamble]) */
 {
   Int	hsym = 0, mode, xhsym=0, xdsym =0;
-  Float	targetblank = 0.0;
+  float	targetblank = 0.0;
  /* uses fits_read, mode depends on arguments */
  /* mode mask uses bits to specify products to return
  1 bit: main header, 2 bit: main array, 4 bit: offset value
@@ -5642,7 +5642,7 @@ Int	anadecrunchrun8(Byte [], Byte [], Int, Int, Int),
   anadecrunch(Byte *, short [], Int, Int, Int),
   anadecrunch32(Byte *, Int [], Int, Int, Int);
 Int fits_read_compressed(Int mode, Int datasym, FILE *fp, Int headersym,
-			 Float targetblank)
+			 float targetblank)
 /* reads data from an LUX Rice-compressed FITS file open on <fp>. */
 /* <mode> determines which data to return: &1 -> header in <headersym>; */
 /* &2 -> data in <datasym>. */
@@ -5655,7 +5655,7 @@ Int fits_read_compressed(Int mode, Int datasym, FILE *fp, Int headersym,
 {
   Int	ncbytes, type, ndim, dims[MAX_DIMS], i, nblock, ok, slice, nx, ny,
     type0;
-  Float	bscale = 0.0, bzero = 0.0, blank = FLT_MAX, min, max;
+  float	bscale = 0.0, bzero = 0.0, blank = FLT_MAX, min, max;
   char	*block, usescrat, *curblock, runlength;
   pointer	p;
 
@@ -5839,7 +5839,7 @@ Int fits_read_compressed(Int mode, Int datasym, FILE *fp, Int headersym,
 	if (isIntegerType(type)) {
 	  if ((bscale && bscale != (Int) bscale)
 	      || (bzero != (Int) bzero))
-	    /* we must upgrade the data type from integer to Float */
+	    /* we must upgrade the data type from integer to float */
 	    type = LUX_FLOAT;
 	  else {
 	    if (!bscale)
@@ -5954,7 +5954,7 @@ Int fits_read_compressed(Int mode, Int datasym, FILE *fp, Int headersym,
 Int	lux_replace(Int, Int), swapb(char [], Int);
 void	swapd(char [], Int);
 Int fits_read(Int mode, Int dsym, Int namsym, Int hsym, Int offsetsym,
-	      Int xoffsetsym, Int xhsym, Int xdsym, Float targetblank)
+	      Int xoffsetsym, Int xhsym, Int xdsym, float targetblank)
  /* internal, read fits files */
  /* returns status as sym # for 0, 1, or 2 */
 /* Headers:
@@ -5975,11 +5975,11 @@ Int fits_read(Int mode, Int dsym, Int namsym, Int hsym, Int offsetsym,
   Int	xtension_found = 0, tfields, gcount, row_bytes,
     dim[MAX_DIMS], type0;
   Int	ext_stuff_malloc_flag = 0;
-  Float	bscale = 0.0, bzero = 0.0, blank = FLT_MAX, min, max;
+  float	bscale = 0.0, bzero = 0.0, blank = FLT_MAX, min, max;
   struct ext_params {
     Int	repeat;
     Int	type;
-    Double	scale, zero;
+    double	scale, zero;
     char	*lab;
   };
   struct ext_params *ext_stuff;
@@ -6193,7 +6193,7 @@ Int fits_read(Int mode, Int dsym, Int namsym, Int hsym, Int offsetsym,
       if (isIntegerType(type)) {
 	if ((bscale && bscale != (Int) bscale)
 	    || (bzero != (Int) bzero))
-	  /* we must upgrade the data type from integer to Float */
+	  /* we must upgrade the data type from integer to float */
 	  type = LUX_FLOAT;
 	else {
 	  if (!bscale)
@@ -6722,7 +6722,7 @@ Int lux_fits_write_general(Int narg, Int ps[], Int func)
   /* upon exiting this routine, so we have two choices: (1) make a copy */
   /* of the data and swap that, or (2) swap the original data, write it to */
   /* the FITS file, and then swap the original data again.  We choose to */
-  /* be frugal with memory, so we go for the Double swap.  LS 18nov99 */
+  /* be frugal with memory, so we go for the double swap.  LS 18nov99 */
 #if !WORDS_BIGENDIAN
   endian(data, array_size(ps[0])*lux_type_size[type], type);
 #endif

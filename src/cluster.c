@@ -36,8 +36,8 @@ void	randomu(Int seed, void *output, Int number, Int modulo);
 Int fptrCompare(const void *p1, const void *p2)
      /* auxilliary function for qsort call in lux_cluster */
 {
-  if (**(Double **) p1 < **(Double **) p2) return -1;
-  if (**(Double **) p1 > **(Double **) p2) return 1;
+  if (**(double **) p1 < **(double **) p2) return -1;
+  if (**(double **) p1 > **(double **) p2) return 1;
   return 0;
 }
 /*----------------------------------------------------------------*/
@@ -139,8 +139,8 @@ Int lux_cluster(Int narg, Int ps[])
 { 
   void	random_unique(Int seed, Int *output, Int number, Int modulo);
   Int	iq, nClusters, nVectorDim, nVectors, i, j, *index, size, dataIndex;
-  Float	*data, *dataPoint, n1, n2, f;
-  Double	s, t, dMin2, d, *center, *center2, *group1, *group2,
+  float	*data, *dataPoint, n1, n2, f;
+  double	s, t, dMin2, d, *center, *center2, *group1, *group2,
 	*dgv, *pdgv, *centroid, *fp, **findex, *firstCenter, *scrap,
 	*rmsptr;
   Int	nSample, *clusterSize, k, n, l, k2, m, dims[2], k0,
@@ -164,7 +164,7 @@ Int lux_cluster(Int narg, Int ps[])
   nDataDims = array_num_dims(iq); /* # data dimensions */
   nVectorDim = dataDims[0]; /* # dimensions in each data vector */
   nVectors = array_size(iq)/nVectorDim; /* # vectors */
-  data = (Float *) array_data(iq); /* data points */
+  data = (float *) array_data(iq); /* data points */
   if (narg >= 4 && ps[3]) {	/* SIZE */
     gotSize = 1;
     if (ps[3] >= NAMED_END)
@@ -212,7 +212,7 @@ Int lux_cluster(Int narg, Int ps[])
   k = nVectors;
   if (gotSample && k > nSample && nSample > 1)
     k = nSample;
-  size = sizeof(Double)*nVectorDim; /* size in bytes of one data point */
+  size = sizeof(double)*nVectorDim; /* size in bytes of one data point */
   switch (symbol_class(ps[1])) { /* CENTERS class */
     case LUX_SCALAR:		/* the scalar denotes the number of */
       /* clusters to find.  Get random sample of data vectors to act */
@@ -226,7 +226,7 @@ Int lux_cluster(Int narg, Int ps[])
       dims[0] = nVectorDim;	/* # dimensions per data point */
       dims[1] = nClusters;	/* # clusters */
       redef_array(ps[1], LUX_DOUBLE, 2, dims);
-      center = (Double *) array_data(ps[1]); /* cluster centers */
+      center = (double *) array_data(ps[1]); /* cluster centers */
 
       if (gotSample) {
 	if (nSample == 1) {
@@ -266,7 +266,7 @@ Int lux_cluster(Int narg, Int ps[])
       for (i = 0; i < nClusters; i++) /* copy selected cluster centers */
 	for (k = 0; k < nVectorDim; k++)
 	  center[k + i*nVectorDim]
-	    = (Double) data[k + clusterOtoC[i]*nVectorDim];
+	    = (double) data[k + clusterOtoC[i]*nVectorDim];
 
       free(clusterOtoC);
       break;
@@ -283,7 +283,7 @@ Int lux_cluster(Int narg, Int ps[])
 		     ps[1]);
       nClusters = array_size(ps[1])/nVectorDim; /* # clusters */
       lux_replace(ps[1], lux_double(1, &ps[1]));
-      center = (Double *) array_data(ps[1]); /* data centers */
+      center = (double *) array_data(ps[1]); /* data centers */
 
       if (gotSample) {
 	if (nSample == 1) {
@@ -395,10 +395,10 @@ Int lux_cluster(Int narg, Int ps[])
 
   /* 2. Determine direction of greatest variation (DGV) */
   /* use an algorithm of my own devising; basically a 2-cluster analysis */
-  dgv = malloc(nVectorDim*sizeof(Double));
+  dgv = malloc(nVectorDim*sizeof(double));
   if (!dgv)
     return cerror(ALLOC_ERR, 0);
-  center2 = malloc(nVectorDim*2*sizeof(Double));
+  center2 = malloc(nVectorDim*2*sizeof(double));
   if (!center2)
     return cerror(ALLOC_ERR, 0);
   /* the first and last cluster centers form the initial centers of */
@@ -470,8 +470,8 @@ Int lux_cluster(Int narg, Int ps[])
   /* 3. Calculate projections of initial cluster centers on DGV (PDGV) */
   /* it is advantageous to have a sentinel on each end of the PDGV array
      with extreme values.  These extreme values must be small enough
-     that their squares can be represented by a variable of type Double. */
-  pdgv = malloc((nClusters + 2)*sizeof(Double));
+     that their squares can be represented by a variable of type double. */
+  pdgv = malloc((nClusters + 2)*sizeof(double));
   if (!pdgv)
     return cerror(ALLOC_ERR, 0);
   pdgv[0] = -0.9*sqrt(DBL_MAX);	/* sentinel */
@@ -486,18 +486,18 @@ Int lux_cluster(Int narg, Int ps[])
 
   nChanged = 1;			/* non-zero to get iteration going */
   /* 4. Order cluster centers according to their PDGV */
-  findex = malloc(nClusters*sizeof(Double *));
-  center2 = malloc(nClusters*nVectorDim*sizeof(Double));
+  findex = malloc(nClusters*sizeof(double *));
+  center2 = malloc(nClusters*nVectorDim*sizeof(double));
   if (!findex || !center2)
     return cerror(ALLOC_ERR, 0);
   clusterSize = NULL;
   while (nChanged) {
     for (i = 0; i < nClusters; i++)
       findex[i] = pdgv + i;	/* current order */
-    qsort(findex, nClusters, sizeof(Double *), fptrCompare); /* sort */
+    qsort(findex, nClusters, sizeof(double *), fptrCompare); /* sort */
     for (i = 0; i < nClusters; i++) /* reorder PDGVs */
       center2[i] = *findex[i];
-    memcpy(pdgv, center2, nClusters*sizeof(Double));
+    memcpy(pdgv, center2, nClusters*sizeof(double));
     for (i = 0; i < nClusters; i++) /* reorder cluster centers */
       memcpy(center2 + i*nVectorDim, center + (findex[i] - pdgv)*nVectorDim,
 	     size);
@@ -509,7 +509,7 @@ Int lux_cluster(Int narg, Int ps[])
     nChanged = 0;
     if (!gotCenter) {		/* we took a random sample */
       for (i = 1; i < nClusters; i++)
-	if (pdgv[i] == pdgv[i - 1]) { /* we may have a Double */
+	if (pdgv[i] == pdgv[i - 1]) { /* we may have a double */
 	  if (!nChanged) {	/* get some random indices */
 	    clusterSize = malloc(10*sizeof(Int));
 	    if (!clusterSize)
@@ -519,13 +519,13 @@ Int lux_cluster(Int narg, Int ps[])
 	    randomu(0, clusterSize, 10, nVectors);
 	  for (k = 0; k < nVectorDim; k++)
 	    center[k + i*nVectorDim]
-	      = (Double) data[k + clusterSize[nChanged % 10]*nVectorDim];
+	      = (double) data[k + clusterSize[nChanged % 10]*nVectorDim];
 	  pdgv[i] = 0.0;
 	  for (j = 0; j < nVectorDim; j++)
 	    pdgv[i] += center[j + i*nVectorDim]*dgv[j];
 	  nChanged++; }
       if (nChanged && vocal)
-	printf("CLUSTER - got %1d new centers because of Double data points\n",
+	printf("CLUSTER - got %1d new centers because of double data points\n",
 	       nChanged);
     }
   } /* end while (nChanged) */
@@ -591,7 +591,7 @@ Int lux_cluster(Int narg, Int ps[])
 
   if (phantom) {		/* we added phantom members, so now */
     /* we must remember their positions so we can remove them afterwards */
-    firstCenter = malloc(nClusters*nVectorDim*sizeof(Double));
+    firstCenter = malloc(nClusters*nVectorDim*sizeof(double));
     if (!firstCenter)
       return cerror(ALLOC_ERR, 0);
     for (i = 0; i < nClusters; i++)
@@ -603,13 +603,13 @@ Int lux_cluster(Int narg, Int ps[])
   if (update)			/* we're updating, so centroid = center */
     centroid = center;
   else {			/* not updating, so separate centroids */
-    centroid = malloc(nClusters*nVectorDim*sizeof(Double));
+    centroid = malloc(nClusters*nVectorDim*sizeof(double));
     if (!centroid)
       return cerror(ALLOC_ERR, 0);
     memcpy(centroid, center, nClusters*size);
   }
 
-  scrap = malloc(nVectorDim*sizeof(Double)); /* scrap space */
+  scrap = malloc(nVectorDim*sizeof(double)); /* scrap space */
 
   /* we want to count the number of changed points and keep track of */
   /* which clusters change */
@@ -660,7 +660,7 @@ Int lux_cluster(Int narg, Int ps[])
 	/* 6. calculate the PDGV of the current data point */
 	s = 0.0;
 	for (j = 0; j < nVectorDim; j++)
-	  s += dgv[j]*((Double) dataPoint[j]); /* s = PDGV */
+	  s += dgv[j]*((double) dataPoint[j]); /* s = PDGV */
 	
 	/* 7. Find the closest cluster center according to PDGVs */
 	/* because of the sentinels at both ends of the PDGV array we
@@ -678,7 +678,7 @@ Int lux_cluster(Int narg, Int ps[])
 	/* 8. Calculate total distance to that cluster center */
 	dMin2 = 0.0;
 	for (l = 0; l < nVectorDim; l++) {
-	  t = ((Double) dataPoint[l] - center[l + k*nVectorDim]);
+	  t = ((double) dataPoint[l] - center[l + k*nVectorDim]);
 	  dMin2 += t*t;
 	}
 
@@ -687,7 +687,7 @@ Int lux_cluster(Int narg, Int ps[])
 	if (nIter == 1 && ordered && k != k0) { /* try the previous point */
 	  d = 0.0;
 	  for (l = 0; l < nVectorDim; l++) {
-	    t = ((Double) dataPoint[l] - center[l + k0*nVectorDim]);
+	    t = ((double) dataPoint[l] - center[l + k0*nVectorDim]);
 	    d += t*t;
 	  }
 	  if (d < dMin2) {
@@ -700,7 +700,7 @@ Int lux_cluster(Int narg, Int ps[])
 	  k0 = clusterOtoC[curO];
 	  d = 0.0;
 	  for (l = 0; l < nVectorDim; l++) {
-	    t = ((Double) dataPoint[l] - center[l + k0*nVectorDim]);
+	    t = ((double) dataPoint[l] - center[l + k0*nVectorDim]);
 	    d += t*t;
 	  }
 	  if (d < dMin2) {
@@ -723,7 +723,7 @@ Int lux_cluster(Int narg, Int ps[])
 	  /* k - 1, and keep updating the admissibility.  (dMin2 = dMin^2)*/
 	  d = 0.0;		/* initialize distance */
 	  for (m = 0; m < nVectorDim; m++) {
-	    t = ((Double) dataPoint[m] - center[m + l*nVectorDim]);
+	    t = ((double) dataPoint[m] - center[m + l*nVectorDim]);
 	    d += t*t;
 	  }
 
@@ -744,7 +744,7 @@ Int lux_cluster(Int narg, Int ps[])
 	  /* k + 1, and keep updating the admissibility. */
 	  d = 0.0;		/* initialize distance */
 	  for (m = 0; m < nVectorDim; m++) {
-	    t = ((Double) dataPoint[m] - center[m + l*nVectorDim]);
+	    t = ((double) dataPoint[m] - center[m + l*nVectorDim]);
 	    d += t*t;
 	  }
 
@@ -784,7 +784,7 @@ Int lux_cluster(Int narg, Int ps[])
 	  l = clusterSize[j]--;
 	  for (m = 0; m < nVectorDim; m++) /* update old centroid */
 	    centroid[m + j*nVectorDim]
-	      = (centroid[m + j*nVectorDim]*l - (Double) dataPoint[m])/(l - 1);
+	      = (centroid[m + j*nVectorDim]*l - (double) dataPoint[m])/(l - 1);
 	  if (update) {
 	    s = 0.0;		/* recalculate PDGVs */
 	    for (m = 0; m < nVectorDim; m++)
@@ -797,7 +797,7 @@ Int lux_cluster(Int narg, Int ps[])
 	      k2--;
 	    if (k2 < j) {	/* reorder below j */
 	      n = sizeof(Int)*(j - k2);
-	      memmove(pdgv + k2 + 1, pdgv + k2, sizeof(Double)*(j - k2));
+	      memmove(pdgv + k2 + 1, pdgv + k2, sizeof(double)*(j - k2));
 	      pdgv[k2] = s;
 	      k0 = clusterSize[j];
 	      memmove(clusterSize + k2 + 1, clusterSize + k2, n);
@@ -824,7 +824,7 @@ Int lux_cluster(Int narg, Int ps[])
 		k2++;
 	      if (k2 > j) {	/* reorder above j */
 		n = sizeof(Int)*(k2 - j);
-		memmove(pdgv + j, pdgv + j + 1, sizeof(Double)*(k2 - j));
+		memmove(pdgv + j, pdgv + j + 1, sizeof(double)*(k2 - j));
 		pdgv[k2] = s;
 		k0 = clusterSize[j];
 		memmove(clusterSize + j, clusterSize + j + 1, n);
@@ -855,7 +855,7 @@ Int lux_cluster(Int narg, Int ps[])
 	  l = clusterSize[k]++;	/* add point to receiving cluster */
 	  for (m = 0; m < nVectorDim; m++) /* update centroid */
 	    centroid[m + k*nVectorDim]
-	      = (centroid[m + k*nVectorDim]*l + (Double) dataPoint[m])/(l + 1);
+	      = (centroid[m + k*nVectorDim]*l + (double) dataPoint[m])/(l + 1);
 	  if (update) {
 	    s = 0.0;		/* recalculate PDGV */
 	    for (m = 0; m < nVectorDim; m++)
@@ -868,7 +868,7 @@ Int lux_cluster(Int narg, Int ps[])
 	      k2--;
 	    if (k2 < k) {	/* reorder below k */
 	      n = sizeof(Int)*(k - k2);
-	      memmove(pdgv + k2 + 1, pdgv + k2, sizeof(Double)*(k - k2));
+	      memmove(pdgv + k2 + 1, pdgv + k2, sizeof(double)*(k - k2));
 	      pdgv[k2] = s;
 	      k0 = clusterSize[k];
 	      memmove(clusterSize + k2 + 1, clusterSize + k2, n);
@@ -890,7 +890,7 @@ Int lux_cluster(Int narg, Int ps[])
 		k2++;
 	      if (k2 > k) {	/* reorder above k */
 		n = sizeof(Int)*(k2 - k);
-		memmove(pdgv + k, pdgv + k + 1, sizeof(Double)*(k2 - k));
+		memmove(pdgv + k, pdgv + k + 1, sizeof(double)*(k2 - k));
 		pdgv[k2] = s;
 		k0 = clusterSize[k];
 		memmove(clusterSize + k, clusterSize + k + 1, n);
@@ -933,7 +933,7 @@ Int lux_cluster(Int narg, Int ps[])
 
     if (record && iterate) {
       for (i = 0; i < nClusters; i++)
-	fwrite(centroid + clusterOtoC[i], sizeof(Double), nVectorDim, file);
+	fwrite(centroid + clusterOtoC[i], sizeof(double), nVectorDim, file);
       for (i = 0; i < nClusters; i++)
 	fwrite(clusterSize + clusterOtoC[i], sizeof(Int), 1, file);
     }
@@ -962,18 +962,18 @@ Int lux_cluster(Int narg, Int ps[])
 	    k = 1; 		/* need to reorder */
 	}
 	if (k) {		/* reorder */
-	  findex = malloc(nClusters*sizeof(Double *));
+	  findex = malloc(nClusters*sizeof(double *));
 	  if (!findex)
 	    return cerror(ALLOC_ERR, 0);
 	  for (i = 0; i < nClusters; i++)
 	    findex[i] = pdgv + i; /* current order */
-	  qsort(findex, nClusters, sizeof(Double *), fptrCompare); /* sort */
-	  center2 = malloc(nClusters*nVectorDim*sizeof(Double));
+	  qsort(findex, nClusters, sizeof(double *), fptrCompare); /* sort */
+	  center2 = malloc(nClusters*nVectorDim*sizeof(double));
 	  if (!center2)
 	    return cerror(ALLOC_ERR, 0);
 	  for (i = 0; i < nClusters; i++) /* reorder PDGVs */
 	    center2[i] = *findex[i];
-	  memcpy(pdgv, center2, nClusters*sizeof(Double));
+	  memcpy(pdgv, center2, nClusters*sizeof(double));
 	  if (center != centroid) {
 	    for (i = 0; i < nClusters; i++) /* reorder cluster centers */
 	      memcpy(center2 + i*nVectorDim,
@@ -1015,7 +1015,7 @@ Int lux_cluster(Int narg, Int ps[])
       printf("CLUSTER - cycle %1d, reclustered %1d points in %1d clusters\n",
 	     nIter, nChanged, j);
       printf("distance calculations/element: %g (total %g)\n",
-	     (Float) nDistCal/nSample, (Float) allDistCal/nSample);
+	     (float) nDistCal/nSample, (float) allDistCal/nSample);
     }
     
     nDistCal = 0;
@@ -1043,7 +1043,7 @@ Int lux_cluster(Int narg, Int ps[])
     fclose(file);
 
   /* restore the centers to their original order */
-  center2 = malloc(nClusters*nVectorDim*sizeof(Double));
+  center2 = malloc(nClusters*nVectorDim*sizeof(double));
   if (!center2)
     return cerror(ALLOC_ERR, 0);
   if (center != centroid && update) { /* updating */

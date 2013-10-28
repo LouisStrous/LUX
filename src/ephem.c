@@ -27,18 +27,18 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <math.h>
 #include "action.h"
 
- typedef Double TIME;
+ typedef double TIME;
  static	Int	m[]  =  {31,28,31,30,31,30,31,31,30,31,30,31};
- static	Float	rq = 57.2957795;
- static	Float	pi = 3.141592654, b, r, d, p;
+ static	float	rq = 57.2957795;
+ static	float	pi = 3.141592654, b, r, d, p;
  static	Int	choice;
  /*--------------------------------------------------------------------------*/
  /* this section has a copy of part of Bogart's time routines, we want to be
  able to get UTC time strings from TAI in seconds and the reverse */
  static struct date_time {
-    Double second;
-    Double julday;
-    Double delta;
+    double second;
+    double julday;
+    double delta;
     Int year;
     Int month;
     Int dofm;
@@ -49,7 +49,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
     Int ut_flag;
     char zone[8];
  } dattim;
- Double	time_tai,  last_tai = 0.0;
+ double	time_tai,  last_tai = 0.0;
 #define JD_EPOCH        (2443144.5)
 #define EPOCH_2000_01_01        ( 725760000.0)
 #define EPOCH_1601_01_01        (-11865398400.0)
@@ -66,7 +66,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #define SEC_GR4C        (12622780800.0)                       /*  146097 d  */
 #define SEC_JL4C        (12623040000.0)                       /*  146100 d  */
  static Int molen[] = {31, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
- static Double ut_leap_time[] = {
+ static double ut_leap_time[] = {
  -536543999.0,                                                /*  1960.01.01  */
  -457747198.0,                                                /*  1962.07.01  */
  -394588797.0,                                                /*  1964.07.01  */
@@ -135,7 +135,7 @@ TIME tai_adjustment (TIME t)
   }
  /* -------------------------------------------------------------*/
 void date_from_epoch_time (TIME t) {
-  Double century, four_year, one_year;
+  double century, four_year, one_year;
   Int year, month, day;
 
   if (t < EPOCH_1582_10_15) {
@@ -412,12 +412,12 @@ Int lux_sun_p(narg,ps)				/* sun_p function */
  return	ephem_setup(narg,ps);
  }
  /*--------------------------------------------------------------------------*/
-Int	execute_error(Int), sephem(Int, Float);
+Int	execute_error(Int), sephem(Int, float);
 Int ephem_setup(narg,ps)
  Int	narg, ps[];
  {
  Int	nsym, result_sym, j, nd, n, iy;
- Float	day;
+ float	day;
  struct	ahead	*h;
  register union	types_ptr q1,q3;
 
@@ -439,7 +439,7 @@ Int ephem_setup(narg,ps)
  n = 1; for (j=0;j<nd;j++) n *= h->dims[j];	/* # of elements for nsym */
  result_sym = array_clone(nsym,3);
  h = (struct ahead *) sym[result_sym].spec.array.ptr;
- q3.f = (Float *) ((char *)h + sizeof(struct ahead));
+ q3.f = (float *) ((char *)h + sizeof(struct ahead));
  break;
  default:	return execute_error(32);
  }
@@ -488,16 +488,16 @@ Int julian(iy,im,id)
  c         jd  -  julian day
  */
  {
- Double	b, did, a;
+ double	b, did, a;
  Int	ii, iyy, ij;
  iyy  =  1900. + iy;
  if (im <= 2) { iyy = iyy - 1;	im = im+12; }
- a = ((Float) iyy)/100.;	b = 2.-a+a/4.;	did = id;
- ii = 365.25 * (Float) iyy;	ij = 30.6001* (Float) (im+1);
+ a = ((float) iyy)/100.;	b = 2.-a+a/4.;	did = id;
+ ii = 365.25 * (float) iyy;	ij = 30.6001* (float) (im+1);
  return	(Int) (ii + ij + b + 1720994.5 + did);
  }
  /*--------------------------------------------------------------------------*/
-Int sephem(Int ny, Float day)
+Int sephem(Int ny, float day)
  {
  /*	returns solar b angle (in radians) and solar radius (in arcsec)
 	 input is year and day of year (including fraction of day)*/
@@ -506,8 +506,8 @@ Int sephem(Int ny, Float day)
    fraction of julian centuries elapsed since 1900.05 (noon 1st of january)
    =  j.d.2415020.0) 
  */
- Double	sday, jd, h, hh, ehel, eks, sml, anm, cc, el, sl, san, av, om, ba;
- Double	year, eincl, t;
+ double	sday, jd, h, hh, ehel, eks, sml, anm, cc, el, sl, san, av, om, ba;
+ double	year, eincl, t;
  Int	id, im, idoy, iy;
  /* the day is done as a fp value such that the first day is 0 - 0.9999999,
  this means that to use the julian date function, we have to add 1,
@@ -515,7 +515,7 @@ Int sephem(Int ny, Float day)
  idoy = (Int) (day+1.0);	iy = ny;	sday = (day- (Int) day);
  admo(idoy, iy, &id, &im);
  /* printf("iy,im,id = %d %d %d\n",iy,im,id); */
- jd = (Double) julian(iy,im,id)+0.5;
+ jd = (double) julian(iy,im,id)+0.5;
  h = (jd + sday - 2415020.0)/36525.0;	hh = h * h;
  /*printf("sday, jd, h0, h, hh = %f, %10.1f %g %g %g\n",sday, jd, h0, h, hh); */
 	 /* newcomb's formulae. (page 98 explanatory suppl. to the ephemeris)

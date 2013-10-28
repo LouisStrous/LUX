@@ -37,7 +37,7 @@ void shell_s(Int n, char *arr[])
   Int	nn,m,j,i,lognb2;
   char	*t;
 
-  lognb2 = (log((Double) n)*ALN2I + TINY);
+  lognb2 = (log((double) n)*ALN2I + TINY);
   m = n;
   for (nn = 1; nn <= lognb2; nn++) {
     m >>= 1;
@@ -53,12 +53,12 @@ void shell_s(Int n, char *arr[])
   }
 }
 /*------------------------------------------------------------------------- */
-void shell_f(Int n, Float arr[])
+void shell_f(Int n, float arr[])
 {
   Int	nn,m,j,i,lognb2;
-  Float	t;
+  float	t;
 
-  lognb2 = (log((Double) n)*ALN2I + TINY);
+  lognb2 = (log((double) n)*ALN2I + TINY);
   m = n;
   for (nn = 1; nn <= lognb2; nn++) {
     m >>= 1;
@@ -79,7 +79,7 @@ void shell_b(Int n, Byte arr[])
   Int	nn,m,j,i,lognb2;
   Byte	t;
 
-  lognb2 = (log((Double) n)*ALN2I + TINY);
+  lognb2 = (log((double) n)*ALN2I + TINY);
   m = n;
   for (nn = 1; nn <= lognb2; nn++) {
     m >>= 1;
@@ -100,7 +100,7 @@ void shell_l(Int n, Int arr[])
  Int	nn,m,j,i,lognb2;
  Int	t;
 
- lognb2 = (log((Double) n)*ALN2I + TINY);
+ lognb2 = (log((double) n)*ALN2I + TINY);
  m = n;
  for (nn = 1; nn <= lognb2; nn++) {
    m >>= 1;
@@ -121,7 +121,7 @@ void shell_w(Int n, Word arr[])
   Int	nn,m,j,i,lognb2;
   Word	t;
 
-  lognb2 = (log((Double) n)*ALN2I + TINY);
+  lognb2 = (log((double) n)*ALN2I + TINY);
   m = n;
   for (nn = 1; nn <= lognb2; nn++) {
     m >>= 1;
@@ -137,12 +137,12 @@ void shell_w(Int n, Word arr[])
   }
 }
 /*------------------------------------------------------------------------- */
-void shell_d(Int n, Double arr[])
+void shell_d(Int n, double arr[])
 {
   Int	nn,m,j,i,lognb2;
-  Double	t;
+  double	t;
 
-  lognb2 = (log((Double) n)*ALN2I + TINY);
+  lognb2 = (log((double) n)*ALN2I + TINY);
   m = n;
   for (nn = 1; nn <= lognb2; nn++) {
     m >>= 1;
@@ -191,10 +191,10 @@ void sort_s(Int n, char *ra[])
   }
 }
 /*------------------------------------------------------------------------- */
-void sort_f(Int n, Float ra[])
+void sort_f(Int n, float ra[])
 {
   Int	l,j,ir,i;
-  Float	rra;
+  float	rra;
 
   l = (n/2);
   ir = n-1;
@@ -323,10 +323,10 @@ void sort_l(Int n, Int ra[])
   }
 }
 /*------------------------------------------------------------------------ */
-void sort_d(Int n, Double ra[])
+void sort_d(Int n, double ra[])
 {
   Int	l,j,ir,i;
-  Double rra;
+  double rra;
 
   l = (n/2);
   ir = n-1;
@@ -391,10 +391,10 @@ void indexx_s(Int n, char *ra[], Int indx[])
   }
 }
 /*------------------------------------------------------------------------- */
-void indexx_d(Int n, Double ra[], Int indx[])
+void indexx_d(Int n, double ra[], Int indx[])
 {
   Int	l,j,ir,i,indxt;
-  Double	q;
+  double	q;
  
   for (i = 0; i < n; i++)
     indx[i] = i;
@@ -531,10 +531,10 @@ void indexx_l(Int n, Int ra[], Int indx[])
   }
 }
 /*------------------------------------------------------------------------- */
-void indexx_f(Int n, Float ra[], Int indx[])
+void indexx_f(Int n, float ra[], Int indx[])
 {
   Int	l,j,ir,i,indxt;
-  Float	q;
+  float	q;
   
   for (i = 0; i < n; i++)
     indx[i] = i;
@@ -566,10 +566,10 @@ void indexx_f(Int n, Float ra[], Int indx[])
   }
 }
 /*------------------------------------------------------------------------- */
-void indexxr_f(Int n, Float ra[], Int indx[])
+void indexxr_f(Int n, float ra[], Int indx[])
 {
   Int	l,j,ir,i,indxt;
-  Float	q;
+  float	q;
   
   for (i = 0; i < n; i++)
     indx[i] = i;
@@ -601,10 +601,10 @@ void indexxr_f(Int n, Float ra[], Int indx[])
   }
 }
 /*------------------------------------------------------------------------- */
-void indexxr_d(Int n, Double ra[], Int indx[])
+void indexxr_d(Int n, double ra[], Int indx[])
 {
   Int	l,j,ir,i,indxt;
-  Double q;
+  double q;
   
   for (i = 0; i < n; i++)
     indx[i] = i;

@@ -58,8 +58,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
  extern	char *find_sym_name();
  extern	Int	lux_type_size[];
  extern	Int	vfix_top, num_lux_subr, next_user_subr_num;
- extern	Float	float_arg();
- extern	Double	double_arg();
+ extern	float	float_arg();
+ extern	double	double_arg();
  static const Int extend_test[16] =   /* entry n is 2**(n-1) */
   { 0, 0x0001, 0x0002, 0x0004, 0x0008, 0x0010, 0x0020, 0x0040, 0x0080,
     0x0100, 0x0200, 0x0400, 0x0800, 0x1000, 0x2000, 0x4000 };
@@ -96,9 +96,9 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
   53, 60, 61, 54, 47, 55, 62, 63
  };
 
- static Float aansf[8] = { 1.0, 1.387039845, 1.306562965, 1.175875602,
+ static float aansf[8] = { 1.0, 1.387039845, 1.306562965, 1.175875602,
 	   1.0, 0.785694958, 0.541196100, 0.275899379};
- static Float ws[64], fqtbl[64], bias = 2048.5;
+ static float ws[64], fqtbl[64], bias = 2048.5;
 /* short	*dct = NULL; */
  char	dct_area[2400000];
  Int	del_indices[2048];
@@ -425,7 +425,7 @@ static Int rdct(image, nx, ny, nblocks, qtable, dct_array)
  for (i = 0; i < 64; i++) {
    row = zag[i] >> 3;
    col = zag[i] & 7;
-   fqtbl[i] = (Float) qtable[i] * aansf[row] * aansf[col] * 0.125;
+   fqtbl[i] = (float) qtable[i] * aansf[row] * aansf[col] * 0.125;
    }
  n = nx*ny/64;	/* number of cells */
  /* check consistency of nx, ny, and nblocks */
@@ -440,28 +440,28 @@ static Int rdct(image, nx, ny, nblocks, qtable, dct_array)
  start = image + iq;
  /* make a fp copy of this cell */
  /* pf = dctfp;	pff = dctstart; */
- /* for (j=0;j < 64; j++)  *pf++ = (Float) *pff++; */
+ /* for (j=0;j < 64; j++)  *pf++ = (float) *pff++; */
 
  {
  Int i;
- Float tmp0, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7;
- Float tmp10, tmp11, tmp12, tmp13;
- Float z5, z11, z13, z10, z12;
+ float tmp0, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7;
+ float tmp10, tmp11, tmp12, tmp13;
+ float z5, z11, z13, z10, z12;
 
  /* first de-zag and de-quantize */
- { register Float *wsptr;
+ { register float *wsptr;
   short	 *dctptr;
   wsptr = ws;	dctptr = dctstart;
   for (i=0; i < 64; i++) {
-  wsptr[zag[i]] = (Float) *dctptr++ * fqtbl[i];
+  wsptr[zag[i]] = (float) *dctptr++ * fqtbl[i];
   }
  }
   /* Pass 1: process columns. */
   /* we don't check for columns of zeroes since this usually uses full
   precision */
   {
-  register Float *wsptr = ws;
-  /* register Float *fqtptr = fqtbl; */
+  register float *wsptr = ws;
+  /* register float *fqtptr = fqtbl; */
   Int	nq = 8;
   while (nq--) {
     tmp0 = wsptr[0];
@@ -518,7 +518,7 @@ static Int rdct(image, nx, ny, nblocks, qtable, dct_array)
 
   /* Pass 2: process rows. */
   {
-  register Float *wsptr;
+  register float *wsptr;
   register short *elemptr;
   Int	nq = 8;
   wsptr = ws;	elemptr = start;
@@ -595,8 +595,8 @@ Int trace_scan(x, limit)
  Int    GapCount, missed, lq, dcount, gcount, next_gap, dq, count_prior;
  Int    gapsize[MAX_GAPS], gaprollover[MAX_GAPS];
  Int    gapblock[MAX_GAPS], gaprs[MAX_GAPS], gapdel[MAX_GAPS];
- Float	gap_rollf[MAX_GAPS];
- Float	del_mean, gapdel_mean, fq, gsum, cfac, delq, dismerit1, dismerit2;
+ float	gap_rollf[MAX_GAPS];
+ float	del_mean, gapdel_mean, fq, gsum, cfac, delq, dismerit1, dismerit2;
  Int	del_total, gapdel_total, gap_guess, del_prior, missed_total;
  n_restarts_found = n_unexpected = 0;
  /* for TRACE the restart_interval is always 8 but in general it could be
@@ -757,7 +757,7 @@ Int trace_scan(x, limit)
 	   /* this is a known gap */
 	   gapdel_total += dq;
 	   /* gapdel[gcount] = dq;
-	   //if (count_prior) gap_del_prior[gcount] = (Float) del_prior/count_prior;
+	   //if (count_prior) gap_del_prior[gcount] = (float) del_prior/count_prior;
 	   //   else gap_del_prior[gcount] = 0.0;
 	   //del_prior = 0;	count_prior = 0;
 	   //printf("del at gap %d = %d, mean del prior = %6.1f\n", gcount, dq,
@@ -774,10 +774,10 @@ Int trace_scan(x, limit)
 	 dq = del_indices[n_restarts_found-1] = pt - start_indices[n_restarts_found-1];
 	 gapdel_total =+ dq;
 	} else del_indices[n_restarts_found-1] = 0;
-	del_mean = (Float) del_total/dcount;
+	del_mean = (float) del_total/dcount;
 	/* printf("del_mean = %6.1f, intervals used = %d\n", del_mean, dcount); */
 	/* compute mean del for the missing areas */
-	gapdel_mean = (Float) gapdel_total/(missed_total);
+	gapdel_mean = (float) gapdel_total/(missed_total);
 	/* printf("gapdel_mean = %6.1f\n", gapdel_mean); */
 
 	/* scan for large values in del_indices that might be hidden gaps */
@@ -791,7 +791,7 @@ Int trace_scan(x, limit)
 	   /* this is a known gap, mark with a negative del */
 	   del_indices[i] = -del_indices[i];
 	   /* printf("large del = %d at %d, factor = %6.1f", dq, i,
-	//	(Float) dq/del_mean);
+	//	(float) dq/del_mean);
 	//printf("   known gap # %d\n", gcount); */
 	   gcount++;
 	   if (gcount < GapCount)  next_gap = gaprs[gcount]; else next_gap = -1;
@@ -800,7 +800,7 @@ Int trace_scan(x, limit)
 	 k +=  restart_interval;
 	 if (dq > 1010 && dq > 5.*del_mean) {
 	   /* printf("large del = %d at %d, factor = %6.1f", dq, i,
-	   //	(Float) dq/del_mean );
+	   //	(float) dq/del_mean );
 	   //printf("   potential hidden gap\n"); */
 	   del_indices[i] = -del_indices[i]; /* mark it */
 	   /* insert this into the list of gaps, gapcount is the next gap and
@@ -823,7 +823,7 @@ Int trace_scan(x, limit)
 	   }
 	 }
 	}
-	gapdel_mean = (Float) gapdel_total/(missed_total);
+	gapdel_mean = (float) gapdel_total/(missed_total);
 	/* printf("gapdel_mean = %6.1f\n", gapdel_mean); */
 	
 	printf("found %d gaps\n", GapCount);
@@ -853,13 +853,13 @@ Int trace_scan(x, limit)
 	 }
 	 /* if we have something, use it, else use gapdel_mean */
 	 /* printf("final: del_prior, count_prior %d %d\n",del_prior, count_prior); */
-	 if (count_prior>0) delq = (Float) del_prior/count_prior;
+	 if (count_prior>0) delq = (float) del_prior/count_prior;
 	 	else delq = gapdel_mean;
 	 /* printf("delq = %6.1f , gapdel_mean = %6.1f\n", delq, gapdel_mean);
 	 //if (gap_del_prior[i] > 0.0) delq=gap_del_prior[i]; else delq=gapdel_mean;
 	 //fq = gapdel[i]/delq - gapsize[i];
 	 //printf("dq, delq, gapsize[i] = %d, %6.1f, %d\n", dq, delq, gapsize[i]); */
-	 fq = (Float) dq/delq - (Float) gapsize[i];
+	 fq = (float) dq/delq - (float) gapsize[i];
 	 /* printf("fq = %6.1f\n", fq); */
 	 if (fq >= 0) {
 	 gap_rollf[i] = fq;	/* actually 8 times the rollover */
@@ -874,7 +874,7 @@ Int trace_scan(x, limit)
 	    //printf("rollover predict = %6.1f for gap %d\n", 0.125*gap_rollf[i],i); */
 	}
 
-	cfac = (Float) missed/gsum;
+	cfac = (float) missed/gsum;
 	/* printf("cfac = %7.3f\n", cfac); */
 	gap_guess = 0;
 
@@ -931,7 +931,7 @@ Int trace_scan(x, limit)
 	  short *source;
 	  Int	mode, istart, icq;
 	  Int	i1,i2,i3,i4,iq,j1;
-	  Float	s1, s2;
+	  float	s1, s2;
 	  short	v1,v2,v3,v4;
 	  istart = gapblock[i];
 	  /* printf("initial istart = %d, istart*64 = %d\n", istart, istart*64); */
@@ -958,12 +958,12 @@ Int trace_scan(x, limit)
 	  v1 = *(source + i1);
 	  v2 = *(source + i2);
 	  v3 = *(source + i3);
-	  /* d1 += (Float) ABS(v1 - v2);
-	     //d2 += (Float) ABS(v3 - v4); */
+	  /* d1 += (float) ABS(v1 - v2);
+	     //d2 += (float) ABS(v3 - v4); */
 	   s1 += v1 + v2;
 	   s2 += v3 + v4;
-	   /* r1 += ((Float) ABS(v1 - v2))/(Float)(v1 + v2);
-	   //r2 += ((Float) ABS(v3 - v4))/(Float)(v3 + v4);
+	   /* r1 += ((float) ABS(v1 - v2))/(float)(v1 + v2);
+	   //r2 += ((float) ABS(v3 - v4))/(float)(v3 + v4);
 	   //printf("i1, i2 = %#x, %#x, values=%d, %d, dif=%d, sum=%d\n",i1+iq,i2+iq,v1,v2, v1-v2,v1+v2);
 	   //printf("i3, i4 = %#x, %#x, values=%d, %d, dif=%d, sum=%d\n",i3+iq,i4+iq,v3,v4, v3-v4,v3+v4); */
 	   }
@@ -986,10 +986,10 @@ Int trace_scan(x, limit)
 	    if (i1 == 0) { j1 = 1;}
 	    else if (i2 == 0) { j1 = -1;}
 	    else {	/* normal case, consider merit of two possibilities */
-	    dismerit1 = ABS((Float) i1 + 1.0 - gap_rollf[i])+
-	    	ABS((Float) i2 - 1.0 - gap_rollf[i+1]);
-	    dismerit2 = ABS((Float) i1 - 1.0 - gap_rollf[i])+
-	    	ABS((Float) i2 + 1.0 - gap_rollf[i+1]);
+	    dismerit1 = ABS((float) i1 + 1.0 - gap_rollf[i])+
+	    	ABS((float) i2 - 1.0 - gap_rollf[i+1]);
+	    dismerit2 = ABS((float) i1 - 1.0 - gap_rollf[i])+
+	    	ABS((float) i2 + 1.0 - gap_rollf[i+1]);
 		if (dismerit1 < dismerit2) { j1 = 1; } else { j1 = -1; }
 	   }
 	    /* printf("re-align, j1 = %d\n", j1); */
@@ -1003,10 +1003,10 @@ Int trace_scan(x, limit)
 	    if (i1 == 0) { j1 = 1;}
 	    else if (i2 == 0) { j1 = -1;}
 	    else {	/* normal case, consider merit of two possibilities */
-	    dismerit1 = ABS((Float) i1 + 1.0 - gap_rollf[i])+
-	    	ABS((Float) i2 - 1.0 - gap_rollf[i+1]);
-	    dismerit2 = ABS((Float) i1 - 1.0 - gap_rollf[i])+
-	    	ABS((Float) i2 + 1.0 - gap_rollf[i+1]);
+	    dismerit1 = ABS((float) i1 + 1.0 - gap_rollf[i])+
+	    	ABS((float) i2 - 1.0 - gap_rollf[i+1]);
+	    dismerit2 = ABS((float) i1 - 1.0 - gap_rollf[i])+
+	    	ABS((float) i2 + 1.0 - gap_rollf[i+1]);
 		if (dismerit1 < dismerit2) { j1 = 1; } else { j1 = -1; }
 	   }
 	    /* printf("re-align, j1 = %d\n", j1); */

@@ -32,18 +32,18 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 
 #define	VSPACE	14.0
 #define	SFAC	0.70
-Int	tkplot(Float x, Float y, Int lineStyle, Int symStyle), fontchange(Int),
+Int	tkplot(float x, float y, Int lineStyle, Int symStyle), fontchange(Int),
   draw(Int);
 void	swapl(char *, Int);
-extern	Float	xfac, yfac;
+extern	float	xfac, yfac;
 extern	char	*expand_name(char *, char *);
 Int	hflag, penDown;
 extern Int	ifont;
 Byte	*fontbase;
 Byte	*fontptr[40];
-Float	callig_xb, callig_yb, theta = 0.0, size = 1.0, dx, dy, sxb, syb;
-Float	st, ct, x, y, nct, nst, angle, callig_ratio = 1.0;
-Float	float_arg(Int);
+float	callig_xb, callig_yb, theta = 0.0, size = 1.0, dx, dy, sxb, syb;
+float	st, ct, x, y, nct, nst, angle, callig_ratio = 1.0;
+float	float_arg(Int);
 Int	calligCoordSys, current_font = 1;
 /*------------------------------------------------------------------------- */
 Int lux_callig(Int narg, Int ps[])
@@ -140,7 +140,7 @@ void drawlatex(char **text)
   static char *member = "ABVDEGCIJKLMXOUPWQRSHTNFab0B3vU1OodV5egEcbueii0jkl4lGmnJxodxup+cwq600rA0U02rshX7tnf";
   char	**match, *p1, *p2;
   Int	code, oldfont, level, c;
-  Double	newsize;
+  double	newsize;
 
   while (1)
     switch ((Int) **text) {
@@ -333,8 +333,8 @@ Int callig2(char *s)
 /* called by either lux_callig or callig, finishes the job */
 {
   Int	ic;
-  Float	angle, xq;
-  Int	coordTrf(Float *, Float *, Int, Int), fontchange(Int), hcom(char **),
+  float	angle, xq;
+  Int	coordTrf(float *, float *, Int, Int), fontchange(Int), hcom(char **),
     draw(Int), empty(void);
 					/* setup context */
   coordTrf(&callig_xb, &callig_yb, calligCoordSys, LUX_DVI);
@@ -368,7 +368,7 @@ Int callig2(char *s)
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int callig(char *s, Float xb, Float yb, Float fsize, Float th, Int font,
+Int callig(char *s, float xb, float yb, float fsize, float th, Int font,
 	   Int nu)
 /* for internal calls, sets variables and calls callig2 */
 {
@@ -385,7 +385,7 @@ Int hcom(char **s)
 					/* an inline callig command */
 {
   Int	ic, i1;
-  Float	newsize;
+  float	newsize;
 
   ic = *(*s)++;
   switch (ic) {
@@ -522,16 +522,16 @@ Int draw(Int ic)
       if (ix > 63) ix = ix - 128;
       ix = ix - ll0;
       iy = iy - ll0;		/* for abnormals */
-      x = (Float) ix*ct - (Float) iy*st + callig_xb;
-      y = ((Float) ix*st + (Float) iy*ct)*callig_ratio + callig_yb;
+      x = (float) ix*ct - (float) iy*st + callig_xb;
+      y = ((float) ix*st + (float) iy*ct)*callig_ratio + callig_yb;
       callig_update = 0;
       tkplot(x, y, mode, 0);
       callig_update = 1;
     }
   }
 			/* update callig_xb and callig_yb */
-  callig_xb += ct*(Float) gap;
-  callig_yb += st*(Float) gap*callig_ratio;
+  callig_xb += ct*(float) gap;
+  callig_yb += st*(float) gap*callig_ratio;
   return 1;
 }
 /*------------------------------------------------------------------------- */

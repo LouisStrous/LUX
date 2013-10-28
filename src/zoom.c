@@ -84,8 +84,8 @@ enum menuItems { ZOOM_TITLE, ZOOM_MAG, ZOOM_STD, ZOOM_TWO,
 
 #define ZOOM_PROFILE	-1
 
-Float	zoom_xc = 0.0, zoom_yc = 0.0, zoom_mag = 0.0;
-Double	zoom_clo = 0.0, zoom_chi = 0.0;
+float	zoom_xc = 0.0, zoom_yc = 0.0, zoom_mag = 0.0;
+double	zoom_clo = 0.0, zoom_chi = 0.0;
 Int	zoom_frame = 0;
 
 Int lux_zoom(Int narg, Int ps[])
@@ -95,16 +95,16 @@ Int lux_zoom(Int narg, Int ps[])
   extern scalar	lastmin, lastmax;
   Int	createMenu(Int num, Int x, Int y, Int nItem, char **item),
     menu_setup(void), lux_xport(Int, Int []),
-    tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
-	  Float y1, Float y2, Float sx, Float sy, Int wid, Float *mag,
-	  Int mode, Double clo, Double chi, Byte *bitmap1, Byte *bitmap2),
-    threecolors(Float *, Int);
+    tvraw(pointer data, Int type, Int nx, Int ny, float x1, float x2,
+	  float y1, float y2, float sx, float sy, Int wid, float *mag,
+	  Int mode, double clo, double chi, Byte *bitmap1, Byte *bitmap2),
+    threecolors(float *, Int);
   Int	i, ntext, ndim, *dims, wid, mid, x = 0, y = 0, selected, j, type,
     nx, ny, sx, sy, sx0, sy0, ww, hw, nframe, stride, profile = -1,
     step[MAX_DIMS], coords[2*MAX_DIMS], sdims[3],
     axes[2] = {0, 1}, follow = 0, play = 0, loop, offset, mousepos = 1;
   Int	minmax(Int *data, Int nelem, Int type);
-  Float	x1, x2, y1, y2, dx, dy, z, colorRange = 1.0;
+  float	x1, x2, y1, y2, dx, dy, z, colorRange = 1.0;
   pointer	data, image, bitmapdata1, bitmap1, bitmapdata2,
     bitmap2;
   char	**zoomText,
@@ -519,7 +519,7 @@ Int lux_zoom(Int narg, Int ps[])
 		  paint_pane(mid, ZOOM_MAG, WHITE);
 		  break;
 		case ZOOM_TWO:	/* zoom in/out by a factor of 2 */
-		  z = (Float) event.xbutton.x/((Float) fontwidth);
+		  z = (float) event.xbutton.x/((float) fontwidth);
 		  if (z < 10.5) {	/* zoom in */
 		    x1 = zoom_xc - sx/zoom_mag;
 		    x2 = zoom_xc + sx/zoom_mag;
@@ -592,24 +592,24 @@ Int lux_zoom(Int narg, Int ps[])
 		    minmax(image.l, nx*ny, type);
 		    switch (type) {
 		      case LUX_BYTE:
-			zoom_clo = (Double) lastmin.b;
-			zoom_chi = (Double) lastmax.b;
+			zoom_clo = (double) lastmin.b;
+			zoom_chi = (double) lastmax.b;
 			break;
 		      case LUX_WORD:
-			zoom_clo = (Double) lastmin.w;
-			zoom_chi = (Double) lastmax.w;
+			zoom_clo = (double) lastmin.w;
+			zoom_chi = (double) lastmax.w;
 			break;
 		      case LUX_LONG:
-			zoom_clo = (Double) lastmin.l;
-			zoom_chi = (Double) lastmax.l;
+			zoom_clo = (double) lastmin.l;
+			zoom_chi = (double) lastmax.l;
 			break;
 		      case LUX_FLOAT:
-			zoom_clo = (Double) lastmin.f;
-			zoom_chi = (Double) lastmax.f;
+			zoom_clo = (double) lastmin.f;
+			zoom_chi = (double) lastmax.f;
 			break;
 		      case LUX_DOUBLE:
-			zoom_clo = (Double) lastmin.d;
-			zoom_chi = (Double) lastmax.d;
+			zoom_clo = (double) lastmin.d;
+			zoom_chi = (double) lastmax.d;
 			break;
 		    }
 		  } else
@@ -952,12 +952,12 @@ Int tvzoom(Int narg, Int ps[])
   Int	*dims, ndim, axes[2] = {0, 1}, sdims[3], nx, ny, wid;
   Int	coords[4], offset, type, sx, sy, i, stride, step[2];
   extern Int	last_wid;
-  Int	tvraw(pointer data, Int type, Int nx, Int ny, Float x1, Float x2,
-	      Float y1, Float y2, Float sx, Float sy, Int wid, Float *mag,
-	      Int mode, Double clo, Double chi, Byte *bitmap1, Byte *bitmap2);
+  Int	tvraw(pointer data, Int type, Int nx, Int ny, float x1, float x2,
+	      float y1, float y2, float sx, float sy, Int wid, float *mag,
+	      Int mode, double clo, double chi, Byte *bitmap1, Byte *bitmap2);
 
   pointer	data, image, bitmapdata, bitmap;
-  Float	x1, x2, y1, y2;
+  float	x1, x2, y1, y2;
 
   if (numerical(ps[0], &dims, &ndim, NULL, &data) < 0)
     return LUX_ERROR;

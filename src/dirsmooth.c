@@ -30,7 +30,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #define CENTER	4
 #define DONE	5
 
-Int sign(Float x)
+Int sign(float x)
 {
   if (x > 0)
     return 1;
@@ -40,7 +40,7 @@ Int sign(Float x)
     return 0;
 }
 /*--------------------------------------------------------------------*/
-Int sgnclass(Float x)
+Int sgnclass(float x)
 {
   if (x > 0)
     return 2;
@@ -50,8 +50,8 @@ Int sgnclass(Float x)
     return 1;
 }
 /*--------------------------------------------------------------------*/
-Int traverseElement(Float xin, Float yin, Float vx, Float vy,
-		    Float *xout, Float *yout)
+Int traverseElement(float xin, float yin, float vx, float vy,
+		    float *xout, float *yout)
 /* if you start at position (<xin>,<yin>), with 0 <= <xin>,<yin> <= 1,
    and move in the direction given by (<vx>,<vy>), then this routine
    determines which pixel boundary you cross (UP, DOWN, LEFT, RIGHT,
@@ -162,7 +162,7 @@ Int lux_lic(Int narg, Int ps[])
 {
   Int	iq, nx, ny, ix, iy, c, index, rindex, count, twosided, normalize,
     gaussian, iq0, di;
-  Float	x1, y1, x2, y2, *vx0, *vy0, value, vx, vy, s, s0, ds, dslimit,
+  float	x1, y1, x2, y2, *vx0, *vy0, value, vx, vy, s, s0, ds, dslimit,
     weight, ws;
   pointer	src, trgt, src0;
   loopInfo	srcinfo, trgtinfo;

@@ -28,10 +28,10 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 
 #if DONOTIGNORE
 static struct VSOPdata usedVSOPdata;
-static Double planetIndexTolerance = -1;
+static double planetIndexTolerance = -1;
 
 struct VSOPdata *planetIndicesForTolerance(struct VSOPdata *data, 
-                                           Double tolerance)
+                                           double tolerance)
 /* returns a pointer to an array of planet indices into the VSOP model
    values, suitable for an error tolerance of nonnegative <tolerance>.
    None of the amplitudes of the VSOP planet terms represented by the
@@ -71,14 +71,14 @@ struct VSOPdata *planetIndicesForTolerance(struct VSOPdata *data,
 }
 #endif
 /*--------------------------------------------------------------------------*/
-static void gatherVSOP(Double T, struct planetIndex *index, Double *terms, 
-                       Double *value)
+static void gatherVSOP(double T, struct planetIndex *index, double *terms, 
+                       double *value)
 /* calculates one coordinate of one object, as indicated by <index>,
    at time <T> in Julian centuries since J2000.0, using the VSOP87
    theory of Bretagnon & Francou (1988).  The heliocentric coordinate
    is returned in <*value>. */
 {
-  Double	*ptr;
+  double	*ptr;
   Int	nTerm, i;
 
   *value = 0.0;			/* initialize */
@@ -95,7 +95,7 @@ static void gatherVSOP(Double T, struct planetIndex *index, Double *terms,
   }
 }
 /*--------------------------------------------------------------------------*/
-void XYZfromVSOP(Double T, Int object, Double *pos, Double tolerance,
+void XYZfromVSOP(double T, Int object, double *pos, double tolerance,
                  struct VSOPdata *data)
 {
   switch (object) {
@@ -113,7 +113,7 @@ void XYZfromVSOP(Double T, Int object, Double *pos, Double tolerance,
   }
 }
 /*--------------------------------------------------------------------------*/
-void XYZdatefromVSOPC(Double T, Int object, Double *pos, Double tolerance)
+void XYZdatefromVSOPC(double T, Int object, double *pos, double tolerance)
 /* returns the heliocentric cartesian coordinates referred to the mean
  dynamical ecliptic and equinox of the date using the VSOP87C theory as
  described in Bretagnon & Francou: "Planetary theories in rectangular
@@ -130,7 +130,7 @@ void XYZdatefromVSOPC(Double T, Int object, Double *pos, Double tolerance)
   return XYZfromVSOP(T, object, pos, tolerance, &VSOP87Cdata);
 }
 /*--------------------------------------------------------------------------*/
-void XYZJ2000fromVSOPA(Double T, Int object, Double *pos, Double tolerance)
+void XYZJ2000fromVSOPA(double T, Int object, double *pos, double tolerance)
 /* returns the heliocentric cartesian coordinates referred to the mean
  dynamical ecliptic and equinox of J2000.0 using the VSOP87A theory as
  described in Bretagnon & Francou: "Planetary theories in rectangular

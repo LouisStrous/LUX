@@ -36,15 +36,15 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 /* 3rd-degree polynomial evaluation (modulo) */
 #define mpol3(a0,a1,a2,a3,t,n) (fmod(a0 + t*(a1 + t*(a2 + t*a3)),n))
 
-static Double	solar_stuff;
-void solar_physical(Double jd, Int select)
+static double	solar_stuff;
+void solar_physical(double jd, Int select)
 /* from J. Meeus: Astronomical Algorithms, Willman-Bell, ISBN 0-943396-35-2, */
 /* chapter 28 */
 /* /MODERN (internalMode & 2): corrections from P. Giles (Ph.D. thesis, */
 /* Stanford University) */
 {
-  Double	l, m, e, c, T, o, l2, eps, x, y, k, i, theta, r, l0, theta0;
-  Double	JDE(Double);
+  double	l, m, e, c, T, o, l2, eps, x, y, k, i, theta, r, l0, theta0;
+  double	JDE(double);
 
   i = ((internalMode & 2)? 7.16: 7.25)*DEG;
   k = (((internalMode & 2)? 73.49: 73 + 4.0/6) + 1.3958333*(jd - 2396758.0)/36525.0)*DEG;
@@ -116,8 +116,8 @@ Int lux_solar_physical(Int narg, Int ps[], Int select)
   switch (symbol_type(result)) {
     case LUX_FLOAT:
       while (n--) {
-	solar_physical((Double) *src.f++, select);
-	*trgt.f++ = (Float) solar_stuff;
+	solar_physical((double) *src.f++, select);
+	*trgt.f++ = (float) solar_stuff;
       }
       break;
     case LUX_DOUBLE:

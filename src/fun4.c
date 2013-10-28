@@ -35,21 +35,21 @@ extern	Int	lastmin_sym, lastmax_sym;
 extern unsigned long	*pixels;
 Int	maxregridsize = 2048, stretchmark, tvsmt, badmatch, stretch_clip = 19;
 Int	islit, dstype, itmax = 20, sort_flag = 0;
-Float	gwid, xoffset, yoffset, xyres;
+float	gwid, xoffset, yoffset, xyres;
 Int	resample_type = BI_CUBIC_SMOOTH;
 void match_1(Int *p1, Int *p2, Int nxa, Int nxb, Int nya, Int nyb, Int nx,
-	     Int ny, Float *gwx, Float *gwy),
-  gwind0(Float *gwx, Float *gwy, Float gwid, Int nxa, Int nxb, Int nya,
+	     Int ny, float *gwx, float *gwy),
+  gwind0(float *gwx, float *gwy, float gwid, Int nxa, Int nxb, Int nya,
 	 Int nyb),
   unbias(void *m1, void *m2, Int nxa, Int nxb, Int nya, Int nyb,
-	 Int nxs, Int nys, Float *gx, Float *gy, Float *av1, Float *av2,
-	 Float *cx, Float *cy, Float *cxx, Float *cxy, Float *cyy,
+	 Int nxs, Int nys, float *gx, float *gy, float *av1, float *av2,
+	 float *cx, float *cy, float *cxx, float *cxy, float *cyy,
 	 Int idelx, Int idely);
-Float averag(void *m, Int nxa, Int nxb, Int nya, Int nyb, Int nxs, Int nys,
-	     Int idx, Int idy, Float *gx, Float *gy),
+float averag(void *m, Int nxa, Int nxb, Int nya, Int nyb, Int nxs, Int nys,
+	     Int idx, Int idy, float *gx, float *gy),
   resid(Int *m1, Int *m2, Int idx, Int idy, Int nxa, Int nxb, Int nya,
-	Int nyb, Int nxs, Int nys, Int ndmx, Float *gx, Float *gy,
-	Float bs);
+	Int nyb, Int nxs, Int nys, Int ndmx, float *gx, float *gy,
+	float bs);
 /*------------------------------------------------------------------------- */
 Int lux_gridmatch(Int narg, Int ps[])/* gridmatch function */		
 /* the call is offsets = gridmatch(m1,m2,gx,gy,dx,dy,gwid,mode)
@@ -66,7 +66,7 @@ Int lux_gridmatch(Int narg, Int ps[])/* gridmatch function */
  Int	type, nx, ny, nxg, nyg, dx, dy, dim[3];
  Int	result_sym, nc, i1, i2, j1, j2, dx2, dy2, mode;
  Int	*gx, *gy;
- Float	*out, *gwx, *gwy;
+ float	*out, *gwx, *gwy;
  pointer p1, p2;
 
  /* <m1> must be a 2D numerical array */
@@ -140,9 +140,9 @@ Int lux_gridmatch(Int narg, Int ps[])/* gridmatch function */
  /* following converted from macro stretch.mar */
  /* try to use scratch for gaussian mask arrays (should work) */
  if ((nx + ny) <= NSCRAT)
-   gwx = (Float *) scrat;
+   gwx = (float *) scrat;
  else
-   gwx = (Float *) malloc((nx + ny)*sizeof(Float));
+   gwx = (float *) malloc((nx + ny)*sizeof(float));
  gwy = gwx + nx;
  nc = nxg*nyg;
  dx2 = dx/2;
@@ -177,19 +177,19 @@ Int lux_gridmatch(Int narg, Int ps[])/* gridmatch function */
    if (mode != 0)
      *out++ = xyres;		/* addition LS 14sep92 */
  }
- if (gwx != (Float *) scrat)
+ if (gwx != (float *) scrat)
    free(gwx);			/* free space if it was allocated */
  return	result_sym;
 }
  /*------------------------------------------------------------------------- */
 void match_1(Int *p1, Int *p2, Int nxa, Int nxb, Int nya, Int nyb, Int nx,
-	    Int ny, Float *gwx, Float *gwy)
+	    Int ny, float *gwx, float *gwy)
  /* note that xoffset and yoffset are zeroed before we get in here */
 {
   Int	idelx, idely, i, j, k, ndmx=1000, done[9];
   Int	di, dj, in, jn, iter, dd, badflag;
-  Float	av1, av2, cx, cy,cxx,cxy,cyy, avdif, t, res[9], buf[9], t1, t2;
-  void	getmin(Float *, Float *, Float *);
+  float	av1, av2, cx, cy,cxx,cxy,cyy, avdif, t, res[9], buf[9], t1, t2;
+  void	getmin(float *, float *, float *);
 
   for (i = 0; i < 9; i++)
     done[i] = 0;
@@ -273,10 +273,10 @@ void match_1(Int *p1, Int *p2, Int nxa, Int nxb, Int nya, Int nyb, Int nx,
   return;
 }
 /*------------------------------------------------------------------------- */
-void gwind0(Float *gwx, Float *gwy, Float gwid, Int nxa, Int nxb, Int nya,
+void gwind0(float *gwx, float *gwy, float gwid, Int nxa, Int nxb, Int nya,
 	    Int nyb)
 {
-  Float	wid, xcen, ycen, xq;
+  float	wid, xcen, ycen, xq;
   Int	i;
   
   wid = gwid*0.6005612;		/* from FWHM to decay scale */
@@ -300,11 +300,11 @@ void gwind0(Float *gwx, Float *gwy, Float gwid, Int nxa, Int nxb, Int nya,
 }
 /*------------------------------------------------------------------------- */
 void unbias(void *m1, void *m2, Int nxa, Int nxb, Int nya, Int nyb,
-	    Int nxs, Int nys, Float *gx, Float *gy, Float *av1, Float *av2,
-	    Float *cx, Float *cy, Float *cxx, Float *cxy, Float *cyy,
+	    Int nxs, Int nys, float *gx, float *gy, float *av1, float *av2,
+	    float *cx, float *cy, float *cxx, float *cxy, float *cyy,
 	    Int idelx, Int idely)
 {
-  Float	t0, t1, t2, t3, t4, t5;
+  float	t0, t1, t2, t3, t4, t5;
 
   /*  find weighted means of m1 & m2 over the window 
       sets up quadratic fit to average of m2 as a fcn. of offsets */
@@ -323,13 +323,13 @@ void unbias(void *m1, void *m2, Int nxa, Int nxb, Int nya, Int nyb,
   *cxy = t5 + t0 - t1 - t3;
 }
 /*------------------------------------------------------------------------- */
-Float averag(void *m, Int nxa, Int nxb, Int nya, Int nyb, Int nxs, Int nys,
-	     Int idx, Int idy, Float *gx, Float *gy)
+float averag(void *m, Int nxa, Int nxb, Int nya, Int nyb, Int nxs, Int nys,
+	     Int idx, Int idy, float *gx, float *gy)
 /* finds weighted average of array m over the block defined */
 {
   pointer p;
   Int	nxc, nxd, nyc, nyd, i, j, jj;
-  Float	sum, sumg, sumx, sumgx;
+  float	sum, sumg, sumx, sumgx;
 
   p.l = m; 
   /* fix limits so sum doesn't run off edge of image */
@@ -384,18 +384,18 @@ Float averag(void *m, Int nxa, Int nxb, Int nya, Int nyb, Int nxs, Int nys,
   return sum/sumg;
 }
 /*------------------------------------------------------------------------- */
-Float resid(Int *m1, Int *m2, Int idx, Int idy, Int nxa, Int nxb, Int nya,
-	    Int nyb, Int nxs, Int nys, Int ndmx, Float *gx, Float *gy,
-	    Float bs)
+float resid(Int *m1, Int *m2, Int idx, Int idy, Int nxa, Int nxb, Int nya,
+	    Int nyb, Int nxs, Int nys, Int ndmx, float *gx, float *gy,
+	    float bs)
 {
   Int     nxc, nxd, nyc, nyd, nx, ny;
   register	pointer   m1p, m2p;
-  register        Float   *p1, *p2, *ps;
-  register        Float   sum, sumx, t, ndmx2;
+  register        float   *p1, *p2, *ps;
+  register        float   sum, sumx, t, ndmx2;
   register        Int     i, j;
-  Float   sumg;
+  float   sumg;
   static  Int     mxc, mxd, myc, myd;
-  static  Float   gsum;
+  static  float   gsum;
 
   /*set up limits */
   nxc = nxa;
@@ -463,7 +463,7 @@ Float resid(Int *m1, Int *m2, Int idx, Int idy, Int nxa, Int nxb, Int nya,
 	p1 = ps;
 	sumx = 0.0;
         while (i) {
-	  t = ((Float) *m1p.b++) - ((Float) *m2p.b++);
+	  t = ((float) *m1p.b++) - ((float) *m2p.b++);
 	  t = t + bs;
 	  t = t*t;
 	  t = MIN(t, ndmx2);
@@ -482,7 +482,7 @@ Float resid(Int *m1, Int *m2, Int idx, Int idy, Int nxa, Int nxb, Int nya,
 	p1 = ps;
 	sumx = 0.0;
         while (i) {
-	  t = ((Float) *m1p.w++) - ((Float) *m2p.w++);
+	  t = ((float) *m1p.w++) - ((float) *m2p.w++);
 	  t = t + bs;
 	  t = t*t;
 	  t = MIN(t, ndmx2);
@@ -501,7 +501,7 @@ Float resid(Int *m1, Int *m2, Int idx, Int idy, Int nxa, Int nxb, Int nya,
 	p1 = ps;
 	sumx = 0.0;
         while (i) {
-	  t = ((Float) *m1p.l++) - ((Float) *m2p.l++);
+	  t = ((float) *m1p.l++) - ((float) *m2p.l++);
 	  t = t + bs;
 	  t = t*t;
 	  t = MIN(t, ndmx2);
@@ -520,7 +520,7 @@ Float resid(Int *m1, Int *m2, Int idx, Int idy, Int nxa, Int nxb, Int nya,
 	p1 = ps;
 	sumx = 0.0;
         while (i) {
-	  t = ((Float) *m1p.f++) - ((Float) *m2p.f++);
+	  t = ((float) *m1p.f++) - ((float) *m2p.f++);
 	  t = t + bs;
 	  t = t*t;
 	  t = MIN(t, ndmx2);
@@ -539,7 +539,7 @@ Float resid(Int *m1, Int *m2, Int idx, Int idy, Int nxa, Int nxb, Int nya,
 	p1 = ps;
 	sumx = 0.0;
         while (i) {
-	  t = ((Float) *m1p.d++) - ((Float) *m2p.d++);
+	  t = ((float) *m1p.d++) - ((float) *m2p.d++);
 	  t = t + bs;
 	  t = t*t;
 	  t = MIN(t, ndmx2);
@@ -564,11 +564,11 @@ Int lux_stretch(Int narg, Int ps[])/* stretch function */
 {
   Int	iq, type, n, m, nxg, nyg, result_sym, jy, j1, j2, nm1, nm2, mm1, mm2;
   Int	nxgm, nygm, ix, iy, i1, i2, i3, i4, j3, j4, jx;
-  Float	xd, yd, xinc, yinc, y, x, xs, dy, dy1;
-  Float	dx, dx1, dx0, dx2, dx3, dx4, fn, fm, xq;
-  Float	w1, w2, w3, w4, xl, yl, c1, c2, c3, c4, b1, b2, b3, b4;
+  float	xd, yd, xinc, yinc, y, x, xs, dy, dy1;
+  float	dx, dx1, dx0, dx2, dx3, dx4, fn, fm, xq;
+  float	w1, w2, w3, w4, xl, yl, c1, c2, c3, c4, b1, b2, b3, b4;
   pointer base, out, bb;
-  Float	*jpbase, *jbase, *xgbase;
+  float	*jpbase, *jbase, *xgbase;
   
   iq = ps[0];			/* <image> */
   if (!symbolIsNumericalArray(iq) || array_num_dims(iq) != 2)
@@ -601,10 +601,10 @@ Int lux_stretch(Int narg, Int ps[])/* stretch function */
   nygm = nyg - 1;
 	/* linearly interpolate the displacement grid values over array */
 	/* similar to regrid3 in inner part */
-  xd = (Float) n/nxg;
+  xd = (float) n/nxg;
   xinc = 1.0/xd;
   xs = xinc + (xd - 1.0)/(2.0*xd);
-  yd = (Float) m/nyg;
+  yd = (float) m/nyg;
   yinc = 1.0/yd;
   y = yinc + (yd - 1.0)/(2.0*yd);
   for (iy = 0; iy < m; iy++) {
@@ -641,10 +641,10 @@ Int lux_stretch(Int narg, Int ps[])/* stretch function */
       i1 = 2*i1;
       i2 = 2*i2;
       xl = w1 * *(jbase+i1) + w2 * *(jbase+i2) + w3 * *(jpbase+i1)
-	+ w4 * *(jpbase+i2) + (Float) ix;
+	+ w4 * *(jpbase+i2) + (float) ix;
       i1 += 1;  i2 += 1;
       yl = w1 * *(jbase+i1) + w2 * *(jbase+i2) + w3 * *(jpbase+i1)
-	+ w4 * *(jpbase+i2) + (Float) iy;
+	+ w4 * *(jpbase+i2) + (float) iy;
       
       /* xl, yl is the place, now do a cubic interpolation for value */
       
@@ -713,8 +713,8 @@ Int lux_stretch(Int narg, Int ps[])/* stretch function */
       switch (type) {
 	case LUX_BYTE:
 	  bb.b = base.b + iq;
-	  xq = b1*(c1*(Float) *(bb.b) + c2* (Float) *(bb.b + i2)
-		   + c3 * (Float) *(bb.b+i3) + c4 * (Float) *(bb.b+i4));
+	  xq = b1*(c1*(float) *(bb.b) + c2* (float) *(bb.b + i2)
+		   + c3 * (float) *(bb.b+i3) + c4 * (float) *(bb.b+i4));
 	  bb.b += j2;
 	  xq += b2*(c1 * *(bb.b) + c2 * *(bb.b+i2)
 		    + c3 * *(bb.b+i3) + c4 * *(bb.b+i4));
@@ -794,12 +794,12 @@ Int lux_stretch(Int narg, Int ps[])/* stretch function */
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-void getmin(Float *, Float *, Float *);
+void getmin(float *, float *, float *);
 Int lux_getmin9(Int narg, Int ps[])/* getmin9 function */		
 /* local minimum for a 3x3 array */
 {
   Int	iq;
-  Float	*p, x0, y0;
+  float	*p, x0, y0;
 					/*first arg must be a 3x3 array */
   iq = ps[0];
   if (symbol_class(iq) != LUX_ARRAY)
@@ -809,7 +809,7 @@ Int lux_getmin9(Int narg, Int ps[])/* getmin9 function */
       || array_dims(iq)[1] != 3)
     return cerror(NEED_3x3_ARR, iq);
   iq = lux_float(1, &iq);	/* ensure FLOAT type */
-  p = (Float *) array_data(iq);
+  p = (float *) array_data(iq);
   getmin(p, &x0, &y0);
   if (redef_scalar(ps[1], 3, &x0) != 1)
     return cerror(ALLOC_ERR, ps[1]);
@@ -818,12 +818,12 @@ Int lux_getmin9(Int narg, Int ps[])/* getmin9 function */
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int	getmin2(Float *, Float *, Float *);
+Int	getmin2(float *, float *, float *);
 Int lux_getmin2(Int narg, Int ps[])/* getmin2 function */		
 /* local minimum for a 3x3 array */
 {
   Int	iq;
-  Float	*p, x0, y0;
+  float	*p, x0, y0;
 					/*first arg must be a 3x3 array */
   iq = ps[0];
   if (symbol_class(iq) != LUX_ARRAY)
@@ -833,7 +833,7 @@ Int lux_getmin2(Int narg, Int ps[])/* getmin2 function */
       || array_dims(iq)[1] != 3)
     return cerror(NEED_3x3_ARR, iq);
   iq = lux_float(1, &iq);	/* ensure FLOAT type */
-  p = (Float *) array_data(iq);
+  p = (float *) array_data(iq);
   getmin2(p, &x0, &y0);
   if (redef_scalar(ps[1], 3, &x0) != 1)
     return cerror(ALLOC_ERR, ps[1]);
@@ -842,12 +842,12 @@ Int lux_getmin2(Int narg, Int ps[])/* getmin2 function */
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int getminSYM(Float *p, Float *x0, Float *y0)
+Int getminSYM(float *p, float *x0, float *y0)
 /* return extremum of least-squares fit of quadratic surface to 3x3 grid */
 /* LS 21mar95 */
 {
-  Float	f1, f2, f3, f4, f5, f6, f7, f8, f9;
-  Float	dx, dy, dxx, dyy, dxy, d;
+  float	f1, f2, f3, f4, f5, f6, f7, f8, f9;
+  float	dx, dy, dxx, dyy, dxy, d;
 
   f1 = *p++;	f2 = *p++;	f3 = *p++;
   f4 = *p++;	f5 = *p++;	f6 = *p++;
@@ -863,10 +863,10 @@ Int getminSYM(Float *p, Float *x0, Float *y0)
   return 1;
 }
 /*------------------------------------------------------------------------- */
-void getmin(Float *p, Float *x0, Float *y0)
+void getmin(float *p, float *x0, float *y0)
 {
-  Float	f11, f12, f13, f21, f22, f23, f31, f32, f33;
-  Float	fx, fy, t, fxx, fyy, fxy;
+  float	f11, f12, f13, f21, f22, f23, f31, f32, f33;
+  float	fx, fy, t, fxx, fyy, fxy;
 				/* find the min, p points to a 3x3 array */
   f11 = *p++;	f21 = *p++;	f31 = *p++;
   f12 = *p++;	f22 = *p++;	f32 = *p++;
@@ -907,9 +907,9 @@ void getmin(Float *p, Float *x0, Float *y0)
   }
 }
 /*------------------------------------------------------------------------- */
-Int getmin2(Float *p, Float *x0, Float *y0)
+Int getmin2(float *p, float *x0, float *y0)
 {
-  Float	a, b, c, d, e, det;
+  float	a, b, c, d, e, det;
 
   a = (p[0] - 2*p[1] + p[2] + p[3] - 2*p[4] + p[5] + p[6] - 2*p[7] + p[8])/6;
   b = (p[0] + p[1] + p[2] - 2*(p[3] + p[4] + p[5]) + p[6] + p[7] + p[8])/6;
@@ -923,12 +923,12 @@ Int getmin2(Float *p, Float *x0, Float *y0)
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int expandImage(Int iq, Float sx, Float sy, Int smt) /* expand function */
+Int expandImage(Int iq, float sx, float sy, Int smt) /* expand function */
 /* magnify (or even demagnify) an array */
 {
   Int	n, m, ns, ms, dim[2], j, i, inc, nc, result_sym, oldi, type, ns2;
-  Float	zc1, zc2, z00, z01, z10, z11, xq;
-  Float	stepx, stepy, yrun, xrun, xbase, q, p, fn;
+  float	zc1, zc2, z00, z01, z10, z11, xq;
+  float	stepx, stepy, yrun, xrun, xbase, q, p, fn;
   array	*h;
   pointer base, jbase, out, jout, nlast;
 				/* first argument must be a 2-D array */
@@ -944,7 +944,7 @@ Int expandImage(Int iq, Float sx, Float sy, Int smt) /* expand function */
     m = h->dims[1];
   else
     m = 1;
-  fn = (Float) n;
+  fn = (float) n;
 					/* get the magnification(s) */
 				/* make sure they're positive  LS 1jul94 */
   if (sx < 0)
@@ -1114,7 +1114,7 @@ Int expandImage(Int iq, Float sx, Float sy, Int smt) /* expand function */
 /*------------------------------------------------------------------------- */
 Int lux_expand(Int narg, Int ps[])
 {
-  Float	sx, sy;
+  float	sx, sy;
   Int	smt;
 
   sx = float_arg(ps[1]);
@@ -1143,7 +1143,7 @@ Int lux_expand(Int narg, Int ps[])
 /* some variables common to several routines */
 static Int regridtypeflag, stretchmark_flag, regrid_type,
   nm1, mm1, nm2, mm2, n;
-static Float	fnm1, fnm5, fmm1, fmm5, xl, yl;
+static float	fnm1, fnm5, fmm1, fmm5, xl, yl;
 static pointer	base, out;
 Int regrid_common(Int, Int []);
 
@@ -1157,7 +1157,7 @@ void bicubic_f(void)	/* internal routine for single pixel */
       P. 258, 1983:  USES THEIR FORMULA WITH ALPHA = -0.5
 */
  Int	i1, i2, i3, i4, j1, j2, j3, j4, iq;
- Float	c1, c2, c3, c4, b1, b2, b3, b4, dx0, dx1, dx2, dx3, dx4, xq;
+ float	c1, c2, c3, c4, b1, b2, b3, b4, dx0, dx1, dx2, dx3, dx4, xq;
  pointer bb;
  /* the location is in xl, yl; base is the pointer to array; out is
  pointer to output; both are unions */
@@ -1288,7 +1288,7 @@ void bicubic_fc()	/* internal routine for single pixel */
      a little slower than the originals, perhaps because of the overhead
      in the call or other adjustments made */
   Int	i1, i2, i3, i4, j1, j2, j3, j4, iq;
-  Float	c1, c2, c3, c4, b1, b2, b3, b4, dx0, dx1, dx2, dx3, dx4, xq;
+  float	c1, c2, c3, c4, b1, b2, b3, b4, dx0, dx1, dx2, dx3, dx4, xq;
   pointer bb;
 
   /* the location is in xl, yl; base is the pointer to array; out is
@@ -1508,7 +1508,7 @@ Int regrid_common(Int narg, Int ps[])/* with branches for type */
   Int	iq, nx, ny, m, ng, mg, ns, ms, ngrun, dim[2];
   Int	iprun, jrun, jprun, ig, ic, jc, result_sym;
   Int	i, j, ind;
-  Float	fn, fm, yrun, ax, bx, cx, dx, ay, by, cy, dy, xq, beta, xinc, yinc,
+  float	fn, fm, yrun, ax, bx, cx, dx, ay, by, cy, dy, xq, beta, xinc, yinc,
     xl0, yl0;
   pointer xgbase, ygbase, jpbase, jbase, ipbase;
 				 /* first argument must be a 2-D array */
@@ -1524,8 +1524,8 @@ Int regrid_common(Int narg, Int ps[])/* with branches for type */
   m = array_dims(iq)[1];	/* data dimension in y coordinate */
   if (n < 2 || m < 2)
     return cerror(NEED_NTRV_2D_ARR, iq);
-  fn = (Float) n;		/* Float versions of data dimensions */
-  fm = (Float) m;
+  fn = (float) n;		/* float versions of data dimensions */
+  fm = (float) m;
 				 /* check xg and yg, must be the same size */
   if (!symbolIsNumericalArray(ps[1]))
     return cerror(NEED_NUM_ARR, ps[1]);
@@ -1567,7 +1567,7 @@ Int regrid_common(Int narg, Int ps[])/* with branches for type */
   }
   result_sym = array_scratch(regrid_type, 2, dim);
   jpbase.l = array_data(result_sym); /* output */
-  yrun = 1.0/ (Float) ms;
+  yrun = 1.0/ (float) ms;
   i = lux_type_size[regrid_type];
   /* various increments, in bytes! */
   iprun = ns * i;		/* one grid cell row (in the output) */
@@ -1602,7 +1602,7 @@ Int regrid_common(Int narg, Int ps[])/* with branches for type */
 				/* - gx[ix,iy+1] + gx[ix,iy] */
 	  dy = dy - by - cy;
 	  j++;			/* to next grid cell */
-	  xq = 1.0/(Float) ns;	/* 1/x scale */
+	  xq = 1.0/(float) ns;	/* 1/x scale */
 	  bx *= xq;		/* (gx[ix+1,iy]-gx[ix,iy])/scale_x */
 	  by *= xq;
 	  dx *= xq*yrun;
@@ -1719,7 +1719,7 @@ Int regrid_common(Int narg, Int ps[])/* with branches for type */
 	  dx = dx - bx - cx;
 	  dy = dy - by - cy;
 	  j++;
-	  xq = 1.0/(Float) ns;
+	  xq = 1.0/(float) ns;
 	  bx *= xq;
 	  by *= xq;
 	  dx *= xq*yrun;
@@ -1945,10 +1945,10 @@ Int lux_compress(Int narg, Int ps[])
       do {
 	sum.d = 0;
 	do
-	  sum.d += (Double) src.f[offset];
+	  sum.d += (double) src.f[offset];
 	while (advanceLoop(&tmpinfo, &src) < tmpinfo.rndim);
 	*trgt.f = sum.d/nel;
-	src.f = (Float *) tmpinfo.data0;
+	src.f = (float *) tmpinfo.data0;
 	n = advanceLoop(&trgtinfo, &trgt);
 	offset = 0;
 	for (i = 0; i < trgtinfo.ndim; i++)
@@ -1962,7 +1962,7 @@ Int lux_compress(Int narg, Int ps[])
 	  sum.d += src.d[offset];
 	while (advanceLoop(&tmpinfo, &src) < tmpinfo.rndim);
 	*trgt.d = sum.d/nel;
-	src.d = (Double *) tmpinfo.data0;
+	src.d = (double *) tmpinfo.data0;
 	n = advanceLoop(&trgtinfo, &trgt);
 	offset = 0;
 	for (i = 0; i < trgtinfo.ndim; i++)
@@ -1978,8 +1978,8 @@ Int lux_oldcompress(Int narg, Int ps[]) /* compress function */
 /*  xc = compress(x, cx, [cy])  */
 {
   Int	n, iq, i, j, cx, cy, nx, ny, type, result_sym, dim[2], nd, nxx;
-  Float	xq, fac;
-  Double	dq, dfac;
+  float	xq, fac;
+  double	dq, dfac;
   array	*h;
   pointer q1, q2, p, base;
 
@@ -2002,7 +2002,7 @@ Int lux_oldcompress(Int narg, Int ps[]) /* compress function */
   result_sym = array_scratch(type, nd, dim);
   h = (array *) sym[result_sym].spec.array.ptr;
   q2.l = (Int *) ((char *)h + sizeof(array));
-  fac = 1.0 / ( (Float) cx * (Float) cy );
+  fac = 1.0 / ( (float) cx * (float) cy );
   n = nxx - cx;					/* step bewteen lines */
   switch (type)
   { case LUX_BYTE:
@@ -2051,14 +2051,14 @@ Int lux_oldcompress(Int narg, Int ps[]) /* compress function */
 	q1.f +=  nxx * cy; }
       break;
     case LUX_DOUBLE:
-      dfac = 1.0 / ( (Double) cx * (Double) cy );
+      dfac = 1.0 / ( (double) cx * (double) cy );
       while (ny--)
       {	base.d = q1.d;  iq = nx;
 	while (iq--)
 	{ p.d = base.d; dq = 0.0;
 	  for (j=0;j<cy;j++)
 	  { for (i=0;i<cx;i++) dq += *p.d++; p.d += n; }
-	  *q2.d++ = (Double) ( dq * dfac );
+	  *q2.d++ = (double) ( dq * dfac );
 	  base.d += cx; }
 	q1.d +=  nxx * cy; }
       break;
@@ -2769,13 +2769,13 @@ Int compress4(Byte *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
  return 1;
 }
 /*------------------------------------------------------------------------- */
-void shift_bicubic(Float dx, Int nx, Int ny, Int inc, Int dline,
+void shift_bicubic(float dx, Int nx, Int ny, Int inc, Int dline,
 		   pointer base, pointer out, Int type)
  /* internal routine for shift in one direction */
 {
   Int	i1, i2, i3, i4, k;
-  Float	c1, c2, c3, c4, dx0, dx1, dx2, dx3, dx4;
-  Double	cd1, cd2, cd3, cd4, ddx0, ddx1, ddx2, ddx3, ddx4;
+  float	c1, c2, c3, c4, dx0, dx1, dx2, dx3, dx4;
+  double	cd1, cd2, cd3, cd4, ddx0, ddx1, ddx2, ddx3, ddx4;
   Int	nzone2, nzone3, nzone4, nz2;
   Int	nz3, nz4, rflag;
   
@@ -2827,7 +2827,7 @@ void shift_bicubic(Float dx, Int nx, Int ny, Int inc, Int dline,
     
   } else {
     /* the F*8 case, use alternate coefficients */
-    ddx0 = (Double) dx0;
+    ddx0 = (double) dx0;
     ddx1 = 1.0 - ddx0;
     switch (resample_type) {
       case BI_CUBIC_SMOOTH:
@@ -2850,13 +2850,13 @@ void shift_bicubic(Float dx, Int nx, Int ny, Int inc, Int dline,
   switch (type) {
     case LUX_BYTE:	/* I*1 image */
     {
-      Float	z4, z1, z2, z3, yq;
+      float	z4, z1, z2, z3, yq;
       Byte	*p, *q;
       for (k=0;k<ny;k++) {
 	p = base.b + k*dline + rflag;
 	q = out.b + k*dline + rflag;
-	z1 = (Float) *(p + i1);	z2 = (Float) *(p + i2);
-	z3 = (Float) *(p + i3);	z4 = (Float) *(p + i4);
+	z1 = (float) *(p + i1);	z2 = (float) *(p + i2);
+	z3 = (float) *(p + i3);	z4 = (float) *(p + i4);
 	p = p + i4;
 	nz2 = nzone2;  nz3 = nzone3;  nz4 = nzone4;
 	
@@ -2891,13 +2891,13 @@ void shift_bicubic(Float dx, Int nx, Int ny, Int inc, Int dline,
      break;
     case LUX_WORD:
     {
-      Float	z4, z1, z2, z3, yq;
+      float	z4, z1, z2, z3, yq;
       short	*p, *q;
       for (k=0;k<ny;k++) {
 	p = base.w + k*dline + rflag;
 	q = out.w  + k*dline + rflag;
-	z1 = (Float) *(p + i1);	z2 = (Float) *(p + i2);
-	z3 = (Float) *(p + i3);	z4 = (Float) *(p + i4);
+	z1 = (float) *(p + i1);	z2 = (float) *(p + i2);
+	z3 = (float) *(p + i3);	z4 = (float) *(p + i4);
 	p = p + i4;
 	nz2 = nzone2;  nz3 = nzone3;  nz4 = nzone4;
 	
@@ -2927,13 +2927,13 @@ void shift_bicubic(Float dx, Int nx, Int ny, Int inc, Int dline,
      break;
     case LUX_LONG:
     {
-      Float	z4, z1, z2, z3, yq;
+      float	z4, z1, z2, z3, yq;
       Int	*p, *q;
       for (k=0;k<ny;k++) {
 	p = base.l + k*dline + rflag;
 	q = out.l  + k*dline + rflag;
-	z1 = (Float) *(p + i1);	z2 = (Float) *(p + i2);
-	z3 = (Float) *(p + i3);	z4 = (Float) *(p + i4);
+	z1 = (float) *(p + i1);	z2 = (float) *(p + i2);
+	z3 = (float) *(p + i3);	z4 = (float) *(p + i4);
 	p = p + i4;
 	nz2 = nzone2;  nz3 = nzone3;  nz4 = nzone4;
 	
@@ -2963,8 +2963,8 @@ void shift_bicubic(Float dx, Int nx, Int ny, Int inc, Int dline,
      break;
     case LUX_FLOAT:	/* floating F*4 */
     {
-      Float	z4, z1, z2, z3, yq;
-      Float	*p, *q;
+      float	z4, z1, z2, z3, yq;
+      float	*p, *q;
       for (k=0;k<ny;k++) {
 	p = base.f + k*dline + rflag;
 	q = out.f + k*dline + rflag;
@@ -2998,10 +2998,10 @@ void shift_bicubic(Float dx, Int nx, Int ny, Int inc, Int dline,
     }
      break;
      
-    case LUX_DOUBLE:	/* F*8, Double precision */
+    case LUX_DOUBLE:	/* F*8, double precision */
     {
-      Double	z4, z1, z2, z3, yq;
-      Double	*p, *q;
+      double	z4, z1, z2, z3, yq;
+      double	*p, *q;
       for (k=0;k<ny;k++) {
 	p = base.d + k*dline + rflag;
 	q = out.d + k*dline + rflag;
@@ -3045,9 +3045,9 @@ Int lux_shift3(Int narg, Int ps[])	/* shift3, bicubic image shift */
  when it is used only for a shift */
 {
   Int	nx, ny, iq, nd, n, nb, result_sym;
-  Float	dx, dy;
+  float	dx, dy;
   pointer	base, out;
-  void	shift_bicubic(Float, Int, Int, Int, Int, pointer, pointer, Int);
+  void	shift_bicubic(float, Int, Int, Int, Int, pointer, pointer, Int);
 
   iq = ps[0];
   if (!symbolIsNumericalArray(iq))
@@ -3089,7 +3089,7 @@ Int lux_shift3(Int narg, Int ps[])	/* shift3, bicubic image shift */
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-void interpolate(void *srcv, Int type, Float xsrc, Float ysrc, Int nsx,
+void interpolate(void *srcv, Int type, float xsrc, float ysrc, Int nsx,
 		 Int nsy, void *trgtv)
 /* does bicubic interpolation. */
 /* <srcv>: pointer to source array */
@@ -3104,7 +3104,7 @@ void interpolate(void *srcv, Int type, Float xsrc, Float ysrc, Int nsx,
 {
   pointer	src, trgt;
   Int	ix, iy, i;
-  Float	px1, px2, px3, px4, py1, py2, py3, py4, bx, by, ax, ay;
+  float	px1, px2, px3, px4, py1, py2, py3, py4, bx, by, ax, ay;
 
   src.v = srcv;
   trgt.v = trgtv;
@@ -3191,7 +3191,7 @@ Int lux_regridls(Int narg, Int ps[])
 {
   Int	type, nx, ny, result, dims[2], ngx, ngy, gx, gy, s, t, nsx, nsy,
     step;
-  Float	xsrc, ysrc, *gridx, *gridy, sx, sy, tx, ty, stx, sty, xsrc0, ysrc0;
+  float	xsrc, ysrc, *gridx, *gridy, sx, sy, tx, ty, stx, sty, xsrc0, ysrc0;
   pointer	src, trgt;
 
   /* <data> */
@@ -3406,13 +3406,13 @@ Int lux_bigger235(Int narg, Int ps[])
 Int single_fft(pointer data, Int n, Int type, Int back)
 /* type = LUX_FLOAT or LUX_DOUBLE */
 {
-  Int gsl_fft(Double *, Int, Int);
-  Int gsl_fft_back(Double *, Int, Int);
-  Double *ddata;
+  Int gsl_fft(double *, Int, Int);
+  Int gsl_fft_back(double *, Int, Int);
+  double *ddata;
   if (type == LUX_DOUBLE)
     ddata = data.d;
   else
-    ddata = malloc(n*sizeof(Double));
+    ddata = malloc(n*sizeof(double));
   if (back)
     gsl_fft_back(ddata, n, 1);
   else
@@ -3430,7 +3430,7 @@ Int lux_cartesian_to_polar(Int narg, Int ps[])
 /* y = CTOP(x [, x0, y0]) */
 {
   Int	nx, ny, result, dims[2], r, rmax, n, az, type, step, i;
-  Float	x0, y0, x, y, daz;
+  float	x0, y0, x, y, daz;
   pointer	src, trgt;
 
   /* <x> */
@@ -3501,7 +3501,7 @@ Int lux_polar_to_cartesian(Int narg, Int ps[])
 /* y = PTOC(x [, nx, ny, x0, y0]) */
 {
   Int	nx, ny, result, dims[2], type, step, ix, iy;
-  Float	x0, y0, daz, dx, dy, az, r;
+  float	x0, y0, daz, dx, dy, az, r;
   pointer	src, trgt;
   Int	single_fft(pointer src, Int n, Int type, Int backwards);
 

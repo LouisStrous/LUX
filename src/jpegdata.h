@@ -117,7 +117,7 @@ typedef JCOEF FAR *JCOEFPTR;	/* useful in a couple of places */
  * the following type, which need not be the same as JCOEF.
  * For example, on a machine with fast floating point, it might make sense
  * to recode the DCT routines to use floating point; then DCTELEM would be
- * 'Float' or 'Double'.
+ * 'float' or 'double'.
  */
 
 typedef JCOEF DCTELEM;
@@ -243,7 +243,7 @@ struct compress_info_struct {
 	COLOR_SPACE in_color_space; /* colorspace of input file */
 	COLOR_SPACE jpeg_color_space; /* colorspace of JPEG file */
 
-	Double input_gamma;	/* image gamma of input file */
+	double input_gamma;	/* image gamma of input file */
 
 	boolean write_JFIF_header; /* should a JFIF marker be written? */
 	/* These three values are not used by the JPEG code, only copied */
@@ -335,7 +335,7 @@ struct decompress_info_struct {
 
 	COLOR_SPACE out_color_space; /* colorspace of output */
 
-	Double output_gamma;	/* image gamma wanted in output */
+	double output_gamma;	/* image gamma wanted in output */
 
 	boolean quantize_colors; /* T if output is a colormapped format */
 	/* the following are ignored if not quantize_colors: */

@@ -42,7 +42,7 @@ Word	stack[STACKSIZE], *stackPointer = &stack[STACKSIZE];
 extern Int	stackSym;
 Int	lux_convert(Int, Int [], Int, Int), copyToSym(Int, Int),
   lux_replace(Int, Int), format_check(char *, char **, Int),
-  f_decomp(Float *, Int, Int), f_solve(Float *, Float *, Int, Int);
+  f_decomp(float *, Int, Int), f_solve(float *, float *, Int, Int);
 void	symdumpswitch(Int, Int);
 /*------------------------------------------------------------------------- */
 Int lux_distr(Int narg, Int ps[])
@@ -391,7 +391,7 @@ Int lux_readarr(Int narg, Int ps[])
  char	*p, *pt, lastchar, token[32], line[BUFSIZE];
  Int	arrs=0, i, iq, maxtype = LUX_LONG, *iptr, 
    getNewLine(char *, size_t, char *, char), redef_array(Int, Int, Int, Int *);
- Float	*fptr;
+ float	*fptr;
 
  iq = ps[0];						/* target */
  tp = Tmpfile();					/* temporary storage */
@@ -405,7 +405,7 @@ Int lux_readarr(Int narg, Int ps[])
    { while (isspace((Byte) *p) || *p == ',') p++; /* skip space & , */
      pt = p;						/* token start */
      while (isspace((Byte) *p) == 0 && *p != ',' && *p != 0) /* scan value */
-     { if (*p == 'e' || *p == 'E' || *p == '.')		/* Float? */
+     { if (*p == 'e' || *p == 'E' || *p == '.')		/* float? */
          maxtype = LUX_FLOAT; p++; }
      lastchar = *p;  *p++ = '\0';
      if (*pt) {
@@ -418,7 +418,7 @@ Int lux_readarr(Int narg, Int ps[])
    if (redef_array(iq, maxtype, 1, &arrs) != 1) 		/* target */
    { printf("(redef_array): "); fclose(tp); return cerror(ALLOC_ERR, iq); }
    if (maxtype == LUX_FLOAT)
-   { fptr = (Float *) ((char *) sym[iq].spec.array.ptr + sizeof(array));
+   { fptr = (float *) ((char *) sym[iq].spec.array.ptr + sizeof(array));
      for (i = arrs; i > 0; i--) fscanf(tp, "%f", fptr++); }
    else
    { iptr = (Int *) ((char *) sym[iq].spec.array.ptr + sizeof(array));
@@ -729,8 +729,8 @@ void endian(void *pp, Int n, Int type)
    goes from bigendian to littleendian or back.
    Byte -> do nothing
    Word -> swap 1 2 to 2 1
-   long, Float -> swap 1 2 3 4 to 4 3 2 1
-   Double -> swap 1 2 3 4 5 6 7 8 to 8 7 6 5 4 3 2 1
+   long, float -> swap 1 2 3 4 to 4 3 2 1
+   double -> swap 1 2 3 4 5 6 7 8 to 8 7 6 5 4 3 2 1
    Works between Ultrix and Irix.   LS 10/12/92	*/
 {
  Int	size, i, n2, n3;
@@ -1058,7 +1058,7 @@ Int varsmooth(Int narg, Int ps[], Int cumul)
 {
   Int	axisSym, widthSym, nWidth, nData, nDim, result, done, type, outType,
     i1, i2, i, step, widthNDim, *widthDim, axis;
-  Float	weight;
+  float	weight;
   pointer	src, trgt, width, width0;
   scalar	sum;
   loopInfo	srcinfo, trgtinfo;
@@ -1215,7 +1215,7 @@ Int varsmooth(Int narg, Int ps[], Int cumul)
 	    sum.f = 0.0;
 	    weight = cumul? 1: (i2 - i1)/step;
 	    for (i = i1; i < i2; i += step)
-	      sum.f += (Float) src.b[i];
+	      sum.f += (float) src.b[i];
 	    *trgt.f = sum.f/weight;
 	    done = advanceLoop(&trgtinfo, &trgt),
 	      advanceLoop(&srcinfo, &src);
@@ -1242,7 +1242,7 @@ Int varsmooth(Int narg, Int ps[], Int cumul)
 	    sum.f = 0.0;
 	    weight = cumul? 1: (i2 - i1)/step;
 	    for (i = i1; i < i2; i += step)
-	      sum.f += (Float) src.w[i];
+	      sum.f += (float) src.w[i];
 	    *trgt.f = sum.f/weight;
 	    done = advanceLoop(&trgtinfo, &trgt),
 	      advanceLoop(&srcinfo, &src);
@@ -1269,7 +1269,7 @@ Int varsmooth(Int narg, Int ps[], Int cumul)
 	    sum.f = 0.0;
 	    weight = cumul? 1: (i2 - i1)/step;
 	    for (i = i1; i < i2; i += step)
-	      sum.f += (Float) src.l[i];
+	      sum.f += (float) src.l[i];
 	    *trgt.f = sum.f/weight;
 	    done = advanceLoop(&trgtinfo, &trgt),
 	      advanceLoop(&srcinfo, &src);
@@ -1326,7 +1326,7 @@ Int varsmooth(Int narg, Int ps[], Int cumul)
 	    sum.d = 0.0;
 	    weight = cumul? 1: (i2 - i1)/step;
 	    for (i = i1; i < i2; i += step)
-	      sum.d += (Double) src.b[i];
+	      sum.d += (double) src.b[i];
 	    *trgt.d = sum.d/weight;
 	    done = advanceLoop(&trgtinfo, &trgt),
 	      advanceLoop(&srcinfo, &src);
@@ -1353,7 +1353,7 @@ Int varsmooth(Int narg, Int ps[], Int cumul)
 	    sum.d = 0.0;
 	    weight = cumul? 1: (i2 - i1)/step;
 	    for (i = i1; i < i2; i += step)
-	      sum.d += (Double) src.w[i];
+	      sum.d += (double) src.w[i];
 	    *trgt.d = sum.d/weight;
 	    done = advanceLoop(&trgtinfo, &trgt),
 	      advanceLoop(&srcinfo, &src);
@@ -1380,7 +1380,7 @@ Int varsmooth(Int narg, Int ps[], Int cumul)
 	    sum.d = 0.0;
 	    weight = cumul? 1: (i2 - i1)/step;
 	    for (i = i1; i < i2; i += step)
-	      sum.d += (Double) src.l[i];
+	      sum.d += (double) src.l[i];
 	    *trgt.d = sum.d/weight;
 	    done = advanceLoop(&trgtinfo, &trgt),
 	      advanceLoop(&srcinfo, &src);
@@ -1407,7 +1407,7 @@ Int varsmooth(Int narg, Int ps[], Int cumul)
 	    sum.d = 0.0;
 	    weight = cumul? 1: (i2 - i1)/step;
 	    for (i = i1; i < i2; i += step)
-	      sum.d += (Double) src.f[i];
+	      sum.d += (double) src.f[i];
 	    *trgt.d = sum.d/weight;
 	    done = advanceLoop(&trgtinfo, &trgt),
 	      advanceLoop(&srcinfo, &src);
@@ -1467,8 +1467,8 @@ Int varsmooth(Int narg, Int ps[], Int cumul)
   Then u + v = (u f+ v) + ((u f- u′) f+ (v f- v″))
  */
 
-#define kahan_sum_f(value,sum,compensation) { Float y = (value) - (compensation); Float t = (sum) + y; (compensation) = (t - (sum)) - y; (sum) = t; }
-#define kahan_sum_d(value,sum,compensation) { Double y = (value) - (compensation); Double t = (sum) + y; (compensation) = (t - (sum)) - y; (sum) = t; }
+#define kahan_sum_f(value,sum,compensation) { float y = (value) - (compensation); float t = (sum) + y; (compensation) = (t - (sum)) - y; (sum) = t; }
+#define kahan_sum_d(value,sum,compensation) { double y = (value) - (compensation); double t = (sum) + y; (compensation) = (t - (sum)) - y; (sum) = t; }
 
 Int smooth(Int narg, Int ps[], Int cumul)
 /* return smoothed version syntax: y = smooth/runcum(x [,axis,width]
@@ -1801,7 +1801,7 @@ Int smooth(Int narg, Int ps[], Int cumul)
 	/* we use the Kahan algorithm to limit roundoff error */
 	do {
 	  value.f = 0;		  /* initialize */
-	  Float c = 0.0;
+	  float c = 0.0;
 	  /* left-hand edge */
 	  if (internalMode & 1) { /* /PARTIAL_WIDTH */
 	    norm = cumul? ww: 0;
@@ -1830,7 +1830,7 @@ Int smooth(Int narg, Int ps[], Int cumul)
 	      kahan_sum_f(*src.f, value.f, c);
 	      src.f += stride; 
 	    }
-	    Double v = value.f/norm;
+	    double v = value.f/norm;
 	    for (i = 0; i < w1; i++) {
 	      *trgt.f = v;
 	      trgt.f += stride; 
@@ -1864,7 +1864,7 @@ Int smooth(Int narg, Int ps[], Int cumul)
 	      trgt.f += stride;
 	    }
 	  } else {
-	    Float v = value.f/norm;
+	    float v = value.f/norm;
 	    for ( ; i < srcinfo.rdims[0]; i++) { /* right edge */
 	      *trgt.f = v;
 	      trgt.f += stride;
@@ -1877,7 +1877,7 @@ Int smooth(Int narg, Int ps[], Int cumul)
 	/* we use the Kahan algorithm to limit roundoff error */
 	do {
 	  value.d = 0;		  /* initialize */
-	  Double c = 0.0;
+	  double c = 0.0;
 	  /* left-hand edge */
 	  if (internalMode & 1) { /* /PARTIAL_WIDTH */
 	    norm = cumul? ww: 0;
@@ -1906,7 +1906,7 @@ Int smooth(Int narg, Int ps[], Int cumul)
 	      kahan_sum_d(*src.d, value.d, c);
 	      src.d += stride; 
 	    }
-	    Double v = value.d/norm;
+	    double v = value.d/norm;
 	    for (i = 0; i < w1; i++) {
 	      *trgt.d = v;
 	      trgt.d += stride; 
@@ -1940,7 +1940,7 @@ Int smooth(Int narg, Int ps[], Int cumul)
 	      trgt.d += stride;
 	    }
 	  } else {
-	    Double v = value.d/norm;
+	    double v = value.d/norm;
 	    for ( ; i < srcinfo.rdims[0]; i++) { /* right edge */
 	      *trgt.d = v;
 	      trgt.d += stride;
@@ -2035,11 +2035,11 @@ Int pcmp2(const void *arg1, const void *arg2)
       d2.l = pcmp_ptr.l[*(Int *) arg2];
       return d1.l < d2.l? -1: (d1.l > d2.l? 1: 0);
     case LUX_FLOAT:
-      d1.f = *(Float *) arg1;
+      d1.f = *(float *) arg1;
       d2.f = pcmp_ptr.f[*(Int *) arg2];
       return d1.f < d2.f? -1: (d1.f > d2.f? 1: 0);
     case LUX_DOUBLE:
-      d1.d = *(Double *) arg1;
+      d1.d = *(double *) arg1;
       d2.d = pcmp_ptr.d[*(Int *) arg2];
       return d1.d < d2.d? -1: (d1.d > d2.d? 1: 0);
     }
@@ -2432,7 +2432,7 @@ Int lux_table2d(Int narg, Int ps[])
      { table.f = *xi.f;
        iTable = (Int) table.f;
        if (iTable < 0) iTable = 0;
-       if (iTable > nRepeat - ((Float) iTable == table.f? 1: 2))
+       if (iTable > nRepeat - ((float) iTable == table.f? 1: 2))
          iTable = nRepeat - 2;
        x.f = ox.f + iTable*nTable % nx;	/* start of relevant table */
        y.f = oy.f + iTable*nTable % ny;
@@ -2446,7 +2446,7 @@ Int lux_table2d(Int narg, Int ps[])
        grad.f = x.f[ix + 1] - x.f[ix];
        if (grad.f != 0.0) grad.f = (y.f[ix + 1] - y.f[ix])/grad.f;
        *r.f = y.f[ix] + grad.f*(*xf.f - x.f[ix]);
-       if (table.f != (Float) iTable)
+       if (table.f != (float) iTable)
        { x.f += nTable % nx;  y.f += nTable % ny;
          if (*xf.f > x.f[ix])
          { while (ix < nTable - 1 && *xf.f > x.f[ix]) ix++;
@@ -2467,7 +2467,7 @@ Int lux_table2d(Int narg, Int ps[])
      { table.d = *xi.d;
        iTable = (Int) table.d;
        if (iTable < 0) iTable = 0;
-       if (iTable > nRepeat - ((Double) iTable == table.d? 1: 2))
+       if (iTable > nRepeat - ((double) iTable == table.d? 1: 2))
          iTable = nRepeat - 2;
        x.d = ox.d + iTable*nTable % nx;
        y.d = oy.d + iTable*nTable % ny;
@@ -2481,7 +2481,7 @@ Int lux_table2d(Int narg, Int ps[])
        grad.d = x.d[ix + 1] - x.d[ix];
        if (grad.d != 0.0) grad.d = (y.d[ix + 1] - y.d[ix])/grad.d;
        *r.d = y.d[ix] + grad.d*(*xf.d - x.d[ix]);
-       if (table.d != (Double) iTable)
+       if (table.d != (double) iTable)
        { x.d += nTable % nx;  y.d += nTable % ny;
          if (*xf.d > x.d[ix])
          { while (ix < nTable - 1 && *xf.d > x.d[ix]) ix++;
@@ -2721,7 +2721,7 @@ Int local_maxormin(Int narg, Int ps[], Int code)
  extern Int	lastmaxloc, lastminloc, lastmin_sym, lastmax_sym;
  extern scalar	lastmax, lastmin;
  char		count[MAX_DIMS], *fname, filemap = 0, ready, edge;
- Float		*grad, *grad2, *hessian, *hessian2, x, v;
+ float		*grad, *grad2, *hessian, *hessian2, x, v;
  scalar		value, nextValue;
  pointer	data, trgt, extr;
  FILE		*fp;
@@ -2779,7 +2779,7 @@ Int local_maxormin(Int narg, Int ps[], Int code)
        puts("Sub-grid position array needs too many dimensions.");
        return cerror(N_DIMS_OVR, 0);
      }
-     memcpy(size, array_dims(iq), array_num_dims(iq)*sizeof(Float));
+     memcpy(size, array_dims(iq), array_num_dims(iq)*sizeof(float));
      j = array_num_dims(iq);
      size[j++] = ndim;
    }
@@ -2801,10 +2801,10 @@ Int local_maxormin(Int narg, Int ps[], Int code)
    defaultOffset -= size[i];
  }
  if (code & 4) {		/* subgrid stuff */
-   allocate(grad, ndim, Float);
-   allocate(grad2, ndim, Float);
-   allocate(hessian, ndim*ndim, Float);
-   allocate(hessian2, ndim, Float);
+   allocate(grad, ndim, float);
+   allocate(grad2, ndim, float);
+   allocate(hessian, ndim*ndim, float);
+   allocate(hessian2, ndim, float);
  }
 		/* setup for search */
  n = ntarget;
@@ -2941,10 +2941,10 @@ Int local_maxormin(Int narg, Int ps[], Int code)
 	   /* calculate gradient and hessian matrix */
 	   if (!filemap) {
 	     extr.b = &data.b[currentIndex];
-	     v = (Float) *extr.b;
+	     v = (float) *extr.b;
 	     for (i = 0; i < ndim; i++)
-	       grad[i] = grad2[i] = ((Float) extr.b[size[i]]
-				     - (Float) extr.b[-size[i]])/2;
+	       grad[i] = grad2[i] = ((float) extr.b[size[i]]
+				     - (float) extr.b[-size[i]])/2;
 	     ready = 1;		/* zero gradient? */
 	     for (i = 0; i < ndim; i++) {
 	       if (grad[i] != 0) {
@@ -2958,23 +2958,23 @@ Int local_maxormin(Int narg, Int ps[], Int code)
 	       for (j = 0; j <= i; j++) {
 		 if (i == j)
 		   hessian[i + i*ndim] = hessian2[i] = 
-		     (Float) extr.b[size[i]] + (Float) extr.b[-size[i]] - 2*v;
+		     (float) extr.b[size[i]] + (float) extr.b[-size[i]] - 2*v;
 		 else {
-		   x = ((Float) extr.b[size[i] + size[j]]
-			+ (Float) extr.b[-size[i] - size[j]]
-			- (Float) extr.b[size[i] - size[j]]
-			- (Float) extr.b[size[j] - size[i]])/4;
+		   x = ((float) extr.b[size[i] + size[j]]
+			+ (float) extr.b[-size[i] - size[j]]
+			- (float) extr.b[size[i] - size[j]]
+			- (float) extr.b[size[j] - size[i]])/4;
 		   hessian[i + j*ndim] = hessian[j + i*ndim] = x;
 		 }
 	       }
 	   } else {		/* filemap array */
 	     readGhost(fp, value.b, currentIndex, typesize);
-	     v = (Float) value.b;
+	     v = (float) value.b;
 	     for (i = 0; i < ndim; i++) {
 	       readGhost(fp, value.b, currentIndex + size[i], typesize);
-	       grad[i] = (Float) value.b;
+	       grad[i] = (float) value.b;
 	       readGhost(fp, value.b, currentIndex - size[i], typesize);
-	       grad[i] = (grad[i] - (Float) value.b)/2;
+	       grad[i] = (grad[i] - (float) value.b)/2;
 	     }
 	     ready = 1;		/* zero gradient? */
 	     for (i = 0; i < ndim; i++) {
@@ -2989,23 +2989,23 @@ Int local_maxormin(Int narg, Int ps[], Int code)
 	       for (j = 0; j <= i; j++) {
 		 if (i == j) {
 		   readGhost(fp, value.b, currentIndex + size[i], typesize);
-		   x = (Float) value.b;
+		   x = (float) value.b;
 		   readGhost(fp, value.b, currentIndex - size[i], typesize);
 		   hessian[i + i*ndim] = hessian2[i] =
-		     x + (Float) value.b - 2*v;
+		     x + (float) value.b - 2*v;
 		 } else {
 		   readGhost(fp, value.b, currentIndex + size[i] + size[j],
 			     typesize);
-		   x = (Float) value.b;
+		   x = (float) value.b;
 		   readGhost(fp, value.b, currentIndex - size[i] - size[j],
 			     typesize);
-		   x += (Float) value.b;
+		   x += (float) value.b;
 		   readGhost(fp, value.b, currentIndex + size[i] - size[j],
 			     typesize);
-		   x -= (Float) value.b;
+		   x -= (float) value.b;
 		   readGhost(fp, value.b, currentIndex - size[i] + size[j],
 			     typesize);
-		   x -= (Float) value.b;
+		   x -= (float) value.b;
 		   hessian[i + j*ndim] = hessian[j + i*ndim] = x/4;
 		 }
 	       }
@@ -3015,10 +3015,10 @@ Int local_maxormin(Int narg, Int ps[], Int code)
 	   /* calculate gradient and hessian matrix */
 	   if (!filemap) {
 	     extr.w = &data.w[currentIndex];
-	     v = (Float) *extr.w;
+	     v = (float) *extr.w;
 	     for (i = 0; i < ndim; i++)
-	       grad[i] = grad2[i] = ((Float) extr.w[size[i]]
-				     - (Float) extr.w[-size[i]])/2;
+	       grad[i] = grad2[i] = ((float) extr.w[size[i]]
+				     - (float) extr.w[-size[i]])/2;
 	     ready = 1;		/* zero gradient? */
 	     for (i = 0; i < ndim; i++) {
 	       if (grad[i] != 0) {
@@ -3032,23 +3032,23 @@ Int local_maxormin(Int narg, Int ps[], Int code)
 	       for (j = 0; j <= i; j++) {
 		 if (i == j)
 		   hessian[i + i*ndim] = hessian2[i] = 
-		     (Float) extr.w[size[i]] + (Float) extr.w[-size[i]] - 2*v;
+		     (float) extr.w[size[i]] + (float) extr.w[-size[i]] - 2*v;
 		 else {
-		   x = ((Float) extr.w[size[i] + size[j]]
-			+ (Float) extr.w[-size[i] - size[j]]
-			- (Float) extr.w[size[i] - size[j]]
-			- (Float) extr.w[size[j] - size[i]])/4;
+		   x = ((float) extr.w[size[i] + size[j]]
+			+ (float) extr.w[-size[i] - size[j]]
+			- (float) extr.w[size[i] - size[j]]
+			- (float) extr.w[size[j] - size[i]])/4;
 		   hessian[i + j*ndim] = hessian[j + i*ndim] = x;
 		 }
 	       }
 	   } else {		/* filemap array */
 	     readGhost(fp, value.w, currentIndex, typesize);
-	     v = (Float) value.w;
+	     v = (float) value.w;
 	     for (i = 0; i < ndim; i++) {
 	       readGhost(fp, value.w, currentIndex + size[i], typesize);
-	       grad[i] = (Float) value.w;
+	       grad[i] = (float) value.w;
 	       readGhost(fp, value.w, currentIndex - size[i], typesize);
-	       grad[i] = (grad[i] - (Float) value.w)/2;
+	       grad[i] = (grad[i] - (float) value.w)/2;
 	     }
 	     ready = 1;		/* zero gradient? */
 	     for (i = 0; i < ndim; i++) {
@@ -3063,23 +3063,23 @@ Int local_maxormin(Int narg, Int ps[], Int code)
 	       for (j = 0; j <= i; j++) {
 		 if (i == j) {
 		   readGhost(fp, value.w, currentIndex + size[i], typesize);
-		   x = (Float) value.w;
+		   x = (float) value.w;
 		   readGhost(fp, value.w, currentIndex - size[i], typesize);
 		   hessian[i + i*ndim] = hessian2[i] =
-		     x + (Float) value.w - 2*v;
+		     x + (float) value.w - 2*v;
 		 } else {
 		   readGhost(fp, value.w, currentIndex + size[i] + size[j],
 			     typesize);
-		   x = (Float) value.w;
+		   x = (float) value.w;
 		   readGhost(fp, value.w, currentIndex - size[i] - size[j],
 			     typesize);
-		   x += (Float) value.w;
+		   x += (float) value.w;
 		   readGhost(fp, value.w, currentIndex + size[i] - size[j],
 			     typesize);
-		   x -= (Float) value.w;
+		   x -= (float) value.w;
 		   readGhost(fp, value.w, currentIndex - size[i] + size[j],
 			     typesize);
-		   x -= (Float) value.w;
+		   x -= (float) value.w;
 		   hessian[i + j*ndim] = hessian[j + i*ndim] = x/4;
 		 }
 	       }
@@ -3089,10 +3089,10 @@ Int local_maxormin(Int narg, Int ps[], Int code)
 	   /* calculate gradient and hessian matrix */
 	   if (!filemap) {
 	     extr.l = &data.l[currentIndex];
-	     v = (Float) *extr.l;
+	     v = (float) *extr.l;
 	     for (i = 0; i < ndim; i++)
-	       grad[i] = grad2[i] = ((Float) extr.l[size[i]]
-				     - (Float) extr.l[-size[i]])/2;
+	       grad[i] = grad2[i] = ((float) extr.l[size[i]]
+				     - (float) extr.l[-size[i]])/2;
 	     ready = 1;		/* zero gradient? */
 	     for (i = 0; i < ndim; i++) {
 	       if (grad[i] != 0) {
@@ -3106,23 +3106,23 @@ Int local_maxormin(Int narg, Int ps[], Int code)
 	       for (j = 0; j <= i; j++) {
 		 if (i == j)
 		   hessian[i + i*ndim] = hessian2[i] = 
-		     (Float) extr.l[size[i]] + (Float) extr.l[-size[i]] - 2*v;
+		     (float) extr.l[size[i]] + (float) extr.l[-size[i]] - 2*v;
 		 else {
-		   x = ((Float) extr.l[size[i] + size[j]]
-			+ (Float) extr.l[-size[i] - size[j]]
-			- (Float) extr.l[size[i] - size[j]]
-			- (Float) extr.l[size[j] - size[i]])/4;
+		   x = ((float) extr.l[size[i] + size[j]]
+			+ (float) extr.l[-size[i] - size[j]]
+			- (float) extr.l[size[i] - size[j]]
+			- (float) extr.l[size[j] - size[i]])/4;
 		   hessian[i + j*ndim] = hessian[j + i*ndim] = x;
 		 }
 	       }
 	   } else {		/* filemap array */
 	     readGhost(fp, value.l, currentIndex, typesize);
-	     v = (Float) value.l;
+	     v = (float) value.l;
 	     for (i = 0; i < ndim; i++) {
 	       readGhost(fp, value.l, currentIndex + size[i], typesize);
-	       grad[i] = (Float) value.l;
+	       grad[i] = (float) value.l;
 	       readGhost(fp, value.l, currentIndex - size[i], typesize);
-	       grad[i] = (grad[i] - (Float) value.l)/2;
+	       grad[i] = (grad[i] - (float) value.l)/2;
 	     }
 	     ready = 1;		/* zero gradient? */
 	     for (i = 0; i < ndim; i++) {
@@ -3137,23 +3137,23 @@ Int local_maxormin(Int narg, Int ps[], Int code)
 	       for (j = 0; j <= i; j++) {
 		 if (i == j) {
 		   readGhost(fp, value.l, currentIndex + size[i], typesize);
-		   x = (Float) value.l;
+		   x = (float) value.l;
 		   readGhost(fp, value.l, currentIndex - size[i], typesize);
 		   hessian[i + i*ndim] = hessian2[i] =
-		     x + (Float) value.l - 2*v;
+		     x + (float) value.l - 2*v;
 		 } else {
 		   readGhost(fp, value.l, currentIndex + size[i] + size[j],
 			     typesize);
-		   x = (Float) value.l;
+		   x = (float) value.l;
 		   readGhost(fp, value.l, currentIndex - size[i] - size[j],
 			     typesize);
-		   x += (Float) value.l;
+		   x += (float) value.l;
 		   readGhost(fp, value.l, currentIndex + size[i] - size[j],
 			     typesize);
-		   x -= (Float) value.l;
+		   x -= (float) value.l;
 		   readGhost(fp, value.l, currentIndex - size[i] + size[j],
 			     typesize);
-		   x -= (Float) value.l;
+		   x -= (float) value.l;
 		   hessian[i + j*ndim] = hessian[j + i*ndim] = x/4;
 		 }
 	       }
@@ -3163,10 +3163,10 @@ Int local_maxormin(Int narg, Int ps[], Int code)
 	   /* calculate gradient and hessian matrix */
 	   if (!filemap) {
 	     extr.f = &data.f[currentIndex];
-	     v = (Float) *extr.f;
+	     v = (float) *extr.f;
 	     for (i = 0; i < ndim; i++)
-	       grad[i] = grad2[i] = ((Float) extr.f[size[i]]
-				     - (Float) extr.f[-size[i]])/2;
+	       grad[i] = grad2[i] = ((float) extr.f[size[i]]
+				     - (float) extr.f[-size[i]])/2;
 	     ready = 1;		/* zero gradient? */
 	     for (i = 0; i < ndim; i++) {
 	       if (grad[i] != 0) {
@@ -3180,23 +3180,23 @@ Int local_maxormin(Int narg, Int ps[], Int code)
 	       for (j = 0; j <= i; j++) {
 		 if (i == j)
 		   hessian[i + i*ndim] = hessian2[i] = 
-		     (Float) extr.f[size[i]] + (Float) extr.f[-size[i]] - 2*v;
+		     (float) extr.f[size[i]] + (float) extr.f[-size[i]] - 2*v;
 		 else {
-		   x = ((Float) extr.f[size[i] + size[j]]
-			+ (Float) extr.f[-size[i] - size[j]]
-			- (Float) extr.f[size[i] - size[j]]
-			- (Float) extr.f[size[j] - size[i]])/4;
+		   x = ((float) extr.f[size[i] + size[j]]
+			+ (float) extr.f[-size[i] - size[j]]
+			- (float) extr.f[size[i] - size[j]]
+			- (float) extr.f[size[j] - size[i]])/4;
 		   hessian[i + j*ndim] = hessian[j + i*ndim] = x;
 		 }
 	       }
 	   } else {		/* filemap array */
 	     readGhost(fp, value.f, currentIndex, typesize);
-	     v = (Float) value.f;
+	     v = (float) value.f;
 	     for (i = 0; i < ndim; i++) {
 	       readGhost(fp, value.f, currentIndex + size[i], typesize);
-	       grad[i] = (Float) value.f;
+	       grad[i] = (float) value.f;
 	       readGhost(fp, value.f, currentIndex - size[i], typesize);
-	       grad[i] = (grad[i] - (Float) value.f)/2;
+	       grad[i] = (grad[i] - (float) value.f)/2;
 	     }
 	     ready = 1;		/* zero gradient? */
 	     for (i = 0; i < ndim; i++) {
@@ -3211,23 +3211,23 @@ Int local_maxormin(Int narg, Int ps[], Int code)
 	       for (j = 0; j <= i; j++) {
 		 if (i == j) {
 		   readGhost(fp, value.f, currentIndex + size[i], typesize);
-		   x = (Float) value.f;
+		   x = (float) value.f;
 		   readGhost(fp, value.f, currentIndex - size[i], typesize);
 		   hessian[i + i*ndim] = hessian2[i] =
-		     x + (Float) value.f - 2*v;
+		     x + (float) value.f - 2*v;
 		 } else {
 		   readGhost(fp, value.f, currentIndex + size[i] + size[j],
 			     typesize);
-		   x = (Float) value.f;
+		   x = (float) value.f;
 		   readGhost(fp, value.f, currentIndex - size[i] - size[j],
 			     typesize);
-		   x += (Float) value.f;
+		   x += (float) value.f;
 		   readGhost(fp, value.f, currentIndex + size[i] - size[j],
 			     typesize);
-		   x -= (Float) value.f;
+		   x -= (float) value.f;
 		   readGhost(fp, value.f, currentIndex - size[i] + size[j],
 			     typesize);
-		   x -= (Float) value.f;
+		   x -= (float) value.f;
 		   hessian[i + j*ndim] = hessian[j + i*ndim] = x/4;
 		 }
 	       }
@@ -3237,10 +3237,10 @@ Int local_maxormin(Int narg, Int ps[], Int code)
 	   /* calculate gradient and hessian matrix */
 	   if (!filemap) {
 	     extr.d = &data.d[currentIndex];
-	     v = (Float) *extr.d;
+	     v = (float) *extr.d;
 	     for (i = 0; i < ndim; i++)
-	       grad[i] = grad2[i] = ((Float) extr.d[size[i]]
-				     - (Float) extr.d[-size[i]])/2;
+	       grad[i] = grad2[i] = ((float) extr.d[size[i]]
+				     - (float) extr.d[-size[i]])/2;
 	     ready = 1;		/* zero gradient? */
 	     for (i = 0; i < ndim; i++) {
 	       if (grad[i] != 0) {
@@ -3254,23 +3254,23 @@ Int local_maxormin(Int narg, Int ps[], Int code)
 	       for (j = 0; j <= i; j++) {
 		 if (i == j)
 		   hessian[i + i*ndim] = hessian2[i] = 
-		     (Float) extr.d[size[i]] + (Float) extr.d[-size[i]] - 2*v;
+		     (float) extr.d[size[i]] + (float) extr.d[-size[i]] - 2*v;
 		 else {
-		   x = ((Float) extr.d[size[i] + size[j]]
-			+ (Float) extr.d[-size[i] - size[j]]
-			- (Float) extr.d[size[i] - size[j]]
-			- (Float) extr.d[size[j] - size[i]])/4;
+		   x = ((float) extr.d[size[i] + size[j]]
+			+ (float) extr.d[-size[i] - size[j]]
+			- (float) extr.d[size[i] - size[j]]
+			- (float) extr.d[size[j] - size[i]])/4;
 		   hessian[i + j*ndim] = hessian[j + i*ndim] = x;
 		 }
 	       }
 	   } else {		/* filemap array */
 	     readGhost(fp, value.d, currentIndex, typesize);
-	     v = (Float) value.d;
+	     v = (float) value.d;
 	     for (i = 0; i < ndim; i++) {
 	       readGhost(fp, value.d, currentIndex + size[i], typesize);
-	       grad[i] = (Float) value.d;
+	       grad[i] = (float) value.d;
 	       readGhost(fp, value.d, currentIndex - size[i], typesize);
-	       grad[i] = (grad[i] - (Float) value.d)/2;
+	       grad[i] = (grad[i] - (float) value.d)/2;
 	     }
 	     ready = 1;		/* zero gradient? */
 	     for (i = 0; i < ndim; i++) {
@@ -3285,23 +3285,23 @@ Int local_maxormin(Int narg, Int ps[], Int code)
 	       for (j = 0; j <= i; j++) {
 		 if (i == j) {
 		   readGhost(fp, value.d, currentIndex + size[i], typesize);
-		   x = (Float) value.d;
+		   x = (float) value.d;
 		   readGhost(fp, value.d, currentIndex - size[i], typesize);
 		   hessian[i + i*ndim] = hessian2[i] =
-		     x + (Float) value.d - 2*v;
+		     x + (float) value.d - 2*v;
 		 } else {
 		   readGhost(fp, value.d, currentIndex + size[i] + size[j],
 			     typesize);
-		   x = (Float) value.d;
+		   x = (float) value.d;
 		   readGhost(fp, value.d, currentIndex - size[i] - size[j],
 			     typesize);
-		   x += (Float) value.d;
+		   x += (float) value.d;
 		   readGhost(fp, value.d, currentIndex + size[i] - size[j],
 			     typesize);
-		   x -= (Float) value.d;
+		   x -= (float) value.d;
 		   readGhost(fp, value.d, currentIndex - size[i] + size[j],
 			     typesize);
-		   x -= (Float) value.d;
+		   x -= (float) value.d;
 		   hessian[i + j*ndim] = hessian[j + i*ndim] = x/4;
 		 }
 	       }
@@ -3358,19 +3358,19 @@ Int local_maxormin(Int narg, Int ps[], Int code)
      if (code & 4) {		/* subgrid value */
        switch (type) {
        case LUX_BYTE:
-	 *trgt.f++ = (Float) nextValue.b;
+	 *trgt.f++ = (float) nextValue.b;
 	 break;
        case LUX_WORD:
-	 *trgt.f++ = (Float) nextValue.w;
+	 *trgt.f++ = (float) nextValue.w;
 	 break;
        case LUX_LONG:
-	 *trgt.f++ = (Float) nextValue.l;
+	 *trgt.f++ = (float) nextValue.l;
 	 break;
        case LUX_FLOAT:
-	 *trgt.f++ = (Float) nextValue.f;
+	 *trgt.f++ = (float) nextValue.f;
 	 break;
        case LUX_DOUBLE:
-	 *trgt.f++ = (Float) nextValue.d;
+	 *trgt.f++ = (float) nextValue.d;
 	 break;
        }
      } else {			/* grid value */
@@ -3405,11 +3405,11 @@ Int local_maxormin(Int narg, Int ps[], Int code)
 		/* prepare result */
  if (max) {			/* sought maximum */
    lastmaxloc = currentIndex;
-   memcpy(&lastmax.b, &nextValue.b, (code & 4)? sizeof(Float): typesize);
+   memcpy(&lastmax.b, &nextValue.b, (code & 4)? sizeof(float): typesize);
    symbol_type(lastmax_sym) = (code & 4)? LUX_FLOAT: type;
  } else {
    lastminloc = currentIndex;
-   memcpy(&lastmin.b, &nextValue.b, (code & 4)? sizeof(Float): typesize);
+   memcpy(&lastmin.b, &nextValue.b, (code & 4)? sizeof(float): typesize);
    symbol_type(lastmin_sym) = (code & 4)? LUX_FLOAT: type;
  }
  return iq;
@@ -3454,7 +3454,7 @@ Int lux_zinv(Int narg, Int ps[])
 {
  Int	topType, result, iq, n;
  pointer	data, target;
- Double	value;
+ double	value;
 
  iq = *ps;
  if (!symbolIsNumerical(iq))
@@ -3672,7 +3672,7 @@ Int lux_bsmooth(Int narg, Int ps[])
   Int	iq, axis, outtype, type, result_sym, *dims, ndim, xdims[MAX_DIMS],
 	width, i, n, tally[MAX_DIMS], step[MAX_DIMS], m, done, j, k, stride;
   pointer	src, trgt, src0, trgt0;
-  Float	fwidth;
+  float	fwidth;
 
   if (narg > 2)
   { iq = ps[2];			/* WIDTH */
@@ -3700,7 +3700,7 @@ Int lux_bsmooth(Int narg, Int ps[])
       outtype = type = array_type(iq);
       if (type < LUX_FLOAT) 
       { outtype = LUX_FLOAT;
-	iq = lux_float(1, &iq); } /*Float the input */
+	iq = lux_float(1, &iq); } /*float the input */
       src0.l = (Int *) array_data(iq);
       m = array_size(iq);
       if (axis >= 0)		/* axis specified */

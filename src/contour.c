@@ -32,25 +32,25 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 extern	Int	current_pen, autocon, contour_mode, contour_box, 
 	contour_nlev, contour_border, contour_tick_pen,	contour_ticks,
 	contour_style, iorder;
-extern	Float	wxb, wxt, wyb, wyt, contour_dash_lev, contour_tick_fac;
+extern	float	wxb, wxt, wyb, wyt, contour_dash_lev, contour_tick_fac;
 Int	contour_flag;
 Int	contour_sym;
 static	Int	nx, ny;
-static	Float	xa, xb, ya, yb;
-static	Float	xsc, ysc;
-Int	tkplot(Float, Float, Int, Int);
+static	float	xa, xb, ya, yb;
+static	float	xsc, ysc;
+Int	tkplot(float, float, Int, Int);
 /*------------------------------------------------------------------------- */
 Int lux_contour(Int narg, Int ps[]) /* contour routine */		
 /* call is CONTOUR, image, nlev, xa, xb, ya, yb */
 {
   array	*h;
   Int	iq, i, nc, lineStyle, symStyle;
-  Float	*pf, *cl, xmax, xmin, *pp, yq, xspace, xq;
-  Int	anacon(Float *, Int, Int, Float *, Int, Int, Float, Float, Float,
-	       Float, Float), installString(char *), lux_replace(Int, Int),
+  float	*pf, *cl, xmax, xmin, *pp, yq, xspace, xq;
+  Int	anacon(float *, Int, Int, float *, Int, Int, float, float, float,
+	       float, float), installString(char *), lux_replace(Int, Int),
 	box(void), ticks(void), fixPlotStyle(Int *, Int *);
   extern Int	tkCoordSys;
-  extern Float	theDashSize;
+  extern float	theDashSize;
   char	gotLevels;
 
   iq = ps[0];
@@ -58,7 +58,7 @@ Int lux_contour(Int narg, Int ps[]) /* contour routine */
   iq = lux_float(1, &iq);
   h = (array *) sym[iq].spec.array.ptr;
   ny = 1; nx = h->dims[0]; if (h->ndim != 1) ny = h->dims[1];
-  pf = (Float *) ((char *) h + sizeof( array ));
+  pf = (float *) ((char *) h + sizeof( array ));
   /* check if $contours array exists yet */
   if (contour_sym == 0) {
     i = installString("$CONTOURS");
@@ -93,7 +93,7 @@ Int lux_contour(Int narg, Int ps[]) /* contour routine */
   if (!gotLevels && ((internalMode & 1) || (!internalMode && autocon)))
   { redef_array(contour_sym, 3, 1, &contour_nlev);
     h = (array *) sym[contour_sym].spec.array.ptr;
-    cl = (Float *) ((char *) h + sizeof( array ));
+    cl = (float *) ((char *) h + sizeof( array ));
     pp = pf;	nc = nx * ny - 1;	xmin = xmax = *pp++;
     while (nc--) {	if (*pp > xmax)  xmax = *pp;
 			if (*pp < xmin)  xmin = *pp;	pp++; }
@@ -122,7 +122,7 @@ Int lux_contour(Int narg, Int ps[]) /* contour routine */
     iq = lux_float(1, &contour_sym);
     h = (array *) sym[iq].spec.array.ptr;
     if (h->ndim != 1) return cerror(BAD_CONTOURS, contour_sym);
-    cl = (Float *) ((char *) h + sizeof( array ));
+    cl = (float *) ((char *) h + sizeof( array ));
     contour_nlev = MIN(contour_nlev, h->dims[0]);  /* min of these used */
   }
   xsc = (xb - xa)/nx;	ysc = (yb - ya)/ny;
@@ -157,7 +157,7 @@ Int box(void)
 Int ticks(void)
 {
   Int	oldpen, pen;
-  Float	tx, ty, y, x, xs, ys;
+  float	tx, ty, y, x, xs, ys;
   Int	set_pen(Int);
 
   if (contour_tick_pen <= 0)
@@ -236,12 +236,12 @@ Int ticks(void)
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int tkdash(Float *aa, Float *bb, Int *ndsh, Int *ntimes)
+Int tkdash(float *aa, float *bb, Int *ndsh, Int *ntimes)
 /* actually no dashed line support yet 3/9/92 */
      /* there is now!  LS 4feb95 */
 {
   Int	nc;
-  Float	x, y;
+  float	x, y;
 
   nc = *ntimes;
   while (nc-- > 0) 
@@ -250,7 +250,7 @@ Int tkdash(Float *aa, Float *bb, Int *ndsh, Int *ntimes)
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int lower_int(Float x)
+Int lower_int(float x)
 /* returns the first integer closer to -Infinity than x */
 {
   Int	i;
@@ -260,7 +260,7 @@ Int lower_int(Float x)
   return i;
 }
 /*------------------------------------------------------------------------- */
-Int closest_int(Float x)
+Int closest_int(float x)
 /* returns the integer closest to x (with integer + 0.5 -> integer + 1) */
 {
   Int	i;

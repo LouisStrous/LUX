@@ -17,7 +17,7 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-Double meanDistances[9][9] = {
+double meanDistances[9][9] = {
   { 0.0000, 0.3871, 0.7233, 1.0000, 1.5237, 5.2026, 9.5549, 19.2184, 30.1104},
   { 0.3871, 0.4929, 0.7761, 1.0378, 1.5484, 5.2098, 9.5588, 19.2203, 30.1116},
   { 0.7233, 0.7761, 0.9209, 1.1358, 1.6108, 5.2278, 9.5686, 19.2252, 30.1147 },
@@ -48,7 +48,7 @@ int16_t nutationMultiples[5*63] = {
    2,-1,-1, 2, 2,   0, 0, 3, 2, 2,   2,-1, 0, 2, 2
  };
 
-Double nutationAmplitudes[4*63] = {
+double nutationAmplitudes[4*63] = {
   -171996, -174.2, 92025, 8.9,  -13187, -1.6, 5736, -3.1,
   -2274, -0.2, 977, -0.5,  2062, 0.2, -895, 0.5,
   1426, -3.4, 54, -0.1,  712, 0.1, -7, 0,  -517, 1.2, 224, -0.6,

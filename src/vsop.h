@@ -26,13 +26,13 @@ struct planetIndex {
 struct VSOPdata {
   struct planetIndex indices[6*3*8];
   int16_t nTerms;
-  Double *terms;
+  double *terms;
 };
 struct VSOPdata planetIndicesForTolerance(struct VSOPdata *data, 
-                                          Double tolerance);
+                                          double tolerance);
 struct VSOPdata VSOP87Adata;
 struct VSOPdata VSOP87Cdata;
 
-void XYZJ2000fromVSOPA(Double T, Int object, Double *pos, Double tolerance);
-void XYZdatefromVSOPC(Double T, Int object, Double *pos, Double tolerance);
+void XYZJ2000fromVSOPA(double T, Int object, double *pos, double tolerance);
+void XYZdatefromVSOPC(double T, Int object, double *pos, double tolerance);
 

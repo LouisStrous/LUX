@@ -106,10 +106,10 @@ pointer lux_func_if_get_param_data(lux_func_if *afif, size_t index)
   return afif->param_data[index];
 }
 
-Double lux_func_if_call(lux_func_if *afif)
+double lux_func_if_call(lux_func_if *afif)
 {
   Int result_sym = eval(afif->func_sym);
-  Double result = (result_sym < 0? NAN: double_arg(result_sym));
+  double result = (result_sym < 0? NAN: double_arg(result_sym));
   zap(result_sym);
   return result;
 }

@@ -38,10 +38,10 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 
 char    PoissonChiSq;           /* flag: Poisson chi-square fitting? */
 uint32_t random_bits(void);
-void indexxr_d(Int, Double *, Int *);
+void indexxr_d(Int, double *, Int *);
 
 /*-----------------------------------------------------------------------*/
-Double gaussians(Double *par, Int nPar, Double *x, Double *y, Double *w, Int nData)
+double gaussians(double *par, Int nPar, double *x, double *y, double *w, Int nData)
 /* Returns the rms error (if PoissonChiSq is zero) or chi-square for */
 /* Poisson distributions (if PoissonChiSq is nonzero) in fitting y vs x */
 /* with a set of gaussians. */
@@ -51,7 +51,7 @@ Double gaussians(Double *par, Int nPar, Double *x, Double *y, Double *w, Int nDa
 /* added.   LS 26oct95  31oct95 */
 {
   Int   j, wstep;
-  Double        rms, fit, arg, one = 1.0;
+  double        rms, fit, arg, one = 1.0;
 
   if (w)
     wstep = 1;
@@ -81,14 +81,14 @@ Double gaussians(Double *par, Int nPar, Double *x, Double *y, Double *w, Int nDa
     return sqrt(rms); }
 }
 /*-----------------------------------------------------------------------*/
-Double powerfunc(Double *par, Int nPar, Double *x, Double *y, Double *w, Int nData)
+double powerfunc(double *par, Int nPar, double *x, double *y, double *w, Int nData)
 /* returns the error in fitting y vs x with a general power function */
 /* superposed on a linear trend. */
 /* the fit profile is  par[0] + par[1]*x + par[2]*(x - par[3])^par[4] */
 /* LS 13nov95 */
 {
   Int   wstep;
-  Double        rms, dfit, one;
+  double        rms, dfit, one;
 
   if (w)
     wstep = 1;
@@ -103,7 +103,7 @@ Double powerfunc(Double *par, Int nPar, Double *x, Double *y, Double *w, Int nDa
   return sqrt(rms);
 }
 /*-----------------------------------------------------------------------*/
-void enforce_bounds(Double *par, Double *lowbound, Double *hibound, Int nPar)
+void enforce_bounds(double *par, double *lowbound, double *hibound, Int nPar)
 {
   if (lowbound || hibound) {
     int i;
@@ -131,14 +131,14 @@ Int lux_generalfit(Int narg, Int ps[])
 {
   Int   ySym, xSym, nPoints, n, nPar, nIter, iThresh, nSame, size,
     iq, i, j, iter, same, fitSym, fitTemp, xTemp, nn, wSym;
-  Double *yp, *xp, *start, *step, qThresh, *pThresh, fac, *lowbound, *hibound,
+  double *yp, *xp, *start, *step, qThresh, *pThresh, fac, *lowbound, *hibound,
         *err, *par, qBest1, qBest2, *parBest1, *parBest2, *ran, qual, temp,
     dir, dThresh, qLast, mu, *meanShift, *weights, tThresh;
   char  vocal, onebyone, vocal_err;
-  void  randome(Double *output, Int number);
-  Double (*fitProfiles[2])(Double *, Int, Double *, Double *, Double *, Int) =
+  void  randome(double *output, Int number);
+  double (*fitProfiles[2])(double *, Int, double *, double *, double *, Int) =
   { gaussians, powerfunc };
-  Double (*fitFunc)(Double *, Int, Double *, Double *, Double *, Int);
+  double (*fitFunc)(double *, Int, double *, double *, double *, Int);
   extern Int    nFixed;
   Word  fitPar, fitArg[4];
   Int   lux_indgen(Int, Int []), eval(Int);
@@ -177,7 +177,7 @@ Int lux_generalfit(Int narg, Int ps[])
     return cerror(NEED_ARR, ySym);
   ySym = lux_double(1, &ySym);  /* ensure LUX_DOUBLE */
   nPoints = array_size(ySym);   /* number of data points */
-  yp = (Double *) array_data(ySym); /* pointer to data */
+  yp = (double *) array_data(ySym); /* pointer to data */
 
   if (xSym)                     /* X */
     switch (symbol_class(xSym)) {
@@ -194,14 +194,14 @@ Int lux_generalfit(Int narg, Int ps[])
         xSym = lux_double(1, &xSym);
         xTemp = xSym;
         if (symbol_class(xSym) == LUX_ARRAY)
-          xp = (Double *) array_data(xSym);
+          xp = (double *) array_data(xSym);
         break;
       default:
         return cerror(ILL_CLASS, xSym);
     }
   else {
     xTemp = lux_indgen(1, &ySym);
-    xp = (Double *) array_data(xTemp);
+    xp = (double *) array_data(xTemp);
   }
 
   iq = ps[2];                   /* START: initial parameter values */
@@ -209,7 +209,7 @@ Int lux_generalfit(Int narg, Int ps[])
     return cerror(NEED_ARR, iq);
   iq = lux_double(1, &iq);
   nPar = array_size(iq);
-  start = (Double *) array_data(iq);
+  start = (double *) array_data(iq);
   
   iq = ps[3];                   /* STEP: initial parameter step sizes */
   if (symbol_class(iq) != LUX_ARRAY)
@@ -231,7 +231,7 @@ Int lux_generalfit(Int narg, Int ps[])
           return luxerror("Need five parameters for power-function fits", ps[3]);
         break;
     }
-  step = (Double *) array_data(iq);
+  step = (double *) array_data(iq);
 
   if (narg >= 5 && (iq = ps[4])) { /* LOWBOUND: lower bound on parameters */
     if (symbol_class(iq) != LUX_ARRAY)
@@ -240,7 +240,7 @@ Int lux_generalfit(Int narg, Int ps[])
     n = array_size(iq);
     if (n != nPar)
       return cerror(INCMP_ARG, ps[4]);
-    lowbound = (Double *) array_data(iq);
+    lowbound = (double *) array_data(iq);
   } else
     lowbound = NULL;
 
@@ -251,7 +251,7 @@ Int lux_generalfit(Int narg, Int ps[])
     n = array_size(iq);
     if (n != nPar)
       return cerror(INCMP_ARG, ps[5]);
-    hibound = (Double *) array_data(iq);
+    hibound = (double *) array_data(iq);
   } else
     hibound = NULL;
 
@@ -268,7 +268,7 @@ Int lux_generalfit(Int narg, Int ps[])
     n = array_size(wSym);
     if (n != nPoints)
       return cerror(INCMP_ARG, ps[6]);
-    weights = (Double *) array_data(wSym);
+    weights = (double *) array_data(wSym);
   } else
     weights = NULL;
 
@@ -284,7 +284,7 @@ Int lux_generalfit(Int narg, Int ps[])
     n = array_size(iq);
     if (n != nPar)
       return cerror(INCMP_ARG, ps[8]);
-    pThresh = (Double *) array_data(iq);
+    pThresh = (double *) array_data(iq);
   } else
     pThresh = NULL;
 
@@ -325,9 +325,9 @@ Int lux_generalfit(Int narg, Int ps[])
     }
     i = nPar;
     redef_array(ps[14], LUX_DOUBLE, 1, &i);
-    err = (Double *) array_data(ps[14]);
+    err = (double *) array_data(ps[14]);
   } else {
-    err = malloc(nPar*sizeof(Double));
+    err = malloc(nPar*sizeof(double));
     if (!err)
       return cerror(ALLOC_ERR, 0);
   }
@@ -349,9 +349,9 @@ Int lux_generalfit(Int narg, Int ps[])
 
   i = nPar + 1;
   fitPar = array_scratch(LUX_DOUBLE, 1, &i); /* fit parameters */
-  par = (Double *) array_data(fitPar);
+  par = (double *) array_data(fitPar);
 
-  size = nPar*sizeof(Double);
+  size = nPar*sizeof(double);
 
   /* copy start values into par */
   memcpy(par, start, size);
@@ -412,20 +412,20 @@ Int lux_generalfit(Int narg, Int ps[])
     zapTemp(i);
   } else
     qBest2 = qBest1 = fitFunc(par, nPar, xp, yp, weights, nPoints);
-  allocate(parBest1, nPar, Double);
-  allocate(parBest2, nPar, Double);
-  allocate(ran, nPar, Double);
+  allocate(parBest1, nPar, double);
+  allocate(parBest2, nPar, double);
+  allocate(ran, nPar, double);
   memcpy(parBest1, par, size);
   memcpy(parBest2, par, size);
   memcpy(err, step, size);
-  allocate(meanShift, nPar, Double);
+  allocate(meanShift, nPar, double);
   for (i = 0; i < nPar; i++)
     meanShift[i] = 0.0;
 
   iter = 0;
   same = 0;
   mu = 0;
-  Double qLag = 1.2*qBest2;
+  double qLag = 1.2*qBest2;
   if (!qLag)
     qLag = 1;
   do {                          /* iterate */
@@ -520,11 +520,11 @@ Int lux_generalfit(Int narg, Int ps[])
   par[nPar] = qBest2;
 
   /* presumably we're close to a local minimum now; home in */
-  Double qualplus, qualmin;
+  double qualplus, qualmin;
   for (i = 0; i < nPar; i++) {
     if (step[i]) {
-      Double h = fabs(step[i]);
-      Double r;
+      double h = fabs(step[i]);
+      double r;
       do {
 	par[i] = parBest2[i] + h;
 	if (fitSym) {
@@ -548,10 +548,10 @@ Int lux_generalfit(Int narg, Int ps[])
 	h *= 12/(r*r - 4);
       } while ((r > 5 || r < 3) && h < err[i]*1e6);
       /* q² = a²(1 + ((x - b)/c)²) */
-      Double psi = (qualplus*qualplus - qualmin*qualmin)/4;
-      Double beta = qBest2*qBest2;
-      Double delta = (qualplus*qualplus + qualmin*qualmin)/2 - beta;
-      Double a2, b, c;
+      double psi = (qualplus*qualplus - qualmin*qualmin)/4;
+      double beta = qBest2*qBest2;
+      double delta = (qualplus*qualplus + qualmin*qualmin)/2 - beta;
+      double a2, b, c;
       if (delta) {
 	a2 = beta - psi*psi/delta; /* a² */
 	if (a2 < 0) {
@@ -565,7 +565,7 @@ Int lux_generalfit(Int narg, Int ps[])
 	c = INFTY;
       }
       par[i] = parBest2[i] + b;
-      Double q;
+      double q;
       if (fitSym) {
 	j = eval(fitTemp);
 	if (j < 0)
@@ -669,12 +669,12 @@ gsl_vector *gsl_vector_from_lux_symbol(Int iq, Int axis)
   return v;
 }
 /*------------------------------------------------------------*/
-Double fit2_func(const gsl_vector *a, void *p)
+double fit2_func(const gsl_vector *a, void *p)
 {
   lux_func_if *afif = (lux_func_if *) p;
   pointer par = lux_func_if_get_param_data(afif, 0);
-  memcpy(par.d, a->data, a->size*sizeof(Double));
-  Double result = lux_func_if_call(afif);
+  memcpy(par.d, a->data, a->size*sizeof(double));
+  double result = lux_func_if_call(afif);
   if (isnan(result))
     return GSL_NAN;
   return result;
@@ -690,7 +690,7 @@ Double fit2_func(const gsl_vector *a, void *p)
   deviation of the difference <y> and <funcname>(<par>, <x>, <y>).
 
   We use the GSL framework to seek X that minimizes the value of
-  function Double generalfit2_func(const gsl_vector * X, void *
+  function double generalfit2_func(const gsl_vector * X, void *
   PARAMS).  Their X corresponds to our <par>, and their PARAMS
   corresponds to our <x> and <y> -- confusing!
 
@@ -719,7 +719,7 @@ Int lux_generalfit2(Int narg, Int ps[])
   lux_func_if *afif = NULL;
   gsl_vector *par_v = NULL, *step_v = NULL;
   Int d_step_sym, d_par_sym, d_x_sym, d_y_sym;
-  Double *errors = NULL, sthresh = 0;
+  double *errors = NULL, sthresh = 0;
 
   Int vocal = (internalMode & 1);
 
@@ -756,7 +756,7 @@ Int lux_generalfit2(Int narg, Int ps[])
   }
   if (narg > 5 && ps[5]) {	/* ERR */
     redef_array(ps[5], LUX_DOUBLE, 1, &nPar);
-    errors = (Double *) array_data(ps[5]);
+    errors = (double *) array_data(ps[5]);
   }
   if (narg > 6 && ps[6])	/* ITHRESH */
     ithresh = int_arg(ps[6]);
@@ -823,7 +823,7 @@ Int lux_generalfit2(Int narg, Int ps[])
   time_t report_after;
   if (vocal)
     report_after = time(NULL);
-  Double oldqual, newqual = 0, vocal_oldqual = 0, size, vocal_oldsize = 0;
+  double oldqual, newqual = 0, vocal_oldqual = 0, size, vocal_oldsize = 0;
   Int no_improvement_niter = 0;
   do {
     ++iter;
@@ -833,16 +833,16 @@ Int lux_generalfit2(Int narg, Int ps[])
     size = gsl_multimin_fminimizer_size(minimizer);
     oldqual = newqual;
     newqual = sqrt(minimizer->fval/nPoints);
-    Double improvement = newqual - oldqual;
+    double improvement = newqual - oldqual;
     if (improvement)
       no_improvement_niter = 0;
     else
       ++no_improvement_niter;
     if (vocal && time(NULL) > report_after) {
       Int i, j = 0;
-      Double vocal_improvement = newqual - vocal_oldqual;
+      double vocal_improvement = newqual - vocal_oldqual;
       vocal_oldqual = newqual;
-      Double size_improvement = size - vocal_oldsize;
+      double size_improvement = size - vocal_oldsize;
       vocal_oldsize = size;
       printf("%d %g (%.3g) %.3g (%+.3g):", iter, newqual, vocal_improvement,
 	     size, size_improvement);
@@ -865,19 +865,19 @@ Int lux_generalfit2(Int narg, Int ps[])
     Int n = best_par->size + 1;
     result = array_scratch(LUX_DOUBLE, 1, &n);
   }
-  Double *tgt = array_data(result);
-  memcpy(tgt, best_par->data, best_par->size*sizeof(Double));
-  Double best_min = lux_func_if_call(afif);
+  double *tgt = array_data(result);
+  memcpy(tgt, best_par->data, best_par->size*sizeof(double));
+  double best_min = lux_func_if_call(afif);
   tgt[best_par->size] = best_min;
 
   if (errors) {
     Int i;
     for (i = 0; i < nPar; i++) {
       if (step_v->data[i]) {
-	Double h;
-	memcpy(par_v->data, best_par->data, nPar*sizeof(Double));
+	double h;
+	memcpy(par_v->data, best_par->data, nPar*sizeof(double));
 	h = step_v->data[i];
-	Double qualplus, qualmin, r;
+	double qualplus, qualmin, r;
 	do {
 	  par_v->data[i] = best_par->data[i] + h;
 	  qualplus = lux_func_if_call(afif);
@@ -889,7 +889,7 @@ Int lux_generalfit2(Int narg, Int ps[])
 	  else if (r < 3)
 	    h *= sqrt(r);
 	} while ((r > 4 || r < 3) && h < errors[i]*1e6);
-	Double v = sqrt((qualplus + qualmin)/(2*best_min) - 1);
+	double v = sqrt((qualplus + qualmin)/(2*best_min) - 1);
 	if (v)
 	  errors[i] = h/v;
 	else
@@ -921,8 +921,8 @@ typedef union {
   Byte  *b;
   unsigned short        *w;
   uint32_t  *l;
-  Float *f;
-  Double        *d;
+  float *f;
+  double        *d;
 } uscalar;
 
 /* replace NaN values by (other) random values */
@@ -936,22 +936,22 @@ void denan(Byte *data, Int size, Int partype)
 
   switch (partype) {
   case LUX_FLOAT:
-    p.f = (Float *) data;
-    for (i = 0; i < size/sizeof(Float); i++) {
+    p.f = (float *) data;
+    for (i = 0; i < size/sizeof(float); i++) {
       while (isnan(*p.f)) {
         uint32_t *r;
-        for (r = (uint32_t *) p.b; (Byte *) r < p.b + sizeof(Float); r++)
+        for (r = (uint32_t *) p.b; (Byte *) r < p.b + sizeof(float); r++)
           *r = random_bits();
       }
       p.f++;
     }
     break;
   case LUX_DOUBLE:
-    p.d = (Double *) data;
-    for (i = 0; i < size/sizeof(Double); i++) {
+    p.d = (double *) data;
+    for (i = 0; i < size/sizeof(double); i++) {
       while (isnan(*p.d)) {
         uint32_t *r;
-        for (r = (uint32_t *) p.b; (Byte *) r < p.b + sizeof(Double); r++) {
+        for (r = (uint32_t *) p.b; (Byte *) r < p.b + sizeof(double); r++) {
           *r = random_bits();
         }
       }
@@ -962,7 +962,7 @@ void denan(Byte *data, Int size, Int partype)
 }
 
 void printgene(Byte *gene, Int nPar, Int partype, Int showbits, 
-               Double *quality) {
+               double *quality) {
   Int j;
   uscalar p;
 
@@ -1003,7 +1003,7 @@ void printgene(Byte *gene, Int nPar, Int partype, Int showbits,
 }
 
 void printgenenl(Byte *gene, Int nPar, Int partype, Int showbits, 
-                 Double *quality) {
+                 double *quality) {
   printgene(gene, nPar, partype, showbits, quality);
   putchar('\n');
 }
@@ -1014,14 +1014,14 @@ Int hasnan(Byte *gene, Int nPar, Int partype) {
 
   switch (partype) {
   case LUX_FLOAT:
-    p.f = (Float *) gene;
+    p.f = (float *) gene;
     for (i = 0; i < nPar; i++) {
       if (isnan(*p.f++))
         return 1;
     }
     break;
   case LUX_DOUBLE:
-    p.d = (Double *) gene;
+    p.d = (double *) gene;
     for (i = 0; i < nPar; i++) {
       if (isnan(*p.d++))
         return 1;
@@ -1046,18 +1046,18 @@ Int hasnan(Byte *gene, Int nPar, Int partype) {
      = (fitness*(mu - 1) + best - avg*mu)/(best - avg)
      = fitness*((mu - 1)/(best - avg)) + (best - avg*mu)/(best - avg)
 */
-void calculate_distribution(Double *distr, Double *deviation, Int *rtoi,
-                            Int nPopulation, Double mu)
+void calculate_distribution(double *distr, double *deviation, Int *rtoi,
+                            Int nPopulation, double mu)
 {
-  Double sum = 0.0;
+  double sum = 0.0;
   Int i;
 
   for (i = 0; i < nPopulation; i++)
     sum += 1/deviation[i];
-  Double a = 1, b = 0;
+  double a = 1, b = 0;
   if (sum > 0) {
-    Double avg_fitness = sum/nPopulation;
-    Double best_fitness = 1/deviation[rtoi[nPopulation - 1]];
+    double avg_fitness = sum/nPopulation;
+    double best_fitness = 1/deviation[rtoi[nPopulation - 1]];
     if (avg_fitness != best_fitness) {
       a = (mu - 1)/(best_fitness - avg_fitness);
       b = (best_fitness - avg_fitness*mu)/(best_fitness - avg_fitness);
@@ -1066,7 +1066,7 @@ void calculate_distribution(Double *distr, Double *deviation, Int *rtoi,
   sum = 0.0;
   distr[0] = 0.0;
   for (i = 1; i <= nPopulation; i++) {
-    Double x = 1/deviation[rtoi[i - 1]];
+    double x = 1/deviation[rtoi[i - 1]];
     if (x) {
       x = a*x + b;
       if (x < 0)
@@ -1096,12 +1096,12 @@ Int lux_geneticfit(Int narg, Int ps[])
   uscalar p;
   Word  *par, fitPar, xSym, ySym, fitArg[4], wSym;
   Byte  *genes, *parent1, *parent2, *genes2, t1, t2;
-  Double *deviation, mu, *distr, random_one(void), pcross, *deviation2,
+  double *deviation, mu, *distr, random_one(void), pcross, *deviation2,
     crossmark, mutatemark, pmutate, sum;
-  Double *weights, *start;
+  double *weights, *start;
   void  invertPermutation(Int *data, Int n),
-    indexxr_f(Int n, Float ra[], Int indx[]);
-  Int   random_distributed(Int modulus, Double *distr);
+    indexxr_f(Int n, float ra[], Int indx[]);
+  Int   random_distributed(Int modulus, double *distr);
   Byte  changed, elite, partype;
   static uint16_t mask1[] = {
     0xff, 0x7f, 0x3f, 0x1f, 0x0f, 0x07, 0x03, 0x01
@@ -1111,7 +1111,7 @@ Int lux_geneticfit(Int narg, Int ps[])
     0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01,
   };
   Int *crossoversites, *mutationsites;
-  void indexxr_d(Int, Double *, Int *);
+  void indexxr_d(Int, double *, Int *);
  
   iq = ps[3];                   /* fit */
   if (!symbolIsStringScalar(iq))
@@ -1148,7 +1148,7 @@ Int lux_geneticfit(Int narg, Int ps[])
   } else if (symbolIsArray(ps[2])) { /* start values */
     Int iq = lux_double(1, &ps[2]);
     nPar = array_size(iq);
-    start = (Double *) array_data(iq);
+    start = (double *) array_data(iq);
     partype = symbol_type(iq);
   }
 
@@ -1219,7 +1219,7 @@ Int lux_geneticfit(Int narg, Int ps[])
     n = array_size(wSym);
     if (n != nPoints)
       return cerror(INCMP_ARG, iq);
-    weights = (Double *) array_data(wSym);
+    weights = (double *) array_data(wSym);
     if (isFreeTemp(wSym))
       symbol_context(wSym) = 1;
   } else
@@ -1252,8 +1252,8 @@ Int lux_geneticfit(Int narg, Int ps[])
   /* create initial population */
   genes = malloc(nPopulation*size);
   genes2 = malloc(nPopulation*size);
-  deviation = malloc(nPopulation*sizeof(Double));
-  deviation2 = malloc(nPopulation*sizeof(Double));
+  deviation = malloc(nPopulation*sizeof(double));
+  deviation2 = malloc(nPopulation*sizeof(double));
   rtoi = malloc(nPopulation*sizeof(Int));
   /* itor = malloc(nPopulation*sizeof(Int)); */
 
@@ -1261,7 +1261,7 @@ Int lux_geneticfit(Int narg, Int ps[])
   /* of ints, so we don't need to worry about the exact type */
   p.l = (uint32_t *) genes;
   if (start) {                  /* fill first member with start values */
-    memcpy(p.d, start, nPar*sizeof(Double));
+    memcpy(p.d, start, nPar*sizeof(double));
     p.d += nPar;
     i = size/sizeof(Int);
   } else
@@ -1301,7 +1301,7 @@ Int lux_geneticfit(Int narg, Int ps[])
   /* calculate the distribution function for selecting members.
      member i gets a reproduction probability equal to
      distr[i+1] - distr[i] */
-  distr = malloc(nPopulation*sizeof(Double));
+  distr = malloc(nPopulation*sizeof(double));
   calculate_distribution(distr, deviation, rtoi, nPopulation, mu);
 
   if (vocal > 1) {
@@ -1498,7 +1498,7 @@ Int lux_geneticfit(Int narg, Int ps[])
     deviation2 -= nPopulation;
     
     memcpy(genes, genes2, nPopulation*size);
-    memcpy(deviation, deviation2, nPopulation*sizeof(Double));
+    memcpy(deviation, deviation2, nPopulation*sizeof(double));
 
     indexxr_d(nPopulation, deviation, rtoi); /* get ranking */
     calculate_distribution(distr, deviation, rtoi, nPopulation, mu);
@@ -1529,9 +1529,9 @@ Int lux_geneticfit(Int narg, Int ps[])
          size);
   if (vocal) {
     printf("%4d offspring (probability %g)\n%4d cross-overs (probability %g per gene pair)\n%4d mutations (probability %g per bit)\n",
-           offspringcount, ((Double) offspringcount)/(nPopulation*nGeneration),
-           crossovercount, ((Double) crossovercount)/(nPopulation*nGeneration/2),
-           mutatecount, ((Double) mutatecount)/(nPopulation*nGeneration*size*8));
+           offspringcount, ((double) offspringcount)/(nPopulation*nGeneration),
+           crossovercount, ((double) crossovercount)/(nPopulation*nGeneration/2),
+           mutatecount, ((double) mutatecount)/(nPopulation*nGeneration*size*8));
     if (vocal > 1) {
       printf("cross-over site frequencies:\n");
       for (i = 0; i < size*8; i++)

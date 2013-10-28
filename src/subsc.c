@@ -308,13 +308,13 @@ Int lux_lmap(Int narg, Int ps[])
 }
 /*------------------------------------------------------------------------- */
 Int lux_fmap(Int narg, Int ps[])
-/* convert type to Float without changing memory contents */
+/* convert type to float without changing memory contents */
 {
   return lux_gmap(narg, ps, LUX_FLOAT);
 }
 /*------------------------------------------------------------------------- */
 Int lux_dmap(Int narg, Int ps[])
-/* convert type to Double without changing memory contents */
+/* convert type to double without changing memory contents */
 {
   return lux_gmap(narg, ps, LUX_DOUBLE);
 }
@@ -2696,15 +2696,15 @@ Int lux_concat(Int narg, Int ps[])
 	    switch (symbol_type(iq)) {
 	      case LUX_BYTE:
 		while (n--)
-		  *q2.f++ = (Float) *q1.b++;
+		  *q2.f++ = (float) *q1.b++;
 		break;
 	      case LUX_WORD:
 		while (n--)
-		  *q2.f++ = (Float) *q1.w++;
+		  *q2.f++ = (float) *q1.w++;
 		break;
 	      case LUX_LONG:
 		while (n--)
-		  *q2.f++ = (Float) *q1.l++;
+		  *q2.f++ = (float) *q1.l++;
 		break;
 	      case LUX_FLOAT:
 		while (n--)
@@ -2716,19 +2716,19 @@ Int lux_concat(Int narg, Int ps[])
 	    switch (symbol_type(iq)) {
 	      case LUX_BYTE:
 		while (n--)
-		  *q2.d++ = (Double) *q1.b++;
+		  *q2.d++ = (double) *q1.b++;
 		break;
 	      case LUX_WORD:
 		while (n--)
-		  *q2.d++ = (Double) *q1.w++;
+		  *q2.d++ = (double) *q1.w++;
 		break;
 	      case LUX_LONG:
 		while (n--)
-		  *q2.d++ = (Double) *q1.l++;
+		  *q2.d++ = (double) *q1.l++;
 		break;
 	      case LUX_FLOAT:
 		while (n--)
-		  *q2.d++ = (Double) *q1.f++;
+		  *q2.d++ = (double) *q1.f++;
 		break;
 	      case LUX_DOUBLE:
 		while (n--)
@@ -2853,7 +2853,7 @@ Int lux_subsc_subgrid(Int narg, Int ps[])
   Byte	class, type;
   Int	ndim, *dims, i, subsc[MAX_DIMS], nSubsc, iq, j, mid,
     stride[MAX_DIMS], index, tally[MAX_DIMS], step[2][MAX_DIMS];
-  Float	*coord[MAX_DIMS], d[MAX_DIMS];
+  float	*coord[MAX_DIMS], d[MAX_DIMS];
   scalar	value, cvalue;
   pointer	src, out;
 
@@ -2951,7 +2951,7 @@ Int lux_subsc_subgrid(Int narg, Int ps[])
     switch (type) {
       case LUX_BYTE:
 	do {
-	  cvalue.f = (Float) src.b[index];
+	  cvalue.f = (float) src.b[index];
 	  for (i = 0; i < ndim; i++)
 	    cvalue.f *= d[i];
 	  for (j = 0; j < ndim; j++) {
@@ -2967,7 +2967,7 @@ Int lux_subsc_subgrid(Int narg, Int ps[])
 	break;
       case LUX_WORD:
 	do {
-	  cvalue.f = (Float) src.w[index];
+	  cvalue.f = (float) src.w[index];
 	  for (i = 0; i < ndim; i++)
 	    cvalue.f *= d[i];
 	  for (j = 0; j < ndim; j++) {
@@ -2983,7 +2983,7 @@ Int lux_subsc_subgrid(Int narg, Int ps[])
 	break;
       case LUX_LONG:
 	do {
-	  cvalue.f = (Float) src.l[index];
+	  cvalue.f = (float) src.l[index];
 	  for (i = 0; i < ndim; i++)
 	    cvalue.f *= d[i];
 	  for (j = 0; j < ndim; j++) {

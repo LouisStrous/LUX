@@ -19,7 +19,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "vsop.h"
 
-Double VSOP87Cterms[] = {
+double VSOP87Cterms[] = {
 0.37749277893, 4.40259139579, 26088.14695905770, 
 0.11918926148, 4.49027758439, 0.24381748350, 
 0.03840153904, 1.17015646101, 52176.05010063190, 

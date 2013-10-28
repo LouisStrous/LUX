@@ -3412,12 +3412,12 @@ void fixedValue(char *name, Int type, ...)
      complex_scalar_type(n) = type;
      p.cf = complex_scalar_data(n).cf;
      if (type == LUX_CFLOAT) {
-       p.cf->real = (Float) va_arg(ap, Double);
-       p.cf->imaginary = (Float) va_arg(ap, Double);
+       p.cf->real = (float) va_arg(ap, double);
+       p.cf->imaginary = (float) va_arg(ap, double);
        p.cf++;
      } else {
-       p.cd->real = va_arg(ap, Double);
-       p.cd->imaginary = va_arg(ap, Double);
+       p.cd->real = va_arg(ap, double);
+       p.cd->imaginary = va_arg(ap, double);
        p.cd++;
      }
      break;
@@ -3429,10 +3429,10 @@ void fixedValue(char *name, Int type, ...)
 	 scalar_value(n).l = va_arg(ap, Int);
 	 break;
        case LUX_FLOAT:
-	 scalar_value(n).f = (Float) va_arg(ap, Double);
+	 scalar_value(n).f = (float) va_arg(ap, double);
 	 break;
        case LUX_DOUBLE:
-	 scalar_value(n).d = va_arg(ap, Double);
+	 scalar_value(n).d = va_arg(ap, double);
 	 break;
      }
      break;
@@ -3585,32 +3585,32 @@ void convertPointer(scalar *target, Int inType, Int outType)
   case LUX_FLOAT:
     switch (inType) {
     case LUX_BYTE:
-      (*target).f = (Float) (*target).b;
+      (*target).f = (float) (*target).b;
       break;
     case LUX_WORD:
-      (*target).f = (Float) (*target).w;
+      (*target).f = (float) (*target).w;
       break;
     case LUX_LONG:
-      (*target).f = (Float) (*target).l;
+      (*target).f = (float) (*target).l;
       break;
     case LUX_DOUBLE:
-      (*target).f = (Float) (*target).d;
+      (*target).f = (float) (*target).d;
       break;
     }
     break;
   case LUX_DOUBLE:
     switch (inType) {
     case LUX_BYTE:
-      (*target).d = (Double) (*target).b;
+      (*target).d = (double) (*target).b;
       break;
     case LUX_WORD:
-      (*target).d = (Double) (*target).w;
+      (*target).d = (double) (*target).w;
       break;
     case LUX_LONG:
-      (*target).d = (Double) (*target).l;
+      (*target).d = (double) (*target).l;
       break;
     case LUX_FLOAT:
-      (*target).d = (Double) (*target).f;
+      (*target).d = (double) (*target).f;
       break;
     }
     break;
@@ -3632,17 +3632,17 @@ void convertWidePointer(wideScalar *target, Int inType, Int outType)
 	  target->l = (Int) target->b;
 	  break;
 	case LUX_FLOAT:
-	  target->f = (Float) target->b;
+	  target->f = (float) target->b;
 	  break;
 	case LUX_DOUBLE:
-	  target->d = (Double) target->b;
+	  target->d = (double) target->b;
 	  break;
 	case LUX_CFLOAT:
-	  target->cf.real = (Float) target->b;
+	  target->cf.real = (float) target->b;
 	  target->cf.imaginary = 0.0;
 	  break;
 	case LUX_CDOUBLE:
-	  target->cd.real = (Double) target->b;
+	  target->cd.real = (double) target->b;
 	  target->cd.imaginary = 0.0;
 	  break;
       }
@@ -3658,17 +3658,17 @@ void convertWidePointer(wideScalar *target, Int inType, Int outType)
 	  target->l = (Int) target->w;
 	  break;
 	case LUX_FLOAT:
-	  target->f = (Float) target->w;
+	  target->f = (float) target->w;
 	  break;
 	case LUX_DOUBLE:
-	  target->d = (Double) target->w;
+	  target->d = (double) target->w;
 	  break;
 	case LUX_CFLOAT:
-	  target->cf.real = (Float) target->w;
+	  target->cf.real = (float) target->w;
 	  target->cf.imaginary = 0.0;
 	  break;
 	case LUX_CDOUBLE:
-	  target->cd.real = (Double) target->w;
+	  target->cd.real = (double) target->w;
 	  target->cd.imaginary = 0.0;
 	  break;
       }
@@ -3685,17 +3685,17 @@ void convertWidePointer(wideScalar *target, Int inType, Int outType)
 	case LUX_LONG:
 	  break;
 	case LUX_FLOAT:
-	  target->f = (Float) target->l;
+	  target->f = (float) target->l;
 	  break;
 	case LUX_DOUBLE:
-	  target->d = (Double) target->l;
+	  target->d = (double) target->l;
 	  break;
 	case LUX_CFLOAT:
-	  target->cf.real = (Float) target->l;
+	  target->cf.real = (float) target->l;
 	  target->cf.imaginary = 0.0;
 	  break;
 	case LUX_CDOUBLE:
-	  target->cd.real = (Double) target->l;
+	  target->cd.real = (double) target->l;
 	  target->cd.imaginary = 0.0;
 	  break;
       }
@@ -3714,14 +3714,14 @@ void convertWidePointer(wideScalar *target, Int inType, Int outType)
 	case LUX_FLOAT:
 	  break;
 	case LUX_DOUBLE:
-	  target->d = (Double) target->f;
+	  target->d = (double) target->f;
 	  break;
 	case LUX_CFLOAT:
-	  target->cf.real = (Float) target->f;
+	  target->cf.real = (float) target->f;
 	  target->cf.imaginary = 0.0;
 	  break;
 	case LUX_CDOUBLE:
-	  target->cd.real = (Double) target->f;
+	  target->cd.real = (double) target->f;
 	  target->cd.imaginary = 0.0;
 	  break;
       }
@@ -3738,16 +3738,16 @@ void convertWidePointer(wideScalar *target, Int inType, Int outType)
 	  target->l = (Int) target->d;
 	  break;
 	case LUX_FLOAT:
-	  target->f = (Float) target->d;
+	  target->f = (float) target->d;
 	  break;
 	case LUX_DOUBLE:
 	  break;
 	case LUX_CFLOAT:
-	  target->cf.real = (Float) target->d;
+	  target->cf.real = (float) target->d;
 	  target->cf.imaginary = 0.0;
 	  break;
 	case LUX_CDOUBLE:
-	  target->cd.real = (Double) target->d;
+	  target->cd.real = (double) target->d;
 	  target->cd.imaginary = 0.0;
 	  break;
       }
@@ -3764,16 +3764,16 @@ void convertWidePointer(wideScalar *target, Int inType, Int outType)
 	  target->l = (Int) target->cf.real;
 	  break;
 	case LUX_FLOAT:
-	  target->f = (Float) target->cf.real;
+	  target->f = (float) target->cf.real;
 	  break;
 	case LUX_DOUBLE:
-	  target->d = (Double) target->cf.real;
+	  target->d = (double) target->cf.real;
 	  break;
 	case LUX_CFLOAT:
 	  break;
 	case LUX_CDOUBLE:
-	  target->cd.real = (Double) target->cf.real;
-	  target->cd.imaginary = (Double) target->cf.imaginary;
+	  target->cd.real = (double) target->cf.real;
+	  target->cd.imaginary = (double) target->cf.imaginary;
 	  break;
       }
       break;
@@ -3789,14 +3789,14 @@ void convertWidePointer(wideScalar *target, Int inType, Int outType)
 	  target->l = (Int) target->cd.real;
 	  break;
 	case LUX_FLOAT:
-	  target->f = (Float) target->cd.real;
+	  target->f = (float) target->cd.real;
 	  break;
 	case LUX_DOUBLE:
-	  target->d = (Double) target->cd.real;
+	  target->d = (double) target->cd.real;
 	  break;
 	case LUX_CFLOAT:
-	  target->cf.real = (Float) target->cd.real;
-	  target->cf.imaginary = (Float) target->cd.imaginary;
+	  target->cf.real = (float) target->cd.real;
+	  target->cf.imaginary = (float) target->cd.imaginary;
 	  break;
 	case LUX_CDOUBLE:
 	  break;
@@ -3874,38 +3874,38 @@ void convertScalar(scalar *target, Int nsym, Int type)
  case LUX_FLOAT:
    switch (n) {
    case LUX_BYTE:
-     (*target).f = (Float) *ptr.b;
+     (*target).f = (float) *ptr.b;
      break;
    case LUX_WORD:
-     (*target).f = (Float) *ptr.w;
+     (*target).f = (float) *ptr.w;
      break;
    case LUX_LONG:
-     (*target).f = (Float) *ptr.l;
+     (*target).f = (float) *ptr.l;
      break;
    case LUX_FLOAT:
-     (*target).f = (Float) *ptr.f;
+     (*target).f = (float) *ptr.f;
      break;
    case LUX_DOUBLE:
-     (*target).f = (Float) *ptr.d;
+     (*target).f = (float) *ptr.d;
      break;
    }
    break;
  case LUX_DOUBLE:
    switch (n) {
    case LUX_BYTE:
-     (*target).d = (Double) *ptr.b;
+     (*target).d = (double) *ptr.b;
      break;
    case LUX_WORD:
-     (*target).d = (Double) *ptr.w;
+     (*target).d = (double) *ptr.w;
      break;
    case LUX_LONG:
-     (*target).d = (Double) *ptr.l;
+     (*target).d = (double) *ptr.l;
      break;
    case LUX_FLOAT:
-     (*target).d = (Double) *ptr.f;
+     (*target).d = (double) *ptr.f;
      break;
    case LUX_DOUBLE:
-     (*target).d = (Double) *ptr.d;
+     (*target).d = (double) *ptr.d;
      break;
    }
    break;
@@ -3949,7 +3949,7 @@ Int lux_symbol_memory()
 Int lux_trace(Int narg, Int ps[])
 /* activates/deactivates trace facility */
 {
-  extern Float	CPUtime;
+  extern float	CPUtime;
 
   if (narg > 0)
     trace = int_arg(*ps);
@@ -3981,7 +3981,7 @@ Int lux_trace(Int narg, Int ps[])
       printw(".\nRegular SHOWSTATS output");
     if (traceMode & T_CPUTIME) {
       printw(".  CPUtime output");
-      CPUtime = (Float) clock()/CLOCKS_PER_SEC;
+      CPUtime = (float) clock()/CLOCKS_PER_SEC;
     }
     if (traceMode & T_SHOWEXEC)
       printw(".  Statement execution index");
@@ -4016,7 +4016,7 @@ Int range_warn_flag = 0, redim_warn_flag = 0, error_extra = 0,
   MSBfirst, area_diag = 1, lastmean_sym, lastsdev_sym, r_d_sym,
   d_r_sym;
 
-Float	contour_dash_lev, contour_tick_fac = 0.5, *p3d;
+float	contour_dash_lev, contour_tick_fac = 0.5, *p3d;
 scalar	lastmin, lastmax, lastmean, lastsdev;
 extern Int	lunplt, landscape, iorder, ilabx, ilaby, irxf, iryf, ndx,
         ndxs, nd, ndys, ifz, ifzx, ier, ifont, ndlabx, ndlaby, 
@@ -4025,11 +4025,11 @@ extern Int	lunplt, landscape, iorder, ilabx, ilaby, irxf, iryf, ndx,
         tvsmt, badmatch, fstepx, fstepy,
         sort_flag, crunch_bits, crunch_slice, byte_count,
 	current_pen, updateBoundingBox, index_cnt, uTermCol, page;
-extern Double	meritc;
+extern double	meritc;
 #if MOTIF
 extern Int	radio_state, radio_button;
 #endif
-extern Float	xfac, yfac, xmin, xmax, ymin, ymax,
+extern float	xfac, yfac, xmin, xmax, ymin, ymax,
 	wxb, wxt, wyb, wyt, ticx, ticxr, ticy, ticyr, plims[],
 	fsized,	symsize, symratio, startx, starty, stepx, stepy,
 	callig_xb, callig_yb, callig_ratio, slabx, slaby,
@@ -4039,7 +4039,7 @@ extern Word	*stackPointer;
 
 #if DEVELOP
 extern Int	irzf, ifzz, ndz, ndzs, resample_type, fstepz;
-extern Float	wzb, wzt, ticz, ticzr, zmin, zmax, defaultProjection[], dvz;
+extern float	wzb, wzt, ticz, ticzr, zmin, zmax, defaultProjection[], dvz;
 #endif
 
 #if HAVE_LIBX11
@@ -4052,9 +4052,9 @@ extern Int lux_button, eventSource, xcoord, ycoord, lux_keycode, lux_keysym,
   xerrors, last_wid, display_width, display_height, private_colormap,
   zoom_frame, foreground_pixel, nColors, colormin, colormax, lux_keystate;
 
-extern Float	tviy, tviyb, tvix, tvixb, xhair, yhair, menu_x, menu_y,
+extern float	tviy, tviyb, tvix, tvixb, xhair, yhair, menu_x, menu_y,
 		tvscale, zoom_xc, zoom_yc, zoom_mag, lumpx;
-extern Double	last_time, zoom_clo, zoom_chi;
+extern double	last_time, zoom_clo, zoom_chi;
 #endif
 
 #if MOTIF
@@ -4308,13 +4308,13 @@ void symbolInitialization(void)
  sym[projectSym].class = LUX_ARRAY;
  array_type(projectSym) = LUX_FLOAT;
  symbol_memory(projectSym) =
-   sizeof(array) + 16*sizeof(Float);
+   sizeof(array) + 16*sizeof(float);
  eallocate(p, i, char);
  array_header(projectSym) = (array *) p;
  array_num_dims(projectSym) = 2;
  array_dims(projectSym)[0] = array_dims(projectSym)[1] = 4;
- memcpy(array_data(projectSym), defaultProjection, 16*sizeof(Float));
- p3d = (Float *) array_data(projectSym);
+ memcpy(array_data(projectSym), defaultProjection, 16*sizeof(float));
+ p3d = (float *) array_data(projectSym);
  nFixed++;
 #endif
 

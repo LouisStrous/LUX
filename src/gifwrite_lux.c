@@ -195,7 +195,7 @@ static Int free_ent = 0;       /* first unused entry */
  /*
  * compress stdin to stdout
  *
- * Algorithm:  use open addressing Double hashing (no chaining) on the 
+ * Algorithm:  use open addressing double hashing (no chaining) on the 
  * prefix code / next character combination.  We do a variant of Knuth's
  * algorithm D (vol. 3, sec. 6.4) along with G. Knott's relatively-prime
  * secondary probe.  Here, the modular division first probe is gives way

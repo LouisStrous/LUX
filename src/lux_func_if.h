@@ -32,4 +32,4 @@ void lux_func_if_free(lux_func_if *);
 Int lux_func_if_set_param(lux_func_if *, size_t index, Int param);
 Int lux_func_if_get_param_sym(lux_func_if *, size_t index);
 pointer lux_func_if_get_param_data(lux_func_if *, size_t index);
-Double lux_func_if_call(lux_func_if *);
+double lux_func_if_call(lux_func_if *);

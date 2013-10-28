@@ -28,8 +28,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "luxdefs.h"
 #include "output.h"
 
-Int curv1_(Int *n, Double *x, Double *y, Double *slp1, Double *slpn,
-	   Double *yp, Double *temp, Double *sigma, Double *xf, Double *yf,
+Int curv1_(Int *n, double *x, double *y, double *slp1, double *slpn,
+	   double *yp, double *temp, double *sigma, double *xf, double *yf,
 	   Int *nf)
 {
     /* System generated locals */
@@ -40,17 +40,17 @@ Int curv1_(Int *n, Double *x, Double *y, Double *slp1, Double *slpn,
 
     /* Local variables */
     static Int ibak;
-    static Double deln, dels, exps, diag1, diag2, delx1, delx2, slpp1, 
+    static double deln, dels, exps, diag1, diag2, delx1, delx2, slpp1, 
 	    exps1;
     static Int i, j;
-    static Double t, delx12, delnn, sinhs, c1, c2, c3;
+    static double t, delx12, delnn, sinhs, c1, c2, c3;
     static Int i1;
-    static Double slppn, delnm1, sinhd1, sinhd2, diagin, spdiag, sigmap, 
+    static double slppn, delnm1, sinhd1, sinhd2, diagin, spdiag, sigmap, 
 	    sinhin;
     static Int nm1;
-    static Double dx1, dx2;
+    static double dx1, dx2;
     static Int np1;
-    static Double del1, del2;
+    static double del1, del2;
 
 
 /* --	generates spline under tension for monotonic x */
@@ -80,11 +80,11 @@ FAILURE */
     slpp1 = *slp1;
     slppn = *slpn;
 L10:
-    sigmap = ABS(*sigma) * (Float) (*n - 1) / (x[*n] - x[1]);
+    sigmap = ABS(*sigma) * (float) (*n - 1) / (x[*n] - x[1]);
 /* 	FOR INTERACTIVE USE, WE SLOW THIS ROUTINE DOWN BY DOING SOME */
 /* 	EXTRA CHECKING FOR THE USER, THIS COULD PREVENT MUCH TIME LOST */
 /* 	FROM A CRASH */
-    dx2 = (Float)0.;
+    dx2 = (float)0.;
     i_1 = *n;
     for (i = 2; i <= i_1; ++i) {
 	delx2 = x[i] - x[i - 1];
@@ -102,14 +102,14 @@ L10:
     if (dx2 > 50.) {
 /* -- IF IT IS TOO BIG, WE GOT TROUBLE; WE WILL AUTO REDUCE TO FIT */
         printf("warning, tension reduced to avoid overflows!\n");
-	sigmap = sigmap * (Float)50. / dx2;
+	sigmap = sigmap * (float)50. / dx2;
     }
     dels = sigmap * delx1;
     exps = exp(dels);
-    sinhs = (exps - (Float)1. / exps) * (Float).5;
-    sinhin = (Float)1. / (delx1 * sinhs);
-    diag1 = sinhin * (dels * (Float).5 * (exps + (Float)1. / exps) - sinhs);
-    diagin = (Float)1. / diag1;
+    sinhs = (exps - (float)1. / exps) * (float).5;
+    sinhin = (float)1. / (delx1 * sinhs);
+    diag1 = sinhin * (dels * (float).5 * (exps + (float)1. / exps) - sinhs);
+    diagin = (float)1. / diag1;
     yp[1] = diagin * (dx1 - slpp1);
     spdiag = sinhin * (sinhs - dels);
     temp[1] = diagin * spdiag;
@@ -122,11 +122,11 @@ L10:
 	dx2 = (y[i + 1] - y[i]) / delx2;
 	dels = sigmap * delx2;
 	exps = exp(dels);
-	sinhs = (exps - (Float)1. / exps) * (Float).5;
-	sinhin = (Float)1. / (delx2 * sinhs);
-	diag2 = sinhin * (dels * ((exps + (Float)1. / exps) * (Float).5) - 
+	sinhs = (exps - (float)1. / exps) * (float).5;
+	sinhin = (float)1. / (delx2 * sinhs);
+	diag2 = sinhin * (dels * ((exps + (float)1. / exps) * (float).5) - 
 		sinhs);
-	diagin = (Float)1. / (diag1 + diag2 - spdiag * temp[i - 1]);
+	diagin = (float)1. / (diag1 + diag2 - spdiag * temp[i - 1]);
 	yp[i] = diagin * (dx2 - dx1 - spdiag * yp[i - 1]);
 	spdiag = sinhin * (sinhs - dels);
 	temp[i] = diagin * spdiag;
@@ -135,7 +135,7 @@ L10:
 /* L20: */
     }
 L30:
-    diagin = (Float)1. / (diag1 - spdiag * temp[nm1]);
+    diagin = (float)1. / (diag1 - spdiag * temp[nm1]);
     yp[*n] = diagin * (slppn - dx2 - spdiag * yp[nm1]);
     i_1 = *n;
     for (i = 2; i <= i_1; ++i) {
@@ -163,8 +163,8 @@ L50:
     slppn = c3 * y[*n - 2] + c2 * y[nm1] + c1 * y[*n];
     goto L10;
 L60:
-    yp[1] = (Float)0.;
-    yp[2] = (Float)0.;
+    yp[1] = (float)0.;
+    yp[2] = (float)0.;
 L200:
     i1 = 2;
     i_1 = *nf;
@@ -193,11 +193,11 @@ L240:
 	del2 = x[i] - t;
 	dels = x[i] - x[i - 1];
 	exps1 = exp(sigmap * del1);
-	sinhd1 = (exps1 - (Float)1. / exps1) * (Float).5;
+	sinhd1 = (exps1 - (float)1. / exps1) * (float).5;
 	exps = exp(sigmap * del2);
-	sinhd2 = (exps - (Float)1. / exps) * (Float).5;
+	sinhd2 = (exps - (float)1. / exps) * (float).5;
 	exps = exps1 * exps;
-	sinhs = (exps - (Float)1. / exps) * (Float).5;
+	sinhs = (exps - (float)1. / exps) * (float).5;
 	yf[j] = (yp[i] * sinhd1 + yp[i - 1] * sinhd2) / sinhs + ((y[i] - yp[i]
 		) * del1 + (y[i - 1] - yp[i - 1]) * del2) / dels;
 	i1 = i;
@@ -214,31 +214,31 @@ L990:
 
 /*===========================================================================
 */
-Int kurv1_(Int *n, Double *x, Double *y, Double *slp1, Double *slpn,
-	   Double *xp, Double *yp, Double *temp, Double *sigma, Double *t,
-	   Double *xs, Double *ys, Int *nf)
+Int kurv1_(Int *n, double *x, double *y, double *slp1, double *slpn,
+	   double *xp, double *yp, double *temp, double *sigma, double *t,
+	   double *xs, double *ys, Int *nf)
 {
     /* Initialized data */
 
-    static Double degrad = .017453292;
+    static double degrad = .017453292;
 
     /* System generated locals */
     Int ret_val, i_1, i_2;
-    Double d_1, d_2;
+    double d_1, d_2;
 
     /* Builtin functions */
     Int s_wsle(), do_lio(), e_wsle();
 
     /* Local variables */
-    static Double deln, dels, delx, dely, exps, diag1, diag2, dels1, 
+    static double deln, dels, delx, dely, exps, diag1, diag2, dels1, 
 	    dels2, delx1, dely1, delx2, dely2, slpp1, exps1;
     static Int i, k;
-    static Double s, dels12, delnn, c1, c2, c3, sinhs;
+    static double s, dels12, delnn, c1, c2, c3, sinhs;
     static Int i1;
-    static Double slppn, delnm1, sinhd1, sinhd2, diagin, tn, spdiag, 
+    static double slppn, delnm1, sinhd1, sinhd2, diagin, tn, spdiag, 
 	    sx, sy, sigmap, sinhin;
     static Int nm1;
-    static Double dx1, dy1, dx2, dy2, sum, del1, del2;
+    static double dx1, dy1, dx2, dy2, sum, del1, del2;
 
 
 /* --	generates spline under tension for any open (x,y) curve */
@@ -278,11 +278,11 @@ FAILURE */
 	if (*n == 2) {
 /* --	if only 2 points and no slopes, we have to assume a 
 straight line */
-	    xp[1] = (Float)0.;
-	    xp[2] = (Float)0.;
-	    yp[1] = (Float)0.;
-	    yp[2] = (Float)0.;
-	    sigmap = ABS(*sigma) * (Float) (*n - 1) / s;
+	    xp[1] = (float)0.;
+	    xp[2] = (float)0.;
+	    yp[1] = (float)0.;
+	    yp[2] = (float)0.;
+	    sigmap = ABS(*sigma) * (float) (*n - 1) / s;
 	} else {
 /* Computing 2nd power */
 	    d_1 = x[3] - x[2];
@@ -341,14 +341,14 @@ straight line */
     }
     xp[*n] = cos(slppn) - dx1;
     yp[*n] = sin(slppn) - dy1;
-    sigmap = ABS(*sigma) * (Float) (*n - 1) / s;
+    sigmap = ABS(*sigma) * (float) (*n - 1) / s;
     dels = sigmap * temp[1];
     exps = exp(dels);
 /* 	TYPE *,'DELS,EXPS =',DELS,EXPS */
-    sinhs = (exps - (Float)1. / exps) * (Float).5;
-    sinhin = (Float)1. / (temp[1] * sinhs);
-    diag1 = sinhin * (dels * (Float).5 * (exps + (Float)1. / exps) - sinhs);
-    diagin = (Float)1. / diag1;
+    sinhs = (exps - (float)1. / exps) * (float).5;
+    sinhin = (float)1. / (temp[1] * sinhs);
+    diag1 = sinhin * (dels * (float).5 * (exps + (float)1. / exps) - sinhs);
+    diagin = (float)1. / diag1;
     xp[1] = diagin * xp[1];
     yp[1] = diagin * yp[1];
     spdiag = sinhin * (sinhs - dels);
@@ -359,11 +359,11 @@ straight line */
 	    dels = sigmap * temp[i];
 	    exps = exp(dels);
 /* 	TYPE *,'DELS,EXPS =',DELS,EXPS */
-	    sinhs = (exps - (Float)1. / exps) * (Float).5;
-	    sinhin = (Float)1. / (temp[i] * sinhs);
-	    diag2 = sinhin * (dels * ((exps + (Float)1. / exps) * (Float).5) 
+	    sinhs = (exps - (float)1. / exps) * (float).5;
+	    sinhin = (float)1. / (temp[i] * sinhs);
+	    diag2 = sinhin * (dels * ((exps + (float)1. / exps) * (float).5) 
 		    - sinhs);
-	    diagin = (Float)1. / (diag1 + diag2 - spdiag * temp[i - 1]);
+	    diagin = (float)1. / (diag1 + diag2 - spdiag * temp[i - 1]);
 	    xp[i] = diagin * (xp[i] - spdiag * xp[i - 1]);
 	    yp[i] = diagin * (yp[i] - spdiag * yp[i - 1]);
 	    spdiag = sinhin * (sinhs - dels);
@@ -371,7 +371,7 @@ straight line */
 	    diag1 = diag2;
 	}
     }
-    diagin = (Float)1. / (diag1 - spdiag * temp[nm1]);
+    diagin = (float)1. / (diag1 - spdiag * temp[nm1]);
     xp[*n] = diagin * (xp[*n] - spdiag * xp[nm1]);
     yp[*n] = diagin * (yp[*n] - spdiag * yp[nm1]);
     for (i = *n - 1; i >= 1; --i) {
@@ -381,7 +381,7 @@ straight line */
 /* --	done with the setup, now do the interpolations */
 
     i = 2;
-    sum = (Float)0.;
+    sum = (float)0.;
     delx = x[2] - x[1];
     dely = y[2] - y[1];
     dels = sqrt(delx * delx + dely * dely);
@@ -427,11 +427,11 @@ L40:
 	del1 = tn - sum;
 	del2 = dels - del1;
 	exps1 = exp(sigmap * del1);
-	sinhd1 = (exps1 - (Float)1. / exps1) * (Float).5;
+	sinhd1 = (exps1 - (float)1. / exps1) * (float).5;
 	exps = exp(sigmap * del2);
-	sinhd2 = (exps - (Float)1. / exps) * (Float).5;
+	sinhd2 = (exps - (float)1. / exps) * (float).5;
 	exps = exps1 * exps;
-	sinhs = (exps - (Float)1. / exps) * (Float).5;
+	sinhs = (exps - (float)1. / exps) * (float).5;
 	xs[k] = (xp[i] * sinhd1 + xp[i - 1] * sinhd2) / sinhs + ((x[i] - xp[i]
 		) * del1 + (x[i - 1] - xp[i - 1]) * del2) / dels;
 	ys[k] = (yp[i] * sinhd1 + yp[i - 1] * sinhd2) / sinhs + ((y[i] - yp[i]
@@ -444,30 +444,30 @@ L50:
 
 /*===========================================================================
 ==*/
-Int kurvp1_(Int *n, Double *x, Double *y, Double *xp, Double *yp,
-	    Double *temp, Double *sigma, Double *t, Double *xs, Double *ys,
+Int kurvp1_(Int *n, double *x, double *y, double *xp, double *yp,
+	    double *temp, double *sigma, double *t, double *xs, double *ys,
 	    Int *nf)
 {
     /* System generated locals */
     Int ret_val, i_1, i_2;
-    Double d_1;
+    double d_1;
 
     /* Builtin functions */
     Int s_wsle(), do_lio(), e_wsle();
 
     /* Local variables */
     static Int ibak;
-    static Double dels, delx, dely, exps, diag1, diag2, dels1, dels2, 
+    static double dels, delx, dely, exps, diag1, diag2, dels1, dels2, 
 	    delx1, dely1, delx2, dely2, exps1;
     static Int i, k;
-    static Double s, sinhs;
+    static double s, sinhs;
     static Int i1;
-    static Double sinhd1, spdig1, sinhd2, diagin, tn, spdiag, sigmap, 
+    static double sinhd1, spdig1, sinhd2, diagin, tn, spdiag, sigmap, 
 	    sinhin;
     static Int im1, ip1, nm1;
-    static Double dx1, dy1;
+    static double dx1, dy1;
     static Int np1;
-    static Double dx2, dy2, sum, del1, del2;
+    static double dx2, dy2, sum, del1, del2;
 
 
 /* --	generates spline under tension for any closed loop (x,y) 
@@ -525,27 +525,27 @@ FAILURE */
     }
     xp[1] -= dx1;
     yp[1] -= dy1;
-    sigmap = ABS(*sigma) * (Float) (*n) / s;
+    sigmap = ABS(*sigma) * (float) (*n) / s;
     dels = sigmap * temp[*n];
     exps = exp(dels);
-    sinhs = (exps - (Float)1. / exps) * (Float).5;
-    sinhin = (Float)1. / (temp[*n] * sinhs);
-    diag1 = sinhin * (dels * (Float).5 * (exps + (Float)1. / exps) - sinhs);
-    diagin = (Float)1. / diag1;
+    sinhs = (exps - (float)1. / exps) * (float).5;
+    sinhin = (float)1. / (temp[*n] * sinhs);
+    diag1 = sinhin * (dels * (float).5 * (exps + (float)1. / exps) - sinhs);
+    diagin = (float)1. / diag1;
     spdig1 = sinhin * (sinhs - dels);
-    spdiag = (Float)0.;
+    spdiag = (float)0.;
     i_1 = *n;
     for (i = 1; i <= i_1; ++i) {
 	dels = sigmap * temp[i];
 	exps = exp(dels);
-	sinhs = (exps - (Float)1. / exps) * (Float).5;
-	sinhin = (Float)1. / (temp[i] * sinhs);
-	diag2 = sinhin * (dels * ((exps + (Float)1. / exps) * (Float).5) - 
+	sinhs = (exps - (float)1. / exps) * (float).5;
+	sinhin = (float)1. / (temp[i] * sinhs);
+	diag2 = sinhin * (dels * ((exps + (float)1. / exps) * (float).5) - 
 		sinhs);
 	if (i == *n) {
 	    goto L30;
 	}
-	diagin = (Float)1. / (diag1 + diag2 - spdiag * temp[i - 1]);
+	diagin = (float)1. / (diag1 + diag2 - spdiag * temp[i - 1]);
 	xp[i] = diagin * (xp[i] - spdiag * xp[i - 1]);
 	yp[i] = diagin * (yp[i] - spdiag * yp[i - 1]);
 /* 	REMOVED TYPO IN NEXT LINE	SHINE 2/2/93 */
@@ -582,7 +582,7 @@ L50:
 /* --	done with setup, now do the interpolations */
 
     i = 2;
-    sum = (Float)0.;
+    sum = (float)0.;
     delx = x[2] - x[1];
     dely = y[2] - y[1];
     dels = sqrt(delx * delx + dely * dely);
@@ -642,11 +642,11 @@ L40:
 	del1 = tn - sum;
 	del2 = dels - del1;
 	exps1 = exp(sigmap * del1);
-	sinhd1 = (exps1 - (Float)1. / exps1) * (Float).5;
+	sinhd1 = (exps1 - (float)1. / exps1) * (float).5;
 	exps = exp(sigmap * del2);
-	sinhd2 = (exps - (Float)1. / exps) * (Float).5;
+	sinhd2 = (exps - (float)1. / exps) * (float).5;
 	exps = exps1 * exps;
-	sinhs = (exps - (Float)1. / exps) * (Float).5;
+	sinhs = (exps - (float)1. / exps) * (float).5;
 	xs[k] = (xp[i] * sinhd1 + xp[im1] * sinhd2) / sinhs + ((x[i] - xp[i]) 
 		* del1 + (x[im1] - xp[im1]) * del2) / dels;
 	ys[k] = (yp[i] * sinhd1 + yp[im1] * sinhd2) / sinhs + ((y[i] - yp[i]) 

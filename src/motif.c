@@ -711,7 +711,7 @@ Int lux_xmframe(narg, ps) /* (parent, [lr_margin, tb_margin, width, type]) */
 Int lux_xmseparator(narg, ps) /* (parent, [orient, margin, type]) */
  /* orient = 0 for horozontal, otherwise vertical
  margin is width or height
- type is 1 for simple line, 0 for empty space, 2 for Double line, 3 for dotted
+ type is 1 for simple line, 0 for empty space, 2 for double line, 3 for dotted
  line, 5 for etched line */
  /* returns widget id, an lux function */
  Int     narg, ps[];
@@ -4060,7 +4060,7 @@ void draw_re_callback(w, ptq, call_data)
  Int	*ptq;
  {
  extern	 Int    wd[], ht[], last_wid,  set_defw();
- extern  Float   xfac, yfac;
+ extern  float   xfac, yfac;
  extern  Int     ixhigh, iyhigh;
  Dimension	ww, wh;
  static	Int	kilroy;

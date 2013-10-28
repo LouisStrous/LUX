@@ -723,7 +723,7 @@ XColor *anaFindBestRGB(XColor *color, Int mode)
 /* LS 12mar99 */
 {
   uint32_t	i, best, i1, i2;
-  Float	mindist, dist, temp;	/* use Float because uint32_t is not */
+  float	mindist, dist, temp;	/* use float because uint32_t is not */
 				/* big enough in all cases */
 
   if (visualPrimariesAreSeparate(visual->class)) {
@@ -769,7 +769,7 @@ XColor *anaFindBestRGB(XColor *color, Int mode)
   } /* end of if (visualPrimariesAreSeparate(visual->class)) else */
 }
 /*-------------------------------------------------------------------------*/
-void storeColorTable(Float *red, Float *green, Float *blue, Int nelem,
+void storeColorTable(float *red, float *green, float *blue, Int nelem,
 		     Int stretch)
 /* stores a new color table in LUX's color map. */
 /* <red>: points at an array of red color intensities between 0 and 1 */
@@ -870,7 +870,7 @@ Int getXcolor(char *colorname, XColor *color, Int alloc)
     return XLookupColor(display, colorMap, colorname, &color2, color);
 }
 /*-------------------------------------------------------------------------*/
-Int threecolors(Float *list, Int n)
+Int threecolors(float *list, Int n)
 /* If <n> is 0 or if <n> is 1 and <*list> is 0, then a standard
    greyscale table is installed; otherwise if <n> is 1 or 9 then a
    three-color color table is installed.  If <n> is 9, then the numbers
@@ -886,7 +886,7 @@ Int threecolors(Float *list, Int n)
    a table with a grey section, a red section, and a blue section.
    LS 12nov98 */
 {
-  Float	factor, tlist[9], off[3], fac[3];
+  float	factor, tlist[9], off[3], fac[3];
   Int	i, j;
 
   switch (n) {

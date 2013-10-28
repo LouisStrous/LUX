@@ -495,7 +495,7 @@ Int lux_segment_dir(Int narg, Int ps[])
 {
   loopInfo	srcinfo, trgtinfo;
   pointer	src, trgt;
-  Float	*angle, s, c, a;
+  float	*angle, s, c, a;
   scalar	value;
   Int	nx, ny, n, result, sign, class;
   Int	off[4];
@@ -749,7 +749,7 @@ Int lux_max_dir(Int narg, Int ps[])
 {
   loopInfo	srcinfo, trgtinfo;
   pointer	src, trgt;
-  Float	*angle, s, c, a;
+  float	*angle, s, c, a;
   scalar	value;
   Int	nx, ny, n, result, sign, class;
   Int	off[4];
@@ -2371,17 +2371,17 @@ Int lux_basin(Int narg, Int ps[])
  register Byte	loc;
  Byte	end, locs[3];
  array	*h;
- register Float	*alt, min0, min1 = 0.0, min2 = 0.0, min;
+ register float	*alt, min0, min1 = 0.0, min2 = 0.0, min;
 
  iq = ps[0];				/* altitude map */
  CK_ARR(iq,1);
- iq = lux_float(1, &iq);		/* make Float for easy programming */
+ iq = lux_float(1, &iq);		/* make float for easy programming */
  h = HEAD(iq);
  if (h->ndim != 2)
    return cerror(NEED_2D_ARR, iq);
  nx = h->dims[0];		/* dimensions */
  ny = h->dims[1];
- alt = (Float *) LPTR(h);	/* altitudes (i.e. data) */
+ alt = (float *) LPTR(h);	/* altitudes (i.e. data) */
  result_sym = array_clone(iq, LUX_LONG);
  h = HEAD(result_sym);
  wsh = LPTR(h);			/* result map */
@@ -3836,7 +3836,7 @@ Int lux_extreme_general(Int narg, Int ps[])
 {
   Int	result, sign, n, i, *offset, k, j, nElem, edge,
 	*diagonal, nDiagonal, n1, n2, nDoDim, i1, i2, n0, haveThreshold;
-  Double	zero = 0.0;
+  double	zero = 0.0;
   pointer	src, trgt, srcl, srcr, t;
   loopInfo	srcinfo, trgtinfo;
 
@@ -4361,16 +4361,16 @@ Int lux_inpolygon(Int narg, Int ps[])
   while (n--) {
     switch (type) {
       case LUX_BYTE:
-	thisx.f = (Float) *x.b++;
-	thisy.f = (Float) *y.b++;
+	thisx.f = (float) *x.b++;
+	thisy.f = (float) *y.b++;
 	break;
       case LUX_WORD:
-	thisx.f = (Float) *x.w++;
-	thisy.f = (Float) *y.w++;
+	thisx.f = (float) *x.w++;
+	thisy.f = (float) *y.w++;
 	break;
       case LUX_LONG:
-	thisx.f = (Float) *x.l++;
-	thisy.f = (Float) *y.l++;
+	thisx.f = (float) *x.l++;
+	thisy.f = (float) *y.l++;
 	break;
       case LUX_FLOAT:
 	thisx.f = *x.f++;

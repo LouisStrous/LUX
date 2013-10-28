@@ -32,8 +32,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <unistd.h>		/* for sbrk() */
 
 Int	minmax(Int *, Int, Int), lux_convert(Int, Int [], Int, Int),
-  copySym(Int), f_decomp(Float *, Int, Int), copyToSym(Int, Int),
-  f_solve(Float *, Float *, Int, Int), to_scratch_array(Int, Int, Int, Int *);
+  copySym(Int), f_decomp(float *, Int, Int), copyToSym(Int, Int),
+  f_solve(float *, float *, Int, Int), to_scratch_array(Int, Int, Int, Int *);
 /*---------------------------------------------------------*/
 Int lux_noop(Int narg, Int ps[])
      /* no operation - a dummy routine that provides an entry point
@@ -130,7 +130,7 @@ Int lux_psum(Int narg, Int ps[])
   pointer	src, trgt;
   Int	*exponent, nexponent, j, k, *temp, outdims[MAX_DIMS],
 	in[MAX_DIMS], *index, nIndex, offset;
-  Double	value, factor, weight, bigweight, *bigweights;
+  double	value, factor, weight, bigweight, *bigweights;
   char	haveClass = '\0';
   extern scalar	lastmin, lastmax;
 
@@ -220,9 +220,9 @@ Int lux_psum(Int narg, Int ps[])
 	size += (offset = -lastmin.l);
       result_sym = array_scratch(LUX_DOUBLE, 1, &size);
       trgt.l = array_data(result_sym);
-      zerobytes(trgt.b, size*sizeof(Double));
-      allocate(bigweights, size, Double);
-      zerobytes(bigweights, size*sizeof(Double));
+      zerobytes(trgt.b, size*sizeof(double));
+      allocate(bigweights, size, double);
+      zerobytes(bigweights, size*sizeof(double));
     }
   } else {			/* no AXES, assume INDGEN(POWERS) */
     axes = NULL;
@@ -277,16 +277,16 @@ Int lux_psum(Int narg, Int ps[])
   do {			      /* loop over all elements */
     switch (type) {
       case LUX_BYTE:
-	value = (Double) *src.b;
+	value = (double) *src.b;
 	break;
       case LUX_WORD:
-	value = (Double) *src.w;
+	value = (double) *src.w;
 	break;
       case LUX_LONG:
-	value = (Double) *src.l;
+	value = (double) *src.l;
 	break;
       case LUX_FLOAT:
-	value = (Double) *src.f;
+	value = (double) *src.f;
 	break;
       case LUX_DOUBLE:
 	value = *src.d;
@@ -512,11 +512,11 @@ Int cmp(const void *x1, const void *x2)
       return *(Int *) x1 < *(Int *) x2? -1:
 	(*(Int *) x1 > *(Int *) x2? 1: 0);
     case LUX_FLOAT:
-      return *(Float *) x1 < *(Float *) x2? -1:
-	(*(Float *) x1 > *(Float *) x2? 1: 0);
+      return *(float *) x1 < *(float *) x2? -1:
+	(*(float *) x1 > *(float *) x2? 1: 0);
     case LUX_DOUBLE:
-      return *(Double *) x1 < *(Double *) x2? -1:
-	(*(Double *) x1 > *(Double *) x2? 1: 0);
+      return *(double *) x1 < *(double *) x2? -1:
+	(*(double *) x1 > *(double *) x2? 1: 0);
   }
   return 1;			/* or some compilers complain */
 }
@@ -529,7 +529,7 @@ Int lux_orderfilter(Int narg, Int ps[])
 {
   Int	output, width, w, med, nelem, range[2*MAX_DIMS], *index,
     *offset, i, j;
-  Float	order;
+  float	order;
   loopInfo	srcinfo, trgtinfo, tmpinfo, tmpinfo2;
   pointer	trgt, tmpsrc, tmptrgt;
   /* we use a global pointer src */
@@ -679,7 +679,7 @@ Int lux_quantile(Int narg, Int ps[])
 /* QUANTILE([<order> ,] <data> [, <axes>]) */
 {
   Int	output, med, nelem, i;
-  Float	order;
+  float	order;
   loopInfo	srcinfo, trgtinfo;
   pointer	trgt, tmp, tmp0;
   /* we use a global pointer src */
@@ -1290,7 +1290,7 @@ Int lux_distarr(Int narg, Int ps[])
 /* and <stretch> must have the same number of elements.  LS 9jan97 22may97 */
 {
   Int	iq, *dims, ndim, i, result, done;
-  Float	*center, temp, temptot, zerocenter[MAX_DIMS], *stretch,
+  float	*center, temp, temptot, zerocenter[MAX_DIMS], *stretch,
 	onestretch[MAX_DIMS];
   pointer	trgt;
   loopInfo	trgtinfo;
@@ -1313,7 +1313,7 @@ Int lux_distarr(Int narg, Int ps[])
     { case LUX_ARRAY:
 	if (array_size(iq) != ndim)
 	  return cerror(INCMP_ARG, ps[1]);
-	center = (Float *) array_data(iq);
+	center = (float *) array_data(iq);
 	break;
       case LUX_SCALAR:
 	if (ndim != 1)
@@ -1323,7 +1323,7 @@ Int lux_distarr(Int narg, Int ps[])
       default:
 	return cerror(ILL_CLASS, ps[1]); }
   } else
-  { zerobytes(zerocenter, ndim*sizeof(Float));
+  { zerobytes(zerocenter, ndim*sizeof(float));
     center = zerocenter; }
   if (narg > 2)
   { iq = lux_float(1, &ps[2]);	/* STRETCH */
@@ -1331,7 +1331,7 @@ Int lux_distarr(Int narg, Int ps[])
     { case LUX_ARRAY:
 	if (array_size(iq) != ndim)
 	  return cerror(INCMP_ARG, ps[2]);
-	stretch = (Float *) array_data(iq);
+	stretch = (float *) array_data(iq);
 	break;
       case LUX_SCALAR:
 	if (ndim != 1)
@@ -1353,7 +1353,7 @@ Int lux_distarr(Int narg, Int ps[])
   result = array_scratch(LUX_FLOAT, ndim, dims);
   if (result == LUX_ERROR)	/* some error */
     return LUX_ERROR;
-  trgt.f = (Float *) array_data(result);
+  trgt.f = (float *) array_data(result);
   setupDimensionLoop(&trgtinfo, ndim, dims, LUX_FLOAT, ndim, NULL, &trgt,
 		     SL_EACHCOORD);
   /* initialize walk through array */
@@ -1364,7 +1364,7 @@ Int lux_distarr(Int narg, Int ps[])
   do
   { temp = (trgtinfo.coords[0] - center[0])*stretch[0];
     *trgt.f = temp*temp + temptot;
-    *trgt.f = sqrt((Double) *trgt.f); /* distance */
+    *trgt.f = sqrt((double) *trgt.f); /* distance */
     done = advanceLoop(&trgtinfo, &trgt);
     if (done && done < ndim)
     { temptot = 0.0;
@@ -1594,7 +1594,7 @@ Int shift(Int narg, Int ps[], Int isFunction)
   char	*tmp, *tmp0 = NULL;
   loopInfo	srcinfo, trgtinfo;
   Int	lux_indgen(Int, Int []);
-  Double	zero = 0.0;
+  double	zero = 0.0;
 
   if (!symbolIsNumericalArray(ps[0]))
     return cerror(NEED_ARR, ps[0]);
@@ -1894,7 +1894,7 @@ Int local_extrema(Int narg, Int ps[], Int code)
   Int	result, sign, degree, n, i, *offset, k, j, ok, *edge, nok,
 	*diagonal, nDiagonal, nDoDim, index, subgrid, ready, done;
   pointer	src, trgt, trgt0, srcl, srcr, trgt00;
-  Float	*grad, *grad2, *hessian, value;
+  float	*grad, *grad2, *hessian, value;
   loopInfo	srcinfo, trgtinfo;
 
   if (!symbolIsNumericalArray(ps[0]))
@@ -2054,7 +2054,7 @@ Int local_extrema(Int narg, Int ps[], Int code)
 	if (degree)
 	  *trgt.l = nok;
 	else if (nok)
-	  *trgt.l++ = src.f - (Float *) srcinfo.data0;
+	  *trgt.l++ = src.f - (float *) srcinfo.data0;
 	done = degree? (advanceLoop(&trgtinfo, &trgt),
 			advanceLoop(&srcinfo, &src)):
 	  advanceLoop(&srcinfo, &src);
@@ -2079,7 +2079,7 @@ Int local_extrema(Int narg, Int ps[], Int code)
 	if (degree)
 	  *trgt.l = nok;
 	else if (nok)
-	  *trgt.l++ = src.d - (Double *) srcinfo.data0;
+	  *trgt.l++ = src.d - (double *) srcinfo.data0;
 	done = degree? (advanceLoop(&trgtinfo, &trgt),
 			advanceLoop(&srcinfo, &src)):
 	  advanceLoop(&srcinfo, &src);
@@ -2095,7 +2095,7 @@ Int local_extrema(Int narg, Int ps[], Int code)
     switch (code) {
       case 0: case 2:		/* find values */
 	result = array_scratch(LUX_FLOAT, 1, &n);
-	trgt.f = (Float *) array_data(result);
+	trgt.f = (float *) array_data(result);
       case 1: case 3:		/* find positions */
 	if (!(internalMode & 4) && !subgrid) {	/* not /COORDS, not /SUBGRID */
 	  srcinfo.coords[0] = n;	/* number of found extrema */
@@ -2123,9 +2123,9 @@ Int local_extrema(Int narg, Int ps[], Int code)
 	    nDiagonal++;
       }	/* end of if (!diagonal) else */
       if (nDiagonal) {
-	allocate(grad2, nDiagonal, Float);
-	allocate(grad, nDiagonal, Float);
-	allocate(hessian, nDiagonal*nDiagonal, Float);
+	allocate(grad2, nDiagonal, float);
+	allocate(grad, nDiagonal, float);
+	allocate(hessian, nDiagonal*nDiagonal, float);
 	k = 0;
 	for (i = 0; i < srcinfo.ndim; i++)
 	  if (!diagonal || diagonal[i])
@@ -2142,11 +2142,11 @@ Int local_extrema(Int narg, Int ps[], Int code)
 	switch (symbol_type(ps[0])) {
 	  case LUX_BYTE:
 	    srcl.b = src.b + index;
-	    value = (Float) *srcl.b;
+	    value = (float) *srcl.b;
 	    for (i = 0; i < nDiagonal; i++)
 	      grad[i] = grad2[i]
-		= ((Float) srcl.b[srcinfo.step[i]]
-		   - (Float) srcl.b[-srcinfo.step[i]])/2;
+		= ((float) srcl.b[srcinfo.step[i]]
+		   - (float) srcl.b[-srcinfo.step[i]])/2;
 	    ready = 1;	/* zero gradient? */
 	    for (i = 0; i < nDiagonal; i++)
 	      if (grad[i] != 0) {
@@ -2159,23 +2159,23 @@ Int local_extrema(Int narg, Int ps[], Int code)
 	      for (j = 0; j <= i; j++)
 		if (i == j)
 		  hessian[i + i*nDiagonal] 
-		    = (Float) srcl.b[srcinfo.step[i]]
-		    + (Float) srcl.b[-srcinfo.step[i]] - 2*value;
+		    = (float) srcl.b[srcinfo.step[i]]
+		    + (float) srcl.b[-srcinfo.step[i]] - 2*value;
 		else
 		  hessian[i + j*nDiagonal] = hessian[j + i*nDiagonal]
-		    = ((Float) srcl.b[srcinfo.step[i] + srcinfo.step[j]]
-		       + (Float) srcl.b[-srcinfo.step[i] - srcinfo.step[j]]
-		       - (Float) srcl.b[srcinfo.step[i] - srcinfo.step[j]]
-		       - (Float) srcl.b[srcinfo.step[j]
+		    = ((float) srcl.b[srcinfo.step[i] + srcinfo.step[j]]
+		       + (float) srcl.b[-srcinfo.step[i] - srcinfo.step[j]]
+		       - (float) srcl.b[srcinfo.step[i] - srcinfo.step[j]]
+		       - (float) srcl.b[srcinfo.step[j]
 				       - srcinfo.step[i]])/4;
 	    break;
 	  case LUX_WORD:
 	    srcl.w = src.w + index;
-	    value = (Float) *srcl.w;
+	    value = (float) *srcl.w;
 	    for (i = 0; i < nDiagonal; i++)
 	      grad[i] = grad2[i]
-		= ((Float) srcl.w[srcinfo.step[i]]
-		   - (Float) srcl.w[-srcinfo.step[i]])/2;
+		= ((float) srcl.w[srcinfo.step[i]]
+		   - (float) srcl.w[-srcinfo.step[i]])/2;
 	    ready = 1;	/* zero gradient? */
 	    for (i = 0; i < nDiagonal; i++)
 	      if (grad[i] != 0) {
@@ -2188,23 +2188,23 @@ Int local_extrema(Int narg, Int ps[], Int code)
 	      for (j = 0; j <= i; j++)
 		if (i == j)
 		  hessian[i + i*nDiagonal] 
-		    = (Float) srcl.w[srcinfo.step[i]]
-		    + (Float) srcl.w[-srcinfo.step[i]] - 2*value;
+		    = (float) srcl.w[srcinfo.step[i]]
+		    + (float) srcl.w[-srcinfo.step[i]] - 2*value;
 		else
 		  hessian[i + j*nDiagonal] = hessian[j + i*nDiagonal]
-		    = ((Float) srcl.w[srcinfo.step[i] + srcinfo.step[j]]
-		       + (Float) srcl.w[-srcinfo.step[i] - srcinfo.step[j]]
-		       - (Float) srcl.w[srcinfo.step[i] - srcinfo.step[j]]
-		       - (Float) srcl.w[srcinfo.step[j]
+		    = ((float) srcl.w[srcinfo.step[i] + srcinfo.step[j]]
+		       + (float) srcl.w[-srcinfo.step[i] - srcinfo.step[j]]
+		       - (float) srcl.w[srcinfo.step[i] - srcinfo.step[j]]
+		       - (float) srcl.w[srcinfo.step[j]
 				       - srcinfo.step[i]])/4;
 	    break;
 	  case LUX_LONG:
 	    srcl.l = src.l + index;
-	    value = (Float) *srcl.l;
+	    value = (float) *srcl.l;
 	    for (i = 0; i < nDiagonal; i++)
 	      grad[i] = grad2[i]
-		= ((Float) srcl.l[srcinfo.step[i]]
-		   - (Float) srcl.l[-srcinfo.step[i]])/2;
+		= ((float) srcl.l[srcinfo.step[i]]
+		   - (float) srcl.l[-srcinfo.step[i]])/2;
 	    ready = 1;	/* zero gradient? */
 	    for (i = 0; i < nDiagonal; i++)
 	      if (grad[i] != 0) {
@@ -2217,23 +2217,23 @@ Int local_extrema(Int narg, Int ps[], Int code)
 	      for (j = 0; j <= i; j++)
 		if (i == j)
 		  hessian[i + i*nDiagonal] 
-		    = (Float) srcl.l[srcinfo.step[i]]
-		    + (Float) srcl.l[-srcinfo.step[i]] - 2*value;
+		    = (float) srcl.l[srcinfo.step[i]]
+		    + (float) srcl.l[-srcinfo.step[i]] - 2*value;
 		else
 		  hessian[i + j*nDiagonal] = hessian[j + i*nDiagonal]
-		    = ((Float) srcl.l[srcinfo.step[i] + srcinfo.step[j]]
-		       + (Float) srcl.l[-srcinfo.step[i] - srcinfo.step[j]]
-		       - (Float) srcl.l[srcinfo.step[i] - srcinfo.step[j]]
-		       - (Float) srcl.l[srcinfo.step[j]
+		    = ((float) srcl.l[srcinfo.step[i] + srcinfo.step[j]]
+		       + (float) srcl.l[-srcinfo.step[i] - srcinfo.step[j]]
+		       - (float) srcl.l[srcinfo.step[i] - srcinfo.step[j]]
+		       - (float) srcl.l[srcinfo.step[j]
 				       - srcinfo.step[i]])/4;
 	    break;
 	  case LUX_FLOAT:
 	    srcl.f = src.f + index;
-	    value = (Float) *srcl.f;
+	    value = (float) *srcl.f;
 	    for (i = 0; i < nDiagonal; i++)
 	      grad[i] = grad2[i]
-		= ((Float) srcl.f[srcinfo.step[i]]
-		   - (Float) srcl.f[-srcinfo.step[i]])/2;
+		= ((float) srcl.f[srcinfo.step[i]]
+		   - (float) srcl.f[-srcinfo.step[i]])/2;
 	    ready = 1;	/* zero gradient? */
 	    for (i = 0; i < nDiagonal; i++)
 	      if (grad[i] != 0) {
@@ -2246,23 +2246,23 @@ Int local_extrema(Int narg, Int ps[], Int code)
 	      for (j = 0; j <= i; j++)
 		if (i == j)
 		  hessian[i + i*nDiagonal] 
-		    = (Float) srcl.f[srcinfo.step[i]]
-		    + (Float) srcl.f[-srcinfo.step[i]] - 2*value;
+		    = (float) srcl.f[srcinfo.step[i]]
+		    + (float) srcl.f[-srcinfo.step[i]] - 2*value;
 		else
 		  hessian[i + j*nDiagonal] = hessian[j + i*nDiagonal]
-		    = ((Float) srcl.f[srcinfo.step[i] + srcinfo.step[j]]
-		       + (Float) srcl.f[-srcinfo.step[i] - srcinfo.step[j]]
-		       - (Float) srcl.f[srcinfo.step[i] - srcinfo.step[j]]
-		       - (Float) srcl.f[srcinfo.step[j]
+		    = ((float) srcl.f[srcinfo.step[i] + srcinfo.step[j]]
+		       + (float) srcl.f[-srcinfo.step[i] - srcinfo.step[j]]
+		       - (float) srcl.f[srcinfo.step[i] - srcinfo.step[j]]
+		       - (float) srcl.f[srcinfo.step[j]
 				       - srcinfo.step[i]])/4;
 	    break;
 	  case LUX_DOUBLE:
 	    srcl.d = src.d + index;
-	    value = (Float) *srcl.d;
+	    value = (float) *srcl.d;
 	    for (i = 0; i < nDiagonal; i++)
 	      grad[i] = grad2[i]
-		= ((Float) srcl.d[srcinfo.step[i]]
-		   - (Float) srcl.d[-srcinfo.step[i]])/2;
+		= ((float) srcl.d[srcinfo.step[i]]
+		   - (float) srcl.d[-srcinfo.step[i]])/2;
 	    ready = 1;	/* zero gradient? */
 	    for (i = 0; i < nDiagonal; i++)
 	      if (grad[i] != 0) {
@@ -2275,14 +2275,14 @@ Int local_extrema(Int narg, Int ps[], Int code)
 	      for (j = 0; j <= i; j++)
 		if (i == j)
 		  hessian[i + i*nDiagonal] 
-		    = (Float) srcl.d[srcinfo.step[i]]
-		    + (Float) srcl.d[-srcinfo.step[i]] - 2*value;
+		    = (float) srcl.d[srcinfo.step[i]]
+		    + (float) srcl.d[-srcinfo.step[i]] - 2*value;
 		else
 		  hessian[i + j*nDiagonal] = hessian[j + i*nDiagonal]
-		    = ((Float) srcl.d[srcinfo.step[i] + srcinfo.step[j]]
-		       + (Float) srcl.d[-srcinfo.step[i] - srcinfo.step[j]]
-		       - (Float) srcl.d[srcinfo.step[i] - srcinfo.step[j]]
-		       - (Float) srcl.d[srcinfo.step[j]
+		    = ((float) srcl.d[srcinfo.step[i] + srcinfo.step[j]]
+		       + (float) srcl.d[-srcinfo.step[i] - srcinfo.step[j]]
+		       - (float) srcl.d[srcinfo.step[i] - srcinfo.step[j]]
+		       - (float) srcl.d[srcinfo.step[j]
 				       - srcinfo.step[i]])/4;
 	    break;
 	} /* end of switch (type) */
@@ -2330,19 +2330,19 @@ Int local_extrema(Int narg, Int ps[], Int code)
 	  index = *trgt0.l++;
 	  switch (symbol_type(ps[0])) {
 	    case LUX_BYTE:
-	      value = (Float) src.b[index];
+	      value = (float) src.b[index];
 	      break;
 	    case LUX_WORD:
-	      value = (Float) src.w[index];
+	      value = (float) src.w[index];
 	      break;
 	    case LUX_LONG:
-	      value = (Float) src.l[index];
+	      value = (float) src.l[index];
 	      break;
 	    case LUX_FLOAT:
-	      value = (Float) src.f[index];
+	      value = (float) src.f[index];
 	      break;
 	    case LUX_DOUBLE:
-	      value = (Float) src.d[index];
+	      value = (float) src.d[index];
 	      break;
 	  } /* end of switch (symbol_type(ps[0])) */
 	  *trgt.f++ = value;
@@ -2576,13 +2576,13 @@ Theory:
 {
   Int	sx, sy, sw, *dims, ndim, nPar, i, nData, type, result, j, k, dw,
     newDims[MAX_DIMS];
-  Float	onef = 1.0;
-  Double	oned = 1.0, errv, f, chi2;
+  float	onef = 1.0;
+  double	oned = 1.0, errv, f, chi2;
   scalar	value;
   pointer	px, py, pl, pr, p1, p2, pw, pc, err, chisq;
-  Int	f_decomp(Float *, Int, Int), d_decomp(Double *, Int, Int),
-    f_solve(Float *, Float *, Int, Int),
-    d_solve(Double *, Double *, Int, Int);
+  Int	f_decomp(float *, Int, Int), d_decomp(double *, Int, Int),
+    f_solve(float *, float *, Int, Int),
+    d_solve(double *, double *, Int, Int);
 
   sx = ps[0];			/* <x>: independent data */
   if (symbol_class(sx) != LUX_ARRAY)
@@ -2664,13 +2664,13 @@ Theory:
 	break;
     }
   else
-    pw.f = (Float *) array_data(sw);
+    pw.f = (float *) array_data(sw);
 
   narg--; ps++;
   if (narg > 0 && *ps) {	/* <cov>: place to return covariances */
     newDims[0] = newDims[1] = nPar;
     to_scratch_array(*ps, type, 2, newDims); /* make into suitable array */
-    pc.f = (Float *) array_data(*ps);
+    pc.f = (float *) array_data(*ps);
     zerobytes(pc.f, nPar*nPar*lux_type_size[type]);
     switch (type) {		/* fill with identity matrix */
       case LUX_FLOAT:
@@ -2703,15 +2703,15 @@ Theory:
   } else
     chisq.f = NULL;
 
-  px.f = (Float *) array_data(sx); /* x data */
-  py.f = (Float *) array_data(sy); /* y data */
+  px.f = (float *) array_data(sx); /* x data */
+  py.f = (float *) array_data(sy); /* y data */
 
   /* now get some scratch space for intermediate results */
-  pl.f = (Float *) malloc(nPar*nPar*lux_type_size[type]);
+  pl.f = (float *) malloc(nPar*nPar*lux_type_size[type]);
   zerobytes(pl.f, nPar*nPar*lux_type_size[type]);
 
   result = array_scratch(type, 1, &nPar); /* return symbol: parameters <a> */
-  pr.f = (Float *) array_data(result);
+  pr.f = (float *) array_data(result);
   zerobytes(pr.f, nPar*lux_type_size[type]);
 
   /* now do the calculations */
@@ -2758,10 +2758,10 @@ Theory:
 	  pw.f += dw;
 	}
 	if (chisq.f != NULL)
-	  *chisq.f = (Float) chi2;
+	  *chisq.f = (float) chi2;
 	errv = sqrt(chi2/f);	/* normalize and get rms */
 	if (err.f != NULL)
-	  *err.f = (Float) errv; /* store */
+	  *err.f = (float) errv; /* store */
       } else
 	chi2 = 1.0;		/* don't calculate: assume 1. */
       if ((internalMode & 1) == 0)
@@ -2834,10 +2834,10 @@ Theory:
 	  pw.d += dw;
 	}
 	if (chisq.d != NULL)
-	  *chisq.d = (Float) chi2;
+	  *chisq.d = (float) chi2;
 	errv = sqrt(chi2/f);	/* normalize and get rms */
 	if (err.d != NULL)
-	  *err.d = (Float) errv; /* store */
+	  *err.d = (float) errv; /* store */
       } else
 	chi2 = 1.0;		/* don't calculate: assume 1. */
       if ((internalMode & 1) == 0)
@@ -2903,8 +2903,8 @@ Theory:
 {
   Int	i, j, k, nPar, nData, type, result, dims[MAX_DIMS], ndim, dw, ncc,
     axisSym, nRepeat, stride, bigstride, ysym, nkernel, n, i1, i2, cc, dk;
-  Float	onef = 1.0;
-  Double oned = 1.0, chi2, f, errv, fwhm, norm;
+  float	onef = 1.0;
+  double oned = 1.0, chi2, f, errv, fwhm, norm;
   scalar	value;
   pointer	px, py, pl, pr, p2, pw, pc, err, chisq, pk;
   loopInfo	xinfo, yinfo, p2info, winfo;
@@ -3011,7 +3011,7 @@ Theory:
     ndim = 2 + yinfo.ndim - k;
     if (to_scratch_array(*ps, type, ndim, dims) == LUX_ERROR)
       return LUX_ERROR;
-    pc.f = (Float *) array_data(*ps);
+    pc.f = (float *) array_data(*ps);
     zerobytes(pc.f, array_size(*ps)*lux_type_size[type]);
     j = fwhm? nRepeat: yinfo.nelem;
     switch (type) {		/* fill with identity matrix */

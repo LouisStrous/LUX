@@ -26,35 +26,35 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
    Modified by Louis Strous 27jul94
 */
 
-Int anacon(Float *xarr, Int nx, Int ny, Float *xlev, Int numlev,
-	    Int itvord, Float xl, Float yl, Float xsc, Float ysc,
-	    Float cut)
+Int anacon(float *xarr, Int nx, Int ny, float *xlev, Int numlev,
+	    Int itvord, float xl, float yl, float xsc, float ysc,
+	    float cut)
 {
   /* System generated locals */
   Int i_1, i_2, i_3;
-  Int	tkdash(Float *, Float *, Int *, Int *);
+  Int	tkdash(float *, float *, Int *, Int *);
 
   /* Local variables */
-  Float cell[5];
+  float cell[5];
   Int minc, ninc, icol, incr, ndsh, imax, ntim;
-  Float xmin, xmax;
+  float xmin, xmax;
   Int irow, j, k, l, ibase;
-  Float xmean;
+  float xmean;
   Int n2, n3, n4;
-  Float aa[4], bb[4];
+  float aa[4], bb[4];
   Int ii, in;
-  Float xa[4], ya[4];
+  float xa[4], ya[4];
   Int ns;
   Int ibindx;
   Int inccon(Int, Int, Int, Int *, Int *, Int *, Int *, Int *, Int *, Int *);
-  Float cellavg(Float *, Int);
+  float cellavg(float *, Int);
   extern /* Subroutine */ Int tkdash();
-  Float xz, yz;
-  Float tmp;
+  float xz, yz;
+  float tmp;
 
-/*   xarr  is data array to contour (Float*4) */
+/*   xarr  is data array to contour (float*4) */
 /*   nx,ny  is size of xarr */
-/*   xlev   is a table of contour levels Float*4 */
+/*   xlev   is a table of contour levels float*4 */
 /*   numlev are the number of levels to contour */
 /*  itvord  is the desired flip of the array - see inccon below for 
 details*/
@@ -78,8 +78,8 @@ details*/
     xsc /= ny;
   }
 /* must reset ix,iy to center the contour on the raster */
-  xz = xl + xsc / (Float)2.;
-  yz = yl + ysc / (Float)2.;
+  xz = xl + xsc / (float)2.;
+  yz = yl + ysc / (float)2.;
 
 /* set up increments and limits for array processing according to itvord 
 */
@@ -136,23 +136,23 @@ side of the cell */
 	      ++ns;
 	      if (l == 1) {
 /* top */
-		xa[ns - 1] = (Float) (icol - 1) +
+		xa[ns - 1] = (float) (icol - 1) +
 		  (xlev[k] - cell[l - 1]) / (cell[l] - cell[l - 1]);
-		ya[ns - 1] = (Float) (irow - 1);
+		ya[ns - 1] = (float) (irow - 1);
 	      } else if (l == 2) {
 /* right side */
-		xa[ns - 1] = (Float) icol;
-		ya[ns - 1] = (Float) (irow - 1) +
+		xa[ns - 1] = (float) icol;
+		ya[ns - 1] = (float) (irow - 1) +
 		  (xlev[k] - cell[l - 1]) / (cell[l] - cell[l - 1]);
 	      } else if (l == 3) {
 /* bottom side */
-		xa[ns - 1] = (Float) (icol - 1) +
+		xa[ns - 1] = (float) (icol - 1) +
 		  (xlev[k] - cell[l]) / (cell[l - 1] - cell[l]);
-		ya[ns - 1] = (Float) irow;
+		ya[ns - 1] = (float) irow;
 	      } else {
 /* left side */
-		xa[ns - 1] = (Float) (icol - 1);
-		ya[ns - 1] = (Float) (irow - 1) +
+		xa[ns - 1] = (float) (icol - 1);
+		ya[ns - 1] = (float) (irow - 1) +
 		  (xlev[k] - cell[l]) / (cell[l - 1] - cell[l]);
 	      }
 	    }
@@ -213,20 +213,20 @@ point 2 and point 3 to 4. */
 } /* anacon_ */
 
 
-Float cellavg(Float *cell, Int nav)
+float cellavg(float *cell, Int nav)
 {
-  Float ret_val;
+  float ret_val;
   Int ii;
   
   /* Parameter adjustments */
   --cell;
 
   /* Function Body */
-  ret_val = (Float) 0.;
+  ret_val = (float) 0.;
   for (ii = 1; ii <= nav; ++ii) {
     ret_val += cell[ii];
   }
-  ret_val /= (Float) nav;
+  ret_val /= (float) nav;
   return ret_val;
 }
 

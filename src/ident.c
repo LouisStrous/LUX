@@ -375,7 +375,7 @@ Int Sprintf_general(char *str, char *format, va_list ap)
 {
   static formatInfo	ownfmi, *fmi;
   Int	width, n;
-  Double	d, d2;
+  double	d, d2;
   char	*p;
   static char	tmp[20];
 
@@ -435,9 +435,9 @@ Int Sprintf_general(char *str, char *format, va_list ap)
     break;
   case 'z':			/* complex number */
     /* for complex numbers, the real and imaginary parts must be specified
-       as separate (Double) arguments */
-    d = va_arg(ap, Double);	/* the real part */
-    d2 = va_arg(ap, Double); /* the imaginary part */
+       as separate (double) arguments */
+    d = va_arg(ap, double);	/* the real part */
+    d2 = va_arg(ap, double); /* the imaginary part */
     sprintf(str, tmp, d, d2, &n);
     if (n < width) {
       memmove(str + (width - n), str, n + 1);
@@ -657,10 +657,10 @@ char *symbolIdent(Int symbol, Int mode)
       ptr.cf = complex_scalar_data(symbol).cf;
       if (complex_scalar_type(symbol) == LUX_CFLOAT) {
 	if (ptr.cf->real == 0.0)
-	  sprintf(curScrat, "(%g", (Double) ptr.cf->imaginary);
+	  sprintf(curScrat, "(%g", (double) ptr.cf->imaginary);
 	else
-	  sprintf(curScrat, "(%g+%g", (Double) ptr.cf->real,
-		  (Double) ptr.cf->imaginary);
+	  sprintf(curScrat, "(%g+%g", (double) ptr.cf->real,
+		  (double) ptr.cf->imaginary);
       } else {
 	if (ptr.cd->real == 0.0)
 	  sprintf(curScrat, "(%g", ptr.cd->imaginary);
@@ -783,7 +783,7 @@ char *symbolIdent(Int symbol, Int mode)
 	  break;
 	case LUX_FLOAT:
 	  while (j--) {
-	    sprintf(curScrat, "%g", (Double) *ptr.f++);
+	    sprintf(curScrat, "%g", (double) *ptr.f++);
 	    curScrat += strlen(curScrat);
 	    if (j || i)
 	      strcpy(curScrat++, ",");
@@ -918,7 +918,7 @@ char *symbolIdent(Int symbol, Int mode)
 	  number.f = *scal_ptr_pointer(symbol).f;
 	  break;
 	case LUX_DOUBLE:
-	  number.f = (Float) *scal_ptr_pointer(symbol).d;
+	  number.f = (float) *scal_ptr_pointer(symbol).d;
 	  break;
 	case LUX_TEMP_STRING:
 	  strcpy(curScrat, scal_ptr_pointer(symbol).s);
@@ -927,7 +927,7 @@ char *symbolIdent(Int symbol, Int mode)
       }
       if (scal_ptr_type(symbol) < LUX_FLOAT) /* integer type */
 	sprintf(curScrat, "%d", number.l);
-      else if (scal_ptr_type(symbol) <= LUX_DOUBLE) /* Float type */
+      else if (scal_ptr_type(symbol) <= LUX_DOUBLE) /* float type */
 	sprintf(curScrat, "%g", number.f);
       break;
     case LUX_SUBSC_PTR:

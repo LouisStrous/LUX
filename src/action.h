@@ -59,7 +59,7 @@ Int 	dereferenceScalPointer(Int), scalar_scratch(Int),
   strccmp(char *, char *), eval(Int), evals(Int), lux_cdouble(Int, Int []),
   strncasecmp_p(char *, char *, Int), strcasecmp_p(char *, char *),
   stringpointer(char *, Int), routineContext(Int), lux_string(Int, Int []),
-  getSimpleNumerical(Int, pointer *, Int *), double_arg_stat(Int, Double *),
+  getSimpleNumerical(Int, pointer *, Int *), double_arg_stat(Int, double *),
   numerical(Int, Int **, Int *, Int *, pointer *),
   numerical_or_string(Int, Int **, Int *, Int *, pointer *),
   findName(char *, hashTableEntry **, Int), to_scalar(Int, Int),
@@ -71,7 +71,7 @@ Int 	dereferenceScalPointer(Int), scalar_scratch(Int),
   redef_array(Int, Int, Int, Int *), string_scratch(Int),
   transferAll(Int symbol), transfer(Int), copySym(Int),
   scalar_scratch_copy(Int), redef_scalar(Int, Int, void *),
-  redef_string(Int, Int), float_arg_stat(Int, Float *),
+  redef_string(Int, Int), float_arg_stat(Int, float *),
   Sprintf(char *, char *, ...), translateEscapes(char *),
   nextchar(FILE *), unnextchar(Int, FILE *);
 
@@ -112,9 +112,9 @@ void	clearToPopTempVariable(Int), pushTempVariable(Int), printw(char *),
   zapMarked(void), pegMark(void), unMark(Int),
   dupList(void), zerobytes(void *, Int), printwf(char *, ...),
   cleanup_cubic_spline_tables(csplineInfo *),
-  cspline_value_and_derivative(Double, Double *, Double *, csplineInfo *),
-  find_cspline_extremes(Double, Double, Double *, Double *,
-			Double *, Double *, csplineInfo *),
+  cspline_value_and_derivative(double, double *, double *, csplineInfo *),
+  find_cspline_extremes(double, double, double *, double *,
+			double *, double *, csplineInfo *),
   undefine(Int),
   setPager(Int), resetPager(void), embed(Int, Int),
   convertPointer(scalar *, Int, Int), zap(Int);
@@ -127,12 +127,12 @@ void setupDimensionLoop(loopInfo *info, Int ndim, Int const *dims,
   rearrangeDimensionLoop(loopInfo *), endian(void *, Int, Int),
   rearrangeEdgeLoop(loopInfo *, loopInfo *, Int);
 
-Float	float_arg(Int);
-Double	double_arg(Int), cspline_value(Double, csplineInfo *),
-	find_cspline_value(Double, Double, Double, csplineInfo *),
-	cspline_derivative(Double, csplineInfo *),
-  cspline_second_derivative(Double, csplineInfo *), famod(Double,Double),
-  fasmod(Double,Double), vhypot(Int, Double, Double, ...), hypota(Int, Double *);
+float	float_arg(Int);
+double	double_arg(Int), cspline_value(double, csplineInfo *),
+	find_cspline_value(double, double, double, csplineInfo *),
+	cspline_derivative(double, csplineInfo *),
+  cspline_second_derivative(double, csplineInfo *), famod(double,double),
+  fasmod(double,double), vhypot(Int, double, double, ...), hypota(Int, double *);
 Int iamod(Int,Int), iasmod(Int,Int);
 FILE	*openPathFile(char *, Int);
 

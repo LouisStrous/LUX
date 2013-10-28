@@ -29,19 +29,19 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
    Modifications include:
         Translation from Pascal to ANSI C.
         Array indexing from 0 rather than 1.
-        Float replaced by Double everywhere.
+        float replaced by double everywhere.
         Support for the Matrix structure.
-        I changed the array indexing so that the matricies (Float [][])
-           could be replaced be a single list (Double *) for more
+        I changed the array indexing so that the matricies (float [][])
+           could be replaced be a single list (double *) for more
            efficient communication with Mathematica.
 */
 
 #define TOLERANCE 1.0e-22
 
-void SVD(Double *W, Double *Z, Int nRow, Int nCol)
+void SVD(double *W, double *Z, Int nRow, Int nCol)
 {
   Int i, j, k, EstColRank, RotCount, SweepCount, slimit;
-  Double eps, e2, tol, vt, p, h2, x0, y0, q, r, c0, s0, c2, d1, d2;
+  double eps, e2, tol, vt, p, h2, x0, y0, q, r, c0, s0, c2, d1, d2;
   eps = TOLERANCE;
   slimit = nCol/4;
   if (slimit < 6.0)
@@ -115,10 +115,10 @@ Int lux_svd(Int narg, Int ps[])
 /* SVD,A,U,S,V */
 {
   Int	iq, nRow, nCol, *d, n;
-  Double	*a, *z;
+  double	*a, *z;
   pointer	src;
 
-/*  void SVD(Double *W, Double *Z, Int nRow, Int nCol) */
+/*  void SVD(double *W, double *Z, Int nRow, Int nCol) */
 
   if (symbol_class(ps[0]) != LUX_ARRAY
       || array_num_dims(ps[0]) != 2)
@@ -126,36 +126,36 @@ Int lux_svd(Int narg, Int ps[])
   d = array_dims(ps[0]);
   if (d[0] > d[1])
     return luxerror("#columns > #rows in input matrix in SVD", ps[0]);
-  a = (Double *) Malloc(d[0]*(d[1] + d[0])*sizeof(Double));
+  a = (double *) Malloc(d[0]*(d[1] + d[0])*sizeof(double));
   if (!a)
     return cerror(ALLOC_ERR, 0);
-  z = (Double *) Malloc(d[1]*sizeof(Double));
+  z = (double *) Malloc(d[1]*sizeof(double));
   n = d[0]*d[1];
   src = array_data(ps[0]);
   switch (symbol_type(ps[0])) {
     case LUX_BYTE:
       while (n--)
-	*a++ = (Double) *src.b++;
+	*a++ = (double) *src.b++;
       a -= n;
       break;
     case LUX_WORD:
       while (n--)
-	*a++ = (Double) *src.w++;
+	*a++ = (double) *src.w++;
       a -= n;
       break;
     case LUX_LONG:
       while (n--)
-	*a++ = (Double) *src.l++;
+	*a++ = (double) *src.l++;
       a -= n;
       break;
     case LUX_FLOAT:
       while (n--)
-	*a++ = (Double) *src.f++;
+	*a++ = (double) *src.f++;
       a -= n;
       break;
     case LUX_DOUBLE:
       while (n--)
-	*a++ = (Double) *src.d++;
+	*a++ = (double) *src.d++;
       a -= n;
       break;
     }rlof

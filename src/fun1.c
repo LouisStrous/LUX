@@ -35,14 +35,14 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "action.h"
 #include "calendar.h"
 
-extern	Double	cbrt(Double), expm1(Double), log1p(Double);
-Double	voigt(Double, Double), beta(Double, Double), gamma(Double),
-	incomplete_gamma(Double, Double), chi_square(Double, Double),
-	incomplete_beta(Double, Double, Double), student(Double, Double),
-	F(Double, Double, Double), loggamma(Double), logbeta(Double, Double),
-	non_central_chi_square(Double, Double, Double), bessel_i0(Double),
-	bessel_i1(Double), bessel_k0(Double), bessel_k1(Double),
-	bessel_kn(Int, Double), sgn(Double);
+extern	double	cbrt(double), expm1(double), log1p(double);
+double	voigt(double, double), beta(double, double), gamma(double),
+	incomplete_gamma(double, double), chi_square(double, double),
+	incomplete_beta(double, double, double), student(double, double),
+	F(double, double, double), loggamma(double), logbeta(double, double),
+	non_central_chi_square(double, double, double), bessel_i0(double),
+	bessel_i1(double), bessel_k0(double), bessel_k1(double),
+	bessel_kn(Int, double), sgn(double);
 static	Int	result_sym;
 Int	math_funcs(Int, Int), math_funcs_2f(Int, Int, Int),
 	math_funcs_i_f(Int, Int, Int), math_funcs_3f(Int, Int, Int, Int);
@@ -67,31 +67,31 @@ enum fddd {
   F_NCCHI2, F_IBETA, F_FRATIO
 };
 
-Double (*func_d[])(Double) = {
+double (*func_d[])(double) = {
   sin, cos, tan, asin, acos, atan, sinh, cosh, tanh, sqrt, cbrt, exp,
   expm1, log, log10, log1p, erf, erfc, j0, j1, y0, y1, gamma, loggamma,
   bessel_i0, bessel_i1, bessel_k0, bessel_k1, sgn, asinh, acosh, atanh
 };
 
-Double (*func_id[])(Int, Double) = {
+double (*func_id[])(Int, double) = {
   jn, yn, bessel_kn
 };
 
-Double (*func_dd[])(Double, Double) = {
+double (*func_dd[])(double, double) = {
   atan2, pow, voigt, beta, logbeta, incomplete_gamma, chi_square, student
 };
 
-Double (*func_ddd[])(Double, Double, Double) = {
+double (*func_ddd[])(double, double, double) = {
   non_central_chi_square, incomplete_beta, F
 };
 
-doubleComplex c_sin(Double, Double), c_cos(Double, Double),
-  c_tan(Double, Double), c_arcsin(Double, Double), c_arccos(Double,
-  Double), c_arctan(Double, Double), c_sinh(Double, Double),
-  c_cosh(Double, Double), c_tanh(Double, Double), c_log(Double,
-  Double), c_exp(Double, Double);
+doubleComplex c_sin(double, double), c_cos(double, double),
+  c_tan(double, double), c_arcsin(double, double), c_arccos(double,
+  double), c_arctan(double, double), c_sinh(double, double),
+  c_cosh(double, double), c_tanh(double, double), c_log(double,
+  double), c_exp(double, double);
 
-doubleComplex (*func_c[])(Double, Double) = {
+doubleComplex (*func_c[])(double, double) = {
   c_sin, c_cos, c_tan, c_arcsin, c_arccos, c_arctan, c_sinh, c_cosh,
   c_tanh, NULL, NULL, c_exp, NULL, c_log, NULL, NULL, NULL, NULL,
   NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
@@ -184,7 +184,7 @@ Int lux_cputime(void)
      /*returns an cpu time in seconds */
 {
   Int	i;
-  Double value;
+  double value;
 
   i = scalar_scratch(LUX_DOUBLE);
 #if HAVE_CLOCK_GETTIME
@@ -193,10 +193,10 @@ Int lux_cputime(void)
   if (!bad) {
     value = tp.tv_sec + tp.tv_nsec/1e9;
   } else {             /* no hi-res clock, use old method after all */
-    value = ((Double) clock())/CLOCKS_PER_SEC;
+    value = ((double) clock())/CLOCKS_PER_SEC;
   }
 #else
-  value = ((Double) clock())/CLOCKS_PER_SEC;
+  value = ((double) clock())/CLOCKS_PER_SEC;
 #endif
   scalar_value(i).d = value;
   return i;
@@ -211,7 +211,7 @@ Int lux_systime(void)
 
   gettimeofday(&tp, &tzp);
   i = scalar_scratch(LUX_DOUBLE);
-  scalar_value(i).d = (Double) tp.tv_sec + 0.000001* (Double) tp.tv_usec;
+  scalar_value(i).d = (double) tp.tv_sec + 0.000001* (double) tp.tv_usec;
   return i;
   return LUX_ZERO;		/* return 0 if not available */
 }
@@ -263,10 +263,10 @@ Int lux_date(void)
 }
 /*------------------------------------------------------------------------- */
 Int lux_jd(void)
-/* returns current Julian Day (relative to UTC) in Double precision */
+/* returns current Julian Day (relative to UTC) in double precision */
 {
   time_t	t;
-  Double	jd;
+  double	jd;
   Int	result;
 
   t = time(NULL);
@@ -279,7 +279,7 @@ Int lux_jd(void)
   /* Use of the struct tm representation is awkward, since I am not */
   /* interested in the (integer) second, minute, hour, day, and year. */
   /* LS 7oct97 */
-  jd = (Double) t/86400.0 + 2440587.5;
+  jd = (double) t/86400.0 + 2440587.5;
   result = scalar_scratch(LUX_DOUBLE);
   scalar_value(result).d = jd;
   return result;
@@ -904,12 +904,12 @@ Int indgen(Int narg, Int ps[], Int isFunc)
       break;
     case LUX_FLOAT:
       do 
-	*trgt.f = (Float) trgtinfo.coords[0];
+	*trgt.f = (float) trgtinfo.coords[0];
       while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.rndim);
       break;
     case LUX_DOUBLE:
       do 
-	*trgt.d = (Double) trgtinfo.coords[0];
+	*trgt.d = (double) trgtinfo.coords[0];
       while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.rndim);
       break;
     case LUX_CFLOAT:
@@ -1020,7 +1020,7 @@ Int lux_isnan(Int narg, Int ps[])
       if (isStringType(array_type(iq)))
 	return cerror(ILL_TYPE, *ps); /* no string arrays allowed here */
       n = array_size(iq);
-      src.f = (Float *) array_data(iq);
+      src.f = (float *) array_data(iq);
       result = array_clone(iq, LUX_LONG);
       trgt = array_data(result);
       break;
@@ -1037,7 +1037,7 @@ Int lux_isnan(Int narg, Int ps[])
   switch (symbol_type(*ps)) {
     case LUX_FLOAT:
       while (n--)
-	*trgt++ = isnan((Double) *src.f++);
+	*trgt++ = isnan((double) *src.f++);
       break;
     case LUX_DOUBLE:
       while (n--)
@@ -1430,8 +1430,8 @@ Int index_total(Int narg, Int ps[], Int mean)
   scalar	temp, value;
   floatComplex	tempcf, valuecf;
   doubleComplex	tempcd, valuecd;
-  Float	temp2f;
-  Double	temp2d;
+  float	temp2f;
+  double	temp2d;
   Byte	*present;
   extern scalar	lastmin, lastmax;
   Int	minmax(Int *, Int, Int);
@@ -1494,8 +1494,8 @@ Int index_total(Int narg, Int ps[], Int mean)
   if (p == 1) {			/* regular summation */
     if (haveWeights) {		/* have <weights> */
       if (mean) {		/* want average */
-	allocate(hist.d, size, Double);
-	zerobytes(hist.d, size*sizeof(Double));
+	allocate(hist.d, size, double);
+	zerobytes(hist.d, size*sizeof(double));
 	hist.d += offset;
 	switch (outType) {
 	  case LUX_FLOAT:
@@ -1503,28 +1503,28 @@ Int index_total(Int narg, Int ps[], Int mean)
 	      case LUX_BYTE:
 		while (i--) {		/* get the sum */
 		  hist.f[*indx] += *weights.f;
-		  trgt.f[*indx] += (Float) *src.b++ * *weights.f++;
+		  trgt.f[*indx] += (float) *src.b++ * *weights.f++;
 		  indx++;
 		}
 		break;
 	      case LUX_WORD:
 		while (i--) {		/* first, get the sum */
 		  hist.f[*indx] += *weights.f;
-		  trgt.f[*indx] += (Float) *src.w++ * *weights.f++;
+		  trgt.f[*indx] += (float) *src.w++ * *weights.f++;
 		  indx++;
 		}
 		break;
 	      case LUX_LONG:
 		while (i--) {		/* first, get the sum */
 		  hist.f[*indx] += *weights.f;
-		  trgt.f[*indx] += (Float) *src.l++ * *weights.f++;
+		  trgt.f[*indx] += (float) *src.l++ * *weights.f++;
 		  indx++;
 		}
 		break;
 	      case LUX_FLOAT:
 		while (i--) {		/* first, get the sum */
 		  hist.f[*indx] += *weights.f;
-		  trgt.f[*indx] += (Float) *src.f++ * *weights.f++;
+		  trgt.f[*indx] += (float) *src.f++ * *weights.f++;
 		  indx++;
 		}
 		break;
@@ -1539,28 +1539,28 @@ Int index_total(Int narg, Int ps[], Int mean)
 	      case LUX_BYTE:
 		while (i--) {		/* get the sum */
 		  hist.d[*indx] += *weights.d;
-		  trgt.d[*indx] += (Double) *src.b++ * *weights.d++;
+		  trgt.d[*indx] += (double) *src.b++ * *weights.d++;
 		  indx++;
 		}
 		break;
 	      case LUX_WORD:
 		while (i--) {		/* first, get the sum */
 		  hist.d[*indx] += *weights.d;
-		  trgt.d[*indx] += (Double) *src.w++ * *weights.d++;
+		  trgt.d[*indx] += (double) *src.w++ * *weights.d++;
 		  indx++;
 		}
 		break;
 	      case LUX_LONG:
 		while (i--) {		/* first, get the sum */
 		  hist.d[*indx] += *weights.d;
-		  trgt.d[*indx] += (Double) *src.l++ * *weights.d++;
+		  trgt.d[*indx] += (double) *src.l++ * *weights.d++;
 		  indx++;
 		}
 		break;
 	      case LUX_FLOAT:
 		while (i--) {		/* first, get the sum */
 		  hist.d[*indx] += *weights.d;
-		  trgt.d[*indx] += (Double) *src.f++ * *weights.d++;
+		  trgt.d[*indx] += (double) *src.f++ * *weights.d++;
 		  indx++;
 		}
 		break;
@@ -1580,9 +1580,9 @@ Int index_total(Int narg, Int ps[], Int mean)
 	  case LUX_CFLOAT:
 	    while (i--) {
 	      hist.f[*indx] += *weights.f;
-	      trgt.cf[*indx].real += (Float) src.cf->real * *weights.f;
+	      trgt.cf[*indx].real += (float) src.cf->real * *weights.f;
 	      trgt.cf[*indx++].imaginary +=
-		(Float) src.cf++->imaginary * *weights.f++;
+		(float) src.cf++->imaginary * *weights.f++;
 	    }
 	    for (i = -offset; i < size - offset; i++)
 	      if (hist.f[i]) {
@@ -1596,17 +1596,17 @@ Int index_total(Int narg, Int ps[], Int mean)
 	      case LUX_CFLOAT:
 		while (i--) {
 		  hist.d[*indx] += *weights.d;
-		  trgt.cd[*indx].real += (Float) src.cf->real * *weights.d;
+		  trgt.cd[*indx].real += (float) src.cf->real * *weights.d;
 		  trgt.cd[*indx++].imaginary +=
-		    (Float) src.cf++->imaginary * *weights.d++;
+		    (float) src.cf++->imaginary * *weights.d++;
 		}
 		break;
 	      case LUX_CDOUBLE:
 		while (i--) {
 		  hist.d[*indx] += *weights.d;
-		  trgt.cd[*indx].real += (Float) src.cd->real * *weights.d;
+		  trgt.cd[*indx].real += (float) src.cd->real * *weights.d;
 		  trgt.cd[*indx++].imaginary +=
-		    (Float) src.cd++->imaginary * *weights.d++;
+		    (float) src.cd++->imaginary * *weights.d++;
 		}
 		break;
 	    } /* end of switch (type) */
@@ -1625,19 +1625,19 @@ Int index_total(Int narg, Int ps[], Int mean)
 	    switch (type) {
 	      case LUX_BYTE:
 		while (i--) 		/* get the sum */
-		  trgt.f[*indx++] += (Float) *src.b++ * *weights.f++;
+		  trgt.f[*indx++] += (float) *src.b++ * *weights.f++;
 		break;
 	      case LUX_WORD:
 		while (i--)		/* first, get the sum */
-		  trgt.f[*indx++] += (Float) *src.w++ * *weights.f++;
+		  trgt.f[*indx++] += (float) *src.w++ * *weights.f++;
 		break;
 	      case LUX_LONG:
 		while (i--)		/* first, get the sum */
-		  trgt.f[*indx++] += (Float) *src.l++ * *weights.f++;
+		  trgt.f[*indx++] += (float) *src.l++ * *weights.f++;
 		break;
 	      case LUX_FLOAT:
 		while (i--)		/* first, get the sum */
-		  trgt.f[*indx++] += (Float) *src.f++ * *weights.f++;
+		  trgt.f[*indx++] += (float) *src.f++ * *weights.f++;
 		break;
 	    } /* end of switch (type) */
 	    break;
@@ -1645,19 +1645,19 @@ Int index_total(Int narg, Int ps[], Int mean)
 	    switch (type) {
 	      case LUX_BYTE:
 		while (i--) 	/* get the sum */
-		  trgt.d[*indx++] += (Double) *src.b++ * *weights.d++;
+		  trgt.d[*indx++] += (double) *src.b++ * *weights.d++;
 		break;
 	      case LUX_WORD:
 		while (i--) 		/* first, get the sum */
-		  trgt.d[*indx++] += (Double) *src.w++ * *weights.d++;
+		  trgt.d[*indx++] += (double) *src.w++ * *weights.d++;
 		break;
 	      case LUX_LONG:
 		while (i--) 		/* first, get the sum */
-		  trgt.d[*indx++] += (Double) *src.l++ * *weights.d++;
+		  trgt.d[*indx++] += (double) *src.l++ * *weights.d++;
 		break;
 	      case LUX_FLOAT:
 		while (i--) 		/* first get the sum */
-		  trgt.d[*indx++] += (Double) *src.f++ * *weights.d++;
+		  trgt.d[*indx++] += (double) *src.f++ * *weights.d++;
 		break;
 	      case LUX_DOUBLE:
 		while (i--) 		/* first get the sum */
@@ -1702,28 +1702,28 @@ Int index_total(Int narg, Int ps[], Int mean)
 	      case LUX_BYTE:
 		while (i--) {		/* get the sum */
 		  hist.l[*indx]++;
-		  trgt.f[*indx] += (Float) *src.b++;
+		  trgt.f[*indx] += (float) *src.b++;
 		  indx++;
 		}
 		break;
 	      case LUX_WORD:
 		while (i--) {		/* first, get the sum */
 		  hist.l[*indx]++;
-		  trgt.f[*indx] += (Float) *src.w++;
+		  trgt.f[*indx] += (float) *src.w++;
 		  indx++;
 		}
 		break;
 	      case LUX_LONG:
 		while (i--) {		/* first, get the sum */
 		  hist.l[*indx]++;
-		  trgt.f[*indx] += (Float) *src.l++;
+		  trgt.f[*indx] += (float) *src.l++;
 		  indx++;
 		}
 		break;
 	      case LUX_FLOAT:
 		while (i--) {		/* first, get the sum */
 		  hist.l[*indx]++;
-		  trgt.f[*indx] += (Float) *src.f++;
+		  trgt.f[*indx] += (float) *src.f++;
 		  indx++;
 		}
 		break;
@@ -1738,28 +1738,28 @@ Int index_total(Int narg, Int ps[], Int mean)
 	      case LUX_BYTE:
 		while (i--) {		/* get the sum */
 		  hist.l[*indx]++;
-		  trgt.d[*indx] += (Float) *src.b++;
+		  trgt.d[*indx] += (float) *src.b++;
 		  indx++;
 		}
 		break;
 	      case LUX_WORD:
 		while (i--) {		/* first, get the sum */
 		  hist.l[*indx]++;
-		  trgt.d[*indx] += (Float) *src.w++;
+		  trgt.d[*indx] += (float) *src.w++;
 		  indx++;
 		}
 		break;
 	      case LUX_LONG:
 		while (i--) {		/* first, get the sum */
 		  hist.l[*indx]++;
-		  trgt.d[*indx] += (Float) *src.l++;
+		  trgt.d[*indx] += (float) *src.l++;
 		  indx++;
 		}
 		break;
 	      case LUX_FLOAT:
 		while (i--) {		/* first, get the sum */
 		  hist.l[*indx]++;
-		  trgt.d[*indx] += (Float) *src.f++;
+		  trgt.d[*indx] += (float) *src.f++;
 		  indx++;
 		}
 		break;
@@ -1779,8 +1779,8 @@ Int index_total(Int narg, Int ps[], Int mean)
 	  case LUX_CFLOAT:
 	    while (i--) {
 	      hist.l[*indx]++;
-	      trgt.cf[*indx].real += (Float) src.cf->real;
-	      trgt.cf[*indx++].imaginary += (Float) src.cf++->imaginary;
+	      trgt.cf[*indx].real += (float) src.cf->real;
+	      trgt.cf[*indx++].imaginary += (float) src.cf++->imaginary;
 	    }
 	    for (i = -offset; i < size - offset; i++)
 	      if (hist.l[i]) {
@@ -1794,15 +1794,15 @@ Int index_total(Int narg, Int ps[], Int mean)
 	      case LUX_CFLOAT:
 		while (i--) {
 		  hist.l[*indx]++;
-		  trgt.cd[*indx].real += (Float) src.cf->real;
-		  trgt.cd[*indx++].imaginary += (Float) src.cf++->imaginary;
+		  trgt.cd[*indx].real += (float) src.cf->real;
+		  trgt.cd[*indx++].imaginary += (float) src.cf++->imaginary;
 		}
 		break;
 	      case LUX_CDOUBLE:
 		while (i--) {
 		  hist.l[*indx]++;
-		  trgt.cd[*indx].real += (Float) src.cd->real;
-		  trgt.cd[*indx++].imaginary += (Float) src.cd++->imaginary;
+		  trgt.cd[*indx].real += (float) src.cd->real;
+		  trgt.cd[*indx++].imaginary += (float) src.cd++->imaginary;
 		}
 		break;
 	    } /* end of switch (type) */
@@ -1821,19 +1821,19 @@ Int index_total(Int narg, Int ps[], Int mean)
 	    switch (type) {
 	      case LUX_BYTE:
 		while (i--) 		/* get the sum */
-		  trgt.f[*indx++] += (Float) *src.b++;
+		  trgt.f[*indx++] += (float) *src.b++;
 		break;
 	      case LUX_WORD:
 		while (i--)		/* first, get the sum */
-		  trgt.f[*indx++] += (Float) *src.w++;
+		  trgt.f[*indx++] += (float) *src.w++;
 		break;
 	      case LUX_LONG:
 		while (i--)		/* first, get the sum */
-		  trgt.f[*indx++] += (Float) *src.l++;
+		  trgt.f[*indx++] += (float) *src.l++;
 		break;
 	      case LUX_FLOAT:
 		while (i--)		/* first, get the sum */
-		  trgt.f[*indx++] += (Float) *src.f++;
+		  trgt.f[*indx++] += (float) *src.f++;
 		break;
 	    } /* end of switch (type) */
 	    break;
@@ -1841,19 +1841,19 @@ Int index_total(Int narg, Int ps[], Int mean)
 	    switch (type) {
 	      case LUX_BYTE:
 		while (i--) 	/* get the sum */
-		  trgt.d[*indx++] += (Float) *src.b++;
+		  trgt.d[*indx++] += (float) *src.b++;
 		break;
 	      case LUX_WORD:
 		while (i--) 		/* first, get the sum */
-		  trgt.d[*indx++] += (Float) *src.w++;
+		  trgt.d[*indx++] += (float) *src.w++;
 		break;
 	      case LUX_LONG:
 		while (i--) 		/* first, get the sum */
-		  trgt.d[*indx++] += (Float) *src.l++;
+		  trgt.d[*indx++] += (float) *src.l++;
 		break;
 	      case LUX_FLOAT:
 		while (i--) 		/* first get the sum */
-		  trgt.d[*indx++] += (Float) *src.f++;
+		  trgt.d[*indx++] += (float) *src.f++;
 		break;
 	      case LUX_DOUBLE:
 		while (i--) 		/* first get the sum */
@@ -1899,8 +1899,8 @@ Int index_total(Int narg, Int ps[], Int mean)
     present = (Byte *) curScrat;
     if (haveWeights) {		/* weighted power summation */
       if (mean) {		/* want averages */
-	allocate(hist.d, size, Double);
-	zerobytes(hist.d, size*sizeof(Double));
+	allocate(hist.d, size, double);
+	zerobytes(hist.d, size*sizeof(double));
 	hist.d += offset;
 	switch (outType) {
 	  case LUX_FLOAT:
@@ -3164,7 +3164,7 @@ Int total(Int narg, Int ps[], Int mean)
 /* The result is at least LUX_LONG.   LS 14jan96 */
 /* TOTAL(array [, axis], POWER=p) returns the total of the <p>th */
 /*   (integer) power of <array>.  LS 22jul98 */
-/* Fixed erroneous cast to (Float) in (Double) summations.  LS 11jul2000 */
+/* Fixed erroneous cast to (float) in (double) summations.  LS 11jul2000 */
 /* Allow LUX_LONG output.  LS 27oct2010 */
 {
   Int	result, done, p, psign, pp, outtype, type, nbase, i, haveWeights, n;
@@ -3172,8 +3172,8 @@ Int total(Int narg, Int ps[], Int mean)
   scalar	sum, value, temp, w;
   floatComplex	sumcf, tempcf, valuecf;
   doubleComplex	sumcd, tempcd, valuecd;
-  Float	temp2f;
-  Double	temp2d;
+  float	temp2f;
+  double	temp2d;
   pointer	src, trgt, weights;
   loopInfo	srcinfo, trgtinfo, winfo;
   
@@ -3423,7 +3423,7 @@ Int total(Int narg, Int ps[], Int mean)
 		sum.d = 0.0;
 		w.d = 0.0;
 		do {
-		  sum.d += (Double) *src.b * *weights.b;
+		  sum.d += (double) *src.b * *weights.b;
 		  w.d += *weights.b;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
@@ -3436,7 +3436,7 @@ Int total(Int narg, Int ps[], Int mean)
 		sum.d = 0.0;
 		w.d = 0.0;
 		do {
-		  sum.d += (Double) *src.w * *weights.w;
+		  sum.d += (double) *src.w * *weights.w;
 		  w.d += *weights.w;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
@@ -3449,7 +3449,7 @@ Int total(Int narg, Int ps[], Int mean)
 		sum.d = 0.0;
 		w.d = 0.0;
 		do {
-		  sum.d += (Double) *src.l * *weights.l;
+		  sum.d += (double) *src.l * *weights.l;
 		  w.d += *weights.l;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
@@ -3462,7 +3462,7 @@ Int total(Int narg, Int ps[], Int mean)
 		sum.d = 0.0;
 		w.d = 0.0;
 		do {
-		  sum.d += (Double) *src.f * *weights.f;
+		  sum.d += (double) *src.f * *weights.f;
 		  w.d += *weights.f;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
@@ -3520,8 +3520,8 @@ Int total(Int narg, Int ps[], Int mean)
 		sumcd.real = sumcd.imaginary = 0.0;
 		w.d = 0.0;
 		do {
-		  sumcd.real += (Double) src.cf->real * *weights.f;
-		  sumcd.imaginary += (Double) src.cf->imaginary * *weights.f;
+		  sumcd.real += (double) src.cf->real * *weights.f;
+		  sumcd.imaginary += (double) src.cf->imaginary * *weights.f;
 		  w.d += *weights.d;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
@@ -4660,7 +4660,7 @@ Int lux_mean(Int narg, Int ps[])
    return total(narg, ps, 1);
  }
 /*------------------------------------------------------------------------- */
-doubleComplex c_sin(Double real, Double imaginary)
+doubleComplex c_sin(double real, double imaginary)
 /* complex sine */
 {
   doubleComplex	result;
@@ -4670,7 +4670,7 @@ doubleComplex c_sin(Double real, Double imaginary)
   return result;
 }
 /*------------------------------------------------------------------------- */
-doubleComplex c_cos(Double real, Double imaginary)
+doubleComplex c_cos(double real, double imaginary)
 /* complex cosine */
 {
   doubleComplex	result;
@@ -4680,11 +4680,11 @@ doubleComplex c_cos(Double real, Double imaginary)
   return result;
 }
 /*------------------------------------------------------------------------- */
-doubleComplex c_tan(Double real, Double imaginary)
+doubleComplex c_tan(double real, double imaginary)
 /* complex tangent */
 {
   doubleComplex result;
-  Double	factor;
+  double	factor;
   
   factor = 1.0/(cos(2*real) + cosh(2*imaginary));
   result.real = sin(2*real)*factor;
@@ -4692,10 +4692,10 @@ doubleComplex c_tan(Double real, Double imaginary)
   return result;
 }
 /*------------------------------------------------------------------------- */
-doubleComplex c_arcsin(Double real, Double imaginary)
+doubleComplex c_arcsin(double real, double imaginary)
 /* complex arc sine */
 {
-  Double	a, b, c, d;
+  double	a, b, c, d;
   doubleComplex	result;
 
   imaginary *= imaginary;
@@ -4710,10 +4710,10 @@ doubleComplex c_arcsin(Double real, Double imaginary)
   return result;
 }
 /*------------------------------------------------------------------------- */
-doubleComplex c_arccos(Double real, Double imaginary)
+doubleComplex c_arccos(double real, double imaginary)
 /* complex arc cosine */
 {
-  Double	a, b, c, d;
+  double	a, b, c, d;
   doubleComplex	result;
 
   imaginary *= imaginary;
@@ -4728,10 +4728,10 @@ doubleComplex c_arccos(Double real, Double imaginary)
   return result;
 }
 /*------------------------------------------------------------------------- */
-doubleComplex c_arctan(Double real, Double imaginary)
+doubleComplex c_arctan(double real, double imaginary)
 /* complex arc tangent */
 {
-  Double	a, b;
+  double	a, b;
   doubleComplex	result;
 
   result.real = 0.5*atan(2*real/(1 - real*real - imaginary*imaginary));
@@ -4744,7 +4744,7 @@ doubleComplex c_arctan(Double real, Double imaginary)
   return result;
 }
 /*------------------------------------------------------------------------- */
-doubleComplex c_sinh(Double real, Double imaginary)
+doubleComplex c_sinh(double real, double imaginary)
 /* complex hyperbolic sine */
 {
   doubleComplex	result;
@@ -4754,7 +4754,7 @@ doubleComplex c_sinh(Double real, Double imaginary)
   return result;
 }
 /*------------------------------------------------------------------------- */
-doubleComplex c_cosh(Double real, Double imaginary)
+doubleComplex c_cosh(double real, double imaginary)
 /* complex hyperbolic cosine */
 {
   doubleComplex	result;
@@ -4764,10 +4764,10 @@ doubleComplex c_cosh(Double real, Double imaginary)
   return result;
 }
 /*------------------------------------------------------------------------- */
-doubleComplex c_tanh(Double real, Double imaginary)
+doubleComplex c_tanh(double real, double imaginary)
 /* complex hyperbolic tangent */
 {
-  Double	factor;
+  double	factor;
   doubleComplex	result;
 
   factor = 1.0/(cosh(2*real) + cos(2*imaginary));
@@ -4776,7 +4776,7 @@ doubleComplex c_tanh(Double real, Double imaginary)
   return result;
 }
 /*------------------------------------------------------------------------- */
-doubleComplex c_log(Double real, Double imaginary)
+doubleComplex c_log(double real, double imaginary)
 /* complex logarithm */
 {
   doubleComplex	result;
@@ -4786,10 +4786,10 @@ doubleComplex c_log(Double real, Double imaginary)
   return result;
 }
 /*------------------------------------------------------------------------- */
-doubleComplex c_exp(Double real, Double imaginary)
+doubleComplex c_exp(double real, double imaginary)
 /* complex exponential */
 {
-  Double	r;
+  double	r;
   doubleComplex	result;
 
   r = exp(real);
@@ -5134,11 +5134,11 @@ Int math_funcs(Int nsym, Int code)
 Int math_funcs_2f(Int nsym1, Int nsym2, Int code)
 /*general program for floating point functions with 2 floating arguments */
 /*messier than the 1 argument case but not as bad as binary ops routines */
-/*assumes that the function requires Double arguments (most C functions) */
+/*assumes that the function requires double arguments (most C functions) */
 {
   Int	n1, n2, nelem, i, result_sym, type1, type2, out_type;
   pointer	src1, src2, trgt;
-  Double	value;
+  double	value;
 
   errno = 0;
 
@@ -5471,12 +5471,12 @@ Int math_funcs_2f(Int nsym1, Int nsym2, Int code)
 }
 /*------------------------------------------------------------------------- */
 Int math_funcs_i_f(Int nsym1, Int nsym2, Int code)
-/*general program for floating point functions with Int and Float arguments */
-/*assumes that the function requires Double arguments (most C functions) */
+/*general program for floating point functions with Int and float arguments */
+/*assumes that the function requires double arguments (most C functions) */
 {
   Int	n1, n2, nelem, i, result_sym, type1, type2, out_type, valuei;
   pointer	src1, src2, trgt;
-  Double	valued;
+  double	valued;
 
   errno = 0;
 
@@ -5814,7 +5814,7 @@ Int math_funcs_3f(Int sym1, Int sym2, Int sym3, Int code)
 {
   Int	n1, n2, n3, iq, n, type1, type2, type3, step1, step2, step3, type;
   pointer	src1, src2, src3, trgt;
-  Double	val1, val2, val3, val;
+  double	val1, val2, val3, val;
 
   errno = 0;
   /* get sizes and pointers */
@@ -5861,93 +5861,93 @@ Int math_funcs_3f(Int sym1, Int sym2, Int sym3, Int code)
   if (!step1)
     switch (type1) {
       case LUX_BYTE:
-	val1 = (Double) *src1.b;
+	val1 = (double) *src1.b;
 	break;
       case LUX_WORD:
-	val1 = (Double) *src1.w;
+	val1 = (double) *src1.w;
 	break;
       case LUX_LONG:
-	val1 = (Double) *src1.l;
+	val1 = (double) *src1.l;
 	break;
       case LUX_FLOAT:
-	val1 = (Double) *src1.f;
+	val1 = (double) *src1.f;
 	break;
       case LUX_DOUBLE:
-	val1 = (Double) *src1.d;
+	val1 = (double) *src1.d;
 	break;
     }
   if (!step2)
     switch (type2) {
       case LUX_BYTE:
-	val2 = (Double) *src2.b;
+	val2 = (double) *src2.b;
 	break;
       case LUX_WORD:
-	val2 = (Double) *src2.w;
+	val2 = (double) *src2.w;
 	break;
       case LUX_LONG:
-	val2 = (Double) *src2.l;
+	val2 = (double) *src2.l;
 	break;
       case LUX_FLOAT:
-	val2 = (Double) *src2.f;
+	val2 = (double) *src2.f;
 	break;
       case LUX_DOUBLE:
-	val2 = (Double) *src2.d;
+	val2 = (double) *src2.d;
 	break;
     }
   if (!step3)
     switch (type3) {
       case LUX_BYTE:
-	val3 = (Double) *src3.b;
+	val3 = (double) *src3.b;
 	break;
       case LUX_WORD:
-	val3 = (Double) *src3.w;
+	val3 = (double) *src3.w;
 	break;
       case LUX_LONG:
-	val3 = (Double) *src3.l;
+	val3 = (double) *src3.l;
 	break;
       case LUX_FLOAT:
-	val3 = (Double) *src3.f;
+	val3 = (double) *src3.f;
 	break;
       case LUX_DOUBLE:
-	val3 = (Double) *src3.d;
+	val3 = (double) *src3.d;
 	break;
     }
   while (n--) {			/* loop over all elements */
     if (step1) {		/* new element */
       switch (type1) {
 	case LUX_BYTE:
-	  val1 = (Double) *src1.b;
+	  val1 = (double) *src1.b;
 	  break;
 	case LUX_WORD:
-	  val1 = (Double) *src1.w;
+	  val1 = (double) *src1.w;
 	  break;
 	case LUX_LONG:
-	  val1 = (Double) *src1.l;
+	  val1 = (double) *src1.l;
 	  break;
 	case LUX_FLOAT:
-	  val1 = (Double) *src1.f;
+	  val1 = (double) *src1.f;
 	  break;
 	case LUX_DOUBLE:
-	  val1 = (Double) *src1.d;
+	  val1 = (double) *src1.d;
 	  break; }
       src1.b += step1;
     }
     if (step2) {
       switch (type2) {
 	case LUX_BYTE:
-	  val2 = (Double) *src2.b;
+	  val2 = (double) *src2.b;
 	  break;
 	case LUX_WORD:
-	  val2 = (Double) *src2.w;
+	  val2 = (double) *src2.w;
 	  break;
 	case LUX_LONG:
-	  val2 = (Double) *src2.l;
+	  val2 = (double) *src2.l;
 	  break;
 	case LUX_FLOAT:
-	  val2 = (Double) *src2.f;
+	  val2 = (double) *src2.f;
 	  break;
 	case LUX_DOUBLE:
-	  val2 = (Double) *src2.d;
+	  val2 = (double) *src2.d;
 	  break;
       }
       src2.b += step2;
@@ -5955,37 +5955,37 @@ Int math_funcs_3f(Int sym1, Int sym2, Int sym3, Int code)
     if (step3) {
       switch (type3) {
 	case LUX_BYTE:
-	  val3 = (Double) *src3.b;
+	  val3 = (double) *src3.b;
 	  break;
 	case LUX_WORD:
-	  val3 = (Double) *src3.w;
+	  val3 = (double) *src3.w;
 	  break;
 	case LUX_LONG:
-	  val3 = (Double) *src3.l;
+	  val3 = (double) *src3.l;
 	  break;
 	case LUX_FLOAT:
-	  val3 = (Double) *src3.f;
+	  val3 = (double) *src3.f;
 	  break;
 	case LUX_DOUBLE:
-	  val3 = (Double) *src3.d;
+	  val3 = (double) *src3.d;
 	  break;
       }
       src3.b += step3;
     }
     val = (*func_ddd[code])(val1, val2, val3); /* get function value */
     if (type == LUX_FLOAT)		/* store result */
-      *trgt.f++ = (Float) val;
+      *trgt.f++ = (float) val;
     else
       *trgt.d++ = val;
   }
   return iq;
 }
 /*------------------------------------------------------------------------- */
-Double voigt(Double a, Double v)
+double voigt(double a, double v)
 {
-    Double	anhs, avsd, sumb, avss;
+    double	anhs, avsd, sumb, avss;
     Int		n;
-    Double	c1, d1, p2, ab, ef, al, aa,
+    double	c1, d1, p2, ab, ef, al, aa,
 		av, aph, avs, vph, sum = 0;
 
     if (a < 0) a = -a;
@@ -6016,17 +6016,17 @@ Double voigt(Double a, Double v)
     return a/(2*M_PI*avss) + a/M_PI*sum + p2;
 }
 /*------------------------------------------------------------------------- */
-Double loggamma(Double x)
+double loggamma(double x)
 /* returns the natural logarithm of the absolute value of the gamma */
 /* function at ordinate <x>. */
 /* Uses the approximation of Lanczos.   LS 11jan96 22jul96 */
 {
-  static Double	a[6] =
+  static double	a[6] =
   { 76.18009172947146, -86.50532032941677, 24.01409824083091,
       -1.231739572450155, 1.208650973866179e-3, -5.395239384953e-6 };
   char	flip;
   Int	i;
-  Double	y, z, w;
+  double	y, z, w;
 
   if (x <= 0)
   { x = 1 - x;
@@ -6044,15 +6044,15 @@ Double loggamma(Double x)
   return y;
 }
 /*------------------------------------------------------------------------- */
-Double gamma(Double x)
+double gamma(double x)
 /* returns the value of the gamma function at ordinate <x>.  LS 22jul96 */
 {
-  static Double	a[6] =
+  static double	a[6] =
   { 76.18009172947146, -86.50532032941677, 24.01409824083091,
       -1.231739572450155, 1.208650973866179e-3, -5.395239384953e-6 };
   char	flip;
   Int	i;
-  Double	y, z, w;
+  double	y, z, w;
 
   if (x <= 0)
   { x = 1 - x;
@@ -6073,13 +6073,13 @@ Double gamma(Double x)
   return y;
 }
 /*------------------------------------------------------------------------- */
-Double incomplete_gamma(Double a, Double x)
+double incomplete_gamma(double a, double x)
 /* returns the incomplete gamma function P(a,x) */
 /* series expansion for x < a + 1, and continued fraction for x > a + 1 */
 /* if internalMode & 1, then 1 - P(a,x) is returned. */
 /* LS 11jan96 22jul96 */
 {
-  Double	z, g, z0, c, d, tiny, aa, bb, del;
+  double	z, g, z0, c, d, tiny, aa, bb, del;
   Int	i;
 
   if (a < 0.0)
@@ -6138,33 +6138,33 @@ Double incomplete_gamma(Double a, Double x)
   return 1.0;			/* or some compilers complain */
 }
 /*------------------------------------------------------------------------- */
-Double beta(Double x, Double y)
+double beta(double x, double y)
 /* returns the beta function. */
 /* LS 15jan96 22jul96 */
 {
   return exp(loggamma(x) + loggamma(y) - loggamma(x + y));
 }
 /*------------------------------------------------------------------------- */
-Double logbeta(Double x, Double y)
+double logbeta(double x, double y)
 /* returns the logarithm of the beta function. */
 /* LS 15jan96 22jul96 */
 {
   return loggamma(x) + loggamma(y) - loggamma(x + y);
 }
 /*------------------------------------------------------------------------- */
-Double chi_square(Double chi2, Double nu)
+double chi_square(double chi2, double nu)
 /* returns the chi-square function or, if internalMode & 1, its */
 /* complement.  LS 15jan95 22jul96 */
 {
   return incomplete_gamma(nu/2, chi2/2);
 }
 /*------------------------------------------------------------------------- */
-Double incomplete_beta(Double x, Double a, Double b)
+double incomplete_beta(double x, double a, double b)
 /* returns the incomplete beta function or (if internalMode & 1) its */
 /* complement or (if internalMode & 2) its natural logarithm. */
 /* LS 15jan96 5nov96 */
 {
-  Double	x0, tiny, c, f, d, e1, e2, e3, e4, e5, aa, del, k, g;
+  double	x0, tiny, c, f, d, e1, e2, e3, e4, e5, aa, del, k, g;
   char	flip;
   Int	j;
 
@@ -6219,11 +6219,11 @@ Double incomplete_beta(Double x, Double a, Double b)
     return (flip ^ (internalMode & 1))? 1 - f: f; }
 }
 /*------------------------------------------------------------------------- */
-Double student(Double t, Double nu)
+double student(double t, double nu)
 /* returns Student's t distribution or, if internalMode & 1, its complement */
 /* or, if internalMode & 2, its natural logarithm.  LS 22jul96 5nov96 */
 {
-  Double result;
+  double result;
 
   internalMode ^= 1;
   result = incomplete_beta(nu/(nu + t*t), nu/2, 0.5);
@@ -6231,19 +6231,19 @@ Double student(Double t, Double nu)
   return result;
 }
 /*------------------------------------------------------------------------- */
-Double F(Double F, Double nu1, Double nu2)
+double F(double F, double nu1, double nu2)
 /* returns the F-ratio function or, if internalMode & 1, its complement */
 /* LS 22jul96 */
 {
   return incomplete_beta(nu2/(nu2 + nu1*F), nu2/2, nu1/2);
 }
 /*------------------------------------------------------------------------- */
-Double non_central_chi_square(Double chi2, Double nu, Double lambda)
+double non_central_chi_square(double chi2, double nu, double lambda)
 /* returns the value of the non-central chi-square distribution for */
 /* chi-square <chi2>, <nu> degrees of freedom, and non-centrality */
 /* parameter <lambda>.  algorithm of my own devising.  LS 19oct96  */
 {
-  Double	a, b, c, d, y, c2, l2, i1, i2;
+  double	a, b, c, d, y, c2, l2, i1, i2;
 
   if (chi2 < 0.0 || lambda < 0.0 || nu < 0) /* all parameters must be */
 					    /* non-negative */
@@ -6266,12 +6266,12 @@ Double non_central_chi_square(Double chi2, Double nu, Double lambda)
   return y*exp(-l2);
 }
 /*------------------------------------------------------------------------- */
-Double bessel_i0(Double x)
+double bessel_i0(double x)
 /* returns value of the modified Bessel function of order zero I0. */
 /* LS 2dec96.  uses Abramowitz & Stegun approximations. */
 /* if internalMode & 1 then returns I0(x)*exp(-x).  LS 3dec95 */
 {
-  Double	t;
+  double	t;
   
   if (x < 0)
     x = -x;
@@ -6288,12 +6288,12 @@ Double bessel_i0(Double x)
   return (internalMode & 1)? t: t*exp(x);
 }
 /*------------------------------------------------------------------------- */
-Double bessel_i1(Double x)
+double bessel_i1(double x)
 /* returns value of the modified Bessel function of order one I1. */
 /* LS 3dec96.  uses Abramowitz & Stegun approximations. */
 {
-  Double	t;
-  Double	sign;
+  double	t;
+  double	sign;
 
   if (x < 0)
   { sign = -1;
@@ -6310,11 +6310,11 @@ Double bessel_i1(Double x)
 	    - 0.00362018)*t - 0.03988024)*t + 0.39894228)/sqrt(x)*exp(x)*sign;
 }
 /*------------------------------------------------------------------------- */
-Double bessel_k0(Double x)
+double bessel_k0(double x)
 /* returns value of the modified Bessel function of order zero K0. */
 /* LS 3dec96.  uses Abramowitz & Stegun approximations. */
 {
-  Double	t;
+  double	t;
 
   if (x <= 0)
     return sqrt(-1);		/* generate error */
@@ -6330,11 +6330,11 @@ Double bessel_k0(Double x)
 	  + 1.25331414)*exp(-x)/sqrt(x);
 }
 /*------------------------------------------------------------------------- */
-Double bessel_k1(Double x)
+double bessel_k1(double x)
 /* returns value of the modified Bessel function of order one K1. */
 /* LS 3dec96.  uses Abramowitz & Stegun approximations. */
 {
-  Double	t;
+  double	t;
   
   if (x <= 0)
     return sqrt(-1);		/* generate domain error */
@@ -6350,11 +6350,11 @@ Double bessel_k1(Double x)
 	  + 1.25331414)*exp(-x)/sqrt(x);
 }
 /*------------------------------------------------------------------------- */
-Double bessel_kn(Int n, Double x)
+double bessel_kn(Int n, double x)
 /* returns value of the modified Bessel function of order n Kn. */
 /* LS 3dec96.  uses Abramowitz & Stegun approximations. */
 {
-  Double	z, b0, b1, b2;
+  double	z, b0, b1, b2;
   Int	i;
 
   if (n < 2 || x <= 0)
@@ -6370,7 +6370,7 @@ Double bessel_kn(Int n, Double x)
   return b2;
 }
 /*------------------------------------------------------------------------- */
-Double sgn(Double x)
+double sgn(double x)
 /* returns the sign of x: +1 if x > 0, -1 if x < 0, and 0 if x == 0. */
 /* LS 19may98 */
 {
@@ -6385,10 +6385,10 @@ Int lux_array_statistics(Int narg, Int ps[])
 /* returns mean, sdev, and other statistics for an array */
 /* this a subroutine with a variable number of arguments of the
    form:  array_statistics, array, max, min, mean, [sdev, skew, kurtosis]
-   where mean, etc are returned values, either Float or Double */
+   where mean, etc are returned values, either float or double */
 {
   Int	n, nc, sdev_flag=0, skew_flag=0, kurtosis_flag=0;
-  Double	fac;
+  double	fac;
   pointer	q1;
   Int	*save_ptr;
   Int	type;
@@ -6402,7 +6402,7 @@ Int lux_array_statistics(Int narg, Int ps[])
   type = symbol_type(iq);
   if (isComplexType(type))
     return luxerror("Sorry, complex numbers not implemented.", ps[0]);
-  fac = 1.0/(Double) n;
+  fac = 1.0/(double) n;
   switch (narg) {
     case 7:
       kurtosis_flag = 1;
@@ -6413,7 +6413,7 @@ Int lux_array_statistics(Int narg, Int ps[])
   }
  /* two major branches, one for doubles and one for everyone else */
   if (type < LUX_DOUBLE) {
-    Float	s, sdev, skew, kurtosis, mean, ss, max, min, xq;
+    float	s, sdev, skew, kurtosis, mean, ss, max, min, xq;
     Int	imax, imin;
     
     s = sdev = skew = kurtosis = 0.0;
@@ -6423,7 +6423,7 @@ Int lux_array_statistics(Int narg, Int ps[])
 	imax = imin = (Int) *q1.w;
 	while (n--) { 
 	  iq = (Int) *q1.w++;
-	  s += (Float) iq;
+	  s += (float) iq;
 	  if (iq > imax)
 	    imax = iq;
 	  else if (iq < imin)
@@ -6434,7 +6434,7 @@ Int lux_array_statistics(Int narg, Int ps[])
 	imax = imin = *q1.l;
 	while (n--) { 
 	  iq = *q1.l++;
-	  s += (Float) iq; 
+	  s += (float) iq; 
 	  if (iq > imax)
 	    imax = iq; 
 	  else if (iq < imin) 
@@ -6456,7 +6456,7 @@ Int lux_array_statistics(Int narg, Int ps[])
 	imax = imin = (Int) *q1.b;
 	while (n--) { 
 	  iq = (Int) *q1.b++;
-	  s += (Float) iq;
+	  s += (float) iq;
 	  if (iq > imax)
 	    imax = iq;
 	  else if (iq < imin)
@@ -6480,7 +6480,7 @@ Int lux_array_statistics(Int narg, Int ps[])
       switch (type) {
 	case LUX_WORD:
 	  while (n--) {
-	    s = (Float) *q1.w++ - mean; 
+	    s = (float) *q1.w++ - mean; 
 	    ss = s * s; 
 	    sdev += ss; 
 	    if (skew_flag) {
@@ -6492,7 +6492,7 @@ Int lux_array_statistics(Int narg, Int ps[])
 	  break;
 	case LUX_LONG:
 	  while (n--) {
-	    s = (Float) *q1.l++ - mean; 
+	    s = (float) *q1.l++ - mean; 
 	    ss = s * s;
 	    sdev += ss; 
 	    if (skew_flag) {
@@ -6514,7 +6514,7 @@ Int lux_array_statistics(Int narg, Int ps[])
 	  } break;
 	case LUX_BYTE:
 	  while (n--) {
-	    s = (Float) *q1.b++ - mean; 
+	    s = (float) *q1.b++ - mean; 
 	    ss = s * s; 
 	    sdev += ss; 
 	    if (skew_flag) {
@@ -6538,7 +6538,7 @@ Int lux_array_statistics(Int narg, Int ps[])
     return LUX_OK;
   } else {
     /* the doubles case */
-    Double	s, sdev, skew, kurtosis, mean, ss, max, min, xq;
+    double	s, sdev, skew, kurtosis, mean, ss, max, min, xq;
 
     s = sdev = skew = kurtosis = 0.0;
     /* need a first pass to get the mean value */

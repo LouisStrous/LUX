@@ -37,7 +37,7 @@ static const char *const ffmts[] =
 
 static Int obstack_printf_sexagesimal_int_left(struct obstack *o,
                                                const struct printf_info *info,
-                                               Double value, Double *lastvalue,
+                                               double value, double *lastvalue,
                                                Int firstwidth)
 {
   Int ivalue, sign, size, precision;
@@ -86,8 +86,8 @@ Int printf_sexagesimal(FILE *stream, const struct printf_info *info,
                        const void *const *args)
 {
   Int width;
-  Double lastvalue;
-  Double value = *((const Double *)(args[0]));
+  double lastvalue;
+  double value = *((const double *)(args[0]));
   struct obstack o;
   
   if (info->alt)                /* %#T */
@@ -138,18 +138,18 @@ Int printf_double1_arginfo(const struct printf_info *p,
 {
   if (n > 0) {
     argtypes[0] = PA_DOUBLE;
-    *size = sizeof(Double);
+    *size = sizeof(double);
   }
   return 1;
 }
 
 static Int obstack_printf_date_int_left(struct obstack *o,
                                         const struct printf_info *info,
-                                        Double value, Double *last,
+                                        double value, double *last,
                                         Int firstwidth)
 {
   Int year, month, ivalue, prec, size;
-  Double day, lastvalue;
+  double day, lastvalue;
   Int fmttype = 0;
   
   size = obstack_object_size(o);
@@ -183,14 +183,14 @@ static Int obstack_printf_date_int_left(struct obstack *o,
   }
   obstack_printf(o, "%d", year < 0? -year: year);
   if (prec == 1) {
-    Double JD1 = CJDtoJD(CommontoCJD(year, 1, 1));
-    Double JD2 = CJDtoJD(CommontoCJD(year + 1, 1, 1));
+    double JD1 = CJDtoJD(CommontoCJD(year, 1, 1));
+    double JD2 = CJDtoJD(CommontoCJD(year + 1, 1, 1));
     lastvalue = (value - JD1)/(JD2 - JD1) + year;
   } else if (prec >= 2) {       /* month */
     obstack_printf(o, "-%02d", month);
     if (prec == 2) {
-      Double JD1 = CJDtoJD(CommontoCJD(year, month, 1));
-      Double JD2 = CJDtoJD(CommontoCJD(year, month + 1, 1));
+      double JD1 = CJDtoJD(CommontoCJD(year, month, 1));
+      double JD2 = CJDtoJD(CommontoCJD(year, month + 1, 1));
       lastvalue = (value - JD1)/(JD2 - JD1) + month;
     } else if (prec >= 3) {     /* day */
       ivalue = (Int) day;
@@ -226,9 +226,9 @@ static Int obstack_printf_date_int_left(struct obstack *o,
 Int printf_date(FILE *stream, const struct printf_info *info,
                 const void *const *args)
 {
-  Double value = *((const Double *)(args[0]));
-  Double value2;
-  void JDtoDate(Double, Int *, Int *, Double *, Int);
+  double value = *((const double *)(args[0]));
+  double value2;
+  void JDtoDate(double, Int *, Int *, double *, Int);
   struct obstack o;
   size_t width;
   Int fmttype = 0;

@@ -45,13 +45,13 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #define TEXTMENU	1
 
 Int	lux_replace(Int, Int), define_menu(Int, Int, Int, Int []),
-  redefine_menu(Int, Int []), coordTrf(Float *, Float *, Int, Int),
+  redefine_menu(Int, Int []), coordTrf(float *, float *, Int, Int),
   set_defw(Int);
 void	printfw(char *, ...);
 
 extern Display	*display;
 extern Int	screen_num, black_pixel, white_pixel;
-extern Double	last_time;
+extern double	last_time;
 Int	theMenu, theItem;
 
 struct Menu {
@@ -69,7 +69,7 @@ Window	menu_win[MAXMENU], inverted_pane = NONE;
 GC	menugc, menurgc;
 Cursor	cursor;
 Int	last_menu, menu_item, fontheight, fontwidth;
-Float	menu_x, menu_y;
+float	menu_x, menu_y;
 Int	text_menus = 0;
 
 void	delete_menu(Int);
@@ -422,9 +422,9 @@ Int lux_wait_for_menu(Int narg, Int ps[])
      case ButtonPress:
        last_menu = theMenu;
        menu_item = theItem;
-       last_time = (Double) event.xbutton.time/1000.0;
-       menu_x = (Float) event.xbutton.x/((Float) fontwidth);
-       menu_y = (Float) event.xbutton.y/((Float) fontheight);
+       last_time = (double) event.xbutton.time/1000.0;
+       menu_x = (float) event.xbutton.x/((float) fontwidth);
+       menu_y = (float) event.xbutton.y/((float) fontheight);
        paint_pane(theMenu, theItem, BLACK);
        paint_pane(theMenu, theItem, WHITE);
        XFlush(display);
@@ -743,7 +743,7 @@ static Int	N_XMask = sizeof(eventCode)/sizeof(Int);
 Int	lux_event, eventSource;
 extern Int	lux_button, root_x, root_y, xcoord, ycoord, last_wid,
 		ht[], wd[];
-extern Float	xhair, yhair;
+extern float	xhair, yhair;
 extern Window	win[];
 
 Int lux_register_event(Int narg, Int ps[])
@@ -1040,7 +1040,7 @@ Int lux_xloop(Int narg, Int ps[])
 	  lux_button = event.xbutton.button;
 	  root_x = event.xbutton.x_root;
 	  root_y = event.xbutton.y_root;
-	  last_time = (Double) event.xbutton.time/1000.0;
+	  last_time = (double) event.xbutton.time/1000.0;
 	  lux_keystate = event.xbutton.state;
 	  switch (j) {
 	    case XLOOP_WINDOW:	/* button press in an LUX window */
@@ -1055,8 +1055,8 @@ Int lux_xloop(Int narg, Int ps[])
 	    case XLOOP_MENU:	/* button press in LUX menu envelope */
 	      return luxerror("?? button press in enveloping menu window?", 0);
 	    default:		/* button press in LUX menu item */
-	      menu_x = (Float) event.xbutton.x / (Float) fontwidth;
-	      menu_y = (Float) event.xbutton.y / (Float) fontheight;
+	      menu_x = (float) event.xbutton.x / (float) fontwidth;
+	      menu_y = (float) event.xbutton.y / (float) fontheight;
 	      eventSource = i | X_MENU;
 	      last_menu = i;
 	      menu_item = j;
@@ -1078,7 +1078,7 @@ Int lux_xloop(Int narg, Int ps[])
 	  lux_keysym = (Int) keysym;
 	  root_x = event.xkey.x_root;
 	  root_y = event.xkey.y_root;
-	  last_time = (Double) event.xkey.time/1000.0;
+	  last_time = (double) event.xkey.time/1000.0;
 	  switch (j) {
 	    case XLOOP_WINDOW:	/* key press in an LUX window */
 	      eventSource = i | X_WINDOW;
@@ -1103,7 +1103,7 @@ Int lux_xloop(Int narg, Int ps[])
 	if (status) {
 	  root_x = event.xmotion.x_root;
 	  root_y = event.xmotion.y_root;
-	  last_time = (Double) event.xmotion.time/1000.0;
+	  last_time = (double) event.xmotion.time/1000.0;
 	  switch (j) {
 	    case XLOOP_WINDOW:
 	      xhair = event.xbutton.x;
@@ -1129,7 +1129,7 @@ Int lux_xloop(Int narg, Int ps[])
 	switch (j) {
 	  case XLOOP_WINDOW:	/* entering an LUX window */
 	    if (status) {
-	      last_time = (Double) event.xcrossing.time/1000.0;
+	      last_time = (double) event.xcrossing.time/1000.0;
 	      eventSource = i | X_WINDOW;
 	    }
 	    break;
@@ -1140,7 +1140,7 @@ Int lux_xloop(Int narg, Int ps[])
 	      last_menu = i;
 	      menu_item = j;
 	      eventSource = i | X_MENU;
-	      last_time = (Double) event.xcrossing.time/1000.0;
+	      last_time = (double) event.xcrossing.time/1000.0;
 	    }
 	    paint_pane(i, j, BLACK);
 	    XFlush(display);
@@ -1156,7 +1156,7 @@ Int lux_xloop(Int narg, Int ps[])
 	  case XLOOP_WINDOW:	/* leaving an LUX window */
 	    if (status) {
 	      eventSource = i | X_WINDOW;
-	      last_time = (Double) event.xcrossing.time/1000.0;
+	      last_time = (double) event.xcrossing.time/1000.0;
 	    }
 	    break;
 	  case XLOOP_MENU:	/* entering a menu envelope */
@@ -1166,7 +1166,7 @@ Int lux_xloop(Int narg, Int ps[])
 	      last_menu = i;
 	      menu_item = j;
 	      eventSource = i | X_MENU;
-	      last_time = (Double) event.xcrossing.time/1000.0;
+	      last_time = (double) event.xcrossing.time/1000.0;
 	    }
 	    paint_pane(i, j, WHITE);
 	    XFlush(display);

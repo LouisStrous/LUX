@@ -1678,7 +1678,7 @@ Int lux_for(Int nsym)
 #define ACTION_BREAKPOINT	1
 #define ACTION_TRACE	2
 #define ACTION_STEP	4
-Float	CPUtime = 0.0;
+float	CPUtime = 0.0;
 Int execute(Int symbol)
      /* executes LUX_EVB <symbol>.  Returns -1 on error, 1 on success, */
      /* various negative numbers on breaks, returns, etc. */
@@ -1700,7 +1700,7 @@ Int execute(Int symbol)
 #if DEBUG
   void checkTemps(void);
 #endif
-  Float	newCPUtime;
+  float	newCPUtime;
   Int	showstats(Int, Int []), getNewLine(char *, size_t, char *, char),
     lux_restart(Int, Int []), showError(Int), insert(Int, Int []),
     nextFreeStackEntry(void);
@@ -1787,7 +1787,7 @@ Int execute(Int symbol)
       if (traceMode & 127)
 	puts(symbolIdent(symbol, I_TRUNCATE | I_FILELEVEL));
       if (traceMode & T_CPUTIME) { /* CPUtime */
-	newCPUtime = (Float) clock()/CLOCKS_PER_SEC;
+	newCPUtime = (float) clock()/CLOCKS_PER_SEC;
 	printf("CPUtime: %10.2f\n", newCPUtime - CPUtime);
 	CPUtime = newCPUtime;
       }
@@ -2725,19 +2725,19 @@ Int insert(Int narg, Int ps[])
 	    case LUX_FLOAT:
 	      switch (srcType) {
 		case LUX_BYTE:
-		  trgt.f[offset] = (Float) *src.b;
+		  trgt.f[offset] = (float) *src.b;
 		  break;
 		case LUX_WORD:
-		  trgt.f[offset] = (Float) *src.w;
+		  trgt.f[offset] = (float) *src.w;
 		  break;
 		case LUX_LONG:
-		  trgt.f[offset] = (Float) *src.l;
+		  trgt.f[offset] = (float) *src.l;
 		  break;
 		case LUX_FLOAT:
 		  trgt.f[offset] = *src.f;
 		  break;
 		case LUX_DOUBLE:
-		  trgt.f[offset] = (Float) *src.d;
+		  trgt.f[offset] = (float) *src.d;
 		  break;
 		case LUX_CFLOAT:
 		  trgt.f[offset] = sqrt(src.cf->real*src.cf->real
@@ -2752,16 +2752,16 @@ Int insert(Int narg, Int ps[])
 	    case LUX_DOUBLE:
 	      switch (srcType) {
 		case LUX_BYTE:
-		  trgt.d[offset] = (Double) *src.b;
+		  trgt.d[offset] = (double) *src.b;
 		  break;
 		case LUX_WORD:
-		  trgt.d[offset] = (Double) *src.w;
+		  trgt.d[offset] = (double) *src.w;
 		  break;
 		case LUX_LONG:
-		  trgt.d[offset] = (Double) *src.l;
+		  trgt.d[offset] = (double) *src.l;
 		  break;
 		case LUX_FLOAT:
-		  trgt.d[offset] = (Double) *src.f;
+		  trgt.d[offset] = (double) *src.f;
 		  break;
 		case LUX_DOUBLE:
 		  trgt.d[offset] = *src.d;
@@ -2779,15 +2779,15 @@ Int insert(Int narg, Int ps[])
 	    case LUX_CFLOAT:
 	      switch (srcType) {
 		case LUX_BYTE:
-		  trgt.cf[offset].real = (Float) *src.b;
+		  trgt.cf[offset].real = (float) *src.b;
 		  trgt.cf[offset].imaginary = 0;
 		  break;
 		case LUX_WORD:
-		  trgt.cf[offset].real = (Float) *src.w;
+		  trgt.cf[offset].real = (float) *src.w;
 		  trgt.cf[offset].imaginary = 0;
 		  break;
 		case LUX_LONG:
-		  trgt.cf[offset].real = (Float) *src.l;
+		  trgt.cf[offset].real = (float) *src.l;
 		  trgt.cf[offset].imaginary = 0;
 		  break;
 		case LUX_FLOAT:
@@ -2795,7 +2795,7 @@ Int insert(Int narg, Int ps[])
 		  trgt.cf[offset].imaginary = 0;
 		  break;
 		case LUX_DOUBLE:
-		  trgt.cf[offset].real = (Float) *src.d;
+		  trgt.cf[offset].real = (float) *src.d;
 		  trgt.cf[offset].imaginary = 0;
 		  break;
 		case LUX_CFLOAT:
@@ -2803,40 +2803,40 @@ Int insert(Int narg, Int ps[])
 		  trgt.cf[offset].imaginary = src.cf->imaginary;
 		  break;
 		case LUX_CDOUBLE:
-		  trgt.cf[offset].real = (Float) src.cd->real;
-		  trgt.cf[offset].imaginary = (Float) src.cd->imaginary;
+		  trgt.cf[offset].real = (float) src.cd->real;
+		  trgt.cf[offset].imaginary = (float) src.cd->imaginary;
 		  break;
 	      }
 	      break;
 	    case LUX_CDOUBLE:
 	      switch (srcType) {
 		case LUX_BYTE:
-		  trgt.cd[offset].real = (Double) *src.b;
+		  trgt.cd[offset].real = (double) *src.b;
 		  trgt.cd[offset].imaginary = 0;
 		  break;
 		case LUX_WORD:
-		  trgt.cd[offset].real = (Double) *src.w;
+		  trgt.cd[offset].real = (double) *src.w;
 		  trgt.cd[offset].imaginary = 0;
 		  break;
 		case LUX_LONG:
-		  trgt.cd[offset].real = (Double) *src.l;
+		  trgt.cd[offset].real = (double) *src.l;
 		  trgt.cd[offset].imaginary = 0;
 		  break;
 		case LUX_FLOAT:
-		  trgt.cd[offset].real = (Double) *src.f;
+		  trgt.cd[offset].real = (double) *src.f;
 		  trgt.cd[offset].imaginary = 0;
 		  break;
 		case LUX_DOUBLE:
-		  trgt.cd[offset].real = (Double) *src.d;
+		  trgt.cd[offset].real = (double) *src.d;
 		  trgt.cd[offset].imaginary = 0;
 		  break;
 		case LUX_CFLOAT:
-		  trgt.cd[offset].real = (Double) src.cf->real;
-		  trgt.cd[offset].imaginary = (Double) src.cf->imaginary;
+		  trgt.cd[offset].real = (double) src.cf->real;
+		  trgt.cd[offset].imaginary = (double) src.cf->imaginary;
 		  break;
 		case LUX_CDOUBLE:
-		  trgt.cd[offset].real = (Double) src.cd->real;
-		  trgt.cd[offset].imaginary = (Double) src.cd->imaginary;
+		  trgt.cd[offset].real = (double) src.cd->real;
+		  trgt.cd[offset].imaginary = (double) src.cd->imaginary;
 		  break;
 	      }
 	      break;
@@ -2951,19 +2951,19 @@ Int insert(Int narg, Int ps[])
 	    case LUX_FLOAT:
 	      switch (srcType) {
 		case LUX_BYTE:
-		  value.f = (Float) *src.b;
+		  value.f = (float) *src.b;
 		  break;
 		case LUX_WORD:
-		  value.f = (Float) *src.w;
+		  value.f = (float) *src.w;
 		  break;
 		case LUX_LONG:
-		  value.f = (Float) *src.l;
+		  value.f = (float) *src.l;
 		  break;
 		case LUX_FLOAT:
 		  value.f = *src.f;
 		  break;
 		case LUX_DOUBLE:
-		  value.f = (Float) *src.d;
+		  value.f = (float) *src.d;
 		  break;
 		case LUX_CFLOAT:
 		  value.f = sqrt(src.cf->real*src.cf->real
@@ -2978,16 +2978,16 @@ Int insert(Int narg, Int ps[])
 	    case LUX_DOUBLE:
 	      switch (srcType) {
 		case LUX_BYTE:
-		  value.d = (Double) *src.b;
+		  value.d = (double) *src.b;
 		  break;
 		case LUX_WORD:
-		  value.d = (Double) *src.w;
+		  value.d = (double) *src.w;
 		  break;
 		case LUX_LONG:
-		  value.d = (Double) *src.l;
+		  value.d = (double) *src.l;
 		  break;
 		case LUX_FLOAT:
-		  value.d = (Double) *src.f;
+		  value.d = (double) *src.f;
 		  break;
 		case LUX_DOUBLE:
 		  value.d = *src.d;
@@ -3265,19 +3265,19 @@ Int insert(Int narg, Int ps[])
 	    case LUX_FLOAT:
 	      switch (srcType) {
 		case LUX_BYTE:
-		  trgt.f[offset] = (Float) *src.b;
+		  trgt.f[offset] = (float) *src.b;
 		  break;
 		case LUX_WORD:
-		  trgt.f[offset] = (Float) *src.w;
+		  trgt.f[offset] = (float) *src.w;
 		  break;
 		case LUX_LONG:
-		  trgt.f[offset] = (Float) *src.l;
+		  trgt.f[offset] = (float) *src.l;
 		  break;
 		case LUX_FLOAT:
 		  trgt.f[offset] = *src.f;
 		  break;
 		case LUX_DOUBLE:
-		  trgt.f[offset] = (Float) *src.d;
+		  trgt.f[offset] = (float) *src.d;
 		  break;
 		case LUX_CFLOAT:
 		  trgt.f[offset] = sqrt(src.cf->real*src.cf->real
@@ -3292,16 +3292,16 @@ Int insert(Int narg, Int ps[])
 	    case LUX_DOUBLE:
 	      switch (srcType) {
 		case LUX_BYTE:
-		  trgt.d[offset] = (Double) *src.b;
+		  trgt.d[offset] = (double) *src.b;
 		  break;
 		case LUX_WORD:
-		  trgt.d[offset] = (Double) *src.w;
+		  trgt.d[offset] = (double) *src.w;
 		  break;
 		case LUX_LONG:
-		  trgt.d[offset] = (Double) *src.l;
+		  trgt.d[offset] = (double) *src.l;
 		  break;
 		case LUX_FLOAT:
-		  trgt.d[offset] = (Double) *src.f;
+		  trgt.d[offset] = (double) *src.f;
 		  break;
 		case LUX_DOUBLE:
 		  trgt.d[offset] = *src.d;
@@ -3499,19 +3499,19 @@ Int insert(Int narg, Int ps[])
 	    case LUX_FLOAT:
 	      switch (srcType) {
 		case LUX_BYTE:
-		  value.f = (Float) *src.b;
+		  value.f = (float) *src.b;
 		  break;
 		case LUX_WORD:
-		  value.f = (Float) *src.w;
+		  value.f = (float) *src.w;
 		  break;
 		case LUX_LONG:
-		  value.f = (Float) *src.l;
+		  value.f = (float) *src.l;
 		  break;
 		case LUX_FLOAT:
 		  value.f = *src.f;
 		  break;
 		case LUX_DOUBLE:
-		  value.f = (Float) *src.d;
+		  value.f = (float) *src.d;
 		  break;
 		case LUX_CFLOAT:
 		  value.f = sqrt(src.cf->real*src.cf->real
@@ -3526,16 +3526,16 @@ Int insert(Int narg, Int ps[])
 	    case LUX_DOUBLE:
 	      switch (srcType) {
 		case LUX_BYTE:
-		  value.d = (Double) *src.b;
+		  value.d = (double) *src.b;
 		  break;
 		case LUX_WORD:
-		  value.d = (Double) *src.w;
+		  value.d = (double) *src.w;
 		  break;
 		case LUX_LONG:
-		  value.d = (Double) *src.l;
+		  value.d = (double) *src.l;
 		  break;
 		case LUX_FLOAT:
-		  value.d = (Double) *src.f;
+		  value.d = (double) *src.f;
 		  break;
 		case LUX_DOUBLE:
 		  value.d = *src.d;
@@ -4171,19 +4171,19 @@ Int einsert(Int lhs, Int rhs)
 	    case LUX_FLOAT:
 	      switch (srcType) {
 		case LUX_BYTE:
-		  trgt.f[offset] = (Float) *src.b;
+		  trgt.f[offset] = (float) *src.b;
 		  break;
 		case LUX_WORD:
-		  trgt.f[offset] = (Float) *src.w;
+		  trgt.f[offset] = (float) *src.w;
 		  break;
 		case LUX_LONG:
-		  trgt.f[offset] = (Float) *src.l;
+		  trgt.f[offset] = (float) *src.l;
 		  break;
 		case LUX_FLOAT:
 		  trgt.f[offset] = *src.f;
 		  break;
 		case LUX_DOUBLE:
-		  trgt.f[offset] = (Float) *src.d;
+		  trgt.f[offset] = (float) *src.d;
 		  break;
 		case LUX_CFLOAT:
 		  trgt.f[offset] = sqrt(src.cf->real*src.cf->real
@@ -4198,16 +4198,16 @@ Int einsert(Int lhs, Int rhs)
 	    case LUX_DOUBLE:
 	      switch (srcType) {
 		case LUX_BYTE:
-		  trgt.d[offset] = (Double) *src.b;
+		  trgt.d[offset] = (double) *src.b;
 		  break;
 		case LUX_WORD:
-		  trgt.d[offset] = (Double) *src.w;
+		  trgt.d[offset] = (double) *src.w;
 		  break;
 		case LUX_LONG:
-		  trgt.d[offset] = (Double) *src.l;
+		  trgt.d[offset] = (double) *src.l;
 		  break;
 		case LUX_FLOAT:
-		  trgt.d[offset] = (Double) *src.f;
+		  trgt.d[offset] = (double) *src.f;
 		  break;
 		case LUX_DOUBLE:
 		  trgt.d[offset] = *src.d;
@@ -4225,15 +4225,15 @@ Int einsert(Int lhs, Int rhs)
 	    case LUX_CFLOAT:
 	      switch (srcType) {
 		case LUX_BYTE:
-		  trgt.cf[offset].real = (Float) *src.b;
+		  trgt.cf[offset].real = (float) *src.b;
 		  trgt.cf[offset].imaginary = 0;
 		  break;
 		case LUX_WORD:
-		  trgt.cf[offset].real = (Float) *src.w;
+		  trgt.cf[offset].real = (float) *src.w;
 		  trgt.cf[offset].imaginary = 0;
 		  break;
 		case LUX_LONG:
-		  trgt.cf[offset].real = (Float) *src.l;
+		  trgt.cf[offset].real = (float) *src.l;
 		  trgt.cf[offset].imaginary = 0;
 		  break;
 		case LUX_FLOAT:
@@ -4241,7 +4241,7 @@ Int einsert(Int lhs, Int rhs)
 		  trgt.cf[offset].imaginary = 0;
 		  break;
 		case LUX_DOUBLE:
-		  trgt.cf[offset].real = (Float) *src.d;
+		  trgt.cf[offset].real = (float) *src.d;
 		  trgt.cf[offset].imaginary = 0;
 		  break;
 		case LUX_CFLOAT:
@@ -4249,40 +4249,40 @@ Int einsert(Int lhs, Int rhs)
 		  trgt.cf[offset].imaginary = src.cf->imaginary;
 		  break;
 		case LUX_CDOUBLE:
-		  trgt.cf[offset].real = (Float) src.cd->real;
-		  trgt.cf[offset].imaginary = (Float) src.cd->imaginary;
+		  trgt.cf[offset].real = (float) src.cd->real;
+		  trgt.cf[offset].imaginary = (float) src.cd->imaginary;
 		  break;
 	      }
 	      break;
 	    case LUX_CDOUBLE:
 	      switch (srcType) {
 		case LUX_BYTE:
-		  trgt.cd[offset].real = (Double) *src.b;
+		  trgt.cd[offset].real = (double) *src.b;
 		  trgt.cd[offset].imaginary = 0;
 		  break;
 		case LUX_WORD:
-		  trgt.cd[offset].real = (Double) *src.w;
+		  trgt.cd[offset].real = (double) *src.w;
 		  trgt.cd[offset].imaginary = 0;
 		  break;
 		case LUX_LONG:
-		  trgt.cd[offset].real = (Double) *src.l;
+		  trgt.cd[offset].real = (double) *src.l;
 		  trgt.cd[offset].imaginary = 0;
 		  break;
 		case LUX_FLOAT:
-		  trgt.cd[offset].real = (Double) *src.f;
+		  trgt.cd[offset].real = (double) *src.f;
 		  trgt.cd[offset].imaginary = 0;
 		  break;
 		case LUX_DOUBLE:
-		  trgt.cd[offset].real = (Double) *src.d;
+		  trgt.cd[offset].real = (double) *src.d;
 		  trgt.cd[offset].imaginary = 0;
 		  break;
 		case LUX_CFLOAT:
-		  trgt.cd[offset].real = (Double) src.cf->real;
-		  trgt.cd[offset].imaginary = (Double) src.cf->imaginary;
+		  trgt.cd[offset].real = (double) src.cf->real;
+		  trgt.cd[offset].imaginary = (double) src.cf->imaginary;
 		  break;
 		case LUX_CDOUBLE:
-		  trgt.cd[offset].real = (Double) src.cd->real;
-		  trgt.cd[offset].imaginary = (Double) src.cd->imaginary;
+		  trgt.cd[offset].real = (double) src.cd->real;
+		  trgt.cd[offset].imaginary = (double) src.cd->imaginary;
 		  break;
 	      }
 	      break;
@@ -4398,19 +4398,19 @@ Int einsert(Int lhs, Int rhs)
 	    case LUX_FLOAT:
 	      switch (srcType) {
 		case LUX_BYTE:
-		  value.f = (Float) *src.b;
+		  value.f = (float) *src.b;
 		  break;
 		case LUX_WORD:
-		  value.f = (Float) *src.w;
+		  value.f = (float) *src.w;
 		  break;
 		case LUX_LONG:
-		  value.f = (Float) *src.l;
+		  value.f = (float) *src.l;
 		  break;
 		case LUX_FLOAT:
 		  value.f = *src.f;
 		  break;
 		case LUX_DOUBLE:
-		  value.f = (Float) *src.d;
+		  value.f = (float) *src.d;
 		  break;
 		case LUX_CFLOAT:
 		  value.f = sqrt(src.cf->real*src.cf->real
@@ -4425,16 +4425,16 @@ Int einsert(Int lhs, Int rhs)
 	    case LUX_DOUBLE:
 	      switch (srcType) {
 		case LUX_BYTE:
-		  value.d = (Double) *src.b;
+		  value.d = (double) *src.b;
 		  break;
 		case LUX_WORD:
-		  value.d = (Double) *src.w;
+		  value.d = (double) *src.w;
 		  break;
 		case LUX_LONG:
-		  value.d = (Double) *src.l;
+		  value.d = (double) *src.l;
 		  break;
 		case LUX_FLOAT:
-		  value.d = (Double) *src.f;
+		  value.d = (double) *src.f;
 		  break;
 		case LUX_DOUBLE:
 		  value.d = *src.d;
@@ -4728,19 +4728,19 @@ Int einsert(Int lhs, Int rhs)
 	    case LUX_FLOAT:
 	      switch (srcType) {
 		case LUX_BYTE:
-		  trgt.f[offset] = (Float) *src.b;
+		  trgt.f[offset] = (float) *src.b;
 		  break;
 		case LUX_WORD:
-		  trgt.f[offset] = (Float) *src.w;
+		  trgt.f[offset] = (float) *src.w;
 		  break;
 		case LUX_LONG:
-		  trgt.f[offset] = (Float) *src.l;
+		  trgt.f[offset] = (float) *src.l;
 		  break;
 		case LUX_FLOAT:
 		  trgt.f[offset] = *src.f;
 		  break;
 		case LUX_DOUBLE:
-		  trgt.f[offset] = (Float) *src.d;
+		  trgt.f[offset] = (float) *src.d;
 		  break;
 		case LUX_CFLOAT:
 		  trgt.f[offset] = sqrt(src.cf->real*src.cf->real
@@ -4755,16 +4755,16 @@ Int einsert(Int lhs, Int rhs)
 	    case LUX_DOUBLE:
 	      switch (srcType) {
 		case LUX_BYTE:
-		  trgt.d[offset] = (Double) *src.b;
+		  trgt.d[offset] = (double) *src.b;
 		  break;
 		case LUX_WORD:
-		  trgt.d[offset] = (Double) *src.w;
+		  trgt.d[offset] = (double) *src.w;
 		  break;
 		case LUX_LONG:
-		  trgt.d[offset] = (Double) *src.l;
+		  trgt.d[offset] = (double) *src.l;
 		  break;
 		case LUX_FLOAT:
-		  trgt.d[offset] = (Double) *src.f;
+		  trgt.d[offset] = (double) *src.f;
 		  break;
 		case LUX_DOUBLE:
 		  trgt.d[offset] = *src.d;
@@ -4963,19 +4963,19 @@ Int einsert(Int lhs, Int rhs)
 	    case LUX_FLOAT:
 	      switch (srcType) {
 		case LUX_BYTE:
-		  value.f = (Float) *src.b;
+		  value.f = (float) *src.b;
 		  break;
 		case LUX_WORD:
-		  value.f = (Float) *src.w;
+		  value.f = (float) *src.w;
 		  break;
 		case LUX_LONG:
-		  value.f = (Float) *src.l;
+		  value.f = (float) *src.l;
 		  break;
 		case LUX_FLOAT:
 		  value.f = *src.f;
 		  break;
 		case LUX_DOUBLE:
-		  value.f = (Float) *src.d;
+		  value.f = (float) *src.d;
 		  break;
 		case LUX_CFLOAT:
 		  value.f = sqrt(src.cf->real*src.cf->real
@@ -4990,16 +4990,16 @@ Int einsert(Int lhs, Int rhs)
 	    case LUX_DOUBLE:
 	      switch (srcType) {
 		case LUX_BYTE:
-		  value.d = (Double) *src.b;
+		  value.d = (double) *src.b;
 		  break;
 		case LUX_WORD:
-		  value.d = (Double) *src.w;
+		  value.d = (double) *src.w;
 		  break;
 		case LUX_LONG:
-		  value.d = (Double) *src.l;
+		  value.d = (double) *src.l;
 		  break;
 		case LUX_FLOAT:
-		  value.d = (Double) *src.f;
+		  value.d = (double) *src.f;
 		  break;
 		case LUX_DOUBLE:
 		  value.d = *src.d;

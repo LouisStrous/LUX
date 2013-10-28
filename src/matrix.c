@@ -96,7 +96,7 @@ Int lux_matrix_product(Int narg, Int ps[])
       do {
 	for (i = 0; i < dims1[1]; i++) /* rows of #1 */
 	  for (j = 0; j < dims2[0]; j++) { /* columns of #2 */
-	    Double *p = &ptrs[2].d[j + i*dims2[0]];
+	    double *p = &ptrs[2].d[j + i*dims2[0]];
 	    *p = 0.0;
 	    for (k = 0; k < dims1[0]; k++) /* columns of #1 = rows of #2 */
 	      *p += ptrs[0].d[k + i*dims1[0]]*ptrs[1].d[j + k*dims2[0]];
@@ -112,7 +112,7 @@ Int lux_matrix_product(Int narg, Int ps[])
     do {
       for (i = 0; i < dims1[1]; i++) /* rows of #1 */
 	for (j = 0; j < dims2[0]; j++) { /* columns of #2 */
-	  Double *p = &ptrs[2].d[j + i*dims2[0]];
+	  double *p = &ptrs[2].d[j + i*dims2[0]];
 	  *p = 0.0;
 	  for (k = 0; k < dims1[0]; k++) /* columns of #1 = rows of #2 */
 	    *p += ptrs[0].d[k + i*dims1[0]]*ptrs[1].d[j + k*dims2[0]];
@@ -132,9 +132,9 @@ Int lux_matrix_product(Int narg, Int ps[])
 }
 REGISTER(matrix_product, f, MPRODUCT, 2, 2, "0INNER:1OUTER");
 /*------------------------------------------------------------------------- */
-Int singular_value_decomposition(Double *a_in, size_t ncol, size_t nrow, 
-				 Double *u_out, Double *s_out,
-				 Double *v_out)
+Int singular_value_decomposition(double *a_in, size_t ncol, size_t nrow, 
+				 double *u_out, double *s_out,
+				 double *v_out)
 {
   if (!a_in || !u_out || !s_out || !v_out || !nrow || !ncol) {
     errno = EDOM;
@@ -279,7 +279,7 @@ Int lux_svd(Int narg, Int ps[])
 }
 REGISTER(svd, s, SVD, 4, 4, NULL);
 /*--------------------------------------------------------------------*/
-Int matrix_transpose(Double *in, Double *out, size_t in_ncol, size_t in_nrow)
+Int matrix_transpose(double *in, double *out, size_t in_ncol, size_t in_nrow)
 {
   Int i, j;
   

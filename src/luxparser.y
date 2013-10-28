@@ -1063,7 +1063,7 @@ void Quit(Int result)
   Int	saveHistory(void);
 
   saveHistory();
-  printf("\nCPUtime: %g seconds\n", ((Float) clock())/CLOCKS_PER_SEC);
+  printf("\nCPUtime: %g seconds\n", ((float) clock())/CLOCKS_PER_SEC);
   puts("Quitting... Bye!");	/* farewell message */
   exit(result);
 }
@@ -1116,7 +1116,7 @@ Int readNumber(YYSTYPE *lvalp)
 	  scalar_value(*lvalp).l = v.l;
 	  break;
 	case LUX_FLOAT:
-	  scalar_value(*lvalp).f = (Float) v.d;
+	  scalar_value(*lvalp).f = (float) v.d;
 	  break;
 	case LUX_DOUBLE:
 	  scalar_value(*lvalp).d = v.d;

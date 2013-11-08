@@ -68,6 +68,8 @@ lux_func_if * lux_func_if_alloc(char const * const name, size_t num_params)
 void lux_func_if_free(lux_func_if * afif)
 {
   if (afif) {
+    if (afif->func_sym)
+      zapTemp(afif->func_sym); /* make it available */
     free(afif->param_data);
     free(afif->param_syms);
     free(afif);

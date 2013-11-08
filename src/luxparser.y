@@ -68,7 +68,7 @@ Int	stackListLength(void),	/* return length of list at top of stack */
 	newSymbol(Int, ...), newBlockSymbol(Int), copySym(Int),
 	luxerror(char *, Int, ...);
 Int	statementDepth = 0, keepEVB = 0;
-Int	yyerror(char *), yylex(YYSTYPE *);
+Int	yyerror(const char *), yylex(YYSTYPE *);
 %}
 
 %pure_parser			/* reentrant parser, so we can compile a
@@ -919,7 +919,7 @@ void away(void)
   getChar = getStreamChar;
 }
 
-Int yyerror(char *s)
+Int yyerror(const char *s)
      /* reports errors occurring during parsing (required by yyparse()) */
 {
  extern Int	curLineNumber;	/* current line number */

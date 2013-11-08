@@ -2833,7 +2833,7 @@ Int lux_scale(Int narg, Int ps[])
   type = array_type(iq);
   q1.l = array_data(iq);
   n = array_size(iq);
-  result_sym = array_clone(iq, colorIndexType);
+  result_sym = array_clone(iq, LUX_BYTE);
   q2.l = array_data(result_sym);
   /* if only one arg., then we scale between the min and max of array */
   if (narg == 1 && (internalMode & 2) == 0) {/* 1 arg and no /ZOOM */

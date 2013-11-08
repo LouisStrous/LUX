@@ -1771,11 +1771,16 @@ Int nextFreeTempVariable(void)
 /* returns index to next free temporary variable in symbol table */
 {
  extern Int	compileLevel;
+ Int oldIndex = tempVariableIndex;
+ static long int count = 0;
 
- while (sym[tempVariableIndex].class)
-   if (++tempVariableIndex == TEMPS_END) {
+ ++count;
+ while (sym[tempVariableIndex].class) {
+   if (++tempVariableIndex == TEMPS_END)
+     tempVariableIndex = TEMPS_START;
+   if (tempVariableIndex == oldIndex)
      return luxerror("Too many temp variables - symbol table full", 0);
-   }
+ }
  sym[tempVariableIndex].exec = nExecuted;
  sym[tempVariableIndex].context = -compileLevel;
  sym[tempVariableIndex].line = curLineNumber;
@@ -1787,10 +1792,13 @@ Int nextFreeTempVariable(void)
 Int nextFreeTempExecutable(void)
 /* returns index to next free temporary executable in symbol table */
 {
+  Int oldIndex = tempExecutableIndex;
   extern Int	compileLevel;
 
   while (sym[tempExecutableIndex].class) {
     if (++tempExecutableIndex == EXE_END) 
+      tempExecutableIndex = EXE_START;
+    if (tempExecutableIndex == oldIndex) /* nothing free */
       return luxerror("Too many temporary executables - symbol table full", 0);
   }
   sym[tempExecutableIndex].exec = nExecuted;

@@ -793,9 +793,11 @@ Int internal_routine(Int symbol, internalRoutine *routine)
 	   free(evalArgs);
 	   name = string_value(keyword_name_symbol(*arg));
 	   return luxerror("Nonexistent keyword: %s", 0, name);
-	 } else if (n == MODEKEY) /* MODE keyword */
-	   internalMode = int_arg(eval(keyword_value(*arg)));
-         else if (n != ORKEY) {	/* not a mode (number) keyword */
+	 } else if (n == MODEKEY) { /* MODE keyword */
+           Int result = eval(keyword_value(*arg));
+           internalMode = int_arg(result);
+           zapTemp(result);
+         } else if (n != ORKEY) {	/* not a mode (number) keyword */
 	   if (*keys >= maxArg)	/* proper index is beyond current max index */
 	     maxArg = *keys + 1; /* update max index */
 	   if (preserveKey)

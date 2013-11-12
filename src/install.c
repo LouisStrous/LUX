@@ -4934,8 +4934,8 @@ Int lux_restart(Int narg, Int ps[])
   printf("\nRestarting LUX...\n\n");
   saveHistory();
   if (execl(programName, programName, NULL)) {
-    return luxerror("Restarting LUX failed; reason: %s\n", 0,
-                    strerror(errno));
+    return luxerror("Restarting LUX (%s) failed; reason: %s\n", 0,
+                    programName, strerror(errno));
   }
   return 1;
 }

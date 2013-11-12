@@ -3437,6 +3437,181 @@ double kepler_v(double M, double e)
 }
 BIND(kepler_v, d_dd_iDaD1rDq_01_2, f, KEPLER, 2, 2, NULL);
 /*--------------------------------------------------------------------------*/
+/** \brief Solves Kepler's equation
+
+    \param[in] Mq - the perifocal anomaly, in radians.  Its value is
+                    unrestricted.
+    \param[in] e - the eccentricity.  Its value is unrestricted
+    \return tan(nu/2) where nu is the true anomaly.
+
+    The perifocal anomaly is the product of the time since perifocus
+    and the angular speed at the time of perifocus, as seen from the
+    focal point.
+
+    Kepler's equation is usually stated in terms of the mean anomaly,
+    which is based on the angular speed averaged over the orbital
+    period, but there is no orbital period for parabolic or hyperbolic
+    orbits.  For hyperbolic orbits, one can use the same formula for
+    the mean anomaly that is also used for elliptical orbits, even
+    though an object in a hyperbolic orbit never returns to a previous
+    position in that orbit.  However, when the perifocal distance and
+    time since perifocus are kept fixed, and the eccentricity
+    approaches 1 from below or above, then the mean anomaly
+    asymptotically goes to 0 for every non-zero perifocal distance, so
+    the mean anomaly is not useful for parabolic orbits, and
+    inconvenient for near-parabolic orbits.
+
+    The perifocal anomaly is well-defined for elliptical, parabolic,
+    and hyperbolic orbits, is continuous across eccentricity 1, and
+    for near-parabolic orbits its value for a fixed time since
+    perifocus hardly depends on the eccentricity.  This fits well with
+    the observation that it is difficult to tell elliptical and
+    hyperbolic near-parabolic orbits apart.
+ */
+double kepler_q(double Mq, double e)
+{
+  double f, g;
+  static double prev_e = 0, prev_f = 1, prev_g = 1;
+  int kind = (internalMode & 7);
+  int return_count = (internalMode & 8) != 0;
+
+  e = fabs(e);
+  if (e == prev_e) {
+    f = prev_f;
+    g = prev_g;
+  } else {
+    if (e != 1) {
+      double z = fabs(1 - e);
+      f = sqrt((1 + e)/z);
+      g = pow(z, 1.5);
+      prev_f = f;
+      prev_g = g;
+    } /* else f and g are not used so their value is immaterial */
+    prev_e = e;
+  }
+  if (e < 1) {     /* elliptical orbit */
+    /* M = √(γ/a³) = √(γ(1-e)³/q³) = (1-e)^(3/2) Mq */
+    double M = g*Mq;
+    M = fmod(M, TWOPI);        /* between -π and +π */
+    double E;
+    switch (kind) {
+    case 1:                     /* small-e approximation */
+      E = M;
+      break;
+    case 2:    /* suggestion in Jean Meeus' Astronomical Algorithms */
+      E = M_PI;
+      break;
+    case 3:                     /* Louis Strous suggestion */
+      E = M + e*(1 + e*e*0.5)*sqrt(M)*sqrt(2*M_PI - M)/(2*sqrt(M_PI));
+      break;
+    case 4:                     /* Louis Strous suggestion */
+      E = M + e*(1 + e*e*0.2)*sqrt(M)*sqrt(2*M_PI - M)/(2*sqrt(M_PI));
+      break;
+    case 5:                     /* parabolic approximation */
+      {
+        double W = 0.75*M_SQRT2*Mq;
+        double u = cbrt(W + sqrt(W*W + 1));
+        double t = u - 1.0/u;   /* estimate for tan ½ν */
+        E = 2*atan(t/f);        /* f*tan(½E) = tan(½ν) */
+      }
+      break;
+    case 6:                     /* near-parabolic approximation */
+      {
+        double W = 0.75*M_SQRT2*Mq;
+        W -= (-0.952440631*pow(W,5.0/3) + W/4)*(1 - e);
+        double u = cbrt(W + sqrt(W*W + 1));
+        double t = u - 1.0/u;
+        E = 2*atan(t/f);
+      }
+      break;
+    default:
+      {
+        double l = e*M_PI;
+        double d = M - M_PI;
+        if (d > l || d < -l)
+          E = M;
+        else
+          E = M_PI;
+      }
+      break;
+    }
+    double prev_ad;
+    double ad = HUGE_VAL;
+    double count = 0;
+    do {
+      double p = 1 - e*cos(E);
+      prev_ad = ad;
+      double d = (M + e*sin(E) - E)/p;
+      E += d;
+      ++count;
+      ad = fabs(d);
+    } while (ad && (ad < prev_ad || ad > FLT_EPSILON));
+    return return_count? count: f*tan(E/2);
+  } else if (e > 1) {	/* hyperbolic orbit */;
+    /* M = √(γ/|a|³) = √(γ(e-1)³/q³) = (e-1)^(3/2) Mq */
+    /* ∆H = (e sinh H - H - M)/(1 - e cosh H)
+       = (M + H - e sinh H)/(e cosh H - 1)
+       = ((M + H)/(e cosh H) - tanh H)/(1 - 1/(e cosh H)) */
+    double M = g*Mq;
+    double prev_ad;
+    double ad = HUGE_VAL;
+    double H;
+    switch (kind) {
+    case 4:                     /* high-eccentricity approximation */
+      {
+        double r = M/e;
+        r = 2*r*(r + 1)/(r + 2);
+        H = log1p(r);
+      }
+      break;
+    case 5:                     /* parabolic approximation */
+      {
+        double W = 0.75*M_SQRT2*Mq;
+        double u = cbrt(W + sqrt(W*W + 1));
+        double t = u - 1.0/u;   /* tan ½ν */
+        /* for a hyperbola, |tan ½ν| cannot exceed f */
+        t /= f;
+        if (fabs(t) >= 1)
+          t = copysign(1 - DBL_EPSILON, t); /* so H is not ±∞ */
+        H = 2*atanh(t);
+      }
+      break;
+    case 6:                     /* near-parabolic approximation */
+      {
+        double W = 0.75*M_SQRT2*Mq;
+        W -= (-0.952440631*pow(W,5.0/3) + W/4)*(1 - e);
+        double u = cbrt(W + sqrt(W*W + 1));
+        double t = u - 1.0/u;   /* tan ½ν */
+        /* for a hyperbola, |tan ½ν| cannot exceed f */
+        t /= f;
+        if (fabs(t) >= 1)
+          t = copysign(1 - DBL_EPSILON, t); /* so H is not ±∞ */
+        H = 2*atanh(t);
+      }
+      break;
+    default: /* large-H approximation, adjusted to also reasonably fit
+                small-H */
+      H = copysign(log1p(2*fabs(M)/e), M);
+      break;
+    }
+    double count = 0;
+    do {
+      double p = (M + H)/e;
+      prev_ad = ad;
+      double d = (asinh(p) - H)/(1 - 1/(e*sqrt(1 + p*p)));
+      H += d;
+      ++count;
+      ad = fabs(d);
+    } while (ad && (ad < prev_ad || ad > FLT_EPSILON));
+    return return_count? count: f*tanh(H/2);
+  } else {			/* parabolic orbit */
+    double W = 0.75*M_SQRT2*Mq;
+    double u = cbrt(W + sqrt(W*W + 1));
+    return return_count? 1: u - 1.0/u;
+  }
+}
+BIND(kepler_q, d_dd_iDaD1rDq_01_2, f, KEPLERQ, 2, 2, "");
+/*--------------------------------------------------------------------------*/
 double interpolate_angle(double a1, double a2, double f)
      /* interpolates between angles <a1> and <a2> (measured in
 	radians) at fraction <f> from <a1> to <a2>, taking into

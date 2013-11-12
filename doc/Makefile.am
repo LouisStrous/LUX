@@ -22,7 +22,8 @@ info_TEXINFOS = lux.texi
 # makeinfo 5.1 has a bug in that it does not accept arguments greater
 # than 9 for @enumerate, but lux.texi uses such enumerations.  Until
 # that bug has been fixed, we ignore the error messages.
-MAKEINFOFLAGS = --force
+MAKEINFOFLAGS = --force --css-ref=lux.css
+EXTRA_DIST = lux.css
 
 if HAVE_DOXYGEN
 

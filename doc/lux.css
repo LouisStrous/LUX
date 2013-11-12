@@ -1,0 +1,6 @@
+cmd { display: block; font-family: monospace; }
+file { font-style: italic; }
+.chapter, .section, .subsection, .subsubsection { background-color:  #FFFFC0; }
+div.example { background-color: #E0E0FF; border-style: dotted;
+              border-width: thin; padding: 0.3em; }
+code { background-color: #E0E0FF; }

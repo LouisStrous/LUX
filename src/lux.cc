@@ -1,4 +1,4 @@
-/* This is file lux.c.
+/* This is file lux.cc.
 
 Copyright 2013 Louis Strous
 
@@ -17,12 +17,11 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include <stdio.h>
-#include "types.h"
+extern "C" {
+  extern int do_main(int, char **);
+};
 
-Int main(Int argc, char **argv)
+int main(int argc, char **argv)
 {
-  Int do_main(Int, char **);
-
   return do_main(argc, argv);
 }

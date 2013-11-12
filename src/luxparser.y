@@ -1573,7 +1573,7 @@ void gehandler(const char *reason, const char *file, Int line, Int gsl_errno)
 }
 /*--------------------------------------------------------------*/
 char	*programName;
-Int do_main(Int argc, char *argv[])
+int do_main(int argc, char *argv[])
      /* main program */
 {
   Int	site(Int, Int []), readHistory(void);

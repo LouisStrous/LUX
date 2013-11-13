@@ -3,8 +3,8 @@
 
 AC_PREREQ([2.68])
 AC_INIT([lux], [1.0.2], [lux@quae.nl])
-AC_LANG([C])
-AC_CONFIG_SRCDIR([src/lux.c])
+AC_LANG([C++])
+AC_CONFIG_SRCDIR([src/lux.cc])
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE
 PKG_CHECK_MODULES([CHECK],[check >= 0.9.4])
@@ -16,6 +16,7 @@ AC_DEFINE_UNQUOTED([PLATFORM], "${host}", [The canonical host type])
 
 # Checks for programs.
 AC_PROG_CC
+AC_PROG_CXX
 AC_PROG_RANLIB
 AC_PROG_YACC
 AC_CHECK_PROGS([DOXYGEN], [doxygen])

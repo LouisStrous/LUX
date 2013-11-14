@@ -1836,14 +1836,14 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
       }
     }
   }
+ wrapup:
   obstack_free(&ops, NULL);
   obstack_free(&ods, NULL);
   return psl;
  error:
-  obstack_free(&ops, NULL);
-  obstack_free(&ods, NULL);
   free_param_spec_list(psl);
-  return NULL;
+  psl = NULL;
+  goto wrapup;
 }
 
 /** Prepares for looping through input and output variables based on a
@@ -1852,11 +1852,15 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
     \param [in] narg the number of arguments in \p ps
     \param [in] ps the array of arguments
     \param [in] fmt the arguments specification in standard format (see below)
+
     \param [out] ptrs a pointer to a list of pointers, one for each
-      argument and possibly one for the return symbol
+      argument and possibly one for the return symbol.  Must be freed
+      when no longer needed, e.g. with \l free_standard_args
+
     \param [out] infos a pointer to a list of loop information
       structures, one for each argument and possibly one for the
-      return symbol
+      return symbol.  Must be freed when no longer needed, e.g. with
+      \l free_standard_args
 
     \return the return symbol, or -1 if an error occurred.
 
@@ -2326,11 +2330,13 @@ Int standard_args(Int narg, Int ps[], char const *fmt, pointer **ptrs,
     }
   }
 
+  free(final);
   free_param_spec_list(psl);
   obstack_free(&o, NULL);
   return returnSym;
 
   error:
+  free(final);
   obstack_free(&o, NULL);
   if (ptrs) {
     free(*ptrs);
@@ -2343,3 +2349,14 @@ Int standard_args(Int narg, Int ps[], char const *fmt, pointer **ptrs,
   return returnSym;
 }
 
+void free_standard_args(pointer **ptrs, loopInfo **infos)
+{
+  if (ptrs) {
+    free(*ptrs);
+    *ptrs = NULL;
+  }
+  if (infos) {
+    free(*infos);
+    *infos = NULL;
+  }
+}

@@ -241,8 +241,10 @@ Int lux_iauCal2jd(Int narg, Int ps[])
     }
     break;
   default:
-    return cerror(ILL_TYPE, ps[0]);
+    iq = cerror(ILL_TYPE, ps[0]);
+    break;
   }
+  free_standard_args(&ptrs, &infos);
   return iq;
 }
 REGISTER(iauCal2jd, f, CAL2JD, 1, 1, NULL);
@@ -313,6 +315,7 @@ Int lux_iauDat(Int narg, Int ps[])
       break;
     }
   }
+  free_standard_args(&ptrs, &infos);
   return iq;
 }
 REGISTER(iauDat, f, DAT, 0, 1, "1VALID");
@@ -401,6 +404,7 @@ Int lux_iauEpb2jd(Int narg, Int ps[])
     iauEpb2jd(*ptrs[0].d++, &djm0, &djm);
     *ptrs[1].d++ = djm0 + djm;
   }
+  free_standard_args(&ptrs, &infos);
   return iq;
 }
 REGISTER(iauEpb2jd, f, EPB2JD, 1, 1, NULL);
@@ -428,6 +432,7 @@ Int lux_iauEpj2jd(Int narg, Int ps[])
     iauEpj2jd(*ptrs[0].d++, &djm0, &djm);
     *ptrs[1].d++ = djm0 + djm;
   }
+  free_standard_args(&ptrs, &infos);
   return iq;
 }
 REGISTER(iauEpj2jd, f, EPJ2JD, 1, 1, NULL);

@@ -95,7 +95,9 @@ void	subdataLoop(Int *, loopInfo *), addVerify(char *, char),
   deleteFacts(Int symbol, Int type), returnLoop(loopInfo *, pointer *, Int),
   setAxisMode(loopInfo *, Int mode),
   standard_redef_array(Int, Symboltype, Int, Int *, Int, Int *, pointer *,
-		       loopInfo *);
+		       loopInfo *),
+  free_standard_args(pointer **, loopInfo **);
+
 void convertWidePointer(wideScalar *, Int, Int);
 
 void	newStack(Int), push(Int), deleteStack(void);

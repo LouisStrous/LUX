@@ -647,13 +647,17 @@ Int lux_fft_expand(Int narg, Int ps[])
   if ((iq = standard_args(narg, ps, "i>D*;i>D1;rD1", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   double factor = *ptrs[1].d;
-  if (factor <= 0)
-    return luxerror("Need positive expansion factor", ps[1]);
+  if (factor <= 0) {
+    iq = luxerror("Need positive expansion factor", ps[1]);
+    goto error;
+  }
   
   Int ndim = infos[0].ndim;
   Int *dims = malloc(ndim*sizeof(Int));
-  if (!dims)
-    return cerror(ALLOC_ERR, 0);
+  if (!dims) {
+    iq = cerror(ALLOC_ERR, 0);
+    goto error;
+  }
   memcpy(dims, infos[0].dims, ndim*sizeof(Int));
   dims[0] = (Int) (dims[0]*factor + 0.5);
   standard_redef_array(iq, LUX_DOUBLE, ndim, dims, 0, NULL,
@@ -669,6 +673,8 @@ Int lux_fft_expand(Int narg, Int ps[])
     ptrs[2].d += infos[2].singlestep[2];
   } while (advanceLoop(&infos[0], &ptrs[0]),
 	   advanceLoop(&infos[2], &ptrs[2]) < infos[2].ndim);
+ error:
+  free_standard_args(&ptrs, &infos);
   return iq;
 }
 REGISTER(fft_expand, f, FFTEXPAND, 2, 2, NULL);

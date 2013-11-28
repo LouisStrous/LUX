@@ -2613,7 +2613,7 @@ Int read_formatted_ascii(Int narg, Int ps[], void *ptr, Int showerrors,
 		  }
 		}
 		
-		if (*theFormat.spec_char == 'T')
+		if (theFormat.flags & FMT_ALTERNATIVE)
 		  d *= 15;	/* from hours to degrees */
 		
 		if (!(theFormat.flags & FMT_SUPPRESS)) {

@@ -604,7 +604,7 @@ Int input_format_check(char *format, char **next, char **widths, Int *datatype,
     else
       break;
   }
-  if (*format == '.')		/* precision - only useful for %t and %T */
+  if (*format == '.')		/* precision - only useful for %T */
     while (isdigit((Byte) *++format));
   big = 0;			/* modifier */
   switch (*format) {
@@ -626,13 +626,10 @@ Int input_format_check(char *format, char **next, char **widths, Int *datatype,
     case 'd': case 'i': case 'o': case 'x': /* integer */
       *datatype = (big == 1)? LUX_WORD: LUX_LONG;
       break;
-    case 'e': case 'f': case 'g': case 't': case 'T': /* floating point */
+    case 'e': case 'f': case 'g': case 'T': /* floating point */
       *datatype = (big == 3)? LUX_DOUBLE: LUX_FLOAT;
       break;
-    case 'c':
-      *datatype = LUX_BYTE;
-      break;
-    case 's': case 'S':
+    case 's': case 'c':
       *datatype = LUX_TEMP_STRING;
       break;
     case '[':
@@ -809,7 +806,7 @@ void type_ascii_one(Int symbol, FILE *fp)
 	sprintf(curScrat, fmt_integer, number.l);
 	fprintw(fp, curScrat);
       } else { 			/* float type */
-	/* it may be a %j, %z, %t, or %T so we must use our own printer */
+	/* it may be a %j, %z, or %T so we must use our own printer */
 	Sprintf(curScrat, fmt_float, number.d);
 	fprintw(fp, curScrat);
       }
@@ -2374,13 +2371,10 @@ Int read_formatted_ascii(Int narg, Int ps[], void *ptr, Int showerrors,
    <showerrors> is unequal to zero are error messages displayed as well. */
 /* the format string is as in C, but with the following exceptions: */
 /* 1. C-formats %p and %n are not supported.
-   2. LUX format %20S (not available in C) reads the next 20 characters
-      up to a newline, whereas LUX and C format %s reads the next
-      20 characters up to a whitespace.
-   3. LUX formats %t and %T read numbers in sexagesimal (base-60) notation,
+   2. LUX format %T read numbers in sexagesimal (base-60) notation,
       for example hours-minutes-seconds.
-   4. LUX format %z reads a complex number
-   5. LUX postfix 6# indicates that the preceding format must be used
+   3. LUX format %z reads a complex number
+   4. LUX postfix 6# indicates that the preceding format must be used
       6 times and the result stored in an array (if not suppressed). */
 /* Headers:
    <stdio.h>: FILE, stdin, sprintf()
@@ -2431,9 +2425,7 @@ Int read_formatted_ascii(Int narg, Int ps[], void *ptr, Int showerrors,
      string ' %10c' would return the next 10 characters if ANSI C is
      followed, but the next 10 characters after initial whitespace if
      gcc is used.  We cannot use such confusion, so I skip initial
-     whitespace in format entries.  There's a new non-C format %S that
-     accepts whitespace characters (%s only accepts non-whitespace).  LS
-     5may97 */
+     whitespace in format entries.  LS 5may97 */
     if (narg < 1		/* no more arguments */
 	&& ((theFormat.flags & FMT_SUPPRESS) == 0) /* and not suppressing */
 	&& theFormat.type != FMT_PLAIN) { /* and not plain text */
@@ -2531,26 +2523,24 @@ Int read_formatted_ascii(Int narg, Int ps[], void *ptr, Int showerrors,
 	    p = scr + strlen(scr) + 1; /* beyond format string */
 	    if (!(len = gscanf(&ptr, scr, NULL, isString)))
 	      return showerrors? cerror(READ_ERR, 0): nout;
-	    if (*theFormat.spec_char == 'S' 
+	    if (*theFormat.spec_char == 'c'
 		&& len < theFormat.width /* not yet at field width */
 		&& *(char *) ptr == '\n') /* and we have a \n */
 	      ptr = (void *) ((char *) ptr + 1); /* skip the \n */
-	  } else {		/* %s or %S or %[...]: read */
+	  } else {		/* %s or %[...]: read */
 	    if (*theFormat.spec_char == '[') {
 	      if (theFormat.width > 0)
 		sprintf(scr, "%%%1d%s", theFormat.width, theFormat.start);
 	      else
 		strcpy(scr, theFormat.start);
-	    } else {            /* %s or %S */
+	    } else {            /* %s or %c */
               strcpy(scr, theFormat.start);
 	    }
 	    p = scr + strlen(scr) + 1; /* beyond specification */
 	    if (!(len = gscanf(&ptr, scr, p, isString))) /* read */
 	      return showerrors? cerror(READ_ERR, 0): nout;
-	    if (*theFormat.spec_char == 'S' 
-		&& len < theFormat.width /* not yet at field width */
-		&& *(char *) ptr == '\n') /* and we have a \n */
-	      ptr = (void *) ((char *) ptr + 1); /* skip the \n */
+	    if (*theFormat.spec_char == 'c')
+              p[len] = '\0';
 	    
 	    symbol_memory(*ps) = strlen(p) + 1;
 	    trgt.s = realloc(trgt.s, symbol_memory(*ps));

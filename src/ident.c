@@ -65,9 +65,10 @@ char *symbolProperName(Int symbol)
   return NULL;			/* did not find it */
 }
 /*---------------------------------------------------------------------*/
-Int fmt_entry(formatInfo *fmi)
-/* finds the next format entry in format string <fmi->current> and returns
-   information in other members of <fmi>.  These members are:
+Int fmt_entry(formatInfo *fmi, fmtDirection direction)
+/* finds the next format entry in format string <fmi->current> for the
+   specified <direction> and returns information in other members of
+   <fmi>.  These members are:
 
    fmi->width: the field width extracted from the format entry, if any, or
            else -1 
@@ -216,7 +217,14 @@ Int fmt_entry(formatInfo *fmi)
     case 'T':
       type = FMT_TIME;
       break;
-    case 's': case 'S':
+    case 'c':
+      if (direction == FMT_OUTPUT) {
+        printf("%%c format is not allowed on output, in %s\n", fmi->current);
+        fmi->type = FMT_ERROR;
+        return FMT_ERROR;
+      }
+      /* else fall-thru */
+    case 's':
       type = FMT_STRING;
       break;
     case 'z':
@@ -313,12 +321,13 @@ Int fmt_entry(formatInfo *fmi)
 }
 /*---------------------------------------------------------------------*/
 formatInfo	theFormat;
-char *fmttok(char *format)
-/* returns the next token from the installed format.  If <format> is equal
-   to NULL, then the next token from the last installed format is returned.
-   If <format> is unequal to NULL, then the string that it points at is
-   installed as the new format from which tokens will be returned, and
-   the first token from that new format is returned in the same call. */
+char *fmttok(char *format, fmtDirection direction)
+/* returns the next token from the installed format, for the specified
+   <direction>.  If <format> is equal to NULL, then the next token
+   from the last installed format is returned.  If <format> is unequal
+   to NULL, then the string that it points at is installed as the new
+   format from which tokens will be returned, and the first token from
+   that new format is returned in the same call. */
 /* if there is nothing left, then theFormat.type is set to FMT_EMPTY */
 /* and NULL is returned.  If an error occurs, then theFormat.type is */
 /* set to FMT_ERROR and NULL is returned.  LS 12nov99 */
@@ -351,7 +360,7 @@ char *fmttok(char *format)
     return NULL;
   }
 
-  if (fmt_entry(fmi) == FMT_ERROR) /* something illegal */
+  if (fmt_entry(fmi, direction) == FMT_ERROR) /* something illegal */
     return NULL;
 
   if (fmi->type != FMT_PLAIN
@@ -382,7 +391,7 @@ Int Sprintf_general(char *str, char *format, va_list ap)
   if (format) {
     ownfmi.format = ownfmi.current = format;
     fmi = &ownfmi;
-    fmt_entry(fmi);
+    fmt_entry(fmi, FMT_OUTPUT);
   } else
     fmi = &theFormat;
 

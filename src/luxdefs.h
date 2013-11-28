@@ -161,6 +161,12 @@ typedef enum {
   FMT_EMPTY                     /*!< (8) empty format */
 } fmtType;
 
+/** \enum LUX format directions  */
+typedef enum {
+  FMT_INPUT,                    /*!< (0) input */
+  FMT_OUTPUT,                   /*!< (1) output */
+} fmtDirection;
+
 /* binary operation classes */
 /* don't change the order of these constants!  this order must
    correspond with the order in binOpName, binOpSign, binFunc* in

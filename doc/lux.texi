@@ -2328,10 +2328,9 @@ See also: @ref{FPRINT}, @ref{FPRINTF}, @ref{FREAD}, @ref{FREADF},
 
 The format specifier consists of one character from the following
 list, optionally preceded by a format type modifier (discussed below
-the table).  The C format types @code{c}, @code{n}, @code{u}, and
-@code{p} are not supported.  The format types @code{j}, @code{J},
-@code{S}, @code{t}, @code{T}, and @code{z} are available in LUX but
-not in C.
+the table).  The C format types @code{n}, @code{u}, and @code{p} are
+not supported.  The format types @code{J}, @code{T}, and @code{z} are
+available in LUX but not in C.
 
 @table @code
 @item d
@@ -2392,10 +2391,10 @@ alignment is selected, then the last displayed component is shown with
 further digits after the decimal marker until the specified width has
 been filled.  @code{%.6J} yields a date and time in ISO 8601 format,
 similar to @code{2000-12-30T03:04:05}.
-@item s, S
-refer to a @code{STRING} argument.  On output, both formats are
-equivalent.  On input, the @code{%s} format does not accept whitespace
-(i.e., reads one whitespace-delimited word), and the @code{%S} format
+@item s, c
+refer to a @code{STRING} argument.  On output, @code{%c} is not
+allowed.  On input, the @code{%s} format does not accept whitespace
+(i.e., reads one whitespace-delimited word), and the @code{%c} format
 does accept whitespace except for newlines.
 @item T
 refers to a floating point (@code{FLOAT}, @code{DOUBLE}) argument.  On
@@ -2424,9 +2423,9 @@ specified precision applies to each of the two components separately.
 
 @code{d i o x X} specifiers may be directly preceded by an @code{h} to
 indicate a @code{WORD} argument rather than a @code{LONG} argument on
-input.  @code{e E f g G t T z} specifiers may be directly preceded by an
-@code{l} to indicate a @code{DOUBLE} argument rather than a @code{FLOAT}
-argument on input.
+input.  @code{e E f g G T z} specifiers may be directly preceded by an
+@code{l} to indicate a @code{DOUBLE} argument rather than a
+@code{FLOAT} argument on input.
 
 If you use a format specifier that is not in this table, then strange
 things may happen.

@@ -3444,9 +3444,8 @@ BIND(kepler_v, d_dd_iDaD1rDq_01_2, f, KEPLER, 2, 2, NULL);
     \param[in] e - the eccentricity.  Its value is unrestricted
     \return tan(nu/2) where nu is the true anomaly.
 
-    The perifocal anomaly is the product of the time since perifocus
-    and the angular speed at the time of perifocus, as seen from the
-    focal point.
+    The perifocal anomaly is the mean anomaly in the circular orbit
+    that touches the real orbit in its perifocus.
 
     Kepler's equation is usually stated in terms of the mean anomaly,
     which is based on the angular speed averaged over the orbital
@@ -3470,59 +3469,76 @@ BIND(kepler_v, d_dd_iDaD1rDq_01_2, f, KEPLER, 2, 2, NULL);
  */
 double kepler_q(double Mq, double e)
 {
-  double f, g;
-  static double prev_e = 0, prev_f = 1, prev_g = 1;
-  int kind = (internalMode & 7);
-  int return_count = (internalMode & 8) != 0;
+  double f, g, z;
+  static double prev_e = 0, prev_f = 1, prev_g = 1, prev_z = 1;
+  int kind = (internalMode & 15);
+  int return_count = (internalMode & 16) != 0;
 
   e = fabs(e);
   if (e == prev_e) {
     f = prev_f;
     g = prev_g;
+    z = prev_z;
   } else {
     if (e != 1) {
-      double z = fabs(1 - e);
+      z = fabs(1 - e);
       f = sqrt((1 + e)/z);
       g = pow(z, 1.5);
       prev_f = f;
       prev_g = g;
-    } /* else f and g are not used so their value is immaterial */
+      prev_z = z;
+    } /* else f, g,z are not used so their value is immaterial */
     prev_e = e;
   }
   if (e < 1) {     /* elliptical orbit */
     /* M = √(γ/a³) = √(γ(1-e)³/q³) = (1-e)^(3/2) Mq */
     double M = g*Mq;
-    M = fmod(M, TWOPI);        /* between -π and +π */
+    M = fmod(M, TWOPI);        /* between 0 and +2π */
     double E;
     switch (kind) {
-    case 1:                     /* small-e approximation */
+    case 1:                     /* for small e */
       E = M;
       break;
-    case 2:    /* suggestion in Jean Meeus' Astronomical Algorithms */
+    case 2:                     /* better for small e */
+      E = M + e*sin(M);
+      break;
+    case 3:                     /* for small Mq, for near-parabolic orbit */
+      E = M/z;
+      break;
+    case 4:                     /* for medium Mq, for near-parabolic orbit */
+      E = cbrt(6*M);
+      break;
+    case 5:                     /* for large Mq, for near-parabolic orbit */
+      E = copysign(log1p(2*fabs(M)), M);
+      break;
+    case 6: /* suggested in Jean Meeus' Astronomical Algorithms, for e
+               > 0.8 */
       E = M_PI;
       break;
-    case 3:                     /* Louis Strous suggestion */
-      E = M + e*(1 + e*e*0.5)*sqrt(M)*sqrt(2*M_PI - M)/(2*sqrt(M_PI));
-      break;
-    case 4:                     /* Louis Strous suggestion */
-      E = M + e*(1 + e*e*0.2)*sqrt(M)*sqrt(2*M_PI - M)/(2*sqrt(M_PI));
-      break;
-    case 5:                     /* parabolic approximation */
+    case 7:                     /* parabolic approximation */
       {
+        Mq = M/g;
         double W = 0.75*M_SQRT2*Mq;
         double u = cbrt(W + sqrt(W*W + 1));
         double t = u - 1.0/u;   /* estimate for tan ½ν */
         E = 2*atan(t/f);        /* f*tan(½E) = tan(½ν) */
       }
       break;
-    case 6:                     /* near-parabolic approximation */
+    case 8:                    /* near-parabolic approximation */
       {
+        Mq = M/g;
+        Mq *= (1 - z/4);
         double W = 0.75*M_SQRT2*Mq;
-        W -= (-0.952440631*pow(W,5.0/3) + W/4)*(1 - e);
         double u = cbrt(W + sqrt(W*W + 1));
         double t = u - 1.0/u;
         E = 2*atan(t/f);
       }
+      break;
+    case 9:                     /* Louis Strous suggestion */
+      E = M + e*(1 + e*e*0.5)*sqrt(M)*sqrt(TWOPI - M)*M_2_SQRTPI/4;
+      break;
+    case 10:                     /* Louis Strous suggestion */
+      E = M + e*(1 + e*e*0.2)*sqrt(M)*sqrt(TWOPI - M)*M_2_SQRTPI/4;
       break;
     default:
       {
@@ -3545,8 +3561,22 @@ double kepler_q(double Mq, double e)
       E += d;
       ++count;
       ad = fabs(d);
-    } while (ad && (ad < prev_ad || ad > FLT_EPSILON));
-    return return_count? count: f*tan(E/2);
+      /* Stop if the correction == 0.  Stop if the correction exceeds
+         the previous correction in magnitude and is smaller than
+         1e-7.  Stop if the correction exceeds the previous correction
+         in magnitude and we've had more than 10 iterations.
+         Otherwise continue.  Stop if
+         ad == 0 ∨ (ad ≥ prev_ad && ad ≤ 1e-7) ∨ (ad ≥ prev_ad && count ≥ 10)
+         I.e., stop if
+         ad == 0 ∨ (ad ≥ prev_ad ∧ (ad ≤ 1e-7 ∨ count ≥ 10))
+         I.e., continue if
+         (ad != 0 ∧ (ad < prev_ad ∨ (ad > 1e-7 ∧ count < 10)))
+         */
+    } while (ad && (ad < prev_ad || (ad > 1e-7 && count < 10)));
+    if (ad >= 1e-7 && count >= 10) /* unable to solve */
+      return return_count? INFTY: NAN;
+    else
+      return return_count? count: f*tan(E/2);
   } else if (e > 1) {	/* hyperbolic orbit */;
     /* M = √(γ/|a|³) = √(γ(e-1)³/q³) = (e-1)^(3/2) Mq */
     /* ∆H = (e sinh H - H - M)/(1 - e cosh H)
@@ -3557,15 +3587,29 @@ double kepler_q(double Mq, double e)
     double ad = HUGE_VAL;
     double H;
     switch (kind) {
-    case 4:                     /* high-eccentricity approximation */
-      {
-        double r = M/e;
-        r = 2*r*(r + 1)/(r + 2);
-        H = log1p(r);
-      }
+    case 1:                     /* for large e and small M */
+      H = M/e;
       break;
-    case 5:                     /* parabolic approximation */
+    case 2:                     /* for large e and large M */
+      H = copysign(log1p(2*fabs(M)/e), M);
+      break;
+    case 3:                     /* for small Mq, near parabolic */
+      H = M/z;
+      break;
+    case 4:                     /* for medium Mq, near parabolic */
+      H = cbrt(6*M);
+      break;
+    case 5:                     /* for large Mq, near parabolic */
+      H = copysign(log1p(2*fabs(M)), M);
+      break;
+    case 6:
+      H = M_PI;
+      break;
+    case 7:                     /* parabolic approximation */
       {
+        double l = 4/(3*g);
+        if (fabs(Mq) > fabs(l))
+          Mq = l;
         double W = 0.75*M_SQRT2*Mq;
         double u = cbrt(W + sqrt(W*W + 1));
         double t = u - 1.0/u;   /* tan ½ν */
@@ -3576,10 +3620,13 @@ double kepler_q(double Mq, double e)
         H = 2*atanh(t);
       }
       break;
-    case 6:                     /* near-parabolic approximation */
+    case 8:                     /* near-parabolic approximation */
       {
+        Mq *= (1 + z/4);
+        double l = 4/(3*g);
+        if (fabs(Mq) > fabs(l))
+          Mq = l;
         double W = 0.75*M_SQRT2*Mq;
-        W -= (-0.952440631*pow(W,5.0/3) + W/4)*(1 - e);
         double u = cbrt(W + sqrt(W*W + 1));
         double t = u - 1.0/u;   /* tan ½ν */
         /* for a hyperbola, |tan ½ν| cannot exceed f */
@@ -3602,8 +3649,11 @@ double kepler_q(double Mq, double e)
       H += d;
       ++count;
       ad = fabs(d);
-    } while (ad && (ad < prev_ad || ad > FLT_EPSILON));
-    return return_count? count: f*tanh(H/2);
+    } while (ad && (ad < prev_ad || (ad > 1e-7 && count < 10)));
+    if (ad >= 1e-7 && count >= 10) /* unable to solve */
+      return return_count? INFTY: NAN;
+    else
+      return return_count? count: f*tanh(H/2);
   } else {			/* parabolic orbit */
     double W = 0.75*M_SQRT2*Mq;
     double u = cbrt(W + sqrt(W*W + 1));

@@ -29,7 +29,7 @@ if HAVE_DOXYGEN
 
 doxy: doxyfile.stamp
 
-doxyfile.stamp: $(top_builddir)/src/liblux.a
+doxyfile.stamp: $(top_builddir)/src/liblux.a Doxyfile
 	$(DOXYGEN) Doxyfile
 	touch doxyfile.stamp
 

@@ -453,7 +453,7 @@ Int lux_reverse(Int narg, Int ps[])
 	return LUX_ERROR;
       if (i != srcinfo.naxes)
 	return cerror(INCMP_ARG, ps[2]); 
-      iq = lux_float(1, ps + 2);
+      iq = lux_double(1, ps + 2);
       numerical(iq, NULL, NULL, NULL, &center);
     } else
       center.v = NULL;
@@ -2853,7 +2853,7 @@ Int lux_subsc_subgrid(Int narg, Int ps[])
   Byte	class, type;
   Int	ndim, *dims, i, subsc[MAX_DIMS], nSubsc, iq, j, mid,
     stride[MAX_DIMS], index, tally[MAX_DIMS], step[2][MAX_DIMS];
-  float	*coord[MAX_DIMS], d[MAX_DIMS];
+  double	*coord[MAX_DIMS], d[MAX_DIMS];
   scalar	value, cvalue;
   pointer	src, out;
 
@@ -2887,7 +2887,7 @@ Int lux_subsc_subgrid(Int narg, Int ps[])
 	    return cerror(INCMP_DIMS, iq);
 	} else
 	  nSubsc = array_size(iq);
-	subsc[i] = lux_float(1, &iq);
+	subsc[i] = lux_double(1, &iq);
 	coord[i] = array_data(subsc[i]);
 	break;
       case LUX_SCALAR:
@@ -2896,8 +2896,8 @@ Int lux_subsc_subgrid(Int narg, Int ps[])
 	    return cerror(INCMP_DIMS, iq);
 	} else
 	  nSubsc = 1;
-	subsc[i] = lux_float(1, &iq);
-	coord[i] = &scalar_value(subsc[i]).f;
+	subsc[i] = lux_double(1, &iq);
+	coord[i] = &scalar_value(subsc[i]).d;
 	break;
       default:
 	return cerror(ILL_CLASS, iq);

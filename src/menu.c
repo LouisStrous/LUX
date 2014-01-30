@@ -45,7 +45,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #define TEXTMENU	1
 
 Int	lux_replace(Int, Int), define_menu(Int, Int, Int, Int []),
-  redefine_menu(Int, Int []), coordTrf(float *, float *, Int, Int),
+  redefine_menu(Int, Int []), coordTrf(double *, double *, Int, Int),
   set_defw(Int);
 void	printfw(char *, ...);
 
@@ -69,7 +69,7 @@ Window	menu_win[MAXMENU], inverted_pane = NONE;
 GC	menugc, menurgc;
 Cursor	cursor;
 Int	last_menu, menu_item, fontheight, fontwidth;
-float	menu_x, menu_y;
+double	menu_x, menu_y;
 Int	text_menus = 0;
 
 void	delete_menu(Int);
@@ -423,8 +423,8 @@ Int lux_wait_for_menu(Int narg, Int ps[])
        last_menu = theMenu;
        menu_item = theItem;
        last_time = (double) event.xbutton.time/1000.0;
-       menu_x = (float) event.xbutton.x/((float) fontwidth);
-       menu_y = (float) event.xbutton.y/((float) fontheight);
+       menu_x = (double) event.xbutton.x/((double) fontwidth);
+       menu_y = (double) event.xbutton.y/((double) fontheight);
        paint_pane(theMenu, theItem, BLACK);
        paint_pane(theMenu, theItem, WHITE);
        XFlush(display);
@@ -743,7 +743,7 @@ static Int	N_XMask = sizeof(eventCode)/sizeof(Int);
 Int	lux_event, eventSource;
 extern Int	lux_button, root_x, root_y, xcoord, ycoord, last_wid,
 		ht[], wd[];
-extern float	xhair, yhair;
+extern double	xhair, yhair;
 extern Window	win[];
 
 Int lux_register_event(Int narg, Int ps[])
@@ -1055,8 +1055,8 @@ Int lux_xloop(Int narg, Int ps[])
 	    case XLOOP_MENU:	/* button press in LUX menu envelope */
 	      return luxerror("?? button press in enveloping menu window?", 0);
 	    default:		/* button press in LUX menu item */
-	      menu_x = (float) event.xbutton.x / (float) fontwidth;
-	      menu_y = (float) event.xbutton.y / (float) fontheight;
+	      menu_x = (double) event.xbutton.x / (double) fontwidth;
+	      menu_y = (double) event.xbutton.y / (double) fontheight;
 	      eventSource = i | X_MENU;
 	      last_menu = i;
 	      menu_item = j;

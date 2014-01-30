@@ -1430,7 +1430,7 @@ Int index_total(Int narg, Int ps[], Int mean)
   scalar	temp, value;
   floatComplex	tempcf, valuecf;
   doubleComplex	tempcd, valuecd;
-  float	temp2f;
+  double	temp2f;
   double	temp2d;
   Byte	*present;
   extern scalar	lastmin, lastmax;
@@ -3172,7 +3172,7 @@ Int total(Int narg, Int ps[], Int mean)
   scalar	sum, value, temp, w;
   floatComplex	sumcf, tempcf, valuecf;
   doubleComplex	sumcd, tempcd, valuecd;
-  float	temp2f;
+  double	temp2f;
   double	temp2d;
   pointer	src, trgt, weights;
   loopInfo	srcinfo, trgtinfo, winfo;
@@ -5058,8 +5058,8 @@ Int math_funcs(Int nsym, Int code)
   /* check that <nsym> is numerical.  Return its number of elements in
      <n>, a pointer to its data in <src>.  Also generate a garbage
      clone in <result> with its data type equal to the greater of
-     <nsym>'s and LUX_FLOAT and return its pointer in <trgt>. */
-  if (getNumerical(nsym, LUX_FLOAT, &n, &src, GN_UPGRADE, &result, &trgt) < 0)
+     <nsym>'s and LUX_DOUBLE and return its pointer in <trgt>. */
+  if (getNumerical(nsym, LUX_DOUBLE, &n, &src, GN_UPGRADE, &result, &trgt) < 0)
     return LUX_ERROR;		/* result */
   out_type = symbol_type(result);
   /*addresses and count set up, now do the calculations in a loop determined

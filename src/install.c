@@ -3957,7 +3957,7 @@ Int lux_symbol_memory()
 Int lux_trace(Int narg, Int ps[])
 /* activates/deactivates trace facility */
 {
-  extern float	CPUtime;
+  extern double	CPUtime;
 
   if (narg > 0)
     trace = int_arg(*ps);
@@ -3989,7 +3989,7 @@ Int lux_trace(Int narg, Int ps[])
       printw(".\nRegular SHOWSTATS output");
     if (traceMode & T_CPUTIME) {
       printw(".  CPUtime output");
-      CPUtime = (float) clock()/CLOCKS_PER_SEC;
+      CPUtime = (double) clock()/CLOCKS_PER_SEC;
     }
     if (traceMode & T_SHOWEXEC)
       printw(".  Statement execution index");
@@ -4024,7 +4024,7 @@ Int range_warn_flag = 0, redim_warn_flag = 0, error_extra = 0,
   MSBfirst, area_diag = 1, lastmean_sym, lastsdev_sym, r_d_sym,
   d_r_sym;
 
-float	contour_dash_lev, contour_tick_fac = 0.5, *p3d;
+double	contour_dash_lev, contour_tick_fac = 0.5, *p3d;
 scalar	lastmin, lastmax, lastmean, lastsdev;
 extern Int	lunplt, landscape, iorder, ilabx, ilaby, irxf, iryf, ndx,
         ndxs, nd, ndys, ifz, ifzx, ier, ifont, ndlabx, ndlaby, 
@@ -4037,7 +4037,7 @@ extern double	meritc;
 #if MOTIF
 extern Int	radio_state, radio_button;
 #endif
-extern float	xfac, yfac, xmin, xmax, ymin, ymax,
+extern double	xfac, yfac, xmin, xmax, ymin, ymax,
 	wxb, wxt, wyb, wyt, ticx, ticxr, ticy, ticyr, plims[],
 	fsized,	symsize, symratio, startx, starty, stepx, stepy,
 	callig_xb, callig_yb, callig_ratio, slabx, slaby,
@@ -4047,7 +4047,7 @@ extern Word	*stackPointer;
 
 #if DEVELOP
 extern Int	irzf, ifzz, ndz, ndzs, resample_type, fstepz;
-extern float	wzb, wzt, ticz, ticzr, zmin, zmax, defaultProjection[], dvz;
+extern double	wzb, wzt, ticz, ticzr, zmin, zmax, defaultProjection[], dvz;
 #endif
 
 #if HAVE_LIBX11
@@ -4060,7 +4060,7 @@ extern Int lux_button, eventSource, xcoord, ycoord, lux_keycode, lux_keysym,
   xerrors, last_wid, display_width, display_height, private_colormap,
   zoom_frame, foreground_pixel, nColors, colormin, colormax, lux_keystate;
 
-extern float	tviy, tviyb, tvix, tvixb, xhair, yhair, menu_x, menu_y,
+extern double	tviy, tviyb, tvix, tvixb, xhair, yhair, menu_x, menu_y,
 		tvscale, zoom_xc, zoom_yc, zoom_mag, lumpx;
 extern double	last_time, zoom_clo, zoom_chi;
 #endif
@@ -4314,15 +4314,15 @@ void symbolInitialization(void)
  iq = installString("#P3D");
  projectSym = findVar(iq, 0);
  sym[projectSym].class = LUX_ARRAY;
- array_type(projectSym) = LUX_FLOAT;
+ array_type(projectSym) = LUX_DOUBLE;
  symbol_memory(projectSym) =
-   sizeof(array) + 16*sizeof(float);
+   sizeof(array) + 16*sizeof(double);
  eallocate(p, i, char);
  array_header(projectSym) = (array *) p;
  array_num_dims(projectSym) = 2;
  array_dims(projectSym)[0] = array_dims(projectSym)[1] = 4;
- memcpy(array_data(projectSym), defaultProjection, 16*sizeof(float));
- p3d = (float *) array_data(projectSym);
+ memcpy(array_data(projectSym), defaultProjection, 16*sizeof(double));
+ p3d = (double *) array_data(projectSym);
  nFixed++;
 #endif
 
@@ -4353,10 +4353,10 @@ void symbolInitialization(void)
 #if HAVE_LIBX11
  l_ptr("!BUTTON",	&lux_button);
 #endif
- f_ptr("!BXB",		&postXBot);
- f_ptr("!BXT",		&postXTop);
- f_ptr("!BYB",		&postYBot);
- f_ptr("!BYT",		&postYTop);
+ d_ptr("!BXB",		&postXBot);
+ d_ptr("!BXT",		&postXTop);
+ d_ptr("!BYB",		&postYBot);
+ d_ptr("!BYT",		&postYTop);
  fnc_p("!CJD",		12);
  l_ptr("!COL",		&uTermCol);
 #if HAVE_LIBX11
@@ -4371,11 +4371,11 @@ void symbolInitialization(void)
  l_ptr("!CONTOUR_STYLE",	&contour_style);
  l_ptr("!CONTOUR_TICKS", 	&contour_ticks);
  l_ptr("!CONTOUR_TICK_PEN", 	&contour_tick_pen);
- f_ptr("!CONTOUR_TICK_FAC", 	&contour_tick_fac);
+ d_ptr("!CONTOUR_TICK_FAC", 	&contour_tick_fac);
  fnc_p("!CPUTIME",	2);
- f_ptr("!CRATIO",	&callig_ratio);
+ d_ptr("!CRATIO",	&callig_ratio);
  l_ptr("!CRUNCH_BITS",	&crunch_bits);
- f_ptr("!CRUNCH_BPP",	&crunch_bpp);
+ d_ptr("!CRUNCH_BPP",	&crunch_bpp);
  l_ptr("!CRUNCH_SLICE", &crunch_slice);
  fnc_p("!CTIME",	5);
  f_ptr("!DASHSIZE",	&dashsize);
@@ -4405,7 +4405,7 @@ void symbolInitialization(void)
  fmt_float = string_value(fformat);
  fmt_string = string_value(sformat);
  fmt_complex = string_value(cformat);
- f_ptr("!FSIZE",	&fsized);
+ d_ptr("!FSIZE",	&fsized);
  l_ptr("!FSTEPX",	&fstepx);
  l_ptr("!FSTEPY",	&fstepy);
 #if DEVELOP
@@ -4416,7 +4416,7 @@ void symbolInitialization(void)
 #if DEVELOP
  l_ptr("!FZZ",		&ifzz);
 #endif
- f_ptr("!HEIGHT",	&yfac);
+ d_ptr("!HEIGHT",	&yfac);
  l_ptr("!HISTMIN", 	&histmin);
  l_ptr("!HISTMAX", 	&histmax);
  l_ptr("!IBLANK",	&iblank);
@@ -4447,7 +4447,7 @@ void symbolInitialization(void)
  l_ptr("!LASTSDEV",	&lastsdev);
 #if HAVE_LIBX11
  l_ptr("!LAST_MENU",	&last_menu);
- f_ptr("!LUMPX",	&lumpx);
+ d_ptr("!LUMPX",	&lumpx);
 #endif
  l_ptr("!MAXHISTSIZE", 	&maxhistsize);
  l_ptr("!MAXREGRIDSIZE", &maxregridsize);
@@ -4458,13 +4458,13 @@ void symbolInitialization(void)
 #if MOTIF
  l_ptr("!MOTIF",	&motif_flag);
 #endif
- f_ptr("!MXB",		&xmin);
- f_ptr("!MXT",		&xmax);
- f_ptr("!MYB",		&ymin);
- f_ptr("!MYT",		&ymax);
+ d_ptr("!MXB",		&xmin);
+ d_ptr("!MXT",		&xmax);
+ d_ptr("!MYB",		&ymin);
+ d_ptr("!MYT",		&ymax);
 #if DEVELOP
- f_ptr("!MZB",		&zmin);
- f_ptr("!MZT",		&zmax);
+ d_ptr("!MZB",		&zmin);
+ d_ptr("!MZT",		&zmax);
 #endif
  l_ptr("!NARG",		&nArg);
 #if HAVE_LIBX11
@@ -4477,8 +4477,8 @@ void symbolInitialization(void)
  l_ptr("!PDEV", 	&lunplt);
  l_ptr("!PEN",		&current_pen);
  l_ptr("!PLTYP",	&ipltyp);
- f_ptr("!PLXERRB",	&xerrsize);
- f_ptr("!PLYERRB",	&yerrsize);
+ d_ptr("!PLXERRB",	&xerrsize);
+ d_ptr("!PLYERRB",	&yerrsize);
 #if HAVE_LIBX11
  l_ptr("!PRIVATE_COLORMAP", &private_colormap);
 #endif
@@ -4508,80 +4508,80 @@ void symbolInitialization(void)
  l_ptr("!SCREEN_WIDTH",	&display_width);
 #endif
  l_ptr("!SORT_FLAG",	&sort_flag);
- f_ptr("!STARTX",	&startx);
- f_ptr("!STARTY",	&starty);
- f_ptr("!STEPX",	&stepx);
- f_ptr("!STEPY",	&stepy);
- f_ptr("!SYMRATIO",	&symratio);
- f_ptr("!SYMSIZE",	&symsize);
+ d_ptr("!STARTX",	&startx);
+ d_ptr("!STARTY",	&starty);
+ d_ptr("!STEPX",	&stepx);
+ d_ptr("!STEPY",	&stepy);
+ d_ptr("!SYMRATIO",	&symratio);
+ d_ptr("!SYMSIZE",	&symsize);
  fnc_p("!SYSTIME",	10);
 #if HAVE_LIBX11
  l_ptr("!TEXTMENUS",	&text_menus); /* development of text menus */
 #endif
- f_ptr("!TICKX",	&ticx);
- f_ptr("!TICKXR",	&ticxr);
- f_ptr("!TICKY",	&ticy);
- f_ptr("!TICKYR",	&ticyr);
+ d_ptr("!TICKX",	&ticx);
+ d_ptr("!TICKXR",	&ticxr);
+ d_ptr("!TICKY",	&ticy);
+ d_ptr("!TICKYR",	&ticyr);
 #if DEVELOP
- f_ptr("!TICKZ",	&ticz);
- f_ptr("!TICKZR",	&ticzr);
+ d_ptr("!TICKZ",	&ticz);
+ d_ptr("!TICKZR",	&ticzr);
 #endif
  fnc_p("!TIME",		6);
 #if HAVE_LIBX11
- f_ptr("!TVIX",		&tvix);
- f_ptr("!TVIXB",	&tvixb);
- f_ptr("!TVIY",		&tviy);
- f_ptr("!TVIYB",	&tviyb);
+ d_ptr("!TVIX",		&tvix);
+ d_ptr("!TVIXB",	&tvixb);
+ d_ptr("!TVIY",		&tviy);
+ d_ptr("!TVIYB",	&tviyb);
  l_ptr("!TVPLANEZOOM",	&tvplanezoom); /* browser */
 #endif
 #if HAVE_LIBX11
- f_ptr("!TVSCALE",	&tvscale);
+ d_ptr("!TVSCALE",	&tvscale);
 #endif
  l_ptr("!TVSMT",	&tvsmt);
  l_ptr("!PROJECT",	&projectTk);
- f_ptr("!WIDTH",	&xfac);
+ d_ptr("!WIDTH",	&xfac);
 #if HAVE_LIBX11
  l_ptr("!WINDOW",	&last_wid);
 #endif
- f_ptr("!WXB", 		&wxb);
- f_ptr("!WXT", 		&wxt);
- f_ptr("!WYB", 		&wyb);
- f_ptr("!WYT", 		&wyt);
+ d_ptr("!WXB", 		&wxb);
+ d_ptr("!WXT", 		&wxt);
+ d_ptr("!WYB", 		&wyb);
+ d_ptr("!WYT", 		&wyt);
 #if DEVELOP
- f_ptr("!WZB",		&wzb);
- f_ptr("!WZT",		&wzt);
+ d_ptr("!WZB",		&wzb);
+ d_ptr("!WZT",		&wzt);
 #endif
- f_ptr("!XB",		&plims[0]);
- f_ptr("!XC",		&callig_xb);
+ d_ptr("!XB",		&plims[0]);
+ d_ptr("!XC",		&callig_xb);
 #if HAVE_LIBX11
  l_ptr("!XERRORS",	&xerrors);
- f_ptr("!XF",		&xhair);
- f_ptr("!XMENU",	&menu_x);
+ d_ptr("!XF",		&xhair);
+ d_ptr("!XMENU",	&menu_x);
 #endif
- f_ptr("!XT",		&plims[1]);
+ d_ptr("!XT",		&plims[1]);
 #if HAVE_LIBX11
  d_ptr("!XTIME",	&last_time);
 #endif
- f_ptr("!YB",		&plims[2]);
- f_ptr("!YC",		&callig_yb);
+ d_ptr("!YB",		&plims[2]);
+ d_ptr("!YC",		&callig_yb);
 #if HAVE_LIBX11
- f_ptr("!YF",		&yhair);
- f_ptr("!YMENU",	&menu_y);
+ d_ptr("!YF",		&yhair);
+ d_ptr("!YMENU",	&menu_y);
 #endif
- f_ptr("!YT",		&plims[3]);
+ d_ptr("!YT",		&plims[3]);
 #if YYDEBUG
  l_ptr("!YYDEBUG",	&yydebug);
 #endif
- f_ptr("!ZB",		&plims[4]);
+ d_ptr("!ZB",		&plims[4]);
 #if HAVE_LIBX11
  l_ptr("!ZOOMFRAME",	&zoom_frame);
  d_ptr("!ZOOMHIGH",	&zoom_chi);
  d_ptr("!ZOOMLOW",	&zoom_clo);
- f_ptr("!ZOOMMAG",	&zoom_mag);
- f_ptr("!ZOOMX",	&zoom_xc);
- f_ptr("!ZOOMY",	&zoom_yc);
+ d_ptr("!ZOOMMAG",	&zoom_mag);
+ d_ptr("!ZOOMX",	&zoom_xc);
+ d_ptr("!ZOOMY",	&zoom_yc);
 #endif
- f_ptr("!ZT",		&plims[5]);
+ d_ptr("!ZT",		&plims[5]);
 
 #if MOTIF
  l_ptr("$RADIO_BUTTON",	&radio_button);

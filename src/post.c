@@ -36,8 +36,8 @@ Int	ipen = 7, ipost = 0;
 extern Int	landscape;
 static Int	nline = 0,	/* number of lines since last Stroke */
   icnt = 0;			/* number of chars on current output line */
-static float	xq, yq;
-extern float	current_gray;
+static double	xq, yq;
+extern double	current_gray;
 extern Int	current_pen;
 FILE	*postScriptFp;
 void	xyup(void), xydown(void);
@@ -88,7 +88,7 @@ Int postreset(Int landscape)
  return 1;
 }
 /*------------------------------------------------------------------------*/
-Int postpen(Int pen, float gray)
+Int postpen(Int pen, double gray)
 {
   if (postreset(landscape) == LUX_ERROR) /* start up if not already */
     return LUX_ERROR;
@@ -104,7 +104,7 @@ Int postpen(Int pen, float gray)
   return 1;
 }
 /*------------------------------------------------------------------------*/
-Int postcolorpen(float red, float green, float blue)
+Int postcolorpen(double red, double green, double blue)
 {
   postreset(landscape);		/* start up if not already */
   if (nline) {
@@ -119,7 +119,7 @@ Int postcolorpen(float red, float green, float blue)
   return 1;
 }
 /*------------------------------------------------------------------------*/
-Int postvec(float xin, float yin, Int mode)
+Int postvec(double xin, double yin, Int mode)
 {
   if (postreset(landscape) == LUX_ERROR) /* start up if not already */
     return LUX_ERROR;
@@ -196,12 +196,12 @@ Int postrawout(char *s)
   return 1;
 }
 /*------------------------------------------------------------------------*/
-Int postgray(char *barray, Int nx, Int ny, float xbot, float xtop, float ybot,
-	     float ytop, Int iorder)
+Int postgray(char *barray, Int nx, Int ny, double xbot, double xtop, double ybot,
+	     double ytop, Int iorder)
 {
   Int	matrx[6], i;
   Int	c;
-  extern float	postXBot, postXTop, postYBot, postYTop;
+  extern double	postXBot, postXTop, postYBot, postYTop;
 
   for (i = 0; i < 6; i++)
     matrx[i] = 0;
@@ -291,8 +291,8 @@ Int postgray(char *barray, Int nx, Int ny, float xbot, float xtop, float ybot,
   return 1;
 }
 /*------------------------------------------------------------------------*/
-Int postcolor(char *barray, Int nx, Int ny, float xbot, float xtop, float ybot,
-	      float ytop, Int iorder)
+Int postcolor(char *barray, Int nx, Int ny, double xbot, double xtop, double ybot,
+	      double ytop, Int iorder)
 /* writes an RGB image to a postscript file.  The image has dimensions
  <nx> by <ny> and has three bytes of color information per pixel, in
  the order red, green, blue.  <xbot>, <xtop>, <ybot>, <ytop> selects
@@ -301,7 +301,7 @@ Int postcolor(char *barray, Int nx, Int ny, float xbot, float xtop, float ybot,
 {
   Int	matrx[6], i, s;
   Int	c;
-  extern float	postXBot, postXTop, postYBot, postYTop;
+  extern double	postXBot, postXTop, postYBot, postYTop;
 
   for (i = 0; i < 6; i++)
     matrx[i] = 0;
@@ -399,18 +399,18 @@ Int postrelease(Int narg, Int ps[])
 {
   char  ok = 0;
   Int	bb1, bb2, bb3, bb4;
-  extern float	postXBot, postXTop, postYBot, postYTop;
+  extern double	postXBot, postXTop, postYBot, postYTop;
   extern Int	psfile;
 
   if (ipost) {
     if (narg)
-      bb1 = float_arg(*ps++);
+      bb1 = double_arg(*ps++);
     if (narg > 1)
-      bb2 = float_arg(*ps++);
+      bb2 = double_arg(*ps++);
     if (narg > 2)
-      bb3 = float_arg(*ps++);
+      bb3 = double_arg(*ps++);
     if (narg > 3)
-      bb4 = float_arg(*ps++);
+      bb4 = double_arg(*ps++);
     fputs("\n", postScriptFp);
     icnt = 0;
     if (nline) 

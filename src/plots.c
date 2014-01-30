@@ -35,16 +35,16 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "action.h"
 
 extern	Int	lastmin_sym, lastmax_sym;
-extern	float	callig_xb, callig_yb;
+extern	double	callig_xb, callig_yb;
 		 /* some common variables */
 array	*h;
 pointer q1, q2, q3, q4;
-Int	tkplot(float x, float y, Int lineStyle, Int symStyle),
-	callig(char *, float, float, float, float, Int, Int),
-	sform(float, float);
+Int	tkplot(double x, double y, Int lineStyle, Int symStyle),
+	callig(char *, double, double, double, double, Int, Int),
+	sform(double, double);
  /* plotting context */
 Int	lunplt = 0, ixlow, ixhigh, iylow, iyhigh, standardGray;
-float	xfac = 512.0, yfac = 512.0, xerrsize = 0.05, yerrsize = 0.05;
+double	xfac = 512.0, yfac = 512.0, xerrsize = 0.05, yerrsize = 0.05;
 Int	numarrays, numstrings, numscalars;
 static	Int	xsym, ysym, xtitlesym, ytitlesym, titlesym, symStyle, nx, ny,
   exsym, eysym;
@@ -53,29 +53,29 @@ static	Int	nelem, isym, nbreak, *qi, huge = INT32_MAX, dq3, dq4,
 char	form[20], label[25], callig_update = 1, *plotxfmt = "%1g",
   *plotyfmt = "%1g";
 Int	landscape = 1, iorder = 0, current_pen = 3;
-float	current_gray = 1, startx, stepx, starty, stepy;
+double	current_gray = 1, startx, stepx, starty, stepy;
  /* contents of VMS common plots follows */
 Int	ilabx = 1, ilaby = 1, irxf = 1, iryf = 1, ndx, fstepx = 0, fstepy = 0;
 Int	nd, ipltyp, ifz = 0, ifzx = 1, ndxs, ndys, ier = 1;
 Int	ifont = 3, ndlabx = 2, ndlaby = 2, iblank = 1, ndot = 1, ifirstflag;
-float	xmin, xmax, ymin, ymax;
-float	wxb = 0.15, wxt = 0.9, wyb = 0.1, wyt = 0.7;
-float	ticx = 0.01, ticy = 0.01, plims[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0}, 
+double	xmin, xmax, ymin, ymax;
+double	wxb = 0.15, wxt = 0.9, wyb = 0.1, wyt = 0.7;
+double	ticx = 0.01, ticy = 0.01, plims[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0}, 
 	xlimit = 0.9999, ylimit = 0.9999;
-float	fsized = 1, symsize = 1.0, dashsize = 1.0, theDashSize = 1.0;
-float	symratio = 1.0, ticxr = 0.5, ticyr = 0.5, dvx, dv;
+double	fsized = 1, symsize = 1.0, dashsize = 1.0, theDashSize = 1.0;
+double	symratio = 1.0, ticxr = 0.5, ticyr = 0.5, dvx, dv;
  /* end of VMS  common plots */
 Int	useProjection = 0, oldLineStyle = 0;
-static float	zero = 0.0, one = 0.99999999;
-float	*plotWindow[4] = { &wxb, &wxt, &wyb, &wyt }, 
+static double	zero = 0.0, one = 0.99999999;
+double	*plotWindow[4] = { &wxb, &wxt, &wyb, &wyt }, 
 	*screenWindow[4] = { &zero, &one, &zero, &one };
 Int	tkCoordSys = LUX_DEP;
 extern Int	projectTk;
-extern float	*projectMatrix;
-Int	createFullProjection(float *, float *, float *), 
-	coordTrf(float *, float *, Int, Int);
+extern double	*projectMatrix;
+Int	createFullProjection(double *, double *, double *), 
+	coordTrf(double *, double *, Int, Int);
  /* for bounding box LS 18jan95: */
-float	postXBot = FLT_MAX, postXTop = -FLT_MAX, 
+double	postXBot = FLT_MAX, postXTop = -FLT_MAX, 
 	postYBot = FLT_MAX, postYTop = -FLT_MAX;
 Int	updateBoundingBox = 1;	/* if 1, then everything counts */
 /* bounding box control is necessary for PLOT, XYMOV, TV */
@@ -83,13 +83,13 @@ Int	updateBoundingBox = 1;	/* if 1, then everything counts */
 Int	alternateDash = 0;	/* if nonzero, then xymov "moves" are
 				   displayed as "draws" in background
 				   color instead. */
-float   lumpx = 0;		/* the desired resolution in the x direction */
+double   lumpx = 0;		/* the desired resolution in the x direction */
 				/* in plots (0 = full) */
 
 void	set_cur_pen(void);
 
 #ifdef DEVELOP
-extern float	*currentOblique, *currentPerspective;
+extern double	*currentOblique, *currentPerspective;
 #endif
  /*------------------------------------------------------------------------- */
 enum { POSSYM, NEGSYM, POSLINE, ZEROS, NONE };
@@ -219,13 +219,13 @@ Int lux_plot(Int narg, Int ps[]) /* plot routine */
  /* plots data */
 {
   Int	oldIer = ier, n;
-  Int	preplot(Int, Int []), plotxy(float [], float [], float [], float [],
+  Int	preplot(Int, Int []), plotxy(double [], double [], double [], double [],
 				     Int, Int, Int), labels(void);
 
   ier = (internalMode & 64)? 0: ier; /* /KEEP: erase before plotting? */
   n = ((lunplt != 0 || setup_x() == LUX_OK)
        && (preplot(narg, ps) == LUX_OK)
-       && (plotxy(q1.f, q2.f, q3.f, q4.f, nelem, dq3, dq4) == LUX_OK)
+       && (plotxy(q1.d, q2.d, q3.d, q4.d, nelem, dq3, dq4) == LUX_OK)
        //       && (labels() == LUX_OK)
     );
   ier = oldIer;
@@ -236,12 +236,12 @@ Int lux_oplot(Int narg, Int ps[]) /* oplot routine */
  /* over plot data */
 {
   Int	preplot(Int, Int []),
-    oplotx(float [], float [], float [], float [], Int, Int, Int);
+    oplotx(double [], double [], double [], double [], Int, Int, Int);
 
   if ((lunplt == 0 && setup_x() != LUX_OK)
       || preplot(narg, ps) != 1
       || fixPlotStyle(&symStyle, &lineStyle) < 0
-      || oplotx(q1.f, q2.f, q3.f, q4.f, nelem, dq3, dq4) != 1)
+      || oplotx(q1.d, q2.d, q3.d, q4.d, nelem, dq3, dq4) != 1)
     return LUX_ERROR;
   return 1; 
 }
@@ -278,13 +278,13 @@ Int preplot(Int narg, Int ps[])
 	      lineStyle = int_arg(iq);
 	      break;
 	    case 2:
-	      theDashSize = float_arg(iq);
+	      theDashSize = double_arg(iq);
 	      break;
 	    case 3:
-	      xerrsize = fabs(float_arg(iq));
+	      xerrsize = fabs(double_arg(iq));
 	      break;
 	    case 4:
-	      yerrsize = fabs(float_arg(iq));
+	      yerrsize = fabs(double_arg(iq));
 	      break;
 	    default:
 	      printf("too many scalars in list\n");	
@@ -297,13 +297,13 @@ Int preplot(Int narg, Int ps[])
 	      lineStyle = int_arg(iq);
 	      break;
 	    case 7:
-	      theDashSize = float_arg(iq);
+	      theDashSize = double_arg(iq);
 	      break;
 	    case 11:
-	      xerrsize = fabs(float_arg(iq));
+	      xerrsize = fabs(double_arg(iq));
 	      break;
 	    case 12:
-	      yerrsize = fabs(float_arg(iq));
+	      yerrsize = fabs(double_arg(iq));
 	      break;
 	    default:
 	      printf("non-scalar argument expected for %s\n", 
@@ -415,16 +415,16 @@ Int preplot(Int narg, Int ps[])
       return cerror(ILL_ARG_LIST, 0);
     }
     ysym = xsym;		/* only one array, gen an x array */
-    ysym = lux_float(1, &ysym);
+    ysym = lux_double(1, &ysym);
     xsym = array_clone(ysym, sym[ysym].type);
     xsym = lux_indgen(1, &xsym); /* x specified */
   }
-  xsym = lux_float(1, &xsym);
+  xsym = lux_double(1, &xsym);
   nx = array_size(xsym);
-  q1.f = (float *) array_data(xsym);
-  ysym = lux_float(1, &ysym);
+  q1.d = (double *) array_data(xsym);
+  ysym = lux_double(1, &ysym);
   ny = array_size(ysym);
-  q2.f = (float *) array_data(ysym);
+  q2.d = (double *) array_data(ysym);
   nelem = MIN(nx, ny);		/* we use the smaller number of elements */
   if (exsym) {
     if (array_size(exsym) == nelem)
@@ -433,10 +433,10 @@ Int preplot(Int narg, Int ps[])
       dq3 = nelem;
     else
       return cerror(INCMP_ARG, exsym);
-    exsym = lux_float(1, &exsym);
-    q3.f = (float *) array_data(exsym);
+    exsym = lux_double(1, &exsym);
+    q3.d = (double *) array_data(exsym);
   } else
-    q3.f = NULL;		/* no error bars */
+    q3.d = NULL;		/* no error bars */
   if (eysym) {
     if (array_size(eysym) == nelem)
       dq4 = 0;
@@ -444,10 +444,10 @@ Int preplot(Int narg, Int ps[])
       dq4 = nelem;
     else
       return cerror(INCMP_ARG, eysym);
-    eysym = lux_float(1, &eysym);
-    q4.f = (float *) array_data(eysym);
+    eysym = lux_double(1, &eysym);
+    q4.d = (double *) array_data(eysym);
   } else
-    q4.f = NULL;		/* no error bars */
+    q4.d = NULL;		/* no error bars */
   if (isym) {			/* line breaks specified */
     isym = lux_long(1, &isym);
     nbreak = array_size(isym);
@@ -463,7 +463,7 @@ Int preplot(Int narg, Int ps[])
   return 1;
 }
  /*------------------------------------------------------------------------- */
-Int mm(float *x, Int n, float *max, float *min)
+Int mm(double *x, Int n, double *max, double *min)
 {
  /* just return the min and max of a floating array */
   if (n <= 0)
@@ -478,26 +478,26 @@ Int mm(float *x, Int n, float *max, float *min)
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int plotxy(float xx[], float yy[], float ex[], float ey[], Int n, Int dx,
+Int plotxy(double xx[], double yy[], double ex[], double ey[], Int n, Int dx,
 	    Int dy)
 /* xx[]: x coordinates */
 /* yy[]: y coordinates */
 /* n: number of data points */
 {
   Int	ixlog, iylog, i, j;
-  float	x, y, stepxdvi, stepydvi, x2, y2, endx, endy;
-  float	xlabel, f;
+  double	x, y, stepxdvi, stepydvi, x2, y2, endx, endy;
+  double	xlabel, f;
   extern Int	calligCoordSys;
-  extern float	callig_ratio;
+  extern double	callig_ratio;
   char	*p;
-  static float	logs[] = { 0.30103, 0.47712, 0.60206, 0.69897,
+  static double	logs[] = { 0.30103, 0.47712, 0.60206, 0.69897,
 			   0.77815, 0.84510, 0.90309, 0.95424 };
-  void	setupticks(float *min, float *max, Int ndlab, Int fstep, Int ilog,
-		   Int irf, Int f, float wb, float wt, float plim_min,
-		   float plim_max, float *start, float *step, float *end,
-		   float *stepdvi);
+  void	setupticks(double *min, double *max, Int ndlab, Int fstep, Int ilog,
+		   Int irf, Int f, double wb, double wt, double plim_min,
+		   double plim_max, double *start, double *step, double *end,
+		   double *stepdvi);
   Int lux_erase(Int, Int []);
-  Int oplotx(float [], float [], float [], float [], Int, Int, Int);
+  Int oplotx(double [], double [], double [], double [], Int, Int, Int);
 
   iylog = ipltyp % 2;
   ixlog = (ipltyp/2) % 2;
@@ -763,7 +763,7 @@ Int plotxy(float xx[], float yy[], float ex[], float ey[], Int n, Int dx,
   }
 
   if (n > 0) {			/* no bounding box checking required in */
-    Int oplotx(float *, float *, float *, float *, Int, Int, Int);
+    Int oplotx(double *, double *, double *, double *, Int, Int, Int);
    /* oplotx, since all data points fall within the plot window, i.e. */
    /* also within the current bounding box.  May want to check when */
    /* the axis labels and titles are drawn, so don't just set to zero */
@@ -778,7 +778,7 @@ Int plotxy(float xx[], float yy[], float ex[], float ey[], Int n, Int dx,
   return LUX_OK;
 }
 /*------------------------------------------------------------------------- */
-Int positionClassWindow(float x, float y, float **w)
+Int positionClassWindow(double x, double y, double **w)
 /* returns position class of point (x, y) relative to the plot window: */
 /*    0 1 2 */
 /*    3 4 5 */
@@ -805,7 +805,7 @@ Int positionClassWindow(float x, float y, float **w)
 #define FIRST_IN	2
 #define SECOND_IN	3
 #define PART_IN		4
-Int clipToWindow(float *xo, float *yo, float x[2], float y[2], float **w)
+Int clipToWindow(double *xo, double *yo, double x[2], double y[2], double **w)
 /* restricts the line between (*xo, *yo) and (x[0], y[0]) to the part within 
  the window.  returns the coordinates of the moved points in 
  (x[0], y[0]) and, if necessary, (x[1], y[1]), and returns NONE_IN if no 
@@ -818,7 +818,7 @@ Int clipToWindow(float *xo, float *yo, float x[2], float y[2], float **w)
  made finite if necessary, are stored in *xo and *yo on exit.  */
 /* LS 25jun94 */
 {
-  float	dx, dy, *xx, *yy, savex, savey;
+  double	dx, dy, *xx, *yy, savex, savey;
   Int	c1, c2;
   Int	result = NONE_IN;
   static char	action[9][9] = 
@@ -934,14 +934,14 @@ Int clipToWindow(float *xo, float *yo, float x[2], float y[2], float **w)
   return result;
 }
  /*------------------------------------------------------------------------- */
-Int oplotx(float x[], float y[], float ex[], float ey[], Int n, Int dx,
+Int oplotx(double x[], double y[], double ex[], double ey[], Int n, Int dx,
 	   Int dy)
 {
-  float		xx[2], yy[2], xl, yl, xe, ye, xerrs, yerrs;
+  double		xx[2], yy[2], xl, yl, xe, ye, xerrs, yerrs;
   Int	i;
   char	c, noclipbars;
   extern Int	fromCoordinateSystem, toCoordinateSystem, calligCoordSys;
-  Int	coordMap(float *, float *), dashload(Int, Int *, float *, float);
+  Int	coordMap(double *, double *), dashload(Int, Int *, double *, double);
 
   noclipbars = (internalMode & 256) == 0; /* no /CLIPBARS */
   ifirstflag = 1;		/* used by symplot if blanking enabled */
@@ -970,7 +970,7 @@ Int oplotx(float x[], float y[], float ex[], float ey[], Int n, Int dx,
     for (i = 0; i < n; i++) {	/* loop over points */
       if (lumpx) {
 	Int nlump = 1, lumpindex;
-	float sumx, sumy;
+	double sumx, sumy;
 	*xx = x[i];
 	*yy = y[i];
 	coordMap(xx, yy);
@@ -1103,11 +1103,11 @@ Int oplotx(float x[], float y[], float ex[], float ey[], Int n, Int dx,
   return 1;
 }
  /*------------------------------------------------------------------------- */
-Int dashload(Int id, Int *ndash, float *sm, float dashsize)
+Int dashload(Int id, Int *ndash, double *sm, double dashsize)
 {
  static	Int	nds[] = {2, 2, 2, 4,  4,  2,  6,  6,  8,  6};
  static	Int	ip[]  = {0, 2, 4, 6, 10, 14, 16, 22, 28, 36};
- static	float	xlens[] = {
+ static	double	xlens[] = {
    .005, .005,			/* style 10: short-dashed */
    .010, .010,			/* style 11: medium-dashed */
    .020, .020,			/* style 12: long-dashed */
@@ -1127,8 +1127,8 @@ Int dashload(Int id, Int *ndash, float *sm, float dashsize)
  return 1;
 }
  /*------------------------------------------------------------------------- */
-Int setl(float *ymax, float *ymin, Int *nq, float *dv, Int ilog, float wyb, 
-	 float wyt)
+Int setl(double *ymax, double *ymin, Int *nq, double *dv, Int ilog, double wyb, 
+	 double wyt)
 /*
  *ymin: minimum y value on input, minimum plot limit on output
  *ymax: maximum y value on input, maximum plot limit on output
@@ -1140,7 +1140,7 @@ Int setl(float *ymax, float *ymin, Int *nq, float *dv, Int ilog, float wyb,
 */
 				 /* set limits, used for "nice" plot limits */
 {
- float	yn, yx, xq, yq, zq, rdx, xt, xb;
+ double	yn, yx, xq, yq, zq, rdx, xt, xb;
  Int	ilg, j1, j2;
 
  /* if ilog == 1 then log scaling done */
@@ -1209,10 +1209,10 @@ Int setl(float *ymax, float *ymin, Int *nq, float *dv, Int ilog, float wyb,
  return 1;
 }
 /*------------------------------------------------------------------------- */
-void setupticks(float *min, float *max, Int ndlab, Int fstep, Int ilog,
-		Int irf, Int f, float wb, float wt, float plim_min,
-		float plim_max, float *start, float *step, float *end,
-		float *stepdvi)
+void setupticks(double *min, double *max, Int ndlab, Int fstep, Int ilog,
+		Int irf, Int f, double wb, double wt, double plim_min,
+		double plim_max, double *start, double *step, double *end,
+		double *stepdvi)
 /* *min: INPUT: least value in data; OUTPUT: least plot data limit */
 /* *max: INPUT: greatest value in data; OUTPUT: greatest plot data limit */
 /* ndlab: INPUT: number of minor divisions per major division */
@@ -1231,7 +1231,7 @@ void setupticks(float *min, float *max, Int ndlab, Int fstep, Int ilog,
 /* it is assumed that *max != *min, but we may have *max < *min. */
 /* if <ilog> is set, then it is assumed that *min, *max > 0 */
 {
-  float	xq, stepvalue;
+  double	xq, stepvalue;
 
   if (ilog) {			/* logarithmic scale */
     /* we assume that *min > 0 */
@@ -1330,20 +1330,20 @@ void setupticks(float *min, float *max, Int ndlab, Int fstep, Int ilog,
     *end = 0.0;
 }
 /*------------------------------------------------------------------------- */
-Int tkplot(float x, float y, Int lineStyle, Int symStyle)
+Int tkplot(double x, double y, Int lineStyle, Int symStyle)
 /* plots a line segment using style <lineStyle> and puts a symbol */
 /* at the end of type <symStyle>.  Both of these arguments are */
 /* nonnegative numbers.  LS 4feb95 */
 /* Fixed lacking update of xLast, yLast in some cases.  LS 20jul2000 */
 {
   static Int	ndash, depth = 0, id;
-  static float	dashes[10], xLast = -0.0001, yLast = -0.0001;
+  static double	dashes[10], xLast = -0.0001, yLast = -0.0001;
   static char	penState;
-  static float	s;
-  float	dx, dy, s0, sd, xc, yc, xx[2], yy[2];
+  static double	s;
+  double	dx, dy, s0, sd, xc, yc, xx[2], yy[2];
   Int	result, ix, iy;
-  Int	symplot(float, float, Int, Int), 
-  	postvec(float, float, Int);
+  Int	symplot(double, double, Int, Int), 
+  	postvec(double, double, Int);
 #if HAVE_LIBX11
   Int	xwindow_plot(Int, Int, Int);
 #endif
@@ -1372,8 +1372,8 @@ Int tkplot(float x, float y, Int lineStyle, Int symStyle)
     coordTrf(&x, &y, tkCoordSys, LUX_DVI);
 #ifdef DEVELOP
     if (useProjection || projectTk) {
-      Int	project(float, float, float);
-      extern float	projected[];
+      Int	project(double, double, double);
+      extern double	projected[];
       
       project(x, y, 0);
       x = projected[0];
@@ -1482,7 +1482,7 @@ Int lux_pen(Int narg, Int ps[])
   if (narg) {
     current_pen = int_arg( ps[0]);
     if (narg > 1)
-      current_gray = float_arg(ps[1]);
+      current_gray = double_arg(ps[1]);
     standardGray = internalMode & 1;
     set_cur_pen();
   } else
@@ -1496,15 +1496,15 @@ Int lux_pencolor(Int narg, Int ps[])
 {
   Int	iq, nx, xflag, n, nred, ngreen, nblue;
   uint32_t	ired, igreen, iblue;
-  static float	red, green, blue;
+  static double	red, green, blue;
   char	*pc = NULL;
-  float	*pf;
+  double	*pf;
 #if HAVE_LIBX11
   Int	getXcolor(char *colorname, XColor *color, Int alloc);
   Status	anaAllocNamedColor(char *, XColor **);
   extern Int	connect_flag;
 #endif
-  Int	postcolorpen(float red, float green, float blue);
+  Int	postcolorpen(double red, double green, double blue);
 #if HAVE_LIBX11
   XColor	color;
 #endif
@@ -1552,7 +1552,7 @@ Int lux_pencolor(Int narg, Int ps[])
 	  return luxerror("Unrecognized color specification", ps[0]);
 	break;
       case LUX_ARRAY:
-	iq = lux_float(1, ps);	/* ensure that it is FLOAT */
+	iq = lux_double(1, ps);	/* ensure that it is DOUBLE */
 	nx = array_dims(iq)[0];
 	if (nx < 3)
 	  return luxerror("PENCOLOR requires a string naming a color\nor an array of 3 RGB values between 0.0 and 1.0", ps[0]);
@@ -1583,9 +1583,9 @@ void set_cur_pen(void)
 /* set pen according to current_pen and current_gray */
 {
 #if HAVE_LIBX11
-  Int lux_xpen(Int, float);
+  Int lux_xpen(Int, double);
 #endif
-  Int postpen(Int, float);
+  Int postpen(Int, double);
   
   switch (lunplt) {
 #if HAVE_LIBX11 
@@ -1601,9 +1601,9 @@ void set_cur_pen(void)
 Int set_pen(Int pen)
 {
 #if HAVE_LIBX11
-  Int lux_xpen(Int, float);
+  Int lux_xpen(Int, double);
 #endif
-  Int postpen(Int, float);
+  Int postpen(Int, double);
   
   switch (lunplt) {
     case 0:
@@ -1664,25 +1664,25 @@ Int lux_limits(Int narg, Int ps[]) /*set or examine limits */
     printf("                   z axis %f to %f\n", plims[4], plims[5]);
     return 1; }
   if (narg > 0)
-    plims[0] = float_arg(ps[0]);
+    plims[0] = double_arg(ps[0]);
   if (narg > 1)
-    plims[1] = float_arg(ps[1]);
+    plims[1] = double_arg(ps[1]);
   if (narg > 2)
-    plims[2] = float_arg(ps[2]);
+    plims[2] = double_arg(ps[2]);
   if (narg > 3)
-    plims[3] = float_arg(ps[3]);
+    plims[3] = double_arg(ps[3]);
   if (narg > 4)
-    plims[4] = float_arg(ps[4]);
+    plims[4] = double_arg(ps[4]);
   if (narg > 5)
-    plims[5] = float_arg(ps[5]);
+    plims[5] = double_arg(ps[5]);
  return 1;
 }
  /*------------------------------------------------------------------------- */
 Int lux_window(Int narg, Int ps[]) /*set or examine window */
 {
-  float	tmp;
+  double	tmp;
 #ifdef DEVELOP
-  extern float	wzb, wzt;
+  extern double	wzb, wzt;
 #endif
 
   if (narg == 0)
@@ -1693,18 +1693,18 @@ Int lux_window(Int narg, Int ps[]) /*set or examine window */
 #endif
     return 1; }
   if (narg > 0) 
-    wxb = float_arg(ps[0]);
+    wxb = double_arg(ps[0]);
   if (narg > 1)
-    wxt = float_arg(ps[1]);
+    wxt = double_arg(ps[1]);
   if (narg > 2) 
-    wyb = float_arg(ps[2]);
+    wyb = double_arg(ps[2]);
   if (narg > 3) 
-    wyt = float_arg(ps[3]);
+    wyt = double_arg(ps[3]);
 #ifdef DEVELOP
   if (narg > 4)
-    wzb = float_arg(ps[4]);
+    wzb = double_arg(ps[4]);
   if (narg > 5)
-    wzt = float_arg(ps[5]);
+    wzt = double_arg(ps[5]);
 #endif
   if (wxb > wxt)
   { tmp = wxb;
@@ -1726,7 +1726,7 @@ Int lux_window(Int narg, Int ps[]) /*set or examine window */
 Int lux_pdev(Int narg, Int ps[])
 {
   Int	postreset(Int);
-  extern float	postXBot, postYBot, postXTop, postYTop;
+  extern double	postXBot, postYBot, postXTop, postYTop;
 
   if (narg > 0) {
     lunplt = int_arg( ps[0]);
@@ -1741,12 +1741,12 @@ Int lux_pdev(Int narg, Int ps[])
   return 1;
 }
  /*------------------------------------------------------------------------- */
-Int sform(float xb, float xt)
+Int sform(double xb, double xt)
 				 /* make a nice format for plot labels */
 {
  /* set default form */
   Int	ie, il;
-  float	xq, xc;
+  double	xq, xc;
 
   xc = MAX(ABS(xb), ABS(xt));	
   sprintf(form, "%s", "%8.1e");	/*default*/
@@ -1781,17 +1781,17 @@ Int empty(void)
   return 1;
 }
  /*------------------------------------------------------------------------- */
-Int symplot(float x, float y, Int symStyle, Int lineStyle)
+Int symplot(double x, double y, Int symStyle, Int lineStyle)
 {
   static Int	is[] =
   { 1, 5,9, 14, 18, 23, 27, 35, 76, 76};
-  static float	poly[] =
+  static double	poly[] =
   { 0.0085, .01, 0,0, 0,0, 0.01, 0.0075, 0,0 };
   static Byte	mode[] = 
   { 0, 1,0, 1,0, 1,0, 1,0, 1,1, 1,1, 0,1, 1,1, 0,1, 1,1, 1,0, 1,1, 1,0, 1,0, 1,0, 1,0, 
       1, 0,1, 1,1, 1,1, 1,1, 1,1, 1,1, 1,1, 1,1, 1,1, 1,1, 1,1, 1,1, 1,1, 1,1, 1,1, 1,
       1, 1,1, 1,1, 1,1, 1,1, 1};
-  static float	dx[] =
+  static double	dx[] =
   {0, 0,.005, -.005, .005, -.005, -.005, .005, .005, .005, -.005, 
      -.005, .005, -.007, 0,.007, -.007, -.007, 0,.007, 0,-.007, 
      -.007, 0,.007, -.007, 0,0, .005, -.005, -.007, .007, -.005, .005, 
@@ -1801,7 +1801,7 @@ Int symplot(float x, float y, Int symStyle, Int lineStyle)
      -.00411, -.00495, -.00566, -.00624, -.00666, -.00691, -.00700, -.00691, 
      -.00666, -.00624, -.00566, -.00495, -.00411, -.00318, -.00216, -.00110, 
      0 };
-  static float	dy[] =
+  static double	dy[] =
   {.005, -.005, 0,0, .005, -.005, .005, -.005, .005, -.005, -.005, 
      .005, .005, -.005, .007, -.005, -.005, 0,.007, 0,-.007, 0,
      .005, -.007, .005, .005, .007, -.007, .005, -.005, 0,0, .005, -.005, 
@@ -1811,10 +1811,10 @@ Int symplot(float x, float y, Int symStyle, Int lineStyle)
      -.00566, -.00495, -.00411, -.00318, -.00216, -.00110, 0.00000, 0.00110, 
      0.00216, 0.00318, 0.00411, 0.00495, 0.00566, 0.00624, 0.00666, 0.00691, 
      .007 };
-  static float	xp, yp;
+  static double	xp, yp;
   Int	nsym = 8, ns, nsm, ia, ib, icept, i, iq;
-  float	tol = 1.e-5, delx, xq, yq, zq, xq2, yq2, slope, x2, y2, sq, pr;
-  float	x1, y1;
+  double	tol = 1.e-5, delx, xq, yq, zq, xq2, yq2, slope, x2, y2, sq, pr;
+  double	x1, y1;
   char	thing[2];
  
   xp = callig_xb;
@@ -2001,7 +2001,7 @@ Int lux_xymov(Int narg, Int ps[])			/* xymov routine */
   Int	mode, nx, ny, nm, *mp, dx, dy, dm, iq, line, one = 1, nc,
     altDash, i;
   Int	fixPlotStyle(Int *, Int *);
-  float	*x, *y, xc, yc;
+  double	*x, *y, xc, yc;
   extern Int	tkCoordSys, ifirstflag;
   char	moveFirst;
 
@@ -2019,12 +2019,12 @@ Int lux_xymov(Int narg, Int ps[])			/* xymov routine */
       iq = dereferenceScalPointer(iq);
     case LUX_SCALAR:
       nx = 1;
-      iq = lux_float(1, &iq); 
+      iq = lux_double(1, &iq); 
       dx = 0;
-      x = &scalar_value(iq).f;
+      x = &scalar_value(iq).d;
       break;
     case LUX_ARRAY:
-      iq = lux_float(1, &iq);
+      iq = lux_double(1, &iq);
       nelem = array_size(iq);
       nd = array_num_dims(iq);
       nx = nelem;
@@ -2032,7 +2032,7 @@ Int lux_xymov(Int narg, Int ps[])			/* xymov routine */
 	dx = 1;
       else
 	dx = 0;
-      x = (float *) array_data(iq);
+      x = (double *) array_data(iq);
       break;
     default:
       return cerror(ILL_CLASS, iq);
@@ -2044,12 +2044,12 @@ Int lux_xymov(Int narg, Int ps[])			/* xymov routine */
       iq = dereferenceScalPointer(iq);
     case LUX_SCALAR:
       ny = 1; 
-      iq = lux_float(1, &iq);
+      iq = lux_double(1, &iq);
       dy = 0;
-      y = &scalar_value(iq).f;
+      y = &scalar_value(iq).d;
       break;
     case LUX_ARRAY:
-      iq = lux_float(1, &iq);
+      iq = lux_double(1, &iq);
       nd = array_num_dims(iq);
       nelem = array_size(iq);
       ny = nelem;
@@ -2057,7 +2057,7 @@ Int lux_xymov(Int narg, Int ps[])			/* xymov routine */
 	dy = 1;
       else
 	dy = 0;
-      y = (float *) array_data(iq);
+      y = (double *) array_data(iq);
       break;
     default:
       return cerror(ILL_CLASS, iq);
@@ -2195,9 +2195,9 @@ Int lux_postimage(Int narg, Int ps[])			/* postimage routine */
  /* subroutine, call is postimage(image, x0, x1, y0, y1) */
 {
   extern	Int	scalemax, scalemin;
-  Int	lux_scale(Int, Int *), postgray(char *, Int, Int, float, float, float, 
-					float, Int);
-  float	x0, x1, y0, y1;
+  Int	lux_scale(Int, Int *), postgray(char *, Int, Int, double, double, double, 
+					double, Int);
+  double	x0, x1, y0, y1;
   Int	iq, nd, nx, ny, s1, s2;
   char	*ptr;
   array	*h;
@@ -2226,13 +2226,13 @@ Int lux_postimage(Int narg, Int ps[])			/* postimage routine */
   ny = h->dims[1];
   ptr = (char *) ((char *) h + sizeof(array));
   if (narg > 1)
-    x0 = float_arg(ps[1]);
+    x0 = double_arg(ps[1]);
   if (narg > 2)
-    x1 = float_arg(ps[2]);
+    x1 = double_arg(ps[2]);
   if (narg > 3)
-    y0 = float_arg(ps[3]);
+    y0 = double_arg(ps[3]);
   if (narg > 4) 
-    y1 = float_arg(ps[4]);
+    y1 = double_arg(ps[4]);
   printf("postimage mode: %d\n", landscape);
   return postgray(ptr, nx, ny, x0, x1, y0, y1, iorder);
 }

@@ -139,7 +139,7 @@ Int lux_cluster(Int narg, Int ps[])
 { 
   void	random_unique(Int seed, Int *output, Int number, Int modulo);
   Int	iq, nClusters, nVectorDim, nVectors, i, j, *index, size, dataIndex;
-  float	*data, *dataPoint, n1, n2, f;
+  double	*data, *dataPoint, n1, n2, f;
   double	s, t, dMin2, d, *center, *center2, *group1, *group2,
 	*dgv, *pdgv, *centroid, *fp, **findex, *firstCenter, *scrap,
 	*rmsptr;
@@ -164,7 +164,7 @@ Int lux_cluster(Int narg, Int ps[])
   nDataDims = array_num_dims(iq); /* # data dimensions */
   nVectorDim = dataDims[0]; /* # dimensions in each data vector */
   nVectors = array_size(iq)/nVectorDim; /* # vectors */
-  data = (float *) array_data(iq); /* data points */
+  data = (double *) array_data(iq); /* data points */
   if (narg >= 4 && ps[3]) {	/* SIZE */
     gotSize = 1;
     if (ps[3] >= NAMED_END)
@@ -1015,7 +1015,7 @@ Int lux_cluster(Int narg, Int ps[])
       printf("CLUSTER - cycle %1d, reclustered %1d points in %1d clusters\n",
 	     nIter, nChanged, j);
       printf("distance calculations/element: %g (total %g)\n",
-	     (float) nDistCal/nSample, (float) allDistCal/nSample);
+	     (double) nDistCal/nSample, (double) allDistCal/nSample);
     }
     
     nDistCal = 0;

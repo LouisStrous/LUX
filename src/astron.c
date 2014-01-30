@@ -244,7 +244,7 @@ void LBRtoXYZ(double *pos, double *pos2),
 Int idiv(Int x, Int y)
      /* returns the largest integer n such that x >= y*n */
 {
-  return (Int) floor(((float) x)/y);
+  return (Int) floor(((double) x)/y);
 }
 
 void printXYZtoLBR(double *xyz);
@@ -2691,7 +2691,7 @@ Int lux_constellationname(Int narg, Int ps[])
   return result;
 }
 /*--------------------------------------------------------------------------*/
-float magnitude(double d, double r, double beta, Int objNum)
+double magnitude(double d, double r, double beta, Int objNum)
      /* Estimates the visual magnitude from the square of the distance */
      /* to the object, the square of the distance of the object to the Sun, */
      /* and the phase angle in degrees*/

@@ -4060,7 +4060,7 @@ void draw_re_callback(w, ptq, call_data)
  Int	*ptq;
  {
  extern	 Int    wd[], ht[], last_wid,  set_defw();
- extern  float   xfac, yfac;
+ extern  double   xfac, yfac;
  extern  Int     ixhigh, iyhigh;
  Dimension	ww, wh;
  static	Int	kilroy;

@@ -929,7 +929,7 @@ typedef union {
 void denan(Byte *data, Int size, Int partype)
 /* <data> = start of data
    <size> = size of data, in bytes
-   <partpe> = data type (LUX_BYTE ... LUX_FLOAT) */
+   <partpe> = data type (LUX_BYTE ... LUX_DOUBLE) */
 {
   uscalar p;
   Int i;
@@ -1100,7 +1100,7 @@ Int lux_geneticfit(Int narg, Int ps[])
     crossmark, mutatemark, pmutate, sum;
   double *weights, *start;
   void  invertPermutation(Int *data, Int n),
-    indexxr_f(Int n, float ra[], Int indx[]);
+    indexxr_f(Int n, double ra[], Int indx[]);
   Int   random_distributed(Int modulus, double *distr);
   Byte  changed, elite, partype;
   static uint16_t mask1[] = {

@@ -212,7 +212,7 @@ Int to_scratch_array(Int n, Int type, Int ndim, Int dims[])
 /* array gets type LUX_STRING_ARRAY.  LS 28mar98 */
 {
  size_t	size, i;
- float	fsize;
+ double	fsize;
  array	*h;
  pointer	ptr;
  
@@ -238,7 +238,7 @@ Int to_scratch_array(Int n, Int type, Int ndim, Int dims[])
  }
  size += sizeof(array);
  fsize += sizeof(array);
- if (fabs(((float) size)/fsize - 1) > 1e-3 || size > INT32_MAX)
+ if (fabs(((double) size)/fsize - 1) > 1e-3 || size > INT32_MAX)
    return luxerror("The number of bytes requested for the array\n(about %g) is too great", 0, fsize);
  undefine(n);
  symbol_class(n) = isComplexType(type)? LUX_CARRAY: LUX_ARRAY;
@@ -287,7 +287,7 @@ Int array_clone(Int symbol, Int type)
   with the same structure as <symbol> */
 {
  Int	n, size;
- float	fsize;
+ double	fsize;
  array	*h, *hOld;
  void	*ptr;
  extern Int	pipeSym, pipeExec;
@@ -296,10 +296,10 @@ Int array_clone(Int symbol, Int type)
 	 / lux_type_size[array_type(symbol)]) * lux_type_size[type]
    + sizeof(array);
  if (lux_type_size[type] > lux_type_size[array_type(symbol)]) {
-   fsize = ((float) (symbol_memory(symbol) - sizeof(array))
+   fsize = ((double) (symbol_memory(symbol) - sizeof(array))
 	    / lux_type_size[array_type(symbol)]) * lux_type_size[type]
      + sizeof(array);
-   if (fsize != (float) size)
+   if (fsize != (double) size)
      return luxerror("The number of bytes requested for the array\n(about %g) is too great", 0, fsize);
  }
  if (!pipeExec

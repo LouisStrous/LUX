@@ -55,9 +55,9 @@ Int lux_orientation(Int narg, Int ps[])
 /* see at end of file for more info on the method */
 {
   double	j11, j22, j33, j12, j13, j23, gg;
-  float	*out, *comp, *widths, *data, *wave;
-  float	*smooth1, *smooth2, *smooth3;
-  float	x, sum, *ptr, *ptr2, y, d1, d2, d3, *ptr3, *ptr0, *aspect;
+  double	*out, *comp, *widths, *data, *wave;
+  double	*smooth1, *smooth2, *smooth3;
+  double	x, sum, *ptr, *ptr2, y, d1, d2, d3, *ptr3, *ptr0, *aspect;
   double	c0, c1, c2;
   double	q, r, ang, c, s, w;
   Int	values, vector, d, *dims, i, iq, n1, n2, n3, odims[4], j, t, *grid;
@@ -86,15 +86,15 @@ Int lux_orientation(Int narg, Int ps[])
   if (ndim != 2 && ndim != 3)
     return luxerror("Need 2D or 3D array", *ps);
   dims = array_dims(*ps);
-  iq = lux_float(1, ps);
-  data = (float *) array_data(iq);
+  iq = lux_double(1, ps);
+  data = (double *) array_data(iq);
   if (symbol_class(ps[1]) != LUX_ARRAY) /* WIDTHS */
     return cerror(NEED_ARR, ps[1]);
   d = array_size(ps[1]);
   if (d != ndim)
     return luxerror("Need %1d smooth widths", ps[1], ndim);
-  iq = lux_float(1, &ps[1]);
-  widths = (float *) array_data(iq);
+  iq = lux_double(1, &ps[1]);
+  widths = (double *) array_data(iq);
   for (i = 0; i < ndim; i++)
     if (widths[i] < 0)
       return luxerror("Need nonnegative smoothing widths", ps[1]);
@@ -103,7 +103,7 @@ Int lux_orientation(Int narg, Int ps[])
     if (array_size(iq) != ndim)
       return luxerror("Need %1d output cube dimensions", ps[5], ndim);
     grid = (Int *) array_data(iq);
-    memcpy(grid2, grid, ndim*sizeof(float));
+    memcpy(grid2, grid, ndim*sizeof(double));
     if (grid[0] == 0)
       grid2[0] = dims[0];
     else if (grid[0] < 0 || grid[0] > dims[0])
@@ -119,13 +119,13 @@ Int lux_orientation(Int narg, Int ps[])
 	return luxerror("Illegal output cube y dimension: %d", ps[5], grid[2]);
     }
   } else
-    memcpy(grid2, dims, ndim*sizeof(float));
+    memcpy(grid2, dims, ndim*sizeof(double));
   if (narg > 6 && ps[6]) {	/* ASPECT */
     if (symbol_class(ps[6]) != LUX_ARRAY)
       return cerror(NEED_ARR, ps[6]);
     if (array_size(ps[6]) != ndim)
       return luxerror("Need %1d aspect sizes", ps[6], ndim);
-    aspect = (float *) array_data(lux_float(1, ps + 6));
+    aspect = (double *) array_data(lux_double(1, ps + 6));
   } else
     aspect = NULL;
   if (narg > 7 && ps[7]) {	/* ORDER: discrete derivative accuracy */
@@ -149,7 +149,7 @@ Int lux_orientation(Int narg, Int ps[])
     if (n1 % 2 == 0)
       n1--;
   }
-  allocate(smooth1, n1, float);
+  allocate(smooth1, n1, double);
   y = w? 1./w: 0;
   x = -((Int) n1/2)*y;
   ptr = smooth1;
@@ -172,7 +172,7 @@ Int lux_orientation(Int narg, Int ps[])
     if (n2 % 2 == 0)
       n2--;
   }
-  allocate(smooth2, n2, float);
+  allocate(smooth2, n2, double);
   y = w? 1./w: 0;
   x = -(n2/2)*y;
   ptr = smooth2;
@@ -196,7 +196,7 @@ Int lux_orientation(Int narg, Int ps[])
       if (n3 % 2 == 0)
 	n3--;
     }
-    allocate(smooth3, n3, float);
+    allocate(smooth3, n3, double);
     y = w? 1./w: 0;
     x = -(n3/2)*y;
     ptr = smooth3;
@@ -219,42 +219,42 @@ Int lux_orientation(Int narg, Int ps[])
   memcpy(odims + 1, grid2, ndim*sizeof(Int));
   if (getVal) {
     odims[0] = ndim;
-    if ((values = array_scratch(LUX_FLOAT, ndim + 1, odims)) < 0) {
+    if ((values = array_scratch(LUX_DOUBLE, ndim + 1, odims)) < 0) {
       free(smooth1);
       free(smooth2);
       if (ndim == 3)
 	free(smooth3);
       return LUX_ERROR;
     }
-    out = (float *) array_data(values);
+    out = (double *) array_data(values);
   }
   if (getVec) {
     if (ndim == 3) {
       odims[0] = ndim;
-      if ((vector = array_scratch(LUX_FLOAT, ndim + 1, odims)) < 0) {
+      if ((vector = array_scratch(LUX_DOUBLE, ndim + 1, odims)) < 0) {
 	free(smooth1);
 	free(smooth2);
 	free(smooth3);
 	return LUX_ERROR;
       }
     } else {
-      if ((vector = array_scratch(LUX_FLOAT, ndim, odims + 1)) < 0) {
+      if ((vector = array_scratch(LUX_DOUBLE, ndim, odims + 1)) < 0) {
 	free(smooth1);
 	free(smooth2);
 	return LUX_ERROR;
       }
     }
-    comp = (float *) array_data(vector);
+    comp = (double *) array_data(vector);
   }
   if (getWave) {
-    if ((wavenum = array_scratch(LUX_FLOAT, ndim, odims + 1)) < 0) {
+    if ((wavenum = array_scratch(LUX_DOUBLE, ndim, odims + 1)) < 0) {
       free(smooth1);
       free(smooth2);
       if (ndim == 3)
 	free(smooth3);
       return LUX_ERROR;
     }
-    wave = (float *) array_data(wavenum);
+    wave = (double *) array_data(wavenum);
   }
   vocal = (internalMode & 1);
   getJ = (internalMode & 2)? 1: 0;
@@ -603,12 +603,12 @@ Int lux_orientation(Int narg, Int ps[])
 
 Int lux_root3(Int narg, Int ps[])
 {
-  float	c0, c1, c2, q, r, s, c, ang, *p;
+  double	c0, c1, c2, q, r, s, c, ang, *p;
   Int	iq;
 
-  c0 = float_arg(*ps++);
-  c1 = float_arg(*ps++);
-  c2 = float_arg(*ps);
+  c0 = double_arg(*ps++);
+  c1 = double_arg(*ps++);
+  c2 = double_arg(*ps);
   r = (c1*c2 - 3*c0)/6 - c2*c2*c2/27;
   q = c2*c2/9 - c1/3;
   s = q*q*q - r*r;
@@ -627,8 +627,8 @@ Int lux_root3(Int narg, Int ps[])
   c1 = r + q;
   c2 = r - q;
   iq = 3;
-  iq = array_scratch(LUX_FLOAT, 1, &iq);
-  p = (float *) LPTR(HEAD(iq));
+  iq = array_scratch(LUX_DOUBLE, 1, &iq);
+  p = (double *) LPTR(HEAD(iq));
   *p++ = c0;  *p++ = c1;  *p++ = c2;
   return iq;
 }

@@ -32,33 +32,33 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 extern	Int	current_pen, autocon, contour_mode, contour_box, 
 	contour_nlev, contour_border, contour_tick_pen,	contour_ticks,
 	contour_style, iorder;
-extern	float	wxb, wxt, wyb, wyt, contour_dash_lev, contour_tick_fac;
+extern	double	wxb, wxt, wyb, wyt, contour_dash_lev, contour_tick_fac;
 Int	contour_flag;
 Int	contour_sym;
 static	Int	nx, ny;
-static	float	xa, xb, ya, yb;
-static	float	xsc, ysc;
-Int	tkplot(float, float, Int, Int);
+static	double	xa, xb, ya, yb;
+static	double	xsc, ysc;
+Int	tkplot(double, double, Int, Int);
 /*------------------------------------------------------------------------- */
 Int lux_contour(Int narg, Int ps[]) /* contour routine */		
 /* call is CONTOUR, image, nlev, xa, xb, ya, yb */
 {
   array	*h;
   Int	iq, i, nc, lineStyle, symStyle;
-  float	*pf, *cl, xmax, xmin, *pp, yq, xspace, xq;
-  Int	anacon(float *, Int, Int, float *, Int, Int, float, float, float,
-	       float, float), installString(char *), lux_replace(Int, Int),
+  double	*pf, *cl, xmax, xmin, *pp, yq, xspace, xq;
+  Int	luxcon(double *, Int, Int, double *, Int, Int, double, double, double,
+	       double, double), installString(char *), lux_replace(Int, Int),
 	box(void), ticks(void), fixPlotStyle(Int *, Int *);
   extern Int	tkCoordSys;
-  extern float	theDashSize;
+  extern double	theDashSize;
   char	gotLevels;
 
   iq = ps[0];
   CK_ARR(iq, 1);
-  iq = lux_float(1, &iq);
+  iq = lux_double(1, &iq);
   h = (array *) sym[iq].spec.array.ptr;
   ny = 1; nx = h->dims[0]; if (h->ndim != 1) ny = h->dims[1];
-  pf = (float *) ((char *) h + sizeof( array ));
+  pf = (double *) ((char *) h + sizeof( array ));
   /* check if $contours array exists yet */
   if (contour_sym == 0) {
     i = installString("$CONTOURS");
@@ -82,18 +82,18 @@ Int lux_contour(Int narg, Int ps[]) /* contour routine */
   if (contour_nlev <= 0 || contour_nlev > 50)
   { printf("invalid # of contour levels = %d\n",contour_nlev); return -1; }
   xa = wxb; xb = wxt; ya = wyb; yb = wyt; /*default window */
-  if (narg > 2 && sym[ps[2]].class) xa = float_arg( ps[2]);
-  if (narg > 3 && sym[ps[3]].class) xb = float_arg( ps[3]);
-  if (narg > 4 && sym[ps[4]].class) ya = float_arg( ps[4]);
-  if (narg > 5 && sym[ps[5]].class) yb = float_arg( ps[5]);
+  if (narg > 2 && sym[ps[2]].class) xa = double_arg( ps[2]);
+  if (narg > 3 && sym[ps[3]].class) xb = double_arg( ps[3]);
+  if (narg > 4 && sym[ps[4]].class) ya = double_arg( ps[4]);
+  if (narg > 5 && sym[ps[5]].class) yb = double_arg( ps[5]);
   if (narg > 6 && sym[ps[6]].class) contour_style = int_arg(ps[6]);
-  if (narg > 7 && sym[ps[7]].class) theDashSize = float_arg(ps[7]);
+  if (narg > 7 && sym[ps[7]].class) theDashSize = double_arg(ps[7]);
   else theDashSize = 1.0;
 						/* check for auto mode */
   if (!gotLevels && ((internalMode & 1) || (!internalMode && autocon)))
   { redef_array(contour_sym, 3, 1, &contour_nlev);
     h = (array *) sym[contour_sym].spec.array.ptr;
-    cl = (float *) ((char *) h + sizeof( array ));
+    cl = (double *) ((char *) h + sizeof( array ));
     pp = pf;	nc = nx * ny - 1;	xmin = xmax = *pp++;
     while (nc--) {	if (*pp > xmax)  xmax = *pp;
 			if (*pp < xmin)  xmin = *pp;	pp++; }
@@ -119,10 +119,10 @@ Int lux_contour(Int narg, Int ps[]) /* contour routine */
   } else {				/* not auto mode, check $contours */
     if ( sym[contour_sym].class != 4 )
       return cerror(BAD_CONTOURS, contour_sym);
-    iq = lux_float(1, &contour_sym);
+    iq = lux_double(1, &contour_sym);
     h = (array *) sym[iq].spec.array.ptr;
     if (h->ndim != 1) return cerror(BAD_CONTOURS, contour_sym);
-    cl = (float *) ((char *) h + sizeof( array ));
+    cl = (double *) ((char *) h + sizeof( array ));
     contour_nlev = MIN(contour_nlev, h->dims[0]);  /* min of these used */
   }
   xsc = (xb - xa)/nx;	ysc = (yb - ya)/ny;
@@ -137,7 +137,7 @@ Int lux_contour(Int narg, Int ps[]) /* contour routine */
   fixPlotStyle(&symStyle, &lineStyle);
   symStyle = contour_style;	/* save for later */
   contour_style = lineStyle;
-  anacon(pf, nx, ny, cl, contour_nlev, iorder, xa, ya, xb, yb,
+  luxcon(pf, nx, ny, cl, contour_nlev, iorder, xa, ya, xb, yb,
 	contour_dash_lev);
   contour_style = symStyle;	/* restore */
   return 1;
@@ -157,7 +157,7 @@ Int box(void)
 Int ticks(void)
 {
   Int	oldpen, pen;
-  float	tx, ty, y, x, xs, ys;
+  double	tx, ty, y, x, xs, ys;
   Int	set_pen(Int);
 
   if (contour_tick_pen <= 0)
@@ -236,12 +236,12 @@ Int ticks(void)
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int tkdash(float *aa, float *bb, Int *ndsh, Int *ntimes)
+Int tkdash(double *aa, double *bb, Int *ndsh, Int *ntimes)
 /* actually no dashed line support yet 3/9/92 */
      /* there is now!  LS 4feb95 */
 {
   Int	nc;
-  float	x, y;
+  double	x, y;
 
   nc = *ntimes;
   while (nc-- > 0) 
@@ -250,7 +250,7 @@ Int tkdash(float *aa, float *bb, Int *ndsh, Int *ntimes)
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int lower_int(float x)
+Int lower_int(double x)
 /* returns the first integer closer to -Infinity than x */
 {
   Int	i;
@@ -260,7 +260,7 @@ Int lower_int(float x)
   return i;
 }
 /*------------------------------------------------------------------------- */
-Int closest_int(float x)
+Int closest_int(double x)
 /* returns the integer closest to x (with integer + 0.5 -> integer + 1) */
 {
   Int	i;

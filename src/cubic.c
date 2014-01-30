@@ -42,7 +42,7 @@ Int lux_cubic_spline(Int narg, Int ps[])
   Int	xNewSym = 0, xTabSym = 0, yTabSym, d1Sym = 0, d2Sym, size,
 	oldType, n;
   pointer	src, trgt, p, q;
-  float	a, b, c, x;
+  double	a, b, c, x;
   static Int	nPoints, type;
   static pointer	xTable, yTable, der2;
 
@@ -81,7 +81,7 @@ Int lux_cubic_spline(Int narg, Int ps[])
   { nPoints = array_size(xTabSym);
     oldType = (array_type(xTabSym) > array_type(yTabSym))?
       array_type(xTabSym): array_type(yTabSym);
-    type = (oldType < LUX_FLOAT)? LUX_FLOAT: oldType;
+    type = (oldType < LUX_DOUBLE)? LUX_DOUBLE: oldType;
     size = lux_type_size[type]*nPoints;
     xTable.b = (Byte *) Malloc(size);
     yTable.b = (Byte *) Malloc(size);

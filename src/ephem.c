@@ -29,8 +29,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 
  typedef double TIME;
  static	Int	m[]  =  {31,28,31,30,31,30,31,31,30,31,30,31};
- static	float	rq = 57.2957795;
- static	float	pi = 3.141592654, b, r, d, p;
+ static	double	rq = 57.2957795;
+ static	double	pi = 3.141592654, b, r, d, p;
  static	Int	choice;
  /*--------------------------------------------------------------------------*/
  /* this section has a copy of part of Bogart's time routines, we want to be
@@ -412,58 +412,78 @@ Int lux_sun_p(narg,ps)				/* sun_p function */
  return	ephem_setup(narg,ps);
  }
  /*--------------------------------------------------------------------------*/
-Int	execute_error(Int), sephem(Int, float);
-Int ephem_setup(narg,ps)
- Int	narg, ps[];
- {
- Int	nsym, result_sym, j, nd, n, iy;
- float	day;
- struct	ahead	*h;
- register union	types_ptr q1,q3;
+Int	execute_error(Int), sephem(Int, double);
+Int ephem_setup(Int narg, Int ps[])
+{
+  Int	nsym, result_sym, j, nd, n, iy;
+  double	day;
+  struct	ahead	*h;
+  register union	types_ptr q1,q3;
 
- /* first arg is the day, can be scalar or array */
- nsym= ps[0];
- nsym = lux_float(1, &nsym);
- /*switch on the class */
- switch (sym[nsym].class)	{
- case 8:							/*scalar ptr*/
- result_sym = scalar_scratch(3); n=1; q1.l = scal_ptr_pointer(nsym).l;
- q3.l = &sym[result_sym].spec.scalar.l; break;
- case 1:							/*scalar */
- result_sym = scalar_scratch(3); n=1; q1.l = &sym[nsym].spec.scalar.l;
- q3.l = &sym[result_sym].spec.scalar.l; break;
- case 4:							/*array */
- h = (struct ahead *) sym[nsym].spec.array.ptr;
- q1.l = (Int *) ((char *)h + sizeof(struct ahead));
- nd = h->ndim;
- n = 1; for (j=0;j<nd;j++) n *= h->dims[j];	/* # of elements for nsym */
- result_sym = array_clone(nsym,3);
- h = (struct ahead *) sym[result_sym].spec.array.ptr;
- q3.f = (float *) ((char *)h + sizeof(struct ahead));
- break;
- default:	return execute_error(32);
- }
- /* second arg is the year which must be a scalar */
- iy = int_arg( ps[1]);
- /* this is important, we really only accept years in the 20th century
- because we want to denote years as either 19xx or xx. The formula
- probably are not really accurate for other centuries anyhow. sephem
- wants the 2 digit form of the year, so we take off a leading 19 here
- and also check for years that we don't want to process */
- if (iy >= 1900) iy = iy -1900;
- /* 4/7/99 - patched to accept year 2000 to 2099 */
- if (iy < 0 || iy > 199 )  return execute_error(117);
- while (n>0) {
- n--;	day = *q1.f++;	sephem( iy, day);
- switch (choice) {
- case 0: *q3.f++ = b; break;
- case 1: *q3.f++ = r; break;
- case 2: *q3.f++ = d; break;
- case 3: *q3.f++ = p; break;
- }
- }
- return	result_sym;
- }
+  /* first arg is the day, can be scalar or array */
+  nsym= ps[0];
+  nsym = lux_double(1, &nsym);
+  /*switch on the class */
+  switch (symbol_class(nsym)) {
+  case LUX_SCAL_PTR:             /*scalar ptr*/
+    result_sym = scalar_scratch(LUX_DOUBLE);
+    n=1;
+    q1.l = scal_ptr_pointer(nsym).l;
+    q3.l = &scalar_value(result_sym).l;
+    break;
+  case LUX_SCALAR:               /*scalar */
+    result_sym = scalar_scratch(LUX_DOUBLE);
+    n=1;
+    q1.l = &scalar_value(nsym).l;
+    q3.l = &scalar_value(result_sym).l;
+    break;
+  case LUX_ARRAY:                /*array */
+    h = (struct ahead *) sym[nsym].spec.array.ptr;
+    q1.l = (Int *) ((char *)h + sizeof(struct ahead));
+    nd = h->ndim;
+    n = 1;
+    for (j=0;j<nd;j++)
+      n *= h->dims[j];	/* # of elements for nsym */
+    result_sym = array_clone(nsym, LUX_DOUBLE);
+    h = (struct ahead *) sym[result_sym].spec.array.ptr;
+    q3.d = (double *) ((char *)h + sizeof(struct ahead));
+    break;
+  default:
+    return execute_error(32);
+  }
+  /* second arg is the year which must be a scalar */
+  iy = int_arg( ps[1]);
+  /* this is important, we really only accept years in the 20th century
+     because we want to denote years as either 19xx or xx. The formula
+     probably are not really accurate for other centuries anyhow. sephem
+     wants the 2 digit form of the year, so we take off a leading 19 here
+     and also check for years that we don't want to process */
+  if (iy >= 1900)
+    iy = iy -1900;
+  /* 4/7/99 - patched to accept year 2000 to 2099 */
+  if (iy < 0 || iy > 199 )
+    return execute_error(117);
+  while (n>0) {
+    n--;
+    day = *q1.d++;
+    sephem( iy, day);
+    switch (choice) {
+    case 0:
+      *q3.d++ = b;
+      break;
+    case 1:
+      *q3.d++ = r;
+      break;
+    case 2:
+      *q3.d++ = d;
+      break;
+    case 3:
+      *q3.d++ = p; 
+      break;
+    }
+  }
+  return result_sym;
+}
  /*--------------------------------------------------------------------------*/
 Int admo(idoy,iyr,idm,imy)
  Int idoy, iyr, *idm, *imy;
@@ -492,12 +512,12 @@ Int julian(iy,im,id)
  Int	ii, iyy, ij;
  iyy  =  1900. + iy;
  if (im <= 2) { iyy = iyy - 1;	im = im+12; }
- a = ((float) iyy)/100.;	b = 2.-a+a/4.;	did = id;
- ii = 365.25 * (float) iyy;	ij = 30.6001* (float) (im+1);
+ a = ((double) iyy)/100.;	b = 2.-a+a/4.;	did = id;
+ ii = 365.25 * (double) iyy;	ij = 30.6001* (double) (im+1);
  return	(Int) (ii + ij + b + 1720994.5 + did);
  }
  /*--------------------------------------------------------------------------*/
-Int sephem(Int ny, float day)
+Int sephem(Int ny, double day)
  {
  /*	returns solar b angle (in radians) and solar radius (in arcsec)
 	 input is year and day of year (including fraction of day)*/

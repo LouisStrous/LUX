@@ -32,18 +32,18 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 
 #define	VSPACE	14.0
 #define	SFAC	0.70
-Int	tkplot(float x, float y, Int lineStyle, Int symStyle), fontchange(Int),
+Int	tkplot(double x, double y, Int lineStyle, Int symStyle), fontchange(Int),
   draw(Int);
 void	swapl(char *, Int);
-extern	float	xfac, yfac;
+extern	double	xfac, yfac;
 extern	char	*expand_name(char *, char *);
 Int	hflag, penDown;
 extern Int	ifont;
 Byte	*fontbase;
 Byte	*fontptr[40];
-float	callig_xb, callig_yb, theta = 0.0, size = 1.0, dx, dy, sxb, syb;
-float	st, ct, x, y, nct, nst, angle, callig_ratio = 1.0;
-float	float_arg(Int);
+double	callig_xb, callig_yb, theta = 0.0, size = 1.0, dx, dy, sxb, syb;
+double	st, ct, x, y, nct, nst, angle, callig_ratio = 1.0;
+double	double_arg(Int);
 Int	calligCoordSys, current_font = 1;
 /*------------------------------------------------------------------------- */
 Int lux_callig(Int narg, Int ps[])
@@ -63,13 +63,13 @@ Int lux_callig(Int narg, Int ps[])
   s = string_value(iq);
 					/* the rest are scalars */
   if (narg > 1 && ps[1])
-    callig_xb = float_arg(ps[1]);
+    callig_xb = double_arg(ps[1]);
   if (narg > 2 && ps[2])
-    callig_yb = float_arg(ps[2]);
+    callig_yb = double_arg(ps[2]);
   if (narg > 3 && ps[3])
-    size = float_arg(ps[3]);
+    size = double_arg(ps[3]);
   if (narg > 4 && ps[4])
-    theta = float_arg(ps[4]);
+    theta = double_arg(ps[4]);
   if (narg > 5 && ps[5])
     ifont = int_arg(ps[5]);
   if (narg > 6 && ps[6])
@@ -333,8 +333,8 @@ Int callig2(char *s)
 /* called by either lux_callig or callig, finishes the job */
 {
   Int	ic;
-  float	angle, xq;
-  Int	coordTrf(float *, float *, Int, Int), fontchange(Int), hcom(char **),
+  double	angle, xq;
+  Int	coordTrf(double *, double *, Int, Int), fontchange(Int), hcom(char **),
     draw(Int), empty(void);
 					/* setup context */
   coordTrf(&callig_xb, &callig_yb, calligCoordSys, LUX_DVI);
@@ -368,7 +368,7 @@ Int callig2(char *s)
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int callig(char *s, float xb, float yb, float fsize, float th, Int font,
+Int callig(char *s, double xb, double yb, double fsize, double th, Int font,
 	   Int nu)
 /* for internal calls, sets variables and calls callig2 */
 {
@@ -385,7 +385,7 @@ Int hcom(char **s)
 					/* an inline callig command */
 {
   Int	ic, i1;
-  float	newsize;
+  double	newsize;
 
   ic = *(*s)++;
   switch (ic) {
@@ -522,16 +522,16 @@ Int draw(Int ic)
       if (ix > 63) ix = ix - 128;
       ix = ix - ll0;
       iy = iy - ll0;		/* for abnormals */
-      x = (float) ix*ct - (float) iy*st + callig_xb;
-      y = ((float) ix*st + (float) iy*ct)*callig_ratio + callig_yb;
+      x = (double) ix*ct - (double) iy*st + callig_xb;
+      y = ((double) ix*st + (double) iy*ct)*callig_ratio + callig_yb;
       callig_update = 0;
       tkplot(x, y, mode, 0);
       callig_update = 1;
     }
   }
 			/* update callig_xb and callig_yb */
-  callig_xb += ct*(float) gap;
-  callig_yb += st*(float) gap*callig_ratio;
+  callig_xb += ct*(double) gap;
+  callig_yb += st*(double) gap*callig_ratio;
   return 1;
 }
 /*------------------------------------------------------------------------- */

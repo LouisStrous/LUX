@@ -26,9 +26,9 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdio.h>
 #include "action.h"
 
-extern float	xfac, yfac, wxt, wxb, wyt, wyb, xmin, xmax, ymin, ymax;
+extern double	xfac, yfac, wxt, wxb, wyt, wyb, xmin, xmax, ymin, ymax;
 #if HAVE_LIBX11
-extern float	tvix, tviy, tvixb, tviyb, tvscale;
+extern double	tvix, tviy, tvixb, tviyb, tvscale;
 #endif
 extern Int	iorder, iyhigh, ipltyp;
 
@@ -39,15 +39,15 @@ Int	lux_replace(Int, Int);
    LUX_RIM, LUX_RPL */
 Int fromCoordinateSystem, toCoordinateSystem;
 /*---------------------------------------------------------------------*/
-Int coordMap(float *x, float *y)
+Int coordMap(double *x, double *y)
 /* transforms (x,y) (in fromCoordinateSystem) to toCoordinateSystem */
 {
-  Int coordTrf(float *, float *, Int, Int);
+  Int coordTrf(double *, double *, Int, Int);
 
   return coordTrf(x, y, fromCoordinateSystem, toCoordinateSystem);
 }
 /*---------------------------------------------------------------------*/
-Int coordTrf(float *x, float *y, Int from, Int to)
+Int coordTrf(double *x, double *y, Int from, Int to)
      /* xfac,yfac are the pixel dimensions of the current window */
      /* wxb,wxt is the DVI x range of the plot window */
      /* wyb,wyt is the DVI y range of the plot window */
@@ -223,36 +223,36 @@ Int lux_coordtrf(Int narg, Int ps[])
 /* /TODVI, /TODEV, /TOIMG, /TOPLT, /TORIM, /TORPL, /TOX11 */
 {
   Int	iq, n, n2, from, to;
-  float	*xold, *yold, *xnew, *ynew, x, y;
+  double	*xold, *yold, *xnew, *ynew, x, y;
 
   from = (internalMode & 7);
   to = (internalMode/8 & 7);
-  iq = lux_float(1, ps);	/* float xold */
+  iq = lux_double(1, ps);	/* double xold */
   switch (symbol_class(iq)) {
     case LUX_SCAL_PTR:
       iq = dereferenceScalPointer(iq);
     case LUX_SCALAR:
-      xold = &scalar_value(iq).f;
+      xold = &scalar_value(iq).d;
       n = 1;
       break;
     case LUX_ARRAY:
       n = array_size(iq);
-      xold = (float *) array_data(iq);
+      xold = (double *) array_data(iq);
       break;
     default:
       return cerror(ILL_CLASS, iq);
   }
-  iq = lux_float(1, &ps[1]);	/* float yold */
+  iq = lux_double(1, &ps[1]);	/* double yold */
   switch (symbol_class(iq)) {
     case LUX_SCAL_PTR:
       iq = dereferenceScalPointer(iq);
     case LUX_SCALAR:
-      yold = &scalar_value(iq).f;
+      yold = &scalar_value(iq).d;
       n2 = 1;
       break;
     case LUX_ARRAY:
       n2 = array_size(iq);
-      yold = (float *) array_data(iq);
+      yold = (double *) array_data(iq);
       break;
     default:
       return cerror(ILL_CLASS, iq);
@@ -263,18 +263,18 @@ Int lux_coordtrf(Int narg, Int ps[])
     lux_replace(ps[2], iq);
     iq = ps[2];
     if (symbol_class(iq) == LUX_SCALAR)
-      xnew = &scalar_value(iq).f;
+      xnew = &scalar_value(iq).d;
     else
-      xnew = (float *) array_data(iq);
+      xnew = (double *) array_data(iq);
   } else
     xnew = xold;
   if (narg >= 4) {		/* ynew */
     lux_replace(ps[3], iq);
     iq = ps[3];
     if (symbol_class(iq) == LUX_SCALAR)
-      ynew = &scalar_value(iq).f;
+      ynew = &scalar_value(iq).d;
     else
-      ynew = (float *) array_data(iq);
+      ynew = (double *) array_data(iq);
   } else
     ynew = yold;
   while (n--) {

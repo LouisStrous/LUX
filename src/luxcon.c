@@ -1,4 +1,4 @@
-/* This is file anacon.c.
+/* This is file luxcon.c.
 
 Copyright 2013 Louis Strous, Richard Shine
 
@@ -22,39 +22,39 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "config.h"
 #endif
 #include "action.h"
-/* anacon.f -- translated by f2c (version of 28 March 1990  0:01:01).
+/* luxcon.f -- translated by f2c (version of 28 March 1990  0:01:01).
    Modified by Louis Strous 27jul94
 */
 
-Int anacon(float *xarr, Int nx, Int ny, float *xlev, Int numlev,
-	    Int itvord, float xl, float yl, float xsc, float ysc,
-	    float cut)
+Int luxcon(double *xarr, Int nx, Int ny, double *xlev, Int numlev,
+	    Int itvord, double xl, double yl, double xsc, double ysc,
+	    double cut)
 {
   /* System generated locals */
   Int i_1, i_2, i_3;
-  Int	tkdash(float *, float *, Int *, Int *);
+  Int	tkdash(double *, double *, Int *, Int *);
 
   /* Local variables */
-  float cell[5];
+  double cell[5];
   Int minc, ninc, icol, incr, ndsh, imax, ntim;
-  float xmin, xmax;
+  double xmin, xmax;
   Int irow, j, k, l, ibase;
-  float xmean;
+  double xmean;
   Int n2, n3, n4;
-  float aa[4], bb[4];
+  double aa[4], bb[4];
   Int ii, in;
-  float xa[4], ya[4];
+  double xa[4], ya[4];
   Int ns;
   Int ibindx;
   Int inccon(Int, Int, Int, Int *, Int *, Int *, Int *, Int *, Int *, Int *);
-  float cellavg(float *, Int);
+  double cellavg(double *, Int);
   extern /* Subroutine */ Int tkdash();
-  float xz, yz;
-  float tmp;
+  double xz, yz;
+  double tmp;
 
-/*   xarr  is data array to contour (float*4) */
+/*   xarr  is data array to contour (double*4) */
 /*   nx,ny  is size of xarr */
-/*   xlev   is a table of contour levels float*4 */
+/*   xlev   is a table of contour levels double*4 */
 /*   numlev are the number of levels to contour */
 /*  itvord  is the desired flip of the array - see inccon below for 
 details*/
@@ -78,8 +78,8 @@ details*/
     xsc /= ny;
   }
 /* must reset ix,iy to center the contour on the raster */
-  xz = xl + xsc / (float)2.;
-  yz = yl + ysc / (float)2.;
+  xz = xl + xsc / (double)2.;
+  yz = yl + ysc / (double)2.;
 
 /* set up increments and limits for array processing according to itvord 
 */
@@ -136,23 +136,23 @@ side of the cell */
 	      ++ns;
 	      if (l == 1) {
 /* top */
-		xa[ns - 1] = (float) (icol - 1) +
+		xa[ns - 1] = (double) (icol - 1) +
 		  (xlev[k] - cell[l - 1]) / (cell[l] - cell[l - 1]);
-		ya[ns - 1] = (float) (irow - 1);
+		ya[ns - 1] = (double) (irow - 1);
 	      } else if (l == 2) {
 /* right side */
-		xa[ns - 1] = (float) icol;
-		ya[ns - 1] = (float) (irow - 1) +
+		xa[ns - 1] = (double) icol;
+		ya[ns - 1] = (double) (irow - 1) +
 		  (xlev[k] - cell[l - 1]) / (cell[l] - cell[l - 1]);
 	      } else if (l == 3) {
 /* bottom side */
-		xa[ns - 1] = (float) (icol - 1) +
+		xa[ns - 1] = (double) (icol - 1) +
 		  (xlev[k] - cell[l]) / (cell[l - 1] - cell[l]);
-		ya[ns - 1] = (float) irow;
+		ya[ns - 1] = (double) irow;
 	      } else {
 /* left side */
-		xa[ns - 1] = (float) (icol - 1);
-		ya[ns - 1] = (float) (irow - 1) +
+		xa[ns - 1] = (double) (icol - 1);
+		ya[ns - 1] = (double) (irow - 1) +
 		  (xlev[k] - cell[l]) / (cell[l - 1] - cell[l]);
 	      }
 	    }
@@ -213,20 +213,20 @@ point 2 and point 3 to 4. */
 } /* anacon_ */
 
 
-float cellavg(float *cell, Int nav)
+double cellavg(double *cell, Int nav)
 {
-  float ret_val;
+  double ret_val;
   Int ii;
   
   /* Parameter adjustments */
   --cell;
 
   /* Function Body */
-  ret_val = (float) 0.;
+  ret_val = (double) 0.;
   for (ii = 1; ii <= nav; ++ii) {
     ret_val += cell[ii];
   }
-  ret_val /= (float) nav;
+  ret_val /= (double) nav;
   return ret_val;
 }
 

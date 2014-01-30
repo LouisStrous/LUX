@@ -924,10 +924,10 @@ char *symbolIdent(Int symbol, Int mode)
 	  number.l = *scal_ptr_pointer(symbol).l;
 	  break;
 	case LUX_FLOAT:
-	  number.f = *scal_ptr_pointer(symbol).f;
+	  number.d = (double) *scal_ptr_pointer(symbol).f;
 	  break;
 	case LUX_DOUBLE:
-	  number.f = (float) *scal_ptr_pointer(symbol).d;
+	  number.d = *scal_ptr_pointer(symbol).d;
 	  break;
 	case LUX_TEMP_STRING:
 	  strcpy(curScrat, scal_ptr_pointer(symbol).s);
@@ -937,7 +937,7 @@ char *symbolIdent(Int symbol, Int mode)
       if (scal_ptr_type(symbol) < LUX_FLOAT) /* integer type */
 	sprintf(curScrat, "%d", number.l);
       else if (scal_ptr_type(symbol) <= LUX_DOUBLE) /* float type */
-	sprintf(curScrat, "%g", number.f);
+	sprintf(curScrat, "%g", number.d);
       break;
     case LUX_SUBSC_PTR:
       if (subsc_ptr_start(symbol) == -1) /* (*) */

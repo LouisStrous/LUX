@@ -30,7 +30,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #define CENTER	4
 #define DONE	5
 
-Int sign(float x)
+Int sign(double x)
 {
   if (x > 0)
     return 1;
@@ -40,7 +40,7 @@ Int sign(float x)
     return 0;
 }
 /*--------------------------------------------------------------------*/
-Int sgnclass(float x)
+Int sgnclass(double x)
 {
   if (x > 0)
     return 2;
@@ -50,8 +50,8 @@ Int sgnclass(float x)
     return 1;
 }
 /*--------------------------------------------------------------------*/
-Int traverseElement(float xin, float yin, float vx, float vy,
-		    float *xout, float *yout)
+Int traverseElement(double xin, double yin, double vx, double vy,
+		    double *xout, double *yout)
 /* if you start at position (<xin>,<yin>), with 0 <= <xin>,<yin> <= 1,
    and move in the direction given by (<vx>,<vy>), then this routine
    determines which pixel boundary you cross (UP, DOWN, LEFT, RIGHT,
@@ -162,7 +162,7 @@ Int lux_lic(Int narg, Int ps[])
 {
   Int	iq, nx, ny, ix, iy, c, index, rindex, count, twosided, normalize,
     gaussian, iq0, di;
-  float	x1, y1, x2, y2, *vx0, *vy0, value, vx, vy, s, s0, ds, dslimit,
+  double	x1, y1, x2, y2, *vx0, *vy0, value, vx, vy, s, s0, ds, dslimit,
     weight, ws;
   pointer	src, trgt, src0;
   loopInfo	srcinfo, trgtinfo;
@@ -171,7 +171,7 @@ Int lux_lic(Int narg, Int ps[])
   if (symbol_class(iq0) != LUX_ARRAY /* not an array */
       || array_num_dims(iq0) != 2) /* or doesn't have 2 dimensions */
     return cerror(NEED_2D_ARR, iq0);
-  iq0 = lux_float(1, &iq0);
+  iq0 = lux_double(1, &iq0);
   nx = array_dims(iq0)[0];
   ny = array_dims(iq0)[1];
 
@@ -181,7 +181,7 @@ Int lux_lic(Int narg, Int ps[])
       || array_dims(iq)[0] != nx
       || array_dims(iq)[1] != ny)
     return cerror(INCMP_ARG, iq);
-  iq = lux_float(1, &iq);
+  iq = lux_double(1, &iq);
   vx0 = array_data(iq);
 
   iq = ps[2];			/* vy */
@@ -190,11 +190,11 @@ Int lux_lic(Int narg, Int ps[])
       || array_dims(iq)[0] != nx
       || array_dims(iq)[1] != ny)
     return cerror(INCMP_ARG, iq);
-  iq = lux_float(1, &iq);
+  iq = lux_double(1, &iq);
   vy0 = array_data(iq);
 
   if (standardLoop(iq0, 0, SL_ALLAXES | SL_SAMEDIMS | SL_EXACT | SL_EACHCOORD,
-		   LUX_FLOAT, &srcinfo, &src, &iq, &trgtinfo, &trgt) < 0)
+		   LUX_DOUBLE, &srcinfo, &src, &iq, &trgtinfo, &trgt) < 0)
     return LUX_ERROR;
   src0.f = src.f;
 

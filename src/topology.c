@@ -495,7 +495,7 @@ Int lux_segment_dir(Int narg, Int ps[])
 {
   loopInfo	srcinfo, trgtinfo;
   pointer	src, trgt;
-  float	*angle, s, c, a;
+  double	*angle, s, c, a;
   scalar	value;
   Int	nx, ny, n, result, sign, class;
   Int	off[4];
@@ -512,7 +512,7 @@ Int lux_segment_dir(Int narg, Int ps[])
 		   &srcinfo, &src, &result, &trgtinfo, &trgt) == LUX_ERROR)
     return LUX_ERROR;
 
-  n = lux_float(1, &ps[1]);
+  n = lux_double(1, &ps[1]);
   angle = array_data(n);
 
   sign = (narg > 1 && ps[2])? int_arg(ps[2]): 1;
@@ -749,7 +749,7 @@ Int lux_max_dir(Int narg, Int ps[])
 {
   loopInfo	srcinfo, trgtinfo;
   pointer	src, trgt;
-  float	*angle, s, c, a;
+  double	*angle, s, c, a;
   scalar	value;
   Int	nx, ny, n, result, sign, class;
   Int	off[4];
@@ -766,7 +766,7 @@ Int lux_max_dir(Int narg, Int ps[])
 		   &srcinfo, &src, &result, &trgtinfo, &trgt) == LUX_ERROR)
     return LUX_ERROR;
 
-  n = lux_float(1, &ps[1]);
+  n = lux_double(1, &ps[1]);
   angle = array_data(n);
 
   sign = (narg > 1 && ps[2])? int_arg(ps[2]): 1;
@@ -2371,17 +2371,17 @@ Int lux_basin(Int narg, Int ps[])
  register Byte	loc;
  Byte	end, locs[3];
  array	*h;
- register float	*alt, min0, min1 = 0.0, min2 = 0.0, min;
+ register double	*alt, min0, min1 = 0.0, min2 = 0.0, min;
 
  iq = ps[0];				/* altitude map */
  CK_ARR(iq,1);
- iq = lux_float(1, &iq);		/* make float for easy programming */
+ iq = lux_double(1, &iq);		/* make double for easy programming */
  h = HEAD(iq);
  if (h->ndim != 2)
    return cerror(NEED_2D_ARR, iq);
  nx = h->dims[0];		/* dimensions */
  ny = h->dims[1];
- alt = (float *) LPTR(h);	/* altitudes (i.e. data) */
+ alt = (double *) LPTR(h);	/* altitudes (i.e. data) */
  result_sym = array_clone(iq, LUX_LONG);
  h = HEAD(result_sym);
  wsh = LPTR(h);			/* result map */

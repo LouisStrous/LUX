@@ -84,7 +84,7 @@ enum menuItems { ZOOM_TITLE, ZOOM_MAG, ZOOM_STD, ZOOM_TWO,
 
 #define ZOOM_PROFILE	-1
 
-float	zoom_xc = 0.0, zoom_yc = 0.0, zoom_mag = 0.0;
+double	zoom_xc = 0.0, zoom_yc = 0.0, zoom_mag = 0.0;
 double	zoom_clo = 0.0, zoom_chi = 0.0;
 Int	zoom_frame = 0;
 
@@ -95,16 +95,16 @@ Int lux_zoom(Int narg, Int ps[])
   extern scalar	lastmin, lastmax;
   Int	createMenu(Int num, Int x, Int y, Int nItem, char **item),
     menu_setup(void), lux_xport(Int, Int []),
-    tvraw(pointer data, Int type, Int nx, Int ny, float x1, float x2,
-	  float y1, float y2, float sx, float sy, Int wid, float *mag,
+    tvraw(pointer data, Int type, Int nx, Int ny, double x1, double x2,
+	  double y1, double y2, double sx, double sy, Int wid, double *mag,
 	  Int mode, double clo, double chi, Byte *bitmap1, Byte *bitmap2),
-    threecolors(float *, Int);
+    threecolors(double *, Int);
   Int	i, ntext, ndim, *dims, wid, mid, x = 0, y = 0, selected, j, type,
     nx, ny, sx, sy, sx0, sy0, ww, hw, nframe, stride, profile = -1,
     step[MAX_DIMS], coords[2*MAX_DIMS], sdims[3],
     axes[2] = {0, 1}, follow = 0, play = 0, loop, offset, mousepos = 1;
   Int	minmax(Int *data, Int nelem, Int type);
-  float	x1, x2, y1, y2, dx, dy, z, colorRange = 1.0;
+  double	x1, x2, y1, y2, dx, dy, z, colorRange = 1.0;
   pointer	data, image, bitmapdata1, bitmap1, bitmapdata2,
     bitmap2;
   char	**zoomText,
@@ -519,7 +519,7 @@ Int lux_zoom(Int narg, Int ps[])
 		  paint_pane(mid, ZOOM_MAG, WHITE);
 		  break;
 		case ZOOM_TWO:	/* zoom in/out by a factor of 2 */
-		  z = (float) event.xbutton.x/((float) fontwidth);
+		  z = (double) event.xbutton.x/((double) fontwidth);
 		  if (z < 10.5) {	/* zoom in */
 		    x1 = zoom_xc - sx/zoom_mag;
 		    x2 = zoom_xc + sx/zoom_mag;
@@ -952,12 +952,12 @@ Int tvzoom(Int narg, Int ps[])
   Int	*dims, ndim, axes[2] = {0, 1}, sdims[3], nx, ny, wid;
   Int	coords[4], offset, type, sx, sy, i, stride, step[2];
   extern Int	last_wid;
-  Int	tvraw(pointer data, Int type, Int nx, Int ny, float x1, float x2,
-	      float y1, float y2, float sx, float sy, Int wid, float *mag,
+  Int	tvraw(pointer data, Int type, Int nx, Int ny, double x1, double x2,
+	      double y1, double y2, double sx, double sy, Int wid, double *mag,
 	      Int mode, double clo, double chi, Byte *bitmap1, Byte *bitmap2);
 
   pointer	data, image, bitmapdata, bitmap;
-  float	x1, x2, y1, y2;
+  double	x1, x2, y1, y2;
 
   if (numerical(ps[0], &dims, &ndim, NULL, &data) < 0)
     return LUX_ERROR;

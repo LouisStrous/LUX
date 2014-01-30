@@ -127,7 +127,7 @@ void randomu(Int seed, void *output, Int number, Int modulo)
 /* a negative value indicates complete reinitialization of the random */
 /* sequence.  a positive value indicates a mere change of seed.  a zero */
 /* value indicates that the current random sequence is continued. */
-/* if <modulo> is zero, then <output> is considered (float *) and the */
+/* if <modulo> is zero, then <output> is considered (double *) and the */
 /* generated random sequence is LUX_DOUBLE.  if <modulo> is positive, then */
 /* <output> is considered (Int *) and the generated random sequence */
 /* runs between 0 and <modulo> - 1 (inclusive) */

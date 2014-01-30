@@ -391,7 +391,7 @@ Int lux_readarr(Int narg, Int ps[])
  char	*p, *pt, lastchar, token[32], line[BUFSIZE];
  Int	arrs=0, i, iq, maxtype = LUX_LONG, *iptr, 
    getNewLine(char *, size_t, char *, char), redef_array(Int, Int, Int, Int *);
- float	*fptr;
+ double	*fptr;
 
  iq = ps[0];						/* target */
  tp = Tmpfile();					/* temporary storage */
@@ -405,8 +405,8 @@ Int lux_readarr(Int narg, Int ps[])
    { while (isspace((Byte) *p) || *p == ',') p++; /* skip space & , */
      pt = p;						/* token start */
      while (isspace((Byte) *p) == 0 && *p != ',' && *p != 0) /* scan value */
-     { if (*p == 'e' || *p == 'E' || *p == '.')		/* float? */
-         maxtype = LUX_FLOAT; p++; }
+     { if (*p == 'e' || *p == 'E' || *p == '.')		/* double? */
+         maxtype = LUX_DOUBLE; p++; }
      lastchar = *p;  *p++ = '\0';
      if (*pt) {
        strcpy(token, pt);
@@ -417,8 +417,8 @@ Int lux_readarr(Int narg, Int ps[])
    rewind(tp);
    if (redef_array(iq, maxtype, 1, &arrs) != 1) 		/* target */
    { printf("(redef_array): "); fclose(tp); return cerror(ALLOC_ERR, iq); }
-   if (maxtype == LUX_FLOAT)
-   { fptr = (float *) ((char *) sym[iq].spec.array.ptr + sizeof(array));
+   if (maxtype == LUX_DOUBLE)
+   { fptr = (double *) ((char *) sym[iq].spec.array.ptr + sizeof(array));
      for (i = arrs; i > 0; i--) fscanf(tp, "%f", fptr++); }
    else
    { iptr = (Int *) ((char *) sym[iq].spec.array.ptr + sizeof(array));
@@ -1058,7 +1058,7 @@ Int varsmooth(Int narg, Int ps[], Int cumul)
 {
   Int	axisSym, widthSym, nWidth, nData, nDim, result, done, type, outType,
     i1, i2, i, step, widthNDim, *widthDim, axis;
-  float	weight;
+  double	weight;
   pointer	src, trgt, width, width0;
   scalar	sum;
   loopInfo	srcinfo, trgtinfo;
@@ -1091,7 +1091,7 @@ Int varsmooth(Int narg, Int ps[], Int cumul)
     width0.l = width.l = array_data(done); }
   
   if (standardLoop(ps[0], axisSym, SL_SAMEDIMS | SL_UPGRADE | SL_EACHCOORD,
-		   cumul? LUX_LONG: LUX_FLOAT,
+		   cumul? LUX_LONG: LUX_DOUBLE,
 		   &srcinfo, &src, &result, &trgtinfo, &trgt) < 0)
     /* generating appropriate output symbol and initializing for looping
      through the data did not succeed */
@@ -3672,7 +3672,7 @@ Int lux_bsmooth(Int narg, Int ps[])
   Int	iq, axis, outtype, type, result_sym, *dims, ndim, xdims[MAX_DIMS],
 	width, i, n, tally[MAX_DIMS], step[MAX_DIMS], m, done, j, k, stride;
   pointer	src, trgt, src0, trgt0;
-  float	fwidth;
+  double	fwidth;
 
   if (narg > 2)
   { iq = ps[2];			/* WIDTH */
@@ -3681,7 +3681,7 @@ Int lux_bsmooth(Int narg, Int ps[])
   { iq = ps[1];			/* WIDTH */
     axis = -1; }		/* no AXIS */
   if (narg > 1)
-  { fwidth = float_arg(iq);
+  { fwidth = double_arg(iq);
     if (fwidth <= 0)
       return cerror(NEED_POS_ARG, iq);
     width = (Int) (fwidth*fwidth/2);

@@ -23,19 +23,19 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "action.h"
 
  /*------------------------------------------------------------------------- */
-static void rdct_spike(Word *start, Int ystride, float *ws)
+static void rdct_spike(Word *start, Int ystride, double *ws)
  /* does reverse dct for one cell, specialize for a spike smooth */
 {
-  float	tmp0, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7;
-  float	tmp10, tmp11, tmp12, tmp13;
-  float	z5, z11, z13, z10, z12;
+  double	tmp0, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7;
+  double	tmp10, tmp11, tmp12, tmp13;
+  double	z5, z11, z13, z10, z12;
 
   /* no de-zag and de-quantize here */
   /* Pass 1: process columns. */
   /* we don't check for columns of zeroes since this usually uses full
      precision */
 {
-  register float *wsptr = ws;
+  register double *wsptr = ws;
   Int	nq = 8;
 
   while (nq--) {
@@ -94,7 +94,7 @@ static void rdct_spike(Word *start, Int ystride, float *ws)
 
   /* Pass 2: process rows. */
 {
-  register float *wsptr;
+  register double *wsptr;
   register short *elemptr;
   Int	nq = 8;
   
@@ -163,13 +163,13 @@ Int lux_despike(Int narg, Int ps[])
   Int	nxc, nyc, cell_flag_sign, niter=1, rms_flag_sign, rms_flag;
   Int	sign_flag, bad_flag, bb_flag, save_niter, ntotal, dim[2];
   Byte	*cell_status;
-  float	frac = 0.25, fsum, cfrac, tq, rms=0.0, fdif;
+  double	frac = 0.25, fsum, cfrac, tq, rms=0.0, fdif;
   Word	*p, *q, *ptr, *p1, *p2, *p3, *out, *out2;
   Word	arr[16], *pps, *ss;
 
   lognb2 = (log((double) 16)*ALN2I+TINY);
 
-  if (narg > 1 && ps[1] && float_arg_stat(ps[1], &frac) != 1)
+  if (narg > 1 && ps[1] && double_arg_stat(ps[1], &frac) != 1)
     return LUX_ERROR;
   if (narg > 2 && ps[2] && int_arg_stat(ps[2], &level) != 1)
     return LUX_ERROR;
@@ -179,7 +179,7 @@ Int lux_despike(Int narg, Int ps[])
     return LUX_ERROR;
   if (narg > 4 && ps[4] && int_arg_stat(ps[4], &cell_flag) != 1)
     return LUX_ERROR;
-  if (narg > 5 && ps[5] && float_arg_stat(ps[5], &rms) != 1)
+  if (narg > 5 && ps[5] && double_arg_stat(ps[5], &rms) != 1)
     return LUX_ERROR;
 
  if (cell_flag > 0)
@@ -281,10 +281,10 @@ Int lux_despike(Int narg, Int ps[])
  p3 = p2 + nx;
  while (n--) {
   /* add the 8 */
-  tq = (cfrac * (float) *p);
+  tq = (cfrac * (double) *p);
   sum = *p1 + *(p1+1) + *(p1+2) + *p2 + *(p2+2) + *p3 + *(p3+1) + *(p3+2);
   p1++;  p2++;  p3++;
-  fsum = (float) sum * 0.125;
+  fsum = (double) sum * 0.125;
   /* now the test */
   if ( fsum <= tq) {  /* we have a bady, zap it */
     nc++;
@@ -350,7 +350,7 @@ Int lux_despike(Int narg, Int ps[])
 
  if (bb_flag) {
   Int badcells = 0;
-  float	dc[9], ws[64], *pf;
+  double	dc[9], ws[64], *pf;
   Int 	i, ix, jx, ic, stride = nx - 8, ii, jj, istart,k;
   Int	ioff[3], joff[3];
   for (i=0;i<cell_count;i++) {
@@ -374,7 +374,7 @@ Int lux_despike(Int narg, Int ps[])
       nc = 8;
       /* get the checkerboard metric */
       while (nc--) { m = 4; while(m--) {
-      	fsum += (float) *q++; fsum += (float) *q++;
+      	fsum += (double) *q++; fsum += (double) *q++;
 	fdif = fdif + *ps1 - *ps2;
 	ps1 += 2;	ps2 += 2;
       	}
@@ -410,7 +410,7 @@ Int lux_despike(Int narg, Int ps[])
       k = ii + jj*3;
       fsum = 0.0;
       nc = 8;
-      while (nc--) { m = 8; while(m--) fsum += (float) *q++; q += stride; }
+      while (nc--) { m = 8; while(m--) fsum += (double) *q++; q += stride; }
       dc[k] = fsum*0.015625; /* that's 1/64 */
       dc[4] += dc[k];
       }

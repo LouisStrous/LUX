@@ -889,7 +889,7 @@ Int lux_fitskey(Int narg, Int ps[])
 #define CENTER	4
 #define DONE	5
 
-Int sign(float x)
+Int sign(double x)
 {
   if (x > 0)
     return 1;
@@ -899,7 +899,7 @@ Int sign(float x)
     return 0;
 }
 /*--------------------------------------------------------------------*/
-Int sgnclass(float x)
+Int sgnclass(double x)
 {
   if (x > 0)
     return 2;
@@ -909,8 +909,8 @@ Int sgnclass(float x)
     return 1;
 }
 /*--------------------------------------------------------------------*/
-Int traverseElement(float xin, float yin, float vx, float vy,
-		    float *xout, float *yout)
+Int traverseElement(double xin, double yin, double vx, double vy,
+		    double *xout, double *yout)
 /* if you start at position (<xin>,<yin>), with 0 <= <xin>,<yin> <= 1,
    and move in the direction given by (<vx>,<vy>), then this routine
    determines which pixel boundary you cross (UP, DOWN, LEFT, RIGHT,
@@ -1005,7 +1005,7 @@ LS 9nov98 */
 {
   Int	iq, nx, ny, ix, iy, c, index, rindex, count, twosided, total,
     gaussian, iq0, di, straight;
-  float	x1, y1, x2, y2, *vx0, *vy0, value, vx, vy, s, s0, ds, dslimit,
+  double	x1, y1, x2, y2, *vx0, *vy0, value, vx, vy, s, s0, ds, dslimit,
     weight, ws, s1;
   pointer	src, trgt, src0;
   loopInfo	srcinfo, trgtinfo;
@@ -1014,7 +1014,7 @@ LS 9nov98 */
   if (symbol_class(iq0) != LUX_ARRAY /* not an array */
       || array_num_dims(iq0) != 2) /* or doesn't have 2 dimensions */
     return cerror(NEED_2D_ARR, iq0);
-  iq0 = lux_float(1, &iq0);
+  iq0 = lux_double(1, &iq0);
   nx = array_dims(iq0)[0];
   ny = array_dims(iq0)[1];
 
@@ -1024,7 +1024,7 @@ LS 9nov98 */
       || array_dims(iq)[0] != nx
       || array_dims(iq)[1] != ny)
     return cerror(INCMP_ARG, iq);
-  iq = lux_float(1, &iq);
+  iq = lux_double(1, &iq);
   vx0 = array_data(iq);
 
   iq = ps[2];			/* vy */
@@ -1033,7 +1033,7 @@ LS 9nov98 */
       || array_dims(iq)[0] != nx
       || array_dims(iq)[1] != ny)
     return cerror(INCMP_ARG, iq);
-  iq = lux_float(1, &iq);
+  iq = lux_double(1, &iq);
   vy0 = array_data(iq);
 
   if (standardLoop(iq0, 0, SL_ALLAXES | SL_SAMEDIMS | SL_EXACT | SL_EACHCOORD,
@@ -1324,7 +1324,7 @@ Int lux_dir_smooth2(Int narg, Int ps[])
 {
   Int	iq, nx, ny, ix, iy, c, index, rindex, count, twosided, normalize,
     gaussian, iq0, di, straight;
-  float	x1, y1, x2, y2, *vx0, *vy0, vx, vy, s, s0, ds, dslimit,
+  double	x1, y1, x2, y2, *vx0, *vy0, vx, vy, s, s0, ds, dslimit,
     weight, ws, s1, norm;
   pointer	src, trgt, src0;
   loopInfo	srcinfo, trgtinfo;
@@ -1333,7 +1333,7 @@ Int lux_dir_smooth2(Int narg, Int ps[])
   if (symbol_class(iq0) != LUX_ARRAY /* not an array */
       || array_num_dims(iq0) != 2) /* or doesn't have 2 dimensions */
     return cerror(NEED_2D_ARR, iq0);
-  iq0 = lux_float(1, &iq0);
+  iq0 = lux_double(1, &iq0);
   nx = array_dims(iq0)[0];
   ny = array_dims(iq0)[1];
 
@@ -1343,7 +1343,7 @@ Int lux_dir_smooth2(Int narg, Int ps[])
       || array_dims(iq)[0] != nx
       || array_dims(iq)[1] != ny)
     return cerror(INCMP_ARG, iq);
-  iq = lux_float(1, &iq);
+  iq = lux_double(1, &iq);
   vx0 = array_data(iq);
 
   iq = ps[2];			/* vy */
@@ -1352,7 +1352,7 @@ Int lux_dir_smooth2(Int narg, Int ps[])
       || array_dims(iq)[0] != nx
       || array_dims(iq)[1] != ny)
     return cerror(INCMP_ARG, iq);
-  iq = lux_float(1, &iq);
+  iq = lux_double(1, &iq);
   vy0 = array_data(iq);
 
   if (standardLoop(iq0, 0, SL_ALLAXES | SL_SAMEDIMS | SL_EXACT | SL_EACHCOORD,
@@ -1365,7 +1365,7 @@ Int lux_dir_smooth2(Int narg, Int ps[])
   gaussian = (internalMode & 2)? 1: 0; /* /GAUSSIAN */
   straight = (internalMode & 8);
 
-  zerobytes(trgt.f, array_size(iq)*sizeof(float)); /* set to zero */
+  zerobytes(trgt.f, array_size(iq)*sizeof(double)); /* set to zero */
 
   if (!gaussian) {		/* boxcar */
     if (!normalize)
@@ -1661,7 +1661,7 @@ Int lux_trajectory(Int narg, Int ps[])
 {
   Int	iq, nx, ny, ix, iy, c, index, di, n, i, dims[MAX_DIMS],
     ngrid, type, dv;
-  float	x1, y1, x2, y2, vx, vy, s, s0, ds, dslimit, s1;
+  double	x1, y1, x2, y2, vx, vy, s, s0, ds, dslimit, s1;
   pointer	gx, gy, vx0, vy0, ox, oy;
   Int lux_convert(Int, Int [], Int, Int);
 
@@ -2148,9 +2148,9 @@ Int lux_enhanceimage(Int narg, Int ps[])
 {
   pointer src, tgt;
   Int ndim, *dims, nhist, *hist, nelem, i, result;
-  float target, part;
-  float a, b;
-  float *m;
+  double target, part;
+  double a, b;
+  double *m;
 
   if (!symbolIsNumericalArray(ps[0]))
     return cerror(NEED_NUM_ARR, ps[0]);
@@ -2159,8 +2159,8 @@ Int lux_enhanceimage(Int narg, Int ps[])
   numerical(ps[0], &dims, &ndim, &nelem, &src);
   if (ndim < 2)
     return luxerror("Need 2 or more dimensions", ps[0]);
-  part = (narg > 1 && ps[1])? float_arg(ps[1]): 1;
-  target = (narg > 2 && ps[2])? float_arg(ps[2]): 100.0/256;
+  part = (narg > 1 && ps[1])? double_arg(ps[1]): 1;
+  target = (narg > 2 && ps[2])? double_arg(ps[2]): 100.0/256;
 
   nhist = 256*dims[0];
   hist = calloc(nhist, sizeof(*hist));
@@ -2190,9 +2190,9 @@ Int lux_enhanceimage(Int narg, Int ps[])
   b = 1 - a;
   m[0] = 1.0;
   for (i = 1; i < nhist; i++) {	/* calculate adjustment factors */
-    float q;
+    double q;
 
-    q = (float) hist[i]*dims[0]/nelem;
+    q = (double) hist[i]*dims[0]/nelem;
     m[i] = q*(a*q + b)/i*nhist;
     if (m[i] < 1 && !(internalMode & 1))
       m[i] = 1;

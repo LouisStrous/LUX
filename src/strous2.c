@@ -529,7 +529,7 @@ Int lux_orderfilter(Int narg, Int ps[])
 {
   Int	output, width, w, med, nelem, range[2*MAX_DIMS], *index,
     *offset, i, j;
-  float	order;
+  double	order;
   loopInfo	srcinfo, trgtinfo, tmpinfo, tmpinfo2;
   pointer	trgt, tmpsrc, tmptrgt;
   /* we use a global pointer src */
@@ -547,7 +547,7 @@ Int lux_orderfilter(Int narg, Int ps[])
   width = 2*w + 1;		/* ensure that <width> is odd */
 
   if (ps[0]) {			/* have <order> */
-    order = float_arg(ps[0]);
+    order = double_arg(ps[0]);
     if (order < 0.0 || order > 1.0)
       return luxerror("Order fraction must be between 0 and 1, was %f",
 		   ps[0], order);
@@ -679,7 +679,7 @@ Int lux_quantile(Int narg, Int ps[])
 /* QUANTILE([<order> ,] <data> [, <axes>]) */
 {
   Int	output, med, nelem, i;
-  float	order;
+  double	order;
   loopInfo	srcinfo, trgtinfo;
   pointer	trgt, tmp, tmp0;
   /* we use a global pointer src */
@@ -688,7 +688,7 @@ Int lux_quantile(Int narg, Int ps[])
     return luxerror("Need data array", 0);
   
   if (ps[0]) {			/* have <order> */
-    order = float_arg(ps[0]);
+    order = double_arg(ps[0]);
     if (order < 0.0 || order > 1.0)
       return luxerror("Order fraction must be between 0 and 1, was %f",
 		   ps[0], order);
@@ -1283,14 +1283,14 @@ Int lux_maxfilter(Int narg, Int ps[])
 }
 /*---------------------------------------------------------*/
 Int lux_distarr(Int narg, Int ps[])
-/* DISTARR(dims[,center,stretch]) returns a FLOAT array of dimensions <dims> */
+/* DISTARR(dims[,center,stretch]) returns a DOUBLE array of dimensions <dims> */
 /* wherein each element contains the distance of the coordinates of */
 /* that element to the point given in <center>, after stretching each */
 /* coordinate by the appropriate factor from <stretch>.  <dims>, <center>, */
 /* and <stretch> must have the same number of elements.  LS 9jan97 22may97 */
 {
   Int	iq, *dims, ndim, i, result, done;
-  float	*center, temp, temptot, zerocenter[MAX_DIMS], *stretch,
+  double	*center, temp, temptot, zerocenter[MAX_DIMS], *stretch,
 	onestretch[MAX_DIMS];
   pointer	trgt;
   loopInfo	trgtinfo;
@@ -1308,35 +1308,35 @@ Int lux_distarr(Int narg, Int ps[])
     default:
       return cerror(ILL_CLASS, ps[0]); }
   if (narg > 1)
-  { iq = lux_float(1, &ps[1]);	/* CENTER */
+  { iq = lux_double(1, &ps[1]);	/* CENTER */
     switch (symbol_class(iq))
     { case LUX_ARRAY:
 	if (array_size(iq) != ndim)
 	  return cerror(INCMP_ARG, ps[1]);
-	center = (float *) array_data(iq);
+	center = (double *) array_data(iq);
 	break;
       case LUX_SCALAR:
 	if (ndim != 1)
 	  return cerror(INCMP_ARG, ps[1]);
-	center = &scalar_value(iq).f;
+	center = &scalar_value(iq).d;
 	break;
       default:
 	return cerror(ILL_CLASS, ps[1]); }
   } else
-  { zerobytes(zerocenter, ndim*sizeof(float));
+  { zerobytes(zerocenter, ndim*sizeof(double));
     center = zerocenter; }
   if (narg > 2)
-  { iq = lux_float(1, &ps[2]);	/* STRETCH */
+  { iq = lux_double(1, &ps[2]);	/* STRETCH */
     switch (symbol_class(iq))
     { case LUX_ARRAY:
 	if (array_size(iq) != ndim)
 	  return cerror(INCMP_ARG, ps[2]);
-	stretch = (float *) array_data(iq);
+	stretch = (double *) array_data(iq);
 	break;
       case LUX_SCALAR:
 	if (ndim != 1)
 	  return cerror(INCMP_ARG, ps[2]);
-	stretch = &scalar_value(iq).f;
+	stretch = &scalar_value(iq).d;
 	break;
       default:
 	return cerror(ILL_CLASS, ps[2]); }
@@ -1350,11 +1350,11 @@ Int lux_distarr(Int narg, Int ps[])
   for (i = 0; i < ndim; i++)
     if (dims[i] <= 0)
       return cerror(ILL_DIM, ps[0]);
-  result = array_scratch(LUX_FLOAT, ndim, dims);
+  result = array_scratch(LUX_DOUBLE, ndim, dims);
   if (result == LUX_ERROR)	/* some error */
     return LUX_ERROR;
-  trgt.f = (float *) array_data(result);
-  setupDimensionLoop(&trgtinfo, ndim, dims, LUX_FLOAT, ndim, NULL, &trgt,
+  trgt.d = (double *) array_data(result);
+  setupDimensionLoop(&trgtinfo, ndim, dims, LUX_DOUBLE, ndim, NULL, &trgt,
 		     SL_EACHCOORD);
   /* initialize walk through array */
   temptot = 0.0;
@@ -1894,7 +1894,7 @@ Int local_extrema(Int narg, Int ps[], Int code)
   Int	result, sign, degree, n, i, *offset, k, j, ok, *edge, nok,
 	*diagonal, nDiagonal, nDoDim, index, subgrid, ready, done;
   pointer	src, trgt, trgt0, srcl, srcr, trgt00;
-  float	*grad, *grad2, *hessian, value;
+  double	*grad, *grad2, *hessian, value;
   loopInfo	srcinfo, trgtinfo;
 
   if (!symbolIsNumericalArray(ps[0]))
@@ -2094,8 +2094,8 @@ Int local_extrema(Int narg, Int ps[], Int code)
       return LUX_MINUS_ONE;
     switch (code) {
       case 0: case 2:		/* find values */
-	result = array_scratch(LUX_FLOAT, 1, &n);
-	trgt.f = (float *) array_data(result);
+	result = array_scratch(LUX_DOUBLE, 1, &n);
+	trgt.d = (double *) array_data(result);
       case 1: case 3:		/* find positions */
 	if (!(internalMode & 4) && !subgrid) {	/* not /COORDS, not /SUBGRID */
 	  srcinfo.coords[0] = n;	/* number of found extrema */
@@ -2104,7 +2104,7 @@ Int local_extrema(Int narg, Int ps[], Int code)
 	} else {
 	  srcinfo.coords[0] = srcinfo.ndim; /* # dimensions in the data */
 	  srcinfo.coords[1] = n;	/* number of found extrema */
-	  result = array_scratch(subgrid? LUX_FLOAT: LUX_LONG, 2,
+	  result = array_scratch(subgrid? LUX_DOUBLE: LUX_LONG, 2,
 				 srcinfo.coords);
 	  trgt.l = (Int *) array_data(result);
 	}
@@ -2123,9 +2123,9 @@ Int local_extrema(Int narg, Int ps[], Int code)
 	    nDiagonal++;
       }	/* end of if (!diagonal) else */
       if (nDiagonal) {
-	allocate(grad2, nDiagonal, float);
-	allocate(grad, nDiagonal, float);
-	allocate(hessian, nDiagonal*nDiagonal, float);
+	allocate(grad2, nDiagonal, double);
+	allocate(grad, nDiagonal, double);
+	allocate(hessian, nDiagonal*nDiagonal, double);
 	k = 0;
 	for (i = 0; i < srcinfo.ndim; i++)
 	  if (!diagonal || diagonal[i])
@@ -2142,11 +2142,11 @@ Int local_extrema(Int narg, Int ps[], Int code)
 	switch (symbol_type(ps[0])) {
 	  case LUX_BYTE:
 	    srcl.b = src.b + index;
-	    value = (float) *srcl.b;
+	    value = (double) *srcl.b;
 	    for (i = 0; i < nDiagonal; i++)
 	      grad[i] = grad2[i]
-		= ((float) srcl.b[srcinfo.step[i]]
-		   - (float) srcl.b[-srcinfo.step[i]])/2;
+		= ((double) srcl.b[srcinfo.step[i]]
+		   - (double) srcl.b[-srcinfo.step[i]])/2;
 	    ready = 1;	/* zero gradient? */
 	    for (i = 0; i < nDiagonal; i++)
 	      if (grad[i] != 0) {
@@ -2159,23 +2159,23 @@ Int local_extrema(Int narg, Int ps[], Int code)
 	      for (j = 0; j <= i; j++)
 		if (i == j)
 		  hessian[i + i*nDiagonal] 
-		    = (float) srcl.b[srcinfo.step[i]]
-		    + (float) srcl.b[-srcinfo.step[i]] - 2*value;
+		    = (double) srcl.b[srcinfo.step[i]]
+		    + (double) srcl.b[-srcinfo.step[i]] - 2*value;
 		else
 		  hessian[i + j*nDiagonal] = hessian[j + i*nDiagonal]
-		    = ((float) srcl.b[srcinfo.step[i] + srcinfo.step[j]]
-		       + (float) srcl.b[-srcinfo.step[i] - srcinfo.step[j]]
-		       - (float) srcl.b[srcinfo.step[i] - srcinfo.step[j]]
-		       - (float) srcl.b[srcinfo.step[j]
+		    = ((double) srcl.b[srcinfo.step[i] + srcinfo.step[j]]
+		       + (double) srcl.b[-srcinfo.step[i] - srcinfo.step[j]]
+		       - (double) srcl.b[srcinfo.step[i] - srcinfo.step[j]]
+		       - (double) srcl.b[srcinfo.step[j]
 				       - srcinfo.step[i]])/4;
 	    break;
 	  case LUX_WORD:
 	    srcl.w = src.w + index;
-	    value = (float) *srcl.w;
+	    value = (double) *srcl.w;
 	    for (i = 0; i < nDiagonal; i++)
 	      grad[i] = grad2[i]
-		= ((float) srcl.w[srcinfo.step[i]]
-		   - (float) srcl.w[-srcinfo.step[i]])/2;
+		= ((double) srcl.w[srcinfo.step[i]]
+		   - (double) srcl.w[-srcinfo.step[i]])/2;
 	    ready = 1;	/* zero gradient? */
 	    for (i = 0; i < nDiagonal; i++)
 	      if (grad[i] != 0) {
@@ -2188,23 +2188,23 @@ Int local_extrema(Int narg, Int ps[], Int code)
 	      for (j = 0; j <= i; j++)
 		if (i == j)
 		  hessian[i + i*nDiagonal] 
-		    = (float) srcl.w[srcinfo.step[i]]
-		    + (float) srcl.w[-srcinfo.step[i]] - 2*value;
+		    = (double) srcl.w[srcinfo.step[i]]
+		    + (double) srcl.w[-srcinfo.step[i]] - 2*value;
 		else
 		  hessian[i + j*nDiagonal] = hessian[j + i*nDiagonal]
-		    = ((float) srcl.w[srcinfo.step[i] + srcinfo.step[j]]
-		       + (float) srcl.w[-srcinfo.step[i] - srcinfo.step[j]]
-		       - (float) srcl.w[srcinfo.step[i] - srcinfo.step[j]]
-		       - (float) srcl.w[srcinfo.step[j]
+		    = ((double) srcl.w[srcinfo.step[i] + srcinfo.step[j]]
+		       + (double) srcl.w[-srcinfo.step[i] - srcinfo.step[j]]
+		       - (double) srcl.w[srcinfo.step[i] - srcinfo.step[j]]
+		       - (double) srcl.w[srcinfo.step[j]
 				       - srcinfo.step[i]])/4;
 	    break;
 	  case LUX_LONG:
 	    srcl.l = src.l + index;
-	    value = (float) *srcl.l;
+	    value = (double) *srcl.l;
 	    for (i = 0; i < nDiagonal; i++)
 	      grad[i] = grad2[i]
-		= ((float) srcl.l[srcinfo.step[i]]
-		   - (float) srcl.l[-srcinfo.step[i]])/2;
+		= ((double) srcl.l[srcinfo.step[i]]
+		   - (double) srcl.l[-srcinfo.step[i]])/2;
 	    ready = 1;	/* zero gradient? */
 	    for (i = 0; i < nDiagonal; i++)
 	      if (grad[i] != 0) {
@@ -2217,23 +2217,23 @@ Int local_extrema(Int narg, Int ps[], Int code)
 	      for (j = 0; j <= i; j++)
 		if (i == j)
 		  hessian[i + i*nDiagonal] 
-		    = (float) srcl.l[srcinfo.step[i]]
-		    + (float) srcl.l[-srcinfo.step[i]] - 2*value;
+		    = (double) srcl.l[srcinfo.step[i]]
+		    + (double) srcl.l[-srcinfo.step[i]] - 2*value;
 		else
 		  hessian[i + j*nDiagonal] = hessian[j + i*nDiagonal]
-		    = ((float) srcl.l[srcinfo.step[i] + srcinfo.step[j]]
-		       + (float) srcl.l[-srcinfo.step[i] - srcinfo.step[j]]
-		       - (float) srcl.l[srcinfo.step[i] - srcinfo.step[j]]
-		       - (float) srcl.l[srcinfo.step[j]
+		    = ((double) srcl.l[srcinfo.step[i] + srcinfo.step[j]]
+		       + (double) srcl.l[-srcinfo.step[i] - srcinfo.step[j]]
+		       - (double) srcl.l[srcinfo.step[i] - srcinfo.step[j]]
+		       - (double) srcl.l[srcinfo.step[j]
 				       - srcinfo.step[i]])/4;
 	    break;
 	  case LUX_FLOAT:
 	    srcl.f = src.f + index;
-	    value = (float) *srcl.f;
+	    value = (double) *srcl.f;
 	    for (i = 0; i < nDiagonal; i++)
 	      grad[i] = grad2[i]
-		= ((float) srcl.f[srcinfo.step[i]]
-		   - (float) srcl.f[-srcinfo.step[i]])/2;
+		= ((double) srcl.f[srcinfo.step[i]]
+		   - (double) srcl.f[-srcinfo.step[i]])/2;
 	    ready = 1;	/* zero gradient? */
 	    for (i = 0; i < nDiagonal; i++)
 	      if (grad[i] != 0) {
@@ -2246,23 +2246,23 @@ Int local_extrema(Int narg, Int ps[], Int code)
 	      for (j = 0; j <= i; j++)
 		if (i == j)
 		  hessian[i + i*nDiagonal] 
-		    = (float) srcl.f[srcinfo.step[i]]
-		    + (float) srcl.f[-srcinfo.step[i]] - 2*value;
+		    = (double) srcl.f[srcinfo.step[i]]
+		    + (double) srcl.f[-srcinfo.step[i]] - 2*value;
 		else
 		  hessian[i + j*nDiagonal] = hessian[j + i*nDiagonal]
-		    = ((float) srcl.f[srcinfo.step[i] + srcinfo.step[j]]
-		       + (float) srcl.f[-srcinfo.step[i] - srcinfo.step[j]]
-		       - (float) srcl.f[srcinfo.step[i] - srcinfo.step[j]]
-		       - (float) srcl.f[srcinfo.step[j]
+		    = ((double) srcl.f[srcinfo.step[i] + srcinfo.step[j]]
+		       + (double) srcl.f[-srcinfo.step[i] - srcinfo.step[j]]
+		       - (double) srcl.f[srcinfo.step[i] - srcinfo.step[j]]
+		       - (double) srcl.f[srcinfo.step[j]
 				       - srcinfo.step[i]])/4;
 	    break;
 	  case LUX_DOUBLE:
 	    srcl.d = src.d + index;
-	    value = (float) *srcl.d;
+	    value = (double) *srcl.d;
 	    for (i = 0; i < nDiagonal; i++)
 	      grad[i] = grad2[i]
-		= ((float) srcl.d[srcinfo.step[i]]
-		   - (float) srcl.d[-srcinfo.step[i]])/2;
+		= ((double) srcl.d[srcinfo.step[i]]
+		   - (double) srcl.d[-srcinfo.step[i]])/2;
 	    ready = 1;	/* zero gradient? */
 	    for (i = 0; i < nDiagonal; i++)
 	      if (grad[i] != 0) {
@@ -2275,14 +2275,14 @@ Int local_extrema(Int narg, Int ps[], Int code)
 	      for (j = 0; j <= i; j++)
 		if (i == j)
 		  hessian[i + i*nDiagonal] 
-		    = (float) srcl.d[srcinfo.step[i]]
-		    + (float) srcl.d[-srcinfo.step[i]] - 2*value;
+		    = (double) srcl.d[srcinfo.step[i]]
+		    + (double) srcl.d[-srcinfo.step[i]] - 2*value;
 		else
 		  hessian[i + j*nDiagonal] = hessian[j + i*nDiagonal]
-		    = ((float) srcl.d[srcinfo.step[i] + srcinfo.step[j]]
-		       + (float) srcl.d[-srcinfo.step[i] - srcinfo.step[j]]
-		       - (float) srcl.d[srcinfo.step[i] - srcinfo.step[j]]
-		       - (float) srcl.d[srcinfo.step[j]
+		    = ((double) srcl.d[srcinfo.step[i] + srcinfo.step[j]]
+		       + (double) srcl.d[-srcinfo.step[i] - srcinfo.step[j]]
+		       - (double) srcl.d[srcinfo.step[i] - srcinfo.step[j]]
+		       - (double) srcl.d[srcinfo.step[j]
 				       - srcinfo.step[i]])/4;
 	    break;
 	} /* end of switch (type) */
@@ -2290,7 +2290,7 @@ Int local_extrema(Int narg, Int ps[], Int code)
 	  for (i = 0; i < nDiagonal; i++)
 	    grad2[i] = 0.0;
 	else {		/* solve hessian.x = gradient */
-	  f_decomp(hessian, nDiagonal, nDiagonal);
+	  d_decomp(hessian, nDiagonal, nDiagonal);
 	  ready = 1;
 	  for (i = nDiagonal*nDiagonal - 1; i >= 0; i -= nDiagonal + 1)
 	    if (!hessian[i]) { /* zero determinant, indeterminate fit */
@@ -2300,7 +2300,7 @@ Int local_extrema(Int narg, Int ps[], Int code)
 	      break;
 	    }	/* end of if (!hessian[i]) */
 	  if (ready) {
-	    f_solve(hessian, grad2, nDiagonal, nDiagonal);
+	    d_solve(hessian, grad2, nDiagonal, nDiagonal);
 	    for (i = 0; i < nDiagonal; i++)
 	      value -= 0.5*grad2[i]*grad[i];
 	  } /* end of if (ready) */
@@ -2330,19 +2330,19 @@ Int local_extrema(Int narg, Int ps[], Int code)
 	  index = *trgt0.l++;
 	  switch (symbol_type(ps[0])) {
 	    case LUX_BYTE:
-	      value = (float) src.b[index];
+	      value = (double) src.b[index];
 	      break;
 	    case LUX_WORD:
-	      value = (float) src.w[index];
+	      value = (double) src.w[index];
 	      break;
 	    case LUX_LONG:
-	      value = (float) src.l[index];
+	      value = (double) src.l[index];
 	      break;
 	    case LUX_FLOAT:
-	      value = (float) src.f[index];
+	      value = (double) src.f[index];
 	      break;
 	    case LUX_DOUBLE:
-	      value = (float) src.d[index];
+	      value = (double) src.d[index];
 	      break;
 	  } /* end of switch (symbol_type(ps[0])) */
 	  *trgt.f++ = value;

@@ -5389,8 +5389,8 @@ Int fits_fatality(FILE *fin)
   return LUX_ZERO;	/* this is the zero symbol */
 }
 /*------------------------------------------------------------------------- */
-void apply_bscale_bzero_blank(Byte *ptr, Int nelem, float bscale, float bzero,
-			      float blank, float targetblank, Int type0,
+void apply_bscale_bzero_blank(Byte *ptr, Int nelem, double bscale, double bzero,
+			      double blank, double targetblank, Int type0,
 			      Int type)
 {
   pointer	p, q;
@@ -5522,12 +5522,12 @@ void apply_bscale_bzero_blank(Byte *ptr, Int nelem, float bscale, float bzero,
   }
 }
 /*------------------------------------------------------------------------- */
-Int fits_read(Int, Int, Int, Int, Int, Int, Int, Int, float);
+Int fits_read(Int, Int, Int, Int, Int, Int, Int, Int, double);
 Int lux_fits_read_general(Int narg, Int ps[], Int func)/* read fits files */
  /* status = fits_read(x, name, [h], [x2], [h2], [extvar_preamble]) */
 {
   Int	hsym = 0, mode, xhsym=0, xdsym =0;
-  float	targetblank = 0.0;
+  double	targetblank = 0.0;
  /* uses fits_read, mode depends on arguments */
  /* mode mask uses bits to specify products to return
  1 bit: main header, 2 bit: main array, 4 bit: offset value
@@ -5554,7 +5554,7 @@ Int lux_fits_read_general(Int narg, Int ps[], Int func)/* read fits files */
     preamble = string_value(ps[5]);
   }
   if (narg >= 7)
-    targetblank = float_arg(ps[6]);
+    targetblank = double_arg(ps[6]);
   mode = fits_read(mode, ps[0], ps[1], hsym, 0, 0, xhsym, xdsym, targetblank);
   if (func)
     return (mode == LUX_ERROR)? LUX_ZERO: LUX_ONE;
@@ -5632,7 +5632,7 @@ Int	anadecrunchrun8(Byte [], Byte [], Int, Int, Int),
   anadecrunch(Byte *, short [], Int, Int, Int),
   anadecrunch32(Byte *, Int [], Int, Int, Int);
 Int fits_read_compressed(Int mode, Int datasym, FILE *fp, Int headersym,
-			 float targetblank)
+			 double targetblank)
 /* reads data from an LUX Rice-compressed FITS file open on <fp>. */
 /* <mode> determines which data to return: &1 -> header in <headersym>; */
 /* &2 -> data in <datasym>. */
@@ -5645,7 +5645,7 @@ Int fits_read_compressed(Int mode, Int datasym, FILE *fp, Int headersym,
 {
   Int	ncbytes, type, ndim, dims[MAX_DIMS], i, nblock, ok, slice, nx, ny,
     type0;
-  float	bscale = 0.0, bzero = 0.0, blank = FLT_MAX, min, max;
+  double	bscale = 0.0, bzero = 0.0, blank = FLT_MAX, min, max;
   char	*block, usescrat, *curblock, runlength;
   pointer	p;
 
@@ -5829,8 +5829,8 @@ Int fits_read_compressed(Int mode, Int datasym, FILE *fp, Int headersym,
 	if (isIntegerType(type)) {
 	  if ((bscale && bscale != (Int) bscale)
 	      || (bzero != (Int) bzero))
-	    /* we must upgrade the data type from integer to float */
-	    type = LUX_FLOAT;
+	    /* we must upgrade the data type from integer to double */
+	    type = LUX_DOUBLE;
 	  else {
 	    if (!bscale)
 	      bscale = 1.0;
@@ -5855,7 +5855,7 @@ Int fits_read_compressed(Int mode, Int datasym, FILE *fp, Int headersym,
 	    else if (min >= INT32_MIN && max <= INT32_MAX)
 	      type = LUX_LONG;
 	    else
-	      type = LUX_FLOAT;
+	      type = LUX_DOUBLE;
 	  }
 	}
       }
@@ -5944,7 +5944,7 @@ Int fits_read_compressed(Int mode, Int datasym, FILE *fp, Int headersym,
 Int	lux_replace(Int, Int), swapb(char [], Int);
 void	swapd(char [], Int);
 Int fits_read(Int mode, Int dsym, Int namsym, Int hsym, Int offsetsym,
-	      Int xoffsetsym, Int xhsym, Int xdsym, float targetblank)
+	      Int xoffsetsym, Int xhsym, Int xdsym, double targetblank)
  /* internal, read fits files */
  /* returns status as sym # for 0, 1, or 2 */
 /* Headers:
@@ -5965,7 +5965,7 @@ Int fits_read(Int mode, Int dsym, Int namsym, Int hsym, Int offsetsym,
   Int	xtension_found = 0, tfields, gcount, row_bytes,
     dim[MAX_DIMS], type0;
   Int	ext_stuff_malloc_flag = 0;
-  float	bscale = 0.0, bzero = 0.0, blank = FLT_MAX, min, max;
+  double	bscale = 0.0, bzero = 0.0, blank = FLT_MAX, min, max;
   struct ext_params {
     Int	repeat;
     Int	type;
@@ -6174,7 +6174,7 @@ Int fits_read(Int mode, Int dsym, Int namsym, Int hsym, Int offsetsym,
       /* If the data in the file (before application of BSCALE and BZERO */
       /* but after decompression) are of an integer type but BSCALE or */
       /* BZERO are not integer values, then the final result will be */
-      /* LUX_FLOAT.  If BSCALE and BZERO are integers, then the final result */
+      /* LUX_DOUBLE.  If BSCALE and BZERO are integers, then the final result */
       /* will be an integer of a sufficiently large type that any possible */
       /* value from the file, corrected for BZERO and BSCALE, can fit in it. */
       /* LS 28jan00 */
@@ -6183,8 +6183,8 @@ Int fits_read(Int mode, Int dsym, Int namsym, Int hsym, Int offsetsym,
       if (isIntegerType(type)) {
 	if ((bscale && bscale != (Int) bscale)
 	    || (bzero != (Int) bzero))
-	  /* we must upgrade the data type from integer to float */
-	  type = LUX_FLOAT;
+	  /* we must upgrade the data type from integer to double */
+	  type = LUX_DOUBLE;
 	else {
 	  if (!bscale)
 	    bscale = 1.0;
@@ -6209,7 +6209,7 @@ Int fits_read(Int mode, Int dsym, Int namsym, Int hsym, Int offsetsym,
 	  else if (min >= INT32_MIN && max <= INT32_MAX)
 	    type = LUX_LONG;
 	  else
-	  type = LUX_FLOAT;
+	  type = LUX_DOUBLE;
 	}
       } 
     }

@@ -1680,7 +1680,7 @@ Int lux_for(Int nsym)
 #define ACTION_BREAKPOINT	1
 #define ACTION_TRACE	2
 #define ACTION_STEP	4
-float	CPUtime = 0.0;
+double	CPUtime = 0.0;
 Int execute(Int symbol)
      /* executes LUX_EVB <symbol>.  Returns -1 on error, 1 on success, */
      /* various negative numbers on breaks, returns, etc. */
@@ -1702,7 +1702,7 @@ Int execute(Int symbol)
 #if DEBUG
   void checkTemps(void);
 #endif
-  float	newCPUtime;
+  double	newCPUtime;
   Int	showstats(Int, Int []), getNewLine(char *, size_t, char *, char),
     lux_restart(Int, Int []), showError(Int), insert(Int, Int []),
     nextFreeStackEntry(void);
@@ -1789,7 +1789,7 @@ Int execute(Int symbol)
       if (traceMode & 127)
 	puts(symbolIdent(symbol, I_TRUNCATE | I_FILELEVEL));
       if (traceMode & T_CPUTIME) { /* CPUtime */
-	newCPUtime = (float) clock()/CLOCKS_PER_SEC;
+	newCPUtime = (double) clock()/CLOCKS_PER_SEC;
 	printf("CPUtime: %10.2f\n", newCPUtime - CPUtime);
 	CPUtime = newCPUtime;
       }

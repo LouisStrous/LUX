@@ -45,13 +45,13 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #define BIG_ENOUGH      1
 #define WHITE_BACKGR	2
 
-Int	coordTrf(float *, float *, Int, Int),
+Int	coordTrf(double *, double *, Int, Int),
   checkCoordSys(Int mode, Int defaultmode);
 
 Int	setup_x(void), anaAllocNamedColor(char *, XColor **);
 
 extern  Int     scalemin, scalemax, setup, connect_flag, visualClass;
-extern  float   xfac, yfac, xlimit, ylimit;
+extern  double   xfac, yfac, xlimit, ylimit;
 extern  Int     ixlow, iylow, ixhigh, iyhigh, threeColors;
 char    *display_name = NULL;
 Int     last_wid = 0;
@@ -60,7 +60,7 @@ double  last_time;
 Int     xcoord, ycoord, lux_button, lux_keycode, lux_keypress, root_x, root_y,
 	preventEventFlush = 0, lux_keystate, lux_keysym;
 uint32_t	kb;
-float	xhair, yhair, tvscale = 1.0;
+double	xhair, yhair, tvscale = 1.0;
 Window  win[MAXWINDOWS];
 /* the size of each of the windows and pixmaps for our use */
 
@@ -74,7 +74,7 @@ XImage  *xi;
 Pixmap  icon_pixmap, maps[MAXPIXMAPS], back_pixmap;
 extern Colormap        colorMap;
 Int	xold, yold;
-float     tvix, tviy, tvixb, tviyb;
+double     tvix, tviy, tvixb, tviyb;
 extern GC	gcnot;
 
 /* from color.c */
@@ -350,17 +350,17 @@ Int lux_xtvlct(Int narg, Int ps[])
 /* expect 3 arrays for RGB */
 {
   Int	i, n, nmin = INT32_MAX, iq;
-  float	*p[3];
-  void	storeColorTable(float *, float *, float *, Int, Int);
+  double	*p[3];
+  void	storeColorTable(double *, double *, double *, Int, Int);
 
   for (i = 0; i < 3; i++) {
     if (!symbolIsNumericalArray(ps[i]))
       return cerror(NEED_NUM_ARR, ps[i]);
-    iq = lux_float(1, ps + i);	/* convert to FLOAT if necessary */
+    iq = lux_double(1, ps + i);	/* convert to DOUBLE if necessary */
     n = array_size(iq);
     if (n < nmin)
       nmin = n;
-    p[i] = (float *) array_data(iq);
+    p[i] = (double *) array_data(iq);
   }
   if (setup_x() == LUX_ERROR)
     return LUX_ERROR;
@@ -843,7 +843,7 @@ Int lux_xsetbackground(Int narg, Int ps[])/* set the background color */
 {
   Int    wid, iq;
   char	*pc;
-  float	*value;
+  double	*value;
   XColor	*color;
   
   ck_events();
@@ -865,7 +865,7 @@ Int lux_xsetbackground(Int narg, Int ps[])/* set the background color */
       break;
     case LUX_ARRAY:
       if (symbolIsRealArray(*ps) && array_size(*ps) == 3) {
-	iq = lux_float(1, ps);	/* ensure FLOAT */
+	iq = lux_double(1, ps);	/* ensure DOUBLE */
 	value = array_data(iq);
 	sprintf(pc = curScrat, "rgbi:%g/%g/%g", value[0], value[1], value[2]);
 	if (anaAllocNamedColor(pc, &color) == 0)
@@ -901,7 +901,7 @@ Int lux_xsetforeground(Int narg, Int ps[])/* set the foreground color */
 {
   Int    wid, iq;
   char	*pc;
-  float	*value;
+  double	*value;
   XColor	*color;
   
   ck_events();
@@ -923,7 +923,7 @@ Int lux_xsetforeground(Int narg, Int ps[])/* set the foreground color */
       break;
     case LUX_ARRAY:
       if (symbolIsRealArray(*ps) && array_size(*ps) == 3) {
-	iq = lux_float(1, ps);	/* ensure FLOAT */
+	iq = lux_double(1, ps);	/* ensure DOUBLE */
 	value = array_data(iq);
 	sprintf(pc = curScrat, "rgbi:%g/%g/%g", value[0], value[1], value[2]);
 	if (anaAllocNamedColor(pc, &color) == 0)
@@ -972,7 +972,7 @@ Int lux_xerase(Int narg, Int ps[])
      /* pixmap support added.  LS 8oct97 */
 {
  Int    wid, xx, yx, wx, hx, old, cs;
- float	x, y, w, h;
+ double	x, y, w, h;
  XGCValues	values;
 
  ck_events();
@@ -986,17 +986,17 @@ Int lux_xerase(Int narg, Int ps[])
      wid = int_arg(ps[0]);	/* window number */
      break;
    case 4:
-     x = float_arg(ps[0]);
-     y = float_arg(ps[1]);
-     w = float_arg(ps[2]);
-     h = float_arg(ps[3]);
+     x = double_arg(ps[0]);
+     y = double_arg(ps[1]);
+     w = double_arg(ps[2]);
+     h = double_arg(ps[3]);
      break;
    case 5:
      wid = int_arg(ps[0]);	/* window number */
-     x = float_arg(ps[1]);
-     y = float_arg(ps[2]);
-     w = float_arg(ps[3]);
-     h = float_arg(ps[4]);
+     x = double_arg(ps[1]);
+     y = double_arg(ps[2]);
+     w = double_arg(ps[3]);
+     h = double_arg(ps[4]);
    default:
      return cerror(ILL_ARG_LIST, 0);
  }
@@ -1108,9 +1108,9 @@ Int lux_xtv_general(Int narg, Int ps[], Int mode)
 {
   pointer	data;
   Int	type, nx, ny, wid;
-  float	x, y;
-  Int	tvraw(pointer data, Int type, Int nx, Int ny, float x1, float x2,
-	  float y1, float y2, float sxf, float syf, Int wid, float *mag,
+  double	x, y;
+  Int	tvraw(pointer data, Int type, Int nx, Int ny, double x1, double x2,
+	  double y1, double y2, double sxf, double syf, Int wid, double *mag,
 	  Int mode, double clo, double chi, Byte *bitmap1, Byte *bitmap2);
 
   if (internalMode & TV_24) {
@@ -1136,14 +1136,14 @@ Int lux_xtv_general(Int narg, Int ps[], Int mode)
   if (narg > 1 && ps[1]) {	/* <x> */
     if (!symbolIsScalar(ps[1]))
       return cerror(NEED_SCAL, ps[1]);
-    x = float_arg(ps[1]);
+    x = double_arg(ps[1]);
   } else
     x = 0;
 
   if (narg > 2 && ps[2]) {	/* <y> */
     if (!symbolIsScalar(ps[2]))
       return cerror(NEED_SCAL, ps[2]);
-    y = float_arg(ps[2]);
+    y = double_arg(ps[2]);
   } else
     y = 0;
 
@@ -1157,7 +1157,7 @@ Int lux_xtv_general(Int narg, Int ps[], Int mode)
   if (narg > 4 && ps[4]) {	/* <scale> */
     if (!symbolIsScalar(ps[4]))
       return cerror(NEED_SCAL, ps[4]);
-    tvscale = float_arg(ps[4]);
+    tvscale = double_arg(ps[4]);
     if (tvscale == 1)
       mode |= TV_SCALE;
   } else
@@ -1182,8 +1182,8 @@ Int lux_xtvraw(Int narg, Int ps[])
   return lux_xtv_general(narg, ps, TV_RAW);
 }
 /*------------------------------------------------------------------------*/
-Int tvraw(pointer data, Int type, Int nx, Int ny, float x1, float x2,
-	  float y1, float y2, float sxf, float syf, Int wid, float *mag,
+Int tvraw(pointer data, Int type, Int nx, Int ny, double x1, double x2,
+	  double y1, double y2, double sxf, double syf, Int wid, double *mag,
 	  Int mode, double clo, double chi, Byte *bitmap1, Byte *bitmap2)
 /* display data in a window. */
 /* data: pointer to the start of the data */
@@ -1205,15 +1205,15 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, float x1, float x2,
   Int	hq, wq, nxx, nyy, ix, iy, xsrc, ysrc, indx, i, toscreen, maxdim,
     iq, sx, sy, bpp, s;
   scalar	min, max, value, factor, offset;
-  float	fx, fy, fx2, fy2, magx, magy, nxxf, nyyf;
-  extern float	postXBot, postXTop, postYBot, postYTop,
+  double	fx, fy, fx2, fy2, magx, magy, nxxf, nyyf;
+  extern double	postXBot, postXTop, postYBot, postYTop,
     zoom_mag, zoom_xc, zoom_yc, zoom_clo, zoom_chi, wxb, wxt, wyb, wyt;
   extern Int	lunplt, bits_per_pixel;
   extern unsigned long	red_mask, green_mask, blue_mask;
   Int	lux_threecolors(Int, Int []), checkCoordSys(Int, Int),
-    coordTrf(float *, float *, Int, Int),
-    postgray(char *, Int, Int, float, float, float, float, Int),
-    postcolor(char *, Int, Int, float, float, float, float, Int);
+    coordTrf(double *, double *, Int, Int),
+    postgray(char *, Int, Int, double, double, double, double, Int),
+    postcolor(char *, Int, Int, double, double, double, double, Int);
   
   toscreen = (internalMode & (TV_SCREEN | TV_POSTSCRIPT | TV_PDEV));
   switch (toscreen) {
@@ -1299,7 +1299,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, float x1, float x2,
     }
   } else if ((mode & TV_SCALE) || (setup & 32)) {
 				/* set magnification to standard value */
-    *mag = MIN((float) hq/ny, (float) wq/nx);
+    *mag = MIN((double) hq/ny, (double) wq/nx);
     if (*mag >= 1)
       *mag = (Int) *mag;
     else
@@ -1309,7 +1309,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, float x1, float x2,
     puts(
       "WARNING - scaled image is significantly bigger than target window.");
     puts(" -- reducing scale factor to accommodate.");
-    *mag = MIN((float) hq/ny, (float) wq/nx);
+    *mag = MIN((double) hq/ny, (double) wq/nx);
     if (*mag >= 1)
       *mag = (Int) *mag;
     else
@@ -1410,10 +1410,10 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, float x1, float x2,
 	    if (max.b == min.b)
 	      factor.f = 1;
 	    else if (threeColors)
-	      factor.f = (256/3)/((float) max.b - min.b);
+	      factor.f = (256/3)/((double) max.b - min.b);
 	    else
-	      factor.f = 255/((float) max.b - min.b);
-	    offset.f = (float) min.b;
+	      factor.f = 255/((double) max.b - min.b);
+	    offset.f = (double) min.b;
 	    break;
 	  case LUX_WORD:
 	    min.w = INT16_MAX;
@@ -1439,10 +1439,10 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, float x1, float x2,
 	    if (max.w == min.w)
 	      factor.f = 1;
 	    else if (threeColors)
-	      factor.f = (256/3)/((float) max.w - min.w);
+	      factor.f = (256/3)/((double) max.w - min.w);
 	    else
-	      factor.f = 255/((float) max.w - min.w);
-	    offset.f = (float) min.w;
+	      factor.f = 255/((double) max.w - min.w);
+	    offset.f = (double) min.w;
 	    break;
 	  case LUX_LONG:
 	    min.l = INT32_MAX;
@@ -1468,10 +1468,10 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, float x1, float x2,
 	    if (max.l == min.l)
 	      factor.f = 1;
 	    else if (threeColors)
-	      factor.f = (256/3)/((float) max.l - min.l);
+	      factor.f = (256/3)/((double) max.l - min.l);
 	    else
-	      factor.f = 255/((float) max.l - min.l);
-	    offset.f = (float) min.l;
+	      factor.f = 255/((double) max.l - min.l);
+	    offset.f = (double) min.l;
 	    break;
 	  case LUX_FLOAT:
 	    min.f = FLT_MAX;
@@ -1497,10 +1497,10 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, float x1, float x2,
 	    if (max.f == min.f)
 	      factor.f = 1;
 	    else if (threeColors)
-	      factor.f = (256/3)/((float) max.f - min.f);
+	      factor.f = (256/3)/((double) max.f - min.f);
 	    else
-	      factor.f = 255/((float) max.f - min.f);
-	    offset.f = (float) min.f;
+	      factor.f = 255/((double) max.f - min.f);
+	    offset.f = (double) min.f;
 	    break;
 	  case LUX_DOUBLE:
 	    min.d = DBL_MAX;
@@ -1526,10 +1526,10 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, float x1, float x2,
 	    if (max.d == min.d)
 	      factor.f = 1;
 	    else if (threeColors)
-	      factor.f = (256/3)/((float) max.d - min.d);
+	      factor.f = (256/3)/((double) max.d - min.d);
 	    else
-	      factor.f = 255/((float) max.d - min.d);
-	    offset.f = (float) min.d;
+	      factor.f = 255/((double) max.d - min.d);
+	    offset.f = (double) min.d;
 	    break;
 	}
       } else {			/* one Byte per pixel */
@@ -1548,10 +1548,10 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, float x1, float x2,
 	    if (max.b == min.b)
 	      factor.f = 1;
 	    else if (threeColors)
-	      factor.f = (256/3)/((float) max.b - min.b);
+	      factor.f = (256/3)/((double) max.b - min.b);
 	    else
-	      factor.f = ((float) scalemax - scalemin)/((float) max.b - min.b);
-	    offset.f = (float) min.b;
+	      factor.f = ((double) scalemax - scalemin)/((double) max.b - min.b);
+	    offset.f = (double) min.b;
 	    break;
 	  case LUX_WORD:
 	    min.w = INT16_MAX;
@@ -1567,10 +1567,10 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, float x1, float x2,
 	    if (max.w == min.w)
 	      factor.f = 1;
 	    else if (threeColors)
-	      factor.f = (256/3)/((float) max.w - min.w);
+	      factor.f = (256/3)/((double) max.w - min.w);
 	    else
-	      factor.f = ((float) scalemax - scalemin)/((float) max.w - min.w);
-	    offset.f = (float) min.w;
+	      factor.f = ((double) scalemax - scalemin)/((double) max.w - min.w);
+	    offset.f = (double) min.w;
 	    break;
 	  case LUX_LONG:
 	    min.l = INT32_MAX;
@@ -1586,10 +1586,10 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, float x1, float x2,
 	    if (max.l == min.l)
 	      factor.f = 1;
 	    else if (threeColors)
-	      factor.f = (256/3)/((float) max.l - min.l);
+	      factor.f = (256/3)/((double) max.l - min.l);
 	    else
-	      factor.f = ((float) scalemax - scalemin)/((float) max.l - min.l);
-	    offset.f = (float) min.l;
+	      factor.f = ((double) scalemax - scalemin)/((double) max.l - min.l);
+	    offset.f = (double) min.l;
 	    break;
 	  case LUX_FLOAT:
 	    min.f = FLT_MAX;
@@ -1643,7 +1643,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, float x1, float x2,
 	  factor.f = (256/3)/(chi - clo);
 	else
 	  factor.f = (scalemax - scalemin)/(chi - clo);
-	offset.f = (float) clo;
+	offset.f = (double) clo;
       }
     }
   }
@@ -1655,14 +1655,14 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, float x1, float x2,
   tviyb = hq - sy;
   
   /* update bounding box */
-  if (postXBot > tvix/(float) wq)
-    postXBot = tvix/(float) wq;
-  if (postXTop < tvixb/(float) wq)
-    postXTop = tvixb/(float) wq;
-  if (postYBot > tviy/(float) hq)
-    postYBot = tviy/(float) hq;
-  if (postYTop < tviyb/(float) hq)
-    postYTop = tviyb/(float) hq;
+  if (postXBot > tvix/(double) wq)
+    postXBot = tvix/(double) wq;
+  if (postXTop < tvixb/(double) wq)
+    postXTop = tvixb/(double) wq;
+  if (postYBot > tviy/(double) hq)
+    postYBot = tviy/(double) hq;
+  if (postYTop < tviyb/(double) hq)
+    postYTop = tviyb/(double) hq;
   /* if we're sending the image to a postscript file, then we can scale
      it to arbitrary size by specifying different desired corner positions
      on the canvas; we do not actually need to change the number of
@@ -3046,10 +3046,10 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, float x1, float x2,
     /* we try to work things so that you get the same aspect ratio on */
     /* screen as on paper.  LS 23mar98 */
     maxdim = MAX(hq, wq);
-    fx = (float) sxf/maxdim;
-    fy = (float) syf/maxdim;
-    fx2 = (float) (sxf + nxxf)/maxdim;
-    fy2 = (float) (syf + nyyf)/maxdim;
+    fx = (double) sxf/maxdim;
+    fy = (double) syf/maxdim;
+    fx2 = (double) (sxf + nxxf)/maxdim;
+    fy2 = (double) (syf + nyyf)/maxdim;
     /* NOTE: must modify this to support 16 and 32-bit color indices */
     if (mode & TV_24)
       iq = postcolor((void *) image0.b, nx, ny, fx, fx2, fy, fy2, 2);
@@ -3426,7 +3426,7 @@ Int lux_xplace(Int narg, Int ps[])
  Int	i, cs, nc;
  KeySym	keysym;
  char	buffer[16];
- Int	coordTrf(float *, float *, Int, Int);
+ Int	coordTrf(double *, double *, Int, Int);
  extern Int	lux_keysym, lux_keystate;
 
  XEvent  report;
@@ -3488,9 +3488,9 @@ Int xwindow_plot(Int ix, Int iy, Int mode)
 /* added pixmap case - LS 8oct97 */
 /* added alternateDash - LS 16oct98 */
 {
- Int     wid, lux_xpen(Int, float);
+ Int     wid, lux_xpen(Int, double);
  extern Int	alternateDash, current_pen;
- extern float	current_gray;
+ extern double	current_gray;
 
  wid = last_wid;
  if ((wid >= 0 && !win[wid]) || (wid < 0 && !maps[-wid]))
@@ -3498,7 +3498,7 @@ Int xwindow_plot(Int ix, Int iy, Int mode)
 
  if (mode == 0) {
    if (alternateDash)
-     lux_xpen(current_pen, (float) 1 - current_gray);
+     lux_xpen(current_pen, (double) 1 - current_gray);
    else {
      xold = ix;
      yold = iy;
@@ -3523,7 +3523,7 @@ Int lux_xflush()
  XFlush(display);       return 1;
  }
  /*------------------------------------------------------------------------*/
-Int lux_xpen(Int pen, float gray)
+Int lux_xpen(Int pen, double gray)
 {
   Int	wid;
   extern Int	standardGray;
@@ -4136,15 +4136,15 @@ Int lux_threecolors(Int narg, Int ps[])
    the blue domain from 2*threeColors through 3*threeColors - 1.
    LS 12nov98 */
 {
-  float	fraction, *list;
-  Int	threecolors(float *, Int);
+  double	fraction, *list;
+  Int	threecolors(double *, Int);
 
   if (ck_events() != LUX_OK)
     return LUX_ERROR;
 
   if (!narg || symbol_class(ps[0]) == LUX_SCALAR) {
     if (narg)
-      fraction = float_arg(ps[0]);
+      fraction = double_arg(ps[0]);
     else
       fraction = 1.0;
     return threecolors(&fraction, 1);
@@ -4154,7 +4154,7 @@ Int lux_threecolors(Int narg, Int ps[])
     return cerror(ILL_CLASS, ps[0]);
   if (array_size(ps[0]) != 9)
     return luxerror("Need 9 elements in array", ps[0]);
-  list = array_data(lux_float(1, ps));
+  list = array_data(lux_double(1, ps));
   return threecolors(list, 9);
 }
 /*---------------------------------------------------------*/
@@ -4162,10 +4162,10 @@ Int lux_tv3(Int narg, Int ps[])
 /* TV3,<image>[,<bitmap1>,<bitmap2>] */
 {
   Int	iq, nx, ny, mode, i, wid;
-  float	fx, fy;
+  double	fx, fy;
   Byte	*bitmap1, *bitmap2;
   pointer	data;
-  Int	coordTrf(float *, float *, Int, Int);
+  Int	coordTrf(double *, double *, Int, Int);
 
   if (!symbolIsNumericalArray(ps[0]) /* <image> */
       || isComplexType(array_type(ps[0]))
@@ -4202,14 +4202,14 @@ Int lux_tv3(Int narg, Int ps[])
   if (narg > 3 && ps[3]) {	/* <x> */
     if (!symbolIsScalar(ps[3]))
       return cerror(NEED_SCAL, ps[3]);
-    fx = float_arg(ps[3]);
+    fx = double_arg(ps[3]);
   } else
     fx = 0;
   
   if (narg > 4 && ps[4]) {	/* <y> */
     if (!symbolIsScalar(ps[4]))
       return cerror(NEED_SCAL, ps[4]);
-    fy = float_arg(ps[4]);
+    fy = double_arg(ps[4]);
   } else
     fy = 0;
 
@@ -4227,7 +4227,7 @@ Int lux_tv3(Int narg, Int ps[])
   if (narg > 6 && ps[6]) {	/* <scale> */
     if (!symbolIsScalar(ps[6]))
       return cerror(NEED_SCAL, ps[6]);
-    tvscale = float_arg(ps[6]);
+    tvscale = double_arg(ps[6]);
     if (tvscale == 1)
       mode |= TV_SCALE;
   } else
@@ -4370,7 +4370,7 @@ Int lux_xdrawarc(Int narg, Int ps[])
 /* subroutine, call is xdrawarc, x1, y1, w, h, [a1, a2, win] */
 {
   Int     wid, ixs, iys, w, h, xa1, xa2;
-  float	a1, a2;
+  double	a1, a2;
   Drawable	dq;
   GC		gq;
 
@@ -4403,9 +4403,9 @@ Int lux_xdrawarc(Int narg, Int ps[])
     return LUX_ERROR;
   a1 = 0.0;
   a2 = 360.0;
-  if (narg > 4 && float_arg_stat(ps[4], &a1) != LUX_OK)
+  if (narg > 4 && double_arg_stat(ps[4], &a1) != LUX_OK)
     return LUX_ERROR;
-  if (narg > 5 && float_arg_stat(ps[5], &a2) != LUX_OK)
+  if (narg > 5 && double_arg_stat(ps[5], &a2) != LUX_OK)
     return LUX_ERROR;
   /* convert these fp angles into X units */
   xa1 = (Int) 64.*a1;

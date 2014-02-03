@@ -2445,8 +2445,8 @@ Format modifiers may be specified in any order.
 @table @code
 @item -
 specifies left adjustment of the argument in its field.  Right
-adjustment is the default.  (Does not affect the @code{%t} and @code{%T}
-formats.)
+adjustment is the default.  (Does not affect the @code{%T}
+formats)
 @item +
 specifies that the number will always be printed with a sign.  By
 default, a sign is not printed for positive numbers.
@@ -2658,10 +2658,9 @@ Each format entry comprises some plain text, a %-specification, or a
 of the %-specification.
 
 The main differences between the LUX format strings and the C format
-strings are that LUX but not C features the @code{%t}, @code{%T},
-@code{%S}, and @code{%z} formats and @code{_} and @code{=} format
-modifiers, and that C but not LUX features @code{%n}, @code{%c}, and
-@code{%p} formats.
+strings are that LUX but not C features the @code{%T}, @code{%S}, and
+@code{%z} formats and @code{_} and @code{=} format modifiers, and that
+C but not LUX features @code{%n}, @code{%c}, and @code{%p} formats.
 
 See also: @ref{Formatted Input/Output}
 @c ------------------------------------------------------------------
@@ -2714,8 +2713,8 @@ modifier).
 @item LUX does not support the C input format @code{%u} (unsigned
 integer).
 @item C modifier @code{L} is not supported in LUX.
-@item LUX formats @code{%t} and @code{%T} read data in sexagesimal
-notation.  This format is not available in C.
+@item LUX format @code{%T} read data in sexagesimal notation.  This
+format is not available in C.
 @item LUX format @code{%z} reads complex numbers.  This format is not
 available in C.
 @end enumerate
@@ -2807,8 +2806,8 @@ Literal @code{%}.  No assignment is made.
 @cindex Examples of input formats
 
 Here are some examples.  The numerical examples all have an argument
-@code{3.14159265}, except for the @code{%t} and @code{%T} examples which
-have arguments @code{3,14,15.92}.  The string examples have argument
+@code{3.14159265}, except for the @code{%T} example which has
+arguments @code{3,14,15.92}.  The string examples have argument
 @code{'alphabet soup'}.  The results are shown as would be produced by
 default @code{TYPE}: with at most 6 digits after the decimal point.
 
@@ -2821,9 +2820,9 @@ default @code{TYPE}: with at most 6 digits after the decimal point.
 @code{3.141}
 @item %5-3f
 @code{3.141} and @code{592}
-@item %t
+@item %T
 @code{3.233333} (equivalent to @code{3:14})
-@item %.3t
+@item %.3T
 @code{3.237756} (equivalent to @code{3:14:15.92})
 @end table
 

@@ -162,7 +162,7 @@ static Int obstack_printf_date_int_left(struct obstack *o,
   prec = info->prec;
   if (prec < 0)
     prec = 3;
-  CJDtoCommon(JDtoCJD(value), &year, &month, &day);
+  CJDtoCommon(value, &year, &month, &day);
   if (info->pad == L'0') {      /* sign comes first */
     if (year < 0)
       obstack_1grow(o, '-');
@@ -183,15 +183,15 @@ static Int obstack_printf_date_int_left(struct obstack *o,
   }
   obstack_printf(o, "%d", year < 0? -year: year);
   if (prec == 1) {
-    double JD1 = CJDtoJD(CommontoCJD(year, 1, 1));
-    double JD2 = CJDtoJD(CommontoCJD(year + 1, 1, 1));
-    lastvalue = (value - JD1)/(JD2 - JD1) + year;
+    double CJD1 = CommontoCJD(year, 1, 1);
+    double CJD2 = CommontoCJD(year + 1, 1, 1);
+    lastvalue = (value - CJD1)/(CJD2 - CJD1) + year;
   } else if (prec >= 2) {       /* month */
     obstack_printf(o, "-%02d", month);
     if (prec == 2) {
-      double JD1 = CJDtoJD(CommontoCJD(year, month, 1));
-      double JD2 = CJDtoJD(CommontoCJD(year, month + 1, 1));
-      lastvalue = (value - JD1)/(JD2 - JD1) + month;
+      double CJD1 = CommontoCJD(year, month, 1);
+      double CJD2 = CommontoCJD(year, month + 1, 1);
+      lastvalue = (value - CJD1)/(CJD2 - CJD1) + month;
     } else if (prec >= 3) {     /* day */
       ivalue = (Int) day;
       obstack_printf(o, "-%02d", ivalue);
@@ -228,7 +228,6 @@ Int printf_date(FILE *stream, const struct printf_info *info,
 {
   double value = *((const double *)(args[0]));
   double value2;
-  void JDtoDate(double, Int *, Int *, double *, Int);
   struct obstack o;
   size_t width;
   Int fmttype = 0;

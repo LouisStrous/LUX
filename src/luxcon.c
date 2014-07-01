@@ -26,29 +26,29 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
    Modified by Louis Strous 27jul94
 */
 
-Int anacon(float *xarr, Int nx, Int ny, float *xlev, Int numlev,
-	    Int itvord, float xl, float yl, float xsc, float ysc,
+int32_t anacon(float *xarr, int32_t nx, int32_t ny, float *xlev, int32_t numlev,
+	    int32_t itvord, float xl, float yl, float xsc, float ysc,
 	    float cut)
 {
   /* System generated locals */
-  Int i_1, i_2, i_3;
-  Int	tkdash(float *, float *, Int *, Int *);
+  int32_t i_1, i_2, i_3;
+  int32_t	tkdash(float *, float *, int32_t *, int32_t *);
 
   /* Local variables */
   float cell[5];
-  Int minc, ninc, icol, incr, ndsh, imax, ntim;
+  int32_t minc, ninc, icol, incr, ndsh, imax, ntim;
   float xmin, xmax;
-  Int irow, j, k, l, ibase;
+  int32_t irow, j, k, l, ibase;
   float xmean;
-  Int n2, n3, n4;
+  int32_t n2, n3, n4;
   float aa[4], bb[4];
-  Int ii, in;
+  int32_t ii, in;
   float xa[4], ya[4];
-  Int ns;
-  Int ibindx;
-  Int inccon(Int, Int, Int, Int *, Int *, Int *, Int *, Int *, Int *, Int *);
-  float cellavg(float *, Int);
-  extern /* Subroutine */ Int tkdash();
+  int32_t ns;
+  int32_t ibindx;
+  int32_t inccon(int32_t, int32_t, int32_t, int32_t *, int32_t *, int32_t *, int32_t *, int32_t *, int32_t *, int32_t *);
+  float cellavg(float *, int32_t);
+  extern /* Subroutine */ int32_t tkdash();
   float xz, yz;
   float tmp;
 
@@ -213,10 +213,10 @@ point 2 and point 3 to 4. */
 } /* anacon_ */
 
 
-float cellavg(float *cell, Int nav)
+float cellavg(float *cell, int32_t nav)
 {
   float ret_val;
-  Int ii;
+  int32_t ii;
   
   /* Parameter adjustments */
   --cell;
@@ -231,8 +231,8 @@ float cellavg(float *cell, Int nav)
 }
 
 
-Int inccon(Int itv, Int nx, Int ny, Int *ibase, Int *ibindx, Int *incr,
-	    Int *ninc, Int *n2, Int *n3, Int *n4)
+int32_t inccon(int32_t itv, int32_t nx, int32_t ny, int32_t *ibase, int32_t *ibindx, int32_t *incr,
+	    int32_t *ninc, int32_t *n2, int32_t *n3, int32_t *n4)
 {
 /* get limits and increments for processing the raw array */
 /* inputs: */

@@ -32,7 +32,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 
 /*------------------------------------------------------------------*/
 #define SEEK_MAXIMUM	(LUX_DOUBLE + 1)
-Int segment_2d(Int narg, Int ps[])
+int32_t segment_2d(int32_t narg, int32_t ps[])
 /* does image segmentation on two-dimensional arrays.
    it is assumed that's what <x> is!
    Y = SEGMENT(x [, sign]) */
@@ -40,7 +40,7 @@ Int segment_2d(Int narg, Int ps[])
   loopInfo	srcinfo, trgtinfo;
   pointer	src, trgt;
   scalar	value;
-  Int	nx, ny, n, result, sign;
+  int32_t	nx, ny, n, result, sign;
 
   if (standardLoop(ps[0], 0, SL_ALLAXES | SL_SAMEDIMS | SL_EXACT, LUX_LONG,
 		   &srcinfo, &src, &result, &trgtinfo, &trgt) == LUX_ERROR)
@@ -52,7 +52,7 @@ Int segment_2d(Int narg, Int ps[])
   ny = srcinfo.dims[1];
   
   /* top row: always zero */
-  zerobytes(trgt.l, nx*sizeof(Int));
+  zerobytes(trgt.l, nx*sizeof(int32_t));
   trgt.l += nx;
   src.b += nx*lux_type_size[array_type(ps[0])];
   ny -= 2;
@@ -83,12 +83,12 @@ Int segment_2d(Int narg, Int ps[])
 	  src.w++;
 	  n = nx - 2;
 	  while (n--) {
-	    value.l = (Int) *src.w * 2;
-	    *trgt.l++ = ((Int) src.w[-1] + (Int) src.w[1] < value.l
-			 && (Int) src.w[nx] + (Int) src.w[-nx] < value.l
-			 && (Int) src.w[1 + nx] + (Int) src.w[-1 - nx]
+	    value.l = (int32_t) *src.w * 2;
+	    *trgt.l++ = ((int32_t) src.w[-1] + (int32_t) src.w[1] < value.l
+			 && (int32_t) src.w[nx] + (int32_t) src.w[-nx] < value.l
+			 && (int32_t) src.w[1 + nx] + (int32_t) src.w[-1 - nx]
 			    < value.l
-			 && (Int) src.w[1 - nx] + (Int) src.w[-1 + nx]
+			 && (int32_t) src.w[1 - nx] + (int32_t) src.w[-1 + nx]
 			    < value.l);
 	    src.w++;
 	  }
@@ -237,11 +237,11 @@ Int segment_2d(Int narg, Int ps[])
 	break;
     }
   }
-  zerobytes(trgt.l, nx*sizeof(Int));
+  zerobytes(trgt.l, nx*sizeof(int32_t));
   return result;
 }
 /*-------------------------------------------------------------------------*/
-Int segment_general(Int narg, Int ps[])
+int32_t segment_general(int32_t narg, int32_t ps[])
 /* Y = SEGMENT(X) curvature-based segmentation in multiple dimensions
    SEGMENT(x [, sign, DIAGONAL=diagonal, /DEGREE])
    <x>: data
@@ -250,7 +250,7 @@ Int segment_general(Int narg, Int ps[])
    /DEGREE: returns number of OK curvatures per data element
    LS 18may95 4aug97 */
 {
-  Int	result, sign, degree, n, i, *offset, k, j, ok, *edge, nok;
+  int32_t	result, sign, degree, n, i, *offset, k, j, ok, *edge, nok;
   scalar	value;
   pointer	src, trgt, srcl, srcr;
   loopInfo	srcinfo, trgtinfo;
@@ -315,7 +315,7 @@ Int segment_general(Int narg, Int ps[])
 	    k = offset[j];
 	    srcl.w = src.w + k;
 	    srcr.w = src.w - k;
-	    if (value.l <= (Int) *srcl.w + (Int) *srcr.w)
+	    if (value.l <= (int32_t) *srcl.w + (int32_t) *srcr.w)
 	      break;
 	  }
 	  *trgt.l = (j == n);
@@ -477,7 +477,7 @@ Int segment_general(Int narg, Int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-Int lux_segment(Int narg, Int ps[])
+int32_t lux_segment(int32_t narg, int32_t ps[])
 {
   if (narg <= 2 && (internalMode == 0) && symbolIsNumericalArray(ps[0])
       && array_num_dims(ps[0]) == 2)
@@ -487,7 +487,7 @@ Int lux_segment(Int narg, Int ps[])
 }
 /*------------------------------------------------------------------------- */
 #define DEG22_5	(M_PI/8)
-Int lux_segment_dir(Int narg, Int ps[])
+int32_t lux_segment_dir(int32_t narg, int32_t ps[])
 /* y = SEGMENTDIR(<im>, <phi> [,<sign>])
    segmentates image <im> only one-dimensionally in the direction <phi>
    (radians measured counterclockwise from the positive x-axis).
@@ -497,8 +497,8 @@ Int lux_segment_dir(Int narg, Int ps[])
   pointer	src, trgt;
   float	*angle, s, c, a;
   scalar	value;
-  Int	nx, ny, n, result, sign, class;
-  Int	off[4];
+  int32_t	nx, ny, n, result, sign, class;
+  int32_t	off[4];
 
   if (!symbolIsNumericalArray(ps[0])
       || array_num_dims(ps[0]) != 2)
@@ -525,7 +525,7 @@ Int lux_segment_dir(Int narg, Int ps[])
   off[3] = nx;
 
   /* top row: always zero */
-  zerobytes(trgt.b, nx*sizeof(Int));
+  zerobytes(trgt.b, nx*sizeof(int32_t));
   trgt.l += nx;
   angle += nx;
   src.b += nx*lux_type_size[array_type(ps[0])];
@@ -737,11 +737,11 @@ Int lux_segment_dir(Int narg, Int ps[])
 	break;
     }
   }
-  zerobytes(trgt.l, nx*sizeof(Int));
+  zerobytes(trgt.l, nx*sizeof(int32_t));
   return result;
 }
 /*------------------------------------------------------------------------- */
-Int lux_max_dir(Int narg, Int ps[])
+int32_t lux_max_dir(int32_t narg, int32_t ps[])
 /* y = MAXDIR(<im>, <phi> [,<sign>])
    returns 1s at the locations of local extremes in image <im> only
    one-dimensionally in the direction <phi> (radians measured
@@ -751,8 +751,8 @@ Int lux_max_dir(Int narg, Int ps[])
   pointer	src, trgt;
   float	*angle, s, c, a;
   scalar	value;
-  Int	nx, ny, n, result, sign, class;
-  Int	off[4];
+  int32_t	nx, ny, n, result, sign, class;
+  int32_t	off[4];
 
   if (!symbolIsNumericalArray(ps[0])
       || array_num_dims(ps[0]) != 2)
@@ -1010,15 +1010,15 @@ Int lux_max_dir(Int narg, Int ps[])
 #define EDGE		-1
 #define MARKED		-2
 #define EDGEMARKED	-3
-Int area_2d(Int narg, Int ps[])
+int32_t area_2d(int32_t narg, int32_t ps[])
 /* AREA,image
  assigns labels to contiguous sets of non-zeros in the bitmap <image>.
  <image> must be a 2D LONG array. */
 {
-  Int	*ptr, *ptr0, *ptr1, *ptrend, nx, ny, n, areaNumber, *ptr2,
+  int32_t	*ptr, *ptr0, *ptr1, *ptrend, nx, ny, n, areaNumber, *ptr2,
     offsets[8], **stack, **stack0, **stackend, nStack, onEdge, ix = 0, iy = 0,
     ix2, iy2, direction;
-  Int	rcoords[8][2] = { 
+  int32_t	rcoords[8][2] = { 
     { 1, 0 }, { 1, 1 }, { 0, 1 }, { -1, 1 },
     { -1, 0 }, { -1, -1 }, { 0, -1 }, { 1, -1 }
   };
@@ -1100,7 +1100,7 @@ Int area_2d(Int narg, Int ps[])
 
   /* prepare a stack */
   nStack = STACKBLOCK;
-  stack = stack0 = malloc(STACKBLOCK*sizeof(Int *));
+  stack = stack0 = malloc(STACKBLOCK*sizeof(int32_t *));
   if (!stack0)			/* allocation failed */
     return cerror(ALLOC_ERR, 0);
   stackend = stack0 + nStack;	/* pointer to one beyond end of stack */
@@ -1154,7 +1154,7 @@ Int area_2d(Int narg, Int ps[])
 	  if (*ptr2 == 1 || *ptr2 == EDGE) { /* neighbor must be treated */
 	    *stack++ = ptr;	/* place neighbor position on stack */
 	    if (stack == stackend) { /* need to enlarge the stack */
-	      stack0 = realloc(stack0, (nStack + STACKBLOCK)*sizeof(Int *));
+	      stack0 = realloc(stack0, (nStack + STACKBLOCK)*sizeof(int32_t *));
 	      if (!stack0)	/* allocation failed */
 		return cerror(ALLOC_ERR, 0);
 	      /* the call to realloc() may have moved the whole stack to
@@ -1173,7 +1173,7 @@ Int area_2d(Int narg, Int ps[])
 	  if (*ptr2 == 1 || *ptr2 == EDGE) { /* neighbor must be treated */
 	    *stack++ = ptr2;	/* place neighbor position on stack */
 	    if (stack == stackend) { /* need to enlarge the stack */
-	      stack0 = realloc(stack0, (nStack + STACKBLOCK)*sizeof(Int *));
+	      stack0 = realloc(stack0, (nStack + STACKBLOCK)*sizeof(int32_t *));
 	      if (!stack0)	/* allocation failed */
 		return cerror(ALLOC_ERR, 0);
 	      /* the call to realloc() may have moved the whole stack to
@@ -1203,7 +1203,7 @@ Int area_2d(Int narg, Int ps[])
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int area_general(Int narg, Int ps[], Int isFunction)
+int32_t area_general(int32_t narg, int32_t ps[], int32_t isFunction)
 /* AREA,bitmap[,seeds,numbers,diagonal]
  <bitmap> is assumed to be a LONG array. */
 /* identifies distinct areas with values equal to 1 in a bitmap.
@@ -1237,10 +1237,10 @@ Int area_general(Int narg, Int ps[], Int isFunction)
       dimension
  LS 17jun98, 5sep98 */
 {
-  Int	iq, *dims, ndim, nelem, nSeed, nNumber, nDirection, *seed, *number,
+  int32_t	iq, *dims, ndim, nelem, nSeed, nNumber, nDirection, *seed, *number,
     i, *rcoord, *offset, j, nStack, **stack, **stack0, areaNumber,
     direction, *edge;
-  Int	*ptr0, *ptr, *ptrend, **stackend, *ptr1, onEdge, ix, ix2, *ptr2;
+  int32_t	*ptr0, *ptr, *ptrend, **stackend, *ptr1, onEdge, ix, ix2, *ptr2;
   pointer	src;
   loopInfo	srcinfo;
 
@@ -1319,7 +1319,7 @@ Int area_general(Int narg, Int ps[], Int isFunction)
       nStack = dims[j];
   nStack *= nDirection;	/* times number of directions */
   /* get space for temporary positions */
-  stack = stack0 = (Int **) malloc(nStack*sizeof(Int *));
+  stack = stack0 = (int32_t **) malloc(nStack*sizeof(int32_t *));
   if (!stack) {
     free(offset);
     free(rcoord);
@@ -1405,7 +1405,7 @@ Int area_general(Int narg, Int ps[], Int isFunction)
 	  if (*ptr2 == 1 || *ptr2 == EDGE) { /* neighbor must be treated */
 	    *stack++ = ptr2;	/* place neighbor position on stack */
 	    if (stack == stackend) { /* need to enlarge the stack */
-	      stack0 = realloc(stack0, (nStack + STACKBLOCK)*sizeof(Int *));
+	      stack0 = realloc(stack0, (nStack + STACKBLOCK)*sizeof(int32_t *));
 	      if (!stack0)	/* allocation failed */
 		return cerror(ALLOC_ERR, 0);
 	      /* the call to realloc() may have moved the whole stack to
@@ -1424,7 +1424,7 @@ Int area_general(Int narg, Int ps[], Int isFunction)
 	  if (*ptr2 == 1 || *ptr2 == EDGE) { /* neighbor must be treated */
 	    *stack++ = ptr2;	/* place neighbor position on stack */
 	    if (stack == stackend) { /* need to enlarge the stack */
-	      stack0 = realloc(stack0, (nStack + STACKBLOCK)*sizeof(Int *));
+	      stack0 = realloc(stack0, (nStack + STACKBLOCK)*sizeof(int32_t *));
 	      if (!stack0)	/* allocation failed */
 		return cerror(ALLOC_ERR, 0);
 	      /* the call to realloc() may have moved the whole stack to
@@ -1462,7 +1462,7 @@ Int area_general(Int narg, Int ps[], Int isFunction)
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int lux_area(Int narg, Int ps[])
+int32_t lux_area(int32_t narg, int32_t ps[])
 /* AREA,bitmap [, SEED=<seed>, NUMBERS=<numbers>, DIAGONAL=<diagonal>] */
 {
   if (!symbolIsNumericalArray(ps[0]) || array_type(ps[0]) != LUX_LONG)
@@ -1476,7 +1476,7 @@ Int lux_area(Int narg, Int ps[])
 }
 /*----------------------------------------------------------------------*/
 #define SEEK_MAXIMUM	(LUX_DOUBLE + 1)
-Int area2_2d(Int narg, Int ps[])
+int32_t area2_2d(int32_t narg, int32_t ps[])
 /* AREA2,bitmap,data [,sign]
  assigns numerical labels to those elements of <bitmap> that have values
  equal to 1.  A particular label is assigned to all eligible elements that
@@ -1484,11 +1484,11 @@ Int area2_2d(Int narg, Int ps[])
  It is assumed that (1) <bitmap> is a 2D LONG array; and (2) <data>
  is a 2D array with the same dimensions as <bitmap>.  LS 5sep98 */
 {
-  Int	*ptr, *ptr0, *ptr1, *ptrend, nx, ny, n, areaNumber, *ptr2,
+  int32_t	*ptr, *ptr0, *ptr1, *ptrend, nx, ny, n, areaNumber, *ptr2,
     offset[8], **stack, **stack0, **stackend, nStack, onEdge, ix = 0, iy = 0,
     ix2, iy2, direction, maximum, j;
-  Int	stride, type;
-  Int	rcoords[8][2] = { { 1, 0 }, { -1, 1 }, { 0, 1 }, { 1, 1 },
+  int32_t	stride, type;
+  int32_t	rcoords[8][2] = { { 1, 0 }, { -1, 1 }, { 0, 1 }, { 1, 1 },
 			  { -1, -1 }, { 0, -1 }, { 1, -1 }, { -1, 0 } };
   pointer	dataptr0, dataptr, dataptr2;
 		      
@@ -1576,7 +1576,7 @@ Int area2_2d(Int narg, Int ps[])
 
   /* prepare a stack */
   nStack = STACKBLOCK;
-  stack = stack0 = malloc(STACKBLOCK*sizeof(Int *));
+  stack = stack0 = malloc(STACKBLOCK*sizeof(int32_t *));
   if (!stack0)			/* allocation failed */
     return cerror(ALLOC_ERR, 0);
   stackend = stack0 + nStack;	/* pointer to one beyond end of stack */
@@ -1793,7 +1793,7 @@ Int area2_2d(Int narg, Int ps[])
 
 	  *stack++ = ptr;	/* place neighbor position on stack */
 	  if (stack == stackend) { /* need to enlarge the stack */
-	    stack0 = realloc(stack0, (nStack + STACKBLOCK)*sizeof(Int *));
+	    stack0 = realloc(stack0, (nStack + STACKBLOCK)*sizeof(int32_t *));
 	    if (!stack0)	/* allocation failed */
 	      return cerror(ALLOC_ERR, 0);
 	    /* the call to realloc() may have moved the whole stack to
@@ -1857,7 +1857,7 @@ Int area2_2d(Int narg, Int ps[])
 	  
 	  *stack++ = ptr2;	/* place neighbor position on stack */
 	  if (stack == stackend) { /* need to enlarge the stack */
-	    stack0 = realloc(stack0, (nStack + STACKBLOCK)*sizeof(Int *));
+	    stack0 = realloc(stack0, (nStack + STACKBLOCK)*sizeof(int32_t *));
 	    if (!stack0)	/* allocation failed */
 	      return cerror(ALLOC_ERR, 0);
 	    /* the call to realloc() may have moved the whole stack to
@@ -1888,7 +1888,7 @@ Int area2_2d(Int narg, Int ps[])
   return 1;
 }
 /*----------------------------------------------------------------------*/
-Int area2_general(Int narg, Int ps[])
+int32_t area2_general(int32_t narg, int32_t ps[])
 /* AREA,bitmap,data[,seed,numbers,diagonal,sign]
  <bitmap> is assumed to be a LONG array. */
 /* identifies distinct areas with values equal to 1 in a bitmap.
@@ -1922,10 +1922,10 @@ Int area2_general(Int narg, Int ps[])
       dimension
  LS 17jun98, 5sep98 */
 {
-  Int	iq, *dims, ndim, nelem, nSeed, nNumber, nDirection, *seed, *number,
+  int32_t	iq, *dims, ndim, nelem, nSeed, nNumber, nDirection, *seed, *number,
     i, *rcoord, *offset, j, nStack, **stack, **stack0, areaNumber,
     direction, stride, maximum, type, *edge;
-  Int	*ptr0, *ptr, *ptrend, **stackend, *ptr1, onEdge, ix, ix2, *ptr2;
+  int32_t	*ptr0, *ptr, *ptrend, **stackend, *ptr1, onEdge, ix, ix2, *ptr2;
   pointer	src, dataptr0, dataptr, dataptr2;
   loopInfo	srcinfo;
 
@@ -2000,7 +2000,7 @@ Int area2_general(Int narg, Int ps[])
 
   /* prepare a stack */
   nStack = STACKBLOCK;
-  stack = stack0 = malloc(STACKBLOCK*sizeof(Int *));
+  stack = stack0 = malloc(STACKBLOCK*sizeof(int32_t *));
   if (!stack0) {
     free(offset);
     free(rcoord);
@@ -2237,7 +2237,7 @@ Int area2_general(Int narg, Int ps[])
 
 	  *stack++ = ptr;	/* place neighbor position on stack */
 	  if (stack == stackend) { /* need to enlarge the stack */
-	    stack0 = realloc(stack0, (nStack + STACKBLOCK)*sizeof(Int *));
+	    stack0 = realloc(stack0, (nStack + STACKBLOCK)*sizeof(int32_t *));
 	    if (!stack0)	/* allocation failed */
 	      return cerror(ALLOC_ERR, 0);
 	    /* the call to realloc() may have moved the whole stack to
@@ -2301,7 +2301,7 @@ Int area2_general(Int narg, Int ps[])
 	  
 	  *stack++ = ptr2;	/* place neighbor position on stack */
 	  if (stack == stackend) { /* need to enlarge the stack */
-	    stack0 = realloc(stack0, (nStack + STACKBLOCK)*sizeof(Int *));
+	    stack0 = realloc(stack0, (nStack + STACKBLOCK)*sizeof(int32_t *));
 	    if (!stack0)	/* allocation failed */
 	      return cerror(ALLOC_ERR, 0);
 	    /* the call to realloc() may have moved the whole stack to
@@ -2338,7 +2338,7 @@ Int area2_general(Int narg, Int ps[])
   return 1;
 }
 /*----------------------------------------------------------------------*/
-Int lux_area2(Int narg, Int ps[])
+int32_t lux_area2(int32_t narg, int32_t ps[])
 {
   if (!symbolIsNumericalArray(ps[0]) || array_type(ps[0]) != LUX_LONG)
     return luxerror("Need LONG array", ps[0]);
@@ -2354,7 +2354,7 @@ Int lux_area2(Int narg, Int ps[])
   return area2_general(narg, ps);
 }
 /*----------------------------------------------------------------------*/
-Int lux_basin(Int narg, Int ps[])
+int32_t lux_basin(int32_t narg, int32_t ps[])
 /* Returns a basin map derived from altitude map <im>
    Syntax:  y = basin(im [,/DIFFERENCE,/SINK,/NUMBER])
    <mode>:  1 /NUMBER -> assign different number to each basin, starting
@@ -2366,8 +2366,8 @@ Int lux_basin(Int narg, Int ps[])
 	      neighbor for each pixel
    LS 19feb93 9may97 */
 {
- Int	iq, result_sym, nx, ny, col, row, *wsh, nx0;
- Int	mode, i, n, nsinks, *code, n0;
+ int32_t	iq, result_sym, nx, ny, col, row, *wsh, nx0;
+ int32_t	mode, i, n, nsinks, *code, n0;
  register uint8_t	loc;
  uint8_t	end, locs[3];
  array	*h;
@@ -2489,7 +2489,7 @@ Int lux_basin(Int narg, Int ps[])
    wsh = LPTR(h);		/* back to start of result map */
    n = n0 = nx*ny;
    row = col = 0;
-   if (!(code = (Int *) malloc(sizeof(Int)*nsinks)))
+   if (!(code = (int32_t *) malloc(sizeof(int32_t)*nsinks)))
      return cerror(ALLOC_ERR, 0);
    if (ny > nx)
      nx = ny;
@@ -2530,7 +2530,7 @@ Int lux_basin(Int narg, Int ps[])
  return result_sym;
 }
 /*----------------------------------------------------------------------*/
-Int lux_basin2(Int narg, Int ps[])
+int32_t lux_basin2(int32_t narg, int32_t ps[])
 /* Returns a basin map derived from "altitude" map <data>
    Syntax:  y = basin(data [, sign, /DIFFERENCE,/SINK,/NUMBER])
       <data>: data array
@@ -2545,7 +2545,7 @@ Int lux_basin2(Int narg, Int ps[])
 	      neighbor for each pixel
    LS 19feb93 9may97 24jun98 */
 {
-  Int	result, mode, n, i, j, k, *offsets, *rcoords, edge = 0,
+  int32_t	result, mode, n, i, j, k, *offsets, *rcoords, edge = 0,
     mini, loc[3], nel, label = 0, sign, maxi = 0;
   pointer	src, trgt, trgt0;
   scalar	min[3], max[3];
@@ -2598,8 +2598,8 @@ Int lux_basin2(Int narg, Int ps[])
   n = 1;
   for (i = 1; i < srcinfo.ndim; i++)
     n *= 3;
-  offsets = (Int *) malloc(n*sizeof(Int));
-  rcoords = (Int *) malloc(n*(srcinfo.ndim - 1)*sizeof(Int));
+  offsets = (int32_t *) malloc(n*sizeof(int32_t));
+  rcoords = (int32_t *) malloc(n*(srcinfo.ndim - 1)*sizeof(int32_t));
   if (!offsets || !rcoords)
     return cerror(ALLOC_ERR, 0);
   for (k = 0; k < n; k++) {
@@ -2608,7 +2608,7 @@ Int lux_basin2(Int narg, Int ps[])
 				/* calculate index offset */
       offsets[k] += srcinfo.coords[j]*srcinfo.singlestep[srcinfo.raxes[j]];
     memcpy(rcoords + k*(srcinfo.ndim - 1), &srcinfo.coords[1],
-	   (srcinfo.ndim - 1)*sizeof(Int));
+	   (srcinfo.ndim - 1)*sizeof(int32_t));
     for (j = 1; j < srcinfo.ndim; j++) { /* to next direction: don't change */
 				/* the first dimension */
       srcinfo.coords[j]++;
@@ -2618,7 +2618,7 @@ Int lux_basin2(Int narg, Int ps[])
 	srcinfo.coords[i] = -1;
     }
   }
-  zerobytes(srcinfo.coords, srcinfo.ndim*sizeof(Int)); /* back to zeros */
+  zerobytes(srcinfo.coords, srcinfo.ndim*sizeof(int32_t)); /* back to zeros */
 
   mini = 2;
   switch (symbol_type(ps[0]) | sign) {
@@ -3824,7 +3824,7 @@ Int lux_basin2(Int narg, Int ps[])
   return result;
 }
 /*----------------------------------------------------------------------*/
-Int lux_extreme_general(Int narg, Int ps[])
+int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 /* Y = ESEGMENT(X) seeks positions of local extremes
    ESEGMENT(x [, sign, DIAGONAL=diagonal, THRESHOLD=threshold])
    <x>: data
@@ -3834,7 +3834,7 @@ Int lux_extreme_general(Int narg, Int ps[])
    returns number of OK extremes per data element
    LS 18may95 4aug97 16nov98 2aug99 */
 {
-  Int	result, sign, n, i, *offset, k, j, nElem, edge,
+  int32_t	result, sign, n, i, *offset, k, j, nElem, edge,
 	*diagonal, nDiagonal, n1, n2, nDoDim, i1, i2, n0, haveThreshold;
   double	zero = 0.0;
   pointer	src, trgt, srcl, srcr, t;
@@ -3890,7 +3890,7 @@ Int lux_extreme_general(Int narg, Int ps[])
     n *= 3;
   n = (n - 1)/2 + nDoDim - nDiagonal;
 
-  offset = (Int *) malloc(n*sizeof(Int)); /* offsets to elements to be */
+  offset = (int32_t *) malloc(n*sizeof(int32_t)); /* offsets to elements to be */
 					  /* investigated */
   if (!offset)
     return cerror(ALLOC_ERR, 0);
@@ -3948,7 +3948,7 @@ Int lux_extreme_general(Int narg, Int ps[])
     }
   }
 
-  zerobytes(srcinfo.coords, srcinfo.ndim*sizeof(Int));
+  zerobytes(srcinfo.coords, srcinfo.ndim*sizeof(int32_t));
   nElem = srcinfo.dims[0];
 
   if (!diagonal || diagonal[0]) {
@@ -4310,11 +4310,11 @@ Int lux_extreme_general(Int narg, Int ps[])
   return result;
 }
 /*----------------------------------------------------------------------*/
-Int lux_inpolygon(Int narg, Int ps[])
+int32_t lux_inpolygon(int32_t narg, int32_t ps[])
 /* INPOLYGON(x,y,lx,ly) returns the indices of those points <x,y> that
  lie within the polyhon defined by points <lx,ly>.  LS 24nov98 */
 {
-  Int	n, np, result, iq, type, *trgt, temptype, i, count, *trgt0, j;
+  int32_t	n, np, result, iq, type, *trgt, temptype, i, count, *trgt0, j;
   pointer	x, y, lx, ly;
   scalar	thisx, thisy, yc;
 
@@ -4435,23 +4435,23 @@ Int lux_inpolygon(Int narg, Int ps[])
   return result;
 }
 /*----------------------------------------------------------------------*/
-Int	*ptr1, *ptr2;
-Int ac_compare(const void *arg1, const void *arg2)
+int32_t	*ptr1, *ptr2;
+int32_t ac_compare(const void *arg1, const void *arg2)
 {
-  Int	i1, i2, d;
+  int32_t	i1, i2, d;
 
-  i1 = *(Int *) arg1;
-  i2 = *(Int *) arg2;
+  i1 = *(int32_t *) arg1;
+  i2 = *(int32_t *) arg2;
   d = ptr1[i1] - ptr1[i2];
   return d? d: ptr2[i1] - ptr2[i2];
 }
 /*----------------------------------------------------------------------*/
-Int intcmp(const void *arg1, const void *arg2)
+int32_t intcmp(const void *arg1, const void *arg2)
 {
-  return *(Int *) arg1 - *(Int *) arg2;
+  return *(int32_t *) arg1 - *(int32_t *) arg2;
 }
 /*----------------------------------------------------------------------*/
-Int lux_area_connect(Int narg, Int ps[])
+int32_t lux_area_connect(int32_t narg, int32_t ps[])
 /* AREACONNECT(im1, im2 [, compact] [, /RAW]) determines connections
  between areas in segmented images <im1> and <im2>.  If /RAW is specified,
  then the raw links
@@ -4470,7 +4470,7 @@ Int lux_area_connect(Int narg, Int ps[])
 {
   char	raw = 0, compact = 1;
   uint8_t	*flags;
-  Int	n, n2, dims[2], i, result, *order, *ptr, i2, v1, v2,
+  int32_t	n, n2, dims[2], i, result, *order, *ptr, i2, v1, v2,
     max1, max2, *ptr0, j, i0, *out1, *out2, *order2, *list,
     qapp, qdisapp, qmerge1, qmerge2, qmerge1list, qsplit1, qsplit2,
     qsplit2list, qstay1, qstay2;
@@ -4496,12 +4496,12 @@ Int lux_area_connect(Int narg, Int ps[])
   n = array_size(ps[0]);
 
   /* we sort the entries by *ptr1 value and secondarily by *ptr2 value */
-  order = malloc(n*sizeof(Int));
+  order = malloc(n*sizeof(int32_t));
   if (!order)
     return cerror(ALLOC_ERR, 0);
   for (i = 0; i < n; i++)
     order[i] = i;
-  qsort(order, n, sizeof(Int), ac_compare); /* sort */
+  qsort(order, n, sizeof(int32_t), ac_compare); /* sort */
   /* now ptr1[order[...]] is in ascending order, and */
   /* ptr2[order[...]] is in ascending order for each fixed value of */
   /* ptr1[order[...]] */
@@ -4569,15 +4569,15 @@ Int lux_area_connect(Int narg, Int ps[])
   /* same image-1 area number, by area number in image 2. */
   /* For what follows, it is convenient to also have the ordering */
   /* by image 2 first and image 1 last.  We get that one now. */
-  order = (Int *) malloc(n2*sizeof(Int));
-  order2 = (Int *) malloc(n2*sizeof(Int));
+  order = (int32_t *) malloc(n2*sizeof(int32_t));
+  order2 = (int32_t *) malloc(n2*sizeof(int32_t));
   if (!order || !order2)
     return cerror(ALLOC_ERR, 0);
   for (i = 0; i < n2; i++)
     order[i] = i;
   ptr1 = ptr0 + n2;
   ptr2 = ptr0;
-  qsort(order, n2, sizeof(Int), ac_compare);
+  qsort(order, n2, sizeof(int32_t), ac_compare);
   /* now ptr1[order] is in ascending order of image-2 area numbers */
   /* and ptr2[order] in ascending order of image-1 area numbers for */
   /* each set of constant image-2 area numbers. */
@@ -5038,14 +5038,14 @@ Int lux_area_connect(Int narg, Int ps[])
     zerobytes(flags, n);
 
     /* we store the replacement numbers in <ptr0> */
-    ptr0 = malloc(n2*sizeof(Int));
+    ptr0 = malloc(n2*sizeof(int32_t));
     if (!ptr0) {
       free(order);
       free(order2);
       free(flags);
       return cerror(ALLOC_ERR, 0);
     }
-    zerobytes(ptr0, n2*sizeof(Int));
+    zerobytes(ptr0, n2*sizeof(int32_t));
     /* we start with stayers. */
     if (symbolIsArray(qstay1)) {
       out1 = array_data(qstay1);
@@ -5053,9 +5053,9 @@ Int lux_area_connect(Int narg, Int ps[])
       j = array_size(qstay1);
       while (j--) {
 	/* seek the encountered image-2 number in the list */
-	ptr = bsearch(out2++, order2, n2, sizeof(Int), intcmp);
+	ptr = bsearch(out2++, order2, n2, sizeof(int32_t), intcmp);
 	ptr0[ptr - order2] = *out1; /* replacement number */
-	ptr = bsearch(out1++, order, n, sizeof(Int), intcmp);
+	ptr = bsearch(out1++, order, n, sizeof(int32_t), intcmp);
 	flags[ptr - order] = 1; /* flag use of this number */
       }
     }
@@ -5072,10 +5072,10 @@ Int lux_area_connect(Int narg, Int ps[])
 	list++;
 	/* corresponding to the current pre-split */
 	while (i--) {		/* all corresponding post-split areas */
-	  ptr = bsearch(out2++, order2, n2, sizeof(Int), intcmp);
+	  ptr = bsearch(out2++, order2, n2, sizeof(int32_t), intcmp);
 	  if (!ptr0[ptr - order2]) { /* not yet assigned */
 	    ptr0[ptr - order2] = *out1;
-	    ptr = bsearch(out1, order, n, sizeof(Int), intcmp);
+	    ptr = bsearch(out1, order, n, sizeof(int32_t), intcmp);
 	    flags[ptr - order] = 1; /* flag use of this number */
 	    break;
 	  }
@@ -5099,17 +5099,17 @@ Int lux_area_connect(Int narg, Int ps[])
 	i = list[1] - list[0];	/* the number of pre-merge areas */
 	list++;
 	/* corresponding to the current post-merge */
-	ptr = bsearch(out2, order2, n2, sizeof(Int), intcmp);
+	ptr = bsearch(out2, order2, n2, sizeof(int32_t), intcmp);
 	if (ptr0[ptr - order2]) {	/* already assigned to */
 	  out2++;
 	  out1 += i;
 	  continue;
 	}
 	while (i--) {		/* all corresponding pre-merge areas */
-	  ptr = bsearch(out1, order, n, sizeof(Int), intcmp);
+	  ptr = bsearch(out1, order, n, sizeof(int32_t), intcmp);
 	  if (!flags[ptr - order]) { /* not yet assigned */
 	    flags[ptr - order] = 1; /* flag use of this number */
-	    ptr = bsearch(out2, order2, n2, sizeof(Int), intcmp);
+	    ptr = bsearch(out2, order2, n2, sizeof(int32_t), intcmp);
 	    ptr0[ptr - order2] = *out1;
 	    break;
 	  }
@@ -5192,7 +5192,7 @@ Int lux_area_connect(Int narg, Int ps[])
 	    *list = i;
 	  else {
 	    j = *list;
-	    ptr = bsearch(list, order2, n2, sizeof(Int), intcmp);
+	    ptr = bsearch(list, order2, n2, sizeof(int32_t), intcmp);
 	    *list = i = ptr0[ptr - order2];
 	  }
 	}
@@ -5207,7 +5207,7 @@ Int lux_area_connect(Int narg, Int ps[])
       list += i2;		/* move to start of image-2 numbers */
       while (i2--) {
 	if (*list > 0) {
-	  ptr = bsearch(list, order2, n2, sizeof(Int), intcmp);
+	  ptr = bsearch(list, order2, n2, sizeof(int32_t), intcmp);
 	  *list = ptr0[ptr - order2];
 	}
 	list++;
@@ -5219,7 +5219,7 @@ Int lux_area_connect(Int narg, Int ps[])
       i2 = array_size(qapp);
       while (i2--) {
 	if (*list > 0) {
-	  ptr = bsearch(list, order2, n2, sizeof(Int), intcmp);
+	  ptr = bsearch(list, order2, n2, sizeof(int32_t), intcmp);
 	  *list = ptr0[ptr - order2];
 	}
 	list++;
@@ -5231,7 +5231,7 @@ Int lux_area_connect(Int narg, Int ps[])
       i2 = array_size(qstay2);
       while (i2--) {
 	if (*list > 0) {
-	  ptr = bsearch(list, order2, n2, sizeof(Int), intcmp);
+	  ptr = bsearch(list, order2, n2, sizeof(int32_t), intcmp);
 	  *list = ptr0[ptr - order2];
 	}
 	list++;
@@ -5243,7 +5243,7 @@ Int lux_area_connect(Int narg, Int ps[])
       i2 = array_size(qsplit2);
       while (i2--) {
 	if (*list > 0) {
-	  ptr = bsearch(list, order2, n2, sizeof(Int), intcmp);
+	  ptr = bsearch(list, order2, n2, sizeof(int32_t), intcmp);
 	  *list = ptr0[ptr - order2];
 	}
 	list++;
@@ -5255,7 +5255,7 @@ Int lux_area_connect(Int narg, Int ps[])
       i2 = array_size(qmerge2);
       while (i2--) {
 	if (*list > 0) {
-	  ptr = bsearch(list, order2, n2, sizeof(Int), intcmp);
+	  ptr = bsearch(list, order2, n2, sizeof(int32_t), intcmp);
 	  *list = ptr0[ptr - order2];
 	}
 	list++;

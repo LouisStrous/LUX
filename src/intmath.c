@@ -34,7 +34,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
    function is similar to div() but ensures that the remainder is
    nonnegative (unlike div(), which returns nonpositive remainders if
    the <numerator> or <denominator> are negative). */
-Div_t adiv(Int numerator, Int denominator)
+Div_t adiv(int32_t numerator, int32_t denominator)
 {
   div32_t d;
 
@@ -56,13 +56,13 @@ Div_t adiv(Int numerator, Int denominator)
 #endif
 }
 
-Int iaquot(Int numerator, Int denominator)
+int32_t iaquot(int32_t numerator, int32_t denominator)
 {
   Div_t d = adiv(numerator, denominator);
   return d.quot;
 }
 
-Int iamod(Int numerator, Int denominator)
+int32_t iamod(int32_t numerator, int32_t denominator)
 {
   Div_t d = adiv(numerator, denominator);
   return d.rem;
@@ -84,7 +84,7 @@ Int iamod(Int numerator, Int denominator)
   greater than fd.
  */
 
-Div_t alinediv(Int numerator, Int factor, Int addend, Int denominator)
+Div_t alinediv(int32_t numerator, int32_t factor, int32_t addend, int32_t denominator)
 {
   Div_t d1, d2, d;
 
@@ -95,13 +95,13 @@ Div_t alinediv(Int numerator, Int factor, Int addend, Int denominator)
   return d;
 }
 
-Int alinequot(Int numerator, Int factor, Int addend, Int denominator)
+int32_t alinequot(int32_t numerator, int32_t factor, int32_t addend, int32_t denominator)
 {
   Div_t d = alinediv(numerator, factor, addend, denominator);
   return d.quot;
 }
 
-Int alinemod(Int numerator, Int factor, Int addend, Int denominator)
+int32_t alinemod(int32_t numerator, int32_t factor, int32_t addend, int32_t denominator)
 {
   Div_t d = alinediv(numerator, factor, addend, denominator);
   return d.rem;

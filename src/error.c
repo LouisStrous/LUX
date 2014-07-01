@@ -249,20 +249,20 @@ char	*errorMessages[] = {
  "Need BYTE argument"
 };
 
-Int     nErrorMessages = sizeof(errorMessages)/sizeof(char **);
+int32_t     nErrorMessages = sizeof(errorMessages)/sizeof(char **);
 #if __STDC__
-char	*what(Int, char);
+char	*what(int32_t, char);
 #else
 char	*what();
 #endif
 extern char	*currentInputFile;
-extern Int	fileLevel;
-Int	errorSym = 0;
+extern int32_t	fileLevel;
+int32_t	errorSym = 0;
 char	*errorPtr = NULL;
 static char	storedErrorMessage[256];
 
 /*-------------------------------------------------------------------*/
-char *verrorMessage(char *message, Int symbol, va_list ap)
+char *verrorMessage(char *message, int32_t symbol, va_list ap)
 /* returns error messages */
 {
   char	*ptr;
@@ -292,7 +292,7 @@ char *verrorMessage(char *message, Int symbol, va_list ap)
   return curScrat;
 }
 /*-------------------------------------------------------------------*/
-char *errorMessage(char *message, Int symbol, ...)
+char *errorMessage(char *message, int32_t symbol, ...)
 {
   char	*result;
   va_list	ap;
@@ -303,7 +303,7 @@ char *errorMessage(char *message, Int symbol, ...)
   return result;
 }
 /*-------------------------------------------------------------------*/
-Int luxerror(char *message, Int symbol, ...)
+int32_t luxerror(char *message, int32_t symbol, ...)
 /* displays error messages */
 {
   va_list	ap;
@@ -322,7 +322,7 @@ Int luxerror(char *message, Int symbol, ...)
   return LUX_ERROR;
 }
 /*-------------------------------------------------------------------*/
-Int cerror(Int message, Int symbol, ...)
+int32_t cerror(int32_t message, int32_t symbol, ...)
 /* displays error messages according to message numbers */
 {
   va_list	ap;
@@ -361,12 +361,12 @@ Int cerror(Int message, Int symbol, ...)
   return LUX_ERROR;
 }
 /*-------------------------------------------------------------------*/
-Int lux_error(Int narg, Int ps[])
+int32_t lux_error(int32_t narg, int32_t ps[])
 /* allows the user to generate an error message */
 /* syntax:  error [,format,symbol] [, /store, /restore] */
 {
   char   *format;
-  Int    symbol;
+  int32_t    symbol;
 
   if (narg) {
     format = string_arg(*ps++);

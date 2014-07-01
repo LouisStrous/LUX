@@ -20,8 +20,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdio.h>
 #include "lux_structures.h"
 
-Int execute_error(n)		/* handle errors */
- Int n;
+int32_t execute_error(n)		/* handle errors */
+ int32_t n;
  {
  printf("execution error: ");
  switch (n) {
@@ -166,7 +166,7 @@ Int execute_error(n)		/* handle errors */
  return -1;
  }						/*end of execute_error */
 
-Int file_open_error()
+int32_t file_open_error()
 {
   puts("Error opening file");
   return -1;

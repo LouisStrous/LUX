@@ -38,9 +38,9 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 
 #define TOLERANCE 1.0e-22
 
-void SVD(double *W, double *Z, Int nRow, Int nCol)
+void SVD(double *W, double *Z, int32_t nRow, int32_t nCol)
 {
-  Int i, j, k, EstColRank, RotCount, SweepCount, slimit;
+  int32_t i, j, k, EstColRank, RotCount, SweepCount, slimit;
   double eps, e2, tol, vt, p, h2, x0, y0, q, r, c0, s0, c2, d1, d2;
   eps = TOLERANCE;
   slimit = nCol/4;
@@ -109,16 +109,16 @@ void SVD(double *W, double *Z, Int nRow, Int nCol)
 #endif
 }
 
-Int lux_svd(Int narg, Int ps[])
+int32_t lux_svd(int32_t narg, int32_t ps[])
 /* calculates the singular value decomposition of matrix A, such that */
 /* A = U S V' */
 /* SVD,A,U,S,V */
 {
-  Int	iq, nRow, nCol, *d, n;
+  int32_t	iq, nRow, nCol, *d, n;
   double	*a, *z;
   pointer	src;
 
-/*  void SVD(double *W, double *Z, Int nRow, Int nCol) */
+/*  void SVD(double *W, double *Z, int32_t nRow, int32_t nCol) */
 
   if (symbol_class(ps[0]) != LUX_ARRAY
       || array_num_dims(ps[0]) != 2)

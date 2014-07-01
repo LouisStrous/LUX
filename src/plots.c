@@ -34,30 +34,30 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <limits.h>
 #include "action.h"
 
-extern	Int	lastmin_sym, lastmax_sym;
+extern	int32_t	lastmin_sym, lastmax_sym;
 extern	float	callig_xb, callig_yb;
 		 /* some common variables */
 array	*h;
 pointer q1, q2, q3, q4;
-Int	tkplot(float x, float y, Int lineStyle, Int symStyle),
-	callig(char *, float, float, float, float, Int, Int),
+int32_t	tkplot(float x, float y, int32_t lineStyle, int32_t symStyle),
+	callig(char *, float, float, float, float, int32_t, int32_t),
 	sform(float, float);
  /* plotting context */
-Int	lunplt = 0, ixlow, ixhigh, iylow, iyhigh, standardGray;
+int32_t	lunplt = 0, ixlow, ixhigh, iylow, iyhigh, standardGray;
 float	xfac = 512.0, yfac = 512.0, xerrsize = 0.05, yerrsize = 0.05;
-Int	numarrays, numstrings, numscalars;
-static	Int	xsym, ysym, xtitlesym, ytitlesym, titlesym, symStyle, nx, ny,
+int32_t	numarrays, numstrings, numscalars;
+static	int32_t	xsym, ysym, xtitlesym, ytitlesym, titlesym, symStyle, nx, ny,
   exsym, eysym;
-static	Int	nelem, isym, nbreak, *qi, huge = INT32_MAX, dq3, dq4,
+static	int32_t	nelem, isym, nbreak, *qi, huge = INT32_MAX, dq3, dq4,
 		lineStyle;	/* lineStyle not yet fully implemented */
 char	form[20], label[25], callig_update = 1, *plotxfmt = "%1g",
   *plotyfmt = "%1g";
-Int	landscape = 1, iorder = 0, current_pen = 3;
+int32_t	landscape = 1, iorder = 0, current_pen = 3;
 float	current_gray = 1, startx, stepx, starty, stepy;
  /* contents of VMS common plots follows */
-Int	ilabx = 1, ilaby = 1, irxf = 1, iryf = 1, ndx, fstepx = 0, fstepy = 0;
-Int	nd, ipltyp, ifz = 0, ifzx = 1, ndxs, ndys, ier = 1;
-Int	ifont = 3, ndlabx = 2, ndlaby = 2, iblank = 1, ndot = 1, ifirstflag;
+int32_t	ilabx = 1, ilaby = 1, irxf = 1, iryf = 1, ndx, fstepx = 0, fstepy = 0;
+int32_t	nd, ipltyp, ifz = 0, ifzx = 1, ndxs, ndys, ier = 1;
+int32_t	ifont = 3, ndlabx = 2, ndlaby = 2, iblank = 1, ndot = 1, ifirstflag;
 float	xmin, xmax, ymin, ymax;
 float	wxb = 0.15, wxt = 0.9, wyb = 0.1, wyt = 0.7;
 float	ticx = 0.01, ticy = 0.01, plims[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0}, 
@@ -65,22 +65,22 @@ float	ticx = 0.01, ticy = 0.01, plims[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
 float	fsized = 1, symsize = 1.0, dashsize = 1.0, theDashSize = 1.0;
 float	symratio = 1.0, ticxr = 0.5, ticyr = 0.5, dvx, dv;
  /* end of VMS  common plots */
-Int	useProjection = 0, oldLineStyle = 0;
+int32_t	useProjection = 0, oldLineStyle = 0;
 static float	zero = 0.0, one = 0.99999999;
 float	*plotWindow[4] = { &wxb, &wxt, &wyb, &wyt }, 
 	*screenWindow[4] = { &zero, &one, &zero, &one };
-Int	tkCoordSys = LUX_DEP;
-extern Int	projectTk;
+int32_t	tkCoordSys = LUX_DEP;
+extern int32_t	projectTk;
 extern float	*projectMatrix;
-Int	createFullProjection(float *, float *, float *), 
-	coordTrf(float *, float *, Int, Int);
+int32_t	createFullProjection(float *, float *, float *), 
+	coordTrf(float *, float *, int32_t, int32_t);
  /* for bounding box LS 18jan95: */
 float	postXBot = FLT_MAX, postXTop = -FLT_MAX, 
 	postYBot = FLT_MAX, postYTop = -FLT_MAX;
-Int	updateBoundingBox = 1;	/* if 1, then everything counts */
+int32_t	updateBoundingBox = 1;	/* if 1, then everything counts */
 /* bounding box control is necessary for PLOT, XYMOV, TV */
 
-Int	alternateDash = 0;	/* if nonzero, then xymov "moves" are
+int32_t	alternateDash = 0;	/* if nonzero, then xymov "moves" are
 				   displayed as "draws" in background
 				   color instead. */
 float   lumpx = 0;		/* the desired resolution in the x direction */
@@ -93,7 +93,7 @@ extern float	*currentOblique, *currentPerspective;
 #endif
  /*------------------------------------------------------------------------- */
 enum { POSSYM, NEGSYM, POSLINE, ZEROS, NONE };
-Int fixPlotStyle(Int *symbol, Int *line)
+int32_t fixPlotStyle(int32_t *symbol, int32_t *line)
      /* checks symbol and line style choices for legality and puts in */
      /* standard format.  LS 3feb95 */
 {
@@ -106,7 +106,7 @@ Int fixPlotStyle(Int *symbol, Int *line)
       POSLINE, POSLINE, POSLINE, POSSYM, POSSYM, POSSYM, POSSYM, POSSYM, 
       POSSYM, POSSYM, POSSYM, POSSYM, POSSYM };
   char	sym, lin, ok = 1;
-  Int	temp;
+  int32_t	temp;
 
   /* first, see what the specified types are */
   if (*symbol >= -9 && *symbol <= 29)
@@ -215,12 +215,12 @@ Int fixPlotStyle(Int *symbol, Int *line)
   return 1;
 }
  /*------------------------------------------------------------------------- */
-Int lux_plot(Int narg, Int ps[]) /* plot routine */
+int32_t lux_plot(int32_t narg, int32_t ps[]) /* plot routine */
  /* plots data */
 {
-  Int	oldIer = ier, n;
-  Int	preplot(Int, Int []), plotxy(float [], float [], float [], float [],
-				     Int, Int, Int), labels(void);
+  int32_t	oldIer = ier, n;
+  int32_t	preplot(int32_t, int32_t []), plotxy(float [], float [], float [], float [],
+				     int32_t, int32_t, int32_t), labels(void);
 
   ier = (internalMode & 64)? 0: ier; /* /KEEP: erase before plotting? */
   n = ((lunplt != 0 || setup_x() == LUX_OK)
@@ -232,11 +232,11 @@ Int lux_plot(Int narg, Int ps[]) /* plot routine */
   return n? 1: LUX_ERROR; 
 }
  /*------------------------------------------------------------------------- */
-Int lux_oplot(Int narg, Int ps[]) /* oplot routine */
+int32_t lux_oplot(int32_t narg, int32_t ps[]) /* oplot routine */
  /* over plot data */
 {
-  Int	preplot(Int, Int []),
-    oplotx(float [], float [], float [], float [], Int, Int, Int);
+  int32_t	preplot(int32_t, int32_t []),
+    oplotx(float [], float [], float [], float [], int32_t, int32_t, int32_t);
 
   if ((lunplt == 0 && setup_x() != LUX_OK)
       || preplot(narg, ps) != 1
@@ -246,13 +246,13 @@ Int lux_oplot(Int narg, Int ps[]) /* oplot routine */
   return 1; 
 }
  /*------------------------------------------------------------------------- */
-Int preplot(Int narg, Int ps[])
+int32_t preplot(int32_t narg, int32_t ps[])
  /* used by plot and oplot to setup */
 {
-  Int	i, iq, freePos = 1, xfmtsym, yfmtsym;
-  Int	lux_indgen(Int, Int []);
-  extern Int	curRoutineNum;
-  char	*keyName(internalRoutine *, Int, Int);
+  int32_t	i, iq, freePos = 1, xfmtsym, yfmtsym;
+  int32_t	lux_indgen(int32_t, int32_t []);
+  extern int32_t	curRoutineNum;
+  char	*keyName(internalRoutine *, int32_t, int32_t);
 
   /* loop through the args and check what we have */
   xsym = ysym = ytitlesym = xtitlesym = titlesym = isym = exsym = eysym = 
@@ -451,7 +451,7 @@ Int preplot(Int narg, Int ps[])
   if (isym) {			/* line breaks specified */
     isym = lux_long(1, &isym);
     nbreak = array_size(isym);
-    qi = (Int *) array_data(isym);
+    qi = (int32_t *) array_data(isym);
   } else {
     qi = &huge;
     nbreak = 0;
@@ -463,7 +463,7 @@ Int preplot(Int narg, Int ps[])
   return 1;
 }
  /*------------------------------------------------------------------------- */
-Int mm(float *x, Int n, float *max, float *min)
+int32_t mm(float *x, int32_t n, float *max, float *min)
 {
  /* just return the min and max of a floating array */
   if (n <= 0)
@@ -478,26 +478,26 @@ Int mm(float *x, Int n, float *max, float *min)
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int plotxy(float xx[], float yy[], float ex[], float ey[], Int n, Int dx,
-	    Int dy)
+int32_t plotxy(float xx[], float yy[], float ex[], float ey[], int32_t n, int32_t dx,
+	    int32_t dy)
 /* xx[]: x coordinates */
 /* yy[]: y coordinates */
 /* n: number of data points */
 {
-  Int	ixlog, iylog, i, j;
+  int32_t	ixlog, iylog, i, j;
   float	x, y, stepxdvi, stepydvi, x2, y2, endx, endy;
   float	xlabel, f;
-  extern Int	calligCoordSys;
+  extern int32_t	calligCoordSys;
   extern float	callig_ratio;
   char	*p;
   static float	logs[] = { 0.30103, 0.47712, 0.60206, 0.69897,
 			   0.77815, 0.84510, 0.90309, 0.95424 };
-  void	setupticks(float *min, float *max, Int ndlab, Int fstep, Int ilog,
-		   Int irf, Int f, float wb, float wt, float plim_min,
+  void	setupticks(float *min, float *max, int32_t ndlab, int32_t fstep, int32_t ilog,
+		   int32_t irf, int32_t f, float wb, float wt, float plim_min,
 		   float plim_max, float *start, float *step, float *end,
 		   float *stepdvi);
-  Int lux_erase(Int, Int []);
-  Int oplotx(float [], float [], float [], float [], Int, Int, Int);
+  int32_t lux_erase(int32_t, int32_t []);
+  int32_t oplotx(float [], float [], float [], float [], int32_t, int32_t, int32_t);
 
   iylog = ipltyp % 2;
   ixlog = (ipltyp/2) % 2;
@@ -763,7 +763,7 @@ Int plotxy(float xx[], float yy[], float ex[], float ey[], Int n, Int dx,
   }
 
   if (n > 0) {			/* no bounding box checking required in */
-    Int oplotx(float *, float *, float *, float *, Int, Int, Int);
+    int32_t oplotx(float *, float *, float *, float *, int32_t, int32_t, int32_t);
    /* oplotx, since all data points fall within the plot window, i.e. */
    /* also within the current bounding box.  May want to check when */
    /* the axis labels and titles are drawn, so don't just set to zero */
@@ -778,7 +778,7 @@ Int plotxy(float xx[], float yy[], float ex[], float ey[], Int n, Int dx,
   return LUX_OK;
 }
 /*------------------------------------------------------------------------- */
-Int positionClassWindow(float x, float y, float **w)
+int32_t positionClassWindow(float x, float y, float **w)
 /* returns position class of point (x, y) relative to the plot window: */
 /*    0 1 2 */
 /*    3 4 5 */
@@ -786,7 +786,7 @@ Int positionClassWindow(float x, float y, float **w)
 /* with #4 the plot window itself. */
 /* LS 25jun94 */
 {
-  Int	class;
+  int32_t	class;
 
   if (x < *(w[0]))
     class = 0;
@@ -805,7 +805,7 @@ Int positionClassWindow(float x, float y, float **w)
 #define FIRST_IN	2
 #define SECOND_IN	3
 #define PART_IN		4
-Int clipToWindow(float *xo, float *yo, float x[2], float y[2], float **w)
+int32_t clipToWindow(float *xo, float *yo, float x[2], float y[2], float **w)
 /* restricts the line between (*xo, *yo) and (x[0], y[0]) to the part within 
  the window.  returns the coordinates of the moved points in 
  (x[0], y[0]) and, if necessary, (x[1], y[1]), and returns NONE_IN if no 
@@ -819,8 +819,8 @@ Int clipToWindow(float *xo, float *yo, float x[2], float y[2], float **w)
 /* LS 25jun94 */
 {
   float	dx, dy, *xx, *yy, savex, savey;
-  Int	c1, c2;
-  Int	result = NONE_IN;
+  int32_t	c1, c2;
+  int32_t	result = NONE_IN;
   static char	action[9][9] = 
   { { 0, 0, 0, 0, 1, 2, 0, 2, 2 }, 
     { 0, 0, 0, 2, 1, 2, 2, 2, 2 }, 
@@ -934,14 +934,14 @@ Int clipToWindow(float *xo, float *yo, float x[2], float y[2], float **w)
   return result;
 }
  /*------------------------------------------------------------------------- */
-Int oplotx(float x[], float y[], float ex[], float ey[], Int n, Int dx,
-	   Int dy)
+int32_t oplotx(float x[], float y[], float ex[], float ey[], int32_t n, int32_t dx,
+	   int32_t dy)
 {
   float		xx[2], yy[2], xl, yl, xe, ye, xerrs, yerrs;
-  Int	i;
+  int32_t	i;
   char	c, noclipbars;
-  extern Int	fromCoordinateSystem, toCoordinateSystem, calligCoordSys;
-  Int	coordMap(float *, float *), dashload(Int, Int *, float *, float);
+  extern int32_t	fromCoordinateSystem, toCoordinateSystem, calligCoordSys;
+  int32_t	coordMap(float *, float *), dashload(int32_t, int32_t *, float *, float);
 
   noclipbars = (internalMode & 256) == 0; /* no /CLIPBARS */
   ifirstflag = 1;		/* used by symplot if blanking enabled */
@@ -969,7 +969,7 @@ Int oplotx(float x[], float y[], float ex[], float ey[], Int n, Int dx,
     }
     for (i = 0; i < n; i++) {	/* loop over points */
       if (lumpx) {
-	Int nlump = 1, lumpindex;
+	int32_t nlump = 1, lumpindex;
 	float sumx, sumy;
 	*xx = x[i];
 	*yy = y[i];
@@ -981,7 +981,7 @@ Int oplotx(float x[], float y[], float ex[], float ey[], Int n, Int dx,
 	  *xx = x[i];
 	  *yy = y[i];
 	  coordMap(xx, yy);
-	  if ((Int) (*xx/lumpx) == lumpindex) {
+	  if ((int32_t) (*xx/lumpx) == lumpindex) {
 	    sumx += *xx;
 	    sumy += *yy;
 	    nlump++;
@@ -1103,10 +1103,10 @@ Int oplotx(float x[], float y[], float ex[], float ey[], Int n, Int dx,
   return 1;
 }
  /*------------------------------------------------------------------------- */
-Int dashload(Int id, Int *ndash, float *sm, float dashsize)
+int32_t dashload(int32_t id, int32_t *ndash, float *sm, float dashsize)
 {
- static	Int	nds[] = {2, 2, 2, 4,  4,  2,  6,  6,  8,  6};
- static	Int	ip[]  = {0, 2, 4, 6, 10, 14, 16, 22, 28, 36};
+ static	int32_t	nds[] = {2, 2, 2, 4,  4,  2,  6,  6,  8,  6};
+ static	int32_t	ip[]  = {0, 2, 4, 6, 10, 14, 16, 22, 28, 36};
  static	float	xlens[] = {
    .005, .005,			/* style 10: short-dashed */
    .010, .010,			/* style 11: medium-dashed */
@@ -1119,7 +1119,7 @@ Int dashload(Int id, Int *ndash, float *sm, float dashsize)
    .010, .005, .010, .005, .002, .005, .002, .005, /* 18: dot-dot-dash-dash */
    .005, .005, .010, .005, .020, .005 /* 19: short-medium-dash */
  };
- Int	i;
+ int32_t	i;
 
  *ndash = nds[id];
  for (i = 0; i < nds[id]; i++)
@@ -1127,7 +1127,7 @@ Int dashload(Int id, Int *ndash, float *sm, float dashsize)
  return 1;
 }
  /*------------------------------------------------------------------------- */
-Int setl(float *ymax, float *ymin, Int *nq, float *dv, Int ilog, float wyb, 
+int32_t setl(float *ymax, float *ymin, int32_t *nq, float *dv, int32_t ilog, float wyb, 
 	 float wyt)
 /*
  *ymin: minimum y value on input, minimum plot limit on output
@@ -1141,7 +1141,7 @@ Int setl(float *ymax, float *ymin, Int *nq, float *dv, Int ilog, float wyb,
 				 /* set limits, used for "nice" plot limits */
 {
  float	yn, yx, xq, yq, zq, rdx, xt, xb;
- Int	ilg, j1, j2;
+ int32_t	ilg, j1, j2;
 
  /* if ilog == 1 then log scaling done */
  if (ilog != 0) {
@@ -1209,8 +1209,8 @@ Int setl(float *ymax, float *ymin, Int *nq, float *dv, Int ilog, float wyb,
  return 1;
 }
 /*------------------------------------------------------------------------- */
-void setupticks(float *min, float *max, Int ndlab, Int fstep, Int ilog,
-		Int irf, Int f, float wb, float wt, float plim_min,
+void setupticks(float *min, float *max, int32_t ndlab, int32_t fstep, int32_t ilog,
+		int32_t irf, int32_t f, float wb, float wt, float plim_min,
 		float plim_max, float *start, float *step, float *end,
 		float *stepdvi)
 /* *min: INPUT: least value in data; OUTPUT: least plot data limit */
@@ -1330,22 +1330,22 @@ void setupticks(float *min, float *max, Int ndlab, Int fstep, Int ilog,
     *end = 0.0;
 }
 /*------------------------------------------------------------------------- */
-Int tkplot(float x, float y, Int lineStyle, Int symStyle)
+int32_t tkplot(float x, float y, int32_t lineStyle, int32_t symStyle)
 /* plots a line segment using style <lineStyle> and puts a symbol */
 /* at the end of type <symStyle>.  Both of these arguments are */
 /* nonnegative numbers.  LS 4feb95 */
 /* Fixed lacking update of xLast, yLast in some cases.  LS 20jul2000 */
 {
-  static Int	ndash, depth = 0, id;
+  static int32_t	ndash, depth = 0, id;
   static float	dashes[10], xLast = -0.0001, yLast = -0.0001;
   static char	penState;
   static float	s;
   float	dx, dy, s0, sd, xc, yc, xx[2], yy[2];
-  Int	result, ix, iy;
-  Int	symplot(float, float, Int, Int), 
-  	postvec(float, float, Int);
+  int32_t	result, ix, iy;
+  int32_t	symplot(float, float, int32_t, int32_t), 
+  	postvec(float, float, int32_t);
 #if HAVE_LIBX11
-  Int	xwindow_plot(Int, Int, Int);
+  int32_t	xwindow_plot(int32_t, int32_t, int32_t);
 #endif
 
  /* use current context to convert to device dependent coords (DD) and
@@ -1372,7 +1372,7 @@ Int tkplot(float x, float y, Int lineStyle, Int symStyle)
     coordTrf(&x, &y, tkCoordSys, LUX_DVI);
 #ifdef DEVELOP
     if (useProjection || projectTk) {
-      Int	project(float, float, float);
+      int32_t	project(float, float, float);
       extern float	projected[];
       
       project(x, y, 0);
@@ -1461,8 +1461,8 @@ Int tkplot(float x, float y, Int lineStyle, Int symStyle)
   switch (lunplt) {
     case 0:			/* to screen */
 #if HAVE_LIBX11
-      ix = (Int) (xx[1]*xfac);
-      iy = iyhigh - (Int) (yy[1]*yfac);
+      ix = (int32_t) (xx[1]*xfac);
+      iy = iyhigh - (int32_t) (yy[1]*yfac);
       xwindow_plot(ix, iy, lineStyle);
 #else
       return cerror(NO_X11, 0);
@@ -1475,7 +1475,7 @@ Int tkplot(float x, float y, Int lineStyle, Int symStyle)
   return 1;
 }
  /*------------------------------------------------------------------------*/
-Int lux_pen(Int narg, Int ps[])
+int32_t lux_pen(int32_t narg, int32_t ps[])
 /* PEN, width, currentgray */
 /* sets or displays the pen width and color */
 {
@@ -1491,20 +1491,20 @@ Int lux_pen(Int narg, Int ps[])
   return 1;
 }
 /*------------------------------------------------------------------------*/
-Int lux_pencolor(Int narg, Int ps[])
+int32_t lux_pencolor(int32_t narg, int32_t ps[])
 /* sets or displays the current pen color. */
 {
-  Int	iq, nx, xflag, n, nred, ngreen, nblue;
+  int32_t	iq, nx, xflag, n, nred, ngreen, nblue;
   uint32_t	ired, igreen, iblue;
   static float	red, green, blue;
   char	*pc = NULL;
   float	*pf;
 #if HAVE_LIBX11
-  Int	getXcolor(char *colorname, XColor *color, Int alloc);
+  int32_t	getXcolor(char *colorname, XColor *color, int32_t alloc);
   Status	anaAllocNamedColor(char *, XColor **);
-  extern Int	connect_flag;
+  extern int32_t	connect_flag;
 #endif
-  Int	postcolorpen(float red, float green, float blue);
+  int32_t	postcolorpen(float red, float green, float blue);
 #if HAVE_LIBX11
   XColor	color;
 #endif
@@ -1583,9 +1583,9 @@ void set_cur_pen(void)
 /* set pen according to current_pen and current_gray */
 {
 #if HAVE_LIBX11
-  Int lux_xpen(Int, float);
+  int32_t lux_xpen(int32_t, float);
 #endif
-  Int postpen(Int, float);
+  int32_t postpen(int32_t, float);
   
   switch (lunplt) {
 #if HAVE_LIBX11 
@@ -1598,12 +1598,12 @@ void set_cur_pen(void)
   }
 }
  /*------------------------------------------------------------------------*/
-Int set_pen(Int pen)
+int32_t set_pen(int32_t pen)
 {
 #if HAVE_LIBX11
-  Int lux_xpen(Int, float);
+  int32_t lux_xpen(int32_t, float);
 #endif
-  Int postpen(Int, float);
+  int32_t postpen(int32_t, float);
   
   switch (lunplt) {
     case 0:
@@ -1618,11 +1618,11 @@ Int set_pen(Int pen)
   return luxerror("Illegal plot device (%1d)!", 0, lunplt);
 }
  /*------------------------------------------------------------------------*/
-Int lux_erase(Int narg, Int ps[])
+int32_t lux_erase(int32_t narg, int32_t ps[])
 {
-  Int	postcopy(void), toscreen;
+  int32_t	postcopy(void), toscreen;
 #if HAVE_LIBX11
-  Int	lux_xerase(Int, Int []);
+  int32_t	lux_xerase(int32_t, int32_t []);
 #endif
 
   toscreen = (internalMode & 192);
@@ -1656,7 +1656,7 @@ Int lux_erase(Int narg, Int ps[])
   return luxerror("Illegal plot device (%1d)!", 0, lunplt);
 }
  /*------------------------------------------------------------------------- */
-Int lux_limits(Int narg, Int ps[]) /*set or examine limits */
+int32_t lux_limits(int32_t narg, int32_t ps[]) /*set or examine limits */
 {
   if (narg == 0)
   { printf("current plot range x axis %f to %f\n", plims[0], plims[1]);
@@ -1678,7 +1678,7 @@ Int lux_limits(Int narg, Int ps[]) /*set or examine limits */
  return 1;
 }
  /*------------------------------------------------------------------------- */
-Int lux_window(Int narg, Int ps[]) /*set or examine window */
+int32_t lux_window(int32_t narg, int32_t ps[]) /*set or examine window */
 {
   float	tmp;
 #ifdef DEVELOP
@@ -1723,9 +1723,9 @@ Int lux_window(Int narg, Int ps[]) /*set or examine window */
   return 1;
  }
  /*------------------------------------------------------------------------- */
-Int lux_pdev(Int narg, Int ps[])
+int32_t lux_pdev(int32_t narg, int32_t ps[])
 {
-  Int	postreset(Int);
+  int32_t	postreset(int32_t);
   extern float	postXBot, postYBot, postXTop, postYTop;
 
   if (narg > 0) {
@@ -1741,11 +1741,11 @@ Int lux_pdev(Int narg, Int ps[])
   return 1;
 }
  /*------------------------------------------------------------------------- */
-Int sform(float xb, float xt)
+int32_t sform(float xb, float xt)
 				 /* make a nice format for plot labels */
 {
  /* set default form */
-  Int	ie, il;
+  int32_t	ie, il;
   float	xq, xc;
 
   xc = MAX(ABS(xb), ABS(xt));	
@@ -1765,7 +1765,7 @@ Int sform(float xb, float xt)
       ie++;
 					 /* how many digits on lhs ? */
     xq = log10(xc);
-    il = (Int) xq;
+    il = (int32_t) xq;
     if (xq > il)
       il++;
     il = MAX(il, 0);
@@ -1775,15 +1775,15 @@ Int sform(float xb, float xt)
   return 1;
 }
  /*------------------------------------------------------------------------- */
-Int empty(void)
+int32_t empty(void)
  /* flush the plot channel (whatever it is) */
 {
   return 1;
 }
  /*------------------------------------------------------------------------- */
-Int symplot(float x, float y, Int symStyle, Int lineStyle)
+int32_t symplot(float x, float y, int32_t symStyle, int32_t lineStyle)
 {
-  static Int	is[] =
+  static int32_t	is[] =
   { 1, 5,9, 14, 18, 23, 27, 35, 76, 76};
   static float	poly[] =
   { 0.0085, .01, 0,0, 0,0, 0.01, 0.0075, 0,0 };
@@ -1812,7 +1812,7 @@ Int symplot(float x, float y, Int symStyle, Int lineStyle)
      0.00216, 0.00318, 0.00411, 0.00495, 0.00566, 0.00624, 0.00666, 0.00691, 
      .007 };
   static float	xp, yp;
-  Int	nsym = 8, ns, nsm, ia, ib, icept, i, iq;
+  int32_t	nsym = 8, ns, nsm, ia, ib, icept, i, iq;
   float	tol = 1.e-5, delx, xq, yq, zq, xq2, yq2, slope, x2, y2, sq, pr;
   float	x1, y1;
   char	thing[2];
@@ -1992,17 +1992,17 @@ Int symplot(float x, float y, Int symStyle, Int lineStyle)
   return 1;
 }
  /*------------------------------------------------------------------------- */
-Int lux_xymov(Int narg, Int ps[])			/* xymov routine */
+int32_t lux_xymov(int32_t narg, int32_t ps[])			/* xymov routine */
  /* subroutine, call is xymov(x, y, [mode, BREAKS=breaks], /boundingbox) */
 {
  /* the x, y, and mode arguments can be scalars or vectors in various
 	 combinations, if no mode, then assume a pen up to first point
 	 and then pen down */
-  Int	mode, nx, ny, nm, *mp, dx, dy, dm, iq, line, one = 1, nc,
+  int32_t	mode, nx, ny, nm, *mp, dx, dy, dm, iq, line, one = 1, nc,
     altDash, i;
-  Int	fixPlotStyle(Int *, Int *);
+  int32_t	fixPlotStyle(int32_t *, int32_t *);
   float	*x, *y, xc, yc;
-  extern Int	tkCoordSys, ifirstflag;
+  extern int32_t	tkCoordSys, ifirstflag;
   char	moveFirst;
 
   mode = LUX_UNSPECIFIED;
@@ -2155,7 +2155,7 @@ Int lux_xymov(Int narg, Int ps[])			/* xymov routine */
   mp += dm;
   nc = nm - dm;
   for (i = 1; i < nelem; i++) {
-    Int isbreak;
+    int32_t isbreak;
 
     xc = *x;
     yc = *y;
@@ -2191,14 +2191,14 @@ Int lux_xymov(Int narg, Int ps[])			/* xymov routine */
   return 1;
 }
  /*------------------------------------------------------------------------- */
-Int lux_postimage(Int narg, Int ps[])			/* postimage routine */
+int32_t lux_postimage(int32_t narg, int32_t ps[])			/* postimage routine */
  /* subroutine, call is postimage(image, x0, x1, y0, y1) */
 {
-  extern	Int	scalemax, scalemin;
-  Int	lux_scale(Int, Int *), postgray(char *, Int, Int, float, float, float, 
-					float, Int);
+  extern	int32_t	scalemax, scalemin;
+  int32_t	lux_scale(int32_t, int32_t *), postgray(char *, int32_t, int32_t, float, float, float, 
+					float, int32_t);
   float	x0, x1, y0, y1;
-  Int	iq, nd, nx, ny, s1, s2;
+  int32_t	iq, nd, nx, ny, s1, s2;
   char	*ptr;
   array	*h;
 
@@ -2237,12 +2237,12 @@ Int lux_postimage(Int narg, Int ps[])			/* postimage routine */
   return postgray(ptr, nx, ny, x0, x1, y0, y1, iorder);
 }
  /*------------------------------------------------------------------------- */
-Int lux_postraw(Int narg, Int ps[])			/* postraw routine */
+int32_t lux_postraw(int32_t narg, int32_t ps[])			/* postraw routine */
  /* subroutine, call is postraw(string) */
 {
-  Int	iq;
+  int32_t	iq;
   char	*s;
-  Int	postrawout(char *);
+  int32_t	postrawout(char *);
 
   iq = ps[0];
   if ( sym[iq].class != 2 ) return cerror(NEED_STR, 0);

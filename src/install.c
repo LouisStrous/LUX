@@ -50,45 +50,45 @@ extern symTableEntry	sym[];
 extern hashTableEntry	*varHashTable[], *subrHashTable[], *funcHashTable[],
 			*blockHashTable[];
 extern int16_t		listStack[];
-extern Int		keepEVB;
+extern int32_t		keepEVB;
 extern char		*currentChar, line[];
 extern FILE		*inputStream, *outputStream;
-extern Int		nExecuted;
+extern int32_t		nExecuted;
 /* extern internalRoutine	subroutine[], function[]; */
 internalRoutine *subroutine, *function;
 
-Int	luxerror(char *, Int, ...), lookForName(char *, hashTableEntry *[], Int),
-	newSymbol(Int, ...), lux_setup();
-void	installKeys(void *keys), zerobytes(void *, Int);
-char	*strsave(char *), *symName(Int, hashTableEntry *[]), *className(Int),
-	*typeName(Int);
-FILE	*openPathFile(char *, Int);
+int32_t	luxerror(char *, int32_t, ...), lookForName(char *, hashTableEntry *[], int32_t),
+	newSymbol(int32_t, ...), lux_setup();
+void	installKeys(void *keys), zerobytes(void *, int32_t);
+char	*strsave(char *), *symName(int32_t, hashTableEntry *[]), *className(int32_t),
+	*typeName(int32_t);
+FILE	*openPathFile(char *, int32_t);
 
-Int	nFixed = 0, noioctl = 0, trace = 0, curTEIndex;
+int32_t	nFixed = 0, noioctl = 0, trace = 0, curTEIndex;
 
 char	batch = 0, *currentInputFile = NULL, ignoreSymbols = 0, restart = 0;
 
-Int	traceMode = T_FILE | T_LOOP | T_BLOCK | T_ROUTINE;
+int32_t	traceMode = T_FILE | T_LOOP | T_BLOCK | T_ROUTINE;
 
 int16_t	*listStackItem = listStack;
 
-Int	symbolStackIndex = 0, tempVariableIndex = TEMPS_START,
+int32_t	symbolStackIndex = 0, tempVariableIndex = TEMPS_START,
 	nTempVariable = 0, namedVariableIndex = NAMED_START,
 	nNamedVariable = 0, nSymbolStack = 0, executableIndex = EXE_START,
 	nExecutable = 0, tempExecutableIndex = TEMP_EXE_START,
 	nTempExecutable, zapContext = 0, installString(char *),
-	lux_verify(Int, Int []), eval_func, insert_subr;
+	lux_verify(int32_t, int32_t []), eval_func, insert_subr;
 
-Int	markStack[MSSIZE], markIndex = 0;
+int32_t	markStack[MSSIZE], markIndex = 0;
 
 executionLevelInfo	*exInfo = NULL;
-Int	nexInfo = 0;
+int32_t	nexInfo = 0;
 
-extern Int	compileLevel, curLineNumber;
+extern int32_t	compileLevel, curLineNumber;
 static char	installing = 1;
 
 /*----------------------------------------------------------------*/ 
-extern Int lux_area(), lux_area2(), lux_array_statistics(),
+extern int32_t lux_area(), lux_area2(), lux_array_statistics(),
   lux_atomize(), lux_batch(), lux_callig(), lux_close(),
   lux_contour(), lux_coordmap(), lux_crunch(),
   lux_cubic_spline_extreme(), lux_debug(), lux_decomp(),
@@ -122,32 +122,32 @@ extern Int lux_area(), lux_area2(), lux_array_statistics(),
   lux_cfloat_inplace(), lux_cdouble_inplace(), lux_string_inplace(),
   lux_fade(), lux_fade_init();
 
-Int	lux_name();
+int32_t	lux_name();
 
 #if DEVELOP
-extern Int lux_fitUnitCube(), lux_projection(), lux_plot3d(),
+extern int32_t lux_fitUnitCube(), lux_projection(), lux_plot3d(),
   lux_trajectory(), lux_getmin2(), lux_projectmap();
 #endif
 
 #if DEBUG
-extern Int	checkList(), lux_whereisAddress(), lux_show_temps(),
+extern int32_t	checkList(), lux_whereisAddress(), lux_show_temps(),
 		lux_newallocs(), show_files();
 #endif
 
 #if HAVE_LIBJPEG
-extern Int	lux_read_jpeg6b(), lux_write_jpeg6b();
+extern int32_t	lux_read_jpeg6b(), lux_write_jpeg6b();
 #endif
 
 #if HAVE_SYS_MTIO_H
-extern Int	lux_tape_status(), lux_rewind(), lux_weof(), lux_unload(),
+extern int32_t	lux_tape_status(), lux_rewind(), lux_weof(), lux_unload(),
   lux_skipr(), lux_skipf(), lux_taprd(), lux_tapwrt(), lux_tapebufin(),
   lux_tapebufout(), lux_wait_for_tape();
 #endif
 
-extern Int	lux_gifread(), lux_gifwrite();
+extern int32_t	lux_gifread(), lux_gifwrite();
 
 #if HAVE_LIBX11
-extern Int lux_menu(), lux_menu_hide(), lux_menu_item(),
+extern int32_t lux_menu(), lux_menu_hide(), lux_menu_item(),
   lux_menu_kill(), lux_menu_pop(), lux_menu_read(),
   lux_register_event(), lux_window(), lux_xcopy(),
   lux_xdelete(), lux_xdrawline(), lux_xevent(), lux_xflush(),
@@ -164,7 +164,7 @@ extern Int lux_menu(), lux_menu_hide(), lux_menu_item(),
 #endif
 
 #if MOTIF
-extern Int lux_xmalignment(), lux_xmarmcolor(), lux_xmattach(),
+extern int32_t lux_xmalignment(), lux_xmarmcolor(), lux_xmattach(),
   lux_xmattach_relative(), lux_xmbackgroundcolor(),
   lux_xmbordercolor(), lux_xmborderwidth(), lux_xmbottomshadowcolor(),
   lux_xmdestroy(), lux_xmdrawinglink(), lux_xmfont(),
@@ -188,15 +188,15 @@ extern Int lux_xmalignment(), lux_xmarmcolor(), lux_xmattach(),
   lux_xmgetwidgetposition(), lux_xminfo();
 #endif
 
-extern Int lux_readorbits(), lux_showorbits();
+extern int32_t lux_readorbits(), lux_showorbits();
 
-extern Int	peek();
-extern Int	lux_breakpoint();
-extern Int	insert();
-Int	lux_restart(Int, Int []);
+extern int32_t	peek();
+extern int32_t	lux_breakpoint();
+extern int32_t	insert();
+int32_t	lux_restart(int32_t, int32_t []);
 
 #if MOTIF
-Int	lux_zeroifnotdefined(), lux_compile_file();	/* browser */
+int32_t	lux_zeroifnotdefined(), lux_compile_file();	/* browser */
 #endif
 
 #define MAX_ARG	100
@@ -678,9 +678,9 @@ internalRoutine	subroutine_table[] = {
   { "ZOOM",	1, 3, lux_zoom, "1OLDCONTRAST" }, /* zoom.c */
 #endif
 };
-Int nSubroutine = sizeof(subroutine_table)/sizeof(internalRoutine);
+int32_t nSubroutine = sizeof(subroutine_table)/sizeof(internalRoutine);
 
-extern Int lux_abs(), lux_acos(), lux_arestore_f(), lux_arg(),
+extern int32_t lux_abs(), lux_acos(), lux_arestore_f(), lux_arg(),
   lux_array(), lux_asin(), lux_assoc(), lux_astore_f(), lux_atan(),
   lux_atan2(), lux_basin(), lux_basin2(), lux_beta(), lux_bisect(),
   lux_bmap(), bytarr(), lux_byte(), bytfarr(), lux_cbrt(), cdblarr(),
@@ -753,31 +753,31 @@ extern Int lux_abs(), lux_acos(), lux_arestore_f(), lux_arg(),
   lux_cspline_find(), lux_covariance();
 
 #if HAVE_REGEX_H
-extern Int lux_getdirectories(), lux_getfiles(), lux_getfiles_r(),
+extern int32_t lux_getdirectories(), lux_getfiles(), lux_getfiles_r(),
   lux_getmatchedfiles(), lux_getmatchedfiles_r(), lux_regex();
 #endif
 
 #if DEVELOP
-extern Int	lux_project(), lux_bsmooth(), lux_compile(),
+extern int32_t	lux_project(), lux_bsmooth(), lux_compile(),
   lux_bessel_i0(), lux_bessel_i1(), lux_bessel_k0(), lux_bessel_k1(),
   lux_bessel_kn(), lux_regridls(), lux_bigger235(),
   lux_geneticfit();
 #endif
 
-extern Int	lux_gifread_f(), lux_gifwrite_f();
+extern int32_t	lux_gifread_f(), lux_gifwrite_f();
 
 #if HAVE_LIBX11
-extern Int	lux_check_menu(), lux_check_window(), lux_colorpixel(),
+extern int32_t	lux_check_menu(), lux_check_window(), lux_colorpixel(),
   lux_event_name(), lux_xlabelwidth(), lux_xquery_f(), lux_xexist();
 #endif
 
-extern Int lux_calendar(), lux_EasterDate(), /* lux_orbitalElement(), */
+extern int32_t lux_calendar(), lux_EasterDate(), /* lux_orbitalElement(), */
   lux_astropos(), lux_precess(), lux_constellation(),
   lux_constellationname(), lux_enhanceimage();
 
 #if MOTIF
 
-extern Int lux_xmarrow(), lux_xmboard(), lux_xmbutton(),
+extern int32_t lux_xmarrow(), lux_xmboard(), lux_xmbutton(),
   lux_xmcheckbox(), lux_xmcolumns(), lux_xmcommand(),
   lux_xmdialog_board(), lux_xmdrawingarea(), lux_xmfileselect(),
   lux_xmform(), lux_xmframe(), lux_xmgetoptionselection(),
@@ -798,10 +798,10 @@ extern Int lux_xmarrow(), lux_xmboard(), lux_xmbutton(),
 #endif
 
 #if HAVE_LIBJPEG
-extern Int lux_read_jpeg6b_f(), lux_write_jpeg6b_f();
+extern int32_t lux_read_jpeg6b_f(), lux_write_jpeg6b_f();
 #endif
 
-extern Int	vargsmooth(), lux_test();
+extern int32_t	vargsmooth(), lux_test();
 
 internalRoutine function_table[] = {
   { "%A_UNARY_NEGATIVE", 1, 1, lux_neg_func, "*" },	/* fun1.c */
@@ -1285,19 +1285,19 @@ internalRoutine function_table[] = {
   { "ZERONANS",	1, 2, lux_zapnan_f, "*%1%VALUE" }, /* fun1.c */
   { "ZINV",	1, 1, lux_zinv, "*" }, /* strous.c */
 };
-Int nFunction = sizeof(function_table)/sizeof(internalRoutine);
+int32_t nFunction = sizeof(function_table)/sizeof(internalRoutine);
 /*----------------------------------------------------------------*/
-void undefine(Int symbol)
+void undefine(int32_t symbol)
 /* free up memory allocated for <symbol> and make it undefined */
 {
-  void	zap(Int), updateIndices(void);
+  void	zap(int32_t), updateIndices(void);
   char	hasMem = 0;
-  Int	n, k, oldZapContext, i;
+  int32_t	n, k, oldZapContext, i;
   int16_t	*ptr;
   pointer	p2;
   listElem	*p;
   extractSec	*eptr, *eptr0;
-  extern Int	tempSym;
+  extern int32_t	tempSym;
   extern char	restart;
 
   if (symbol < 0 || symbol > NSYM)
@@ -1530,11 +1530,11 @@ void undefine(Int symbol)
 /* when they are undefined (e.g. as lhs in a replacement) */
 }
 /*----------------------------------------------------------------*/
-void zap(Int nsym)
+void zap(int32_t nsym)
 /* undefine & remove name (if any) */
 {
  char	*name, *noName = "[]";
- Int	context, hashValue;
+ int32_t	context, hashValue;
  hashTableEntry	*hp, *oldHp, **hashTable;
 #if DEBUG
  void	checkTemps(void);
@@ -1619,7 +1619,7 @@ void zap(Int nsym)
 #endif
 }
 /*----------------------------------------------------------------*/
-void cleanUp(Int context, Int which)
+void cleanUp(int32_t context, int32_t which)
 /* names in symbolStack are supposed to be removed after use by the */
 /* routines that use them.  only resetting of the index is done here. */
 /* all temporary variables that have the specified context are removed */ 
@@ -1627,7 +1627,7 @@ void cleanUp(Int context, Int which)
 /* CLEANUP_COMP CLEANUP_ERROR */
 {
   char	comp;
-  Int	i;
+  int32_t	i;
   void	zapParseTemps(void);
 
   comp = which & CLEANUP_COMP;
@@ -1660,7 +1660,7 @@ void cleanUp(Int context, Int which)
     zapParseTemps();
 }
 /*----------------------------------------------------------------*/
-void cleanUpRoutine(Int context, char keepBase)
+void cleanUpRoutine(int32_t context, char keepBase)
 /* completely removes all traces of the routine with the given context */
 /* keeps the LUX_SUBROUTINE, LUX_FUNCTION, or LUX_BLOCKROUTINE symbol */
 /* itself if keepBase is unequal to zero.  If keepBase is unequal to
@@ -1669,7 +1669,7 @@ void cleanUpRoutine(Int context, char keepBase)
  into an LUX_BLOCK.  LS 19feb97 21may99 */
 {
   char	mem;
-  Int	n;
+  int32_t	n;
   int16_t	*ptr;
 
   if (context < nFixed || context >= NAMED_END) {
@@ -1732,10 +1732,10 @@ void updateIndices(void)
     tempExecutableIndex--;
 }
 /*----------------------------------------------------------------*/
-Int nextFreeStackEntry(void)
+int32_t nextFreeStackEntry(void)
      /* returns index to next free item in symbolStack.  May cycle. */
 {
-  Int	oldIndex = symbolStackIndex;
+  int32_t	oldIndex = symbolStackIndex;
 
   while (symbolStack[symbolStackIndex]) {
     if (++symbolStackIndex == SYMBOLSTACKSIZE)
@@ -1747,13 +1747,13 @@ Int nextFreeStackEntry(void)
   return symbolStackIndex;
 }
 /*----------------------------------------------------------------*/
-Int nextFreeNamedVariable(void)
+int32_t nextFreeNamedVariable(void)
      /* returns index to next free named variable in symbol table.
 	some may have been zapped in the meantime, so cycle if at end of
 	table */
 {
-  Int	oldIndex = namedVariableIndex;
-  extern Int	compileLevel;
+  int32_t	oldIndex = namedVariableIndex;
+  extern int32_t	compileLevel;
 
   while (sym[namedVariableIndex].class) {
     if (++namedVariableIndex == NAMED_END) namedVariableIndex = NAMED_START;
@@ -1767,11 +1767,11 @@ Int nextFreeNamedVariable(void)
   return namedVariableIndex++;
 }
 /*----------------------------------------------------------------*/
-Int nextFreeTempVariable(void)
+int32_t nextFreeTempVariable(void)
 /* returns index to next free temporary variable in symbol table */
 {
- extern Int	compileLevel;
- Int oldIndex = tempVariableIndex;
+ extern int32_t	compileLevel;
+ int32_t oldIndex = tempVariableIndex;
  static long int count = 0;
 
  ++count;
@@ -1789,11 +1789,11 @@ Int nextFreeTempVariable(void)
  return tempVariableIndex++;
 }
 /*----------------------------------------------------------------*/
-Int nextFreeTempExecutable(void)
+int32_t nextFreeTempExecutable(void)
 /* returns index to next free temporary executable in symbol table */
 {
-  Int oldIndex = tempExecutableIndex;
-  extern Int	compileLevel;
+  int32_t oldIndex = tempExecutableIndex;
+  extern int32_t	compileLevel;
 
   while (sym[tempExecutableIndex].class) {
     if (++tempExecutableIndex == EXE_END) 
@@ -1808,13 +1808,13 @@ Int nextFreeTempExecutable(void)
   return tempExecutableIndex++;
 }
 /*----------------------------------------------------------------*/
-Int nextFreeExecutable(void)
+int32_t nextFreeExecutable(void)
 /* returns index to next free executable in symbol table
    some may have been zapped in the meantime, so cycle if at end
    of table */
 {
-  Int    oldIndex = executableIndex;
-  extern Int	compileLevel;
+  int32_t    oldIndex = executableIndex;
+  extern int32_t	compileLevel;
 
   while (sym[executableIndex].class) {
     if (++executableIndex == EXE_END)
@@ -1829,11 +1829,11 @@ Int nextFreeExecutable(void)
   return executableIndex++;
 }
 /*----------------------------------------------------------------*/
-Int nextFreeUndefined(void)
+int32_t nextFreeUndefined(void)
 /* returns a free undefined temporary variable */
 {
-  extern Int	compileLevel;
-  Int	n;
+  extern int32_t	compileLevel;
+  int32_t	n;
 
   n = nextFreeTempVariable();
   if (n < 0) return n;		/* some error */
@@ -1861,7 +1861,7 @@ int16_t popList(void)
  return luxerror("Attempt to read from empty list stack\n", 0);
 }
 /*----------------------------------------------------------------*/
-Int moveList(Int n)
+int32_t moveList(int32_t n)
 /* moves the topmost <n> entries on the list stack over by one */
 {
   if (listStackItem - listStack < NLIST)
@@ -1872,22 +1872,22 @@ Int moveList(Int n)
 	       listStackItem - listStack);
 }
 /*----------------------------------------------------------------*/
-void swapList(Int n1, Int n2)
+void swapList(int32_t n1, int32_t n2)
 /* swaps the elements <n1> and <n2> positions down the list stack */
 {
- Int	temp;
+ int32_t	temp;
 
  temp = listStackItem[-n2];
  listStackItem[-n2] = listStackItem[-n1];
  listStackItem[-n1] = temp;
 }
 /*----------------------------------------------------------------*/
-Int stackListLength(void)
+int32_t stackListLength(void)
 /* returns the number of elements in the topmost list in the stack */
 /* assumes that all lists are delimited by LUX_NEW_LIST */
 {
  int16_t	*i = listStackItem - 1;
- Int	n = 0;
+ int32_t	n = 0;
 
  if (i < listStack)
    return -1;		/* no list in stack */
@@ -1901,7 +1901,7 @@ Int stackListLength(void)
 void dupList(void)
 /* duplicates the topmost list */
 {
-  Int	n, n2;
+  int32_t	n, n2;
 
   n = n2 = stackListLength();
   pushList(LUX_NEW_LIST);
@@ -1909,7 +1909,7 @@ void dupList(void)
     pushList(listStackItem[-n-1]);
 }
 /*----------------------------------------------------------------*/
-void unlinkString(Int index)
+void unlinkString(int32_t index)
 /* zero symbolStack[index] and update symbolStackIndex, */
 /* but do not free the memory */
 {
@@ -1921,7 +1921,7 @@ void unlinkString(Int index)
   nSymbolStack--;
 }
 /*----------------------------------------------------------------*/
-void freeString(Int index)
+void freeString(int32_t index)
      /* removes the string (if any) from index <index> in symbolStack[] */
      /* and updates symbolStackIndex  */
 {
@@ -1929,11 +1929,11 @@ void freeString(Int index)
   unlinkString(index);
 }
 /*----------------------------------------------------------------*/
-Int installStruct(Int base, Int key)
+int32_t installStruct(int32_t base, int32_t key)
 /* returns a struct pointer, supports variables, user-functions, */
 /* and user-routines as structures */
 {
-  Int	n;
+  int32_t	n;
 
   n = lookForVar(base, curContext); /* seek user-defined item */
   if (n < 0)			/* no such item found */
@@ -1947,13 +1947,13 @@ Int installStruct(Int base, Int key)
   return newSymbol(LUX_LIST_PTR, n, key);
 }
 /*----------------------------------------------------------------*/
-Int copyElement(Int symbol, char *key)
+int32_t copyElement(int32_t symbol, char *key)
 /* return a complete copy of variable <symbol>, with name (key) <key>, for */
 /* inclusion in a list, structure, or range.  such a variable must */
 /* not be a temporary, to prevent its premature deletion. */
 {
-  Int	n;
-  Int	lux_replace(Int, Int);
+  int32_t	n;
+  int32_t	lux_replace(int32_t, int32_t);
 
   if ((n = installString(key)) < 0) return n;
   if ((n = findVar(n, 0)) < 0) return n;
@@ -1961,7 +1961,7 @@ Int copyElement(Int symbol, char *key)
   return n;
 }
 /*----------------------------------------------------------------*/
-Int findTarget(char *name, Int *type, Int allowSubr)
+int32_t findTarget(char *name, int32_t *type, int32_t allowSubr)
 /* seeks identification of the name <*name> as a
    variable or a user-defined routine or an internal function.
    User-defined subroutines are only checked if <allowSubr> is non-zero.
@@ -1979,9 +1979,9 @@ Int findTarget(char *name, Int *type, Int allowSubr)
    no target was found.  The symbolStack[] entry is removed.
    LS 26dec98 */
 {
-  Int	result;
+  int32_t	result;
   FILE	*fp;
-  Int	nextCompileLevel(FILE *, char *);
+  int32_t	nextCompileLevel(FILE *, char *);
 
   /* seek a named variable */
   result = lookForName(name, varHashTable, curContext);
@@ -2037,7 +2037,7 @@ Int findTarget(char *name, Int *type, Int allowSubr)
   return LUX_ERROR;
 }
 /*----------------------------------------------------------------*/
-Int newSymbol(Int kind, ...)
+int32_t newSymbol(int32_t kind, ...)
 /* returns index to symbol table for a new symbol.
    arguments depend on kind:
      (LUX_SCALAR, type)
@@ -2074,19 +2074,19 @@ Int newSymbol(Int kind, ...)
      (LUX_STRUCT_PTR)
 */
 {
-  Int		n, i, narg, isStruct, isScalarRange, j, target, depth;
+  int32_t		n, i, narg, isStruct, isScalarRange, j, target, depth;
   extern char	reportBody, ignoreSymbols, compileOnly;
   extractSec	*eptr;
   int16_t	*ptr;
   pointer	p;
 #if YYDEBUG
-  extern Int	yydebug;
+  extern int32_t	yydebug;
 #endif
   /* static char	inDefinition = 0; */
   int16_t		*arg;
   va_list	ap;
-  Int	int_arg(Int);
-  void	fixContext(Int, Int);
+  int32_t	int_arg(int32_t);
+  void	fixContext(int32_t, int32_t);
 
  /* don't generate symbols in bodies of routines when using @@file */
  /* (reportBody) and when defining a routine (inDefinition).  */
@@ -2122,14 +2122,14 @@ Int newSymbol(Int kind, ...)
     }
     switch (kind) {
       case LUX_SCALAR:
-	scalar_type(n) = va_arg(ap, Int);
+	scalar_type(n) = va_arg(ap, int32_t);
 	break;
       case LUX_FIXED_NUMBER:
 	/* same as an ordinary scalar, but in EDB symbol space, so that it */
 	/* doesn't get overwritten as "just another temp" (i.e. isFreeTemp() */
 	/* returns 0).  otherwise, get problems e.g. in a for-loop, where */
 	/* temp numbers are used more than once.  */
-	symbol_type(n) = va_arg(ap, Int);
+	symbol_type(n) = va_arg(ap, int32_t);
 	if (symbol_type(n) >= LUX_CFLOAT) { /* a complex scalar */
 	  symbol_class(n) = LUX_CSCALAR;
 	  complex_scalar_memory(n) = lux_type_size[symbol_type(n)];
@@ -2143,7 +2143,7 @@ Int newSymbol(Int kind, ...)
 	/* a literal string */
 	symbol_class(n) = LUX_STRING;
 	string_type(n) = LUX_LSTRING;
-	string_value(n) = symbolStack[i = va_arg(ap, Int)];
+	string_value(n) = symbolStack[i = va_arg(ap, int32_t)];
 	symbol_memory(n) = strlen(symbolStack[i]) + 1; /* count \0 */
 	unlinkString(i);		/* free position in stack */
 	break;
@@ -2210,13 +2210,13 @@ Int newSymbol(Int kind, ...)
 	break;
       case LUX_META:		/* a meta symbol, i.e. a string expression */
 				/* which points at a symbol */
-	meta_target(n) = va_arg(ap, Int);
+	meta_target(n) = va_arg(ap, int32_t);
 	embed(meta_target(n), n);
 	break;
       case LUX_RANGE:  /* a range */
 	isScalarRange = 1;
 	/* range start: */
-	i = va_arg(ap, Int);
+	i = va_arg(ap, int32_t);
 	range_start(n) = i;
 	if (i < 0)
 	  i = -i;
@@ -2224,7 +2224,7 @@ Int newSymbol(Int kind, ...)
 	if (symbol_class(i) != LUX_SCALAR)
 	  isScalarRange = 0;
 	/* range end: */
-	i = va_arg(ap, Int);
+	i = va_arg(ap, int32_t);
 	range_end(n) = i;
 	if (i < 0)
 	  i = -i;
@@ -2238,7 +2238,7 @@ Int newSymbol(Int kind, ...)
       case LUX_PRE_RANGE:
 	isScalarRange = 1;
 	/* pre_range start: */
-	i = va_arg(ap, Int);
+	i = va_arg(ap, int32_t);
 	pre_range_start(n) = i;
 	if (i < 0)
 	  i = -i;
@@ -2246,7 +2246,7 @@ Int newSymbol(Int kind, ...)
 	if (symbol_class(i) != LUX_SCALAR)
 	  isScalarRange = 0;
 	/* pre_range end: */
-	i = va_arg(ap, Int);
+	i = va_arg(ap, int32_t);
 	pre_range_end(n) = i;
 	if (i < 0)
 	  i = -i;
@@ -2258,8 +2258,8 @@ Int newSymbol(Int kind, ...)
 	pre_range_scalar(n) = isScalarRange;
 	break;
       case LUX_LIST_PTR:		/* pointer to a struct element */
-	list_ptr_target(n) = va_arg(ap, Int); /* the struct */
-	if ((i = va_arg(ap, Int)) >= 0) { /* non-numerical key */
+	list_ptr_target(n) = va_arg(ap, int32_t); /* the struct */
+	if ((i = va_arg(ap, int32_t)) >= 0) { /* non-numerical key */
 	  list_ptr_tag_string(n) = symbolStack[i]; /* key */
 	 list_ptr_tag_size(n) = strlen(symbolStack[i]) + 1;
 	 unlinkString(i);	/* unlink keyword from stack */
@@ -2327,17 +2327,17 @@ Int newSymbol(Int kind, ...)
 	popList();				/* pop LUX_NEW_LIST */
 	break;
       case LUX_SUBSC_PTR:	/* subscript pointer */
-	if (!(symbol_data(n) = (Int *) malloc(4*sizeof(Int)))) {
+	if (!(symbol_data(n) = (int32_t *) malloc(4*sizeof(int32_t)))) {
 	  va_end(ap);
 	  printf("newSymbol: ");
 	  return cerror(ALLOC_ERR, 0);
 	}
-	symbol_memory(n) = 4*sizeof(Int);
+	symbol_memory(n) = 4*sizeof(int32_t);
 	break;
       case LUX_POINTER:
 	transfer_is_parameter(n) = 0;	/* not a formal argument in a */
 					/* user-defined function or routine */
-	narg = va_arg(ap, Int);
+	narg = va_arg(ap, int32_t);
 	i = lookForSubr(narg);
 	if (i < 0)
 	  i = lookForFunc(narg);
@@ -2368,9 +2368,9 @@ Int newSymbol(Int kind, ...)
 	transfer_target(n) = i;
 	break;
       case LUX_KEYWORD:
-	keyword_name_symbol(n) = newSymbol(LUX_FIXED_STRING, va_arg(ap, Int));
+	keyword_name_symbol(n) = newSymbol(LUX_FIXED_STRING, va_arg(ap, int32_t));
 	embed(keyword_name_symbol(n), n);
-	keyword_value(n) = va_arg(ap, Int);
+	keyword_value(n) = va_arg(ap, int32_t);
 	embed(keyword_value(n), n);
 	break;
       case LUX_SUBROUTINE: case LUX_FUNCTION: case LUX_BLOCKROUTINE:
@@ -2383,10 +2383,10 @@ Int newSymbol(Int kind, ...)
 	  if the routine is already compiled;  merely note the file if
 	  the routine is not yet defined */
       { int16_t	nArg, nStatement;
-	Int	oldContext;
+	int32_t	oldContext;
 	char	**key;
 	 
-	n = i = va_arg(ap, Int);
+	n = i = va_arg(ap, int32_t);
 	if (n >= 0) {		/* first pass: n = index of routine's name */
 				/* in symbolStack[] */
 	  switch (kind)	{	/* first see if the routine is already */
@@ -2582,7 +2582,7 @@ Int newSymbol(Int kind, ...)
       }
       case LUX_EVB: case LUX_INT_FUNC: case LUX_USR_FUNC:
 	if (kind == LUX_EVB) {
-	  kind = va_arg(ap, Int);
+	  kind = va_arg(ap, int32_t);
 	  symbol_type(n) = kind;
 	}
 	i = 0;			/* default: no more items to retrieve */
@@ -2601,21 +2601,21 @@ Int newSymbol(Int kind, ...)
 	    i = 4; 
 	    break;
 	  case EVB_USR_CODE:
-	    usr_code_routine_num(n) = va_arg(ap, Int); /* routine number */
+	    usr_code_routine_num(n) = va_arg(ap, int32_t); /* routine number */
 	    break;
 	  case EVB_FILE:
-	    i = va_arg(ap, Int);	/* index to string */
+	    i = va_arg(ap, int32_t);	/* index to string */
 	    file_name(n) = symbolStack[i];
 	    symbol_memory(n) = strlen(symbolStack[i]) + 1;
 	    unlinkString(i);
-	    i = va_arg(ap, Int);	/* include type: INCLUDE -> always,
+	    i = va_arg(ap, int32_t);	/* include type: INCLUDE -> always,
 					   REPORT -> only if necessary */
 	    file_include_type(n) = i;
 	    i = 0;		/* no more items to retrieve */
 	    break;
 	  case EVB_INT_SUB: case EVB_USR_SUB: case EVB_INSERT:
 	  case LUX_INT_FUNC: case LUX_USR_FUNC:
-	    sym[n].xx = va_arg(ap, Int); /* routine number (SUB) or target */
+	    sym[n].xx = va_arg(ap, int32_t); /* routine number (SUB) or target */
 	  case EVB_CASE: case EVB_NCASE: case EVB_BLOCK: 
 	    i = stackListLength();		/* # of expr and statements */
 	    if (i) {			/* only if there are any elements */
@@ -2641,33 +2641,33 @@ Int newSymbol(Int kind, ...)
 	if (i > 0) {
 	  arg = sym[n].spec.evb.args;
 	  while (i--) {
-	    *arg = va_arg(ap, Int);
+	    *arg = va_arg(ap, int32_t);
 	    embed(*arg, n);
 	    arg++;
 	  }
 	  if (kind == EVB_FOR) {
-	    for_body(n) = va_arg(ap, Int);
+	    for_body(n) = va_arg(ap, int32_t);
 	    embed(for_body(n), n);
 	  }
 	}
 	break;
       case LUX_BIN_OP: case LUX_IF_OP:
-	bin_op_type(n) = va_arg(ap, Int);
-	bin_op_lhs(n) = va_arg(ap, Int);
+	bin_op_type(n) = va_arg(ap, int32_t);
+	bin_op_lhs(n) = va_arg(ap, int32_t);
 	embed(bin_op_lhs(n), n);
-	bin_op_rhs(n) = va_arg(ap, Int);
+	bin_op_rhs(n) = va_arg(ap, int32_t);
 	embed(bin_op_rhs(n), n);
 	break;
     }
   } else {			/* reportBody & in definition */
     switch (kind) {
       case LUX_FIXED_STRING:
-	i = va_arg(ap, Int);	/* index to symbolStack */
+	i = va_arg(ap, int32_t);	/* index to symbolStack */
 	freeString(i);
 	break;
       case LUX_LIST_PTR:
-	i = va_arg(ap, Int);	/* struct number */
-	i = va_arg(ap, Int);	/* key */
+	i = va_arg(ap, int32_t);	/* struct number */
+	i = va_arg(ap, int32_t);	/* key */
 	if (i >= 0)		/* non-numerical key */
 	  freeString(i); 
 	break;
@@ -2681,14 +2681,14 @@ Int newSymbol(Int kind, ...)
 	}
 	break;
       case LUX_KEYWORD:
-	i = va_arg(ap, Int);
+	i = va_arg(ap, int32_t);
 	freeString(i);
 	break;
       case LUX_SUBROUTINE: case LUX_FUNCTION: case LUX_BLOCKROUTINE:
 	/* when we get here, a symbol has already been reserved for the */
 	/* routine, and the parameters have been ignored.  we only need to */
 	/* get rid of the routine body. */
-	n = va_arg(ap, Int);
+	n = va_arg(ap, int32_t);
 	n = -n - 1;		/* routine # */
 	routine_num_statements(n) = 0; /* no statements */
 	i = stackListLength();
@@ -2724,10 +2724,10 @@ Int newSymbol(Int kind, ...)
 	break;
       case LUX_EVB: case LUX_INT_FUNC: case LUX_USR_FUNC:
 	if (kind == LUX_EVB)
-	  kind = va_arg(ap, Int);
+	  kind = va_arg(ap, int32_t);
 	switch (kind) {
 	  case EVB_FILE:
-	    i = va_arg(ap, Int);
+	    i = va_arg(ap, int32_t);
 	    freeString(i);
 	    break;
 	  case EVB_INT_SUB: case EVB_USR_SUB: case EVB_INSERT:
@@ -2752,15 +2752,15 @@ Int newSymbol(Int kind, ...)
   return n;
 }
 /*----------------------------------------------------------------*/
-Int hash(char *string)
+int32_t hash(char *string)
 {
- Int	i;
+ int32_t	i;
 
  for (i = 0; *string; ) i += *string++;
  return i % HASHSIZE;
 }
 /*----------------------------------------------------------------*/
-Int ircmp(const void *a, const void *b)
+int32_t ircmp(const void *a, const void *b)
 {
   internalRoutine *ra, *rb;
   
@@ -2769,7 +2769,7 @@ Int ircmp(const void *a, const void *b)
   return strcmp(ra->name, rb->name);
 }
 /*----------------------------------------------------------------*/
-Int findInternalName(char *name, Int isSubroutine)
+int32_t findInternalName(char *name, int32_t isSubroutine)
 /* searches for name in the appropriate subroutine
   or function table.  if found, returns
   index, else returns -1 */
@@ -2790,21 +2790,21 @@ Int findInternalName(char *name, Int isSubroutine)
 }
 /*----------------------------------------------------------------*/
 static compileInfo	*c_info = NULL;
-Int	cur_c_info = 0, n_c_info = 0;
+int32_t	cur_c_info = 0, n_c_info = 0;
 compileInfo	*curCompileInfo;
 
-Int nextCompileLevel(FILE *fp, char *fileName)
+int32_t nextCompileLevel(FILE *fp, char *fileName)
 /* saves the rest of the current input line and starts reading
  input from file fp.  When the file is processed, compilation
  at the current level is resumed. */
 {
- Int	n, oldZapContext;
+ int32_t	n, oldZapContext;
  char	*name;
- extern Int	echo; 
+ extern int32_t	echo; 
  extern char	inHistoryBuffer, tLine[], *inputString;
  extern uint8_t	disableNewline;
- Int	yyparse(void), getStreamChar(void), getStringChar(void);
- extern Int	(*getChar)(void);
+ int32_t	yyparse(void), getStreamChar(void), getStringChar(void);
+ extern int32_t	(*getChar)(void);
  compileInfo	*nextFreeCompileInfo(void);
  void	pegParse(void), removeParseMarker(void), releaseCompileInfo(void);
 
@@ -2877,16 +2877,16 @@ Int nextCompileLevel(FILE *fp, char *fileName)
  return n;
 } 
 /*----------------------------------------------------------------*/
-static Int	compileCount = 0;
-Int compile(char *string)
+static int32_t	compileCount = 0;
+int32_t compile(char *string)
 /* compiles string <string> and store in BLOCKROUTINE.  Returns */
 /* but does not execute the block routine.  LS 5feb96 */
 {
-  Int	oldContext, n, getStringChar(void), getStreamChar(void), nsym, result;
+  int32_t	oldContext, n, getStringChar(void), getStreamChar(void), nsym, result;
   extern char	*inputString, compileOnly;
-  extern Int	(*getChar)(void), executeLevel;
+  extern int32_t	(*getChar)(void), executeLevel;
   char	compileName[12], oldInstalling;
-  Int	newBlockSymbol(Int);
+  int32_t	newBlockSymbol(int32_t);
 
   inputString = string;
   compileOnly++;
@@ -2919,10 +2919,10 @@ Int compile(char *string)
 }
 /*----------------------------------------------------------------*/
 #if DEVELOP
-Int lux_compile(Int narg, Int ps[])
+int32_t lux_compile(int32_t narg, int32_t ps[])
 {
   char	*string;
-  Int	result, value;
+  int32_t	result, value;
 
   string = string_arg(*ps);
   result = scalar_scratch(LUX_LONG);
@@ -2935,11 +2935,11 @@ Int lux_compile(Int narg, Int ps[])
 }
 #endif
 /*----------------------------------------------------------------*/
-Int newBlockSymbol(Int index)
+int32_t newBlockSymbol(int32_t index)
 /* searches for user block symbolStack[index] in list of user-defined
   block routines.  treats function pointers */
 {
-  Int	n, result;
+  int32_t	n, result;
   extern char	reportBody;
   
   if (reportBody) {		/* remove name from stack */
@@ -2975,7 +2975,7 @@ Int newBlockSymbol(Int index)
   return result;
 }
 /*----------------------------------------------------------------*/
-Int newSubrSymbol(Int index)
+int32_t newSubrSymbol(int32_t index)
 /* searches for subroutine symbolStack[index] in lists of internal
   and user-defined subroutines.  if not found, then searches for an
   appropriate file to find a definition.  if such a file is found,
@@ -2984,9 +2984,9 @@ Int newSubrSymbol(Int index)
   or EVB_USR_SUB) is returned.  if such a file is not found, then
   an error is generated. */
 {
- Int	n, i;
+ int32_t	n, i;
  extern char	reportBody;
- extern Int	findBody;
+ extern int32_t	findBody;
 
  /* In order, look for: */
  /* 1. function pointer to some user-defined or internal subroutine */
@@ -3031,11 +3031,11 @@ Int newSubrSymbol(Int index)
  return newSymbol(LUX_EVB, EVB_USR_SUB, n);
 }
 /*----------------------------------------------------------------*/
-Int lookForName(char *name, hashTableEntry *hashTable[], Int context)
+int32_t lookForName(char *name, hashTableEntry *hashTable[], int32_t context)
      /* searches name in hashTable[] for context.  if found,
 	returns symbol number, otherwise returns -1 */
 {
-  Int		hashValue, n;
+  int32_t		hashValue, n;
   hashTableEntry	*hp;
   
   hashValue = hash(name);
@@ -3058,13 +3058,13 @@ Int lookForName(char *name, hashTableEntry *hashTable[], Int context)
   return -1;
 }
 /*----------------------------------------------------------------*/
-Int findSym(Int index, hashTableEntry *hashTable[], Int context)
+int32_t findSym(int32_t index, hashTableEntry *hashTable[], int32_t context)
 /* searches symbolStack[index] in hashTable[] for context.  if found,
    returns symbol number, otherwise installs the name in hashTable[]
    and sym[].  always removes the entry from the symbolStack. */
 {
  char	*name;
- Int	n;
+ int32_t	n;
  extern char	ignoreSymbols;
 
  if (ignoreSymbols) {
@@ -3077,11 +3077,11 @@ Int findSym(Int index, hashTableEntry *hashTable[], Int context)
  return n;
 }
 /*----------------------------------------------------------------*/
-char *symName(Int symNum, hashTableEntry *hashTable[])
+char *symName(int32_t symNum, hashTableEntry *hashTable[])
 /* returns the name of the symbol, if any, or "[symNum]" */
 {
  static char	name[7];
- Int		hashValue;
+ int32_t		hashValue;
  hashTableEntry	*hp;
 
  if (symNum < 0 || symNum >= NSYM)
@@ -3099,7 +3099,7 @@ char *symName(Int symNum, hashTableEntry *hashTable[])
  return name;
 }
 /*----------------------------------------------------------------*/
-char *symbolName(Int symbol)
+char *symbolName(int32_t symbol)
 /* returns the name of the symbol. */
 {
   hashTableEntry	**hashTable;
@@ -3125,11 +3125,11 @@ char *symbolName(Int symbol)
   return symName(symbol, hashTable);
 }
 /*----------------------------------------------------------------*/
-Int suppressEvalRoutine(Int index)
+int32_t suppressEvalRoutine(int32_t index)
 /* returns evaluation suppression associated with internal routine */
 /* symbolStack[index] */
 {
-  Int	n;
+  int32_t	n;
   keyList	*keys;
 
   n = findInternalSym(index, 1); /* >= 0 -> internal subroutine */
@@ -3141,13 +3141,13 @@ Int suppressEvalRoutine(Int index)
 #define	IGNORE_SIG	1
 #define ASK_SIG		2
 #define SIG_BREAK	3
-void exception(Int sig)
+void exception(int32_t sig)
 /* exception handler */
 {
- Int	c, saveHistory(void);
- extern Int	curSymbol, executeLevel, step, statementDepth;
+ int32_t	c, saveHistory(void);
+ extern int32_t	curSymbol, executeLevel, step, statementDepth;
  extern jmp_buf	jmpenv;
- void	cleanUp(Int, Int), Quit(Int);
+ void	cleanUp(int32_t, int32_t), Quit(int32_t);
 
  if (sig != SIGCONT && curSymbol)
    puts(symbolIdent(curSymbol, 1));
@@ -3230,7 +3230,7 @@ void exception(Int sig)
  return;
 }
 /*----------------------------------------------------------------*/
-char *typeName(Int type)
+char *typeName(int32_t type)
 /* returns the name that goes with the data type */
 {
   static char *typeNames[] = {
@@ -3238,7 +3238,7 @@ char *typeName(Int type)
     "STRING", "STRING", "STRING", "CFLOAT", "CDOUBLE",
     "undefined", "unknown"
   };
-  Int	index;
+  int32_t	index;
 
   if (type == LUX_UNDEFINED)
     index = 10;			/* undefined */
@@ -3249,7 +3249,7 @@ char *typeName(Int type)
   return typeNames[index];
 }
 /*----------------------------------------------------------------*/
-char *className(Int class)
+char *className(int32_t class)
 /* returns the name of the class */
 {
   static struct classInfo {
@@ -3306,7 +3306,7 @@ char *className(Int class)
   42, 42, 32, 33, 34, 35, 36, 37, 42, 42, 38, 39, 40
  };
 
- Int	hash;
+ int32_t	hash;
 
  if (class < 0)
    hash = 26;
@@ -3315,16 +3315,16 @@ char *className(Int class)
    if (hash > 51)
      hash = 25;
    hash = classHashTable[hash];
-   if (class != (Int) classes[hash].number)
+   if (class != (int32_t) classes[hash].number)
      hash = 42;
  }
  return classes[hash].name;
 }
 /*----------------------------------------------------------------*/
-Int lux_classname(Int narg, Int ps[])
+int32_t lux_classname(int32_t narg, int32_t ps[])
      /* returns name associated with class number */
 {
-  Int	class, result;
+  int32_t	class, result;
   char	*name;
 
   class = int_arg(*ps);
@@ -3336,10 +3336,10 @@ Int lux_classname(Int narg, Int ps[])
   return result;
 }
 /*----------------------------------------------------------------*/
-Int lux_typeName(Int narg, Int ps[])
+int32_t lux_typeName(int32_t narg, int32_t ps[])
      /* returns name associated with type number */
 {
-  Int	type, result;
+  int32_t	type, result;
   char	*name;
 
   if ((type = int_arg(*ps)) < 0) return -1;
@@ -3351,7 +3351,7 @@ Int lux_typeName(Int narg, Int ps[])
   return result;
 }
 /*----------------------------------------------------------------*/
-char *evbName(Int evbType)
+char *evbName(int32_t evbType)
      /* returns the name of an EVB type */
 {
   static char *evbTypeNames[] = {
@@ -3369,7 +3369,7 @@ char *evbName(Int evbType)
   return evbTypeNames[evbType - 1];
 }
 /*----------------------------------------------------------------*/
-char *filetypeName(Int filetype)
+char *filetypeName(int32_t filetype)
 /* returns the name associated with a file type */
 {
   static char *filetypeNames[] = {
@@ -3383,10 +3383,10 @@ char *filetypeName(Int filetype)
   return filetypeNames[filetype];
 }
 /*----------------------------------------------------------------*/
-Int lux_filetype_name(Int narg, Int ps[])
+int32_t lux_filetype_name(int32_t narg, int32_t ps[])
 {
   char	*name;
-  Int	result;
+  int32_t	result;
 
   name = filetypeName(int_arg(ps[0]));
   result = string_scratch(strlen(name));
@@ -3394,10 +3394,10 @@ Int lux_filetype_name(Int narg, Int ps[])
   return result;
 }
 /*----------------------------------------------------------------*/
-void fixedValue(char *name, Int type, ...)
+void fixedValue(char *name, int32_t type, ...)
 /* install a numerical constant */
 {
- Int	n, iq;
+ int32_t	n, iq;
  pointer	p;
  va_list	ap;
 
@@ -3434,7 +3434,7 @@ void fixedValue(char *name, Int type, ...)
      scalar_type(n) = type;
      switch (type) {
        case LUX_LONG:
-	 scalar_value(n).l = va_arg(ap, Int);
+	 scalar_value(n).l = va_arg(ap, int32_t);
 	 break;
        case LUX_FLOAT:
 	 scalar_value(n).f = (float) va_arg(ap, double);
@@ -3447,11 +3447,11 @@ void fixedValue(char *name, Int type, ...)
  }
 }
 /*----------------------------------------------------------------*/
-Int installSysFunc(char *name, Int number)
+int32_t installSysFunc(char *name, int32_t number)
 /* install a system function.  These are implemented as FUNC_PTRs to */
 /* the appropriate function */
 {
- Int	n, iq;
+ int32_t	n, iq;
 
  iq = installString(name);
  n = findVar(iq,0);
@@ -3461,22 +3461,22 @@ Int installSysFunc(char *name, Int number)
  return n;
 }
 /*----------------------------------------------------------------*/
-Int installPointer(char *name, Int type, void *ptr)
+int32_t installPointer(char *name, int32_t type, void *ptr)
 /* install a LUX_SCAL_PTR system variable */
 { 
- Int	n, iq;
+ int32_t	n, iq;
  
  iq = installString(name);
  n = findVar(iq, 0);
  sym[n].class = LUX_SCAL_PTR;
  scal_ptr_type(n) = type;
- scal_ptr_pointer(n).l = (Int *) ptr;
+ scal_ptr_pointer(n).l = (int32_t *) ptr;
  if (type == LUX_TEMP_STRING)
    symbol_memory(n) = strlen(ptr) + 1;
  return n;
 }
 /*----------------------------------------------------------------*/
-Int convertRange(Int range)
+int32_t convertRange(int32_t range)
 /* convert a LUX_RANGE symbol to a LUX_SUBSC_PTR symbol. */
 /* elements:  #1:  range start */
 /*            #2:  range end */
@@ -3487,7 +3487,7 @@ Int convertRange(Int range)
 /*            element of the list/array.  if #2 == LUX_ZERO, then only one */
 /*            element is requested. */
 {
-  Int	subsc, eval(Int), j1, j2;
+  int32_t	subsc, eval(int32_t), j1, j2;
   
   if ((subsc = newSymbol(LUX_SUBSC_PTR)) < 0) return -1;
   j1 = range_start(range);
@@ -3538,7 +3538,7 @@ Int convertRange(Int range)
   return subsc;
 }
 /*----------------------------------------------------------------*/
-void convertPointer(scalar *target, Int inType, Int outType)
+void convertPointer(scalar *target, int32_t inType, int32_t outType)
 /* converts value in target from inType to outType */
 {
   switch (outType) {
@@ -3577,16 +3577,16 @@ void convertPointer(scalar *target, Int inType, Int outType)
   case LUX_LONG:
     switch (inType) {
     case LUX_BYTE:
-      (*target).l = (Int) (*target).b;
+      (*target).l = (int32_t) (*target).b;
       break;
     case LUX_WORD:
-      (*target).l = (Int) (*target).w;
+      (*target).l = (int32_t) (*target).w;
       break;
     case LUX_FLOAT:
-      (*target).l = (Int) (*target).f;
+      (*target).l = (int32_t) (*target).f;
       break;
     case LUX_DOUBLE:
-      (*target).l = (Int) (*target).d;
+      (*target).l = (int32_t) (*target).d;
       break;
     }
     break;
@@ -3625,7 +3625,7 @@ void convertPointer(scalar *target, Int inType, Int outType)
   }
 }
 /*----------------------------------------------------------------*/
-void convertWidePointer(wideScalar *target, Int inType, Int outType)
+void convertWidePointer(wideScalar *target, int32_t inType, int32_t outType)
 /* converts value in <target> from <inType> to <outType> */
 {
   switch (inType) {
@@ -3637,7 +3637,7 @@ void convertWidePointer(wideScalar *target, Int inType, Int outType)
 	  target->w = (int16_t) target->b;
 	  break;
 	case LUX_LONG:
-	  target->l = (Int) target->b;
+	  target->l = (int32_t) target->b;
 	  break;
 	case LUX_FLOAT:
 	  target->f = (float) target->b;
@@ -3663,7 +3663,7 @@ void convertWidePointer(wideScalar *target, Int inType, Int outType)
 	case LUX_WORD:
 	  break;
 	case LUX_LONG:
-	  target->l = (Int) target->w;
+	  target->l = (int32_t) target->w;
 	  break;
 	case LUX_FLOAT:
 	  target->f = (float) target->w;
@@ -3717,7 +3717,7 @@ void convertWidePointer(wideScalar *target, Int inType, Int outType)
 	  target->w = (int16_t) target->f;
 	  break;
 	case LUX_LONG:
-	  target->l = (Int) target->f;
+	  target->l = (int32_t) target->f;
 	  break;
 	case LUX_FLOAT:
 	  break;
@@ -3743,7 +3743,7 @@ void convertWidePointer(wideScalar *target, Int inType, Int outType)
 	  target->w = (int16_t) target->d;
 	  break;
 	case LUX_LONG:
-	  target->l = (Int) target->d;
+	  target->l = (int32_t) target->d;
 	  break;
 	case LUX_FLOAT:
 	  target->f = (float) target->d;
@@ -3769,7 +3769,7 @@ void convertWidePointer(wideScalar *target, Int inType, Int outType)
 	  target->w = (int16_t) target->cf.real;
 	  break;
 	case LUX_LONG:
-	  target->l = (Int) target->cf.real;
+	  target->l = (int32_t) target->cf.real;
 	  break;
 	case LUX_FLOAT:
 	  target->f = (float) target->cf.real;
@@ -3794,7 +3794,7 @@ void convertWidePointer(wideScalar *target, Int inType, Int outType)
 	  target->w = (int16_t) target->cd.real;
 	  break;
 	case LUX_LONG:
-	  target->l = (Int) target->cd.real;
+	  target->l = (int32_t) target->cd.real;
 	  break;
 	case LUX_FLOAT:
 	  target->f = (float) target->cd.real;
@@ -3813,10 +3813,10 @@ void convertWidePointer(wideScalar *target, Int inType, Int outType)
   }
 }
 /*----------------------------------------------------------------*/
-void convertScalar(scalar *target, Int nsym, Int type)
+void convertScalar(scalar *target, int32_t nsym, int32_t type)
 /* returns scalar value of nsym, converted to proper type, in target */
 {
- Int		n;
+ int32_t		n;
  pointer	ptr;
 
  n = scalar_type(nsym);
@@ -3863,19 +3863,19 @@ void convertScalar(scalar *target, Int nsym, Int type)
  case LUX_LONG:
    switch (n) {
    case LUX_BYTE:
-     (*target).l = (Int) *ptr.b;
+     (*target).l = (int32_t) *ptr.b;
      break;
    case LUX_WORD:
-     (*target).l = (Int) *ptr.w;
+     (*target).l = (int32_t) *ptr.w;
      break;
    case LUX_LONG:
-     (*target).l = (Int) *ptr.l;
+     (*target).l = (int32_t) *ptr.l;
      break;
    case LUX_FLOAT:
-     (*target).l = (Int) *ptr.f;
+     (*target).l = (int32_t) *ptr.f;
      break;
    case LUX_DOUBLE:
-     (*target).l = (Int) *ptr.d;
+     (*target).l = (int32_t) *ptr.d;
      break;
    }
    break;
@@ -3920,12 +3920,12 @@ void convertScalar(scalar *target, Int nsym, Int type)
  }
 }
 /*----------------------------------------------------------------*/
-Int lux_symbol_memory()
+int32_t lux_symbol_memory()
 /* returns the total of the memory allocated for each LUX symbol */
 /* - which is NOT the same as the total allocated memory. */
 /* Note:  some small stuff is not included. */
 {
- Int	i, mem = 0;
+ int32_t	i, mem = 0;
 
  for (i = 0; i < NSYM; i++)
  { switch (sym[i].class)
@@ -3954,7 +3954,7 @@ Int lux_symbol_memory()
  return i;
 }
 /*----------------------------------------------------------------*/
-Int lux_trace(Int narg, Int ps[])
+int32_t lux_trace(int32_t narg, int32_t ps[])
 /* activates/deactivates trace facility */
 {
   extern float	CPUtime;
@@ -4014,7 +4014,7 @@ Int lux_trace(Int narg, Int ps[])
 
 char	*defaultRedirect = "diagnostic.lux";
 
-Int range_warn_flag = 0, redim_warn_flag = 0, error_extra = 0,
+int32_t range_warn_flag = 0, redim_warn_flag = 0, error_extra = 0,
   maxhistsize = 20000, histmin, histmax, lastmaxloc, lastminloc,
   scalemin = 0, scalemax = 255, fftdp = 0, lastmax_sym, lastmin_sym,
   autocon = 1, contour_mode, contour_box, contour_nlev = 5,
@@ -4026,7 +4026,7 @@ Int range_warn_flag = 0, redim_warn_flag = 0, error_extra = 0,
 
 float	contour_dash_lev, contour_tick_fac = 0.5, *p3d;
 scalar	lastmin, lastmax, lastmean, lastsdev;
-extern Int	lunplt, landscape, iorder, ilabx, ilaby, irxf, iryf, ndx,
+extern int32_t	lunplt, landscape, iorder, ilabx, ilaby, irxf, iryf, ndx,
         ndxs, nd, ndys, ifz, ifzx, ier, ifont, ndlabx, ndlaby, 
         ndot, ipltyp, iblank, maxregridsize, nExecuted,
         kb, nArg, ixhigh, iyhigh,
@@ -4035,7 +4035,7 @@ extern Int	lunplt, landscape, iorder, ilabx, ilaby, irxf, iryf, ndx,
 	current_pen, updateBoundingBox, index_cnt, uTermCol, page;
 extern double	meritc;
 #if MOTIF
-extern Int	radio_state, radio_button;
+extern int32_t	radio_state, radio_button;
 #endif
 extern float	xfac, yfac, xmin, xmax, ymin, ymax,
 	wxb, wxt, wyb, wyt, ticx, ticxr, ticy, ticyr, plims[],
@@ -4046,16 +4046,16 @@ extern float	xfac, yfac, xmin, xmax, ymin, ymax,
 extern int16_t	*stackPointer;
 
 #if DEVELOP
-extern Int	irzf, ifzz, ndz, ndzs, resample_type, fstepz;
+extern int32_t	irzf, ifzz, ndz, ndzs, resample_type, fstepz;
 extern float	wzb, wzt, ticz, ticzr, zmin, zmax, defaultProjection[], dvz;
 #endif
 
 #if HAVE_LIBX11
-extern Int	text_menus, tvplanezoom;
+extern int32_t	text_menus, tvplanezoom;
 #endif
 
 #if HAVE_LIBX11
-extern Int lux_button, eventSource, xcoord, ycoord, lux_keycode, lux_keysym,
+extern int32_t lux_button, eventSource, xcoord, ycoord, lux_keycode, lux_keysym,
   last_menu, menu_item, lux_event, preventEventFlush, root_x, root_y,
   xerrors, last_wid, display_width, display_height, private_colormap,
   zoom_frame, foreground_pixel, nColors, colormin, colormax, lux_keystate;
@@ -4066,7 +4066,7 @@ extern double	last_time, zoom_clo, zoom_chi;
 #endif
 
 #if MOTIF
-extern Int	motif_flag;
+extern int32_t	motif_flag;
 #endif
 
 char	*firstbreak;		/* for memck.c */
@@ -4152,29 +4152,29 @@ struct boundsStruct	bounds = {
  { UINT8_MAX, INT16_MAX, INT32_MAX, FLT_MAX, DBL_MAX }
 };
 
-Int	LUX_MATMUL_FUN;
+int32_t	LUX_MATMUL_FUN;
 
 internalRoutine *subroutine, *function;
 
 #define	FORMATSIZE	1024
 void symbolInitialization(void)
 {
- Int	i, iq;
+ int32_t	i, iq;
 #if YYDEBUG
- extern Int	yydebug;
+ extern int32_t	yydebug;
 #endif
- extern Int	termRow, termCol, despike_count;
+ extern int32_t	termRow, termCol, despike_count;
 #if DEVELOP
  char	*p;
 #endif
- Int	to_scratch_array(Int, Int, Int, Int []);
+ int32_t	to_scratch_array(int32_t, int32_t, int32_t, int32_t []);
  extern char	*fmt_integer, *fmt_float, *fmt_string, *fmt_complex,
   *curScrat, *printString;
  union { uint8_t b[2]; int16_t w; } whichendian;
 
  /* determine if the machine is little-endian or bigendian */
  whichendian.w = 1;
- MSBfirst = (Int) whichendian.b[1]; /* most significant Byte first? */
+ MSBfirst = (int32_t) whichendian.b[1]; /* most significant Byte first? */
 
  firstbreak = sbrk(0);		/* for memck.c */
  curTEIndex = tempExecutableIndex;
@@ -4186,7 +4186,7 @@ void symbolInitialization(void)
    luxerror("Could not install exception handlers", 0);
 
  extern struct obstack *registered_subroutines;
- Int registered_subroutines_size
+ int32_t registered_subroutines_size
    = registered_subroutines? obstack_object_size(registered_subroutines): 0;
  subroutine = malloc(registered_subroutines_size
                      + nSubroutine*sizeof(internalRoutine));
@@ -4200,7 +4200,7 @@ void symbolInitialization(void)
    obstack_free(registered_subroutines, NULL);
 
  extern struct obstack *registered_functions;
- Int registered_functions_size
+ int32_t registered_functions_size
    = registered_functions? obstack_object_size(registered_functions): 0;
  function = malloc(registered_functions_size
                      + nFunction*sizeof(internalRoutine));
@@ -4336,7 +4336,7 @@ void symbolInitialization(void)
  iq = findVarName("#TYPESIZE", 0);
  i = 10;			/* lux_type_size[] # elements! */
  to_scratch_array(iq, LUX_LONG, 1, &i);
- memcpy(array_data(iq), lux_type_size, i*sizeof(Int));
+ memcpy(array_data(iq), lux_type_size, i*sizeof(int32_t));
 
  /* s_fix("#NL",		"\n"); */
  l_ptr("#COL",		&termCol);
@@ -4605,12 +4605,12 @@ void symbolInitialization(void)
  installing = 0;
 }
 /*----------------------------------------------------------------*/
-Int matchInternalName(char *name, internalRoutine *table, Int size, Int hi)
+int32_t matchInternalName(char *name, internalRoutine *table, int32_t size, int32_t hi)
 /* matches name against the initial parts of all names in the table.
    returns index of first match (i.e., closest to the start of the table),
    or -1 if none were found.  LS97 */
 {
- Int	lo = 0, mid, s;
+ int32_t	lo = 0, mid, s;
 
  hi--;
  while (lo <= hi) {
@@ -4628,7 +4628,7 @@ Int matchInternalName(char *name, internalRoutine *table, Int size, Int hi)
  return -1;
 }
 /*----------------------------------------------------------------*/
-void zerobytes(void *sp, Int len)
+void zerobytes(void *sp, int32_t len)
 /* zeros <len> bytes starting at <sp> */
 {
   char	*p;
@@ -4637,14 +4637,14 @@ void zerobytes(void *sp, Int len)
   while (len--) *p++ = '\0';
 }
 /*----------------------------------------------------------------*/
-Int strncasecmp_p(char *s1, char *s2, Int n)
+int32_t strncasecmp_p(char *s1, char *s2, int32_t n)
 /* compares the first <n> bytes of strings <s1> and <s2> and returns 0 */
 /* if they are equal in both strings, a number > 0 if <s2> is later */
 /* that <s1> in the internal character set, or < 0 otherwise. */
 /* LS 17feb97 */
 {
   char	c1, c2;
-  Int	i = 0;
+  int32_t	i = 0;
 
   do
   { c1 = toupper(*s1++);
@@ -4654,13 +4654,13 @@ Int strncasecmp_p(char *s1, char *s2, Int n)
   return c2 - c1;
 }
 /*----------------------------------------------------------------*/
-Int strcasecmp_p(char *s1, char *s2)
+int32_t strcasecmp_p(char *s1, char *s2)
 /* compares strings <s1> and <s2> without regard to case and returns 0 */
 /* if they are equal, a number > 0 if <s2> is later */
 /* that <s1> in the internal character set, or < 0 otherwise. */
 /* LS 21feb97 */
 {
-  Int	c1, c2;
+  int32_t	c1, c2;
 
   do
   { c1 = toupper(*s1++);
@@ -4669,17 +4669,17 @@ Int strcasecmp_p(char *s1, char *s2)
   return c2 - c1;
 }
 /*----------------------------------------------------------------*/
-Int	nBreakpoint = 0;
+int32_t	nBreakpoint = 0;
 breakpointInfo	breakpoint[NBREAKPOINTS];
-Int lux_breakpoint(Int narg, Int ps[])
+int32_t lux_breakpoint(int32_t narg, int32_t ps[])
 /* BREAKPOINT,string[,/SET,/VARIABLE] */
 /* BREAKPOINT,n[,/DISABLE,/ENABLE,/DELETE] */
 /* BREAKPOINT,/LIST */
 /* /LIST can be specified together with one of the other switches */
 {
-  static Int	curBreakpoint = 0;
+  static int32_t	curBreakpoint = 0;
   char	*s, *p;
-  Int	n;
+  int32_t	n;
   
   if (narg) 
     switch (internalMode & 3) {
@@ -4783,12 +4783,12 @@ Int lux_breakpoint(Int narg, Int ps[])
 }
 /*----------------------------------------------------------------*/
 int16_t	watchVars[NWATCHVARS];
-Int	nWatchVars = 0;
-Int lux_watch(Int narg, Int ps[])
+int32_t	nWatchVars = 0;
+int32_t lux_watch(int32_t narg, int32_t ps[])
 /* WATCH,<variable>[,/DELETE,/LIST] */
 {
-  static Int	curWatchVar = 0;
-  Int	i;
+  static int32_t	curWatchVar = 0;
+  int32_t	i;
 
   if (narg) {
     if (!symbolIsNamed(ps[0]))
@@ -4828,17 +4828,17 @@ Int lux_watch(Int narg, Int ps[])
   return LUX_OK;
 }
 /*----------------------------------------------------------------*/
-Int lux_symbol_number(Int narg, Int ps[])
+int32_t lux_symbol_number(int32_t narg, int32_t ps[])
      /* returns the symbol number of the argument */
 {
-  Int	result;
+  int32_t	result;
   
   result = scalar_scratch(LUX_LONG);
   sym[result].spec.scalar.l = *ps;
   return result;
 }
 /*----------------------------------------------------------------*/
-void mark(Int symbol)
+void mark(int32_t symbol)
 {
   if (markIndex == MSSIZE - 1)
   { luxerror("mark: WARNING - Too many temps marked", symbol);
@@ -4864,7 +4864,7 @@ void pegParse(void)
 /*----------------------------------------------------------------*/
 void zapParseTemps(void)
 {
-  Int	iq;
+  int32_t	iq;
   
   while (markIndex > 0 && (iq = markStack[--markIndex]) >= 0)
     zapTemp(iq);
@@ -4882,9 +4882,9 @@ void removeParseMarker(void)
   markIndex--;
 }
 /*----------------------------------------------------------------*/
-void unMark(Int symbol)
+void unMark(int32_t symbol)
 {
-  Int	i;
+  int32_t	i;
 
   i = markIndex;
   while (i--)
@@ -4896,7 +4896,7 @@ void unMark(Int symbol)
 /*----------------------------------------------------------------*/
 void zapMarked(void)
 {
-  Int	iq;
+  int32_t	iq;
   
   while (markIndex > 0 && (iq = markStack[--markIndex]) >= 0)
     zapTemp(iq);
@@ -4906,8 +4906,8 @@ void checkTemps(void)
 /* for debugging: checks that the number of temporary (unnamed) */
 /* variables is equal to what is expected. */
 {
-  Int	i, n;
-  extern Int	nTempVariable;
+  int32_t	i, n;
+  extern int32_t	nTempVariable;
 
   n = 0;
   for (i = TEMPS_START; i < TEMPS_END; i++)
@@ -4926,10 +4926,10 @@ void checkTemps(void)
 }
 /*----------------------------------------------------------------*/
 #include <unistd.h>
-Int lux_restart(Int narg, Int ps[])
+int32_t lux_restart(int32_t narg, int32_t ps[])
 {
   extern char	*programName;
-  Int	saveHistory(void);
+  int32_t	saveHistory(void);
 
   printf("\nRestarting LUX...\n\n");
   saveHistory();
@@ -4940,7 +4940,7 @@ Int lux_restart(Int narg, Int ps[])
   return 1;
 }
 /*----------------------------------------------------------------*/
-Int strccmp(char *s1, char *s2)
+int32_t strccmp(char *s1, char *s2)
 /* checks strings s1 and s2 for equality disregarding upper/lower case */
 /* distinctions */
 {
@@ -4948,12 +4948,12 @@ Int strccmp(char *s1, char *s2)
   return *s1 - *s2;
 }
 /*----------------------------------------------------------------*/
-Int structSize(Int symbol, Int *nstruct, Int *nbyte)
+int32_t structSize(int32_t symbol, int32_t *nstruct, int32_t *nbyte)
 /* returns in <*nstruct> the number of structure descriptors that are
    required to describe <symbol>, and in <*nbyte> the total number of bytes
    covered by the data in <symbol>. */
 {
-  Int	n, ns, nb;
+  int32_t	n, ns, nb;
   pointer	p;
   listElem	*l;
 
@@ -5004,10 +5004,10 @@ Int structSize(Int symbol, Int *nstruct, Int *nbyte)
   }
 }
 /*----------------------------------------------------------------*/
-Int makeStruct(Int symbol, char *tag, structElem **se, char *data,
-	       Int *offset, Int descend)
+int32_t makeStruct(int32_t symbol, char *tag, structElem **se, char *data,
+	       int32_t *offset, int32_t descend)
 {
-  Int	size, offset0, ndim, n;
+  int32_t	size, offset0, ndim, n;
   structElem	*se0;
   int16_t	*arg;
   listElem	*le;
@@ -5028,7 +5028,7 @@ Int makeStruct(Int symbol, char *tag, structElem **se, char *data,
       case LUX_STRING:
 	(*se)->u.regular.type = LUX_TEMP_STRING; /* data type */
 	(*se)->u.regular.spec.singular.ndim = 1; /* strings always have 1 */
-	if (!((*se)->u.regular.spec.singular.dims = malloc(sizeof(Int))))
+	if (!((*se)->u.regular.spec.singular.dims = malloc(sizeof(int32_t))))
 	  return cerror(ALLOC_ERR, 0);
 	size = string_size(symbol); /* bytes per value */
 	(*se)->u.regular.spec.singular.dims[0] = size; /* first dimension */
@@ -5041,17 +5041,17 @@ Int makeStruct(Int symbol, char *tag, structElem **se, char *data,
 	  ndim++;		/* add one for string arrays to hold the */
 				/* length of the strings */
 	(*se)->u.regular.spec.singular.ndim = ndim;
-	if (!((*se)->u.regular.spec.singular.dims = malloc(ndim*sizeof(Int))))
+	if (!((*se)->u.regular.spec.singular.dims = malloc(ndim*sizeof(int32_t))))
 	  return cerror(ALLOC_ERR, 0);
 	if (array_type(symbol) == LUX_STRING_ARRAY) {
 	  (*se)->u.regular.spec.singular.dims[0] =
 	    strlen(*(char **) array_data(symbol)); /* take length of first */
 						   /* one for all */
 	  memcpy((*se)->u.regular.spec.singular.dims + 1, 
-		 array_dims(symbol), array_num_dims(symbol)*sizeof(Int));
+		 array_dims(symbol), array_num_dims(symbol)*sizeof(int32_t));
 	} else
 	  memcpy((*se)->u.regular.spec.singular.dims,
-		 array_dims(symbol), array_num_dims(symbol)*sizeof(Int));
+		 array_dims(symbol), array_num_dims(symbol)*sizeof(int32_t));
 	size = lux_type_size[array_type(symbol)]*array_size(symbol);
 	memcpy(data + *offset, array_data(symbol), size); /* copy values */
 	break;
@@ -5099,7 +5099,7 @@ Int makeStruct(Int symbol, char *tag, structElem **se, char *data,
   return LUX_OK;
 }
 /*----------------------------------------------------------------*/
-Int lux_struct(Int narg, Int ps[])
+int32_t lux_struct(int32_t narg, int32_t ps[])
 /* definition of a structure.  Structures can contain values of all
    numerical and string types, with individual dimensional structures
    for each component.  Each element of a structure covers a specific
@@ -5113,7 +5113,7 @@ Int lux_struct(Int narg, Int ps[])
    LS 8aug98
 */
 {
-  Int	result, size, nstruct, dims[MAX_DIMS], ndim, n, i, offset;
+  int32_t	result, size, nstruct, dims[MAX_DIMS], ndim, n, i, offset;
   pointer	data;
   structElem	*se;
   
@@ -5133,7 +5133,7 @@ Int lux_struct(Int narg, Int ps[])
   if (result == LUX_ERROR)
     return LUX_ERROR;
   symbol_class(result) = LUX_STRUCT;
-  symbol_memory(result) = sizeof(Int) /* to store the number of elements */
+  symbol_memory(result) = sizeof(int32_t) /* to store the number of elements */
     + nstruct*sizeof(structElem) /* to store the structure information */
     + size*n;			/* to store the data values */
   data.v = malloc(symbol_memory(result));
@@ -5163,9 +5163,9 @@ Int lux_struct(Int narg, Int ps[])
   se->u.first.nelem = n;
   se->u.first.size = size;
   se->u.first.ndim = ndim;
-  if (!(se->u.first.dims = malloc(ndim*sizeof(Int))))
+  if (!(se->u.first.dims = malloc(ndim*sizeof(int32_t))))
     return cerror(ALLOC_ERR, 0);
-  memcpy(se->u.first.dims, dims, ndim*sizeof(Int));
+  memcpy(se->u.first.dims, dims, ndim*sizeof(int32_t));
   se++;				/* point at the next one */
   offset = 0;
 
@@ -5175,13 +5175,13 @@ Int lux_struct(Int narg, Int ps[])
   return result;
 }
 /*----------------------------------------------------------------*/
-Int translateEscapes(char *p)
+int32_t translateEscapes(char *p)
 /* replace explicit escape sequences \x by internal ones; returns */
 /* the final length of the string */
 {
   char	escapechars[] = "ntvbrfa\\?'\"", escapes[] = "\n\t\v\b\r\f\a\\?'\"",
     *p2, *p0;
-  Int	i, c;
+  int32_t	i, c;
 
   p0 = p;
   while (*p) {
@@ -5219,13 +5219,13 @@ Int translateEscapes(char *p)
   return p - p0;
 }
 /*----------------------------------------------------------------*/
-Int installString(char *string)
+int32_t installString(char *string)
 /* installs string in symbol stack; returns index to stack */
 {
- Int	index, n;
+ int32_t	index, n;
  char	*p, *p0;
 #if YYDEBUG
- extern Int	yydebug;
+ extern int32_t	yydebug;
 #endif
 
  if ((index = nextFreeStackEntry()) == LUX_ERROR)
@@ -5274,7 +5274,7 @@ void installKeys(void *keys)
 {
  char	*p, **result, *copy;
  keyList	*theKeyList;
- Int	n = 1, i;
+ int32_t	n = 1, i;
 
  if (!*(char **) keys)		/* empty key */
    return;
@@ -5334,15 +5334,15 @@ void installKeys(void *keys)
  *(keyList **) keys = theKeyList;
 }
 /*----------------------------------------------------------------*/
-Int findName(char *name, hashTableEntry *hashTable[], Int context)
+int32_t findName(char *name, hashTableEntry *hashTable[], int32_t context)
 /* searches for <name> in <hashTable[]> (with <context>).  if found, */
 /* returns symbol number, otherwise installs a copy of the name in */
 /* <hashTable[]> and sym[].  Returns -1 if an error occurs.  LS 6feb96 */
 {
- Int		hashValue, i;
+ int32_t		hashValue, i;
  hashTableEntry	*hp, *oldHp;
 #if YYDEBUG
- extern Int	yydebug;
+ extern int32_t	yydebug;
 #endif
  extern char	ignoreSymbols;
 
@@ -5386,15 +5386,15 @@ Int findName(char *name, hashTableEntry *hashTable[], Int context)
  return i;
 }
 /*----------------------------------------------------------------*/
-Int lux_verify(Int narg, Int ps[])
+int32_t lux_verify(int32_t narg, int32_t ps[])
 /* verifies that all referenced subroutines, functions, and files
    actually exist */
 {
   char	*name, *p, compileName[12], oldInstalling;
   FILE	*fp;
-  Int	i, n, oldContext, nsym, result;
+  int32_t	i, n, oldContext, nsym, result;
   extern char	compileOnly;
-  extern Int	executeLevel;
+  extern int32_t	executeLevel;
 
   result = 0;
   if (narg) {
@@ -5520,8 +5520,8 @@ void releaseCompileInfo(void)
 }
 /*----------------------------------------------------------------*/
 static executionLevelInfo	*e_info;
-static Int	n_e_info = 0, cur_e_info = 0;
-void pushExecutionLevel(Int line, Int target)
+static int32_t	n_e_info = 0, cur_e_info = 0;
+void pushExecutionLevel(int32_t line, int32_t target)
 {
   if (cur_e_info + 1 >= n_e_info) { /* need more room */
     n_e_info += 16;
@@ -5543,9 +5543,9 @@ void popExecutionLevel(void)
   cur_e_info--;
 }
 /*----------------------------------------------------------------*/
-void showExecutionLevel(Int symbol)
+void showExecutionLevel(int32_t symbol)
 {
-  Int	i, target;
+  int32_t	i, target;
 
   if (cur_e_info)
     for (i = cur_e_info; i >= 0; i--) {

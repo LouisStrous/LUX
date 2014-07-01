@@ -31,16 +31,16 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 static double	subdx, subdy;
 static double	xoff, yoff;
 static double	a1, a2, a3,a4,a5, a6, a7, a8, a9 ,a10, a11, a12, a13, a14, a15;
-extern Int	badmatch;
+extern int32_t	badmatch;
 double	meritc;
 /*------------------------------------------------------------------------- */
-Int lux_subshift(Int narg, Int ps[]) /* LCT for a cell  */
+int32_t lux_subshift(int32_t narg, int32_t ps[]) /* LCT for a cell  */
      /* wants 2 arrays, already F*8 and extracted, both the same size */
      /* returns the shift */
 {
-  Int		iq, jq, *d;
+  int32_t		iq, jq, *d;
   double	*x1, *x2;
-  void	subshift(double *, double *, Int, Int);
+  void	subshift(double *, double *, int32_t, int32_t);
 
   iq = ps[0];
   if (symbol_class(iq) != LUX_ARRAY
@@ -69,17 +69,17 @@ Int lux_subshift(Int narg, Int ps[]) /* LCT for a cell  */
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int lux_subshiftc(Int narg, Int ps[]) /* LCT for a cell, sym version */
+int32_t lux_subshiftc(int32_t narg, int32_t ps[]) /* LCT for a cell, sym version */
  /* subshiftc, s1b, s2b, xoff, yoff, mask  */
  /* 3/4/97 added apodizer array, optional */
  /* wants 2 or 3 arrays, already F*8 and extracted, both the same size */
  /* returns the shift */
 {
-  Int	iq, jq, kq;
+  int32_t	iq, jq, kq;
   double	*x1, *x2, *msk;
-  Int	nx, ny;
-  double	subshiftc(double *, double *, Int, Int),
-    subshiftc_apod(double *, double *, double *, Int, Int);
+  int32_t	nx, ny;
+  double	subshiftc(double *, double *, int32_t, int32_t),
+    subshiftc_apod(double *, double *, double *, int32_t, int32_t);
 
   iq = ps[0];
   jq = ps[1];
@@ -194,7 +194,7 @@ void getsxsy(void)
  {
  /* iterate to the min (if any), loading results in globals subdx and subdy */
  /* seed with syz = 0.5 */
- Int	n;
+ int32_t	n;
  double	sxz, syz;
  syz=sxz=.5;
  n = 11;
@@ -230,15 +230,15 @@ void  subshift(x, r, nx, ny)
  /* q is the reference cell (old m1), r is the one we interpolate (old m2) */
  /* we assume that the arrays have already been converted to F*8 */
  double	*r, *x;
- Int     nx, ny;
+ int32_t     nx, ny;
  {
- Int     nxs;
+ int32_t     nxs;
  double  sum, cs0, cs1, cs2, cs3, t2, t1, t0, t3;
  double  parts[5][5], xx[3][3], xdx[3][2], xdy[2][3], xmmpp[2][2], xppmm[2][2]; 
  double  partsdx[5][3], partsdy[3][5], partsppmm[3][3], partsmmpp[3][3];
  double  cmm,c0m,cpm,cm0,c00,cp0,cmp,c0p,cpp,sumxx;
  double	 qbest, qcur, outside, qd;
- Int     i, j, nxm2, nym2, ii, jj, mflag;
+ int32_t     i, j, nxm2, nym2, ii, jj, mflag;
  double	*rp, *rp2, *row, *rowq, *qp;
 
  nxs = nx;
@@ -760,12 +760,12 @@ double syvaluec(double sx)
 double  subshiftc(xa, xb, nx, ny)
  /* we assume that the arrays have already been converted to F*8 */
  double	*xa, *xb;
- Int     nx, ny;
+ int32_t     nx, ny;
  {
- Int     nxs;
+ int32_t     nxs;
  double  t2, t1, t4, t3, d1, d2, d3, d4, sxz, syz;
  double	 x0, x1, x2, x3, y0, y1, y2, y3;
- Int     i, j, n, stride;
+ int32_t     i, j, n, stride;
  double	*xpa1, *xpa2, *xpb1, *xpb2;
 
  nxs = nx;
@@ -850,12 +850,12 @@ double  subshiftc_apod(xa, xb, gg, nx, ny)
  which must be dimensioned (nx-1) by (ny-1) */
  /* we assume that the arrays have already been converted to F*8 */
  double	*xa, *xb, *gg;
- Int     nx, ny;
+ int32_t     nx, ny;
  {
- Int     nxs;
+ int32_t     nxs;
  double  t2, t1, t4, t3, d1, d2, d3, d4, sxz, syz;
  double	 x0, x1, x2, x3, y0, y1, y2, y3, gapod;
- Int     i, j, n, stride;
+ int32_t     i, j, n, stride;
  double	*xpa1, *xpa2, *xpb1, *xpb2, xq;
 
  nxs = nx;
@@ -939,10 +939,10 @@ double  subshiftc_apod(xa, xb, gg, nx, ny)
  return mertc(sxz, syz);
  }
  /*------------------------------------------------------------------------- */
-Int lux_dilate(Int narg, Int ps[])
+int32_t lux_dilate(int32_t narg, int32_t ps[])
 /* dilates a 2D image.  LS 9nov98 */
 {
-  Int	nx, ny, result, type, n;
+  int32_t	nx, ny, result, type, n;
   pointer	data, out;
 
   if (!symbolIsNumericalArray(ps[0]) /* not a numerical array */
@@ -1059,10 +1059,10 @@ Int lux_dilate(Int narg, Int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-Int lux_erode(Int narg, Int ps[])
+int32_t lux_erode(int32_t narg, int32_t ps[])
 /* erodes a 2D image.  LS 9nov98, 9may2000 */
 {
-  Int	nx, ny, result, type, n;
+  int32_t	nx, ny, result, type, n;
   pointer	data, out;
   char	zeroedge;
 

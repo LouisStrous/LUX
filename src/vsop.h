@@ -33,6 +33,6 @@ struct VSOPdata planetIndicesForTolerance(struct VSOPdata *data,
 struct VSOPdata VSOP87Adata;
 struct VSOPdata VSOP87Cdata;
 
-void XYZJ2000fromVSOPA(double T, Int object, double *pos, double tolerance);
-void XYZdatefromVSOPC(double T, Int object, double *pos, double tolerance);
+void XYZJ2000fromVSOPA(double T, int32_t object, double *pos, double tolerance);
+void XYZdatefromVSOPC(double T, int32_t object, double *pos, double tolerance);
 

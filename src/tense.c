@@ -28,28 +28,28 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "luxdefs.h"
 #include "output.h"
 
-Int curv1_(Int *n, double *x, double *y, double *slp1, double *slpn,
+int32_t curv1_(int32_t *n, double *x, double *y, double *slp1, double *slpn,
 	   double *yp, double *temp, double *sigma, double *xf, double *yf,
-	   Int *nf)
+	   int32_t *nf)
 {
     /* System generated locals */
-    Int ret_val, i_1, i_2;
+    int32_t ret_val, i_1, i_2;
 
     /* Builtin functions */
-    Int s_wsle(), do_lio(), e_wsle();
+    int32_t s_wsle(), do_lio(), e_wsle();
 
     /* Local variables */
-    static Int ibak;
+    static int32_t ibak;
     static double deln, dels, exps, diag1, diag2, delx1, delx2, slpp1, 
 	    exps1;
-    static Int i, j;
+    static int32_t i, j;
     static double t, delx12, delnn, sinhs, c1, c2, c3;
-    static Int i1;
+    static int32_t i1;
     static double slppn, delnm1, sinhd1, sinhd2, diagin, spdiag, sigmap, 
 	    sinhin;
-    static Int nm1;
+    static int32_t nm1;
     static double dx1, dx2;
-    static Int np1;
+    static int32_t np1;
     static double del1, del2;
 
 
@@ -214,30 +214,30 @@ L990:
 
 /*===========================================================================
 */
-Int kurv1_(Int *n, double *x, double *y, double *slp1, double *slpn,
+int32_t kurv1_(int32_t *n, double *x, double *y, double *slp1, double *slpn,
 	   double *xp, double *yp, double *temp, double *sigma, double *t,
-	   double *xs, double *ys, Int *nf)
+	   double *xs, double *ys, int32_t *nf)
 {
     /* Initialized data */
 
     static double degrad = .017453292;
 
     /* System generated locals */
-    Int ret_val, i_1, i_2;
+    int32_t ret_val, i_1, i_2;
     double d_1, d_2;
 
     /* Builtin functions */
-    Int s_wsle(), do_lio(), e_wsle();
+    int32_t s_wsle(), do_lio(), e_wsle();
 
     /* Local variables */
     static double deln, dels, delx, dely, exps, diag1, diag2, dels1, 
 	    dels2, delx1, dely1, delx2, dely2, slpp1, exps1;
-    static Int i, k;
+    static int32_t i, k;
     static double s, dels12, delnn, c1, c2, c3, sinhs;
-    static Int i1;
+    static int32_t i1;
     static double slppn, delnm1, sinhd1, sinhd2, diagin, tn, spdiag, 
 	    sx, sy, sigmap, sinhin;
-    static Int nm1;
+    static int32_t nm1;
     static double dx1, dy1, dx2, dy2, sum, del1, del2;
 
 
@@ -444,29 +444,29 @@ L50:
 
 /*===========================================================================
 ==*/
-Int kurvp1_(Int *n, double *x, double *y, double *xp, double *yp,
+int32_t kurvp1_(int32_t *n, double *x, double *y, double *xp, double *yp,
 	    double *temp, double *sigma, double *t, double *xs, double *ys,
-	    Int *nf)
+	    int32_t *nf)
 {
     /* System generated locals */
-    Int ret_val, i_1, i_2;
+    int32_t ret_val, i_1, i_2;
     double d_1;
 
     /* Builtin functions */
-    Int s_wsle(), do_lio(), e_wsle();
+    int32_t s_wsle(), do_lio(), e_wsle();
 
     /* Local variables */
-    static Int ibak;
+    static int32_t ibak;
     static double dels, delx, dely, exps, diag1, diag2, dels1, dels2, 
 	    delx1, dely1, delx2, dely2, exps1;
-    static Int i, k;
+    static int32_t i, k;
     static double s, sinhs;
-    static Int i1;
+    static int32_t i1;
     static double sinhd1, spdig1, sinhd2, diagin, tn, spdiag, sigmap, 
 	    sinhin;
-    static Int im1, ip1, nm1;
+    static int32_t im1, ip1, nm1;
     static double dx1, dy1;
-    static Int np1;
+    static int32_t np1;
     static double dx2, dy2, sum, del1, del2;
 
 

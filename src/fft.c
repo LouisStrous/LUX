@@ -496,14 +496,14 @@ wsave   contains initialization calculations which must not be
 ****************************************************************** */
 
 /* modifications of f2c output, by Louis Strous:
-   integer -> Int
+   integer -> int32_t
    real    -> float
    remove underscores from routine names
    from K&R to ANSI declarations
    make all static variables dynamic
    replace all external declarations by local declarations
    make a second copy with doubles rather than floats
-   replace "Int *ifac" by "float *ifac" or "double *ifac" to fix
+   replace "int32_t *ifac" by "float *ifac" or "double *ifac" to fix
      mismatch of data types in some function calls
    replace "(doublereal)" by "(float)" because the "doublereals" are stored
      in floats anyway
@@ -514,26 +514,26 @@ wsave   contains initialization calculations which must not be
 #include "config.h"
 #endif
 #include "action.h"
-Int ezfft1(Int *n, float *wa, float *ifac)
+int32_t ezfft1(int32_t *n, float *wa, float *ifac)
 {
     /* Initialized data */
 
-  Int ntryh[4] = { 4,2,3,5 };
+  int32_t ntryh[4] = { 4,2,3,5 };
   float tpi = (float)6.28318530717959;
 
   /* System generated locals */
-  Int i__1, i__2, i__3;
+  int32_t i__1, i__2, i__3;
 
   /* Builtin functions */
   double cos(double), sin(double);
 
   /* Local variables */
   float argh;
-  Int ntry, i, j, k1, l1, l2, ib, ii, nf, ip, nl, is, nq, nr;
+  int32_t ntry, i, j, k1, l1, l2, ib, ii, nf, ip, nl, is, nq, nr;
   float ch1, sh1;
-  Int ido, ipm;
+  int32_t ido, ipm;
   float dch1, ch1h, arg1, dsh1;
-  Int nfm1;
+  int32_t nfm1;
 
     /* Parameter adjustments */
     --ifac;
@@ -632,15 +632,15 @@ L109:
     return 0;
 } /* ezfft1 */
 /*------------------------------------------------------------------------*/
-Int ezfftb(Int *n, float *r, float *azero, float *a, float *b, float *wsave)
+int32_t ezfftb(int32_t *n, float *r, float *azero, float *a, float *b, float *wsave)
 {
   /* System generated locals */
-  Int i__1;
+  int32_t i__1;
 
   /* Local variables */
-  Int i;
-  Int rfftb(Int *n, float *r, float *wsave);
-  Int ns2;
+  int32_t i;
+  int32_t rfftb(int32_t *n, float *r, float *wsave);
+  int32_t ns2;
 
     /* Parameter adjustments */
     --wsave;
@@ -679,18 +679,18 @@ L103:
     return 0;
 } /* ezfftb */
 /*------------------------------------------------------------------------*/
-Int ezfftf(Int *n, float *r, float *azero, float *a, float *b, float *wsave)
+int32_t ezfftf(int32_t *n, float *r, float *azero, float *a, float *b, float *wsave)
 {
   /* System generated locals */
-  Int i__1;
+  int32_t i__1;
 
   /* Local variables */
-  Int i;
-  Int rfftf(Int *n, float *r, float *wsave);
+  int32_t i;
+  int32_t rfftf(int32_t *n, float *r, float *wsave);
   float cf;
-  Int ns2;
+  int32_t ns2;
   float cfm;
-  Int ns2m;
+  int32_t ns2m;
 
 
 /*                       VERSION 3  JUNE 1979 */
@@ -742,9 +742,9 @@ L103:
     return 0;
 } /* ezfftf */
 /*------------------------------------------------------------------------*/
-Int ezffti(Int *n, float *wsave)
+int32_t ezffti(int32_t *n, float *wsave)
 {
-  Int ezfft1(Int *n, float *wa, float *ifac);
+  int32_t ezfft1(int32_t *n, float *wa, float *ifac);
 
   /* Parameter adjustments */
   --wsave;
@@ -757,15 +757,15 @@ Int ezffti(Int *n, float *wsave)
     return 0;
 } /* ezffti */
 /*------------------------------------------------------------------------*/
-Int radb2(Int *ido, Int *l1, float *cc, float *ch, float *wa1)
+int32_t radb2(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1)
 {
   /* System generated locals */
-  Int cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
+  int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
   /* Local variables */
-  Int i, k, ic;
+  int32_t i, k, ic;
   float ti2, tr2;
-  Int idp2;
+  int32_t idp2;
   
   /* Parameter adjustments */
   ch_dim1 = *ido;
@@ -832,7 +832,7 @@ L107:
     return 0;
 } /* radb2 */
 /*------------------------------------------------------------------------*/
-Int radb3(Int *ido, Int *l1, float *cc, float *ch, float *wa1, float *wa2)
+int32_t radb3(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1, float *wa2)
 {
   /* Initialized data */
   
@@ -840,12 +840,12 @@ Int radb3(Int *ido, Int *l1, float *cc, float *ch, float *wa1, float *wa2)
   float taui = (float).866025403784439;
 
   /* System generated locals */
-  Int cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
+  int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
   /* Local variables */
-  Int i, k, ic;
+  int32_t i, k, ic;
   float ci2, ci3, di2, di3, cr2, cr3, dr2, dr3, ti2, tr2;
-  Int idp2;
+  int32_t idp2;
 
     /* Parameter adjustments */
     ch_dim1 = *ido;
@@ -913,7 +913,7 @@ Int radb3(Int *ido, Int *l1, float *cc, float *ch, float *wa1, float *wa2)
     return 0;
 } /* radb3 */
 /*------------------------------------------------------------------------*/
-Int radb4(Int *ido, Int *l1, float *cc, float *ch, float *wa1,
+int32_t radb4(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1,
 	  float *wa2, float *wa3)
 {
   /* Initialized data */
@@ -921,13 +921,13 @@ Int radb4(Int *ido, Int *l1, float *cc, float *ch, float *wa1,
   float sqrt2 = (float)1.414213562373095;
 
   /* System generated locals */
-  Int cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
+  int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
   /* Local variables */
-  Int i, k, ic;
+  int32_t i, k, ic;
   float ci2, ci3, ci4, cr2, cr3, cr4, ti1, ti2, ti3, ti4, tr1, tr2, 
     tr3, tr4;
-  Int idp2;
+  int32_t idp2;
 
     /* Parameter adjustments */
     ch_dim1 = *ido;
@@ -1037,7 +1037,7 @@ L107:
     return 0;
 } /* radb4 */
 /*------------------------------------------------------------------------*/
-Int radb5(Int *ido, Int *l1, float *cc, float *ch, float *wa1,
+int32_t radb5(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1,
 	  float *wa2, float *wa3, float *wa4)
 {
   /* Initialized data */
@@ -1048,13 +1048,13 @@ Int radb5(Int *ido, Int *l1, float *cc, float *ch, float *wa1,
   float ti12 = (float).587785252292473;
   
   /* System generated locals */
-  Int cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
+  int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
   
   /* Local variables */
-  Int i, k, ic;
+  int32_t i, k, ic;
   float ci2, ci3, ci4, ci5, di3, di4, di5, di2, cr2, cr3, cr5, cr4, 
     ti2, ti3, ti4, ti5, dr3, dr4, dr5, dr2, tr2, tr3, tr4, tr5;
-  Int idp2;
+  int32_t idp2;
 
     /* Parameter adjustments */
     ch_dim1 = *ido;
@@ -1158,7 +1158,7 @@ Int radb5(Int *ido, Int *l1, float *cc, float *ch, float *wa1,
     return 0;
 } /* radb5 */
 /*------------------------------------------------------------------------*/
-Int radbg(Int *ido, Int *ip, Int *l1, Int *idl1, float *cc, float *c1,
+int32_t radbg(int32_t *ido, int32_t *ip, int32_t *l1, int32_t *idl1, float *cc, float *c1,
 	  float *c2, float *ch, float *ch2, float *wa)
 {
   /* Initialized data */
@@ -1166,7 +1166,7 @@ Int radbg(Int *ido, Int *ip, Int *l1, Int *idl1, float *cc, float *c1,
   float tpi = (float)6.28318530717959;
 
   /* System generated locals */
-  Int ch_dim1, ch_dim2, ch_offset, cc_dim1, cc_dim2, cc_offset, c1_dim1,
+  int32_t ch_dim1, ch_dim2, ch_offset, cc_dim1, cc_dim2, cc_offset, c1_dim1,
     c1_dim2, c1_offset, c2_dim1, c2_offset, ch2_dim1, ch2_offset, 
     i__1, i__2, i__3;
 
@@ -1174,11 +1174,11 @@ Int radbg(Int *ido, Int *ip, Int *l1, Int *idl1, float *cc, float *c1,
   double cos(double), sin(double);
 
   /* Local variables */
-  Int idij, ipph, i, j, k, l, j2, ic, jc, lc, ik, is;
+  int32_t idij, ipph, i, j, k, l, j2, ic, jc, lc, ik, is;
   float dc2, ai1, ai2, ar1, ar2, ds2;
-  Int nbd;
+  int32_t nbd;
   float dcp, arg, dsp, ar1h, ar2h;
-  Int idp2, ipp2;
+  int32_t idp2, ipp2;
 
     /* Parameter adjustments */
     ch_dim1 = *ido;
@@ -1498,15 +1498,15 @@ L143:
     return 0;
 } /* radbg */
 /*------------------------------------------------------------------------*/
-Int radf2(Int *ido, Int *l1, float *cc, float *ch, float *wa1)
+int32_t radf2(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1)
 {
   /* System generated locals */
-  Int ch_dim1, ch_offset, cc_dim1, cc_dim2, cc_offset, i__1, i__2;
+  int32_t ch_dim1, ch_offset, cc_dim1, cc_dim2, cc_offset, i__1, i__2;
 
   /* Local variables */
-  Int i, k, ic;
+  int32_t i, k, ic;
   float ti2, tr2;
-  Int idp2;
+  int32_t idp2;
 
   /* Parameter adjustments */
     ch_dim1 = *ido;
@@ -1573,7 +1573,7 @@ L107:
     return 0;
 } /* radf2 */
 /*------------------------------------------------------------------------*/
-Int radf3(Int *ido, Int *l1, float *cc, float *ch, float *wa1, float *wa2)
+int32_t radf3(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1, float *wa2)
 {
   /* Initialized data */
   
@@ -1581,12 +1581,12 @@ Int radf3(Int *ido, Int *l1, float *cc, float *ch, float *wa1, float *wa2)
   float taui = (float).866025403784439;
   
   /* System generated locals */
-  Int ch_dim1, ch_offset, cc_dim1, cc_dim2, cc_offset, i__1, i__2;
+  int32_t ch_dim1, ch_offset, cc_dim1, cc_dim2, cc_offset, i__1, i__2;
   
   /* Local variables */
-  Int i, k, ic;
+  int32_t i, k, ic;
   float ci2, di2, di3, cr2, dr2, dr3, ti2, ti3, tr2, tr3;
-  Int idp2;
+  int32_t idp2;
 
     /* Parameter adjustments */
     ch_dim1 = *ido;
@@ -1649,7 +1649,7 @@ Int radf3(Int *ido, Int *l1, float *cc, float *ch, float *wa1, float *wa2)
     return 0;
 } /* radf3 */
 /*------------------------------------------------------------------------*/
-Int radf4(Int *ido, Int *l1, float *cc, float *ch, float *wa1,
+int32_t radf4(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1,
 	  float *wa2, float *wa3)
 {
   /* Initialized data */
@@ -1657,13 +1657,13 @@ Int radf4(Int *ido, Int *l1, float *cc, float *ch, float *wa1,
   float hsqt2 = (float).7071067811865475;
   
   /* System generated locals */
-  Int cc_dim1, cc_dim2, cc_offset, ch_dim1, ch_offset, i__1, i__2;
+  int32_t cc_dim1, cc_dim2, cc_offset, ch_dim1, ch_offset, i__1, i__2;
 
   /* Local variables */
-  Int i, k, ic;
+  int32_t i, k, ic;
   float ci2, ci3, ci4, cr2, cr3, cr4, ti1, ti2, ti3, ti4, tr1, tr2, 
     tr3, tr4;
-  Int idp2;
+  int32_t idp2;
 
     /* Parameter adjustments */
     ch_dim1 = *ido;
@@ -1762,7 +1762,7 @@ L107:
     return 0;
 } /* radf4 */
 /*------------------------------------------------------------------------*/
-Int radf5(Int *ido, Int *l1, float *cc, float *ch, float *wa1,
+int32_t radf5(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1,
 	  float *wa2, float *wa3, float *wa4)
 {
   /* Initialized data */
@@ -1773,13 +1773,13 @@ Int radf5(Int *ido, Int *l1, float *cc, float *ch, float *wa1,
   float ti12 = (float).587785252292473;
   
   /* System generated locals */
-  Int cc_dim1, cc_dim2, cc_offset, ch_dim1, ch_offset, i__1, i__2;
+  int32_t cc_dim1, cc_dim2, cc_offset, ch_dim1, ch_offset, i__1, i__2;
   
   /* Local variables */
-  Int i, k, ic;
+  int32_t i, k, ic;
   float ci2, di2, ci4, ci5, di3, di4, di5, ci3, cr2, cr3, dr2, dr3, 
     dr4, dr5, cr5, cr4, ti2, ti3, ti5, ti4, tr2, tr3, tr4, tr5;
-  Int idp2;
+  int32_t idp2;
   
     /* Parameter adjustments */
     ch_dim1 = *ido;
@@ -1877,7 +1877,7 @@ Int radf5(Int *ido, Int *l1, float *cc, float *ch, float *wa1,
     return 0;
 } /* radf5 */
 /*------------------------------------------------------------------------*/
-Int radfg(Int *ido, Int *ip, Int *l1, Int *idl1, float *cc, float *c1,
+int32_t radfg(int32_t *ido, int32_t *ip, int32_t *l1, int32_t *idl1, float *cc, float *c1,
 	  float *c2, float *ch, float *ch2, float *wa)
 {
   /* Initialized data */
@@ -1885,7 +1885,7 @@ Int radfg(Int *ido, Int *ip, Int *l1, Int *idl1, float *cc, float *c1,
   float tpi = (float)6.28318530717959;
   
   /* System generated locals */
-  Int ch_dim1, ch_dim2, ch_offset, cc_dim1, cc_dim2, cc_offset, c1_dim1,
+  int32_t ch_dim1, ch_dim2, ch_offset, cc_dim1, cc_dim2, cc_offset, c1_dim1,
     c1_dim2, c1_offset, c2_dim1, c2_offset, ch2_dim1, ch2_offset, 
     i__1, i__2, i__3;
   
@@ -1893,11 +1893,11 @@ Int radfg(Int *ido, Int *ip, Int *l1, Int *idl1, float *cc, float *c1,
   double cos(double), sin(double);
 
   /* Local variables */
-  Int idij, ipph, i, j, k, l, j2, ic, jc, lc, ik, is;
+  int32_t idij, ipph, i, j, k, l, j2, ic, jc, lc, ik, is;
   float dc2, ai1, ai2, ar1, ar2, ds2;
-  Int nbd;
+  int32_t nbd;
   float dcp, arg, dsp, ar1h, ar2h;
-  Int idp2, ipp2;
+  int32_t idp2, ipp2;
 
     /* Parameter adjustments */
     ch_dim1 = *ido;
@@ -2221,9 +2221,9 @@ L141:
     return 0;
 } /* radfg */
 /*------------------------------------------------------------------------*/
-Int rfftb(Int *n, float *r, float *wsave)
+int32_t rfftb(int32_t *n, float *r, float *wsave)
 {
-  Int rfftb1(Int *n, float *c, float *ch, float *wa, float *ifac);
+  int32_t rfftb1(int32_t *n, float *c, float *ch, float *wa, float *ifac);
 
   /* Parameter adjustments */
   --wsave;
@@ -2237,22 +2237,22 @@ Int rfftb(Int *n, float *r, float *wsave)
     return 0;
 } /* rfftb */
 /*------------------------------------------------------------------------*/
-Int rfftb1(Int *n, float *c, float *ch, float *wa, float *ifac)
+int32_t rfftb1(int32_t *n, float *c, float *ch, float *wa, float *ifac)
 {
   /* System generated locals */
-  Int i__1;
+  int32_t i__1;
 
   /* Local variables */
-  Int radb2(Int *ido, Int *l1, float *cc, float *ch, float *wa1),
-    radb3(Int *ido, Int *l1, float *cc, float *ch, float *wa1, float *wa2),
-    radb4(Int *ido, Int *l1, float *cc, float *ch, float *wa1,
+  int32_t radb2(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1),
+    radb3(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1, float *wa2),
+    radb4(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1,
 	  float *wa2, float *wa3),
-    radb5(Int *ido, Int *l1, float *cc, float *ch, float *wa1,
+    radb5(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1,
 	  float *wa2, float *wa3, float *wa4);
-  Int i;
-  Int radbg(Int *ido, Int *ip, Int *l1, Int *idl1, float *cc, float *c1,
+  int32_t i;
+  int32_t radbg(int32_t *ido, int32_t *ip, int32_t *l1, int32_t *idl1, float *cc, float *c1,
 	  float *c2, float *ch, float *ch2, float *wa);
-  Int k1, l1, l2, na, nf, ip, iw, ix2, ix3, ix4, ido, idl1;
+  int32_t k1, l1, l2, na, nf, ip, iw, ix2, ix3, ix4, ido, idl1;
 
     /* Parameter adjustments */
     --ifac;
@@ -2364,9 +2364,9 @@ L115:
     return 0;
 } /* rfftb1 */
 /*------------------------------------------------------------------------*/
-Int rfftf(Int *n, float *r, float *wsave)
+int32_t rfftf(int32_t *n, float *r, float *wsave)
 {
-  Int rfftf1(Int *n, float *c, float *ch, float *wa, float *ifac);
+  int32_t rfftf1(int32_t *n, float *c, float *ch, float *wa, float *ifac);
   
   /* Parameter adjustments */
   --wsave;
@@ -2380,22 +2380,22 @@ Int rfftf(Int *n, float *r, float *wsave)
   return 0;
 } /* rfftf */
 /*------------------------------------------------------------------------*/
-Int rfftf1(Int *n, float *c, float *ch, float *wa, float *ifac)
+int32_t rfftf1(int32_t *n, float *c, float *ch, float *wa, float *ifac)
 {
   /* System generated locals */
-  Int i__1;
+  int32_t i__1;
 
   /* Local variables */
-  Int radf2(Int *ido, Int *l1, float *cc, float *ch, float *wa1),
-    radf3(Int *ido, Int *l1, float *cc, float *ch, float *wa1, float *wa2),
-    radf4(Int *ido, Int *l1, float *cc, float *ch, float *wa1,
+  int32_t radf2(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1),
+    radf3(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1, float *wa2),
+    radf4(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1,
 	  float *wa2, float *wa3),
-    radf5(Int *ido, Int *l1, float *cc, float *ch, float *wa1,
+    radf5(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1,
 	  float *wa2, float *wa3, float *wa4);
-  Int i;
-  Int radfg(Int *ido, Int *ip, Int *l1, Int *idl1, float *cc, float *c1,
+  int32_t i;
+  int32_t radfg(int32_t *ido, int32_t *ip, int32_t *l1, int32_t *idl1, float *cc, float *c1,
 	  float *c2, float *ch, float *ch2, float *wa);
-  Int k1, l1, l2, na, kh, nf, ip, iw, ix2, ix3, ix4, ido, idl1;
+  int32_t k1, l1, l2, na, kh, nf, ip, iw, ix2, ix3, ix4, ido, idl1;
 
     /* Parameter adjustments */
     --ifac;
@@ -2502,9 +2502,9 @@ L110:
     return 0;
 } /* rfftf1 */
 /*------------------------------------------------------------------------*/
-Int rffti(Int *n, float *wsave)
+int32_t rffti(int32_t *n, float *wsave)
 {
-  Int rffti1(Int *n, float *wa, float *ifac);
+  int32_t rffti1(int32_t *n, float *wa, float *ifac);
 
   /* Parameter adjustments */
   --wsave;
@@ -2517,29 +2517,29 @@ Int rffti(Int *n, float *wsave)
     return 0;
 } /* rffti */
 /*------------------------------------------------------------------------*/
-Int rffti1(Int *n, float *wa, float *ifac)
+int32_t rffti1(int32_t *n, float *wa, float *ifac)
 {
   /* Initialized data */
   
-  Int ntryh[4] = { 4,2,3,5 };
+  int32_t ntryh[4] = { 4,2,3,5 };
   
   /* System generated locals */
-  Int i__1, i__2, i__3;
+  int32_t i__1, i__2, i__3;
   
   /* Builtin functions */
   double cos(double), sin(double);
   
   /* Local variables */
   float argh;
-  Int ntry, i, j;
+  int32_t ntry, i, j;
   float argld;
-  Int k1, l1, l2, ib;
+  int32_t k1, l1, l2, ib;
   float fi;
-  Int ld, ii, nf, ip, nl, is, nq, nr;
+  int32_t ld, ii, nf, ip, nl, is, nq, nr;
   float arg;
-  Int ido, ipm;
+  int32_t ido, ipm;
   float tpi;
-  Int nfm1;
+  int32_t nfm1;
 
     /* Parameter adjustments */
     --ifac;
@@ -2633,19 +2633,19 @@ L107:
 /*------------------------------------------------------------------------*/
 /* Below follow routines for complex ffts */
 /*------------------------------------------------------------------------*/
-Int passf(Int *nac, Int *ido, Int *ip, Int *l1, Int *idl1,
+int32_t passf(int32_t *nac, int32_t *ido, int32_t *ip, int32_t *l1, int32_t *idl1,
 	  float *cc, float *c1, float *c2, float *ch, float *ch2, float *wa)
 {
     /* System generated locals */
-    Int ch_dim1, ch_dim2, ch_offset, cc_dim1, cc_dim2, cc_offset, c1_dim1,
+    int32_t ch_dim1, ch_dim2, ch_offset, cc_dim1, cc_dim2, cc_offset, c1_dim1,
 	     c1_dim2, c1_offset, c2_dim1, c2_offset, ch2_dim1, ch2_offset, 
 	    i__1, i__2, i__3;
 
     /* Local variables */
-    Int idij, idlj, idot, ipph, i__, j, k, l, jc, lc, ik, idj, 
+    int32_t idij, idlj, idot, ipph, i__, j, k, l, jc, lc, ik, idj, 
 	    idl, inc, idp;
     double wai, war;
-    Int ipp2;
+    int32_t ipp2;
 
     /* Parameter adjustments */
     ch_dim1 = *ido;
@@ -2871,13 +2871,13 @@ L127:
     return 0;
 } /* passf */
 /*------------------------------------------------------------------------*/
-Int passf2(Int *ido, Int *l1, float *cc, float *ch, float *wa1)
+int32_t passf2(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1)
 {
     /* System generated locals */
-    Int cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
+    int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
     /* Local variables */
-    Int i__, k;
+    int32_t i__, k;
     double ti2, tr2;
 
     /* Parameter adjustments */
@@ -2931,7 +2931,7 @@ L102:
     return 0;
 } /* passf2 */
 /*------------------------------------------------------------------------*/
-Int passf3(Int *ido, Int *l1, float *cc, float *ch, float *wa1, float *wa2)
+int32_t passf3(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1, float *wa2)
 {
     /* Initialized data */
 
@@ -2939,10 +2939,10 @@ Int passf3(Int *ido, Int *l1, float *cc, float *ch, float *wa1, float *wa2)
     double taui = (float)-.866025403784439;
 
     /* System generated locals */
-    Int cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
+    int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
     /* Local variables */
-    Int i__, k;
+    int32_t i__, k;
     double ci2, ci3, di2, di3, cr2, cr3, dr2, dr3, ti2, tr2;
 
     /* Parameter adjustments */
@@ -3017,14 +3017,14 @@ L102:
     return 0;
 } /* passf3 */
 /*------------------------------------------------------------------------*/
-Int passf4(Int *ido, Int *l1, float *cc, float *ch, float *wa1, float *wa2,
+int32_t passf4(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1, float *wa2,
 	   float *wa3)
 {
     /* System generated locals */
-    Int cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
+    int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
     /* Local variables */
-    Int i__, k;
+    int32_t i__, k;
     double ci2, ci3, ci4, cr2, cr3, cr4, ti1, ti2, ti3, ti4, tr1, tr2, 
 	    tr3, tr4;
 
@@ -3121,7 +3121,7 @@ L102:
     return 0;
 } /* passf4 */
 /*------------------------------------------------------------------------*/
-Int passf5(Int *ido, Int *l1, float *cc, float *ch, float *wa1, float *wa2,
+int32_t passf5(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1, float *wa2,
 	   float *wa3, float *wa4)
 {
     /* Initialized data */
@@ -3132,10 +3132,10 @@ Int passf5(Int *ido, Int *l1, float *cc, float *ch, float *wa1, float *wa2,
     double ti12 = (float)-.587785252292473;
 
     /* System generated locals */
-    Int cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
+    int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
     /* Local variables */
-    Int i__, k;
+    int32_t i__, k;
     double ci2, ci3, ci4, ci5, di3, di4, di5, di2, cr2, cr3, cr5, cr4, 
 	    ti2, ti3, ti4, ti5, dr3, dr4, dr5, dr2, tr2, tr3, tr4, tr5;
 
@@ -3255,22 +3255,22 @@ L102:
     return 0;
 } /* passf5 */
 /*------------------------------------------------------------------------*/
-Int cfftf1(Int *n, float *c__, float *ch, float *wa, float *ifac)
+int32_t cfftf1(int32_t *n, float *c__, float *ch, float *wa, float *ifac)
 {
     /* System generated locals */
-    Int i__1;
+    int32_t i__1;
 
     /* Local variables */
-    Int idot, i__;
-    Int passf(Int *, Int *, Int *, Int *, Int *, float *, float *, float *,
+    int32_t idot, i__;
+    int32_t passf(int32_t *, int32_t *, int32_t *, int32_t *, int32_t *, float *, float *, float *,
 	      float *, float *, float *);
-    Int k1, l1, l2, n2;
-    Int passf2(Int *, Int *, float *, float *, float *),
-      passf3(Int *, Int *, float *, float *, float *, float *),
-      passf4(Int *, Int *, float *, float *, float *, float *, float *),
-      passf5(Int *, Int *, float *, float *, float *, float *, float *,
+    int32_t k1, l1, l2, n2;
+    int32_t passf2(int32_t *, int32_t *, float *, float *, float *),
+      passf3(int32_t *, int32_t *, float *, float *, float *, float *),
+      passf4(int32_t *, int32_t *, float *, float *, float *, float *, float *),
+      passf5(int32_t *, int32_t *, float *, float *, float *, float *, float *,
 	     float *);
-    Int na, nf, ip, iw, ix2, ix3, ix4, nac, ido, idl1;
+    int32_t na, nf, ip, iw, ix2, ix3, ix4, nac, ido, idl1;
 
     /* Parameter adjustments */
     --ifac;
@@ -3384,10 +3384,10 @@ L115:
     return 0;
 } /* cfftf1 */
 /*------------------------------------------------------------------------*/
-Int cfftf(Int *n, float *c__, float *wsave)
+int32_t cfftf(int32_t *n, float *c__, float *wsave)
 {
-  Int cfftf1(Int *, float *, float *, float *, float *);
-  Int iw1, iw2;
+  int32_t cfftf1(int32_t *, float *, float *, float *, float *);
+  int32_t iw1, iw2;
 
   /* Parameter adjustments */
   --wsave;
@@ -3403,19 +3403,19 @@ Int cfftf(Int *n, float *c__, float *wsave)
   return 0;
 } /* cfftf */
 /*------------------------------------------------------------------------*/
-Int passb(Int *nac, Int *ido, Int *ip, Int *l1, Int *idl1,
+int32_t passb(int32_t *nac, int32_t *ido, int32_t *ip, int32_t *l1, int32_t *idl1,
 	  float *cc, float *c1, float *c2, float *ch, float *ch2, float *wa)
 {
     /* System generated locals */
-    Int ch_dim1, ch_dim2, ch_offset, cc_dim1, cc_dim2, cc_offset, c1_dim1,
+    int32_t ch_dim1, ch_dim2, ch_offset, cc_dim1, cc_dim2, cc_offset, c1_dim1,
 	     c1_dim2, c1_offset, c2_dim1, c2_offset, ch2_dim1, ch2_offset, 
 	    i__1, i__2, i__3;
 
     /* Local variables */
-    Int idij, idlj, idot, ipph, i__, j, k, l, jc, lc, ik, idj, 
+    int32_t idij, idlj, idot, ipph, i__, j, k, l, jc, lc, ik, idj, 
 	    idl, inc, idp;
     double wai, war;
-    Int ipp2;
+    int32_t ipp2;
 
     /* Parameter adjustments */
     ch_dim1 = *ido;
@@ -3641,13 +3641,13 @@ L127:
     return 0;
 } /* passb */
 /*------------------------------------------------------------------------*/
-Int passb2(Int *ido, Int *l1, float *cc, float *ch, float *wa1)
+int32_t passb2(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1)
 {
     /* System generated locals */
-    Int cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
+    int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
     /* Local variables */
-    Int i__, k;
+    int32_t i__, k;
     double ti2, tr2;
 
     /* Parameter adjustments */
@@ -3701,7 +3701,7 @@ L102:
     return 0;
 } /* passb2 */
 /*------------------------------------------------------------------------*/
-Int passb3(Int *ido, Int *l1, float *cc, float *ch, float *wa1, float *wa2)
+int32_t passb3(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1, float *wa2)
 {
     /* Initialized data */
 
@@ -3709,10 +3709,10 @@ Int passb3(Int *ido, Int *l1, float *cc, float *ch, float *wa1, float *wa2)
     double taui = (float).866025403784439;
 
     /* System generated locals */
-    Int cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
+    int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
     /* Local variables */
-    Int i__, k;
+    int32_t i__, k;
     double ci2, ci3, di2, di3, cr2, cr3, dr2, dr3, ti2, tr2;
 
     /* Parameter adjustments */
@@ -3787,14 +3787,14 @@ L102:
     return 0;
 } /* passb3 */
 /*------------------------------------------------------------------------*/
-Int passb4(Int *ido, Int *l1, float *cc, float *ch, float *wa1, float *wa2,
+int32_t passb4(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1, float *wa2,
 	   float *wa3)
 {
     /* System generated locals */
-    Int cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
+    int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
     /* Local variables */
-    Int i__, k;
+    int32_t i__, k;
     double ci2, ci3, ci4, cr2, cr3, cr4, ti1, ti2, ti3, ti4, tr1, tr2, 
 	    tr3, tr4;
 
@@ -3891,7 +3891,7 @@ L102:
     return 0;
 } /* passb4 */
 /*------------------------------------------------------------------------*/
-Int passb5(Int *ido, Int *l1, float *cc, float *ch, float *wa1, float *wa2,
+int32_t passb5(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1, float *wa2,
 	   float *wa3, float *wa4)
 {
     /* Initialized data */
@@ -3902,10 +3902,10 @@ Int passb5(Int *ido, Int *l1, float *cc, float *ch, float *wa1, float *wa2,
     double ti12 = (float).587785252292473;
 
     /* System generated locals */
-    Int cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
+    int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
     /* Local variables */
-    Int i__, k;
+    int32_t i__, k;
     double ci2, ci3, ci4, ci5, di3, di4, di5, di2, cr2, cr3, cr5, cr4, 
 	    ti2, ti3, ti4, ti5, dr3, dr4, dr5, dr2, tr2, tr3, tr4, tr5;
 
@@ -4025,22 +4025,22 @@ L102:
     return 0;
 } /* passb5 */
 /*------------------------------------------------------------------------*/
-Int cfftb1(Int *n, float *c__, float *ch, float *wa, float *ifac)
+int32_t cfftb1(int32_t *n, float *c__, float *ch, float *wa, float *ifac)
 {
     /* System generated locals */
-    Int i__1;
+    int32_t i__1;
 
     /* Local variables */
-    Int idot, i__;
-    Int passb(Int *, Int *, Int *, Int *, Int *, float *, float *, float *,
+    int32_t idot, i__;
+    int32_t passb(int32_t *, int32_t *, int32_t *, int32_t *, int32_t *, float *, float *, float *,
 	      float *, float *, float *); 
-    Int k1, l1, l2, n2;
-    Int passb2(Int *, Int *, float *, float *, float *),
-      passb3(Int *, Int *, float *, float *, float *, float *),
-      passb4(Int *, Int *, float *, float *, float *, float *, float *),
-      passb5(Int *, Int *, float *, float *, float *, float *, float *,
+    int32_t k1, l1, l2, n2;
+    int32_t passb2(int32_t *, int32_t *, float *, float *, float *),
+      passb3(int32_t *, int32_t *, float *, float *, float *, float *),
+      passb4(int32_t *, int32_t *, float *, float *, float *, float *, float *),
+      passb5(int32_t *, int32_t *, float *, float *, float *, float *, float *,
 	     float *);
-    Int na, nf, ip, iw, ix2, ix3, ix4, nac, ido, idl1;
+    int32_t na, nf, ip, iw, ix2, ix3, ix4, nac, ido, idl1;
 
     /* Parameter adjustments */
     --ifac;
@@ -4154,10 +4154,10 @@ L115:
     return 0;
 } /* cfftb1 */
 /*------------------------------------------------------------------------*/
-Int cfftb(Int *n, float *c__, float *wsave)
+int32_t cfftb(int32_t *n, float *c__, float *wsave)
 {
-  Int cfftb1(Int *, float *, float *, float *, float *);
-    Int iw1, iw2;
+  int32_t cfftb1(int32_t *, float *, float *, float *, float *);
+    int32_t iw1, iw2;
 
     /* Parameter adjustments */
     --wsave;
@@ -4173,27 +4173,27 @@ Int cfftb(Int *n, float *c__, float *wsave)
     return 0;
 } /* cfftb */
 /*------------------------------------------------------------------------*/
-Int cffti1(Int *n, float *wa, float *ifac)
+int32_t cffti1(int32_t *n, float *wa, float *ifac)
 {
     /* Initialized data */
 
-    Int ntryh[4] = { 3,4,2,5 };
+    int32_t ntryh[4] = { 3,4,2,5 };
 
     /* System generated locals */
-    Int i__1, i__2, i__3;
+    int32_t i__1, i__2, i__3;
 
     /* Builtin functions */
     double cos(double), sin(double);
 
     /* Local variables */
     double argh;
-    Int idot, ntry, i__, j;
+    int32_t idot, ntry, i__, j;
     double argld;
-    Int i1, k1, l1, l2, ib;
+    int32_t i1, k1, l1, l2, ib;
     double fi;
-    Int ld, ii, nf, ip, nl, nq, nr;
+    int32_t ld, ii, nf, ip, nl, nq, nr;
     double arg;
-    Int ido, ipm;
+    int32_t ido, ipm;
     double tpi;
 
     /* Parameter adjustments */
@@ -4290,10 +4290,10 @@ L109:
     return 0;
 } /* cffti1 */
 /*------------------------------------------------------------------------*/
-Int cffti(Int *n, float *wsave)
+int32_t cffti(int32_t *n, float *wsave)
 {
-  Int cffti1(Int *, float *, float *);
-  Int iw1, iw2;
+  int32_t cffti1(int32_t *, float *, float *);
+  int32_t iw1, iw2;
 
     /* Parameter adjustments */
     --wsave;
@@ -4313,26 +4313,26 @@ Int cffti(Int *n, float *wsave)
    from the foregoing by Louis Strous 15 June 1998 */
 
 /*------------------------------------------------------------------------*/
-Int ezfft1d(Int *n, double *wa, double *ifac)
+int32_t ezfft1d(int32_t *n, double *wa, double *ifac)
 {
     /* Initialized data */
 
-  Int ntryh[4] = { 4,2,3,5 };
+  int32_t ntryh[4] = { 4,2,3,5 };
   double tpi = (double)6.28318530717959;
 
   /* System generated locals */
-  Int i__1, i__2, i__3;
+  int32_t i__1, i__2, i__3;
 
   /* Builtin functions */
   double cos(double), sin(double);
 
   /* Local variables */
   double argh;
-  Int ntry, i, j, k1, l1, l2, ib, ii, nf, ip, nl, is, nq, nr;
+  int32_t ntry, i, j, k1, l1, l2, ib, ii, nf, ip, nl, is, nq, nr;
   double ch1, sh1;
-  Int ido, ipm;
+  int32_t ido, ipm;
   double dch1, ch1h, arg1, dsh1;
-  Int nfm1;
+  int32_t nfm1;
 
     /* Parameter adjustments */
     --ifac;
@@ -4431,15 +4431,15 @@ L109:
     return 0;
 } /* ezfft1 */
 /*------------------------------------------------------------------------*/
-Int ezfftbd(Int *n, double *r, double *azero, double *a, double *b, double *wsave)
+int32_t ezfftbd(int32_t *n, double *r, double *azero, double *a, double *b, double *wsave)
 {
   /* System generated locals */
-  Int i__1;
+  int32_t i__1;
 
   /* Local variables */
-  Int i;
-  Int rfftbd(Int *n, double *r, double *wsave);
-  Int ns2;
+  int32_t i;
+  int32_t rfftbd(int32_t *n, double *r, double *wsave);
+  int32_t ns2;
 
     /* Parameter adjustments */
     --wsave;
@@ -4478,18 +4478,18 @@ L103:
     return 0;
 } /* ezfftb */
 /*------------------------------------------------------------------------*/
-Int ezfftfd(Int *n, double *r, double *azero, double *a, double *b, double *wsave)
+int32_t ezfftfd(int32_t *n, double *r, double *azero, double *a, double *b, double *wsave)
 {
   /* System generated locals */
-  Int i__1;
+  int32_t i__1;
 
   /* Local variables */
-  Int i;
-  Int rfftfd(Int *n, double *r, double *wsave);
+  int32_t i;
+  int32_t rfftfd(int32_t *n, double *r, double *wsave);
   double cf;
-  Int ns2;
+  int32_t ns2;
   double cfm;
-  Int ns2m;
+  int32_t ns2m;
 
 
 /*                       VERSION 3  JUNE 1979 */
@@ -4541,9 +4541,9 @@ L103:
     return 0;
 } /* ezfftf */
 /*------------------------------------------------------------------------*/
-Int ezfftid(Int *n, double *wsave)
+int32_t ezfftid(int32_t *n, double *wsave)
 {
-  Int ezfft1d(Int *n, double *wa, double *ifac);
+  int32_t ezfft1d(int32_t *n, double *wa, double *ifac);
 
   /* Parameter adjustments */
   --wsave;
@@ -4556,15 +4556,15 @@ Int ezfftid(Int *n, double *wsave)
     return 0;
 } /* ezffti */
 /*------------------------------------------------------------------------*/
-Int radb2d(Int *ido, Int *l1, double *cc, double *ch, double *wa1)
+int32_t radb2d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1)
 {
   /* System generated locals */
-  Int cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
+  int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
   /* Local variables */
-  Int i, k, ic;
+  int32_t i, k, ic;
   double ti2, tr2;
-  Int idp2;
+  int32_t idp2;
   
   /* Parameter adjustments */
   ch_dim1 = *ido;
@@ -4631,7 +4631,7 @@ L107:
     return 0;
 } /* radb2 */
 /*------------------------------------------------------------------------*/
-Int radb3d(Int *ido, Int *l1, double *cc, double *ch, double *wa1, double *wa2)
+int32_t radb3d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1, double *wa2)
 {
   /* Initialized data */
   
@@ -4639,12 +4639,12 @@ Int radb3d(Int *ido, Int *l1, double *cc, double *ch, double *wa1, double *wa2)
   double taui = (double).866025403784439;
 
   /* System generated locals */
-  Int cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
+  int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
   /* Local variables */
-  Int i, k, ic;
+  int32_t i, k, ic;
   double ci2, ci3, di2, di3, cr2, cr3, dr2, dr3, ti2, tr2;
-  Int idp2;
+  int32_t idp2;
 
     /* Parameter adjustments */
     ch_dim1 = *ido;
@@ -4712,7 +4712,7 @@ Int radb3d(Int *ido, Int *l1, double *cc, double *ch, double *wa1, double *wa2)
     return 0;
 } /* radb3 */
 /*------------------------------------------------------------------------*/
-Int radb4d(Int *ido, Int *l1, double *cc, double *ch, double *wa1,
+int32_t radb4d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1,
 	  double *wa2, double *wa3)
 {
   /* Initialized data */
@@ -4720,13 +4720,13 @@ Int radb4d(Int *ido, Int *l1, double *cc, double *ch, double *wa1,
   double sqrt2 = (double)1.414213562373095;
 
   /* System generated locals */
-  Int cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
+  int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
   /* Local variables */
-  Int i, k, ic;
+  int32_t i, k, ic;
   double ci2, ci3, ci4, cr2, cr3, cr4, ti1, ti2, ti3, ti4, tr1, tr2, 
     tr3, tr4;
-  Int idp2;
+  int32_t idp2;
 
     /* Parameter adjustments */
     ch_dim1 = *ido;
@@ -4836,7 +4836,7 @@ L107:
     return 0;
 } /* radb4 */
 /*------------------------------------------------------------------------*/
-Int radb5d(Int *ido, Int *l1, double *cc, double *ch, double *wa1,
+int32_t radb5d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1,
 	  double *wa2, double *wa3, double *wa4)
 {
   /* Initialized data */
@@ -4847,13 +4847,13 @@ Int radb5d(Int *ido, Int *l1, double *cc, double *ch, double *wa1,
   double ti12 = (double).587785252292473;
   
   /* System generated locals */
-  Int cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
+  int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
   
   /* Local variables */
-  Int i, k, ic;
+  int32_t i, k, ic;
   double ci2, ci3, ci4, ci5, di3, di4, di5, di2, cr2, cr3, cr5, cr4, 
     ti2, ti3, ti4, ti5, dr3, dr4, dr5, dr2, tr2, tr3, tr4, tr5;
-  Int idp2;
+  int32_t idp2;
 
     /* Parameter adjustments */
     ch_dim1 = *ido;
@@ -4957,7 +4957,7 @@ Int radb5d(Int *ido, Int *l1, double *cc, double *ch, double *wa1,
     return 0;
 } /* radb5 */
 /*------------------------------------------------------------------------*/
-Int radbgd(Int *ido, Int *ip, Int *l1, Int *idl1, double *cc, double *c1,
+int32_t radbgd(int32_t *ido, int32_t *ip, int32_t *l1, int32_t *idl1, double *cc, double *c1,
 	  double *c2, double *ch, double *ch2, double *wa)
 {
   /* Initialized data */
@@ -4965,7 +4965,7 @@ Int radbgd(Int *ido, Int *ip, Int *l1, Int *idl1, double *cc, double *c1,
   double tpi = (double)6.28318530717959;
 
   /* System generated locals */
-  Int ch_dim1, ch_dim2, ch_offset, cc_dim1, cc_dim2, cc_offset, c1_dim1,
+  int32_t ch_dim1, ch_dim2, ch_offset, cc_dim1, cc_dim2, cc_offset, c1_dim1,
     c1_dim2, c1_offset, c2_dim1, c2_offset, ch2_dim1, ch2_offset, 
     i__1, i__2, i__3;
 
@@ -4973,11 +4973,11 @@ Int radbgd(Int *ido, Int *ip, Int *l1, Int *idl1, double *cc, double *c1,
   double cos(double), sin(double);
 
   /* Local variables */
-  Int idij, ipph, i, j, k, l, j2, ic, jc, lc, ik, is;
+  int32_t idij, ipph, i, j, k, l, j2, ic, jc, lc, ik, is;
   double dc2, ai1, ai2, ar1, ar2, ds2;
-  Int nbd;
+  int32_t nbd;
   double dcp, arg, dsp, ar1h, ar2h;
-  Int idp2, ipp2;
+  int32_t idp2, ipp2;
 
     /* Parameter adjustments */
     ch_dim1 = *ido;
@@ -5297,15 +5297,15 @@ L143:
     return 0;
 } /* radbg */
 /*------------------------------------------------------------------------*/
-Int radf2d(Int *ido, Int *l1, double *cc, double *ch, double *wa1)
+int32_t radf2d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1)
 {
   /* System generated locals */
-  Int ch_dim1, ch_offset, cc_dim1, cc_dim2, cc_offset, i__1, i__2;
+  int32_t ch_dim1, ch_offset, cc_dim1, cc_dim2, cc_offset, i__1, i__2;
 
   /* Local variables */
-  Int i, k, ic;
+  int32_t i, k, ic;
   double ti2, tr2;
-  Int idp2;
+  int32_t idp2;
 
   /* Parameter adjustments */
     ch_dim1 = *ido;
@@ -5372,7 +5372,7 @@ L107:
     return 0;
 } /* radf2 */
 /*------------------------------------------------------------------------*/
-Int radf3d(Int *ido, Int *l1, double *cc, double *ch, double *wa1, double *wa2)
+int32_t radf3d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1, double *wa2)
 {
   /* Initialized data */
   
@@ -5380,12 +5380,12 @@ Int radf3d(Int *ido, Int *l1, double *cc, double *ch, double *wa1, double *wa2)
   double taui = (double).866025403784439;
   
   /* System generated locals */
-  Int ch_dim1, ch_offset, cc_dim1, cc_dim2, cc_offset, i__1, i__2;
+  int32_t ch_dim1, ch_offset, cc_dim1, cc_dim2, cc_offset, i__1, i__2;
   
   /* Local variables */
-  Int i, k, ic;
+  int32_t i, k, ic;
   double ci2, di2, di3, cr2, dr2, dr3, ti2, ti3, tr2, tr3;
-  Int idp2;
+  int32_t idp2;
 
     /* Parameter adjustments */
     ch_dim1 = *ido;
@@ -5448,7 +5448,7 @@ Int radf3d(Int *ido, Int *l1, double *cc, double *ch, double *wa1, double *wa2)
     return 0;
 } /* radf3 */
 /*------------------------------------------------------------------------*/
-Int radf4d(Int *ido, Int *l1, double *cc, double *ch, double *wa1,
+int32_t radf4d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1,
 	  double *wa2, double *wa3)
 {
   /* Initialized data */
@@ -5456,13 +5456,13 @@ Int radf4d(Int *ido, Int *l1, double *cc, double *ch, double *wa1,
   double hsqt2 = (double).7071067811865475;
   
   /* System generated locals */
-  Int cc_dim1, cc_dim2, cc_offset, ch_dim1, ch_offset, i__1, i__2;
+  int32_t cc_dim1, cc_dim2, cc_offset, ch_dim1, ch_offset, i__1, i__2;
 
   /* Local variables */
-  Int i, k, ic;
+  int32_t i, k, ic;
   double ci2, ci3, ci4, cr2, cr3, cr4, ti1, ti2, ti3, ti4, tr1, tr2, 
     tr3, tr4;
-  Int idp2;
+  int32_t idp2;
 
     /* Parameter adjustments */
     ch_dim1 = *ido;
@@ -5561,7 +5561,7 @@ L107:
     return 0;
 } /* radf4 */
 /*------------------------------------------------------------------------*/
-Int radf5d(Int *ido, Int *l1, double *cc, double *ch, double *wa1,
+int32_t radf5d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1,
 	  double *wa2, double *wa3, double *wa4)
 {
   /* Initialized data */
@@ -5572,13 +5572,13 @@ Int radf5d(Int *ido, Int *l1, double *cc, double *ch, double *wa1,
   double ti12 = (double).587785252292473;
   
   /* System generated locals */
-  Int cc_dim1, cc_dim2, cc_offset, ch_dim1, ch_offset, i__1, i__2;
+  int32_t cc_dim1, cc_dim2, cc_offset, ch_dim1, ch_offset, i__1, i__2;
   
   /* Local variables */
-  Int i, k, ic;
+  int32_t i, k, ic;
   double ci2, di2, ci4, ci5, di3, di4, di5, ci3, cr2, cr3, dr2, dr3, 
     dr4, dr5, cr5, cr4, ti2, ti3, ti5, ti4, tr2, tr3, tr4, tr5;
-  Int idp2;
+  int32_t idp2;
   
     /* Parameter adjustments */
     ch_dim1 = *ido;
@@ -5676,7 +5676,7 @@ Int radf5d(Int *ido, Int *l1, double *cc, double *ch, double *wa1,
     return 0;
 } /* radf5 */
 /*------------------------------------------------------------------------*/
-Int radfgd(Int *ido, Int *ip, Int *l1, Int *idl1, double *cc, double *c1,
+int32_t radfgd(int32_t *ido, int32_t *ip, int32_t *l1, int32_t *idl1, double *cc, double *c1,
 	  double *c2, double *ch, double *ch2, double *wa)
 {
   /* Initialized data */
@@ -5684,7 +5684,7 @@ Int radfgd(Int *ido, Int *ip, Int *l1, Int *idl1, double *cc, double *c1,
   double tpi = (double)6.28318530717959;
   
   /* System generated locals */
-  Int ch_dim1, ch_dim2, ch_offset, cc_dim1, cc_dim2, cc_offset, c1_dim1,
+  int32_t ch_dim1, ch_dim2, ch_offset, cc_dim1, cc_dim2, cc_offset, c1_dim1,
     c1_dim2, c1_offset, c2_dim1, c2_offset, ch2_dim1, ch2_offset, 
     i__1, i__2, i__3;
   
@@ -5692,11 +5692,11 @@ Int radfgd(Int *ido, Int *ip, Int *l1, Int *idl1, double *cc, double *c1,
   double cos(double), sin(double);
 
   /* Local variables */
-  Int idij, ipph, i, j, k, l, j2, ic, jc, lc, ik, is;
+  int32_t idij, ipph, i, j, k, l, j2, ic, jc, lc, ik, is;
   double dc2, ai1, ai2, ar1, ar2, ds2;
-  Int nbd;
+  int32_t nbd;
   double dcp, arg, dsp, ar1h, ar2h;
-  Int idp2, ipp2;
+  int32_t idp2, ipp2;
 
     /* Parameter adjustments */
     ch_dim1 = *ido;
@@ -6020,9 +6020,9 @@ L141:
     return 0;
 } /* radfg */
 /*------------------------------------------------------------------------*/
-Int rfftbd(Int *n, double *r, double *wsave)
+int32_t rfftbd(int32_t *n, double *r, double *wsave)
 {
-  Int rfftb1d(Int *n, double *c, double *ch, double *wa, double *ifac);
+  int32_t rfftb1d(int32_t *n, double *c, double *ch, double *wa, double *ifac);
 
   /* Parameter adjustments */
   --wsave;
@@ -6036,22 +6036,22 @@ Int rfftbd(Int *n, double *r, double *wsave)
     return 0;
 } /* rfftb */
 /*------------------------------------------------------------------------*/
-Int rfftb1d(Int *n, double *c, double *ch, double *wa, double *ifac)
+int32_t rfftb1d(int32_t *n, double *c, double *ch, double *wa, double *ifac)
 {
   /* System generated locals */
-  Int i__1;
+  int32_t i__1;
 
   /* Local variables */
-  Int radb2d(Int *ido, Int *l1, double *cc, double *ch, double *wa1),
-    radb3d(Int *ido, Int *l1, double *cc, double *ch, double *wa1, double *wa2),
-    radb4d(Int *ido, Int *l1, double *cc, double *ch, double *wa1,
+  int32_t radb2d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1),
+    radb3d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1, double *wa2),
+    radb4d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1,
 	  double *wa2, double *wa3),
-    radb5d(Int *ido, Int *l1, double *cc, double *ch, double *wa1,
+    radb5d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1,
 	  double *wa2, double *wa3, double *wa4);
-  Int i;
-  Int radbgd(Int *ido, Int *ip, Int *l1, Int *idl1, double *cc, double *c1,
+  int32_t i;
+  int32_t radbgd(int32_t *ido, int32_t *ip, int32_t *l1, int32_t *idl1, double *cc, double *c1,
 	  double *c2, double *ch, double *ch2, double *wa);
-  Int k1, l1, l2, na, nf, ip, iw, ix2, ix3, ix4, ido, idl1;
+  int32_t k1, l1, l2, na, nf, ip, iw, ix2, ix3, ix4, ido, idl1;
 
     /* Parameter adjustments */
     --ifac;
@@ -6163,9 +6163,9 @@ L115:
     return 0;
 } /* rfftb1 */
 /*------------------------------------------------------------------------*/
-Int rfftfd(Int *n, double *r, double *wsave)
+int32_t rfftfd(int32_t *n, double *r, double *wsave)
 {
-  Int rfftf1d(Int *n, double *c, double *ch, double *wa, double *ifac);
+  int32_t rfftf1d(int32_t *n, double *c, double *ch, double *wa, double *ifac);
   
   /* Parameter adjustments */
   --wsave;
@@ -6179,22 +6179,22 @@ Int rfftfd(Int *n, double *r, double *wsave)
   return 0;
 } /* rfftf */
 /*------------------------------------------------------------------------*/
-Int rfftf1d(Int *n, double *c, double *ch, double *wa, double *ifac)
+int32_t rfftf1d(int32_t *n, double *c, double *ch, double *wa, double *ifac)
 {
   /* System generated locals */
-  Int i__1;
+  int32_t i__1;
 
   /* Local variables */
-  Int radf2d(Int *ido, Int *l1, double *cc, double *ch, double *wa1),
-    radf3d(Int *ido, Int *l1, double *cc, double *ch, double *wa1, double *wa2),
-    radf4d(Int *ido, Int *l1, double *cc, double *ch, double *wa1,
+  int32_t radf2d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1),
+    radf3d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1, double *wa2),
+    radf4d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1,
 	  double *wa2, double *wa3),
-    radf5d(Int *ido, Int *l1, double *cc, double *ch, double *wa1,
+    radf5d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1,
 	  double *wa2, double *wa3, double *wa4);
-  Int i;
-  Int radfgd(Int *ido, Int *ip, Int *l1, Int *idl1, double *cc, double *c1,
+  int32_t i;
+  int32_t radfgd(int32_t *ido, int32_t *ip, int32_t *l1, int32_t *idl1, double *cc, double *c1,
 	  double *c2, double *ch, double *ch2, double *wa);
-  Int k1, l1, l2, na, kh, nf, ip, iw, ix2, ix3, ix4, ido, idl1;
+  int32_t k1, l1, l2, na, kh, nf, ip, iw, ix2, ix3, ix4, ido, idl1;
 
     /* Parameter adjustments */
     --ifac;
@@ -6301,9 +6301,9 @@ L110:
     return 0;
 } /* rfftf1 */
 /*------------------------------------------------------------------------*/
-Int rfftid(Int *n, double *wsave)
+int32_t rfftid(int32_t *n, double *wsave)
 {
-  Int rffti1d(Int *n, double *wa, double *ifac);
+  int32_t rffti1d(int32_t *n, double *wa, double *ifac);
 
   /* Parameter adjustments */
   --wsave;
@@ -6316,29 +6316,29 @@ Int rfftid(Int *n, double *wsave)
     return 0;
 } /* rffti */
 /*------------------------------------------------------------------------*/
-Int rffti1d(Int *n, double *wa, double *ifac)
+int32_t rffti1d(int32_t *n, double *wa, double *ifac)
 {
   /* Initialized data */
   
-  Int ntryh[4] = { 4,2,3,5 };
+  int32_t ntryh[4] = { 4,2,3,5 };
   
   /* System generated locals */
-  Int i__1, i__2, i__3;
+  int32_t i__1, i__2, i__3;
   
   /* Builtin functions */
   double cos(double), sin(double);
   
   /* Local variables */
   double argh;
-  Int ntry, i, j;
+  int32_t ntry, i, j;
   double argld;
-  Int k1, l1, l2, ib;
+  int32_t k1, l1, l2, ib;
   double fi;
-  Int ld, ii, nf, ip, nl, is, nq, nr;
+  int32_t ld, ii, nf, ip, nl, is, nq, nr;
   double arg;
-  Int ido, ipm;
+  int32_t ido, ipm;
   double tpi;
-  Int nfm1;
+  int32_t nfm1;
 
     /* Parameter adjustments */
     --ifac;
@@ -6432,19 +6432,19 @@ L107:
 /*------------------------------------------------------------------------*/
 /* Below follow routines for complex ffts */
 /*------------------------------------------------------------------------*/
-Int passfd(Int *nac, Int *ido, Int *ip, Int *l1, Int *idl1,
+int32_t passfd(int32_t *nac, int32_t *ido, int32_t *ip, int32_t *l1, int32_t *idl1,
 	  double *cc, double *c1, double *c2, double *ch, double *ch2, double *wa)
 {
     /* System generated locals */
-    Int ch_dim1, ch_dim2, ch_offset, cc_dim1, cc_dim2, cc_offset, c1_dim1,
+    int32_t ch_dim1, ch_dim2, ch_offset, cc_dim1, cc_dim2, cc_offset, c1_dim1,
 	     c1_dim2, c1_offset, c2_dim1, c2_offset, ch2_dim1, ch2_offset, 
 	    i__1, i__2, i__3;
 
     /* Local variables */
-    Int idij, idlj, idot, ipph, i__, j, k, l, jc, lc, ik, idj, 
+    int32_t idij, idlj, idot, ipph, i__, j, k, l, jc, lc, ik, idj, 
 	    idl, inc, idp;
     double wai, war;
-    Int ipp2;
+    int32_t ipp2;
 
     /* Parameter adjustments */
     ch_dim1 = *ido;
@@ -6670,13 +6670,13 @@ L127:
     return 0;
 } /* passf */
 /*------------------------------------------------------------------------*/
-Int passf2d(Int *ido, Int *l1, double *cc, double *ch, double *wa1)
+int32_t passf2d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1)
 {
     /* System generated locals */
-    Int cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
+    int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
     /* Local variables */
-    Int i__, k;
+    int32_t i__, k;
     double ti2, tr2;
 
     /* Parameter adjustments */
@@ -6730,7 +6730,7 @@ L102:
     return 0;
 } /* passf2 */
 /*------------------------------------------------------------------------*/
-Int passf3d(Int *ido, Int *l1, double *cc, double *ch, double *wa1, double *wa2)
+int32_t passf3d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1, double *wa2)
 {
     /* Initialized data */
 
@@ -6738,10 +6738,10 @@ Int passf3d(Int *ido, Int *l1, double *cc, double *ch, double *wa1, double *wa2)
     double taui = (double)-.866025403784439;
 
     /* System generated locals */
-    Int cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
+    int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
     /* Local variables */
-    Int i__, k;
+    int32_t i__, k;
     double ci2, ci3, di2, di3, cr2, cr3, dr2, dr3, ti2, tr2;
 
     /* Parameter adjustments */
@@ -6816,14 +6816,14 @@ L102:
     return 0;
 } /* passf3 */
 /*------------------------------------------------------------------------*/
-Int passf4d(Int *ido, Int *l1, double *cc, double *ch, double *wa1, double *wa2,
+int32_t passf4d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1, double *wa2,
 	   double *wa3)
 {
     /* System generated locals */
-    Int cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
+    int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
     /* Local variables */
-    Int i__, k;
+    int32_t i__, k;
     double ci2, ci3, ci4, cr2, cr3, cr4, ti1, ti2, ti3, ti4, tr1, tr2, 
 	    tr3, tr4;
 
@@ -6920,7 +6920,7 @@ L102:
     return 0;
 } /* passf4 */
 /*------------------------------------------------------------------------*/
-Int passf5d(Int *ido, Int *l1, double *cc, double *ch, double *wa1, double *wa2,
+int32_t passf5d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1, double *wa2,
 	   double *wa3, double *wa4)
 {
     /* Initialized data */
@@ -6931,10 +6931,10 @@ Int passf5d(Int *ido, Int *l1, double *cc, double *ch, double *wa1, double *wa2,
     double ti12 = (double)-.587785252292473;
 
     /* System generated locals */
-    Int cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
+    int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
     /* Local variables */
-    Int i__, k;
+    int32_t i__, k;
     double ci2, ci3, ci4, ci5, di3, di4, di5, di2, cr2, cr3, cr5, cr4, 
 	    ti2, ti3, ti4, ti5, dr3, dr4, dr5, dr2, tr2, tr3, tr4, tr5;
 
@@ -7054,22 +7054,22 @@ L102:
     return 0;
 } /* passf5 */
 /*------------------------------------------------------------------------*/
-Int cfftf1d(Int *n, double *c__, double *ch, double *wa, double *ifac)
+int32_t cfftf1d(int32_t *n, double *c__, double *ch, double *wa, double *ifac)
 {
     /* System generated locals */
-    Int i__1;
+    int32_t i__1;
 
     /* Local variables */
-    Int idot, i__;
-    Int passfd(Int *, Int *, Int *, Int *, Int *, double *, double *, double *,
+    int32_t idot, i__;
+    int32_t passfd(int32_t *, int32_t *, int32_t *, int32_t *, int32_t *, double *, double *, double *,
 	      double *, double *, double *);
-    Int k1, l1, l2, n2;
-    Int passf2d(Int *, Int *, double *, double *, double *),
-      passf3d(Int *, Int *, double *, double *, double *, double *),
-      passf4d(Int *, Int *, double *, double *, double *, double *, double *),
-      passf5d(Int *, Int *, double *, double *, double *, double *, double *,
+    int32_t k1, l1, l2, n2;
+    int32_t passf2d(int32_t *, int32_t *, double *, double *, double *),
+      passf3d(int32_t *, int32_t *, double *, double *, double *, double *),
+      passf4d(int32_t *, int32_t *, double *, double *, double *, double *, double *),
+      passf5d(int32_t *, int32_t *, double *, double *, double *, double *, double *,
 	     double *);
-    Int na, nf, ip, iw, ix2, ix3, ix4, nac, ido, idl1;
+    int32_t na, nf, ip, iw, ix2, ix3, ix4, nac, ido, idl1;
 
     /* Parameter adjustments */
     --ifac;
@@ -7183,10 +7183,10 @@ L115:
     return 0;
 } /* cfftf1 */
 /*------------------------------------------------------------------------*/
-Int cfftfd(Int *n, double *c__, double *wsave)
+int32_t cfftfd(int32_t *n, double *c__, double *wsave)
 {
-  Int cfftf1d(Int *, double *, double *, double *, double *);
-  Int iw1, iw2;
+  int32_t cfftf1d(int32_t *, double *, double *, double *, double *);
+  int32_t iw1, iw2;
 
   /* Parameter adjustments */
   --wsave;
@@ -7202,19 +7202,19 @@ Int cfftfd(Int *n, double *c__, double *wsave)
   return 0;
 } /* cfftf */
 /*------------------------------------------------------------------------*/
-Int passbd(Int *nac, Int *ido, Int *ip, Int *l1, Int *idl1,
+int32_t passbd(int32_t *nac, int32_t *ido, int32_t *ip, int32_t *l1, int32_t *idl1,
 	  double *cc, double *c1, double *c2, double *ch, double *ch2, double *wa)
 {
     /* System generated locals */
-    Int ch_dim1, ch_dim2, ch_offset, cc_dim1, cc_dim2, cc_offset, c1_dim1,
+    int32_t ch_dim1, ch_dim2, ch_offset, cc_dim1, cc_dim2, cc_offset, c1_dim1,
 	     c1_dim2, c1_offset, c2_dim1, c2_offset, ch2_dim1, ch2_offset, 
 	    i__1, i__2, i__3;
 
     /* Local variables */
-    Int idij, idlj, idot, ipph, i__, j, k, l, jc, lc, ik, idj, 
+    int32_t idij, idlj, idot, ipph, i__, j, k, l, jc, lc, ik, idj, 
 	    idl, inc, idp;
     double wai, war;
-    Int ipp2;
+    int32_t ipp2;
 
     /* Parameter adjustments */
     ch_dim1 = *ido;
@@ -7440,13 +7440,13 @@ L127:
     return 0;
 } /* passb */
 /*------------------------------------------------------------------------*/
-Int passb2d(Int *ido, Int *l1, double *cc, double *ch, double *wa1)
+int32_t passb2d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1)
 {
     /* System generated locals */
-    Int cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
+    int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
     /* Local variables */
-    Int i__, k;
+    int32_t i__, k;
     double ti2, tr2;
 
     /* Parameter adjustments */
@@ -7500,7 +7500,7 @@ L102:
     return 0;
 } /* passb2 */
 /*------------------------------------------------------------------------*/
-Int passb3d(Int *ido, Int *l1, double *cc, double *ch, double *wa1, double *wa2)
+int32_t passb3d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1, double *wa2)
 {
     /* Initialized data */
 
@@ -7508,10 +7508,10 @@ Int passb3d(Int *ido, Int *l1, double *cc, double *ch, double *wa1, double *wa2)
     double taui = (double).866025403784439;
 
     /* System generated locals */
-    Int cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
+    int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
     /* Local variables */
-    Int i__, k;
+    int32_t i__, k;
     double ci2, ci3, di2, di3, cr2, cr3, dr2, dr3, ti2, tr2;
 
     /* Parameter adjustments */
@@ -7586,14 +7586,14 @@ L102:
     return 0;
 } /* passb3 */
 /*------------------------------------------------------------------------*/
-Int passb4d(Int *ido, Int *l1, double *cc, double *ch, double *wa1, double *wa2,
+int32_t passb4d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1, double *wa2,
 	   double *wa3)
 {
     /* System generated locals */
-    Int cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
+    int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
     /* Local variables */
-    Int i__, k;
+    int32_t i__, k;
     double ci2, ci3, ci4, cr2, cr3, cr4, ti1, ti2, ti3, ti4, tr1, tr2, 
 	    tr3, tr4;
 
@@ -7690,7 +7690,7 @@ L102:
     return 0;
 } /* passb4 */
 /*------------------------------------------------------------------------*/
-Int passb5d(Int *ido, Int *l1, double *cc, double *ch, double *wa1, double *wa2,
+int32_t passb5d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1, double *wa2,
 	   double *wa3, double *wa4)
 {
     /* Initialized data */
@@ -7701,10 +7701,10 @@ Int passb5d(Int *ido, Int *l1, double *cc, double *ch, double *wa1, double *wa2,
     double ti12 = (double).587785252292473;
 
     /* System generated locals */
-    Int cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
+    int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
     /* Local variables */
-    Int i__, k;
+    int32_t i__, k;
     double ci2, ci3, ci4, ci5, di3, di4, di5, di2, cr2, cr3, cr5, cr4, 
 	    ti2, ti3, ti4, ti5, dr3, dr4, dr5, dr2, tr2, tr3, tr4, tr5;
 
@@ -7824,22 +7824,22 @@ L102:
     return 0;
 } /* passb5 */
 /*------------------------------------------------------------------------*/
-Int cfftb1d(Int *n, double *c__, double *ch, double *wa, double *ifac)
+int32_t cfftb1d(int32_t *n, double *c__, double *ch, double *wa, double *ifac)
 {
     /* System generated locals */
-    Int i__1;
+    int32_t i__1;
 
     /* Local variables */
-    Int idot, i__;
-    Int passbd(Int *, Int *, Int *, Int *, Int *, double *, double *, double *,
+    int32_t idot, i__;
+    int32_t passbd(int32_t *, int32_t *, int32_t *, int32_t *, int32_t *, double *, double *, double *,
 	      double *, double *, double *); 
-    Int k1, l1, l2, n2;
-    Int passb2d(Int *, Int *, double *, double *, double *),
-      passb3d(Int *, Int *, double *, double *, double *, double *),
-      passb4d(Int *, Int *, double *, double *, double *, double *, double *),
-      passb5d(Int *, Int *, double *, double *, double *, double *, double *,
+    int32_t k1, l1, l2, n2;
+    int32_t passb2d(int32_t *, int32_t *, double *, double *, double *),
+      passb3d(int32_t *, int32_t *, double *, double *, double *, double *),
+      passb4d(int32_t *, int32_t *, double *, double *, double *, double *, double *),
+      passb5d(int32_t *, int32_t *, double *, double *, double *, double *, double *,
 	     double *);
-    Int na, nf, ip, iw, ix2, ix3, ix4, nac, ido, idl1;
+    int32_t na, nf, ip, iw, ix2, ix3, ix4, nac, ido, idl1;
 
     /* Parameter adjustments */
     --ifac;
@@ -7953,10 +7953,10 @@ L115:
     return 0;
 } /* cfftb1 */
 /*------------------------------------------------------------------------*/
-Int cfftbd(Int *n, double *c__, double *wsave)
+int32_t cfftbd(int32_t *n, double *c__, double *wsave)
 {
-  Int cfftb1d(Int *, double *, double *, double *, double *);
-    Int iw1, iw2;
+  int32_t cfftb1d(int32_t *, double *, double *, double *, double *);
+    int32_t iw1, iw2;
 
     /* Parameter adjustments */
     --wsave;
@@ -7972,27 +7972,27 @@ Int cfftbd(Int *n, double *c__, double *wsave)
     return 0;
 } /* cfftb */
 /*------------------------------------------------------------------------*/
-Int cffti1d(Int *n, double *wa, double *ifac)
+int32_t cffti1d(int32_t *n, double *wa, double *ifac)
 {
     /* Initialized data */
 
-    Int ntryh[4] = { 3,4,2,5 };
+    int32_t ntryh[4] = { 3,4,2,5 };
 
     /* System generated locals */
-    Int i__1, i__2, i__3;
+    int32_t i__1, i__2, i__3;
 
     /* Builtin functions */
     double cos(double), sin(double);
 
     /* Local variables */
     double argh;
-    Int idot, ntry, i__, j;
+    int32_t idot, ntry, i__, j;
     double argld;
-    Int i1, k1, l1, l2, ib;
+    int32_t i1, k1, l1, l2, ib;
     double fi;
-    Int ld, ii, nf, ip, nl, nq, nr;
+    int32_t ld, ii, nf, ip, nl, nq, nr;
     double arg;
-    Int ido, ipm;
+    int32_t ido, ipm;
     double tpi;
 
     /* Parameter adjustments */
@@ -8089,10 +8089,10 @@ L109:
     return 0;
 } /* cffti1 */
 /*------------------------------------------------------------------------*/
-Int cfftid(Int *n, double *wsave)
+int32_t cfftid(int32_t *n, double *wsave)
 {
-  Int cffti1d(Int *, double *, double *);
-  Int iw1, iw2;
+  int32_t cffti1d(int32_t *, double *, double *);
+  int32_t iw1, iw2;
 
     /* Parameter adjustments */
     --wsave;

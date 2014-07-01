@@ -24,8 +24,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <setjmp.h>
 
  /* parameters for the current image */
- Int	nx, ny;
- static	Int result_sym;
+ int32_t	nx, ny;
+ static	int32_t result_sym;
  static pointer q1;
  uint8_t	*base;
  /*------------------------------------------------------------------------- */
@@ -70,10 +70,10 @@ METHODDEF void c_ui_method_selection (compress_info_ptr cinfo)
   jselwjfif(cinfo);
 }
  /*------------------------------------------------------------------------- */
-Int lux_write_jpeg_f(Int narg, Int ps[])
+int32_t lux_write_jpeg_f(int32_t narg, int32_t ps[])
 /* a function version that returns 1 if read OK */
 {
-  Int	lux_write_jpeg(Int, Int []);
+  int32_t	lux_write_jpeg(int32_t, int32_t []);
 
   if (lux_write_jpeg(narg, ps) == LUX_OK) 
     return LUX_ONE;
@@ -81,14 +81,14 @@ Int lux_write_jpeg_f(Int narg, Int ps[])
     return LUX_ZERO;
 }
  /*------------------------------------------------------------------------- */
-Int lux_write_jpeg(Int narg, Int ps[])	/* jpeg write subroutine */
+int32_t lux_write_jpeg(int32_t narg, int32_t ps[])	/* jpeg write subroutine */
  /* 10/17/92, start with 2-D uint8_t files */
 {
  struct compress_info_struct cinfo;
  struct compress_methods_struct c_methods;
  struct external_methods_struct e_methods;
  char	*name;
- Int	iq, nd, type, jqual;
+ int32_t	iq, nd, type, jqual;
 
  iq = ps[0];
  if (!symbolIsNumericalArray(iq))
@@ -161,7 +161,7 @@ METHODDEF void
 METHODDEF void output_init (decompress_info_ptr cinfo)
 /* This routine should do any setup required */
 {
- Int	dim[2], iq;
+ int32_t	dim[2], iq;
 
  nx = cinfo->image_width;		/* width in pixels */
  ny = cinfo->image_height;		/* height in pixels */
@@ -191,7 +191,7 @@ METHODDEF void output_init (decompress_info_ptr cinfo)
 }
  /*------------------------------------------------------------------------- */
 METHODDEF void
-put_color_map (decompress_info_ptr cinfo, Int num_colors, JSAMPARRAY colormap)
+put_color_map (decompress_info_ptr cinfo, int32_t num_colors, JSAMPARRAY colormap)
 /* Write the color map */
 {
   /* You need not provide this routine if you always set cinfo->quantize_colors
@@ -202,7 +202,7 @@ put_color_map (decompress_info_ptr cinfo, Int num_colors, JSAMPARRAY colormap)
 }
  /*------------------------------------------------------------------------- */
 METHODDEF void
-put_pixel_rows (decompress_info_ptr cinfo, Int num_rows, JSAMPIMAGE pixel_data)
+put_pixel_rows (decompress_info_ptr cinfo, int32_t num_rows, JSAMPIMAGE pixel_data)
 /* Write some rows of output data */
 {
   /* This example shows how you might write full-color RGB data (3 components)
@@ -210,7 +210,7 @@ put_pixel_rows (decompress_info_ptr cinfo, Int num_rows, JSAMPIMAGE pixel_data)
    */
  register JSAMPROW ptr0;
  register long col;
- register Int row;
+ register int32_t row;
   
  /* printf("put_pixel_rows: num_rows, cinfo->image_width = %d, %d\n",
  	num_rows, cinfo->image_width); */
@@ -244,10 +244,10 @@ METHODDEF void d_ui_method_selection (decompress_info_ptr cinfo)
   cinfo->methods->output_term = output_term;
  }
  /*------------------------------------------------------------------------- */
-Int lux_read_jpeg_f(Int narg, Int ps[])
+int32_t lux_read_jpeg_f(int32_t narg, int32_t ps[])
 /* a function version that returns 1 if read OK */
 {
-  Int	lux_read_jpeg(Int, Int []);
+  int32_t	lux_read_jpeg(int32_t, int32_t []);
 
   if (lux_read_jpeg(narg, ps) == LUX_OK)
     return LUX_ONE;
@@ -255,7 +255,7 @@ Int lux_read_jpeg_f(Int narg, Int ps[])
     return LUX_ZERO;
 }
  /*------------------------------------------------------------------------- */
-Int lux_read_jpeg(Int narg, Int ps[])	/* jpeg read subroutine */
+int32_t lux_read_jpeg(int32_t narg, int32_t ps[])	/* jpeg read subroutine */
  /* 10/17/92, start with 2-D uint8_t files */
  {
  char	*name;

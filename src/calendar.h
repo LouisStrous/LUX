@@ -92,7 +92,7 @@ double CJD_now(void);
 
     \return the current Chronological Julian Day Number
 */
-Int CJDN_now(void);
+int32_t CJDN_now(void);
 
 /* GREGORIAN CALENDAR */
 
@@ -105,7 +105,7 @@ Int CJDN_now(void);
     \param[out] month pointer to the corresponding month.  Must not be NULL!
     \param[out] day pointer to the corresponding day.  Must not be NULL!
  */
-void   CJDNtoGregorian(Int CJDN, Int *year, Int *month, Int *day);
+void   CJDNtoGregorian(int32_t CJDN, int32_t *year, int32_t *month, int32_t *day);
 
 /** Translates a Chronological Julian Day Number to a Gregorian
     calendar date.
@@ -115,7 +115,7 @@ void   CJDNtoGregorian(Int CJDN, Int *year, Int *month, Int *day);
     \param[out] date a pointer to the corresponding calendar date.
     Must have at least 3 elements (year, month, date).
  */
-void   CJDNtoGregorianA(Int const *CJDN, Int *date);
+void   CJDNtoGregorianA(int32_t const *CJDN, int32_t *date);
 
 /** Translates a Chronological Julian Day Number to Gregorian
     calendar date text, consisting of the day number, the full month
@@ -129,7 +129,7 @@ void   CJDNtoGregorianA(Int const *CJDN, Int *date);
     allocated by the routine; free after use.
 
   */
-char * CJDNtoGregorianS(Int CJDN);
+char * CJDNtoGregorianS(int32_t CJDN);
 
 /** Translates a Chronological Julian Day Number to Gregorian
     calendar date text, consisting of the day number, the full month
@@ -144,7 +144,7 @@ char * CJDNtoGregorianS(Int CJDN);
     allocated by the routine; free after use.
 
   */
-void   CJDNtoGregorianSA(Int const *CJDN, char **date);
+void   CJDNtoGregorianSA(int32_t const *CJDN, char **date);
 
 /** Translates a Chronological Julian Day to a Gregorian
     date.
@@ -154,7 +154,7 @@ void   CJDNtoGregorianSA(Int const *CJDN, char **date);
     \param[out] month pointer to the corresponding month.  Must not be NULL!
     \param[out] day pointer to the corresponding day.  Must not be NULL!
  */
-void   CJDtoGregorian(double CJD, Int *year, Int *month, double *day);
+void   CJDtoGregorian(double CJD, int32_t *year, int32_t *month, double *day);
 
 /** Translates a Chronological Julian Day to a Gregorian calendar date.
 
@@ -200,7 +200,7 @@ void   CJDtoGregorianSA(double const *CJD, char **date);
     \param[in] day the day
     \return the corresponding Chronological Julian Day Number
  */
-Int    GregoriantoCJDN(Int year, Int month, Int day);
+int32_t    GregoriantoCJDN(int32_t year, int32_t month, int32_t day);
 
 /** Translates a Gregorian calendar date to a Chronological Julian Day
     Number.
@@ -211,7 +211,7 @@ Int    GregoriantoCJDN(Int year, Int month, Int day);
     \param[out] CJDN a pointer to the corresponding Chronological
     Julian Day Number.  Must not be NULL.
  */
-void   GregoriantoCJDNA(Int const *date, Int *CJDN);
+void   GregoriantoCJDNA(int32_t const *date, int32_t *CJDN);
 
 /** Translates a Gregorian calendar date in text form to a
     Chronological Julian Day Number.
@@ -225,7 +225,7 @@ void   GregoriantoCJDNA(Int const *date, Int *CJDN);
     \return the corresponding Chronological Julian Day Number, or 0 if
     no legal date was recognized in the input.
  */
-Int    GregorianStoCJDN(char const *date);
+int32_t    GregorianStoCJDN(char const *date);
 
 /** Translates a Gregorian calendar date in text form to a
     Chronological Julian Day Number.
@@ -239,7 +239,7 @@ Int    GregorianStoCJDN(char const *date);
     \return the corresponding Chronological Julian Day Number, or 0 if
     no legal date was recognized in the input.
  */
-void   GregorianStoCJDNA(char * const *date, Int *CJDN);
+void   GregorianStoCJDNA(char * const *date, int32_t *CJDN);
 
 /** Translates a Gregorian calendar date to a Chronological Julian Day.
 
@@ -248,7 +248,7 @@ void   GregorianStoCJDNA(char * const *date, Int *CJDN);
     \param[in] day the day
     \return the corresponding Chronological Julian Day
  */
-double GregoriantoCJD(Int year, Int month, double day);
+double GregoriantoCJD(int32_t year, int32_t month, double day);
 
 /** Translates a Gregorian calendar date to a Chronological Julian Day.
 
@@ -299,7 +299,7 @@ void   GregorianStoCJDA(char * const *date, double *CJD);
     \param[out] month pointer to the corresponding month.  Must not be NULL!
     \param[out] day pointer to the corresponding day.  Must not be NULL!
  */
-void   CJDNtoJulian(Int CJDN, Int *year, Int *month, Int *day);
+void   CJDNtoJulian(int32_t CJDN, int32_t *year, int32_t *month, int32_t *day);
 
 /** Translates a Chronological Julian Day Number to a Julian
     calendar date.
@@ -309,7 +309,7 @@ void   CJDNtoJulian(Int CJDN, Int *year, Int *month, Int *day);
     \param[out] date a pointer to the corresponding calendar date.
     Must have at least 3 elements (year, month, date).
  */
-void   CJDNtoJulianA(Int const *CJDN, Int *date);
+void   CJDNtoJulianA(int32_t const *CJDN, int32_t *date);
 
 /** Translates a Chronological Julian Day Number to Julian
     calendar date text, consisting of the day number, the full month
@@ -323,7 +323,7 @@ void   CJDNtoJulianA(Int const *CJDN, Int *date);
     allocated by the routine; free after use.
 
   */
-char * CJDNtoJulianS(Int CJDN);
+char * CJDNtoJulianS(int32_t CJDN);
 
 /** Translates a Chronological Julian Day Number to Julian
     calendar date text, consisting of the day number, the full month
@@ -338,7 +338,7 @@ char * CJDNtoJulianS(Int CJDN);
     allocated by the routine; free after use.
 
   */
-void   CJDNtoJulianSA(Int const *CJDN, char **date);
+void   CJDNtoJulianSA(int32_t const *CJDN, char **date);
 
 /** Translates a Chronological Julian Day to a Julian
     date.
@@ -348,7 +348,7 @@ void   CJDNtoJulianSA(Int const *CJDN, char **date);
     \param[out] month pointer to the corresponding month.  Must not be NULL!
     \param[out] day pointer to the corresponding day.  Must not be NULL!
  */
-void   CJDtoJulian(double CJD, Int *year, Int *month, double *day);
+void   CJDtoJulian(double CJD, int32_t *year, int32_t *month, double *day);
 
 /** Translates a Chronological Julian Day to a Julian calendar date.
 
@@ -394,7 +394,7 @@ void   CJDtoJulianSA(double const *CJD, char **date);
     \param[in] day the day
     \return the corresponding Chronological Julian Day Number
  */
-Int    JuliantoCJDN(Int year, Int month, Int day);
+int32_t    JuliantoCJDN(int32_t year, int32_t month, int32_t day);
 
 /** Translates a Julian calendar date to a Chronological Julian Day
     Number.
@@ -405,7 +405,7 @@ Int    JuliantoCJDN(Int year, Int month, Int day);
     \param[out] CJDN a pointer to the corresponding Chronological
     Julian Day Number.  Must not be NULL.
  */
-void   JuliantoCJDNA(Int const *date, Int *CJDN);
+void   JuliantoCJDNA(int32_t const *date, int32_t *CJDN);
 
 /** Translates a Julian calendar date in text form to a
     Chronological Julian Day Number.
@@ -419,7 +419,7 @@ void   JuliantoCJDNA(Int const *date, Int *CJDN);
     \return the corresponding Chronological Julian Day Number, or 0 if
     no legal date was recognized in the input.
  */
-Int    JulianStoCJDN(char const *date);
+int32_t    JulianStoCJDN(char const *date);
 
 /** Translates a Julian calendar date in text form to a
     Chronological Julian Day Number.
@@ -433,7 +433,7 @@ Int    JulianStoCJDN(char const *date);
     \return the corresponding Chronological Julian Day Number, or 0 if
     no legal date was recognized in the input.
  */
-void   JulianStoCJDNA(char * const *date, Int *CJDN);
+void   JulianStoCJDNA(char * const *date, int32_t *CJDN);
 
 /** Translates a Julian calendar date to a Chronological Julian Day.
 
@@ -442,7 +442,7 @@ void   JulianStoCJDNA(char * const *date, Int *CJDN);
     \param[in] day the day
     \return the corresponding Chronological Julian Day
  */
-double JuliantoCJD(Int year, Int month, double day);
+double JuliantoCJD(int32_t year, int32_t month, double day);
 
 /** Translates a Julian calendar date to a Chronological Julian Day.
 
@@ -493,7 +493,7 @@ void   JulianStoCJDA(char * const *date, double *CJD);
     \param[out] month pointer to the corresponding month.  Must not be NULL!
     \param[out] day pointer to the corresponding day.  Must not be NULL!
  */
-void   CJDNtoCommon(Int CJDN, Int *year, Int *month, Int *day);
+void   CJDNtoCommon(int32_t CJDN, int32_t *year, int32_t *month, int32_t *day);
 
 /** Translates a Chronological Julian Day Number to a Common
     calendar date.
@@ -503,7 +503,7 @@ void   CJDNtoCommon(Int CJDN, Int *year, Int *month, Int *day);
     \param[out] date a pointer to the corresponding calendar date.
     Must have at least 3 elements (year, month, date).
  */
-void   CJDNtoCommonA(Int const *CJDN, Int *date);
+void   CJDNtoCommonA(int32_t const *CJDN, int32_t *date);
 
 /** Translates a Chronological Julian Day Number to Common
     calendar date text, consisting of the day number, the full month
@@ -517,7 +517,7 @@ void   CJDNtoCommonA(Int const *CJDN, Int *date);
     allocated by the routine; free after use.
 
   */
-char * CJDNtoCommonS(Int CJDN);
+char * CJDNtoCommonS(int32_t CJDN);
 
 /** Translates a Chronological Julian Day Number to Common
     calendar date text, consisting of the day number, the full month
@@ -532,7 +532,7 @@ char * CJDNtoCommonS(Int CJDN);
     allocated by the routine; free after use.
 
   */
-void   CJDNtoCommonSA(Int const *CJDN, char **date);
+void   CJDNtoCommonSA(int32_t const *CJDN, char **date);
 
 /** Translates a Chronological Julian Day to a Common
     date.
@@ -542,7 +542,7 @@ void   CJDNtoCommonSA(Int const *CJDN, char **date);
     \param[out] month pointer to the corresponding month.  Must not be NULL!
     \param[out] day pointer to the corresponding day.  Must not be NULL!
  */
-void   CJDtoCommon(double CJD, Int *year, Int *month, double *day);
+void   CJDtoCommon(double CJD, int32_t *year, int32_t *month, double *day);
 
 /** Translates a Chronological Julian Day to a Common calendar date.
 
@@ -588,7 +588,7 @@ void   CJDtoCommonSA(double const *CJD, char **date);
     \param[in] day the day
     \return the corresponding Chronological Julian Day Number
  */
-Int    CommontoCJDN(Int year, Int month, Int day);
+int32_t    CommontoCJDN(int32_t year, int32_t month, int32_t day);
 
 /** Translates a Common calendar date to a Chronological Julian Day
     Number.
@@ -599,7 +599,7 @@ Int    CommontoCJDN(Int year, Int month, Int day);
     \param[out] CJDN a pointer to the corresponding Chronological
     Julian Day Number.  Must not be NULL.
  */
-void   CommontoCJDNA(Int const *date, Int *CJDN);
+void   CommontoCJDNA(int32_t const *date, int32_t *CJDN);
 
 /** Translates a Common calendar date in text form to a
     Chronological Julian Day Number.
@@ -613,7 +613,7 @@ void   CommontoCJDNA(Int const *date, Int *CJDN);
     \return the corresponding Chronological Julian Day Number, or 0 if
     no legal date was recognized in the input.
  */
-Int    CommonStoCJDN(char const *date);
+int32_t    CommonStoCJDN(char const *date);
 
 /** Translates a Common calendar date in text form to a
     Chronological Julian Day Number.
@@ -627,7 +627,7 @@ Int    CommonStoCJDN(char const *date);
     \return the corresponding Chronological Julian Day Number, or 0 if
     no legal date was recognized in the input.
  */
-void   CommonStoCJDNA(char * const *date, Int *CJDN);
+void   CommonStoCJDNA(char * const *date, int32_t *CJDN);
 
 /** Translates a Common calendar date to a Chronological Julian Day.
 
@@ -636,7 +636,7 @@ void   CommonStoCJDNA(char * const *date, Int *CJDN);
     \param[in] day the day
     \return the corresponding Chronological Julian Day
  */
-double CommontoCJD(Int year, Int month, double day);
+double CommontoCJD(int32_t year, int32_t month, double day);
 
 /** Translates a Common calendar date to a Chronological Julian Day.
 
@@ -687,7 +687,7 @@ void   CommonStoCJDA(char * const *date, double *CJD);
     \param[out] month pointer to the corresponding month.  Must not be NULL!
     \param[out] day pointer to the corresponding day.  Must not be NULL!
  */
-void   CJDNtoHebrew(Int CJDN, Int *year, Int *month, Int *day);
+void   CJDNtoHebrew(int32_t CJDN, int32_t *year, int32_t *month, int32_t *day);
 
 /** Translates a Chronological Julian Day Number to a Hebrew
     calendar date.
@@ -697,7 +697,7 @@ void   CJDNtoHebrew(Int CJDN, Int *year, Int *month, Int *day);
     \param[out] date a pointer to the corresponding calendar date.
     Must have at least 3 elements (year, month, date).
  */
-void   CJDNtoHebrewA(Int const *CJDN, Int *date);
+void   CJDNtoHebrewA(int32_t const *CJDN, int32_t *date);
 
 /** Translates a Chronological Julian Day Number to Hebrew
     calendar date text, consisting of the day number, the full month
@@ -711,7 +711,7 @@ void   CJDNtoHebrewA(Int const *CJDN, Int *date);
     allocated by the routine; free after use.
 
   */
-char * CJDNtoHebrewS(Int CJDN);
+char * CJDNtoHebrewS(int32_t CJDN);
 
 /** Translates a Chronological Julian Day Number to Hebrew
     calendar date text, consisting of the day number, the full month
@@ -726,7 +726,7 @@ char * CJDNtoHebrewS(Int CJDN);
     allocated by the routine; free after use.
 
   */
-void   CJDNtoHebrewSA(Int const *CJDN, char **date);
+void   CJDNtoHebrewSA(int32_t const *CJDN, char **date);
 
 /** Translates a Chronological Julian Day to a Hebrew
     date.
@@ -736,7 +736,7 @@ void   CJDNtoHebrewSA(Int const *CJDN, char **date);
     \param[out] month pointer to the corresponding month.  Must not be NULL!
     \param[out] day pointer to the corresponding day.  Must not be NULL!
  */
-void   CJDtoHebrew(double CJD, Int *year, Int *month, double *day);
+void   CJDtoHebrew(double CJD, int32_t *year, int32_t *month, double *day);
 
 /** Translates a Chronological Julian Day to a Hebrew calendar date.
 
@@ -782,7 +782,7 @@ void   CJDtoHebrewSA(double const *CJD, char **date);
     \param[in] day the day
     \return the corresponding Chronological Julian Day Number
  */
-Int    HebrewtoCJDN(Int year, Int month, Int day);
+int32_t    HebrewtoCJDN(int32_t year, int32_t month, int32_t day);
 
 /** Translates a Hebrew calendar date to a Chronological Julian Day
     Number.
@@ -793,7 +793,7 @@ Int    HebrewtoCJDN(Int year, Int month, Int day);
     \param[out] CJDN a pointer to the corresponding Chronological
     Julian Day Number.  Must not be NULL.
  */
-void   HebrewtoCJDNA(Int const *date, Int *CJDN);
+void   HebrewtoCJDNA(int32_t const *date, int32_t *CJDN);
 
 /** Translates a Hebrew calendar date in text form to a
     Chronological Julian Day Number.
@@ -807,7 +807,7 @@ void   HebrewtoCJDNA(Int const *date, Int *CJDN);
     \return the corresponding Chronological Julian Day Number, or 0 if
     no legal date was recognized in the input.
  */
-Int    HebrewStoCJDN(char const *date);
+int32_t    HebrewStoCJDN(char const *date);
 
 /** Translates a Hebrew calendar date in text form to a
     Chronological Julian Day Number.
@@ -821,7 +821,7 @@ Int    HebrewStoCJDN(char const *date);
     \return the corresponding Chronological Julian Day Number, or 0 if
     no legal date was recognized in the input.
  */
-void   HebrewStoCJDNA(char * const *date, Int *CJDN);
+void   HebrewStoCJDNA(char * const *date, int32_t *CJDN);
 
 /** Translates a Hebrew calendar date to a Chronological Julian Day.
 
@@ -830,7 +830,7 @@ void   HebrewStoCJDNA(char * const *date, Int *CJDN);
     \param[in] day the day
     \return the corresponding Chronological Julian Day
  */
-double HebrewtoCJD(Int year, Int month, double day);
+double HebrewtoCJD(int32_t year, int32_t month, double day);
 
 /** Translates a Hebrew calendar date to a Chronological Julian Day.
 
@@ -881,7 +881,7 @@ void   HebrewStoCJDA(char * const *date, double *CJD);
     \param[out] month pointer to the corresponding month.  Must not be NULL!
     \param[out] day pointer to the corresponding day.  Must not be NULL!
  */
-void   CJDNtoIslamic(Int CJDN, Int *year, Int *month, Int *day);
+void   CJDNtoIslamic(int32_t CJDN, int32_t *year, int32_t *month, int32_t *day);
 
 /** Translates a Chronological Julian Day Number to a Islamic
     calendar date.
@@ -891,7 +891,7 @@ void   CJDNtoIslamic(Int CJDN, Int *year, Int *month, Int *day);
     \param[out] date a pointer to the corresponding calendar date.
     Must have at least 3 elements (year, month, date).
  */
-void   CJDNtoIslamicA(Int const *CJDN, Int *date);
+void   CJDNtoIslamicA(int32_t const *CJDN, int32_t *date);
 
 /** Translates a Chronological Julian Day Number to Islamic
     calendar date text, consisting of the day number, the full month
@@ -905,7 +905,7 @@ void   CJDNtoIslamicA(Int const *CJDN, Int *date);
     allocated by the routine; free after use.
 
   */
-char * CJDNtoIslamicS(Int CJDN);
+char * CJDNtoIslamicS(int32_t CJDN);
 
 /** Translates a Chronological Julian Day Number to Islamic
     calendar date text, consisting of the day number, the full month
@@ -920,7 +920,7 @@ char * CJDNtoIslamicS(Int CJDN);
     allocated by the routine; free after use.
 
   */
-void   CJDNtoIslamicSA(Int const *CJDN, char **date);
+void   CJDNtoIslamicSA(int32_t const *CJDN, char **date);
 
 /** Translates a Chronological Julian Day to a Islamic
     date.
@@ -930,7 +930,7 @@ void   CJDNtoIslamicSA(Int const *CJDN, char **date);
     \param[out] month pointer to the corresponding month.  Must not be NULL!
     \param[out] day pointer to the corresponding day.  Must not be NULL!
  */
-void   CJDtoIslamic(double CJD, Int *year, Int *month, double *day);
+void   CJDtoIslamic(double CJD, int32_t *year, int32_t *month, double *day);
 
 /** Translates a Chronological Julian Day to a Islamic calendar date.
 
@@ -976,7 +976,7 @@ void   CJDtoIslamicSA(double const *CJD, char **date);
     \param[in] day the day
     \return the corresponding Chronological Julian Day Number
  */
-Int    IslamictoCJDN(Int year, Int month, Int day);
+int32_t    IslamictoCJDN(int32_t year, int32_t month, int32_t day);
 
 /** Translates a Islamic calendar date to a Chronological Julian Day
     Number.
@@ -987,7 +987,7 @@ Int    IslamictoCJDN(Int year, Int month, Int day);
     \param[out] CJDN a pointer to the corresponding Chronological
     Julian Day Number.  Must not be NULL.
  */
-void   IslamictoCJDNA(Int const *date, Int *CJDN);
+void   IslamictoCJDNA(int32_t const *date, int32_t *CJDN);
 
 /** Translates a Islamic calendar date in text form to a
     Chronological Julian Day Number.
@@ -1001,7 +1001,7 @@ void   IslamictoCJDNA(Int const *date, Int *CJDN);
     \return the corresponding Chronological Julian Day Number, or 0 if
     no legal date was recognized in the input.
  */
-Int    IslamicStoCJDN(char const *date);
+int32_t    IslamicStoCJDN(char const *date);
 
 /** Translates a Islamic calendar date in text form to a
     Chronological Julian Day Number.
@@ -1015,7 +1015,7 @@ Int    IslamicStoCJDN(char const *date);
     \return the corresponding Chronological Julian Day Number, or 0 if
     no legal date was recognized in the input.
  */
-void   IslamicStoCJDNA(char * const *date, Int *CJDN);
+void   IslamicStoCJDNA(char * const *date, int32_t *CJDN);
 
 /** Translates a Islamic calendar date to a Chronological Julian Day.
 
@@ -1024,7 +1024,7 @@ void   IslamicStoCJDNA(char * const *date, Int *CJDN);
     \param[in] day the day
     \return the corresponding Chronological Julian Day
  */
-double IslamictoCJD(Int year, Int month, double day);
+double IslamictoCJD(int32_t year, int32_t month, double day);
 
 /** Translates a Islamic calendar date to a Chronological Julian Day.
 
@@ -1075,7 +1075,7 @@ void   IslamicStoCJDA(char * const *date, double *CJD);
     \param[out] month pointer to the corresponding month.  Must not be NULL!
     \param[out] day pointer to the corresponding day.  Must not be NULL!
  */
-void   CJDNtoEgyptian(Int CJDN, Int *year, Int *month, Int *day);
+void   CJDNtoEgyptian(int32_t CJDN, int32_t *year, int32_t *month, int32_t *day);
 
 /** Translates a Chronological Julian Day Number to a Egyptian
     calendar date.
@@ -1085,7 +1085,7 @@ void   CJDNtoEgyptian(Int CJDN, Int *year, Int *month, Int *day);
     \param[out] date a pointer to the corresponding calendar date.
     Must have at least 3 elements (year, month, date).
  */
-void   CJDNtoEgyptianA(Int const *CJDN, Int *date);
+void   CJDNtoEgyptianA(int32_t const *CJDN, int32_t *date);
 
 /** Translates a Chronological Julian Day Number to Egyptian
     calendar date text, consisting of the day number, the full month
@@ -1099,7 +1099,7 @@ void   CJDNtoEgyptianA(Int const *CJDN, Int *date);
     allocated by the routine; free after use.
 
   */
-char * CJDNtoEgyptianS(Int CJDN);
+char * CJDNtoEgyptianS(int32_t CJDN);
 
 /** Translates a Chronological Julian Day Number to Egyptian
     calendar date text, consisting of the day number, the full month
@@ -1114,7 +1114,7 @@ char * CJDNtoEgyptianS(Int CJDN);
     allocated by the routine; free after use.
 
   */
-void   CJDNtoEgyptianSA(Int const *CJDN, char **date);
+void   CJDNtoEgyptianSA(int32_t const *CJDN, char **date);
 
 /** Translates a Chronological Julian Day to a Egyptian
     date.
@@ -1124,7 +1124,7 @@ void   CJDNtoEgyptianSA(Int const *CJDN, char **date);
     \param[out] month pointer to the corresponding month.  Must not be NULL!
     \param[out] day pointer to the corresponding day.  Must not be NULL!
  */
-void   CJDtoEgyptian(double CJD, Int *year, Int *month, double *day);
+void   CJDtoEgyptian(double CJD, int32_t *year, int32_t *month, double *day);
 
 /** Translates a Chronological Julian Day to a Egyptian calendar date.
 
@@ -1170,7 +1170,7 @@ void   CJDtoEgyptianSA(double const *CJD, char **date);
     \param[in] day the day
     \return the corresponding Chronological Julian Day Number
  */
-Int    EgyptiantoCJDN(Int year, Int month, Int day);
+int32_t    EgyptiantoCJDN(int32_t year, int32_t month, int32_t day);
 
 /** Translates a Egyptian calendar date to a Chronological Julian Day
     Number.
@@ -1181,7 +1181,7 @@ Int    EgyptiantoCJDN(Int year, Int month, Int day);
     \param[out] CJDN a pointer to the corresponding Chronological
     Julian Day Number.  Must not be NULL.
  */
-void   EgyptiantoCJDNA(Int const *date, Int *CJDN);
+void   EgyptiantoCJDNA(int32_t const *date, int32_t *CJDN);
 
 /** Translates a Egyptian calendar date in text form to a
     Chronological Julian Day Number.
@@ -1195,7 +1195,7 @@ void   EgyptiantoCJDNA(Int const *date, Int *CJDN);
     \return the corresponding Chronological Julian Day Number, or 0 if
     no legal date was recognized in the input.
  */
-Int    EgyptianStoCJDN(char const *date);
+int32_t    EgyptianStoCJDN(char const *date);
 
 /** Translates a Egyptian calendar date in text form to a
     Chronological Julian Day Number.
@@ -1209,7 +1209,7 @@ Int    EgyptianStoCJDN(char const *date);
     \return the corresponding Chronological Julian Day Number, or 0 if
     no legal date was recognized in the input.
  */
-void   EgyptianStoCJDNA(char * const *date, Int *CJDN);
+void   EgyptianStoCJDNA(char * const *date, int32_t *CJDN);
 
 /** Translates a Egyptian calendar date to a Chronological Julian Day.
 
@@ -1218,7 +1218,7 @@ void   EgyptianStoCJDNA(char * const *date, Int *CJDN);
     \param[in] day the day
     \return the corresponding Chronological Julian Day
  */
-double EgyptiantoCJD(Int year, Int month, double day);
+double EgyptiantoCJD(int32_t year, int32_t month, double day);
 
 /** Translates a Egyptian calendar date to a Chronological Julian Day.
 
@@ -1308,7 +1308,7 @@ void CJDtoJDA(double const *CJD, double *JD);
     \param[out] out a pointer to the target.  Must not be NULL!
 
  */
-void CJDNtoCJDNA(Int const *in, Int *out);
+void CJDNtoCJDNA(int32_t const *in, int32_t *out);
 
 /** Copies a Chronological Julian Day Number.
 
@@ -1384,9 +1384,9 @@ void LunartoCJDA(double const *lunar, double *CJD);
     \param[out] year_venteina a pointer to the venteina day count of
     the first day of the haab year.  Must not be NULL!
  */
-void CJDNtoMayan(Int CJDN, Int *trecena, Int *venteina,
-                 Int *haab_day, Int *haab_month,
-                 Int *year_trecena, Int *year_venteina);
+void CJDNtoMayan(int32_t CJDN, int32_t *trecena, int32_t *venteina,
+                 int32_t *haab_day, int32_t *haab_month,
+                 int32_t *year_trecena, int32_t *year_venteina);
 
 /** Translates a Chronological Julian Day Number into a Mayan
     tzolkin/haab calendar date (from Tikal).
@@ -1399,7 +1399,7 @@ void CJDNtoMayan(Int CJDN, Int *trecena, Int *venteina,
     trecena of first day of haab year, venteina of first day of haab
     year)!
  */
-void CJDNtoMayanA(Int const *CJDN, Int *date);
+void CJDNtoMayanA(int32_t const *CJDN, int32_t *date);
 
 /** Translates a Chronological Julian Day Number to Mayan calendar
     date text, consisting of the trecena number, the full venteina
@@ -1415,7 +1415,7 @@ void CJDNtoMayanA(Int const *CJDN, Int *date);
     corresponding calendar date text.  The character array is
     allocated by the routine; free after use.
   */
-char *CJDNtoMayanS(Int CJDN);
+char *CJDNtoMayanS(int32_t CJDN);
 
 /** Translates a Chronological Julian Day Number to Mayan calendar
     date text, consisting of the trecena number, the full venteina
@@ -1433,7 +1433,7 @@ char *CJDNtoMayanS(Int CJDN);
     allocated by the routine; free after use.
 
   */
-void CJDNtoMayanSA(Int const *CJDN, char **date);
+void CJDNtoMayanSA(int32_t const *CJDN, char **date);
 
 /** Translates a Chronological Julian Day into a Mayan tzolkin/haab
     calendar date (from Tikal).
@@ -1458,9 +1458,9 @@ void CJDNtoMayanSA(Int const *CJDN, char **date);
     \param[out] year_venteina a pointer to the venteina day count of
     the first day of the haab year.  Must not be NULL!
  */
-void CJDtoMayan(double CJD, Int *trecena, Int *venteina,
-                double *haab_day, Int *haab_month,
-                Int *year_trecena, Int *year_venteina);
+void CJDtoMayan(double CJD, int32_t *trecena, int32_t *venteina,
+                double *haab_day, int32_t *haab_month,
+                int32_t *year_trecena, int32_t *year_venteina);
 
 /** Translates a Chronological Julian Day into a Mayan tzolkin/haab
     calendar date (from Tikal).
@@ -1538,8 +1538,8 @@ void CJDtoMayanSA(double const *CJD, char **date);
     \p CJDN_upper that has the specified Mayan calendar date, or 0 if
     an impossible Mayan calendar date is specified.
  */
-Int MayantoCJDN(Int trecena, Int venteina, Int haab_day, Int haab_month,
-                Int year_trecena, Int year_venteina, Int CJDN_upper);
+int32_t MayantoCJDN(int32_t trecena, int32_t venteina, int32_t haab_day, int32_t haab_month,
+                int32_t year_trecena, int32_t year_venteina, int32_t CJDN_upper);
 
 /** Translates a Mayan calendar date to a corresponding Chronological
     Julian Day Number on or before a specified Chronological Julian
@@ -1565,7 +1565,7 @@ Int MayantoCJDN(Int trecena, Int venteina, Int haab_day, Int haab_month,
     specified Mayan calendar date components, or 0 if an impossible
     Mayan calendar date is specified.
  */
-void MayantoCJDNA(Int const *date, Int *CJDN);
+void MayantoCJDNA(int32_t const *date, int32_t *CJDN);
 
 /** Translates a Mayan tzolkin/haab calendar date in text form to a
     Chronological Julian Day Number.
@@ -1591,7 +1591,7 @@ void MayantoCJDNA(Int const *date, Int *CJDN);
     \return the corresponding Chronological Julian Day Number, or 0 if
     no legal date was recognized in the input.
  */
-Int MayanStoCJDN(char const *date);
+int32_t MayanStoCJDN(char const *date);
 
 /** Translates a Mayan tzolkin/haab calendar date in text form to a
     Chronological Julian Day Number.
@@ -1618,7 +1618,7 @@ Int MayanStoCJDN(char const *date);
     Julian Day Number.  It is set to 0 if no legal date was recognized
     in the input.
  */
-void MayanStoCJDNA(char * const *date, Int *CJDN);
+void MayanStoCJDNA(char * const *date, int32_t *CJDN);
 
 /** Translates a Mayan calendar date to a corresponding Chronological
     Julian Day on or before a specified Chronological Julian Day
@@ -1651,8 +1651,8 @@ void MayanStoCJDNA(char * const *date, Int *CJDN);
     CJDN_upper that has the specified Mayan calendar date, or 0 if an
     impossible Mayan calendar date is specified.
  */
-double MayantoCJD(Int trecena, Int venteina, double haab_day, Int haab_month,
-                  Int year_trecena, Int year_venteina, Int CJDN_upper);
+double MayantoCJD(int32_t trecena, int32_t venteina, double haab_day, int32_t haab_month,
+                  int32_t year_trecena, int32_t year_venteina, int32_t CJDN_upper);
 
 /** Translates a Mayan calendar date to a corresponding Chronological
     Julian Day on or before a specified Chronological Julian Day
@@ -1756,8 +1756,8 @@ void MayanStoCJDA(char * const *date, double *CJD);
     \param[out] kin the corresponding number of kin, in the range from
     0 through 19.
  */
-void CJDNtoLongCount(Int CJDN, Int *baktun, Int *katun, Int *tun,
-                     Int *uinal, Int *kin);
+void CJDNtoLongCount(int32_t CJDN, int32_t *baktun, int32_t *katun, int32_t *tun,
+                     int32_t *uinal, int32_t *kin);
 
 /** Translates a Chronological Julian Day Number to a Maya Long Count.
 
@@ -1769,7 +1769,7 @@ void CJDNtoLongCount(Int CJDN, Int *baktun, Int *katun, Int *tun,
     The last 4 elements are restricted to ranges from 0 through,
     respectively, 19 [katun], 19 [tun], 17 [uinal], and 19 [kin].
  */
-void CJDNtoLongCountA(Int const *CJDN, Int *date);
+void CJDNtoLongCountA(int32_t const *CJDN, int32_t *date);
 
 /** Translates a Chronological Julian Day Number to Mayan Long Count
     calendar date text, consisting of the five numbers in decreasing
@@ -1781,7 +1781,7 @@ void CJDNtoLongCountA(Int const *CJDN, Int *date);
     corresponding calendar date text.  The character array is
     allocated by the routine; free after use.
   */
-char *CJDNtoLongCountS(Int CJDN);
+char *CJDNtoLongCountS(int32_t CJDN);
 
 /** Translates a Chronological Julian Day Number to Mayan Long Count
     calendar date text, consisting of the five numbers in decreasing
@@ -1794,7 +1794,7 @@ char *CJDNtoLongCountS(Int CJDN);
     corresponding calendar date text.  The character array is
     allocated by the routine; free after use.
   */
-void CJDNtoLongCountSA(Int const *CJDN, char **date);
+void CJDNtoLongCountSA(int32_t const *CJDN, char **date);
 
 /** Translates a Chronological Julian Day to a Maya Long Count.
 
@@ -1815,7 +1815,7 @@ void CJDNtoLongCountSA(Int const *CJDN, char **date);
     \param[out] kin the corresponding number of kin, in the range from
     0 through 19.
  */
-void CJDtoLongCount(double CJD, Int *baktun, Int *katun, Int *tun, Int *uinal,
+void CJDtoLongCount(double CJD, int32_t *baktun, int32_t *katun, int32_t *tun, int32_t *uinal,
                     double *kin);
 
 /** Translates a Chronological Julian Day to a Maya Long Count.
@@ -1871,7 +1871,7 @@ void CJDtoLongCountSA(double const *CJD, char **date);
 
     \return the corresponding Chronological Julian Day Number.
  */
-Int LongCounttoCJDN(Int baktun, Int katun, Int tun, Int uinal, Int kin);
+int32_t LongCounttoCJDN(int32_t baktun, int32_t katun, int32_t tun, int32_t uinal, int32_t kin);
 
 /** Translates a Maya Long Count to a Chronological Julian Day Number.
 
@@ -1882,7 +1882,7 @@ Int LongCounttoCJDN(Int baktun, Int katun, Int tun, Int uinal, Int kin);
     \param[out] CJDN a pointer to the corresponding Chronological
     Julian Day Number.  Must not be NULL!
  */
-void LongCounttoCJDNA(Int const *date, Int *CJDN);
+void LongCounttoCJDNA(int32_t const *date, int32_t *CJDN);
 
 /** Translates a Maya Long Count text to a Chronological Julian Day
     Number.
@@ -1894,7 +1894,7 @@ void LongCounttoCJDNA(Int const *date, Int *CJDN);
     \return the corresponding Chronological Julian Day Number, or 0 if
     no legal Long Count was recognized.
   */
-Int LongCountStoCJDN(char const *date);
+int32_t LongCountStoCJDN(char const *date);
 
 /** Translates a Maya Long Count text to a Chronological Julian Day
     Number.
@@ -1907,7 +1907,7 @@ Int LongCountStoCJDN(char const *date);
     Julian Day Number.  If no legal Long Count was recognized, then 0
     is returned.
   */
-void LongCountStoCJDNA(char * const *date, Int *CJDN);
+void LongCountStoCJDNA(char * const *date, int32_t *CJDN);
 
 /** Translates a Maya Long Count to a Chronological Julian Day.
 
@@ -1923,7 +1923,7 @@ void LongCountStoCJDNA(char * const *date, Int *CJDN);
 
     \return the corresponding Chronological Julian Day.
  */
-double LongCounttoCJD(Int baktun, Int katun, Int tun, Int uinal, double kin);
+double LongCounttoCJD(int32_t baktun, int32_t katun, int32_t tun, int32_t uinal, double kin);
 
 /** Translates a Maya Long Count to a Chronological Julian Day.
 

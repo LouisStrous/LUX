@@ -24,18 +24,19 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
-#include <stdio.h>
+
 #include <stdarg.h>
-#include "types.h"
+#include <stdint.h>
+#include <stdio.h>
 
 extern char	recording;
 extern FILE	*recordFile;
 
 /*----------------------------------------------------------------------*/
-Int Printf(const char *format, ...)
+int32_t Printf(const char *format, ...)
 {
   va_list	ap;
-  Int	result;
+  int32_t	result;
 
   va_start(ap, format);
   if (recording & 2)		/* record output */
@@ -45,10 +46,10 @@ Int Printf(const char *format, ...)
   return result;
 }
 /*----------------------------------------------------------------------*/
-Int Fprintf(FILE *stream, const char *format, ...)
+int32_t Fprintf(FILE *stream, const char *format, ...)
 {
   va_list	ap;
-  Int	result;
+  int32_t	result;
 
   va_start(ap, format);
   if ((stream == stdout || stream == stderr) && (recording & 2))
@@ -59,9 +60,9 @@ Int Fprintf(FILE *stream, const char *format, ...)
   return result;
 }
 /*----------------------------------------------------------------------*/
-Int Vprintf(const char *format, va_list arg)
+int32_t Vprintf(const char *format, va_list arg)
 {
-  Int	result;
+  int32_t	result;
 
   if (recording & 2) /* record output */
     vfprintf(recordFile, format, arg);
@@ -69,9 +70,9 @@ Int Vprintf(const char *format, va_list arg)
   return result;
 }  
 /*----------------------------------------------------------------------*/
-Int Vfprintf(FILE *stream, const char *format, va_list arg)
+int32_t Vfprintf(FILE *stream, const char *format, va_list arg)
 {
-  Int	result;
+  int32_t	result;
 
   if ((stream == stdout || stream == stderr) && (recording & 2))
 						/* record output */
@@ -80,7 +81,7 @@ Int Vfprintf(FILE *stream, const char *format, va_list arg)
   return result;
 }
 /*----------------------------------------------------------------------*/
-Int Puts(const char *s)
+int32_t Puts(const char *s)
 {
   if (recording & 2)		/* record output */
   { fputs(s, recordFile);
@@ -88,7 +89,7 @@ Int Puts(const char *s)
   return puts(s);
 }  
 /*----------------------------------------------------------------------*/
-Int Fputs(const char *s, FILE *stream)
+int32_t Fputs(const char *s, FILE *stream)
 {
   if ((stream == stdout || stream == stderr)
       && (recording & 2)
@@ -97,7 +98,7 @@ Int Fputs(const char *s, FILE *stream)
   return fputs(s, stream);
 }
 /*----------------------------------------------------------------------*/
-Int Fputc(Int c, FILE *stream)
+int32_t Fputc(int32_t c, FILE *stream)
 {
   if ((stream == stdout || stream == stderr)
       && (recording & 2)

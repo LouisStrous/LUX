@@ -28,11 +28,11 @@ typedef struct {
   int32_t rem;
 } Div_t;
 
-Div_t adiv(Int numerator, Int denominator);
-Int iaquot(Int numerator, Int denominator);
-Int iamod(Int numerator, Int denominator);
-Div_t alinediv(Int numerator, Int factor, Int addend, Int denominator);
-Int alinequot(Int numerator, Int factor, Int addend, Int denominator);
-Int alinemod(Int numerator, Int factor, Int addend, Int denominator);
+Div_t adiv(int32_t numerator, int32_t denominator);
+int32_t iaquot(int32_t numerator, int32_t denominator);
+int32_t iamod(int32_t numerator, int32_t denominator);
+Div_t alinediv(int32_t numerator, int32_t factor, int32_t addend, int32_t denominator);
+int32_t alinequot(int32_t numerator, int32_t factor, int32_t addend, int32_t denominator);
+int32_t alinemod(int32_t numerator, int32_t factor, int32_t addend, int32_t denominator);
 
 #endif

@@ -39,17 +39,17 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "editor.h"		/* for BUFSIZE */
 
 int16_t	stack[STACKSIZE], *stackPointer = &stack[STACKSIZE];
-extern Int	stackSym;
-Int	lux_convert(Int, Int [], Int, Int), copyToSym(Int, Int),
-  lux_replace(Int, Int), format_check(char *, char **, Int),
-  f_decomp(float *, Int, Int), f_solve(float *, float *, Int, Int);
-void	symdumpswitch(Int, Int);
+extern int32_t	stackSym;
+int32_t	lux_convert(int32_t, int32_t [], int32_t, int32_t), copyToSym(int32_t, int32_t),
+  lux_replace(int32_t, int32_t), format_check(char *, char **, int32_t),
+  f_decomp(float *, int32_t, int32_t), f_solve(float *, float *, int32_t, int32_t);
+void	symdumpswitch(int32_t, int32_t);
 /*------------------------------------------------------------------------- */
-Int lux_distr(Int narg, Int ps[])
+int32_t lux_distr(int32_t narg, int32_t ps[])
 /* DISTR,target,bins,values  puts each <value> in the corresponding
    <bin> of <target>.  LS */
 {
- Int	iq, ntarget, i, targettype, n, *bin, nout = 0;
+ int32_t	iq, ntarget, i, targettype, n, *bin, nout = 0;
  array	*h, *h2;
  pointer	target, value;
 
@@ -71,7 +71,7 @@ Int lux_distr(Int narg, Int ps[])
  value.l = LPTR(h2);
  if (h2->ndim != h->ndim)
    return cerror(INCMP_ARR, iq);
- for (i = 0; i < (Int) h->ndim; i++)
+ for (i = 0; i < (int32_t) h->ndim; i++)
    if (h->dims[i] != h2->dims[i])
      return cerror(INCMP_DIMS, iq);
  switch (targettype) {
@@ -126,17 +126,17 @@ Int lux_distr(Int narg, Int ps[])
  return 1;
 } 
 /*------------------------------------------------------------------------- */
-Int lux_distr_f(Int narg, Int ps[])
+int32_t lux_distr_f(int32_t narg, int32_t ps[])
 /* y=DISTR(bins,values)  puts each <value> in the corresponding <bin> and
    returns an array containing bins 0 through max(values). LS */
 {
-  extern Int	maxhistsize, histmin, histmax;
+  extern int32_t	maxhistsize, histmin, histmax;
   extern scalar	lastmin, lastmax;
-  Int	iq, i, n, nd, nd2, range, type, type2, result_sym,
-	minmax(Int *, Int, Int);
+  int32_t	iq, i, n, nd, nd2, range, type, type2, result_sym,
+	minmax(int32_t *, int32_t, int32_t);
   pointer arg1, arg2, res;
-  Int	lux_zero(Int, Int []);
-  void convertWidePointer(wideScalar *, Int, Int);
+  int32_t	lux_zero(int32_t, int32_t []);
+  void convertWidePointer(wideScalar *, int32_t, int32_t);
 
   iq = ps[0];
   if (symbol_class(iq) != LUX_ARRAY)
@@ -157,7 +157,7 @@ Int lux_distr_f(Int narg, Int ps[])
   arg2.l = array_data(iq);
   /* always need the range */
   minmax(arg1.l, n, type);
-  /* get long (Int) versions of min and max */
+  /* get long (int32_t) versions of min and max */
   convertPointer(&lastmin, type, LUX_LONG);
   convertPointer(&lastmax, type, LUX_LONG);
   /* create an array for results */
@@ -358,9 +358,9 @@ Int lux_distr_f(Int narg, Int ps[])
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-Int readkey(Int mode)
+int32_t readkey(int32_t mode)
 {
- Int	ch, result_sym;
+ int32_t	ch, result_sym;
  
  ch = rl_getc(stdin);
  result_sym = scalar_scratch(LUX_LONG);
@@ -369,28 +369,28 @@ Int readkey(Int mode)
  return result_sym;
 }
 /*------------------------------------------------------------------------- */
-Int lux_readkey()
+int32_t lux_readkey()
 /* returns the code for the next pressed key and echos that key */
 {
  return readkey(1);
 }
 /*------------------------------------------------------------------------- */
-Int lux_readkeyne()
+int32_t lux_readkeyne()
 /* returns the code for the next pressed key but does not echo that key */
 /* see lux_readkey for more info */
 {
  return readkey(0);
 }
 /*------------------------------------------------------------------------- */
-Int lux_readarr(Int narg, Int ps[])
+int32_t lux_readarr(int32_t narg, int32_t ps[])
 /* reads array elements until they are exhausted and returns read elements */
 /* in an array.  Louis Strous 24may92 */
 {
  extern FILE	*inputStream;
  FILE	*tp, *is;
  char	*p, *pt, lastchar, token[32], line[BUFSIZE];
- Int	arrs=0, i, iq, maxtype = LUX_LONG, *iptr, 
-   getNewLine(char *, size_t, char *, char), redef_array(Int, Int, Int, Int *);
+ int32_t	arrs=0, i, iq, maxtype = LUX_LONG, *iptr, 
+   getNewLine(char *, size_t, char *, char), redef_array(int32_t, int32_t, int32_t, int32_t *);
  float	*fptr;
 
  iq = ps[0];						/* target */
@@ -421,14 +421,14 @@ Int lux_readarr(Int narg, Int ps[])
    { fptr = (float *) ((char *) sym[iq].spec.array.ptr + sizeof(array));
      for (i = arrs; i > 0; i--) fscanf(tp, "%f", fptr++); }
    else
-   { iptr = (Int *) ((char *) sym[iq].spec.array.ptr + sizeof(array));
+   { iptr = (int32_t *) ((char *) sym[iq].spec.array.ptr + sizeof(array));
      for (i = arrs; i > 0; i--) fscanf(tp, "%d", iptr++); }
  }
  fclose(tp);
  return 1;
 }  
 /*------------------------------------------------------------------------- */
-Int lux_find(Int narg, Int ps[])
+int32_t lux_find(int32_t narg, int32_t ps[])
 /* for each element of <key>, finds first occurrence of that
    element in <array>.
    Call:  y = FIND(array,key,offset,mode)
@@ -445,9 +445,9 @@ Int lux_find(Int narg, Int ps[])
   array	*h, *har;
   pointer	ar, base, key, off, indx, theKey, theOff;
   char	repeat = 0;
-  Int	type, mode = 0, result, i, index = 0, offset, nRepeat;
-  Int	resulttype, iq, nar, noff, nkey, class, n, step, loop;
-  Int   dims[MAX_DIMS], ndim;
+  int32_t	type, mode = 0, result, i, index = 0, offset, nRepeat;
+  int32_t	resulttype, iq, nar, noff, nkey, class, n, step, loop;
+  int32_t   dims[MAX_DIMS], ndim;
   
   iq = ps[0];			/* array */
   CK_ARR(iq,1);
@@ -493,13 +493,13 @@ Int lux_find(Int narg, Int ps[])
       nRepeat = 1; }
     else
     { if (nkey == 1)
-      { memcpy(dims, har->dims + 1, (har->ndim - 1)*sizeof(Int));
+      { memcpy(dims, har->dims + 1, (har->ndim - 1)*sizeof(int32_t));
 	ndim = har->ndim - 1; }
       else
-      { if ((Int) h->ndim + (Int) har->ndim - 1 > MAX_DIMS)
+      { if ((int32_t) h->ndim + (int32_t) har->ndim - 1 > MAX_DIMS)
 	  return luxerror("too many dimensions for returned array", iq);
-        memcpy(dims + h->ndim, har->dims + 1, (har->ndim - 1)*sizeof(Int));
-	memcpy(dims, h->dims, h->ndim*sizeof(Int));
+        memcpy(dims + h->ndim, har->dims + 1, (har->ndim - 1)*sizeof(int32_t));
+	memcpy(dims, h->dims, h->ndim*sizeof(int32_t));
 	ndim = har->ndim - 1 + h->ndim; }
       result = array_scratch(resulttype, ndim, dims);
       nRepeat = nar/har->dims[0];
@@ -573,12 +573,12 @@ Int lux_find(Int narg, Int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-Int lux_find2(Int narg, Int ps[])
+int32_t lux_find2(int32_t narg, int32_t ps[])
 /* FIND2(array, key) */
 {
-  Int *data_dims, data_dim_count, data_count, keys_count, result, type;
+  int32_t *data_dims, data_dim_count, data_count, keys_count, result, type;
   pointer data, keys, target;
-  Int i, j;
+  int32_t i, j;
 
   if (numerical_or_string(ps[0], &data_dims, &data_dim_count, &data_count, &data) < 0)
     return LUX_ERROR;
@@ -586,11 +586,11 @@ Int lux_find2(Int narg, Int ps[])
     return LUX_ERROR;
   if (symbol_type(ps[1]) != symbol_type(ps[0])) {
     if (symbol_type(ps[1]) > symbol_type(ps[0])) {
-      Int iq = lux_converts[symbol_type(ps[1])](1, &ps[0]);
+      int32_t iq = lux_converts[symbol_type(ps[1])](1, &ps[0]);
       numerical_or_string(iq, NULL, NULL, NULL, &data);
       type = symbol_type(ps[1]);
     } else {
-      Int iq = lux_converts[symbol_type(ps[0])](1, &ps[1]);
+      int32_t iq = lux_converts[symbol_type(ps[0])](1, &ps[1]);
       numerical_or_string(iq, NULL, NULL, NULL, &keys);
       type = symbol_type(ps[0]);
     }
@@ -668,7 +668,7 @@ Int lux_find2(Int narg, Int ps[])
 }
 /*------------------------------------------------------------------------- */
 #include <errno.h>
-Int lux_help(Int narg, Int ps[])
+int32_t lux_help(int32_t narg, int32_t ps[])
 {
   char *topic = narg? string_arg(*ps): "Top";
   char cmd[300];
@@ -724,7 +724,7 @@ Int lux_help(Int narg, Int ps[])
   return result? LUX_ERROR: LUX_OK;
 }
 /*------------------------------------------------------------------------- */
-void endian(void *pp, Int n, Int type)
+void endian(void *pp, int32_t n, int32_t type)
 /* swap bytes according to data type, starting at p, spanning n bytes.
    goes from bigendian to littleendian or back.
    uint8_t -> do nothing
@@ -733,7 +733,7 @@ void endian(void *pp, Int n, Int type)
    double -> swap 1 2 3 4 5 6 7 8 to 8 7 6 5 4 3 2 1
    Works between Ultrix and Irix.   LS 10/12/92	*/
 {
- Int	size, i, n2, n3;
+ int32_t	size, i, n2, n3;
  uint8_t	temp, *p2, *p;
 
  p = (uint8_t *) pp;
@@ -754,12 +754,12 @@ void endian(void *pp, Int n, Int type)
  return;
 }
 /*------------------------------------------------------------------------- */
-Int lux_endian(Int narg, Int ps[])
+int32_t lux_endian(int32_t narg, int32_t ps[])
 /* Switches an array between littleendian and bigendian or vice versa.
    Works between Ultrix and Irix.  LS 10/12/92 */
 /* added support for scalars.  LS 10oct97 */
 {
- Int	iq, n, type;
+ int32_t	iq, n, type;
  pointer	q;
 
  iq = ps[0];
@@ -781,7 +781,7 @@ Int lux_endian(Int narg, Int ps[])
  return 1;
 }
 /*------------------------------------------------------------------------- */
-Int lux_differ(Int narg, Int ps[])
+int32_t lux_differ(int32_t narg, int32_t ps[])
 /* running difference; reverse of running sum 
   syntax:  y = differ(x [[,axis] ,order]) 
   axis is the dimension along which differencing is performed; for each of the
@@ -797,7 +797,7 @@ Int lux_differ(Int narg, Int ps[])
   LS 24nov92 */
 {
   pointer	src, trgt, order;
-  Int	result, nOrder, loop, o, ww, stride, offset1, offset3,
+  int32_t	result, nOrder, loop, o, ww, stride, offset1, offset3,
     w1, one = 1, iq, n, type, i, old, circular;
   loopInfo	srcinfo, trgtinfo;
 
@@ -1053,10 +1053,10 @@ Int lux_differ(Int narg, Int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-Int varsmooth(Int narg, Int ps[], Int cumul)
+int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 /* SMOOTH(data [[, axis], widths] [,/FW_EDGE_NEIGHBOR]) */
 {
-  Int	axisSym, widthSym, nWidth, nData, nDim, result, done, type, outType,
+  int32_t	axisSym, widthSym, nWidth, nData, nDim, result, done, type, outType,
     i1, i2, i, step, widthNDim, *widthDim, axis;
   float	weight;
   pointer	src, trgt, width, width0;
@@ -1133,7 +1133,7 @@ Int varsmooth(Int narg, Int ps[], Int cumul)
 	    i2 *= step;
 	    sum.l = 0.0;
 	    for (i = i1; i < i2; i += step)
-	      sum.l += (Int) src.b[i];
+	      sum.l += (int32_t) src.b[i];
 	    *trgt.l = sum.l;
 	    done = advanceLoop(&trgtinfo, &trgt), 
 	      advanceLoop(&srcinfo, &src);
@@ -1159,7 +1159,7 @@ Int varsmooth(Int narg, Int ps[], Int cumul)
 	    i2 *= step;
 	    sum.l = 0.0;
 	    for (i = i1; i < i2; i += step)
-	      sum.l += (Int) src.w[i];
+	      sum.l += (int32_t) src.w[i];
 	    *trgt.l = sum.l;
 	    done = advanceLoop(&trgtinfo, &trgt),
 	      advanceLoop(&srcinfo, &src);
@@ -1470,7 +1470,7 @@ Int varsmooth(Int narg, Int ps[], Int cumul)
 #define kahan_sum_f(value,sum,compensation) { float y = (value) - (compensation); float t = (sum) + y; (compensation) = (t - (sum)) - y; (sum) = t; }
 #define kahan_sum_d(value,sum,compensation) { double y = (value) - (compensation); double t = (sum) + y; (compensation) = (t - (sum)) - y; (sum) = t; }
 
-Int smooth(Int narg, Int ps[], Int cumul)
+int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
 /* return smoothed version syntax: y = smooth/runcum(x [,axis,width]
   [,/FW_EDGE_NEIGHBOR]) <axis> is the dimension along which summing is
   performed; for each of the remaining coordinates summing is started
@@ -1485,12 +1485,12 @@ Int smooth(Int narg, Int ps[], Int cumul)
   because "integer" range of floats is too small. */
 {
   uint8_t	type;
-  Int	n, result, i, offset, stride, nWidth, w1, w2, ww, loop, three=3, norm,
+  int32_t	n, result, i, offset, stride, nWidth, w1, w2, ww, loop, three=3, norm,
     iq, jq;
   pointer	src, trgt, width;
   scalar	value;
   loopInfo	srcinfo, trgtinfo;
-  Int mode;
+  int32_t mode;
 
   mode = 0;
   if (narg > 2)			/* have <axes> */
@@ -1754,7 +1754,7 @@ Int smooth(Int narg, Int ps[], Int cumul)
 	      value.l += *src.l;
 	      src.l += stride; 
 	    }
-	    Int v = value.l/norm;
+	    int32_t v = value.l/norm;
 	    for (i = 0; i < w1; i++) {
 	      *trgt.l = v;
 	      trgt.l += stride; 
@@ -1788,7 +1788,7 @@ Int smooth(Int narg, Int ps[], Int cumul)
 	      trgt.l += stride;
 	    }
 	  } else {
-	    Int v = value.l/norm;
+	    int32_t v = value.l/norm;
 	    for ( ; i < srcinfo.rdims[0]; i++) { /* right edge */
 	      *trgt.l = v;
 	      trgt.l += stride;
@@ -1972,86 +1972,86 @@ Int smooth(Int narg, Int ps[], Int cumul)
   return result;
 }
 /*------------------------------------------------------------------------- */
-Int lux_smooth(Int narg, Int ps[])
+int32_t lux_smooth(int32_t narg, int32_t ps[])
 /* smoothing */
 {
   return smooth(narg, ps, 0);
 }
 /*------------------------------------------------------------------------- */
-Int lux_runcum(Int narg, Int ps[])
+int32_t lux_runcum(int32_t narg, int32_t ps[])
 /* running cumulative */
 { return smooth(narg, ps, 1); }
 /*----------------------------------------------------------------------*/
-static Int	pcmp_type;
+static int32_t	pcmp_type;
 static pointer	pcmp_ptr;
-Int pcmp(const void *arg1, const void *arg2)
+int32_t pcmp(const void *arg1, const void *arg2)
 {
   extern pointer	pcmp_ptr;
-  extern Int	pcmp_type;
+  extern int32_t	pcmp_type;
   scalar	d1, d2;
 
   switch (pcmp_type) {
     case LUX_BYTE:
-      d1.b = pcmp_ptr.b[*(Int *) arg1];
-      d2.b = pcmp_ptr.b[*(Int *) arg2];
+      d1.b = pcmp_ptr.b[*(int32_t *) arg1];
+      d2.b = pcmp_ptr.b[*(int32_t *) arg2];
       return d1.b < d2.b? -1: (d1.b > d2.b? 1: 0);
     case LUX_WORD:
-      d1.w = pcmp_ptr.w[*(Int *) arg1];
-      d2.w = pcmp_ptr.w[*(Int *) arg2];
+      d1.w = pcmp_ptr.w[*(int32_t *) arg1];
+      d2.w = pcmp_ptr.w[*(int32_t *) arg2];
       return d1.w < d2.w? -1: (d1.w > d2.w? 1: 0);
     case LUX_LONG:
-      d1.l = pcmp_ptr.l[*(Int *) arg1];
-      d2.l = pcmp_ptr.l[*(Int *) arg2];
+      d1.l = pcmp_ptr.l[*(int32_t *) arg1];
+      d2.l = pcmp_ptr.l[*(int32_t *) arg2];
       return d1.l < d2.l? -1: (d1.l > d2.l? 1: 0);
     case LUX_FLOAT:
-      d1.f = pcmp_ptr.f[*(Int *) arg1];
-      d2.f = pcmp_ptr.f[*(Int *) arg2];
+      d1.f = pcmp_ptr.f[*(int32_t *) arg1];
+      d2.f = pcmp_ptr.f[*(int32_t *) arg2];
       return d1.f < d2.f? -1: (d1.f > d2.f? 1: 0);
     case LUX_DOUBLE:
-      d1.d = pcmp_ptr.d[*(Int *) arg1];
-      d2.d = pcmp_ptr.d[*(Int *) arg2];
+      d1.d = pcmp_ptr.d[*(int32_t *) arg1];
+      d2.d = pcmp_ptr.d[*(int32_t *) arg2];
       return d1.d < d2.d? -1: (d1.d > d2.d? 1: 0);
     }
   return 1;			/* or some compilers complain */
 }
 /*----------------------------------------------------------------------*/
-Int pcmp2(const void *arg1, const void *arg2)
+int32_t pcmp2(const void *arg1, const void *arg2)
 {
   extern pointer	pcmp_ptr;
-  extern Int	pcmp_type;
+  extern int32_t	pcmp_type;
   scalar	d1, d2;
 
   switch (pcmp_type) {
     case LUX_BYTE:
       d1.b = *(uint8_t *) arg1;
-      d2.b = pcmp_ptr.b[*(Int *) arg2];
+      d2.b = pcmp_ptr.b[*(int32_t *) arg2];
       return d1.b < d2.b? -1: (d1.b > d2.b? 1: 0);
     case LUX_WORD:
       d1.w = *(int16_t *) arg1;
-      d2.w = pcmp_ptr.w[*(Int *) arg2];
+      d2.w = pcmp_ptr.w[*(int32_t *) arg2];
       return d1.w < d2.w? -1: (d1.w > d2.w? 1: 0);
     case LUX_LONG:
-      d1.l = *(Int *) arg1;
-      d2.l = pcmp_ptr.l[*(Int *) arg2];
+      d1.l = *(int32_t *) arg1;
+      d2.l = pcmp_ptr.l[*(int32_t *) arg2];
       return d1.l < d2.l? -1: (d1.l > d2.l? 1: 0);
     case LUX_FLOAT:
       d1.f = *(float *) arg1;
-      d2.f = pcmp_ptr.f[*(Int *) arg2];
+      d2.f = pcmp_ptr.f[*(int32_t *) arg2];
       return d1.f < d2.f? -1: (d1.f > d2.f? 1: 0);
     case LUX_DOUBLE:
       d1.d = *(double *) arg1;
-      d2.d = pcmp_ptr.d[*(Int *) arg2];
+      d2.d = pcmp_ptr.d[*(int32_t *) arg2];
       return d1.d < d2.d? -1: (d1.d > d2.d? 1: 0);
     }
   return 1;			/* or some compilers complain */
 }
 /*----------------------------------------------------------------------*/
-Int lux_match(Int narg, Int ps[])
+int32_t lux_match(int32_t narg, int32_t ps[])
 /* y = match(target, set) returns the index of each element of <target>
    in <set>, or -1 for elements that are not in <set>.
    LS 14apr97 */
 {
- Int	nTarget, nSet, iq, step, *ptr, i, *p;
+ int32_t	nTarget, nSet, iq, step, *ptr, i, *p;
  pointer	target, set, result;
  uint8_t	maxType;
 
@@ -2082,18 +2082,18 @@ Int lux_match(Int narg, Int ps[])
    result.l = &scalar_value(iq).l;
  }
 
- ptr = malloc(nSet*sizeof(Int));
+ ptr = malloc(nSet*sizeof(int32_t));
  if (!ptr)
    return cerror(ALLOC_ERR, 0);
  for (i = 0; i < nSet; i++)
    ptr[i] = i;
  pcmp_ptr = set;
  pcmp_type = maxType;
- qsort(ptr, nSet, sizeof(Int), pcmp);
+ qsort(ptr, nSet, sizeof(int32_t), pcmp);
 
  step = lux_type_size[maxType];
  while (nTarget--) {
-   p = bsearch(target.b, ptr, nSet, sizeof(Int), pcmp2);
+   p = bsearch(target.b, ptr, nSet, sizeof(int32_t), pcmp2);
    *result.l++ = p? *p: -1;
    target.b += step;
  }
@@ -2101,11 +2101,11 @@ Int lux_match(Int narg, Int ps[])
  return iq;
 }
 /*----------------------------------------------------------------------*/
-Int lux_not(Int narg, Int ps[])
+int32_t lux_not(int32_t narg, int32_t ps[])
 /* returns a uint8_t 1 for every 0, and 0 for every non-zero element.
    LS 25feb93 */
 {
- Int	iq, i, type;
+ int32_t	iq, i, type;
  array	*h;
  register pointer	arg, result;
 
@@ -2126,7 +2126,7 @@ Int lux_not(Int narg, Int ps[])
  return iq;
 }
 /*----------------------------------------------------------------------*/
-Int lux_table(Int narg, Int ps[])
+int32_t lux_table(int32_t narg, int32_t ps[])
 /* General linear interpolation routine.
    Syntax:  ynew = table(x, y, [index,] xnew)
    Use:  The first dimensions of <x> and <y> must be equal and
@@ -2142,12 +2142,12 @@ Int lux_table(Int narg, Int ps[])
      then the result gets dimensions [7,5,2]
 */
 {
- Int	symx, symy, symf, topType, nTable, nOut, nRepeat, ix, n1,
+ int32_t	symx, symy, symf, topType, nTable, nOut, nRepeat, ix, n1,
 	symr, i, nsymx, nsymy, nsymf, nLoop, n2;
  array	*hx, *hy, *hf, *hMax, *hr;
  pointer	x, y, xf, r, ox, oy, of, nx, ny;
  scalar	grad;
- Int	lux_table2d(Int, Int []);
+ int32_t	lux_table2d(int32_t, int32_t []);
 
  if (narg == 4)
    return lux_table2d(narg, ps);
@@ -2179,7 +2179,7 @@ Int lux_table(Int narg, Int ps[])
  if (hy->ndim > hMax->ndim)
    hMax = hy;
 	/* all common dims between x and y must be equal */
- for (i = 1; i < (Int) ((hMax == hx)? hy->ndim: hx->ndim); i++)
+ for (i = 1; i < (int32_t) ((hMax == hx)? hy->ndim: hx->ndim); i++)
    if (hy->dims[i] != hx->dims[i])
      return cerror(INCMP_DIMS, symy);
  nTable = hx->dims[0];
@@ -2190,12 +2190,12 @@ Int lux_table(Int narg, Int ps[])
    GET_SIZE(nOut, hf->dims, hf->ndim);
    nLoop = 1; }   
  else
- { for (i = 1; i < (Int) ((hMax->ndim > hf->ndim)? hf->ndim: hMax->ndim); i++)
+ { for (i = 1; i < (int32_t) ((hMax->ndim > hf->ndim)? hf->ndim: hMax->ndim); i++)
      if (hMax->dims[i] != hf->dims[i])
        return cerror(INCMP_DIMS, symf);
    if (hMax->ndim > hf->ndim)
    { GET_SIZE(nRepeat, (&hMax->dims[hf->ndim]),
-	      ((Int) hMax->ndim - hf->ndim)); }
+	      ((int32_t) hMax->ndim - hf->ndim)); }
    else nRepeat = 1;
    nOut = hf->dims[0];
    GET_SIZE(nLoop, (&hf->dims[1]), hf->ndim - 1);
@@ -2209,16 +2209,16 @@ Int lux_table(Int narg, Int ps[])
  if (internalMode & 1)		/* first dim from xnew, higher from x,y,xnew */
  { if (hMax->ndim > hf->ndim)
    { hr->dims[0] = hf->dims[0];
-     memcpy(hr->dims + 1, hMax->dims + 1, (hMax->ndim - 1)*sizeof(Int));
+     memcpy(hr->dims + 1, hMax->dims + 1, (hMax->ndim - 1)*sizeof(int32_t));
      hr->ndim = hMax->ndim; }
    else
-   { memcpy(hr->dims, hf->dims, hf->ndim*sizeof(Int));
+   { memcpy(hr->dims, hf->dims, hf->ndim*sizeof(int32_t));
      hr->ndim = hf->ndim; }
  }
  else				/* all dims from xnew, all higher from x,y */
- { memcpy(hr->dims, hf->dims, hf->ndim*sizeof(Int));
+ { memcpy(hr->dims, hf->dims, hf->ndim*sizeof(int32_t));
    if (hMax->ndim > 1)
-     memcpy(hr->dims + hf->ndim, hMax->dims + 1, (hMax->ndim - 1)*sizeof(Int));
+     memcpy(hr->dims + hf->ndim, hMax->dims + 1, (hMax->ndim - 1)*sizeof(int32_t));
    hr->ndim = hf->ndim + hMax->ndim - 1; }
  ox.l = x.l = LPTR(hx);
  oy.l = y.l = LPTR(hy);
@@ -2294,7 +2294,7 @@ Int lux_table(Int narg, Int ps[])
  return symr;
 }
 /*----------------------------------------------------------------------*/
-Int lux_table2d(Int narg, Int ps[])
+int32_t lux_table2d(int32_t narg, int32_t ps[])
 /* General linear interpolation routine.
    Syntax:  ynew = table2d(x, y, index, xnew)
    Standard use:  <x> and <y> have the same dimensions; <xnew> and <index>
@@ -2311,7 +2311,7 @@ Int lux_table2d(Int narg, Int ps[])
   LS 30aug93
 */
 {
- Int	symx, symy, symf, symi, topType, nTable, nIndex, nRepeat, ix,
+ int32_t	symx, symy, symf, symi, topType, nTable, nIndex, nRepeat, ix,
 	symr, i, nsymx, nsymy, nsymf, nsymi, nx, ny, iTable;
  array	*hx, *hy, *hf, *hi;
  pointer	x, y, xf, xi, r, ox, oy, of, nf, oi, ni;
@@ -2347,13 +2347,13 @@ Int lux_table2d(Int narg, Int ps[])
  nRepeat = 1;			/* the number of tables */
 		/* shared dimensions must be equal */
  if (hy->ndim > hx->ndim)
- { for (i = 1; i < (Int) hx->ndim; i++)  if (hx->dims[i] != hy->dims[i])
+ { for (i = 1; i < (int32_t) hx->ndim; i++)  if (hx->dims[i] != hy->dims[i])
      return cerror(INCMP_DIMS, symy);
    if (hy->ndim > 1)
    { GET_SIZE(nRepeat, (hy->dims + 1), hy->ndim - 1); }
  }
  else
- { for (i = 1; i < (Int) hy->ndim; i++)  if (hx->dims[i] != hy->dims[i])
+ { for (i = 1; i < (int32_t) hy->ndim; i++)  if (hx->dims[i] != hy->dims[i])
      return cerror(INCMP_DIMS, symy);
    if (hx->ndim > 1)
    { GET_SIZE(nRepeat, (hx->dims + 1), hx->ndim - 1); }
@@ -2364,15 +2364,15 @@ Int lux_table2d(Int narg, Int ps[])
 	/* shared dimensions must be equal; single numbers are taken
 	   as arrays with zero dimensions */
    if (hf->ndim > hi->ndim)
-   { if ((Int) hi->ndim > 1 || (hi->dims[0] > 1 && hf->dims[0] > 1))
+   { if ((int32_t) hi->ndim > 1 || (hi->dims[0] > 1 && hf->dims[0] > 1))
 						/* not zero dimensions */
-       for (i = 0; i < (Int) hi->ndim; i++)  if (hf->dims[i] != hi->dims[i])
+       for (i = 0; i < (int32_t) hi->ndim; i++)  if (hf->dims[i] != hi->dims[i])
          return cerror(INCMP_DIMS, symi);
      GET_SIZE(nIndex, hf->dims, hf->ndim);
      ix = symf; }
    else
-   { if ((Int) hf->ndim > 1 || (hf->dims[0] > 1 && hi->dims[0] > 1))
-       for (i = 0; i < (Int) hf->ndim; i++)  if (hf->dims[i] != hi->dims[i])
+   { if ((int32_t) hf->ndim > 1 || (hf->dims[0] > 1 && hi->dims[0] > 1))
+       for (i = 0; i < (int32_t) hf->ndim; i++)  if (hf->dims[i] != hi->dims[i])
          return cerror(INCMP_DIMS, symi);
      if (hi->ndim > 1 || hi->dims[0] > hf->dims[0])
      { GET_SIZE(nIndex, hi->dims, hi->ndim);
@@ -2430,7 +2430,7 @@ Int lux_table2d(Int narg, Int ps[])
      ix = nTable/2;		/* start looking in the middle */
      while (nIndex--)
      { table.f = *xi.f;
-       iTable = (Int) table.f;
+       iTable = (int32_t) table.f;
        if (iTable < 0) iTable = 0;
        if (iTable > nRepeat - ((float) iTable == table.f? 1: 2))
          iTable = nRepeat - 2;
@@ -2465,7 +2465,7 @@ Int lux_table2d(Int narg, Int ps[])
      ix = nTable/2;		/* start looking in the middle */
      while (nIndex--)
      { table.d = *xi.d;
-       iTable = (Int) table.d;
+       iTable = (int32_t) table.d;
        if (iTable < 0) iTable = 0;
        if (iTable > nRepeat - ((double) iTable == table.d? 1: 2))
          iTable = nRepeat - 2;
@@ -2500,11 +2500,11 @@ Int lux_table2d(Int narg, Int ps[])
  return symr;
 }
 /*----------------------------------------------------------------------*/
-Int lux_push(Int narg, Int ps[])
+int32_t lux_push(int32_t narg, int32_t ps[])
 /* Push a number of variables onto the user stack
    LS 27may94 3aug99 */
 { 
-  Int	iq;
+  int32_t	iq;
 
   while (narg--) {
     if (stackPointer == stack)
@@ -2520,7 +2520,7 @@ Int lux_push(Int narg, Int ps[])
   return 1;
 }
 /*----------------------------------------------------------------------*/
-Int lux_pop(Int narg, Int ps[])
+int32_t lux_pop(int32_t narg, int32_t ps[])
 /* pop a number of variables from the user stack, in reverse order from PUSH;
    i.e. after  push,x,y  pop,x,y  restores x and y.
    pop,NUM=<number> pops the top <number> symbols into their original sources.
@@ -2529,7 +2529,7 @@ Int lux_pop(Int narg, Int ps[])
    LS 27may94 3aug99 */
 {
   char	isError = 0;
-  Int	number, iq, i1, i2, i;
+  int32_t	number, iq, i1, i2, i;
 
   if (ps[0]) {			/* have NUM */
     number = int_arg(ps[0]);
@@ -2583,11 +2583,11 @@ Int lux_pop(Int narg, Int ps[])
   return isError? LUX_ERROR: LUX_OK;
 }
 /*----------------------------------------------------------------------*/
-Int lux_dump_stack(Int narg, Int ps[])
+int32_t lux_dump_stack(int32_t narg, int32_t ps[])
 /* Displays the contents of the user stack
    LS 27may94 */
 {
-  Int	iq, count = 0;
+  int32_t	iq, count = 0;
   int16_t	*p;
   
   if (stackPointer == stack + STACKSIZE) {
@@ -2602,10 +2602,10 @@ Int lux_dump_stack(Int narg, Int ps[])
   return 1;
 }
 /*----------------------------------------------------------------------*/
-Int peek(Int narg, Int ps[])
+int32_t peek(int32_t narg, int32_t ps[])
 /* display memory contents */
 { 
-  Int	start, nr;
+  int32_t	start, nr;
   uint8_t	*adr, i;
   char	s;
 
@@ -2622,15 +2622,15 @@ Int peek(Int narg, Int ps[])
   return 1;
 }
 /*----------------------------------------------------------------------*/
-Int lux_atomize(Int narg, Int ps[])
+int32_t lux_atomize(int32_t narg, int32_t ps[])
 /* atomizes and displays symbol *ps - for debugging purposes
    second argument determines whether all individual atomic arguments
    are also lux_dump-ed
    LS 18may93 */
 {
- char	*symbol_ident(char *, Int, Int, char);
- Int	iq, dump;
- void	dumpLine(Int), dumpTree(Int);
+ char	*symbol_ident(char *, int32_t, int32_t, char);
+ int32_t	iq, dump;
+ void	dumpLine(int32_t), dumpTree(int32_t);
 
  iq = int_arg(*ps++);
  if (internalMode & 2)
@@ -2644,7 +2644,7 @@ Int lux_atomize(Int narg, Int ps[])
  return 1;
 }
 /*----------------------------------------------------------------------*/
-Int lux_redirect_diagnostic(Int narg, Int ps[])
+int32_t lux_redirect_diagnostic(int32_t narg, int32_t ps[])
 /* specifies file to which diagnostic information is redirected */
 /* LS 29may93 */
 {
@@ -2660,7 +2660,7 @@ Int lux_redirect_diagnostic(Int narg, Int ps[])
  return 1;
 }
 /*----------------------------------------------------------------------*/
-Int lux_default(Int narg, Int ps[])
+int32_t lux_default(int32_t narg, int32_t ps[])
 /* syntax:  default,var1,val1,var2,val2,...
    assigns <val1>, <val2>,... to <var1>, <var2>,... if <var1> etc. are
    undefined, i.e. specifies default values.   LS 4jun93 */
@@ -2669,7 +2669,7 @@ Int lux_default(Int narg, Int ps[])
 /* DEFAULT,A,3,B,2*A  works fine even when A and B are both undefined */
 /* before this statement was executed.  LS 27mar97 */
 {
- Int	i, n = 1, iq;
+ int32_t	i, n = 1, iq;
 
  for (i = 0; i < narg/2; i++)
  { iq = *ps;
@@ -2687,7 +2687,7 @@ Int lux_default(Int narg, Int ps[])
  return n;
 }
 /*----------------------------------------------------------------------*/
-Int local_maxormin(Int narg, Int ps[], Int code)
+int32_t local_maxormin(int32_t narg, int32_t ps[], int32_t code)
 /* arguments:  (array, position, code)
    searches for local extreme in <array>, starting at <position> (which
    is either a scalar or an array of indices)
@@ -2714,11 +2714,11 @@ Int local_maxormin(Int narg, Int ps[], Int code)
    position in !LASTMAX or !LASTMIN.   LS 9jun93 */
 /* added ghost-array support  LS 23jun93 */
 {
- Int		iq, *dims, ndim, type, n, i, currentIndex,
+ int32_t		iq, *dims, ndim, type, n, i, currentIndex,
 		comparisonIndex, nextIndex,
 		size[MAX_DIMS], typesize, max, indx[MAX_DIMS], j,
 		defaultOffset, *indexPtr, n2, trgttype, ntarget, nelem;
- extern Int	lastmaxloc, lastminloc, lastmin_sym, lastmax_sym;
+ extern int32_t	lastmaxloc, lastminloc, lastmin_sym, lastmax_sym;
  extern scalar	lastmax, lastmin;
  char		count[MAX_DIMS], *fname, filemap = 0, ready, edge;
  float		*grad, *grad2, *hessian, *hessian2, x, v;
@@ -3415,7 +3415,7 @@ Int local_maxormin(Int narg, Int ps[], Int code)
  return iq;
 }
 /*----------------------------------------------------------------------*/
-Int lux_local_maxf(Int narg, Int ps[])
+int32_t lux_local_maxf(int32_t narg, int32_t ps[])
 /* find value of local maximum in <array>, starting at <position> and
    walking along the steepest gradient.
    Adjusts !LASTMAX, !LASTMAXLOC.
@@ -3423,7 +3423,7 @@ Int lux_local_maxf(Int narg, Int ps[])
    LS 9jun93 */
 { return local_maxormin(narg, ps, 2); }
 /*----------------------------------------------------------------------*/
-Int lux_local_maxloc(Int narg, Int ps[])
+int32_t lux_local_maxloc(int32_t narg, int32_t ps[])
 /* find position of local maximum in <array>, starting at <position> and
    walking along the steepest gradient.
    Adjusts !LASTMAX, !LASTMAXLOC.
@@ -3431,7 +3431,7 @@ Int lux_local_maxloc(Int narg, Int ps[])
    LS 9jun93 */
 { return local_maxormin(narg, ps, 3); }
 /*----------------------------------------------------------------------*/
-Int lux_local_minf(Int narg, Int ps[])
+int32_t lux_local_minf(int32_t narg, int32_t ps[])
 /* find value of local minimum in <array>, starting at <position> and
    walking along the steepest gradient.
    Adjusts !LASTMIN, !LASTMINLOC.
@@ -3439,7 +3439,7 @@ Int lux_local_minf(Int narg, Int ps[])
    LS 9jun93 */
 { return local_maxormin(narg, ps, 0); }
 /*----------------------------------------------------------------------*/
-Int lux_local_minloc(Int narg, Int ps[])
+int32_t lux_local_minloc(int32_t narg, int32_t ps[])
 /* find position of local minimum in <array>, starting at <position> and
    walking along the steepest gradient.
    Adjusts !LASTMIN, !LASTMINLOC.
@@ -3447,12 +3447,12 @@ Int lux_local_minloc(Int narg, Int ps[])
    LS 9jun93 */
 { return local_maxormin(narg, ps, 1); }
 /*----------------------------------------------------------------------*/
-Int lux_zinv(Int narg, Int ps[])
+int32_t lux_zinv(int32_t narg, int32_t ps[])
 /* y = zinv(x)
    y = 1.0/x if x not equal to 0, y = 0 otherwise.
    LS 30aug93 */
 {
- Int	topType, result, iq, n;
+ int32_t	topType, result, iq, n;
  pointer	data, target;
  double	value;
 
@@ -3548,13 +3548,13 @@ Int lux_zinv(Int narg, Int ps[])
  return result;
 }
 /*----------------------------------------------------------------------*/
-Int lux_find_maxloc_old(Int narg, Int ps[])
+int32_t lux_find_maxloc_old(int32_t narg, int32_t ps[])
 /* Returns the indices of local maximums in a 2D image.
    Must be maximums in 4 directions (N-S, E-W, NE-SW, NW-SE).
    The edges are disregarded.
    LS 18feb94 */
 {
- Int	nx, ny, row, column, result, indx, num = 0;
+ int32_t	nx, ny, row, column, result, indx, num = 0;
  pointer	data, data_start;
  scalar		this;
  array	*h;
@@ -3581,7 +3581,7 @@ Int lux_find_maxloc_old(Int narg, Int ps[])
            && this.b >= data.b[-1-nx] && this.b > data.b[-1+nx]
            && this.b >= data.b[1-nx] && this.b > data.b[1+nx])
          { indx = data.b - data_start.b;
-           fwrite(&indx, sizeof(Int), 1, fp);  num++; }
+           fwrite(&indx, sizeof(int32_t), 1, fp);  num++; }
          data.b++; }
        data.b += 2; }
      break;
@@ -3596,7 +3596,7 @@ Int lux_find_maxloc_old(Int narg, Int ps[])
            && this.w >= data.w[-1-nx] && this.w > data.w[-1+nx]
            && this.w >= data.w[1-nx] && this.w > data.w[1+nx])
          { indx = data.w - data_start.w;
-           fwrite(&indx, sizeof(Int), 1, fp);  num++; }
+           fwrite(&indx, sizeof(int32_t), 1, fp);  num++; }
          data.w++; }
        data.w += 2; }
      break;
@@ -3611,7 +3611,7 @@ Int lux_find_maxloc_old(Int narg, Int ps[])
            && this.l >= data.l[-1-nx] && this.l > data.l[-1+nx]
            && this.l >= data.l[1-nx] && this.l > data.l[1+nx])
          { indx = data.l - data_start.l;
-           fwrite(&indx, sizeof(Int), 1, fp);  num++; }
+           fwrite(&indx, sizeof(int32_t), 1, fp);  num++; }
          data.l++; }
        data.l += 2; }
      break;
@@ -3626,7 +3626,7 @@ Int lux_find_maxloc_old(Int narg, Int ps[])
            && this.f >= data.f[-1-nx] && this.f > data.f[-1+nx]
            && this.f >= data.f[1-nx] && this.f > data.f[1+nx])
          { indx = data.f - data_start.f;
-           fwrite(&indx, sizeof(Int), 1, fp);  num++; }
+           fwrite(&indx, sizeof(int32_t), 1, fp);  num++; }
          data.f++; }
        data.f += 2; }
      break;
@@ -3641,7 +3641,7 @@ Int lux_find_maxloc_old(Int narg, Int ps[])
            && this.d >= data.d[-1-nx] && this.d > data.d[-1+nx]
            && this.d >= data.d[1-nx] && this.d > data.d[1+nx])
          { indx = data.d - data_start.d;
-           fwrite(&indx, sizeof(Int), 1, fp);  num++; }
+           fwrite(&indx, sizeof(int32_t), 1, fp);  num++; }
          data.d++; }
        data.d += 2; }
      break;
@@ -3650,7 +3650,7 @@ Int lux_find_maxloc_old(Int narg, Int ps[])
  { result = array_scratch(LUX_LONG, 1, &num);
    data.l = LPTR(HEAD(result));
    rewind(fp);
-   if (num != fread(data.l, sizeof(Int), num, fp))
+   if (num != fread(data.l, sizeof(int32_t), num, fp))
    { puts("FIND_MAXLOC: some numbers got lost"); fclose(fp); return -1; }
  }
  else result = LUX_MINUS_ONE;	/* none found */
@@ -3658,7 +3658,7 @@ Int lux_find_maxloc_old(Int narg, Int ps[])
  return result;
 }
 /*----------------------------------------------------------------------*/
-Int lux_bsmooth(Int narg, Int ps[])
+int32_t lux_bsmooth(int32_t narg, int32_t ps[])
 /* binary smooth.  Smooths an array by repeatedly applying two-element */
 /* (binary) averaging along dimension AXIS.  The number of repeats is */
 /* WIDTH*WIDTH/2, so the FWHM of this filter is about WIDTH. */
@@ -3669,7 +3669,7 @@ Int lux_bsmooth(Int narg, Int ps[])
 /* division by 2 with a shift operation may speed things up for integer */
 /* data. */
 {
-  Int	iq, axis, outtype, type, result_sym, *dims, ndim, xdims[MAX_DIMS],
+  int32_t	iq, axis, outtype, type, result_sym, *dims, ndim, xdims[MAX_DIMS],
 	width, i, n, tally[MAX_DIMS], step[MAX_DIMS], m, done, j, k, stride;
   pointer	src, trgt, src0, trgt0;
   float	fwidth;
@@ -3684,7 +3684,7 @@ Int lux_bsmooth(Int narg, Int ps[])
   { fwidth = float_arg(iq);
     if (fwidth <= 0)
       return cerror(NEED_POS_ARG, iq);
-    width = (Int) (fwidth*fwidth/2);
+    width = (int32_t) (fwidth*fwidth/2);
     if (!width)
       width = 1; }
   else
@@ -3701,7 +3701,7 @@ Int lux_bsmooth(Int narg, Int ps[])
       if (type < LUX_FLOAT) 
       { outtype = LUX_FLOAT;
 	iq = lux_float(1, &iq); } /*float the input */
-      src0.l = (Int *) array_data(iq);
+      src0.l = (int32_t *) array_data(iq);
       m = array_size(iq);
       if (axis >= 0)		/* axis specified */
       { dims = array_dims(iq);
@@ -3715,11 +3715,11 @@ Int lux_bsmooth(Int narg, Int ps[])
       break;
     default:
       return cerror(ILL_CLASS, iq); }
-  memcpy(xdims, dims, sizeof(Int)*ndim);		/* copy dims */
+  memcpy(xdims, dims, sizeof(int32_t)*ndim);		/* copy dims */
   if (width >= (axis >= 0? xdims[axis]: m)) /* just return original */
     return iq;
   result_sym = array_clone(iq, outtype);
-  trgt0.l = (Int *) array_data(result_sym);
+  trgt0.l = (int32_t *) array_data(result_sym);
   /* set up for walk through array */
   n = *step = lux_type_size[outtype];
   for (i = 1; i < ndim; i++)

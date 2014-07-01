@@ -34,7 +34,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
   void Free(void *), *Malloc(size_t), *Calloc(size_t, size_t),
        *Realloc(void *, size_t);
   FILE *Fopen(const char *, const char *), *Tmpfile(void);
-  Int  Fclose(FILE *);
+  int32_t  Fclose(FILE *);
 #define free	Free
 #define malloc	Malloc
 #define calloc	Calloc

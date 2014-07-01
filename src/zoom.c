@@ -38,7 +38,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #define BLACK           1
 
 struct Menu {
-  Int          n_items;		/* number of menu panes (including title) */
+  int32_t          n_items;		/* number of menu panes (including title) */
   char         **text;		/* pointer to item strings */
   Window       *window;		/* pointer to item windows */
 };
@@ -47,14 +47,14 @@ typedef        struct Menu     Menu;
 extern Display	*display;
 extern Menu	menu[MAXMENU];
 extern Window	menu_win[], win[];
-extern Int	ht[], wd[];
-extern Int	fontwidth;
+extern int32_t	ht[], wd[];
+extern int32_t	fontwidth;
 
-Int	extractNumerical(pointer, pointer, Int, Int, Int *, Int *, Int, Int *),
-  lux_xerase(Int, Int []);
-void	paint_pane(Int, Int, Int), delete_menu(Int);
+int32_t	extractNumerical(pointer, pointer, int32_t, int32_t, int32_t *, int32_t *, int32_t, int32_t *),
+  lux_xerase(int32_t, int32_t []);
+void	paint_pane(int32_t, int32_t, int32_t), delete_menu(int32_t);
 /*--------------------------------------------------------------------------*/
-void value_string(char *trgt, pointer image, Int type, Int indx)
+void value_string(char *trgt, pointer image, int32_t type, int32_t indx)
 {
   switch (type) {
     case LUX_BYTE:
@@ -86,24 +86,24 @@ enum menuItems { ZOOM_TITLE, ZOOM_MAG, ZOOM_STD, ZOOM_TWO,
 
 float	zoom_xc = 0.0, zoom_yc = 0.0, zoom_mag = 0.0;
 double	zoom_clo = 0.0, zoom_chi = 0.0;
-Int	zoom_frame = 0;
+int32_t	zoom_frame = 0;
 
-Int lux_zoom(Int narg, Int ps[])
+int32_t lux_zoom(int32_t narg, int32_t ps[])
 /* ZOOM,image[,bitmap] */
 {
-  extern Int	menu_setup_done, last_wid, threeColors;
+  extern int32_t	menu_setup_done, last_wid, threeColors;
   extern scalar	lastmin, lastmax;
-  Int	createMenu(Int num, Int x, Int y, Int nItem, char **item),
-    menu_setup(void), lux_xport(Int, Int []),
-    tvraw(pointer data, Int type, Int nx, Int ny, float x1, float x2,
-	  float y1, float y2, float sx, float sy, Int wid, float *mag,
-	  Int mode, double clo, double chi, uint8_t *bitmap1, uint8_t *bitmap2),
-    threecolors(float *, Int);
-  Int	i, ntext, ndim, *dims, wid, mid, x = 0, y = 0, selected, j, type,
+  int32_t	createMenu(int32_t num, int32_t x, int32_t y, int32_t nItem, char **item),
+    menu_setup(void), lux_xport(int32_t, int32_t []),
+    tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, float x2,
+	  float y1, float y2, float sx, float sy, int32_t wid, float *mag,
+	  int32_t mode, double clo, double chi, uint8_t *bitmap1, uint8_t *bitmap2),
+    threecolors(float *, int32_t);
+  int32_t	i, ntext, ndim, *dims, wid, mid, x = 0, y = 0, selected, j, type,
     nx, ny, sx, sy, sx0, sy0, ww, hw, nframe, stride, profile = -1,
     step[MAX_DIMS], coords[2*MAX_DIMS], sdims[3],
     axes[2] = {0, 1}, follow = 0, play = 0, loop, offset, mousepos = 1;
-  Int	minmax(Int *data, Int nelem, Int type);
+  int32_t	minmax(int32_t *data, int32_t nelem, int32_t type);
   float	x1, x2, y1, y2, dx, dy, z, colorRange = 1.0;
   pointer	data, image, bitmapdata1, bitmap1, bitmapdata2,
     bitmap2;
@@ -125,7 +125,7 @@ Int lux_zoom(Int narg, Int ps[])
 		"Frame:         0",
 		"Value:          ",
 		"Quit            " };
-  char	*eventName(Int), *readPane(Int menuid, Int menu_item, char *query);
+  char	*eventName(int32_t), *readPane(int32_t menuid, int32_t menu_item, char *query);
   XEvent	event;
 
   if (numerical(ps[0], &dims, &ndim, NULL, &data) < 0)
@@ -169,15 +169,15 @@ Int lux_zoom(Int narg, Int ps[])
       || zoom_yc >= ny) {
     zoom_xc = 0.5*nx;
     zoom_yc = 0.5*ny;
-    zoom_mag = (Int) ((2*sx)/nx);
-    i = (Int) ((2*sy)/ny);
+    zoom_mag = (int32_t) ((2*sx)/nx);
+    i = (int32_t) ((2*sy)/ny);
     if (i < zoom_mag)
       zoom_mag = i;
     if (!zoom_mag)
     zoom_mag = 1.0;
   } else if (zoom_mag <= 0.0) {
-    zoom_mag = (Int) ((2*sx)/nx);
-    i = (Int) ((2*sy)/ny);
+    zoom_mag = (int32_t) ((2*sx)/nx);
+    i = (int32_t) ((2*sy)/ny);
     if (i < zoom_mag)
       zoom_mag = i;
     if (!zoom_mag)
@@ -947,14 +947,14 @@ Int lux_zoom(Int narg, Int ps[])
   } while (1);
 }
 /*--------------------------------------------------------------------------*/
-Int tvzoom(Int narg, Int ps[])
+int32_t tvzoom(int32_t narg, int32_t ps[])
 {
-  Int	*dims, ndim, axes[2] = {0, 1}, sdims[3], nx, ny, wid;
-  Int	coords[4], offset, type, sx, sy, i, stride, step[2];
-  extern Int	last_wid;
-  Int	tvraw(pointer data, Int type, Int nx, Int ny, float x1, float x2,
-	      float y1, float y2, float sx, float sy, Int wid, float *mag,
-	      Int mode, double clo, double chi, uint8_t *bitmap1, uint8_t *bitmap2);
+  int32_t	*dims, ndim, axes[2] = {0, 1}, sdims[3], nx, ny, wid;
+  int32_t	coords[4], offset, type, sx, sy, i, stride, step[2];
+  extern int32_t	last_wid;
+  int32_t	tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, float x2,
+	      float y1, float y2, float sx, float sy, int32_t wid, float *mag,
+	      int32_t mode, double clo, double chi, uint8_t *bitmap1, uint8_t *bitmap2);
 
   pointer	data, image, bitmapdata, bitmap;
   float	x1, x2, y1, y2;
@@ -990,15 +990,15 @@ Int tvzoom(Int narg, Int ps[])
       || zoom_yc >= ny) {
     zoom_xc = 0.5*nx;
     zoom_yc = 0.5*ny;
-    zoom_mag = (Int) ((2*sx)/nx);
-    i = (Int) ((2*sy)/ny);
+    zoom_mag = (int32_t) ((2*sx)/nx);
+    i = (int32_t) ((2*sy)/ny);
     if (i < zoom_mag)
       zoom_mag = i;
     if (!zoom_mag)
     zoom_mag = 1.0;
   } else if (zoom_mag <= 0.0) {
-    zoom_mag = (Int) ((2*sx)/nx);
-    i = (Int) ((2*sy)/ny);
+    zoom_mag = (int32_t) ((2*sx)/nx);
+    i = (int32_t) ((2*sy)/ny);
     if (i < zoom_mag)
       zoom_mag = i;
     if (!zoom_mag)

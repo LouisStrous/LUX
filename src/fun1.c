@@ -42,11 +42,11 @@ double	voigt(double, double), beta(double, double), gamma(double),
 	F(double, double, double), loggamma(double), logbeta(double, double),
 	non_central_chi_square(double, double, double), bessel_i0(double),
 	bessel_i1(double), bessel_k0(double), bessel_k1(double),
-	bessel_kn(Int, double), sgn(double);
-static	Int	result_sym;
-Int	math_funcs(Int, Int), math_funcs_2f(Int, Int, Int),
-	math_funcs_i_f(Int, Int, Int), math_funcs_3f(Int, Int, Int, Int);
-Int	lux_zerof(Int, Int []);
+	bessel_kn(int32_t, double), sgn(double);
+static	int32_t	result_sym;
+int32_t	math_funcs(int32_t, int32_t), math_funcs_2f(int32_t, int32_t, int32_t),
+	math_funcs_i_f(int32_t, int32_t, int32_t), math_funcs_3f(int32_t, int32_t, int32_t, int32_t);
+int32_t	lux_zerof(int32_t, int32_t []);
 
 enum fd {
   F_SIN, F_COS, F_TAN, F_ASIN, F_ACOS, F_ATAN, F_SINH, F_COSH, F_TANH,
@@ -73,7 +73,7 @@ double (*func_d[])(double) = {
   bessel_i0, bessel_i1, bessel_k0, bessel_k1, sgn, asinh, acosh, atanh
 };
 
-double (*func_id[])(Int, double) = {
+double (*func_id[])(int32_t, double) = {
   jn, yn, bessel_kn
 };
 
@@ -103,7 +103,7 @@ doubleComplex (*func_c[])(double, double) = {
 /* an LUX_EVB, so they are superfluous here.  keep them around just in case */
 /* LS 29aug94 */
 /*------------------------------------------------------------------------- */
-Int defined(Int symbol, Int argument)
+int32_t defined(int32_t symbol, int32_t argument)
 /* <argument> = 0: Returns 0 if <symbol> is or links to (through LUX_TRANSFERs)
     a class of LUX_UNDEFINED or LUX_UNUSED, 1 otherwise.
  <argument> != 0: same as <argument> = 0 except when <symbol> is an argument
@@ -111,7 +111,7 @@ Int defined(Int symbol, Int argument)
     specified a (possibly undefined) value for <symbol>, 0 otherwise.
  LS 27may96 4aug97 */
 {
-  Int	target;
+  int32_t	target;
 
   target = symbol;
   target = transfer(target);
@@ -130,7 +130,7 @@ Int defined(Int symbol, Int argument)
 	  || symbol_class(target) == LUX_UNDEFINED)? 0: 1;
 }
 /*------------------------------------------------------------------------- */
-Int lux_defined(Int narg, Int ps[])
+int32_t lux_defined(int32_t narg, int32_t ps[])
 /* DEFINED(x) returns 0 if <x> is itself, or is linked through LUX_TRANSFERs */
 /* with, a class of LUX_UNUSED or LUX_UNDEFINED.  DEFINED(x,/TARGET) returns 0 */
 /* if it is itself, or is linked through LUX_POINTERs with, a class of */
@@ -144,10 +144,10 @@ Int lux_defined(Int narg, Int ps[])
   return defined(*ps, internalMode)? LUX_ONE: LUX_ZERO;
 }
 /*------------------------------------------------------------------------- */
-Int lux_delete(Int narg, Int ps[])
+int32_t lux_delete(int32_t narg, int32_t ps[])
 /* deletes symbols (deallocates memory & makes undefined) */
 {
-  Int   i, iq;
+  int32_t   i, iq;
 
   for (i = 0; i < narg; i++) {
     iq = *ps++;
@@ -166,11 +166,11 @@ Int lux_delete(Int narg, Int ps[])
   return LUX_OK;
 }
 /*------------------------------------------------------------------------- */
-Int lux_quit(Int narg, Int ps[])
+int32_t lux_quit(int32_t narg, int32_t ps[])
 /*exit routine, calls are exit,status or quit,status */
 {
- Int	iq, saveHistory(void);
- void	Quit(Int);
+ int32_t	iq, saveHistory(void);
+ void	Quit(int32_t);
 
  if (narg)
    iq = int_arg(ps[0]);
@@ -180,10 +180,10 @@ Int lux_quit(Int narg, Int ps[])
  return LUX_OK;			/* or some compilers complain */
 }
 /*------------------------------------------------------------------------- */
-Int lux_cputime(void)
+int32_t lux_cputime(void)
      /*returns an cpu time in seconds */
 {
-  Int	i;
+  int32_t	i;
   double value;
 
   i = scalar_scratch(LUX_DOUBLE);
@@ -202,10 +202,10 @@ Int lux_cputime(void)
   return i;
 }
 /*------------------------------------------------------------------------- */
-Int lux_systime(void)
+int32_t lux_systime(void)
      /* returns the system time in LUX_DOUBLE seconds */
 {
-  Int     i;
+  int32_t     i;
   struct timeval tp;
   struct timezone tzp;
 
@@ -216,10 +216,10 @@ Int lux_systime(void)
   return LUX_ZERO;		/* return 0 if not available */
 }
 /*------------------------------------------------------------------------- */
-Int lux_ctime(void)
+int32_t lux_ctime(void)
      /* returns current time and date in a string */
 {
-  Int	i;
+  int32_t	i;
   time_t	t;
 
   i = string_scratch(24);
@@ -228,11 +228,11 @@ Int lux_ctime(void)
   return i;
 }
 /*------------------------------------------------------------------------- */
-Int lux_time(void)
+int32_t lux_time(void)
      /* returns current time in a string */
      /* added \0 to result string  LS 22may94 */
 {
-  Int	i;
+  int32_t	i;
   time_t	t;
   char	*p;
   
@@ -244,10 +244,10 @@ Int lux_time(void)
   return i;
 }
 /*------------------------------------------------------------------------- */
-Int lux_date(void)
+int32_t lux_date(void)
      /* returns current date in a string */
 {
-  Int	i;
+  int32_t	i;
   time_t	t;
   char	*p, *p2;
 
@@ -262,12 +262,12 @@ Int lux_date(void)
   return i;
 }
 /*------------------------------------------------------------------------- */
-Int lux_jd(void)
+int32_t lux_jd(void)
 /* returns current Julian Day (relative to UTC) in double precision */
 {
   time_t	t;
   double	jd;
-  Int	result;
+  int32_t	result;
 
   t = time(NULL);
   /* NOTE: I assume here that t indicates the number of seconds since */
@@ -285,23 +285,23 @@ Int lux_jd(void)
   return result;
 }
 /*------------------------------------------------------------------------- */
-Int lux_cjd(void)
+int32_t lux_cjd(void)
 /* returns current Chronological Julian Day, relative to the current
    time zone */
 {
-  Int result;
+  int32_t result;
 
   result = scalar_scratch(LUX_DOUBLE);
   scalar_value(result).d = CJD_now();
   return result;
 }
 /*------------------------------------------------------------------------- */
-Int lux_show(Int narg, Int ps[])
+int32_t lux_show(int32_t narg, int32_t ps[])
 /*show some info about symbols by number or subname */
 {
-  Int	iq, i;
+  int32_t	iq, i;
   char	*s, *s2;
-  Int	lux_dump(Int, Int []);
+  int32_t	lux_dump(int32_t, int32_t []);
   
   if (narg == 0)
     return lux_dump(-1, ps);	/* everybody */
@@ -322,7 +322,7 @@ Int lux_show(Int narg, Int ps[])
       s2 = strsave(s);
       s = s2;
       while (*s2) {
-	*s2 = toupper((Int) *s2);
+	*s2 = toupper((int32_t) *s2);
 	s2++;
       }
       for (i = 0; i < NSYM; i++) {
@@ -345,11 +345,11 @@ Int lux_show(Int narg, Int ps[])
   }
 }
 /*------------------------------------------------------------------------- */
-void symdumpswitch(Int nsym, Int mode)
+void symdumpswitch(int32_t nsym, int32_t mode)
 {
-  char	*s, *typeName(Int), *save;
-  Int	j, *ip;
-  Int	evalListPtr(Int);
+  char	*s, *typeName(int32_t), *save;
+  int32_t	j, *ip;
+  int32_t	evalListPtr(int32_t);
   
   if (symbol_class(nsym) == LUX_TRANSFER || symbol_class(nsym) == LUX_POINTER) {
     j = transfer_target(nsym);
@@ -403,7 +403,7 @@ void symdumpswitch(Int nsym, Int mode)
     printwf("#elem = %1d, ", clist_num_symbols(nsym));
     break;
     case LUX_ASSOC:			/* assoc */
-      s = typeName((Int) assoc_type(nsym));
+      s = typeName((int32_t) assoc_type(nsym));
       printwf("lun = %d, offset = %d, ", assoc_lun(nsym),
 	      assoc_has_offset(nsym)? assoc_offset(nsym): 0);
       break;
@@ -440,9 +440,9 @@ void symdumpswitch(Int nsym, Int mode)
   return;
 }
 /*------------------------------------------------------------------------- */
-Int lux_dump_one(Int iq, Int full)
+int32_t lux_dump_one(int32_t iq, int32_t full)
 {
-  Int	j;
+  int32_t	j;
   char	*s, *save;
 
   if (iq < 0 || iq >= NSYM)
@@ -477,7 +477,7 @@ Int lux_dump_one(Int iq, Int full)
   return 0;
 }
 /*------------------------------------------------------------------------- */
-Int lux_dump(Int narg, Int ps[])
+int32_t lux_dump(int32_t narg, int32_t ps[])
 /* show some info about symbols in list */
 /* internalMode:  1 fixed, 2 system, 4 zero, 8 local, 16 context */
 /* 1 -> all fixed numbers (#s < nFixed)
@@ -486,9 +486,9 @@ Int lux_dump(Int narg, Int ps[])
    8 -> all local variables
    16 -> all variables of a specific context (in *ps) */
 {
-  Int	i, mode, imode, iq, context = -1;
-  void	setPager(Int), resetPager(void);
-  extern Int nFixed, tempSym;
+  int32_t	i, mode, imode, iq, context = -1;
+  void	setPager(int32_t), resetPager(void);
+  extern int32_t nFixed, tempSym;
 
   mode = 0;
   imode = internalMode;
@@ -530,14 +530,14 @@ Int lux_dump(Int narg, Int ps[])
   return 1;
 }							/*end of lux_dump */
 /*------------------------------------------------------------------------- */
-Int lux_zero(Int narg, Int ps[])
+int32_t lux_zero(int32_t narg, int32_t ps[])
 /* subroutine version,  LUX_ZERO, x, [y ...] zero symbols in list */
 {
-  Int	i, iq, mq, n;
-  extern Int	nFixed;
+  int32_t	i, iq, mq, n;
+  extern int32_t	nFixed;
   char	*p;
   pointer	q;
-  extern Int	scrat[];
+  extern int32_t	scrat[];
   FILE	*fp;
   
   for (i = 0; i < narg; i++) {
@@ -557,13 +557,13 @@ Int lux_zero(Int narg, Int ps[])
 	  printf("File %s; ", p);
 	  return cerror(ERR_OPEN, iq);
 	}
-	if (mq > NSCRAT*sizeof(Int)) {
-	  zerobytes(scrat, NSCRAT*sizeof(Int));
-	  n = (Int) (mq/NSCRAT/sizeof(Int));
+	if (mq > NSCRAT*sizeof(int32_t)) {
+	  zerobytes(scrat, NSCRAT*sizeof(int32_t));
+	  n = (int32_t) (mq/NSCRAT/sizeof(int32_t));
 	  for (i = 0; i < n; i++)
-	    if (fwrite(scrat, 1, NSCRAT*sizeof(Int), fp) < 1)
+	    if (fwrite(scrat, 1, NSCRAT*sizeof(int32_t), fp) < 1)
 	      return cerror(WRITE_ERR, iq);
-	  n = mq - n*NSCRAT*sizeof(Int);
+	  n = mq - n*NSCRAT*sizeof(int32_t);
 	  if (n && (fwrite(scrat, 1, n, fp) < 1))
 	    return cerror(WRITE_ERR, iq);
 	} else {
@@ -660,12 +660,12 @@ Int lux_zero(Int narg, Int ps[])
   return 1;
 }							/*end of lux_type */
 /*------------------------------------------------------------------------- */
-Int lux_onef(Int narg, Int ps[])
+int32_t lux_onef(int32_t narg, int32_t ps[])
 /* ONE(x) returns copy of numerical <x> with all elements equal to 1 */
 /* LS 7apr98 */
 {
   pointer	p;
-  Int	n, iq;
+  int32_t	n, iq;
 
   iq = ps[0];
   switch (symbol_class(iq)) {
@@ -724,12 +724,12 @@ Int lux_onef(Int narg, Int ps[])
   return iq;
 }
 /*------------------------------------------------------------------------- */
-Int lux_one(Int narg, Int ps[])
+int32_t lux_one(int32_t narg, int32_t ps[])
 /* replaces all values in numerical array ps[0] by ones. */
 /* LS 7apr98 */
 {
   pointer	p;
-  Int	n, iq;
+  int32_t	n, iq;
 
   while (narg--) {
     iq = *ps++;
@@ -795,11 +795,11 @@ Int lux_one(Int narg, Int ps[])
   return LUX_OK;
 }
 /*------------------------------------------------------------------------- */
-Int lux_zerof(Int narg, Int ps[])
+int32_t lux_zerof(int32_t narg, int32_t ps[])
 /* function version,  x = LUX_ZERO(y)
    create array x of same type and size as y and set all elements to zero */
 {
-  Int	iq, mq;
+  int32_t	iq, mq;
   char	*p;
 
   iq = ps[0];
@@ -862,14 +862,14 @@ Int lux_zerof(Int narg, Int ps[])
   }
 }
 /*------------------------------------------------------------------------- */
-Int indgen(Int narg, Int ps[], Int isFunc)
+int32_t indgen(int32_t narg, int32_t ps[], int32_t isFunc)
 /* fills array elements with their element index or with the value of
  one of their coordinates */
 /* if called as function: INDGEN(<tgt> [, <axis>])
    if called as subroutine: INDGEN, <tgt> [, <axis>] */
 {
   pointer	src, trgt;
-  Int	result;
+  int32_t	result;
   loopInfo	srcinfo, trgtinfo;
 
   if (isFunc) {
@@ -899,7 +899,7 @@ Int indgen(Int narg, Int ps[], Int isFunc)
       break;
     case LUX_LONG:
       do 
-	*trgt.l = (Int) trgtinfo.coords[0];
+	*trgt.l = (int32_t) trgtinfo.coords[0];
       while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.rndim);
       break;
     case LUX_FLOAT:
@@ -928,21 +928,21 @@ Int indgen(Int narg, Int ps[], Int isFunc)
   return result;
 }
 /*------------------------------------------------------------------------- */
-Int lux_indgen(Int narg, Int ps[])
+int32_t lux_indgen(int32_t narg, int32_t ps[])
 {
   return indgen(narg, ps, 1);
 }
 /*------------------------------------------------------------------------- */
-Int lux_indgen_s(Int narg, Int ps[])
+int32_t lux_indgen_s(int32_t narg, int32_t ps[])
 {
   return indgen(narg, ps, 0);
 }
 REGISTER(indgen_s, s, INDGEN, 1, 2, "*");
 /*------------------------------------------------------------------------- */
-Int lux_neg_func(Int narg, Int ps[])
+int32_t lux_neg_func(int32_t narg, int32_t ps[])
      /*take the negative of something */
 {
-  Int	n, result;
+  int32_t	n, result;
   pointer	src, trgt;
 
   /* check that <*ps> is numerical, return number of elements in <n>,
@@ -988,11 +988,11 @@ Int lux_neg_func(Int narg, Int ps[])
   return result;
 } /* end of lux_neg_func */
 /*------------------------------------------------------------------------- */
-Int lux_isnan(Int narg, Int ps[])
+int32_t lux_isnan(int32_t narg, int32_t ps[])
      /* returns 1 if the argument is not a number (NaN).  Only works */
      /* if IEEE function isnan is available.  LS 28jun97 */
 {
-  Int	n, result, iq, *trgt;
+  int32_t	n, result, iq, *trgt;
   pointer	src;
   floatComplex	*trgtc;
 
@@ -1059,13 +1059,13 @@ Int lux_isnan(Int narg, Int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-Int zapnan(Int narg, Int ps[], Int func)
+int32_t zapnan(int32_t narg, int32_t ps[], int32_t func)
 /* ZERONANS,value=<value>, <arg1>, <arg2>, ... */
 /* ZERONANS(value=<value>, <arg1>) */
 /* replaces NaNs in numerical <arg1> &c with <value> (if defined), or */
 /* with 0.  LS 27apr99 */
 {
-  Int	size, result, valueSym;
+  int32_t	size, result, valueSym;
   scalar	value;
   pointer	data, trgt;
 
@@ -1142,24 +1142,24 @@ Int zapnan(Int narg, Int ps[], Int func)
   return func? result: LUX_OK;
 }
 /*------------------------------------------------------------------------- */
-Int lux_zapnan(Int narg, Int ps[])
+int32_t lux_zapnan(int32_t narg, int32_t ps[])
 /* ZAPNAN,value=<value>, <x1>, <x2>, ... replaces NaNs in the <x>s with the */
 /* scalar <value>, which defaults to zero.  LS 8jun98 27apr99 */
 {
   return zapnan(narg, ps, 0);
 }
 /*------------------------------------------------------------------------- */
-Int lux_zapnan_f(Int narg, Int ps[])
+int32_t lux_zapnan_f(int32_t narg, int32_t ps[])
 /* ZAPNAN(value=<value>, <x>) returns a copy of <x> with all NaNs replaced */
 /* by the scalar <value> which defaults to zero.  LS 8jun98 27apr99 */
 {
   return zapnan(narg, ps, 1);
 }
 /*------------------------------------------------------------------------- */
-Int lux_abs(Int narg, Int ps[])
+int32_t lux_abs(int32_t narg, int32_t ps[])
 /*take the absolute value of something */
 {
-  Int	n, result, iq;
+  int32_t	n, result, iq;
   pointer	src, trgt;
 
   iq = *ps;
@@ -1250,14 +1250,14 @@ Int lux_abs(Int narg, Int ps[])
   return result;
 }						/*end of lux_abs */
 /*------------------------------------------------------------------------- */
-Int lux_complexsquare(Int narg, Int ps[])
+int32_t lux_complexsquare(int32_t narg, int32_t ps[])
 /* returns the complex square of argument <x>, i.e., the product of
    <x> and its complex conjugate; if <x> is not complex, then assumes
    that it came from a call to the FFT function with real argument,
    i.e., that it contains the amplitudes of sine and cosine series.
    LS 2005dec18 */
 {
-  Int	n, result, iq;
+  int32_t	n, result, iq;
   pointer	src, trgt;
 
   iq = *ps;
@@ -1302,7 +1302,7 @@ Int lux_complexsquare(Int narg, Int ps[])
       return cerror(ILL_CLASS, *ps);
   }
 
-  Int i, n2;
+  int32_t i, n2;
 
   switch (symbol_type(*ps)) {
     case LUX_BYTE:
@@ -1368,11 +1368,11 @@ Int lux_complexsquare(Int narg, Int ps[])
   return result;  
 }
 /*------------------------------------------------------------------------- */
-Int lux_conjugate(Int narg, Int ps[])
+int32_t lux_conjugate(int32_t narg, int32_t ps[])
 /* returns the complex conjugate of numerical symbols */
 /* LS 31jul98 */
 {
-  Int	result, n;
+  int32_t	result, n;
   pointer	src, trgt;
 
   if (!symbolIsNumerical(*ps))
@@ -1421,10 +1421,10 @@ Int lux_conjugate(Int narg, Int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-Int index_total(Int narg, Int ps[], Int mean)
+int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 /* accumulates source values by class */
 {
-  Int	type, offset, *indx, i, size, result, nElem, indices2,
+  int32_t	type, offset, *indx, i, size, result, nElem, indices2,
   	outType, haveWeights, p, psign, pp, nbase, j;
   pointer	src, trgt, sum, weights, hist;
   scalar	temp, value;
@@ -1434,7 +1434,7 @@ Int index_total(Int narg, Int ps[], Int mean)
   double	temp2d;
   uint8_t	*present;
   extern scalar	lastmin, lastmax;
-  Int	minmax(Int *, Int, Int);
+  int32_t	minmax(int32_t *, int32_t, int32_t);
 
   if (narg > 3 && ps[3]) {	/* have <weights> */
     if (!symbolIsNumericalArray(ps[3]) /* not a numerical array */
@@ -1693,8 +1693,8 @@ Int index_total(Int narg, Int ps[], Int mean)
       }	/* end of if (mean) else */
     } else {			/* no <weights>: each element counts once */
       if (mean) {		/* want average */
-	allocate(hist.l, size, Int);
-	zerobytes(hist.l, size*sizeof(Int));
+	allocate(hist.l, size, int32_t);
+	zerobytes(hist.l, size*sizeof(int32_t));
 	hist.l += offset;
 	switch (outType) {
 	  case LUX_FLOAT:
@@ -2555,8 +2555,8 @@ Int index_total(Int narg, Int ps[], Int mean)
       }	/* end of if (mean) else */
     } else {			/* unweighted power summation */
       if (mean) {		/* want averages */
-	allocate(hist.l, size, Int);
-	zerobytes(hist.l, size*sizeof(Int));
+	allocate(hist.l, size, int32_t);
+	zerobytes(hist.l, size*sizeof(int32_t));
 	hist.l += offset;
 	switch (outType) {
 	  case LUX_FLOAT:
@@ -3149,7 +3149,7 @@ Int index_total(Int narg, Int ps[], Int mean)
   return result;
 }
 /*-----------------------------------------------------------------------*/
-Int total(Int narg, Int ps[], Int mean)
+int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 /* TOTAL(x, [ mode, POWER=p, WEIGHTS=w, /KEEPDIMS, /FLOAT, /DOUBLE]) */
 
 /* TOTAL(array) sums all elements of <array> and returns a LUX_SCALAR. */
@@ -3167,7 +3167,7 @@ Int total(Int narg, Int ps[], Int mean)
 /* Fixed erroneous cast to (float) in (double) summations.  LS 11jul2000 */
 /* Allow LUX_LONG output.  LS 27oct2010 */
 {
-  Int	result, done, p, psign, pp, outtype, type, nbase, i, haveWeights, n;
+  int32_t	result, done, p, psign, pp, outtype, type, nbase, i, haveWeights, n;
   uint8_t	*present;
   scalar	sum, value, temp, w;
   floatComplex	sumcf, tempcf, valuecf;
@@ -4650,12 +4650,12 @@ Int total(Int narg, Int ps[], Int mean)
 }
 #undef DEBUG_VOCAL
 /*------------------------------------------------------------------------- */
-Int lux_total(Int narg, Int ps[])
+int32_t lux_total(int32_t narg, int32_t ps[])
  {
    return total(narg, ps, 0);
  }
 /*------------------------------------------------------------------------- */
-Int lux_mean(Int narg, Int ps[])
+int32_t lux_mean(int32_t narg, int32_t ps[])
  {
    return total(narg, ps, 1);
  }
@@ -4804,166 +4804,166 @@ doubleComplex c_exp(double real, double imaginary)
 /*math functions with 1 argument, all just call math_funcs with approiate
 code, all have names of form lux_xxx... */
 /*------------------------------------------------------------------------- */
-Int lux_sin(Int narg, Int ps[])
+int32_t lux_sin(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_SIN);
 }
 /*------------------------------------------------------------------------- */
-Int lux_cos(Int narg, Int ps[])
+int32_t lux_cos(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_COS);
 }
 /*------------------------------------------------------------------------- */
-Int lux_tan(Int narg, Int ps[])
+int32_t lux_tan(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_TAN);
 }
 /*------------------------------------------------------------------------- */
-Int lux_asin(Int narg, Int ps[])
+int32_t lux_asin(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_ASIN);
 }
 /*------------------------------------------------------------------------- */
-Int lux_acos(Int narg, Int ps[])
+int32_t lux_acos(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_ACOS);
 }
 /*------------------------------------------------------------------------- */
-Int lux_atan(Int narg, Int ps[])
+int32_t lux_atan(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_ATAN);
 }
 /*------------------------------------------------------------------------- */
-Int lux_sinh(Int narg, Int ps[])
+int32_t lux_sinh(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_SINH);
 }
 /*------------------------------------------------------------------------- */
-Int lux_cosh(Int narg, Int ps[])
+int32_t lux_cosh(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_COSH);
 }
 /*------------------------------------------------------------------------- */
-Int lux_tanh(Int narg, Int ps[])
+int32_t lux_tanh(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_TANH);
 }
 /*------------------------------------------------------------------------- */
-Int lux_asinh(Int narg, Int ps[])
+int32_t lux_asinh(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_ASINH);
 }
 /*------------------------------------------------------------------------- */
-Int lux_acosh(Int narg, Int ps[])
+int32_t lux_acosh(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_ACOSH);
 }
 /*------------------------------------------------------------------------- */
-Int lux_atanh(Int narg, Int ps[])
+int32_t lux_atanh(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_ATANH);
 }
 /*------------------------------------------------------------------------- */
-Int lux_sqrt(Int narg, Int ps[])
+int32_t lux_sqrt(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_SQRT);
 }
 /*------------------------------------------------------------------------- */
-Int lux_cbrt(Int narg, Int ps[])
+int32_t lux_cbrt(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_CBRT);
 }
 /*------------------------------------------------------------------------- */
-Int lux_exp(Int narg, Int ps[])
+int32_t lux_exp(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_EXP);
 }
 /*------------------------------------------------------------------------- */
-Int lux_expm1(Int narg, Int ps[])
+int32_t lux_expm1(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_EXPM1);
 }
 /*------------------------------------------------------------------------- */
-Int lux_log(Int narg, Int ps[])
+int32_t lux_log(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_LOG);
 }
 /*------------------------------------------------------------------------- */
-Int lux_log10(Int narg, Int ps[])
+int32_t lux_log10(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_LOG10);
 }
 /*------------------------------------------------------------------------- */
-Int lux_log1p(Int narg, Int ps[])
+int32_t lux_log1p(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_LOG1P);
 }
 /*------------------------------------------------------------------------- */
-Int lux_erf(Int narg, Int ps[])
+int32_t lux_erf(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_ERF);
 }
 /*------------------------------------------------------------------------- */
-Int lux_erfc(Int narg, Int ps[])
+int32_t lux_erfc(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_ERFC);
 }
 /*------------------------------------------------------------------------- */
-Int lux_atan2(Int narg, Int ps[])
+int32_t lux_atan2(int32_t narg, int32_t ps[])
 /*the right way to do atan's, the atan2 function, 2 arguments */
 {
   return math_funcs_2f(ps[0], ps[1], F_ATAN2);
 }
 /*------------------------------------------------------------------------- */
-Int lux_j0(Int narg, Int ps[])
+int32_t lux_j0(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_J0);
 }
 /*------------------------------------------------------------------------- */
-Int lux_j1(Int narg, Int ps[])
+int32_t lux_j1(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_J1);
 }
 /*------------------------------------------------------------------------- */
-Int lux_jn(Int narg, Int ps[])
+int32_t lux_jn(int32_t narg, int32_t ps[])
 {
   return math_funcs_i_f(ps[0], ps[1], F_JN);
 }
 /*------------------------------------------------------------------------- */
-Int lux_y0(Int narg, Int ps[])
+int32_t lux_y0(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_Y0);
 }
 /*------------------------------------------------------------------------- */
-Int lux_y1(Int narg, Int ps[])
+int32_t lux_y1(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_Y1);
 }
 /*------------------------------------------------------------------------- */
-Int lux_yn(Int narg, Int ps[])
+int32_t lux_yn(int32_t narg, int32_t ps[])
 {
   return math_funcs_i_f(ps[0], ps[1], F_YN);
 }
 /*------------------------------------------------------------------------- */
-Int lux_pow(Int narg, Int ps[])
+int32_t lux_pow(int32_t narg, int32_t ps[])
 {
   return math_funcs_2f(ps[0], ps[1], F_POW);
 }
 /*------------------------------------------------------------------------- */
-Int lux_voigt(Int narg, Int ps[])
+int32_t lux_voigt(int32_t narg, int32_t ps[])
 /* the voigt function.  LS */
 {
   return math_funcs_2f(ps[0], ps[1], F_VOIGT);
 }
 /*------------------------------------------------------------------------- */
-Int lux_gamma(Int narg, Int ps[])
+int32_t lux_gamma(int32_t narg, int32_t ps[])
 /* returns the gamma function - or the natural logarithm of it (if keyword */
 /* /LOG is present)  LS 11jan96 */
 {
   return math_funcs(ps[0], (internalMode & 1)? F_LOGGAMMA: F_GAMMA);
 }
 /*------------------------------------------------------------------------- */
-Int lux_beta(Int narg, Int ps[])
+int32_t lux_beta(int32_t narg, int32_t ps[])
 /* the beta function: beta(x,y) = gamma(x)*gamma(y)/gamma(x+y). */
 /* Switch /COMPLEMENT returns one minus the beta function. */
 /* LS 11jan96 22jul96 */
@@ -4971,83 +4971,83 @@ Int lux_beta(Int narg, Int ps[])
   return math_funcs_2f(ps[0], ps[1], (internalMode & 1)? F_LOGBETA: F_BETA);
 }
 /*------------------------------------------------------------------------- */
-Int lux_incomplete_gamma(Int narg, Int ps[])
+int32_t lux_incomplete_gamma(int32_t narg, int32_t ps[])
 /* the incomplete gamma function P(a,x).  LS 11jan96 */
 {
   return math_funcs_2f(ps[0], ps[1], F_IGAMMA);
 }
 /*------------------------------------------------------------------------- */
-Int lux_chi_square(Int narg, Int ps[])
+int32_t lux_chi_square(int32_t narg, int32_t ps[])
 /* the chi-square function chi2(chi2, nu).  LS 11jan96 19oct96 */
 {
   return math_funcs_2f(ps[0], ps[1], F_CHI2);
 }
 /*------------------------------------------------------------------------- */
-Int lux_noncentral_chi_square(Int narg, Int ps[])
+int32_t lux_noncentral_chi_square(int32_t narg, int32_t ps[])
 /* the noncentral chi-squre function ncchi2(chi2, nu, nc) */
 {
   return math_funcs_3f(ps[0], ps[1], ps[2], F_NCCHI2);
 }
 /*------------------------------------------------------------------------- */
-Int lux_bessel_i0(Int narg, Int ps[])
+int32_t lux_bessel_i0(int32_t narg, int32_t ps[])
 /* the modified bessel function I0 */
 {
   return math_funcs(ps[0], F_I0);
 }
 /*------------------------------------------------------------------------- */
-Int lux_bessel_i1(Int narg, Int ps[])
+int32_t lux_bessel_i1(int32_t narg, int32_t ps[])
 /* the modified bessel function I1 */
 {
   return math_funcs(ps[0], F_I1);
 }
 /*------------------------------------------------------------------------- */
-Int lux_bessel_k0(Int narg, Int ps[])
+int32_t lux_bessel_k0(int32_t narg, int32_t ps[])
 /* the modified bessel function K0 */
 {
   return math_funcs(ps[0], F_K0);
 }
 /*------------------------------------------------------------------------- */
-Int lux_bessel_k1(Int narg, Int ps[])
+int32_t lux_bessel_k1(int32_t narg, int32_t ps[])
 /* the modified bessel function K1 */
 {
   return math_funcs(ps[0], F_K1);
 }
 /*------------------------------------------------------------------------- */
-Int lux_bessel_kn(Int narg, Int ps[])
+int32_t lux_bessel_kn(int32_t narg, int32_t ps[])
 /* the modified bessel function Kn */
 {
   return math_funcs_i_f(ps[0], ps[1], F_KN);
 }
 /*------------------------------------------------------------------------- */
-Int lux_sgn(Int narg, Int ps[])
+int32_t lux_sgn(int32_t narg, int32_t ps[])
 /* the signum function: returns +1 if the argument is positive, -1 if */
 /* negative, and 0 if zero.  LS 19may98 */
 {
   return math_funcs(ps[0], F_SGN);
 }
 /*------------------------------------------------------------------------- */
-Int lux_incomplete_beta(Int narg, Int ps[])
+int32_t lux_incomplete_beta(int32_t narg, int32_t ps[])
 /* the incomplete beta function I_x(a,b).  LS 15jan96 */
 {
   return math_funcs_3f(ps[0], ps[1], ps[2], F_IBETA);
 }
 /*------------------------------------------------------------------------- */
-Int lux_student(Int narg, Int ps[])
+int32_t lux_student(int32_t narg, int32_t ps[])
 /* Student's t-distribution.  LS 15jan96 */
 {
   return math_funcs_2f(ps[0], ps[1], F_STUDENT);
 }
 /*------------------------------------------------------------------------- */
-Int lux_f_ratio(Int narg, Int ps[])
+int32_t lux_f_ratio(int32_t narg, int32_t ps[])
 /* F variance ratio.  LS 15jan96 */
 {
   return math_funcs_3f(ps[0], ps[1], ps[2], F_FRATIO);
 }
 /*------------------------------------------------------------------------- */
-Int math_funcs(Int nsym, Int code)
+int32_t math_funcs(int32_t nsym, int32_t code)
      /*general program for floating point functions */
 {
-  Int	n, result, type, out_type;
+  int32_t	n, result, type, out_type;
   pointer	trgt, src;
   doubleComplex	value;
 
@@ -5131,12 +5131,12 @@ Int math_funcs(Int nsym, Int code)
   return result;
 }						/*end of math_funcs */
 /*------------------------------------------------------------------------- */
-Int math_funcs_2f(Int nsym1, Int nsym2, Int code)
+int32_t math_funcs_2f(int32_t nsym1, int32_t nsym2, int32_t code)
 /*general program for floating point functions with 2 floating arguments */
 /*messier than the 1 argument case but not as bad as binary ops routines */
 /*assumes that the function requires double arguments (most C functions) */
 {
-  Int	n1, n2, nelem, i, result_sym, type1, type2, out_type;
+  int32_t	n1, n2, nelem, i, result_sym, type1, type2, out_type;
   pointer	src1, src2, trgt;
   double	value;
 
@@ -5470,11 +5470,11 @@ Int math_funcs_2f(Int nsym1, Int nsym2, Int code)
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-Int math_funcs_i_f(Int nsym1, Int nsym2, Int code)
-/*general program for floating point functions with Int and float arguments */
+int32_t math_funcs_i_f(int32_t nsym1, int32_t nsym2, int32_t code)
+/*general program for floating point functions with int32_t and float arguments */
 /*assumes that the function requires double arguments (most C functions) */
 {
-  Int	n1, n2, nelem, i, result_sym, type1, type2, out_type, valuei;
+  int32_t	n1, n2, nelem, i, result_sym, type1, type2, out_type, valuei;
   pointer	src1, src2, trgt;
   double	valued;
 
@@ -5803,7 +5803,7 @@ Int math_funcs_i_f(Int nsym1, Int nsym2, Int code)
   return result_sym;
 }						/*end of math_funcs_i_f */
 /*------------------------------------------------------------------------- */
-Int math_funcs_3f(Int sym1, Int sym2, Int sym3, Int code)
+int32_t math_funcs_3f(int32_t sym1, int32_t sym2, int32_t sym3, int32_t code)
 /* mathematical function with three arguments.  This code goes for */
 /* conciseness, not for speed.  It is assumed that the calculation */
 /* of the actual mathematical function takes more time than */
@@ -5812,7 +5812,7 @@ Int math_funcs_3f(Int sym1, Int sym2, Int sym3, Int code)
 /* the same number of elements.  The dimensional structures are not */
 /* checked.  LS 15jan96 */
 {
-  Int	n1, n2, n3, iq, n, type1, type2, type3, step1, step2, step3, type;
+  int32_t	n1, n2, n3, iq, n, type1, type2, type3, step1, step2, step3, type;
   pointer	src1, src2, src3, trgt;
   double	val1, val2, val3, val;
 
@@ -5984,7 +5984,7 @@ Int math_funcs_3f(Int sym1, Int sym2, Int sym3, Int code)
 double voigt(double a, double v)
 {
     double	anhs, avsd, sumb, avss;
-    Int		n;
+    int32_t		n;
     double	c1, d1, p2, ab, ef, al, aa,
 		av, aph, avs, vph, sum = 0;
 
@@ -6025,7 +6025,7 @@ double loggamma(double x)
   { 76.18009172947146, -86.50532032941677, 24.01409824083091,
       -1.231739572450155, 1.208650973866179e-3, -5.395239384953e-6 };
   char	flip;
-  Int	i;
+  int32_t	i;
   double	y, z, w;
 
   if (x <= 0)
@@ -6051,7 +6051,7 @@ double gamma(double x)
   { 76.18009172947146, -86.50532032941677, 24.01409824083091,
       -1.231739572450155, 1.208650973866179e-3, -5.395239384953e-6 };
   char	flip;
-  Int	i;
+  int32_t	i;
   double	y, z, w;
 
   if (x <= 0)
@@ -6068,7 +6068,7 @@ double gamma(double x)
   if (flip)
     y = 1.14472988584940017 - y - log(fabs(sin(x*M_PI)));
   y = exp(y);
-  if (flip && ((Int) x) % 2 == 1)
+  if (flip && ((int32_t) x) % 2 == 1)
     y = -y;
   return y;
 }
@@ -6080,7 +6080,7 @@ double incomplete_gamma(double a, double x)
 /* LS 11jan96 22jul96 */
 {
   double	z, g, z0, c, d, tiny, aa, bb, del;
-  Int	i;
+  int32_t	i;
 
   if (a < 0.0)
     return sqrt(-1);
@@ -6166,7 +6166,7 @@ double incomplete_beta(double x, double a, double b)
 {
   double	x0, tiny, c, f, d, e1, e2, e3, e4, e5, aa, del, k, g;
   char	flip;
-  Int	j;
+  int32_t	j;
 
   if (a <= 0 || b <= 0)
     return -1.0;			/* error condition */
@@ -6350,12 +6350,12 @@ double bessel_k1(double x)
 	  + 1.25331414)*exp(-x)/sqrt(x);
 }
 /*------------------------------------------------------------------------- */
-double bessel_kn(Int n, double x)
+double bessel_kn(int32_t n, double x)
 /* returns value of the modified Bessel function of order n Kn. */
 /* LS 3dec96.  uses Abramowitz & Stegun approximations. */
 {
   double	z, b0, b1, b2;
-  Int	i;
+  int32_t	i;
 
   if (n < 2 || x <= 0)
     return sqrt(-1);		/* generate error */
@@ -6381,18 +6381,18 @@ double sgn(double x)
   return 0.0;
 }
 /*------------------------------------------------------------------------- */
-Int lux_array_statistics(Int narg, Int ps[])
+int32_t lux_array_statistics(int32_t narg, int32_t ps[])
 /* returns mean, sdev, and other statistics for an array */
 /* this a subroutine with a variable number of arguments of the
    form:  array_statistics, array, max, min, mean, [sdev, skew, kurtosis]
    where mean, etc are returned values, either float or double */
 {
-  Int	n, nc, sdev_flag=0, skew_flag=0, kurtosis_flag=0;
+  int32_t	n, nc, sdev_flag=0, skew_flag=0, kurtosis_flag=0;
   double	fac;
   pointer	q1;
-  Int	*save_ptr;
-  Int	type;
-  Int	iq;
+  int32_t	*save_ptr;
+  int32_t	type;
+  int32_t	iq;
 
   iq = ps[0];
   if (numerical(iq, NULL, NULL, &n, &q1) == LUX_ERROR)
@@ -6414,15 +6414,15 @@ Int lux_array_statistics(Int narg, Int ps[])
  /* two major branches, one for doubles and one for everyone else */
   if (type < LUX_DOUBLE) {
     float	s, sdev, skew, kurtosis, mean, ss, max, min, xq;
-    Int	imax, imin;
+    int32_t	imax, imin;
     
     s = sdev = skew = kurtosis = 0.0;
    /* need a first pass to get the mean value */
     switch (type) {
       case LUX_WORD:
-	imax = imin = (Int) *q1.w;
+	imax = imin = (int32_t) *q1.w;
 	while (n--) { 
-	  iq = (Int) *q1.w++;
+	  iq = (int32_t) *q1.w++;
 	  s += (float) iq;
 	  if (iq > imax)
 	    imax = iq;
@@ -6453,9 +6453,9 @@ Int lux_array_statistics(Int narg, Int ps[])
 	}
 	break;
       case LUX_BYTE:
-	imax = imin = (Int) *q1.b;
+	imax = imin = (int32_t) *q1.b;
 	while (n--) { 
-	  iq = (Int) *q1.b++;
+	  iq = (int32_t) *q1.b++;
 	  s += (float) iq;
 	  if (iq > imax)
 	    imax = iq;

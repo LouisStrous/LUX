@@ -21,7 +21,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "action.h"
 
 typedef struct {
-  Int func_sym;
+  int32_t func_sym;
   size_t num_params;
   int16_t *param_syms;
   pointer *param_data;
@@ -29,7 +29,7 @@ typedef struct {
 
 lux_func_if * lux_func_if_alloc(char const * const name, size_t num_params);
 void lux_func_if_free(lux_func_if *);
-Int lux_func_if_set_param(lux_func_if *, size_t index, Int param);
-Int lux_func_if_get_param_sym(lux_func_if *, size_t index);
+int32_t lux_func_if_set_param(lux_func_if *, size_t index, int32_t param);
+int32_t lux_func_if_get_param_sym(lux_func_if *, size_t index);
 pointer lux_func_if_get_param_data(lux_func_if *, size_t index);
 double lux_func_if_call(lux_func_if *);

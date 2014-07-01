@@ -17,7 +17,7 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-struct moonlrTerm { Int d; Int m; Int mm; Int f; Int l; Int r; }
+struct moonlrTerm { int32_t d; int32_t m; int32_t mm; int32_t f; int32_t l; int32_t r; }
 moonlr[] = {
   { 0,0,1,0,6288774,-20905355 },
   { 2,0,-1,0,1274027,-3699111 },
@@ -81,7 +81,7 @@ moonlr[] = {
   { 2,0,-1,-2,0,8752 }
 };
 
-struct moonbTerm { Int d; Int m; Int mm; Int f; Int b; }
+struct moonbTerm { int32_t d; int32_t m; int32_t mm; int32_t f; int32_t b; }
 moonb[] = {
   { 0,0,0,1,5128122 },
   { 0,0,1,1,280602 },

@@ -30,7 +30,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
    if any.  It must be called before the first node is entered into
    the tree.
 
-   Int (*compare)(const void *, const void *): is a function that compares
+   int32_t (*compare)(const void *, const void *): is a function that compares
    the two arguments and returns an integer greater than, equal to, or
    less than zero, depending on whether the first argument is to be
    considered greater than, equal to, or less than the second argument.
@@ -54,10 +54,10 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 typedef char	node;
 
 static void	*bt_root;
-static Int	(*bt_compare)(const void *, const void *);
+static int32_t	(*bt_compare)(const void *, const void *);
 static void	**bt_blocks = NULL;
 static void	*bt_curnode, **bt_curblock;
-static Int	bt_nblocks = 0, bt_nfreeblocks = 0, bt_nfreenodes = 0;
+static int32_t	bt_nblocks = 0, bt_nfreeblocks = 0, bt_nfreenodes = 0;
 static size_t	bt_nodesize;
 
 void	bt_cleanup(void);
@@ -91,7 +91,7 @@ void *bt_nextnode(void)
   return bt_curnode;
 }
 
-void bt_initialize(Int (*compare)(const void *, const void *), size_t size)
+void bt_initialize(int32_t (*compare)(const void *, const void *), size_t size)
 /* intialize for a new binary tree.  Only one can be active at any given */
 /* time!  <compare> is a function that compares its two node arguments and */
 /* returns a positive, zero, or negative number when the second node is */
@@ -129,7 +129,7 @@ void *bt_delete(const void *key)
   return tdelete(key, &bt_root, bt_compare);
 }
 
-void bt_walk(void (*action)(const void *, VISIT, Int))
+void bt_walk(void (*action)(const void *, VISIT, int32_t))
 /* walk through the current tree in depth-first, left-to-right fashion */
 /* and call routine <action> on each visited node.  <action> has three */
 /* arguments: the address of the node that is visited; a key that indicates */

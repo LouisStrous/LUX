@@ -30,11 +30,11 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "action.h"
 
 /*-------------------------------------------------------------------------*/
-Int filemap(Int type, Int narg, Int ps[])
+int32_t filemap(int32_t type, int32_t narg, int32_t ps[])
 /* Create a file map symbol (file array) and stores array structure,
    file name and offset */
 {
- Int	iq, ndim, dims[8], mq, get_dims(Int *, Int *, Int *);
+ int32_t	iq, ndim, dims[8], mq, get_dims(int32_t *, int32_t *, int32_t *);
  char	*p;
 
  iq = ps[1];				/* file name */
@@ -53,7 +53,7 @@ Int filemap(Int type, Int narg, Int ps[])
  symbol_context(iq) = -1;	/* ? */
  symbol_line(iq) = curLineNumber;
 					/* memory requirement */
- mq = sizeof(array) + sizeof(Int)*(*ps != 0) + strlen(p) + 1;
+ mq = sizeof(array) + sizeof(int32_t)*(*ps != 0) + strlen(p) + 1;
  symbol_memory(iq) = mq;
 /* allocate((char *) file_map_header(iq), mq, char); */
  allocate(file_map_header(iq), mq, char); 
@@ -64,7 +64,7 @@ Int filemap(Int type, Int narg, Int ps[])
  if (internalMode & 2)		/* /SWAP */
    set_file_map_swap(iq);
  file_map_num_dims(iq) = ndim;
- memcpy(file_map_dims(iq), dims, ndim*sizeof(Int)); /* copy dimensions */
+ memcpy(file_map_dims(iq), dims, ndim*sizeof(int32_t)); /* copy dimensions */
  if (*ps) {
    set_file_map_has_offset(iq);
    file_map_offset(iq) = int_arg(*ps);
@@ -73,40 +73,40 @@ Int filemap(Int type, Int narg, Int ps[])
  return iq;
 }
 /*-------------------------------------------------------------------------*/
-Int bytfarr(Int narg, Int ps[])
+int32_t bytfarr(int32_t narg, int32_t ps[])
 /* Create a LUX_BYTE file array (file map) */
 { return filemap(LUX_BYTE, narg, ps); }
 /*-------------------------------------------------------------------------*/
-Int intfarr(Int narg, Int ps[])
+int32_t intfarr(int32_t narg, int32_t ps[])
 /* Create a LUX_WORD file array (file map) */
 { return filemap(LUX_WORD, narg, ps); }
 /*-------------------------------------------------------------------------*/
-Int lonfarr(Int narg, Int ps[])
+int32_t lonfarr(int32_t narg, int32_t ps[])
 /* Create a LUX_LONG file array (file map) */
 { return filemap(LUX_LONG, narg, ps); }
 /*-------------------------------------------------------------------------*/
-Int fltfarr(Int narg, Int ps[])
+int32_t fltfarr(int32_t narg, int32_t ps[])
 /* Create a LUX_FLOAT file array (file map) */
 { return filemap(LUX_FLOAT, narg, ps); }
 /*-------------------------------------------------------------------------*/
-Int dblfarr(Int narg, Int ps[])
+int32_t dblfarr(int32_t narg, int32_t ps[])
 /* Create a LUX_DOUBLE file array (file map) */
 { return filemap(LUX_DOUBLE, narg, ps); }
 /*-------------------------------------------------------------------------*/
-Int cfltfarr(Int narg, Int ps[])
+int32_t cfltfarr(int32_t narg, int32_t ps[])
 /* Create a LUX_CFLOAT file array (file map) */
 { return filemap(LUX_CFLOAT, narg, ps); }
 /*-------------------------------------------------------------------------*/
-Int cdblfarr(Int narg, Int ps[])
+int32_t cdblfarr(int32_t narg, int32_t ps[])
 /* Create a LUX_CDOUBLE file array (file map) */
 { return filemap(LUX_CDOUBLE, narg, ps); }
 /*-------------------------------------------------------------------------*/
-Int lux_i_file_output(FILE *fp, pointer q, Int assoctype,
- Int offsym, Int dsize, Int fsize, Int baseOffset)
+int32_t lux_i_file_output(FILE *fp, pointer q, int32_t assoctype,
+ int32_t offsym, int32_t dsize, int32_t fsize, int32_t baseOffset)
 /* use a file array as a guide to writing into a file, and an
  index array as a guide to the positions where to write */
 {
-  Int	*qi, error = 0, size, dindx, i;
+  int32_t	*qi, error = 0, size, dindx, i;
   array	*h;
 
   if (sym[offsym].type != LUX_LONG)
@@ -148,14 +148,14 @@ Int lux_i_file_output(FILE *fp, pointer q, Int assoctype,
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int lux_file_output(Int iq, Int jq, Int offsym, Int axsym)
+int32_t lux_file_output(int32_t iq, int32_t jq, int32_t offsym, int32_t axsym)
      /* use a file array as a guide to writing into a file */
      /* iq is sym # of file array, jq is rhs sym with data */
 {
- Int    ddat, *dat, dfile, *file, daxes, *axes, doff, *off, offset;
- Int    i, dattype, assoctype, ystep[MAX_DIMS], rstep[MAX_DIMS],
+ int32_t    ddat, *dat, dfile, *file, daxes, *axes, doff, *off, offset;
+ int32_t    i, dattype, assoctype, ystep[MAX_DIMS], rstep[MAX_DIMS],
 	tally[MAX_DIMS], done;
- Int    efile, n, *step, baseOffset;
+ int32_t    efile, n, *step, baseOffset;
  pointer       q;
  FILE   *fp;
  char	*fname;
@@ -299,15 +299,15 @@ Int lux_file_output(Int iq, Int jq, Int offsym, Int axsym)
  return 1;
 }
 /*------------------------------------------------------------------------- */
-Int lux_fzarr(Int narg, Int ps[])
+int32_t lux_fzarr(int32_t narg, int32_t ps[])
 /* FZARR(name) returns a file array symbol appropriate for an */
 /* uncompressed FZ file. */
 {
   char	*name, *p;
-  Int	wwflag, iq, mq;
+  int32_t	wwflag, iq, mq;
   FILE	*fp;
   fzHead	*fh;
-  Int	ck_synch_hd(FILE *, fzHead *, char **, Int *);
+  int32_t	ck_synch_hd(FILE *, fzHead *, char **, int32_t *);
 
   if (symbol_class(*ps) != LUX_STRING)
     return cerror(NEED_STR, *ps);
@@ -328,7 +328,7 @@ Int lux_fzarr(Int narg, Int ps[])
   symbol_context(iq) = -1;	/* ? */
   symbol_line(iq) = curLineNumber;
 					/* memory requirement */
-  mq = sizeof(array) + sizeof(Int) + strlen(name) + 1;
+  mq = sizeof(array) + sizeof(int32_t) + strlen(name) + 1;
   symbol_memory(iq) = mq;
   allocate(file_map_header(iq), mq, char); 
   if (internalMode & 1)
@@ -337,7 +337,7 @@ Int lux_fzarr(Int narg, Int ps[])
   set_file_map_has_offset(iq);	/* offset will be specified */
 
    /* copy dimensions */
-  memcpy(file_map_dims(iq), fh->dim, fh->ndim*sizeof(Int));
+  memcpy(file_map_dims(iq), fh->dim, fh->ndim*sizeof(int32_t));
   file_map_offset(iq) = 512*fh->nhb; /* offset */
   strcpy(file_map_file_name(iq), name); /* copy file name */
   return iq;

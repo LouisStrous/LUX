@@ -36,15 +36,15 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <X11/Xutil.h>
 #endif
 
-void	zerobytes(void *, Int), updateIndices(void), symdumpswitch(Int, Int);
+void	zerobytes(void *, int32_t), updateIndices(void), symdumpswitch(int32_t, int32_t);
 #if HAVE_LIBX11
-void	xsynchronize(Int);
+void	xsynchronize(int32_t);
 #endif
-Int	installString(char *), fixContext(Int, Int), lux_replace(Int, Int);
+int32_t	installString(char *), fixContext(int32_t, int32_t), lux_replace(int32_t, int32_t);
 char *fmttok(char *);
-Int Sprintf_tok(char *, ...);
+int32_t Sprintf_tok(char *, ...);
 /*-----------------------------------------------------*/
-void embed(Int target, Int context)
+void embed(int32_t target, int32_t context)
 /* gives <target> the specified <context>, if it is a contextless */
 /* temporary.  LS 15jun98 */
 {
@@ -58,10 +58,10 @@ void embed(Int target, Int context)
   }
 }
 /*-----------------------------------------------------*/
-Int structPtrTarget(Int symbol)
+int32_t structPtrTarget(int32_t symbol)
 /* returns number of symbol that LIST_PTR <symbol> points at */
 {
-  Int	base, index = -1, i, n;
+  int32_t	base, index = -1, i, n;
   char	*key;
   
   base = list_ptr_target(symbol); /* the enveloping structure */
@@ -114,7 +114,7 @@ Int structPtrTarget(Int symbol)
   }
 }
 /*-----------------------------------------------------*/
-Int transfer(Int symbol)
+int32_t transfer(int32_t symbol)
 /* if symbol is a TRANSFER or POINTER, return symbol number of */
 /* ultimate target */
 {
@@ -133,12 +133,12 @@ Int transfer(Int symbol)
   return symbol;
 }
 /*-----------------------------------------------------*/
-Int lux_convert(Int, Int [], Int, Int);
-Int lux_convertsym(Int narg, Int ps[])
+int32_t lux_convert(int32_t, int32_t [], int32_t, int32_t);
+int32_t lux_convertsym(int32_t narg, int32_t ps[])
      /* Y = CONVERT(X, TYPE) returns a copy of X converted to data type */
      /* TYPE (according to #TYPE).  LS 1aug97 */
 {
-  Int	iq, type;
+  int32_t	iq, type;
 
   iq = ps[0];
   switch (symbol_class(ps[1])) {
@@ -155,10 +155,10 @@ Int lux_convertsym(Int narg, Int ps[])
   return lux_convert(1, ps, type, 1);
 }
 /*-----------------------------------------------------*/
-Int scalar_scratch(Int type)
+int32_t scalar_scratch(int32_t type)
 /* returns a temporary scalar of the indicated type */
 {
- Int	n;
+ int32_t	n;
 
  getFreeTempVariable(n);
  symbol_type(n) = type;
@@ -174,10 +174,10 @@ Int scalar_scratch(Int type)
  return n;
 }
 /*-----------------------------------------------------*/
-Int scalar_scratch_copy(Int nsym)
+int32_t scalar_scratch_copy(int32_t nsym)
 /* creates a temporary scalar which is a copy of <nsym> */
 {
- Int	n;
+ int32_t	n;
 
  getFreeTempVariable(n);
  sym[n].class = LUX_SCALAR;
@@ -187,11 +187,11 @@ Int scalar_scratch_copy(Int nsym)
  return n;
 }
 /*-----------------------------------------------------*/
-Int string_scratch(Int size)
+int32_t string_scratch(int32_t size)
 /* returns a new temporary string with the indicated size
    (terminating null not counted) */
 {
- Int	n;
+ int32_t	n;
 
  getFreeTempVariable(n);
  sym[n].class = LUX_STRING;
@@ -206,7 +206,7 @@ Int string_scratch(Int size)
  return n;
 }
 /*-----------------------------------------------------*/
-Int to_scratch_array(Int n, Int type, Int ndim, Int dims[])
+int32_t to_scratch_array(int32_t n, int32_t type, int32_t ndim, int32_t dims[])
 /* modifies symbol <n> to an array of the specified type and dimensions */
 /* if the type is LUX_TEMP_STRING or LUX_LSTRING, then the new */
 /* array gets type LUX_STRING_ARRAY.  LS 28mar98 */
@@ -251,14 +251,14 @@ Int to_scratch_array(Int n, Int type, Int ndim, Int dims[])
  array_header(n) = h = (array *) ptr.v;
  symbol_memory(n) = size;
  array_num_dims(n) = ndim;
- memcpy(array_dims(n), dims, ndim*sizeof(Int));
+ memcpy(array_dims(n), dims, ndim*sizeof(int32_t));
  h->c1 = h->c2 = h->nfacts = 0;
  h->facts = NULL;
  zerobytes(array_data(n), array_size(n)*lux_type_size[type]);
  return n;
 } 
 /*-----------------------------------------------------*/
-Int to_scalar(Int nsym, Int type)
+int32_t to_scalar(int32_t nsym, int32_t type)
 /* turns symbol <nsym> into a scalar or cscalar of the given <type> */
 {
   undefine(nsym);
@@ -272,9 +272,9 @@ Int to_scalar(Int nsym, Int type)
   return LUX_OK;
 }
 /*-----------------------------------------------------*/
-Int array_scratch(Int type, Int ndim, Int dims[])
+int32_t array_scratch(int32_t type, int32_t ndim, int32_t dims[])
 {
-  Int	n;
+  int32_t	n;
 
   if (!isLegalType(type))
     return cerror(ILL_TYPE, 0, typeName(type));
@@ -282,15 +282,15 @@ Int array_scratch(Int type, Int ndim, Int dims[])
   return to_scratch_array(n, type, ndim, dims);
 }
 /*-----------------------------------------------------*/
-Int array_clone(Int symbol, Int type)
+int32_t array_clone(int32_t symbol, int32_t type)
 /* returns a new temporary array of the indicated type,
   with the same structure as <symbol> */
 {
- Int	n, size;
+ int32_t	n, size;
  float	fsize;
  array	*h, *hOld;
  void	*ptr;
- extern Int	pipeSym, pipeExec;
+ extern int32_t	pipeSym, pipeExec;
 
  size = ((symbol_memory(symbol) - sizeof(array))
 	 / lux_type_size[array_type(symbol)]) * lux_type_size[type]
@@ -322,7 +322,7 @@ Int array_clone(Int symbol, Int type)
    h = (array *) ptr;
    hOld = HEAD(symbol);
    h->ndim = hOld->ndim;
-   memcpy(h->dims, hOld->dims, h->ndim*sizeof(Int));
+   memcpy(h->dims, hOld->dims, h->ndim*sizeof(int32_t));
    h->c1 = h->c2 = h->nfacts = 0;
    h->facts = NULL;
  }
@@ -330,7 +330,7 @@ Int array_clone(Int symbol, Int type)
  return n; 
 }
 /*-----------------------------------------------------*/
-Int numerical_clone(Int iq, Symboltype type) {
+int32_t numerical_clone(int32_t iq, Symboltype type) {
   switch (symbol_class(iq)) {
   case LUX_ARRAY:
     return array_clone(iq, type);
@@ -341,11 +341,11 @@ Int numerical_clone(Int iq, Symboltype type) {
   }
 }
 /*-----------------------------------------------------*/
-Int dereferenceScalPointer(Int nsym)
+int32_t dereferenceScalPointer(int32_t nsym)
 /* returns an ordinary LUX_SCALAR for a LUX_SCAL_PTR.  NOTE: assumes that
  <nsym> is a SCAL_PTR!  LS 31jul98 */
 {
- Int	n, type;
+ int32_t	n, type;
  pointer	ptr;
 
  type = scal_ptr_type(nsym);
@@ -419,7 +419,7 @@ char *strsave(char *str)
  return p;
 }
 /*-----------------------------------------------------*/
-Int int_arg(Int nsym)
+int32_t int_arg(int32_t nsym)
 /* returns the integer value of a scalar symbol */
 {
  if (nsym < 0 || nsym >= NSYM) {
@@ -434,21 +434,21 @@ Int int_arg(Int nsym)
  }
  switch (scalar_type(nsym)) {
    case LUX_BYTE:
-     return (Int) scalar_value(nsym).b;
+     return (int32_t) scalar_value(nsym).b;
    case LUX_WORD:
-     return (Int) scalar_value(nsym).w;
+     return (int32_t) scalar_value(nsym).w;
    case LUX_LONG:
-     return (Int) scalar_value(nsym).l;
+     return (int32_t) scalar_value(nsym).l;
    case LUX_FLOAT:
-     return (Int) scalar_value(nsym).f;
+     return (int32_t) scalar_value(nsym).f;
    case LUX_DOUBLE:
-     return (Int) scalar_value(nsym).d;
+     return (int32_t) scalar_value(nsym).d;
    default:
      return cerror(ILL_TYPE, nsym);
  }
 }
 /*-----------------------------------------------------*/
-Int int_arg_stat(Int nsym, Int *value)
+int32_t int_arg_stat(int32_t nsym, int32_t *value)
 /* returns integer value of symbol <nsym>, if any, or an error */
 {
  if (nsym < 0 || nsym >= NSYM) 
@@ -459,24 +459,24 @@ Int int_arg_stat(Int nsym, Int *value)
    return cerror(NO_SCAL, nsym);
  switch (scalar_type(nsym))
  { case LUX_BYTE:
-     *value = (Int) scalar_value(nsym).b;
+     *value = (int32_t) scalar_value(nsym).b;
      break;
    case LUX_WORD:
-     *value = (Int) scalar_value(nsym).w;
+     *value = (int32_t) scalar_value(nsym).w;
      break;
    case LUX_LONG:
-     *value = (Int) scalar_value(nsym).l;
+     *value = (int32_t) scalar_value(nsym).l;
      break;
    case LUX_FLOAT:
-     *value = (Int) scalar_value(nsym).f;
+     *value = (int32_t) scalar_value(nsym).f;
      break;
    case LUX_DOUBLE:
-     *value = (Int) scalar_value(nsym).d;
+     *value = (int32_t) scalar_value(nsym).d;
      break; }
  return 1;			/* everything OK */
 }  
 /*-----------------------------------------------------*/
-float float_arg(Int nsym)
+float float_arg(int32_t nsym)
 /* returns the float value of a scalar symbol */
 {
  if (nsym < 0 || nsym >= NSYM) 
@@ -499,7 +499,7 @@ float float_arg(Int nsym)
      return cerror(ILL_TYPE, nsym); }
 }
 /*-----------------------------------------------------*/
-Int float_arg_stat(Int nsym, float *value)
+int32_t float_arg_stat(int32_t nsym, float *value)
 /* returns float value of symbol <nsym>, if any, or an error */
 {
  if (nsym < 0 || nsym >= NSYM) 
@@ -528,7 +528,7 @@ Int float_arg_stat(Int nsym, float *value)
  return LUX_OK;			/* everything OK */
 }  
 /*-----------------------------------------------------*/
-double double_arg(Int nsym)
+double double_arg(int32_t nsym)
 /* returns the double value of a LUX_DOUBLE scalar symbol */
 {
  if (nsym < 0 || nsym >= NSYM) 
@@ -551,7 +551,7 @@ double double_arg(Int nsym)
      return cerror(ILL_TYPE, nsym); }
 }
 /*-----------------------------------------------------*/
-Int double_arg_stat(Int nsym, double *value)
+int32_t double_arg_stat(int32_t nsym, double *value)
 /* returns double value of symbol <nsym>, if any, or an error */
 {
  if (nsym < 0 || nsym >= NSYM) 
@@ -580,7 +580,7 @@ Int double_arg_stat(Int nsym, double *value)
  return LUX_OK;			/* everything OK */
 }  
 /*-----------------------------------------------------*/
-char *string_arg(Int nsym)
+char *string_arg(int32_t nsym)
 /* returns the string value of a string symbol, or NULL */
 {
  if (nsym < 0 || nsym >= NSYM) 
@@ -591,33 +591,33 @@ char *string_arg(Int nsym)
  return string_value(nsym);
 }
 /*-----------------------------------------------------*/
-Int lux_byte(Int narg, Int ps[])
+int32_t lux_byte(int32_t narg, int32_t ps[])
 /* returns a LUX_BYTE version of the argument */
 {
   return lux_convert(narg, ps, LUX_BYTE, 1);
 }
 /*-----------------------------------------------------*/
-Int lux_word(Int narg, Int ps[])
+int32_t lux_word(int32_t narg, int32_t ps[])
 /* returns a LUX_WORD version of the argument */
 {
   return lux_convert(narg, ps, LUX_WORD, 1);
 }
 /*-----------------------------------------------------*/
-Int lux_long(Int narg, Int ps[])
+int32_t lux_long(int32_t narg, int32_t ps[])
 /* returns a LUX_LONG version of the argument */
 {
   return lux_convert(narg, ps, LUX_LONG, 1);
 }
 /*-----------------------------------------------------*/
-Int lux_floor(Int narg, Int ps[])
+int32_t lux_floor(int32_t narg, int32_t ps[])
 /* returns a LUX_LONG version of the argument */
 /* each float number is transformed into the next lower integer */
 /* compare lux_long(), where each float number is transformed into the */
 /* next integer closer to zero, and lux_rfix(), where each float is */
 /* transformed into the closest integer.  LS 24may96 */
 {
- Int	iq, result, n, temp, size, type;
- Int	value;
+ int32_t	iq, result, n, temp, size, type;
+ int32_t	value;
  pointer	src, trgt;
 
  iq = *ps;
@@ -647,7 +647,7 @@ Int lux_floor(Int narg, Int ps[])
        result = iq; 
      else
        result = scalar_scratch(LUX_LONG);
-     value = (Int) floor(atof((char *) string_value(iq))); /* convert */
+     value = (int32_t) floor(atof((char *) string_value(iq))); /* convert */
      if (temp) {
        free(string_value(iq));	/* change string to scalar: free up memory */
        symbol_class(result) = LUX_SCALAR;
@@ -666,7 +666,7 @@ Int lux_floor(Int narg, Int ps[])
      /* we can use the input symbol if it is free and if
 	it has at least as much memory as we need */
      if (temp
-	 && (Int) array_type(iq) >= LUX_LONG)
+	 && (int32_t) array_type(iq) >= LUX_LONG)
        result = iq;
      else {
        result = array_clone(iq, LUX_LONG);
@@ -684,37 +684,37 @@ Int lux_floor(Int narg, Int ps[])
  switch (type) {
    case LUX_BYTE:
      while (n--)
-       *trgt.l++ = (Int) *src.b++;
+       *trgt.l++ = (int32_t) *src.b++;
      break;
    case LUX_WORD:
      while (n--)
-       *trgt.l++ = (Int) *src.w++;
+       *trgt.l++ = (int32_t) *src.w++;
      break;
    case LUX_LONG:
      while (n--)
-       *trgt.l++ = (Int) *src.l++;
+       *trgt.l++ = (int32_t) *src.l++;
      break;
    case LUX_FLOAT:
      while (n--)
-       *trgt.l++ = (Int) floor(*src.f++);
+       *trgt.l++ = (int32_t) floor(*src.f++);
      break;
    case LUX_DOUBLE:
      while (n--)
-       *trgt.l++ = (Int) floor(*src.d++);
+       *trgt.l++ = (int32_t) floor(*src.d++);
      break;
    case LUX_CFLOAT:
      while (n--)
-       *trgt.l++ = (Int) floor(src.cf++->real);
+       *trgt.l++ = (int32_t) floor(src.cf++->real);
      break;
    case LUX_CDOUBLE:
      while (n--)
-       *trgt.l++ = (Int) floor(src.cd++->real);
+       *trgt.l++ = (int32_t) floor(src.cd++->real);
      break;
  }
  if (temp			/* we used input symbol to store results */
      && symbol_class(iq) == LUX_ARRAY /* it's an array */
      && array_type(iq) > LUX_LONG) { /* and bigger than we needed */
-   symbol_memory(iq) = sizeof(array) + size*sizeof(Int);
+   symbol_memory(iq) = sizeof(array) + size*sizeof(int32_t);
    symbol_data(iq) = (array *) realloc(symbol_data(iq), symbol_memory(iq));
    if (!symbol_data(iq))	/* reallocation failed */
      return luxerror("Realloc() failed in lux_floor", 0);
@@ -723,15 +723,15 @@ Int lux_floor(Int narg, Int ps[])
  return result;
 }
 /*-----------------------------------------------------*/
-Int lux_ceil(Int narg, Int ps[])
+int32_t lux_ceil(int32_t narg, int32_t ps[])
 /* returns a LUX_LONG version of the argument */
 /* each float number is transformed into the next higher integer */
 /* compare lux_long(), where each float number is transformed into the */
 /* next integer closer to zero, and lux_rfix(), where each float is */
 /* transformed into the closest integer.  LS 24may96 */
 {
- Int	iq, result, n, temp, size, type;
- Int	value;
+ int32_t	iq, result, n, temp, size, type;
+ int32_t	value;
  pointer	src, trgt;
 
  iq = *ps;
@@ -761,7 +761,7 @@ Int lux_ceil(Int narg, Int ps[])
        result = iq; 
      else
        result = scalar_scratch(LUX_LONG);
-     value = (Int) ceil(atof((char *) string_value(iq))); /* convert */
+     value = (int32_t) ceil(atof((char *) string_value(iq))); /* convert */
      if (temp) {
        free(string_value(iq));	/* change string to scalar: free up memory */
        symbol_class(result) = LUX_SCALAR;
@@ -780,7 +780,7 @@ Int lux_ceil(Int narg, Int ps[])
      /* we can use the input symbol if it is free and if
 	it has at least as much memory as we need */
      if (temp
-	 && (Int) array_type(iq) >= LUX_LONG)
+	 && (int32_t) array_type(iq) >= LUX_LONG)
        result = iq;
      else {
        result = array_clone(iq, LUX_LONG);
@@ -798,37 +798,37 @@ Int lux_ceil(Int narg, Int ps[])
  switch (type) {
    case LUX_BYTE:
      while (n--)
-       *trgt.l++ = (Int) *src.b++;
+       *trgt.l++ = (int32_t) *src.b++;
      break;
    case LUX_WORD:
      while (n--)
-       *trgt.l++ = (Int) *src.w++;
+       *trgt.l++ = (int32_t) *src.w++;
      break;
    case LUX_LONG:
      while (n--)
-       *trgt.l++ = (Int) *src.l++;
+       *trgt.l++ = (int32_t) *src.l++;
      break;
    case LUX_FLOAT:
      while (n--)
-       *trgt.l++ = (Int) ceil(*src.f++);
+       *trgt.l++ = (int32_t) ceil(*src.f++);
      break;
    case LUX_DOUBLE:
      while (n--)
-       *trgt.l++ = (Int) ceil(*src.d++);
+       *trgt.l++ = (int32_t) ceil(*src.d++);
      break;
    case LUX_CFLOAT:
      while (n--)
-       *trgt.l++ = (Int) ceil(src.cf++->real);
+       *trgt.l++ = (int32_t) ceil(src.cf++->real);
      break;
    case LUX_CDOUBLE:
      while (n--)
-       *trgt.l++ = (Int) ceil(src.cd++->real);
+       *trgt.l++ = (int32_t) ceil(src.cd++->real);
      break;
  }
  if (temp			/* we used input symbol to store results */
      && symbol_class(iq) == LUX_ARRAY /* it's an array */
      && array_type(iq) > LUX_LONG) { /* and bigger than we needed */
-   symbol_memory(iq) = sizeof(array) + size*sizeof(Int);
+   symbol_memory(iq) = sizeof(array) + size*sizeof(int32_t);
    symbol_data(iq) = (array *) realloc(symbol_data(iq), symbol_memory(iq));
    if (!symbol_data(iq))	/* reallocation failed */
      return luxerror("Realloc() failed in lux_floor", 0);
@@ -837,32 +837,32 @@ Int lux_ceil(Int narg, Int ps[])
  return result;
 }
 /*-----------------------------------------------------*/
-Int lux_float(Int narg, Int ps[])
+int32_t lux_float(int32_t narg, int32_t ps[])
 /* returns a LUX_FLOAT version of the argument */
 {
   return lux_convert(narg, ps, LUX_FLOAT, 1);
 }
 /*-----------------------------------------------------*/
-Int lux_double(Int narg, Int ps[])
+int32_t lux_double(int32_t narg, int32_t ps[])
 /* returns a LUX_DOUBLE version of the argument */
 {
   return lux_convert(narg, ps, LUX_DOUBLE, 1);
 }
 /*-----------------------------------------------------*/
-Int lux_cfloat(Int narg, Int ps[])
+int32_t lux_cfloat(int32_t narg, int32_t ps[])
 /* returns an LUX_CFLOAT version of the argument */
 {
   return lux_convert(narg, ps, LUX_CFLOAT, 1);
 }
 /*-----------------------------------------------------*/
-Int lux_cdouble(Int narg, Int ps[])
+int32_t lux_cdouble(int32_t narg, int32_t ps[])
 /* returns an LUX_CDOUBLE version of the argument */
 {
   return lux_convert(narg, ps, LUX_CDOUBLE, 1);
 }
 /*-----------------------------------------------------*/
-extern Int	nFixed;
-Int lux_convert(Int narg, Int ps[], Int totype, Int isFunc)
+extern int32_t	nFixed;
+int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 /* converts ps[0] to data type <totype>. */
 /* we use this function in one of two modes: function mode (isFunc != 0)
    or subroutine mode (isFunc = 0).  In function mode, there can be
@@ -874,14 +874,14 @@ Int lux_convert(Int narg, Int ps[], Int totype, Int isFunc)
    arguments must be a named, writeable symbol, and we convert each
    of them in-place.  LS 16dec99 */
 {
-  Int	iq, n, size, type, srcstep, trgtstep, temp, result;
+  int32_t	iq, n, size, type, srcstep, trgtstep, temp, result;
   char	do_realloc = 0;
   pointer	src, trgt;
   scalar	value;
   extern char	*fmt_integer, *fmt_float, *fmt_complex;
-  void	read_a_number(char **, scalar *, Int *);
+  void	read_a_number(char **, scalar *, int32_t *);
   char *fmttok(char *);
-  Int Sprintf_tok(char *, ...);
+  int32_t Sprintf_tok(char *, ...);
 
   while (narg--) {
     iq = *ps++;
@@ -921,15 +921,15 @@ Int lux_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	  switch (type) {
 	    case LUX_BYTE:
 	      fmttok(fmt_integer);
-	      Sprintf_tok(curScrat, (Int) *src.b);
+	      Sprintf_tok(curScrat, (int32_t) *src.b);
 	      break;
 	    case LUX_WORD:
 	      fmttok(fmt_integer);
-	      Sprintf_tok(curScrat, (Int) *src.w);
+	      Sprintf_tok(curScrat, (int32_t) *src.w);
 	      break;
 	    case LUX_LONG:
 	      fmttok(fmt_integer);
-	      Sprintf_tok(curScrat, (Int) *src.l);
+	      Sprintf_tok(curScrat, (int32_t) *src.l);
 	      break;
 	    case LUX_FLOAT:
 	      fmttok(fmt_float);
@@ -1032,7 +1032,7 @@ Int lux_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	      scalar_value(result).w = (int16_t) value.d;
 	      break;
 	    case LUX_LONG:
-	      scalar_value(result).l = (Int) value.d;
+	      scalar_value(result).l = (int32_t) value.d;
 	      break;
 	    case LUX_FLOAT:
 	      scalar_value(result).f = (float) value.d;
@@ -1049,15 +1049,15 @@ Int lux_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	  switch (type) {
 	    case LUX_BYTE:
 	      fmttok(fmt_integer);
-	      Sprintf_tok(curScrat, (Int) *src.b);
+	      Sprintf_tok(curScrat, (int32_t) *src.b);
 	      break;
 	    case LUX_WORD:
 	      fmttok(fmt_integer);
-	      Sprintf_tok(curScrat, (Int) *src.w);
+	      Sprintf_tok(curScrat, (int32_t) *src.w);
 	      break;
 	    case LUX_LONG:
 	      fmttok(fmt_integer);
-	      Sprintf_tok(curScrat, (Int) *src.l);
+	      Sprintf_tok(curScrat, (int32_t) *src.l);
 	      break;
 	    case LUX_FLOAT:
 	      fmttok(fmt_float);
@@ -1154,7 +1154,7 @@ Int lux_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	    break;
 	  case LUX_LONG:
 	    while (n--) {
-	      *trgt.l = (Int) *src.b;
+	      *trgt.l = (int32_t) *src.b;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
@@ -1192,7 +1192,7 @@ Int lux_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	  case LUX_STRING_ARRAY:
 	    fmttok(fmt_integer);
 	    while (n--) {
-	      Sprintf_tok(curScrat, (Int) *src.b);
+	      Sprintf_tok(curScrat, (int32_t) *src.b);
 	      temp = strlen(curScrat) + 1;
 	      *trgt.sp = malloc(temp);
 	      if (!*trgt.sp)
@@ -1253,7 +1253,7 @@ Int lux_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	  case LUX_STRING_ARRAY:
 	    fmttok(fmt_integer);
 	    while (n--) {
-	      Sprintf_tok(curScrat, (Int) *src.w);
+	      Sprintf_tok(curScrat, (int32_t) *src.w);
 	      temp = strlen(curScrat) + 1;
 	      *trgt.sp = malloc(temp);
 	      if (!*trgt.sp)
@@ -1269,28 +1269,28 @@ Int lux_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	switch (totype) {		/* target type */
 	  case LUX_BYTE:
 	    while (n--) {
-	      *trgt.b = (Int) *src.l;
+	      *trgt.b = (int32_t) *src.l;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case LUX_WORD:
 	    while (n--) {
-	      *trgt.w = (Int) *src.l;
+	      *trgt.w = (int32_t) *src.l;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case LUX_FLOAT:
 	    while (n--) {
-	      *trgt.f = (Int) *src.l;
+	      *trgt.f = (int32_t) *src.l;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case LUX_DOUBLE:
 	    while (n--) {
-	      *trgt.d = (Int) *src.l;
+	      *trgt.d = (int32_t) *src.l;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
@@ -1314,7 +1314,7 @@ Int lux_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	  case LUX_STRING_ARRAY:
 	    fmttok(fmt_integer);
 	    while (n--) {
-	      Sprintf_tok(curScrat, (Int) *src.l);
+	      Sprintf_tok(curScrat, (int32_t) *src.l);
 	      temp = strlen(curScrat) + 1;
 	      *trgt.sp = malloc(temp);
 	      if (!*trgt.sp)
@@ -1466,7 +1466,7 @@ Int lux_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	    break;
 	  case LUX_LONG:
 	    while (n--) {
-	      *trgt.l = (Int) src.cf->real;
+	      *trgt.l = (int32_t) src.cf->real;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
@@ -1526,7 +1526,7 @@ Int lux_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	    break;
 	  case LUX_LONG:
 	    while (n--) {
-	      *trgt.l = (Int) src.cd->real;
+	      *trgt.l = (int32_t) src.cd->real;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
@@ -1681,60 +1681,60 @@ Int lux_convert(Int narg, Int ps[], Int totype, Int isFunc)
   return isFunc? result: LUX_OK;
 }
 /*-----------------------------------------------------*/
-Int lux_byte_inplace(Int narg, Int ps[])
+int32_t lux_byte_inplace(int32_t narg, int32_t ps[])
 /* BYTE,x  converts <x> to LUX_BYTE. */
 {
   return lux_convert(narg, ps, LUX_BYTE, 0);
 }
 /*-----------------------------------------------------*/
-Int lux_word_inplace(Int narg, Int ps[])
+int32_t lux_word_inplace(int32_t narg, int32_t ps[])
 /* WORD,x  converts <x> to LUX_WORD. */
 {
   return lux_convert(narg, ps, LUX_WORD, 0);
 }
 /*-----------------------------------------------------*/
-Int lux_long_inplace(Int narg, Int ps[])
+int32_t lux_long_inplace(int32_t narg, int32_t ps[])
 /* LONG,x  converts <x> to LUX_LONG. */
 {
   return lux_convert(narg, ps, LUX_LONG, 0);
 }
 /*-----------------------------------------------------*/
-Int lux_float_inplace(Int narg, Int ps[])
+int32_t lux_float_inplace(int32_t narg, int32_t ps[])
 /* FLOAT,x  converts <x> to LUX_FLOAT. */
 {
   return lux_convert(narg, ps, LUX_FLOAT, 0);
 }
 /*-----------------------------------------------------*/
-Int lux_double_inplace(Int narg, Int ps[])
+int32_t lux_double_inplace(int32_t narg, int32_t ps[])
 /* DOUBLE,x  converts <x> to LUX_DOUBLE. */
 {
   return lux_convert(narg, ps, LUX_DOUBLE, 0);
 }
 /*-----------------------------------------------------*/
-Int lux_cfloat_inplace(Int narg, Int ps[])
+int32_t lux_cfloat_inplace(int32_t narg, int32_t ps[])
 /* CFLOAT,x  converts <x> to LUX_CFLOAT. */
 {
   return lux_convert(narg, ps, LUX_CFLOAT, 0);
 }
 /*-----------------------------------------------------*/
-Int lux_cdouble_inplace(Int narg, Int ps[])
+int32_t lux_cdouble_inplace(int32_t narg, int32_t ps[])
 /* CDOUBLE,x  converts <x> to LUX_CDOUBLE. */
 {
   return lux_convert(narg, ps, LUX_CDOUBLE, 0);
 }
 /*-----------------------------------------------------*/
-Int lux_string_inplace(Int narg, Int ps[])
+int32_t lux_string_inplace(int32_t narg, int32_t ps[])
 /* STRING,x  converts <x> into a string form. */
 {
   return lux_convert(narg, ps, LUX_STRING_ARRAY, 0);
 }
 /*-----------------------------------------------------*/
-Int get_dims(Int *num, Int *arg, Int *dims)
+int32_t get_dims(int32_t *num, int32_t *arg, int32_t *dims)
 /* reads *num positive integers from subsequent arg[]s and puts them */
 /* in dims[]; returns the actual number of dimensions that were read
  in *num. */
 {
- Int	n, iq, size, *ptr, i;
+ int32_t	n, iq, size, *ptr, i;
 
  n = *num;
  while (n--) {
@@ -1748,7 +1748,7 @@ Int get_dims(Int *num, Int *arg, Int *dims)
        return cerror(N_DIMS_OVR, arg[-1]);
      ptr = array_data(iq);
      *num = size;
-     memcpy(dims, ptr, size*sizeof(Int));
+     memcpy(dims, ptr, size*sizeof(int32_t));
      for (i = 0; i < size; i++)
        if (dims[i] <= 0)
 	 return cerror(ILL_DIM, iq);
@@ -1758,12 +1758,12 @@ Int get_dims(Int *num, Int *arg, Int *dims)
  return 1;
 }
 /*-----------------------------------------------------*/
-Int create_sub_ptr(Int nsym, char *p, Int index)
+int32_t create_sub_ptr(int32_t nsym, char *p, int32_t index)
 /* creates a LUX_SCAL_PTR symbol pointing at the element with
   index <index> in the array <p> with the data type
   of symbol <nsym> */
 {
- Int	iq;
+ int32_t	iq;
 
  getFreeTempVariable(iq);
  sym[iq].class = LUX_SCAL_PTR;
@@ -1773,7 +1773,7 @@ Int create_sub_ptr(Int nsym, char *p, Int index)
  return iq;
 }
 /*-----------------------------------------------------*/
-Int lux_array_convert(pointer *q1, pointer *q2, Int type1, Int type2, Int n)
+int32_t lux_array_convert(pointer *q1, pointer *q2, int32_t type1, int32_t type2, int32_t n)
  /* more general conversion, converts data starting at q1 of type1 to type2
          data starting at q2, n count */
  /* note that indices are bumped even when count is one */
@@ -1795,10 +1795,10 @@ Int lux_array_convert(pointer *q1, pointer *q2, Int type1, Int type2, Int n)
          }      break;
    case 2: switch (type1) {
          case 2: while (n) { *q2->l++ =  (*q1->l++);n--;} break;
-         case 1: while (n) { *q2->l++ = (Int) (*q1->w++);n--;} break;
-         case 0: while (n) { *q2->l++ = (Int) (*q1->b++);n--;} break;
-         case 3: while (n) { *q2->l++ = (Int) (*q1->f++);n--;} break;
-         case 4: while (n) { *q2->l++ = (Int) (*q1->d++);n--;} break;
+         case 1: while (n) { *q2->l++ = (int32_t) (*q1->w++);n--;} break;
+         case 0: while (n) { *q2->l++ = (int32_t) (*q1->b++);n--;} break;
+         case 3: while (n) { *q2->l++ = (int32_t) (*q1->f++);n--;} break;
+         case 4: while (n) { *q2->l++ = (int32_t) (*q1->d++);n--;} break;
          }      break;
    case 3: switch (type1) {
          case 3: while (n) { *q2->f++ =  (*q1->f++);n--;} break;
@@ -1818,7 +1818,7 @@ Int lux_array_convert(pointer *q1, pointer *q2, Int type1, Int type2, Int n)
  return 1;
  }
 /*-----------------------------------------------------*/
-Int redef_scalar(Int nsym, Int ntype, void *val)
+int32_t redef_scalar(int32_t nsym, int32_t ntype, void *val)
 /* redefine symbol nsym to be a scalar of type ntype with value *val */
 {
   wideScalar	*value;
@@ -1866,7 +1866,7 @@ Int redef_scalar(Int nsym, Int ntype, void *val)
   return LUX_OK;
 }
 /*-----------------------------------------------------*/
-Int redef_string(Int nsym, Int len)
+int32_t redef_string(int32_t nsym, int32_t len)
 /* redefine symbol nsym to be a string with length len (excluding \0) */
 {
  undefine(nsym);
@@ -1877,11 +1877,11 @@ Int redef_string(Int nsym, Int len)
  return 1;
 }
 /*-----------------------------------------------------*/
-Int redef_array(Int nsym, Int ntype, Int ndim, Int *dims)
+int32_t redef_array(int32_t nsym, int32_t ntype, int32_t ndim, int32_t *dims)
 /* redefines symbol nsym to be an array of the given type, number of
   dimensions, and dimensions; or a scalar if <ndim> == 0 */
 {                                /*redefine a symbol i to an array */
-  Int   mq, j;
+  int32_t   mq, j;
   array	*h;
   pointer	p;
 
@@ -1912,7 +1912,7 @@ Int redef_array(Int nsym, Int ntype, Int ndim, Int *dims)
   h = array_header(nsym);
   h->ndim = ndim;
   h->c1 = 0; h->c2 = 0; h->nfacts = 0;
-  memcpy(h->dims, dims, ndim*sizeof(Int));
+  memcpy(h->dims, dims, ndim*sizeof(int32_t));
   h->facts = NULL;                      /* no known facts */
   if (ntype == LUX_STRING_ARRAY) {
     /* a string array: set all elements to NULL */
@@ -1924,10 +1924,10 @@ Int redef_array(Int nsym, Int ntype, Int ndim, Int *dims)
   return 1;
 }
 /*-----------------------------------------------------*/
-Int redef_array_extra_dims(Int tgt, Int src, Symboltype type, Int ndim, Int *dims)
+int32_t redef_array_extra_dims(int32_t tgt, int32_t src, Symboltype type, int32_t ndim, int32_t *dims)
 {
-  Int *srcdims, srcndim;
-  Int tgtdims[MAX_DIMS];
+  int32_t *srcdims, srcndim;
+  int32_t tgtdims[MAX_DIMS];
 
   if (!symbolIsModifiable(tgt))
     return cerror(NEED_NAMED, tgt);
@@ -1943,80 +1943,80 @@ Int redef_array_extra_dims(Int tgt, Int src, Symboltype type, Int ndim, Int *dim
   return redef_array(tgt, type, ndim, tgtdims);
 }
 /*-----------------------------------------------------*/
-Int bytarr(Int narg, Int ps[])
+int32_t bytarr(int32_t narg, int32_t ps[])
 /* create an array of I*1 elements */
 {
- Int	dims[MAX_DIMS];
+ int32_t	dims[MAX_DIMS];
 
  if (get_dims(&narg, ps, dims) != 1)
    return LUX_ERROR;
  return array_scratch(LUX_BYTE, narg, dims);
 }
 /*-----------------------------------------------------*/
-Int intarr(Int narg, Int ps[])
+int32_t intarr(int32_t narg, int32_t ps[])
 /* create an array of I*2 elements */
 {
- Int	dims[MAX_DIMS];
+ int32_t	dims[MAX_DIMS];
 
  if (get_dims(&narg, ps, dims) != 1)
    return LUX_ERROR;
  return array_scratch(LUX_WORD, narg, dims);
 }
 /*-----------------------------------------------------*/
-Int lonarr(Int narg, Int ps[])
+int32_t lonarr(int32_t narg, int32_t ps[])
 /* create an array of I*4 elements */
 {
- Int	dims[MAX_DIMS];
+ int32_t	dims[MAX_DIMS];
 
  if (get_dims(&narg, ps, dims) != 1)
    return LUX_ERROR;
  return array_scratch(LUX_LONG, narg, dims);
 }
 /*-----------------------------------------------------*/
-Int fltarr(Int narg, Int ps[])
+int32_t fltarr(int32_t narg, int32_t ps[])
 /* create an array of F*4 elements */
 {
- Int	dims[MAX_DIMS];
+ int32_t	dims[MAX_DIMS];
 
  if (get_dims(&narg, ps, dims) != 1)
    return LUX_ERROR;
  return array_scratch(LUX_FLOAT, narg, dims);
 }
 /*-----------------------------------------------------*/
-Int dblarr(Int narg, Int ps[])
+int32_t dblarr(int32_t narg, int32_t ps[])
 /* create an array of I*1 elements */
 {
- Int	dims[MAX_DIMS];
+ int32_t	dims[MAX_DIMS];
 
  if (get_dims(&narg, ps, dims) != 1)
    return LUX_ERROR;
  return array_scratch(LUX_DOUBLE, narg, dims);
 }
 /*-----------------------------------------------------*/
-Int cfltarr(Int narg, Int ps[])
+int32_t cfltarr(int32_t narg, int32_t ps[])
 /* create a CFLOAT array */
 {
-  Int	dims[MAX_DIMS];
+  int32_t	dims[MAX_DIMS];
 
   if (get_dims(&narg, ps, dims) != 1)
     return LUX_ERROR;
   return array_scratch(LUX_CFLOAT, narg, dims);
 }
 /*-----------------------------------------------------*/
-Int cdblarr(Int narg, Int ps[])
+int32_t cdblarr(int32_t narg, int32_t ps[])
 /* create a CDOUBLE array */
 {
-  Int	dims[MAX_DIMS];
+  int32_t	dims[MAX_DIMS];
 
   if (get_dims(&narg, ps, dims) != 1)
     return LUX_ERROR;
   return array_scratch(LUX_CDOUBLE, narg, dims);
 }
 /*-----------------------------------------------------*/
-Int strarr(Int narg, Int ps[])
+int32_t strarr(int32_t narg, int32_t ps[])
 /* create an array of NULL string pointers */
 {
- Int	dims[MAX_DIMS], iq, size, n;
+ int32_t	dims[MAX_DIMS], iq, size, n;
  char	**ptr;
 
  size = ps[0]? int_arg(ps[0]): 0;
@@ -2039,12 +2039,12 @@ Int strarr(Int narg, Int ps[])
  return iq;
 }
 /*-----------------------------------------------------*/
-Int show_routine(internalRoutine *table, Int tableLength, Int narg, Int ps[])
+int32_t show_routine(internalRoutine *table, int32_t tableLength, int32_t narg, int32_t ps[])
 /* shows all routine names that contain a specified substring,
  or all of them */
 {
- extern Int	uTermCol;
- Int	i, nOut = 0, nLine = uTermCol/16;
+ extern int32_t	uTermCol;
+ int32_t	i, nOut = 0, nLine = uTermCol/16;
  char	*chars, *p;
  char	*name, **ptr;
  keyList	*keys;
@@ -2094,23 +2094,23 @@ Int show_routine(internalRoutine *table, Int tableLength, Int narg, Int ps[])
  return 1;
 }
 /*-----------------------------------------------------*/
-Int lux_show_subr(Int narg, Int ps[])
+int32_t lux_show_subr(int32_t narg, int32_t ps[])
 {
  return show_routine(subroutine, nSubroutine, narg, ps);
 }
 /*-----------------------------------------------------*/
-Int lux_show_func(Int narg, Int ps[])
+int32_t lux_show_func(int32_t narg, int32_t ps[])
 {
  return show_routine(function, nFunction, narg, ps);
 }
 /*-----------------------------------------------------*/
-Int lux_switch(Int narg, Int ps[])
+int32_t lux_switch(int32_t narg, int32_t ps[])
 /* switches identity of two symbols.  We cannot just swap the names
    because then the connection between a particular name and a
    particular symbol number is broken.  We must swap the values instead.
    LS 9nov98 9oct2010*/
 {
- Int	sym1, sym2;
+ int32_t	sym1, sym2;
  symTableEntry	temp1, temp2;
 
  sym1 = ps[0];
@@ -2152,10 +2152,10 @@ Int lux_switch(Int narg, Int ps[])
  return 1;
 } 
 /*-----------------------------------------------------*/
-Int lux_array(Int narg, Int ps[])
+int32_t lux_array(int32_t narg, int32_t ps[])
 /* create an array of the specified type and dimensions */
 {
- Int	dims[MAX_DIMS], type;
+ int32_t	dims[MAX_DIMS], type;
 
  narg--;
  type = int_arg(*ps);
@@ -2168,11 +2168,11 @@ Int lux_array(Int narg, Int ps[])
  return array_scratch(type, narg, dims);
 }
 /*-----------------------------------------------------*/
-Int lux_assoc(Int narg, Int ps[])
+int32_t lux_assoc(int32_t narg, int32_t ps[])
 /* returns an associated variable.
   syntax: assoc(lun, array [, offset]) */
 {
- Int	lun, result, iq, size;
+ int32_t	lun, result, iq, size;
  array	*h;
 
  lun = int_arg(*ps);
@@ -2184,7 +2184,7 @@ Int lux_assoc(Int narg, Int ps[])
  sym[result].line = curLineNumber;
  h = HEAD(iq);
  size = sizeof(array);
- if (narg >= 3) size += sizeof(Int);
+ if (narg >= 3) size += sizeof(int32_t);
  if (!(sym[result].spec.array.ptr = (array *) Malloc(size)))
    return cerror(ALLOC_ERR, iq);
  sym[result].spec.array.bstore = size;
@@ -2200,11 +2200,11 @@ Int lux_assoc(Int narg, Int ps[])
  return result;
 }
 /*-----------------------------------------------------*/
-Int lux_rfix(Int narg, Int ps[])
+int32_t lux_rfix(int32_t narg, int32_t ps[])
 /* returns an I*4 version of the argument, rounded to the nearest
  integer if necessary */
 {
- Int	nsym, type, size, *trgt, i, result;
+ int32_t	nsym, type, size, *trgt, i, result;
  pointer	src;
  double	temp;
  array	*h;
@@ -2227,41 +2227,41 @@ Int lux_rfix(Int narg, Int ps[])
  		/* now convert */
  switch (type)
  { case LUX_BYTE:
-     while (size--) *trgt++ = (Int) *src.b++;  break;
+     while (size--) *trgt++ = (int32_t) *src.b++;  break;
    case LUX_WORD:
-     while (size--) *trgt++ = (Int) *src.w++;  break;
+     while (size--) *trgt++ = (int32_t) *src.w++;  break;
    case LUX_FLOAT:
      while (size--)
-     { *trgt++ = (Int) (*src.f + ((*src.f >= 0)? 0.5: -0.5));
+     { *trgt++ = (int32_t) (*src.f + ((*src.f >= 0)? 0.5: -0.5));
        src.f++; }
      break;
    case LUX_DOUBLE:
      while (size--)
-     {*trgt++ = (Int) (*src.d + ((*src.d >= 0)? 0.5: -0.5));
+     {*trgt++ = (int32_t) (*src.d + ((*src.d >= 0)? 0.5: -0.5));
       src.d++; }
      break; }
  return result;
 }
 /*-----------------------------------------------------*/
-Int lux_echo(Int narg, Int ps[])
+int32_t lux_echo(int32_t narg, int32_t ps[])
 /* turn on echoing of input lines from non-keyboard sources */
 {
- extern Int	echo;
+ extern int32_t	echo;
  
  if (narg >= 1) echo = int_arg(*ps); else echo = 1;
  return 1;
 }
 /*-----------------------------------------------------*/
-Int lux_noecho(Int narg, Int ps[])
+int32_t lux_noecho(int32_t narg, int32_t ps[])
 /* turn on echoing of input lines from non-keyboard sources */
 {
- extern Int	echo;
+ extern int32_t	echo;
 
  echo = 0;
  return 1;
 }
 /*-----------------------------------------------------*/
-Int lux_batch(Int narg, Int ps[])
+int32_t lux_batch(int32_t narg, int32_t ps[])
 /* turn on/off batch mode */
 {
  extern char	batch;
@@ -2273,7 +2273,7 @@ Int lux_batch(Int narg, Int ps[])
 /*-----------------------------------------------------*/
 FILE	*recordFile = NULL;
 extern char	recording;
-Int lux_record(Int narg, Int ps[])
+int32_t lux_record(int32_t narg, int32_t ps[])
  /* start/stop recording. */
  /* Syntax:  RECORD [,file] [,/RESET,/INPUT,/OUTPUT] */
 {
@@ -2326,10 +2326,10 @@ Int lux_record(Int narg, Int ps[])
   return 1;
 }
 /*-------------------------------------------------------------------------*/
-Int step = 0;
-Int lux_step(Int narg, Int ps[])
+int32_t step = 0;
+int32_t lux_step(int32_t narg, int32_t ps[])
 {
-  Int	i = 1;
+  int32_t	i = 1;
 
   if (narg) i = int_arg(*ps);
   if (i) { step = i;  printf("Commence stepping at level %d\n", step); }
@@ -2337,11 +2337,11 @@ Int lux_step(Int narg, Int ps[])
   return 1;
 }
 /*-------------------------------------------------------------------------*/
-Int lux_varname(Int narg, Int ps[])
+int32_t lux_varname(int32_t narg, int32_t ps[])
 /* returns the name of the variable */
 {
   char	*name;
-  Int	iq;
+  int32_t	iq;
 
   name = varName(*ps);
   iq = string_scratch(strlen(name));
@@ -2349,7 +2349,7 @@ Int lux_varname(Int narg, Int ps[])
   return iq;
 }
 /*-------------------------------------------------------------------------*/
-Int namevar(Int symbol, Int safe)
+int32_t namevar(int32_t symbol, int32_t safe)
 /* if safe == 0: returns the variable that goes with the name string */
 /* in the current context, or an error if not found. */
 /* if safe == 1: as for safe == 0, but if not found and if at main level */
@@ -2358,7 +2358,7 @@ Int namevar(Int symbol, Int safe)
 /* if safe == 3: as for safe == 1, but search and create at main level. */
 {
   char	*name;
-  Int	iq, context;
+  int32_t	iq, context;
 
   if (symbol_class(symbol) != LUX_STRING)
     return cerror(NEED_STR, symbol);
@@ -2385,7 +2385,7 @@ Int namevar(Int symbol, Int safe)
   return iq;
 }
 /*-------------------------------------------------------------------------*/
-char *keyName(internalRoutine *routine, Int number, Int index)
+char *keyName(internalRoutine *routine, int32_t number, int32_t index)
 /* returns the name of the <index>th positional keyword of <routine> */
 /* #<number>.  LS 19jan95 */
 {
@@ -2398,7 +2398,7 @@ char *keyName(internalRoutine *routine, Int number, Int index)
   keys = list->keys;
   if (index < 0) return "(unnamed)";	/* before first named key */
   while (*keys && index)
-  { if (!isdigit((Int) **keys)) index--;
+  { if (!isdigit((int32_t) **keys)) index--;
     keys++; }
   if (index) return "(unnamed)";	/* beyond last key */
   return *keys;
@@ -2415,21 +2415,21 @@ void checkErrno(void)
 }
 /*-------------------------------------------------------------------------*/
 char	allowPromptInInput = 1; /* default */
-Int lux_set(Int narg, Int ps[])
+int32_t lux_set(int32_t narg, int32_t ps[])
 /* SET[,/SHOWALLOC,/WHITEBACKGROUND,/INVIMCOORDS,/SET,/RESET,/ZOOM]
  governs aspects of the behaviour of various routines.  LS 11mar98 */
 {
-  extern Int	setup;
+  extern int32_t	setup;
 #if HAVE_LIBX11
   char	*string;
   char	*visualNames[] = { "StaticGray", "StaticColor", "TrueColor",
 			   "GrayScale", "PseudoColor", "DirectColor",
 			   "SG", "SC", "TC", "GS", "PC", "DC",
 			   "GSL", "CSL", "CSI", "GDL", "CDL", "CDI" };
-  Int	visualClassCode[] = { StaticGray, StaticColor, TrueColor,
+  int32_t	visualClassCode[] = { StaticGray, StaticColor, TrueColor,
 			      GrayScale, PseudoColor, DirectColor };
-  Int	setup_x_visual(Int), i;
-  extern Int	connect_flag;
+  int32_t	setup_x_visual(int32_t), i;
+  extern int32_t	connect_flag;
   extern Visual	*visual;
 #endif
 
@@ -2504,7 +2504,7 @@ Int lux_set(Int narg, Int ps[])
   return LUX_ONE;
 }
 /*-------------------------------------------------------------------------*/
-void zapTemp(Int symbol)
+void zapTemp(int32_t symbol)
 /* zaps <symbol> only if it is a temporary variable */
 /* and if its context is equal to -compileLevel */
 {
@@ -2515,10 +2515,10 @@ void zapTemp(Int symbol)
     updateIndices(); }
 }
 /*-------------------------------------------------------------------------*/
-Int copyEvalSym(Int source)
+int32_t copyEvalSym(int32_t source)
   /* evaluates <source> and returns it in a temp */
 {
-  Int	result, target;
+  int32_t	result, target;
 
   result = eval(source);
   if (result < 0) return -1;	/* some error */
@@ -2534,12 +2534,12 @@ Int copyEvalSym(Int source)
   return target;
 }
 /*-------------------------------------------------------------------------*/
-Int (*lux_converts[10])(Int, Int []) = {
+int32_t (*lux_converts[10])(int32_t, int32_t []) = {
   lux_byte, lux_word, lux_long, lux_float, lux_double, lux_string,
   lux_string, lux_string, lux_cfloat, lux_cdouble
 };
-Int getNumerical(Int iq, Int minType, Int *n, pointer *src, char mode,
-		 Int *result, pointer *trgt)
+int32_t getNumerical(int32_t iq, int32_t minType, int32_t *n, pointer *src, char mode,
+		 int32_t *result, pointer *trgt)
 /* gets pointer to and size of the data in numerical argument <iq>.
    returns pointer in <*src>, number of elements in <*n>.
 
@@ -2563,7 +2563,7 @@ Int getNumerical(Int iq, Int minType, Int *n, pointer *src, char mode,
 
    LS 19nov98 */
 {
-  Int	type;
+  int32_t	type;
 
   if (!symbolIsNumerical(iq))
     return cerror(ILL_CLASS, iq);
@@ -2613,7 +2613,7 @@ Int getNumerical(Int iq, Int minType, Int *n, pointer *src, char mode,
   return 1;
 }  
 /*-------------------------------------------------------------------------*/
-Int getSimpleNumerical(Int iq, pointer *data, Int *nelem)
+int32_t getSimpleNumerical(int32_t iq, pointer *data, int32_t *nelem)
 /* returns pointer in <*data> to data in symbol <iq>, and in <*nelem> the
    number of data elements, and 1 as function return value, if <iq>
    is of numerical type.  Otherwise, returns -1 as function value, 0 in
@@ -2637,9 +2637,9 @@ Int getSimpleNumerical(Int iq, pointer *data, Int *nelem)
   return 1;
 }
 /*-------------------------------------------------------------------------*/
-Int file_map_size(Int symbol)
+int32_t file_map_size(int32_t symbol)
 {
- Int	i, n, *p, size;
+ int32_t	i, n, *p, size;
 
   p = file_map_dims(symbol);
   n = file_map_num_dims(symbol);
@@ -2649,7 +2649,7 @@ Int file_map_size(Int symbol)
   return size;
 }
 /*-------------------------------------------------------------------------*/
-Int lux_pointer(Int narg, Int ps[])
+int32_t lux_pointer(int32_t narg, int32_t ps[])
 /* POINTER,pointer,target [,/FUNCTION, /SUBROUTINE, /INTERNAL, /MAIN] */
 /* makes named variable */
 /* <pointer> point at named variable <target>.  If <pointer> is a pointer */
@@ -2657,7 +2657,7 @@ Int lux_pointer(Int narg, Int ps[])
 /* place.  <target> may be an expression as long as it evaluates to a */
 /* named variable.  LS 11feb97 */
 {
-  Int	iq;
+  int32_t	iq;
   char	*name, *name2, *p;
   
   if (ps[0] >= TEMPS_START)
@@ -2719,7 +2719,7 @@ Int lux_pointer(Int narg, Int ps[])
   return 1;
 }
 /*-------------------------------------------------------------------------*/
-Int lux_symbol(Int narg, Int ps[])
+int32_t lux_symbol(int32_t narg, int32_t ps[])
 /* SYMBOL('name') returns the variable with the <name> in the current */
 /* context, or if not found and if at the main level, then creates */
 /* such a variable and returns it.  SYMBOL('name',/MAIN) checks */
@@ -2728,7 +2728,7 @@ Int lux_symbol(Int narg, Int ps[])
   return namevar(ps[0], (internalMode & 1) == 1? 3: 1);
 }
 /*-------------------------------------------------------------------------*/
-Int stringpointer(char *name, Int type)
+int32_t stringpointer(char *name, int32_t type)
 /* seeks <name> as user-defined function (SP_USER_FUNC), user-defined */
 /* subroutine (SP_USER_SUBR), variable (SP_VAR), internal function */
 /* (SP_INT_FUNC), or internal subroutine (SP_INT_SUBR).  Also: */
@@ -2736,7 +2736,7 @@ Int stringpointer(char *name, Int type)
 /* (SP_SUBR = SP_USER_SUBR then SP_INT_SUBR), and any at all (SP_ANY). */
 /* LS 1apr97 */
 {
-  Int	n;
+  int32_t	n;
   char	*p;
 
   allocate(p, strlen(name) + 1, char);
@@ -2783,11 +2783,11 @@ Int stringpointer(char *name, Int type)
   return -1;			/* not found */
 }
 /*-------------------------------------------------------------------------*/
-Int lux_show_temps(Int narg, Int ps[])
+int32_t lux_show_temps(int32_t narg, int32_t ps[])
 /* a routine for debugging LUX.  It shows the temporary variables that */
 /* are currently defined.  LS 2mar97 */
 {
-  Int	i;
+  int32_t	i;
 
   setPager(0);
   for (i = TEMPS_START; i < TEMPS_END; i++) {
@@ -2800,7 +2800,7 @@ Int lux_show_temps(Int narg, Int ps[])
   return 1;
 }
 /*-------------------------------------------------------------------------*/
-Int routineContext(Int nsym)
+int32_t routineContext(int32_t nsym)
 /* returns the number of the user-defined subroutine or function that
    symbol <nsym> is in, or 0 if at the main level.  LS 18apr97 */
 {
@@ -2853,7 +2853,7 @@ Int routineContext(Int nsym)
 /*-------------------------------------------------------------------------*/
 #define isodigit(x) (isdigit(x) && x < '8')
  
-void read_a_number(char **buf, scalar *value, Int *type)
+void read_a_number(char **buf, scalar *value, int32_t *type)
 /* reads the number at <*buf>, puts it in <*value> and its data type
    in <*type>, and modifies <*buf> to point just after the detected
    value.  NOTE: if the type is integer (BYTE, WORD, LONG), then the
@@ -2865,13 +2865,13 @@ void read_a_number(char **buf, scalar *value, Int *type)
    exactly to the <*type>: e.g., a BYTE number gets its value returned
    in value->l and *type set to LUX_BYTE.  LS 17sep98 */
 {
-  Int	base = 10, kind, sign;
+  int32_t	base = 10, kind, sign;
   char	*p, *numstart, c, ce, *p2;
 
   p = *buf;
   *type = LUX_LONG;		/* default */
   /* skip whitespace */
-  while (!isdigit((Int) *p) && !strchr("+-.", (Int) *p))
+  while (!isdigit((int32_t) *p) && !strchr("+-.", (int32_t) *p))
     p++;
 
   /* skip sign, if any */
@@ -2893,7 +2893,7 @@ void read_a_number(char **buf, scalar *value, Int *type)
   /* character; <c> contains the last read character, which must match */
   /* one of the characters just after a vertical bar. */
 
-  while (isodigit((Int) *p))
+  while (isodigit((int32_t) *p))
     p++;
   
   /* ooo|O[{BWLI}] */
@@ -2916,7 +2916,7 @@ void read_a_number(char **buf, scalar *value, Int *type)
 	   ^ we are here */
   } else
     /* skip remaining digits, if any */
-    while (isdigit((Int) *p))
+    while (isdigit((int32_t) *p))
       p++;
 
   /* oooO|{BWLI} */
@@ -2940,7 +2940,7 @@ void read_a_number(char **buf, scalar *value, Int *type)
 	/* 0|X[hhh][{WLI}] */
 	/*  ^ we are here */
 	p++;
-	while (isxdigit((Int) *p))
+	while (isxdigit((int32_t) *p))
 	  p++;
 	base = 16;
 	/*  0X[hhh]|[{WLI}] */
@@ -2959,8 +2959,8 @@ void read_a_number(char **buf, scalar *value, Int *type)
       numstart = p;
       /* ddd{SH}|[ddd:]*[ddd][.ddd][{DE}][I] */
       /*        ^ we are here */
-      while (isdigit((Int) *p)) {
-	while (isdigit((Int) *p))
+      while (isdigit((int32_t) *p)) {
+	while (isdigit((int32_t) *p))
 	  p++;
 	/* ddd{SH}ddd|:[ddd:]*[ddd][.ddd][{DE}][I] */
 	/* ddd{SH}ddd|.[ddd][{DE}][I] */
@@ -2969,7 +2969,7 @@ void read_a_number(char **buf, scalar *value, Int *type)
 	/*           ^ we are here */
 	if (*p == '.') {	/* a float number: the last entry */
 	  p++;
-	  while (isdigit((Int) *p)) /* find the rest */
+	  while (isdigit((int32_t) *p)) /* find the rest */
 	    p++;
 	  /* ddd{SH}[ddd:]*[ddd][.ddd]|[{DE}][I] */
 	  /*                          ^ we are here */
@@ -3017,7 +3017,7 @@ void read_a_number(char **buf, scalar *value, Int *type)
       /*    ^ we are here */
       if (*p == '.') {
 	p++;			/* skip . */
-	while (isdigit((Int) *p))
+	while (isdigit((int32_t) *p))
 	  p++;
       }
       /* ddd.[ddd]|[I] */
@@ -3044,7 +3044,7 @@ void read_a_number(char **buf, scalar *value, Int *type)
 	/* ddd.[ddd]{DE}[[{+-}|ddd][I] */
 	/*      .ddd{DE}[[{+-}|ddd][I] */
 	/*                    ^ we are here */
-	while (isdigit((Int) *p))
+	while (isdigit((int32_t) *p))
 	  p++;
 	kind = toupper(*p);
       }
@@ -3105,7 +3105,7 @@ void read_a_number(char **buf, scalar *value, Int *type)
   *buf = p;
 }
 /*-------------------------------------------------------------------------*/
-void read_a_number_fp(FILE *fp, scalar *value, Int *type)
+void read_a_number_fp(FILE *fp, scalar *value, int32_t *type)
 /* reads the number at <*fp>, puts it in <*value> and its data type
    in <*type>.  Other than the source of the data, exactly the same as
    read_a_number().
@@ -3119,7 +3119,7 @@ void read_a_number_fp(FILE *fp, scalar *value, Int *type)
    in value->l and *type set to LUX_BYTE.  LS 17sep98 */
 /* Fixed reading of numbers with exponents.  LS 11jul2000 */
 {
-  Int	base = 10, kind, sign, ch;
+  int32_t	base = 10, kind, sign, ch;
   char	*p, *numstart;
 
   *type = LUX_LONG;		/* default */
@@ -3144,7 +3144,7 @@ void read_a_number_fp(FILE *fp, scalar *value, Int *type)
   *p++ = ch;
   do
     *p++ = nextchar(fp);
-  while (isodigit((Int) p[-1]));
+  while (isodigit((int32_t) p[-1]));
   ch = p[-1];
 
   if (ch == EOF) {
@@ -3162,7 +3162,7 @@ void read_a_number_fp(FILE *fp, scalar *value, Int *type)
     /* read remaining digits, if any */
     do
       *p++ = nextchar(fp);
-    while (isdigit((Int) p[-1]));
+    while (isdigit((int32_t) p[-1]));
     ch = p[-1];
   }
 		   
@@ -3173,7 +3173,7 @@ void read_a_number_fp(FILE *fp, scalar *value, Int *type)
       if (p == numstart + 2 && numstart[0] == '0') { /* yes, a hex number */
 	do
 	  *p++ = nextchar(fp);
-	while (isxdigit((Int) p[-1]));
+	while (isxdigit((int32_t) p[-1]));
 	ch = p[-1];
 	base = 16;
       } /* else we're already at the end of the non-hex number */
@@ -3188,7 +3188,7 @@ void read_a_number_fp(FILE *fp, scalar *value, Int *type)
       base = 0;			/* count the number of elements */
       ch = nextchar(fp);
       if (ch == EOF) {
-	value->l = (Int) value->d;
+	value->l = (int32_t) value->d;
 	return;
       }
       while (isdigit(ch)) {
@@ -3196,14 +3196,14 @@ void read_a_number_fp(FILE *fp, scalar *value, Int *type)
 	  *p++ = ch;
 	  ch = nextchar(fp);
 	  if (ch == EOF) {
-	    value->l = (Int) value->d;
+	    value->l = (int32_t) value->d;
 	    return;
 	  }
 	}
 	if (ch == '.') {	/* a float number: the last entry */
 	  do
 	    *p++ = nextchar(fp);
-	  while (isdigit((Int) p[-1])); /* find the rest */
+	  while (isdigit((int32_t) p[-1])); /* find the rest */
 	  *p = '\0';		/* temporary termination */
 	  value->d *= 60;
 	  value->d += atof(numstart);
@@ -3237,7 +3237,7 @@ void read_a_number_fp(FILE *fp, scalar *value, Int *type)
       if (ch == '.') {
 	do
 	  *p++ = nextchar(fp);
-	while (isdigit((Int) p[-1]));
+	while (isdigit((int32_t) p[-1]));
       }
       kind = toupper(p[-1]);
       *type = LUX_FLOAT;	/* default */
@@ -3253,7 +3253,7 @@ void read_a_number_fp(FILE *fp, scalar *value, Int *type)
 	  unnextchar(ch, fp);
 	do
 	  *p++ = nextchar(fp);
-	while (isdigit((Int) p[-1]));
+	while (isdigit((int32_t) p[-1]));
 	kind = toupper(p[-1]); /* must look for I */
       }
       *p = '\0';		/* temporary end */
@@ -3304,7 +3304,7 @@ void read_a_number_fp(FILE *fp, scalar *value, Int *type)
 }
 /*-------------------------------------------------------------------------*/
 #ifdef FACTS
-void *seekFacts(Int symbol, Int type, Int flag)
+void *seekFacts(int32_t symbol, int32_t type, int32_t flag)
 /* seeks facts of the indicated <type> and <flag> associated with the */
 /* <symbol>. */
 /* Returns a pointer to the facts, if found, or else returns NULL. */
@@ -3327,7 +3327,7 @@ void *seekFacts(Int symbol, Int type, Int flag)
   return NULL;
 }
 /*-------------------------------------------------------------------------*/
-void *setFacts(Int symbol, Int type, Int flag)
+void *setFacts(int32_t symbol, int32_t type, int32_t flag)
 /* seeks facts of the indicated <type> associated with the <symbol>. */
 /* Returns a pointer to the facts, if found.  Otherwise, allocates a */
 /* new slot for the facts and returns a pointer to it. */
@@ -3335,7 +3335,7 @@ void *setFacts(Int symbol, Int type, Int flag)
 /* Returns NULL if unsucessful.  LS 6apr99 */
 {
   arrayFacts	*facts;
-  Int	n;
+  int32_t	n;
 
   if (!symbolIsNumericalArray(symbol)) /* not a numerical symbol */
     return NULL;
@@ -3365,9 +3365,9 @@ void *setFacts(Int symbol, Int type, Int flag)
   return facts;			/* pointer to the last one */
 }
 /*-------------------------------------------------------------------------*/
-void deleteFacts(Int symbol, Int type)
+void deleteFacts(int32_t symbol, int32_t type)
 {
-  Int	n, nf;
+  int32_t	n, nf;
   arrayFacts	*facts;
 
   if (!symbolIsNumericalArray(symbol))
@@ -3415,19 +3415,19 @@ char *strsave_system(char *str)
 /* push value <x> unto the stack, and call pop() to pop the top element */
 /* from the stack.  When pop() returns the sentinel value, then the */
 /* stack is empty.  Call deleteStack() to properly clean up. */
-static Int *stack, stack_sentinel;
-void newStack(Int sentinel)
+static int32_t *stack, stack_sentinel;
+void newStack(int32_t sentinel)
 {
-  stack = (Int *) curScrat;
+  stack = (int32_t *) curScrat;
   *stack++ = stack_sentinel = sentinel;
 }
 /*-----------------------------------------------------*/
-void push(Int value)
+void push(int32_t value)
 {
   *stack++ = value;
 }
 /*-----------------------------------------------------*/
-Int pop(void)
+int32_t pop(void)
 {
   return *--stack;
 }
@@ -3443,13 +3443,13 @@ static struct {
   char *ptr;
 } keyboard = { NULL, NULL };
 
-Int nextchar(FILE *fp) {
+int32_t nextchar(FILE *fp) {
   /* returns the next char from the indicated file pointer */
   /* if fp == stdin (i.e., reading from the keyboard), then a special */
   /* data input buffer is used, with all command line editing except */
   /* history buffer stuff enabled.  This can be used as an alternative */
   /* for fgetc(). LS 29mar2001 */
-  Int getNewLine(char *, size_t, char *, char);
+  int32_t getNewLine(char *, size_t, char *, char);
 
   if (fp == stdin) {
     if (!keyboard.ptr) {
@@ -3479,7 +3479,7 @@ Int nextchar(FILE *fp) {
     return fgetc(fp);
 }
 /*------------------------------------------------------------------------- */
-Int unnextchar(Int c, FILE *fp) {
+int32_t unnextchar(int32_t c, FILE *fp) {
   /* push-back analogon to nextchar().  Can be used instead of ungetc(). */
   /* LS 29mar2001 */
   if (fp == stdin) {

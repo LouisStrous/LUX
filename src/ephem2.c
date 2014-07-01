@@ -37,7 +37,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #define mpol3(a0,a1,a2,a3,t,n) (fmod(a0 + t*(a1 + t*(a2 + t*a3)),n))
 
 static double	solar_stuff;
-void solar_physical(double jd, Int select)
+void solar_physical(double jd, int32_t select)
 /* from J. Meeus: Astronomical Algorithms, Willman-Bell, ISBN 0-943396-35-2, */
 /* chapter 28 */
 /* /MODERN (internalMode & 2): corrections from P. Giles (Ph.D. thesis, */
@@ -100,10 +100,10 @@ void solar_physical(double jd, Int select)
   }
 }
 /*------------------------------------------------------------------------*/
-Int lux_solar_physical(Int narg, Int ps[], Int select)
+int32_t lux_solar_physical(int32_t narg, int32_t ps[], int32_t select)
 /* LS < 1998 */
 {
-  Int	n, result;
+  int32_t	n, result;
   pointer	src, trgt;
 
   /* get copy of ps[0] upgraded to LUX_FLOAT if necessary, return pointer
@@ -130,22 +130,22 @@ Int lux_solar_physical(Int narg, Int ps[], Int select)
   return result;
 }
 /*------------------------------------------------------------------------*/
-Int lux_solar_p(Int narg, Int ps[])
+int32_t lux_solar_p(int32_t narg, int32_t ps[])
 {
   return lux_solar_physical(narg, ps, 0);
 }
 /*------------------------------------------------------------------------*/
-Int lux_solar_b(Int narg, Int ps[])
+int32_t lux_solar_b(int32_t narg, int32_t ps[])
 {
   return lux_solar_physical(narg, ps, 1);
 }
 /*------------------------------------------------------------------------*/
-Int lux_solar_l(Int narg, Int ps[])
+int32_t lux_solar_l(int32_t narg, int32_t ps[])
 {
   return lux_solar_physical(narg, ps, (internalMode & 1)? 4: 2);
 }
 /*------------------------------------------------------------------------*/
-Int lux_solar_r(Int narg, Int ps[])
+int32_t lux_solar_r(int32_t narg, int32_t ps[])
 {
   return lux_solar_physical(narg, ps, 3);
 }

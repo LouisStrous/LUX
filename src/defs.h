@@ -167,7 +167,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #define HEAD(SYM)		(struct ahead *) sym[SYM].spec.array.ptr
 
 /* LONG ptr to array data */
-#define LPTR(HEAD)		(Int *)((char *) HEAD + sizeof(struct ahead))
+#define LPTR(HEAD)		(int32_t *)((char *) HEAD + sizeof(struct ahead))
 
 /* check that all array elements are nonnegative */
 #define CK_SGN(ARR, N, ARGN, SYM) \

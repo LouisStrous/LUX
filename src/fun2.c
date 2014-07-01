@@ -37,15 +37,15 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "action.h"
 #include "install.h"
 
-extern Int	nFixed;
-static	Int	result_sym , type, detrend_flag;
+extern int32_t	nFixed;
+static	int32_t	result_sym , type, detrend_flag;
 static	char	templine[256];		/* a temp for output and istring */
-void	zerobytes(void *, Int);
-Int	f_decomp(float *, Int, Int), d_decomp(double *, Int, Int),
-  f_solve(float *, float *, Int, Int), d_solve(double *, double *, Int, Int),
-  lux_replace(Int, Int);
+void	zerobytes(void *, int32_t);
+int32_t	f_decomp(float *, int32_t, int32_t), d_decomp(double *, int32_t, int32_t),
+  f_solve(float *, float *, int32_t, int32_t), d_solve(double *, double *, int32_t, int32_t),
+  lux_replace(int32_t, int32_t);
 /*------------------------------------------------------------------------- */
-Int lux_runsum(Int narg, Int ps[])
+int32_t lux_runsum(int32_t narg, int32_t ps[])
 /*generate a running sum
   syntax:  y = runsum(x [,axis,order])
   <axis> is the dimension along which summing is performed; for each of the
@@ -58,8 +58,8 @@ Int lux_runsum(Int narg, Int ps[])
   implementation of 1D double-precision case LS 11feb2007 */
 {
  register pointer q1,q2,p;
- Int	result_sym, iq, axis, m, n, i, j, done, *dims, ndim, tally[8], step[8];
- Int	xdims[8], order, size;
+ int32_t	result_sym, iq, axis, m, n, i, j, done, *dims, ndim, tally[8], step[8];
+ int32_t	xdims[8], order, size;
  array	*h;
 
  if (narg > 2) order = int_arg(ps[2]); else order = -1;
@@ -92,7 +92,7 @@ Int lux_runsum(Int narg, Int ps[])
      { puts("Runsum order too large for input array");
        return cerror(INCMP_ARG, ps[2]); }
      if (order == 0) order = 1;
-     memcpy(xdims, dims, sizeof(Int)*ndim);		/* copy dims */
+     memcpy(xdims, dims, sizeof(int32_t)*ndim);		/* copy dims */
      result_sym = array_clone(iq, type);
      h = HEAD(result_sym);
      q2.l = LPTR(h);
@@ -140,19 +140,19 @@ Int lux_runsum(Int narg, Int ps[])
  return result_sym;
 }						/*end of lux_runsum */
 /*------------------------------------------------------------------------- */
-Int index_sdev(Int narg, Int ps[], Int sq)
+int32_t index_sdev(int32_t narg, int32_t ps[], int32_t sq)
 /* calculates standard deviations or variances by class. */
 /* f(<x>, <classes> [, <weights>, /SAMPLE, /POPULATION, /DOUBLE]) */
 /* we assume that ps[0] and ps[1] are numerical arrays with the same number */
 /* of dimensions. */
 /* see at sdev() for more info. */
 {
-  Int	type, offset, *indx, i, size, result, nElem, indices2,
+  int32_t	type, offset, *indx, i, size, result, nElem, indices2,
   	outType, haveWeights, shift;
   pointer	src, trgt, sum, weights, hist;
   scalar	temp;
   extern scalar	lastmin, lastmax;
-  Int	minmax(Int *, Int, Int);
+  int32_t	minmax(int32_t *, int32_t, int32_t);
 
   if (narg > 2 && ps[2]) {	/* have <weights> */
     if (!symbolIsNumericalArray(ps[2]) /* not a numerical array */
@@ -477,8 +477,8 @@ Int index_sdev(Int narg, Int ps[], Int sq)
     }
     free(hist.d - offset);
   } else {			/* no <weights>: each element counts once */
-    allocate(hist.l, size, Int);
-    zerobytes(hist.l, size*sizeof(Int));
+    allocate(hist.l, size, int32_t);
+    zerobytes(hist.l, size*sizeof(int32_t));
     hist.l += offset;
     switch (outType) {
       case LUX_FLOAT:
@@ -759,7 +759,7 @@ Int index_sdev(Int narg, Int ps[], Int sq)
   return result;
 }
 /*------------------------------------------------------------------------- */
-Int lux_covariance(Int narg, Int ps[])
+int32_t lux_covariance(int32_t narg, int32_t ps[])
 /* f(<x> , <y> [, <mode>, WEIGHTS=<weights>, /SAMPLE, /POPULATION, /KEEPDIMS, */
 /*         /DOUBLE]) */
 /* Returns the covariance of <x> and <y>, which must be */
@@ -785,12 +785,12 @@ Int lux_covariance(Int narg, Int ps[])
 /*    then the result is always DOUBLE. */
 /* LS 2011-04-15 */
 {
-  Int	result, n, i, done, n2, save[MAX_DIMS], outtype, haveWeights;
+  int32_t	result, n, i, done, n2, save[MAX_DIMS], outtype, haveWeights;
   pointer	xsrc, ysrc, trgt, xsrc0, ysrc0, weight, weight0;
   double	xmean, ymean, xtemp, ytemp, cov, nn;
   loopInfo	xsrcinfo, ysrcinfo, trgtinfo, winfo;
   extern scalar	lastmean;
-  extern Int	lastsdev_sym, lastmean_sym;
+  extern int32_t	lastsdev_sym, lastmean_sym;
   
   /* return values by class? */
 #ifdef IMPLEMENT_LATER
@@ -888,7 +888,7 @@ Int lux_covariance(Int narg, Int ps[])
 	do {
 	  xmean = 0.0;
           ymean = 0.0;
-	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(Int));
+	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(int32_t));
 	  xsrc0 = xsrc;
           ysrc0 = ysrc;
 	  weight0 = weight;
@@ -901,8 +901,8 @@ Int lux_covariance(Int narg, Int ps[])
 	  while (advanceLoop(&winfo, &weight), 
 		 advanceLoop(&ysrcinfo, &ysrc),
                  advanceLoop(&xsrcinfo, &xsrc) < xsrcinfo.naxes);
-	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(Int));
-	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(Int));
+	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(int32_t));
+	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(int32_t));
 	  xsrc = xsrc0;
           ysrc = ysrc0;
 	  weight = weight0;
@@ -933,7 +933,7 @@ Int lux_covariance(Int narg, Int ps[])
 	do {
 	  xmean = 0.0;
           ymean = 0.0;
-	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(Int));
+	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(int32_t));
 	  xsrc0 = xsrc;
           ysrc0 = ysrc;
 	  weight0 = weight;
@@ -946,8 +946,8 @@ Int lux_covariance(Int narg, Int ps[])
 	  while (advanceLoop(&winfo, &weight),
 		 advanceLoop(&ysrcinfo, &ysrc),
                  advanceLoop(&xsrcinfo, &xsrc) < xsrcinfo.naxes);
-	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(Int));
-	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(Int));
+	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(int32_t));
+	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(int32_t));
 	  xsrc = xsrc0;
           ysrc = ysrc0;
 	  weight = weight0;
@@ -978,7 +978,7 @@ Int lux_covariance(Int narg, Int ps[])
 	do {
 	  xmean = 0.0;
           ymean = 0.0;
-	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(Int));
+	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(int32_t));
 	  xsrc0 = xsrc;
           ysrc0 = ysrc;
 	  weight0 = weight;
@@ -991,8 +991,8 @@ Int lux_covariance(Int narg, Int ps[])
 	  while (advanceLoop(&winfo, &weight),
 		 advanceLoop(&ysrcinfo, &ysrc),
                  advanceLoop(&xsrcinfo, &xsrc) < xsrcinfo.naxes);
-	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(Int));
-	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(Int));
+	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(int32_t));
+	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(int32_t));
 	  xsrc = xsrc0;
           ysrc = ysrc0;
 	  weight = weight0;
@@ -1024,7 +1024,7 @@ Int lux_covariance(Int narg, Int ps[])
 	do {
 	  xmean = 0.0;
           ymean = 0.0;
-	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(Int));
+	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(int32_t));
 	  xsrc0 = xsrc;
           ysrc0 = ysrc;
 	  weight0 = weight;
@@ -1037,8 +1037,8 @@ Int lux_covariance(Int narg, Int ps[])
 	  while (advanceLoop(&winfo, &weight),
 		 advanceLoop(&ysrcinfo, &ysrc),
                  advanceLoop(&xsrcinfo, &xsrc) < xsrcinfo.naxes);
-	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(Int));
-	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(Int));
+	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(int32_t));
+	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(int32_t));
 	  xsrc = xsrc0;
           ysrc = ysrc0;
 	  weight = weight0;
@@ -1070,7 +1070,7 @@ Int lux_covariance(Int narg, Int ps[])
 	do {
 	  xmean = 0.0;
           ymean = 0.0;
-	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(Int));
+	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(int32_t));
 	  xsrc0 = xsrc;
           ysrc0 = ysrc;
 	  weight0 = weight;
@@ -1083,8 +1083,8 @@ Int lux_covariance(Int narg, Int ps[])
 	  while (advanceLoop(&winfo, &weight),
 		 advanceLoop(&ysrcinfo, &ysrc),
                  advanceLoop(&xsrcinfo, &xsrc) < xsrcinfo.naxes);
-	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(Int));
-	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(Int));
+	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(int32_t));
+	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(int32_t));
 	  xsrc = xsrc0;
           ysrc = ysrc0;
 	  weight = weight0;
@@ -1119,7 +1119,7 @@ Int lux_covariance(Int narg, Int ps[])
 	do {
 	  xmean = 0.0;
           ymean = 0.0;
-	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(Int));
+	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(int32_t));
 	  xsrc0 = xsrc;
           ysrc0 = ysrc;
 	  do {
@@ -1127,8 +1127,8 @@ Int lux_covariance(Int narg, Int ps[])
             ymean += (double) *ysrc.b;
 	  } while (advanceLoop(&ysrcinfo, &ysrc),
 		   advanceLoop(&xsrcinfo, &xsrc) < xsrcinfo.naxes);
-	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(Int));
-	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(Int));
+	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(int32_t));
+	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(int32_t));
 	  xsrc = xsrc0;
           ysrc = ysrc0;
 	  xmean /= n;
@@ -1154,8 +1154,8 @@ Int lux_covariance(Int narg, Int ps[])
 	do {
 	  xmean = 0.0;
           ymean = 0.0;
-	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(Int));
-	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(Int));
+	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(int32_t));
+	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(int32_t));
 	  xsrc0 = xsrc;
           ysrc0 = ysrc;
 	  do {
@@ -1163,7 +1163,7 @@ Int lux_covariance(Int narg, Int ps[])
             ymean += (double) *ysrc.w;
 	  } while (advanceLoop(&ysrcinfo, &ysrc),
 		   advanceLoop(&xsrcinfo, &xsrc) < xsrcinfo.naxes);
-	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(Int));
+	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(int32_t));
 	  xsrc = xsrc0;
           ysrc = ysrc0;
 	  xmean /= n;
@@ -1189,7 +1189,7 @@ Int lux_covariance(Int narg, Int ps[])
 	do {
 	  xmean = 0.0;
           ymean = 0.0;
-	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(Int));
+	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(int32_t));
 	  xsrc0 = xsrc;
           ysrc0 = ysrc;
 	  do {
@@ -1197,8 +1197,8 @@ Int lux_covariance(Int narg, Int ps[])
             ymean += (double) *ysrc.l;
 	  } while (advanceLoop(&ysrcinfo, &ysrc),
 		   advanceLoop(&xsrcinfo, &xsrc) < xsrcinfo.naxes);
-	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(Int));
-	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(Int));
+	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(int32_t));
+	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(int32_t));
 	  xsrc = xsrc0;
           ysrc = ysrc0;
 	  xmean /= n;
@@ -1224,7 +1224,7 @@ Int lux_covariance(Int narg, Int ps[])
 	do {
 	  xmean = 0.0;
           ymean = 0.0;
-	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(Int));
+	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(int32_t));
 	  xsrc0 = xsrc;
           ysrc0 = ysrc;
 	  do {
@@ -1232,8 +1232,8 @@ Int lux_covariance(Int narg, Int ps[])
             ymean += (double) *ysrc.f;
 	  } while (advanceLoop(&ysrcinfo, &ysrc),
 		   advanceLoop(&xsrcinfo, &xsrc) < xsrcinfo.naxes);
-	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(Int));
-	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(Int));
+	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(int32_t));
+	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(int32_t));
 	  xsrc = xsrc0;
           ysrc = ysrc0;
 	  xmean /= n;
@@ -1259,7 +1259,7 @@ Int lux_covariance(Int narg, Int ps[])
 	do {
 	  xmean = 0.0;
           ymean = 0.0;
-	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(Int));
+	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(int32_t));
 	  xsrc0 = xsrc;
           ysrc0 = ysrc;
 	  do {
@@ -1267,8 +1267,8 @@ Int lux_covariance(Int narg, Int ps[])
             ymean += (double) *ysrc.d;
 	  } while (advanceLoop(&ysrcinfo, &ysrc),
 		   advanceLoop(&xsrcinfo, &xsrc) < xsrcinfo.naxes);
-	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(Int));
-	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(Int));
+	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(int32_t));
+	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(int32_t));
 	  xsrc = xsrc0;
           ysrc = ysrc0;
 	  xmean /= n;
@@ -1298,7 +1298,7 @@ Int lux_covariance(Int narg, Int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-Int sdev(Int narg, Int ps[], Int sq)
+int32_t sdev(int32_t narg, int32_t ps[], int32_t sq)
 /* f(<x> [, <mode>, WEIGHTS=<weights>, /SAMPLE, /POPULATION, /KEEPDIMS, */
 /*         /DOUBLE]) */
 /* with f = SDEV (sq = 1) or VARIANCE (sq = 0) */
@@ -1325,13 +1325,13 @@ Int sdev(Int narg, Int ps[], Int sq)
 /*    then the result is always DOUBLE. */
 /* LS 19 July 2000 */
 {
-  Int	result, n, i, done, n2, save[MAX_DIMS], outtype, haveWeights;
+  int32_t	result, n, i, done, n2, save[MAX_DIMS], outtype, haveWeights;
   pointer	src, trgt, src0, trgt0, weight, weight0;
   double	mean, sdev, temp, nn;
   doubleComplex	cmean;
   loopInfo	srcinfo, trgtinfo, winfo;
   extern scalar	lastsdev, lastmean;
-  extern Int	lastsdev_sym, lastmean_sym;
+  extern int32_t	lastsdev_sym, lastmean_sym;
   
   /* return values by class? */
   if (narg > 1 && ps[1] && symbolIsNumericalArray(ps[1])
@@ -1409,7 +1409,7 @@ Int sdev(Int narg, Int ps[], Int sq)
       case LUX_BYTE:
 	do {
 	  mean = 0.0;
-	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(Int));
+	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(int32_t));
 	  src0 = src;
 	  weight0 = weight;
 	  nn = 0;
@@ -1419,7 +1419,7 @@ Int sdev(Int narg, Int ps[], Int sq)
 	  }
 	  while (advanceLoop(&winfo, &weight),
 		 advanceLoop(&srcinfo, &src) < srcinfo.naxes);
-	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(Int));
+	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(int32_t));
 	  src = src0;
 	  weight = weight0;
 	  mean /= (nn? nn: 1);
@@ -1445,7 +1445,7 @@ Int sdev(Int narg, Int ps[], Int sq)
       case LUX_WORD:
 	do {
 	  mean = 0.0;
-	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(Int));
+	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(int32_t));
 	  src0 = src;
 	  weight0 = weight;
 	  nn = 0;
@@ -1455,7 +1455,7 @@ Int sdev(Int narg, Int ps[], Int sq)
 	  }
 	  while (advanceLoop(&winfo, &weight),
 		 advanceLoop(&srcinfo, &src) < srcinfo.naxes);
-	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(Int));
+	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(int32_t));
 	  src = src0;
 	  weight = weight0;
 	  mean /= (nn? nn: 1);
@@ -1481,7 +1481,7 @@ Int sdev(Int narg, Int ps[], Int sq)
       case LUX_LONG:
 	do {
 	  mean = 0.0;
-	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(Int));
+	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(int32_t));
 	  src0 = src;
 	  weight0 = weight;
 	  nn = 0;
@@ -1491,7 +1491,7 @@ Int sdev(Int narg, Int ps[], Int sq)
 	  }
 	  while (advanceLoop(&winfo, &weight),
 		 advanceLoop(&srcinfo, &src) < srcinfo.naxes);
-	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(Int));
+	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(int32_t));
 	  src = src0;
 	  weight = weight0;
 	  mean /= (nn? nn: 1);
@@ -1517,7 +1517,7 @@ Int sdev(Int narg, Int ps[], Int sq)
       case LUX_FLOAT:
 	do {
 	  mean = 0.0;
-	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(Int));
+	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(int32_t));
 	  src0 = src;
 	  weight0 = weight;
 	  nn = 0;
@@ -1527,7 +1527,7 @@ Int sdev(Int narg, Int ps[], Int sq)
 	  }
 	  while (advanceLoop(&winfo, &weight),
 		 advanceLoop(&srcinfo, &src) < srcinfo.naxes);
-	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(Int));
+	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(int32_t));
 	  src = src0;
 	  weight = weight0;
 	  mean /= (nn? nn: 1);
@@ -1553,7 +1553,7 @@ Int sdev(Int narg, Int ps[], Int sq)
       case LUX_DOUBLE:
 	do {
 	  mean = 0.0;
-	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(Int));
+	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(int32_t));
 	  src0 = src;
 	  weight0 = weight;
 	  nn = 0;
@@ -1563,7 +1563,7 @@ Int sdev(Int narg, Int ps[], Int sq)
 	  }
 	  while (advanceLoop(&winfo, &weight),
 		 advanceLoop(&srcinfo, &src) < srcinfo.naxes);
-	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(Int));
+	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(int32_t));
 	  src = src0;
 	  weight = weight0;
 	  mean /= (nn? nn: 1);
@@ -1600,12 +1600,12 @@ Int sdev(Int narg, Int ps[], Int sq)
       case LUX_BYTE:
 	do {
 	  mean = 0.0;
-	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(Int));
+	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(int32_t));
 	  src0 = src;
 	  do
 	    mean += (double) *src.b;
 	  while (advanceLoop(&srcinfo, &src) < srcinfo.naxes);
-	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(Int));
+	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(int32_t));
 	  src = src0;
 	  mean /= n;
 	  sdev = 0.0;
@@ -1626,12 +1626,12 @@ Int sdev(Int narg, Int ps[], Int sq)
       case LUX_WORD:
 	do {
 	  mean = 0.0;
-	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(Int));
+	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(int32_t));
 	  src0 = src;
 	  do
 	    mean += (double) *src.w;
 	  while (advanceLoop(&srcinfo, &src) < srcinfo.naxes);
-	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(Int));
+	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(int32_t));
 	  src = src0;
 	  mean /= n;
 	  sdev = 0.0;
@@ -1652,12 +1652,12 @@ Int sdev(Int narg, Int ps[], Int sq)
       case LUX_LONG:
 	do {
 	  mean = 0.0;
-	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(Int));
+	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(int32_t));
 	  src0 = src;
 	  do
 	    mean += (double) *src.l;
 	  while (advanceLoop(&srcinfo, &src) < srcinfo.naxes);
-	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(Int));
+	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(int32_t));
 	  src = src0;
 	  mean /= n;
 	  sdev = 0.0;
@@ -1678,12 +1678,12 @@ Int sdev(Int narg, Int ps[], Int sq)
       case LUX_FLOAT:
 	do {
 	  mean = 0.0;
-	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(Int));
+	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(int32_t));
 	  src0 = src;
 	  do
 	    mean += (double) *src.f;
 	  while (advanceLoop(&srcinfo, &src) < srcinfo.naxes);
-	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(Int));
+	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(int32_t));
 	  src = src0;
 	  mean /= n;
 	  sdev = 0.0;
@@ -1704,12 +1704,12 @@ Int sdev(Int narg, Int ps[], Int sq)
       case LUX_DOUBLE:
 	do {
 	  mean = 0.0;
-	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(Int));
+	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(int32_t));
 	  src0 = src;
 	  do
 	    mean += (double) *src.d;
 	  while (advanceLoop(&srcinfo, &src) < srcinfo.naxes);
-	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(Int));
+	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(int32_t));
 	  src = src0;
 	  mean /= n;
 	  sdev = 0.0;
@@ -1723,13 +1723,13 @@ Int sdev(Int narg, Int ps[], Int sq)
       case LUX_CFLOAT:
 	do {
 	  cmean.real = cmean.imaginary = 0.0;
-	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(Int));
+	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(int32_t));
 	  src0 = src;
 	  do {
 	    cmean.real += (double) src.cf->real;
 	    cmean.imaginary += (double) src.cf->imaginary;
 	  } while (advanceLoop(&srcinfo, &src) < srcinfo.naxes);
-	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(Int));
+	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(int32_t));
 	  src = src0;
 	  cmean.real /= n;
 	  cmean.imaginary /= n;
@@ -1753,13 +1753,13 @@ Int sdev(Int narg, Int ps[], Int sq)
       case LUX_CDOUBLE:
 	do {
 	  cmean.real = cmean.imaginary = 0.0;
-	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(Int));
+	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(int32_t));
 	  src0 = src;
 	  do {
 	    cmean.real += (double) src.cd->real;
 	    cmean.imaginary += (double) src.cd->imaginary;
 	  } while (advanceLoop(&srcinfo, &src) < srcinfo.naxes);
-	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(Int));
+	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(int32_t));
 	  src = src0;
 	  cmean.real /= n;
 	  cmean.imaginary /= n;
@@ -1841,13 +1841,13 @@ Int sdev(Int narg, Int ps[], Int sq)
   return result;
 }
 /*------------------------------------------------------------------------- */
-Int lux_sdev(Int narg, Int ps[])
+int32_t lux_sdev(int32_t narg, int32_t ps[])
      /* return standard deviation */
 {
   return sdev(narg, ps, 1);
 }
 /*------------------------------------------------------------------------- */
-Int lux_variance(Int narg, Int ps[])
+int32_t lux_variance(int32_t narg, int32_t ps[])
      /* returns variance */
 {
   return sdev(narg, ps, 0);
@@ -1903,14 +1903,14 @@ S₂ = 0 + (1 - 2)*(1 - 4/3)*2 = 2/3
 s = √(2/3/(3 - 1)) = √(1/3) = ⅓√3
  */
 /*------------------------------------------------------------------------- */
-Int lux_swab(Int narg, Int ps[])
+int32_t lux_swab(int32_t narg, int32_t ps[])
 /*swap bytes in an array or even an scalar */
 /*this is a subroutine and swaps the input symbol (not a copy) */
 {
-  Int	iq, n, nd, j;
+  int32_t	iq, n, nd, j;
   pointer q1;
   array	*h;
-  Int	swapb(char *, Int);
+  int32_t	swapb(char *, int32_t);
 
   while (narg--)
   { iq = *ps++;						/*just 1 argument */
@@ -1929,7 +1929,7 @@ Int lux_swab(Int narg, Int ps[])
       case 4:						/*array case */
 	n = lux_type_size[type];
 	h = (array *) sym[iq].spec.array.ptr;
-	q1.l = (Int *) ((char *)h + sizeof(array));
+	q1.l = (int32_t *) ((char *)h + sizeof(array));
 	nd = h->ndim;
 	for (j=0;j<nd;j++) n *= h->dims[j]; 		/*# of elements */
 	break;
@@ -1941,7 +1941,7 @@ Int lux_swab(Int narg, Int ps[])
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int lux_wait(Int narg, Int ps[])
+int32_t lux_wait(int32_t narg, int32_t ps[])
 /* wait the specified # of seconds (floating point) */
 {
   float	xq;
@@ -1956,17 +1956,17 @@ Int lux_wait(Int narg, Int ps[])
   return LUX_OK;
 }
 /*---------------------------------------------------------*/
-Int lux_esmooth(Int narg, Int ps[])
+int32_t lux_esmooth(int32_t narg, int32_t ps[])
   /* Exponential Asymmetric Smoothing */
   /* Syntax: Y = ESMOOTH( X [, AXIS, ORDER] ) */
 {
-  Int	iq, axis, result_sym, outtype, type, m, ndim, *dims, xdims[8],
+  int32_t	iq, axis, result_sym, outtype, type, m, ndim, *dims, xdims[8],
   	i, tally[8], n, step[8], done;
   float	damping, width;
   array	*h;
   pointer	src, trgt;
   scalar	sum, weight;
-  extern float	float_arg(Int);
+  extern float	float_arg(int32_t);
 
   if (narg > 2) { iq = ps[2];  axis = int_arg(ps[1]); }
   else { iq = ps[1];  axis = -1; }
@@ -1991,7 +1991,7 @@ Int lux_esmooth(Int narg, Int ps[])
 	if (axis >= ndim) return cerror(ILL_DIM, ps[1]); }
       else
       { dims = &m;  ndim = 1;  axis = 0; }
-      memcpy(xdims, dims, sizeof(Int)*ndim); /* copy dimensions */
+      memcpy(xdims, dims, sizeof(int32_t)*ndim); /* copy dimensions */
       result_sym = array_clone(iq, outtype);
       h = HEAD(result_sym);
       trgt.l = LPTR(h);
@@ -2039,7 +2039,7 @@ void esmooth_asymmetric(double *srcdata, size_t srccount, size_t srcstride,
   double damping = exp(-1.0/width);
   double sum = 0.0;
   double weight = 0.0;
-  Int i;
+  int32_t i;
 
   assert(tgtcount >= srccount);
 
@@ -2068,7 +2068,7 @@ void esmooth_symmetric(double *srcdata, size_t srccount, size_t srcstride,
   double damping = exp(-1.0/width);
   double sum = 0.0;
   double weight = 0.0;
-  Int i;
+  int32_t i;
 
   assert(tgtcount >= srccount);
 
@@ -2111,7 +2111,7 @@ void esmooth_symmetric(double *srcdata, size_t srccount, size_t srcstride,
 /* i>D*;i?D1;rD& */
 BIND(esmooth_symmetric, v_sddsd_iDaD1rDq_012, f, ESMOOTH2, 1, 2, NULL);
 /*------------------------------------------------------------------------- */
-void vargsmoothkernel(double width, Int nx, Int *n2, Int *ng, double **gkern,
+void vargsmoothkernel(double width, int32_t nx, int32_t *n2, int32_t *ng, double **gkern,
 		      double *gsum, double **partial)
 /* makes sure a gaussian kernel of FWHM <width> and kernel size at
  most <nx> is returned in <*gkern>.  The kernel size is returned in
@@ -2125,11 +2125,11 @@ void vargsmoothkernel(double width, Int nx, Int *n2, Int *ng, double **gkern,
  specifying an <nx> of zero.  Then the current kernel space is
  released.  LS 25apr97 */
 {
-  Int	n, nm;
+  int32_t	n, nm;
   double	w, *pt3, *pt2;
   double	xq, wq, dq;
   static double	ow = 0.0;
-  static Int	maxng = 0;
+  static int32_t	maxng = 0;
 
   if (!nx) {			/* release kernel space */
     Free(*gkern);
@@ -2179,7 +2179,7 @@ void vargsmoothkernel(double width, Int nx, Int *n2, Int *ng, double **gkern,
   /* all done */
 }
 /*------------------------------------------------------------------------- */
-Int lux_gsmooth(Int narg, Int ps[])
+int32_t lux_gsmooth(int32_t narg, int32_t ps[])
  /* smooth input array with a gaussian*/
  /* ps[0] is input array and ps[1] is fwhm width */
  /* Addition LS 13aug94:  user may supply kernel
@@ -2200,15 +2200,15 @@ Int lux_gsmooth(Int narg, Int ps[])
 /* this way a smoothed version of a straight line is also a straight line. */
 /* LS 13aug97 */
 {
-  extern	Int scrat[NSCRAT];
+  extern	int32_t scrat[NSCRAT];
   float	sum, *pt3, wq, sumg, xq;
-  Int	n, nWidth;
+  int32_t	n, nWidth;
   pointer	src, trgt, widths, gkern, pt1;
-  Int	j, n2, ng, i2, i, ik, id, k;
-  Int	iq, nx, mem = 0, dgkern;
+  int32_t	j, n2, ng, i2, i, ik, id, k;
+  int32_t	iq, nx, mem = 0, dgkern;
   float	width, gsum;
   char	haveKernel = 0;
-  Int	stride, result, loop, mode = 0;
+  int32_t	stride, result, loop, mode = 0;
   loopInfo	srcinfo, trgtinfo;
 
   iq = 0;
@@ -2972,48 +2972,48 @@ Int lux_gsmooth(Int narg, Int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-Int lux_lower(narg,ps)					/*lower function */
+int32_t lux_lower(narg,ps)					/*lower function */
 /* convert all letters in a string to lower case */
-Int narg,ps[];
+int32_t narg,ps[];
 {
 register  uint8_t *p1, *p2;
-register  Int  mq;
-Int	result_sym;
+register  int32_t  mq;
+int32_t	result_sym;
 if ( sym[ ps[0] ].class != 2 ) return cerror(NEED_STR, *ps);
 mq = sym[ps[0]].spec.array.bstore - 1;
 result_sym = string_scratch(mq);		/*for resultant string */
 p1 = (uint8_t *) sym[ps[0] ].spec.array.ptr;
 p2 = (uint8_t *) sym[result_sym].spec.array.ptr;
 while (mq--)
- *p2++ = isupper( (Int) *p1 ) ? (uint8_t) tolower( (Int) *p1++) : *p1++;
+ *p2++ = isupper( (int32_t) *p1 ) ? (uint8_t) tolower( (int32_t) *p1++) : *p1++;
 *p2 = 0;					/*ending null */
 return result_sym;
 }
 /*------------------------------------------------------------------------- */
-Int lux_upper(narg,ps)					/*upper function */
+int32_t lux_upper(narg,ps)					/*upper function */
 /* convert all letters in a string to upper case */
-Int narg,ps[];
+int32_t narg,ps[];
 {
 register  uint8_t *p1, *p2;
-register  Int  mq;
-Int	result_sym;
+register  int32_t  mq;
+int32_t	result_sym;
 if ( sym[ ps[0] ].class != 2 ) return cerror(NEED_STR, *ps);
 mq = sym[ps[0]].spec.array.bstore - 1;
 result_sym = string_scratch(mq);		/*for resultant string */
 p1 = (uint8_t *) sym[ps[0] ].spec.array.ptr;
 p2 = (uint8_t *) sym[result_sym].spec.array.ptr;
 while (mq--)
- *p2++ = islower( (Int) *p1 ) ? (uint8_t) toupper( (Int) *p1++) : *p1++;
+ *p2++ = islower( (int32_t) *p1 ) ? (uint8_t) toupper( (int32_t) *p1++) : *p1++;
 *p2 = 0;					/*ending null */
 return result_sym;
 }
 /*------------------------------------------------------------------------- */
-Int lux_strpos(Int narg, Int ps[]) /*STRPOS function */
+int32_t lux_strpos(int32_t narg, int32_t ps[]) /*STRPOS function */
 /* returns index of sub string if found */
      /* added index - LS 11jun97 */
 {
   register char *p1, *p2, *p3;
-  Int	result_sym, index;
+  int32_t	result_sym, index;
 
   if (symbol_class(ps[0]) != LUX_STRING)
     return cerror(NEED_STR, *ps);
@@ -3038,12 +3038,12 @@ Int lux_strpos(Int narg, Int ps[]) /*STRPOS function */
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-Int lux_strcount(narg,ps)				/*STRCOUNT function */
+int32_t lux_strcount(narg,ps)				/*STRCOUNT function */
 /*  count # of occurences of a substring  */
-Int narg,ps[];
+int32_t narg,ps[];
 {
 register char *p1, *p2, *p3;
-Int	result_sym, n;
+int32_t	result_sym, n;
 if ( sym[ ps[0] ].class != 2 ) return cerror(NEED_STR, ps[0]);
 if ( sym[ ps[1] ].class != 2 ) return cerror(NEED_STR, ps[1]);
 result_sym = scalar_scratch(2);		/*for resultant position */
@@ -3056,13 +3056,13 @@ sym[result_sym].spec.scalar.l = n;
 return result_sym;
 }
 /*------------------------------------------------------------------------- */
-Int lux_strreplace(narg,ps)			/*STRREPLACE function */
+int32_t lux_strreplace(narg,ps)			/*STRREPLACE function */
 /* replace a substring nc times */
-Int narg,ps[];
+int32_t narg,ps[];
 {
 register char *p1, *p2, *p3, *p4;
 char	*pq;
-Int	result_sym, n, nc, nr, mq, ns;
+int32_t	result_sym, n, nc, nr, mq, ns;
 if ( sym[ ps[0] ].class != 2 ) return cerror(NEED_STR, ps[0]);
 if ( sym[ ps[1] ].class != 2 ) return cerror(NEED_STR, ps[1]);
 if ( sym[ ps[2] ].class != 2 ) return cerror(NEED_STR, ps[2]);
@@ -3099,13 +3099,13 @@ if (nc > 0) { while (nc--) { *p4++ = *p1++; } }
 return result_sym;
 }
 /*------------------------------------------------------------------------- */
-Int lux_strpbrk(Int narg, Int ps[])
+int32_t lux_strpbrk(int32_t narg, int32_t ps[])
  /* returns a string from s1 starting with the first char from s2
  found in s1, if none found, an empty string */
 {
   char *p1, *p2, *p3, *p4;
-  Int  mq, off;
-  Int    result_sym;
+  int32_t  mq, off;
+  int32_t    result_sym;
 
   if (!symbolIsStringScalar(ps[0]))
     return cerror(NEED_STR, ps[0]);
@@ -3123,14 +3123,14 @@ Int lux_strpbrk(Int narg, Int ps[])
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-Int lux_strloc(narg,ps)					/*STRLOC function */
+int32_t lux_strloc(narg,ps)					/*STRLOC function */
 /* returns rest of source starting at object string
  */
-Int narg,ps[];
+int32_t narg,ps[];
 {
 register char *p1, *p2, *p3;
-register  Int  mq, off;
-Int	result_sym;
+register  int32_t  mq, off;
+int32_t	result_sym;
 if ( sym[ ps[0] ].class != 2 ) return cerror(NEED_STR, ps[0]);
 if ( sym[ ps[1] ].class != 2 ) return cerror(NEED_STR, ps[1]);
 p1 = (char *) sym[ps[0] ].spec.array.ptr;
@@ -3145,14 +3145,14 @@ memcpy(p3, p1 + off, mq);
 return result_sym;
 }
 /*------------------------------------------------------------------------- */
-Int lux_strskp(narg,ps)					/*STRSKP function */
+int32_t lux_strskp(narg,ps)					/*STRSKP function */
 /*  returns rest of source starting AFTER object string
  */
-Int narg,ps[];
+int32_t narg,ps[];
 {
 register char *p1, *p2, *p3;
-register  Int  mq, off;
-Int	result_sym;
+register  int32_t  mq, off;
+int32_t	result_sym;
 if ( sym[ ps[0] ].class != 2 ) return cerror(NEED_STR, ps[0]);
 if ( sym[ ps[1] ].class != 2 ) return cerror(NEED_STR, ps[1]);
 p1 = (char *) sym[ps[0] ].spec.array.ptr;
@@ -3169,13 +3169,13 @@ if (mq != 0)  memcpy(p3, p1 + off, mq);
 return result_sym;
 }
 /*------------------------------------------------------------------------- */
-Int lux_skipc(narg,ps)					/*SKIPC function */
+int32_t lux_skipc(narg,ps)					/*SKIPC function */
 /* skip over characters */
-Int narg,ps[];
+int32_t narg,ps[];
 {
 register char *p1, *p2, *p3;
-Int  mq, off;
-Int	result_sym;
+int32_t  mq, off;
+int32_t	result_sym;
 if ( sym[ ps[0] ].class != 2 ) return cerror(NEED_STR, ps[0]);
 if ( sym[ ps[1] ].class != 2 ) return cerror(NEED_STR, ps[1]);
 p1 = (char *) sym[ps[0] ].spec.array.ptr;
@@ -3190,13 +3190,13 @@ if (mq != 0)  memcpy(p3, p1 + off, mq);
 return result_sym;
 }
 /*------------------------------------------------------------------------- */
-Int lux_strsub(narg,ps)				/*STRSUB function */
+int32_t lux_strsub(narg,ps)				/*STRSUB function */
 /* return a substring */
-Int narg,ps[];
+int32_t narg,ps[];
 {
 register char *p1, *p3;
-Int  mq, off, len;
-Int	result_sym;
+int32_t  mq, off, len;
+int32_t	result_sym;
 if ( sym[ ps[0] ].class != 2 ) return cerror(NEED_STR, ps[0]);
 p1 = (char *) sym[ps[0] ].spec.array.ptr;
 off = int_arg( ps[1] );
@@ -3211,13 +3211,13 @@ if (mq != 0)  memcpy(p3, p1 + off, mq);
 return result_sym;
 }
 /*------------------------------------------------------------------------- */
-Int lux_strtrim(Int narg, Int ps[]) /*STRTRIM function */
+int32_t lux_strtrim(int32_t narg, int32_t ps[]) /*STRTRIM function */
 /* trim trailing blanks and tabs and any control chars */
      /* older version took off last OK char, too - fixed.  LS 7may97 */
 {
   register char *p1, *p2, *p3;
-  Int  mq;
-  Int	result_sym;
+  int32_t  mq;
+  int32_t	result_sym;
   
   if (symbol_class(ps[0]) != LUX_STRING)
     return cerror(NEED_STR, *ps);
@@ -3241,13 +3241,13 @@ Int lux_strtrim(Int narg, Int ps[]) /*STRTRIM function */
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-Int lux_istring(narg,ps)				/* ISTRING function */
+int32_t lux_istring(narg,ps)				/* ISTRING function */
 /* string in I format */
-Int narg,ps[];
+int32_t narg,ps[];
 {
 char	s[6], *p3;
-Int  iq, mq, n, k, mode;
-Int	result_sym;
+int32_t  iq, mq, n, k, mode;
+int32_t	result_sym;
 iq = ps[0];
 switch (sym[iq].class)	{
 default: return cerror(NO_SCAL, iq);
@@ -3276,16 +3276,16 @@ memcpy(p3, templine, mq);
 return result_sym;
 }
 /*------------------------------------------------------------------------- */
-Int lux_fstring(Int narg, Int ps[])			/* FSTRING function */
+int32_t lux_fstring(int32_t narg, int32_t ps[])			/* FSTRING function */
 /* string from scalar, C-format */
 /* syntax:  FSTRING(format, arg1, arg2, ...)
    the argument is modified to suit the data type expected by the format.
    LS 24apr93 */
 {
- extern	Int	column;
+ extern	int32_t	column;
  char	*p3;
- Int	col, mq;
- Int	type_formatted_ascii(Int, Int [], FILE *);
+ int32_t	col, mq;
+ int32_t	type_formatted_ascii(int32_t, int32_t [], FILE *);
 
  col = column;
  column = 0;
@@ -3299,13 +3299,13 @@ Int lux_fstring(Int narg, Int ps[])			/* FSTRING function */
  return result_sym;
 }
 /*------------------------------------------------------------------------- */
-Int lux_string(Int narg, Int ps[])
+int32_t lux_string(int32_t narg, int32_t ps[])
  /* converts to LUX_STRING
    LS 24apr93 21sep98 8sep99 */
 {
   scalar	value;
   char	*p;
-  Int	result, n, nel;
+  int32_t	result, n, nel;
   pointer	q;
   extern char	*fmt_integer, *fmt_float;
 
@@ -3379,10 +3379,10 @@ Int lux_string(Int narg, Int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-Int lux_strlen(Int narg, Int ps[])/*strlen function */
+int32_t lux_strlen(int32_t narg, int32_t ps[])/*strlen function */
 /* length, not counting null; duplicates num_elem but insists on string */
 {
-  Int	result_sym, *l, n;
+  int32_t	result_sym, *l, n;
   pointer	p;
 
   switch (symbol_class(ps[0])) {
@@ -3408,13 +3408,13 @@ Int lux_strlen(Int narg, Int ps[])/*strlen function */
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-Int lux_decomp(Int narg, Int ps[])/*decomp routine */
+int32_t lux_decomp(int32_t narg, int32_t ps[])/*decomp routine */
 		/*replaces a square matrix with it's lu decomposition */
 {
-  Int	iq, nd, nx;
+  int32_t	iq, nd, nx;
   array	*h;
   pointer q1;
-  Int	lux_replace(Int, Int);
+  int32_t	lux_replace(int32_t, int32_t);
 
 if ( narg != 1 ) return cerror(WRNG_N_ARG, 0);
 iq = ps[0];
@@ -3439,11 +3439,11 @@ case 4:
 return 1;
 }
 /*------------------------------------------------------------------------- */
-Int lux_dsolve(narg,ps)					/*decomp routine */
+int32_t lux_dsolve(narg,ps)					/*decomp routine */
 		/*solves a linear system given lu decomp and rhs */
-Int narg,ps[];
+int32_t narg,ps[];
 {
-Int	iq, jq, nd, nx, toptype, j, outer;
+int32_t	iq, jq, nd, nx, toptype, j, outer;
 array	*h;
 pointer q1, q2;
 if ( narg != 2 ) return cerror(WRNG_N_ARG, 0);
@@ -3456,7 +3456,7 @@ if ( nd != 2 || nx != h->dims[1] ) return cerror(NEED_2D_SQ_ARR, iq);
 					/*must be 2-D and square */
 jq = ps[1];				/*rhs side (may be more than one)*/
 if (isFreeTemp(jq)) return cerror(RET_ARG_NO_ATOM, jq);
-toptype = toptype > (Int) sym[jq].type ? toptype :  sym[iq].type;
+toptype = toptype > (int32_t) sym[jq].type ? toptype :  sym[iq].type;
 if (toptype < 3) toptype = 3;
 h = (array *) sym[jq].spec.array.ptr;
 nd = h->ndim;	if ( h->dims[0] != nx) return cerror(INCMP_LU_RHS, iq);
@@ -3471,9 +3471,9 @@ case 4:
 }
 if (jq != ps[1] ) lux_replace(ps[1], jq);	jq = ps[1];
 h = (array *) sym[iq].spec.array.ptr;
-q1.l = (Int *) ((char *)h + sizeof(array));
+q1.l = (int32_t *) ((char *)h + sizeof(array));
 h = (array *) sym[jq].spec.array.ptr;
-q2.l = (Int *) ((char *)h + sizeof(array));
+q2.l = (int32_t *) ((char *)h + sizeof(array));
 while (outer--) {
 		/*could be either float or double, support both */
 switch ( toptype ) {
@@ -3486,17 +3486,17 @@ d_solve( q1.d, q2.d, nx, nx ); q2.d += nx;	break;
 return 1;
 }
 /*------------------------------------------------------------------------- */
-Int lux_pit(Int narg, Int ps[])	/*pit function */
+int32_t lux_pit(int32_t narg, int32_t ps[])	/*pit function */
 			/* polynomial fit, CALL IS C=PIT([X],Y,[NPOW])*/
 {
   double	*a, *fbase, *cfbase;
   pointer qxbase,qybase;
-  Int	npow, symx, symy, nd, nxq, outer, outerx, dim[2], cfsym;
-  Int	j, toptype;
+  int32_t	npow, symx, symy, nd, nxq, outer, outerx, dim[2], cfsym;
+  int32_t	j, toptype;
   array	*h;
-  Int	setxpit(Int, Int),
-    clux_pit(pointer *, pointer *, Int, Int, double *, double *, double *,
-	     Int, Int);
+  int32_t	setxpit(int32_t, int32_t),
+    clux_pit(pointer *, pointer *, int32_t, int32_t, double *, double *, double *,
+	     int32_t, int32_t);
 
 /* depending on # of nargs, we may have to default x or npow, narg=2 case
 	is ambiguous until we get class */
@@ -3525,7 +3525,7 @@ nd = h->ndim;	nxq = h->dims[0];	outer = 1;
 if (nd > 1) for(j=1;j<nd;j++) outer *= h->dims[j];
 					/* check x if specified */
 if (symx > 0) { CK_ARR(symx, -1); 
- toptype = (Int) sym[symx].type > toptype ? sym[symx].type : toptype;
+ toptype = (int32_t) sym[symx].type > toptype ? sym[symx].type : toptype;
  h = (array *) sym[symx].spec.array.ptr;
 			/* a specified x must match y in some regards */
  nd = h->ndim;	if (h->dims[0] != nxq) return cerror(INCMP_DIMS, symy);
@@ -3543,9 +3543,9 @@ case 4:
  symy = lux_double( 1, &symy); symx = lux_double( 1, &symx); break;
 }
 h = (array *) sym[symy].spec.array.ptr;
-qybase.l = (Int *) ((char *)h + sizeof(array));
+qybase.l = (int32_t *) ((char *)h + sizeof(array));
 h = (array *) sym[symx].spec.array.ptr;
-qxbase.l = (Int *) ((char *)h + sizeof(array));
+qxbase.l = (int32_t *) ((char *)h + sizeof(array));
 			/* get the various matrices and vectors needed */
 dim[0] = npow + 1;	dim[1] = outer;
 if (outer > 1) cfsym = array_scratch(4, 2, dim);	/*always double */		
@@ -3565,13 +3565,13 @@ Free(a);  Free(fbase);
 return cfsym;
 }
 /*------------------------------------------------------------------------- */
-Int clux_pit(pointer *qxbase, pointer *qybase, Int nxq, Int npow, double *a,
-	     double *cfbase, double *fbase, Int toptype, Int outerx)
+int32_t clux_pit(pointer *qxbase, pointer *qybase, int32_t nxq, int32_t npow, double *a,
+	     double *cfbase, double *fbase, int32_t toptype, int32_t outerx)
 /* internal routine used by lux_pit, lux_trend, and lux_detrend */
 {
 double	sum, *f, *cf;
 pointer qx,qy;
-Int	i, n, ib, ie, k;
+int32_t	i, n, ib, ie, k;
 cf = cfbase;	f = fbase;	qy.l = qybase->l;  qx.l = qxbase->l;
 switch (toptype) {
 case 3:
@@ -3625,7 +3625,7 @@ d_solve(a, cfbase, npow+1, npow+1);
 return 1;
 }
 /*------------------------------------------------------------------------- */
-Int setxpit(Int type, Int n)	/* used by several routines to set up
+int32_t setxpit(int32_t type, int32_t n)	/* used by several routines to set up
 				   an x array */
 			/*consisting of {0,1/n,2/n,...,(n-1)/n} */
 			/* type must be 3 or 4 */
@@ -3633,7 +3633,7 @@ Int setxpit(Int type, Int n)	/* used by several routines to set up
   register pointer qx;
   register float	del;
   register double	ddel;
-  Int	nsym, nx;
+  int32_t	nsym, nx;
   array	*h;
   nx = n;
   nsym = array_scratch(type, 1, &nx );
@@ -3645,29 +3645,29 @@ Int setxpit(Int type, Int n)	/* used by several routines to set up
   case 4:
     ddel = 1.0/ nx;  *qx.d = 0.0;  while (--nx) *(qx.d+1) = *qx.d++ + ddel; break;
   }
-  qx.l = (Int *) ((char *)h + sizeof(array));
+  qx.l = (int32_t *) ((char *)h + sizeof(array));
   return nsym;
 }
 /*------------------------------------------------------------------------- */
-Int lux_detrend(Int narg, Int ps[])/*detrend function */
+int32_t lux_detrend(int32_t narg, int32_t ps[])/*detrend function */
 	/* detrend using a polynomial fit, CALL IS DT=detrend(Y,[NPOW])*/
 {
-  Int	lux_trend(Int, Int []);
+  int32_t	lux_trend(int32_t, int32_t []);
 			/* just call trend  with the detrend flag set */
   detrend_flag = 1;
   return lux_trend(narg, ps);
 }
 /*------------------------------------------------------------------------- */
-Int lux_trend(Int narg, Int ps[]) /*trend function */
+int32_t lux_trend(int32_t narg, int32_t ps[]) /*trend function */
 	/* trend using a polynomial fit, CALL IS T=trend(Y,[NPOW])*/
 {
   register double	*a;
   double	*fbase, *cfbase;
   pointer qxbase,qybase,qzbase;
-  Int	npow, symx, symy, nd, nxq, outer;
-  Int	toptype, result_sym;
-  Int	clux_poly(double *cfbase, pointer *qxbase, Int nxq, Int npow,
-		  pointer *qzbase, Int toptype);
+  int32_t	npow, symx, symy, nd, nxq, outer;
+  int32_t	toptype, result_sym;
+  int32_t	clux_poly(double *cfbase, pointer *qxbase, int32_t nxq, int32_t npow,
+		  pointer *qzbase, int32_t toptype);
 
   /* second argument is optional, default is linear fit (npow = 1) */
   npow = 1;
@@ -3750,13 +3750,13 @@ Int lux_trend(Int narg, Int ps[]) /*trend function */
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-Int clux_poly(double *cfbase, pointer *qxbase, Int nxq, Int npow,
-	      pointer *qzbase, Int toptype)
+int32_t clux_poly(double *cfbase, pointer *qxbase, int32_t nxq, int32_t npow,
+	      pointer *qzbase, int32_t toptype)
 /* internal routine used by lux_trend, and lux_detrend */
 {
 double	sum, *cf, xq;
 pointer qz,qx;
-Int	n, m;
+int32_t	n, m;
 cf = cfbase;	qz.l = qzbase->l;  qx.l = qxbase->l;
 switch (toptype) {
 case 3:
@@ -3785,12 +3785,12 @@ qzbase->d += nxq; break;
 return 1;
 }
 /*------------------------------------------------------------------------- */
-Int lux_poly(Int narg, Int ps[])
+int32_t lux_poly(int32_t narg, int32_t ps[])
  /* y = poly(x,c) */
  /* x: data values at which to evaluate the polynomials */
  /* c: coefficients of the polynomial */
 {
-  Int result, ndata, ncoeff, datasym, coeffsym, i;
+  int32_t result, ndata, ncoeff, datasym, coeffsym, i;
   uint8_t outtype;
   pointer data, tgt, coeff;
 
@@ -3863,7 +3863,7 @@ Int lux_poly(Int narg, Int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-Int lux_strtok(Int narg, Int ps[])
+int32_t lux_strtok(int32_t narg, int32_t ps[])
 /* mimics the C strtok function.
  STRTOK( [<s1>,] <s2>)
  all specified arguments must be strings.  If <s1> is specified and not
@@ -3879,7 +3879,7 @@ Int lux_strtok(Int narg, Int ps[])
  then an error is generated.  LS 19sep98 */
 {
   char	*s1, *s2, *s;
-  Int	iq;
+  int32_t	iq;
   static char	*string = NULL;
 
   if (symbol_class(ps[0]) != LUX_STRING)
@@ -3918,9 +3918,9 @@ Int lux_strtok(Int narg, Int ps[])
   return iq;
 }
 /*------------------------------------------------------------------------- */
-void ksmooth(loopInfo *srcinfo, loopInfo *trgtinfo, float *kernel, Int nkernel)
+void ksmooth(loopInfo *srcinfo, loopInfo *trgtinfo, float *kernel, int32_t nkernel)
 {
-  Int	nx, n2, dataindex, kernelindex, di, ki, npoints, ncalc, np, i, stride;
+  int32_t	nx, n2, dataindex, kernelindex, di, ki, npoints, ncalc, np, i, stride;
   float	sum, norm;
   pointer	src, trgt;
 
@@ -4468,12 +4468,12 @@ void ksmooth(loopInfo *srcinfo, loopInfo *trgtinfo, float *kernel, Int nkernel)
   trgtinfo->data->v = trgt.v;
 }
 /*------------------------------------------------------------------------- */
-Int lux_ksmooth(Int narg, Int ps[])
+int32_t lux_ksmooth(int32_t narg, int32_t ps[])
 /* y = KSMOOTH(x, kernel [, axis] [, /BALANCED]) */
 {
   loopInfo	srcinfo, trgtinfo;
   pointer	src, trgt;
-  Int	result, iq, nkernel;
+  int32_t	result, iq, nkernel;
   float	*kernel;
 
   if (!symbolIsNumericalArray(ps[1])) /* <kernel> must be a numerical array */
@@ -4503,14 +4503,14 @@ Int lux_ksmooth(Int narg, Int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-Int lux_crosscorr(Int narg, Int ps[])
+int32_t lux_crosscorr(int32_t narg, int32_t ps[])
 /* y = CROSSCORR(x1, x2 [,mode]) */
 /* returns the cross-correlation coefficient between <x1> and <x2>, */
 /* along the axis indicated by <mode> (if scalar), or as a function of */
 /* class as specified in <mode> (if an array of the same size as <x1> and */
 /* <x2>).  LS 8apr99 */
 {
-  Int	type, outtype, i, iq1, iq2, result, n, save[MAX_DIMS], done;
+  int32_t	type, outtype, i, iq1, iq2, result, n, save[MAX_DIMS], done;
   double	meanx, meany, kx, ky, pxy, tempx, tempy;
   doubleComplex	cmeanx, cmeany, cpxy, ctempx, ctempy;
   pointer	src1, src2, src1save, src2save, trgt;
@@ -4561,7 +4561,7 @@ Int lux_crosscorr(Int narg, Int ps[])
     case LUX_BYTE:
       do {
 	meanx = meany = 0.0;
-	memcpy(save, srcinfo1.coords, srcinfo1.ndim*sizeof(Int));
+	memcpy(save, srcinfo1.coords, srcinfo1.ndim*sizeof(int32_t));
 	src1save = src1;
 	src2save = src2;
 	do {
@@ -4569,7 +4569,7 @@ Int lux_crosscorr(Int narg, Int ps[])
 	  meany += (double) *src2.b;
 	} while (advanceLoop(&srcinfo2, &src2),
 		 advanceLoop(&srcinfo1, &src1) < srcinfo1.naxes);
-	memcpy(srcinfo1.coords, save, srcinfo1.ndim*sizeof(Int));
+	memcpy(srcinfo1.coords, save, srcinfo1.ndim*sizeof(int32_t));
 	src1 = src1save;
 	src2 = src2save;
 	meanx /= n;
@@ -4590,7 +4590,7 @@ Int lux_crosscorr(Int narg, Int ps[])
     case LUX_WORD:
       do {
 	meanx = meany = 0.0;
-	memcpy(save, srcinfo1.coords, srcinfo1.ndim*sizeof(Int));
+	memcpy(save, srcinfo1.coords, srcinfo1.ndim*sizeof(int32_t));
 	src1save = src1;
 	src2save = src2;
 	do {
@@ -4598,7 +4598,7 @@ Int lux_crosscorr(Int narg, Int ps[])
 	  meany += (double) *src2.w;
 	} while (advanceLoop(&srcinfo2, &src2),
 		 advanceLoop(&srcinfo1, &src1) < srcinfo1.naxes);
-	memcpy(srcinfo1.coords, save, srcinfo1.ndim*sizeof(Int));
+	memcpy(srcinfo1.coords, save, srcinfo1.ndim*sizeof(int32_t));
 	src1 = src1save;
 	src2 = src2save;
 	meanx /= n;
@@ -4619,7 +4619,7 @@ Int lux_crosscorr(Int narg, Int ps[])
     case LUX_LONG:
       do {
 	meanx = meany = 0.0;
-	memcpy(save, srcinfo1.coords, srcinfo1.ndim*sizeof(Int));
+	memcpy(save, srcinfo1.coords, srcinfo1.ndim*sizeof(int32_t));
 	src1save = src1;
 	src2save = src2;
 	do {
@@ -4627,7 +4627,7 @@ Int lux_crosscorr(Int narg, Int ps[])
 	  meany += (double) *src2.l;
 	} while (advanceLoop(&srcinfo2, &src2),
 		 advanceLoop(&srcinfo1, &src1) < srcinfo1.naxes);
-	memcpy(srcinfo1.coords, save, srcinfo1.ndim*sizeof(Int));
+	memcpy(srcinfo1.coords, save, srcinfo1.ndim*sizeof(int32_t));
 	src1 = src1save;
 	src2 = src2save;
 	meanx /= n;
@@ -4648,7 +4648,7 @@ Int lux_crosscorr(Int narg, Int ps[])
     case LUX_FLOAT:
       do {
 	meanx = meany = 0.0;
-	memcpy(save, srcinfo1.coords, srcinfo1.ndim*sizeof(Int));
+	memcpy(save, srcinfo1.coords, srcinfo1.ndim*sizeof(int32_t));
 	src1save = src1;
 	src2save = src2;
 	do {
@@ -4656,7 +4656,7 @@ Int lux_crosscorr(Int narg, Int ps[])
 	  meany += (double) *src2.f;
 	} while (advanceLoop(&srcinfo2, &src2),
 		 advanceLoop(&srcinfo1, &src1) < srcinfo1.naxes);
-	memcpy(srcinfo1.coords, save, srcinfo1.ndim*sizeof(Int));
+	memcpy(srcinfo1.coords, save, srcinfo1.ndim*sizeof(int32_t));
 	src1 = src1save;
 	src2 = src2save;
 	meanx /= n;
@@ -4677,7 +4677,7 @@ Int lux_crosscorr(Int narg, Int ps[])
     case LUX_DOUBLE:
       do {
 	meanx = meany = 0.0;
-	memcpy(save, srcinfo1.coords, srcinfo1.ndim*sizeof(Int));
+	memcpy(save, srcinfo1.coords, srcinfo1.ndim*sizeof(int32_t));
 	src1save = src1;
 	src2save = src2;
 	do {
@@ -4685,7 +4685,7 @@ Int lux_crosscorr(Int narg, Int ps[])
 	  meany += (double) *src2.d;
 	} while (advanceLoop(&srcinfo2, &src2),
 		 advanceLoop(&srcinfo1, &src1) < srcinfo1.naxes);
-	memcpy(srcinfo1.coords, save, srcinfo1.ndim*sizeof(Int));
+	memcpy(srcinfo1.coords, save, srcinfo1.ndim*sizeof(int32_t));
 	src1 = src1save;
 	src2 = src2save;
 	meanx /= n;
@@ -4706,7 +4706,7 @@ Int lux_crosscorr(Int narg, Int ps[])
     case LUX_CFLOAT:
       do {
 	cmeanx.real = cmeanx.imaginary = cmeany.real = cmeany.imaginary = 0.0;
-	memcpy(save, srcinfo1.coords, srcinfo1.ndim*sizeof(Int));
+	memcpy(save, srcinfo1.coords, srcinfo1.ndim*sizeof(int32_t));
 	src1save = src1;
 	src2save = src2;
 	do {
@@ -4716,7 +4716,7 @@ Int lux_crosscorr(Int narg, Int ps[])
 	  cmeany.imaginary += (double) src2.cf->imaginary;
 	} while (advanceLoop(&srcinfo2, &src2),
 		 advanceLoop(&srcinfo1, &src1) < srcinfo1.naxes);
-	memcpy(srcinfo1.coords, save, srcinfo1.ndim*sizeof(Int));
+	memcpy(srcinfo1.coords, save, srcinfo1.ndim*sizeof(int32_t));
 	src1 = src1save;
 	src2 = src2save;
 	cmeanx.real /= n;
@@ -4750,7 +4750,7 @@ Int lux_crosscorr(Int narg, Int ps[])
     case LUX_CDOUBLE:
       do {
 	cmeanx.real = cmeanx.imaginary = cmeany.real = cmeany.imaginary = 0.0;
-	memcpy(save, srcinfo1.coords, srcinfo1.ndim*sizeof(Int));
+	memcpy(save, srcinfo1.coords, srcinfo1.ndim*sizeof(int32_t));
 	src1save = src1;
 	src2save = src2;
 	do {
@@ -4760,7 +4760,7 @@ Int lux_crosscorr(Int narg, Int ps[])
 	  cmeany.imaginary += (double) src2.cd->imaginary;
 	} while (advanceLoop(&srcinfo2, &src2),
 		 advanceLoop(&srcinfo1, &src1) < srcinfo1.naxes);
-	memcpy(srcinfo1.coords, save, srcinfo1.ndim*sizeof(Int));
+	memcpy(srcinfo1.coords, save, srcinfo1.ndim*sizeof(int32_t));
 	src1 = src1save;
 	src2 = src2save;
 	cmeanx.real /= n;

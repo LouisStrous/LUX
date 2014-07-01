@@ -34,7 +34,7 @@ static uint32_t	currentBitSeed = 123459876;
 static gsl_rng *rng;
 
 /*------------------------------------------------------------------------- */
-void random_init(Int seed)
+void random_init(int32_t seed)
 {
   uint64_t s;
 
@@ -53,9 +53,9 @@ double random_one(void)
   return gsl_rng_uniform(rng);
 }
 /*------------------------------------------------------------------------- */
-Int locate_value(double value, double *values, Int nElem)
+int32_t locate_value(double value, double *values, int32_t nElem)
 {
-  Int	ilo, ihi, imid;
+  int32_t	ilo, ihi, imid;
 
   ilo = 0;
   ihi = nElem - 1;
@@ -74,7 +74,7 @@ Int locate_value(double value, double *values, Int nElem)
   return ihi;
 }
 
-Int random_distributed(Int modulus, double *distr)
+int32_t random_distributed(int32_t modulus, double *distr)
 /* returns a random number between 0 and <modulus - 1> drawn according */
 /* to the distribution function <distr>, which must have at least */
 /* <modulus> elements, with distr[0] == 0 and distr[modulus - 1] <= 1, */
@@ -102,10 +102,10 @@ uint8_t random_bit(void)
 }
 /*------------------------------------------------------------------------- */
 uint32_t random_bits(void)
-/* Returns a Int-full of random bits, using primitive polynomials modulo 2. */
+/* Returns a int32_t-full of random bits, using primitive polynomials modulo 2. */
 {
   static uint32_t	mask = 0x9, mask1 = 0x80000000;
-  Int	n = 32;
+  int32_t	n = 32;
   uint32_t	result = 0;
   
   while (n--) {
@@ -120,7 +120,7 @@ uint32_t random_bits(void)
   return result;
 }
 /*------------------------------------------------------------------------- */
-void randomu(Int seed, void *output, Int number, Int modulo)
+void randomu(int32_t seed, void *output, int32_t number, int32_t modulo)
 /* generates <number> uniformly distributed pseudo-random numbers */
 /* and stores them in <output>, for which */
 /* memory must have been allocated by the user.  <seed> is an optional seed. */
@@ -129,12 +129,12 @@ void randomu(Int seed, void *output, Int number, Int modulo)
 /* value indicates that the current random sequence is continued. */
 /* if <modulo> is zero, then <output> is considered (float *) and the */
 /* generated random sequence is LUX_DOUBLE.  if <modulo> is positive, then */
-/* <output> is considered (Int *) and the generated random sequence */
+/* <output> is considered (int32_t *) and the generated random sequence */
 /* runs between 0 and <modulo> - 1 (inclusive) */
 {
- Int	j;
+ int32_t	j;
  double	*fp;
- Int	*ip;
+ int32_t	*ip;
 
  /* check if we are initializing */
  if (seed)
@@ -142,9 +142,9 @@ void randomu(Int seed, void *output, Int number, Int modulo)
  if (modulo) {			/* integers */
    if (modulo < 0)
      modulo = -modulo;
-   ip = (Int *) output;
+   ip = (int32_t *) output;
    for (j = 0; j < number; j++)
-     *ip++ = (Int) (random_one()*modulo);
+     *ip++ = (int32_t) (random_one()*modulo);
  } else { /* floating point */
    fp = (double *) output;
    for (j = 0; j < number; j++)
@@ -152,14 +152,14 @@ void randomu(Int seed, void *output, Int number, Int modulo)
  }
 }
 /*------------------------------------------------------------------------- */
-void randome(void *output, Int number, double limit)
+void randome(void *output, int32_t number, double limit)
 /* generates <number> exponentially distributed (with unit scale)
    pseudo-random numbers and stores them in <output>, for which memory
    must have been allocated by the user.  Both positive and negative
    numbers are returned.  If <limit> is greater than 0, then only
    numbers whose magnitude is at least <limit> are returned */
 {
- Int	j;
+ int32_t	j;
  double	*fp, value;
 
  if (limit < 0)
@@ -198,7 +198,7 @@ void randome(void *output, Int number, double limit)
  }
 }
 /*----------------------------------------------------------------------*/
-void random_unique(Int seed, Int *output, Int number, Int modulo)
+void random_unique(int32_t seed, int32_t *output, int32_t number, int32_t modulo)
 /* generates <number> uniformly distributed integer pseudo-random numbers */
 /* in the range 0 to <modulo> - 1 (inclusive) in which no particular */
 /* number appears more than once, and stores them in <output>, for which */
@@ -210,7 +210,7 @@ void random_unique(Int seed, Int *output, Int number, Int modulo)
 /* <number> is more than <modulo>. */
 /* LS 24nov95 */
 {
-  Int	m, t;
+  int32_t	m, t;
 
   if (number > modulo) {	/* both are assumed positive */
     luxerror("random_unique: asked %1d unique numbers modulo %1d: Impossible",
@@ -223,7 +223,7 @@ void random_unique(Int seed, Int *output, Int number, Int modulo)
   /* Use Knuth's Algorithm S (D. Knuth, Seminumerical Algorithms) */
   t = m = 0;
   while (m < number) {
-    if ((Int) ((modulo - t)*random_one()) < number - m) {
+    if ((int32_t) ((modulo - t)*random_one()) < number - m) {
       *output++ = t;
       m++;
     }
@@ -231,7 +231,7 @@ void random_unique(Int seed, Int *output, Int number, Int modulo)
   }
 }
 /*----------------------------------------------------------------------*/
-void random_unique_shuffle(Int seed, Int *output, Int number, Int modulo)
+void random_unique_shuffle(int32_t seed, int32_t *output, int32_t number, int32_t modulo)
 /* generates <number> uniformly distributed integer pseudo-random numbers */
 /* in the range 0 to <modulo> - 1 (inclusive) in which no particular */
 /* number appears more than once, and stores them in <output>, for which */
@@ -243,21 +243,21 @@ void random_unique_shuffle(Int seed, Int *output, Int number, Int modulo)
 /* <number> is less than <modulo>.  The random numbers are shuffled.  */
 /* LS 5oct97 */
 {
-  Int	i, j, temp;
+  int32_t	i, j, temp;
 
   random_unique(seed, output, number, modulo);
   if (number > modulo)
     return;			/* error */
   /* now shuffle.  I hope this algorithm is sufficient.  LS */
   for (i = 0; i < number; i++) {
-    j = (Int) (random_one()*number);
+    j = (int32_t) (random_one()*number);
     temp = output[i];
     output[i] = output[j];
     output[j] = temp;
   }
 }
 /*----------------------------------------------------------------------*/
-void randomn(Int seed, double *output, Int number, char hasUniform)
+void randomn(int32_t seed, double *output, int32_t number, char hasUniform)
 /* returns <number> pseudo-random numbers following the standard */
 /* normal distribution (mean zero, standard deviation one), using the */
 /* Box-Muller transformation.  Sufficient memory for the numbers */
@@ -266,7 +266,7 @@ void randomn(Int seed, double *output, Int number, char hasUniform)
 /* pseudo-random numbers are already present in <output>, */
 /* otherwise they are generated in this routine.  LS 25oct95 */
 {
-  Int	n, i;
+  int32_t	n, i;
   double	r, a, extra[2];
 
   n = number%2;
@@ -287,12 +287,12 @@ void randomn(Int seed, double *output, Int number, char hasUniform)
   }
 }  
 /*----------------------------------------------------------------------*/
-Int lux_randomu(Int narg, Int ps[])
+int32_t lux_randomu(int32_t narg, int32_t ps[])
  /*create an array of random elements in the [0,1.0] range (exclusive) */
 {
  double *p;
- Int	k, seed, cycle;
- Int	dims[8], *pd, j, result_sym, n;
+ int32_t	k, seed, cycle;
+ int32_t	dims[8], *pd, j, result_sym, n;
 
  if (*ps) {
    seed = int_arg(*ps);
@@ -333,7 +333,7 @@ Int lux_randomu(Int narg, Int ps[])
  return result_sym;
 }
 /*------------------------------------------------------------------------- */
-Int lux_randomd(Int narg, Int ps[])
+int32_t lux_randomd(int32_t narg, int32_t ps[])
 /* RANDOMD([seed,]distr,dimens) generates a LONG array with dimensions */
 /* <dimens> with each number drawn at random from the range 0 through */
 /* <NUM_ELEM(distr) - 1> (inclusive) according to the distribution */
@@ -341,7 +341,7 @@ Int lux_randomd(Int narg, Int ps[])
 /* increasing, <distr(0)> must be greater than or equal to 0, and */
 /* <distr(*-1)> must be equal to one.  LS 25aug2000 */
 {
-  Int	result, dims[MAX_DIMS], *pd, n, j, modulus, seed;
+  int32_t	result, dims[MAX_DIMS], *pd, n, j, modulus, seed;
   double	*distr;
 
   if (*ps) {			/* seed */
@@ -381,7 +381,7 @@ Int lux_randomd(Int narg, Int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-Int lux_randomn(Int narg, Int ps[])
+int32_t lux_randomn(int32_t narg, int32_t ps[])
  /*create a normal distribution of pseudo-random #'s, centered at 0 with */
  /* a width of 1.0
  uses Box-Muller transformation, given 2 uniformly random #'s (0 to 1 range)
@@ -392,7 +392,7 @@ Int lux_randomn(Int narg, Int ps[])
 
  */
 {
-  Int	result_sym;
+  int32_t	result_sym;
 
   /* first get a uniform distribution */
   result_sym = lux_randomu(narg,ps);
@@ -404,13 +404,13 @@ Int lux_randomn(Int narg, Int ps[])
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-Int lux_randome(Int narg, Int ps[])
+int32_t lux_randome(int32_t narg, int32_t ps[])
  /* create an exponential distribution of pseudo-random #'s, centered
     at 0 with a given scale length */
 {
   double *p, scale, limit;
-  Int	k;
-  Int	dims[8], *pd, j, result_sym, n;
+  int32_t	k;
+  int32_t	dims[8], *pd, j, result_sym, n;
 
   limit = ps[0]? double_arg(ps[0]): 0;
   scale = double_arg(ps[1]);
@@ -442,12 +442,12 @@ Int lux_randome(Int narg, Int ps[])
 }
 REGISTER(randome, f, RANDOME, 3, MAX_DIMS, "%1%LIMIT:SCALE");
 /*------------------------------------------------------------------------- */
-Int lux_randomb(Int narg, Int ps[])
+int32_t lux_randomb(int32_t narg, int32_t ps[])
 /* RANDOMB([SEED=seed,] dimens, [/LONG]) */
 /* returns a BYTE array of the indicated dimensions where each value */
 /* is either a 0 or a 1. LS 21jul98 */
 {
-  Int	dims[MAX_DIMS], ndim, iq, result, n;
+  int32_t	dims[MAX_DIMS], ndim, iq, result, n;
   pointer p;
 
   if (*ps) 			/* seed */
@@ -465,7 +465,7 @@ Int lux_randomb(Int narg, Int ps[])
 	if (ndim + array_size(*ps) > MAX_DIMS)
 	  return luxerror("Too many dimensions specified", 0);
 	iq = lux_long(1, ps);	/* ensure LONG dimensions */
-	memcpy(dims + ndim, array_data(iq), array_size(iq)*sizeof(Int));
+	memcpy(dims + ndim, array_data(iq), array_size(iq)*sizeof(int32_t));
 	ndim += array_size(iq);
 	break;
       default:
@@ -490,13 +490,13 @@ Int lux_randomb(Int narg, Int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-Int lux_randoml(Int narg, Int ps[])
+int32_t lux_randoml(int32_t narg, int32_t ps[])
 /* RANDOML([SEED=seed,] dimens) */
 /* returns a FLOAT or DOUBLE (if /DOUBLE is set) array of the indicated */
 /* dimensions, filled with values drawn from a logarithmic distribution */
 /* over all representable numbers.  LS 27aug2000 */
 {
-  Int	dims[MAX_DIMS], ndim, iq, result, n;
+  int32_t	dims[MAX_DIMS], ndim, iq, result, n;
   pointer	p;
   uint8_t	type;
 
@@ -515,7 +515,7 @@ Int lux_randoml(Int narg, Int ps[])
 	if (ndim + array_size(*ps) > MAX_DIMS)
 	  return luxerror("Too many dimensions specified", 0);
 	iq = lux_long(1, ps);	/* ensure LONG dimensions */
-	memcpy(dims + ndim, array_data(iq), array_size(iq)*sizeof(Int));
+	memcpy(dims + ndim, array_data(iq), array_size(iq)*sizeof(int32_t));
 	ndim += array_size(iq);
 	break;
       default:
@@ -531,9 +531,9 @@ Int lux_randoml(Int narg, Int ps[])
     return LUX_ERROR;
   p.v = array_data(result);	/* pointer to result data */
 
-  /* we generate random bits by the Int-full, so we do a loop over */
-  /* the number of Int-fulls in the array */
-  n = array_size(result)*lux_type_size[type]/sizeof(Int);
+  /* we generate random bits by the int32_t-full, so we do a loop over */
+  /* the number of int32_t-fulls in the array */
+  n = array_size(result)*lux_type_size[type]/sizeof(int32_t);
   /* some of the generated bit patterns do not correspond to representable */
   /* numbers but rather to NaNs.  We must replace those with representable */
   /* numbers.  We use a single scheme for both FLOAT and DOUBLE numbers, */
@@ -544,7 +544,7 @@ Int lux_randoml(Int narg, Int ps[])
   /* number. */
   while (n--) {
     do 
-      *p.l = random_bits();	/* get one Int-full of bits */
+      *p.l = random_bits();	/* get one int32_t-full of bits */
     while (isnan(*p.f));
     p.l++;
   }
@@ -552,7 +552,7 @@ Int lux_randoml(Int narg, Int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-Int lux_random(Int narg, Int ps[])
+int32_t lux_random(int32_t narg, int32_t ps[])
 /* General pseudo-random-number generating routine.  Switches select the */
 /* distribution of the numbers.  General Syntax: */
 /*   Y = RANDOM([SEED=seed, PERIOD=period,] dimens */
@@ -585,7 +585,7 @@ Int lux_random(Int narg, Int ps[])
 /*       generates an LUX_BYTE array with dimensions <dimens>, containing */
 /*       either a 0 or a 1, drawn at random with equal probability.  */
 {
-  Int	result, ndim, dims[MAX_DIMS], iq, i, period, seed;
+  int32_t	result, ndim, dims[MAX_DIMS], iq, i, period, seed;
   uint8_t	*p;
 
   if (!internalMode)
@@ -610,7 +610,7 @@ Int lux_random(Int narg, Int ps[])
 	  if (ndim + array_size(ps[i]) > MAX_DIMS)
 	    return luxerror("Too many dimensions", 0);
 	  iq = lux_long(1, &ps[i]); /* ensure LONG dimensions */
-	  memcpy(dims + ndim, array_data(iq), ndim*sizeof(Int));
+	  memcpy(dims + ndim, array_data(iq), ndim*sizeof(int32_t));
 	  ndim += array_size(iq);
 	  break;
 	case LUX_SCALAR:
@@ -638,7 +638,7 @@ Int lux_random(Int narg, Int ps[])
 	result = array_scratch(LUX_LONG, ndim, dims);
 	if (result == LUX_ERROR)
 	  return LUX_ERROR;
-	randomu(seed, (Int *) array_data(result), array_size(result),
+	randomu(seed, (int32_t *) array_data(result), array_size(result),
 		period);
       } else {			/* no PERIOD, so get FLOATs */
 	result = array_scratch(LUX_DOUBLE, ndim, dims);
@@ -661,10 +661,10 @@ Int lux_random(Int narg, Int ps[])
       if (result == LUX_ERROR)
 	return LUX_ERROR;
       if (internalMode == 3)
-	random_unique(seed, (Int *) array_data(result), array_size(result),
+	random_unique(seed, (int32_t *) array_data(result), array_size(result),
 		      period);
       else
-	random_unique_shuffle(seed, (Int *) array_data(result),
+	random_unique_shuffle(seed, (int32_t *) array_data(result),
 			      array_size(result), period);
       break;
     case 5:			/* /BITS */

@@ -23,7 +23,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "action.h"
 
  /*------------------------------------------------------------------------- */
-static void rdct_spike(int16_t *start, Int ystride, float *ws)
+static void rdct_spike(int16_t *start, int32_t ystride, float *ws)
  /* does reverse dct for one cell, specialize for a spike smooth */
 {
   float	tmp0, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7;
@@ -36,7 +36,7 @@ static void rdct_spike(int16_t *start, Int ystride, float *ws)
      precision */
 {
   register float *wsptr = ws;
-  Int	nq = 8;
+  int32_t	nq = 8;
 
   while (nq--) {
     tmp0 = wsptr[0];
@@ -96,7 +96,7 @@ static void rdct_spike(int16_t *start, Int ystride, float *ws)
 {
   register float *wsptr;
   register short *elemptr;
-  Int	nq = 8;
+  int32_t	nq = 8;
   
   wsptr = ws;
   elemptr = start;
@@ -153,15 +153,15 @@ static void rdct_spike(int16_t *start, Int ystride, float *ws)
 /*---------------------------------------------------------------------------*/
 #define ALN2I 1.442695022
 #define TINY 1.0e-5
-Int	despike_count = 0, cell_smooth_type = 1;
-Int lux_despike(Int narg, Int ps[])
+int32_t	despike_count = 0, cell_smooth_type = 1;
+int32_t lux_despike(int32_t narg, int32_t ps[])
 /* despike function RAS */
 /* the call is x = despike(array, [frac, level, niter, cell_flag, rms]) */
 {
-  Int	iq, result_sym, type, nx, ny, n, m, level=7, sum, nc, cell_flag=0;
-  Int	lognb2, cell_malloc = 0, cell_count, jj, jc;
-  Int	nxc, nyc, cell_flag_sign, niter=1, rms_flag_sign, rms_flag;
-  Int	sign_flag, bad_flag, bb_flag, save_niter, ntotal, dim[2];
+  int32_t	iq, result_sym, type, nx, ny, n, m, level=7, sum, nc, cell_flag=0;
+  int32_t	lognb2, cell_malloc = 0, cell_count, jj, jc;
+  int32_t	nxc, nyc, cell_flag_sign, niter=1, rms_flag_sign, rms_flag;
+  int32_t	sign_flag, bad_flag, bb_flag, save_niter, ntotal, dim[2];
   uint8_t	*cell_status;
   float	frac = 0.25, fsum, cfrac, tq, rms=0.0, fdif;
   int16_t	*p, *q, *ptr, *p1, *p2, *p3, *out, *out2;
@@ -223,7 +223,7 @@ Int lux_despike(Int narg, Int ps[])
  results */
  if (bb_flag) {
   cell_count = nx*ny/64;
-  if (cell_count <= (NSCRAT*sizeof(Int) + ((char *) scrat - curScrat)))
+  if (cell_count <= (NSCRAT*sizeof(int32_t) + ((char *) scrat - curScrat)))
     cell_status = (uint8_t *) scrat;
   else {
     cell_status = (uint8_t *) malloc(cell_count);
@@ -305,7 +305,7 @@ Int lux_despike(Int narg, Int ps[])
      pps = p +2 *nx - 2;
      *ss++ = *pps++; *ss++ = *pps++; *ss++ = *pps++; *ss++ = *pps++; *ss++ = *pps++;
       /* a built in sorter here */
-      { Int nn,m,j,i,n=16;
+      { int32_t nn,m,j,i,n=16;
         short t;
         m=n;
         for (nn=1;nn<=lognb2;nn++) {
@@ -349,10 +349,10 @@ Int lux_despike(Int narg, Int ps[])
 
 
  if (bb_flag) {
-  Int badcells = 0;
+  int32_t badcells = 0;
   float	dc[9], ws[64], *pf;
-  Int 	i, ix, jx, ic, stride = nx - 8, ii, jj, istart,k;
-  Int	ioff[3], joff[3];
+  int32_t 	i, ix, jx, ic, stride = nx - 8, ii, jj, istart,k;
+  int32_t	ioff[3], joff[3];
   for (i=0;i<cell_count;i++) {
    /* we can have a bad cell by the number of spikes (the strike out
    option) and/or we can check the rms, if doing both we check the
@@ -436,7 +436,7 @@ Int lux_despike(Int narg, Int ps[])
     break;
     case 1:
     {
-    Int	a1, a2, acc, t1, t2, nxmo=nx-8 , nymo=ny-8;
+    int32_t	a1, a2, acc, t1, t2, nxmo=nx-8 , nymo=ny-8;
     /* get array index for start of cell */
     ix = ic*8;  jx = jc*8;
     istart = ix + jx*nx;
@@ -448,11 +448,11 @@ Int lux_despike(Int narg, Int ps[])
     while (nc--) {
     /* get a point to left of cell if available */
     if (ix) { p--;	
-    	a2 = (Int)*p++;
-    	a1 = (Int)*p++;
+    	a2 = (int32_t)*p++;
+    	a1 = (int32_t)*p++;
     	a2 = a2 + a1;
      } else {
-    	a1 = (Int)*p++;
+    	a1 = (int32_t)*p++;
     	a2 = a1 + a1;
      }
      /* proceed over 7 points */
@@ -477,11 +477,11 @@ Int lux_despike(Int narg, Int ps[])
     while (nc--) {
     /* get a point to bottom of cell if available */
     if (jx) { p = p - nx;
-   	a2 = (Int)*p;	p += nx;
-    	a1 = (Int)*p;	p += nx;
+   	a2 = (int32_t)*p;	p += nx;
+    	a1 = (int32_t)*p;	p += nx;
     	a2 = a2 + a1;
      } else {
-    	a1 = (Int)*p;	p += nx;
+    	a1 = (int32_t)*p;	p += nx;
     	a2 = a1 + a1;
      }
      /* proceed over 7 points */
@@ -510,13 +510,13 @@ Int lux_despike(Int narg, Int ps[])
  return result_sym;
 }
 /*------------------------------------------------------------------------- */
-Int lux_reorder(Int narg, Int ps[])/* reorder function */
+int32_t lux_reorder(int32_t narg, int32_t ps[])/* reorder function */
 /* the call is x = reorder(array, order)
    where array must be a 2-D array, returns the re-ordered result */
 /* reordering is reversals and transposes of a 2-D array, there are
    8 ways to "flip" an array, the "order" ranges from 0-7 accordingly */
 {
-  Int  iorder, iq, result_sym, type, nx, ny, m, inc, dim[2];
+  int32_t  iorder, iq, result_sym, type, nx, ny, m, inc, dim[2];
   uint8_t   *p, *q, *ptr;
 
   if (int_arg_stat(ps[1], &iorder) != 1)
@@ -550,7 +550,7 @@ Int lux_reorder(Int narg, Int ps[])/* reorder function */
       case LUX_BYTE:
 	if (iorder < 4) {
 	  register  uint8_t *pp, *qq;
-	  register  Int  nn, mm, nxx, inc;
+	  register  int32_t  nn, mm, nxx, inc;
 
 	  nxx = nx;
 	  mm = ny;
@@ -594,7 +594,7 @@ Int lux_reorder(Int narg, Int ps[])/* reorder function */
 	  }
 	} else {
 	  register  uint8_t *pp, *qq;
-	  register  Int  nn, mm, nyy, inc;
+	  register  int32_t  nn, mm, nyy, inc;
 
 	  mm = ny;
 	  qq = q;
@@ -634,7 +634,7 @@ Int lux_reorder(Int narg, Int ps[])/* reorder function */
       case LUX_WORD:
 	if (iorder < 4) {
 	  register  short *pp, *qq;
-	  register  Int  nn, mm, nxx, inc;
+	  register  int32_t  nn, mm, nxx, inc;
 
 	  nxx = nx;
 	  mm = ny;
@@ -678,7 +678,7 @@ Int lux_reorder(Int narg, Int ps[])/* reorder function */
 	  } 
 	} else {
 	  register  short *pp, *qq;
-	  register  Int  nyy, nn, mm;
+	  register  int32_t  nyy, nn, mm;
 
 	  switch (iorder) {
 	    case 4:		/* transpose in x and y */
@@ -717,18 +717,18 @@ Int lux_reorder(Int narg, Int ps[])/* reorder function */
 	break;
       case LUX_LONG:
 	if (iorder < 4) {
-	  register  Int *pp, *qq;
-	  register  Int  nn, mm, nxx;
+	  register  int32_t *pp, *qq;
+	  register  int32_t  nn, mm, nxx;
 
 	  nxx = nx;
 	  mm = ny;
-	  qq = (Int *) q;
+	  qq = (int32_t *) q;
 
 	  switch (iorder) {
 	    case 1:		/* reverse in x */
 	    {
-	      register  Int *pp = (Int *) p + nx;
-	      register  Int inc = 2*nx;
+	      register  int32_t *pp = (int32_t *) p + nx;
+	      register  int32_t inc = 2*nx;
 
 	      while (mm--) {
 		nn = nxx;
@@ -741,7 +741,7 @@ Int lux_reorder(Int narg, Int ps[])/* reorder function */
 	    }
 	    break;
 	    case 2:		/* just reverse in y */
-	      pp = (Int *) p + nx * ny - nx;
+	      pp = (int32_t *) p + nx * ny - nx;
 	      inc = -2*nx;
 	      while (mm--) {
 		nn = nxx;
@@ -753,7 +753,7 @@ Int lux_reorder(Int narg, Int ps[])/* reorder function */
 	      }
 	      break;
 	    case 3:		/* reverse in x and y */
-	      pp = (Int *) p + nx*ny;
+	      pp = (int32_t *) p + nx*ny;
 	      while (mm--) {
 		nn = nxx;
 		while (nn) {
@@ -764,29 +764,29 @@ Int lux_reorder(Int narg, Int ps[])/* reorder function */
 	      break;
 	  } 
 	} else {
-	  register  Int *pp, *qq;
-	  register  Int  nn, mm, nyy;
+	  register  int32_t *pp, *qq;
+	  register  int32_t  nn, mm, nyy;
 	  
 	  mm = ny;
-	  qq = (Int *) q;
+	  qq = (int32_t *) q;
 	  switch (iorder) {
 	    case 4:		/* transpose in x and y */
-	      pp = (Int *) p;
+	      pp = (int32_t *) p;
 	      inc = -nx*ny + 1;
 	      nyy = ny;
 	      break;
 	    case 5:		/* transpose plus reverse in y */
-	      pp = (Int *) p +nx*ny - ny;
+	      pp = (int32_t *) p +nx*ny - ny;
 	      inc = nx*ny + 1;
 	      nyy = -ny;
 	      break;
 	    case 6:		/* transpose plus reverse in x */
-	      pp = (Int *) p + ny - 1;
+	      pp = (int32_t *) p + ny - 1;
 	      inc = -nx*ny - 1;
 	      nyy = ny;
 	      break;
 	    case 7:		/* transpose plus reverse in x,y */
-	      pp = (Int *) p + ny*nx - 1;
+	      pp = (int32_t *) p + ny*nx - 1;
 	      inc = nx*ny - 1;
 	      nyy = -ny;
 	      break;
@@ -805,7 +805,7 @@ Int lux_reorder(Int narg, Int ps[])/* reorder function */
       case LUX_FLOAT:
 	if (iorder < 4) {
 	  register  float *pp, *qq;
-	  register  Int  nn, mm, nxx;
+	  register  int32_t  nn, mm, nxx;
 
 	  nxx = nx;
 	  mm = ny;
@@ -849,7 +849,7 @@ Int lux_reorder(Int narg, Int ps[])/* reorder function */
 	  } 
 	} else {
 	  register  float *pp, *qq;
-	  register  Int  nn, mm, nyy;
+	  register  int32_t  nn, mm, nyy;
 	  
 	  mm = ny;
 	  qq = (float *) q;
@@ -889,7 +889,7 @@ Int lux_reorder(Int narg, Int ps[])/* reorder function */
       case LUX_DOUBLE:
 	if (iorder < 4) {
 	  register  double *pp, *qq;
-	  register  Int  nn, mm, nxx;
+	  register  int32_t  nn, mm, nxx;
 
 	  nxx = nx;
 	  mm = ny;
@@ -933,7 +933,7 @@ Int lux_reorder(Int narg, Int ps[])/* reorder function */
 	  } 
 	} else {
 	  register  double *pp, *qq;
-	  register  Int  nn, mm, nyy;
+	  register  int32_t  nn, mm, nyy;
 	  
 	  mm = ny;
 	  qq = (double *) q;

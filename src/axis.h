@@ -30,21 +30,21 @@ struct dims_spec {
 
 struct param_spec {
   enum param_spec_type { PS_INPUT, PS_OUTPUT, PS_RETURN } logical_type;
-  Int is_optional;
+  int32_t is_optional;
   enum type_spec_limit_type { PS_EXACT, PS_LOWER_LIMIT } data_type_limit;
   Symboltype data_type;
   size_t num_dims_spec;
   struct dims_spec *dims_spec;
-  Int ref_par;
-  Int axis_par;
+  int32_t ref_par;
+  int32_t axis_par;
   enum remaining_dims_type { PS_ABSENT, PS_EQUAL_TO_REFERENCE, PS_ARBITRARY } remaining_dims;
-  Int remaining_dims_equal_to_reference;
+  int32_t remaining_dims_equal_to_reference;
 };
 
 struct param_spec_list {
   size_t num_param_specs;
   struct param_spec *param_specs;
-  Int return_param_index;
+  int32_t return_param_index;
 };
 
 #endif

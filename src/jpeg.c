@@ -48,14 +48,14 @@ METHODDEF(void) my_error_exit(j_common_ptr cinfo)
   longjmp(myerr->setjmp_buffer, 1);
 }
 /*--------------------------------------------------------------------------*/
-Int read_jpeg6b(Int narg, Int ps[], Int isFunc)
+int32_t read_jpeg6b(int32_t narg, int32_t ps[], int32_t isFunc)
 /* JREAD,<x>,<file>[,<header>,SHRINK=<shrink>][,/GREYSCALE] */
 {
   char	*filename, *p;
   struct jpeg_decompress_struct	cinfo;
   struct my_error_mgr		jerr;
   FILE	*infile;
-  Int	dims[3], i, stride, n;
+  int32_t	dims[3], i, stride, n;
   JSAMPROW	row_pointer[1];	/* pointer to a single row */
   JSAMPLE	*image;
 
@@ -172,20 +172,20 @@ Int read_jpeg6b(Int narg, Int ps[], Int isFunc)
   return LUX_OK;
 }
 /*--------------------------------------------------------------------------*/
-Int lux_read_jpeg6b(Int narg, Int ps[])
+int32_t lux_read_jpeg6b(int32_t narg, int32_t ps[])
 {
   return read_jpeg6b(narg, ps, 0);
 }
 /*--------------------------------------------------------------------------*/
-Int lux_read_jpeg6b_f(Int narg, Int ps[])
+int32_t lux_read_jpeg6b_f(int32_t narg, int32_t ps[])
 {
   return (read_jpeg6b(narg, ps, 1) == LUX_OK)? LUX_ONE: LUX_ZERO;
 }
 /*--------------------------------------------------------------------------*/
-Int write_jpeg6b(Int narg, Int ps[], Int isFunc)
+int32_t write_jpeg6b(int32_t narg, int32_t ps[], int32_t isFunc)
 /* JWRITE,<x>,<file>[,<header>,<quality>] */
 {
-  Int	nx, ny, nd, quality, stride;
+  int32_t	nx, ny, nd, quality, stride;
   struct jpeg_compress_struct	cinfo;
   struct my_error_mgr		jerr;
   FILE	*outfile;
@@ -282,12 +282,12 @@ Int write_jpeg6b(Int narg, Int ps[], Int isFunc)
   return LUX_OK;
 }
 /*--------------------------------------------------------------------------*/
-Int lux_write_jpeg6b(Int narg, Int ps[])
+int32_t lux_write_jpeg6b(int32_t narg, int32_t ps[])
 {
   return write_jpeg6b(narg, ps, 0);
 }
 /*--------------------------------------------------------------------------*/
-Int lux_write_jpeg6b_f(Int narg, Int ps[])
+int32_t lux_write_jpeg6b_f(int32_t narg, int32_t ps[])
 {
   return (write_jpeg6b(narg, ps, 1) == LUX_OK)? LUX_ONE: LUX_ZERO;
 }

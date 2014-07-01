@@ -42,7 +42,7 @@ char *hershey_set_filename(char *filename)
   return filename;
 }
 
-static Int hershey_load(char *filename)
+static int32_t hershey_load(char *filename)
 {
   FILE *fp;
 
@@ -100,19 +100,19 @@ static Int hershey_load(char *filename)
   return 1;
 }
 
-static Int uint16cmp(const void *arg1, const void *arg2)
+static int32_t uint16cmp(const void *arg1, const void *arg2)
 {
   return *(uint16_t *) arg1 - *(uint16_t *) arg2;
 }
 
-Int hershey_max_char(void)
+int32_t hershey_max_char(void)
 {
   if (!hershey_numbers && hershey_load(NULL))
     return 0;
   return hershey_numbers[hershey_numbers_count - 1];
 }
 
-Int hershey_max_handle(void)
+int32_t hershey_max_handle(void)
 {
   if (!hershey_numbers && hershey_load(NULL))
     return 0;
@@ -120,7 +120,7 @@ Int hershey_max_handle(void)
 }
 
 /*
-  Int hershey_exists(Int hershey_char)
+  int32_t hershey_exists(int32_t hershey_char)
 
   Purpose: to return HERSHEY_ERR if the specified character from the
   Hershey character set does not exist, or else a handle to the
@@ -135,7 +135,7 @@ Int hershey_max_handle(void)
     HERSHEY_ERR if no such Hershey character is defined, or otherwise a
     handle to the coordinates otherwise.
  */
-hershey_handle hershey_exists(Int hershey_char) {
+hershey_handle hershey_exists(int32_t hershey_char) {
   uint16_t number;
   uint16_t *found;
 
@@ -145,7 +145,7 @@ hershey_handle hershey_exists(Int hershey_char) {
   found = bsearch(&number, hershey_numbers, hershey_numbers_count,
 		  sizeof(uint16_t), uint16cmp);
   if (found) {
-    Int i;
+    int32_t i;
 
     i = (found - hershey_numbers)/sizeof(uint16_t);
     return hershey_indices[i];
@@ -154,7 +154,7 @@ hershey_handle hershey_exists(Int hershey_char) {
 }
 
 /*
-  Int hershey_coords(Int *index, Int *x, Int *y)
+  int32_t hershey_coords(int32_t *index, int32_t *x, int32_t *y)
 
   Purpose: to return coordinates of a Hershey character.
 
@@ -177,8 +177,8 @@ hershey_handle hershey_exists(Int hershey_char) {
     HERSHEY_ERR = the handle *index was invalid.
 
  */
-Int hershey_coords(hershey_handle *handle, Int *x, Int *y) {
-  Int result = HERSHEY_DRAW;
+int32_t hershey_coords(hershey_handle *handle, int32_t *x, int32_t *y) {
+  int32_t result = HERSHEY_DRAW;
 
   if (*handle < 0 || *handle >= hershey_data_size)
     return HERSHEY_ERR;
@@ -198,9 +198,9 @@ Int hershey_coords(hershey_handle *handle, Int *x, Int *y) {
 }
 
 #include "unittest.h"
-Int test_hershey(void)
+int32_t test_hershey(void)
 {
-  Int bad = 0;
+  int32_t bad = 0;
 
   {
     char *f = hershey_set_filename("foo.bar");

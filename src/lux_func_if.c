@@ -42,7 +42,7 @@ lux_func_if * lux_func_if_alloc(char const * const name, size_t num_params)
   lux_func_if *afif = calloc(1, sizeof(lux_func_if));
   if (!afif)
     return NULL;
-  Int func_sym = stringpointer((char *) name, SP_USER_FUNC);
+  int32_t func_sym = stringpointer((char *) name, SP_USER_FUNC);
   if (func_sym < 0) {
     errno = EDOM;
     goto error;
@@ -76,7 +76,7 @@ void lux_func_if_free(lux_func_if * afif)
   }
 }
 
-Int lux_func_if_set_param(lux_func_if *afif, size_t index, Int param)
+int32_t lux_func_if_set_param(lux_func_if *afif, size_t index, int32_t param)
 {
   if (!afif || index >= afif->num_params
       || !symbolIsNumerical(param)) {
@@ -88,7 +88,7 @@ Int lux_func_if_set_param(lux_func_if *afif, size_t index, Int param)
   return 0;
 }
 
-Int lux_func_if_get_param_sym(lux_func_if *afif, size_t index)
+int32_t lux_func_if_get_param_sym(lux_func_if *afif, size_t index)
 {
   if (index >= afif->num_params) {
     errno = EDOM;
@@ -110,7 +110,7 @@ pointer lux_func_if_get_param_data(lux_func_if *afif, size_t index)
 
 double lux_func_if_call(lux_func_if *afif)
 {
-  Int result_sym = eval(afif->func_sym);
+  int32_t result_sym = eval(afif->func_sym);
   double result = (result_sym < 0? NAN: double_arg(result_sym));
   zap(result_sym);
   return result;

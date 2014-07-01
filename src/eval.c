@@ -42,7 +42,7 @@ char *binOpSign[] = {           /* token of binary operators, for messages */
  "NE", "OR", "AND", "XOR", "^", "ANDIF", "ORIF"
 };
 
-static Int      lhs,            /* the current left-hand side operand */
+static int32_t      lhs,            /* the current left-hand side operand */
                 rhs,            /* the current right-hand side operand */
                 binOp,          /* the current binary operator */
                 topType,        /* the data type of the result */
@@ -53,13 +53,13 @@ static pointer  lp,             /* pointer to the LHS values */
                 rp,             /* pointer to the RHS values */
                 tp;             /* pointer to the result values */
 
-Int     internal_routine(Int, internalRoutine *), /* interal routine call */
-        usr_routine(Int);       /* user routine call */
+int32_t     internal_routine(int32_t, internalRoutine *), /* interal routine call */
+        usr_routine(int32_t);       /* user routine call */
 char    evalScalPtr = 1;        /* we need to evaluate scalar pointers, too */
 
-Int     newSymbol(Int kind, ...), nextCompileLevel(FILE *fp, char *filename),
-  lux_neg_func(Int, Int []);
-void    embed(Int target, Int context), zap(Int symbol);
+int32_t     newSymbol(int32_t kind, ...), nextCompileLevel(FILE *fp, char *filename),
+  lux_neg_func(int32_t, int32_t []);
+void    embed(int32_t target, int32_t context), zap(int32_t symbol);
 /*----------------------------------------------------------*/
 void lux_bin_pow(void)
      /* power-taking with two array operands */
@@ -2124,7 +2124,7 @@ void lux_add_as(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = (Int) *lp.b++ + *rp.l;
+            *tp.l++ = (int32_t) *lp.b++ + *rp.l;
           break;
         case LUX_FLOAT:
           while (nRepeat--)
@@ -2162,7 +2162,7 @@ void lux_add_as(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = (Int) *lp.w++ + *rp.l;
+            *tp.l++ = (int32_t) *lp.w++ + *rp.l;
           break;
         case LUX_FLOAT:
           while (nRepeat--)
@@ -2192,11 +2192,11 @@ void lux_add_as(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.l++ = *lp.l++ + (Int) *rp.b;
+            *tp.l++ = *lp.l++ + (int32_t) *rp.b;
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.l++ = *lp.l++ + (Int) *rp.w;
+            *tp.l++ = *lp.l++ + (int32_t) *rp.w;
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -2410,7 +2410,7 @@ void lux_add_sa(void)
      /* commutative, we just swap the LHS and RHS and pass on to */
      /* lux_add_as() */
 {
- Int            temp;
+ int32_t            temp;
  pointer        tempp;
 
  temp = lhsType;
@@ -2444,7 +2444,7 @@ void lux_sub(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = (Int) *lp.b++ - *rp.l++;
+            *tp.l++ = (int32_t) *lp.b++ - *rp.l++;
           break;
         case LUX_FLOAT:
           while (nRepeat--)
@@ -2482,7 +2482,7 @@ void lux_sub(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = (Int) *lp.w++ - *rp.l++;
+            *tp.l++ = (int32_t) *lp.w++ - *rp.l++;
           break;
         case LUX_FLOAT:
           while (nRepeat--)
@@ -2512,11 +2512,11 @@ void lux_sub(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.l++ = *lp.l++ - (Int) *rp.b++;
+            *tp.l++ = *lp.l++ - (int32_t) *rp.b++;
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.l++ = *lp.l++ - (Int) *rp.w++;
+            *tp.l++ = *lp.l++ - (int32_t) *rp.w++;
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -2741,7 +2741,7 @@ void lux_sub_as(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = (Int) *lp.b++ - *rp.l;
+            *tp.l++ = (int32_t) *lp.b++ - *rp.l;
           break;
         case LUX_FLOAT:
           while (nRepeat--)
@@ -2779,7 +2779,7 @@ void lux_sub_as(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = (Int) *lp.w++ - *rp.l;
+            *tp.l++ = (int32_t) *lp.w++ - *rp.l;
           break;
         case LUX_FLOAT:
           while (nRepeat--)
@@ -2809,11 +2809,11 @@ void lux_sub_as(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.l++ = *lp.l++ - (Int) *rp.b;
+            *tp.l++ = *lp.l++ - (int32_t) *rp.b;
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.l++ = *lp.l++ - (Int) *rp.w;
+            *tp.l++ = *lp.l++ - (int32_t) *rp.w;
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -3038,7 +3038,7 @@ void lux_sub_sa(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = (Int) *lp.b - *rp.l++;
+            *tp.l++ = (int32_t) *lp.b - *rp.l++;
           break;
         case LUX_FLOAT:
           while (nRepeat--)
@@ -3076,7 +3076,7 @@ void lux_sub_sa(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = (Int) *lp.w - *rp.l++;
+            *tp.l++ = (int32_t) *lp.w - *rp.l++;
           break;
         case LUX_FLOAT:
           while (nRepeat--)
@@ -3106,11 +3106,11 @@ void lux_sub_sa(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.l++ = *lp.l - (Int) *rp.b++;
+            *tp.l++ = *lp.l - (int32_t) *rp.b++;
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.l++ = *lp.l - (Int) *rp.w++;
+            *tp.l++ = *lp.l - (int32_t) *rp.w++;
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -3337,7 +3337,7 @@ void lux_mul(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = (Int) *lp.b++ * *rp.l++;
+            *tp.l++ = (int32_t) *lp.b++ * *rp.l++;
           break;
         case LUX_FLOAT:
           while (nRepeat--)
@@ -3379,7 +3379,7 @@ void lux_mul(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = (Int) *lp.w++ * *rp.l++;
+            *tp.l++ = (int32_t) *lp.w++ * *rp.l++;
           break;
         case LUX_FLOAT:
           while (nRepeat--)
@@ -3413,11 +3413,11 @@ void lux_mul(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.l++ = *lp.l++ * (Int) *rp.b++;
+            *tp.l++ = *lp.l++ * (int32_t) *rp.b++;
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.l++ = *lp.l++ * (Int) *rp.w++;
+            *tp.l++ = *lp.l++ * (int32_t) *rp.w++;
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -3698,7 +3698,7 @@ void lux_mul_as(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = (Int) *lp.b++ * *rp.l;
+            *tp.l++ = (int32_t) *lp.b++ * *rp.l;
           break;
         case LUX_FLOAT:
           while (nRepeat--)
@@ -3740,7 +3740,7 @@ void lux_mul_as(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = (Int) *lp.w++ * *rp.l;
+            *tp.l++ = (int32_t) *lp.w++ * *rp.l;
           break;
         case LUX_FLOAT:
           while (nRepeat--)
@@ -3774,11 +3774,11 @@ void lux_mul_as(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.l++ = *lp.l++ * (Int) *rp.b;
+            *tp.l++ = *lp.l++ * (int32_t) *rp.b;
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.l++ = *lp.l++ * (Int) *rp.w;
+            *tp.l++ = *lp.l++ * (int32_t) *rp.w;
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -4026,7 +4026,7 @@ void lux_mul_sa(void)
      /* is commutative, we just swap the LHS and RHS and pass on to */
      /* lux_mul_as() */
 {
-  Int           temp;
+  int32_t           temp;
   pointer       tempp;
   
   temp = lhsType;
@@ -4063,7 +4063,7 @@ void lux_div(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = (Int) *lp.b++ / *rp.l++;
+            *tp.l++ = (int32_t) *lp.b++ / *rp.l++;
           break;
         case LUX_FLOAT:
           while (nRepeat--)
@@ -4111,7 +4111,7 @@ void lux_div(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = (Int) *lp.w++ / *rp.l++;
+            *tp.l++ = (int32_t) *lp.w++ / *rp.l++;
           break;
         case LUX_FLOAT:
           while (nRepeat--)
@@ -4151,11 +4151,11 @@ void lux_div(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.l++ = *lp.l++ / (Int) *rp.b++;
+            *tp.l++ = *lp.l++ / (int32_t) *rp.b++;
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.l++ = *lp.l++ / (Int) *rp.w++;
+            *tp.l++ = *lp.l++ / (int32_t) *rp.w++;
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -4456,7 +4456,7 @@ void lux_div_as(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = (Int) *lp.b++ / *rp.l;
+            *tp.l++ = (int32_t) *lp.b++ / *rp.l;
           break;
         case LUX_FLOAT:
           while (nRepeat--)
@@ -4504,7 +4504,7 @@ void lux_div_as(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = (Int) *lp.w++ / *rp.l;
+            *tp.l++ = (int32_t) *lp.w++ / *rp.l;
           break;
         case LUX_FLOAT:
           while (nRepeat--)
@@ -4544,11 +4544,11 @@ void lux_div_as(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.l++ = *lp.l++ / (Int) *rp.b;
+            *tp.l++ = *lp.l++ / (int32_t) *rp.b;
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.l++ = *lp.l++ / (Int) *rp.w;
+            *tp.l++ = *lp.l++ / (int32_t) *rp.w;
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -4845,7 +4845,7 @@ void lux_div_sa(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = (Int) *lp.b / *rp.l++;
+            *tp.l++ = (int32_t) *lp.b / *rp.l++;
           break;
         case LUX_FLOAT:
           while (nRepeat--)
@@ -4893,7 +4893,7 @@ void lux_div_sa(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = (Int) *lp.w / *rp.l++;
+            *tp.l++ = (int32_t) *lp.w / *rp.l++;
           break;
         case LUX_FLOAT:
           while (nRepeat--)
@@ -4933,11 +4933,11 @@ void lux_div_sa(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.l++ = *lp.l / (Int) *rp.b++;
+            *tp.l++ = *lp.l / (int32_t) *rp.b++;
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.l++ = *lp.l / (Int) *rp.w++;
+            *tp.l++ = *lp.l / (int32_t) *rp.w++;
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -5754,9 +5754,9 @@ void lux_idiv_sa(void)
 }
 /*----------------------------------------------------------*/
 /* returns z = x mod y such that -|y|/2 < z <= |y|/2 */
-Int iasmod(Int x, Int y)
+int32_t iasmod(int32_t x, int32_t y)
 {
-  Int v;
+  int32_t v;
 
   if (!y)
     return 0;
@@ -5808,7 +5808,7 @@ doubleComplex zamod(doubleComplex x, doubleComplex y)
      z1 - n*z2 where n is the greatest integer not smaller
      than the real number closest to z2 */
   double rx, ry, ax, ay, d;
-  Int n;
+  int32_t n;
   doubleComplex z;
 
   ry = hypot(y.real, y.imaginary);
@@ -5820,7 +5820,7 @@ doubleComplex zamod(doubleComplex x, doubleComplex y)
     ax = atan2(x.imaginary, x.real);
   
     d = rx/ry*cos(ax - ay);
-    n = (Int) d;
+    n = (int32_t) d;
     if (d < 0)
       n--;
     z.real = x.real - n*y.real;
@@ -8502,7 +8502,7 @@ void lux_max(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = ((value1.l = (Int) *lp.b++) > (value2.l = *rp.l++))?
+            *tp.l++ = ((value1.l = (int32_t) *lp.b++) > (value2.l = *rp.l++))?
               value1.l:
               value2.l;
           break;
@@ -8566,7 +8566,7 @@ void lux_max(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = ((value1.l = (Int) *lp.w++) > (value2.l = *rp.l++))?
+            *tp.l++ = ((value1.l = (int32_t) *lp.w++) > (value2.l = *rp.l++))?
               value1.l:
               value2.l;
           break;
@@ -8618,13 +8618,13 @@ void lux_max(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.l++ = ((value1.l = *lp.l++) > (value2.l = (Int) *rp.b++))?
+            *tp.l++ = ((value1.l = *lp.l++) > (value2.l = (int32_t) *rp.b++))?
               value1.l:
               value2.l;
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.l++ = ((value1.l = *lp.l++) > (value2.l = (Int) *rp.w++))?
+            *tp.l++ = ((value1.l = *lp.l++) > (value2.l = (int32_t) *rp.w++))?
               value1.l:
               value2.l;
           break;
@@ -9118,7 +9118,7 @@ void lux_max_as(void)
           break;
         case LUX_LONG:
           value2.l = *rp.l;  while (nRepeat--)
-            *tp.l++ = ((value1.l = (Int) *lp.w++) > value2.l)?
+            *tp.l++ = ((value1.l = (int32_t) *lp.w++) > value2.l)?
               value1.l:
               value2.l;
           break;
@@ -9171,13 +9171,13 @@ void lux_max_as(void)
     case LUX_LONG:
       switch (rhsType) {
         case LUX_BYTE:
-          value2.l = (Int) *rp.b;  while (nRepeat--)
+          value2.l = (int32_t) *rp.b;  while (nRepeat--)
             *tp.l++ = ((value1.l = *lp.l++) > value2.l)?
               value1.l:
               value2.l;
           break;
         case LUX_WORD:
-          value2.l = (Int) *rp.w;  while (nRepeat--)
+          value2.l = (int32_t) *rp.w;  while (nRepeat--)
             *tp.l++ = ((value1.l = *lp.l++) > value2.l)?
               value1.l:
               value2.l;
@@ -9602,7 +9602,7 @@ void lux_max_sa(void)
      /* is commutative, we just swap LHS and RHS and pass on to */
      /* lux_max_as() */
 {
-  Int           temp;
+  int32_t           temp;
   pointer       tempp;
   
   temp = lhsType;
@@ -9642,7 +9642,7 @@ void lux_min(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = ((value1.l = (Int) *lp.b++) < (value2.l = *rp.l++))?
+            *tp.l++ = ((value1.l = (int32_t) *lp.b++) < (value2.l = *rp.l++))?
               value1.l:
               value2.l;
           break;
@@ -9706,7 +9706,7 @@ void lux_min(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = ((value1.l = (Int) *lp.w++) < (value2.l = *rp.l++))?
+            *tp.l++ = ((value1.l = (int32_t) *lp.w++) < (value2.l = *rp.l++))?
               value1.l:
               value2.l;
           break;
@@ -9758,13 +9758,13 @@ void lux_min(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.l++ = ((value1.l = *lp.l++) < (value2.l = (Int) *rp.b++))?
+            *tp.l++ = ((value1.l = *lp.l++) < (value2.l = (int32_t) *rp.b++))?
               value1.l:
               value2.l;
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.l++ = ((value1.l = *lp.l++) < (value2.l = (Int) *rp.w++))?
+            *tp.l++ = ((value1.l = *lp.l++) < (value2.l = (int32_t) *rp.w++))?
               value1.l:
               value2.l;
           break;
@@ -10258,7 +10258,7 @@ void lux_min_as(void)
           break;
         case LUX_LONG:
           value2.l = *rp.l;  while (nRepeat--)
-            *tp.l++ = ((value1.l = (Int) *lp.w++) < value2.l)?
+            *tp.l++ = ((value1.l = (int32_t) *lp.w++) < value2.l)?
               value1.l:
               value2.l;
           break;
@@ -10311,13 +10311,13 @@ void lux_min_as(void)
     case LUX_LONG:
       switch (rhsType) {
         case LUX_BYTE:
-          value2.l = (Int) *rp.b;  while (nRepeat--)
+          value2.l = (int32_t) *rp.b;  while (nRepeat--)
             *tp.l++ = ((value1.l = *lp.l++) < value2.l)?
               value1.l:
               value2.l;
           break;
         case LUX_WORD:
-          value2.l = (Int) *rp.w;  while (nRepeat--)
+          value2.l = (int32_t) *rp.w;  while (nRepeat--)
             *tp.l++ = ((value1.l = *lp.l++) < value2.l)?
               value1.l:
               value2.l;
@@ -10742,7 +10742,7 @@ void lux_min_sa(void)
      /* is commutative we just swap LHS and RHS and pass on to */
      /* lux_min_as() */
 {
-  Int           temp;
+  int32_t           temp;
   pointer       tempp;
   
   temp = lhsType;
@@ -10848,11 +10848,11 @@ void lux_eq(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.l++ = (*lp.l++ == (Int) *rp.b++);
+            *tp.l++ = (*lp.l++ == (int32_t) *rp.b++);
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.l++ = (*lp.l++ == (Int) *rp.w++);
+            *tp.l++ = (*lp.l++ == (int32_t) *rp.w++);
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -11106,7 +11106,7 @@ void lux_eq_as(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = ((Int) *lp.b++ == *rp.l);
+            *tp.l++ = ((int32_t) *lp.b++ == *rp.l);
           break;
         case LUX_FLOAT:
           while (nRepeat--)
@@ -11140,7 +11140,7 @@ void lux_eq_as(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = ((Int) *lp.w++ == *rp.l);
+            *tp.l++ = ((int32_t) *lp.w++ == *rp.l);
           break;
         case LUX_FLOAT:
           while (nRepeat--)
@@ -11166,11 +11166,11 @@ void lux_eq_as(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.l++ = (*lp.l++ == (Int) *rp.b);
+            *tp.l++ = (*lp.l++ == (int32_t) *rp.b);
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.l++ = (*lp.l++ == (Int) *rp.w);
+            *tp.l++ = (*lp.l++ == (int32_t) *rp.w);
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -11345,7 +11345,7 @@ void lux_eq_sa(void)
      /* equal-to with scalar LHS and array RHS; a commutative operation, */
      /* so we swap LHS and RHS and pass on to lux_eq_as() */
 {
-  Int           temp;
+  int32_t           temp;
   pointer       tempp;
   
   temp = lhsType;
@@ -11379,7 +11379,7 @@ void lux_gt(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = ((Int) *lp.b++ > *rp.l++);
+            *tp.l++ = ((int32_t) *lp.b++ > *rp.l++);
           break;
         case LUX_FLOAT:
           while (nRepeat--)
@@ -11419,7 +11419,7 @@ void lux_gt(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = ((Int) *lp.w++ > *rp.l++);
+            *tp.l++ = ((int32_t) *lp.w++ > *rp.l++);
           break;
         case LUX_FLOAT:
           while (nRepeat--)
@@ -11451,11 +11451,11 @@ void lux_gt(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.l++ = (*lp.l++ > (Int) *rp.b++);
+            *tp.l++ = (*lp.l++ > (int32_t) *rp.b++);
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.l++ = (*lp.l++ > (Int) *rp.w++);
+            *tp.l++ = (*lp.l++ > (int32_t) *rp.w++);
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -11729,7 +11729,7 @@ void lux_gt_as(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = ((Int) *lp.b++ > *rp.l);
+            *tp.l++ = ((int32_t) *lp.b++ > *rp.l);
           break;
         case LUX_FLOAT:
           while (nRepeat--)
@@ -11769,7 +11769,7 @@ void lux_gt_as(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = ((Int) *lp.w++ > *rp.l);
+            *tp.l++ = ((int32_t) *lp.w++ > *rp.l);
           break;
         case LUX_FLOAT:
           while (nRepeat--)
@@ -11801,11 +11801,11 @@ void lux_gt_as(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.l++ = (*lp.l++ > (Int) *rp.b);
+            *tp.l++ = (*lp.l++ > (int32_t) *rp.b);
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.l++ = (*lp.l++ > (Int) *rp.w);
+            *tp.l++ = (*lp.l++ > (int32_t) *rp.w);
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -12058,7 +12058,7 @@ void lux_gt_sa(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = ((Int) *lp.b > *rp.l++);
+            *tp.l++ = ((int32_t) *lp.b > *rp.l++);
           break;
         case LUX_FLOAT:
           while (nRepeat--)
@@ -12098,7 +12098,7 @@ void lux_gt_sa(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = ((Int) *lp.w > *rp.l++);
+            *tp.l++ = ((int32_t) *lp.w > *rp.l++);
           break;
         case LUX_FLOAT:
           while (nRepeat--)
@@ -12130,11 +12130,11 @@ void lux_gt_sa(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.l++ = (*lp.l > (Int) *rp.b++);
+            *tp.l++ = (*lp.l > (int32_t) *rp.b++);
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.l++ = (*lp.l > (Int) *rp.w++);
+            *tp.l++ = (*lp.l > (int32_t) *rp.w++);
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -12385,7 +12385,7 @@ void lux_ge(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = ((Int) *lp.b++ >= *rp.l++);
+            *tp.l++ = ((int32_t) *lp.b++ >= *rp.l++);
           break;
         case LUX_FLOAT:
           while (nRepeat--)
@@ -12425,7 +12425,7 @@ void lux_ge(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = ((Int) *lp.w++ >= *rp.l++);
+            *tp.l++ = ((int32_t) *lp.w++ >= *rp.l++);
           break;
         case LUX_FLOAT:
           while (nRepeat--)
@@ -12457,11 +12457,11 @@ void lux_ge(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.l++ = (*lp.l++ >= (Int) *rp.b++);
+            *tp.l++ = (*lp.l++ >= (int32_t) *rp.b++);
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.l++ = (*lp.l++ >= (Int) *rp.w++);
+            *tp.l++ = (*lp.l++ >= (int32_t) *rp.w++);
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -12735,7 +12735,7 @@ void lux_ge_as(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = ((Int) *lp.b++ >= *rp.l);
+            *tp.l++ = ((int32_t) *lp.b++ >= *rp.l);
           break;
         case LUX_FLOAT:
           while (nRepeat--)
@@ -12775,7 +12775,7 @@ void lux_ge_as(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = ((Int) *lp.w++ >= *rp.l);
+            *tp.l++ = ((int32_t) *lp.w++ >= *rp.l);
           break;
         case LUX_FLOAT:
           while (nRepeat--)
@@ -12807,11 +12807,11 @@ void lux_ge_as(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.l++ = (*lp.l++ >= (Int) *rp.b);
+            *tp.l++ = (*lp.l++ >= (int32_t) *rp.b);
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.l++ = (*lp.l++ >= (Int) *rp.w);
+            *tp.l++ = (*lp.l++ >= (int32_t) *rp.w);
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -13064,7 +13064,7 @@ void lux_ge_sa(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = ((Int) *lp.b >= *rp.l++);
+            *tp.l++ = ((int32_t) *lp.b >= *rp.l++);
           break;
         case LUX_FLOAT:
           while (nRepeat--)
@@ -13104,7 +13104,7 @@ void lux_ge_sa(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = ((Int) *lp.w >= *rp.l++);
+            *tp.l++ = ((int32_t) *lp.w >= *rp.l++);
           break;
         case LUX_FLOAT:
           while (nRepeat--)
@@ -13136,11 +13136,11 @@ void lux_ge_sa(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.l++ = (*lp.l >= (Int) *rp.b++);
+            *tp.l++ = (*lp.l >= (int32_t) *rp.b++);
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.l++ = (*lp.l >= (Int) *rp.w++);
+            *tp.l++ = (*lp.l >= (int32_t) *rp.w++);
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -13379,7 +13379,7 @@ void lux_lt(void)
      /* less-than with array operands.  This operator is the mirror image */
      /* of greater-than, so we swap LHS and RHS and pass on to lux_gt() */
 {
-  Int   temp;
+  int32_t   temp;
   pointer       tempp;
   
   temp = lhsType;  lhsType = rhsType;  rhsType = temp;
@@ -13393,7 +13393,7 @@ void lux_lt_as(void)
      /* less-than with array LHS and scalar RHS.  This operand is the */
      /* mirror image of lux_gt_as(), so swap LHS and RHS and use that */
 {
-  Int           temp;
+  int32_t           temp;
   pointer       tempp;
   
   temp = lhsType;  lhsType = rhsType;  rhsType = temp;
@@ -13407,7 +13407,7 @@ void lux_lt_sa(void)
      /* less-than with scalar LHS and array RHS.  This operand is the mirror */
      /* image of lux_gt_sa() so we swap LHS and RHS and use that */
 {
-  Int           temp;
+  int32_t           temp;
   pointer       tempp;
   
   temp = lhsType;  lhsType = rhsType;  rhsType = temp;
@@ -13421,7 +13421,7 @@ void lux_le(void)
      /* less-than with array operands.  Mirror image of lux_ge(), so */
      /* swap operands and use that */
 {
-  Int           temp;
+  int32_t           temp;
   pointer       tempp;
   
   temp = lhsType;  lhsType = rhsType;  rhsType = temp;
@@ -13435,7 +13435,7 @@ void lux_le_as(void)
      /* less-than with array LHS and scalar RHS.  Mirror image of */
      /* lux_ge_as() so swap operands and use that */
 {
-  Int           temp;
+  int32_t           temp;
   pointer       tempp;
   
   temp = lhsType;  lhsType = rhsType;  rhsType = temp;
@@ -13449,7 +13449,7 @@ void lux_le_sa(void)
      /* less-than with scalar LHS and array RHS.  Mirror image of */
      /* lux_ge_sa() so swap operands and use that */
 {
-  Int           temp;
+  int32_t           temp;
   pointer       tempp;
   
   temp = lhsType;  lhsType = rhsType;  rhsType = temp;
@@ -13547,11 +13547,11 @@ void lux_ne(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.l++ = (*lp.l++ != (Int) *rp.b++);
+            *tp.l++ = (*lp.l++ != (int32_t) *rp.b++);
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.l++ = (*lp.l++ != (Int) *rp.w++);
+            *tp.l++ = (*lp.l++ != (int32_t) *rp.w++);
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -13805,7 +13805,7 @@ void lux_ne_as(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = ((Int) *lp.b++ != *rp.l);
+            *tp.l++ = ((int32_t) *lp.b++ != *rp.l);
           break;
         case LUX_FLOAT:
           while (nRepeat--)
@@ -13839,7 +13839,7 @@ void lux_ne_as(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = ((Int) *lp.w++ != *rp.l);
+            *tp.l++ = ((int32_t) *lp.w++ != *rp.l);
           break;
         case LUX_FLOAT:
           while (nRepeat--)
@@ -13865,11 +13865,11 @@ void lux_ne_as(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.l++ = (*lp.l++ != (Int) *rp.b);
+            *tp.l++ = (*lp.l++ != (int32_t) *rp.b);
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.l++ = (*lp.l++ != (Int) *rp.w);
+            *tp.l++ = (*lp.l++ != (int32_t) *rp.w);
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -14044,7 +14044,7 @@ void lux_ne_sa(void)
      /* not-equal-to with scalar LHS and array RHS.  Operator is */
      /* commutative, so swap operands and use lux_ne_as() */
 {
-  Int           temp;
+  int32_t           temp;
   pointer       tempp;
   
   temp = lhsType;  lhsType = rhsType;  rhsType = temp;
@@ -14070,7 +14070,7 @@ void lux_and(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = ((Int) *lp.b++ & *rp.l++);
+            *tp.l++ = ((int32_t) *lp.b++ & *rp.l++);
           break;
         default:
           cerror(ILL_TYPE, rhs, typeName(rhsType));
@@ -14088,7 +14088,7 @@ void lux_and(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = ((Int) *lp.w++ & *rp.l++);
+            *tp.l++ = ((int32_t) *lp.w++ & *rp.l++);
           break;
         default:
           cerror(ILL_TYPE, rhs, typeName(rhsType));
@@ -14098,11 +14098,11 @@ void lux_and(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.l++ = (*lp.l++ & (Int) *rp.b++);
+            *tp.l++ = (*lp.l++ & (int32_t) *rp.b++);
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.l++ = (*lp.l++ & (Int) *rp.w++);
+            *tp.l++ = (*lp.l++ & (int32_t) *rp.w++);
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -14133,7 +14133,7 @@ void lux_and_as(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = ((Int) *lp.b++ & *rp.l);
+            *tp.l++ = ((int32_t) *lp.b++ & *rp.l);
           break;
         default:
           cerror(ILL_TYPE, rhs, typeName(rhsType));
@@ -14151,7 +14151,7 @@ void lux_and_as(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = ((Int) *lp.w++ & *rp.l);
+            *tp.l++ = ((int32_t) *lp.w++ & *rp.l);
           break;
         default:
           cerror(ILL_TYPE, rhs, typeName(rhsType));
@@ -14161,11 +14161,11 @@ void lux_and_as(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.l++ = (*lp.l++ & (Int) *rp.b);
+            *tp.l++ = (*lp.l++ & (int32_t) *rp.b);
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.l++ = (*lp.l++ & (Int) *rp.w);
+            *tp.l++ = (*lp.l++ & (int32_t) *rp.w);
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -14184,7 +14184,7 @@ void lux_and_sa(void)
      /* logical-and with scalar LHS and array RHS.  Operator is commutative, */
      /* so swap operands and use lux_and_as() */
 {
-  Int           temp;
+  int32_t           temp;
   pointer       tempp;
   
   temp = lhsType;  lhsType = rhsType;  rhsType = temp;
@@ -14210,7 +14210,7 @@ void lux_or(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = ((Int) *lp.b++ | *rp.l++);
+            *tp.l++ = ((int32_t) *lp.b++ | *rp.l++);
           break;
         default:
           cerror(ILL_TYPE, rhs, typeName(rhsType));
@@ -14228,7 +14228,7 @@ void lux_or(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = ((Int) *lp.w++ | *rp.l++);
+            *tp.l++ = ((int32_t) *lp.w++ | *rp.l++);
           break;
         default:
           cerror(ILL_TYPE, rhs, typeName(rhsType));
@@ -14238,11 +14238,11 @@ void lux_or(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.l++ = (*lp.l++ | (Int) *rp.b++);
+            *tp.l++ = (*lp.l++ | (int32_t) *rp.b++);
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.l++ = (*lp.l++ | (Int) *rp.w++);
+            *tp.l++ = (*lp.l++ | (int32_t) *rp.w++);
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -14273,7 +14273,7 @@ void lux_or_as(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = ((Int) *lp.b++ | *rp.l);
+            *tp.l++ = ((int32_t) *lp.b++ | *rp.l);
           break;
         default:
           cerror(ILL_TYPE, rhs, typeName(rhsType));
@@ -14291,7 +14291,7 @@ void lux_or_as(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = ((Int) *lp.w++ | *rp.l);
+            *tp.l++ = ((int32_t) *lp.w++ | *rp.l);
           break;
         default:
           cerror(ILL_TYPE, rhs, typeName(rhsType));
@@ -14301,11 +14301,11 @@ void lux_or_as(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.l++ = (*lp.l++ | (Int) *rp.b);
+            *tp.l++ = (*lp.l++ | (int32_t) *rp.b);
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.l++ = (*lp.l++ | (Int) *rp.w);
+            *tp.l++ = (*lp.l++ | (int32_t) *rp.w);
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -14324,7 +14324,7 @@ void lux_or_sa(void)
      /* logical-or with scalar LHS and array RHS.  Operator is */
      /* commutative, so swap operands and use lux_or_as() */
 {
-  Int           temp;
+  int32_t           temp;
   pointer       tempp;
   
   temp = lhsType;  lhsType = rhsType;  rhsType = temp;
@@ -14350,7 +14350,7 @@ void lux_xor(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = ((Int) *lp.b++ ^ *rp.l++);
+            *tp.l++ = ((int32_t) *lp.b++ ^ *rp.l++);
           break;
         default:
           cerror(ILL_TYPE, rhs, typeName(rhsType));
@@ -14368,7 +14368,7 @@ void lux_xor(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = ((Int) *lp.w++ ^ *rp.l++);
+            *tp.l++ = ((int32_t) *lp.w++ ^ *rp.l++);
           break;
         default:
           cerror(ILL_TYPE, rhs, typeName(rhsType));
@@ -14378,11 +14378,11 @@ void lux_xor(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.l++ = (*lp.l++ ^ (Int) *rp.b++);
+            *tp.l++ = (*lp.l++ ^ (int32_t) *rp.b++);
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.l++ = (*lp.l++ ^ (Int) *rp.w++);
+            *tp.l++ = (*lp.l++ ^ (int32_t) *rp.w++);
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -14413,7 +14413,7 @@ void lux_xor_as(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = ((Int) *lp.b++ ^ *rp.l);
+            *tp.l++ = ((int32_t) *lp.b++ ^ *rp.l);
           break;
         default:
           cerror(ILL_TYPE, rhs, typeName(rhsType));
@@ -14431,7 +14431,7 @@ void lux_xor_as(void)
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = ((Int) *lp.w++ ^ *rp.l);
+            *tp.l++ = ((int32_t) *lp.w++ ^ *rp.l);
           break;
         default:
           cerror(ILL_TYPE, rhs, typeName(rhsType));
@@ -14441,11 +14441,11 @@ void lux_xor_as(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.l++ = (*lp.l++ ^ (Int) *rp.b);
+            *tp.l++ = (*lp.l++ ^ (int32_t) *rp.b);
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.l++ = (*lp.l++ ^ (Int) *rp.w);
+            *tp.l++ = (*lp.l++ ^ (int32_t) *rp.w);
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -14464,7 +14464,7 @@ void lux_xor_sa(void)
      /* logical-exlusive-or with scalar LHS and array RHS.  Operator is */
      /* commutative, so swap operands and use lux_xor_as() */
 {
-  Int           temp;
+  int32_t           temp;
   pointer       tempp;
   
   temp = lhsType;  lhsType = rhsType;  rhsType = temp;
@@ -14474,10 +14474,10 @@ void lux_xor_sa(void)
   tempp = lp;  lp = rp;  rp = tempp;
 }
 /*----------------------------------------------------------*/
-Int lux_string_add(void)
+int32_t lux_string_add(void)
      /* add (i.e. concatenate) two strings */
 {
-  Int   result, i;
+  int32_t   result, i;
   
   i = string_size(lhs) + string_size(rhs); /* size of result */
   result = string_scratch(i);   /* get result symbol */
@@ -14511,12 +14511,12 @@ static void (*binFunc_as[])(void) = {
 };
 
 /*----------------------------------------------------------*/
-Int evalScalarBinOp(void)
+int32_t evalScalarBinOp(void)
 /* evaluate binary operation with scalar operands.
  return value: symbol number of newly created output symbol
 */
 {
-  Int   result;
+  int32_t   result;
   
   result = scalar_scratch(topType); /* get symbol for result */
   if (isComplexType(lhsType))
@@ -14536,12 +14536,12 @@ Int evalScalarBinOp(void)
   return result;                        /* done */
 }
 /*----------------------------------------------------------*/
-Int evalScalarArrayBinOp(void)
+int32_t evalScalarArrayBinOp(void)
 /* evaluate binary operation with scalar as left-hand operand and
    array as right-hand operand
    return value: number of newly created output symbol */
 {
-  Int   result;
+  int32_t   result;
   
   if (array_type(rhs) == topType && isFreeTemp(rhs))
     /* we can overwrite the array with the results */
@@ -14560,12 +14560,12 @@ Int evalScalarArrayBinOp(void)
   return result;
 }
 /*----------------------------------------------------------*/
-Int evalArrayScalarBinOp(void)
+int32_t evalArrayScalarBinOp(void)
 /* evaluate binary operation with array as left-hand operand and
  scalar as right-hand operand.  Return value: number of newly created
  output symbol */
 {
-  Int   result;
+  int32_t   result;
   
   if (array_type(lhs) == topType && (isFreeTemp(lhs)))
     /* we can overwrite the array with the results */
@@ -14587,15 +14587,15 @@ Int evalArrayScalarBinOp(void)
 #define ORDINARY        1
 #define SCALAR_LEFT     2
 #define SCALAR_RIGHT    3
-Int evalArrayBinOp(void)
+int32_t evalArrayBinOp(void)
 /* supports "implicit dimensions", i.e. dimensions which are 1 in one of */
 /* the operands and non-1 in the other.  The smaller operand is repeated */
 /* as needed to service all elements of the larger operand. */
 {
-  Int   result, i, nRepeats[MAX_DIMS], action[MAX_DIMS], nAction = 0,
+  int32_t   result, i, nRepeats[MAX_DIMS], action[MAX_DIMS], nAction = 0,
     tally[MAX_DIMS], nCumulR[MAX_DIMS], nCumulL[MAX_DIMS], ndim,
     bigOne;
-  extern Int    pipeSym, pipeExec;
+  extern int32_t    pipeSym, pipeExec;
   
   /* the arrays must have an equal number of dimensions, except for */
   /* possible trailing dimensions of one element */
@@ -14668,7 +14668,7 @@ Int evalArrayBinOp(void)
     (*binFunc[binOp])();
     return result;
   } else {                              /* implicit dimensions */
-    Int lStride, rStride;
+    int32_t lStride, rStride;
     char        done = 0;
     
     /* create result array: first calculate its number of elements */
@@ -14777,10 +14777,10 @@ Int evalArrayBinOp(void)
   }
 }
 /*----------------------------------------------------------*/
-Int evalStringBinOp(void)
+int32_t evalStringBinOp(void)
      /* binary operation with two string arguments */
 {
-  Int   result, i;
+  int32_t   result, i;
   
   lp.s = string_value(lhs);
   rp.s = string_value(rhs);
@@ -14814,10 +14814,10 @@ Int evalStringBinOp(void)
   return result;
 }
 /*----------------------------------------------------------*/
-Int evalSArrayStringBinOp(void)
+int32_t evalSArrayStringBinOp(void)
 /* binary operation with a string and a string array */
 {
-  Int   n, result;
+  int32_t   n, result;
 
   lp.sp = array_data(lhs);
   rp.s = string_value(rhs);
@@ -14861,10 +14861,10 @@ Int evalSArrayStringBinOp(void)
   return result;
 }
 /*----------------------------------------------------------*/
-Int evalStringSArrayBinOp(void)
+int32_t evalStringSArrayBinOp(void)
 /* binary operation with a string and a string array */
 {
-  Int   n, result;
+  int32_t   n, result;
 
   rp.sp = array_data(rhs);
   lp.s = string_value(lhs);
@@ -14908,13 +14908,13 @@ Int evalStringSArrayBinOp(void)
   return result;
 }
 /*----------------------------------------------------------*/
-Int evalScalarRangeBinOp(void)
+int32_t evalScalarRangeBinOp(void)
 /* binary operation on a scalar and a scalar LUX_RANGE symbol */
 /* if range start or end has * - expr notation, then must apply */
 /* operation to minus its value, so that, say, (1:*-10) + 3 yields */
 /* (4:*-7) rather than (4:*-13). */
 {
-  Int   range, result;
+  int32_t   range, result;
   
   range = rhs;
   result = newSymbol(LUX_RANGE, 0, 0);
@@ -14929,7 +14929,7 @@ Int evalScalarRangeBinOp(void)
     topType = rhsType;
   range_start(result) = evalScalarBinOp();
   if (range_start(range) < 0) { /* restore * - expr notation */
-    rhs = (Int) range_start(result);
+    rhs = (int32_t) range_start(result);
     rhs = lux_neg_func(1, &rhs);
     range_start(result) = (int16_t) -rhs;
     embed(-range_start(result), result);
@@ -14946,7 +14946,7 @@ Int evalScalarRangeBinOp(void)
     topType = rhsType;
   range_end(result) = evalScalarBinOp();
   if (range_end(range) < 0) {   /* restore * - expr notation */
-    rhs = (Int) range_end(result);
+    rhs = (int32_t) range_end(result);
     rhs = lux_neg_func(1, &rhs);
     range_end(result) = (int16_t) -rhs;
     embed(-range_end(result), result);
@@ -14955,11 +14955,11 @@ Int evalScalarRangeBinOp(void)
   return result;
 }
 /*----------------------------------------------------------*/
-Int evalRangeScalarBinOp(void)
+int32_t evalRangeScalarBinOp(void)
      /* binary operation on a scalar and a scalar LUX_RANGE symbol */
 {
-  Int   range, result;
-  Int   newSymbol(Int, ...);
+  int32_t   range, result;
+  int32_t   newSymbol(int32_t, ...);
   
   range = lhs;
   result = newSymbol(LUX_RANGE, 0, 0);
@@ -14974,7 +14974,7 @@ Int evalRangeScalarBinOp(void)
     topType = lhsType;
   range_start(result) = evalScalarBinOp();
   if (range_start(range) < 0) { /* restore * - expr notation */
-    lhs = (Int) range_start(result);
+    lhs = (int32_t) range_start(result);
     lhs = lux_neg_func(1, &lhs);
     range_start(result) = (int16_t) -lhs;
     embed(-range_start(result), result);
@@ -14991,7 +14991,7 @@ Int evalRangeScalarBinOp(void)
     topType = lhsType;
   range_end(result) = evalScalarBinOp();
   if (range_end(range) < 0) {   /* restore * - expr notation */
-    lhs = (Int) range_end(result);
+    lhs = (int32_t) range_end(result);
     lhs = lux_neg_func(1, &lhs);
     range_end(result) = (int16_t) -lhs;
     embed(-range_end(result), result);
@@ -15000,14 +15000,14 @@ Int evalRangeScalarBinOp(void)
   return result;
 }
 /*----------------------------------------------------------*/
-Int extractListElem(Int base, Int index, char *key, Int write)
+int32_t extractListElem(int32_t base, int32_t index, char *key, int32_t write)
 /* returns the number of the symbol that <arg> points at in
    the CLIST or LIST <base>.  If <base> is negative, then
    <index> is the numerical tag; otherwise <key> is the string tag.
    LS 14sep98 */
 {
-  Int   i, n;
-  Int   eval(Int), copySym(Int), installString(char *);
+  int32_t   i, n;
+  int32_t   eval(int32_t), copySym(int32_t), installString(char *);
   
   if (base < 0)                 /* numerical tag */
     base = -base;
@@ -15081,7 +15081,7 @@ Int extractListElem(Int base, Int index, char *key, Int write)
   }
 }
 /*----------------------------------------------------------*/
-Int evalListPtr(Int symbol)
+int32_t evalListPtr(int32_t symbol)
      /* evaluates pointers to elements of structures, lists, */
      /* ranges, and enums, and also pointers to local variables */
      /* in user functions, routines, and block-routines */
@@ -15089,7 +15089,7 @@ Int evalListPtr(Int symbol)
      /* (for LISTs, and RANGEs) because the same */
      /* element may be pointed at more than once. */
 {
-  Int   base, index = -1, n;
+  int32_t   base, index = -1, n;
   char  *key;
   
   base = list_ptr_target(symbol); /* the enveloping structure */
@@ -15106,12 +15106,12 @@ Int evalListPtr(Int symbol)
   return n;
 }
 /*----------------------------------------------------------*/
-Int evalStructPtr(Int symbol)
+int32_t evalStructPtr(int32_t symbol)
 /* evaluates <symbol> as a STRUCT_PTR */
 {
   return luxerror("evaluation of structure pointers not yet implemented", symbol);
 #if IMPLEMENTED
-  Int   target, result, n, i, nout, one = 1, outdims[MAX_DIMS], outndim = 0,
+  int32_t   target, result, n, i, nout, one = 1, outdims[MAX_DIMS], outndim = 0,
     *dims, ndim, nms, i1, i2, j, k, nelem, *p, ne, type, total_ndim;
   structElem    *se;
   structPtr     *spe;
@@ -15244,18 +15244,18 @@ Int evalStructPtr(Int symbol)
 #endif
 }
 /*----------------------------------------------------------*/
-Int evalLhs(symbol)
+int32_t evalLhs(symbol)
 /* evaluate <symbol> as a left-hand side of an assignment: resolves
    TRANSFERs and finds the member of LISTs that is pointed at.
    Returns an LUX_EXTRACT symbol wherein the head is a simple variable.
    LS 7jan99 */
 {
-  Int   target, kind, depth, nitem, class, modified, result, n, special, j;
+  int32_t   target, kind, depth, nitem, class, modified, result, n, special, j;
   extractSec    *eptr, *tptr;
   char  **sptr, *name, *p;
-  Int   findTarget(char *, Int *, Int);
+  int32_t   findTarget(char *, int32_t *, int32_t);
   void  *v;
-  extern Int    eval_func,  /* function number of EVAL function */
+  extern int32_t    eval_func,  /* function number of EVAL function */
     d_r_sym, r_d_sym;           /* symbol numbers of #D.R and #R.D */
 
   switch (symbol_class(symbol)) {
@@ -15448,7 +15448,7 @@ Int evalLhs(symbol)
               }
               break;
             case LUX_LIST:
-            { Int       i;
+            { int32_t       i;
 
               for (i = 0; i < list_num_symbols(target); i++)
                 if (!strcmp(list_key(target, i), *sptr))
@@ -15472,17 +15472,17 @@ Int evalLhs(symbol)
   return luxerror("Unexpected exit from evalLhs()", symbol);
 } /* end of evalLhs() */
 /*----------------------------------------------------------*/
-Int evalExtractRhs(Int symbol)
+int32_t evalExtractRhs(int32_t symbol)
 /* evaluate LUX_EXTRACT symbol as rhs */
 {
-  Int   target, class, depth, result, n, nitem, i, kind, special, allowSubr,
+  int32_t   target, class, depth, result, n, nitem, i, kind, special, allowSubr,
     j, k, *ip;
-  Int   findTarget(char *, Int *, Int), getBody(Int);
+  int32_t   findTarget(char *, int32_t *, int32_t), getBody(int32_t);
   int16_t  *wptr;
   extractSec    *eptr;
   char  **sptr;
   pointer       p, q, r;
-  extern Int    d_r_sym, r_d_sym;
+  extern int32_t    d_r_sym, r_d_sym;
   structElem    *se;
   structPtr     *spe;
   structPtrMember       *spm;
@@ -16008,27 +16008,27 @@ Int evalExtractRhs(Int symbol)
                     /* assume the data type is real! */
                     spm->type = LUX_ARRAY;
                     k = spm->data.array.n_elem = array_size(i);
-                    ip = spm->data.array.ptr = malloc(k*sizeof(Int));
+                    ip = spm->data.array.ptr = malloc(k*sizeof(int32_t));
                     p.v = array_data(i);
                     switch (array_type(i)) {
                       case LUX_BYTE:
                         while (k--)
-                          *ip++ = (Int) *p.b++;
+                          *ip++ = (int32_t) *p.b++;
                         break;
                       case LUX_WORD:
                         while (k--)
-                          *ip++ = (Int) *p.w++;
+                          *ip++ = (int32_t) *p.w++;
                         break;
                       case LUX_LONG:
-                        memcpy(ip, p.l, k*sizeof(Int));
+                        memcpy(ip, p.l, k*sizeof(int32_t));
                         break;
                       case LUX_FLOAT:
                         while (k--)
-                          *ip++ = (Int) *p.f++;
+                          *ip++ = (int32_t) *p.f++;
                         break;
                       case LUX_DOUBLE:
                         while (k--)
-                          *ip++ = (Int) *p.d++;
+                          *ip++ = (int32_t) *p.d++;
                         break;
                     }
                     break;
@@ -16080,18 +16080,18 @@ Int evalExtractRhs(Int symbol)
   return luxerror("Unexpected exit from extractRhsSymbol", symbol);
 }
 /*----------------------------------------------------------*/
-Int eval(Int symbol)
+int32_t eval(int32_t symbol)
      /* evaluates the symbol.  classes PRE_XXX */
      /* contain unevaluated member symbols.  classes XXX */
      /* only contain evaluated member symbols. */
 {
-  Int   n, thisLhs, thisRhs, result, i;
+  int32_t   n, thisLhs, thisRhs, result, i;
   char  isScalarRange, offsetEnd;
-  extern Int    tempSym,        /* symbol number of !TEMP */
+  extern int32_t    tempSym,        /* symbol number of !TEMP */
         tempVariableIndex,
         pipeExec,       /* pipe executable */
         pipeSym;        /* pipe symbol */
-  Int   namevar(Int, Int), transfer(Int);
+  int32_t   namevar(int32_t, int32_t), transfer(int32_t);
   void  updateIndices(void);
   
   if (symbol == LUX_ERROR)              /* some error */
@@ -16534,9 +16534,9 @@ Int eval(Int symbol)
     return cerror(-1, symbol);
 }
 /*----------------------------------------------------------*/
-Int evals(Int nsym)
+int32_t evals(int32_t nsym)
      /* always evaluate LUX_SCAL_PTR to LUX_SCALAR or LUX_TEMP_STRING */
-{ Int   temp;
+{ int32_t   temp;
   
   temp = evalScalPtr;
   evalScalPtr = 1;
@@ -16547,14 +16547,14 @@ Int evals(Int nsym)
 /*----------------------------------------------------------*/
 #define UNKNOWN -1
 #define NEXT -2
-branchInfo checkBranch(Int lhs, Int rhs)
+branchInfo checkBranch(int32_t lhs, int32_t rhs)
      /* determines at what level in the assignment <lhs> = <rhs> the <lhs> can */
      /* be used for storage of intermediate results */
 {
   branchInfo    result = { 0, 0, 0, 0}, branch1, branch2;
-  static Int    depth, lhsSize;
+  static int32_t    depth, lhsSize;
   int16_t  *args;
-  Int   n;
+  int32_t   n;
   
   if (!rhs)                     /* initialization */
   { depth = 0;
@@ -16690,8 +16690,8 @@ branchInfo checkBranch(Int lhs, Int rhs)
   return result;
 }
 /*----------------------------------------------------------*/
-Int     pipeExec = 0, pipeSym = 0;
-branchInfo checkTree(Int lhs, Int rhs)
+int32_t     pipeExec = 0, pipeSym = 0;
+branchInfo checkTree(int32_t lhs, int32_t rhs)
 {
   branchInfo    result;
   

@@ -31,7 +31,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <X11/Xutil.h>		/* for XVisualInfo */
 
 Display		*display;
-Int		screen_num, connect_flag = 0, private_colormap = 0,
+int32_t		screen_num, connect_flag = 0, private_colormap = 0,
   threeColors = 0, foreground_pixel, colormin, colormax, nColors,
   select_visual = 0, bits_per_rgb, bits_per_pixel, colorIndexType,
   visualClass;
@@ -46,8 +46,8 @@ XColor		*colors;
 GC	gcnot;
 Atom	wm_delete;
 
-Int	xerr(Display *, XErrorEvent *), selectVisual(void);
-XColor	*anaFindBestRGB(XColor *color, Int mode);
+int32_t	xerr(Display *, XErrorEvent *), selectVisual(void);
+XColor	*anaFindBestRGB(XColor *color, int32_t mode);
 Status	anaAllocNamedColor(char *, XColor **);
 
 #define FBRGB_RAMP		1 /* color ramp */
@@ -135,7 +135,7 @@ char	*visualNames[] = { "StaticGray", "GrayScale", "StaticColor",
 			   "PseudoColor", "TrueColor", "DirectColor" };
 
 
-Int setup_x_visual(Int desiredVisualClass)
+int32_t setup_x_visual(int32_t desiredVisualClass)
 /* tries to open a connection to the X server and initializes a grey ramp */
 /* colormap.  Returns LUX_OK and sets connect_flag to 1 on success; */
 /* returns LUX_ERROR and sets connect_flag to 0 on failure.  If connect_flag */
@@ -143,9 +143,9 @@ Int setup_x_visual(Int desiredVisualClass)
 /* routine returns LUX_OK immediately.  Sets some of the globals. */
 /* LS 12mar99 */
 {
-  extern Int	scalemin, scalemax;
+  extern int32_t	scalemin, scalemax;
   Window	win;
-  Int	i, j;
+  int32_t	i, j;
   XColor	*tempColor, rgb;
   unsigned long	n;
   extern char	*display_name;
@@ -232,7 +232,7 @@ Int setup_x_visual(Int desiredVisualClass)
   /* we may need more than 8 bits to specify a color index */
   if (depth <= 8*sizeof(uint8_t))
     colorIndexType = LUX_BYTE;
-  else if (depth <= 8*sizeof(Int))
+  else if (depth <= 8*sizeof(int32_t))
     colorIndexType = LUX_WORD;
   else if (depth <= 8*sizeof(int64_t))
     colorIndexType = LUX_LONG;
@@ -491,7 +491,7 @@ Int setup_x_visual(Int desiredVisualClass)
   return LUX_OK;
 }
 /*-------------------------------------------------------------------------*/
-Int setup_x(void)
+int32_t setup_x(void)
 {
   return setup_x_visual(-1);
 }
@@ -511,12 +511,12 @@ void disconnect_x(void)
   free(colors);
 }
 /*-------------------------------------------------------------------------*/
-Int selectVisual(void)
+int32_t selectVisual(void)
 /* allow the user to select a visual */
 {
   XVisualInfo	*vInfo, vTemplate;
-  Int	nVisual, i, mask, j;
-  Int	getNewLine(char *, size_t, char *, char);
+  int32_t	nVisual, i, mask, j;
+  int32_t	getNewLine(char *, size_t, char *, char);
   uint32_t	r, x;
   char	*name;
 
@@ -590,11 +590,11 @@ Int selectVisual(void)
   return LUX_OK;
 }
 /*-------------------------------------------------------------------------*/
-Int nextFreeColorsIndex(void)
+int32_t nextFreeColorsIndex(void)
 /* returns an index to a free colors[] element. */
 /* NOTE: this routine assumes there is such an element! */
 {
-  static Int	index = 0;
+  static int32_t	index = 0;
 
   while (colors[index].flags) {
     index++;
@@ -604,11 +604,11 @@ Int nextFreeColorsIndex(void)
   return index;
 }
 /*-------------------------------------------------------------------------*/
-void installPixel(Int pixel)
+void installPixel(int32_t pixel)
 /* installs the indicated pixel value as one incidental color in the */
 /* colors[] database if it does not already exist there. */
 {
-  Int	i;
+  int32_t	i;
 
   for (i = nColors; i < nColorCells; i++)
     if (colors[i].pixel == pixel)
@@ -644,7 +644,7 @@ Status anaAllocNamedColor(char *colorName, XColor **return_color)
   unsigned long	pixel;
   XColor	color, color2, *bestcolor;
   static XColor	rcolor;
-  Int	index;
+  int32_t	index;
 
   if (visual->class == GrayScale || visual->class == PseudoColor) {
     /* figure out which RGB values to store */
@@ -714,7 +714,7 @@ Status anaAllocNamedColor(char *colorName, XColor **return_color)
   return 1;
 }
 /*-------------------------------------------------------------------------*/
-XColor *anaFindBestRGB(XColor *color, Int mode)
+XColor *anaFindBestRGB(XColor *color, int32_t mode)
 /* finds the color in the current colormap that has RGB values closest to */
 /* those in <color>, and returns a pointer to the associated color. */
 /* <mode> is the logical sum of: */
@@ -769,8 +769,8 @@ XColor *anaFindBestRGB(XColor *color, Int mode)
   } /* end of if (visualPrimariesAreSeparate(visual->class)) else */
 }
 /*-------------------------------------------------------------------------*/
-void storeColorTable(float *red, float *green, float *blue, Int nelem,
-		     Int stretch)
+void storeColorTable(float *red, float *green, float *blue, int32_t nelem,
+		     int32_t stretch)
 /* stores a new color table in LUX's color map. */
 /* <red>: points at an array of red color intensities between 0 and 1 */
 /* <green>: points at an array of green color intensities between 0 and 1 */
@@ -798,14 +798,14 @@ void storeColorTable(float *red, float *green, float *blue, Int nelem,
       for (i = 0; i < n; i++) {
 	j = (i*k2)/k1;
 	colors[i].red = colors[i].green = colors[i].blue =
-	  ((Int) floor((red[j] + green[j] + blue[j])/3.0*0xffff)) & 0xffff;
+	  ((int32_t) floor((red[j] + green[j] + blue[j])/3.0*0xffff)) & 0xffff;
       }
     else
       for (i = 0; i < n; i++) {
 	j = (i*k2)/k1;
-	colors[i].red = ((Int) floor(red[j]*0xffff)) & 0xffff;
-	colors[i].blue = ((Int) floor(blue[j]*0xffff)) & 0xffff;
-	colors[i].green = ((Int) floor(green[j]*0xffff)) & 0xffff;
+	colors[i].red = ((int32_t) floor(red[j]*0xffff)) & 0xffff;
+	colors[i].blue = ((int32_t) floor(blue[j]*0xffff)) & 0xffff;
+	colors[i].green = ((int32_t) floor(green[j]*0xffff)) & 0xffff;
       }
     XStoreColors(display, colorMap, colors, n);
     XFlush(display);
@@ -815,24 +815,24 @@ void storeColorTable(float *red, float *green, float *blue, Int nelem,
       for (i = 0; i < display_cells; i++) {
 	j = (i*k2)/k1;
 	rgb.red = rgb.green = rgb.blue =
-	  ((Int) floor((red[j] + green[j] + blue[j])/3.0*0xffff)) & 0xffff;
+	  ((int32_t) floor((red[j] + green[j] + blue[j])/3.0*0xffff)) & 0xffff;
 	XAllocColor(display, colorMap, &rgb);
 	pixels[i] = rgb.pixel;
       }
     else
       for (i = 0; i < display_cells; i++) {
 	j = (i*k2)/k1;
-	rgb.red = ((Int) floor(red[j]*0xffff)) & 0xffff;
-	rgb.blue = ((Int) floor(blue[j]*0xffff)) & 0xffff;
-	rgb.green = ((Int) floor(green[j]*0xffff)) & 0xffff;
+	rgb.red = ((int32_t) floor(red[j]*0xffff)) & 0xffff;
+	rgb.blue = ((int32_t) floor(blue[j]*0xffff)) & 0xffff;
+	rgb.green = ((int32_t) floor(green[j]*0xffff)) & 0xffff;
 	XAllocColor(display, colorMap, &rgb);
 	pixels[i] = rgb.pixel;
       }
   }
 }
 /*-------------------------------------------------------------------------*/
-Int	ck_window(Int);
-Int getXcolor(char *colorname, XColor *color, Int alloc)
+int32_t	ck_window(int32_t);
+int32_t getXcolor(char *colorname, XColor *color, int32_t alloc)
 /* looks for the named color in the current colormap.  Returns the found */
 /* color in <color>, which must be predefined.  If <alloc> is non-zero, then */
 /* the color is placed in the current colormap.   Currently, no checks are */
@@ -841,9 +841,9 @@ Int getXcolor(char *colorname, XColor *color, Int alloc)
 /* LS 12mar99 */
 {
   XColor	color2, *pcolor;
-  extern Int	last_wid;
+  extern int32_t	last_wid;
   extern GC	gc[], gcmap[];
-  Int	lux_xcreat(Int, uint32_t, uint32_t, Int, Int, Int, char *,
+  int32_t	lux_xcreat(int32_t, uint32_t, uint32_t, int32_t, int32_t, int32_t, char *,
 		   char *);
   extern Window	win[];
   extern Pixmap	maps[];
@@ -870,7 +870,7 @@ Int getXcolor(char *colorname, XColor *color, Int alloc)
     return XLookupColor(display, colorMap, colorname, &color2, color);
 }
 /*-------------------------------------------------------------------------*/
-Int threecolors(float *list, Int n)
+int32_t threecolors(float *list, int32_t n)
 /* If <n> is 0 or if <n> is 1 and <*list> is 0, then a standard
    greyscale table is installed; otherwise if <n> is 1 or 9 then a
    three-color color table is installed.  If <n> is 9, then the numbers
@@ -887,7 +887,7 @@ Int threecolors(float *list, Int n)
    LS 12nov98 */
 {
   float	factor, tlist[9], off[3], fac[3];
-  Int	i, j;
+  int32_t	i, j;
 
   switch (n) {
     case 0:			/* uninstall */
@@ -997,16 +997,16 @@ Int threecolors(float *list, Int n)
   return LUX_OK;
 }
 /*---------------------------------------------------------*/
-Int lux_colorComponents(Int narg, Int ps[])
+int32_t lux_colorComponents(int32_t narg, int32_t ps[])
 /* colorcomponents,pixels,r,g,b */
 /* takes raw pixel values <pixels> and returns the relative red, green, */
 /* and blue components in <r>, <g>, and <b>, which range between 0 and 255. */
 /* <pixels> must have type */
 {
   uint8_t	*data;
-  Int *q1, *q2, *q3;
+  int32_t *q1, *q2, *q3;
   uint8_t	*red, *green, *blue;
-  Int	nelem, i, step, pix;
+  int32_t	nelem, i, step, pix;
   XColor	*color;
 
   if (!symbolIsNumericalArray(ps[0]))
@@ -1035,7 +1035,7 @@ Int lux_colorComponents(Int narg, Int ps[])
 
   switch (visual->class) {
   case PseudoColor: case GrayScale: case StaticColor: case StaticGray:
-    q1 = malloc(display_cells*sizeof(Int));
+    q1 = malloc(display_cells*sizeof(int32_t));
     if (!q1)
       return cerror(ALLOC_ERR, 0);
     for (i = 0; i < display_cells; i++)
@@ -1052,9 +1052,9 @@ Int lux_colorComponents(Int narg, Int ps[])
     free(q1);
     break;
   case DirectColor:
-    q1 = malloc(display_cells*sizeof(Int));
-    q2 = malloc(display_cells*sizeof(Int));
-    q3 = malloc(display_cells*sizeof(Int));
+    q1 = malloc(display_cells*sizeof(int32_t));
+    q2 = malloc(display_cells*sizeof(int32_t));
+    q3 = malloc(display_cells*sizeof(int32_t));
     if (!q1 || !q2 || !q3)
       return cerror(ALLOC_ERR, 0);
     for (i = 0; i < nColors; i++) {
@@ -1086,15 +1086,15 @@ Int lux_colorComponents(Int narg, Int ps[])
   return LUX_OK;
 }
 /*---------------------------------------------------------*/
-Int lux_pixelsto8bit(Int narg, Int ps[])
+int32_t lux_pixelsto8bit(int32_t narg, int32_t ps[])
  /* pixelsto8bit,pixels,bits,colormap
     returns 8-bit pixel values in <bits> and a color map in <colormap>
     based on the pixel values in <pixels>.  
   */
 {
-  Int result, ncolors, iq;
-  Int lux_tolookup(Int, Int *);
-  Int lux_byte_inplace(Int, Int *);
+  int32_t result, ncolors, iq;
+  int32_t lux_tolookup(int32_t, int32_t *);
+  int32_t lux_byte_inplace(int32_t, int32_t *);
 
   if (!symbolIsNumericalArray(ps[0]))
     return cerror(ILL_CLASS, ps[0]);
@@ -1112,10 +1112,10 @@ Int lux_pixelsto8bit(Int narg, Int ps[])
     return result;
   ncolors = array_size(ps[1]);
   if (ncolors <= 256) {
-    Int dims[2] = { 3, 256 };
-    Int i, pix;
+    int32_t dims[2] = { 3, 256 };
+    int32_t i, pix;
     uint8_t *p, *q;
-    Int *q1, step, *q2, *q3;
+    int32_t *q1, step, *q2, *q3;
 
     /* we can use the indices from tolookup if we convert them to LUX_BYTE */
     if (lux_byte_inplace(1, ps + 2) == LUX_ERROR
@@ -1126,7 +1126,7 @@ Int lux_pixelsto8bit(Int narg, Int ps[])
     step = bits_per_pixel/8;
     switch (visual->class) {
     case PseudoColor: case GrayScale: case StaticColor: case StaticGray:
-      q1 = malloc(display_cells*sizeof(Int));
+      q1 = malloc(display_cells*sizeof(int32_t));
       if (!q1) {
 	cerror(ALLOC_ERR, 0);
 	goto error_1;
@@ -1135,7 +1135,7 @@ Int lux_pixelsto8bit(Int narg, Int ps[])
 	if (colors[i].flags & (DoRed | DoGreen | DoBlue))
 	  q1[colors[i].pixel] = i;
       for (i = 0; i < ncolors; i++) {
-	Int pix;
+	int32_t pix;
 	XColor *color;
 
 	memcpy(&pix, p, step);
@@ -1153,9 +1153,9 @@ Int lux_pixelsto8bit(Int narg, Int ps[])
       }
       break;
     case DirectColor:
-      q1 = malloc(display_cells*sizeof(Int));
-      q2 = malloc(display_cells*sizeof(Int));
-      q3 = malloc(display_cells*sizeof(Int));
+      q1 = malloc(display_cells*sizeof(int32_t));
+      q2 = malloc(display_cells*sizeof(int32_t));
+      q3 = malloc(display_cells*sizeof(int32_t));
       if (!q1 || !q2 || !q3) {
 	free(q1);
 	free(q2);
@@ -1211,15 +1211,15 @@ Int lux_pixelsto8bit(Int narg, Int ps[])
   return LUX_ERROR;
 }
 /*---------------------------------------------------------*/
-Int lux_colorstogrey(Int narg, Int ps[])
+int32_t lux_colorstogrey(int32_t narg, int32_t ps[])
 /* colorstogrey,pixels
    takes raw pixel values and replaces them by the corresponding grey
    scale values, which range between 0 and 255.
    LS 2003mar08 */
 {
-  Int *q1, *q2, *q3, i;
+  int32_t *q1, *q2, *q3, i;
   uint8_t *data;
-  Int nelem, red, green, blue, grey, pix = 0, step;
+  int32_t nelem, red, green, blue, grey, pix = 0, step;
   XColor *color;
     
   if (!symbolIsNumericalArray(ps[0]))
@@ -1233,7 +1233,7 @@ Int lux_colorstogrey(Int narg, Int ps[])
   step = bits_per_pixel/8;
   switch (visual->class) {
   case PseudoColor: case GrayScale: case StaticColor: case StaticGray:
-    q1 = malloc(display_cells*sizeof(Int));
+    q1 = malloc(display_cells*sizeof(int32_t));
     if (!q1)
       return cerror(ALLOC_ERR, 0);
     for (i = 0; i < display_cells; i++)
@@ -1252,9 +1252,9 @@ Int lux_colorstogrey(Int narg, Int ps[])
     free(q1);
     break;
   case DirectColor:
-    q1 = malloc(display_cells*sizeof(Int));
-    q2 = malloc(display_cells*sizeof(Int));
-    q3 = malloc(display_cells*sizeof(Int));
+    q1 = malloc(display_cells*sizeof(int32_t));
+    q2 = malloc(display_cells*sizeof(int32_t));
+    q3 = malloc(display_cells*sizeof(int32_t));
     if (!q1 || !q2 || !q3)
       return cerror(ALLOC_ERR, 0);
     for (i = 0; i < nColors; i++) {

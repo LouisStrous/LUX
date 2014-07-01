@@ -27,11 +27,10 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "install.h"
 #endif
 
-#include "types.h"
-
-#include <stdio.h>
-#include <stdarg.h>
 #include <gsl/gsl_spline.h>
+#include <stdarg.h>
+#include <stdint.h>
+#include <stdio.h>
 
         /* tLine code */
 #define TRANS_FIXED_STRING      1
@@ -378,7 +377,7 @@ typedef enum {
 #define SP_SUBR         (SP_USER_SUBR + SP_INT_SUBR)
 #define SP_ANY          (SP_VAR + SP_FUNC + SP_SUBR)
 
-#define scratSize()     (NSCRAT*sizeof(Int) + (curScrat - (char *) scrat))
+#define scratSize()     (NSCRAT*sizeof(int32_t) + (curScrat - (char *) scrat))
 
 /** \struct a single-precision complex number */
 typedef struct {
@@ -397,19 +396,19 @@ typedef union {
   
 /** \union a union of scalar values */
 typedef union {
-  uint8_t b; int16_t w; Int l; float f; double d; char *s; char **sp;
+  uint8_t b; int16_t w; int32_t l; float f; double d; char *s; char **sp;
 } scalar;
 
 /* wideScalar is equal to scalar plus the complex data types; we have */
 /* separate scalar and wideScalars because wideScalar is wider, which is */
 /* not always desirable. */
 typedef union {
-  uint8_t b; int16_t w; Int l; float f; double d; floatComplex cf;
+  uint8_t b; int16_t w; int32_t l; float f; double d; floatComplex cf;
   doubleComplex cd; char *s; char **sp;
 } wideScalar;
 
 typedef union pointerUnion {
-  uint8_t *b; int16_t *w; Int *l; float *f; double *d; char *s;
+  uint8_t *b; int16_t *w; int32_t *l; float *f; double *d; char *s;
   char **sp; void *v; floatComplex *cf; doubleComplex *cd;
 } pointer;
 
@@ -418,12 +417,12 @@ typedef struct {
 } listElem;
 
 typedef struct {
-  char *key; Int value;
+  char *key; int32_t value;
 } enumElem;
 
 typedef struct {
   char suppressEval; char pipe; char suppressUnused;
-  Int defaultMode; uint8_t offset; char **keys;
+  int32_t defaultMode; uint8_t offset; char **keys;
 } keyList;
 
 /* kinds of facts */
@@ -438,32 +437,32 @@ enum {
 #define LUX_STAT_FACTS_SDEV     (1<<2)
 
 typedef struct {
-  Int min; Int max; Int minloc; Int maxloc; double total; double sdev;
+  int32_t min; int32_t max; int32_t minloc; int32_t maxloc; double total; double sdev;
 } statFacts_b;
 
 typedef struct {
-  int16_t min; int16_t max; Int minloc; Int maxloc; double total; double sdev;
+  int16_t min; int16_t max; int32_t minloc; int32_t maxloc; double total; double sdev;
 } statFacts_w;
 
 typedef struct {
-  Int min; Int max; Int minloc; Int maxloc; double total; double sdev;
+  int32_t min; int32_t max; int32_t minloc; int32_t maxloc; double total; double sdev;
 } statFacts_l;
 
 typedef struct {
-  float min; float max; Int minloc; Int maxloc; double total; double sdev;
+  float min; float max; int32_t minloc; int32_t maxloc; double total; double sdev;
 } statFacts_f;
 
 typedef struct {
-  double min; double max; Int minloc; Int maxloc; double total; double sdev;
+  double min; double max; int32_t minloc; int32_t maxloc; double total; double sdev;
 } statFacts_d;
 
 typedef struct {
-  floatComplex min; floatComplex max; Int minloc; Int maxloc;
+  floatComplex min; floatComplex max; int32_t minloc; int32_t maxloc;
   doubleComplex total; double sdev;
 } statFacts_cf;
 
 typedef struct {
-  doubleComplex min; doubleComplex max; Int minloc; Int maxloc;
+  doubleComplex min; doubleComplex max; int32_t minloc; int32_t maxloc;
   doubleComplex total; double sdev;
 } statFacts_cd;
 
@@ -486,26 +485,26 @@ typedef struct {
 } arrayFacts;
 
 typedef struct arrayStruct {
-  uint8_t ndim, c1, c2, nfacts; Int dims[MAX_DIMS]; arrayFacts *facts;
+  uint8_t ndim, c1, c2, nfacts; int32_t dims[MAX_DIMS]; arrayFacts *facts;
 } array;
 
 struct boundsStruct {
-  struct { uint8_t b; int16_t w; Int l; float f; double d; } min;
-  struct { uint8_t b; int16_t w; Int l; float f; double d; } max;
+  struct { uint8_t b; int16_t w; int32_t l; float f; double d; } min;
+  struct { uint8_t b; int16_t w; int32_t l; float f; double d; } max;
 };
 
 typedef struct structElemStruct {
   union {
     struct {
-      Int nelem; Int size; Int *dims; uint8_t ndim;
+      int32_t nelem; int32_t size; int32_t *dims; uint8_t ndim;
     } first;
     struct {
       char *tag; off_t offset; uint8_t type;
       union {
         struct {
-          Int *dims; uint8_t ndim;
+          int32_t *dims; uint8_t ndim;
         } singular;
-        Int member;
+        int32_t member;
       } spec;
     } regular;
   } u;
@@ -521,22 +520,22 @@ typedef struct {
   uint8_t  type;                   /* subscript type: scalar, range, index */
   union {
     struct {
-      Int       value;          /* the single integer subscript */
+      int32_t       value;          /* the single integer subscript */
     } scalar;
     struct {
-      Int       start;          /* the integer range start */
-      Int       end;            /* the integer range end */
+      int32_t       start;          /* the integer range start */
+      int32_t       end;            /* the integer range end */
     } range;
     struct {
-      Int       n_elem;         /* the number of index array elements */
-      Int       *ptr;           /* pointer to the index array elements */
+      int32_t       n_elem;         /* the number of index array elements */
+      int32_t       *ptr;           /* pointer to the index array elements */
     } array;
   } data;
 } structPtrMember;
 
 typedef struct structPtrStruct {
-  Int   desc;                   /* index of structure descriptor */
-  Int   n_subsc;                /* number of subscripts */
+  int32_t   desc;                   /* index of structure descriptor */
+  int32_t   n_subsc;                /* number of subscripts */
   structPtrMember       *member;
 } structPtr;
         
@@ -546,20 +545,20 @@ typedef struct {
 } preExtract;
 
 typedef struct symTableEntryStruct {
- uint8_t class; uint8_t type; int16_t xx; Int line; int16_t context; Int exec;
+ uint8_t class; uint8_t type; int16_t xx; int32_t line; int16_t context; int32_t exec;
   union specUnion
   { scalar scalar;
-    struct { array      *ptr; Int bstore; } array;
-    struct { int16_t       *ptr; Int bstore; } wlist;
-    struct { uint16_t      *ptr; Int bstore; } uwlist;
-    struct { enumElem   *ptr; Int bstore; } enumElem;
-    struct { char       *ptr; Int bstore; } name;
-    struct { listElem   *ptr; Int bstore; } listElem;
-    struct { Int        *ptr; Int bstore; } intList;
-    struct { extractSec *ptr; Int bstore; } extract;
-    struct { preExtract *ptr; Int bstore; } preExtract;
-    struct { void       *ptr; Int bstore; } general;
-    struct { structPtr  *ptr; Int bstore; } structPtr;
+    struct { array      *ptr; int32_t bstore; } array;
+    struct { int16_t       *ptr; int32_t bstore; } wlist;
+    struct { uint16_t      *ptr; int32_t bstore; } uwlist;
+    struct { enumElem   *ptr; int32_t bstore; } enumElem;
+    struct { char       *ptr; int32_t bstore; } name;
+    struct { listElem   *ptr; int32_t bstore; } listElem;
+    struct { int32_t        *ptr; int32_t bstore; } intList;
+    struct { extractSec *ptr; int32_t bstore; } extract;
+    struct { preExtract *ptr; int32_t bstore; } preExtract;
+    struct { void       *ptr; int32_t bstore; } general;
+    struct { structPtr  *ptr; int32_t bstore; } structPtr;
     pointer     pointer;  
     struct { int16_t args[4]; } evb;
     struct { uint16_t args[4]; } uevb;
@@ -569,26 +568,26 @@ typedef struct symTableEntryStruct {
 } symTableEntry;
 
 typedef struct hashTableEntryStruct {
-  char *name; Int symNum; struct hashTableEntryStruct *next;
+  char *name; int32_t symNum; struct hashTableEntryStruct *next;
 } hashTableEntry;
 
 typedef struct internalRoutineStruct {
-  char *name; int16_t minArg; int16_t maxArg; Int (*ptr)(Int, Int []); void *keys;
+  char *name; int16_t minArg; int16_t maxArg; int32_t (*ptr)(int32_t, int32_t []); void *keys;
 } internalRoutine;
 
 typedef struct {
- Int    synch_pattern;
+ int32_t    synch_pattern;
  uint8_t   subf, source, nhb, datyp, ndim, free1, cbytes[4], free[178];
- Int    dim[16];
+ int32_t    dim[16];
  char   txt[256];
 } fzHead;
 
 typedef struct {
-  Int symbol;  char kind; char mode;
+  int32_t symbol;  char kind; char mode;
 } debugItem;
 
 typedef struct {
-  Int depth, symbol, size;  char containLHS;
+  int32_t depth, symbol, size;  char containLHS;
 } branchInfo;
 
 typedef struct {
@@ -609,44 +608,44 @@ typedef struct {
       axes are traversed (and in what order), and taking into account
       axis compression, if any.  \code{coords[i]} indicates the
       position along axis \code{axes[i]} (for \c i < \c naxes). */
-  Int coords[MAX_DIMS];
+  int32_t coords[MAX_DIMS];
   /** The step size (elements) per original dimension.  You have to
       move the \c data pointer forward by \code{coords[i]} elements
       when original dimension \c i increases by 1.  */
-  Int singlestep[MAX_DIMS];
-  Int step[MAX_DIMS];           /*!< combined step size for loop transfer */
-  Int dims[MAX_DIMS];           /*!< original dimensions */
-  Int nelem;                    /*!< number of elements */
-  Int ndim;                     /*!< number of original dimensions */
-  Int axes[MAX_DIMS];           /*!< selected axes */
-  Int naxes;                    /*!< selected number of axes */
-  Int rdims[MAX_DIMS];          /*!< compressed rearranged dimensions */
-  Int rndim;                    /*!< number of compressed rearranged dims */
-  Int rsinglestep[MAX_DIMS];    /*!< step size per rearranged coordinate */
-  Int axisindex;                /*!< index to current axis (in axes[]) */
-  Int mode;                     /*!< desired treatment modes */
-  Int stride;                   /*!< bytes per data element */
+  int32_t singlestep[MAX_DIMS];
+  int32_t step[MAX_DIMS];           /*!< combined step size for loop transfer */
+  int32_t dims[MAX_DIMS];           /*!< original dimensions */
+  int32_t nelem;                    /*!< number of elements */
+  int32_t ndim;                     /*!< number of original dimensions */
+  int32_t axes[MAX_DIMS];           /*!< selected axes */
+  int32_t naxes;                    /*!< selected number of axes */
+  int32_t rdims[MAX_DIMS];          /*!< compressed rearranged dimensions */
+  int32_t rndim;                    /*!< number of compressed rearranged dims */
+  int32_t rsinglestep[MAX_DIMS];    /*!< step size per rearranged coordinate */
+  int32_t axisindex;                /*!< index to current axis (in axes[]) */
+  int32_t mode;                     /*!< desired treatment modes */
+  int32_t stride;                   /*!< bytes per data element */
   Symboltype type;         /*!< data type */
-  Int advanceaxis;              /*!< how many axes not to advance (from start) */
-  Int raxes[MAX_DIMS];          /*!< from rearranged to old axes */
-  Int iraxes[MAX_DIMS];         /*!< from old to rearranged axes */
+  int32_t advanceaxis;              /*!< how many axes not to advance (from start) */
+  int32_t raxes[MAX_DIMS];          /*!< from rearranged to old axes */
+  int32_t iraxes[MAX_DIMS];         /*!< from old to rearranged axes */
 } loopInfo;
 
 /* for nextCompileLevel: */
 typedef struct compileInfoStruct {
   char  *line;
-  Int (*charfunc)(void);
+  int32_t (*charfunc)(void);
   char  *name;
   FILE  *stream;
-  Int   line_number;
+  int32_t   line_number;
   struct compileInfoStruct      *next;
   struct compileInfoStruct      *prev;
 } compileInfo;
 
 /* for execution nesting info: */
 typedef struct executionLevelInfoStruct {
-  Int   target;
-  Int   line;
+  int32_t   target;
+  int32_t   line;
 } executionLevelInfo;
 
 typedef struct {
@@ -658,13 +657,13 @@ typedef struct {
   char  *plain;                 /* start of plain text? */
   char  *end;                   /* end of current format entry */
   char  *next;                  /* start of next format entry */
-  Int   type;                   /* format type */
-  Int   width;                  /* format width */
-  Int   precision;              /* format precision */
-  Int   flags;                  /* format modification flags */
-  Int   count;                  /* format repetition count */
-  Int   active_group;           /* number of currently active groups */
-  Int   group_count[MAXFMT];    /* current group counts */
+  int32_t   type;                   /* format type */
+  int32_t   width;                  /* format width */
+  int32_t   precision;              /* format precision */
+  int32_t   flags;                  /* format modification flags */
+  int32_t   count;                  /* format repetition count */
+  int32_t   active_group;           /* number of currently active groups */
+  int32_t   group_count[MAXFMT];    /* current group counts */
   char  *group_start[MAXFMT];   /* current group starts */
   char  save1;                  /* for temporary storage  */
   char  save2;                  /* for temporary storage */
@@ -673,7 +672,7 @@ typedef struct {
 
 /* for breakpoints: */
 typedef struct {
-  Int   line;
+  int32_t   line;
   char  *name;
   char  status;
 } breakpointInfo;
@@ -689,12 +688,12 @@ typedef struct {
 #define class8_to_1(x)  dereferenceScalPointer(x)
 
 #define symbol_ident_single(x,y)        what(x,y)
-Int     nextFreeTempVariable(void), nextFreeNamedVariable(void),
+int32_t     nextFreeTempVariable(void), nextFreeNamedVariable(void),
         nextFreeExecutable(void), nextFreeTempExecutable(void),
-        dereferenceScalPointer(Int), findSym(Int, hashTableEntry *[], Int),
-        findInternalName(char *, Int), luxerror(char *, Int, ...),
-        lookForName(char *, hashTableEntry *[], Int), execute(Int);
-char    *symName(Int, hashTableEntry *[]);
+        dereferenceScalPointer(int32_t), findSym(int32_t, hashTableEntry *[], int32_t),
+        findInternalName(char *, int32_t), luxerror(char *, int32_t, ...),
+        lookForName(char *, hashTableEntry *[], int32_t), execute(int32_t);
+char    *symName(int32_t, hashTableEntry *[]);
 
 #define getFreeTempVariable(a)\
         { if ((a = nextFreeTempVariable()) < 0) return a; }
@@ -745,7 +744,7 @@ extern char *symbolStack[];
 #undef ABS
 #define ABS(A)                  (((A) >= 0)? (A): -(A))
 #define HEAD(SYM)               ((array *) sym[SYM].spec.array.ptr)
-#define LPTR(HEAD)              ((Int *)((char *) HEAD + sizeof(array)))
+#define LPTR(HEAD)              ((int32_t *)((char *) HEAD + sizeof(array)))
 #define CK_ARR(SYM, ARGN)       if (sym[SYM].class != LUX_ARRAY)\
                                 return cerror(NEED_ARR, SYM)
 #define CK_SGN(ARR, N, ARGN, SYM)\
@@ -754,7 +753,7 @@ extern char *symbolStack[];
 #define CK_MAG(MAG, ARR, N, ARGN, SYM) \
   for (i = 0; i < N; i++) \
     if (ARR[i] >= MAG) return cerror(ILL_DIM, ARGN, SYM)
-#define GET_SIZE(SIZ, ARR, N) SIZ = 1; for (i = 0; i < (Int) N; i++)\
+#define GET_SIZE(SIZ, ARR, N) SIZ = 1; for (i = 0; i < (int32_t) N; i++)\
                          SIZ *= ARR[i]
 #define N_ELEM(N) ((sym[N].spec.array.bstore - sizeof(array))\
                    /anaTypeSize[sym[N].type])

@@ -30,7 +30,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #define CENTER	4
 #define DONE	5
 
-Int sign(float x)
+int32_t sign(float x)
 {
   if (x > 0)
     return 1;
@@ -40,7 +40,7 @@ Int sign(float x)
     return 0;
 }
 /*--------------------------------------------------------------------*/
-Int sgnclass(float x)
+int32_t sgnclass(float x)
 {
   if (x > 0)
     return 2;
@@ -50,7 +50,7 @@ Int sgnclass(float x)
     return 1;
 }
 /*--------------------------------------------------------------------*/
-Int traverseElement(float xin, float yin, float vx, float vy,
+int32_t traverseElement(float xin, float yin, float vx, float vy,
 		    float *xout, float *yout)
 /* if you start at position (<xin>,<yin>), with 0 <= <xin>,<yin> <= 1,
    and move in the direction given by (<vx>,<vy>), then this routine
@@ -154,13 +154,13 @@ Int traverseElement(float xin, float yin, float vx, float vy,
 }
 /*--------------------------------------------------------------------*/
 #define FACTOR	(0.886226925)	/* 0.5*sqrt(pi) */
-Int lux_lic(Int narg, Int ps[])
+int32_t lux_lic(int32_t narg, int32_t ps[])
 /* Y = LIC(<data>,<vx>,<vy>)
    smooths 2D image <data> in the direction indicated by the
    angle <vx> and <vy>, over a distance indicated by the magnitude of vector
    <v>. */
 {
-  Int	iq, nx, ny, ix, iy, c, index, rindex, count, twosided, normalize,
+  int32_t	iq, nx, ny, ix, iy, c, index, rindex, count, twosided, normalize,
     gaussian, iq0, di;
   float	x1, y1, x2, y2, *vx0, *vy0, value, vx, vy, s, s0, ds, dslimit,
     weight, ws;

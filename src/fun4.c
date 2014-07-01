@@ -31,27 +31,27 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #define BI_CUBIC_SMOOTH	4
 #define BI_CUBIC	3
 
-extern	Int	lastmin_sym, lastmax_sym;
+extern	int32_t	lastmin_sym, lastmax_sym;
 extern unsigned long	*pixels;
-Int	maxregridsize = 2048, stretchmark, tvsmt, badmatch, stretch_clip = 19;
-Int	islit, dstype, itmax = 20, sort_flag = 0;
+int32_t	maxregridsize = 2048, stretchmark, tvsmt, badmatch, stretch_clip = 19;
+int32_t	islit, dstype, itmax = 20, sort_flag = 0;
 float	gwid, xoffset, yoffset, xyres;
-Int	resample_type = BI_CUBIC_SMOOTH;
-void match_1(Int *p1, Int *p2, Int nxa, Int nxb, Int nya, Int nyb, Int nx,
-	     Int ny, float *gwx, float *gwy),
-  gwind0(float *gwx, float *gwy, float gwid, Int nxa, Int nxb, Int nya,
-	 Int nyb),
-  unbias(void *m1, void *m2, Int nxa, Int nxb, Int nya, Int nyb,
-	 Int nxs, Int nys, float *gx, float *gy, float *av1, float *av2,
+int32_t	resample_type = BI_CUBIC_SMOOTH;
+void match_1(int32_t *p1, int32_t *p2, int32_t nxa, int32_t nxb, int32_t nya, int32_t nyb, int32_t nx,
+	     int32_t ny, float *gwx, float *gwy),
+  gwind0(float *gwx, float *gwy, float gwid, int32_t nxa, int32_t nxb, int32_t nya,
+	 int32_t nyb),
+  unbias(void *m1, void *m2, int32_t nxa, int32_t nxb, int32_t nya, int32_t nyb,
+	 int32_t nxs, int32_t nys, float *gx, float *gy, float *av1, float *av2,
 	 float *cx, float *cy, float *cxx, float *cxy, float *cyy,
-	 Int idelx, Int idely);
-float averag(void *m, Int nxa, Int nxb, Int nya, Int nyb, Int nxs, Int nys,
-	     Int idx, Int idy, float *gx, float *gy),
-  resid(Int *m1, Int *m2, Int idx, Int idy, Int nxa, Int nxb, Int nya,
-	Int nyb, Int nxs, Int nys, Int ndmx, float *gx, float *gy,
+	 int32_t idelx, int32_t idely);
+float averag(void *m, int32_t nxa, int32_t nxb, int32_t nya, int32_t nyb, int32_t nxs, int32_t nys,
+	     int32_t idx, int32_t idy, float *gx, float *gy),
+  resid(int32_t *m1, int32_t *m2, int32_t idx, int32_t idy, int32_t nxa, int32_t nxb, int32_t nya,
+	int32_t nyb, int32_t nxs, int32_t nys, int32_t ndmx, float *gx, float *gy,
 	float bs);
 /*------------------------------------------------------------------------- */
-Int lux_gridmatch(Int narg, Int ps[])/* gridmatch function */		
+int32_t lux_gridmatch(int32_t narg, int32_t ps[])/* gridmatch function */		
 /* the call is offsets = gridmatch(m1,m2,gx,gy,dx,dy,gwid,mode)
 	where	m1 = reference input image
 	m2 = image to compare with m1, m1 and m2 must be same size
@@ -63,9 +63,9 @@ Int lux_gridmatch(Int narg, Int ps[])/* gridmatch function */
         is also returned in result (third "coordinate")  LS 14sep92
 */
 {
- Int	type, nx, ny, nxg, nyg, dx, dy, dim[3];
- Int	result_sym, nc, i1, i2, j1, j2, dx2, dy2, mode;
- Int	*gx, *gy;
+ int32_t	type, nx, ny, nxg, nyg, dx, dy, dim[3];
+ int32_t	result_sym, nc, i1, i2, j1, j2, dx2, dy2, mode;
+ int32_t	*gx, *gy;
  float	*out, *gwx, *gwy;
  pointer p1, p2;
 
@@ -182,12 +182,12 @@ Int lux_gridmatch(Int narg, Int ps[])/* gridmatch function */
  return	result_sym;
 }
  /*------------------------------------------------------------------------- */
-void match_1(Int *p1, Int *p2, Int nxa, Int nxb, Int nya, Int nyb, Int nx,
-	    Int ny, float *gwx, float *gwy)
+void match_1(int32_t *p1, int32_t *p2, int32_t nxa, int32_t nxb, int32_t nya, int32_t nyb, int32_t nx,
+	    int32_t ny, float *gwx, float *gwy)
  /* note that xoffset and yoffset are zeroed before we get in here */
 {
-  Int	idelx, idely, i, j, k, ndmx=1000, done[9];
-  Int	di, dj, in, jn, iter, dd, badflag;
+  int32_t	idelx, idely, i, j, k, ndmx=1000, done[9];
+  int32_t	di, dj, in, jn, iter, dd, badflag;
   float	av1, av2, cx, cy,cxx,cxy,cyy, avdif, t, res[9], buf[9], t1, t2;
   void	getmin(float *, float *, float *);
 
@@ -273,11 +273,11 @@ void match_1(Int *p1, Int *p2, Int nxa, Int nxb, Int nya, Int nyb, Int nx,
   return;
 }
 /*------------------------------------------------------------------------- */
-void gwind0(float *gwx, float *gwy, float gwid, Int nxa, Int nxb, Int nya,
-	    Int nyb)
+void gwind0(float *gwx, float *gwy, float gwid, int32_t nxa, int32_t nxb, int32_t nya,
+	    int32_t nyb)
 {
   float	wid, xcen, ycen, xq;
-  Int	i;
+  int32_t	i;
   
   wid = gwid*0.6005612;		/* from FWHM to decay scale */
   if (wid > 0) {
@@ -299,10 +299,10 @@ void gwind0(float *gwx, float *gwy, float gwid, Int nxa, Int nxb, Int nya,
   }
 }
 /*------------------------------------------------------------------------- */
-void unbias(void *m1, void *m2, Int nxa, Int nxb, Int nya, Int nyb,
-	    Int nxs, Int nys, float *gx, float *gy, float *av1, float *av2,
+void unbias(void *m1, void *m2, int32_t nxa, int32_t nxb, int32_t nya, int32_t nyb,
+	    int32_t nxs, int32_t nys, float *gx, float *gy, float *av1, float *av2,
 	    float *cx, float *cy, float *cxx, float *cxy, float *cyy,
-	    Int idelx, Int idely)
+	    int32_t idelx, int32_t idely)
 {
   float	t0, t1, t2, t3, t4, t5;
 
@@ -323,12 +323,12 @@ void unbias(void *m1, void *m2, Int nxa, Int nxb, Int nya, Int nyb,
   *cxy = t5 + t0 - t1 - t3;
 }
 /*------------------------------------------------------------------------- */
-float averag(void *m, Int nxa, Int nxb, Int nya, Int nyb, Int nxs, Int nys,
-	     Int idx, Int idy, float *gx, float *gy)
+float averag(void *m, int32_t nxa, int32_t nxb, int32_t nya, int32_t nyb, int32_t nxs, int32_t nys,
+	     int32_t idx, int32_t idy, float *gx, float *gy)
 /* finds weighted average of array m over the block defined */
 {
   pointer p;
-  Int	nxc, nxd, nyc, nyd, i, j, jj;
+  int32_t	nxc, nxd, nyc, nyd, i, j, jj;
   float	sum, sumg, sumx, sumgx;
 
   p.l = m; 
@@ -384,17 +384,17 @@ float averag(void *m, Int nxa, Int nxb, Int nya, Int nyb, Int nxs, Int nys,
   return sum/sumg;
 }
 /*------------------------------------------------------------------------- */
-float resid(Int *m1, Int *m2, Int idx, Int idy, Int nxa, Int nxb, Int nya,
-	    Int nyb, Int nxs, Int nys, Int ndmx, float *gx, float *gy,
+float resid(int32_t *m1, int32_t *m2, int32_t idx, int32_t idy, int32_t nxa, int32_t nxb, int32_t nya,
+	    int32_t nyb, int32_t nxs, int32_t nys, int32_t ndmx, float *gx, float *gy,
 	    float bs)
 {
-  Int     nxc, nxd, nyc, nyd, nx, ny;
+  int32_t     nxc, nxd, nyc, nyd, nx, ny;
   register	pointer   m1p, m2p;
   register        float   *p1, *p2, *ps;
   register        float   sum, sumx, t, ndmx2;
-  register        Int     i, j;
+  register        int32_t     i, j;
   float   sumg;
-  static  Int     mxc, mxd, myc, myd;
+  static  int32_t     mxc, mxd, myc, myd;
   static  float   gsum;
 
   /*set up limits */
@@ -557,13 +557,13 @@ float resid(Int *m1, Int *m2, Int idx, Int idy, Int nxa, Int nxb, Int nya,
   return sum/sumg;
 }
 /*------------------------------------------------------------------------- */
-Int lux_stretch(Int narg, Int ps[])/* stretch function */
+int32_t lux_stretch(int32_t narg, int32_t ps[])/* stretch function */
 /* the call is MS = STRETCH( M2, DELTA)
    where M2 is the original array to be destretched, MS is the result, and
    DELTA is a displacement grid as generated by GRIDMATCH */
 {
-  Int	iq, type, n, m, nxg, nyg, result_sym, jy, j1, j2, nm1, nm2, mm1, mm2;
-  Int	nxgm, nygm, ix, iy, i1, i2, i3, i4, j3, j4, jx;
+  int32_t	iq, type, n, m, nxg, nyg, result_sym, jy, j1, j2, nm1, nm2, mm1, mm2;
+  int32_t	nxgm, nygm, ix, iy, i1, i2, i3, i4, j3, j4, jx;
   float	xd, yd, xinc, yinc, y, x, xs, dy, dy1;
   float	dx, dx1, dx0, dx2, dx3, dx4, fn, fm, xq;
   float	w1, w2, w3, w4, xl, yl, c1, c2, c3, c4, b1, b2, b3, b4;
@@ -795,10 +795,10 @@ Int lux_stretch(Int narg, Int ps[])/* stretch function */
 }
 /*------------------------------------------------------------------------- */
 void getmin(float *, float *, float *);
-Int lux_getmin9(Int narg, Int ps[])/* getmin9 function */		
+int32_t lux_getmin9(int32_t narg, int32_t ps[])/* getmin9 function */		
 /* local minimum for a 3x3 array */
 {
-  Int	iq;
+  int32_t	iq;
   float	*p, x0, y0;
 					/*first arg must be a 3x3 array */
   iq = ps[0];
@@ -818,11 +818,11 @@ Int lux_getmin9(Int narg, Int ps[])/* getmin9 function */
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int	getmin2(float *, float *, float *);
-Int lux_getmin2(Int narg, Int ps[])/* getmin2 function */		
+int32_t	getmin2(float *, float *, float *);
+int32_t lux_getmin2(int32_t narg, int32_t ps[])/* getmin2 function */		
 /* local minimum for a 3x3 array */
 {
-  Int	iq;
+  int32_t	iq;
   float	*p, x0, y0;
 					/*first arg must be a 3x3 array */
   iq = ps[0];
@@ -842,7 +842,7 @@ Int lux_getmin2(Int narg, Int ps[])/* getmin2 function */
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int getminSYM(float *p, float *x0, float *y0)
+int32_t getminSYM(float *p, float *x0, float *y0)
 /* return extremum of least-squares fit of quadratic surface to 3x3 grid */
 /* LS 21mar95 */
 {
@@ -907,7 +907,7 @@ void getmin(float *p, float *x0, float *y0)
   }
 }
 /*------------------------------------------------------------------------- */
-Int getmin2(float *p, float *x0, float *y0)
+int32_t getmin2(float *p, float *x0, float *y0)
 {
   float	a, b, c, d, e, det;
 
@@ -923,10 +923,10 @@ Int getmin2(float *p, float *x0, float *y0)
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int expandImage(Int iq, float sx, float sy, Int smt) /* expand function */
+int32_t expandImage(int32_t iq, float sx, float sy, int32_t smt) /* expand function */
 /* magnify (or even demagnify) an array */
 {
-  Int	n, m, ns, ms, dim[2], j, i, inc, nc, result_sym, oldi, type, ns2;
+  int32_t	n, m, ns, ms, dim[2], j, i, inc, nc, result_sym, oldi, type, ns2;
   float	zc1, zc2, z00, z01, z10, z11, xq;
   float	stepx, stepy, yrun, xrun, xbase, q, p, fn;
   array	*h;
@@ -935,7 +935,7 @@ Int expandImage(Int iq, float sx, float sy, Int smt) /* expand function */
   CK_ARR(iq, 1);
   type = sym[iq].type;
   h = (array *) sym[iq].spec.array.ptr;
-  base.l = (Int *) ((char *)h + sizeof(array));
+  base.l = (int32_t *) ((char *)h + sizeof(array));
 					/* we want a 1 or 2-D array only */
   if ( h->ndim > 2 )
     return cerror(NEED_1D_2D_ARR, iq);
@@ -963,7 +963,7 @@ Int expandImage(Int iq, float sx, float sy, Int smt) /* expand function */
   dim[1] = ms;
   result_sym = array_scratch(type, h->ndim, dim);
   h = (array *) sym[result_sym].spec.array.ptr;
-  out.l = jout.l = (Int *) ((char *)h + sizeof(array));
+  out.l = jout.l = (int32_t *) ((char *)h + sizeof(array));
 							/* setup the steps */
   stepx = 1.0 / sx;
   stepy = 1.0 /sy;
@@ -1112,10 +1112,10 @@ Int expandImage(Int iq, float sx, float sy, Int smt) /* expand function */
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-Int lux_expand(Int narg, Int ps[])
+int32_t lux_expand(int32_t narg, int32_t ps[])
 {
   float	sx, sy;
-  Int	smt;
+  int32_t	smt;
 
   sx = float_arg(ps[1]);
   if (narg > 2)
@@ -1141,11 +1141,11 @@ Int lux_expand(Int narg, Int ps[])
 }
 /*------------------------------------------------------------------------- */
 /* some variables common to several routines */
-static Int regridtypeflag, stretchmark_flag, regrid_type,
+static int32_t regridtypeflag, stretchmark_flag, regrid_type,
   nm1, mm1, nm2, mm2, n;
 static float	fnm1, fnm5, fmm1, fmm5, xl, yl;
 static pointer	base, out;
-Int regrid_common(Int, Int []);
+int32_t regrid_common(int32_t, int32_t []);
 
 void bicubic_f(void)	/* internal routine for single pixel */
  {
@@ -1156,12 +1156,12 @@ void bicubic_f(void)	/* internal routine for single pixel */
       S.K. PARK & R.A. SCHOWENGERDT, COMP. VIS. & IM. PROC., VOL. 23,
       P. 258, 1983:  USES THEIR FORMULA WITH ALPHA = -0.5
 */
- Int	i1, i2, i3, i4, j1, j2, j3, j4, iq;
+ int32_t	i1, i2, i3, i4, j1, j2, j3, j4, iq;
  float	c1, c2, c3, c4, b1, b2, b3, b4, dx0, dx1, dx2, dx3, dx4, xq;
  pointer bb;
  /* the location is in xl, yl; base is the pointer to array; out is
  pointer to output; both are unions */
- i2 = (Int) xl;		j2 = (Int) yl;
+ i2 = (int32_t) xl;		j2 = (int32_t) yl;
  if ( i2 >= 1 && i2 < nm2 ) {		/* normal interior */
 	 dx0 = xl - i2; i1 = i2 - 1; i2 = 1; i3 = 2; i4 = 3;	 }
 	 else {				/* edge cases */
@@ -1287,14 +1287,14 @@ void bicubic_fc()	/* internal routine for single pixel */
   /* used by all (most?) routines that do bi-cubic interpolations, runs
      a little slower than the originals, perhaps because of the overhead
      in the call or other adjustments made */
-  Int	i1, i2, i3, i4, j1, j2, j3, j4, iq;
+  int32_t	i1, i2, i3, i4, j1, j2, j3, j4, iq;
   float	c1, c2, c3, c4, b1, b2, b3, b4, dx0, dx1, dx2, dx3, dx4, xq;
   pointer bb;
 
   /* the location is in xl, yl; base is the pointer to array; out is
      pointer to output; both are unions */
-  i2 = (Int) xl;
-  j2 = (Int) yl;
+  i2 = (int32_t) xl;
+  j2 = (int32_t) yl;
   if (i2 >= 1 && i2 < nm2) {		/* normal interior */
     dx0 = xl - i2;		/* Bx */
     i1 = i2 - 1;
@@ -1471,43 +1471,43 @@ void bicubic_fc()	/* internal routine for single pixel */
   return;
 }
  /*------------------------------------------------------------------------- */
-Int lux_regrid(narg,ps)				/* regrid function */
+int32_t lux_regrid(narg,ps)				/* regrid function */
  /* call is Y = REGRID( X, XG, YG, DX, DY) */
- Int	narg, ps[];
+ int32_t	narg, ps[];
  {
  regridtypeflag = 0;	/* for a nearest neighbor regrid */
  return regrid_common(narg,ps);
  }
  /*------------------------------------------------------------------------- */
-Int lux_regrid3(narg,ps)			/* regrid3 function */
+int32_t lux_regrid3(narg,ps)			/* regrid3 function */
  /* call is Y = REGRID3( X, XG, YG, DX, DY) */
  /* similar to regrid but uses bicubic interpolation rather than nearest
   neighbor for pixel value, still uses bilinear for grid, also uses stretch
   marks for boundaries */
- Int	narg, ps[];
+ int32_t	narg, ps[];
  {
  regridtypeflag = 1;	/* for a bicubic with stretchmarks regrid */
  stretchmark_flag = 1;
  return regrid_common(narg,ps);
  }
  /*------------------------------------------------------------------------- */
-Int lux_regrid3ns(narg,ps)			/* regrid3ns function */
+int32_t lux_regrid3ns(narg,ps)			/* regrid3ns function */
  /* call is Y = REGRID3( X, XG, YG, DX, DY) */
  /* similar to regrid but uses bicubic interpolation rather than nearest
   neighbor for pixel value, still uses bilinear for grid, without stretch
   marks for boundaries (hence the ns)*/
- Int	narg, ps[];
+ int32_t	narg, ps[];
  {
  regridtypeflag = 1;	/* for a bicubic with stretchmarks regrid */
  stretchmark_flag = 0;
  return regrid_common(narg,ps);
  }
  /*------------------------------------------------------------------------- */
-Int regrid_common(Int narg, Int ps[])/* with branches for type */
+int32_t regrid_common(int32_t narg, int32_t ps[])/* with branches for type */
 {
-  Int	iq, nx, ny, m, ng, mg, ns, ms, ngrun, dim[2];
-  Int	iprun, jrun, jprun, ig, ic, jc, result_sym;
-  Int	i, j, ind;
+  int32_t	iq, nx, ny, m, ng, mg, ns, ms, ngrun, dim[2];
+  int32_t	iprun, jrun, jprun, ig, ic, jc, result_sym;
+  int32_t	i, j, ind;
   float	fn, fm, yrun, ax, bx, cx, dx, ay, by, cy, dy, xq, beta, xinc, yinc,
     xl0, yl0;
   pointer xgbase, ygbase, jpbase, jbase, ipbase;
@@ -1630,7 +1630,7 @@ Int regrid_common(Int narg, Int ps[])/* with branches for type */
 		  if (xl < 0 || xl >= fn || yl < 0 || yl >= fm)
 		    *out.b++ = 0;
 		  else
-		    *out.b++ = *(base.b + (Int) xl + n * (Int) yl);
+		    *out.b++ = *(base.b + (int32_t) xl + n * (int32_t) yl);
 		  xl += xinc;
 		  yl += yinc;
 		}
@@ -1640,7 +1640,7 @@ Int regrid_common(Int narg, Int ps[])/* with branches for type */
 		  if (xl < 0 || xl >= fn || yl < 0 || yl >= fm)
 		    *out.w++ = 0;
 		  else
-		    *out.w++ = *(base.w + (Int) xl + n * (Int) yl);
+		    *out.w++ = *(base.w + (int32_t) xl + n * (int32_t) yl);
 		  xl += xinc;
 		  yl += yinc;
 		}
@@ -1650,7 +1650,7 @@ Int regrid_common(Int narg, Int ps[])/* with branches for type */
 		  if (xl < 0 || xl >= fn || yl < 0 || yl >= fm)
 		    *out.l++ = 0;
 		  else
-		    *out.l++ = *(base.l + (Int) xl + n * (Int) yl);
+		    *out.l++ = *(base.l + (int32_t) xl + n * (int32_t) yl);
 		  xl += xinc;
 		  yl += yinc;
 		}
@@ -1660,7 +1660,7 @@ Int regrid_common(Int narg, Int ps[])/* with branches for type */
 		  if (xl < 0 || xl >= fn || yl < 0 || yl >= fm)
 		    *out.f++ = 0;
 		  else
-		    *out.f++ = *(base.f + (Int) xl + n * (Int) yl);
+		    *out.f++ = *(base.f + (int32_t) xl + n * (int32_t) yl);
 		  xl += xinc;
 		  yl += yinc;
 		}
@@ -1670,7 +1670,7 @@ Int regrid_common(Int narg, Int ps[])/* with branches for type */
 		  if (xl < 0 || xl >= fn || yl < 0 || yl >= fm)
 		    *out.d++ = 0;
 		  else
-		    *out.d++ = *(base.d + (Int) xl + n * (Int) yl);
+		    *out.d++ = *(base.d + (int32_t) xl + n * (int32_t) yl);
 		  xl += xinc;
 		  yl += yinc;
 		}
@@ -1775,20 +1775,20 @@ Int regrid_common(Int narg, Int ps[])/* with branches for type */
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-Int lux_compress(Int narg, Int ps[])
+int32_t lux_compress(int32_t narg, int32_t ps[])
 /* COMPRESS(data [, axes], factors) compresses the data array by the */
 /* integer <factors> in the indicated <axes>.  If no <axes> are */
 /* specified and <factors> contains a single value, then that value */
 /* is applied to all dimensions.  LS 30apr98 */
 /* Fixed overflow problem.  LS 19nov99 */
 {
-  Int	iq, nFac, *factors, outDims[MAX_DIMS], i,
+  int32_t	iq, nFac, *factors, outDims[MAX_DIMS], i,
     n, offset, div[MAX_DIMS], range[2*MAX_DIMS], nel;
   pointer	src, trgt;
   char	allAxes;
   scalar	sum;
   loopInfo	srcinfo, trgtinfo, tmpinfo;
-  Int	lux_indgen(Int, Int []);
+  int32_t	lux_indgen(int32_t, int32_t []);
 
   if (symbol_class(ps[0]) != LUX_ARRAY)
     return cerror(NEED_ARR, ps[0]); /* data not an array */
@@ -1806,7 +1806,7 @@ Int lux_compress(Int narg, Int ps[])
     case LUX_ARRAY:
       iq = lux_long(1, &iq);	/* ensure LONG */
       nFac = array_size(iq);	/* number of factors */
-      factors = (Int *) array_data(iq);	/* pointer to factors */
+      factors = (int32_t *) array_data(iq);	/* pointer to factors */
       break;
     default:
       return cerror(ILL_CLASS, narg > 2? ps[2]: ps[1]);	/* illegal */
@@ -1865,7 +1865,7 @@ Int lux_compress(Int narg, Int ps[])
   subdataLoop(range, &srcinfo);	/* restrict treated part */
 
   /* create the output symbol */
-  memcpy(outDims, srcinfo.dims, srcinfo.ndim*sizeof(Int));
+  memcpy(outDims, srcinfo.dims, srcinfo.ndim*sizeof(int32_t));
   if (allAxes)
     for (i = 0; i < srcinfo.ndim; i++) {
       outDims[i] = outDims[i]/factors[0];
@@ -1892,7 +1892,7 @@ Int lux_compress(Int narg, Int ps[])
   /* set up for walk through subarea that gets compressed into a single */
   /* element */
   tmpinfo = srcinfo;
-  zerobytes(range, srcinfo.ndim*2*sizeof(Int));
+  zerobytes(range, srcinfo.ndim*2*sizeof(int32_t));
   for (i = 0; i < srcinfo.ndim; i++)
     range[2*i + 1] = div[i] - 1;
   subdataLoop(range, &tmpinfo);
@@ -1903,7 +1903,7 @@ Int lux_compress(Int narg, Int ps[])
       do {
 	sum.l = 0;
 	do
-	  sum.l += (Int) src.b[offset];
+	  sum.l += (int32_t) src.b[offset];
 	while (advanceLoop(&tmpinfo, &src) < tmpinfo.rndim);
 	*trgt.b = sum.l/nel;
 	src.b = (uint8_t *) tmpinfo.data0;
@@ -1917,7 +1917,7 @@ Int lux_compress(Int narg, Int ps[])
       do {
 	sum.l = 0;
 	do
-	  sum.l += (Int) src.w[offset];
+	  sum.l += (int32_t) src.w[offset];
 	while (advanceLoop(&tmpinfo, &src) < tmpinfo.rndim);
 	*trgt.w = sum.l/nel;
 	src.w = (int16_t *) tmpinfo.data0;
@@ -1934,7 +1934,7 @@ Int lux_compress(Int narg, Int ps[])
 	  sum.l += src.l[offset];
 	while (advanceLoop(&tmpinfo, &src) < tmpinfo.rndim);
 	*trgt.l = sum.l/nel;
-	src.l = (Int *) tmpinfo.data0;
+	src.l = (int32_t *) tmpinfo.data0;
 	n = advanceLoop(&trgtinfo, &trgt);
 	offset = 0;
 	for (i = 0; i < trgtinfo.ndim; i++)
@@ -1973,11 +1973,11 @@ Int lux_compress(Int narg, Int ps[])
   return iq;
 }
 /*------------------------------------------------------------------------- */
-Int lux_oldcompress(Int narg, Int ps[]) /* compress function */
+int32_t lux_oldcompress(int32_t narg, int32_t ps[]) /* compress function */
 /* compresses image data by an integer factor */
 /*  xc = compress(x, cx, [cy])  */
 {
-  Int	n, iq, i, j, cx, cy, nx, ny, type, result_sym, dim[2], nd, nxx;
+  int32_t	n, iq, i, j, cx, cy, nx, ny, type, result_sym, dim[2], nd, nxx;
   float	xq, fac;
   double	dq, dfac;
   array	*h;
@@ -1987,7 +1987,7 @@ Int lux_oldcompress(Int narg, Int ps[]) /* compress function */
   CK_ARR(iq, 1);
   type = sym[iq].type;
   h = (array *) sym[iq].spec.array.ptr;
-  q1.l = (Int *) ((char *)h + sizeof(array));
+  q1.l = (int32_t *) ((char *)h + sizeof(array));
   nd = h->ndim;
   /* we want a 1 or 2-D array only */
   if ( nd > 2 ) return cerror(NEED_1D_2D_ARR, iq);
@@ -2001,7 +2001,7 @@ Int lux_oldcompress(Int narg, Int ps[]) /* compress function */
   dim[0] = nx;	dim[1] = ny;	nxx = h->dims[0];
   result_sym = array_scratch(type, nd, dim);
   h = (array *) sym[result_sym].spec.array.ptr;
-  q2.l = (Int *) ((char *)h + sizeof(array));
+  q2.l = (int32_t *) ((char *)h + sizeof(array));
   fac = 1.0 / ( (float) cx * (float) cy );
   n = nxx - cx;					/* step bewteen lines */
   switch (type)
@@ -2035,7 +2035,7 @@ Int lux_oldcompress(Int narg, Int ps[]) /* compress function */
 	{ p.l = base.l; xq = 0.0;  
 	  for (j=0;j<cy;j++)
 	  { for (i=0;i<cx;i++) xq += *p.l++; p.l += n; }
-	  *q2.l++ = (Int) ( xq * fac );
+	  *q2.l++ = (int32_t) ( xq * fac );
 	  base.l += cx; }
 	q1.l +=  nxx * cy; }
       break;
@@ -2066,23 +2066,23 @@ Int lux_oldcompress(Int narg, Int ps[]) /* compress function */
   return result_sym;
 }
  /*------------------------------------------------------------------------- */
-Int lux_sort(Int narg, Int ps[])
+int32_t lux_sort(int32_t narg, int32_t ps[])
 /*sort contents of a copy of an array */
 {
-  Int	iq, type, result_sym, n, nloop, step;
+  int32_t	iq, type, result_sym, n, nloop, step;
   pointer	p;
   char	sortType;
 
-  /* SGI cc does not accept combination of (Int, uint8_t *) and (Int, int16_t *) */
+  /* SGI cc does not accept combination of (int32_t, uint8_t *) and (int32_t, int16_t *) */
   /* functions in one array of function pointers, not even if the function */
-  /* pointer array is defined as (Int, void *). */
+  /* pointer array is defined as (int32_t, void *). */
   void	sort_b(), sort_w(), sort_l(), sort_f(), sort_d(), sort_s(),
   	shell_b(), shell_w(), shell_l(), shell_f(), shell_d(), shell_s();
-  static void (*sortFunc[])(Int, void *) = {
+  static void (*sortFunc[])(int32_t, void *) = {
     sort_b, sort_w, sort_l, sort_f, sort_d, sort_s, 
     shell_b, shell_w, shell_l, shell_f, shell_d, shell_s
   };
-  Int	lux_replace(Int, Int);
+  int32_t	lux_replace(int32_t, int32_t);
 
   iq = ps[0];
   if (!symbolIsArray(iq))
@@ -2131,21 +2131,21 @@ Int lux_sort(Int narg, Int ps[])
   return result_sym;
 }
  /*------------------------------------------------------------------------- */
-Int lux_index(Int narg, Int ps[])
+int32_t lux_index(int32_t narg, int32_t ps[])
  /* construct a sorted index table for an array */
  /* the index is returned as a long array of the same size */
  /* uses heap sort only */
 {
-  Int	iq, type, result_sym, n, nloop, step1, step2, nloop2;
+  int32_t	iq, type, result_sym, n, nloop, step1, step2, nloop2;
   pointer	p, q;
-  /* SGI cc does not accept combination of (Int, uint8_t *) and (Int, int16_t *) */
+  /* SGI cc does not accept combination of (int32_t, uint8_t *) and (int32_t, int16_t *) */
   /* functions in one array of function pointers, not even if the function */
-  /* pointer array is defined as (Int, void *). */
+  /* pointer array is defined as (int32_t, void *). */
   void	indexx_b(), indexx_w(), indexx_l(), indexx_f(), indexx_d(), indexx_s();
-  static void	(*indexFunc[])(Int, void *, Int []) = {
+  static void	(*indexFunc[])(int32_t, void *, int32_t []) = {
     indexx_b, indexx_w, indexx_l, indexx_f, indexx_d, indexx_s
   };
-  void invertPermutation(Int *, Int);
+  void invertPermutation(int32_t *, int32_t);
 
   iq = ps[0];
   if (symbol_class(iq) != LUX_ARRAY)
@@ -2153,12 +2153,12 @@ Int lux_index(Int narg, Int ps[])
   type = symbol_type(iq);
   if (type >= LUX_CFLOAT)
     return cerror(ILL_TYPE, iq, typeName(type));
-  q.l = (Int *) array_data(iq);
+  q.l = (int32_t *) array_data(iq);
   n = array_size(iq);
   if (n <= 1)			/* nothing to sort */
     return LUX_ZERO;
   result_sym = array_clone(iq, LUX_LONG);
-  p.l = (Int *) array_data(result_sym);
+  p.l = (int32_t *) array_data(result_sym);
   if (internalMode & 1) {	/* along 0th dimension */
     nloop = n/array_dims(iq)[0];
     n = array_dims(iq)[0];
@@ -2166,13 +2166,13 @@ Int lux_index(Int narg, Int ps[])
     nloop = 1;
   nloop2 = nloop;
   step1 = n*lux_type_size[type];
-  step2 = n*sizeof(Int);
+  step2 = n*sizeof(int32_t);
   if (isStringType(type))
     type = LUX_TEMP_STRING;
   for ( ; nloop--; q.b += step1, p.b += step2)
     indexFunc[type](n, q.b, p.l);
   if (internalMode & 2) {	/* reverse index to get list of ranks */
-    p.l = (Int *) array_data(result_sym); /* back to start of data */
+    p.l = (int32_t *) array_data(result_sym); /* back to start of data */
     /* we reverse the list by moving each number x to the position */
     /* indicated at p.l[x], and moving the old value at that */
     /* position in the same fashion until we've completed a cycle */
@@ -2188,20 +2188,20 @@ Int lux_index(Int narg, Int ps[])
 }
  /*------------------------------------------------------------------------- */
 static char	*zoomtemp = "$ZOOM_TEMP";
-Int zoomer2(uint8_t *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
-	    Int sym_flag)
+int32_t zoomer2(uint8_t *ain, int32_t n, int32_t m, int32_t *symout, int32_t *nx2, int32_t *ny2,
+	    int32_t sym_flag)
 /* internal zoom2 */
 /* zoom a uint8_t array by 2 */
 /* requires the original address, some size info */
 /* creates a symbol $zoom_temp to allow re-use of memory for some calls */
 /* RAS */
 {
- Int	ns, ms, dim[2], j, i, ns4, result_sym, leftover;
+ int32_t	ns, ms, dim[2], j, i, ns4, result_sym, leftover;
  uint8_t	*pin, *pout, *poutbase, tmp;
- Int	*p1, *p2, k;
+ int32_t	*p1, *p2, k;
 #ifdef __alpha
  long	*p8;
- Int	alpha_flag = 0;
+ int32_t	alpha_flag = 0;
 #endif
 
  pin = ain;
@@ -2241,7 +2241,7 @@ Int zoomer2(uint8_t *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
  if (alpha_flag) {		/* this is a faster method if we have every
 				   row aligned I*4 */
    p8 = (long *) poutbase;
-   p1 = (Int *) pin;
+   p1 = (int32_t *) pin;
    for (j = 0; j < m; j++) {
      for (i = 0; i < n/4; i++) {
        register unsigned long pix = (long) *p1++;
@@ -2297,7 +2297,7 @@ Int zoomer2(uint8_t *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
  /*t2 = systime();*/
  /* now dupe the lines, this is why we wanted ns%4 = 0 */
  ns4 = ns/4;
- p1 = (Int *) poutbase;
+ p1 = (int32_t *) poutbase;
  p2 = p1 + ns4;
  for (j = 0; j < m; j++) {
    for (i = 0; i < ns4; i++) {
@@ -2309,16 +2309,16 @@ Int zoomer2(uint8_t *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
  return 1;
 }
 /*------------------------------------------------------------------------- */
-Int zoomer3(uint8_t *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
-	    Int sym_flag) /* internal zoom3 */
+int32_t zoomer3(uint8_t *ain, int32_t n, int32_t m, int32_t *symout, int32_t *nx2, int32_t *ny2,
+	    int32_t sym_flag) /* internal zoom3 */
  /* zoom a uint8_t array by 3 */
  /* requires the original address, some size info */
  /* creates a symbol $zoom_temp to allow re-use of memory for some calls */
 /* RAS */
 {
-  Int	ns, ms, dim[2], j, i, ns4, result_sym, leftover;
+  int32_t	ns, ms, dim[2], j, i, ns4, result_sym, leftover;
   uint8_t	*pin, *pout, *poutbase, tmp;
-  Int	*p1, *p2, *p3, nst2, tmpint, k, nsd2;
+  int32_t	*p1, *p2, *p3, nst2, tmpint, k, nsd2;
 
   pin = ain;
 				/* compute new ns and ms */
@@ -2367,7 +2367,7 @@ Int zoomer3(uint8_t *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
   /* now dupe the lines, this is why we needed ns%4 = 0 */
   ns4 = ns/4;
   nsd2 = ns/2;
-  p1 = (Int *) poutbase;
+  p1 = (int32_t *) poutbase;
   p2 = p1 + ns4;
   p3 = p2 + ns4;
   for (j = 0; j < m; j++) {
@@ -2383,16 +2383,16 @@ Int zoomer3(uint8_t *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int zoomer4(uint8_t *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
-	    Int sym_flag) /* internal zoom4 */
+int32_t zoomer4(uint8_t *ain, int32_t n, int32_t m, int32_t *symout, int32_t *nx2, int32_t *ny2,
+	    int32_t sym_flag) /* internal zoom4 */
 /* zoom a uint8_t array by 4 */
 /* requires the original address, some size info */
 /* creates a symbol $zoom_temp to allow re-use of memory for some calls */
 /* RAS */
 {
-  Int	ns, ms, dim[2], j, i, ns4, result_sym;
+  int32_t	ns, ms, dim[2], j, i, ns4, result_sym;
   uint8_t	*pin, *pout, *poutbase, tmp;
-  Int	*p1, *p2, *p3, *p4, nst3, tmpint, nsd2;
+  int32_t	*p1, *p2, *p3, *p4, nst3, tmpint, nsd2;
 
   pin = ain;
 				/* compute new ns and ms */
@@ -2434,7 +2434,7 @@ Int zoomer4(uint8_t *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
   /* now dupe the lines, this is why we needed ns%4 = 0 */
   ns4 = ns/4;
   nsd2 = 3*ns4;
-  p1 = (Int *) poutbase;
+  p1 = (int32_t *) poutbase;
   p2 = p1 + ns4;
   p3 = p2 + ns4;
   p4 = p3 + ns4;
@@ -2453,17 +2453,17 @@ Int zoomer4(uint8_t *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
  return 1;
 }
 /*------------------------------------------------------------------------- */
-Int zoomer8(uint8_t *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
-	    Int sym_flag) /* internal zoom8 */
+int32_t zoomer8(uint8_t *ain, int32_t n, int32_t m, int32_t *symout, int32_t *nx2, int32_t *ny2,
+	    int32_t sym_flag) /* internal zoom8 */
 /* zoom a uint8_t array by 8 */
 /* requires the original address, some size info */
 /* creates a symbol $zoom_temp to allow re-use of memory for some calls */
 /* RAS */
 {
-  Int	ns, ms, dim[2], j, i, result_sym;
+  int32_t	ns, ms, dim[2], j, i, result_sym;
   uint8_t	*pin, *poutbase;
-  union	{ uint8_t	bb[4];   Int  ii; } tmp;
-  Int	*p1, *p2, delta;
+  union	{ uint8_t	bb[4];   int32_t  ii; } tmp;
+  int32_t	*p1, *p2, delta;
 
   pin = ain;
 				/* compute new ns and ms */
@@ -2486,7 +2486,7 @@ Int zoomer8(uint8_t *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
   }
   *symout = result_sym;
   poutbase = array_data(result_sym);
-  p1 = (Int *) poutbase;
+  p1 = (int32_t *) poutbase;
   delta = 2*(n - 1);
   
   /*t1 = systime();*/
@@ -2522,17 +2522,17 @@ Int zoomer8(uint8_t *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int zoomer16(uint8_t *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
-	     Int sym_flag) /* internal zoom16 */
+int32_t zoomer16(uint8_t *ain, int32_t n, int32_t m, int32_t *symout, int32_t *nx2, int32_t *ny2,
+	     int32_t sym_flag) /* internal zoom16 */
 /* zoom a uint8_t array by 16 */
 /* requires the original address, some size info */
 /* creates a symbol $zoom_temp to allow re-use of memory for some calls */
 /* RAS */
 {
-  Int	ns, ms, dim[2], j, i, result_sym;
+  int32_t	ns, ms, dim[2], j, i, result_sym;
   uint8_t	*pin, *poutbase;
-  union	{ uint8_t	bb[4];   Int  ii; } tmp;
-  Int	*p1, *p2, delta;
+  union	{ uint8_t	bb[4];   int32_t  ii; } tmp;
+  int32_t	*p1, *p2, delta;
 
   pin = ain;
 				/* compute new ns and ms */
@@ -2555,7 +2555,7 @@ Int zoomer16(uint8_t *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
   }
   *symout = result_sym;
   poutbase = array_data(result_sym);
-  p1 = (Int *) poutbase;
+  p1 = (int32_t *) poutbase;
   delta = 4*(n - 1);
 
   /*t1 = systime();*/
@@ -2647,16 +2647,16 @@ Int zoomer16(uint8_t *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int compress2(uint8_t *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
-	      Int sym_flag) /* internal compress2 */
+int32_t compress2(uint8_t *ain, int32_t n, int32_t m, int32_t *symout, int32_t *nx2, int32_t *ny2,
+	      int32_t sym_flag) /* internal compress2 */
 /* compress a uint8_t array by 2 */
 /* requires the original address, some size info */
 /* creates a symbol $zoom_temp to allow re-use of memory for some calls */
 /* RAS */
 {
-  Int	ns, ms, dim[2], result_sym;
+  int32_t	ns, ms, dim[2], result_sym;
   uint8_t	*pin, *pout, *poutbase, *p1, *p2;
-  Int	nx, ny, xq, nskip;
+  int32_t	nx, ny, xq, nskip;
 
   pin = ain;
 					/* compute new ns and ms */
@@ -2700,16 +2700,16 @@ Int compress2(uint8_t *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int compress4(uint8_t *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
-	      Int sym_flag) /* internal compress4 */
+int32_t compress4(uint8_t *ain, int32_t n, int32_t m, int32_t *symout, int32_t *nx2, int32_t *ny2,
+	      int32_t sym_flag) /* internal compress4 */
 /* compress a uint8_t array by 4 */
 /* requires the original address, some size info */
 /* creates a symbol $zoom_temp to allow re-use of memory for some calls */
 /* RAS */
 {
- Int	ns, ms, dim[2], result_sym;
+ int32_t	ns, ms, dim[2], result_sym;
  uint8_t	*pin, *pout, *poutbase, *p1, *p2, *p3, *p4;
- Int	nx, ny, xq, nskip;
+ int32_t	nx, ny, xq, nskip;
 
  pin = ain;
 					/* compute new ns and ms */
@@ -2769,15 +2769,15 @@ Int compress4(uint8_t *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
  return 1;
 }
 /*------------------------------------------------------------------------- */
-void shift_bicubic(float dx, Int nx, Int ny, Int inc, Int dline,
-		   pointer base, pointer out, Int type)
+void shift_bicubic(float dx, int32_t nx, int32_t ny, int32_t inc, int32_t dline,
+		   pointer base, pointer out, int32_t type)
  /* internal routine for shift in one direction */
 {
-  Int	i1, i2, i3, i4, k;
+  int32_t	i1, i2, i3, i4, k;
   float	c1, c2, c3, c4, dx0, dx1, dx2, dx3, dx4;
   double	cd1, cd2, cd3, cd4, ddx0, ddx1, ddx2, ddx3, ddx4;
-  Int	nzone2, nzone3, nzone4, nz2;
-  Int	nz3, nz4, rflag;
+  int32_t	nzone2, nzone3, nzone4, nz2;
+  int32_t	nz3, nz4, rflag;
   
   nm1 = nx -1; rflag = 0;
   /* get the fraction shift and the integer shift */
@@ -2788,7 +2788,7 @@ void shift_bicubic(float dx, Int nx, Int ny, Int inc, Int dline,
     inc = - inc;
     dx = -dx;
   }
-  i2 = (Int) dx;
+  i2 = (int32_t) dx;
   dx0 = dx - i2;
   
   /* 3 zones, zone 1 gone with reversal technique */
@@ -2928,7 +2928,7 @@ void shift_bicubic(float dx, Int nx, Int ny, Int inc, Int dline,
     case LUX_LONG:
     {
       float	z4, z1, z2, z3, yq;
-      Int	*p, *q;
+      int32_t	*p, *q;
       for (k=0;k<ny;k++) {
 	p = base.l + k*dline + rflag;
 	q = out.l  + k*dline + rflag;
@@ -2939,7 +2939,7 @@ void shift_bicubic(float dx, Int nx, Int ny, Int inc, Int dline,
 	
 	if (nz2) {
 	  yq = c1*z1 +c2*z2 + c3*z3 + c4*z4;
-	  *q = (Int) yq;
+	  *q = (int32_t) yq;
 	  q = q + inc;
 	  nz2--;
 	  while (nz2--) {
@@ -2947,17 +2947,17 @@ void shift_bicubic(float dx, Int nx, Int ny, Int inc, Int dline,
 	    z1 = z2;  z2 = z3;  z3 = z4;
 	    z4 = *p;
 	    yq = c1*z1 +c2*z2 + c3*z3 + c4*z4;
-	    *q = (Int) yq;
+	    *q = (int32_t) yq;
 	    q = q + inc;
 	  }
 	}
 	if (nz3) {
 	  z1 = z2;  z2 = z3;  z3 = z4;
 	  yq = c1*z1 +c2*z2 + c3*z3 + c4*z4;
-	  *q = (Int) yq;
+	  *q = (int32_t) yq;
 	  q = q + inc;
 	}
-	while (nz4--) { *q = (Int) z4;  q = q + inc; }
+	while (nz4--) { *q = (int32_t) z4;  q = q + inc; }
       }
     }
      break;
@@ -3037,17 +3037,17 @@ void shift_bicubic(float dx, Int nx, Int ny, Int inc, Int dline,
   } return;
 }
  /*------------------------------------------------------------------------- */
-Int lux_shift3(Int narg, Int ps[])	/* shift3, bicubic image shift */
+int32_t lux_shift3(int32_t narg, int32_t ps[])	/* shift3, bicubic image shift */
  /* y = shift3(x, dx, dy) */
  /* the direction of the shift is such that a positive dx moves the image
  to the left (toward smaller x) and likewise in y. Hence the original (dx,dy)
  becomes (0,0). Note that this is the opposite of the direction for rotate3
  when it is used only for a shift */
 {
-  Int	nx, ny, iq, nd, n, nb, result_sym;
+  int32_t	nx, ny, iq, nd, n, nb, result_sym;
   float	dx, dy;
   pointer	base, out;
-  void	shift_bicubic(float, Int, Int, Int, Int, pointer, pointer, Int);
+  void	shift_bicubic(float, int32_t, int32_t, int32_t, int32_t, pointer, pointer, int32_t);
 
   iq = ps[0];
   if (!symbolIsNumericalArray(iq))
@@ -3089,8 +3089,8 @@ Int lux_shift3(Int narg, Int ps[])	/* shift3, bicubic image shift */
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-void interpolate(void *srcv, Int type, float xsrc, float ysrc, Int nsx,
-		 Int nsy, void *trgtv)
+void interpolate(void *srcv, int32_t type, float xsrc, float ysrc, int32_t nsx,
+		 int32_t nsy, void *trgtv)
 /* does bicubic interpolation. */
 /* <srcv>: pointer to source array */
 /* <type>: data type of source array, either LUX_FLOAT or LUX_DOUBLE */
@@ -3103,13 +3103,13 @@ void interpolate(void *srcv, Int type, float xsrc, float ysrc, Int nsx,
 /* LS 4 August 2000 */
 {
   pointer	src, trgt;
-  Int	ix, iy, i;
+  int32_t	ix, iy, i;
   float	px1, px2, px3, px4, py1, py2, py3, py4, bx, by, ax, ay;
 
   src.v = srcv;
   trgt.v = trgtv;
-  ix = (Int) xsrc;
-  iy = (Int) ysrc;
+  ix = (int32_t) xsrc;
+  iy = (int32_t) ysrc;
   if (ix < 1)
     ix = 1;
   else if (ix > nsx - 3)
@@ -3186,10 +3186,10 @@ void interpolate(void *srcv, Int type, float xsrc, float ysrc, Int nsx,
   return;
 }
 /*------------------------------------------------------------------------- */
-Int lux_regridls(Int narg, Int ps[])
+int32_t lux_regridls(int32_t narg, int32_t ps[])
 /* REGRIDLS(<data>,<gx>,<gy>,<nx>,<ny>) */
 {
-  Int	type, nx, ny, result, dims[2], ngx, ngy, gx, gy, s, t, nsx, nsy,
+  int32_t	type, nx, ny, result, dims[2], ngx, ngy, gx, gy, s, t, nsx, nsy,
     step;
   float	xsrc, ysrc, *gridx, *gridy, sx, sy, tx, ty, stx, sty, xsrc0, ysrc0;
   pointer	src, trgt;
@@ -3292,7 +3292,7 @@ Int lux_regridls(Int narg, Int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-Int bigger235(Int x)
+int32_t bigger235(int32_t x)
 /* returns a number not less than <x> that can be expressed as */
 /* the product of integer powers of 2, 3, and 5 only.  For <x> less than */
 /* or equal to 6480, the result is guaranteed to be the smallest number */
@@ -3300,7 +3300,7 @@ Int bigger235(Int x)
 /* the smallest possible one.  LS 2 August 2000 */
 {
 
-  static Int table[] = {
+  static int32_t table[] = {
     1, 2, 3, 4, 5, 6, 8, 9, 10, 12, 15, 16, 18, 20, 24, 25, 27, 30,
     32, 36, 40, 45, 48, 50, 54, 60, 64, 72, 75, 80, 81, 90, 96, 100,
     108, 120, 125, 128, 135, 144, 150, 160, 162, 180, 192, 200, 216,
@@ -3314,9 +3314,9 @@ Int bigger235(Int x)
     3645, 3750, 3840, 3888, 4000, 4050, 4096, 4320, 4374, 4500, 4608,
     4800, 4860, 5000, 5120, 5184, 5400, 5625, 5760, 5832, 6000, 6075,
     6144, 6250, 6400, 6480
-  }, n = sizeof(table)/sizeof(Int);
-  Int	ilo, ihi, imid;
-  Int	fac = 1, fac2, x2;
+  }, n = sizeof(table)/sizeof(int32_t);
+  int32_t	ilo, ihi, imid;
+  int32_t	fac = 1, fac2, x2;
 
   if (x < 1)
     return 1;
@@ -3374,9 +3374,9 @@ Int bigger235(Int x)
   return x;
 }
 /*-------------------------------------------------------------------------*/
-Int lux_bigger235(Int narg, Int ps[])
+int32_t lux_bigger235(int32_t narg, int32_t ps[])
 {
-  Int	iq, *src, *trgt, n, result;
+  int32_t	iq, *src, *trgt, n, result;
 
   switch (symbol_class(ps[0])) {
     case LUX_ARRAY:
@@ -3403,11 +3403,11 @@ Int lux_bigger235(Int narg, Int ps[])
   return result;
 }
 /*-------------------------------------------------------------------------*/
-Int single_fft(pointer data, Int n, Int type, Int back)
+int32_t single_fft(pointer data, int32_t n, int32_t type, int32_t back)
 /* type = LUX_FLOAT or LUX_DOUBLE */
 {
-  Int gsl_fft(double *, Int, Int);
-  Int gsl_fft_back(double *, Int, Int);
+  int32_t gsl_fft(double *, int32_t, int32_t);
+  int32_t gsl_fft_back(double *, int32_t, int32_t);
   double *ddata;
   if (type == LUX_DOUBLE)
     ddata = data.d;
@@ -3418,7 +3418,7 @@ Int single_fft(pointer data, Int n, Int type, Int back)
   else
     gsl_fft(ddata, n, 1);
   if (type != LUX_DOUBLE) {
-    Int i;
+    int32_t i;
     for (i = 0; i < n; i++)
       data.f[i] = ddata[i];
     free(ddata);
@@ -3426,10 +3426,10 @@ Int single_fft(pointer data, Int n, Int type, Int back)
   return 0;
 }
 /*-------------------------------------------------------------------------*/
-Int lux_cartesian_to_polar(Int narg, Int ps[])
+int32_t lux_cartesian_to_polar(int32_t narg, int32_t ps[])
 /* y = CTOP(x [, x0, y0]) */
 {
-  Int	nx, ny, result, dims[2], r, rmax, n, az, type, step, i;
+  int32_t	nx, ny, result, dims[2], r, rmax, n, az, type, step, i;
   float	x0, y0, x, y, daz;
   pointer	src, trgt;
 
@@ -3457,7 +3457,7 @@ Int lux_cartesian_to_polar(Int narg, Int ps[])
     return luxerror("No circles around (%g,%g) fall completely within the image",
 		 ps[0], x0, y0);
 
-  dims[0] = bigger235((Int) ceil(rmax*TWOPI));	/* #pts for biggest circle */
+  dims[0] = bigger235((int32_t) ceil(rmax*TWOPI));	/* #pts for biggest circle */
   dims[1] = rmax + 1;
   result = array_scratch(type, 2, dims);
   if (result == LUX_ERROR)
@@ -3465,7 +3465,7 @@ Int lux_cartesian_to_polar(Int narg, Int ps[])
   trgt.v = array_data(result);
 
   for (r = 0; r <= rmax; r++) {
-    n = bigger235((Int) ceil(r*TWOPI));
+    n = bigger235((int32_t) ceil(r*TWOPI));
     daz = TWOPI/n;
     for (az = 0; az < n; az++) {
       x = x0 + r*cos(az*daz);
@@ -3497,13 +3497,13 @@ Int lux_cartesian_to_polar(Int narg, Int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-Int lux_polar_to_cartesian(Int narg, Int ps[])
+int32_t lux_polar_to_cartesian(int32_t narg, int32_t ps[])
 /* y = PTOC(x [, nx, ny, x0, y0]) */
 {
-  Int	nx, ny, result, dims[2], type, step, ix, iy;
+  int32_t	nx, ny, result, dims[2], type, step, ix, iy;
   float	x0, y0, daz, dx, dy, az, r;
   pointer	src, trgt;
-  Int	single_fft(pointer src, Int n, Int type, Int backwards);
+  int32_t	single_fft(pointer src, int32_t n, int32_t type, int32_t backwards);
 
   /* <x> */
   if (!symbolIsNumericalArray(ps[0]) || array_num_dims(ps[0]) != 2)
@@ -3533,7 +3533,7 @@ Int lux_polar_to_cartesian(Int narg, Int ps[])
       dx = ix - x0;
       dy = iy - y0;
       r = hypot(dx,dy);
-      az = ((Int) floor(atan2(dy,dx)*daz + 0.5) + nx) % nx;
+      az = ((int32_t) floor(atan2(dy,dx)*daz + 0.5) + nx) % nx;
       if (r < ny)
 	interpolate(src.v, type, az, r, nx, ny, trgt.v);
       else

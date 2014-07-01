@@ -42,7 +42,7 @@ Bytestack Bytestack_create(void);
 void Bytestack_delete(Bytestack bytestack);
 char *Bytestack_pop(Bytestack bytestack, Bytestack_index index);
 char *Bytestack_pop_all(Bytestack bytestack);
-Int Bytestack_restore(Bytestack bytestack, Int size);
+int32_t Bytestack_restore(Bytestack bytestack, int32_t size);
 Bytestack_index Bytestack_push_text(Bytestack bytestack,
 				    const char *text);
 char *Bytestack_strcpy(Bytestack bytestack,

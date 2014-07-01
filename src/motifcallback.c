@@ -22,8 +22,8 @@ void execute_string(char *text)
  /* this needs to be re-entrant, the parser call here may cause
  this routine to be called, so be careful */
 {
- extern Int	nest, motif_input_flag;
- extern	Int	single_string_parse_flag, single_string_parse_nest, nest;
+ extern int32_t	nest, motif_input_flag;
+ extern	int32_t	single_string_parse_flag, single_string_parse_nest, nest;
  extern uint8_t	*input_compile_string;	/* used for compiling strings */
  extern uint8_t line2[];
  extern struct	sdesc	cur_line;
@@ -32,9 +32,9 @@ void execute_string(char *text)
  Arg	args[10];
  Cardinal	n;
  unsigned char *new_text;
- Int	iq, mq, start_nest, nsym, prev_flag;
+ int32_t	iq, mq, start_nest, nsym, prev_flag;
  char *text, *p, *s;
- Int	result_position, result_string;
+ int32_t	result_position, result_string;
 
  mq = strlen(text);
  prev_flag = motif_input_flag; /* save this state, allows for nesting */

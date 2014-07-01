@@ -41,14 +41,14 @@ struct  mtop    unl = {MTOFFL, 1 };
 struct  mtop    mtweof = {MTWEOF, 1 };
 struct  mtop    tape_op = {MTFSR, 1 };
 struct  mtget   ti;
-Int	tape_lun, io_status;
-extern Int	byte_count;	/* defined in files.c */
-Int	tape_messages=1;
-static	Int	tape_fd[MAXTAPE], neof[MAXTAPE], neot[MAXTAPE];
+int32_t	tape_lun, io_status;
+extern int32_t	byte_count;	/* defined in files.c */
+int32_t	tape_messages=1;
+static	int32_t	tape_fd[MAXTAPE], neof[MAXTAPE], neot[MAXTAPE];
 /*------------------------------------------------------------------------- */
-Int lux_tape_status(Int narg, Int ps[])/* print tape status */
+int32_t lux_tape_status(int32_t narg, int32_t ps[])/* print tape status */
 {
-  Int   fd, j;
+  int32_t   fd, j;
 
   printf("Tape status:\n");
   for (j = 0; j <= MAXTAPE; j++) {
@@ -62,7 +62,7 @@ Int lux_tape_status(Int narg, Int ps[])/* print tape status */
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int tape_setup(Int narg, Int ps[])		/* for internal use */
+int32_t tape_setup(int32_t narg, int32_t ps[])		/* for internal use */
 {
   char	*name;
 
@@ -104,7 +104,7 @@ Int tape_setup(Int narg, Int ps[])		/* for internal use */
   return tape_fd[tape_lun];
 }
 /*------------------------------------------------------------------------- */
-Int check_tape_io(Int iq)
+int32_t check_tape_io(int32_t iq)
 {
   io_status = errno;
   if (iq)
@@ -118,26 +118,26 @@ Int check_tape_io(Int iq)
   return LUX_OK;
 }
 /*------------------------------------------------------------------------- */
-Int lux_rewind(Int narg, Int ps[])/* rewind a tape drive */
+int32_t lux_rewind(int32_t narg, int32_t ps[])/* rewind a tape drive */
 {
-  Int	fd;
+  int32_t	fd;
 
   if ((fd = tape_setup(narg,ps)) < 0)
     return LUX_ERROR;
   return check_tape_io(ioctl(fd, MTIOCTOP, &rew));
 }
 /*------------------------------------------------------------------------- */
-Int lux_weof(narg,ps)				/* write an eof on tape drive */
-Int	narg, ps[];
+int32_t lux_weof(narg,ps)				/* write an eof on tape drive */
+int32_t	narg, ps[];
 {
-Int	fd;
+int32_t	fd;
 if ( (fd = tape_setup(narg,ps)) < 0) return -1;;
 return check_tape_io( ioctl(fd, MTIOCTOP, &mtweof) );
 }
 /*------------------------------------------------------------------------- */
-Int lux_unload(Int narg, Int ps[])/* unload a tape drive */
+int32_t lux_unload(int32_t narg, int32_t ps[])/* unload a tape drive */
 {
-  Int	fd;
+  int32_t	fd;
 
   if ((fd = tape_setup(narg,ps)) < 0)
     return LUX_ERROR;
@@ -149,10 +149,10 @@ Int lux_unload(Int narg, Int ps[])/* unload a tape drive */
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int lux_skipr(narg,ps)				/* skip records */
-Int	narg, ps[];
+int32_t lux_skipr(narg,ps)				/* skip records */
+int32_t	narg, ps[];
 {
-Int	fd, nr;
+int32_t	fd, nr;
 if ( (fd = tape_setup(narg,ps)) < 0) return -1;;
 if (narg > 1 ) nr = int_arg( ps[1] ); else nr = 1;
 if (nr == 0)  return 1;
@@ -164,10 +164,10 @@ tape_op.mt_op = MTBSR;	tape_op.mt_count = -nr;
 return check_tape_io( ioctl(fd, MTIOCTOP, &tape_op) );
 }
 /*------------------------------------------------------------------------- */
-Int lux_skipf(narg,ps)				/* skip records */
-Int	narg, ps[];
+int32_t lux_skipf(narg,ps)				/* skip records */
+int32_t	narg, ps[];
 {
-Int	fd, nf;
+int32_t	fd, nf;
 if ( (fd = tape_setup(narg,ps)) < 0) return -1;;
 if (narg > 1 ) nf = int_arg( ps[1] ); else nf = 1;
 if (nf == 0)  return 1;
@@ -179,11 +179,11 @@ tape_op.mt_op = MTBSF;	tape_op.mt_count = -nf;
 return check_tape_io( ioctl(fd, MTIOCTOP, &tape_op) );
 }
 /*------------------------------------------------------------------------- */
-Int lux_taprd(Int narg, Int ps[])
+int32_t lux_taprd(int32_t narg, int32_t ps[])
 /* read tape record.  Modified LS 27mar98 to read records until the */
 /* requested number of bytes is read (or an error occurs) */
 {
-  Int	fd, nbr, iq, n, type, nread, cur;
+  int32_t	fd, nbr, iq, n, type, nread, cur;
   pointer q1;
   
   if ( (fd = tape_setup(narg,ps)) < 0)
@@ -193,7 +193,7 @@ Int lux_taprd(Int narg, Int ps[])
   if (symbol_class(iq) != LUX_ARRAY)
     return cerror(NEED_ARR, iq);
 
-  q1.l = (Int *) array_data(iq);
+  q1.l = (int32_t *) array_data(iq);
   type = array_type(iq);
   n = cur = lux_type_size[type]*array_size(iq);
   nread = 0;
@@ -220,10 +220,10 @@ Int lux_taprd(Int narg, Int ps[])
   return 1;
 }
  /*------------------------------------------------------------------------- */
-Int lux_tapwrt(narg,ps)				/* read tape record */
- Int	narg, ps[];
+int32_t lux_tapwrt(narg,ps)				/* read tape record */
+ int32_t	narg, ps[];
  {
- Int	fd, nbr, iq, j, nd, n, type;
+ int32_t	fd, nbr, iq, j, nd, n, type;
  array	*h;
  pointer q1;
  if ( (fd = tape_setup(narg,ps)) < 0) return -1;
@@ -231,7 +231,7 @@ Int lux_tapwrt(narg,ps)				/* read tape record */
  iq = ps[1];
  CK_ARR(iq, 1);
  h = (array *) sym[iq].spec.array.ptr;
- q1.l = (Int *) ((char *)h + sizeof(array));
+ q1.l = (int32_t *) ((char *)h + sizeof(array));
  nd = h->ndim;
  type = sym[iq].type;
  n = lux_type_size[type]; errno = 0;
@@ -250,13 +250,13 @@ Int lux_tapwrt(narg,ps)				/* read tape record */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int lux_tapebufout(Int narg, Int ps[])			/* write tape record */
+int32_t lux_tapebufout(int32_t narg, int32_t ps[])			/* write tape record */
  /*the call is TAPEBUFOUT,tape#,array,[recsize,offset,len]
  the defaults for offset and len are just the whole array (or what is left of
  it if just offset is specified) and the default for recsize is 16384 bytes
  intended for dumping large amounts of data */
 {
- Int	fd, nbr, iq, j, nd, n, recsize, nb, ic, offset, len, type;
+ int32_t	fd, nbr, iq, j, nd, n, recsize, nb, ic, offset, len, type;
  array	*h;
  pointer q1;
 #if !WORDS_BIGENDIAN
@@ -268,7 +268,7 @@ Int lux_tapebufout(Int narg, Int ps[])			/* write tape record */
  iq = ps[1];
  CK_ARR(iq, 1);
  h = (array *) sym[iq].spec.array.ptr;
- q1.l = (Int *) ((char *)h + sizeof(array));
+ q1.l = (int32_t *) ((char *)h + sizeof(array));
  nd = h->ndim;
  type = sym[iq].type;
  nb = n = lux_type_size[sym[iq].type];
@@ -311,7 +311,7 @@ Int lux_tapebufout(Int narg, Int ps[])			/* write tape record */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int lux_tapebufin(Int narg, Int ps[])/* read tape record */
+int32_t lux_tapebufin(int32_t narg, int32_t ps[])/* read tape record */
  /*the call is TAPEBUFIN,tape#,array,[recsize,offset,len]
  the defaults for offset and len are just the whole array (or what is left of
  it if just offset is specified) and the default for recsize is 32768 bytes
@@ -320,7 +320,7 @@ Int lux_tapebufin(Int narg, Int ps[])/* read tape record */
  acquiring or processing data
  */
 {
- Int	fd, nbr, iq, n, recsize, nb, ic, offset, len, type;
+ int32_t	fd, nbr, iq, n, recsize, nb, ic, offset, len, type;
  pointer q1;
 #if !WORDS_BIGENDIAN
  char	*p;
@@ -332,7 +332,7 @@ Int lux_tapebufin(Int narg, Int ps[])/* read tape record */
  iq = ps[1];
  if (symbol_class(iq) != LUX_ARRAY)
    return cerror(NEED_ARR, iq);
- q1.l = (Int *) array_data(iq);
+ q1.l = (int32_t *) array_data(iq);
  type = array_type(iq);
  nb = n = lux_type_size[type];
  errno = 0;
@@ -406,8 +406,8 @@ Int lux_tapebufin(Int narg, Int ps[])/* read tape record */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-Int lux_wait_for_tape(narg,ps)				/* read tape record */
-Int	narg, ps[];
+int32_t lux_wait_for_tape(narg,ps)				/* read tape record */
+int32_t	narg, ps[];
 {
 /* a dummy version, we'll need this when we do asynchronous tape i/o */
 return 1;

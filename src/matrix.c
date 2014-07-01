@@ -28,16 +28,16 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "errno.h"
 #include <gsl/gsl_linalg.h>
 
-Int lux_matrix_product(Int narg, Int ps[])
+int32_t lux_matrix_product(int32_t narg, int32_t ps[])
 {
   pointer *ptrs;
   loopInfo *infos;
-  Int iq;
+  int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;i>D*;rD1", &ptrs, &infos)) < 0)
     return LUX_ERROR;
 
-  Int *dims1, *dims2;
+  int32_t *dims1, *dims2;
   if (infos[0].ndim >= 2)
     dims1 = infos[0].dims;
   else
@@ -55,20 +55,20 @@ Int lux_matrix_product(Int narg, Int ps[])
   if (dims1[0] != dims2[1])
     return luxerror("The number of columns (now %d) of the 1st argument must equal the number of rows (now %d) of the 2nd argument", ps[1], dims1[0], dims2[1]);
 
-  Int i, *tdims, tndim;
+  int32_t i, *tdims, tndim;
   if (internalMode & 1) {	/* /OUTER */
     tndim = infos[0].ndim + infos[1].ndim - 2;
     if (tndim > MAX_DIMS)
       return luxerror("Result would have %d dimensions, "
 		      "but at most %d are allowed",
 		      ps[1], tndim, MAX_DIMS);
-    tdims = malloc(tndim*sizeof(Int));
-    memcpy(tdims + 2, infos[0].dims + 2, (infos[0].ndim - 2)*sizeof(Int));
+    tdims = malloc(tndim*sizeof(int32_t));
+    memcpy(tdims + 2, infos[0].dims + 2, (infos[0].ndim - 2)*sizeof(int32_t));
     memcpy(tdims + 2 + infos[0].ndim - 2, infos[1].dims + 2,
-	   (infos[1].ndim - 2)*sizeof(Int));
+	   (infos[1].ndim - 2)*sizeof(int32_t));
   } else {			/* /INNER */
     tndim = infos[0].ndim;
-    tdims = malloc(tndim*sizeof(Int));
+    tdims = malloc(tndim*sizeof(int32_t));
     if (infos[1].ndim != infos[0].ndim) {
       iq = luxerror("Needs the same number of dimensions as the previous argument", ps[1]);
       goto error_1;
@@ -78,7 +78,7 @@ Int lux_matrix_product(Int narg, Int ps[])
 	iq = luxerror("The dimensions beyond the first two must be the same as in the previous argument", ps[1]);
 	goto error_1;
       }
-    memcpy(tdims + 2, infos[0].dims + 2, (infos[0].ndim - 2)*sizeof(Int));
+    memcpy(tdims + 2, infos[0].dims + 2, (infos[0].ndim - 2)*sizeof(int32_t));
   }
   tdims[0] = dims2[0];
   tdims[1] = dims1[1];
@@ -90,7 +90,7 @@ Int lux_matrix_product(Int narg, Int ps[])
   setAxes(&infos[1], 2, NULL, SL_EACHBLOCK);
   setAxes(&infos[2], 2, NULL, SL_EACHBLOCK);
 
-  Int j, k;
+  int32_t j, k;
   if (internalMode & 1) {	/* /OUTER */
     do {
       do {
@@ -132,7 +132,7 @@ Int lux_matrix_product(Int narg, Int ps[])
 }
 REGISTER(matrix_product, f, MPRODUCT, 2, 2, "0INNER:1OUTER");
 /*------------------------------------------------------------------------- */
-Int singular_value_decomposition(double *a_in, size_t ncol, size_t nrow, 
+int32_t singular_value_decomposition(double *a_in, size_t ncol, size_t nrow, 
 				 double *u_out, double *s_out,
 				 double *v_out)
 {
@@ -145,8 +145,8 @@ Int singular_value_decomposition(double *a_in, size_t ncol, size_t nrow,
   gsl_matrix *v;
   gsl_vector *s;
   gsl_vector *w;
-  Int result;
-  Int nmin, nmax;
+  int32_t result;
+  int32_t nmin, nmax;
 
   if (ncol <= nrow) {
     nmin = ncol;
@@ -171,7 +171,7 @@ Int singular_value_decomposition(double *a_in, size_t ncol, size_t nrow,
     nmax = ncol;
     a = gsl_matrix_alloc(nmax, nmin);
 
-    Int i, j;
+    int32_t i, j;
 
     for (i = 0; i < nmax; i++)
       for (j = 0; j < nmin; j++)
@@ -231,18 +231,18 @@ Int singular_value_decomposition(double *a_in, size_t ncol, size_t nrow,
    If Sd is the square matrix with the values of S2 on its diagnonal,
    then A = U2 # Sd # transpose(V2).
 */
-Int lux_svd(Int narg, Int ps[])
+int32_t lux_svd(int32_t narg, int32_t ps[])
 {
   pointer *ptrs;
   loopInfo *infos;
-  Int iq;
+  int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;oD&;oD1;oD1", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   if (infos[0].ndim < 2)
     return luxerror("Need at least two dimensions", ps[0]);
-  Int dims[MAX_DIMS];
-  memcpy(dims, infos[0].dims, infos[0].ndim*sizeof(Int));
+  int32_t dims[MAX_DIMS];
+  memcpy(dims, infos[0].dims, infos[0].ndim*sizeof(int32_t));
   if (infos[0].dims[0] <= infos[0].dims[1]) {
     dims[1] = dims[0];		/* # columns */
     standard_redef_array(ps[2], LUX_DOUBLE, infos[0].ndim - 1, dims + 1,
@@ -279,9 +279,9 @@ Int lux_svd(Int narg, Int ps[])
 }
 REGISTER(svd, s, SVD, 4, 4, NULL);
 /*--------------------------------------------------------------------*/
-Int matrix_transpose(double *in, double *out, size_t in_ncol, size_t in_nrow)
+int32_t matrix_transpose(double *in, double *out, size_t in_ncol, size_t in_nrow)
 {
-  Int i, j;
+  int32_t i, j;
   
   if (!in || !out || in_ncol < 1 || in_nrow < 1) {
     errno = EDOM;
@@ -293,20 +293,20 @@ Int matrix_transpose(double *in, double *out, size_t in_ncol, size_t in_nrow)
   return 0;
 }
 /*--------------------------------------------------------------------*/
-Int lux_transpose_matrix(Int narg, Int ps[])
+int32_t lux_transpose_matrix(int32_t narg, int32_t ps[])
 {
   pointer *ptrs;
   loopInfo *infos;
-  Int iq;
+  int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;rD1", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   if (infos[0].ndim < 2)
     return luxerror("Need at least 2 dimensions", ps[0]);
-  Int *dims = malloc(infos[0].ndim*sizeof(Int));
+  int32_t *dims = malloc(infos[0].ndim*sizeof(int32_t));
   dims[0] = infos[0].dims[1];
   dims[1] = infos[0].dims[0];
-  memcpy(dims + 2, infos[0].dims + 2, (infos[0].ndim - 2)*sizeof(Int));
+  memcpy(dims + 2, infos[0].dims + 2, (infos[0].ndim - 2)*sizeof(int32_t));
   standard_redef_array(iq, LUX_DOUBLE, infos[0].ndim, dims, 0, NULL,
 		       &ptrs[1], &infos[1]);
   dims[0] = 0;
@@ -314,7 +314,7 @@ Int lux_transpose_matrix(Int narg, Int ps[])
   setAxes(&infos[0], 2, dims, SL_EACHBLOCK);
   setAxes(&infos[1], 2, dims, SL_EACHBLOCK);
   free(dims);
-  Int n = infos[0].dims[0]*infos[0].dims[1];
+  int32_t n = infos[0].dims[0]*infos[0].dims[1];
   do {
     matrix_transpose(ptrs[0].d, ptrs[1].d, infos[0].dims[0], infos[0].dims[1]);
     ptrs[0].d += n;
@@ -325,19 +325,19 @@ Int lux_transpose_matrix(Int narg, Int ps[])
 }
 REGISTER(transpose_matrix, f, TRANSPOSE, 1, 1, NULL);
 /*--------------------------------------------------------------------*/
-Int lux_diagonal_matrix(Int narg, Int ps[])
+int32_t lux_diagonal_matrix(int32_t narg, int32_t ps[])
 {
   pointer *ptrs;
   loopInfo *infos;
-  Int iq;
+  int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;rD1", &ptrs, &infos)) < 0)
     return LUX_ERROR;
-  Int dims[2];
+  int32_t dims[2];
   dims[0] = dims[1] = infos[0].nelem;
   standard_redef_array(iq, LUX_DOUBLE, 2, dims, 0, NULL, &ptrs[1], &infos[1]);
   lux_zero(1, &iq);
-  Int i;
+  int32_t i;
   for (i = 0; i < infos[0].nelem; i++)
     ptrs[1].d[i + i*infos[0].nelem] = ptrs[0].d[i];
   return iq;

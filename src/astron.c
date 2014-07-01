@@ -117,7 +117,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 
 #define EARTH		3
 
-Int	findint(Int, Int *, Int);
+int32_t	findint(int32_t, int32_t *, int32_t);
 void	UTC_to_TAI(double *), TAI_to_UTC(double *);
 void	CJDLT_to_TAI(double *), TAI_to_CJDLT(double *);
 
@@ -154,7 +154,7 @@ char *EgyptianMonths[] = {
   "Pharmuthi", "Pachon", "Payni", "Epiphi", "Mesore", "epagomenai"
 };
 
-Int	nonae[] = {
+int32_t	nonae[] = {
   5, 5, 7, 5, 7, 5, 7, 5, 5, 7, 5, 5
 }, idus[] = {
   13, 13, 15, 13, 15, 13, 15, 13, 13, 15, 13, 13
@@ -171,7 +171,7 @@ char *latinMonthsI[] = {
 char **calendars[] = {
   GregorianMonths, IslamicMonths, HebrewMonths, EgyptianMonths
 };
-Int calendarType[] = {
+int32_t calendarType[] = {
   CAL_COMMON, CAL_ISLAMIC, CAL_HEBREW, CAL_EGYPTIAN
 };
 
@@ -184,7 +184,7 @@ Int calendarType[] = {
 /* 4th-degree polynomial evaluation */
 #define pol4(a0,a1,a2,a3,a4,t) (a0 + t*(a1 + t*(a2 + t*(a3 + t*a4))))
 
-double JDE(double, Int);
+double JDE(double, int32_t);
 /* time in centuries since epoch 1900.0 */
 #define TC1900(JD) ((JD - 2415020.0)/36525)
 /* time in centuries since epoch 2000.0 */
@@ -207,9 +207,9 @@ double JDE(double, Int);
 #define ecos	0.9174369451	/* cos(ecliptic2000) */
 #define esin	0.3978812030	/* sin(ecliptic2000) */
 
-static Int	*extraIDs;
+static int32_t	*extraIDs;
 static struct extraInfo {
-  Int		nterms;
+  int32_t		nterms;
   double	equinox;
   double	absmag;
   char		*comment;
@@ -229,22 +229,22 @@ static struct extraInfo {
   } *orbits;
 } *extraOrbits = NULL;
   
-static Int	nExtraObj = 0;
+static int32_t	nExtraObj = 0;
 
 static double	extraElements[9];
 static char	haveExtraElements;
 
-extern Int getAstronError;
-extern Int fullVSOP;
+extern int32_t getAstronError;
+extern int32_t fullVSOP;
 
 void LBRtoXYZ(double *pos, double *pos2),
   XYZtoLBR(double *, double *),
   XYZ_eclipticPrecession(double *pos, double equinox1, double equinox2);
 
-Int idiv(Int x, Int y)
+int32_t idiv(int32_t x, int32_t y)
      /* returns the largest integer n such that x >= y*n */
 {
-  return (Int) floor(((float) x)/y);
+  return (int32_t) floor(((float) x)/y);
 }
 
 void printXYZtoLBR(double *xyz);
@@ -303,11 +303,11 @@ double meanSynodicMonth(double JD)
   return pol2(29.5305888531, 2.1621e-7, -3.64e-10, T);
 }
 /*--------------------------------------------------------------------------*/
-Int EasterDate(Int year, Int *month, Int *day)
+int32_t EasterDate(int32_t year, int32_t *month, int32_t *day)
      /* the date of Easter in year y (Julian until 1582, Gregorian after */
      /* 1582) is returned in *month and *day. [ES12.22,Oudin1940; JM4] */
 {
-  Int	c, n, k, i, j, l;
+  int32_t	c, n, k, i, j, l;
 
   if (year < 1)
     puts("The current algorithm may not work for non-positive years!");
@@ -358,14 +358,14 @@ double JDtoLunar(double JD)
   return k;
 }
 /*--------------------------------------------------------------------------*/
-Int DatetoCJDN(Int year, Int month, Int day, Int calendar)
+int32_t DatetoCJDN(int32_t year, int32_t month, int32_t day, int32_t calendar)
 /* Calculated the Chronological Julian Day Number at the given
    calendar date.  "calendar" indicates the calendar that year, month,
    and date are in.  possible values for calendar: CAL_GREGORIAN
    (Gregorian, started 15 October 1582); CAL_ISLAMIC (civil calendar);
    CAL_JULIAN (Julian proleptic calendar). */
 {
-  static Int (*f[])(Int, Int, Int) =
+  static int32_t (*f[])(int32_t, int32_t, int32_t) =
     { NULL, CommontoCJDN, GregoriantoCJDN, IslamictoCJDN,
       JuliantoCJDN, HebrewtoCJDN, EgyptiantoCJDN };
 
@@ -376,7 +376,7 @@ Int DatetoCJDN(Int year, Int month, Int day, Int calendar)
   return f[calendar](year, month, day);
 }
 /*--------------------------------------------------------------------------*/
-double DatetoCJD(Int year, Int month, double day, Int calendar)
+double DatetoCJD(int32_t year, int32_t month, double day, int32_t calendar)
 /* Calculates the Chronological Julian Date at the given date.
    "calendar" indicates the calendar that year, month, and date are
    in.  possible values for calendar: CAL_GREGORIAN (Gregorian,
@@ -385,7 +385,7 @@ double DatetoCJD(Int year, Int month, double day, Int calendar)
    returned in the same time base as its arguments (TAI, UTC, TT, or
    something else altogether) */
 {
-  static double (*f[])(Int, Int, double) =
+  static double (*f[])(int32_t, int32_t, double) =
     { NULL, CommontoCJD, GregoriantoCJD, IslamictoCJD,
       JuliantoCJD, HebrewtoCJD, EgyptiantoCJD };
 
@@ -396,12 +396,12 @@ double DatetoCJD(Int year, Int month, double day, Int calendar)
   return f[calendar](year, month, day);
 }
 /*--------------------------------------------------------------------------*/
-void CJDNtoDate(Int CJDN, Int *year, Int *month, Int *day, Int calendar)
+void CJDNtoDate(int32_t CJDN, int32_t *year, int32_t *month, int32_t *day, int32_t calendar)
      /* returns the date corresponding to Julian Date JD. */
      /* possible values for calendar (see JulianDate): CAL_GREGORIAN, */
      /* CAL_ISLAMIC, CAL_JULIAN, CAL_HEBREW, CAL_EGYPTIAN, CAL_COMMON */
 {
-  static void (*f[])(Int, Int *, Int *, Int *) =
+  static void (*f[])(int32_t, int32_t *, int32_t *, int32_t *) =
     { CJDNtoCommon, CJDNtoGregorian, CJDNtoIslamic,
       CJDNtoJulian, CJDNtoHebrew, CJDNtoEgyptian };
 
@@ -411,13 +411,13 @@ void CJDNtoDate(Int CJDN, Int *year, Int *month, Int *day, Int calendar)
     f[calendar](CJDN, year, month, day);
 }
 /*--------------------------------------------------------------------------*/
-void CJDtoDate(double CJD, Int *year, Int *month, double *day, Int calendar)
+void CJDtoDate(double CJD, int32_t *year, int32_t *month, double *day, int32_t calendar)
      /* returns the date corresponding to Chronological Julian Day
         CJD.  possible values for calendar (see JulianDate):
         CAL_GREGORIAN, CAL_ISLAMIC, CAL_JULIAN, CAL_HEBREW,
         CAL_EGYPTIAN, CAL_COMMON */
 {
-  static void (*f[])(double, Int *, Int *, double *) =
+  static void (*f[])(double, int32_t *, int32_t *, double *) =
     { CJDtoCommon, CJDtoGregorian, CJDtoIslamic,
       CJDtoJulian, CJDtoHebrew, CJDtoEgyptian };
 
@@ -428,8 +428,8 @@ void CJDtoDate(double CJD, Int *year, Int *month, double *day, Int calendar)
     f[calendar](CJD, year, month, day);
 }
 /*--------------------------------------------------------------------------*/
-void findTextDate(char *text, Int *year, Int *month, double *day, Int *cal,
-		  Int order)
+void findTextDate(char *text, int32_t *year, int32_t *month, double *day, int32_t *cal,
+		  int32_t order)
 /* interpret the <text> as a date string in the calendar indicated by */
 /* <*cal> (e.g., CAL_HEBREW).  If <*cal> is CAL_DEFAULT, then the */
 /* used calendar is deduced from (the start of) the month name.  <order> */
@@ -438,7 +438,7 @@ void findTextDate(char *text, Int *year, Int *month, double *day, Int *cal,
 /* deduced calendar is returned in <*cal>, and the year, month number, */
 /* and day are returned in <*year>, <*month>, and <*day>, respectively. */
 {
-  Int	i, j, nnum = 0, ntext = 0, c;
+  int32_t	i, j, nnum = 0, ntext = 0, c;
   char	*daystring = NULL, *monthstring = NULL, *yearstring = NULL, *text0;
 
   /* first we seek the starts of the day, month, and year.  We assume that */
@@ -449,10 +449,10 @@ void findTextDate(char *text, Int *year, Int *month, double *day, Int *cal,
   /* year and the second number is the day.  The month string may come */
   /* anywhere before, between, or after the numbers. */
   text0 = text;
-  while (isspace((Int) *text))	/* skip whitespace */
+  while (isspace((int32_t) *text))	/* skip whitespace */
     text++;
   do {
-    if (*text == '-' || *text == '+' || isdigit((Int) *text)) {	/* a number */
+    if (*text == '-' || *text == '+' || isdigit((int32_t) *text)) {	/* a number */
       switch (nnum) {
 	case 0:			/* the first number */
 	  switch (order) {
@@ -476,9 +476,9 @@ void findTextDate(char *text, Int *year, Int *month, double *day, Int *cal,
 	  break;
       }
       nnum++;
-      while (*text && !isspace((Int) *text)) /* find next whitespace */
+      while (*text && !isspace((int32_t) *text)) /* find next whitespace */
 	text++;
-      while (*text && isspace((Int) *text)) /* skip it */
+      while (*text && isspace((int32_t) *text)) /* skip it */
 	text++;
     } else {			/* a non-number */
       switch (ntext) {
@@ -489,14 +489,14 @@ void findTextDate(char *text, Int *year, Int *month, double *day, Int *cal,
       ntext++;
       text++;
       do {
-	while (*text && !isdigit((Int) *text) && *text != '-' && *text != '+')
+	while (*text && !isdigit((int32_t) *text) && *text != '-' && *text != '+')
 	  text++;
-	if (!isspace((Int) text[-1]))
-	  while (*text && !isspace((Int) *text))
+	if (!isspace((int32_t) text[-1]))
+	  while (*text && !isspace((int32_t) *text))
 	    text++;
       } while (*text
-	       && (!(isdigit((Int) *text) || *text == '+' || *text == '-')
-		   || !isspace((Int) text[-1])));
+	       && (!(isdigit((int32_t) *text) || *text == '+' || *text == '-')
+		   || !isspace((int32_t) text[-1])));
     }
   } while (*text);
 
@@ -522,11 +522,11 @@ void findTextDate(char *text, Int *year, Int *month, double *day, Int *cal,
       /* the day number follows the month name; we seek the whitespace */
       /* after the last character of the month name */
       text = daystring;
-      while (text > text0 && isspace((Int) text[-1]))
+      while (text > text0 && isspace((int32_t) text[-1]))
 	text--;
     } else if (yearstring > monthstring) {
       text = yearstring;
-      while (text > text0 && isspace((Int) text[-1]))
+      while (text > text0 && isspace((int32_t) text[-1]))
 	text--;
     }
     c = *text;
@@ -609,12 +609,12 @@ void findTextDate(char *text, Int *year, Int *month, double *day, Int *cal,
     *month = 1;
 }
 /*--------------------------------------------------------------------------*/
-void roman_numeral(Int number)
+void roman_numeral(int32_t number)
 /* Stores at curScrat the number in Roman numeral form if it is positive and
    less than 4,000, otherwise in regular digital form. */
 {
   char	*p;
-  Int	i;
+  int32_t	i;
 
   if (number <= 0 || number >= 4000) {
     sprintf(curScrat, "%1d", number);
@@ -688,10 +688,10 @@ void roman_numeral(Int number)
   *p++ = '\0';
 }
 /*--------------------------------------------------------------------------*/
-Int construct_output_dims(Int *input_dims, Int num_input_dims,
-			  Int inputs_per_entry,
-			  Int *output_dims, Int output_dims_size,
-			  Int outputs_per_entry)
+int32_t construct_output_dims(int32_t *input_dims, int32_t num_input_dims,
+			  int32_t inputs_per_entry,
+			  int32_t *output_dims, int32_t output_dims_size,
+			  int32_t outputs_per_entry)
 /* constructs a list of output dimensions for cases where the number of
    inputs per entry and the number of outputs per entry may differ.
    All dimensions for which there is no room in the output are combined
@@ -707,7 +707,7 @@ Int construct_output_dims(Int *input_dims, Int num_input_dims,
    value if an error occurred.
    */
 {
-  Int num_output_dims = 0;
+  int32_t num_output_dims = 0;
 
   if (!input_dims || num_input_dims < 1 || inputs_per_entry < 1
       || !output_dims || output_dims_size < 1 || outputs_per_entry < 1)
@@ -744,9 +744,9 @@ Int construct_output_dims(Int *input_dims, Int num_input_dims,
   return num_output_dims;
 }
 /*--------------------------------------------------------------------------*/
-Int gcd(Int a, Int b)
+int32_t gcd(int32_t a, int32_t b)
 {
-  Int c;
+  int32_t c;
 
   if (!a || !b)
     return 1;
@@ -765,10 +765,10 @@ Int gcd(Int a, Int b)
   return b;
 }
 /*--------------------------------------------------------------------------*/
-Int lux_calendar(Int narg, Int ps[])
+int32_t lux_calendar(int32_t narg, int32_t ps[])
 {
-  Int result, input_elem_per_date, output_elem_per_date, iq;
-  Int *dims = NULL, ndim = 0;
+  int32_t result, input_elem_per_date, output_elem_per_date, iq;
+  int32_t *dims = NULL, ndim = 0;
   loopInfo tgtinfo, srcinfo;
   pointer src, tgt;
   /* enum Calendar_order fromorder, toorder; */
@@ -777,15 +777,15 @@ Int lux_calendar(Int narg, Int ps[])
   Symboltype inputtype, internaltype, outputtype;
   enum Calendar_outputtype outputkind;
   static struct {
-    Int to_elements_per_date;   /* translating to calendar date */
-    Int from_elements_per_date; /* translating from calendar date */
-    void (*CJDNtoCal)(Int const *CJDN, Int *date);
+    int32_t to_elements_per_date;   /* translating to calendar date */
+    int32_t from_elements_per_date; /* translating from calendar date */
+    void (*CJDNtoCal)(int32_t const *CJDN, int32_t *date);
     void (*CJDtoCal)(double const *CJD, double *date);
-    void (*CaltoCJDN)(Int const *date, Int *CJDN);
+    void (*CaltoCJDN)(int32_t const *date, int32_t *CJDN);
     void (*CaltoCJD)(double const *date, double *CJD);
-    void (*CJDNtoCalS)(Int const *CJDN, char **date);
+    void (*CJDNtoCalS)(int32_t const *CJDN, char **date);
     void (*CJDtoCalS)(double const *CJD, char **date);
-    void (*CalStoCJDN)(char * const *date, Int *CJDN);
+    void (*CalStoCJDN)(char * const *date, int32_t *CJDN);
     void (*CalStoCJD)(char * const *date, double *CJD);
   } cal_data[] = {
     { 0, 0, NULL,             NULL,            NULL,             NULL,            NULL,              NULL,             NULL,              NULL },
@@ -835,12 +835,12 @@ Int lux_calendar(Int narg, Int ps[])
       fromcalendar = CAL_CJD;
   }
 
-  void (*CaltoCJDN)(Int const *date, Int *CJDN)
+  void (*CaltoCJDN)(int32_t const *date, int32_t *CJDN)
     = cal_data[fromcalendar].CaltoCJDN;
   void (*CaltoCJD)(double const *date, double *CJDN)
     = cal_data[fromcalendar].CaltoCJD;
   /*
-  void (*CalStoCJDN)(char * const *date, Int *CJDN)
+  void (*CalStoCJDN)(char * const *date, int32_t *CJDN)
     = cal_data[fromcalendar].CalStoCJDN;
   */
   void (*CalStoCJD)(char * const *date, double *CJD)
@@ -887,11 +887,11 @@ Int lux_calendar(Int narg, Int ps[])
       && fromtime == totime)    /* no conversion */
     return *ps;
 
-  void (*CJDNtoCal)(Int const *CJDN, Int *date)
+  void (*CJDNtoCal)(int32_t const *CJDN, int32_t *date)
     = cal_data[tocalendar].CJDNtoCal;
   void (*CJDtoCal)(double const *CJD, double *date)
     = cal_data[tocalendar].CJDtoCal;
-  void (*CJDNtoCalS)(Int const *CJDN, char **date)
+  void (*CJDNtoCalS)(int32_t const *CJDN, char **date)
     = cal_data[tocalendar].CJDNtoCalS;
   void (*CJDtoCalS)(double const *CJD, char **date)
     = cal_data[tocalendar].CJDtoCalS;
@@ -931,7 +931,7 @@ Int lux_calendar(Int narg, Int ps[])
     else {
       internaltype = LUX_LONG;
       if (input_elem_per_date != 1) {
-        Int lux_floor(Int, Int *);
+        int32_t lux_floor(int32_t, int32_t *);
         iq = lux_floor(1, &iq);
         inputtype = LUX_LONG;
       }
@@ -966,7 +966,7 @@ Int lux_calendar(Int narg, Int ps[])
     outputtype = internaltype;
 
   {
-    Int more[1], less[1], nMore, nLess;
+    int32_t more[1], less[1], nMore, nLess;
 
     /* does the output need more elements than the input? */
     nMore = nLess = 0;
@@ -1000,7 +1000,7 @@ Int lux_calendar(Int narg, Int ps[])
        date, but the first dimension must be exactly equal to the
        expected number else the standard loop ignores the excess
        elements.  We shift the excess to the second dimension. */
-    Int dims[MAX_DIMS];
+    int32_t dims[MAX_DIMS];
 
     assert(srcinfo.dims[0] % input_elem_per_date == 0);
     memcpy(dims, srcinfo.dims, srcinfo.ndim*sizeof(*dims));
@@ -1008,7 +1008,7 @@ Int lux_calendar(Int narg, Int ps[])
       dims[1] = 1;              /* add a 2nd dimension */
       srcinfo.ndim = 2;
     }
-    Int d = srcinfo.dims[0]/input_elem_per_date;
+    int32_t d = srcinfo.dims[0]/input_elem_per_date;
     dims[1] *= d;
     dims[0] /= d;
     setupDimensionLoop(&srcinfo, srcinfo.ndim, dims, srcinfo.type,
@@ -1057,7 +1057,7 @@ Int lux_calendar(Int narg, Int ps[])
         break;
       case LUX_DOUBLE: /* only cases with one element per date reach here */
         assert(input_elem_per_date == 1);
-        temp.l = (Int) floor(*src.d); /* translate from DOUBLE to LONG */
+        temp.l = (int32_t) floor(*src.d); /* translate from DOUBLE to LONG */
         CaltoCJDN(&temp.l, &timestamp.l); /* use LONG translation */
         src.d += input_elem_per_date;
         break;
@@ -1144,7 +1144,7 @@ Int lux_calendar(Int narg, Int ps[])
     case LUX_DOUBLE:
       switch (outputtype) {
       case LUX_LONG:
-        temp.l = (Int) floor(timestamp.d); /* translate from DOUBLE to LONG */
+        temp.l = (int32_t) floor(timestamp.d); /* translate from DOUBLE to LONG */
         CJDNtoCal(&temp.l, tgt.l);         /* use LONG translation */
         tgt.l += output_elem_per_date;
         break;
@@ -1171,7 +1171,7 @@ Int lux_calendar(Int narg, Int ps[])
   return result;
 }
 /*--------------------------------------------------------------------------*/
-Int lux_calendar_OLD(Int narg, Int ps[])
+int32_t lux_calendar_OLD(int32_t narg, int32_t ps[])
      /* general calendar conversion routine */
      /* syntax: DATE2 = CALENDAR(DATE1, /FROMCALENDAR, /TOCALENDAR) */
      /* "/FROMCALENDAR":  /FROMCOMMON /FROMGREGORIAN /FROMISLAMIC */
@@ -1180,7 +1180,7 @@ Int lux_calendar_OLD(Int narg, Int ps[])
      /* "/TOCALENDAR": /TOCOMMON /TOGREGORIAN /TOISLAMIC /TOJULIAN /TOJD */
      /*                /TOCJD /TOMAYAN /TOLONGCOUNT /TOUTC /TOTAI /TOTT */
 {
-  Int	n, *dims, ndim, nRepeat, type, i, iq, cal, newDims[MAX_DIMS],
+  int32_t	n, *dims, ndim, nRepeat, type, i, iq, cal, newDims[MAX_DIMS],
     num_newDims, year, month, nd, d, t, v, m, sec, min, hour,
     fromcalendar, tocalendar, fromtime, totime, output, fromorder, toorder,
     outtype, iday;
@@ -1237,7 +1237,7 @@ Int lux_calendar_OLD(Int narg, Int ps[])
       iq = lux_double(1, ps);
       type = LUX_DOUBLE;
     }
-    data.l = (Int *) array_data(iq);
+    data.l = (int32_t *) array_data(iq);
     break;
   case LUX_STRING:
     nRepeat = 1;
@@ -1288,7 +1288,7 @@ Int lux_calendar_OLD(Int narg, Int ps[])
   /* temporary space for JDs */
   switch (outtype) {
   case LUX_LONG:
-    JD.l = (Int *) malloc(nRepeat*sizeof(Int));
+    JD.l = (int32_t *) malloc(nRepeat*sizeof(int32_t));
     if (!JD.l)
       return cerror(ALLOC_ERR, *ps);
     break;
@@ -1314,7 +1314,7 @@ Int lux_calendar_OLD(Int narg, Int ps[])
     case CAL_LONGCOUNT:
       for (i = 0; i < nRepeat; i++) {
 	char *p, *q;
-	Int level = 0;
+	int32_t level = 0;
 	long stride = 1;
 	long d = 0, this = 0;
 	
@@ -1433,13 +1433,13 @@ Int lux_calendar_OLD(Int narg, Int ps[])
         switch (fromorder) {
         case CAL_YMD:
           for (i = 0; i < nRepeat; i++)
-            JD.l[i] = DatetoCJDN((Int) data.d[3*i], (Int) data.d[3*i + 1],
-                                 (Int) data.d[3*i + 2], cal);
+            JD.l[i] = DatetoCJDN((int32_t) data.d[3*i], (int32_t) data.d[3*i + 1],
+                                 (int32_t) data.d[3*i + 2], cal);
           break;
         case CAL_DMY:
           for (i = 0; i < nRepeat; i++)
-            JD.l[i] = DatetoCJDN((Int) data.d[3*i + 2], (Int) data.d[3*i + 1],
-                                 (Int) data.d[3*i], cal);
+            JD.l[i] = DatetoCJDN((int32_t) data.d[3*i + 2], (int32_t) data.d[3*i + 1],
+                                 (int32_t) data.d[3*i], cal);
           break;
         }
         break;
@@ -1465,12 +1465,12 @@ Int lux_calendar_OLD(Int narg, Int ps[])
         switch (fromorder) {
         case CAL_YMD:
           for (i = 0; i < nRepeat; i++)
-            JD.d[i] = DatetoCJD((Int) data.d[3*i], (Int) data.d[3*i + 1],
+            JD.d[i] = DatetoCJD((int32_t) data.d[3*i], (int32_t) data.d[3*i + 1],
                                 data.d[3*i + 2], cal);
           break;
         case CAL_DMY:
           for (i = 0; i < nRepeat; i++)
-            JD.d[i] = DatetoCJD((Int) data.d[3*i + 2], (Int) data.d[3*i + 1],
+            JD.d[i] = DatetoCJD((int32_t) data.d[3*i + 2], (int32_t) data.d[3*i + 1],
                                 data.d[3*i], cal);
           break;
         }
@@ -1543,13 +1543,13 @@ Int lux_calendar_OLD(Int narg, Int ps[])
       switch (output) {
       case 999 /* CAL_ISOTEXT */:
         if (outtype == LUX_DOUBLE) {
-          sec = (day - (Int) day)*86400;
+          sec = (day - (int32_t) day)*86400;
           min = sec/60;
           sec = sec % 60;
           hour = min/60;
           min = min % 60;
           sprintf(line,"%4d-%02d-%02dT%02d:%02d:%02d", year, month,
-                  (Int) day, hour, min, sec);
+                  (int32_t) day, hour, min, sec);
         } else
           sprintf(line,"%4d-%02d-%02d", year, month, iday);
         *data.sp++ = strsave(line);
@@ -1559,14 +1559,14 @@ Int lux_calendar_OLD(Int narg, Int ps[])
         case CAL_YMD:
           if (outtype == LUX_DOUBLE)
             sprintf(line, "%1d %s %1d", year,
-                    GregorianMonths[month - 1], (Int) day);
+                    GregorianMonths[month - 1], (int32_t) day);
           else
             sprintf(line, "%1d %s %1d", year,
                     GregorianMonths[month - 1], iday);
           break;
         case CAL_DMY:
           if (outtype == LUX_DOUBLE)
-            sprintf(line, "%1d %s %1d", (Int) day,
+            sprintf(line, "%1d %s %1d", (int32_t) day,
                     GregorianMonths[month - 1], year);
           else
             sprintf(line, "%1d %s %1d", iday,
@@ -1634,11 +1634,11 @@ Int lux_calendar_OLD(Int narg, Int ps[])
     }
     for (i = 0; i < nRepeat; i++) {
       char	*p = curScrat, type = 0;
-      Int	l;
+      int32_t	l;
 
       if (outtype == LUX_DOUBLE) {
         CJDtoDate(JD.d[i], &year, &month, &day, CAL_COMMON);
-        iday = (Int) day;
+        iday = (int32_t) day;
       } else
         CJDNtoDate(JD.l[i], &year, &month, &iday, CAL_COMMON);
       /* first we determine the designation of the day; days are counted
@@ -1742,7 +1742,7 @@ Int lux_calendar_OLD(Int narg, Int ps[])
       num_newDims = construct_output_dims(dims, ndim, n,
                                           newDims, MAX_DIMS, 1);
       iq = array_scratch(outtype, num_newDims, newDims);
-      data.l = (Int *) array_data(iq);
+      data.l = (int32_t *) array_data(iq);
     }
     memcpy(data.l, JD.l, nRepeat*sizeof(*JD.l));
     if (!isFree)
@@ -1803,7 +1803,7 @@ Int lux_calendar_OLD(Int narg, Int ps[])
     }
     allocate(line, 80, char);
     for (i = 0; i < nRepeat; i++) {
-      Int n;
+      int32_t n;
 
       if (outtype == LUX_DOUBLE)
         d = floor(JDtoCJD(JD.d[i]) - 584283);
@@ -1853,13 +1853,13 @@ Int lux_calendar_OLD(Int narg, Int ps[])
   for (i = 0; i < nRepeat; i++) {
     if (outtype == LUX_DOUBLE) {
       CJDtoDate(JD.d[i], &year, &month, &day, tocalendar);
-      iday = (Int) day;
+      iday = (int32_t) day;
     } else
       CJDNtoDate(JD.l[i], &year, &month, &iday, tocalendar);
     switch (output) {
     case 999 /* CAL_ISOTEXT */:
       if (outtype == LUX_DOUBLE) {
-        sec = (day - (Int) day)*86400;
+        sec = (day - (int32_t) day)*86400;
         min = sec/60;
         sec = sec % 60;
         hour = min/60;
@@ -1926,13 +1926,13 @@ Int lux_calendar_OLD(Int narg, Int ps[])
   return iq;
 }
 /*--------------------------------------------------------------------------*/
-Int lux_EasterDate(Int narg, Int ps[])
+int32_t lux_EasterDate(int32_t narg, int32_t ps[])
      /* returns dates of Easter in the common calendar (Gregorian-Julian). */
      /* syntax:  X = EASTERDATE(YEARS), where YEARS is an array.  X will */
      /* have three elements in its first dimension, in the order year, */
      /* month, day */
 {
-  Int	*year, nYear, iq, *dims, nDim, newDims[MAX_DIMS], *ptr, month, day;
+  int32_t	*year, nYear, iq, *dims, nDim, newDims[MAX_DIMS], *ptr, month, day;
 
   switch (symbol_class(*ps))
   { case LUX_SCALAR:
@@ -1942,7 +1942,7 @@ Int lux_EasterDate(Int narg, Int ps[])
       break;
     case LUX_ARRAY:
       iq = lux_long(1, ps);
-      year = (Int *) array_data(iq);
+      year = (int32_t *) array_data(iq);
       nYear = array_size(iq);  dims = array_dims(iq);
       nDim = array_num_dims(iq);
       break;
@@ -1952,7 +1952,7 @@ Int lux_EasterDate(Int narg, Int ps[])
   *newDims = 3;
   if (nDim) memcpy(newDims + 1, dims, nDim);
   iq = array_scratch(LUX_LONG, nDim + 1, newDims);
-  ptr = (Int *) array_data(iq);
+  ptr = (int32_t *) array_data(iq);
   while (nYear--)
   { if (EasterDate(*year, &month, &day) < 0)
       return -1;		/* some error */
@@ -1997,9 +1997,9 @@ double deltaT(double CJD)
     0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0,
   };
-  static Int	n = sizeof(JDs)/sizeof(double);
+  static int32_t	n = sizeof(JDs)/sizeof(double);
   double	T, dT;
-  Int	lo, hi, mid;
+  int32_t	lo, hi, mid;
 
   double JD = CJD - 0.5;
   if (JD < JDs[0]) {		/* before 1961-01-01 */
@@ -2116,7 +2116,7 @@ void TAI_to_CJDLT(double *CJD)
   *CJD = t_LT/(double) 86400.0 + 2440588;
 }
 /*--------------------------------------------------------------------------*/
-double JDE(double JD, Int direction)
+double JDE(double JD, int32_t direction)
      /* corrects JD for changes in the rotation rate of the Earth. */
      /* (i.e., takes JD (UT) and returns an approximate JDE (TDT). */
      /* The algorithms are based on observations between years -390 */
@@ -2137,7 +2137,7 @@ double JDE(double JD, Int direction)
   return (direction < 0)? JD - dT/86400: JD + dT/86400;
 }
 /*--------------------------------------------------------------------------*/
-void rotate(double *pos, double angle, Int axis)
+void rotate(double *pos, double angle, int32_t axis)
 /* rotate X, Y, and Z (pos[0] through pos[2]) over the specified angle */
 /* (in radians) along the specified axis (X = 0, etc.) */
 {
@@ -2203,7 +2203,7 @@ void rotate(double *pos, double angle, Int axis)
     }
 }
 /*--------------------------------------------------------------------------*/
-void precess(double *pos, double equinox, Int forward)
+void precess(double *pos, double equinox, int32_t forward)
      /* precess the rectangular coordinates from equinox 2000.0 to */
      /* the specified one (JDE) (forward > 0) or backward (forward <= 0) */
      /* ES3.212 */
@@ -2303,7 +2303,7 @@ void precessEquatorial(double *ra, double *dec, double JDfrom, double JDto)
   *dec = asin(C);
 }
 /*--------------------------------------------------------------------------*/
-Int lux_precess(Int narg, Int ps[])
+int32_t lux_precess(int32_t narg, int32_t ps[])
 /* PRECESS(coords, JDfrom, JDto) precesses the equatorial coordinates
    <coords> from the equinox of <JDfrom> to <JDto>, both measured in
    Julian Days.  <coords>(0,*) is taken to contain right ascensions
@@ -2313,7 +2313,7 @@ Int lux_precess(Int narg, Int ps[])
   double JDfrom, JDto, alpha, delta;
   pointer src, tgt;
   loopInfo srcinfo, tgtinfo;
-  Int n, outtype, result, done;
+  int32_t n, outtype, result, done;
 
   JDfrom = double_arg(ps[1]);
   JDto = double_arg(ps[2]);
@@ -2430,15 +2430,15 @@ Int lux_precess(Int narg, Int ps[])
 }
 /*--------------------------------------------------------------------------*/
 #include "constellations.h"
-Int constellation(double alpha, double delta)
+int32_t constellation(double alpha, double delta)
 /* returns the identity of the official constellation that the
    position is in that is indicated by right ascension <alpha> and
    declination <delta>, both measured in degrees relative to the
    equinox of B1875.0.  LS 2004may03
  */
 {
-  Int nb = sizeof(constellation_boundaries)/sizeof(struct constellation_struct);
-  Int i;
+  int32_t nb = sizeof(constellation_boundaries)/sizeof(struct constellation_struct);
+  int32_t i;
   struct constellation_struct *cb = constellation_boundaries;
 
   if (delta < -90)
@@ -2454,7 +2454,7 @@ Int constellation(double alpha, double delta)
 }
 /*--------------------------------------------------------------------------*/
 #define B1875 (2405889.25855047) /* from SOFA Epb2jd routine */
-Int lux_constellation(Int narg, Int ps[])
+int32_t lux_constellation(int32_t narg, int32_t ps[])
 /* CONSTELLATION(coords [, equinox, /JULIAN, /BESSELIAN]) returns the
    constellation of each set of <coords> relative to the given <equinox>.
    <coords>(0,*) are right ascensions measured in degrees.
@@ -2467,11 +2467,11 @@ Int lux_constellation(Int narg, Int ps[])
    LS 2004may03
  */
 {
-  Int n, result, done;
+  int32_t n, result, done;
   double equinox, alpha, delta;
   loopInfo srcinfo, tgtinfo;
   pointer src, tgt;
-  Int vocal;
+  int32_t vocal;
 
   if (narg > 1) {
     equinox = double_arg(ps[1]);
@@ -2616,13 +2616,13 @@ Int lux_constellation(Int narg, Int ps[])
   return result;
 }
 /*--------------------------------------------------------------------------*/
-Int lux_constellationname(Int narg, Int ps[]) 
+int32_t lux_constellationname(int32_t narg, int32_t ps[]) 
 /* CONSTELLATIONNAME(<index>) returns the official abbreviation of the
    name of the constellation with the given <index> (may be an array),
    as returned by function CONSTELLATION.  LS 2004may03
  */
 {
-  Int result, n, nc;
+  int32_t result, n, nc;
   pointer src;
   char **tgt;
 
@@ -2672,7 +2672,7 @@ Int lux_constellationname(Int narg, Int ps[])
       if (*src.f < 0 || *src.f >= nc)
 	*tgt = strdup("***");
       else
-	*tgt = strdup(constellation_names[(Int) *src.f]);
+	*tgt = strdup(constellation_names[(int32_t) *src.f]);
       tgt++;
       src.f++;
     }
@@ -2682,7 +2682,7 @@ Int lux_constellationname(Int narg, Int ps[])
       if (*src.d < 0 || *src.d >= nc)
 	*tgt = strdup("***");
       else
-	*tgt = strdup(constellation_names[(Int) *src.d]);
+	*tgt = strdup(constellation_names[(int32_t) *src.d]);
       tgt++;
       src.d++;
     }
@@ -2691,14 +2691,14 @@ Int lux_constellationname(Int narg, Int ps[])
   return result;
 }
 /*--------------------------------------------------------------------------*/
-float magnitude(double d, double r, double beta, Int objNum)
+float magnitude(double d, double r, double beta, int32_t objNum)
      /* Estimates the visual magnitude from the square of the distance */
      /* to the object, the square of the distance of the object to the Sun, */
      /* and the phase angle in degrees*/
      /* [ES7, 15] */
 {
   double	temp;
-  Int	i;
+  int32_t	i;
 
   switch (objNum) {
     default:
@@ -2744,12 +2744,12 @@ float magnitude(double d, double r, double beta, Int objNum)
   }
 }
 /*--------------------------------------------------------------------------*/
-const char const *objectName(Int objNum)
+const char const *objectName(int32_t objNum)
 {
   switch (objNum) {
     default:
       if (nExtraObj) {
-	Int i = findint(objNum, extraIDs, nExtraObj);
+	int32_t i = findint(objNum, extraIDs, nExtraObj);
 	return extraOrbits[i].comment;
       }
       return "Unknown";
@@ -2786,7 +2786,7 @@ void nutation(double JDE, double *dPsi, double *cdPsi, double *sdPsi,
 {
   double	d, m, mm, f, o, *amp, angle, T;
   int16_t	*mul;
-  Int	i;
+  int32_t	i;
 
   T = (JDE - J2000)/36525;
   d = mpol3(297.85036, 445267.111480, -0.0019142, 1./189474, T, 360)*DEG;
@@ -2845,7 +2845,7 @@ double obliquity(double JDE, double *dEps)
   return eps;
 }
 /*--------------------------------------------------------------------------*/
-double standardSiderealTime(Int JD, double *dPsi, double ceps)
+double standardSiderealTime(int32_t JD, double *dPsi, double ceps)
 /* returns the sidereal time at longitude zero at 0 UT of the day of which */
 /* 12 UT corresponds to Julian Day number <JD>, in radians; mean if */
 /* dPsi == NULL, apparent otherwise.  */
@@ -2879,13 +2879,13 @@ double siderealTime(double JD, double *dPsi, double ceps)
   return c;  
 }
 /*--------------------------------------------------------------------------*/
-Int lux_siderealtime(Int narg, Int ps[]) 
+int32_t lux_siderealtime(int32_t narg, int32_t ps[]) 
 /* SIDEREALTIME(<jd>) returns the mean sidereal time at the indicated */
 /* julian dates, in hours */
 /* LS 31mar2002 */
 {
   double *jd, *out;
-  Int n, iq, result;
+  int32_t n, iq, result;
   double dPsi, cdPsi, sdPsi, dEps, epsilon;
 
   switch (symbol_class(ps[0])) {
@@ -2963,7 +2963,7 @@ void XYZ_VSOPtoFK5(double T, double *pos)
 /*--------------------------------------------------------------------------*/
 #define EQUINOX_OF_DATE	DBL_MAX
 
-Int readExtra(char *file, char mode)
+int32_t readExtra(char *file, char mode)
 /* read orbital data for extra celestial bodies from file <file>.
 
  Data format:
@@ -3001,7 +3001,7 @@ Int readExtra(char *file, char mode)
 {
   FILE	*fp;
   char	*defaultFile = "$ANADIR/orbits", orbitLine[256], *pp;
-  Int	obj, id, rec, c, format, n, nmore, indx, nterm;
+  int32_t	obj, id, rec, c, format, n, nmore, indx, nterm;
   double	jd, a, e, i, node, peri, m, equinox;
   double	sn, cn, si, ci, f, g, p, q, mag;
 
@@ -3037,12 +3037,12 @@ Int readExtra(char *file, char mode)
   if (mode == 2 || !extraOrbits) { /* replace or new */
     extraOrbits =
       (struct extraInfo *) malloc(nExtraObj*sizeof(struct extraInfo));
-    extraIDs = (Int *) malloc(nExtraObj*sizeof(Int));
+    extraIDs = (int32_t *) malloc(nExtraObj*sizeof(int32_t));
   } else {			/* merge */
     extraOrbits =
       (struct extraInfo *) realloc(extraOrbits,
 				   nExtraObj*sizeof(struct extraInfo));
-    extraIDs = (Int *) realloc(extraIDs, nExtraObj*sizeof(Int));
+    extraIDs = (int32_t *) realloc(extraIDs, nExtraObj*sizeof(int32_t));
   }
     
   if (!extraOrbits || !extraIDs)
@@ -3071,7 +3071,7 @@ Int readExtra(char *file, char mode)
       free(extraOrbits[indx].comment);
       nmore--;
     } else {			/* insert object */
-      memmove(extraIDs + indx + 1, extraIDs + indx, nmore*sizeof(Int));
+      memmove(extraIDs + indx + 1, extraIDs + indx, nmore*sizeof(int32_t));
       memmove(extraOrbits + indx + 1, extraOrbits + indx,
 	      nmore*sizeof(struct extraInfo));
     }
@@ -3238,14 +3238,14 @@ Int readExtra(char *file, char mode)
     extraOrbits =
       (struct extraInfo *) realloc(extraOrbits,
 				   indx*sizeof(struct extraInfo));
-    extraIDs = (Int *) realloc(extraIDs, indx*sizeof(Int));
+    extraIDs = (int32_t *) realloc(extraIDs, indx*sizeof(int32_t));
     nExtraObj = indx;
   }
 
   return 1;
 }
 /*--------------------------------------------------------------------------*/
-Int lux_readorbits(Int narg, Int ps[])
+int32_t lux_readorbits(int32_t narg, int32_t ps[])
 /* READORBITS [,<file>,/LIST,/REPLACE] reads orbital information from <file>.
  Lists comments if /LIST is specified.  Replace preread data (if any)
  if /REPLACE is specified, else merges */
@@ -3259,7 +3259,7 @@ Int lux_readorbits(Int narg, Int ps[])
 void showExtra(void)
 /* list the presently read auxilliary object */
 {
-  Int	i;
+  int32_t	i;
 
   if (nExtraObj) {
     puts("Auxilliary orbits were read for:");
@@ -3270,7 +3270,7 @@ void showExtra(void)
     puts("No auxilliary orbits have been read.");
 }
 /*--------------------------------------------------------------------------*/
-Int lux_showorbits(Int narg, Int ps[])
+int32_t lux_showorbits(int32_t narg, int32_t ps[])
 {
   showExtra();
   return 1;
@@ -3451,12 +3451,12 @@ double interpolate_angle(double a1, double a2, double f)
   return a2;
 }
 /*--------------------------------------------------------------------------*/
-Int extraHeliocentric(double JDE, Int object, double *equinox,
+int32_t extraHeliocentric(double JDE, int32_t object, double *equinox,
                       double *f, double *r)
 /* For <JDE>, return the polar coordinates of <object> in <f>, and the
  equinox for which it was specified in <equinox>. */
 {
-  Int	findint(Int, Int *, Int), i, low, high, mid;
+  int32_t	findint(int32_t, int32_t *, int32_t), i, low, high, mid;
   double	m, e, k, d1, d2, q;
   struct extraInfo	*pp;
   struct orbitParams	*qq;
@@ -3535,7 +3535,7 @@ void extraElementsHeliocentric(double JDE, double *equinox, double *f,
   if (haveExtraElements & 4) {	/* new */
     double i, node, peri, ci, si, cn, sn,
       ff, g, p, qq;
-    Int ii;
+    int32_t ii;
 
     theequinox = extraElements[0];
     epoch = extraElements[1];
@@ -3596,14 +3596,14 @@ void extraElementsHeliocentric(double JDE, double *equinox, double *f,
   f[2] = *r*zfac*sin(zangle + m);
 }
 /*--------------------------------------------------------------------------*/
-void heliocentricXYZr(double JDE, Int object, double equinox, double *pos,
-		      double *r, double tolerance, Int vocal, Int source)
+void heliocentricXYZr(double JDE, int32_t object, double equinox, double *pos,
+		      double *r, double tolerance, int32_t vocal, int32_t source)
      /* returns in <f> the cartesian heliocentric ecliptic coordinates of
 	object <object> for the desired <equinox> at <JDE>, and in
 	<r> the heliocentric distance */
 {
   double	T, standardEquinox;
-  Int	i;
+  int32_t	i;
 
   T = (JDE - J2000)/365250;	/* Julian millennia since J2000.0 */
   switch (object) {
@@ -3690,7 +3690,7 @@ void heliocentricXYZr(double JDE, Int object, double equinox, double *pos,
 	sumb, E[5], XYZmoon[3], Tc;
       struct moonlrTerm *mlrt;
       struct moonbTerm *mbt;
-      Int i;
+      int32_t i;
 
       Tc = T*10 + 4.069459e-10; /* convert from julian millennia to */
       /* julian centuries and take out light-time correction which is */
@@ -3883,7 +3883,7 @@ void galtoeq(double *pos, double equinox, char forward)
   }
 }
 /*--------------------------------------------------------------------------*/
-Int lux_astrf(Int narg, Int ps[], Int forward) {
+int32_t lux_astrf(int32_t narg, int32_t ps[], int32_t forward) {
 /* ASTRF(<coords>[, <equinox>, /JULIAN, /BESSELIAN]
    [, /FROMEQUATORIAL, /FROMECLIPTICAL, /FROMGALACTIC]
    [, /TOEQUATORIAL, /TOECLIPTICAL, /TOGALACTIC])
@@ -3902,7 +3902,7 @@ Int lux_astrf(Int narg, Int ps[], Int forward) {
 */
   loopInfo srcinfo, tgtinfo;
   pointer src, tgt;
-  Int result, from, to;
+  int32_t result, from, to;
   double pos[2], ceps, seps, epsilon, equinox;
 
   if (internalMode & 2)
@@ -4104,7 +4104,7 @@ void geocentricCoords(double latitude, double height, double *rcp, double *rsp)
   *rsp = FLAT*sin(u) + height*sin(latitude)/R_EARTH;
 }
 /*--------------------------------------------------------------------------*/
-double meanDistance(Int obj1, Int obj2)
+double meanDistance(int32_t obj1, int32_t obj2)
 {
   if (obj1 < 0 || obj1 > 8 || obj2 < 0 || obj2 > 8)
     return 0.0;
@@ -4152,7 +4152,7 @@ void printHBRtoXYZ(double *lbr)
   printf(" X = %.10g, Y = %.10g, Z = %.10g\n", xyz[0], xyz[1], xyz[2]);
 }
 /*--------------------------------------------------------------------------*/
-Int lux_astropos(Int narg, Int ps[])
+int32_t lux_astropos(int32_t narg, int32_t ps[])
      /* returns the positions of a set of heavenly bodies at a specific */
      /* set of times, for equinox 2000.0 */
      /* Syntax: X = ASTRON(JDs, OBJECTS [, OBJECT0, OBSERVER=OBSERVER, */
@@ -4189,7 +4189,7 @@ Int lux_astropos(Int narg, Int ps[])
      /* 8 - Neptune, 9 - Pluto, 10 - Moon. */
 {
   char	tdt, *string;
-  Int	iq, nJD, *object, nObjects, object0, dims[MAX_DIMS],
+  int32_t	iq, nJD, *object, nObjects, object0, dims[MAX_DIMS],
     nDims, i, j, result, coordSystem, vocal;
   double	*JD, *f, *f0, longitude, latitude, height = 0.0, rsp,
     rcp, clat, slat, equinox;
@@ -4235,7 +4235,7 @@ Int lux_astropos(Int narg, Int ps[])
       break;
     case LUX_ARRAY:
       iq = lux_long(1, &iq);
-      object = (Int *) array_data(iq);
+      object = (int32_t *) array_data(iq);
       nObjects = array_size(iq);
       break;
     default:

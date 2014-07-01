@@ -30,24 +30,24 @@ extern float	xfac, yfac, wxt, wxb, wyt, wyb, xmin, xmax, ymin, ymax;
 #if HAVE_LIBX11
 extern float	tvix, tviy, tvixb, tviyb, tvscale;
 #endif
-extern Int	iorder, iyhigh, ipltyp;
+extern int32_t	iorder, iyhigh, ipltyp;
 
-Int	lux_replace(Int, Int);
+int32_t	lux_replace(int32_t, int32_t);
 
 /* A bunch of coordinate transformation routines */
 /* choices: LUX_DVI, LUX_DEV (xport), LUX_IMG, LUX_PLT (plot),
    LUX_RIM, LUX_RPL */
-Int fromCoordinateSystem, toCoordinateSystem;
+int32_t fromCoordinateSystem, toCoordinateSystem;
 /*---------------------------------------------------------------------*/
-Int coordMap(float *x, float *y)
+int32_t coordMap(float *x, float *y)
 /* transforms (x,y) (in fromCoordinateSystem) to toCoordinateSystem */
 {
-  Int coordTrf(float *, float *, Int, Int);
+  int32_t coordTrf(float *, float *, int32_t, int32_t);
 
   return coordTrf(x, y, fromCoordinateSystem, toCoordinateSystem);
 }
 /*---------------------------------------------------------------------*/
-Int coordTrf(float *x, float *y, Int from, Int to)
+int32_t coordTrf(float *x, float *y, int32_t from, int32_t to)
      /* xfac,yfac are the pixel dimensions of the current window */
      /* wxb,wxt is the DVI x range of the plot window */
      /* wyb,wyt is the DVI y range of the plot window */
@@ -57,7 +57,7 @@ Int coordTrf(float *x, float *y, Int from, Int to)
 /* if <x> or <y> are equal to NULL, then the corresponding coordinate */
 /* is not treated. */
 {
-  extern Int	setup;
+  extern int32_t	setup;
 
   if (from == to)
     return 1;
@@ -215,14 +215,14 @@ Int coordTrf(float *x, float *y, Int from, Int to)
   return 1;
 }
 /*---------------------------------------------------------------------*/
-Int lux_coordtrf(Int narg, Int ps[])
+int32_t lux_coordtrf(int32_t narg, int32_t ps[])
 /* transform coordinates between various coordinate systems */
 /* syntax:  COORDTRF,xold,yold[,xnew,ynew] */
 /* specify the coordinate systems with keywords: */
 /* /DVI, /DEV, /IMG, /PLT, /RIM, /RPL, /DEP, /X11 */
 /* /TODVI, /TODEV, /TOIMG, /TOPLT, /TORIM, /TORPL, /TOX11 */
 {
-  Int	iq, n, n2, from, to;
+  int32_t	iq, n, n2, from, to;
   float	*xold, *yold, *xnew, *ynew, x, y;
 
   from = (internalMode & 7);

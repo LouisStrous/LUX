@@ -95,7 +95,7 @@ void init_XYZ_eclipticPrecession(double fromequinox, double toequinox)
    for cartesian coordinates, for precession from <fromequinox> to
    <toequinox> (both measured in JDE) */
 {
-  Int new = (toequinox != a_toJ2000[9] || fromequinox != a_fromJ2000[9]);
+  int32_t new = (toequinox != a_toJ2000[9] || fromequinox != a_fromJ2000[9]);
   if (!new)
     return;
   if (toequinox != a_toJ2000[9]) {

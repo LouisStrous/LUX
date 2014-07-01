@@ -26,16 +26,16 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdio.h>
 #include "action.h"
 /*--------------------------------------------------------------------------*/
-Int d_decomp(x, n, nd)
+int32_t d_decomp(x, n, nd)
 /*translated from fortran anadecomp.for which may be easier to follow since
 	it uses subscripts rather than the pointers used here */
 /*no pivoting in this version !, so diagonals must be != 0 */
 double	*x;
-Int	n, nd;
+int32_t	n, nd;
 {
 register	double	sum1, sum2, *p1, *p2, *p3, *p4;
 double	*qd, *q2, *q1, div;
-Int	nq, mq, lq, k;
+int32_t	nq, mq, lq, k;
 p1 = x;
 div = 1.0 / *p1; nq = n-1; while (nq--) { p1 += nd; *p1 *= div; }
 nq = n-1;	k = 1;		qd = x + 1 + nd; /*qd is diagonal ptr */
@@ -56,14 +56,14 @@ k++; qd += (nd + 1); }				/*end of outer loop */
 return 1;			/* added LS 5feb97 */
 }
 /*--------------------------------------------------------------------------*/
-Int f_decomp(float *x, Int n, Int nd)
+int32_t f_decomp(float *x, int32_t n, int32_t nd)
 /*translated from fortran anadecomp.for which may be easier to follow since
 	it uses subscripts rather than the pointers used here */
 /*no pivoting in this version !, so diagonals must be != 0 */
 {
   register	float	sum1, sum2, *p1, *p2, *p3, *p4;
   float		*qd, * q2, *q1, div;
-  Int		nq, mq, lq, k;
+  int32_t		nq, mq, lq, k;
 
   p1 = x;
   div = 1.0/ *p1;
@@ -90,11 +90,11 @@ Int f_decomp(float *x, Int n, Int nd)
 return 1;			/* added LS 5feb97 */
 }
 /*--------------------------------------------------------------------------*/
-Int f_solve(float *a, float *b, Int n, Int nd)
+int32_t f_solve(float *a, float *b, int32_t n, int32_t nd)
 {
   register	float	sum, *p1, *p2;
   float		*qd, *q1;
-  Int		nq, mq, k;
+  int32_t		nq, mq, k;
 
 /*printf("in f_solve\n");*/
   p1 = a;	q1 = b;
@@ -116,13 +116,13 @@ Int f_solve(float *a, float *b, Int n, Int nd)
 return 1;			/* added LS 5feb97 */
 }
 /*--------------------------------------------------------------------------*/
-Int d_solve(a, b, n, nd)
+int32_t d_solve(a, b, n, nd)
 double	*a,*b;
-Int	n, nd;
+int32_t	n, nd;
 {
 register	double	sum, *p1, *p2;
 double	*qd, *q1;
-Int	nq, mq, k;
+int32_t	nq, mq, k;
 /*printf("in d_solve\n");*/
 p1 = a;	q1 = b; *q1++ /= *p1;
 nq = n-1;	k = 1;		qd = a + 1 + nd; /*qd is diagonal ptr */

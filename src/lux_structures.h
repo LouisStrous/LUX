@@ -20,25 +20,25 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 /* stuff to make Shine's file compile in Strous LUX without modifications */
 #include "action.h"
 
-Int	execute_error(Int), file_open_error(void);
+int32_t	execute_error(int32_t), file_open_error(void);
 #define lux_subr	subroutine
 #define lux_func	function
 #define lux_subr_struct	internalRoutineStruct
 #define STROUS	1
 
-struct sdesc { Int n; uint8_t *p; };
+struct sdesc { int32_t n; uint8_t *p; };
 
 /* declarations for use in motif.c */
-Int	ck_motif(void), set_textfontlist(Int), setup_colors(Int),
-  set_fontlist(Int), compile(char *), get_widget_id(Int, Int *),
-  rows_or_columns(Int, Int [], Int), lux_int_xmscrollbar(Int, Int [], Int),
-  ck_window(Int), lux_xdelete(Int, Int []),
-  lux_xmradiobox(Int, Int []),
-  set_labelfontlist(Int), lux_int_xmscale(Int, Int [], Int),
-  colorset(Int, Int [], Int), ck_events(void), redef_string(Int, Int),
-  lux_xtloop(Int, Int []), compileString(char *);
+int32_t	ck_motif(void), set_textfontlist(int32_t), setup_colors(int32_t),
+  set_fontlist(int32_t), compile(char *), get_widget_id(int32_t, int32_t *),
+  rows_or_columns(int32_t, int32_t [], int32_t), lux_int_xmscrollbar(int32_t, int32_t [], int32_t),
+  ck_window(int32_t), lux_xdelete(int32_t, int32_t []),
+  lux_xmradiobox(int32_t, int32_t []),
+  set_labelfontlist(int32_t), lux_int_xmscale(int32_t, int32_t [], int32_t),
+  colorset(int32_t, int32_t [], int32_t), ck_events(void), redef_string(int32_t, int32_t),
+  lux_xtloop(int32_t, int32_t []), compileString(char *);
 void	color_not_available(void), font_not_available(void), lux_xminit(void),
-  lux_callback_execute(Int);
+  lux_callback_execute(int32_t);
 #define lux_execute_symbol(symbol,u)		compile(symbol)
 /*#define bcopy(src, dst, len)	memcpy(dst, src, len)*/
 #define strarr_scratch(ndim,dims)	array_scratch(LUX_STRING_ARRAY,ndim,dims)

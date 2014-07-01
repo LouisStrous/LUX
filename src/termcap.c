@@ -28,17 +28,17 @@ char	*c_left, *c_right, *c_up, *c_down, *cl_eos,
 	*c_save, *c_restore, *k_backspace, *k_delete, *k_insert,
 	*k_left, *k_right, *k_up, *k_down, *special[7], bs = '\010';
 static char	termcaps[1024];
-extern Int	scrat[];
+extern int32_t	scrat[];
 /*----------------------------------------------------*/
 void getTermCaps(void)
 /* reads terminal capabilities of terminal type TERM (environment variable) */
 /* from file /etc/termcap. Uses vt100 defaults for capabilities that */
 /* could not be found. */
 {
-  /*  Int	tgetent(char *buffer, char *name);
+  /*  int32_t	tgetent(char *buffer, char *name);
       char	*tgetstr(char *cap, char **buf); */
   char	*term, *ptr, *cscrat = (char *) scrat;
-  Int	n, keycode(char *);
+  int32_t	n, keycode(char *);
   
   term = getenv("TERM");
   if (!term)

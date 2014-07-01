@@ -34,7 +34,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #define YYERROR_VERBOSE
 #define startList(x)	{ pushList(LUX_NEW_LIST); pushList(x); }
 				/* start a new list */
-extern Int	scrat[],	/* general-purpose scratch storage (once.h) */
+extern int32_t	scrat[],	/* general-purpose scratch storage (once.h) */
 		compileLevel,	/* number of nested open input files */
 		executeLevel,	/* number of nested execution items */
 		symbolStackIndex, /* next free slot in symbol stack */
@@ -55,20 +55,20 @@ char	debugLine = 0,		/* we're not in a debugger line */
 uint8_t disableNewline = 0;	/* disables NEWLINE token so that complex */
 				/* structures can be parsed across newlines */
 void	pushList(int16_t),		/* push symbol number onto list stack */
-	swapList(Int, Int),	/* swap items in the list stack */
-	cleanUp(Int, Int),
+	swapList(int32_t, int32_t),	/* swap items in the list stack */
+	cleanUp(int32_t, int32_t),
 	away(void);
 int16_t	popList(void);		/* pop an item from the list stack's top */
-Int	stackListLength(void),	/* return length of list at top of stack */
-	isInternalSubr(Int),	/* 1 if symbol is internal subroutine */
+int32_t	stackListLength(void),	/* return length of list at top of stack */
+	isInternalSubr(int32_t),	/* 1 if symbol is internal subroutine */
 	installExec(void),
-	findSym(Int, hashTableEntry *[], Int),
-	installSubsc(Int),
-	addSubsc(Int, Int, Int), newSubrSymbol(Int),
-	newSymbol(Int, ...), newBlockSymbol(Int), copySym(Int),
-	luxerror(char *, Int, ...);
-Int	statementDepth = 0, keepEVB = 0;
-Int	yyerror(const char *), yylex(YYSTYPE *);
+	findSym(int32_t, hashTableEntry *[], int32_t),
+	installSubsc(int32_t),
+	addSubsc(int32_t, int32_t, int32_t), newSubrSymbol(int32_t),
+	newSymbol(int32_t, ...), newBlockSymbol(int32_t), copySym(int32_t),
+	luxerror(char *, int32_t, ...);
+int32_t	statementDepth = 0, keepEVB = 0;
+int32_t	yyerror(const char *), yylex(YYSTYPE *);
 %}
 
 %pure_parser			/* reentrant parser, so we can compile a
@@ -876,7 +876,7 @@ char	*currentChar,		/* the character currently being parsed */
 static char	oldChar = '\0';
 extern FILE	*inputStream;		/* source of input, if file */
 extern char	*inputString;		/* source of input, if string */
-Int	ignoreInput = 0,	/* nesting level of IGNORE-RESUME pairs */
+int32_t	ignoreInput = 0,	/* nesting level of IGNORE-RESUME pairs */
         findBody = 0,		/* nonzero if a specific user-routine */
 				/* is sought for recompilation */
 	calculatorMode = 0;	/* nonzero if in calculator mode
@@ -899,8 +899,8 @@ void away(void)
      /* clean up the symbol stack and reinitialize various counters */
 {
   char	**p;
-  extern Int	keepEVB, (*getChar)(void), nSymbolStack;
-  Int	getStreamChar(void);
+  extern int32_t	keepEVB, (*getChar)(void), nSymbolStack;
+  int32_t	getStreamChar(void);
 
   /* statementDepth = disableNewline = curContext = keepEVB = 0; */
   curContext = keepEVB = 0;
@@ -919,10 +919,10 @@ void away(void)
   getChar = getStreamChar;
 }
 
-Int yyerror(const char *s)
+int32_t yyerror(const char *s)
      /* reports errors occurring during parsing (required by yyparse()) */
 {
- extern Int	curLineNumber;	/* current line number */
+ extern int32_t	curLineNumber;	/* current line number */
  extern compileInfo	*curCompileInfo;
 
  if (setup & 1024)	/* no parser warnings */
@@ -957,7 +957,7 @@ void translateLine(void)
    string in line[] may be changed */
 {
   char	*p, *tp, inString = 0;
-  Int	nonWhite, i;
+  int32_t	nonWhite, i;
   extern char	*ANAPrompts[],
 		allowPromptInInput; /* allow prompts at start of line */
 
@@ -1057,10 +1057,10 @@ void translateLine(void)
   *tp++ = '\0';			/* sure close */
 }
 /*--------------------------------------------------------------*/
-void Quit(Int result)
+void Quit(int32_t result)
 /* Quits the program */
 {
-  Int	saveHistory(void);
+  int32_t	saveHistory(void);
 
   saveHistory();
   printf("\nCPUtime: %g seconds\n", ((float) clock())/CLOCKS_PER_SEC);
@@ -1090,13 +1090,13 @@ void Quit(Int result)
                    2EX = 0X2E = LUX_LONG hex 2E = LUX_LONG 46
 */
 /*--------------------------------------------------------------*/
-Int readNumber(YYSTYPE *lvalp)
+int32_t readNumber(YYSTYPE *lvalp)
 /* reads the number at currentChar, puts it in a new sybol, assigns
    the symbol number to *lvalp, and returns the proper parser code */
 {
-  Int	type;
+  int32_t	type;
   scalar	v;
-  void	read_a_number(char **, scalar *, Int *);
+  void	read_a_number(char **, scalar *, int32_t *);
 
   read_a_number(&currentChar, &v, &type);
   if (!ignoreInput) {		/* we're not ignoring stuff */
@@ -1137,13 +1137,13 @@ Int readNumber(YYSTYPE *lvalp)
     return 0;
 }
 /*--------------------------------------------------------------*/
-Int strcmp2(const void *key, const void *data)
+int32_t strcmp2(const void *key, const void *data)
 /* compares key to data */
 {
   return strcmp((char *) key, *(char **) data);
 }
 /*--------------------------------------------------------------*/
-Int isKeyWord(void)
+int32_t isKeyWord(void)
 /* checks if the string starting at currentChar is a reserved (key) Word;
   if so, returns the keyword's code */
 {
@@ -1154,7 +1154,7 @@ Int isKeyWord(void)
    "MOD", "NCASE", "NE", "OR", "ORIF", "REPEAT", "RETALL", "RETURN", 
    "RUN", "SMOD", "SUBR", "SUBROUTINE", "THEN", "UNTIL", "WHILE", "XOR"
  };
- static Int	keyCodes[] = {
+ static int32_t	keyCodes[] = {
    AND, ANDIF, BEGIN, BLOCK, BREAK, CASE, CONTINUE, DO, ELSE,
    END, ENDBLOCK, ENDCASE, ENDFUNC, ENDSUBR, EQ, FOR, FUNC, FUNC, GE,
    GT, IF, LE, LT, '%', NCASE, NE, OR, ORIF, REPEAT, RETALL, RETURN, RUN,
@@ -1167,14 +1167,14 @@ Int isKeyWord(void)
  return (ptr)? keyCodes[ptr - keyWords]: 0;
 }
 /*--------------------------------------------------------------*/
-Int readIdentifier(YYSTYPE *lvalp)
+int32_t readIdentifier(YYSTYPE *lvalp)
 /* identifies keywords at currentChar and returns appropriate lexical number;
   otherwise reads identifier, stores in stack, returns index to
   stack in *lvalp, and returns appropriate lexical number. */
 {
  char	*p, c;
- Int	n;
- Int	installString(char *string);
+ int32_t	n;
+ int32_t	installString(char *string);
 
  p = currentChar + 1;		/* skip over first character, which */
 				/* is assumed to be OK by this routine */
@@ -1202,17 +1202,17 @@ Int readIdentifier(YYSTYPE *lvalp)
  }
 }
 /*--------------------------------------------------------------*/
-Int yylex(YYSTYPE *lvalp)
+int32_t yylex(YYSTYPE *lvalp)
 /* returns semantic value of next read token in *lvalp, and the
    lexical value as function return value */
 {
  char	*p, c, *prompt, *p2;
- Int	i;
- static Int	len = 0;
+ int32_t	i;
+ static int32_t	len = 0;
  extern char	recording, *currentInputFile;
- extern Int	curLineNumber;	/* current line number */
- Int	getNewLine(char *buffer, size_t bufsize, char *prompt, char historyFlag),
-   showstats(Int narg, Int ps[]), installString(char *);
+ extern int32_t	curLineNumber;	/* current line number */
+ int32_t	getNewLine(char *buffer, size_t bufsize, char *prompt, char historyFlag),
+   showstats(int32_t narg, int32_t ps[]), installString(char *);
 
  if (errorState)
    return ERRORSTATE;		/* if a syntax error occurred, then */
@@ -1555,19 +1555,19 @@ Int yylex(YYSTYPE *lvalp)
  }
 }
 /*--------------------------------------------------------------*/
-Int calc_lex(YYSTYPE *lvalp)
+int32_t calc_lex(YYSTYPE *lvalp)
 /* required to make ana_calculator() parsing work */
 {
   return yylex(lvalp);
 }
 /*--------------------------------------------------------------*/
-Int calc_error(char *s)
+int32_t calc_error(char *s)
 /* required to make ana_calculator() parsing work */
 {
   return yyerror(s);
 }
 /*--------------------------------------------------------------*/
-void gehandler(const char *reason, const char *file, Int line, Int gsl_errno)
+void gehandler(const char *reason, const char *file, int32_t line, int32_t gsl_errno)
 {
   luxerror("GSL error %d (%s line %d): %s", 0, gsl_errno, file, line, reason);
 }
@@ -1576,13 +1576,13 @@ char	*programName;
 int do_main(int argc, char *argv[])
      /* main program */
 {
-  Int	site(Int, Int []), readHistory(void);
+  int32_t	site(int32_t, int32_t []), readHistory(void);
   char	*p;
-  extern Int	nSymbolStack;
+  extern int32_t	nSymbolStack;
   extern void	getTerminalSize(void);
   void	pegParse(void), inHistory(char *), getTermCaps(void);
   FILE	*fp;
-  Int	yyparse(void);
+  int32_t	yyparse(void);
 
   programName = argv[0];
   getTerminalSize();
@@ -1594,7 +1594,7 @@ int do_main(int argc, char *argv[])
   *line = '\0';			/* start with an empty line */
   p = line;
 
-  void gehandler(const char *, const char *, Int, Int);
+  void gehandler(const char *, const char *, int32_t, int32_t);
 
   gsl_set_error_handler(&gehandler);
   /* seek .luxinit in home directory */

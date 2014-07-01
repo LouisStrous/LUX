@@ -32,9 +32,9 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "action.h"
 #include "Bytestack.h"
 
-Int	to_scratch_array(Int, Int, Int, Int []);
+int32_t	to_scratch_array(int32_t, int32_t, int32_t, int32_t []);
 /*---------------------------------------------------------------------*/
-Int lux_bisect(Int narg, Int ps[])
+int32_t lux_bisect(int32_t narg, int32_t ps[])
 /* y = BISECT([x,] y, values [, AXIS=axis, POS=pos, WIDTH=width]) */
 /* calculates bisector positions */
 /* <axis> may only have a single dimension. */
@@ -52,7 +52,7 @@ Int lux_bisect(Int narg, Int ps[])
    bisector positions are returned in it. */
 /* LS 7may98 */
 {
-  Int	result, iq, pos, nLev, outDims[MAX_DIMS], step,
+  int32_t	result, iq, pos, nLev, outDims[MAX_DIMS], step,
     lev, xSym, ySym, vSym, il, ir;
   double	xl, xr, min, minpos, max, maxpos, x1l, x2l, x1r, x2r;
   pointer	src, trgt, level, ptr, rightedge, left, width, x;
@@ -105,9 +105,9 @@ Int lux_bisect(Int narg, Int ps[])
   /* create output symbol */
   if (nLev > 1) {
     outDims[0] = nLev;
-    memcpy(outDims + 1, srcinfo.dims, srcinfo.raxes[0]*sizeof(Int));
+    memcpy(outDims + 1, srcinfo.dims, srcinfo.raxes[0]*sizeof(int32_t));
     memcpy(outDims + srcinfo.raxes[0] + 1, srcinfo.dims + srcinfo.raxes[0] + 1,
-	   (srcinfo.ndim - srcinfo.raxes[0] - 1)*sizeof(Int));
+	   (srcinfo.ndim - srcinfo.raxes[0] - 1)*sizeof(int32_t));
     result = array_scratch(srcinfo.type, srcinfo.ndim, outDims);
     if (narg > 5 && ps[5])	/* have <width> */
       if (to_scratch_array(ps[5], srcinfo.type, srcinfo.ndim, outDims)
@@ -115,9 +115,9 @@ Int lux_bisect(Int narg, Int ps[])
 	return LUX_ERROR;
   } else {
     if (srcinfo.ndim > 1) {
-      memcpy(outDims, srcinfo.dims, srcinfo.raxes[0]*sizeof(Int));
+      memcpy(outDims, srcinfo.dims, srcinfo.raxes[0]*sizeof(int32_t));
       memcpy(outDims + srcinfo.raxes[0], srcinfo.dims + srcinfo.raxes[0] + 1,
-	     (srcinfo.ndim - srcinfo.raxes[0] - 1)*sizeof(Int));
+	     (srcinfo.ndim - srcinfo.raxes[0] - 1)*sizeof(int32_t));
       result = array_scratch(srcinfo.type, srcinfo.ndim - 1, outDims);
       if (narg > 5 && ps[5])	/* have <width> */
 	if (to_scratch_array(ps[5], srcinfo.type, srcinfo.ndim, outDims)
@@ -404,10 +404,10 @@ Int lux_bisect(Int narg, Int ps[])
   return result;
 }
 /*---------------------------------------------------------------------*/
-static Int cmp0(const void *a, const void *b)
+static int32_t cmp0(const void *a, const void *b)
 {
-  struct c { double v; Int l; } aa, bb;
-  Int d;
+  struct c { double v; int32_t l; } aa, bb;
+  int32_t d;
   
   aa = *(struct c *) a;
   bb = *(struct c *) b;
@@ -425,7 +425,7 @@ static Int cmp0(const void *a, const void *b)
   return 0;
 }
 /*---------------------------------------------------------------------*/
-Int lux_cspline_find(Int narg, Int ps[])
+int32_t lux_cspline_find(int32_t narg, int32_t ps[])
 /* z = CSPLINE_FIND(y, levels [, AXIS=axis, INDEX=index]) */
 /* locates positions where a certain value gets attained, using cubic
    splines
@@ -441,13 +441,13 @@ Int lux_cspline_find(Int narg, Int ps[])
    index <index(i)> and run up to but not including index <index(i+1)>. */
 /* LS 2009-08-09 */
 {
-  Int	result, iq, nLev, lev, ySym, vSym, i, step, *index, j;
+  int32_t	result, iq, nLev, lev, ySym, vSym, i, step, *index, j;
   pointer	src, level;
   csplineInfo	cspl;
   loopInfo	srcinfo;
   Bytestack b;
-  struct c { double v; Int l; Int c; } *c;
-  Int csize;
+  struct c { double v; int32_t l; int32_t c; } *c;
+  int32_t csize;
 
   ySym = ps[0];		/* <y> */
   vSym = ps[1];		/* <values> */
@@ -472,8 +472,8 @@ Int lux_cspline_find(Int narg, Int ps[])
   if (narg > 3 && ps[3]) {	/* <index> */
     if (to_scratch_array(ps[3], LUX_LONG, 1, &nLev) == LUX_ERROR)
       return LUX_ERROR;
-    index = (Int *) array_data(ps[3]);
-    memset(index, 0, srcinfo.ndim*sizeof(Int));
+    index = (int32_t *) array_data(ps[3]);
+    memset(index, 0, srcinfo.ndim*sizeof(int32_t));
   } else
     index = NULL;
     
@@ -484,11 +484,11 @@ Int lux_cspline_find(Int narg, Int ps[])
 
   /* we'll store the data as follows on the Byte stack:
      1. the found location in the target dimension (double)
-     2. the index of the level of which this is the location (Int)
-     3. the (one or more) coordinates of the location (Int) */
+     2. the index of the level of which this is the location (int32_t)
+     3. the (one or more) coordinates of the location (int32_t) */
   {
     struct c cc;
-    csize = (uint8_t *) &cc.c - (uint8_t *) &cc.v + srcinfo.ndim*sizeof(Int);
+    csize = (uint8_t *) &cc.c - (uint8_t *) &cc.v + srcinfo.ndim*sizeof(int32_t);
   }
   c = malloc(csize);
 
@@ -593,7 +593,7 @@ Int lux_cspline_find(Int narg, Int ps[])
      so that we first have the positions for the first level, then
      those for the second level, and so on. */
   {
-    Int n;
+    int32_t n;
     struct c *d;
     
     n = Bytestack_bytes(b, 0)/csize; /* number of found data points */
@@ -613,11 +613,11 @@ Int lux_cspline_find(Int narg, Int ps[])
 	Bytestack_push_var(NULL, srcinfo.ndim);
       Bytestack_push_var(NULL, n);
       result = array_scratch(LUX_DOUBLE, (srcinfo.ndim > 1? 2: 1),
-			     (Int *) Bytestack_pop(NULL, bi));
+			     (int32_t *) Bytestack_pop(NULL, bi));
       src.d = array_data(result);
       q.c = d;
       for (i = 0; i < n; i++) {
-	Int j;
+	int32_t j;
 	for (j = 0; j < srcinfo.ndim; j++) {
 	  if (j == srcinfo.raxes[0])
 	    *src.d++ = q.c->v;
@@ -654,7 +654,7 @@ Int lux_cspline_find(Int narg, Int ps[])
 #define SYNCH_OK	0x5555aaaa
 #define SYNCH_REVERSE	0xaaaa5555
 #endif
-Int lux_fitskey(Int narg, Int ps[])
+int32_t lux_fitskey(int32_t narg, int32_t ps[])
 /* FITSKEY(file, key) returns the value associated with the string <key> */
 /* in FITS file <file>.  If <file> is a string, then it is taken as the
    name of the FITS file.  If <file> is a scalar, then its (integer) value
@@ -669,11 +669,11 @@ Int lux_fitskey(Int narg, Int ps[])
 /* in the file.  LS 4jun98 */
 {
   char	*file, *key, *key2, *scr, mustclose, ok;
-  Int	n, n2, i, evalString(char *, Int), ptr, iq, i0, type;
+  int32_t	n, n2, i, evalString(char *, int32_t), ptr, iq, i0, type;
   pointer	p;
   scalar	value;
   FILE	*fp;
-  void	read_a_number(char **buf, scalar *value, Int *type);
+  void	read_a_number(char **buf, scalar *value, int32_t *type);
 
   switch (symbol_class(ps[0])) {
     case LUX_STRING:
@@ -792,7 +792,7 @@ Int lux_fitskey(Int narg, Int ps[])
   /* LS 26may99 */
   scr += 9;			/* beginning of data value */
   n = 0;
-  while (isspace((Int) *scr))
+  while (isspace((int32_t) *scr))
     scr++;
   key = scr;
   while (*key) {
@@ -804,10 +804,10 @@ Int lux_fitskey(Int narg, Int ps[])
 	if (!n) { 		/* not in a literal text string */
 	  if (internalMode & 1) { /* /COMMENT */
 	    scr = key + 1;	/* start reading here */
-	    while (isspace((Int) *scr))
+	    while (isspace((int32_t) *scr))
 	      scr++;		/* skip initial whitespace */
 	    key = scr + strlen(scr) - 1; /* skip final whitespace */
-	    while (key > scr && isspace((Int) *key))
+	    while (key > scr && isspace((int32_t) *key))
 	      key--;
 	    key[1] = '\0';
 	    iq = string_scratch(strlen(scr));
@@ -815,7 +815,7 @@ Int lux_fitskey(Int narg, Int ps[])
 	    return iq;
 	  } else {
 	    while (key > scr
-		   && isspace((Int) key[-1])) /* skip trailing spaces */
+		   && isspace((int32_t) key[-1])) /* skip trailing spaces */
 	      key--;
 	    *key-- = '\0';	/* terminate data value */
 	  }
@@ -837,12 +837,12 @@ Int lux_fitskey(Int narg, Int ps[])
       break;
     case '-': case '+':		/* may be a number */
       scr = key++;
-      while (isspace((Int) *key)) /* skip whitespace */
+      while (isspace((int32_t) *key)) /* skip whitespace */
 	key++;
-      if (!isdigit((Int) *key)) { /* treat it as a string */
+      if (!isdigit((int32_t) *key)) { /* treat it as a string */
 	key += strlen(key);	/* go to the end of the string */
 	while (key > scr
-	       && isspace((Int) key[-1])) /* skip trailing whitespace */
+	       && isspace((int32_t) key[-1])) /* skip trailing whitespace */
 	  key--;
 	break;
       }
@@ -889,7 +889,7 @@ Int lux_fitskey(Int narg, Int ps[])
 #define CENTER	4
 #define DONE	5
 
-Int sign(float x)
+int32_t sign(float x)
 {
   if (x > 0)
     return 1;
@@ -899,7 +899,7 @@ Int sign(float x)
     return 0;
 }
 /*--------------------------------------------------------------------*/
-Int sgnclass(float x)
+int32_t sgnclass(float x)
 {
   if (x > 0)
     return 2;
@@ -909,7 +909,7 @@ Int sgnclass(float x)
     return 1;
 }
 /*--------------------------------------------------------------------*/
-Int traverseElement(float xin, float yin, float vx, float vy,
+int32_t traverseElement(float xin, float yin, float vx, float vy,
 		    float *xout, float *yout)
 /* if you start at position (<xin>,<yin>), with 0 <= <xin>,<yin> <= 1,
    and move in the direction given by (<vx>,<vy>), then this routine
@@ -986,7 +986,7 @@ Int traverseElement(float xin, float yin, float vx, float vy,
 }
 /*--------------------------------------------------------------------*/
 #define FACTOR	(0.886226925)	/* 0.5*sqrt(pi) */
-Int lux_dir_smooth(Int narg, Int ps[])
+int32_t lux_dir_smooth(int32_t narg, int32_t ps[])
 /* Y = DSMOOTH(<data>,<vx>,<vy> [, /TWOSIDED, /ONESIDED, /BOXCAR, /GAUSSIAN,
                /NORMALIZE])
    smooths 2D image <data> in the direction indicated by the
@@ -1003,7 +1003,7 @@ Int lux_dir_smooth(Int narg, Int ps[])
 
 LS 9nov98 */
 {
-  Int	iq, nx, ny, ix, iy, c, index, rindex, count, twosided, total,
+  int32_t	iq, nx, ny, ix, iy, c, index, rindex, count, twosided, total,
     gaussian, iq0, di, straight;
   float	x1, y1, x2, y2, *vx0, *vy0, value, vx, vy, s, s0, ds, dslimit,
     weight, ws, s1;
@@ -1316,13 +1316,13 @@ LS 9nov98 */
   return iq;
 }
 /*--------------------------------------------------------------------*/
-Int lux_dir_smooth2(Int narg, Int ps[])
+int32_t lux_dir_smooth2(int32_t narg, int32_t ps[])
 /* Y = LSMOOTH(<data>,<vx>,<vy>)
    smooths 2D image <data> in the direction indicated by the
    angle <vx> and <vy>, over a distance indicated by the magnitude of vector
    <v>. */
 {
-  Int	iq, nx, ny, ix, iy, c, index, rindex, count, twosided, normalize,
+  int32_t	iq, nx, ny, ix, iy, c, index, rindex, count, twosided, normalize,
     gaussian, iq0, di, straight;
   float	x1, y1, x2, y2, *vx0, *vy0, vx, vy, s, s0, ds, dslimit,
     weight, ws, s1, norm;
@@ -1634,7 +1634,7 @@ Int lux_dir_smooth2(Int narg, Int ps[])
   return iq;
 }
 /*--------------------------------------------------------------------*/
-Int lux_trajectory(Int narg, Int ps[])
+int32_t lux_trajectory(int32_t narg, int32_t ps[])
 /* TRAJECTORY,<gx>,<gy>,<vx>,<vy>[,<n>][,<ox>,<oy>])
   Takes the positions indicated by <gx>,<gy> and advances them for <n>
   time steps according to the velocity field in <vx>,<vy>.  The first
@@ -1659,11 +1659,11 @@ Int lux_trajectory(Int narg, Int ps[])
      gx,gy,vx,vy, n,ox,oy
   */
 {
-  Int	iq, nx, ny, ix, iy, c, index, di, n, i, dims[MAX_DIMS],
+  int32_t	iq, nx, ny, ix, iy, c, index, di, n, i, dims[MAX_DIMS],
     ngrid, type, dv;
   float	x1, y1, x2, y2, vx, vy, s, s0, ds, dslimit, s1;
   pointer	gx, gy, vx0, vy0, ox, oy;
-  Int lux_convert(Int, Int [], Int, Int);
+  int32_t lux_convert(int32_t, int32_t [], int32_t, int32_t);
 
   /* we treat all arguments. */
   if (!symbolIsRealArray(ps[0]))/* <gx> must be a real array */
@@ -1733,14 +1733,14 @@ Int lux_trajectory(Int narg, Int ps[])
     i = 0;
     if (n > 1)
       dims[i++] = n;
-    memcpy(dims + i, array_dims(ps[0]), array_num_dims(ps[0])*sizeof(Int));
+    memcpy(dims + i, array_dims(ps[0]), array_num_dims(ps[0])*sizeof(int32_t));
     i += array_num_dims(ps[0]);
     to_scratch_array(ps[narg - 2], type, i, dims);
     ox.v = array_data(ps[narg - 2]);
     to_scratch_array(ps[narg - 1], type, i, dims);
     oy.v = array_data(ps[narg - 1]);
   } else {			/* use <gx> and <gy> for <ox> and <oy> */
-    Int lux_convert(Int, Int [], Int, Int);
+    int32_t lux_convert(int32_t, int32_t [], int32_t, int32_t);
     lux_convert(2, ps, type, 0);
     ox.v = array_data(ps[0]);
     oy.v = array_data(ps[1]);
@@ -1797,32 +1797,32 @@ Int lux_trajectory(Int narg, Int ps[])
       } else {
 	switch (type) {
 	  case LUX_BYTE:
-	    ix = (Int) *gx.b;	/* x pixel coordinate */
-	    iy = (Int) *gy.b;	/* y pixel coordinate */
+	    ix = (int32_t) *gx.b;	/* x pixel coordinate */
+	    iy = (int32_t) *gy.b;	/* y pixel coordinate */
 	    x1 = (double) *gx.b++ - ix;
 	    y1 = (double) *gy.b++ - iy;
 	    break;
 	  case LUX_WORD:
-	    ix = (Int) *gx.w;	/* x pixel coordinate */
-	    iy = (Int) *gy.w;	/* y pixel coordinate */
+	    ix = (int32_t) *gx.w;	/* x pixel coordinate */
+	    iy = (int32_t) *gy.w;	/* y pixel coordinate */
 	    x1 = (double) *gx.w++ - ix;
 	    y1 = (double) *gy.w++ - iy;
 	    break;
 	  case LUX_LONG:
-	    ix = (Int) *gx.l;	/* x pixel coordinate */
-	    iy = (Int) *gy.l;	/* y pixel coordinate */
+	    ix = (int32_t) *gx.l;	/* x pixel coordinate */
+	    iy = (int32_t) *gy.l;	/* y pixel coordinate */
 	    x1 = (double) *gx.l++ - ix;
 	    y1 = (double) *gy.l++ - iy;
 	    break;
 	  case LUX_FLOAT:
-	    ix = (Int) *gx.f;	/* x pixel coordinate */
-	    iy = (Int) *gy.f;	/* y pixel coordinate */
+	    ix = (int32_t) *gx.f;	/* x pixel coordinate */
+	    iy = (int32_t) *gy.f;	/* y pixel coordinate */
 	    x1 = (double) *gx.f++ - ix;
 	    y1 = (double) *gy.f++ - iy;
 	    break;
 	  case LUX_DOUBLE:
-	    ix = (Int) *gx.d;	/* x pixel coordinate */
-	    iy = (Int) *gy.d;	/* y pixel coordinate */
+	    ix = (int32_t) *gx.d;	/* x pixel coordinate */
+	    iy = (int32_t) *gy.d;	/* y pixel coordinate */
 	    x1 = (double) *gx.d++ - ix;
 	    y1 = (double) *gy.d++ - iy;
 	    break;
@@ -1986,7 +1986,7 @@ Int lux_trajectory(Int narg, Int ps[])
   return LUX_OK;
 }
 /*--------------------------------------------------------------------*/
-void legendre(double x, Int lmax, double *values)
+void legendre(double x, int32_t lmax, double *values)
 /* calculates the values of the associate Legendre polynomials */
 /* P_l^m(x) at ordinate <x> for all <l> from 0 through <lmax> and all <m> */
 /* from 0 through <l> */
@@ -1999,7 +1999,7 @@ void legendre(double x, Int lmax, double *values)
 /* (with n!! the product of all *odd* values between 1 and n) */
 /* P_{m+1}^m = x (2 m + 1) P_m^m */
 {
-  Int	l, m, j1, j2, j3, j4;
+  int32_t	l, m, j1, j2, j3, j4;
   double	z, *p, v1, v2;
 
   zerobytes(values, (lmax + 1)*(lmax + 2)*sizeof(double)/2);
@@ -2047,7 +2047,7 @@ void legendre(double x, Int lmax, double *values)
   }
 }
 /*--------------------------------------------------------------------*/
-void spherical_harmonics(double x, Int lmax, double *values)
+void spherical_harmonics(double x, int32_t lmax, double *values)
 /* calculates the values of the normalized associate Legendre polynomials */
 /* y_l^m(x) at ordinate <x> for all <l> from 0 through <lmax> and all <m> */
 /* from 0 through <l>.  The normalization is such that */
@@ -2058,7 +2058,7 @@ void spherical_harmonics(double x, Int lmax, double *values)
 /* m 0 0 1 0 1 2 0 1 2 3 */
 /* NOTE: doesn't seem quite OK yet */
 {
-  Int	l, m, j4;
+  int32_t	l, m, j4;
   double	z, *p, v1, v2, w1, w2, w3, w4, w5, w6;
 
   p = values;
@@ -2113,11 +2113,11 @@ void spherical_harmonics(double x, Int lmax, double *values)
   }
 }
 /*--------------------------------------------------------------------*/
-Int lux_legendre(Int narg, Int ps[])
+int32_t lux_legendre(int32_t narg, int32_t ps[])
 /* LEGENDRE(x, lmax) */
 {
   double	x, *values;
-  Int	lmax, out, n;
+  int32_t	lmax, out, n;
 
   x = double_arg(ps[0]);
   if (x < -1 || x > 1)
@@ -2135,7 +2135,7 @@ Int lux_legendre(Int narg, Int ps[])
   return out;
 }
 /*--------------------------------------------------------------------*/
-Int lux_enhanceimage(Int narg, Int ps[])
+int32_t lux_enhanceimage(int32_t narg, int32_t ps[])
 /* ENHANCEIMAGE(<x> [, <part>, <tgt>, /SYMMETRIC]) enhances an image
   <x>.  The first dimension of <x> is assumed to select between color
   channels.  <x> is assumed to contain BYTE values between 0 and 255,
@@ -2147,7 +2147,7 @@ Int lux_enhanceimage(Int narg, Int ps[])
   means to enhance only from the low end.  LS 2006jun15 */
 {
   pointer src, tgt;
-  Int ndim, *dims, nhist, *hist, nelem, i, result;
+  int32_t ndim, *dims, nhist, *hist, nelem, i, result;
   float target, part;
   float a, b;
   float *m;
@@ -2177,7 +2177,7 @@ Int lux_enhanceimage(Int narg, Int ps[])
   }
   tgt.b = array_data(result);
   for (i = 0; i < nelem; i += dims[0]) {
-    Int j, x = 0;
+    int32_t j, x = 0;
 
     for (j = 0; j < dims[0]; j++) /* over all color channels */
       x += *src.b++;
@@ -2200,12 +2200,12 @@ Int lux_enhanceimage(Int narg, Int ps[])
       m[i] = part*m[i] + 1 - part;
   }
   for (i = 0; i < nelem; i += dims[0]) { /* calculate adjusted image */
-    Int j, x = 0;
+    int32_t j, x = 0;
 
     for (j = 0; j < dims[0]; j++)
       x += src.b[j];
     for (j = 0; j < dims[0]; j++) {
-      Int y;
+      int32_t y;
 
       y = *src.b++ * m[x];
       if (y > 255)
@@ -2218,8 +2218,8 @@ Int lux_enhanceimage(Int narg, Int ps[])
   return result;
 }
 /*--------------------------------------------------------------------*/
-Int lux_hamming(Int narg, Int ps[]) {
-  Int nelem, nelem2, ndim, *dims, result, i, type, nr2isarray;
+int32_t lux_hamming(int32_t narg, int32_t ps[]) {
+  int32_t nelem, nelem2, ndim, *dims, result, i, type, nr2isarray;
   pointer src, src2, tgt;
 
   if (!symbolIsNumerical(ps[0]))
@@ -2320,7 +2320,7 @@ Int lux_hamming(Int narg, Int ps[]) {
   return result;
 }
 /*--------------------------------------------------------------------*/
-double vhypot(Int n, double arg1, double arg2, ...)
+double vhypot(int32_t n, double arg1, double arg2, ...)
 {
   double arg = hypot(arg1, arg2);
   if (n < 3)
@@ -2334,7 +2334,7 @@ double vhypot(Int n, double arg1, double arg2, ...)
   return arg;
 }
 /*--------------------------------------------------------------------*/
-double hypota(Int n, double *x)
+double hypota(int32_t n, double *x)
 {
   if (n < 1)
     return 0.0;
@@ -2344,15 +2344,15 @@ double hypota(Int n, double *x)
   return arg;
 }
 /*--------------------------------------------------------------------*/
-Int compare_doubles(const void *a, const void *b)
+int32_t compare_doubles(const void *a, const void *b)
 {
   const double *da = (const double *) a;
   const double *db = (const double *) b;
   return (*da > *db) - (*da < *db);
 }
-Int runord_d(double *data, Int n, Int width, Int ord, double *result)
+int32_t runord_d(double *data, int32_t n, int32_t width, int32_t ord, double *result)
 {
-  Int i;
+  int32_t i;
   
   if (n < 1 || width < 1) {
     errno = EDOM;
@@ -2369,7 +2369,7 @@ Int runord_d(double *data, Int n, Int width, Int ord, double *result)
     ord = 0;
   if (ord > width - 1)
     ord = width - 1;
-  Int o = width/2;
+  int32_t o = width/2;
   for (i = 0; i < n - width; i++) {
     memcpy(temp, data + i, width*sizeof(double));
     qsort(temp, width, sizeof(double), compare_doubles);
@@ -2384,13 +2384,13 @@ Int runord_d(double *data, Int n, Int width, Int ord, double *result)
 }
 BIND(runord_d, i_dpiT3dp_iDaiLiLrDq_00T3, f, RUNORD, 3, 3, NULL);
 /*--------------------------------------------------------------------*/
-Int runmax_d(double *data, Int n, Int width, double *result)
+int32_t runmax_d(double *data, int32_t n, int32_t width, double *result)
 {
   return runord_d(data, n, width, width - 1, result);
 }
 BIND(runmax_d, i_dpiidp_iDaLrDq_00T2, f, RUNMAX, 2, 2, NULL);
 /*--------------------------------------------------------------------*/
-Int runmin_d(double *data, Int n, Int width, double *result)
+int32_t runmin_d(double *data, int32_t n, int32_t width, double *result)
 {
   return runord_d(data, n, width, 0, result);
 }
@@ -2407,11 +2407,11 @@ double unmod(double cur, double prev, double period, double average)
   return cur + period*ceil((prev - cur + average)/period - 0.5);
 }
 /*--------------------------------------------------------------------*/
-Int unmod_slice_d(double *srcptr, size_t srccount, size_t srcstride,
+int32_t unmod_slice_d(double *srcptr, size_t srccount, size_t srcstride,
                   double period, double average,
                   double *tgtptr, size_t tgtcount, size_t tgtstride)
 {
-  Int i;
+  int32_t i;
 
   if (!period || !srcptr || srccount < 1 || !tgtptr) {
     errno = EDOM;

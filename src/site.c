@@ -32,7 +32,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "editor.h"		/* for BUFSIZE */
 #include "version.h"		/* for GIT_VERSION */
 
-extern Int	internalMode;
+extern int32_t	internalMode;
 void	printw(char *), printwf(char *, ...);
 extern char	*c_left, *k_left, *c_right, *k_right,
 	*c_up, *k_up, *c_down, *k_down, *k_delete,
@@ -53,18 +53,18 @@ void printnice(char *p)
   }
 }
 
-Int site(Int narg, Int ps[])
+int32_t site(int32_t narg, int32_t ps[])
 /* Prints greeting message.  More info available when arguments are used.
    Be sure to delete  site.o  before every compilation, because otherwise the
    compilation time etc. aren't updated!   LS 10/5/92 */
 {
   char	fmt[] = " %22s %6d %6d\n", hasInclude = 0, *p, *p2;
-  void	setPager(Int), resetPager(void);
+  void	setPager(int32_t), resetPager(void);
   
   setPager(0);
   if (!internalMode || internalMode == 255) {
     printw("*** Welcome to " PACKAGE_STRING "\n");
-    printw("Copyright 2013 Louis Strous.\n"
+    printw("Copyright 2013,2014 Louis Strous.\n"
            "This program comes with ABSOLUTELY NO WARRANTY; "
            "for details type ‘info,/warranty’.  "
            "This is free software, and you are welcome to redistribute "

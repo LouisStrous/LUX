@@ -28,15 +28,15 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "install.h"
 #include <limits.h>
 
-extern Int	redim_warn_flag, range_warn_flag;
-Int	lux_assoc_output(Int iq, Int jq, Int offsym, Int axsym),
-  lux_file_output(Int iq, Int jq, Int offsym, Int axsym),
-  lux_gmap(Int narg, Int ps[], Int new), lux_assoc_input(Int, Int []),
-  simple_reverse(Int *p1, Int *p2, Int n, Int type), getBody(Int),
-  string_sub(Int, Int []);
-void	convertPointer(scalar *, Int, Int);
+extern int32_t	redim_warn_flag, range_warn_flag;
+int32_t	lux_assoc_output(int32_t iq, int32_t jq, int32_t offsym, int32_t axsym),
+  lux_file_output(int32_t iq, int32_t jq, int32_t offsym, int32_t axsym),
+  lux_gmap(int32_t narg, int32_t ps[], int32_t new), lux_assoc_input(int32_t, int32_t []),
+  simple_reverse(int32_t *p1, int32_t *p2, int32_t n, int32_t type), getBody(int32_t),
+  string_sub(int32_t, int32_t []);
+void	convertPointer(scalar *, int32_t, int32_t);
 /*------------------------------------------------------------------------- */
-Int lux_inserter(Int narg, Int ps[])
+int32_t lux_inserter(int32_t narg, int32_t ps[])
 /* syntax: insert,target,source [,origin]
    inserts <source> in <target>, starting at <target> coordinates
    <origin> (one or more).
@@ -46,7 +46,7 @@ Int lux_inserter(Int narg, Int ps[])
 {
   loopInfo	trgtinfo;
   pointer	src, trgt;
-  Int	*dims, ndim, i, offset[2*MAX_DIMS], doff, daxes, nelem;
+  int32_t	*dims, ndim, i, offset[2*MAX_DIMS], doff, daxes, nelem;
 
   switch (symbol_class(ps[0])) {
     case LUX_ASSOC:
@@ -233,13 +233,13 @@ Int lux_inserter(Int narg, Int ps[])
   return LUX_OK;
 }
 /*------------------------------------------------------------------------- */
-Int lux_smap(Int narg, Int ps[])
+int32_t lux_smap(int32_t narg, int32_t ps[])
  /* convert type (and class) to a string */
 {
-  register Int n;
+  register int32_t n;
   register pointer q1,q3;
-  Int	nsym, nd, j, n1;
-  Int	result_sym, size;
+  int32_t	nsym, nd, j, n1;
+  int32_t	result_sym, size;
 
   nsym = ps[0];				/*only one argument */
   if (symbol_class(nsym) == LUX_STRING)
@@ -255,7 +255,7 @@ Int lux_smap(Int narg, Int ps[])
       q1.l = &scalar_value(nsym).l;
       break;
     case LUX_ARRAY:			/*array */
-      q1.l = (Int *) array_data(nsym);
+      q1.l = (int32_t *) array_data(nsym);
       nd = array_num_dims(nsym);
       n = array_size(nsym);
       break;
@@ -289,54 +289,54 @@ Int lux_smap(Int narg, Int ps[])
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-Int lux_bmap(Int narg,Int ps[])
+int32_t lux_bmap(int32_t narg,int32_t ps[])
 /* convert type to uint8_t without changing memory contents */
 {
   return lux_gmap(narg, ps, LUX_BYTE);
 }
 /*------------------------------------------------------------------------- */
-Int lux_wmap(Int narg, Int ps[])
+int32_t lux_wmap(int32_t narg, int32_t ps[])
 /* convert type to uint8_t without changing memory contents */
 {
   return lux_gmap(narg, ps, LUX_WORD);
 }
 /*------------------------------------------------------------------------- */
-Int lux_lmap(Int narg, Int ps[])
+int32_t lux_lmap(int32_t narg, int32_t ps[])
 /* convert type to long without changing memory contents */
 {
   return lux_gmap(narg, ps, LUX_LONG);
 }
 /*------------------------------------------------------------------------- */
-Int lux_fmap(Int narg, Int ps[])
+int32_t lux_fmap(int32_t narg, int32_t ps[])
 /* convert type to float without changing memory contents */
 {
   return lux_gmap(narg, ps, LUX_FLOAT);
 }
 /*------------------------------------------------------------------------- */
-Int lux_dmap(Int narg, Int ps[])
+int32_t lux_dmap(int32_t narg, int32_t ps[])
 /* convert type to double without changing memory contents */
 {
   return lux_gmap(narg, ps, LUX_DOUBLE);
 }
 /*------------------------------------------------------------------------- */
-Int lux_cfmap(Int narg, Int ps[])
+int32_t lux_cfmap(int32_t narg, int32_t ps[])
 /* convert type to cfloat without changing memory contents */
 {
   return lux_gmap(narg, ps, LUX_CFLOAT);
 }
 /*------------------------------------------------------------------------- */
-Int lux_cdmap(Int narg, Int ps[])
+int32_t lux_cdmap(int32_t narg, int32_t ps[])
 /* convert type to cdouble without changing memory contents */
 {
   return lux_gmap(narg, ps, LUX_CDOUBLE);
 }
 /*------------------------------------------------------------------------- */
-Int lux_gmap(Int narg, Int ps[], Int new)
+int32_t lux_gmap(int32_t narg, int32_t ps[], int32_t new)
                 /* general part for map routines */
 {
   register pointer q1,q3;
-  Int	nsym, nd, n, nn;
-  Int	result_sym, type;
+  int32_t	nsym, nd, n, nn;
+  int32_t	result_sym, type;
 
   nsym = ps[0];				/* only one argument */
   type = symbol_type(nsym);
@@ -416,19 +416,19 @@ Int lux_gmap(Int narg, Int ps[], Int new)
   return result_sym;
 }
  /*------------------------------------------------------------------------- */
-void rearr(Int x[], Int rear[], Int nd)
+void rearr(int32_t x[], int32_t rear[], int32_t nd)
  /*rearrange subscript vectors */
 /* added rear[] and nd parameters and scratch[] variable declaration to make */
 /* lux_subsc_func recursive LS 30mar94 */
 {
-  static Int scratch[MAX_DIMS];
-  Int	k;
+  static int32_t scratch[MAX_DIMS];
+  int32_t	k;
   for (k=0;k<nd;k++) scratch[k] = x[ rear[k] ];
   for (k=0;k<nd;k++) x[k] = scratch[k];
 }
 /*------------------------------------------------------------------------- */
-#define rint(value) ((Int) (value + ((value >= 0)? 0.5: -0.5)))
-Int lux_reverse(Int narg, Int ps[])
+#define rint(value) ((int32_t) (value + ((value >= 0)? 0.5: -0.5)))
+int32_t lux_reverse(int32_t narg, int32_t ps[])
 /* y = REVERSE(x [, axes, center] [, /ZERO])
  reverse <x> in the indicated <axes>, around the specified <center>.
  if any elements would have to reverse into <y> from outside <x>, then
@@ -438,7 +438,7 @@ Int lux_reverse(Int narg, Int ps[])
   loopInfo	srcinfo, trgtinfo;
   pointer	src, trgt, src2, trgt2, center;
   scalar	value;
-  Int	result, stride, i, iq, w, n, inplace;
+  int32_t	result, stride, i, iq, w, n, inplace;
 
   if (symbolIsNumerical(ps[0])) {
     if (standardLoop(ps[0], (narg > 1 && ps[1])? ps[1]: 0, 
@@ -577,7 +577,7 @@ Int lux_reverse(Int narg, Int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-Int expandListArguments(Int *narg, Int *ps[], Int list, Int indx, Int freeList)
+int32_t expandListArguments(int32_t *narg, int32_t *ps[], int32_t list, int32_t indx, int32_t freeList)
 /* put the elements of the LIST/STRUCT <list> into <*ps> at
    index <indx>, replacing the symbol currently at that position.
    Recursively replaces LIST/STRUCTs in the expanded parts of the
@@ -585,7 +585,7 @@ Int expandListArguments(Int *narg, Int *ps[], Int list, Int indx, Int freeList)
    elements.
    LS 14jun98 */
 {
-  Int	n, i, nlist, j, iq, k;
+  int32_t	n, i, nlist, j, iq, k;
 
   nlist = 1;
   iq = -list;
@@ -600,13 +600,13 @@ Int expandListArguments(Int *narg, Int *ps[], Int list, Int indx, Int freeList)
 	*narg += n - 1;		/* minus one because the slot now occupied
 				 by <list> can be occupied by its first
 				 element instead */
-	*ps = realloc(*ps, *narg*sizeof(Int)); /* more memory as needed */
+	*ps = realloc(*ps, *narg*sizeof(int32_t)); /* more memory as needed */
 	if (!*ps)		/* some allocation error occurred */
 	  return cerror(ALLOC_ERR, iq);
 	/* move the stuff that is after <list> to make room for the elements
 	   of <list> */
 	memmove(*ps + indx + n, *ps + indx + 1,
-		(*narg - indx - n)*sizeof(Int));
+		(*narg - indx - n)*sizeof(int32_t));
 	/* now insert the elements of <iq> */
 	for (i = 0; i < n; i++) {
 	  k = (*ps)[indx + i] = clist_symbols(iq)[i];
@@ -628,10 +628,10 @@ Int expandListArguments(Int *narg, Int *ps[], Int list, Int indx, Int freeList)
       case LUX_LIST:
 	n = list_num_symbols(iq);
 	*narg += n - 1;
-	*ps = realloc(*ps, *narg*sizeof(Int));
+	*ps = realloc(*ps, *narg*sizeof(int32_t));
 	if (!*ps)
 	  return cerror(ALLOC_ERR, iq);
-	memmove(*ps + indx + n, *ps + indx, (*narg - indx - n)*sizeof(Int));
+	memmove(*ps + indx + n, *ps + indx, (*narg - indx - n)*sizeof(int32_t));
 	for (i = 0; i < n; i++) {
 	  k = (*ps)[indx + i] = list_symbol(iq, i);
 	  if (freeList
@@ -649,7 +649,7 @@ Int expandListArguments(Int *narg, Int *ps[], Int list, Int indx, Int freeList)
   return nlist;			/* done */
 }
  /*------------------------------------------------------------------------- */
-Int treatListArguments(Int *narg, Int *ps[], Int offset)
+int32_t treatListArguments(int32_t *narg, int32_t *ps[], int32_t offset)
 /* expands appropriate LIST/STRUCT arguments in the argument list */
 /* this routine takes argument list <*ps> and checks if any of the
    <*narg> arguments is a compact list with one element which is itself
@@ -666,7 +666,7 @@ Int treatListArguments(Int *narg, Int *ps[], Int offset)
    zapped, its temporary-variable elements get zapped, too, unless
    we assign them to a different context. */
 {
-  Int	i, iq, n, i1, i2, list;
+  int32_t	i, iq, n, i1, i2, list;
 
   if (offset >= 0) {
     i1 = offset;
@@ -738,8 +738,8 @@ Int treatListArguments(Int *narg, Int *ps[], Int offset)
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int expandListArguments_w(Int *narg, int16_t *ps[], Int list, Int indx,
-			  Int freeList)
+int32_t expandListArguments_w(int32_t *narg, int16_t *ps[], int32_t list, int32_t indx,
+			  int32_t freeList)
 /* put the elements of the LIST/STRUCT <list> into <*ps> at
    index <indx>, replacing the symbol currently at that position.
    Recursively replaces LIST/STRUCTs in the expanded parts of the
@@ -747,7 +747,7 @@ Int expandListArguments_w(Int *narg, int16_t *ps[], Int list, Int indx,
    elements.
    LS 14jun98 */
 {
-  Int	n, i, nlist, j, iq, k;
+  int32_t	n, i, nlist, j, iq, k;
 
   nlist = 1;
   iq = -list;
@@ -811,7 +811,7 @@ Int expandListArguments_w(Int *narg, int16_t *ps[], Int list, Int indx,
   return nlist;			/* done */
 }
 /*------------------------------------------------------------------------- */
-Int treatListArguments_w(Int *narg, int16_t *ps[], Int offset)
+int32_t treatListArguments_w(int32_t *narg, int16_t *ps[], int32_t offset)
 /* expands appropriate LIST/STRUCT arguments in the argument list */
 /* this routine takes argument list <*ps> and checks if any of the
    <*narg> arguments is a compact list with one element which is itself
@@ -828,7 +828,7 @@ Int treatListArguments_w(Int *narg, int16_t *ps[], Int offset)
    zapped, its temporary-variable elements get zapped, too, unless
    we assign them to a different context. */
 {
-  Int	i, iq, n, i1, i2, list;
+  int32_t	i, iq, n, i1, i2, list;
 
   if (offset >= 0) {
     i1 = offset;
@@ -904,12 +904,12 @@ Int treatListArguments_w(Int *narg, int16_t *ps[], Int offset)
 #define INNER	1
 #define OUTER	2
 
-Int lux_subsc_func(Int narg, Int ps[])
+int32_t lux_subsc_func(int32_t narg, int32_t ps[])
 /* decipher and extract subscripted values from a symbol; supports arrays, */
 /* strings, associated variables, file maps, and function pointers. */
 /* rewritten LS 6aug96 */
 {
-  Int	nsym, type, i, n, iq, ndim, *dims, start[MAX_DIMS], j, nsum,
+  int32_t	nsym, type, i, n, iq, ndim, *dims, start[MAX_DIMS], j, nsum,
 	size[MAX_DIMS], todim[MAX_DIMS], *index[MAX_DIMS], nelem, *iptr,
 	trgtndim, trgtdims[MAX_DIMS], fromdim[MAX_DIMS], one = 1, offset0,
 	stride[MAX_DIMS], offset, width, tally[MAX_DIMS], step[MAX_DIMS],
@@ -920,8 +920,8 @@ Int lux_subsc_func(Int narg, Int ps[])
   uint8_t	subsc_type[MAX_DIMS], sum[MAX_DIMS];
   listElem	*le;
   FILE	*fp = NULL;
-  Int	lux_subsc_subgrid(Int, Int []);
-  Int lux_endian(Int, Int []);
+  int32_t	lux_subsc_subgrid(int32_t, int32_t []);
+  int32_t lux_endian(int32_t, int32_t []);
 
   nsym = ps[--narg];
   /* now nsym is the source (subscripted) symbol and narg is the number
@@ -996,7 +996,7 @@ Int lux_subsc_func(Int narg, Int ps[])
 	allocate(symbol_data(n), narg, int16_t *);
 	ap = symbol_data(n);
 	while (narg--)
-	  *ap++ = *ps++;	/* ap is int16_t* and ps is Int*, so we cannot */
+	  *ap++ = *ps++;	/* ap is int16_t* and ps is int32_t*, so we cannot */
 				/* just use memcpy(). */
       }
       iq = eval(n);
@@ -1018,7 +1018,7 @@ Int lux_subsc_func(Int narg, Int ps[])
       type = file_map_type(nsym);
       break;
     case LUX_ARRAY: case LUX_CARRAY:
-      src.l = (Int *) array_data(nsym);
+      src.l = (int32_t *) array_data(nsym);
       ndim = array_num_dims(nsym);
       dims = array_dims(nsym);
       nelem = array_size(nsym);
@@ -1147,7 +1147,7 @@ Int lux_subsc_func(Int narg, Int ps[])
 	  i = narg;
 	} else {		/* no /SEPARATE */
 	  if (n == 1) {		/* only one element: mimic scalar */
-	    start[i] = *(Int *) array_data(iq);
+	    start[i] = *(int32_t *) array_data(iq);
 	    if (narg == 1)	/* single subscript only */
 	      width = nelem;
 	    else
@@ -1158,7 +1158,7 @@ Int lux_subsc_func(Int narg, Int ps[])
 	    }
 	    subsc_type[i] = LUX_RANGE;
 	  } else {		/* multiple elements in this subscript */
-	    iptr = index[i] = (Int *) array_data(iq);
+	    iptr = index[i] = (int32_t *) array_data(iq);
 	    if (narg == 1)	/* only a single subscript; addresses */
 				/* whole source array as if it were 1D */
 	      width = nelem;
@@ -1202,7 +1202,7 @@ Int lux_subsc_func(Int narg, Int ps[])
 	    case LUX_ARRAY:
 	      j = lux_long(1, &j);	/* ensure LONG indices */
 	      n = size[i] = array_size(j);
-	      iptr = index[i] = (Int *) array_data(j);
+	      iptr = index[i] = (int32_t *) array_data(j);
 	      while (n--) {	/* check if all subscripts are within range */
 		if (*iptr < 0 || *iptr >= dims[i]) {
 		  cerror(ILL_SUBSC, iq, *iptr, dims[i]);
@@ -1487,7 +1487,7 @@ Int lux_subsc_func(Int narg, Int ps[])
       else			/* must be a range */
 	iq = array_scratch(type, 1, &size[n]);
       nelem = array_size(iq);
-      trgt.l = (Int *) array_data(iq);
+      trgt.l = (int32_t *) array_data(iq);
     } else {
       iq = scalar_scratch(type);
       nelem = 1;
@@ -1627,7 +1627,7 @@ Int lux_subsc_func(Int narg, Int ps[])
 	if (subsc_type[j] == LUX_ARRAY && size[j] > 1 && !sum[j]) {
 	  /* a multi-dimensional array was specified as a subscript */
 	  /* without summation; copy the dimensions to the output symbol */
-	  memcpy(trgtdims + n, array_dims(ps2[j]), step[j]*sizeof(Int));
+	  memcpy(trgtdims + n, array_dims(ps2[j]), step[j]*sizeof(int32_t));
 	  n += step[j];
 	} else if (!sum[j])	/* simple argument: one dimension extra */
 	  trgtdims[n++] = size[j];
@@ -1635,7 +1635,7 @@ Int lux_subsc_func(Int narg, Int ps[])
 	  trgtdims[n++] = 1;
       }	/* end of for (i = 0...) */
       iq = array_scratch(type, noutdim, trgtdims);
-      trgt.l = (Int *) array_data(iq);
+      trgt.l = (int32_t *) array_data(iq);
     } /* end of if (noutdim) */
     else if (class == LUX_STRING_ARRAY) { /* string from string array */
       if (src.sp[start[0]]) {	/* non-null string */
@@ -1686,7 +1686,7 @@ Int lux_subsc_func(Int narg, Int ps[])
 	for (i = 0; i < narg; i++)
 	  if (!sum[fromdim[i]])	/* and then the non-summed ones */
 	    stride[n++] = fromdim[i];
-	memcpy(fromdim, stride, narg*sizeof(Int));
+	memcpy(fromdim, stride, narg*sizeof(int32_t));
       }
     }
     /* for LUX_ARRAY subscripts the offset is calculated for each index; */
@@ -1709,11 +1709,11 @@ Int lux_subsc_func(Int narg, Int ps[])
       /* first the number of elements in each target dimension */
       for (i = 0; i < trgtndim; i++)
 	ps2[i] = size[fromdim[i]];
-      memcpy(size, ps2, trgtndim*sizeof(Int));
+      memcpy(size, ps2, trgtndim*sizeof(int32_t));
       /* then the step sizes to go through each target dimension */
       for (i = 0; i < trgtndim; i++)
 	ps2[i] = stride[fromdim[i]];
-      memcpy(stride, ps2, trgtndim*sizeof(Int));
+      memcpy(stride, ps2, trgtndim*sizeof(int32_t));
       /* then the subscript types */
       for (i = 0; i < trgtndim; i++)
 	ps2[i] = subsc_type[fromdim[i]];
@@ -1745,11 +1745,11 @@ Int lux_subsc_func(Int narg, Int ps[])
       /* now <i> indicates the number of dimensions at the beginning */
       /* that can be treated as a single dimension.  We adjust the */
       /* info accordingly. */
-      memmove(step, step + i, (trgtndim - i)*sizeof(Int));
-      memmove(size, size + i, (trgtndim - i)*sizeof(Int));
-      memmove(stride, stride + i, (trgtndim - i)*sizeof(Int));
+      memmove(step, step + i, (trgtndim - i)*sizeof(int32_t));
+      memmove(size, size + i, (trgtndim - i)*sizeof(int32_t));
+      memmove(stride, stride + i, (trgtndim - i)*sizeof(int32_t));
       memmove(subsc_type, subsc_type + i, trgtndim - i);
-      memmove(fromdim, fromdim + i, (trgtndim - i)*sizeof(Int));
+      memmove(fromdim, fromdim + i, (trgtndim - i)*sizeof(int32_t));
       step[0] += width;
       trgtndim -= i;
     }
@@ -1928,7 +1928,7 @@ Int lux_subsc_func(Int narg, Int ps[])
 	break;
     }
   }
-  Int lux_endian(Int, Int *);
+  int32_t lux_endian(int32_t, int32_t *);
   if (class == LUX_FILEMAP && file_map_swap(nsym))
     lux_endian(1, &iq);		/* Byte swap */
   return iq;
@@ -1939,13 +1939,13 @@ Int lux_subsc_func(Int narg, Int ps[])
   return LUX_ERROR;
 }						/* end of lux_subsc */
  /*------------------------------------------------------------------------- */
-Int string_sub(Int narg, Int ps[])
+int32_t string_sub(int32_t narg, int32_t ps[])
 /* subscripts for strings, called by lux_subc */
 /* the string is in ps[narg]; narg indicates the number of subscripts.
  LS 19aug98 */
 {
   /* this is a subset of cases for arrays since strings are 1-D */
-  Int	iq, n, result_sym, ns, nsym, i;
+  int32_t	iq, n, result_sym, ns, nsym, i;
   char	*p, *q;
   pointer p2;
 
@@ -1956,7 +1956,7 @@ Int string_sub(Int narg, Int ps[])
   n = string_size(nsym);
   iq = ps[0];			/* only one subscript */
   switch (symbol_class(iq)) {
-    case LUX_SCALAR:	/*a scalar, simple, get a long (Int) version */
+    case LUX_SCALAR:	/*a scalar, simple, get a long (int32_t) version */
       i = int_arg(iq);
       if (i < 0)
 	i += n;	/* (*-expr) */
@@ -1980,7 +1980,7 @@ Int string_sub(Int narg, Int ps[])
     case LUX_ARRAY:
       /* a string is created with length = # elements in array */
       iq = lux_long(1, &iq);	/* get a long version */
-      p2.l = (Int *) array_data(iq);
+      p2.l = (int32_t *) array_data(iq);
       ns = array_size(iq);
       result_sym = string_scratch(ns);
       q = string_value(result_sym);
@@ -2029,12 +2029,12 @@ Int string_sub(Int narg, Int ps[])
   return 1;
 }
  /*------------------------------------------------------------------------- */
-Int lux_symclass(Int narg, Int ps[])
+int32_t lux_symclass(int32_t narg, int32_t ps[])
  /*return the class of the argument symbol */
  /* NOTE: scalar pointers (class 8) are returned as scalars (class 1)
     LS 13may92 */
 {
-  Int	nsym, nd, result_sym;
+  int32_t	nsym, nd, result_sym;
 
   if (internalMode & 2)
     nsym = int_arg(ps[0]);
@@ -2051,11 +2051,11 @@ Int lux_symclass(Int narg, Int ps[])
   return result_sym;
 }
  /*------------------------------------------------------------------------- */
-Int lux_symdtype(narg,ps)
+int32_t lux_symdtype(narg,ps)
  /*return the type of the argument symbol */
-Int narg,ps[];
+int32_t narg,ps[];
 {
-  Int	nsym, result_sym;
+  int32_t	nsym, result_sym;
 
   nsym = ps[0];				/*the target symbol is the first */
   result_sym = scalar_scratch(2);
@@ -2063,12 +2063,12 @@ Int narg,ps[];
   return result_sym;
 }
  /*------------------------------------------------------------------------- */
-Int lux_num_elem(Int narg, Int ps[])
+int32_t lux_num_elem(int32_t narg, int32_t ps[])
 /* return the number of elements in the argument symbol, or the number
    contained within the specified dimensions.
    call:  NUM_ELEM(x [, dims]) */
 {
-  Int	nsym, n, j, result_sym, *dims, *axes, naxes, ndim, temp;
+  int32_t	nsym, n, j, result_sym, *dims, *axes, naxes, ndim, temp;
 
   nsym = ps[0];				/*the target symbol is the first */
   result_sym = scalar_scratch(LUX_LONG);
@@ -2138,11 +2138,11 @@ Int lux_num_elem(Int narg, Int ps[])
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-Int lux_num_dimen(narg,ps)
+int32_t lux_num_dimen(narg,ps)
  /*return the number of dimensions in the argument symbol */
-Int narg,ps[];
+int32_t narg,ps[];
 {
-  Int	nsym, nd, result_sym;
+  int32_t	nsym, nd, result_sym;
 
   array	*h;
   nsym = ps[0];				/*the target symbol is the first */
@@ -2164,13 +2164,13 @@ Int narg,ps[];
   return result_sym;
 }
  /*------------------------------------------------------------------------- */
-Int lux_dimen(Int narg, Int ps[])
+int32_t lux_dimen(int32_t narg, int32_t ps[])
 /* DIMEN(x [,axes]) returns the indicated dimensions of <x>.  If <x> is */
 /* a scalar or a string, then a scalar 1 is returned.  If <x> has only */
 /* one dimension, then that is returned in a scalar.  If <axes> is not */
 /* specified, then all dimensions are returned.  LS 19may98 */
 {
-  Int	nAxes, iq, *out, i, ndim, *dims;
+  int32_t	nAxes, iq, *out, i, ndim, *dims;
   pointer	axes;
 
   if (narg > 1) {		/* have <axes> */
@@ -2188,7 +2188,7 @@ Int lux_dimen(Int narg, Int ps[])
 	  return cerror(ILL_AXIS, ps[1], axes.l[i]);
       if (nAxes > 1) {
 	iq = array_scratch(LUX_LONG, 1, &nAxes);
-	out = (Int *) array_data(iq);
+	out = (int32_t *) array_data(iq);
 	while (nAxes--)
 	  *out++ = 1;
       } else {
@@ -2204,7 +2204,7 @@ Int lux_dimen(Int narg, Int ps[])
 	  return cerror(ILL_AXIS, ps[1], axes.l[i]);
       if (nAxes > 1) {
 	iq = array_scratch(LUX_LONG, 1, &nAxes);
-	out = (Int *) array_data(iq);
+	out = (int32_t *) array_data(iq);
 	while (nAxes--)
 	  *out++ = dims[*axes.l++];
       } else if (nAxes == 1) {
@@ -2213,7 +2213,7 @@ Int lux_dimen(Int narg, Int ps[])
       } else {			/* return all dimensions */
 	if (ndim > 1) {
 	  iq = array_scratch(LUX_LONG, 1, &ndim);
-	  memcpy(array_data(iq), dims, ndim*sizeof(Int));
+	  memcpy(array_data(iq), dims, ndim*sizeof(int32_t));
 	} else {
 	  iq = scalar_scratch(LUX_LONG);
 	  scalar_value(iq).l = dims[0];
@@ -2226,17 +2226,17 @@ Int lux_dimen(Int narg, Int ps[])
   return iq;
 }
  /*------------------------------------------------------------------------- */
-Int lux_redim_f(Int narg, Int ps[])
+int32_t lux_redim_f(int32_t narg, int32_t ps[])
  /* redimension an array, a function version, returns input symbol */
 {
-  Int	result, n, *args;
-  Int	lux_redim(Int, Int []);
+  int32_t	result, n, *args;
+  int32_t	lux_redim(int32_t, int32_t []);
 
-  args = Malloc(narg*sizeof(Int));
+  args = Malloc(narg*sizeof(int32_t));
   if (!args)
     return LUX_ERROR;
   result = copySym(ps[0]);
-  memcpy(args, ps, narg*sizeof(Int));
+  memcpy(args, ps, narg*sizeof(int32_t));
   args[0] = result;
   n = lux_redim(narg, args);
   Free(args);
@@ -2247,7 +2247,7 @@ Int lux_redim_f(Int narg, Int ps[])
   return n;
 }
  /*------------------------------------------------------------------------- */
-Int lux_redim(Int narg, Int ps[])
+int32_t lux_redim(int32_t narg, int32_t ps[])
      /* redimension an array */
      /* NOTE: my array_size() calculates the number of elements in an */
      /* array from the size of the allocated memory and this assumes that */
@@ -2257,8 +2257,8 @@ Int lux_redim(Int narg, Int ps[])
      /* this behavior and I hope loose-fit memory does not cause problems */
      /* for me elsewhere.  LS 19may97 */
 {
-  extern Int	redim_warn_flag;
-  Int	oldSize, newSize, ndim, dims[MAX_DIMS], i, iq, nsym;
+  extern int32_t	redim_warn_flag;
+  int32_t	oldSize, newSize, ndim, dims[MAX_DIMS], i, iq, nsym;
   array	*data;
 
   nsym = ps[0];			/* the target symbol is the first */
@@ -2279,7 +2279,7 @@ Int lux_redim(Int narg, Int ps[])
 	if (ndim + array_size(ps[i]) > MAX_DIMS)
 	  return luxerror("Too many dimensions specified", ps[i]);
 	iq = lux_long(1, &ps[i]);
-	memcpy(dims + ndim, array_data(iq), array_size(iq)*sizeof(Int));
+	memcpy(dims + ndim, array_data(iq), array_size(iq)*sizeof(int32_t));
 	ndim += array_size(iq);
 	break;
       default:
@@ -2292,7 +2292,7 @@ Int lux_redim(Int narg, Int ps[])
     return cerror(ARR_SMALL, nsym);
   else if (newSize < oldSize && redim_warn_flag)
     printf("WARNING: result from REDIM is smaller than original\n");
-  memcpy(array_dims(nsym), dims, ndim*sizeof(Int));
+  memcpy(array_dims(nsym), dims, ndim*sizeof(int32_t));
   array_num_dims(nsym) = ndim;
   newSize = newSize*lux_type_size[array_type(nsym)] + sizeof(array);
   data = Realloc(array_header(nsym), newSize);
@@ -2303,10 +2303,10 @@ Int lux_redim(Int narg, Int ps[])
   return 1;
 }
  /*------------------------------------------------------------------------- */
-Int lux_concat_list(Int narg, Int ps[])
+int32_t lux_concat_list(int32_t narg, int32_t ps[])
 /* concatenation involving LUX_CLIST or LUX_LIST. LS 15jun98 */
 {
-  Int	result, i, iq, nelem = 0, j, indx;
+  int32_t	result, i, iq, nelem = 0, j, indx;
   uint8_t	isStruct = 0;
 
   if ((result = nextFreeTempVariable()) == LUX_ERROR)
@@ -2417,7 +2417,7 @@ Int lux_concat_list(Int narg, Int ps[])
   return result;		/* everything OK */
 }
  /*------------------------------------------------------------------------- */
-Int lux_concat(Int narg, Int ps[])
+int32_t lux_concat(int32_t narg, int32_t ps[])
  /* lux's concatenation function, insisted on by idl users, but works a bit
 	 differently
  there are 2 modes
@@ -2433,8 +2433,8 @@ Int lux_concat(Int narg, Int ps[])
 /* allow concatenation of LISTs and STRUCTs LS 7feb95 */
 {
   pointer q1,q2;
-  Int	nd, j, i, dim[MAX_DIMS], nundef = 0;
-  Int	iq, nsym, mq, toptype = LUX_BYTE, topnd = 0, sflag = 0, n, nq;
+  int32_t	nd, j, i, dim[MAX_DIMS], nundef = 0;
+  int32_t	iq, nsym, mq, toptype = LUX_BYTE, topnd = 0, sflag = 0, n, nq;
   scalar	temp;
 
   if (narg <= 0)
@@ -2477,7 +2477,7 @@ Int lux_concat(Int narg, Int ps[])
 					    /* dimensions */
 	  return cerror(N_DIMS_OVR, iq);
 	nd = array_num_dims(iq);
-	memcpy(dim, array_dims(iq), nd*sizeof(Int));
+	memcpy(dim, array_dims(iq), nd*sizeof(int32_t));
 	dim[nd++] = 1;		/* extra dimension */
         nsym = array_scratch(array_type(iq), nd, dim);
         if (array_type(nsym) == LUX_STRING_ARRAY) { /* string array */
@@ -2598,7 +2598,7 @@ Int lux_concat(Int narg, Int ps[])
 	    }
 	    nq += mq;		/* collect total in loose dimension */
 	  } else {		/* create result dimensions list */
-	    memcpy(dim, array_dims(iq), array_num_dims(iq)*sizeof(Int));
+	    memcpy(dim, array_dims(iq), array_num_dims(iq)*sizeof(int32_t));
 	    /* we count the last dimension separately: all the others */
 	    /* must match, but the last one may vary between components */
 	    nq = (array_num_dims(iq) == topnd)? dim[topnd - 1]: 1;
@@ -2680,11 +2680,11 @@ Int lux_concat(Int narg, Int ps[])
 	    switch (symbol_type(iq)) {
 	      case LUX_BYTE:
 		while (n--)
-		  *q2.l++ = (Int) *q1.b++;
+		  *q2.l++ = (int32_t) *q1.b++;
 		break;
 	      case LUX_WORD:
 		while (n--)
-		  *q2.l++ = (Int) *q1.w++;
+		  *q2.l++ = (int32_t) *q1.w++;
 		break;
 	      case LUX_LONG:
 		while (n--)
@@ -2831,19 +2831,19 @@ Int lux_concat(Int narg, Int ps[])
   } /* end of if else 2-or-more args */
 }						/*end of lux_concat */
 /*------------------------------------------------------------------------- */
-Int lux_isscalar(Int narg, Int ps[])
+int32_t lux_isscalar(int32_t narg, int32_t ps[])
 /* return 1 if symbol is a scalar, 0 otherwise */
 { return (sym[*ps].class == LUX_SCALAR)? 1: 4; }
 /*------------------------------------------------------------------------- */
-Int lux_isarray(Int narg, Int ps[])
+int32_t lux_isarray(int32_t narg, int32_t ps[])
 /* return 1 if symbol is an array, 0 otherwise */
 { return (sym[*ps].class == LUX_ARRAY)? 1: 4; }
 /*------------------------------------------------------------------------- */
-Int lux_isstring(Int narg, Int ps[])
+int32_t lux_isstring(int32_t narg, int32_t ps[])
 /* return 1 if symbol is a string, 0 otherwise */
 { return (sym[*ps].class == LUX_STRING)? 1: 4; }
 /*------------------------------------------------------------------------- */
-Int lux_subsc_subgrid(Int narg, Int ps[])
+int32_t lux_subsc_subgrid(int32_t narg, int32_t ps[])
 /* like x(subsc,/inner) but with linear interpolation for fractional
    coordinates.  LS 19jun97 */
 /* the target (subscripted) symbol is in ps[narg]; narg indicates the
@@ -2851,7 +2851,7 @@ Int lux_subsc_subgrid(Int narg, Int ps[])
    LS 19aug98 */
 {
   uint8_t	class, type;
-  Int	ndim, *dims, i, subsc[MAX_DIMS], nSubsc, iq, j, mid,
+  int32_t	ndim, *dims, i, subsc[MAX_DIMS], nSubsc, iq, j, mid,
     stride[MAX_DIMS], index, tally[MAX_DIMS], step[2][MAX_DIMS];
   float	*coord[MAX_DIMS], d[MAX_DIMS];
   scalar	value, cvalue;
@@ -2939,7 +2939,7 @@ Int lux_subsc_subgrid(Int narg, Int ps[])
       else if (*coord[i] >= dims[i] - 1)
 	mid = dims[i] - 2;
       else
-	mid = (Int) *coord[i];
+	mid = (int32_t) *coord[i];
       d[i] = mid + 1 - *coord[i]; /* interpolation distance */
       index += mid*stride[i];
       coord[i]++;
@@ -3034,8 +3034,8 @@ Int lux_subsc_subgrid(Int narg, Int ps[])
   return iq;
 }
 /*------------------------------------------------------------------------- */
-Int extractNumerical(pointer src, pointer trgt, Int type, Int ndim, Int *dims,
-		     Int *coords, Int nAxes, Int *axes)
+int32_t extractNumerical(pointer src, pointer trgt, int32_t type, int32_t ndim, int32_t *dims,
+		     int32_t *coords, int32_t nAxes, int32_t *axes)
 {
   loopInfo	info;
 
@@ -3051,7 +3051,7 @@ Int extractNumerical(pointer src, pointer trgt, Int type, Int ndim, Int *dims,
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int lux_roll(Int narg, Int ps[])
+int32_t lux_roll(int32_t narg, int32_t ps[])
 /* ROLL(array, target) rearranges the dimensions of <array> according to */
 /* <target>.  If <target> is a scalar, then the dimensions list is shifted */
 /* cyclically over that number of elements.  If <target> is a numerical */
@@ -3063,7 +3063,7 @@ Int lux_roll(Int narg, Int ps[])
 /* array).  If <target> is an array, then DIMEN(array)(target) is equal to */
 /* DIMEN(ROLL(array,target)).  LS 12sep2000 */
 {
-  Int	nd, result, temp, iq, i;
+  int32_t	nd, result, temp, iq, i;
   loopInfo	srcinfo, trgtinfo;
   pointer	src, trgt;
 
@@ -3101,7 +3101,7 @@ Int lux_roll(Int narg, Int ps[])
 		   &src, &result, &trgtinfo, &trgt) == LUX_ERROR)
     return LUX_ERROR;
 
-  memcpy(array_dims(result), srcinfo.rdims, nd*sizeof(Int));
+  memcpy(array_dims(result), srcinfo.rdims, nd*sizeof(int32_t));
 
   if (temp)
     zap(iq);			/* no longer needed */

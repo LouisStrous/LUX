@@ -34,22 +34,22 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 extern char	*c_left, *c_right, *c_up, *c_down, *cl_eos, *k_backspace,
 	*k_delete, *k_insert, *k_up, *k_down, *k_right, *k_left, *c_save,
 	*c_restore, *special[7], isSpecial[256];
-extern Int	scrat[];
-static Int	str_count;
+extern int32_t	scrat[];
+static int32_t	str_count;
 static char	*cap_strings;
 static uint8_t	*cap_offsets;
-char	*termEntry(Int);
+char	*termEntry(int32_t);
 /*----------------------------------------------------*/
 void getTermCaps(void)
 /* reads terminal capabilities of terminal type TERM (environment variable) */
 /* through terminfo or (if terminfo is not available) termcap. */
 {
   char	*term, *terminfo, buf[256], txt[12], *p, *q, found;
-  Int	n, i, name_size, bool_count, num_count, str_size, ncap;
+  int32_t	n, i, name_size, bool_count, num_count, str_size, ncap;
   FILE	*fp;
   /* order: c_left, k_left, c_down, k_down, c_up, k_up, c_right, k_right, */
   /* cl_eos, k_backspace, k_delete, k_insert, c_save, c_restore */
-  Int	terminfos[] = {
+  int32_t	terminfos[] = {
     STR_CAP_cub1,               /* move left one space */
     STR_CAP_kcub1,              /* left-arrow key */
     STR_CAP_cud1,               /* down one line */
@@ -239,7 +239,7 @@ void getTermCaps(void)
  because memory allocated here is not associated with any particular
  symbol.  LS 21sep98 */
 #undef malloc
-char *termEntry(Int index)
+char *termEntry(int32_t index)
 {
   char	*p, *q;
 

@@ -45,35 +45,35 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #define BIG_ENOUGH      1
 #define WHITE_BACKGR	2
 
-Int	coordTrf(float *, float *, Int, Int),
-  checkCoordSys(Int mode, Int defaultmode);
+int32_t	coordTrf(float *, float *, int32_t, int32_t),
+  checkCoordSys(int32_t mode, int32_t defaultmode);
 
-Int	setup_x(void), anaAllocNamedColor(char *, XColor **);
+int32_t	setup_x(void), anaAllocNamedColor(char *, XColor **);
 
-extern  Int     scalemin, scalemax, setup, connect_flag, visualClass;
+extern  int32_t     scalemin, scalemax, setup, connect_flag, visualClass;
 extern  float   xfac, yfac, xlimit, ylimit;
-extern  Int     ixlow, iylow, ixhigh, iyhigh, threeColors;
+extern  int32_t     ixlow, iylow, ixhigh, iyhigh, threeColors;
 char    *display_name = NULL;
-Int     last_wid = 0;
+int32_t     last_wid = 0;
 
 double  last_time;
-Int     xcoord, ycoord, lux_button, lux_keycode, lux_keypress, root_x, root_y,
+int32_t     xcoord, ycoord, lux_button, lux_keycode, lux_keypress, root_x, root_y,
 	preventEventFlush = 0, lux_keystate, lux_keysym;
 uint32_t	kb;
 float	xhair, yhair, tvscale = 1.0;
 Window  win[MAXWINDOWS];
 /* the size of each of the windows and pixmaps for our use */
 
-Int     wd[MAXWINDOWS], ht[MAXWINDOWS], wdmap[MAXPIXMAPS], htmap[MAXPIXMAPS];
-Int     xerrors;
+int32_t     wd[MAXWINDOWS], ht[MAXWINDOWS], wdmap[MAXPIXMAPS], htmap[MAXPIXMAPS];
+int32_t     xerrors;
 extern Atom	wm_delete;
 GC      gc[MAXWINDOWS], gcmap[MAXPIXMAPS];
-Int	drawingareas[MAXWINDOWS]; /* used in motif.c */
+int32_t	drawingareas[MAXWINDOWS]; /* used in motif.c */
 XFontStruct     *font_info[MAXWINDOWS];
 XImage  *xi;
 Pixmap  icon_pixmap, maps[MAXPIXMAPS], back_pixmap;
 extern Colormap        colorMap;
-Int	xold, yold;
+int32_t	xold, yold;
 float     tvix, tviy, tvixb, tviyb;
 extern GC	gcnot;
 
@@ -81,13 +81,13 @@ extern GC	gcnot;
 extern unsigned long	black_pixel, white_pixel, *pixels;
 extern Visual	*visual;
 extern uint32_t	depth;
-extern Int	private_colormap, screen_num;
+extern int32_t	private_colormap, screen_num;
 extern uint32_t	display_width, display_height, display_cells, nColors;
 extern Display	*display;
 
 extern char   *strsave(char  *s), *visualNames[];
 
-Int	freeCellIndex, nFreeCells;
+int32_t	freeCellIndex, nFreeCells;
 
 #ifdef MOTIF
 #include <X11/Intrinsic.h>
@@ -101,7 +101,7 @@ extern Widget	lux_widget_id[MAXWIDGETS];
 /*  *                 TV                    *   */
 
 /*--------------------------------------------------------------------------*/
-Int xerr(Display *display, XErrorEvent *err)
+int32_t xerr(Display *display, XErrorEvent *err)
 /* our own non-fatal X window error routine */
 /* essentially copied from manual */
 /* Expanded 9 oct 97 - LS */
@@ -116,7 +116,7 @@ Int xerr(Display *display, XErrorEvent *err)
   return LUX_ERROR;
 }
  /*--------------------------------------------------------------------------*/
-void eventType(Int type)
+void eventType(int32_t type)
 /* reports the name corresponding to the event type */
 {
   static unsigned long	count = 0;
@@ -226,7 +226,7 @@ void eventType(Int type)
   }
 }
  /*--------------------------------------------------------------------------*/
-void xsynchronize(Int status)
+void xsynchronize(int32_t status)
      /* sets (status != 0) or resets (status == 0) X-window event */
      /* synchronization.  If set, all X events are treated in the order */
      /* in which the commands are specified.  If reset, then X events */
@@ -243,11 +243,11 @@ void xsynchronize(Int status)
   printf("X synchronization %sset.\n", status? "": "re");
 }
  /*--------------------------------------------------------------------------*/
-Int lux_show_visuals(Int narg, Int ps[])
+int32_t lux_show_visuals(int32_t narg, int32_t ps[])
 {
   XVisualInfo	*vInfo, vTemplate;
   extern char	*visualNames[];
-  Int	nVisual, i, mask, j;
+  int32_t	nVisual, i, mask, j;
 
   if (!connect_flag && setup_x() < 0)
     return LUX_ERROR;
@@ -287,12 +287,12 @@ Int lux_show_visuals(Int narg, Int ps[])
   return 1;
 }
 /*--------------------------------------------------------------------------*/
-Int lux_xclose(Int narg, Int ps[])
+int32_t lux_xclose(int32_t narg, int32_t ps[])
 /* close connection to window manager: close and destroy all windows, */
 /* pixmaps, color maps, etc.  LS 30jul96 */
 {
-  Int	i;
-  extern Int	menu_setup_done;
+  int32_t	i;
+  extern int32_t	menu_setup_done;
   void	disconnect_x();
 
   if (connect_flag) {
@@ -306,14 +306,14 @@ Int lux_xclose(Int narg, Int ps[])
   return 1;
 }
 /*--------------------------------------------------------------------------*/
-Int ck_area(Int wid, Int *xpos, Int *ypos, Int *width, Int *height)
+int32_t ck_area(int32_t wid, int32_t *xpos, int32_t *ypos, int32_t *width, int32_t *height)
 /* checks whether the specified DEV area lies within window <wid>.
    If OK, then returns 1.  If the area lies partially in the window,
    then the parameters are adjusted so the area is wholly inside the
    window, and 1 is returned.  If the area is wholly outside the window,
    or the window does not exist, then 0 is returned.  LS 16apr93 */
 {
- Int	dwd, dht;
+ int32_t	dwd, dht;
 
  if (wid >= 0) {
    if (!win[wid])
@@ -345,13 +345,13 @@ Int ck_area(Int wid, Int *xpos, Int *ypos, Int *width, Int *height)
  return 1;
 }
  /*--------------------------------------------------------------------------*/
-Int lux_xtvlct(Int narg, Int ps[])
+int32_t lux_xtvlct(int32_t narg, int32_t ps[])
 /* load color table, scaling to available range */
 /* expect 3 arrays for RGB */
 {
-  Int	i, n, nmin = INT32_MAX, iq;
+  int32_t	i, n, nmin = INT32_MAX, iq;
   float	*p[3];
-  void	storeColorTable(float *, float *, float *, Int, Int);
+  void	storeColorTable(float *, float *, float *, int32_t, int32_t);
 
   for (i = 0; i < 3; i++) {
     if (!symbolIsNumericalArray(ps[i]))
@@ -368,11 +368,11 @@ Int lux_xtvlct(Int narg, Int ps[])
   return LUX_OK;
 }
 /*--------------------------------------------------------------------------*/
-Int lux_xopen(Int narg, Int ps[])
+int32_t lux_xopen(int32_t narg, int32_t ps[])
 /* sets or changes the display name for x setup and/or sets or changes the */
 /* color map default.  LS 30jul96 */
 {
-  extern Int	select_visual;
+  extern int32_t	select_visual;
 
   if (narg && ps[0]) {			/* set display name */
     if (symbol_class(ps[0]) != LUX_STRING)
@@ -407,10 +407,10 @@ Int lux_xopen(Int narg, Int ps[])
   return setup_x();
 }
 /*--------------------------------------------------------------------------*/
-Int lux_xexist(Int narg, Int ps[])/* return 1 if window exists */
+int32_t lux_xexist(int32_t narg, int32_t ps[])/* return 1 if window exists */
  /* argument is port # */
 {
-  Int     wid;
+  int32_t     wid;
 
   if (int_arg_stat(ps[0], &wid) != 1)
     return LUX_ERROR;
@@ -425,7 +425,7 @@ Int lux_xexist(Int narg, Int ps[])/* return 1 if window exists */
   return LUX_ZERO;
 }
 /*--------------------------------------------------------------------------*/
-Int lux_xport(Int narg, Int ps[])	/* open a window or pixmap */
+int32_t lux_xport(int32_t narg, int32_t ps[])	/* open a window or pixmap */
  /* arguments are port #, width , height (default is 512x512) */
  /* position x, y, window title (<128 chars), icon title (<16 chars) */
  /* might be nice to have some commands to change things like the background
@@ -433,11 +433,11 @@ Int lux_xport(Int narg, Int ps[])	/* open a window or pixmap */
  /* added titles  LS 13apr93 */
 /* check validity of window number  LS 14jul2000 */
 {
-  Int     wid, mapid, xpos = 0, ypos = 0, pflag, n;
+  int32_t     wid, mapid, xpos = 0, ypos = 0, pflag, n;
   uint32_t	width, height;
   char	*wtitle = NULL, *ititle = NULL;
-  Int	ck_window(Int), set_defw(Int), lux_xdelete(Int, Int []),
-    lux_xcreat(Int, uint32_t, uint32_t, Int, Int, Int, char *,
+  int32_t	ck_window(int32_t), set_defw(int32_t), lux_xdelete(int32_t, int32_t []),
+    lux_xcreat(int32_t, uint32_t, uint32_t, int32_t, int32_t, int32_t, char *,
 	       char *);
   
   if (narg > 0)
@@ -500,7 +500,7 @@ Int lux_xport(Int narg, Int ps[])	/* open a window or pixmap */
   return n;
 }
  /*--------------------------------------------------------------------------*/
-Int ck_window(Int wid)
+int32_t ck_window(int32_t wid)
 /* only checks if a window value is in allowed range */
 {
   if (wid >= MAXWINDOWS || wid <= -MAXPIXMAPS)
@@ -510,7 +510,7 @@ Int ck_window(Int wid)
     return LUX_OK;
 }
  /*--------------------------------------------------------------------------*/
-Int ck_events(void)         /* checks events for focus and size changes */
+int32_t ck_events(void)         /* checks events for focus and size changes */
  /* updates the last_wid and any window sizes */
  /* will also change last_win to a window with a button or key pressed even
  if focus not changed; i.e., LUX's focus for a plot or tv can be changed
@@ -519,9 +519,9 @@ Int ck_events(void)         /* checks events for focus and size changes */
  other windows including the xterm (or whatever) that LUX is running in */
 {
    XEvent  report;
-   Int     nev, i, j, iq;
+   int32_t     nev, i, j, iq;
    Window wq;
-   Int	set_defw(Int);
+   int32_t	set_defw(int32_t);
    
    if (setup_x() < 0)
      return LUX_ERROR;
@@ -589,10 +589,10 @@ Int ck_events(void)         /* checks events for focus and size changes */
    return  1;
 }
 /*-------------------------------------------------------------------------*/
-Int set_defw(Int wid)
+int32_t set_defw(int32_t wid)
 /* assumes window is defined, sets last_wid and plotting context */
 {
-  Int     mapid;
+  int32_t     mapid;
 
   last_wid = wid;
   if (wid < 0 ) {		/* pixmap case */
@@ -610,8 +610,8 @@ Int set_defw(Int wid)
   return  1;
 }
 /*--------------------------------------------------------------------------*/
-Int lux_xcreat(Int wid, uint32_t height, uint32_t width, Int xpos,
-	       Int ypos, Int pflag, char *wtitle, char *ititle)
+int32_t lux_xcreat(int32_t wid, uint32_t height, uint32_t width, int32_t xpos,
+	       int32_t ypos, int32_t pflag, char *wtitle, char *ititle)
  /* might be nice to have some commands to change things like the background
  color and pattern and cursor */
 {
@@ -625,7 +625,7 @@ Int lux_xcreat(Int wid, uint32_t height, uint32_t width, Int xpos,
  XWMHints        wm_hints;
  XSetWindowAttributes    attributes;
  Cursor cursor;
- Int     mapid;
+ int32_t     mapid;
 
  /* start execution here */
  if (setup_x() < 0)
@@ -780,9 +780,9 @@ Int lux_xcreat(Int wid, uint32_t height, uint32_t width, Int xpos,
  return 1;
 }
 /*--------------------------------------------------------------------------*/
-Int lux_xsetinputs(Int narg, Int ps[])		/* set the input mask */
+int32_t lux_xsetinputs(int32_t narg, int32_t ps[])		/* set the input mask */
 {
-  Int	wid;
+  int32_t	wid;
 
   if (ck_events() != 1)
     return LUX_ERROR;
@@ -794,9 +794,9 @@ Int lux_xsetinputs(Int narg, Int ps[])		/* set the input mask */
   return 1;
 }
  /*-------------------------------------------------------------------------*/
-Int lux_xcursor(Int narg, Int ps[]) /* set the cursor */
+int32_t lux_xcursor(int32_t narg, int32_t ps[]) /* set the cursor */
 {
-  Int    wid, iq;
+  int32_t    wid, iq;
   Cursor cursor;
   XColor	*cfore, *cback;
   char	*cfore_default = {"red"};
@@ -834,14 +834,14 @@ Int lux_xcursor(Int narg, Int ps[]) /* set the cursor */
   return LUX_OK;
 }
 /*--------------------------------------------------------------------------*/
-Int lux_xsetbackground(Int narg, Int ps[])/* set the background color */
+int32_t lux_xsetbackground(int32_t narg, int32_t ps[])/* set the background color */
  /* setbackground [, win#] , color */
 /* made first argument optional.  Also check that window/pixmap */
 /* really exists before attempting to change its background color */
 /* LS 13jul2000 */
 /* allow three-element array for <color> to specify RGB values. LS 14jul2000 */
 {
-  Int    wid, iq;
+  int32_t    wid, iq;
   char	*pc;
   float	*value;
   XColor	*color;
@@ -892,14 +892,14 @@ Int lux_xsetbackground(Int narg, Int ps[])/* set the background color */
   return luxerror("error in foreground color", 0);
 }
 /*--------------------------------------------------------------------------*/
-Int lux_xsetforeground(Int narg, Int ps[])/* set the foreground color */
+int32_t lux_xsetforeground(int32_t narg, int32_t ps[])/* set the foreground color */
  /* setforeground [, win#] , color */
 /* made first argument optional.  Also check that window/pixmap */
 /* really exists before attempting to change its foreground color */
 /* LS 13jul2000 */
 /* allow three-element array for <color> to specify RGB values. LS 14jul2000 */
 {
-  Int    wid, iq;
+  int32_t    wid, iq;
   char	*pc;
   float	*value;
   XColor	*color;
@@ -948,9 +948,9 @@ Int lux_xsetforeground(Int narg, Int ps[])/* set the foreground color */
   return luxerror("error in foreground color", 0);
 }
 /*--------------------------------------------------------------------------*/
-Int lux_xdelete(Int narg, Int ps[]) /* delete a window or a pixmap */
+int32_t lux_xdelete(int32_t narg, int32_t ps[]) /* delete a window or a pixmap */
 {
-  Int    wid;
+  int32_t    wid;
   
   ck_events();
   wid = int_arg( ps[0] );
@@ -967,11 +967,11 @@ Int lux_xdelete(Int narg, Int ps[]) /* delete a window or a pixmap */
   return 1;
  }
  /*--------------------------------------------------------------------------*/
-Int lux_xerase(Int narg, Int ps[])
+int32_t lux_xerase(int32_t narg, int32_t ps[])
      /* erase a window */
      /* pixmap support added.  LS 8oct97 */
 {
- Int    wid, xx, yx, wx, hx, old, cs;
+ int32_t    wid, xx, yx, wx, hx, old, cs;
  float	x, y, w, h;
  XGCValues	values;
 
@@ -1036,10 +1036,10 @@ Int lux_xerase(Int narg, Int ps[])
      cs = LUX_X11;
    coordTrf(&x, &y, cs, LUX_X11);
    coordTrf(&w, &h, cs, LUX_X11);
-   xx = (Int) x;
-   yx = (Int) y;
-   wx = (Int) fabs(w - x);
-   hx = (Int) fabs(h - y);
+   xx = (int32_t) x;
+   yx = (int32_t) y;
+   wx = (int32_t) fabs(w - x);
+   hx = (int32_t) fabs(h - y);
  }
 
  if (!ck_area(wid, &xx, &yx, &wx, &hx)) /* area wholly outside window */
@@ -1061,15 +1061,15 @@ Int lux_xerase(Int narg, Int ps[])
  return 1;
 }
  /*------------------------------------------------------------------------*/
-Int lux_xsetaction(Int narg, Int ps[])
+int32_t lux_xsetaction(int32_t narg, int32_t ps[])
 /* This routine associates a certain copy action with a window.
    Codes 1 and 2 select sprite action.  A sprite disappears
    without a trace if drawn for a second time.  LS 14apr93 */
 /* syntax:  xsetaction [,code,window]
     code defaults to 1, window to last_win */
 {
-  Int	wid = last_wid, code = 1;
-  static Int	function_code[] = {
+  int32_t	wid = last_wid, code = 1;
+  static int32_t	function_code[] = {
 	GXcopy, GXxor, GXequiv, GXclear, GXset, GXnoop, GXinvert, GXand,
 	GXandReverse, GXandInverted, GXor, GXorReverse, GXorInverted,
 	GXnand, GXnor, GXcopyInverted };
@@ -1090,11 +1090,11 @@ Int lux_xsetaction(Int narg, Int ps[])
   return 1;
 }
  /*------------------------------------------------------------------------*/
-Int reverseYImage(Int iq)
+int32_t reverseYImage(int32_t iq)
 /* returns a copy of 2D image <iq> reversed in the y direction */
 {
-  Int	ps[2];
-  Int	lux_reverse(Int, Int *);
+  int32_t	ps[2];
+  int32_t	lux_reverse(int32_t, int32_t *);
 
   if (symbol_class(iq) != LUX_ARRAY
       || array_num_dims(iq) != 2)
@@ -1104,14 +1104,14 @@ Int reverseYImage(Int iq)
   return lux_reverse(2, ps);
 }
 /*------------------------------------------------------------------------*/
-Int lux_xtv_general(Int narg, Int ps[], Int mode)
+int32_t lux_xtv_general(int32_t narg, int32_t ps[], int32_t mode)
 {
   pointer	data;
-  Int	type, nx, ny, wid;
+  int32_t	type, nx, ny, wid;
   float	x, y;
-  Int	tvraw(pointer data, Int type, Int nx, Int ny, float x1, float x2,
-	  float y1, float y2, float sxf, float syf, Int wid, float *mag,
-	  Int mode, double clo, double chi, uint8_t *bitmap1, uint8_t *bitmap2);
+  int32_t	tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, float x2,
+	  float y1, float y2, float sxf, float syf, int32_t wid, float *mag,
+	  int32_t mode, double clo, double chi, uint8_t *bitmap1, uint8_t *bitmap2);
 
   if (internalMode & TV_24) {
     mode |= TV_24;
@@ -1167,7 +1167,7 @@ Int lux_xtv_general(Int narg, Int ps[], Int mode)
 	       mode, 0.0, 0.0, NULL, NULL);
 }
 /*------------------------------------------------------------------------*/
-Int lux_xtvraw(Int narg, Int ps[])
+int32_t lux_xtvraw(int32_t narg, int32_t ps[])
 /* scales non-LUX_BYTE arrays; displays on screen */
 /* NOTE: in older versions of LUX the coordinates of the image were
  counted from the upper left-hand corner of the screen, and the
@@ -1182,9 +1182,9 @@ Int lux_xtvraw(Int narg, Int ps[])
   return lux_xtv_general(narg, ps, TV_RAW);
 }
 /*------------------------------------------------------------------------*/
-Int tvraw(pointer data, Int type, Int nx, Int ny, float x1, float x2,
-	  float y1, float y2, float sxf, float syf, Int wid, float *mag,
-	  Int mode, double clo, double chi, uint8_t *bitmap1, uint8_t *bitmap2)
+int32_t tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, float x2,
+	  float y1, float y2, float sxf, float syf, int32_t wid, float *mag,
+	  int32_t mode, double clo, double chi, uint8_t *bitmap1, uint8_t *bitmap2)
 /* display data in a window. */
 /* data: pointer to the start of the data */
 /* type: data type */
@@ -1202,18 +1202,18 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, float x1, float x2,
 /* it is assumed here that the arguments are consistent! */
 {
   pointer	image, image0;
-  Int	hq, wq, nxx, nyy, ix, iy, xsrc, ysrc, indx, i, toscreen, maxdim,
+  int32_t	hq, wq, nxx, nyy, ix, iy, xsrc, ysrc, indx, i, toscreen, maxdim,
     iq, sx, sy, bpp, s;
   scalar	min, max, value, factor, offset;
   float	fx, fy, fx2, fy2, magx, magy, nxxf, nyyf;
   extern float	postXBot, postXTop, postYBot, postYTop,
     zoom_mag, zoom_xc, zoom_yc, zoom_clo, zoom_chi, wxb, wxt, wyb, wyt;
-  extern Int	lunplt, bits_per_pixel;
+  extern int32_t	lunplt, bits_per_pixel;
   extern unsigned long	red_mask, green_mask, blue_mask;
-  Int	lux_threecolors(Int, Int []), checkCoordSys(Int, Int),
-    coordTrf(float *, float *, Int, Int),
-    postgray(char *, Int, Int, float, float, float, float, Int),
-    postcolor(char *, Int, Int, float, float, float, float, Int);
+  int32_t	lux_threecolors(int32_t, int32_t []), checkCoordSys(int32_t, int32_t),
+    coordTrf(float *, float *, int32_t, int32_t),
+    postgray(char *, int32_t, int32_t, float, float, float, float, int32_t),
+    postcolor(char *, int32_t, int32_t, float, float, float, float, int32_t);
   
   toscreen = (internalMode & (TV_SCREEN | TV_POSTSCRIPT | TV_PDEV));
   switch (toscreen) {
@@ -1257,8 +1257,8 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, float x1, float x2,
   if (internalMode & TV_ZOOM) {	/* use ZOOM parameters instead */
     sxf = wq*0.5;		/* zoom target coordinates: image center */
     syf = hq*0.5;
-    sx = (Int) sxf;
-    sy = (Int) syf;
+    sx = (int32_t) sxf;
+    sy = (int32_t) syf;
     *mag = zoom_mag;		/* zoom scale */
     internalMode |= TV_CENTER;	/* zoom coordinates indicate image center */
     internalMode = (internalMode & ~63) | LUX_DEV;
@@ -1301,9 +1301,9 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, float x1, float x2,
 				/* set magnification to standard value */
     *mag = MIN((float) hq/ny, (float) wq/nx);
     if (*mag >= 1)
-      *mag = (Int) *mag;
+      *mag = (int32_t) *mag;
     else
-      *mag = 1.0/((Int) 1.0/ *mag);
+      *mag = 1.0/((int32_t) 1.0/ *mag);
     magx = magy = *mag;
   } else if ((x2 - x1 + 1)**mag > 2*wq || (y2 - y1 + 1)**mag > 2*hq) {
     puts(
@@ -1311,23 +1311,23 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, float x1, float x2,
     puts(" -- reducing scale factor to accommodate.");
     *mag = MIN((float) hq/ny, (float) wq/nx);
     if (*mag >= 1)
-      *mag = (Int) *mag;
+      *mag = (int32_t) *mag;
     else
-      *mag = 1.0/((Int) 1.0/ *mag);
+      *mag = 1.0/((int32_t) 1.0/ *mag);
     magx = magy = *mag;
   } else
     magx = magy = *mag;
 
   nxxf = (x2 + 1 - x1)*magx; /* scaled dimensions */
   nyyf = (y2 + 1 - y1)*magy;
-  nxx = (Int) nxxf;
-  nyy = (Int) nyyf;
+  nxx = (int32_t) nxxf;
+  nyy = (int32_t) nyyf;
 
   if (internalMode & TV_PLOTWINDOW) {
     sxf = wxb * wq;
     syf = (1 - wyt) * hq;
-    sx = (Int) sxf;
-    sy = (Int) syf;
+    sx = (int32_t) sxf;
+    sy = (int32_t) syf;
   } else {
     i = (internalMode & 7);
     if (toscreen		/* displaying on screen */
@@ -1335,8 +1335,8 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, float x1, float x2,
 	&& i == LUX_DEV)	/* have DEV coordinates */
       i = LUX_X11;		/* interpret as X11 */
     coordTrf(&sxf, &syf, i, LUX_DEV); /* transform to DEV */
-    sx = (Int) sxf;
-    sy = (Int) syf;
+    sx = (int32_t) sxf;
+    sy = (int32_t) syf;
     /* calculate coordinates of image's upper right-hand corner in X11
        coordinates */
     switch (internalMode & TV_CENTER) {	/* /CENTER */
@@ -3062,12 +3062,12 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, float x1, float x2,
   return iq;
 }
  /*------------------------------------------------------------------------*/
-Int lux_colorpixel(Int narg, Int ps[])
+int32_t lux_colorpixel(int32_t narg, int32_t ps[])
 /* maps color indices to pixel values */
 {
   pointer	p, q;
-  Int	n, iq, bpp, type;
-  extern Int	bits_per_pixel;
+  int32_t	n, iq, bpp, type;
+  extern int32_t	bits_per_pixel;
   extern unsigned long	red_mask, green_mask, blue_mask;
 
   bpp = bits_per_pixel? bits_per_pixel: 
@@ -3127,54 +3127,54 @@ Int lux_colorpixel(Int narg, Int ps[])
 	switch (symbol_type(*ps)) {
 	  case LUX_BYTE:
 	    while (n--)
-	      *q.b++ = (pixels[(Int) *p.b] & red_mask)
-		| (pixels[(Int) p.b[n]] & green_mask)
-		| (pixels[(Int) p.b[2*n]] & blue_mask);
+	      *q.b++ = (pixels[(int32_t) *p.b] & red_mask)
+		| (pixels[(int32_t) p.b[n]] & green_mask)
+		| (pixels[(int32_t) p.b[2*n]] & blue_mask);
 	    break;
 	  case LUX_WORD:
 	    while (n--)
-	      *q.b++ = (pixels[(Int) *p.w] & red_mask)
-		| (pixels[(Int) p.w[n]] & green_mask)
-		| (pixels[(Int) p.w[2*n]] & blue_mask);
+	      *q.b++ = (pixels[(int32_t) *p.w] & red_mask)
+		| (pixels[(int32_t) p.w[n]] & green_mask)
+		| (pixels[(int32_t) p.w[2*n]] & blue_mask);
 	    break;
 	  case LUX_LONG:
 	    while (n--)
-	      *q.b++ = (pixels[(Int) *p.l] & red_mask)
-		| (pixels[(Int) p.l[n]] & green_mask)
-		| (pixels[(Int) p.l[2*n]] & blue_mask);
+	      *q.b++ = (pixels[(int32_t) *p.l] & red_mask)
+		| (pixels[(int32_t) p.l[n]] & green_mask)
+		| (pixels[(int32_t) p.l[2*n]] & blue_mask);
 	    break;
 	  case LUX_FLOAT:
 	    while (n--)
-	      *q.b++ = (pixels[(Int) *p.f] & red_mask)
-		| (pixels[(Int) p.f[n]] & green_mask)
-		| (pixels[(Int) p.f[2*n]] & blue_mask);
+	      *q.b++ = (pixels[(int32_t) *p.f] & red_mask)
+		| (pixels[(int32_t) p.f[n]] & green_mask)
+		| (pixels[(int32_t) p.f[2*n]] & blue_mask);
 	    break;
 	  case LUX_DOUBLE:
 	    while (n--)
-	      *q.b++ = (pixels[(Int) *p.d] & red_mask)
-		| (pixels[(Int) p.d[n]] & green_mask)
-		| (pixels[(Int) p.d[2*n]] & blue_mask);
+	      *q.b++ = (pixels[(int32_t) *p.d] & red_mask)
+		| (pixels[(int32_t) p.d[n]] & green_mask)
+		| (pixels[(int32_t) p.d[2*n]] & blue_mask);
 	    break;
 	} else switch (symbol_type(*ps)) {
 	  case LUX_BYTE:
 	    while (n--)
-	      *q.b++ = pixels[(Int) *p.b++];
+	      *q.b++ = pixels[(int32_t) *p.b++];
 	    break;
 	  case LUX_WORD:
 	    while (n--)
-	      *q.b++ = pixels[(Int) ((uint8_t) *p.w++)];
+	      *q.b++ = pixels[(int32_t) ((uint8_t) *p.w++)];
 	    break;
 	  case LUX_LONG:
 	    while (n--)
-	      *q.b++ = pixels[(Int) ((uint8_t) *p.l++)];
+	      *q.b++ = pixels[(int32_t) ((uint8_t) *p.l++)];
 	    break;
 	  case LUX_FLOAT:
 	    while (n--)
-	      *q.b++ = pixels[(Int) ((uint8_t) *p.f++)];
+	      *q.b++ = pixels[(int32_t) ((uint8_t) *p.f++)];
 	    break;
 	  case LUX_DOUBLE:
 	    while (n--)
-	      *q.b++ = pixels[(Int) ((uint8_t) *p.d++)];
+	      *q.b++ = pixels[(int32_t) ((uint8_t) *p.d++)];
 	    break;
 	}
       break;
@@ -3183,54 +3183,54 @@ Int lux_colorpixel(Int narg, Int ps[])
 	switch (symbol_type(*ps)) {
 	  case LUX_BYTE:
 	    while (n--)
-	      *q.w++ = (pixels[(Int) *p.b] & red_mask)
-		| (pixels[(Int) p.b[n]] & green_mask)
-		| (pixels[(Int) p.b[2*n]] & blue_mask);
+	      *q.w++ = (pixels[(int32_t) *p.b] & red_mask)
+		| (pixels[(int32_t) p.b[n]] & green_mask)
+		| (pixels[(int32_t) p.b[2*n]] & blue_mask);
 	    break;
 	  case LUX_WORD:
 	    while (n--)
-	      *q.w++ = (pixels[(Int) *p.w] & red_mask)
-		| (pixels[(Int) p.w[n]] & green_mask)
-		| (pixels[(Int) p.w[2*n]] & blue_mask);
+	      *q.w++ = (pixels[(int32_t) *p.w] & red_mask)
+		| (pixels[(int32_t) p.w[n]] & green_mask)
+		| (pixels[(int32_t) p.w[2*n]] & blue_mask);
 	    break;
 	  case LUX_LONG:
 	    while (n--)
-	      *q.w++ = (pixels[(Int) *p.l] & red_mask)
-		| (pixels[(Int) p.l[n]] & green_mask)
-		| (pixels[(Int) p.l[2*n]] & blue_mask);
+	      *q.w++ = (pixels[(int32_t) *p.l] & red_mask)
+		| (pixels[(int32_t) p.l[n]] & green_mask)
+		| (pixels[(int32_t) p.l[2*n]] & blue_mask);
 	    break;
 	  case LUX_FLOAT:
 	    while (n--)
-	      *q.w++ = (pixels[(Int) *p.f] & red_mask)
-		| (pixels[(Int) p.f[n]] & green_mask)
-		| (pixels[(Int) p.f[2*n]] & blue_mask);
+	      *q.w++ = (pixels[(int32_t) *p.f] & red_mask)
+		| (pixels[(int32_t) p.f[n]] & green_mask)
+		| (pixels[(int32_t) p.f[2*n]] & blue_mask);
 	    break;
 	  case LUX_DOUBLE:
 	    while (n--)
-	      *q.w++ = (pixels[(Int) *p.d] & red_mask)
-		| (pixels[(Int) p.d[n]] & green_mask)
-		| (pixels[(Int) p.d[2*n]] & blue_mask);
+	      *q.w++ = (pixels[(int32_t) *p.d] & red_mask)
+		| (pixels[(int32_t) p.d[n]] & green_mask)
+		| (pixels[(int32_t) p.d[2*n]] & blue_mask);
 	    break;
 	} else switch (symbol_type(*ps)) {
 	  case LUX_BYTE:
 	    while (n--)
-	      *q.w++ = pixels[(Int) *p.b++];
+	      *q.w++ = pixels[(int32_t) *p.b++];
 	    break;
 	  case LUX_WORD:
 	    while (n--)
-	      *q.w++ = pixels[(Int) ((uint8_t) *p.w++)];
+	      *q.w++ = pixels[(int32_t) ((uint8_t) *p.w++)];
 	    break;
 	  case LUX_LONG:
 	    while (n--)
-	      *q.w++ = pixels[(Int) ((uint8_t) *p.l++)];
+	      *q.w++ = pixels[(int32_t) ((uint8_t) *p.l++)];
 	    break;
 	  case LUX_FLOAT:
 	    while (n--)
-	      *q.w++ = pixels[(Int) ((uint8_t) *p.f++)];
+	      *q.w++ = pixels[(int32_t) ((uint8_t) *p.f++)];
 	    break;
 	  case LUX_DOUBLE:
 	    while (n--)
-	      *q.w++ = pixels[(Int) ((uint8_t) *p.d++)];
+	      *q.w++ = pixels[(int32_t) ((uint8_t) *p.d++)];
 	    break;
 	}
       break;
@@ -3239,54 +3239,54 @@ Int lux_colorpixel(Int narg, Int ps[])
 	switch (symbol_type(*ps)) {
 	  case LUX_BYTE:
 	    while (n--)
-	      *q.l++ = (pixels[(Int) *p.b] & red_mask)
-		| (pixels[(Int) p.b[n]] & green_mask)
-		| (pixels[(Int) p.b[2*n]] & blue_mask);
+	      *q.l++ = (pixels[(int32_t) *p.b] & red_mask)
+		| (pixels[(int32_t) p.b[n]] & green_mask)
+		| (pixels[(int32_t) p.b[2*n]] & blue_mask);
 	    break;
 	  case LUX_WORD:
 	    while (n--)
-	      *q.l++ = (pixels[(Int) *p.w] & red_mask)
-		| (pixels[(Int) p.w[n]] & green_mask)
-		| (pixels[(Int) p.w[2*n]] & blue_mask);
+	      *q.l++ = (pixels[(int32_t) *p.w] & red_mask)
+		| (pixels[(int32_t) p.w[n]] & green_mask)
+		| (pixels[(int32_t) p.w[2*n]] & blue_mask);
 	    break;
 	  case LUX_LONG:
 	    while (n--)
-	      *q.l++ = (pixels[(Int) *p.l] & red_mask)
-		| (pixels[(Int) p.l[n]] & green_mask)
-		| (pixels[(Int) p.l[2*n]] & blue_mask);
+	      *q.l++ = (pixels[(int32_t) *p.l] & red_mask)
+		| (pixels[(int32_t) p.l[n]] & green_mask)
+		| (pixels[(int32_t) p.l[2*n]] & blue_mask);
 	    break;
 	  case LUX_FLOAT:
 	    while (n--)
-	      *q.l++ = (pixels[(Int) *p.f] & red_mask)
-		| (pixels[(Int) p.f[n]] & green_mask)
-		| (pixels[(Int) p.f[2*n]] & blue_mask);
+	      *q.l++ = (pixels[(int32_t) *p.f] & red_mask)
+		| (pixels[(int32_t) p.f[n]] & green_mask)
+		| (pixels[(int32_t) p.f[2*n]] & blue_mask);
 	    break;
 	  case LUX_DOUBLE:
 	    while (n--)
-	      *q.l++ = (pixels[(Int) *p.d] & red_mask)
-		| (pixels[(Int) p.d[n]] & green_mask)
-		| (pixels[(Int) p.d[2*n]] & blue_mask);
+	      *q.l++ = (pixels[(int32_t) *p.d] & red_mask)
+		| (pixels[(int32_t) p.d[n]] & green_mask)
+		| (pixels[(int32_t) p.d[2*n]] & blue_mask);
 	    break;
 	} else switch (symbol_type(*ps)) {
 	  case LUX_BYTE:
 	    while (n--)
-	      *q.l++ = pixels[(Int) *p.b++];
+	      *q.l++ = pixels[(int32_t) *p.b++];
 	    break;
 	  case LUX_WORD:
 	    while (n--)
-	      *q.l++ = pixels[(Int) ((uint8_t) *p.w++)];
+	      *q.l++ = pixels[(int32_t) ((uint8_t) *p.w++)];
 	    break;
 	  case LUX_LONG:
 	    while (n--)
-	      *q.l++ = pixels[(Int) ((uint8_t) *p.l++)];
+	      *q.l++ = pixels[(int32_t) ((uint8_t) *p.l++)];
 	    break;
 	  case LUX_FLOAT:
 	    while (n--)
-	      *q.l++ = pixels[(Int) ((uint8_t) *p.f++)];
+	      *q.l++ = pixels[(int32_t) ((uint8_t) *p.f++)];
 	    break;
 	  case LUX_DOUBLE:
 	    while (n--)
-	      *q.l++ = pixels[(Int) ((uint8_t) *p.d++)];
+	      *q.l++ = pixels[(int32_t) ((uint8_t) *p.d++)];
 	    break;
 	}
       break;
@@ -3294,27 +3294,27 @@ Int lux_colorpixel(Int narg, Int ps[])
   return iq;
 }
  /*------------------------------------------------------------------------*/
-Int lux_xtv(Int narg, Int ps[])
+int32_t lux_xtv(int32_t narg, int32_t ps[])
 /* displays an image, properly colored for the current color map, on screen.
    LS 18jan94 */
 {
   return lux_xtv_general(narg, ps, (narg && symbol_type(ps[0]) == LUX_BYTE)? TV_MAP: 0);
 }
  /*------------------------------------------------------------------------*/
-Int lux_xtvmap(Int narg, Int ps[])
+int32_t lux_xtvmap(int32_t narg, int32_t ps[])
 /* displays an image of color indices, mapped to proper pixel values,
   on screen.  LS 18jan94 */
 {
   return lux_xtv_general(narg, ps, TV_MAP);
 }
  /*------------------------------------------------------------------------*/
-Int lux_xcopy(Int narg, Int ps[])
+int32_t lux_xcopy(int32_t narg, int32_t ps[])
  /* 1/8/92 modified to treat negative numbers as pixmaps and 0 and >0 as
    displayed windows */
  /* needs lots of checking which isn't implemented yet */
  /* also just assumes 512x512 for testing */
  {
- Int     id1, id2, ixs, iys, ixd, iyd, w, h, ws, hs;
+ int32_t     id1, id2, ixs, iys, ixd, iyd, w, h, ws, hs;
  Drawable        *src, *dest;
  GC      *cgc;
 
@@ -3351,10 +3351,10 @@ Int lux_xcopy(Int narg, Int ps[])
  return 1;
  }
  /*------------------------------------------------------------------------*/
-Int lux_xevent(Int narg, Int ps[])
+int32_t lux_xevent(int32_t narg, int32_t ps[])
 {
  XEvent  report;
- Int     nev, i;
+ int32_t     nev, i;
 
  XFlush(display);
  nev = XPending( display);
@@ -3405,11 +3405,11 @@ Int lux_xevent(Int narg, Int ps[])
  return 1;
  }
  /*------------------------------------------------------------------------*/
-Int lux_xpurge(narg,ps)	/* just throw away any pending X events */
- Int narg, ps[];
+int32_t lux_xpurge(narg,ps)	/* just throw away any pending X events */
+ int32_t narg, ps[];
  {
  XEvent  report;
- Int     nev, i;
+ int32_t     nev, i;
 
  XFlush(display);
  nev = XPending( display);
@@ -3419,15 +3419,15 @@ Int lux_xpurge(narg,ps)	/* just throw away any pending X events */
  return 1;
  }
  /*------------------------------------------------------------------------*/
-Int lux_xplace(Int narg, Int ps[])
+int32_t lux_xplace(int32_t narg, int32_t ps[])
  /* response to a key or button press in an lux window and note the
  time and position */
 {
- Int	i, cs, nc;
+ int32_t	i, cs, nc;
  KeySym	keysym;
  char	buffer[16];
- Int	coordTrf(float *, float *, Int, Int);
- extern Int	lux_keysym, lux_keystate;
+ int32_t	coordTrf(float *, float *, int32_t, int32_t);
+ extern int32_t	lux_keysym, lux_keystate;
 
  XEvent  report;
 
@@ -3451,8 +3451,8 @@ Int lux_xplace(Int narg, Int ps[])
  xhair = report.xbutton.x;
  yhair = report.xbutton.y;
  coordTrf(&xhair, &yhair, LUX_X11, LUX_DEV);
- xcoord = (Int) xhair;
- ycoord = (Int) yhair;
+ xcoord = (int32_t) xhair;
+ ycoord = (int32_t) yhair;
  cs = (internalMode & 7);
  if (!cs)
    cs = LUX_DVI;
@@ -3468,7 +3468,7 @@ Int lux_xplace(Int narg, Int ps[])
    lux_keystate = report.xkey.state;
    nc = XLookupString(&(report.xkey), buffer, 15, &keysym, NULL);
    buffer[nc] = '\0';
-   lux_keysym = (Int) keysym;
+   lux_keysym = (int32_t) keysym;
    break;
  }
 	/* return parameters if they were arguments */
@@ -3483,13 +3483,13 @@ Int lux_xplace(Int narg, Int ps[])
  return 1;
 }
  /*------------------------------------------------------------------------*/
-Int xwindow_plot(Int ix, Int iy, Int mode)
+int32_t xwindow_plot(int32_t ix, int32_t iy, int32_t mode)
 /* drawing on X-window */
 /* added pixmap case - LS 8oct97 */
 /* added alternateDash - LS 16oct98 */
 {
- Int     wid, lux_xpen(Int, float);
- extern Int	alternateDash, current_pen;
+ int32_t     wid, lux_xpen(int32_t, float);
+ extern int32_t	alternateDash, current_pen;
  extern float	current_gray;
 
  wid = last_wid;
@@ -3518,17 +3518,17 @@ Int xwindow_plot(Int ix, Int iy, Int mode)
  return 1;
 }
  /*------------------------------------------------------------------------*/
-Int lux_xflush()
+int32_t lux_xflush()
  {
  XFlush(display);       return 1;
  }
  /*------------------------------------------------------------------------*/
-Int lux_xpen(Int pen, float gray)
+int32_t lux_xpen(int32_t pen, float gray)
 {
-  Int	wid;
-  extern Int	standardGray;
+  int32_t	wid;
+  extern int32_t	standardGray;
   XColor	seek_color, *return_color;
-  XColor	*anaFindBestRGB(XColor *, Int);
+  XColor	*anaFindBestRGB(XColor *, int32_t);
 
   /* lines on screen with a given non-unity pen width appear much
      fatter than the corresponding lines on paper, so reduce screen
@@ -3557,11 +3557,11 @@ Int lux_xpen(Int pen, float gray)
  return 1;
 }
  /*------------------------------------------------------------------------*/
-Int lux_xfont(narg, ps)
+int32_t lux_xfont(narg, ps)
                                         /* set font for a window */
- Int     narg, ps[];
+ int32_t     narg, ps[];
  {
- Int      wid, iq;
+ int32_t      wid, iq;
  char    *fontname;
  /* first arg is a string which should be a font name */
  ck_events();
@@ -3578,11 +3578,11 @@ Int lux_xfont(narg, ps)
  return 1;
  }
  /*------------------------------------------------------------------------*/
-Int lux_xlabel(narg, ps)
+int32_t lux_xlabel(narg, ps)
                                         /* user labels */
- Int     narg, ps[];
+ int32_t     narg, ps[];
  {
- Int     wid, iq, ix, iy, len;
+ int32_t     wid, iq, ix, iy, len;
  char    *s;
  /* first arg is a string which will be the label */
  ck_events();
@@ -3600,11 +3600,11 @@ Int lux_xlabel(narg, ps)
  return 1;
  }
  /*------------------------------------------------------------------------*/
-Int lux_xlabelwidth(narg, ps)
+int32_t lux_xlabelwidth(narg, ps)
                                         /* user label width */
- Int     narg, ps[];
+ int32_t     narg, ps[];
  {
- Int     wid, iq, len, result_sym;
+ int32_t     wid, iq, len, result_sym;
  char    *s;
  /* arg is a string which will be the label */
  ck_events();
@@ -3619,10 +3619,10 @@ Int lux_xlabelwidth(narg, ps)
  return result_sym;
  }
  /*------------------------------------------------------------------------*/
-Int xlabel(char *s, Int ix, Int iy)
+int32_t xlabel(char *s, int32_t ix, int32_t iy)
                                         /* internal call for labels */
 {
-  Int     len, wid;
+  int32_t     len, wid;
 
   len = strlen(s);
   wid = last_wid;
@@ -3630,11 +3630,11 @@ Int xlabel(char *s, Int ix, Int iy)
   return 1;
 }
  /*------------------------------------------------------------------------*/
-Int xlabelwidth(s)
+int32_t xlabelwidth(s)
                                         /* internal call for labels */
  char    *s;
  {
- Int     len, wid;
+ int32_t     len, wid;
  len = strlen(s);
  wid = last_wid;
  /* does window exist? If not create a default size */
@@ -3642,16 +3642,16 @@ Int xlabelwidth(s)
  return  XTextWidth(font_info[wid], s, len );
  }
  /*------------------------------------------------------------------------*/
-Int lux_xtvread(Int narg, Int ps[])
+int32_t lux_xtvread(int32_t narg, int32_t ps[])
 {
  /* read from an X window or pixmap and create a uint8_t array */
- Int  nx, ny, ix, iy, wid, result_sym, dim[2], w, hh, type;
+ int32_t  nx, ny, ix, iy, wid, result_sym, dim[2], w, hh, type;
  pointer    ptr;
  Drawable        *src;
- Int	lux_zerof(Int, Int *);
- extern Int	bits_per_pixel;
- Int lux_colorstogrey(Int, Int []);
- Int lux_delete(Int, Int []);
+ int32_t	lux_zerof(int32_t, int32_t *);
+ extern int32_t	bits_per_pixel;
+ int32_t lux_colorstogrey(int32_t, int32_t []);
+ int32_t lux_delete(int32_t, int32_t []);
 
  /* the input arguments are all scalars */
  ck_events();
@@ -3716,8 +3716,8 @@ Int lux_xtvread(Int narg, Int ps[])
  XDestroyImage(xi);
  XFlush(display);
  if (internalMode & 1) {
-   Int lux_colorstogrey(Int narg, Int ps[]);
-   Int lux_delete(Int narg, Int ps[]);
+   int32_t lux_colorstogrey(int32_t narg, int32_t ps[]);
+   int32_t lux_delete(int32_t narg, int32_t ps[]);
    if (lux_colorstogrey(1, &result_sym) != LUX_OK) {
      lux_delete(1, &result_sym);
      return LUX_ERROR;
@@ -3726,28 +3726,28 @@ Int lux_xtvread(Int narg, Int ps[])
  return reverseYImage(result_sym);
 }
 /*------------------------------------------------------------------------*/
-Int lux_xquery(Int narg, Int ps[])
+int32_t lux_xquery(int32_t narg, int32_t ps[])
 {
-  Int	xquery(Int, Int []);
+  int32_t	xquery(int32_t, int32_t []);
 
   xquery(narg, ps);
   return 1;
 }
  /*------------------------------------------------------------------------*/
-Int lux_xquery_f(Int narg, Int ps[])
+int32_t lux_xquery_f(int32_t narg, int32_t ps[])
 {
- Int	result;
- Int	xquery(Int, Int []);
+ int32_t	result;
+ int32_t	xquery(int32_t, int32_t []);
 
  result = scalar_scratch(LUX_LONG);
  sym[result].spec.scalar.l = xquery(narg, ps);
  return result;
 }
 /*------------------------------------------------------------------------*/
-Int xquery(Int narg, Int ps[])
+int32_t xquery(int32_t narg, int32_t ps[])
 /* note time and position of mouse */
 {
-  Int	wid;
+  int32_t	wid;
   Window	qroot, qchild;
 
   wid = narg? int_arg(ps[0]): last_wid;
@@ -3766,21 +3766,21 @@ Bool windowButtonPress(Display *display, XEvent *event, XPointer arg)
 /* returns True if the event is a ButtonPress in an LUX window,
    False otherwise */
 {
-  Int	i, num;
+  int32_t	i, num;
   extern Window	win[];
   
   if (event->type != ButtonPress) return False;
-  if (arg) num = *((Int *) arg); else num = -1;
+  if (arg) num = *((int32_t *) arg); else num = -1;
   for (i = (num < 0)? 0: num; i < (num < 0? MAXWINDOWS: num + 1); i++)
     /* if no arg, then check all windows, else just indicated one */
     if (win[i] && event->xbutton.window == win[i]) return True;
   return False;
 }
 /*------------------------------------------------------------------------*/
-Int lux_check_window(Int narg, Int ps[])
+int32_t lux_check_window(int32_t narg, int32_t ps[])
      /* checks event buffer for any pending window selections */
 {
-  Int	num, w, i;
+  int32_t	num, w, i;
   XEvent	event;
   
   if (setup_x() < 0)
@@ -3799,9 +3799,9 @@ Int lux_check_window(Int narg, Int ps[])
   return 4;
 } 
 /*------------------------------------------------------------------------*/
-Int lux_xraise(Int narg, Int ps[]) /* raise (popup) a window */
+int32_t lux_xraise(int32_t narg, int32_t ps[]) /* raise (popup) a window */
 {
-  Int    wid;
+  int32_t    wid;
 
   wid = int_arg( ps[0] );
   if (ck_window(wid) != 1)
@@ -3815,11 +3815,11 @@ Int lux_xraise(Int narg, Int ps[]) /* raise (popup) a window */
   return 1;
 }
 /*------------------------------------------------------------------------*/
-Int lux_xanimate(Int narg, Int ps[])
+int32_t lux_xanimate(int32_t narg, int32_t ps[])
 /* XANIMATE,data [, x, y, FR1=fr1, FR2=fr2, FRSTEP=frstep] [, /TIME, */
 /* /REPEAT] */
 {
-  Int	wid, nx, ny, ix, iy, *dims, nFrame, i, nnx, nny, fr1, fr2, frs;
+  int32_t	wid, nx, ny, ix, iy, *dims, nFrame, i, nnx, nny, fr1, fr2, frs;
   double	ts, tc;
   struct timeval	tp;
   struct timezone	tzp;
@@ -3894,11 +3894,11 @@ Int lux_xanimate(Int narg, Int ps[])
   return 1;
 }
 /*---------------------------------------------------------*/
-Int lux_xzoom(Int narg, Int ps[])
+int32_t lux_xzoom(int32_t narg, int32_t ps[])
 /* ZOOM,image [,x,y,window] */
 {
   XEvent	event;
-  Int	wid, i, type, nx, ny;
+  int32_t	wid, i, type, nx, ny;
   pointer	ptr;
 
   if (symbol_class(ps[0]) != LUX_ARRAY)
@@ -3957,8 +3957,8 @@ Int lux_xzoom(Int narg, Int ps[])
   }
 }
 /*---------------------------------------------------------*/
-Int tvplanezoom = 1;
-Int lux_xtvplane(Int narg, Int ps[])
+int32_t tvplanezoom = 1;
+int32_t lux_xtvplane(int32_t narg, int32_t ps[])
  /* use negative zoom factors for compression, not real fast */
  /* 9/21/96 allow 2-D arrays also but verify that plane is 0 */
  /* tvplane, cube, in, ix,iy, window
@@ -3973,17 +3973,17 @@ Int lux_xtvplane(Int narg, Int ps[])
  windows. Also, don't set the !tvix,!tvixb stuff for this routine.
  */
 {
-  Int iq, nx, ny, nz, nd, ix=0, iy=0, wid, hq, wq, ip;
-  Int	zoom_sym, ns, ms;
+  int32_t iq, nx, ny, nz, nd, ix=0, iy=0, wid, hq, wq, ip;
+  int32_t	zoom_sym, ns, ms;
   uint8_t	*ptr, *ptr2, *ptr0;
   static uint8_t *subfree;
-  Int zoomer2(uint8_t *, Int, Int, Int *, Int *, Int *, Int),
-    zoomer3(uint8_t *, Int, Int, Int *, Int *, Int *, Int),
-    zoomer4(uint8_t *, Int, Int, Int *, Int *, Int *, Int),
-    zoomer8(uint8_t *, Int, Int, Int *, Int *, Int *, Int),
-    zoomer16(uint8_t *, Int, Int, Int *, Int *, Int *, Int),
-    compress2(uint8_t *, Int, Int, Int *, Int *, Int *, Int),
-    compress4(uint8_t *, Int, Int, Int *, Int *, Int *, Int);
+  int32_t zoomer2(uint8_t *, int32_t, int32_t, int32_t *, int32_t *, int32_t *, int32_t),
+    zoomer3(uint8_t *, int32_t, int32_t, int32_t *, int32_t *, int32_t *, int32_t),
+    zoomer4(uint8_t *, int32_t, int32_t, int32_t *, int32_t *, int32_t *, int32_t),
+    zoomer8(uint8_t *, int32_t, int32_t, int32_t *, int32_t *, int32_t *, int32_t),
+    zoomer16(uint8_t *, int32_t, int32_t, int32_t *, int32_t *, int32_t *, int32_t),
+    compress2(uint8_t *, int32_t, int32_t, int32_t *, int32_t *, int32_t *, int32_t),
+    compress4(uint8_t *, int32_t, int32_t, int32_t *, int32_t *, int32_t *, int32_t);
 
   if (ck_events() != 1)
     return LUX_ERROR;
@@ -4046,7 +4046,7 @@ Int lux_xtvplane(Int narg, Int ps[])
     /* 2 obvious upgrades, if zooming, the extraction and zoom can be
        combined and the data could be re-oriented while extracting */
     uint8_t	*sub, *p;
-    Int	m = hq, n, stride;
+    int32_t	m = hq, n, stride;
     
     p = ptr;
     sub = ptr = malloc(wq*hq);
@@ -4127,7 +4127,7 @@ Int lux_xtvplane(Int narg, Int ps[])
   return 1;
 }
 /*---------------------------------------------------------*/
-Int lux_threecolors(Int narg, Int ps[])
+int32_t lux_threecolors(int32_t narg, int32_t ps[])
 /* installs color table with three domains */
 /* THREECOLORS,arg */
 /* the color table consists of a grey domain, a red domain, and a blue
@@ -4137,7 +4137,7 @@ Int lux_threecolors(Int narg, Int ps[])
    LS 12nov98 */
 {
   float	fraction, *list;
-  Int	threecolors(float *, Int);
+  int32_t	threecolors(float *, int32_t);
 
   if (ck_events() != LUX_OK)
     return LUX_ERROR;
@@ -4158,14 +4158,14 @@ Int lux_threecolors(Int narg, Int ps[])
   return threecolors(list, 9);
 }
 /*---------------------------------------------------------*/
-Int lux_tv3(Int narg, Int ps[])
+int32_t lux_tv3(int32_t narg, int32_t ps[])
 /* TV3,<image>[,<bitmap1>,<bitmap2>] */
 {
-  Int	iq, nx, ny, mode, i, wid;
+  int32_t	iq, nx, ny, mode, i, wid;
   float	fx, fy;
   uint8_t	*bitmap1, *bitmap2;
   pointer	data;
-  Int	coordTrf(float *, float *, Int, Int);
+  int32_t	coordTrf(float *, float *, int32_t, int32_t);
 
   if (!symbolIsNumericalArray(ps[0]) /* <image> */
       || isComplexType(array_type(ps[0]))
@@ -4241,14 +4241,14 @@ Int lux_tv3(Int narg, Int ps[])
   return i;
 }
 /*---------------------------------------------------------*/
-Int invert_flag = 0;
-Int lux_xdrawline(Int narg, Int ps[])
+int32_t invert_flag = 0;
+int32_t lux_xdrawline(int32_t narg, int32_t ps[])
 /* subroutine, call is xdrawline, x1, y1, x2, y2 where the arguments can
    be scalars or arrays but all must match in length */
 /* used for X window drawing with lower overhead than xymov calls */
 /* better for interactive graphics */
 {
-  Int     wid, ixs, iys, ix, iy;
+  int32_t     wid, ixs, iys, ix, iy;
   Drawable	dq;
   GC		gq;
 
@@ -4297,7 +4297,7 @@ Int lux_xdrawline(Int narg, Int ps[])
     }
   } else {
     /* here we expect 4 arrays of the same size */
-    Int	*px1, *px2, *py1, *py2, n, nx, iq;
+    int32_t	*px1, *px2, *py1, *py2, n, nx, iq;
 
     iq = lux_long(1, &ps[0]);
     nx = array_size(iq);
@@ -4343,11 +4343,11 @@ Int lux_xdrawline(Int narg, Int ps[])
   return LUX_OK;
 }
 /*---------------------------------------------------------*/
-Int lux_xinvertline(Int narg, Int ps[])
+int32_t lux_xinvertline(int32_t narg, int32_t ps[])
 /* used for X window drawing with lower overhead than xymov calls */
 /* better for interactive graphics */
 {
-  Int	iq;
+  int32_t	iq;
 
   invert_flag = 1;
   iq = lux_xdrawline(narg, ps);
@@ -4355,10 +4355,10 @@ Int lux_xinvertline(Int narg, Int ps[])
   return iq;
 }
 /*------------------------------------------------------------------------*/
-Int lux_xinvertarc(Int narg, Int ps[])
+int32_t lux_xinvertarc(int32_t narg, int32_t ps[])
 {
-  Int	iq;
-  Int	lux_xdrawarc(Int, Int []);
+  int32_t	iq;
+  int32_t	lux_xdrawarc(int32_t, int32_t []);
 
   invert_flag = 1;
   iq = lux_xdrawarc(narg, ps);
@@ -4366,10 +4366,10 @@ Int lux_xinvertarc(Int narg, Int ps[])
   return iq;
 }
 /*------------------------------------------------------------------------*/
-Int lux_xdrawarc(Int narg, Int ps[])
+int32_t lux_xdrawarc(int32_t narg, int32_t ps[])
 /* subroutine, call is xdrawarc, x1, y1, w, h, [a1, a2, win] */
 {
-  Int     wid, ixs, iys, w, h, xa1, xa2;
+  int32_t     wid, ixs, iys, w, h, xa1, xa2;
   float	a1, a2;
   Drawable	dq;
   GC		gq;
@@ -4408,8 +4408,8 @@ Int lux_xdrawarc(Int narg, Int ps[])
   if (narg > 5 && float_arg_stat(ps[5], &a2) != LUX_OK)
     return LUX_ERROR;
   /* convert these fp angles into X units */
-  xa1 = (Int) 64.*a1;
-  xa2 = (Int) 64.*a2;
+  xa1 = (int32_t) 64.*a1;
+  xa2 = (int32_t) 64.*a2;
 
   switch (invert_flag) {
     case 0:

@@ -25,18 +25,18 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #define ORDINARY	1
 #define SCALAR_LEFT	2
 #define SCALAR_RIGHT	3
-Int evalBinOp(Int lhs, Int rhs,
-	      Int (*function)(pointer, pointer, pointer))
+int32_t evalBinOp(int32_t lhs, int32_t rhs,
+	      int32_t (*function)(pointer, pointer, pointer))
 /* supports "implicit dimensions", i.e. dimensions which are 1 in one of */
 /* the operands and non-1 in the other.  The smaller operand is repeated */
 /* as needed to service all elements of the larger operand. */
 {
-  Int	result, i, i0, nRepeats[MAX_DIMS], action[MAX_DIMS], nAction = 0,
+  int32_t	result, i, i0, nRepeats[MAX_DIMS], action[MAX_DIMS], nAction = 0,
     tally[MAX_DIMS], nCumulR[MAX_DIMS], nCumulL[MAX_DIMS], ndim,
     bigOne;
-  extern Int	pipeSym, pipeExec;
-  Int ldims[MAX_DIMS], rdims[MAX_DIMS], lndims, rndims;
-  Int topType, ltype, rtype;
+  extern int32_t	pipeSym, pipeExec;
+  int32_t ldims[MAX_DIMS], rdims[MAX_DIMS], lndims, rndims;
+  int32_t topType, ltype, rtype;
 
   if (numerical(lhs, ldims, &lndims, NULL, &lp) == LUX_ERROR)
     return LUX_ERROR;
@@ -113,7 +113,7 @@ Int evalBinOp(Int lhs, Int rhs,
     tp.l = array_data(result);	/* output data */
     array_type(result) = topType;
     {
-      Int repeat = nRepeat;
+      int32_t repeat = nRepeat;
 
       while (repeat--) {
 	function(&lp, &rp, &tp, lhsType, rhsType, topType);
@@ -121,7 +121,7 @@ Int evalBinOp(Int lhs, Int rhs,
     }
     return result;
   } else {				/* implicit dimensions */
-    Int	lStride, rStride;
+    int32_t	lStride, rStride;
     char	done = 0;
     
     /* create result array: first calculate its number of elements */

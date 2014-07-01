@@ -30,11 +30,11 @@ char	*fmt_integer, *fmt_float, *fmt_string, *fmt_complex, *fmt_time;
 FILE	*outputStream;
 
 /*-------------------------------------------------------------------*/
-char *symbolProperName(Int symbol)
+char *symbolProperName(int32_t symbol)
 /* returns the proper name of the symbol, if any, or NULL */
 {
   hashTableEntry	**hashTable, *hp;
-  Int	hashValue;
+  int32_t	hashValue;
 
   if (symbol < 0 || symbol >= NAMED_END) /* out of range */
     return NULL;
@@ -65,7 +65,7 @@ char *symbolProperName(Int symbol)
   return NULL;			/* did not find it */
 }
 /*---------------------------------------------------------------------*/
-Int fmt_entry(formatInfo *fmi)
+int32_t fmt_entry(formatInfo *fmi)
 /* finds the next format entry in format string <fmi->current> and returns
    information in other members of <fmi>.  These members are:
 
@@ -101,7 +101,7 @@ Int fmt_entry(formatInfo *fmi)
 
   */
 {
-  Int	type, k;
+  int32_t	type, k;
   char	*p, *p2;
 
   if (!fmi->current || !*fmi->current) { /* no format */
@@ -366,7 +366,7 @@ char *fmttok(char *format)
   return fmi->start;
 }
 /*---------------------------------------------------------------------*/
-Int Sprintf_general(char *str, char *format, va_list ap)
+int32_t Sprintf_general(char *str, char *format, va_list ap)
 /* prints the first argument into a string at <str> under guidance of
    the format specification in <format>.
    Only one argument is serviced, and only the first % entry is
@@ -374,7 +374,7 @@ Int Sprintf_general(char *str, char *format, va_list ap)
 /* Sprintf does not attempt to write into <format>. */
 {
   static formatInfo	ownfmi, *fmi;
-  Int	width, n;
+  int32_t	width, n;
   double	d, d2;
   char	*p;
   static char	tmp[20];
@@ -457,14 +457,14 @@ Int Sprintf_general(char *str, char *format, va_list ap)
   return n;
 }
 /*---------------------------------------------------------------------*/
-Int Sprintf_tok(char *str, ...)
+int32_t Sprintf_tok(char *str, ...)
 /* prints the first argument into a string at <str> under guidance of
    the format specification currently installed through fmttok().
    Only one argument is serviced, and only the first % entry is
    recognized: everything else is printed as plain text.  LS 16nove98 */
 {
   va_list	ap;
-  Int	n;
+  int32_t	n;
 
   va_start(ap, str);
   n = Sprintf_general(str, NULL, ap);
@@ -472,7 +472,7 @@ Int Sprintf_tok(char *str, ...)
   return n;
 }
 /*---------------------------------------------------------------------*/
-Int Sprintf(char *str, char *format, ...)
+int32_t Sprintf(char *str, char *format, ...)
 /* prints the first argument into a string at <str> under guidance of
    the format specification in <format>.
    Only one argument is serviced, and only the first % entry is
@@ -480,7 +480,7 @@ Int Sprintf(char *str, char *format, ...)
 /* Sprintf does not attempt to write into <format>. */
 {
   va_list	ap;
-  Int	n;
+  int32_t	n;
 
   va_start(ap, format);
   n = Sprintf_general(str, format, ap);
@@ -488,7 +488,7 @@ Int Sprintf(char *str, char *format, ...)
   return n;
 }
 /*---------------------------------------------------------------------*/
-char *symbolIdent(Int symbol, Int mode)
+char *symbolIdent(int32_t symbol, int32_t mode)
 /* assembles a string identifying symbol <iq>, depending on <mode>, at
    curScrat, and returns curScrat. 
    modes:
@@ -510,7 +510,7 @@ char *symbolIdent(Int symbol, Int mode)
 {
   char	*save, *p, *scalarIndicator = "bw\0\0d", *name;
   scalar	number;
-  Int	i, j, n, m;
+  int32_t	i, j, n, m;
   pointer	ptr;
   listElem	*sptr;
   enumElem	*eptr;
@@ -519,10 +519,10 @@ char *symbolIdent(Int symbol, Int mode)
   structPtr	*spe;
   structPtrMember	*spm;
   int16_t	*arg;
-  extern Int	fileLevel, errorSym;
+  extern int32_t	fileLevel, errorSym;
   extern char	*errorPtr;
-  static Int	indent = 0;
-  Int	identStruct(structElem *);
+  static int32_t	indent = 0;
+  int32_t	identStruct(structElem *);
   
   save = curScrat;
 
@@ -616,13 +616,13 @@ char *symbolIdent(Int symbol, Int mode)
     case LUX_SCALAR: case LUX_FIXED_NUMBER:
       switch (scalar_type(symbol)) {
 	case LUX_BYTE:
-	  number.l = (Int) scalar_value(symbol).b;
+	  number.l = (int32_t) scalar_value(symbol).b;
 	  break;
 	case LUX_WORD:
-	  number.l = (Int) scalar_value(symbol).w;
+	  number.l = (int32_t) scalar_value(symbol).w;
 	  break;
 	case LUX_LONG:
-	  number.l = (Int) scalar_value(symbol).l;
+	  number.l = (int32_t) scalar_value(symbol).l;
 	  break;
 	case LUX_FLOAT:
 	  number.d = scalar_value(symbol).f;
@@ -759,7 +759,7 @@ char *symbolIdent(Int symbol, Int mode)
       switch (array_type(symbol)) {
 	case LUX_BYTE:
 	  while (j--) {
-	    sprintf(curScrat, "%d", (Int) *ptr.b++);
+	    sprintf(curScrat, "%d", (int32_t) *ptr.b++);
 	    curScrat += strlen(curScrat);
 	    if (j || i)
 	      strcpy(curScrat++, ",");
@@ -767,7 +767,7 @@ char *symbolIdent(Int symbol, Int mode)
 	  break;
 	case LUX_WORD:
 	  while (j--) {
-	    sprintf(curScrat, "%d", (Int) *ptr.w++);
+	    sprintf(curScrat, "%d", (int32_t) *ptr.w++);
 	    curScrat += strlen(curScrat);
 	    if (j || i)
 	      strcpy(curScrat++, ",");
@@ -906,10 +906,10 @@ char *symbolIdent(Int symbol, Int mode)
     case LUX_SCAL_PTR:
       switch (scal_ptr_type(symbol)) {
 	case LUX_BYTE:
-	  number.l = (Int) *scal_ptr_pointer(symbol).b;
+	  number.l = (int32_t) *scal_ptr_pointer(symbol).b;
 	  break;
 	case LUX_WORD:
-	  number.l = (Int) *scal_ptr_pointer(symbol).w;
+	  number.l = (int32_t) *scal_ptr_pointer(symbol).w;
 	  break;
 	case LUX_LONG:
 	  number.l = *scal_ptr_pointer(symbol).l;
@@ -1916,9 +1916,9 @@ char *symbolIdent(Int symbol, Int mode)
   return curScrat;
 }
 /*---------------------------------------------------------------------*/
-Int identStruct(structElem *se)
+int32_t identStruct(structElem *se)
 {
-  Int	n, nelem, ndim, *dims, ndim2, *dims2;
+  int32_t	n, nelem, ndim, *dims, ndim2, *dims2;
   char	*arrName[] = {
     "BYTARR", "INTARR", "LONARR", "FLTARR", "DBLARR", "STRARR",
     "STRARR", "STRARR", "CFLTARR", "CDBLARR"
@@ -1985,11 +1985,11 @@ Int identStruct(structElem *se)
   return 1;
 }
 /*---------------------------------------------------------------------*/
-void dumpTree(Int symbol)
+void dumpTree(int32_t symbol)
 {
-  Int	kind, i, n, *l;
+  int32_t	kind, i, n, *l;
   int16_t	*ptr;
-  static Int	indent = 0;
+  static int32_t	indent = 0;
   extern char *binOpName[];
   char	*name, noName[] = "-", **sp;
   extractSec	*eptr;
@@ -2474,20 +2474,20 @@ void dumpTree(Int symbol)
   return;
 }
 /*------------------------------------------------------------------------- */
-void dumpLine(Int symbol)
+void dumpLine(int32_t symbol)
 {
   while (symbol_context(symbol) > 0)
     symbol = symbol_context(symbol);
   dumpTree(symbol);
 }
 /*------------------------------------------------------------------------- */
-Int lux_list(Int narg, Int ps[])
+int32_t lux_list(int32_t narg, int32_t ps[])
 /* shows the definition of a user-defined subroutine, function,
    or block routine */
 /* LIST,symbol  or  LIST,'name'  lists the definition of the given symbol
  or of the routine with the given name.  */
 {
-  Int	symbol;
+  int32_t	symbol;
   char	*name, *p;
 
   switch (symbol_class(ps[0])) {

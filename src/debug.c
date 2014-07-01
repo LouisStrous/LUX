@@ -50,28 +50,28 @@ static struct allocItem
   size_t		size;	/* size of allocated memory */
   struct allocItem	*prev;	/* link to previous allocation element */
   struct allocItem	*next;	/* link to next allocation element */
-  Int			context; /* context of symbol for which memory */
+  int32_t			context; /* context of symbol for which memory */
 				 /* is allocated*/
-  Int			line;	/* line number of symbol for which */
+  int32_t			line;	/* line number of symbol for which */
 				/* memory is allocated*/
-  Int			count;	/* current execution count */
+  int32_t			count;	/* current execution count */
   char			flag;
 } allocList[MAXALLOC];
 
 size_t	tSize;
-Int	nAlloc = 0;
+int32_t	nAlloc = 0;
 
-extern Int	setup, curLineNumber, nExecuted;
-Int	checkChain(void), findAddress(void *, struct allocItem **),
-  addressToSymbol(void *), lux_dump(Int, Int []);
+extern int32_t	setup, curLineNumber, nExecuted;
+int32_t	checkChain(void), findAddress(void *, struct allocItem **),
+  addressToSymbol(void *), lux_dump(int32_t, int32_t []);
 
-char	*evbName(Int);
+char	*evbName(int32_t);
 
 static FILE	*Fopen_ptr[FOPEN_MAX];
 static char	*Fopen_name[FOPEN_MAX], *Fopen_type[FOPEN_MAX];
-static Int	Fopen_index = 0;
+static int32_t	Fopen_index = 0;
 
-Int checkListMessage(void *ptr, Int size, Int limit, Int symbol, char *msg)
+int32_t checkListMessage(void *ptr, int32_t size, int32_t limit, int32_t symbol, char *msg)
 {
   struct allocItem	*ap;
   char	*p;
@@ -87,12 +87,12 @@ Int checkListMessage(void *ptr, Int size, Int limit, Int symbol, char *msg)
   return 1;
 }
 
-Int checkOneSymbol(Int symbol, Int limit)
+int32_t checkOneSymbol(int32_t symbol, int32_t limit)
 {
   char	regular, *p, ok;
   struct allocItem	*ap;
   extractSec	*eptr;
-  Int	n, i;
+  int32_t	n, i;
   pointer	pp;
 
   regular = 0;			/* default: not a regular symbol */
@@ -212,18 +212,18 @@ Int checkOneSymbol(Int symbol, Int limit)
 }
 
 char	checkListOk = 0;
-Int checkList(Int narg, Int ps[])
+int32_t checkList(int32_t narg, int32_t ps[])
 /* checks all allocation entries against the LUX symbol tables and
    reports discrepancies.  NOTE: internal function and routine key lists
    are not regarded, so they result in spurious error messages.  These lists
    at present do not exceed 32 bytes in size, so a limit of 33 ought to take
    care of them. */
 {
- Int	limit, i, nbad = 0, symbol;
+ int32_t	limit, i, nbad = 0, symbol;
  struct allocItem	*ap;
- char	*symbolProperName(Int);
- extern Int nSymbolStack;
- void	setPager(Int), resetPager(void);
+ char	*symbolProperName(int32_t);
+ extern int32_t nSymbolStack;
+ void	setPager(int32_t), resetPager(void);
  extern char	*theFormat, *ulib_path;
 
  if (narg)
@@ -289,7 +289,7 @@ Int checkList(Int narg, Int ps[])
  return 1;
 }
 /*------------------------------------------------------------------*/
-Int findAddress(void *p, struct allocItem **ap)
+int32_t findAddress(void *p, struct allocItem **ap)
 /* finds address p in list.  Returns FOUND if found, BEYOND if beyond last
    item, FIRST if first item, BEFORE if before first item,
    and BETWEEN otherwise.
@@ -315,11 +315,11 @@ Int findAddress(void *p, struct allocItem **ap)
  return (ai->prev && p == ai->prev->ptr)? FOUND: BETWEEN;
 }
 /*-----------------------------------------------------------------------*/
-Int freeAllocItemIndex = 1;
-Int findFreeItem(void)
+int32_t freeAllocItemIndex = 1;
+int32_t findFreeItem(void)
 /* returns index to next free item in allocList, or -1 if none available */
 {
- Int		oldindx;
+ int32_t		oldindx;
 
  oldindx = freeAllocItemIndex;
  while (allocList[freeAllocItemIndex].size) {
@@ -331,10 +331,10 @@ Int findFreeItem(void)
  return freeAllocItemIndex;
 }
 /*-----------------------------------------------------------------------*/
-Int listAddress(void *address)
+int32_t listAddress(void *address)
 {
   struct allocItem	*ap;
-  Int	result;
+  int32_t	result;
   
   result = findAddress(address, &ap);
   switch (result) {
@@ -357,7 +357,7 @@ Int listAddress(void *address)
 void Free(void *ptr)
 /* Like standard free(), but keeping records for debugging */
 {
-  Int			found;
+  int32_t			found;
   struct allocItem	*ap;
 
   if (!ptr) return;
@@ -395,7 +395,7 @@ void *Malloc(size_t size)
 {
   void	*p;
   struct allocItem	*ap;
-  Int	found, i;
+  int32_t	found, i;
   
   if (!size)
     return NULL;
@@ -461,7 +461,7 @@ void *Calloc(size_t nobj, size_t size)
 {
   void	*p;
   char	*c;
-  Int	n;
+  int32_t	n;
 
   p = Malloc(n = nobj*size);
   c = (char *) p;
@@ -473,7 +473,7 @@ void *Calloc(size_t nobj, size_t size)
 void *Realloc(void *p, size_t size)
 /* realloc with stored information for consistency checks */
 {
-  Int	i, found;
+  int32_t	i, found;
   struct allocItem	*ai;
   void	*p2;
 
@@ -566,11 +566,11 @@ void *Realloc(void *p, size_t size)
   return p2;
 }
 /*-----------------------------------------------------------------------*/
-Int checkChain(void)
+int32_t checkChain(void)
      /* checks the allocation list for consistency */
 {
   struct allocItem	*ai;
-  Int	count = 0;
+  int32_t	count = 0;
 
   ai = allocList;
   while (ai->next) {
@@ -604,7 +604,7 @@ Int checkChain(void)
   return 1;
 }
 /*-----------------------------------------------------------------------*/
-Int findWorm(void)
+int32_t findWorm(void)
 /* checks the allocation list for internal consistency */
 {
   struct allocItem	*ai, *ai2;
@@ -612,8 +612,8 @@ Int findWorm(void)
 
   ai = allocList;
   while (ai->next) {
-    if ((Int) ai->next < 0x10000000 || ai->flag ||
-	(ai != allocList && (Int) ai->ptr < 0x10000000)) {
+    if ((int32_t) ai->next < 0x10000000 || ai->flag ||
+	(ai != allocList && (int32_t) ai->ptr < 0x10000000)) {
       printf("*** Suspect allocation element at %p\n", ai);
       if (ai->flag)
 	suspect = 1;
@@ -630,10 +630,10 @@ Int findWorm(void)
   return suspect;
 }
 /*-----------------------------------------------------------------------*/
-Int lux_whereisAddress(Int narg, Int ps[])
+int32_t lux_whereisAddress(int32_t narg, int32_t ps[])
 /* returns information on memory at a given address */
 {
-  Int	address, where, cut;
+  int32_t	address, where, cut;
   struct allocItem	*ai;
 
   if (internalMode & 1) {
@@ -655,8 +655,8 @@ Int lux_whereisAddress(Int narg, Int ps[])
       where = 0;
       break;
     case BETWEEN: case BEYOND:
-      where = (address < (Int) ai->ptr ||
-	       address >= (Int) ai->ptr + ai->size)? 0: 1;
+      where = (address < (int32_t) ai->ptr ||
+	       address >= (int32_t) ai->ptr + ai->size)? 0: 1;
       break;
     case FOUND:
       where = 1;
@@ -671,9 +671,9 @@ Int lux_whereisAddress(Int narg, Int ps[])
   return 1;
 }
 /*-----------------------------------------------------------------------*/
-Int addressToSymbol(void *address)
+int32_t addressToSymbol(void *address)
 {
-  Int	iq, symbol = -1, i, n, j;
+  int32_t	iq, symbol = -1, i, n, j;
   array	*h;
   pointer	ptr;
 
@@ -732,13 +732,13 @@ Int addressToSymbol(void *address)
   return symbol;
 }
 /*-----------------------------------------------------------------------*/
-Int lux_newallocs(Int narg, Int ps[])
+int32_t lux_newallocs(int32_t narg, int32_t ps[])
      /* NEWALLOCS reports on new allocations since the last call to */
      /* NEWALLOCS.  LS 11dec97 */
 {
   struct allocItem	*ai;
-  static Int	baseCount = 0, *baseExecs = NULL;
-  Int	count, i;
+  static int32_t	baseCount = 0, *baseExecs = NULL;
+  int32_t	count, i;
 
   if (narg) {
     if (symbol_class(ps[0]) != LUX_SCALAR)
@@ -764,7 +764,7 @@ Int lux_newallocs(Int narg, Int ps[])
     if (!count)
       count = 1;
     baseCount = count;
-    baseExecs = (Int *) Malloc(baseCount*sizeof(Int));
+    baseExecs = (int32_t *) Malloc(baseCount*sizeof(int32_t));
     for (i = 0; i < baseCount; i++)
       baseExecs[i] = nExecuted;
   } else {			/* report */
@@ -785,15 +785,15 @@ Int lux_newallocs(Int narg, Int ps[])
       }
       ai = ai->next;
     }
-    memcpy(baseExecs, baseExecs + sizeof(Int), (baseCount - 1)*sizeof(Int));
+    memcpy(baseExecs, baseExecs + sizeof(int32_t), (baseCount - 1)*sizeof(int32_t));
     baseExecs[baseCount - 1] = nExecuted;
   }
   return 1;
 }
 /*-----------------------------------------------------------------------*/
-Int squeeze(void)
+int32_t squeeze(void)
 {
-  Int	brk, last;
+  int32_t	brk, last;
   int16_t	*position;
   extern char	*firstbreak;
   struct allocItem	*ai;
@@ -807,10 +807,10 @@ Int squeeze(void)
   return 1;
 }
 /*-----------------------------------------------------------------------*/
-Int lux_squeeze(Int narg, Int ps[])
+int32_t lux_squeeze(int32_t narg, int32_t ps[])
 {
   struct allocItem	*ai;
-  Int	iq, dim, *p;
+  int32_t	iq, dim, *p;
   array	*h;
   
   dim = nAlloc*2;
@@ -823,7 +823,7 @@ Int lux_squeeze(Int narg, Int ps[])
   ai = allocList;
   while (ai->next)
   { ai = ai->next;
-    *p++ = (Int) ai->ptr;
+    *p++ = (int32_t) ai->ptr;
     *p++ = ai->size; }
   return iq;
 }
@@ -873,9 +873,9 @@ FILE *Tmpfile(void)
   return fp;    
 }
 /*-----------------------------------------------------------------------*/
-Int Fclose(FILE *stream)
+int32_t Fclose(FILE *stream)
 {
-  Int	n, i;
+  int32_t	n, i;
 
   n = fclose(stream);
   if (!n) {			/* closed OK */
@@ -894,9 +894,9 @@ Int Fclose(FILE *stream)
   return n;
 }
 /*-----------------------------------------------------------------------*/
-Int show_files(Int narg, Int ps[])
+int32_t show_files(int32_t narg, int32_t ps[])
 {
-  Int	i;
+  int32_t	i;
 
   puts("Open files:");
   for (i = 0; i < FOPEN_MAX; i++)

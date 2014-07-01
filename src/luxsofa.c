@@ -194,17 +194,17 @@ BIND(iauC2txy, v_dT8dp3_iDaT5rDp3p3q_0zzz1T5, f, C2TXY, 5, 5, NULL)
    dimension (year, month, day).  Unexpected results may be given if
    illegal year, month, or day numbers are specified.  Dates before
    -4799-01-01 or after 1465073-02-28 are rejected. */
-Int lux_iauCal2jd(Int narg, Int ps[])
+int32_t lux_iauCal2jd(int32_t narg, int32_t ps[])
 {
   double djm0, djm;
   pointer *ptrs;
   loopInfo *infos;
-  Int iq;
+  int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>L3*;r>L-3*", &ptrs, &infos)) < 0)
     return LUX_ERROR;
 
-  /* iauCal2jd(Int iy, Int im, Int id, double *djm0, double *djm) */
+  /* iauCal2jd(int32_t iy, int32_t im, int32_t id, double *djm0, double *djm) */
   switch (infos[0].type) {
   case LUX_LONG:
     while (infos[1].nelem--) {
@@ -218,9 +218,9 @@ Int lux_iauCal2jd(Int narg, Int ps[])
     break;
   case LUX_FLOAT:
     while (infos[1].nelem--) {
-      Int day = floor(ptrs[0].f[2]);
+      int32_t day = floor(ptrs[0].f[2]);
       double daypart = ptrs[0].f[2] - day;
-      if (iauCal2jd((Int) ptrs[0].f[0], (Int) ptrs[0].f[1], day, &djm0, &djm))
+      if (iauCal2jd((int32_t) ptrs[0].f[0], (int32_t) ptrs[0].f[1], day, &djm0, &djm))
         *ptrs[1].f = 0;
       else
         *ptrs[1].f = djm0 + djm + daypart;
@@ -230,9 +230,9 @@ Int lux_iauCal2jd(Int narg, Int ps[])
     break;
   case LUX_DOUBLE:
     while (infos[1].nelem--) {
-      Int day = floor(ptrs[0].d[2]);
+      int32_t day = floor(ptrs[0].d[2]);
       double daypart = ptrs[0].d[2] - day;
-      if (iauCal2jd((Int) ptrs[0].d[0], (Int) ptrs[0].d[1], day, &djm0, &djm))
+      if (iauCal2jd((int32_t) ptrs[0].d[0], (int32_t) ptrs[0].d[1], day, &djm0, &djm))
         *ptrs[1].d = 0;
       else
         *ptrs[1].d = 2400000.5 + djm + daypart;
@@ -249,15 +249,15 @@ REGISTER(iauCal2jd, f, CAL2JD, 1, 1, NULL);
 /*-----------------------------------------------------------------------*/
 /* DAT(date) returns delta(AT) = TAI - UTC for the given UTC date
    ([year, month, day]) */
-Int lux_iauDat(Int narg, Int ps[])
+int32_t lux_iauDat(int32_t narg, int32_t ps[])
 {
   pointer *ptrs;
   loopInfo *infos;
-  Int iq;
+  int32_t iq;
 
   if (internalMode & 1) {       /* /VALID */
     time_t t;
-    Int jdlo, jdhi, y, m, d;
+    int32_t jdlo, jdhi, y, m, d;
     double f, dt;
 
     /* determine the last date of validity of the current implementation */
@@ -268,7 +268,7 @@ Int lux_iauDat(Int narg, Int ps[])
     iauJd2cal(jdlo, 0.0, &y, &m, &d, &f);
     iauJd2cal(jdhi, 0.0, &y, &m, &d, &f);
     do {
-      Int jd, s;
+      int32_t jd, s;
       jd = (jdhi + jdlo)/2;
       iauJd2cal(jd, 0.0, &y, &m, &d, &f);
       s = iauDat(y, m, d, f, &dt);
@@ -295,17 +295,17 @@ Int lux_iauDat(Int narg, Int ps[])
       break;
     case LUX_FLOAT:
       while (infos[1].nelem--) {
-        Int d = (Int) floor(ptrs[0].f[2]);
+        int32_t d = (int32_t) floor(ptrs[0].f[2]);
         double f = ptrs[0].f[2] - d;
-        iauDat((Int) ptrs[0].f[0], (Int) ptrs[0].f[1], d, f, ptrs[1].d++);
+        iauDat((int32_t) ptrs[0].f[0], (int32_t) ptrs[0].f[1], d, f, ptrs[1].d++);
         ptrs[0].f += 3;
       }
       break;
     case LUX_DOUBLE:
       while (infos[1].nelem--) {
-        Int d = (Int) floor(ptrs[0].d[2]);
+        int32_t d = (int32_t) floor(ptrs[0].d[2]);
         double f = ptrs[0].d[2] - d;
-        iauDat((Int) ptrs[0].d[0], (Int) ptrs[0].d[1], d, f, ptrs[1].d++);
+        iauDat((int32_t) ptrs[0].d[0], (int32_t) ptrs[0].d[1], d, f, ptrs[1].d++);
         ptrs[0].d += 3;
       }
       break;
@@ -387,11 +387,11 @@ BIND(iauEpb, d_dd_iLarDq_0z_1, f, EPB, 1, 1, NULL)
 
    Returns the Julian Date corresponding to Besselian epoch <bepoch>
    (e.g., 1957.3). */
-Int lux_iauEpb2jd(Int narg, Int ps[])
+int32_t lux_iauEpb2jd(int32_t narg, int32_t ps[])
 {
   pointer *ptrs;
   loopInfo *infos;
-  Int iq;
+  int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;rD&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
@@ -414,11 +414,11 @@ BIND(iauEpj, d_dd_iLarDq_0z_1, f, EPJ, 1, 1, NULL)
 
    Returns the Julian Date corresponding to Julian epoch <bepoch>
    (e.g., 1957.3). */
-Int lux_iauEpj2jd(Int narg, Int ps[])
+int32_t lux_iauEpj2jd(int32_t narg, int32_t ps[])
 {
   pointer *ptrs;
   loopInfo *infos;
-  Int iq;
+  int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;rD*", &ptrs, &infos)) < 0)
     return LUX_ERROR;

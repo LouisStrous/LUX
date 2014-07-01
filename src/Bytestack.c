@@ -117,7 +117,7 @@ Bytestack_delete(Bytestack b)
     may in fact be added.
 
     @return 0 upon success, non-zero upon error. */
-static Int 
+static int32_t 
 enlarge(Bytestack b, size_t n) 
 {
   char *p;
@@ -282,8 +282,8 @@ char *Bytestack_pop_all(Bytestack b)
  * negative or larger than the number of bytes available for
  * restoring).
  */
-Int 
-Bytestack_restore(Bytestack b, Int size) 
+int32_t 
+Bytestack_restore(Bytestack b, int32_t size) 
 {
   if (!b)
     b = default_Bytestack();
@@ -726,8 +726,8 @@ Bytestack_stream_write(void *cookie, const char *buffer,
  *
  * @return 0 for success, -1 for failure.
  */
-static Int 
-Bytestack_stream_seek(void *cookie, off64_t *position, Int whence)
+static int32_t 
+Bytestack_stream_seek(void *cookie, off64_t *position, int32_t whence)
 {
   Bytestack_cookie lc = (Bytestack_cookie) cookie;
   Bytestack stack = lc->stack;
@@ -763,7 +763,7 @@ static void Bytestack_delete_cookie(Bytestack_cookie cookie);
  *
  * @return 0
  */
-static Int 
+static int32_t 
 Bytestack_stream_close(void *cookie)
 {
   Bytestack_cookie lc = (Bytestack_cookie) cookie;

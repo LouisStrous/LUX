@@ -26,10 +26,10 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 #include "action.h"
 
-Int	lux_replace(Int, Int);
+int32_t	lux_replace(int32_t, int32_t);
 /*--------------------------------------------------------------------*/
 #define SQRT3	1.7320508075688772935
-Int lux_orientation(Int narg, Int ps[])
+int32_t lux_orientation(int32_t narg, int32_t ps[])
 /* determine local orientation in a two- or three-dimensional data array */
 /* Syntax: ORIENTATION,data,widths[,orientation,values,wavenumber, */
 /*                                  grid,order] */
@@ -60,9 +60,9 @@ Int lux_orientation(Int narg, Int ps[])
   float	x, sum, *ptr, *ptr2, y, d1, d2, d3, *ptr3, *ptr0, *aspect;
   double	c0, c1, c2;
   double	q, r, ang, c, s, w;
-  Int	values, vector, d, *dims, i, iq, n1, n2, n3, odims[4], j, t, *grid;
-  Int	step[4], w1, w2, w3, m1, m2, m3, i2, j2, t2, grid2[3], i3, j3, t3;
-  Int	order, wavenum, ndim, xdims[3];
+  int32_t	values, vector, d, *dims, i, iq, n1, n2, n3, odims[4], j, t, *grid;
+  int32_t	step[4], w1, w2, w3, m1, m2, m3, i2, j2, t2, grid2[3], i3, j3, t3;
+  int32_t	order, wavenum, ndim, xdims[3];
   char	vocal, getVal, getVec, getJ, getWave, parallel;
 
   /* First, treat input data */
@@ -102,7 +102,7 @@ Int lux_orientation(Int narg, Int ps[])
     iq = lux_long(1, &ps[5]);
     if (array_size(iq) != ndim)
       return luxerror("Need %1d output cube dimensions", ps[5], ndim);
-    grid = (Int *) array_data(iq);
+    grid = (int32_t *) array_data(iq);
     memcpy(grid2, grid, ndim*sizeof(float));
     if (grid[0] == 0)
       grid2[0] = dims[0];
@@ -143,7 +143,7 @@ Int lux_orientation(Int narg, Int ps[])
   /* Create Gaussian smoothing kernels */
 				/* X kernel */
   w = widths[0]*0.6005612;
-  n1 = 4*((Int) w) + 1;
+  n1 = 4*((int32_t) w) + 1;
   if (n1 > dims[0]) {
     n1 = dims[0];
     if (n1 % 2 == 0)
@@ -151,7 +151,7 @@ Int lux_orientation(Int narg, Int ps[])
   }
   allocate(smooth1, n1, float);
   y = w? 1./w: 0;
-  x = -((Int) n1/2)*y;
+  x = -((int32_t) n1/2)*y;
   ptr = smooth1;
   sum = 0;
   for (i = 0; i < n1; i++) {
@@ -166,7 +166,7 @@ Int lux_orientation(Int narg, Int ps[])
   }
 				/* Y kernel */
   w = widths[1]*0.6005612;
-  n2 = 4*((Int) w) + 1;
+  n2 = 4*((int32_t) w) + 1;
   if (n2 > dims[1]) {
     n2 = dims[1];
     if (n2 % 2 == 0)
@@ -190,7 +190,7 @@ Int lux_orientation(Int narg, Int ps[])
 				/* T kernel */
   if (ndim == 3) {
     w = widths[2]*0.6005612;
-    n3 = 4*((Int) w) + 1;
+    n3 = 4*((int32_t) w) + 1;
     if (n3 > dims[2]) {
       n3 = dims[2];
       if (n3 % 2 == 0)
@@ -216,7 +216,7 @@ Int lux_orientation(Int narg, Int ps[])
   n1 /= 2;
   n2 /= 2;
 				/* Create the output symbols */
-  memcpy(odims + 1, grid2, ndim*sizeof(Int));
+  memcpy(odims + 1, grid2, ndim*sizeof(int32_t));
   if (getVal) {
     odims[0] = ndim;
     if ((values = array_scratch(LUX_FLOAT, ndim + 1, odims)) < 0) {
@@ -259,7 +259,7 @@ Int lux_orientation(Int narg, Int ps[])
   vocal = (internalMode & 1);
   getJ = (internalMode & 2)? 1: 0;
   /* Now start the real work */
-  memcpy(xdims, dims, ndim*sizeof(Int));
+  memcpy(xdims, dims, ndim*sizeof(int32_t));
   if (ndim == 2) {
     xdims[2] = 1;
     grid2[2] = 1;
@@ -601,10 +601,10 @@ Int lux_orientation(Int narg, Int ps[])
   return 1;
 }
 
-Int lux_root3(Int narg, Int ps[])
+int32_t lux_root3(int32_t narg, int32_t ps[])
 {
   float	c0, c1, c2, q, r, s, c, ang, *p;
-  Int	iq;
+  int32_t	iq;
 
   c0 = float_arg(*ps++);
   c1 = float_arg(*ps++);

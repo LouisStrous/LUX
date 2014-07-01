@@ -17,8 +17,10 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "types.h"
-Int cerror(Int, Int, ...);
+
+#include <stdint.h>
+
+int32_t cerror(int32_t, int32_t, ...);
 
 #define COND_NO_SCAL	0
 #define ILL_COMB	1

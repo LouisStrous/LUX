@@ -31,62 +31,62 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
  caused rare errors in output that might have gone unnoticed for a while,
  not sure how long the sunbow vesrion had this bug, the umbra version was
  OK, bug marked in crunch32 below */
-/* union types_ptr { uint8_t *b; short *w; Int *l; float *f; double *d;}; */
+/* union types_ptr { uint8_t *b; short *w; int32_t *l; float *f; double *d;}; */
 /* commented out because already defined in .h file - LS 30apr97 */
 uint8_t bits[8]={1,2,4,8,16,32,64,128};
-Int	crunch_bits;
+int32_t	crunch_bits;
 float	crunch_bpp;
-Int	crunch_slice = 5;
-static Int	crunch_run_flag=0;
+int32_t	crunch_slice = 5;
+static int32_t	crunch_run_flag=0;
 
-Int	docrunch(Int narg, Int ps[], Int showerror),
-   anacrunch(uint8_t *, short [], Int, Int, Int, Int),
-   anacrunch8(uint8_t *, uint8_t [], Int, Int, Int, Int),
-   anacrunchrun(uint8_t *, short [], Int, Int, Int, Int),
-   anacrunchrun8(uint8_t *, uint8_t [], Int, Int, Int, Int),
-   anadecrunch(uint8_t *, short [], Int, Int, Int),
-   anadecrunch8(uint8_t *, uint8_t [], Int, Int, Int),
-   anadecrunchrun(uint8_t *, short [], Int, Int, Int),
-   anadecrunchrun8(uint8_t *, uint8_t [], Int, Int, Int);
+int32_t	docrunch(int32_t narg, int32_t ps[], int32_t showerror),
+   anacrunch(uint8_t *, short [], int32_t, int32_t, int32_t, int32_t),
+   anacrunch8(uint8_t *, uint8_t [], int32_t, int32_t, int32_t, int32_t),
+   anacrunchrun(uint8_t *, short [], int32_t, int32_t, int32_t, int32_t),
+   anacrunchrun8(uint8_t *, uint8_t [], int32_t, int32_t, int32_t, int32_t),
+   anadecrunch(uint8_t *, short [], int32_t, int32_t, int32_t),
+   anadecrunch8(uint8_t *, uint8_t [], int32_t, int32_t, int32_t),
+   anadecrunchrun(uint8_t *, short [], int32_t, int32_t, int32_t),
+   anadecrunchrun8(uint8_t *, uint8_t [], int32_t, int32_t, int32_t);
 #if SIZEOF_LONG_LONG_INT == 8	/* 64 bit integers */
-Int anacrunch32(uint8_t *, Int *, Int, Int, Int, Int),
-  anadecrunch32(uint8_t *, Int *, Int, Int, Int);
+int32_t anacrunch32(uint8_t *, int32_t *, int32_t, int32_t, int32_t, int32_t),
+  anadecrunch32(uint8_t *, int32_t *, int32_t, int32_t, int32_t);
 #endif
-void	swapl(void *, Int);
+void	swapl(void *, int32_t);
 
  /*--------------------------------------------------------------------------*/
-Int lux_crunchrun(Int narg, Int ps[])		/* crunch subroutine */
+int32_t lux_crunchrun(int32_t narg, int32_t ps[])		/* crunch subroutine */
  /* compress an array with imbedded run length encoding plus variable
  bit encoding */		
  /*  lux call is: crunchrun, IN, b ,OUT */
  /* note that OUT must be predefined and limit is used to make certain we
  don't run out of space */
 {
-  Int iq;
+  int32_t iq;
   crunch_run_flag = 1;	/* normally 0, used below */
   iq = docrunch(narg,ps,1);
   crunch_run_flag = 0;	/* restore default */
   return iq;
 }
 /*--------------------------------------------------------------------------*/
-Int lux_crunch(Int narg, Int ps[])
+int32_t lux_crunch(int32_t narg, int32_t ps[])
 {
   return docrunch(narg, ps, 1);
 }
 /*--------------------------------------------------------------------------*/
-Int lux_crunch_f(Int narg, Int ps[])
+int32_t lux_crunch_f(int32_t narg, int32_t ps[])
 {
   return docrunch(narg, ps, 0);
 }
 /*--------------------------------------------------------------------------*/
-Int docrunch(Int narg, Int ps[], Int showerror)/* crunch subroutine */
+int32_t docrunch(int32_t narg, int32_t ps[], int32_t showerror)/* crunch subroutine */
  /* compress an array */		
  /*  lux call is: crunch, IN, b ,OUT */
  /* note that OUT must be predefined and limit is used to make certain we
     don't run out of space */
 {
   /* works only for I*1, I*2, and I*4 arrays */
-  Int	iq, slice, limit, nx, outer, n, type, ctype;
+  int32_t	iq, slice, limit, nx, outer, n, type, ctype;
   union	types_ptr q1, q2;
 
   iq = ps[0];
@@ -156,14 +156,14 @@ Int docrunch(Int narg, Int ps[], Int showerror)/* crunch subroutine */
   return LUX_OK;
 }
  /*--------------------------------------------------------------------------*/
-Int lux_decrunch(Int narg, Int ps[])		/* decrunch subroutine */
+int32_t lux_decrunch(int32_t narg, int32_t ps[])		/* decrunch subroutine */
  /* decompress an array */		
  /*  decrunch, IN, OUT */
 {
   /* works only for I*2 and I*1 arrays */
-  Int	iq, slice, nx, outer, nd, type, ctype, dim[2];
+  int32_t	iq, slice, nx, outer, nd, type, ctype, dim[2];
 #if WORDS_BIGENDIAN
-  Int bsize;
+  int32_t bsize;
 #endif
   struct	ahead	*h;
   union	types_ptr q1, q2;
@@ -172,7 +172,7 @@ Int lux_decrunch(Int narg, Int ps[])		/* decrunch subroutine */
   if ( sym[iq].class != 4 ) return cerror(NEED_ARR, iq);
   /* decrunch doesn't care about input array type since it looks at bit stream*/
   h = (struct ahead *) sym[iq].spec.array.ptr;
-  q1.l = (Int *) ((char *)h + sizeof(struct ahead));
+  q1.l = (int32_t *) ((char *)h + sizeof(struct ahead));
 #if WORDS_BIGENDIAN
   bsize =  *q1.l++;
 #else
@@ -203,7 +203,7 @@ Int lux_decrunch(Int narg, Int ps[])		/* decrunch subroutine */
 	   nx, outer);
     return -1;}
   h = (struct ahead *) sym[iq].spec.array.ptr;
-  q2.l = (Int *) ((char *)h + sizeof(struct ahead));
+  q2.l = (int32_t *) ((char *)h + sizeof(struct ahead));
   switch (ctype) {
   case 0:
     iq = anadecrunch(q1.b, q2.w, slice, nx, outer);
@@ -235,8 +235,8 @@ Int lux_decrunch(Int narg, Int ps[])		/* decrunch subroutine */
  /*--------------------------------------------------------------------------*/
 void bitprint(short z)
 {
-  Int mask={0xffff},yq;
-  Int i;
+  int32_t mask={0xffff},yq;
+  int32_t i;
   yq=z & mask;
   for (i=0;i<16;i++) {printf("%1d",yq%2); yq=yq/2; }
   printf(" ");
@@ -244,22 +244,22 @@ void bitprint(short z)
 }       /* end of bitprint */
  /*--------------------------------------------------------------------------*/
 #if SIZEOF_LONG_LONG_INT == 8	/* 64-bit integers */
-Int anacrunch32(uint8_t *x, Int array[], Int slice, Int nx, Int ny, Int limit)
+int32_t anacrunch32(uint8_t *x, int32_t array[], int32_t slice, int32_t nx, int32_t ny, int32_t limit)
  /* compress 32 bit array into x (a uint8_t array) using ny blocks each of size
  nx, bit slice size slice, returns # of bytes in x */
 {
   struct compresshead {
-    Int     tsize,nblocks,bsize;
+    int32_t     tsize,nblocks,bsize;
     uint8_t    slice_size,type; } *ch;
   uint32_t nb,ixa,ixb,big=0;
   unsigned register i,j,r1,in;
-  Int r0;
+  int32_t r0;
   long long	r3, mask, y64;
-  Int i2,k,iy;
-  union { Int i; short w; unsigned char b[4]; } y;
+  int32_t i2,k,iy;
+  union { int32_t i; short w; unsigned char b[4]; } y;
   union { long long l64; unsigned char b[8];  } yy, c;
 
-  /* We need value 0x1ffffffff but it's too wide for an Int using gcc
+  /* We need value 0x1ffffffff but it's too wide for an int32_t using gcc
      on an i586-pc-linux-gnulibc1 system.  The GNU C manual says that
      one can specify that a constant is long int64_t by appending LL to
      it, but at least for our constant in hexadecimal notation the compiler
@@ -280,7 +280,7 @@ Int anacrunch32(uint8_t *x, Int array[], Int slice, Int nx, Int ny, Int limit)
 			   we don't check all times */
   mask=1; for (i=0;i<slice;i++) mask=2*mask;
   mask=mask-1; /* no inline expon. in C */
-  /* determine the # of bytes to transfer to 32 bit Int for fixed portion */
+  /* determine the # of bytes to transfer to 32 bit int32_t for fixed portion */
   nb = (slice + 14)/8;	/* range 1 to 5 */
   if (slice == 0) nb=0;	/* but slice = 0 a special case */
 
@@ -382,18 +382,18 @@ Int anacrunch32(uint8_t *x, Int array[], Int slice, Int nx, Int ny, Int limit)
 }       /* end of routine */
 #endif
  /*--------------------------------------------------------------------------*/
-Int anacrunch(uint8_t *x, short array[], Int slice, Int nx, Int ny, Int limit)
+int32_t anacrunch(uint8_t *x, short array[], int32_t slice, int32_t nx, int32_t ny, int32_t limit)
  /* compress 16 bit array into x (a uint8_t array) using ny blocks each of size
  nx, bit slice size slice, returns # of bytes in x */
 {
   struct compresshead {
-    Int     tsize,nblocks,bsize;
+    int32_t     tsize,nblocks,bsize;
     uint8_t    slice_size,type; } *ch;
   unsigned nb,ixa,ixb;
   unsigned register i,j,r1,in;
-  Int r0,r3,mask;
-  Int i2,k,iy;
-  union { Int i; short w; unsigned char b[4]; } y;
+  int32_t r0,r3,mask;
+  int32_t i2,k,iy;
+  union { int32_t i; short w; unsigned char b[4]; } y;
   /* begin execution */
   if (limit < 25)
     return luxerror("limit (%d) too small in crunch", 0, limit);
@@ -401,7 +401,7 @@ Int anacrunch(uint8_t *x, short array[], Int slice, Int nx, Int ny, Int limit)
 			   we don't check all times */
   mask=1; for (i=0;i<slice;i++) mask=2*mask;
   mask=mask-1; /* no inline expon. in C */
-  /* determine the # of bytes to transfer to 32 bit Int for fixed portion */
+  /* determine the # of bytes to transfer to 32 bit int32_t for fixed portion */
   if (slice == 0) nb=0; else { if (slice < 2 ) nb=1;
   else { if (slice < 10) nb=2; else nb=3;    }};
   y.i=0;
@@ -496,18 +496,18 @@ Int anacrunch(uint8_t *x, short array[], Int slice, Int nx, Int ny, Int limit)
   return  i;      /*return # of bytes used */
 }       /* end of routine */
  /*--------------------------------------------------------------------------*/
-Int anacrunch8(uint8_t *x, uint8_t array[], Int slice, Int nx, Int ny, Int limit)
+int32_t anacrunch8(uint8_t *x, uint8_t array[], int32_t slice, int32_t nx, int32_t ny, int32_t limit)
  /* compress 8 bit array into x (a uint8_t array) using ny blocks each of size
  nx, bit slice size slice, returns # of bytes in x */
 {
   struct compresshead {
-    Int     tsize,nblocks,bsize;
+    int32_t     tsize,nblocks,bsize;
     uint8_t    slice_size,type; } *ch;
   unsigned nb,ixa,ixb;
   unsigned register i,j,r1,in;
-  Int r0,r3,mask;
-  Int i2,k,iy;
-  union { Int i; short w; unsigned char b[4]; } y;
+  int32_t r0,r3,mask;
+  int32_t i2,k,iy;
+  union { int32_t i; short w; unsigned char b[4]; } y;
   /* begin execution */
   if (limit < 25)
     return luxerror("limit (%d) too small in crunch8", 0, limit);
@@ -515,7 +515,7 @@ Int anacrunch8(uint8_t *x, uint8_t array[], Int slice, Int nx, Int ny, Int limit
 			   we don't check all times */
   mask=1; for (i=0;i<slice;i++) mask=2*mask;
   mask=mask-1; /* no inline expon. in C */
-  /* determine the # of bytes to transfer to 32 bit Int for fixed portion */
+  /* determine the # of bytes to transfer to 32 bit int32_t for fixed portion */
   if (slice > 8) slice = 8;
   if (slice == 0) nb=0; else { if (slice < 2 ) nb=1;
   else { if (slice < 10) nb=2; else nb=3;    }};
@@ -535,7 +535,7 @@ Int anacrunch8(uint8_t *x, uint8_t array[], Int slice, Int nx, Int ny, Int limit
     ixa=1+iy*nx;    ixb=(iy+1)*nx;
     for (in=ixa; in<ixb; in++)      {               /* start of ix (inner) loop */
       /* first the fixed slice portion */
-      y.i= (Int) array[in]- (Int) array[in-1];
+      y.i= (int32_t) array[in]- (int32_t) array[in-1];
       r3=(y.i>>slice);
       i=r1>>3;
       j=r1%8;
@@ -596,10 +596,10 @@ Int anacrunch8(uint8_t *x, uint8_t array[], Int slice, Int nx, Int ny, Int limit
   return  i;      /*return # of bytes used */
 }       /* end of routine */
  /*--------------------------------------------------------------------------*/
-void swapl(void *vx, Int n)
+void swapl(void *vx, int32_t n)
 /* reverse n longs (4 bytes each) */
 {
-  Int	i1, i2, i3, i4, i;
+  int32_t	i1, i2, i3, i4, i;
   char	xq, *x;
 
   x = (char *) vx;
@@ -621,10 +621,10 @@ void swapl(void *vx, Int n)
   }
 }
  /*--------------------------------------------------------------------------*/
-void swapd(char x[], Int n)
+void swapd(char x[], int32_t n)
      /* n; the number of F*8 (8 bytes each) to reverse */
 {
-  Int   i1,i2,i3,i4,i5,i6,i7,i8,i;
+  int32_t   i1,i2,i3,i4,i5,i6,i7,i8,i;
   char  xq;
   i1=0; i2=1; i3=2; i4=3; i5=5; i6=5; i7=6; i8=7;
   for (i=0;i<n;i++) { xq=x[i1];
@@ -635,9 +635,9 @@ void swapd(char x[], Int n)
   i1+=8;  i2+=8;  i3+=8;  i4+=8; i5+=8; i6+=8; i7+=8; i8+=8;  }
 }
  /*--------------------------------------------------------------------------*/
-Int swapb(char x[], Int n)
+int32_t swapb(char x[], int32_t n)
 {
-  Int   i;
+  int32_t   i;
   char  xq;
   if (n < 2 ) { printf("error in swapb count, n = %d\n",n);  return -1; }
   if (n%2 != 0 ) n--;
@@ -646,16 +646,16 @@ Int swapb(char x[], Int n)
 }
  /*--------------------------------------------------------------------------*/
 #if SIZEOF_LONG_LONG_INT == 8	/* 64-bit integers */
-Int anadecrunch32(uint8_t *x, Int array[], Int r9, Int nx, Int ny)
+int32_t anadecrunch32(uint8_t *x, int32_t array[], int32_t r9, int32_t nx, int32_t ny)
      /* decompress a bit stream in x; result is n I*4 elements, put in array;
 	 bit slice size r9 */
 {
-  Int	iq;
-  Int	r0, r1, r2, nb;
-  Int	j, in, i, k, ix, iy, mask;
+  int32_t	iq;
+  int32_t	r0, r1, r2, nb;
+  int32_t	j, in, i, k, ix, iy, mask;
   long long	y64;
   unsigned char xq;
-  union { Int i; short w; unsigned char b[4]; } y;
+  union { int32_t i; short w; unsigned char b[4]; } y;
   union { long long l64; unsigned char b[8];  } yy, c1, c2, c3;
 
   /* We cannot specify long int64_t hexadecimal constants on all
@@ -686,7 +686,7 @@ Int anadecrunch32(uint8_t *x, Int array[], Int r9, Int nx, Int ny)
   mask = mask - 1;
   /* printf("slice width = %d\n",r9); */
   /* printf ("mask = %x, %d\n",mask,mask); */
-  /* determine the # of bytes to transfer to 32 bit Int for fixed portion */
+  /* determine the # of bytes to transfer to 32 bit int32_t for fixed portion */
   nb = (r9 + 14)/8;	/* range 1 to 5 */
   if (r9 == 0)
     nb = 0;	/* but slice = 0 a special case */
@@ -745,7 +745,7 @@ Int anadecrunch32(uint8_t *x, Int array[], Int r9, Int nx, Int ny)
       }
 #endif
       /* shift and mask out the bit slice */
-      r2= (Int) ((yy.l64>>j) & mask);
+      r2= (int32_t) ((yy.l64>>j) & mask);
       /*printf("r2 = %x, %d\n",r2,r2);*/
       /* the variable bit portion, find the first set bit */
       r1=r1+r9;       /* bump r1 pass the fixed part */
@@ -815,20 +815,20 @@ Int anadecrunch32(uint8_t *x, Int array[], Int r9, Int nx, Int ny)
 }  						     /* end of routine */
 #endif
 /*--------------------------------------------------------------------------*/
-Int anadecrunch(uint8_t *x, short array[], Int r9, Int nx, Int ny)
+int32_t anadecrunch(uint8_t *x, short array[], int32_t r9, int32_t nx, int32_t ny)
  /* decompress a bit stream in x; result is n I*2 elements, put in array;
 	 bit slice size r9 */
 {
   short iq;
-  Int r0,r1,r2,r4,nb,mask;
-  Int j,in,i,k,ix,iy;
+  int32_t r0,r1,r2,r4,nb,mask;
+  int32_t j,in,i,k,ix,iy;
   unsigned char xq;
-  union { Int i; short w; unsigned char b[4]; } y;
+  union { int32_t i; short w; unsigned char b[4]; } y;
   /* begin execution */
   mask=1; for (i=0;i<r9;i++) mask=2*mask; mask=mask-1;
   /*printf("slice width = %d\n",r9);*/
   /*printf ("mask = %x, %d\n",mask,mask);*/
-  /* determine the # of bytes to transfer to 32 bit Int for fixed portion */
+  /* determine the # of bytes to transfer to 32 bit int32_t for fixed portion */
   if (r9 == 0) nb=0; else { if (r9 < 2 ) nb=1;
   else { if (r9 < 10) nb=2; else nb=3;    }};
   y.i=0;
@@ -922,20 +922,20 @@ Int anadecrunch(uint8_t *x, short array[], Int r9, Int nx, Int ny)
   return 1;
 }  						     /* end of routine */
  /*--------------------------------------------------------------------------*/
-Int anadecrunch8(uint8_t *x, uint8_t array[], Int r9, Int nx, Int ny)
+int32_t anadecrunch8(uint8_t *x, uint8_t array[], int32_t r9, int32_t nx, int32_t ny)
  /* decompress a bit stream in x; result is n I*1 elements, put in array;
 	  bit slice size r9 */
 				 /* uint8_t version, modified from I*2 version
 				 r. shine 6/5/91 */
 {
   uint8_t iq;
-  Int r0,r1,r2,r4,nb,mask;
-  Int j,in,i,k,ix,iy;
+  int32_t r0,r1,r2,r4,nb,mask;
+  int32_t j,in,i,k,ix,iy;
   uint8_t xq;
-  union { Int i; short w; unsigned char b[4]; } y;
+  union { int32_t i; short w; unsigned char b[4]; } y;
   /* begin execution */
   mask=1; for (i=0;i<r9;i++) mask=2*mask; mask=mask-1;
-  /* determine the # of bytes to transfer to 32 bit Int for fixed portion */
+  /* determine the # of bytes to transfer to 32 bit int32_t for fixed portion */
   if (r9 == 0) nb=0; else { if (r9 < 2 ) nb=1;
   else { if (r9 < 10) nb=2; else nb=3;    }};
   y.i=0;
@@ -1018,28 +1018,28 @@ Int anadecrunch8(uint8_t *x, uint8_t array[], Int r9, Int nx, Int ny)
   return 1;
 }       /* end of routine */
  /*--------------------------------------------------------------------------*/
-Int anacrunchrun(uint8_t *x, short array[], Int slice, Int nx, Int ny, Int limit)
+int32_t anacrunchrun(uint8_t *x, short array[], int32_t slice, int32_t nx, int32_t ny, int32_t limit)
  /* compress 16 bit array into x (a uint8_t array) using ny blocks each of size
  nx, bit slice size slice, returns # of bytes in x */
 {
   struct compresshead {
-    Int     tsize,nblocks,bsize;
+    int32_t     tsize,nblocks,bsize;
     uint8_t    slice_size,type; } *ch;
   short	*p;
   unsigned nb;
   unsigned register i,j,r1;
-  Int	r0,r3,mask, nrun, lrun, ic;
-  Int	*dif, *d, nc, zq, yq, *dd;
+  int32_t	r0,r3,mask, nrun, lrun, ic;
+  int32_t	*dif, *d, nc, zq, yq, *dd;
   /* enum	state { RUN, LITERAL }; */
-  Int	i2,k,iy;
-  union { Int i; short w; unsigned char b[4]; } y;
+  int32_t	i2,k,iy;
+  union { int32_t i; short w; unsigned char b[4]; } y;
   /* begin execution */
   if (limit < 25)
     return luxerror("limit (%d) too small in crunchrun", 0, limit);
   limit = limit - 24;	/* some margin since we don't check all times */
   mask=1; for (i=0;i<slice;i++) mask=2*mask;
   mask=mask-1; /* no inline expon. in C */
-  /* determine the # of bytes to transfer to 32 bit Int for fixed portion */
+  /* determine the # of bytes to transfer to 32 bit int32_t for fixed portion */
   if (slice == 0) nb=0; else { if (slice < 2 ) nb=1;
   else { if (slice < 10) nb=2; else nb=3;    }};
   y.i=0;
@@ -1050,7 +1050,7 @@ Int anacrunchrun(uint8_t *x, short array[], Int slice, Int nx, Int ny, Int limit
   x = x + 14;
   ch->bsize = nx;  ch->nblocks = ny;  ch->slice_size = slice;  ch->type = 2;
   i=0;    r1=0;
-  dif = (Int *) malloc(nx*4);			/* line buffer */
+  dif = (int32_t *) malloc(nx*4);			/* line buffer */
   for (iy=0;iy<ny;iy++) {                 	/* start of iy (outer) loop */
     /* load the first value, reverse bytes (VAX style)*/
 #if WORDS_BIGENDIAN
@@ -1060,8 +1060,8 @@ Int anacrunchrun(uint8_t *x, short array[], Int slice, Int nx, Int ny, Int limit
 #endif 
     /* compute and store the first differences for this line */
     p = (array+nx*iy);	nc=nx-1;
-    d=dif; yq=(Int) *p++;	zq=(Int) *p++;
-    while (nc--) { *d++ = zq - yq; yq = zq; zq = (Int) *p++; }
+    d=dif; yq=(int32_t) *p++;	zq=(int32_t) *p++;
+    while (nc--) { *d++ = zq - yq; yq = zq; zq = (int32_t) *p++; }
     r1=r1+16;
     p = (array+nx*iy);	nc=nx-1;
     d=dif;
@@ -1194,27 +1194,27 @@ Int anacrunchrun(uint8_t *x, short array[], Int slice, Int nx, Int ny, Int limit
   return  i;      /*return # of bytes used */
 }       /* end of routine */
  /*--------------------------------------------------------------------------*/
-Int anacrunchrun8(uint8_t *x, uint8_t array[], Int slice, Int nx, Int ny, Int limit)
+int32_t anacrunchrun8(uint8_t *x, uint8_t array[], int32_t slice, int32_t nx, int32_t ny, int32_t limit)
  /* compress 8 bit array into x (a uint8_t array) using ny blocks each of size
  nx, bit slice size slice, returns # of bytes in x */
 {
   struct compresshead {
-    Int     tsize,nblocks,bsize;
+    int32_t     tsize,nblocks,bsize;
     uint8_t    slice_size,type; } *ch;
   uint8_t	*p;
   unsigned nb;
   unsigned register i,j,r1;
-  Int	r0,r3,mask, nrun, lrun, ic;
-  Int	*dif, *d, nc, zq, yq, *dd;
-  Int	i2,k,iy;
-  union { Int i; short w; unsigned char b[4]; } y;
+  int32_t	r0,r3,mask, nrun, lrun, ic;
+  int32_t	*dif, *d, nc, zq, yq, *dd;
+  int32_t	i2,k,iy;
+  union { int32_t i; short w; unsigned char b[4]; } y;
   /* begin execution */
   if (limit < 25)
     return luxerror("limit (%d) too small in crunchrun8", 0, limit);
   limit = limit - 24;	/* some margin since we don't check all times */
   mask=1; for (i=0;i<slice;i++) mask=2*mask;
   mask=mask-1; /* no inline expon. in C */
-  /* determine the # of bytes to transfer to 32 bit Int for fixed portion */
+  /* determine the # of bytes to transfer to 32 bit int32_t for fixed portion */
   if (slice == 0) nb=0; else { if (slice < 2 ) nb=1;
   else { if (slice < 10) nb=2; else nb=3;    }};
   y.i=0;
@@ -1225,15 +1225,15 @@ Int anacrunchrun8(uint8_t *x, uint8_t array[], Int slice, Int nx, Int ny, Int li
   x = x + 14;
   ch->bsize = nx;  ch->nblocks = ny;  ch->slice_size = slice;  ch->type = 3;
   i=0;    r1=0;
-  dif = (Int *) malloc(nx*4);			/* line buffer */
+  dif = (int32_t *) malloc(nx*4);			/* line buffer */
   for (iy=0;iy<ny;iy++) {                 	/* start of iy (outer) loop */
     /* load the first value */
     x[i++] = array[iy*nx];
  
     /* compute and store the first differences for this line */
     p = (array+nx*iy);	nc=nx-1;
-    d=dif; yq=(Int) *p++;	zq=(Int) *p++;
-    while (nc--) { *d++ = zq - yq; yq = zq; zq = (Int) *p++; }
+    d=dif; yq=(int32_t) *p++;	zq=(int32_t) *p++;
+    while (nc--) { *d++ = zq - yq; yq = zq; zq = (int32_t) *p++; }
     r1=r1+8;
     p = (array+nx*iy);	nc=nx-1;
     d=dif;
@@ -1367,21 +1367,21 @@ Int anacrunchrun8(uint8_t *x, uint8_t array[], Int slice, Int nx, Int ny, Int li
   return  i;      /*return # of bytes used */
 }
  /*--------------------------------------------------------------------------*/
-Int anadecrunchrun(uint8_t *x, short array[], Int r9, Int nx, Int ny)
+int32_t anadecrunchrun(uint8_t *x, short array[], int32_t r9, int32_t nx, int32_t ny)
  /* decompress a bit stream in x; result is n I*2 elements, put in array;
 	 bit slice size r9 */
  /* this version handles the run length encoding used in anacrunchrun */
 {
   short iq;
-  Int r0,r1,r2,r4,nb,mask,nrun,n,nc;
-  Int j,in,i,k,iy;
+  int32_t r0,r1,r2,r4,nb,mask,nrun,n,nc;
+  int32_t j,in,i,k,iy;
   unsigned char xq;
-  union { Int i; short w; unsigned char b[4]; } y;
+  union { int32_t i; short w; unsigned char b[4]; } y;
   /* begin execution */
   mask=1; for (i=0;i<r9;i++) mask=2*mask; mask=mask-1;
   /*printf("slice width = %d\n",r9);*/
   /*printf ("mask = %x, %d\n",mask,mask);*/
-  /* determine the # of bytes to transfer to 32 bit Int for fixed portion */
+  /* determine the # of bytes to transfer to 32 bit int32_t for fixed portion */
   if (r9 == 0) nb=0; else { if (r9 < 2 ) nb=1;
   else { if (r9 < 10) nb=2; else nb=3;    }};
   y.i=0;
@@ -1400,7 +1400,7 @@ Int anadecrunchrun(uint8_t *x, short array[], Int r9, Int nx, Int ny)
     while (nc>0) {
       /* look at the next run length code */
       /* printf("i = %d\n", i); */
-      nrun = (Int) x[i++];
+      nrun = (int32_t) x[i++];
       /* printf("nrun = %d\n", nrun); */
       if (nrun > 127) {	/* a run of a constant difference */
 	n = 255 - nrun + 2;
@@ -1509,19 +1509,19 @@ Int anadecrunchrun(uint8_t *x, short array[], Int r9, Int nx, Int ny)
   return 1;
 }  						     /* end of routine */
  /*--------------------------------------------------------------------------*/
-Int anadecrunchrun8(uint8_t x[], uint8_t array[], Int r9, Int nx, Int ny)
+int32_t anadecrunchrun8(uint8_t x[], uint8_t array[], int32_t r9, int32_t nx, int32_t ny)
  /* decompress a bit stream in x; result is n I*2 elements, put in array;
 	 bit slice size r9 */
  /* this version handles the run length encoding used in anacrunchrun */
 {
   uint8_t iq;
-  Int r0,r1,r2,r4,nb,mask,nrun,n,nc;
-  Int j,in,i,k,iy;
+  int32_t r0,r1,r2,r4,nb,mask,nrun,n,nc;
+  int32_t j,in,i,k,iy;
   unsigned char xq;
-  union { Int i; short w; unsigned char b[4]; } y;
+  union { int32_t i; short w; unsigned char b[4]; } y;
   /* begin execution */
   mask=1; for (i=0;i<r9;i++) mask=2*mask; mask=mask-1;
-  /* determine the # of bytes to transfer to 32 bit Int for fixed portion */
+  /* determine the # of bytes to transfer to 32 bit int32_t for fixed portion */
   if (r9 == 0) nb=0; else { if (r9 < 2 ) nb=1;
   else { if (r9 < 10) nb=2; else nb=3;    }};
   y.i=0;
@@ -1537,7 +1537,7 @@ Int anadecrunchrun8(uint8_t x[], uint8_t array[], Int r9, Int nx, Int ny)
     while (nc>0) {
       /* look at the next run length code */
       /* printf("i = %d\n", i); */
-      nrun = (Int) x[i++];
+      nrun = (int32_t) x[i++];
       /* printf("nrun = %d\n", nrun); */
       if (nrun > 127) {	/* a run of a constant difference */
 	n = 255 - nrun + 2;

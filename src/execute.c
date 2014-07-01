@@ -33,30 +33,30 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "install.h"
 #include "action.h"
 
-extern Int	nFixed, traceMode;
+extern int32_t	nFixed, traceMode;
 
-Int	nArg, currentEVB = 0, suppressMsg = 0;
+int32_t	nArg, currentEVB = 0, suppressMsg = 0;
 uint32_t internalMode;
-Int	nExecuted = 0, executeLevel = 0, fileLevel = 0,
+int32_t	nExecuted = 0, executeLevel = 0, fileLevel = 0,
 	returnSym, noTrace = 0, curRoutineNum = 0;
 char	preserveKey;
 
 char	*currentRoutineName = NULL;
 
-Int	lux_convert(Int, Int *, Int, Int), convertScalar(scalar *, Int, Int),
-	dereferenceScalPointer(Int), eval(Int),
+int32_t	lux_convert(int32_t, int32_t *, int32_t, int32_t), convertScalar(scalar *, int32_t, int32_t),
+	dereferenceScalPointer(int32_t), eval(int32_t),
 	nextCompileLevel(FILE *, char *);
-void	zap(Int symbol), updateIndices(void);
-void pushExecutionLevel(Int line, Int target);
+void	zap(int32_t symbol), updateIndices(void);
+void pushExecutionLevel(int32_t line, int32_t target);
 void popExecutionLevel(void);
-void showExecutionLevel(Int symbol);
+void showExecutionLevel(int32_t symbol);
 
 /*------------------------------------------------------------------*/
-void fixContext(Int symbol, Int context)
+void fixContext(int32_t symbol, int32_t context)
 /* change the context of embedded symbols (in LUX_RANGE, LUX_LIST, */
 /* LUX_CLIST, LUX_KEYWORD) to reflect embedding in <symbol>. */
 {
-  Int	i, nElem;
+  int32_t	i, nElem;
   int16_t	*ptr;
   listElem	*p;
 
@@ -101,16 +101,16 @@ void fixContext(Int symbol, Int context)
   }
 }
 /*------------------------------------------------------------------*/
-Int copyToSym(Int target, Int source)
+int32_t copyToSym(int32_t target, int32_t source)
 /* puts a copy of <source> (including any embedded symbols) in <target> */
 {
-  Int	size, i;
+  int32_t	size, i;
   pointer	optr, ptr;
   char	zapIt = 0;
   listElem	*eptr, *oeptr;
-  Int	copySym(Int);
+  int32_t	copySym(int32_t);
   extractSec	*etrgt, *esrc;
-  void	embed(Int target, Int context), zap(Int);
+  void	embed(int32_t target, int32_t context), zap(int32_t);
 
   if (source < 0)		/* some error */
     return source;
@@ -292,22 +292,22 @@ Int copyToSym(Int target, Int source)
   return target;
 }
 /*------------------------------------------------------------------*/
-Int copySym(Int symbol)
+int32_t copySym(int32_t symbol)
 /* creates an exact copy of <symbol> in a new temporary variable */
 {
-  Int	result;
+  int32_t	result;
 
   result = nextFreeTempVariable();
   return copyToSym(result, symbol);
 }
 /*------------------------------------------------------------------*/
 #if REALLY
-Int extractReplace(Int symbol)
+int32_t extractReplace(int32_t symbol)
 {
-  Int	target, lhs, rhs, result, n;
+  int32_t	target, lhs, rhs, result, n;
   int16_t	*ptr;
   char	findTarget = '\0', *name;
-  Int	lux_replace(Int, Int);
+  int32_t	lux_replace(int32_t, int32_t);
 
   lhs = replace_lhs(symbol);
   if (symbol_class(lhs) == LUX_FUNC_PTR)
@@ -383,20 +383,20 @@ Int extractReplace(Int symbol)
 }
 #endif
 /*------------------------------------------------------------------*/
-Int lux_replace(Int lhs, Int rhs)
+int32_t lux_replace(int32_t lhs, int32_t rhs)
      /* replaces <lhs> with <rhs> */
 {
-  Int	lhsSize, rhsSize, namevar(Int, Int), result, i, n;
+  int32_t	lhsSize, rhsSize, namevar(int32_t, int32_t), result, i, n;
   char	takeOver = 0, *name;
-  extern Int	trace, step, nBreakpoint;
+  extern int32_t	trace, step, nBreakpoint;
   extern breakpointInfo	breakpoint[];
-  branchInfo	checkTree(Int, Int);
-  Int	oldPipeExec, oldPipeSym;
-  extern Int	pipeExec, pipeSym, tempVariableIndex, nTempVariable,
+  branchInfo	checkTree(int32_t, int32_t);
+  int32_t	oldPipeExec, oldPipeSym;
+  extern int32_t	pipeExec, pipeSym, tempVariableIndex, nTempVariable,
     fformat, iformat, sformat, cformat;
   extern char	*fmt_float, *fmt_integer, *fmt_complex, *fmt_string;
   branchInfo	tree;
-  Int	evalLhs(Int), einsert(Int, Int);
+  int32_t	evalLhs(int32_t), einsert(int32_t, int32_t);
   void	updateIndices(void);
   
   if (lhs == LUX_ERROR)		/* e.g., when !XX = 3 is tried */
@@ -573,7 +573,7 @@ Int lux_replace(Int lhs, Int rhs)
 #define ORKEY		-1001
 #define MODEKEY		-1002
 #define ZEROKEY		-1003
-Int matchKey(int16_t index, char **keys, Int *var)
+int32_t matchKey(int16_t index, char **keys, int32_t *var)
 /* matches symbol[index] to the keyword list and returns index
   of matched key (or NOKEY) */
 /* if a key is preceded by a number, then the number is OR-ed into */
@@ -647,12 +647,12 @@ Int matchKey(int16_t index, char **keys, Int *var)
  return *var = NOKEY;
 }
 /*------------------------------------------------------------------*/
-Int matchUserKey(char *name, Int routineNum)
+int32_t matchUserKey(char *name, int32_t routineNum)
 /* matches name to the names of the arguments of user routine #routineNum */
 /* and returns the argument index of the matched key (or -1) */
 {
   char	**keys;
-  Int	n, l, i;
+  int32_t	n, l, i;
 
   if (sym[routineNum].class != LUX_SUBROUTINE &&
       sym[routineNum].class != LUX_FUNCTION)
@@ -671,7 +671,7 @@ Int matchUserKey(char *name, Int routineNum)
 }
 /*------------------------------------------------------------------*/
 #define PRESERVE_KEY	1024
-Int internal_routine(Int symbol, internalRoutine *routine)
+int32_t internal_routine(int32_t symbol, internalRoutine *routine)
 /* execute an internal routine (subroutine or function) */
 /* keywords:  each internal function and routine has associated with it */
 /* a (possibly empty) list of keywords, associated with particular */
@@ -689,17 +689,17 @@ Int internal_routine(Int symbol, internalRoutine *routine)
     sym[symbol].spec.array.ptr -> arguments
     sym[symbol].spec.array.bstore/sizeof(int16_t) -> # arguments  */
 
-  /* evalArgs must be Int* because it is passed on to individual */
-  /* routines (Int ps[]) */
- Int	nArg, nKeys = 0, i, maxArg, *evalArgs,
+  /* evalArgs must be int32_t* because it is passed on to individual */
+  /* routines (int32_t ps[]) */
+ int32_t	nArg, nKeys = 0, i, maxArg, *evalArgs,
 	routineNum, n, thisInternalMode = 0, ordinary = 0;
  uint8_t	isSubroutine;
  keyList	*theKeyList;
  int16_t	*arg;
  char	*name, suppressEval = 0, suppressUnused = 0;
  extern char	evalScalPtr;
- extern Int	pipeExec;
- Int	treatListArguments(Int *, Int *[], Int);
+ extern int32_t	pipeExec;
+ int32_t	treatListArguments(int32_t *, int32_t *[], int32_t);
 
  nArg = int_sub_num_arguments(symbol); /* number of arguments */
  routineNum = int_sub_routine_num(symbol); /* routine number */
@@ -739,7 +739,7 @@ Int internal_routine(Int symbol, internalRoutine *routine)
  /* treat the arguments */
  if (nKeys? maxArg: (nArg + ordinary)) {/* arguments possible */
    i = nKeys? maxArg: (nArg + ordinary);
-   evalArgs = malloc(i*sizeof(Int));
+   evalArgs = malloc(i*sizeof(int32_t));
    if (!evalArgs)
      return cerror(ALLOC_ERR, 0);
    if (!nKeys) {		/* default: no keys */
@@ -770,7 +770,7 @@ Int internal_routine(Int symbol, internalRoutine *routine)
        *--evalArgs = 0;
      maxArg = nArg + ordinary;	/* index of last specified argument */
    } else {			/* we've got some keys */
-     Int	*keys;
+     int32_t	*keys;
 
      for (i = 0; i < maxArg; i++) /* default max number of allowed arguments */
 				  /* for this routine to zero */
@@ -779,7 +779,7 @@ Int internal_routine(Int symbol, internalRoutine *routine)
      arg -= nArg;		/* back to beginning of list */
 
      /* match the keywords with the routine's keyword list */
-     allocate(keys, nArg, Int);	/* storage */
+     allocate(keys, nArg, int32_t);	/* storage */
      for (i = maxArg = 0; i < nArg; i++, arg++, keys++)
        if (symbol_class(*arg) == LUX_KEYWORD) {	/* a keyword */
 	 n = matchKey(keyword_name_symbol(*arg),
@@ -794,7 +794,7 @@ Int internal_routine(Int symbol, internalRoutine *routine)
 	   name = string_value(keyword_name_symbol(*arg));
 	   return luxerror("Nonexistent keyword: %s", 0, name);
 	 } else if (n == MODEKEY) { /* MODE keyword */
-           Int result = eval(keyword_value(*arg));
+           int32_t result = eval(keyword_value(*arg));
            internalMode = int_arg(result);
            zapTemp(result);
          } else if (n != ORKEY) {	/* not a mode (number) keyword */
@@ -959,12 +959,12 @@ Int internal_routine(Int symbol, internalRoutine *routine)
  return i;
 }
 /*------------------------------------------------------------------*/
-Int getBody(Int routine)
+int32_t getBody(int32_t routine)
 /* finds and compiles body of uncompiled routine */
 {
  char	*name, isFunction;
- Int	result;
- extern Int	findBody, ignoreInput;
+ int32_t	result;
+ extern int32_t	findBody, ignoreInput;
  FILE	*fp;
 
  name = deferred_routine_filename(routine);
@@ -989,21 +989,21 @@ Int getBody(Int routine)
  return result;
 }
 /*------------------------------------------------------------------*/
-Int usr_routine(Int symbol)
+int32_t usr_routine(int32_t symbol)
 /* executes a user-defined subroutine, function or block routine */
 {
-  /* evalArg must be Int* because unProtect expects that, because */
+  /* evalArg must be int32_t* because unProtect expects that, because */
   /* it does so in internal_routine because there it gets passed on */
-  /* to individual routines (Int ps[]) */
- Int	nPar, nStmnt, i, oldContext = curContext, n, routineNum, nKeys = 0,
+  /* to individual routines (int32_t ps[]) */
+ int32_t	nPar, nStmnt, i, oldContext = curContext, n, routineNum, nKeys = 0,
 	ordinary = 0, thisNArg, *evalArg, oldNArg, listSym = 0;
  int16_t	*arg, *par, *list = NULL;
  char	type, *name, msg, isError,
    *routineTypeNames[] = { "FUNC", "SUBR", "BLOCK" };
  symTableEntry	*oldpars;
- extern Int	returnSym, defined(Int, Int);
+ extern int32_t	returnSym, defined(int32_t, int32_t);
  extern char	evalScalPtr;
- void pushExecutionLevel(Int, Int), popExecutionLevel(void);
+ void pushExecutionLevel(int32_t, int32_t), popExecutionLevel(void);
  
  executeLevel++;
  fileLevel++;
@@ -1112,7 +1112,7 @@ Int usr_routine(Int symbol)
      if (symbol_class(*arg++) == LUX_KEYWORD)
        nKeys++;
    arg -= thisNArg;		/* back to start of list */
-   evalArg = malloc(nPar*sizeof(Int)); /* room for the evaluated parameters */
+   evalArg = malloc(nPar*sizeof(int32_t)); /* room for the evaluated parameters */
    if (nPar && !evalArg) {
      cerror(ALLOC_ERR, 0);
      goto usr_routine_1;
@@ -1175,7 +1175,7 @@ Int usr_routine(Int symbol)
 	     luxerror("Argument #%d doubly defined", 0, ordinary);
 	     goto usr_routine_3;
 	   } /* end if (evalArg[ordinary]) */
-	   evalArg[ordinary] = eval((Int) *arg++); /* assign value */
+	   evalArg[ordinary] = eval((int32_t) *arg++); /* assign value */
 	   if (evalArg[ordinary] == LUX_ERROR) /* some error */
 	     goto usr_routine_3;
 	   if (isFreeTemp(evalArg[ordinary]))
@@ -1345,15 +1345,15 @@ Int usr_routine(Int symbol)
  return LUX_ERROR;
 }
 /*------------------------------------------------------------------*/
-Int lux_for(Int nsym)
+int32_t lux_for(int32_t nsym)
 /* executes LUX FOR-statement */
 {
  pointer	counter;
  scalar		start, inc, end;
- Int		hiType, n, temp, action;
+ int32_t		hiType, n, temp, action;
  int16_t		startSym, endSym, stepSym, counterSym;
  char		forward;
- extern Int	trace, step;
+ extern int32_t	trace, step;
 
 		/* find highest type of loop start, increment, and end */
  startSym = eval(for_start(nsym));
@@ -1681,15 +1681,15 @@ Int lux_for(Int nsym)
 #define ACTION_TRACE	2
 #define ACTION_STEP	4
 float	CPUtime = 0.0;
-Int execute(Int symbol)
+int32_t execute(int32_t symbol)
      /* executes LUX_EVB <symbol>.  Returns -1 on error, 1 on success, */
      /* various negative numbers on breaks, returns, etc. */
 {
   int16_t	*ptr;
-  Int	temp, temp2, temp3, n, c = 0, oldStep, go = 0, oldEVB, oldBreakpoint,
+  int32_t	temp, temp2, temp3, n, c = 0, oldStep, go = 0, oldEVB, oldBreakpoint,
     action;
-  static Int	atBreakpoint = 0;
-  extern Int	trace, step, traceMode, findBody, nWatchVars,
+  static int32_t	atBreakpoint = 0;
+  extern int32_t	trace, step, traceMode, findBody, nWatchVars,
   		tempVariableIndex, nBreakpoint;
   extern char	reportBody, ignoreSymbols, debugLine, evalScalPtr;
   extern char	*currentInputFile;
@@ -1703,10 +1703,10 @@ Int execute(Int symbol)
   void checkTemps(void);
 #endif
   float	newCPUtime;
-  Int	showstats(Int, Int []), getNewLine(char *, size_t, char *, char),
-    lux_restart(Int, Int []), showError(Int), insert(Int, Int []),
+  int32_t	showstats(int32_t, int32_t []), getNewLine(char *, size_t, char *, char),
+    lux_restart(int32_t, int32_t []), showError(int32_t), insert(int32_t, int32_t []),
     nextFreeStackEntry(void);
-  void showExecutionLevel(Int);
+  void showExecutionLevel(int32_t);
 
   curSymbol = symbol;		/* put in global so we know where an */
 				/* exception (interrupt) occurred, if any */
@@ -2056,7 +2056,7 @@ Int execute(Int symbol)
 	noTrace--;
       break;
     case EVB_IF:
-      temp = evals((Int) *ptr);			/* evaluate condition */
+      temp = evals((int32_t) *ptr);			/* evaluate condition */
       if (symbol_class(temp) != LUX_SCALAR) {
 	n = cerror(COND_NO_SCAL, symbol, "in IF-statement");
 	zapTemp(temp);
@@ -2100,7 +2100,7 @@ Int execute(Int symbol)
 	  continue;
 	} else if (n <= 0)
 	  break; 
-	temp3 = eval((Int) temp2);		/* condition */
+	temp3 = eval((int32_t) temp2);		/* condition */
 	n = int_arg(temp3);
 	if (symbol_class(temp3) != LUX_SCALAR)
 	  n = LUX_ERROR;
@@ -2126,7 +2126,7 @@ Int execute(Int symbol)
 	  continue;
 	else if (n <= 0)
 	  break;
-	temp3 = eval((Int) temp2);		/* condition */
+	temp3 = eval((int32_t) temp2);		/* condition */
 	n = int_arg(temp3);
 	if (symbol_class(temp3) != LUX_SCALAR)
 	  n = LUX_ERROR;
@@ -2148,7 +2148,7 @@ Int execute(Int symbol)
       if ((traceMode & T_LOOP) == 0)
 	noTrace++;
       while (1) {
-	temp3 = eval((Int) temp2);		/* condition */
+	temp3 = eval((int32_t) temp2);		/* condition */
 	if (symbol_class(temp3) != LUX_SCALAR)
 	  n = 0;
 	else n = int_arg(temp3);
@@ -2249,13 +2249,13 @@ Int execute(Int symbol)
   return n;
 }
 /*------------------------------------------------------------------*/
-Int lux_execute(Int narg, Int ps[])
+int32_t lux_execute(int32_t narg, int32_t ps[])
 /* execute a string as if it were typed at the keyboard */
 /* or execute the symbol indicated by number */
 /* keyword /MAIN (1) has the execution take place at the main level */
 {
-  Int	n, oldContext;
-  Int	compileString(char *);
+  int32_t	n, oldContext;
+  int32_t	compileString(char *);
 
   if (internalMode & 1)
   { oldContext = curContext;
@@ -2274,13 +2274,13 @@ Int lux_execute(Int narg, Int ps[])
   return n;
 }
 /*------------------------------------------------------------------*/
-Int compileString(char *string)
+int32_t compileString(char *string)
 /* compiles string <string> */
 {
   char	*oldInputString;
   extern char	*inputString;
-  extern Int	executeLevel;
-  Int	n;
+  extern int32_t	executeLevel;
+  int32_t	n;
 
   oldInputString = inputString;
   executeLevel++;
@@ -2295,12 +2295,12 @@ Int compileString(char *string)
 #define INNER	1
 #define OUTER	2
 
-Int insert(Int narg, Int ps[])
+int32_t insert(int32_t narg, int32_t ps[])
 /* an insertion statement with subscripted target */
 /* ps[0]..ps[narg-3]: subscripts; ps[narg - 2]: source;
    ps[narg - 1]: target */
 {
-  Int	target, source, i, iq, start[MAX_DIMS], width, *dims,
+  int32_t	target, source, i, iq, start[MAX_DIMS], width, *dims,
 	ndim, nelem, type, size[MAX_DIMS], subsc_type[MAX_DIMS],
 	*index[MAX_DIMS], *iptr, j, n, class, srcNdim, *srcDims, srcNelem,
 	srcType, stride[MAX_DIMS], tally[MAX_DIMS], offset0, nmult,
@@ -2309,8 +2309,8 @@ Int insert(Int narg, Int ps[])
   wideScalar	value;
   char	*name;
   FILE	*fp;
-  extern Int	trace, step;
-  Int	lux_assoc_output(Int, Int, Int, Int);
+  extern int32_t	trace, step;
+  int32_t	lux_assoc_output(int32_t, int32_t, int32_t, int32_t);
 
   target = ps[--narg];
   source = ps[--narg];
@@ -2382,7 +2382,7 @@ Int insert(Int narg, Int ps[])
       dims = array_dims(target);
       nelem = array_size(target);
       type = array_type(target);
-      trgt.l = (Int *) array_data(target);
+      trgt.l = (int32_t *) array_data(target);
       break;
   }
 
@@ -2426,7 +2426,7 @@ Int insert(Int narg, Int ps[])
       srcDims = array_dims(source);
       srcNelem = array_size(source);
       srcType = array_type(source);
-      src.l = (Int *) array_data(source);
+      src.l = (int32_t *) array_data(source);
       break;
   }
 
@@ -2477,7 +2477,7 @@ Int insert(Int narg, Int ps[])
 	  iq = lux_long(1, &iq); /* get LONG indices */
 	  n = size[i] = array_size(iq); /* number of array elements */
 	  if (n == 1) {		/* only one element: mimic scalar */
-	    start[i] = *(Int *) array_data(iq);
+	    start[i] = *(int32_t *) array_data(iq);
 	    if (narg == 1)	/* single subscript only */
 	      width = nelem;
 	    else
@@ -2486,7 +2486,7 @@ Int insert(Int narg, Int ps[])
 	      return cerror(ILL_SUBSC, iq, start[i], width);
 	    subsc_type[i] = LUX_RANGE;
 	  } else {
-	    iptr = index[i] = (Int *) array_data(iq);
+	    iptr = index[i] = (int32_t *) array_data(iq);
 	    if (narg == 1)	/* only a single subscript; addresses */
 				/* whole source array as if it were 1D */
 	      width = nelem;
@@ -2700,19 +2700,19 @@ Int insert(Int narg, Int ps[])
 	    case LUX_LONG:
 	      switch (srcType) {
 		case LUX_BYTE:
-		  trgt.l[offset] = (Int) *src.b;
+		  trgt.l[offset] = (int32_t) *src.b;
 		  break;
 		case LUX_WORD:
-		  trgt.l[offset] = (Int) *src.w;
+		  trgt.l[offset] = (int32_t) *src.w;
 		  break;
 		case LUX_LONG:
 		  trgt.l[offset] = *src.l;
 		  break;
 		case LUX_FLOAT:
-		  trgt.l[offset] = (Int) *src.f;
+		  trgt.l[offset] = (int32_t) *src.f;
 		  break;
 		case LUX_DOUBLE:
-		  trgt.l[offset] = (Int) *src.d;
+		  trgt.l[offset] = (int32_t) *src.d;
 		  break;
 		case LUX_CFLOAT:
 		  trgt.l[offset] = sqrt(src.cf->real*src.cf->real
@@ -2926,19 +2926,19 @@ Int insert(Int narg, Int ps[])
 	    case LUX_LONG:
 	      switch (srcType) {
 		case LUX_BYTE:
-		  value.l = (Int) *src.b;
+		  value.l = (int32_t) *src.b;
 		  break;
 		case LUX_WORD:
-		  value.l = (Int) *src.w;
+		  value.l = (int32_t) *src.w;
 		  break;
 		case LUX_LONG:
 		  value.l = *src.l;
 		  break;
 		case LUX_FLOAT:
-		  value.l = (Int) *src.f;
+		  value.l = (int32_t) *src.f;
 		  break;
 		case LUX_DOUBLE:
-		  value.l = (Int) *src.d;
+		  value.l = (int32_t) *src.d;
 		  break;
 		case LUX_CFLOAT:
 		  value.l = sqrt(src.cf->real*src.cf->real
@@ -3240,19 +3240,19 @@ Int insert(Int narg, Int ps[])
 	    case LUX_LONG:
 	      switch (srcType) {
 		case LUX_BYTE:
-		  trgt.l[offset] = (Int) *src.b;
+		  trgt.l[offset] = (int32_t) *src.b;
 		  break;
 		case LUX_WORD:
-		  trgt.l[offset] = (Int) *src.w;
+		  trgt.l[offset] = (int32_t) *src.w;
 		  break;
 		case LUX_LONG:
 		  trgt.l[offset] = *src.l;
 		  break;
 		case LUX_FLOAT:
-		  trgt.l[offset] = (Int) *src.f;
+		  trgt.l[offset] = (int32_t) *src.f;
 		  break;
 		case LUX_DOUBLE:
-		  trgt.l[offset] = (Int) *src.d;
+		  trgt.l[offset] = (int32_t) *src.d;
 		  break;
 		case LUX_CFLOAT:
 		  trgt.l[offset] = sqrt(src.cf->real*src.cf->real
@@ -3474,19 +3474,19 @@ Int insert(Int narg, Int ps[])
 	    case LUX_LONG:
 	      switch (srcType) {
 		case LUX_BYTE:
-		  value.l = (Int) *src.b;
+		  value.l = (int32_t) *src.b;
 		  break;
 		case LUX_WORD:
-		  value.l = (Int) *src.w;
+		  value.l = (int32_t) *src.w;
 		  break;
 		case LUX_LONG:
 		  value.l = *src.l;
 		  break;
 		case LUX_FLOAT:
-		  value.l = (Int) *src.f;
+		  value.l = (int32_t) *src.f;
 		  break;
 		case LUX_DOUBLE:
-		  value.l = (Int) *src.d;
+		  value.l = (int32_t) *src.d;
 		  break;
 		case LUX_CFLOAT:
 		  value.l = sqrt(src.cf->real*src.cf->real
@@ -3639,11 +3639,11 @@ Int insert(Int narg, Int ps[])
   return 1;
 }
 /*------------------------------------------------------------------*/
-Int einsert(Int lhs, Int rhs)
+int32_t einsert(int32_t lhs, int32_t rhs)
 /* an insertion statement with subscripted target */
 /* lhs = an LUX_EXTRACT symbol; rhs is already evaluated */
 {
-  Int	target, source, i, iq, start[MAX_DIMS], width, *dims,
+  int32_t	target, source, i, iq, start[MAX_DIMS], width, *dims,
     ndim, nelem, type, size[MAX_DIMS], subsc_type[MAX_DIMS],
     *index[MAX_DIMS], *iptr, j, n, class, srcNdim, *srcDims, srcNelem,
     srcType, stride[MAX_DIMS], tally[MAX_DIMS], offset0, nmult,
@@ -3654,9 +3654,9 @@ Int einsert(Int lhs, Int rhs)
   wideScalar	value;
   char	*name, keepps2;
   FILE	*fp;
-  extern Int	trace, step, insert_subr;
-  Int	lux_assoc_output(Int, Int, Int, Int),
-    treatListArguments(Int *, Int **, Int);
+  extern int32_t	trace, step, insert_subr;
+  int32_t	lux_assoc_output(int32_t, int32_t, int32_t, int32_t),
+    treatListArguments(int32_t *, int32_t **, int32_t);
 
   target = extract_target(lhs);
   source = rhs;
@@ -3682,7 +3682,7 @@ Int einsert(Int lhs, Int rhs)
   }
   oldInternalMode = internalMode;
   internalMode = 0;
-  ps2 = malloc((narg - nelem)*sizeof(Int));
+  ps2 = malloc((narg - nelem)*sizeof(int32_t));
   j = 0;
   if (!ps2)
     return cerror(ALLOC_ERR, 0);
@@ -3764,7 +3764,7 @@ Int einsert(Int lhs, Int rhs)
       dims = array_dims(target);
       nelem = array_size(target);
       type = array_type(target);
-      trgt.l = (Int *) array_data(target);
+      trgt.l = (int32_t *) array_data(target);
       break;
   }
 
@@ -3817,7 +3817,7 @@ Int einsert(Int lhs, Int rhs)
 	srcMult += (srcDims[i] > 1);
       srcNelem = array_size(source);
       srcType = array_type(source);
-      src.l = (Int *) array_data(source);
+      src.l = (int32_t *) array_data(source);
       break;
   }
 
@@ -3881,7 +3881,7 @@ Int einsert(Int lhs, Int rhs)
 	  iq = lux_long(1, &iq); /* get LONG indices */
 	  n = size[i] = array_size(iq); /* number of array elements */
 	  if (n == 1) {		/* only one element: mimic scalar */
-	    start[i] = *(Int *) array_data(iq);
+	    start[i] = *(int32_t *) array_data(iq);
 	    if (narg == 1)	/* single subscript only */
 	      width = nelem;
 	    else
@@ -3892,7 +3892,7 @@ Int einsert(Int lhs, Int rhs)
 	    }
 	    subsc_type[i] = LUX_RANGE;
 	  } else {
-	    iptr = index[i] = (Int *) array_data(iq);
+	    iptr = index[i] = (int32_t *) array_data(iq);
 	    keepps2 = 1;	/* we should not delete until the end of
 				 the routine, or else our index data
 				 may be clobbered too soon */
@@ -4146,19 +4146,19 @@ Int einsert(Int lhs, Int rhs)
 	    case LUX_LONG:
 	      switch (srcType) {
 		case LUX_BYTE:
-		  trgt.l[offset] = (Int) *src.b;
+		  trgt.l[offset] = (int32_t) *src.b;
 		  break;
 		case LUX_WORD:
-		  trgt.l[offset] = (Int) *src.w;
+		  trgt.l[offset] = (int32_t) *src.w;
 		  break;
 		case LUX_LONG:
 		  trgt.l[offset] = *src.l;
 		  break;
 		case LUX_FLOAT:
-		  trgt.l[offset] = (Int) *src.f;
+		  trgt.l[offset] = (int32_t) *src.f;
 		  break;
 		case LUX_DOUBLE:
-		  trgt.l[offset] = (Int) *src.d;
+		  trgt.l[offset] = (int32_t) *src.d;
 		  break;
 		case LUX_CFLOAT:
 		  trgt.l[offset] = sqrt(src.cf->real*src.cf->real
@@ -4373,19 +4373,19 @@ Int einsert(Int lhs, Int rhs)
 	    case LUX_LONG:
 	      switch (srcType) {
 		case LUX_BYTE:
-		  value.l = (Int) *src.b;
+		  value.l = (int32_t) *src.b;
 		  break;
 		case LUX_WORD:
-		  value.l = (Int) *src.w;
+		  value.l = (int32_t) *src.w;
 		  break;
 		case LUX_LONG:
 		  value.l = *src.l;
 		  break;
 		case LUX_FLOAT:
-		  value.l = (Int) *src.f;
+		  value.l = (int32_t) *src.f;
 		  break;
 		case LUX_DOUBLE:
-		  value.l = (Int) *src.d;
+		  value.l = (int32_t) *src.d;
 		  break;
 		case LUX_CFLOAT:
 		  value.l = sqrt(src.cf->real*src.cf->real
@@ -4703,19 +4703,19 @@ Int einsert(Int lhs, Int rhs)
 	    case LUX_LONG:
 	      switch (srcType) {
 		case LUX_BYTE:
-		  trgt.l[offset] = (Int) *src.b;
+		  trgt.l[offset] = (int32_t) *src.b;
 		  break;
 		case LUX_WORD:
-		  trgt.l[offset] = (Int) *src.w;
+		  trgt.l[offset] = (int32_t) *src.w;
 		  break;
 		case LUX_LONG:
 		  trgt.l[offset] = *src.l;
 		  break;
 		case LUX_FLOAT:
-		  trgt.l[offset] = (Int) *src.f;
+		  trgt.l[offset] = (int32_t) *src.f;
 		  break;
 		case LUX_DOUBLE:
-		  trgt.l[offset] = (Int) *src.d;
+		  trgt.l[offset] = (int32_t) *src.d;
 		  break;
 		case LUX_CFLOAT:
 		  trgt.l[offset] = sqrt(src.cf->real*src.cf->real
@@ -4938,19 +4938,19 @@ Int einsert(Int lhs, Int rhs)
 	    case LUX_LONG:
 	      switch (srcType) {
 		case LUX_BYTE:
-		  value.l = (Int) *src.b;
+		  value.l = (int32_t) *src.b;
 		  break;
 		case LUX_WORD:
-		  value.l = (Int) *src.w;
+		  value.l = (int32_t) *src.w;
 		  break;
 		case LUX_LONG:
 		  value.l = *src.l;
 		  break;
 		case LUX_FLOAT:
-		  value.l = (Int) *src.f;
+		  value.l = (int32_t) *src.f;
 		  break;
 		case LUX_DOUBLE:
-		  value.l = (Int) *src.d;
+		  value.l = (int32_t) *src.d;
 		  break;
 		case LUX_CFLOAT:
 		  value.l = sqrt(src.cf->real*src.cf->real
@@ -5112,10 +5112,10 @@ Int einsert(Int lhs, Int rhs)
   return iq;
 }
 /*------------------------------------------------------------------*/
-Int lux_test(Int narg, Int ps[])
+int32_t lux_test(int32_t narg, int32_t ps[])
 /* a test function */
 {
-  Int	n, value, *edge, i, *offset;
+  int32_t	n, value, *edge, i, *offset;
   loopInfo	info;
   pointer	src;
 

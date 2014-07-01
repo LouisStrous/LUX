@@ -26,18 +26,18 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <string.h>		/* for memcpy */
 
 typedef struct {
-  Int num_levels;
-  Int *nx;
-  Int *ny;
-  Int type;
+  int32_t num_levels;
+  int32_t *nx;
+  int32_t *ny;
+  int32_t type;
   pointer data;
   pointer *levels;
 } *Pyramid;
 
-Int lux_laplace2d(Int narg, Int ps[])
+int32_t lux_laplace2d(int32_t narg, int32_t ps[])
 /* LAPLACE(img) calculates the Laplacian of 2D <img> */
 {
-  Int img, nx, ny, result, i, j;
+  int32_t img, nx, ny, result, i, j;
   pointer src, tgt;
 
   img = ps[0];
@@ -144,10 +144,10 @@ Int lux_laplace2d(Int narg, Int ps[])
   return result;
 }
   
-Int gauss_seidel_2d2o(pointer b, pointer x, scalar sx, scalar sy, Int type,
-		      Int nx, Int ny)
+int32_t gauss_seidel_2d2o(pointer b, pointer x, scalar sx, scalar sy, int32_t type,
+		      int32_t nx, int32_t ny)
 {
-  Int i, j;
+  int32_t i, j;
   scalar s;
   
   switch (type) {
@@ -255,10 +255,10 @@ Int gauss_seidel_2d2o(pointer b, pointer x, scalar sx, scalar sy, Int type,
   return 0;
 }
 
-void restrict2(pointer b, pointer x, Int type, Int nx, Int ny, scalar sx, 
-	      scalar sy, Int do_residual, pointer tgt)
+void restrict2(pointer b, pointer x, int32_t type, int32_t nx, int32_t ny, scalar sx, 
+	      scalar sy, int32_t do_residual, pointer tgt)
 {
-  Int i, j, nx2, ny2;
+  int32_t i, j, nx2, ny2;
   pointer r0, r;		/* nx+2 by 3 elements */
 
   nx2 = nx/2;
@@ -423,13 +423,13 @@ void restrict2(pointer b, pointer x, Int type, Int nx, Int ny, scalar sx,
   }
 }
 
-void restrict_residual(pointer b, pointer x, Int type, Int nx, Int ny,
+void restrict_residual(pointer b, pointer x, int32_t type, int32_t nx, int32_t ny,
 		      scalar sx, scalar sy, pointer tgt)
 {
   restrict2(b, x, type, nx, ny, sx, sy, 1, tgt);
 }
 
-void restrict(pointer x, Int type, Int nx, Int ny, pointer tgt)
+void restrict(pointer x, int32_t type, int32_t nx, int32_t ny, pointer tgt)
 {
   scalar dummy;
 
@@ -437,9 +437,9 @@ void restrict(pointer x, Int type, Int nx, Int ny, pointer tgt)
   restrict2(x, x, type, nx, ny, dummy, dummy, 0, tgt);
 }
 
-Int lux_antilaplace2d(Int narg, Int ps[])
+int32_t lux_antilaplace2d(int32_t narg, int32_t ps[])
 {
-  Int img, result = LUX_ERROR, nx, ny, type, nx2, ny2, nlevel, i, nelem;
+  int32_t img, result = LUX_ERROR, nx, ny, type, nx2, ny2, nlevel, i, nelem;
   pointer src, tgt;
   Pyramid pyramid;
 
@@ -530,7 +530,7 @@ Int lux_antilaplace2d(Int narg, Int ps[])
   //  gauss_seidel_2d2o(src, tgt, sx, sy, type, nx, ny);
 
   {
-    Int ndim, *dims;
+    int32_t ndim, *dims;
 
     ndim = array_num_dims(img);
     ALLOCATE(dims, ndim + 1);

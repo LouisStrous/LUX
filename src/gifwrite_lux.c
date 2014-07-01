@@ -50,28 +50,28 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
         unsigned char height_msb;
         unsigned char mask;
  } ;
- static void compress(Int, FILE *, uint8_t *, Int), output(Int),
-   cl_block(void), cl_hash(register Int) /*, char_init()*/;
- static void char_out(Int), flush_char(void);
+ static void compress(int32_t, FILE *, uint8_t *, int32_t), output(int32_t),
+   cl_block(void), cl_hash(register int32_t) /*, char_init()*/;
+ static void char_out(int32_t), flush_char(void);
 
-Int	lux_gifwrite(Int, Int []);
+int32_t	lux_gifwrite(int32_t, int32_t []);
  /*------------------------------------------------------------------------- */
-Int lux_gifwrite_f(narg, ps)
+int32_t lux_gifwrite_f(narg, ps)
  /* a function version that returns 1 if read OK */
- Int	narg, ps[];
+ int32_t	narg, ps[];
  {
  if ( lux_gifwrite(narg, ps) == 1 ) return 1; else return 4;
  }
  /*------------------------------------------------------------------------- */
-Int lux_gifwrite(narg,ps)      /* gifwrite subroutine */
+int32_t lux_gifwrite(narg,ps)      /* gifwrite subroutine */
  /* write a very plain gif file, 8 bit deep */
  /* call is gifwrite,array,file,[map] where map is the color map 
  and must be (3,256) I*1 in rgb triplets */
- Int    narg, ps[];
+ int32_t    narg, ps[];
  {
  FILE	*fout;
- Int    iq, nd, type, i;
- Int    nx, ny, ncolmap;
+ int32_t    iq, nd, type, i;
+ int32_t    nx, ny, ncolmap;
  uint8_t   codesize=8;
  char   *p, *data, *colormap, *name;
  struct ahead   *h, *h2;
@@ -146,7 +146,7 @@ Int lux_gifwrite(narg,ps)      /* gifwrite subroutine */
  }
  /*------------------------------------------------------------------------- */
  static unsigned long cur_accum = 0;
- static Int           cur_bits = 0;
+ static int32_t           cur_bits = 0;
 
 #define min(a,b)        ((a>b) ? b : a)
 #define XV_BITS 12    /* BITS was already defined on some systems */
@@ -155,19 +155,19 @@ Int lux_gifwrite(narg,ps)      /* gifwrite subroutine */
 
  typedef unsigned char   char_type;
  
- static Int n_bits;                    /* number of bits/code */
- static Int maxbits = XV_BITS;         /* user settable max # bits/code */
- static Int maxcode;                   /* maximum code, given n_bits */
- static Int maxmaxcode = 1 << XV_BITS; /* NEVER generate this */
+ static int32_t n_bits;                    /* number of bits/code */
+ static int32_t maxbits = XV_BITS;         /* user settable max # bits/code */
+ static int32_t maxcode;                   /* maximum code, given n_bits */
+ static int32_t maxmaxcode = 1 << XV_BITS; /* NEVER generate this */
 
 #define MAXCODE(n_bits)     ( (1 << (n_bits)) - 1)
 
- static  Int      htab [HSIZE];
+ static  int32_t      htab [HSIZE];
  static  unsigned short codetab [HSIZE];
 #define HashTabOf(i)   htab[i]
 #define CodeTabOf(i)   codetab[i]
 
- static Int hsize = HSIZE;            /* for dynamic table sizing */
+ static int32_t hsize = HSIZE;            /* for dynamic table sizing */
 
  /*
  * To save much memory, we overlay the table used by compress() with those
@@ -182,13 +182,13 @@ Int lux_gifwrite(narg,ps)      /* gifwrite subroutine */
 #define tab_suffixof(i)        ((char_type *)(htab))[i]
 #define de_stack               ((char_type *)&tab_suffixof(1<<XV_BITS))
 
-static Int free_ent = 0;       /* first unused entry */
+static int32_t free_ent = 0;       /* first unused entry */
 
  /*
  * block compression parameters -- after all codes are used up,
  * and compression rate changes, start over.
  */
- static Int clear_flg = 0;
+ static int32_t clear_flg = 0;
  static int64_t in_count = 1;            /* length of input */
  static int64_t out_count = 0;           /* # of codes output (for debugging) */
 
@@ -208,22 +208,22 @@ static Int free_ent = 0;       /* first unused entry */
  * questions about this implementation to ames!jaw.
  */
 
- static Int g_init_bits;
+ static int32_t g_init_bits;
  static FILE *g_outfile;
  
- static Int ClearCode;
- static Int EOFCode;
+ static int32_t ClearCode;
+ static int32_t EOFCode;
 
  /********************************************************/
-static void compress(Int init_bits, FILE *outfile, uint8_t *data, Int len)
+static void compress(int32_t init_bits, FILE *outfile, uint8_t *data, int32_t len)
  {
   register long fcode;
-  register Int i = 0;
-  register Int c;
-  register Int ent;
-  register Int disp;
-  register Int hsize_reg;
-  register Int hshift;
+  register int32_t i = 0;
+  register int32_t c;
+  register int32_t ent;
+  register int32_t disp;
+  register int32_t hsize_reg;
+  register int32_t hshift;
 
   /*
    * Set up the globals:  g_init_bits - initial number of bits
@@ -265,7 +265,7 @@ static void compress(Int init_bits, FILE *outfile, uint8_t *data, Int len)
   hshift = 8 - hshift;                /* set hash code range bound */
 
   hsize_reg = hsize;
-  cl_hash( (Int) hsize_reg);            /* clear hash table */
+  cl_hash( (int32_t) hsize_reg);            /* clear hash table */
 
   output(ClearCode);
     
@@ -274,7 +274,7 @@ static void compress(Int init_bits, FILE *outfile, uint8_t *data, Int len)
     in_count++;
 
     fcode = (long) ( ( (long) c << maxbits) + ent);
-    i = (((Int) c << hshift) ^ ent);    /* xor hashing */
+    i = (((int32_t) c << hshift) ^ ent);    /* xor hashing */
 
     if ( HashTabOf (i) == fcode ) {
       ent = CodeTabOf (i);
@@ -341,7 +341,7 @@ static void compress(Int init_bits, FILE *outfile, uint8_t *data, Int len)
                                   0x01FF, 0x03FF, 0x07FF, 0x0FFF,
                                   0x1FFF, 0x3FFF, 0x7FFF, 0xFFFF };
 
-static void output(Int code)
+static void output(int32_t code)
  {
   cur_accum &= masks[cur_bits];
 
@@ -401,16 +401,16 @@ static void cl_block(void)	/* table clear for block compress */
  {
   /* Clear out the hash table */
 
-  cl_hash ( (Int) hsize );
+  cl_hash ( (int32_t) hsize );
   free_ent = ClearCode + 2;
   clear_flg = 1;
 
   output(ClearCode);
  }
  /********************************/
-static void cl_hash(register Int hsize)          /* reset code table */
+static void cl_hash(register int32_t hsize)          /* reset code table */
  {
-  register Int *htab_p = htab+hsize;
+  register int32_t *htab_p = htab+hsize;
   register long i;
   register long m1 = -1;
 
@@ -446,7 +446,7 @@ static void cl_hash(register Int hsize)          /* reset code table */
  /*
  * Number of characters so far in this 'packet'
  */
-static Int a_count;
+static int32_t a_count;
 
  /*
  * Set up the 'Byte output' routine
@@ -465,7 +465,7 @@ static void char_init()
  * Add a character to the end of the current packet, and if it is 254
  * characters, flush the packet to disk.
  */
-static void char_out(Int c)
+static void char_out(int32_t c)
  {
   accum[ a_count++ ] = c;
   if( a_count >= 254 ) 

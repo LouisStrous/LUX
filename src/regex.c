@@ -27,14 +27,14 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <sys/types.h>
 #include <string.h>
 
-static Int countMatches(char *text) {
-  Int n = 1;
+static int32_t countMatches(char *text) {
+  int32_t n = 1;
   char *p = text;
 
   while (p = strchr(p, '(')) {
     if (p > text) {
-      Int n = p - text;
-      Int i = 1;
+      int32_t n = p - text;
+      int32_t i = 1;
 
       while (i <= n && text[n - i] == '\\')
 	i++;
@@ -57,12 +57,12 @@ If no <regex> is specified, then the last one is used again.
 
 */
 
-Int lux_regex(Int narg, Int ps[]) {
+int32_t lux_regex(int32_t narg, int32_t ps[]) {
   char *text, *regex;
-  Int result, flags, i;
+  int32_t result, flags, i;
   static regex_t preg;
   static regmatch_t *pmatch = NULL;
-  static Int nmatch = 0;
+  static int32_t nmatch = 0;
 
   text = string_arg(ps[0]);
   if (!text)
@@ -77,7 +77,7 @@ Int lux_regex(Int narg, Int ps[]) {
     regfree(&preg);		/* clean out previous one */
     result = regcomp(&preg, regex, REG_EXTENDED);
     if (result) {
-      Int size;
+      int32_t size;
       char errbuf[256];
     
       size = regerror(result, &preg, errbuf, 256);
@@ -102,7 +102,7 @@ Int lux_regex(Int narg, Int ps[]) {
       p = (char **) array_data(result);
       for (i = 0; i < nmatch; i++) {
 	if (pmatch[i].rm_so >= 0) {
-	  Int len;
+	  int32_t len;
 	
 	  len = pmatch[i].rm_eo - pmatch[i].rm_so;
 	  *p = malloc(len + 1);
@@ -119,7 +119,7 @@ Int lux_regex(Int narg, Int ps[]) {
       }
     } else {			/* nmatch == 1 */
       char *p;
-      Int len;
+      int32_t len;
 	
       len = pmatch[0].rm_eo - pmatch[0].rm_so;
       result = string_scratch(len);

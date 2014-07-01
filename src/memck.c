@@ -28,11 +28,11 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #ifdef SBRK_H
 #include SBRK_H
 #else
-void	*sbrk(Int);
+void	*sbrk(int32_t);
 #endif
 
 /*-------------------------------------------------------------------*/
-Int lux_memstat(Int narg, Int ps[])
+int32_t lux_memstat(int32_t narg, int32_t ps[])
 /* returns some info on memory usage */
 {
  char		*p;
@@ -44,10 +44,10 @@ Int lux_memstat(Int narg, Int ps[])
  return 1;
 }
 /*-------------------------------------------------------------------*/
-Int lux_memory(Int narg, Int ps[])
+int32_t lux_memory(int32_t narg, int32_t ps[])
      /* returns size of allocated memory */
 {
-  Int	result;
+  int32_t	result;
   char	*p;
   extern char	*firstbreak;
 

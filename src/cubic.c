@@ -18,7 +18,7 @@ You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 /*------------------------------------------------------------------------- */
-Int lux_cubic_spline(Int narg, Int ps[])
+int32_t lux_cubic_spline(int32_t narg, int32_t ps[])
 /* Cubic spline interpolation along the first dimension of an array.
    ynew = CSPLINE(xtab, ytab [, xnew][, d1, d2][,/keep])
      interpolates in the table of <ytab> versus <xtab> (must be in
@@ -39,11 +39,11 @@ Int lux_cubic_spline(Int narg, Int ps[])
    LS 29apr96 */
 {
   static char	haveTable = '\0';
-  Int	xNewSym = 0, xTabSym = 0, yTabSym, d1Sym = 0, d2Sym, size,
+  int32_t	xNewSym = 0, xTabSym = 0, yTabSym, d1Sym = 0, d2Sym, size,
 	oldType, n;
   pointer	src, trgt, p, q;
   float	a, b, c, x;
-  static Int	nPoints, type;
+  static int32_t	nPoints, type;
   static pointer	xTable, yTable, der2;
 
   /* first check on all the arguments */

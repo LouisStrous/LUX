@@ -32,13 +32,13 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #define _Xdebug			/* to get synchronous X error messages */
 #endif
 
-Int	ipen = 7, ipost = 0;
-extern Int	landscape;
-static Int	nline = 0,	/* number of lines since last Stroke */
+int32_t	ipen = 7, ipost = 0;
+extern int32_t	landscape;
+static int32_t	nline = 0,	/* number of lines since last Stroke */
   icnt = 0;			/* number of chars on current output line */
 static float	xq, yq;
 extern float	current_gray;
-extern Int	current_pen;
+extern int32_t	current_pen;
 FILE	*postScriptFp;
 void	xyup(void), xydown(void);
 /*------------------------------------------------------------------------*/
@@ -49,10 +49,10 @@ void	xyup(void), xydown(void);
   r g b setrgbcolor	selects DeviceRGB color space
   width height bits/comp matrix datasrc false 3 colorimage
  */
-Int postreset(Int landscape)
+int32_t postreset(int32_t landscape)
 {
  char	*fname = NULL;
- extern Int	psfile, updateBoundingBox;
+ extern int32_t	psfile, updateBoundingBox;
 
  if (ipost == 0) {	/* check if already started up */
    if (symbol_type(psfile) == LUX_TEMP_STRING)
@@ -88,7 +88,7 @@ Int postreset(Int landscape)
  return 1;
 }
 /*------------------------------------------------------------------------*/
-Int postpen(Int pen, float gray)
+int32_t postpen(int32_t pen, float gray)
 {
   if (postreset(landscape) == LUX_ERROR) /* start up if not already */
     return LUX_ERROR;
@@ -104,7 +104,7 @@ Int postpen(Int pen, float gray)
   return 1;
 }
 /*------------------------------------------------------------------------*/
-Int postcolorpen(float red, float green, float blue)
+int32_t postcolorpen(float red, float green, float blue)
 {
   postreset(landscape);		/* start up if not already */
   if (nline) {
@@ -119,7 +119,7 @@ Int postcolorpen(float red, float green, float blue)
   return 1;
 }
 /*------------------------------------------------------------------------*/
-Int postvec(float xin, float yin, Int mode)
+int32_t postvec(float xin, float yin, int32_t mode)
 {
   if (postreset(landscape) == LUX_ERROR) /* start up if not already */
     return LUX_ERROR;
@@ -147,7 +147,7 @@ Int postvec(float xin, float yin, Int mode)
 /*------------------------------------------------------------------------*/
 void xyup(void)
 {
-  extern Int	alternateDash;
+  extern int32_t	alternateDash;
 
   if (alternateDash)
     fprintf(postScriptFp, " %.6f setgray %.4f %.4f L %.6f setgray",
@@ -163,7 +163,7 @@ void xydown(void)
   icnt += 14;
 }
 /*------------------------------------------------------------------------*/
-Int postcopy()
+int32_t postcopy()
 {
   if (!ipost) {			/* if the output file is not yet opened, */
 	/* then we don't need to generate an empty page with "showpage". */
@@ -184,7 +184,7 @@ Int postcopy()
   return 1;
 }
 /*------------------------------------------------------------------------*/
-Int postrawout(char *s)
+int32_t postrawout(char *s)
 {
   if (postreset(landscape) == LUX_ERROR) /* start up if not already */
     return LUX_ERROR;
@@ -196,11 +196,11 @@ Int postrawout(char *s)
   return 1;
 }
 /*------------------------------------------------------------------------*/
-Int postgray(char *barray, Int nx, Int ny, float xbot, float xtop, float ybot,
-	     float ytop, Int iorder)
+int32_t postgray(char *barray, int32_t nx, int32_t ny, float xbot, float xtop, float ybot,
+	     float ytop, int32_t iorder)
 {
-  Int	matrx[6], i;
-  Int	c;
+  int32_t	matrx[6], i;
+  int32_t	c;
   extern float	postXBot, postXTop, postYBot, postYTop;
 
   for (i = 0; i < 6; i++)
@@ -291,16 +291,16 @@ Int postgray(char *barray, Int nx, Int ny, float xbot, float xtop, float ybot,
   return 1;
 }
 /*------------------------------------------------------------------------*/
-Int postcolor(char *barray, Int nx, Int ny, float xbot, float xtop, float ybot,
-	      float ytop, Int iorder)
+int32_t postcolor(char *barray, int32_t nx, int32_t ny, float xbot, float xtop, float ybot,
+	      float ytop, int32_t iorder)
 /* writes an RGB image to a postscript file.  The image has dimensions
  <nx> by <ny> and has three bytes of color information per pixel, in
  the order red, green, blue.  <xbot>, <xtop>, <ybot>, <ytop> selects
  the coordinate ranges (in PostScript units) where the image is displayed.
  LS 10oct99 */
 {
-  Int	matrx[6], i, s;
-  Int	c;
+  int32_t	matrx[6], i, s;
+  int32_t	c;
   extern float	postXBot, postXTop, postYBot, postYTop;
 
   for (i = 0; i < 6; i++)
@@ -395,12 +395,12 @@ Int postcolor(char *barray, Int nx, Int ny, float xbot, float xtop, float ybot,
   return LUX_OK;
 }
 /*------------------------------------------------------------------------*/
-Int postrelease(Int narg, Int ps[])
+int32_t postrelease(int32_t narg, int32_t ps[])
 {
   char  ok = 0;
-  Int	bb1, bb2, bb3, bb4;
+  int32_t	bb1, bb2, bb3, bb4;
   extern float	postXBot, postXTop, postYBot, postYTop;
-  extern Int	psfile;
+  extern int32_t	psfile;
 
   if (ipost) {
     if (narg)
@@ -438,15 +438,15 @@ Int postrelease(Int narg, Int ps[])
       }
       if (!ok) {
 	if (landscape) {
-	  bb1 = (Int) (594 - 720*postYTop);
-	  bb2 = (Int) (36 + 720*postXBot);
-	  bb3 = (Int) (594 - 720*postYBot);
-	  bb4 = (Int) (36 + 720*postXTop);
+	  bb1 = (int32_t) (594 - 720*postYTop);
+	  bb2 = (int32_t) (36 + 720*postXBot);
+	  bb3 = (int32_t) (594 - 720*postYBot);
+	  bb4 = (int32_t) (36 + 720*postXTop);
 	} else {
-	  bb1 = (Int) (720*(0.05 + postXBot));
-	  bb2 = (Int) (720*(0.025+ postYBot));
-	  bb3 = (Int) (720*(0.05 + postXTop));
-	  bb4 = (Int) (720*(0.025 + postYTop));
+	  bb1 = (int32_t) (720*(0.05 + postXBot));
+	  bb2 = (int32_t) (720*(0.025+ postYBot));
+	  bb3 = (int32_t) (720*(0.05 + postXTop));
+	  bb4 = (int32_t) (720*(0.025 + postYTop));
 	}	  
       }
       fprintf(postScriptFp, "% 4.4d % 4.4d % 4.4d % 4.4d", bb1, bb2, bb3, bb4);

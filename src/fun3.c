@@ -36,25 +36,25 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "editorcharclass.h"
 #include "luxparser.h"
 
-Int	ezffti(Int *, float *), fade_xsize, fade_ysize, fade_dim[2];
-Int rffti(Int *, float *);
-Int rfftb(Int *, float *, float *);
-Int rfftf(Int *, float *, float *);
-Int rfftid(Int *, double *);
-Int rfftbd(Int *, double *, double *);
-Int rfftfd(Int *, double *, double *);
+int32_t	ezffti(int32_t *, float *), fade_xsize, fade_ysize, fade_dim[2];
+int32_t rffti(int32_t *, float *);
+int32_t rfftb(int32_t *, float *, float *);
+int32_t rfftf(int32_t *, float *, float *);
+int32_t rfftid(int32_t *, double *);
+int32_t rfftbd(int32_t *, double *, double *);
+int32_t rfftfd(int32_t *, double *, double *);
 int16_t	*fade1, *fade2;
-extern Int	scalemax, scalemin, lastmaxloc, lastminloc, maxhistsize,
+extern int32_t	scalemax, scalemin, lastmaxloc, lastminloc, maxhistsize,
   histmin, histmax, fftdp, lastmax_sym, lastmin_sym, errno;
 extern scalar	lastmin, lastmax;
-static	Int	nold = 0, fftdpold, mqold;
+static	int32_t	nold = 0, fftdpold, mqold;
 static pointer	work;
-Int	minmax(Int *, Int, Int), neutral(void *, Int);
-void	zerobytes(void *, Int), zap(Int);
-Int	simple_scale(void *, Int, Int, void *);
-void convertWidePointer(wideScalar *, Int, Int);
+int32_t	minmax(int32_t *, int32_t, int32_t), neutral(void *, int32_t);
+void	zerobytes(void *, int32_t), zap(int32_t);
+int32_t	simple_scale(void *, int32_t, int32_t, void *);
+void convertWidePointer(wideScalar *, int32_t, int32_t);
 /*------------------------------------------------------------------------- */
-Int evalString(char *expr, Int nmax)
+int32_t evalString(char *expr, int32_t nmax)
 /* compiles and evaluates a string, interpreting it as code */
 /* non-strings are just evaluated.  If the second argument it set, */
 /* then it determines up to how many numbers are read from the string */
@@ -68,15 +68,15 @@ Int evalString(char *expr, Int nmax)
 /* LS 2may96 */
 {
  char	*save, *text;
- Int	result, readNumber(YYSTYPE *), n, type, temp, size;
- void	translateLine(void), convertScalar(scalar *, Int, Int);
+ int32_t	result, readNumber(YYSTYPE *), n, type, temp, size;
+ void	translateLine(void), convertScalar(scalar *, int32_t, int32_t);
  pointer	p;
  scalar	s;
  extern char	*currentChar;
- extern Int	tempSym;
+ extern int32_t	tempSym;
  YYSTYPE	valp;
  int16_t	popList(void);
- Int	compileString(char *);
+ int32_t	compileString(char *);
  void	pushList(int16_t);
 
  if (nmax < 0)			/* /ALLNUMBER */
@@ -136,13 +136,13 @@ Int evalString(char *expr, Int nmax)
  return (result > 0)? copySym(tempSym): LUX_ERROR;
 }
 /*------------------------------------------------------------------------- */
-Int lux_eval(Int narg, Int ps[])
+int32_t lux_eval(int32_t narg, int32_t ps[])
 /* evaluates a string argument.  If there is a single argument and that
    argument is a single name, then we seek the number of the symbol that
    has that name and return the number, if any.  Otherwise we return the
    value of the expression.  LS 7jan99 */
 {
-  Int	nmax, result;
+  int32_t	nmax, result;
   char	*expr, *p1, *p2, *p3, c;
   
   if (symbol_class(*ps) != LUX_STRING)
@@ -158,14 +158,14 @@ Int lux_eval(Int narg, Int ps[])
   expr = string_arg(*ps);
 
   p1 = expr;
-  while (*p1 && isWhiteSpace((Int) *p1))
+  while (*p1 && isWhiteSpace((int32_t) *p1))
     p1++;
-  if (isFirstChar((Int) *p1)) {	/* an identifier? */
+  if (isFirstChar((int32_t) *p1)) {	/* an identifier? */
     p2 = p1 + 1;
-    while (isNextChar((Int) *p2)) /* span the identifier */
+    while (isNextChar((int32_t) *p2)) /* span the identifier */
       p2++;
     p3 = p2;
-    while (*p3 && isWhiteSpace((Int) *p3))
+    while (*p3 && isWhiteSpace((int32_t) *p3))
       p3++;
     if (!*p3) {			/* found an identifier and whitespace */
       c = *p2;			/* save */
@@ -196,17 +196,17 @@ Int lux_eval(Int narg, Int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-Int lux_tense(Int narg, Int ps[])			/* tense function */ 
+int32_t lux_tense(int32_t narg, int32_t ps[])			/* tense function */ 
 /* splines under tension */
 /* THE CALL IS  YF=TENSE(X,Y,XF,[SIGMA],[DLHS,DRHS]) */
 {
-  Int	i, iq, len[3], n, result_sym, nf;
+  int32_t	i, iq, len[3], n, result_sym, nf;
   double	sigma, der_left, der_right, *st, *yf;
   pointer p[3];
   array	*h;
-  Int	curv1_(Int *n, double *x, double *y, double *slp1, double *slpn,
+  int32_t	curv1_(int32_t *n, double *x, double *y, double *slp1, double *slpn,
 	   double *yp, double *temp, double *sigma, double *xf, double *yf,
-	   Int *nf);
+	   int32_t *nf);
 					/* first 3 args must be 1-D vectors */
   for (i=0;i<3;i++) {
     iq = ps[i];
@@ -217,7 +217,7 @@ Int lux_tense(Int narg, Int ps[])			/* tense function */
     iq = lux_double(1, &iq);
     h = (array *) sym[iq].spec.array.ptr;
     len[i] = h->dims[0];
-    p[i].l = (Int *) ((char *)h + sizeof(array));
+    p[i].l = (int32_t *) ((char *)h + sizeof(array));
   }
   /* take smaller of X and Y size */
   n = MIN( len[0], len[1]);
@@ -240,7 +240,7 @@ Int lux_tense(Int narg, Int ps[])			/* tense function */
   if ( iq == 1) return result_sym; else return -1;
 }
 /*------------------------------------------------------------------------- */
-Int lux_tense_curve(Int narg, Int ps[])/* tense_curve function */
+int32_t lux_tense_curve(int32_t narg, int32_t ps[])/* tense_curve function */
 /* splines under tension */
 /* THE CALL IS  XY=TENSE_CURVE(X,Y,XS,[SIGMA],[DLHS,DRHS]) */
 {
@@ -254,13 +254,13 @@ Int lux_tense_curve(Int narg, Int ps[])/* tense_curve function */
   the output is a 2-D array containing matching x and y coordinates on
   the curve
 */
-  Int	i, iq, len[3], n, result_sym, dim[2], nf;
+  int32_t	i, iq, len[3], n, result_sym, dim[2], nf;
   double	sigma, der_left, der_right, *st, *yf, *xf;
   pointer p[3];
   array	*h;
-  Int	kurv1_(Int *n, double *x, double *y, double *slp1, double *slpn,
+  int32_t	kurv1_(int32_t *n, double *x, double *y, double *slp1, double *slpn,
 	   double *xp, double *yp, double *temp, double *sigma, double *t,
-	   double *xs, double *ys, Int *nf);
+	   double *xs, double *ys, int32_t *nf);
 
 				/* first 3 args must be 1-D vectors */
 for (i=0;i<3;i++) {
@@ -272,7 +272,7 @@ if ( h->ndim != 1) return cerror(NEED_1D_ARR, ps[i]); 	/* ck if 1-D */
 iq = lux_double(1, &iq);
 h = (array *) sym[iq].spec.array.ptr;
 len[i] = h->dims[0];
-p[i].l = (Int *) ((char *)h + sizeof(array));
+p[i].l = (int32_t *) ((char *)h + sizeof(array));
 }
 /* take smaller of X and Y size */
 n = MIN( len[0], len[1]);
@@ -294,7 +294,7 @@ free( st);
 if ( iq == 1) return result_sym; else return -1;
 }
 /*------------------------------------------------------------------------- */
-Int lux_tense_loop(Int narg, Int ps[])/* tense_loop function */		
+int32_t lux_tense_loop(int32_t narg, int32_t ps[])/* tense_loop function */		
 /* generates spline under tension for any closed (x,y) curve */
 /* THE CALL IS  XY=TENSE_LOOP(X,Y,XS,[SIGMA]) */
 {
@@ -308,13 +308,13 @@ Int lux_tense_loop(Int narg, Int ps[])/* tense_loop function */
     the output is a 2-D array containing matching x and y coordinates on
     the curve
     */
-  Int	i, iq, len[3], n, result_sym, dim[2], nf;
+  int32_t	i, iq, len[3], n, result_sym, dim[2], nf;
   double	sigma, *st, *yf, *xf;
   pointer p[3];
   array	*h;
-  Int kurvp1_(Int *n, double *x, double *y, double *xp, double *yp,
+  int32_t kurvp1_(int32_t *n, double *x, double *y, double *xp, double *yp,
 	      double *temp, double *sigma, double *t, double *xs, double *ys,
-	      Int *nf);
+	      int32_t *nf);
 					/* first 3 args must be 1-D vectors */
 for (i=0;i<3;i++) {
 iq = ps[i];
@@ -325,7 +325,7 @@ if ( h->ndim != 1) return cerror(NEED_1D_ARR, ps[i]); 	/* ck if 1-D */
 iq = lux_double(1, &iq);
 h = (array *) sym[iq].spec.array.ptr;
 len[i] = h->dims[0];
-p[i].l = (Int *) ((char *)h + sizeof(array));
+p[i].l = (int32_t *) ((char *)h + sizeof(array));
 }
 /* take smaller of X and Y size */
 n = MIN( len[0], len[1]);
@@ -346,14 +346,14 @@ free( st);
 if ( iq == 1) return result_sym; else return -1;
 }
 /*------------------------------------------------------------------------- */
-Int lux_sc(Int narg, Int ps[])	/* sc routine */		
+int32_t lux_sc(int32_t narg, int32_t ps[])	/* sc routine */		
 /* sine-cosine style FFT --  sc, x, s, c */
 {
-  Int	iq, nd, outer, n, mq, dim[MAX_DIMS], type, jq, nn;
+  int32_t	iq, nd, outer, n, mq, dim[MAX_DIMS], type, jq, nn;
   pointer	q1,q2,q3;
-  Int	ezffti(Int *n, float *wsave), ezfftid(Int *n, double *wsave),
-    ezfftf(Int *n, float *r, float *azero, float *a, float *b, float *wsave),
-    ezfftfd(Int *n, double *r, double *azero, double *a, double *b,
+  int32_t	ezffti(int32_t *n, float *wsave), ezfftid(int32_t *n, double *wsave),
+    ezfftf(int32_t *n, float *r, float *azero, float *a, float *b, float *wsave),
+    ezfftfd(int32_t *n, double *r, double *azero, double *a, double *b,
 	    double *wsave);
 
   iq = ps[0];
@@ -371,7 +371,7 @@ Int lux_sc(Int narg, Int ps[])	/* sc routine */
   nd = array_num_dims(iq);
   n = array_dims(iq)[0];
   outer = array_size(iq)/n;
-  memcpy(dim + 1, array_dims(iq)+ 1, (nd - 1)*sizeof(Int));
+  memcpy(dim + 1, array_dims(iq)+ 1, (nd - 1)*sizeof(int32_t));
   mq = array_size(iq)*lux_type_size[array_type(iq)];
 
 	/* scratch storage is needed, can we use the last one setup ? */
@@ -381,7 +381,7 @@ Int lux_sc(Int narg, Int ps[])	/* sc routine */
     mq = n*28 + 120;
     if (!fftdp)
       mq = mq/2;
-    work.l = (Int *) malloc(mq);
+    work.l = (int32_t *) malloc(mq);
     if (!fftdp)
       ezffti(&n, work.f);
     else
@@ -427,15 +427,15 @@ Int lux_sc(Int narg, Int ps[])	/* sc routine */
 #include <gsl/gsl_fft_real.h>
 #include <gsl/gsl_fft_halfcomplex.h>
 static gsl_fft_real_wavetable* rwave = NULL;
-static Int nrwave = -1;
+static int32_t nrwave = -1;
 static gsl_fft_real_workspace* rwork = NULL;
-static Int nrwork = -1;
+static int32_t nrwork = -1;
 static gsl_fft_halfcomplex_wavetable* hwave = NULL;
-static Int nhwave = -1;
+static int32_t nhwave = -1;
 static double *ffttemp = NULL;
-static Int nffttemp = -1;
+static int32_t nffttemp = -1;
 
-gsl_fft_real_wavetable *update_rwave(Int n)
+gsl_fft_real_wavetable *update_rwave(int32_t n)
 {
   if (n != nrwave) {
     gsl_fft_real_wavetable_free(rwave);
@@ -452,7 +452,7 @@ void clear_rwave(void)
   nrwave = -1;
 }
 /*------------------------------------------------------------------------- */
-gsl_fft_halfcomplex_wavetable *update_hwave(Int n)
+gsl_fft_halfcomplex_wavetable *update_hwave(int32_t n)
 {
   if (n != nhwave) {
     gsl_fft_halfcomplex_wavetable_free(hwave);
@@ -469,7 +469,7 @@ void clear_hwave(void)
   nhwave = -1;
 }
 /*------------------------------------------------------------------------- */
-gsl_fft_real_workspace *update_rwork(Int n)
+gsl_fft_real_workspace *update_rwork(int32_t n)
 {
   if (n != nrwork) {
     gsl_fft_real_workspace_free(rwork);
@@ -486,7 +486,7 @@ void clear_rwork(void)
   nrwork = -1;
 }
 /*------------------------------------------------------------------------- */
-double *update_ffttemp(Int n)
+double *update_ffttemp(int32_t n)
 {
   if (n != nffttemp) {
     free(ffttemp);
@@ -503,19 +503,19 @@ void clear_ffttemp(void)
   nffttemp = -1;
 }
 /*------------------------------------------------------------------------- */
-Int gsl_fft(double *data, size_t n, size_t stride)
+int32_t gsl_fft(double *data, size_t n, size_t stride)
 {
   if (!update_rwave(n) || !update_rwork(n))
     return 1;
   
-  Int result = gsl_fft_real_transform(data, stride, n, rwave, rwork);
+  int32_t result = gsl_fft_real_transform(data, stride, n, rwave, rwork);
   if (internalMode & 2) {	/* /AMPLITUDES */
     double factor1 = 1.0/n;
     /* average */
     *data *= factor1;
     data += stride;
     /* non-Nyquist non-zero frequencies */
-    Int i;
+    int32_t i;
     double factor2 = 2.0/n;
     /* 5 -> 3; 6 -> 3; 7 -> 4 */
     for (i = 1; i <= (n + 1)/2; i += 2) {
@@ -531,7 +531,7 @@ Int gsl_fft(double *data, size_t n, size_t stride)
 BIND(gsl_fft, i_sd_iDaLarDq_000, f, FFT, 1, 2, "1ALLAXES:2AMPLITUDES");
 BIND(gsl_fft, i_sd_iDaLa_000, s, FFT, 1, 2, "1ALLAXES:2AMPLITUDES");
 /*------------------------------------------------------------------------- */
-Int gsl_fft_back(double *data, size_t n, size_t stride)
+int32_t gsl_fft_back(double *data, size_t n, size_t stride)
 {
   if (!update_hwave(n) || !update_rwork(n))
     return 1;
@@ -542,7 +542,7 @@ Int gsl_fft_back(double *data, size_t n, size_t stride)
     *data *= factor1;
     data += stride;
     /* non-Nyquist non-zero frequencies */
-    Int i;
+    int32_t i;
     double factor2 = n/2.0;
     /* 5 -> 3; 6 -> 3; 7 -> 4 */
     for (i = 1; i <= (n + 1)/2; i += 2) {
@@ -558,15 +558,15 @@ Int gsl_fft_back(double *data, size_t n, size_t stride)
 BIND(gsl_fft_back, i_sd_iDaLarDq_000, f, FFTB, 1, 2, "1ALLAXES:2AMPLITUDES");
 BIND(gsl_fft_back, i_sd_iDaLa_000, s, FFTB, 1, 2, "1ALLAXES:2AMPLITUDES");
 /*------------------------------------------------------------------------- */
-Int hilbert(double *data, size_t n, size_t stride)
+int32_t hilbert(double *data, size_t n, size_t stride)
 {
   if (!update_rwave(n) || !update_hwave(n) || !update_rwork(n))
     return 1;
   
-  Int result = gsl_fft_real_transform(data, stride, n, rwave, rwork);
+  int32_t result = gsl_fft_real_transform(data, stride, n, rwave, rwork);
   if (result)
     return 1;
-  Int i;
+  int32_t i;
   for (i = 1; i < n - 1; i+= 2) {
     /* advance phase by 90 degrees */
     double t = data[i*stride];
@@ -578,13 +578,13 @@ Int hilbert(double *data, size_t n, size_t stride)
 BIND(hilbert, i_sd_iDaLarDq_000, f, HILBERT, 1, 2, "1ALLAXES");
 BIND(hilbert, i_sd_iDaLa_000, s, HILBERT, 1, 2, "1ALLAXES");
 /*------------------------------------------------------------------------- */
-Int gsl_fft_expand(double *sdata, size_t scount, size_t sstride,
+int32_t gsl_fft_expand(double *sdata, size_t scount, size_t sstride,
 		   double *tdata, size_t tcount, size_t tstride)
 {
   if (!update_rwave(scount) || !update_hwave(tcount))
     return 1;
   
-  Int i, result;
+  int32_t i, result;
   double *sdata2 = sdata;
   double *tdata2 = tdata;
   if (tcount >= scount) {
@@ -638,11 +638,11 @@ Int gsl_fft_expand(double *sdata, size_t scount, size_t sstride,
   return 0;
 }
 /*------------------------------------------------------------------------- */
-Int lux_fft_expand(Int narg, Int ps[])
+int32_t lux_fft_expand(int32_t narg, int32_t ps[])
 {
   pointer *ptrs;
   loopInfo *infos;
-  Int iq;
+  int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;i>D1;rD1", &ptrs, &infos)) < 0)
     return LUX_ERROR;
@@ -650,12 +650,12 @@ Int lux_fft_expand(Int narg, Int ps[])
   if (factor <= 0)
     return luxerror("Need positive expansion factor", ps[1]);
   
-  Int ndim = infos[0].ndim;
-  Int *dims = malloc(ndim*sizeof(Int));
+  int32_t ndim = infos[0].ndim;
+  int32_t *dims = malloc(ndim*sizeof(int32_t));
   if (!dims)
     return cerror(ALLOC_ERR, 0);
-  memcpy(dims, infos[0].dims, ndim*sizeof(Int));
-  dims[0] = (Int) (dims[0]*factor + 0.5);
+  memcpy(dims, infos[0].dims, ndim*sizeof(int32_t));
+  dims[0] = (int32_t) (dims[0]*factor + 0.5);
   standard_redef_array(iq, LUX_DOUBLE, ndim, dims, 0, NULL,
 		       &ptrs[2], &infos[2]);
   free(dims);
@@ -676,10 +676,10 @@ REGISTER(fft_expand, f, FFTEXPAND, 2, 2, NULL);
 //#define SQRTHALF	M_SQRT1_2
 //#define SQRTWO		M_SQRT2
 /*------------------------------------------------------------------------- */
-Int lux_real(Int narg, Int ps[])
+int32_t lux_real(int32_t narg, int32_t ps[])
 /* returns the real part of the argument.  LS 17nov98 */
 {
-  Int	iq, outtype, result, n;
+  int32_t	iq, outtype, result, n;
   pointer	value, trgt;
 
   if (!symbolIsNumerical(ps[0]))
@@ -724,10 +724,10 @@ Int lux_real(Int narg, Int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-Int lux_imaginary(Int narg, Int ps[])
+int32_t lux_imaginary(int32_t narg, int32_t ps[])
 /* returns the imaginary part of the argument.  LS 17nov98 */
 {
-  Int	iq, outtype, result, n;
+  int32_t	iq, outtype, result, n;
   pointer	value, trgt;
 
   if (!symbolIsNumerical(ps[0]))
@@ -772,10 +772,10 @@ Int lux_imaginary(Int narg, Int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-Int lux_arg(Int narg, Int ps[])
+int32_t lux_arg(int32_t narg, int32_t ps[])
 /* returns the complex argument of the argument.  LS 17nov98 */
 {
-  Int	iq, outtype, result, type, n;
+  int32_t	iq, outtype, result, type, n;
   pointer	value, trgt;
 
   if (!symbolIsNumerical(ps[0]))
@@ -874,7 +874,7 @@ Int lux_arg(Int narg, Int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-Int lux_complex(Int narg, Int ps[])
+int32_t lux_complex(int32_t narg, int32_t ps[])
 /* returns a complex version of the argument */
 {
   if (!symbolIsNumerical(ps[0]))
@@ -885,16 +885,16 @@ Int lux_complex(Int narg, Int ps[])
     lux_cdouble(1, ps): lux_cfloat(1, ps);
 }
 /*------------------------------------------------------------------------- */
-Int fftshift(Int narg, Int ps[], Int subroutine)
+int32_t fftshift(int32_t narg, int32_t ps[], int32_t subroutine)
 /* y = FFTSHIFT(data,dist) */
 {
-  Int	iq, n, mq, type, j, jq, result, step, ndist;
+  int32_t	iq, n, mq, type, j, jq, result, step, ndist;
   pointer	src, trgt, work, tmp, otmp, src0, trgt0, dist,
     sines, cosines;
   scalar	v, factor;
-  Int	rfftb(Int *, float *, float *), rfftf(Int *, float *, float *),
-    rfftbd(Int *, double *, double *), rfftfd(Int *, double *, double *),
-    rffti(Int *, float *), rfftid(Int *, double *), lux_indgen(Int, Int *);
+  int32_t	rfftb(int32_t *, float *, float *), rfftf(int32_t *, float *, float *),
+    rfftbd(int32_t *, double *, double *), rfftfd(int32_t *, double *, double *),
+    rffti(int32_t *, float *), rfftid(int32_t *, double *), lux_indgen(int32_t, int32_t *);
   loopInfo	srcinfo, trgtinfo;
 
   iq = ps[0];			/* <data> */
@@ -958,7 +958,7 @@ Int fftshift(Int narg, Int ps[], Int subroutine)
     mq = n*20 + 120;
     if (!fftdp)
       mq = mq/2;
-    work.l = (Int *) realloc(work.l, mq);
+    work.l = (int32_t *) realloc(work.l, mq);
     /* get space to store phase numbers */
     j = (n/2)*lux_type_size[type];
     sines.f = malloc(j);
@@ -1088,25 +1088,25 @@ Int fftshift(Int narg, Int ps[], Int subroutine)
   return subroutine? LUX_OK: result;
 }
 /*------------------------------------------------------------------------- */
-Int lux_fftshift(Int narg, Int ps[])
+int32_t lux_fftshift(int32_t narg, int32_t ps[])
 {
   return fftshift(narg, ps, 1);
 }
 /*------------------------------------------------------------------------- */
-Int lux_fftshift_f(Int narg, Int ps[])
+int32_t lux_fftshift_f(int32_t narg, int32_t ps[])
 {
   return fftshift(narg, ps, 0);
 }
 /*------------------------------------------------------------------------- */
-Int lux_power(Int narg, Int ps[])
+int32_t lux_power(int32_t narg, int32_t ps[])
 /* power function: POWER(data [,axis, /POWER, /SHAPE]) */
 {
-  Int	iq, n, mq, type, j, jq, outDims[MAX_DIMS], result, step;
+  int32_t	iq, n, mq, type, j, jq, outDims[MAX_DIMS], result, step;
   pointer	src, trgt, work, tmp, otmp, src0, trgt0;
   scalar	factor;
-  Int	rfftb(Int *, float *, float *), rfftf(Int *, float *, float *),
-    rfftbd(Int *, double *, double *), rfftfd(Int *, double *, double *),
-    rffti(Int *, float *), rfftid(Int *, double *);
+  int32_t	rfftb(int32_t *, float *, float *), rfftf(int32_t *, float *, float *),
+    rfftbd(int32_t *, double *, double *), rfftfd(int32_t *, double *, double *),
+    rffti(int32_t *, float *), rfftid(int32_t *, double *);
   loopInfo	srcinfo;
 
   iq = ps[0];
@@ -1135,7 +1135,7 @@ Int lux_power(Int narg, Int ps[])
 
   /* get result symbol */
   outDims[0] = srcinfo.rdims[0]/2 + 1;
-  memcpy(outDims + 1, srcinfo.rdims + 1, (srcinfo.rndim - 1)*sizeof(Int));
+  memcpy(outDims + 1, srcinfo.rdims + 1, (srcinfo.rndim - 1)*sizeof(int32_t));
   result = array_scratch(type, srcinfo.rndim, outDims);
   trgt0.f = array_data(result);
 
@@ -1147,7 +1147,7 @@ Int lux_power(Int narg, Int ps[])
     mq = n*20 + 120;
     if (!fftdp)
       mq = mq/2;
-    work.l = (Int *) realloc(work.l, mq);
+    work.l = (int32_t *) realloc(work.l, mq);
     if (!work.l) {
       zap(result);
       result = cerror(ALLOC_ERR, 0);
@@ -1242,14 +1242,14 @@ Int lux_power(Int narg, Int ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-Int lux_scb(Int narg, Int ps[])	/* scb routine */		
+int32_t lux_scb(int32_t narg, int32_t ps[])	/* scb routine */		
 /* backwards sine-cosine style FFT --  scb, x, s, c */
 {
-  Int	iq, nd, outer, nx, n, mq, dim[8], type, j, jq, outer2, nx2;
+  int32_t	iq, nd, outer, nx, n, mq, dim[8], type, j, jq, outer2, nx2;
   pointer	q1,q2,q3;
-  Int	ezffti(Int *n, float *wsave), ezfftid(Int *n, double *wsave),
-    ezfftb(Int *n, float *r, float *azero, float *a, float *b, float *wsave),
-    ezfftbd(Int *n, double *r, double *azero, double *a, double *b,
+  int32_t	ezffti(int32_t *n, float *wsave), ezfftid(int32_t *n, double *wsave),
+    ezfftb(int32_t *n, float *r, float *azero, float *a, float *b, float *wsave),
+    ezfftbd(int32_t *n, double *r, double *azero, double *a, double *b,
 	    double *wsave);
 
   iq = ps[1];
@@ -1270,7 +1270,7 @@ Int lux_scb(Int narg, Int ps[])	/* scb routine */
   nd = array_num_dims(iq);
   nx = array_dims(iq)[0];
   outer = array_size(iq)/nx;
-  memcpy(dim + 1, array_dims(iq) + 1, (nd - 1)*sizeof(Int));
+  memcpy(dim + 1, array_dims(iq) + 1, (nd - 1)*sizeof(int32_t));
   q3.l = array_data(jq);
   nx2 = array_dims(jq)[0];
   outer2 = array_size(jq)/nx2;
@@ -1338,7 +1338,7 @@ Int lux_scb(Int narg, Int ps[])	/* scb routine */
     mq = n*28 + 120;
     if (!fftdp)
       mq = mq/2;
-    work.l = (Int *) malloc(mq);
+    work.l = (int32_t *) malloc(mq);
     if (!fftdp)
       ezffti(&n, work.f);
     else
@@ -1376,26 +1376,26 @@ Int lux_scb(Int narg, Int ps[])	/* scb routine */
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int lux_histr(Int narg, Int ps[]) /* histr function */		
+int32_t lux_histr(int32_t narg, int32_t ps[]) /* histr function */		
 /* running sum histogram, normalized to 1.0 */
 {
-  Int	iq, n, nd, j, type, size, nRepeat;
+  int32_t	iq, n, nd, j, type, size, nRepeat;
   float	sum, fac;
   array	*h;
   pointer q1, q2;
-  Int	lux_hist(Int, Int []);
+  int32_t	lux_hist(int32_t, int32_t []);
 
 					/* first get a normal histogram */
   if ( (iq = lux_hist(narg,ps) ) <= 0 ) return iq;
 /* the returned symbol should be a long array, convert in place to a float,
-	this depends on float and long (Int) being 32 bits! */
+	this depends on float and long (int32_t) being 32 bits! */
 			/* check for some impossible errors */
   if ( sym[iq].class != LUX_ARRAY ) {
     return cerror(IMPOSSIBLE, iq);}
   type = sym[iq].type;
   if (type != LUX_LONG ) return cerror(IMPOSSIBLE, iq);
   h = (array *) sym[iq].spec.array.ptr;
-  q1.l = (Int *) ((char *)h + sizeof(array));
+  q1.l = (int32_t *) ((char *)h + sizeof(array));
   nd = h->ndim;	n = 1;
   for(j=0;j<nd;j++) n *= h->dims[j];
   sym[iq].type = LUX_FLOAT;		/* change to float */
@@ -1412,13 +1412,13 @@ Int lux_histr(Int narg, Int ps[]) /* histr function */
   return iq;
 }
 /*------------------------------------------------------------------------- */
-Int findint(Int current, Int *value, Int nValue)
+int32_t findint(int32_t current, int32_t *value, int32_t nValue)
 /* finds <current> in list <value> (<nValue> elements) which must be sorted
  in ascending order.  Returns nonnegative index of found <current>, or
  minus the index of the next higher present value, if <current> itself
  is not found. */
 {
-  Int	low, mid, high;
+  int32_t	low, mid, high;
   
   low = 0;
   high = nValue - 1;
@@ -1434,43 +1434,43 @@ Int findint(Int current, Int *value, Int nValue)
   return -low - 1;
 }
 /*------------------------------------------------------------------------- */
-Int lux_hist_dense(Int narg, Int ps[])
+int32_t lux_hist_dense(int32_t narg, int32_t ps[])
 /* returns compact histogram for widely spaced data values. */
 /* HIST(x,l) returns list of present data values in <l> and corresponding */
 /* histogram as return value.  LS 18feb98 */
 {
-  Int	nStore, nValue, nData, *value, *freq, x, y, result;
+  int32_t	nStore, nValue, nData, *value, *freq, x, y, result;
   char	*avalue, *afreq;
   pointer	src;
-  Int	findint(Int, Int *, Int);
+  int32_t	findint(int32_t, int32_t *, int32_t);
 
   if (numerical(ps[0], NULL, NULL, &nData, &src) == LUX_ERROR)
     return LUX_ERROR;
   nStore = 512;
-  avalue = (char *) malloc(nStore*sizeof(Int) + sizeof(array));
-  afreq = (char *) malloc(nStore*sizeof(Int) + sizeof(array));
+  avalue = (char *) malloc(nStore*sizeof(int32_t) + sizeof(array));
+  afreq = (char *) malloc(nStore*sizeof(int32_t) + sizeof(array));
   if (!avalue || !afreq)
     return cerror(ALLOC_ERR, 0);
-  value = (Int *) (avalue + sizeof(array));
-  freq = (Int *) (afreq + sizeof(array));
+  value = (int32_t *) (avalue + sizeof(array));
+  freq = (int32_t *) (afreq + sizeof(array));
 
   nValue = 0;
   while (nData--) {
     switch (symbol_type(ps[0])) {
     case LUX_BYTE:
-      x = (Int) *src.b++;
+      x = (int32_t) *src.b++;
       break;
     case LUX_WORD:
-      x = (Int) *src.w++;
+      x = (int32_t) *src.w++;
       break;
     case LUX_LONG:
-      x = (Int) *src.l++;
+      x = (int32_t) *src.l++;
       break;
     case LUX_FLOAT:
-      x = (Int) *src.f++;
+      x = (int32_t) *src.f++;
       break;
     case LUX_DOUBLE:
-      x = (Int) *src.d++;
+      x = (int32_t) *src.d++;
       break;
     }
     y = findint(x, value, nValue);
@@ -1479,22 +1479,22 @@ Int lux_hist_dense(Int narg, Int ps[])
     else {			/* not yet in list */
       if (++nValue == nStore) { /* need to allocate more room */
 	nStore += 512;
-	avalue = (char *) realloc(avalue, nStore*sizeof(Int) + sizeof(array));
-	afreq = (char *) realloc(afreq, nStore*sizeof(Int) + sizeof(array));
+	avalue = (char *) realloc(avalue, nStore*sizeof(int32_t) + sizeof(array));
+	afreq = (char *) realloc(afreq, nStore*sizeof(int32_t) + sizeof(array));
 	if (!avalue || !afreq)
 	  return cerror(ALLOC_ERR, 0);
-	value = (Int *) (avalue + sizeof(array));
-	freq = (Int *) (afreq + sizeof(array));
+	value = (int32_t *) (avalue + sizeof(array));
+	freq = (int32_t *) (afreq + sizeof(array));
       }
       y = -y;
-      memmove(value + y, value + y - 1, (nValue - y)*sizeof(Int));
-      memmove(freq + y, freq + y - 1, (nValue - y)*sizeof(Int));
+      memmove(value + y, value + y - 1, (nValue - y)*sizeof(int32_t));
+      memmove(freq + y, freq + y - 1, (nValue - y)*sizeof(int32_t));
       value[--y] = x;
       freq[y] = 1;
     }
   }
-  avalue = (char *) realloc(avalue, nValue*sizeof(Int) + sizeof(array));
-  afreq = (char *) realloc(afreq, nValue*sizeof(Int) + sizeof(array));
+  avalue = (char *) realloc(avalue, nValue*sizeof(int32_t) + sizeof(array));
+  afreq = (char *) realloc(afreq, nValue*sizeof(int32_t) + sizeof(array));
   if (!avalue || !afreq)
     return cerror(ALLOC_ERR, 0);
 
@@ -1507,7 +1507,7 @@ Int lux_hist_dense(Int narg, Int ps[])
   array_header(result)->c1 = array_header(result)->c2
     = array_header(result)->nfacts = 0;
   array_header(result)->facts = NULL;
-  symbol_memory(result) = nValue*sizeof(Int) + sizeof(array);
+  symbol_memory(result) = nValue*sizeof(int32_t) + sizeof(array);
 
   symbol_class(ps[1]) = LUX_ARRAY;
   array_type(ps[1]) = LUX_LONG;
@@ -1522,7 +1522,7 @@ Int lux_hist_dense(Int narg, Int ps[])
   return result;
 }  
 /*------------------------------------------------------------------------- */
-Int lux_hist(Int narg, Int ps[]) /* histogram function */
+int32_t lux_hist(int32_t narg, int32_t ps[]) /* histogram function */
 				 /* (frequency distribution) */
 /* general histogram function */
 /* keyword /FIRST produces a histogram of all elements along the 0th */
@@ -1530,13 +1530,13 @@ Int lux_hist(Int narg, Int ps[]) /* histogram function */
 /* LS 12jul2000: added /SILENT keyword (internalMode & 8) to suppress */
 /* warnings about negative histogram elements. */
 {
-  void	convertPointer(scalar *, Int, Int);
-  Int	iq, i, n, range, type, result_sym, *dims, nRepeat,
+  void	convertPointer(scalar *, int32_t, int32_t);
+  int32_t	iq, i, n, range, type, result_sym, *dims, nRepeat,
   	ndim, axis, one = 1, size;
   array	*h;
   pointer q1, q2;
-  Int	lux_zero(Int, Int []);
-  void convertWidePointer(wideScalar *, Int, Int);
+  int32_t	lux_zero(int32_t, int32_t []);
+  void convertWidePointer(wideScalar *, int32_t, int32_t);
 
   if (narg == 2)
     return lux_hist_dense(narg, ps);
@@ -1561,7 +1561,7 @@ Int lux_hist(Int narg, Int ps[]) /* histogram function */
     }
   /* always need the range */
   minmax( q1.l, n, type);
-  /* get long (Int) versions of min and max */
+  /* get long (int32_t) versions of min and max */
   convertPointer(&lastmin, type, LUX_LONG);
   convertPointer(&lastmax, type, LUX_LONG);
   /* create a long array for results */
@@ -1597,7 +1597,7 @@ Int lux_hist(Int narg, Int ps[]) /* histogram function */
     result_sym = array_scratch(LUX_LONG, 1, &one);
     h = HEAD(result_sym);
     h->dims[0] = range;
-    if (ndim > 1) memcpy(&h->dims[1], &dims[1], sizeof(Int)*(ndim - 1));
+    if (ndim > 1) memcpy(&h->dims[1], &dims[1], sizeof(int32_t)*(ndim - 1));
     h->ndim = ndim; }
   else
   { one = range;
@@ -1605,7 +1605,7 @@ Int lux_hist(Int narg, Int ps[]) /* histogram function */
     nRepeat = 1;
     result_sym = array_scratch(2, 1, &one);
     h = HEAD(result_sym); }
-  q2.l = (Int *) ((char *)h + sizeof(array));
+  q2.l = (int32_t *) ((char *)h + sizeof(array));
   lux_zero( 1, &result_sym);		/* need to zero initially */
   /* now accumulate the distribution */
   while (nRepeat--)
@@ -1631,7 +1631,7 @@ Int lux_hist(Int narg, Int ps[]) /* histogram function */
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-Int lux_sieve(Int narg, Int ps[])
+int32_t lux_sieve(int32_t narg, int32_t ps[])
 /* X=SIEVE(array,condition), where condition is normally a logical array
    array and condition must both be arrays and condition must be at least
    as long as array 
@@ -1642,7 +1642,7 @@ Int lux_sieve(Int narg, Int ps[])
    returned.  alternate use: X=SIEVE(condition) yields the same as
    X=SIEVE(LUX_LONG(INDGEN(condition)),condition) */ 
 {
-  Int	iq, n, nc, cnt, *p, type, typec, result_sym;
+  int32_t	iq, n, nc, cnt, *p, type, typec, result_sym;
   pointer q1, q2, q3;
 
   iq = ps[0];
@@ -1660,7 +1660,7 @@ Int lux_sieve(Int narg, Int ps[])
 	n = 1;
 	break;
       case LUX_ARRAY:
-	q1.l = (Int *) array_data(iq);
+	q1.l = (int32_t *) array_data(iq);
 	n = array_size(iq);
 	break;
       default:
@@ -1675,7 +1675,7 @@ Int lux_sieve(Int narg, Int ps[])
       p = &scalar_value(iq).l;
       break;
     case LUX_ARRAY:		/*array case */
-      p = (Int *) array_data(iq);
+      p = (int32_t *) array_data(iq);
       nc = array_size(iq);
       break; }
   typec = symbol_type(iq);
@@ -1929,17 +1929,17 @@ Int lux_sieve(Int narg, Int ps[])
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-Int lux_maxf(Int narg, Int ps[])
+int32_t lux_maxf(int32_t narg, int32_t ps[])
 				/* finds the max element in an array */
 {
-  Int	maxormin(Int, Int [], Int);
+  int32_t	maxormin(int32_t, int32_t [], int32_t);
 
   return maxormin(narg, ps, 0);
 }
 /*------------------------------------------------------------------------- */
-Int index_maxormin(Int source, Int indices, Int code)
+int32_t index_maxormin(int32_t source, int32_t indices, int32_t code)
 {
-  Int	nIndx, type, offset, *indx, i, result, size, nElem, indices2;
+  int32_t	nIndx, type, offset, *indx, i, result, size, nElem, indices2;
   char	*any;
   pointer	src, trgt;
   extern scalar	lastmin, lastmax;
@@ -2291,19 +2291,19 @@ Int index_maxormin(Int source, Int indices, Int code)
   return result;
 }
 /*------------------------------------------------------------------------- */
-Int maxormin(Int narg, Int ps[], Int code)
+int32_t maxormin(int32_t narg, int32_t ps[], int32_t code)
 /* finds extreme values.  arguments:  <data> [, <axes>] [, /KEEPDIMS] */
 /* <code>: 0 -> max value; 1 -> min value; 2 -> max location;
    3 -> min location */
 {
-  Int	mode, minloc, maxloc, n, result, n1;
+  int32_t	mode, minloc, maxloc, n, result, n1;
   loopInfo	srcinfo, trgtinfo;
   pointer	src, trgt;
   scalar	min, max;
   double	value;
   extern scalar	lastmin, lastmax;
-  extern Int	lastminloc, lastmaxloc;
-  extern Int	lastmin_sym, lastmax_sym;
+  extern int32_t	lastminloc, lastmaxloc;
+  extern int32_t	lastmin_sym, lastmax_sym;
 
   if (narg == 2
       && symbolIsNumericalArray(ps[0])
@@ -2393,14 +2393,14 @@ Int maxormin(Int narg, Int ps[], Int code)
 	/* take first value as initial values */
 	memcpy(&min, src.l, srcinfo.stride);
 	memcpy(&max, src.l, srcinfo.stride);
-	minloc = maxloc = src.l - (Int *) srcinfo.data0;
+	minloc = maxloc = src.l - (int32_t *) srcinfo.data0;
 	do {
 	  if (*src.l > max.l) {
 	    max.l = *src.l;
-	    maxloc = src.l - (Int *) srcinfo.data0;
+	    maxloc = src.l - (int32_t *) srcinfo.data0;
 	  } else if (*src.l < min.l) {
 	    min.l = *src.l;
-	    minloc = src.l - (Int *) srcinfo.data0;
+	    minloc = src.l - (int32_t *) srcinfo.data0;
 	  }
 	} while ((n = advanceLoop(&srcinfo, &src)) < n1);
 	switch (code) {
@@ -2566,27 +2566,27 @@ Int maxormin(Int narg, Int ps[], Int code)
   return result;
 }
 /*------------------------------------------------------------------------- */
-Int lux_minf(Int narg, Int ps[])
+int32_t lux_minf(int32_t narg, int32_t ps[])
 				/* finds the min element in an array */
 {
   return maxormin(narg, ps, 1);
 }
 /*------------------------------------------------------------------------- */
-Int lux_minloc(narg,ps)
+int32_t lux_minloc(narg,ps)
 				/* finds the min element in an array */
-Int	narg, ps[];
+int32_t	narg, ps[];
 {
 return maxormin(narg, ps, 3);
 }
 /*------------------------------------------------------------------------- */
-Int lux_maxloc(narg,ps)
+int32_t lux_maxloc(narg,ps)
 				/* finds the max element in an array */
-Int	narg, ps[];
+int32_t	narg, ps[];
 {
 return maxormin(narg, ps, 2);
 }
 /*------------------------------------------------------------------------- */
-void scale(pointer data, uint8_t type, Int size, double datalow, double datahigh,
+void scale(pointer data, uint8_t type, int32_t size, double datalow, double datahigh,
 	   void *dest, double trgtlow, double trgthigh)
 /* returns a copy of the data at <data>, linearly transformed such that
  <datalow> maps to <trgtlow> and <datahigh> to <trgthigh>.  Data that falls
@@ -2598,9 +2598,9 @@ void scale(pointer data, uint8_t type, Int size, double datalow, double datahigh
   float	ffac, foff;
   pointer	trgt;
 #if HAVE_LIBX11
-  extern Int	colorIndexType;
+  extern int32_t	colorIndexType;
 #else
-  Int	colorIndexType = LUX_BYTE;
+  int32_t	colorIndexType = LUX_BYTE;
 #endif
 
   trgt.b = dest;
@@ -2809,22 +2809,22 @@ void scale(pointer data, uint8_t type, Int size, double datalow, double datahigh
   }
 }
 /*------------------------------------------------------------------------- */
-Int lux_scale(Int narg, Int ps[])
+int32_t lux_scale(int32_t narg, int32_t ps[])
 /* scale an array to the range (!scalemin,!scalemax) and put into an array */
 /* of the smallest data type that can fit any allowed color cell index  */
 /* add keyword /FULLRANGE: scale between 0 and the greatest color */
 /* cell index.  LS 30jul96 23mar99 */
 {
-  Int	iq, type, result_sym, n, oldScalemin, oldScalemax;
+  int32_t	iq, type, result_sym, n, oldScalemin, oldScalemax;
   scalar	min, max;
   register	pointer q1, q2;
   double	sd, qd;
 #if HAVE_LIBX11
   extern double	zoom_clo, zoom_chi;
-  extern Int	threeColors;
-  extern Int	colorIndexType, display_cells;
+  extern int32_t	threeColors;
+  extern int32_t	colorIndexType, display_cells;
 #else
-  Int	colorIndexType = LUX_BYTE, display_cells = 256;
+  int32_t	colorIndexType = LUX_BYTE, display_cells = 256;
 #endif
 
   iq = ps[0];
@@ -2895,7 +2895,7 @@ Int lux_scale(Int narg, Int ps[])
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-Int lux_scalerange(Int narg, Int ps[])
+int32_t lux_scalerange(int32_t narg, int32_t ps[])
 /* scale an array and put in BYTE result 
    SCALERANGE(<data>, <lowgrey>, <higrey> [, <lowvalue>, <hivalue>, /BYTE,
               /ZOOM])
@@ -2911,16 +2911,16 @@ Int lux_scalerange(Int narg, Int ps[])
    is specified, then !ZOOMLOW and !ZOOMHIGH are taken for <lowvalue>
    and <hivalue>, respectively.  LS 16oct98 */
 {
-  Int	iq, type, result_sym, n, oldScalemin, oldScalemax;
+  int32_t	iq, type, result_sym, n, oldScalemin, oldScalemax;
   scalar	min, max;
   register	pointer q1, q2;
   double	sd, qd, logrey, higrey;
 #if HAVE_LIBX11
   extern double	zoom_clo, zoom_chi;
-  extern Int	threeColors;
-  extern Int	colorIndexType, display_cells;
+  extern int32_t	threeColors;
+  extern int32_t	colorIndexType, display_cells;
 #else
-  Int	colorIndexType = LUX_BYTE, display_cells = 256;
+  int32_t	colorIndexType = LUX_BYTE, display_cells = 256;
 #endif
 
   iq = ps[0];
@@ -2945,19 +2945,19 @@ Int lux_scalerange(Int narg, Int ps[])
     oldScalemin = scalemin;	/* remember for later */
     oldScalemax = scalemax;
     if (internalMode & 1) {	/* /BYTE */
-      scalemin = (Int) (logrey*(display_cells - 0.001));
-      scalemax = (Int) (higrey*(display_cells - 0.001));
+      scalemin = (int32_t) (logrey*(display_cells - 0.001));
+      scalemax = (int32_t) (higrey*(display_cells - 0.001));
     }
 #if HAVE_LIBX11
     else if (threeColors) {
-      scalemin = (Int) ((display_cells/3 - 0.001)*logrey);
-      scalemax = (Int) ((display_cells/3 - 0.001)*higrey);
+      scalemin = (int32_t) ((display_cells/3 - 0.001)*logrey);
+      scalemax = (int32_t) ((display_cells/3 - 0.001)*higrey);
     }
 #endif
     else {
       iq = scalemax - scalemin;
-      scalemin = (Int) (iq*logrey + scalemin);
-      scalemax = (Int) (scalemax - iq*(1 - higrey));
+      scalemin = (int32_t) (iq*logrey + scalemin);
+      scalemax = (int32_t) (scalemax - iq*(1 - higrey));
     }
     simple_scale(q1.l, n, type, q2.b); /* scale and put in output array */
     scalemin = oldScalemin;	/* restore */
@@ -3001,16 +3001,16 @@ Int lux_scalerange(Int narg, Int ps[])
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-Int minmax(Int *p, Int n, Int type)
+int32_t minmax(int32_t *p, int32_t n, int32_t type)
 /* finds the min and max (and their locations) for an array */
 {
   pointer q;
   scalar	min, max;
 /* pointers on OSF machines are bigger than ints, so casts from pointers */
-/* to ints must be avoided!  thus, changed  minloc, maxloc  from Int to */
+/* to ints must be avoided!  thus, changed  minloc, maxloc  from int32_t to */
 /* uint8_t *.  LS27jul94 */
   void	*minloc, *maxloc;
-  Int	 nc;
+  int32_t	 nc;
 
   q.l = p;
   nc = n - 1;
@@ -3102,7 +3102,7 @@ Int minmax(Int *p, Int n, Int type)
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int simple_scale(void *p1, Int n, Int type, void *p2)
+int32_t simple_scale(void *p1, int32_t n, int32_t type, void *p2)
 /* scale n elements of the given data <type> starting at <p1> into the */
 /* array at <p2> */
 /* uses the min and max stashed in lastmin and lastmax */
@@ -3112,13 +3112,13 @@ Int simple_scale(void *p1, Int n, Int type, void *p2)
 {
   register	pointer q1, q2;
   register	scalar	range, min;
-  register	Int	xq;
+  register	int32_t	xq;
   register	float	fq;
   register	double	dq;
 #if HAVE_LIBX11
-  extern Int	connect_flag, colorIndexType;
+  extern int32_t	connect_flag, colorIndexType;
 #else
-  Int	colorIndexType = LUX_BYTE;
+  int32_t	colorIndexType = LUX_BYTE;
 #endif
 
 #if HAVE_LIBX11
@@ -3131,7 +3131,7 @@ Int simple_scale(void *p1, Int n, Int type, void *p2)
     case LUX_BYTE:
       min.b = lastmin.b;
       range.l = lastmax.b - min.b;
-      xq = (Int) (scalemax - scalemin);
+      xq = (int32_t) (scalemax - scalemin);
       if (range.l == 0)
 	return neutral(p2, n);
       switch (colorIndexType) {
@@ -3152,7 +3152,7 @@ Int simple_scale(void *p1, Int n, Int type, void *p2)
     case LUX_WORD:
       min.w = lastmin.w;
       range.l = lastmax.w - min.w;
-      xq = (Int) (scalemax - scalemin);	
+      xq = (int32_t) (scalemax - scalemin);	
       if (range.l == 0)
 	return neutral(p2, n);
       switch (colorIndexType) {
@@ -3238,15 +3238,15 @@ Int simple_scale(void *p1, Int n, Int type, void *p2)
   return LUX_OK;
 }
 /*------------------------------------------------------------------------- */
-Int neutral(void *p, Int n)
+int32_t neutral(void *p, int32_t n)
 /* fills an array of type <colorIndexType> with (scalemax-scalemin)/2 */
 {
-  Int	xq;
+  int32_t	xq;
   pointer	pp;
 #if HAVE_LIBX11
-  extern Int	colorIndexType;
+  extern int32_t	colorIndexType;
 #else
-  Int	colorIndexType = LUX_BYTE;
+  int32_t	colorIndexType = LUX_BYTE;
 #endif
 
   pp.b = p;
@@ -3286,9 +3286,9 @@ void cleanup_cubic_spline_tables(csplineInfo *cspl) {
   cspl->y = NULL;
 }
 /*------------------------------------------------------------------------- */
-Int cubic_spline_tables(void *xx, Int xType, Int xStep,
-			void *yy, Int yType, Int yStep,
-			Int nPoints, uint8_t periodic, uint8_t akima,
+int32_t cubic_spline_tables(void *xx, int32_t xType, int32_t xStep,
+			void *yy, int32_t yType, int32_t yStep,
+			int32_t nPoints, uint8_t periodic, uint8_t akima,
 			csplineInfo *cspl)
 /* installs a cubic spline for later quick multiple interpolations */
 /* <xx> must point to the x coordinates, which are of LUX data type <xType> */
@@ -3298,7 +3298,7 @@ Int cubic_spline_tables(void *xx, Int xType, Int xStep,
    the data is assumed to be periodic; otherwise it is not. */
 /* LS 9may98; redone using GSL 2009sep27 */
 {
-  Int	n;
+  int32_t	n;
   pointer xin, yin;
   double *x, *y;
 
@@ -3425,7 +3425,7 @@ double cspline_value(double x, csplineInfo *cspl)
     return s->y[0] + dx*(d1 + dx*d2);
   }
   if (x > s->x[s->size - 1]) {
-    Int n = s->size - 1;
+    int32_t n = s->size - 1;
     double d1 = gsl_spline_eval_deriv(s, s->x[n], cspl->acc);
     double d2 = gsl_spline_eval_deriv2(s, s->x[n], cspl->acc);
     double dx = x - s->x[n];
@@ -3444,7 +3444,7 @@ double cspline_derivative(double x, csplineInfo *cspl)
   if (x < s->x[0])
     return (s->y[1] - s->y[0])/(s->x[1] - s->x[0]);
   if (x > s->x[s->size - 1]) {
-    Int n = s->size;
+    int32_t n = s->size;
     return (s->y[n-1] - s->y[n-2])/(s->x[n-1] - s->x[n-2]);
   }
   return gsl_spline_eval_deriv(cspl->spline, x, cspl->acc);
@@ -3474,7 +3474,7 @@ double find_cspline_value(double value, double x1, double x2,
 /* LS 9may98 */
 {
   double	v1, v2, vc, dt, x, tiny, dtnr, dx;
-  Int	i, slow;
+  int32_t	i, slow;
 
   tiny = 2*DBL_EPSILON;
 
@@ -3526,7 +3526,7 @@ void find_cspline_extremes(double x1, double x2, double *minpos, double *min,
  is undefined which one is returned.  LS 11may98 */
 {
   double	v1, v2, dt, x, tiny, dtnr, vc, dx, xx1, xx2;
-  Int	i, slow, sgn;
+  int32_t	i, slow, sgn;
 
   tiny = 2*DBL_EPSILON;
   v1 = cspline_derivative(x1, cspl);
@@ -3611,7 +3611,7 @@ void find_cspline_extremes(double x1, double x2, double *minpos, double *min,
   }
 }
 /*------------------------------------------------------------------------- */
-Int lux_cubic_spline(Int narg, Int ps[])
+int32_t lux_cubic_spline(int32_t narg, int32_t ps[])
 /* Cubic spline interpolation along the first dimension of an array.
    ynew = CSPLINE(xtab, ytab [, xnew] [, /KEEP, /PERIODIC, /GETDERIVATIVE])
      interpolates in the table of <ytab> versus <xtab> (must be in
@@ -3636,9 +3636,9 @@ Int lux_cubic_spline(Int narg, Int ps[])
 {
   static char	haveTable = '\0';
   static csplineInfo	cspl = { NULL, NULL, NULL, NULL };
-  Int	xNewSym, xTabSym, yTabSym, size, oldType, result_sym;
+  int32_t	xNewSym, xTabSym, yTabSym, size, oldType, result_sym;
   pointer	src, trgt;
-  Int	lux_convert(Int, Int [], Int, Int);
+  int32_t	lux_convert(int32_t, int32_t [], int32_t, int32_t);
 
   /* first check on all the arguments */
   if (!narg) { 			/* CSPLINE(): clean-up */
@@ -3717,12 +3717,12 @@ Int lux_cubic_spline(Int narg, Int ps[])
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-Int lux_cubic_spline_extreme(Int narg, Int ps[])
+int32_t lux_cubic_spline_extreme(int32_t narg, int32_t ps[])
 /* CSPLINE_EXTREME, <x>, <y> [, <axis>, POS=<pos>, MINPOS=<minpos>,
    MINVAL=<min>, MAXPOS=<maxpos>, MAXVAL=<max>, /KEEPDIMS, /PERIODIC]
  */
 {
-  Int	iq, dims[MAX_DIMS], ndim, step, pos, i, mode;
+  int32_t	iq, dims[MAX_DIMS], ndim, step, pos, i, mode;
   double	thisextpos, thisext, x1, x2;
   loopInfo	yinfo;
   pointer	y, x, minpos, min, maxpos, max, rightedge, ptr, q;
@@ -3756,15 +3756,15 @@ Int lux_cubic_spline_extreme(Int narg, Int ps[])
 
   /* prepare the output variables */
   if (internalMode & 1) {
-    memcpy(dims, yinfo.dims, yinfo.ndim*sizeof(Int));
+    memcpy(dims, yinfo.dims, yinfo.ndim*sizeof(int32_t));
     dims[yinfo.axes[0]] = 1;
     ndim = yinfo.ndim;
   } else if (yinfo.rndim == 1)
     ndim = 0;
   else {
-    memcpy(dims, yinfo.dims, yinfo.axes[0]*sizeof(Int));
+    memcpy(dims, yinfo.dims, yinfo.axes[0]*sizeof(int32_t));
     memcpy(dims + yinfo.axes[0], yinfo.dims + yinfo.axes[0] + 1,
-	   (yinfo.ndim - yinfo.axes[0] - 1)*sizeof(Int));
+	   (yinfo.ndim - yinfo.axes[0] - 1)*sizeof(int32_t));
     ndim = yinfo.ndim - 1;
   }
 
@@ -4013,11 +4013,11 @@ Int lux_cubic_spline_extreme(Int narg, Int ps[])
   return LUX_OK;
 }
 /*------------------------------------------------------------------------- */
-Int lux_strtol(Int narg, Int ps[])
+int32_t lux_strtol(int32_t narg, int32_t ps[])
 /* corresponds to C strtol */
 {
   char	*string;
-  Int	base, number, result;
+  int32_t	base, number, result;
 
   if (symbol_class(ps[0]) != LUX_STRING)
     return cerror(NEED_STR, ps[0]);
@@ -4041,13 +4041,13 @@ uint32_t bitmask[] = {
 static uint32_t bits[16] = {
   1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768
 };
-Int lux_extract_bits_f(Int narg, Int ps[])/* get a bit field from data */
+int32_t lux_extract_bits_f(int32_t narg, int32_t ps[])/* get a bit field from data */
 /* call is xint = extract_bits(array, start, width) */
 /* if width is < 0, then abs(width) is used for width and the sign
    is extended */
 {
-  Int	result_sym, value;
-  Int	extract_bits(Int, Int [], Int *);
+  int32_t	result_sym, value;
+  int32_t	extract_bits(int32_t, int32_t [], int32_t *);
 
   if (extract_bits(narg, ps, &value) != 1)
     return LUX_ERROR;
@@ -4056,13 +4056,13 @@ Int lux_extract_bits_f(Int narg, Int ps[])/* get a bit field from data */
   return result_sym;
 }
 /*------------------------------------------------------------------------ */
-Int lux_extract_bits(Int narg, Int ps[])/* get a bit field from data */
+int32_t lux_extract_bits(int32_t narg, int32_t ps[])/* get a bit field from data */
 /* call is extract_bits, result, array, start, width */
 /* if width is < 0, then abs(width) is used for width and the sign
    is extended */
 {
-  Int	result_sym, value;
-  Int	extract_bits(Int, Int [], Int *);
+  int32_t	result_sym, value;
+  int32_t	extract_bits(int32_t, int32_t [], int32_t *);
 
   result_sym = ps[0];
   if (extract_bits(narg - 1, &ps[1], &value) != 1)
@@ -4070,9 +4070,9 @@ Int lux_extract_bits(Int narg, Int ps[])/* get a bit field from data */
   return redef_scalar(result_sym, LUX_WORD, &value);
 }
 /*------------------------------------------------------------------------ */
-Int extract_bits(Int narg, Int ps[], Int *value)/* internal routine */
+int32_t extract_bits(int32_t narg, int32_t ps[], int32_t *value)/* internal routine */
 {
-  Int	n, start, width, iq, j, sign_flag, type;
+  int32_t	n, start, width, iq, j, sign_flag, type;
   pointer	q;
   
   iq = ps[0];
@@ -4094,7 +4094,7 @@ Int extract_bits(Int narg, Int ps[], Int *value)/* internal routine */
     return luxerror("Extracting bits beyond the end of the data", ps[2]);
   /* start is a bit count, get the I*2 index */
   j = start/16;
-  iq = (Int) q.w[j];
+  iq = (int32_t) q.w[j];
   j = start % 16;	/* our shift */
   iq = (iq >> j) & bitmask[width];
   if (sign_flag)
@@ -4106,14 +4106,14 @@ Int extract_bits(Int narg, Int ps[], Int *value)/* internal routine */
   return LUX_OK;
 }
 /*------------------------------------------------------------------------- */
-Int lux_fade_init(Int narg, Int ps[])
+int32_t lux_fade_init(int32_t narg, int32_t ps[])
 /* initializes a fade (or dissolve) between 2 uint8_t arrays, the actual
    fade result is obtained with the subroutine fade
    call is: fade_init, x1, x2 */
 {
   uint8_t	*p1, *p2;
   int16_t	*q1, *q2;
-  Int	n, iq;
+  int32_t	n, iq;
 
   iq = ps[0];
   if (!symbolIsNumericalArray(iq) || array_num_dims(iq) != 2)
@@ -4156,7 +4156,7 @@ Int lux_fade_init(Int narg, Int ps[])
   return LUX_OK;
 }
 /*------------------------------------------------------------------------- */
-Int lux_fade(Int narg, Int ps[])
+int32_t lux_fade(int32_t narg, int32_t ps[])
  /* does a fade (or dissolve) between 2 uint8_t arrays, must be initialized
  with fade_init
  call is: fade, weight, result - where n is from 0 to 256 and represents
@@ -4165,7 +4165,7 @@ Int lux_fade(Int narg, Int ps[])
 {
   uint8_t	*p1;
   int16_t	*q1, *q2, wt;
-  Int	weight, n, iq;
+  int32_t	weight, n, iq;
 
   if (int_arg_stat(ps[0], &weight) != LUX_OK) return LUX_ERROR;
   wt = (int16_t) weight;

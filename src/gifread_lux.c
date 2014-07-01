@@ -51,39 +51,39 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #define FALSE 0
 #define TRUE 1
 
- typedef Int bool;
+ typedef int32_t bool;
  typedef struct codestruct {
             struct codestruct *prefix;
             unsigned char first,suffix;
         } codetype;
  codetype *codetable;                /* LZW compression code data */
- Int datasize,codesize,codemask;     /* Decoder working variables */
- Int clear,eoi;                      /* Special code values */
+ int32_t datasize,codesize,codemask;     /* Decoder working variables */
+ int32_t clear,eoi;                      /* Special code values */
  
- void readextension(FILE *), readimage(FILE *, Int, char *),
-   loadcolortable(FILE *, Int, Int), readraster(Int, FILE *, unsigned char *);
- static	Int	quit = 0, status = 1, gcmflag;
- static Int	nxs, nys;
+ void readextension(FILE *), readimage(FILE *, int32_t, char *),
+   loadcolortable(FILE *, int32_t, int32_t), readraster(int32_t, FILE *, unsigned char *);
+ static	int32_t	quit = 0, status = 1, gcmflag;
+ static int32_t	nxs, nys;
 
-Int	lux_gifread(Int, Int []);
-void	process(Int, unsigned char **);
+int32_t	lux_gifread(int32_t, int32_t []);
+void	process(int32_t, unsigned char **);
 
  /*------------------------------------------------------------------------- */
-Int lux_gifread_f(narg, ps)
+int32_t lux_gifread_f(narg, ps)
  /* a function version that returns 1 if read OK */
- Int	narg, ps[];
+ int32_t	narg, ps[];
  {
  if ( lux_gifread(narg, ps) == 1 ) return 1; else return 4;
  }
  /*------------------------------------------------------------------------- */
-Int lux_gifread(Int narg, Int ps[])       /* gifread subroutine */
+int32_t lux_gifread(int32_t narg, int32_t ps[])       /* gifread subroutine */
  /* read a "simple" gif file, 8 bit deep */
  /* call is gifread,array,file,map where map is the color map, if
  map not in argument list, you don't get it! */
  {
  FILE	*fin;
- Int    iq, n, cr, pixel;
- Int    sep, cmsym, dim[8];
+ int32_t    iq, n, cr, pixel;
+ int32_t    sep, cmsym, dim[8];
  char   *p, *name, *data;
  struct ahead   *h;
  struct GIFScreen gh;
@@ -180,11 +180,11 @@ void readextension(FILE *fin)
  /* printf("note , extension with code = %c ignored\n"); */
  }
  /*------------------------------------------------------------------------- */
-void readimage(FILE *fin, Int cmsym, char *data)
+void readimage(FILE *fin, int32_t cmsym, char *data)
  {
  struct GIFImage gimage;
- Int	nx, ny, ix, iy, local, localbits, nc, fflag;
- Int	n, m, stride;
+ int32_t	nx, ny, ix, iy, local, localbits, nc, fflag;
+ int32_t	n, m, stride;
  char	*image, *p, *p2;
  if (fread(&gimage.left_lsb,1,9,fin) != 9) {
  perror("gifread in image descriptor");
@@ -230,9 +230,9 @@ void readimage(FILE *fin, Int cmsym, char *data)
  }
  }
  /*------------------------------------------------------------------------- */
-void loadcolortable(FILE *fin, Int nc, Int cmsym)
+void loadcolortable(FILE *fin, int32_t nc, int32_t cmsym)
  {
- Int	dim[8], ncolmap;
+ int32_t	dim[8], ncolmap;
  struct ahead   *h;
  char	*colormap;
  /* we either load the color table into lux symbol cmsym or we just
@@ -272,9 +272,9 @@ void outcode(register codetype *p, register unsigned char **fill)
    code. */
 
  /*------------------------------------------------------------------------- */
-void process(Int code, unsigned char **fill)
+void process(int32_t code, unsigned char **fill)
  {
-        static Int avail,oldcode;
+        static int32_t avail,oldcode;
         register codetype *p;
 
         if (code == clear) {
@@ -311,14 +311,14 @@ void process(Int code, unsigned char **fill)
         }
 }
  /*------------------------------------------------------------------------- */
-void readraster(Int nsize, FILE *fin, unsigned char *raster)
+void readraster(int32_t nsize, FILE *fin, unsigned char *raster)
  {
 	unsigned char *fill;
         unsigned char buf[255];
-        register Int bits=0;
+        register int32_t bits=0;
         register unsigned count,datum=0;
         register unsigned char *ch;
-        register Int code;
+        register int32_t code;
 
 	fill = raster;
         datasize = getc(fin);

@@ -166,7 +166,7 @@
  * In that case you need only comment out these definitions.
  */
 
-typedef Int boolean;
+typedef int32_t boolean;
 #undef FALSE			/* in case these macros already exist */
 #undef TRUE
 #define FALSE	0		/* values of boolean */
@@ -235,7 +235,7 @@ typedef Int boolean;
  * The remaining definitions don't need to be hand-edited in most cases.
  * You may need to change these if you have a machine with unusual data
  * types; for example, "char" not 8 bits, "short" not 16 bits,
- * or "long" not 32 bits.  We don't care whether "Int" is 16 or 32 bits,
+ * or "long" not 32 bits.  We don't care whether "int32_t" is 16 or 32 bits,
  * but it had better be at least 16.
  */
 
@@ -298,7 +298,7 @@ typedef unsigned short JSAMPLE;
 
 #else /* not HAVE_UNSIGNED_SHORT */
 
-/* If Int is 32 bits this'll be horrendously inefficient storage-wise.
+/* If int32_t is 32 bits this'll be horrendously inefficient storage-wise.
  * But since we don't actually support 16-bit samples (ie lossless coding) yet,
  * I'm not going to worry about making a smarter definition ...
  */

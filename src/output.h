@@ -43,13 +43,13 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 extern char recording;
 extern FILE *recordFile;
 
-Int Printf(const char *format, ...);
-Int Fprintf(FILE *stream, const char *format, ...);
-Int Vprintf(const char *format, va_list arg);
-Int Vfprintf(FILE *stream, const char *format, va_list arg);
-Int Puts(const char *s);
-Int Fputs(const char *s, FILE *stream);
-Int Fputc(Int c, FILE *stream);
+int32_t Printf(const char *format, ...);
+int32_t Fprintf(FILE *stream, const char *format, ...);
+int32_t Vprintf(const char *format, va_list arg);
+int32_t Vfprintf(FILE *stream, const char *format, va_list arg);
+int32_t Puts(const char *s);
+int32_t Fputs(const char *s, FILE *stream);
+int32_t Fputc(int32_t c, FILE *stream);
 
 /* also redefine the output macros: first undefine the old ones so no */
 /* warnings ensue during compilation */

@@ -29,27 +29,27 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "action.h"
 
 /* contour parameters and flags */
-extern	Int	current_pen, autocon, contour_mode, contour_box, 
+extern	int32_t	current_pen, autocon, contour_mode, contour_box, 
 	contour_nlev, contour_border, contour_tick_pen,	contour_ticks,
 	contour_style, iorder;
 extern	float	wxb, wxt, wyb, wyt, contour_dash_lev, contour_tick_fac;
-Int	contour_flag;
-Int	contour_sym;
-static	Int	nx, ny;
+int32_t	contour_flag;
+int32_t	contour_sym;
+static	int32_t	nx, ny;
 static	float	xa, xb, ya, yb;
 static	float	xsc, ysc;
-Int	tkplot(float, float, Int, Int);
+int32_t	tkplot(float, float, int32_t, int32_t);
 /*------------------------------------------------------------------------- */
-Int lux_contour(Int narg, Int ps[]) /* contour routine */		
+int32_t lux_contour(int32_t narg, int32_t ps[]) /* contour routine */		
 /* call is CONTOUR, image, nlev, xa, xb, ya, yb */
 {
   array	*h;
-  Int	iq, i, nc, lineStyle, symStyle;
+  int32_t	iq, i, nc, lineStyle, symStyle;
   float	*pf, *cl, xmax, xmin, *pp, yq, xspace, xq;
-  Int	anacon(float *, Int, Int, float *, Int, Int, float, float, float,
-	       float, float), installString(char *), lux_replace(Int, Int),
-	box(void), ticks(void), fixPlotStyle(Int *, Int *);
-  extern Int	tkCoordSys;
+  int32_t	anacon(float *, int32_t, int32_t, float *, int32_t, int32_t, float, float, float,
+	       float, float), installString(char *), lux_replace(int32_t, int32_t),
+	box(void), ticks(void), fixPlotStyle(int32_t *, int32_t *);
+  extern int32_t	tkCoordSys;
   extern float	theDashSize;
   char	gotLevels;
 
@@ -143,9 +143,9 @@ Int lux_contour(Int narg, Int ps[]) /* contour routine */
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int box(void)
+int32_t box(void)
 {
-  Int	set_pen(Int pen);
+  int32_t	set_pen(int32_t pen);
 
   set_pen(contour_border);
   tkplot(xa, ya, 0, 0);	tkplot(xb, ya, 1, 0);	tkplot(xb, yb, 1, 0);
@@ -154,11 +154,11 @@ Int box(void)
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int ticks(void)
+int32_t ticks(void)
 {
-  Int	oldpen, pen;
+  int32_t	oldpen, pen;
   float	tx, ty, y, x, xs, ys;
-  Int	set_pen(Int);
+  int32_t	set_pen(int32_t);
 
   if (contour_tick_pen <= 0)
     return 1;
@@ -236,11 +236,11 @@ Int ticks(void)
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int tkdash(float *aa, float *bb, Int *ndsh, Int *ntimes)
+int32_t tkdash(float *aa, float *bb, int32_t *ndsh, int32_t *ntimes)
 /* actually no dashed line support yet 3/9/92 */
      /* there is now!  LS 4feb95 */
 {
-  Int	nc;
+  int32_t	nc;
   float	x, y;
 
   nc = *ntimes;
@@ -250,22 +250,22 @@ Int tkdash(float *aa, float *bb, Int *ndsh, Int *ntimes)
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int lower_int(float x)
+int32_t lower_int(float x)
 /* returns the first integer closer to -Infinity than x */
 {
-  Int	i;
+  int32_t	i;
 
-  i = (Int) x;
+  i = (int32_t) x;
   if (x < 0) i--;
   return i;
 }
 /*------------------------------------------------------------------------- */
-Int closest_int(float x)
+int32_t closest_int(float x)
 /* returns the integer closest to x (with integer + 0.5 -> integer + 1) */
 {
-  Int	i;
+  int32_t	i;
 
-  i = (Int) x;
+  i = (int32_t) x;
   if (x < 0) i--;
   if (x - i >= 0.5) i++;
   return i;

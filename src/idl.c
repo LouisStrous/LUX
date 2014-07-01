@@ -22,17 +22,17 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdio.h>
 #include "action.h"
 
-Int lux_idlrestore(Int narg, Int ps[])
+int32_t lux_idlrestore(int32_t narg, int32_t ps[])
 /* IDLRESTORE,<filename> restores all variables from the IDL Save file
    with name <filename>.  Supports scalars, strings, and numerical arrays
    LS 18sep98 */
 {
   uint8_t	bytes[8];
   char	*p;
-  Int	ints[3], dims[MAX_DIMS], n, var, ndim, type, nread;
+  int32_t	ints[3], dims[MAX_DIMS], n, var, ndim, type, nread;
   FILE	*fp;
-  void	endian(void *, Int, Int);
-  Int	installString(char *);
+  void	endian(void *, int32_t, int32_t);
+  int32_t	installString(char *);
   scalar	value;
   pointer	pp, data;
 
@@ -65,8 +65,8 @@ Int lux_idlrestore(Int narg, Int ps[])
 
   pp.b = &value.b;
 
-  fseek(fp, 4, SEEK_CUR);	/* skip one Int */
-  fread(ints, 4, 1, fp);	/* read one Int */
+  fseek(fp, 4, SEEK_CUR);	/* skip one int32_t */
+  fread(ints, 4, 1, fp);	/* read one int32_t */
 #if !LITTLEENDIAN
   endian(ints, 4, LUX_LONG);
 #endif
@@ -138,10 +138,10 @@ Int lux_idlrestore(Int narg, Int ps[])
       data.b = array_data(var);
       switch (type) {
 	case 1:			/* bytes stored as longs (!) */
-	  fseek(fp, 4, SEEK_CUR); /* skip extra Int */
+	  fseek(fp, 4, SEEK_CUR); /* skip extra int32_t */
 	  fread(data.b, 1, n, fp);
 	  n = 3 - (n - 1) % 4;
-	  if (n)		/* align on Int boundary */
+	  if (n)		/* align on int32_t boundary */
 	    fseek(fp, n, SEEK_CUR);
 	  break;
 	case 2:			/* int16_t */
@@ -216,7 +216,7 @@ Int lux_idlrestore(Int narg, Int ps[])
 	  p[ints[0]] = '\0';	/* terminate string */
 	  n = 3 - (ints[0] - 1) % 4;
 	  if (n)
-	    fseek(fp, n, SEEK_CUR); /* align on Int */
+	    fseek(fp, n, SEEK_CUR); /* align on int32_t */
 	  break;
 	default:
 	  fclose(fp);
@@ -227,7 +227,7 @@ Int lux_idlrestore(Int narg, Int ps[])
   } while (1);
 }
 /*-----------------------------------------------------------------------*/
-Int lux_idlread_f(Int narg, Int ps[])
+int32_t lux_idlread_f(int32_t narg, int32_t ps[])
 /* IDLREAD(<var>, <filename>) restores the first variable from the IDL
    Save file with name <filename> into <var>.  Supports scalars, strings,
    and numerical arrays.  Returns LUX_ONE on success, LUX_ZERO on failure.
@@ -235,10 +235,10 @@ Int lux_idlread_f(Int narg, Int ps[])
 {
   uint8_t	bytes[8];
   char	*p;
-  Int	ints[3], dims[MAX_DIMS], n, var, ndim, type;
+  int32_t	ints[3], dims[MAX_DIMS], n, var, ndim, type;
   FILE	*fp;
-  void	endian(void *, Int, Int);
-  Int	installString(char *);
+  void	endian(void *, int32_t, int32_t);
+  int32_t	installString(char *);
   scalar	value;
   pointer	pp, data;
 
@@ -269,8 +269,8 @@ Int lux_idlread_f(Int narg, Int ps[])
 
   pp.b = &value.b;
 
-  fseek(fp, 4, SEEK_CUR);	/* skip one Int */
-  fread(ints, 4, 1, fp);	/* read one Int */
+  fseek(fp, 4, SEEK_CUR);	/* skip one int32_t */
+  fread(ints, 4, 1, fp);	/* read one int32_t */
 #if LITTLEENDIAN
   endian(ints, 4, LUX_LONG);
 #endif
@@ -334,7 +334,7 @@ Int lux_idlread_f(Int narg, Int ps[])
     data.b = array_data(var);
     switch (type) {
       case 1:			/* bytes stored as longs (!) */
-	fseek(fp, 4, SEEK_CUR); /* skip extra Int */
+	fseek(fp, 4, SEEK_CUR); /* skip extra int32_t */
 	fread(data.b, 1, n, fp);
 	break;
       case 2:			/* int16_t */

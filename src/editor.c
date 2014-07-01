@@ -38,15 +38,15 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 char	line[BUFSIZE], tLine[BUFSIZE], recording = 0;
 FILE	*inputStream;
 char	*inputString;
-Int	curLineNumber = 0, compileLevel = 0;
-static Int	promptLength, show = 1;
-Int	echo = 0;  /* flag: 1 -> echo lines even if not gotten from stdin */
-Int	getStreamChar(void), getStringChar(void);
-Int     (*getChar)(void) = getStreamChar, termCol, termRow, uTermCol, page;
-Int	noPrompt = 0;
-static Int	col = 0, row = 0, textWidth;
+int32_t	curLineNumber = 0, compileLevel = 0;
+static int32_t	promptLength, show = 1;
+int32_t	echo = 0;  /* flag: 1 -> echo lines even if not gotten from stdin */
+int32_t	getStreamChar(void), getStringChar(void);
+int32_t     (*getChar)(void) = getStreamChar, termCol, termRow, uTermCol, page;
+int32_t	noPrompt = 0;
+static int32_t	col = 0, row = 0, textWidth;
 static char	*thePrompt;
-extern Int	scrat[];
+extern int32_t	scrat[];
 /*----------------------------------------------------*/
 void getTerminalSize(void)
 {
@@ -73,7 +73,7 @@ int getSingleStdinChar(void)
 int getStringChar(void)
 /* gets the next input char from inputString, no control sequences */
 {
-  Int	c;
+  int32_t	c;
 
   c = *inputString++;
   if (!c)
@@ -82,7 +82,7 @@ int getStringChar(void)
   return c;
 }
 /*----------------------------------------------------*/
-Int readHistory(void)
+int32_t readHistory(void)
 /* reads history from a history file (~/.lux-history) */
 {
   int result = read_history(expand_name("~/.lux-history", NULL));
@@ -93,7 +93,7 @@ Int readHistory(void)
   return result;
 }
 /*----------------------------------------------------*/
-Int saveHistory(void)
+int32_t saveHistory(void)
 /* saves history in a history file (~/.lux-history) */
 {
   int result = write_history(expand_name("~/.lux-history", NULL));
@@ -103,7 +103,7 @@ Int saveHistory(void)
   return result;
 }
 /*----------------------------------------------------*/
-Int getNewLine(char *buffer, size_t bufsize, char *prompt, char historyFlag)
+int32_t getNewLine(char *buffer, size_t bufsize, char *prompt, char historyFlag)
 /* reads new line from keyboard or file into buffer; returns length
    (terminating null isn't included in count).
    includes history buffer, Word-by-Word movement, search in

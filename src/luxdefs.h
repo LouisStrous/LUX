@@ -513,7 +513,7 @@ typedef struct structElemStruct {
 
 typedef struct {
   uint8_t type;
-  uWord number;
+  uint16_t number;
   union { Word *w; char **sp; } ptr;
 } extractSec;
 
@@ -551,7 +551,7 @@ typedef struct symTableEntryStruct {
   { scalar scalar;
     struct { array      *ptr; Int bstore; } array;
     struct { Word       *ptr; Int bstore; } wlist;
-    struct { uWord      *ptr; Int bstore; } uwlist;
+    struct { uint16_t      *ptr; Int bstore; } uwlist;
     struct { enumElem   *ptr; Int bstore; } enumElem;
     struct { char       *ptr; Int bstore; } name;
     struct { listElem   *ptr; Int bstore; } listElem;
@@ -562,8 +562,8 @@ typedef struct symTableEntryStruct {
     struct { structPtr  *ptr; Int bstore; } structPtr;
     pointer     pointer;  
     struct { Word args[4]; } evb;
-    struct { uWord args[4]; } uevb;
-    struct { uint8_t narg; char **keys; uint8_t extend; uWord nstmnt;
+    struct { uint16_t args[4]; } uevb;
+    struct { uint8_t narg; char **keys; uint8_t extend; uint16_t nstmnt;
       Word *ptr; } routine;
   } spec;
 } symTableEntry;

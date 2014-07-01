@@ -3394,7 +3394,7 @@ int32_t lux_filetype_name(int32_t narg, int32_t ps[])
   return result;
 }
 /*----------------------------------------------------------------*/
-void fixedValue(char *name, int32_t type, ...)
+void fixedValue(char *name, Symboltype type, ...)
 /* install a numerical constant */
 {
  int32_t	n, iq;
@@ -3405,45 +3405,50 @@ void fixedValue(char *name, int32_t type, ...)
  iq = installString(name);
  n = findVar(iq, 0);
  switch (type) {
-   case LUX_LSTRING:
-     symbol_class(n) = LUX_STRING;
-     string_type(n) = LUX_LSTRING;
-     string_value(n) = va_arg(ap, char *);
-     symbol_memory(n) = strlen(string_value(n)) + 1;
+ case LUX_LSTRING:
+   symbol_class(n) = LUX_STRING;
+   string_type(n) = LUX_LSTRING;
+   string_value(n) = va_arg(ap, char *);
+   symbol_memory(n) = strlen(string_value(n)) + 1;
+   break;
+ case LUX_CFLOAT: case LUX_CDOUBLE:
+   complex_scalar_data(n).cf = malloc(lux_type_size[type]);
+   if (!complex_scalar_data(n).cf)
+     puts("WARNING - memory allocation error in symbol initialization");
+   complex_scalar_memory(n) = lux_type_size[type];
+   symbol_class(n) = LUX_CSCALAR;
+   complex_scalar_type(n) = type;
+   p.cf = complex_scalar_data(n).cf;
+   if (type == LUX_CFLOAT) {
+     p.cf->real = (float) va_arg(ap, double);
+     p.cf->imaginary = (float) va_arg(ap, double);
+     p.cf++;
+   } else {
+     p.cd->real = va_arg(ap, double);
+     p.cd->imaginary = va_arg(ap, double);
+     p.cd++;
+   }
+   break;
+ default:
+   symbol_class(n) = LUX_SCALAR;
+   scalar_type(n) = type;
+   switch (type) {
+   case LUX_LONG:
+     scalar_value(n).l = va_arg(ap, int32_t);
      break;
-   case LUX_CFLOAT: case LUX_CDOUBLE:
-     complex_scalar_data(n).cf = malloc(lux_type_size[type]);
-     if (!complex_scalar_data(n).cf)
-       puts("WARNING - memory allocation error in symbol initialization");
-     complex_scalar_memory(n) = lux_type_size[type];
-     symbol_class(n) = LUX_CSCALAR;
-     complex_scalar_type(n) = type;
-     p.cf = complex_scalar_data(n).cf;
-     if (type == LUX_CFLOAT) {
-       p.cf->real = (float) va_arg(ap, double);
-       p.cf->imaginary = (float) va_arg(ap, double);
-       p.cf++;
-     } else {
-       p.cd->real = va_arg(ap, double);
-       p.cd->imaginary = va_arg(ap, double);
-       p.cd++;
-     }
+   case LUX_QUAD:
+     scalar_value(n).q = va_arg(ap, int64_t);
+     break;
+   case LUX_FLOAT:
+     scalar_value(n).f = (float) va_arg(ap, double);
+     break;
+   case LUX_DOUBLE:
+     scalar_value(n).d = va_arg(ap, double);
      break;
    default:
-     symbol_class(n) = LUX_SCALAR;
-     scalar_type(n) = type;
-     switch (type) {
-       case LUX_LONG:
-	 scalar_value(n).l = va_arg(ap, int32_t);
-	 break;
-       case LUX_FLOAT:
-	 scalar_value(n).f = (float) va_arg(ap, double);
-	 break;
-       case LUX_DOUBLE:
-	 scalar_value(n).d = va_arg(ap, double);
-	 break;
-     }
-     break;
+     cerror(ILL_TYPE, n);
+   }
+   break;
  }
 }
 /*----------------------------------------------------------------*/
@@ -4001,6 +4006,7 @@ int32_t lux_trace(int32_t narg, int32_t ps[])
 /*----------------------------------------------------------------*/
 #define b_fix(name, value) { fixedValue(name, LUX_BYTE, value);  nFixed++; }
 #define l_fix(name, value) { fixedValue(name, LUX_LONG, value);  nFixed++; }
+#define q_fix(name, value) { fixedValue(name, LUX_QUAD, value);  nFixed++; }
 #define f_fix(name, value) { fixedValue(name, LUX_FLOAT, value);  nFixed++; }
 #define d_fix(name, value) { fixedValue(name, LUX_DOUBLE, value);  nFixed++; }
 #define s_fix(name, value) { fixedValue(name, LUX_LSTRING, value);  nFixed++; }
@@ -4241,10 +4247,12 @@ void symbolInitialization(void)
  l_fix("#MAX_BYTE",	bounds.max.b);
  l_fix("#MAX_WORD",	bounds.max.w);
  l_fix("#MAX_LONG",	bounds.max.l);
+ q_fix("#MAX_QUAD",     bounds.max.q);
  f_fix("#MAX_FLOAT", 	bounds.max.f);
  d_fix("#MAX_DOUBLE", 	bounds.max.d);
  l_fix("#MIN_WORD",	bounds.min.w);
  l_fix("#MIN_LONG",	bounds.min.l);
+ q_fix("#MIN_QUAD",     bounds.min.q);
  f_fix("#MIN_FLOAT", 	FLT_MIN);
  d_fix("#MIN_DOUBLE", 	DBL_MIN);
  l_fix("#MAX_DIMS",	MAX_DIMS);
@@ -4262,7 +4270,7 @@ void symbolInitialization(void)
  d_fix("#EC",		6.6252E-27);
  d_fix("#M",		9.1084E-28);
  d_fix("#K",		1.308046E-16);
- d_fix("#R",		8.317E7); 
+ d_fix("#R",		8.317E7);
  d_fix("#RAD",		RAD);
  r_d_sym = nFixed;
  d_fix("#R.D",		RAD);

@@ -140,7 +140,7 @@ Int lux_generalfit(Int narg, Int ps[])
   { gaussians, powerfunc };
   double (*fitFunc)(double *, Int, double *, double *, double *, Int);
   extern Int    nFixed;
-  Word  fitPar, fitArg[4];
+  int16_t  fitPar, fitArg[4];
   Int   lux_indgen(Int, Int []), eval(Int);
   void  zap(Int);
   time_t starttime;
@@ -377,7 +377,7 @@ Int lux_generalfit(Int narg, Int ps[])
     fitTemp = nextFreeTempExecutable();
     symbol_class(fitTemp) = LUX_USR_FUNC;
     usr_func_arguments(fitTemp) = fitArg;
-    symbol_memory(fitTemp) = (weights? 4: 3)*sizeof(Word);
+    symbol_memory(fitTemp) = (weights? 4: 3)*sizeof(int16_t);
     usr_func_number(fitTemp) = fitSym;
   }
 
@@ -1094,7 +1094,7 @@ Int lux_geneticfit(Int narg, Int ps[])
     *rtoi, pair, k, w, generation, i1, i2, ibit,
     iter = 0, vocal, typesize, nGeneration;
   uscalar p;
-  Word  *par, fitPar, xSym, ySym, fitArg[4], wSym;
+  int16_t  *par, fitPar, xSym, ySym, fitArg[4], wSym;
   uint8_t  *genes, *parent1, *parent2, *genes2, t1, t2;
   double *deviation, mu, *distr, random_one(void), pcross, *deviation2,
     crossmark, mutatemark, pmutate, sum;
@@ -1246,7 +1246,7 @@ Int lux_geneticfit(Int narg, Int ps[])
   fitTemp = nextFreeTempExecutable();
   symbol_class(fitTemp) = LUX_USR_FUNC;
   usr_func_arguments(fitTemp) = fitArg;
-  symbol_memory(fitTemp) = (weights? 4: 3)*sizeof(Word);
+  symbol_memory(fitTemp) = (weights? 4: 3)*sizeof(int16_t);
   usr_func_number(fitTemp) = fitSym;
 
   /* create initial population */
@@ -1376,12 +1376,12 @@ Int lux_geneticfit(Int narg, Int ps[])
         crossoversites[ibit]++;
         w = ibit/8;             /* Byte index */
         k = ibit - 8*w;         /* bit index */
-        for (i = 0; i < w; i++) { /* swap before cross-over Word */
+        for (i = 0; i < w; i++) { /* swap before cross-over int16_t */
           t1 = child1[i];
           child1[i] = child2[i];
           child2[i] = t1;
         } /* end of for (i = 0; ...) */
-        if (k) {                /* cross-over site is not on Word boundary */
+        if (k) {                /* cross-over site is not on int16_t boundary */
           t1 = ((child1[w] & mask1[k]) | (child2[w] & mask2[k]));
           t2 = ((child2[w] & mask1[k]) | (child1[w] & mask2[k]));
           child1[w] = t1;
@@ -1391,12 +1391,12 @@ Int lux_geneticfit(Int narg, Int ps[])
             || hasnan(child2, nPar, partype)) {
           /* we generated one or two NaNs from regular numbers: */
           /* undo the crossover */
-          for (i = 0; i < w; i++) { /* swap before cross-over Word */
+          for (i = 0; i < w; i++) { /* swap before cross-over int16_t */
             t1 = child1[i];
             child1[i] = child2[i];
             child2[i] = t1;
           } /* end of for (i = 0; ...) */
-          if (k) {              /* cross-over site is not on Word boundary */
+          if (k) {              /* cross-over site is not on int16_t boundary */
             t1 = ((child1[w] & mask1[k]) | (child2[w] & mask2[k]));
             t2 = ((child2[w] & mask1[k]) | (child1[w] & mask2[k]));
             child1[w] = t1;

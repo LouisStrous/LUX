@@ -57,7 +57,7 @@ void fixContext(Int symbol, Int context)
 /* LUX_CLIST, LUX_KEYWORD) to reflect embedding in <symbol>. */
 {
   Int	i, nElem;
-  Word	*ptr;
+  int16_t	*ptr;
   listElem	*p;
 
   switch (symbol_class(symbol)) {
@@ -159,11 +159,11 @@ Int copyToSym(Int target, Int source)
     case LUX_CLIST:
       size = clist_num_symbols(source);
       optr.w = clist_symbols(source);
-      allocate(clist_symbols(target), size, Word);
+      allocate(clist_symbols(target), size, int16_t);
       symbol_memory(target) = symbol_memory(source);
       ptr.w = clist_symbols(target);
       while (size--) {
-	*ptr.w = (Word) copySym(*optr.w++);
+	*ptr.w = (int16_t) copySym(*optr.w++);
 	embed(*ptr.w, target);
 	ptr.w++;
       }
@@ -171,7 +171,7 @@ Int copyToSym(Int target, Int source)
     case LUX_CPLIST:
       size = clist_num_symbols(source);
       optr.w = clist_symbols(source);
-      allocate(clist_symbols(target), size, Word);
+      allocate(clist_symbols(target), size, int16_t);
       symbol_memory(target) = symbol_memory(source);
       ptr.w = clist_symbols(target);
       while (size--) {
@@ -186,7 +186,7 @@ Int copyToSym(Int target, Int source)
       symbol_memory(target) = symbol_memory(source);
       eptr = list_symbols(target);
       while (size--) {
-	eptr->value = (Word) copySym(oeptr->value);
+	eptr->value = (int16_t) copySym(oeptr->value);
 	embed(eptr->value, target);
 	eptr->key = oeptr->key? strsave(oeptr->key): NULL;
 	eptr++;
@@ -246,7 +246,7 @@ Int copyToSym(Int target, Int source)
 	etrgt->number = esrc->number;
 	switch (esrc->type) {
 	  case LUX_RANGE:
-	    etrgt->ptr.w = malloc(esrc->number*sizeof(Word));
+	    etrgt->ptr.w = malloc(esrc->number*sizeof(int16_t));
 	    i = esrc->number;
 	    while (i--) {
 	      *etrgt->ptr.w = copySym(*esrc->ptr.w);
@@ -305,7 +305,7 @@ Int copySym(Int symbol)
 Int extractReplace(Int symbol)
 {
   Int	target, lhs, rhs, result, n;
-  Word	*ptr;
+  int16_t	*ptr;
   char	findTarget = '\0', *name;
   Int	lux_replace(Int, Int);
 
@@ -344,11 +344,11 @@ Int extractReplace(Int symbol)
       int_sub_routine_num(symbol) = LUX_INSERT_SUB;
       /* required argument list:  subscripts, source, target */
       /* current argument list: target subscripts */
-      int_sub_arguments(symbol) = ptr = realloc(ptr, (n + 1)*sizeof(Word));
-      symbol_memory(symbol) = (n + 1)*sizeof(Word);
+      int_sub_arguments(symbol) = ptr = realloc(ptr, (n + 1)*sizeof(int16_t));
+      symbol_memory(symbol) = (n + 1)*sizeof(int16_t);
       if (!ptr)
 	return LUX_ERROR;	/* some reallocation error */
-      memmove(ptr, ptr + 1, n*sizeof(Word)); /* now: subscripts ... ... */
+      memmove(ptr, ptr + 1, n*sizeof(int16_t)); /* now: subscripts ... ... */
       ptr[n - 1] = rhs;		/* subscripts rhs ... */
       ptr[n] = target;		/* subscripts rhs target */
       extract_ptr(lhs) = NULL;	/* or else it will get zapped */
@@ -573,7 +573,7 @@ Int lux_replace(Int lhs, Int rhs)
 #define ORKEY		-1001
 #define MODEKEY		-1002
 #define ZEROKEY		-1003
-Int matchKey(Word index, char **keys, Int *var)
+Int matchKey(int16_t index, char **keys, Int *var)
 /* matches symbol[index] to the keyword list and returns index
   of matched key (or NOKEY) */
 /* if a key is preceded by a number, then the number is OR-ed into */
@@ -687,7 +687,7 @@ Int internal_routine(Int symbol, internalRoutine *routine)
 {
  /* sym[symbol].xx -> routine number
     sym[symbol].spec.array.ptr -> arguments
-    sym[symbol].spec.array.bstore/sizeof(Word) -> # arguments  */
+    sym[symbol].spec.array.bstore/sizeof(int16_t) -> # arguments  */
 
   /* evalArgs must be Int* because it is passed on to individual */
   /* routines (Int ps[]) */
@@ -695,7 +695,7 @@ Int internal_routine(Int symbol, internalRoutine *routine)
 	routineNum, n, thisInternalMode = 0, ordinary = 0;
  uint8_t	isSubroutine;
  keyList	*theKeyList;
- Word	*arg;
+ int16_t	*arg;
  char	*name, suppressEval = 0, suppressUnused = 0;
  extern char	evalScalPtr;
  extern Int	pipeExec;
@@ -997,7 +997,7 @@ Int usr_routine(Int symbol)
   /* to individual routines (Int ps[]) */
  Int	nPar, nStmnt, i, oldContext = curContext, n, routineNum, nKeys = 0,
 	ordinary = 0, thisNArg, *evalArg, oldNArg, listSym = 0;
- Word	*arg, *par, *list = NULL;
+ int16_t	*arg, *par, *list = NULL;
  char	type, *name, msg, isError,
    *routineTypeNames[] = { "FUNC", "SUBR", "BLOCK" };
  symTableEntry	*oldpars;
@@ -1159,7 +1159,7 @@ Int usr_routine(Int symbol)
 	   if (listSym == LUX_ERROR)
 	     goto usr_routine_2;
 	   symbol_class(listSym) = LUX_CPLIST;
-	   symbol_memory(listSym) = (thisNArg - nPar + 1)*sizeof(Word);
+	   symbol_memory(listSym) = (thisNArg - nPar + 1)*sizeof(int16_t);
 	   list = malloc(symbol_memory(listSym));
 	   if (!list) {
 	     cerror(ALLOC_ERR, listSym);
@@ -1351,7 +1351,7 @@ Int lux_for(Int nsym)
  pointer	counter;
  scalar		start, inc, end;
  Int		hiType, n, temp, action;
- Word		startSym, endSym, stepSym, counterSym;
+ int16_t		startSym, endSym, stepSym, counterSym;
  char		forward;
  extern Int	trace, step;
 
@@ -1685,7 +1685,7 @@ Int execute(Int symbol)
      /* executes LUX_EVB <symbol>.  Returns -1 on error, 1 on success, */
      /* various negative numbers on breaks, returns, etc. */
 {
-  Word	*ptr;
+  int16_t	*ptr;
   Int	temp, temp2, temp3, n, c = 0, oldStep, go = 0, oldEVB, oldBreakpoint,
     action;
   static Int	atBreakpoint = 0;
@@ -1695,7 +1695,7 @@ Int execute(Int symbol)
   extern char	*currentInputFile;
   extern breakpointInfo	breakpoint[];
   extern uint8_t	disableNewline;
-  extern Word	watchVars[];
+  extern int16_t	watchVars[];
   uint8_t	oldNL;
   char	*name, *p, *oldRoutineName;
   FILE	*fp;
@@ -2673,19 +2673,19 @@ Int insert(Int narg, Int ps[])
 	    case LUX_WORD:
 	      switch (srcType) {
 		case LUX_BYTE:
-		  trgt.w[offset] = (Word) *src.b;
+		  trgt.w[offset] = (int16_t) *src.b;
 		  break;
 		case LUX_WORD:
 		  trgt.w[offset] = *src.w;
 		  break;
 		case LUX_LONG:
-		  trgt.w[offset] = (Word) *src.l;
+		  trgt.w[offset] = (int16_t) *src.l;
 		  break;
 		case LUX_FLOAT:
-		  trgt.w[offset] = (Word) *src.f;
+		  trgt.w[offset] = (int16_t) *src.f;
 		  break;
 		case LUX_DOUBLE:
-		  trgt.w[offset] = (Word) *src.d;
+		  trgt.w[offset] = (int16_t) *src.d;
 		  break;
 		case LUX_CFLOAT:
 		  trgt.w[offset] = sqrt(src.cf->real*src.cf->real
@@ -2899,19 +2899,19 @@ Int insert(Int narg, Int ps[])
 	    case LUX_WORD:
 	      switch (srcType) {
 		case LUX_BYTE:
-		  value.w = (Word) *src.b;
+		  value.w = (int16_t) *src.b;
 		  break;
 		case LUX_WORD:
 		  value.w = *src.w;
 		  break;
 		case LUX_LONG:
-		  value.w = (Word) *src.l;
+		  value.w = (int16_t) *src.l;
 		  break;
 		case LUX_FLOAT:
-		  value.w = (Word) *src.f;
+		  value.w = (int16_t) *src.f;
 		  break;
 		case LUX_DOUBLE:
-		  value.w = (Word) *src.d;
+		  value.w = (int16_t) *src.d;
 		  break;
 		case LUX_CFLOAT:
 		  value.w = sqrt(src.cf->real*src.cf->real
@@ -3213,19 +3213,19 @@ Int insert(Int narg, Int ps[])
 	    case LUX_WORD:
 	      switch (srcType) {
 		case LUX_BYTE:
-		  trgt.w[offset] = (Word) *src.b;
+		  trgt.w[offset] = (int16_t) *src.b;
 		  break;
 		case LUX_WORD:
 		  trgt.w[offset] = *src.w;
 		  break;
 		case LUX_LONG:
-		  trgt.w[offset] = (Word) *src.l;
+		  trgt.w[offset] = (int16_t) *src.l;
 		  break;
 		case LUX_FLOAT:
-		  trgt.w[offset] = (Word) *src.f;
+		  trgt.w[offset] = (int16_t) *src.f;
 		  break;
 		case LUX_DOUBLE:
-		  trgt.w[offset] = (Word) *src.d;
+		  trgt.w[offset] = (int16_t) *src.d;
 		  break;
 		case LUX_CFLOAT:
 		  trgt.w[offset] = sqrt(src.cf->real*src.cf->real
@@ -3447,19 +3447,19 @@ Int insert(Int narg, Int ps[])
 	    case LUX_WORD:
 	      switch (srcType) {
 		case LUX_BYTE:
-		  value.w = (Word) *src.b;
+		  value.w = (int16_t) *src.b;
 		  break;
 		case LUX_WORD:
 		  value.w = *src.w;
 		  break;
 		case LUX_LONG:
-		  value.w = (Word) *src.l;
+		  value.w = (int16_t) *src.l;
 		  break;
 		case LUX_FLOAT:
-		  value.w = (Word) *src.f;
+		  value.w = (int16_t) *src.f;
 		  break;
 		case LUX_DOUBLE:
-		  value.w = (Word) *src.d;
+		  value.w = (int16_t) *src.d;
 		  break;
 		case LUX_CFLOAT:
 		  value.w = sqrt(src.cf->real*src.cf->real
@@ -3649,7 +3649,7 @@ Int einsert(Int lhs, Int rhs)
     srcType, stride[MAX_DIMS], tally[MAX_DIMS], offset0, nmult,
     tstep[MAX_DIMS], offset, onestep, unit, combineType, narg,
     oldInternalMode, *ps2, srcMult;
-  Word	*ps;
+  int16_t	*ps;
   pointer	src, trgt;
   wideScalar	value;
   char	*name, keepps2;
@@ -4119,19 +4119,19 @@ Int einsert(Int lhs, Int rhs)
 	    case LUX_WORD:
 	      switch (srcType) {
 		case LUX_BYTE:
-		  trgt.w[offset] = (Word) *src.b;
+		  trgt.w[offset] = (int16_t) *src.b;
 		  break;
 		case LUX_WORD:
 		  trgt.w[offset] = *src.w;
 		  break;
 		case LUX_LONG:
-		  trgt.w[offset] = (Word) *src.l;
+		  trgt.w[offset] = (int16_t) *src.l;
 		  break;
 		case LUX_FLOAT:
-		  trgt.w[offset] = (Word) *src.f;
+		  trgt.w[offset] = (int16_t) *src.f;
 		  break;
 		case LUX_DOUBLE:
-		  trgt.w[offset] = (Word) *src.d;
+		  trgt.w[offset] = (int16_t) *src.d;
 		  break;
 		case LUX_CFLOAT:
 		  trgt.w[offset] = sqrt(src.cf->real*src.cf->real
@@ -4346,19 +4346,19 @@ Int einsert(Int lhs, Int rhs)
 	    case LUX_WORD:
 	      switch (srcType) {
 		case LUX_BYTE:
-		  value.w = (Word) *src.b;
+		  value.w = (int16_t) *src.b;
 		  break;
 		case LUX_WORD:
 		  value.w = *src.w;
 		  break;
 		case LUX_LONG:
-		  value.w = (Word) *src.l;
+		  value.w = (int16_t) *src.l;
 		  break;
 		case LUX_FLOAT:
-		  value.w = (Word) *src.f;
+		  value.w = (int16_t) *src.f;
 		  break;
 		case LUX_DOUBLE:
-		  value.w = (Word) *src.d;
+		  value.w = (int16_t) *src.d;
 		  break;
 		case LUX_CFLOAT:
 		  value.w = sqrt(src.cf->real*src.cf->real
@@ -4676,19 +4676,19 @@ Int einsert(Int lhs, Int rhs)
 	    case LUX_WORD:
 	      switch (srcType) {
 		case LUX_BYTE:
-		  trgt.w[offset] = (Word) *src.b;
+		  trgt.w[offset] = (int16_t) *src.b;
 		  break;
 		case LUX_WORD:
 		  trgt.w[offset] = *src.w;
 		  break;
 		case LUX_LONG:
-		  trgt.w[offset] = (Word) *src.l;
+		  trgt.w[offset] = (int16_t) *src.l;
 		  break;
 		case LUX_FLOAT:
-		  trgt.w[offset] = (Word) *src.f;
+		  trgt.w[offset] = (int16_t) *src.f;
 		  break;
 		case LUX_DOUBLE:
-		  trgt.w[offset] = (Word) *src.d;
+		  trgt.w[offset] = (int16_t) *src.d;
 		  break;
 		case LUX_CFLOAT:
 		  trgt.w[offset] = sqrt(src.cf->real*src.cf->real
@@ -4911,19 +4911,19 @@ Int einsert(Int lhs, Int rhs)
 	    case LUX_WORD:
 	      switch (srcType) {
 		case LUX_BYTE:
-		  value.w = (Word) *src.b;
+		  value.w = (int16_t) *src.b;
 		  break;
 		case LUX_WORD:
 		  value.w = *src.w;
 		  break;
 		case LUX_LONG:
-		  value.w = (Word) *src.l;
+		  value.w = (int16_t) *src.l;
 		  break;
 		case LUX_FLOAT:
-		  value.w = (Word) *src.f;
+		  value.w = (int16_t) *src.f;
 		  break;
 		case LUX_DOUBLE:
-		  value.w = (Word) *src.d;
+		  value.w = (int16_t) *src.d;
 		  break;
 		case LUX_CFLOAT:
 		  value.w = sqrt(src.cf->real*src.cf->real

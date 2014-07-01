@@ -23,7 +23,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 typedef struct {
   Int func_sym;
   size_t num_params;
-  Word *param_syms;
+  int16_t *param_syms;
   pointer *param_data;
 } lux_func_if;
 

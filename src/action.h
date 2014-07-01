@@ -25,7 +25,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "bindings.h"
 
 extern char		expname[], line[], *curScrat, *currentRoutineName;
-extern Word		listStack[],  curContext;
+extern int16_t		listStack[],  curContext;
 extern Int		scrat[], lux_file_open[], errorSym,
 			MSBfirst, suppressMsg;
 extern Int	lux_type_size[];
@@ -106,7 +106,7 @@ Int	setup_x(void);
 #endif
 
 void	clearToPopTempVariable(Int), pushTempVariable(Int), printw(char *),
-  protect(Int *, Int), protectOne(Word), unProtect(Int *, Int),
+  protect(Int *, Int), protectOne(int16_t), unProtect(Int *, Int),
   pushTempVariableIndex(void), checkErrno(void), updatIndices(void),
   zapTemp(Int), freeString(Int), unlinkString(Int), mark(Int),
   zapMarked(void), pegMark(void), unMark(Int),

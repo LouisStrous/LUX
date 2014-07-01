@@ -2183,7 +2183,7 @@ Int read_ascii(Int narg, Int ps[], FILE *fp, Int flag)
 	  scalar_value(iq).b = (uint8_t) value.l;
 	  break;
 	case LUX_WORD:
-	  scalar_value(iq).w = (Word) value.l;
+	  scalar_value(iq).w = (int16_t) value.l;
 	  break;
 	case LUX_FLOAT:
 	  scalar_value(iq).f = (float) value.d;
@@ -2235,10 +2235,10 @@ Int read_ascii(Int narg, Int ps[], FILE *fp, Int flag)
 	    case LUX_WORD:
 	      switch (type) {
 	      case LUX_BYTE: case LUX_WORD: case LUX_LONG:
-		*pp.w++ = (Word) value.l;
+		*pp.w++ = (int16_t) value.l;
 		break;
 	      case LUX_FLOAT: case LUX_DOUBLE:
-		*pp.w++ = (Word) value.d;
+		*pp.w++ = (int16_t) value.d;
 		break;
 	      }
 	      break;
@@ -3261,9 +3261,9 @@ Int fzread(Int narg, Int ps[], Int flag) /* fzread subroutine */
   fzHead	*fh;
   pointer q1;
   FILE	*fin;
-  Int	anadecrunch(uint8_t *, Word [], Int, Int, Int),
+  Int	anadecrunch(uint8_t *, int16_t [], Int, Int, Int),
 	anadecrunch8(uint8_t *, uint8_t [], Int, Int, Int),
-	anadecrunchrun(uint8_t *, Word [], Int, Int, Int),
+	anadecrunchrun(uint8_t *, int16_t [], Int, Int, Int),
 	anadecrunchrun8(uint8_t *, uint8_t [], Int, Int, Int);
 #if SIZEOF_LONG_LONG_INT == 8	/* 64-bit integers */
   Int	anadecrunch32(uint8_t *, Int [], Int, Int, Int);
@@ -4088,7 +4088,7 @@ Int lux_astore_f(Int narg, Int ps[])
 /*------------------------------------------------------------------------- */
 Int arestore_one(FILE* fp, Int iq, Int reverseOrder)
 {
-  Word hash, context;
+  int16_t hash, context;
   Int line, exec, n, j;
   pointer p;
 
@@ -4165,7 +4165,7 @@ Int arestore_one(FILE* fp, Int iq, Int reverseOrder)
       return 1;
     if (reverseOrder)
       endian(&n, sizeof(Int), LUX_LONG);
-    allocate(p.w, n*sizeof(Word), Word);
+    allocate(p.w, n*sizeof(int16_t), int16_t);
     clist_symbols(iq) = p.w;
     for (j = 0; j < n; j++) {
       Int iq2 = nextFreeTempVariable();

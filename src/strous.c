@@ -38,7 +38,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "format.h"
 #include "editor.h"		/* for BUFSIZE */
 
-Word	stack[STACKSIZE], *stackPointer = &stack[STACKSIZE];
+int16_t	stack[STACKSIZE], *stackPointer = &stack[STACKSIZE];
 extern Int	stackSym;
 Int	lux_convert(Int, Int [], Int, Int), copyToSym(Int, Int),
   lux_replace(Int, Int), format_check(char *, char **, Int),
@@ -728,7 +728,7 @@ void endian(void *pp, Int n, Int type)
 /* swap bytes according to data type, starting at p, spanning n bytes.
    goes from bigendian to littleendian or back.
    uint8_t -> do nothing
-   Word -> swap 1 2 to 2 1
+   int16_t -> swap 1 2 to 2 1
    long, float -> swap 1 2 3 4 to 4 3 2 1
    double -> swap 1 2 3 4 5 6 7 8 to 8 7 6 5 4 3 2 1
    Works between Ultrix and Irix.   LS 10/12/92	*/
@@ -1660,7 +1660,7 @@ Int smooth(Int narg, Int ps[], Int cumul)
 	      src.w += stride;
 	      if (!cumul)
 		++norm;
-	      *trgt.w = (Word) (value.l/norm);
+	      *trgt.w = (int16_t) (value.l/norm);
 	      trgt.w += stride;
 	      i = 1;
 	    } else
@@ -1672,7 +1672,7 @@ Int smooth(Int narg, Int ps[], Int cumul)
 	      src.w += stride;
 	      if (!cumul)
 		norm += 2;
-	      *trgt.w = (Word) (value.l/norm);
+	      *trgt.w = (int16_t) (value.l/norm);
 	      trgt.w += stride;
 	    }
 	  } else {		/* full width */
@@ -1680,7 +1680,7 @@ Int smooth(Int narg, Int ps[], Int cumul)
 	      value.l += *src.w;
 	      src.w += stride; 
 	    }
-	    Word v = (Word) (value.l/norm);
+	    int16_t v = (int16_t) (value.l/norm);
 	    for (i = 0; i < w1; i++) {
 	      *trgt.w = v;
 	      trgt.w += stride; 
@@ -1690,7 +1690,7 @@ Int smooth(Int narg, Int ps[], Int cumul)
 	  for ( ; i < w2; i++) {
 	    value.l += *src.w - src.w[offset];
 	    src.w += stride;
-	    *trgt.w = (Word) (value.l/norm);
+	    *trgt.w = (int16_t) (value.l/norm);
 	    trgt.w += stride;
 	  }
 	  /* right-hand edge */
@@ -1702,7 +1702,7 @@ Int smooth(Int narg, Int ps[], Int cumul)
 	      offset += stride;
 	      if (!cumul)
 		norm -= 2;
-	      *trgt.w = (Word) (value.l/norm);
+	      *trgt.w = (int16_t) (value.l/norm);
 	      trgt.w += stride;
 	    }
 	    if (!(ww%2)) {
@@ -1710,11 +1710,11 @@ Int smooth(Int narg, Int ps[], Int cumul)
 	      offset += stride;
 	      if (!cumul)
 		--norm;
-	      *trgt.w = (Word) (value.l/norm);
+	      *trgt.w = (int16_t) (value.l/norm);
 	      trgt.w += stride;
 	    }
 	  } else {
-	    Word v = (Word) (value.l/norm);
+	    int16_t v = (int16_t) (value.l/norm);
 	    for ( ; i < srcinfo.rdims[0]; i++) { /* right edge */
 	      *trgt.w = v;
 	      trgt.w += stride;
@@ -2027,7 +2027,7 @@ Int pcmp2(const void *arg1, const void *arg2)
       d2.b = pcmp_ptr.b[*(Int *) arg2];
       return d1.b < d2.b? -1: (d1.b > d2.b? 1: 0);
     case LUX_WORD:
-      d1.w = *(Word *) arg1;
+      d1.w = *(int16_t *) arg1;
       d2.w = pcmp_ptr.w[*(Int *) arg2];
       return d1.w < d2.w? -1: (d1.w > d2.w? 1: 0);
     case LUX_LONG:
@@ -2515,7 +2515,7 @@ Int lux_push(Int narg, Int ps[])
     ps++;
     *--stackPointer = iq;
     clist_symbols(stackSym) = stackPointer;
-    symbol_memory(stackSym) += sizeof(Word);
+    symbol_memory(stackSym) += sizeof(int16_t);
   }
   return 1;
 }
@@ -2543,7 +2543,7 @@ Int lux_pop(Int narg, Int ps[])
       } else if (lux_replace(sym[iq].xx, iq) == LUX_ERROR)
 	isError = 1;
       zap(iq);
-      symbol_memory(stackSym) -= sizeof(Word);
+      symbol_memory(stackSym) -= sizeof(int16_t);
       clist_symbols(stackSym) = stackPointer;
     }
   }
@@ -2559,7 +2559,7 @@ Int lux_pop(Int narg, Int ps[])
       if (lux_replace(ps[i], *stackPointer) == LUX_ERROR)
 	isError = 1;
       zap(*stackPointer++);
-      symbol_memory(stackSym) -= sizeof(Word);
+      symbol_memory(stackSym) -= sizeof(int16_t);
       clist_symbols(stackSym) = stackPointer;
     }
     if (i2 < narg) {		/* number of symbols to pop */
@@ -2574,7 +2574,7 @@ Int lux_pop(Int narg, Int ps[])
 	} else if (lux_replace(sym[iq].xx, iq) == LUX_ERROR)
 	  isError = 1;
 	zap(iq);
-        symbol_memory(stackSym) -= sizeof(Word);
+        symbol_memory(stackSym) -= sizeof(int16_t);
         clist_symbols(stackSym) = stackPointer;
       }
     }
@@ -2588,7 +2588,7 @@ Int lux_dump_stack(Int narg, Int ps[])
    LS 27may94 */
 {
   Int	iq, count = 0;
-  Word	*p;
+  int16_t	*p;
   
   if (stackPointer == stack + STACKSIZE) {
     puts("The stack is empty.");

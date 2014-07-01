@@ -518,7 +518,7 @@ char *symbolIdent(Int symbol, Int mode)
   structElem	*se;
   structPtr	*spe;
   structPtrMember	*spm;
-  Word	*arg;
+  int16_t	*arg;
   extern Int	fileLevel, errorSym;
   extern char	*errorPtr;
   static Int	indent = 0;
@@ -1988,7 +1988,7 @@ Int identStruct(structElem *se)
 void dumpTree(Int symbol)
 {
   Int	kind, i, n, *l;
-  Word	*ptr;
+  int16_t	*ptr;
   static Int	indent = 0;
   extern char *binOpName[];
   char	*name, noName[] = "-", **sp;

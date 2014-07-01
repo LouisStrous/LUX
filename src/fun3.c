@@ -43,7 +43,7 @@ Int rfftf(Int *, float *, float *);
 Int rfftid(Int *, double *);
 Int rfftbd(Int *, double *, double *);
 Int rfftfd(Int *, double *, double *);
-Word	*fade1, *fade2;
+int16_t	*fade1, *fade2;
 extern Int	scalemax, scalemin, lastmaxloc, lastminloc, maxhistsize,
   histmin, histmax, fftdp, lastmax_sym, lastmin_sym, errno;
 extern scalar	lastmin, lastmax;
@@ -75,9 +75,9 @@ Int evalString(char *expr, Int nmax)
  extern char	*currentChar;
  extern Int	tempSym;
  YYSTYPE	valp;
- Word	popList(void);
+ int16_t	popList(void);
  Int	compileString(char *);
- void	pushList(Word);
+ void	pushList(int16_t);
 
  if (nmax < 0)			/* /ALLNUMBER */
    nmax = INT32_MAX;
@@ -2362,14 +2362,14 @@ Int maxormin(Int narg, Int ps[], Int code)
 	/* take first value as initial values */
 	memcpy(&min, src.w, srcinfo.stride);
 	memcpy(&max, src.w, srcinfo.stride);
-	minloc = maxloc = src.w - (Word *) srcinfo.data0;
+	minloc = maxloc = src.w - (int16_t *) srcinfo.data0;
 	do {
 	  if (*src.w > max.w) {
 	    max.w = *src.w;
-	    maxloc = src.w - (Word *) srcinfo.data0;
+	    maxloc = src.w - (int16_t *) srcinfo.data0;
 	  } else if (*src.w < min.w) {
 	    min.w = *src.w;
-	    minloc = src.w - (Word *) srcinfo.data0;
+	    minloc = src.w - (int16_t *) srcinfo.data0;
 	  }
 	} while ((n = advanceLoop(&srcinfo, &src)) < n1);
 	switch (code) {
@@ -4112,7 +4112,7 @@ Int lux_fade_init(Int narg, Int ps[])
    call is: fade_init, x1, x2 */
 {
   uint8_t	*p1, *p2;
-  Word	*q1, *q2;
+  int16_t	*q1, *q2;
   Int	n, iq;
 
   iq = ps[0];
@@ -4164,11 +4164,11 @@ Int lux_fade(Int narg, Int ps[])
  result is a subroutine argument to avoid mallocs */
 {
   uint8_t	*p1;
-  Word	*q1, *q2, wt;
+  int16_t	*q1, *q2, wt;
   Int	weight, n, iq;
 
   if (int_arg_stat(ps[0], &weight) != LUX_OK) return LUX_ERROR;
-  wt = (Word) weight;
+  wt = (int16_t) weight;
   iq = ps[1];
   if (redef_array(iq, 0, 2, fade_dim) != LUX_OK) return LUX_ERROR;
 

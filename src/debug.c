@@ -129,7 +129,7 @@ Int checkOneSymbol(Int symbol, Int limit)
 			       routine_num_parameters(symbol)*sizeof(char *),
 			       limit, symbol, "routine_parameter_names"))
 	ok = 0;
-      if (!checkListMessage(routine_parameters(symbol), (routine_num_parameters(symbol) + routine_num_statements(symbol))*sizeof(Word), limit, symbol, "routine_parameters"))
+      if (!checkListMessage(routine_parameters(symbol), (routine_num_parameters(symbol) + routine_num_statements(symbol))*sizeof(int16_t), limit, symbol, "routine_parameters"))
 	ok = 0;
       break;
     case LUX_EXTRACT: case LUX_PRE_EXTRACT:
@@ -156,7 +156,7 @@ Int checkOneSymbol(Int symbol, Int limit)
       while (n--) {
 	switch (eptr->type) {
 	  case LUX_RANGE:
-	    if (!checkListMessage(eptr->ptr.w, eptr->number*sizeof(Word),
+	    if (!checkListMessage(eptr->ptr.w, eptr->number*sizeof(int16_t),
 				  limit, symbol, "eptr->ptr.w"))
 	      ok = 0;
 	    break;
@@ -794,7 +794,7 @@ Int lux_newallocs(Int narg, Int ps[])
 Int squeeze(void)
 {
   Int	brk, last;
-  Word	*position;
+  int16_t	*position;
   extern char	*firstbreak;
   struct allocItem	*ai;
 
@@ -803,7 +803,7 @@ Int squeeze(void)
   while (ai->next) ai = ai->next;
   last = (char *) ai->ptr - firstbreak;
   printf("last: %d;  break: %d;  allocated %d\n", last, brk, tSize);
-  position = (Word *) calloc(nAlloc, sizeof(Word));
+  position = (int16_t *) calloc(nAlloc, sizeof(int16_t));
   return 1;
 }
 /*-----------------------------------------------------------------------*/

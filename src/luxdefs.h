@@ -397,24 +397,24 @@ typedef union {
   
 /** \union a union of scalar values */
 typedef union {
-  uint8_t b; Word w; Int l; float f; double d; char *s; char **sp;
+  uint8_t b; int16_t w; Int l; float f; double d; char *s; char **sp;
 } scalar;
 
 /* wideScalar is equal to scalar plus the complex data types; we have */
 /* separate scalar and wideScalars because wideScalar is wider, which is */
 /* not always desirable. */
 typedef union {
-  uint8_t b; Word w; Int l; float f; double d; floatComplex cf;
+  uint8_t b; int16_t w; Int l; float f; double d; floatComplex cf;
   doubleComplex cd; char *s; char **sp;
 } wideScalar;
 
 typedef union pointerUnion {
-  uint8_t *b; Word *w; Int *l; float *f; double *d; char *s;
+  uint8_t *b; int16_t *w; Int *l; float *f; double *d; char *s;
   char **sp; void *v; floatComplex *cf; doubleComplex *cd;
 } pointer;
 
 typedef struct {
-  char *key; Word value;
+  char *key; int16_t value;
 } listElem;
 
 typedef struct {
@@ -442,7 +442,7 @@ typedef struct {
 } statFacts_b;
 
 typedef struct {
-  Word min; Word max; Int minloc; Int maxloc; double total; double sdev;
+  int16_t min; int16_t max; Int minloc; Int maxloc; double total; double sdev;
 } statFacts_w;
 
 typedef struct {
@@ -490,8 +490,8 @@ typedef struct arrayStruct {
 } array;
 
 struct boundsStruct {
-  struct { uint8_t b; Word w; Int l; float f; double d; } min;
-  struct { uint8_t b; Word w; Int l; float f; double d; } max;
+  struct { uint8_t b; int16_t w; Int l; float f; double d; } min;
+  struct { uint8_t b; int16_t w; Int l; float f; double d; } max;
 };
 
 typedef struct structElemStruct {
@@ -514,7 +514,7 @@ typedef struct structElemStruct {
 typedef struct {
   uint8_t type;
   uint16_t number;
-  union { Word *w; char **sp; } ptr;
+  union { int16_t *w; char **sp; } ptr;
 } extractSec;
 
 typedef struct {
@@ -546,11 +546,11 @@ typedef struct {
 } preExtract;
 
 typedef struct symTableEntryStruct {
- uint8_t class; uint8_t type; Word xx; Int line; Word context; Int exec;
+ uint8_t class; uint8_t type; int16_t xx; Int line; int16_t context; Int exec;
   union specUnion
   { scalar scalar;
     struct { array      *ptr; Int bstore; } array;
-    struct { Word       *ptr; Int bstore; } wlist;
+    struct { int16_t       *ptr; Int bstore; } wlist;
     struct { uint16_t      *ptr; Int bstore; } uwlist;
     struct { enumElem   *ptr; Int bstore; } enumElem;
     struct { char       *ptr; Int bstore; } name;
@@ -561,10 +561,10 @@ typedef struct symTableEntryStruct {
     struct { void       *ptr; Int bstore; } general;
     struct { structPtr  *ptr; Int bstore; } structPtr;
     pointer     pointer;  
-    struct { Word args[4]; } evb;
+    struct { int16_t args[4]; } evb;
     struct { uint16_t args[4]; } uevb;
     struct { uint8_t narg; char **keys; uint8_t extend; uint16_t nstmnt;
-      Word *ptr; } routine;
+      int16_t *ptr; } routine;
   } spec;
 } symTableEntry;
 
@@ -573,7 +573,7 @@ typedef struct hashTableEntryStruct {
 } hashTableEntry;
 
 typedef struct internalRoutineStruct {
-  char *name; Word minArg; Word maxArg; Int (*ptr)(Int, Int []); void *keys;
+  char *name; int16_t minArg; int16_t maxArg; Int (*ptr)(Int, Int []); void *keys;
 } internalRoutine;
 
 typedef struct {

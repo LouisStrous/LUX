@@ -1920,7 +1920,7 @@ Int lux_compress(Int narg, Int ps[])
 	  sum.l += (Int) src.w[offset];
 	while (advanceLoop(&tmpinfo, &src) < tmpinfo.rndim);
 	*trgt.w = sum.l/nel;
-	src.w = (Word *) tmpinfo.data0;
+	src.w = (int16_t *) tmpinfo.data0;
 	n = advanceLoop(&trgtinfo, &trgt);
 	offset = 0;
 	for (i = 0; i < trgtinfo.ndim; i++)
@@ -2073,7 +2073,7 @@ Int lux_sort(Int narg, Int ps[])
   pointer	p;
   char	sortType;
 
-  /* SGI cc does not accept combination of (Int, uint8_t *) and (Int, Word *) */
+  /* SGI cc does not accept combination of (Int, uint8_t *) and (Int, int16_t *) */
   /* functions in one array of function pointers, not even if the function */
   /* pointer array is defined as (Int, void *). */
   void	sort_b(), sort_w(), sort_l(), sort_f(), sort_d(), sort_s(),
@@ -2138,7 +2138,7 @@ Int lux_index(Int narg, Int ps[])
 {
   Int	iq, type, result_sym, n, nloop, step1, step2, nloop2;
   pointer	p, q;
-  /* SGI cc does not accept combination of (Int, uint8_t *) and (Int, Word *) */
+  /* SGI cc does not accept combination of (Int, uint8_t *) and (Int, int16_t *) */
   /* functions in one array of function pointers, not even if the function */
   /* pointer array is defined as (Int, void *). */
   void	indexx_b(), indexx_w(), indexx_l(), indexx_f(), indexx_d(), indexx_s();

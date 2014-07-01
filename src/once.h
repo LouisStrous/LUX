@@ -79,10 +79,10 @@ hashTableEntry	*varHashTable[HASHSIZE], *subrHashTable[HASHSIZE],
 		*funcHashTable[HASHSIZE], *blockHashTable[HASHSIZE];
 symTableEntry	sym[NSYM];
 Int		scrat[NSCRAT], curSymbol;
-Word		listStack[NLIST];
-Word		curContext = 0;
+int16_t		listStack[NLIST];
+int16_t		curContext = 0;
 Int		lux_type_size[] =
-	{ sizeof(uint8_t), sizeof(Word), sizeof(Int), sizeof(float),
+	{ sizeof(uint8_t), sizeof(int16_t), sizeof(Int), sizeof(float),
 	  sizeof(double), sizeof(char), sizeof(char), sizeof(char *),
 	  sizeof(floatComplex), sizeof(doubleComplex) };
 char	*curScrat = (char *) scrat, *printString;

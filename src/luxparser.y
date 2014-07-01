@@ -42,7 +42,7 @@ extern Int	scrat[],	/* general-purpose scratch storage (once.h) */
 extern char	*symbolStack[],	/* stack of not-yet parsed symbols */
 		line[],		/* raw user input */
 		tLine[];	/* translated user input */
-extern Word	curContext,	/* context of current execution */
+extern int16_t	curContext,	/* context of current execution */
 		listStack[],	/* stack of unincorporated list items */
 		*listStackItem;	/* next free list stack item */
 extern hashTableEntry	*varHashTable[], /* name hash table for variables */
@@ -54,11 +54,11 @@ char	debugLine = 0,		/* we're not in a debugger line */
 	compileOnly = 0;	/* not just compiling but also executing */
 uint8_t disableNewline = 0;	/* disables NEWLINE token so that complex */
 				/* structures can be parsed across newlines */
-void	pushList(Word),		/* push symbol number onto list stack */
+void	pushList(int16_t),		/* push symbol number onto list stack */
 	swapList(Int, Int),	/* swap items in the list stack */
 	cleanUp(Int, Int),
 	away(void);
-Word	popList(void);		/* pop an item from the list stack's top */
+int16_t	popList(void);		/* pop an item from the list stack's top */
 Int	stackListLength(void),	/* return length of list at top of stack */
 	isInternalSubr(Int),	/* 1 if symbol is internal subroutine */
 	installExec(void),
@@ -1110,7 +1110,7 @@ Int readNumber(YYSTYPE *lvalp)
 	  scalar_value(*lvalp).b = (uint8_t) v.l;
 	  break;
 	case LUX_WORD:
-	  scalar_value(*lvalp).w = (Word) v.l;
+	  scalar_value(*lvalp).w = (int16_t) v.l;
 	  break;
 	case LUX_LONG:
 	  scalar_value(*lvalp).l = v.l;

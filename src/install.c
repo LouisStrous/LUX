@@ -49,7 +49,7 @@ extern char		*symbolStack[];
 extern symTableEntry	sym[];
 extern hashTableEntry	*varHashTable[], *subrHashTable[], *funcHashTable[],
 			*blockHashTable[];
-extern Word		listStack[];
+extern int16_t		listStack[];
 extern Int		keepEVB;
 extern char		*currentChar, line[];
 extern FILE		*inputStream, *outputStream;
@@ -70,7 +70,7 @@ char	batch = 0, *currentInputFile = NULL, ignoreSymbols = 0, restart = 0;
 
 Int	traceMode = T_FILE | T_LOOP | T_BLOCK | T_ROUTINE;
 
-Word	*listStackItem = listStack;
+int16_t	*listStackItem = listStack;
 
 Int	symbolStackIndex = 0, tempVariableIndex = TEMPS_START,
 	nTempVariable = 0, namedVariableIndex = NAMED_START,
@@ -1293,7 +1293,7 @@ void undefine(Int symbol)
   void	zap(Int), updateIndices(void);
   char	hasMem = 0;
   Int	n, k, oldZapContext, i;
-  Word	*ptr;
+  int16_t	*ptr;
   pointer	p2;
   listElem	*p;
   extractSec	*eptr, *eptr0;
@@ -1483,7 +1483,7 @@ void undefine(Int symbol)
 	  /* fall through to the below case */
 	case EVB_INT_SUB: case EVB_INSERT: case LUX_INT_FUNC: case
 	LUX_USR_FUNC: case EVB_CASE: case EVB_NCASE: case EVB_BLOCK:
-	  n = symbol_memory(symbol)/sizeof(Word);
+	  n = symbol_memory(symbol)/sizeof(int16_t);
 	  ptr = symbol_data(symbol);
 	  while (n--)
 	    if (symbol_context(k = *ptr++) == symbol
@@ -1670,7 +1670,7 @@ void cleanUpRoutine(Int context, char keepBase)
 {
   char	mem;
   Int	n;
-  Word	*ptr;
+  int16_t	*ptr;
 
   if (context < nFixed || context >= NAMED_END) {
     luxerror("Illegal routine or function specified", context);
@@ -1842,7 +1842,7 @@ Int nextFreeUndefined(void)
   return n;
 }
 /*----------------------------------------------------------------*/
-void pushList(Word symNum)
+void pushList(int16_t symNum)
 /* pushes a symbol number unto the list stack */
 {
  if (listStackItem - listStack < NLIST) {
@@ -1853,7 +1853,7 @@ void pushList(Word symNum)
        listStackItem - listStack);
 }
 /*----------------------------------------------------------------*/
-Word popList(void)
+int16_t popList(void)
 /* pops a symbol number from the list stack */
 {
  if (listStackItem > listStack)
@@ -1865,7 +1865,7 @@ Int moveList(Int n)
 /* moves the topmost <n> entries on the list stack over by one */
 {
   if (listStackItem - listStack < NLIST)
-  { memcpy(listStack + 1, listStack, n*sizeof(Word));
+  { memcpy(listStack + 1, listStack, n*sizeof(int16_t));
     listStackItem++;
     return 1; }
   return luxerror("Too many elements (%d) in list; list stack full\n", 0,
@@ -1886,7 +1886,7 @@ Int stackListLength(void)
 /* returns the number of elements in the topmost list in the stack */
 /* assumes that all lists are delimited by LUX_NEW_LIST */
 {
- Word	*i = listStackItem - 1;
+ int16_t	*i = listStackItem - 1;
  Int	n = 0;
 
  if (i < listStack)
@@ -2077,13 +2077,13 @@ Int newSymbol(Int kind, ...)
   Int		n, i, narg, isStruct, isScalarRange, j, target, depth;
   extern char	reportBody, ignoreSymbols, compileOnly;
   extractSec	*eptr;
-  Word	*ptr;
+  int16_t	*ptr;
   pointer	p;
 #if YYDEBUG
   extern Int	yydebug;
 #endif
   /* static char	inDefinition = 0; */
-  Word		*arg;
+  int16_t		*arg;
   va_list	ap;
   Int	int_arg(Int);
   void	fixContext(Int, Int);
@@ -2187,7 +2187,7 @@ Int newSymbol(Int kind, ...)
 	  i = eptr->number;
 	  switch (eptr->type) {
 	    case LUX_RANGE:
-	      eptr->ptr.w = malloc(i*sizeof(Word));
+	      eptr->ptr.w = malloc(i*sizeof(int16_t));
 	      p.w = eptr->ptr.w + i; /* start at the end */
 	      while (i--) {
 		*--p.w = popList();
@@ -2309,13 +2309,13 @@ Int newSymbol(Int kind, ...)
 	} else {		/* must be a list */
 	  symbol_class(n) = LUX_PRE_CLIST;
 	  if (narg) {
-	    if (!(arg = (Word *) malloc(narg*sizeof(Word)))) {
+	    if (!(arg = (int16_t *) malloc(narg*sizeof(int16_t)))) {
 	      va_end(ap); 
 	      return luxerror("Could not allocate memory for a list", 0);
 	    }
 	  } else
 	    arg = NULL;
-	  symbol_memory(n) = narg*sizeof(Word);
+	  symbol_memory(n) = narg*sizeof(int16_t);
 	  pre_clist_symbols(n) = arg;
 	  arg += narg;
 	  while (narg--) {
@@ -2382,7 +2382,7 @@ Int newSymbol(Int kind, ...)
 	  if encountered during a @@-compilation, then don't do anything
 	  if the routine is already compiled;  merely note the file if
 	  the routine is not yet defined */
-      { Word	nArg, nStatement;
+      { int16_t	nArg, nStatement;
 	Int	oldContext;
 	char	**key;
 	 
@@ -2443,7 +2443,7 @@ Int newSymbol(Int kind, ...)
 	      routine_num_parameters(n) = nArg;
 	      if (nArg
 		  && !(routine_parameters(n)
-		       = (Word *) malloc(nArg*sizeof(Word)))) {
+		       = (int16_t *) malloc(nArg*sizeof(int16_t)))) {
 				/* could not allocate room for parameters */
 		va_end(ap);
 		reportBody = 0;
@@ -2531,7 +2531,7 @@ Int newSymbol(Int kind, ...)
 	    /* the beginning of the combined parameters+statements list) */
 	    if (nStatement &&
 		!(routine_parameters(n) =
-		  (Word *) malloc(nStatement*sizeof(Word)))) {
+		  (int16_t *) malloc(nStatement*sizeof(int16_t)))) {
 	      va_end(ap); 
 	      curContext = oldContext;	/* restore context */
 	      ignoreSymbols = 0;
@@ -2545,12 +2545,12 @@ Int newSymbol(Int kind, ...)
 	    if (nArg)		/* reallocate memory for combined */
 				/* parameters+statements list */
 	      routine_parameters(n) =
-		(Word *) realloc(routine_parameters(n),
-				 (nArg + nStatement)*sizeof(Word));
+		(int16_t *) realloc(routine_parameters(n),
+				 (nArg + nStatement)*sizeof(int16_t));
 	    else		/* no parameters, just allocate space for */
 				/* statements */
 	      routine_parameters(n) =
-		(Word *) malloc(nStatement*sizeof(Word));
+		(int16_t *) malloc(nStatement*sizeof(int16_t));
 	    if (!routine_parameters(n)) { /* allocation failed */
 	      va_end(ap);
 	      curContext = oldContext;	/* restore context */
@@ -2619,13 +2619,13 @@ Int newSymbol(Int kind, ...)
 	  case EVB_CASE: case EVB_NCASE: case EVB_BLOCK: 
 	    i = stackListLength();		/* # of expr and statements */
 	    if (i) {			/* only if there are any elements */
-	      if (!(arg = (Word *) malloc(i*sizeof(Word)))) {
+	      if (!(arg = (int16_t *) malloc(i*sizeof(int16_t)))) {
 		va_end(ap);
 		return luxerror("Could not allocate memory for stacked elements",
 			     0);
 	      }
 	      symbol_data(n) = arg; /* the elements */
-	      symbol_memory(n) = i*sizeof(Word);	/* the memory size */
+	      symbol_memory(n) = i*sizeof(int16_t);	/* the memory size */
 	      arg += i;	/* start with the last element (which is */
 	      /* on top of the stack) */
 	      while (i--) {	/* all elements */
@@ -3561,16 +3561,16 @@ void convertPointer(scalar *target, Int inType, Int outType)
   case LUX_WORD:
     switch (inType) {
     case LUX_BYTE:
-      (*target).w = (Word) (*target).b;
+      (*target).w = (int16_t) (*target).b;
       break;
     case LUX_LONG:
-      (*target).w = (Word) (*target).l;
+      (*target).w = (int16_t) (*target).l;
       break;
     case LUX_FLOAT:
-      (*target).w = (Word) (*target).f;
+      (*target).w = (int16_t) (*target).f;
       break;
     case LUX_DOUBLE:
-      (*target).w = (Word) (*target).d;
+      (*target).w = (int16_t) (*target).d;
       break;
     }
     break;
@@ -3634,7 +3634,7 @@ void convertWidePointer(wideScalar *target, Int inType, Int outType)
 	case LUX_BYTE:
 	  break;
 	case LUX_WORD:
-	  target->w = (Word) target->b;
+	  target->w = (int16_t) target->b;
 	  break;
 	case LUX_LONG:
 	  target->l = (Int) target->b;
@@ -3688,7 +3688,7 @@ void convertWidePointer(wideScalar *target, Int inType, Int outType)
 	  break;
 	  break;
 	case LUX_WORD:
-	  target->w = (Word) target->l;
+	  target->w = (int16_t) target->l;
 	  break;
 	case LUX_LONG:
 	  break;
@@ -3714,7 +3714,7 @@ void convertWidePointer(wideScalar *target, Int inType, Int outType)
 	  target->b = (uint8_t) target->f;
 	  break;
 	case LUX_WORD:
-	  target->w = (Word) target->f;
+	  target->w = (int16_t) target->f;
 	  break;
 	case LUX_LONG:
 	  target->l = (Int) target->f;
@@ -3740,7 +3740,7 @@ void convertWidePointer(wideScalar *target, Int inType, Int outType)
 	  target->b = (uint8_t) target->d;
 	  break;
 	case LUX_WORD:
-	  target->w = (Word) target->d;
+	  target->w = (int16_t) target->d;
 	  break;
 	case LUX_LONG:
 	  target->l = (Int) target->d;
@@ -3766,7 +3766,7 @@ void convertWidePointer(wideScalar *target, Int inType, Int outType)
 	  target->b = (uint8_t) target->cf.real;
 	  break;
 	case LUX_WORD:
-	  target->w = (Word) target->cf.real;
+	  target->w = (int16_t) target->cf.real;
 	  break;
 	case LUX_LONG:
 	  target->l = (Int) target->cf.real;
@@ -3791,7 +3791,7 @@ void convertWidePointer(wideScalar *target, Int inType, Int outType)
 	  target->b = (uint8_t) target->cd.real;
 	  break;
 	case LUX_WORD:
-	  target->w = (Word) target->cd.real;
+	  target->w = (int16_t) target->cd.real;
 	  break;
 	case LUX_LONG:
 	  target->l = (Int) target->cd.real;
@@ -3844,19 +3844,19 @@ void convertScalar(scalar *target, Int nsym, Int type)
  case LUX_WORD:
    switch (n) {
    case LUX_BYTE:
-     (*target).w = (Word) *ptr.b;
+     (*target).w = (int16_t) *ptr.b;
      break;
    case LUX_WORD:
-     (*target).w = (Word) *ptr.w;
+     (*target).w = (int16_t) *ptr.w;
      break;
    case LUX_LONG:
-     (*target).w = (Word) *ptr.l;
+     (*target).w = (int16_t) *ptr.l;
      break;
    case LUX_FLOAT:
-     (*target).w = (Word) *ptr.f;
+     (*target).w = (int16_t) *ptr.f;
      break;
    case LUX_DOUBLE:
-     (*target).w = (Word) *ptr.d;
+     (*target).w = (int16_t) *ptr.d;
      break;
    }
    break;
@@ -3945,8 +3945,8 @@ Int lux_symbol_memory()
 	 mem += strlen(list_ptr_tag_string(i)) + 1;
        break;
      case LUX_SUBROUTINE: case LUX_FUNCTION: case LUX_BLOCKROUTINE:
-       mem += routine_num_parameters(i)*(sizeof(char *) + sizeof(Word))
-	 + routine_num_statements(i)*sizeof(Word);
+       mem += routine_num_parameters(i)*(sizeof(char *) + sizeof(int16_t))
+	 + routine_num_statements(i)*sizeof(int16_t);
        break; }
  }
  i = scalar_scratch(LUX_LONG);
@@ -4043,7 +4043,7 @@ extern float	xfac, yfac, xmin, xmax, ymin, ymax,
 	callig_xb, callig_yb, callig_ratio, slabx, slaby,
         dashsize, crunch_bpp, postXBot, postXTop,
 	postYBot, postYTop, xerrsize, yerrsize;
-extern Word	*stackPointer;
+extern int16_t	*stackPointer;
 
 #if DEVELOP
 extern Int	irzf, ifzz, ndz, ndzs, resample_type, fstepz;
@@ -4170,7 +4170,7 @@ void symbolInitialization(void)
  Int	to_scratch_array(Int, Int, Int, Int []);
  extern char	*fmt_integer, *fmt_float, *fmt_string, *fmt_complex,
   *curScrat, *printString;
- union { uint8_t b[2]; Word w; } whichendian;
+ union { uint8_t b[2]; int16_t w; } whichendian;
 
  /* determine if the machine is little-endian or bigendian */
  whichendian.w = 1;
@@ -4782,7 +4782,7 @@ Int lux_breakpoint(Int narg, Int ps[])
   return 1;
 }
 /*----------------------------------------------------------------*/
-Word	watchVars[NWATCHVARS];
+int16_t	watchVars[NWATCHVARS];
 Int	nWatchVars = 0;
 Int lux_watch(Int narg, Int ps[])
 /* WATCH,<variable>[,/DELETE,/LIST] */
@@ -5009,7 +5009,7 @@ Int makeStruct(Int symbol, char *tag, structElem **se, char *data,
 {
   Int	size, offset0, ndim, n;
   structElem	*se0;
-  Word	*arg;
+  int16_t	*arg;
   listElem	*le;
 
   if (descend) {

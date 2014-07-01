@@ -856,7 +856,7 @@ Int lux_fitskey(Int narg, Int ps[])
 	  scalar_value(iq).b = (uint8_t) value.l;
 	  break;
 	case LUX_WORD:
-	  scalar_value(iq).w = (Word) value.l;
+	  scalar_value(iq).w = (int16_t) value.l;
 	  break;
 	case LUX_LONG:
 	  scalar_value(iq).l = value.l;

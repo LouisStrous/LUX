@@ -738,7 +738,7 @@ Int treatListArguments(Int *narg, Int *ps[], Int offset)
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int expandListArguments_w(Int *narg, Word *ps[], Int list, Int indx,
+Int expandListArguments_w(Int *narg, int16_t *ps[], Int list, Int indx,
 			  Int freeList)
 /* put the elements of the LIST/STRUCT <list> into <*ps> at
    index <indx>, replacing the symbol currently at that position.
@@ -762,13 +762,13 @@ Int expandListArguments_w(Int *narg, Word *ps[], Int list, Int indx,
 	*narg += n - 1;		/* minus one because the slot now occupied
 				 by <list> can be occupied by its first
 				 element instead */
-	*ps = realloc(*ps, *narg*sizeof(Word)); /* more memory as needed */
+	*ps = realloc(*ps, *narg*sizeof(int16_t)); /* more memory as needed */
 	if (!*ps)		/* some allocation error occurred */
 	  return cerror(ALLOC_ERR, iq);
 	/* move the stuff that is after <list> to make room for the elements
 	   of <list> */
 	memmove(*ps + indx + n, *ps + indx + 1,
-		(*narg - indx - n)*sizeof(Word));
+		(*narg - indx - n)*sizeof(int16_t));
 	/* now insert the elements of <iq> */
 	for (i = 0; i < n; i++) {
 	  k = (*ps)[indx + i] = clist_symbols(iq)[i];
@@ -790,10 +790,10 @@ Int expandListArguments_w(Int *narg, Word *ps[], Int list, Int indx,
       case LUX_LIST:
 	n = list_num_symbols(iq);
 	*narg += n - 1;
-	*ps = realloc(*ps, *narg*sizeof(Word));
+	*ps = realloc(*ps, *narg*sizeof(int16_t));
 	if (!*ps)
 	  return cerror(ALLOC_ERR, iq);
-	memmove(*ps + indx + n, *ps + indx, (*narg - indx - n)*sizeof(Word));
+	memmove(*ps + indx + n, *ps + indx, (*narg - indx - n)*sizeof(int16_t));
 	for (i = 0; i < n; i++) {
 	  k = (*ps)[indx + i] = list_symbol(iq, i);
 	  if (freeList
@@ -811,7 +811,7 @@ Int expandListArguments_w(Int *narg, Word *ps[], Int list, Int indx,
   return nlist;			/* done */
 }
 /*------------------------------------------------------------------------- */
-Int treatListArguments_w(Int *narg, Word *ps[], Int offset)
+Int treatListArguments_w(Int *narg, int16_t *ps[], Int offset)
 /* expands appropriate LIST/STRUCT arguments in the argument list */
 /* this routine takes argument list <*ps> and checks if any of the
    <*narg> arguments is a compact list with one element which is itself
@@ -914,7 +914,7 @@ Int lux_subsc_func(Int narg, Int ps[])
 	trgtndim, trgtdims[MAX_DIMS], fromdim[MAX_DIMS], one = 1, offset0,
 	stride[MAX_DIMS], offset, width, tally[MAX_DIMS], step[MAX_DIMS],
 	noutdim, ps2[MAX_DIMS], class, narr, combineType;
-  Word	*ap;
+  int16_t	*ap;
   pointer	src, trgt;
   wideScalar	value, item;
   uint8_t	subsc_type[MAX_DIMS], sum[MAX_DIMS];
@@ -991,12 +991,12 @@ Int lux_subsc_func(Int narg, Int ps[])
 	symbol_class(n) = LUX_INT_FUNC;
 	int_func_number(n) = iq;
       }
-      symbol_memory(n) = narg*sizeof(Word);
+      symbol_memory(n) = narg*sizeof(int16_t);
       if (narg) {		/* arguments */
-	allocate(symbol_data(n), narg, Word *);
+	allocate(symbol_data(n), narg, int16_t *);
 	ap = symbol_data(n);
 	while (narg--)
-	  *ap++ = *ps++;	/* ap is Word* and ps is Int*, so we cannot */
+	  *ap++ = *ps++;	/* ap is int16_t* and ps is Int*, so we cannot */
 				/* just use memcpy(). */
       }
       iq = eval(n);
@@ -1350,7 +1350,7 @@ Int lux_subsc_func(Int narg, Int ps[])
       if (iq == LUX_ERROR)
 	goto lux_subsc_1;
       symbol_class(iq) = class;
-      n = size[0]*sizeof(Word);
+      n = size[0]*sizeof(int16_t);
       ap = clist_symbols(iq) = malloc(n);
       if (!clist_symbols(iq)) {
 	cerror(ALLOC_ERR, iq);
@@ -1359,7 +1359,7 @@ Int lux_subsc_func(Int narg, Int ps[])
       symbol_memory(iq) = n;
       switch (subsc_type[0]) {
 	case LUX_RANGE:
-	  memcpy(ap, clist_symbols(nsym) + start[0], size[0]*sizeof(Word));
+	  memcpy(ap, clist_symbols(nsym) + start[0], size[0]*sizeof(int16_t));
 	  break;
 	case LUX_ARRAY:
 	  n = size[0];
@@ -1388,7 +1388,7 @@ Int lux_subsc_func(Int narg, Int ps[])
 	if (iq == LUX_ERROR)
 	  goto lux_subsc_1;
 	symbol_class(iq) = class;
-	n = size[0]*sizeof(Word);
+	n = size[0]*sizeof(int16_t);
 	ap = clist_symbols(iq) = malloc(n);
 	if (!clist_symbols(iq)) {
 	  cerror(ALLOC_ERR, iq);
@@ -1397,7 +1397,7 @@ Int lux_subsc_func(Int narg, Int ps[])
 	symbol_memory(iq) = n;
 	switch (subsc_type[0]) {
 	  case LUX_RANGE:
-	    memcpy(ap, clist_symbols(nsym) + start[0], size[0]*sizeof(Word));
+	    memcpy(ap, clist_symbols(nsym) + start[0], size[0]*sizeof(int16_t));
 	    break;
 	  case LUX_ARRAY:
 	    n = size[0];
@@ -2339,10 +2339,10 @@ Int lux_concat_list(Int narg, Int ps[])
     symbol_memory(result) = nelem*sizeof(listElem);
   } else {
     symbol_class(result) = LUX_CLIST;
-    clist_symbols(result) = Malloc(nelem*sizeof(Word));
+    clist_symbols(result) = Malloc(nelem*sizeof(int16_t));
     if (!clist_symbols(result))
       return cerror(ALLOC_ERR, 0);
-    symbol_memory(result) = nelem*sizeof(Word);
+    symbol_memory(result) = nelem*sizeof(int16_t);
   }
 
   indx = 0;
@@ -2668,7 +2668,7 @@ Int lux_concat(Int narg, Int ps[])
 	    switch (symbol_type(iq)) {
 	      case LUX_BYTE:
 		while (n--)
-		  *q2.w++ = (Word) *q1.b++;
+		  *q2.w++ = (int16_t) *q1.b++;
 		break;
 	      case LUX_WORD:
 		while (n--)

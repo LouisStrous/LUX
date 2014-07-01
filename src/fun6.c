@@ -23,7 +23,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "action.h"
 
  /*------------------------------------------------------------------------- */
-static void rdct_spike(Word *start, Int ystride, float *ws)
+static void rdct_spike(int16_t *start, Int ystride, float *ws)
  /* does reverse dct for one cell, specialize for a spike smooth */
 {
   float	tmp0, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7;
@@ -164,8 +164,8 @@ Int lux_despike(Int narg, Int ps[])
   Int	sign_flag, bad_flag, bb_flag, save_niter, ntotal, dim[2];
   uint8_t	*cell_status;
   float	frac = 0.25, fsum, cfrac, tq, rms=0.0, fdif;
-  Word	*p, *q, *ptr, *p1, *p2, *p3, *out, *out2;
-  Word	arr[16], *pps, *ss;
+  int16_t	*p, *q, *ptr, *p1, *p2, *p3, *out, *out2;
+  int16_t	arr[16], *pps, *ss;
 
   lognb2 = (log((double) 16)*ALN2I+TINY);
 
@@ -251,7 +251,7 @@ Int lux_despike(Int narg, Int ps[])
  /* if there are 2 or more iterations, we need an extra array, we can't do the
     despike step in place because it "erodes" from the low y direction. */
  if (niter > 1) {
-   out2 = malloc(nx*ny*sizeof(Word));
+   out2 = malloc(nx*ny*sizeof(int16_t));
    if (!out2)
      return cerror(ALLOC_ERR, 0);
  }

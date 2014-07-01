@@ -32,10 +32,10 @@ extern Int	ans;
 
 #define startList(x)	{ pushList(ANA_NEW_LIST); pushList(x); }
 				/* start a new list */
-void	pushList(Word symNum),	/* push symbol number onto list stack */
+void	pushList(int16_t symNum),	/* push symbol number onto list stack */
 	swapList(Int, Int),	/* swap items in the list stack */
 	away(void);
-Word	popList(void);		/* pop an item from the list stack's top */
+int16_t	popList(void);		/* pop an item from the list stack's top */
 Int	stackListLength(void),	/* return length of list at top of stack */
 	isInternalSubr(Int),	/* 1 if symbol is internal subroutine */
 	installExec(void),

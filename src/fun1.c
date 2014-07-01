@@ -894,7 +894,7 @@ Int indgen(Int narg, Int ps[], Int isFunc)
       break;
     case LUX_WORD:
       do 
-	*trgt.w = (Word) trgtinfo.coords[0];
+	*trgt.w = (int16_t) trgtinfo.coords[0];
       while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.rndim);
       break;
     case LUX_LONG:

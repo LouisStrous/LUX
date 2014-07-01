@@ -2120,7 +2120,7 @@ void lux_add_as(void)
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.w++ = (Word) *lp.b++ + *rp.w;
+            *tp.w++ = (int16_t) *lp.b++ + *rp.w;
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -2154,7 +2154,7 @@ void lux_add_as(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.w++ = *lp.w++ + (Word) *rp.b;
+            *tp.w++ = *lp.w++ + (int16_t) *rp.b;
           break;
         case LUX_WORD:
           while (nRepeat--)
@@ -2440,7 +2440,7 @@ void lux_sub(void)
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.w++ = (Word) *lp.b++ - *rp.w++;
+            *tp.w++ = (int16_t) *lp.b++ - *rp.w++;
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -2474,7 +2474,7 @@ void lux_sub(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.w++ = *lp.w++ - (Word) *rp.b++;
+            *tp.w++ = *lp.w++ - (int16_t) *rp.b++;
           break;
         case LUX_WORD:
           while (nRepeat--)
@@ -2737,7 +2737,7 @@ void lux_sub_as(void)
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.w++ = (Word) *lp.b++ - *rp.w;
+            *tp.w++ = (int16_t) *lp.b++ - *rp.w;
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -2771,7 +2771,7 @@ void lux_sub_as(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.w++ = *lp.w++ - (Word) *rp.b;
+            *tp.w++ = *lp.w++ - (int16_t) *rp.b;
           break;
         case LUX_WORD:
           while (nRepeat--)
@@ -3034,7 +3034,7 @@ void lux_sub_sa(void)
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.w++ = (Word) *lp.b - *rp.w++;
+            *tp.w++ = (int16_t) *lp.b - *rp.w++;
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -3068,7 +3068,7 @@ void lux_sub_sa(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.w++ = *lp.w - (Word) *rp.b++;
+            *tp.w++ = *lp.w - (int16_t) *rp.b++;
           break;
         case LUX_WORD:
           while (nRepeat--)
@@ -3333,7 +3333,7 @@ void lux_mul(void)
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.w++ = (Word) *lp.b++ * *rp.w++;
+            *tp.w++ = (int16_t) *lp.b++ * *rp.w++;
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -3371,7 +3371,7 @@ void lux_mul(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.w++ = *lp.w++ * (Word) *rp.b++;
+            *tp.w++ = *lp.w++ * (int16_t) *rp.b++;
           break;
         case LUX_WORD:
           while (nRepeat--)
@@ -3694,7 +3694,7 @@ void lux_mul_as(void)
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.w++ = (Word) *lp.b++ * *rp.w;
+            *tp.w++ = (int16_t) *lp.b++ * *rp.w;
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -3732,7 +3732,7 @@ void lux_mul_as(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.w++ = *lp.w++ * (Word) *rp.b;
+            *tp.w++ = *lp.w++ * (int16_t) *rp.b;
           break;
         case LUX_WORD:
           while (nRepeat--)
@@ -4059,7 +4059,7 @@ void lux_div(void)
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.w++ = (Word) *lp.b++ / *rp.w++;
+            *tp.w++ = (int16_t) *lp.b++ / *rp.w++;
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -4103,7 +4103,7 @@ void lux_div(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.w++ = *lp.w++ / (Word) *rp.b++;
+            *tp.w++ = *lp.w++ / (int16_t) *rp.b++;
           break;
         case LUX_WORD:
           while (nRepeat--)
@@ -4452,7 +4452,7 @@ void lux_div_as(void)
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.w++ = (Word) *lp.b++ / *rp.w;
+            *tp.w++ = (int16_t) *lp.b++ / *rp.w;
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -4496,7 +4496,7 @@ void lux_div_as(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.w++ = *lp.w++ / (Word) *rp.b;
+            *tp.w++ = *lp.w++ / (int16_t) *rp.b;
           break;
         case LUX_WORD:
           while (nRepeat--)
@@ -4841,7 +4841,7 @@ void lux_div_sa(void)
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.w++ = (Word) *lp.b / *rp.w++;
+            *tp.w++ = (int16_t) *lp.b / *rp.w++;
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -4885,7 +4885,7 @@ void lux_div_sa(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.w++ = *lp.w / (Word) *rp.b++;
+            *tp.w++ = *lp.w / (int16_t) *rp.b++;
           break;
         case LUX_WORD:
           while (nRepeat--)
@@ -8496,7 +8496,7 @@ void lux_max(void)
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.w++ = ((value1.w = (Word) *lp.b++) > (value2.w = *rp.w++))?
+            *tp.w++ = ((value1.w = (int16_t) *lp.b++) > (value2.w = *rp.w++))?
               value1.w:
               value2.w;
           break;
@@ -8554,7 +8554,7 @@ void lux_max(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.w++ = ((value1.w = *lp.w++) > (value2.w = (Word) *rp.b++))?
+            *tp.w++ = ((value1.w = *lp.w++) > (value2.w = (int16_t) *rp.b++))?
               value1.w:
               value2.w;
           break;
@@ -9105,7 +9105,7 @@ void lux_max_as(void)
     case LUX_WORD:
       switch (rhsType) {
         case LUX_BYTE:
-          value2.w = (Word) *rp.b;  while (nRepeat--)
+          value2.w = (int16_t) *rp.b;  while (nRepeat--)
             *tp.w++ = ((value1.w = *lp.w++) > value2.w)?
               value1.w:
               value2.w;
@@ -9636,7 +9636,7 @@ void lux_min(void)
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.w++ = ((value1.w = (Word) *lp.b++) < (value2.w = *rp.w++))?
+            *tp.w++ = ((value1.w = (int16_t) *lp.b++) < (value2.w = *rp.w++))?
               value1.w:
               value2.w;
           break;
@@ -9694,7 +9694,7 @@ void lux_min(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.w++ = ((value1.w = *lp.w++) < (value2.w = (Word) *rp.b++))?
+            *tp.w++ = ((value1.w = *lp.w++) < (value2.w = (int16_t) *rp.b++))?
               value1.w:
               value2.w;
           break;
@@ -10245,7 +10245,7 @@ void lux_min_as(void)
     case LUX_WORD:
       switch (rhsType) {
         case LUX_BYTE:
-          value2.w = (Word) *rp.b;  while (nRepeat--)
+          value2.w = (int16_t) *rp.b;  while (nRepeat--)
             *tp.w++ = ((value1.w = *lp.w++) < value2.w)?
               value1.w:
               value2.w;
@@ -10808,23 +10808,23 @@ void lux_eq(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.l++ = (*lp.w++ == (Word) *rp.b++);
+            *tp.l++ = (*lp.w++ == (int16_t) *rp.b++);
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.l++ = (*lp.w++ == (Word) *rp.w++);
+            *tp.l++ = (*lp.w++ == (int16_t) *rp.w++);
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = (*lp.w++ == (Word) *rp.l++);
+            *tp.l++ = (*lp.w++ == (int16_t) *rp.l++);
           break;
         case LUX_FLOAT:
           while (nRepeat--)
-            *tp.l++ = (*lp.w++ == (Word) *rp.f++);
+            *tp.l++ = (*lp.w++ == (int16_t) *rp.f++);
           break;
         case LUX_DOUBLE:
           while (nRepeat--)
-            *tp.l++ = (*lp.w++ == (Word) *rp.d++);
+            *tp.l++ = (*lp.w++ == (int16_t) *rp.d++);
           break;
         case LUX_CFLOAT:
           while (nRepeat--) {
@@ -11102,7 +11102,7 @@ void lux_eq_as(void)
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.l++ = ((Word) *lp.b++ == *rp.w);
+            *tp.l++ = ((int16_t) *lp.b++ == *rp.w);
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -11132,7 +11132,7 @@ void lux_eq_as(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.l++ = (*lp.w++ == (Word) *rp.b);
+            *tp.l++ = (*lp.w++ == (int16_t) *rp.b);
           break;
         case LUX_WORD:
           while (nRepeat--)
@@ -11375,7 +11375,7 @@ void lux_gt(void)
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.l++ = ((Word) *lp.b++ > *rp.w++);
+            *tp.l++ = ((int16_t) *lp.b++ > *rp.w++);
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -11411,7 +11411,7 @@ void lux_gt(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.l++ = (*lp.w++ > (Word) *rp.b++);
+            *tp.l++ = (*lp.w++ > (int16_t) *rp.b++);
           break;
         case LUX_WORD:
           while (nRepeat--)
@@ -11725,7 +11725,7 @@ void lux_gt_as(void)
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.l++ = ((Word) *lp.b++ > *rp.w);
+            *tp.l++ = ((int16_t) *lp.b++ > *rp.w);
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -11761,7 +11761,7 @@ void lux_gt_as(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.l++ = (*lp.w++ > (Word) *rp.b);
+            *tp.l++ = (*lp.w++ > (int16_t) *rp.b);
           break;
         case LUX_WORD:
           while (nRepeat--)
@@ -12054,7 +12054,7 @@ void lux_gt_sa(void)
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.l++ = ((Word) *lp.b > *rp.w++);
+            *tp.l++ = ((int16_t) *lp.b > *rp.w++);
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -12090,7 +12090,7 @@ void lux_gt_sa(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.l++ = (*lp.w > (Word) *rp.b++);
+            *tp.l++ = (*lp.w > (int16_t) *rp.b++);
           break;
         case LUX_WORD:
           while (nRepeat--)
@@ -12381,7 +12381,7 @@ void lux_ge(void)
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.l++ = ((Word) *lp.b++ >= *rp.w++);
+            *tp.l++ = ((int16_t) *lp.b++ >= *rp.w++);
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -12417,7 +12417,7 @@ void lux_ge(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.l++ = (*lp.w++ >= (Word) *rp.b++);
+            *tp.l++ = (*lp.w++ >= (int16_t) *rp.b++);
           break;
         case LUX_WORD:
           while (nRepeat--)
@@ -12731,7 +12731,7 @@ void lux_ge_as(void)
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.l++ = ((Word) *lp.b++ >= *rp.w);
+            *tp.l++ = ((int16_t) *lp.b++ >= *rp.w);
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -12767,7 +12767,7 @@ void lux_ge_as(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.l++ = (*lp.w++ >= (Word) *rp.b);
+            *tp.l++ = (*lp.w++ >= (int16_t) *rp.b);
           break;
         case LUX_WORD:
           while (nRepeat--)
@@ -13060,7 +13060,7 @@ void lux_ge_sa(void)
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.l++ = ((Word) *lp.b >= *rp.w++);
+            *tp.l++ = ((int16_t) *lp.b >= *rp.w++);
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -13096,7 +13096,7 @@ void lux_ge_sa(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.l++ = (*lp.w >= (Word) *rp.b++);
+            *tp.l++ = (*lp.w >= (int16_t) *rp.b++);
           break;
         case LUX_WORD:
           while (nRepeat--)
@@ -13507,23 +13507,23 @@ void lux_ne(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.l++ = (*lp.w++ != (Word) *rp.b++);
+            *tp.l++ = (*lp.w++ != (int16_t) *rp.b++);
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.l++ = (*lp.w++ != (Word) *rp.w++);
+            *tp.l++ = (*lp.w++ != (int16_t) *rp.w++);
           break;
         case LUX_LONG:
           while (nRepeat--)
-            *tp.l++ = (*lp.w++ != (Word) *rp.l++);
+            *tp.l++ = (*lp.w++ != (int16_t) *rp.l++);
           break;
         case LUX_FLOAT:
           while (nRepeat--)
-            *tp.l++ = (*lp.w++ != (Word) *rp.f++);
+            *tp.l++ = (*lp.w++ != (int16_t) *rp.f++);
           break;
         case LUX_DOUBLE:
           while (nRepeat--)
-            *tp.l++ = (*lp.w++ != (Word) *rp.d++);
+            *tp.l++ = (*lp.w++ != (int16_t) *rp.d++);
           break;
         case LUX_CFLOAT:
           while (nRepeat--) {
@@ -13801,7 +13801,7 @@ void lux_ne_as(void)
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.l++ = ((Word) *lp.b++ != *rp.w);
+            *tp.l++ = ((int16_t) *lp.b++ != *rp.w);
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -13831,7 +13831,7 @@ void lux_ne_as(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.l++ = (*lp.w++ != (Word) *rp.b);
+            *tp.l++ = (*lp.w++ != (int16_t) *rp.b);
           break;
         case LUX_WORD:
           while (nRepeat--)
@@ -14066,7 +14066,7 @@ void lux_and(void)
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.l++ = ((Word) *lp.b++ & *rp.w++);
+            *tp.l++ = ((int16_t) *lp.b++ & *rp.w++);
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -14080,7 +14080,7 @@ void lux_and(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.l++ = (*lp.w++ & (Word) *rp.b++);
+            *tp.l++ = (*lp.w++ & (int16_t) *rp.b++);
           break;
         case LUX_WORD:
           while (nRepeat--)
@@ -14129,7 +14129,7 @@ void lux_and_as(void)
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.l++ = ((Word) *lp.b++ & *rp.w);
+            *tp.l++ = ((int16_t) *lp.b++ & *rp.w);
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -14143,7 +14143,7 @@ void lux_and_as(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.l++ = (*lp.w++ & (Word) *rp.b);
+            *tp.l++ = (*lp.w++ & (int16_t) *rp.b);
           break;
         case LUX_WORD:
           while (nRepeat--)
@@ -14206,7 +14206,7 @@ void lux_or(void)
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.l++ = ((Word) *lp.b++ | *rp.w++);
+            *tp.l++ = ((int16_t) *lp.b++ | *rp.w++);
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -14220,7 +14220,7 @@ void lux_or(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.l++ = (*lp.w++ | (Word) *rp.b++);
+            *tp.l++ = (*lp.w++ | (int16_t) *rp.b++);
           break;
         case LUX_WORD:
           while (nRepeat--)
@@ -14269,7 +14269,7 @@ void lux_or_as(void)
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.l++ = ((Word) *lp.b++ | *rp.w);
+            *tp.l++ = ((int16_t) *lp.b++ | *rp.w);
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -14283,7 +14283,7 @@ void lux_or_as(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.l++ = (*lp.w++ | (Word) *rp.b);
+            *tp.l++ = (*lp.w++ | (int16_t) *rp.b);
           break;
         case LUX_WORD:
           while (nRepeat--)
@@ -14346,7 +14346,7 @@ void lux_xor(void)
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.l++ = ((Word) *lp.b++ ^ *rp.w++);
+            *tp.l++ = ((int16_t) *lp.b++ ^ *rp.w++);
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -14360,7 +14360,7 @@ void lux_xor(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.l++ = (*lp.w++ ^ (Word) *rp.b++);
+            *tp.l++ = (*lp.w++ ^ (int16_t) *rp.b++);
           break;
         case LUX_WORD:
           while (nRepeat--)
@@ -14409,7 +14409,7 @@ void lux_xor_as(void)
           break;
         case LUX_WORD:
           while (nRepeat--)
-            *tp.l++ = ((Word) *lp.b++ ^ *rp.w);
+            *tp.l++ = ((int16_t) *lp.b++ ^ *rp.w);
           break;
         case LUX_LONG:
           while (nRepeat--)
@@ -14423,7 +14423,7 @@ void lux_xor_as(void)
       switch (rhsType) {
         case LUX_BYTE:
           while (nRepeat--)
-            *tp.l++ = (*lp.w++ ^ (Word) *rp.b);
+            *tp.l++ = (*lp.w++ ^ (int16_t) *rp.b);
           break;
         case LUX_WORD:
           while (nRepeat--)
@@ -14931,7 +14931,7 @@ Int evalScalarRangeBinOp(void)
   if (range_start(range) < 0) { /* restore * - expr notation */
     rhs = (Int) range_start(result);
     rhs = lux_neg_func(1, &rhs);
-    range_start(result) = (Word) -rhs;
+    range_start(result) = (int16_t) -rhs;
     embed(-range_start(result), result);
   } else
     embed(range_start(result), result);
@@ -14948,7 +14948,7 @@ Int evalScalarRangeBinOp(void)
   if (range_end(range) < 0) {   /* restore * - expr notation */
     rhs = (Int) range_end(result);
     rhs = lux_neg_func(1, &rhs);
-    range_end(result) = (Word) -rhs;
+    range_end(result) = (int16_t) -rhs;
     embed(-range_end(result), result);
   } else
     embed(range_end(result), result);
@@ -14976,7 +14976,7 @@ Int evalRangeScalarBinOp(void)
   if (range_start(range) < 0) { /* restore * - expr notation */
     lhs = (Int) range_start(result);
     lhs = lux_neg_func(1, &lhs);
-    range_start(result) = (Word) -lhs;
+    range_start(result) = (int16_t) -lhs;
     embed(-range_start(result), result);
   } else
     embed(range_start(result), result);
@@ -14993,7 +14993,7 @@ Int evalRangeScalarBinOp(void)
   if (range_end(range) < 0) {   /* restore * - expr notation */
     lhs = (Int) range_end(result);
     lhs = lux_neg_func(1, &lhs);
-    range_end(result) = (Word) -lhs;
+    range_end(result) = (int16_t) -lhs;
     embed(-range_end(result), result);
   } else
     embed(range_end(result), result);
@@ -15416,11 +15416,11 @@ Int evalLhs(symbol)
                 for (j = 0; j <= depth; j++) {
                   tptr[j].type = eptr[j].type;
                   tptr[j].number = eptr[j].number;
-                  tptr[j].ptr.w = malloc(tptr[j].number*sizeof(Word));
+                  tptr[j].ptr.w = malloc(tptr[j].number*sizeof(int16_t));
                   if (!tptr[j].ptr.w)
                     return cerror(ALLOC_ERR, 0);
                   memcpy(tptr[j].ptr.w, eptr[j].ptr.w,
-                         tptr[j].number*sizeof(Word));
+                         tptr[j].number*sizeof(int16_t));
                 }
                 return result;
               } else
@@ -15478,7 +15478,7 @@ Int evalExtractRhs(Int symbol)
   Int   target, class, depth, result, n, nitem, i, kind, special, allowSubr,
     j, k, *ip;
   Int   findTarget(char *, Int *, Int), getBody(Int);
-  Word  *wptr;
+  int16_t  *wptr;
   extractSec    *eptr;
   char  **sptr;
   pointer       p, q, r;
@@ -15619,12 +15619,12 @@ Int evalExtractRhs(Int symbol)
                 return LUX_ERROR;
               symbol_class(result) = LUX_INT_FUNC;
               int_func_number(result) = target;
-              int_func_arguments(result) = malloc(eptr->number*sizeof(Word));
+              int_func_arguments(result) = malloc(eptr->number*sizeof(int16_t));
               if (!int_func_arguments(result))
                 return cerror(ALLOC_ERR, 0);
-              symbol_memory(result) = eptr->number*sizeof(Word);
+              symbol_memory(result) = eptr->number*sizeof(int16_t);
               memcpy(int_func_arguments(result), eptr->ptr.w,
-                     eptr->number*sizeof(Word));
+                     eptr->number*sizeof(int16_t));
               target = eval(result);
               zap(result);      /*  it was a temp */
               break;
@@ -15644,9 +15644,9 @@ Int evalExtractRhs(Int symbol)
               symbol_class(result) = LUX_INT_FUNC;
               int_func_number(result) = LUX_SUBSC_FUN;
               n = eptr->number;
-              symbol_memory(result) = (n + 1)*sizeof(Word);
+              symbol_memory(result) = (n + 1)*sizeof(int16_t);
               int_func_arguments(result) = malloc(symbol_memory(result));
-              memcpy(int_func_arguments(result), eptr->ptr.w, n*sizeof(Word));
+              memcpy(int_func_arguments(result), eptr->ptr.w, n*sizeof(int16_t));
               int_func_arguments(result)[n] = target;
               target = eval(result);
               unMark(result);
@@ -15669,7 +15669,7 @@ Int evalExtractRhs(Int symbol)
                 return LUX_ERROR;
               symbol_class(result) = LUX_USR_FUNC;
               usr_func_number(result) = target;
-              symbol_memory(result) = eptr->number*sizeof(Word);
+              symbol_memory(result) = eptr->number*sizeof(int16_t);
               usr_func_arguments(result) = malloc(symbol_memory(result));
               memcpy(usr_func_arguments(result), eptr->ptr.w,
                      symbol_memory(result));
@@ -15720,7 +15720,7 @@ Int evalExtractRhs(Int symbol)
                       return cerror(SUBSC_RANGE, symbol);
                   target = nextFreeTempVariable();
                   symbol_class(target) = LUX_LIST;
-                  symbol_memory(target) = n*sizeof(Word);
+                  symbol_memory(target) = n*sizeof(int16_t);
                   q.w = clist_symbols(target) = malloc(symbol_memory(target));
                   if (!q.w)
                     return cerror(ALLOC_ERR, symbol);
@@ -15759,7 +15759,7 @@ Int evalExtractRhs(Int symbol)
                       return cerror(SUBSC_RANGE, symbol);
                   target = nextFreeTempVariable();
                   symbol_class(target) = LUX_CLIST;
-                  symbol_memory(target) = n*sizeof(Word);
+                  symbol_memory(target) = n*sizeof(int16_t);
                   q.w = clist_symbols(target) = malloc(symbol_memory(target));
                   if (!q.w)
                     return cerror(ALLOC_ERR, symbol);
@@ -15820,7 +15820,7 @@ Int evalExtractRhs(Int symbol)
                     return LUX_ERROR;
                   symbol_class(n) = LUX_INT_FUNC;
                   int_func_number(n) = LUX_SUBSC_FUN;
-                  symbol_memory(n) = 2*sizeof(Word);
+                  symbol_memory(n) = 2*sizeof(int16_t);
                   int_func_arguments(n) = malloc(symbol_memory(result));
                   *int_func_arguments(n) = result;
                   int_func_arguments(n)[1] = target;
@@ -15860,7 +15860,7 @@ Int evalExtractRhs(Int symbol)
                       return cerror(SUBSC_RANGE, symbol);
                   target = nextFreeTempVariable();
                   symbol_class(target) = LUX_CLIST;
-                  symbol_memory(target) = n*sizeof(Word);
+                  symbol_memory(target) = n*sizeof(int16_t);
                   q.w = clist_symbols(target) = malloc(symbol_memory(target));
                   if (!q.w)
                     return cerror(ALLOC_ERR, symbol);
@@ -16182,7 +16182,7 @@ Int eval(Int symbol)
       symbol_class(result) = LUX_CLIST; /* generate LUX_CLIST symbol */
       symbol_context(result) = -compileLevel; /* main level */
       n = pre_clist_num_symbols(symbol); /* number of elements */
-      allocate(clist_symbols(result), n, Word); /* get memory */
+      allocate(clist_symbols(result), n, int16_t); /* get memory */
       symbol_memory(result) = symbol_memory(symbol); /* same size */
       for (i = 0; i < n; i++) { /* all elements */
         if ((clist_symbols(result)[i]
@@ -16553,7 +16553,7 @@ branchInfo checkBranch(Int lhs, Int rhs)
 {
   branchInfo    result = { 0, 0, 0, 0}, branch1, branch2;
   static Int    depth, lhsSize;
-  Word  *args;
+  int16_t  *args;
   Int   n;
   
   if (!rhs)                     /* initialization */

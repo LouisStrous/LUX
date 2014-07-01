@@ -65,11 +65,11 @@ Int segment_2d(Int narg, Int ps[])
 	  n = nx - 2;
 	  while (n--) {
 	    value.w = *src.b * 2;
-	    *trgt.l++ = ((Word) src.b[-1] + (Word) src.b[1] < value.w
-			 && (Word) src.b[nx] + (Word) src.b[-nx] < value.w
-			 && (Word) src.b[1 + nx] + (Word) src.b[-1 - nx] 
+	    *trgt.l++ = ((int16_t) src.b[-1] + (int16_t) src.b[1] < value.w
+			 && (int16_t) src.b[nx] + (int16_t) src.b[-nx] < value.w
+			 && (int16_t) src.b[1 + nx] + (int16_t) src.b[-1 - nx] 
 			 < value.w
-			 && (Word) src.b[1 - nx] + (Word) src.b[-1 + nx]
+			 && (int16_t) src.b[1 - nx] + (int16_t) src.b[-1 + nx]
 			 < value.w);
 	    src.b++;
 	  }
@@ -296,12 +296,12 @@ Int segment_general(Int narg, Int ps[])
     switch (array_type(ps[0])) {
       case LUX_BYTE:
 	do {
-	  value.w = 2 * (Word) *src.b;
+	  value.w = 2 * (int16_t) *src.b;
 	  for (j = 0; j < n; j++) {	/* all directions */	  
 	    k = offset[j];
 	    srcl.b = src.b + k;
 	    srcr.b = src.b - k;
-	    if (value.w <= (Word) *srcl.b + (Word) *srcr.b)
+	    if (value.w <= (int16_t) *srcl.b + (int16_t) *srcr.b)
 	      break;
 	  }
 	  *trgt.l = (j == n);

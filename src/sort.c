@@ -116,10 +116,10 @@ void shell_l(Int n, Int arr[])
  }
 }
 /*------------------------------------------------------------------------- */
-void shell_w(Int n, Word arr[])
+void shell_w(Int n, int16_t arr[])
 {
   Int	nn,m,j,i,lognb2;
-  Word	t;
+  int16_t	t;
 
   lognb2 = (log((double) n)*ALN2I + TINY);
   m = n;
@@ -257,10 +257,10 @@ void sort_b(Int n, uint8_t ra[])
   }
 }
 /*------------------------------------------------------------------------- */
-void sort_w(Int n, Word ra[])
+void sort_w(Int n, int16_t ra[])
 {
   Int	l,j,ir,i;
-  Word	rra;
+  int16_t	rra;
 
   l = (n/2);
   ir = n-1;
@@ -461,10 +461,10 @@ void indexx_b(Int n, uint8_t ra[], Int indx[])
   }
 }
 /*------------------------------------------------------------------------- */
-void indexx_w(Int n, Word ra[], Int indx[])
+void indexx_w(Int n, int16_t ra[], Int indx[])
 {
   Int	l,j,ir,i,indxt;
-  Word	q;
+  int16_t	q;
  
   for (i = 0; i < n; i++)
     indx[i] = i;

@@ -1029,7 +1029,7 @@ Int lux_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	      scalar_value(result).b = (uint8_t) value.d;
 	      break;
 	    case LUX_WORD:
-	      scalar_value(result).w = (Word) value.d;
+	      scalar_value(result).w = (int16_t) value.d;
 	      break;
 	    case LUX_LONG:
 	      scalar_value(result).l = (Int) value.d;
@@ -1147,7 +1147,7 @@ Int lux_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	switch (totype) {		/* target type */
 	  case LUX_WORD:
 	    while (n--) {
-	      *trgt.w = (Word) *src.b;
+	      *trgt.w = (int16_t) *src.b;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
@@ -1208,28 +1208,28 @@ Int lux_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	switch (totype) {		/* target type */
 	  case LUX_BYTE:
 	    while (n--) {
-	      *trgt.b = (Word) *src.w;
+	      *trgt.b = (int16_t) *src.w;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case LUX_LONG:
 	    while (n--) {
-	      *trgt.l = (Word) *src.w;
+	      *trgt.l = (int16_t) *src.w;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case LUX_FLOAT:
 	    while (n--) {
-	      *trgt.f = (Word) *src.w;
+	      *trgt.f = (int16_t) *src.w;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
 	  case LUX_DOUBLE:
 	    while (n--) {
-	      *trgt.d = (Word) *src.w;
+	      *trgt.d = (int16_t) *src.w;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
@@ -1459,7 +1459,7 @@ Int lux_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	    break;
 	  case LUX_WORD:
 	    while (n--) {
-	      *trgt.w = (Word) src.cf->real;
+	      *trgt.w = (int16_t) src.cf->real;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
@@ -1519,7 +1519,7 @@ Int lux_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	    break;
 	  case LUX_WORD:
 	    while (n--) {
-	      *trgt.w = (Word) src.cd->real;
+	      *trgt.w = (int16_t) src.cd->real;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }

@@ -74,7 +74,7 @@ Int lux_zap(Int narg, Int ps[])
 /*---------------------------------------------------------*/
 Int showstats(Int narg, Int ps[])
 { 
-  extern Word	listStack[], *listStackItem, curContext;
+  extern int16_t	listStack[], *listStackItem, curContext;
   extern Int	nNamedVariable, nTempVariable, markIndex,
   		tempExecutableIndex, executeLevel,
   		nSymbolStack, nExecutable, statementDepth, compileLevel;
@@ -506,8 +506,8 @@ Int cmp(const void *x1, const void *x2)
       return *(uint8_t *) x1 < *(uint8_t *) x2? -1:
 	(*(uint8_t *) x1 > *(uint8_t *) x2? 1: 0);
     case LUX_WORD:
-      return *(Word *) x1 < *(Word *) x2? -1:
-	(*(Word *) x1 > *(Word *) x2? 1: 0);
+      return *(int16_t *) x1 < *(int16_t *) x2? -1:
+	(*(int16_t *) x1 > *(int16_t *) x2? 1: 0);
     case LUX_LONG:
       return *(Int *) x1 < *(Int *) x2? -1:
 	(*(Int *) x1 > *(Int *) x2? 1: 0);
@@ -742,7 +742,7 @@ Int lux_quantile(Int narg, Int ps[])
 	if (nelem % 2)
 	  *trgt.b = tmp0.b[med];
 	else
-	  *trgt.b = ((Word) tmp0.b[med] + tmp0.b[med + 1])/2;
+	  *trgt.b = ((int16_t) tmp0.b[med] + tmp0.b[med + 1])/2;
 	break;
       case LUX_WORD:
 	if (nelem % 2)
@@ -2004,7 +2004,7 @@ Int local_extrema(Int narg, Int ps[], Int code)
 	if (degree)
 	  *trgt.l = nok;
 	else if (nok)
-	  *trgt.l++ = src.w - (Word *) srcinfo.data0;
+	  *trgt.l++ = src.w - (int16_t *) srcinfo.data0;
 	done = degree? (advanceLoop(&trgtinfo, &trgt),
 			advanceLoop(&srcinfo, &src)):
 	  advanceLoop(&srcinfo, &src);

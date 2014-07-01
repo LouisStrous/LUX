@@ -49,7 +49,7 @@ lux_func_if * lux_func_if_alloc(char const * const name, size_t num_params)
   }
   afif->num_params = num_params;
   if (num_params) {
-    afif->param_syms = calloc(num_params, sizeof(Word));
+    afif->param_syms = calloc(num_params, sizeof(int16_t));
     afif->param_data = calloc(num_params, sizeof(pointer));
     if (!afif->param_syms || !afif->param_data)
       goto error;
@@ -57,7 +57,7 @@ lux_func_if * lux_func_if_alloc(char const * const name, size_t num_params)
   afif->func_sym = nextFreeTempExecutable();
   symbol_class(afif->func_sym) = LUX_USR_FUNC;
   usr_func_arguments(afif->func_sym) = afif->param_syms;
-  symbol_memory(afif->func_sym) = num_params*sizeof(Word);
+  symbol_memory(afif->func_sym) = num_params*sizeof(int16_t);
   usr_func_number(afif->func_sym) = func_sym;
   return afif;
  error:

@@ -144,7 +144,7 @@ Int lux_idlrestore(Int narg, Int ps[])
 	  if (n)		/* align on Int boundary */
 	    fseek(fp, n, SEEK_CUR);
 	  break;
-	case 2:			/* Word */
+	case 2:			/* int16_t */
 	  /* words are stored as longs (!) so we have to read them one by
 	     one and Byte-swap if necessary */
 	  while (n--) {
@@ -176,7 +176,7 @@ Int lux_idlrestore(Int narg, Int ps[])
 	  value.b = value.l;
 	  redef_scalar(var, LUX_BYTE, &value.b);
 	  break;
-	case 2:			/* Word */
+	case 2:			/* int16_t */
 	  fread(pp.b, 1, 4, fp); /* words are stored as ints */
 #if !LITTLEENDIAN
 	  endian(pp.b, 4, LUX_LONG);
@@ -337,7 +337,7 @@ Int lux_idlread_f(Int narg, Int ps[])
 	fseek(fp, 4, SEEK_CUR); /* skip extra Int */
 	fread(data.b, 1, n, fp);
 	break;
-      case 2:			/* Word */
+      case 2:			/* int16_t */
 	/* words are stored as longs (!) so we have to read them one by
 	   one and Byte-swap if necessary */
 	while (n--) {
@@ -368,7 +368,7 @@ Int lux_idlread_f(Int narg, Int ps[])
 	value.b = value.l;
 	redef_scalar(var, LUX_BYTE, &value.b);
 	break;
-      case 2:			/* Word */
+      case 2:			/* int16_t */
 	fread(pp.b, 1, 4, fp);	/* words are stored as ints */
 #if LITTLEENDIAN
 	endian(pp.b, 4, LUX_LONG);

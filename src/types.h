@@ -23,7 +23,6 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdint.h>
 
 	/* C auxilliary variable types */
-typedef int16_t		Word;
 typedef int32_t		Int;
 
 #endif

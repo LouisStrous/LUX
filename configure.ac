@@ -32,6 +32,10 @@ AC_CHECK_LIB(readline, readline)
 # Checks for header files.
 
 # Checks for typedefs, structures, and compiler characteristics.
+AC_TYPE_INT8_T
+AC_TYPE_INT16_T
+AC_TYPE_INT32_T
+AC_TYPE_INT64_T
 
 # Checks for library functions.
 AC_CHECK_FUNCS([clock_gettime])

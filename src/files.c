@@ -99,7 +99,7 @@ extern	Int	noioctl, iformat, fformat, sformat, cformat, tformat,
   noTrace;
 Int	lux_swab(Int, Int *);
 Int	swapl(Int *, Int);
-extern Byte	line2[];
+extern uint8_t	line2[];
 extern char	expname[], batch;
 extern Int	nest;	/* batch flag */
 extern FILE	*inputStream;
@@ -132,11 +132,11 @@ static Int	runlengthflag = 0;
 char	*fmttok(char *);
 
 Int	anacrunch(unsigned char *, short [], Int, Int, Int, Int),
-	anacrunch8(unsigned char *, Byte [], Int, Int, Int, Int);
+	anacrunch8(unsigned char *, uint8_t [], Int, Int, Int, Int);
 Int	anacrunchrun(unsigned char *, short [], Int, Int, Int, Int),
-	anacrunchrun8(unsigned char *, Byte [], Int, Int, Int, Int);
+	anacrunchrun8(unsigned char *, uint8_t [], Int, Int, Int, Int);
 #if SIZEOF_LONG_LONG_INT == 8	/* 64-bit integers */
-Int	anacrunch32(Byte *, Int [], Int, Int, Int, Int);
+Int	anacrunch32(uint8_t *, Int [], Int, Int, Int, Int);
 #endif
 
 Int	byte_count;		/* also used by tape.c, which is only */
@@ -322,7 +322,7 @@ FILE *openPathFile(char *name, Int mode)
   }
   mode &= ~FIND_LOWER;
   p = copy;
-  while (isspace((Byte) *p++));			/* skip spaces */
+  while (isspace((uint8_t) *p++));			/* skip spaces */
   switch (*--p) {
     case '$': case '~': case '/':
       plist = NULL;
@@ -486,19 +486,19 @@ Int format_check(char *format, char **next, Int store)
    n += p - format;
    p2 = p++;			/* add prefix to size */
    p += strspn(p, "-+ 0#");	/* skip -+0# and space */
-   if (isdigit((Byte) *p))		/* width */
+   if (isdigit((uint8_t) *p))		/* width */
      sscanf(p, "%d", &format_width);
    else
      format_width = -1;		/* not specified */
-   while (isdigit((Byte) *p))
+   while (isdigit((uint8_t) *p))
      p++;			/* skip width */
    if (*p == '.') {
      p++;
-     if (isdigit((Byte) *p))		/* precision */
+     if (isdigit((uint8_t) *p))		/* precision */
        sscanf(p, "%d", &format_precision);
      else
        format_precision = -1;	/* not specified */
-     while (isdigit((Byte) *p))
+     while (isdigit((uint8_t) *p))
        p++;			/* skip precision */
    } else
      format_precision = -1;	/* not specified */
@@ -570,7 +570,7 @@ Int input_format_check(char *format, char **next, char **widths, Int *datatype,
 
   /* skip initial whitespace: not all compilers handle it the same way */
   p = format;
-  while (*format && isspace((Byte) *format))
+  while (*format && isspace((uint8_t) *format))
     format++;
   p2 = format;			/* possible start of explicit text */
   /* seek format entry */
@@ -605,7 +605,7 @@ Int input_format_check(char *format, char **next, char **widths, Int *datatype,
       break;
   }
   if (*format == '.')		/* precision - only useful for %t and %T */
-    while (isdigit((Byte) *++format));
+    while (isdigit((uint8_t) *++format));
   big = 0;			/* modifier */
   switch (*format) {
     case 'h':
@@ -648,7 +648,7 @@ Int input_format_check(char *format, char **next, char **widths, Int *datatype,
   }
   p = ++format;			/* just after data type specification */
   /* look for repeat count */
-  while (isdigit((Byte) *p))
+  while (isdigit((uint8_t) *p))
     p++;
   if (p != format && *p == '#')	 /* have a repeat count */
     *number *= strtol(format, &format, 10);
@@ -2180,7 +2180,7 @@ Int read_ascii(Int narg, Int ps[], FILE *fp, Int flag)
 	switch (type) {
 	  /* <iq> is returned as LUX_LONG or LUX_DOUBLE by redef_scalar() */
 	case LUX_BYTE:
-	  scalar_value(iq).b = (Byte) value.l;
+	  scalar_value(iq).b = (uint8_t) value.l;
 	  break;
 	case LUX_WORD:
 	  scalar_value(iq).w = (Word) value.l;
@@ -2225,10 +2225,10 @@ Int read_ascii(Int narg, Int ps[], FILE *fp, Int flag)
 	    case LUX_BYTE:
 	      switch (type) {
 	      case LUX_BYTE: case LUX_WORD: case LUX_LONG:
-		*pp.b++ = (Byte) value.l;
+		*pp.b++ = (uint8_t) value.l;
 		break;
 	      case LUX_FLOAT: case LUX_DOUBLE:
-		*pp.b++ = (Byte) value.d;
+		*pp.b++ = (uint8_t) value.d;
 		break;
 	      }
 	      break;
@@ -3261,20 +3261,20 @@ Int fzread(Int narg, Int ps[], Int flag) /* fzread subroutine */
   fzHead	*fh;
   pointer q1;
   FILE	*fin;
-  Int	anadecrunch(Byte *, Word [], Int, Int, Int),
-	anadecrunch8(Byte *, Byte [], Int, Int, Int),
-	anadecrunchrun(Byte *, Word [], Int, Int, Int),
-	anadecrunchrun8(Byte *, Byte [], Int, Int, Int);
+  Int	anadecrunch(uint8_t *, Word [], Int, Int, Int),
+	anadecrunch8(uint8_t *, uint8_t [], Int, Int, Int),
+	anadecrunchrun(uint8_t *, Word [], Int, Int, Int),
+	anadecrunchrun8(uint8_t *, uint8_t [], Int, Int, Int);
 #if SIZEOF_LONG_LONG_INT == 8	/* 64-bit integers */
-  Int	anadecrunch32(Byte *, Int [], Int, Int, Int);
+  Int	anadecrunch32(uint8_t *, Int [], Int, Int, Int);
 #endif
  
   struct compresshead {
     Int     tsize, nblocks, bsize;
-    Byte    slice_size, type; } ch;
+    uint8_t    slice_size, type; } ch;
  
 #if WORDS_BIGENDIAN
-  union { Int i;  Byte b[4];} lmap;
+  union { Int i;  uint8_t b[4];} lmap;
 #endif
 
 	 /* first arg is the variable to load, second is name of file */
@@ -3363,20 +3363,20 @@ Int fzread(Int narg, Int ps[], Int flag) /* fzread subroutine */
       return flag? LUX_ERROR: luxerror("inconsisent compression type", 0);
     switch (ch.type) {
       case 0:
-	iq = anadecrunch((Byte *) p, q1.w, sbit, ch.bsize, ch.nblocks);
+	iq = anadecrunch((uint8_t *) p, q1.w, sbit, ch.bsize, ch.nblocks);
 	break;
       case 1:
-	iq = anadecrunch8((Byte *) p, q1.b, sbit, ch.bsize, ch.nblocks);
+	iq = anadecrunch8((uint8_t *) p, q1.b, sbit, ch.bsize, ch.nblocks);
 	break;
       case 2:
-	iq = anadecrunchrun((Byte *) p, q1.w, sbit, ch.bsize, ch.nblocks);
+	iq = anadecrunchrun((uint8_t *) p, q1.w, sbit, ch.bsize, ch.nblocks);
 	break;
       case 3:
-	iq = anadecrunchrun8((Byte *) p, q1.b, sbit, ch.bsize, ch.nblocks);
+	iq = anadecrunchrun8((uint8_t *) p, q1.b, sbit, ch.bsize, ch.nblocks);
 	break;
       case 4:
 #if SIZEOF_LONG_LONG_INT == 8	/* 64-bit integers */
-	iq = anadecrunch32((Byte *) p, q1.l, sbit, ch.bsize, ch.nblocks);
+	iq = anadecrunch32((uint8_t *) p, q1.l, sbit, ch.bsize, ch.nblocks);
 #else
 	puts("32-bit decompression was not compiled into your version of LUX");
 	iq = LUX_ERROR;
@@ -3540,9 +3540,9 @@ Int fzwrite(Int narg, Int ps[], Int flag) /* fzwrite subroutine */
 	q2.sp++;
       }
     }
-    mq = (mq + 256) % 512;	/* how many in the last 512-Byte block */
+    mq = (mq + 256) % 512;	/* how many in the last 512-uint8_t block */
     if (mq) {			/* we must pad until we get another full */
-				/* 512-Byte block */
+				/* 512-uint8_t block */
       mq = 512 - mq;
       while (mq--)		/* pad */
 	putc('\0', fout);
@@ -3632,7 +3632,7 @@ Int fcwrite(Int narg, Int ps[], Int flag)/* fcwrite subroutine */
  char	*name, *p;
  fzHead	*fh;
  pointer q1, q2;
- union { Int i;  Byte b[4];} lmap;
+ union { Int i;  uint8_t b[4];} lmap;
  FILE	*fout;
 					 /* first arg. must be an array */
  iq = ps[0];
@@ -3692,7 +3692,7 @@ Int fcwrite(Int narg, Int ps[], Int flag)/* fcwrite subroutine */
  ny = n/nx;
  n = n * lux_type_size[type];
 
- /* now compress the array, must be a Byte or short */
+ /* now compress the array, must be a uint8_t or short */
  limit = 2*n;
  q2.l = (Int *) malloc(limit);	/* some room for mistakes */
  switch (type) {
@@ -4223,7 +4223,7 @@ Int arestore(Int narg, Int ps[], Int flag)
   }
   nvalue = intro[1];		/* number of variables in the file */
   if (reverseOrder)
-    endian((Byte *) &nvalue, sizeof(Int), LUX_LONG);
+    endian((uint8_t *) &nvalue, sizeof(Int), LUX_LONG);
   if (narg && narg < nvalue)
     nvalue = narg;		/* the number of variables to restore */
   if (narg)			/* all arguments must be named variables */
@@ -5014,7 +5014,7 @@ Int lux_identify_file(Int narg, Int ps[])
  */
 {
   char	*name;
-  Byte	buf[4];
+  uint8_t	buf[4];
   FILE	*fp;
   Int	type, result;
 
@@ -5132,7 +5132,7 @@ void printw(char *string)
   /* if the first character is whitespace (but no newline), then we
    keep whitespace at the beginning of screen lines; otherwise we
    discard it. */
-  keepws = (isspace((Byte) *p) && *p != '\n');
+  keepws = (isspace((uint8_t) *p) && *p != '\n');
   pn = strpbrk(p, "\n\r");	/* find next newline or return */
   while (n) {			/* while we have more characters to print */
     toolong = (n + column >= uTermCol);
@@ -5145,14 +5145,14 @@ void printw(char *string)
       /* we must break there */
       p2 = pn + 1;
       pn = strpbrk(p2, "\n\r");	/* next newline or return */
-    } else if (isspace((Byte) p2[-1]) && keepws) {
+    } else if (isspace((uint8_t) p2[-1]) && keepws) {
       /* if <keepws> is set, then we only want breakpoints such that there
 	 is no whitespace directly before the breakpoint.  This is suitable
 	 for printing lists of numbers in formats with a fixed field width;
 	 they'll then line up nicely in columns, even if the screen width
 	 is not some simple multiple of the field width. */
       p2--;
-      while (p2 > p && isspace((Byte) p2[-1]))
+      while (p2 > p && isspace((uint8_t) p2[-1]))
 	p2--;
       if (p2 == p)		/* the whole line is whitespace: use
 				   the original breakpoint. */
@@ -5168,10 +5168,10 @@ void printw(char *string)
 	&& *p2			/* not at end of string */
 	&& p2[-1] != '\n'	/* not just after a \n */
 	&& p2[-1] != '\r'	/* not just after a \r */
-	&& (!isspace((Byte) *p2) /* not just before whitespace */
-	    || isspace((Byte) p2[-1]))) { /* or just after whitespace */
+	&& (!isspace((uint8_t) *p2) /* not just before whitespace */
+	    || isspace((uint8_t) p2[-1]))) { /* or just after whitespace */
       p2--;
-      while ((isspace((Byte) p2[-1]) || !isspace((Byte) *p2))
+      while ((isspace((uint8_t) p2[-1]) || !isspace((uint8_t) *p2))
 	     && p2 > p)		/* seek a better place to break... */
 	p2--;			/* ... earlier in the line */
     }
@@ -5182,7 +5182,7 @@ void printw(char *string)
     if (!keepws && !column) 	/* we're not interested in whitespace;
 				   if we have any at the start of the line
 				   then we skip it. */
-      while (isspace((Byte) *p) && *p != '\n') {
+      while (isspace((uint8_t) *p) && *p != '\n') {
 	p++;
 	n--;
       }
@@ -5288,7 +5288,7 @@ Int lux_hex(Int narg, Int ps[])
 	} flag=1; break;			/*end of scalar case */
       case LUX_SCAL_PTR:	/*scalar ptr case */
 	switch (sym[iq].type) {
-	  case 0: fprintf(fp, "      %#4x",*(Byte *)sym[iq].spec.array.ptr); break;
+	  case 0: fprintf(fp, "      %#4x",*(uint8_t *)sym[iq].spec.array.ptr); break;
 	  case 1: fprintf(fp, "    %#6x",*(short *)sym[iq].spec.array.ptr); break;
 	  case 2: fprintf(fp, "%#10x",*(Int *)sym[iq].spec.array.ptr); break;
 	  case 3: fprintf(fp, "%#10x",*(float *)sym[iq].spec.array.ptr); break;
@@ -5309,7 +5309,7 @@ Int lux_hex(Int narg, Int ps[])
 	      { fprintf(fp, "%#10x",*p1.l++); if (j%8 == 7) fprintf(fp, "\n");}  break;
 	      case 3:  p1.f = (float *)ptr; k=6; for (j=0;j<nelem;j++)
 	      { fprintf(fp, "%#10x",*p1.f++); if (j%6 == 5) fprintf(fp, "\n");}  break;
-	      case 0:  p1.b = (Byte *)ptr; k=8; for (j=0;j<nelem;j++)
+	      case 0:  p1.b = (uint8_t *)ptr; k=8; for (j=0;j<nelem;j++)
 	      { fprintf(fp, "      %#4x",*p1.b++); if (j%8 == 7) fprintf(fp, "\n");}  break;
 	      case 1:  p1.w = (short *)ptr; k=8; for (j=0;j<nelem;j++)
 	      { fprintf(fp, "    %#6x",*p1.w++); if (j%8 == 7) fprintf(fp, "\n");}  break;
@@ -5399,7 +5399,7 @@ Int fits_fatality(FILE *fin)
   return LUX_ZERO;	/* this is the zero symbol */
 }
 /*------------------------------------------------------------------------- */
-void apply_bscale_bzero_blank(Byte *ptr, Int nelem, float bscale, float bzero,
+void apply_bscale_bzero_blank(uint8_t *ptr, Int nelem, float bscale, float bzero,
 			      float blank, float targetblank, Int type0,
 			      Int type)
 {
@@ -5636,11 +5636,11 @@ Int lux_fits_xread_f(Int narg, Int ps[])/* read fits extension and headers */
  return fits_read(mode, 0, ps[1], hsym, offsetsym, 0, xhsym, ps[0], 0);
 }
 /*------------------------------------------------------------------------- */
-Int	anadecrunchrun8(Byte [], Byte [], Int, Int, Int),
-  anadecrunch8(Byte *, Byte [], Int, Int, Int),
-  anadecrunchrun(Byte *, short [], Int, Int, Int),
-  anadecrunch(Byte *, short [], Int, Int, Int),
-  anadecrunch32(Byte *, Int [], Int, Int, Int);
+Int	anadecrunchrun8(uint8_t [], uint8_t [], Int, Int, Int),
+  anadecrunch8(uint8_t *, uint8_t [], Int, Int, Int),
+  anadecrunchrun(uint8_t *, short [], Int, Int, Int),
+  anadecrunch(uint8_t *, short [], Int, Int, Int),
+  anadecrunch32(uint8_t *, Int [], Int, Int, Int);
 Int fits_read_compressed(Int mode, Int datasym, FILE *fp, Int headersym,
 			 float targetblank)
 /* reads data from an LUX Rice-compressed FITS file open on <fp>. */
@@ -5894,7 +5894,7 @@ Int fits_read_compressed(Int mode, Int datasym, FILE *fp, Int headersym,
     } /* end of if (!fread) */
 
     if (internalMode & 1) {	/* decompress */
-      p.b = (Byte *) block;
+      p.b = (uint8_t *) block;
       slice = p.b[12];
       ny = p.l[1];
       nx = p.l[2];
@@ -6242,7 +6242,7 @@ Int fits_read(Int mode, Int dsym, Int namsym, Int hsym, Int offsetsym,
     }
     /* now correct for BZERO, BSCALE, BLANK */
     if (!(internalMode & 2) && (bscale || bzero))
-      apply_bscale_bzero_blank((Byte *) q, nbsize/lux_type_size[type0], bscale, bzero,
+      apply_bscale_bzero_blank((uint8_t *) q, nbsize/lux_type_size[type0], bscale, bzero,
 			       blank, targetblank, type0, type);
     /* lux_replace ordinarily yields some output when STEPping or TRACEing, */
     /* but here we don't want that: ensure that noTrace is non-zero */

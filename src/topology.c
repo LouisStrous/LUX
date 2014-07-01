@@ -2368,8 +2368,8 @@ Int lux_basin(Int narg, Int ps[])
 {
  Int	iq, result_sym, nx, ny, col, row, *wsh, nx0;
  Int	mode, i, n, nsinks, *code, n0;
- register Byte	loc;
- Byte	end, locs[3];
+ register uint8_t	loc;
+ uint8_t	end, locs[3];
  array	*h;
  register float	*alt, min0, min1 = 0.0, min2 = 0.0, min;
 
@@ -4469,7 +4469,7 @@ Int lux_area_connect(Int narg, Int ps[])
  in <im1>, as far as possible. */
 {
   char	raw = 0, compact = 1;
-  Byte	*flags;
+  uint8_t	*flags;
   Int	n, n2, dims[2], i, result, *order, *ptr, i2, v1, v2,
     max1, max2, *ptr0, j, i0, *out1, *out2, *order2, *list,
     qapp, qdisapp, qmerge1, qmerge2, qmerge1list, qsplit1, qsplit2,

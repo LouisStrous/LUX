@@ -139,7 +139,7 @@ Int fmt_entry(formatInfo *fmi)
   type = FMT_PLAIN;		/* default */
   fmi->flags = 0;
   if (*p == '%' && p[1] != '%' && p[1] != ')') { /* a format specification */
-    Byte done = 0;
+    uint8_t done = 0;
     p++;			/* skip the initial % */
     
     /* service any modifier */
@@ -176,7 +176,7 @@ Int fmt_entry(formatInfo *fmi)
       }
     } while (!done);
 
-    if (isdigit((Byte) *p))
+    if (isdigit((uint8_t) *p))
       fmi->width = strtol(p, &p, 10); /* find & skip the number */
     else
       fmi->width = -1;		/* no explicit width */
@@ -248,9 +248,9 @@ Int fmt_entry(formatInfo *fmi)
 
     /* look for a repeat count */
     fmi->count = -1;		/* default */
-    if (isdigit((Byte) *p)) {	/* maybe a repeat count */
+    if (isdigit((uint8_t) *p)) {	/* maybe a repeat count */
       p2 = p + 1;
-      while (isdigit((Byte) *p2))
+      while (isdigit((uint8_t) *p2))
 	p2++;
       if (*p2 == '#') {		/* yes, a repeat count */
 	fmi->count = strtol(p, &p, 10);
@@ -286,7 +286,7 @@ Int fmt_entry(formatInfo *fmi)
     if (fmi->group_count[fmi->active_group] == -1) {
       /* we don't have a repeat count for this grouping yet */
       fmi->group_count[fmi->active_group] = 1;/* default */
-      if (isdigit((Byte) *p)) { /* may be a repeat count */
+      if (isdigit((uint8_t) *p)) { /* may be a repeat count */
 	p2 = p;
 	k = strtol(p2, &p2, 10);
 	if (*p2 == '#')  	/* yes, it's a repeat count */

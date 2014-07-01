@@ -24,8 +24,8 @@ void execute_string(char *text)
 {
  extern Int	nest, motif_input_flag;
  extern	Int	single_string_parse_flag, single_string_parse_nest, nest;
- extern Byte	*input_compile_string;	/* used for compiling strings */
- extern Byte line2[];
+ extern uint8_t	*input_compile_string;	/* used for compiling strings */
+ extern uint8_t line2[];
  extern struct	sdesc	cur_line;
  extern	char	*strsavsd();
  struct	sdesc	save_cur_line;
@@ -41,9 +41,9 @@ void execute_string(char *text)
  /* printf("command entered: %s\n", s); */
  /* check if something in the parser buffer and save if so */
  /* we'll put it back at the end */
- if (save_cur_line.n=cur_line.n) save_cur_line.p=(Byte *) strsavsd(&cur_line);
+ if (save_cur_line.n=cur_line.n) save_cur_line.p=(uint8_t *) strsavsd(&cur_line);
  cur_line.n = 0;
- input_compile_string = (Byte *) text;
+ input_compile_string = (uint8_t *) text;
  /* if we entered with input_modal_flag on, we don't call parser */
  if (input_modal_flag == 0) {
  single_string_parse_flag = 1;

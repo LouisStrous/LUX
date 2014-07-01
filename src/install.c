@@ -2802,7 +2802,7 @@ Int nextCompileLevel(FILE *fp, char *fileName)
  char	*name;
  extern Int	echo; 
  extern char	inHistoryBuffer, tLine[], *inputString;
- extern Byte	disableNewline;
+ extern uint8_t	disableNewline;
  Int	yyparse(void), getStreamChar(void), getStringChar(void);
  extern Int	(*getChar)(void);
  compileInfo	*nextFreeCompileInfo(void);
@@ -3253,7 +3253,7 @@ char *className(Int class)
 /* returns the name of the class */
 {
   static struct classInfo {
-    Byte number; char *name;
+    uint8_t number; char *name;
   } classes[] = {
     { LUX_UNUSED, "not used" },
     { LUX_SCALAR, "scalar" },
@@ -3545,16 +3545,16 @@ void convertPointer(scalar *target, Int inType, Int outType)
   case LUX_BYTE:
     switch (inType) {
     case LUX_WORD:
-      (*target).b = (Byte) (*target).w;
+      (*target).b = (uint8_t) (*target).w;
       break;
     case LUX_LONG:
-      (*target).b = (Byte) (*target).l;
+      (*target).b = (uint8_t) (*target).l;
       break;
     case LUX_FLOAT:
-      (*target).b = (Byte) (*target).f;
+      (*target).b = (uint8_t) (*target).f;
       break;
     case LUX_DOUBLE:
-      (*target).b = (Byte) (*target).d;
+      (*target).b = (uint8_t) (*target).d;
       break;
     }
     break;
@@ -3658,7 +3658,7 @@ void convertWidePointer(wideScalar *target, Int inType, Int outType)
     case LUX_WORD:
       switch (outType) {
 	case LUX_BYTE:
-	  target->b = (Byte) target->w;
+	  target->b = (uint8_t) target->w;
 	  break;
 	case LUX_WORD:
 	  break;
@@ -3684,7 +3684,7 @@ void convertWidePointer(wideScalar *target, Int inType, Int outType)
     case LUX_LONG:
       switch (outType) {
 	case LUX_BYTE:
-	  target->b = (Byte) target->l;
+	  target->b = (uint8_t) target->l;
 	  break;
 	  break;
 	case LUX_WORD:
@@ -3711,7 +3711,7 @@ void convertWidePointer(wideScalar *target, Int inType, Int outType)
     case LUX_FLOAT:
       switch (outType) {
 	case LUX_BYTE:
-	  target->b = (Byte) target->f;
+	  target->b = (uint8_t) target->f;
 	  break;
 	case LUX_WORD:
 	  target->w = (Word) target->f;
@@ -3737,7 +3737,7 @@ void convertWidePointer(wideScalar *target, Int inType, Int outType)
     case LUX_DOUBLE:
       switch (outType) {
 	case LUX_BYTE:
-	  target->b = (Byte) target->d;
+	  target->b = (uint8_t) target->d;
 	  break;
 	case LUX_WORD:
 	  target->w = (Word) target->d;
@@ -3763,7 +3763,7 @@ void convertWidePointer(wideScalar *target, Int inType, Int outType)
     case LUX_CFLOAT:
       switch (outType) {
 	case LUX_BYTE:
-	  target->b = (Byte) target->cf.real;
+	  target->b = (uint8_t) target->cf.real;
 	  break;
 	case LUX_WORD:
 	  target->w = (Word) target->cf.real;
@@ -3788,7 +3788,7 @@ void convertWidePointer(wideScalar *target, Int inType, Int outType)
     case LUX_CDOUBLE:
       switch (outType) {
 	case LUX_BYTE:
-	  target->b = (Byte) target->cd.real;
+	  target->b = (uint8_t) target->cd.real;
 	  break;
 	case LUX_WORD:
 	  target->w = (Word) target->cd.real;
@@ -3825,19 +3825,19 @@ void convertScalar(scalar *target, Int nsym, Int type)
  case LUX_BYTE:
    switch (n) {
    case LUX_BYTE:
-     (*target).b = (Byte) *ptr.b;
+     (*target).b = (uint8_t) *ptr.b;
      break;
    case LUX_WORD:
-     (*target).b = (Byte) *ptr.w;
+     (*target).b = (uint8_t) *ptr.w;
      break;
    case LUX_LONG:
-     (*target).b = (Byte) *ptr.l;
+     (*target).b = (uint8_t) *ptr.l;
      break;
    case LUX_FLOAT:
-     (*target).b = (Byte) *ptr.f;
+     (*target).b = (uint8_t) *ptr.f;
      break;
    case LUX_DOUBLE:
-     (*target).b = (Byte) *ptr.d;
+     (*target).b = (uint8_t) *ptr.d;
      break;
    }
    break;
@@ -4170,7 +4170,7 @@ void symbolInitialization(void)
  Int	to_scratch_array(Int, Int, Int, Int []);
  extern char	*fmt_integer, *fmt_float, *fmt_string, *fmt_complex,
   *curScrat, *printString;
- union { Byte b[2]; Word w; } whichendian;
+ union { uint8_t b[2]; Word w; } whichendian;
 
  /* determine if the machine is little-endian or bigendian */
  whichendian.w = 1;
@@ -4704,7 +4704,7 @@ Int lux_breakpoint(Int narg, Int ps[])
 	    if (!p)			/* no number */
 	      breakpoint[curBreakpoint].line = 0;
 	    else {
-	      if (!isdigit((Byte) *p))
+	      if (!isdigit((uint8_t) *p))
 		return
 		  luxerror("Illegal breakpoint line number specification (%s)",
 			ps[0], p);
@@ -5194,7 +5194,7 @@ Int translateEscapes(char *p)
 	i = strtol(p + 2, &p2, 10);
 	*p = i;
 	memcpy(p + 1, p2, strlen(p2) + 1);
-      } else if (isdigit((Byte) p[1]) && p[1] < '8') { /* an octal number */
+      } else if (isdigit((uint8_t) p[1]) && p[1] < '8') { /* an octal number */
 	/* octal-number escape sequences have at most 3 octal digits.
 	   we cannot rely on strtol because it may find more than 3
 	   (e.g., when the user specifies '\000123' the \000 is an octal
@@ -5203,7 +5203,7 @@ Int translateEscapes(char *p)
 	   octal number manually. */
 	p2 = p + 2;		/* just beyond the first octal digit */
 	for (i = 2; i < 4; i++)
-	  if (isdigit((Byte) *p2) && *p2 < '8')	/* an octal digit */
+	  if (isdigit((uint8_t) *p2) && *p2 < '8')	/* an octal digit */
 	    p2++;
 	c = *p2;		/* temporary storage */
 	*p2 = '\0';		/* temporary end to force strtol not to

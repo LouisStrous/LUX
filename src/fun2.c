@@ -191,7 +191,7 @@ Int index_sdev(Int narg, Int ps[], Int sq)
     size += (offset = -lastmin.l);
   result = array_scratch(outType, 1, &size);
   trgt.l = array_data(result);
-  allocate(sum.b, size*lux_type_size[outType], Byte);
+  allocate(sum.b, size*lux_type_size[outType], uint8_t);
   zerobytes(trgt.b, size*lux_type_size[outType]);
   zerobytes(sum.b, size*lux_type_size[outType]);
   trgt.b += offset*lux_type_size[outType];
@@ -2976,16 +2976,16 @@ Int lux_lower(narg,ps)					/*lower function */
 /* convert all letters in a string to lower case */
 Int narg,ps[];
 {
-register  Byte *p1, *p2;
+register  uint8_t *p1, *p2;
 register  Int  mq;
 Int	result_sym;
 if ( sym[ ps[0] ].class != 2 ) return cerror(NEED_STR, *ps);
 mq = sym[ps[0]].spec.array.bstore - 1;
 result_sym = string_scratch(mq);		/*for resultant string */
-p1 = (Byte *) sym[ps[0] ].spec.array.ptr;
-p2 = (Byte *) sym[result_sym].spec.array.ptr;
+p1 = (uint8_t *) sym[ps[0] ].spec.array.ptr;
+p2 = (uint8_t *) sym[result_sym].spec.array.ptr;
 while (mq--)
- *p2++ = isupper( (Int) *p1 ) ? (Byte) tolower( (Int) *p1++) : *p1++;
+ *p2++ = isupper( (Int) *p1 ) ? (uint8_t) tolower( (Int) *p1++) : *p1++;
 *p2 = 0;					/*ending null */
 return result_sym;
 }
@@ -2994,16 +2994,16 @@ Int lux_upper(narg,ps)					/*upper function */
 /* convert all letters in a string to upper case */
 Int narg,ps[];
 {
-register  Byte *p1, *p2;
+register  uint8_t *p1, *p2;
 register  Int  mq;
 Int	result_sym;
 if ( sym[ ps[0] ].class != 2 ) return cerror(NEED_STR, *ps);
 mq = sym[ps[0]].spec.array.bstore - 1;
 result_sym = string_scratch(mq);		/*for resultant string */
-p1 = (Byte *) sym[ps[0] ].spec.array.ptr;
-p2 = (Byte *) sym[result_sym].spec.array.ptr;
+p1 = (uint8_t *) sym[ps[0] ].spec.array.ptr;
+p2 = (uint8_t *) sym[result_sym].spec.array.ptr;
 while (mq--)
- *p2++ = islower( (Int) *p1 ) ? (Byte) toupper( (Int) *p1++) : *p1++;
+ *p2++ = islower( (Int) *p1 ) ? (uint8_t) toupper( (Int) *p1++) : *p1++;
 *p2 = 0;					/*ending null */
 return result_sym;
 }
@@ -3342,7 +3342,7 @@ Int lux_string(Int narg, Int ps[])
 	  break;
       }
       p = curScrat;
-      while (isspace((Byte) *p)) /* skip initial whitespace */
+      while (isspace((uint8_t) *p)) /* skip initial whitespace */
 	p++;
       result = string_scratch(strlen(p));
       strcpy(string_value(result), p);
@@ -3791,7 +3791,7 @@ Int lux_poly(Int narg, Int ps[])
  /* c: coefficients of the polynomial */
 {
   Int result, ndata, ncoeff, datasym, coeffsym, i;
-  Byte outtype;
+  uint8_t outtype;
   pointer data, tgt, coeff;
 
   if (!symbolIsNumerical(ps[0])

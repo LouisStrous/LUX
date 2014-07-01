@@ -27,7 +27,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
  Int	nx, ny;
  static	Int result_sym;
  static pointer q1;
- Byte	*base;
+ uint8_t	*base;
  /*------------------------------------------------------------------------- */
 METHODDEF void input_init (compress_info_ptr cinfo)
 /* Initialize for input; return image size and component data. */
@@ -82,7 +82,7 @@ Int lux_write_jpeg_f(Int narg, Int ps[])
 }
  /*------------------------------------------------------------------------- */
 Int lux_write_jpeg(Int narg, Int ps[])	/* jpeg write subroutine */
- /* 10/17/92, start with 2-D Byte files */
+ /* 10/17/92, start with 2-D uint8_t files */
 {
  struct compress_info_struct cinfo;
  struct compress_methods_struct c_methods;
@@ -256,7 +256,7 @@ Int lux_read_jpeg_f(Int narg, Int ps[])
 }
  /*------------------------------------------------------------------------- */
 Int lux_read_jpeg(Int narg, Int ps[])	/* jpeg read subroutine */
- /* 10/17/92, start with 2-D Byte files */
+ /* 10/17/92, start with 2-D uint8_t files */
  {
  char	*name;
  struct decompress_info_struct cinfo;

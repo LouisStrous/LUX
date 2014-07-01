@@ -74,10 +74,10 @@ void shell_f(Int n, float arr[])
   }
 }
 /*------------------------------------------------------------------------- */
-void shell_b(Int n, Byte arr[])
+void shell_b(Int n, uint8_t arr[])
 {
   Int	nn,m,j,i,lognb2;
-  Byte	t;
+  uint8_t	t;
 
   lognb2 = (log((double) n)*ALN2I + TINY);
   m = n;
@@ -224,10 +224,10 @@ void sort_f(Int n, float ra[])
   }
 }
 /*------------------------------------------------------------------------- */
-void sort_b(Int n, Byte ra[])
+void sort_b(Int n, uint8_t ra[])
 {
   Int	l,j,ir,i;
-  Byte	rra;
+  uint8_t	rra;
 
   l = (n/2);
   ir = n-1;
@@ -426,10 +426,10 @@ void indexx_d(Int n, double ra[], Int indx[])
   }
 }
 /*------------------------------------------------------------------------- */
-void indexx_b(Int n, Byte ra[], Int indx[])
+void indexx_b(Int n, uint8_t ra[], Int indx[])
 {
   Int	l,j,ir,i,indxt;
-  Byte	q;
+  uint8_t	q;
  
   for (i = 0; i < n; i++)
     indx[i] = i;

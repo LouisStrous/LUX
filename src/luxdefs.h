@@ -397,19 +397,19 @@ typedef union {
   
 /** \union a union of scalar values */
 typedef union {
-  Byte b; Word w; Int l; float f; double d; char *s; char **sp;
+  uint8_t b; Word w; Int l; float f; double d; char *s; char **sp;
 } scalar;
 
 /* wideScalar is equal to scalar plus the complex data types; we have */
 /* separate scalar and wideScalars because wideScalar is wider, which is */
 /* not always desirable. */
 typedef union {
-  Byte b; Word w; Int l; float f; double d; floatComplex cf;
+  uint8_t b; Word w; Int l; float f; double d; floatComplex cf;
   doubleComplex cd; char *s; char **sp;
 } wideScalar;
 
 typedef union pointerUnion {
-  Byte *b; Word *w; Int *l; float *f; double *d; char *s;
+  uint8_t *b; Word *w; Int *l; float *f; double *d; char *s;
   char **sp; void *v; floatComplex *cf; doubleComplex *cd;
 } pointer;
 
@@ -423,7 +423,7 @@ typedef struct {
 
 typedef struct {
   char suppressEval; char pipe; char suppressUnused;
-  Int defaultMode; Byte offset; char **keys;
+  Int defaultMode; uint8_t offset; char **keys;
 } keyList;
 
 /* kinds of facts */
@@ -479,31 +479,31 @@ typedef union {
 } allFacts;
 
 typedef struct {
-  Byte  type;
-  Byte  flags;
-  Byte  pad[2];
+  uint8_t  type;
+  uint8_t  flags;
+  uint8_t  pad[2];
   allFacts      fact;
 } arrayFacts;
 
 typedef struct arrayStruct {
-  Byte ndim, c1, c2, nfacts; Int dims[MAX_DIMS]; arrayFacts *facts;
+  uint8_t ndim, c1, c2, nfacts; Int dims[MAX_DIMS]; arrayFacts *facts;
 } array;
 
 struct boundsStruct {
-  struct { Byte b; Word w; Int l; float f; double d; } min;
-  struct { Byte b; Word w; Int l; float f; double d; } max;
+  struct { uint8_t b; Word w; Int l; float f; double d; } min;
+  struct { uint8_t b; Word w; Int l; float f; double d; } max;
 };
 
 typedef struct structElemStruct {
   union {
     struct {
-      Int nelem; Int size; Int *dims; Byte ndim;
+      Int nelem; Int size; Int *dims; uint8_t ndim;
     } first;
     struct {
-      char *tag; off_t offset; Byte type;
+      char *tag; off_t offset; uint8_t type;
       union {
         struct {
-          Int *dims; Byte ndim;
+          Int *dims; uint8_t ndim;
         } singular;
         Int member;
       } spec;
@@ -512,13 +512,13 @@ typedef struct structElemStruct {
 } structElem;
 
 typedef struct {
-  Byte type;
+  uint8_t type;
   uWord number;
   union { Word *w; char **sp; } ptr;
 } extractSec;
 
 typedef struct {
-  Byte  type;                   /* subscript type: scalar, range, index */
+  uint8_t  type;                   /* subscript type: scalar, range, index */
   union {
     struct {
       Int       value;          /* the single integer subscript */
@@ -546,7 +546,7 @@ typedef struct {
 } preExtract;
 
 typedef struct symTableEntryStruct {
- Byte class; Byte type; Word xx; Int line; Word context; Int exec;
+ uint8_t class; uint8_t type; Word xx; Int line; Word context; Int exec;
   union specUnion
   { scalar scalar;
     struct { array      *ptr; Int bstore; } array;
@@ -563,7 +563,7 @@ typedef struct symTableEntryStruct {
     pointer     pointer;  
     struct { Word args[4]; } evb;
     struct { uWord args[4]; } uevb;
-    struct { Byte narg; char **keys; Byte extend; uWord nstmnt;
+    struct { uint8_t narg; char **keys; uint8_t extend; uWord nstmnt;
       Word *ptr; } routine;
   } spec;
 } symTableEntry;
@@ -578,7 +578,7 @@ typedef struct internalRoutineStruct {
 
 typedef struct {
  Int    synch_pattern;
- Byte   subf, source, nhb, datyp, ndim, free1, cbytes[4], free[178];
+ uint8_t   subf, source, nhb, datyp, ndim, free1, cbytes[4], free[178];
  Int    dim[16];
  char   txt[256];
 } fzHead;

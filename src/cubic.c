@@ -83,9 +83,9 @@ Int lux_cubic_spline(Int narg, Int ps[])
       array_type(xTabSym): array_type(yTabSym);
     type = (oldType < LUX_FLOAT)? LUX_FLOAT: oldType;
     size = lux_type_size[type]*nPoints;
-    xTable.b = (Byte *) Malloc(size);
-    yTable.b = (Byte *) Malloc(size);
-    der2.b = (Byte *) Malloc(size);
+    xTable.b = (uint8_t *) Malloc(size);
+    yTable.b = (uint8_t *) Malloc(size);
+    der2.b = (uint8_t *) Malloc(size);
     if (oldType == type)
     { memcpy(xTable.b, array_data(xTabSym), size);
       memcpy(yTable.b, array_data(yTabSym), size); }
@@ -162,7 +162,7 @@ Int lux_cubic_spline(Int narg, Int ps[])
       der2.f[0] = der2.f[nPoints - 1] = 0.0;
     else
       der2.d[0] = der2.d[nPoints - 1] = 0.0;
-    temp.b = (Byte *) Malloc(size*nPoints);
+    temp.b = (uint8_t *) Malloc(size*nPoints);
     src = xTable;
     trgt = yTable;
     switch (type)

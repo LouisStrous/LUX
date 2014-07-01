@@ -27,9 +27,9 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "action.h"
 
 #define MAGIC	0432
-#define DVI(x)		(((Byte)(x)[0]) + 256*((Byte)(x)[1]))
-#define IS_MINUS1(x)	((Byte)((x)[0]) == 0377 && (Byte)((x)[1]) == 0377)
-#define IS_MINUS2(x)	((Byte)((x)[0]) == 0376 && (Byte)((x)[1]) == 0377)
+#define DVI(x)		(((uint8_t)(x)[0]) + 256*((uint8_t)(x)[1]))
+#define IS_MINUS1(x)	((uint8_t)((x)[0]) == 0377 && (uint8_t)((x)[1]) == 0377)
+#define IS_MINUS2(x)	((uint8_t)((x)[0]) == 0376 && (uint8_t)((x)[1]) == 0377)
 
 extern char	*c_left, *c_right, *c_up, *c_down, *cl_eos, *k_backspace,
 	*k_delete, *k_insert, *k_up, *k_down, *k_right, *k_left, *c_save,
@@ -37,7 +37,7 @@ extern char	*c_left, *c_right, *c_up, *c_down, *cl_eos, *k_backspace,
 extern Int	scrat[];
 static Int	str_count;
 static char	*cap_strings;
-static Byte	*cap_offsets;
+static uint8_t	*cap_offsets;
 char	*termEntry(Int);
 /*----------------------------------------------------*/
 void getTermCaps(void)

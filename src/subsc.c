@@ -290,13 +290,13 @@ Int lux_smap(Int narg, Int ps[])
 }
 /*------------------------------------------------------------------------- */
 Int lux_bmap(Int narg,Int ps[])
-/* convert type to Byte without changing memory contents */
+/* convert type to uint8_t without changing memory contents */
 {
   return lux_gmap(narg, ps, LUX_BYTE);
 }
 /*------------------------------------------------------------------------- */
 Int lux_wmap(Int narg, Int ps[])
-/* convert type to Byte without changing memory contents */
+/* convert type to uint8_t without changing memory contents */
 {
   return lux_gmap(narg, ps, LUX_WORD);
 }
@@ -917,7 +917,7 @@ Int lux_subsc_func(Int narg, Int ps[])
   Word	*ap;
   pointer	src, trgt;
   wideScalar	value, item;
-  Byte	subsc_type[MAX_DIMS], sum[MAX_DIMS];
+  uint8_t	subsc_type[MAX_DIMS], sum[MAX_DIMS];
   listElem	*le;
   FILE	*fp = NULL;
   Int	lux_subsc_subgrid(Int, Int []);
@@ -2307,7 +2307,7 @@ Int lux_concat_list(Int narg, Int ps[])
 /* concatenation involving LUX_CLIST or LUX_LIST. LS 15jun98 */
 {
   Int	result, i, iq, nelem = 0, j, indx;
-  Byte	isStruct = 0;
+  uint8_t	isStruct = 0;
 
   if ((result = nextFreeTempVariable()) == LUX_ERROR)
     return LUX_ERROR;
@@ -2850,7 +2850,7 @@ Int lux_subsc_subgrid(Int narg, Int ps[])
    number of subscripts.  This is somewhat non-standard use of ps/narg!
    LS 19aug98 */
 {
-  Byte	class, type;
+  uint8_t	class, type;
   Int	ndim, *dims, i, subsc[MAX_DIMS], nSubsc, iq, j, mid,
     stride[MAX_DIMS], index, tally[MAX_DIMS], step[2][MAX_DIMS];
   float	*coord[MAX_DIMS], d[MAX_DIMS];

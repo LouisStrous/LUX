@@ -45,7 +45,7 @@ void printnice(char *p)
     return;
   }
   while (*p) {
-    if (isprint((Byte) *p))
+    if (isprint((uint8_t) *p))
       putchar(*p);
     else
       printf("\\%03o", *p);

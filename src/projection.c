@@ -1093,7 +1093,7 @@ typedef struct {
   float y;			/* y coordinate of first end of segment */
   float dx;			/* difference in x to second end */
   float dy;			/* difference in y to second end */
-  Byte status;
+  uint8_t status;
 } lineSegment;
 
 typedef struct {

@@ -418,7 +418,7 @@ Int lux_tolookup(Int narg, Int ps[])
 {
   Int	iq, *index, i, dims[2], curIndex, n, *order, size,
 	nd, j;
-  Byte	*list;
+  uint8_t	*list;
 
   if (symbol_class(*ps) != LUX_ARRAY)
     return cerror(NEED_ARR, *ps);
@@ -449,7 +449,7 @@ Int lux_tolookup(Int narg, Int ps[])
   dims[1] = multiCompNCoord;
   redef_array(ps[1], array_type(iq), dims[1] > 1? 2: 1, dims); /* LIST */
 
-  list = (Byte *) array_data(ps[1]);
+  list = (uint8_t *) array_data(ps[1]);
   size = lux_type_size[array_type(iq)];
   for (j = 0; j < multiCompNCoord; j++)
     memcpy(list + j*n*size,
@@ -503,8 +503,8 @@ Int cmp(const void *x1, const void *x2)
 {
   switch (type) {
     case LUX_BYTE:
-      return *(Byte *) x1 < *(Byte *) x2? -1:
-	(*(Byte *) x1 > *(Byte *) x2? 1: 0);
+      return *(uint8_t *) x1 < *(uint8_t *) x2? -1:
+	(*(uint8_t *) x1 > *(uint8_t *) x2? 1: 0);
     case LUX_WORD:
       return *(Word *) x1 < *(Word *) x2? -1:
 	(*(Word *) x1 > *(Word *) x2? 1: 0);
@@ -788,7 +788,7 @@ Int lux_minfilter(Int narg, Int ps[])
 /* syntax:  Y = MINFILTER(X [[,AXIS], WIDTH]) */
 /* LS 31dec95 30jul97 */
 {
-  Byte	type;
+  uint8_t	type;
   Int	n, result, i, offset1, offset2, stride,	w1, j, ww, loop, iq, three=3,
     nWidth;
   pointer	src, trgt, width;
@@ -1038,7 +1038,7 @@ Int lux_maxfilter(Int narg, Int ps[])
 /* syntax:  Y = MAXFILTER(X [[,AXIS], WIDTH]) */
 /* LS 31dec95 30jul97 */
 {
-  Byte	type;
+  uint8_t	type;
   Int	n, result, i, offset1, offset2, stride,	w1, j, ww, loop, iq, three=3,
     nWidth;
   pointer	src, trgt, width;
@@ -1383,7 +1383,7 @@ Int lux_multisieve(Int narg, Int ps[])
     for all j
     LS 14apr97 - 15apr97 */
 {
-  Byte	maxType;
+  uint8_t	maxType;
   pointer	xData, yData;
   Int	nx, ny, *listData, *indexData,
     n, *temp, nTemp, iq, nnTemp, noMatch, ix, i, match, *base, step,
@@ -1979,7 +1979,7 @@ Int local_extrema(Int narg, Int ps[], Int code)
 	if (degree)
 	  *trgt.l = nok;
 	else if (nok)
-	  *trgt.l++ = src.b - (Byte *) srcinfo.data0;
+	  *trgt.l++ = src.b - (uint8_t *) srcinfo.data0;
 	done = degree? (advanceLoop(&trgtinfo, &trgt),
 			advanceLoop(&srcinfo, &src)):
 	  advanceLoop(&srcinfo, &src);

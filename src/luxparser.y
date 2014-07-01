@@ -52,7 +52,7 @@ extern symTableEntry	sym[];	/* all symbols */
 char	debugLine = 0,		/* we're not in a debugger line */
 	errorState = 0,		/* we've not just experienced an error */
 	compileOnly = 0;	/* not just compiling but also executing */
-Byte disableNewline = 0;	/* disables NEWLINE token so that complex */
+uint8_t disableNewline = 0;	/* disables NEWLINE token so that complex */
 				/* structures can be parsed across newlines */
 void	pushList(Word),		/* push symbol number onto list stack */
 	swapList(Int, Int),	/* swap items in the list stack */
@@ -973,12 +973,12 @@ void translateLine(void)
 	break;
       }
   if (!inString)
-    while (isspace((Byte) *p))
+    while (isspace((uint8_t) *p))
       p++;			/* skip heading whitespace
 				   outside literal strings */
   nonWhite = 0;			/* number of consecutive non-whitespaces */
   while (*p) {			/* not at end of line */
-    if (iscntrl((Byte) *p))
+    if (iscntrl((uint8_t) *p))
       *p = ' ';			/* control characters are transformed into
 				   whitespace */
     switch (*p) {
@@ -1004,7 +1004,7 @@ void translateLine(void)
 	if (!inString) {	/* we're not inside a literal string, so
 				   it must be a "@filename" */
 	  *tp++ = *p++;		/* @ goes into the translation */
-          while (isFileNameChar((Byte) *p))
+          while (isFileNameChar((uint8_t) *p))
 	    *tp++ = *p++;	/* file name goes into the translation */
 	  p--;
 	} else
@@ -1107,7 +1107,7 @@ Int readNumber(YYSTYPE *lvalp)
       switch(type) {		/* non-zero return value (??) */
 				/* insert value of proper type */
 	case LUX_BYTE:
-	  scalar_value(*lvalp).b = (Byte) v.l;
+	  scalar_value(*lvalp).b = (uint8_t) v.l;
 	  break;
 	case LUX_WORD:
 	  scalar_value(*lvalp).w = (Word) v.l;
@@ -1178,7 +1178,7 @@ Int readIdentifier(YYSTYPE *lvalp)
 
  p = currentChar + 1;		/* skip over first character, which */
 				/* is assumed to be OK by this routine */
- while (isNextChar((Byte) *p))
+ while (isNextChar((uint8_t) *p))
    p++;				/* span identifier */
  c = *p;
  *p = '\0';			/* terminate string, but save clobbered char */
@@ -1191,7 +1191,7 @@ Int readIdentifier(YYSTYPE *lvalp)
  if (!ignoreInput) {		/* we're not ignoring stuff, so need to save */
    *lvalp = installString(currentChar);	/* save string, index in *lvalp */
    *p = c;			/* restore clobbered char */
-   n = isNextChar((Byte) *currentChar)? C_ID: S_ID;
+   n = isNextChar((uint8_t) *currentChar)? C_ID: S_ID;
    currentChar = p;		/* continue parse beyond string */
    if (*lvalp < 0)
      return LUX_ERROR;		/* some error occurred */
@@ -1252,17 +1252,17 @@ Int yylex(YYSTYPE *lvalp)
      currentChar = tLine; 	/* first character of translated input line */
 				/* is current one in parsing */
    }
-   while (isspace((Byte) *currentChar))
+   while (isspace((uint8_t) *currentChar))
      currentChar++;		/* skip leading spaces */
 
    /* we recognize RESUME and IGNORE only at the beginning of a line */
    if (currentChar == tLine) {
      if (!strncmp(currentChar, "IGNORE", 6)
-	 && !isNextChar((Byte) currentChar[6])) {
+	 && !isNextChar((uint8_t) currentChar[6])) {
        ignoreInput++;
        prompt = ANAPrompts[2];	/* ign> */
      } else if (!strncmp(currentChar, "RESUME", 6)
-		&& !isNextChar((Byte) currentChar[6])) {
+		&& !isNextChar((uint8_t) currentChar[6])) {
        if (!ignoreInput)
 	 puts("Unmatched RESUME ignored");
        else
@@ -1321,7 +1321,7 @@ Int yylex(YYSTYPE *lvalp)
      return '#';
    }
 
-   if (isFirstChar((Byte) *currentChar)) { /* an identifier of some sort */
+   if (isFirstChar((uint8_t) *currentChar)) { /* an identifier of some sort */
      i = readIdentifier(lvalp);	/* which standard one or what kind is it? */
      switch (i) {
        case SUBR: case FUNC: case BLOCK: /* SUBR, FUNC, BLOCK: */
@@ -1330,7 +1330,7 @@ Int yylex(YYSTYPE *lvalp)
 				/* routine/function.  If the just */
 				/* encounterd routine/function is the */
 				/* sought one, then we need to compile it */
-	   for (p = currentChar + 2; isNextChar((Byte) *p); p++);
+	   for (p = currentChar + 2; isNextChar((uint8_t) *p); p++);
 	   /* end of name */
 	   c = *p;
 	   *p = '\0';		/* temporary termination */
@@ -1379,7 +1379,7 @@ Int yylex(YYSTYPE *lvalp)
      }
    }
 
-   if (isdigit((Byte) *currentChar)) {	/* a number */
+   if (isdigit((uint8_t) *currentChar)) {	/* a number */
      i = readNumber(lvalp);	/* read number into symbol */
      if (ignoreInput)
        continue;		/* we're ignoring stuff, so the number */
@@ -1389,7 +1389,7 @@ Int yylex(YYSTYPE *lvalp)
        return i; 		/* pass token NUM on to yyparse() */
    }
 
-   if (isTwoOperator((Byte) *currentChar)) { /* possibly op-assignment */
+   if (isTwoOperator((uint8_t) *currentChar)) { /* possibly op-assignment */
      if (currentChar[1] == '=')	{ /* yes, an operation-assignment (e.g. +=) */
        currentChar += 2;	/* continue parse beyond operator */
        if (ignoreInput)
@@ -1431,7 +1431,7 @@ Int yylex(YYSTYPE *lvalp)
 	i = 1;			/* no ignoring, signal @@ */
        currentChar++; 		/* skip extra @ */
     }
-    for (p = currentChar + 1; isFileNameChar((Byte) *p); p++); /* span name */
+    for (p = currentChar + 1; isFileNameChar((uint8_t) *p); p++); /* span name */
     if (!ignoreInput) {		/* not ignoring, so note file name */
       c = *p;			/* save character beyond file name */
       *p = '\0';		/* temporary string terminator */
@@ -1462,15 +1462,15 @@ Int yylex(YYSTYPE *lvalp)
   }
 
   if (*currentChar == '.') {	/* a structure tag or ellipsis or a number */
-    if (isdigit((Byte) currentChar[1])) { /* a number */
+    if (isdigit((uint8_t) currentChar[1])) { /* a number */
       i = readNumber(lvalp);
       if (ignoreInput)
 	continue;
       else
 	return i;
-    } else if (isNextChar((Byte) currentChar[1])) { /* a string tag */
+    } else if (isNextChar((uint8_t) currentChar[1])) { /* a string tag */
       p = ++currentChar;	/* skip . */
-      while (isNextChar((Byte) *currentChar))
+      while (isNextChar((uint8_t) *currentChar))
 	currentChar++;		/* span identifier */
       if (ignoreInput)
 	continue;

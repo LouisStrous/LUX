@@ -26,7 +26,7 @@ Int	execute_error(Int), file_open_error(void);
 #define lux_subr_struct	internalRoutineStruct
 #define STROUS	1
 
-struct sdesc { Int n; Byte *p; };
+struct sdesc { Int n; uint8_t *p; };
 
 /* declarations for use in motif.c */
 Int	ck_motif(void), set_textfontlist(Int), setup_colors(Int),

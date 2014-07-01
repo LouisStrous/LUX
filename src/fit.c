@@ -918,7 +918,7 @@ Int lux_generalfit2(Int narg, Int ps[])
 REGISTER(generalfit2, f, FIT3, 5, 7, "X:Y:START:STEP:F:ERR:ITHRESH:1VOCAL");
 /*------------------------------------------------------------*/
 typedef union {
-  Byte  *b;
+  uint8_t  *b;
   unsigned short        *w;
   uint32_t  *l;
   float *f;
@@ -926,7 +926,7 @@ typedef union {
 } uscalar;
 
 /* replace NaN values by (other) random values */
-void denan(Byte *data, Int size, Int partype)
+void denan(uint8_t *data, Int size, Int partype)
 /* <data> = start of data
    <size> = size of data, in bytes
    <partpe> = data type (LUX_BYTE ... LUX_FLOAT) */
@@ -940,7 +940,7 @@ void denan(Byte *data, Int size, Int partype)
     for (i = 0; i < size/sizeof(float); i++) {
       while (isnan(*p.f)) {
         uint32_t *r;
-        for (r = (uint32_t *) p.b; (Byte *) r < p.b + sizeof(float); r++)
+        for (r = (uint32_t *) p.b; (uint8_t *) r < p.b + sizeof(float); r++)
           *r = random_bits();
       }
       p.f++;
@@ -951,7 +951,7 @@ void denan(Byte *data, Int size, Int partype)
     for (i = 0; i < size/sizeof(double); i++) {
       while (isnan(*p.d)) {
         uint32_t *r;
-        for (r = (uint32_t *) p.b; (Byte *) r < p.b + sizeof(double); r++) {
+        for (r = (uint32_t *) p.b; (uint8_t *) r < p.b + sizeof(double); r++) {
           *r = random_bits();
         }
       }
@@ -961,7 +961,7 @@ void denan(Byte *data, Int size, Int partype)
   }
 }
 
-void printgene(Byte *gene, Int nPar, Int partype, Int showbits, 
+void printgene(uint8_t *gene, Int nPar, Int partype, Int showbits, 
                double *quality) {
   Int j;
   uscalar p;
@@ -990,7 +990,7 @@ void printgene(Byte *gene, Int nPar, Int partype, Int showbits,
     }
     if (showbits) {
       Int i;
-      Byte *b = gene + lux_type_size[partype]*j;
+      uint8_t *b = gene + lux_type_size[partype]*j;
       printf(" {");
       for (i = lux_type_size[partype] - 1; i >= 0; i--)
         printf("%02x", b[i]);
@@ -1002,13 +1002,13 @@ void printgene(Byte *gene, Int nPar, Int partype, Int showbits,
   putchar(']');
 }
 
-void printgenenl(Byte *gene, Int nPar, Int partype, Int showbits, 
+void printgenenl(uint8_t *gene, Int nPar, Int partype, Int showbits, 
                  double *quality) {
   printgene(gene, nPar, partype, showbits, quality);
   putchar('\n');
 }
 
-Int hasnan(Byte *gene, Int nPar, Int partype) {
+Int hasnan(uint8_t *gene, Int nPar, Int partype) {
   Int i;
   uscalar p;
 
@@ -1095,14 +1095,14 @@ Int lux_geneticfit(Int narg, Int ps[])
     iter = 0, vocal, typesize, nGeneration;
   uscalar p;
   Word  *par, fitPar, xSym, ySym, fitArg[4], wSym;
-  Byte  *genes, *parent1, *parent2, *genes2, t1, t2;
+  uint8_t  *genes, *parent1, *parent2, *genes2, t1, t2;
   double *deviation, mu, *distr, random_one(void), pcross, *deviation2,
     crossmark, mutatemark, pmutate, sum;
   double *weights, *start;
   void  invertPermutation(Int *data, Int n),
     indexxr_f(Int n, float ra[], Int indx[]);
   Int   random_distributed(Int modulus, double *distr);
-  Byte  changed, elite, partype;
+  uint8_t  changed, elite, partype;
   static uint16_t mask1[] = {
     0xff, 0x7f, 0x3f, 0x1f, 0x0f, 0x07, 0x03, 0x01
   }, mask2[] = {
@@ -1329,8 +1329,8 @@ Int lux_geneticfit(Int narg, Int ps[])
   crossmark = pcross? random_one()/pcross: LONG_MAX; /* bytes */
   mutatemark = pmutate? random_one()/pmutate: LONG_MAX; /* bits */
 
-  Byte *child1 = malloc(size);
-  Byte *child2 = malloc(size);
+  uint8_t *child1 = malloc(size);
+  uint8_t *child2 = malloc(size);
   crossoversites = calloc(size*8, sizeof(Int));
   mutationsites = calloc(size*8, sizeof(Int));
 

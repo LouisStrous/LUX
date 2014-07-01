@@ -1026,7 +1026,7 @@ Int lux_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	  symbol_class(result) = LUX_SCALAR;
 	  switch (totype) {
 	    case LUX_BYTE:
-	      scalar_value(result).b = (Byte) value.d;
+	      scalar_value(result).b = (uint8_t) value.d;
 	      break;
 	    case LUX_WORD:
 	      scalar_value(result).w = (Word) value.d;
@@ -1452,7 +1452,7 @@ Int lux_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	switch (totype) {
 	  case LUX_BYTE:
 	    while (n--) {
-	      *trgt.b = (Byte) src.cf->real;
+	      *trgt.b = (uint8_t) src.cf->real;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
@@ -1512,7 +1512,7 @@ Int lux_convert(Int narg, Int ps[], Int totype, Int isFunc)
 	switch (totype) {
 	  case LUX_BYTE:
 	    while (n--) {
-	      *trgt.b = (Byte) src.cd->real;
+	      *trgt.b = (uint8_t) src.cd->real;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
@@ -1781,10 +1781,10 @@ Int lux_array_convert(pointer *q1, pointer *q2, Int type1, Int type2, Int n)
  switch (type2) {
    case 0: switch (type1) {
          case 0:        while (n) { *q2->b++ =  (*q1->b++);n--;} break;
-         case 1: while (n) { *q2->b++ = (Byte) (*q1->w++);n--;} break;
-         case 2: while (n) { *q2->b++ = (Byte) (*q1->l++);n--;} break;
-         case 3: while (n) { *q2->b++ = (Byte) (*q1->f++);n--;} break;
-         case 4: while (n) { *q2->b++ = (Byte) (*q1->d++);n--;} break;
+         case 1: while (n) { *q2->b++ = (uint8_t) (*q1->w++);n--;} break;
+         case 2: while (n) { *q2->b++ = (uint8_t) (*q1->l++);n--;} break;
+         case 3: while (n) { *q2->b++ = (uint8_t) (*q1->f++);n--;} break;
+         case 4: while (n) { *q2->b++ = (uint8_t) (*q1->d++);n--;} break;
          }
    case 1: switch (type1) {
          case 1: while (n) { *q2->w++ =  (*q1->w++);n--;} break;
@@ -2364,10 +2364,10 @@ Int namevar(Int symbol, Int safe)
     return cerror(NEED_STR, symbol);
   name = string_value(symbol);
   strcpy(line, name);
-  if (!isalpha((Byte) *name) && *name != '$' && *name != '!')
+  if (!isalpha((uint8_t) *name) && *name != '$' && *name != '!')
     return luxerror("Illegal symbol name: %s", symbol, name);
   for (name = line; *name; name++)
-  { if (!isalnum((Byte) *name))
+  { if (!isalnum((uint8_t) *name))
     return luxerror("Illegal symbol name: %s", symbol, name);
     *name = toupper(*name); }
   safe = safe & 3;
@@ -2590,11 +2590,11 @@ Int getNumerical(Int iq, Int minType, Int *n, pointer *src, char mode,
 	*result = iq;
       break;
     case LUX_ARRAY: case LUX_CARRAY:
-      (*src).b = (Byte *) array_data(iq);
+      (*src).b = (uint8_t *) array_data(iq);
       *n = array_size(iq);
       if (trgt) {
 	*result = array_clone(iq, type);
-	(*trgt).b = (Byte *) array_data(*result);
+	(*trgt).b = (uint8_t *) array_data(*result);
       } else if (result)
 	*result = iq;
       break;
@@ -3310,7 +3310,7 @@ void *seekFacts(Int symbol, Int type, Int flag)
 /* Returns a pointer to the facts, if found, or else returns NULL. */
 /* LS 6apr99 */
 {
-  Byte	n;
+  uint8_t	n;
   arrayFacts	*facts;
 
   if (!symbolIsNumericalArray(symbol) /* not a numerical symbol */

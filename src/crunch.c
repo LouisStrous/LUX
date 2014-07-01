@@ -31,26 +31,26 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
  caused rare errors in output that might have gone unnoticed for a while,
  not sure how long the sunbow vesrion had this bug, the umbra version was
  OK, bug marked in crunch32 below */
-/* union types_ptr { Byte *b; short *w; Int *l; float *f; double *d;}; */
+/* union types_ptr { uint8_t *b; short *w; Int *l; float *f; double *d;}; */
 /* commented out because already defined in .h file - LS 30apr97 */
-Byte bits[8]={1,2,4,8,16,32,64,128};
+uint8_t bits[8]={1,2,4,8,16,32,64,128};
 Int	crunch_bits;
 float	crunch_bpp;
 Int	crunch_slice = 5;
 static Int	crunch_run_flag=0;
 
 Int	docrunch(Int narg, Int ps[], Int showerror),
-   anacrunch(Byte *, short [], Int, Int, Int, Int),
-   anacrunch8(Byte *, Byte [], Int, Int, Int, Int),
-   anacrunchrun(Byte *, short [], Int, Int, Int, Int),
-   anacrunchrun8(Byte *, Byte [], Int, Int, Int, Int),
-   anadecrunch(Byte *, short [], Int, Int, Int),
-   anadecrunch8(Byte *, Byte [], Int, Int, Int),
-   anadecrunchrun(Byte *, short [], Int, Int, Int),
-   anadecrunchrun8(Byte *, Byte [], Int, Int, Int);
+   anacrunch(uint8_t *, short [], Int, Int, Int, Int),
+   anacrunch8(uint8_t *, uint8_t [], Int, Int, Int, Int),
+   anacrunchrun(uint8_t *, short [], Int, Int, Int, Int),
+   anacrunchrun8(uint8_t *, uint8_t [], Int, Int, Int, Int),
+   anadecrunch(uint8_t *, short [], Int, Int, Int),
+   anadecrunch8(uint8_t *, uint8_t [], Int, Int, Int),
+   anadecrunchrun(uint8_t *, short [], Int, Int, Int),
+   anadecrunchrun8(uint8_t *, uint8_t [], Int, Int, Int);
 #if SIZEOF_LONG_LONG_INT == 8	/* 64 bit integers */
-Int anacrunch32(Byte *, Int *, Int, Int, Int, Int),
-  anadecrunch32(Byte *, Int *, Int, Int, Int);
+Int anacrunch32(uint8_t *, Int *, Int, Int, Int, Int),
+  anadecrunch32(uint8_t *, Int *, Int, Int, Int);
 #endif
 void	swapl(void *, Int);
 
@@ -244,13 +244,13 @@ void bitprint(short z)
 }       /* end of bitprint */
  /*--------------------------------------------------------------------------*/
 #if SIZEOF_LONG_LONG_INT == 8	/* 64-bit integers */
-Int anacrunch32(Byte *x, Int array[], Int slice, Int nx, Int ny, Int limit)
- /* compress 32 bit array into x (a Byte array) using ny blocks each of size
+Int anacrunch32(uint8_t *x, Int array[], Int slice, Int nx, Int ny, Int limit)
+ /* compress 32 bit array into x (a uint8_t array) using ny blocks each of size
  nx, bit slice size slice, returns # of bytes in x */
 {
   struct compresshead {
     Int     tsize,nblocks,bsize;
-    Byte    slice_size,type; } *ch;
+    uint8_t    slice_size,type; } *ch;
   uint32_t nb,ixa,ixb,big=0;
   unsigned register i,j,r1,in;
   Int r0;
@@ -264,7 +264,7 @@ Int anacrunch32(Byte *x, Int array[], Int slice, Int nx, Int ny, Int limit)
      one can specify that a constant is long int64_t by appending LL to
      it, but at least for our constant in hexadecimal notation the compiler
      regards the LL suffix as a parser error.  We construct the constant
-     Byte by Byte instead.  LS 13mar99 */
+     uint8_t by uint8_t instead.  LS 13mar99 */
   c.b[0] = c.b[1] = c.b[2] = c.b[3] = 0xff;
   c.b[4] = 0x1f;
   c.b[5] = c.b[6] = c.b[7] = 0;
@@ -310,21 +310,21 @@ Int anacrunch32(Byte *x, Int array[], Int slice, Int nx, Int ny, Int limit)
       j=r1%8;
       if ( i > limit ) return -1;		/* bad news, went too far */
       /* now load nb bytes into x */
-      /*low order Byte of y.i is first in stream */
+      /*low order uint8_t of y.i is first in stream */
       if (j == 0) {
-	y64=(y64 & mask);	x[i]= (Byte) y64;
-	/* since we started at bit 0, spillover to the next Byte is
+	y64=(y64 & mask);	x[i]= (uint8_t) y64;
+	/* since we started at bit 0, spillover to the next uint8_t is
 	   determined as follows (and is unlikely since slice gt 8 is unusual */
-	if (slice > 8) { x[i+1]= (Byte) (y64 >> 8);
-	if (slice > 16) { x[i+2]= (Byte) (y64 >> 16);
-	if (slice > 24) { x[i+3]= (Byte) (y64 >> 24);}}}
+	if (slice > 8) { x[i+1]= (uint8_t) (y64 >> 8);
+	if (slice > 16) { x[i+2]= (uint8_t) (y64 >> 16);
+	if (slice > 24) { x[i+3]= (uint8_t) (y64 >> 24);}}}
       } else {
-	y64=(y64 & mask)<<j;	x[i]=x[i] | (Byte) y64;
+	y64=(y64 & mask)<<j;	x[i]=x[i] | (uint8_t) y64;
 	/* spillover more likely here */
-	if (nb>1) { x[i+1] = (Byte) (y64 >> 8);
-	if (nb>2) { x[i+2] = (Byte) (y64 >> 16);
-	if (nb>3) { x[i+3] = (Byte) (y64 >> 24);
-	if (nb>4) { x[i+4] = (Byte) (y64 >> 32);}}}}
+	if (nb>1) { x[i+1] = (uint8_t) (y64 >> 8);
+	if (nb>2) { x[i+2] = (uint8_t) (y64 >> 16);
+	if (nb>3) { x[i+3] = (uint8_t) (y64 >> 24);
+	if (nb>4) { x[i+4] = (uint8_t) (y64 >> 32);}}}}
       }
 
       r1=r1+slice;       /* bump r1 pass the fixed part */
@@ -369,7 +369,7 @@ Int anacrunch32(Byte *x, Int array[], Int slice, Int nx, Int ny, Int limit)
       }       /* end of (r3==0) conditional */
       /*in=in+1; */                   }       /* end of ix loop */
     /* some checks here */
-    /* bump to next Byte boundary */
+    /* bump to next uint8_t boundary */
     i=(r1+7)/8;     r1=8*i;                 }       /* end of iy loop */
   ch->tsize = i = i + 14;
   /* we have to put these in a form readable by the Vax (these may be used
@@ -382,13 +382,13 @@ Int anacrunch32(Byte *x, Int array[], Int slice, Int nx, Int ny, Int limit)
 }       /* end of routine */
 #endif
  /*--------------------------------------------------------------------------*/
-Int anacrunch(Byte *x, short array[], Int slice, Int nx, Int ny, Int limit)
- /* compress 16 bit array into x (a Byte array) using ny blocks each of size
+Int anacrunch(uint8_t *x, short array[], Int slice, Int nx, Int ny, Int limit)
+ /* compress 16 bit array into x (a uint8_t array) using ny blocks each of size
  nx, bit slice size slice, returns # of bytes in x */
 {
   struct compresshead {
     Int     tsize,nblocks,bsize;
-    Byte    slice_size,type; } *ch;
+    uint8_t    slice_size,type; } *ch;
   unsigned nb,ixa,ixb;
   unsigned register i,j,r1,in;
   Int r0,r3,mask;
@@ -430,17 +430,17 @@ Int anacrunch(Byte *x, short array[], Int slice, Int nx, Int ny, Int limit)
       j=r1%8;
       if ( i > limit ) return -1;		/* bad news, went too far */
       /* now load nb bytes into x */
-      /*low order Byte of y.i is first in stream */
+      /*low order uint8_t of y.i is first in stream */
       if (j == 0) {
-	y.i=(y.i & mask);	x[i]= (Byte) y.i;
-	/* since we started at bit 0, spillover to the next Byte is
+	y.i=(y.i & mask);	x[i]= (uint8_t) y.i;
+	/* since we started at bit 0, spillover to the next uint8_t is
 	   determined as follows (and is unlikely since slice gt 8 is unusual */
-	if (slice > 8) x[i+1]= (Byte) (y.i >> 8);
+	if (slice > 8) x[i+1]= (uint8_t) (y.i >> 8);
       } else {
-	y.i=(y.i & mask)<<j;	x[i]=x[i] | (Byte) y.i;
+	y.i=(y.i & mask)<<j;	x[i]=x[i] | (uint8_t) y.i;
 	/* spillover more likely here */
-	if (nb>1) { x[i+1]= (Byte) (y.i >> 8);
-	if (nb>2) x[i+2]=(Byte) (y.i >> 16); }
+	if (nb>1) { x[i+1]= (uint8_t) (y.i >> 8);
+	if (nb>2) x[i+2]=(uint8_t) (y.i >> 16); }
       }
 
       r1=r1+slice;       /* bump r1 pass the fixed part */
@@ -485,7 +485,7 @@ Int anacrunch(Byte *x, short array[], Int slice, Int nx, Int ny, Int limit)
       }       /* end of (r3==0) conditional */
       /*in=in+1; */                   }       /* end of ix loop */
     /* some checks here */
-    /* bump to next Byte boundary */
+    /* bump to next uint8_t boundary */
     i=(r1+7)/8;     r1=8*i;                 }       /* end of iy loop */
   ch->tsize = i = i + 14;
   /* we have to put these in a form readable by the Vax (these may be used
@@ -496,13 +496,13 @@ Int anacrunch(Byte *x, short array[], Int slice, Int nx, Int ny, Int limit)
   return  i;      /*return # of bytes used */
 }       /* end of routine */
  /*--------------------------------------------------------------------------*/
-Int anacrunch8(Byte *x, Byte array[], Int slice, Int nx, Int ny, Int limit)
- /* compress 8 bit array into x (a Byte array) using ny blocks each of size
+Int anacrunch8(uint8_t *x, uint8_t array[], Int slice, Int nx, Int ny, Int limit)
+ /* compress 8 bit array into x (a uint8_t array) using ny blocks each of size
  nx, bit slice size slice, returns # of bytes in x */
 {
   struct compresshead {
     Int     tsize,nblocks,bsize;
-    Byte    slice_size,type; } *ch;
+    uint8_t    slice_size,type; } *ch;
   unsigned nb,ixa,ixb;
   unsigned register i,j,r1,in;
   Int r0,r3,mask;
@@ -541,7 +541,7 @@ Int anacrunch8(Byte *x, Byte array[], Int slice, Int nx, Int ny, Int limit)
       j=r1%8;
       if ( i > limit ) return -1;		/* bad news, went too far */
       /* now load nb bytes into x */
-      /*low order Byte of y.i is first in stream */
+      /*low order uint8_t of y.i is first in stream */
 #if WORDS_BIGENDIAN
       if (j == 0) {y.i=(y.i & mask); x[i]=y.b[3];}
       else { y.i=(y.i & mask)<<j; x[i]=x[i] | y.b[3];}
@@ -585,7 +585,7 @@ Int anacrunch8(Byte *x, Byte array[], Int slice, Int nx, Int ny, Int limit)
       }       /* end of (r3==0) conditional */
     }       /* end of ix loop */
     /* some checks here */
-    /* bump to next Byte boundary */
+    /* bump to next uint8_t boundary */
     i=(r1+7)/8;     r1=8*i;                 }       /* end of iy loop */
   ch->tsize = i = i + 14;
   /* we have to put these in a form readable by the Vax (these may be used
@@ -646,7 +646,7 @@ Int swapb(char x[], Int n)
 }
  /*--------------------------------------------------------------------------*/
 #if SIZEOF_LONG_LONG_INT == 8	/* 64-bit integers */
-Int anadecrunch32(Byte *x, Int array[], Int r9, Int nx, Int ny)
+Int anadecrunch32(uint8_t *x, Int array[], Int r9, Int nx, Int ny)
      /* decompress a bit stream in x; result is n I*4 elements, put in array;
 	 bit slice size r9 */
 {
@@ -751,7 +751,7 @@ Int anadecrunch32(Byte *x, Int array[], Int r9, Int nx, Int ny)
       r1=r1+r9;       /* bump r1 pass the fixed part */
       i=r1/8;         j=r1%8;
       if ((xq= (x[i]>>j) ) != 0) {
-	/* caught it on first Byte, find the bit */
+	/* caught it on first uint8_t, find the bit */
 	if ((xq&1) != 0) r0=1; else {
 	  if ((xq&2) != 0) r0=2; else {
 	    if ((xq&4) != 0) r0=3; else {
@@ -760,8 +760,8 @@ Int anadecrunch32(Byte *x, Int array[], Int r9, Int nx, Int ny)
 		  if ((xq&32) != 0) r0=6; else {
 		    if ((xq&64) != 0) r0=7; else {
 		      if ((xq&128) != 0) r0=8; }}}}}}}}       else {
-			/* not in first Byte (or part of one) checked, carry on, first count bits in
-			   that first Byte */
+			/* not in first uint8_t (or part of one) checked, carry on, first count bits in
+			   that first uint8_t */
 			r0=8-j;
 			/* check up to 4 more bytes, if not found than an error */
 			for (k=i+1;k<i+5;k++) { if ( (xq=x[k]) != 0 ) {
@@ -774,7 +774,7 @@ Int anadecrunch32(Byte *x, Int array[], Int r9, Int nx, Int ny)
 				    if ((xq&32) != 0) r0+=6; else {
 				      if ((xq&64) != 0) r0+=7; else {
 					if ((xq&128) != 0) r0+=8; }}}}}}} break; } else { r0=r0+8; 
-					/* add 8 bits for each all zero Byte */
+					/* add 8 bits for each all zero uint8_t */
 					if (r0 > 32) { printf("DECRUNCH -- bad bit sequence, cannot continue\n");
 					printf("i = %d, r1 = %d, ix= %d, iy = %d\n",i,r1,ix,iy);
 					return -1; }       }       }       }
@@ -815,7 +815,7 @@ Int anadecrunch32(Byte *x, Int array[], Int r9, Int nx, Int ny)
 }  						     /* end of routine */
 #endif
 /*--------------------------------------------------------------------------*/
-Int anadecrunch(Byte *x, short array[], Int r9, Int nx, Int ny)
+Int anadecrunch(uint8_t *x, short array[], Int r9, Int nx, Int ny)
  /* decompress a bit stream in x; result is n I*2 elements, put in array;
 	 bit slice size r9 */
 {
@@ -864,7 +864,7 @@ Int anadecrunch(Byte *x, short array[], Int r9, Int nx, Int ny)
       r1=r1+r9;       /* bump r1 pass the fixed part */
       i=r1/8;         j=r1%8;
       if ((xq=x[i]>>j) != 0) {
-	/* caught it on first Byte, find the bit */
+	/* caught it on first uint8_t, find the bit */
 	if ((xq&1) != 0) r0=1; else {
 	  if ((xq&2) != 0) r0=2; else {
 	    if ((xq&4) != 0) r0=3; else {
@@ -873,8 +873,8 @@ Int anadecrunch(Byte *x, short array[], Int r9, Int nx, Int ny)
 		  if ((xq&32) != 0) r0=6; else {
 		    if ((xq&64) != 0) r0=7; else {
 		      if ((xq&128) != 0) r0=8; }}}}}}}}       else {
-			/* not in first Byte (or part of one) checked, carry on, first count bits in
-			   that first Byte */
+			/* not in first uint8_t (or part of one) checked, carry on, first count bits in
+			   that first uint8_t */
 			r0=8-j;
 			/* check up to 4 more bytes, if not found than an error */
 			for (k=i+1;k<i+5;k++) { if ( (xq=x[k]) != 0 ) {
@@ -887,7 +887,7 @@ Int anadecrunch(Byte *x, short array[], Int r9, Int nx, Int ny)
 				    if ((xq&32) != 0) r0+=6; else {
 				      if ((xq&64) != 0) r0+=7; else {
 					if ((xq&128) != 0) r0+=8; }}}}}}} break; } else { r0=r0+8; 
-					/* add 8 bits for each all zero Byte */
+					/* add 8 bits for each all zero uint8_t */
 					if (r0 > 32) { printf("DECRUNCH -- bad bit sequence, cannot continue\n");
 					printf("i = %d, r1 = %d, ix= %d, iy = %d\n",i,r1,ix,iy);
 					return -1; }       }       }       }
@@ -922,16 +922,16 @@ Int anadecrunch(Byte *x, short array[], Int r9, Int nx, Int ny)
   return 1;
 }  						     /* end of routine */
  /*--------------------------------------------------------------------------*/
-Int anadecrunch8(Byte *x, Byte array[], Int r9, Int nx, Int ny)
+Int anadecrunch8(uint8_t *x, uint8_t array[], Int r9, Int nx, Int ny)
  /* decompress a bit stream in x; result is n I*1 elements, put in array;
 	  bit slice size r9 */
-				 /* Byte version, modified from I*2 version
+				 /* uint8_t version, modified from I*2 version
 				 r. shine 6/5/91 */
 {
-  Byte iq;
+  uint8_t iq;
   Int r0,r1,r2,r4,nb,mask;
   Int j,in,i,k,ix,iy;
-  Byte xq;
+  uint8_t xq;
   union { Int i; short w; unsigned char b[4]; } y;
   /* begin execution */
   mask=1; for (i=0;i<r9;i++) mask=2*mask; mask=mask-1;
@@ -961,7 +961,7 @@ Int anadecrunch8(Byte *x, Byte array[], Int r9, Int nx, Int ny)
       r1=r1+r9;     				  /* bump r1 pass the fixed part */
       i=r1/8;         j=r1%8;
       if ((xq=x[i]>>j) != 0) {
-	/* caught it on first Byte, find the bit */
+	/* caught it on first uint8_t, find the bit */
 	if ((xq&1) != 0) r0=1; else {
 	  if ((xq&2) != 0) r0=2; else {
 	    if ((xq&4) != 0) r0=3; else {
@@ -970,8 +970,8 @@ Int anadecrunch8(Byte *x, Byte array[], Int r9, Int nx, Int ny)
 		  if ((xq&32) != 0) r0=6; else {
 		    if ((xq&64) != 0) r0=7; else {
 		      if ((xq&128) != 0) r0=8; }}}}}}}}       else {
-			/* not in first Byte (or part of one) checked, carry on, first count bits in
-			   that first Byte */
+			/* not in first uint8_t (or part of one) checked, carry on, first count bits in
+			   that first uint8_t */
 			r0=8-j;
 			/* check up to 4 more bytes, if not found than an error */
 			for (k=i+1;k<i+5;k++) { if ( (xq=x[k]) != 0 ) {
@@ -984,7 +984,7 @@ Int anadecrunch8(Byte *x, Byte array[], Int r9, Int nx, Int ny)
 				    if ((xq&32) != 0) r0+=6; else {
 				      if ((xq&64) != 0) r0+=7; else {
 					if ((xq&128) != 0) r0+=8; }}}}}}} break; } else { r0=r0+8; 
-					/* add 8 bits for each all zero Byte */
+					/* add 8 bits for each all zero uint8_t */
 					if (r0 > 32) { printf("DECRUNCH -- bad bit sequence, cannot continue");
 					return -1; }       }       }       }
       r1=r1+r0;       /* update pointer */
@@ -1018,13 +1018,13 @@ Int anadecrunch8(Byte *x, Byte array[], Int r9, Int nx, Int ny)
   return 1;
 }       /* end of routine */
  /*--------------------------------------------------------------------------*/
-Int anacrunchrun(Byte *x, short array[], Int slice, Int nx, Int ny, Int limit)
- /* compress 16 bit array into x (a Byte array) using ny blocks each of size
+Int anacrunchrun(uint8_t *x, short array[], Int slice, Int nx, Int ny, Int limit)
+ /* compress 16 bit array into x (a uint8_t array) using ny blocks each of size
  nx, bit slice size slice, returns # of bytes in x */
 {
   struct compresshead {
     Int     tsize,nblocks,bsize;
-    Byte    slice_size,type; } *ch;
+    uint8_t    slice_size,type; } *ch;
   short	*p;
   unsigned nb;
   unsigned register i,j,r1;
@@ -1118,18 +1118,18 @@ Int anacrunchrun(Byte *x, short array[], Int slice, Int nx, Int ny, Int limit)
       if (++lrun > 127)	{		/* need a new literal run count */
 	x[ic] = 127;
 	/* printf("ic = %d, i,r1 = %d %d\n", ic,i,r1); */
-	/* bump to next Byte boundary */
+	/* bump to next uint8_t boundary */
 	i = (r1+7)/8;	ic = i++;     r1 = 8*i;		lrun = 1;
 	/* printf("next ic = %d\n", ic); */
       }
       /* first the fixed slice portion */
       /* printf("y.i = %d\n", y.i);*/
       r3=(y.i>>slice);
-      i=r1>>3;	/* Byte number */
+      i=r1>>3;	/* uint8_t number */
       j=r1 & 7;		/* bit number */
       if ( i > limit ) return -1;			/* bad news, went too far */
       /* now load nb bytes into x */
-      /*low order Byte of y.i is first in stream */
+      /*low order uint8_t of y.i is first in stream */
 #if WORDS_BIGENDIAN
       if (j == 0) {y.i=(y.i & mask); x[i]=y.b[3];}
       else { y.i=(y.i & mask)<<j; x[i]=x[i] | y.b[3];}
@@ -1176,7 +1176,7 @@ Int anacrunchrun(Byte *x, short array[], Int slice, Int nx, Int ny, Int limit)
       /* printf(" x[r1/8] = %d\n",  x[r1/8]);*/
     }       /* end of ix loop */
     /* some checks here */
-    /* bump to next Byte boundary */
+    /* bump to next uint8_t boundary */
     /* a final literal ? */
     /* printf("final lrun = %d, ic = %d\n", lrun, ic);*/
     if (lrun != 0) { x[ic] = lrun;	lrun = 0; }
@@ -1194,14 +1194,14 @@ Int anacrunchrun(Byte *x, short array[], Int slice, Int nx, Int ny, Int limit)
   return  i;      /*return # of bytes used */
 }       /* end of routine */
  /*--------------------------------------------------------------------------*/
-Int anacrunchrun8(Byte *x, Byte array[], Int slice, Int nx, Int ny, Int limit)
- /* compress 8 bit array into x (a Byte array) using ny blocks each of size
+Int anacrunchrun8(uint8_t *x, uint8_t array[], Int slice, Int nx, Int ny, Int limit)
+ /* compress 8 bit array into x (a uint8_t array) using ny blocks each of size
  nx, bit slice size slice, returns # of bytes in x */
 {
   struct compresshead {
     Int     tsize,nblocks,bsize;
-    Byte    slice_size,type; } *ch;
-  Byte	*p;
+    uint8_t    slice_size,type; } *ch;
+  uint8_t	*p;
   unsigned nb;
   unsigned register i,j,r1;
   Int	r0,r3,mask, nrun, lrun, ic;
@@ -1291,18 +1291,18 @@ Int anacrunchrun8(Byte *x, Byte array[], Int slice, Int nx, Int ny, Int limit)
       if (++lrun > 127)	{		/* need a new literal run count */
 	x[ic] = 127;
 	/* printf("ic = %d, i,r1 = %d %d\n", ic,i,r1); */
-	/* bump to next Byte boundary */
+	/* bump to next uint8_t boundary */
 	i = (r1+7)/8;	ic = i++;     r1 = 8*i;		lrun = 1;
 	/* printf("next ic = %d\n", ic); */
       }
       /* first the fixed slice portion */
       /* printf("y.i = %d\n", y.i);*/
       r3=(y.i>>slice);
-      i=r1>>3;	/* Byte number */
+      i=r1>>3;	/* uint8_t number */
       j=r1 & 7;		/* bit number */
       if ( i > limit ) return -1;			/* bad news, went too far */
       /* now load nb bytes into x */
-      /*low order Byte of y.i is first in stream */
+      /*low order uint8_t of y.i is first in stream */
 #if WORDS_BIGENDIAN
       if (j == 0) {y.i=(y.i & mask); x[i]=y.b[3];}
       else { y.i=(y.i & mask)<<j; x[i]=x[i] | y.b[3];}
@@ -1349,7 +1349,7 @@ Int anacrunchrun8(Byte *x, Byte array[], Int slice, Int nx, Int ny, Int limit)
       /* printf(" x[r1/8] = %d\n",  x[r1/8]);*/
     }       /* end of ix loop */
     /* some checks here */
-    /* bump to next Byte boundary */
+    /* bump to next uint8_t boundary */
     /* a final literal ? */
     /* printf("final lrun = %d, ic = %d\n", lrun, ic);*/
     if (lrun != 0) { x[ic] = lrun;	lrun = 0; }
@@ -1367,7 +1367,7 @@ Int anacrunchrun8(Byte *x, Byte array[], Int slice, Int nx, Int ny, Int limit)
   return  i;      /*return # of bytes used */
 }
  /*--------------------------------------------------------------------------*/
-Int anadecrunchrun(Byte *x, short array[], Int r9, Int nx, Int ny)
+Int anadecrunchrun(uint8_t *x, short array[], Int r9, Int nx, Int ny)
  /* decompress a bit stream in x; result is n I*2 elements, put in array;
 	 bit slice size r9 */
  /* this version handles the run length encoding used in anacrunchrun */
@@ -1438,7 +1438,7 @@ Int anadecrunchrun(Byte *x, short array[], Int r9, Int nx, Int ny)
 	  r1=r1+r9;       /* bump r1 pass the fixed part */
 	  i=r1/8;         j=r1%8;
 	  if ((xq=x[i]>>j) != 0) {
-	    /* caught it on first Byte, find the bit */
+	    /* caught it on first uint8_t, find the bit */
 	    if ((xq&1) != 0) r0=1; else {
 	      if ((xq&2) != 0) r0=2; else {
 		if ((xq&4) != 0) r0=3; else {
@@ -1447,8 +1447,8 @@ Int anadecrunchrun(Byte *x, short array[], Int r9, Int nx, Int ny)
 		      if ((xq&32) != 0) r0=6; else {
 			if ((xq&64) != 0) r0=7; else {
 			  if ((xq&128) != 0) r0=8; }}}}}}}}       else {
-			    /* not in first Byte (or part of one) checked, carry on, first count bits in
-			       that first Byte */
+			    /* not in first uint8_t (or part of one) checked, carry on, first count bits in
+			       that first uint8_t */
 			    r0=8-j;
 			    /* check up to 4 more bytes, if not found than an error */
 			    for (k=i+1;k<i+5;k++) { if ( (xq=x[k]) != 0 ) {
@@ -1461,7 +1461,7 @@ Int anadecrunchrun(Byte *x, short array[], Int r9, Int nx, Int ny)
 					if ((xq&32) != 0) r0+=6; else {
 					  if ((xq&64) != 0) r0+=7; else {
 					    if ((xq&128) != 0) r0+=8; }}}}}}} break; } else { r0=r0+8; 
-					    /* add 8 bits for each all zero Byte */
+					    /* add 8 bits for each all zero uint8_t */
 					    if (r0 > 32) { printf("DECRUNCH -- bad bit sequence, cannot continue\n");
 					    printf("i = %d, r1 = %d, iy = %d\n",i,r1,iy);
 					    return -1; }       }       }       }
@@ -1509,12 +1509,12 @@ Int anadecrunchrun(Byte *x, short array[], Int r9, Int nx, Int ny)
   return 1;
 }  						     /* end of routine */
  /*--------------------------------------------------------------------------*/
-Int anadecrunchrun8(Byte x[], Byte array[], Int r9, Int nx, Int ny)
+Int anadecrunchrun8(uint8_t x[], uint8_t array[], Int r9, Int nx, Int ny)
  /* decompress a bit stream in x; result is n I*2 elements, put in array;
 	 bit slice size r9 */
  /* this version handles the run length encoding used in anacrunchrun */
 {
-  Byte iq;
+  uint8_t iq;
   Int r0,r1,r2,r4,nb,mask,nrun,n,nc;
   Int j,in,i,k,iy;
   unsigned char xq;
@@ -1574,7 +1574,7 @@ Int anadecrunchrun8(Byte x[], Byte array[], Int r9, Int nx, Int ny)
 	  r1=r1+r9;       /* bump r1 pass the fixed part */
 	  i=r1/8;         j=r1%8;
 	  if ((xq=x[i]>>j) != 0) {
-	    /* caught it on first Byte, find the bit */
+	    /* caught it on first uint8_t, find the bit */
 	    if ((xq&1) != 0) r0=1; else {
 	      if ((xq&2) != 0) r0=2; else {
 		if ((xq&4) != 0) r0=3; else {
@@ -1591,8 +1591,8 @@ Int anadecrunchrun8(Byte x[], Byte array[], Int r9, Int nx, Int ny)
 	      }
 	    }
 	  } else {
-	    /* not in first Byte (or part of one) checked, carry on, first count bits in
-	       that first Byte */
+	    /* not in first uint8_t (or part of one) checked, carry on, first count bits in
+	       that first uint8_t */
 	    r0=8-j;
 	    /* check up to 4 more bytes, if not found than an error */
 	    for (k=i+1;k<i+5;k++) { if ( (xq=x[k]) != 0 ) {
@@ -1615,7 +1615,7 @@ Int anadecrunchrun8(Byte x[], Byte array[], Int r9, Int nx, Int ny)
 	      break;
 	    } else {
 	      r0=r0+8; 
-	      /* add 8 bits for each all zero Byte */
+	      /* add 8 bits for each all zero uint8_t */
 	      if (r0 > 32) { printf("DECRUNCH -- bad bit sequence, cannot continue\n");
 	      printf("i = %d, r1 = %d, iy = %d\n",i,r1,iy);
 	      return -1; }       }       }       }

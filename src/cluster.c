@@ -149,7 +149,7 @@ Int lux_cluster(Int narg, Int ps[])
   char	gotIndex, gotSize, gotSample, update, gotCenter,
 	useIndex, iterate, *changed, *changedOld, vocal, ordered,
 	gotPhantom, recluster, quick, record, curChanged;
-  Byte	indexType;
+  uint8_t	indexType;
   pointer	clusterNumber;
   FILE	*file;
   Int	nDistCal = 0, allDistCal = 0;
@@ -326,7 +326,7 @@ Int lux_cluster(Int narg, Int ps[])
 	&& (Int) array_type(ps[2]) <= LUX_LONG) { /* integer data type */
       indexType = array_type(ps[2]);	/* index data type */
       useIndex = 1;		/* default: useful indices */
-      clusterNumber.b = (Byte *) array_data(ps[2]);
+      clusterNumber.b = (uint8_t *) array_data(ps[2]);
       switch (indexType) {
 	case LUX_BYTE:
 	  for (i = 0; i < nVectors; i++)
@@ -369,9 +369,9 @@ Int lux_cluster(Int narg, Int ps[])
       indexType = LUX_LONG;
     if (gotIndex && !gotSample)	{ /* have a variable, redefine */
       redef_array(ps[2], indexType , nDataDims - 1, dataDims + 1);
-      clusterNumber.b = (Byte *) array_data(ps[2]);
+      clusterNumber.b = (uint8_t *) array_data(ps[2]);
     } else {			/* no variable, allocate */
-      clusterNumber.b = malloc(nSample*lux_type_size[indexType]*sizeof(Byte));
+      clusterNumber.b = malloc(nSample*lux_type_size[indexType]*sizeof(uint8_t));
       if (!clusterNumber.b)
 	return cerror(ALLOC_ERR, 0);
     }

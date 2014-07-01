@@ -27,7 +27,7 @@ Int lux_idlrestore(Int narg, Int ps[])
    with name <filename>.  Supports scalars, strings, and numerical arrays
    LS 18sep98 */
 {
-  Byte	bytes[8];
+  uint8_t	bytes[8];
   char	*p;
   Int	ints[3], dims[MAX_DIMS], n, var, ndim, type, nread;
   FILE	*fp;
@@ -233,7 +233,7 @@ Int lux_idlread_f(Int narg, Int ps[])
    and numerical arrays.  Returns LUX_ONE on success, LUX_ZERO on failure.
    LS 18sep98 */
 {
-  Byte	bytes[8];
+  uint8_t	bytes[8];
   char	*p;
   Int	ints[3], dims[MAX_DIMS], n, var, ndim, type;
   FILE	*fp;

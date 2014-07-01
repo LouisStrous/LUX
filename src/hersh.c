@@ -39,8 +39,8 @@ extern	float	xfac, yfac;
 extern	char	*expand_name(char *, char *);
 Int	hflag, penDown;
 extern Int	ifont;
-Byte	*fontbase;
-Byte	*fontptr[40];
+uint8_t	*fontbase;
+uint8_t	*fontptr[40];
 float	callig_xb, callig_yb, theta = 0.0, size = 1.0, dx, dy, sxb, syb;
 float	st, ct, x, y, nct, nst, angle, callig_ratio = 1.0;
 float	float_arg(Int);
@@ -394,7 +394,7 @@ Int hcom(char **s)
 						/* font change */
       ic = ic % 128;
       i1 = ic - 48;			/* convert ASCII to binary */
-      if ( isdigit ((Byte) **s ) ) i1 = 10 * i1 + (*(*s)++) - 48;
+      if ( isdigit ((uint8_t) **s ) ) i1 = 10 * i1 + (*(*s)++) - 48;
       if (fontchange(i1) < 0) return -1;	break;
     case 'A':  case 'a':
 				/* move up, no change in size */
@@ -538,7 +538,7 @@ Int draw(Int ic)
 Int fontchange(Int font)
 {
   Int	n, iq;
-  Byte	*p;
+  uint8_t	*p;
   char	name1[PATH_MAX], *name2;
   FILE	*fin;
   
@@ -575,12 +575,12 @@ Int fontchange(Int font)
 					/* read in file */
   fscanf(fin, "%d", &n);
   n = n/2;
-  if ((p = (Byte *) malloc(n)) == NULL)
+  if ((p = (uint8_t *) malloc(n)) == NULL)
     return LUX_ERROR;
   fontptr[font] = p;
   while (n--) {
     fscanf(fin, "%2x", &iq);
-    *p++ = (Byte) iq;
+    *p++ = (uint8_t) iq;
   }
   fontbase = fontptr[font];
   fclose(fin);

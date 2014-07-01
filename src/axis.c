@@ -1115,7 +1115,7 @@ void subdataLoop(Int *range, loopInfo *src)
   for (i = src->ndim - 1; i > 0; i--)
     src->step[i] -= src->step[i - 1]*src->rdims[i - 1];
 
-  (*src->data).b = (Byte *) src->data0 + offset*src->stride;
+  (*src->data).b = (uint8_t *) src->data0 + offset*src->stride;
 }
 /*--------------------------------------------------------------------*/
 void rearrangeEdgeLoop(loopInfo *src, loopInfo *trgt, Int index)
@@ -1130,7 +1130,7 @@ void rearrangeEdgeLoop(loopInfo *src, loopInfo *trgt, Int index)
    <trgt>->data0 point at the start of their respective data.  LS 23oct98
    LS 2feb99 */
 {
-  Byte	back;
+  uint8_t	back;
   Int	axis, trgtstride, i;
   pointer	*trgtdata;
   void	*trgtdata0;

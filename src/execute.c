@@ -605,7 +605,7 @@ Int matchKey(Word index, char **keys, Int *var)
        negate = 1;
        theKey++;
      }
-     if (isdigit((Byte) *theKey)) {
+     if (isdigit((uint8_t) *theKey)) {
        modeKey = 1;
        theMode = strtol(theKey, &theKey, 10);
      }
@@ -693,7 +693,7 @@ Int internal_routine(Int symbol, internalRoutine *routine)
   /* routines (Int ps[]) */
  Int	nArg, nKeys = 0, i, maxArg, *evalArgs,
 	routineNum, n, thisInternalMode = 0, ordinary = 0;
- Byte	isSubroutine;
+ uint8_t	isSubroutine;
  keyList	*theKeyList;
  Word	*arg;
  char	*name, suppressEval = 0, suppressUnused = 0;
@@ -1068,7 +1068,7 @@ Int usr_routine(Int symbol)
  msg = (traceMode & T_ROUTINEIO);
  if (msg) {
    currentRoutineName = symbolProperName(routineNum);
-   printf("Entering %s %s", routineTypeNames[(Byte) type],
+   printf("Entering %s %s", routineTypeNames[(uint8_t) type],
 	  currentRoutineName);
    if (!type)
      putchar('(');
@@ -1319,7 +1319,7 @@ Int usr_routine(Int symbol)
  if (i != LUX_ERROR && i != LOOP_RETALL)
    i = 1;
  if (msg) {
-   printf("Leaving %s %s", routineTypeNames[(Byte) type],
+   printf("Leaving %s %s", routineTypeNames[(uint8_t) type],
 	  currentRoutineName);
    putchar('\n');
  }
@@ -1694,9 +1694,9 @@ Int execute(Int symbol)
   extern char	reportBody, ignoreSymbols, debugLine, evalScalPtr;
   extern char	*currentInputFile;
   extern breakpointInfo	breakpoint[];
-  extern Byte	disableNewline;
+  extern uint8_t	disableNewline;
   extern Word	watchVars[];
-  Byte	oldNL;
+  uint8_t	oldNL;
   char	*name, *p, *oldRoutineName;
   FILE	*fp;
 #if DEBUG
@@ -2649,16 +2649,16 @@ Int insert(Int narg, Int ps[])
 		  trgt.b[offset] = *src.b;
 		  break;
 		case LUX_WORD:
-		  trgt.b[offset] = (Byte) *src.w;
+		  trgt.b[offset] = (uint8_t) *src.w;
 		  break;
 		case LUX_LONG:
-		  trgt.b[offset] = (Byte) *src.l;
+		  trgt.b[offset] = (uint8_t) *src.l;
 		  break;
 		case LUX_FLOAT:
-		  trgt.b[offset] = (Byte) *src.f;
+		  trgt.b[offset] = (uint8_t) *src.f;
 		  break;
 		case LUX_DOUBLE:
-		  trgt.b[offset] = (Byte) *src.d;
+		  trgt.b[offset] = (uint8_t) *src.d;
 		  break;
 		case LUX_CFLOAT:
 		  trgt.b[offset] = sqrt(src.cf->real*src.cf->real
@@ -2875,16 +2875,16 @@ Int insert(Int narg, Int ps[])
 		  value.b = *src.b;
 		  break;
 		case LUX_WORD:
-		  value.b = (Byte) *src.w;
+		  value.b = (uint8_t) *src.w;
 		  break;
 		case LUX_LONG:
-		  value.b = (Byte) *src.l;
+		  value.b = (uint8_t) *src.l;
 		  break;
 		case LUX_FLOAT:
-		  value.b = (Byte) *src.f;
+		  value.b = (uint8_t) *src.f;
 		  break;
 		case LUX_DOUBLE:
-		  value.b = (Byte) *src.d;
+		  value.b = (uint8_t) *src.d;
 		  break;
 		case LUX_CFLOAT:
 		  value.b = sqrt(src.cf->real*src.cf->real
@@ -3189,16 +3189,16 @@ Int insert(Int narg, Int ps[])
 		  trgt.b[offset] = *src.b;
 		  break;
 		case LUX_WORD:
-		  trgt.b[offset] = (Byte) *src.w;
+		  trgt.b[offset] = (uint8_t) *src.w;
 		  break;
 		case LUX_LONG:
-		  trgt.b[offset] = (Byte) *src.l;
+		  trgt.b[offset] = (uint8_t) *src.l;
 		  break;
 		case LUX_FLOAT:
-		  trgt.b[offset] = (Byte) *src.f;
+		  trgt.b[offset] = (uint8_t) *src.f;
 		  break;
 		case LUX_DOUBLE:
-		  trgt.b[offset] = (Byte) *src.d;
+		  trgt.b[offset] = (uint8_t) *src.d;
 		  break;
 		case LUX_CFLOAT:
 		  trgt.b[offset] = sqrt(src.cf->real*src.cf->real
@@ -3423,16 +3423,16 @@ Int insert(Int narg, Int ps[])
 		  value.b = *src.b;
 		  break;
 		case LUX_WORD:
-		  value.b = (Byte) *src.w;
+		  value.b = (uint8_t) *src.w;
 		  break;
 		case LUX_LONG:
-		  value.b = (Byte) *src.l;
+		  value.b = (uint8_t) *src.l;
 		  break;
 		case LUX_FLOAT:
-		  value.b = (Byte) *src.f;
+		  value.b = (uint8_t) *src.f;
 		  break;
 		case LUX_DOUBLE:
-		  value.b = (Byte) *src.d;
+		  value.b = (uint8_t) *src.d;
 		  break;
 		case LUX_CFLOAT:
 		  value.b = sqrt(src.cf->real*src.cf->real
@@ -4095,16 +4095,16 @@ Int einsert(Int lhs, Int rhs)
 		  trgt.b[offset] = *src.b;
 		  break;
 		case LUX_WORD:
-		  trgt.b[offset] = (Byte) *src.w;
+		  trgt.b[offset] = (uint8_t) *src.w;
 		  break;
 		case LUX_LONG:
-		  trgt.b[offset] = (Byte) *src.l;
+		  trgt.b[offset] = (uint8_t) *src.l;
 		  break;
 		case LUX_FLOAT:
-		  trgt.b[offset] = (Byte) *src.f;
+		  trgt.b[offset] = (uint8_t) *src.f;
 		  break;
 		case LUX_DOUBLE:
-		  trgt.b[offset] = (Byte) *src.d;
+		  trgt.b[offset] = (uint8_t) *src.d;
 		  break;
 		case LUX_CFLOAT:
 		  trgt.b[offset] = sqrt(src.cf->real*src.cf->real
@@ -4322,16 +4322,16 @@ Int einsert(Int lhs, Int rhs)
 		  value.b = *src.b;
 		  break;
 		case LUX_WORD:
-		  value.b = (Byte) *src.w;
+		  value.b = (uint8_t) *src.w;
 		  break;
 		case LUX_LONG:
-		  value.b = (Byte) *src.l;
+		  value.b = (uint8_t) *src.l;
 		  break;
 		case LUX_FLOAT:
-		  value.b = (Byte) *src.f;
+		  value.b = (uint8_t) *src.f;
 		  break;
 		case LUX_DOUBLE:
-		  value.b = (Byte) *src.d;
+		  value.b = (uint8_t) *src.d;
 		  break;
 		case LUX_CFLOAT:
 		  value.b = sqrt(src.cf->real*src.cf->real
@@ -4652,16 +4652,16 @@ Int einsert(Int lhs, Int rhs)
 		  trgt.b[offset] = *src.b;
 		  break;
 		case LUX_WORD:
-		  trgt.b[offset] = (Byte) *src.w;
+		  trgt.b[offset] = (uint8_t) *src.w;
 		  break;
 		case LUX_LONG:
-		  trgt.b[offset] = (Byte) *src.l;
+		  trgt.b[offset] = (uint8_t) *src.l;
 		  break;
 		case LUX_FLOAT:
-		  trgt.b[offset] = (Byte) *src.f;
+		  trgt.b[offset] = (uint8_t) *src.f;
 		  break;
 		case LUX_DOUBLE:
-		  trgt.b[offset] = (Byte) *src.d;
+		  trgt.b[offset] = (uint8_t) *src.d;
 		  break;
 		case LUX_CFLOAT:
 		  trgt.b[offset] = sqrt(src.cf->real*src.cf->real
@@ -4887,16 +4887,16 @@ Int einsert(Int lhs, Int rhs)
 		  value.b = *src.b;
 		  break;
 		case LUX_WORD:
-		  value.b = (Byte) *src.w;
+		  value.b = (uint8_t) *src.w;
 		  break;
 		case LUX_LONG:
-		  value.b = (Byte) *src.l;
+		  value.b = (uint8_t) *src.l;
 		  break;
 		case LUX_FLOAT:
-		  value.b = (Byte) *src.f;
+		  value.b = (uint8_t) *src.f;
 		  break;
 		case LUX_DOUBLE:
-		  value.b = (Byte) *src.d;
+		  value.b = (uint8_t) *src.d;
 		  break;
 		case LUX_CFLOAT:
 		  value.b = sqrt(src.cf->real*src.cf->real

@@ -3020,7 +3020,7 @@ Int readExtra(char *file, char mode)
   ungetc(c, fp);
   fscanf(fp, "%d", &n);		/* number of objects in this file*/
   fgets(orbitLine, 256, fp);	/* rest of 1st data line */
-  for (pp = orbitLine; isspace((Byte) *pp); pp++);
+  for (pp = orbitLine; isspace((uint8_t) *pp); pp++);
   if (*pp && mode & 1)
     printf(pp);
   

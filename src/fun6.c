@@ -162,7 +162,7 @@ Int lux_despike(Int narg, Int ps[])
   Int	lognb2, cell_malloc = 0, cell_count, jj, jc;
   Int	nxc, nyc, cell_flag_sign, niter=1, rms_flag_sign, rms_flag;
   Int	sign_flag, bad_flag, bb_flag, save_niter, ntotal, dim[2];
-  Byte	*cell_status;
+  uint8_t	*cell_status;
   float	frac = 0.25, fsum, cfrac, tq, rms=0.0, fdif;
   Word	*p, *q, *ptr, *p1, *p2, *p3, *out, *out2;
   Word	arr[16], *pps, *ss;
@@ -224,9 +224,9 @@ Int lux_despike(Int narg, Int ps[])
  if (bb_flag) {
   cell_count = nx*ny/64;
   if (cell_count <= (NSCRAT*sizeof(Int) + ((char *) scrat - curScrat)))
-    cell_status = (Byte *) scrat;
+    cell_status = (uint8_t *) scrat;
   else {
-    cell_status = (Byte *) malloc(cell_count);
+    cell_status = (uint8_t *) malloc(cell_count);
     if (!cell_status)
       return cerror(ALLOC_ERR, 0);
     cell_malloc = 1;
@@ -517,7 +517,7 @@ Int lux_reorder(Int narg, Int ps[])/* reorder function */
    8 ways to "flip" an array, the "order" ranges from 0-7 accordingly */
 {
   Int  iorder, iq, result_sym, type, nx, ny, m, inc, dim[2];
-  Byte   *p, *q, *ptr;
+  uint8_t   *p, *q, *ptr;
 
   if (int_arg_stat(ps[1], &iorder) != 1)
     return LUX_ERROR;
@@ -541,7 +541,7 @@ Int lux_reorder(Int narg, Int ps[])/* reorder function */
   dim[1] = ny;
   result_sym = array_scratch(type, 2, dim); /* for the result */
   q = array_data(result_sym);
-  p = (Byte *) ptr;
+  p = (uint8_t *) ptr;
   if (iorder == 0)        /* no change, make a copy */
     bcopy(p, q, nx*ny*lux_type_size[type]);
   else {
@@ -549,7 +549,7 @@ Int lux_reorder(Int narg, Int ps[])/* reorder function */
     switch (type) {
       case LUX_BYTE:
 	if (iorder < 4) {
-	  register  Byte *pp, *qq;
+	  register  uint8_t *pp, *qq;
 	  register  Int  nn, mm, nxx, inc;
 
 	  nxx = nx;
@@ -593,7 +593,7 @@ Int lux_reorder(Int narg, Int ps[])/* reorder function */
 	      break;
 	  }
 	} else {
-	  register  Byte *pp, *qq;
+	  register  uint8_t *pp, *qq;
 	  register  Int  nn, mm, nyy, inc;
 
 	  mm = ny;

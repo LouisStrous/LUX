@@ -402,9 +402,9 @@ Int lux_readarr(Int narg, Int ps[])
  if (i > 0)
  { p = line; lastchar = *p;
    while (lastchar)					/* more chars */
-   { while (isspace((Byte) *p) || *p == ',') p++; /* skip space & , */
+   { while (isspace((uint8_t) *p) || *p == ',') p++; /* skip space & , */
      pt = p;						/* token start */
-     while (isspace((Byte) *p) == 0 && *p != ',' && *p != 0) /* scan value */
+     while (isspace((uint8_t) *p) == 0 && *p != ',' && *p != 0) /* scan value */
      { if (*p == 'e' || *p == 'E' || *p == '.')		/* float? */
          maxtype = LUX_FLOAT; p++; }
      lastchar = *p;  *p++ = '\0';
@@ -727,16 +727,16 @@ Int lux_help(Int narg, Int ps[])
 void endian(void *pp, Int n, Int type)
 /* swap bytes according to data type, starting at p, spanning n bytes.
    goes from bigendian to littleendian or back.
-   Byte -> do nothing
+   uint8_t -> do nothing
    Word -> swap 1 2 to 2 1
    long, float -> swap 1 2 3 4 to 4 3 2 1
    double -> swap 1 2 3 4 5 6 7 8 to 8 7 6 5 4 3 2 1
    Works between Ultrix and Irix.   LS 10/12/92	*/
 {
  Int	size, i, n2, n3;
- Byte	temp, *p2, *p;
+ uint8_t	temp, *p2, *p;
 
- p = (Byte *) pp;
+ p = (uint8_t *) pp;
  size = lux_type_size[type];
  if (size <= 1)
    return;
@@ -1484,7 +1484,7 @@ Int smooth(Int narg, Int ps[], Int cumul)
   LS 26nov92 5mar93 implement LUX_LONG, LUX_FLOAT, and LUX_DOUBLE,
   because "integer" range of floats is too small. */
 {
-  Byte	type;
+  uint8_t	type;
   Int	n, result, i, offset, stride, nWidth, w1, w2, ww, loop, three=3, norm,
     iq, jq;
   pointer	src, trgt, width;
@@ -1586,7 +1586,7 @@ Int smooth(Int narg, Int ps[], Int cumul)
 	      src.b += stride;
 	      if (!cumul)
 		++norm;
-	      *trgt.b = (Byte) (value.l/norm);
+	      *trgt.b = (uint8_t) (value.l/norm);
 	      trgt.b += stride;
 	      i = 1;
 	    } else
@@ -1598,7 +1598,7 @@ Int smooth(Int narg, Int ps[], Int cumul)
 	      src.b += stride;
 	      if (!cumul)
 		norm += 2;
-	      *trgt.b = (Byte) (value.l/norm);
+	      *trgt.b = (uint8_t) (value.l/norm);
 	      trgt.b += stride;
 	    }
 	  } else {		/* full width */
@@ -1606,7 +1606,7 @@ Int smooth(Int narg, Int ps[], Int cumul)
 	      value.l += *src.b;
 	      src.b += stride; 
 	    }
-	    Byte v = (Byte) (value.l/norm);
+	    uint8_t v = (uint8_t) (value.l/norm);
 	    for (i = 0; i < w1; i++) {
 	      *trgt.b = v;
 	      trgt.b += stride; 
@@ -1616,7 +1616,7 @@ Int smooth(Int narg, Int ps[], Int cumul)
 	  for ( ; i < w2; i++) {
 	    value.l += *src.b - src.b[offset];
 	    src.b += stride;
-	    *trgt.b = (Byte) (value.l/norm);
+	    *trgt.b = (uint8_t) (value.l/norm);
 	    trgt.b += stride;
 	  }
 	  /* right-hand edge */
@@ -1628,7 +1628,7 @@ Int smooth(Int narg, Int ps[], Int cumul)
 	      offset += stride;
 	      if (!cumul)
 		norm -= 2;
-	      *trgt.b = (Byte) (value.l/norm);
+	      *trgt.b = (uint8_t) (value.l/norm);
 	      trgt.b += stride;
 	    }
 	    if (!(ww%2)) {
@@ -1636,11 +1636,11 @@ Int smooth(Int narg, Int ps[], Int cumul)
 	      offset += stride;
 	      if (!cumul)
 		--norm;
-	      *trgt.b = (Byte) (value.l/norm);
+	      *trgt.b = (uint8_t) (value.l/norm);
 	      trgt.b += stride;
 	    }
 	  } else {
-	    Byte v = (Byte) (value.l/norm);
+	    uint8_t v = (uint8_t) (value.l/norm);
 	    for ( ; i < srcinfo.rdims[0]; i++) { /* right edge */
 	      *trgt.b = v;
 	      trgt.b += stride;
@@ -2023,7 +2023,7 @@ Int pcmp2(const void *arg1, const void *arg2)
 
   switch (pcmp_type) {
     case LUX_BYTE:
-      d1.b = *(Byte *) arg1;
+      d1.b = *(uint8_t *) arg1;
       d2.b = pcmp_ptr.b[*(Int *) arg2];
       return d1.b < d2.b? -1: (d1.b > d2.b? 1: 0);
     case LUX_WORD:
@@ -2053,7 +2053,7 @@ Int lux_match(Int narg, Int ps[])
 {
  Int	nTarget, nSet, iq, step, *ptr, i, *p;
  pointer	target, set, result;
- Byte	maxType;
+ uint8_t	maxType;
 
  if (getSimpleNumerical(ps[0], &target, &nTarget) < 0)
    return -1;			/* some error */
@@ -2102,7 +2102,7 @@ Int lux_match(Int narg, Int ps[])
 }
 /*----------------------------------------------------------------------*/
 Int lux_not(Int narg, Int ps[])
-/* returns a Byte 1 for every 0, and 0 for every non-zero element.
+/* returns a uint8_t 1 for every 0, and 0 for every non-zero element.
    LS 25feb93 */
 {
  Int	iq, i, type;
@@ -2606,7 +2606,7 @@ Int peek(Int narg, Int ps[])
 /* display memory contents */
 { 
   Int	start, nr;
-  Byte	*adr, i;
+  uint8_t	*adr, i;
   char	s;
 
 /* we're in trouble on OSF machines, where pointers are bigger than ints. */
@@ -2614,7 +2614,7 @@ Int peek(Int narg, Int ps[])
   start = int_arg(ps[0]);
   if (narg > 1) nr = int_arg(ps[1]); else nr = 1;
   if (nr < 1) nr = 1;
-  adr = (Byte *) NULL + start;
+  adr = (uint8_t *) NULL + start;
   while (nr--)
   { i = *adr++;
     if (isprint(i)) s = (char) i; else s = '*';

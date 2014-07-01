@@ -74,8 +74,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
  char	*default_huffman = {"/hosts/shimmer/usr/people/shine/trace/hufpack1"};
  char	*default_qt = {"/hosts/shimmer/usr/people/shine/trace/qt1"};
  /* global tables for Huffman decoding*/
- Byte	dc_look_nbits[256],dc_look_sym[256],ac_look_nbits[256],ac_look_sym[256];
- Byte	dc_bits[16], dc_huffval[16], ac_bits[16], ac_huffval[256];
+ uint8_t	dc_look_nbits[256],dc_look_sym[256],ac_look_nbits[256],ac_look_sym[256];
+ uint8_t	dc_bits[16], dc_huffval[16], ac_bits[16], ac_huffval[256];
  Int	dc_mincode[16], dc_maxcode[16], dc_valptr[16];
  Int	ac_mincode[16], ac_maxcode[16], ac_valptr[16];
 
@@ -102,7 +102,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 /* short	*dct = NULL; */
  char	dct_area[2400000];
  Int	del_indices[2048];
- Byte	*start_indices[2048];
+ uint8_t	*start_indices[2048];
  char	*dct_head = dct_area;
  short	*dct = (short *) (dct_area + sizeof( struct ahead ));
  static	short	*qt;
@@ -124,12 +124,12 @@ void prefill(dct_ptr, nb)
  }
  /* ----------------------------------------------------*/
 Int huff_setups( packed_huffman)
- Byte *packed_huffman;
+ uint8_t *packed_huffman;
  {
  unsigned char huffsize[256], *p, *bits, *huffval;
  unsigned short	huffcode[256], *pc;
  Int	*mincode, *maxcode, *valptr;
- Byte	*look_nbits, *look_sym;
+ uint8_t	*look_nbits, *look_sym;
  Int	i, j, code, k, iq, n;
  Int	jq, ntable, lookbits;
  /* unpack the Huffman tables read from file, make our own copy
@@ -231,7 +231,7 @@ static Int huff_decode_dct(dct, nblocks, x, limit)
  huff_encode_dct */
  /* assumes messages and pads already removed by a pre-scan */
  short	dct[];
- Byte	x[];
+ uint8_t	x[];
  Int	limit, nblocks;
  {
  Int	i, j, k, idct, r1, last_dc=0;
@@ -239,7 +239,7 @@ static Int huff_decode_dct(dct, nblocks, x, limit)
  uint32_t	temp, temp2, nbits, rs;
  uint32_t mask[] = { 0x00, 0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f, 0xff,
   0x1ff,0x3ff,0x7ff,0xfff,0x1fff,0x3fff,0x7fff,0xffff};
- Byte *px;
+ uint8_t *px;
 
  px = x;	/* where we get the Huffman coded version */
  r1 = 0;	/* a bit count */
@@ -585,10 +585,10 @@ Int scan_err(n)
  /*------------------------------------------------------------------------- */
 Int trace_scan(x, limit)
  /* scans the contents of x for a TRACE image, decodes cleaned up blocks */
- Byte	x[];
+ uint8_t	x[];
  Int	limit;
  {
- Byte	*px, *pt, *pb;
+ uint8_t	*px, *pt, *pb;
  short	*dct_ptr;
  Int	i, j, k, n, code, iblock = 0, restart_interval = 8, stat;
  Int    RestartNumber, PrevRestartNumber, bcount, knowngaps, expected_restarts;
@@ -1112,7 +1112,7 @@ Int lux_trace_decoder(narg,ps)	/* initial TRACE decompresser */
  Int	i;
  static	char	*dctarray = {"$DCT_ARRAY"};
  char	*fname, *pname;
- Byte	packed[304], *buf;
+ uint8_t	packed[304], *buf;
  short	*image;
  struct	ahead	*h;
  /* determine our endian */
@@ -1124,7 +1124,7 @@ Int lux_trace_decoder(narg,ps)	/* initial TRACE decompresser */
  iq = ps[2];
  if ( sym[iq].class != 4 ) return execute_error(66);
  h = (struct ahead *) sym[iq].spec.array.ptr;
- buf = (Byte *) ((char *)h + sizeof(struct ahead));
+ buf = (uint8_t *) ((char *)h + sizeof(struct ahead));
  nd = h->ndim;
  limit = lux_type_size[sym[iq].type];
  for (j=0;j<nd;j++) limit *= h->dims[j]; 		/* # of bytes */

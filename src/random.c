@@ -86,7 +86,7 @@ Int random_distributed(Int modulus, double *distr)
   return locate_value(r, distr, modulus);
 }
 /*------------------------------------------------------------------------- */
-Byte random_bit(void)
+uint8_t random_bit(void)
 /* Returns a random bit (either zero or one), using primitive polynomials */
 /* modulo 2. */
 {
@@ -94,10 +94,10 @@ Byte random_bit(void)
 
   if (currentBitSeed & mask1) {
     currentBitSeed = ((currentBitSeed ^ mask) << 1) | 1;
-    return (Byte) 1;
+    return (uint8_t) 1;
   } else {
     currentBitSeed = (currentBitSeed << 1) & ~1;
-    return (Byte) 0;
+    return (uint8_t) 0;
   }
 }
 /*------------------------------------------------------------------------- */
@@ -498,7 +498,7 @@ Int lux_randoml(Int narg, Int ps[])
 {
   Int	dims[MAX_DIMS], ndim, iq, result, n;
   pointer	p;
-  Byte	type;
+  uint8_t	type;
 
   if (*ps) 			/* seed */
     currentBitSeed = int_arg(*ps); /* install new seed */
@@ -586,7 +586,7 @@ Int lux_random(Int narg, Int ps[])
 /*       either a 0 or a 1, drawn at random with equal probability.  */
 {
   Int	result, ndim, dims[MAX_DIMS], iq, i, period, seed;
-  Byte	*p;
+  uint8_t	*p;
 
   if (!internalMode)
     internalMode = 1;

@@ -82,7 +82,7 @@ Int		scrat[NSCRAT], curSymbol;
 Word		listStack[NLIST];
 Word		curContext = 0;
 Int		lux_type_size[] =
-	{ sizeof(Byte), sizeof(Word), sizeof(Int), sizeof(float),
+	{ sizeof(uint8_t), sizeof(Word), sizeof(Int), sizeof(float),
 	  sizeof(double), sizeof(char), sizeof(char), sizeof(char *),
 	  sizeof(floatComplex), sizeof(doubleComplex) };
 char	*curScrat = (char *) scrat, *printString;

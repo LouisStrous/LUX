@@ -288,7 +288,7 @@ Int lux_tapebufout(Int narg, Int ps[])			/* write tape record */
    return -1; }
 #if !WORDS_BIGENDIAN
  p = (char *) q1.b;
- endian((Byte *) p, n, type);
+ endian((uint8_t *) p, n, type);
 #endif
  q1.b += offset;	/* starting address for writing */
  ic = n;
@@ -306,7 +306,7 @@ Int lux_tapebufout(Int narg, Int ps[])			/* write tape record */
  ic -= nbr;	q1.b += nbr;
  }
 #if !WORDS_BIGENDIAN
- endian((Byte *) p, n, type);				/* restore original */
+ endian((uint8_t *) p, n, type);				/* restore original */
 #endif
  return 1;
  }
@@ -361,7 +361,7 @@ Int lux_tapebufin(Int narg, Int ps[])/* read tape record */
 #if !WORDS_BIGENDIAN
  p = (char *) q1.b;
  if (offset != 0)		/* need proper imbedding */
-   endian((Byte *) p, n, type);
+   endian((uint8_t *) p, n, type);
 #endif
  q1.b += offset;
  ic = n;
@@ -401,7 +401,7 @@ Int lux_tapebufin(Int narg, Int ps[])/* read tape record */
    q1.b += nbr;
  }
 #if !WORDS_BIGENDIAN
- endian((Byte *) p, n, type);
+ endian((uint8_t *) p, n, type);
 #endif
  return 1;
  }

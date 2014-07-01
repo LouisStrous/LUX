@@ -488,7 +488,7 @@ Int lux_cspline_find(Int narg, Int ps[])
      3. the (one or more) coordinates of the location (Int) */
   {
     struct c cc;
-    csize = (Byte *) &cc.c - (Byte *) &cc.v + srcinfo.ndim*sizeof(Int);
+    csize = (uint8_t *) &cc.c - (uint8_t *) &cc.v + srcinfo.ndim*sizeof(Int);
   }
   c = malloc(csize);
 
@@ -521,7 +521,7 @@ Int lux_cspline_find(Int narg, Int ps[])
 	      /* and after that the coordinates */
 	      for (j = 0; j < srcinfo.ndim; j++)
 		(&c->c)[srcinfo.raxes[j]] = srcinfo.coords[j];
-	      Bytestack_push_data(b, c, (Byte *) c + csize);
+	      Bytestack_push_data(b, c, (uint8_t *) c + csize);
 	    } else if (lev < nLev && *src.f >= level.f[lev]) {
 	      /* passed a target level going up: determine &
 		 remember detailed location */
@@ -533,7 +533,7 @@ Int lux_cspline_find(Int narg, Int ps[])
 	      c->l = lev++;
 	      for (j = 0; j < srcinfo.ndim; j++)
 		(&c->c)[srcinfo.raxes[j]] = srcinfo.coords[j];
-	      Bytestack_push_data(b, c, (Byte *) c + csize);
+	      Bytestack_push_data(b, c, (uint8_t *) c + csize);
 	    }
 	  }
 	} while ((i = advanceLoop(&srcinfo, &src)) == 0);
@@ -565,7 +565,7 @@ Int lux_cspline_find(Int narg, Int ps[])
 	      c->l = --lev;
 	      for (j = 0; j < srcinfo.ndim; j++)
 		(&c->c)[srcinfo.raxes[j]] = srcinfo.coords[j];
-	      Bytestack_push_data(b, c, (Byte *) c + csize);
+	      Bytestack_push_data(b, c, (uint8_t *) c + csize);
 	    } else if (lev < nLev && *src.d >= level.d[lev]) {
 	      /* passed a target level going up: determine &
 		 remember detailed location */
@@ -577,7 +577,7 @@ Int lux_cspline_find(Int narg, Int ps[])
 	      c->l = lev++;
 	      for (j = 0; j < srcinfo.ndim; j++)
 		(&c->c)[srcinfo.raxes[j]] = srcinfo.coords[j];
-	      Bytestack_push_data(b, c, (Byte *) c + csize);
+	      Bytestack_push_data(b, c, (uint8_t *) c + csize);
 	    }
 	  }
 	} while ((i = advanceLoop(&srcinfo, &src)) == 0);
@@ -601,7 +601,7 @@ Int lux_cspline_find(Int narg, Int ps[])
       Bytestack_index bi;
       union {
 	struct c *c; 
-	Byte *b; 
+	uint8_t *b; 
       } q;
 
       d = (struct c *) Bytestack_peek(b, 0); /* beginning of data */
@@ -633,7 +633,7 @@ Int lux_cspline_find(Int narg, Int ps[])
 	  for (i = 0; i < n; i++) {
 	    while (d->l != lev)
 	      index[++lev] = i;
-	    d = (struct c *) ((Byte *)d + csize);
+	    d = (struct c *) ((uint8_t *)d + csize);
 	  }
 	}
       }
@@ -853,7 +853,7 @@ Int lux_fitskey(Int narg, Int ps[])
       iq = scalar_scratch(type);
       switch (type) {
 	case LUX_BYTE:
-	  scalar_value(iq).b = (Byte) value.l;
+	  scalar_value(iq).b = (uint8_t) value.l;
 	  break;
 	case LUX_WORD:
 	  scalar_value(iq).w = (Word) value.l;

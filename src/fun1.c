@@ -889,7 +889,7 @@ Int indgen(Int narg, Int ps[], Int isFunc)
   switch (symbol_type(ps[0])) {
     case LUX_BYTE:
       do 
-	*trgt.b = (Byte) trgtinfo.coords[0];
+	*trgt.b = (uint8_t) trgtinfo.coords[0];
       while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.rndim);
       break;
     case LUX_WORD:
@@ -1432,7 +1432,7 @@ Int index_total(Int narg, Int ps[], Int mean)
   doubleComplex	tempcd, valuecd;
   float	temp2f;
   double	temp2d;
-  Byte	*present;
+  uint8_t	*present;
   extern scalar	lastmin, lastmax;
   Int	minmax(Int *, Int, Int);
 
@@ -1889,14 +1889,14 @@ Int index_total(Int narg, Int ps[], Int mean)
   } else {			/* power summation */
     /* we set up for the calculation of the powers.  We use a scheme that */
     /* minimizes the number of multiplications that need to be performed. */
-    present = (Byte *) curScrat;/* some scratch space */
+    present = (uint8_t *) curScrat;/* some scratch space */
     pp = p;
     while (pp) {
       *present++ = (pp & 1);
       pp >>= 1;
     }
-    nbase = present - (Byte *) curScrat; /* number of bits in the exponent */
-    present = (Byte *) curScrat;
+    nbase = present - (uint8_t *) curScrat; /* number of bits in the exponent */
+    present = (uint8_t *) curScrat;
     if (haveWeights) {		/* weighted power summation */
       if (mean) {		/* want averages */
 	allocate(hist.d, size, double);
@@ -3168,7 +3168,7 @@ Int total(Int narg, Int ps[], Int mean)
 /* Allow LUX_LONG output.  LS 27oct2010 */
 {
   Int	result, done, p, psign, pp, outtype, type, nbase, i, haveWeights, n;
-  Byte	*present;
+  uint8_t	*present;
   scalar	sum, value, temp, w;
   floatComplex	sumcf, tempcf, valuecf;
   doubleComplex	sumcd, tempcd, valuecd;
@@ -3753,14 +3753,14 @@ Int total(Int narg, Int ps[], Int mean)
 #endif
     /* we set up for the calculation of the powers.  We use a scheme that */
     /* minimizes the number of multiplications that need to be performed. */
-    present = (Byte *) curScrat;/* some scratch space */
+    present = (uint8_t *) curScrat;/* some scratch space */
     pp = p;
     while (pp) {
       *present++ = (pp & 1);
       pp >>= 1;
     }
-    nbase = present - (Byte *) curScrat; /* number of bits in the exponent */
-    present = (Byte *) curScrat;
+    nbase = present - (uint8_t *) curScrat; /* number of bits in the exponent */
+    present = (uint8_t *) curScrat;
     if (haveWeights) {		/* weighted power summation */
 #if DEBUG_VOCAL
       debugout("weighted power summation");
@@ -5852,7 +5852,7 @@ Int math_funcs_3f(Int sym1, Int sym2, Int sym3, Int code)
   if (symbol_class(iq) == LUX_SCALAR) /* get pointer to output data */
     trgt.b =  &scalar_value(iq).b;
   else
-    trgt.b = (Byte *) array_data(iq);
+    trgt.b = (uint8_t *) array_data(iq);
   step1 = (n1 == 1)? 0: lux_type_size[type1]; /* get step sizes */
   step2 = (n2 == 1)? 0: lux_type_size[type2];
   step3 = (n3 == 1)? 0: lux_type_size[type3];

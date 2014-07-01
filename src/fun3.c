@@ -87,14 +87,14 @@ Int evalString(char *expr, Int nmax)
    n = 0;
    type = LUX_BYTE;
    while (n < nmax) {
-     while (!isNumberChar((Byte) *currentChar)
+     while (!isNumberChar((uint8_t) *currentChar)
 	    && *currentChar) /* seek digit */
        currentChar++;
      if (!*currentChar)		/* no (more) digits */
        break;
-     if (currentChar > expr && isalpha((Byte) currentChar[-1])) {
+     if (currentChar > expr && isalpha((uint8_t) currentChar[-1])) {
        /* not a separate number */
-       while (isNumberChar((Byte) *currentChar))
+       while (isNumberChar((uint8_t) *currentChar))
 	 currentChar++;
        continue;
      }
@@ -111,7 +111,7 @@ Int evalString(char *expr, Int nmax)
        p.b = &scalar_value(result).b + size; 
      } else {
        result = array_scratch(type, 1, &n);
-       p.b = (Byte *) array_data(result) + n*size;
+       p.b = (uint8_t *) array_data(result) + n*size;
      }
      while (n--) {
        temp = popList();
@@ -1962,7 +1962,7 @@ Int index_maxormin(Int source, Int indices, Int code)
     size += (offset = -lastmin.l);
   result = array_scratch(code < 2? type: LUX_LONG, 1, &size);
   /* make trgt.b point to the element associated with index zero */
-  trgt.b = (Byte *) array_data(result) + offset*lux_type_size[array_type(result)];
+  trgt.b = (uint8_t *) array_data(result) + offset*lux_type_size[array_type(result)];
   /* Initialize result to zero */
   zerobytes(array_data(result), size*lux_type_size[array_type(result)]);
   /* use "any" as an array of flags indicating if any number has been */
@@ -2331,14 +2331,14 @@ Int maxormin(Int narg, Int ps[], Int code)
 	/* take first value as initial values */
 	memcpy(&min, src.b, srcinfo.stride);
 	memcpy(&max, src.b, srcinfo.stride);
-	minloc = maxloc = src.b - (Byte *) srcinfo.data0;
+	minloc = maxloc = src.b - (uint8_t *) srcinfo.data0;
 	do {
 	  if (*src.b > max.b) {
 	    max.b = *src.b;
-	    maxloc = src.b - (Byte *) srcinfo.data0;
+	    maxloc = src.b - (uint8_t *) srcinfo.data0;
 	  } else if (*src.b < min.b) {
 	    min.b = *src.b;
-	    minloc = src.b - (Byte *) srcinfo.data0;
+	    minloc = src.b - (uint8_t *) srcinfo.data0;
 	  }
 	} while ((n = advanceLoop(&srcinfo, &src)) < n1);
 	switch (code) {
@@ -2586,7 +2586,7 @@ Int	narg, ps[];
 return maxormin(narg, ps, 2);
 }
 /*------------------------------------------------------------------------- */
-void scale(pointer data, Byte type, Int size, double datalow, double datahigh,
+void scale(pointer data, uint8_t type, Int size, double datalow, double datahigh,
 	   void *dest, double trgtlow, double trgthigh)
 /* returns a copy of the data at <data>, linearly transformed such that
  <datalow> maps to <trgtlow> and <datahigh> to <trgthigh>.  Data that falls
@@ -3008,13 +3008,13 @@ Int minmax(Int *p, Int n, Int type)
   scalar	min, max;
 /* pointers on OSF machines are bigger than ints, so casts from pointers */
 /* to ints must be avoided!  thus, changed  minloc, maxloc  from Int to */
-/* Byte *.  LS27jul94 */
+/* uint8_t *.  LS27jul94 */
   void	*minloc, *maxloc;
   Int	 nc;
 
   q.l = p;
   nc = n - 1;
-  minloc = maxloc = (Byte *) p;
+  minloc = maxloc = (uint8_t *) p;
   switch (type) {
     case LUX_BYTE:
       min.b = max.b = *q.b++;
@@ -3097,8 +3097,8 @@ Int minmax(Int *p, Int n, Int type)
       scalar_type(lastmin_sym) = scalar_type(lastmax_sym) = LUX_DOUBLE;
       break;
     }						/* end of type switch */
-  lastmaxloc = ((Byte *) maxloc - (Byte *) p) / lux_type_size[type];
-  lastminloc = ((Byte *) minloc - (Byte *) p) / lux_type_size[type];
+  lastmaxloc = ((uint8_t *) maxloc - (uint8_t *) p) / lux_type_size[type];
+  lastminloc = ((uint8_t *) minloc - (uint8_t *) p) / lux_type_size[type];
   return 1;
 }
 /*------------------------------------------------------------------------- */
@@ -3288,7 +3288,7 @@ void cleanup_cubic_spline_tables(csplineInfo *cspl) {
 /*------------------------------------------------------------------------- */
 Int cubic_spline_tables(void *xx, Int xType, Int xStep,
 			void *yy, Int yType, Int yStep,
-			Int nPoints, Byte periodic, Byte akima,
+			Int nPoints, uint8_t periodic, uint8_t akima,
 			csplineInfo *cspl)
 /* installs a cubic spline for later quick multiple interpolations */
 /* <xx> must point to the x coordinates, which are of LUX data type <xType> */
@@ -3322,8 +3322,8 @@ Int cubic_spline_tables(void *xx, Int xType, Int xStep,
 
   x = cspl->x = malloc(nPoints*sizeof(double));
   y = cspl->y = malloc(nPoints*sizeof(double));
-  xin.b = (Byte *) xx;
-  yin.b = (Byte *) yy;
+  xin.b = (uint8_t *) xx;
+  yin.b = (uint8_t *) yy;
 
   /* first copy x (with necessary type conversion) */
   if (xx) {			/* have x */
@@ -3690,12 +3690,12 @@ Int lux_cubic_spline(Int narg, Int ps[])
 	if (oldType <= LUX_DOUBLE) { /* not a string array */
 	  if (oldType != LUX_DOUBLE)
 	    xNewSym = lux_convert(1, &xNewSym, LUX_DOUBLE, 1);
-	  src.b = (Byte *) array_data(xNewSym);
+	  src.b = (uint8_t *) array_data(xNewSym);
 	  size = array_size(xNewSym);
 	} else
 	  return cerror(ILL_TYPE, xNewSym);
 	result_sym = array_clone(xNewSym, LUX_DOUBLE);
-	trgt.b = (Byte *) array_data(result_sym);
+	trgt.b = (uint8_t *) array_data(result_sym);
 	break;
       default:
 	result_sym = cerror(ILL_TYPE, xNewSym);
@@ -4107,11 +4107,11 @@ Int extract_bits(Int narg, Int ps[], Int *value)/* internal routine */
 }
 /*------------------------------------------------------------------------- */
 Int lux_fade_init(Int narg, Int ps[])
-/* initializes a fade (or dissolve) between 2 Byte arrays, the actual
+/* initializes a fade (or dissolve) between 2 uint8_t arrays, the actual
    fade result is obtained with the subroutine fade
    call is: fade_init, x1, x2 */
 {
-  Byte	*p1, *p2;
+  uint8_t	*p1, *p2;
   Word	*q1, *q2;
   Int	n, iq;
 
@@ -4138,7 +4138,7 @@ Int lux_fade_init(Int narg, Int ps[])
   /* set up the I*2 arrays for quick fades */
   if (fade1) { free(fade1); fade1 = NULL; }
   if (fade2) { free(fade2); fade2 = NULL; }
-  /* since the inputs are Byte arrays, n1 is the size in bytes, we need 2*n1
+  /* since the inputs are uint8_t arrays, n1 is the size in bytes, we need 2*n1
      for the fade arrays */
   n = 2 * fade_xsize * fade_ysize;
   fade1 = (short *) malloc(n);
@@ -4157,13 +4157,13 @@ Int lux_fade_init(Int narg, Int ps[])
 }
 /*------------------------------------------------------------------------- */
 Int lux_fade(Int narg, Int ps[])
- /* does a fade (or dissolve) between 2 Byte arrays, must be initialized
+ /* does a fade (or dissolve) between 2 uint8_t arrays, must be initialized
  with fade_init
  call is: fade, weight, result - where n is from 0 to 256 and represents
  the weight of the first array that was passed to fade_init
  result is a subroutine argument to avoid mallocs */
 {
-  Byte	*p1;
+  uint8_t	*p1;
   Word	*q1, *q2, wt;
   Int	weight, n, iq;
 
@@ -4175,7 +4175,7 @@ Int lux_fade(Int narg, Int ps[])
   p1 = array_data(iq);
   n = fade_xsize * fade_ysize;	q1 = fade1;	q2 = fade2;
   while (n--) { 
-    *p1++ = (Byte) (( wt * *q2++ + *q1++) >> 8);
+    *p1++ = (uint8_t) (( wt * *q2++ + *q1++) >> 8);
   }
   return LUX_OK;
 }

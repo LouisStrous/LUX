@@ -1232,7 +1232,7 @@ void bicubic_f(void)	/* internal routine for single pixel */
  xq += b3*(c1 * *(bb.b) + c2 * *(bb.b+i2)+ c3 * *(bb.b+i3) + c4 * *(bb.b+i4));
  bb.b += j4;
  xq += b4*(c1 * *(bb.b) + c2 * *(bb.b+i2)+ c3 * *(bb.b+i3) + c4 * *(bb.b+i4));
- /* Byte arrays need to be range restricted, too many simple minds out there */
+ /* uint8_t arrays need to be range restricted, too many simple minds out there */
  xq = MAX( 0, MIN( 255, xq));
  /* also we need to round rather than truncate, taking that extra care */
  *out.b++ = rint(xq); break;
@@ -1416,7 +1416,7 @@ void bicubic_fc()	/* internal routine for single pixel */
       xq += b3*(c1*bb.b[0] + c2*bb.b[i2]+ c3*bb.b[i3] + c4*bb.b[i4]);
       bb.b += j4;
       xq += b4*(c1*bb.b[0] + c2*bb.b[i2]+ c3*bb.b[i3] + c4*bb.b[i4]);
-      /* Byte arrays need to be range restricted, too many simple minds out there */
+      /* uint8_t arrays need to be range restricted, too many simple minds out there */
       xq = MAX( 0, MIN( 255, xq));
       /* also we need to round rather than truncate, taking that extra care */
       *out.b++ = rint(xq);
@@ -1906,7 +1906,7 @@ Int lux_compress(Int narg, Int ps[])
 	  sum.l += (Int) src.b[offset];
 	while (advanceLoop(&tmpinfo, &src) < tmpinfo.rndim);
 	*trgt.b = sum.l/nel;
-	src.b = (Byte *) tmpinfo.data0;
+	src.b = (uint8_t *) tmpinfo.data0;
 	n = advanceLoop(&trgtinfo, &trgt);
 	offset = 0;
 	for (i = 0; i < trgtinfo.ndim; i++)
@@ -2013,7 +2013,7 @@ Int lux_oldcompress(Int narg, Int ps[]) /* compress function */
 	  for (j = 0; j < cy; j++)
 	  { for (i = 0; i < cx; i++) xq += *p.b++;
 	    p.b += n; }
-	  *q2.b++ = (Byte) ( xq * fac );
+	  *q2.b++ = (uint8_t) ( xq * fac );
 	  base.b += cx; }
 	q1.b +=  nxx * cy; }
       break;
@@ -2073,7 +2073,7 @@ Int lux_sort(Int narg, Int ps[])
   pointer	p;
   char	sortType;
 
-  /* SGI cc does not accept combination of (Int, Byte *) and (Int, Word *) */
+  /* SGI cc does not accept combination of (Int, uint8_t *) and (Int, Word *) */
   /* functions in one array of function pointers, not even if the function */
   /* pointer array is defined as (Int, void *). */
   void	sort_b(), sort_w(), sort_l(), sort_f(), sort_d(), sort_s(),
@@ -2138,7 +2138,7 @@ Int lux_index(Int narg, Int ps[])
 {
   Int	iq, type, result_sym, n, nloop, step1, step2, nloop2;
   pointer	p, q;
-  /* SGI cc does not accept combination of (Int, Byte *) and (Int, Word *) */
+  /* SGI cc does not accept combination of (Int, uint8_t *) and (Int, Word *) */
   /* functions in one array of function pointers, not even if the function */
   /* pointer array is defined as (Int, void *). */
   void	indexx_b(), indexx_w(), indexx_l(), indexx_f(), indexx_d(), indexx_s();
@@ -2188,16 +2188,16 @@ Int lux_index(Int narg, Int ps[])
 }
  /*------------------------------------------------------------------------- */
 static char	*zoomtemp = "$ZOOM_TEMP";
-Int zoomer2(Byte *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
+Int zoomer2(uint8_t *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
 	    Int sym_flag)
 /* internal zoom2 */
-/* zoom a Byte array by 2 */
+/* zoom a uint8_t array by 2 */
 /* requires the original address, some size info */
 /* creates a symbol $zoom_temp to allow re-use of memory for some calls */
 /* RAS */
 {
  Int	ns, ms, dim[2], j, i, ns4, result_sym, leftover;
- Byte	*pin, *pout, *poutbase, tmp;
+ uint8_t	*pin, *pout, *poutbase, tmp;
  Int	*p1, *p2, k;
 #ifdef __alpha
  long	*p8;
@@ -2309,15 +2309,15 @@ Int zoomer2(Byte *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
  return 1;
 }
 /*------------------------------------------------------------------------- */
-Int zoomer3(Byte *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
+Int zoomer3(uint8_t *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
 	    Int sym_flag) /* internal zoom3 */
- /* zoom a Byte array by 3 */
+ /* zoom a uint8_t array by 3 */
  /* requires the original address, some size info */
  /* creates a symbol $zoom_temp to allow re-use of memory for some calls */
 /* RAS */
 {
   Int	ns, ms, dim[2], j, i, ns4, result_sym, leftover;
-  Byte	*pin, *pout, *poutbase, tmp;
+  uint8_t	*pin, *pout, *poutbase, tmp;
   Int	*p1, *p2, *p3, nst2, tmpint, k, nsd2;
 
   pin = ain;
@@ -2383,15 +2383,15 @@ Int zoomer3(Byte *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int zoomer4(Byte *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
+Int zoomer4(uint8_t *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
 	    Int sym_flag) /* internal zoom4 */
-/* zoom a Byte array by 4 */
+/* zoom a uint8_t array by 4 */
 /* requires the original address, some size info */
 /* creates a symbol $zoom_temp to allow re-use of memory for some calls */
 /* RAS */
 {
   Int	ns, ms, dim[2], j, i, ns4, result_sym;
-  Byte	*pin, *pout, *poutbase, tmp;
+  uint8_t	*pin, *pout, *poutbase, tmp;
   Int	*p1, *p2, *p3, *p4, nst3, tmpint, nsd2;
 
   pin = ain;
@@ -2453,16 +2453,16 @@ Int zoomer4(Byte *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
  return 1;
 }
 /*------------------------------------------------------------------------- */
-Int zoomer8(Byte *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
+Int zoomer8(uint8_t *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
 	    Int sym_flag) /* internal zoom8 */
-/* zoom a Byte array by 8 */
+/* zoom a uint8_t array by 8 */
 /* requires the original address, some size info */
 /* creates a symbol $zoom_temp to allow re-use of memory for some calls */
 /* RAS */
 {
   Int	ns, ms, dim[2], j, i, result_sym;
-  Byte	*pin, *poutbase;
-  union	{ Byte	bb[4];   Int  ii; } tmp;
+  uint8_t	*pin, *poutbase;
+  union	{ uint8_t	bb[4];   Int  ii; } tmp;
   Int	*p1, *p2, delta;
 
   pin = ain;
@@ -2522,16 +2522,16 @@ Int zoomer8(Byte *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int zoomer16(Byte *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
+Int zoomer16(uint8_t *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
 	     Int sym_flag) /* internal zoom16 */
-/* zoom a Byte array by 16 */
+/* zoom a uint8_t array by 16 */
 /* requires the original address, some size info */
 /* creates a symbol $zoom_temp to allow re-use of memory for some calls */
 /* RAS */
 {
   Int	ns, ms, dim[2], j, i, result_sym;
-  Byte	*pin, *poutbase;
-  union	{ Byte	bb[4];   Int  ii; } tmp;
+  uint8_t	*pin, *poutbase;
+  union	{ uint8_t	bb[4];   Int  ii; } tmp;
   Int	*p1, *p2, delta;
 
   pin = ain;
@@ -2647,15 +2647,15 @@ Int zoomer16(Byte *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int compress2(Byte *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
+Int compress2(uint8_t *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
 	      Int sym_flag) /* internal compress2 */
-/* compress a Byte array by 2 */
+/* compress a uint8_t array by 2 */
 /* requires the original address, some size info */
 /* creates a symbol $zoom_temp to allow re-use of memory for some calls */
 /* RAS */
 {
   Int	ns, ms, dim[2], result_sym;
-  Byte	*pin, *pout, *poutbase, *p1, *p2;
+  uint8_t	*pin, *pout, *poutbase, *p1, *p2;
   Int	nx, ny, xq, nskip;
 
   pin = ain;
@@ -2692,7 +2692,7 @@ Int compress2(Byte *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
       xq += *p2++;
       xq += *p1++;
       xq += *p2++;
-      *pout++ = (Byte) (xq/4);
+      *pout++ = (uint8_t) (xq/4);
     }
     p1 += nskip;
     p2 += nskip;
@@ -2700,15 +2700,15 @@ Int compress2(Byte *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
   return 1;
 }
 /*------------------------------------------------------------------------- */
-Int compress4(Byte *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
+Int compress4(uint8_t *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
 	      Int sym_flag) /* internal compress4 */
-/* compress a Byte array by 4 */
+/* compress a uint8_t array by 4 */
 /* requires the original address, some size info */
 /* creates a symbol $zoom_temp to allow re-use of memory for some calls */
 /* RAS */
 {
  Int	ns, ms, dim[2], result_sym;
- Byte	*pin, *pout, *poutbase, *p1, *p2, *p3, *p4;
+ uint8_t	*pin, *pout, *poutbase, *p1, *p2, *p3, *p4;
  Int	nx, ny, xq, nskip;
 
  pin = ain;
@@ -2759,7 +2759,7 @@ Int compress4(Byte *ain, Int n, Int m, Int *symout, Int *nx2, Int *ny2,
      xq += *p2++;
      xq += *p3++;
      xq += *p4++;
-     *pout++ = (Byte) (xq/16);
+     *pout++ = (uint8_t) (xq/16);
    }
    p1 += nskip;
    p2 += nskip;
@@ -2851,7 +2851,7 @@ void shift_bicubic(float dx, Int nx, Int ny, Int inc, Int dline,
     case LUX_BYTE:	/* I*1 image */
     {
       float	z4, z1, z2, z3, yq;
-      Byte	*p, *q;
+      uint8_t	*p, *q;
       for (k=0;k<ny;k++) {
 	p = base.b + k*dline + rflag;
 	q = out.b + k*dline + rflag;
@@ -2862,9 +2862,9 @@ void shift_bicubic(float dx, Int nx, Int ny, Int inc, Int dline,
 	
 	if (nz2) {
 	  yq = c1*z1 +c2*z2 + c3*z3 + c4*z4;
-	  /* Byte arrays need to be range restricted */
+	  /* uint8_t arrays need to be range restricted */
 	  yq = MAX( 0, MIN( 255.0, yq));
-	  *q = (Byte) yq;
+	  *q = (uint8_t) yq;
 	  q = q + inc;
 	  nz2--;
 	  while (nz2--) {
@@ -2873,7 +2873,7 @@ void shift_bicubic(float dx, Int nx, Int ny, Int inc, Int dline,
 	    z4 = *p;
 	    yq = c1*z1 +c2*z2 + c3*z3 + c4*z4;
 	    yq = MAX( 0, MIN( 255.0, yq));
-	    *q = (Byte) yq;
+	    *q = (uint8_t) yq;
 	    q = q + inc;
 	  }
 	}
@@ -2881,11 +2881,11 @@ void shift_bicubic(float dx, Int nx, Int ny, Int inc, Int dline,
 	  z1 = z2;  z2 = z3;  z3 = z4;
 	  yq = c1*z1 +c2*z2 + c3*z3 + c4*z4;
 	  yq = MAX( 0, MIN( 255.0, yq));
-	  *q = (Byte) yq;
+	  *q = (uint8_t) yq;
 	  q = q + inc;
 	}
 	z4 = MAX( 0, MIN( 255.0, z4));
-	while (nz4--) { *q = (Byte) z4;  q = q + inc; }
+	while (nz4--) { *q = (uint8_t) z4;  q = q + inc; }
       }
     }
      break;

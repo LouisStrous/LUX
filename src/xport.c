@@ -1111,7 +1111,7 @@ Int lux_xtv_general(Int narg, Int ps[], Int mode)
   float	x, y;
   Int	tvraw(pointer data, Int type, Int nx, Int ny, float x1, float x2,
 	  float y1, float y2, float sxf, float syf, Int wid, float *mag,
-	  Int mode, double clo, double chi, Byte *bitmap1, Byte *bitmap2);
+	  Int mode, double clo, double chi, uint8_t *bitmap1, uint8_t *bitmap2);
 
   if (internalMode & TV_24) {
     mode |= TV_24;
@@ -1184,7 +1184,7 @@ Int lux_xtvraw(Int narg, Int ps[])
 /*------------------------------------------------------------------------*/
 Int tvraw(pointer data, Int type, Int nx, Int ny, float x1, float x2,
 	  float y1, float y2, float sxf, float syf, Int wid, float *mag,
-	  Int mode, double clo, double chi, Byte *bitmap1, Byte *bitmap2)
+	  Int mode, double clo, double chi, uint8_t *bitmap1, uint8_t *bitmap2)
 /* display data in a window. */
 /* data: pointer to the start of the data */
 /* type: data type */
@@ -1532,7 +1532,7 @@ Int tvraw(pointer data, Int type, Int nx, Int ny, float x1, float x2,
 	    offset.f = (float) min.d;
 	    break;
 	}
-      } else {			/* one Byte per pixel */
+      } else {			/* one uint8_t per pixel */
 	switch (type) {
 	  case LUX_BYTE:
 	    min.b = UINT8_MAX;
@@ -3162,19 +3162,19 @@ Int lux_colorpixel(Int narg, Int ps[])
 	    break;
 	  case LUX_WORD:
 	    while (n--)
-	      *q.b++ = pixels[(Int) ((Byte) *p.w++)];
+	      *q.b++ = pixels[(Int) ((uint8_t) *p.w++)];
 	    break;
 	  case LUX_LONG:
 	    while (n--)
-	      *q.b++ = pixels[(Int) ((Byte) *p.l++)];
+	      *q.b++ = pixels[(Int) ((uint8_t) *p.l++)];
 	    break;
 	  case LUX_FLOAT:
 	    while (n--)
-	      *q.b++ = pixels[(Int) ((Byte) *p.f++)];
+	      *q.b++ = pixels[(Int) ((uint8_t) *p.f++)];
 	    break;
 	  case LUX_DOUBLE:
 	    while (n--)
-	      *q.b++ = pixels[(Int) ((Byte) *p.d++)];
+	      *q.b++ = pixels[(Int) ((uint8_t) *p.d++)];
 	    break;
 	}
       break;
@@ -3218,19 +3218,19 @@ Int lux_colorpixel(Int narg, Int ps[])
 	    break;
 	  case LUX_WORD:
 	    while (n--)
-	      *q.w++ = pixels[(Int) ((Byte) *p.w++)];
+	      *q.w++ = pixels[(Int) ((uint8_t) *p.w++)];
 	    break;
 	  case LUX_LONG:
 	    while (n--)
-	      *q.w++ = pixels[(Int) ((Byte) *p.l++)];
+	      *q.w++ = pixels[(Int) ((uint8_t) *p.l++)];
 	    break;
 	  case LUX_FLOAT:
 	    while (n--)
-	      *q.w++ = pixels[(Int) ((Byte) *p.f++)];
+	      *q.w++ = pixels[(Int) ((uint8_t) *p.f++)];
 	    break;
 	  case LUX_DOUBLE:
 	    while (n--)
-	      *q.w++ = pixels[(Int) ((Byte) *p.d++)];
+	      *q.w++ = pixels[(Int) ((uint8_t) *p.d++)];
 	    break;
 	}
       break;
@@ -3274,19 +3274,19 @@ Int lux_colorpixel(Int narg, Int ps[])
 	    break;
 	  case LUX_WORD:
 	    while (n--)
-	      *q.l++ = pixels[(Int) ((Byte) *p.w++)];
+	      *q.l++ = pixels[(Int) ((uint8_t) *p.w++)];
 	    break;
 	  case LUX_LONG:
 	    while (n--)
-	      *q.l++ = pixels[(Int) ((Byte) *p.l++)];
+	      *q.l++ = pixels[(Int) ((uint8_t) *p.l++)];
 	    break;
 	  case LUX_FLOAT:
 	    while (n--)
-	      *q.l++ = pixels[(Int) ((Byte) *p.f++)];
+	      *q.l++ = pixels[(Int) ((uint8_t) *p.f++)];
 	    break;
 	  case LUX_DOUBLE:
 	    while (n--)
-	      *q.l++ = pixels[(Int) ((Byte) *p.d++)];
+	      *q.l++ = pixels[(Int) ((uint8_t) *p.d++)];
 	    break;
 	}
       break;
@@ -3644,7 +3644,7 @@ Int xlabelwidth(s)
  /*------------------------------------------------------------------------*/
 Int lux_xtvread(Int narg, Int ps[])
 {
- /* read from an X window or pixmap and create a Byte array */
+ /* read from an X window or pixmap and create a uint8_t array */
  Int  nx, ny, ix, iy, wid, result_sym, dim[2], w, hh, type;
  pointer    ptr;
  Drawable        *src;
@@ -3975,15 +3975,15 @@ Int lux_xtvplane(Int narg, Int ps[])
 {
   Int iq, nx, ny, nz, nd, ix=0, iy=0, wid, hq, wq, ip;
   Int	zoom_sym, ns, ms;
-  Byte	*ptr, *ptr2, *ptr0;
-  static Byte *subfree;
-  Int zoomer2(Byte *, Int, Int, Int *, Int *, Int *, Int),
-    zoomer3(Byte *, Int, Int, Int *, Int *, Int *, Int),
-    zoomer4(Byte *, Int, Int, Int *, Int *, Int *, Int),
-    zoomer8(Byte *, Int, Int, Int *, Int *, Int *, Int),
-    zoomer16(Byte *, Int, Int, Int *, Int *, Int *, Int),
-    compress2(Byte *, Int, Int, Int *, Int *, Int *, Int),
-    compress4(Byte *, Int, Int, Int *, Int *, Int *, Int);
+  uint8_t	*ptr, *ptr2, *ptr0;
+  static uint8_t *subfree;
+  Int zoomer2(uint8_t *, Int, Int, Int *, Int *, Int *, Int),
+    zoomer3(uint8_t *, Int, Int, Int *, Int *, Int *, Int),
+    zoomer4(uint8_t *, Int, Int, Int *, Int *, Int *, Int),
+    zoomer8(uint8_t *, Int, Int, Int *, Int *, Int *, Int),
+    zoomer16(uint8_t *, Int, Int, Int *, Int *, Int *, Int),
+    compress2(uint8_t *, Int, Int, Int *, Int *, Int *, Int),
+    compress4(uint8_t *, Int, Int, Int *, Int *, Int *, Int);
 
   if (ck_events() != 1)
     return LUX_ERROR;
@@ -4019,7 +4019,7 @@ Int lux_xtvplane(Int narg, Int ps[])
     return luxerror("TVPLANE - window must be pre-defined, %d\n", narg > 4? ps[4]: 0, wid);
 
   /* get pointer to the unzoomed image */
-  ptr = (Byte *) array_data(iq) + ip*nx*ny;
+  ptr = (uint8_t *) array_data(iq) + ip*nx*ny;
 
   /* how much do we need ? depends on destination window and zoom */
   wq = wd[wid];
@@ -4045,7 +4045,7 @@ Int lux_xtvplane(Int narg, Int ps[])
   if (ix != 0 || iy != 0 || nx != wq || ny != hq) {
     /* 2 obvious upgrades, if zooming, the extraction and zoom can be
        combined and the data could be re-oriented while extracting */
-    Byte	*sub, *p;
+    uint8_t	*sub, *p;
     Int	m = hq, n, stride;
     
     p = ptr;
@@ -4111,7 +4111,7 @@ Int lux_xtvplane(Int narg, Int ps[])
   ptr0 = ptr2;
   wq = nx*ny;			/* size of final image */
   while (wq--) 
-    *ptr2++ = pixels[(Byte) *ptr++];
+    *ptr2++ = pixels[(uint8_t) *ptr++];
 
 		 /* create image structure */
   xi = XCreateImage(display, visual, depth, ZPixmap, 0, (char *) ptr0,
@@ -4163,7 +4163,7 @@ Int lux_tv3(Int narg, Int ps[])
 {
   Int	iq, nx, ny, mode, i, wid;
   float	fx, fy;
-  Byte	*bitmap1, *bitmap2;
+  uint8_t	*bitmap1, *bitmap2;
   pointer	data;
   Int	coordTrf(float *, float *, Int, Int);
 

@@ -50,7 +50,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
         unsigned char height_msb;
         unsigned char mask;
  } ;
- static void compress(Int, FILE *, Byte *, Int), output(Int),
+ static void compress(Int, FILE *, uint8_t *, Int), output(Int),
    cl_block(void), cl_hash(register Int) /*, char_init()*/;
  static void char_out(Int), flush_char(void);
 
@@ -72,7 +72,7 @@ Int lux_gifwrite(narg,ps)      /* gifwrite subroutine */
  FILE	*fout;
  Int    iq, nd, type, i;
  Int    nx, ny, ncolmap;
- Byte   codesize=8;
+ uint8_t   codesize=8;
  char   *p, *data, *colormap, *name;
  struct ahead   *h, *h2;
  struct GIFScreen gh = {"GIF87a", 0,0,0,0,247,0,0};
@@ -137,7 +137,7 @@ Int lux_gifwrite(narg,ps)      /* gifwrite subroutine */
  /* our code size is 8 */
  putc(codesize, fout);
  /* could probably use anybody's lzw compressor here */
- compress(codesize+1, fout, (Byte *) data, nx*ny);
+ compress(codesize+1, fout, (uint8_t *) data, nx*ny);
  
  putc(0, fout);
  putc(';', fout);
@@ -215,7 +215,7 @@ static Int free_ent = 0;       /* first unused entry */
  static Int EOFCode;
 
  /********************************************************/
-static void compress(Int init_bits, FILE *outfile, Byte *data, Int len)
+static void compress(Int init_bits, FILE *outfile, uint8_t *data, Int len)
  {
   register long fcode;
   register Int i = 0;

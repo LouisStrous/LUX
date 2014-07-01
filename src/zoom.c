@@ -97,7 +97,7 @@ Int lux_zoom(Int narg, Int ps[])
     menu_setup(void), lux_xport(Int, Int []),
     tvraw(pointer data, Int type, Int nx, Int ny, float x1, float x2,
 	  float y1, float y2, float sx, float sy, Int wid, float *mag,
-	  Int mode, double clo, double chi, Byte *bitmap1, Byte *bitmap2),
+	  Int mode, double clo, double chi, uint8_t *bitmap1, uint8_t *bitmap2),
     threecolors(float *, Int);
   Int	i, ntext, ndim, *dims, wid, mid, x = 0, y = 0, selected, j, type,
     nx, ny, sx, sy, sx0, sy0, ww, hw, nframe, stride, profile = -1,
@@ -954,7 +954,7 @@ Int tvzoom(Int narg, Int ps[])
   extern Int	last_wid;
   Int	tvraw(pointer data, Int type, Int nx, Int ny, float x1, float x2,
 	      float y1, float y2, float sx, float sy, Int wid, float *mag,
-	      Int mode, double clo, double chi, Byte *bitmap1, Byte *bitmap2);
+	      Int mode, double clo, double chi, uint8_t *bitmap1, uint8_t *bitmap2);
 
   pointer	data, image, bitmapdata, bitmap;
   float	x1, x2, y1, y2;

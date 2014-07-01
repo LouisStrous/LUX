@@ -230,7 +230,7 @@ Int setup_x_visual(Int desiredVisualClass)
        || visual->class == TrueColor) */
 
   /* we may need more than 8 bits to specify a color index */
-  if (depth <= 8*sizeof(Byte))
+  if (depth <= 8*sizeof(uint8_t))
     colorIndexType = LUX_BYTE;
   else if (depth <= 8*sizeof(Int))
     colorIndexType = LUX_WORD;
@@ -1003,9 +1003,9 @@ Int lux_colorComponents(Int narg, Int ps[])
 /* and blue components in <r>, <g>, and <b>, which range between 0 and 255. */
 /* <pixels> must have type */
 {
-  Byte	*data;
+  uint8_t	*data;
   Int *q1, *q2, *q3;
-  Byte	*red, *green, *blue;
+  uint8_t	*red, *green, *blue;
   Int	nelem, i, step, pix;
   XColor	*color;
 
@@ -1114,7 +1114,7 @@ Int lux_pixelsto8bit(Int narg, Int ps[])
   if (ncolors <= 256) {
     Int dims[2] = { 3, 256 };
     Int i, pix;
-    Byte *p, *q;
+    uint8_t *p, *q;
     Int *q1, step, *q2, *q3;
 
     /* we can use the indices from tolookup if we convert them to LUX_BYTE */
@@ -1218,7 +1218,7 @@ Int lux_colorstogrey(Int narg, Int ps[])
    LS 2003mar08 */
 {
   Int *q1, *q2, *q3, i;
-  Byte *data;
+  uint8_t *data;
   Int nelem, red, green, blue, grey, pix = 0, step;
   XColor *color;
     

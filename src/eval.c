@@ -4939,390 +4939,476 @@ void lux_div(void)
   scalar        re, im, d;
 
   switch (lhsType) {
+  case LUX_BYTE:
+    switch (rhsType) {
     case LUX_BYTE:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--)
-            *tp.b++ = *lp.b++ / *rp.b++;
-          break;
-        case LUX_WORD:
-          while (nRepeat--)
-            *tp.w++ = (int16_t) *lp.b++ / *rp.w++;
-          break;
-        case LUX_LONG:
-          while (nRepeat--)
-            *tp.l++ = (int32_t) *lp.b++ / *rp.l++;
-          break;
-        case LUX_FLOAT:
-          while (nRepeat--)
-            *tp.f++ = (float) *lp.b++ / *rp.f++;
-          break;
-        case LUX_DOUBLE:
-          while (nRepeat--)
-            *tp.d++ = (double) *lp.b++ / *rp.d++;
-          break;
-        case LUX_CFLOAT:
-          while (nRepeat--) {
-            d.f = rp.cf->real*rp.cf->real
-              + rp.cf->imaginary*rp.cf->imaginary;
-            d.f = 1.0/d.f;
-            re.f = ((float) *lp.b * rp.cf->real)*d.f;
-            im.f = (-(float) *lp.b++ * rp.cf++->imaginary)*d.f;
-            tp.cf->real = re.f;
-            tp.cf++->imaginary = im.f;
-          }
-          break;
-        case LUX_CDOUBLE:
-          while (nRepeat--) {
-            d.d = rp.cd->real*rp.cd->real
-              + rp.cd->imaginary*rp.cd->imaginary;
-            d.d = 1.0/d.d;
-            re.d = ((double) *lp.b * rp.cd->real)*d.d;
-            im.d = (-(double) *lp.b++ * rp.cd++->imaginary)*d.d;
-            tp.cd->real = re.d;
-            tp.cd++->imaginary = im.d;
-          }
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
-      }
+      while (nRepeat--)
+        *tp.b++ = *lp.b++ / *rp.b++;
       break;
     case LUX_WORD:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--)
-            *tp.w++ = *lp.w++ / (int16_t) *rp.b++;
-          break;
-        case LUX_WORD:
-          while (nRepeat--)
-            *tp.w++ = *lp.w++ / *rp.w++;
-          break;
-        case LUX_LONG:
-          while (nRepeat--)
-            *tp.l++ = (int32_t) *lp.w++ / *rp.l++;
-          break;
-        case LUX_FLOAT:
-          while (nRepeat--)
-            *tp.f++ = (float) *lp.w++ / *rp.f++;
-          break;
-        case LUX_DOUBLE:
-          while (nRepeat--)
-            *tp.d++ = (double) *lp.w++ / *rp.d++;
-          break;
-        case LUX_CFLOAT:
-          while (nRepeat--) {
-            d.f = rp.cf->real*rp.cf->real
-              + rp.cf->imaginary*rp.cf->imaginary;
-            d.f = 1.0/d.f;
-            re.f = ((float) *lp.w * rp.cf->real)*d.f;
-            im.f = (-(float) *lp.w++ * rp.cf++->imaginary)*d.f;
-            tp.cf->real = re.f;
-            tp.cf++->imaginary = im.f;
-          }
-          break;
-        case LUX_CDOUBLE:
-          while (nRepeat--) {
-            d.d = rp.cd->real*rp.cd->real
-              + rp.cd->imaginary*rp.cd->imaginary;
-            d.d = 1.0/d.d;
-            re.d = ((double) *lp.w * rp.cd->real)*d.d;
-            im.d = (-(double) *lp.w++ * rp.cd++->imaginary)*d.d;
-            tp.cd->real = re.d;
-            tp.cd++->imaginary = im.d;
-          }
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
-      }
+      while (nRepeat--)
+        *tp.w++ = (int16_t) *lp.b++ / *rp.w++;
       break;
     case LUX_LONG:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--)
-            *tp.l++ = *lp.l++ / (int32_t) *rp.b++;
-          break;
-        case LUX_WORD:
-          while (nRepeat--)
-            *tp.l++ = *lp.l++ / (int32_t) *rp.w++;
-          break;
-        case LUX_LONG:
-          while (nRepeat--)
-            *tp.l++ = *lp.l++ / *rp.l++;
-          break;
-        case LUX_FLOAT:
-          while (nRepeat--)
-            *tp.f++ = (float) *lp.l++ / *rp.f++;
-          break;
-        case LUX_DOUBLE:
-          while (nRepeat--)
-            *tp.d++ = (double) *lp.l++ / *rp.d++;
-          break;
-        case LUX_CFLOAT:
-          while (nRepeat--) {
-            d.f = rp.cf->real*rp.cf->real
-              + rp.cf->imaginary*rp.cf->imaginary;
-            d.f = 1.0/d.f;
-            re.f = ((float) *lp.l * rp.cf->real)*d.f;
-            im.f = (-(float) *lp.l++ * rp.cf++->imaginary)*d.f;
-            tp.cf->real = re.f;
-            tp.cf++->imaginary = im.f;
-          }
-          break;
-        case LUX_CDOUBLE:
-          while (nRepeat--) {
-            d.d = rp.cd->real*rp.cd->real
-              + rp.cd->imaginary*rp.cd->imaginary;
-            d.d = 1.0/d.d;
-            re.d = ((double) *lp.l * rp.cd->real)*d.d;
-            im.d = (-(double) *lp.l++ * rp.cd++->imaginary)*d.d;
-            tp.cd->real = re.d;
-            tp.cd++->imaginary = im.d;
-          }
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
-      }
+      while (nRepeat--)
+        *tp.l++ = (int32_t) *lp.b++ / *rp.l++;
+      break;
+    case LUX_QUAD:
+      while (nRepeat--)
+        *tp.q++ = (int64_t) *lp.b++ / *rp.q++;
       break;
     case LUX_FLOAT:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--)
-            *tp.f++ = *lp.f++ / (float) *rp.b++;
-          break;
-        case LUX_WORD:
-          while (nRepeat--)
-            *tp.f++ = *lp.f++ / (float) *rp.w++;
-          break;
-        case LUX_LONG:
-          while (nRepeat--)
-            *tp.f++ = *lp.f++ / (float) *rp.l++;
-          break;
-        case LUX_FLOAT:
-          while (nRepeat--)
-            *tp.f++ = *lp.f++ / *rp.f++;
-          break;
-        case LUX_DOUBLE:
-          while (nRepeat--)
-            *tp.d++ = (double) *lp.f++ / *rp.d++;
-          break;
-        case LUX_CFLOAT:
-          while (nRepeat--) {
-            d.f = rp.cf->real*rp.cf->real
-              + rp.cf->imaginary*rp.cf->imaginary;
-            d.f = 1.0/d.f;
-            re.f = ((float) *lp.f * rp.cf->real)*d.f;
-            im.f = (-(float) *lp.f++ * rp.cf++->imaginary)*d.f;
-            tp.cf->real = re.f;
-            tp.cf++->imaginary = im.f;
-          }
-          break;
-        case LUX_CDOUBLE:
-          while (nRepeat--) {
-            d.d = rp.cd->real*rp.cd->real
-              + rp.cd->imaginary*rp.cd->imaginary;
-            d.d = 1.0/d.d;
-            re.d = ((double) *lp.f * rp.cd->real)*d.d;
-            im.d = (-(double) *lp.f++ * rp.cd++->imaginary)*d.d;
-            tp.cd->real = re.d;
-            tp.cd++->imaginary = im.d;
-          }
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
-      }
+      while (nRepeat--)
+        *tp.f++ = (float) *lp.b++ / *rp.f++;
       break;
     case LUX_DOUBLE:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--)
-            *tp.d++ = *lp.d++ / (double) *rp.b++;
-          break;
-        case LUX_WORD:
-          while (nRepeat--)
-            *tp.d++ = *lp.d++ / (double) *rp.w++;
-          break;
-        case LUX_LONG:
-          while (nRepeat--)
-            *tp.d++ = *lp.d++ / (double) *rp.l++;
-          break;
-        case LUX_FLOAT:
-          while (nRepeat--)
-            *tp.d++ = *lp.d++ / (double) *rp.f++;
-          break;
-        case LUX_DOUBLE:
-          while (nRepeat--)
-            *tp.d++ = *lp.d++ / *rp.d++;
-          break;
-        case LUX_CFLOAT:
-          while (nRepeat--) {
-            d.d = (double) rp.cf->real*(double) rp.cf->real
-             + (double) rp.cf->imaginary*(double) rp.cf->imaginary;
-            d.d = 1.0/d.d;
-            re.d = (*lp.d * (double) rp.cf->real)*d.d;
-            im.d = (-*lp.d++ * (double) rp.cf++->imaginary)*d.d;
-            tp.cd->real = re.d;
-            tp.cd++->imaginary = im.d;
-          }
-          break;
-        case LUX_CDOUBLE:
-          while (nRepeat--) {
-            d.d = rp.cd->real*rp.cd->real
-              + rp.cd->imaginary*rp.cd->imaginary;
-            d.d = 1.0/d.d;
-            re.d = (*lp.d * rp.cd->real)*d.d;
-            im.d = (-*lp.d++ * rp.cd++->imaginary)*d.d;
-            tp.cd->real = re.d;
-            tp.cd++->imaginary = im.d;
-          }
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
-      }
+      while (nRepeat--)
+        *tp.d++ = (double) *lp.b++ / *rp.d++;
       break;
     case LUX_CFLOAT:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--) {
-            d.f = 1.0/(float) *rp.b++;
-            tp.cf->real = lp.cf->real*d.f;
-            tp.cf++->imaginary = lp.cf++->imaginary*d.f;
-          }
-          break;
-        case LUX_WORD:
-          while (nRepeat--) {
-            d.f = 1.0/(float) *rp.w++;
-            tp.cf->real = lp.cf->real*d.f;
-            tp.cf++->imaginary = lp.cf++->imaginary*d.f;
-          }
-          break;
-        case LUX_LONG:
-          while (nRepeat--) {
-            d.f = 1.0/(float) *rp.l++;
-            tp.cf->real = lp.cf->real*d.f;
-            tp.cf++->imaginary = lp.cf++->imaginary*d.f;
-          }
-          break;
-        case LUX_FLOAT:
-          while (nRepeat--) {
-            d.f = 1.0/ *rp.f++;
-            tp.cf->real = lp.cf->real*d.f;
-            tp.cf++->imaginary = lp.cf++->imaginary*d.f;
-          }
-          break;
-        case LUX_DOUBLE:
-          while (nRepeat--) {
-            d.d = 1.0/ *rp.d++;
-            tp.cd->real = (double) lp.cf->real*d.d;
-            tp.cd++->imaginary = (double) lp.cf++->imaginary*d.d;
-          }
-          break;
-        case LUX_CFLOAT:
-          while (nRepeat--) {
-            d.f = rp.cf->real*rp.cf->real
-              + rp.cf->imaginary*rp.cf->imaginary;
-            d.f = 1.0/d.f;
-            re.f = (lp.cf->real*rp.cf->real
-                    + lp.cf->imaginary*rp.cf->imaginary)*d.f;
-            im.f = (lp.cf->imaginary*rp.cf->real
-                    - lp.cf->real*rp.cf->imaginary)*d.f;
-            tp.cf->real = re.f;
-            tp.cf++->imaginary = im.f;
-            lp.cf++;
-            rp.cf++;
-          }
-          break;
-        case LUX_CDOUBLE:
-          while (nRepeat--) {
-            d.d = rp.cd->real*rp.cd->real
-              + rp.cd->imaginary*rp.cd->imaginary;
-            d.d = 1.0/d.d;
-            re.d = ((double) lp.cf->real*rp.cd->real
-                    + (double) lp.cf->imaginary*rp.cd->imaginary)*d.d;
-            im.d = ((double) lp.cf->imaginary*rp.cd->real
-                    - (double) lp.cf->real*rp.cd->imaginary)*d.d;
-            tp.cd->real = re.d;
-            tp.cd++->imaginary = im.d;
-            lp.cf++;
-            rp.cd++;
-          }
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
+      while (nRepeat--) {
+        d.f = rp.cf->real*rp.cf->real
+          + rp.cf->imaginary*rp.cf->imaginary;
+        d.f = 1.0/d.f;
+        re.f = ((float) *lp.b * rp.cf->real)*d.f;
+        im.f = (-(float) *lp.b++ * rp.cf++->imaginary)*d.f;
+        tp.cf->real = re.f;
+        tp.cf++->imaginary = im.f;
       }
       break;
     case LUX_CDOUBLE:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--) {
-            d.d = 1.0/(double) *rp.b++;
-            tp.cd->real = lp.cd->real*d.d;
-            tp.cd++->imaginary = lp.cd++->imaginary*d.d;
-          }
-          break;
-        case LUX_WORD:
-          while (nRepeat--) {
-            d.d = 1.0/(double) *rp.w++;
-            tp.cd->real = lp.cd->real*d.d;
-            tp.cd++->imaginary = lp.cd++->imaginary*d.d;
-          }
-          break;
-        case LUX_LONG:
-          while (nRepeat--) {
-            d.d = 1.0/(double) *rp.l++;
-            tp.cd->real = lp.cd->real*d.d;
-            tp.cd++->imaginary = lp.cd++->imaginary*d.d;
-          }
-          break;
-        case LUX_FLOAT:
-          while (nRepeat--) {
-            d.d = 1.0/(double) *rp.f++;
-            tp.cd->real = lp.cd->real*d.d;
-            tp.cd++->imaginary = lp.cd++->imaginary*d.d;
-          }
-          break;
-        case LUX_DOUBLE:
-          while (nRepeat--) {
-            d.d = 1.0/ *rp.d++;
-            tp.cd->real = lp.cd->real*d.d;
-            tp.cd++->imaginary = lp.cd++->imaginary*d.d;
-          }
-          break;
-        case LUX_CFLOAT:
-          while (nRepeat--) {
-            d.d = (double) rp.cf->real*(double) rp.cf->real
-              + (double) rp.cf->imaginary*(double) rp.cf->imaginary;
-            d.d = 1.0/d.d;
-            re.d = (lp.cd->real*(double) rp.cf->real
-                    + lp.cd->imaginary*(double) rp.cf->imaginary)*d.d;
-            im.d = (lp.cd->imaginary*(double) rp.cf->real
-                    - lp.cd->real*(double) rp.cf->imaginary)*d.d;
-            tp.cd->real = re.d;
-            tp.cd++->imaginary = im.d;
-            lp.cd++;
-            rp.cf++;
-          }
-          break;
-        case LUX_CDOUBLE:
-          while (nRepeat--) {
-            d.d = rp.cd->real*rp.cd->real
-              + rp.cd->imaginary*rp.cd->imaginary;
-            d.d = 1.0/d.d;
-            re.d = (lp.cd->real*rp.cd->real
-                    + lp.cd->imaginary*rp.cd->imaginary)*d.d;
-            im.d = (lp.cd->imaginary*rp.cd->real
-                    - lp.cd->real*rp.cd->imaginary)*d.d;
-            tp.cd->real = re.d;
-            tp.cd++->imaginary = im.d;
-            lp.cd++;
-            rp.cd++;
-          }
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
+      while (nRepeat--) {
+        d.d = rp.cd->real*rp.cd->real
+          + rp.cd->imaginary*rp.cd->imaginary;
+        d.d = 1.0/d.d;
+        re.d = ((double) *lp.b * rp.cd->real)*d.d;
+        im.d = (-(double) *lp.b++ * rp.cd++->imaginary)*d.d;
+        tp.cd->real = re.d;
+        tp.cd++->imaginary = im.d;
       }
-      break;      
+      break;
     default:
-      cerror(ILL_TYPE, lhs, typeName(lhsType));
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_WORD:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--)
+        *tp.w++ = *lp.w++ / (int16_t) *rp.b++;
+      break;
+    case LUX_WORD:
+      while (nRepeat--)
+        *tp.w++ = *lp.w++ / *rp.w++;
+      break;
+    case LUX_LONG:
+      while (nRepeat--)
+        *tp.l++ = (int32_t) *lp.w++ / *rp.l++;
+      break;
+    case LUX_QUAD:
+      while (nRepeat--)
+        *tp.q++ = (int64_t) *lp.w++ / *rp.q++;
+      break;
+    case LUX_FLOAT:
+      while (nRepeat--)
+        *tp.f++ = (float) *lp.w++ / *rp.f++;
+      break;
+    case LUX_DOUBLE:
+      while (nRepeat--)
+        *tp.d++ = (double) *lp.w++ / *rp.d++;
+      break;
+    case LUX_CFLOAT:
+      while (nRepeat--) {
+        d.f = rp.cf->real*rp.cf->real
+          + rp.cf->imaginary*rp.cf->imaginary;
+        d.f = 1.0/d.f;
+        re.f = ((float) *lp.w * rp.cf->real)*d.f;
+        im.f = (-(float) *lp.w++ * rp.cf++->imaginary)*d.f;
+        tp.cf->real = re.f;
+        tp.cf++->imaginary = im.f;
+      }
+      break;
+    case LUX_CDOUBLE:
+      while (nRepeat--) {
+        d.d = rp.cd->real*rp.cd->real
+          + rp.cd->imaginary*rp.cd->imaginary;
+        d.d = 1.0/d.d;
+        re.d = ((double) *lp.w * rp.cd->real)*d.d;
+        im.d = (-(double) *lp.w++ * rp.cd++->imaginary)*d.d;
+        tp.cd->real = re.d;
+        tp.cd++->imaginary = im.d;
+      }
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_LONG:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--)
+        *tp.l++ = *lp.l++ / (int32_t) *rp.b++;
+      break;
+    case LUX_WORD:
+      while (nRepeat--)
+        *tp.l++ = *lp.l++ / (int32_t) *rp.w++;
+      break;
+    case LUX_LONG:
+      while (nRepeat--)
+        *tp.l++ = *lp.l++ / *rp.l++;
+      break;
+    case LUX_QUAD:
+      while (nRepeat--)
+        *tp.q++ = *lp.l++ / *rp.q++;
+      break;
+    case LUX_FLOAT:
+      while (nRepeat--)
+        *tp.f++ = (float) *lp.l++ / *rp.f++;
+      break;
+    case LUX_DOUBLE:
+      while (nRepeat--)
+        *tp.d++ = (double) *lp.l++ / *rp.d++;
+      break;
+    case LUX_CFLOAT:
+      while (nRepeat--) {
+        d.f = rp.cf->real*rp.cf->real
+          + rp.cf->imaginary*rp.cf->imaginary;
+        d.f = 1.0/d.f;
+        re.f = ((float) *lp.l * rp.cf->real)*d.f;
+        im.f = (-(float) *lp.l++ * rp.cf++->imaginary)*d.f;
+        tp.cf->real = re.f;
+        tp.cf++->imaginary = im.f;
+      }
+      break;
+    case LUX_CDOUBLE:
+      while (nRepeat--) {
+        d.d = rp.cd->real*rp.cd->real
+          + rp.cd->imaginary*rp.cd->imaginary;
+        d.d = 1.0/d.d;
+        re.d = ((double) *lp.l * rp.cd->real)*d.d;
+        im.d = (-(double) *lp.l++ * rp.cd++->imaginary)*d.d;
+        tp.cd->real = re.d;
+        tp.cd++->imaginary = im.d;
+      }
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_QUAD:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--)
+        *tp.q++ = *lp.q++ / (int64_t) *rp.b++;
+      break;
+    case LUX_WORD:
+      while (nRepeat--)
+        *tp.q++ = *lp.q++ / (int64_t) *rp.w++;
+      break;
+    case LUX_LONG:
+      while (nRepeat--)
+        *tp.q++ = *lp.q++ / (int64_t) *rp.l++;
+      break;
+    case LUX_QUAD:
+      while (nRepeat--)
+        *tp.q++ = *lp.q++ / *rp.q++;
+      break;
+    case LUX_FLOAT:
+      while (nRepeat--)
+        *tp.d++ = (double) *lp.q++ / *rp.f++;
+      break;
+    case LUX_DOUBLE:
+      while (nRepeat--)
+        *tp.d++ = (double) *lp.q++ / *rp.d++;
+      break;
+    case LUX_CFLOAT:
+      while (nRepeat--) {
+        d.d = rp.cf->real*rp.cf->real
+          + rp.cf->imaginary*rp.cf->imaginary;
+        d.d = 1.0/d.d;
+        re.d = ((double) *lp.q * rp.cf->real)*d.d;
+        im.d = (-(double) *lp.q++ * rp.cf++->imaginary)*d.d;
+        tp.cd->real = re.d;
+        tp.cd++->imaginary = im.d;
+      }
+      break;
+    case LUX_CDOUBLE:
+      while (nRepeat--) {
+        d.d = rp.cd->real*rp.cd->real
+          + rp.cd->imaginary*rp.cd->imaginary;
+        d.d = 1.0/d.d;
+        re.d = ((double) *lp.q * rp.cd->real)*d.d;
+        im.d = (-(double) *lp.q++ * rp.cd++->imaginary)*d.d;
+        tp.cd->real = re.d;
+        tp.cd++->imaginary = im.d;
+      }
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_FLOAT:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--)
+        *tp.f++ = *lp.f++ / (float) *rp.b++;
+      break;
+    case LUX_WORD:
+      while (nRepeat--)
+        *tp.f++ = *lp.f++ / (float) *rp.w++;
+      break;
+    case LUX_LONG:
+      while (nRepeat--)
+        *tp.f++ = *lp.f++ / (float) *rp.l++;
+      break;
+    case LUX_QUAD:
+      while (nRepeat--)
+        *tp.d++ = *lp.f++ / (double) *rp.q++;
+      break;
+    case LUX_FLOAT:
+      while (nRepeat--)
+        *tp.f++ = *lp.f++ / *rp.f++;
+      break;
+    case LUX_DOUBLE:
+      while (nRepeat--)
+        *tp.d++ = (double) *lp.f++ / *rp.d++;
+      break;
+    case LUX_CFLOAT:
+      while (nRepeat--) {
+        d.f = rp.cf->real*rp.cf->real
+          + rp.cf->imaginary*rp.cf->imaginary;
+        d.f = 1.0/d.f;
+        re.f = ((float) *lp.f * rp.cf->real)*d.f;
+        im.f = (-(float) *lp.f++ * rp.cf++->imaginary)*d.f;
+        tp.cf->real = re.f;
+        tp.cf++->imaginary = im.f;
+      }
+      break;
+    case LUX_CDOUBLE:
+      while (nRepeat--) {
+        d.d = rp.cd->real*rp.cd->real
+          + rp.cd->imaginary*rp.cd->imaginary;
+        d.d = 1.0/d.d;
+        re.d = ((double) *lp.f * rp.cd->real)*d.d;
+        im.d = (-(double) *lp.f++ * rp.cd++->imaginary)*d.d;
+        tp.cd->real = re.d;
+        tp.cd++->imaginary = im.d;
+      }
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_DOUBLE:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--)
+        *tp.d++ = *lp.d++ / (double) *rp.b++;
+      break;
+    case LUX_WORD:
+      while (nRepeat--)
+        *tp.d++ = *lp.d++ / (double) *rp.w++;
+      break;
+    case LUX_LONG:
+      while (nRepeat--)
+        *tp.d++ = *lp.d++ / (double) *rp.l++;
+      break;
+    case LUX_QUAD:
+      while (nRepeat--)
+        *tp.d++ = *lp.d++ / (double) *rp.q++;
+      break;
+    case LUX_FLOAT:
+      while (nRepeat--)
+        *tp.d++ = *lp.d++ / (double) *rp.f++;
+      break;
+    case LUX_DOUBLE:
+      while (nRepeat--)
+        *tp.d++ = *lp.d++ / *rp.d++;
+      break;
+    case LUX_CFLOAT:
+      while (nRepeat--) {
+        d.d = (double) rp.cf->real*(double) rp.cf->real
+          + (double) rp.cf->imaginary*(double) rp.cf->imaginary;
+        d.d = 1.0/d.d;
+        re.d = (*lp.d * (double) rp.cf->real)*d.d;
+        im.d = (-*lp.d++ * (double) rp.cf++->imaginary)*d.d;
+        tp.cd->real = re.d;
+        tp.cd++->imaginary = im.d;
+      }
+      break;
+    case LUX_CDOUBLE:
+      while (nRepeat--) {
+        d.d = rp.cd->real*rp.cd->real
+          + rp.cd->imaginary*rp.cd->imaginary;
+        d.d = 1.0/d.d;
+        re.d = (*lp.d * rp.cd->real)*d.d;
+        im.d = (-*lp.d++ * rp.cd++->imaginary)*d.d;
+        tp.cd->real = re.d;
+        tp.cd++->imaginary = im.d;
+      }
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_CFLOAT:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--) {
+        d.f = 1.0/(float) *rp.b++;
+        tp.cf->real = lp.cf->real*d.f;
+        tp.cf++->imaginary = lp.cf++->imaginary*d.f;
+      }
+      break;
+    case LUX_WORD:
+      while (nRepeat--) {
+        d.f = 1.0/(float) *rp.w++;
+        tp.cf->real = lp.cf->real*d.f;
+        tp.cf++->imaginary = lp.cf++->imaginary*d.f;
+      }
+      break;
+    case LUX_LONG:
+      while (nRepeat--) {
+        d.f = 1.0/(float) *rp.l++;
+        tp.cf->real = lp.cf->real*d.f;
+        tp.cf++->imaginary = lp.cf++->imaginary*d.f;
+      }
+      break;
+    case LUX_QUAD:
+      while (nRepeat--) {
+        d.d = 1.0/(double) *rp.q++;
+        tp.cd->real = lp.cf->real*d.d;
+        tp.cd++->imaginary = lp.cf++->imaginary*d.d;
+      }
+      break;
+    case LUX_FLOAT:
+      while (nRepeat--) {
+        d.f = 1.0/ *rp.f++;
+        tp.cf->real = lp.cf->real*d.f;
+        tp.cf++->imaginary = lp.cf++->imaginary*d.f;
+      }
+      break;
+    case LUX_DOUBLE:
+      while (nRepeat--) {
+        d.d = 1.0/ *rp.d++;
+        tp.cd->real = (double) lp.cf->real*d.d;
+        tp.cd++->imaginary = (double) lp.cf++->imaginary*d.d;
+      }
+      break;
+    case LUX_CFLOAT:
+      while (nRepeat--) {
+        d.f = rp.cf->real*rp.cf->real
+          + rp.cf->imaginary*rp.cf->imaginary;
+        d.f = 1.0/d.f;
+        re.f = (lp.cf->real*rp.cf->real
+                + lp.cf->imaginary*rp.cf->imaginary)*d.f;
+        im.f = (lp.cf->imaginary*rp.cf->real
+                - lp.cf->real*rp.cf->imaginary)*d.f;
+        tp.cf->real = re.f;
+        tp.cf++->imaginary = im.f;
+        lp.cf++;
+        rp.cf++;
+      }
+      break;
+    case LUX_CDOUBLE:
+      while (nRepeat--) {
+        d.d = rp.cd->real*rp.cd->real
+          + rp.cd->imaginary*rp.cd->imaginary;
+        d.d = 1.0/d.d;
+        re.d = ((double) lp.cf->real*rp.cd->real
+                + (double) lp.cf->imaginary*rp.cd->imaginary)*d.d;
+        im.d = ((double) lp.cf->imaginary*rp.cd->real
+                - (double) lp.cf->real*rp.cd->imaginary)*d.d;
+        tp.cd->real = re.d;
+        tp.cd++->imaginary = im.d;
+        lp.cf++;
+        rp.cd++;
+      }
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_CDOUBLE:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--) {
+        d.d = 1.0/(double) *rp.b++;
+        tp.cd->real = lp.cd->real*d.d;
+        tp.cd++->imaginary = lp.cd++->imaginary*d.d;
+      }
+      break;
+    case LUX_WORD:
+      while (nRepeat--) {
+        d.d = 1.0/(double) *rp.w++;
+        tp.cd->real = lp.cd->real*d.d;
+        tp.cd++->imaginary = lp.cd++->imaginary*d.d;
+      }
+      break;
+    case LUX_LONG:
+      while (nRepeat--) {
+        d.d = 1.0/(double) *rp.l++;
+        tp.cd->real = lp.cd->real*d.d;
+        tp.cd++->imaginary = lp.cd++->imaginary*d.d;
+      }
+      break;
+    case LUX_QUAD:
+      while (nRepeat--) {
+        d.d = 1.0/(double) *rp.q++;
+        tp.cd->real = lp.cd->real*d.d;
+        tp.cd++->imaginary = lp.cd++->imaginary*d.d;
+      }
+      break;
+    case LUX_FLOAT:
+      while (nRepeat--) {
+        d.d = 1.0/(double) *rp.f++;
+        tp.cd->real = lp.cd->real*d.d;
+        tp.cd++->imaginary = lp.cd++->imaginary*d.d;
+      }
+      break;
+    case LUX_DOUBLE:
+      while (nRepeat--) {
+        d.d = 1.0/ *rp.d++;
+        tp.cd->real = lp.cd->real*d.d;
+        tp.cd++->imaginary = lp.cd++->imaginary*d.d;
+      }
+      break;
+    case LUX_CFLOAT:
+      while (nRepeat--) {
+        d.d = (double) rp.cf->real*(double) rp.cf->real
+          + (double) rp.cf->imaginary*(double) rp.cf->imaginary;
+        d.d = 1.0/d.d;
+        re.d = (lp.cd->real*(double) rp.cf->real
+                + lp.cd->imaginary*(double) rp.cf->imaginary)*d.d;
+        im.d = (lp.cd->imaginary*(double) rp.cf->real
+                - lp.cd->real*(double) rp.cf->imaginary)*d.d;
+        tp.cd->real = re.d;
+        tp.cd++->imaginary = im.d;
+        lp.cd++;
+        rp.cf++;
+      }
+      break;
+    case LUX_CDOUBLE:
+      while (nRepeat--) {
+        d.d = rp.cd->real*rp.cd->real
+          + rp.cd->imaginary*rp.cd->imaginary;
+        d.d = 1.0/d.d;
+        re.d = (lp.cd->real*rp.cd->real
+                + lp.cd->imaginary*rp.cd->imaginary)*d.d;
+        im.d = (lp.cd->imaginary*rp.cd->real
+                - lp.cd->real*rp.cd->imaginary)*d.d;
+        tp.cd->real = re.d;
+        tp.cd++->imaginary = im.d;
+        lp.cd++;
+        rp.cd++;
+      }
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  default:
+    cerror(ILL_TYPE, lhs, typeName(lhsType));
   }
 }
 /*----------------------------------------------------------*/
@@ -5332,386 +5418,472 @@ void lux_div_as(void)
   scalar        re, im, d;
 
   switch (lhsType) {
+  case LUX_BYTE:
+    switch (rhsType) {
     case LUX_BYTE:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--)
-            *tp.b++ = *lp.b++ / *rp.b;
-          break;
-        case LUX_WORD:
-          while (nRepeat--)
-            *tp.w++ = (int16_t) *lp.b++ / *rp.w;
-          break;
-        case LUX_LONG:
-          while (nRepeat--)
-            *tp.l++ = (int32_t) *lp.b++ / *rp.l;
-          break;
-        case LUX_FLOAT:
-          while (nRepeat--)
-            *tp.f++ = (float) *lp.b++ / *rp.f;
-          break;
-        case LUX_DOUBLE:
-          while (nRepeat--)
-            *tp.d++ = (double) *lp.b++ / *rp.d;
-          break;
-        case LUX_CFLOAT:
-          while (nRepeat--) {
-            d.f = rp.cf->real*rp.cf->real
-              + rp.cf->imaginary*rp.cf->imaginary;
-            d.f = 1.0/d.f;
-            re.f = ((float) *lp.b * rp.cf->real)*d.f;
-            im.f = (-(float) *lp.b++ * rp.cf->imaginary)*d.f;
-            tp.cf->real = re.f;
-            tp.cf++->imaginary = im.f;
-          }
-          break;
-        case LUX_CDOUBLE:
-          while (nRepeat--) {
-            d.d = rp.cd->real*rp.cd->real
-              + rp.cd->imaginary*rp.cd->imaginary;
-            d.d = 1.0/d.d;
-            re.d = ((double) *lp.b * rp.cd->real)*d.d;
-            im.d = (-(double) *lp.b++ * rp.cd->imaginary)*d.d;
-            tp.cd->real = re.d;
-            tp.cd++->imaginary = im.d;
-          }
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
-      }
+      while (nRepeat--)
+        *tp.b++ = *lp.b++ / *rp.b;
       break;
     case LUX_WORD:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--)
-            *tp.w++ = *lp.w++ / (int16_t) *rp.b;
-          break;
-        case LUX_WORD:
-          while (nRepeat--)
-            *tp.w++ = *lp.w++ / *rp.w;
-          break;
-        case LUX_LONG:
-          while (nRepeat--)
-            *tp.l++ = (int32_t) *lp.w++ / *rp.l;
-          break;
-        case LUX_FLOAT:
-          while (nRepeat--)
-            *tp.f++ = (float) *lp.w++ / *rp.f;
-          break;
-        case LUX_DOUBLE:
-          while (nRepeat--)
-            *tp.d++ = (double) *lp.w++ / *rp.d;
-          break;
-        case LUX_CFLOAT:
-          while (nRepeat--) {
-            d.f = rp.cf->real*rp.cf->real
-              + rp.cf->imaginary*rp.cf->imaginary;
-            d.f = 1.0/d.f;
-            re.f = ((float) *lp.w * rp.cf->real)*d.f;
-            im.f = (-(float) *lp.w++ * rp.cf->imaginary)*d.f;
-            tp.cf->real = re.f;
-            tp.cf++->imaginary = im.f;
-          }
-          break;
-        case LUX_CDOUBLE:
-          while (nRepeat--) {
-            d.d = rp.cd->real*rp.cd->real
-              + rp.cd->imaginary*rp.cd->imaginary;
-            d.d = 1.0/d.d;
-            re.d = ((double) *lp.w * rp.cd->real)*d.d;
-            im.d = (-(double) *lp.w++ * rp.cd->imaginary)*d.d;
-            tp.cd->real = re.d;
-            tp.cd++->imaginary = im.d;
-          }
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
-      }
+      while (nRepeat--)
+        *tp.w++ = (int16_t) *lp.b++ / *rp.w;
       break;
     case LUX_LONG:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--)
-            *tp.l++ = *lp.l++ / (int32_t) *rp.b;
-          break;
-        case LUX_WORD:
-          while (nRepeat--)
-            *tp.l++ = *lp.l++ / (int32_t) *rp.w;
-          break;
-        case LUX_LONG:
-          while (nRepeat--)
-            *tp.l++ = *lp.l++ / *rp.l;
-          break;
-        case LUX_FLOAT:
-          while (nRepeat--)
-            *tp.f++ = (float) *lp.l++ / *rp.f;
-          break;
-        case LUX_DOUBLE:
-          while (nRepeat--)
-            *tp.d++ = (double) *lp.l++ / *rp.d;
-          break;
-        case LUX_CFLOAT:
-          while (nRepeat--) {
-            d.f = rp.cf->real*rp.cf->real
-              + rp.cf->imaginary*rp.cf->imaginary;
-            d.f = 1.0/d.f;
-            re.f = ((float) *lp.l * rp.cf->real)*d.f;
-            im.f = (-(float) *lp.l++ * rp.cf->imaginary)*d.f;
-            tp.cf->real = re.f;
-            tp.cf++->imaginary = im.f;
-          }
-          break;
-        case LUX_CDOUBLE:
-          while (nRepeat--) {
-            d.d = rp.cd->real*rp.cd->real
-              + rp.cd->imaginary*rp.cd->imaginary;
-            d.d = 1.0/d.d;
-            re.d = ((double) *lp.l * rp.cd->real)*d.d;
-            im.d = (-(double) *lp.l++ * rp.cd->imaginary)*d.d;
-            tp.cd->real = re.d;
-            tp.cd++->imaginary = im.d;
-          }
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
-      }
+      while (nRepeat--)
+        *tp.l++ = (int32_t) *lp.b++ / *rp.l;
+      break;
+    case LUX_QUAD:
+      while (nRepeat--)
+        *tp.q++ = (int64_t) *lp.b++ / *rp.q;
       break;
     case LUX_FLOAT:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--)
-            *tp.f++ = *lp.f++ / (float) *rp.b;
-          break;
-        case LUX_WORD:
-          while (nRepeat--)
-            *tp.f++ = *lp.f++ / (float) *rp.w;
-          break;
-        case LUX_LONG:
-          while (nRepeat--)
-            *tp.f++ = *lp.f++ / (float) *rp.l;
-          break;
-        case LUX_FLOAT:
-          while (nRepeat--)
-            *tp.f++ = *lp.f++ / *rp.f;
-          break;
-        case LUX_DOUBLE:
-          while (nRepeat--)
-            *tp.d++ = (double) *lp.f++ / *rp.d;
-          break;
-        case LUX_CFLOAT:
-          while (nRepeat--) {
-            d.f = rp.cf->real*rp.cf->real
-              + rp.cd->imaginary*rp.cd->imaginary;
-            d.f = 1.0/d.f;
-            re.f = ((float) *lp.f * rp.cf->real)*d.f;
-            im.f = (-(float) *lp.f++ * rp.cf->imaginary)*d.f;
-            tp.cf->real = re.f;
-            tp.cf++->imaginary = im.f;
-          }
-          break;
-        case LUX_CDOUBLE:
-          while (nRepeat--) {
-            d.d = rp.cd->real*rp.cd->real
-              + rp.cd->imaginary*rp.cd->imaginary;
-            d.d = 1.0/d.d;
-            re.d = ((double) *lp.f * rp.cd->real)*d.d;
-            im.d = (-(double) *lp.f++ * rp.cd->imaginary)*d.d;
-            tp.cd->real = re.d;
-            tp.cd++->imaginary = im.d;
-          }
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
-      }
+      while (nRepeat--)
+        *tp.f++ = (float) *lp.b++ / *rp.f;
       break;
     case LUX_DOUBLE:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--)
-            *tp.d++ = *lp.d++ / (double) *rp.b;
-          break;
-        case LUX_WORD:
-          while (nRepeat--)
-            *tp.d++ = *lp.d++ / (double) *rp.w;
-          break;
-        case LUX_LONG:
-          while (nRepeat--)
-            *tp.d++ = *lp.d++ / (double) *rp.l;
-          break;
-        case LUX_FLOAT:
-          while (nRepeat--)
-            *tp.d++ = *lp.d++ / (double) *rp.f;
-          break;
-        case LUX_DOUBLE:
-          while (nRepeat--)
-            *tp.d++ = *lp.d++ / *rp.d;
-          break;
-        case LUX_CFLOAT:
-          while (nRepeat--) {
-            d.d = (double) rp.cf->real*(double) rp.cf->real
-             + (double) rp.cf->imaginary*(double) rp.cf->imaginary;
-            d.d = 1.0/d.d;
-            re.d = (*lp.d * (double) rp.cf->real)*d.d;
-            im.d = (-*lp.d++ * (double) rp.cf->imaginary)*d.d;
-            tp.cd->real = re.d;
-            tp.cd++->imaginary = im.d;
-          }
-          break;
-        case LUX_CDOUBLE:
-          while (nRepeat--) {
-            d.d = rp.cd->real*rp.cd->real
-              + rp.cd->imaginary*rp.cd->imaginary;
-            d.d = 1.0/d.d;
-            re.d = (*lp.d * rp.cd->real)*d.d;
-            im.d = (-*lp.d++ * rp.cd->imaginary)*d.d;
-            tp.cd->real = re.d;
-            tp.cd++->imaginary = im.d;
-          }
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
-      }
+      while (nRepeat--)
+        *tp.d++ = (double) *lp.b++ / *rp.d;
       break;
     case LUX_CFLOAT:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--) {
-            d.f = 1.0/(float) *rp.b;
-            tp.cf->real = lp.cf->real*d.f;
-            tp.cf++->imaginary = lp.cf++->imaginary*d.f;
-          }
-          break;
-        case LUX_WORD:
-          while (nRepeat--) {
-            d.f = 1.0/(float) *rp.w;
-            tp.cf->real = lp.cf->real*d.f;
-            tp.cf++->imaginary = lp.cf++->imaginary*d.f;
-          }
-          break;
-        case LUX_LONG:
-          while (nRepeat--) {
-            d.f = 1.0/(float) *rp.l;
-            tp.cf->real = lp.cf->real*d.f;
-            tp.cf++->imaginary = lp.cf++->imaginary*d.f;
-          }
-          break;
-        case LUX_FLOAT:
-          while (nRepeat--) {
-            d.f = 1.0/ *rp.f;
-            tp.cf->real = lp.cf->real*d.f;
-            tp.cf++->imaginary = lp.cf++->imaginary*d.f;
-          }
-          break;
-        case LUX_DOUBLE:
-          while (nRepeat--) {
-            d.d = 1.0/ *rp.d;
-            tp.cd->real = (double) lp.cf->real*d.d;
-            tp.cd++->imaginary = (double) lp.cf++->imaginary*d.d;
-          }
-          break;
-        case LUX_CFLOAT:
-          while (nRepeat--) {
-            d.f = rp.cf->real*rp.cf->real
-              + rp.cf->imaginary*rp.cf->imaginary;
-            d.f = 1.0/d.f;
-            re.f = (lp.cf->real*rp.cf->real
-                    + lp.cf->imaginary*rp.cf->imaginary)*d.f;
-            im.f = (lp.cf->imaginary*rp.cf->real
-                    - lp.cf->real*rp.cf->imaginary)*d.f;
-            tp.cf->real = re.f;
-            tp.cf++->imaginary = im.f;
-            lp.cf++;
-          }
-          break;
-        case LUX_CDOUBLE:
-          while (nRepeat--) {
-            d.d = rp.cd->real*rp.cd->real
-              + rp.cd->imaginary*rp.cd->imaginary;
-            d.d = 1.0/d.d;
-            re.d = ((double) lp.cf->real*rp.cd->real
-                    + (double) lp.cf->imaginary*rp.cd->imaginary)*d.d;
-            im.d = ((double) lp.cf->imaginary*rp.cd->real
-                    - (double) lp.cf->real*rp.cd->imaginary)*d.d;
-            tp.cd->real = re.d;
-            tp.cd++->imaginary = im.d;
-            lp.cf++;
-          }
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
+      while (nRepeat--) {
+        d.f = rp.cf->real*rp.cf->real
+          + rp.cf->imaginary*rp.cf->imaginary;
+        d.f = 1.0/d.f;
+        re.f = ((float) *lp.b * rp.cf->real)*d.f;
+        im.f = (-(float) *lp.b++ * rp.cf->imaginary)*d.f;
+        tp.cf->real = re.f;
+        tp.cf++->imaginary = im.f;
       }
       break;
     case LUX_CDOUBLE:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--) {
-            d.d = 1.0/(double) *rp.b;
-            tp.cd->real = lp.cd->real*d.d;
-            tp.cd++->imaginary = lp.cd++->imaginary*d.d;
-          }
-          break;
-        case LUX_WORD:
-          while (nRepeat--) {
-            d.d = 1.0/(double) *rp.w;
-            tp.cd->real = lp.cd->real*d.d;
-            tp.cd++->imaginary = lp.cd++->imaginary*d.d;
-          }
-          break;
-        case LUX_LONG:
-          while (nRepeat--) {
-            d.d = 1.0/(double) *rp.l;
-            tp.cd->real = lp.cd->real*d.d;
-            tp.cd++->imaginary = lp.cd++->imaginary*d.d;
-          }
-          break;
-        case LUX_FLOAT:
-          while (nRepeat--) {
-            d.d = 1.0/(double) *rp.f;
-            tp.cd->real = lp.cd->real*d.d;
-            tp.cd++->imaginary = lp.cd++->imaginary*d.d;
-          }
-          break;
-        case LUX_DOUBLE:
-          while (nRepeat--) {
-            d.d = 1.0/ *rp.d;
-            tp.cd->real = lp.cd->real*d.d;
-            tp.cd++->imaginary = lp.cd++->imaginary*d.d;
-          }
-          break;
-        case LUX_CFLOAT:
-          while (nRepeat--) {
-            d.d = (double) rp.cf->real*(double) rp.cf->real
-              + (double) rp.cf->imaginary*(double) rp.cf->imaginary;
-            d.d = 1.0/d.d;
-            re.d = (lp.cd->real*(double) rp.cf->real
-                    + lp.cd->imaginary*(double) rp.cf->imaginary)*d.d;
-            im.d = (lp.cd->imaginary*(double) rp.cf->real
-                    - lp.cd->real*(double) rp.cf->imaginary)*d.d;
-            tp.cd->real = re.d;
-            tp.cd++->imaginary = im.d;
-            lp.cd++;
-          }
-          break;
-        case LUX_CDOUBLE:
-          while (nRepeat--) {
-            d.d = rp.cd->real*rp.cd->real
-              + rp.cd->imaginary*rp.cd->imaginary;
-            d.d = 1.0/d.d;
-            re.d = (lp.cd->real*rp.cd->real
-                    + lp.cd->imaginary*rp.cd->imaginary)*d.d;
-            im.d = (lp.cd->imaginary*rp.cd->real
-                    - lp.cd->real*rp.cd->imaginary)*d.d;
-            tp.cd->real = re.d;
-            tp.cd++->imaginary = im.d;
-            lp.cd++;
-          }
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
+      while (nRepeat--) {
+        d.d = rp.cd->real*rp.cd->real
+          + rp.cd->imaginary*rp.cd->imaginary;
+        d.d = 1.0/d.d;
+        re.d = ((double) *lp.b * rp.cd->real)*d.d;
+        im.d = (-(double) *lp.b++ * rp.cd->imaginary)*d.d;
+        tp.cd->real = re.d;
+        tp.cd++->imaginary = im.d;
       }
-      break;      
+      break;
     default:
-      cerror(ILL_TYPE, lhs, typeName(lhsType));
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_WORD:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--)
+        *tp.w++ = *lp.w++ / (int16_t) *rp.b;
+      break;
+    case LUX_WORD:
+      while (nRepeat--)
+        *tp.w++ = *lp.w++ / *rp.w;
+      break;
+    case LUX_LONG:
+      while (nRepeat--)
+        *tp.l++ = (int32_t) *lp.w++ / *rp.l;
+      break;
+    case LUX_QUAD:
+      while (nRepeat--)
+        *tp.q++ = (int64_t) *lp.w++ / *rp.q;
+      break;
+    case LUX_FLOAT:
+      while (nRepeat--)
+        *tp.f++ = (float) *lp.w++ / *rp.f;
+      break;
+    case LUX_DOUBLE:
+      while (nRepeat--)
+        *tp.d++ = (double) *lp.w++ / *rp.d;
+      break;
+    case LUX_CFLOAT:
+      while (nRepeat--) {
+        d.f = rp.cf->real*rp.cf->real
+          + rp.cf->imaginary*rp.cf->imaginary;
+        d.f = 1.0/d.f;
+        re.f = ((float) *lp.w * rp.cf->real)*d.f;
+        im.f = (-(float) *lp.w++ * rp.cf->imaginary)*d.f;
+        tp.cf->real = re.f;
+        tp.cf++->imaginary = im.f;
+      }
+      break;
+    case LUX_CDOUBLE:
+      while (nRepeat--) {
+        d.d = rp.cd->real*rp.cd->real
+          + rp.cd->imaginary*rp.cd->imaginary;
+        d.d = 1.0/d.d;
+        re.d = ((double) *lp.w * rp.cd->real)*d.d;
+        im.d = (-(double) *lp.w++ * rp.cd->imaginary)*d.d;
+        tp.cd->real = re.d;
+        tp.cd++->imaginary = im.d;
+      }
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_LONG:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--)
+        *tp.l++ = *lp.l++ / (int32_t) *rp.b;
+      break;
+    case LUX_WORD:
+      while (nRepeat--)
+        *tp.l++ = *lp.l++ / (int32_t) *rp.w;
+      break;
+    case LUX_LONG:
+      while (nRepeat--)
+        *tp.l++ = *lp.l++ / *rp.l;
+      break;
+    case LUX_QUAD:
+      while (nRepeat--)
+        *tp.q++ = *lp.l++ / *rp.q;
+      break;
+    case LUX_FLOAT:
+      while (nRepeat--)
+        *tp.f++ = (float) *lp.l++ / *rp.f;
+      break;
+    case LUX_DOUBLE:
+      while (nRepeat--)
+        *tp.d++ = (double) *lp.l++ / *rp.d;
+      break;
+    case LUX_CFLOAT:
+      while (nRepeat--) {
+        d.f = rp.cf->real*rp.cf->real
+          + rp.cf->imaginary*rp.cf->imaginary;
+        d.f = 1.0/d.f;
+        re.f = ((float) *lp.l * rp.cf->real)*d.f;
+        im.f = (-(float) *lp.l++ * rp.cf->imaginary)*d.f;
+        tp.cf->real = re.f;
+        tp.cf++->imaginary = im.f;
+      }
+      break;
+    case LUX_CDOUBLE:
+      while (nRepeat--) {
+        d.d = rp.cd->real*rp.cd->real
+          + rp.cd->imaginary*rp.cd->imaginary;
+        d.d = 1.0/d.d;
+        re.d = ((double) *lp.l * rp.cd->real)*d.d;
+        im.d = (-(double) *lp.l++ * rp.cd->imaginary)*d.d;
+        tp.cd->real = re.d;
+        tp.cd++->imaginary = im.d;
+      }
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_QUAD:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--)
+        *tp.q++ = *lp.q++ / (int64_t) *rp.b;
+      break;
+    case LUX_WORD:
+      while (nRepeat--)
+        *tp.q++ = *lp.q++ / (int64_t) *rp.w;
+      break;
+    case LUX_LONG:
+      while (nRepeat--)
+        *tp.q++ = *lp.q++ / *rp.l;
+      break;
+    case LUX_QUAD:
+      while (nRepeat--)
+        *tp.q++ = *lp.q++ / *rp.q;
+      break;
+    case LUX_FLOAT:
+      while (nRepeat--)
+        *tp.d++ = (double) *lp.q++ / *rp.f;
+      break;
+    case LUX_DOUBLE:
+      while (nRepeat--)
+        *tp.d++ = (double) *lp.q++ / *rp.d;
+      break;
+    case LUX_CFLOAT:
+      while (nRepeat--) {
+        d.d = rp.cf->real*rp.cf->real
+          + rp.cf->imaginary*rp.cf->imaginary;
+        d.d = 1.0/d.d;
+        re.d = ((double) *lp.q * rp.cf->real)*d.d;
+        im.d = (-(double) *lp.q++ * rp.cf->imaginary)*d.d;
+        tp.cd->real = re.d;
+        tp.cd++->imaginary = im.d;
+      }
+      break;
+    case LUX_CDOUBLE:
+      while (nRepeat--) {
+        d.d = rp.cd->real*rp.cd->real
+          + rp.cd->imaginary*rp.cd->imaginary;
+        d.d = 1.0/d.d;
+        re.d = ((double) *lp.q * rp.cd->real)*d.d;
+        im.d = (-(double) *lp.q++ * rp.cd->imaginary)*d.d;
+        tp.cd->real = re.d;
+        tp.cd++->imaginary = im.d;
+      }
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_FLOAT:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--)
+        *tp.f++ = *lp.f++ / (float) *rp.b;
+      break;
+    case LUX_WORD:
+      while (nRepeat--)
+        *tp.f++ = *lp.f++ / (float) *rp.w;
+      break;
+    case LUX_LONG:
+      while (nRepeat--)
+        *tp.f++ = *lp.f++ / (float) *rp.l;
+      break;
+    case LUX_QUAD:
+      while (nRepeat--)
+        *tp.d++ = *lp.f++ / (double) *rp.q;
+      break;
+    case LUX_FLOAT:
+      while (nRepeat--)
+        *tp.f++ = *lp.f++ / *rp.f;
+      break;
+    case LUX_DOUBLE:
+      while (nRepeat--)
+        *tp.d++ = (double) *lp.f++ / *rp.d;
+      break;
+    case LUX_CFLOAT:
+      while (nRepeat--) {
+        d.f = rp.cf->real*rp.cf->real
+          + rp.cd->imaginary*rp.cd->imaginary;
+        d.f = 1.0/d.f;
+        re.f = ((float) *lp.f * rp.cf->real)*d.f;
+        im.f = (-(float) *lp.f++ * rp.cf->imaginary)*d.f;
+        tp.cf->real = re.f;
+        tp.cf++->imaginary = im.f;
+      }
+      break;
+    case LUX_CDOUBLE:
+      while (nRepeat--) {
+        d.d = rp.cd->real*rp.cd->real
+          + rp.cd->imaginary*rp.cd->imaginary;
+        d.d = 1.0/d.d;
+        re.d = ((double) *lp.f * rp.cd->real)*d.d;
+        im.d = (-(double) *lp.f++ * rp.cd->imaginary)*d.d;
+        tp.cd->real = re.d;
+        tp.cd++->imaginary = im.d;
+      }
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_DOUBLE:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--)
+        *tp.d++ = *lp.d++ / (double) *rp.b;
+      break;
+    case LUX_WORD:
+      while (nRepeat--)
+        *tp.d++ = *lp.d++ / (double) *rp.w;
+      break;
+    case LUX_LONG:
+      while (nRepeat--)
+        *tp.d++ = *lp.d++ / (double) *rp.l;
+      break;
+    case LUX_QUAD:
+      while (nRepeat--)
+        *tp.d++ = *lp.d++ / (double) *rp.q;
+      break;
+    case LUX_FLOAT:
+      while (nRepeat--)
+        *tp.d++ = *lp.d++ / (double) *rp.f;
+      break;
+    case LUX_DOUBLE:
+      while (nRepeat--)
+        *tp.d++ = *lp.d++ / *rp.d;
+      break;
+    case LUX_CFLOAT:
+      while (nRepeat--) {
+        d.d = (double) rp.cf->real*(double) rp.cf->real
+          + (double) rp.cf->imaginary*(double) rp.cf->imaginary;
+        d.d = 1.0/d.d;
+        re.d = (*lp.d * (double) rp.cf->real)*d.d;
+        im.d = (-*lp.d++ * (double) rp.cf->imaginary)*d.d;
+        tp.cd->real = re.d;
+        tp.cd++->imaginary = im.d;
+      }
+      break;
+    case LUX_CDOUBLE:
+      while (nRepeat--) {
+        d.d = rp.cd->real*rp.cd->real
+          + rp.cd->imaginary*rp.cd->imaginary;
+        d.d = 1.0/d.d;
+        re.d = (*lp.d * rp.cd->real)*d.d;
+        im.d = (-*lp.d++ * rp.cd->imaginary)*d.d;
+        tp.cd->real = re.d;
+        tp.cd++->imaginary = im.d;
+      }
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_CFLOAT:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--) {
+        d.f = 1.0/(float) *rp.b;
+        tp.cf->real = lp.cf->real*d.f;
+        tp.cf++->imaginary = lp.cf++->imaginary*d.f;
+      }
+      break;
+    case LUX_WORD:
+      while (nRepeat--) {
+        d.f = 1.0/(float) *rp.w;
+        tp.cf->real = lp.cf->real*d.f;
+        tp.cf++->imaginary = lp.cf++->imaginary*d.f;
+      }
+      break;
+    case LUX_LONG:
+      while (nRepeat--) {
+        d.f = 1.0/(float) *rp.l;
+        tp.cf->real = lp.cf->real*d.f;
+        tp.cf++->imaginary = lp.cf++->imaginary*d.f;
+      }
+      break;
+    case LUX_QUAD:
+      while (nRepeat--) {
+        d.d = 1.0/(double) *rp.q;
+        tp.cd->real = lp.cf->real*d.d;
+        tp.cd++->imaginary = lp.cf++->imaginary*d.d;
+      }
+      break;
+    case LUX_FLOAT:
+      while (nRepeat--) {
+        d.f = 1.0/ *rp.f;
+        tp.cf->real = lp.cf->real*d.f;
+        tp.cf++->imaginary = lp.cf++->imaginary*d.f;
+      }
+      break;
+    case LUX_DOUBLE:
+      while (nRepeat--) {
+        d.d = 1.0/ *rp.d;
+        tp.cd->real = (double) lp.cf->real*d.d;
+        tp.cd++->imaginary = (double) lp.cf++->imaginary*d.d;
+      }
+      break;
+    case LUX_CFLOAT:
+      while (nRepeat--) {
+        d.f = rp.cf->real*rp.cf->real
+          + rp.cf->imaginary*rp.cf->imaginary;
+        d.f = 1.0/d.f;
+        re.f = (lp.cf->real*rp.cf->real
+                + lp.cf->imaginary*rp.cf->imaginary)*d.f;
+        im.f = (lp.cf->imaginary*rp.cf->real
+                - lp.cf->real*rp.cf->imaginary)*d.f;
+        tp.cf->real = re.f;
+        tp.cf++->imaginary = im.f;
+        lp.cf++;
+      }
+      break;
+    case LUX_CDOUBLE:
+      while (nRepeat--) {
+        d.d = rp.cd->real*rp.cd->real
+          + rp.cd->imaginary*rp.cd->imaginary;
+        d.d = 1.0/d.d;
+        re.d = ((double) lp.cf->real*rp.cd->real
+                + (double) lp.cf->imaginary*rp.cd->imaginary)*d.d;
+        im.d = ((double) lp.cf->imaginary*rp.cd->real
+                - (double) lp.cf->real*rp.cd->imaginary)*d.d;
+        tp.cd->real = re.d;
+        tp.cd++->imaginary = im.d;
+        lp.cf++;
+      }
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_CDOUBLE:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--) {
+        d.d = 1.0/(double) *rp.b;
+        tp.cd->real = lp.cd->real*d.d;
+        tp.cd++->imaginary = lp.cd++->imaginary*d.d;
+      }
+      break;
+    case LUX_WORD:
+      while (nRepeat--) {
+        d.d = 1.0/(double) *rp.w;
+        tp.cd->real = lp.cd->real*d.d;
+        tp.cd++->imaginary = lp.cd++->imaginary*d.d;
+      }
+      break;
+    case LUX_LONG:
+      while (nRepeat--) {
+        d.d = 1.0/(double) *rp.l;
+        tp.cd->real = lp.cd->real*d.d;
+        tp.cd++->imaginary = lp.cd++->imaginary*d.d;
+      }
+      break;
+    case LUX_QUAD:
+      while (nRepeat--) {
+        d.d = 1.0/(double) *rp.q;
+        tp.cd->real = lp.cd->real*d.d;
+        tp.cd++->imaginary = lp.cd++->imaginary*d.d;
+      }
+      break;
+    case LUX_FLOAT:
+      while (nRepeat--) {
+        d.d = 1.0/(double) *rp.f;
+        tp.cd->real = lp.cd->real*d.d;
+        tp.cd++->imaginary = lp.cd++->imaginary*d.d;
+      }
+      break;
+    case LUX_DOUBLE:
+      while (nRepeat--) {
+        d.d = 1.0/ *rp.d;
+        tp.cd->real = lp.cd->real*d.d;
+        tp.cd++->imaginary = lp.cd++->imaginary*d.d;
+      }
+      break;
+    case LUX_CFLOAT:
+      while (nRepeat--) {
+        d.d = (double) rp.cf->real*(double) rp.cf->real
+          + (double) rp.cf->imaginary*(double) rp.cf->imaginary;
+        d.d = 1.0/d.d;
+        re.d = (lp.cd->real*(double) rp.cf->real
+                + lp.cd->imaginary*(double) rp.cf->imaginary)*d.d;
+        im.d = (lp.cd->imaginary*(double) rp.cf->real
+                - lp.cd->real*(double) rp.cf->imaginary)*d.d;
+        tp.cd->real = re.d;
+        tp.cd++->imaginary = im.d;
+        lp.cd++;
+      }
+      break;
+    case LUX_CDOUBLE:
+      while (nRepeat--) {
+        d.d = rp.cd->real*rp.cd->real
+          + rp.cd->imaginary*rp.cd->imaginary;
+        d.d = 1.0/d.d;
+        re.d = (lp.cd->real*rp.cd->real
+                + lp.cd->imaginary*rp.cd->imaginary)*d.d;
+        im.d = (lp.cd->imaginary*rp.cd->real
+                - lp.cd->real*rp.cd->imaginary)*d.d;
+        tp.cd->real = re.d;
+        tp.cd++->imaginary = im.d;
+        lp.cd++;
+      }
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  default:
+    cerror(ILL_TYPE, lhs, typeName(lhsType));
   }
 }
 /*----------------------------------------------------------*/
@@ -5721,386 +5893,472 @@ void lux_div_sa(void)
   scalar        re, im, d;
 
   switch (lhsType) {
+  case LUX_BYTE:
+    switch (rhsType) {
     case LUX_BYTE:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--)
-            *tp.b++ = *lp.b / *rp.b++;
-          break;
-        case LUX_WORD:
-          while (nRepeat--)
-            *tp.w++ = (int16_t) *lp.b / *rp.w++;
-          break;
-        case LUX_LONG:
-          while (nRepeat--)
-            *tp.l++ = (int32_t) *lp.b / *rp.l++;
-          break;
-        case LUX_FLOAT:
-          while (nRepeat--)
-            *tp.f++ = (float) *lp.b / *rp.f++;
-          break;
-        case LUX_DOUBLE:
-          while (nRepeat--)
-            *tp.d++ = (double) *lp.b / *rp.d++;
-          break;
-        case LUX_CFLOAT:
-          while (nRepeat--) {
-            d.f = rp.cf->real*rp.cf->real
-              + rp.cf->imaginary*rp.cf->imaginary;
-            d.f = 1.0/d.f;
-            re.f = ((float) *lp.b * rp.cf->real)*d.f;
-            im.f = (-(float) *lp.b * rp.cf++->imaginary)*d.f;
-            tp.cf->real = re.f;
-            tp.cf++->imaginary = im.f;
-          }
-          break;
-        case LUX_CDOUBLE:
-          while (nRepeat--) {
-            d.d = rp.cd->real*rp.cd->real
-              + rp.cd->imaginary*rp.cd->imaginary;
-            d.d = 1.0/d.d;
-            re.d = ((double) *lp.b * rp.cd->real)*d.d;
-            im.d = (-(double) *lp.b * rp.cd++->imaginary)*d.d;
-            tp.cd->real = re.d;
-            tp.cd++->imaginary = im.d;
-          }
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
-      }
+      while (nRepeat--)
+        *tp.b++ = *lp.b / *rp.b++;
       break;
     case LUX_WORD:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--)
-            *tp.w++ = *lp.w / (int16_t) *rp.b++;
-          break;
-        case LUX_WORD:
-          while (nRepeat--)
-            *tp.w++ = *lp.w / *rp.w++;
-          break;
-        case LUX_LONG:
-          while (nRepeat--)
-            *tp.l++ = (int32_t) *lp.w / *rp.l++;
-          break;
-        case LUX_FLOAT:
-          while (nRepeat--)
-            *tp.f++ = (float) *lp.w / *rp.f++;
-          break;
-        case LUX_DOUBLE:
-          while (nRepeat--)
-            *tp.d++ = (double) *lp.w / *rp.d++;
-          break;
-        case LUX_CFLOAT:
-          while (nRepeat--) {
-            d.f = rp.cf->real*rp.cf->real
-              + rp.cf->imaginary*rp.cf->imaginary;
-            d.f = 1.0/d.f;
-            re.f = ((float) *lp.w * rp.cf->real)*d.f;
-            im.f = (-(float) *lp.w * rp.cf++->imaginary)*d.f;
-            tp.cf->real = re.f;
-            tp.cf++->imaginary = im.f;
-          }
-          break;
-        case LUX_CDOUBLE:
-          while (nRepeat--) {
-            d.d = rp.cd->real*rp.cd->real
-              + rp.cd->imaginary*rp.cd->imaginary;
-            d.d = 1.0/d.d;
-            re.d = ((double) *lp.w * rp.cd->real)*d.d;
-            im.d = (-(double) *lp.w * rp.cd++->imaginary)*d.d;
-            tp.cd->real = re.d;
-            tp.cd++->imaginary = im.d;
-          }
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
-      }
+      while (nRepeat--)
+        *tp.w++ = (int16_t) *lp.b / *rp.w++;
       break;
     case LUX_LONG:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--)
-            *tp.l++ = *lp.l / (int32_t) *rp.b++;
-          break;
-        case LUX_WORD:
-          while (nRepeat--)
-            *tp.l++ = *lp.l / (int32_t) *rp.w++;
-          break;
-        case LUX_LONG:
-          while (nRepeat--)
-            *tp.l++ = *lp.l / *rp.l++;
-          break;
-        case LUX_FLOAT:
-          while (nRepeat--)
-            *tp.f++ = (float) *lp.l / *rp.f++;
-          break;
-        case LUX_DOUBLE:
-          while (nRepeat--)
-            *tp.d++ = (double) *lp.l / *rp.d++;
-          break;
-        case LUX_CFLOAT:
-          while (nRepeat--) {
-            d.f = rp.cf->real*rp.cf->real
-              + rp.cf->imaginary*rp.cf->imaginary;
-            d.f = 1.0/d.f;
-            re.f = ((float) *lp.l * rp.cf->real)*d.f;
-            im.f = (-(float) *lp.l * rp.cf++->imaginary)*d.f;
-            tp.cf->real = re.f;
-            tp.cf++->imaginary = im.f;
-          }
-          break;
-        case LUX_CDOUBLE:
-          while (nRepeat--) {
-            d.d = rp.cd->real*rp.cd->real
-              + rp.cd->imaginary*rp.cd->imaginary;
-            d.d = 1.0/d.d;
-            re.d = ((double) *lp.l * rp.cd->real)*d.d;
-            im.d = (-(double) *lp.l * rp.cd++->imaginary)*d.d;
-            tp.cd->real = re.d;
-            tp.cd++->imaginary = im.d;
-          }
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
-      }
+      while (nRepeat--)
+        *tp.l++ = (int32_t) *lp.b / *rp.l++;
+      break;
+    case LUX_QUAD:
+      while (nRepeat--)
+        *tp.q++ = (int64_t) *lp.b / *rp.q++;
       break;
     case LUX_FLOAT:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--)
-            *tp.f++ = *lp.f / (float) *rp.b++;
-          break;
-        case LUX_WORD:
-          while (nRepeat--)
-            *tp.f++ = *lp.f / (float) *rp.w++;
-          break;
-        case LUX_LONG:
-          while (nRepeat--)
-            *tp.f++ = *lp.f / (float) *rp.l++;
-          break;
-        case LUX_FLOAT:
-          while (nRepeat--)
-            *tp.f++ = *lp.f / *rp.f++;
-          break;
-        case LUX_DOUBLE:
-          while (nRepeat--)
-            *tp.d++ = (double) *lp.f / *rp.d++;
-          break;
-        case LUX_CFLOAT:
-          while (nRepeat--) {
-            d.f = rp.cf->real*rp.cf->real
-              + rp.cf->imaginary*rp.cf->imaginary;
-            d.f = 1.0/d.f;
-            re.f = ((float) *lp.f * rp.cf->real)*d.f;
-            im.f = (-(float) *lp.f * rp.cf++->imaginary)*d.f;
-            tp.cf->real = re.f;
-            tp.cf++->imaginary = im.f;
-          }
-          break;
-        case LUX_CDOUBLE:
-          while (nRepeat--) {
-            d.d = rp.cd->real*rp.cd->real
-              + rp.cd->imaginary*rp.cd->imaginary;
-            d.d = 1.0/d.d;
-            re.d = ((double) *lp.f * rp.cd->real)*d.d;
-            im.d = (-(double) *lp.f * rp.cd++->imaginary)*d.d;
-            tp.cd->real = re.d;
-            tp.cd++->imaginary = im.d;
-          }
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
-      }
+      while (nRepeat--)
+        *tp.f++ = (float) *lp.b / *rp.f++;
       break;
     case LUX_DOUBLE:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--)
-            *tp.d++ = *lp.d / (double) *rp.b++;
-          break;
-        case LUX_WORD:
-          while (nRepeat--)
-            *tp.d++ = *lp.d / (double) *rp.w++;
-          break;
-        case LUX_LONG:
-          while (nRepeat--)
-            *tp.d++ = *lp.d / (double) *rp.l++;
-          break;
-        case LUX_FLOAT:
-          while (nRepeat--)
-            *tp.d++ = *lp.d / (double) *rp.f++;
-          break;
-        case LUX_DOUBLE:
-          while (nRepeat--)
-            *tp.d++ = *lp.d / *rp.d++;
-          break;
-        case LUX_CFLOAT:
-          while (nRepeat--) {
-            d.d = (double) rp.cf->real*(double) rp.cf->real
-             + (double) rp.cf->imaginary*(double) rp.cf->imaginary;
-            d.d = 1.0/d.d;
-            re.d = (*lp.d * (double) rp.cf->real)*d.d;
-            im.d = (-*lp.d * (double) rp.cf++->imaginary)*d.d;
-            tp.cd->real = re.d;
-            tp.cd++->imaginary = im.d;
-          }
-          break;
-        case LUX_CDOUBLE:
-          while (nRepeat--) {
-            d.d = rp.cd->real*rp.cd->real
-              + rp.cd->imaginary*rp.cd->imaginary;
-            d.d = 1.0/d.d;
-            re.d = (*lp.d * rp.cd->real)*d.d;
-            im.d = (-*lp.d * rp.cd++->imaginary)*d.d;
-            tp.cd->real = re.d;
-            tp.cd++->imaginary = im.d;
-          }
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
-      }
+      while (nRepeat--)
+        *tp.d++ = (double) *lp.b / *rp.d++;
       break;
     case LUX_CFLOAT:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--) {
-            d.f = 1.0/(float) *rp.b++;
-            tp.cf->real = lp.cf->real*d.f;
-            tp.cf++->imaginary = lp.cf->imaginary*d.f;
-          }
-          break;
-        case LUX_WORD:
-          while (nRepeat--) {
-            d.f = 1.0/(float) *rp.w++;
-            tp.cf->real = lp.cf->real*d.f;
-            tp.cf++->imaginary = lp.cf->imaginary*d.f;
-          }
-          break;
-        case LUX_LONG:
-          while (nRepeat--) {
-            d.f = 1.0/(float) *rp.l++;
-            tp.cf->real = lp.cf->real*d.f;
-            tp.cf++->imaginary = lp.cf->imaginary*d.f;
-          }
-          break;
-        case LUX_FLOAT:
-          while (nRepeat--) {
-            d.f = 1.0/ *rp.f++;
-            tp.cf->real = lp.cf->real*d.f;
-            tp.cf++->imaginary = lp.cf->imaginary*d.f;
-          }
-          break;
-        case LUX_DOUBLE:
-          while (nRepeat--) {
-            d.d = 1.0/ *rp.d++;
-            tp.cd->real = (double) lp.cf->real*d.d;
-            tp.cd++->imaginary = (double) lp.cf->imaginary*d.d;
-          }
-          break;
-        case LUX_CFLOAT:
-          while (nRepeat--) {
-            d.f = rp.cf->real*rp.cf->real
-              + rp.cf->imaginary*rp.cf->imaginary;
-            d.f = 1.0/d.f;
-            re.f = (lp.cf->real*rp.cf->real
-                    + lp.cf->imaginary*rp.cf->imaginary)*d.f;
-            im.f = (lp.cf->imaginary*rp.cf->real
-                    - lp.cf->real*rp.cf->imaginary)*d.f;
-            tp.cf->real = re.f;
-            tp.cf++->imaginary = im.f;
-            rp.cf++;
-          }
-          break;
-        case LUX_CDOUBLE:
-          while (nRepeat--) {
-            d.d = rp.cd->real*rp.cd->real
-              + rp.cd->imaginary*rp.cd->imaginary;
-            d.d = 1.0/d.d;
-            re.d = ((double) lp.cf->real*rp.cd->real
-                    + (double) lp.cf->imaginary*rp.cd->imaginary)*d.d;
-            im.d = ((double) lp.cf->imaginary*rp.cd->real
-                    - (double) lp.cf->real*rp.cd->imaginary)*d.d;
-            tp.cd->real = re.d;
-            tp.cd++->imaginary = im.d;
-            rp.cd++;
-          }
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
+      while (nRepeat--) {
+        d.f = rp.cf->real*rp.cf->real
+          + rp.cf->imaginary*rp.cf->imaginary;
+        d.f = 1.0/d.f;
+        re.f = ((float) *lp.b * rp.cf->real)*d.f;
+        im.f = (-(float) *lp.b * rp.cf++->imaginary)*d.f;
+        tp.cf->real = re.f;
+        tp.cf++->imaginary = im.f;
       }
       break;
     case LUX_CDOUBLE:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--) {
-            d.d = 1.0/(double) *rp.b++;
-            tp.cd->real = lp.cd->real*d.d;
-            tp.cd++->imaginary = lp.cd->imaginary*d.d;
-          }
-          break;
-        case LUX_WORD:
-          while (nRepeat--) {
-            d.d = 1.0/(double) *rp.w++;
-            tp.cd->real = lp.cd->real*d.d;
-            tp.cd++->imaginary = lp.cd->imaginary*d.d;
-          }
-          break;
-        case LUX_LONG:
-          while (nRepeat--) {
-            d.d = 1.0/(double) *rp.l++;
-            tp.cd->real = lp.cd->real*d.d;
-            tp.cd++->imaginary = lp.cd->imaginary*d.d;
-          }
-          break;
-        case LUX_FLOAT:
-          while (nRepeat--) {
-            d.d = 1.0/(double) *rp.f++;
-            tp.cd->real = lp.cd->real*d.d;
-            tp.cd++->imaginary = lp.cd->imaginary*d.d;
-          }
-          break;
-        case LUX_DOUBLE:
-          while (nRepeat--) {
-            d.d = 1.0/ *rp.d++;
-            tp.cd->real = lp.cd->real*d.d;
-            tp.cd++->imaginary = lp.cd->imaginary*d.d;
-          }
-          break;
-        case LUX_CFLOAT:
-          while (nRepeat--) {
-            d.d = (double) rp.cf->real*(double) rp.cf->real
-              + (double) rp.cf->imaginary*(double) rp.cf->imaginary;
-            d.d = 1.0/d.d;
-            re.d = (lp.cd->real*(double) rp.cf->real
-                    + lp.cd->imaginary*(double) rp.cf->imaginary)*d.d;
-            im.d = (lp.cd->imaginary*(double) rp.cf->real
-                    - lp.cd->real*(double) rp.cf->imaginary)*d.d;
-            tp.cd->real = re.d;
-            tp.cd++->imaginary = im.d;
-            rp.cf++;
-          }
-          break;
-        case LUX_CDOUBLE:
-          while (nRepeat--) {
-            d.d = rp.cd->real*rp.cd->real
-              + rp.cd->imaginary*rp.cd->imaginary;
-            d.d = 1.0/d.d;
-            re.d = (lp.cd->real*rp.cd->real
-                    + lp.cd->imaginary*rp.cd->imaginary)*d.d;
-            im.d = (lp.cd->imaginary*rp.cd->real
-                    - lp.cd->real*rp.cd->imaginary)*d.d;
-            tp.cd->real = re.d;
-            tp.cd++->imaginary = im.d;
-            rp.cd++;
-          }
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
+      while (nRepeat--) {
+        d.d = rp.cd->real*rp.cd->real
+          + rp.cd->imaginary*rp.cd->imaginary;
+        d.d = 1.0/d.d;
+        re.d = ((double) *lp.b * rp.cd->real)*d.d;
+        im.d = (-(double) *lp.b * rp.cd++->imaginary)*d.d;
+        tp.cd->real = re.d;
+        tp.cd++->imaginary = im.d;
       }
-      break;      
+      break;
     default:
-      cerror(ILL_TYPE, lhs, typeName(lhsType));
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_WORD:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--)
+        *tp.w++ = *lp.w / (int16_t) *rp.b++;
+      break;
+    case LUX_WORD:
+      while (nRepeat--)
+        *tp.w++ = *lp.w / *rp.w++;
+      break;
+    case LUX_LONG:
+      while (nRepeat--)
+        *tp.l++ = (int32_t) *lp.w / *rp.l++;
+      break;
+    case LUX_QUAD:
+      while (nRepeat--)
+        *tp.q++ = (int64_t) *lp.w / *rp.q++;
+      break;
+    case LUX_FLOAT:
+      while (nRepeat--)
+        *tp.f++ = (float) *lp.w / *rp.f++;
+      break;
+    case LUX_DOUBLE:
+      while (nRepeat--)
+        *tp.d++ = (double) *lp.w / *rp.d++;
+      break;
+    case LUX_CFLOAT:
+      while (nRepeat--) {
+        d.f = rp.cf->real*rp.cf->real
+          + rp.cf->imaginary*rp.cf->imaginary;
+        d.f = 1.0/d.f;
+        re.f = ((float) *lp.w * rp.cf->real)*d.f;
+        im.f = (-(float) *lp.w * rp.cf++->imaginary)*d.f;
+        tp.cf->real = re.f;
+        tp.cf++->imaginary = im.f;
+      }
+      break;
+    case LUX_CDOUBLE:
+      while (nRepeat--) {
+        d.d = rp.cd->real*rp.cd->real
+          + rp.cd->imaginary*rp.cd->imaginary;
+        d.d = 1.0/d.d;
+        re.d = ((double) *lp.w * rp.cd->real)*d.d;
+        im.d = (-(double) *lp.w * rp.cd++->imaginary)*d.d;
+        tp.cd->real = re.d;
+        tp.cd++->imaginary = im.d;
+      }
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_LONG:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--)
+        *tp.l++ = *lp.l / (int32_t) *rp.b++;
+      break;
+    case LUX_WORD:
+      while (nRepeat--)
+        *tp.l++ = *lp.l / (int32_t) *rp.w++;
+      break;
+    case LUX_LONG:
+      while (nRepeat--)
+        *tp.l++ = *lp.l / *rp.l++;
+      break;
+    case LUX_QUAD:
+      while (nRepeat--)
+        *tp.q++ = *lp.l / *rp.q++;
+      break;
+    case LUX_FLOAT:
+      while (nRepeat--)
+        *tp.f++ = (float) *lp.l / *rp.f++;
+      break;
+    case LUX_DOUBLE:
+      while (nRepeat--)
+        *tp.d++ = (double) *lp.l / *rp.d++;
+      break;
+    case LUX_CFLOAT:
+      while (nRepeat--) {
+        d.f = rp.cf->real*rp.cf->real
+          + rp.cf->imaginary*rp.cf->imaginary;
+        d.f = 1.0/d.f;
+        re.f = ((float) *lp.l * rp.cf->real)*d.f;
+        im.f = (-(float) *lp.l * rp.cf++->imaginary)*d.f;
+        tp.cf->real = re.f;
+        tp.cf++->imaginary = im.f;
+      }
+      break;
+    case LUX_CDOUBLE:
+      while (nRepeat--) {
+        d.d = rp.cd->real*rp.cd->real
+          + rp.cd->imaginary*rp.cd->imaginary;
+        d.d = 1.0/d.d;
+        re.d = ((double) *lp.l * rp.cd->real)*d.d;
+        im.d = (-(double) *lp.l * rp.cd++->imaginary)*d.d;
+        tp.cd->real = re.d;
+        tp.cd++->imaginary = im.d;
+      }
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_QUAD:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--)
+        *tp.q++ = *lp.q / *rp.b++;
+      break;
+    case LUX_WORD:
+      while (nRepeat--)
+        *tp.q++ = *lp.q / *rp.w++;
+      break;
+    case LUX_LONG:
+      while (nRepeat--)
+        *tp.q++ = *lp.q / *rp.l++;
+      break;
+    case LUX_QUAD:
+      while (nRepeat--)
+        *tp.q++ = *lp.q / *rp.q++;
+      break;
+    case LUX_FLOAT:
+      while (nRepeat--)
+        *tp.d++ = (double) *lp.q / *rp.f++;
+      break;
+    case LUX_DOUBLE:
+      while (nRepeat--)
+        *tp.d++ = (double) *lp.q / *rp.d++;
+      break;
+    case LUX_CFLOAT:
+      while (nRepeat--) {
+        d.d = rp.cf->real*rp.cf->real
+          + rp.cf->imaginary*rp.cf->imaginary;
+        d.d = 1.0/d.d;
+        re.d = ((double) *lp.q * rp.cf->real)*d.d;
+        im.d = (-(double) *lp.q * rp.cf++->imaginary)*d.d;
+        tp.cd->real = re.d;
+        tp.cd++->imaginary = im.d;
+      }
+      break;
+    case LUX_CDOUBLE:
+      while (nRepeat--) {
+        d.d = rp.cd->real*rp.cd->real
+          + rp.cd->imaginary*rp.cd->imaginary;
+        d.d = 1.0/d.d;
+        re.d = ((double) *lp.l * rp.cd->real)*d.d;
+        im.d = (-(double) *lp.l * rp.cd++->imaginary)*d.d;
+        tp.cd->real = re.d;
+        tp.cd++->imaginary = im.d;
+      }
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_FLOAT:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--)
+        *tp.f++ = *lp.f / (float) *rp.b++;
+      break;
+    case LUX_WORD:
+      while (nRepeat--)
+        *tp.f++ = *lp.f / (float) *rp.w++;
+      break;
+    case LUX_LONG:
+      while (nRepeat--)
+        *tp.f++ = *lp.f / (float) *rp.l++;
+      break;
+    case LUX_QUAD:
+      while (nRepeat--)
+        *tp.d++ = *lp.f / (double) *rp.q++;
+      break;
+    case LUX_FLOAT:
+      while (nRepeat--)
+        *tp.f++ = *lp.f / *rp.f++;
+      break;
+    case LUX_DOUBLE:
+      while (nRepeat--)
+        *tp.d++ = (double) *lp.f / *rp.d++;
+      break;
+    case LUX_CFLOAT:
+      while (nRepeat--) {
+        d.f = rp.cf->real*rp.cf->real
+          + rp.cf->imaginary*rp.cf->imaginary;
+        d.f = 1.0/d.f;
+        re.f = ((float) *lp.f * rp.cf->real)*d.f;
+        im.f = (-(float) *lp.f * rp.cf++->imaginary)*d.f;
+        tp.cf->real = re.f;
+        tp.cf++->imaginary = im.f;
+      }
+      break;
+    case LUX_CDOUBLE:
+      while (nRepeat--) {
+        d.d = rp.cd->real*rp.cd->real
+          + rp.cd->imaginary*rp.cd->imaginary;
+        d.d = 1.0/d.d;
+        re.d = ((double) *lp.f * rp.cd->real)*d.d;
+        im.d = (-(double) *lp.f * rp.cd++->imaginary)*d.d;
+        tp.cd->real = re.d;
+        tp.cd++->imaginary = im.d;
+      }
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_DOUBLE:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--)
+        *tp.d++ = *lp.d / (double) *rp.b++;
+      break;
+    case LUX_WORD:
+      while (nRepeat--)
+        *tp.d++ = *lp.d / (double) *rp.w++;
+      break;
+    case LUX_LONG:
+      while (nRepeat--)
+        *tp.d++ = *lp.d / (double) *rp.l++;
+      break;
+    case LUX_QUAD:
+      while (nRepeat--)
+        *tp.d++ = *lp.d / (double) *rp.q++;
+      break;
+    case LUX_FLOAT:
+      while (nRepeat--)
+        *tp.d++ = *lp.d / (double) *rp.f++;
+      break;
+    case LUX_DOUBLE:
+      while (nRepeat--)
+        *tp.d++ = *lp.d / *rp.d++;
+      break;
+    case LUX_CFLOAT:
+      while (nRepeat--) {
+        d.d = (double) rp.cf->real*(double) rp.cf->real
+          + (double) rp.cf->imaginary*(double) rp.cf->imaginary;
+        d.d = 1.0/d.d;
+        re.d = (*lp.d * (double) rp.cf->real)*d.d;
+        im.d = (-*lp.d * (double) rp.cf++->imaginary)*d.d;
+        tp.cd->real = re.d;
+        tp.cd++->imaginary = im.d;
+      }
+      break;
+    case LUX_CDOUBLE:
+      while (nRepeat--) {
+        d.d = rp.cd->real*rp.cd->real
+          + rp.cd->imaginary*rp.cd->imaginary;
+        d.d = 1.0/d.d;
+        re.d = (*lp.d * rp.cd->real)*d.d;
+        im.d = (-*lp.d * rp.cd++->imaginary)*d.d;
+        tp.cd->real = re.d;
+        tp.cd++->imaginary = im.d;
+      }
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_CFLOAT:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--) {
+        d.f = 1.0/(float) *rp.b++;
+        tp.cf->real = lp.cf->real*d.f;
+        tp.cf++->imaginary = lp.cf->imaginary*d.f;
+      }
+      break;
+    case LUX_WORD:
+      while (nRepeat--) {
+        d.f = 1.0/(float) *rp.w++;
+        tp.cf->real = lp.cf->real*d.f;
+        tp.cf++->imaginary = lp.cf->imaginary*d.f;
+      }
+      break;
+    case LUX_LONG:
+      while (nRepeat--) {
+        d.f = 1.0/(float) *rp.l++;
+        tp.cf->real = lp.cf->real*d.f;
+        tp.cf++->imaginary = lp.cf->imaginary*d.f;
+      }
+      break;
+    case LUX_QUAD:
+      while (nRepeat--) {
+        d.d = 1.0/(double) *rp.q++;
+        tp.cd->real = lp.cf->real*d.d;
+        tp.cd++->imaginary = lp.cf->imaginary*d.d;
+      }
+      break;
+    case LUX_FLOAT:
+      while (nRepeat--) {
+        d.f = 1.0/ *rp.f++;
+        tp.cf->real = lp.cf->real*d.f;
+        tp.cf++->imaginary = lp.cf->imaginary*d.f;
+      }
+      break;
+    case LUX_DOUBLE:
+      while (nRepeat--) {
+        d.d = 1.0/ *rp.d++;
+        tp.cd->real = (double) lp.cf->real*d.d;
+        tp.cd++->imaginary = (double) lp.cf->imaginary*d.d;
+      }
+      break;
+    case LUX_CFLOAT:
+      while (nRepeat--) {
+        d.f = rp.cf->real*rp.cf->real
+          + rp.cf->imaginary*rp.cf->imaginary;
+        d.f = 1.0/d.f;
+        re.f = (lp.cf->real*rp.cf->real
+                + lp.cf->imaginary*rp.cf->imaginary)*d.f;
+        im.f = (lp.cf->imaginary*rp.cf->real
+                - lp.cf->real*rp.cf->imaginary)*d.f;
+        tp.cf->real = re.f;
+        tp.cf++->imaginary = im.f;
+        rp.cf++;
+      }
+      break;
+    case LUX_CDOUBLE:
+      while (nRepeat--) {
+        d.d = rp.cd->real*rp.cd->real
+          + rp.cd->imaginary*rp.cd->imaginary;
+        d.d = 1.0/d.d;
+        re.d = ((double) lp.cf->real*rp.cd->real
+                + (double) lp.cf->imaginary*rp.cd->imaginary)*d.d;
+        im.d = ((double) lp.cf->imaginary*rp.cd->real
+                - (double) lp.cf->real*rp.cd->imaginary)*d.d;
+        tp.cd->real = re.d;
+        tp.cd++->imaginary = im.d;
+        rp.cd++;
+      }
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_CDOUBLE:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--) {
+        d.d = 1.0/(double) *rp.b++;
+        tp.cd->real = lp.cd->real*d.d;
+        tp.cd++->imaginary = lp.cd->imaginary*d.d;
+      }
+      break;
+    case LUX_WORD:
+      while (nRepeat--) {
+        d.d = 1.0/(double) *rp.w++;
+        tp.cd->real = lp.cd->real*d.d;
+        tp.cd++->imaginary = lp.cd->imaginary*d.d;
+      }
+      break;
+    case LUX_LONG:
+      while (nRepeat--) {
+        d.d = 1.0/(double) *rp.l++;
+        tp.cd->real = lp.cd->real*d.d;
+        tp.cd++->imaginary = lp.cd->imaginary*d.d;
+      }
+      break;
+    case LUX_QUAD:
+      while (nRepeat--) {
+        d.d = 1.0/(double) *rp.q++;
+        tp.cd->real = lp.cd->real*d.d;
+        tp.cd++->imaginary = lp.cd->imaginary*d.d;
+      }
+      break;
+    case LUX_FLOAT:
+      while (nRepeat--) {
+        d.d = 1.0/(double) *rp.f++;
+        tp.cd->real = lp.cd->real*d.d;
+        tp.cd++->imaginary = lp.cd->imaginary*d.d;
+      }
+      break;
+    case LUX_DOUBLE:
+      while (nRepeat--) {
+        d.d = 1.0/ *rp.d++;
+        tp.cd->real = lp.cd->real*d.d;
+        tp.cd++->imaginary = lp.cd->imaginary*d.d;
+      }
+      break;
+    case LUX_CFLOAT:
+      while (nRepeat--) {
+        d.d = (double) rp.cf->real*(double) rp.cf->real
+          + (double) rp.cf->imaginary*(double) rp.cf->imaginary;
+        d.d = 1.0/d.d;
+        re.d = (lp.cd->real*(double) rp.cf->real
+                + lp.cd->imaginary*(double) rp.cf->imaginary)*d.d;
+        im.d = (lp.cd->imaginary*(double) rp.cf->real
+                - lp.cd->real*(double) rp.cf->imaginary)*d.d;
+        tp.cd->real = re.d;
+        tp.cd++->imaginary = im.d;
+        rp.cf++;
+      }
+      break;
+    case LUX_CDOUBLE:
+      while (nRepeat--) {
+        d.d = rp.cd->real*rp.cd->real
+          + rp.cd->imaginary*rp.cd->imaginary;
+        d.d = 1.0/d.d;
+        re.d = (lp.cd->real*rp.cd->real
+                + lp.cd->imaginary*rp.cd->imaginary)*d.d;
+        im.d = (lp.cd->imaginary*rp.cd->real
+                - lp.cd->real*rp.cd->imaginary)*d.d;
+        tp.cd->real = re.d;
+        tp.cd++->imaginary = im.d;
+        rp.cd++;
+      }
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  default:
+    cerror(ILL_TYPE, lhs, typeName(lhsType));
   }
 }
 /*----------------------------------------------------------*/

@@ -91,13 +91,14 @@ typedef enum {
   LUX_BYTE,                     /*!< (0) 1-byte integers */
   LUX_WORD,                     /*!< (1) 2-byte integers */
   LUX_LONG,                     /*!< (2) 4-byte integers */
-  LUX_FLOAT,                    /*!< (3) 4-byte floats */
-  LUX_DOUBLE,                   /*!< (4) 8-byte floats */
-  LUX_TEMP_STRING,              /*!< (5) temporary strings */
-  LUX_LSTRING,                  /*!< (6) literal strings */
-  LUX_STRING_ARRAY,             /*!< (7) string arrays */
-  LUX_CFLOAT,                   /*!< (8) 8-byte complex floats */
-  LUX_CDOUBLE,                  /*!< (9) 16-byte complex floats */
+  LUX_QUAD,                     /*!< (3) 8-byte integers */
+  LUX_FLOAT,                    /*!< (4) 4-byte floats */
+  LUX_DOUBLE,                   /*!< (5) 8-byte floats */
+  LUX_TEMP_STRING,              /*!< (6) temporary strings */
+  LUX_LSTRING,                  /*!< (7) literal strings */
+  LUX_STRING_ARRAY,             /*!< (8) string arrays */
+  LUX_CFLOAT,                   /*!< (9) 8-byte complex floats */
+  LUX_CDOUBLE,                  /*!< (10) 16-byte complex floats */
   LUX_NO_SYMBOLTYPE,            /*!< sentinel; not for use */
 } Symboltype;
 
@@ -284,8 +285,9 @@ typedef enum {
 #define FMT_SUPPRESS            (1 << 5) /* * modifier */
 #define FMT_BIG                 (1 << 6) /* l modifier */
 #define FMT_SMALL               (1 << 7) /* h modifier */
-#define FMT_MIX                 (1 << 8) /* _ modifier */
-#define FMT_MIX2                (1 << 9) /* = modifier */
+#define FMT_BIGINT              (1 << 8) /* j modifier */
+#define FMT_MIX                 (1 << 9) /* _ modifier */
+#define FMT_MIX2                (1 << 10) /* = modifier */
 
 /* tv, tvraw modes */
 #define TV_SCREEN       (1 << 6) /* 64 */
@@ -381,39 +383,67 @@ typedef enum {
 
 /** \struct a single-precision complex number */
 typedef struct {
-  float real; float imaginary;
+  float real;
+  float imaginary;
 } floatComplex;
 
 /** \struct a double-precision complex number */
 typedef struct {
-  double real; double imaginary;
+  double real;
+  double imaginary;
 } doubleComplex;
 
 /** \union a union of pointers to a complex number */
 typedef union {
-  floatComplex *f; doubleComplex *d;
+  floatComplex *f;
+  doubleComplex *d;
 } complexPointer;
-  
+
 /** \union a union of scalar values */
 typedef union {
-  uint8_t b; int16_t w; int32_t l; float f; double d; char *s; char **sp;
+  uint8_t b;
+  int16_t w;
+  int32_t l;
+  int64_t q;
+  float f;
+  double d;
+  char *s;
+  char **sp;
 } scalar;
 
 /* wideScalar is equal to scalar plus the complex data types; we have */
 /* separate scalar and wideScalars because wideScalar is wider, which is */
 /* not always desirable. */
 typedef union {
-  uint8_t b; int16_t w; int32_t l; float f; double d; floatComplex cf;
-  doubleComplex cd; char *s; char **sp;
+  uint8_t b;
+  int16_t w;
+  int32_t l;
+  int64_t q;
+  float f;
+  double d;
+  floatComplex cf;
+  doubleComplex cd;
+  char *s;
+  char **sp;
 } wideScalar;
 
 typedef union pointerUnion {
-  uint8_t *b; int16_t *w; int32_t *l; float *f; double *d; char *s;
-  char **sp; void *v; floatComplex *cf; doubleComplex *cd;
+  uint8_t *b;
+  int16_t *w;
+  int32_t *l;
+  int64_t *q;
+  float *f;
+  double *d;
+  char *s;
+  char **sp;
+  void *v;
+  floatComplex *cf;
+  doubleComplex *cd;
 } pointer;
 
 typedef struct {
-  char *key; int16_t value;
+  char *key;
+ int16_t value;
 } listElem;
 
 typedef struct {
@@ -489,8 +519,8 @@ typedef struct arrayStruct {
 } array;
 
 struct boundsStruct {
-  struct { uint8_t b; int16_t w; int32_t l; float f; double d; } min;
-  struct { uint8_t b; int16_t w; int32_t l; float f; double d; } max;
+  struct { uint8_t b; int16_t w; int32_t l; int64_t q; float f; double d; } min;
+  struct { uint8_t b; int16_t w; int32_t l; int64_t q; float f; double d; } max;
 };
 
 typedef struct structElemStruct {
@@ -538,7 +568,7 @@ typedef struct structPtrStruct {
   int32_t   n_subsc;                /* number of subscripts */
   structPtrMember       *member;
 } structPtr;
-        
+
 typedef struct {
   char  *name;
   extractSec    *extract;
@@ -559,7 +589,7 @@ typedef struct symTableEntryStruct {
     struct { preExtract *ptr; int32_t bstore; } preExtract;
     struct { void       *ptr; int32_t bstore; } general;
     struct { structPtr  *ptr; int32_t bstore; } structPtr;
-    pointer     pointer;  
+    pointer     pointer;
     struct { int16_t args[4]; } evb;
     struct { uint16_t args[4]; } uevb;
     struct { uint8_t narg; char **keys; uint8_t extend; uint16_t nstmnt;

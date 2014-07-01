@@ -70,14 +70,15 @@ int32_t fmt_entry(formatInfo *fmi)
    information in other members of <fmi>.  These members are:
 
    fmi->width: the field width extracted from the format entry, if any, or
-           else -1 
+           else -1
    fmi->precision: the precision, if any, or else -1
    fmi->count: the repeat count, if any, or else -1
    fmi->flags: the modifier flags; the logical sum ("or") of zero or more
            of the following: FMT_LEFT_JUSTIFY (-), FMT_ALWAYS_SIGN
            (+), FMT_ZERO_PAD (0), FMT_ALTERNATIVE (#),
            FMT_POSITIVE_BLANK ( ), FMT_SUPPRESS (*), FMT_SMALL (h),
-	   FMT_BIG (l), FMT_MIX (_), FMT_MIX2 (=), FMT_SEPARATE (:).
+	   FMT_BIG (l), FMT_BIGINT (j), FMT_MIX (_), FMT_MIX2 (=),
+           FMT_SEPARATE (:).
    fmi->start: points at the % that introduces the format.
    fmi->spec_char: a pointer to the format specifier character.
    fmi->repeat: points at the start of the repeat count, if any, or
@@ -190,15 +191,18 @@ int32_t fmt_entry(formatInfo *fmi)
     /* more modifiers? */
     do {
       switch (*p++) {
-	case 'h':
-	  fmi->flags |= FMT_SMALL;
-	  continue;
-	case 'l':
-	  fmi->flags |= FMT_BIG;
-	  continue;
-	default:
-	  p--;			/* we went one too far */
-	  break;
+      case 'h':
+        fmi->flags |= FMT_SMALL;
+        continue;
+      case 'j':
+        fmi->flags |= FMT_BIGINT;
+        continue;
+      case 'l':
+        fmi->flags |= FMT_BIG;
+        continue;
+      default:
+        p--;			/* we went one too far */
+        break;
       }
     } while (0);
 
@@ -243,7 +247,7 @@ int32_t fmt_entry(formatInfo *fmi)
 	p++;
       p++;			/* point one beyond the closing ] */
     }
-  
+
     fmi->repeat = p;		/* record this position */
 
     /* look for a repeat count */
@@ -262,7 +266,7 @@ int32_t fmt_entry(formatInfo *fmi)
   fmi->plain = p;
   /* now we are looking at plain text or a group end */
   if (*p != '%' || p[1] != ')')	{ /* we have plain text */
-    if (type == FMT_PLAIN || 
+    if (type == FMT_PLAIN ||
 	(fmi->flags & (FMT_MIX | FMT_MIX2))) { /* plain text is allowed */
       do {
 	p2 = strchr(p, '%');
@@ -490,13 +494,13 @@ int32_t Sprintf(char *str, char *format, ...)
 /*---------------------------------------------------------------------*/
 char *symbolIdent(int32_t symbol, int32_t mode)
 /* assembles a string identifying symbol <iq>, depending on <mode>, at
-   curScrat, and returns curScrat. 
+   curScrat, and returns curScrat.
    modes:
      I_VALUE		show symbol values rather than symbol names; except
 			for routines and functions (see I_ROUTINE)
      I_PARENT		show symbol as member of parent structure
                         (e.g., ROUTINE.SYMBOLNAME)
-     I_TRUNCATE		truncate strings at 20 characters; arrays, 
+     I_TRUNCATE		truncate strings at 20 characters; arrays,
 			structures, and lists at 3 elements; statement
 			groups at 1 member statement
      I_LINE		show the line number associated with the symbol
@@ -508,7 +512,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
   LS 23jul98
 */
 {
-  char	*save, *p, *scalarIndicator = "bw\0\0d", *name;
+  char	*save, *p, *scalarIndicator = "bw\0q\0d", *name;
   scalar	number;
   int32_t	i, j, n, m;
   pointer	ptr;
@@ -523,7 +527,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
   extern char	*errorPtr;
   static int32_t	indent = 0;
   int32_t	identStruct(structElem *);
-  
+
   save = curScrat;
 
   if (symbol == LUX_ERROR) {	/* the error symbol: should not occur here */
@@ -547,7 +551,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
 	return curScrat;
     }
   }
-  
+
   if ((mode & I_FILELEVEL) /* want file level */
       && fileLevel) {		/* have file level */
     sprintf(curScrat, "%1d, ", fileLevel);
@@ -573,7 +577,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
 
   if ((mode & I_NL) == 0)
     mode &= ~I_FILELEVEL;
-  
+
   switch (symbol_class(symbol)) {
     case LUX_SUBROUTINE: case LUX_FUNCTION: case LUX_BLOCKROUTINE:
     case LUX_DEFERRED_SUBR: case LUX_DEFERRED_FUNC: case LUX_DEFERRED_BLOCK:
@@ -586,7 +590,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
 
   if (symbol == errorSym)
     errorPtr = curScrat;
-  
+
   if (i == 0) {		/* want a name, if available */
     p = symbolProperName(symbol); /* get symbol's name at curScrat */
     if (p) { 			/* have a name */
@@ -611,1307 +615,1338 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     symbol = j;
   else
     symbol = i;
-  
+
+  intmax_t intval;
+  double fltval;
+
   switch (symbol_class(symbol)) {
-    case LUX_SCALAR: case LUX_FIXED_NUMBER:
-      switch (scalar_type(symbol)) {
-	case LUX_BYTE:
-	  number.l = (int32_t) scalar_value(symbol).b;
-	  break;
-	case LUX_WORD:
-	  number.l = (int32_t) scalar_value(symbol).w;
-	  break;
-	case LUX_LONG:
-	  number.l = (int32_t) scalar_value(symbol).l;
-	  break;
-	case LUX_FLOAT:
-	  number.d = scalar_value(symbol).f;
-	  break;
-	case LUX_DOUBLE:
-	  number.d = scalar_value(symbol).d;
-	  break;
-      }
-      if (scalar_type(symbol) < LUX_FLOAT) /* integer type */
-	sprintf(curScrat, "%d%c", number.l,
-		scalarIndicator[scalar_type(symbol)]);
-      else {
-	sprintf(curScrat, "%g", number.d);
-	if (scalar_type(symbol) == LUX_FLOAT) {
-	  p = strchr(curScrat, '.');
-	  if (!p) {		/* none yet: add one */
-	    p = curScrat + strlen(curScrat);
-	    strcpy(p, ".");
-	  }
-	} else {		/* DOUBLE */
-	  p = strchr(curScrat, 'e');
-	  if (p)
-	    *p = 'd';		/* replace "e" with "d" to indicate DOUBLE*/
-	  else {
-	    p = curScrat + strlen(curScrat);
-	    strcpy(p, "d");
-	  }
-	}
-      }
+  case LUX_SCALAR: case LUX_FIXED_NUMBER:
+    switch (scalar_type(symbol)) {
+    case LUX_BYTE:
+      intval = (intmax_t) scalar_value(symbol).b;
       break;
-    case LUX_CSCALAR:		/* complex number */
-      ptr.cf = complex_scalar_data(symbol).cf;
-      if (complex_scalar_type(symbol) == LUX_CFLOAT) {
-	if (ptr.cf->real == 0.0)
-	  sprintf(curScrat, "(%g", (double) ptr.cf->imaginary);
-	else
-	  sprintf(curScrat, "(%g+%g", (double) ptr.cf->real,
-		  (double) ptr.cf->imaginary);
-      } else {
-	if (ptr.cd->real == 0.0)
-	  sprintf(curScrat, "(%g", ptr.cd->imaginary);
-	else
-	  sprintf(curScrat, "(%g+%g", ptr.cd->real, ptr.cd->imaginary);
-      }
-      /* we must make sure that there is an "e" or "d" type indicator
-	 in the string; sprintf may provide one or two "e"s if the numbers
-	 are big enough; for CDOUBLE these "e"s must be replaced by "d"s;
-	 if there is no "e" or "d" already in the string, then we add one
-	 at the end.  we also add an "i" at the end to indicate the
-	 complex nature of the number.  LS 16nov98 */
-      p = strchr(curScrat, 'e');
-      if (p) {
-	if (complex_scalar_type(symbol) == LUX_CDOUBLE) {
-	  *p = 'd';
-	  p = strchr(p + 1, 'e');
-	  if (p)
-	    *p = 'd';
-	}
-      } else {
-	/* add one at the end */
-	if (complex_scalar_type(symbol) == LUX_CFLOAT)
-	  strcat(curScrat, "e");
-	else
-	  strcat(curScrat, "d");
-      }
-      strcat(curScrat, "i)");	/* indicate complex number */
+    case LUX_WORD:
+      intval = (intmax_t) scalar_value(symbol).w;
       break;
-    case LUX_STRING:
-      if ((mode & I_TRUNCATE) 
-	  && string_size(symbol) > 20) { /* truncate */
-	sprintf(curScrat, "'%.17s...'", string_value(symbol));
-      } else			/* full value */
-	sprintf(curScrat, "'%s'", string_value(symbol));
-      if ((mode & I_LENGTH)) {	/* need length indication */
-	curScrat += strlen(curScrat);
-	sprintf(curScrat, " (%1d#)", string_size(symbol));
-      }
+    case LUX_LONG:
+      intval = (intmax_t) scalar_value(symbol).l;
       break;
-    case LUX_RANGE: case LUX_PRE_RANGE:
-      strcpy(curScrat++, "(");
-      i = range_start(symbol);
-      if (i == -1)		/* (*) */
-	strcpy(curScrat++, "*");
-      else {
-	if (i < 0) {		/* (* - expr ...) */
-	  i = -i;
-	  strcpy(curScrat, "*-");
-	  curScrat += 2;
-	}
-	symbolIdent(i, mode);
-	curScrat += strlen(curScrat);
-	i = range_end(symbol);
-	if (i != LUX_ZERO) {	/* really have a range end */
-	  strcpy(curScrat++, ":");
-	  if (i < 0) {		/* * ... */
-	    if (i == -1) {	/* just * */
-	      strcpy(curScrat++, "*");
-	      i = 0;
-	    } else {		/* * - expr */
-	      strcpy(curScrat, "*-");
-	      curScrat += 2;
-	      i = -i;
-	    }
-	  }
-	  if (i)
-	    symbolIdent(i, mode);
-	  curScrat += strlen(curScrat);
-	}
-	if (range_sum(symbol)) {
-	  strcpy(curScrat, ":+");
-	  curScrat += 2;
-	}
-	if (range_redirect(symbol) >= 0) {
-	  strcpy(curScrat, ":>");
-	  curScrat += 2;
-	  symbolIdent(range_redirect(symbol), mode);
-	  curScrat += strlen(curScrat);
-	}
-      }
-      strcpy(curScrat, ")");
+    case LUX_QUAD:
+      intval = (intmax_t) scalar_value(symbol).q;
       break;
-    case LUX_ARRAY:
-      strcpy(curScrat++, "[");
-      n = array_size(symbol);
-      if ((mode & I_TRUNCATE)
-	  && n > 3) {
-	j = 3;			/* number to print */
-	i = 1;			/* did truncate */
-      } else {
-	j = n;			/* print all */
-	i = 0;			/* no truncation */
-      }
-      ptr.b = array_data(symbol);
-      switch (array_type(symbol)) {
-	case LUX_BYTE:
-	  while (j--) {
-	    sprintf(curScrat, "%d", (int32_t) *ptr.b++);
-	    curScrat += strlen(curScrat);
-	    if (j || i)
-	      strcpy(curScrat++, ",");
-	  }
-	  break;
-	case LUX_WORD:
-	  while (j--) {
-	    sprintf(curScrat, "%d", (int32_t) *ptr.w++);
-	    curScrat += strlen(curScrat);
-	    if (j || i)
-	      strcpy(curScrat++, ",");
-	  }
-	  break;
-	case LUX_LONG:
-	  while (j--) {
-	    sprintf(curScrat, "%d", *ptr.l++);
-	    curScrat += strlen(curScrat);
-	    if (j || i)
-	      strcpy(curScrat++, ",");
-	  }
-	  break;
-	case LUX_FLOAT:
-	  while (j--) {
-	    sprintf(curScrat, "%g", (double) *ptr.f++);
-	    curScrat += strlen(curScrat);
-	    if (j || i)
-	      strcpy(curScrat++, ",");
-	  }
-	  break;
-	case LUX_DOUBLE:
-	  while (j--) {
-	    sprintf(curScrat, "%g", *ptr.d++);
-	    curScrat += strlen(curScrat);
-	    if (j || i)
-	      strcpy(curScrat++, ",");
-	  }
-	  break;
-	case LUX_STRING_ARRAY:
-	  if ((mode & I_TRUNCATE)) {
-	    while (j--) {
-	      if (*ptr.sp) {
-		if (strlen(*ptr.sp) > 20)  /* need to truncate */
-		  sprintf(curScrat, "'%.17s...'", *ptr.sp);
-		else
-		  sprintf(curScrat, "'%s'", *ptr.sp);
-	      } else
-		strcpy(curScrat, "''");
-	      ptr.sp++;
-	      curScrat += strlen(curScrat);
-	      if (j || i)
-		strcpy(curScrat++, ",");
-	    }
-	  } else {		/* no truncation */
-	    while (j--) {
-	      if (*ptr.sp)
-		sprintf(curScrat, "'%s'", *ptr.sp);
-	      else
-		strcpy(curScrat, "''");
-	      ptr.sp++;
-	      curScrat += strlen(curScrat);
-	      if (j)
-		strcpy(curScrat++, ",");
-	    }
-	  }
-	  break;
-      }
-      if (i) {		/* we truncated */
-	strcpy(curScrat, "...");
-	curScrat += 3;
-      }
-      strcpy(curScrat, "]");
-      if ((mode & I_LENGTH)) { /* need length indication */
-	curScrat += strlen(curScrat);
-	sprintf(curScrat, " (");
-	curScrat += 2;
-	ptr.l = array_dims(symbol);
-	n = array_num_dims(symbol);
-	while (n--) {
-	  sprintf(curScrat, "%1d", *ptr.l++);
-	  curScrat += strlen(curScrat);
-	  if (n)
-	    strcpy(curScrat++, ",");
-	}
-	strcpy(curScrat++, "#)");
-      }
+    case LUX_FLOAT:
+      fltval = (double) scalar_value(symbol).f;
       break;
-    case LUX_POINTER: case LUX_TRANSFER:
-      /* if we get here then this is a pointer to nothing */
-      p = symbolProperName(symbol);
-      strcpy(curScrat, p? p: "(unnamed)");
-      break;
-    case LUX_ASSOC:
-      sprintf(curScrat, "ASSOC(%1d,", assoc_lun(symbol));
-      curScrat += strlen(curScrat);
-      switch (assoc_type(symbol)) {
-	case LUX_BYTE:
-	  strcpy(curScrat, "BYTARR(");
-	  break;
-	case LUX_WORD:
-	  strcpy(curScrat, "INTARR(");
-	  break;
-	case LUX_LONG:
-	  strcpy(curScrat, "LONARR(");
-	  break;
-	case LUX_FLOAT:
-	  strcpy(curScrat, "FLTARR(");
-	  break;
-	case LUX_DOUBLE:
-	  strcpy(curScrat, "DBLARR(");
-	  break;
-      }
-      curScrat += strlen(curScrat);
-      n = assoc_num_dims(symbol);
-      ptr.l = assoc_dims(symbol);
-      while (n--) {
-	sprintf(curScrat, "%1d", *ptr.l++);
-	curScrat += strlen(curScrat);
-	if (n)
-	  strcpy(curScrat++, ",");
-      }
-      strcpy(curScrat++, ")");
-      if (assoc_has_offset(symbol)) {
-	sprintf(curScrat, ",OFFSET=%1d", assoc_offset(symbol));
-	curScrat += strlen(curScrat);
-      }
-      strcpy(curScrat, ")");
-      break;
-    case LUX_FUNC_PTR:
-      strcpy(curScrat++, "&");
-      n = func_ptr_routine_num(symbol);
-      if (n < 0) {		/* internal function/routine */
-	n = -n;
-	switch (func_ptr_type(symbol)) {
-	  case LUX_SUBROUTINE:
-	    strcpy(curScrat, subroutine[n].name);
-	    break;
-	  case LUX_FUNCTION:
-	    strcpy(curScrat, function[n].name);
-	    break;
-	}
-      } else			/* user-defined function/routine */
-	symbolIdent(n, mode);	/* is put at curScratch */
-      break;
-    case LUX_SCAL_PTR:
-      switch (scal_ptr_type(symbol)) {
-	case LUX_BYTE:
-	  number.l = (int32_t) *scal_ptr_pointer(symbol).b;
-	  break;
-	case LUX_WORD:
-	  number.l = (int32_t) *scal_ptr_pointer(symbol).w;
-	  break;
-	case LUX_LONG:
-	  number.l = *scal_ptr_pointer(symbol).l;
-	  break;
-	case LUX_FLOAT:
-	  number.f = *scal_ptr_pointer(symbol).f;
-	  break;
-	case LUX_DOUBLE:
-	  number.f = (float) *scal_ptr_pointer(symbol).d;
-	  break;
-	case LUX_TEMP_STRING:
-	  strcpy(curScrat, scal_ptr_pointer(symbol).s);
-	  curScrat += strlen(curScrat);
-	  break;
-      }
-      if (scal_ptr_type(symbol) < LUX_FLOAT) /* integer type */
-	sprintf(curScrat, "%d", number.l);
-      else if (scal_ptr_type(symbol) <= LUX_DOUBLE) /* float type */
-	sprintf(curScrat, "%g", number.f);
-      break;
-    case LUX_SUBSC_PTR:
-      if (subsc_ptr_start(symbol) == -1) /* (*) */
-	strcpy(curScrat++, "*");
-      else {
-	if (subsc_ptr_start(symbol) < 0) /* (*-...) */
-	  sprintf(curScrat, "*%+1d", subsc_ptr_start(symbol));
-	else
-	  sprintf(curScrat, "%1d", subsc_ptr_start(symbol));
-	curScrat += strlen(curScrat);
-	strcpy(curScrat++, ":");
-	if (subsc_ptr_end(symbol) < 0) { /* (...:*...) */
-	  strcpy(curScrat++, "*");
-	  if (subsc_ptr_end(symbol) != -1) { /* not (...:*-...) */
-	    sprintf(curScrat, "%+1d", subsc_ptr_end(symbol));
-	    curScrat += strlen(curScrat);
-	  }
-	} else {		/* (...:...) */
-	  sprintf(curScrat, "%1d", subsc_ptr_end(symbol));
-	  curScrat += strlen(curScrat);
-	}
-	if (subsc_ptr_sum(symbol)) {
-	  strcpy(curScrat, ":+");
-	  curScrat += 2;
-	}
-	if (subsc_ptr_redirect(symbol) >= 0) {
-	  sprintf(curScrat, ":>%1d", subsc_ptr_redirect(symbol));
-	  curScrat += strlen(curScrat);
-	}
-      }
-      break;
-    case LUX_FILEMAP:
-      switch (file_map_type(symbol)) {
-	case LUX_BYTE:
-	  strcpy(curScrat, "BYTFARR(");
-	  break;
-	case LUX_WORD:
-	  strcpy(curScrat, "INTFARR(");
-	  break;
-	case LUX_LONG:
-	  strcpy(curScrat, "LONFARR(");
-	  break;
-	case LUX_FLOAT:
-	  strcpy(curScrat, "FLTFARR(");
-	  break;
-	case LUX_DOUBLE:
-	  strcpy(curScrat, "DBLFARR(");
-	  break;
-      }
-      curScrat += strlen(curScrat);
-      sprintf(curScrat, "'%s',", file_map_file_name(symbol));
-      curScrat += strlen(curScrat);
-      n = file_map_num_dims(symbol);
-      ptr.l = file_map_dims(symbol);
-      while (n--) {
-	sprintf(curScrat, "%1d", *ptr.l++);
-	curScrat += strlen(curScrat);
-	if (n)
-	  strcpy(curScrat++, ",");
-      }
-      if (file_map_has_offset(symbol)) {
-	sprintf(curScrat, ",OFFSET=%1d", file_map_offset(symbol));
-	curScrat += strlen(curScrat);
-      }
-      if (file_map_readonly(symbol)) {
-	strcpy(curScrat, ",/READONLY");
-	curScrat += strlen(curScrat);
-      }
-      strcpy(curScrat, ")");
-      break;
-    case LUX_CLIST: case LUX_PRE_CLIST: case LUX_CPLIST:
-      strcpy(curScrat++, "{");
-      n = clist_num_symbols(symbol);
-      ptr.w = clist_symbols(symbol);
-      if ((mode & I_TRUNCATE)) {
-	if (n > 3) {
-	  j = 3;		/* number of elements to display */
-	  i = 1;		/* flag truncation */
-	} else {
-	  j = n;
-	  i = 0;		/* no trunctation was necessary */
-	}
-      } else {
-	j = n;
-	i = 0;
-      }
-      m = mode & I_SINGLEMODE;
-      if (symbol_class(symbol) == LUX_CPLIST)
-	/* for CPLIST, show names if possible */
-	m &= ~I_VALUE;
-      while (j--) {
-	symbolIdent(*ptr.w++, m);
-	curScrat += strlen(curScrat);
-	if (j || i)
-	  strcpy(curScrat++, ",");
-      }
-      if (i) {			/* we did truncate */
-	strcpy(curScrat, "...");
-	curScrat += strlen(curScrat);
-      }
-      strcpy(curScrat++, "}");
-      if (i && (mode & I_LENGTH))
-	sprintf(curScrat, " (%1d#)", n);
-      break;
-    case LUX_LIST: case LUX_PRE_LIST:
-      strcpy(curScrat++, "{");
-      n = list_num_symbols(symbol);
-      sptr = list_symbols(symbol);
-      if ((mode & I_TRUNCATE)) {
-	if (n > 3) {
-	  j = 3;
-	  i = 1;
-	} else {
-	  j = n;
-	  i = 0;
-	}
-      } else {
-	j = n;
-	i = 0;
-      }
-      while (j--) {
-	if (sptr->key) {
-	  sprintf(curScrat, "%s:", sptr->key);
-	  curScrat += strlen(curScrat);
-	}
-	symbolIdent(sptr->value, mode & I_SINGLEMODE);
-	curScrat += strlen(curScrat);
-	if (j || i)
-	  strcpy(curScrat++, ",");
-	sptr++;
-      }
-      if (i) {
-	strcpy(curScrat, "...");
-	curScrat += strlen(curScrat);
-      }
-      strcpy(curScrat++, "}");
-      if (i && (mode & I_LENGTH))
-	sprintf(curScrat, " (%1d#)", n);
-      break;
-    case LUX_KEYWORD:
-      if (keyword_value(symbol) == LUX_ONE)
-	sprintf(curScrat, "/%s", keyword_name(symbol));
-      else {
-	sprintf(curScrat, "%s=", keyword_name(symbol));
-	curScrat += strlen(curScrat);
-	symbolIdent(keyword_value(symbol), mode & I_SINGLEMODE);
-      }
-      break;
-    case LUX_LIST_PTR:
-      symbolIdent(list_ptr_target(symbol), mode & I_SINGLEMODE);
-      curScrat += strlen(curScrat);
-      if (list_ptr_target(symbol) < 0) /* numerical tag */
-	sprintf(curScrat, ".%1d", list_ptr_tag_number(symbol));
-      else
-	sprintf(curScrat, ".%s", list_ptr_tag_string(symbol));
-      break;
-    case LUX_ENUM:
-      n = enum_num_elements(symbol);
-      strcpy(curScrat++, "{");
-      eptr = enum_list(symbol);
-      if ((mode & I_TRUNCATE) && n > 3) {
-	j = 3;
-	i = 1;
-      } else {
-	j = n;
-	i = 0;
-      }
-      while (j--) {
-	sprintf(curScrat, "%s:%1d", eptr->key, eptr->value);
-	eptr++;
-	curScrat += strlen(curScrat);
-	if (i || j)
-	  strcpy(curScrat++, ",");
-      }
-      if (i) {
-	strcpy(curScrat, "...");
-	curScrat += strlen(curScrat);
-      }
-      if (mode & I_LENGTH) {
-	sprintf(curScrat, " (%1d#)", n);
-	curScrat += strlen(curScrat);
-      }
-      strcpy(curScrat, "}");
-      break;
-    case LUX_META:
-      sprintf(curScrat, "SYMBOL('%s')", string_value(meta_target(symbol)));
-      break;
-    case LUX_CARRAY:
-      ptr.cf = array_data(symbol);
-      n = array_size(symbol);
-      strcpy(curScrat++, "[");
-      if ((mode & I_TRUNCATE)
-	  && n > 3) {
-	j = 3;
-	i = 1;
-      } else {
-	j = n;
-	i = 0;
-      }
-      switch (array_type(symbol)) {
-	case LUX_CFLOAT:
-	  while (j--) {
-	    sprintf(curScrat, "(%g%+-1gi)", ptr.cf->real, ptr.cf->imaginary);
-	    curScrat += strlen(curScrat);
-	    if (i || j)
-	      strcpy(curScrat++, ",");
-	    ptr.cf++;
-	  }
-	  break;
-	case LUX_CDOUBLE:
-	  while (j--) {
-	    sprintf(curScrat, "(%g%+-1gi)", ptr.cd->real, ptr.cd->imaginary);
-	    curScrat += strlen(curScrat);
-	    if (i || j)
-		strcpy(curScrat++, ",");
-	    ptr.cd++;
-	    }
-	  break;
-      }
-      if (i) {
-	sprintf(curScrat, "...");
-	curScrat += strlen(curScrat);
-      }
-      if (mode & I_LENGTH) {
-	sprintf(curScrat, " (%1d#)", n);
-	curScrat += strlen(curScrat);
-      }
-      strcpy(curScrat, "]");
-      break;
-    case LUX_SUBROUTINE: case LUX_FUNCTION: case LUX_BLOCKROUTINE:
-    case LUX_DEFERRED_SUBR: case LUX_DEFERRED_FUNC: case LUX_DEFERRED_BLOCK:
-      switch (symbol_class(symbol)) {
-	case LUX_SUBROUTINE: case LUX_DEFERRED_SUBR:
-	  name = "SUBR";
-	  break;
-	case LUX_FUNCTION: case LUX_DEFERRED_FUNC:
-	  name = "FUNC";
-	  break;
-	case LUX_BLOCKROUTINE: case LUX_DEFERRED_BLOCK:
-	  name = "BLOCK";
-	  break;
-      }
-      sprintf(curScrat, " %s ", name);
-      curScrat += strlen(curScrat);
-      p = symbolProperName(symbol);
-      strcpy(curScrat, p? p: "(unnamed)");
-      curScrat += strlen(curScrat);
-      if (symbol_class(symbol) == LUX_DEFERRED_SUBR
-	  || symbol_class(symbol) == LUX_DEFERRED_FUNC
-	  || symbol_class(symbol) == LUX_DEFERRED_BLOCK) {
-	sprintf(curScrat, " (deferred, file \"%s\") END%s",
-		deferred_routine_filename(symbol), name);
-	curScrat += strlen(curScrat);
-	if (mode & I_NL) {
-	  sprintf(curScrat, "\n%*s", indent, "");
-	  curScrat += strlen(curScrat);
-	} else
-	  strcpy(curScrat++, " ");
-	break;
-      }
-      n = routine_num_parameters(symbol);
-      if (symbol_class(symbol) == LUX_FUNCTION)
-	strcpy(curScrat++, "(");
-      if (n) {			/* have parameters */
-	ptr.sp = routine_parameter_names(symbol);
-	if (symbol_class(symbol) == LUX_SUBROUTINE)
-	  strcpy(curScrat++, ",");
-	while (n--) {
-	  sprintf(curScrat, "%s", *ptr.sp++);
-	  curScrat += strlen(curScrat);
-	  if (n)
-	    strcpy(curScrat++, ",");
-	}
-      }
-      if (symbol_class(symbol) == LUX_FUNCTION)
-	strcpy(curScrat++, ")");
-      if (mode & I_NL) {
-	indent += 2;
-	sprintf(curScrat, "\n%*s", indent, "");
-	curScrat += strlen(curScrat);
-      } else
-	strcpy(curScrat++, " ");
-      n = routine_num_statements(symbol);
-      ptr.w = routine_statements(symbol);
-      if ((mode & I_TRUNCATE) && n > 1) {
-	j = 1;
-	i = 1;
-      } else {
-	j = n;
-	i = 0;
-      }
-      if (j) {			/* have statements */
-	while (j--) {
-	  symbolIdent(*ptr.w++, mode & ~I_PARENT);
-	  curScrat += strlen(curScrat);
-	  if (mode & I_NL) {
-	    if (!j && !i)
-	      indent -= 2;
-	    sprintf(curScrat, "\n%*s", indent, "");
-	    curScrat += strlen(curScrat);
-	  } else
-	    strcpy(curScrat++, " ");
-	}
-      }
-      if (i) {			/* we truncated */
-	strcpy(curScrat, "...");
-	curScrat += strlen(curScrat);
-	if ((mode & I_LENGTH)) {
-	  sprintf(curScrat, " (%1d#)", n);
-	  curScrat += strlen(curScrat);
-	}
-	if (mode & I_NL) {
-	  indent -= 2;
-	  sprintf(curScrat, "\n%*s", indent, "");
-	  curScrat += strlen(curScrat);
-	} else
-	  strcpy(curScrat++, " ");
-      }
-      sprintf(curScrat, "END%s", name);
-      curScrat += strlen(curScrat);
-      if (mode & I_NL) {
-	sprintf(curScrat, "\n%*s", indent, "");
-	curScrat += strlen(curScrat);
-      }	else
-	strcpy(curScrat++, " ");
-      break;
-    case LUX_BIN_OP: case LUX_IF_OP:
-      strcpy(curScrat++, "(");
-      symbolIdent(bin_op_lhs(symbol), mode & I_SINGLEMODE);
-      curScrat += strlen(curScrat);
-      switch (bin_op_type(symbol)) {
-      case LUX_ADD: case LUX_SUB: case LUX_MUL: case LUX_DIV:
-      case LUX_POW: case LUX_MOD: case LUX_MAX: case LUX_MIN:
-      case LUX_IDIV:
-	strcpy(curScrat, binOpSign[bin_op_type(symbol)]);
-	break;
-      case LUX_EQ: case LUX_LE: case LUX_LT: case LUX_GT:
-      case LUX_NE: case LUX_AND: case LUX_OR: case LUX_XOR:
-      case LUX_ANDIF: case LUX_ORIF: case LUX_GE: case LUX_SMOD:
-	sprintf(curScrat, " %s ", binOpSign[bin_op_type(symbol)]);
-	break;
-      }
-      curScrat += strlen(curScrat);
-      symbolIdent(bin_op_rhs(symbol), mode & I_SINGLEMODE);
-      curScrat += strlen(curScrat);
-      strcpy(curScrat, ")");
-      break;
-    case LUX_INT_FUNC:
-      n = 0;
-      switch (int_func_number(symbol)) {
-	case 0:			/* unary_negative */
-	  strcpy(curScrat++, "-");
-	  if (symbolIsUnitaryExpression(symbol)) {
-	    symbolIdent(*int_func_arguments(symbol), mode & I_SINGLEMODE);
-	    n = 0;
-	  } else {
-	    strcpy(curScrat++, "(");
-	    n = 1;
-	  }
-	  break;
-	case 1:			/* subscript */
-	  n = int_func_num_arguments(symbol);
-	  arg = int_func_arguments(symbol);
-	  symbolIdent(arg[n - 1], mode & I_SINGLEMODE);
-	  curScrat += strlen(curScrat);
-	  strcpy(curScrat++, "(");
-	  n--;
-	  while (n--) {
-	    symbolIdent(*arg++, mode & I_SINGLEMODE);
-	    curScrat += strlen(curScrat);
-	    if (n)
-	      strcpy(curScrat++, ",");
-	  }
-	  strcpy(curScrat, ")");
-	  n = 0;
-	  break;
-	case 2:			/* cputime */
-	  strcpy(curScrat, "!CPUTIME");
-	  curScrat += strlen(curScrat);
-	  n = 0;
-	  break;
-	case 3:			/* power */
-	  n = 1;
-	  break;
-	case 4:			/* concat */
-	  strcpy(curScrat++, "[");
-	  n = int_func_num_arguments(symbol);
-	  if ((mode & I_TRUNCATE)
-	      && n > 3) {
-	    n = 3;
-	    i = 1;
-	  } else
-	    i = 0;
-	  arg = int_func_arguments(symbol);
-	  while (n--) {
-	    symbolIdent(*arg++, mode & I_SINGLEMODE);
-	    curScrat += strlen(curScrat);
-	    if (n)
-	      strcpy(curScrat++, ",");
-	  }
-	  if (i) {
-	    strcpy(curScrat, ",...");
-	    curScrat += strlen(curScrat);
-	  }
-	  strcpy(curScrat, "]");
-	  n = 0;
-	  break;
-	case 5:			/* ctime */
-	  strcpy(curScrat, "!CTIME");
-	  curScrat += strlen(curScrat);
-	  n = 0;
-	  break;
-	case 6:			/* time */
-	  strcpy(curScrat, "!TIME");
-	  curScrat += strlen(curScrat);
-	  n = 0;
-	  break;
-	case 7:			/* date */
-	  strcpy(curScrat, "!DATE");
-	  curScrat += strlen(curScrat);
-	  n = 0;
-	  break;
-	case 8:			/* readkey */
-	  strcpy(curScrat, "!READKEY");
-	  curScrat += strlen(curScrat);
-	  n = 0;
-	  break;
-	case 9:			/* readkeyne */
-	  strcpy(curScrat, "!READKEYNE");
-	  curScrat += strlen(curScrat);
-	  n = 0;
-	  break;
-	case 10:		/* systime */
-	  strcpy(curScrat, "!SYSTIME");
-	  curScrat += strlen(curScrat);
-	  n = 0;
-	  break;
-	case 11:		/* jd */
-	  strcpy(curScrat, "!JD");
-	  curScrat += strlen(curScrat);
-	  n = 0;
-	  break;
-	default:
-	  sprintf(curScrat, "%s(", function[int_func_number(symbol)].name);
-	  curScrat += strlen(curScrat);
-	  n = 1;
-	  break;
-      }
-      if (n) {
-	n = int_func_num_arguments(symbol);
-	ptr.w = int_func_arguments(symbol);
-	while (n--) {
-	  symbolIdent(*ptr.w++, mode & I_SINGLEMODE);
-	  curScrat += strlen(curScrat);
-	  if (n)
-	    strcpy(curScrat++, ",");
-	}
-	strcpy(curScrat++, ")");
-      }
-      break;
-    case LUX_USR_FUNC:
-      p = symbolProperName(usr_func_number(symbol));
-      sprintf(curScrat, "%s(", p? p: "(unnamed)");
-      curScrat += strlen(curScrat);
-      n = usr_func_num_arguments(symbol);
-      ptr.w = usr_func_arguments(symbol);
-      while (n--) {
-	symbolIdent(*ptr.w++, mode & I_SINGLEMODE);
-	curScrat += strlen(curScrat);
-	if (n)
-	  strcpy(curScrat++, ",");
-      }
-      strcpy(curScrat++, ")");
-      break;
-    case LUX_EXTRACT: case LUX_PRE_EXTRACT:
-      if (symbol_class(symbol) == LUX_EXTRACT) {
-	if (extract_target(symbol) > 0) { /* target is regular symbol */
-	  switch (symbol_class(extract_target(symbol))) {
-	    case LUX_FUNCTION:
-	      strcpy(curScrat, symbolProperName(extract_target(symbol)));
-	      break;
-	    default:
-	      symbolIdent(extract_target(symbol), mode & I_SINGLEMODE);
-	      break;
-	  }
-	} else
-	  strcpy(curScrat, function[-extract_target(symbol)].name);
-	curScrat += strlen(curScrat);
-	sec = extract_ptr(symbol);
-	n = extract_num_sec(symbol);
-      } else {			/* an LUX_PRE_EXTRACT symbol */
-	strcpy(curScrat, pre_extract_name(symbol));
-	sec = pre_extract_ptr(symbol);
-	n = pre_extract_num_sec(symbol);
-      }
-      curScrat += strlen(curScrat);
-      if (!n) {
-	strcpy(curScrat, "()");
-	break;
-      }
-      while (n--) {
-	i = sec->number;
-	switch (sec->type) {
-	  case LUX_RANGE:
-	    strcpy(curScrat++, "(");
-	    ptr.w = sec->ptr.w;
-	    while (i--) {
-	      symbolIdent(*ptr.w++, mode & I_SINGLEMODE);
-	      curScrat += strlen(curScrat);
-	      if (i)
-		strcpy(curScrat++, ",");
-	    }
-	    strcpy(curScrat++, ")");
-	    break;
-	  case LUX_LIST:
-	    ptr.sp = sec->ptr.sp;
-	    while (i--) {
-	      strcpy(curScrat++, ".");
-	      strcpy(curScrat, *ptr.sp++);
-	      curScrat += strlen(curScrat);
-	    }
-	    break;
-	}
-	sec++;
-      }
-      break;
-    case LUX_EVB:
-      n = evb_num_elements(symbol);
-      ptr.w = evb_args(symbol);
-      switch (evb_type(symbol)) {
-	case EVB_RETURN:
-	  strcpy(curScrat, "RETURN");
-	  curScrat += strlen(curScrat);
-	  if (return_value(symbol)) {
-	    strcpy(curScrat++, ",");
-	    symbolIdent(return_value(symbol), mode & I_SINGLEMODE);
-	  }
-	  break;
-	case EVB_REPLACE:
-	  symbolIdent(replace_lhs(symbol), mode & I_SINGLEMODE & ~I_VALUE);
-	  curScrat += strlen(curScrat);
-	  strcpy(curScrat++, "=");
-	  symbolIdent(replace_rhs(symbol), mode & I_SINGLEMODE);
-	  break;
-	case EVB_REPEAT:
-	  strcpy(curScrat, "REPEAT ");
-	  curScrat += strlen(curScrat);
-	  if (mode & I_NL) {
-	    indent += 2;
-	    sprintf(curScrat, "\n%*s", indent, "");
-	    curScrat += strlen(curScrat);
-	  } else
-	    strcpy(curScrat++, " ");
-	  symbolIdent(repeat_body(symbol), mode);
-	  curScrat += strlen(curScrat);
-	  if (mode & I_NL) {
-	    indent -= 2;
-	    sprintf(curScrat, "\n%*s", indent, "");
-	    curScrat += strlen(curScrat);
-	  } else
-	    strcpy(curScrat++, " ");
-	  strcpy(curScrat, "UNTIL ");
-	  curScrat += strlen(curScrat);
-	  symbolIdent(repeat_condition(symbol), mode & I_SINGLEMODE);
-	  break;
-	case EVB_WHILE_DO:
-	  strcpy(curScrat, "WHILE ");
-	  curScrat += strlen(curScrat);
-	  symbolIdent(while_do_condition(symbol), mode & I_SINGLEMODE);
-	  curScrat += strlen(curScrat);
-	  strcpy(curScrat, " DO ");
-	  curScrat += strlen(curScrat);
-	  if (mode & I_NL) {
-	    indent += 2;
-	    sprintf(curScrat, "\n%*s", indent, "");
-	    curScrat += strlen(curScrat);
-	  } else
-	    strcpy(curScrat++, " ");
-	  symbolIdent(while_do_body(symbol), mode);
-	  curScrat += strlen(curScrat);
-	  if (mode & I_NL)
-	    indent -= 2;
-	  break;
-	case EVB_DO_WHILE:
-	  strcpy(curScrat, "DO ");
-	  curScrat += strlen(curScrat);
-	  if (mode & I_NL) {
-	    indent += 2;
-	    sprintf(curScrat, "\n%*s", indent, "");
-	    curScrat += strlen(curScrat);
-	  } else
-	    strcpy(curScrat++, " ");
-	  symbolIdent(do_while_body(symbol), mode);
-	  curScrat += strlen(curScrat);
-	  if (mode & I_NL) {
-	    indent -= 2;
-	    sprintf(curScrat, "\n%*s", indent, "");
-	    curScrat += strlen(curScrat);
-	  } else
-	    strcpy(curScrat++, " ");
-	  strcpy(curScrat, "WHILE ");
-	  curScrat += strlen(curScrat);
-	  symbolIdent(do_while_condition(symbol), mode & I_SINGLEMODE);
-	  break;
-	case EVB_IF:
-	  strcpy(curScrat, "IF ");
-	  curScrat += strlen(curScrat);
-	  symbolIdent(if_condition(symbol), mode & I_SINGLEMODE);
-	  curScrat += strlen(curScrat);
-	  strcpy(curScrat, " THEN");
-	  curScrat += strlen(curScrat);
-	  if (mode & I_NL) {
-	    indent += 2;
-	    sprintf(curScrat, "\n%*s", indent, "");
-	    curScrat += strlen(curScrat);
-	  } else
-	    strcpy(curScrat++, " ");
-	  symbolIdent(if_true_body(symbol), mode);
-	  curScrat += strlen(curScrat);
-	  if (mode & I_NL) {
-	    indent -= 2;
-	    sprintf(curScrat, "\n%*s", indent, "");
-	    curScrat += strlen(curScrat);
-	  } else
-	    strcpy(curScrat++, " ");
-	  if (if_false_body(symbol)) {
-	    strcpy(curScrat, "ELSE");
-	    curScrat += strlen(curScrat);
-	    if (mode & I_NL) {
-	      indent += 2;
-	      sprintf(curScrat, "\n%*s", indent, "");
-	      curScrat += strlen(curScrat);
-	    } else
-	      strcpy(curScrat++, " ");
-	    symbolIdent(if_false_body(symbol), mode);
-	    curScrat += strlen(curScrat);
-	    if (mode & I_NL) {
-	      indent -= 2;
-	      sprintf(curScrat, "\n%*s", indent, "");
-	      curScrat += strlen(curScrat);
-	    } else
-	      strcpy(curScrat++, " ");
-	  }
-	  break;
-	case EVB_FOR:
-	  strcpy(curScrat, "FOR ");
-	  curScrat += strlen(curScrat);
-	  p = symbolProperName(for_loop_symbol(symbol));
-	  sprintf(curScrat, "%s=", p? p: "(unnamed)");
-	  curScrat += strlen(curScrat);
-	  symbolIdent(for_start(symbol), mode & I_SINGLEMODE);
-	  curScrat += strlen(curScrat);
-	  strcpy(curScrat++, ",");
-	  symbolIdent(for_end(symbol), mode & I_SINGLEMODE);
-	  curScrat += strlen(curScrat);
-	  if (for_step(symbol) != LUX_ONE) {
-	    strcpy(curScrat++, ",");
-	    symbolIdent(for_step(symbol), mode & I_SINGLEMODE);
-	    curScrat += strlen(curScrat);
-	  }
-	  if (mode & I_NL) {
-	    indent += 2;
-	    sprintf(curScrat, "\n%*s", indent, "");
-	    curScrat += strlen(curScrat);
-	  } else
-	    strcpy(curScrat++, " ");
-	  symbolIdent(for_body(symbol), mode);
-	  curScrat += strlen(curScrat);
-	  if (mode & I_NL)
-	    indent -= 2;
-	  break;
-	case EVB_USR_CODE:
-	  strcpy(curScrat, "RUN,");
-	  curScrat += strlen(curScrat);
-	  n = usr_code_routine_num(symbol);
-	  if (symbol_class(n) == LUX_STRING)  /* unevaluated name */
-	    strcpy(curScrat, string_value(n));
-	  else {
-	    p = symbolProperName(usr_code_routine_num(symbol));
-	    strcpy(curScrat, p? p: "(unnamed)");
-	  }
-	  break;
-	case EVB_FILE:
-	  switch (file_include_type(symbol)) {
-	    case FILE_REPORT:
-	      strcpy(curScrat, "@@");
-	      curScrat += 2;
-	      break;
-	    case FILE_INCLUDE:
-	      strcpy(curScrat++, "@");
-	      break;
-	  }
-	  strcpy(curScrat, file_name(symbol));
-	  break;
-	case EVB_INT_SUB:
-	  switch (int_sub_routine_num(symbol)) {
-	    case LUX_INSERT_SUB: /* INSERT */
-	      n = int_sub_num_arguments(symbol) - 2;
-	      ptr.w = int_sub_arguments(symbol);
-	      symbolIdent(ptr.w[n + 1], mode & I_SINGLEMODE);
-	      curScrat += strlen(curScrat);
-	      strcpy(curScrat++, "(");
-	      while (n--) {
-		symbolIdent(*ptr.w++, mode & I_SINGLEMODE);
-		curScrat += strlen(curScrat);
-		if (n)
-		  strcpy(curScrat++, ",");
-	      }
-	      strcpy(curScrat, ")=");
-	      curScrat += strlen(curScrat);
-	      symbolIdent(*ptr.w, mode & I_SINGLEMODE);
-	      break;
-	    default:
-	      strcpy(curScrat, subroutine[int_sub_routine_num(symbol)].name);
-	      curScrat += strlen(curScrat);
-	      n = int_sub_num_arguments(symbol);
-	      ptr.w = int_sub_arguments(symbol);
-	      while (n--) {
-		strcpy(curScrat++, ",");
-		symbolIdent(*ptr.w++, mode & I_SINGLEMODE);
-		curScrat += strlen(curScrat);
-	      }
-	      break;
-	  }
-	  break;
-	case EVB_USR_SUB:
-	  if (usr_sub_is_deferred(symbol))  /* call to an LUX_DEFERRED_SUBR */
-	    strcpy(curScrat, string_value(usr_sub_routine_num(symbol)));
-	  else {
-	    p = symbolProperName(usr_sub_routine_num(symbol));
-	    sprintf(curScrat, "%s", p? p: "(unnamed)");
-	  }
-	  curScrat += strlen(curScrat);
-	  n = usr_sub_num_arguments(symbol);
-	  ptr.w = usr_sub_arguments(symbol);
-	  while (n--) {
-	    strcpy(curScrat++, ",");
-	    symbolIdent(*ptr.w++, mode & I_SINGLEMODE);
-	    curScrat += strlen(curScrat);
-	  }
-	  break;
-	case EVB_INSERT:
-	  p = symbolProperName(insert_target(symbol));
-	  sprintf(curScrat, "%s(", p? p: "(unnamed)");
-	  curScrat += strlen(curScrat);
-	  n = insert_num_target_indices(symbol);
-	  ptr.w = insert_target_indices(symbol);
-	  while (n--) {
-	    symbolIdent(*ptr.w++, mode & I_SINGLEMODE);
-	    curScrat += strlen(curScrat);
-	    if (n)
-	      strcpy(curScrat++, ",");
-	  }
-	  strcpy(curScrat++, ")=");
-	  symbolIdent(insert_source(symbol), mode & I_SINGLEMODE);
-	  break;
-	case EVB_CASE:
-	  strcpy(curScrat, "CASE ");
-	  curScrat += strlen(curScrat);
-	  if (mode & I_NL) {
-	    indent += 2;
-	    sprintf(curScrat, "\n%*s", indent, "");
-	    curScrat += strlen(curScrat);
-	  } else
-	    strcpy(curScrat++, " ");
-	  n = case_num_statements(symbol);
-	  n = (n - 1)/2;	/* number of statements */
-	  if ((mode & I_TRUNCATE) && n > 1) {
-	    j = 1;
-	    i = 1;
-	  } else {
-	    j = n;
-	    i = 0;
-	  }
-	  ptr.w = case_statements(symbol);
-	  while (j--) {
-	    symbolIdent(*ptr.w++, mode & I_SINGLEMODE);	/* condition */
-	    curScrat += strlen(curScrat);
-	    strcpy(curScrat, " : ");
-	    curScrat += 3;
-	    if (mode & I_NL) {
-	      indent += 2;
-	      sprintf(curScrat, "\n%*s", indent, "");
-	      curScrat += strlen(curScrat);
-	    } else
-	      strcpy(curScrat++, " ");
-	    curScrat += strlen(curScrat);
-	    symbolIdent(*ptr.w++, mode & I_SINGLEMODE);	/* action */
-	    curScrat += strlen(curScrat);
-	    if (mode & I_NL) {
-	      indent -= 2;
-	      if (!j && !*ptr.w) /* last one and no ELSE */
-		indent -= 2;
-	      sprintf(curScrat, "\n%*s", indent, "");
-	      curScrat += strlen(curScrat);
-	    } else
-	      strcpy(curScrat++, " ");
-	  }
-	  if (i) {		/* we truncated */
-	    strcpy(curScrat, "...");
-	    curScrat += 3;
-	    if ((mode & I_LENGTH)) {
-	      sprintf(curScrat, " (%1d#)", n);
-	      curScrat += strlen(curScrat);
-	    }
-	    ptr.w += n - 1;
-	  }
-	  if (*ptr.w) {		/* have an ELSE clause */
-	    strcpy(curScrat, "ELSE ");
-	    curScrat += strlen(curScrat);
-	    if (mode & I_NL) {
-	      indent += 2;
-	      sprintf(curScrat, "\n%*s", indent, "");
-	      curScrat += strlen(curScrat);
-	    } else
-	      strcpy(curScrat++, " ");
-	    symbolIdent(*ptr.w, mode & I_SINGLEMODE);
-	    curScrat += strlen(curScrat);
-	    if (mode & I_NL) {
-	      indent -= 4;
-	      sprintf(curScrat, "\n%*s", indent, "");
-	      curScrat += strlen(curScrat);
-	    } else
-	      strcpy(curScrat++, " ");
-	  }
-	  strcpy(curScrat, "ENDCASE");
-	  break;
-	case EVB_NCASE:
-	  strcpy(curScrat, "NCASE ");
-	  curScrat += strlen(curScrat);
-	  symbolIdent(ncase_switch_value(symbol), mode & I_SINGLEMODE);
-	  curScrat += strlen(curScrat);
-	  if (mode & I_NL) {
-	    indent += 2;
-	    sprintf(curScrat, "\n%*s", indent, "");
-	    curScrat += strlen(curScrat);
-	  } else
-	    strcpy(curScrat++, " ");
-	  n = ncase_num_statements(symbol);
-	  if ((mode & I_TRUNCATE) && n > 1) {
-	    j = 1;
-	    i = 1;
-	  } else {
-	    j = n;
-	    i = 0;
-	  }
-	  ptr.w = ncase_statements(symbol);
-	  while (j--) {
-	    symbolIdent(*ptr.w++, mode & I_SINGLEMODE);
-	    curScrat += strlen(curScrat);
-	    if (mode & I_NL) {
-	      if (!j && !ncase_else(symbol))
-		indent -= 2;
-	      sprintf(curScrat, "\n%*s", indent, "");
-	      curScrat += strlen(curScrat);
-	    } else
-	      strcpy(curScrat++, " ");
-	  }
-	  if (i) {		/* we were truncating */
-	    strcpy(curScrat, "...");
-	    curScrat += strlen(curScrat);
-	    if ((mode & I_LENGTH)) {
-	      sprintf(curScrat, " (%1d#)", n);
-	      curScrat += strlen(curScrat);
-	    }
-	    ptr.w += n - 1;
-	  }
-	  if (ncase_else(symbol)) {
-	    strcpy(curScrat, "ELSE ");
-	    curScrat += strlen(curScrat);
-	    if (mode & I_NL) {
-	      indent += 2;
-	      sprintf(curScrat, "\n%*s", indent, "");
-	      curScrat += strlen(curScrat);
-	    } else
-	      strcpy(curScrat++, " ");
-	    symbolIdent(ncase_else(symbol), mode & I_SINGLEMODE);
-	    curScrat += strlen(curScrat);
-	    if (mode & I_NL) {
-	      indent -= 4;
-	      sprintf(curScrat, "\n%*s", indent, "");
-	      curScrat += strlen(curScrat);
-	    } else
-	      strcpy(curScrat++, " ");
-	  }
-	  strcpy(curScrat, "ENDCASE");
-	  break;
-	case EVB_BLOCK:
-	  strcpy(curScrat, "{ ");
-	  if (mode & I_NL)
-	    indent += 2;
-	  curScrat += strlen(curScrat);
-	  n = block_num_statements(symbol);
-	  ptr.w = block_statements(symbol);
-	  if ((mode & I_TRUNCATE) && n > 1) {
-	    j = 1;
-	    i = 1;
-	  } else {
-	    j = n;
-	    i = 0;
-	  }
-	  while (j--) {
-	    symbolIdent(*ptr.w++, mode);
-	    curScrat += strlen(curScrat);
-	    if ((mode & I_NL) && (j || i)) {
-	      sprintf(curScrat, "\n%*s", indent, "");
-	      curScrat += strlen(curScrat);
-	    } else
-	      strcpy(curScrat++, " ");
-	  }
-	  if (i) {		/* we truncated */
-	    strcpy(curScrat, "...");
-	    curScrat += strlen(curScrat);
-	    if ((mode & I_LENGTH)) {
-	      sprintf(curScrat, " (%1d#)", n);
-	      curScrat += strlen(curScrat);
-	    }
-	  }
-	  strcpy(curScrat++, "}");
-	  if (mode & I_NL)
-	    indent -= 2;
-	  break;
-	default:
-	  sprintf(curScrat, "[EVB type %1d]", evb_type(symbol));
-	  break;
-      }
-      break;
-    case LUX_STRUCT:
-      se = struct_elements(symbol);
-      identStruct(se);
-      break;
-    case LUX_STRUCT_PTR:
-      spe = struct_ptr_elements(symbol);
-      n = struct_ptr_n_elements(symbol);
-      symbolIdent(struct_ptr_target(symbol), mode);
-      curScrat += strlen(curScrat);
-      strcpy(curScrat++, "(");
-      se = struct_elements(struct_ptr_target(symbol));
-      while (n--) {
-	if (!spe->desc) {	/* top element */
-	  i = spe->n_subsc;	/* number of subscripts */
-	  spm = spe->member;
-	  while (i--) {
-	    switch (spm->type) {
-	      case LUX_SCALAR:
-		sprintf(curScrat, "%1d", spm->data.scalar.value);
-		break;
-	      case LUX_RANGE:
-		sprintf(curScrat, "%1d:%1d", spm->data.range.start,
-			spm->data.range.end);
-		break;
-	      case LUX_ARRAY:
-		strcpy(curScrat++, "[");
-		j = spm->data.array.n_elem;
-		if ((mode & I_TRUNCATE) && j > 3)
-		  j = 3;
-		ptr.l = spm->data.array.ptr;
-		while (j--) {
-		  sprintf(curScrat, "%1d", *ptr.l++);
-		  curScrat += strlen(curScrat);
-		  if (j)
-		    strcpy(curScrat++, ",");
-		}
-		strcpy(curScrat++, "]");
-		break;
-	    }
-	    curScrat += strlen(curScrat);
-	    spm++;
-	  }
-	}
-	spe++;
-      }
-      break;
-    case LUX_UNDEFINED:
-      p = symbolProperName(symbol);
-      sprintf(curScrat, "%s?", p? p: "(unnamed)");
+    case LUX_DOUBLE:
+      fltval = (double) scalar_value(symbol).d;
       break;
     default:
-      sprintf(curScrat, "[class %1d (%s)]",
-	      symbol_class(symbol), className(symbol_class(symbol)));
+      cerror(ILL_TYPE, symbol);
+    }
+    if (symbolIsInteger(symbol))
+      sprintf(curScrat, "%jd%c", intval,
+              scalarIndicator[scalar_type(symbol)]);
+    else {
+      sprintf(curScrat, "%g", fltval);
+      if (scalar_type(symbol) == LUX_FLOAT) {
+        p = strchr(curScrat, '.');
+        if (!p) {		/* none yet: add one */
+          p = curScrat + strlen(curScrat);
+          strcpy(p, ".");
+        }
+      } else {		/* DOUBLE */
+        p = strchr(curScrat, 'e');
+        if (p)
+          *p = 'd';		/* replace "e" with "d" to indicate DOUBLE*/
+        else {
+          p = curScrat + strlen(curScrat);
+          strcpy(p, "d");
+        }
+      }
+    }
+    break;
+  case LUX_CSCALAR:		/* complex number */
+    ptr.cf = complex_scalar_data(symbol).cf;
+    if (complex_scalar_type(symbol) == LUX_CFLOAT) {
+      if (ptr.cf->real == 0.0)
+        sprintf(curScrat, "(%g", (double) ptr.cf->imaginary);
+      else
+        sprintf(curScrat, "(%g+%g", (double) ptr.cf->real,
+                (double) ptr.cf->imaginary);
+    } else {
+      if (ptr.cd->real == 0.0)
+        sprintf(curScrat, "(%g", ptr.cd->imaginary);
+      else
+        sprintf(curScrat, "(%g+%g", ptr.cd->real, ptr.cd->imaginary);
+    }
+    /* we must make sure that there is an "e" or "d" type indicator
+       in the string; sprintf may provide one or two "e"s if the numbers
+       are big enough; for CDOUBLE these "e"s must be replaced by "d"s;
+       if there is no "e" or "d" already in the string, then we add one
+       at the end.  we also add an "i" at the end to indicate the
+       complex nature of the number.  LS 16nov98 */
+    p = strchr(curScrat, 'e');
+    if (p) {
+      if (complex_scalar_type(symbol) == LUX_CDOUBLE) {
+        *p = 'd';
+        p = strchr(p + 1, 'e');
+        if (p)
+          *p = 'd';
+      }
+    } else {
+      /* add one at the end */
+      if (complex_scalar_type(symbol) == LUX_CFLOAT)
+        strcat(curScrat, "e");
+      else
+        strcat(curScrat, "d");
+    }
+    strcat(curScrat, "i)");	/* indicate complex number */
+    break;
+  case LUX_STRING:
+    if ((mode & I_TRUNCATE)
+        && string_size(symbol) > 20) { /* truncate */
+      sprintf(curScrat, "'%.17s...'", string_value(symbol));
+    } else			/* full value */
+      sprintf(curScrat, "'%s'", string_value(symbol));
+    if ((mode & I_LENGTH)) {	/* need length indication */
+      curScrat += strlen(curScrat);
+      sprintf(curScrat, " (%1d#)", string_size(symbol));
+    }
+    break;
+  case LUX_RANGE: case LUX_PRE_RANGE:
+    strcpy(curScrat++, "(");
+    i = range_start(symbol);
+    if (i == -1)		/* (*) */
+      strcpy(curScrat++, "*");
+    else {
+      if (i < 0) {		/* (* - expr ...) */
+        i = -i;
+        strcpy(curScrat, "*-");
+        curScrat += 2;
+      }
+      symbolIdent(i, mode);
+      curScrat += strlen(curScrat);
+      i = range_end(symbol);
+      if (i != LUX_ZERO) {	/* really have a range end */
+        strcpy(curScrat++, ":");
+        if (i < 0) {		/* * ... */
+          if (i == -1) {	/* just * */
+            strcpy(curScrat++, "*");
+            i = 0;
+          } else {		/* * - expr */
+            strcpy(curScrat, "*-");
+            curScrat += 2;
+            i = -i;
+          }
+        }
+        if (i)
+          symbolIdent(i, mode);
+        curScrat += strlen(curScrat);
+      }
+      if (range_sum(symbol)) {
+        strcpy(curScrat, ":+");
+        curScrat += 2;
+      }
+      if (range_redirect(symbol) >= 0) {
+        strcpy(curScrat, ":>");
+        curScrat += 2;
+        symbolIdent(range_redirect(symbol), mode);
+        curScrat += strlen(curScrat);
+      }
+    }
+    strcpy(curScrat, ")");
+    break;
+  case LUX_ARRAY:
+    strcpy(curScrat++, "[");
+    n = array_size(symbol);
+    if ((mode & I_TRUNCATE)
+        && n > 3) {
+      j = 3;			/* number to print */
+      i = 1;			/* did truncate */
+    } else {
+      j = n;			/* print all */
+      i = 0;			/* no truncation */
+    }
+    ptr.b = array_data(symbol);
+    switch (array_type(symbol)) {
+    case LUX_BYTE:
+      while (j--) {
+        sprintf(curScrat, "%d", (int32_t) *ptr.b++);
+        curScrat += strlen(curScrat);
+        if (j || i)
+          strcpy(curScrat++, ",");
+      }
       break;
+    case LUX_WORD:
+      while (j--) {
+        sprintf(curScrat, "%d", (int32_t) *ptr.w++);
+        curScrat += strlen(curScrat);
+        if (j || i)
+          strcpy(curScrat++, ",");
+      }
+      break;
+    case LUX_LONG:
+      while (j--) {
+        sprintf(curScrat, "%d", *ptr.l++);
+        curScrat += strlen(curScrat);
+        if (j || i)
+          strcpy(curScrat++, ",");
+      }
+      break;
+    case LUX_QUAD:
+      while (j--) {
+        sprintf(curScrat, "%jd", (intmax_t) *ptr.q++);
+        curScrat += strlen(curScrat);
+        if (j || i)
+          strcpy(curScrat++, ",");
+      }
+      break;
+    case LUX_FLOAT:
+      while (j--) {
+        sprintf(curScrat, "%g", (double) *ptr.f++);
+        curScrat += strlen(curScrat);
+        if (j || i)
+          strcpy(curScrat++, ",");
+      }
+      break;
+    case LUX_DOUBLE:
+      while (j--) {
+        sprintf(curScrat, "%g", *ptr.d++);
+        curScrat += strlen(curScrat);
+        if (j || i)
+          strcpy(curScrat++, ",");
+      }
+      break;
+    case LUX_STRING_ARRAY:
+      if ((mode & I_TRUNCATE)) {
+        while (j--) {
+          if (*ptr.sp) {
+            if (strlen(*ptr.sp) > 20)  /* need to truncate */
+              sprintf(curScrat, "'%.17s...'", *ptr.sp);
+            else
+              sprintf(curScrat, "'%s'", *ptr.sp);
+          } else
+            strcpy(curScrat, "''");
+          ptr.sp++;
+          curScrat += strlen(curScrat);
+          if (j || i)
+            strcpy(curScrat++, ",");
+        }
+      } else {		/* no truncation */
+        while (j--) {
+          if (*ptr.sp)
+            sprintf(curScrat, "'%s'", *ptr.sp);
+          else
+            strcpy(curScrat, "''");
+          ptr.sp++;
+          curScrat += strlen(curScrat);
+          if (j)
+            strcpy(curScrat++, ",");
+        }
+      }
+      break;
+    default:
+      cerror(ILL_TYPE, symbol);
+    }
+    if (i) {		/* we truncated */
+      strcpy(curScrat, "...");
+      curScrat += 3;
+    }
+    strcpy(curScrat, "]");
+    if ((mode & I_LENGTH)) { /* need length indication */
+      curScrat += strlen(curScrat);
+      sprintf(curScrat, " (");
+      curScrat += 2;
+      ptr.l = array_dims(symbol);
+      n = array_num_dims(symbol);
+      while (n--) {
+        sprintf(curScrat, "%1d", *ptr.l++);
+        curScrat += strlen(curScrat);
+        if (n)
+          strcpy(curScrat++, ",");
+      }
+      strcpy(curScrat++, "#)");
+    }
+    break;
+  case LUX_POINTER: case LUX_TRANSFER:
+    /* if we get here then this is a pointer to nothing */
+    p = symbolProperName(symbol);
+    strcpy(curScrat, p? p: "(unnamed)");
+    break;
+  case LUX_ASSOC:
+    sprintf(curScrat, "ASSOC(%1d,", assoc_lun(symbol));
+    curScrat += strlen(curScrat);
+    switch (assoc_type(symbol)) {
+    case LUX_BYTE:
+      strcpy(curScrat, "BYTARR(");
+      break;
+    case LUX_WORD:
+      strcpy(curScrat, "INTARR(");
+      break;
+    case LUX_LONG:
+      strcpy(curScrat, "LONARR(");
+      break;
+    case LUX_QUAD:
+      strcpy(curScrat, "QUADARR(");
+      break;
+    case LUX_FLOAT:
+      strcpy(curScrat, "FLTARR(");
+      break;
+    case LUX_DOUBLE:
+      strcpy(curScrat, "DBLARR(");
+      break;
+    }
+    curScrat += strlen(curScrat);
+    n = assoc_num_dims(symbol);
+    ptr.l = assoc_dims(symbol);
+    while (n--) {
+      sprintf(curScrat, "%1d", *ptr.l++);
+      curScrat += strlen(curScrat);
+      if (n)
+        strcpy(curScrat++, ",");
+    }
+    strcpy(curScrat++, ")");
+    if (assoc_has_offset(symbol)) {
+      sprintf(curScrat, ",OFFSET=%1d", assoc_offset(symbol));
+      curScrat += strlen(curScrat);
+    }
+    strcpy(curScrat, ")");
+    break;
+  case LUX_FUNC_PTR:
+    strcpy(curScrat++, "&");
+    n = func_ptr_routine_num(symbol);
+    if (n < 0) {		/* internal function/routine */
+      n = -n;
+      switch (func_ptr_type(symbol)) {
+      case LUX_SUBROUTINE:
+        strcpy(curScrat, subroutine[n].name);
+        break;
+      case LUX_FUNCTION:
+        strcpy(curScrat, function[n].name);
+        break;
+      }
+    } else			/* user-defined function/routine */
+      symbolIdent(n, mode);	/* is put at curScratch */
+    break;
+  case LUX_SCAL_PTR:
+    switch (scal_ptr_type(symbol)) {
+    case LUX_BYTE:
+      intval = (intmax_t) *scal_ptr_pointer(symbol).b;
+      break;
+    case LUX_WORD:
+      intval = (intmax_t) *scal_ptr_pointer(symbol).w;
+      break;
+    case LUX_LONG:
+      intval = (intmax_t) *scal_ptr_pointer(symbol).l;
+      break;
+    case LUX_QUAD:
+      intval = (intmax_t) *scal_ptr_pointer(symbol).q;
+      break;
+    case LUX_FLOAT:
+      fltval = (double) *scal_ptr_pointer(symbol).f;
+      break;
+    case LUX_DOUBLE:
+      fltval = (double) *scal_ptr_pointer(symbol).d;
+      break;
+    case LUX_TEMP_STRING:
+      strcpy(curScrat, scal_ptr_pointer(symbol).s);
+      curScrat += strlen(curScrat);
+      break;
+    default:
+      cerror(ILL_TYPE, symbol);
+    }
+    if (isIntegerType(scal_ptr_type(symbol))) /* integer type */
+      sprintf(curScrat, "%jd", intval);
+    else if (isRealType(scal_ptr_type(symbol))) /* float type */
+      sprintf(curScrat, "%g", number.f);
+    break;
+  case LUX_SUBSC_PTR:
+    if (subsc_ptr_start(symbol) == -1) /* (*) */
+      strcpy(curScrat++, "*");
+    else {
+      if (subsc_ptr_start(symbol) < 0) /* (*-...) */
+        sprintf(curScrat, "*%+1d", subsc_ptr_start(symbol));
+      else
+        sprintf(curScrat, "%1d", subsc_ptr_start(symbol));
+      curScrat += strlen(curScrat);
+      strcpy(curScrat++, ":");
+      if (subsc_ptr_end(symbol) < 0) { /* (...:*...) */
+        strcpy(curScrat++, "*");
+        if (subsc_ptr_end(symbol) != -1) { /* not (...:*-...) */
+          sprintf(curScrat, "%+1d", subsc_ptr_end(symbol));
+          curScrat += strlen(curScrat);
+        }
+      } else {		/* (...:...) */
+        sprintf(curScrat, "%1d", subsc_ptr_end(symbol));
+        curScrat += strlen(curScrat);
+      }
+      if (subsc_ptr_sum(symbol)) {
+        strcpy(curScrat, ":+");
+        curScrat += 2;
+      }
+      if (subsc_ptr_redirect(symbol) >= 0) {
+        sprintf(curScrat, ":>%1d", subsc_ptr_redirect(symbol));
+        curScrat += strlen(curScrat);
+      }
+    }
+    break;
+  case LUX_FILEMAP:
+    switch (file_map_type(symbol)) {
+    case LUX_BYTE:
+      strcpy(curScrat, "BYTFARR(");
+      break;
+    case LUX_WORD:
+      strcpy(curScrat, "INTFARR(");
+      break;
+    case LUX_LONG:
+      strcpy(curScrat, "LONFARR(");
+      break;
+    case LUX_QUAD:
+      strcpy(curScrat, "QUADFARR(");
+      break;
+    case LUX_FLOAT:
+      strcpy(curScrat, "FLTFARR(");
+      break;
+    case LUX_DOUBLE:
+      strcpy(curScrat, "DBLFARR(");
+      break;
+    default:
+      cerror(ILL_TYPE, symbol);
+    }
+    curScrat += strlen(curScrat);
+    sprintf(curScrat, "'%s',", file_map_file_name(symbol));
+    curScrat += strlen(curScrat);
+    n = file_map_num_dims(symbol);
+    ptr.l = file_map_dims(symbol);
+    while (n--) {
+      sprintf(curScrat, "%1d", *ptr.l++);
+      curScrat += strlen(curScrat);
+      if (n)
+        strcpy(curScrat++, ",");
+    }
+    if (file_map_has_offset(symbol)) {
+      sprintf(curScrat, ",OFFSET=%1d", file_map_offset(symbol));
+      curScrat += strlen(curScrat);
+    }
+    if (file_map_readonly(symbol)) {
+      strcpy(curScrat, ",/READONLY");
+      curScrat += strlen(curScrat);
+    }
+    strcpy(curScrat, ")");
+    break;
+  case LUX_CLIST: case LUX_PRE_CLIST: case LUX_CPLIST:
+    strcpy(curScrat++, "{");
+    n = clist_num_symbols(symbol);
+    ptr.w = clist_symbols(symbol);
+    if ((mode & I_TRUNCATE)) {
+      if (n > 3) {
+        j = 3;		/* number of elements to display */
+        i = 1;		/* flag truncation */
+      } else {
+        j = n;
+        i = 0;		/* no trunctation was necessary */
+      }
+    } else {
+      j = n;
+      i = 0;
+    }
+    m = mode & I_SINGLEMODE;
+    if (symbol_class(symbol) == LUX_CPLIST)
+      /* for CPLIST, show names if possible */
+      m &= ~I_VALUE;
+    while (j--) {
+      symbolIdent(*ptr.w++, m);
+      curScrat += strlen(curScrat);
+      if (j || i)
+        strcpy(curScrat++, ",");
+    }
+    if (i) {			/* we did truncate */
+      strcpy(curScrat, "...");
+      curScrat += strlen(curScrat);
+    }
+    strcpy(curScrat++, "}");
+    if (i && (mode & I_LENGTH))
+      sprintf(curScrat, " (%1d#)", n);
+    break;
+  case LUX_LIST: case LUX_PRE_LIST:
+    strcpy(curScrat++, "{");
+    n = list_num_symbols(symbol);
+    sptr = list_symbols(symbol);
+    if ((mode & I_TRUNCATE)) {
+      if (n > 3) {
+        j = 3;
+        i = 1;
+      } else {
+        j = n;
+        i = 0;
+      }
+    } else {
+      j = n;
+      i = 0;
+    }
+    while (j--) {
+      if (sptr->key) {
+        sprintf(curScrat, "%s:", sptr->key);
+        curScrat += strlen(curScrat);
+      }
+      symbolIdent(sptr->value, mode & I_SINGLEMODE);
+      curScrat += strlen(curScrat);
+      if (j || i)
+        strcpy(curScrat++, ",");
+      sptr++;
+    }
+    if (i) {
+      strcpy(curScrat, "...");
+      curScrat += strlen(curScrat);
+    }
+    strcpy(curScrat++, "}");
+    if (i && (mode & I_LENGTH))
+      sprintf(curScrat, " (%1d#)", n);
+    break;
+  case LUX_KEYWORD:
+    if (keyword_value(symbol) == LUX_ONE)
+      sprintf(curScrat, "/%s", keyword_name(symbol));
+    else {
+      sprintf(curScrat, "%s=", keyword_name(symbol));
+      curScrat += strlen(curScrat);
+      symbolIdent(keyword_value(symbol), mode & I_SINGLEMODE);
+    }
+    break;
+  case LUX_LIST_PTR:
+    symbolIdent(list_ptr_target(symbol), mode & I_SINGLEMODE);
+    curScrat += strlen(curScrat);
+    if (list_ptr_target(symbol) < 0) /* numerical tag */
+      sprintf(curScrat, ".%1d", list_ptr_tag_number(symbol));
+    else
+      sprintf(curScrat, ".%s", list_ptr_tag_string(symbol));
+    break;
+  case LUX_ENUM:
+    n = enum_num_elements(symbol);
+    strcpy(curScrat++, "{");
+    eptr = enum_list(symbol);
+    if ((mode & I_TRUNCATE) && n > 3) {
+      j = 3;
+      i = 1;
+    } else {
+      j = n;
+      i = 0;
+    }
+    while (j--) {
+      sprintf(curScrat, "%s:%1d", eptr->key, eptr->value);
+      eptr++;
+      curScrat += strlen(curScrat);
+      if (i || j)
+        strcpy(curScrat++, ",");
+    }
+    if (i) {
+      strcpy(curScrat, "...");
+      curScrat += strlen(curScrat);
+    }
+    if (mode & I_LENGTH) {
+      sprintf(curScrat, " (%1d#)", n);
+      curScrat += strlen(curScrat);
+    }
+    strcpy(curScrat, "}");
+    break;
+  case LUX_META:
+    sprintf(curScrat, "SYMBOL('%s')", string_value(meta_target(symbol)));
+    break;
+  case LUX_CARRAY:
+    ptr.cf = array_data(symbol);
+    n = array_size(symbol);
+    strcpy(curScrat++, "[");
+    if ((mode & I_TRUNCATE)
+        && n > 3) {
+      j = 3;
+      i = 1;
+    } else {
+      j = n;
+      i = 0;
+    }
+    switch (array_type(symbol)) {
+    case LUX_CFLOAT:
+      while (j--) {
+        sprintf(curScrat, "(%g%+-1gi)", ptr.cf->real, ptr.cf->imaginary);
+        curScrat += strlen(curScrat);
+        if (i || j)
+          strcpy(curScrat++, ",");
+        ptr.cf++;
+      }
+      break;
+    case LUX_CDOUBLE:
+      while (j--) {
+        sprintf(curScrat, "(%g%+-1gi)", ptr.cd->real, ptr.cd->imaginary);
+        curScrat += strlen(curScrat);
+        if (i || j)
+          strcpy(curScrat++, ",");
+        ptr.cd++;
+      }
+      break;
+    }
+    if (i) {
+      sprintf(curScrat, "...");
+      curScrat += strlen(curScrat);
+    }
+    if (mode & I_LENGTH) {
+      sprintf(curScrat, " (%1d#)", n);
+      curScrat += strlen(curScrat);
+    }
+    strcpy(curScrat, "]");
+    break;
+  case LUX_SUBROUTINE: case LUX_FUNCTION: case LUX_BLOCKROUTINE:
+  case LUX_DEFERRED_SUBR: case LUX_DEFERRED_FUNC: case LUX_DEFERRED_BLOCK:
+    switch (symbol_class(symbol)) {
+    case LUX_SUBROUTINE: case LUX_DEFERRED_SUBR:
+      name = "SUBR";
+      break;
+    case LUX_FUNCTION: case LUX_DEFERRED_FUNC:
+      name = "FUNC";
+      break;
+    case LUX_BLOCKROUTINE: case LUX_DEFERRED_BLOCK:
+      name = "BLOCK";
+      break;
+    }
+    sprintf(curScrat, " %s ", name);
+    curScrat += strlen(curScrat);
+    p = symbolProperName(symbol);
+    strcpy(curScrat, p? p: "(unnamed)");
+    curScrat += strlen(curScrat);
+    if (symbol_class(symbol) == LUX_DEFERRED_SUBR
+        || symbol_class(symbol) == LUX_DEFERRED_FUNC
+        || symbol_class(symbol) == LUX_DEFERRED_BLOCK) {
+      sprintf(curScrat, " (deferred, file \"%s\") END%s",
+              deferred_routine_filename(symbol), name);
+      curScrat += strlen(curScrat);
+      if (mode & I_NL) {
+        sprintf(curScrat, "\n%*s", indent, "");
+        curScrat += strlen(curScrat);
+      } else
+        strcpy(curScrat++, " ");
+      break;
+    }
+    n = routine_num_parameters(symbol);
+    if (symbol_class(symbol) == LUX_FUNCTION)
+      strcpy(curScrat++, "(");
+    if (n) {			/* have parameters */
+      ptr.sp = routine_parameter_names(symbol);
+      if (symbol_class(symbol) == LUX_SUBROUTINE)
+        strcpy(curScrat++, ",");
+      while (n--) {
+        sprintf(curScrat, "%s", *ptr.sp++);
+        curScrat += strlen(curScrat);
+        if (n)
+          strcpy(curScrat++, ",");
+      }
+    }
+    if (symbol_class(symbol) == LUX_FUNCTION)
+      strcpy(curScrat++, ")");
+    if (mode & I_NL) {
+      indent += 2;
+      sprintf(curScrat, "\n%*s", indent, "");
+      curScrat += strlen(curScrat);
+    } else
+      strcpy(curScrat++, " ");
+    n = routine_num_statements(symbol);
+    ptr.w = routine_statements(symbol);
+    if ((mode & I_TRUNCATE) && n > 1) {
+      j = 1;
+      i = 1;
+    } else {
+      j = n;
+      i = 0;
+    }
+    if (j) {			/* have statements */
+      while (j--) {
+        symbolIdent(*ptr.w++, mode & ~I_PARENT);
+        curScrat += strlen(curScrat);
+        if (mode & I_NL) {
+          if (!j && !i)
+            indent -= 2;
+          sprintf(curScrat, "\n%*s", indent, "");
+          curScrat += strlen(curScrat);
+        } else
+          strcpy(curScrat++, " ");
+      }
+    }
+    if (i) {			/* we truncated */
+      strcpy(curScrat, "...");
+      curScrat += strlen(curScrat);
+      if ((mode & I_LENGTH)) {
+        sprintf(curScrat, " (%1d#)", n);
+        curScrat += strlen(curScrat);
+      }
+      if (mode & I_NL) {
+        indent -= 2;
+        sprintf(curScrat, "\n%*s", indent, "");
+        curScrat += strlen(curScrat);
+      } else
+        strcpy(curScrat++, " ");
+    }
+    sprintf(curScrat, "END%s", name);
+    curScrat += strlen(curScrat);
+    if (mode & I_NL) {
+      sprintf(curScrat, "\n%*s", indent, "");
+      curScrat += strlen(curScrat);
+    }	else
+      strcpy(curScrat++, " ");
+    break;
+  case LUX_BIN_OP: case LUX_IF_OP:
+    strcpy(curScrat++, "(");
+    symbolIdent(bin_op_lhs(symbol), mode & I_SINGLEMODE);
+    curScrat += strlen(curScrat);
+    switch (bin_op_type(symbol)) {
+    case LUX_ADD: case LUX_SUB: case LUX_MUL: case LUX_DIV:
+    case LUX_POW: case LUX_MOD: case LUX_MAX: case LUX_MIN:
+    case LUX_IDIV:
+      strcpy(curScrat, binOpSign[bin_op_type(symbol)]);
+      break;
+    case LUX_EQ: case LUX_LE: case LUX_LT: case LUX_GT:
+    case LUX_NE: case LUX_AND: case LUX_OR: case LUX_XOR:
+    case LUX_ANDIF: case LUX_ORIF: case LUX_GE: case LUX_SMOD:
+      sprintf(curScrat, " %s ", binOpSign[bin_op_type(symbol)]);
+      break;
+    }
+    curScrat += strlen(curScrat);
+    symbolIdent(bin_op_rhs(symbol), mode & I_SINGLEMODE);
+    curScrat += strlen(curScrat);
+    strcpy(curScrat, ")");
+    break;
+  case LUX_INT_FUNC:
+    n = 0;
+    switch (int_func_number(symbol)) {
+    case 0:			/* unary_negative */
+      strcpy(curScrat++, "-");
+      if (symbolIsUnitaryExpression(symbol)) {
+        symbolIdent(*int_func_arguments(symbol), mode & I_SINGLEMODE);
+        n = 0;
+      } else {
+        strcpy(curScrat++, "(");
+        n = 1;
+      }
+      break;
+    case 1:			/* subscript */
+      n = int_func_num_arguments(symbol);
+      arg = int_func_arguments(symbol);
+      symbolIdent(arg[n - 1], mode & I_SINGLEMODE);
+      curScrat += strlen(curScrat);
+      strcpy(curScrat++, "(");
+      n--;
+      while (n--) {
+        symbolIdent(*arg++, mode & I_SINGLEMODE);
+        curScrat += strlen(curScrat);
+        if (n)
+          strcpy(curScrat++, ",");
+      }
+      strcpy(curScrat, ")");
+      n = 0;
+      break;
+    case 2:			/* cputime */
+      strcpy(curScrat, "!CPUTIME");
+      curScrat += strlen(curScrat);
+      n = 0;
+      break;
+    case 3:			/* power */
+      n = 1;
+      break;
+    case 4:			/* concat */
+      strcpy(curScrat++, "[");
+      n = int_func_num_arguments(symbol);
+      if ((mode & I_TRUNCATE)
+          && n > 3) {
+        n = 3;
+        i = 1;
+      } else
+        i = 0;
+      arg = int_func_arguments(symbol);
+      while (n--) {
+        symbolIdent(*arg++, mode & I_SINGLEMODE);
+        curScrat += strlen(curScrat);
+        if (n)
+          strcpy(curScrat++, ",");
+      }
+      if (i) {
+        strcpy(curScrat, ",...");
+        curScrat += strlen(curScrat);
+      }
+      strcpy(curScrat, "]");
+      n = 0;
+      break;
+    case 5:			/* ctime */
+      strcpy(curScrat, "!CTIME");
+      curScrat += strlen(curScrat);
+      n = 0;
+      break;
+    case 6:			/* time */
+      strcpy(curScrat, "!TIME");
+      curScrat += strlen(curScrat);
+      n = 0;
+      break;
+    case 7:			/* date */
+      strcpy(curScrat, "!DATE");
+      curScrat += strlen(curScrat);
+      n = 0;
+      break;
+    case 8:			/* readkey */
+      strcpy(curScrat, "!READKEY");
+      curScrat += strlen(curScrat);
+      n = 0;
+      break;
+    case 9:			/* readkeyne */
+      strcpy(curScrat, "!READKEYNE");
+      curScrat += strlen(curScrat);
+      n = 0;
+      break;
+    case 10:		/* systime */
+      strcpy(curScrat, "!SYSTIME");
+      curScrat += strlen(curScrat);
+      n = 0;
+      break;
+    case 11:		/* jd */
+      strcpy(curScrat, "!JD");
+      curScrat += strlen(curScrat);
+      n = 0;
+      break;
+    default:
+      sprintf(curScrat, "%s(", function[int_func_number(symbol)].name);
+      curScrat += strlen(curScrat);
+      n = 1;
+      break;
+    }
+    if (n) {
+      n = int_func_num_arguments(symbol);
+      ptr.w = int_func_arguments(symbol);
+      while (n--) {
+        symbolIdent(*ptr.w++, mode & I_SINGLEMODE);
+        curScrat += strlen(curScrat);
+        if (n)
+          strcpy(curScrat++, ",");
+      }
+      strcpy(curScrat++, ")");
+    }
+    break;
+  case LUX_USR_FUNC:
+    p = symbolProperName(usr_func_number(symbol));
+    sprintf(curScrat, "%s(", p? p: "(unnamed)");
+    curScrat += strlen(curScrat);
+    n = usr_func_num_arguments(symbol);
+    ptr.w = usr_func_arguments(symbol);
+    while (n--) {
+      symbolIdent(*ptr.w++, mode & I_SINGLEMODE);
+      curScrat += strlen(curScrat);
+      if (n)
+        strcpy(curScrat++, ",");
+    }
+    strcpy(curScrat++, ")");
+    break;
+  case LUX_EXTRACT: case LUX_PRE_EXTRACT:
+    if (symbol_class(symbol) == LUX_EXTRACT) {
+      if (extract_target(symbol) > 0) { /* target is regular symbol */
+        switch (symbol_class(extract_target(symbol))) {
+        case LUX_FUNCTION:
+          strcpy(curScrat, symbolProperName(extract_target(symbol)));
+          break;
+        default:
+          symbolIdent(extract_target(symbol), mode & I_SINGLEMODE);
+          break;
+        }
+      } else
+        strcpy(curScrat, function[-extract_target(symbol)].name);
+      curScrat += strlen(curScrat);
+      sec = extract_ptr(symbol);
+      n = extract_num_sec(symbol);
+    } else {			/* an LUX_PRE_EXTRACT symbol */
+      strcpy(curScrat, pre_extract_name(symbol));
+      sec = pre_extract_ptr(symbol);
+      n = pre_extract_num_sec(symbol);
+    }
+    curScrat += strlen(curScrat);
+    if (!n) {
+      strcpy(curScrat, "()");
+      break;
+    }
+    while (n--) {
+      i = sec->number;
+      switch (sec->type) {
+      case LUX_RANGE:
+        strcpy(curScrat++, "(");
+        ptr.w = sec->ptr.w;
+        while (i--) {
+          symbolIdent(*ptr.w++, mode & I_SINGLEMODE);
+          curScrat += strlen(curScrat);
+          if (i)
+            strcpy(curScrat++, ",");
+        }
+        strcpy(curScrat++, ")");
+        break;
+      case LUX_LIST:
+        ptr.sp = sec->ptr.sp;
+        while (i--) {
+          strcpy(curScrat++, ".");
+          strcpy(curScrat, *ptr.sp++);
+          curScrat += strlen(curScrat);
+        }
+        break;
+      }
+      sec++;
+    }
+    break;
+  case LUX_EVB:
+    n = evb_num_elements(symbol);
+    ptr.w = evb_args(symbol);
+    switch (evb_type(symbol)) {
+    case EVB_RETURN:
+      strcpy(curScrat, "RETURN");
+      curScrat += strlen(curScrat);
+      if (return_value(symbol)) {
+        strcpy(curScrat++, ",");
+        symbolIdent(return_value(symbol), mode & I_SINGLEMODE);
+      }
+      break;
+    case EVB_REPLACE:
+      symbolIdent(replace_lhs(symbol), mode & I_SINGLEMODE & ~I_VALUE);
+      curScrat += strlen(curScrat);
+      strcpy(curScrat++, "=");
+      symbolIdent(replace_rhs(symbol), mode & I_SINGLEMODE);
+      break;
+    case EVB_REPEAT:
+      strcpy(curScrat, "REPEAT ");
+      curScrat += strlen(curScrat);
+      if (mode & I_NL) {
+        indent += 2;
+        sprintf(curScrat, "\n%*s", indent, "");
+        curScrat += strlen(curScrat);
+      } else
+        strcpy(curScrat++, " ");
+      symbolIdent(repeat_body(symbol), mode);
+      curScrat += strlen(curScrat);
+      if (mode & I_NL) {
+        indent -= 2;
+        sprintf(curScrat, "\n%*s", indent, "");
+        curScrat += strlen(curScrat);
+      } else
+        strcpy(curScrat++, " ");
+      strcpy(curScrat, "UNTIL ");
+      curScrat += strlen(curScrat);
+      symbolIdent(repeat_condition(symbol), mode & I_SINGLEMODE);
+      break;
+    case EVB_WHILE_DO:
+      strcpy(curScrat, "WHILE ");
+      curScrat += strlen(curScrat);
+      symbolIdent(while_do_condition(symbol), mode & I_SINGLEMODE);
+      curScrat += strlen(curScrat);
+      strcpy(curScrat, " DO ");
+      curScrat += strlen(curScrat);
+      if (mode & I_NL) {
+        indent += 2;
+        sprintf(curScrat, "\n%*s", indent, "");
+        curScrat += strlen(curScrat);
+      } else
+        strcpy(curScrat++, " ");
+      symbolIdent(while_do_body(symbol), mode);
+      curScrat += strlen(curScrat);
+      if (mode & I_NL)
+        indent -= 2;
+      break;
+    case EVB_DO_WHILE:
+      strcpy(curScrat, "DO ");
+      curScrat += strlen(curScrat);
+      if (mode & I_NL) {
+        indent += 2;
+        sprintf(curScrat, "\n%*s", indent, "");
+        curScrat += strlen(curScrat);
+      } else
+        strcpy(curScrat++, " ");
+      symbolIdent(do_while_body(symbol), mode);
+      curScrat += strlen(curScrat);
+      if (mode & I_NL) {
+        indent -= 2;
+        sprintf(curScrat, "\n%*s", indent, "");
+        curScrat += strlen(curScrat);
+      } else
+        strcpy(curScrat++, " ");
+      strcpy(curScrat, "WHILE ");
+      curScrat += strlen(curScrat);
+      symbolIdent(do_while_condition(symbol), mode & I_SINGLEMODE);
+      break;
+    case EVB_IF:
+      strcpy(curScrat, "IF ");
+      curScrat += strlen(curScrat);
+      symbolIdent(if_condition(symbol), mode & I_SINGLEMODE);
+      curScrat += strlen(curScrat);
+      strcpy(curScrat, " THEN");
+      curScrat += strlen(curScrat);
+      if (mode & I_NL) {
+        indent += 2;
+        sprintf(curScrat, "\n%*s", indent, "");
+        curScrat += strlen(curScrat);
+      } else
+        strcpy(curScrat++, " ");
+      symbolIdent(if_true_body(symbol), mode);
+      curScrat += strlen(curScrat);
+      if (mode & I_NL) {
+        indent -= 2;
+        sprintf(curScrat, "\n%*s", indent, "");
+        curScrat += strlen(curScrat);
+      } else
+        strcpy(curScrat++, " ");
+      if (if_false_body(symbol)) {
+        strcpy(curScrat, "ELSE");
+        curScrat += strlen(curScrat);
+        if (mode & I_NL) {
+          indent += 2;
+          sprintf(curScrat, "\n%*s", indent, "");
+          curScrat += strlen(curScrat);
+        } else
+          strcpy(curScrat++, " ");
+        symbolIdent(if_false_body(symbol), mode);
+        curScrat += strlen(curScrat);
+        if (mode & I_NL) {
+          indent -= 2;
+          sprintf(curScrat, "\n%*s", indent, "");
+          curScrat += strlen(curScrat);
+        } else
+          strcpy(curScrat++, " ");
+      }
+      break;
+    case EVB_FOR:
+      strcpy(curScrat, "FOR ");
+      curScrat += strlen(curScrat);
+      p = symbolProperName(for_loop_symbol(symbol));
+      sprintf(curScrat, "%s=", p? p: "(unnamed)");
+      curScrat += strlen(curScrat);
+      symbolIdent(for_start(symbol), mode & I_SINGLEMODE);
+      curScrat += strlen(curScrat);
+      strcpy(curScrat++, ",");
+      symbolIdent(for_end(symbol), mode & I_SINGLEMODE);
+      curScrat += strlen(curScrat);
+      if (for_step(symbol) != LUX_ONE) {
+        strcpy(curScrat++, ",");
+        symbolIdent(for_step(symbol), mode & I_SINGLEMODE);
+        curScrat += strlen(curScrat);
+      }
+      if (mode & I_NL) {
+        indent += 2;
+        sprintf(curScrat, "\n%*s", indent, "");
+        curScrat += strlen(curScrat);
+      } else
+        strcpy(curScrat++, " ");
+      symbolIdent(for_body(symbol), mode);
+      curScrat += strlen(curScrat);
+      if (mode & I_NL)
+        indent -= 2;
+      break;
+    case EVB_USR_CODE:
+      strcpy(curScrat, "RUN,");
+      curScrat += strlen(curScrat);
+      n = usr_code_routine_num(symbol);
+      if (symbol_class(n) == LUX_STRING)  /* unevaluated name */
+        strcpy(curScrat, string_value(n));
+      else {
+        p = symbolProperName(usr_code_routine_num(symbol));
+        strcpy(curScrat, p? p: "(unnamed)");
+      }
+      break;
+    case EVB_FILE:
+      switch (file_include_type(symbol)) {
+      case FILE_REPORT:
+        strcpy(curScrat, "@@");
+        curScrat += 2;
+        break;
+      case FILE_INCLUDE:
+        strcpy(curScrat++, "@");
+        break;
+      }
+      strcpy(curScrat, file_name(symbol));
+      break;
+    case EVB_INT_SUB:
+      switch (int_sub_routine_num(symbol)) {
+      case LUX_INSERT_SUB: /* INSERT */
+        n = int_sub_num_arguments(symbol) - 2;
+        ptr.w = int_sub_arguments(symbol);
+        symbolIdent(ptr.w[n + 1], mode & I_SINGLEMODE);
+        curScrat += strlen(curScrat);
+        strcpy(curScrat++, "(");
+        while (n--) {
+          symbolIdent(*ptr.w++, mode & I_SINGLEMODE);
+          curScrat += strlen(curScrat);
+          if (n)
+            strcpy(curScrat++, ",");
+        }
+        strcpy(curScrat, ")=");
+        curScrat += strlen(curScrat);
+        symbolIdent(*ptr.w, mode & I_SINGLEMODE);
+        break;
+      default:
+        strcpy(curScrat, subroutine[int_sub_routine_num(symbol)].name);
+        curScrat += strlen(curScrat);
+        n = int_sub_num_arguments(symbol);
+        ptr.w = int_sub_arguments(symbol);
+        while (n--) {
+          strcpy(curScrat++, ",");
+          symbolIdent(*ptr.w++, mode & I_SINGLEMODE);
+          curScrat += strlen(curScrat);
+        }
+        break;
+      }
+      break;
+    case EVB_USR_SUB:
+      if (usr_sub_is_deferred(symbol))  /* call to an LUX_DEFERRED_SUBR */
+        strcpy(curScrat, string_value(usr_sub_routine_num(symbol)));
+      else {
+        p = symbolProperName(usr_sub_routine_num(symbol));
+        sprintf(curScrat, "%s", p? p: "(unnamed)");
+      }
+      curScrat += strlen(curScrat);
+      n = usr_sub_num_arguments(symbol);
+      ptr.w = usr_sub_arguments(symbol);
+      while (n--) {
+        strcpy(curScrat++, ",");
+        symbolIdent(*ptr.w++, mode & I_SINGLEMODE);
+        curScrat += strlen(curScrat);
+      }
+      break;
+    case EVB_INSERT:
+      p = symbolProperName(insert_target(symbol));
+      sprintf(curScrat, "%s(", p? p: "(unnamed)");
+      curScrat += strlen(curScrat);
+      n = insert_num_target_indices(symbol);
+      ptr.w = insert_target_indices(symbol);
+      while (n--) {
+        symbolIdent(*ptr.w++, mode & I_SINGLEMODE);
+        curScrat += strlen(curScrat);
+        if (n)
+          strcpy(curScrat++, ",");
+      }
+      strcpy(curScrat++, ")=");
+      symbolIdent(insert_source(symbol), mode & I_SINGLEMODE);
+      break;
+    case EVB_CASE:
+      strcpy(curScrat, "CASE ");
+      curScrat += strlen(curScrat);
+      if (mode & I_NL) {
+        indent += 2;
+        sprintf(curScrat, "\n%*s", indent, "");
+        curScrat += strlen(curScrat);
+      } else
+        strcpy(curScrat++, " ");
+      n = case_num_statements(symbol);
+      n = (n - 1)/2;	/* number of statements */
+      if ((mode & I_TRUNCATE) && n > 1) {
+        j = 1;
+        i = 1;
+      } else {
+        j = n;
+        i = 0;
+      }
+      ptr.w = case_statements(symbol);
+      while (j--) {
+        symbolIdent(*ptr.w++, mode & I_SINGLEMODE);	/* condition */
+        curScrat += strlen(curScrat);
+        strcpy(curScrat, " : ");
+        curScrat += 3;
+        if (mode & I_NL) {
+          indent += 2;
+          sprintf(curScrat, "\n%*s", indent, "");
+          curScrat += strlen(curScrat);
+        } else
+          strcpy(curScrat++, " ");
+        curScrat += strlen(curScrat);
+        symbolIdent(*ptr.w++, mode & I_SINGLEMODE);	/* action */
+        curScrat += strlen(curScrat);
+        if (mode & I_NL) {
+          indent -= 2;
+          if (!j && !*ptr.w) /* last one and no ELSE */
+            indent -= 2;
+          sprintf(curScrat, "\n%*s", indent, "");
+          curScrat += strlen(curScrat);
+        } else
+          strcpy(curScrat++, " ");
+      }
+      if (i) {		/* we truncated */
+        strcpy(curScrat, "...");
+        curScrat += 3;
+        if ((mode & I_LENGTH)) {
+          sprintf(curScrat, " (%1d#)", n);
+          curScrat += strlen(curScrat);
+        }
+        ptr.w += n - 1;
+      }
+      if (*ptr.w) {		/* have an ELSE clause */
+        strcpy(curScrat, "ELSE ");
+        curScrat += strlen(curScrat);
+        if (mode & I_NL) {
+          indent += 2;
+          sprintf(curScrat, "\n%*s", indent, "");
+          curScrat += strlen(curScrat);
+        } else
+          strcpy(curScrat++, " ");
+        symbolIdent(*ptr.w, mode & I_SINGLEMODE);
+        curScrat += strlen(curScrat);
+        if (mode & I_NL) {
+          indent -= 4;
+          sprintf(curScrat, "\n%*s", indent, "");
+          curScrat += strlen(curScrat);
+        } else
+          strcpy(curScrat++, " ");
+      }
+      strcpy(curScrat, "ENDCASE");
+      break;
+    case EVB_NCASE:
+      strcpy(curScrat, "NCASE ");
+      curScrat += strlen(curScrat);
+      symbolIdent(ncase_switch_value(symbol), mode & I_SINGLEMODE);
+      curScrat += strlen(curScrat);
+      if (mode & I_NL) {
+        indent += 2;
+        sprintf(curScrat, "\n%*s", indent, "");
+        curScrat += strlen(curScrat);
+      } else
+        strcpy(curScrat++, " ");
+      n = ncase_num_statements(symbol);
+      if ((mode & I_TRUNCATE) && n > 1) {
+        j = 1;
+        i = 1;
+      } else {
+        j = n;
+        i = 0;
+      }
+      ptr.w = ncase_statements(symbol);
+      while (j--) {
+        symbolIdent(*ptr.w++, mode & I_SINGLEMODE);
+        curScrat += strlen(curScrat);
+        if (mode & I_NL) {
+          if (!j && !ncase_else(symbol))
+            indent -= 2;
+          sprintf(curScrat, "\n%*s", indent, "");
+          curScrat += strlen(curScrat);
+        } else
+          strcpy(curScrat++, " ");
+      }
+      if (i) {		/* we were truncating */
+        strcpy(curScrat, "...");
+        curScrat += strlen(curScrat);
+        if ((mode & I_LENGTH)) {
+          sprintf(curScrat, " (%1d#)", n);
+          curScrat += strlen(curScrat);
+        }
+        ptr.w += n - 1;
+      }
+      if (ncase_else(symbol)) {
+        strcpy(curScrat, "ELSE ");
+        curScrat += strlen(curScrat);
+        if (mode & I_NL) {
+          indent += 2;
+          sprintf(curScrat, "\n%*s", indent, "");
+          curScrat += strlen(curScrat);
+        } else
+          strcpy(curScrat++, " ");
+        symbolIdent(ncase_else(symbol), mode & I_SINGLEMODE);
+        curScrat += strlen(curScrat);
+        if (mode & I_NL) {
+          indent -= 4;
+          sprintf(curScrat, "\n%*s", indent, "");
+          curScrat += strlen(curScrat);
+        } else
+          strcpy(curScrat++, " ");
+      }
+      strcpy(curScrat, "ENDCASE");
+      break;
+    case EVB_BLOCK:
+      strcpy(curScrat, "{ ");
+      if (mode & I_NL)
+        indent += 2;
+      curScrat += strlen(curScrat);
+      n = block_num_statements(symbol);
+      ptr.w = block_statements(symbol);
+      if ((mode & I_TRUNCATE) && n > 1) {
+        j = 1;
+        i = 1;
+      } else {
+        j = n;
+        i = 0;
+      }
+      while (j--) {
+        symbolIdent(*ptr.w++, mode);
+        curScrat += strlen(curScrat);
+        if ((mode & I_NL) && (j || i)) {
+          sprintf(curScrat, "\n%*s", indent, "");
+          curScrat += strlen(curScrat);
+        } else
+          strcpy(curScrat++, " ");
+      }
+      if (i) {		/* we truncated */
+        strcpy(curScrat, "...");
+        curScrat += strlen(curScrat);
+        if ((mode & I_LENGTH)) {
+          sprintf(curScrat, " (%1d#)", n);
+          curScrat += strlen(curScrat);
+        }
+      }
+      strcpy(curScrat++, "}");
+      if (mode & I_NL)
+        indent -= 2;
+      break;
+    default:
+      sprintf(curScrat, "[EVB type %1d]", evb_type(symbol));
+      break;
+    }
+    break;
+  case LUX_STRUCT:
+    se = struct_elements(symbol);
+    identStruct(se);
+    break;
+  case LUX_STRUCT_PTR:
+    spe = struct_ptr_elements(symbol);
+    n = struct_ptr_n_elements(symbol);
+    symbolIdent(struct_ptr_target(symbol), mode);
+    curScrat += strlen(curScrat);
+    strcpy(curScrat++, "(");
+    se = struct_elements(struct_ptr_target(symbol));
+    while (n--) {
+      if (!spe->desc) {	/* top element */
+        i = spe->n_subsc;	/* number of subscripts */
+        spm = spe->member;
+        while (i--) {
+          switch (spm->type) {
+          case LUX_SCALAR:
+            sprintf(curScrat, "%1d", spm->data.scalar.value);
+            break;
+          case LUX_RANGE:
+            sprintf(curScrat, "%1d:%1d", spm->data.range.start,
+                    spm->data.range.end);
+            break;
+          case LUX_ARRAY:
+            strcpy(curScrat++, "[");
+            j = spm->data.array.n_elem;
+            if ((mode & I_TRUNCATE) && j > 3)
+              j = 3;
+            ptr.l = spm->data.array.ptr;
+            while (j--) {
+              sprintf(curScrat, "%1d", *ptr.l++);
+              curScrat += strlen(curScrat);
+              if (j)
+                strcpy(curScrat++, ",");
+            }
+            strcpy(curScrat++, "]");
+            break;
+          }
+          curScrat += strlen(curScrat);
+          spm++;
+        }
+      }
+      spe++;
+    }
+    break;
+  case LUX_UNDEFINED:
+    p = symbolProperName(symbol);
+    sprintf(curScrat, "%s?", p? p: "(unnamed)");
+    break;
+  default:
+    sprintf(curScrat, "[class %1d (%s)]",
+            symbol_class(symbol), className(symbol_class(symbol)));
+    break;
   }
-  
+
   curScrat = save;		/* restore proper value */
   return curScrat;
 }
@@ -1920,7 +1955,7 @@ int32_t identStruct(structElem *se)
 {
   int32_t	n, nelem, ndim, *dims, ndim2, *dims2;
   char	*arrName[] = {
-    "BYTARR", "INTARR", "LONARR", "FLTARR", "DBLARR", "STRARR",
+    "BYTARR", "INTARR", "LONARR", "QUADARR", "FLTARR", "DBLARR", "STRARR",
     "STRARR", "STRARR", "CFLTARR", "CDBLARR"
   };
 

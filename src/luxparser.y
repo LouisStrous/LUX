@@ -1094,9 +1094,9 @@ int32_t readNumber(YYSTYPE *lvalp)
 /* reads the number at currentChar, puts it in a new sybol, assigns
    the symbol number to *lvalp, and returns the proper parser code */
 {
-  int32_t	type;
+  Symboltype	type;
   scalar	v;
-  void	read_a_number(char **, scalar *, int32_t *);
+  void	read_a_number(char **, scalar *, Symboltype *);
 
   read_a_number(&currentChar, &v, &type);
   if (!ignoreInput) {		/* we're not ignoring stuff */
@@ -1106,31 +1106,34 @@ int32_t readNumber(YYSTYPE *lvalp)
     if (*lvalp)
       switch(type) {		/* non-zero return value (??) */
 				/* insert value of proper type */
-	case LUX_BYTE:
-	  scalar_value(*lvalp).b = (uint8_t) v.l;
-	  break;
-	case LUX_WORD:
-	  scalar_value(*lvalp).w = (int16_t) v.l;
-	  break;
-	case LUX_LONG:
-	  scalar_value(*lvalp).l = v.l;
-	  break;
-	case LUX_FLOAT:
-	  scalar_value(*lvalp).f = (float) v.d;
-	  break;
-	case LUX_DOUBLE:
-	  scalar_value(*lvalp).d = v.d;
-	  break;
-	case LUX_CFLOAT:
-	  complex_scalar_data(*lvalp).cf->real = 0.0;
-	  complex_scalar_data(*lvalp).cf->imaginary = v.d;
-	  break;
-	case LUX_CDOUBLE:
-	  complex_scalar_data(*lvalp).cd->real = 0.0;
-	  complex_scalar_data(*lvalp).cd->imaginary = v.d;
-	  break;
-	default:
-	  return cerror(ILL_TYPE, 0);
+      case LUX_BYTE:
+        scalar_value(*lvalp).b = (uint8_t) v.q;
+        break;
+      case LUX_WORD:
+        scalar_value(*lvalp).w = (int16_t) v.q;
+        break;
+      case LUX_LONG:
+        scalar_value(*lvalp).l = (int32_t) v.q;
+        break;
+      case LUX_QUAD:
+        scalar_value(*lvalp).q = v.q;
+        break;
+      case LUX_FLOAT:
+        scalar_value(*lvalp).f = (float) v.d;
+        break;
+      case LUX_DOUBLE:
+        scalar_value(*lvalp).d = v.d;
+        break;
+      case LUX_CFLOAT:
+        complex_scalar_data(*lvalp).cf->real = 0.0;
+        complex_scalar_data(*lvalp).cf->imaginary = v.d;
+        break;
+      case LUX_CDOUBLE:
+        complex_scalar_data(*lvalp).cd->real = 0.0;
+        complex_scalar_data(*lvalp).cd->imaginary = v.d;
+        break;
+      default:
+        return cerror(ILL_TYPE, 0);
       }
     return NUMBER;
   } else

@@ -2104,7 +2104,7 @@ int32_t newSymbol(int32_t kind, ...)
 	va_end(ap);
 	return LUX_ERROR;	/* didn't work */
       }
-      symbol_class(n) = kind; 
+      symbol_class(n) = kind;
       if (keepEVB)
 	symbol_context(n) = curContext;
     } else if (kind < LUX_SUBROUTINE) {	/* named variable */
@@ -3234,7 +3234,7 @@ char *typeName(int32_t type)
 /* returns the name that goes with the data type */
 {
   static char *typeNames[] = {
-    "BYTE", "WORD", "LONG", "FLOAT", "DOUBLE",
+    "BYTE", "WORD", "LONG", "QUAD", "FLOAT", "DOUBLE",
     "STRING", "STRING", "STRING", "CFLOAT", "CDOUBLE",
     "undefined", "unknown"
   };
@@ -3243,7 +3243,7 @@ char *typeName(int32_t type)
   if (type == LUX_UNDEFINED)
     index = 10;			/* undefined */
   else if (type < 0 || type > LUX_CDOUBLE)
-    index = 11;			/* unknown */
+    index = sizeof(typeNames)/sizeof(*typeNames) - 1; /* unknown */
   else
     index = type;		/* OK */
   return typeNames[index];
@@ -4147,9 +4147,9 @@ enumElem	filetypeStruct[] = {
   { "PM", FILE_TYPE_PM }
 };
 
-struct boundsStruct	bounds = {
- { 0, INT16_MIN, INT32_MIN, -FLT_MAX, -DBL_MAX},
- { UINT8_MAX, INT16_MAX, INT32_MAX, FLT_MAX, DBL_MAX }
+struct boundsStruct bounds = {
+  { 0, INT16_MIN, INT32_MIN, INT64_MIN, -FLT_MAX, -DBL_MAX},
+  { UINT8_MAX, INT16_MAX, INT32_MAX, INT64_MAX, FLT_MAX, DBL_MAX }
 };
 
 int32_t	LUX_MATMUL_FUN;
@@ -4398,7 +4398,7 @@ void symbolInitialization(void)
  l_ptr("!FOREGROUND_COLOR",	&foreground_pixel);
 #endif
  fformat = s_ptr("!FORMAT_F", strsave("%14.7g"));
- iformat = s_ptr("!FORMAT_I", strsave("%10d"));
+ iformat = s_ptr("!FORMAT_I", strsave("%10jd"));
  sformat = s_ptr("!FORMAT_S", strsave("%s"));
  cformat = s_ptr("!FORMAT_C", strsave("%28.7z"));
  fmt_integer = string_value(iformat);

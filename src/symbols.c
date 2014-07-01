@@ -21,6 +21,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -43,6 +44,45 @@ void	xsynchronize(int32_t);
 int32_t	installString(char *), fixContext(int32_t, int32_t), lux_replace(int32_t, int32_t);
 char *fmttok(char *);
 int32_t Sprintf_tok(char *, ...);
+/*-----------------------------------------------------*/
+/* combinedType(type1,type2) returns the type that a value based on
+   the combination of the two specified types should get.  The
+   combined type is as wide as the widest of the two types.  For
+   complex types, count the width of one of the two components.  If a
+   complex type is involved, then the combined type is complex.
+   Otherwise, if a float type is involved, then the combined type is
+   float.  Otherwise, the combined type is integer.
+
+       B  W  L  Q  F  D CF CD
+   B   B  W  L  Q  F  D CF CD
+   W   W  W  L  Q  F  D CF CD
+   L   L  L  L  Q  F  D CF CD
+   Q   Q  Q  Q  Q  D  D CD CD
+   F   F  F  F  D  F  D CF CD
+   D   D  D  D  D  D  D CD CD
+   CF CF CF CF CD CF CD CF CD
+   CD CD CD CD CD CD CD CD CD
+   w   1  2  4  8  4  8  4  8
+*/
+Symboltype combinedType(Symboltype type1, Symboltype type2)
+{
+  static Symboltype const combined[LUX_NO_SYMBOLTYPE][LUX_NO_SYMBOLTYPE] =
+    {
+      {    LUX_BYTE,    LUX_WORD,    LUX_LONG,    LUX_QUAD,   LUX_FLOAT,  LUX_DOUBLE, 0, 0,  LUX_CFLOAT, LUX_CDOUBLE },
+      {    LUX_WORD,    LUX_WORD,    LUX_LONG,    LUX_QUAD,   LUX_FLOAT,  LUX_DOUBLE, 0, 0,  LUX_CFLOAT, LUX_CDOUBLE },
+      {    LUX_LONG,    LUX_LONG,    LUX_LONG,    LUX_QUAD,   LUX_FLOAT,  LUX_DOUBLE, 0, 0,  LUX_CFLOAT, LUX_CDOUBLE },
+      {    LUX_QUAD,    LUX_QUAD,    LUX_QUAD,    LUX_QUAD,  LUX_DOUBLE,  LUX_DOUBLE, 0, 0, LUX_CDOUBLE, LUX_CDOUBLE },
+      {   LUX_FLOAT,   LUX_FLOAT,   LUX_FLOAT,  LUX_DOUBLE,   LUX_FLOAT,  LUX_DOUBLE, 0, 0,  LUX_CFLOAT, LUX_CDOUBLE },
+      {  LUX_DOUBLE,  LUX_DOUBLE,  LUX_DOUBLE,  LUX_DOUBLE,  LUX_DOUBLE,  LUX_DOUBLE, 0, 0, LUX_CDOUBLE, LUX_CDOUBLE },
+      { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+      { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+      {  LUX_CFLOAT,  LUX_CFLOAT,  LUX_CFLOAT, LUX_CDOUBLE,  LUX_CFLOAT, LUX_CDOUBLE, 0, 0,  LUX_CFLOAT, LUX_CDOUBLE },
+      { LUX_CDOUBLE, LUX_CDOUBLE, LUX_CDOUBLE, LUX_CDOUBLE, LUX_CDOUBLE, LUX_CDOUBLE, 0, 0, LUX_CDOUBLE, LUX_CDOUBLE },
+    };
+  assert(type1 >= 0 && type1 < LUX_NO_SYMBOLTYPE);
+  assert(type2 >= 0 && type2 < LUX_NO_SYMBOLTYPE);
+  return combined[type1][type2];
+}
 /*-----------------------------------------------------*/
 void embed(int32_t target, int32_t context)
 /* gives <target> the specified <context>, if it is a contextless */
@@ -874,12 +914,13 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
    arguments must be a named, writeable symbol, and we convert each
    of them in-place.  LS 16dec99 */
 {
-  int32_t	iq, n, size, type, srcstep, trgtstep, temp, result;
+  int32_t	iq, n, size, srcstep, trgtstep, temp, result;
+  Symboltype type;
   char	do_realloc = 0;
   pointer	src, trgt;
   scalar	value;
   extern char	*fmt_integer, *fmt_float, *fmt_complex;
-  void	read_a_number(char **, scalar *, int32_t *);
+  void	read_a_number(char **, scalar *, Symboltype *);
   char *fmttok(char *);
   int32_t Sprintf_tok(char *, ...);
 
@@ -965,7 +1006,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	  value.d = atof(string_value(iq));
 	else {			/* complex type */
 	  src.s = string_value(iq);
-	  read_a_number(&src.s, &value, &size);
+	  read_a_number(&src.s, &value, NULL);
 	}
 	if (result == iq)
 	  free(string_value(iq)); /* change string to scalar: free up memory */
@@ -1112,7 +1153,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	if (iq == result) {
 	  if (size <= symbol_memory(iq))
 	    do_realloc = 1;		/* need to reallocate afterwards */
-	  else 
+	  else
 	    array_header(result) = realloc(array_header(result), size);
 	} else
 	  array_header(result) = malloc(size);
@@ -1131,7 +1172,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
       default:
 	return cerror(ILL_CLASS, iq);
     }
-    
+
     if (trgtstep > srcstep) {
       /* we must start at the end, or else we'll overwrite stuff we */
       /* need later */
@@ -1140,7 +1181,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
       trgtstep = -trgtstep;
       srcstep = -srcstep;
     }
-    
+
     /* convert */
     switch (type) {		/* source type */
       case LUX_BYTE:
@@ -1622,16 +1663,14 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	    break;
 	  case LUX_CFLOAT:
 	    while (n--) {
-	      read_a_number(src.sp, &value, &temp);
+              Symboltype thistype;
+	      read_a_number(src.sp, &value, &thistype);
 	      if (iq == result && *src.sp)
 		free(*src.sp);
-	      switch (temp) {
-		case LUX_LONG:
-		  trgt.cf->real = value.l;
-		  break;
-		case LUX_DOUBLE:
-		  trgt.cf->real = value.d;
-		  break;
+              if (isIntegerType(thistype)) {
+                trgt.cf->real = value.q;
+              } else {
+                trgt.cf->real = value.d;
 	      }
 	      trgt.cf->imaginary = 0.0;
 	      trgt.b += trgtstep;
@@ -1640,17 +1679,15 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	    break;
 	  case LUX_CDOUBLE:
 	    while (n--) {
-	      read_a_number(src.sp, &value, &temp);
+              Symboltype thistype;
+	      read_a_number(src.sp, &value, &thistype);
 	      if (iq == result && *src.sp)
 		free(*src.sp);
-	      switch (temp) {
-		case LUX_LONG:
-		  trgt.cd->real = value.l;
-		  break;
-		case LUX_DOUBLE:
-		  trgt.cd->real = value.d;
-		  break;
-	      }
+              if (isIntegerType(thistype)) {
+                trgt.cd->real = value.q;
+              } else {
+                trgt.cd->real = value.d;
+              }
 	      trgt.cd->imaginary = 0.0;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
@@ -1659,9 +1696,9 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	}
 	break;
     }
-    
+
     symbol_type(result) = totype;
-    
+
     switch (do_realloc) {
       case 1:
 	array_header(result) = realloc(array_header(result), size);
@@ -2852,24 +2889,26 @@ int32_t routineContext(int32_t nsym)
  */
 /*-------------------------------------------------------------------------*/
 #define isodigit(x) (isdigit(x) && x < '8')
- 
-void read_a_number(char **buf, scalar *value, int32_t *type)
+
+void read_a_number(char **buf, scalar *value, Symboltype *type)
 /* reads the number at <*buf>, puts it in <*value> and its data type
-   in <*type>, and modifies <*buf> to point just after the detected
-   value.  NOTE: if the type is integer (BYTE, WORD, LONG), then the
-   value is returned in value->l; if the type is floating-point
-   (FLOAT, DOUBLE), then the value is returned in value->d.  if an I
-   follows the number, then the type is complex (CFLOAT, CDOUBLE) and
-   the value (transformed to real) is returned in value.d.
-   So, the union member that the value is in does not necessarily correspond
-   exactly to the <*type>: e.g., a BYTE number gets its value returned
-   in value->l and *type set to LUX_BYTE.  LS 17sep98 */
+   in <*type> (if <type> is not NULL), and modifies <*buf> to point
+   just after the detected value.  NOTE: if the type is integer (BYTE,
+   WORD, LONG, QUAD), then the value is returned in value->q; if the
+   type is floating-point (FLOAT, DOUBLE), then the value is returned
+   in value->d.  if an I follows the number, then the type is complex
+   (CFLOAT, CDOUBLE) and the value (transformed to real) is returned
+   in value.d.  So, the union member that the value is in does not
+   necessarily correspond exactly to the <*type>: e.g., a BYTE number
+   gets its value returned in value->q and *type set to LUX_BYTE.  LS
+   17sep98 */
 {
   int32_t	base = 10, kind, sign;
   char	*p, *numstart, c, ce, *p2;
+  Symboltype thetype;
 
   p = *buf;
-  *type = LUX_LONG;		/* default */
+  thetype = LUX_LONG;		/* default */
   /* skip whitespace */
   while (!isdigit((int32_t) *p) && !strchr("+-.", (int32_t) *p))
     p++;
@@ -2880,10 +2919,10 @@ void read_a_number(char **buf, scalar *value, int32_t *type)
     p++;
   } else sign = 1;
   numstart = p;
-  
-  /* |oooO[{BWLI}] */
-  /* |ddd[{BWLI}] */
-  /* |0X[hhh][{WLI}] */
+
+  /* |oooO[{BWLQI}] */
+  /* |ddd[{BWLQI}] */
+  /* |0X[hhh][{WLQI}] */
   /* |ddd{SH}[ddd:]*[ddd][.ddd][{DE}][I] */
   /* |ddd.[ddd][I] */
   /* |.ddd[{DE}[[{+-}]ddd]][I] */
@@ -2895,12 +2934,12 @@ void read_a_number(char **buf, scalar *value, int32_t *type)
 
   while (isodigit((int32_t) *p))
     p++;
-  
-  /* ooo|O[{BWLI}] */
-  /*  dd|d[{BWLI}] */
-  /* ddd|{BWLI} */
+
+  /* ooo|O[{BWLQI}] */
+  /*  dd|d[{BWLQI}] */
+  /* ddd|{BWLQI} */
   /* ddd| */
-  /*   0|X[hhh][{BWLI}] */
+  /*   0|X[hhh][{BWLQI}] */
   /*  dd|d{ST}[ddd:]*[ddd][.ddd][{DE}][I] */
   /* ddd|{ST}[ddd:]*[ddd][.ddd][{DE}][I] */
   /*    |.ddd[{DE}[[{+-}]ddd]][I] */
@@ -2912,18 +2951,18 @@ void read_a_number(char **buf, scalar *value, int32_t *type)
   if (*p == 'O') {		/* octal integer */
     base = 8;
     p++;
-    /* oooO|[{BWLI}]
+    /* oooO|[{BWLQI}]
 	   ^ we are here */
   } else
     /* skip remaining digits, if any */
     while (isdigit((int32_t) *p))
       p++;
 
-  /* oooO|{BWLI} */
+  /* oooO|{BWLQI} */
   /* oooO| */
-  /*  ddd|{BWLI} */
+  /*  ddd|{BWLQI} */
   /*  ddd| */
-  /*    0|X[hhh][{BWLI}] */
+  /*    0|X[hhh][{BWLQI}] */
   /*  ddd|{ST}[ddd:]*[ddd][.ddd][{DE}][I] */
   /*  ddd|.[ddd][I] */
   /*     |.ddd[{DE}[[{+-}]ddd]][I] */
@@ -2931,19 +2970,19 @@ void read_a_number(char **buf, scalar *value, int32_t *type)
   /*     ^ we are here */
 
   switch (toupper(*p)) {
-    case 'W': case 'L': case 'B': case 'I': /* done with the digits */
-      /* ddd|{BWLI} */
+  case 'W': case 'L': case 'B': case 'Q': case 'I': /* done with the digits */
+      /* ddd|{BWLQI} */
       /*    ^ we are here */
       break;
     case 'X':			/* hex number? */
       if (p == numstart + 1 && numstart[0] == '0') { /* yes, a hex number */
-	/* 0|X[hhh][{WLI}] */
+	/* 0|X[hhh][{WLQI}] */
 	/*  ^ we are here */
 	p++;
 	while (isxdigit((int32_t) *p))
 	  p++;
 	base = 16;
-	/*  0X[hhh]|[{WLI}] */
+	/*  0X[hhh]|[{WLQI}] */
 	/*         ^ we are here */
       } /* else we're already at the end of the non-hex number */
       break;
@@ -2998,15 +3037,15 @@ void read_a_number(char **buf, scalar *value, int32_t *type)
       if (kind == 'D' || kind == 'E') {
 	c = *++p;		/* next one could be an I */
 	if (toupper(c) == 'I') { /* imaginary */
-	  *type = (kind == 'D')? LUX_CDOUBLE: LUX_CFLOAT;
+	  thetype = (kind == 'D')? LUX_CDOUBLE: LUX_CFLOAT;
 	  p++;			/* skip */
-	} else 
-	  *type = (kind == 'D')? LUX_DOUBLE: LUX_FLOAT;
+	} else
+	  thetype = (kind == 'D')? LUX_DOUBLE: LUX_FLOAT;
       } else if (kind == 'I') {
-	*type = LUX_CFLOAT;
+	thetype = LUX_CFLOAT;
 	p++;
       } else
-	*type = LUX_FLOAT;
+	thetype = LUX_FLOAT;
       value->d *= sign;	/* put the sign back on it */
       *buf = p;
       return;
@@ -3027,13 +3066,13 @@ void read_a_number(char **buf, scalar *value, int32_t *type)
       /*          ^ we are here */
       kind = toupper(*p);
       p2 = NULL;
-      *type = LUX_FLOAT;	/* default */
+      thetype = LUX_FLOAT;	/* default */
       if (kind == 'D' || kind == 'E') {
 	if (kind == 'D') {
 	  ce = *p;
 	  *p = 'E';		/* temporarily, so atof can read it */
 	  p2 = p;
-	  *type = LUX_DOUBLE;
+	  thetype = LUX_DOUBLE;
 	}
 	p++;
 	/* ddd.[ddd]{DE}|[[{+-}ddd][I] */
@@ -3058,16 +3097,18 @@ void read_a_number(char **buf, scalar *value, int32_t *type)
       if (p2)
 	*p2 = ce;
       if (kind == 'I') {
-	*type = (*type == LUX_DOUBLE)? LUX_CDOUBLE: LUX_CFLOAT;
+	thetype = (thetype == LUX_DOUBLE)? LUX_CDOUBLE: LUX_CFLOAT;
 	p++;			/* skip the I */
       }
       *buf = p;
+      if (type)
+        *type = thetype;
       return;
   }
 
-  /*    oooO|[{BWLI}] */
-  /*     ddd|[{BWLI}] */
-  /* 0X[hhh]|[{BWLI}] */
+  /*    oooO|[{BWLQI}] */
+  /*     ddd|[{BWLQI}] */
+  /* 0X[hhh]|[{BWLQI}] */
   /*        ^ we are here */
   kind = toupper(*p);
   c = *p;
@@ -3078,55 +3119,64 @@ void read_a_number(char **buf, scalar *value, int32_t *type)
   /* has no trouble generating such numbers.  I.e., t,'%x',-0x35b9f040 */
   /* yielded c9460fd0 but t,'%x',0xc9460fd0 when using strtol() yields */
   /* 0xffffffff.  LS 11nov99 */
-  value->l = strtoul(numstart, NULL, base)*sign;
+  value->q = strtoull(numstart, NULL, base)*sign;
   *p = c;
   switch (kind) {
-    case 'B':
-      *type = LUX_BYTE;
-      p++;
-      break;
-    case 'W':
-      *type = LUX_WORD;
-      p++;
-      break;
-    case 'L':
-      *type = LUX_LONG;
-      p++;
-      break;
-    case 'I':
-      value->d = value->l;
-      *type = LUX_CFLOAT;
-      p++;
-      break;
-    default:
-      *type = LUX_LONG;		/* default */
-      break;
+  case 'B':
+    thetype = LUX_BYTE;
+    p++;
+    break;
+  case 'W':
+    thetype = LUX_WORD;
+    p++;
+    break;
+  case 'L':
+    thetype = LUX_LONG;
+    p++;
+    break;
+  case 'Q':
+    thetype = LUX_QUAD;
+    p++;
+    break;
+  case 'I':
+    value->d = value->q;
+    thetype = LUX_CFLOAT;
+    p++;
+    break;
+  default:
+    thetype = LUX_LONG;		/* default */
+    break;
   }
+  if (type)
+    *type = thetype;
   *buf = p;
 }
 /*-------------------------------------------------------------------------*/
-void read_a_number_fp(FILE *fp, scalar *value, int32_t *type)
-/* reads the number at <*fp>, puts it in <*value> and its data type
-   in <*type>.  Other than the source of the data, exactly the same as
-   read_a_number().
-   NOTE: if the type is integer (BYTE, WORD, LONG), then the
-   value is returned in value->l; if the type is floating-point
-   (FLOAT, DOUBLE), then the value is returned in value->d.  if an I
-   follows the number, then the type is complex (CFLOAT, CDOUBLE) and
-   the value (transformed to real) is returned in value.d.
-   So, the union member that the value is in does not necessarily correspond
-   exactly to the <*type>: e.g., a BYTE number gets its value returned
-   in value->l and *type set to LUX_BYTE.  LS 17sep98 */
+void read_a_number_fp(FILE *fp, scalar *value, Symboltype *type)
+/* reads the number at <*fp>, puts it in <*value> and its data type in
+   <*type> (if <type> is not NULL).  Other than the source of the
+   data, exactly the same as read_a_number().  NOTE: if the type is
+   integer (BYTE, WORD, LONG, QUAD), then the value is returned in
+   value->q; if the type is floating-point (FLOAT, DOUBLE), then the
+   value is returned in value->d.  if an I follows the number, then
+   the type is complex (CFLOAT, CDOUBLE) and the value (transformed to
+   real) is returned in value.d.  So, the union member that the value
+   is in does not necessarily correspond exactly to the <*type>: e.g.,
+   a BYTE number gets its value returned in value->l and *type set to
+   LUX_BYTE.  LS 17sep98 */
 /* Fixed reading of numbers with exponents.  LS 11jul2000 */
 {
   int32_t	base = 10, kind, sign, ch;
   char	*p, *numstart;
+  Symboltype thetype;
 
-  *type = LUX_LONG;		/* default */
+  thetype = LUX_LONG;		/* default */
   /* skip non-digits, non-signs */
   while ((ch = nextchar(fp)) != EOF && !isdigit(ch) && !strchr("+-", ch));
   if (ch == EOF) {		/* end of file; return LONG 0 */
-    value->l = 0;
+    value->q = 0;
+    if (type)
+      *type = thetype;
     return;
   }
 
@@ -3135,7 +3185,9 @@ void read_a_number_fp(FILE *fp, scalar *value, int32_t *type)
     sign = (ch == '-')? -1: 1;
     ch = nextchar(fp);
     if (ch == EOF) {
-      value->l = 0;
+      value->q = 0;
+      if (type)
+        *type = thetype;
       return;
     }
   } else sign = 1;
@@ -3148,14 +3200,18 @@ void read_a_number_fp(FILE *fp, scalar *value, int32_t *type)
   ch = p[-1];
 
   if (ch == EOF) {
-    value->l = 0;
+    value->q = 0;
+    if (type)
+      *type = thetype;
     return;
   }
   if (ch == 'O') {		/* octal integer */
     base = 8;
     ch = nextchar(fp);
     if (ch == EOF) {
-      value->l = 0;
+      value->q = 0;
+      if (type)
+        *type = thetype;
       return;
     }
   } else if (isdigit(ch)) {	/* not an octal integer */
@@ -3165,113 +3221,121 @@ void read_a_number_fp(FILE *fp, scalar *value, int32_t *type)
     while (isdigit((int32_t) p[-1]));
     ch = p[-1];
   }
-		   
+
   switch (toupper(ch)) {
-    case 'W': case 'L': case 'B': case 'I': /* done with the digits */
-      break;
-    case 'X':			/* hex number? */
-      if (p == numstart + 2 && numstart[0] == '0') { /* yes, a hex number */
-	do
-	  *p++ = nextchar(fp);
-	while (isxdigit((int32_t) p[-1]));
-	ch = p[-1];
-	base = 16;
-      } /* else we're already at the end of the non-hex number */
-      break;
-    case 'S': case 'H':	/* sexagesimal numbers */
-      /* ddd|{SH}[ddd:]*[ddd][.ddd][{DE}][I] */
-      /*    ^ we are here */
-      kind = ch;		/* S or H */
-      *p = '\0';		/* temporarily terminate */
-      value->d = atol(numstart); /* read the first number */
-      p = numstart;
-      base = 0;			/* count the number of elements */
-      ch = nextchar(fp);
-      if (ch == EOF) {
-	value->l = (int32_t) value->d;
-	return;
-      }
+  case 'W': case 'L': case 'B': case 'Q': case 'I': /* done with the digits */
+    break;
+  case 'X':			/* hex number? */
+    if (p == numstart + 2 && numstart[0] == '0') { /* yes, a hex number */
+      do
+        *p++ = nextchar(fp);
+      while (isxdigit((int32_t) p[-1]));
+      ch = p[-1];
+      base = 16;
+    } /* else we're already at the end of the non-hex number */
+    break;
+  case 'S': case 'H':	/* sexagesimal numbers */
+    /* ddd|{SH}[ddd:]*[ddd][.ddd][{DE}][I] */
+    /*    ^ we are here */
+    kind = ch;		/* S or H */
+    *p = '\0';		/* temporarily terminate */
+    value->d = atol(numstart); /* read the first number */
+    p = numstart;
+    base = 0;			/* count the number of elements */
+    ch = nextchar(fp);
+    if (ch == EOF) {
+      value->q = (intmax_t) value->d;
+      if (type)
+        *type = thetype;
+      return;
+    }
+    while (isdigit(ch)) {
       while (isdigit(ch)) {
-	while (isdigit(ch)) {
-	  *p++ = ch;
-	  ch = nextchar(fp);
-	  if (ch == EOF) {
-	    value->l = (int32_t) value->d;
-	    return;
-	  }
-	}
-	if (ch == '.') {	/* a float number: the last entry */
-	  do
-	    *p++ = nextchar(fp);
-	  while (isdigit((int32_t) p[-1])); /* find the rest */
-	  *p = '\0';		/* temporary termination */
-	  value->d *= 60;
-	  value->d += atof(numstart);
-	  base++;
-	  break;		/* we're done */
-	} else {		/* we found another integer element */
-	  *p = '\0';		/* temporary termination */
-	  value->d *= 60;
-	  value->d += atol(numstart);
-	  base++;
-	  ch = nextchar(fp);
-	}
+        *p++ = ch;
+        ch = nextchar(fp);
+        if (ch == EOF) {
+          value->q = (intmax_t) value->d;
+          if (type)
+            *type = thetype;
+          return;
+        }
       }
-      while (base--)		/* back to units */
-	value->d /= 60;
-      if (kind == 'H')
-	value->d *= 15;	/* from hours to degrees */
-      kind = toupper(*p);
-      if (kind == 'D' || kind == 'E') {
-	if (toupper(ch) == 'I') { /* imaginary */
-	  *type = (kind == 'D')? LUX_CDOUBLE: LUX_CFLOAT;
-	} else 
-	  *type = (kind == 'D')? LUX_DOUBLE: LUX_FLOAT;
-      } else if (kind == 'I') {
-	*type = LUX_CFLOAT;
+      if (ch == '.') {	/* a float number: the last entry */
+        do
+          *p++ = nextchar(fp);
+        while (isdigit((int32_t) p[-1])); /* find the rest */
+        *p = '\0';		/* temporary termination */
+        value->d *= 60;
+        value->d += atof(numstart);
+        base++;
+        break;		/* we're done */
+      } else {		/* we found another integer element */
+        *p = '\0';		/* temporary termination */
+        value->d *= 60;
+        value->d += atol(numstart);
+        base++;
+        ch = nextchar(fp);
+      }
+    }
+    while (base--)		/* back to units */
+      value->d /= 60;
+    if (kind == 'H')
+      value->d *= 15;	/* from hours to degrees */
+    kind = toupper(*p);
+    if (kind == 'D' || kind == 'E') {
+      if (toupper(ch) == 'I') { /* imaginary */
+        thetype = (kind == 'D')? LUX_CDOUBLE: LUX_CFLOAT;
       } else
-	*type = LUX_FLOAT;
-      value->d *= sign;	/* put the sign back on it */
-      return;
-    case '.': case 'D': case 'E':
-      if (ch == '.') {
-	do
-	  *p++ = nextchar(fp);
-	while (isdigit((int32_t) p[-1]));
+        thetype = (kind == 'D')? LUX_DOUBLE: LUX_FLOAT;
+    } else if (kind == 'I') {
+      thetype = LUX_CFLOAT;
+    } else
+      thetype = LUX_FLOAT;
+    value->d *= sign;	/* put the sign back on it */
+    if (type)
+      *type = thetype;
+    return;
+  case '.': case 'D': case 'E':
+    if (ch == '.') {
+      do
+        *p++ = nextchar(fp);
+      while (isdigit((int32_t) p[-1]));
+    }
+    kind = toupper(p[-1]);
+    thetype = LUX_FLOAT;	/* default */
+    if (kind == 'D' || kind == 'E') {
+      if (kind == 'D') {
+        p[-1] = 'E';		/* so atof can read it */
+        thetype = LUX_DOUBLE;
       }
-      kind = toupper(p[-1]);
-      *type = LUX_FLOAT;	/* default */
-      if (kind == 'D' || kind == 'E') {
-	if (kind == 'D') {
-	  p[-1] = 'E';		/* so atof can read it */
-	  *type = LUX_DOUBLE;
-	}
-	ch = nextchar(fp);
-	if (ch == '+' || ch == '-') /* a signed exponent */
-	  *p++ = ch;
-	else
-	  unnextchar(ch, fp);
-	do
-	  *p++ = nextchar(fp);
-	while (isdigit((int32_t) p[-1]));
-	kind = toupper(p[-1]); /* must look for I */
-      }
-      *p = '\0';		/* temporary end */
-      value->d = atof(numstart)*sign;
-      if (kind == 'I') {
-	*type = (*type == LUX_DOUBLE)? LUX_CDOUBLE: LUX_CFLOAT;
-      }
-      /* the last character we read was not part of the number. */
-      /* if it is not a newline, then we put it back in the stream. */
-      if (kind != '\n' && unnextchar(kind, fp) != kind)
-	puts("unnextchar() unsuccessful");
-      return;
-    default:
-      /* the last character we read was not part of the number. */
-      /* if it is not a newline, then we put it back in the stream. */
-      if (ch != '\n' && unnextchar(ch, fp) != ch)
-	puts("unnextchar() unsuccessful");
-      break;
+      ch = nextchar(fp);
+      if (ch == '+' || ch == '-') /* a signed exponent */
+        *p++ = ch;
+      else
+        unnextchar(ch, fp);
+      do
+        *p++ = nextchar(fp);
+      while (isdigit((int32_t) p[-1]));
+      kind = toupper(p[-1]); /* must look for I */
+    }
+    *p = '\0';		/* temporary end */
+    value->d = atof(numstart)*sign;
+    if (kind == 'I') {
+      thetype = (thetype == LUX_DOUBLE)? LUX_CDOUBLE: LUX_CFLOAT;
+    }
+    /* the last character we read was not part of the number. */
+    /* if it is not a newline, then we put it back in the stream. */
+    if (kind != '\n' && unnextchar(kind, fp) != kind)
+      puts("unnextchar() unsuccessful");
+    if (type)
+      *type = thetype;
+    return;
+  default:
+    /* the last character we read was not part of the number. */
+    /* if it is not a newline, then we put it back in the stream. */
+    if (ch != '\n' && unnextchar(ch, fp) != ch)
+      puts("unnextchar() unsuccessful");
+    break;
   }
 
   kind = toupper(p[-1]);
@@ -3282,25 +3346,30 @@ void read_a_number_fp(FILE *fp, scalar *value, int32_t *type)
   /* has no trouble generating such numbers.  I.e., t,'%x',-0x35b9f040 */
   /* yielded c9460fd0 but t,'%x',0xc9460fd0 when using strtol() yields */
   /* 0xffffffff.  LS 11nov99 */
-  value->l = strtoul(numstart, NULL, base)*sign;
+  value->q = strtoull(numstart, NULL, base)*sign;
   switch (kind) {
-    case 'B':
-      *type = LUX_BYTE;
-      break;
-    case 'W':
-      *type = LUX_WORD;
-      break;
-    case 'L':
-      *type = LUX_LONG;
-      break;
-    case 'I':
-      value->d = value->l;
-      *type = LUX_CFLOAT;
-      break;
-    default:
-      *type = LUX_LONG;		/* default */
-      break;
+  case 'B':
+    thetype = LUX_BYTE;
+    break;
+  case 'W':
+    thetype = LUX_WORD;
+    break;
+  case 'L':
+    thetype = LUX_LONG;
+    break;
+  case 'Q':
+    thetype = LUX_QUAD;
+    break;
+  case 'I':
+    value->d = value->q;
+    thetype = LUX_CFLOAT;
+    break;
+  default:
+    thetype = LUX_LONG;		/* default */
+    break;
   }
+  if (type)
+    *type = thetype;
 }
 /*-------------------------------------------------------------------------*/
 #ifdef FACTS

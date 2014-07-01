@@ -224,18 +224,9 @@ int32_t	file_map_size(int32_t symbol);
 #define isStringType(type)	/* int32_t */ ((type) > LUX_DOUBLE && (type) < LUX_CFLOAT)
 #define isRealType(type)	/* int32_t */ ((type) <= LUX_DOUBLE)
 #define isComplexType(type)	/* int32_t */ ((type) >= LUX_CFLOAT)
-#define isIntegerType(type)	/* int32_t */ ((type) <= LUX_LONG)
+#define isIntegerType(type)	/* int32_t */ ((type) <= LUX_QUAD)
 #define isFloatType(type)	/* int32_t */ ((type) == LUX_FLOAT || (type) == LUX_DOUBLE || (type) == LUX_CFLOAT || (type) == LUX_CDOUBLE)
 #define isLegalType(type)	/* int32_t */ ((type) >= LUX_BYTE && (type) <= LUX_CDOUBLE)
-/* combinedType(type1,type2) returns the highest type among its arguments.
-   If no complex data types are involved, then it is straightforward:
-   Return whichever type is numerically greater.  If complex data types
-   are involved, then the same trick will do, except if type1 == LUX_CFLOAT
-   and type2 == LUX_DOUBLE: then the simple comparison would return
-   LUX_CFLOAT, while we want LUX_CDOUBLE (i.e., LUX_DOUBLE promoted to
-   a complex type). */
-#define combinedType(type1,type2) /* int32_t */ (((type1) == LUX_CFLOAT && (type2) == LUX_DOUBLE)? LUX_CDOUBLE: ((type2) > (type1))? (type2): (type1))
-#define typeCmp(type1,type2) /* int32_t */ (((type1) == LUX_CFLOAT && (type2) == LUX_DOUBLE)? -1: ((type1) < (type2))? -1: ((type1) > (type2))? +1: 0)
 /* realType(type) returns <type> if it is real, or the corresponding real */
 /* type if it is complex. */
 #define realType(type)		/* int32_t */ (((type) >= LUX_CFLOAT)? (type) + (LUX_FLOAT - LUX_CFLOAT): (type))

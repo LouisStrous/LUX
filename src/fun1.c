@@ -350,7 +350,7 @@ void symdumpswitch(int32_t nsym, int32_t mode)
   char	*s, *typeName(int32_t), *save;
   int32_t	j, *ip;
   int32_t	evalListPtr(int32_t);
-  
+
   if (symbol_class(nsym) == LUX_TRANSFER || symbol_class(nsym) == LUX_POINTER) {
     j = transfer_target(nsym);
     if (j == nsym)
@@ -372,7 +372,7 @@ void symdumpswitch(int32_t nsym, int32_t mode)
       return;
     }
   }
-  
+
   printwf("%s, ", className(symbol_class(nsym)));
 
   switch (symbol_class(nsym)) {

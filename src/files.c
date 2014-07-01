@@ -775,7 +775,8 @@ void type_ascii_one(int32_t symbol, FILE *fp)
    <string.h>: strcpy()
 */
 {
-  scalar	number;
+  uintmax_t intval;
+  double fltval;
   extern char	*fmt_integer, *fmt_float, *fmt_complex, *fmt_string;
   extern formatInfo	theFormat;
   int32_t	i, n, j;
@@ -787,229 +788,254 @@ void type_ascii_one(int32_t symbol, FILE *fp)
   symbol = transfer(symbol);
 
   switch (symbol_class(symbol)) {
-    case LUX_SCALAR: case LUX_FIXED_NUMBER:
-      switch (scalar_type(symbol)) {
-	case LUX_BYTE:
-	  number.l = (int32_t) scalar_value(symbol).b;
-	  break;
-	case LUX_WORD:
-	  number.l = (int32_t) scalar_value(symbol).w;
-	  break;
-	case LUX_LONG:
-	  number.l = (int32_t) scalar_value(symbol).l;
-	  break;
-	case LUX_FLOAT:
-	  number.d = scalar_value(symbol).f;
-	  break;
-	case LUX_DOUBLE:
-	  number.d = scalar_value(symbol).d;
-	  break;
-      }
-      if (scalar_type(symbol) < LUX_FLOAT) { /* integer type */
-	sprintf(curScrat, fmt_integer, number.l);
-	fprintw(fp, curScrat);
-      } else { 			/* float type */
-	/* it may be a %j, %z, %t, or %T so we must use our own printer */
-	Sprintf(curScrat, fmt_float, number.d);
-	fprintw(fp, curScrat);
-      }
+  case LUX_SCALAR: case LUX_FIXED_NUMBER:
+    switch (scalar_type(symbol)) {
+    case LUX_BYTE:
+      intval = (intmax_t) scalar_value(symbol).b;
       break;
-    case LUX_CSCALAR:
-      ptr.cf = complex_scalar_data(symbol).cf;
-      if (complex_scalar_type(symbol) == LUX_CFLOAT)
-	Sprintf(curScrat, fmt_complex, (double) ptr.cf->real,
-		(double) ptr.cf->imaginary);
-      else
-	Sprintf(curScrat, fmt_complex, ptr.cd->real, ptr.cd->imaginary);
+    case LUX_WORD:
+      intval = (intmax_t) scalar_value(symbol).w;
+      break;
+    case LUX_LONG:
+      intval = (intmax_t) scalar_value(symbol).l;
+      break;
+    case LUX_QUAD:
+      intval = (intmax_t) scalar_value(symbol).q;
+      break;
+    case LUX_FLOAT:
+      fltval = scalar_value(symbol).f;
+      break;
+    case LUX_DOUBLE:
+      fltval = scalar_value(symbol).d;
+      break;
+    default:
+      cerror(ILL_TYPE, symbol);
+      break;
+    }
+    if (symbolIsInteger(symbol)) { /* integer type */
+      sprintf(curScrat, fmt_integer, intval);
       fprintw(fp, curScrat);
-      break;
-    case LUX_STRING:
-      sprintf(curScrat, fmt_string, string_value(symbol));
+    } else { 			/* float type */
+      /* it may be a %j, %z, %t, or %T so we must use our own printer */
+      Sprintf(curScrat, fmt_float, fltval);
       fprintw(fp, curScrat);
-      break;
-    case LUX_RANGE:
-      fprintw(fp, "(");
-      i = range_start(symbol);
-      if (i == -1)		/* (*) */
-	strcpy(curScrat++, "*");
-      else {
-	if (i < 0) {		/* (* - expr ...) */
-	  i = -i;
-	  fprintw(fp, "*-");
-	}
-	type_ascii_one(i, fp);
-	i = range_end(symbol);
-	if (i != LUX_ZERO) {	/* really have a range end */
-	  fprintw(fp, ":");
-	  if (i < 0) {		/* * ... */
-	    if (i == -1) {	/* just * */
-	      fprintw(fp, "*");
-	      i = 0;
-	    } else {		/* * - expr */
-	      fprintw(fp, "*-");
-	      i = -i;
-	    }
-	  }
-	  if (i)
-	    type_ascii_one(i, fp);
-	}
-	if (range_sum(symbol))
-	  fprintw(fp, ":+");
-	if (range_redirect(symbol) >= 0) {
-	  fprintw(fp, ":>");
-	  type_ascii_one(range_redirect(symbol), fp);
-	}
+    }
+    break;
+  case LUX_CSCALAR:
+    ptr.cf = complex_scalar_data(symbol).cf;
+    if (complex_scalar_type(symbol) == LUX_CFLOAT)
+      Sprintf(curScrat, fmt_complex, (double) ptr.cf->real,
+              (double) ptr.cf->imaginary);
+    else
+      Sprintf(curScrat, fmt_complex, ptr.cd->real, ptr.cd->imaginary);
+    fprintw(fp, curScrat);
+    break;
+  case LUX_STRING:
+    sprintf(curScrat, fmt_string, string_value(symbol));
+    fprintw(fp, curScrat);
+    break;
+  case LUX_RANGE:
+    fprintw(fp, "(");
+    i = range_start(symbol);
+    if (i == -1)		/* (*) */
+      strcpy(curScrat++, "*");
+    else {
+      if (i < 0) {		/* (* - expr ...) */
+        i = -i;
+        fprintw(fp, "*-");
       }
-      fprintw(fp, ")");
-      break;
-    case LUX_ARRAY:
-      j = array_size(symbol);
-      ptr.b = array_data(symbol);
-      switch (array_type(symbol)) {
-	case LUX_BYTE:
-	  fmttok(fmt_integer);
-	  while (j--) {
-	    if (!j && (theFormat.flags & FMT_MIX2))
-	      theFormat.spec_char[1] = '\0';
-	    Sprintf_tok(curScrat, (int32_t) *ptr.b++);
-	    fprintw(fp, curScrat);
-	    if (j && (internalMode & 4))
-	      nextformat(NULL, 1);
-	  }
-	  break;
-	case LUX_WORD:
-	  fmttok(fmt_integer);
-	  while (j--) {
-	    if (!j && (theFormat.flags & FMT_MIX2))
-	      theFormat.spec_char[1] = '\0';
-	    Sprintf_tok(curScrat, (int32_t) *ptr.w++);
-	    fprintw(fp, curScrat);
-	    if (j && (internalMode & 4))
-	      nextformat(NULL, 1);
-	  }
-	  break;
-	case LUX_LONG:
-	  fmttok(fmt_integer);
-	  while (j--) {
-	    if (!j && (theFormat.flags & FMT_MIX2))
-	      theFormat.spec_char[1] = '\0';
-	    Sprintf_tok(curScrat, (int32_t) *ptr.l++);
-	    fprintw(fp, curScrat);
-	    if (j && (internalMode & 4))
-	      nextformat(NULL, 1);
-	  }
-	  break;
-	case LUX_FLOAT:
-	  fmttok(fmt_float);
-	  while (j--) {
-	    if (!j && (theFormat.flags & FMT_MIX2))
-	      theFormat.spec_char[1] = '\0';
-	    Sprintf_tok(curScrat, (double) *ptr.f++);
-	    fprintw(fp, curScrat);
-	    if (j && (internalMode & 4))
-	      nextformat(NULL, 1);
-	  }
-	  break;
-	case LUX_DOUBLE:
-	  fmttok(fmt_float);
-	  while (j--) {
-	    if (!j && (theFormat.flags & FMT_MIX2))
-	      theFormat.spec_char[1] = '\0';
-	    Sprintf_tok(curScrat, (double) *ptr.d++);
-	    fprintw(fp, curScrat);
-	    if (j && (internalMode & 4))
-	      nextformat(NULL, 1);
-	  }
-	  break;
-	case LUX_STRING_ARRAY:
-	  fmttok(fmt_string);
-	  while (j--) {
-	    if (!j && (theFormat.flags & FMT_MIX2))
-	      theFormat.spec_char[1] = '\0';
-	    if (*ptr.sp)
-	      Sprintf_tok(curScrat, *ptr.sp);
-	    else
-	      *curScrat = '\0';
-	    ptr.sp++;
-	    fprintw(fp, curScrat);
-	    if (j && (internalMode & 4))
-	      nextformat(NULL, 1);
-	  }
+      type_ascii_one(i, fp);
+      i = range_end(symbol);
+      if (i != LUX_ZERO) {	/* really have a range end */
+        fprintw(fp, ":");
+        if (i < 0) {		/* * ... */
+          if (i == -1) {	/* just * */
+            fprintw(fp, "*");
+            i = 0;
+          } else {		/* * - expr */
+            fprintw(fp, "*-");
+            i = -i;
+          }
+        }
+        if (i)
+          type_ascii_one(i, fp);
+      }
+      if (range_sum(symbol))
+        fprintw(fp, ":+");
+      if (range_redirect(symbol) >= 0) {
+        fprintw(fp, ":>");
+        type_ascii_one(range_redirect(symbol), fp);
+      }
+    }
+    fprintw(fp, ")");
+    break;
+  case LUX_ARRAY:
+    j = array_size(symbol);
+    ptr.b = array_data(symbol);
+    switch (array_type(symbol)) {
+    case LUX_BYTE:
+      fmttok(fmt_integer);
+      while (j--) {
+        if (!j && (theFormat.flags & FMT_MIX2))
+          theFormat.spec_char[1] = '\0';
+        Sprintf_tok(curScrat, (int32_t) *ptr.b++);
+        fprintw(fp, curScrat);
+        if (j && (internalMode & 4))
+          nextformat(NULL, 1);
       }
       break;
-    case LUX_SCAL_PTR:
-      switch (scal_ptr_type(symbol)) {
-	case LUX_BYTE:
-	  number.l = (int32_t) *scal_ptr_pointer(symbol).b;
-	  break;
-	case LUX_WORD:
-	  number.l = (int32_t) *scal_ptr_pointer(symbol).w;
-	  break;
-	case LUX_LONG:
-	  number.l = *scal_ptr_pointer(symbol).l;
-	  break;
-	case LUX_FLOAT:
-	  number.f = *scal_ptr_pointer(symbol).f;
-	  break;
-	case LUX_DOUBLE:
-	  number.f = (float) *scal_ptr_pointer(symbol).d;
-	  break;
-      }
-      if (scal_ptr_type(symbol) < LUX_FLOAT) { /* integer type */
-	sprintf(curScrat, fmt_integer, number.l);
-	fprintw(fp, curScrat);
-      } else if (scal_ptr_type(symbol) <= LUX_DOUBLE) { /* float type */
-	Sprintf(curScrat, fmt_float, number.f);
-	fprintw(fp, curScrat);
+    case LUX_WORD:
+      fmttok(fmt_integer);
+      while (j--) {
+        if (!j && (theFormat.flags & FMT_MIX2))
+          theFormat.spec_char[1] = '\0';
+        Sprintf_tok(curScrat, (int32_t) *ptr.w++);
+        fprintw(fp, curScrat);
+        if (j && (internalMode & 4))
+          nextformat(NULL, 1);
       }
       break;
-    case LUX_CLIST: case LUX_PRE_CLIST: case LUX_CPLIST:
-      n = clist_num_symbols(symbol);
-      ptr.w = clist_symbols(symbol);
-      while (n--) {
-	type_ascii_one(*ptr.w++, fp);
-	if (n && (internalMode & 4))
-	  nextformat(NULL, 1);
+    case LUX_LONG:
+      fmttok(fmt_integer);
+      while (j--) {
+        if (!j && (theFormat.flags & FMT_MIX2))
+          theFormat.spec_char[1] = '\0';
+        Sprintf_tok(curScrat, (int32_t) *ptr.l++);
+        fprintw(fp, curScrat);
+        if (j && (internalMode & 4))
+          nextformat(NULL, 1);
       }
       break;
-    case LUX_LIST: case LUX_PRE_LIST:
-      n = list_num_symbols(symbol);
-      sptr = list_symbols(symbol);
-      while (n--) {
-	type_ascii_one(sptr->value, fp);
-	sptr++;
-	if (n && (internalMode & 4))
-	  nextformat(NULL, 1);
+    case LUX_QUAD:
+      fmttok(fmt_integer);
+      while (j--) {
+        if (!j && (theFormat.flags & FMT_MIX2))
+          theFormat.spec_char[1] = '\0';
+        Sprintf_tok(curScrat, (intmax_t) *ptr.q++);
+        fprintw(fp, curScrat);
+        if (j && (internalMode & 4))
+          nextformat(NULL, 1);
       }
       break;
-    case LUX_CARRAY:
-      ptr.cf = array_data(symbol);
-      n = array_size(symbol);
-      switch (array_type(symbol)) {
-	case LUX_CFLOAT:
-	  while (n--) {
-	    Sprintf(curScrat, fmt_complex, (double) ptr.cf->real,
-		    (double) ptr.cf->imaginary);
-	    fprintw(fp, curScrat);
-	    ptr.cf++;
-	    if (n && (internalMode & 4))
-	      nextformat(NULL, 1);
-	  }
-	  break;
-	case LUX_CDOUBLE:
-	  while (n--) {
-	    Sprintf(curScrat, fmt_complex, ptr.cd->real, ptr.cd->imaginary);
-	    fprintw(fp, curScrat);
-	    ptr.cd++;
-	    if (n && (internalMode & 4))
-	      nextformat(NULL, 1);
-	  }
-	  break;
+    case LUX_FLOAT:
+      fmttok(fmt_float);
+      while (j--) {
+        if (!j && (theFormat.flags & FMT_MIX2))
+          theFormat.spec_char[1] = '\0';
+        Sprintf_tok(curScrat, (double) *ptr.f++);
+        fprintw(fp, curScrat);
+        if (j && (internalMode & 4))
+          nextformat(NULL, 1);
+      }
+      break;
+    case LUX_DOUBLE:
+      fmttok(fmt_float);
+      while (j--) {
+        if (!j && (theFormat.flags & FMT_MIX2))
+          theFormat.spec_char[1] = '\0';
+        Sprintf_tok(curScrat, (double) *ptr.d++);
+        fprintw(fp, curScrat);
+        if (j && (internalMode & 4))
+          nextformat(NULL, 1);
+      }
+      break;
+    case LUX_STRING_ARRAY:
+      fmttok(fmt_string);
+      while (j--) {
+        if (!j && (theFormat.flags & FMT_MIX2))
+          theFormat.spec_char[1] = '\0';
+        if (*ptr.sp)
+          Sprintf_tok(curScrat, *ptr.sp);
+        else
+          *curScrat = '\0';
+        ptr.sp++;
+        fprintw(fp, curScrat);
+        if (j && (internalMode & 4))
+          nextformat(NULL, 1);
       }
       break;
     default:
-      symbolIdent(symbol, I_VALUE);
+      cerror(ILL_TYPE, symbol);
+    }
+    break;
+  case LUX_SCAL_PTR:
+    switch (scal_ptr_type(symbol)) {
+    case LUX_BYTE:
+      intval = (intmax_t) *scal_ptr_pointer(symbol).b;
+      break;
+    case LUX_WORD:
+      intval = (intmax_t) *scal_ptr_pointer(symbol).w;
+      break;
+    case LUX_LONG:
+      intval = (intmax_t) *scal_ptr_pointer(symbol).l;
+      break;
+    case LUX_QUAD:
+      intval = (intmax_t) *scal_ptr_pointer(symbol).q;
+      break;
+    case LUX_FLOAT:
+      fltval = (double) *scal_ptr_pointer(symbol).f;
+      break;
+    case LUX_DOUBLE:
+      fltval = *scal_ptr_pointer(symbol).d;
+      break;
+    default:
+      cerror(ILL_TYPE, symbol);
+    }
+    if (isIntegerType(scal_ptr_type(symbol))) { /* integer type */
+      sprintf(curScrat, fmt_integer, intval);
       fprintw(fp, curScrat);
+    } else if (scal_ptr_type(symbol) <= LUX_DOUBLE) { /* float type */
+      Sprintf(curScrat, fmt_float, fltval);
+      fprintw(fp, curScrat);
+    }
+    break;
+  case LUX_CLIST: case LUX_PRE_CLIST: case LUX_CPLIST:
+    n = clist_num_symbols(symbol);
+    ptr.w = clist_symbols(symbol);
+    while (n--) {
+      type_ascii_one(*ptr.w++, fp);
+      if (n && (internalMode & 4))
+        nextformat(NULL, 1);
+    }
+    break;
+  case LUX_LIST: case LUX_PRE_LIST:
+    n = list_num_symbols(symbol);
+    sptr = list_symbols(symbol);
+    while (n--) {
+      type_ascii_one(sptr->value, fp);
+      sptr++;
+      if (n && (internalMode & 4))
+        nextformat(NULL, 1);
+    }
+    break;
+  case LUX_CARRAY:
+    ptr.cf = array_data(symbol);
+    n = array_size(symbol);
+    switch (array_type(symbol)) {
+    case LUX_CFLOAT:
+      while (n--) {
+        Sprintf(curScrat, fmt_complex, (double) ptr.cf->real,
+                (double) ptr.cf->imaginary);
+        fprintw(fp, curScrat);
+        ptr.cf++;
+        if (n && (internalMode & 4))
+          nextformat(NULL, 1);
+      }
+      break;
+    case LUX_CDOUBLE:
+      while (n--) {
+        Sprintf(curScrat, fmt_complex, ptr.cd->real, ptr.cd->imaginary);
+        fprintw(fp, curScrat);
+        ptr.cd++;
+        if (n && (internalMode & 4))
+          nextformat(NULL, 1);
+      }
+      break;
+    }
+    break;
+  default:
+    symbolIdent(symbol, I_VALUE);
+    fprintw(fp, curScrat);
   }
 }
 /*------------------------------------------------------------------------- */
@@ -1104,7 +1130,7 @@ int32_t type_ascii(int32_t narg, int32_t ps[], FILE *fp)
   char	*p = NULL;
   char	*fmttok(char *);
   extern formatInfo	theFormat;
-  
+
   theFormat.type = 0;
   theFormat.start = theFormat.next = NULL;
   for (i = 0; i < narg; i++) {
@@ -1122,7 +1148,7 @@ int32_t type_ascii(int32_t narg, int32_t ps[], FILE *fp)
 	continue;
       }
     }
-    
+
     if (p)
       p = NULL;
     else {
@@ -2456,7 +2482,12 @@ int32_t read_formatted_ascii(int32_t narg, int32_t ps[], void *ptr, int32_t show
 	  else
 	    return nout;
 	case FMT_INTEGER:
-	  type = (theFormat.flags & FMT_SMALL)? LUX_WORD: LUX_LONG;
+          if (theFormat.flags & FMT_SMALL)
+            type = LUX_WORD;
+          else if (theFormat.flags & FMT_BIGINT)
+            type = LUX_QUAD;
+          else
+            type = LUX_LONG;
 	  break;
 	case FMT_FLOAT: case FMT_TIME:
 	  type = (theFormat.flags & FMT_BIG)? LUX_DOUBLE: LUX_FLOAT;
@@ -2464,7 +2495,7 @@ int32_t read_formatted_ascii(int32_t narg, int32_t ps[], void *ptr, int32_t show
 	case FMT_COMPLEX:
 	  type = (theFormat.flags & FMT_BIG)? LUX_CDOUBLE: LUX_CFLOAT;
 	  break;
-      }	    
+      }
 
       /* modify output symbol, if necessary */
       if (!(theFormat.flags & FMT_SUPPRESS)) {

@@ -655,7 +655,7 @@ void lux_pow_as(void)
         case LUX_DOUBLE:
           re.d = *rp.d;
           while (nRepeat--)
-            *tp.f++ = (float) pow((double) *lp.b++, re.d);
+            *tp.d++ = pow((double) *lp.b++, re.d);
           break;
         case LUX_CFLOAT:
           re.f = rp.cf->real;
@@ -783,7 +783,7 @@ void lux_pow_as(void)
         case LUX_DOUBLE:
           re.d = *rp.d;
           while (nRepeat--)
-            *tp.f++ = (float) pow((double) *lp.l++, re.d);
+            *tp.d++ = pow((double) *lp.l++, re.d);
           break;
         case LUX_CFLOAT:
           re.f = rp.cf->real;
@@ -846,9 +846,9 @@ void lux_pow_as(void)
             *tp.f++ = (float) pow((double) *lp.f++, re.f);
           break;
         case LUX_DOUBLE:
-          re.f = *rp.d;
+          re.d = *rp.d;
           while (nRepeat--)
-            *tp.f++ = (float) pow((double) *lp.f++, re.f);
+            *tp.d++ = pow((double) *lp.f++, re.d);
           break;
         case LUX_CFLOAT:
           re.f = rp.cf->real;
@@ -913,7 +913,7 @@ void lux_pow_as(void)
         case LUX_DOUBLE:
           re.d = *rp.d;
           while (nRepeat--)
-            *tp.f++ = pow(*lp.d++, re.d);
+            *tp.d++ = pow(*lp.d++, re.d);
           break;
         case LUX_CFLOAT:
           re.d = rp.cf->real;

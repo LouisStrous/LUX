@@ -3801,7 +3801,7 @@ int32_t lux_poly(int32_t narg, int32_t ps[])
     return luxerror("Need a real array", ps[1]);
   datasym = (symbol_type(ps[0]) < LUX_FLOAT)? lux_float(1, &ps[0]): ps[0];
   coeffsym = (symbol_type(ps[1]) < LUX_FLOAT)? lux_float(1, &ps[1]): ps[1];
-  outtype = highestType(symbol_type(datasym), array_type(coeffsym));
+  outtype = combinedType(symbol_type(datasym), array_type(coeffsym));
   if (getNumerical(datasym, outtype, &ndata, &data, GN_UPGRADE, &result, &tgt)
       != LUX_OK)
     return LUX_ERROR;
@@ -4529,7 +4529,7 @@ int32_t lux_crosscorr(int32_t narg, int32_t ps[])
     if (array_dims(ps[0])[i] != array_dims(ps[1])[i])
       return cerror(INCMP_ARG, ps[1]);
 
-  type = highestType(symbol_type(ps[0]), symbol_type(ps[1]));
+  type = combinedType(symbol_type(ps[0]), symbol_type(ps[1]));
   if (isComplexType(type))
     outtype = type;
   else

@@ -2931,7 +2931,7 @@ Theory:
     axisSym = lux_indgen(1, &axisSym);
   }
   
-  type = highestType(array_type(ps[0]), array_type(ps[1]));
+  type = combinedType(array_type(ps[0]), array_type(ps[1]));
   if (type < LUX_FLOAT)
     type = LUX_FLOAT;
 

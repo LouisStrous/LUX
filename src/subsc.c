@@ -2527,7 +2527,7 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
         default:
 	  return cerror(ILL_CLASS, iq);
       }
-      toptype = highestType(toptype, symbol_type(iq));
+      toptype = combinedType(toptype, symbol_type(iq));
     }	/* end of for */
     /* now run through again */
     if (!mq)

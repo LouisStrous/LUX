@@ -3543,7 +3543,7 @@ int32_t convertRange(int32_t range)
   return subsc;
 }
 /*----------------------------------------------------------------*/
-void convertPointer(scalar *target, int32_t inType, int32_t outType)
+void convertPointer(scalar *target, Symboltype inType, Symboltype outType)
 /* converts value in target from inType to outType */
 {
   switch (outType) {
@@ -3554,6 +3554,9 @@ void convertPointer(scalar *target, int32_t inType, int32_t outType)
       break;
     case LUX_LONG:
       (*target).b = (uint8_t) (*target).l;
+      break;
+    case LUX_QUAD:
+      (*target).b = (uint8_t) (*target).q;
       break;
     case LUX_FLOAT:
       (*target).b = (uint8_t) (*target).f;
@@ -3571,6 +3574,9 @@ void convertPointer(scalar *target, int32_t inType, int32_t outType)
     case LUX_LONG:
       (*target).w = (int16_t) (*target).l;
       break;
+    case LUX_QUAD:
+      (*target).w = (int16_t) (*target).q;
+      break;
     case LUX_FLOAT:
       (*target).w = (int16_t) (*target).f;
       break;
@@ -3587,11 +3593,33 @@ void convertPointer(scalar *target, int32_t inType, int32_t outType)
     case LUX_WORD:
       (*target).l = (int32_t) (*target).w;
       break;
+    case LUX_QUAD:
+      (*target).l = (int32_t) (*target).q;
+      break;
     case LUX_FLOAT:
       (*target).l = (int32_t) (*target).f;
       break;
     case LUX_DOUBLE:
       (*target).l = (int32_t) (*target).d;
+      break;
+    }
+    break;
+  case LUX_QUAD:
+    switch (inType) {
+    case LUX_BYTE:
+      (*target).q = (int64_t) (*target).b;
+      break;
+    case LUX_WORD:
+      (*target).q = (int64_t) (*target).w;
+      break;
+    case LUX_LONG:
+      (*target).q = (int64_t) (*target).l;
+      break;
+    case LUX_FLOAT:
+      (*target).q = (int64_t) (*target).f;
+      break;
+    case LUX_DOUBLE:
+      (*target).q = (int64_t) (*target).d;
       break;
     }
     break;
@@ -3605,6 +3633,9 @@ void convertPointer(scalar *target, int32_t inType, int32_t outType)
       break;
     case LUX_LONG:
       (*target).f = (float) (*target).l;
+      break;
+    case LUX_QUAD:
+      (*target).f = (float) (*target).q;
       break;
     case LUX_DOUBLE:
       (*target).f = (float) (*target).d;
@@ -3622,6 +3653,9 @@ void convertPointer(scalar *target, int32_t inType, int32_t outType)
     case LUX_LONG:
       (*target).d = (double) (*target).l;
       break;
+    case LUX_QUAD:
+      (*target).d = (double) (*target).q;
+      break;
     case LUX_FLOAT:
       (*target).d = (double) (*target).f;
       break;
@@ -3634,191 +3668,242 @@ void convertWidePointer(wideScalar *target, int32_t inType, int32_t outType)
 /* converts value in <target> from <inType> to <outType> */
 {
   switch (inType) {
+  case LUX_BYTE:
+    switch (outType) {
     case LUX_BYTE:
-      switch (outType) {
-	case LUX_BYTE:
-	  break;
-	case LUX_WORD:
-	  target->w = (int16_t) target->b;
-	  break;
-	case LUX_LONG:
-	  target->l = (int32_t) target->b;
-	  break;
-	case LUX_FLOAT:
-	  target->f = (float) target->b;
-	  break;
-	case LUX_DOUBLE:
-	  target->d = (double) target->b;
-	  break;
-	case LUX_CFLOAT:
-	  target->cf.real = (float) target->b;
-	  target->cf.imaginary = 0.0;
-	  break;
-	case LUX_CDOUBLE:
-	  target->cd.real = (double) target->b;
-	  target->cd.imaginary = 0.0;
-	  break;
-      }
       break;
     case LUX_WORD:
-      switch (outType) {
-	case LUX_BYTE:
-	  target->b = (uint8_t) target->w;
-	  break;
-	case LUX_WORD:
-	  break;
-	case LUX_LONG:
-	  target->l = (int32_t) target->w;
-	  break;
-	case LUX_FLOAT:
-	  target->f = (float) target->w;
-	  break;
-	case LUX_DOUBLE:
-	  target->d = (double) target->w;
-	  break;
-	case LUX_CFLOAT:
-	  target->cf.real = (float) target->w;
-	  target->cf.imaginary = 0.0;
-	  break;
-	case LUX_CDOUBLE:
-	  target->cd.real = (double) target->w;
-	  target->cd.imaginary = 0.0;
-	  break;
-      }
+      target->w = (int16_t) target->b;
       break;
     case LUX_LONG:
-      switch (outType) {
-	case LUX_BYTE:
-	  target->b = (uint8_t) target->l;
-	  break;
-	  break;
-	case LUX_WORD:
-	  target->w = (int16_t) target->l;
-	  break;
-	case LUX_LONG:
-	  break;
-	case LUX_FLOAT:
-	  target->f = (float) target->l;
-	  break;
-	case LUX_DOUBLE:
-	  target->d = (double) target->l;
-	  break;
-	case LUX_CFLOAT:
-	  target->cf.real = (float) target->l;
-	  target->cf.imaginary = 0.0;
-	  break;
-	case LUX_CDOUBLE:
-	  target->cd.real = (double) target->l;
-	  target->cd.imaginary = 0.0;
-	  break;
-      }
+      target->l = (int32_t) target->b;
+      break;
+    case LUX_QUAD:
+      target->q = (int64_t) target->b;
       break;
     case LUX_FLOAT:
-      switch (outType) {
-	case LUX_BYTE:
-	  target->b = (uint8_t) target->f;
-	  break;
-	case LUX_WORD:
-	  target->w = (int16_t) target->f;
-	  break;
-	case LUX_LONG:
-	  target->l = (int32_t) target->f;
-	  break;
-	case LUX_FLOAT:
-	  break;
-	case LUX_DOUBLE:
-	  target->d = (double) target->f;
-	  break;
-	case LUX_CFLOAT:
-	  target->cf.real = (float) target->f;
-	  target->cf.imaginary = 0.0;
-	  break;
-	case LUX_CDOUBLE:
-	  target->cd.real = (double) target->f;
-	  target->cd.imaginary = 0.0;
-	  break;
-      }
+      target->f = (float) target->b;
       break;
     case LUX_DOUBLE:
-      switch (outType) {
-	case LUX_BYTE:
-	  target->b = (uint8_t) target->d;
-	  break;
-	case LUX_WORD:
-	  target->w = (int16_t) target->d;
-	  break;
-	case LUX_LONG:
-	  target->l = (int32_t) target->d;
-	  break;
-	case LUX_FLOAT:
-	  target->f = (float) target->d;
-	  break;
-	case LUX_DOUBLE:
-	  break;
-	case LUX_CFLOAT:
-	  target->cf.real = (float) target->d;
-	  target->cf.imaginary = 0.0;
-	  break;
-	case LUX_CDOUBLE:
-	  target->cd.real = (double) target->d;
-	  target->cd.imaginary = 0.0;
-	  break;
-      }
+      target->d = (double) target->b;
       break;
     case LUX_CFLOAT:
-      switch (outType) {
-	case LUX_BYTE:
-	  target->b = (uint8_t) target->cf.real;
-	  break;
-	case LUX_WORD:
-	  target->w = (int16_t) target->cf.real;
-	  break;
-	case LUX_LONG:
-	  target->l = (int32_t) target->cf.real;
-	  break;
-	case LUX_FLOAT:
-	  target->f = (float) target->cf.real;
-	  break;
-	case LUX_DOUBLE:
-	  target->d = (double) target->cf.real;
-	  break;
-	case LUX_CFLOAT:
-	  break;
-	case LUX_CDOUBLE:
-	  target->cd.real = (double) target->cf.real;
-	  target->cd.imaginary = (double) target->cf.imaginary;
-	  break;
-      }
+      target->cf.real = (float) target->b;
+      target->cf.imaginary = 0.0;
       break;
     case LUX_CDOUBLE:
-      switch (outType) {
-	case LUX_BYTE:
-	  target->b = (uint8_t) target->cd.real;
-	  break;
-	case LUX_WORD:
-	  target->w = (int16_t) target->cd.real;
-	  break;
-	case LUX_LONG:
-	  target->l = (int32_t) target->cd.real;
-	  break;
-	case LUX_FLOAT:
-	  target->f = (float) target->cd.real;
-	  break;
-	case LUX_DOUBLE:
-	  target->d = (double) target->cd.real;
-	  break;
-	case LUX_CFLOAT:
-	  target->cf.real = (float) target->cd.real;
-	  target->cf.imaginary = (float) target->cd.imaginary;
-	  break;
-	case LUX_CDOUBLE:
-	  break;
-      }
+      target->cd.real = (double) target->b;
+      target->cd.imaginary = 0.0;
       break;
+    }
+    break;
+  case LUX_WORD:
+    switch (outType) {
+    case LUX_BYTE:
+      target->b = (uint8_t) target->w;
+      break;
+    case LUX_WORD:
+      break;
+    case LUX_LONG:
+      target->l = (int32_t) target->w;
+      break;
+    case LUX_QUAD:
+      target->q = (int64_t) target->w;
+      break;
+    case LUX_FLOAT:
+      target->f = (float) target->w;
+      break;
+    case LUX_DOUBLE:
+      target->d = (double) target->w;
+      break;
+    case LUX_CFLOAT:
+      target->cf.real = (float) target->w;
+      target->cf.imaginary = 0.0;
+      break;
+    case LUX_CDOUBLE:
+      target->cd.real = (double) target->w;
+      target->cd.imaginary = 0.0;
+      break;
+    }
+    break;
+  case LUX_LONG:
+    switch (outType) {
+    case LUX_BYTE:
+      target->b = (uint8_t) target->l;
+      break;
+      break;
+    case LUX_WORD:
+      target->w = (int16_t) target->l;
+      break;
+    case LUX_LONG:
+      break;
+    case LUX_QUAD:
+      target->q = (int64_t) target->l;
+      break;
+    case LUX_FLOAT:
+      target->f = (float) target->l;
+      break;
+    case LUX_DOUBLE:
+      target->d = (double) target->l;
+      break;
+    case LUX_CFLOAT:
+      target->cf.real = (float) target->l;
+      target->cf.imaginary = 0.0;
+      break;
+    case LUX_CDOUBLE:
+      target->cd.real = (double) target->l;
+      target->cd.imaginary = 0.0;
+      break;
+    }
+    break;
+  case LUX_QUAD:
+    switch (outType) {
+    case LUX_BYTE:
+      target->b = (uint8_t) target->q;
+      break;
+      break;
+    case LUX_WORD:
+      target->w = (int16_t) target->q;
+      break;
+    case LUX_LONG:
+      target->l = (int32_t) target->q;
+      break;
+    case LUX_QUAD:
+      break;
+    case LUX_FLOAT:
+      target->f = (float) target->q;
+      break;
+    case LUX_DOUBLE:
+      target->d = (double) target->q;
+      break;
+    case LUX_CFLOAT:
+      target->cf.real = (float) target->q;
+      target->cf.imaginary = 0.0;
+      break;
+    case LUX_CDOUBLE:
+      target->cd.real = (double) target->q;
+      target->cd.imaginary = 0.0;
+      break;
+    }
+    break;
+  case LUX_FLOAT:
+    switch (outType) {
+    case LUX_BYTE:
+      target->b = (uint8_t) target->f;
+      break;
+    case LUX_WORD:
+      target->w = (int16_t) target->f;
+      break;
+    case LUX_LONG:
+      target->l = (int32_t) target->f;
+      break;
+    case LUX_QUAD:
+      target->q = (int64_t) target->f;
+      break;
+    case LUX_FLOAT:
+      break;
+    case LUX_DOUBLE:
+      target->d = (double) target->f;
+      break;
+    case LUX_CFLOAT:
+      target->cf.real = (float) target->f;
+      target->cf.imaginary = 0.0;
+      break;
+    case LUX_CDOUBLE:
+      target->cd.real = (double) target->f;
+      target->cd.imaginary = 0.0;
+      break;
+    }
+    break;
+  case LUX_DOUBLE:
+    switch (outType) {
+    case LUX_BYTE:
+      target->b = (uint8_t) target->d;
+      break;
+    case LUX_WORD:
+      target->w = (int16_t) target->d;
+      break;
+    case LUX_LONG:
+      target->l = (int32_t) target->d;
+      break;
+    case LUX_QUAD:
+      target->q = (int64_t) target->d;
+      break;
+    case LUX_FLOAT:
+      target->f = (float) target->d;
+      break;
+    case LUX_DOUBLE:
+      break;
+    case LUX_CFLOAT:
+      target->cf.real = (float) target->d;
+      target->cf.imaginary = 0.0;
+      break;
+    case LUX_CDOUBLE:
+      target->cd.real = (double) target->d;
+      target->cd.imaginary = 0.0;
+      break;
+    }
+    break;
+  case LUX_CFLOAT:
+    switch (outType) {
+    case LUX_BYTE:
+      target->b = (uint8_t) target->cf.real;
+      break;
+    case LUX_WORD:
+      target->w = (int16_t) target->cf.real;
+      break;
+    case LUX_LONG:
+      target->l = (int32_t) target->cf.real;
+      break;
+    case LUX_QUAD:
+      target->q = (int64_t) target->cf.real;
+      break;
+    case LUX_FLOAT:
+      target->f = (float) target->cf.real;
+      break;
+    case LUX_DOUBLE:
+      target->d = (double) target->cf.real;
+      break;
+    case LUX_CFLOAT:
+      break;
+    case LUX_CDOUBLE:
+      target->cd.real = (double) target->cf.real;
+      target->cd.imaginary = (double) target->cf.imaginary;
+      break;
+    }
+    break;
+  case LUX_CDOUBLE:
+    switch (outType) {
+    case LUX_BYTE:
+      target->b = (uint8_t) target->cd.real;
+      break;
+    case LUX_WORD:
+      target->w = (int16_t) target->cd.real;
+      break;
+    case LUX_LONG:
+      target->l = (int32_t) target->cd.real;
+      break;
+    case LUX_QUAD:
+      target->q = (int64_t) target->cd.real;
+      break;
+    case LUX_FLOAT:
+      target->f = (float) target->cd.real;
+      break;
+    case LUX_DOUBLE:
+      target->d = (double) target->cd.real;
+      break;
+    case LUX_CFLOAT:
+      target->cf.real = (float) target->cd.real;
+      target->cf.imaginary = (float) target->cd.imaginary;
+      break;
+    case LUX_CDOUBLE:
+      break;
+    }
+    break;
   }
 }
 /*----------------------------------------------------------------*/
-void convertScalar(scalar *target, int32_t nsym, int32_t type)
+void convertScalar(scalar *target, int32_t nsym, Symboltype type)
 /* returns scalar value of nsym, converted to proper type, in target */
 {
  int32_t		n;
@@ -3837,6 +3922,9 @@ void convertScalar(scalar *target, int32_t nsym, int32_t type)
      break;
    case LUX_LONG:
      (*target).b = (uint8_t) *ptr.l;
+     break;
+   case LUX_QUAD:
+     (*target).b = (uint8_t) *ptr.q;
      break;
    case LUX_FLOAT:
      (*target).b = (uint8_t) *ptr.f;
@@ -3857,6 +3945,9 @@ void convertScalar(scalar *target, int32_t nsym, int32_t type)
    case LUX_LONG:
      (*target).w = (int16_t) *ptr.l;
      break;
+   case LUX_QUAD:
+     (*target).w = (int16_t) *ptr.q;
+     break;
    case LUX_FLOAT:
      (*target).w = (int16_t) *ptr.f;
      break;
@@ -3876,11 +3967,36 @@ void convertScalar(scalar *target, int32_t nsym, int32_t type)
    case LUX_LONG:
      (*target).l = (int32_t) *ptr.l;
      break;
+   case LUX_QUAD:
+     (*target).l = (int32_t) *ptr.q;
+     break;
    case LUX_FLOAT:
      (*target).l = (int32_t) *ptr.f;
      break;
    case LUX_DOUBLE:
      (*target).l = (int32_t) *ptr.d;
+     break;
+   }
+   break;
+ case LUX_QUAD:
+   switch (n) {
+   case LUX_BYTE:
+     (*target).q = (int64_t) *ptr.b;
+     break;
+   case LUX_WORD:
+     (*target).q = (int64_t) *ptr.w;
+     break;
+   case LUX_LONG:
+     (*target).q = (int64_t) *ptr.l;
+     break;
+   case LUX_QUAD:
+     (*target).q = (int64_t) *ptr.q;
+     break;
+   case LUX_FLOAT:
+     (*target).q = (int64_t) *ptr.f;
+     break;
+   case LUX_DOUBLE:
+     (*target).q = (int64_t) *ptr.d;
      break;
    }
    break;
@@ -3894,6 +4010,9 @@ void convertScalar(scalar *target, int32_t nsym, int32_t type)
      break;
    case LUX_LONG:
      (*target).f = (float) *ptr.l;
+     break;
+   case LUX_QUAD:
+     (*target).f = (float) *ptr.q;
      break;
    case LUX_FLOAT:
      (*target).f = (float) *ptr.f;
@@ -3913,6 +4032,9 @@ void convertScalar(scalar *target, int32_t nsym, int32_t type)
      break;
    case LUX_LONG:
      (*target).d = (double) *ptr.l;
+     break;
+   case LUX_QUAD:
+     (*target).d = (double) *ptr.q;
      break;
    case LUX_FLOAT:
      (*target).d = (double) *ptr.f;

@@ -1520,7 +1520,7 @@ int32_t lux_hist_dense(int32_t narg, int32_t ps[])
   symbol_memory(ps[1]) = symbol_memory(result);
   
   return result;
-}  
+}
 /*------------------------------------------------------------------------- */
 int32_t lux_hist(int32_t narg, int32_t ps[]) /* histogram function */
 				 /* (frequency distribution) */
@@ -1530,7 +1530,6 @@ int32_t lux_hist(int32_t narg, int32_t ps[]) /* histogram function */
 /* LS 12jul2000: added /SILENT keyword (internalMode & 8) to suppress */
 /* warnings about negative histogram elements. */
 {
-  void	convertPointer(scalar *, int32_t, int32_t);
   int32_t	iq, i, n, range, type, result_sym, *dims, nRepeat,
   	ndim, axis, one = 1, size;
   array	*h;

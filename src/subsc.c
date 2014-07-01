@@ -34,7 +34,6 @@ int32_t	lux_assoc_output(int32_t iq, int32_t jq, int32_t offsym, int32_t axsym),
   lux_gmap(int32_t narg, int32_t ps[], int32_t new), lux_assoc_input(int32_t, int32_t []),
   simple_reverse(int32_t *p1, int32_t *p2, int32_t n, int32_t type), getBody(int32_t),
   string_sub(int32_t, int32_t []);
-void	convertPointer(scalar *, int32_t, int32_t);
 /*------------------------------------------------------------------------- */
 int32_t lux_inserter(int32_t narg, int32_t ps[])
 /* syntax: insert,target,source [,origin]
@@ -2434,7 +2433,8 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
 {
   pointer q1,q2;
   int32_t	nd, j, i, dim[MAX_DIMS], nundef = 0;
-  int32_t	iq, nsym, mq, toptype = LUX_BYTE, topnd = 0, sflag = 0, n, nq;
+  int32_t	iq, nsym, mq, topnd = 0, sflag = 0, n, nq;
+  Symboltype toptype = LUX_BYTE;
   scalar	temp;
 
   if (narg <= 0)
@@ -2472,7 +2472,7 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
         return nsym;
       case LUX_ARRAY: case LUX_CARRAY: /*array */
 	/* make a copy with an additional dimension (of size 1) added */
-	
+
 	if (array_num_dims(iq) == MAX_DIMS) /* already at max number of */
 					    /* dimensions */
 	  return cerror(N_DIMS_OVR, iq);
@@ -2566,7 +2566,7 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
 	    break;
           default:		/*just in case */
 	    return cerror(ILL_CLASS, iq);
-	} 
+	}
       }
       return nsym;
     }
@@ -2660,171 +2660,211 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
       }	/* switch (symbol_class(iq)) */
       if (n)
 	switch (toptype) {
-	  case LUX_BYTE:
-	    while (n--)
-	      *q2.b++ = *q1.b++;
-	    break;
-	  case LUX_WORD:
-	    switch (symbol_type(iq)) {
-	      case LUX_BYTE:
-		while (n--)
-		  *q2.w++ = (int16_t) *q1.b++;
-		break;
-	      case LUX_WORD:
-		while (n--)
-		  *q2.w++ = *q1.w++;
-		break;
-	    }
-	    break;
-	  case LUX_LONG:
-	    switch (symbol_type(iq)) {
-	      case LUX_BYTE:
-		while (n--)
-		  *q2.l++ = (int32_t) *q1.b++;
-		break;
-	      case LUX_WORD:
-		while (n--)
-		  *q2.l++ = (int32_t) *q1.w++;
-		break;
-	      case LUX_LONG:
-		while (n--)
-		  *q2.l++ = *q1.l++;
-		break;
-	    }
-	    break;
-	  case LUX_FLOAT:
-	    switch (symbol_type(iq)) {
-	      case LUX_BYTE:
-		while (n--)
-		  *q2.f++ = (float) *q1.b++;
-		break;
-	      case LUX_WORD:
-		while (n--)
-		  *q2.f++ = (float) *q1.w++;
-		break;
-	      case LUX_LONG:
-		while (n--)
-		  *q2.f++ = (float) *q1.l++;
-		break;
-	      case LUX_FLOAT:
-		while (n--)
-		  *q2.f++ = *q1.f++;
-		break;
-	    }
-	    break;
-	  case LUX_DOUBLE:
-	    switch (symbol_type(iq)) {
-	      case LUX_BYTE:
-		while (n--)
-		  *q2.d++ = (double) *q1.b++;
-		break;
-	      case LUX_WORD:
-		while (n--)
-		  *q2.d++ = (double) *q1.w++;
-		break;
-	      case LUX_LONG:
-		while (n--)
-		  *q2.d++ = (double) *q1.l++;
-		break;
-	      case LUX_FLOAT:
-		while (n--)
-		  *q2.d++ = (double) *q1.f++;
-		break;
-	      case LUX_DOUBLE:
-		while (n--)
-		  *q2.d++ = *q1.d++;
-		break;
-	    }
-	    break;
-	  case LUX_CFLOAT:
-	    switch (symbol_type(iq)) {
-	      case LUX_BYTE:
-		while (n--) {
-		  q2.cf->real = *q1.b++;
-		  q2.cf++->imaginary = 0.0;
-		}
-		break;
-	      case LUX_WORD:
-		while (n--) {
-		  q2.cf->real = *q1.w++;
-		  q2.cf++->imaginary = 0.0;
-		}
-		break;
-	      case LUX_LONG:
-		while (n--) {
-		  q2.cf->real = *q1.l++;
-		  q2.cf++->imaginary = 0.0;
-		}
-		break;
-	      case LUX_FLOAT:
-		while (n--) {
-		  q2.cf->real = *q1.f++;
-		  q2.cf++->imaginary = 0.0;
-		}
-		break;
-	      case LUX_CFLOAT:
-		while (n--) {
-		  q2.cf->real = q1.cf->real;
-		  q2.cf++->imaginary = q1.cf++->imaginary;
-		}
-		break;
-	    }
-	    break;
-	  case LUX_CDOUBLE:
-	    switch (symbol_type(iq)) {
-	      case LUX_BYTE:
-		while (n--) {
-		  q2.cd->real = *q1.b++;
-		  q2.cd++->imaginary = 0.0;
-		}
-		break;
-	      case LUX_WORD:
-		while (n--) {
-		  q2.cd->real = *q1.w++;
-		  q2.cd++->imaginary = 0.0;
-		}
-		break;
-	      case LUX_LONG:
-		while (n--) {
-		  q2.cd->real = *q1.l++;
-		  q2.cd++->imaginary = 0.0;
-		}
-		break;
-	      case LUX_FLOAT:
-		while (n--) {
-		  q2.cd->real = *q1.f++;
-		  q2.cd++->imaginary = 0.0;
-		}
-		break;
-	      case LUX_DOUBLE:
-		while (n--) {
-		  q2.cd->real = *q1.d++;
-		  q2.cd++->imaginary = 0.0;
-		}
-		break;
-	      case LUX_CFLOAT:
-		while (n--) {
-		  q2.cd->real = q1.cf->real;
-		  q2.cd++->imaginary = q1.cf++->imaginary;
-		}
-		break;
-	      case LUX_CDOUBLE:
-		while (n--) {
-		  q2.cd->real = q1.cd->real;
-		  q2.cd++->imaginary = q1.cd++->imaginary;
-		}
-		break;
-	    }
-	    break;
-	  case LUX_TEMP_STRING: case LUX_LSTRING: case LUX_STRING_ARRAY:
-	    if (symbol_class(iq) == LUX_STRING) 
-	      *q2.sp = strsave(q1.s);
-	    else 		/* string array */
-	      while (n--) {
-		*q2.sp++ = *q1.sp? strsave(*q1.sp): NULL;
-		q1.sp++;
-	      }
-	    break;
+        case LUX_BYTE:
+          while (n--)
+            *q2.b++ = *q1.b++;
+          break;
+        case LUX_WORD:
+          switch (symbol_type(iq)) {
+          case LUX_BYTE:
+            while (n--)
+              *q2.w++ = (int16_t) *q1.b++;
+            break;
+          case LUX_WORD:
+            while (n--)
+              *q2.w++ = *q1.w++;
+            break;
+          }
+          break;
+        case LUX_LONG:
+          switch (symbol_type(iq)) {
+          case LUX_BYTE:
+            while (n--)
+              *q2.l++ = (int32_t) *q1.b++;
+            break;
+          case LUX_WORD:
+            while (n--)
+              *q2.l++ = (int32_t) *q1.w++;
+            break;
+          case LUX_LONG:
+            while (n--)
+              *q2.l++ = *q1.l++;
+            break;
+          }
+          break;
+        case LUX_QUAD:
+          switch (symbol_type(iq)) {
+          case LUX_BYTE:
+            while (n--)
+              *q2.q++ = (int64_t) *q1.b++;
+            break;
+          case LUX_WORD:
+            while (n--)
+              *q2.q++ = (int64_t) *q1.w++;
+            break;
+          case LUX_LONG:
+            while (n--)
+              *q2.q++ = (int64_t) *q1.l++;
+            break;
+          case LUX_QUAD:
+            while (n--)
+              *q2.q++ = *q1.q++;
+            break;
+          }
+          break;
+        case LUX_FLOAT:
+          switch (symbol_type(iq)) {
+          case LUX_BYTE:
+            while (n--)
+              *q2.f++ = (float) *q1.b++;
+            break;
+          case LUX_WORD:
+            while (n--)
+              *q2.f++ = (float) *q1.w++;
+            break;
+          case LUX_LONG:
+            while (n--)
+              *q2.f++ = (float) *q1.l++;
+            break;
+          case LUX_QUAD:
+            while (n--)
+              *q2.f++ = (float) *q1.q++;
+            break;
+          case LUX_FLOAT:
+            while (n--)
+              *q2.f++ = *q1.f++;
+            break;
+          }
+          break;
+        case LUX_DOUBLE:
+          switch (symbol_type(iq)) {
+          case LUX_BYTE:
+            while (n--)
+              *q2.d++ = (double) *q1.b++;
+            break;
+          case LUX_WORD:
+            while (n--)
+              *q2.d++ = (double) *q1.w++;
+            break;
+          case LUX_LONG:
+            while (n--)
+              *q2.d++ = (double) *q1.l++;
+            break;
+          case LUX_QUAD:
+            while (n--)
+              *q2.d++ = (double) *q1.q++;
+            break;
+          case LUX_FLOAT:
+            while (n--)
+              *q2.d++ = (double) *q1.f++;
+            break;
+          case LUX_DOUBLE:
+            while (n--)
+              *q2.d++ = *q1.d++;
+            break;
+          }
+          break;
+        case LUX_CFLOAT:
+          switch (symbol_type(iq)) {
+          case LUX_BYTE:
+            while (n--) {
+              q2.cf->real = *q1.b++;
+              q2.cf++->imaginary = 0.0;
+            }
+            break;
+          case LUX_WORD:
+            while (n--) {
+              q2.cf->real = *q1.w++;
+              q2.cf++->imaginary = 0.0;
+            }
+            break;
+          case LUX_LONG:
+            while (n--) {
+              q2.cf->real = *q1.l++;
+              q2.cf++->imaginary = 0.0;
+            }
+            break;
+          case LUX_QUAD:
+            while (n--) {
+              q2.cf->real = *q1.q++;
+              q2.cf++->imaginary = 0.0;
+            }
+            break;
+          case LUX_FLOAT:
+            while (n--) {
+              q2.cf->real = *q1.f++;
+              q2.cf++->imaginary = 0.0;
+            }
+            break;
+          case LUX_CFLOAT:
+            while (n--) {
+              q2.cf->real = q1.cf->real;
+              q2.cf++->imaginary = q1.cf++->imaginary;
+            }
+            break;
+          }
+          break;
+        case LUX_CDOUBLE:
+          switch (symbol_type(iq)) {
+          case LUX_BYTE:
+            while (n--) {
+              q2.cd->real = *q1.b++;
+              q2.cd++->imaginary = 0.0;
+            }
+            break;
+          case LUX_WORD:
+            while (n--) {
+              q2.cd->real = *q1.w++;
+              q2.cd++->imaginary = 0.0;
+            }
+            break;
+          case LUX_LONG:
+            while (n--) {
+              q2.cd->real = *q1.l++;
+              q2.cd++->imaginary = 0.0;
+            }
+            break;
+          case LUX_QUAD:
+            while (n--) {
+              q2.cd->real = *q1.q++;
+              q2.cd++->imaginary = 0.0;
+            }
+            break;
+          case LUX_FLOAT:
+            while (n--) {
+              q2.cd->real = *q1.f++;
+              q2.cd++->imaginary = 0.0;
+            }
+            break;
+          case LUX_DOUBLE:
+            while (n--) {
+              q2.cd->real = *q1.d++;
+              q2.cd++->imaginary = 0.0;
+            }
+            break;
+          case LUX_CFLOAT:
+            while (n--) {
+              q2.cd->real = q1.cf->real;
+              q2.cd++->imaginary = q1.cf++->imaginary;
+            }
+            break;
+          case LUX_CDOUBLE:
+            while (n--) {
+              q2.cd->real = q1.cd->real;
+              q2.cd++->imaginary = q1.cd++->imaginary;
+            }
+            break;
+          }
+          break;
+        case LUX_TEMP_STRING: case LUX_LSTRING: case LUX_STRING_ARRAY:
+          if (symbol_class(iq) == LUX_STRING)
+            *q2.sp = strsave(q1.s);
+          else 		/* string array */
+            while (n--) {
+              *q2.sp++ = *q1.sp? strsave(*q1.sp): NULL;
+              q1.sp++;
+            }
+          break;
 	} /* switch (toptype) */
     } /* for (i = 0; ...) */
     return nsym;

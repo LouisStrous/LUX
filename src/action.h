@@ -117,7 +117,7 @@ void	clearToPopTempVariable(int32_t), pushTempVariable(int32_t), printw(char *),
 			double *, double *, csplineInfo *),
   undefine(int32_t),
   setPager(int32_t), resetPager(void), embed(int32_t, int32_t),
-  convertPointer(scalar *, int32_t, int32_t), zap(int32_t);
+  convertPointer(scalar *, Symboltype, Symboltype), zap(int32_t);
 
 const csplineInfo empty_cubic_spline(void);
 

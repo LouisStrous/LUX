@@ -75,14 +75,14 @@ char	class[] = {
 #include "install.h"
 
 char		*symbolStack[SYMBOLSTACKSIZE];
-hashTableEntry	*varHashTable[HASHSIZE], *subrHashTable[HASHSIZE], 
+hashTableEntry	*varHashTable[HASHSIZE], *subrHashTable[HASHSIZE],
 		*funcHashTable[HASHSIZE], *blockHashTable[HASHSIZE];
 symTableEntry	sym[NSYM];
 int32_t		scrat[NSCRAT], curSymbol;
 int16_t		listStack[NLIST];
 int16_t		curContext = 0;
 int32_t		lux_type_size[] =
-	{ sizeof(uint8_t), sizeof(int16_t), sizeof(int32_t), sizeof(float),
-	  sizeof(double), sizeof(char), sizeof(char), sizeof(char *),
-	  sizeof(floatComplex), sizeof(doubleComplex) };
+  { sizeof(uint8_t), sizeof(int16_t), sizeof(int32_t), sizeof(int64_t),
+    sizeof(float), sizeof(double), sizeof(char), sizeof(char),
+    sizeof(char *), sizeof(floatComplex), sizeof(doubleComplex) };
 char	*curScrat = (char *) scrat, *printString;

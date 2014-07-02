@@ -22,9 +22,10 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
-#include <math.h>
-#include <string.h>
 #include <ctype.h>
+#include <math.h>
+#include <stdlib.h>
+#include <string.h>
 #include "action.h"
 #include "install.h"
 
@@ -6368,176 +6369,255 @@ void lux_idiv(void)
 /* NOTE: no checking for division by zero! */
 {
   div_t qr;
+  lldiv_t iqr;
 
   switch (lhsType) {
+  case LUX_BYTE:
+    switch (rhsType) {
     case LUX_BYTE:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--) {
-            qr = div(*lp.b++, *rp.b++);
-            if (qr.rem < 0)
-              qr.quot--;
-            *tp.b++ = qr.quot;
-          }
-          break;
-        case LUX_WORD:
-          while (nRepeat--) {
-            qr = div(*lp.b++, *rp.w++);
-            if (qr.rem < 0)
-              qr.quot--;
-            *tp.w++ = qr.quot;
-          }
-          break;
-        case LUX_LONG:
-          while (nRepeat--) {
-            qr = div(*lp.b++, *rp.l++);
-            if (qr.rem < 0)
-              qr.quot--;
-            *tp.l++ = qr.quot;
-          }
-          break;
-        case LUX_FLOAT:
-          while (nRepeat--)
-            *tp.f++ = floor(*lp.b++ / *rp.f++);
-          break;
-        case LUX_DOUBLE:
-          while (nRepeat--)
-            *tp.d++ = floor(*lp.b++ / *rp.d++);
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
+      while (nRepeat--) {
+        qr = div(*lp.b++, *rp.b++);
+        if (qr.rem < 0)
+          qr.quot--;
+        *tp.b++ = qr.quot;
       }
       break;
     case LUX_WORD:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--) {
-            qr = div(*lp.w++, *rp.b++);
-            if (qr.rem < 0)
-              qr.quot--;
-            *tp.w++ = qr.quot;
-          }
-          break;
-        case LUX_WORD:
-          while (nRepeat--) {
-            qr = div(*lp.w++, *rp.w++);
-            if (qr.rem < 0)
-              qr.quot--;
-            *tp.w++ = qr.quot;
-          }
-          break;
-        case LUX_LONG:
-          while (nRepeat--) {
-            qr = div(*lp.w++, *rp.l++);
-            if (qr.rem < 0)
-              qr.quot--;
-            *tp.l++ = qr.quot;
-          }
-          break;
-        case LUX_FLOAT:
-          while (nRepeat--)
-            *tp.f++ = floor(*lp.w++ / *rp.f++);
-          break;
-        case LUX_DOUBLE:
-          while (nRepeat--)
-            *tp.d++ = floor(*lp.w++ / *rp.d++);
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
+      while (nRepeat--) {
+        qr = div(*lp.b++, *rp.w++);
+        if (qr.rem < 0)
+          qr.quot--;
+        *tp.w++ = qr.quot;
       }
       break;
     case LUX_LONG:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--) {
-            qr = div(*lp.l++, *rp.b++);
-            if (qr.rem < 0)
-              qr.quot--;
-            *tp.l++ = qr.quot;
-          }
-          break;
-        case LUX_WORD:
-          while (nRepeat--) {
-            qr = div(*lp.l++, *rp.w++);
-            if (qr.rem < 0)
-              qr.quot--;
-            *tp.l++ = qr.quot;
-          }
-          break;
-        case LUX_LONG:
-          while (nRepeat--) {
-            qr = div(*lp.l++, *rp.l++);
-            if (qr.rem < 0)
-              qr.quot--;
-            *tp.l++ = qr.quot;
-          }
-          break;
-        case LUX_FLOAT:
-          while (nRepeat--)
-            *tp.f++ = floor(*lp.l++ / *rp.f++);
-          break;
-        case LUX_DOUBLE:
-          while (nRepeat--)
-            *tp.d++ = floor(*lp.l++ / *rp.d++);
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
+      while (nRepeat--) {
+        qr = div(*lp.b++, *rp.l++);
+        if (qr.rem < 0)
+          qr.quot--;
+        *tp.l++ = qr.quot;
+      }
+      break;
+    case LUX_QUAD:
+      while (nRepeat--) {
+        iqr = lldiv(*lp.b++, *rp.q++);
+        if (iqr.rem < 0)
+          iqr.quot--;
+        *tp.q++ = iqr.quot;
       }
       break;
     case LUX_FLOAT:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--)
-            *tp.f++ = floor(*lp.f++ / *rp.b++);
-          break;
-        case LUX_WORD:
-          while (nRepeat--)
-            *tp.f++ = floor(*lp.f++ / *rp.w++);
-          break;
-        case LUX_LONG:
-          while (nRepeat--)
-            *tp.f++ = floor(*lp.f++ / *rp.l++);
-          break;
-        case LUX_FLOAT:
-          while (nRepeat--)
-            *tp.f++ = floor(*lp.f++ / *rp.f++);
-          break;
-        case LUX_DOUBLE:
-          while (nRepeat--)
-            *tp.d++ = floor(*lp.f++ / *rp.d++);
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
-      }
+      while (nRepeat--)
+        *tp.f++ = floor(*lp.b++ / *rp.f++);
       break;
     case LUX_DOUBLE:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--)
-            *tp.d++ = floor(*lp.d++ / *rp.b++);
-          break;
-        case LUX_WORD:
-          while (nRepeat--)
-            *tp.d++ = floor(*lp.d++ / *rp.w++);
-          break;
-        case LUX_LONG:
-          while (nRepeat--)
-            *tp.d++ = floor(*lp.d++ / *rp.l++);
-          break;
-        case LUX_FLOAT:
-          while (nRepeat--)
-            *tp.d++ = floor(*lp.d++ / *rp.f++);
-          break;
-        case LUX_DOUBLE:
-          while (nRepeat--)
-            *tp.d++ = floor(*lp.d++ / *rp.d++);
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
-      }
+      while (nRepeat--)
+        *tp.d++ = floor(*lp.b++ / *rp.d++);
       break;
     default:
-      cerror(ILL_TYPE, lhs, typeName(lhsType));
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_WORD:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--) {
+        qr = div(*lp.w++, *rp.b++);
+        if (qr.rem < 0)
+          qr.quot--;
+        *tp.w++ = qr.quot;
+      }
+      break;
+    case LUX_WORD:
+      while (nRepeat--) {
+        qr = div(*lp.w++, *rp.w++);
+        if (qr.rem < 0)
+          qr.quot--;
+        *tp.w++ = qr.quot;
+      }
+      break;
+    case LUX_LONG:
+      while (nRepeat--) {
+        qr = div(*lp.w++, *rp.l++);
+        if (qr.rem < 0)
+          qr.quot--;
+        *tp.l++ = qr.quot;
+      }
+      break;
+    case LUX_QUAD:
+      while (nRepeat--) {
+        iqr = lldiv(*lp.w++, *rp.q++);
+        if (iqr.rem < 0)
+          iqr.quot--;
+        *tp.q++ = iqr.quot;
+      }
+      break;
+    case LUX_FLOAT:
+      while (nRepeat--)
+        *tp.f++ = floor(*lp.w++ / *rp.f++);
+      break;
+    case LUX_DOUBLE:
+      while (nRepeat--)
+        *tp.d++ = floor(*lp.w++ / *rp.d++);
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_LONG:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--) {
+        qr = div(*lp.l++, *rp.b++);
+        if (qr.rem < 0)
+          qr.quot--;
+        *tp.l++ = qr.quot;
+      }
+      break;
+    case LUX_WORD:
+      while (nRepeat--) {
+        qr = div(*lp.l++, *rp.w++);
+        if (qr.rem < 0)
+          qr.quot--;
+        *tp.l++ = qr.quot;
+      }
+      break;
+    case LUX_LONG:
+      while (nRepeat--) {
+        qr = div(*lp.l++, *rp.l++);
+        if (qr.rem < 0)
+          qr.quot--;
+        *tp.l++ = qr.quot;
+      }
+      break;
+    case LUX_QUAD:
+      while (nRepeat--) {
+        iqr = lldiv(*lp.l++, *rp.q++);
+        if (iqr.rem < 0)
+          iqr.quot--;
+        *tp.q++ = iqr.quot;
+      }
+      break;
+    case LUX_FLOAT:
+      while (nRepeat--)
+        *tp.f++ = floor(*lp.l++ / *rp.f++);
+      break;
+    case LUX_DOUBLE:
+      while (nRepeat--)
+        *tp.d++ = floor(*lp.l++ / *rp.d++);
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_QUAD:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--) {
+        iqr = lldiv(*lp.q++, *rp.b++);
+        if (iqr.rem < 0)
+          iqr.quot--;
+        *tp.q++ = iqr.quot;
+      }
+      break;
+    case LUX_WORD:
+      while (nRepeat--) {
+        iqr = lldiv(*lp.q++, *rp.w++);
+        if (iqr.rem < 0)
+          iqr.quot--;
+        *tp.q++ = iqr.quot;
+      }
+      break;
+    case LUX_LONG:
+      while (nRepeat--) {
+        iqr = lldiv(*lp.q++, *rp.l++);
+        if (iqr.rem < 0)
+          iqr.quot--;
+        *tp.q++ = iqr.quot;
+      }
+      break;
+    case LUX_QUAD:
+      while (nRepeat--) {
+        iqr = lldiv(*lp.q++, *rp.q++);
+        if (iqr.rem < 0)
+          iqr.quot--;
+        *tp.q++ = iqr.quot;
+      }
+      break;
+    case LUX_FLOAT:
+      while (nRepeat--)
+        *tp.d++ = floor((double) *lp.q++ / *rp.f++);
+      break;
+    case LUX_DOUBLE:
+      while (nRepeat--)
+        *tp.d++ = floor((double) *lp.q++ / *rp.d++);
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_FLOAT:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--)
+        *tp.f++ = floor(*lp.f++ / *rp.b++);
+      break;
+    case LUX_WORD:
+      while (nRepeat--)
+        *tp.f++ = floor(*lp.f++ / *rp.w++);
+      break;
+    case LUX_LONG:
+      while (nRepeat--)
+        *tp.f++ = floor(*lp.f++ / *rp.l++);
+      break;
+    case LUX_QUAD:
+      while (nRepeat--)
+        *tp.d++ = floor(*lp.f++ / (double) *rp.q++);
+      break;
+    case LUX_FLOAT:
+      while (nRepeat--)
+        *tp.f++ = floor(*lp.f++ / *rp.f++);
+      break;
+    case LUX_DOUBLE:
+      while (nRepeat--)
+        *tp.d++ = floor(*lp.f++ / *rp.d++);
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_DOUBLE:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--)
+        *tp.d++ = floor(*lp.d++ / *rp.b++);
+      break;
+    case LUX_WORD:
+      while (nRepeat--)
+        *tp.d++ = floor(*lp.d++ / *rp.w++);
+      break;
+    case LUX_LONG:
+      while (nRepeat--)
+        *tp.d++ = floor(*lp.d++ / *rp.l++);
+      break;
+    case LUX_QUAD:
+      while (nRepeat--)
+        *tp.d++ = floor(*lp.d++ / (double) *rp.q++);
+      break;
+    case LUX_FLOAT:
+      while (nRepeat--)
+        *tp.d++ = floor(*lp.d++ / *rp.f++);
+      break;
+    case LUX_DOUBLE:
+      while (nRepeat--)
+        *tp.d++ = floor(*lp.d++ / *rp.d++);
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  default:
+    cerror(ILL_TYPE, lhs, typeName(lhsType));
   }
 }
 /*----------------------------------------------------------*/
@@ -6547,176 +6627,209 @@ void lux_idiv_as(void)
 /* NOTE: no checking for division by zero! */
 {
   div_t qr;
+  lldiv_t iqr;
 
   switch (lhsType) {
+  case LUX_BYTE:
+    switch (rhsType) {
     case LUX_BYTE:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--) {
-            qr = div(*lp.b++, *rp.b);
-            if (qr.rem < 0)
-              qr.quot--;
-            *tp.b++ = qr.quot;
-          }
-          break;
-        case LUX_WORD:
-          while (nRepeat--) {
-            qr = div(*lp.b++, *rp.w);
-            if (qr.rem < 0)
-              qr.quot--;
-            *tp.w++ = qr.quot;
-          }
-          break;
-        case LUX_LONG:
-          while (nRepeat--) {
-            qr = div(*lp.b++, *rp.l);
-            if (qr.rem < 0)
-              qr.quot--;
-            *tp.l++ = qr.quot;
-          }
-          break;
-        case LUX_FLOAT:
-          while (nRepeat--)
-            *tp.f++ = floor(*lp.b++ / *rp.f);
-          break;
-        case LUX_DOUBLE:
-          while (nRepeat--)
-            *tp.d++ = floor(*lp.b++ / *rp.d);
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
+      while (nRepeat--) {
+        qr = div(*lp.b++, *rp.b);
+        if (qr.rem < 0)
+          qr.quot--;
+        *tp.b++ = qr.quot;
       }
       break;
     case LUX_WORD:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--) {
-            qr = div(*lp.w++, *rp.b);
-            if (qr.rem < 0)
-              qr.quot--;
-            *tp.w++ = qr.quot;
-          }
-          break;
-        case LUX_WORD:
-          while (nRepeat--) {
-            qr = div(*lp.w++, *rp.w);
-            if (qr.rem < 0)
-              qr.quot--;
-            *tp.w++ = qr.quot;
-          }
-          break;
-        case LUX_LONG:
-          while (nRepeat--) {
-            qr = div(*lp.w++, *rp.l);
-            if (qr.rem < 0)
-              qr.quot--;
-            *tp.l++ = qr.quot;
-          }
-          break;
-        case LUX_FLOAT:
-          while (nRepeat--)
-            *tp.f++ = floor(*lp.w++ / *rp.f);
-          break;
-        case LUX_DOUBLE:
-          while (nRepeat--)
-            *tp.d++ = floor(*lp.w++ / *rp.d);
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
+      while (nRepeat--) {
+        qr = div(*lp.b++, *rp.w);
+        if (qr.rem < 0)
+          qr.quot--;
+        *tp.w++ = qr.quot;
       }
       break;
     case LUX_LONG:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--) {
-            qr = div(*lp.l++, *rp.b);
-            if (qr.rem < 0)
-              qr.quot--;
-            *tp.l++ = qr.quot;
-          }
-          break;
-        case LUX_WORD:
-          while (nRepeat--) {
-            qr = div(*lp.l++, *rp.w);
-            if (qr.rem < 0)
-              qr.quot--;
-            *tp.l++ = qr.quot;
-          }
-          break;
-        case LUX_LONG:
-          while (nRepeat--) {
-            qr = div(*lp.l++, *rp.l);
-            if (qr.rem < 0)
-              qr.quot--;
-            *tp.l++ = qr.quot;
-          }
-          break;
-        case LUX_FLOAT:
-          while (nRepeat--)
-            *tp.f++ = floor(*lp.l++ / *rp.f);
-          break;
-        case LUX_DOUBLE:
-          while (nRepeat--)
-            *tp.d++ = floor(*lp.l++ / *rp.d);
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
+      while (nRepeat--) {
+        qr = div(*lp.b++, *rp.l);
+        if (qr.rem < 0)
+          qr.quot--;
+        *tp.l++ = qr.quot;
+      }
+      break;
+    case LUX_QUAD:
+      while (nRepeat--) {
+        iqr = lldiv(*lp.b++, *rp.q);
+        if (iqr.rem < 0)
+          iqr.quot--;
+        *tp.q++ = iqr.quot;
       }
       break;
     case LUX_FLOAT:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--)
-            *tp.f++ = floor(*lp.f++ / *rp.b);
-          break;
-        case LUX_WORD:
-          while (nRepeat--)
-            *tp.f++ = floor(*lp.f++ / *rp.w);
-          break;
-        case LUX_LONG:
-          while (nRepeat--)
-            *tp.f++ = floor(*lp.f++ / *rp.l);
-          break;
-        case LUX_FLOAT:
-          while (nRepeat--)
-            *tp.f++ = floor(*lp.f++ / *rp.f);
-          break;
-        case LUX_DOUBLE:
-          while (nRepeat--)
-            *tp.d++ = floor(*lp.f++ / *rp.d);
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
-      }
+      while (nRepeat--)
+        *tp.f++ = floor(*lp.b++ / *rp.f);
       break;
     case LUX_DOUBLE:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--)
-            *tp.d++ = floor(*lp.d++ / *rp.b);
-          break;
-        case LUX_WORD:
-          while (nRepeat--)
-            *tp.d++ = floor(*lp.d++ / *rp.w);
-          break;
-        case LUX_LONG:
-          while (nRepeat--)
-            *tp.d++ = floor(*lp.d++ / *rp.l);
-          break;
-        case LUX_FLOAT:
-          while (nRepeat--)
-            *tp.d++ = floor(*lp.d++ / *rp.f);
-          break;
-        case LUX_DOUBLE:
-          while (nRepeat--)
-            *tp.d++ = floor(*lp.d++ / *rp.d);
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
-      }
+      while (nRepeat--)
+        *tp.d++ = floor(*lp.b++ / *rp.d);
       break;
     default:
-      cerror(ILL_TYPE, lhs, typeName(lhsType));
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_WORD:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--) {
+        qr = div(*lp.w++, *rp.b);
+        if (qr.rem < 0)
+          qr.quot--;
+        *tp.w++ = qr.quot;
+      }
+      break;
+    case LUX_WORD:
+      while (nRepeat--) {
+        qr = div(*lp.w++, *rp.w);
+        if (qr.rem < 0)
+          qr.quot--;
+        *tp.w++ = qr.quot;
+      }
+      break;
+    case LUX_LONG:
+      while (nRepeat--) {
+        qr = div(*lp.w++, *rp.l);
+        if (qr.rem < 0)
+          qr.quot--;
+        *tp.l++ = qr.quot;
+      }
+      break;
+    case LUX_QUAD:
+      while (nRepeat--) {
+        iqr = lldiv(*lp.w++, *rp.q);
+        if (iqr.rem < 0)
+          iqr.quot--;
+        *tp.q++ = iqr.quot;
+      }
+      break;
+    case LUX_FLOAT:
+      while (nRepeat--)
+        *tp.f++ = floor(*lp.w++ / *rp.f);
+      break;
+    case LUX_DOUBLE:
+      while (nRepeat--)
+        *tp.d++ = floor(*lp.w++ / *rp.d);
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_LONG:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--) {
+        qr = div(*lp.l++, *rp.b);
+        if (qr.rem < 0)
+          qr.quot--;
+        *tp.l++ = qr.quot;
+      }
+      break;
+    case LUX_WORD:
+      while (nRepeat--) {
+        qr = div(*lp.l++, *rp.w);
+        if (qr.rem < 0)
+          qr.quot--;
+        *tp.l++ = qr.quot;
+      }
+      break;
+    case LUX_LONG:
+      while (nRepeat--) {
+        qr = div(*lp.l++, *rp.l);
+        if (qr.rem < 0)
+          qr.quot--;
+        *tp.l++ = qr.quot;
+      }
+      break;
+    case LUX_QUAD:
+      while (nRepeat--) {
+        iqr = lldiv(*lp.l++, *rp.q);
+        if (iqr.rem < 0)
+          iqr.quot--;
+        *tp.q++ = iqr.quot;
+      }
+      break;
+    case LUX_FLOAT:
+      while (nRepeat--)
+        *tp.f++ = floor(*lp.l++ / *rp.f);
+      break;
+    case LUX_DOUBLE:
+      while (nRepeat--)
+        *tp.d++ = floor(*lp.l++ / *rp.d);
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_FLOAT:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--)
+        *tp.f++ = floor(*lp.f++ / *rp.b);
+      break;
+    case LUX_WORD:
+      while (nRepeat--)
+        *tp.f++ = floor(*lp.f++ / *rp.w);
+      break;
+    case LUX_LONG:
+      while (nRepeat--)
+        *tp.f++ = floor(*lp.f++ / *rp.l);
+      break;
+    case LUX_QUAD:
+      while (nRepeat--)
+        *tp.d++ = floor(*lp.f++ / (double) *rp.q);
+      break;
+    case LUX_FLOAT:
+      while (nRepeat--)
+        *tp.f++ = floor(*lp.f++ / *rp.f);
+      break;
+    case LUX_DOUBLE:
+      while (nRepeat--)
+        *tp.d++ = floor(*lp.f++ / *rp.d);
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_DOUBLE:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--)
+        *tp.d++ = floor(*lp.d++ / *rp.b);
+      break;
+    case LUX_WORD:
+      while (nRepeat--)
+        *tp.d++ = floor(*lp.d++ / *rp.w);
+      break;
+    case LUX_LONG:
+      while (nRepeat--)
+        *tp.d++ = floor(*lp.d++ / *rp.l);
+      break;
+    case LUX_QUAD:
+      while (nRepeat--)
+        *tp.d++ = floor(*lp.d++ / (double) *rp.q);
+      break;
+    case LUX_FLOAT:
+      while (nRepeat--)
+        *tp.d++ = floor(*lp.d++ / *rp.f);
+      break;
+    case LUX_DOUBLE:
+      while (nRepeat--)
+        *tp.d++ = floor(*lp.d++ / *rp.d);
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  default:
+    cerror(ILL_TYPE, lhs, typeName(lhsType));
   }
 }
 /*----------------------------------------------------------*/
@@ -6726,176 +6839,209 @@ void lux_idiv_sa(void)
 /* NOTE: no checking for division by zero! */
 {
   div_t qr;
+  lldiv_t iqr;
 
   switch (lhsType) {
+  case LUX_BYTE:
+    switch (rhsType) {
     case LUX_BYTE:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--) {
-            qr = div(*lp.b, *rp.b++);
-            if (qr.rem < 0)
-              qr.quot--;
-            *tp.b++ = qr.quot;
-          }
-          break;
-        case LUX_WORD:
-          while (nRepeat--) {
-            qr = div(*lp.b, *rp.w++);
-            if (qr.rem < 0)
-              qr.quot--;
-            *tp.w++ = qr.quot;
-          }
-          break;
-        case LUX_LONG:
-          while (nRepeat--) {
-            qr = div(*lp.b, *rp.l++);
-            if (qr.rem < 0)
-              qr.quot--;
-            *tp.l++ = qr.quot;
-          }
-          break;
-        case LUX_FLOAT:
-          while (nRepeat--)
-            *tp.f++ = floor(*lp.b / *rp.f++);
-          break;
-        case LUX_DOUBLE:
-          while (nRepeat--)
-            *tp.d++ = floor(*lp.b / *rp.d++);
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
+      while (nRepeat--) {
+        qr = div(*lp.b, *rp.b++);
+        if (qr.rem < 0)
+          qr.quot--;
+        *tp.b++ = qr.quot;
       }
       break;
     case LUX_WORD:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--) {
-            qr = div(*lp.w, *rp.b++);
-            if (qr.rem < 0)
-              qr.quot--;
-            *tp.w++ = qr.quot;
-          }
-          break;
-        case LUX_WORD:
-          while (nRepeat--) {
-            qr = div(*lp.w, *rp.w++);
-            if (qr.rem < 0)
-              qr.quot--;
-            *tp.w++ = qr.quot;
-          }
-          break;
-        case LUX_LONG:
-          while (nRepeat--) {
-            qr = div(*lp.w, *rp.l++);
-            if (qr.rem < 0)
-              qr.quot--;
-            *tp.l++ = qr.quot;
-          }
-          break;
-        case LUX_FLOAT:
-          while (nRepeat--)
-            *tp.f++ = floor(*lp.w / *rp.f++);
-          break;
-        case LUX_DOUBLE:
-          while (nRepeat--)
-            *tp.d++ = floor(*lp.w / *rp.d++);
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
+      while (nRepeat--) {
+        qr = div(*lp.b, *rp.w++);
+        if (qr.rem < 0)
+          qr.quot--;
+        *tp.w++ = qr.quot;
       }
       break;
     case LUX_LONG:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--) {
-            qr = div(*lp.l, *rp.b++);
-            if (qr.rem < 0)
-              qr.quot--;
-            *tp.l++ = qr.quot;
-          }
-          break;
-        case LUX_WORD:
-          while (nRepeat--) {
-            qr = div(*lp.l, *rp.w++);
-            if (qr.rem < 0)
-              qr.quot--;
-            *tp.l++ = qr.quot;
-          }
-          break;
-        case LUX_LONG:
-          while (nRepeat--) {
-            qr = div(*lp.l, *rp.l++);
-            if (qr.rem < 0)
-              qr.quot--;
-            *tp.l++ = qr.quot;
-          }
-          break;
-        case LUX_FLOAT:
-          while (nRepeat--)
-            *tp.f++ = floor(*lp.l / *rp.f++);
-          break;
-        case LUX_DOUBLE:
-          while (nRepeat--)
-            *tp.d++ = floor(*lp.l / *rp.d++);
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
+      while (nRepeat--) {
+        qr = div(*lp.b, *rp.l++);
+        if (qr.rem < 0)
+          qr.quot--;
+        *tp.l++ = qr.quot;
+      }
+      break;
+    case LUX_QUAD:
+      while (nRepeat--) {
+        iqr = lldiv(*lp.b, *rp.q++);
+        if (iqr.rem < 0)
+          iqr.quot--;
+        *tp.q++ = iqr.quot;
       }
       break;
     case LUX_FLOAT:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--)
-            *tp.f++ = floor(*lp.f / *rp.b++);
-          break;
-        case LUX_WORD:
-          while (nRepeat--)
-            *tp.f++ = floor(*lp.f / *rp.w++);
-          break;
-        case LUX_LONG:
-          while (nRepeat--)
-            *tp.f++ = floor(*lp.f / *rp.l++);
-          break;
-        case LUX_FLOAT:
-          while (nRepeat--)
-            *tp.f++ = floor(*lp.f / *rp.f++);
-          break;
-        case LUX_DOUBLE:
-          while (nRepeat--)
-            *tp.d++ = floor(*lp.f / *rp.d++);
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
-      }
+      while (nRepeat--)
+        *tp.f++ = floor(*lp.b / *rp.f++);
       break;
     case LUX_DOUBLE:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--)
-            *tp.d++ = floor(*lp.d / *rp.b++);
-          break;
-        case LUX_WORD:
-          while (nRepeat--)
-            *tp.d++ = floor(*lp.d / *rp.w++);
-          break;
-        case LUX_LONG:
-          while (nRepeat--)
-            *tp.d++ = floor(*lp.d / *rp.l++);
-          break;
-        case LUX_FLOAT:
-          while (nRepeat--)
-            *tp.d++ = floor(*lp.d / *rp.f++);
-          break;
-        case LUX_DOUBLE:
-          while (nRepeat--)
-            *tp.d++ = floor(*lp.d / *rp.d++);
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
-      }
+      while (nRepeat--)
+        *tp.d++ = floor(*lp.b / *rp.d++);
       break;
     default:
-      cerror(ILL_TYPE, lhs, typeName(lhsType));
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_WORD:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--) {
+        qr = div(*lp.w, *rp.b++);
+        if (qr.rem < 0)
+          qr.quot--;
+        *tp.w++ = qr.quot;
+      }
+      break;
+    case LUX_WORD:
+      while (nRepeat--) {
+        qr = div(*lp.w, *rp.w++);
+        if (qr.rem < 0)
+          qr.quot--;
+        *tp.w++ = qr.quot;
+      }
+      break;
+    case LUX_LONG:
+      while (nRepeat--) {
+        qr = div(*lp.w, *rp.l++);
+        if (qr.rem < 0)
+          qr.quot--;
+        *tp.l++ = qr.quot;
+      }
+      break;
+    case LUX_QUAD:
+      while (nRepeat--) {
+        iqr = lldiv(*lp.w, *rp.q++);
+        if (iqr.rem < 0)
+          iqr.quot--;
+        *tp.q++ = iqr.quot;
+      }
+      break;
+    case LUX_FLOAT:
+      while (nRepeat--)
+        *tp.f++ = floor(*lp.w / *rp.f++);
+      break;
+    case LUX_DOUBLE:
+      while (nRepeat--)
+        *tp.d++ = floor(*lp.w / *rp.d++);
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_LONG:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--) {
+        qr = div(*lp.l, *rp.b++);
+        if (qr.rem < 0)
+          qr.quot--;
+        *tp.l++ = qr.quot;
+      }
+      break;
+    case LUX_WORD:
+      while (nRepeat--) {
+        qr = div(*lp.l, *rp.w++);
+        if (qr.rem < 0)
+          qr.quot--;
+        *tp.l++ = qr.quot;
+      }
+      break;
+    case LUX_LONG:
+      while (nRepeat--) {
+        qr = div(*lp.l, *rp.l++);
+        if (qr.rem < 0)
+          qr.quot--;
+        *tp.l++ = qr.quot;
+      }
+      break;
+    case LUX_QUAD:
+      while (nRepeat--) {
+        iqr = lldiv(*lp.l, *rp.q++);
+        if (iqr.rem < 0)
+          iqr.quot--;
+        *tp.q++ = iqr.quot;
+      }
+      break;
+    case LUX_FLOAT:
+      while (nRepeat--)
+        *tp.f++ = floor(*lp.l / *rp.f++);
+      break;
+    case LUX_DOUBLE:
+      while (nRepeat--)
+        *tp.d++ = floor(*lp.l / *rp.d++);
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_FLOAT:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--)
+        *tp.f++ = floor(*lp.f / *rp.b++);
+      break;
+    case LUX_WORD:
+      while (nRepeat--)
+        *tp.f++ = floor(*lp.f / *rp.w++);
+      break;
+    case LUX_LONG:
+      while (nRepeat--)
+        *tp.f++ = floor(*lp.f / *rp.l++);
+      break;
+    case LUX_QUAD:
+      while (nRepeat--)
+        *tp.d++ = floor(*lp.f / (double) *rp.q++);
+      break;
+    case LUX_FLOAT:
+      while (nRepeat--)
+        *tp.f++ = floor(*lp.f / *rp.f++);
+      break;
+    case LUX_DOUBLE:
+      while (nRepeat--)
+        *tp.d++ = floor(*lp.f / *rp.d++);
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_DOUBLE:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--)
+        *tp.d++ = floor(*lp.d / *rp.b++);
+      break;
+    case LUX_WORD:
+      while (nRepeat--)
+        *tp.d++ = floor(*lp.d / *rp.w++);
+      break;
+    case LUX_LONG:
+      while (nRepeat--)
+        *tp.d++ = floor(*lp.d / *rp.l++);
+      break;
+    case LUX_QUAD:
+      while (nRepeat--)
+        *tp.d++ = floor(*lp.d / (double) *rp.q++);
+      break;
+    case LUX_FLOAT:
+      while (nRepeat--)
+        *tp.d++ = floor(*lp.d / *rp.f++);
+      break;
+    case LUX_DOUBLE:
+      while (nRepeat--)
+        *tp.d++ = floor(*lp.d / *rp.d++);
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  default:
+    cerror(ILL_TYPE, lhs, typeName(lhsType));
   }
 }
 /*----------------------------------------------------------*/

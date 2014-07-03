@@ -2016,6 +2016,15 @@ int32_t lonarr(int32_t narg, int32_t ps[])
    return LUX_ERROR;
  return array_scratch(LUX_INT32, narg, dims);
 }
+/*-----------------------------------------------------*/
+int32_t int64arr(int32_t narg, int32_t ps[])
+/* create an array of 64-bit elements */
+{
+ int32_t	dims[MAX_DIMS];
+
+ if (get_dims(&narg, ps, dims) != 1)
+   return LUX_ERROR;
+ return array_scratch(LUX_INT64, narg, dims);
 }
 /*-----------------------------------------------------*/
 int32_t fltarr(int32_t narg, int32_t ps[])

@@ -85,6 +85,10 @@ int32_t lonfarr(int32_t narg, int32_t ps[])
 /* Create a LUX_INT32 file array (file map) */
 { return filemap(LUX_INT32, narg, ps); }
 /*-------------------------------------------------------------------------*/
+int32_t int64farr(int32_t narg, int32_t ps[])
+/* Create a LUX_INT64 file array (file map) */
+{ return filemap(LUX_INT64, narg, ps); }
+/*-------------------------------------------------------------------------*/
 int32_t fltfarr(int32_t narg, int32_t ps[])
 /* Create a LUX_FLOAT file array (file map) */
 { return filemap(LUX_FLOAT, narg, ps); }

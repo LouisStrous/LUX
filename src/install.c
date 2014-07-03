@@ -709,7 +709,8 @@ extern int32_t lux_abs(), lux_acos(), lux_arestore_f(), lux_arg(),
   lux_getenv(), lux_gridmatch(), lux_gsmooth(), lux_hamming(), lux_hilbert(),
   lux_hist(), lux_histr(), lux_identify_file(), lux_idlread_f(),
   lux_imaginary(), lux_incomplete_beta(), lux_incomplete_gamma(),
-  lux_index(), lux_indgen(), lux_inpolygon(), intarr(), intfarr(),
+  lux_index(), lux_indgen(), lux_inpolygon(), intarr(), int64arr(),
+  int64farr(), intfarr(),
   lux_isarray(), lux_isnan(), lux_isscalar(), lux_isstring(),
   lux_istring(), lux_j0(), lux_j1(), lux_jd(), lux_jn(), lux_cjd(),
   lux_ksmooth(), lux_laplace2d(), lux_lmap(), lux_local_maxf(),
@@ -1024,6 +1025,9 @@ internalRoutine function_table[] = {
   { "INDGEN",	1, 2, lux_indgen, "*" }, /* fun1.c */
   { "INPOLYGON", 4, 4, lux_inpolygon, 0 }, /* topology.c */
   { "INT",	1, 1, lux_word, "*" }, /* symbols.c */
+  { "INT64ARR", 1, MAX_DIMS, int64arr, 0 }, /* symbols.c */
+  { "INT64FARR", 3, MAX_DIMS+1, int64farr, /* filemap.c */
+    "%1%OFFSET:1READONLY:2SWAP" },
   { "INTARR",	1, MAX_DIMS, intarr, 0 }, /* symbols.c */
   { "INTFARR",	3, MAX_DIMS + 1, intfarr, /* filemap.c */
     "%1%OFFSET:1READONLY:2SWAP" },

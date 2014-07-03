@@ -118,9 +118,9 @@ extern int32_t lux_area(), lux_area2(), lux_array_statistics(),
   lux_extract_bits(), lux_fftshift(), lux_manualterm(), lux_watch(),
   lux_fcrunwrite(), lux_fits_read(), lux_fits_write(), lux_subshift(),
   lux_subshiftc(), lux_byte_inplace(), lux_word_inplace(),
-  lux_long_inplace(), lux_float_inplace(), lux_double_inplace(),
-  lux_cfloat_inplace(), lux_cdouble_inplace(), lux_string_inplace(),
-  lux_fade(), lux_fade_init();
+  lux_long_inplace(), lux_int64_inplace(), lux_float_inplace(),
+  lux_double_inplace(), lux_cfloat_inplace(), lux_cdouble_inplace(),
+  lux_string_inplace(), lux_fade(), lux_fade_init();
 
 int32_t	lux_name();
 
@@ -391,6 +391,7 @@ internalRoutine	subroutine_table[] = {
     "1TABLE:2TIME:4PLATFORM:8PACKAGES:16WARRANTY:32COPY:64BUGS:128KEYS:255ALL" },
   { "INSERT", 	2, 4, lux_inserter, 0 }, /* subsc.c */
   { "INT",	1, MAX_ARG, lux_word_inplace, 0 }, /* symbols.c */
+  { "INT64",    1, MAX_ARG, lux_int64_inplace, 0 }, /* symbols.c */
 #if HAVE_LIBJPEG
   { "JPEGREAD", 2, 4, lux_read_jpeg6b, ":::SHRINK:1GREYSCALE" }, /* jpeg.c */
   { "JPEGWRITE", 2, 4, lux_write_jpeg6b, 0 },/* jpeg.c */

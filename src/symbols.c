@@ -1736,8 +1736,11 @@ int32_t lux_long_inplace(int32_t narg, int32_t ps[])
 {
   return lux_convert(narg, ps, LUX_INT32, 0);
 }
+/*-----------------------------------------------------*/
+int32_t lux_int64_inplace(int32_t narg, int32_t ps[])
+/* INT64,x  converts <x> to LUX_INT64. */
 {
-  return lux_convert(narg, ps, LUX_LONG, 0);
+  return lux_convert(narg, ps, LUX_INT64, 0);
 }
 /*-----------------------------------------------------*/
 int32_t lux_float_inplace(int32_t narg, int32_t ps[])

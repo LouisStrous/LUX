@@ -648,6 +648,11 @@ int32_t lux_long(int32_t narg, int32_t ps[])
 {
   return lux_convert(narg, ps, LUX_INT32, 1);
 }
+/*-----------------------------------------------------*/
+int32_t lux_int64(int32_t narg, int32_t ps[])
+/* returns a LUX_INT64 version of the argument */
+{
+  return lux_convert(narg, ps, LUX_INT64, 1);
 }
 /*-----------------------------------------------------*/
 int32_t lux_floor(int32_t narg, int32_t ps[])

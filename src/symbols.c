@@ -413,34 +413,37 @@ int32_t dereferenceScalPointer(int32_t nsym)
  }
  ptr = scal_ptr_pointer(nsym);
  switch (scal_ptr_type(nsym)) {
-   case LUX_INT8:
-     scalar_value(n).b = *ptr.b;
-     break;
-   case LUX_INT16:
-     scalar_value(n).w = *ptr.w;
-     break;
-   case LUX_INT32:
-     scalar_value(n).l = *ptr.l;
-     break;
-   case LUX_FLOAT:
-     scalar_value(n).f = *ptr.f;
-     break;
-   case LUX_DOUBLE:
-     scalar_value(n).d = *ptr.d;
-     break;
-   case LUX_CFLOAT:
-     complex_scalar_data(n).cf->real = ptr.cf->real;
-     complex_scalar_data(n).cf->imaginary = ptr.cf->imaginary;
-     break;
-   case LUX_CDOUBLE:
-     complex_scalar_data(n).cd->real = ptr.cd->real;
-     complex_scalar_data(n).cd->imaginary = ptr.cd->imaginary;
-     break;
-   case LUX_TEMP_STRING:
-     string_value(n) = strsave(ptr.s);
-     break;
-   default:
-     return cerror(ILL_CLASS, nsym);
+ case LUX_INT8:
+   scalar_value(n).b = *ptr.b;
+   break;
+ case LUX_INT16:
+   scalar_value(n).w = *ptr.w;
+   break;
+ case LUX_INT32:
+   scalar_value(n).l = *ptr.l;
+   break;
+ case LUX_INT64:
+   scalar_value(n).q = *ptr.q;
+   break;
+ case LUX_FLOAT:
+   scalar_value(n).f = *ptr.f;
+   break;
+ case LUX_DOUBLE:
+   scalar_value(n).d = *ptr.d;
+   break;
+ case LUX_CFLOAT:
+   complex_scalar_data(n).cf->real = ptr.cf->real;
+   complex_scalar_data(n).cf->imaginary = ptr.cf->imaginary;
+   break;
+ case LUX_CDOUBLE:
+   complex_scalar_data(n).cd->real = ptr.cd->real;
+   complex_scalar_data(n).cd->imaginary = ptr.cd->imaginary;
+   break;
+ case LUX_TEMP_STRING:
+   string_value(n) = strsave(ptr.s);
+   break;
+ default:
+   return cerror(ILL_CLASS, nsym);
  }
  return n;
 }
@@ -460,7 +463,7 @@ char *strsave(char *str)
 }
 /*-----------------------------------------------------*/
 int32_t int_arg(int32_t nsym)
-/* returns the integer value of a scalar symbol */
+/* returns the 32-bit integer value of a scalar symbol */
 {
  if (nsym < 0 || nsym >= NSYM) {
    cerror(ILL_SYM, 0, nsym, "int_arg");
@@ -479,6 +482,8 @@ int32_t int_arg(int32_t nsym)
      return (int32_t) scalar_value(nsym).w;
    case LUX_INT32:
      return (int32_t) scalar_value(nsym).l;
+   case LUX_INT64:
+     return (int32_t) scalar_value(nsym).q;
    case LUX_FLOAT:
      return (int32_t) scalar_value(nsym).f;
    case LUX_DOUBLE:
@@ -491,59 +496,66 @@ int32_t int_arg(int32_t nsym)
 int32_t int_arg_stat(int32_t nsym, int32_t *value)
 /* returns integer value of symbol <nsym>, if any, or an error */
 {
- if (nsym < 0 || nsym >= NSYM) 
+ if (nsym < 0 || nsym >= NSYM)
    return cerror(ILL_SYM, 0, nsym, "int_arg_stat");
  if (symbol_class(nsym) == LUX_SCAL_PTR)
    nsym = dereferenceScalPointer(nsym);
  if (symbol_class(nsym) != LUX_SCALAR)
    return cerror(NO_SCAL, nsym);
- switch (scalar_type(nsym))
- { case LUX_INT8:
-     *value = (int32_t) scalar_value(nsym).b;
-     break;
-   case LUX_INT16:
-     *value = (int32_t) scalar_value(nsym).w;
-     break;
-   case LUX_INT32:
-     *value = (int32_t) scalar_value(nsym).l;
-     break;
-   case LUX_FLOAT:
-     *value = (int32_t) scalar_value(nsym).f;
-     break;
-   case LUX_DOUBLE:
-     *value = (int32_t) scalar_value(nsym).d;
-     break; }
+ switch (scalar_type(nsym)) {
+ case LUX_INT8:
+   *value = (int32_t) scalar_value(nsym).b;
+   break;
+ case LUX_INT16:
+   *value = (int32_t) scalar_value(nsym).w;
+   break;
+ case LUX_INT32:
+   *value = (int32_t) scalar_value(nsym).l;
+   break;
+ case LUX_INT64:
+   *value = (int32_t) scalar_value(nsym).q;
+   break;
+ case LUX_FLOAT:
+   *value = (int32_t) scalar_value(nsym).f;
+   break;
+ case LUX_DOUBLE:
+   *value = (int32_t) scalar_value(nsym).d;
+   break;
+ }
  return 1;			/* everything OK */
-}  
+}
 /*-----------------------------------------------------*/
 float float_arg(int32_t nsym)
 /* returns the float value of a scalar symbol */
 {
- if (nsym < 0 || nsym >= NSYM) 
- { cerror(ILL_SYM, 0, nsym, "float_arg");
-   return 0; }
- if (sym[nsym].class == LUX_SCAL_PTR) nsym = dereferenceScalPointer(nsym);
- if (sym[nsym].class != LUX_SCALAR) { cerror(NO_SCAL, nsym);  return 0.0; }
- switch (scalar_type(nsym))
- { case LUX_INT8:
-     return (float) scalar_value(nsym).b;
-   case LUX_INT16:
-     return (float) scalar_value(nsym).w;
-   case LUX_INT32:
-     return (float) scalar_value(nsym).l;
-   case LUX_FLOAT:
-     return (float) scalar_value(nsym).f;
-   case LUX_DOUBLE:
-     return (float) scalar_value(nsym).d;
-   default:
-     return cerror(ILL_TYPE, nsym); }
+  if (nsym < 0 || nsym >= NSYM)
+    { cerror(ILL_SYM, 0, nsym, "float_arg");
+      return 0; }
+  if (sym[nsym].class == LUX_SCAL_PTR) nsym = dereferenceScalPointer(nsym);
+  if (sym[nsym].class != LUX_SCALAR) { cerror(NO_SCAL, nsym);  return 0.0; }
+  switch (scalar_type(nsym)) {
+  case LUX_INT8:
+    return (float) scalar_value(nsym).b;
+  case LUX_INT16:
+    return (float) scalar_value(nsym).w;
+  case LUX_INT32:
+    return (float) scalar_value(nsym).l;
+  case LUX_INT64:
+    return (float) scalar_value(nsym).q;
+  case LUX_FLOAT:
+    return (float) scalar_value(nsym).f;
+  case LUX_DOUBLE:
+    return (float) scalar_value(nsym).d;
+  default:
+    return cerror(ILL_TYPE, nsym);
+  }
 }
 /*-----------------------------------------------------*/
 int32_t float_arg_stat(int32_t nsym, float *value)
 /* returns float value of symbol <nsym>, if any, or an error */
 {
- if (nsym < 0 || nsym >= NSYM) 
-   return cerror(ILL_SYM, 0, nsym, "int_arg_stat");
+ if (nsym < 0 || nsym >= NSYM)
+   return cerror(ILL_SYM, 0, nsym, "float_arg_stat");
  if (symbol_class(nsym) == LUX_SCAL_PTR)
    nsym = dereferenceScalPointer(nsym);
  if (symbol_class(nsym) != LUX_SCALAR)
@@ -558,6 +570,9 @@ int32_t float_arg_stat(int32_t nsym, float *value)
    case LUX_INT32:
      *value = (float) scalar_value(nsym).l;
      break;
+   case LUX_INT64:
+     *value = (float) scalar_value(nsym).q;
+     break;
    case LUX_FLOAT:
      *value = (float) scalar_value(nsym).f;
      break;
@@ -566,12 +581,12 @@ int32_t float_arg_stat(int32_t nsym, float *value)
      break;
  }
  return LUX_OK;			/* everything OK */
-}  
+}
 /*-----------------------------------------------------*/
 double double_arg(int32_t nsym)
 /* returns the double value of a LUX_DOUBLE scalar symbol */
 {
- if (nsym < 0 || nsym >= NSYM) 
+ if (nsym < 0 || nsym >= NSYM)
  { cerror(ILL_SYM, 0, nsym, "double_arg");
    return 0; }
  if (sym[nsym].class == LUX_SCAL_PTR) nsym = dereferenceScalPointer(nsym);
@@ -583,6 +598,8 @@ double double_arg(int32_t nsym)
      return (double) scalar_value(nsym).w;
    case LUX_INT32:
      return (double) scalar_value(nsym).l;
+   case LUX_INT64:
+     return (double) scalar_value(nsym).q;
    case LUX_FLOAT:
      return (double) scalar_value(nsym).f;
    case LUX_DOUBLE:
@@ -594,7 +611,7 @@ double double_arg(int32_t nsym)
 int32_t double_arg_stat(int32_t nsym, double *value)
 /* returns double value of symbol <nsym>, if any, or an error */
 {
- if (nsym < 0 || nsym >= NSYM) 
+ if (nsym < 0 || nsym >= NSYM)
    return cerror(ILL_SYM, 0, nsym, "int_arg_stat");
  if (symbol_class(nsym) == LUX_SCAL_PTR)
    nsym = dereferenceScalPointer(nsym);
@@ -610,6 +627,9 @@ int32_t double_arg_stat(int32_t nsym, double *value)
    case LUX_INT32:
      *value = (double) scalar_value(nsym).l;
      break;
+   case LUX_INT64:
+     *value = (double) scalar_value(nsym).q;
+     break;
    case LUX_FLOAT:
      *value = (double) scalar_value(nsym).f;
      break;
@@ -618,12 +638,12 @@ int32_t double_arg_stat(int32_t nsym, double *value)
      break;
  }
  return LUX_OK;			/* everything OK */
-}  
+}
 /*-----------------------------------------------------*/
 char *string_arg(int32_t nsym)
 /* returns the string value of a string symbol, or NULL */
 {
- if (nsym < 0 || nsym >= NSYM) 
+ if (nsym < 0 || nsym >= NSYM)
  { cerror(ILL_SYM, 0, nsym, "string_arg");
    return 0; }
  if (sym[nsym].class == LUX_SCAL_PTR) nsym = dereferenceScalPointer(nsym);
@@ -690,7 +710,7 @@ int32_t lux_floor(int32_t narg, int32_t ps[])
      break;
    case LUX_STRING:
      if (temp)
-       result = iq; 
+       result = iq;
      else
        result = scalar_scratch(LUX_INT32);
      value = (int32_t) floor(atof((char *) string_value(iq))); /* convert */
@@ -739,6 +759,10 @@ int32_t lux_floor(int32_t narg, int32_t ps[])
    case LUX_INT32:
      while (n--)
        *trgt.l++ = (int32_t) *src.l++;
+     break;
+   case LUX_INT64:
+     while (n--)
+       *trgt.l++ = (int32_t) *src.q++;
      break;
    case LUX_FLOAT:
      while (n--)
@@ -804,7 +828,7 @@ int32_t lux_ceil(int32_t narg, int32_t ps[])
      break;
    case LUX_STRING:
      if (temp)
-       result = iq; 
+       result = iq;
      else
        result = scalar_scratch(LUX_INT32);
      value = (int32_t) ceil(atof((char *) string_value(iq))); /* convert */
@@ -853,6 +877,10 @@ int32_t lux_ceil(int32_t narg, int32_t ps[])
    case LUX_INT32:
      while (n--)
        *trgt.l++ = (int32_t) *src.l++;
+     break;
+   case LUX_INT64:
+     while (n--)
+       *trgt.l++ = (int32_t) *src.q++;
      break;
    case LUX_FLOAT:
      while (n--)
@@ -978,6 +1006,10 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	      fmttok(fmt_integer);
 	      Sprintf_tok(curScrat, (int32_t) *src.l);
 	      break;
+	    case LUX_INT64:
+	      fmttok(fmt_integer);
+	      Sprintf_tok(curScrat, *src.q);
+	      break;
 	    case LUX_FLOAT:
 	      fmttok(fmt_float);
 	      Sprintf_tok(curScrat, (double) *src.f);
@@ -1039,6 +1071,9 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	  case LUX_INT32:
 	    *trgt.l = value.l;
 	    break;
+	  case LUX_INT64:
+	    *trgt.q = value.q;
+	    break;
 	  case LUX_FLOAT:
 	    *trgt.f = value.d;
 	    break;
@@ -1081,6 +1116,9 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	    case LUX_INT32:
 	      scalar_value(result).l = (int32_t) value.d;
 	      break;
+	    case LUX_INT64:
+	      scalar_value(result).q = (int64_t) value.d;
+	      break;
 	    case LUX_FLOAT:
 	      scalar_value(result).f = (float) value.d;
 	      break;
@@ -1105,6 +1143,10 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	    case LUX_INT32:
 	      fmttok(fmt_integer);
 	      Sprintf_tok(curScrat, (int32_t) *src.l);
+	      break;
+	    case LUX_INT64:
+	      fmttok(fmt_integer);
+	      Sprintf_tok(curScrat, (int64_t) *src.q);
 	      break;
 	    case LUX_FLOAT:
 	      fmttok(fmt_float);
@@ -1206,6 +1248,13 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	      src.b += srcstep;
 	    }
 	    break;
+	  case LUX_INT64:
+	    while (n--) {
+	      *trgt.q = *src.b;
+	      trgt.b += trgtstep;
+	      src.b += srcstep;
+	    }
+	    break;
 	  case LUX_FLOAT:
 	    while (n--) {
 	      *trgt.f = (float) *src.b;
@@ -1263,6 +1312,13 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	  case LUX_INT32:
 	    while (n--) {
 	      *trgt.l = (int16_t) *src.w;
+	      trgt.b += trgtstep;
+	      src.b += srcstep;
+	    }
+	    break;
+	  case LUX_INT64:
+	    while (n--) {
+	      *trgt.q = *src.w;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
@@ -1328,6 +1384,13 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	      src.b += srcstep;
 	    }
 	    break;
+	  case LUX_INT64:
+	    while (n--) {
+	      *trgt.q = *src.l;
+	      trgt.b += trgtstep;
+	      src.b += srcstep;
+	    }
+	    break;
 	  case LUX_FLOAT:
 	    while (n--) {
 	      *trgt.f = (int32_t) *src.l;
@@ -1373,6 +1436,74 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	    break;
 	}
 	break;
+      case LUX_INT64:
+	switch (totype) {		/* target type */
+	  case LUX_INT8:
+	    while (n--) {
+	      *trgt.b = *src.q;
+	      trgt.b += trgtstep;
+	      src.b += srcstep;
+	    }
+	    break;
+	  case LUX_INT16:
+	    while (n--) {
+	      *trgt.w = *src.q;
+	      trgt.b += trgtstep;
+	      src.b += srcstep;
+	    }
+	    break;
+	  case LUX_INT32:
+	    while (n--) {
+	      *trgt.l = *src.q;
+	      trgt.b += trgtstep;
+	      src.b += srcstep;
+	    }
+	    break;
+	  case LUX_FLOAT:
+	    while (n--) {
+	      *trgt.f = *src.q;
+	      trgt.b += trgtstep;
+	      src.b += srcstep;
+	    }
+	    break;
+	  case LUX_DOUBLE:
+	    while (n--) {
+	      *trgt.d = *src.q;
+	      trgt.b += trgtstep;
+	      src.b += srcstep;
+	    }
+	    break;
+	  case LUX_CFLOAT:
+	    while (n--) {
+	      trgt.cf->real = *src.q;
+	      trgt.cf->imaginary = 0.0;
+	      trgt.b += trgtstep;
+	      src.b += srcstep;
+	    }
+	    break;
+	  case LUX_CDOUBLE:
+	    while (n--) {
+	      trgt.cd->real = *src.q;
+	      trgt.cd->imaginary = 0.0;
+	      trgt.b += trgtstep;
+	      src.b += srcstep;
+	    }
+	    break;
+	  case LUX_STRING_ARRAY:
+	    fmttok(fmt_integer);
+	    while (n--) {
+	      Sprintf_tok(curScrat, *src.q);
+	      temp = strlen(curScrat) + 1;
+	      *trgt.sp = malloc(temp);
+	      if (!*trgt.sp)
+		return cerror(ALLOC_ERR, 0);
+	      memcpy(*trgt.sp, curScrat, temp);
+	      trgt.b += trgtstep;
+	      src.b += srcstep;
+	    }
+	    break;
+	}
+	break;
       case LUX_FLOAT:
 	switch (totype) {		/* target type */
 	  case LUX_INT8:
@@ -1392,6 +1523,13 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	  case LUX_INT32:
 	    while (n--) {
 	      *trgt.l = (float) *src.f;
+	      trgt.b += trgtstep;
+	      src.b += srcstep;
+	    }
+	    break;
+	  case LUX_INT64:
+	    while (n--) {
+	      *trgt.q = *src.f;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
@@ -1457,6 +1595,13 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	      src.b += srcstep;
 	    }
 	    break;
+	  case LUX_INT64:
+	    while (n--) {
+	      *trgt.q = *src.d;
+	      trgt.b += trgtstep;
+	      src.b += srcstep;
+	    }
+	    break;
 	  case LUX_FLOAT:
 	    while (n--) {
 	      *trgt.f = (double) *src.d;
@@ -1518,6 +1663,13 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	      src.b += srcstep;
 	    }
 	    break;
+	  case LUX_INT64:
+	    while (n--) {
+	      *trgt.q = src.cf->real;
+	      trgt.b += trgtstep;
+	      src.b += srcstep;
+	    }
+	    break;
 	  case LUX_FLOAT:
 	    while (n--) {
 	      *trgt.f = (float) src.cf->real;
@@ -1574,6 +1726,13 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	  case LUX_INT32:
 	    while (n--) {
 	      *trgt.l = (int32_t) src.cd->real;
+	      trgt.b += trgtstep;
+	      src.b += srcstep;
+	    }
+	    break;
+	  case LUX_INT64:
+	    while (n--) {
+	      *trgt.q = src.cd->real;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
@@ -1643,6 +1802,16 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	      if (iq == result && *src.sp)
 		free(*src.sp);
 	      *trgt.l = value.l;
+	      trgt.b += trgtstep;
+	      src.b += srcstep;
+	    }
+	    break;
+	  case LUX_INT64:
+	    while (n--) {
+	      value.q = atoll(*src.sp);
+	      if (iq == result && *src.sp)
+		free(*src.sp);
+	      *trgt.q = value.q;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
@@ -1822,51 +1991,6 @@ int32_t create_sub_ptr(int32_t nsym, char *p, int32_t index)
  return iq;
 }
 /*-----------------------------------------------------*/
-int32_t lux_array_convert(pointer *q1, pointer *q2, int32_t type1, int32_t type2, int32_t n)
- /* more general conversion, converts data starting at q1 of type1 to type2
-         data starting at q2, n count */
- /* note that indices are bumped even when count is one */
- {
- switch (type2) {
-   case 0: switch (type1) {
-         case 0:        while (n) { *q2->b++ =  (*q1->b++);n--;} break;
-         case 1: while (n) { *q2->b++ = (uint8_t) (*q1->w++);n--;} break;
-         case 2: while (n) { *q2->b++ = (uint8_t) (*q1->l++);n--;} break;
-         case 3: while (n) { *q2->b++ = (uint8_t) (*q1->f++);n--;} break;
-         case 4: while (n) { *q2->b++ = (uint8_t) (*q1->d++);n--;} break;
-         }
-   case 1: switch (type1) {
-         case 1: while (n) { *q2->w++ =  (*q1->w++);n--;} break;
-         case 0: while (n) { *q2->w++ = (short) (*q1->b++);n--;} break;
-         case 2: while (n) { *q2->w++ = (short) (*q1->l++);n--;} break;
-         case 3: while (n) { *q2->w++ = (short) (*q1->f++);n--;} break;
-         case 4: while (n) { *q2->w++ = (short) (*q1->d++);n--;} break;
-         }      break;
-   case 2: switch (type1) {
-         case 2: while (n) { *q2->l++ =  (*q1->l++);n--;} break;
-         case 1: while (n) { *q2->l++ = (int32_t) (*q1->w++);n--;} break;
-         case 0: while (n) { *q2->l++ = (int32_t) (*q1->b++);n--;} break;
-         case 3: while (n) { *q2->l++ = (int32_t) (*q1->f++);n--;} break;
-         case 4: while (n) { *q2->l++ = (int32_t) (*q1->d++);n--;} break;
-         }      break;
-   case 3: switch (type1) {
-         case 3: while (n) { *q2->f++ =  (*q1->f++);n--;} break;
-         case 2: while (n) { *q2->f++ = (float) (*q1->l++);n--;} break;
-         case 1: while (n) { *q2->f++ = (float) (*q1->w++);n--;} break;
-         case 0: while (n) { *q2->f++ = (float) (*q1->b++);n--;} break;
-         case 4: while (n) { *q2->f++ = (float) (*q1->d++);n--;} break;
-         }      break;
-   case 4: switch (type1) {
-         case 4: while (n) { *q2->d++ =  (*q1->d++);n--;} break;
-         case 3: while (n) { *q2->d++ = (double) (*q1->f++);n--;} break;
-         case 2: while (n) { *q2->d++ = (double) (*q1->l++);n--;} break;
-         case 1: while (n) { *q2->d++ = (double) (*q1->w++);n--;} break;
-         case 0: while (n) { *q2->d++ = (double) (*q1->b++);n--;} break;
-         }      break;
-  }
- return 1;
- }
-/*-----------------------------------------------------*/
 int32_t redef_scalar(int32_t nsym, int32_t ntype, void *val)
 /* redefine symbol nsym to be a scalar of type ntype with value *val */
 {
@@ -1886,6 +2010,9 @@ int32_t redef_scalar(int32_t nsym, int32_t ntype, void *val)
       break;
     case LUX_INT32:
       scalar_value(nsym).l = value? value->l: 0;
+      break;
+    case LUX_INT64:
+      scalar_value(nsym).q = value? value->q: 0;
       break;
     case LUX_FLOAT:
       scalar_value(nsym).f = value? value->f: 0.0;
@@ -2186,7 +2313,7 @@ int32_t lux_switch(int32_t narg, int32_t ps[])
  sym[sym2].context = temp2.context;
  sym[sym1].exec = temp1.exec;
  sym[sym2].exec = temp2.exec;
- 
+
 #ifdef DONTIGNORE
  temp = sym[sym2].xx;		/* hash value for the name */
  tempcontext = sym[sym2].context; /* the context */
@@ -2209,7 +2336,7 @@ int32_t lux_switch(int32_t narg, int32_t ps[])
  sym[sym1].exec = tempexec;
 #endif
  return 1;
-} 
+}
 /*-----------------------------------------------------*/
 int32_t lux_array(int32_t narg, int32_t ps[])
 /* create an array of the specified type and dimensions */
@@ -2289,6 +2416,8 @@ int32_t lux_rfix(int32_t narg, int32_t ps[])
      while (size--) *trgt++ = (int32_t) *src.b++;  break;
    case LUX_INT16:
      while (size--) *trgt++ = (int32_t) *src.w++;  break;
+   case LUX_INT64:
+     while (size--) *trgt++ = (int32_t) *src.q++;  break;
    case LUX_FLOAT:
      while (size--)
      { *trgt++ = (int32_t) (*src.f + ((*src.f >= 0)? 0.5: -0.5));
@@ -2306,7 +2435,7 @@ int32_t lux_echo(int32_t narg, int32_t ps[])
 /* turn on echoing of input lines from non-keyboard sources */
 {
  extern int32_t	echo;
- 
+
  if (narg >= 1) echo = int_arg(*ps); else echo = 1;
  return 1;
 }

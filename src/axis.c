@@ -182,7 +182,7 @@ void setupDimensionLoop(loopInfo *info, int32_t ndim, int32_t const *dims,
   else
     for (i = 0; i < info->naxes; i++)
       info->axes[i] = i;		/* SL_ALLAXES was selected */
-  /* the type of data: LUX_BYTE, ..., LUX_DOUBLE */
+  /* the type of data: LUX_INT8, ..., LUX_DOUBLE */
   info->type = type;
   /* a pointer to a pointer to the data */
   info->data = data;
@@ -1583,15 +1583,15 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
       /* optional data type specification */
       switch (*fmt) {
       case 'B':
-        p_spec.data_type = LUX_BYTE;
+        p_spec.data_type = LUX_INT8;
         fmt++;
         break;
       case 'W':
-        p_spec.data_type = LUX_WORD;
+        p_spec.data_type = LUX_INT16;
         fmt++;
         break;
       case 'L':
-        p_spec.data_type = LUX_LONG;
+        p_spec.data_type = LUX_INT32;
         fmt++;
         break;
       case 'F':
@@ -1912,9 +1912,9 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
 
     For the type specification \c type-spec:
     - ‘>’ = the type should be at least equal to the indicated type.
-    - ‘B’ = LUX_BYTE
-    - ‘W’ = LUX_WORD
-    - ‘L’ = LUX_LONG
+    - ‘B’ = LUX_INT8
+    - ‘W’ = LUX_INT16
+    - ‘L’ = LUX_INT32
     - ‘F’ = LUX_FLOAT
     - ‘D’ = LUX_DOUBLE
     - ‘S’ = LUX_STRING

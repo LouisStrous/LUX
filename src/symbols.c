@@ -68,10 +68,10 @@ Symboltype combinedType(Symboltype type1, Symboltype type2)
 {
   static Symboltype const combined[LUX_NO_SYMBOLTYPE][LUX_NO_SYMBOLTYPE] =
     {
-      {    LUX_BYTE,    LUX_WORD,    LUX_LONG,    LUX_QUAD,   LUX_FLOAT,  LUX_DOUBLE, 0, 0,  LUX_CFLOAT, LUX_CDOUBLE },
-      {    LUX_WORD,    LUX_WORD,    LUX_LONG,    LUX_QUAD,   LUX_FLOAT,  LUX_DOUBLE, 0, 0,  LUX_CFLOAT, LUX_CDOUBLE },
-      {    LUX_LONG,    LUX_LONG,    LUX_LONG,    LUX_QUAD,   LUX_FLOAT,  LUX_DOUBLE, 0, 0,  LUX_CFLOAT, LUX_CDOUBLE },
-      {    LUX_QUAD,    LUX_QUAD,    LUX_QUAD,    LUX_QUAD,  LUX_DOUBLE,  LUX_DOUBLE, 0, 0, LUX_CDOUBLE, LUX_CDOUBLE },
+      {    LUX_INT8,    LUX_INT16,    LUX_INT32,    LUX_INT64,   LUX_FLOAT,  LUX_DOUBLE, 0, 0,  LUX_CFLOAT, LUX_CDOUBLE },
+      {    LUX_INT16,    LUX_INT16,    LUX_INT32,    LUX_INT64,   LUX_FLOAT,  LUX_DOUBLE, 0, 0,  LUX_CFLOAT, LUX_CDOUBLE },
+      {    LUX_INT32,    LUX_INT32,    LUX_INT32,    LUX_INT64,   LUX_FLOAT,  LUX_DOUBLE, 0, 0,  LUX_CFLOAT, LUX_CDOUBLE },
+      {    LUX_INT64,    LUX_INT64,    LUX_INT64,    LUX_INT64,  LUX_DOUBLE,  LUX_DOUBLE, 0, 0, LUX_CDOUBLE, LUX_CDOUBLE },
       {   LUX_FLOAT,   LUX_FLOAT,   LUX_FLOAT,  LUX_DOUBLE,   LUX_FLOAT,  LUX_DOUBLE, 0, 0,  LUX_CFLOAT, LUX_CDOUBLE },
       {  LUX_DOUBLE,  LUX_DOUBLE,  LUX_DOUBLE,  LUX_DOUBLE,  LUX_DOUBLE,  LUX_DOUBLE, 0, 0, LUX_CDOUBLE, LUX_CDOUBLE },
       { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
@@ -190,7 +190,7 @@ int32_t lux_convertsym(int32_t narg, int32_t ps[])
     default:
       return cerror(ILL_CLASS, ps[0]);
   }
-  if (type < LUX_BYTE || type > LUX_DOUBLE)
+  if (type < LUX_INT8 || type > LUX_DOUBLE)
     return cerror(ILL_TYPE, ps[1]);
   return lux_convert(1, ps, type, 1);
 }
@@ -413,13 +413,13 @@ int32_t dereferenceScalPointer(int32_t nsym)
  }
  ptr = scal_ptr_pointer(nsym);
  switch (scal_ptr_type(nsym)) {
-   case LUX_BYTE:
+   case LUX_INT8:
      scalar_value(n).b = *ptr.b;
      break;
-   case LUX_WORD:
+   case LUX_INT16:
      scalar_value(n).w = *ptr.w;
      break;
-   case LUX_LONG:
+   case LUX_INT32:
      scalar_value(n).l = *ptr.l;
      break;
    case LUX_FLOAT:
@@ -473,11 +473,11 @@ int32_t int_arg(int32_t nsym)
    return 0;
  }
  switch (scalar_type(nsym)) {
-   case LUX_BYTE:
+   case LUX_INT8:
      return (int32_t) scalar_value(nsym).b;
-   case LUX_WORD:
+   case LUX_INT16:
      return (int32_t) scalar_value(nsym).w;
-   case LUX_LONG:
+   case LUX_INT32:
      return (int32_t) scalar_value(nsym).l;
    case LUX_FLOAT:
      return (int32_t) scalar_value(nsym).f;
@@ -498,13 +498,13 @@ int32_t int_arg_stat(int32_t nsym, int32_t *value)
  if (symbol_class(nsym) != LUX_SCALAR)
    return cerror(NO_SCAL, nsym);
  switch (scalar_type(nsym))
- { case LUX_BYTE:
+ { case LUX_INT8:
      *value = (int32_t) scalar_value(nsym).b;
      break;
-   case LUX_WORD:
+   case LUX_INT16:
      *value = (int32_t) scalar_value(nsym).w;
      break;
-   case LUX_LONG:
+   case LUX_INT32:
      *value = (int32_t) scalar_value(nsym).l;
      break;
    case LUX_FLOAT:
@@ -525,11 +525,11 @@ float float_arg(int32_t nsym)
  if (sym[nsym].class == LUX_SCAL_PTR) nsym = dereferenceScalPointer(nsym);
  if (sym[nsym].class != LUX_SCALAR) { cerror(NO_SCAL, nsym);  return 0.0; }
  switch (scalar_type(nsym))
- { case LUX_BYTE:
+ { case LUX_INT8:
      return (float) scalar_value(nsym).b;
-   case LUX_WORD:
+   case LUX_INT16:
      return (float) scalar_value(nsym).w;
-   case LUX_LONG:
+   case LUX_INT32:
      return (float) scalar_value(nsym).l;
    case LUX_FLOAT:
      return (float) scalar_value(nsym).f;
@@ -549,13 +549,13 @@ int32_t float_arg_stat(int32_t nsym, float *value)
  if (symbol_class(nsym) != LUX_SCALAR)
    return cerror(NO_SCAL, nsym);
  switch (scalar_type(nsym)) {
-   case LUX_BYTE:
+   case LUX_INT8:
      *value = (float) scalar_value(nsym).b;
      break;
-   case LUX_WORD:
+   case LUX_INT16:
      *value = (float) scalar_value(nsym).w;
      break;
-   case LUX_LONG:
+   case LUX_INT32:
      *value = (float) scalar_value(nsym).l;
      break;
    case LUX_FLOAT:
@@ -577,11 +577,11 @@ double double_arg(int32_t nsym)
  if (sym[nsym].class == LUX_SCAL_PTR) nsym = dereferenceScalPointer(nsym);
  if (sym[nsym].class != LUX_SCALAR) { cerror(NO_SCAL, nsym);  return 0.0; }
  switch (scalar_type(nsym))
- { case LUX_BYTE:
+ { case LUX_INT8:
      return (double) scalar_value(nsym).b;
-   case LUX_WORD:
+   case LUX_INT16:
      return (double) scalar_value(nsym).w;
-   case LUX_LONG:
+   case LUX_INT32:
      return (double) scalar_value(nsym).l;
    case LUX_FLOAT:
      return (double) scalar_value(nsym).f;
@@ -601,13 +601,13 @@ int32_t double_arg_stat(int32_t nsym, double *value)
  if (symbol_class(nsym) != LUX_SCALAR)
    return cerror(NO_SCAL, nsym);
  switch (scalar_type(nsym)) {
-   case LUX_BYTE:
+   case LUX_INT8:
      *value = (double) scalar_value(nsym).b;
      break;
-   case LUX_WORD:
+   case LUX_INT16:
      *value = (double) scalar_value(nsym).w;
      break;
-   case LUX_LONG:
+   case LUX_INT32:
      *value = (double) scalar_value(nsym).l;
      break;
    case LUX_FLOAT:
@@ -632,25 +632,26 @@ char *string_arg(int32_t nsym)
 }
 /*-----------------------------------------------------*/
 int32_t lux_byte(int32_t narg, int32_t ps[])
-/* returns a LUX_BYTE version of the argument */
+/* returns a LUX_INT8 version of the argument */
 {
-  return lux_convert(narg, ps, LUX_BYTE, 1);
+  return lux_convert(narg, ps, LUX_INT8, 1);
 }
 /*-----------------------------------------------------*/
 int32_t lux_word(int32_t narg, int32_t ps[])
-/* returns a LUX_WORD version of the argument */
+/* returns a LUX_INT16 version of the argument */
 {
-  return lux_convert(narg, ps, LUX_WORD, 1);
+  return lux_convert(narg, ps, LUX_INT16, 1);
 }
 /*-----------------------------------------------------*/
 int32_t lux_long(int32_t narg, int32_t ps[])
-/* returns a LUX_LONG version of the argument */
+/* returns a LUX_INT32 version of the argument */
 {
-  return lux_convert(narg, ps, LUX_LONG, 1);
+  return lux_convert(narg, ps, LUX_INT32, 1);
+}
 }
 /*-----------------------------------------------------*/
 int32_t lux_floor(int32_t narg, int32_t ps[])
-/* returns a LUX_LONG version of the argument */
+/* returns a LUX_INT32 version of the argument */
 /* each float number is transformed into the next lower integer */
 /* compare lux_long(), where each float number is transformed into the */
 /* next integer closer to zero, and lux_rfix(), where each float is */
@@ -664,7 +665,7 @@ int32_t lux_floor(int32_t narg, int32_t ps[])
  if (!symbolIsNumerical(iq)	/* not numerical */
      && !symbolIsStringScalar(iq))	/* and not a string either */
    return cerror(ILL_CLASS, iq); /* reject */
- if (symbol_type(iq) == LUX_LONG) /* if it's already BYTE then we're done */
+ if (symbol_type(iq) == LUX_INT32) /* if it's already BYTE then we're done */
    return iq;
  temp = (isFreeTemp(iq))? 1: 0;
  type = symbol_type(iq);	/* gotta store now because "result" may */
@@ -677,7 +678,7 @@ int32_t lux_floor(int32_t narg, int32_t ps[])
      if (temp)			/* can use iq to store the result */
        result = iq;
      else			/* need new scalar */
-       result = scalar_scratch(LUX_LONG);
+       result = scalar_scratch(LUX_INT32);
      trgt.b = &scalar_value(result).b;
      src.b = &scalar_value(iq).b;
      n = 1;
@@ -686,17 +687,17 @@ int32_t lux_floor(int32_t narg, int32_t ps[])
      if (temp)
        result = iq; 
      else
-       result = scalar_scratch(LUX_LONG);
+       result = scalar_scratch(LUX_INT32);
      value = (int32_t) floor(atof((char *) string_value(iq))); /* convert */
      if (temp) {
        free(string_value(iq));	/* change string to scalar: free up memory */
        symbol_class(result) = LUX_SCALAR;
-       scalar_type(result) = LUX_LONG;
+       scalar_type(result) = LUX_INT32;
      }
      scalar_value(result).l = value;
      return result;
    case LUX_CSCALAR:
-     result = scalar_scratch(LUX_LONG);
+     result = scalar_scratch(LUX_INT32);
      temp = 0;
      n = 1;
      trgt.b = &scalar_value(result).b;
@@ -706,10 +707,10 @@ int32_t lux_floor(int32_t narg, int32_t ps[])
      /* we can use the input symbol if it is free and if
 	it has at least as much memory as we need */
      if (temp
-	 && (int32_t) array_type(iq) >= LUX_LONG)
+	 && (int32_t) array_type(iq) >= LUX_INT32)
        result = iq;
      else {
-       result = array_clone(iq, LUX_LONG);
+       result = array_clone(iq, LUX_INT32);
        temp = 0;
      }
      n = array_size(result);
@@ -722,15 +723,15 @@ int32_t lux_floor(int32_t narg, int32_t ps[])
 	/* convert */
  size = n;
  switch (type) {
-   case LUX_BYTE:
+   case LUX_INT8:
      while (n--)
        *trgt.l++ = (int32_t) *src.b++;
      break;
-   case LUX_WORD:
+   case LUX_INT16:
      while (n--)
        *trgt.l++ = (int32_t) *src.w++;
      break;
-   case LUX_LONG:
+   case LUX_INT32:
      while (n--)
        *trgt.l++ = (int32_t) *src.l++;
      break;
@@ -753,18 +754,18 @@ int32_t lux_floor(int32_t narg, int32_t ps[])
  }
  if (temp			/* we used input symbol to store results */
      && symbol_class(iq) == LUX_ARRAY /* it's an array */
-     && array_type(iq) > LUX_LONG) { /* and bigger than we needed */
+     && array_type(iq) > LUX_INT32) { /* and bigger than we needed */
    symbol_memory(iq) = sizeof(array) + size*sizeof(int32_t);
    symbol_data(iq) = (array *) realloc(symbol_data(iq), symbol_memory(iq));
    if (!symbol_data(iq))	/* reallocation failed */
      return luxerror("Realloc() failed in lux_floor", 0);
  }
- symbol_type(result) = LUX_LONG;
+ symbol_type(result) = LUX_INT32;
  return result;
 }
 /*-----------------------------------------------------*/
 int32_t lux_ceil(int32_t narg, int32_t ps[])
-/* returns a LUX_LONG version of the argument */
+/* returns a LUX_INT32 version of the argument */
 /* each float number is transformed into the next higher integer */
 /* compare lux_long(), where each float number is transformed into the */
 /* next integer closer to zero, and lux_rfix(), where each float is */
@@ -778,7 +779,7 @@ int32_t lux_ceil(int32_t narg, int32_t ps[])
  if (!symbolIsNumerical(iq)	/* not numerical */
      && !symbolIsStringScalar(iq))	/* and not a string either */
    return cerror(ILL_CLASS, iq); /* reject */
- if (symbol_type(iq) == LUX_LONG) /* if it's already BYTE then we're done */
+ if (symbol_type(iq) == LUX_INT32) /* if it's already BYTE then we're done */
    return iq;
  temp = (isFreeTemp(iq))? 1: 0;
  type = symbol_type(iq);	/* gotta store now because "result" may */
@@ -791,7 +792,7 @@ int32_t lux_ceil(int32_t narg, int32_t ps[])
      if (temp)			/* can use iq to store the result */
        result = iq;
      else			/* need new scalar */
-       result = scalar_scratch(LUX_LONG);
+       result = scalar_scratch(LUX_INT32);
      trgt.b = &scalar_value(result).b;
      src.b = &scalar_value(iq).b;
      n = 1;
@@ -800,17 +801,17 @@ int32_t lux_ceil(int32_t narg, int32_t ps[])
      if (temp)
        result = iq; 
      else
-       result = scalar_scratch(LUX_LONG);
+       result = scalar_scratch(LUX_INT32);
      value = (int32_t) ceil(atof((char *) string_value(iq))); /* convert */
      if (temp) {
        free(string_value(iq));	/* change string to scalar: free up memory */
        symbol_class(result) = LUX_SCALAR;
-       scalar_type(result) = LUX_LONG;
+       scalar_type(result) = LUX_INT32;
      }
      scalar_value(result).l = value;
      return result;
    case LUX_CSCALAR:
-     result = scalar_scratch(LUX_LONG);
+     result = scalar_scratch(LUX_INT32);
      temp = 0;
      n = 1;
      trgt.b = &scalar_value(result).b;
@@ -820,10 +821,10 @@ int32_t lux_ceil(int32_t narg, int32_t ps[])
      /* we can use the input symbol if it is free and if
 	it has at least as much memory as we need */
      if (temp
-	 && (int32_t) array_type(iq) >= LUX_LONG)
+	 && (int32_t) array_type(iq) >= LUX_INT32)
        result = iq;
      else {
-       result = array_clone(iq, LUX_LONG);
+       result = array_clone(iq, LUX_INT32);
        temp = 0;
      }
      n = array_size(result);
@@ -836,15 +837,15 @@ int32_t lux_ceil(int32_t narg, int32_t ps[])
 	/* convert */
  size = n;
  switch (type) {
-   case LUX_BYTE:
+   case LUX_INT8:
      while (n--)
        *trgt.l++ = (int32_t) *src.b++;
      break;
-   case LUX_WORD:
+   case LUX_INT16:
      while (n--)
        *trgt.l++ = (int32_t) *src.w++;
      break;
-   case LUX_LONG:
+   case LUX_INT32:
      while (n--)
        *trgt.l++ = (int32_t) *src.l++;
      break;
@@ -867,13 +868,13 @@ int32_t lux_ceil(int32_t narg, int32_t ps[])
  }
  if (temp			/* we used input symbol to store results */
      && symbol_class(iq) == LUX_ARRAY /* it's an array */
-     && array_type(iq) > LUX_LONG) { /* and bigger than we needed */
+     && array_type(iq) > LUX_INT32) { /* and bigger than we needed */
    symbol_memory(iq) = sizeof(array) + size*sizeof(int32_t);
    symbol_data(iq) = (array *) realloc(symbol_data(iq), symbol_memory(iq));
    if (!symbol_data(iq))	/* reallocation failed */
      return luxerror("Realloc() failed in lux_floor", 0);
  }
- symbol_type(result) = LUX_LONG;
+ symbol_type(result) = LUX_INT32;
  return result;
 }
 /*-----------------------------------------------------*/
@@ -908,7 +909,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
    or subroutine mode (isFunc = 0).  In function mode, there can be
    only a single argument, so then <narg> == 1.  In that case,
    we generate a copy of ps[0] with data type <totype>, which may
-   be one of LUX_BYTE ... LUX_DOUBLE LUX_CFLOAT LUX_CDOUBLE
+   be one of LUX_INT8 ... LUX_DOUBLE LUX_CFLOAT LUX_CDOUBLE
    LUX_TEMP_STRING.  If ps[0] is a temporary variable, then we use it
    to store the results in, too.  In subroutine mode, each of the
    arguments must be a named, writeable symbol, and we convert each
@@ -960,15 +961,15 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	} else if (isStringType(totype)) {
 	  src.b = &scalar_value(iq).b;
 	  switch (type) {
-	    case LUX_BYTE:
+	    case LUX_INT8:
 	      fmttok(fmt_integer);
 	      Sprintf_tok(curScrat, (int32_t) *src.b);
 	      break;
-	    case LUX_WORD:
+	    case LUX_INT16:
 	      fmttok(fmt_integer);
 	      Sprintf_tok(curScrat, (int32_t) *src.w);
 	      break;
-	    case LUX_LONG:
+	    case LUX_INT32:
 	      fmttok(fmt_integer);
 	      Sprintf_tok(curScrat, (int32_t) *src.l);
 	      break;
@@ -1024,13 +1025,13 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	  trgt.cf = complex_scalar_data(result).cf;
 	}
 	switch (totype) {
-	  case LUX_BYTE:
+	  case LUX_INT8:
 	    *trgt.b = value.l;
 	    break;
-	  case LUX_WORD:
+	  case LUX_INT16:
 	    *trgt.w = value.l;
 	    break;
-	  case LUX_LONG:
+	  case LUX_INT32:
 	    *trgt.l = value.l;
 	    break;
 	  case LUX_FLOAT:
@@ -1066,13 +1067,13 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	    free(complex_scalar_data(iq).cf);
 	  symbol_class(result) = LUX_SCALAR;
 	  switch (totype) {
-	    case LUX_BYTE:
+	    case LUX_INT8:
 	      scalar_value(result).b = (uint8_t) value.d;
 	      break;
-	    case LUX_WORD:
+	    case LUX_INT16:
 	      scalar_value(result).w = (int16_t) value.d;
 	      break;
-	    case LUX_LONG:
+	    case LUX_INT32:
 	      scalar_value(result).l = (int32_t) value.d;
 	      break;
 	    case LUX_FLOAT:
@@ -1088,15 +1089,15 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	  continue;
 	} else if (isStringType(totype)) { /* to a string */
 	  switch (type) {
-	    case LUX_BYTE:
+	    case LUX_INT8:
 	      fmttok(fmt_integer);
 	      Sprintf_tok(curScrat, (int32_t) *src.b);
 	      break;
-	    case LUX_WORD:
+	    case LUX_INT16:
 	      fmttok(fmt_integer);
 	      Sprintf_tok(curScrat, (int32_t) *src.w);
 	      break;
-	    case LUX_LONG:
+	    case LUX_INT32:
 	      fmttok(fmt_integer);
 	      Sprintf_tok(curScrat, (int32_t) *src.l);
 	      break;
@@ -1184,16 +1185,16 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 
     /* convert */
     switch (type) {		/* source type */
-      case LUX_BYTE:
+      case LUX_INT8:
 	switch (totype) {		/* target type */
-	  case LUX_WORD:
+	  case LUX_INT16:
 	    while (n--) {
 	      *trgt.w = (int16_t) *src.b;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
-	  case LUX_LONG:
+	  case LUX_INT32:
 	    while (n--) {
 	      *trgt.l = (int32_t) *src.b;
 	      trgt.b += trgtstep;
@@ -1245,16 +1246,16 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	    break;
 	}
 	break;
-      case LUX_WORD:
+      case LUX_INT16:
 	switch (totype) {		/* target type */
-	  case LUX_BYTE:
+	  case LUX_INT8:
 	    while (n--) {
 	      *trgt.b = (int16_t) *src.w;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
-	  case LUX_LONG:
+	  case LUX_INT32:
 	    while (n--) {
 	      *trgt.l = (int16_t) *src.w;
 	      trgt.b += trgtstep;
@@ -1306,16 +1307,16 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	    break;
 	}
 	break;
-      case LUX_LONG:
+      case LUX_INT32:
 	switch (totype) {		/* target type */
-	  case LUX_BYTE:
+	  case LUX_INT8:
 	    while (n--) {
 	      *trgt.b = (int32_t) *src.l;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
-	  case LUX_WORD:
+	  case LUX_INT16:
 	    while (n--) {
 	      *trgt.w = (int32_t) *src.l;
 	      trgt.b += trgtstep;
@@ -1369,21 +1370,21 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	break;
       case LUX_FLOAT:
 	switch (totype) {		/* target type */
-	  case LUX_BYTE:
+	  case LUX_INT8:
 	    while (n--) {
 	      *trgt.b = (float) *src.f;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
-	  case LUX_WORD:
+	  case LUX_INT16:
 	    while (n--) {
 	      *trgt.w = (float) *src.f;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
-	  case LUX_LONG:
+	  case LUX_INT32:
 	    while (n--) {
 	      *trgt.l = (float) *src.f;
 	      trgt.b += trgtstep;
@@ -1430,21 +1431,21 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	break;
       case LUX_DOUBLE:
 	switch (totype) {		/* target type */
-	  case LUX_BYTE:
+	  case LUX_INT8:
 	    while (n--) {
 	      *trgt.b = (double) *src.d;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
-	  case LUX_WORD:
+	  case LUX_INT16:
 	    while (n--) {
 	      *trgt.w = (double) *src.d;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
-	  case LUX_LONG:
+	  case LUX_INT32:
 	    while (n--) {
 	      *trgt.l = (double) *src.d;
 	      trgt.b += trgtstep;
@@ -1491,21 +1492,21 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	break;
       case LUX_CFLOAT:
 	switch (totype) {
-	  case LUX_BYTE:
+	  case LUX_INT8:
 	    while (n--) {
 	      *trgt.b = (uint8_t) src.cf->real;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
-	  case LUX_WORD:
+	  case LUX_INT16:
 	    while (n--) {
 	      *trgt.w = (int16_t) src.cf->real;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
-	  case LUX_LONG:
+	  case LUX_INT32:
 	    while (n--) {
 	      *trgt.l = (int32_t) src.cf->real;
 	      trgt.b += trgtstep;
@@ -1551,21 +1552,21 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	break;
       case LUX_CDOUBLE:
 	switch (totype) {
-	  case LUX_BYTE:
+	  case LUX_INT8:
 	    while (n--) {
 	      *trgt.b = (uint8_t) src.cd->real;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
-	  case LUX_WORD:
+	  case LUX_INT16:
 	    while (n--) {
 	      *trgt.w = (int16_t) src.cd->real;
 	      trgt.b += trgtstep;
 	      src.b += srcstep;
 	    }
 	    break;
-	  case LUX_LONG:
+	  case LUX_INT32:
 	    while (n--) {
 	      *trgt.l = (int32_t) src.cd->real;
 	      trgt.b += trgtstep;
@@ -1611,7 +1612,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	break;
       case LUX_STRING_ARRAY:	/* from string array */
 	switch (totype) {
-	  case LUX_BYTE:
+	  case LUX_INT8:
 	    while (n--) {
 	      value.b = atol(*src.sp);
 	      if (iq == result && *src.sp)
@@ -1621,7 +1622,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	      src.b += srcstep;
 	    }
 	    break;
-	  case LUX_WORD:
+	  case LUX_INT16:
 	    while (n--) {
 	      value.w = atol(*src.sp);
 	      if (iq == result && *src.sp)
@@ -1631,7 +1632,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	      src.b += srcstep;
 	    }
 	    break;
-	  case LUX_LONG:
+	  case LUX_INT32:
 	    while (n--) {
 	      value.l = atol(*src.sp);
 	      if (iq == result && *src.sp)
@@ -1719,19 +1720,22 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 }
 /*-----------------------------------------------------*/
 int32_t lux_byte_inplace(int32_t narg, int32_t ps[])
-/* BYTE,x  converts <x> to LUX_BYTE. */
+/* BYTE,x  converts <x> to LUX_INT8. */
 {
-  return lux_convert(narg, ps, LUX_BYTE, 0);
+  return lux_convert(narg, ps, LUX_INT8, 0);
 }
 /*-----------------------------------------------------*/
 int32_t lux_word_inplace(int32_t narg, int32_t ps[])
-/* WORD,x  converts <x> to LUX_WORD. */
+/* WORD,x  converts <x> to LUX_INT16. */
 {
-  return lux_convert(narg, ps, LUX_WORD, 0);
+  return lux_convert(narg, ps, LUX_INT16, 0);
 }
 /*-----------------------------------------------------*/
 int32_t lux_long_inplace(int32_t narg, int32_t ps[])
-/* LONG,x  converts <x> to LUX_LONG. */
+/* LONG,x  converts <x> to LUX_INT32. */
+{
+  return lux_convert(narg, ps, LUX_INT32, 0);
+}
 {
   return lux_convert(narg, ps, LUX_LONG, 0);
 }
@@ -1866,13 +1870,13 @@ int32_t redef_scalar(int32_t nsym, int32_t ntype, void *val)
   symbol_class(nsym) = LUX_SCALAR;
   symbol_type(nsym) = ntype;
   switch (ntype) {
-    case LUX_BYTE:
+    case LUX_INT8:
       scalar_value(nsym).b = value? value->b: 0;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       scalar_value(nsym).w = value? value->w: 0;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       scalar_value(nsym).l = value? value->l: 0;
       break;
     case LUX_FLOAT:
@@ -1987,7 +1991,7 @@ int32_t bytarr(int32_t narg, int32_t ps[])
 
  if (get_dims(&narg, ps, dims) != 1)
    return LUX_ERROR;
- return array_scratch(LUX_BYTE, narg, dims);
+ return array_scratch(LUX_INT8, narg, dims);
 }
 /*-----------------------------------------------------*/
 int32_t intarr(int32_t narg, int32_t ps[])
@@ -1997,7 +2001,7 @@ int32_t intarr(int32_t narg, int32_t ps[])
 
  if (get_dims(&narg, ps, dims) != 1)
    return LUX_ERROR;
- return array_scratch(LUX_WORD, narg, dims);
+ return array_scratch(LUX_INT16, narg, dims);
 }
 /*-----------------------------------------------------*/
 int32_t lonarr(int32_t narg, int32_t ps[])
@@ -2007,7 +2011,8 @@ int32_t lonarr(int32_t narg, int32_t ps[])
 
  if (get_dims(&narg, ps, dims) != 1)
    return LUX_ERROR;
- return array_scratch(LUX_LONG, narg, dims);
+ return array_scratch(LUX_INT32, narg, dims);
+}
 }
 /*-----------------------------------------------------*/
 int32_t fltarr(int32_t narg, int32_t ps[])
@@ -2247,25 +2252,25 @@ int32_t lux_rfix(int32_t narg, int32_t ps[])
  array	*h;
 
  nsym = *ps;
- if ((type = sym[nsym].type) == LUX_LONG) return nsym; /* already of proper type */
+ if ((type = sym[nsym].type) == LUX_INT32) return nsym; /* already of proper type */
  switch (sym[nsym].class)
  { case LUX_SCALAR:
      src.l = &sym[nsym].spec.scalar.l;  size = 1;
-     result = scalar_scratch(LUX_LONG);  trgt = &sym[result].spec.scalar.l;  break;
+     result = scalar_scratch(LUX_INT32);  trgt = &sym[result].spec.scalar.l;  break;
    case LUX_STRING:
-     result = scalar_scratch(LUX_LONG);  type = LUX_DOUBLE;
+     result = scalar_scratch(LUX_INT32);  type = LUX_DOUBLE;
      temp = atof((char *) sym[nsym].spec.array.ptr);  src.d = &temp;
      size = 1;  trgt = &sym[result].spec.scalar.l;  break;
    case LUX_ARRAY:
-     result = array_clone(nsym, LUX_LONG);  h = HEAD(nsym);
+     result = array_clone(nsym, LUX_INT32);  h = HEAD(nsym);
      GET_SIZE(size, h->dims, h->ndim);  src.l = LPTR(h);
      trgt = LPTR(HEAD(result));  break;
    default: return cerror(ILL_CLASS, nsym); }
  		/* now convert */
  switch (type)
- { case LUX_BYTE:
+ { case LUX_INT8:
      while (size--) *trgt++ = (int32_t) *src.b++;  break;
-   case LUX_WORD:
+   case LUX_INT16:
      while (size--) *trgt++ = (int32_t) *src.w++;  break;
    case LUX_FLOAT:
      while (size--)
@@ -2900,7 +2905,7 @@ void read_a_number(char **buf, scalar *value, Symboltype *type)
    (CFLOAT, CDOUBLE) and the value (transformed to real) is returned
    in value.d.  So, the union member that the value is in does not
    necessarily correspond exactly to the <*type>: e.g., a BYTE number
-   gets its value returned in value->q and *type set to LUX_BYTE.  LS
+   gets its value returned in value->q and *type set to LUX_INT8.  LS
    17sep98 */
 {
   int32_t	base = 10, kind, sign;
@@ -2908,7 +2913,7 @@ void read_a_number(char **buf, scalar *value, Symboltype *type)
   Symboltype thetype;
 
   p = *buf;
-  thetype = LUX_LONG;		/* default */
+  thetype = LUX_INT32;		/* default */
   /* skip whitespace */
   while (!isdigit((int32_t) *p) && !strchr("+-.", (int32_t) *p))
     p++;
@@ -3123,19 +3128,19 @@ void read_a_number(char **buf, scalar *value, Symboltype *type)
   *p = c;
   switch (kind) {
   case 'B':
-    thetype = LUX_BYTE;
+    thetype = LUX_INT8;
     p++;
     break;
   case 'W':
-    thetype = LUX_WORD;
+    thetype = LUX_INT16;
     p++;
     break;
   case 'L':
-    thetype = LUX_LONG;
+    thetype = LUX_INT32;
     p++;
     break;
   case 'Q':
-    thetype = LUX_QUAD;
+    thetype = LUX_INT64;
     p++;
     break;
   case 'I':
@@ -3144,7 +3149,7 @@ void read_a_number(char **buf, scalar *value, Symboltype *type)
     p++;
     break;
   default:
-    thetype = LUX_LONG;		/* default */
+    thetype = LUX_INT32;		/* default */
     break;
   }
   if (type)
@@ -3163,14 +3168,14 @@ void read_a_number_fp(FILE *fp, scalar *value, Symboltype *type)
    real) is returned in value.d.  So, the union member that the value
    is in does not necessarily correspond exactly to the <*type>: e.g.,
    a BYTE number gets its value returned in value->l and *type set to
-   LUX_BYTE.  LS 17sep98 */
+   LUX_INT8.  LS 17sep98 */
 /* Fixed reading of numbers with exponents.  LS 11jul2000 */
 {
   int32_t	base = 10, kind, sign, ch;
   char	*p, *numstart;
   Symboltype thetype;
 
-  thetype = LUX_LONG;		/* default */
+  thetype = LUX_INT32;		/* default */
   /* skip non-digits, non-signs */
   while ((ch = nextchar(fp)) != EOF && !isdigit(ch) && !strchr("+-", ch));
   if (ch == EOF) {		/* end of file; return LONG 0 */
@@ -3349,23 +3354,23 @@ void read_a_number_fp(FILE *fp, scalar *value, Symboltype *type)
   value->q = strtoull(numstart, NULL, base)*sign;
   switch (kind) {
   case 'B':
-    thetype = LUX_BYTE;
+    thetype = LUX_INT8;
     break;
   case 'W':
-    thetype = LUX_WORD;
+    thetype = LUX_INT16;
     break;
   case 'L':
-    thetype = LUX_LONG;
+    thetype = LUX_INT32;
     break;
   case 'Q':
-    thetype = LUX_QUAD;
+    thetype = LUX_INT64;
     break;
   case 'I':
     value->d = value->q;
     thetype = LUX_CFLOAT;
     break;
   default:
-    thetype = LUX_LONG;		/* default */
+    thetype = LUX_INT32;		/* default */
     break;
   }
   if (type)

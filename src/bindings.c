@@ -641,7 +641,7 @@ int32_t lux_d_dT6_iLaDaD1T3rDq_0z1T4_5_f_(int32_t narg, int32_t ps[], double (*f
     return LUX_ERROR;
 
   switch (infos[0].type) {
-  case LUX_LONG:
+  case LUX_INT32:
     while (infos[0].nelem--)
       *ptrs[5].d++ = f((double) *ptrs[0].l++, 0.0, *ptrs[1].d, *ptrs[2].d,
                        *ptrs[3].d, *ptrs[4].d);
@@ -690,7 +690,7 @@ int32_t lux_i_dddp3dp3_iLaoDp2p3qT2_0z12_s_(int32_t narg, int32_t ps[], int32_t 
   double (*pvb)[3] = (double (*)[3]) ptrs[2].d;
 
   switch (infos[0].type) {
-  case LUX_LONG:
+  case LUX_INT32:
     while (infos[0].nelem--) {
       f((double) *ptrs[0].l++, 0.0, pvh, pvb);
       pvh += 2;
@@ -820,7 +820,7 @@ int32_t lux_d_dT4_iLaDaDarDq_0z12_f_(int32_t narg, int32_t ps[], double (*f)(dou
   if ((iq = standard_args(narg, ps, "i>L*;i>D*;i>D*;r>D&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   switch (infos[0].type) {
-  case LUX_LONG:
+  case LUX_INT32:
     while (infos[1].nelem--)
       *ptrs[3].d++ = f((double) *ptrs[0].l++, 0.0, *ptrs[1].d++, *ptrs[2].d++);
     break;
@@ -881,7 +881,7 @@ int32_t lux_v_dddp3T3_iLaoD33oDp3p3qDcq_0z1T3_s_(int32_t narg, int32_t ps[], voi
     return LUX_ERROR;
 
   switch (infos[0].type) {
-  case LUX_LONG:
+  case LUX_INT32:
     while (infos[0].nelem--) {
       f((double) *ptrs[0].l++, 0.0, (double (*)[3]) ptrs[1].d,
         (double (*)[3]) ptrs[2].d, (double (*)[3]) ptrs[3].d);
@@ -993,7 +993,7 @@ int32_t lux_iddipT3dp_iLarDp3q_0z1111_f_(int32_t narg, int32_t ps[], int32_t (*f
     return LUX_ERROR;
   
   switch (infos[0].type) {
-  case LUX_LONG:
+  case LUX_INT32:
     while (infos[0].nelem--) {
       if (f((double) *ptrs[0].l++, 0.0, &y, &m, &d, &fd)) {
         ptrs[1].d[0] = 0.0;
@@ -1359,7 +1359,7 @@ int32_t lux_d_dd_iLarDq_0z_1_f_(int32_t narg, int32_t ps[], double (*f)(double, 
     return LUX_ERROR;
 
   switch (infos[0].type) {
-  case LUX_LONG:
+  case LUX_INT32:
     while (infos[1].nelem--)
       *ptrs[1].d++ = f((double) *ptrs[0].l++, 0.0);
     break;

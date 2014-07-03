@@ -2208,7 +2208,7 @@ int32_t lux_postimage(int32_t narg, int32_t ps[])			/* postimage routine */
   y1 = wyt;
   iq = ps[0];
   CK_ARR(iq, 0);
-  if (sym[iq].type != LUX_BYTE )
+  if (sym[iq].type != LUX_INT8 )
  /* scale using (0, 255) for scalemax and scalemin */
   { s1 = scalemin;
     s2 = scalemax;

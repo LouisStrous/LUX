@@ -283,7 +283,7 @@ int32_t lux_spawn_f(int32_t narg, int32_t ps[])		/* execute a shell command */
   if (!symbolIsStringScalar(ps[0]))
     return cerror(NEED_STR, *ps);
   p = string_value(ps[0]);
-  result = scalar_scratch(LUX_LONG);
+  result = scalar_scratch(LUX_INT32);
   scalar_value(result).l = system(p);
   return result;
  }
@@ -551,7 +551,7 @@ int32_t input_format_check(char *format, char **next, char **widths, int32_t *da
  Returns character code of data type in <*formatchar>, or 0 if no data type
  is present.  Returns suppression flag (1 for suppression, 0 for no
  suppression) in <*suppress>.  Returns requested data value type
- (LUX_LONG etc) in <*datatype>, and the number of repeats in <*number>.
+ (LUX_INT32 etc) in <*datatype>, and the number of repeats in <*number>.
  Returns a positive number if all is OK (1 plus the number of chars of
  explicit text before the actual format entry), -1 if an illegal format
  is found, and 0 if explicit text but no data type specification is found. 
@@ -624,13 +624,13 @@ int32_t input_format_check(char *format, char **next, char **widths, int32_t *da
   *formatchar = *format;
   switch (*format) {		/* data type */
     case 'd': case 'i': case 'o': case 'x': /* integer */
-      *datatype = (big == 1)? LUX_WORD: LUX_LONG;
+      *datatype = (big == 1)? LUX_INT16: LUX_INT32;
       break;
     case 'e': case 'f': case 'g': case 't': case 'T': /* floating point */
       *datatype = (big == 3)? LUX_DOUBLE: LUX_FLOAT;
       break;
     case 'c':
-      *datatype = LUX_BYTE;
+      *datatype = LUX_INT8;
       break;
     case 's': case 'S':
       *datatype = LUX_TEMP_STRING;
@@ -790,16 +790,16 @@ void type_ascii_one(int32_t symbol, FILE *fp)
   switch (symbol_class(symbol)) {
   case LUX_SCALAR: case LUX_FIXED_NUMBER:
     switch (scalar_type(symbol)) {
-    case LUX_BYTE:
+    case LUX_INT8:
       intval = (intmax_t) scalar_value(symbol).b;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       intval = (intmax_t) scalar_value(symbol).w;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       intval = (intmax_t) scalar_value(symbol).l;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       intval = (intmax_t) scalar_value(symbol).q;
       break;
     case LUX_FLOAT:
@@ -873,7 +873,7 @@ void type_ascii_one(int32_t symbol, FILE *fp)
     j = array_size(symbol);
     ptr.b = array_data(symbol);
     switch (array_type(symbol)) {
-    case LUX_BYTE:
+    case LUX_INT8:
       fmttok(fmt_integer);
       while (j--) {
         if (!j && (theFormat.flags & FMT_MIX2))
@@ -884,7 +884,7 @@ void type_ascii_one(int32_t symbol, FILE *fp)
           nextformat(NULL, 1);
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       fmttok(fmt_integer);
       while (j--) {
         if (!j && (theFormat.flags & FMT_MIX2))
@@ -895,7 +895,7 @@ void type_ascii_one(int32_t symbol, FILE *fp)
           nextformat(NULL, 1);
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       fmttok(fmt_integer);
       while (j--) {
         if (!j && (theFormat.flags & FMT_MIX2))
@@ -906,7 +906,7 @@ void type_ascii_one(int32_t symbol, FILE *fp)
           nextformat(NULL, 1);
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       fmttok(fmt_integer);
       while (j--) {
         if (!j && (theFormat.flags & FMT_MIX2))
@@ -960,16 +960,16 @@ void type_ascii_one(int32_t symbol, FILE *fp)
     break;
   case LUX_SCAL_PTR:
     switch (scal_ptr_type(symbol)) {
-    case LUX_BYTE:
+    case LUX_INT8:
       intval = (intmax_t) *scal_ptr_pointer(symbol).b;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       intval = (intmax_t) *scal_ptr_pointer(symbol).w;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       intval = (intmax_t) *scal_ptr_pointer(symbol).l;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       intval = (intmax_t) *scal_ptr_pointer(symbol).q;
       break;
     case LUX_FLOAT:
@@ -1309,7 +1309,7 @@ int32_t type_formatted_ascii(int32_t narg, int32_t ps[], FILE *fp)
 	switch (theFormat.type) {
 	  case FMT_INTEGER:
 	    switch (symbol_type(iq)) {
-	      case LUX_BYTE:
+	      case LUX_INT8:
 		if (fp) 
 		  while (n--) {
 		    fprintf(fp, thefmt, (int32_t) *p.b++);
@@ -1326,7 +1326,7 @@ int32_t type_formatted_ascii(int32_t narg, int32_t ps[], FILE *fp)
 		    }
 		  }
 		break;
-	      case LUX_WORD:
+	      case LUX_INT16:
 		if (fp) 
 		  while (n--) {
 		    fprintf(fp, thefmt, (int32_t) *p.w++);
@@ -1343,7 +1343,7 @@ int32_t type_formatted_ascii(int32_t narg, int32_t ps[], FILE *fp)
 		    }
 		  }
 		break;
-	      case LUX_LONG:
+	      case LUX_INT32:
 		if (fp) 
 		  while (n--) {
 		    fprintf(fp, thefmt, (int32_t) *p.l++);
@@ -1441,7 +1441,7 @@ int32_t type_formatted_ascii(int32_t narg, int32_t ps[], FILE *fp)
 	    break;
 	  case FMT_FLOAT:
 	    switch (symbol_type(iq)) {
-	      case LUX_BYTE:
+	      case LUX_INT8:
 		if (fp)
 		  while (n--) {
 		    fprintf(fp, thefmt, (double) *p.b++);
@@ -1458,7 +1458,7 @@ int32_t type_formatted_ascii(int32_t narg, int32_t ps[], FILE *fp)
 		    }
 		  }
 		break;
-	      case LUX_WORD:
+	      case LUX_INT16:
 		if (fp)
 		  while (n--) {
 		    fprintf(fp, thefmt, (double) *p.w++);
@@ -1475,7 +1475,7 @@ int32_t type_formatted_ascii(int32_t narg, int32_t ps[], FILE *fp)
 		    }
 		  }
 		break;
-	      case LUX_LONG:
+	      case LUX_INT32:
 		if (fp)
 		  while (n--) {
 		    fprintf(fp, thefmt, (double) *p.l++);
@@ -1572,7 +1572,7 @@ int32_t type_formatted_ascii(int32_t narg, int32_t ps[], FILE *fp)
 	    break;
 	  case FMT_TIME: case FMT_DATE:
 	    switch (symbol_type(iq)) {
-	      case LUX_BYTE:
+	      case LUX_INT8:
 		while (n--) {
 		  Sprintf(curScrat, thefmt, (double) *p.b++);
 		  if (fp)
@@ -1589,7 +1589,7 @@ int32_t type_formatted_ascii(int32_t narg, int32_t ps[], FILE *fp)
 		  }
 		}
 		break;
-	      case LUX_WORD:
+	      case LUX_INT16:
 		while (n--) {
 		  Sprintf(curScrat, thefmt, (double) *p.w++);
 		  if (fp)
@@ -1606,7 +1606,7 @@ int32_t type_formatted_ascii(int32_t narg, int32_t ps[], FILE *fp)
 		  }
 		}
 		break;
-	      case LUX_LONG:
+	      case LUX_INT32:
 		while (n--) {
 		  Sprintf(curScrat, thefmt, (double) *p.l++);
 		  if (fp)
@@ -1661,7 +1661,7 @@ int32_t type_formatted_ascii(int32_t narg, int32_t ps[], FILE *fp)
 	    break;
 	  case FMT_COMPLEX:
 	    switch (symbol_type(iq)) {
-	      case LUX_BYTE:
+	      case LUX_INT8:
 		while (n--) {
 		  Sprintf(curScrat, thefmt, (double) *p.b++, (double) 0.0);
 		  if (fp)
@@ -1678,7 +1678,7 @@ int32_t type_formatted_ascii(int32_t narg, int32_t ps[], FILE *fp)
 		  }
 		}
 		break;
-	      case LUX_WORD:
+	      case LUX_INT16:
 		while (n--) {
 		  Sprintf(curScrat, thefmt, (double) *p.w++, (double) 0.0);
 		  if (fp)
@@ -1695,7 +1695,7 @@ int32_t type_formatted_ascii(int32_t narg, int32_t ps[], FILE *fp)
 		  }
 		}
 		break;
-	      case LUX_LONG:
+	      case LUX_INT32:
 		while (n--) {
 		  Sprintf(curScrat, thefmt, (double) *p.l++, (double) 0.0);
 		  if (fp)
@@ -1920,7 +1920,7 @@ int32_t open_file(int32_t narg, int32_t ps[], char *access, char function)
  char	*name;
 
  if (function) {		/* function call */
-   result_sym = scalar_scratch(LUX_LONG);
+   result_sym = scalar_scratch(LUX_INT32);
    scalar_value(result_sym).l = 0; /* default: error */
  }
  if (internalMode & 1) {	/* /GET_LUN */
@@ -1931,7 +1931,7 @@ int32_t open_file(int32_t narg, int32_t ps[], char *access, char function)
      return luxerror("No logical unit free", 0);
    undefine(*ps);		/* clear old value of lun and put in new */
    symbol_class(*ps) = LUX_SCALAR;
-   scalar_type(*ps) = LUX_LONG;
+   scalar_type(*ps) = LUX_INT32;
    scalar_value(*ps).l = lun;
  } else {
    lun = int_arg(ps[0]);
@@ -2204,11 +2204,11 @@ int32_t read_ascii(int32_t narg, int32_t ps[], FILE *fp, int32_t flag)
 	index_cnt++;
 	redef_scalar(iq, type, &value);
 	switch (type) {
-	  /* <iq> is returned as LUX_LONG or LUX_DOUBLE by redef_scalar() */
-	case LUX_BYTE:
+	  /* <iq> is returned as LUX_INT32 or LUX_DOUBLE by redef_scalar() */
+	case LUX_INT8:
 	  scalar_value(iq).b = (uint8_t) value.l;
 	  break;
-	case LUX_WORD:
+	case LUX_INT16:
 	  scalar_value(iq).w = (int16_t) value.l;
 	  break;
 	case LUX_FLOAT:
@@ -2222,9 +2222,9 @@ int32_t read_ascii(int32_t narg, int32_t ps[], FILE *fp, int32_t flag)
 	read_a_number_fp(fp, &value, &type);
 	index_cnt++;
 	switch (type) {
-	case LUX_BYTE: case LUX_WORD: case LUX_LONG:
+	case LUX_INT8: case LUX_INT16: case LUX_INT32:
 	  *scal_ptr_pointer(iq).l = value.l;
-	  scal_ptr_type(iq) = LUX_LONG;
+	  scal_ptr_type(iq) = LUX_INT32;
 	  break;
 	case LUX_FLOAT:
 	  *scal_ptr_pointer(iq).f = (float) value.d;
@@ -2248,9 +2248,9 @@ int32_t read_ascii(int32_t narg, int32_t ps[], FILE *fp, int32_t flag)
 	    read_a_number_fp(fp, &value, &type);
 	    index_cnt++;
 	    switch (array_type(iq)) {
-	    case LUX_BYTE:
+	    case LUX_INT8:
 	      switch (type) {
-	      case LUX_BYTE: case LUX_WORD: case LUX_LONG:
+	      case LUX_INT8: case LUX_INT16: case LUX_INT32:
 		*pp.b++ = (uint8_t) value.l;
 		break;
 	      case LUX_FLOAT: case LUX_DOUBLE:
@@ -2258,9 +2258,9 @@ int32_t read_ascii(int32_t narg, int32_t ps[], FILE *fp, int32_t flag)
 		break;
 	      }
 	      break;
-	    case LUX_WORD:
+	    case LUX_INT16:
 	      switch (type) {
-	      case LUX_BYTE: case LUX_WORD: case LUX_LONG:
+	      case LUX_INT8: case LUX_INT16: case LUX_INT32:
 		*pp.w++ = (int16_t) value.l;
 		break;
 	      case LUX_FLOAT: case LUX_DOUBLE:
@@ -2268,9 +2268,9 @@ int32_t read_ascii(int32_t narg, int32_t ps[], FILE *fp, int32_t flag)
 		break;
 	      }
 	      break;
-	    case LUX_LONG:
+	    case LUX_INT32:
 	      switch (type) {
-	      case LUX_BYTE: case LUX_WORD: case LUX_LONG:
+	      case LUX_INT8: case LUX_INT16: case LUX_INT32:
 		*pp.l++ = (int32_t) value.l;
 		break;
 	      case LUX_FLOAT: case LUX_DOUBLE:
@@ -2280,7 +2280,7 @@ int32_t read_ascii(int32_t narg, int32_t ps[], FILE *fp, int32_t flag)
 	      break;
 	    case LUX_FLOAT:
 	      switch (type) {
-	      case LUX_BYTE: case LUX_WORD: case LUX_LONG:
+	      case LUX_INT8: case LUX_INT16: case LUX_INT32:
 		*pp.f++ = (float) value.l;
 		break;
 	      case LUX_FLOAT: case LUX_DOUBLE:
@@ -2290,7 +2290,7 @@ int32_t read_ascii(int32_t narg, int32_t ps[], FILE *fp, int32_t flag)
 	      break;
 	    case LUX_DOUBLE:
 	      switch (type) {
-	      case LUX_BYTE: case LUX_WORD: case LUX_LONG:
+	      case LUX_INT8: case LUX_INT16: case LUX_INT32:
 		*pp.d++ = (double) value.l;
 		break;
 	      case LUX_FLOAT: case LUX_DOUBLE:
@@ -2483,11 +2483,11 @@ int32_t read_formatted_ascii(int32_t narg, int32_t ps[], void *ptr, int32_t show
 	    return nout;
 	case FMT_INTEGER:
           if (theFormat.flags & FMT_SMALL)
-            type = LUX_WORD;
+            type = LUX_INT16;
           else if (theFormat.flags & FMT_BIGINT)
-            type = LUX_QUAD;
+            type = LUX_INT64;
           else
-            type = LUX_LONG;
+            type = LUX_INT32;
 	  break;
 	case FMT_FLOAT: case FMT_TIME:
 	  type = (theFormat.flags & FMT_BIG)? LUX_DOUBLE: LUX_FLOAT;
@@ -2753,7 +2753,7 @@ int32_t lux_fread(int32_t narg, int32_t ps[])
     case 1:
       return LUX_ONE;
     default:
-      iq = scalar_scratch(LUX_LONG);
+      iq = scalar_scratch(LUX_INT32);
       scalar_value(iq).l = result;
       break;
   }
@@ -2785,7 +2785,7 @@ int32_t lux_freadf_f(int32_t narg, int32_t ps[])
     case 1:
       return LUX_ONE;
     default:
-      iq = scalar_scratch(LUX_LONG);
+      iq = scalar_scratch(LUX_INT32);
       scalar_value(iq).l = result;
       break;
   }
@@ -2959,9 +2959,9 @@ int32_t lux_assoc_output(int32_t iq, int32_t jq, int32_t offsym, int32_t axsym)
  dattype = sym[jq].type;
  if (assoctype != dattype)			/* make proper type */
  { switch (assoctype)
-   { case LUX_BYTE:  jq = lux_byte(1, &jq);  break;
-     case LUX_WORD:  jq = lux_word(1, &jq);  break;
-     case LUX_LONG:  jq = lux_long(1, &jq);  break;
+   { case LUX_INT8:  jq = lux_byte(1, &jq);  break;
+     case LUX_INT16:  jq = lux_word(1, &jq);  break;
+     case LUX_INT32:  jq = lux_long(1, &jq);  break;
      case LUX_FLOAT: jq = lux_float(1, &jq); break;
      case LUX_DOUBLE: jq = lux_double(1, &jq); break; }
  }
@@ -3114,7 +3114,7 @@ int32_t ck_synch_hd(FILE *fin, fzHead *fh, int32_t *wwflag)
   } else
     *wwflag = 0;
   if (MSBfirst ^ *wwflag)
-    endian(fh->dim, fh->ndim*sizeof(int32_t), LUX_LONG);
+    endian(fh->dim, fh->ndim*sizeof(int32_t), LUX_INT32);
   return 1; 
 }
 /*------------------------------------------------------------------------- */
@@ -3361,12 +3361,12 @@ int32_t fzread(int32_t narg, int32_t ps[], int32_t flag) /* fzread subroutine */
     if (nq != 14 && !flag) 
       perror("error reading in compression header");
 #if WORDS_BIGENDIAN
-    endian(&ch.tsize, sizeof(int32_t), LUX_LONG);
-    endian(&ch.nblocks, sizeof(int32_t), LUX_LONG);
-    endian(&ch.bsize, sizeof(int32_t), LUX_LONG);
+    endian(&ch.tsize, sizeof(int32_t), LUX_INT32);
+    endian(&ch.nblocks, sizeof(int32_t), LUX_INT32);
+    endian(&ch.bsize, sizeof(int32_t), LUX_INT32);
     for (i = 0; i < 4; i++)
       lmap.b[i] = fh->cbytes[i];
-    endian(&lmap.i, sizeof(int32_t), LUX_LONG);
+    endian(&lmap.i, sizeof(int32_t), LUX_INT32);
 #endif
     mq = ch.tsize - 14;
     if (mq <= NSCRAT)
@@ -3430,7 +3430,7 @@ int32_t fzread(int32_t narg, int32_t ps[], int32_t flag) /* fzread subroutine */
       while (nelem--) {
 	fread(&mq, sizeof(int32_t), 1, fin);
 	if (nq)
-	  endian(&mq, sizeof(int32_t), LUX_LONG);
+	  endian(&mq, sizeof(int32_t), LUX_INT32);
 	if (mq) {
 	  *q1.sp = malloc(mq + 1);
 	  if (!*q1.sp) {
@@ -3534,7 +3534,7 @@ int32_t fzwrite(int32_t narg, int32_t ps[], int32_t flag) /* fzwrite subroutine 
   n = array_size(iq)*lux_type_size[type];
   memcpy(fh->dim, array_dims(iq), nd*sizeof(int32_t));
 #if WORDS_BIGENDIAN
-  endian(fh->dim, fh->ndim*sizeof(int32_t), LUX_LONG);
+  endian(fh->dim, fh->ndim*sizeof(int32_t), LUX_INT32);
 #endif
 
   if (narg > 2) {			 /* have a header */
@@ -3670,7 +3670,7 @@ int32_t fcwrite(int32_t narg, int32_t ps[], int32_t flag)/* fcwrite subroutine *
  if (symbol_class(iq) != LUX_ARRAY)
    return (flag)? LUX_ERROR: cerror(NEED_ARR, *ps);
  type = array_type(iq);
- if (type != LUX_BYTE && type != LUX_WORD) {
+ if (type != LUX_INT8 && type != LUX_INT16) {
    if (!flag) {
      puts("FCWRITE - Need I*1 or I*2 argument"); 
      return cerror(ILL_TYPE, iq, typeName(symbol_type(iq)));
@@ -3718,7 +3718,7 @@ int32_t fcwrite(int32_t narg, int32_t ps[], int32_t flag)/* fcwrite subroutine *
  memcpy(fh->dim, array_dims(iq), nd*sizeof(int32_t));
  nx = fh->dim[0];
 #if WORDS_BIGENDIAN
- endian(fh->dim, fh->ndim*sizeof(int32_t), LUX_LONG);
+ endian(fh->dim, fh->ndim*sizeof(int32_t), LUX_INT32);
 #endif
  ny = n/nx;
  n = n * lux_type_size[type];
@@ -3727,20 +3727,20 @@ int32_t fcwrite(int32_t narg, int32_t ps[], int32_t flag)/* fcwrite subroutine *
  limit = 2*n;
  q2.l = (int32_t *) malloc(limit);	/* some room for mistakes */
  switch (type) {
-   case LUX_BYTE:
+   case LUX_INT8:
      if (runlengthflag)
        iq = anacrunchrun8(q2.b, q1.b, crunch_slice, nx, ny, limit);
      else
        iq = anacrunch8(q2.b, q1.b, crunch_slice, nx, ny, limit);
      break;
-   case LUX_WORD:
+   case LUX_INT16:
      if (runlengthflag)
        iq = anacrunchrun(q2.b, q1.w, crunch_slice, nx, ny, limit);
      else
        iq = anacrunch(q2.b, q1.w, crunch_slice, nx, ny, limit);
      break;
 #if SIZEOF_LONG_LONG_INT == 8
-   case LUX_LONG:
+   case LUX_INT32:
      if (!runlengthflag)
        iq = anacrunch32(q2.b, q1.l, crunch_slice, nx, ny, limit);
      /* else fall-through to default: we don't have a 32-bit crunchrun */
@@ -3759,7 +3759,7 @@ int32_t fcwrite(int32_t narg, int32_t ps[], int32_t flag)/* fcwrite subroutine *
  lmap.i = iq;			/* need to use this roundabout method because
 				 .cbytes is not aligned on an int32_t boundary */
 #if WORDS_BIGENDIAN
- endian(&lmap.i, sizeof(int32_t), LUX_LONG);
+ endian(&lmap.i, sizeof(int32_t), LUX_INT32);
 #endif
  for (i = 0; i < 4; i++)
    fh->cbytes[i] = lmap.b[i];
@@ -4136,7 +4136,7 @@ int32_t arestore_one(FILE* fp, int32_t iq, int32_t reverseOrder)
   switch (symbol_class(iq)) {
   case LUX_ARRAY:
     if (reverseOrder)
-      endian(&symbol_memory(iq), sizeof(int32_t), LUX_LONG);
+      endian(&symbol_memory(iq), sizeof(int32_t), LUX_INT32);
     n = symbol_memory(iq);
     allocate(p.v, n, char);
     array_header(iq) = (array *) p.v;
@@ -4144,7 +4144,7 @@ int32_t arestore_one(FILE* fp, int32_t iq, int32_t reverseOrder)
       return 1;
     n = array_num_dims(iq);
     if (reverseOrder) {
-      endian(array_dims(iq), n*sizeof(int32_t), LUX_LONG);
+      endian(array_dims(iq), n*sizeof(int32_t), LUX_INT32);
       endian(array_data(iq), array_size(iq)*lux_type_size[array_type(iq)],
 	     array_type(iq));
     }
@@ -4156,7 +4156,7 @@ int32_t arestore_one(FILE* fp, int32_t iq, int32_t reverseOrder)
 	if (!fread(&j, sizeof(int32_t), 1, fp))
 	  return 1;
 	if (reverseOrder)
-	  endian(&j, sizeof(int32_t), LUX_LONG);
+	  endian(&j, sizeof(int32_t), LUX_INT32);
 	if (j) {
 	  *p.sp = malloc(j + 1); /* reserve space for the string */
 	  if (!*p.sp)
@@ -4173,7 +4173,7 @@ int32_t arestore_one(FILE* fp, int32_t iq, int32_t reverseOrder)
   case LUX_STRING:
     n = symbol_memory(iq);
     if (reverseOrder)
-      endian(&n, sizeof(int32_t), LUX_LONG);
+      endian(&n, sizeof(int32_t), LUX_INT32);
     allocate(p.s, n, char);
     string_value(iq) = p.s;
     if (!fread(p.b, n, 1, fp))
@@ -4182,20 +4182,20 @@ int32_t arestore_one(FILE* fp, int32_t iq, int32_t reverseOrder)
   case LUX_FILEMAP:
     n = symbol_memory(iq);
     if (reverseOrder)
-      endian(&n, sizeof(int32_t), LUX_LONG);
+      endian(&n, sizeof(int32_t), LUX_INT32);
     allocate(p.s, n, char);
     file_map_header(iq) = (array *) p.s;
     if (!fread(p.b, n, 1, fp))
       return 1;
     n = file_map_num_dims(iq);
-    endian(file_map_dims(iq), n*sizeof(int32_t), LUX_LONG);
-    endian(&file_map_offset(iq), sizeof(int32_t), LUX_LONG);
+    endian(file_map_dims(iq), n*sizeof(int32_t), LUX_INT32);
+    endian(&file_map_offset(iq), sizeof(int32_t), LUX_INT32);
     break;
   case LUX_CLIST:
     if (!fread(&n, sizeof(int32_t), 1, fp))
       return 1;
     if (reverseOrder)
-      endian(&n, sizeof(int32_t), LUX_LONG);
+      endian(&n, sizeof(int32_t), LUX_INT32);
     allocate(p.w, n*sizeof(int16_t), int16_t);
     clist_symbols(iq) = p.w;
     for (j = 0; j < n; j++) {
@@ -4254,7 +4254,7 @@ int32_t arestore(int32_t narg, int32_t ps[], int32_t flag)
   }
   nvalue = intro[1];		/* number of variables in the file */
   if (reverseOrder)
-    endian((uint8_t *) &nvalue, sizeof(int32_t), LUX_LONG);
+    endian((uint8_t *) &nvalue, sizeof(int32_t), LUX_INT32);
   if (narg && narg < nvalue)
     nvalue = narg;		/* the number of variables to restore */
   if (narg)			/* all arguments must be named variables */
@@ -4267,7 +4267,7 @@ int32_t arestore(int32_t narg, int32_t ps[], int32_t flag)
     if (!fread(&n, sizeof(int32_t), 1, fp))  /* size of name */
       return flag? cerror(READ_ERR, 0): LUX_ZERO;
     if (reverseOrder)
-      endian(&n, sizeof(int32_t), LUX_LONG);
+      endian(&n, sizeof(int32_t), LUX_INT32);
     if (!narg) {		/* reading all of them: restore original */
 				/* names */
       name = (char *) malloc(n);
@@ -4350,7 +4350,7 @@ int32_t fileptr(int32_t narg, int32_t ps[], char function)
   fp = lux_file[lun];
   if (narg == 1 && internalMode == 0) { /* show file pointer */
     if (function) {
-      iq = scalar_scratch(LUX_LONG);
+      iq = scalar_scratch(LUX_INT32);
       scalar_value(iq).l = ftell(fp);
       return iq;
     }
@@ -4439,7 +4439,7 @@ int32_t lux_get_lun(int32_t narg, int32_t ps[])
 
   for (i = 0; i < MAXFILES; i++)
     if (!lux_file_open[i]) {
-      n = scalar_scratch(LUX_LONG);
+      n = scalar_scratch(LUX_INT32);
       scalar_value(n).l = i;
       return n; 
     }
@@ -4490,7 +4490,7 @@ int32_t lux_filesize(int32_t narg, int32_t ps[])
   if (symbol_class(ps[0]) != LUX_STRING)
     return cerror(ILL_CLASS, ps[0]);
   fp = fopen(expand_name(string_arg(ps[0]), NULL), "r");
-  result = scalar_scratch(LUX_LONG);
+  result = scalar_scratch(LUX_INT32);
   if (fp) {
     fseek(fp, 0, SEEK_END);
     scalar_value(result).l = ftell(fp);
@@ -4527,7 +4527,7 @@ int32_t lux_freads_f(int32_t narg, int32_t ps[])
     case 1:
       return LUX_ONE;
     default:
-      iq = scalar_scratch(LUX_LONG);
+      iq = scalar_scratch(LUX_INT32);
       scalar_value(iq).l = result;
       break;
   }
@@ -4553,7 +4553,7 @@ int32_t lux_file_to_fz(int32_t narg, int32_t ps[])
   if (symbol_class(ps[0]) != LUX_STRING)
     return cerror(NEED_STR, ps[0]);
   type = int_arg(ps[1]);
-  if (type < LUX_BYTE || type > LUX_DOUBLE)
+  if (type < LUX_INT8 || type > LUX_DOUBLE)
     return cerror(ILL_TYPE, ps[1]);
   switch (symbol_class(ps[2])) {
     case LUX_ARRAY:
@@ -4596,7 +4596,7 @@ int32_t lux_file_to_fz(int32_t narg, int32_t ps[])
   fh->ndim = nd;
   memcpy(fh->dim, dims, nd*sizeof(int32_t));
   if (MSBfirst)
-    endian(fh->dim, fh->ndim*sizeof(int32_t), LUX_LONG);
+    endian(fh->dim, fh->ndim*sizeof(int32_t), LUX_INT32);
   j = fwrite(fh, 1, 512 * fh->nhb, fp); /*write header */
   fclose(fp);
   if (j != 512 * fh->nhb) {
@@ -5138,7 +5138,7 @@ int32_t lux_identify_file(int32_t narg, int32_t ps[])
   fclose(fp);
 
   if (type) {
-    result = scalar_scratch(LUX_LONG);
+    result = scalar_scratch(LUX_INT32);
     scalar_value(result).l = type;
     return result;
   }
@@ -5445,23 +5445,23 @@ void apply_bscale_bzero_blank(uint8_t *ptr, int32_t nelem, float bscale, float b
     /* we must start at the end so that we don't overwrite data that */
     /* we still need */
     switch (type) {
-      case LUX_BYTE:
+      case LUX_INT8:
 	switch (type0) {
-	  case LUX_BYTE:
+	  case LUX_INT8:
 	    while (nelem--) {
 	      *q.b = (*p.b == blank)? targetblank: *p.b * bscale + bzero;
 	      q.b--;
 	      p.b--;
 	    }
 	    break;
-	  case LUX_WORD:
+	  case LUX_INT16:
 	    while (nelem--) {
 	      *q.b = (*p.w == blank)? targetblank: *p.w * bscale + bzero;
 	      q.b--;
 	      p.w--;
 	    }
 	    break;
-	  case LUX_LONG:
+	  case LUX_INT32:
 	    while (nelem--) {
 	      *q.b = (*p.l == blank)? targetblank: *p.l * bscale + bzero;
 	      q.b--;
@@ -5470,23 +5470,23 @@ void apply_bscale_bzero_blank(uint8_t *ptr, int32_t nelem, float bscale, float b
 	    break;
 	}
 	break;
-      case LUX_WORD:
+      case LUX_INT16:
 	switch (type0) {
-	  case LUX_BYTE:
+	  case LUX_INT8:
 	    while (nelem--) {
 	      *q.w = (*p.b == blank)? targetblank: *p.b * bscale + bzero;
 	      q.w--;
 	      p.b--;
 	    }
 	    break;
-	  case LUX_WORD:
+	  case LUX_INT16:
 	    while (nelem--) {
 	      *q.w = (*p.w == blank)? targetblank: *p.w * bscale + bzero;
 	      q.w--;
 	      p.w--;
 	    }
 	    break;
-	  case LUX_LONG:
+	  case LUX_INT32:
 	    while (nelem--) {
 	      *q.w = (*p.l == blank)? targetblank: *p.l * bscale + bzero;
 	      q.w--;
@@ -5495,23 +5495,23 @@ void apply_bscale_bzero_blank(uint8_t *ptr, int32_t nelem, float bscale, float b
 	    break;
 	}
 	break;
-      case LUX_LONG:
+      case LUX_INT32:
 	switch (type0) {
-	  case LUX_BYTE:
+	  case LUX_INT8:
 	    while (nelem--) {
 	      *q.l = (*p.b == blank)? targetblank: *p.b * bscale + bzero;
 	      q.l--;
 	      p.b--;
 	    }
 	    break;
-	  case LUX_WORD:
+	  case LUX_INT16:
 	    while (nelem--) {
 	      *q.l = (*p.w == blank)? targetblank: *p.w * bscale + bzero;
 	      q.l--;
 	      p.w--;
 	    }
 	    break;
-	  case LUX_LONG:
+	  case LUX_INT32:
 	    while (nelem--) {
 	      *q.l = (*p.l == blank)? targetblank: *p.l * bscale + bzero;
 	      q.l--;
@@ -5522,21 +5522,21 @@ void apply_bscale_bzero_blank(uint8_t *ptr, int32_t nelem, float bscale, float b
 	break;
       case LUX_FLOAT:
 	switch (type0) {
-	  case LUX_BYTE:
+	  case LUX_INT8:
 	    while (nelem--) {
 	      *q.f = (*p.b == blank)? targetblank: *p.b * bscale + bzero;
 	      q.f--;
 	      p.b--;
 	    }
 	    break;
-	  case LUX_WORD:
+	  case LUX_INT16:
 	    while (nelem--) {
 	      *q.f = (*p.w == blank)? targetblank: *p.w * bscale + bzero;
 	      q.f--;
 	      p.w--;
 	    }
 	    break;
-	  case LUX_LONG:
+	  case LUX_INT32:
 	    while (nelem--) {
 	      *q.f = (*p.l == blank)? targetblank: *p.l * bscale + bzero;
 	      q.f--;
@@ -5738,13 +5738,13 @@ int32_t fits_read_compressed(int32_t mode, int32_t datasym, FILE *fp, int32_t he
   
   switch (type) {
     case 8:
-      type = LUX_BYTE;
+      type = LUX_INT8;
       break;
     case 16:
-      type = LUX_WORD;
+      type = LUX_INT16;
       break;
     case 32:
-      type = LUX_LONG;
+      type = LUX_INT32;
       break;
     case -32:
       type = LUX_FLOAT;
@@ -5785,7 +5785,7 @@ int32_t fits_read_compressed(int32_t mode, int32_t datasym, FILE *fp, int32_t he
 
   } else {			/* don't uncompress */
     dims[0] = ncbytes;
-    type = LUX_BYTE;
+    type = LUX_INT8;
     ndim = 1;
   }
 
@@ -5876,25 +5876,25 @@ int32_t fits_read_compressed(int32_t mode, int32_t datasym, FILE *fp, int32_t he
 	    if (!bscale)
 	      bscale = 1.0;
 	    switch (type) {
-	      case LUX_BYTE:
+	      case LUX_INT8:
 		min = bzero;
 		max = 255*bscale + bzero;
 		break;
-	      case LUX_WORD:
+	      case LUX_INT16:
 		min = INT16_MIN*bscale + bzero;
 		max = INT16_MAX*bscale + bzero;
 		break;
-	      case LUX_LONG:
+	      case LUX_INT32:
 		min = INT32_MIN*bscale + bzero;
 		max = INT32_MAX*bscale + bzero;
 		break;
 	    }
 	    if (min >= 0 && max <= 255)
-	      type = LUX_BYTE;
+	      type = LUX_INT8;
 	    else if (min >= INT16_MIN && max <= INT16_MAX)
-	      type = LUX_WORD;
+	      type = LUX_INT16;
 	    else if (min >= INT32_MIN && max <= INT32_MAX)
-	      type = LUX_LONG;
+	      type = LUX_INT32;
 	    else
 	      type = LUX_FLOAT;
 	  }
@@ -5937,17 +5937,17 @@ int32_t fits_read_compressed(int32_t mode, int32_t datasym, FILE *fp, int32_t he
       swapl(&ny, 1);
 #endif
       switch (type0) {
-	case LUX_BYTE:
+	case LUX_INT8:
 	  ok = runlength?
 	    anadecrunchrun8(p.b, array_data(datasym), slice, nx, ny):
 	      anadecrunch8(p.b, array_data(datasym), slice, nx, ny);
 	  break;
-	case LUX_WORD:
+	case LUX_INT16:
 	  ok = runlength?
 	    anadecrunchrun(p.b, array_data(datasym), slice, nx, ny):
 	      anadecrunch(p.b, array_data(datasym), slice, nx, ny);
 	  break;
-	case LUX_LONG:
+	case LUX_INT32:
 #if SIZEOF_LONG_LONG_INT == 8	/* 64-bit integers */
 	  if (runlength) {
 	    if (!usescrat)
@@ -6230,25 +6230,25 @@ int32_t fits_read(int32_t mode, int32_t dsym, int32_t namsym, int32_t hsym, int3
 	  if (!bscale)
 	    bscale = 1.0;
 	  switch (type) {
-	    case LUX_BYTE:
+	    case LUX_INT8:
 	      min = bzero;
 	      max = 255*bscale + bzero;
 	      break;
-	    case LUX_WORD:
+	    case LUX_INT16:
 	      min = INT16_MIN*bscale + bzero;
 	      max = INT16_MAX*bscale + bzero;
 	      break;
-	    case LUX_LONG:
+	    case LUX_INT32:
 	      min = INT32_MIN*bscale + bzero;
 	      max = INT32_MAX*bscale + bzero;
 	      break;
 	  }
 	  if (min >= 0 && max <= 255)
-	    type = LUX_BYTE;
+	    type = LUX_INT8;
 	  else if (min >= INT16_MIN && max <= INT16_MAX)
-	    type = LUX_WORD;
+	    type = LUX_INT16;
 	  else if (min >= INT32_MIN && max <= INT32_MAX)
-	    type = LUX_LONG;
+	    type = LUX_INT32;
 	  else
 	  type = LUX_FLOAT;
 	}
@@ -6760,16 +6760,16 @@ int32_t lux_fits_write_general(int32_t narg, int32_t ps[], int32_t func)
 
   if (slice) {
     switch (type) {
-      case LUX_BYTE:
+      case LUX_INT8:
 	size = runlength? anacrunchrun8(out, data, slice, nx, ny, limit):
 	  anacrunch8(out, data, slice, nx, ny, limit);
 	break;
-      case LUX_WORD:
+      case LUX_INT16:
 	size = runlength? anacrunchrun(out, data, slice, nx, ny, limit):
 	  anacrunch(out, data, slice, nx, ny, limit);
 	break;
 #if SIZEOF_LONG_LONG_INT == 8	/* 64-bit integers */
-      case LUX_LONG:
+      case LUX_INT32:
 	if (runlength) {
 	  puts("WARNING - no compression with run-length encoding is currently\navailable for 32-bit data.  Using compression without RLE instead.");
 	  runlength = 0;
@@ -6989,7 +6989,7 @@ int32_t lux_fileread(int32_t narg, int32_t ps[])
       || int_arg_stat(ps[3], &num) != LUX_OK
       || int_arg_stat(ps[4], &type) != LUX_OK)
     return LUX_ERROR;
-  if (type < LUX_BYTE || type > LUX_DOUBLE)
+  if (type < LUX_INT8 || type > LUX_DOUBLE)
     return cerror(ILL_TYPE, ps[4]);
   iq = ps[1];
   nd = 1;

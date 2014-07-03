@@ -470,7 +470,7 @@ int32_t lux_cspline_find(int32_t narg, int32_t ps[])
   numerical(iq, NULL, NULL, &nLev, &level);
 
   if (narg > 3 && ps[3]) {	/* <index> */
-    if (to_scratch_array(ps[3], LUX_LONG, 1, &nLev) == LUX_ERROR)
+    if (to_scratch_array(ps[3], LUX_INT32, 1, &nLev) == LUX_ERROR)
       return LUX_ERROR;
     index = (int32_t *) array_data(ps[3]);
     memset(index, 0, srcinfo.ndim*sizeof(int32_t));
@@ -852,13 +852,13 @@ int32_t lux_fitskey(int32_t narg, int32_t ps[])
       read_a_number(&scr, &value, &type);
       iq = scalar_scratch(type);
       switch (type) {
-	case LUX_BYTE:
+	case LUX_INT8:
 	  scalar_value(iq).b = (uint8_t) value.l;
 	  break;
-	case LUX_WORD:
+	case LUX_INT16:
 	  scalar_value(iq).w = (int16_t) value.l;
 	  break;
-	case LUX_LONG:
+	case LUX_INT32:
 	  scalar_value(iq).l = value.l;
 	  break;
 	case LUX_FLOAT:
@@ -1796,19 +1796,19 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
 	y1 = y2;
       } else {
 	switch (type) {
-	  case LUX_BYTE:
+	  case LUX_INT8:
 	    ix = (int32_t) *gx.b;	/* x pixel coordinate */
 	    iy = (int32_t) *gy.b;	/* y pixel coordinate */
 	    x1 = (double) *gx.b++ - ix;
 	    y1 = (double) *gy.b++ - iy;
 	    break;
-	  case LUX_WORD:
+	  case LUX_INT16:
 	    ix = (int32_t) *gx.w;	/* x pixel coordinate */
 	    iy = (int32_t) *gy.w;	/* y pixel coordinate */
 	    x1 = (double) *gx.w++ - ix;
 	    y1 = (double) *gy.w++ - iy;
 	    break;
-	  case LUX_LONG:
+	  case LUX_INT32:
 	    ix = (int32_t) *gx.l;	/* x pixel coordinate */
 	    iy = (int32_t) *gy.l;	/* y pixel coordinate */
 	    x1 = (double) *gx.l++ - ix;
@@ -1839,15 +1839,15 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
       index = ix + iy*nx;	/* index relative to data start */
     
       switch (type) {
-	case LUX_BYTE:
+	case LUX_INT8:
 	  vx = (double) vx0.b[index*dv]; /* x velocity */
 	  vy = (double) vy0.b[index*dv]; /* y velocity */
 	  break;
-	case LUX_WORD:
+	case LUX_INT16:
 	  vx = (double) vx0.w[index*dv]; /* x velocity */
 	  vy = (double) vy0.w[index*dv]; /* y velocity */
 	  break;
-	case LUX_LONG:
+	case LUX_INT32:
 	  vx = (double) vx0.l[index*dv]; /* x velocity */
 	  vy = (double) vy0.l[index*dv]; /* y velocity */
 	  break;
@@ -1933,15 +1933,15 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
 	index += di;
 	s += ds;
 	switch (type) {
-	  case LUX_BYTE:
+	  case LUX_INT8:
 	    vx = (double) vx0.b[index*dv];
 	    vy = (double) vy0.b[index*dv];
 	    break;
-	  case LUX_WORD:
+	  case LUX_INT16:
 	    vx = (double) vx0.w[index*dv];
 	    vy = (double) vy0.w[index*dv];
 	    break;
-	  case LUX_LONG:
+	  case LUX_INT32:
 	    vx = (double) vx0.l[index*dv];
 	    vy = (double) vy0.l[index*dv];
 	    break;
@@ -1960,15 +1960,15 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
       /* it a bit.  We adjust. */
 
       switch (type) {
-	case LUX_BYTE:
+	case LUX_INT8:
 	  *ox.b++ = ix + x2;
 	  *oy.b++ = iy + y2;
 	  break;
-	case LUX_WORD:
+	case LUX_INT16:
 	  *ox.w++ = ix + x2;
 	  *oy.w++ = iy + y2;
 	  break;
-	case LUX_LONG:
+	case LUX_INT32:
 	  *ox.l++ = ix + x2;
 	  *oy.l++ = iy + y2;
 	  break;
@@ -2154,7 +2154,7 @@ int32_t lux_enhanceimage(int32_t narg, int32_t ps[])
 
   if (!symbolIsNumericalArray(ps[0]))
     return cerror(NEED_NUM_ARR, ps[0]);
-  if (symbol_type(ps[0]) != LUX_BYTE)
+  if (symbol_type(ps[0]) != LUX_INT8)
     return luxerror("Need BYTE array", ps[0]);
   numerical(ps[0], &dims, &ndim, &nelem, &src);
   if (ndim < 2)
@@ -2169,7 +2169,7 @@ int32_t lux_enhanceimage(int32_t narg, int32_t ps[])
     free(hist);
     return cerror(ALLOC_ERR, 0);
   }
-  result = array_clone(ps[0], LUX_BYTE);
+  result = array_clone(ps[0], LUX_INT8);
   if (result == LUX_ERROR) {
     free(hist);
     free(m);
@@ -2243,10 +2243,10 @@ int32_t lux_hamming(int32_t narg, int32_t ps[]) {
   }
 
   if (symbol_type(ps[0]) == LUX_SCALAR) {
-    result = scalar_scratch(LUX_LONG);
+    result = scalar_scratch(LUX_INT32);
     tgt.l = &scalar_value(result).l;
   } else {
-    result = array_scratch(LUX_LONG, ndim, dims);
+    result = array_scratch(LUX_INT32, ndim, dims);
     tgt.l = array_data(result);
   }
 
@@ -2254,7 +2254,7 @@ int32_t lux_hamming(int32_t narg, int32_t ps[]) {
     for (i = 0; i < nelem; i++) {
       uint32_t dist = 0, val;
       switch (type) {
-      case LUX_BYTE:
+      case LUX_INT8:
         val = *src.b++;
         while (val) {
           ++dist;
@@ -2262,7 +2262,7 @@ int32_t lux_hamming(int32_t narg, int32_t ps[]) {
         }
         *tgt.l++ = dist;
         break;
-      case LUX_WORD:
+      case LUX_INT16:
         val = *src.w++;
         while (val) {
           ++dist;
@@ -2270,7 +2270,7 @@ int32_t lux_hamming(int32_t narg, int32_t ps[]) {
         }
         *tgt.l++ = dist;
         break;
-      case LUX_LONG:
+      case LUX_INT32:
         val = *src.l++;
         while (val) {
           ++dist;
@@ -2284,7 +2284,7 @@ int32_t lux_hamming(int32_t narg, int32_t ps[]) {
     for (i = 0; i < nelem; i++) {
       uint32_t dist = 0, val;
       switch (type) {
-      case LUX_BYTE:
+      case LUX_INT8:
         val = *src.b++ ^ *src2.b;
         if (nr2isarray)
           src2.b++;
@@ -2294,7 +2294,7 @@ int32_t lux_hamming(int32_t narg, int32_t ps[]) {
         }
         *tgt.l++ = dist;
         break;
-      case LUX_WORD:
+      case LUX_INT16:
         val = *src.w++ ^ *src2.w;
         if (nr2isarray)
           src2.w++;
@@ -2304,7 +2304,7 @@ int32_t lux_hamming(int32_t narg, int32_t ps[]) {
         }
         *tgt.l++ = dist;
         break;
-      case LUX_LONG:
+      case LUX_INT32:
         val = *src.l++ ^ *src2.l;
         if (nr2isarray)
           src2.l++;

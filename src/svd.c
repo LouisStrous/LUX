@@ -133,17 +133,17 @@ int32_t lux_svd(int32_t narg, int32_t ps[])
   n = d[0]*d[1];
   src = array_data(ps[0]);
   switch (symbol_type(ps[0])) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (n--)
 	*a++ = (double) *src.b++;
       a -= n;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (n--)
 	*a++ = (double) *src.w++;
       a -= n;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (n--)
 	*a++ = (double) *src.l++;
       a -= n;

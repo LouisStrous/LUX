@@ -855,7 +855,7 @@ int32_t lux_calendar(int32_t narg, int32_t ps[])
     type = symbol_type(iq);
     if (isIntegerType(type)) {
       iq = lux_long(1, &iq);
-      inputtype = LUX_LONG;
+      inputtype = LUX_INT32;
     } else if (isFloatType(type)) {
       iq = lux_double(1, &iq);
       inputtype = LUX_DOUBLE;
@@ -907,9 +907,9 @@ int32_t lux_calendar(int32_t narg, int32_t ps[])
      If CaltoCJDN is NULL and the number of input elements per date
      is not equal to 1, then work with a DOUBLE copy of the input
      symbol. */
-  if (inputtype == LUX_LONG) {
+  if (inputtype == LUX_INT32) {
     if (CaltoCJDN && fromtime == totime)
-      internaltype = LUX_LONG;
+      internaltype = LUX_INT32;
     else {
       internaltype = LUX_DOUBLE;
       if (input_elem_per_date != 1) {
@@ -929,11 +929,11 @@ int32_t lux_calendar(int32_t narg, int32_t ps[])
     if (CaltoCJD || fromtime != totime)
       internaltype = LUX_DOUBLE;
     else {
-      internaltype = LUX_LONG;
+      internaltype = LUX_INT32;
       if (input_elem_per_date != 1) {
         int32_t lux_floor(int32_t, int32_t *);
         iq = lux_floor(1, &iq);
-        inputtype = LUX_LONG;
+        inputtype = LUX_INT32;
       }
     }
   }
@@ -944,7 +944,7 @@ int32_t lux_calendar(int32_t narg, int32_t ps[])
     if (outputkind == CAL_DOUBLE)
       internaltype = LUX_DOUBLE;
     else
-      internaltype = LUX_LONG;
+      internaltype = LUX_INT32;
     input_elem_per_date = 1; /* all input elements in a single text value */
   }
   
@@ -958,10 +958,10 @@ int32_t lux_calendar(int32_t narg, int32_t ps[])
   if (outputkind == CAL_TEXT) {
     outputtype = LUX_STRING_ARRAY;
     output_elem_per_date = 1;   /* all date components in a single text value */
-  } else if (outputkind == CAL_LONG || internaltype == LUX_LONG)
-    outputtype = CJDNtoCal? LUX_LONG: LUX_DOUBLE;
+  } else if (outputkind == CAL_LONG || internaltype == LUX_INT32)
+    outputtype = CJDNtoCal? LUX_INT32: LUX_DOUBLE;
   else if (outputkind == CAL_DOUBLE || internaltype == LUX_DOUBLE)
-    outputtype = CJDtoCal? LUX_DOUBLE: LUX_LONG;
+    outputtype = CJDtoCal? LUX_DOUBLE: LUX_INT32;
   else                          /* should not happen */
     outputtype = internaltype;
 
@@ -1031,7 +1031,7 @@ int32_t lux_calendar(int32_t narg, int32_t ps[])
      available. */
   if (outputtype == LUX_STRING_ARRAY)
     switch (internaltype) {
-    case LUX_LONG:
+    case LUX_INT32:
       if (!CJDNtoCalS)
         return luxerror("Translating CJDN to STRING is not supported for this calendar", ps[0]);
       break;
@@ -1049,9 +1049,9 @@ int32_t lux_calendar(int32_t narg, int32_t ps[])
 
     /* translate input to CJD or CJDN */
     switch (internaltype) {
-    case LUX_LONG:              /* translate to CJDN */
+    case LUX_INT32:              /* translate to CJDN */
       switch (inputtype) {
-      case LUX_LONG:
+      case LUX_INT32:
         CaltoCJDN(src.l, &timestamp.l);
         src.l += input_elem_per_date;
         break;
@@ -1067,7 +1067,7 @@ int32_t lux_calendar(int32_t narg, int32_t ps[])
       break;
     case LUX_DOUBLE:            /* translate to CJD */
       switch (inputtype) {
-      case LUX_LONG: /* only cases with one element per date reach here */
+      case LUX_INT32: /* only cases with one element per date reach here */
         assert(input_elem_per_date == 1);
         temp.d = (double) *src.l; /* translate from LONG to DOUBLE */
         CaltoCJD(&temp.d, &timestamp.d); /* use DOUBLE translation */
@@ -1121,9 +1121,9 @@ int32_t lux_calendar(int32_t narg, int32_t ps[])
 
     /* translate CJD or CJDN to output */
     switch (internaltype) {
-    case LUX_LONG:
+    case LUX_INT32:
       switch (outputtype) {
-      case LUX_LONG:
+      case LUX_INT32:
         CJDNtoCal(&timestamp.l, tgt.l);
         tgt.l += output_elem_per_date;
         break;
@@ -1143,7 +1143,7 @@ int32_t lux_calendar(int32_t narg, int32_t ps[])
       break;
     case LUX_DOUBLE:
       switch (outputtype) {
-      case LUX_LONG:
+      case LUX_INT32:
         temp.l = (int32_t) floor(timestamp.d); /* translate from DOUBLE to LONG */
         CJDNtoCal(&temp.l, tgt.l);         /* use LONG translation */
         tgt.l += output_elem_per_date;
@@ -1210,9 +1210,9 @@ int32_t lux_calendar_OLD(int32_t narg, int32_t ps[])
     ndim = 1;
     dims = &n;
     type = scalar_type(iq);
-    if (type < LUX_LONG) {
+    if (type < LUX_INT32) {
       iq = lux_long(1, ps);
-      type = LUX_LONG;
+      type = LUX_INT32;
     } else if (type == LUX_FLOAT) {
       iq = lux_double(1, ps);
       type = LUX_DOUBLE;
@@ -1230,9 +1230,9 @@ int32_t lux_calendar_OLD(int32_t narg, int32_t ps[])
       nRepeat /= 3;
     }
     type = array_type(iq);
-    if (type < LUX_LONG) {
+    if (type < LUX_INT32) {
       iq = lux_long(1, ps);
-      type = LUX_LONG;
+      type = LUX_INT32;
     } else if (type == LUX_FLOAT) {
       iq = lux_double(1, ps);
       type = LUX_DOUBLE;
@@ -1281,13 +1281,13 @@ int32_t lux_calendar_OLD(int32_t narg, int32_t ps[])
       || type == LUX_STRING_ARRAY)
     outtype = LUX_DOUBLE;
 
-  /* if outtype == LUX_LONG, then JD.l contains CJDN values
+  /* if outtype == LUX_INT32, then JD.l contains CJDN values
      if outtype == LUX_DOUBLE, then JD.d contains JD values
      CJDN = floor(JD + 0.5) */
 
   /* temporary space for JDs */
   switch (outtype) {
-  case LUX_LONG:
+  case LUX_INT32:
     JD.l = (int32_t *) malloc(nRepeat*sizeof(int32_t));
     if (!JD.l)
       return cerror(ALLOC_ERR, *ps);
@@ -1349,7 +1349,7 @@ int32_t lux_calendar_OLD(int32_t narg, int32_t ps[])
     case CAL_JD:		/* from Julian Day */
       assert(outtype == LUX_DOUBLE);
       switch (type) {
-      case LUX_LONG:
+      case LUX_INT32:
         for (i = 0; i < nRepeat; i++)
           JD.d[i] = data.l[i];
         break;
@@ -1360,9 +1360,9 @@ int32_t lux_calendar_OLD(int32_t narg, int32_t ps[])
       break;
     case CAL_CJD:		/* from Chronological Julian Day */
       switch (outtype) {
-      case LUX_LONG:
+      case LUX_INT32:
         switch (type) {
-        case LUX_LONG:
+        case LUX_INT32:
           memcpy(JD.l, data.l, nRepeat*sizeof(*JD.l));
           break;
         case LUX_DOUBLE:
@@ -1374,7 +1374,7 @@ int32_t lux_calendar_OLD(int32_t narg, int32_t ps[])
         break;
       case LUX_DOUBLE:
         switch (type) {
-        case LUX_LONG:
+        case LUX_INT32:
           for (i = 0; i < nRepeat; i++)
             JD.d[i] = CJDtoJD((double) data.l[i]);
           break;
@@ -1387,7 +1387,7 @@ int32_t lux_calendar_OLD(int32_t narg, int32_t ps[])
     case CAL_LUNAR:		/* from lunar calendar */
       assert(outtype == LUX_DOUBLE);
       switch (type) {
-      case LUX_LONG:
+      case LUX_INT32:
         for (i = 0; i < nRepeat; i++)
           JD.d[i] = lunarToJD((double) data.l[i]);
         break;
@@ -1400,7 +1400,7 @@ int32_t lux_calendar_OLD(int32_t narg, int32_t ps[])
       break;
     default:
       switch (type) {
-      case LUX_LONG:
+      case LUX_INT32:
         free(JD.l);
         break;
       case LUX_DOUBLE:
@@ -1413,9 +1413,9 @@ int32_t lux_calendar_OLD(int32_t narg, int32_t ps[])
   /* go from FROM_CALENDAR to Julian Date */
   if (cal != CAL_JD)		/* not done yet, calculate Julian date */
     switch (outtype) {
-    case LUX_LONG:              /* convert to CJDN */
+    case LUX_INT32:              /* convert to CJDN */
       switch (type) {
-      case LUX_LONG:
+      case LUX_INT32:
         switch (fromorder) {
         case CAL_YMD:
           for (i = 0; i < nRepeat; i++)
@@ -1447,7 +1447,7 @@ int32_t lux_calendar_OLD(int32_t narg, int32_t ps[])
       break;
     case LUX_DOUBLE:            /* convert to JD */
       switch (type) {
-      case LUX_LONG:
+      case LUX_INT32:
         switch (fromorder) {
         case CAL_YMD:
           for (i = 0; i < nRepeat; i++)
@@ -1506,7 +1506,7 @@ int32_t lux_calendar_OLD(int32_t narg, int32_t ps[])
 	break;
       }
       break;
-    case LUX_LONG:                /* no time translation */
+    case LUX_INT32:                /* no time translation */
       break;
     }
   }
@@ -1734,7 +1734,7 @@ int32_t lux_calendar_OLD(int32_t narg, int32_t ps[])
       free(JD.l);
     return iq;
   case CAL_CJD:		/* /TOCJD */
-    assert(outtype == LUX_LONG);
+    assert(outtype == LUX_INT32);
     if (nRepeat == 1) {	/* need scalar */
       iq = scalar_scratch(outtype);
       data.l = &scalar_value(iq).l;
@@ -1899,7 +1899,7 @@ int32_t lux_calendar_OLD(int32_t narg, int32_t ps[])
           break;
         }
         break;
-      case LUX_LONG:
+      case LUX_INT32:
         switch (toorder) {
         case CAL_YMD:
           *data.l++ = year;
@@ -1936,7 +1936,7 @@ int32_t lux_EasterDate(int32_t narg, int32_t ps[])
 
   switch (symbol_class(*ps))
   { case LUX_SCALAR:
-      iq = lux_long(1, ps);	/* make LUX_LONG */
+      iq = lux_long(1, ps);	/* make LUX_INT32 */
       year = &scalar_value(iq).l;
       nYear = 1;  nDim = 0;
       break;
@@ -1951,7 +1951,7 @@ int32_t lux_EasterDate(int32_t narg, int32_t ps[])
   /* create result */
   *newDims = 3;
   if (nDim) memcpy(newDims + 1, dims, nDim);
-  iq = array_scratch(LUX_LONG, nDim + 1, newDims);
+  iq = array_scratch(LUX_INT32, nDim + 1, newDims);
   ptr = (int32_t *) array_data(iq);
   while (nYear--)
   { if (EasterDate(*year, &month, &day) < 0)
@@ -2340,7 +2340,7 @@ int32_t lux_precess(int32_t narg, int32_t ps[])
   }
   
   switch (symbol_type(ps[0])) {
-  case LUX_BYTE:
+  case LUX_INT8:
     do {
       alpha = *src.b*DEG;
       advanceLoop(&srcinfo, &src);
@@ -2357,7 +2357,7 @@ int32_t lux_precess(int32_t narg, int32_t ps[])
       } while (!done);
     } while (done < srcinfo.rndim);
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     do {
       alpha = *src.w*DEG;
       advanceLoop(&srcinfo, &src);
@@ -2374,7 +2374,7 @@ int32_t lux_precess(int32_t narg, int32_t ps[])
       } while (!done);
     } while (done < srcinfo.rndim);
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     do {
       alpha = *src.l*DEG;
       advanceLoop(&srcinfo, &src);
@@ -2484,7 +2484,7 @@ int32_t lux_constellation(int32_t narg, int32_t ps[])
   vocal = internalMode & 4;
 
   n = standardLoop(ps[0], LUX_ZERO, SL_AXISCOORD | SL_COMPRESS,
-		   LUX_BYTE, &srcinfo, &src, &result, &tgtinfo, &tgt);
+		   LUX_INT8, &srcinfo, &src, &result, &tgtinfo, &tgt);
   if (n == LUX_ERROR)
     return n;
   if (srcinfo.ndim < 1) {
@@ -2497,7 +2497,7 @@ int32_t lux_constellation(int32_t narg, int32_t ps[])
   }
 
   switch (symbol_type(ps[0])) {
-  case LUX_BYTE:
+  case LUX_INT8:
     do {
       alpha = *src.b*DEG;
       advanceLoop(&srcinfo, &src);
@@ -2520,7 +2520,7 @@ int32_t lux_constellation(int32_t narg, int32_t ps[])
       advanceLoop(&tgtinfo, &tgt);
     } while (done < srcinfo.rndim);
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     do {
       alpha = *src.w*DEG;
       advanceLoop(&srcinfo, &src);
@@ -2543,7 +2543,7 @@ int32_t lux_constellation(int32_t narg, int32_t ps[])
       advanceLoop(&tgtinfo, &tgt);
     } while (done < srcinfo.rndim);
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     do {
       alpha = *src.l*DEG;
       advanceLoop(&srcinfo, &src);
@@ -2637,7 +2637,7 @@ int32_t lux_constellationname(int32_t narg, int32_t ps[])
   }
   nc = sizeof(constellation_names)/sizeof(char *);
   switch (symbol_type(ps[0])) {
-  case LUX_BYTE:
+  case LUX_INT8:
     while (n--) {
       if (*src.b >= nc)
 	*tgt = strdup("***");
@@ -2647,7 +2647,7 @@ int32_t lux_constellationname(int32_t narg, int32_t ps[])
       src.b++;
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     while (n--) {
       if (*src.w < 0 || *src.w >= nc)
 	*tgt = strdup("***");
@@ -2657,7 +2657,7 @@ int32_t lux_constellationname(int32_t narg, int32_t ps[])
       src.w++;
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     while (n--) {
       if (*src.l < 0 || *src.l >= nc)
 	*tgt = strdup("***");
@@ -3940,15 +3940,15 @@ int32_t lux_astrf(int32_t narg, int32_t ps[], int32_t forward) {
     switch (tgtinfo.type) {
     case LUX_FLOAT:
       switch (srcinfo.type) {
-      case LUX_BYTE:
+      case LUX_INT8:
 	pos[0] = (double) src.b[0]*DEG;
 	pos[1] = (double) src.b[1]*DEG;
 	break;
-      case LUX_WORD:
+      case LUX_INT16:
 	pos[0] = (double) src.w[0]*DEG;
 	pos[1] = (double) src.w[1]*DEG;
 	break;
-      case LUX_LONG:
+      case LUX_INT32:
 	pos[0] = (double) src.l[0]*DEG;
 	pos[1] = (double) src.l[1]*DEG;
 	break;
@@ -3980,15 +3980,15 @@ int32_t lux_astrf(int32_t narg, int32_t ps[], int32_t forward) {
       break;
     case LUX_DOUBLE:
       switch (srcinfo.type) {
-      case LUX_BYTE:
+      case LUX_INT8:
 	pos[0] = (double) src.b[0]*DEG;
 	pos[1] = (double) src.b[1]*DEG;
 	break;
-      case LUX_WORD:
+      case LUX_INT16:
 	pos[0] = (double) src.w[0]*DEG;
 	pos[1] = (double) src.w[1]*DEG;
 	break;
-      case LUX_LONG:
+      case LUX_INT32:
 	pos[0] = (double) src.l[0]*DEG;
 	pos[1] = (double) src.l[1]*DEG;
 	break;

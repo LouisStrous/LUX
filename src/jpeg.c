@@ -116,7 +116,7 @@ int32_t read_jpeg6b(int32_t narg, int32_t ps[], int32_t isFunc)
     dims[i++] = cinfo.output_components;
   dims[i++] = cinfo.output_width;
   dims[i++] = cinfo.output_height;
-  if (to_scratch_array(*ps, LUX_BYTE, i, dims) == LUX_ERROR)
+  if (to_scratch_array(*ps, LUX_INT8, i, dims) == LUX_ERROR)
     goto read_jpeg6b_1;
   image = (JSAMPLE *) array_data(*ps);
   stride = cinfo.output_width*cinfo.output_components;
@@ -201,7 +201,7 @@ int32_t write_jpeg6b(int32_t narg, int32_t ps[], int32_t isFunc)
     return isFunc? LUX_ERROR: cerror(ILL_NUM_DIM, ps[0]);
   if (nd == 3 && array_dims(ps[0])[0] != 3)
     return isFunc? LUX_ERROR: luxerror("When saving an RGB image, the first dimension must have 3 elements", ps[0]);
-  if (array_type(ps[0]) != LUX_BYTE)
+  if (array_type(ps[0]) != LUX_INT8)
     return isFunc? LUX_ERROR: luxerror("Only JPEG compression of BYTE arrays is supported", ps[0]);
   nx = array_dims(ps[0])[0 + (nd == 3)];
   ny = array_dims(ps[0])[1 + (nd == 3)];

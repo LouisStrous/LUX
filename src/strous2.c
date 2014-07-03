@@ -213,7 +213,7 @@ int32_t lux_psum(int32_t narg, int32_t ps[])
       nIndex = array_size(iq);
       if (nIndex != size)
 	return cerror(INCMP_ARR, ps[3]);
-      minmax(index, nIndex, LUX_LONG); /* determine range of indices */
+      minmax(index, nIndex, LUX_INT32); /* determine range of indices */
       size = lastmax.l + 1;
       offset = 0;
       if (lastmin.l < 0)
@@ -276,13 +276,13 @@ int32_t lux_psum(int32_t narg, int32_t ps[])
   done3 = !haveClass && !(internalMode & 8);
   do {			      /* loop over all elements */
     switch (type) {
-      case LUX_BYTE:
+      case LUX_INT8:
 	value = (double) *src.b;
 	break;
-      case LUX_WORD:
+      case LUX_INT16:
 	value = (double) *src.w;
 	break;
-      case LUX_LONG:
+      case LUX_INT32:
 	value = (double) *src.l;
 	break;
       case LUX_FLOAT:
@@ -363,7 +363,7 @@ int32_t multiCompare(const void *arg1, const void *arg2)
   i1 = *(int32_t *) arg1;
   i2 = *(int32_t *) arg2;
   switch (multiCompType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     for (i = 0; i < multiCompNCoord; i++) {
       d.l = (int32_t) multiCompData.b[i1 + i*multiCompNPoints]
 	- (int32_t) multiCompData.b[i2 + i*multiCompNPoints];
@@ -371,7 +371,7 @@ int32_t multiCompare(const void *arg1, const void *arg2)
 	return d.l;
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     for (i = 0; i < multiCompNCoord; i++) {
       d.l = (int32_t) multiCompData.w[i1 + i*multiCompNPoints]
 	- (int32_t) multiCompData.w[i2 + i*multiCompNPoints];
@@ -379,7 +379,7 @@ int32_t multiCompare(const void *arg1, const void *arg2)
 	return d.l;
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     for (i = 0; i < multiCompNCoord; i++) {
       d.l = (int32_t) multiCompData.l[i1 + i*multiCompNPoints]
 	- (int32_t) multiCompData.l[i2 + i*multiCompNPoints];
@@ -443,7 +443,7 @@ int32_t lux_tolookup(int32_t narg, int32_t ps[])
     if (multiCompare(order + i, order + i + 1))
       n++;
   j = (multiCompNCoord > 1)? nd - 1: nd;
-  redef_array(ps[2], LUX_LONG, j, index); /* INDEX */
+  redef_array(ps[2], LUX_INT32, j, index); /* INDEX */
   index = (int32_t *) array_data(ps[2]);
   dims[0] = n;
   dims[1] = multiCompNCoord;
@@ -476,15 +476,15 @@ int32_t mcmp(const void *x1, const void *x2)
   scalar	d1, d2;
 
   switch (type)
-  { case LUX_BYTE:
+  { case LUX_INT8:
       d1.b = src.b[*(int32_t *) x1];
       d2.b = src.b[*(int32_t *) x2];
       return d1.b < d2.b? -1: (d1.b > d2.b? 1: 0);
-    case LUX_WORD:
+    case LUX_INT16:
       d1.w = src.w[*(int32_t *) x1];
       d2.w = src.w[*(int32_t *) x2];
       return d1.w < d2.w? -1: (d1.w > d2.w? 1: 0);
-    case LUX_LONG:
+    case LUX_INT32:
       d1.l = src.l[*(int32_t *) x1];
       d2.l = src.l[*(int32_t *) x2];
       return d1.l < d2.l? -1: (d1.l > d2.l? 1: 0);
@@ -502,13 +502,13 @@ int32_t mcmp(const void *x1, const void *x2)
 int32_t cmp(const void *x1, const void *x2)
 {
   switch (type) {
-    case LUX_BYTE:
+    case LUX_INT8:
       return *(uint8_t *) x1 < *(uint8_t *) x2? -1:
 	(*(uint8_t *) x1 > *(uint8_t *) x2? 1: 0);
-    case LUX_WORD:
+    case LUX_INT16:
       return *(int16_t *) x1 < *(int16_t *) x2? -1:
 	(*(int16_t *) x1 > *(int16_t *) x2? 1: 0);
-    case LUX_LONG:
+    case LUX_INT32:
       return *(int32_t *) x1 < *(int32_t *) x2? -1:
 	(*(int32_t *) x1 > *(int32_t *) x2? 1: 0);
     case LUX_FLOAT:
@@ -606,7 +606,7 @@ int32_t lux_orderfilter(int32_t narg, int32_t ps[])
   for (i = 0; i < srcinfo.naxes; i++)
     range[i] = width;
   tmpsrc = src;			/* just to be safe */
-  setupDimensionLoop(&tmpinfo, srcinfo.naxes, range, LUX_LONG, srcinfo.naxes,
+  setupDimensionLoop(&tmpinfo, srcinfo.naxes, range, LUX_INT32, srcinfo.naxes,
 		     NULL, &tmpsrc, SL_EACHCOORD);
 
   index = malloc(nelem*sizeof(int32_t));
@@ -644,13 +644,13 @@ int32_t lux_orderfilter(int32_t narg, int32_t ps[])
     memcpy(index, offset, nelem*sizeof(int32_t));
     qsort(index, nelem, sizeof(*index), mcmp);
     switch (type) {
-      case LUX_BYTE:
+      case LUX_INT8:
 	*trgt.b = src.b[index[med]];
 	break;
-      case LUX_WORD:
+      case LUX_INT16:
 	*trgt.w = src.w[index[med]];
 	break;
-      case LUX_LONG:
+      case LUX_INT32:
 	*trgt.l = src.l[index[med]];
 	break;
       case LUX_FLOAT:
@@ -738,19 +738,19 @@ int32_t lux_quantile(int32_t narg, int32_t ps[])
     } while (advanceLoop(&srcinfo, &src) < srcinfo.naxes);
     qsort(tmp0.b, nelem, srcinfo.stride, cmp);
     switch (type) {
-      case LUX_BYTE:
+      case LUX_INT8:
 	if (nelem % 2)
 	  *trgt.b = tmp0.b[med];
 	else
 	  *trgt.b = ((int16_t) tmp0.b[med] + tmp0.b[med + 1])/2;
 	break;
-      case LUX_WORD:
+      case LUX_INT16:
 	if (nelem % 2)
 	  *trgt.w = tmp0.w[med];
 	else
 	  *trgt.w = ((int32_t) tmp0.w[med] + tmp0.w[med + 1])/2;
 	break;
-      case LUX_LONG:
+      case LUX_INT32:
 	if (nelem % 2)
 	  *trgt.l = tmp0.l[med];
 	else
@@ -796,12 +796,12 @@ int32_t lux_minfilter(int32_t narg, int32_t ps[])
   loopInfo	srcinfo, trgtinfo;
 
   if (standardLoop(ps[0], narg > 2? ps[1]: 0,
-		   SL_SAMEDIMS | SL_UPGRADE | SL_EACHROW, LUX_BYTE,
+		   SL_SAMEDIMS | SL_UPGRADE | SL_EACHROW, LUX_INT8,
 		   &srcinfo, &src, &result, &trgtinfo, &trgt) < 0)
     return LUX_ERROR;
   if (narg > 1) {		/* <width> */
-    /* check that it is numerical and ensure that it is LUX_LONG */
-    if (getNumerical(ps[narg - 1], LUX_LONG, &nWidth, &width,
+    /* check that it is numerical and ensure that it is LUX_INT32 */
+    if (getNumerical(ps[narg - 1], LUX_INT32, &nWidth, &width,
 		     GN_UPDATE | GN_UPGRADE, NULL, NULL) < 0)
       return LUX_ERROR;
     if (nWidth > 1 && nWidth != srcinfo.naxes)
@@ -829,7 +829,7 @@ int32_t lux_minfilter(int32_t narg, int32_t ps[])
     switch (type) {
       default:
 	return cerror(ILL_TYPE, ps[0]);
-      case LUX_BYTE:
+      case LUX_INT8:
 	do {
 	  value.b = bounds.max.b;	/* initialize */
 	  for (i = 0; i < ww; i++) { /* do the left edge */
@@ -866,7 +866,7 @@ int32_t lux_minfilter(int32_t narg, int32_t ps[])
 	} while (advanceLoop(&trgtinfo, &trgt),
 		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
-      case LUX_WORD:
+      case LUX_INT16:
 	do {
 	  value.w = bounds.max.w;	/* initialize */
 	  for (i = 0; i < ww; i++) { /* do the left edge */
@@ -903,7 +903,7 @@ int32_t lux_minfilter(int32_t narg, int32_t ps[])
 	} while (advanceLoop(&trgtinfo, &trgt),
 		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
-      case LUX_LONG:
+      case LUX_INT32:
 	do {
 	  value.l = bounds.max.l;	/* initialize */
 	  for (i = 0; i < ww; i++) { /* do the left edge */
@@ -1046,12 +1046,12 @@ int32_t lux_maxfilter(int32_t narg, int32_t ps[])
   loopInfo	srcinfo, trgtinfo;
 
   if (standardLoop(ps[0], narg > 2? ps[1]: 0,
-		   SL_SAMEDIMS | SL_UPGRADE | SL_EACHROW, LUX_BYTE,
+		   SL_SAMEDIMS | SL_UPGRADE | SL_EACHROW, LUX_INT8,
 		   &srcinfo, &src, &result, &trgtinfo, &trgt) < 0)
     return LUX_ERROR;
   if (narg > 1) {		/* <width> */
-    /* check that it is numerical and ensure that it is LUX_LONG */
-    if (getNumerical(ps[narg - 1], LUX_LONG, &nWidth, &width,
+    /* check that it is numerical and ensure that it is LUX_INT32 */
+    if (getNumerical(ps[narg - 1], LUX_INT32, &nWidth, &width,
 		     GN_UPGRADE | GN_UPDATE, NULL, NULL) < 0)
       return LUX_ERROR;
     if (nWidth > 1 && nWidth != srcinfo.naxes)
@@ -1079,7 +1079,7 @@ int32_t lux_maxfilter(int32_t narg, int32_t ps[])
     switch (type) {
       default:
 	return cerror(ILL_TYPE, ps[0]);
-      case LUX_BYTE:
+      case LUX_INT8:
 	do {
 	  value.b = bounds.min.b;	/* initialize */
 	  for (i = 0; i < ww; i++) { /* do the left edge */
@@ -1116,7 +1116,7 @@ int32_t lux_maxfilter(int32_t narg, int32_t ps[])
 	} while (advanceLoop(&trgtinfo, &trgt),
 		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
-      case LUX_WORD:
+      case LUX_INT16:
 	do {
 	  value.w = bounds.min.w;	/* initialize */
 	  for (i = 0; i < ww; i++) { /* do the left edge */
@@ -1153,7 +1153,7 @@ int32_t lux_maxfilter(int32_t narg, int32_t ps[])
 	} while (advanceLoop(&trgtinfo, &trgt),
 		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
-      case LUX_LONG:
+      case LUX_INT32:
 	do {
 	  value.l = bounds.min.l;	/* initialize */
 	  for (i = 0; i < ww; i++) { /* do the left edge */
@@ -1413,7 +1413,7 @@ int32_t lux_multisieve(int32_t narg, int32_t ps[])
   step = lux_type_size[maxType];
 
   n = ny + 1;
-  if (redef_array(ps[3], LUX_LONG, 1, &n) < 0) /* <indices> */
+  if (redef_array(ps[3], LUX_INT32, 1, &n) < 0) /* <indices> */
     return -1;
   indexData = array_data(ps[3]);
   indexData[0] = 0;
@@ -1442,21 +1442,21 @@ int32_t lux_multisieve(int32_t narg, int32_t ps[])
   { while (nnTemp > 3 && ix < nx)
     { match = -1;		/* default: no match */
       switch (maxType)
-      { case LUX_BYTE:
+      { case LUX_INT8:
 	  for (i = 0; i < ny; i++)
 	    if (*xData.b == yData.b[i])
 	    { match = i;
 	      indexData[match]++; /* count */
 	      break; }
 	  break;
-	case LUX_WORD:
+	case LUX_INT16:
 	  for (i = 0; i < ny; i++)
 	    if (*xData.w == yData.w[i])
 	    { match = i;
 	      indexData[match]++; /* count */
 	      break; }
 	  break;
-	case LUX_LONG:
+	case LUX_INT32:
 	  for (i = 0; i < ny; i++)
 	    if (*xData.l == yData.l[i])
 	    { match = i;
@@ -1521,10 +1521,10 @@ int32_t lux_multisieve(int32_t narg, int32_t ps[])
   if (!nMatch)			/* no matches at all: return -1 */
   { undefine(ps[2]);
     symbol_class(ps[2]) = LUX_SCALAR;
-    scalar_type(ps[2]) = LUX_LONG;
+    scalar_type(ps[2]) = LUX_INT32;
     scalar_value(ps[2]).l = -1; }
   else
-  { if (redef_array(ps[2], LUX_LONG, 1, &nMatch) < 0) /* <list> */
+  { if (redef_array(ps[2], LUX_INT32, 1, &nMatch) < 0) /* <list> */
       return -1;		/* some error */
     listData = array_data(ps[2]);
   
@@ -1603,7 +1603,7 @@ int32_t shift(int32_t narg, int32_t ps[], int32_t isFunction)
     /* SHIFT(x) */
     /* create <dist> = DIMEN(<x>)/2 */
     iq = array_num_dims(ps[0]);
-    distSym = array_scratch(LUX_LONG, 1, &iq);
+    distSym = array_scratch(LUX_INT32, 1, &iq);
     ptr = array_data(distSym);
     memcpy(ptr, array_dims(ps[0]), iq*sizeof(int32_t));
     for (i = 0; i < iq; i++) {
@@ -1632,12 +1632,12 @@ int32_t shift(int32_t narg, int32_t ps[], int32_t isFunction)
   if (isFunction) {
     if (standardLoop(ps[0], axesSym,
 		     SL_UPGRADE | SL_UNIQUEAXES | SL_EACHROW | SL_AXISCOORD,
-		     LUX_BYTE, &srcinfo, &src, &iq, &trgtinfo, &trgt) < 0)
+		     LUX_INT8, &srcinfo, &src, &iq, &trgtinfo, &trgt) < 0)
       return LUX_ERROR;
   } else {
     if (standardLoop(ps[0], axesSym,
 		     SL_UPGRADE | SL_UNIQUEAXES | SL_EACHROW | SL_AXISCOORD,
-		     LUX_BYTE, &srcinfo, &src, NULL, NULL, NULL) < 0)
+		     LUX_INT8, &srcinfo, &src, NULL, NULL, NULL) < 0)
       return LUX_ERROR;
     trgtinfo = srcinfo;
     trgtinfo.data = &trgt;
@@ -1839,7 +1839,7 @@ int32_t lux_equivalence(int32_t narg, int32_t ps[])
     return cerror(INCMP_ARR, ps[2]);
   x1 = (int32_t *) array_data(lux_long(1, ps));
   x2 = (int32_t *) array_data(lux_long(1, ps + 1));
-  result = array_clone(ps[0], LUX_LONG);
+  result = array_clone(ps[0], LUX_INT32);
   trgt = (int32_t *) array_data(result);
   mx = INT32_MIN;
   mn = INT32_MAX;
@@ -1903,9 +1903,9 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
   if ((degree
        && standardLoop(ps[0], 0,
 		       SL_ALLAXES | SL_SAMEDIMS | SL_EXACT | SL_EACHCOORD,
-		       LUX_LONG, &srcinfo, &src, &result, &trgtinfo, &trgt)
+		       LUX_INT32, &srcinfo, &src, &result, &trgtinfo, &trgt)
        < 0)
-      || standardLoop(ps[0], 0, SL_ALLAXES | SL_EACHCOORD, LUX_BYTE,
+      || standardLoop(ps[0], 0, SL_ALLAXES | SL_EACHCOORD, LUX_INT8,
 		      &srcinfo, &src, NULL, NULL, NULL) < 0)
     return LUX_ERROR;
 
@@ -1960,7 +1960,7 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
   
   /* now do the loop work */
   switch (array_type(ps[0])) {
-    case LUX_BYTE:
+    case LUX_INT8:
       do {
 	nok = 1 - degree;
 	for (j = 0; j < n; j++) {	/* all directions */	  
@@ -1985,7 +1985,7 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
 	  advanceLoop(&srcinfo, &src);
       } while (done < srcinfo.ndim);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       do {
 	nok = 1 - degree;
 	for (j = 0; j < n; j++) {	/* all directions */	  
@@ -2010,7 +2010,7 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
 	  advanceLoop(&srcinfo, &src);
       } while (done < srcinfo.ndim);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       do {
 	nok = 1 - degree;
 	for (j = 0; j < n; j++) {	/* all directions */	  
@@ -2099,12 +2099,12 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
       case 1: case 3:		/* find positions */
 	if (!(internalMode & 4) && !subgrid) {	/* not /COORDS, not /SUBGRID */
 	  srcinfo.coords[0] = n;	/* number of found extrema */
-	  result = array_scratch(LUX_LONG, 1, srcinfo.coords);
+	  result = array_scratch(LUX_INT32, 1, srcinfo.coords);
 	  trgt.l = (int32_t *) array_data(result);
 	} else {
 	  srcinfo.coords[0] = srcinfo.ndim; /* # dimensions in the data */
 	  srcinfo.coords[1] = n;	/* number of found extrema */
-	  result = array_scratch(subgrid? LUX_FLOAT: LUX_LONG, 2,
+	  result = array_scratch(subgrid? LUX_FLOAT: LUX_INT32, 2,
 				 srcinfo.coords);
 	  trgt.l = (int32_t *) array_data(result);
 	}
@@ -2140,7 +2140,7 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
 	  k /= srcinfo.dims[i];
 	} /* end of for (i = 0;...) */
 	switch (symbol_type(ps[0])) {
-	  case LUX_BYTE:
+	  case LUX_INT8:
 	    srcl.b = src.b + index;
 	    value = (float) *srcl.b;
 	    for (i = 0; i < nDiagonal; i++)
@@ -2169,7 +2169,7 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
 		       - (float) srcl.b[srcinfo.step[j]
 				       - srcinfo.step[i]])/4;
 	    break;
-	  case LUX_WORD:
+	  case LUX_INT16:
 	    srcl.w = src.w + index;
 	    value = (float) *srcl.w;
 	    for (i = 0; i < nDiagonal; i++)
@@ -2198,7 +2198,7 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
 		       - (float) srcl.w[srcinfo.step[j]
 				       - srcinfo.step[i]])/4;
 	    break;
-	  case LUX_LONG:
+	  case LUX_INT32:
 	    srcl.l = src.l + index;
 	    value = (float) *srcl.l;
 	    for (i = 0; i < nDiagonal; i++)
@@ -2329,13 +2329,13 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
 	while (n--) {
 	  index = *trgt0.l++;
 	  switch (symbol_type(ps[0])) {
-	    case LUX_BYTE:
+	    case LUX_INT8:
 	      value = (float) src.b[index];
 	      break;
-	    case LUX_WORD:
+	    case LUX_INT16:
 	      value = (float) src.w[index];
 	      break;
-	    case LUX_LONG:
+	    case LUX_INT32:
 	      value = (float) src.l[index];
 	      break;
 	    case LUX_FLOAT:
@@ -2407,7 +2407,7 @@ int32_t lux_replace_values(int32_t narg, int32_t ps[])
   type = symbol_type(ps[0]);
   
   switch (type) {
-  case LUX_BYTE:
+  case LUX_INT8:
     mid = 0;
     v.b = *data.b + 1;
     while (nData--) {		/* all data points */
@@ -2435,7 +2435,7 @@ int32_t lux_replace_values(int32_t narg, int32_t ps[])
       data.b++;
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     mid = 0;
     v.w = *data.w + 1;
     while (nData--) {		/* all data points */
@@ -2463,7 +2463,7 @@ int32_t lux_replace_values(int32_t narg, int32_t ps[])
       data.w++;
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     mid = 0;
     v.l = *data.l + 1;
     while (nData--) {		/* all data points */
@@ -2927,7 +2927,7 @@ Theory:
     axisSym = ps[2];
   } else {			/* default: all <y> axes */
     axisSym = array_num_dims(ps[1]);
-    axisSym = array_scratch(LUX_LONG, 1, &axisSym);
+    axisSym = array_scratch(LUX_INT32, 1, &axisSym);
     axisSym = lux_indgen(1, &axisSym);
   }
   
@@ -3269,12 +3269,12 @@ int32_t lux_runprod(int32_t narg, int32_t ps[])
 
   if (standardLoop(ps[0], narg > 1? ps[1]: 0,
 		   SL_SAMEDIMS | SL_UPGRADE | SL_ONEAXIS | SL_NEGONED,
-		   LUX_BYTE,
+		   LUX_INT8,
 		   &srcinfo, &src, &result, &trgtinfo, &trgt) == LUX_ERROR)
     return LUX_ERROR;
 
   switch (srcinfo.type) {
-    case LUX_BYTE:
+    case LUX_INT8:
       value.b = 1;
       do {
 	value.b *= *src.b;
@@ -3284,7 +3284,7 @@ int32_t lux_runprod(int32_t narg, int32_t ps[])
 	  value.b = 1;
       } while (n < srcinfo.rndim);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       value.w = 1;
       do {
 	value.w *= *src.w;
@@ -3294,7 +3294,7 @@ int32_t lux_runprod(int32_t narg, int32_t ps[])
 	  value.w = 1;
       } while (n < srcinfo.rndim);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       value.l = 1;
       do {
 	value.l *= *src.l;

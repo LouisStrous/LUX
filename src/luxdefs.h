@@ -88,10 +88,10 @@ typedef enum {
 
 /** \enum LUX symbol types */
 typedef enum {
-  LUX_BYTE,                     /*!< (0) 1-byte integers */
-  LUX_WORD,                     /*!< (1) 2-byte integers */
-  LUX_LONG,                     /*!< (2) 4-byte integers */
-  LUX_QUAD,                     /*!< (3) 8-byte integers */
+  LUX_INT8,                     /*!< (0) 1-byte integers */
+  LUX_INT16,                     /*!< (1) 2-byte integers */
+  LUX_INT32,                     /*!< (2) 4-byte integers */
+  LUX_INT64,                     /*!< (3) 8-byte integers */
   LUX_FLOAT,                    /*!< (4) 4-byte floats */
   LUX_DOUBLE,                   /*!< (5) 8-byte floats */
   LUX_TEMP_STRING,              /*!< (6) temporary strings */
@@ -804,33 +804,33 @@ extern char *symbolStack[];
         /* multi-type macro */
 #define multiSwitch2(type, first, second) \
  switch (type) \
- { case LUX_BYTE:   first .b second ; break; \
-   case LUX_WORD:   first .w second ; break; \
-   case LUX_LONG:   first .l second ; break; \
+ { case LUX_INT8:   first .b second ; break; \
+   case LUX_INT16:   first .w second ; break; \
+   case LUX_INT32:   first .l second ; break; \
    case LUX_FLOAT:  first .f second ; break; \
    case LUX_DOUBLE: first .d second ; break; }
 
 #define multiSwitch3(type, first, second, third) \
  switch (type) \
- { case LUX_BYTE:   first .b second .b third ; break; \
-   case LUX_WORD:   first .w second .w third ; break; \
-   case LUX_LONG:   first .l second .l third ; break; \
+ { case LUX_INT8:   first .b second .b third ; break; \
+   case LUX_INT16:   first .w second .w third ; break; \
+   case LUX_INT32:   first .l second .l third ; break; \
    case LUX_FLOAT:  first .f second .f third ; break; \
    case LUX_DOUBLE: first .d second .d third ; break; }
 
 #define multiSwitch4(type, first, second, third, fourth) \
  switch (type) \
- { case LUX_BYTE:   first .b second .b third .b fourth ; break; \
-   case LUX_WORD:   first .w second .w third .b fourth ; break; \
-   case LUX_LONG:   first .l second .l third .b fourth ; break; \
+ { case LUX_INT8:   first .b second .b third .b fourth ; break; \
+   case LUX_INT16:   first .w second .w third .b fourth ; break; \
+   case LUX_INT32:   first .l second .l third .b fourth ; break; \
    case LUX_FLOAT:  first .f second .f third .b fourth ; break; \
    case LUX_DOUBLE: first .d second .d third .b fourth ; break; }
 
 #define multiSwitch5(type, first, second, third, fourth, fifth) \
  switch (type) \
- { case LUX_BYTE:   first .b second .b third .b fourth .b fifth ; break; \
-   case LUX_WORD:   first .w second .w third .b fourth .b fifth ; break; \
-   case LUX_LONG:   first .l second .l third .b fourth .b fifth ; break; \
+ { case LUX_INT8:   first .b second .b third .b fourth .b fifth ; break; \
+   case LUX_INT16:   first .w second .w third .b fourth .b fifth ; break; \
+   case LUX_INT32:   first .l second .l third .b fourth .b fifth ; break; \
    case LUX_FLOAT:  first .f second .f third .b fourth .b fifth ; break; \
    case LUX_DOUBLE: first .d second .d third .b fourth .b fifth ; break; }
 

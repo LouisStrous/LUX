@@ -231,11 +231,11 @@ int32_t setup_x_visual(int32_t desiredVisualClass)
 
   /* we may need more than 8 bits to specify a color index */
   if (depth <= 8*sizeof(uint8_t))
-    colorIndexType = LUX_BYTE;
+    colorIndexType = LUX_INT8;
   else if (depth <= 8*sizeof(int32_t))
-    colorIndexType = LUX_WORD;
+    colorIndexType = LUX_INT16;
   else if (depth <= 8*sizeof(int64_t))
-    colorIndexType = LUX_LONG;
+    colorIndexType = LUX_INT32;
 
   /* 5. get a colormap for the selected visual */
   /* for read-write colormaps, we first try to find enough color cells in */
@@ -1025,9 +1025,9 @@ int32_t lux_colorComponents(int32_t narg, int32_t ps[])
 
   data = array_data(ps[0]);
   nelem = array_size(ps[0]);
-  to_scratch_array(ps[1], LUX_BYTE, array_num_dims(ps[0]), array_dims(ps[0]));
-  to_scratch_array(ps[2], LUX_BYTE, array_num_dims(ps[0]), array_dims(ps[0]));
-  to_scratch_array(ps[3], LUX_BYTE, array_num_dims(ps[0]), array_dims(ps[0]));
+  to_scratch_array(ps[1], LUX_INT8, array_num_dims(ps[0]), array_dims(ps[0]));
+  to_scratch_array(ps[2], LUX_INT8, array_num_dims(ps[0]), array_dims(ps[0]));
+  to_scratch_array(ps[3], LUX_INT8, array_num_dims(ps[0]), array_dims(ps[0]));
   red = array_data(ps[1]);
   green = array_data(ps[2]);
   blue = array_data(ps[3]);
@@ -1117,9 +1117,9 @@ int32_t lux_pixelsto8bit(int32_t narg, int32_t ps[])
     uint8_t *p, *q;
     int32_t *q1, step, *q2, *q3;
 
-    /* we can use the indices from tolookup if we convert them to LUX_BYTE */
+    /* we can use the indices from tolookup if we convert them to LUX_INT8 */
     if (lux_byte_inplace(1, ps + 2) == LUX_ERROR
-	|| redef_array(iq, LUX_BYTE, 2, dims) == LUX_ERROR)
+	|| redef_array(iq, LUX_INT8, 2, dims) == LUX_ERROR)
       goto error_1;
     q = array_data(iq);
     p = array_data(ps[1]);

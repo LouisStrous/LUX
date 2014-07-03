@@ -323,12 +323,12 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
     if (!gotSample		/* no SAMPLE */
 	&& symbol_class(ps[2]) == LUX_ARRAY /* INDEX is an array */
 	&& array_size(ps[2]) == nVectors /* an index for each data point */
-	&& (int32_t) array_type(ps[2]) <= LUX_LONG) { /* integer data type */
+	&& (int32_t) array_type(ps[2]) <= LUX_INT32) { /* integer data type */
       indexType = array_type(ps[2]);	/* index data type */
       useIndex = 1;		/* default: useful indices */
       clusterNumber.b = (uint8_t *) array_data(ps[2]);
       switch (indexType) {
-	case LUX_BYTE:
+	case LUX_INT8:
 	  for (i = 0; i < nVectors; i++)
 	    if ((int32_t) clusterNumber.b[i] >= nClusters) { /* index too large */
 	      printf("CLUSTER - illegal index #%1d (%1d), ignore all\n",
@@ -337,7 +337,7 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
 	      break;
 	    }
 	  break;
-	case LUX_WORD:
+	case LUX_INT16:
 	  for (i = 0; i < nClusters; i++)
 	    if (clusterNumber.w[i] < 0 /* index too small */
 		|| clusterNumber.w[i] >= nClusters) { /* index too large */
@@ -347,7 +347,7 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
 	      break;
 	    }
 	  break;
-	case LUX_LONG:
+	case LUX_INT32:
 	  for (i = 0; i < nClusters; i++)
 	    if (clusterNumber.l[i] < 0 /* index too small */
 		|| clusterNumber.l[i] >= nClusters) { /* index too large */
@@ -361,12 +361,12 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
     } /* end of if (symbol_class(ps[2]) == LUX_ARRAY && ...) */
   }
   if (!useIndex) {	/* no sufficient memory yet for cluster numbers */
-    if (nClusters - 1 <= UINT8_MAX)	/* LUX_BYTE will do it */
-      indexType = LUX_BYTE;
-    else if (nClusters - 1 <= INT16_MAX) /* LUX_WORD to store biggest index */
-      indexType = LUX_WORD;
-    else			/* need LUX_LONG */
-      indexType = LUX_LONG;
+    if (nClusters - 1 <= UINT8_MAX)	/* LUX_INT8 will do it */
+      indexType = LUX_INT8;
+    else if (nClusters - 1 <= INT16_MAX) /* LUX_INT16 to store biggest index */
+      indexType = LUX_INT16;
+    else			/* need LUX_INT32 */
+      indexType = LUX_INT32;
     if (gotIndex && !gotSample)	{ /* have a variable, redefine */
       redef_array(ps[2], indexType , nDataDims - 1, dataDims + 1);
       clusterNumber.b = (uint8_t *) array_data(ps[2]);
@@ -553,7 +553,7 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
   free(findex);
 
   if (gotSize) {		/* SIZE was specified by user */
-    redef_array(ps[3], LUX_LONG, 1, &nClusters); /* get in shape */
+    redef_array(ps[3], LUX_INT32, 1, &nClusters); /* get in shape */
     clusterSize = (int32_t *) array_data(ps[3]);
   } else {				/* no SIZE specified */
     clusterSize = malloc(nClusters*sizeof(int32_t)); /* so allocate some space */
@@ -566,19 +566,19 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
       && (update || gotSize)	/* going to update cluster centers */
       && !gotPhantom) {		/* user did not ask for phantom clusters */
     switch (indexType) {
-      case LUX_BYTE:
+      case LUX_INT8:
 	for (i = 0; i < nSample; i++) {
 	  j = clusterOtoC[clusterNumber.b[i]];
 	  clusterSize[j]++;
 	}
 	break;
-      case LUX_WORD:
+      case LUX_INT16:
 	for (i = 0; i < nSample; i++) {
 	  j = clusterOtoC[clusterNumber.w[i]];
 	  clusterSize[j]++;
 	}
 	break;
-      case LUX_LONG:
+      case LUX_INT32:
 	for (i = 0; i < nSample; i++) {
 	  j = clusterOtoC[clusterNumber.l[i]];
 	  clusterSize[j]++;
@@ -646,13 +646,13 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
       dataPoint = data + dataIndex*nVectorDim; /* current data point */
       if (useIndex)		/* get old cluster number */
 	switch (indexType) {
-	  case LUX_BYTE:
+	  case LUX_INT8:
 	    curO = *clusterNumber.b;
 	    break;
-	  case LUX_WORD:
+	  case LUX_INT16:
 	    curO = *clusterNumber.w;
 	    break;
-	  case LUX_LONG:
+	  case LUX_INT32:
 	    curO = *clusterNumber.l;
 	    break;
 	}
@@ -916,13 +916,13 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
 	newO = curO;
       
       switch (indexType) {	/* save cluster number */
-	case LUX_BYTE:
+	case LUX_INT8:
 	  *clusterNumber.b++ = newO;
 	  break;
-	case LUX_WORD:
+	case LUX_INT16:
 	  *clusterNumber.w++ = newO;
 	  break;
-	case LUX_LONG:
+	case LUX_INT32:
 	  *clusterNumber.l++ = newO;
 	  break;
       }

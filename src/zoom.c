@@ -57,13 +57,13 @@ void	paint_pane(int32_t, int32_t, int32_t), delete_menu(int32_t);
 void value_string(char *trgt, pointer image, int32_t type, int32_t indx)
 {
   switch (type) {
-    case LUX_BYTE:
+    case LUX_INT8:
       sprintf(trgt, "Value:% 10d", image.b[indx]);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       sprintf(trgt, "Value:% 10d", image.w[indx]);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       sprintf(trgt, "Value:% 10d", image.l[indx]);
       break;
     case LUX_FLOAT:
@@ -236,10 +236,10 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
       offset += coords[2*i]*step[i];
   if (extractNumerical(data, image, type, ndim, dims, coords, 2, axes) < 0
       || (bitmap1.b
-	  && extractNumerical(bitmapdata1, bitmap1, LUX_BYTE, ndim, dims,
+	  && extractNumerical(bitmapdata1, bitmap1, LUX_INT8, ndim, dims,
 			      coords, 2, axes) < 0)
       || (bitmap2.b
-	  && extractNumerical(bitmapdata2, bitmap2, LUX_BYTE, ndim, dims,
+	  && extractNumerical(bitmapdata2, bitmap2, LUX_INT8, ndim, dims,
 			      coords, 2, axes) < 0)) {
     free(image.b);
     free(bitmap1.b);		/* it's OK to free something if it is
@@ -591,15 +591,15 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
 		  if (i < 8) {	/* take from current image */
 		    minmax(image.l, nx*ny, type);
 		    switch (type) {
-		      case LUX_BYTE:
+		      case LUX_INT8:
 			zoom_clo = (double) lastmin.b;
 			zoom_chi = (double) lastmax.b;
 			break;
-		      case LUX_WORD:
+		      case LUX_INT16:
 			zoom_clo = (double) lastmin.w;
 			zoom_chi = (double) lastmax.w;
 			break;
-		      case LUX_LONG:
+		      case LUX_INT32:
 			zoom_clo = (double) lastmin.l;
 			zoom_chi = (double) lastmax.l;
 			break;
@@ -685,11 +685,11 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
 		  if (extractNumerical(data, image, type, ndim, dims, coords,
 				       2, axes) < 0
 		      || (bitmapdata1.v
-			  && extractNumerical(bitmapdata1, bitmap1, LUX_BYTE,
+			  && extractNumerical(bitmapdata1, bitmap1, LUX_INT8,
 					      ndim, dims, coords, 2, axes)
 			  < 0)
 		      || (bitmapdata2.v
-			  && extractNumerical(bitmapdata2, bitmap2, LUX_BYTE,
+			  && extractNumerical(bitmapdata2, bitmap2, LUX_INT8,
 					      ndim, dims, coords, 2, axes)
 			  < 0)) {
 		    free(image.b);
@@ -816,11 +816,11 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
 		    if (extractNumerical(data, image, type, ndim, dims,
 					 coords, 2, axes) < 0
 			|| (bitmapdata1.v
-			    && extractNumerical(bitmapdata1, bitmap1, LUX_BYTE,
+			    && extractNumerical(bitmapdata1, bitmap1, LUX_INT8,
 						ndim, dims, coords, 2, axes)
 			    < 0)
 			|| (bitmapdata2.v
-			    && extractNumerical(bitmapdata2, bitmap2, LUX_BYTE,
+			    && extractNumerical(bitmapdata2, bitmap2, LUX_INT8,
 						ndim, dims, coords, 2, axes)
 			    < 0)) {
 		      free(image.b);
@@ -914,10 +914,10 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
       if (extractNumerical(data, image, type, ndim, dims,
 			   coords, 2, axes) < 0
 	  || (bitmapdata1.v
-	      && extractNumerical(bitmapdata1, bitmap1, LUX_BYTE,
+	      && extractNumerical(bitmapdata1, bitmap1, LUX_INT8,
 				  ndim, dims, coords, 2, axes) < 0)
 	  || (bitmapdata2.v
-	      && extractNumerical(bitmapdata2, bitmap2, LUX_BYTE,
+	      && extractNumerical(bitmapdata2, bitmap2, LUX_INT8,
 				  ndim, dims, coords, 2, axes) < 0)) {
 	free(image.b);
 	free(bitmap1.b);
@@ -1041,7 +1041,7 @@ int32_t tvzoom(int32_t narg, int32_t ps[])
       offset += coords[2*i]*step[i];
   if (extractNumerical(data, image, type, ndim, dims, coords, 2, axes) < 0
       || (bitmap.b
-	  && extractNumerical(bitmapdata, bitmap, LUX_BYTE, ndim, dims,
+	  && extractNumerical(bitmapdata, bitmap, LUX_INT8, ndim, dims,
 			      coords, 2, axes) < 0)) {
     free(image.b);
     free(bitmap.b);		/* it's OK to free something if it is

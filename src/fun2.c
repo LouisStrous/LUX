@@ -112,9 +112,9 @@ int32_t lux_runsum(int32_t narg, int32_t ps[])
      *xdims -= ABS(order);
      do                                         /* main loop */
      { switch (type)
-       { case LUX_BYTE:	*q2.b = *q1.b + *p.b; break;
-         case LUX_WORD:	*q2.w = *q1.w + *p.w; break;
-         case LUX_LONG:	*q2.l = *q1.l + *p.l; break;
+       { case LUX_INT8:	*q2.b = *q1.b + *p.b; break;
+         case LUX_INT16:	*q2.w = *q1.w + *p.w; break;
+         case LUX_INT32:	*q2.l = *q1.l + *p.l; break;
          case LUX_FLOAT:	*q2.f = *q1.f + *p.f; break;
          case LUX_DOUBLE:	*q2.d = *q1.d + *p.d; break; }
        q2.b += *step; q1.b += *step; p.b += *step;
@@ -182,9 +182,9 @@ int32_t index_sdev(int32_t narg, int32_t ps[], int32_t sq)
 
   /* need min and max of indices so we can create result array of */
   /* proper size */
-  indices2 = lux_long(1, &ps[1]); /* force LUX_LONG */
+  indices2 = lux_long(1, &ps[1]); /* force LUX_INT32 */
   indx = array_data(indices2);	/* assumed of same size as <source>! */
-  minmax(indx, nElem, LUX_LONG);
+  minmax(indx, nElem, LUX_INT32);
   size = lastmax.l + 1;
   offset = 0;
   if (lastmin.l < 0)
@@ -204,7 +204,7 @@ int32_t index_sdev(int32_t narg, int32_t ps[], int32_t sq)
     switch (outType) {
       case LUX_FLOAT:
 	switch (type) {
-	  case LUX_BYTE:
+	  case LUX_INT8:
 	    while (i--) {		/* first, get the sum */
 	      hist.f[*indx] += *weights.b;
 	      sum.f[*indx] += (float) *src.b++ * *weights.b++;
@@ -223,7 +223,7 @@ int32_t index_sdev(int32_t narg, int32_t ps[], int32_t sq)
 	      trgt.f[*indx++] += temp.f*temp.f* *weights.b++;
 	    }
 	    break;
-	  case LUX_WORD:
+	  case LUX_INT16:
 	    while (i--) {		/* first, get the sum */
 	      hist.f[*indx] += *weights.w;
 	      sum.f[*indx] += (float) *src.w++ * *weights.w++;
@@ -242,7 +242,7 @@ int32_t index_sdev(int32_t narg, int32_t ps[], int32_t sq)
 	      trgt.f[*indx++] += temp.f*temp.f* *weights.w++;
 	    }
 	    break;
-	  case LUX_LONG:
+	  case LUX_INT32:
 	    while (i--) {		/* first, get the sum */
 	      hist.f[*indx] += *weights.l;
 	      sum.f[*indx] += (float) *src.l++ * *weights.l++;
@@ -319,7 +319,7 @@ int32_t index_sdev(int32_t narg, int32_t ps[], int32_t sq)
 	break;
       case LUX_DOUBLE:
 	switch (type) {
-	  case LUX_BYTE:
+	  case LUX_INT8:
 	    while (i--) {		/* first, get the sum */
 	      hist.d[*indx] += *weights.b;
 	      sum.d[*indx] += (double) *src.b++ * *weights.b++;
@@ -338,7 +338,7 @@ int32_t index_sdev(int32_t narg, int32_t ps[], int32_t sq)
 	      trgt.d[*indx++] += temp.d*temp.d* *weights.b++;
 	    }
 	    break;
-	  case LUX_WORD:
+	  case LUX_INT16:
 	    while (i--) {		/* first, get the sum */
 	      hist.d[*indx] += *weights.w;
 	      sum.d[*indx] += (double) *src.w++ * *weights.w++;
@@ -357,7 +357,7 @@ int32_t index_sdev(int32_t narg, int32_t ps[], int32_t sq)
 	      trgt.d[*indx++] += temp.d*temp.d* *weights.w++;
 	    }
 	    break;
-	  case LUX_LONG:
+	  case LUX_INT32:
 	    while (i--) {		/* first, get the sum */
 	      hist.d[*indx] += *weights.l;
 	      sum.d[*indx] += (double) *src.l++ * *weights.l++;
@@ -483,7 +483,7 @@ int32_t index_sdev(int32_t narg, int32_t ps[], int32_t sq)
     switch (outType) {
       case LUX_FLOAT:
 	switch (type) {
-	  case LUX_BYTE:
+	  case LUX_INT8:
 	    while (i--) {		/* first, get the sum */
 	      hist.l[*indx]++;
 	      sum.f[*indx] += *src.b++;
@@ -501,7 +501,7 @@ int32_t index_sdev(int32_t narg, int32_t ps[], int32_t sq)
 	      trgt.f[*indx++] += temp.f*temp.f;
 	    }
 	    break;
-	  case LUX_WORD:
+	  case LUX_INT16:
 	    while (i--) {		/* first, get the sum */
 	      hist.l[*indx]++;
 	      sum.f[*indx] += *src.w++;
@@ -519,7 +519,7 @@ int32_t index_sdev(int32_t narg, int32_t ps[], int32_t sq)
 	      trgt.f[*indx++] += temp.f*temp.f;
 	    }
 	    break;
-	  case LUX_LONG:
+	  case LUX_INT32:
 	    while (i--) {		/* first, get the sum */
 	      hist.l[*indx]++;
 	      sum.f[*indx] += *src.l++;
@@ -591,7 +591,7 @@ int32_t index_sdev(int32_t narg, int32_t ps[], int32_t sq)
 	break;
       case LUX_DOUBLE:
 	switch (type) {
-	  case LUX_BYTE:
+	  case LUX_INT8:
 	    while (i--) {		/* first, get the sum */
 	      hist.l[*indx]++;
 	      sum.d[*indx] += *src.b++;
@@ -609,7 +609,7 @@ int32_t index_sdev(int32_t narg, int32_t ps[], int32_t sq)
 	      trgt.d[*indx++] += temp.d*temp.d;
 	    }
 	    break;
-	  case LUX_WORD:
+	  case LUX_INT16:
 	    while (i--) {		/* first, get the sum */
 	      hist.l[*indx]++;
 	      sum.d[*indx] += *src.w++;
@@ -627,7 +627,7 @@ int32_t index_sdev(int32_t narg, int32_t ps[], int32_t sq)
 	      trgt.d[*indx++] += temp.d*temp.d;
 	    }
 	    break;
-	  case LUX_LONG:
+	  case LUX_INT32:
 	    while (i--) {		/* first, get the sum */
 	      hist.l[*indx]++;
 	      sum.d[*indx] += *src.l++;
@@ -884,7 +884,7 @@ int32_t lux_covariance(int32_t narg, int32_t ps[])
   /* errors */
   if (haveWeights) {
     switch (symbol_type(ps[0])) {
-      case LUX_BYTE:
+      case LUX_INT8:
 	do {
 	  xmean = 0.0;
           ymean = 0.0;
@@ -929,7 +929,7 @@ int32_t lux_covariance(int32_t narg, int32_t ps[])
 	  }
 	} while (done < xsrcinfo.rndim);
 	break;
-      case LUX_WORD:
+      case LUX_INT16:
 	do {
 	  xmean = 0.0;
           ymean = 0.0;
@@ -974,7 +974,7 @@ int32_t lux_covariance(int32_t narg, int32_t ps[])
 	  }
 	} while (done < xsrcinfo.rndim);
 	break;
-      case LUX_LONG:
+      case LUX_INT32:
 	do {
 	  xmean = 0.0;
           ymean = 0.0;
@@ -1115,7 +1115,7 @@ int32_t lux_covariance(int32_t narg, int32_t ps[])
       return luxerror("Single values have no sample standard deviation", ps[0]);
 
     switch (symbol_type(ps[0])) {
-      case LUX_BYTE:
+      case LUX_INT8:
 	do {
 	  xmean = 0.0;
           ymean = 0.0;
@@ -1150,7 +1150,7 @@ int32_t lux_covariance(int32_t narg, int32_t ps[])
 	  }
 	} while (done < xsrcinfo.rndim);
 	break;
-      case LUX_WORD:
+      case LUX_INT16:
 	do {
 	  xmean = 0.0;
           ymean = 0.0;
@@ -1185,7 +1185,7 @@ int32_t lux_covariance(int32_t narg, int32_t ps[])
 	  }
 	} while (done < xsrcinfo.rndim);
         break;
-      case LUX_LONG:
+      case LUX_INT32:
 	do {
 	  xmean = 0.0;
           ymean = 0.0;
@@ -1406,7 +1406,7 @@ int32_t sdev(int32_t narg, int32_t ps[], int32_t sq)
   /* errors */
   if (haveWeights) {
     switch (symbol_type(ps[0])) {
-      case LUX_BYTE:
+      case LUX_INT8:
 	do {
 	  mean = 0.0;
 	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(int32_t));
@@ -1442,7 +1442,7 @@ int32_t sdev(int32_t narg, int32_t ps[], int32_t sq)
 	  }
 	} while (done < srcinfo.rndim);
 	break;
-      case LUX_WORD:
+      case LUX_INT16:
 	do {
 	  mean = 0.0;
 	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(int32_t));
@@ -1478,7 +1478,7 @@ int32_t sdev(int32_t narg, int32_t ps[], int32_t sq)
 	  }
 	} while (done < srcinfo.rndim);
 	break;
-      case LUX_LONG:
+      case LUX_INT32:
 	do {
 	  mean = 0.0;
 	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(int32_t));
@@ -1597,7 +1597,7 @@ int32_t sdev(int32_t narg, int32_t ps[], int32_t sq)
       return luxerror("Single values have no sample standard deviation", ps[0]);
 
     switch (symbol_type(ps[0])) {
-      case LUX_BYTE:
+      case LUX_INT8:
 	do {
 	  mean = 0.0;
 	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(int32_t));
@@ -1623,7 +1623,7 @@ int32_t sdev(int32_t narg, int32_t ps[], int32_t sq)
 	  }
 	} while (done < srcinfo.rndim);
 	break;
-      case LUX_WORD:
+      case LUX_INT16:
 	do {
 	  mean = 0.0;
 	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(int32_t));
@@ -1649,7 +1649,7 @@ int32_t sdev(int32_t narg, int32_t ps[], int32_t sq)
 	  }
 	} while (done < srcinfo.rndim);
 	break;
-      case LUX_LONG:
+      case LUX_INT32:
 	do {
 	  mean = 0.0;
 	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(int32_t));
@@ -2482,7 +2482,7 @@ int32_t lux_gsmooth(int32_t narg, int32_t ps[])
 	for nx >= ng, the index of the first included data point for
 	the first calculation in zone 3 is equal to nx - ng + 2; it
 	increases by 2 every next calculation. */
-      case LUX_BYTE:
+      case LUX_INT8:
 	do {		/* main loop */
 	  /* zone 1: left edge */
 	  ik = n2;		/* index into kernel */
@@ -2576,7 +2576,7 @@ int32_t lux_gsmooth(int32_t narg, int32_t ps[])
 	} while (advanceLoop(&trgtinfo, &trgt),
 		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
-      case LUX_WORD:
+      case LUX_INT16:
 	do {		/* main loop */
 	  /* zone 1: left edge */
 	  ik = n2;		/* index into kernel */
@@ -2670,7 +2670,7 @@ int32_t lux_gsmooth(int32_t narg, int32_t ps[])
 	} while (advanceLoop(&trgtinfo, &trgt),
 		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
-      case LUX_LONG:
+      case LUX_INT32:
 	do {		/* main loop */
 	  /* zone 1: left edge */
 	  ik = n2;		/* index into kernel */
@@ -3019,7 +3019,7 @@ int32_t lux_strpos(int32_t narg, int32_t ps[]) /*STRPOS function */
     return cerror(NEED_STR, *ps);
   if (symbol_class(ps[1]) != LUX_STRING)
     return cerror(NEED_STR, ps[1]);
-  result_sym = scalar_scratch(LUX_LONG); /*for resultant position */
+  result_sym = scalar_scratch(LUX_INT32); /*for resultant position */
   scalar_value(result_sym).l = -1;
 
   p1 = string_value(ps[0]);
@@ -3315,13 +3315,13 @@ int32_t lux_string(int32_t narg, int32_t ps[])
   switch (symbol_class(ps[0])) {
     case LUX_SCALAR:
       switch (scalar_type(ps[0])) {
-	case LUX_BYTE:
+	case LUX_INT8:
 	  value.l = scalar_value(ps[0]).b;
 	  break;
-	case LUX_WORD:
+	case LUX_INT16:
 	  value.l = scalar_value(ps[0]).w;
 	  break;
-	case LUX_LONG:
+	case LUX_INT32:
 	  value.l = scalar_value(ps[0]).l;
 	  break;
 	case LUX_FLOAT:
@@ -3334,7 +3334,7 @@ int32_t lux_string(int32_t narg, int32_t ps[])
 	  return cerror(ILL_TYPE, ps[0]);
       }
       switch (scalar_type(ps[0])) {
-	case LUX_BYTE: case LUX_WORD: case LUX_LONG:
+	case LUX_INT8: case LUX_INT16: case LUX_INT32:
 	  sprintf(curScrat, fmt_integer, value.l);
 	  break;
 	case LUX_FLOAT: case LUX_DOUBLE:
@@ -3387,12 +3387,12 @@ int32_t lux_strlen(int32_t narg, int32_t ps[])/*strlen function */
 
   switch (symbol_class(ps[0])) {
     case LUX_STRING:
-      result_sym = scalar_scratch(LUX_LONG);
+      result_sym = scalar_scratch(LUX_INT32);
       scalar_value(result_sym).l = string_size(ps[0]);
       break;
     case LUX_ARRAY:
       if (array_type(ps[0]) == LUX_STRING_ARRAY) {
-	result_sym = array_scratch(LUX_LONG, array_num_dims(ps[0]),
+	result_sym = array_scratch(LUX_INT32, array_num_dims(ps[0]),
 				   array_dims(ps[0]));
 	l = array_data(result_sym);
 	p.sp = array_data(ps[0]);
@@ -3930,7 +3930,7 @@ void ksmooth(loopInfo *srcinfo, loopInfo *trgtinfo, float *kernel, int32_t nkern
   n2 = (nkernel - 1)/2;
   stride = srcinfo->rsinglestep[0];
   switch (srcinfo->type) {
-    case LUX_BYTE:
+    case LUX_INT8:
       /* zone 1: starts with dataindex 0 */
       if (internalMode & 1) {	/* /BALANCED */
 	ncalc = (nx + 1)/2;
@@ -4036,7 +4036,7 @@ void ksmooth(loopInfo *srcinfo, loopInfo *trgtinfo, float *kernel, int32_t nkern
 	}
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       /* zone 1: starts with dataindex 0 */
       if (internalMode & 1) {	/* /BALANCED */
 	ncalc = (nx + 1)/2;
@@ -4142,7 +4142,7 @@ void ksmooth(loopInfo *srcinfo, loopInfo *trgtinfo, float *kernel, int32_t nkern
 	}
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       /* zone 1: starts with dataindex 0 */
       if (internalMode & 1) {	/* /BALANCED */
 	ncalc = (nx + 1)/2;
@@ -4558,7 +4558,7 @@ int32_t lux_crosscorr(int32_t narg, int32_t ps[])
     n *= srcinfo1.rdims[i];
 
   switch (symbol_type(ps[0])) {
-    case LUX_BYTE:
+    case LUX_INT8:
       do {
 	meanx = meany = 0.0;
 	memcpy(save, srcinfo1.coords, srcinfo1.ndim*sizeof(int32_t));
@@ -4587,7 +4587,7 @@ int32_t lux_crosscorr(int32_t narg, int32_t ps[])
 	*trgt.f++ = tempx? pxy/sqrt(tempx): 0.0;
       } while (done < srcinfo1.rndim);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       do {
 	meanx = meany = 0.0;
 	memcpy(save, srcinfo1.coords, srcinfo1.ndim*sizeof(int32_t));
@@ -4616,7 +4616,7 @@ int32_t lux_crosscorr(int32_t narg, int32_t ps[])
 	*trgt.f++ = tempx? pxy/sqrt(tempx): 0.0;
       } while (done < srcinfo1.rndim);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       do {
 	meanx = meany = 0.0;
 	memcpy(save, srcinfo1.coords, srcinfo1.ndim*sizeof(int32_t));

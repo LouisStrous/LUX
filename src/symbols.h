@@ -224,9 +224,9 @@ int32_t	file_map_size(int32_t symbol);
 #define isStringType(type)	/* int32_t */ ((type) > LUX_DOUBLE && (type) < LUX_CFLOAT)
 #define isRealType(type)	/* int32_t */ ((type) <= LUX_DOUBLE)
 #define isComplexType(type)	/* int32_t */ ((type) >= LUX_CFLOAT)
-#define isIntegerType(type)	/* int32_t */ ((type) <= LUX_QUAD)
+#define isIntegerType(type)	/* int32_t */ ((type) <= LUX_INT64)
 #define isFloatType(type)	/* int32_t */ ((type) == LUX_FLOAT || (type) == LUX_DOUBLE || (type) == LUX_CFLOAT || (type) == LUX_CDOUBLE)
-#define isLegalType(type)	/* int32_t */ ((type) >= LUX_BYTE && (type) <= LUX_CDOUBLE)
+#define isLegalType(type)	/* int32_t */ ((type) >= LUX_INT8 && (type) <= LUX_CDOUBLE)
 /* realType(type) returns <type> if it is real, or the corresponding real */
 /* type if it is complex. */
 #define realType(type)		/* int32_t */ (((type) >= LUX_CFLOAT)? (type) + (LUX_FLOAT - LUX_CFLOAT): (type))

@@ -68,7 +68,7 @@ int32_t lux_idlrestore(int32_t narg, int32_t ps[])
   fseek(fp, 4, SEEK_CUR);	/* skip one int32_t */
   fread(ints, 4, 1, fp);	/* read one int32_t */
 #if !LITTLEENDIAN
-  endian(ints, 4, LUX_LONG);
+  endian(ints, 4, LUX_INT32);
 #endif
   fseek(fp, ints[0], SEEK_SET);	/* go to the indicated offset */
 
@@ -77,7 +77,7 @@ int32_t lux_idlrestore(int32_t narg, int32_t ps[])
   do {
     fread(ints, 4, 2, fp);	/* read 2 ints */
 #if !LITTLEENDIAN
-    endian(ints, 8, LUX_LONG);
+    endian(ints, 8, LUX_INT32);
 #endif
     if (ints[0] == 14) {
       fseek(fp, ints[1], SEEK_SET);
@@ -94,7 +94,7 @@ int32_t lux_idlrestore(int32_t narg, int32_t ps[])
     
     fread(ints, 4, 3, fp);	/* read 3 ints */
 #if !LITTLEENDIAN
-    endian(ints, 12, LUX_LONG);
+    endian(ints, 12, LUX_INT32);
 #endif
     
     n = ints[2];		/* size of name */
@@ -112,7 +112,7 @@ int32_t lux_idlrestore(int32_t narg, int32_t ps[])
 
     fread(ints, 4, 3, fp);
 #if !LITTLEENDIAN
-    endian(ints, 12, LUX_LONG);
+    endian(ints, 12, LUX_INT32);
 #endif
     if (ints[1] == 20) {	/* array */
       type = ints[0];
@@ -120,7 +120,7 @@ int32_t lux_idlrestore(int32_t narg, int32_t ps[])
       fseek(fp, 12, SEEK_CUR);
       fread(ints, 4, 1, fp);
 #if !LITTLEENDIAN
-      endian(ints, 4, LUX_LONG);
+      endian(ints, 4, LUX_INT32);
 #endif
       ndim = ints[0];		/* number of dimensions */
 
@@ -128,7 +128,7 @@ int32_t lux_idlrestore(int32_t narg, int32_t ps[])
 
       fread(dims, 4, 8, fp);	/* read dimensions */
 #if !LITTLEENDIAN
-      endian(dims, 4*ndim, LUX_LONG);
+      endian(dims, 4*ndim, LUX_INT32);
 #endif
 
       redef_array(var, type - 1, ndim, dims);
@@ -150,7 +150,7 @@ int32_t lux_idlrestore(int32_t narg, int32_t ps[])
 	  while (n--) {
 	    fread(pp.b, 4, 1, fp);
 #if !LITTLEENDIAN
-	    endian(pp.b, 4, LUX_LONG);
+	    endian(pp.b, 4, LUX_INT32);
 #endif
 	    *data.w++ = *pp.l;
 	  }
@@ -158,7 +158,7 @@ int32_t lux_idlrestore(int32_t narg, int32_t ps[])
 	case 3:	case 4: case 5:	/* long, float, double */
 	  fread(data.b, lux_type_size[type - 1], n, fp);
 #if !LITTLEENDIAN
-	  endian(data.b, lux_type_size[type - 1]*n, LUX_LONG);
+	  endian(data.b, lux_type_size[type - 1]*n, LUX_INT32);
 #endif
 	  break;
 	default:
@@ -171,25 +171,25 @@ int32_t lux_idlrestore(int32_t narg, int32_t ps[])
 	case 1:			/* Byte */
 	  fread(pp.b, 1, 4, fp);
 #if !LITTLEENDIAN
-	  endian(pp.b, 4, LUX_LONG);
+	  endian(pp.b, 4, LUX_INT32);
 #endif	
 	  value.b = value.l;
-	  redef_scalar(var, LUX_BYTE, &value.b);
+	  redef_scalar(var, LUX_INT8, &value.b);
 	  break;
 	case 2:			/* int16_t */
 	  fread(pp.b, 1, 4, fp); /* words are stored as ints */
 #if !LITTLEENDIAN
-	  endian(pp.b, 4, LUX_LONG);
+	  endian(pp.b, 4, LUX_INT32);
 #endif
 	  value.w = value.l;
-	  redef_scalar(var, LUX_WORD, &value.w);
+	  redef_scalar(var, LUX_INT16, &value.w);
 	  break;
 	case 3:			/* long */
 	  fread(pp.b, 1, 4, fp);
 #if !LITTLEENDIAN
-	  endian(pp.b, 4, LUX_LONG);
+	  endian(pp.b, 4, LUX_INT32);
 #endif
-	  redef_scalar(var, LUX_LONG, &value.l);
+	  redef_scalar(var, LUX_INT32, &value.l);
 	  break;
 	case 4:			/* float */
 	  fread(pp.b, 1, 4, fp);
@@ -208,7 +208,7 @@ int32_t lux_idlrestore(int32_t narg, int32_t ps[])
 	case 7:			/* string */
 	  fread(ints, 4, 2, fp);
 #if !LITTLEENDIAN
-	  endian(ints, 4, LUX_LONG);
+	  endian(ints, 4, LUX_INT32);
 #endif
 	  redef_string(var, ints[0]);
 	  p = string_value(var);
@@ -272,14 +272,14 @@ int32_t lux_idlread_f(int32_t narg, int32_t ps[])
   fseek(fp, 4, SEEK_CUR);	/* skip one int32_t */
   fread(ints, 4, 1, fp);	/* read one int32_t */
 #if LITTLEENDIAN
-  endian(ints, 4, LUX_LONG);
+  endian(ints, 4, LUX_INT32);
 #endif
   fseek(fp, ints[0], SEEK_SET);	/* go to the indicated offset */
   
   do {
     fread(ints, 4, 2, fp);	/* read 2 ints */
 #if LITTLEENDIAN
-    endian(ints, 8, LUX_LONG);
+    endian(ints, 8, LUX_INT32);
 #endif
     if (ints[0] == 14) {
       fseek(fp, ints[1], SEEK_SET);
@@ -293,7 +293,7 @@ int32_t lux_idlread_f(int32_t narg, int32_t ps[])
     
   fread(ints, 4, 3, fp);	/* read 3 ints */
 #if LITTLEENDIAN
-  endian(ints, 12, LUX_LONG);
+  endian(ints, 12, LUX_INT32);
 #endif
     
   n = ints[2];			/* size of name */
@@ -308,7 +308,7 @@ int32_t lux_idlread_f(int32_t narg, int32_t ps[])
 
   fread(ints, 4, 3, fp);
 #if LITTLEENDIAN
-  endian(ints, 12, LUX_LONG);
+  endian(ints, 12, LUX_INT32);
 #endif
   if (ints[1] == 20) {		/* array */
     type = ints[0];
@@ -316,7 +316,7 @@ int32_t lux_idlread_f(int32_t narg, int32_t ps[])
     fseek(fp, 12, SEEK_CUR);
     fread(ints, 4, 1, fp);
 #if LITTLEENDIAN
-    endian(ints, 4, LUX_LONG);
+    endian(ints, 4, LUX_INT32);
 #endif
     ndim = ints[0];		/* number of dimensions */
 
@@ -324,7 +324,7 @@ int32_t lux_idlread_f(int32_t narg, int32_t ps[])
 
     fread(dims, 4, 8, fp);	/* read dimensions */
 #if LITTLEENDIAN
-    endian(dims, 4*ndim, LUX_LONG);
+    endian(dims, 4*ndim, LUX_INT32);
 #endif
 
     redef_array(var, type - 1, ndim, dims);
@@ -343,7 +343,7 @@ int32_t lux_idlread_f(int32_t narg, int32_t ps[])
 	while (n--) {
 	  fread(pp.b, 4, 1, fp);
 #if LITTLEENDIAN
-	  endian(pp.b, 4, LUX_LONG);
+	  endian(pp.b, 4, LUX_INT32);
 #endif
 	  *data.w++ = *pp.l;
 	}
@@ -351,7 +351,7 @@ int32_t lux_idlread_f(int32_t narg, int32_t ps[])
       case 3: case 4: case 5:	/* long, float, double */
 	fread(data.b, lux_type_size[type - 1], n, fp);
 #if LITTLEENDIAN
-	endian(data.b, lux_type_size[type - 1]*n, LUX_LONG);
+	endian(data.b, lux_type_size[type - 1]*n, LUX_INT32);
 #endif
 	break;
       default:
@@ -363,25 +363,25 @@ int32_t lux_idlread_f(int32_t narg, int32_t ps[])
       case 1:			/* Byte */
 	fread(pp.b, 1, 4, fp);
 #if LITTLEENDIAN
-	endian(pp.b, 4, LUX_LONG);
+	endian(pp.b, 4, LUX_INT32);
 #endif	
 	value.b = value.l;
-	redef_scalar(var, LUX_BYTE, &value.b);
+	redef_scalar(var, LUX_INT8, &value.b);
 	break;
       case 2:			/* int16_t */
 	fread(pp.b, 1, 4, fp);	/* words are stored as ints */
 #if LITTLEENDIAN
-	endian(pp.b, 4, LUX_LONG);
+	endian(pp.b, 4, LUX_INT32);
 #endif
 	value.w = value.l;
-	redef_scalar(var, LUX_WORD, &value.w);
+	redef_scalar(var, LUX_INT16, &value.w);
 	break;
       case 3:			/* long */
 	fread(pp.b, 1, 4, fp);
 #if LITTLEENDIAN
-	endian(pp.b, 4, LUX_LONG);
+	endian(pp.b, 4, LUX_INT32);
 #endif
-	redef_scalar(var, LUX_LONG, &value.l);
+	redef_scalar(var, LUX_INT32, &value.l);
 	break;
       case 4:			/* float */
 	fread(pp.b, 1, 4, fp);
@@ -402,7 +402,7 @@ int32_t lux_idlread_f(int32_t narg, int32_t ps[])
 	p = string_value(var);
 	fread(ints, 4, 2, fp);
 #if LITTLEENDIAN
-	endian(ints + 1, 4, LUX_LONG);
+	endian(ints + 1, 4, LUX_INT32);
 #endif
 	fread(p, 1, ints[1], fp);
 	p[ints[1]] = '\0';	/* terminate string */

@@ -68,21 +68,21 @@ void lux_bin_pow(void)
   scalar        mod1, arg1, mod2, arg2;
 
   switch (lhsType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.f++ = pow(*lp.b++, *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.f++ = pow(*lp.b++, *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.f++ = pow(*lp.b++, *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = pow(*lp.b++, *rp.q++);
       break;
@@ -128,21 +128,21 @@ void lux_bin_pow(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.f++ = pow(*lp.w++, *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.f++ = pow(*lp.w++, *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.f++ = pow(*lp.w++, *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = pow(*lp.w++, *rp.q++);
       break;
@@ -190,21 +190,21 @@ void lux_bin_pow(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.f++ = pow(*lp.l++, *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.f++ = pow(*lp.l++, *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.f++ = pow(*lp.l++, *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = pow(*lp.l++, *rp.q++);
       break;
@@ -252,21 +252,21 @@ void lux_bin_pow(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_QUAD:
+  case LUX_INT64:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.d++ = pow(*lp.q++, *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.d++ = pow(*lp.q++, *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.d++ = pow(*lp.q++, *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = pow(*lp.q++, *rp.q++);
       break;
@@ -316,19 +316,19 @@ void lux_bin_pow(void)
     break;
   case LUX_FLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.f++ = pow(*lp.f++, *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.f++ = pow(*lp.f++, *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.f++ = pow(*lp.f++, *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = pow(*lp.f++, *rp.q++);
       break;
@@ -378,19 +378,19 @@ void lux_bin_pow(void)
     break;
   case LUX_DOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.d++ = pow(*lp.d++, *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.d++ = pow(*lp.d++, *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.d++ = pow(*lp.d++, *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = pow(*lp.d++, *rp.q++);
       break;
@@ -440,7 +440,7 @@ void lux_bin_pow(void)
     break;
   case LUX_CFLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         mod1.f = lp.cf->real*lp.cf->real
           + lp.cf->imaginary*lp.cf->imaginary;
@@ -458,7 +458,7 @@ void lux_bin_pow(void)
         tp.cf++;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         mod1.f = lp.cf->real*lp.cf->real
           + lp.cf->imaginary*lp.cf->imaginary;
@@ -476,7 +476,7 @@ void lux_bin_pow(void)
         tp.cf++;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         mod1.f = lp.cf->real*lp.cf->real
           + lp.cf->imaginary*lp.cf->imaginary;
@@ -494,7 +494,7 @@ void lux_bin_pow(void)
         tp.cf++;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         mod1.d = lp.cf->real*lp.cf->real
           + lp.cf->imaginary*lp.cf->imaginary;
@@ -590,7 +590,7 @@ void lux_bin_pow(void)
     break;
   case LUX_CDOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         mod1.d = lp.cd->real*lp.cd->real
           + lp.cd->imaginary*lp.cd->imaginary;
@@ -608,7 +608,7 @@ void lux_bin_pow(void)
         tp.cd++;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         mod1.d = lp.cd->real*lp.cd->real
           + lp.cd->imaginary*lp.cd->imaginary;
@@ -626,7 +626,7 @@ void lux_bin_pow(void)
         tp.cd++;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         mod1.d = lp.cd->real*lp.cd->real
           + lp.cd->imaginary*lp.cd->imaginary;
@@ -644,7 +644,7 @@ void lux_bin_pow(void)
         tp.cd++;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         mod1.d = lp.cd->real*lp.cd->real
           + lp.cd->imaginary*lp.cd->imaginary;
@@ -749,24 +749,24 @@ void lux_pow_as(void)
   scalar        re, im, mod1, arg1, mod2, arg2;
 
   switch (lhsType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       re.f = *rp.b;
       while (nRepeat--)
         *tp.f++ = pow(*lp.b++, re.f);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       re.f = *rp.w;
       while (nRepeat--)
         *tp.f++ = pow(*lp.b++, re.f);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       re.f = *rp.l;
       while (nRepeat--)
         *tp.f++ = pow(*lp.b++, re.f);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       re.d = *rp.q;
       while (nRepeat--)
         *tp.d++ = pow(*lp.b++, re.d);
@@ -817,24 +817,24 @@ void lux_pow_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       re.f = *rp.b;
       while (nRepeat--)
         *tp.f++ = pow(*lp.w++, re.f);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       re.f = *rp.w;
       while (nRepeat--)
         *tp.f++ = pow(*lp.w++, re.f);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       re.f = *rp.l;
       while (nRepeat--)
         *tp.f++ = pow(*lp.w++, re.f);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       re.d = *rp.q;
       while (nRepeat--)
         *tp.f++ = pow(*lp.w++, re.d);
@@ -887,24 +887,24 @@ void lux_pow_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       re.f = *rp.b;
       while (nRepeat--)
         *tp.f++ = pow(*lp.l++, re.f);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       re.f = *rp.w;
       while (nRepeat--)
         *tp.f++ = pow(*lp.l++, re.f);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       re.f = *rp.l;
       while (nRepeat--)
         *tp.f++ = pow(*lp.l++, re.f);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       re.d = *rp.q;
       while (nRepeat--)
         *tp.d++ = pow(*lp.l++, re.d);
@@ -937,24 +937,24 @@ void lux_pow_as(void)
       }
       break;
     }
-  case LUX_QUAD:
+  case LUX_INT64:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       re.d = *rp.b;
       while (nRepeat--)
         *tp.d++ = pow(*lp.q++, re.d);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       re.d = *rp.w;
       while (nRepeat--)
         *tp.d++ = pow(*lp.q++, re.d);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       re.d = *rp.l;
       while (nRepeat--)
         *tp.d++ = pow(*lp.q++, re.d);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       re.d = *rp.q;
       while (nRepeat--)
         *tp.d++ = pow(*lp.q++, re.d);
@@ -1009,22 +1009,22 @@ void lux_pow_as(void)
     break;
   case LUX_FLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       re.f = *rp.b;
       while (nRepeat--)
         *tp.f++ = pow(*lp.f++, re.f);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       re.f = *rp.w;
       while (nRepeat--)
         *tp.f++ = pow(*lp.f++, re.f);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       re.f = *rp.l;
       while (nRepeat--)
         *tp.f++ = pow(*lp.f++, re.f);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       re.d = *rp.q;
       while (nRepeat--)
         *tp.d++ = pow(*lp.f++, re.d);
@@ -1079,22 +1079,22 @@ void lux_pow_as(void)
     break;
   case LUX_DOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       re.d = *rp.b;
       while (nRepeat--)
         *tp.d++ = pow(*lp.d++, re.d);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       re.d = *rp.w;
       while (nRepeat--)
         *tp.d++ = pow(*lp.d++, re.d);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       re.d = *rp.l;
       while (nRepeat--)
         *tp.d++ = pow(*lp.d++, re.d);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       re.d = *rp.q;
       while (nRepeat--)
         *tp.d++ = pow(*lp.d++, re.d);
@@ -1149,7 +1149,7 @@ void lux_pow_as(void)
     break;
   case LUX_CFLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       re.f = *rp.b;
       while (nRepeat--) {
         mod1.f = lp.cf->real*lp.cf->real
@@ -1167,7 +1167,7 @@ void lux_pow_as(void)
         lp.cf++;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       re.f = *rp.w;
       while (nRepeat--) {
         mod1.f = lp.cf->real*lp.cf->real
@@ -1185,7 +1185,7 @@ void lux_pow_as(void)
         lp.cf++;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       re.f = *rp.l;
       while (nRepeat--) {
         mod1.f = lp.cf->real*lp.cf->real
@@ -1203,7 +1203,7 @@ void lux_pow_as(void)
         tp.cf++;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       re.d = *rp.q;
       while (nRepeat--) {
         mod1.d = lp.cf->real*lp.cf->real
@@ -1298,7 +1298,7 @@ void lux_pow_as(void)
     break;
   case LUX_CDOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       re.d = *rp.b;
       while (nRepeat--) {
         mod1.d = lp.cd->real*lp.cd->real
@@ -1316,7 +1316,7 @@ void lux_pow_as(void)
         lp.cd++;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       re.d = *rp.w;
       while (nRepeat--) {
         mod1.d = lp.cd->real*lp.cd->real
@@ -1334,7 +1334,7 @@ void lux_pow_as(void)
         lp.cd++;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       re.d = *rp.l;
       while (nRepeat--) {
         mod1.d = lp.cd->real*lp.cd->real
@@ -1352,7 +1352,7 @@ void lux_pow_as(void)
         lp.cd++;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       re.d = *rp.q;
       while (nRepeat--) {
         mod1.d = lp.cd->real*lp.cd->real
@@ -1459,24 +1459,24 @@ void lux_pow_sa(void)
   scalar        re, im, arg1, mod1, mod2, arg2;
 
   switch (lhsType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       mod1.f = *lp.b;
       while (nRepeat--)
         *tp.f++ = pow(mod1.f, *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       mod1.f = *lp.b;
       while (nRepeat--)
         *tp.f++ = pow(mod1.f, *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       mod1.f = *lp.b;
       while (nRepeat--)
         *tp.f++ = pow(mod1.f, *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       mod1.d = *lp.b;
       while (nRepeat--)
         *tp.d++ = pow(mod1.d, *rp.q++);
@@ -1527,24 +1527,24 @@ void lux_pow_sa(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       mod1.f = *lp.w;
       while (nRepeat--)
         *tp.f++ = pow(mod1.f, *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       mod1.f = *lp.w;
       while (nRepeat--)
         *tp.f++ = pow(mod1.f, *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       mod1.f = *lp.w;
       while (nRepeat--)
         *tp.f++ = pow(mod1.f, *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       mod1.d = *lp.w;
       while (nRepeat--)
         *tp.d++ = pow(mod1.d, *rp.q++);
@@ -1597,24 +1597,24 @@ void lux_pow_sa(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       mod1.f = *lp.l;
       while (nRepeat--)
         *tp.f++ = pow(mod1.f, *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       mod1.f = *lp.l;
       while (nRepeat--)
         *tp.f++ = pow(mod1.f, *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       mod1.f = *lp.l;
       while (nRepeat--)
         *tp.f++ = pow(mod1.f, *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       mod1.d = *lp.l;
       while (nRepeat--)
         *tp.d++ = pow(mod1.d, *rp.q++);
@@ -1667,24 +1667,24 @@ void lux_pow_sa(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_QUAD:
+  case LUX_INT64:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       mod1.d = *lp.q;
       while (nRepeat--)
         *tp.d++ = pow(mod1.d, *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       mod1.d = *lp.q;
       while (nRepeat--)
         *tp.d++ = pow(mod1.d, *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       mod1.d = *lp.q;
       while (nRepeat--)
         *tp.d++ = pow(mod1.d, *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       mod1.d = *lp.q;
       while (nRepeat--)
         *tp.d++ = pow(mod1.d, *rp.q++);
@@ -1739,22 +1739,22 @@ void lux_pow_sa(void)
     break;
   case LUX_FLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       mod1.f = *lp.f;
       while (nRepeat--)
         *tp.f++ = pow(mod1.f, *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       mod1.f = *lp.f;
       while (nRepeat--)
         *tp.f++ = pow(mod1.f, *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       mod1.f = *lp.f;
       while (nRepeat--)
         *tp.f++ = pow(mod1.f, *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       mod1.d = *lp.f;
       while (nRepeat--)
         *tp.d++ = pow(mod1.f, *rp.q++);
@@ -1809,22 +1809,22 @@ void lux_pow_sa(void)
     break;
   case LUX_DOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       mod1.f = *lp.d;
       while (nRepeat--)
         *tp.f++ = pow(mod1.f, *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       mod1.f = *lp.d;
       while (nRepeat--)
         *tp.f++ = pow(mod1.f, *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       mod1.f = *lp.d;
       while (nRepeat--)
         *tp.f++ = pow(mod1.f, *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       mod1.d = *lp.d;
       while (nRepeat--)
         *tp.d++ = pow(mod1.d, *rp.q++);
@@ -1879,7 +1879,7 @@ void lux_pow_sa(void)
     break;
   case LUX_CFLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       mod1.f = lp.cf->real*lp.cf->real
         + lp.cf->imaginary*lp.cf->imaginary;
       if (mod1.f) {
@@ -1896,7 +1896,7 @@ void lux_pow_sa(void)
           tp.cf++;
         }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       mod1.f = lp.cf->real*lp.cf->real
         + lp.cf->imaginary*lp.cf->imaginary;
       if (mod1.f) {
@@ -1913,7 +1913,7 @@ void lux_pow_sa(void)
           tp.cf++;
         }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       mod1.f = lp.cf->real*lp.cf->real
         + lp.cf->imaginary*lp.cf->imaginary;
       if (mod1.f) {
@@ -1930,7 +1930,7 @@ void lux_pow_sa(void)
           tp.cf++;
         }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       mod1.d = lp.cf->real*lp.cf->real
         + lp.cf->imaginary*lp.cf->imaginary;
       if (mod1.d) {
@@ -2023,7 +2023,7 @@ void lux_pow_sa(void)
     break;
   case LUX_CDOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       mod1.d = lp.cd->real*lp.cd->real
         + lp.cd->imaginary*lp.cd->imaginary;
       if (mod1.d) {
@@ -2040,7 +2040,7 @@ void lux_pow_sa(void)
           tp.cd++;
         }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       mod1.d = lp.cd->real*lp.cd->real
         + lp.cd->imaginary*lp.cd->imaginary;
       if (mod1.d) {
@@ -2057,7 +2057,7 @@ void lux_pow_sa(void)
           tp.cd++;
         }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       mod1.d = lp.cd->real*lp.cd->real
         + lp.cd->imaginary*lp.cd->imaginary;
       if (mod1.d) {
@@ -2074,7 +2074,7 @@ void lux_pow_sa(void)
           tp.cd++;
         }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       mod1.d = lp.cd->real*lp.cd->real
         + lp.cd->imaginary*lp.cd->imaginary;
       if (mod1.d) {
@@ -2174,21 +2174,21 @@ void lux_add(void)
      /* addition with array operands */
 {
   switch (lhsType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.b++ = *lp.b++ + *rp.b++;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.w++ = *lp.b++ + *rp.w++;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = *lp.b++ + *rp.l++;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = *lp.b++ + *rp.q++;
       break;
@@ -2216,21 +2216,21 @@ void lux_add(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.w++ = *lp.w++ + *rp.b++;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.w++ = *lp.w++ + *rp.w++;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = *lp.w++ + *rp.l++;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = *lp.w++ + *rp.q++;
       break;
@@ -2258,21 +2258,21 @@ void lux_add(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = *lp.l++ + *rp.b++;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = *lp.l++ + *rp.w++;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = *lp.l++ + *rp.l++;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = *lp.l++ + *rp.q++;
       break;
@@ -2300,21 +2300,21 @@ void lux_add(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_QUAD:
+  case LUX_INT64:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.q++ = *lp.q++ + *rp.b++;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.q++ = *lp.q++ + *rp.w++;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.q++ = *lp.q++ + *rp.l++;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = *lp.q++ + *rp.q++;
       break;
@@ -2344,19 +2344,19 @@ void lux_add(void)
     break;
   case LUX_FLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.f++ = *lp.f++ + *rp.b++;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.f++ = *lp.f++ + *rp.w++;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.f++ = *lp.f++ + *rp.l++;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = *lp.f++ + *rp.q++;
       break;
@@ -2386,19 +2386,19 @@ void lux_add(void)
     break;
   case LUX_DOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.d++ = *lp.d++ + *rp.b++;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.d++ = *lp.d++ + *rp.w++;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.d++ = *lp.d++ + *rp.l++;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = *lp.d++ + *rp.q++;
       break;
@@ -2428,25 +2428,25 @@ void lux_add(void)
     break;
   case LUX_CFLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         tp.cf->real = lp.cf->real + *rp.b++;
         tp.cf++->imaginary = lp.cf++->imaginary;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         tp.cf->real = lp.cf->real + *rp.w++;
         tp.cf++->imaginary = lp.cf++->imaginary;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         tp.cf->real = lp.cf->real + *rp.l++;
         tp.cf++->imaginary = lp.cf++->imaginary;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         tp.cd->real = lp.cf->real + *rp.q++;
         tp.cd++->imaginary = lp.cf++->imaginary;
@@ -2483,25 +2483,25 @@ void lux_add(void)
     break;
   case LUX_CDOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         tp.cd->real = lp.cd->real + *rp.b++;
         tp.cd++->imaginary = lp.cd++->imaginary;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         tp.cd->real = lp.cd->real + *rp.w++;
         tp.cd++->imaginary = lp.cd++->imaginary;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         tp.cd->real = lp.cd->real + *rp.l++;
         tp.cd++->imaginary = lp.cd++->imaginary;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         tp.cd->real = lp.cd->real + *rp.q++;
         tp.cd++->imaginary = lp.cd++->imaginary;
@@ -2545,21 +2545,21 @@ void lux_add_as(void)
      /* addition with array LHS and scalar RHS */
 {
   switch (lhsType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.b++ = *lp.b++ + *rp.b;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.w++ = *lp.b++ + *rp.w;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = *lp.b++ + *rp.l;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = *lp.b++ + *rp.q;
       break;
@@ -2587,21 +2587,21 @@ void lux_add_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.w++ = *lp.w++ + *rp.b;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.w++ = *lp.w++ + *rp.w;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = *lp.w++ + *rp.l;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = *lp.w++ + *rp.q;
       break;
@@ -2629,21 +2629,21 @@ void lux_add_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = *lp.l++ + *rp.b;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = *lp.l++ + *rp.w;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = *lp.l++ + *rp.l;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = *lp.l++ + *rp.q;
       break;
@@ -2671,21 +2671,21 @@ void lux_add_as(void)
       break;
     }
     break;
-  case LUX_QUAD:
+  case LUX_INT64:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.q++ = *lp.q++ + *rp.b;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.q++ = *lp.q++ + *rp.w;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.q++ = *lp.q++ + *rp.l;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = *lp.q++ + *rp.q;
       break;
@@ -2715,19 +2715,19 @@ void lux_add_as(void)
     break;
   case LUX_FLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.f++ = *lp.f++ + *rp.b;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.f++ = *lp.f++ + *rp.w;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.f++ = *lp.f++ + *rp.l;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = *lp.f++ + *rp.q;
       break;
@@ -2757,19 +2757,19 @@ void lux_add_as(void)
     break;
   case LUX_DOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.d++ = *lp.d++ + *rp.b;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.d++ = *lp.d++ + *rp.w;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.d++ = *lp.d++ + *rp.l;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = *lp.d++ + *rp.q;
       break;
@@ -2799,25 +2799,25 @@ void lux_add_as(void)
     break;
   case LUX_CFLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         tp.cf->real = lp.cf->real + *rp.b;
         tp.cf++->imaginary = lp.cf++->imaginary;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         tp.cf->real = lp.cf->real + *rp.w;
         tp.cf++->imaginary = lp.cf++->imaginary;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         tp.cf->real = lp.cf->real + *rp.l;
         tp.cf++->imaginary = lp.cf++->imaginary;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         tp.cd->real = lp.cf->real + *rp.q;
         tp.cd++->imaginary = lp.cf++->imaginary;
@@ -2854,25 +2854,25 @@ void lux_add_as(void)
     break;
   case LUX_CDOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         tp.cd->real = lp.cd->real + *rp.b;
         tp.cd++->imaginary = lp.cd++->imaginary;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         tp.cd->real = lp.cd->real + *rp.w;
         tp.cd++->imaginary = lp.cd++->imaginary;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         tp.cd->real = lp.cd->real + *rp.l;
         tp.cd++->imaginary = lp.cd++->imaginary;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         tp.cd->real = lp.cd->real + *rp.q;
         tp.cd++->imaginary = lp.cd++->imaginary;
@@ -2939,21 +2939,21 @@ void lux_sub(void)
      /* subtraction with array operands */
 {
   switch (lhsType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.b++ = *lp.b++ - *rp.b++;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.w++ = *lp.b++ - *rp.w++;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = *lp.b++ - *rp.l++;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = (int64_t) *lp.b++ - *rp.q++;
       break;
@@ -2981,21 +2981,21 @@ void lux_sub(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.w++ = *lp.w++ - *rp.b++;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.w++ = *lp.w++ - *rp.w++;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = *lp.w++ - *rp.l++;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = (int64_t) *lp.w++ - *rp.q++;
       break;
@@ -3023,21 +3023,21 @@ void lux_sub(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = *lp.l++ - *rp.b++;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = *lp.l++ - *rp.w++;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = *lp.l++ - *rp.l++;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = *lp.l++ - *rp.q++;
       break;
@@ -3065,21 +3065,21 @@ void lux_sub(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_QUAD:
+  case LUX_INT64:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.q++ = *lp.q++ - (int64_t) *rp.b++;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.q++ = *lp.q++ - (int64_t) *rp.w++;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.q++ = *lp.q++ - *rp.l++;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = *lp.q++ - *rp.q++;
       break;
@@ -3109,19 +3109,19 @@ void lux_sub(void)
     break;
   case LUX_FLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.f++ = *lp.f++ - *rp.b++;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.f++ = *lp.f++ - *rp.w++;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.f++ = *lp.f++ - *rp.l++;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = *lp.f++ - *rp.q++;
       break;
@@ -3151,19 +3151,19 @@ void lux_sub(void)
     break;
   case LUX_DOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.d++ = *lp.d++ - *rp.b++;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.d++ = *lp.d++ - *rp.w++;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.d++ = *lp.d++ - *rp.l++;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = *lp.d++ - *rp.q++;
       break;
@@ -3193,25 +3193,25 @@ void lux_sub(void)
     break;
   case LUX_CFLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         tp.cf->real = lp.cf->real - *rp.b++;
         tp.cf++->imaginary = lp.cf++->imaginary;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         tp.cf->real = lp.cf->real - *rp.w++;
         tp.cf++->imaginary = lp.cf++->imaginary;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         tp.cf->real = lp.cf->real - *rp.l++;
         tp.cf++->imaginary = lp.cf++->imaginary;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         tp.cd->real = lp.cf->real - *rp.q++;
         tp.cd++->imaginary = lp.cf++->imaginary;
@@ -3248,25 +3248,25 @@ void lux_sub(void)
     break;
   case LUX_CDOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         tp.cd->real = lp.cd->real - *rp.b++;
         tp.cd++->imaginary = lp.cd++->imaginary;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         tp.cd->real = lp.cd->real - *rp.w++;
         tp.cd++->imaginary = lp.cd++->imaginary;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         tp.cd->real = lp.cd->real - *rp.l++;
         tp.cd++->imaginary = lp.cd++->imaginary;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         tp.cd->real = lp.cd->real - *rp.q++;
         tp.cd++->imaginary = lp.cd++->imaginary;
@@ -3310,21 +3310,21 @@ void lux_sub_as(void)
      /* subtraction with array LHS and scalar RHS */
 {
   switch (lhsType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.b++ = *lp.b++ - *rp.b;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.w++ = *lp.b++ - *rp.w;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = *lp.b++ - *rp.l;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = *lp.b++ - *rp.q;
       break;
@@ -3352,21 +3352,21 @@ void lux_sub_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.w++ = *lp.w++ - *rp.b;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.w++ = *lp.w++ - *rp.w;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = *lp.w++ - *rp.l;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = *lp.w++ - *rp.q;
       break;
@@ -3394,21 +3394,21 @@ void lux_sub_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = *lp.l++ - *rp.b;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = *lp.l++ - *rp.w;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = *lp.l++ - *rp.l;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = *lp.l++ - *rp.q;
       break;
@@ -3436,21 +3436,21 @@ void lux_sub_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_QUAD:
+  case LUX_INT64:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.q++ = *lp.q++ - *rp.b;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.q++ = *lp.q++ - *rp.w;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.q++ = *lp.q++ - *rp.l;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = *lp.q++ - *rp.q;
       break;
@@ -3480,19 +3480,19 @@ void lux_sub_as(void)
     break;
   case LUX_FLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.f++ = *lp.f++ - *rp.b;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.f++ = *lp.f++ - *rp.w;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.f++ = *lp.f++ - *rp.l;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = *lp.f++ - *rp.q;
       break;
@@ -3522,19 +3522,19 @@ void lux_sub_as(void)
     break;
   case LUX_DOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.d++ = *lp.d++ - *rp.b;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.d++ = *lp.d++ - *rp.w;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.d++ = *lp.d++ - *rp.l;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = *lp.d++ - *rp.q;
       break;
@@ -3564,25 +3564,25 @@ void lux_sub_as(void)
     break;
   case LUX_CFLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         tp.cf->real = lp.cf->real - *rp.b;
         tp.cf++->imaginary = lp.cf++->imaginary;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         tp.cf->real = lp.cf->real - *rp.w;
         tp.cf++->imaginary = lp.cf++->imaginary;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         tp.cf->real = lp.cf->real - *rp.l;
         tp.cf++->imaginary = lp.cf++->imaginary;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         tp.cd->real = lp.cf->real - *rp.q;
         tp.cd++->imaginary = lp.cf++->imaginary;
@@ -3619,25 +3619,25 @@ void lux_sub_as(void)
     break;
   case LUX_CDOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         tp.cd->real = lp.cd->real - *rp.b;
         tp.cd++->imaginary = lp.cd++->imaginary;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         tp.cd->real = lp.cd->real - *rp.w;
         tp.cd++->imaginary = lp.cd++->imaginary;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         tp.cd->real = lp.cd->real - *rp.l;
         tp.cd++->imaginary = lp.cd++->imaginary;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         tp.cd->real = lp.cd->real - *rp.q;
         tp.cd++->imaginary = lp.cd++->imaginary;
@@ -3681,21 +3681,21 @@ void lux_sub_sa(void)
      /* subtraction with scalar LHS and array RHS */
 {
   switch (lhsType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.b++ = *lp.b - *rp.b++;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.w++ = *lp.b - *rp.w++;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = *lp.b - *rp.l++;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = *lp.b - *rp.q++;
       break;
@@ -3723,21 +3723,21 @@ void lux_sub_sa(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.w++ = *lp.w - *rp.b++;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.w++ = *lp.w - *rp.w++;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = *lp.w - *rp.l++;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = *lp.w - *rp.q++;
       break;
@@ -3765,21 +3765,21 @@ void lux_sub_sa(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = *lp.l - *rp.b++;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = *lp.l - *rp.w++;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = *lp.l - *rp.l++;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = *lp.l - *rp.q++;
       break;
@@ -3807,21 +3807,21 @@ void lux_sub_sa(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_QUAD:
+  case LUX_INT64:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.q++ = *lp.q - *rp.b++;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.q++ = *lp.q - *rp.w++;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.q++ = *lp.q - *rp.l++;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = *lp.q - *rp.q++;
       break;
@@ -3851,19 +3851,19 @@ void lux_sub_sa(void)
     break;
   case LUX_FLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.f++ = *lp.f - *rp.b++;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.f++ = *lp.f - *rp.w++;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.f++ = *lp.f - *rp.l++;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = *lp.f - *rp.q++;
       break;
@@ -3893,19 +3893,19 @@ void lux_sub_sa(void)
     break;
   case LUX_DOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.d++ = *lp.d - *rp.b++;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.d++ = *lp.d - *rp.w++;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.d++ = *lp.d - *rp.l++;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = *lp.d - *rp.q++;
       break;
@@ -3935,25 +3935,25 @@ void lux_sub_sa(void)
     break;
   case LUX_CFLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         tp.cf->real = lp.cf->real - *rp.b++;
         tp.cf++->imaginary = lp.cf->imaginary;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         tp.cf->real = lp.cf->real - *rp.w++;
         tp.cf++->imaginary = lp.cf->imaginary;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         tp.cf->real = lp.cf->real - *rp.l++;
         tp.cf++->imaginary = lp.cf->imaginary;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         tp.cd->real = lp.cf->real - *rp.q++;
         tp.cd++->imaginary = lp.cf->imaginary;
@@ -3990,25 +3990,25 @@ void lux_sub_sa(void)
     break;
   case LUX_CDOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         tp.cd->real = lp.cd->real - *rp.b++;
         tp.cd++->imaginary = lp.cd->imaginary;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         tp.cd->real = lp.cd->real - *rp.w++;
         tp.cd++->imaginary = lp.cd->imaginary;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         tp.cd->real = lp.cd->real - *rp.l++;
         tp.cd++->imaginary = lp.cd->imaginary;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         tp.cd->real = lp.cd->real - *rp.q++;
         tp.cd++->imaginary = lp.cd->imaginary;
@@ -4054,21 +4054,21 @@ void lux_mul(void)
   scalar        re, im;
 
   switch (lhsType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.b++ = *lp.b++ * *rp.b++;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.w++ = *lp.b++ * *rp.w++;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = *lp.b++ * *rp.l++;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = *lp.b++ * *rp.q++;
       break;
@@ -4100,21 +4100,21 @@ void lux_mul(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.w++ = *lp.w++ * *rp.b++;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.w++ = *lp.w++ * *rp.w++;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = *lp.w++ * *rp.l++;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = *lp.w++ * *rp.q++;
       break;
@@ -4146,21 +4146,21 @@ void lux_mul(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = *lp.l++ * *rp.b++;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = *lp.l++ * *rp.w++;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = *lp.l++ * *rp.l++;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = *lp.l++ * *rp.q++;
       break;
@@ -4192,21 +4192,21 @@ void lux_mul(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_QUAD:
+  case LUX_INT64:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.q++ = *lp.q++ * *rp.b++;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.q++ = *lp.q++ * *rp.w++;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.q++ = *lp.q++ * *rp.l++;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = *lp.q++ * *rp.q++;
       break;
@@ -4240,19 +4240,19 @@ void lux_mul(void)
     break;
   case LUX_FLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.f++ = *lp.f++ * *rp.b++;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.f++ = *lp.f++ * *rp.w++;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.f++ = *lp.f++ * *rp.l++;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = *lp.f++ * *rp.q++;
       break;
@@ -4286,19 +4286,19 @@ void lux_mul(void)
     break;
   case LUX_DOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.d++ = *lp.d++ * *rp.b++;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.d++ = *lp.d++ * *rp.w++;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.d++ = *lp.d++ * *rp.l++;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = *lp.d++ * *rp.q++;
       break;
@@ -4332,7 +4332,7 @@ void lux_mul(void)
     break;
   case LUX_CFLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         re.f = lp.cf->real * *rp.b;
         im.f = lp.cf++->imaginary * *rp.b++;
@@ -4340,7 +4340,7 @@ void lux_mul(void)
         tp.cf++->imaginary = im.f;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         re.f = lp.cf->real * *rp.w;
         im.f = lp.cf++->imaginary * *rp.w++;
@@ -4348,7 +4348,7 @@ void lux_mul(void)
         tp.cf++->imaginary = im.f;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         re.f = lp.cf->real * *rp.l;
         im.f = lp.cf++->imaginary * *rp.l++;
@@ -4356,7 +4356,7 @@ void lux_mul(void)
         tp.cf++->imaginary = im.f;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         re.d = lp.cf->real * *rp.q;
         im.d = lp.cf++->imaginary * *rp.q++;
@@ -4410,7 +4410,7 @@ void lux_mul(void)
     break;
   case LUX_CDOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         re.d = lp.cd->real * *rp.b;
         im.d = lp.cd++->imaginary * *rp.b++;
@@ -4418,7 +4418,7 @@ void lux_mul(void)
         tp.cd++->imaginary = im.d;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         re.d = lp.cd->real * *rp.w;
         im.d = lp.cd++->imaginary * *rp.w++;
@@ -4426,7 +4426,7 @@ void lux_mul(void)
         tp.cd++->imaginary = im.d;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         re.d = lp.cd->real * *rp.l;
         im.d = lp.cd++->imaginary * *rp.l++;
@@ -4434,7 +4434,7 @@ void lux_mul(void)
         tp.cd++->imaginary = im.d;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         re.d = lp.cd->real * *rp.q;
         im.d = lp.cd++->imaginary * *rp.q++;
@@ -4497,21 +4497,21 @@ void lux_mul_as(void)
   scalar        re, im;
 
   switch (lhsType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.b++ = *lp.b++ * *rp.b;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.w++ = *lp.b++ * *rp.w;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = *lp.b++ * *rp.l;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = *lp.b++ * *rp.q;
       break;
@@ -4543,21 +4543,21 @@ void lux_mul_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.w++ = *lp.w++ * *rp.b;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.w++ = *lp.w++ * *rp.w;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = *lp.w++ * *rp.l;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = *lp.w++ * *rp.q;
       break;
@@ -4589,21 +4589,21 @@ void lux_mul_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = *lp.l++ * *rp.b;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = *lp.l++ * *rp.w;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = *lp.l++ * *rp.l;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = *lp.l++ * *rp.q;
       break;
@@ -4635,21 +4635,21 @@ void lux_mul_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_QUAD:
+  case LUX_INT64:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.q++ = *lp.q++ * *rp.b;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.q++ = *lp.q++ * *rp.w;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.q++ = *lp.q++ * *rp.l;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = *lp.q++ * *rp.q;
       break;
@@ -4683,19 +4683,19 @@ void lux_mul_as(void)
     break;
   case LUX_FLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.f++ = *lp.f++ * *rp.b;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.f++ = *lp.f++ * *rp.w;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.f++ = *lp.f++ * *rp.l;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = *lp.f++ * *rp.q;
       break;
@@ -4729,19 +4729,19 @@ void lux_mul_as(void)
     break;
   case LUX_DOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.d++ = *lp.d++ * *rp.b;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.d++ = *lp.d++ * *rp.w;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.d++ = *lp.d++ * *rp.l;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = *lp.d++ * *rp.q;
       break;
@@ -4775,25 +4775,25 @@ void lux_mul_as(void)
     break;
   case LUX_CFLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         tp.cf->real = lp.cf->real**rp.b;
         tp.cf++->imaginary = lp.cf++->imaginary**rp.b;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         tp.cf->real = lp.cf->real**rp.w;
         tp.cf++->imaginary = lp.cf++->imaginary**rp.w;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         tp.cf->real = lp.cf->real**rp.l;
         tp.cf++->imaginary = lp.cf++->imaginary**rp.l;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         tp.cd->real = lp.cf->real**rp.q;
         tp.cd++->imaginary = lp.cf++->imaginary**rp.q;
@@ -4841,25 +4841,25 @@ void lux_mul_as(void)
     break;
   case LUX_CDOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         tp.cd->real = lp.cd->real**rp.b;
         tp.cd++->imaginary = lp.cd++->imaginary**rp.b;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         tp.cd->real = lp.cd->real**rp.w;
         tp.cd++->imaginary = lp.cd++->imaginary**rp.w;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         tp.cd->real = lp.cd->real**rp.l;
         tp.cd++->imaginary = lp.cd++->imaginary**rp.l;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         tp.cd->real = lp.cd->real**rp.q;
         tp.cd++->imaginary = lp.cd++->imaginary**rp.q;
@@ -4940,21 +4940,21 @@ void lux_div(void)
   scalar        re, im, d;
 
   switch (lhsType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.b++ = *lp.b++ / *rp.b++;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.w++ = *lp.b++ / *rp.w++;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = *lp.b++ / *rp.l++;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = *lp.b++ / *rp.q++;
       break;
@@ -4990,21 +4990,21 @@ void lux_div(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.w++ = *lp.w++ / *rp.b++;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.w++ = *lp.w++ / *rp.w++;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = *lp.w++ / *rp.l++;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = *lp.w++ / *rp.q++;
       break;
@@ -5040,21 +5040,21 @@ void lux_div(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = *lp.l++ / *rp.b++;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = *lp.l++ / *rp.w++;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = *lp.l++ / *rp.l++;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = *lp.l++ / *rp.q++;
       break;
@@ -5090,21 +5090,21 @@ void lux_div(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_QUAD:
+  case LUX_INT64:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.q++ = *lp.q++ / *rp.b++;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.q++ = *lp.q++ / *rp.w++;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.q++ = *lp.q++ / *rp.l++;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = *lp.q++ / *rp.q++;
       break;
@@ -5142,19 +5142,19 @@ void lux_div(void)
     break;
   case LUX_FLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.f++ = *lp.f++ / *rp.b++;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.f++ = *lp.f++ / *rp.w++;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.f++ = *lp.f++ / *rp.l++;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = *lp.f++ / *rp.q++;
       break;
@@ -5192,19 +5192,19 @@ void lux_div(void)
     break;
   case LUX_DOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.d++ = *lp.d++ / *rp.b++;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.d++ = *lp.d++ / *rp.w++;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.d++ = *lp.d++ / *rp.l++;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = *lp.d++ / *rp.q++;
       break;
@@ -5242,28 +5242,28 @@ void lux_div(void)
     break;
   case LUX_CFLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         d.f = 1.0/ *rp.b++;
         tp.cf->real = lp.cf->real*d.f;
         tp.cf++->imaginary = lp.cf++->imaginary*d.f;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         d.f = 1.0/ *rp.w++;
         tp.cf->real = lp.cf->real*d.f;
         tp.cf++->imaginary = lp.cf++->imaginary*d.f;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         d.f = 1.0/ *rp.l++;
         tp.cf->real = lp.cf->real*d.f;
         tp.cf++->imaginary = lp.cf++->imaginary*d.f;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         d.d = 1.0/ *rp.q++;
         tp.cd->real = lp.cf->real*d.d;
@@ -5318,28 +5318,28 @@ void lux_div(void)
     break;
   case LUX_CDOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         d.d = 1.0/ *rp.b++;
         tp.cd->real = lp.cd->real*d.d;
         tp.cd++->imaginary = lp.cd++->imaginary*d.d;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         d.d = 1.0/ *rp.w++;
         tp.cd->real = lp.cd->real*d.d;
         tp.cd++->imaginary = lp.cd++->imaginary*d.d;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         d.d = 1.0/ *rp.l++;
         tp.cd->real = lp.cd->real*d.d;
         tp.cd++->imaginary = lp.cd++->imaginary*d.d;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         d.d = 1.0/ *rp.q++;
         tp.cd->real = lp.cd->real*d.d;
@@ -5403,21 +5403,21 @@ void lux_div_as(void)
   scalar        re, im, d;
 
   switch (lhsType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.b++ = *lp.b++ / *rp.b;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.w++ = *lp.b++ / *rp.w;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = *lp.b++ / *rp.l;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = *lp.b++ / *rp.q;
       break;
@@ -5453,21 +5453,21 @@ void lux_div_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.w++ = *lp.w++ / *rp.b;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.w++ = *lp.w++ / *rp.w;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = *lp.w++ / *rp.l;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = *lp.w++ / *rp.q;
       break;
@@ -5503,21 +5503,21 @@ void lux_div_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = *lp.l++ / *rp.b;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = *lp.l++ / *rp.w;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = *lp.l++ / *rp.l;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = *lp.l++ / *rp.q;
       break;
@@ -5553,21 +5553,21 @@ void lux_div_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_QUAD:
+  case LUX_INT64:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.q++ = *lp.q++ / *rp.b;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.q++ = *lp.q++ / *rp.w;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.q++ = *lp.q++ / *rp.l;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = *lp.q++ / *rp.q;
       break;
@@ -5605,19 +5605,19 @@ void lux_div_as(void)
     break;
   case LUX_FLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.f++ = *lp.f++ / *rp.b;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.f++ = *lp.f++ / *rp.w;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.f++ = *lp.f++ / *rp.l;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = *lp.f++ / *rp.q;
       break;
@@ -5655,19 +5655,19 @@ void lux_div_as(void)
     break;
   case LUX_DOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.d++ = *lp.d++ / *rp.b;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.d++ = *lp.d++ / *rp.w;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.d++ = *lp.d++ / *rp.l;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = *lp.d++ / *rp.q;
       break;
@@ -5705,28 +5705,28 @@ void lux_div_as(void)
     break;
   case LUX_CFLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         d.f = 1.0/ *rp.b;
         tp.cf->real = lp.cf->real*d.f;
         tp.cf++->imaginary = lp.cf++->imaginary*d.f;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         d.f = 1.0/ *rp.w;
         tp.cf->real = lp.cf->real*d.f;
         tp.cf++->imaginary = lp.cf++->imaginary*d.f;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         d.f = 1.0/ *rp.l;
         tp.cf->real = lp.cf->real*d.f;
         tp.cf++->imaginary = lp.cf++->imaginary*d.f;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         d.d = 1.0/ *rp.q;
         tp.cd->real = lp.cf->real*d.d;
@@ -5779,28 +5779,28 @@ void lux_div_as(void)
     break;
   case LUX_CDOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         d.d = 1.0/ *rp.b;
         tp.cd->real = lp.cd->real*d.d;
         tp.cd++->imaginary = lp.cd++->imaginary*d.d;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         d.d = 1.0/ *rp.w;
         tp.cd->real = lp.cd->real*d.d;
         tp.cd++->imaginary = lp.cd++->imaginary*d.d;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         d.d = 1.0/ *rp.l;
         tp.cd->real = lp.cd->real*d.d;
         tp.cd++->imaginary = lp.cd++->imaginary*d.d;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         d.d = 1.0/ *rp.q;
         tp.cd->real = lp.cd->real*d.d;
@@ -5862,21 +5862,21 @@ void lux_div_sa(void)
   scalar        re, im, d;
 
   switch (lhsType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.b++ = *lp.b / *rp.b++;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.w++ = *lp.b / *rp.w++;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = *lp.b / *rp.l++;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = *lp.b / *rp.q++;
       break;
@@ -5912,21 +5912,21 @@ void lux_div_sa(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.w++ = *lp.w / *rp.b++;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.w++ = *lp.w / *rp.w++;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = *lp.w / *rp.l++;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = *lp.w / *rp.q++;
       break;
@@ -5962,21 +5962,21 @@ void lux_div_sa(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = *lp.l / *rp.b++;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = *lp.l / *rp.w++;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = *lp.l / *rp.l++;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = *lp.l / *rp.q++;
       break;
@@ -6012,21 +6012,21 @@ void lux_div_sa(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_QUAD:
+  case LUX_INT64:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.q++ = *lp.q / *rp.b++;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.q++ = *lp.q / *rp.w++;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.q++ = *lp.q / *rp.l++;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = *lp.q / *rp.q++;
       break;
@@ -6064,19 +6064,19 @@ void lux_div_sa(void)
     break;
   case LUX_FLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.f++ = *lp.f / *rp.b++;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.f++ = *lp.f / *rp.w++;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.f++ = *lp.f / *rp.l++;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = *lp.f / *rp.q++;
       break;
@@ -6114,19 +6114,19 @@ void lux_div_sa(void)
     break;
   case LUX_DOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.d++ = *lp.d / *rp.b++;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.d++ = *lp.d / *rp.w++;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.d++ = *lp.d / *rp.l++;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = *lp.d / *rp.q++;
       break;
@@ -6164,28 +6164,28 @@ void lux_div_sa(void)
     break;
   case LUX_CFLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         d.f = 1.0/ *rp.b++;
         tp.cf->real = lp.cf->real*d.f;
         tp.cf++->imaginary = lp.cf->imaginary*d.f;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         d.f = 1.0/ *rp.w++;
         tp.cf->real = lp.cf->real*d.f;
         tp.cf++->imaginary = lp.cf->imaginary*d.f;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         d.f = 1.0/ *rp.l++;
         tp.cf->real = lp.cf->real*d.f;
         tp.cf++->imaginary = lp.cf->imaginary*d.f;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         d.d = 1.0/ *rp.q++;
         tp.cd->real = lp.cf->real*d.d;
@@ -6238,28 +6238,28 @@ void lux_div_sa(void)
     break;
   case LUX_CDOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         d.d = 1.0/ *rp.b++;
         tp.cd->real = lp.cd->real*d.d;
         tp.cd++->imaginary = lp.cd->imaginary*d.d;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         d.d = 1.0/ *rp.w++;
         tp.cd->real = lp.cd->real*d.d;
         tp.cd++->imaginary = lp.cd->imaginary*d.d;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         d.d = 1.0/ *rp.l++;
         tp.cd->real = lp.cd->real*d.d;
         tp.cd++->imaginary = lp.cd->imaginary*d.d;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         d.d = 1.0/ *rp.q++;
         tp.cd->real = lp.cd->real*d.d;
@@ -6324,9 +6324,9 @@ void lux_idiv(void)
   lldiv_t iqr;
 
   switch (lhsType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         qr = div(*lp.b++, *rp.b++);
         if (qr.rem < 0)
@@ -6334,7 +6334,7 @@ void lux_idiv(void)
         *tp.b++ = qr.quot;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         qr = div(*lp.b++, *rp.w++);
         if (qr.rem < 0)
@@ -6342,7 +6342,7 @@ void lux_idiv(void)
         *tp.w++ = qr.quot;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         qr = div(*lp.b++, *rp.l++);
         if (qr.rem < 0)
@@ -6350,7 +6350,7 @@ void lux_idiv(void)
         *tp.l++ = qr.quot;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         iqr = lldiv(*lp.b++, *rp.q++);
         if (iqr.rem < 0)
@@ -6370,9 +6370,9 @@ void lux_idiv(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         qr = div(*lp.w++, *rp.b++);
         if (qr.rem < 0)
@@ -6380,7 +6380,7 @@ void lux_idiv(void)
         *tp.w++ = qr.quot;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         qr = div(*lp.w++, *rp.w++);
         if (qr.rem < 0)
@@ -6388,7 +6388,7 @@ void lux_idiv(void)
         *tp.w++ = qr.quot;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         qr = div(*lp.w++, *rp.l++);
         if (qr.rem < 0)
@@ -6396,7 +6396,7 @@ void lux_idiv(void)
         *tp.l++ = qr.quot;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         iqr = lldiv(*lp.w++, *rp.q++);
         if (iqr.rem < 0)
@@ -6416,9 +6416,9 @@ void lux_idiv(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         qr = div(*lp.l++, *rp.b++);
         if (qr.rem < 0)
@@ -6426,7 +6426,7 @@ void lux_idiv(void)
         *tp.l++ = qr.quot;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         qr = div(*lp.l++, *rp.w++);
         if (qr.rem < 0)
@@ -6434,7 +6434,7 @@ void lux_idiv(void)
         *tp.l++ = qr.quot;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         qr = div(*lp.l++, *rp.l++);
         if (qr.rem < 0)
@@ -6442,7 +6442,7 @@ void lux_idiv(void)
         *tp.l++ = qr.quot;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         iqr = lldiv(*lp.l++, *rp.q++);
         if (iqr.rem < 0)
@@ -6462,9 +6462,9 @@ void lux_idiv(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_QUAD:
+  case LUX_INT64:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         iqr = lldiv(*lp.q++, *rp.b++);
         if (iqr.rem < 0)
@@ -6472,7 +6472,7 @@ void lux_idiv(void)
         *tp.q++ = iqr.quot;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         iqr = lldiv(*lp.q++, *rp.w++);
         if (iqr.rem < 0)
@@ -6480,7 +6480,7 @@ void lux_idiv(void)
         *tp.q++ = iqr.quot;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         iqr = lldiv(*lp.q++, *rp.l++);
         if (iqr.rem < 0)
@@ -6488,7 +6488,7 @@ void lux_idiv(void)
         *tp.q++ = iqr.quot;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         iqr = lldiv(*lp.q++, *rp.q++);
         if (iqr.rem < 0)
@@ -6510,19 +6510,19 @@ void lux_idiv(void)
     break;
   case LUX_FLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.f++ = floor(*lp.f++ / *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.f++ = floor(*lp.f++ / *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.f++ = floor(*lp.f++ / *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = floor(*lp.f++ / *rp.q++);
       break;
@@ -6540,19 +6540,19 @@ void lux_idiv(void)
     break;
   case LUX_DOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.d++ = floor(*lp.d++ / *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.d++ = floor(*lp.d++ / *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.d++ = floor(*lp.d++ / *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = floor(*lp.d++ / *rp.q++);
       break;
@@ -6582,9 +6582,9 @@ void lux_idiv_as(void)
   lldiv_t iqr;
 
   switch (lhsType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         qr = div(*lp.b++, *rp.b);
         if (qr.rem < 0)
@@ -6592,7 +6592,7 @@ void lux_idiv_as(void)
         *tp.b++ = qr.quot;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         qr = div(*lp.b++, *rp.w);
         if (qr.rem < 0)
@@ -6600,7 +6600,7 @@ void lux_idiv_as(void)
         *tp.w++ = qr.quot;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         qr = div(*lp.b++, *rp.l);
         if (qr.rem < 0)
@@ -6608,7 +6608,7 @@ void lux_idiv_as(void)
         *tp.l++ = qr.quot;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         iqr = lldiv(*lp.b++, *rp.q);
         if (iqr.rem < 0)
@@ -6628,9 +6628,9 @@ void lux_idiv_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         qr = div(*lp.w++, *rp.b);
         if (qr.rem < 0)
@@ -6638,7 +6638,7 @@ void lux_idiv_as(void)
         *tp.w++ = qr.quot;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         qr = div(*lp.w++, *rp.w);
         if (qr.rem < 0)
@@ -6646,7 +6646,7 @@ void lux_idiv_as(void)
         *tp.w++ = qr.quot;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         qr = div(*lp.w++, *rp.l);
         if (qr.rem < 0)
@@ -6654,7 +6654,7 @@ void lux_idiv_as(void)
         *tp.l++ = qr.quot;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         iqr = lldiv(*lp.w++, *rp.q);
         if (iqr.rem < 0)
@@ -6674,9 +6674,9 @@ void lux_idiv_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         qr = div(*lp.l++, *rp.b);
         if (qr.rem < 0)
@@ -6684,7 +6684,7 @@ void lux_idiv_as(void)
         *tp.l++ = qr.quot;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         qr = div(*lp.l++, *rp.w);
         if (qr.rem < 0)
@@ -6692,7 +6692,7 @@ void lux_idiv_as(void)
         *tp.l++ = qr.quot;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         qr = div(*lp.l++, *rp.l);
         if (qr.rem < 0)
@@ -6700,7 +6700,7 @@ void lux_idiv_as(void)
         *tp.l++ = qr.quot;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         iqr = lldiv(*lp.l++, *rp.q);
         if (iqr.rem < 0)
@@ -6722,19 +6722,19 @@ void lux_idiv_as(void)
     break;
   case LUX_FLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.f++ = floor(*lp.f++ / *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.f++ = floor(*lp.f++ / *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.f++ = floor(*lp.f++ / *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = floor(*lp.f++ / *rp.q);
       break;
@@ -6752,19 +6752,19 @@ void lux_idiv_as(void)
     break;
   case LUX_DOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.d++ = floor(*lp.d++ / *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.d++ = floor(*lp.d++ / *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.d++ = floor(*lp.d++ / *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = floor(*lp.d++ / *rp.q);
       break;
@@ -6794,9 +6794,9 @@ void lux_idiv_sa(void)
   lldiv_t iqr;
 
   switch (lhsType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         qr = div(*lp.b, *rp.b++);
         if (qr.rem < 0)
@@ -6804,7 +6804,7 @@ void lux_idiv_sa(void)
         *tp.b++ = qr.quot;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         qr = div(*lp.b, *rp.w++);
         if (qr.rem < 0)
@@ -6812,7 +6812,7 @@ void lux_idiv_sa(void)
         *tp.w++ = qr.quot;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         qr = div(*lp.b, *rp.l++);
         if (qr.rem < 0)
@@ -6820,7 +6820,7 @@ void lux_idiv_sa(void)
         *tp.l++ = qr.quot;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         iqr = lldiv(*lp.b, *rp.q++);
         if (iqr.rem < 0)
@@ -6840,9 +6840,9 @@ void lux_idiv_sa(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         qr = div(*lp.w, *rp.b++);
         if (qr.rem < 0)
@@ -6850,7 +6850,7 @@ void lux_idiv_sa(void)
         *tp.w++ = qr.quot;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         qr = div(*lp.w, *rp.w++);
         if (qr.rem < 0)
@@ -6858,7 +6858,7 @@ void lux_idiv_sa(void)
         *tp.w++ = qr.quot;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         qr = div(*lp.w, *rp.l++);
         if (qr.rem < 0)
@@ -6866,7 +6866,7 @@ void lux_idiv_sa(void)
         *tp.l++ = qr.quot;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         iqr = lldiv(*lp.w, *rp.q++);
         if (iqr.rem < 0)
@@ -6886,9 +6886,9 @@ void lux_idiv_sa(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         qr = div(*lp.l, *rp.b++);
         if (qr.rem < 0)
@@ -6896,7 +6896,7 @@ void lux_idiv_sa(void)
         *tp.l++ = qr.quot;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         qr = div(*lp.l, *rp.w++);
         if (qr.rem < 0)
@@ -6904,7 +6904,7 @@ void lux_idiv_sa(void)
         *tp.l++ = qr.quot;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         qr = div(*lp.l, *rp.l++);
         if (qr.rem < 0)
@@ -6912,7 +6912,7 @@ void lux_idiv_sa(void)
         *tp.l++ = qr.quot;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         iqr = lldiv(*lp.l, *rp.q++);
         if (iqr.rem < 0)
@@ -6934,19 +6934,19 @@ void lux_idiv_sa(void)
     break;
   case LUX_FLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.f++ = floor(*lp.f / *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.f++ = floor(*lp.f / *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.f++ = floor(*lp.f / *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = floor(*lp.f / *rp.q++);
       break;
@@ -6964,19 +6964,19 @@ void lux_idiv_sa(void)
     break;
   case LUX_DOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.d++ = floor(*lp.d / *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.d++ = floor(*lp.d / *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.d++ = floor(*lp.d / *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = floor(*lp.d / *rp.q++);
       break;
@@ -7114,21 +7114,21 @@ void lux_smod(void)
   doubleComplex l, r, t;
 
   switch (lhsType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.b++ = iasmod(*lp.b++, *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.w++ = iasmod(*lp.b++, *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = iasmod(*lp.b++, *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = i64asmod(*lp.b++, *rp.q++);
       break;
@@ -7168,21 +7168,21 @@ void lux_smod(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.w++ = iasmod(*lp.w++, *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.w++ = iasmod(*lp.w++, *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = iasmod(*lp.w++, *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = i64asmod(*lp.w++, *rp.q++);
       break;
@@ -7222,21 +7222,21 @@ void lux_smod(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = iasmod(*lp.l++, *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = iasmod(*lp.l++, *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = iasmod(*lp.l++, *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = i64asmod(*lp.l++, *rp.q++);
       break;
@@ -7276,21 +7276,21 @@ void lux_smod(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_QUAD:
+  case LUX_INT64:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.q++ = iasmod(*lp.q++, *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.q++ = iasmod(*lp.q++, *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.q++ = iasmod(*lp.q++, *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = i64asmod(*lp.q++, *rp.q++);
       break;
@@ -7332,19 +7332,19 @@ void lux_smod(void)
     break;
   case LUX_FLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.f++ = fasmod(*lp.f++, *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.f++ = fasmod(*lp.f++, *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.f++ = fasmod(*lp.f++, *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = fasmod(*lp.f++, *rp.q++);
       break;
@@ -7386,19 +7386,19 @@ void lux_smod(void)
     break;
   case LUX_DOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.d++ = fasmod(*lp.d++, *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.d++ = fasmod(*lp.d++, *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.d++ = fasmod(*lp.d++, *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = fasmod(*lp.d++, *rp.q++);
       break;
@@ -7440,7 +7440,7 @@ void lux_smod(void)
     break;
   case LUX_CFLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         l.real = lp.cf->real;
         l.imaginary = lp.cf->imaginary;
@@ -7452,7 +7452,7 @@ void lux_smod(void)
         lp.cf++; rp.b++; tp.cf++;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         l.real = lp.cf->real;
         l.imaginary = lp.cf->imaginary;
@@ -7464,7 +7464,7 @@ void lux_smod(void)
         lp.cf++; rp.w++; tp.cf++;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         l.real = lp.cf->real;
         l.imaginary = lp.cf->imaginary;
@@ -7476,7 +7476,7 @@ void lux_smod(void)
         lp.cf++; rp.l++; tp.cf++;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         l.real = lp.cf->real;
         l.imaginary = lp.cf->imaginary;
@@ -7542,7 +7542,7 @@ void lux_smod(void)
     break;
   case LUX_CDOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         l.real = lp.cd->real;
         l.imaginary = lp.cd->imaginary;
@@ -7554,7 +7554,7 @@ void lux_smod(void)
         lp.cd++; rp.b++; tp.cd++;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         l.real = lp.cd->real;
         l.imaginary = lp.cd->imaginary;
@@ -7566,7 +7566,7 @@ void lux_smod(void)
         lp.cd++; rp.w++; tp.cd++;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         l.real = lp.cd->real;
         l.imaginary = lp.cd->imaginary;
@@ -7578,7 +7578,7 @@ void lux_smod(void)
         lp.cd++; rp.l++; tp.cd++;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         l.real = lp.cd->real;
         l.imaginary = lp.cd->imaginary;
@@ -7653,21 +7653,21 @@ void lux_smod_as(void)
   doubleComplex l, r, t;
 
   switch (lhsType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.b++ = iasmod(*lp.b++, *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.w++ = iasmod(*lp.b++, *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = iasmod(*lp.b++, *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = i64asmod(*lp.b++, *rp.q);
       break;
@@ -7707,21 +7707,21 @@ void lux_smod_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.w++ = iasmod(*lp.w++, *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.w++ = iasmod(*lp.w++, *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = iasmod(*lp.w++, *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = i64asmod(*lp.w++, *rp.q);
       break;
@@ -7761,21 +7761,21 @@ void lux_smod_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = iasmod(*lp.l++, *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = iasmod(*lp.l++, *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = iasmod(*lp.l++, *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = i64asmod(*lp.l++, *rp.q);
       break;
@@ -7815,21 +7815,21 @@ void lux_smod_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_QUAD:
+  case LUX_INT64:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.q++ = i64asmod(*lp.q++, *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.q++ = i64asmod(*lp.q++, *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.q++ = i64asmod(*lp.q++, *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = i64asmod(*lp.q++, *rp.q);
       break;
@@ -7871,19 +7871,19 @@ void lux_smod_as(void)
     break;
   case LUX_FLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.f++ = fasmod(*lp.f++, *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.f++ = fasmod(*lp.f++, *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.f++ = fasmod(*lp.f++, *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = fasmod(*lp.f++, *rp.q);
       break;
@@ -7925,19 +7925,19 @@ void lux_smod_as(void)
     break;
   case LUX_DOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.d++ = fasmod(*lp.d++, *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.d++ = fasmod(*lp.d++, *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.d++ = fasmod(*lp.d++, *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = fasmod(*lp.d++, *rp.q);
       break;
@@ -7979,7 +7979,7 @@ void lux_smod_as(void)
     break;
   case LUX_CFLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       r.real = *rp.b;
       r.imaginary = 0;
       while (nRepeat--) {
@@ -7991,7 +7991,7 @@ void lux_smod_as(void)
         lp.cf++; tp.cf++;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       r.real = *rp.w;
       r.imaginary = 0;
       while (nRepeat--) {
@@ -8003,7 +8003,7 @@ void lux_smod_as(void)
         lp.cf++; tp.cf++;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       r.real = *rp.l;
       r.imaginary = 0;
       while (nRepeat--) {
@@ -8015,7 +8015,7 @@ void lux_smod_as(void)
         lp.cf++; tp.cf++;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       r.real = *rp.q;
       r.imaginary = 0;
       while (nRepeat--) {
@@ -8081,7 +8081,7 @@ void lux_smod_as(void)
     break;
   case LUX_CDOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       r.real = *rp.b;
       r.imaginary = 0;
       while (nRepeat--) {
@@ -8093,7 +8093,7 @@ void lux_smod_as(void)
         lp.cd++; tp.cd++;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       r.real = *rp.w;
       r.imaginary = 0;
       while (nRepeat--) {
@@ -8105,7 +8105,7 @@ void lux_smod_as(void)
         lp.cd++; tp.cd++;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       r.real = *rp.l;
       r.imaginary = 0;
       while (nRepeat--) {
@@ -8117,7 +8117,7 @@ void lux_smod_as(void)
         lp.cd++; tp.cd++;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       r.real = *rp.q;
       r.imaginary = 0;
       while (nRepeat--) {
@@ -8192,21 +8192,21 @@ void lux_smod_sa(void)
   doubleComplex l, r, t;
 
   switch (lhsType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.b++ = iasmod(*lp.b, *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.w++ = iasmod(*lp.b, *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = iasmod(*lp.b, *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = i64asmod(*lp.b, *rp.q++);
       break;
@@ -8246,21 +8246,21 @@ void lux_smod_sa(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.w++ = iasmod(*lp.w, *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.w++ = iasmod(*lp.w, *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = iasmod(*lp.w, *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = i64asmod(*lp.w, *rp.q++);
       break;
@@ -8300,21 +8300,21 @@ void lux_smod_sa(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = iasmod(*lp.l, *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = iasmod(*lp.l, *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = iasmod(*lp.l, *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = i64asmod(*lp.l, *rp.q++);
       break;
@@ -8354,21 +8354,21 @@ void lux_smod_sa(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_QUAD:
+  case LUX_INT64:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.q++ = i64asmod(*lp.q, *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.q++ = i64asmod(*lp.q, *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.q++ = i64asmod(*lp.q, *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = i64asmod(*lp.q, *rp.q++);
       break;
@@ -8410,19 +8410,19 @@ void lux_smod_sa(void)
     break;
   case LUX_FLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.f++ = fasmod(*lp.f, *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.f++ = fasmod(*lp.f, *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.f++ = fasmod(*lp.f, *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = fasmod(*lp.f, *rp.q++);
       break;
@@ -8464,19 +8464,19 @@ void lux_smod_sa(void)
     break;
   case LUX_DOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.d++ = fasmod(*lp.d, *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.d++ = fasmod(*lp.d, *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.d++ = fasmod(*lp.d, *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = fasmod(*lp.d, *rp.q++);
       break;
@@ -8518,7 +8518,7 @@ void lux_smod_sa(void)
     break;
   case LUX_CFLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       l.real = lp.cf->real;
       l.imaginary = lp.cf->imaginary;
       while (nRepeat--) {
@@ -8530,7 +8530,7 @@ void lux_smod_sa(void)
         rp.b++; tp.cf++;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       l.real = lp.cf->real;
       l.imaginary = lp.cf->imaginary;
       while (nRepeat--) {
@@ -8542,7 +8542,7 @@ void lux_smod_sa(void)
         rp.w++; tp.cf++;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       l.real = lp.cf->real;
       l.imaginary = lp.cf->imaginary;
       while (nRepeat--) {
@@ -8554,7 +8554,7 @@ void lux_smod_sa(void)
         rp.l++; tp.cf++;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       l.real = lp.cf->real;
       l.imaginary = lp.cf->imaginary;
       while (nRepeat--) {
@@ -8620,7 +8620,7 @@ void lux_smod_sa(void)
     break;
   case LUX_CDOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       l.real = lp.cd->real;
       l.imaginary = lp.cd->imaginary;
       while (nRepeat--) {
@@ -8632,7 +8632,7 @@ void lux_smod_sa(void)
         rp.b++; tp.cd++;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       l.real = lp.cd->real;
       l.imaginary = lp.cd->imaginary;
       while (nRepeat--) {
@@ -8644,7 +8644,7 @@ void lux_smod_sa(void)
         rp.w++; tp.cd++;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       l.real = lp.cd->real;
       l.imaginary = lp.cd->imaginary;
       while (nRepeat--) {
@@ -8656,7 +8656,7 @@ void lux_smod_sa(void)
         rp.l++; tp.cd++;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       l.real = lp.cd->real;
       l.imaginary = lp.cd->imaginary;
       while (nRepeat--) {
@@ -8731,21 +8731,21 @@ void lux_mod(void)
   doubleComplex l, r, t;
 
   switch (lhsType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.b++ = iamod(*lp.b++, *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.w++ = iamod(*lp.b++, *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = iamod(*lp.b++, *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = i64amod(*lp.b++, *rp.q++);
       break;
@@ -8785,21 +8785,21 @@ void lux_mod(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.w++ = iamod(*lp.w++, *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.w++ = iamod(*lp.w++, *rp.w++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = i64amod(*lp.w++, *rp.q++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = iamod(*lp.w++, *rp.l++);
       break;
@@ -8839,21 +8839,21 @@ void lux_mod(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = iamod(*lp.l++, *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = iamod(*lp.l++, *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = iamod(*lp.l++, *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = i64amod(*lp.l++, *rp.q++);
       break;
@@ -8893,21 +8893,21 @@ void lux_mod(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_QUAD:
+  case LUX_INT64:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.q++ = i64amod(*lp.q++, *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.q++ = i64amod(*lp.q++, *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.q++ = i64amod(*lp.q++, *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = i64amod(*lp.q++, *rp.q++);
       break;
@@ -8949,19 +8949,19 @@ void lux_mod(void)
     break;
   case LUX_FLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.f++ = famod(*lp.f++, *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.f++ = famod(*lp.f++, *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.f++ = famod(*lp.f++, *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = famod(*lp.f++, *rp.q++);
       break;
@@ -9003,19 +9003,19 @@ void lux_mod(void)
     break;
   case LUX_DOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.d++ = famod(*lp.d++, *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.d++ = famod(*lp.d++, *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.d++ = famod(*lp.d++, *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = famod(*lp.d++, *rp.q++);
       break;
@@ -9057,7 +9057,7 @@ void lux_mod(void)
     break;
   case LUX_CFLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         l.real = lp.cf->real;
         l.imaginary = lp.cf->imaginary;
@@ -9069,7 +9069,7 @@ void lux_mod(void)
         lp.cf++; rp.b++; tp.cf++;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         l.real = lp.cf->real;
         l.imaginary = lp.cf->imaginary;
@@ -9081,7 +9081,7 @@ void lux_mod(void)
         lp.cf++; rp.w++; tp.cf++;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         l.real = lp.cf->real;
         l.imaginary = lp.cf->imaginary;
@@ -9093,7 +9093,7 @@ void lux_mod(void)
         lp.cf++; rp.l++; tp.cf++;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         l.real = lp.cf->real;
         l.imaginary = lp.cf->imaginary;
@@ -9159,7 +9159,7 @@ void lux_mod(void)
     break;
   case LUX_CDOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         l.real = lp.cd->real;
         l.imaginary = lp.cd->imaginary;
@@ -9171,7 +9171,7 @@ void lux_mod(void)
         lp.cd++; rp.b++; tp.cd++;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         l.real = lp.cd->real;
         l.imaginary = lp.cd->imaginary;
@@ -9183,7 +9183,7 @@ void lux_mod(void)
         lp.cd++; rp.w++; tp.cd++;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         l.real = lp.cd->real;
         l.imaginary = lp.cd->imaginary;
@@ -9195,7 +9195,7 @@ void lux_mod(void)
         lp.cd++; rp.l++; tp.cd++;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         l.real = lp.cd->real;
         l.imaginary = lp.cd->imaginary;
@@ -9270,21 +9270,21 @@ void lux_mod_as(void)
   doubleComplex l, r, t;
 
   switch (lhsType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.b++ = iamod(*lp.b++, *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.w++ = iamod(*lp.b++, *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = iamod(*lp.b++, *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = i64amod(*lp.b++, *rp.q);
       break;
@@ -9324,21 +9324,21 @@ void lux_mod_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.w++ = iamod(*lp.w++, *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.w++ = iamod(*lp.w++, *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = iamod(*lp.w++, *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = i64amod(*lp.w++, *rp.q);
       break;
@@ -9378,21 +9378,21 @@ void lux_mod_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = iamod(*lp.l++, *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = iamod(*lp.l++, *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = iamod(*lp.l++, *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = i64amod(*lp.l++, *rp.q);
       break;
@@ -9434,19 +9434,19 @@ void lux_mod_as(void)
     break;
   case LUX_FLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.f++ = famod(*lp.f++, *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.f++ = famod(*lp.f++, *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.f++ = famod(*lp.f++, *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = famod(*lp.f++, *rp.q);
       break;
@@ -9488,19 +9488,19 @@ void lux_mod_as(void)
     break;
   case LUX_DOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.d++ = famod(*lp.d++, *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.d++ = famod(*lp.d++, *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.d++ = famod(*lp.d++, *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = famod(*lp.d++, *rp.q);
       break;
@@ -9542,7 +9542,7 @@ void lux_mod_as(void)
     break;
   case LUX_CFLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       r.real = *rp.b;
       r.imaginary = 0;
       while (nRepeat--) {
@@ -9554,7 +9554,7 @@ void lux_mod_as(void)
         lp.cf++; tp.cf++;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       r.real = *rp.w;
       r.imaginary = 0;
       while (nRepeat--) {
@@ -9566,7 +9566,7 @@ void lux_mod_as(void)
         lp.cf++; tp.cf++;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       r.real = *rp.l;
       r.imaginary = 0;
       while (nRepeat--) {
@@ -9578,7 +9578,7 @@ void lux_mod_as(void)
         lp.cf++; tp.cf++;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       r.real = *rp.q;
       r.imaginary = 0;
       while (nRepeat--) {
@@ -9644,7 +9644,7 @@ void lux_mod_as(void)
     break;
   case LUX_CDOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       r.real = *rp.b;
       r.imaginary = 0;
       while (nRepeat--) {
@@ -9656,7 +9656,7 @@ void lux_mod_as(void)
         lp.cd++; tp.cd++;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       r.real = *rp.w;
       r.imaginary = 0;
       while (nRepeat--) {
@@ -9668,7 +9668,7 @@ void lux_mod_as(void)
         lp.cd++; tp.cd++;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       r.real = *rp.l;
       r.imaginary = 0;
       while (nRepeat--) {
@@ -9680,7 +9680,7 @@ void lux_mod_as(void)
         lp.cd++; tp.cd++;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       r.real = *rp.q;
       r.imaginary = 0;
       while (nRepeat--) {
@@ -9755,21 +9755,21 @@ void lux_mod_sa(void)
   doubleComplex l, r, t;
 
   switch (lhsType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.b++ = iamod(*lp.b, *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.w++ = iamod(*lp.b, *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = iamod(*lp.b, *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = i64amod(*lp.b, *rp.q++);
       break;
@@ -9809,21 +9809,21 @@ void lux_mod_sa(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.w++ = iamod(*lp.w, *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.w++ = iamod(*lp.w, *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = iamod(*lp.w, *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = i64amod(*lp.w, *rp.q++);
       break;
@@ -9863,21 +9863,21 @@ void lux_mod_sa(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = iamod(*lp.l, *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = iamod(*lp.l, *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = iamod(*lp.l, *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = i64amod(*lp.l, *rp.q++);
       break;
@@ -9917,21 +9917,21 @@ void lux_mod_sa(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_QUAD:
+  case LUX_INT64:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.q++ = i64amod(*lp.q, *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.q++ = i64amod(*lp.q, *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.q++ = i64amod(*lp.q, *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = i64amod(*lp.q, *rp.q++);
       break;
@@ -9973,19 +9973,19 @@ void lux_mod_sa(void)
     break;
   case LUX_FLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.f++ = famod(*lp.f, *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.f++ = famod(*lp.f, *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.f++ = famod(*lp.f, *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = famod(*lp.f, *rp.q++);
       break;
@@ -10027,19 +10027,19 @@ void lux_mod_sa(void)
     break;
   case LUX_DOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.d++ = famod(*lp.d, *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.d++ = famod(*lp.d, *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.d++ = famod(*lp.d, *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = famod(*lp.d, *rp.q++);
       break;
@@ -10081,7 +10081,7 @@ void lux_mod_sa(void)
     break;
   case LUX_CFLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       l.real = lp.cf->real;
       l.imaginary = lp.cf->imaginary;
       while (nRepeat--) {
@@ -10093,7 +10093,7 @@ void lux_mod_sa(void)
         rp.b++; tp.cf++;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       l.real = lp.cf->real;
       l.imaginary = lp.cf->imaginary;
       while (nRepeat--) {
@@ -10105,7 +10105,7 @@ void lux_mod_sa(void)
         rp.w++; tp.cf++;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       l.real = lp.cf->real;
       l.imaginary = lp.cf->imaginary;
       while (nRepeat--) {
@@ -10117,7 +10117,7 @@ void lux_mod_sa(void)
         rp.l++; tp.cf++;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       l.real = lp.cf->real;
       l.imaginary = lp.cf->imaginary;
       while (nRepeat--) {
@@ -10183,7 +10183,7 @@ void lux_mod_sa(void)
     break;
   case LUX_CDOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       l.real = lp.cd->real;
       l.imaginary = lp.cd->imaginary;
       while (nRepeat--) {
@@ -10195,7 +10195,7 @@ void lux_mod_sa(void)
         rp.b++; tp.cd++;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       l.real = lp.cd->real;
       l.imaginary = lp.cd->imaginary;
       while (nRepeat--) {
@@ -10207,7 +10207,7 @@ void lux_mod_sa(void)
         rp.w++; tp.cd++;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       l.real = lp.cd->real;
       l.imaginary = lp.cd->imaginary;
       while (nRepeat--) {
@@ -10219,7 +10219,7 @@ void lux_mod_sa(void)
         rp.l++; tp.cd++;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       l.real = lp.cd->real;
       l.imaginary = lp.cd->imaginary;
       while (nRepeat--) {
@@ -10294,27 +10294,27 @@ void lux_max(void)
   scalar        value1, value2;
 
   switch (lhsType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.b++ = ((value1.b = *lp.b++) > (value2.b = *rp.b++))?
           value1.b:
           value2.b;
           break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.w++ = ((value1.w = *lp.b++) > (value2.w = *rp.w++))?
           value1.w:
           value2.w;
           break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = ((value1.l = *lp.b++) > (value2.l = *rp.l++))?
           value1.l:
           value2.l;
           break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = ((value1.q = *lp.b++) > (value2.q = *rp.q++))?
           value1.q:
@@ -10366,27 +10366,27 @@ void lux_max(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.w++ = ((value1.w = *lp.w++) > (value2.w = *rp.b++))?
           value1.w:
           value2.w;
           break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.w++ = ((value1.w = *lp.w++) > (value2.w = *rp.w++))?
           value1.w:
           value2.w;
           break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = ((value1.q = *lp.w++) > (value2.q = *rp.q++))?
           value1.q:
           value2.q;
           break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = ((value1.l = *lp.w++) > (value2.l = *rp.l++))?
           value1.l:
@@ -10438,27 +10438,27 @@ void lux_max(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = ((value1.l = *lp.l++) > (value2.l = *rp.b++))?
           value1.l:
           value2.l;
           break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = ((value1.l = *lp.l++) > (value2.l = *rp.w++))?
           value1.l:
           value2.l;
           break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = ((value1.l = *lp.l++) > (value2.l = *rp.l++))?
           value1.l:
           value2.l;
           break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = ((value1.q = *lp.l++) > (value2.q = *rp.q++))?
           value1.q:
@@ -10510,27 +10510,27 @@ void lux_max(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_QUAD:
+  case LUX_INT64:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.q++ = ((value1.q = *lp.q++) > (value2.q = *rp.b++))?
           value1.q:
           value2.q;
           break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.q++ = ((value1.q = *lp.q++) > (value2.q = *rp.w++))?
           value1.q:
           value2.q;
           break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.q++ = ((value1.q = *lp.q++) > (value2.q = *rp.l++))?
           value1.q:
           value2.q;
           break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = ((value1.q = *lp.q++) > (value2.q = *rp.q++))?
           value1.q:
@@ -10584,25 +10584,25 @@ void lux_max(void)
     break;
   case LUX_FLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.f++ = ((value1.f = *lp.f++) > (value2.f = *rp.b++))?
           value1.f:
           value2.f;
           break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.f++ = ((value1.f = *lp.f++) > (value2.f = *rp.w++))?
           value1.f:
           value2.f;
           break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.f++ = ((value1.f = *lp.f++) > (value2.f = *rp.l++))?
           value1.f:
           value2.f;
           break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = ((value1.d = *lp.f++) > (value2.d = *rp.q++))?
           value1.d:
@@ -10656,25 +10656,25 @@ void lux_max(void)
     break;
   case LUX_DOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.d++ = ((value1.d = *lp.d++) > (value2.d = *rp.b++))?
           value1.d:
           value2.d;
           break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.d++ = ((value1.d = *lp.d++) > (value2.d = *rp.w++))?
           value1.d:
           value2.d;
           break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.d++ = ((value1.d = *lp.d++) > (value2.d = *rp.l++))?
           value1.d:
           value2.d;
           break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = ((value1.d = *lp.d++) > (value2.d = *rp.q++))?
           value1.d:
@@ -10729,7 +10729,7 @@ void lux_max(void)
   case LUX_CFLOAT:
     /* if complex numbers are involved, then we compare absolute values */
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         if (hypot(lp.cf->real, lp.cf->imaginary) > fabs(*rp.b)) {
           tp.cf->real = lp.cf->real;
@@ -10743,7 +10743,7 @@ void lux_max(void)
         rp.b++;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         if (hypot(lp.cf->real, lp.cf->imaginary) > fabs(*rp.w)) {
           tp.cf->real = lp.cf->real;
@@ -10757,7 +10757,7 @@ void lux_max(void)
         rp.w++;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         if (hypot(lp.cf->real, lp.cf->imaginary) > fabs(*rp.l)) {
           tp.cf->real = lp.cf->real;
@@ -10771,7 +10771,7 @@ void lux_max(void)
         rp.l++;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         if (hypot(lp.cf->real, lp.cf->imaginary) > fabs(*rp.q)) {
           tp.cd->real = lp.cf->real;
@@ -10850,7 +10850,7 @@ void lux_max(void)
   case LUX_CDOUBLE:
     /* if complex numbers are involved, then we compare absolute values */
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         if (hypot(lp.cd->real, lp.cd->imaginary) > fabs(*rp.b)) {
           tp.cd->real = lp.cd->real;
@@ -10864,7 +10864,7 @@ void lux_max(void)
         rp.b++;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         if (hypot(lp.cd->real, lp.cd->imaginary) > fabs(*rp.w)) {
           tp.cd->real = lp.cd->real;
@@ -10878,7 +10878,7 @@ void lux_max(void)
         rp.w++;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         if (hypot(lp.cd->real, lp.cd->imaginary) > fabs(*rp.l)) {
           tp.cd->real = lp.cd->real;
@@ -10892,7 +10892,7 @@ void lux_max(void)
         rp.l++;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         if (hypot(lp.cd->real, lp.cd->imaginary) > fabs(*rp.q)) {
           tp.cd->real = lp.cd->real;
@@ -10979,30 +10979,30 @@ void lux_max_as(void)
   scalar        value1, value2;
 
   switch (lhsType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       value2.b = *rp.b;
       while (nRepeat--)
         *tp.b++ = ((value1.b = *lp.b++) > value2.b)?
           value1.b:
           value2.b;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       value2.w = *rp.w;
       while (nRepeat--)
         *tp.w++ = ((value1.w = *lp.b++) > value2.w)?
           value1.w:
           value2.w;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       value2.l = *rp.l;
       while (nRepeat--)
         *tp.l++ = ((value1.l = *lp.b++) > value2.l)?
           value1.l:
           value2.l;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       value2.q = *rp.q;
       while (nRepeat--)
         *tp.q++ = ((value1.q = *lp.b++) > value2.q)?
@@ -11055,30 +11055,30 @@ void lux_max_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       value2.w = *rp.b;
       while (nRepeat--)
         *tp.w++ = ((value1.w = *lp.w++) > value2.w)?
           value1.w:
           value2.w;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       value2.w = *rp.w;
       while (nRepeat--)
         *tp.w++ = ((value1.w = *lp.w++) > value2.w)?
           value1.w:
           value2.w;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       value2.l = *rp.l;
       while (nRepeat--)
         *tp.l++ = ((value1.l = *lp.w++) > value2.l)?
           value1.l:
           value2.l;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       value2.q = *rp.q;
       while (nRepeat--)
         *tp.q++ = ((value1.q = *lp.w++) > value2.q)?
@@ -11131,30 +11131,30 @@ void lux_max_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       value2.l = *rp.b;
       while (nRepeat--)
         *tp.l++ = ((value1.l = *lp.l++) > value2.l)?
           value1.l:
           value2.l;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       value2.l = *rp.w;
       while (nRepeat--)
         *tp.l++ = ((value1.l = *lp.l++) > value2.l)?
           value1.l:
           value2.l;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       value2.l = *rp.l;
       while (nRepeat--)
         *tp.l++ = ((value1.l = *lp.l++) > value2.l)?
           value1.l:
           value2.l;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       value2.q = *rp.q;
       while (nRepeat--)
         *tp.q++ = ((value1.q = *lp.l++) > value2.q)?
@@ -11207,30 +11207,30 @@ void lux_max_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_QUAD:
+  case LUX_INT64:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       value2.q = *rp.b;
       while (nRepeat--)
         *tp.q++ = ((value1.q = *lp.q++) > value2.q)?
           value1.q:
           value2.q;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       value2.q = *rp.w;
       while (nRepeat--)
         *tp.q++ = ((value1.q = *lp.q++) > value2.q)?
           value1.q:
           value2.q;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       value2.q = *rp.l;
       while (nRepeat--)
         *tp.q++ = ((value1.q = *lp.q++) > value2.q)?
           value1.q:
           value2.q;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       value2.q = *rp.q;
       while (nRepeat--)
         *tp.q++ = ((value1.q = *lp.q++) > value2.q)?
@@ -11285,28 +11285,28 @@ void lux_max_as(void)
     break;
   case LUX_FLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       value2.f = *rp.b;
       while (nRepeat--)
         *tp.f++ = ((value1.f = *lp.f++) > value2.f)?
           value1.f:
           value2.f;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       value2.f = *rp.w;
       while (nRepeat--)
         *tp.f++ = ((value1.f = *lp.f++) > value2.f)?
           value1.f:
           value2.f;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       value2.f = *rp.l;
       while (nRepeat--)
         *tp.f++ = ((value1.f = *lp.f++) > value2.f)?
           value1.f:
           value2.f;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       value2.d = *rp.q;
       while (nRepeat--)
         *tp.d++ = ((value1.d = *lp.f++) > value2.d)?
@@ -11361,28 +11361,28 @@ void lux_max_as(void)
     break;
   case LUX_DOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       value2.d = *rp.b;
       while (nRepeat--)
         *tp.d++ = ((value1.d = *lp.d++) > value2.d)?
           value1.d:
           value2.d;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       value2.d = *rp.w;
       while (nRepeat--)
         *tp.d++ = ((value1.d = *lp.d++) > value2.d)?
           value1.d:
           value2.d;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       value2.d = *rp.l;
       while (nRepeat--)
         *tp.d++ = ((value1.d = *lp.d++) > value2.d)?
           value1.d:
           value2.d;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       value2.d = *rp.q;
       while (nRepeat--)
         *tp.d++ = ((value1.d = *lp.d++) > value2.d)?
@@ -11437,7 +11437,7 @@ void lux_max_as(void)
     break;
   case LUX_CFLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       value2.d = fabs(*rp.b);
       while (nRepeat--) {
         if (hypot(lp.cf->real, lp.cf->imaginary) > value2.d) {
@@ -11451,7 +11451,7 @@ void lux_max_as(void)
         tp.cf++;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       value2.d = fabs(*rp.w);
       while (nRepeat--) {
         if (hypot(lp.cf->real, lp.cf->imaginary) > value2.d) {
@@ -11465,7 +11465,7 @@ void lux_max_as(void)
         tp.cf++;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       value2.d = fabs(*rp.l);
       while (nRepeat--) {
         if (hypot(lp.cf->real, lp.cf->imaginary) > value2.d) {
@@ -11479,7 +11479,7 @@ void lux_max_as(void)
         tp.cf++;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       value2.d = fabs(*rp.q);
       while (nRepeat--) {
         if (hypot(lp.cf->real, lp.cf->imaginary) > value2.d) {
@@ -11555,7 +11555,7 @@ void lux_max_as(void)
     break;
   case LUX_CDOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       value2.d = fabs(*rp.b);
       while (nRepeat--) {
         if (hypot(lp.cd->real, lp.cd->imaginary) > value2.d) {
@@ -11569,7 +11569,7 @@ void lux_max_as(void)
         tp.cd++;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       value2.d = fabs(*rp.w);
       while (nRepeat--) {
         if (hypot(lp.cd->real, lp.cd->imaginary) > value2.d) {
@@ -11583,7 +11583,7 @@ void lux_max_as(void)
         tp.cd++;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       value2.d = fabs(*rp.l);
       while (nRepeat--) {
         if (hypot(lp.cd->real, lp.cd->imaginary) > value2.d) {
@@ -11597,7 +11597,7 @@ void lux_max_as(void)
         tp.cd++;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       value2.d = fabs(*rp.q);
       while (nRepeat--) {
         if (hypot(lp.cd->real, lp.cd->imaginary) > value2.d) {
@@ -11705,27 +11705,27 @@ void lux_min(void)
   scalar        value1, value2;
 
   switch (lhsType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.b++ = ((value1.b = *lp.b++) < (value2.b = *rp.b++))?
           value1.b:
           value2.b;
           break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.w++ = ((value1.w = *lp.b++) < (value2.w = *rp.w++))?
           value1.w:
           value2.w;
           break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = ((value1.l = *lp.b++) < (value2.l = *rp.l++))?
           value1.l:
           value2.l;
           break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = ((value1.q = *lp.b++) < (value2.q = *rp.q++))?
           value1.q:
@@ -11777,27 +11777,27 @@ void lux_min(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.w++ = ((value1.w = *lp.w++) < (value2.w = *rp.b++))?
           value1.w:
           value2.w;
           break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.w++ = ((value1.w = *lp.w++) < (value2.w = *rp.w++))?
           value1.w:
           value2.w;
           break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = ((value1.q = *lp.w++) < (value2.q = *rp.q++))?
           value1.q:
           value2.q;
           break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = ((value1.l = *lp.w++) < (value2.l = *rp.l++))?
           value1.l:
@@ -11849,27 +11849,27 @@ void lux_min(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = ((value1.l = *lp.l++) < (value2.l = *rp.b++))?
           value1.l:
           value2.l;
           break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = ((value1.l = *lp.l++) < (value2.l = *rp.w++))?
           value1.l:
           value2.l;
           break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = ((value1.l = *lp.l++) < (value2.l = *rp.l++))?
           value1.l:
           value2.l;
           break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = ((value1.q = *lp.l++) < (value2.q = *rp.q++))?
           value1.q:
@@ -11921,27 +11921,27 @@ void lux_min(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_QUAD:
+  case LUX_INT64:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.q++ = ((value1.q = *lp.q++) < (value2.q = *rp.b++))?
           value1.q:
           value2.q;
           break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.q++ = ((value1.q = *lp.q++) < (value2.q = *rp.w++))?
           value1.q:
           value2.q;
           break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.q++ = ((value1.q = *lp.q++) < (value2.q = *rp.l++))?
           value1.q:
           value2.q;
           break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = ((value1.q = *lp.q++) < (value2.q = *rp.q++))?
           value1.q:
@@ -11995,25 +11995,25 @@ void lux_min(void)
     break;
   case LUX_FLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.f++ = ((value1.f = *lp.f++) < (value2.f = *rp.b++))?
           value1.f:
           value2.f;
           break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.f++ = ((value1.f = *lp.f++) < (value2.f = *rp.w++))?
           value1.f:
           value2.f;
           break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.f++ = ((value1.f = *lp.f++) < (value2.f = *rp.l++))?
           value1.f:
           value2.f;
           break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = ((value1.d = *lp.f++) < (value2.d = *rp.q++))?
           value1.d:
@@ -12067,25 +12067,25 @@ void lux_min(void)
     break;
   case LUX_DOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.d++ = ((value1.d = *lp.d++) < (value2.d = *rp.b++))?
           value1.d:
           value2.d;
           break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.d++ = ((value1.d = *lp.d++) < (value2.d = *rp.w++))?
           value1.d:
           value2.d;
           break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.d++ = ((value1.d = *lp.d++) < (value2.d = *rp.l++))?
           value1.d:
           value2.d;
           break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.d++ = ((value1.d = *lp.d++) < (value2.d = *rp.q++))?
           value1.d:
@@ -12140,7 +12140,7 @@ void lux_min(void)
   case LUX_CFLOAT:
     /* if complex numbers are involved, then we compare absolute values */
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         if (hypot(lp.cf->real, lp.cf->imaginary) < fabs(*rp.b)) {
           tp.cf->real = lp.cf->real;
@@ -12154,7 +12154,7 @@ void lux_min(void)
         rp.b++;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         if (hypot(lp.cf->real, lp.cf->imaginary) < fabs(*rp.w)) {
           tp.cf->real = lp.cf->real;
@@ -12168,7 +12168,7 @@ void lux_min(void)
         rp.w++;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         if (hypot(lp.cf->real, lp.cf->imaginary) < fabs(*rp.l)) {
           tp.cf->real = lp.cf->real;
@@ -12182,7 +12182,7 @@ void lux_min(void)
         rp.l++;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         if (hypot(lp.cf->real, lp.cf->imaginary) < fabs(*rp.q)) {
           tp.cd->real = lp.cf->real;
@@ -12261,7 +12261,7 @@ void lux_min(void)
   case LUX_CDOUBLE:
     /* if complex numbers are involved, then we compare absolute values */
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         if (hypot(lp.cd->real, lp.cd->imaginary) < fabs(*rp.b)) {
           tp.cd->real = lp.cd->real;
@@ -12275,7 +12275,7 @@ void lux_min(void)
         rp.b++;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         if (hypot(lp.cd->real, lp.cd->imaginary) < fabs(*rp.w)) {
           tp.cd->real = lp.cd->real;
@@ -12289,7 +12289,7 @@ void lux_min(void)
         rp.w++;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         if (hypot(lp.cd->real, lp.cd->imaginary) < fabs(*rp.l)) {
           tp.cd->real = lp.cd->real;
@@ -12303,7 +12303,7 @@ void lux_min(void)
         rp.l++;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         if (hypot(lp.cd->real, lp.cd->imaginary) < fabs(*rp.q)) {
           tp.cd->real = lp.cd->real;
@@ -12390,30 +12390,30 @@ void lux_min_as(void)
   scalar        value1, value2;
 
   switch (lhsType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       value2.b = *rp.b;
       while (nRepeat--)
         *tp.b++ = ((value1.b = *lp.b++) < value2.b)?
           value1.b:
           value2.b;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       value2.w = *rp.w;
       while (nRepeat--)
         *tp.w++ = ((value1.w = *lp.b++) < value2.w)?
           value1.w:
           value2.w;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       value2.l = *rp.l;
       while (nRepeat--)
         *tp.l++ = ((value1.l = *lp.b++) < value2.l)?
           value1.l:
           value2.l;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       value2.q = *rp.q;
       while (nRepeat--)
         *tp.q++ = ((value1.q = *lp.b++) < value2.q)?
@@ -12466,30 +12466,30 @@ void lux_min_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       value2.w = *rp.b;
       while (nRepeat--)
         *tp.w++ = ((value1.w = *lp.w++) < value2.w)?
           value1.w:
           value2.w;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       value2.w = *rp.w;
       while (nRepeat--)
         *tp.w++ = ((value1.w = *lp.w++) < value2.w)?
           value1.w:
           value2.w;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       value2.l = *rp.l;
       while (nRepeat--)
         *tp.l++ = ((value1.l = *lp.w++) < value2.l)?
           value1.l:
           value2.l;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       value2.q = *rp.q;
       while (nRepeat--)
         *tp.q++ = ((value1.q = *lp.w++) < value2.q)?
@@ -12542,30 +12542,30 @@ void lux_min_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       value2.l = *rp.b;
       while (nRepeat--)
         *tp.l++ = ((value1.l = *lp.l++) < value2.l)?
           value1.l:
           value2.l;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       value2.l = *rp.w;
       while (nRepeat--)
         *tp.l++ = ((value1.l = *lp.l++) < value2.l)?
           value1.l:
           value2.l;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       value2.l = *rp.l;
       while (nRepeat--)
         *tp.l++ = ((value1.l = *lp.l++) < value2.l)?
           value1.l:
           value2.l;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       value2.q = *rp.q;
       while (nRepeat--)
         *tp.q++ = ((value1.q = *lp.l++) < value2.q)?
@@ -12618,30 +12618,30 @@ void lux_min_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_QUAD:
+  case LUX_INT64:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       value2.q = *rp.b;
       while (nRepeat--)
         *tp.q++ = ((value1.q = *lp.q++) < value2.q)?
           value1.q:
           value2.q;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       value2.q = *rp.w;
       while (nRepeat--)
         *tp.q++ = ((value1.q = *lp.q++) < value2.q)?
           value1.q:
           value2.q;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       value2.q = *rp.l;
       while (nRepeat--)
         *tp.q++ = ((value1.q = *lp.q++) < value2.q)?
           value1.q:
           value2.q;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       value2.q = *rp.q;
       while (nRepeat--)
         *tp.q++ = ((value1.q = *lp.q++) < value2.q)?
@@ -12696,28 +12696,28 @@ void lux_min_as(void)
     break;
   case LUX_FLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       value2.f = *rp.b;
       while (nRepeat--)
         *tp.f++ = ((value1.f = *lp.f++) < value2.f)?
           value1.f:
           value2.f;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       value2.f = *rp.w;
       while (nRepeat--)
         *tp.f++ = ((value1.f = *lp.f++) < value2.f)?
           value1.f:
           value2.f;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       value2.f = *rp.l;
       while (nRepeat--)
         *tp.f++ = ((value1.f = *lp.f++) < value2.f)?
           value1.f:
           value2.f;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       value2.d = *rp.q;
       while (nRepeat--)
         *tp.d++ = ((value1.d = *lp.f++) < value2.d)?
@@ -12772,28 +12772,28 @@ void lux_min_as(void)
     break;
   case LUX_DOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       value2.d = *rp.b;
       while (nRepeat--)
         *tp.d++ = ((value1.d = *lp.d++) < value2.d)?
           value1.d:
           value2.d;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       value2.d = *rp.w;
       while (nRepeat--)
         *tp.d++ = ((value1.d = *lp.d++) < value2.d)?
           value1.d:
           value2.d;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       value2.d = *rp.l;
       while (nRepeat--)
         *tp.d++ = ((value1.d = *lp.d++) < value2.d)?
           value1.d:
           value2.d;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       value2.d = *rp.q;
       while (nRepeat--)
         *tp.d++ = ((value1.d = *lp.d++) < value2.d)?
@@ -12848,7 +12848,7 @@ void lux_min_as(void)
     break;
   case LUX_CFLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       value2.d = fabs(*rp.b);
       while (nRepeat--) {
         if (hypot(lp.cf->real, lp.cf->imaginary) < value2.d) {
@@ -12862,7 +12862,7 @@ void lux_min_as(void)
         tp.cf++;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       value2.d = fabs(*rp.w);
       while (nRepeat--) {
         if (hypot(lp.cf->real, lp.cf->imaginary) < value2.d) {
@@ -12876,7 +12876,7 @@ void lux_min_as(void)
         tp.cf++;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       value2.d = fabs(*rp.l);
       while (nRepeat--) {
         if (hypot(lp.cf->real, lp.cf->imaginary) < value2.d) {
@@ -12890,7 +12890,7 @@ void lux_min_as(void)
         tp.cf++;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       value2.d = fabs(*rp.q);
       while (nRepeat--) {
         if (hypot(lp.cf->real, lp.cf->imaginary) < value2.d) {
@@ -12966,7 +12966,7 @@ void lux_min_as(void)
     break;
   case LUX_CDOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       value2.d = fabs(*rp.b);
       while (nRepeat--) {
         if (hypot(lp.cd->real, lp.cd->imaginary) < value2.d) {
@@ -12980,7 +12980,7 @@ void lux_min_as(void)
         tp.cd++;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       value2.d = fabs(*rp.w);
       while (nRepeat--) {
         if (hypot(lp.cd->real, lp.cd->imaginary) < value2.d) {
@@ -12994,7 +12994,7 @@ void lux_min_as(void)
         tp.cd++;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       value2.d = fabs(*rp.l);
       while (nRepeat--) {
         if (hypot(lp.cd->real, lp.cd->imaginary) < value2.d) {
@@ -13008,7 +13008,7 @@ void lux_min_as(void)
         tp.cd++;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       value2.d = fabs(*rp.q);
       while (nRepeat--) {
         if (hypot(lp.cd->real, lp.cd->imaginary) < value2.d) {
@@ -13114,21 +13114,21 @@ void lux_eq(void)
      /* equal-to with array operands */
 {
   switch (lhsType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ == *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ == *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ == *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ == *rp.q++);
       break;
@@ -13158,21 +13158,21 @@ void lux_eq(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ == *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ == *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ == *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ == *rp.q++);
       break;
@@ -13202,21 +13202,21 @@ void lux_eq(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ == *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ == *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ == *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ == *rp.q++);
       break;
@@ -13246,21 +13246,21 @@ void lux_eq(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_QUAD:
+  case LUX_INT64:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.q++ == *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.q++ == *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.q++ == *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.q++ == *rp.q++);
       break;
@@ -13292,19 +13292,19 @@ void lux_eq(void)
     break;
   case LUX_FLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.f++ == *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.f++ == *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.f++ == *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.f++ == *rp.q++);
       break;
@@ -13336,19 +13336,19 @@ void lux_eq(void)
     break;
   case LUX_DOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.d++ == *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.d++ == *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.d++ == *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.d++ == *rp.q++);
       break;
@@ -13380,28 +13380,28 @@ void lux_eq(void)
     break;
   case LUX_CFLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         *tp.l++ = (lp.cf->real == *rp.b && lp.cf->imaginary == 0);
         lp.cf++;
         rp.b++;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         *tp.l++ = (lp.cf->real == *rp.w && lp.cf->imaginary == 0);
         lp.cf++;
         rp.w++;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         *tp.l++ = (lp.cf->real == *rp.l && lp.cf->imaginary == 0);
         lp.cf++;
         rp.l++;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         *tp.l++ = (lp.cf->real == *rp.q && lp.cf->imaginary == 0);
         lp.cf++;
@@ -13444,28 +13444,28 @@ void lux_eq(void)
     break;
   case LUX_CDOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         *tp.l++ = (lp.cd->real == *rp.b && lp.cd->imaginary == 0);
         lp.cd++;
         rp.b++;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         *tp.l++ = (lp.cd->real == *rp.w && lp.cd->imaginary == 0);
         lp.cd++;
         rp.w++;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         *tp.l++ = (lp.cd->real == *rp.l && lp.cd->imaginary == 0);
         lp.cd++;
         rp.l++;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         *tp.l++ = (lp.cd->real == *rp.q && lp.cd->imaginary == 0);
         lp.cd++;
@@ -13522,21 +13522,21 @@ void lux_eq_as(void)
      /* equal-to with array LHS and scalar RHS */
 {
   switch (lhsType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ == *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ == *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ == *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ == *rp.q);
       break;
@@ -13560,21 +13560,21 @@ void lux_eq_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ == *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ == *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ == *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ == *rp.q);
       break;
@@ -13598,21 +13598,21 @@ void lux_eq_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ == *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ == *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ == *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.q++ == *rp.q);
       break;
@@ -13636,21 +13636,21 @@ void lux_eq_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_QUAD:
+  case LUX_INT64:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.q++ == *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.q++ == *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.q++ == *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.q++ == *rp.q);
       break;
@@ -13676,19 +13676,19 @@ void lux_eq_as(void)
     break;
   case LUX_FLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.f++ == *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.f++ == *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.f++ == *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.f++ == *rp.q);
       break;
@@ -13714,19 +13714,19 @@ void lux_eq_as(void)
     break;
   case LUX_DOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.d++ == *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.d++ == *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.d++ == *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.d++ == *rp.q);
       break;
@@ -13752,19 +13752,19 @@ void lux_eq_as(void)
     break;
   case LUX_CFLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (lp.cf->real == *rp.b && lp.cf->imaginary == 0);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (lp.cf->real == *rp.w && lp.cf->imaginary == 0);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (lp.cf->real == *rp.l && lp.cf->imaginary == 0);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (lp.cf->real == *rp.q && lp.cf->imaginary == 0);
       break;
@@ -13792,19 +13792,19 @@ void lux_eq_as(void)
     break;
   case LUX_CDOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (lp.cd->real == *rp.b && lp.cd->imaginary == 0);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (lp.cd->real == *rp.w && lp.cd->imaginary == 0);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (lp.cd->real == *rp.l && lp.cd->imaginary == 0);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (lp.cd->real == *rp.q && lp.cd->imaginary == 0);
       break;
@@ -13861,21 +13861,21 @@ void lux_gt(void)
      /* greater-than with two array operands */
 {
   switch (lhsType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ > *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ > *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ > *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ > *rp.q++);
       break;
@@ -13905,21 +13905,21 @@ void lux_gt(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ > *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ > *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ > *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ > *rp.q++);
       break;
@@ -13949,21 +13949,21 @@ void lux_gt(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ > *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ > *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ > *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ > *rp.q++);
       break;
@@ -13993,21 +13993,21 @@ void lux_gt(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_QUAD:
+  case LUX_INT64:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.q++ > *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.q++ > *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.q++ > *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.q++ > *rp.q++);
       break;
@@ -14039,19 +14039,19 @@ void lux_gt(void)
     break;
   case LUX_FLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.f++ > *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.f++ > *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.f++ > *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.f++ > *rp.q++);
       break;
@@ -14083,19 +14083,19 @@ void lux_gt(void)
     break;
   case LUX_DOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.d++ > *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.d++ > *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.d++ > *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.d++ > *rp.q++);
       break;
@@ -14127,28 +14127,28 @@ void lux_gt(void)
     break;
   case LUX_CFLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) > fabs(*rp.b));
         lp.cf++;
         rp.b++;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) > fabs(*rp.w));
         lp.cf++;
         rp.w++;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) > fabs(*rp.l));
         lp.cf++;
         rp.l++;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) > fabs(*rp.q));
         lp.cf++;
@@ -14191,28 +14191,28 @@ void lux_gt(void)
     break;
   case LUX_CDOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) > fabs(*rp.b));
         lp.cd++;
         rp.b++;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) > fabs(*rp.w));
         lp.cd++;
         rp.w++;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) > fabs(*rp.l));
         lp.cd++;
         rp.l++;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) > fabs(*rp.q));
         lp.cd++;
@@ -14271,21 +14271,21 @@ void lux_gt_as(void)
   double        value;
 
   switch (lhsType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ > *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ > *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ > *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ > *rp.q);
       break;
@@ -14315,21 +14315,21 @@ void lux_gt_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ > *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ > *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ > *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ > *rp.q);
       break;
@@ -14359,21 +14359,21 @@ void lux_gt_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ > *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ > *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ > *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ > *rp.q);
       break;
@@ -14403,21 +14403,21 @@ void lux_gt_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_QUAD:
+  case LUX_INT64:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.q++ > *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.q++ > *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.q++ > *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.q++ > *rp.q);
       break;
@@ -14449,19 +14449,19 @@ void lux_gt_as(void)
     break;
   case LUX_FLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.f++ > *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.f++ > *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.f++ > *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.f++ > *rp.q);
       break;
@@ -14493,19 +14493,19 @@ void lux_gt_as(void)
     break;
   case LUX_DOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.d++ > *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.d++ > *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.d++ > *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.d++ > *rp.q);
       break;
@@ -14537,25 +14537,25 @@ void lux_gt_as(void)
     break;
   case LUX_CFLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) > fabs(*rp.b));
         lp.cf++;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) > fabs(*rp.w));
         lp.cf++;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) > fabs(*rp.l));
         lp.cf++;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) > fabsl(*rp.q));
         lp.cf++;
@@ -14593,25 +14593,25 @@ void lux_gt_as(void)
     break;
   case LUX_CDOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) > fabs(*rp.b));
         lp.cd++;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) > fabs(*rp.w));
         lp.cd++;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) > fabs(*rp.l));
         lp.cd++;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) > fabsl(*rp.q));
         lp.cd++;
@@ -14658,21 +14658,21 @@ void lux_gt_sa(void)
   double        value;
 
   switch (lhsType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.b > *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.b > *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.b > *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.b > *rp.q++);
       break;
@@ -14702,21 +14702,21 @@ void lux_gt_sa(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.w > *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.w > *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.w > *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.w > *rp.q++);
       break;
@@ -14746,21 +14746,21 @@ void lux_gt_sa(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.l > *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.l > *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.l > *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.l > *rp.q++);
       break;
@@ -14790,21 +14790,21 @@ void lux_gt_sa(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_QUAD:
+  case LUX_INT64:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.q > *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.q > *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.q > *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.q > *rp.q++);
       break;
@@ -14836,19 +14836,19 @@ void lux_gt_sa(void)
     break;
   case LUX_FLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.f > *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.f > *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.f > *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.f > *rp.q++);
       break;
@@ -14880,19 +14880,19 @@ void lux_gt_sa(void)
     break;
   case LUX_DOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.d > *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.d > *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.d > *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.d > *rp.q++);
       break;
@@ -14924,19 +14924,19 @@ void lux_gt_sa(void)
     break;
   case LUX_CFLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) > fabs(*rp.b++));
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) > fabs(*rp.w++));
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) > fabs(*rp.l++));
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) > fabs(*rp.q++));
       break;
@@ -14968,19 +14968,19 @@ void lux_gt_sa(void)
     break;
   case LUX_CDOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) > fabs(*rp.b++));
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) > fabs(*rp.w++));
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) > fabs(*rp.l++));
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) > fabs(*rp.q++));
       break;
@@ -15019,21 +15019,21 @@ void lux_ge(void)
      /* greater-than-or-equal-to with array operands */
 {
   switch (lhsType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ >= *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ >= *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ >= *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ >= *rp.q++);
       break;
@@ -15063,21 +15063,21 @@ void lux_ge(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ >= *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ >= *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ >= *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ >= *rp.q++);
       break;
@@ -15107,21 +15107,21 @@ void lux_ge(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ >= *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ >= *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ >= *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ >= *rp.q++);
       break;
@@ -15149,21 +15149,21 @@ void lux_ge(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_QUAD:
+  case LUX_INT64:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.q++ >= *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.q++ >= *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.q++ >= *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.q++ >= *rp.q++);
       break;
@@ -15193,19 +15193,19 @@ void lux_ge(void)
     break;
   case LUX_FLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.f++ >= *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.f++ >= *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.f++ >= *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.f++ >= *rp.q++);
       break;
@@ -15237,19 +15237,19 @@ void lux_ge(void)
     break;
   case LUX_DOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.d++ >= *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.d++ >= *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.d++ >= *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.d++ >= *rp.q++);
       break;
@@ -15281,28 +15281,28 @@ void lux_ge(void)
     break;
   case LUX_CFLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) >= fabs(*rp.b));
         lp.cf++;
         rp.b++;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) >= fabs(*rp.w));
         lp.cf++;
         rp.w++;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) >= fabs(*rp.l));
         lp.cf++;
         rp.l++;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) >= fabs(*rp.q++));
         lp.cf++;
@@ -15344,28 +15344,28 @@ void lux_ge(void)
     break;
   case LUX_CDOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) >= fabs(*rp.b));
         lp.cd++;
         rp.b++;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) >= fabs(*rp.w));
         lp.cd++;
         rp.w++;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) >= fabs(*rp.l));
         lp.cd++;
         rp.l++;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) >= fabs(*rp.q++));
         lp.cd++;
@@ -15423,21 +15423,21 @@ void lux_ge_as(void)
   double        value;
 
   switch (lhsType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ >= *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ >= *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ >= *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ >= *rp.q);
       break;
@@ -15467,21 +15467,21 @@ void lux_ge_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ >= *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ >= *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ >= *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ >= *rp.q);
       break;
@@ -15511,21 +15511,21 @@ void lux_ge_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ >= *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ >= *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ >= *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ >= *rp.q);
       break;
@@ -15555,21 +15555,21 @@ void lux_ge_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_QUAD:
+  case LUX_INT64:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.q++ >= *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.q++ >= *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.q++ >= *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.q++ >= *rp.q);
       break;
@@ -15597,19 +15597,19 @@ void lux_ge_as(void)
     break;
   case LUX_FLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.f++ >= *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.f++ >= *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.f++ >= *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.f++ >= *rp.q);
       break;
@@ -15641,19 +15641,19 @@ void lux_ge_as(void)
     break;
   case LUX_DOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.d++ >= *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.d++ >= *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.d++ >= *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.d++ >= *rp.q);
       break;
@@ -15685,26 +15685,26 @@ void lux_ge_as(void)
     break;
   case LUX_CFLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary)
                     >= fabs(*rp.b));
         lp.cf++;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) >= fabs(*rp.w));
         lp.cf++;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) >= fabs(*rp.l));
         lp.cf++;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       value = fabs(*rp.q);
       while (nRepeat--) {
         *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) >= value);
@@ -15743,25 +15743,25 @@ void lux_ge_as(void)
     break;
   case LUX_CDOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) >= fabs(*rp.b));
         lp.cd++;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) >= fabs(*rp.w));
         lp.cd++;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) >= fabs(*rp.l));
         lp.cd++;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       value = fabs(*rp.q);
       while (nRepeat--) {
         *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) >= value);
@@ -15809,21 +15809,21 @@ void lux_ge_sa(void)
   double        value;
 
   switch (lhsType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.b >= *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.b >= *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.b >= *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.b >= *rp.q++);
       break;
@@ -15853,21 +15853,21 @@ void lux_ge_sa(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.w >= *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.w >= *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.w >= *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.w >= *rp.q++);
       break;
@@ -15897,21 +15897,21 @@ void lux_ge_sa(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.l >= *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.l >= *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.l >= *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.l >= *rp.q++);
       break;
@@ -15941,21 +15941,21 @@ void lux_ge_sa(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_QUAD:
+  case LUX_INT64:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.q >= *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.q >= *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.q >= *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.q >= *rp.q++);
       break;
@@ -15987,19 +15987,19 @@ void lux_ge_sa(void)
     break;
   case LUX_FLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.f >= *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.f >= *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.f >= *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.f >= *rp.q++);
       break;
@@ -16031,19 +16031,19 @@ void lux_ge_sa(void)
     break;
   case LUX_DOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.d >= *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.d >= *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.d >= *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.d >= *rp.q++);
       break;
@@ -16075,25 +16075,25 @@ void lux_ge_sa(void)
     break;
   case LUX_CFLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) >= fabs(*rp.b));
         rp.b++;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) >= fabs(*rp.w));
         rp.w++;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) >= fabs(*rp.l));
         rp.l++;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       value = hypot(lp.cf->real, lp.cf->imaginary);
       while (nRepeat--)
         *tp.l++ = (value >= fabs(*rp.q++));
@@ -16130,25 +16130,25 @@ void lux_ge_sa(void)
     break;
   case LUX_CDOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) >= fabs(*rp.b));
         rp.b++;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) >= fabs(*rp.w));
         rp.w++;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) >= fabs(*rp.l));
         rp.l++;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       value = hypot(lp.cd->real, lp.cd->imaginary);
       while (nRepeat--)
         *tp.l++ = (value >= fabs(*rp.q++));
@@ -16276,21 +16276,21 @@ void lux_ne(void)
      /* not-equal-to with array operands */
 {
   switch (lhsType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ != *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ != *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ != *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ != *rp.q++);
       break;
@@ -16320,21 +16320,21 @@ void lux_ne(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ != *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ != *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ != *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ != *rp.q++);
       break;
@@ -16364,21 +16364,21 @@ void lux_ne(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ != *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ != *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ != *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ != *rp.q++);
       break;
@@ -16408,21 +16408,21 @@ void lux_ne(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_QUAD:
+  case LUX_INT64:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.q++ != *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.q++ != *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.q++ != *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.q++ != *rp.q++);
       break;
@@ -16452,19 +16452,19 @@ void lux_ne(void)
     break;
   case LUX_FLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.f++ != *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.f++ != *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.f++ != *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.f++ != *rp.q++);
       break;
@@ -16496,19 +16496,19 @@ void lux_ne(void)
     break;
   case LUX_DOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.d++ != *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.d++ != *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.d++ != *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.d++ != *rp.q++);
       break;
@@ -16540,28 +16540,28 @@ void lux_ne(void)
     break;
   case LUX_CFLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         *tp.l++ = (lp.cf->real != *rp.b || lp.cf->imaginary != 0);
         lp.cf++;
         rp.b++;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         *tp.l++ = (lp.cf->real != *rp.w || lp.cf->imaginary != 0);
         lp.cf++;
         rp.w++;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         *tp.l++ = (lp.cf->real != *rp.l || lp.cf->imaginary != 0);
         lp.cf++;
         rp.l++;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         *tp.l++ = (lp.cf->real != *rp.q++ || lp.cf->imaginary != 0);
         lp.cf++;
@@ -16603,28 +16603,28 @@ void lux_ne(void)
     break;
   case LUX_CDOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--) {
         *tp.l++ = (lp.cd->real != *rp.b || lp.cd->imaginary != 0);
         lp.cd++;
         rp.b++;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--) {
         *tp.l++ = (lp.cd->real != *rp.w || lp.cd->imaginary != 0);
         lp.cd++;
         rp.w++;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--) {
         *tp.l++ = (lp.cd->real != *rp.l || lp.cd->imaginary != 0);
         lp.cd++;
         rp.l++;
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--) {
         *tp.l++ = (lp.cd->real != *rp.q++ || lp.cd->imaginary != 0);
         lp.cd++;
@@ -16680,21 +16680,21 @@ void lux_ne_as(void)
      /* not-equal-to with array LHS and scalar RHS */
 {
   switch (lhsType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ != *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ != *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ != *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ != *rp.q);
       break;
@@ -16718,21 +16718,21 @@ void lux_ne_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ != *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ != *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ != *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ != *rp.q);
       break;
@@ -16756,21 +16756,21 @@ void lux_ne_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ != *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ != *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ != *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.q++ != *rp.q);
       break;
@@ -16794,21 +16794,21 @@ void lux_ne_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_QUAD:
+  case LUX_INT64:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.q++ != *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.q++ != *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.q++ != *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.q++ != *rp.q);
       break;
@@ -16834,19 +16834,19 @@ void lux_ne_as(void)
     break;
   case LUX_FLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.f++ != *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.f++ != *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.f++ != *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.f++ != *rp.q);
       break;
@@ -16872,19 +16872,19 @@ void lux_ne_as(void)
     break;
   case LUX_DOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.d++ != *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.d++ != *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.d++ != *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (*lp.d++ != *rp.q);
       break;
@@ -16910,19 +16910,19 @@ void lux_ne_as(void)
     break;
   case LUX_CFLOAT:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (lp.cf->real != *rp.b || lp.cf->imaginary != 0);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (lp.cf->real != *rp.w || lp.cf->imaginary != 0);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (lp.cf->real != *rp.l || lp.cf->imaginary != 0);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (lp.cf->real != *rp.q || lp.cf->imaginary != 0);
       break;
@@ -16950,19 +16950,19 @@ void lux_ne_as(void)
     break;
   case LUX_CDOUBLE:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (lp.cd->real != *rp.b || lp.cd->imaginary != 0);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (lp.cd->real != *rp.w || lp.cd->imaginary != 0);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (lp.cd->real != *rp.l || lp.cd->imaginary != 0);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.l++ = (lp.cd->real != *rp.q || lp.cd->imaginary != 0);
       break;
@@ -17011,21 +17011,21 @@ void lux_and(void)
      /* logical-and with array operands */
 {
   switch (lhsType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ & *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ & *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ & *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = (*lp.b++ & *rp.q++);
       break;
@@ -17033,21 +17033,21 @@ void lux_and(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ & *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ & *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ & *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = (*lp.w++ & *rp.q++);
       break;
@@ -17055,21 +17055,21 @@ void lux_and(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ & *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ & *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ & *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = (*lp.l++ & *rp.q++);
       break;
@@ -17077,21 +17077,21 @@ void lux_and(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_QUAD:
+  case LUX_INT64:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.q++ = (*lp.q++ & *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.q++ = (*lp.q++ & *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.q++ = (*lp.q++ & *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = (*lp.q++ & *rp.q++);
       break;
@@ -17108,21 +17108,21 @@ void lux_and_as(void)
      /* logical-and with array LHS and scalar RHS */
 {
   switch (lhsType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ & *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ & *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ & *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = (*lp.b++ & *rp.q);
       break;
@@ -17130,21 +17130,21 @@ void lux_and_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ & *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ & *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ & *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = (*lp.w++ & *rp.q);
       break;
@@ -17152,21 +17152,21 @@ void lux_and_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ & *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ & *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ & *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = (*lp.l++ & *rp.q);
       break;
@@ -17174,21 +17174,21 @@ void lux_and_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_QUAD:
+  case LUX_INT64:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.q++ = (*lp.q++ & *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.q++ = (*lp.q++ & *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.q++ = (*lp.q++ & *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = (*lp.q++ & *rp.q);
       break;
@@ -17219,21 +17219,21 @@ void lux_or(void)
      /* logical-or with array operands */
 {
   switch (lhsType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ | *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ | *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ | *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = (*lp.b++ | *rp.q++);
       break;
@@ -17241,21 +17241,21 @@ void lux_or(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ | *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ | *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ | *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = (*lp.w++ | *rp.q++);
       break;
@@ -17263,21 +17263,21 @@ void lux_or(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ | *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ | *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ | *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = (*lp.l++ | *rp.q++);
       break;
@@ -17285,21 +17285,21 @@ void lux_or(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_QUAD:
+  case LUX_INT64:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.q++ = (*lp.q++ | *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.q++ = (*lp.q++ | *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.q++ = (*lp.q++ | *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = (*lp.q++ | *rp.q++);
       break;
@@ -17316,21 +17316,21 @@ void lux_or_as(void)
      /* logical-or with array LHS and scalar RHS */
 {
   switch (lhsType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ | *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ | *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ | *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = (*lp.b++ | *rp.q);
       break;
@@ -17338,21 +17338,21 @@ void lux_or_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ | *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ | *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ | *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = (*lp.w++ | *rp.q);
       break;
@@ -17360,21 +17360,21 @@ void lux_or_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ | *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ | *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ | *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = (*lp.l++ | *rp.q);
       break;
@@ -17382,21 +17382,21 @@ void lux_or_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_QUAD:
+  case LUX_INT64:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.q++ = (*lp.q++ | *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.q++ = (*lp.q++ | *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.q++ = (*lp.q++ | *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = (*lp.q++ | *rp.q);
       break;
@@ -17427,21 +17427,21 @@ void lux_xor(void)
      /* logical-xor with array operands */
 {
   switch (lhsType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ ^ *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ ^ *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ ^ *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = (*lp.b++ ^ *rp.q++);
       break;
@@ -17449,21 +17449,21 @@ void lux_xor(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ ^ *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ ^ *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ ^ *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = (*lp.w++ ^ *rp.q++);
       break;
@@ -17471,21 +17471,21 @@ void lux_xor(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ ^ *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ ^ *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ ^ *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = (*lp.l++ ^ *rp.q++);
       break;
@@ -17493,21 +17493,21 @@ void lux_xor(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_QUAD:
+  case LUX_INT64:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.q++ = (*lp.q++ ^ *rp.b++);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.q++ = (*lp.q++ ^ *rp.w++);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.q++ = (*lp.q++ ^ *rp.l++);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = (*lp.q++ ^ *rp.q++);
       break;
@@ -17524,21 +17524,21 @@ void lux_xor_as(void)
      /* logical-xor with array LHS and scalar RHS */
 {
   switch (lhsType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ ^ *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ ^ *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.b++ ^ *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = (*lp.b++ ^ *rp.q);
       break;
@@ -17546,21 +17546,21 @@ void lux_xor_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ ^ *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ ^ *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.w++ ^ *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = (*lp.w++ ^ *rp.q);
       break;
@@ -17568,21 +17568,21 @@ void lux_xor_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ ^ *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ ^ *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.l++ = (*lp.l++ ^ *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = (*lp.l++ ^ *rp.q);
       break;
@@ -17590,21 +17590,21 @@ void lux_xor_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
-  case LUX_QUAD:
+  case LUX_INT64:
     switch (rhsType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (nRepeat--)
         *tp.q++ = (*lp.q++ ^ *rp.b);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nRepeat--)
         *tp.q++ = (*lp.q++ ^ *rp.w);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nRepeat--)
         *tp.q++ = (*lp.q++ ^ *rp.l);
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (nRepeat--)
         *tp.q++ = (*lp.q++ ^ *rp.q);
       break;
@@ -17929,7 +17929,7 @@ int32_t evalArrayBinOp(void)
     array_type(result) = topType; /* in case we use one of the operands */
     /* for result and the type of the operand */
     /* is different from the type of the result */
-    /* (e.g. LUX_LONG -> LUX_FLOAT) */
+    /* (e.g. LUX_INT32 -> LUX_FLOAT) */
     return result;
   }
 }
@@ -17966,7 +17966,7 @@ int32_t evalStringBinOp(void)
     default:
       return cerror(ILL_W_STR, lhs);
   }
-  result = scalar_scratch(LUX_LONG);
+  result = scalar_scratch(LUX_INT32);
   scalar_value(result).l = i;
   return result;
 }
@@ -17986,7 +17986,7 @@ int32_t evalSArrayStringBinOp(void)
     default:
       return cerror(ILL_W_STR, lhs);
   }
-  result = array_clone(lhs, LUX_LONG);
+  result = array_clone(lhs, LUX_INT32);
   tp.l = array_data(result);
 
   switch (binOp) {
@@ -18033,7 +18033,7 @@ int32_t evalStringSArrayBinOp(void)
     default:
       return cerror(ILL_W_STR, lhs);
   }
-  result = array_clone(rhs, LUX_LONG);
+  result = array_clone(rhs, LUX_INT32);
   tp.l = array_data(result);
 
   switch (binOp) {
@@ -18217,7 +18217,7 @@ int32_t extractListElem(int32_t base, int32_t index, char *key, int32_t write)
       if ((n = nextFreeTempVariable()) < 0)
         return LUX_ERROR;
       symbol_class(n) = LUX_SCALAR;
-      scalar_type(n) = LUX_LONG;
+      scalar_type(n) = LUX_INT32;
       scalar_value(n).l = enum_value(base,index);
       return n;
     case LUX_SUBROUTINE:
@@ -18950,7 +18950,7 @@ int32_t evalExtractRhs(int32_t symbol)
                   break;
               if (i == n)       /* none found */
                 return cerror(BAD_STRUCT_KEY, symbol);
-              result = scalar_scratch(LUX_LONG);
+              result = scalar_scratch(LUX_INT32);
               scalar_value(result).l = enum_value(target, i);
               target = result;
               sptr++;
@@ -19168,15 +19168,15 @@ int32_t evalExtractRhs(int32_t symbol)
                     ip = spm->data.array.ptr = malloc(k*sizeof(int32_t));
                     p.v = array_data(i);
                     switch (array_type(i)) {
-                      case LUX_BYTE:
+                      case LUX_INT8:
                         while (k--)
                           *ip++ = *p.b++;
                         break;
-                      case LUX_WORD:
+                      case LUX_INT16:
                         while (k--)
                           *ip++ = *p.w++;
                         break;
-                      case LUX_LONG:
+                      case LUX_INT32:
                         memcpy(ip, p.l, k*sizeof(int32_t));
                         break;
                       case LUX_FLOAT:
@@ -19445,16 +19445,16 @@ int32_t eval(int32_t symbol)
         /* FALL-THRU to LUX_SCALAR */
       case LUX_SCALAR:
         switch (scalar_type(thisLhs)) { /* is LHS nonzero? */
-        case LUX_BYTE:
+        case LUX_INT8:
           n = (scalar_value(thisLhs).b)? 1: 0;
           break;
-        case LUX_WORD:
+        case LUX_INT16:
           n = (scalar_value(thisLhs).w)? 1: 0;
           break;
-        case LUX_LONG:
+        case LUX_INT32:
           n = (scalar_value(thisLhs).l)? 1: 0;
           break;
-        case LUX_QUAD:
+        case LUX_INT64:
           n = (scalar_value(thisLhs).q)? 1: 0;
           break;
         case LUX_FLOAT:
@@ -19496,16 +19496,16 @@ int32_t eval(int32_t symbol)
           /* FALL-THRU to LUX_SCALAR */
         case LUX_SCALAR:
           switch (scalar_type(thisRhs)) { /* is RHS non-zero? */
-          case LUX_BYTE:
+          case LUX_INT8:
             n = (scalar_value(thisRhs).b)? 1: 0;
             break;
-          case LUX_WORD:
+          case LUX_INT16:
             n = (scalar_value(thisRhs).w)? 1: 0;
             break;
-          case LUX_LONG:
+          case LUX_INT32:
             n = (scalar_value(thisRhs).l)? 1: 0;
             break;
-          case LUX_QUAD:
+          case LUX_INT64:
             n = (scalar_value(thisRhs).q)? 1: 0;
             break;
           case LUX_FLOAT:
@@ -19572,9 +19572,9 @@ int32_t eval(int32_t symbol)
         if (topType < LUX_FLOAT)
           topType = combinedType(topType, LUX_FLOAT);
       }
-      /* all logical function return LUX_LONG */
+      /* all logical function return LUX_INT32 */
       if (binOp >= LUX_EQ && binOp < LUX_POW)
-        topType = LUX_LONG;
+        topType = LUX_INT32;
       if (binOp >= LUX_OR && binOp < LUX_POW) {
         if (!isIntegerType(lhsType)) {
           result = cerror(NO_FLT_COND, lhs, binOpName[binOp],

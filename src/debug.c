@@ -814,7 +814,7 @@ int32_t lux_squeeze(int32_t narg, int32_t ps[])
   array	*h;
   
   dim = nAlloc*2;
-  iq = array_scratch(LUX_LONG, 1, &dim);
+  iq = array_scratch(LUX_INT32, 1, &dim);
   h = HEAD(iq);
   h->ndim = 2;
   h->dims[0] = 2;

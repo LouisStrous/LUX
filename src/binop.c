@@ -225,7 +225,7 @@ int32_t evalBinOp(int32_t lhs, int32_t rhs,
     array_type(result) = topType; /* in case we use one of the operands */
     /* for result and the type of the operand */
     /* is different from the type of the result */
-    /* (e.g. LUX_LONG -> LUX_FLOAT) */
+    /* (e.g. LUX_INT32 -> LUX_FLOAT) */
     return result;
   }
 }

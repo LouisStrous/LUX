@@ -956,12 +956,12 @@ int32_t lux_dilate(int32_t narg, int32_t ps[])
 
   type = array_type(ps[0]);
   if (type >= LUX_FLOAT)
-    type = LUX_LONG;
+    type = LUX_INT32;
   result = array_clone(ps[0], type);
   out.b = array_data(result);
 
   switch (type) {
-    case LUX_BYTE:
+    case LUX_INT8:
       memcpy(out.b, data.b, nx*lux_type_size[type]); /* top row: just copy */
       ny -= 2;
       out.b += nx;
@@ -979,7 +979,7 @@ int32_t lux_dilate(int32_t narg, int32_t ps[])
       }
       memcpy(out.b, data.b, nx*lux_type_size[type]); /* top row: just copy */
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       memcpy(out.w, data.w, nx*lux_type_size[type]); /* top row: just copy */
       ny -= 2;
       out.w += nx;
@@ -997,7 +997,7 @@ int32_t lux_dilate(int32_t narg, int32_t ps[])
       }
       memcpy(out.w, data.w, nx*lux_type_size[type]); /* top row: just copy */
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       memcpy(out.l, data.l, nx*lux_type_size[type]); /* top row: just copy */
       ny -= 2;
       out.l += nx;
@@ -1077,14 +1077,14 @@ int32_t lux_erode(int32_t narg, int32_t ps[])
 
   type = array_type(ps[0]);
   if (type >= LUX_FLOAT)
-    type = LUX_LONG;
+    type = LUX_INT32;
   result = array_clone(ps[0], type);
   out.b = array_data(result);
 
   zeroedge = (internalMode & 1); /* /ZEROEDGE */
 
   switch (type) {
-    case LUX_BYTE:
+    case LUX_INT8:
       n = nx;
       if (zeroedge) {
 	while (n--)
@@ -1115,7 +1115,7 @@ int32_t lux_erode(int32_t narg, int32_t ps[])
 	while (n--)
 	  *out.b++ = (*data.b++ != 0);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       n = nx;
       if (zeroedge) {
 	while (n--)
@@ -1146,7 +1146,7 @@ int32_t lux_erode(int32_t narg, int32_t ps[])
 	while (n--)
 	  *out.w++ = (*data.w++ != 0);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       n = nx;
       if (zeroedge) {
 	while (n--)

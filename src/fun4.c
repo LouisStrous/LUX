@@ -117,7 +117,7 @@ int32_t lux_gridmatch(int32_t narg, int32_t ps[])/* gridmatch function */
  }
  dstype = type;
 
- /* we convert <gx> and <gy> to LUX_LONG */
+ /* we convert <gx> and <gy> to LUX_INT32 */
  gx = array_data(lux_long(1, &ps[2]));
  gy = array_data(lux_long(1, &ps[3]));
 
@@ -357,15 +357,15 @@ float averag(void *m, int32_t nxa, int32_t nxb, int32_t nya, int32_t nyb, int32_
     sumx = 0.0;
     jj = idx + nxs*(j + idy);
     switch (dstype) {
-      case LUX_BYTE:
+      case LUX_INT8:
 	for (i = nxc; i < nxd; i++)
 	  sumx += gx[i]*p.b[i + jj];
 	break;
-      case LUX_WORD:
+      case LUX_INT16:
 	for (i = nxc; i < nxd; i++)
 	  sumx += gx[i]*p.w[i + jj];
 	break;
-      case LUX_LONG:
+      case LUX_INT32:
 	for (i = nxc; i < nxd; i++)
 	  sumx += gx[i]*p.l[i + jj];
 	break;
@@ -457,7 +457,7 @@ float resid(int32_t *m1, int32_t *m2, int32_t idx, int32_t idy, int32_t nxa, int
   j = nyd - nyc +1;
   ndmx2 = ndmx * ndmx;
   switch (dstype) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (j) {
 	i = nx;
 	p1 = ps;
@@ -476,7 +476,7 @@ float resid(int32_t *m1, int32_t *m2, int32_t idx, int32_t idy, int32_t nxa, int
 	j--;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (j) {
 	i = nx;
 	p1 = ps;
@@ -495,7 +495,7 @@ float resid(int32_t *m1, int32_t *m2, int32_t idx, int32_t idy, int32_t nxa, int
 	j--;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (j) {
 	i = nx;
 	p1 = ps;
@@ -711,7 +711,7 @@ int32_t lux_stretch(int32_t narg, int32_t ps[])/* stretch function */
       j3 = (j3 - j2)*n;
       j2 = (j2 - j1)*n;
       switch (type) {
-	case LUX_BYTE:
+	case LUX_INT8:
 	  bb.b = base.b + iq;
 	  xq = b1*(c1*(float) *(bb.b) + c2* (float) *(bb.b + i2)
 		   + c3 * (float) *(bb.b+i3) + c4 * (float) *(bb.b+i4));
@@ -726,7 +726,7 @@ int32_t lux_stretch(int32_t narg, int32_t ps[])/* stretch function */
 		    + c3 * *(bb.b+i3) + c4 * *(bb.b+i4));
 	  *out.b++ = xq;
 	  break;
-	case LUX_WORD:
+	case LUX_INT16:
 	  bb.w = base.w + iq;
 	  xq = b1*(c1 * *(bb.w) + c2 * *(bb.w+i2)
 		   + c3 * *(bb.w+i3) + c4 * *(bb.w+i4));
@@ -741,7 +741,7 @@ int32_t lux_stretch(int32_t narg, int32_t ps[])/* stretch function */
 		    + c3 * *(bb.w+i3) + c4 * *(bb.w+i4));
 	  *out.w++ = xq;
 	  break;
-	case LUX_LONG:
+	case LUX_INT32:
 	  bb.l = base.l+iq;
 	  xq = b1*(c1 * *(bb.l) + c2 * *(bb.l+i2)
 		   + c3 * *(bb.l+i3) + c4 * *(bb.l+i4));
@@ -1306,13 +1306,13 @@ void bicubic_fc()	/* internal routine for single pixel */
     if (stretchmark_flag == 0) {
       if (xl < -0.5 || xl > fnm5) {
 	switch (regrid_type) {
-	  case LUX_BYTE:
+	  case LUX_INT8:
 	    *out.b++ = 0;
 	    break;
-	  case LUX_WORD:
+	  case LUX_INT16:
 	    *out.w++ = 0;
 	    break;
-	  case LUX_LONG:
+	  case LUX_INT32:
 	    *out.l++ = 0;
 	    break;
 	  case LUX_FLOAT:
@@ -1360,13 +1360,13 @@ void bicubic_fc()	/* internal routine for single pixel */
     if (stretchmark_flag == 0) {
       if (yl < -0.5 || yl > fmm5) {
 	switch (regrid_type) {
-	  case LUX_BYTE:
+	  case LUX_INT8:
 	    *out.b++ = 0;
 	    break;
-	  case LUX_WORD:
+	  case LUX_INT16:
 	    *out.w++ = 0;
 	    break;
-	  case LUX_LONG:
+	  case LUX_INT32:
 	    *out.l++ = 0;
 	    break;
 	  case LUX_FLOAT:
@@ -1407,7 +1407,7 @@ void bicubic_fc()	/* internal routine for single pixel */
   iq = i1 + j1 * n;
   /* printf("offset j1, j2, j3, j4 = %d %d %d %d\n", j1, j2, j3, j4);*/
   switch (regrid_type) {
-    case LUX_BYTE:
+    case LUX_INT8:
       bb.b = base.b+iq;
       xq = b1*(c1*bb.b[0] + c2*bb.b[i2]+ c3*bb.b[i3] + c4*bb.b[i4]);
       bb.b += j2;
@@ -1421,7 +1421,7 @@ void bicubic_fc()	/* internal routine for single pixel */
       /* also we need to round rather than truncate, taking that extra care */
       *out.b++ = rint(xq);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       bb.w = base.w+iq;
       xq = b1*(c1*bb.w[0] + c2*bb.w[i2]+ c3*bb.w[i3] + c4*bb.w[i4]);
       bb.w += j2;
@@ -1433,7 +1433,7 @@ void bicubic_fc()	/* internal routine for single pixel */
       /* also we need to round rather than truncate, taking that extra care */
       *out.w++ = rint(xq);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       bb.l = base.l+iq;
       xq = b1*(c1*bb.l[0] + c2*bb.l[i2]+ c3*bb.l[i3] + c4*bb.l[i4]);
       bb.l += j2;
@@ -1625,7 +1625,7 @@ int32_t regrid_common(int32_t narg, int32_t ps[])/* with branches for type */
 	    ic = ns;
 					 /* type switch for inner loop */
 	    switch (regrid_type) {
-	      case LUX_BYTE:
+	      case LUX_INT8:
 		while (ic--) {
 		  if (xl < 0 || xl >= fn || yl < 0 || yl >= fm)
 		    *out.b++ = 0;
@@ -1635,7 +1635,7 @@ int32_t regrid_common(int32_t narg, int32_t ps[])/* with branches for type */
 		  yl += yinc;
 		}
 		break;
-	      case LUX_WORD:
+	      case LUX_INT16:
 		while (ic--) {
 		  if (xl < 0 || xl >= fn || yl < 0 || yl >= fm)
 		    *out.w++ = 0;
@@ -1645,7 +1645,7 @@ int32_t regrid_common(int32_t narg, int32_t ps[])/* with branches for type */
 		  yl += yinc;
 		}
 		break;
-	      case LUX_LONG:
+	      case LUX_INT32:
 		while (ic--) {
 		  if (xl < 0 || xl >= fn || yl < 0 || yl >= fm)
 		    *out.l++ = 0;
@@ -1899,7 +1899,7 @@ int32_t lux_compress(int32_t narg, int32_t ps[])
   
   offset = 0;
   switch (array_type(iq)) {
-    case LUX_BYTE:
+    case LUX_INT8:
       do {
 	sum.l = 0;
 	do
@@ -1913,7 +1913,7 @@ int32_t lux_compress(int32_t narg, int32_t ps[])
 	  offset += srcinfo.rsinglestep[i]*trgtinfo.coords[i]*div[srcinfo.raxes[i]];
       } while (n < trgtinfo.rndim);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       do {
 	sum.l = 0;
 	do
@@ -1927,7 +1927,7 @@ int32_t lux_compress(int32_t narg, int32_t ps[])
 	  offset += srcinfo.rsinglestep[i]*trgtinfo.coords[i]*div[srcinfo.raxes[i]];
       } while (n < trgtinfo.rndim);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       do {
 	sum.l = 0;
 	do
@@ -2005,7 +2005,7 @@ int32_t lux_oldcompress(int32_t narg, int32_t ps[]) /* compress function */
   fac = 1.0 / ( (float) cx * (float) cy );
   n = nxx - cx;					/* step bewteen lines */
   switch (type)
-  { case LUX_BYTE:
+  { case LUX_INT8:
       while (ny--)
       {	base.b = q1.b;  iq = nx;
 	while (iq--)
@@ -2017,7 +2017,7 @@ int32_t lux_oldcompress(int32_t narg, int32_t ps[]) /* compress function */
 	  base.b += cx; }
 	q1.b +=  nxx * cy; }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (ny--)
       {	base.w = q1.w;  iq = nx;
 	while (iq--)
@@ -2028,7 +2028,7 @@ int32_t lux_oldcompress(int32_t narg, int32_t ps[]) /* compress function */
 	  base.w += cx; }
 	q1.w +=  nxx * cy; }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (ny--) 
       {	base.l = q1.l;  iq = nx;
 	while (iq--)
@@ -2157,7 +2157,7 @@ int32_t lux_index(int32_t narg, int32_t ps[])
   n = array_size(iq);
   if (n <= 1)			/* nothing to sort */
     return LUX_ZERO;
-  result_sym = array_clone(iq, LUX_LONG);
+  result_sym = array_clone(iq, LUX_INT32);
   p.l = (int32_t *) array_data(result_sym);
   if (internalMode & 1) {	/* along 0th dimension */
     nloop = n/array_dims(iq)[0];
@@ -2223,12 +2223,12 @@ int32_t zoomer2(uint8_t *ain, int32_t n, int32_t m, int32_t *symout, int32_t *nx
  /* depending on the state of sym_flag, we create a temporary symbol
     or use $zoom_temp, the latter is for tvplanezoom */
  if (sym_flag) {
-   result_sym = array_scratch(LUX_BYTE, 2, dim);
+   result_sym = array_scratch(LUX_INT8, 2, dim);
    if (result_sym < 0)
      return LUX_ERROR;
  } else {
    result_sym = findVarName(zoomtemp, 0);
-   if (redef_array(result_sym, LUX_BYTE, 2, dim) != 1)
+   if (redef_array(result_sym, LUX_INT8, 2, dim) != 1)
      return LUX_ERROR;
  }
  *symout = result_sym;
@@ -2334,12 +2334,12 @@ int32_t zoomer3(uint8_t *ain, int32_t n, int32_t m, int32_t *symout, int32_t *nx
   /* depending on the state of sym_flag, we create a temporary symbol
      or use $zoom_temp, the latter is for tvplanezoom */
   if (sym_flag) {
-    result_sym = array_scratch(LUX_BYTE, 2, dim);
+    result_sym = array_scratch(LUX_INT8, 2, dim);
     if (result_sym < 0)
       return LUX_ERROR;
   } else {
     result_sym = findVarName(zoomtemp, 0);
-    if (redef_array(result_sym, LUX_BYTE, 2, dim) != 1)
+    if (redef_array(result_sym, LUX_INT8, 2, dim) != 1)
       return LUX_ERROR;
   }
   *symout = result_sym;
@@ -2406,12 +2406,12 @@ int32_t zoomer4(uint8_t *ain, int32_t n, int32_t m, int32_t *symout, int32_t *nx
   /* depending on the state of sym_flag, we create a temporary symbol
      or use $zoom_temp, the latter is for tvplanezoom */
   if (sym_flag) {
-    result_sym = array_scratch(LUX_BYTE, 2, dim);
+    result_sym = array_scratch(LUX_INT8, 2, dim);
     if (result_sym < 0)
       return LUX_ERROR;
   } else {
     result_sym = findVarName(zoomtemp, 0);
-    if (redef_array(result_sym, LUX_BYTE, 2, dim) != 1)
+    if (redef_array(result_sym, LUX_INT8, 2, dim) != 1)
       return LUX_ERROR;
   }
   *symout = result_sym;
@@ -2476,12 +2476,12 @@ int32_t zoomer8(uint8_t *ain, int32_t n, int32_t m, int32_t *symout, int32_t *nx
   /* depending on the state of sym_flag, we create a temporary symbol
      or use $zoom_temp, the latter is for tvplanezoom */
   if (sym_flag) {
-    result_sym = array_scratch(LUX_BYTE, 2, dim);
+    result_sym = array_scratch(LUX_INT8, 2, dim);
     if (result_sym < 0)
       return LUX_ERROR;
   } else {
     result_sym = findVarName(zoomtemp, 0);
-    if (redef_array(result_sym, LUX_BYTE, 2, dim) != 1)
+    if (redef_array(result_sym, LUX_INT8, 2, dim) != 1)
       return LUX_ERROR;
   }
   *symout = result_sym;
@@ -2545,12 +2545,12 @@ int32_t zoomer16(uint8_t *ain, int32_t n, int32_t m, int32_t *symout, int32_t *n
   /* depending on the state of sym_flag, we create a temporary symbol
      or use $zoom_temp, the latter is for tvplanezoom */
   if (sym_flag) {
-    result_sym = array_scratch(LUX_BYTE, 2, dim);
+    result_sym = array_scratch(LUX_INT8, 2, dim);
     if (result_sym < 0)
       return LUX_ERROR;
   } else {
     result_sym = findVarName(zoomtemp, 0);
-    if (redef_array(result_sym, LUX_BYTE, 2, dim) != 1)
+    if (redef_array(result_sym, LUX_INT8, 2, dim) != 1)
       return LUX_ERROR;
   }
   *symout = result_sym;
@@ -2669,12 +2669,12 @@ int32_t compress2(uint8_t *ain, int32_t n, int32_t m, int32_t *symout, int32_t *
   /* depending on the state of sym_flag, we create a temporary symbol
      or use $zoom_temp, the latter is for tvplanezoom */
   if (sym_flag) {
-    result_sym = array_scratch(LUX_BYTE, 2, dim);
+    result_sym = array_scratch(LUX_INT8, 2, dim);
     if (result_sym < 0)
       return LUX_ERROR;
   } else {
     result_sym = findVarName(zoomtemp, 0);
-    if (redef_array(result_sym, LUX_BYTE, 2, dim) != 1)
+    if (redef_array(result_sym, LUX_INT8, 2, dim) != 1)
       return LUX_ERROR;
   }
   *symout = result_sym;
@@ -2722,12 +2722,12 @@ int32_t compress4(uint8_t *ain, int32_t n, int32_t m, int32_t *symout, int32_t *
  /* depending on the state of sym_flag, we create a temporary symbol
  or use $zoom_temp, the latter is for tvplanezoom */
  if (sym_flag) {
-   result_sym = array_scratch(LUX_BYTE, 2, dim);
+   result_sym = array_scratch(LUX_INT8, 2, dim);
    if (result_sym < 0)
      return LUX_ERROR;
  } else {
    result_sym = findVarName(zoomtemp, 0);
-   if (redef_array(result_sym, LUX_BYTE, 2, dim) != 1)
+   if (redef_array(result_sym, LUX_INT8, 2, dim) != 1)
      return LUX_ERROR;
  }
  *symout = result_sym;
@@ -2848,7 +2848,7 @@ void shift_bicubic(float dx, int32_t nx, int32_t ny, int32_t inc, int32_t dline,
     
   }
   switch (type) {
-    case LUX_BYTE:	/* I*1 image */
+    case LUX_INT8:	/* I*1 image */
     {
       float	z4, z1, z2, z3, yq;
       uint8_t	*p, *q;
@@ -2889,7 +2889,7 @@ void shift_bicubic(float dx, int32_t nx, int32_t ny, int32_t inc, int32_t dline,
       }
     }
      break;
-    case LUX_WORD:
+    case LUX_INT16:
     {
       float	z4, z1, z2, z3, yq;
       short	*p, *q;
@@ -2925,7 +2925,7 @@ void shift_bicubic(float dx, int32_t nx, int32_t ny, int32_t inc, int32_t dline,
       }
     }
      break;
-    case LUX_LONG:
+    case LUX_INT32:
     {
       float	z4, z1, z2, z3, yq;
       int32_t	*p, *q;
@@ -3132,7 +3132,7 @@ void interpolate(void *srcv, int32_t type, float xsrc, float ysrc, int32_t nsx,
   py4 = -0.5*ay*by*by;
   i = ix + iy*nsx;
   switch (type) {
-    case LUX_BYTE:
+    case LUX_INT8:
       *trgt.b = py1*(px1*src.b[i - nsx - 1] + px2*src.b[i - nsx]
 		     + px3*src.b[i - nsx + 1] + px4*src.b[i - nsx + 2])
 	+ py2*(px1*src.b[i - 1] + px2*src.b[i] + px3*src.b[i + 1]
@@ -3142,7 +3142,7 @@ void interpolate(void *srcv, int32_t type, float xsrc, float ysrc, int32_t nsx,
 	+ py4*(px1*src.b[i + 2*nsx - 1] + px2*src.b[i + 2*nsx]
 	       + px3*src.b[i + 2*nsx + 1] + px4*src.b[i + 2*nsx + 2]);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       *trgt.w = py1*(px1*src.w[i - nsx - 1] + px2*src.w[i - nsx]
 		     + px3*src.w[i - nsx + 1] + px4*src.w[i - nsx + 2])
 	+ py2*(px1*src.w[i - 1] + px2*src.w[i] + px3*src.w[i + 1]
@@ -3152,7 +3152,7 @@ void interpolate(void *srcv, int32_t type, float xsrc, float ysrc, int32_t nsx,
 	+ py4*(px1*src.w[i + 2*nsx - 1] + px2*src.w[i + 2*nsx]
 	       + px3*src.w[i + 2*nsx + 1] + px4*src.w[i + 2*nsx + 2]);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       *trgt.l = py1*(px1*src.l[i - nsx - 1] + px2*src.l[i - nsx]
 		     + px3*src.l[i - nsx + 1] + px4*src.l[i - nsx + 2])
 	+ py2*(px1*src.l[i - 1] + px2*src.l[i] + px3*src.l[i + 1]
@@ -3383,14 +3383,14 @@ int32_t lux_bigger235(int32_t narg, int32_t ps[])
       iq = lux_long(1, ps);
       src = array_data(iq);
       n = array_size(iq);
-      result = array_clone(iq, LUX_LONG);
+      result = array_clone(iq, LUX_INT32);
       trgt = array_data(result);
       break;
     case LUX_SCALAR:
       iq = lux_long(1, ps);
       src = &scalar_value(iq).l;
       n = 1;
-      result = scalar_scratch(LUX_LONG);
+      result = scalar_scratch(LUX_INT32);
       trgt = &scalar_value(result).l;
       break;
     default:

@@ -95,17 +95,17 @@ int32_t lux_inserter(int32_t narg, int32_t ps[])
   do {
     nelem = trgtinfo.rdims[0];
     switch (trgtinfo.type) {
-      case LUX_BYTE:
+      case LUX_INT8:
 	switch (symbol_type(ps[1])) {
-	  case LUX_BYTE:
+	  case LUX_INT8:
 	    while (nelem--)
 	      *trgt.b++ = *src.b++;
 	    break;
-	  case LUX_WORD:
+	  case LUX_INT16:
 	    while (nelem--)
 	      *trgt.b++ = *src.w++;
 	    break;
-	  case LUX_LONG:
+	  case LUX_INT32:
 	    while (nelem--)
 	      *trgt.b++ = *src.l++;
 	    break;
@@ -121,17 +121,17 @@ int32_t lux_inserter(int32_t narg, int32_t ps[])
 	    return cerror(ILL_TYPE, ps[1]);
 	}
 	break;
-      case LUX_WORD:
+      case LUX_INT16:
 	switch (symbol_type(ps[1])) {
-	  case LUX_BYTE:
+	  case LUX_INT8:
 	    while (nelem--)
 	      *trgt.w++ = *src.b++;
 	    break;
-	  case LUX_WORD:
+	  case LUX_INT16:
 	    while (nelem--)
 	      *trgt.w++ = *src.w++;
 	    break;
-	  case LUX_LONG:
+	  case LUX_INT32:
 	    while (nelem--)
 	      *trgt.w++ = *src.l++;
 	    break;
@@ -147,17 +147,17 @@ int32_t lux_inserter(int32_t narg, int32_t ps[])
 	    return cerror(ILL_TYPE, ps[1]);
 	}
 	break;
-      case LUX_LONG:
+      case LUX_INT32:
 	switch (symbol_type(ps[1])) {
-	  case LUX_BYTE:
+	  case LUX_INT8:
 	    while (nelem--)
 	      *trgt.l++ = *src.b++;	    
 	    break;
-	  case LUX_WORD:
+	  case LUX_INT16:
 	    while (nelem--)
 	      *trgt.l++ = *src.w++;	    
 	    break;
-	  case LUX_LONG:
+	  case LUX_INT32:
 	    while (nelem--)
 	      *trgt.l++ = *src.l++;	    
 	    break;
@@ -175,15 +175,15 @@ int32_t lux_inserter(int32_t narg, int32_t ps[])
 	break;
       case LUX_FLOAT:
 	switch (symbol_type(ps[1])) {
-	  case LUX_BYTE:
+	  case LUX_INT8:
 	    while (nelem--)
 	      *trgt.f++ = *src.b++;	    
 	    break;
-	  case LUX_WORD:
+	  case LUX_INT16:
 	    while (nelem--)
 	      *trgt.f++ = *src.w++;	    
 	    break;
-	  case LUX_LONG:
+	  case LUX_INT32:
 	    while (nelem--)
 	      *trgt.f++ = *src.l++;	    
 	    break;
@@ -201,15 +201,15 @@ int32_t lux_inserter(int32_t narg, int32_t ps[])
 	break;
       case LUX_DOUBLE:
 	switch (symbol_type(ps[1])) {
-	  case LUX_BYTE:
+	  case LUX_INT8:
 	    while (nelem--)
 	      *trgt.d++ = *src.b++;	    
 	    break;
-	  case LUX_WORD:
+	  case LUX_INT16:
 	    while (nelem--)
 	      *trgt.d++ = *src.w++;	    
 	    break;
-	  case LUX_LONG:
+	  case LUX_INT32:
 	    while (nelem--)
 	      *trgt.d++ = *src.l++;	    
 	    break;
@@ -291,19 +291,19 @@ int32_t lux_smap(int32_t narg, int32_t ps[])
 int32_t lux_bmap(int32_t narg,int32_t ps[])
 /* convert type to uint8_t without changing memory contents */
 {
-  return lux_gmap(narg, ps, LUX_BYTE);
+  return lux_gmap(narg, ps, LUX_INT8);
 }
 /*------------------------------------------------------------------------- */
 int32_t lux_wmap(int32_t narg, int32_t ps[])
 /* convert type to uint8_t without changing memory contents */
 {
-  return lux_gmap(narg, ps, LUX_WORD);
+  return lux_gmap(narg, ps, LUX_INT16);
 }
 /*------------------------------------------------------------------------- */
 int32_t lux_lmap(int32_t narg, int32_t ps[])
 /* convert type to long without changing memory contents */
 {
-  return lux_gmap(narg, ps, LUX_LONG);
+  return lux_gmap(narg, ps, LUX_INT32);
 }
 /*------------------------------------------------------------------------- */
 int32_t lux_fmap(int32_t narg, int32_t ps[])
@@ -1764,13 +1764,13 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
 	      if (subsc_type[i] == LUX_ARRAY)
 		offset += index[fromdim[i]][tally[i]]*stride[i];
 	    switch (type) {
-	      case LUX_BYTE:
+	      case LUX_INT8:
 		value.b += src.b[offset];
 		break;
-	      case LUX_WORD:
+	      case LUX_INT16:
 		value.w += src.w[offset];
 		break;
-	      case LUX_LONG:
+	      case LUX_INT32:
 		value.l += src.l[offset];
 		break;
 	      case LUX_FLOAT:
@@ -1863,13 +1863,13 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
 	      goto lux_subsc_1;
 	    }
 	    switch (type) {
-	      case LUX_BYTE:
+	      case LUX_INT8:
 		value.b += item.b;
 		break;
-	      case LUX_WORD:
+	      case LUX_INT16:
 		value.w += item.w;
 		break;
-	      case LUX_LONG:
+	      case LUX_INT32:
 		value.l += item.l;
 		break;
 	      case LUX_FLOAT:
@@ -2039,7 +2039,7 @@ int32_t lux_symclass(int32_t narg, int32_t ps[])
     nsym = int_arg(ps[0]);
   else
     nsym = (internalMode & 1)? eval(ps[0]): ps[0]; /* target symbol */
-  result_sym = scalar_scratch(LUX_LONG);
+  result_sym = scalar_scratch(LUX_INT32);
   if (nsym < 0 || nsym >= NSYM)
     nd = LUX_UNUSED;
   else
@@ -2070,7 +2070,7 @@ int32_t lux_num_elem(int32_t narg, int32_t ps[])
   int32_t	nsym, n, j, result_sym, *dims, *axes, naxes, ndim, temp;
 
   nsym = ps[0];				/*the target symbol is the first */
-  result_sym = scalar_scratch(LUX_LONG);
+  result_sym = scalar_scratch(LUX_INT32);
   if (narg > 1) {		/* have <dims> */
     temp = lux_long(1, ps + 1);	/* ensure LONG */
     switch (symbol_class(temp)) {
@@ -2186,12 +2186,12 @@ int32_t lux_dimen(int32_t narg, int32_t ps[])
 	if (axes.l[i] != 0)
 	  return cerror(ILL_AXIS, ps[1], axes.l[i]);
       if (nAxes > 1) {
-	iq = array_scratch(LUX_LONG, 1, &nAxes);
+	iq = array_scratch(LUX_INT32, 1, &nAxes);
 	out = (int32_t *) array_data(iq);
 	while (nAxes--)
 	  *out++ = 1;
       } else {
-	iq = scalar_scratch(LUX_LONG);
+	iq = scalar_scratch(LUX_INT32);
 	scalar_value(iq).l = 1;
       }
       break;
@@ -2202,19 +2202,19 @@ int32_t lux_dimen(int32_t narg, int32_t ps[])
 	if (axes.l[i] < 0 || axes.l[i] >= ndim)
 	  return cerror(ILL_AXIS, ps[1], axes.l[i]);
       if (nAxes > 1) {
-	iq = array_scratch(LUX_LONG, 1, &nAxes);
+	iq = array_scratch(LUX_INT32, 1, &nAxes);
 	out = (int32_t *) array_data(iq);
 	while (nAxes--)
 	  *out++ = dims[*axes.l++];
       } else if (nAxes == 1) {
-	iq = scalar_scratch(LUX_LONG);
+	iq = scalar_scratch(LUX_INT32);
 	scalar_value(iq).l = dims[*axes.l];
       } else {			/* return all dimensions */
 	if (ndim > 1) {
-	  iq = array_scratch(LUX_LONG, 1, &ndim);
+	  iq = array_scratch(LUX_INT32, 1, &ndim);
 	  memcpy(array_data(iq), dims, ndim*sizeof(int32_t));
 	} else {
-	  iq = scalar_scratch(LUX_LONG);
+	  iq = scalar_scratch(LUX_INT32);
 	  scalar_value(iq).l = dims[0];
 	}
       }
@@ -2434,7 +2434,7 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
   pointer q1,q2;
   int32_t	nd, j, i, dim[MAX_DIMS], nundef = 0;
   int32_t	iq, nsym, mq, topnd = 0, sflag = 0, n, nq;
-  Symboltype toptype = LUX_BYTE;
+  Symboltype toptype = LUX_INT8;
   scalar	temp;
 
   if (narg <= 0)
@@ -2660,53 +2660,53 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
       }	/* switch (symbol_class(iq)) */
       if (n)
 	switch (toptype) {
-        case LUX_BYTE:
+        case LUX_INT8:
           while (n--)
             *q2.b++ = *q1.b++;
           break;
-        case LUX_WORD:
+        case LUX_INT16:
           switch (symbol_type(iq)) {
-          case LUX_BYTE:
+          case LUX_INT8:
             while (n--)
               *q2.w++ = (int16_t) *q1.b++;
             break;
-          case LUX_WORD:
+          case LUX_INT16:
             while (n--)
               *q2.w++ = *q1.w++;
             break;
           }
           break;
-        case LUX_LONG:
+        case LUX_INT32:
           switch (symbol_type(iq)) {
-          case LUX_BYTE:
+          case LUX_INT8:
             while (n--)
               *q2.l++ = (int32_t) *q1.b++;
             break;
-          case LUX_WORD:
+          case LUX_INT16:
             while (n--)
               *q2.l++ = (int32_t) *q1.w++;
             break;
-          case LUX_LONG:
+          case LUX_INT32:
             while (n--)
               *q2.l++ = *q1.l++;
             break;
           }
           break;
-        case LUX_QUAD:
+        case LUX_INT64:
           switch (symbol_type(iq)) {
-          case LUX_BYTE:
+          case LUX_INT8:
             while (n--)
               *q2.q++ = (int64_t) *q1.b++;
             break;
-          case LUX_WORD:
+          case LUX_INT16:
             while (n--)
               *q2.q++ = (int64_t) *q1.w++;
             break;
-          case LUX_LONG:
+          case LUX_INT32:
             while (n--)
               *q2.q++ = (int64_t) *q1.l++;
             break;
-          case LUX_QUAD:
+          case LUX_INT64:
             while (n--)
               *q2.q++ = *q1.q++;
             break;
@@ -2714,19 +2714,19 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
           break;
         case LUX_FLOAT:
           switch (symbol_type(iq)) {
-          case LUX_BYTE:
+          case LUX_INT8:
             while (n--)
               *q2.f++ = (float) *q1.b++;
             break;
-          case LUX_WORD:
+          case LUX_INT16:
             while (n--)
               *q2.f++ = (float) *q1.w++;
             break;
-          case LUX_LONG:
+          case LUX_INT32:
             while (n--)
               *q2.f++ = (float) *q1.l++;
             break;
-          case LUX_QUAD:
+          case LUX_INT64:
             while (n--)
               *q2.f++ = (float) *q1.q++;
             break;
@@ -2738,19 +2738,19 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
           break;
         case LUX_DOUBLE:
           switch (symbol_type(iq)) {
-          case LUX_BYTE:
+          case LUX_INT8:
             while (n--)
               *q2.d++ = (double) *q1.b++;
             break;
-          case LUX_WORD:
+          case LUX_INT16:
             while (n--)
               *q2.d++ = (double) *q1.w++;
             break;
-          case LUX_LONG:
+          case LUX_INT32:
             while (n--)
               *q2.d++ = (double) *q1.l++;
             break;
-          case LUX_QUAD:
+          case LUX_INT64:
             while (n--)
               *q2.d++ = (double) *q1.q++;
             break;
@@ -2766,25 +2766,25 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
           break;
         case LUX_CFLOAT:
           switch (symbol_type(iq)) {
-          case LUX_BYTE:
+          case LUX_INT8:
             while (n--) {
               q2.cf->real = *q1.b++;
               q2.cf++->imaginary = 0.0;
             }
             break;
-          case LUX_WORD:
+          case LUX_INT16:
             while (n--) {
               q2.cf->real = *q1.w++;
               q2.cf++->imaginary = 0.0;
             }
             break;
-          case LUX_LONG:
+          case LUX_INT32:
             while (n--) {
               q2.cf->real = *q1.l++;
               q2.cf++->imaginary = 0.0;
             }
             break;
-          case LUX_QUAD:
+          case LUX_INT64:
             while (n--) {
               q2.cf->real = *q1.q++;
               q2.cf++->imaginary = 0.0;
@@ -2806,25 +2806,25 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
           break;
         case LUX_CDOUBLE:
           switch (symbol_type(iq)) {
-          case LUX_BYTE:
+          case LUX_INT8:
             while (n--) {
               q2.cd->real = *q1.b++;
               q2.cd++->imaginary = 0.0;
             }
             break;
-          case LUX_WORD:
+          case LUX_INT16:
             while (n--) {
               q2.cd->real = *q1.w++;
               q2.cd++->imaginary = 0.0;
             }
             break;
-          case LUX_LONG:
+          case LUX_INT32:
             while (n--) {
               q2.cd->real = *q1.l++;
               q2.cd++->imaginary = 0.0;
             }
             break;
-          case LUX_QUAD:
+          case LUX_INT64:
             while (n--) {
               q2.cd->real = *q1.q++;
               q2.cd++->imaginary = 0.0;
@@ -2989,7 +2989,7 @@ int32_t lux_subsc_subgrid(int32_t narg, int32_t ps[])
 
     /* now do the interpolating */
     switch (type) {
-      case LUX_BYTE:
+      case LUX_INT8:
 	do {
 	  cvalue.f = (float) src.b[index];
 	  for (i = 0; i < ndim; i++)
@@ -3005,7 +3005,7 @@ int32_t lux_subsc_subgrid(int32_t narg, int32_t ps[])
 	} while (j < ndim);
 	*out.f++ = value.f;
 	break;
-      case LUX_WORD:
+      case LUX_INT16:
 	do {
 	  cvalue.f = (float) src.w[index];
 	  for (i = 0; i < ndim; i++)
@@ -3021,7 +3021,7 @@ int32_t lux_subsc_subgrid(int32_t narg, int32_t ps[])
 	} while (j < ndim);
 	*out.f++ = value.f;
 	break;
-      case LUX_LONG:
+      case LUX_INT32:
 	do {
 	  cvalue.f = (float) src.l[index];
 	  for (i = 0; i < ndim; i++)
@@ -3119,7 +3119,7 @@ int32_t lux_roll(int32_t narg, int32_t ps[])
     if (result > nd)
       result -= (result/nd)*nd;
     /* we must construct an array containing the target list of dimensions */
-    iq = array_scratch(LUX_LONG, 1, &nd);
+    iq = array_scratch(LUX_INT32, 1, &nd);
     src.l = array_data(iq);
     for (i = 0; i < nd; i++) {
       *src.l = i + result;

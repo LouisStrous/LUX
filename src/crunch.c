@@ -93,7 +93,7 @@ int32_t docrunch(int32_t narg, int32_t ps[], int32_t showerror)/* crunch subrout
   if (!symbolIsNumericalArray(iq))
     return cerror(NEED_ARR, iq);
   type = array_type(iq);
-  if (type > LUX_LONG)
+  if (type > LUX_INT32)
     return luxerror("crunch only accepts I*1,2,4 arrays", iq);
   q1.l = array_data(iq);
   nx = array_dims(iq)[0];

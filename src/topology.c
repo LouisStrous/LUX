@@ -42,7 +42,7 @@ int32_t segment_2d(int32_t narg, int32_t ps[])
   scalar	value;
   int32_t	nx, ny, n, result, sign;
 
-  if (standardLoop(ps[0], 0, SL_ALLAXES | SL_SAMEDIMS | SL_EXACT, LUX_LONG,
+  if (standardLoop(ps[0], 0, SL_ALLAXES | SL_SAMEDIMS | SL_EXACT, LUX_INT32,
 		   &srcinfo, &src, &result, &trgtinfo, &trgt) == LUX_ERROR)
     return LUX_ERROR;
 
@@ -58,7 +58,7 @@ int32_t segment_2d(int32_t narg, int32_t ps[])
   ny -= 2;
   if (sign >= 0) {		/* seek hill-like objects */
     switch (array_type(ps[0])) {
-      case LUX_BYTE:
+      case LUX_INT8:
 	while (ny--) {		/* all rows except for bottom one */
 	  *trgt.l++ = 0;
 	  src.b++;
@@ -77,7 +77,7 @@ int32_t segment_2d(int32_t narg, int32_t ps[])
 	  src.b++;
 	}
 	break;
-      case LUX_WORD:
+      case LUX_INT16:
 	while (ny--) {		/* all rows except for bottom one */
 	  *trgt.l++ = 0;
 	  src.w++;
@@ -96,7 +96,7 @@ int32_t segment_2d(int32_t narg, int32_t ps[])
 	  src.w++;
 	}
 	break;
-      case LUX_LONG:
+      case LUX_INT32:
 	while (ny--) {		/* all rows except for bottom one */
 	  *trgt.l++ = 0;
 	  src.l++;
@@ -150,7 +150,7 @@ int32_t segment_2d(int32_t narg, int32_t ps[])
     }
   } else {			/* seek valley-like objects */
     switch (array_type(ps[0])) {
-      case LUX_BYTE:
+      case LUX_INT8:
 	while (ny--) {		/* all rows except for bottom one */
 	  *trgt.l++ = 0;
 	  src.b++;
@@ -167,7 +167,7 @@ int32_t segment_2d(int32_t narg, int32_t ps[])
 	  src.b++;
 	}
 	break;
-      case LUX_WORD:
+      case LUX_INT16:
 	while (ny--) {		/* all rows except for bottom one */
 	  *trgt.l++ = 0;
 	  src.w++;
@@ -184,7 +184,7 @@ int32_t segment_2d(int32_t narg, int32_t ps[])
 	  src.w++;
 	}
 	break;
-      case LUX_LONG:
+      case LUX_INT32:
 	while (ny--) {		/* all rows except for bottom one */
 	  *trgt.l++ = 0;
 	  src.l++;
@@ -257,7 +257,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
 
   /* gather info about ps[0] and prepare a return symbol */
   if (standardLoop(ps[0], 0, SL_ALLAXES | SL_SAMEDIMS | SL_EXACT,
-		   LUX_LONG, &srcinfo, &src, &result, &trgtinfo, &trgt) < 0)
+		   LUX_INT32, &srcinfo, &src, &result, &trgtinfo, &trgt) < 0)
     return LUX_ERROR;
   if (symbol_class(ps[0]) != LUX_ARRAY)
     return cerror(ILL_CLASS, ps[0]);
@@ -294,7 +294,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
   if (sign && !degree && (internalMode & 2) == 0)
 		/* standard form - make as fast as possible */
     switch (array_type(ps[0])) {
-      case LUX_BYTE:
+      case LUX_INT8:
 	do {
 	  value.w = 2 * (int16_t) *src.b;
 	  for (j = 0; j < n; j++) {	/* all directions */	  
@@ -308,7 +308,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
 	} while (advanceLoop(&trgtinfo, &trgt), 
 		 advanceLoop(&srcinfo, &src) < srcinfo.ndim);
 	break;
-      case LUX_WORD:
+      case LUX_INT16:
 	do {
 	  value.l = 2 * *src.w;
 	  for (j = 0; j < n; j++) {	/* all directions */	  
@@ -322,7 +322,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
 	} while (advanceLoop(&trgtinfo, &trgt),
 		 advanceLoop(&srcinfo, &src) < srcinfo.ndim);
 	break;
-      case LUX_LONG:
+      case LUX_INT32:
 	do {
 	  value.l = 2 * *src.l;
 	  for (j = 0; j < n; j++) {	/* all directions */	  
@@ -366,7 +366,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
 	break;
     } else 				/* general case - a bit slower */
       switch (array_type(ps[0])) {
-	case LUX_BYTE:
+	case LUX_INT8:
 	  do {
 	    nok = 1 - degree;
 	    value.b = 2 * *src.b;
@@ -387,7 +387,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
 	  } while (advanceLoop(&trgtinfo, &trgt),
 		   advanceLoop(&srcinfo, &src) < srcinfo.ndim);
 	  break;
-	case LUX_WORD:
+	case LUX_INT16:
 	  do {
 	    nok = 1 - degree;
 	    value.w = 2 * *src.w;
@@ -408,7 +408,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
 	  } while (advanceLoop(&trgtinfo, &trgt),
 		   advanceLoop(&srcinfo, &src) < srcinfo.ndim);
 	  break;
-	case LUX_LONG:
+	case LUX_INT32:
 	  do {
 	    nok = 1 - degree;
 	    value.l = 2 * *src.l;
@@ -508,7 +508,7 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
       || array_size(ps[1]) != array_size(ps[0]))
     return cerror(INCMP_ARG, ps[1]);
 
-  if (standardLoop(ps[0], 0, SL_ALLAXES | SL_SAMEDIMS | SL_EXACT, LUX_LONG,
+  if (standardLoop(ps[0], 0, SL_ALLAXES | SL_SAMEDIMS | SL_EXACT, LUX_INT32,
 		   &srcinfo, &src, &result, &trgtinfo, &trgt) == LUX_ERROR)
     return LUX_ERROR;
 
@@ -532,7 +532,7 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
   ny -= 2;
   if (sign >= 0) {		/* seek hill-like objects */
     switch (array_type(ps[0])) {
-      case LUX_BYTE:
+      case LUX_INT8:
 	while (ny--) {		/* all rows except for bottom one */
 	  *trgt.l++ = 0;
 	  angle++;
@@ -552,7 +552,7 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
 	  angle++;
 	}
 	break;
-      case LUX_WORD:
+      case LUX_INT16:
 	while (ny--) {		/* all rows except for bottom one */
 	  *trgt.l++ = 0;
 	  angle++;
@@ -572,7 +572,7 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
 	  angle++;
 	}
 	break;
-      case LUX_LONG:
+      case LUX_INT32:
 	while (ny--) {		/* all rows except for bottom one */
 	  *trgt.l++ = 0;
 	  angle++;
@@ -635,7 +635,7 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
     }
   } else {			/* seek valley-like objects */
     switch (array_type(ps[0])) {
-      case LUX_BYTE:
+      case LUX_INT8:
 	while (ny--) {		/* all rows except for bottom one */
 	  *trgt.l++ = 0;
 	  src.b++;
@@ -655,7 +655,7 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
 	  src.b++;
 	}
 	break;
-      case LUX_WORD:
+      case LUX_INT16:
 	while (ny--) {		/* all rows except for bottom one */
 	  *trgt.l++ = 0;
 	  src.w++;
@@ -675,7 +675,7 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
 	  src.w++;
 	}
 	break;
-      case LUX_LONG:
+      case LUX_INT32:
 	while (ny--) {		/* all rows except for bottom one */
 	  *trgt.l++ = 0;
 	  src.l++;
@@ -762,7 +762,7 @@ int32_t lux_max_dir(int32_t narg, int32_t ps[])
       || array_size(ps[1]) != array_size(ps[0]))
     return cerror(INCMP_ARG, ps[1]);
 
-  if (standardLoop(ps[0], 0, SL_ALLAXES | SL_SAMEDIMS | SL_EXACT, LUX_BYTE,
+  if (standardLoop(ps[0], 0, SL_ALLAXES | SL_SAMEDIMS | SL_EXACT, LUX_INT8,
 		   &srcinfo, &src, &result, &trgtinfo, &trgt) == LUX_ERROR)
     return LUX_ERROR;
 
@@ -786,7 +786,7 @@ int32_t lux_max_dir(int32_t narg, int32_t ps[])
   ny -= 2;
   if (sign >= 0) {		/* seek hill-like objects */
     switch (array_type(ps[0])) {
-      case LUX_BYTE:
+      case LUX_INT8:
 	while (ny--) {		/* all rows except for bottom one */
 	  *trgt.b++ = 0;
 	  angle++;
@@ -807,7 +807,7 @@ int32_t lux_max_dir(int32_t narg, int32_t ps[])
 	  angle++;
 	}
 	break;
-      case LUX_WORD:
+      case LUX_INT16:
 	while (ny--) {		/* all rows except for bottom one */
 	  *trgt.b++ = 0;
 	  angle++;
@@ -828,7 +828,7 @@ int32_t lux_max_dir(int32_t narg, int32_t ps[])
 	  angle++;
 	}
 	break;
-      case LUX_LONG:
+      case LUX_INT32:
 	while (ny--) {		/* all rows except for bottom one */
 	  *trgt.b++ = 0;
 	  angle++;
@@ -894,7 +894,7 @@ int32_t lux_max_dir(int32_t narg, int32_t ps[])
     }
   } else {			/* seek valley-like objects */
     switch (array_type(ps[0])) {
-      case LUX_BYTE:
+      case LUX_INT8:
 	while (ny--) {		/* all rows except for bottom one */
 	  *trgt.b++ = 0;
 	  src.b++;
@@ -915,7 +915,7 @@ int32_t lux_max_dir(int32_t narg, int32_t ps[])
 	  src.b++;
 	}
 	break;
-      case LUX_WORD:
+      case LUX_INT16:
 	while (ny--) {		/* all rows except for bottom one */
 	  *trgt.b++ = 0;
 	  src.w++;
@@ -936,7 +936,7 @@ int32_t lux_max_dir(int32_t narg, int32_t ps[])
 	  src.w++;
 	}
 	break;
-      case LUX_LONG:
+      case LUX_INT32:
 	while (ny--) {		/* all rows except for bottom one */
 	  *trgt.b++ = 0;
 	  src.l++;
@@ -1465,7 +1465,7 @@ int32_t area_general(int32_t narg, int32_t ps[], int32_t isFunction)
 int32_t lux_area(int32_t narg, int32_t ps[])
 /* AREA,bitmap [, SEED=<seed>, NUMBERS=<numbers>, DIAGONAL=<diagonal>] */
 {
-  if (!symbolIsNumericalArray(ps[0]) || array_type(ps[0]) != LUX_LONG)
+  if (!symbolIsNumericalArray(ps[0]) || array_type(ps[0]) != LUX_INT32)
     return luxerror("Need LONG array", ps[0]);
   
   if (array_num_dims(ps[0]) == 2
@@ -1649,19 +1649,19 @@ int32_t area2_2d(int32_t narg, int32_t ps[])
 	    continue;
 	}
 	switch (maximum + type) {
-	  case SEEK_MAXIMUM + LUX_BYTE:
+	  case SEEK_MAXIMUM + LUX_INT8:
 	    if (dataptr.b[offset[direction]] > *dataptr2.b) {
 	      j = direction;
 	      dataptr2.b = dataptr.b + offset[direction];
 	    }
 	    break;
-	  case SEEK_MAXIMUM + LUX_WORD:
+	  case SEEK_MAXIMUM + LUX_INT16:
 	    if (dataptr.w[offset[direction]] > *dataptr2.w) {
 	      j = direction;
 	      dataptr2.w = dataptr.w + offset[direction];
 	    }
 	    break;
-	  case SEEK_MAXIMUM + LUX_LONG:
+	  case SEEK_MAXIMUM + LUX_INT32:
 	    if (dataptr.l[offset[direction]] > *dataptr2.l) {
 	      j = direction;
 	      dataptr2.l = dataptr.l + offset[direction];
@@ -1679,19 +1679,19 @@ int32_t area2_2d(int32_t narg, int32_t ps[])
 	      dataptr2.d = dataptr.d + offset[direction];
 	    }
 	    break;
-	  case LUX_BYTE:
+	  case LUX_INT8:
 	    if (dataptr.b[offset[direction]] < *dataptr2.b) {
 	      j = direction;
 	      dataptr2.b = dataptr.b + offset[direction];
 	    }
 	    break;
-	  case LUX_WORD:
+	  case LUX_INT16:
 	    if (dataptr.w[offset[direction]] < *dataptr2.w) {
 	      j = direction;
 	      dataptr2.w = dataptr.w + offset[direction];
 	    }
 	    break;
-	  case LUX_LONG:
+	  case LUX_INT32:
 	    if (dataptr.l[offset[direction]] < *dataptr2.l) {
 	      j = direction;
 	      dataptr2.l = dataptr.l + offset[direction];
@@ -1747,15 +1747,15 @@ int32_t area2_2d(int32_t narg, int32_t ps[])
 	  if (*ptr2 != 1 && *ptr2 != EDGE)
 	    continue;
 	  switch (maximum + type) {
-	    case SEEK_MAXIMUM + LUX_BYTE:
+	    case SEEK_MAXIMUM + LUX_INT8:
 	      if (dataptr.b[offset[direction]] >= *dataptr.b)
 		continue;
 	      break;
-	    case SEEK_MAXIMUM + LUX_WORD:
+	    case SEEK_MAXIMUM + LUX_INT16:
 	      if (dataptr.w[offset[direction]] >= *dataptr.w)
 		continue;
 	      break;
-	    case SEEK_MAXIMUM + LUX_LONG:
+	    case SEEK_MAXIMUM + LUX_INT32:
 	      if (dataptr.l[offset[direction]] >= *dataptr.l)
 		continue;
 	      break;
@@ -1767,15 +1767,15 @@ int32_t area2_2d(int32_t narg, int32_t ps[])
 	      if (dataptr.d[offset[direction]] >= *dataptr.d)
 		continue;
 	      break;
-	    case LUX_BYTE:
+	    case LUX_INT8:
 	      if (dataptr.b[offset[direction]] <= *dataptr.b)
 		continue;
 	      break;
-	    case LUX_WORD:
+	    case LUX_INT16:
 	      if (dataptr.w[offset[direction]] <= *dataptr.w)
 		continue;
 	      break;
-	    case LUX_LONG:
+	    case LUX_INT32:
 	      if (dataptr.l[offset[direction]] <= *dataptr.l)
 		continue;
 	      break;
@@ -1811,15 +1811,15 @@ int32_t area2_2d(int32_t narg, int32_t ps[])
 	  if (*ptr2 != 1 && *ptr2 != EDGE)
 	    continue;
 	  switch (maximum + type) {
-	    case SEEK_MAXIMUM + LUX_BYTE:
+	    case SEEK_MAXIMUM + LUX_INT8:
 	      if (dataptr.b[offset[direction]] >= *dataptr.b)
 		continue;
 	      break;
-	    case SEEK_MAXIMUM + LUX_WORD:
+	    case SEEK_MAXIMUM + LUX_INT16:
 	      if (dataptr.w[offset[direction]] >= *dataptr.w)
 		continue;
 	      break;
-	    case SEEK_MAXIMUM + LUX_LONG:
+	    case SEEK_MAXIMUM + LUX_INT32:
 	      if (dataptr.l[offset[direction]] >= *dataptr.l)
 		continue;
 	      break;
@@ -1831,15 +1831,15 @@ int32_t area2_2d(int32_t narg, int32_t ps[])
 	      if (dataptr.d[offset[direction]] >= *dataptr.d)
 		continue;
 	      break;
-	    case LUX_BYTE:
+	    case LUX_INT8:
 	      if (dataptr.b[offset[direction]] <= *dataptr.b)
 		continue;
 	      break;
-	    case LUX_WORD:
+	    case LUX_INT16:
 	      if (dataptr.w[offset[direction]] <= *dataptr.w)
 		continue;
 	      break;
-	    case LUX_LONG:
+	    case LUX_INT32:
 	      if (dataptr.l[offset[direction]] <= *dataptr.l)
 		continue;
 	      break;
@@ -2090,19 +2090,19 @@ int32_t area2_general(int32_t narg, int32_t ps[])
 	  }
 	}
 	switch (maximum + type) {
-	  case SEEK_MAXIMUM + LUX_BYTE:
+	  case SEEK_MAXIMUM + LUX_INT8:
 	    if (dataptr.b[offset[direction]] > *dataptr2.b) {
 	      j = direction;
 	      dataptr2.b = dataptr.b + offset[direction];
 	    }
 	    break;
-	  case SEEK_MAXIMUM + LUX_WORD:
+	  case SEEK_MAXIMUM + LUX_INT16:
 	    if (dataptr.w[offset[direction]] > *dataptr2.w) {
 	      j = direction;
 	      dataptr2.w = dataptr.w + offset[direction];
 	    }
 	    break;
-	  case SEEK_MAXIMUM + LUX_LONG:
+	  case SEEK_MAXIMUM + LUX_INT32:
 	    if (dataptr.l[offset[direction]] > *dataptr2.l) {
 	      j = direction;
 	      dataptr2.l = dataptr.l + offset[direction];
@@ -2120,19 +2120,19 @@ int32_t area2_general(int32_t narg, int32_t ps[])
 	      dataptr2.d = dataptr.d + offset[direction];
 	    }
 	    break;
-	  case LUX_BYTE:
+	  case LUX_INT8:
 	    if (dataptr.b[offset[direction]] < *dataptr2.b) {
 	      j = direction;
 	      dataptr2.b = dataptr.b + offset[direction];
 	    }
 	    break;
-	  case LUX_WORD:
+	  case LUX_INT16:
 	    if (dataptr.w[offset[direction]] < *dataptr2.w) {
 	      j = direction;
 	      dataptr2.w = dataptr.w + offset[direction];
 	    }
 	    break;
-	  case LUX_LONG:
+	  case LUX_INT32:
 	    if (dataptr.l[offset[direction]] < *dataptr2.l) {
 	      j = direction;
 	      dataptr2.l = dataptr.l + offset[direction];
@@ -2191,15 +2191,15 @@ int32_t area2_general(int32_t narg, int32_t ps[])
 	  if (*ptr2 != 1 && *ptr2 != EDGE)
 	    continue;
 	  switch (maximum + type) {
-	    case SEEK_MAXIMUM + LUX_BYTE:
+	    case SEEK_MAXIMUM + LUX_INT8:
 	      if (dataptr.b[offset[direction]] >= *dataptr.b)
 		continue;
 	      break;
-	    case SEEK_MAXIMUM + LUX_WORD:
+	    case SEEK_MAXIMUM + LUX_INT16:
 	      if (dataptr.w[offset[direction]] >= *dataptr.w)
 		continue;
 	      break;
-	    case SEEK_MAXIMUM + LUX_LONG:
+	    case SEEK_MAXIMUM + LUX_INT32:
 	      if (dataptr.l[offset[direction]] >= *dataptr.l)
 		continue;
 	      break;
@@ -2211,15 +2211,15 @@ int32_t area2_general(int32_t narg, int32_t ps[])
 	      if (dataptr.d[offset[direction]] >= *dataptr.d)
 		continue;
 	      break;
-	    case LUX_BYTE:
+	    case LUX_INT8:
 	      if (dataptr.b[offset[direction]] <= *dataptr.b)
 		continue;
 	      break;
-	    case LUX_WORD:
+	    case LUX_INT16:
 	      if (dataptr.w[offset[direction]] <= *dataptr.w)
 		continue;
 	      break;
-	    case LUX_LONG:
+	    case LUX_INT32:
 	      if (dataptr.l[offset[direction]] <= *dataptr.l)
 		continue;
 	      break;
@@ -2255,15 +2255,15 @@ int32_t area2_general(int32_t narg, int32_t ps[])
 	  if (*ptr2 != 1 && *ptr2 != EDGE)
 	    continue;
 	  switch (maximum + type) {
-	    case SEEK_MAXIMUM + LUX_BYTE:
+	    case SEEK_MAXIMUM + LUX_INT8:
 	      if (dataptr.b[offset[direction]] >= *dataptr.b)
 		continue;
 	      break;
-	    case SEEK_MAXIMUM + LUX_WORD:
+	    case SEEK_MAXIMUM + LUX_INT16:
 	      if (dataptr.w[offset[direction]] >= *dataptr.w)
 		continue;
 	      break;
-	    case SEEK_MAXIMUM + LUX_LONG:
+	    case SEEK_MAXIMUM + LUX_INT32:
 	      if (dataptr.l[offset[direction]] >= *dataptr.l)
 		continue;
 	      break;
@@ -2275,15 +2275,15 @@ int32_t area2_general(int32_t narg, int32_t ps[])
 	      if (dataptr.d[offset[direction]] >= *dataptr.d)
 		continue;
 	      break;
-	    case LUX_BYTE:
+	    case LUX_INT8:
 	      if (dataptr.b[offset[direction]] <= *dataptr.b)
 		continue;
 	      break;
-	    case LUX_WORD:
+	    case LUX_INT16:
 	      if (dataptr.w[offset[direction]] <= *dataptr.w)
 		continue;
 	      break;
-	    case LUX_LONG:
+	    case LUX_INT32:
 	      if (dataptr.l[offset[direction]] <= *dataptr.l)
 		continue;
 	      break;
@@ -2340,7 +2340,7 @@ int32_t area2_general(int32_t narg, int32_t ps[])
 /*----------------------------------------------------------------------*/
 int32_t lux_area2(int32_t narg, int32_t ps[])
 {
-  if (!symbolIsNumericalArray(ps[0]) || array_type(ps[0]) != LUX_LONG)
+  if (!symbolIsNumericalArray(ps[0]) || array_type(ps[0]) != LUX_INT32)
     return luxerror("Need LONG array", ps[0]);
   if (!symbolIsNumericalArray(ps[1]))
     return cerror(NEED_ARR, ps[1]);
@@ -2382,7 +2382,7 @@ int32_t lux_basin(int32_t narg, int32_t ps[])
  nx = h->dims[0];		/* dimensions */
  ny = h->dims[1];
  alt = (float *) LPTR(h);	/* altitudes (i.e. data) */
- result_sym = array_clone(iq, LUX_LONG);
+ result_sym = array_clone(iq, LUX_INT32);
  h = HEAD(result_sym);
  wsh = LPTR(h);			/* result map */
  switch (internalMode & 7) {
@@ -2561,7 +2561,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
     return luxerror("Sorry, must be FLOAT at the moment", ps[0]);
 
   if (standardLoop(ps[0], 0, SL_ALLAXES | SL_SAMEDIMS | SL_EACHCOORD | SL_EXACT,
-		   LUX_LONG,
+		   LUX_INT32,
 		   &srcinfo, &src, &result, &trgtinfo, &trgt) < 0)
     return LUX_ERROR;
   trgt0 = trgt;
@@ -2622,7 +2622,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 
   mini = 2;
   switch (symbol_type(ps[0]) | sign) {
-    case LUX_BYTE:
+    case LUX_INT8:
       min[0].b = min[1].b = bounds.max.b;
       do {
 	min[2].b = min[1].b;
@@ -2737,7 +2737,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
       } while (advanceLoop(&trgtinfo, &trgt),
 	       advanceLoop(&srcinfo, &src) < srcinfo.rndim);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       min[0].w = min[1].w = bounds.max.w;
       do {
 	min[2].w = min[1].w;
@@ -2852,7 +2852,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
       } while (advanceLoop(&trgtinfo, &trgt),
 	       advanceLoop(&srcinfo, &src) < srcinfo.rndim);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       min[0].l = min[1].l = bounds.max.l;
       do {
 	min[2].l = min[1].l;
@@ -3198,7 +3198,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	       advanceLoop(&srcinfo, &src) < srcinfo.rndim);
       break;
 
-    case LUX_BYTE | 0x20:
+    case LUX_INT8 | 0x20:
       max[0].b = max[1].b = bounds.min.b;
       do {
 	max[2].b = max[1].b;
@@ -3313,7 +3313,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
       } while (advanceLoop(&trgtinfo, &trgt),
 	       advanceLoop(&srcinfo, &src) < srcinfo.rndim);
       break;
-    case LUX_WORD | 0x20:
+    case LUX_INT16 | 0x20:
       max[0].w = max[1].w = bounds.min.w;
       do {
 	max[2].w = max[1].w;
@@ -3428,7 +3428,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
       } while (advanceLoop(&trgtinfo, &trgt),
 	       advanceLoop(&srcinfo, &src) < srcinfo.rndim);
       break;
-    case LUX_LONG | 0x20:
+    case LUX_INT32 | 0x20:
       max[0].l = max[1].l = bounds.min.l;
       do {
 	max[2].l = max[1].l;
@@ -3842,7 +3842,7 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 
   /* gather info about ps[0] and prepare a return symbol */
   if (standardLoop(ps[0], 0, SL_ALLAXES | SL_SAMEDIMS | SL_EXACT | SL_EACHROW,
-		   LUX_BYTE, &srcinfo, &src, &result, &trgtinfo, &trgt) < 0)
+		   LUX_INT8, &srcinfo, &src, &result, &trgtinfo, &trgt) < 0)
     return LUX_ERROR;
   if (symbol_class(ps[0]) != LUX_ARRAY)
     return cerror(ILL_CLASS, ps[0]);
@@ -3962,7 +3962,7 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
   if (sign && (internalMode & 2) == 0 && !diagonal && !haveThreshold)
 		/* standard form - make as fast as possible */
     switch (array_type(ps[0])) {
-      case LUX_BYTE:
+      case LUX_INT8:
 	do {
 	  for (edge = srcinfo.ndim - 1; edge; edge--)
 	    if (!srcinfo.coords[edge]
@@ -3992,7 +3992,7 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 	} while (advanceLoop(&trgtinfo, &trgt),
 		 advanceLoop(&srcinfo, &src) < srcinfo.ndim);
 	break;
-      case LUX_WORD:
+      case LUX_INT16:
 	do {
 	  for (edge = srcinfo.ndim - 1; edge; edge--)
 	    if (!srcinfo.coords[edge]
@@ -4022,7 +4022,7 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 	} while (advanceLoop(&trgtinfo, &trgt),
 		 advanceLoop(&srcinfo, &src) < srcinfo.ndim);
 	break;
-      case LUX_LONG:
+      case LUX_INT32:
 	do {
 	  for (edge = srcinfo.ndim - 1; edge; edge--)
 	    if (!srcinfo.coords[edge]
@@ -4114,7 +4114,7 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 	break;
     } else 				/* general case - a bit slower */
       switch (array_type(ps[0])) {
-	case LUX_BYTE:
+	case LUX_INT8:
 	  do {
 	    for (edge = srcinfo.ndim - 1; edge; edge--)
 	      if ((!diagonal || diagonal[edge])
@@ -4152,7 +4152,7 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 	  } while (advanceLoop(&trgtinfo, &trgt),
 		   advanceLoop(&srcinfo, &src) < srcinfo.ndim);
 	  break;
-	case LUX_WORD:
+	case LUX_INT16:
 	  do {
 	    for (edge = srcinfo.ndim - 1; edge; edge--)
 	      if ((!diagonal || diagonal[edge])
@@ -4190,7 +4190,7 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 	  } while (advanceLoop(&trgtinfo, &trgt),
 		   advanceLoop(&srcinfo, &src) < srcinfo.ndim);
 	  break;
-	case LUX_LONG:
+	case LUX_INT32:
 	  do {
 	    for (edge = srcinfo.ndim - 1; edge; edge--)
 	      if ((!diagonal || diagonal[edge])
@@ -4331,7 +4331,7 @@ int32_t lux_inpolygon(int32_t narg, int32_t ps[])
       || array_size(ps[3]) != np)
     return cerror(INCMP_ARG, ps[3]);
 
-  result = array_clone(ps[0], LUX_LONG);
+  result = array_clone(ps[0], LUX_INT32);
   array_num_dims(result) = 1;
   array_dims(result)[0] = n;
   trgt = trgt0 = array_data(result);
@@ -4360,15 +4360,15 @@ int32_t lux_inpolygon(int32_t narg, int32_t ps[])
   j = 0;
   while (n--) {
     switch (type) {
-      case LUX_BYTE:
+      case LUX_INT8:
 	thisx.f = (float) *x.b++;
 	thisy.f = (float) *y.b++;
 	break;
-      case LUX_WORD:
+      case LUX_INT16:
 	thisx.f = (float) *x.w++;
 	thisy.f = (float) *y.w++;
 	break;
-      case LUX_LONG:
+      case LUX_INT32:
 	thisx.f = (float) *x.l++;
 	thisy.f = (float) *y.l++;
 	break;
@@ -4429,7 +4429,7 @@ int32_t lux_inpolygon(int32_t narg, int32_t ps[])
   } else {
     undefine(result);
     symbol_class(result) = LUX_SCALAR;
-    scalar_type(result) = LUX_LONG;
+    scalar_type(result) = LUX_INT32;
     scalar_value(result).l = -1;
   }
   return result;
@@ -4487,9 +4487,9 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
   for (i = 0; i < n; i++)
     if (array_dims(ps[0])[i] != array_dims(ps[1])[i])
       return cerror(INCMP_DIMS, ps[1]);
-  if (array_type(ps[0]) != LUX_LONG)
+  if (array_type(ps[0]) != LUX_INT32)
     return luxerror("Need a LONG array", ps[0]);
-  if (array_type(ps[1]) != LUX_LONG)
+  if (array_type(ps[1]) != LUX_INT32)
     return luxerror("Need a LONG array", ps[1]);
   ptr1 = array_data(ps[0]);
   ptr2 = array_data(ps[1]);
@@ -4529,7 +4529,7 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
     /* prepare an output array */
     dims[0] = n2;		/* number of non-zero entries */
     dims[1] = 3;		/* three output numbers per entry */
-    result = array_scratch(LUX_LONG, 2, dims);
+    result = array_scratch(LUX_INT32, 2, dims);
     ptr = ptr0 = array_data(result); /* output pointer */
     /* we store the area numbers in both images, count the number of */
     /* pixels with that combination, and keep track of the maximum */
@@ -4624,14 +4624,14 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
     return LUX_ERROR;
   }
   if (v1) {			/* we have <v1> splitters to store */
-    if (to_scratch_array(qsplit1, LUX_LONG, 1, &v1) == LUX_ERROR) {
+    if (to_scratch_array(qsplit1, LUX_INT32, 1, &v1) == LUX_ERROR) {
       free(order);
       free(order2);
       return LUX_ERROR;
     }
     out1 = array_data(qsplit1);
   } else {			/* no splitters to store: output scalar -1 */
-    to_scalar(qsplit1, LUX_LONG);
+    to_scalar(qsplit1, LUX_INT32);
     scalar_value(qsplit1).l = -1;
   }
   qsplit2list = findVarName("$SPLIT2_INDEX", 0);
@@ -4645,7 +4645,7 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
     /* beyond the end of the $SPLIT2 array, so that */
     /* $SPLIT2($SPLIT2_INDEX(I):$SPLIT2_INDEX(I+1)-1) works even for */
     /* the last valid value of I. */
-    if (to_scratch_array(qsplit2list, LUX_LONG, 1, &v1) == LUX_ERROR) {
+    if (to_scratch_array(qsplit2list, LUX_INT32, 1, &v1) == LUX_ERROR) {
       free(order);
       free(order2);
       return LUX_ERROR;
@@ -4653,7 +4653,7 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
     list = array_data(qsplit2list);
     v1--;			/* return to previous value */
   } else {
-    to_scalar(qsplit2list, LUX_LONG);
+    to_scalar(qsplit2list, LUX_INT32);
     scalar_value(qsplit2list).l = -1;
   }
   qsplit2 = findVarName("$SPLIT2", 0);
@@ -4663,14 +4663,14 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
     return LUX_ERROR;
   }
   if (v2) {
-    if (to_scratch_array(qsplit2, LUX_LONG, 1, &v2) == LUX_ERROR) {
+    if (to_scratch_array(qsplit2, LUX_INT32, 1, &v2) == LUX_ERROR) {
       free(order);
       free(order2);
       return LUX_ERROR;
     }
     out2 = array_data(qsplit2);
   } else {
-    to_scalar(qsplit2, LUX_LONG);
+    to_scalar(qsplit2, LUX_INT32);
     scalar_value(qsplit2).l = -1;
   }
     
@@ -4727,14 +4727,14 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
     return LUX_ERROR;
   }
   if (v1) {
-    if (to_scratch_array(qmerge2, LUX_LONG, 1, &v1) == LUX_ERROR) {
+    if (to_scratch_array(qmerge2, LUX_INT32, 1, &v1) == LUX_ERROR) {
       free(order);
       free(order2);
       return LUX_ERROR;
     }
     out1 = array_data(qmerge2);
   } else {
-    to_scalar(qmerge2, LUX_LONG);
+    to_scalar(qmerge2, LUX_INT32);
     scalar_value(qmerge2).l = -1;
   }
   qmerge1list = findVarName("$MERGE1_INDEX", 0);
@@ -4745,7 +4745,7 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
   }
   if (v1) {
     v1++;
-    if (to_scratch_array(qmerge1list, LUX_LONG, 1, &v1) == LUX_ERROR) {
+    if (to_scratch_array(qmerge1list, LUX_INT32, 1, &v1) == LUX_ERROR) {
       free(order);
       free(order2);
       return LUX_ERROR;
@@ -4753,7 +4753,7 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
     list = array_data(qmerge1list);
     v1--;
   } else {
-    to_scalar(qmerge1list, LUX_LONG);
+    to_scalar(qmerge1list, LUX_INT32);
     scalar_value(qmerge1list).l = -1;
   }
   qmerge1 = findVarName("$MERGE1", 0);
@@ -4763,14 +4763,14 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
     return LUX_ERROR;
   }
   if (v2) {
-    if (to_scratch_array(qmerge1, LUX_LONG, 1, &v2) == LUX_ERROR) {
+    if (to_scratch_array(qmerge1, LUX_INT32, 1, &v2) == LUX_ERROR) {
       free(order);
       free(order2);
       return LUX_ERROR;
     }
     out2 = array_data(qmerge1);
   } else {
-    to_scalar(qmerge1, LUX_LONG);
+    to_scalar(qmerge1, LUX_INT32);
     scalar_value(qmerge1).l = -1;
   }
     
@@ -4821,7 +4821,7 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
     return LUX_ERROR;
   }
   if (n) {
-    if (to_scratch_array(qapp, LUX_LONG, 1, &n) == LUX_ERROR) {
+    if (to_scratch_array(qapp, LUX_INT32, 1, &n) == LUX_ERROR) {
       free(order);
       free(order2);
       return LUX_ERROR;
@@ -4836,7 +4836,7 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
     if (!ptr1[order[n2 - 1]] && ptr2[order[n2 - 2]] != ptr2[order[n2 - 1]])
       *ptr++ = ptr2[order[n2 - 1]];
   } else {
-    to_scalar(qapp, LUX_LONG);
+    to_scalar(qapp, LUX_INT32);
     scalar_value(qapp).l = -1;
   }
 
@@ -4864,7 +4864,7 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
     return LUX_ERROR;
   }
   if (n) {
-    if (to_scratch_array(qdisapp, LUX_LONG, 1, &n) == LUX_ERROR) {
+    if (to_scratch_array(qdisapp, LUX_INT32, 1, &n) == LUX_ERROR) {
       free(order);
       free(order2);
       return LUX_ERROR;
@@ -4879,7 +4879,7 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
     if (!ptr2[n2 - 1] && ptr1[n2 - 2] != ptr1[n2 - 1])
       *ptr++ = ptr1[n2 - 1];
   } else {
-    to_scalar(qdisapp, LUX_LONG);
+    to_scalar(qdisapp, LUX_INT32);
     scalar_value(qdisapp).l = -1;
   }
 
@@ -4924,14 +4924,14 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
     return LUX_ERROR;
   }
   if (n) {
-    if (to_scratch_array(qstay1, LUX_LONG, 1, &n) == LUX_ERROR) {
+    if (to_scratch_array(qstay1, LUX_INT32, 1, &n) == LUX_ERROR) {
       free(order);
       free(order2);
       return LUX_ERROR;
     }
     out1 = array_data(qstay1);
   } else {
-    to_scalar(qstay1, LUX_LONG);
+    to_scalar(qstay1, LUX_INT32);
     scalar_value(qstay1).l = -1;
   }
 
@@ -4942,14 +4942,14 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
     return LUX_ERROR;
   }
   if (n) {
-    if (to_scratch_array(qstay2, LUX_LONG, 1, &n) == LUX_ERROR) {
+    if (to_scratch_array(qstay2, LUX_INT32, 1, &n) == LUX_ERROR) {
       free(order);
       free(order2);
       return LUX_ERROR;
     }
     out2 = array_data(qstay2);
   } else {
-    to_scalar(qstay2, LUX_LONG);
+    to_scalar(qstay2, LUX_INT32);
     scalar_value(qstay2).l = -1;
   }
 
@@ -5173,7 +5173,7 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
       if (compact > 1 && symbolProperName(ps[2])) {
 	/* store highest assigned number in <compact>, if it is a */
 	/* named variable (and not an expression) */
-	to_scalar(ps[2], LUX_LONG);
+	to_scalar(ps[2], LUX_INT32);
 	scalar_value(ps[2]).l = j;
       }
     }

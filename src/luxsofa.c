@@ -206,7 +206,7 @@ int32_t lux_iauCal2jd(int32_t narg, int32_t ps[])
 
   /* iauCal2jd(int32_t iy, int32_t im, int32_t id, double *djm0, double *djm) */
   switch (infos[0].type) {
-  case LUX_LONG:
+  case LUX_INT32:
     while (infos[1].nelem--) {
       if (iauCal2jd(ptrs[0].l[0], ptrs[0].l[1], ptrs[0].l[2], &djm0, &djm))
         *ptrs[1].l = 0;
@@ -278,7 +278,7 @@ int32_t lux_iauDat(int32_t narg, int32_t ps[])
         jdlo = jd;
       }
     } while (jdhi - jdlo > 1);
-    iq = scalar_scratch(LUX_LONG);
+    iq = scalar_scratch(LUX_INT32);
     scalar_value(iq).l = jdlo;
     return iq;
   } else {
@@ -287,7 +287,7 @@ int32_t lux_iauDat(int32_t narg, int32_t ps[])
     if ((iq = standard_args(narg, ps, "i>L3*;rD-3*", &ptrs, &infos)) < 0)
       return LUX_ERROR;
     switch (infos[0].type) {
-    case LUX_LONG:
+    case LUX_INT32:
       while (infos[1].nelem--) {
         iauDat(ptrs[0].l[0], ptrs[0].l[1], ptrs[0].l[2], 0.0, ptrs[1].d++);
         ptrs[0].l += 3;

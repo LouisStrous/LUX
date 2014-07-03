@@ -1168,7 +1168,7 @@ int32_t lux_xtv_general(int32_t narg, int32_t ps[], int32_t mode)
 }
 /*------------------------------------------------------------------------*/
 int32_t lux_xtvraw(int32_t narg, int32_t ps[])
-/* scales non-LUX_BYTE arrays; displays on screen */
+/* scales non-LUX_INT8 arrays; displays on screen */
 /* NOTE: in older versions of LUX the coordinates of the image were
  counted from the upper left-hand corner of the screen, and the
  position specified for the image was that of the upper left-hand
@@ -1386,7 +1386,7 @@ int32_t tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
       /* determine min/max */
       if (mode & TV_24) {		/* three bytes per pixel */
 	switch (type) {
-	  case LUX_BYTE:
+	  case LUX_INT8:
 	    min.b = UINT8_MAX;
 	    max.b = 0;
 	    for (iy = y1; iy <= y2; iy++)
@@ -1415,7 +1415,7 @@ int32_t tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
 	      factor.f = 255/((float) max.b - min.b);
 	    offset.f = (float) min.b;
 	    break;
-	  case LUX_WORD:
+	  case LUX_INT16:
 	    min.w = INT16_MAX;
 	    max.w = -INT16_MAX;
 	    for (iy = y1; iy <= y2; iy++)
@@ -1444,7 +1444,7 @@ int32_t tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
 	      factor.f = 255/((float) max.w - min.w);
 	    offset.f = (float) min.w;
 	    break;
-	  case LUX_LONG:
+	  case LUX_INT32:
 	    min.l = INT32_MAX;
 	    max.l = -INT32_MAX;
 	    for (iy = y1; iy <= y2; iy++)
@@ -1534,7 +1534,7 @@ int32_t tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
 	}
       } else {			/* one uint8_t per pixel */
 	switch (type) {
-	  case LUX_BYTE:
+	  case LUX_INT8:
 	    min.b = UINT8_MAX;
 	    max.b = 0;
 	    for (iy = y1; iy <= y2; iy++)
@@ -1553,7 +1553,7 @@ int32_t tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
 	      factor.f = ((float) scalemax - scalemin)/((float) max.b - min.b);
 	    offset.f = (float) min.b;
 	    break;
-	  case LUX_WORD:
+	  case LUX_INT16:
 	    min.w = INT16_MAX;
 	    max.w = -INT16_MAX;
 	    for (iy = y1; iy <= y2; iy++)
@@ -1572,7 +1572,7 @@ int32_t tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
 	      factor.f = ((float) scalemax - scalemin)/((float) max.w - min.w);
 	    offset.f = (float) min.w;
 	    break;
-	  case LUX_LONG:
+	  case LUX_INT32:
 	    min.l = INT32_MAX;
 	    max.l = -INT32_MAX;
 	    for (iy = y1; iy <= y2; iy++)
@@ -1684,7 +1684,7 @@ int32_t tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
     if (setup & 4) {		/* "reversed" images */
       if (mode & TV_24) {	/* 24-bit colors */
 	switch (type) {
-	  case LUX_BYTE:
+	  case LUX_INT8:
 	    for (iy = 0; iy < nyy; iy--)
 	      for (ix = 0; ix < nxx; ix++) {
 		xsrc = x1 + ix/magx;
@@ -1739,7 +1739,7 @@ int32_t tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
 		} /* end of switch (bpp) */
 	      }	/* end of for (ix...) */
 	    break;
-	  case LUX_WORD:
+	  case LUX_INT16:
 	    for (iy = 0; iy < nyy; iy--)
 	      for (ix = 0; ix < nxx; ix++) {
 		xsrc = x1 + ix/magx;
@@ -1794,7 +1794,7 @@ int32_t tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
 		} /* end of switch (bpp) */
 	      }	/* end of for (ix...) */
 	    break;
-	  case LUX_LONG:
+	  case LUX_INT32:
 	    for (iy = 0; iy < nyy; iy--)
 	      for (ix = 0; ix < nxx; ix++) {
 		xsrc = x1 + ix/magx;
@@ -1963,7 +1963,7 @@ int32_t tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
       }	/* end of if (mode & TV_24) */
       else if (threeColors) {	/* have three-color colortable */
 	switch (type) {
-	  case LUX_BYTE:
+	  case LUX_INT8:
 	    for (iy = 0; iy < nyy; iy++)
 	      for (ix = 0; ix < nxx; ix++) {
 		xsrc = x1 + ix/magx;
@@ -1990,7 +1990,7 @@ int32_t tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
 		} /* end of switch (bpp) */
 	      }	/* end of for (ix...) */
 	    break;
-	  case LUX_WORD:
+	  case LUX_INT16:
 	    for (iy = 0; iy < nyy; iy++)
 	      for (ix = 0; ix < nxx; ix++) {
 		xsrc = x1 + ix/magx;
@@ -2017,7 +2017,7 @@ int32_t tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
 		} /* end of switch (bpp) */
 	      }	/* end of for (ix...) */
 	    break;
-	  case LUX_LONG:
+	  case LUX_INT32:
 	    for (iy = 0; iy < nyy; iy++)
 	      for (ix = 0; ix < nxx; ix++) {
 		xsrc = x1 + ix/magx;
@@ -2101,7 +2101,7 @@ int32_t tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
 	} /* end of switch (type) */
       } /* end of if (mode & TV_24) else if (threeColors) */
       else switch (type) {	/* ordinary color table */
-	case LUX_BYTE:
+	case LUX_INT8:
 	  for (iy = 0; iy < nyy; iy++)
 	    for (ix = 0; ix < nxx; ix++) {
 	      xsrc = x1 + ix/magx;
@@ -2125,7 +2125,7 @@ int32_t tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
 	      }	/* end of switch (bpp) */
 	    } /* end of for (ix) */
 	  break;
-	case LUX_WORD:
+	case LUX_INT16:
 	  for (iy = 0; iy < nyy; iy++)
 	    for (ix = 0; ix < nxx; ix++) {
 	      xsrc = x1 + ix/magx;
@@ -2149,7 +2149,7 @@ int32_t tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
 	      }	/* end of switch (bpp) */
 	    } /* end of for (ix) */
 	  break;
-	case LUX_LONG:
+	case LUX_INT32:
 	  for (iy = 0; iy < nyy; iy++)
 	    for (ix = 0; ix < nxx; ix++) {
 	      xsrc = x1 + ix/magx;
@@ -2226,7 +2226,7 @@ int32_t tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
     else {			/* standard image */
       if (mode & TV_24) {	/* 24-bit colors */
 	switch (type) {
-	  case LUX_BYTE:
+	  case LUX_INT8:
 	    for (iy = nyy - 1; iy >= 0; iy--)
 	      for (ix = 0; ix < nxx; ix++) {
 		xsrc = x1 + ix/magx;
@@ -2281,7 +2281,7 @@ int32_t tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
 		} /* end of switch (bpp) */
 	      }	/* end of for (ix) */
 	    break;
-	  case LUX_WORD:
+	  case LUX_INT16:
 	    for (iy = nyy - 1; iy >= 0; iy--)
 	      for (ix = 0; ix < nxx; ix++) {
 		xsrc = x1 + ix/magx;
@@ -2336,7 +2336,7 @@ int32_t tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
 		} /* end of switch (bpp) */
 	      }	/* end of for (ix) */
 	    break;
-	  case LUX_LONG:
+	  case LUX_INT32:
 	    for (iy = nyy - 1; iy >= 0; iy--)
 	      for (ix = 0; ix < nxx; ix++) {
 		xsrc = x1 + ix/magx;
@@ -2505,7 +2505,7 @@ int32_t tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
       }	/* end of if (mode & TV_24) */
       else if (threeColors) {	/* have three-color colortable */
 	switch (type) {
-	  case LUX_BYTE:
+	  case LUX_INT8:
 	    for (iy = nyy - 1; iy >= 0; iy--)
 	      for (ix = 0; ix < nxx; ix++) {
 		xsrc = x1 + ix/magx;
@@ -2532,7 +2532,7 @@ int32_t tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
 		} /* end of switch (bpp) */
 	      }	/* end of for (ix) */
 	    break;
-	  case LUX_WORD:
+	  case LUX_INT16:
 	    for (iy = nyy - 1; iy >= 0; iy--)
 	      for (ix = 0; ix < nxx; ix++) {
 		xsrc = x1 + ix/magx;
@@ -2559,7 +2559,7 @@ int32_t tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
 		} /* end of switch (bpp) */
 	      }	/* end of if (ix) */
 	    break;
-	  case LUX_LONG:
+	  case LUX_INT32:
 	    for (iy = nyy - 1; iy >= 0; iy--)
 	      for (ix = 0; ix < nxx; ix++) {
 		xsrc = x1 + ix/magx;
@@ -2643,7 +2643,7 @@ int32_t tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
 	} /* end of switch (type) */
       }	/* end of if (mode & TV_24) else if (threeColors) */
       else switch (type) {	/* ordinary color table */
-	case LUX_BYTE:
+	case LUX_INT8:
 	  for (iy = nyy - 1; iy >= 0; iy--)
 	    for (ix = 0; ix < nxx; ix++) {
 	      xsrc = x1 + ix/magx;
@@ -2667,7 +2667,7 @@ int32_t tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
 	      }	/* end of switch (bpp) */
 	    } /* end of for (ix) */
 	  break;
-	case LUX_WORD:
+	case LUX_INT16:
 	  for (iy = nyy - 1; iy >= 0; iy--)
 	    for (ix = 0; ix < nxx; ix++) {
 	      xsrc = x1 + ix/magx;
@@ -2691,7 +2691,7 @@ int32_t tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
 	      }	/* end of switch (bpp) */
 	    } /* end of for (ix) */
 	  break;
-	case LUX_LONG:
+	case LUX_INT32:
 	  for (iy = nyy - 1; iy >= 0; iy--)
 	    for (ix = 0; ix < nxx; ix++) {
 	      xsrc = x1 + ix/magx;
@@ -3076,13 +3076,13 @@ int32_t lux_colorpixel(int32_t narg, int32_t ps[])
 					tv,x,/post) */
   switch (bpp) {
     case 8:
-      type = LUX_BYTE;
+      type = LUX_INT8;
       break;
     case 16:
-      type = LUX_WORD;
+      type = LUX_INT16;
       break;
     case 24:
-      type = LUX_LONG;
+      type = LUX_INT32;
       break;
     default:
       return luxerror("Illegal bpp in lux_colorpixel()", 0);
@@ -3125,19 +3125,19 @@ int32_t lux_colorpixel(int32_t narg, int32_t ps[])
     case 8:
       if (internalMode & TV_24)
 	switch (symbol_type(*ps)) {
-	  case LUX_BYTE:
+	  case LUX_INT8:
 	    while (n--)
 	      *q.b++ = (pixels[(int32_t) *p.b] & red_mask)
 		| (pixels[(int32_t) p.b[n]] & green_mask)
 		| (pixels[(int32_t) p.b[2*n]] & blue_mask);
 	    break;
-	  case LUX_WORD:
+	  case LUX_INT16:
 	    while (n--)
 	      *q.b++ = (pixels[(int32_t) *p.w] & red_mask)
 		| (pixels[(int32_t) p.w[n]] & green_mask)
 		| (pixels[(int32_t) p.w[2*n]] & blue_mask);
 	    break;
-	  case LUX_LONG:
+	  case LUX_INT32:
 	    while (n--)
 	      *q.b++ = (pixels[(int32_t) *p.l] & red_mask)
 		| (pixels[(int32_t) p.l[n]] & green_mask)
@@ -3156,15 +3156,15 @@ int32_t lux_colorpixel(int32_t narg, int32_t ps[])
 		| (pixels[(int32_t) p.d[2*n]] & blue_mask);
 	    break;
 	} else switch (symbol_type(*ps)) {
-	  case LUX_BYTE:
+	  case LUX_INT8:
 	    while (n--)
 	      *q.b++ = pixels[(int32_t) *p.b++];
 	    break;
-	  case LUX_WORD:
+	  case LUX_INT16:
 	    while (n--)
 	      *q.b++ = pixels[(int32_t) ((uint8_t) *p.w++)];
 	    break;
-	  case LUX_LONG:
+	  case LUX_INT32:
 	    while (n--)
 	      *q.b++ = pixels[(int32_t) ((uint8_t) *p.l++)];
 	    break;
@@ -3181,19 +3181,19 @@ int32_t lux_colorpixel(int32_t narg, int32_t ps[])
     case 16:
       if (internalMode & TV_24)
 	switch (symbol_type(*ps)) {
-	  case LUX_BYTE:
+	  case LUX_INT8:
 	    while (n--)
 	      *q.w++ = (pixels[(int32_t) *p.b] & red_mask)
 		| (pixels[(int32_t) p.b[n]] & green_mask)
 		| (pixels[(int32_t) p.b[2*n]] & blue_mask);
 	    break;
-	  case LUX_WORD:
+	  case LUX_INT16:
 	    while (n--)
 	      *q.w++ = (pixels[(int32_t) *p.w] & red_mask)
 		| (pixels[(int32_t) p.w[n]] & green_mask)
 		| (pixels[(int32_t) p.w[2*n]] & blue_mask);
 	    break;
-	  case LUX_LONG:
+	  case LUX_INT32:
 	    while (n--)
 	      *q.w++ = (pixels[(int32_t) *p.l] & red_mask)
 		| (pixels[(int32_t) p.l[n]] & green_mask)
@@ -3212,15 +3212,15 @@ int32_t lux_colorpixel(int32_t narg, int32_t ps[])
 		| (pixels[(int32_t) p.d[2*n]] & blue_mask);
 	    break;
 	} else switch (symbol_type(*ps)) {
-	  case LUX_BYTE:
+	  case LUX_INT8:
 	    while (n--)
 	      *q.w++ = pixels[(int32_t) *p.b++];
 	    break;
-	  case LUX_WORD:
+	  case LUX_INT16:
 	    while (n--)
 	      *q.w++ = pixels[(int32_t) ((uint8_t) *p.w++)];
 	    break;
-	  case LUX_LONG:
+	  case LUX_INT32:
 	    while (n--)
 	      *q.w++ = pixels[(int32_t) ((uint8_t) *p.l++)];
 	    break;
@@ -3237,19 +3237,19 @@ int32_t lux_colorpixel(int32_t narg, int32_t ps[])
     case 24:
       if (internalMode & TV_24)
 	switch (symbol_type(*ps)) {
-	  case LUX_BYTE:
+	  case LUX_INT8:
 	    while (n--)
 	      *q.l++ = (pixels[(int32_t) *p.b] & red_mask)
 		| (pixels[(int32_t) p.b[n]] & green_mask)
 		| (pixels[(int32_t) p.b[2*n]] & blue_mask);
 	    break;
-	  case LUX_WORD:
+	  case LUX_INT16:
 	    while (n--)
 	      *q.l++ = (pixels[(int32_t) *p.w] & red_mask)
 		| (pixels[(int32_t) p.w[n]] & green_mask)
 		| (pixels[(int32_t) p.w[2*n]] & blue_mask);
 	    break;
-	  case LUX_LONG:
+	  case LUX_INT32:
 	    while (n--)
 	      *q.l++ = (pixels[(int32_t) *p.l] & red_mask)
 		| (pixels[(int32_t) p.l[n]] & green_mask)
@@ -3268,15 +3268,15 @@ int32_t lux_colorpixel(int32_t narg, int32_t ps[])
 		| (pixels[(int32_t) p.d[2*n]] & blue_mask);
 	    break;
 	} else switch (symbol_type(*ps)) {
-	  case LUX_BYTE:
+	  case LUX_INT8:
 	    while (n--)
 	      *q.l++ = pixels[(int32_t) *p.b++];
 	    break;
-	  case LUX_WORD:
+	  case LUX_INT16:
 	    while (n--)
 	      *q.l++ = pixels[(int32_t) ((uint8_t) *p.w++)];
 	    break;
-	  case LUX_LONG:
+	  case LUX_INT32:
 	    while (n--)
 	      *q.l++ = pixels[(int32_t) ((uint8_t) *p.l++)];
 	    break;
@@ -3298,7 +3298,7 @@ int32_t lux_xtv(int32_t narg, int32_t ps[])
 /* displays an image, properly colored for the current color map, on screen.
    LS 18jan94 */
 {
-  return lux_xtv_general(narg, ps, (narg && symbol_type(ps[0]) == LUX_BYTE)? TV_MAP: 0);
+  return lux_xtv_general(narg, ps, (narg && symbol_type(ps[0]) == LUX_INT8)? TV_MAP: 0);
 }
  /*------------------------------------------------------------------------*/
 int32_t lux_xtvmap(int32_t narg, int32_t ps[])
@@ -3474,10 +3474,10 @@ int32_t lux_xplace(int32_t narg, int32_t ps[])
 	/* return parameters if they were arguments */
  switch (narg) {
  case 2:
-   if (redef_scalar(ps[1], LUX_LONG, &ycoord) != 1)
+   if (redef_scalar(ps[1], LUX_INT32, &ycoord) != 1)
      return cerror(ALLOC_ERR, ps[1]);
  case 1:
-   if (redef_scalar(ps[0], LUX_LONG, &xcoord) != 1)
+   if (redef_scalar(ps[0], LUX_INT32, &xcoord) != 1)
      return cerror(ALLOC_ERR, ps[0]);
  }
  return 1;
@@ -3696,13 +3696,13 @@ int32_t lux_xtvread(int32_t narg, int32_t ps[])
  dim[1] = ny;
  switch (bits_per_pixel) {
    case 8:
-     type = LUX_BYTE;
+     type = LUX_INT8;
      break;
    case 16:
-     type = LUX_WORD;
+     type = LUX_INT16;
      break;
    case 32:
-     type = LUX_LONG;
+     type = LUX_INT32;
      break;
  }
  result_sym = array_scratch(type, 2, dim);
@@ -3739,7 +3739,7 @@ int32_t lux_xquery_f(int32_t narg, int32_t ps[])
  int32_t	result;
  int32_t	xquery(int32_t, int32_t []);
 
- result = scalar_scratch(LUX_LONG);
+ result = scalar_scratch(LUX_INT32);
  sym[result].spec.scalar.l = xquery(narg, ps);
  return result;
 }
@@ -3930,13 +3930,13 @@ int32_t lux_xzoom(int32_t narg, int32_t ps[])
       if (event.xmotion.x < nx && event.xmotion.y < ny) {
 	i = event.xmotion.x + event.xmotion.y*nx;
 	switch (type) {
-	case LUX_BYTE:
+	case LUX_INT8:
 	  printf("%10d", ptr.b[i]);
 	  break;
-	case LUX_WORD:
+	case LUX_INT16:
 	  printf("%10d", ptr.w[i]);
 	  break;
-	case LUX_LONG:
+	case LUX_INT32:
 	  printf("%10d", ptr.l[i]);
 	  break;
 	case LUX_FLOAT:
@@ -3995,7 +3995,7 @@ int32_t lux_xtvplane(int32_t narg, int32_t ps[])
     return cerror(NEED_ARR, iq);
   nd = array_num_dims(iq);
   if ((nd != 3 && nd != 2)
-      || array_type(iq) != LUX_BYTE)
+      || array_type(iq) != LUX_INT8)
     return luxerror("TVPLANE - array must be 2-D or 3-D BYTE", iq);
   nx = array_dims(iq)[0];
   ny = array_dims(iq)[1];

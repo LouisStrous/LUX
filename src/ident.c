@@ -622,16 +622,16 @@ char *symbolIdent(int32_t symbol, int32_t mode)
   switch (symbol_class(symbol)) {
   case LUX_SCALAR: case LUX_FIXED_NUMBER:
     switch (scalar_type(symbol)) {
-    case LUX_BYTE:
+    case LUX_INT8:
       intval = (intmax_t) scalar_value(symbol).b;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       intval = (intmax_t) scalar_value(symbol).w;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       intval = (intmax_t) scalar_value(symbol).l;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       intval = (intmax_t) scalar_value(symbol).q;
       break;
     case LUX_FLOAT:
@@ -769,7 +769,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     }
     ptr.b = array_data(symbol);
     switch (array_type(symbol)) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (j--) {
         sprintf(curScrat, "%d", (int32_t) *ptr.b++);
         curScrat += strlen(curScrat);
@@ -777,7 +777,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
           strcpy(curScrat++, ",");
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (j--) {
         sprintf(curScrat, "%d", (int32_t) *ptr.w++);
         curScrat += strlen(curScrat);
@@ -785,7 +785,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
           strcpy(curScrat++, ",");
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (j--) {
         sprintf(curScrat, "%d", *ptr.l++);
         curScrat += strlen(curScrat);
@@ -793,7 +793,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
           strcpy(curScrat++, ",");
       }
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       while (j--) {
         sprintf(curScrat, "%jd", (intmax_t) *ptr.q++);
         curScrat += strlen(curScrat);
@@ -877,16 +877,16 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     sprintf(curScrat, "ASSOC(%1d,", assoc_lun(symbol));
     curScrat += strlen(curScrat);
     switch (assoc_type(symbol)) {
-    case LUX_BYTE:
+    case LUX_INT8:
       strcpy(curScrat, "BYTARR(");
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       strcpy(curScrat, "INTARR(");
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       strcpy(curScrat, "LONARR(");
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       strcpy(curScrat, "QUADARR(");
       break;
     case LUX_FLOAT:
@@ -930,16 +930,16 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     break;
   case LUX_SCAL_PTR:
     switch (scal_ptr_type(symbol)) {
-    case LUX_BYTE:
+    case LUX_INT8:
       intval = (intmax_t) *scal_ptr_pointer(symbol).b;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       intval = (intmax_t) *scal_ptr_pointer(symbol).w;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       intval = (intmax_t) *scal_ptr_pointer(symbol).l;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       intval = (intmax_t) *scal_ptr_pointer(symbol).q;
       break;
     case LUX_FLOAT:
@@ -992,16 +992,16 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     break;
   case LUX_FILEMAP:
     switch (file_map_type(symbol)) {
-    case LUX_BYTE:
+    case LUX_INT8:
       strcpy(curScrat, "BYTFARR(");
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       strcpy(curScrat, "INTFARR(");
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       strcpy(curScrat, "LONFARR(");
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       strcpy(curScrat, "QUADFARR(");
       break;
     case LUX_FLOAT:

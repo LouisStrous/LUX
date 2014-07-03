@@ -85,7 +85,7 @@ int32_t evalString(char *expr, int32_t nmax)
    save = currentChar;		/* remember what we were interpreting before */
    currentChar = expr;
    n = 0;
-   type = LUX_BYTE;
+   type = LUX_INT8;
    while (n < nmax) {
      while (!isNumberChar((uint8_t) *currentChar)
 	    && *currentChar) /* seek digit */
@@ -816,15 +816,15 @@ int32_t lux_arg(int32_t narg, int32_t ps[])
   switch (outtype) {
     case LUX_FLOAT:
       switch (type) {
-	case LUX_BYTE:
+	case LUX_INT8:
 	  while (n--)
 	    *trgt.f++ = 0.0;
 	  break;
-	case LUX_WORD:
+	case LUX_INT16:
 	  while (n--)
 	    *trgt.f++ = (*value.w++ >= 0)? 0.0: M_PI;
 	  break;
-	case LUX_LONG:
+	case LUX_INT32:
 	  while (n--)
 	    *trgt.f++ = (*value.l++ >= 0)? 0.0: M_PI;
 	  break;
@@ -842,15 +842,15 @@ int32_t lux_arg(int32_t narg, int32_t ps[])
       break;
     case LUX_DOUBLE:
       switch (type) {
-	case LUX_BYTE:
+	case LUX_INT8:
 	  while (n--)
 	    *trgt.d++ = 0.0;
 	  break;
-	case LUX_WORD:
+	case LUX_INT16:
 	  while (n--)
 	    *trgt.d++ = (*value.w++ >= 0)? 0.0: M_PI;
 	  break;
-	case LUX_LONG:
+	case LUX_INT32:
 	  while (n--)
 	    *trgt.d++ = (*value.l++ >= 0)? 0.0: M_PI;
 	  break;
@@ -1393,7 +1393,7 @@ int32_t lux_histr(int32_t narg, int32_t ps[]) /* histr function */
   if ( sym[iq].class != LUX_ARRAY ) {
     return cerror(IMPOSSIBLE, iq);}
   type = sym[iq].type;
-  if (type != LUX_LONG ) return cerror(IMPOSSIBLE, iq);
+  if (type != LUX_INT32 ) return cerror(IMPOSSIBLE, iq);
   h = (array *) sym[iq].spec.array.ptr;
   q1.l = (int32_t *) ((char *)h + sizeof(array));
   nd = h->ndim;	n = 1;
@@ -1457,13 +1457,13 @@ int32_t lux_hist_dense(int32_t narg, int32_t ps[])
   nValue = 0;
   while (nData--) {
     switch (symbol_type(ps[0])) {
-    case LUX_BYTE:
+    case LUX_INT8:
       x = (int32_t) *src.b++;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       x = (int32_t) *src.w++;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       x = (int32_t) *src.l++;
       break;
     case LUX_FLOAT:
@@ -1500,7 +1500,7 @@ int32_t lux_hist_dense(int32_t narg, int32_t ps[])
 
   getFreeTempVariable(result);
   symbol_class(result) = LUX_ARRAY;
-  array_type(result) = LUX_LONG;
+  array_type(result) = LUX_INT32;
   array_header(result) = (array *) afreq;
   array_num_dims(result) = 1;
   *array_dims(result) = nValue;
@@ -1510,7 +1510,7 @@ int32_t lux_hist_dense(int32_t narg, int32_t ps[])
   symbol_memory(result) = nValue*sizeof(int32_t) + sizeof(array);
 
   symbol_class(ps[1]) = LUX_ARRAY;
-  array_type(ps[1]) = LUX_LONG;
+  array_type(ps[1]) = LUX_INT32;
   array_header(ps[1]) = (array *) avalue;
   array_num_dims(ps[1]) = 1;
   *array_dims(ps[1]) = nValue;
@@ -1561,8 +1561,8 @@ int32_t lux_hist(int32_t narg, int32_t ps[]) /* histogram function */
   /* always need the range */
   minmax( q1.l, n, type);
   /* get long (int32_t) versions of min and max */
-  convertPointer(&lastmin, type, LUX_LONG);
-  convertPointer(&lastmax, type, LUX_LONG);
+  convertPointer(&lastmin, type, LUX_INT32);
+  convertPointer(&lastmax, type, LUX_INT32);
   /* create a long array for results */
   histmin = lastmin.l;
   histmax = lastmax.l;
@@ -1593,7 +1593,7 @@ int32_t lux_hist(int32_t narg, int32_t ps[]) /* histogram function */
   { size = *dims;
     nRepeat = n/size;
     one = nRepeat*range;
-    result_sym = array_scratch(LUX_LONG, 1, &one);
+    result_sym = array_scratch(LUX_INT32, 1, &one);
     h = HEAD(result_sym);
     h->dims[0] = range;
     if (ndim > 1) memcpy(&h->dims[1], &dims[1], sizeof(int32_t)*(ndim - 1));
@@ -1610,13 +1610,13 @@ int32_t lux_hist(int32_t narg, int32_t ps[]) /* histogram function */
   while (nRepeat--)
   { n = size;
     switch (type)
-    { case LUX_BYTE:
+    { case LUX_INT8:
 	while (n--)
 	{ i = *q1.b++ - histmin;  q2.l[i]++; }  break;
-      case LUX_WORD:
+      case LUX_INT16:
 	while (n--)
 	{ i = *q1.w++ - histmin;  q2.l[i]++; }  break;
-      case LUX_LONG:
+      case LUX_INT32:
 	while (n--)
 	{ i = *q1.l++ - histmin;  q2.l[i]++; }  break;
       case LUX_FLOAT:
@@ -1639,7 +1639,7 @@ int32_t lux_sieve(int32_t narg, int32_t ps[])
    12may92 LS:
    if <condition> does not contain non-zero elements, then a scalar -1 is
    returned.  alternate use: X=SIEVE(condition) yields the same as
-   X=SIEVE(LUX_LONG(INDGEN(condition)),condition) */ 
+   X=SIEVE(LUX_INT32(INDGEN(condition)),condition) */ 
 {
   int32_t	iq, n, nc, cnt, *p, type, typec, result_sym;
   pointer q1, q2, q3;
@@ -1682,24 +1682,24 @@ int32_t lux_sieve(int32_t narg, int32_t ps[])
   /* use the min of size of array and conditional */
   if (narg == 1)
   { n = nc;
-    type = LUX_LONG; }
+    type = LUX_INT32; }
   else
     n = n <= nc ? n : nc;
   nc = n;
   cnt = 0;
   q3.l = p;
   switch (typec)
-  { case LUX_BYTE:
+  { case LUX_INT8:
       while (nc--)
 	if (*q3.b++)
 	  cnt++;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (nc--)
 	if (*q3.w++)
 	  cnt++;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (nc--)
 	if (*q3.l++)
 	  cnt++;
@@ -1717,7 +1717,7 @@ int32_t lux_sieve(int32_t narg, int32_t ps[])
   q3.l = p;
  /* if count is zero, then no boolean TRUEs; return a scalar -1.  LS 12may92*/
   if (cnt == 0)
-  { result_sym = scalar_scratch(LUX_LONG);
+  { result_sym = scalar_scratch(LUX_INT32);
     scalar_value(result_sym).l = -1;
     return result_sym; }
   result_sym = array_scratch(type, 1, &cnt); /*for the result */
@@ -1726,19 +1726,19 @@ int32_t lux_sieve(int32_t narg, int32_t ps[])
   if (narg == 1)		/* one-argument case      LS 12may92 */
   { n = 0;			/* use as indgen counter */
     switch (typec)
-    { case LUX_BYTE:
+    { case LUX_INT8:
 	while (nc--)
 	{ if (*q3.b++)
 	    *q2.l++ = n;
 	  n++; }
 	break;
-      case LUX_WORD:
+      case LUX_INT16:
 	while (nc--)
 	{ if (*q3.w++)
 	    *q2.l++ = n;
 	  n++; }
 	break;
-      case LUX_LONG:
+      case LUX_INT32:
 	while (nc--)
 	{ if (*q3.l++)
 	    *q2.l++ = n;
@@ -1760,21 +1760,21 @@ int32_t lux_sieve(int32_t narg, int32_t ps[])
   else				/* two-argument case */
     /* this is a 25 case situation */
     switch (typec) {
-    case LUX_BYTE:
+    case LUX_INT8:
       switch (type)
-      { case LUX_BYTE:
+      { case LUX_INT8:
 	  while (nc--)
 	  { if (*q3.b++)
 	      *q2.b++ = *q1.b;
 	    q1.b++; }
 	  break;
-	case LUX_WORD:
+	case LUX_INT16:
 	  while (nc--)
 	  { if (*q3.b++)
 	      *q2.w++ = *q1.w;
 	    q1.w++; }
 	  break;
-	case LUX_LONG:
+	case LUX_INT32:
 	  while (nc--)
 	  { if (*q3.b++)
 	      *q2.l++ = *q1.l;
@@ -1793,21 +1793,21 @@ int32_t lux_sieve(int32_t narg, int32_t ps[])
 	    q1.d++; }
 	  break; }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       switch (type)
-      { case LUX_BYTE:
+      { case LUX_INT8:
 	  while (nc--)
 	  { if (*q3.w++)
 	      *q2.b++ = *q1.b;
 	    q1.b++; }
 	  break;
-	case LUX_WORD:
+	case LUX_INT16:
 	  while (nc--)
 	  { if (*q3.w++)
 	      *q2.w++ = *q1.w;
 	    q1.w++; }
 	  break;
-	case LUX_LONG:
+	case LUX_INT32:
 	  while (nc--)
 	  { if (*q3.w++)
 	      *q2.l++ = *q1.l;
@@ -1826,21 +1826,21 @@ int32_t lux_sieve(int32_t narg, int32_t ps[])
 	    q1.d++; }
 	  break; }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       switch (type) 
-      { case LUX_BYTE:
+      { case LUX_INT8:
 	  while (nc--)
 	  { if (*q3.l++)
 	      *q2.b++ = *q1.b;
 	    q1.b++; }
 	  break;
-	case LUX_WORD:
+	case LUX_INT16:
 	  while (nc--)
 	  { if (*q3.l++)
 	      *q2.w++ = *q1.w;
 	    q1.w++; }
 	  break;
-	case LUX_LONG:
+	case LUX_INT32:
 	  while (nc--)
 	  { if (*q3.l++)
 	      *q2.l++ = *q1.l;
@@ -1861,19 +1861,19 @@ int32_t lux_sieve(int32_t narg, int32_t ps[])
       break;
     case LUX_FLOAT:
       switch (type) 
-      { case LUX_BYTE:
+      { case LUX_INT8:
 	  while (nc--)
 	  { if (*q3.f++)
 	      *q2.b++ = *q1.b;
 	    q1.b++; }
 	  break;
-	case LUX_WORD:
+	case LUX_INT16:
 	  while (nc--)
 	  { if (*q3.f++)
 	      *q2.w++ = *q1.w;
 	    q1.w++; }
 	  break;
-	case LUX_LONG:
+	case LUX_INT32:
 	  while (nc--)
 	  { if (*q3.f++)
 	      *q2.l++ = *q1.l;
@@ -1894,19 +1894,19 @@ int32_t lux_sieve(int32_t narg, int32_t ps[])
       break;
     case LUX_DOUBLE:
       switch (type) 
-      { case LUX_BYTE:
+      { case LUX_INT8:
 	  while (nc--)
 	  { if (*q3.d++)
 	      *q2.b++ = *q1.b;
 	    q1.b++; }
 	  break;
-	case LUX_WORD:
+	case LUX_INT16:
 	  while (nc--)
 	  { if (*q3.d++)
 	      *q2.w++ = *q1.w;
 	    q1.w++; }
 	  break;
-	case LUX_LONG:
+	case LUX_INT32:
 	  while (nc--)
 	  { if (*q3.d++)
 	      *q2.l++ = *q1.l;
@@ -1953,13 +1953,13 @@ int32_t index_maxormin(int32_t source, int32_t indices, int32_t code)
     return cerror(INCMP_ARR, indices);
   /* find min and max of indices so we can create a result array of the */
   /* correct size */
-  minmax(indx, nIndx, LUX_LONG);
+  minmax(indx, nIndx, LUX_INT32);
   /* use offset so we can treat negative indices */
   size = lastmax.l + 1;
   offset = 0;
   if (lastmin.l < 0)
     size += (offset = -lastmin.l);
-  result = array_scratch(code < 2? type: LUX_LONG, 1, &size);
+  result = array_scratch(code < 2? type: LUX_INT32, 1, &size);
   /* make trgt.b point to the element associated with index zero */
   trgt.b = (uint8_t *) array_data(result) + offset*lux_type_size[array_type(result)];
   /* Initialize result to zero */
@@ -1970,7 +1970,7 @@ int32_t index_maxormin(int32_t source, int32_t indices, int32_t code)
   zerobytes(any, size);		/* initialize to empty */
   any += offset;		/* in case of negative indices */
   switch (type) {
-    case LUX_BYTE:
+    case LUX_INT8:
       for (i = 0; i < nIndx; i++)
 	switch (code) {
 	  case 0: /* maxf */
@@ -2015,7 +2015,7 @@ int32_t index_maxormin(int32_t source, int32_t indices, int32_t code)
 	    break;
 	}
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       for (i = 0; i < nIndx; i++)
 	switch (code) {
 	  case 0: /* maxf */
@@ -2060,7 +2060,7 @@ int32_t index_maxormin(int32_t source, int32_t indices, int32_t code)
 	    break;
 	}
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       for (i = 0; i < nIndx; i++)
 	switch (code) {
 	  case 0: /* maxf */
@@ -2312,20 +2312,20 @@ int32_t maxormin(int32_t narg, int32_t ps[], int32_t code)
 
   mode = SL_UNIQUEAXES | SL_COMPRESSALL | SL_AXESBLOCK;
   if (code & 2)			/* seek location */
-    mode |= SL_EXACT;		/* output must be exactly LUX_LONG */
+    mode |= SL_EXACT;		/* output must be exactly LUX_INT32 */
   else
     mode |= SL_KEEPTYPE;	/* output must be same type as input */
   if (internalMode & 1)		/* /KEEPDIMS */
     mode |= SL_ONEDIMS;
 
-  if (standardLoop(ps[0], narg > 1? ps[1]: 0, mode, LUX_LONG, &srcinfo,
+  if (standardLoop(ps[0], narg > 1? ps[1]: 0, mode, LUX_INT32, &srcinfo,
 		   &src, &result, &trgtinfo, &trgt) == LUX_ERROR)
     return LUX_ERROR;
 
   n1 = srcinfo.naxes? srcinfo.naxes: 1;
 
   switch (srcinfo.type) {
-    case LUX_BYTE:
+    case LUX_INT8:
       do {
 	/* take first value as initial values */
 	memcpy(&min, src.b, srcinfo.stride);
@@ -2356,7 +2356,7 @@ int32_t maxormin(int32_t narg, int32_t ps[], int32_t code)
 	}
       } while (n < srcinfo.rndim);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       do {
 	/* take first value as initial values */
 	memcpy(&min, src.w, srcinfo.stride);
@@ -2387,7 +2387,7 @@ int32_t maxormin(int32_t narg, int32_t ps[], int32_t code)
 	}
       } while (n < srcinfo.rndim);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       do {
 	/* take first value as initial values */
 	memcpy(&min, src.l, srcinfo.stride);
@@ -2599,7 +2599,7 @@ void scale(pointer data, uint8_t type, int32_t size, double datalow, double data
 #if HAVE_LIBX11
   extern int32_t	colorIndexType;
 #else
-  int32_t	colorIndexType = LUX_BYTE;
+  int32_t	colorIndexType = LUX_INT8;
 #endif
 
   trgt.b = dest;
@@ -2611,11 +2611,11 @@ void scale(pointer data, uint8_t type, int32_t size, double datalow, double data
   dfac = (trgthigh - trgtlow)/drange;
 
   switch (type) {
-    case LUX_BYTE:
+    case LUX_INT8:
       ffac = (float) dfac;
       foff = trgtlow - datalow*ffac;
       switch (colorIndexType) {
-	case LUX_BYTE:
+	case LUX_INT8:
 	  while (size--) {
 	    if (*data.b < datalow)
 	      *trgt.b++ = trgtlow;
@@ -2626,7 +2626,7 @@ void scale(pointer data, uint8_t type, int32_t size, double datalow, double data
 	    data.b++;
 	  }
 	  break;
-	case LUX_WORD:
+	case LUX_INT16:
 	  while (size--) {
 	    if (*data.b < datalow)
 	      *trgt.w++ = trgtlow;
@@ -2637,7 +2637,7 @@ void scale(pointer data, uint8_t type, int32_t size, double datalow, double data
 	    data.b++;
 	  }
 	  break;
-	case LUX_LONG:
+	case LUX_INT32:
 	  while (size--) {
 	    if (*data.b < datalow)
 	      *trgt.l++ = trgtlow;
@@ -2650,11 +2650,11 @@ void scale(pointer data, uint8_t type, int32_t size, double datalow, double data
 	  break;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       ffac = (float) dfac;
       foff = trgtlow - datalow*ffac;
       switch (colorIndexType) {
-	case LUX_BYTE:
+	case LUX_INT8:
 	  while (size--) {
 	    if (*data.w < datalow)
 	      *trgt.b++ = trgtlow;
@@ -2665,7 +2665,7 @@ void scale(pointer data, uint8_t type, int32_t size, double datalow, double data
 	    data.w++;
 	  }
 	  break;
-	case LUX_WORD:
+	case LUX_INT16:
 	  while (size--) {
 	    if (*data.w < datalow)
 	      *trgt.w++ = trgtlow;
@@ -2676,7 +2676,7 @@ void scale(pointer data, uint8_t type, int32_t size, double datalow, double data
 	    data.w++;
 	  }
 	  break;
-	case LUX_LONG:
+	case LUX_INT32:
 	  while (size--) {
 	    if (*data.w < datalow)
 	      *trgt.l++ = trgtlow;
@@ -2689,11 +2689,11 @@ void scale(pointer data, uint8_t type, int32_t size, double datalow, double data
 	  break;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       ffac = (float) dfac;
       foff = trgtlow - datalow*ffac;
       switch (colorIndexType) {
-	case LUX_BYTE:
+	case LUX_INT8:
 	  while (size--) {
 	    if (*data.l < datalow)
 	      *trgt.b++ = trgtlow;
@@ -2704,7 +2704,7 @@ void scale(pointer data, uint8_t type, int32_t size, double datalow, double data
 	    data.l++;
 	  }
 	  break;
-	case LUX_WORD:
+	case LUX_INT16:
 	  while (size--) {
 	    if (*data.l < datalow)
 	      *trgt.w++ = trgtlow;
@@ -2715,7 +2715,7 @@ void scale(pointer data, uint8_t type, int32_t size, double datalow, double data
 	    data.l++;
 	  }
 	  break;
-	case LUX_LONG:
+	case LUX_INT32:
 	  while (size--) {
 	    if (*data.l < datalow)
 	      *trgt.l++ = trgtlow;
@@ -2732,7 +2732,7 @@ void scale(pointer data, uint8_t type, int32_t size, double datalow, double data
       ffac = (float) dfac;
       foff = trgtlow - datalow*ffac;
       switch (colorIndexType) {
-	case LUX_BYTE:
+	case LUX_INT8:
 	  while (size--) {
 	    if (*data.f < datalow)
 	      *trgt.b++ = trgtlow;
@@ -2743,7 +2743,7 @@ void scale(pointer data, uint8_t type, int32_t size, double datalow, double data
 	    data.f++;
 	  }
 	  break;
-	case LUX_WORD:
+	case LUX_INT16:
 	  while (size--) {
 	    if (*data.f < datalow)
 	      *trgt.w++ = trgtlow;
@@ -2754,7 +2754,7 @@ void scale(pointer data, uint8_t type, int32_t size, double datalow, double data
 	    data.f++;
 	  }
 	  break;
-	case LUX_LONG:
+	case LUX_INT32:
 	  while (size--) {
 	    if (*data.f < datalow)
 	      *trgt.l++ = trgtlow;
@@ -2770,7 +2770,7 @@ void scale(pointer data, uint8_t type, int32_t size, double datalow, double data
     case LUX_DOUBLE:
       doff = trgtlow - datalow*dfac;
       switch (colorIndexType) {
-	case LUX_BYTE:
+	case LUX_INT8:
 	  while (size--) {
 	    if (*data.d < datalow)
 	      *trgt.b++ = trgtlow;
@@ -2781,7 +2781,7 @@ void scale(pointer data, uint8_t type, int32_t size, double datalow, double data
 	    data.d++;
 	  }
 	  break;
-	case LUX_WORD:
+	case LUX_INT16:
 	  while (size--) {
 	    if (*data.d < datalow)
 	      *trgt.b++ = trgtlow;
@@ -2792,7 +2792,7 @@ void scale(pointer data, uint8_t type, int32_t size, double datalow, double data
 	    data.d++;
 	  }
 	  break;
-	case LUX_LONG:
+	case LUX_INT32:
 	  while (size--) {
 	    if (*data.d < datalow)
 	      *trgt.b++ = trgtlow;
@@ -2823,7 +2823,7 @@ int32_t lux_scale(int32_t narg, int32_t ps[])
   extern int32_t	threeColors;
   extern int32_t	colorIndexType, display_cells;
 #else
-  int32_t	colorIndexType = LUX_BYTE, display_cells = 256;
+  int32_t	colorIndexType = LUX_INT8, display_cells = 256;
 #endif
 
   iq = ps[0];
@@ -2832,7 +2832,7 @@ int32_t lux_scale(int32_t narg, int32_t ps[])
   type = array_type(iq);
   q1.l = array_data(iq);
   n = array_size(iq);
-  result_sym = array_clone(iq, LUX_BYTE);
+  result_sym = array_clone(iq, LUX_INT8);
   q2.l = array_data(result_sym);
   /* if only one arg., then we scale between the min and max of array */
   if (narg == 1 && (internalMode & 2) == 0) {/* 1 arg and no /ZOOM */
@@ -2919,7 +2919,7 @@ int32_t lux_scalerange(int32_t narg, int32_t ps[])
   extern int32_t	threeColors;
   extern int32_t	colorIndexType, display_cells;
 #else
-  int32_t	colorIndexType = LUX_BYTE, display_cells = 256;
+  int32_t	colorIndexType = LUX_INT8, display_cells = 256;
 #endif
 
   iq = ps[0];
@@ -3015,7 +3015,7 @@ int32_t minmax(int32_t *p, int32_t n, int32_t type)
   nc = n - 1;
   minloc = maxloc = (uint8_t *) p;
   switch (type) {
-    case LUX_BYTE:
+    case LUX_INT8:
       min.b = max.b = *q.b++;
       while (nc--) {
 	if (*q.b > max.b) {
@@ -3029,9 +3029,9 @@ int32_t minmax(int32_t *p, int32_t n, int32_t type)
       }
       lastmin.b = min.b;
       lastmax.b = max.b;
-      scalar_type(lastmin_sym) = scalar_type(lastmax_sym) = LUX_BYTE;
+      scalar_type(lastmin_sym) = scalar_type(lastmax_sym) = LUX_INT8;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       min.w = max.w = *q.w++;
       while (nc--) {
 	if (*q.w > max.w) {
@@ -3045,9 +3045,9 @@ int32_t minmax(int32_t *p, int32_t n, int32_t type)
       }
       lastmin.w = min.w;
       lastmax.w = max.w;
-      scalar_type(lastmin_sym) = scalar_type(lastmax_sym) = LUX_WORD;
+      scalar_type(lastmin_sym) = scalar_type(lastmax_sym) = LUX_INT16;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       min.l = max.l = *q.l++;
       while (nc--) {
 	if (*q.l > max.l) {
@@ -3061,7 +3061,7 @@ int32_t minmax(int32_t *p, int32_t n, int32_t type)
       }
       lastmin.l = min.l;
       lastmax.l = max.l;
-      scalar_type(lastmin_sym) = scalar_type(lastmax_sym) = LUX_LONG;
+      scalar_type(lastmin_sym) = scalar_type(lastmax_sym) = LUX_INT32;
       break;
     case LUX_FLOAT:
       min.f = max.f = *q.f++;
@@ -3117,7 +3117,7 @@ int32_t simple_scale(void *p1, int32_t n, int32_t type, void *p2)
 #if HAVE_LIBX11
   extern int32_t	connect_flag, colorIndexType;
 #else
-  int32_t	colorIndexType = LUX_BYTE;
+  int32_t	colorIndexType = LUX_INT8;
 #endif
 
 #if HAVE_LIBX11
@@ -3127,49 +3127,49 @@ int32_t simple_scale(void *p1, int32_t n, int32_t type, void *p2)
   q1.l = p1;
   q2.l = p2;
   switch (type) {
-    case LUX_BYTE:
+    case LUX_INT8:
       min.b = lastmin.b;
       range.l = lastmax.b - min.b;
       xq = (int32_t) (scalemax - scalemin);
       if (range.l == 0)
 	return neutral(p2, n);
       switch (colorIndexType) {
-	case LUX_BYTE:
+	case LUX_INT8:
 	  while (n--)
 	    *q2.b++ = (xq*(*q1.b++ - min.b))/range.l + scalemin;
 	  break;
-	case LUX_WORD:
+	case LUX_INT16:
 	  while (n--)
 	    *q2.w++ = (xq*(*q1.b++ - min.b))/range.l + scalemin;
 	  break;
-	case LUX_LONG:
+	case LUX_INT32:
 	  while (n--)
 	    *q2.l++ = (xq*(*q1.b++ - min.b))/range.l + scalemin;
 	  break;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       min.w = lastmin.w;
       range.l = lastmax.w - min.w;
       xq = (int32_t) (scalemax - scalemin);	
       if (range.l == 0)
 	return neutral(p2, n);
       switch (colorIndexType) {
-	case LUX_BYTE:
+	case LUX_INT8:
 	  while (n--)
 	    *q2.b++ = (xq*(*q1.w++ - min.w))/range.l + scalemin;
 	  break;
-	case LUX_WORD:
+	case LUX_INT16:
 	  while (n--)
 	    *q2.w++ = (xq*(*q1.w++ - min.w))/range.l + scalemin;
 	  break;
-	case LUX_LONG:
+	case LUX_INT32:
 	  while (n--)
 	    *q2.l++ = (xq*(*q1.w++ - min.w))/range.l + scalemin;
 	  break;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       /* to avoid possible range problems, calculation is done in fp */
       min.l = lastmin.l;
       range.l = lastmax.l - min.l;
@@ -3177,15 +3177,15 @@ int32_t simple_scale(void *p1, int32_t n, int32_t type, void *p2)
 	return neutral(p2, n);
       fq = (float) (scalemax - scalemin)/(float) range.l;
       switch (colorIndexType) {
-	case LUX_BYTE:
+	case LUX_INT8:
 	  while (n--)
 	    *q2.b++ = (fq*(*q1.l++ - min.l)) + scalemin;
 	  break;
-	case LUX_WORD:
+	case LUX_INT16:
 	  while (n--)
 	    *q2.w++ = (fq*(*q1.l++ - min.l)) + scalemin;
 	  break;
-	case LUX_LONG:
+	case LUX_INT32:
 	  while (n--)
 	    *q2.l++ = (fq*(*q1.l++ - min.l)) + scalemin;
 	  break;
@@ -3198,15 +3198,15 @@ int32_t simple_scale(void *p1, int32_t n, int32_t type, void *p2)
 	return neutral(p2, n);
       fq = (float) (scalemax-scalemin)/range.f;
       switch (colorIndexType) {
-	case LUX_BYTE:
+	case LUX_INT8:
 	  while (n--)
 	    *q2.b++ = (fq*(*q1.f++ - min.f)) + scalemin;
 	  break;
-	case LUX_WORD:
+	case LUX_INT16:
 	  while (n--)
 	    *q2.w++ = (fq*(*q1.f++ - min.f)) + scalemin;
 	  break;
-	case LUX_LONG:
+	case LUX_INT32:
 	  while (n--)
 	    *q2.l++ = (fq*(*q1.f++ - min.f)) + scalemin;
 	  break;
@@ -3219,15 +3219,15 @@ int32_t simple_scale(void *p1, int32_t n, int32_t type, void *p2)
 	return neutral(p2, n );
       dq = (double) (scalemax - scalemin)/range.d;
       switch (colorIndexType) {
-	case LUX_BYTE:
+	case LUX_INT8:
 	  while (n--)
 	    *q2.b++ = (dq*(*q1.d++ - min.d)) + scalemin;
 	  break;
-	case LUX_WORD:
+	case LUX_INT16:
 	  while (n--)
 	    *q2.w++ = (dq*(*q1.d++ - min.d)) + scalemin;
 	  break;
-	case LUX_LONG:
+	case LUX_INT32:
 	  while (n--)
 	    *q2.l++ = (dq*(*q1.d++ - min.d)) + scalemin;
 	  break;
@@ -3245,21 +3245,21 @@ int32_t neutral(void *p, int32_t n)
 #if HAVE_LIBX11
   extern int32_t	colorIndexType;
 #else
-  int32_t	colorIndexType = LUX_BYTE;
+  int32_t	colorIndexType = LUX_INT8;
 #endif
 
   pp.b = p;
   xq = (scalemax - scalemin)/2;
   switch (colorIndexType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (n--)
 	*pp.b++ = xq;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (n--)
 	*pp.w++ = xq;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (n--)
 	*pp.l++ = xq;
       break;
@@ -3328,19 +3328,19 @@ int32_t cubic_spline_tables(void *xx, int32_t xType, int32_t xStep,
   if (xx) {			/* have x */
     n = nPoints;
     switch (xType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (n--) {
 	*x++ = (double) *xin.b;
 	xin.b += xStep;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (n--) {
 	*x++ = (double) *xin.w;
 	xin.w += xStep;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (n--) {
 	*x++ = (double) *xin.l;
 	xin.l += xStep;
@@ -3370,19 +3370,19 @@ int32_t cubic_spline_tables(void *xx, int32_t xType, int32_t xStep,
   if (yy) {			/* have y */
     n = nPoints;
     switch (yType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       while (n--) {
 	*y++ = (double) *yin.b;
 	yin.b += yStep;
       }
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       while (n--) {
 	*y++ = (double) *yin.w;
 	yin.w += yStep;
       }
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       while (n--) {
 	*y++ = (double) *yin.l;
 	yin.l += yStep;
@@ -4028,7 +4028,7 @@ int32_t lux_strtol(int32_t narg, int32_t ps[])
   } else
     base = 10;
   number = strtol(string, NULL, base);
-  result = scalar_scratch(LUX_LONG);
+  result = scalar_scratch(LUX_INT32);
   scalar_value(result).l = number;
   return result;
 }
@@ -4050,7 +4050,7 @@ int32_t lux_extract_bits_f(int32_t narg, int32_t ps[])/* get a bit field from da
 
   if (extract_bits(narg, ps, &value) != 1)
     return LUX_ERROR;
-  result_sym = scalar_scratch(LUX_WORD);
+  result_sym = scalar_scratch(LUX_INT16);
   scalar_value(result_sym).w = (short) value;
   return result_sym;
 }
@@ -4066,7 +4066,7 @@ int32_t lux_extract_bits(int32_t narg, int32_t ps[])/* get a bit field from data
   result_sym = ps[0];
   if (extract_bits(narg - 1, &ps[1], &value) != 1)
     return LUX_ERROR;
-  return redef_scalar(result_sym, LUX_WORD, &value);
+  return redef_scalar(result_sym, LUX_INT16, &value);
 }
 /*------------------------------------------------------------------------ */
 int32_t extract_bits(int32_t narg, int32_t ps[], int32_t *value)/* internal routine */
@@ -4117,7 +4117,7 @@ int32_t lux_fade_init(int32_t narg, int32_t ps[])
   iq = ps[0];
   if (!symbolIsNumericalArray(iq) || array_num_dims(iq) != 2)
     return cerror(NEED_2D_ARR, iq);
-  if (array_type(iq) != LUX_BYTE)
+  if (array_type(iq) != LUX_INT8)
     return cerror(NEED_BYTE, iq);
   p1 = array_data(iq);
   fade_xsize = array_dims(iq)[0];
@@ -4128,7 +4128,7 @@ int32_t lux_fade_init(int32_t narg, int32_t ps[])
   iq = ps[1];
   if (!symbolIsNumericalArray(iq) || array_num_dims(iq) != 2)
     return cerror(NEED_2D_ARR, iq);
-  if (array_type(iq) != LUX_BYTE)
+  if (array_type(iq) != LUX_INT8)
     return cerror(NEED_BYTE, iq);
   if (array_dims(iq)[0] != fade_xsize || array_dims(iq)[1] != fade_ysize)
     return cerror(INCMP_ARG, iq);

@@ -74,16 +74,16 @@ int32_t filemap(int32_t type, int32_t narg, int32_t ps[])
 }
 /*-------------------------------------------------------------------------*/
 int32_t bytfarr(int32_t narg, int32_t ps[])
-/* Create a LUX_BYTE file array (file map) */
-{ return filemap(LUX_BYTE, narg, ps); }
+/* Create a LUX_INT8 file array (file map) */
+{ return filemap(LUX_INT8, narg, ps); }
 /*-------------------------------------------------------------------------*/
 int32_t intfarr(int32_t narg, int32_t ps[])
-/* Create a LUX_WORD file array (file map) */
-{ return filemap(LUX_WORD, narg, ps); }
+/* Create a LUX_INT16 file array (file map) */
+{ return filemap(LUX_INT16, narg, ps); }
 /*-------------------------------------------------------------------------*/
 int32_t lonfarr(int32_t narg, int32_t ps[])
-/* Create a LUX_LONG file array (file map) */
-{ return filemap(LUX_LONG, narg, ps); }
+/* Create a LUX_INT32 file array (file map) */
+{ return filemap(LUX_INT32, narg, ps); }
 /*-------------------------------------------------------------------------*/
 int32_t fltfarr(int32_t narg, int32_t ps[])
 /* Create a LUX_FLOAT file array (file map) */
@@ -109,7 +109,7 @@ int32_t lux_i_file_output(FILE *fp, pointer q, int32_t assoctype,
   int32_t	*qi, error = 0, size, dindx, i;
   array	*h;
 
-  if (sym[offsym].type != LUX_LONG)
+  if (sym[offsym].type != LUX_INT32)
     offsym = lux_long(1, &offsym);
   switch (sym[offsym].class)
   { case LUX_SCAL_PTR:

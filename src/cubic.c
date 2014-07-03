@@ -96,7 +96,7 @@ int32_t lux_cubic_spline(int32_t narg, int32_t ps[])
       switch (type)
       { case LUX_FLOAT:
 	  switch (oldType)
-	  { case LUX_BYTE:
+	  { case LUX_INT8:
 	      while (n--)
 		*trgt.f++ = (float) *src.b++;
 	      src.b = array_data(yTabSym);
@@ -104,7 +104,7 @@ int32_t lux_cubic_spline(int32_t narg, int32_t ps[])
 	      while (n--)
 		*trgt.f++ = (float) *src.b++;
 	      break;
-	    case LUX_WORD:
+	    case LUX_INT16:
 	      while (n--)
 		*trgt.f++ = (float) *src.w++;
 	      src.b = array_data(yTabSym);
@@ -112,7 +112,7 @@ int32_t lux_cubic_spline(int32_t narg, int32_t ps[])
 	      while (n--)
 		*trgt.f++ = (float) *src.w++;
 	      break;
-	    case LUX_LONG:
+	    case LUX_INT32:
 	      while (n--)
 		*trgt.f++ = (float) *src.l++;
 	      src.b = array_data(yTabSym);
@@ -123,7 +123,7 @@ int32_t lux_cubic_spline(int32_t narg, int32_t ps[])
 	  break;
 	case LUX_DOUBLE:
 	  switch (oldType)
-	  { case LUX_BYTE:
+	  { case LUX_INT8:
 	      while (n--)
 		*trgt.d++ = (double) *src.b++;
 	      src.b = array_data(yTabSym);
@@ -131,7 +131,7 @@ int32_t lux_cubic_spline(int32_t narg, int32_t ps[])
 	      while (n--)
 		*trgt.d++ = (double) *src.b++;
 	      break;
-	    case LUX_WORD:
+	    case LUX_INT16:
 	      while (n--)
 		*trgt.d++ = (double) *src.w++;
 	      src.b = array_data(yTabSym);
@@ -139,7 +139,7 @@ int32_t lux_cubic_spline(int32_t narg, int32_t ps[])
 	      while (n--)
 		*trgt.d++ = (double) *src.w++;
 	      break;
-	    case LUX_LONG:
+	    case LUX_INT32:
 	      while (n--)
 		*trgt.d++ = (double) *src.l++;
 	      src.b = array_data(yTabSym);

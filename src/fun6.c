@@ -202,7 +202,7 @@ int32_t lux_despike(int32_t narg, int32_t ps[])
  if (symbol_class(iq) != LUX_ARRAY)
    return cerror(NEED_ARR, iq);
  type = array_type(iq);
- if (type != LUX_WORD)
+ if (type != LUX_INT16)
    return luxerror("Need WORD argument", iq); /* must be I*2 */
  if (array_num_dims(iq) != 2)
    return cerror(NEED_2D_ARR, iq);
@@ -547,7 +547,7 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])/* reorder function */
   else {
     /* outer switch for type, inners for orientation */
     switch (type) {
-      case LUX_BYTE:
+      case LUX_INT8:
 	if (iorder < 4) {
 	  register  uint8_t *pp, *qq;
 	  register  int32_t  nn, mm, nxx, inc;
@@ -631,7 +631,7 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])/* reorder function */
 	  }
 	}
 	break;
-      case LUX_WORD:
+      case LUX_INT16:
 	if (iorder < 4) {
 	  register  short *pp, *qq;
 	  register  int32_t  nn, mm, nxx, inc;
@@ -715,7 +715,7 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])/* reorder function */
 	  }
 	}
 	break;
-      case LUX_LONG:
+      case LUX_INT32:
 	if (iorder < 4) {
 	  register  int32_t *pp, *qq;
 	  register  int32_t  nn, mm, nxx;

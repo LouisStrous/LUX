@@ -929,7 +929,7 @@ typedef union {
 void denan(uint8_t *data, int32_t size, int32_t partype)
 /* <data> = start of data
    <size> = size of data, in bytes
-   <partpe> = data type (LUX_BYTE ... LUX_FLOAT) */
+   <partpe> = data type (LUX_INT8 ... LUX_FLOAT) */
 {
   uscalar p;
   int32_t i;
@@ -972,13 +972,13 @@ void printgene(uint8_t *gene, int32_t nPar, int32_t partype, int32_t showbits,
     if (j)
       putchar(' ');
     switch (partype) {
-    case LUX_BYTE:
+    case LUX_INT8:
       printf("%u", p.b[j]);
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       printf("%u", p.w[j]);
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       printf("%u", p.l[j]);
       break;
     case LUX_FLOAT:
@@ -1130,13 +1130,13 @@ int32_t lux_geneticfit(int32_t narg, int32_t ps[])
     start = NULL;
     switch (internalMode/2 & 7) {
     case 1:
-      partype = LUX_BYTE;
+      partype = LUX_INT8;
       break;
     case 2: default:
-      partype = LUX_WORD;
+      partype = LUX_INT16;
       break;
     case 3:
-      partype = LUX_LONG;
+      partype = LUX_INT32;
       break;
     case 4:
       partype = LUX_FLOAT;
@@ -1181,7 +1181,7 @@ int32_t lux_geneticfit(int32_t narg, int32_t ps[])
     if (nPopulation < 1)
       nPopulation = 1;
     /* we make sure that the population fills a number of ints exactly */
-    if (partype < LUX_LONG)
+    if (partype < LUX_INT32)
       nPopulation += (nPopulation % (sizeof(int32_t)/lux_type_size[partype]));
   } else
     nPopulation = 100;

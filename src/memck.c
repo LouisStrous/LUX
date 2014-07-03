@@ -52,7 +52,7 @@ int32_t lux_memory(int32_t narg, int32_t ps[])
   extern char	*firstbreak;
 
   p = sbrk(0);
-  result = scalar_scratch(LUX_LONG);
+  result = scalar_scratch(LUX_INT32);
   sym[result].spec.scalar.l = p - firstbreak;
   return result;
 }

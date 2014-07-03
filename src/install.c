@@ -2925,7 +2925,7 @@ int32_t lux_compile(int32_t narg, int32_t ps[])
   int32_t	result, value;
 
   string = string_arg(*ps);
-  result = scalar_scratch(LUX_LONG);
+  result = scalar_scratch(LUX_INT32);
   if (string)
   { value = compile(string);
     scalar_value(result).l = value; }
@@ -3433,10 +3433,10 @@ void fixedValue(char *name, Symboltype type, ...)
    symbol_class(n) = LUX_SCALAR;
    scalar_type(n) = type;
    switch (type) {
-   case LUX_LONG:
+   case LUX_INT32:
      scalar_value(n).l = va_arg(ap, int32_t);
      break;
-   case LUX_QUAD:
+   case LUX_INT64:
      scalar_value(n).q = va_arg(ap, int64_t);
      break;
    case LUX_FLOAT:
@@ -3547,15 +3547,15 @@ void convertPointer(scalar *target, Symboltype inType, Symboltype outType)
 /* converts value in target from inType to outType */
 {
   switch (outType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (inType) {
-    case LUX_WORD:
+    case LUX_INT16:
       (*target).b = (uint8_t) (*target).w;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       (*target).b = (uint8_t) (*target).l;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       (*target).b = (uint8_t) (*target).q;
       break;
     case LUX_FLOAT:
@@ -3566,15 +3566,15 @@ void convertPointer(scalar *target, Symboltype inType, Symboltype outType)
       break;
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (inType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       (*target).w = (int16_t) (*target).b;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       (*target).w = (int16_t) (*target).l;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       (*target).w = (int16_t) (*target).q;
       break;
     case LUX_FLOAT:
@@ -3585,15 +3585,15 @@ void convertPointer(scalar *target, Symboltype inType, Symboltype outType)
       break;
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (inType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       (*target).l = (int32_t) (*target).b;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       (*target).l = (int32_t) (*target).w;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       (*target).l = (int32_t) (*target).q;
       break;
     case LUX_FLOAT:
@@ -3604,15 +3604,15 @@ void convertPointer(scalar *target, Symboltype inType, Symboltype outType)
       break;
     }
     break;
-  case LUX_QUAD:
+  case LUX_INT64:
     switch (inType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       (*target).q = (int64_t) (*target).b;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       (*target).q = (int64_t) (*target).w;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       (*target).q = (int64_t) (*target).l;
       break;
     case LUX_FLOAT:
@@ -3625,16 +3625,16 @@ void convertPointer(scalar *target, Symboltype inType, Symboltype outType)
     break;
   case LUX_FLOAT:
     switch (inType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       (*target).f = (float) (*target).b;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       (*target).f = (float) (*target).w;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       (*target).f = (float) (*target).l;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       (*target).f = (float) (*target).q;
       break;
     case LUX_DOUBLE:
@@ -3644,16 +3644,16 @@ void convertPointer(scalar *target, Symboltype inType, Symboltype outType)
     break;
   case LUX_DOUBLE:
     switch (inType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       (*target).d = (double) (*target).b;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       (*target).d = (double) (*target).w;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       (*target).d = (double) (*target).l;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       (*target).d = (double) (*target).q;
       break;
     case LUX_FLOAT:
@@ -3668,17 +3668,17 @@ void convertWidePointer(wideScalar *target, int32_t inType, int32_t outType)
 /* converts value in <target> from <inType> to <outType> */
 {
   switch (inType) {
-  case LUX_BYTE:
+  case LUX_INT8:
     switch (outType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       target->w = (int16_t) target->b;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       target->l = (int32_t) target->b;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       target->q = (int64_t) target->b;
       break;
     case LUX_FLOAT:
@@ -3697,17 +3697,17 @@ void convertWidePointer(wideScalar *target, int32_t inType, int32_t outType)
       break;
     }
     break;
-  case LUX_WORD:
+  case LUX_INT16:
     switch (outType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       target->b = (uint8_t) target->w;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       target->l = (int32_t) target->w;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       target->q = (int64_t) target->w;
       break;
     case LUX_FLOAT:
@@ -3726,18 +3726,18 @@ void convertWidePointer(wideScalar *target, int32_t inType, int32_t outType)
       break;
     }
     break;
-  case LUX_LONG:
+  case LUX_INT32:
     switch (outType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       target->b = (uint8_t) target->l;
       break;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       target->w = (int16_t) target->l;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       target->q = (int64_t) target->l;
       break;
     case LUX_FLOAT:
@@ -3756,19 +3756,19 @@ void convertWidePointer(wideScalar *target, int32_t inType, int32_t outType)
       break;
     }
     break;
-  case LUX_QUAD:
+  case LUX_INT64:
     switch (outType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       target->b = (uint8_t) target->q;
       break;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       target->w = (int16_t) target->q;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       target->l = (int32_t) target->q;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       break;
     case LUX_FLOAT:
       target->f = (float) target->q;
@@ -3788,16 +3788,16 @@ void convertWidePointer(wideScalar *target, int32_t inType, int32_t outType)
     break;
   case LUX_FLOAT:
     switch (outType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       target->b = (uint8_t) target->f;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       target->w = (int16_t) target->f;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       target->l = (int32_t) target->f;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       target->q = (int64_t) target->f;
       break;
     case LUX_FLOAT:
@@ -3817,16 +3817,16 @@ void convertWidePointer(wideScalar *target, int32_t inType, int32_t outType)
     break;
   case LUX_DOUBLE:
     switch (outType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       target->b = (uint8_t) target->d;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       target->w = (int16_t) target->d;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       target->l = (int32_t) target->d;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       target->q = (int64_t) target->d;
       break;
     case LUX_FLOAT:
@@ -3846,16 +3846,16 @@ void convertWidePointer(wideScalar *target, int32_t inType, int32_t outType)
     break;
   case LUX_CFLOAT:
     switch (outType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       target->b = (uint8_t) target->cf.real;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       target->w = (int16_t) target->cf.real;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       target->l = (int32_t) target->cf.real;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       target->q = (int64_t) target->cf.real;
       break;
     case LUX_FLOAT:
@@ -3874,16 +3874,16 @@ void convertWidePointer(wideScalar *target, int32_t inType, int32_t outType)
     break;
   case LUX_CDOUBLE:
     switch (outType) {
-    case LUX_BYTE:
+    case LUX_INT8:
       target->b = (uint8_t) target->cd.real;
       break;
-    case LUX_WORD:
+    case LUX_INT16:
       target->w = (int16_t) target->cd.real;
       break;
-    case LUX_LONG:
+    case LUX_INT32:
       target->l = (int32_t) target->cd.real;
       break;
-    case LUX_QUAD:
+    case LUX_INT64:
       target->q = (int64_t) target->cd.real;
       break;
     case LUX_FLOAT:
@@ -3912,18 +3912,18 @@ void convertScalar(scalar *target, int32_t nsym, Symboltype type)
  n = scalar_type(nsym);
  ptr.b = &scalar_value(nsym).b;
  switch (type) {
- case LUX_BYTE:
+ case LUX_INT8:
    switch (n) {
-   case LUX_BYTE:
+   case LUX_INT8:
      (*target).b = (uint8_t) *ptr.b;
      break;
-   case LUX_WORD:
+   case LUX_INT16:
      (*target).b = (uint8_t) *ptr.w;
      break;
-   case LUX_LONG:
+   case LUX_INT32:
      (*target).b = (uint8_t) *ptr.l;
      break;
-   case LUX_QUAD:
+   case LUX_INT64:
      (*target).b = (uint8_t) *ptr.q;
      break;
    case LUX_FLOAT:
@@ -3934,18 +3934,18 @@ void convertScalar(scalar *target, int32_t nsym, Symboltype type)
      break;
    }
    break;
- case LUX_WORD:
+ case LUX_INT16:
    switch (n) {
-   case LUX_BYTE:
+   case LUX_INT8:
      (*target).w = (int16_t) *ptr.b;
      break;
-   case LUX_WORD:
+   case LUX_INT16:
      (*target).w = (int16_t) *ptr.w;
      break;
-   case LUX_LONG:
+   case LUX_INT32:
      (*target).w = (int16_t) *ptr.l;
      break;
-   case LUX_QUAD:
+   case LUX_INT64:
      (*target).w = (int16_t) *ptr.q;
      break;
    case LUX_FLOAT:
@@ -3956,18 +3956,18 @@ void convertScalar(scalar *target, int32_t nsym, Symboltype type)
      break;
    }
    break;
- case LUX_LONG:
+ case LUX_INT32:
    switch (n) {
-   case LUX_BYTE:
+   case LUX_INT8:
      (*target).l = (int32_t) *ptr.b;
      break;
-   case LUX_WORD:
+   case LUX_INT16:
      (*target).l = (int32_t) *ptr.w;
      break;
-   case LUX_LONG:
+   case LUX_INT32:
      (*target).l = (int32_t) *ptr.l;
      break;
-   case LUX_QUAD:
+   case LUX_INT64:
      (*target).l = (int32_t) *ptr.q;
      break;
    case LUX_FLOAT:
@@ -3978,18 +3978,18 @@ void convertScalar(scalar *target, int32_t nsym, Symboltype type)
      break;
    }
    break;
- case LUX_QUAD:
+ case LUX_INT64:
    switch (n) {
-   case LUX_BYTE:
+   case LUX_INT8:
      (*target).q = (int64_t) *ptr.b;
      break;
-   case LUX_WORD:
+   case LUX_INT16:
      (*target).q = (int64_t) *ptr.w;
      break;
-   case LUX_LONG:
+   case LUX_INT32:
      (*target).q = (int64_t) *ptr.l;
      break;
-   case LUX_QUAD:
+   case LUX_INT64:
      (*target).q = (int64_t) *ptr.q;
      break;
    case LUX_FLOAT:
@@ -4002,16 +4002,16 @@ void convertScalar(scalar *target, int32_t nsym, Symboltype type)
    break;
  case LUX_FLOAT:
    switch (n) {
-   case LUX_BYTE:
+   case LUX_INT8:
      (*target).f = (float) *ptr.b;
      break;
-   case LUX_WORD:
+   case LUX_INT16:
      (*target).f = (float) *ptr.w;
      break;
-   case LUX_LONG:
+   case LUX_INT32:
      (*target).f = (float) *ptr.l;
      break;
-   case LUX_QUAD:
+   case LUX_INT64:
      (*target).f = (float) *ptr.q;
      break;
    case LUX_FLOAT:
@@ -4024,16 +4024,16 @@ void convertScalar(scalar *target, int32_t nsym, Symboltype type)
    break;
  case LUX_DOUBLE:
    switch (n) {
-   case LUX_BYTE:
+   case LUX_INT8:
      (*target).d = (double) *ptr.b;
      break;
-   case LUX_WORD:
+   case LUX_INT16:
      (*target).d = (double) *ptr.w;
      break;
-   case LUX_LONG:
+   case LUX_INT32:
      (*target).d = (double) *ptr.l;
      break;
-   case LUX_QUAD:
+   case LUX_INT64:
      (*target).d = (double) *ptr.q;
      break;
    case LUX_FLOAT:
@@ -4076,7 +4076,7 @@ int32_t lux_symbol_memory()
 	 + routine_num_statements(i)*sizeof(int16_t);
        break; }
  }
- i = scalar_scratch(LUX_LONG);
+ i = scalar_scratch(LUX_INT32);
  scalar_value(i).l = mem;
  return i;
 }
@@ -4126,15 +4126,15 @@ int32_t lux_trace(int32_t narg, int32_t ps[])
   return 1;
 }
 /*----------------------------------------------------------------*/
-#define b_fix(name, value) { fixedValue(name, LUX_BYTE, value);  nFixed++; }
-#define l_fix(name, value) { fixedValue(name, LUX_LONG, value);  nFixed++; }
-#define q_fix(name, value) { fixedValue(name, LUX_QUAD, value);  nFixed++; }
+#define b_fix(name, value) { fixedValue(name, LUX_INT8, value);  nFixed++; }
+#define l_fix(name, value) { fixedValue(name, LUX_INT32, value);  nFixed++; }
+#define q_fix(name, value) { fixedValue(name, LUX_INT64, value);  nFixed++; }
 #define f_fix(name, value) { fixedValue(name, LUX_FLOAT, value);  nFixed++; }
 #define d_fix(name, value) { fixedValue(name, LUX_DOUBLE, value);  nFixed++; }
 #define s_fix(name, value) { fixedValue(name, LUX_LSTRING, value);  nFixed++; }
 #define cf_fix(name, re, im) { fixedValue(name, LUX_CFLOAT, re, im); nFixed++; }
 #define cd_fix(name, re, im) { fixedValue(name, LUX_DFLOAT, re, im); nFixed++; }
-#define l_ptr(name, value) installPointer(name, LUX_LONG, value)
+#define l_ptr(name, value) installPointer(name, LUX_INT32, value)
 #define f_ptr(name, value) installPointer(name, LUX_FLOAT, value)
 #define d_ptr(name, value) installPointer(name, LUX_DOUBLE, value)
 #define s_ptr(name, value) installPointer(name, LUX_TEMP_STRING, value)
@@ -4223,9 +4223,9 @@ enumElem	classesStruct[] = {
 };
 
 enumElem	typesStruct[] = {
-  { "BYTE", LUX_BYTE },
-  { "WORD", LUX_WORD },
-  { "LONG", LUX_LONG },
+  { "BYTE", LUX_INT8 },
+  { "WORD", LUX_INT16 },
+  { "LONG", LUX_INT32 },
   { "FLOAT", LUX_FLOAT },
   { "DOUBLE", LUX_DOUBLE },
   { "STRING", LUX_TEMP_STRING },
@@ -4403,7 +4403,7 @@ void symbolInitialization(void)
  iq = installString("#CLASS");
  stackSym = findVar(iq, 0);	/* stackSym is a dummy variable */
  sym[stackSym].class = LUX_ENUM;
- enum_type(stackSym) = LUX_LONG;
+ enum_type(stackSym) = LUX_INT32;
  enum_list(stackSym) = classesStruct;
  symbol_memory(stackSym) = sizeof(classesStruct);
  nFixed++;
@@ -4411,7 +4411,7 @@ void symbolInitialization(void)
  iq = installString("#COORDSYS");
  stackSym = findVar(iq, 0);
  symbol_class(stackSym) = LUX_ENUM;
- enum_type(stackSym) = LUX_LONG;
+ enum_type(stackSym) = LUX_INT32;
  enum_list(stackSym) = coordSysStruct;
  symbol_memory(stackSym) = sizeof(coordSysStruct);
  nFixed++;
@@ -4419,7 +4419,7 @@ void symbolInitialization(void)
  iq = installString("#EVENT");
  stackSym = findVar(iq, 0);
  sym[stackSym].class = LUX_ENUM;
- enum_type(stackSym) = LUX_LONG;
+ enum_type(stackSym) = LUX_INT32;
  enum_list(stackSym) = eventStruct;
  symbol_memory(stackSym) = sizeof(eventStruct);
  nFixed++;
@@ -4427,7 +4427,7 @@ void symbolInitialization(void)
  iq = installString("#FILETYPE");
  stackSym = findVar(iq, 0);
  sym[stackSym].class = LUX_ENUM;
- enum_type(stackSym) = LUX_LONG;
+ enum_type(stackSym) = LUX_INT32;
  enum_list(stackSym) = filetypeStruct;
  symbol_memory(stackSym) = sizeof(filetypeStruct);
  nFixed++;
@@ -4435,7 +4435,7 @@ void symbolInitialization(void)
  iq = installString("#TYPE");
  stackSym = findVar(iq, 0);
  sym[stackSym].class = LUX_ENUM;
- enum_type(stackSym) = LUX_LONG;
+ enum_type(stackSym) = LUX_INT32;
  enum_list(stackSym) = typesStruct;
  symbol_memory(stackSym) = sizeof(typesStruct);
  nFixed++;
@@ -4465,7 +4465,7 @@ void symbolInitialization(void)
 
  iq = findVarName("#TYPESIZE", 0);
  i = 10;			/* lux_type_size[] # elements! */
- to_scratch_array(iq, LUX_LONG, 1, &i);
+ to_scratch_array(iq, LUX_INT32, 1, &i);
  memcpy(array_data(iq), lux_type_size, i*sizeof(int32_t));
 
  /* s_fix("#NL",		"\n"); */
@@ -4723,7 +4723,7 @@ void symbolInitialization(void)
  iq = installString("!TEMP");
  tempSym = findVar(iq, 0);
  sym[tempSym].class = LUX_SCALAR;
- scalar_type(tempSym) = LUX_LONG;
+ scalar_type(tempSym) = LUX_INT32;
  scalar_value(tempSym).l = 0;
  lastmax_sym = lookForVarName("!LASTMAX", 0);
  lastmin_sym = lookForVarName("!LASTMIN", 0);
@@ -4963,7 +4963,7 @@ int32_t lux_symbol_number(int32_t narg, int32_t ps[])
 {
   int32_t	result;
   
-  result = scalar_scratch(LUX_LONG);
+  result = scalar_scratch(LUX_INT32);
   sym[result].spec.scalar.l = *ps;
   return result;
 }

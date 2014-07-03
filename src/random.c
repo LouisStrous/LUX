@@ -324,7 +324,7 @@ int32_t lux_randomu(int32_t narg, int32_t ps[])
      dims[j] = int_arg(ps[j]); /*get the dimensions */
    pd = dims;
  }
- result_sym = array_scratch(cycle? LUX_LONG: LUX_DOUBLE, narg, pd);
+ result_sym = array_scratch(cycle? LUX_INT32: LUX_DOUBLE, narg, pd);
  if (result_sym == LUX_ERROR)
    return LUX_ERROR;
  p = array_data(result_sym);
@@ -371,7 +371,7 @@ int32_t lux_randomd(int32_t narg, int32_t ps[])
     pd = dims;
   }
 
-  result = array_scratch(LUX_LONG, n, pd);
+  result = array_scratch(LUX_INT32, n, pd);
   if (result == LUX_ERROR)
     return LUX_ERROR;
   pd = array_data(result);
@@ -474,7 +474,7 @@ int32_t lux_randomb(int32_t narg, int32_t ps[])
     ps++;			/* go to next argument */
   }
 
-  result = array_scratch((internalMode & 1)? LUX_LONG: LUX_BYTE, ndim, dims);
+  result = array_scratch((internalMode & 1)? LUX_INT32: LUX_INT8, ndim, dims);
   if (result == LUX_ERROR)	/* some error? */
     return LUX_ERROR;
   p.l = array_data(result);	/* pointer to result data */
@@ -562,17 +562,17 @@ int32_t lux_random(int32_t narg, int32_t ps[])
 /*       generates a LUX_FLOAT array with dimensions <dimens>, containing */
 /*       numbers uniformly distributed between 0 and 1 (exclusive) */
 /*   Y = RANDOM([SEED=seed,] PERIOD=period, dimens [,/UNIFORM]) */
-/*       generates a LUX_LONG array with dimensions <dimens>, containing */
+/*       generates a LUX_INT32 array with dimensions <dimens>, containing */
 /*       numbers uniformly distributed between 0 and <period> - 1 */
 /*       (inclusive), where any number may occur more than once. */
 /*   Y = RANDOM([SEED=seed,] PERIOD=period, dimens, /SAMPLE) */
-/*       generates a LUX_LONG array with dimensions <dimens>, containing */
+/*       generates a LUX_INT32 array with dimensions <dimens>, containing */
 /*       numbers uniformly distributed between 0 and <period> - 1 */
 /*       (inclusive), but any number occurs at most once.  The number */
 /*       of elements must not be larger than <period>.  The numbers are */
 /*       ordered in ascending order. */
 /*   Y = RANDOM([SEED=seed,] PERIOD=period, dimens, /SHUFFLE) */
-/*       generates a LUX_LONG array with dimensions <dimens>, containing */
+/*       generates a LUX_INT32 array with dimensions <dimens>, containing */
 /*       numbers uniformly distributed between 0 and <period> - 1 */
 /*       (inclusive), but any number occurs at most once.  The number */
 /*       of elements must not be larger than <period>.  The numbers are */
@@ -582,7 +582,7 @@ int32_t lux_random(int32_t narg, int32_t ps[])
 /*       numbers normally distributed with zero mean and unit standard */
 /*       deviation. */
 /*   Y = RANDOM([SEED=seed,] dimens, /BITS) */
-/*       generates an LUX_BYTE array with dimensions <dimens>, containing */
+/*       generates an LUX_INT8 array with dimensions <dimens>, containing */
 /*       either a 0 or a 1, drawn at random with equal probability.  */
 {
   int32_t	result, ndim, dims[MAX_DIMS], iq, i, period, seed;
@@ -635,7 +635,7 @@ int32_t lux_random(int32_t narg, int32_t ps[])
         if (!symbolIsScalar(ps[1]))
           return cerror(NEED_SCAL, ps[1]);
 	period = int_arg(ps[1]);
-	result = array_scratch(LUX_LONG, ndim, dims);
+	result = array_scratch(LUX_INT32, ndim, dims);
 	if (result == LUX_ERROR)
 	  return LUX_ERROR;
 	randomu(seed, (int32_t *) array_data(result), array_size(result),
@@ -657,7 +657,7 @@ int32_t lux_random(int32_t narg, int32_t ps[])
       if (narg < 1 || !ps[1])	/* PERIOD absent, but is required */
 	return luxerror("RANDOM - need PERIOD with /SAMPLE", 0);
       period = int_arg(ps[1]);	/* PERIOD */
-      result = array_scratch(LUX_LONG, ndim, dims);
+      result = array_scratch(LUX_INT32, ndim, dims);
       if (result == LUX_ERROR)
 	return LUX_ERROR;
       if (internalMode == 3)
@@ -670,7 +670,7 @@ int32_t lux_random(int32_t narg, int32_t ps[])
     case 5:			/* /BITS */
       if (narg > 1 && ps[1])	/* PERIOD specified - illegal */
 	return luxerror("RANDOM - no PERIOD allowed with /BITS", ps[1]);
-      result = array_scratch(LUX_BYTE, ndim, dims);
+      result = array_scratch(LUX_INT8, ndim, dims);
       if (result == LUX_ERROR)
 	return LUX_ERROR;
       iq = array_size(result);

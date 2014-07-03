@@ -902,6 +902,11 @@ int32_t indgen(int32_t narg, int32_t ps[], int32_t isFunc)
 	*trgt.l = (int32_t) trgtinfo.coords[0];
       while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.rndim);
       break;
+    case LUX_INT64:
+      do
+	*trgt.q = (int32_t) trgtinfo.coords[0];
+      while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.rndim);
+      break;
     case LUX_FLOAT:
       do
 	*trgt.f = (float) trgtinfo.coords[0];

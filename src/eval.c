@@ -17416,62 +17416,96 @@ void lux_or(void)
      /* logical-or with array operands */
 {
   switch (lhsType) {
+  case LUX_BYTE:
+    switch (rhsType) {
     case LUX_BYTE:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--)
-            *tp.l++ = (*lp.b++ | *rp.b++);
-          break;
-        case LUX_WORD:
-          while (nRepeat--)
-            *tp.l++ = ((int16_t) *lp.b++ | *rp.w++);
-          break;
-        case LUX_LONG:
-          while (nRepeat--)
-            *tp.l++ = ((int32_t) *lp.b++ | *rp.l++);
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
-      }
+      while (nRepeat--)
+        *tp.l++ = (*lp.b++ | *rp.b++);
       break;
     case LUX_WORD:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--)
-            *tp.l++ = (*lp.w++ | (int16_t) *rp.b++);
-          break;
-        case LUX_WORD:
-          while (nRepeat--)
-            *tp.l++ = (*lp.w++ | *rp.w++);
-          break;
-        case LUX_LONG:
-          while (nRepeat--)
-            *tp.l++ = ((int32_t) *lp.w++ | *rp.l++);
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
-      }
+      while (nRepeat--)
+        *tp.l++ = (*lp.b++ | *rp.w++);
       break;
     case LUX_LONG:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--)
-            *tp.l++ = (*lp.l++ | (int32_t) *rp.b++);
-          break;
-        case LUX_WORD:
-          while (nRepeat--)
-            *tp.l++ = (*lp.l++ | (int32_t) *rp.w++);
-          break;
-        case LUX_LONG:
-          while (nRepeat--)
-            *tp.l++ = (*lp.l++ | *rp.l++);
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
-      }
+      while (nRepeat--)
+        *tp.l++ = (*lp.b++ | *rp.l++);
+      break;
+    case LUX_QUAD:
+      while (nRepeat--)
+        *tp.q++ = (*lp.b++ | *rp.q++);
       break;
     default:
-      cerror(ILL_TYPE, lhs, typeName(lhsType));
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_WORD:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--)
+        *tp.l++ = (*lp.w++ | (int16_t) *rp.b++);
+      break;
+    case LUX_WORD:
+      while (nRepeat--)
+        *tp.l++ = (*lp.w++ | *rp.w++);
+      break;
+    case LUX_LONG:
+      while (nRepeat--)
+        *tp.l++ = ((int32_t) *lp.w++ | *rp.l++);
+      break;
+    case LUX_QUAD:
+      while (nRepeat--)
+        *tp.q++ = (*lp.w++ | *rp.q++);
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_LONG:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--)
+        *tp.l++ = (*lp.l++ | (int32_t) *rp.b++);
+      break;
+    case LUX_WORD:
+      while (nRepeat--)
+        *tp.l++ = (*lp.l++ | (int32_t) *rp.w++);
+      break;
+    case LUX_LONG:
+      while (nRepeat--)
+        *tp.l++ = (*lp.l++ | *rp.l++);
+      break;
+    case LUX_QUAD:
+      while (nRepeat--)
+        *tp.q++ = (*lp.l++ | *rp.q++);
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_QUAD:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--)
+        *tp.q++ = (*lp.q++ | *rp.b++);
+      break;
+    case LUX_WORD:
+      while (nRepeat--)
+        *tp.q++ = (*lp.q++ | *rp.w++);
+      break;
+    case LUX_LONG:
+      while (nRepeat--)
+        *tp.q++ = (*lp.q++ | *rp.l++);
+      break;
+    case LUX_QUAD:
+      while (nRepeat--)
+        *tp.q++ = (*lp.q++ | *rp.q++);
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  default:
+    cerror(ILL_TYPE, lhs, typeName(lhsType));
   }
 }
 /*----------------------------------------------------------*/
@@ -17479,72 +17513,106 @@ void lux_or_as(void)
      /* logical-or with array LHS and scalar RHS */
 {
   switch (lhsType) {
+  case LUX_BYTE:
+    switch (rhsType) {
     case LUX_BYTE:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--)
-            *tp.l++ = (*lp.b++ | *rp.b);
-          break;
-        case LUX_WORD:
-          while (nRepeat--)
-            *tp.l++ = ((int16_t) *lp.b++ | *rp.w);
-          break;
-        case LUX_LONG:
-          while (nRepeat--)
-            *tp.l++ = ((int32_t) *lp.b++ | *rp.l);
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
-      }
+      while (nRepeat--)
+        *tp.l++ = (*lp.b++ | *rp.b);
       break;
     case LUX_WORD:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--)
-            *tp.l++ = (*lp.w++ | (int16_t) *rp.b);
-          break;
-        case LUX_WORD:
-          while (nRepeat--)
-            *tp.l++ = (*lp.w++ | *rp.w);
-          break;
-        case LUX_LONG:
-          while (nRepeat--)
-            *tp.l++ = ((int32_t) *lp.w++ | *rp.l);
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
-      }
+      while (nRepeat--)
+        *tp.l++ = (*lp.b++ | *rp.w);
       break;
     case LUX_LONG:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--)
-            *tp.l++ = (*lp.l++ | (int32_t) *rp.b);
-          break;
-        case LUX_WORD:
-          while (nRepeat--)
-            *tp.l++ = (*lp.l++ | (int32_t) *rp.w);
-          break;
-        case LUX_LONG:
-          while (nRepeat--)
-            *tp.l++ = (*lp.l++ | *rp.l);
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
-      }
+      while (nRepeat--)
+        *tp.l++ = (*lp.b++ | *rp.l);
+      break;
+    case LUX_QUAD:
+      while (nRepeat--)
+        *tp.q++ = (*lp.b++ | *rp.q);
       break;
     default:
-      cerror(ILL_TYPE, lhs, typeName(lhsType));
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_WORD:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--)
+        *tp.l++ = (*lp.w++ | (int16_t) *rp.b);
+      break;
+    case LUX_WORD:
+      while (nRepeat--)
+        *tp.l++ = (*lp.w++ | *rp.w);
+      break;
+    case LUX_LONG:
+      while (nRepeat--)
+        *tp.l++ = ((int32_t) *lp.w++ | *rp.l);
+      break;
+    case LUX_QUAD:
+      while (nRepeat--)
+        *tp.q++ = (*lp.w++ | *rp.q);
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_LONG:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--)
+        *tp.l++ = (*lp.l++ | (int32_t) *rp.b);
+      break;
+    case LUX_WORD:
+      while (nRepeat--)
+        *tp.l++ = (*lp.l++ | (int32_t) *rp.w);
+      break;
+    case LUX_LONG:
+      while (nRepeat--)
+        *tp.l++ = (*lp.l++ | *rp.l);
+      break;
+    case LUX_QUAD:
+      while (nRepeat--)
+        *tp.q++ = (*lp.l++ | *rp.q);
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_QUAD:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--)
+        *tp.q++ = (*lp.q++ | *rp.b);
+      break;
+    case LUX_WORD:
+      while (nRepeat--)
+        *tp.q++ = (*lp.q++ | *rp.w);
+      break;
+    case LUX_LONG:
+      while (nRepeat--)
+        *tp.q++ = (*lp.q++ | *rp.l);
+      break;
+    case LUX_QUAD:
+      while (nRepeat--)
+        *tp.q++ = (*lp.q++ | *rp.q);
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  default:
+    cerror(ILL_TYPE, lhs, typeName(lhsType));
   }
 }
 /*----------------------------------------------------------*/
 void lux_or_sa(void)
-     /* logical-or with scalar LHS and array RHS.  Operator is */
-     /* commutative, so swap operands and use lux_or_as() */
+     /* logical-or with scalar LHS and array RHS.  Operator is commutative, */
+     /* so swap operands and use lux_or_as() */
 {
   int32_t           temp;
   pointer       tempp;
-  
+
   temp = lhsType;  lhsType = rhsType;  rhsType = temp;
   tempp = lp;  lp = rp;  rp = tempp;
   lux_or_as();
@@ -17553,138 +17621,206 @@ void lux_or_sa(void)
 }
 /*----------------------------------------------------------*/
 void lux_xor(void)
-     /* logical-exclusive-or with array operands */
+     /* logical-xor with array operands */
 {
   switch (lhsType) {
+  case LUX_BYTE:
+    switch (rhsType) {
     case LUX_BYTE:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--)
-            *tp.l++ = (*lp.b++ ^ *rp.b++);
-          break;
-        case LUX_WORD:
-          while (nRepeat--)
-            *tp.l++ = ((int16_t) *lp.b++ ^ *rp.w++);
-          break;
-        case LUX_LONG:
-          while (nRepeat--)
-            *tp.l++ = ((int32_t) *lp.b++ ^ *rp.l++);
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
-      }
+      while (nRepeat--)
+        *tp.l++ = (*lp.b++ ^ *rp.b++);
       break;
     case LUX_WORD:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--)
-            *tp.l++ = (*lp.w++ ^ (int16_t) *rp.b++);
-          break;
-        case LUX_WORD:
-          while (nRepeat--)
-            *tp.l++ = (*lp.w++ ^ *rp.w++);
-          break;
-        case LUX_LONG:
-          while (nRepeat--)
-            *tp.l++ = ((int32_t) *lp.w++ ^ *rp.l++);
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
-      }
+      while (nRepeat--)
+        *tp.l++ = (*lp.b++ ^ *rp.w++);
       break;
     case LUX_LONG:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--)
-            *tp.l++ = (*lp.l++ ^ (int32_t) *rp.b++);
-          break;
-        case LUX_WORD:
-          while (nRepeat--)
-            *tp.l++ = (*lp.l++ ^ (int32_t) *rp.w++);
-          break;
-        case LUX_LONG:
-          while (nRepeat--)
-            *tp.l++ = (*lp.l++ ^ *rp.l++);
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
-      }
+      while (nRepeat--)
+        *tp.l++ = (*lp.b++ ^ *rp.l++);
+      break;
+    case LUX_QUAD:
+      while (nRepeat--)
+        *tp.q++ = (*lp.b++ ^ *rp.q++);
       break;
     default:
-      cerror(ILL_TYPE, lhs, typeName(lhsType));
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_WORD:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--)
+        *tp.l++ = (*lp.w++ ^ (int16_t) *rp.b++);
+      break;
+    case LUX_WORD:
+      while (nRepeat--)
+        *tp.l++ = (*lp.w++ ^ *rp.w++);
+      break;
+    case LUX_LONG:
+      while (nRepeat--)
+        *tp.l++ = ((int32_t) *lp.w++ ^ *rp.l++);
+      break;
+    case LUX_QUAD:
+      while (nRepeat--)
+        *tp.q++ = (*lp.w++ ^ *rp.q++);
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_LONG:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--)
+        *tp.l++ = (*lp.l++ ^ (int32_t) *rp.b++);
+      break;
+    case LUX_WORD:
+      while (nRepeat--)
+        *tp.l++ = (*lp.l++ ^ (int32_t) *rp.w++);
+      break;
+    case LUX_LONG:
+      while (nRepeat--)
+        *tp.l++ = (*lp.l++ ^ *rp.l++);
+      break;
+    case LUX_QUAD:
+      while (nRepeat--)
+        *tp.q++ = (*lp.l++ ^ *rp.q++);
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_QUAD:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--)
+        *tp.q++ = (*lp.q++ ^ *rp.b++);
+      break;
+    case LUX_WORD:
+      while (nRepeat--)
+        *tp.q++ = (*lp.q++ ^ *rp.w++);
+      break;
+    case LUX_LONG:
+      while (nRepeat--)
+        *tp.q++ = (*lp.q++ ^ *rp.l++);
+      break;
+    case LUX_QUAD:
+      while (nRepeat--)
+        *tp.q++ = (*lp.q++ ^ *rp.q++);
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  default:
+    cerror(ILL_TYPE, lhs, typeName(lhsType));
   }
 }
 /*----------------------------------------------------------*/
 void lux_xor_as(void)
-     /* logical-exclusive-or with array LHS and scalar RHS */
+     /* logical-xor with array LHS and scalar RHS */
 {
   switch (lhsType) {
+  case LUX_BYTE:
+    switch (rhsType) {
     case LUX_BYTE:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--)
-            *tp.l++ = (*lp.b++ ^ *rp.b);
-          break;
-        case LUX_WORD:
-          while (nRepeat--)
-            *tp.l++ = ((int16_t) *lp.b++ ^ *rp.w);
-          break;
-        case LUX_LONG:
-          while (nRepeat--)
-            *tp.l++ = ((int32_t) *lp.b++ ^ *rp.l);
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
-      }
+      while (nRepeat--)
+        *tp.l++ = (*lp.b++ ^ *rp.b);
       break;
     case LUX_WORD:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--)
-            *tp.l++ = (*lp.w++ ^ (int16_t) *rp.b);
-          break;
-        case LUX_WORD:
-          while (nRepeat--)
-            *tp.l++ = (*lp.w++ ^ *rp.w);
-          break;
-        case LUX_LONG:
-          while (nRepeat--)
-            *tp.l++ = ((int32_t) *lp.w++ ^ *rp.l);
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
-      }
+      while (nRepeat--)
+        *tp.l++ = (*lp.b++ ^ *rp.w);
       break;
     case LUX_LONG:
-      switch (rhsType) {
-        case LUX_BYTE:
-          while (nRepeat--)
-            *tp.l++ = (*lp.l++ ^ (int32_t) *rp.b);
-          break;
-        case LUX_WORD:
-          while (nRepeat--)
-            *tp.l++ = (*lp.l++ ^ (int32_t) *rp.w);
-          break;
-        case LUX_LONG:
-          while (nRepeat--)
-            *tp.l++ = (*lp.l++ ^ *rp.l);
-          break;
-        default:
-          cerror(ILL_TYPE, rhs, typeName(rhsType));
-      }
+      while (nRepeat--)
+        *tp.l++ = (*lp.b++ ^ *rp.l);
+      break;
+    case LUX_QUAD:
+      while (nRepeat--)
+        *tp.q++ = (*lp.b++ ^ *rp.q);
       break;
     default:
-      cerror(ILL_TYPE, lhs, typeName(lhsType));
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_WORD:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--)
+        *tp.l++ = (*lp.w++ ^ (int16_t) *rp.b);
+      break;
+    case LUX_WORD:
+      while (nRepeat--)
+        *tp.l++ = (*lp.w++ ^ *rp.w);
+      break;
+    case LUX_LONG:
+      while (nRepeat--)
+        *tp.l++ = ((int32_t) *lp.w++ ^ *rp.l);
+      break;
+    case LUX_QUAD:
+      while (nRepeat--)
+        *tp.q++ = (*lp.w++ ^ *rp.q);
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_LONG:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--)
+        *tp.l++ = (*lp.l++ ^ (int32_t) *rp.b);
+      break;
+    case LUX_WORD:
+      while (nRepeat--)
+        *tp.l++ = (*lp.l++ ^ (int32_t) *rp.w);
+      break;
+    case LUX_LONG:
+      while (nRepeat--)
+        *tp.l++ = (*lp.l++ ^ *rp.l);
+      break;
+    case LUX_QUAD:
+      while (nRepeat--)
+        *tp.q++ = (*lp.l++ ^ *rp.q);
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  case LUX_QUAD:
+    switch (rhsType) {
+    case LUX_BYTE:
+      while (nRepeat--)
+        *tp.q++ = (*lp.q++ ^ *rp.b);
+      break;
+    case LUX_WORD:
+      while (nRepeat--)
+        *tp.q++ = (*lp.q++ ^ *rp.w);
+      break;
+    case LUX_LONG:
+      while (nRepeat--)
+        *tp.q++ = (*lp.q++ ^ *rp.l);
+      break;
+    case LUX_QUAD:
+      while (nRepeat--)
+        *tp.q++ = (*lp.q++ ^ *rp.q);
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
+  default:
+    cerror(ILL_TYPE, lhs, typeName(lhsType));
   }
 }
 /*----------------------------------------------------------*/
 void lux_xor_sa(void)
-     /* logical-exlusive-or with scalar LHS and array RHS.  Operator is */
-     /* commutative, so swap operands and use lux_xor_as() */
+     /* logical-xor with scalar LHS and array RHS.  Operator is commutative, */
+     /* so swap operands and use lux_xor_as() */
 {
   int32_t           temp;
   pointer       tempp;
-  
+
   temp = lhsType;  lhsType = rhsType;  rhsType = temp;
   tempp = lp;  lp = rp;  rp = tempp;
   lux_xor_as();

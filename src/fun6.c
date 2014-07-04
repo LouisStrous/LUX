@@ -802,6 +802,93 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])/* reorder function */
 	  }
 	}
 	break;
+      case LUX_INT64:
+	if (iorder < 4) {
+	  register  int64_t *pp, *qq;
+	  register  int32_t  nn, mm, nxx;
+
+	  nxx = nx;
+	  mm = ny;
+	  qq = (int64_t *) q;
+
+	  switch (iorder) {
+	    case 1:		/* reverse in x */
+	    {
+	      pp = (int64_t *) p + nx;
+	      inc = 2*nx;
+
+	      while (mm--) {
+		nn = nxx;
+		while (nn) {
+		  *qq++ = *--pp;
+		  nn--;
+		}
+		pp += inc;
+	      }
+	    }
+	    break;
+	    case 2:		/* just reverse in y */
+	      pp = (int64_t *) p + nx * ny - nx;
+	      inc = -2*nx;
+	      while (mm--) {
+		nn = nxx;
+		while (nn) {
+		  *qq++ = *pp++;
+		  nn--;
+		}
+		pp += inc;
+	      }
+	      break;
+	    case 3:		/* reverse in x and y */
+	      pp = (int64_t *) p + nx*ny;
+	      while (mm--) {
+		nn = nxx;
+		while (nn) {
+		  *qq++ = *--pp;
+		  nn--;
+		}
+	      }
+	      break;
+	  }
+	} else {
+	  register  int64_t *pp, *qq;
+	  register  int32_t  nn, mm, nyy;
+
+	  mm = ny;
+	  qq = (int64_t *) q;
+	  switch (iorder) {
+	    case 4:		/* transpose in x and y */
+	      pp = (int64_t *) p;
+	      inc = -nx*ny + 1;
+	      nyy = ny;
+	      break;
+	    case 5:		/* transpose plus reverse in y */
+	      pp = (int64_t *) p +nx*ny - ny;
+	      inc = nx*ny + 1;
+	      nyy = -ny;
+	      break;
+	    case 6:		/* transpose plus reverse in x */
+	      pp = (int64_t *) p + ny - 1;
+	      inc = -nx*ny - 1;
+	      nyy = ny;
+	      break;
+	    case 7:		/* transpose plus reverse in x,y */
+	      pp = (int64_t *) p + ny*nx - 1;
+	      inc = nx*ny - 1;
+	      nyy = -ny;
+	      break;
+	  }
+	  while (mm--) {
+	    nn= nx;
+	    while (nn) {
+	      *qq++ = *pp;
+	      pp += nyy;
+	      nn--;
+	    }
+	    pp += inc;
+	  }
+	}
+	break;
       case LUX_FLOAT:
 	if (iorder < 4) {
 	  register  float *pp, *qq;

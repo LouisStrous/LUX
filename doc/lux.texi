@@ -595,7 +595,6 @@ Internal Functions and Subroutines
 * ARESTORE::                    Restore complete variables from disk
 * ARG::                         Complex argument
 * ARRAY::                       Create an array of arbitrary type
-* ARRAY_STATISTICS::            Main statistics of an array
 * ASIN::                        Arc sine
 * ASINH::                       Inverse hyperbolic sine
 * ASSOC::                       Create an associated variable
@@ -6983,8 +6982,6 @@ associated with any particular concept, such as "plotting" or
 This is a list of routines that manipulate arrays.
 
 @table @asis
-@item @ref{ARRAY_STATISTICS}
-Returns some statistics of an array.
 @item @ref{COMPRESS}
 To reduce the size of an array by combining data.
 @item @ref{CONCAT}
@@ -7813,8 +7810,6 @@ These routines provide information about variables, functions,
 subroutines, and sundry things.
 
 @table @asis
-@item @ref{ARRAY_STATISTICS}
-Returns basic statistics of an numerical array.
 @item @ref{CLASSNAME}
 Returns the name corresponding to a data class code.
 @item @ref{D}
@@ -7853,7 +7848,7 @@ To determine if a variable is a scalar.
 To determine if a variable is a string.
 @item @ref{LIST}
 To display the current definition of a user-defined subroutine or
-function. 
+function.
 @item @ref{NUM_DIM}
 Returns the number of dimensions.
 @item @ref{NUM_ELEM}
@@ -11799,7 +11794,6 @@ arguments.
 * ARESTORE::                    Restore complete variables from disk
 * ARG::                         Complex argument
 * ARRAY::                       Create an array of arbitrary type
-* ARRAY_STATISTICS::            Main statistics of an array
 * ASIN::                        Arc sine
 * ASINH::                       Inverse hyperbolic sine
 * ASSOC::                       Create an associated variable
@@ -13018,7 +13012,7 @@ See also: @ref{ABS}, @ref{CONJUGATE}, @ref{IMAGINARY}, @ref{REAL},
 
 [2.13.87]
 @c -------------------------------------
-@node ARRAY, ARRAY_STATISTICS, ARG, Internal Routines
+@node ARRAY, ASIN, ARG, Internal Routines
 @subsection ARRAY
 @findex ARRAY
 
@@ -13034,25 +13028,7 @@ See also: @ref{BYTARR}, @ref{DBLARR}, @ref{DISTARR}, @ref{FLTARR},
 @ref{Default Arrays}
 
 @c -------------------------------------
-@node ARRAY_STATISTICS, ASIN, ARRAY, Internal Routines
-@comment  node-name,  next,  previous,  up
-@subsection ARRAY_STATISTICS
-@findex ARRAY_STATISTICS
-
-@code{ARRAY_STATISTICS, @var{array}, @var{max}, @var{min}, @var{mean} [,
-@var{sdev}, @var{skew}, @var{kurtosis}]}
-
-Returns various statistics of real numerical array @code{@var{array}}:
-the maximum value in @code{@var{max}}, the minimum value in
-@code{@var{min}}, the average value in @code{@var{mean}}, and
-(optionally) the standard deviation in @code{@var{sdev}}, the skewness
-in @code{@var{skew}}, and the kurtosis in @code{@var{kurtosis}}.
-
-See also: @ref{Information}
-
-[3.1.503]
-@c -------------------------------------
-@node ASIN, ASINH, ARRAY_STATISTICS, Internal Routines
+@node ASIN, ASINH, ARRAY, Internal Routines
 @subsection ASIN
 @findex ASIN
 

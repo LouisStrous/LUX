@@ -87,8 +87,8 @@ int32_t	nexInfo = 0;
 extern int32_t	compileLevel, curLineNumber;
 static char	installing = 1;
 
-/*----------------------------------------------------------------*/ 
-extern int32_t lux_area(), lux_area2(), lux_array_statistics(),
+/*----------------------------------------------------------------*/
+extern int32_t lux_area(), lux_area2(),
   lux_atomize(), lux_batch(), lux_callig(), lux_close(),
   lux_contour(), lux_coordmap(), lux_crunch(),
   lux_cubic_spline_extreme(), lux_debug(), lux_decomp(),
@@ -280,7 +280,6 @@ internalRoutine	subroutine_table[] = {
   { "AREA2",	2, 6, lux_area2, /* toplogy.c */
     "::SEED:NUMBERS:DIAGONAL:SIGN" },
   { "ARESTORE",	1, MAX_ARG, lux_arestore, 0 }, /* files.c */
-  { "ARRAY_STATISTICS", 4, 7, lux_array_statistics, 0, }, /* fun1.c */
   { "ASTORE",	2, MAX_ARG, lux_astore, 0 }, /* files.c */
   { "ATOMIZE", 	1, 1, lux_atomize, "1TREE:2LINE" }, /* strous.c */
   { "BATCH",	0, 1, lux_batch, "1QUIT" }, /* symbols.c */

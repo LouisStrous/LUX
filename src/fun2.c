@@ -115,6 +115,7 @@ int32_t lux_runsum(int32_t narg, int32_t ps[])
        { case LUX_INT8:	*q2.b = *q1.b + *p.b; break;
          case LUX_INT16:	*q2.w = *q1.w + *p.w; break;
          case LUX_INT32:	*q2.l = *q1.l + *p.l; break;
+         case LUX_INT64:	*q2.q = *q1.q + *p.q; break;
          case LUX_FLOAT:	*q2.f = *q1.f + *p.f; break;
          case LUX_DOUBLE:	*q2.d = *q1.d + *p.d; break; }
        q2.b += *step; q1.b += *step; p.b += *step;
@@ -261,6 +262,25 @@ int32_t index_sdev(int32_t narg, int32_t ps[], int32_t sq)
 	      trgt.f[*indx++] += temp.f*temp.f* *weights.l++;
 	    }
 	    break;
+	  case LUX_INT64:
+	    while (i--) {		/* first, get the sum */
+	      hist.f[*indx] += *weights.q;
+	      sum.f[*indx] += (float) *src.q++ * *weights.q++;
+	      indx++;
+	    }
+	    /* calculate the average */
+	    for (i = -offset; i < size - offset; i++)
+	      if (hist.f[i])
+		sum.f[i] /= hist.f[i];
+	    src.q -= nElem;
+	    indx -= nElem;
+	    weights.q -= nElem;
+	    /* now the squared deviations */
+	    while (nElem--) {
+	      temp.f = (float) *src.q++ - sum.f[*indx];
+	      trgt.f[*indx++] += temp.f*temp.f* *weights.q++;
+	    }
+	    break;
 	  case LUX_FLOAT:
 	    while (i--) {		/* first, get the sum */
 	      hist.f[*indx] += *weights.f;
@@ -374,6 +394,25 @@ int32_t index_sdev(int32_t narg, int32_t ps[], int32_t sq)
 	    while (nElem--) {
 	      temp.d = (double) *src.l++ - sum.d[*indx];
 	      trgt.d[*indx++] += temp.d*temp.d* *weights.l++;
+	    }
+	    break;
+	  case LUX_INT64:
+	    while (i--) {		/* first, get the sum */
+	      hist.d[*indx] += *weights.q;
+	      sum.d[*indx] += (double) *src.q++ * *weights.q++;
+	      indx++;
+	    }
+	    /* calculate the average */
+	    for (i = -offset; i < size - offset; i++)
+	      if (hist.d[i])
+		sum.d[i] /= hist.d[i];
+	    src.q -= nElem;
+	    indx -= nElem;
+	    weights.q -= nElem;
+	    /* now the squared deviations */
+	    while (nElem--) {
+	      temp.d = (double) *src.q++ - sum.d[*indx];
+	      trgt.d[*indx++] += temp.d*temp.d* *weights.q++;
 	    }
 	    break;
 	  case LUX_FLOAT:
@@ -537,6 +576,24 @@ int32_t index_sdev(int32_t narg, int32_t ps[], int32_t sq)
 	      trgt.f[*indx++] += temp.f*temp.f;
 	    }
 	    break;
+	  case LUX_INT64:
+	    while (i--) {		/* first, get the sum */
+	      hist.l[*indx]++;
+	      sum.f[*indx] += *src.q++;
+	      indx++;
+	    }
+	    /* calculate the average */
+	    for (i = -offset; i < size - offset; i++)
+	      if (hist.l[i])
+		sum.f[i] /= hist.l[i];
+	    src.q -= nElem;
+	    indx -= nElem;
+	    /* now the squared deviations */
+	    while (nElem--) {
+	      temp.f = (float) *src.q++ - sum.f[*indx];
+	      trgt.f[*indx++] += temp.f*temp.f;
+	    }
+	    break;
 	  case LUX_FLOAT:
 	    while (i--) {		/* first, get the sum */
 	      hist.l[*indx]++;
@@ -642,6 +699,24 @@ int32_t index_sdev(int32_t narg, int32_t ps[], int32_t sq)
 	    /* now the squared deviations */
 	    while (nElem--) {
 	      temp.d = (double) *src.l++ - sum.d[*indx];
+	      trgt.d[*indx++] += temp.d*temp.d;
+	    }
+	    break;
+	  case LUX_INT64:
+	    while (i--) {		/* first, get the sum */
+	      hist.l[*indx]++;
+	      sum.d[*indx] += *src.q++;
+	      indx++;
+	    }
+	    /* calculate the average */
+	    for (i = -offset; i < size - offset; i++)
+	      if (hist.l[i])
+		sum.d[i] /= hist.l[i];
+	    src.q -= nElem;
+	    indx -= nElem;
+	    /* now the squared deviations */
+	    while (nElem--) {
+	      temp.d = (double) *src.q++ - sum.d[*indx];
 	      trgt.d[*indx++] += temp.d*temp.d;
 	    }
 	    break;
@@ -1018,7 +1093,51 @@ int32_t lux_covariance(int32_t narg, int32_t ps[])
 	      break;
 	  }
 	} while (done < xsrcinfo.rndim);
-	
+	break;
+      case LUX_INT64:
+	do {
+	  xmean = 0.0;
+          ymean = 0.0;
+	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(int32_t));
+	  xsrc0 = xsrc;
+          ysrc0 = ysrc;
+	  weight0 = weight;
+	  nn = 0;
+	  do {
+	    xmean += (double) *xsrc.q * *weight.q;
+            ymean += (double) *ysrc.q * *weight.q;
+	    nn += (double) *weight.q;
+	  }
+	  while (advanceLoop(&winfo, &weight),
+		 advanceLoop(&ysrcinfo, &ysrc),
+                 advanceLoop(&xsrcinfo, &xsrc) < xsrcinfo.naxes);
+	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(int32_t));
+	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(int32_t));
+	  xsrc = xsrc0;
+          ysrc = ysrc0;
+	  weight = weight0;
+	  xmean /= (nn? nn: 1);
+          ymean /= (nn? nn: 1);
+	  cov = 0.0;
+	  do {
+	    xtemp = ((double) *xsrc.q - xmean);
+            ytemp = ((double) *ysrc.q - ymean);
+	    cov += xtemp*ytemp* *weight.q;
+	  } while ((done = (advanceLoop(&winfo, &weight),
+			    advanceLoop(&ysrcinfo, &ysrc),
+			    advanceLoop(&xsrcinfo, &xsrc))) < xsrcinfo.naxes);
+	  if (!nn)
+	    nn = 1;
+	  cov /= nn;
+	  switch (outtype) {
+	    case LUX_FLOAT:
+	      *trgt.f++ = (float) cov;
+	      break;
+	    case LUX_DOUBLE:
+	      *trgt.d++ = cov;
+	      break;
+	  }
+	} while (done < xsrcinfo.rndim);
 	break;
       case LUX_FLOAT:
 	do {
@@ -1064,7 +1183,6 @@ int32_t lux_covariance(int32_t narg, int32_t ps[])
 	      break;
 	  }
 	} while (done < xsrcinfo.rndim);
-	
 	break;
       case LUX_DOUBLE:
 	do {
@@ -1220,6 +1338,41 @@ int32_t lux_covariance(int32_t narg, int32_t ps[])
 	  }
 	} while (done < xsrcinfo.rndim);
         break;
+      case LUX_INT64:
+	do {
+	  xmean = 0.0;
+          ymean = 0.0;
+	  memcpy(save, xsrcinfo.coords, xsrcinfo.ndim*sizeof(int32_t));
+	  xsrc0 = xsrc;
+          ysrc0 = ysrc;
+	  do {
+	    xmean += (double) *xsrc.q;
+            ymean += (double) *ysrc.q;
+	  } while (advanceLoop(&ysrcinfo, &ysrc),
+		   advanceLoop(&xsrcinfo, &xsrc) < xsrcinfo.naxes);
+	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(int32_t));
+	  memcpy(ysrcinfo.coords, save, ysrcinfo.ndim*sizeof(int32_t));
+	  xsrc = xsrc0;
+          ysrc = ysrc0;
+	  xmean /= n;
+          ymean /= n;
+	  cov = 0.0;
+	  do {
+	    xtemp = ((double) *xsrc.q - xmean);
+            ytemp = ((double) *ysrc.q - ymean);
+	    cov += xtemp*ytemp;
+	  } while ((done = (advanceLoop(&ysrcinfo, &ysrc),
+			    advanceLoop(&xsrcinfo, &xsrc))) < xsrcinfo.naxes);
+	  switch (outtype) {
+	    case LUX_FLOAT:
+	      *trgt.f++ = (float) (cov/n2);
+	      break;
+	    case LUX_DOUBLE:
+	      *trgt.d++ = (cov/n2);
+	      break;
+	  }
+	} while (done < xsrcinfo.rndim);
+        break;
       case LUX_FLOAT:
 	do {
 	  xmean = 0.0;
@@ -1285,7 +1438,7 @@ int32_t lux_covariance(int32_t narg, int32_t ps[])
         break;
     }
   }
-  
+
   switch (outtype) {
   case LUX_FLOAT:
     lastmean.f = xmean;
@@ -1514,6 +1667,42 @@ int32_t sdev(int32_t narg, int32_t ps[], int32_t sq)
 	  }
 	} while (done < srcinfo.rndim);
 	break;
+      case LUX_INT64:
+	do {
+	  mean = 0.0;
+	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(int32_t));
+	  src0 = src;
+	  weight0 = weight;
+	  nn = 0;
+	  do {
+	    mean += (double) *src.q * *weight.q;
+	    nn += (double) *weight.q;
+	  }
+	  while (advanceLoop(&winfo, &weight),
+		 advanceLoop(&srcinfo, &src) < srcinfo.naxes);
+	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(int32_t));
+	  src = src0;
+	  weight = weight0;
+	  mean /= (nn? nn: 1);
+	  sdev = 0.0;
+	  do {
+	    temp = ((double) *src.q - mean);
+	    sdev += temp*temp* *weight.q;
+	  } while ((done = (advanceLoop(&winfo, &weight),
+			    advanceLoop(&srcinfo, &src))) < srcinfo.naxes);
+	  if (!nn)
+	    nn = 1;
+	  sdev /= nn;
+	  switch (outtype) {
+	    case LUX_FLOAT:
+	      *trgt.f++ = (float) sdev;
+	      break;
+	    case LUX_DOUBLE:
+	      *trgt.d++ = sdev;
+	      break;
+	  }
+	} while (done < srcinfo.rndim);
+	break;
       case LUX_FLOAT:
 	do {
 	  mean = 0.0;
@@ -1663,6 +1852,32 @@ int32_t sdev(int32_t narg, int32_t ps[], int32_t sq)
 	  sdev = 0.0;
 	  do {
 	    temp = ((double) *src.l - mean);
+	    sdev += temp*temp;
+	  } while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+	  switch (outtype) {
+	    case LUX_FLOAT:
+	      *trgt.f++ = (float) (sdev/n2);
+	      break;
+	    case LUX_DOUBLE:
+	      *trgt.d++ = (sdev/n2);
+	      break;
+	  }
+	} while (done < srcinfo.rndim);
+	break;
+      case LUX_INT64:
+	do {
+	  mean = 0.0;
+	  memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(int32_t));
+	  src0 = src;
+	  do
+	    mean += (double) *src.q;
+	  while (advanceLoop(&srcinfo, &src) < srcinfo.naxes);
+	  memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(int32_t));
+	  src = src0;
+	  mean /= n;
+	  sdev = 0.0;
+	  do {
+	    temp = ((double) *src.q - mean);
 	    sdev += temp*temp;
 	  } while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 	  switch (outtype) {
@@ -2697,7 +2912,7 @@ int32_t lux_gsmooth(int32_t narg, int32_t ps[])
 	    if (internalMode & 4) /* /BALANCED */
 	      i2 += 2;		/* add new points in pairs */
 	    else 		/* unbalanced */
-	      if (i2 < nx) 
+	      if (i2 < nx)
 		i2++;		/* add one more */
 	  }
 	  /* zone 2 */
@@ -2761,6 +2976,100 @@ int32_t lux_gsmooth(int32_t narg, int32_t ps[])
 	    }
 	  }
 	  src.l += nx*stride;
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+	break;
+      case LUX_INT64:
+	do {		/* main loop */
+	  /* zone 1: left edge */
+	  ik = n2;		/* index into kernel */
+	  if (internalMode & 4) {/* /BALANCED */
+	    k = (nx < ng)? (nx + 1)/2: n2; /* # calculations */
+	    i2 = 1;		/* number of points to sum */
+	  } else {		/* not balanced */
+	    k = n2 + (nx < ng);
+	    i2 = n2;
+	  }
+	  for (j = 0; j < k; j++) {
+	    sum = sumg = 0.0;
+	    pt3 = gkern.f + ik; /* pointer into kernel */
+	    pt1.q = src.q;	/* pointer into source */
+	    n = i2;
+	    while (n--) {
+	      sum += *pt1.q * *pt3;
+	      pt1.q += stride;
+	      sumg += *pt3++;
+	    }
+	    *trgt.f = sum / ((internalMode & 2)? gsum: sumg);
+	    trgt.f += stride;
+	    ik--;
+	    if (internalMode & 4) /* /BALANCED */
+	      i2 += 2;		/* add new points in pairs */
+	    else 		/* unbalanced */
+	      if (i2 < nx)
+		i2++;		/* add one more */
+	  }
+	  /* zone 2 */
+	  k = nx + 1 - ng;	/* number of calculations in zone 2 */
+	  for (j = 0; j < k; j++) {
+	    sum = 0.0;
+	    pt1.q = src.q + stride*j; /* pointer into source */
+	    pt3 = gkern.f;	/* pointer to start of kernel */
+	    n = ng;
+	    while (n--) {
+	      sum += (float) *pt1.q * *pt3++;
+	      pt1.q += stride;
+	    }
+	    *trgt.f = sum / gsum;
+	    trgt.f += stride;
+	  }
+	  /* zone 3: right edge */
+	  if (internalMode & 4) { /* /BALANCED */
+	    if (nx < ng) {
+	      k = nx/2;
+	      ik = (ng - nx)/2 + 1;
+	      id = 2 - (nx % 2 == 0);
+	      i2 = nx - 1 - (nx % 2 == 1);
+	    } else {
+	      k = n2;
+	      ik = 1;
+	      id = nx - ng + 2;
+	      i2 = ng - 2;
+	    }
+	  } else {		/* unbalanced */
+	    ik = 0;
+	    if (nx < ng) {
+	      k = nx - n2 - 1;
+	      id = 1;
+	      i2 = nx - 1;
+	    } else {
+	      k = n2;
+	      id = nx - ng + 1;
+	      i2 = ng - 1;
+	    }
+	  }
+	  for (j = 0; j < k; j++) {
+	    sum = sumg = 0.0;
+	    pt1.q = src.q + id*stride; /* pointer into source */
+	    pt3 = gkern.f + ik;	/* pointer into kernel */
+	    n = i2;
+	    while (n--) {
+	      sum += *pt1.q * *pt3;
+	      pt1.q += stride;
+	      sumg += *pt3++;
+	    }
+	    *trgt.f = sum / ((internalMode & 2)? gsum: sumg);
+	    trgt.f += stride;
+	    if (internalMode & 4) { /* /BALANCED */
+	      id += 2;
+	      i2 -= 2;
+	      ik++;
+	    } else {		/* unbalanced */
+	      id++;
+	      i2--;
+	    }
+	  }
+	  src.q += nx*stride;
 	} while (advanceLoop(&trgtinfo, &trgt),
 		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
@@ -3324,6 +3633,9 @@ int32_t lux_string(int32_t narg, int32_t ps[])
 	case LUX_INT32:
 	  value.l = scalar_value(ps[0]).l;
 	  break;
+	case LUX_INT64:
+	  value.q = scalar_value(ps[0]).q;
+	  break;
 	case LUX_FLOAT:
 	  value.d = scalar_value(ps[0]).f;
 	  break;
@@ -3336,6 +3648,9 @@ int32_t lux_string(int32_t narg, int32_t ps[])
       switch (scalar_type(ps[0])) {
 	case LUX_INT8: case LUX_INT16: case LUX_INT32:
 	  sprintf(curScrat, fmt_integer, value.l);
+	  break;
+	case LUX_INT64:
+	  sprintf(curScrat, fmt_integer, value.q);
 	  break;
 	case LUX_FLOAT: case LUX_DOUBLE:
 	  sprintf(curScrat, fmt_float, value.d);
@@ -4148,7 +4463,7 @@ void ksmooth(loopInfo *srcinfo, loopInfo *trgtinfo, float *kernel, int32_t nkern
 	ncalc = (nx + 1)/2;
 	if (ncalc > n2 + 1)
 	  ncalc = n2 + 1;
-	npoints = 1;	
+	npoints = 1;
       } else {
 	ncalc = n2 + 1;
 	if (ncalc > nx)
@@ -4231,6 +4546,112 @@ void ksmooth(loopInfo *srcinfo, loopInfo *trgtinfo, float *kernel, int32_t nkern
 	  norm = 0.0;
 	  while (np--) {
 	    sum += src.l[di]*kernel[ki];
+	    norm += kernel[ki];
+	    di += stride;
+	    ki += stride;
+	  }
+	  *trgt.f = norm? sum/norm: 0;
+	  trgt.f += stride;
+	  if (internalMode & 1) {
+	    dataindex += 2;
+	    kernelindex += stride;
+	    npoints -= 2;
+	  } else {
+	    dataindex += stride;
+	    npoints--;
+	  }
+	}
+      }
+      break;
+    case LUX_INT64:
+      /* zone 1: starts with dataindex 0 */
+      if (internalMode & 1) {	/* /BALANCED */
+	ncalc = (nx + 1)/2;
+	if (ncalc > n2 + 1)
+	  ncalc = n2 + 1;
+	npoints = 1;
+      } else {
+	ncalc = n2 + 1;
+	if (ncalc > nx)
+	  ncalc = nx;
+	npoints = ncalc;
+      }
+      dataindex = 0;
+      kernelindex = n2*stride;
+      while (ncalc--) {
+	np = npoints;
+	sum = 0.0;
+	norm = 0;
+	di = dataindex;
+	ki = kernelindex;
+	while (np--) {
+	  sum += src.q[di]*kernel[ki];
+	  norm += kernel[ki];
+	  di += stride;
+	  ki += stride;
+	}
+	*trgt.f = norm? sum/norm: 0;
+	trgt.f += stride;
+	if (kernelindex)
+	  kernelindex -= stride;
+	if (internalMode & 1)
+	  npoints += 2;
+	else if (npoints < nx)
+	  npoints++;
+      }
+      /* zone2: data covers whole kernel */
+      if (nx > nkernel) {
+	ncalc = nx - nkernel;
+	dataindex = stride;
+	kernelindex = 0;
+	npoints = nkernel;
+	norm = 0;
+	for (i = 0; i < npoints; i++)
+	  norm += kernel[i];
+	norm = norm? 1.0/norm: 0;
+	while (ncalc--) {
+	  np = npoints;
+	  di = dataindex;
+	  ki = kernelindex;
+	  sum = 0.0;
+	  while (np--) {
+	    sum += src.q[di]*kernel[ki];
+	    di += stride;
+	    ki += stride;
+	  }
+	  *trgt.f = sum*norm;
+	  trgt.f += stride;
+	  dataindex += stride;
+	}
+      }
+      /* zone 3: through last data element */
+      if (nx > nkernel - 3) {
+	if (internalMode & 1) {
+	  ncalc = nx/2;
+	  if (ncalc > n2)
+	    ncalc = n2;
+	  npoints = 2*ncalc - 1;
+	  dataindex = (nx - 2*ncalc + 1)*stride;
+	  kernelindex = (n2 - ncalc + 1)*stride;
+	} else {
+	  ncalc = n2;
+	  if (ncalc > nx - 4)
+	    ncalc = nx - 4;
+	  dataindex = nx - nkernel + 1;
+	  if (dataindex < 1)
+	    dataindex = 1;
+	  dataindex *= stride;
+	  kernelindex = 0;
+	  npoints = nkernel - 1;
+	}
+	while (ncalc--) {
+	  np = npoints;
+	  di = dataindex;
+	  ki = kernelindex;
+	  sum = 0.0;
+	  norm = 0.0;
+	  while (np--) {
+	    sum += src.q[di]*kernel[ki];
 	    norm += kernel[ki];
 	    di += stride;
 	    ki += stride;
@@ -4636,6 +5057,35 @@ int32_t lux_crosscorr(int32_t narg, int32_t ps[])
 	do {
 	  tempx = ((double) *src1.l - meanx);
 	  tempy = ((double) *src2.l - meany);
+	  kx += tempx*tempx;
+	  ky += tempy*tempy;
+	  pxy += tempx*tempy;
+	} while ((done = (advanceLoop(&srcinfo2, &src2),
+			  advanceLoop(&srcinfo1, &src1))) < srcinfo1.naxes);
+	tempx = kx*ky;
+	*trgt.f++ = tempx? pxy/sqrt(tempx): 0.0;
+      } while (done < srcinfo1.rndim);
+      break;
+    case LUX_INT64:
+      do {
+	meanx = meany = 0.0;
+	memcpy(save, srcinfo1.coords, srcinfo1.ndim*sizeof(int32_t));
+	src1save = src1;
+	src2save = src2;
+	do {
+	  meanx += (double) *src1.q;
+	  meany += (double) *src2.q;
+	} while (advanceLoop(&srcinfo2, &src2),
+		 advanceLoop(&srcinfo1, &src1) < srcinfo1.naxes);
+	memcpy(srcinfo1.coords, save, srcinfo1.ndim*sizeof(int32_t));
+	src1 = src1save;
+	src2 = src2save;
+	meanx /= n;
+	meany /= n;
+	pxy = kx = ky = 0.0;
+	do {
+	  tempx = ((double) *src1.q - meanx);
+	  tempy = ((double) *src2.q - meany);
 	  kx += tempx*tempx;
 	  ky += tempy*tempy;
 	  pxy += tempx*tempy;

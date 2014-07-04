@@ -369,6 +369,10 @@ float averag(void *m, int32_t nxa, int32_t nxb, int32_t nya, int32_t nyb, int32_
 	for (i = nxc; i < nxd; i++)
 	  sumx += gx[i]*p.l[i + jj];
 	break;
+      case LUX_INT64:
+	for (i = nxc; i < nxd; i++)
+	  sumx += gx[i]*p.q[i + jj];
+	break;
       case LUX_FLOAT:
 	for (i = nxc; i < nxd; i++)
 	  sumx += gx[i]*p.f[i + jj];
@@ -511,6 +515,25 @@ float resid(int32_t *m1, int32_t *m2, int32_t idx, int32_t idy, int32_t nxa, int
         sum += (*p2++) * sumx;
         m1p.l += ny;
 	m2p.l += ny;
+	j--;
+      }
+      break;
+    case LUX_INT64:
+      while (j) {
+	i = nx;
+	p1 = ps;
+	sumx = 0.0;
+        while (i) {
+	  t = ((float) *m1p.q++) - ((float) *m2p.q++);
+	  t = t + bs;
+	  t = t*t;
+	  t = MIN(t, ndmx2);
+	  sumx += (*p1++) * t;
+	  i--;
+	}
+        sum += (*p2++) * sumx;
+        m1p.q += ny;
+	m2p.q += ny;
 	j--;
       }
       break;
@@ -756,7 +779,22 @@ int32_t lux_stretch(int32_t narg, int32_t ps[])/* stretch function */
 		    + c3 * *(bb.l+i3) + c4 * *(bb.l+i4));
 	  *out.l++ = xq;
 	  break;
-	case 3:
+	case LUX_INT64:
+	  bb.q = base.q+iq;
+	  xq = b1*(c1 * *(bb.q) + c2 * *(bb.q+i2)
+		   + c3 * *(bb.q+i3) + c4 * *(bb.q+i4));
+	  bb.q += j2;
+	  xq += b2*(c1 * *(bb.q) + c2 * *(bb.q+i2)
+		    + c3 * *(bb.q+i3) + c4 * *(bb.q+i4));
+	  bb.q += j3;
+	  xq += b3*(c1 * *(bb.q) + c2 * *(bb.q+i2)
+		    + c3 * *(bb.q+i3) + c4 * *(bb.q+i4));
+	  bb.q += j4;
+	  xq += b4*(c1 * *(bb.q) + c2 * *(bb.q+i2)
+		    + c3 * *(bb.q+i3) + c4 * *(bb.q+i4));
+	  *out.q++ = xq;
+	  break;
+	case LUX_FLOAT:
 	  bb.f = base.f+iq;
 	  xq = b1*(c1 * *(bb.f) + c2 * *(bb.f+i2)
 		   + c3 * *(bb.f+i3) + c4 * *(bb.f+i4));
@@ -771,7 +809,7 @@ int32_t lux_stretch(int32_t narg, int32_t ps[])/* stretch function */
 		    + c3 * *(bb.f+i3) + c4 * *(bb.f+i4));
 	  *out.f++ = xq;
 	  break;
-	case 4:
+	case LUX_DOUBLE:
 	  bb.d = base.d+iq;
 	  xq = b1*(c1 * *(bb.d) + c2 * *(bb.d+i2)
 		   + c3 * *(bb.d+i3) + c4 * *(bb.d+i4));
@@ -1315,6 +1353,9 @@ void bicubic_fc()	/* internal routine for single pixel */
 	  case LUX_INT32:
 	    *out.l++ = 0;
 	    break;
+	  case LUX_INT64:
+	    *out.q++ = 0;
+	    break;
 	  case LUX_FLOAT:
 	    *out.f++ = 0;
 	    break;
@@ -1368,6 +1409,9 @@ void bicubic_fc()	/* internal routine for single pixel */
 	    break;
 	  case LUX_INT32:
 	    *out.l++ = 0;
+	    break;
+	  case LUX_INT64:
+	    *out.q++ = 0;
 	    break;
 	  case LUX_FLOAT:
 	    *out.f++ = 0;
@@ -1444,6 +1488,18 @@ void bicubic_fc()	/* internal routine for single pixel */
       xq += b4*(c1*bb.l[0] + c2*bb.l[i2]+ c3*bb.l[i3] + c4*bb.l[i4]);
       /* also we need to round rather than truncate, taking that extra care */
       *out.l++ = rint(xq);
+      break;
+    case LUX_INT64:
+      bb.q = base.q+iq;
+      xq = b1*(c1*bb.q[0] + c2*bb.q[i2]+ c3*bb.q[i3] + c4*bb.q[i4]);
+      bb.q += j2;
+      xq += b2*(c1*bb.q[0] + c2*bb.q[i2]+ c3*bb.q[i3] + c4*bb.q[i4]);
+      bb.q += j3;
+      xq += b3*(c1*bb.q[0] + c2*bb.q[i2]+ c3*bb.q[i3] + c4*bb.q[i4]);
+      bb.q += j4;
+      xq += b4*(c1*bb.q[0] + c2*bb.q[i2]+ c3*bb.q[i3] + c4*bb.q[i4]);
+      /* also we need to round rather than truncate, taking that extra care */
+      *out.q++ = rint(xq);
       break;
     case LUX_FLOAT:
       bb.f = base.f+iq;
@@ -1651,6 +1707,16 @@ int32_t regrid_common(int32_t narg, int32_t ps[])/* with branches for type */
 		    *out.l++ = 0;
 		  else
 		    *out.l++ = *(base.l + (int32_t) xl + n * (int32_t) yl);
+		  xl += xinc;
+		  yl += yinc;
+		}
+		break;
+	      case LUX_INT64:
+		while (ic--) {
+		  if (xl < 0 || xl >= fn || yl < 0 || yl >= fm)
+		    *out.q++ = 0;
+		  else
+		    *out.q++ = *(base.q + (int32_t) xl + n * (int32_t) yl);
 		  xl += xinc;
 		  yl += yinc;
 		}
@@ -1941,6 +2007,20 @@ int32_t lux_compress(int32_t narg, int32_t ps[])
 	  offset += srcinfo.rsinglestep[i]*trgtinfo.coords[i]*div[srcinfo.raxes[i]];
       } while (n < trgtinfo.rndim);
       break;
+    case LUX_INT64:
+      do {
+	sum.q = 0;
+	do
+	  sum.q += src.q[offset];
+	while (advanceLoop(&tmpinfo, &src) < tmpinfo.rndim);
+	*trgt.q = sum.q/nel;
+	src.q = tmpinfo.data0;
+	n = advanceLoop(&trgtinfo, &trgt);
+	offset = 0;
+	for (i = 0; i < trgtinfo.ndim; i++)
+	  offset += srcinfo.rsinglestep[i]*trgtinfo.coords[i]*div[srcinfo.raxes[i]];
+      } while (n < trgtinfo.rndim);
+      break;
     case LUX_FLOAT:
       do {
 	sum.d = 0;
@@ -2029,21 +2109,32 @@ int32_t lux_oldcompress(int32_t narg, int32_t ps[]) /* compress function */
 	q1.w +=  nxx * cy; }
       break;
     case LUX_INT32:
-      while (ny--) 
+      while (ny--)
       {	base.l = q1.l;  iq = nx;
 	while (iq--)
-	{ p.l = base.l; xq = 0.0;  
+	{ p.l = base.l; xq = 0.0;
 	  for (j=0;j<cy;j++)
 	  { for (i=0;i<cx;i++) xq += *p.l++; p.l += n; }
 	  *q2.l++ = (int32_t) ( xq * fac );
 	  base.l += cx; }
 	q1.l +=  nxx * cy; }
       break;
+    case LUX_INT64:
+      while (ny--)
+      {	base.q = q1.q;  iq = nx;
+	while (iq--)
+	{ p.q = base.q; xq = 0.0;
+	  for (j=0;j<cy;j++)
+	  { for (i=0;i<cx;i++) xq += *p.q++; p.q += n; }
+	  *q2.q++ = xq * fac;
+	  base.q += cx; }
+	q1.q +=  nxx * cy; }
+      break;
     case LUX_FLOAT:
       while (ny--)
       {	base.f = q1.f;  iq = nx;
 	while (iq--)
-	{ p.f = base.f; xq = 0.0;  
+	{ p.f = base.f; xq = 0.0;
 	  for (j=0;j<cy;j++)
 	  { for (i=0;i<cx;i++) xq += *p.f++; p.f += n; }
 	  *q2.f++ =  ( xq * fac );
@@ -2936,7 +3027,7 @@ void shift_bicubic(float dx, int32_t nx, int32_t ny, int32_t inc, int32_t dline,
 	z3 = (float) *(p + i3);	z4 = (float) *(p + i4);
 	p = p + i4;
 	nz2 = nzone2;  nz3 = nzone3;  nz4 = nzone4;
-	
+
 	if (nz2) {
 	  yq = c1*z1 +c2*z2 + c3*z3 + c4*z4;
 	  *q = (int32_t) yq;
@@ -2958,6 +3049,42 @@ void shift_bicubic(float dx, int32_t nx, int32_t ny, int32_t inc, int32_t dline,
 	  q = q + inc;
 	}
 	while (nz4--) { *q = (int32_t) z4;  q = q + inc; }
+      }
+    }
+     break;
+    case LUX_INT64:
+    {
+      double	z4, z1, z2, z3, yq;
+      int64_t	*p, *q;
+      for (k=0;k<ny;k++) {
+	p = base.q + k*dline + rflag;
+	q = out.q  + k*dline + rflag;
+	z1 = *(p + i1);	z2 = *(p + i2);
+	z3 = *(p + i3);	z4 = *(p + i4);
+	p = p + i4;
+	nz2 = nzone2;  nz3 = nzone3;  nz4 = nzone4;
+
+	if (nz2) {
+	  yq = c1*z1 +c2*z2 + c3*z3 + c4*z4;
+	  *q = yq;
+	  q = q + inc;
+	  nz2--;
+	  while (nz2--) {
+	    p = p + inc;
+	    z1 = z2;  z2 = z3;  z3 = z4;
+	    z4 = *p;
+	    yq = c1*z1 +c2*z2 + c3*z3 + c4*z4;
+	    *q = yq;
+	    q = q + inc;
+	  }
+	}
+	if (nz3) {
+	  z1 = z2;  z2 = z3;  z3 = z4;
+	  yq = c1*z1 +c2*z2 + c3*z3 + c4*z4;
+	  *q = yq;
+	  q = q + inc;
+	}
+	while (nz4--) { *q = z4;  q = q + inc; }
       }
     }
      break;
@@ -3161,6 +3288,16 @@ void interpolate(void *srcv, int32_t type, float xsrc, float ysrc, int32_t nsx,
 	       + px3*src.l[i + nsx + 1] + px4*src.l[i + nsx + 2])
 	+ py4*(px1*src.l[i + 2*nsx - 1] + px2*src.l[i + 2*nsx]
 	       + px3*src.l[i + 2*nsx + 1] + px4*src.l[i + 2*nsx + 2]);
+      break;
+    case LUX_INT64:
+      *trgt.q = py1*(px1*src.q[i - nsx - 1] + px2*src.q[i - nsx]
+		     + px3*src.q[i - nsx + 1] + px4*src.q[i - nsx + 2])
+	+ py2*(px1*src.q[i - 1] + px2*src.q[i] + px3*src.q[i + 1]
+	       + px4*src.q[i + 2])
+	+ py3*(px1*src.q[i + nsx - 1] + px2*src.q[i + nsx]
+	       + px3*src.q[i + nsx + 1] + px4*src.q[i + nsx + 2])
+	+ py4*(px1*src.q[i + 2*nsx - 1] + px2*src.q[i + 2*nsx]
+	       + px3*src.q[i + 2*nsx + 1] + px4*src.q[i + 2*nsx + 2]);
       break;
     case LUX_FLOAT:
       *trgt.f = py1*(px1*src.f[i - nsx - 1] + px2*src.f[i - nsx]

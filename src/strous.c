@@ -102,6 +102,15 @@ int32_t lux_distr(int32_t narg, int32_t ps[])
      bin++;
    }
    break;
+ case LUX_INT64:
+   while (n--) {
+     if (*bin >= 0 && *bin < ntarget)
+       target.q[*bin] += *value.q++;
+     else
+       nout++;
+     bin++;
+   }
+   break;
  case LUX_FLOAT:
    while (n--) {
      if (*bin >= 0 && *bin < ntarget)
@@ -204,6 +213,12 @@ int32_t lux_distr_f(int32_t narg, int32_t ps[])
 	res.b[i] += *arg2.b++;
       }
       break;
+    case LUX_INT64:
+      while (n--) {
+	i = *arg1.q++ - histmin;
+	res.b[i] += *arg2.b++;
+      }
+      break;
     case LUX_FLOAT:
       while (n--) {
 	i = *arg1.f++ - histmin;
@@ -235,6 +250,12 @@ int32_t lux_distr_f(int32_t narg, int32_t ps[])
     case LUX_INT32:
       while (n--) {
 	i = *arg1.l++ - histmin;
+	res.w[i] += *arg2.w++;
+      }
+      break;
+    case LUX_INT64:
+      while (n--) {
+	i = *arg1.q++ - histmin;
 	res.w[i] += *arg2.w++;
       }
       break;
@@ -272,6 +293,12 @@ int32_t lux_distr_f(int32_t narg, int32_t ps[])
 	res.l[i] += *arg2.l++;
       }
       break;
+    case LUX_INT64:
+      while (n--) {
+	i = *arg1.q++ - histmin;
+	res.l[i] += *arg2.l++;
+      }
+      break;
     case LUX_FLOAT:
       while (n--) {
 	i = *arg1.f++ - histmin;
@@ -282,6 +309,46 @@ int32_t lux_distr_f(int32_t narg, int32_t ps[])
       while (n--) {
 	i = *arg1.d++ - histmin;
 	res.l[i] += *arg2.l++;
+      }
+      break;
+    }
+    break;
+  case LUX_INT64:
+    switch (type) {
+    case LUX_INT8:
+      while (n--) {
+	i = *arg1.b++ - histmin;
+	res.q[i] += *arg2.q++;
+      }
+      break;
+    case LUX_INT16:
+      while (n--) {
+	i = *arg1.w++ - histmin;
+	res.q[i] += *arg2.q++;
+      }
+      break;
+    case LUX_INT32:
+      while (n--) {
+	i = *arg1.l++ - histmin;
+	res.q[i] += *arg2.q++;
+      }
+      break;
+    case LUX_INT64:
+      while (n--) {
+	i = *arg1.q++ - histmin;
+	res.q[i] += *arg2.q++;
+      }
+      break;
+    case LUX_FLOAT:
+      while (n--) {
+	i = *arg1.f++ - histmin;
+	res.q[i] += *arg2.q++;
+      }
+      break;
+    case LUX_DOUBLE:
+      while (n--) {
+	i = *arg1.d++ - histmin;
+	res.q[i] += *arg2.q++;
       }
       break;
     }
@@ -303,6 +370,12 @@ int32_t lux_distr_f(int32_t narg, int32_t ps[])
     case LUX_INT32:
       while (n--) {
 	i = *arg1.l++ - histmin;
+	res.f[i] += *arg2.f++;
+      }
+      break;
+    case LUX_INT64:
+      while (n--) {
+	i = *arg1.q++ - histmin;
 	res.f[i] += *arg2.f++;
       }
       break;
@@ -337,6 +410,12 @@ int32_t lux_distr_f(int32_t narg, int32_t ps[])
     case LUX_INT32:
       while (n--) {
 	i = *arg1.l++ - histmin;
+	res.d[i] += *arg2.d++;
+      }
+      break;
+    case LUX_INT64:
+      while (n--) {
+	i = *arg1.q++ - histmin;
 	res.d[i] += *arg2.d++;
       }
       break;
@@ -469,6 +548,8 @@ int32_t lux_find(int32_t narg, int32_t ps[])
       iq = lux_word(1, &iq);  break;
     case LUX_INT32:
       iq = lux_long(1, &iq);  break;
+    case LUX_INT64:
+      iq = lux_int64(1, &iq);  break;
     case LUX_FLOAT:
       iq = lux_float(1, &iq);  break;
     case LUX_DOUBLE: 
@@ -528,6 +609,9 @@ int32_t lux_find(int32_t narg, int32_t ps[])
 	    case LUX_INT32:
 	      for (ar.l += offset; n && *(ar.l++) != *key.l; n--);
 	      if (n) index = ar.l - base.l; break;
+	    case LUX_INT64:
+	      for (ar.q += offset; n && *(ar.q++) != *key.q; n--);
+	      if (n) index = ar.q - base.q; break;
 	    case LUX_FLOAT:
 	      for (ar.f += offset; n && *(ar.f++) != *key.f; n--);
 	      if (n) index = ar.f - base.f; break;
@@ -546,6 +630,9 @@ int32_t lux_find(int32_t narg, int32_t ps[])
 	    case LUX_INT32:
 	      for (ar.l += offset; n && *(ar.l++) < *key.l; n--);
 	      if (n) index = ar.l - base.l; break;
+	    case LUX_INT64:
+	      for (ar.q += offset; n && *(ar.q++) < *key.q; n--);
+	      if (n) index = ar.q - base.q; break;
 	    case LUX_FLOAT:
 	      for (ar.f += offset; n && *(ar.f++) < *key.f; n--);
 	      if (n) index = ar.f - base.f; break;
@@ -562,11 +649,13 @@ int32_t lux_find(int32_t narg, int32_t ps[])
 	  *indx.w++ = (indx.w)? *(base.w+index-1): -1; break;
 	case LUX_INT32:
 	  *indx.l++ = (indx.l)? *(base.l+index-1): -1; break;
+	case LUX_INT64:
+	  *indx.q++ = (indx.q)? *(base.q+index-1): -1; break;
 	case LUX_FLOAT:
 	  *indx.f++ = (indx.f)? *(base.f+index-1): -1; break;
 	case LUX_DOUBLE:
 	  *indx.d++ = (indx.d)? *(base.d+index-1): -1; break; }
-      if (noff > 1) off.l++; 
+      if (noff > 1) off.l++;
     }	/* end of while (loop--) */
     base.b += nar*step;
   } /* end of while (nRepeat--) */
@@ -632,6 +721,15 @@ int32_t lux_find2(int32_t narg, int32_t ps[])
           break;
       *target.l++ = (j == data_count? -1: j);
       keys.l++;
+    }
+    break;
+  case LUX_INT64:
+    for (i = 0; i < keys_count; i++) {
+      for (j = 0; j < data_count; j++)
+        if (*keys.q == data.q[j])
+          break;
+      *target.q++ = (j == data_count? -1: j);
+      keys.q++;
     }
     break;
   case LUX_FLOAT:
@@ -971,6 +1069,39 @@ int32_t lux_differ(int32_t narg, int32_t ps[])
 	} while (advanceLoop(&trgtinfo, &trgt),
 		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
+      case LUX_INT64:
+	do {
+	  /* do the left edge */
+	  if (o > 0 || old) {
+	    if (circular)
+	      for (i = 0; i < w1 - old; i++) {
+		*trgt.q = *src.q - src.q[offset3];
+		trgt.q += stride;
+	      }
+	    else
+	      for (i = 0; i < w1 - old; i++) {
+		*trgt.q = 0;	/* zeros */
+		trgt.q += stride;
+	      }
+	    src.q -= offset1;
+	  } else
+	    for (i = 0; i < ww; i++) {
+	      *trgt.q = *src.q; /* original values */
+	      trgt.q += stride;
+	      src.q += stride;
+	    }
+	  for (i = ww; i < srcinfo.rdims[0]; i++) { /* middle part */
+	    *trgt.q = *src.q - src.q[offset1];
+	    src.q += stride;
+	    trgt.q += stride;
+	  }
+	  for (i = w1; i < ww; i++) { /* right edge */
+	    *trgt.q = 0;	/* zeros */
+	    trgt.q += stride;
+	  }
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+	break;
       case LUX_FLOAT:
 	do {
 	  /* do the left edge */
@@ -1195,6 +1326,113 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	  } while (done < srcinfo.rndim);
 	  break; }
       break;
+    case LUX_INT64:
+      switch (type) {
+	case LUX_INT8:
+	  do {
+	    i1 = -*width.l/2;
+	    i2 = i1 + *width.l;
+	    if (i1 + srcinfo.coords[axis] < 0) {
+	      i1 = -srcinfo.coords[axis];
+	      if (internalMode & 1) /* /FW_EDGE_NEIGHBOR */
+		i2 = i1 + *width.l; }
+	    if (i2 + srcinfo.coords[axis] > srcinfo.dims[axis])
+	    { i2 = srcinfo.dims[axis] - srcinfo.coords[axis];
+	      if (internalMode & 1 /* /FW_EDGE_NEIGHBOR */
+		  && *width.l <= srcinfo.dims[axis]) /* not wider than data */
+		i1 = i2 - *width.l; }
+	    i1 *= step;
+	    i2 *= step;
+	    sum.q = 0.0;
+	    for (i = i1; i < i2; i += step)
+	      sum.q += src.b[i];
+	    *trgt.q = sum.q;
+	    done = advanceLoop(&trgtinfo, &trgt),
+	      advanceLoop(&srcinfo, &src);
+	    width.l++;
+	    if (done == widthNDim)	/* done with indicated axis */
+	      width.l = width0.l;
+	  } while (done < srcinfo.rndim);
+	  break;
+	case LUX_INT16:
+	  do {
+	    i1 = -*width.l/2;
+	    i2 = i1 + *width.l;
+	    if (i1 + srcinfo.coords[axis] < 0) {
+	      i1 = -srcinfo.coords[axis];
+	      if (internalMode & 1) /* /FW_EDGE_NEIGHBOR */
+		i2 = i1 + *width.l; }
+	    if (i2 + srcinfo.coords[axis] > srcinfo.dims[axis])
+	    { i2 = srcinfo.dims[axis] - srcinfo.coords[axis];
+	      if (internalMode & 1 /* /FW_EDGE_NEIGHBOR */
+		  && *width.l <= srcinfo.dims[axis]) /* not wider than data */
+		i1 = i2 - *width.l; }
+	    i1 *= step;
+	    i2 *= step;
+	    sum.q = 0.0;
+	    for (i = i1; i < i2; i += step)
+	      sum.q += src.w[i];
+	    *trgt.q = sum.q;
+	    done = advanceLoop(&trgtinfo, &trgt),
+	      advanceLoop(&srcinfo, &src);
+	    width.l++;
+	    if (done == widthNDim)	/* done with indicated axis */
+	      width.l = width0.l;
+	  } while (done < srcinfo.rndim);
+	  break;
+	case LUX_INT32:
+	  do {
+	    i1 = -*width.l/2;
+	    i2 = i1 + *width.l;
+	    if (i1 + srcinfo.coords[axis] < 0) {
+	      i1 = -srcinfo.coords[axis];
+	      if (internalMode & 1) /* /FW_EDGE_NEIGHBOR */
+		i2 = i1 + *width.l; }
+	    if (i2 + srcinfo.coords[axis] > srcinfo.dims[axis])
+	    { i2 = srcinfo.dims[axis] - srcinfo.coords[axis];
+	      if (internalMode & 1 /* /FW_EDGE_NEIGHBOR */
+		  && *width.l <= srcinfo.dims[axis]) /* not wider than data */
+		i1 = i2 - *width.l; }
+	    i1 *= step;
+	    i2 *= step;
+	    sum.q = 0.0;
+	    for (i = i1; i < i2; i += step)
+	      sum.q += src.l[i];
+	    *trgt.q = sum.q;
+	    done = advanceLoop(&trgtinfo, &trgt),
+	      advanceLoop(&srcinfo, &src);
+	    width.l++;
+	    if (done == widthNDim)	/* done with indicated axis */
+	      width.l = width0.l;
+	  } while (done < srcinfo.rndim);
+	  break;
+	case LUX_INT64:
+	  do {
+	    i1 = -*width.l/2;
+	    i2 = i1 + *width.l;
+	    if (i1 + srcinfo.coords[axis] < 0) {
+	      i1 = -srcinfo.coords[axis];
+	      if (internalMode & 1) /* /FW_EDGE_NEIGHBOR */
+		i2 = i1 + *width.l; }
+	    if (i2 + srcinfo.coords[axis] > srcinfo.dims[axis])
+	    { i2 = srcinfo.dims[axis] - srcinfo.coords[axis];
+	      if (internalMode & 1 /* /FW_EDGE_NEIGHBOR */
+		  && *width.l <= srcinfo.dims[axis]) /* not wider than data */
+		i1 = i2 - *width.l; }
+	    i1 *= step;
+	    i2 *= step;
+	    sum.q = 0.0;
+	    for (i = i1; i < i2; i += step)
+	      sum.q += src.q[i];
+	    *trgt.q = sum.q;
+	    done = advanceLoop(&trgtinfo, &trgt),
+	      advanceLoop(&srcinfo, &src);
+	    width.l++;
+	    if (done == widthNDim)	/* done with indicated axis */
+	      width.l = width0.l;
+	  } while (done < srcinfo.rndim);
+	  break; }
+      break;
     case LUX_FLOAT:
       switch (type) {
 	case LUX_INT8:
@@ -1270,6 +1508,33 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	    weight = cumul? 1: (i2 - i1)/step;
 	    for (i = i1; i < i2; i += step)
 	      sum.f += (float) src.l[i];
+	    *trgt.f = sum.f/weight;
+	    done = advanceLoop(&trgtinfo, &trgt),
+	      advanceLoop(&srcinfo, &src);
+	    width.l++;
+	    if (done == widthNDim)	/* done with indicated axis */
+	      width.l = width0.l;
+	  } while (done < srcinfo.rndim);
+	  break;
+	case LUX_INT64:
+	  do {
+	    i1 = -*width.l/2;
+	    i2 = i1 + *width.l;
+	    if (i1 + srcinfo.coords[axis] < 0) {
+	      i1 = -srcinfo.coords[axis];
+	      if (internalMode & 1) /* /FW_EDGE_NEIGHBOR */
+		i2 = i1 + *width.l; }
+	    if (i2 + srcinfo.coords[axis] > srcinfo.dims[axis])
+	    { i2 = srcinfo.dims[axis] - srcinfo.coords[axis];
+	      if (internalMode & 1 /* /FW_EDGE_NEIGHBOR */
+		  && *width.l <= srcinfo.dims[axis]) /* not wider than data */
+		i1 = i2 - *width.l; }
+	    i1 *= step;
+	    i2 *= step;
+	    sum.f = 0.0;
+	    weight = cumul? 1: (i2 - i1)/step;
+	    for (i = i1; i < i2; i += step)
+	      sum.f += (float) src.q[i];
 	    *trgt.f = sum.f/weight;
 	    done = advanceLoop(&trgtinfo, &trgt),
 	      advanceLoop(&srcinfo, &src);
@@ -1381,6 +1646,33 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	    weight = cumul? 1: (i2 - i1)/step;
 	    for (i = i1; i < i2; i += step)
 	      sum.d += (double) src.l[i];
+	    *trgt.d = sum.d/weight;
+	    done = advanceLoop(&trgtinfo, &trgt),
+	      advanceLoop(&srcinfo, &src);
+	    width.l++;
+	    if (done == widthNDim)	/* done with indicated axis */
+	      width.l = width0.l;
+	  } while (done < srcinfo.rndim);
+	  break;
+	case LUX_INT64:
+	  do {
+	    i1 = -*width.l/2;
+	    i2 = i1 + *width.l;
+	    if (i1 + srcinfo.coords[axis] < 0) {
+	      i1 = -srcinfo.coords[axis];
+	      if (internalMode & 1) /* /FW_EDGE_NEIGHBOR */
+		i2 = i1 + *width.l; }
+	    if (i2 + srcinfo.coords[axis] > srcinfo.dims[axis])
+	    { i2 = srcinfo.dims[axis] - srcinfo.coords[axis];
+	      if (internalMode & 1 /* /FW_EDGE_NEIGHBOR */
+		  && *width.l <= srcinfo.dims[axis]) /* not wider than data */
+		i1 = i2 - *width.l; }
+	    i1 *= step;
+	    i2 *= step;
+	    sum.d = 0.0;
+	    weight = cumul? 1: (i2 - i1)/step;
+	    for (i = i1; i < i2; i += step)
+	      sum.d += (double) src.q[i];
 	    *trgt.d = sum.d/weight;
 	    done = advanceLoop(&trgtinfo, &trgt),
 	      advanceLoop(&srcinfo, &src);
@@ -1797,6 +2089,80 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
 	} while (advanceLoop(&trgtinfo, &trgt),
 		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
 	break;
+      case LUX_INT64:
+	do {
+	  value.q = 0;		  /* initialize */
+	  /* left-hand edge */
+	  if (internalMode & 1) { /* /PARTIAL_WIDTH */
+	    norm = cumul? ww: 0;
+	    if (ww%2) {		/* odd width */
+	      value.q += *src.q;
+	      src.q += stride;
+	      if (!cumul)
+		++norm;
+	      *trgt.q = value.q/norm;
+	      trgt.q += stride;
+	      i = 1;
+	    } else
+	      i = 0;
+	    for ( ; i < w1; i++) {
+	      value.q += *src.q;
+	      src.q += stride;
+	      value.q += *src.q;
+	      src.q += stride;
+	      if (!cumul)
+		norm += 2;
+	      *trgt.q = value.q/norm;
+	      trgt.q += stride;
+	    }
+	  } else {		/* full width */
+	    for (i = 0; i < ww; i++) { /* do the left edge */
+	      value.q += *src.q;
+	      src.q += stride;
+	    }
+	    int32_t v = value.q/norm;
+	    for (i = 0; i < w1; i++) {
+	      *trgt.q = v;
+	      trgt.q += stride;
+	    }
+	  }
+	  /* middle part */
+	  for ( ; i < w2; i++) {
+	    value.q += *src.q - src.q[offset];
+	    src.q += stride;
+	    *trgt.q = value.q/norm;
+	    trgt.q += stride;
+	  }
+	  /* right-hand edge */
+	  if (internalMode & 1) { /* /PARTIAL_WIDTH */
+	    for ( ; i < srcinfo.rdims[0] - !(ww%2); i++) {
+	      value.q -= src.q[offset];
+	      offset += stride;
+	      value.q -= src.q[offset];
+	      offset += stride;
+	      if (!cumul)
+		norm -= 2;
+	      *trgt.q = value.q/norm;
+	      trgt.q += stride;
+	    }
+	    if (!(ww%2)) {
+	      value.q -= src.q[offset];
+	      offset += stride;
+	      if (!cumul)
+		--norm;
+	      *trgt.q = value.q/norm;
+	      trgt.q += stride;
+	    }
+	  } else {
+	    int32_t v = value.q/norm;
+	    for ( ; i < srcinfo.rdims[0]; i++) { /* right edge */
+	      *trgt.q = v;
+	      trgt.q += stride;
+	    }
+	  }
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+	break;
       case LUX_FLOAT:
 	/* we use the Kahan algorithm to limit roundoff error */
 	do {
@@ -2003,6 +2369,10 @@ int32_t pcmp(const void *arg1, const void *arg2)
       d1.l = pcmp_ptr.l[*(int32_t *) arg1];
       d2.l = pcmp_ptr.l[*(int32_t *) arg2];
       return d1.l < d2.l? -1: (d1.l > d2.l? 1: 0);
+    case LUX_INT64:
+      d1.q = pcmp_ptr.q[*(int32_t *) arg1];
+      d2.q = pcmp_ptr.q[*(int32_t *) arg2];
+      return d1.q < d2.q? -1: (d1.q > d2.q? 1: 0);
     case LUX_FLOAT:
       d1.f = pcmp_ptr.f[*(int32_t *) arg1];
       d2.f = pcmp_ptr.f[*(int32_t *) arg2];
@@ -2034,6 +2404,10 @@ int32_t pcmp2(const void *arg1, const void *arg2)
       d1.l = *(int32_t *) arg1;
       d2.l = pcmp_ptr.l[*(int32_t *) arg2];
       return d1.l < d2.l? -1: (d1.l > d2.l? 1: 0);
+    case LUX_INT64:
+      d1.q = *(int64_t *) arg1;
+      d2.q = pcmp_ptr.q[*(int32_t *) arg2];
+      return d1.q < d2.q? -1: (d1.q > d2.q? 1: 0);
     case LUX_FLOAT:
       d1.f = *(float *) arg1;
       d2.f = pcmp_ptr.f[*(int32_t *) arg2];
@@ -2121,6 +2495,7 @@ int32_t lux_not(int32_t narg, int32_t ps[])
  { case LUX_INT8:    while (narg--) *result.b++ = (*arg.b++)? 0: 1;  break;
    case LUX_INT16:    while (narg--) *result.b++ = (*arg.w++)? 0: 1;  break;
    case LUX_INT32:    while (narg--) *result.b++ = (*arg.l++)? 0: 1;  break;
+   case LUX_INT64:    while (narg--) *result.b++ = (*arg.q++)? 0: 1;  break;
    case LUX_FLOAT:   while (narg--) *result.b++ = (*arg.f++)? 0: 1;  break;
    case LUX_DOUBLE:  while (narg--) *result.b++ = (*arg.d++)? 0: 1;  break; }
  return iq;
@@ -2867,6 +3242,14 @@ int32_t local_maxormin(int32_t narg, int32_t ps[], int32_t code)
 	     nextValue.l = value.l;
 	   }
 	   break;
+	 case LUX_INT64:
+	   if (!filemap)
+	     value.q = data.q[comparisonIndex];
+	   if ((max)? value.q > nextValue.q: value.q < nextValue.q) {
+	     nextIndex = comparisonIndex;
+	     nextValue.q = value.q;
+	   }
+	   break;
 	 case LUX_FLOAT:
 	   if (!filemap)
 	     value.f = data.f[comparisonIndex];
@@ -3159,6 +3542,80 @@ int32_t local_maxormin(int32_t narg, int32_t ps[], int32_t code)
 	       }
 	   }
 	   break;
+	 case LUX_INT64:
+	   /* calculate gradient and hessian matrix */
+	   if (!filemap) {
+	     extr.q = &data.q[currentIndex];
+	     v = (float) *extr.q;
+	     for (i = 0; i < ndim; i++)
+	       grad[i] = grad2[i] = ((float) extr.q[size[i]]
+				     - (float) extr.q[-size[i]])/2;
+	     ready = 1;		/* zero gradient? */
+	     for (i = 0; i < ndim; i++) {
+	       if (grad[i] != 0) {
+		 ready = 0;
+		 break;
+	       }
+	     }
+	     if (ready)
+	       break;
+	     for (i = 0; i < ndim; i++)
+	       for (j = 0; j <= i; j++) {
+		 if (i == j)
+		   hessian[i + i*ndim] = hessian2[i] =
+		     (float) extr.q[size[i]] + (float) extr.q[-size[i]] - 2*v;
+		 else {
+		   x = ((float) extr.q[size[i] + size[j]]
+			+ (float) extr.q[-size[i] - size[j]]
+			- (float) extr.q[size[i] - size[j]]
+			- (float) extr.q[size[j] - size[i]])/4;
+		   hessian[i + j*ndim] = hessian[j + i*ndim] = x;
+		 }
+	       }
+	   } else {		/* filemap array */
+	     readGhost(fp, value.q, currentIndex, typesize);
+	     v = (float) value.q;
+	     for (i = 0; i < ndim; i++) {
+	       readGhost(fp, value.q, currentIndex + size[i], typesize);
+	       grad[i] = (float) value.q;
+	       readGhost(fp, value.q, currentIndex - size[i], typesize);
+	       grad[i] = (grad[i] - (float) value.q)/2;
+	     }
+	     ready = 1;		/* zero gradient? */
+	     for (i = 0; i < ndim; i++) {
+	       if (grad[i] != 0) {
+		 ready = 0;
+		 break;
+	       }
+	     }
+	     if (ready)
+	       break;
+	     for (i = 0; i < ndim; i++)
+	       for (j = 0; j <= i; j++) {
+		 if (i == j) {
+		   readGhost(fp, value.q, currentIndex + size[i], typesize);
+		   x = (float) value.q;
+		   readGhost(fp, value.q, currentIndex - size[i], typesize);
+		   hessian[i + i*ndim] = hessian2[i] =
+		     x + (float) value.q - 2*v;
+		 } else {
+		   readGhost(fp, value.q, currentIndex + size[i] + size[j],
+			     typesize);
+		   x = (float) value.q;
+		   readGhost(fp, value.q, currentIndex - size[i] - size[j],
+			     typesize);
+		   x += (float) value.q;
+		   readGhost(fp, value.q, currentIndex + size[i] - size[j],
+			     typesize);
+		   x -= (float) value.q;
+		   readGhost(fp, value.q, currentIndex - size[i] + size[j],
+			     typesize);
+		   x -= (float) value.q;
+		   hessian[i + j*ndim] = hessian[j + i*ndim] = x/4;
+		 }
+	       }
+	   }
+	   break;
 	 case LUX_FLOAT:
 	   /* calculate gradient and hessian matrix */
 	   if (!filemap) {
@@ -3366,6 +3823,9 @@ int32_t local_maxormin(int32_t narg, int32_t ps[], int32_t code)
        case LUX_INT32:
 	 *trgt.f++ = (float) nextValue.l;
 	 break;
+       case LUX_INT64:
+	 *trgt.f++ = (float) nextValue.q;
+	 break;
        case LUX_FLOAT:
 	 *trgt.f++ = (float) nextValue.f;
 	 break;
@@ -3383,6 +3843,9 @@ int32_t local_maxormin(int32_t narg, int32_t ps[], int32_t code)
 	 break;
        case LUX_INT32:
 	 *trgt.l++ = nextValue.l;
+	 break;
+       case LUX_INT64:
+	 *trgt.q++ = nextValue.q;
 	 break;
        case LUX_FLOAT:
 	 *trgt.f++ = nextValue.f;
@@ -3508,6 +3971,12 @@ int32_t lux_zinv(int32_t narg, int32_t ps[])
        data.l++;
      }
      break;
+   case LUX_INT64:
+     while (n--) {
+       *target.f++ = *data.q? 1.0/ *data.q: 0.0;
+       data.q++;
+     }
+     break;
    case LUX_FLOAT:
      while (n--) {
        *target.f++ = *data.f? 1.0/ *data.f: 0.0;
@@ -3614,6 +4083,21 @@ int32_t lux_find_maxloc_old(int32_t narg, int32_t ps[])
            fwrite(&indx, sizeof(int32_t), 1, fp);  num++; }
          data.l++; }
        data.l += 2; }
+     break;
+   case LUX_INT64:
+     data.q += nx + 1;
+     row = ny - 2;
+     while (row--)
+     { column = nx - 2;
+       while (column--)
+       { if ((this.q = *data.q) >= data.q[-1] && this.q > data.q[1]
+           && this.q >= data.q[-nx] && this.q > data.q[nx]
+           && this.q >= data.q[-1-nx] && this.q > data.q[-1+nx]
+           && this.q >= data.q[1-nx] && this.q > data.q[1+nx])
+         { indx = data.q - data_start.q;
+           fwrite(&indx, sizeof(int32_t), 1, fp);  num++; }
+         data.q++; }
+       data.q += 2; }
      break;
    case LUX_FLOAT:
      data.f += nx + 1;

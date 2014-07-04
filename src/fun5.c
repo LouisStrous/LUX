@@ -1015,6 +1015,24 @@ int32_t lux_dilate(int32_t narg, int32_t ps[])
       }
       memcpy(out.l, data.l, nx*lux_type_size[type]); /* top row: just copy */
       break;
+    case LUX_INT64:
+      n = nx;
+      while (n--)
+        *out.l++ = *data.q++;
+      ny -= 2;
+      while (ny--) {
+	*out.l++ = *data.q++;	/* left edge: just copy */
+	n = nx - 2;
+	while (n--) {
+	  *out.l++ = (*data.q || data.q[1] || data.q[1 + nx] || data.q[nx]
+		      || data.q[nx - 1] || data.q[-1] || data.q[-1 - nx]
+		      || data.q[-nx] || data.q[-nx + 1]);
+	  data.q++;
+	}
+	*out.l++ = *data.q++;	/* right edge: just copy */
+      }
+      memcpy(out.q, data.q, nx*lux_type_size[type]); /* top row: just copy */
+      break;
     case LUX_FLOAT:
       n = nx;
       while (n--)
@@ -1176,6 +1194,37 @@ int32_t lux_erode(int32_t narg, int32_t ps[])
       else
 	while (n--)
 	  *out.l++ = (*data.l++ != 0);
+      break;
+    case LUX_INT64:
+      n = nx;
+      if (zeroedge) {
+	while (n--)
+	  *out.l++ = 0;
+	data.q += nx;
+      } else
+	while (n--)
+	  *out.l++ = (*data.q++ != 0);
+      ny -= 2;
+      while (ny--) {
+	*out.l++ = zeroedge? 0: (*data.q != 0); /* left edge */
+	data.q++;
+	n = nx - 2;
+	while (n--) {
+	  *out.l++ = (*data.q && data.q[1] && data.q[1 + nx] && data.q[nx]
+		      && data.q[nx - 1] && data.q[-1] && data.q[-1 - nx]
+		      && data.q[-nx] && data.q[-nx + 1]);
+	  data.q++;
+	}
+	*out.l++ = zeroedge? 0: (*data.q != 0); /* right edge */
+	data.q++;
+      }
+      n = nx;
+      if (zeroedge)
+	while (n--)
+	  *out.l++ = 0;
+      else
+	while (n--)
+	  *out.l++ = (*data.q++ != 0);
       break;
     case LUX_FLOAT:
       n = nx;

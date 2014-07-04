@@ -4140,6 +4140,7 @@ int32_t lux_trace(int32_t narg, int32_t ps[])
 #define cf_fix(name, re, im) { fixedValue(name, LUX_CFLOAT, re, im); nFixed++; }
 #define cd_fix(name, re, im) { fixedValue(name, LUX_DFLOAT, re, im); nFixed++; }
 #define l_ptr(name, value) installPointer(name, LUX_INT32, value)
+#define q_ptr(name, value) installPointer(name, LUX_INT64, value)
 #define f_ptr(name, value) installPointer(name, LUX_FLOAT, value)
 #define d_ptr(name, value) installPointer(name, LUX_DOUBLE, value)
 #define s_ptr(name, value) installPointer(name, LUX_TEMP_STRING, value)
@@ -4160,7 +4161,7 @@ int32_t range_warn_flag = 0, redim_warn_flag = 0, error_extra = 0,
 float	contour_dash_lev, contour_tick_fac = 0.5, *p3d;
 scalar	lastmin, lastmax, lastmean, lastsdev;
 extern int32_t	lunplt, landscape, iorder, ilabx, ilaby, irxf, iryf, ndx,
-        ndxs, nd, ndys, ifz, ifzx, ier, ifont, ndlabx, ndlaby, 
+        ndxs, nd, ndys, ifz, ifzx, ier, ifont, ndlabx, ndlaby,
         ndot, ipltyp, iblank, maxregridsize, nExecuted,
         kb, nArg, ixhigh, iyhigh,
         tvsmt, badmatch, fstepx, fstepy,
@@ -4231,6 +4232,7 @@ enumElem	typesStruct[] = {
   { "BYTE", LUX_INT8 },
   { "WORD", LUX_INT16 },
   { "LONG", LUX_INT32 },
+  { "INT64", LUX_INT64 },
   { "FLOAT", LUX_FLOAT },
   { "DOUBLE", LUX_DOUBLE },
   { "STRING", LUX_TEMP_STRING },
@@ -4444,7 +4446,7 @@ void symbolInitialization(void)
  enum_list(stackSym) = typesStruct;
  symbol_memory(stackSym) = sizeof(typesStruct);
  nFixed++;
- 
+
 #if DEVELOP
  iq = installString("#P3D");
  projectSym = findVar(iq, 0);
@@ -4967,7 +4969,7 @@ int32_t lux_symbol_number(int32_t narg, int32_t ps[])
      /* returns the symbol number of the argument */
 {
   int32_t	result;
-  
+
   result = scalar_scratch(LUX_INT32);
   sym[result].spec.scalar.l = *ps;
   return result;

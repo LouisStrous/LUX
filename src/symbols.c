@@ -690,7 +690,7 @@ int32_t lux_floor(int32_t narg, int32_t ps[])
  if (!symbolIsNumerical(iq)	/* not numerical */
      && !symbolIsStringScalar(iq))	/* and not a string either */
    return cerror(ILL_CLASS, iq); /* reject */
- if (symbol_type(iq) == LUX_INT32) /* if it's already BYTE then we're done */
+ if (isIntegerType(symbol_type(iq))) /* if it's already integer then we're done */
    return iq;
  temp = (isFreeTemp(iq))? 1: 0;
  type = symbol_type(iq);	/* gotta store now because "result" may */
@@ -808,7 +808,7 @@ int32_t lux_ceil(int32_t narg, int32_t ps[])
  if (!symbolIsNumerical(iq)	/* not numerical */
      && !symbolIsStringScalar(iq))	/* and not a string either */
    return cerror(ILL_CLASS, iq); /* reject */
- if (symbol_type(iq) == LUX_INT32) /* if it's already BYTE then we're done */
+ if (isIntegerType(symbol_type(iq))) /* if it's already integer then we're done */
    return iq;
  temp = (isFreeTemp(iq))? 1: 0;
  type = symbol_type(iq);	/* gotta store now because "result" may */

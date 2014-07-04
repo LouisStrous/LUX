@@ -861,6 +861,9 @@ int32_t lux_fitskey(int32_t narg, int32_t ps[])
 	case LUX_INT32:
 	  scalar_value(iq).l = value.l;
 	  break;
+	case LUX_INT64:
+	  scalar_value(iq).q = value.l;
+	  break;
 	case LUX_FLOAT:
 	  scalar_value(iq).f = (float) value.d;
 	  break;
@@ -1814,6 +1817,12 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
 	    x1 = (double) *gx.l++ - ix;
 	    y1 = (double) *gy.l++ - iy;
 	    break;
+	  case LUX_INT64:
+	    ix = (int32_t) *gx.q;	/* x pixel coordinate */
+	    iy = (int32_t) *gy.q;	/* y pixel coordinate */
+	    x1 = (double) *gx.q++ - ix;
+	    y1 = (double) *gy.q++ - iy;
+	    break;
 	  case LUX_FLOAT:
 	    ix = (int32_t) *gx.f;	/* x pixel coordinate */
 	    iy = (int32_t) *gy.f;	/* y pixel coordinate */
@@ -1850,6 +1859,10 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
 	case LUX_INT32:
 	  vx = (double) vx0.l[index*dv]; /* x velocity */
 	  vy = (double) vy0.l[index*dv]; /* y velocity */
+	  break;
+	case LUX_INT64:
+	  vx = (double) vx0.q[index*dv]; /* x velocity */
+	  vy = (double) vy0.q[index*dv]; /* y velocity */
 	  break;
 	case LUX_FLOAT:
 	  vx = (double) vx0.f[index*dv]; /* x velocity */
@@ -1945,6 +1958,10 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
 	    vx = (double) vx0.l[index*dv];
 	    vy = (double) vy0.l[index*dv];
 	    break;
+	  case LUX_INT64:
+	    vx = (double) vx0.q[index*dv];
+	    vy = (double) vy0.q[index*dv];
+	    break;
 	  case LUX_FLOAT:
 	    vx = (double) vx0.f[index*dv];
 	    vy = (double) vy0.f[index*dv];
@@ -1971,6 +1988,10 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
 	case LUX_INT32:
 	  *ox.l++ = ix + x2;
 	  *oy.l++ = iy + y2;
+	  break;
+	case LUX_INT64:
+	  *ox.q++ = ix + x2;
+	  *oy.q++ = iy + y2;
 	  break;
 	case LUX_FLOAT:
 	  *ox.f++ = ix + x2;
@@ -2278,6 +2299,14 @@ int32_t lux_hamming(int32_t narg, int32_t ps[]) {
         }
         *tgt.l++ = dist;
         break;
+      case LUX_INT64:
+        val = *src.q++;
+        while (val) {
+          ++dist;
+          val &= val - 1;
+        }
+        *tgt.l++ = dist;
+        break;
       }
     }
   } else {
@@ -2308,6 +2337,16 @@ int32_t lux_hamming(int32_t narg, int32_t ps[]) {
         val = *src.l++ ^ *src2.l;
         if (nr2isarray)
           src2.l++;
+        while (val) {
+          ++dist;
+          val &= val - 1;
+        }
+        *tgt.l++ = dist;
+        break;
+      case LUX_INT64:
+        val = *src.q++ ^ *src2.q;
+        if (nr2isarray)
+          src2.q++;
         while (val) {
           ++dist;
           val &= val - 1;

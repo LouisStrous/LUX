@@ -1594,6 +1594,10 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
         p_spec.data_type = LUX_INT32;
         fmt++;
         break;
+      case 'Q':
+        p_spec.data_type = LUX_INT64;
+        fmt++;
+        break;
       case 'F':
         p_spec.data_type = LUX_FLOAT;
         fmt++;
@@ -1915,6 +1919,7 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
     - ‘B’ = LUX_INT8
     - ‘W’ = LUX_INT16
     - ‘L’ = LUX_INT32
+    - 'Q' = LUX_INT64
     - ‘F’ = LUX_FLOAT
     - ‘D’ = LUX_DOUBLE
     - ‘S’ = LUX_STRING

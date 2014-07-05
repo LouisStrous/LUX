@@ -646,6 +646,11 @@ int32_t lux_d_dT6_iLaDaD1T3rDq_0z1T4_5_f_(int32_t narg, int32_t ps[], double (*f
       *ptrs[5].d++ = f((double) *ptrs[0].l++, 0.0, *ptrs[1].d, *ptrs[2].d,
                        *ptrs[3].d, *ptrs[4].d);
     break;
+  case LUX_INT64:
+    while (infos[0].nelem--)
+      *ptrs[5].d++ = f((double) *ptrs[0].q++, 0.0, *ptrs[1].d, *ptrs[2].d,
+                       *ptrs[3].d, *ptrs[4].d);
+    break;
   case LUX_FLOAT:
     while (infos[0].nelem--)
       *ptrs[5].d++ = f((double) *ptrs[0].f++, 0.0, *ptrs[1].d, *ptrs[2].d,
@@ -653,13 +658,13 @@ int32_t lux_d_dT6_iLaDaD1T3rDq_0z1T4_5_f_(int32_t narg, int32_t ps[], double (*f
     break;
   case LUX_DOUBLE:
     while (infos[0].nelem--)
-      *ptrs[5].d++ = f(*ptrs[0].d++, 0.0, *ptrs[1].d, *ptrs[2].d, 
+      *ptrs[5].d++ = f(*ptrs[0].d++, 0.0, *ptrs[1].d, *ptrs[2].d,
                        *ptrs[3].d, *ptrs[4].d);
     break;
   default:
     break;
   }
-  return iq;  
+  return iq;
 }
 /*-----------------------------------------------------------------------*/
 int32_t lux_i_ddidp3_iDaL1rDp3p2q_0z12_f_(int32_t narg, int32_t ps[], int32_t (*f)(double, double, int32_t, double (*)[3]))
@@ -693,6 +698,13 @@ int32_t lux_i_dddp3dp3_iLaoDp2p3qT2_0z12_s_(int32_t narg, int32_t ps[], int32_t 
   case LUX_INT32:
     while (infos[0].nelem--) {
       f((double) *ptrs[0].l++, 0.0, pvh, pvb);
+      pvh += 2;
+      pvb += 2;
+    }
+    break;
+  case LUX_INT64:
+    while (infos[0].nelem--) {
+      f((double) *ptrs[0].q++, 0.0, pvh, pvb);
       pvh += 2;
       pvb += 2;
     }
@@ -824,6 +836,10 @@ int32_t lux_d_dT4_iLaDaDarDq_0z12_f_(int32_t narg, int32_t ps[], double (*f)(dou
     while (infos[1].nelem--)
       *ptrs[3].d++ = f((double) *ptrs[0].l++, 0.0, *ptrs[1].d++, *ptrs[2].d++);
     break;
+  case LUX_INT64:
+    while (infos[1].nelem--)
+      *ptrs[3].d++ = f((double) *ptrs[0].q++, 0.0, *ptrs[1].d++, *ptrs[2].d++);
+    break;
   case LUX_FLOAT:
     while (infos[1].nelem--)
       *ptrs[3].d++ = f((double) *ptrs[0].f++, 0.0, *ptrs[1].d++, *ptrs[2].d++);
@@ -889,7 +905,15 @@ int32_t lux_v_dddp3T3_iLaoD33oDp3p3qDcq_0z1T3_s_(int32_t narg, int32_t ps[], voi
       ptrs[3].d += 9;
     }
     break;
-  case LUX_FLOAT: 
+  case LUX_INT64:
+    while (infos[0].nelem--) {
+      f((double) *ptrs[0].q++, 0.0, (double (*)[3]) ptrs[1].d,
+        (double (*)[3]) ptrs[2].d, (double (*)[3]) ptrs[3].d);
+      ptrs[2].d += 9;
+      ptrs[3].d += 9;
+    }
+    break;
+  case LUX_FLOAT:
     while (infos[0].nelem--) {
       f((double) *ptrs[0].f++, 0.0, (double (*)[3]) ptrs[1].d,
         (double (*)[3]) ptrs[2].d, (double (*)[3]) ptrs[3].d);
@@ -991,11 +1015,25 @@ int32_t lux_iddipT3dp_iLarDp3q_0z1111_f_(int32_t narg, int32_t ps[], int32_t (*f
 
   if ((iq = standard_args(narg, ps, "i>L*;r>D+3&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
-  
+
   switch (infos[0].type) {
   case LUX_INT32:
     while (infos[0].nelem--) {
       if (f((double) *ptrs[0].l++, 0.0, &y, &m, &d, &fd)) {
+        ptrs[1].d[0] = 0.0;
+        ptrs[1].d[1] = 0.0;
+        ptrs[1].d[2] = 0.0;
+      } else {
+        ptrs[1].d[0] = (double) y;
+        ptrs[1].d[1] = (double) m;
+        ptrs[1].d[2] = (double) d + fd;
+      }
+      ptrs[1].d += 3;
+    }
+    break;
+  case LUX_INT64:
+    while (infos[0].nelem--) {
+      if (f((double) *ptrs[0].q++, 0.0, &y, &m, &d, &fd)) {
         ptrs[1].d[0] = 0.0;
         ptrs[1].d[1] = 0.0;
         ptrs[1].d[2] = 0.0;
@@ -1341,7 +1379,7 @@ int32_t lux_v_dddp_iDaDarDp3q_0T2_f_(int32_t narg, int32_t ps[], void (*f)(doubl
 
   if ((iq = standard_args(narg, ps, "i>D*;i>D*;rD+3&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
-  
+
   while (infos[0].nelem--) {
     f(*ptrs[0].d++, *ptrs[1].d++, ptrs[2].d);
     ptrs[2].d += 3;
@@ -1363,6 +1401,10 @@ int32_t lux_d_dd_iLarDq_0z_1_f_(int32_t narg, int32_t ps[], double (*f)(double, 
     while (infos[1].nelem--)
       *ptrs[1].d++ = f((double) *ptrs[0].l++, 0.0);
     break;
+  case LUX_INT64:
+    while (infos[1].nelem--)
+      *ptrs[1].d++ = f((double) *ptrs[0].q++, 0.0);
+    break;
   case LUX_FLOAT:
     while (infos[1].nelem--)
       *ptrs[1].d++ = f((double) *ptrs[0].f++, 0.0);
@@ -1374,7 +1416,7 @@ int32_t lux_d_dd_iLarDq_0z_1_f_(int32_t narg, int32_t ps[], double (*f)(double, 
   default:
     break;
   }
-  return iq;  
+  return iq;
 }
 /*-----------------------------------------------------------------------*/
 int32_t lux_d_d_iDarDq_0_1_f_(int32_t narg, int32_t ps[], double (*f)(double))

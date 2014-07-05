@@ -31,7 +31,7 @@
 This text documents the LUX data processing language and program,
 version @value{VERSION}, and was last updated on @value{UPDATED}.
 
-@copyright{} 1995-2013 Louis Strous
+@copyright{} 1995-2014 Louis Strous
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.3 or
@@ -394,12 +394,14 @@ Read-Only Global Variables
 * #MAX_DIMS::                   Maximum allowed number of array dimensions
 * #MAX_DOUBLE::                 Greatest value possible in a DOUBLE
 * #MAX_FLOAT::                  Greatest value possible in a FLOAT
+* #MAX_INT64::                  Greatest value possible in an INT64
 * #MAX_LONG::                   Greatest value possible in a LONG
 * #MAX_PIXMAP::                 Greatest pixmap number
 * #MAX_WINDOW::                 Greatest window number
 * #MAX_WORD::                   Greatest value possible in an INT
 * #MIN_DOUBLE::                 Smallest nonzero value possible in a DOUBLE
 * #MIN_FLOAT::                  Smallest nonzero value possible in a FLOAT
+* #MIN_INT64::                  Most negative value possible in an INT64
 * #MIN_LONG::                   Most negative value possible in a LONG
 * #MIN_WORD::                   Most negative value possible in an INT
 * #MINUS1::                     Minus one
@@ -897,6 +899,10 @@ Internal Functions and Subroutines
 * INPOLYGON::                   Determine if points are inside a polygon
 * INSERT::                      Insert data into an array
 * INT::                         Convert to @code{WORD} value by value
+* INT64::                       Convert to @code{INT64} value by value
+* INT64ARR::                    Create an @code{INT64} array
+* INT64FARR::                   Create an @code{INT64} file array
+* INT64MAP::                    Convert to @code{INT64} byte by byte
 * INTARR::                      Create a @code{WORD} array
 * INTFARR::                     Create a @code{WORD} file array
 * IR::                          Identity 3-by-3 matrix
@@ -2328,9 +2334,8 @@ See also: @ref{FPRINT}, @ref{FPRINTF}, @ref{FREAD}, @ref{FREADF},
 The format specifier consists of one character from the following
 list, optionally preceded by a format type modifier (discussed below
 the table).  The C format types @code{c}, @code{n}, @code{u}, and
-@code{p} are not supported.  The format types @code{j}, @code{J},
-@code{S}, @code{t}, @code{T}, and @code{z} are available in LUX but
-not in C.
+@code{p} are not supported.  The format types @code{J}, @code{S},
+@code{t}, @code{T}, and @code{z} are available in LUX but not in C.
 
 @table @code
 @item d
@@ -2338,7 +2343,7 @@ refers to an integer (@code{LONG}) argument.  On ouput, it is
 printed in decimal (base 10) notation.  On input, its base is determined
 from the first character(s): initial @code{0x} or @code{0X} indicate a
 hexadecimal (base 16) number; otherwise initial @code{0} indicates an
-octal (base 8) number; otherwise it's a decimal (base 10) number. 
+octal (base 8) number; otherwise it's a decimal (base 10) number.
 @item i
 refers to an integer (@code{LONG}) argument in decimal (base 10)
 notation.
@@ -2423,9 +2428,10 @@ specified precision applies to each of the two components separately.
 
 @code{d i o x X} specifiers may be directly preceded by an @code{h} to
 indicate a @code{WORD} argument rather than a @code{LONG} argument on
-input.  @code{e E f g G t T z} specifiers may be directly preceded by an
-@code{l} to indicate a @code{DOUBLE} argument rather than a @code{FLOAT}
-argument on input.
+input, or by a @code{j} to indicate a @code{INT64} argument.  @code{e
+E f g G t T z} specifiers may be directly preceded by an @code{l} to
+indicate a @code{DOUBLE} argument rather than a @code{FLOAT} argument
+on input.
 
 If you use a format specifier that is not in this table, then strange
 things may happen.
@@ -2510,7 +2516,7 @@ The meaning of the precision for the various format types is as follows:
 
 @table @code
 @item e, E, f
-the number of digits to be printed after the decimal point. 
+the number of digits to be printed after the decimal point.
 @item g, G
 the number of significant digits to be printed.
 @item z
@@ -2615,7 +2621,7 @@ formats.  For each next argument, the next format entry (if any) will be
 copied into the appropriate format symbol.  A format is maintained until
 the end of the current argument list or until it is superseded by
 another format from the same class (integer, float, or string).
- 
+
 Each argument takes the most recently defined format string that suits
 its data type.
 
@@ -2734,31 +2740,34 @@ available in C.
 @cindex Types of input formats
 @cindex Formats, input types
 
-The format types consist of a single character from the following list. 
+The format types consist of a single character from the following list.
 LUX does not support C types @code{u} (unsigned integer), @code{c}
-(character). 
+(character).
 
 @table @code
 @item d
 Decimal integer.  @code{%hd} generates a @code{WORD}, @code{%ld} and
-@code{%d} generate @code{LONG}s.
+@code{%d} generate @code{LONG}s, @code{%jd} generates a @code{INT64}.
 @item i
 Integer, which may be decimal, octal (leading @code{0}), or hexadecimal
 (leading @code{0x} or @code{0X}).  @code{%hi} generates a @code{WORD},
-@code{%li} and @code{%i} generate @code{LONG}s.
+@code{%li} and @code{%i} generate @code{LONG}s, and @code{%ji}
+generates a @code{INT64}.
 @item o
 Octal integer.  @code{%ho} generates a @code{WORD}, @code{%lo} and
-@code{%o} generate @code{LONG}s.
+@code{%o} generate @code{LONG}s, and @code{%jo} generates a
+@code{INT64}.
 @item x
 Hexadecimal integer.  @code{%hx} generates a @code{WORD}, @code{%lx} and
-@code{%x} generate @code{LONG}s. 
+@code{%x} generate @code{LONG}s, and @code{%jx} generates an
+@code{INT64}.
 @item e, f, g
 Floating-point numbers, consisting of an optional sign, a string of
 numbers containing an optional decimal point, and an optional exponent
 field containing an @code{e} or @code{E} and an optionally signed
 integer exponent.  @code{%e}, @code{%f}, and @code{%g} generate
 @code{FLOAT}s, @code{%le}, @code{%lf}, and @code{%lg} generate
-@code{DOUBLE}s. 
+@code{DOUBLE}s.
 @item s
 A string consisting of the next non-whitespace characters (up to the
 field width).  The result may be shorter than the field width, if
@@ -2945,7 +2954,7 @@ expressions, which is not taken into account in these rules.
 @code{(} @code{subsc_list} @code{)} | @code{tag_list} |
 @code{member_spec} @code{(} @code{subsc_list} @code{)} |
 @code{member_spec} @code{tag_list}
-			
+
 @item lhs:
 @code{var} @code{member_spec} | @code{var}
 
@@ -2986,7 +2995,7 @@ expressions, which is not taken into account in these rules.
 @code{expr} @code{:} @code{expr} | @code{*} @code{-} @code{expr}
 @code{:} @code{*} @code{-} @code{expr} | @code{*} @code{-} @code{expr}
 @code{:} @code{*} | @code{*} @code{-} @code{expr} | @code{*}
-	
+
 @item subsc:
 @code{range} | @code{range} @code{:} @code{+} | @code{range} @code{:}
 @code{>} @code{expr} | @code{+} | @code{>} @code{expr} | @code{expr}
@@ -3340,25 +3349,26 @@ LUX allows specification of complex numbers.
 @cindex WORD value
 @cindex INT value
 @cindex LONG value
+@cindex INT64 value
 @cindex FLOAT value
 @cindex DOUBLE value
 
 LUX offers the following numerical data types:
 @table @code
 @item BYTE
-A @code{BYTE} number requires one byte of storage, and can have any
+A @code{BYTE} number requires 8 bits of storage, and can have any
 integer value between 0 and 255 (@code{#MAX_BYTE} -- @ref{#MAX_BYTE} --
-inclusive). 
+inclusive).
 @ifinfo
 (2^8 - 1),
 @end ifinfo
 @tex
 $2^8-1$,
 @end tex
-inclusive. 
+inclusive.
 
 @item WORD
-A @code{WORD} number requires two bytes of storage, and can have any
+A @code{WORD} number requires 16 bits of storage, and can have any
 integer value between @minus{}32768 (@code{#MIN_WORD} --
 @ref{#MIN_WORD}) and +32767 (@code{#MAX_WORD} -- @ref{#MAX_WORD})
 @ifinfo
@@ -3370,7 +3380,7 @@ integer value between @minus{}32768 (@code{#MIN_WORD} --
 inclusive.
 
 @item LONG
-A @code{LONG} number requires four bytes of storage, and can have any
+A @code{LONG} number requires 32 bits of storage, and can have any
 integer value between @minus{}2147483648 (@code{#MIN_LONG} --
 @ref{#MIN_LONG}) and +2147483647 (@code{#MAX_LONG} -- @ref{#MAX_LONG})
 @ifinfo
@@ -3381,13 +3391,26 @@ integer value between @minus{}2147483648 (@code{#MIN_LONG} --
 @end tex
 inclusive.
 
+@item INT64
+An @code{INT64} number requires 64 bits of storage, and can have any
+integer value between @minus{}9223372036854775808 (@code{#MIN_INT64}
+-- @ref{#MIN_INT64}) and +9223372036854775807 (@code{#MAX_INT64} --
+@ref{#MAX_INT64})
+@ifinfo
+(2^63 - 1),
+@end ifinfo
+@tex
+($2^{63}-1$),
+@end tex
+inclusive.
+
 @item FLOAT
 A @code{FLOAT} number requires four bytes of storage, and has a
 single-precision floating-point value.  The meaning of "single
 precision" depends on the way that floating-point numbers are
 represented inside your computer.  On all computers, these values have
 at least 6 significant digits, and may have a magnitude at least as
-large as 
+large as
 @ifinfo
 10^37
 @end ifinfo
@@ -3500,11 +3523,12 @@ and @kbd{0X3A} all specify the same number in base 16, which is equal to
 By default, an integer number is assumed to have data type @code{LONG}
 (see @ref{Numerical Data Types}).  A non-hexadecimal number can be
 specified to be @code{BYTE} by appending a @code{b} or @code{B} to the
-number.  A number in any base is specified to be of type @code{WORD} by
-appending a @code{w} or @code{W}.  Data type @code{LONG} can be
-specified explicitly by appending an @code{l} or @code{L}.  For example,
-@code{17} and @code{17L} have data type @code{LONG}, @code{17b} is
-@code{BYTE}, and @code{17w} is @code{WORD}.
+number.  A number in any base is specified to be of type @code{WORD}
+by appending a @code{w} or @code{W}.  Data type @code{LONG} can be
+specified explicitly by appending an @code{l} or @code{L}.  Data type
+@code{INT64} is selected by appending a @code{q} or @code{Q}.  For
+example, @code{17} and @code{17L} have data type @code{LONG},
+@code{17b} is @code{BYTE}, and @code{17w} is @code{WORD}.
 
 The data type specification, if any, follows the base specification, if
 any.  The @code{bB} specifier is disallowed for hexadecimal numbers to
@@ -3749,35 +3773,54 @@ as shown in the following example:
 @code{@var{x}} = [ 5, 7, 13.0, 23 ]
 @end example
 
-The data type (see @ref{Numerical Data Types}) of such a numerical array
-is the highest data type present among the elements in its
-specification, in the order @code{BYTE}, @code{WORD}, @code{LONG},
-@code{FLOAT} (@code{CFLOAT}), @code{DOUBLE} (@code{CDOUBLE}).  If any of
-the elements are complex, then the array will be complex, too.  The
-array in the example has data type @code{FLOAT}.
+The data type (see @ref{Numerical Data Types}) of such a numerical
+array is the smallest data type that can store all of the elements
+while (if both integer and floating-point values are present) losing
+as little precision as possible.
+
+For determining the data type of the array, the data types of the
+elements are divided into size classes as follows:
+
+@enumerate 1
+@item
+@code{BYTE}
+@item
+@code{WORD}
+@item
+@code{LONG}, @code{FLOAT}, @code{CFLOAT}
+@item
+@code{INT64}, @code{DOUBLE}, @code{CDOUBLE}
+@end enumerate
+
+The data type of the array is in the greatest size class present among
+its elements.  Moreover, if any of the elements are complex
+(@code{CFLOAT}, @code{CDOUBLE}), then so is the array.  Otherwise, if
+any of the elements are non-complex floating-point (@code{FLOAT},
+@code{DOUBLE}), then so is the array.  Otherwise, the array is
+integer.
 
 One-dimensional string arrays can be specified in the same way as
 numerical arrays are, by combining the string
-components.  For instance, 
+components.  For instance,
 @example
 @code{@var{s}} = ['Jill', 'John', 'Joan', 'Jerry Lee Lewis']
 @end example
 generates a string array with four elements.
 
-Arrays with a specific dimensional structure and data type but elements
-that are not set to any particular value can be created through the
-functions @code{BYTARR}, @code{INTARR}, @code{LONARR}, @code{FLTARR},
-@code{DBLARR}, @code{CFLTARR}, @code{CDBLARR}, @code{STRARR}, and
-@code{ARRAY} (@ref{ARRAY}).  For 
-instance, 
+Arrays with a specific dimensional structure and data type and with
+all of their elements set to zero can be created through the functions
+@code{BYTARR}, @code{INTARR}, @code{LONARR}, @code{INT64ARR},
+@code{FLTARR}, @code{DBLARR}, @code{CFLTARR}, @code{CDBLARR},
+@code{STRARR}, and @code{ARRAY} (@ref{ARRAY}).  For instance,
 @example
 @code{x} = FLTARR(200,100)
 @end example
-creates a @code{FLOAT} array with dimensions 200 by 100, with undefined
-elements; i.e., the elements get whatever values happen to be in the
-memory slots that the elements are assigned to.  You can fill the array
-with specific values through, for instance, the @code{ZERO}, @code{ONE},
-and @code{INDGEN} functions (@ref{ZERO}, @ref{ONE}, @ref{INDGEN}).
+creates a @code{FLOAT} array with dimensions 200 by 100, with
+undefined elements; i.e., the elements get whatever values happen to
+be in the memory slots that the elements are assigned to.  You can
+fill the array with specific values through, for instance, the
+@code{ZERO}, @code{ONE}, and @code{INDGEN} functions (@ref{ZERO},
+@ref{ONE}, @ref{INDGEN}).
 
 It is quite easy to request an array that is so large that not enough
 room for it is available in your computer, or even so large that the
@@ -7074,6 +7117,8 @@ To create a @code{FLOAT} array.
 To create a @code{WORD} array.
 @item @ref{LONARR}
 To create a @code{LONG} array.
+@item @ref{INT64ARR}
+To create a @code{INT64} array.
 @item @ref{READARR}
 To create an array from values entered at the keyboard.
 @item @ref{STRARR}
@@ -7108,6 +7153,8 @@ To create a file array suitable for an FZ file.
 To create a @code{WORD} file array.
 @item @ref{LONFARR}
 To create a @code{LONG} file array.
+@item @ref{INT64FARR}
+To create a @code{INT64} file array.
 @end table
 
 @c ------------------------------------------------------------------
@@ -7603,6 +7650,8 @@ To convert to @code{CFLOAT}.
 To convert to @code{DOUBLE}.
 @item @ref{FMAP}
 To convert to @code{FLOAT}.
+@item @ref{INT64MAP}
+To convert to @code{INT64}.
 @item @ref{LMAP}
 To convert to @code{LONG}.
 @item @ref{SMAP}
@@ -7688,6 +7737,8 @@ To convert to @code{LONG}, by substituting the next-lower integer value
 to a fractional value if necessary.
 @item @ref{INT}
 To convert to @code{WORD}.
+@item @ref{INT64}
+To convert to @code{INT64}.
 @item @ref{LONG}
 To convert to @code{LONG}.
 @item @ref{RFIX}
@@ -8284,11 +8335,17 @@ Create a @code{CFLOAT} file map.
 @item @ref{CFLOAT}
 Convert to @code{CFLOAT}.
 @item @ref{FIX}
+Convert to @code{LONG}.
 @item @ref{FLOAT}
+Convert to @code{FLOAT}.
 @item @ref{FLOOR}
+Next lesser integer.
 @item @ref{INT}
+Convert to @code{WORD}.
 @item @ref{LONG}
+Convert to @code{LONG}.
 @item @ref{WORD}
+Convert to @code{WORD}.
 @end table
 
 @c ------------------------------------------------------------------
@@ -9462,12 +9519,14 @@ everywhere, including inside subroutines and functions.
 * #MAX_DIMS::                   Maximum allowed number of array dimensions
 * #MAX_DOUBLE::                 Greatest value possible in a DOUBLE
 * #MAX_FLOAT::                  Greatest value possible in a FLOAT
+* #MAX_INT64::
 * #MAX_LONG::                   Greatest value possible in a LONG
 * #MAX_PIXMAP::                 Greatest pixmap number
 * #MAX_WINDOW::                 Greatest window number
 * #MAX_WORD::                   Greatest value possible in an INT
 * #MIN_DOUBLE::                 Smallest nonzero value possible in a DOUBLE
 * #MIN_FLOAT::                  Smallest nonzero value possible in a FLOAT
+* #MIN_INT64::
 * #MIN_LONG::                   Most negative value possible in a LONG
 * #MIN_WORD::                   Most negative value possible in an INT
 * #MINUS1::                     Minus one
@@ -9687,8 +9746,8 @@ subroutine or function.
 
 The largest value representable in a variable of type @code{BYTE}.
 
-See also: @ref{#MAX_DOUBLE}, @ref{#MAX_FLOAT}, @ref{#MAX_LONG},
-@ref{#MAX_WORD}, @ref{Numerical Data Types}
+See also: @ref{#MAX_DOUBLE}, @ref{#MAX_INT64}, @ref{#MAX_FLOAT},
+@ref{#MAX_LONG}, @ref{#MAX_WORD}, @ref{Numerical Data Types}
 
 @c --------------------------------------
 @node #MAX_DIMS, #MAX_DOUBLE, #MAX_BYTE, Read-Only Globals
@@ -9709,11 +9768,12 @@ The largest absolute value representable in a variable of type
 @code{DOUBLE}, and in the real and imaginary parts of a variable of type
 @code{CDOUBLE}.
 
-See also: @ref{#MAX_BYTE}, @ref{#MAX_FLOAT}, @ref{#MAX_LONG},
-@ref{#MAX_WORD}, @ref{#MIN_DOUBLE}, @ref{Numerical Data Types}
+See also: @ref{#MAX_BYTE}, @ref{#MAX_FLOAT}, @ref{#MAX_INT64},
+@ref{#MAX_LONG}, @ref{#MAX_WORD}, @ref{#MIN_DOUBLE}, @ref{Numerical
+Data Types}
 
 @c --------------------------------------
-@node #MAX_FLOAT, #MAX_LONG, #MAX_DOUBLE, Read-Only Globals
+@node #MAX_FLOAT, #MAX_INT64, #MAX_DOUBLE, Read-Only Globals
 @comment  node-name,  next,  previous,  up
 @subsection #MAX_FLOAT
 
@@ -9721,18 +9781,30 @@ The largest absolute value representable in a variable of type
 @code{FLOAT}, and in the real and imaginary parts of a variable of type
 @code{CFLOAT}.
 
-See also: @ref{#MAX_BYTE}, @ref{#MAX_DOUBLE}, @ref{#MAX_LONG},
-@ref{#MAX_WORD}, @ref{#MIN_FLOAT}, @ref{Numerical Data Types}
+See also: @ref{#MAX_BYTE}, @ref{#MAX_DOUBLE}, @ref{#MAX_INT64},
+@ref{#MAX_LONG}, @ref{#MAX_WORD}, @ref{#MIN_FLOAT}, @ref{Numerical
+Data Types}
 
 @c --------------------------------------
-@node #MAX_LONG, #MAX_PIXMAP, #MAX_FLOAT, Read-Only Globals
+@node #MAX_INT64, #MAX_LONG, #MAX_FLOAT, Read-Only Globals
+@comment  node-name,  next,  previous,  up
+@subsection #MAX_INT64
+
+The largest value representable in a variable of type @code{INT64}.
+
+See also: @ref{#MAX_DOUBLE}, @ref{#MAX_BYTE}, @ref{#MAX_FLOAT},
+@ref{#MAX_LONG}, @ref{#MAX_WORD}, @ref{Numerical Data Types}
+
+@c --------------------------------------
+@node #MAX_LONG, #MAX_PIXMAP, #MAX_INT64, Read-Only Globals
 @comment  node-name,  next,  previous,  up
 @subsection #MAX_LONG
 
 The largest value representable in a variable of type @code{LONG}.
 
 See also: @ref{#MAX_BYTE}, @ref{#MAX_DOUBLE}, @ref{#MAX_FLOAT},
-@ref{#MAX_WORD}, @ref{#MIN_LONG}, @ref{Numerical Data Types}
+@ref{#MAX_INT64}, @ref{#MAX_WORD}, @ref{#MIN_LONG}, @ref{Numerical
+Data Types}
 
 @c --------------------------------------
 @node #MAX_PIXMAP, #MAX_WINDOW, #MAX_LONG, Read-Only Globals
@@ -9743,7 +9815,6 @@ The greatest (positive integer) allowed pixmap number.
 
 See also: @ref{XPORT}, @ref{#MAX_WINDOW}
 
-[3.2.28]
 @c --------------------------------------
 @node #MAX_WINDOW, #MAX_WORD, #MAX_PIXMAP, Read-Only Globals
 @comment  node-name,  next,  previous,  up
@@ -9753,7 +9824,6 @@ The greatest (positive integer) allowed window number.
 
 See also: @ref{XPORT}, @ref{#MAX_PIXMAP}
 
-[3.2.28]
 @c --------------------------------------
 @node #MAX_WORD, #MIN_DOUBLE, #MAX_WINDOW, Read-Only Globals
 @comment  node-name,  next,  previous,  up
@@ -9762,7 +9832,8 @@ See also: @ref{XPORT}, @ref{#MAX_PIXMAP}
 The largest value representable in a variable of type @code{WORD}.
 
 See also: @ref{#MAX_BYTE}, @ref{#MAX_DOUBLE}, @ref{#MAX_FLOAT},
-@ref{#MAX_LONG}, @ref{#MIN_WORD}, @ref{Numerical Data Types}
+@ref{#MAX_INT64}, @ref{#MAX_LONG}, @ref{#MIN_WORD}, @ref{Numerical
+Data Types}
 
 @c --------------------------------------
 @node #MIN_DOUBLE, #MIN_FLOAT, #MAX_WORD, Read-Only Globals
@@ -9773,11 +9844,11 @@ The smallest non-zero absolute value representable in a variable of type
 @code{DOUBLE}, and in the real and imaginary parts of a variable of type
 @code{CDOUBLE}.
 
-See also: @ref{#MAX_DOUBLE}, @ref{#MIN_FLOAT}, @ref{#MIN_LONG},
-@ref{#MIN_WORD}, @ref{Numerical Data Types}
+See also: @ref{#MAX_DOUBLE}, @ref{#MIN_FLOAT}, @ref{#MIN_INT64},
+@ref{#MIN_LONG}, @ref{#MIN_WORD}, @ref{Numerical Data Types}
 
 @c --------------------------------------
-@node #MIN_FLOAT, #MIN_LONG, #MIN_DOUBLE, Read-Only Globals
+@node #MIN_FLOAT, #MIN_INT64, #MIN_DOUBLE, Read-Only Globals
 @comment  node-name,  next,  previous,  up
 @subsection #MIN_FLOAT
 
@@ -9785,19 +9856,30 @@ The smallest non-zero absolute value representable in a variable of type
 @code{FLOAT}, and in the real and imaginary parts of a variable of type
 @code{CFLOAT}.
 
-See also: @ref{#MAX_FLOAT}, @ref{#MIN_DOUBLE}, @ref{#MIN_LONG},
-@ref{#MIN_WORD}, @ref{Numerical Data Types}
+See also: @ref{#MAX_FLOAT}, @ref{#MIN_DOUBLE}, @ref{#MIN_INT64},
+@ref{#MIN_LONG}, @ref{#MIN_WORD}, @ref{Numerical Data Types}
 
 @c --------------------------------------
-@node #MIN_LONG, #MIN_WORD, #MIN_FLOAT, Read-Only Globals
+@node #MIN_INT64, #MIN_LONG, #MIN_FLOAT, Read-Only Globals
+@comment  node-name,  next,  previous,  up
+@subsection #MIN_INT64
+
+The most negative value representable in a variable of type
+@code{INT64}.
+
+See also: @ref{#MAX_INT64}, @ref{#MIN_DOUBLE}, @ref{#MIN_FLOAT},
+@ref{#MIN_LONG}, @ref{#MIN_WORD}, @ref{Numerical Data Types}
+
+@c --------------------------------------
+@node #MIN_LONG, #MIN_WORD, #MIN_INT64, Read-Only Globals
 @comment  node-name,  next,  previous,  up
 @subsection #MIN_LONG
 
 The most negative value representable in a variable of type
-@code{LONG}. 
+@code{LONG}.
 
 See also: @ref{#MAX_LONG}, @ref{#MIN_DOUBLE}, @ref{#MIN_FLOAT},
-@ref{#MIN_WORD}, @ref{Numerical Data Types}
+@ref{#MIN_INT64}, @ref{#MIN_WORD}, @ref{Numerical Data Types}
 
 @c --------------------------------------
 @node #MIN_WORD, #MINUS1, #MIN_LONG, Read-Only Globals
@@ -9807,7 +9889,7 @@ See also: @ref{#MAX_LONG}, @ref{#MIN_DOUBLE}, @ref{#MIN_FLOAT},
 The most negative value representable in a variable of type @code{WORD}.
 
 See also: @ref{#MAX_WORD}, @ref{#MIN_DOUBLE}, @ref{#MIN_FLOAT},
-@ref{#MIN_LONG}, @ref{Numerical Data Types}
+@ref{#MIN_INT64}, @ref{#MIN_LONG}, @ref{Numerical Data Types}
 
 @c --------------------------------------
 @node #MINUS1, #MSBFIRST, #MIN_WORD, Read-Only Globals
@@ -9896,7 +9978,8 @@ See also: @ref{POP}, @ref{PUSH}
 Is an enumeration constant (a read-only @code{LIST}, see @ref{Lists})
 containing the numerical values of the data types of the various LUX
 variables.  Members: @code{BYTE}, @code{WORD}, @code{LONG},
-@code{FLOAT}, @code{DOUBLE}, @code{STRING}, @code{UNDEFINED}.
+@code{INT64}, @code{FLOAT}, @code{DOUBLE}, @code{STRING},
+@code{UNDEFINED}.
 
 See also: @ref{#CLASS}, @ref{Numerical Data Types}
 @c --------------------------------------
@@ -10132,8 +10215,8 @@ See also: @ref{TAPRD}, @ref{TAPWRT}
 @node !BUTTON, !BXB, !BC, Read-Write Global Vars
 @subsection !BUTTON
 
- This @code{LONG} variable holds the code of the last pressed mouse
-button. 
+This @code{LONG} variable holds the code of the last pressed mouse
+button.
 
 See also: @ref{CHECKWINDOW}, @ref{XPLACE}
 
@@ -10142,7 +10225,7 @@ See also: @ref{CHECKWINDOW}, @ref{XPLACE}
 @subsection !BXB
 
 This @code{FLOAT} variable holds the smallest x coordinate in the current
-bounding box. 
+bounding box.
 
 See also: @ref{!BB_UPDATE}, @ref{!BXT}, @ref{!BYB}, @ref{!BYT}
 
@@ -10169,7 +10252,7 @@ See also: @ref{!BB_UPDATE}, @ref{!BXB}, @ref{!BXT}, @ref{!BYT}
 @subsection !BYT
 
 This @code{FLOAT} variable holds the largest y coordinate in the current
-bounding box. 
+bounding box.
 
 See also: @ref{!BB_UPDATE}, @ref{!BXB}, @ref{!BXT}, @ref{!BYB}
 
@@ -10224,7 +10307,7 @@ See also: @ref{CONTOUR}
 @subsection !CONTOUR_NLEV
 
 This @code{LONG} variable holds the number of levels used to make a
-contour plot.  It defaults to 5. 
+contour plot.  It defaults to 5.
 
 See also: @ref{CONTOUR}
 
@@ -10267,7 +10350,7 @@ See also: @ref{CALLIG}, @ref{PLOT}
 @subsection !CRUNCH_BITS
 
 This @code{LONG} variable holds the number of bits that the last
-@code{CRUNCH}-compressed array needed. 
+@code{CRUNCH}-compressed array needed.
 
 See also: @ref{CRUNCH}, @ref{FCWRITE}
 
@@ -10297,7 +10380,7 @@ See also: @ref{CRUNCH}, @ref{FCWRITE}
 @subsection !DASHSIZE
 
 This @code{LONG} variable determines the size of the dashes in dashed
-lines, and defaults to 1. 
+lines, and defaults to 1.
 
 See also: @ref{PLOT}, @ref{XYMOV}
 
@@ -10306,7 +10389,7 @@ See also: @ref{PLOT}, @ref{XYMOV}
 @subsection !DLABX
 
 The @code{LONG} number of divisions per label on the X axis, which
-defaults to 2. 
+defaults to 2.
 
 See also: @ref{!DLABY}, @ref{PLOT}
 
@@ -10315,7 +10398,7 @@ See also: @ref{!DLABY}, @ref{PLOT}
 @subsection !DLABY
 
 The @code{LONG} number of divisions per label on the Y axis, which
-defaults to 2. 
+defaults to 2.
 
 See also:  @ref{!DLABX}, @ref{PLOT}
 
@@ -10348,7 +10431,7 @@ See also: @ref{ERASE}, @ref{!PDEV}, @ref{PLOT}
 @subsection !ERRNO
 
 The last error code encountered during tape I/O using @code{TAPWRT} or
-@code{TAPRD}. 
+@code{TAPRD}.
 
 See also: @ref{TAPRD}, @ref{TAPWRT}
 
@@ -10384,7 +10467,7 @@ See also: @ref{#EVENT}, @ref{!EVENTSOURCE}, @ref{XLOOP}, @ref{XREGISTER}
 
 If this @code{LONG} variable is non-zero, then all Fourier transforms are
 performed in double precision (@code{DOUBLE}), otherwise in single
-precision (@code{FLOAT}). 
+precision (@code{FLOAT}).
 
 See also: @ref{SC}, @ref{SCB}
 
@@ -10509,7 +10592,7 @@ See also: @ref{!FZ}, @ref{!FZZ}, @ref{PLOT3D}
 @subsection !HEIGHT
 
 This @code{LONG} variable holds the height in pixels of the current
-window. 
+window.
 
 See also: @ref{!WIDTH}, @ref{!WINDOW}, @ref{XPORT}
 
@@ -10527,7 +10610,7 @@ See also: @ref{HIST}, @ref{!HISTMAX}, @ref{HISTR}
 @subsection !HISTMAX
 
 This @code{FLOAT} variable holds the maximum value included in the last
-histogram. 
+histogram.
 
 See also: @ref{HIST}, @ref{!HISTMIN}, @ref{HISTR}
 
@@ -10556,9 +10639,9 @@ See also: @ref{GRIDMATCH}
 @c ---------------------------------------
 @node !IX, !IXHIGH, !ITMAX, Read-Write Global Vars
 @subsection !IX
- 
+
 @code{DEV} X coordinate of the last position selected in a LUX window.
- 
+
 See also: @ref{CHECKWINDOW}, @ref{!IY}, @ref{Screen Coordinates},
 @ref{!XF}, @ref{XPLACE}, @ref{XQUERY}
 
@@ -10612,12 +10695,12 @@ The 4th modifier key is depressed.
 @item 128
 The 5th modifier key is depressed.
 @item 256
-The 1st pointer button is depressed.  This is usually the leftmost mouse 
+The 1st pointer button is depressed.  This is usually the leftmost mouse
 button.
 @item 512
 The 2nd pointer button is depressed.  This is usually the middle mouse
 button on three-button mice, or the rightmost mouse button on two-button
-mice. 
+mice.
 @item 1024
 The 3rd pointer button is depressed.  This is usually the rightmost
 mouse button on three-button mice.
@@ -10835,7 +10918,7 @@ See also: @ref{SDEV}, @ref{VARIANCE}, @ref{!LASTMEAN}
 @subsection !LAST_MENU
 
 The @code{LONG} number of the LUX menu in which the last event
-caught by @code{XLOOP} occurred. 
+caught by @code{XLOOP} occurred.
 
 See also: @ref{!EVENTSOURCE}, @ref{!EVENTTYPE}, @ref{WAIT_FOR_MENU},
 @ref{XLOOP}, @ref{XREGISTER}
@@ -10853,7 +10936,7 @@ See also: @ref{DISTR}, @ref{HIST}, @ref{HISTR}
 @subsection !MAXREGRIDSIZE
 
 The @code{LONG} maximum size in any dimension of the output image in
-@code{REGRID} and @code{REGRID3}.  
+@code{REGRID} and @code{REGRID3}.
 
 See also: @ref{REGRID}, @ref{REGRID3}
 
@@ -10861,8 +10944,8 @@ See also: @ref{REGRID}, @ref{REGRID3}
 @node !MENU_ITEM, !MERITC, !MAXREGRIDSIZE, Read-Write Global Vars
 @subsection !MENU_ITEM
 
- The @code{LONG} number of the LUX menu item in which the last
-event caught by @code{XLOOP} occurred. 
+The @code{LONG} number of the LUX menu item in which the last event
+caught by @code{XLOOP} occurred.
 
 See also: @ref{!EVENTSOURCE}, @ref{!EVENTTYPE}, @ref{WAIT_FOR_MENU},
 @ref{XLOOP}, @ref{XREGISTER}
@@ -11224,7 +11307,7 @@ See also: @ref{PLOT}, @ref{!STARTY}, @ref{!STEPX}
 @subsection !STRETCHMARK
 
 A non-zero @code{LONG} value for this variable allows stretch marks to
-appear in @code{REGRID} and @code{REGRID3} results. 
+appear in @code{REGRID} and @code{REGRID3} results.
 
 See also: @ref{REGRID}, @ref{REGRID3}
 
@@ -11239,7 +11322,7 @@ See also: @ref{GRIDMATCH}
 @subsection !SYMRATIO
 
 This @code{FLOAT} variable defines the X to Y size ratio of plot symbols,
-and defaults to 1. 
+and defaults to 1.
 
 See also: @ref{PLOT}
 
@@ -11578,7 +11661,7 @@ parser status during parsing is enabled.
 @comment  node-name,  next,  previous,  up
 @subsection !ZOOMFRAME
 
- The index of the last frame shown using @code{ZOOM}.  It is used
+The index of the last frame shown using @code{ZOOM}.  It is used
 as the default for the next call to @code{ZOOM}.
 
 See also: @ref{ZOOM}, @ref{!ZOOMMAG}, @ref{!ZOOMX}, @ref{!ZOOMY}
@@ -11589,7 +11672,7 @@ See also: @ref{ZOOM}, @ref{!ZOOMMAG}, @ref{!ZOOMX}, @ref{!ZOOMY}
 @comment  node-name,  next,  previous,  up
 @subsection !ZOOMHIGH
 
- The top limit of the contrast data range using @code{ZOOM}.  Zero
+The top limit of the contrast data range using @code{ZOOM}.  Zero
 means the top limit will be equal to the maximum data value.
 
 See also: @ref{ZOOM}
@@ -11600,7 +11683,7 @@ See also: @ref{ZOOM}
 @comment  node-name,  next,  previous,  up
 @subsection !ZOOMLOW
 
- The bottom limit of the contrast data range using @code{ZOOM}.
+The bottom limit of the contrast data range using @code{ZOOM}.
 Zero means the bottom limit will be equal to the minimum data value.
 
 See also: @ref{ZOOM}
@@ -11693,7 +11776,7 @@ See also: @ref{!CTIME}
 @subsection !JD
 
 Returns the current Julian Date (UTC) in double precision, measured in
-days. 
+days.
 
 See also: @ref{CALENDAR}, @ref{!DATE}
 
@@ -12096,6 +12179,10 @@ arguments.
 * INPOLYGON::                   Determine if points are inside a polygon
 * INSERT::                      Insert data into an array
 * INT::                         Convert to @code{WORD} value by value
+* INT64::                       Convert to @code{INT64} value by value
+* INT64ARR::                    Create an @code{INT64} array
+* INT64FARR::                   Create an @code{INT64} file array
+* INT64MAP::                    Convert to @code{INT64} byte by byte
 * INTARR::                      Create a @code{WORD} array
 * INTFARR::                     Create a @code{WORD} file array
 * IR::                          Identity 3-by-3 matrix
@@ -13195,14 +13282,14 @@ selects the equinox of the date.
 selects return of X Y Z coordinates in AU.  If @code{/XYZ} is not
 specified, then polar coordinates are returned (right
 ascension/longitude in degrees, declination/latitude in degrees, and
-distance in AU). 
+distance in AU).
 @item /EQUATORIAL
 return equatorial coordinates (based on the celestial equator).
 @item /ECLIPTICAL
 return ecliptical coordinates (based on the ecliptic).
 @item /HORIZONTAL
 return azimuth (West from South) and height (in degrees), and distance
-(in AU). 
+(in AU).
 @item /ELONGATION
 return elongation (angular distance to Sun) in degrees, phase angle (angular
 distance of observer to Sun as seen from target object) in degrees, and
@@ -14352,7 +14439,7 @@ equals @code{/...GREGORIAN} from 15 October 1582 (Gregorian) on and
 @item /TOMAYAN
 indicates the Mayan Tikal calendar round (according to "The Book of the
 Year" by Munro Edmonson).  @code{/FROMMAYAN} is not available.
-@code{/TOMAYAN} implies @code{/TOTEXT}. 
+@code{/TOMAYAN} implies @code{/TOTEXT}.
 @item /...LONGCOUNT
 indicates the Olmec Long Count (according to Edmonson).  Long Count
 0.0.0.0.0 corresponds to 6 September -3113 in the Julian calendar.
@@ -17098,7 +17185,7 @@ See also: @ref{Astronomical Coordinate Calculations}
 @subsection EQUIVALENCE
 @findex EQUIVALENCE
 
-@code{EQUIVALENCE(@var{e1}, @var{e2})} 
+@code{EQUIVALENCE(@var{e1}, @var{e2})}
 
 Returns equivalence classes.  In arrays @code{@var{e1}} and
 @code{@var{e2}} (which are transformed to type @code{LONG}) the user
@@ -20355,7 +20442,67 @@ Alias: @ref{WORD}
 
 See also: @ref{Number Conversion}
 
-[3.1.914]
+@c -------------------------------------
+@node INT64, INTARR, INSERT, Internal Routines
+@subsection INT64
+@findex INT64
+
+@code{INT64(@var{x})}
+
+@code{INT64, @var{x} [, @dots{}]}
+
+Converts the arguments to data type @code{INT64} by truncating at the
+decimal point (if any).  The function returns a converted copy and
+leaves @code{@var{x}} itself alone.  The subroutine modifies
+@code{@var{x}} itself.
+
+See also: @ref{Number Conversion}
+
+@c -------------------------------------
+@node INT64ARR, INTFARR, INT, Internal Routines
+@subsection INT64ARR
+@findex INT64ARR
+
+@code{INT64ARR(@var{dimensions})}
+
+Returns a @code{INT64} array of the specified @code{@var{dimensions}}.
+The latter may be an array containing the dimensions, or a list of up
+to @code{#MAX_DIMS} dimensions.
+
+See also: @ref{ARRAY}, @ref{BYTARR}, @ref{LONARR}, @ref{FLTARR},
+@ref{DBLARR}, @ref{#MAX_DIMS}
+
+@c -------------------------------------
+@node INT64FARR, IR, INTARR, Internal Routines
+@subsection INT64FARR
+@findex INT64FARR
+
+@code{INT64FARR(@var{file}, @var{dimensions} [, OFFSET = @var{offset},
+/READONLY, /SWAP])}
+
+Links an @code{INT64} array structure with the specified
+@code{@var{dimensions}} to the specified @code{@var{file}}.
+@code{@var{dimensions}} may be an array, or a list of up to ten
+dimensions.  The file need not exist.  @code{@var{offset}} indicates
+the length in bytes of a header after which the array data is to be
+found.  It defaults to zero.  Keyword @code{/READONLY} disallows
+writing into the file through the file array.  Keyword @code{/SWAP}
+indicates that the data should be byte-swapped after reading (for
+input only).
+
+See also: @ref{File Arrays}, @ref{ARRAY}, @ref{INT64ARR}
+
+@c -------------------------------------
+@node INT64MAP, IR, INTARR, Internal Routines
+@subsection INT64MAP
+@findex INT64MAP
+
+@code{INT64MAP(@var{x})}
+
+Maps @code{@var{x}} byte for byte into an @code{INT64} array.
+
+See also: @ref{SMAP}, @ref{BMAP}, @ref{WMAP}, @ref{FMAP}, @ref{DMAP}
+
 @c -------------------------------------
 @node INTARR, INTFARR, INT, Internal Routines
 @subsection INTARR
@@ -20367,8 +20514,8 @@ Returns a @code{WORD} (2-byte) array of the specified
 @code{@var{dimensions}}.  The latter may be an array containing the
 dimensions, or a list of up to @code{#MAX_DIMS} dimensions.
 
-See also: @ref{ARRAY}, @ref{BYTARR}, @ref{LONARR}, @ref{FLTARR},
-@ref{DBLARR}, @ref{#MAX_DIMS}
+See also: @ref{ARRAY}, @ref{BYTARR}, @ref{INT64ARR}, @ref{LONARR},
+@ref{FLTARR}, @ref{DBLARR}, @ref{#MAX_DIMS}
 
 @c -------------------------------------
 @node INTFARR, IR, INTARR, Internal Routines
@@ -20710,7 +20857,8 @@ WEIGHTS=@var{weights}, COV=@var{cov}, ERR=@var{err}, CHISQ=@var{chisq}]
 
 Maps @code{@var{x}} byte for byte into a @code{LONG} (4-byte) array.
 
-See also: @ref{SMAP}, @ref{BMAP}, @ref{WMAP}, @ref{FMAP}, @ref{DMAP}
+See also: @ref{SMAP}, @ref{BMAP}, @ref{WMAP}, @ref{FMAP}, @ref{DMAP},
+@ref{INT64MAP}
 
 @c -------------------------------------
 @node LOCAL_MAX, LOCAL_MAXLOC, LMAP, Internal Routines
@@ -20868,8 +21016,8 @@ Returns a @code{LONG} (4-byte) array of the specified
 @code{@var{dimensions}}.  The latter may be an array containing the
 dimensions, or a list of up to @code{#MAX_DIMS} dimensions.
 
-See also: @ref{ARRAY}, @ref{BYTARR}, @ref{INTARR}, @ref{FLTARR},
-@ref{DBLARR}, @ref{STRARR}, @ref{#MAX_DIMS}
+See also: @ref{ARRAY}, @ref{BYTARR}, @ref{INTARR}, @ref{INT64ARR},
+@ref{FLTARR}, @ref{DBLARR}, @ref{STRARR}, @ref{#MAX_DIMS}
 
 @c -------------------------------------
 @node LONFARR, LONG, LONARR, Internal Routines
@@ -21265,7 +21413,7 @@ Examples, with @code{X = [[[6.0, 4, 3]],[[8, 2, 4]]]} and @code{C = [2.0, 2,
 2, 2, 1, 1]}:
 
 To print the average along the first dimension (dimension 0, rows) of
-@code{X}: 
+@code{X}:
 @example
 LUX>T,MEAN(X,0)
       4.333333      4.666667
@@ -27110,7 +27258,7 @@ to trace into any kind of loop (repeat, for, etc.).
 to trace into @{@}-delimited blocks.
 @item /ROUTINE
 to trace into user-defined subroutines, functions, and block routines.
-@item /ALL 
+@item /ALL
 to trace all of the above.
 @item /SHOWSTATS
 to also display @code{SHOWSTATS} information.

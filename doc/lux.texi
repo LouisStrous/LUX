@@ -2235,7 +2235,6 @@ then your computer is littleendian.
 
 See also: @ref{Disk File I/O}, @ref{#MSBFIRST}
 
-[3.2.345]
 @c ------------------------------------------------------------------
 @node Tape File I/O,  , Byte Order, Data I/O Routines
 @comment  node-name,  next,  previous,  up
@@ -2313,7 +2312,6 @@ See also: @ref{FPRINT}, @ref{FPRINTF}, @ref{FREAD}, @ref{FREADF},
 @ref{FREADS}, @ref{FSTRING}, @ref{PRINTF}, @ref{READ}, @ref{READF},
 @ref{STR}, @ref{STRING}, @ref{TYPE}.
 
-[3.2.320]
 @c ------------------------------------------------------------------
 @menu
 * Format Specifiers::
@@ -2436,7 +2434,6 @@ on input.
 If you use a format specifier that is not in this table, then strange
 things may happen.
 
-[3.2.320]
 @c ------------------------------------------------------------------
 @node Format Modifiers, Format Field Width, Format Specifiers, Formatted Input/Output
 @comment  node-name,  next,  previous,  up
@@ -2487,7 +2484,6 @@ once after all the elements have been printed.
 
 The @code{_} and @code{=} format modifiers are LUX extensions to the C set.
 
-[3.2.336]
 @c ------------------------------------------------------------------
 @node Format Field Width, Format Precision, Format Modifiers, Formatted Input/Output
 @comment  node-name,  next,  previous,  up
@@ -2557,7 +2553,6 @@ x:1-2-3; y: 32 11  2
 
 See also: @ref{Formatted Input/Output}
 
-[3.2.336]
 @c ------------------------------------------------------------------
 @node Long output lines, In-Line Print Formats, Format Grouping, Formatted Input/Output
 @comment  node-name,  next,  previous,  up
@@ -2629,7 +2624,6 @@ See also: @ref{!FORMAT_C}, @ref{!FORMAT_F}, @ref{!FORMAT_I},
 @ref{!FORMAT_S}, @ref{FORMAT_SET}, @ref{Output Data Formats},
 @ref{PRINT}, @ref{PRINTF}.
 
-[3.1.665]
 @c ------------------------------------------------------------------
 @node Output Data Formats, Input Data Formats, In-Line Print Formats, Formatted Input/Output
 @comment  node-name,  next,  previous,  up
@@ -2888,7 +2882,6 @@ with "hh" equal to an arbitrary number of hexadecimal digits: stands for
 the character whose value is equal to the indicated hexadecimal number.
 @end table
 
-[2.1.291]
 @c ------------------------------------------------------------------
 @node Syntax, Expressions, Input/Output, Top
 @comment  node-name,  next,  previous,  up
@@ -4066,7 +4059,6 @@ The subscripts may be scalars, ranges, or arrays of indices.
 Lists can be used to specify arbitrary number of subscripts to functions
 or expressions.  @ref{Lists of Subscripts}.
 
-[2.12.1499]
 @c ------------------------------------------------------------------
 @node Compact Pointer Lists, Lists, Compact Lists, Data Classes
 @comment  node-name,  next,  previous,  up
@@ -4079,7 +4071,6 @@ extended parameter lists in user-defined subroutines and functions.
 See also: @ref{Extended Parameter Lists}, @ref{Function Call},
 @ref{Subroutine Call}
 
-[2.13.178]
 @c ------------------------------------------------------------------
 @node Lists, Structures, Compact Pointer Lists, Data Classes
 @comment  node-name,  next,  previous,  up
@@ -4146,7 +4137,6 @@ indicate a member of a list.  Their use is discouraged, however, in
 favor of @code{#DEG} and @code{#RAD} (@ref{#DEG}, @ref{#RAD}) which
 serve the same purpose but do not contain periods.
 
-[2.12.1499]
 @c ------------------------------------------------------------------
 @node Structures, Pointers, Lists, Data Classes
 @comment  node-name,  next,  previous,  up
@@ -4827,7 +4817,6 @@ instance, if @code{x} is an array with 3 by 2 by 5 by 3 elements, then
 @code{*}.  For example, with the same @code{x} as before,
 @code{x(2,1,/ALL)} is equivalent to @code{x(2,1,*,*)}.
 
-[2.11.248]
 @c ------------------------------------------------------------------
 @node Fractional Subscripts,  , Multiple Subscripts, Subscripts
 @comment  node-name,  next,  previous,  up
@@ -4852,7 +4841,6 @@ otherwise.  If @code{/SUBGRID} is specified, then @code{/INNER} is
 implied.  For example, @code{x([1.2,2.3], [3.3,4.1], /SUBGRID)} is
 equivalent to @code{[x(1.2, 3.3, /SUBGRID), x(2.3, 4.1, /SUBGRID)]}.
 
-[3.1.637]
 @c ------------------------------------------------------------------
 @node Expression Subscripts,  , Fractional Subscripts, Subscripts
 @comment  node-name,  next,  previous,  up
@@ -4909,7 +4897,6 @@ value has been @code{RETURN}ed, then an error is generated.
 Some functions can be called with more arguments than it has parameters.
 See @ref{Extended Parameter Lists} for details.
 
-[2.13.178]
 @c ------------------------------------------------------------------
 @menu
 * Arguments::                   Arguments to subroutines and functions
@@ -5799,7 +5786,6 @@ argument list that ends with @code{...} is referred to as an
 
 See also: @ref{Subroutine Call}, @ref{Extended Parameter Lists}
 
-[2.13.178]
 @c ------------------------------------------------------------------
 @node Subroutine Call, Extended Parameter Lists, Subroutine Definition, Statements
 @comment  node-name,  next,  previous,  up
@@ -5883,7 +5869,6 @@ Subroutines can be called recursively.  See @ref{Recursion} for details.
 Some subroutines can be called with more arguments than it has
 parameters.  See @ref{Extended Parameter Lists} for details.
 
-[2.13.178]
 @c ------------------------------------------------------------------
 @node Extended Parameter Lists, File Inclusion, Subroutine Call, Statements
 @comment  node-name,  next,  previous,  up
@@ -5965,7 +5950,6 @@ are entered into the list in the order in which they are specified.
 
 See @code{Extended Parameter Lists} for more details.
 
-[2.13.178]
 @c ------------------------------------------------------------------
 @node Jumps, File Inclusion, Function Definition, Statements
 @comment  node-name,  next,  previous,  up
@@ -6400,7 +6384,6 @@ See also: @ref{!MXB}, @ref{!MXT}, @ref{!MYB}, @ref{!MYT}, @ref{SET},
 @ref{!TVIX}, @ref{!TVIY}, @ref{!TVSCALE}, @ref{!WXB}, @ref{!WXT},
 @ref{!WYB}, @ref{!WYT}, @ref{#COORDSYS}
 
-[3.2.423]
 @c ------------------------------------------------------------------
 @node Colors, Image Display, Screen Coordinates, Graphics
 @comment  node-name,  next,  previous,  up
@@ -6463,7 +6446,6 @@ window and screen background will be shown with the correct colors.
 
 See also: @ref{XOPEN}
 
-[3.2.22]
 @c ------------------------------------------------------------------
 @menu
 * Color Ramp::                  For image display
@@ -6483,7 +6465,6 @@ specified in the @code{TVLCT} command, using linear interpolation.
 
 See also: @ref{Colors}, @ref{Image Display}, @ref{TVLCT}
 
-[3.2.22]
 @c ------------------------------------------------------------------
 @node Incidental Colors,  , Color Ramp, Colors
 @comment  node-name,  next,  previous,  up
@@ -6555,7 +6536,6 @@ corresponds to @code{SETFG,'rgbi:r/g/b'}.
 
 See also: @ref{SETFG}, @ref{SETBG}, @ref{PLOT}, @ref{CALLIG}
 
-[3.2.22]
 @c ------------------------------------------------------------------
 @node Image Display, Plots and Graphs, Colors, Graphics
 @comment  node-name,  next,  previous,  up
@@ -6742,7 +6722,6 @@ they were received.
 
 See also: @ref{XTLOOP}
 
-[2.13.531]
 @c ------------------------------------------------------------------
 @node Debugging, Calculator Mode, Graphics, Top
 @comment  node-name,  next,  previous,  up
@@ -6942,7 +6921,6 @@ output to a file.
 
 See also: @ref{DIAGNOSTIC}, @ref{RECORD}
 
-[3.1.347]
 @c ------------------------------------------------------------------
 @node Calculator Mode, Routine Groups, Debugging, Top
 @comment  node-name,  next,  previous,  up
@@ -9564,7 +9542,6 @@ Has the @code{DOUBLE} value of twice pi.
 
 See also:  @ref{#PI}
 
-[4.0.118]
 @c --------------------------------------
 @node #42, #C, #2PI, Read-Only Globals
 @subsection #42
@@ -9604,7 +9581,6 @@ the system.  This value is also the default of @code{!COL}.
 
 See also: @ref{!COL}, @ref{#ROW}
 
-[2.11.1232]
 @c --------------------------------------
 @node #COORDSYS, #DEG, #COL, Read-Only Globals
 @comment  node-name,  next,  previous,  up
@@ -9617,7 +9593,6 @@ available in LUX windows.  Members: @code{DEP}, @code{DEV}, @code{DVI},
 
 See also: @ref{Screen Coordinates}
 
-[3.2.423]
 @c --------------------------------------
 @node #DEG, #D.R, #COORDSYS, Read-Only Globals
 @subsection #DEG
@@ -9918,7 +9893,6 @@ and the radius of a circle.
 
 See also: @ref{#2PI}
 
-[4.0.118]
 @c --------------------------------------
 @node #P3D, #R, #PI, Read-Only Globals
 @subsection #P3D
@@ -9962,7 +9936,6 @@ querying the system.  This value is also the default for @code{!ROW}.
 
 See also: @ref{#COL}, @ref{!ROW}
 
-[2.11.1232]
 @c --------------------------------------
 @node #STACK, #TYPE, #ROW, Read-Only Globals
 @subsection #STACK
@@ -9993,7 +9966,6 @@ various data types.  The size (in bytes) of one element of data type
 
 See also: @ref{#TYPE}
 
-[2.12.1841]
 @c --------------------------------------
 @node #ZERO,  , #TYPESIZE, Read-Only Globals
 @subsection #ZERO
@@ -10268,7 +10240,6 @@ generated by the @code{HELP} and @code{INFO} commands).  It is equal to
 
 See also: @ref{#COL}, @ref{HELP}, @ref{INFO}, @ref{!ROW}
 
-[2.11.1232]
 @c ---------------------------------------
 @node !CONTOUR_BORDER, !CONTOUR_BOX, !COL, Read-Write Global Vars
 @subsection !CONTOUR_BORDER
@@ -10645,7 +10616,6 @@ See also: @ref{GRIDMATCH}
 See also: @ref{CHECKWINDOW}, @ref{!IY}, @ref{Screen Coordinates},
 @ref{!XF}, @ref{XPLACE}, @ref{XQUERY}
 
-[3.11.388]
 @c ---------------------------------------
 @node !IXHIGH, !IY, !IX, Read-Write Global Vars
 @subsection !IXHIGH
@@ -10661,7 +10631,6 @@ See also: @ref{!IX}, @ref{!IYHIGH}, @ref{XPORT}
 See also: @ref{CHECKWINDOW}, @ref{!IX}, @ref{Screen Coordinates},
 @ref{XPLACE}, @ref{XQUERY}, @ref{!YF}
 
-[3.11.388]
 @c ---------------------------------------
 @node !IYHIGH, !KB, !IY, Read-Write Global Vars
 @subsection !IYHIGH
@@ -10712,7 +10681,6 @@ The 5th pointer button is depressed.
 
 See also: @ref{XQUERY}
 
-[3.1.22]
 @c ---------------------------------------
 @node !KEYCODE, !KEYSTATE, !KB, Read-Write Global Vars
 @subsection !KEYCODE
@@ -10729,7 +10697,6 @@ to inspect @code{!KEYSYM} instead.
 
 See also: @ref{!KEYSTATE}, @ref{!KEYSYM}, @ref{XLOOP}, @ref{XREGISTER}
 
-[3.2.147]
 @c ---------------------------------------
 @node !KEYSTATE, !KEYSYM, !KEYCODE, Read-Write Global Vars
 @comment  node-name,  next,  previous,  up
@@ -10757,7 +10724,6 @@ The @code{Scroll Lock} state is active
 
 See also: @ref{!KEYCODE}, @ref{!KEYSYM}, @ref{XLOOP}, @ref{XREGISTER}
 
-[3.2.147]
 @c ---------------------------------------
 @node !KEYSYM, !LABX, !KEYSTATE, Read-Write Global Vars
 @comment  node-name,  next,  previous,  up
@@ -10822,7 +10788,6 @@ key values are valid:
 See also: @ref{!KEYCODE}, @ref{!KEYSTATE}, @ref{SMAP}, @ref{XLOOP},
 @ref{XREGISTER}
 
-[3.2.147]
 @c ---------------------------------------
 @node !LABX, !LABY, !KEYSYM, Read-Write Global Vars
 @subsection !LABX
@@ -10881,7 +10846,6 @@ functions @code{MEAN}, @code{SDEV} or @code{VARIANCE}.
 
 See also: @ref{MEAN}, @ref{SDEV}, @ref{VARIANCE}, @ref{!LASTSDEV}
 
-[3.2.6]
 @c ---------------------------------------
 @node !LASTMIN, !LASTMINLOC, !LASTMEAN, Read-Write Global Vars
 @subsection !LASTMIN
@@ -10912,7 +10876,6 @@ This variable holds the last calculated standard deviation (through
 
 See also: @ref{SDEV}, @ref{VARIANCE}, @ref{!LASTMEAN}
 
-[3.2.6]
 @c ---------------------------------------
 @node !LAST_MENU, !MAXHISTSIZE, !LASTSDEV, Read-Write Global Vars
 @subsection !LAST_MENU
@@ -10960,7 +10923,6 @@ A variable in which a merit value is returned by function
 
 See also: @ref{SUBSHIFTC}
 
-[3.1.837]
 @c ---------------------------------------
 @node !MOTIF, !MXB, !MERITC, Read-Write Global Vars
 @comment  node-name,  next,  previous,  up
@@ -10972,7 +10934,6 @@ if it was called through @code{XTLOOP,1}: The manager exits when
 
 See also: @ref{XTLOOP}
 
-[2.13.531]
 @c ---------------------------------------
 @node !MXB, !MXT, !MOTIF, Read-Write Global Vars
 @subsection !MXB
@@ -11034,7 +10995,6 @@ The @code{LONG} number of arguments specified in the currently active
 call to a user-defined function or subroutine -- or the number in the
 most recently active routine, if at the main execution level.
 
-[2.12.1604]
 @c ---------------------------------------
 @node !NOEVENTFLUSH, !PDEV, !NARG, Read-Write Global Vars
 @subsection !NOEVENTFLUSH
@@ -11093,7 +11053,6 @@ horizontal error bar in @code{PLOT} or @code{OPLOT}.
 
 See also: @ref{PLOT}, @ref{!PLYERRB}
 
-[3.1.1375]
 @c ---------------------------------------
 @node !PLYERRB, !PS_FILE, !PLXERRB, Read-Write Global Vars
 @comment  node-name,  next,  previous,  up
@@ -11104,7 +11063,6 @@ vertical error bar in @code{PLOT} or @code{OPLOT}.
 
 See also: @ref{PLOT}, @ref{!PLXERRB}
 
-[3.1.1375]
 @c ---------------------------------------
 @node !PS_FILE, !RANGE_WARN_FLAG, !PLYERRB, Read-Write Global Vars
 @subsection !PS_FILE
@@ -11169,7 +11127,6 @@ generated by the @code{HELP} and @code{INFO} commands).  It is equal to
 
 See also: @ref{!COL}, @ref{HELP}, @ref{INFO}, @ref{#ROW}
 
-[2.11.1232]
 @c ---------------------------------------
 @node !RX, !RY, !ROW, Read-Write Global Vars
 @subsection !RX
@@ -11186,7 +11143,6 @@ Note: the meaning of @code{!RX} was changed to what it is now in LUX
 
 See also: @ref{PLOT}, @ref{!RY}
 
-[3.2.233]
 @c ---------------------------------------
 @node !RY, !SCALEMAX, !RX, Read-Write Global Vars
 @subsection !RY
@@ -11262,7 +11218,6 @@ base 10.
 
 See also: @ref{PLOT}, @ref{!STARTY}, @ref{!STEPX}
 
-[3.2.230]
 @c ---------------------------------------
 @node !STARTY, !STEPX, !STARTX, Read-Write Global Vars
 @comment  node-name,  next,  previous,  up
@@ -11275,7 +11230,6 @@ base 10.
 
 See also: @ref{PLOT}, @ref{!STARTX}, @ref{!STEPY}
 
-[3.2.230]
 @c ---------------------------------------
 @node !STEPX, !STEPY, !STARTY, Read-Write Global Vars
 @comment  node-name,  next,  previous,  up
@@ -11288,7 +11242,6 @@ a logarithm on base 10.
 
 See also: @ref{PLOT}, @ref{!STARTX}, @ref{!STEPY}
 
-[3.2.230]
 @c ---------------------------------------
 @node !STEPY, !STRETCHMARK, !STEPX, Read-Write Global Vars
 @comment  node-name,  next,  previous,  up
@@ -11301,7 +11254,6 @@ logarithm on base 10.
 
 See also: @ref{PLOT}, @ref{!STARTY}, @ref{!STEPX}
 
-[3.2.230]
 @c ---------------------------------------
 @node !STRETCHMARK, !STRETCH_CLIP, !STEPY, Read-Write Global Vars
 @subsection !STRETCHMARK
@@ -11389,7 +11341,6 @@ the last displayed image.
 
 See also: @ref{Screen Coordinates}, @ref{TV}, @ref{!TVIXB}, @ref{!TVIY}
 
-[2.11.375]
 @c ---------------------------------------
 @node !TVIXB, !TVIY, !TVIX, Read-Write Global Vars
 @subsection !TVIXB
@@ -11399,7 +11350,6 @@ right edge of the last displayed image.
 
 See also: @ref{TV}, @ref{!TVIX}, @ref{!TVIYB}
 
-[2.11.375]
 @c ---------------------------------------
 @node !TVIY, !TVIYB, !TVIXB, Read-Write Global Vars
 @subsection !TVIY
@@ -11409,7 +11359,6 @@ of the last displayed image.
 
 See also: @ref{TV}, @ref{!TVIX}, @ref{!TVIYB}
 
-[2.11.375]
 @c ---------------------------------------
 @node !TVIYB, !TVSCALE, !TVIY, Read-Write Global Vars
 @subsection !TVIYB
@@ -11419,7 +11368,6 @@ top edge of the last displayed image.
 
 See also: @ref{TV}, @ref{!TVIXB}, @ref{!TVIY}
 
-[2.11.375]
 @c ---------------------------------------
 @node !TVSCALE, !TVSMT, !TVIYB, Read-Write Global Vars
 @comment  node-name,  next,  previous,  up
@@ -11430,7 +11378,6 @@ factor for use in image display.
 
 See also: @ref{TV}
 
-[2.11.378]
 @c ---------------------------------------
 @node !TVSMT, !VDEV, !TVSCALE, Read-Write Global Vars
 @subsection !TVSMT
@@ -11557,7 +11504,6 @@ the coordinate system specified at that time.
 
 See also: @ref{!IX}, @ref{XPLACE}, @ref{!YF}
 
-[2.11.388]
 @c ---------------------------------------
 @node !XMENU, !XROOT, !XF, Read-Write Global Vars
 @subsection !XMENU
@@ -11620,7 +11566,6 @@ the coordinate system specified at that time.
 
 See also: @ref{!IY}, @ref{!XF}, @ref{XPLACE}
 
-[2.11.388]
 @c ---------------------------------------
 @node !YMENU, !YROOT, !YF, Read-Write Global Vars
 @subsection !YMENU
@@ -11666,7 +11611,6 @@ as the default for the next call to @code{ZOOM}.
 
 See also: @ref{ZOOM}, @ref{!ZOOMMAG}, @ref{!ZOOMX}, @ref{!ZOOMY}
 
-[2.12.433]
 @c ---------------------------------------
 @node !ZOOMHIGH, !ZOOMLOW, !ZOOMFRAME, Read-Write Global Vars
 @comment  node-name,  next,  previous,  up
@@ -11677,7 +11621,6 @@ means the top limit will be equal to the maximum data value.
 
 See also: @ref{ZOOM}
 
-[2.12.1778]
 @c ---------------------------------------
 @node !ZOOMLOW, !ZOOMMAG, !ZOOMHIGH, Read-Write Global Vars
 @comment  node-name,  next,  previous,  up
@@ -11688,7 +11631,6 @@ Zero means the bottom limit will be equal to the minimum data value.
 
 See also: @ref{ZOOM}
 
-[2.12.1778]
 @c ---------------------------------------
 @node !ZOOMMAG, !ZOOMX, !ZOOMLOW, Read-Write Global Vars
 @comment  node-name,  next,  previous,  up
@@ -11699,7 +11641,6 @@ the default for the next call to @code{ZOOM}.
 
 See also: @ref{ZOOM}, @ref{!ZOOMFRAME}, @ref{!ZOOMX}, @ref{!ZOOMY}
 
-[2.12.346]
 @c ---------------------------------------
 @node !ZOOMX, !ZOOMY, !ZOOMMAG, Read-Write Global Vars
 @comment  node-name,  next,  previous,  up
@@ -11710,7 +11651,6 @@ used as the default for the next call to @code{ZOOM}.
 
 See also: @ref{ZOOM}, @ref{!ZOOMFRAME}, @ref{!ZOOMMAG}, @ref{!ZOOMY}
 
-[2.12.346]
 @c ---------------------------------------
 @node !ZOOMY,  , !ZOOMX, Read-Write Global Vars
 @comment  node-name,  next,  previous,  up
@@ -11721,7 +11661,6 @@ used as the default for the next call to @code{ZOOM}.
 
 See also: @ref{ZOOM}, @ref{!ZOOMFRAME}, @ref{!ZOOMMAG}, @ref{!ZOOMX}
 
-[2.12.346]
 @c ----------------------------------------------------------------------
 @node Status Funcs, Internal Routines, Read-Write Global Vars, Reference Manual
 @section Status Functions
@@ -11780,8 +11719,6 @@ days.
 
 See also: @ref{CALENDAR}, @ref{!DATE}
 
-[2.10.1248]
-
 @c ---------------------------------------
 @node !READKEY, !READKEYNE, !JD, Status Funcs
 @subsection !READKEY
@@ -11828,7 +11765,6 @@ January 1970, 00:00.  This system function only works properly if your
 computer platform supports it.  Otherwise, it always returns @code{LONG}
 zero.
 
-[3.1.347]
 @c ---------------------------------------
 @node !TIME,  , !SYSTIME, Status Funcs
 @subsection !TIME
@@ -12706,7 +12642,6 @@ arguments.
 
 See also: @ref{SGN}, @ref{Math Routines}, @ref{Complex Functions}
 
-[2.12.827]
 @c -------------------------------------
 @node ACOS, ACOSH, ABS, Internal Routines
 @subsection ACOS
@@ -12728,7 +12663,6 @@ Reverse: @ref{COS}
 See also: @ref{ASIN}, @ref{ATAN}, @ref{#RAD}, @ref{Trigonometry},
 @ref{Complex Functions}
 
-[3.0.192]
 @c -------------------------------------
 @node ACOSH, ALOG, ACOS, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -12744,7 +12678,6 @@ Reverse: @ref{COSH}
 
 See also: @ref{ASINH}, @ref{ATANH}, @ref{Hyperbolic Functions}
 
-[4.0.262]
 @c -------------------------------------
 @node ALOG, ALOG10, ACOSH, Internal Routines
 @subsection ALOG
@@ -12763,7 +12696,6 @@ Alias: @ref{LOG}
 See also: @ref{ALOG10}, @ref{#E}, @ref{Exponential/Logarithmic
 Functions}, @ref{Complex Functions}
 
-[3.0.192]
 @c -------------------------------------
 @node ALOG10, AND, ALOG, Internal Routines
 @subsection ALOG10
@@ -12779,7 +12711,6 @@ Alias: @ref{LOG10}
 
 See also: @ref{ALOG}, @ref{Exponential/Logarithmic Functions}
 
-[3.0.192]
 @c -------------------------------------
 @node AND, ANDIF, ALOG10, Internal Routines
 @subsection AND
@@ -12873,7 +12804,6 @@ it may be discarded.
 
 See also: @ref{AREA2}, @ref{SEGMENT}, @ref{AREACONNECT}, @ref{Topology}
 
-[3.0.103]
 @c -------------------------------------
 @node AREA2, AREACONNECT, AREA, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -12945,7 +12875,6 @@ version about 0.12 microseconds (24 CPU cycles).
 
 See also: @ref{AREA}, @ref{SEGMENT}, @ref{AREACONNECT}, @ref{Topology}
 
-[3.0.149]
 @c -------------------------------------
 @node AREACONNECT, ARESTORE, AREA2, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -13060,7 +12989,6 @@ whichever is greater.
 
 See also: @ref{AREA}, @ref{SEGMENT}, @ref{Topology}
 
-[3.1.813]
 @c -------------------------------------
 @node ARESTORE, ARG, AREACONNECT, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -13080,7 +13008,6 @@ the values in the file run out.  The function form returns 1 on success,
 
 See also: @ref{ASTORE}, @ref{Uncompressed Disk Output}
 
-[2.10.873]
 @c -------------------------------------
 @node ARG, ARRAY, ARESTORE, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -13097,7 +13024,6 @@ in counterclockwise radians from the origin.
 See also: @ref{ABS}, @ref{CONJUGATE}, @ref{IMAGINARY}, @ref{REAL},
 @ref{Complex Numbers}, @ref{Math Routines}, @ref{Complex Functions}
 
-[2.13.87]
 @c -------------------------------------
 @node ARRAY, ASIN, ARG, Internal Routines
 @subsection ARRAY
@@ -13135,7 +13061,6 @@ Reverse: @ref{SIN}
 See also: @ref{ACOS}, @ref{ATAN}, @ref{#RAD}, @ref{Trigonometry},
 @ref{Complex Functions}
 
-[3.0.192]
 @c -------------------------------------
 @node ASINH, ASSOC, ASIN, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -13151,7 +13076,6 @@ Reverse: @ref{SINH}
 
 See also: @ref{ACOSH}, @ref{ATANH}, @ref{Hyperbolic Functions}
 
-[4.0.262]
 @c -------------------------------------
 @node ASSOC, ASTORE, ASINH, Internal Routines
 @subsection ASSOC
@@ -13186,7 +13110,6 @@ function form returns 1 on success, 0 on failure.
 
 See also: @ref{ARESTORE}, @ref{Uncompressed Disk Output}
 
-[2.10.863]
 @c -------------------------------------
 @node ASTRF, ASTRON, ASTORE, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -13214,7 +13137,6 @@ structure as @code{@var{coords}}.  By default, @code{/FROMEQUATORIAL,
 
 See also: @ref{ASTRON}, @ref{PRECESS}
 
-[4.0.323]
 @c -------------------------------------
 @node ASTRON, ATAN, ASTRF, Internal Routines
 @subsection ASTRON
@@ -13357,7 +13279,6 @@ desired time is performed.
 
 See also: @ref{CALENDAR}, @ref{READORBITS}, @ref{Astronomy and Calendars}
 
-[2.11.366]
 @c -------------------------------------
 @node ATAN, ATAN2, ASTRON, Internal Routines
 @subsection ATAN
@@ -13373,7 +13294,6 @@ Reverse: @ref{TAN}
 See also: @ref{ACOS}, @ref{ASIN}, @ref{ATAN2}, @ref{#RAD},
 @ref{Trigonometry}, @ref{Complex Functions}
 
-[3.0.235]
 @c -------------------------------------
 @node ATAN2, ATANH, ATAN, Internal Routines
 @subsection ATAN2
@@ -13402,7 +13322,6 @@ Reverse: @ref{TANH}
 
 See also: @ref{ASINH}, @ref{ACOSH}, @ref{Hyperbolic Functions}
 
-[4.0.262]
 @c -------------------------------------
 @node ATOL, ATOMIZE, ATANH, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -13421,7 +13340,6 @@ Alias: @ref{STRTOL}
 
 See also: @ref{EVAL}, @ref{String Routines}
 
-[3.1.669]
 @c -------------------------------------
 @node ATOMIZE, BASIN, ATOL, Internal Routines
 @subsection ATOMIZE
@@ -13461,7 +13379,6 @@ neighbor is returned for each pixel.
 
 See also: @ref{SEGMENT}, @ref{AREA}, @ref{AREA2}, @ref{Topology}
 
-[2.12.413]
 @c -------------------------------------
 @node BATCH, BESSEL_I0, BASIN, Internal Routines
 @subsection BATCH
@@ -13752,7 +13669,6 @@ width.
 
 See also: @ref{CSPLINE}, @ref{Interpolation}
 
-[3.0.225]
 @c -------------------------------------
 @node BJ0, BJ1, BISECT, Internal Routines
 @subsection BJ0
@@ -14018,7 +13934,6 @@ itself alone.  The subroutine modifies @code{@var{x}} itself.
 
 See also: @ref{Number Conversion}
 
-[3.1.912]
 @c -------------------------------------
 @node BYTFARR, C, BYTE, Internal Routines
 @subsection BYTFARR
@@ -14039,7 +13954,6 @@ should be byte-swapped after reading (for input only).
 
 See also: @ref{File Arrays}, @ref{#MAX_DIMS}, @ref{File Array Creation}
 
-[4.0.12]
 @c -------------------------------------
 @node C, C2I00A, BYTFARR, Internal Routines
 @subsection C
@@ -14394,7 +14308,6 @@ equal sign.  If you wish to evaluate a multi-argument function, then use
 
 See also: @ref{Running}
 
-[2.11.273]
 @c -------------------------------------
 @node CALENDAR, CALLIG, CALCULATOR, Internal Routines
 @subsection CALENDAR
@@ -14548,7 +14461,6 @@ with noon of 16 July 622 C.E.
 
 See also: @ref{!JD}, @ref{Astronomy and Calendars}
 
-[3.1.867]
 @c -------------------------------------
 @menu
 * General Calendar Details::
@@ -15244,7 +15156,6 @@ See also: @ref{!CRATIO}, @ref{!FONT}, @ref{!FSIZE}, @ref{!HEIGHT},
 @ref{!TVIYB}, @ref{!WIDTH}, @ref{!WXB}, @ref{!WXT}, @ref{!WYB},
 @ref{!WYT}, @ref{!XC}, @ref{!YC}, @ref{Plots}, @ref{Screen Coordinates}
 
-[3.1.347]
 @c -------------------------------------
 @node CBRT, CDBLARR, CALLIG, Internal Routines
 @subsection CBRT
@@ -15270,7 +15181,6 @@ The latter may be an array containing the dimensions, or up to
 
 See also: @ref{ARRAY}, @ref{Default Arrays}, @ref{Complex Numbers}
 
-[2.12.826]
 @c -------------------------------------
 @node CDBLFARR, CDMAP, CDBLARR, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -15292,7 +15202,6 @@ the data should be byte-swapped after reading (for input only).
 See also: @ref{File Arrays}, @ref{File Array Creation}, @ref{Complex
 Functions} 
 
-[4.0.12]
 @c -------------------------------------
 @node CDMAP, CDOUBLE, CDBLFARR, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -15307,7 +15216,6 @@ i.e. each sixteen bytes of @code{@var{x}} are transformed into one
 
 See also: @ref{Data Mapping}, @ref{Complex Functions}
 
-[2.13.77]
 @c -------------------------------------
 @node CDOUBLE, CEIL, CDMAP, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -15326,7 +15234,6 @@ and leaves @code{@var{x}} itself alone.  The subroutine modifies
 See also: @ref{Complex Numbers}, @ref{Complex Functions}, @ref{Number
 Conversion}
 
-[3.1.913]
 @c -------------------------------------
 @node CEIL, CFLOAT, CDOUBLE, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -15342,7 +15249,6 @@ result is based on the real part only.
 See also: @ref{FLOOR}, @ref{RFIX}, @ref{LONG}, @ref{Complex Functions},
 @ref{Math Routines}
 
-[3.0.150]
 @c -------------------------------------
 @node CFLOAT, CFLTARR, CEIL, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -15361,7 +15267,6 @@ and leaves @code{@var{x}} itself alone.  The subroutine modifies
 See also: @ref{Complex Numbers}, @ref{Complex Functions}, @ref{Number
 Conversion}
 
-[3.1.913]
 @c -------------------------------------
 @node CFLTARR, CFLTFARR, CFLOAT, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -15377,7 +15282,6 @@ The latter may be an array containing the dimensions, or up to
 See also: @ref{ARRAY}, @ref{#MAX_DIMS}, @ref{Complex Functions},
 @ref{Default Arrays}
 
-[2.12.826]
 @c -------------------------------------
 @node CFLTFARR, CFMAP, CFLTARR, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -15399,7 +15303,6 @@ the data should be byte-swapped after reading (for input only).
 See also: @ref{File Arrays}, @ref{File Array Creation}, @ref{Complex
 Functions} 
 
-[4.0.12]
 @c -------------------------------------
 @node CFMAP, CHDIR, CFLTFARR, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -15414,7 +15317,6 @@ i.e. each eight bytes of @code{@var{x}} are transformed into one
 
 See also: @ref{Data Mapping}, @ref{Complex Functions}
 
-[2.13.77]
 @c -------------------------------------
 @node CHDIR, CHECKLIST, CFMAP, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -15430,7 +15332,6 @@ This routine is only available if your computer platform supports it.
 
 See also: @ref{System}
 
-[3.1.347]
 @c -------------------------------------
 @node CHECKLIST, CHECKMENU, CHDIR, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -15490,7 +15391,6 @@ natural logarithm of the result if keyword @code{/LOG} is specified.
 
 See also: @ref{IGAMMA}, @ref{Statistical Functions}
 
-[2.11.226]
 @c -------------------------------------
 @node CLASSNAME, CLOSE, CHI2, Internal Routines
 @subsection CLASSNAME
@@ -15645,7 +15545,6 @@ between 0 (absent) and 255 (full intensity).
 
 See also: @ref{Color}
 
-[3.1.503]
 @c -------------------------------------
 @node COLORPIXEL, COLORSTOGREY, COLORCOMPONENTS, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -15659,7 +15558,6 @@ raw pixel values, according to the current color map.
 
 See also: @ref{TVRAW}, @ref{Color}
 
-[3.1.503]
 @c -------------------------------------
 @node COLORSTOGREY, COMPILE, COLORPIXEL, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -15673,7 +15571,6 @@ the corresponding grey scale values (between 0 and 255).
 
 See also: @ref{COLORCOMPONENTS}, @ref{Color}
 
-[4.0.188]
 @c -------------------------------------
 @node COMPILE, COMPILE_FILE, COLORSTOGREY, Internal Routines
 @subsection COMPILE
@@ -15700,7 +15597,6 @@ See also: @ref{EVAL}, @ref{EXECUTE}, @ref{Running}
 
 See also: @ref{Running}
 
-[3.1.5]
 @c -------------------------------------
 @node COMPLEX, COMPRESS, COMPILE_FILE, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -15716,7 +15612,6 @@ the corresponding complex data type (i.e., @code{DOUBLE} to
 See also: @ref{ABS}, @ref{ARG}, @ref{IMAGINARY}, @ref{REAL},
 @ref{Complex Numbers}, @ref{Number Conversion}, @ref{Complex Functions}
 
-[2.13.94]
 @c -------------------------------------
 @node COMPRESS, CONCAT, COMPLEX, Internal Routines
 @subsection COMPRESS
@@ -15756,7 +15651,6 @@ data only.  The old version was called like this: @code{COMPRESS (
 dimensions, respectively, and @code{@var{yfac}} defaulted to
 @code{@var{xfac}}.
 
-[2.11.835]
 @c -------------------------------------
 @node CONCAT, CONJUGATE, COMPRESS, Internal Routines
 @subsection CONCAT
@@ -15782,7 +15676,6 @@ Returns the complex conjugate of numerical argument @code{@var{arg}}.
 
 See also: @ref{Complex Numbers}, @ref{Complex Functions}
 
-[2.12.778]
 @c -------------------------------------
 @node CONSTELLATION, CONSTELLATIONNAME, CONJUGATE, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -15808,7 +15701,6 @@ is assumed.
 
 See also: @ref{ASTRON}, @ref{CONSTELLATIONNAME}, @ref{PRECESS}, @ref{CALENDAR}
 
-[4.0.284]
 @c -------------------------------------
 @node CONSTELLATIONNAME, CONTOUR, CONSTELLATION, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -15824,7 +15716,6 @@ inclusive, as returned by the function @code{CONSTELLATION}.
 
 See also: @ref{CONSTELLATION}
 
-[4.0.284]
 @c -------------------------------------
 @node CONTOUR, CONVERT, CONSTELLATIONNAME, Internal Routines
 @subsection CONTOUR
@@ -15904,7 +15795,6 @@ See also: @ref{!AUTOCON}, @ref{!CONTOUR_BORDER}, @ref{!CONTOUR_BOX},
 @ref{!CONTOUR_TICKS}, @ref{!CONTOUR_TICK_FAC}, @ref{!CONTOUR_TICK_PEN},
 @ref{PLOT}, @ref{Plots}
 
-[3.1.307]
 @c -------------------------------------
 @node CONVERT, COORDTRF, CONTOUR, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -15919,7 +15809,6 @@ Returns a copy of @code{@var{x}} converted to numerical data type
 
 See also: @ref{SYMDTYPE}, @ref{#TYPE}, @ref{Number Conversion}
 
-[2.10.851]
 @c -------------------------------------
 @node COORDTRF, COS, CONVERT, Internal Routines
 @subsection COORDTRF
@@ -15949,7 +15838,6 @@ one can use @code{COORDTRF,x,y,/IMG,/TORPL} or
 
 See also: @ref{Screen Coordinates}, @ref{#COORDSYS}
 
-[3.2.423]
 @c -------------------------------------
 @node COS, COSH, COORDTRF, Internal Routines
 @subsection COS
@@ -15992,7 +15880,6 @@ the affected dimensions are replaced by dimensions of 1.
 
 See also: @ref{MEAN}, @ref{SDEV}, @ref{STUDENT}
 
-[3.1.176]
 @c -------------------------------------
 @node CRUNCH, CRUNCHRUN, CROSSCORR, Internal Routines
 @subsection CRUNCH
@@ -16034,14 +15921,12 @@ Reverse: @ref{DECRUNCH}
 
 See also: @ref{!CRUNCH_BITS}, @ref{!CRUNCH_BPP}, @ref{!CRUNCH_SLICE}
 
-[3.1.419]
 @c -------------------------------------
 @node CRUNCHRUN, CSPLINE, CRUNCH, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection CRUNCHRUN
 @findex CRUNCHRUN
 
-[3.1.503]
 @c -------------------------------------
 @node CSPLINE, CSPLINE_EXTR, CRUNCHRUN, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -16082,7 +15967,6 @@ the table is real big and you want to get rid of it.)
 See also: @ref{CSPLINE_EXTR}, @ref{POLATE}, @ref{TABLE}, @ref{TENSE},
 @ref{TENSE_CURVE}, @ref{TENSE_LOOP}
 
-[3.0.235]
 @c -------------------------------------
 @node CSPLINE_EXTR, CSPLINE_FIND, CSPLINE, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -16108,7 +15992,6 @@ as appropriate.
 
 See also: @ref{CSPLINE}
 
-[3.0.235]
 @c -------------------------------------
 @node CSPLINE_FIND, CTOP, CSPLINE_EXTR, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -16139,7 +16022,6 @@ for each next value from @code{@var{levels}} begin.  If these indices
 are stored in @code{i}, then the locations for @code{levels(j)}
 are @code{z(*,i(j))} through @code{z(*,i(j+1)-1)}.
 
-[4.0.647]
 @c -------------------------------------
 @node CTOP, D, CSPLINE_FIND, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -16179,7 +16061,6 @@ Reverse: @ref{PTOC}
 
 See also: @ref{DIMEN}, @ref{FFT}, @ref{SIN}, @ref{#2PI}
 
-[3.2.169]
 @c -------------------------------------
 @menu
 * CTOP Details::
@@ -16261,7 +16142,6 @@ seconds term.
 
 Reverse: @ref{TAI_FROM_DATE}
 
-[3.1.425]
 @c -------------------------------------
 @node DBLARR, DBLFARR, DATE_FROM_TAI, Internal Routines
 @subsection DBLARR
@@ -16296,7 +16176,6 @@ byte-swapped after reading (for input only).
 
 See also: @ref{ARRAY}, @ref{File Arrays}, @ref{#MAX_DIMS}
 
-[4.0.12]
 @c -------------------------------------
 @node DECOMP, DECRUNCH, DBLFARR, Internal Routines
 @subsection DECOMP
@@ -16415,7 +16294,6 @@ with images that were restored by JPEG decompression, and requires that
 the dimensions of @code{@var{x}} be multiples of 8.
 @end table
 
-[3.1.503]
 @c -------------------------------------
 @node DETREND, DIAGNOSTIC, DESPIKE, Internal Routines
 @subsection DETREND
@@ -16441,7 +16319,6 @@ only available if your computer platform supports it.
 
 See also: @ref{Diagnostic Output}, @ref{RECORD}
 
-[3.1.347]
 @c -------------------------------------
 @node DIFFER, DILATE, DIAGNOSTIC, Internal Routines
 @subsection DIFFER
@@ -16474,7 +16351,6 @@ numbers of elements.
 
 Reverse: @ref{RUNSUM}
 
-[2.10.743]
 @c -------------------------------------
 @node DILATE, DILATEDIR, DIFFER, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -16493,14 +16369,12 @@ element of interest is unequal to zero, or a 0 otherwise.
 
 See also: @ref{ERODE}
 
-[2.12.1829]
 @c -------------------------------------
 @node DILATEDIR, DIMEN, DILATE, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection DILATEDIR
 @findex DILATEDIR
 
-[3.1.503]
 @c -------------------------------------
 @node DIMEN, DISABLENEWLINE, DILATEDIR, Internal Routines
 @subsection DIMEN
@@ -16517,7 +16391,6 @@ scalar; otherwise an array is returned.
 
 See also @ref{NUM_DIM}, @ref{NUM_ELEM}, @ref{SYMCLASS}
 
-[3.1.1423]
 @c -------------------------------------
 @node DISABLENEWLINE, DISTARR, DIMEN, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -16551,7 +16424,6 @@ the point whose coordinates are specified in @code{@var{center}}, or to
 specified, contains a factor for each dimensions by which the distance
 in that dimensions must be multiplied.
 
-[2.10.887]
 
 @c -------------------------------------
 @node DISTR, DMAP, DISTARR, Internal Routines
@@ -16580,7 +16452,6 @@ range of values.
 
 See also: @ref{HIST}, @ref{!MAXHISTSIZE}
 
-[2.10.852]
 @c -------------------------------------
 @node DMAP, DOUB, DISTR, Internal Routines
 @subsection DMAP
@@ -16612,7 +16483,6 @@ Alias: @ref{DOUBLE}
 
 See also: @ref{Number Conversion}
 
-[3.1.913]
 @c -------------------------------------
 @node DOUBLE, DSMOOTH, DOUB, Internal Routines
 @subsection DOUBLE
@@ -16630,7 +16500,6 @@ Alias: @ref{DOUB}
 
 See also: @ref{Number Conversion}
 
-[3.1.913]
 @c -------------------------------------
 @node DSMOOTH, DSOLVE, DOUBLE, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -16678,7 +16547,6 @@ streamline (or tangent).
 
 See also: @ref{ESMOOTH}, @ref{GSMOOTH}, @ref{LSMOOTH}, @ref{SMOOTH}
 
-[2.12.1866]
 @c -------------------------------------
 @node DSOLVE, DSUM, DSMOOTH, Internal Routines
 @subsection DSOLVE
@@ -16706,7 +16574,6 @@ An alias of @code{TOTAL(..., /DOUBLE)}.
 
 See also: @ref{FSUM}, @ref{MEAN}, @ref{TOTAL}
 
-[3.2.48]
 @c -------------------------------------
 @node DTDB, DUMP, DSUM, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -16789,7 +16656,6 @@ Alias: @ref{D}
 
 See also: @ref{SHOW}, @ref{DUMP_STACK}, @ref{ATOMIZE}
 
-[2.13.185]
 @c -------------------------------------
 @node DUMP_LUN, DUMP_STACK, DUMP, Internal Routines
 @subsection DUMP_LUN
@@ -16988,7 +16854,6 @@ numbers, bytes 0 and 3 are swapped, and bytes 1 and 2.  In a
 bytes 2 and 5, and bytes 3 and 4.  In a @code{WORD} number, bytes 0 and
 1 are swapped.  A @code{BYTE} number is left unchanged.
 
-[2.11.1]
 @c -------------------------------------
 @node ENHANCEIMAGE, EO06A, ENDIAN, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -17028,7 +16893,6 @@ histogram equalization (on large scales in the histogram).
 
 See also: @ref{ENHANCEIMAGE}
 
-[4.0.474]
 @c -------------------------------------
 @node EO06A, EORS, ENHANCEIMAGE, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -17202,7 +17066,6 @@ elements 2, 3, 6, and 7 belong to one equivalence class (with element 2
 having the smallest element number) and elements 4 and 5 to another
 (with element 4 the smallest).
 
-[2.10.784] 
 @c -------------------------------------
 @node ERA00, ERASE, EQUIVALENCE, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -17241,7 +17104,6 @@ keywords, or in @code{DEV} coordinated by default.
 See also: @ref{Screen Coordinates}, @ref{!PDEV}, @ref{!WINDOW},
 @ref{!PS_FILE} 
 
-[2.11.635]
 @c -------------------------------------
 @node ERF, ERFC, ERASE, Internal Routines
 @subsection ERF
@@ -17290,14 +17152,12 @@ zero.
 
 See also: @ref{DILATE}
 
-[3.1.1385]
 @c -------------------------------------
 @node ERODEDIR, ERROR, ERODE, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection ERODEDIR
 @findex ERODEDIR
 
-[3.1.503]
 @c -------------------------------------
 @node ERROR, ESEGMENT, ERODEDIR, Internal Routines
 @subsection ERROR
@@ -17356,7 +17216,6 @@ directions.
 
 See also: @ref{SEGMENT}
 
-[3.1.538]
 @c -------------------------------------
 @node ESMOOTH, EVAL, ESEGMENT, Internal Routines
 @subsection ESMOOTH
@@ -17374,7 +17233,6 @@ specified, then @code{@var{x}} is treated as a one-dimensional array.
 
 See also: @ref{SMOOTH}, @ref{GSMOOTH}, @ref{RUNSUM}, @ref{RUNCUM}
 
-[2.10.707]
 @c -------------------------------------
 @node EVAL, EVENTNAME, ESMOOTH, Internal Routines
 @subsection EVAL
@@ -17393,7 +17251,6 @@ is returned for it.
 
 See also: @ref{EXECUTE}
 
-[3.1.590]
 @c -------------------------------------
 @node EVENTNAME, EXECUTE, EVAL, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -17461,7 +17318,6 @@ dimensions, then @code{array} is returned immediately.
 
 See also: @ref{COMPRESS}, @ref{REGRID}, @ref{REGRID3}, @ref{!TVSMT}
 
-[2.11.762]
 @c -------------------------------------
 @node EXPM1, F0H, EXPAND, Internal Routines
 @subsection EXPM1
@@ -17600,7 +17456,6 @@ The weight of the first image is taken as @code{@var{weight}} (from 0 to
 
 See also: @ref{FADE_INIT}
 
-[3.1.993]
 @c -------------------------------------
 @node FADE_INIT, FAE03, FADE, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -17615,7 +17470,6 @@ routine @code{FADE}.
 
 See also: @ref{FADE}
 
-[3.1.993]
 @c -------------------------------------
 @node FAE03, FAF03, FADE_INIT, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -17859,7 +17713,6 @@ Reverse: @ref{FZREAD}
 See also: @ref{FCWRITE}, @ref{FZWRITE}, @ref{FZREAD}, @ref{FZHEAD},
 @ref{!CRUNCH_SLICE}
 
-[3.1.645]
 @c -------------------------------------
 @node FCRW, FCW, FCRUNWRITE, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -17882,7 +17735,6 @@ Reverse: @ref{FZREAD}
 See also: @ref{FCW}, @ref{FZWRITE}, @ref{FZREAD}, @ref{FZHEAD},
 @ref{!CRUNCH_SLICE}
 
-[3.1.645]
 @c -------------------------------------
 @node FCW, FCWRITE, FCRW, Internal Routines
 @subsection FCW
@@ -17904,7 +17756,6 @@ Reverse: @ref{FZREAD}
 
 See also: @ref{FCRUNWRITE}, @ref{FZWRITE}, @ref{FZHEAD}
 
-[3.1.645]
 @c -------------------------------------
 @node FCWRITE, FFT, FCW, Internal Routines
 @subsection FCWRITE
@@ -17925,7 +17776,6 @@ Reverse: @ref{FZREAD}
 
 See also: @ref{FZWRITE}, @ref{FZREAD}, @ref{FZHEAD}
 
-[3.1.548]
 @c -------------------------------------
 @node FFT, FFTB, FCWRITE, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -18085,7 +17935,6 @@ spectrum of the original.
 
 See also: @ref{SHIFT}
 
-[2.13.525]
 @c -------------------------------------
 @node FILEPTR, FILEREAD, FFTSHIFT, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -18143,7 +17992,6 @@ position in the file.
 
 See also: @ref{FILEWRITE}, @ref{#TYPE}, @ref{OPENR}
 
-[3.1.525]
 @c -------------------------------------
 @comment  node-name,  next,  previous,  up
 @node FILESIZE, FILETOFZ, FILEREAD, Internal Routines
@@ -18155,7 +18003,6 @@ See also: @ref{FILEWRITE}, @ref{#TYPE}, @ref{OPENR}
 Returns the size of the indicated @code{@var{file}}, in bytes, or
 @code{-1} if the file does not exist.
 
-[3.1.567]
 @c -------------------------------------
 @node FILETOFZ, FILETYPE, FILESIZE, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -18188,7 +18035,6 @@ file cannot be opened for reading then an error is generated.
 
 See also: @ref{#FILETYPE}, @ref{FILETYPENAME}
 
-[5.12.1547]
 @c -------------------------------------
 @node FILETYPENAME, FILEWRITE, FILETYPE, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -18201,7 +18047,6 @@ Returns a string that describes numerical file type @code{type}.
 
 See also: @ref{#FILETYPE}, @ref{FILETYPE}
 
-[2.12.1547]
 @c -------------------------------------
 @node FILEWRITE, FIND, FILETYPENAME, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -18218,7 +18063,6 @@ data is written at the current file position.
 
 See also: @ref{FILEREAD}, @ref{OPENW}
 
-[3.1.525]
 @c -------------------------------------
 @node FIND, FINDFILE, FILEWRITE, Internal Routines
 @subsection FIND
@@ -18270,7 +18114,6 @@ slashes and any preceding text is removed first.
 
 See also: @ref{GETDIRECTORIES}, @ref{GETFILES}, @ref{GETMATCHEDFILES}
 
-[2.14.17]
 @c -------------------------------------
 @node FIND_MAX, FIND_MAXLOC, FINDFILE, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -18338,7 +18181,6 @@ constitutes a local maximum.  Such regions are ignored.
 
 See also: @ref{LOCAL_MAX}, @ref{FIND_MAXLOC}, @ref{FIND_MIN}
 
-[2.11.783]
 @c -------------------------------------
 @node FIND_MAXLOC, FIND_MIN, FIND_MAX, Internal Routines
 @subsection FIND_MAXLOC
@@ -18419,7 +18261,6 @@ plateau is returned.
 See also: @ref{FIND}, @ref{LOCAL_MAX}, @ref{FIND_MAX},
 @ref{FIND_MINLOC}
 
-[2.11.762]
 @c -------------------------------------
 @node FIND_MIN, FIND_MINLOC, FIND_MAXLOC, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -18487,7 +18328,6 @@ constitutes a local minimum.  Such regions are ignored.
 
 See also: @ref{LOCAL_MIN}, @ref{FIND_MINLOC}, @ref{FIND_MIN}
 
-[2.11.783]
 @c -------------------------------------
 @node FIND_MINLOC, FIT, FIND_MIN, Internal Routines
 @subsection FIND_MINLOC
@@ -18552,7 +18392,6 @@ constitutes a local minimum.  Such regions are ignored.
 
 See also: @ref{LOCAL_MIN}, @ref{FIND_MIN}, @ref{FIND_MINLOC}
 
-[2.11.762]
 @c -------------------------------------
 @node FIT, FIT2, FIND_MINLOC, Internal Routines
 @subsection FIT
@@ -18689,7 +18528,6 @@ are displayed.
 
 See also: @ref{TREND}, @ref{LSQ}, @ref{FIT}
 
-[2.13.264]
 @c -------------------------------------
 @node FIT2, FIT3, FIT, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -18795,7 +18633,6 @@ Upon success, this function returns a @code{1}, otherwise a @code{0}.
 
 See also: @ref{FITS_READ}, @ref{FITS_XREAD}
 
-[3.1.337]
 @c -------------------------------------
 @node FITS_KEY, FITS_READ, FITS_HEADER, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -18824,7 +18661,6 @@ If the key is not found in the FITS header, then a zero is returned.
 @code{FITSKEY} to @code{FITS_KEY} because the names of all other
 routines and functions relating to FITS files also start with @code{FITS_}.)
 
-[3.1.645]
 @c -------------------------------------
 @node FITS_READ, FITS_WRITE, FITS_KEY, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -18873,7 +18709,6 @@ The subroutine form generates an error if a problem is encountered.
 
 See also: @ref{FITS_HEADER}, @ref{FITS_XREAD}
 
-[3.1.1046]
 @c -------------------------------------
 @node FITS_WRITE, FITS_XREAD, FITS_READ, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -18939,7 +18774,6 @@ written to its own FITS record after a @code{COMMENT =} keyword.  If
 @code{@var{header}} is a string array, then each element is written to
 one or more of its own @code{COMMENT} lines.
 
-[3.1.1051]
 @c -------------------------------------
 @node FITS_XREAD, FIX, FITS_WRITE, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -18964,7 +18798,6 @@ Upon success, this function returns a @code{1}, otherwise a @code{0}.
 
 See also: @ref{FITS_HEADER}, @ref{FITS_READ}
 
-[3.1.337]
 @c -------------------------------------
 @node FIX, FK52H, FITS_XREAD, Internal Routines
 @subsection FIX
@@ -18983,7 +18816,6 @@ Alias: @ref{LONG}
 
 See also: @ref{Number Conversion}
 
-[3.1.913]
 @c -------------------------------------
 @node FK52H, FK5HIP, FIX, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -19062,7 +18894,6 @@ modifies @code{@var{x}} itself.
 
 See also: @ref{Number Conversion}
 
-[3.1.913]
 @c -------------------------------------
 @node FLOOR, FLTARR, FLOAT, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -19109,7 +18940,6 @@ the data should be byte-swapped after reading (for input only).
 
 See also: @ref{File Arrays}, @ref{ARRAY}
 
-[4.0.12]
 @c -------------------------------------
 @node FMAP, FORMAT_SET, FLTFARR, Internal Routines
 @subsection FMAP
@@ -19158,7 +18988,6 @@ number is used.  This is only of interest when treating arrays.
 See also: @ref{Output Data Formats}, @ref{PRINT}, @ref{PRINTF},
 @ref{FPRINTF} 
 
-[2.12.1969]
 @c -------------------------------------
 @node FPRINTF, FRATIO, FPRINT, Internal Routines
 @subsection FPRINTF
@@ -19194,7 +19023,6 @@ returned instead.
 
 See also: @ref{ERF}, @ref{ERFC}, @ref{CHI2}, @ref{STUDENT}, @ref{IBETA}.
 
-[2.11.224]
 @c -------------------------------------
 @node FREAD, FREADF, FRATIO, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -19214,7 +19042,6 @@ Reverse: @ref{FPRINT}
 
 See also: @ref{!READ_COUNT}, @ref{Input Data Formats}, @ref{FREADF}
 
-[3.1.590]
 @c -------------------------------------
 @node FREADF, FREADS, FREAD, Internal Routines
 @subsection FREADF
@@ -19239,7 +19066,6 @@ Reverse: @ref{FPRINTF}
 
 See also: @ref{!READ_COUNT}, @ref{Input Data Formats}, @ref{READF}
 
-[3.1.1350]
 @c -------------------------------------
 @node FREADS, FSTRING, FREADF, Internal Routines
 @subsection FREADS
@@ -19262,7 +19088,6 @@ Alias: @ref{SSCANF}
 See also: @ref{!READ_COUNT}, @ref{Input Data Formats}, @ref{READF},
 @ref{FREADF}
 
-[3.1.1350]
 @c -------------------------------------
 @node FSTRING, FSUM, FREADS, Internal Routines
 @subsection FSTRING
@@ -19295,7 +19120,6 @@ An alias of @code{TOTAL}.
 
 See also: @ref{TOTAL}, @ref{DSUM}, @ref{MEAN}
 
-[3.2.48]
 @c -------------------------------------
 @node FW2M, FW2XY, FSUM, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -19474,7 +19298,6 @@ See also: @ref{FCWRITE}, @ref{FZREAD}, @ref{FZHEAD}
 
 Alias: @ref{FZW}, @ref{F0W}, @ref{F0WRITE}
 
-[3.1.548]
 @c -------------------------------------
 @node GAMMA, GC2GD, FZWRITE, Internal Routines
 @subsection GAMMA
@@ -19597,7 +19420,6 @@ Alias: @ref{GETDIRECTS}
 
 See also: @ref{FINDFILE}, @ref{GETFILES}, @ref{GETMATCHEDFILES}
 
-[2.14.17]
 @c -------------------------------------
 @node GETDIRECTS, GETENV, GETDIRECTORIES, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -19616,7 +19438,6 @@ Alias: @ref{GETDIRECTORIES}
 
 See also: @ref{FINDFILE}, @ref{GETFILES}, @ref{GETMATCHEDFILES}
 
-[2.14.17]
 @c -------------------------------------
 @node GETENV, GETFILES, GETDIRECTS, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -19628,7 +19449,6 @@ See also: @ref{FINDFILE}, @ref{GETFILES}, @ref{GETMATCHEDFILES}
 Returns the translation of the environment variable specified in string
 @code{@var{name}}, if any, or else an empty string.
 
-[2.14.17]
 @c -------------------------------------
 @node GETFILES, GETFILES_R, GETENV, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -19647,7 +19467,6 @@ were found.  If no files are found, then scalar @code{0} is returned.
 
 See also: @ref{FINDFILE}, @ref{GETFILES_R}
 
-[2.14.17]
 @c -------------------------------------
 @node GETFILES_R, GETMATCHEDFILES, GETFILES, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -19666,7 +19485,6 @@ no file names are found, then scalar @code{0} is returned.
 
 See also: @ref{FINDFILE}, @ref{GETFILES}
 
-[2.14.17]
 @c -------------------------------------
 @node GETMATCHEDFILES, GETMATCHEDFILES_R, GETFILES_R, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -19716,7 +19534,6 @@ This routine is only available if your computer platform supports it.
 
 See also: @ref{GETFILES}, @ref{GETMATCHEDFILES_R}
 
-[3.1.347]
 @c -------------------------------------
 @node GETMATCHEDFILES_R, GETMIN9, GETMATCHEDFILES, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -19736,7 +19553,6 @@ This routine is only available if your computer platform supports it.
 
 See also: @ref{GETFILES_R}, @ref{GETMATCHEDFILES}
 
-[3.1.347]
 @c -------------------------------------
 @node GETMIN9, GET_LUN, GETMATCHEDFILES_R, Internal Routines
 @subsection GETMIN9
@@ -19759,7 +19575,6 @@ Return the number of a logical unit that is currently unused.
 
 See also: @ref{OPENR}
 
-[2.14.17]
 @c -------------------------------------
 @node GIFREAD, GIFWRITE, GET_LUN, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -19774,7 +19589,6 @@ Reads a GIF @code{@var{image}} and (optionally) the
 
 See also: @ref{GIFWRITE}
 
-[3.1.513]
 @c -------------------------------------
 @node GIFWRITE, GMST00, GIFREAD, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -19789,7 +19603,6 @@ a 3 by 256 element @code{BYTE} array containing rgb triplets.
 
 See also: @ref{GIFREAD}
 
-[3.1.513]
 @c -------------------------------------
 @node GMST00, GMST06, GIFWRITE, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -19901,7 +19714,6 @@ is ignored if @code{@var{axis}} is specified.
 
 See also: @ref{SMOOTH}, @ref{ESMOOTH}
 
-[2.11.2]
 
 @c -------------------------------------
 @node GST00A, GST00B, GSMOOTH, Internal Routines
@@ -20048,7 +19860,6 @@ See also: @ref{Astronomical Coordinate Calculations}
 
 See also: @ref{XPLACE}
 
-[2.13.275]
 @c -------------------------------------
 @node HELP, HEX, HAIRS, Internal Routines
 @subsection HELP
@@ -20069,7 +19880,6 @@ functions).
 @subsection HEX
 @findex HEX
 
-[5.1.514]
 @c -------------------------------------
 @node HFK5Z, HILBERT, HEX, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -20134,7 +19944,6 @@ to the power spectrum of @code{x} itself, except at zero frequency
 
 See also: @ref{FFT}, @ref{SC}, @ref{SCB}
 
-[2.12.304]
 
 @menu
 * HILBERT Details::
@@ -20183,7 +19992,6 @@ histogram is large yet sparsely occupied.
 See also: @ref{HISTR}, @ref{DISTR}, @ref{!HISTMIN}, @ref{!HISTMAX},
 @ref{!MAXHISTSIZE}
 
-[3.2.7]
 @c -------------------------------------
 @node HISTR, IBETA, HIST, Internal Routines
 @subsection HISTR
@@ -20206,7 +20014,6 @@ value 0 from @code{@var{x}} but to the most negative value).  If
 
 See also: @ref{HIST}
 
-[3.2.7]
 @c -------------------------------------
 @node IBETA, IDLREAD, HISTR, Internal Routines
 @subsection IBETA
@@ -20241,7 +20048,6 @@ returns @code{1} on success.
 
 See also: @ref{IDLRESTORE}, @ref{ARESTORE}
 
-[2.12.1240]
 @c -------------------------------------
 @node IDLRESTORE, IGAMMA, IDLREAD, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -20259,7 +20065,6 @@ generated.
 
 See also: @ref{IDLREAD}, @ref{ARESTORE}
 
-[2.12.1240]
 @c -------------------------------------
 @node IGAMMA, IGNORE, IDLRESTORE, Internal Routines
 @subsection IGAMMA
@@ -20277,7 +20082,6 @@ returned instead.
 
 See also: @ref{GAMMA}, @ref{CHI2}
 
-[2.11.226]
 @c -------------------------------------
 @node IGNORE, IMAGINARY, IGAMMA, Internal Routines
 @subsection IGNORE
@@ -20307,7 +20111,6 @@ data, this is equivalent to @code{ZERO(@var{x})}.
 See also: @ref{ABS}, @ref{ARG}, @ref{CONJUGATE}, @ref{REAL}, @ref{ZERO},
 @ref{Complex Numbers}
 
-[2.13.87]
 @c -------------------------------------
 @node INDEX, INDGEN, IMAGINARY, Internal Routines
 @subsection INDEX
@@ -20335,7 +20138,6 @@ are supported.
 
 See also: @ref{ZERO}, @ref{ONE}
 
-[2.12.827]
 @c -------------------------------------
 @node INFO, INPOLYGON, INDGEN, Internal Routines
 @subsection INFO
@@ -20378,7 +20180,6 @@ Returns indices to @code{@var{x}} and @code{@var{y}} of those points
 that lie within the polygon defined by coordinates @code{@var{lx}} and
 @code{@var{ly}}, or scalar @minus{}1 if no such points were found.
 
-[2.13.213]
 @c -------------------------------------
 @node INSERT, INT, INPOLYGON, Internal Routines
 @subsection INSERT
@@ -20422,7 +20223,6 @@ was not totally backwardly compatible with the LUX 1 argument list.
 When insertion through subscripts became available, @code{INSERT} could
 revert to its LUX 1 form.
 
-[3.1.17]
 @c -------------------------------------
 @node INT, INTARR, INSERT, Internal Routines
 @subsection INT
@@ -20536,7 +20336,6 @@ the data should be byte-swapped after reading (for input only).
 
 See also: @ref{File Arrays}, @ref{ARRAY}, @ref{INTARR}
 
-[4.0.12]
 @c -------------------------------------
 @node IR, ISARRAY, INTFARR, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -20684,7 +20483,6 @@ implement this routine.
 
 See also: @ref{JPEGWRITE}, @ref{FZREAD}, @ref{GIFREAD}
 
-[3.2.401]
 @c -------------------------------------
 @node JPEGWRITE, KEPLER, JPEGREAD, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -20711,7 +20509,6 @@ implement this routine.
 
 See also: @ref{JPEGREAD}, @ref{FCWRITE}, @ref{FZWRITE}, @ref{GIFWRITE}
 
-[3.2.401]
 @c -------------------------------------
 @node KEPLER, KSMOOTH, JPEGWRITE, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -20730,7 +20527,6 @@ which may have any values.
 @subsection KSMOOTH
 @findex KSMOOTH
 
-[3.1.514]
 @c -------------------------------------
 @node LE, LEGENDRE, KSMOOTH, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -20807,7 +20603,6 @@ degree @code{m}.  The number of returned values is equal to
 @code{(@var{lmax} + 1)*(@var{lmax} + 2)/2}.  The @code{l + 1} values for
 order @code{l} start at index @code{l*(l + 1)/2}.
 
-[3.1.1148]
 @c -------------------------------------
 @node LIMITS, LIST, LEGENDRE, Internal Routines
 @subsection LIMITS
@@ -20834,7 +20629,6 @@ routine that has symbol number @code{@var{symbol}} (if
 
 See also: @ref{DUMP}, @ref{SHOW_FUNC}, @ref{SHOW_SUBR}
 
-[2.13.370]
 @c -------------------------------------
 @node LLSQ, LMAP, LIST, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -20847,7 +20641,6 @@ WEIGHTS=@var{weights}, COV=@var{cov}, ERR=@var{err}, CHISQ=@var{chisq}]
 
 
 
-[3.1.514]
 @c -------------------------------------
 @node LMAP, LOCAL_MAX, LLSQ, Internal Routines
 @subsection LMAP
@@ -20884,7 +20677,6 @@ then the nearest position inside the @code{@var{array}} is used instead.
 See also: @ref{LOCAL_MAXLOC}, @ref{LOCAL_MIN}, @ref{LOCAL_MINLOC},
 @ref{MAX}, @ref{MAXLOC}, @ref{!LASTMAX}, @ref{!LASTMAXLOC}
 
-[2.11.1247]
 @c -------------------------------------
 @node LOCAL_MAXLOC, LOCAL_MIN, LOCAL_MAX, Internal Routines
 @subsection LOCAL_MAXLOC
@@ -20910,7 +20702,6 @@ the @code{@var{array}} is used instead.
 See also: @ref{LOCAL_MAX}, @ref{LOCAL_MIN}, @ref{LOCAL_MINLOC},
 @ref{MAX}, @ref{MAXLOC}, @ref{!LASTMAX}, @ref{!LASTMAXLOC}
 
-[2.11.1247]
 @c -------------------------------------
 @node LOCAL_MIN, LOCAL_MINLOC, LOCAL_MAXLOC, Internal Routines
 @subsection LOCAL_MIN
@@ -20935,7 +20726,6 @@ then the nearest position inside the @code{@var{array}} is used instead.
 See also: @ref{LOCAL_MINLOC}, @ref{LOCAL_MAX}, @ref{LOCAL_MAXLOC},
 @ref{MIN}, @ref{MINLOC}, @ref{!LASTMIN}, @ref{!LASTMINLOC}
 
-[2.11.1247]
 @c -------------------------------------
 @node LOCAL_MINLOC, LOG, LOCAL_MIN, Internal Routines
 @subsection LOCAL_MINLOC
@@ -20962,7 +20752,6 @@ coordinates to @code{@var{array}}.  If an indicated
 See also: @ref{LOCAL_MIN}, @ref{LOCAL_MAX}, @ref{LOCAL_MAXLOC},
 @ref{MIN}, @ref{MINLOC}, @ref{!LASTMIN}, @ref{!LASTMINLOC}
 
-[2.11.1247]
 @c -------------------------------------
 @node LOG, LOG10, LOCAL_MINLOC, Internal Routines
 @subsection LOG
@@ -21038,7 +20827,6 @@ the data should be byte-swapped after reading (for input only).
 
 See also: @ref{File Arrays}, @ref{ARRAY}, @ref{LONARR}
 
-[4.0.12]
 @c -------------------------------------
 @node LONG, LOWCASE, LONFARR, Internal Routines
 @subsection LONG
@@ -21057,7 +20845,6 @@ Alias: @ref{FIX}
 
 See also: @ref{Number Conversion}
 
-[3.1.913]
 @c -------------------------------------
 @node LOWCASE, LOWER, LONG, Internal Routines
 @subsection LOWCASE
@@ -21135,7 +20922,6 @@ streamline (or tangent).
 
 See also: @ref{DSMOOTH}, @ref{ESMOOTH}, @ref{GSMOOTH}, @ref{SMOOTH}
 
-[2.12.1866]
 @c -------------------------------------
 @node LSQ, LT, LSMOOTH, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -21201,7 +20987,6 @@ value of @code{n - 1}.
 
 See also: @ref{FIT}
 
-[3.1.261]
 @c -------------------------------------
 @node LT, MATCH, LSQ, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -21230,7 +21015,6 @@ Returns an index to the position in @code{@var{set}} of each member of
 that are not in @code{@var{set}}.  @code{@var{set}} must be sorted in
 ascending order.
 
-[2.10.199]
 
 @c -------------------------------------
 @node MAX, MAXDIR, MATCH, Internal Routines
@@ -21274,14 +21058,12 @@ See also: @ref{MAXLOC}, @ref{MIN}, @ref{MINLOC}, @ref{!LASTMAX},
 @ref{LOCAL_MAXLOC}, @ref{LOCAL_MIN}, @ref{LOCAL_MINLOC},
 @ref{FIND_MAXLOC}
 
-[3.1.1253]
 @c -------------------------------------
 @node MAXDIR, MAXFILTER, MAX, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection MAXDIR
 @findex MAXDIR
 
-[3.1.514]
 @c -------------------------------------
 @node MAXFILTER, MAXLOC, MAXDIR, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -21304,7 +21086,6 @@ is returned.
 
 See also:  @code{MINFILTER}, @code{ORDFILTER}, @code{MEDFILTER}
 
-[2.13.273]
 @c -------------------------------------
 @node MAXLOC, MDIAGONAL, MAXFILTER, Internal Routines
 @subsection MAXLOC
@@ -21346,7 +21127,6 @@ E.g. if @code{x = [[[1,7]],[[3,5]]]} then @code{MAX(x) = 7 MAX(x,0) =
 
 See also: @ref{MAX}, @ref{!LASTMAX}, @ref{!LASTMAXLOC}
 
-[3.0.235]
 @c -------------------------------------
 @node MDIAGONAL, MEAN, MAXLOC, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -21466,7 +21246,6 @@ than @code{FLOAT/CFLOAT} @code{TOTAL}.
 See also: @ref{HIST}, @ref{MEAN}, @ref{DSUM}, @ref{FSUM}, @ref{TOTAL},
 @ref{SDEV}
 
-[3.2.44]
 @c -------------------------------------
 @node MEDFILTER, MEDIAN, MEAN, Internal Routines
 @subsection MEDFILTER
@@ -21499,7 +21278,6 @@ Calculates the median of numerical @code{@var{x}} along the indicated
 
 See also: @ref{MEDFILTER}, @ref{QUANTILE}
 
-[2.12.1778]
 @c -------------------------------------
 @node MEMORY, MENU, MEDIAN, Internal Routines
 @subsection MEMORY
@@ -21639,7 +21417,6 @@ See also: @ref{MAX}, @ref{MAXLOC}, @ref{MINLOC}, @ref{!LASTMAX},
 @ref{LOCAL_MIN}, @ref{LOCAL_MAXLOC}, @ref{LOCAL_MINLOC},
 @ref{FIND_MAXLOC}
 
-[3.1.1253]
 @c -------------------------------------
 @node MINFILTER, MINLOC, MIN, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -21662,7 +21439,6 @@ is returned.
 
 See also:  @code{MAXFILTER}, @code{ORDFILTER}, @code{MEDFILTER}
 
-[2.13.273]
 @c -------------------------------------
 @node MINLOC, MOD, MINFILTER, Internal Routines
 @subsection MINLOC
@@ -21763,7 +21539,6 @@ This functions gets called when the @code{#} operator is used.
 
 See also: @ref{DECOMP}, @ref{DSOLVE}, @ref{SVD}
 
-[3.1.471]
 @c -------------------------------------
 @node MULTISIEVE, NAME, MPRODUCT, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -21792,7 +21567,6 @@ See also: @ref{SIEVE}
 @subsection NAME
 @findex NAME
 
-[3.1.514]
 @c -------------------------------------
 @node NCCHI2, NE, NAME, Internal Routines
 @subsection NCCHI2
@@ -21836,7 +21610,6 @@ reported: at least @code{@var{count}} @code{NEWALLOC}s old.  If
 subsequently accepted in @code{NEWALLOC}s without @code{/RESET}.  If
 @code{@var{count}} is not specified, then 0 is assumed.
 
-[2.11.150]
 @c -------------------------------------
 @node NOECHO, NOOP, NEWALLOCS, Internal Routines
 @subsection NOECHO
@@ -21969,7 +21742,6 @@ and lists.
 
 See also: @ref{NUM_DIM}, @ref{DIMEN}, @ref{SYMCLASS}, @ref{SYMDTYPE}
 
-[3.1.1422]
 @c -------------------------------------
 @node NUT00A, NUT00B, NUM_ELEM, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -22105,7 +21877,6 @@ generate errors in the function form.
 
 See also: @ref{ZERO}
 
-[2.12.827]
 @c -------------------------------------
 @node OPENR, OPENU, ONE, Internal Routines
 @subsection OPENR
@@ -22183,7 +21954,6 @@ data points.
 
 See @ref{PLOT} for more information.
 
-[3.1.1377]
 @c -------------------------------------
 @node OR, ORDFILTER, OPLOT, Internal Routines
 @subsection OR
@@ -22293,7 +22063,6 @@ The returned orientations are ambiguous over 180 degrees.
 * ORIENTATION details::
 @end menu
 
-[2.12.1818]
 @c ---------------------------------------------------------------------
 @node ORIENTATION details,  , ORIENTATION, ORIENTATION
 @comment  node-name,  next,  previous,  up
@@ -22554,7 +22323,6 @@ white.
 
 See also: @ref{ERASE}, @ref{SET}, @ref{!WINDOW}
 
-[2.10.668]
 @c -------------------------------------
 @node PENCOLOR, PFW06, PEN, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -22581,7 +22349,6 @@ color names are valid (@ref{Incidental Colors}).
 See also: @ref{Incidental Colors}, @ref{!PDEV}, @ref{PDEV}, @ref{XOPEN},
 @ref{XCLOSE}
 
-[3.2.122]
 @c -------------------------------------
 @node PFW06, PIT, PENCOLOR, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -22774,7 +22541,6 @@ right of its x value.
 See also: @ref{CALLIG}, @ref{OPLOT}, @ref{!PLTYP}, @ref{!PLXERRB},
 @ref{!PLYERRB}
 
-[3.2.241]
 @c -------------------------------------------------------------
 @menu
 * Plot Styles::
@@ -22841,7 +22607,6 @@ connected by solid lines.
 
 See also: @ref{PLOT}, @ref{OPLOT}
 
-[3.2.241]
 @c -------------------------------------------------------------
 @node PLOT Globals,  , Plot Styles, PLOT
 @comment  node-name,  next,  previous,  up
@@ -22924,7 +22689,6 @@ See also: @ref{PLOT}, @ref{OPLOT}, @ref{!DASHSIZE}, @ref{!DLABX},
 @ref{!TICKY}, @ref{!TICKXR}, @ref{!TICKYR}, @ref{!WXB}, @ref{!WXT},
 @ref{!WYB}, @ref{!WYT}
 
-[3.2.241]
 @c -------------------------------------
 @node PLOT3D, PM, PLOT, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -23295,7 +23059,6 @@ restore to their original locations.
 
 See also: @ref{PUSH}, @ref{DUMP_STACK}, @ref{#STACK}, @ref{Stack}
 
-[3.1.539]
 @c -------------------------------------
 @node POSTIMAGE, POSTRAW, POP, Internal Routines
 @subsection POSTIMAGE
@@ -23374,7 +23137,6 @@ as a one-dimensional array.
 
 See also: @ref{SC}, @ref{SCB}
 
-[3.1.555]
 @c -------------------------------------
 @node PR00, PREC76, POWER, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -23448,7 +23210,6 @@ corresponds to JDE 2433282.4235.
 
 See also: @ref{ASTRON}, @ref{CALENDAR}
 
-[4.0.284]
 @c -------------------------------------
 @node PRINT, PRINTF, PRECESS, Internal Routines
 @subsection PRINT
@@ -23465,7 +23226,6 @@ Alias: @ref{T}, @ref{TY}, @ref{TYPE}
 
 See also: @ref{PRINTF}, @ref{In-Line Print Formats}
 
-[2.12.1602]
 @c -------------------------------------
 @node PRINTF, PROJECT, PRINT, Internal Routines
 @subsection PRINTF
@@ -23580,7 +23340,6 @@ taken for the dimensions.  If @code{@var{hdist}} is zero, then the
 greatest dimension of the output array spans
 @code{@var{height}/@var{mag}} elements of the map.
 
-[4.0.46]
 @c -------------------------------------
 @node PSUM, PTOC, PROJECTMAP, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -23610,7 +23369,6 @@ If @code{w = INDGEN(data, 0)} then @code{PSUM(data, n, 0)} is equal to
 @code{TOTAL(data*w^n,0)}, and @code{PSUM(data, n, 1, /CNORMALIZE} is
 equal to @code{TOTAL(data*w^n)/TOTAL(w^n)}.
 
-[2.12.1485]
 @c -------------------------------------
 @node PTOC, PUSH, PSUM, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -23635,7 +23393,6 @@ used.
 
 Reverse: @ref{CTOP}
 
-[3.2.169]
 @c -------------------------------------
 @node PUSH, PV2S, PTOC, Internal Routines
 @subsection PUSH
@@ -23647,7 +23404,6 @@ Pushes the specified variables onto variables stack @code{#STACK}.
 
 See also: @ref{POP}, @ref{DUMP_STACK}, @ref{#STACK}, @ref{Stack}
 
-[3.1.539]
 @c -------------------------------------
 @node PV2S, PVDPV, PUSH, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -23785,7 +23541,6 @@ are therefore faster.
 
 See also: @ref{MEDIAN}, @ref{ORDFILTER}, @ref{MIN}, @ref{MAX}
 
-[2.12.1778]
 @c -------------------------------------
 @node QUIT, RANDOM, QUANTILE, Internal Routines
 @subsection QUIT
@@ -23855,7 +23610,6 @@ generator.  The period of this generator is @code{2^19937 - 1}, or about
 
 See also: @ref{RANDOMB}, @ref{RANDOMN}, @ref{RANDOMU}, @ref{Random Arrays}
 
-[3.2.100]
 @c -------------------------------------
 @node RANDOMB, RANDOMD, RANDOM, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -23882,7 +23636,6 @@ Alias: @code{RANDOM(/BITS)} (if @code{/LONG} is not set)
 
 See also: @ref{RANDOM}, @ref{RANDOMN}, @ref{RANDOMU}, @ref{Random Arrays}
 
-[3.2.315]
 @c -------------------------------------
 @node RANDOMD, RANDOME, RANDOMB, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -23909,7 +23662,6 @@ numbers every time.  Different seeds generate different sequences.
 
 See also: @ref{RANDOM}, @ref{Random Arrays}
 
-[3.2.279]
 @c -------------------------------------
 @node RANDOME, RANDOMN, RANDOMD, Internal Routines
 @subsection RANDOMN
@@ -23926,7 +23678,6 @@ numbers whose magnitude is at least @code{@var{limit}} are returned.
 
 See also: @ref{RANDOM}, @ref{RANDOMB}, @ref{RANDOMU}, @ref{Random Arrays}
 
-[3.2.316]
 @c -------------------------------------
 @node RANDOMN, RANDOMU, RANDOME, Internal Routines
 @subsection RANDOMN
@@ -23951,7 +23702,6 @@ Alias: @code{RANDOM(/NORMAL)}
 
 See also: @ref{RANDOM}, @ref{RANDOMB}, @ref{RANDOMU}, @ref{Random Arrays}
 
-[3.2.100]
 @c -------------------------------------
 @node RANDOMU, READ, RANDOMN, Internal Routines
 @subsection RANDOMU
@@ -23982,7 +23732,6 @@ Alias: @code{RANDOM(/UNIFORM)}
 
 See also: @ref{RANDOM}, @ref{RANDOMB}, @ref{RANDOMN}, @ref{Random Arrays}
 
-[3.2.100]
 @c -------------------------------------
 @node READ, READARR, RANDOMU, Internal Routines
 @subsection READ
@@ -24029,7 +23778,6 @@ the keyboard (standard input) is read one line at a time.
 See also: @ref{READARR}, @ref{READF}, @ref{PRINT}, @ref{OPENR},
 @ref{!READ_COUNT}
 
-[3.1.1294]
 @c -------------------------------------
 @node READARR, READF, READ, Internal Routines
 @subsection READARR
@@ -24070,7 +23818,6 @@ Upon exit, @code{!READ_COUNT} contains the number of read elements.
 
 See also: @ref{PRINTF}, @ref{READ}, @ref{READU}, @ref{!READ_COUNT}
 
-[3.1.91]
 @c -------------------------------------
 @node READORBITS, READU, READF, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -24135,7 +23882,6 @@ must be sorted in ascending order of their JDE.
 
 See also: @ref{ASTRON}
 
-[2.11.390]
 @c -------------------------------------
 @node READU, READ_JPEG, READORBITS, Internal Routines
 @subsection READU
@@ -24174,7 +23920,6 @@ arguments, this is equivalent to returing @code{@var{x}} itself.
 See also: @ref{ABS}, @ref{ARG}, @ref{CONJUGATE}, @ref{IMAGINARY},
 @ref{Complex Numbers}
 
-[2.13.87]
 @c -------------------------------------
 @node RECORD, REDIM, REAL, Internal Routines
 @subsection RECORD
@@ -24191,7 +23936,6 @@ platform supports it.
 
 See also: @ref{DIAGNOSTIC}, @ref{Diagnostic Output}
 
-[3.1.347]
 @c -------------------------------------
 @node REDIM, REGEX, RECORD, Internal Routines
 @subsection REDIM
@@ -24208,7 +23952,6 @@ the modified @code{@var{array}}.
 
 See also: @ref{DIMEN}, @ref{NUM_DIM}, @ref{#MAX_DIMS}
 
-[2.11.1200]
 @c -------------------------------------
 @node REGEX, REGRID, REDIM, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -24230,7 +23973,6 @@ subexpression (as defined by the opening parenthesis).  If
 @code{@var{regex}} is not specified, then the regular expression that
 was specified most recently is used.
 
-[4.0.314]
 @c -------------------------------------
 @node REGRID, REGRID3, REGEX, Internal Routines
 @subsection REGRID
@@ -24299,7 +24041,6 @@ point @code{(100,200)} and expand it by a factor of 3, you could do
 
 See also: @ref{COMPRESS}, @ref{EXPAND}, @ref{REGRID3}, @ref{REGRID3NS}
 
-[3.2.96]
 @c -------------------------------------
 @menu
 * REGRID Details::
@@ -24350,7 +24091,6 @@ ALPHA = @minus{}0.5).
 
 See also: @ref{REGRID}, @ref{REGRID3}
 
-[3.2.96]
 @c -------------------------------------
 @node REGRID3, REGRID3NS, REGRID, Internal Routines
 @subsection REGRID3
@@ -24383,7 +24123,6 @@ See at @code{REGRID} for more information and examples.
 
 See also: @ref{COMPRESS}, @ref{EXPAND}, @ref{REGRID}, @ref{REGRID3NS}
 
-[3.1.1423]
 @c -------------------------------------
 @node REGRID3NS, REORDER, REGRID3, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -24413,7 +24152,6 @@ See at @code{REGRID} for more information and examples.
 
 See also: @ref{COMPRESS}, @ref{EXPAND}, @ref{REGRID}, @ref{REGRID3}
 
-[3.1.1423]
 @c -------------------------------------
 @node REORDER, REPLACE, REGRID3NS, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -24426,7 +24164,6 @@ Reorders (flips, transposes) two-dimensional @code{@var{array}}
 according to @code{@var{order}}, which must be between @code{0} and
 @code{7}, inclusive.
 
-[3.2.423]
 @c -------------------------------------
 @node REPLACE, RESTART, REORDER, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -24444,7 +24181,6 @@ be in ascending order.  No check is made if these values are in fact in
 ascending order, and if they are not, then the results may not be what
 you expect.
 
-[2.11.244]
 
 @c -------------------------------------
 @node RESTART, RESTORE, REPLACE, Internal Routines
@@ -24515,7 +24251,6 @@ in which it is used.
 Reverses @code{@var{array}} in the indicated @code{@var{dimensions}}
 around the indicated @code{@var{center}}.  
 
-[2.13.271]
 @c -------------------------------------
 @node REWIND, REWINDF, REVERSE, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -24610,7 +24345,6 @@ is a three-dimensional array, then @code{ROLL(x,1)} is equivalent to
 @code{ROLL(x,[2,0,1])} and @code{x(>1,>2,>0)}, and @code{ROLL(x,-1)} is
 equivalent to @code{ROLL(x,[1,2,0])} and @code{x(>2,>0,>1)}.
 
-[3.2.432]
 @c -------------------------------------
 @node ROOT3, RUNCUM, ROLL, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -24639,7 +24373,6 @@ are filled with the nearest full-width value.
 
 See also: @ref{RUNSUM}, @ref{SMOOTH}
 
-[2.13.272]
 @c -------------------------------------
 @node RUNMAX, RUNMIN, RUNCUM, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -24712,7 +24445,6 @@ For example, if @code{x} is equal to @code{[2,4,3]}, then
 
 See also: @ref{RUNSUM}
 
-[2.12.435]
 @c -------------------------------------
 @node RUNSUM, RV2M, RUNPROD, Internal Routines
 @subsection RUNSUM
@@ -25001,7 +24733,6 @@ Reverse: @ref{SCB}
 
 See also: @ref{POWER}, @ref{FFT}, @ref{HILBERT}
 
-[2.12.301]
 
 @menu
 * SC Details::
@@ -25045,7 +24776,6 @@ default to the lowest and highest values in @code{@var{image}}.
 See also: @ref{SCALERANGE}, @ref{!SCALEMIN}, @ref{!SCALEMAX},
 @ref{!ZOOMLOW}, @ref{!ZOOMHIGH}
 
-[3.1.63]
 @c -------------------------------------
 @node SCALERANGE, SCANF, SCALE, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -25074,7 +24804,6 @@ If @code{/ZOOM} is specified, then the values of @code{!ZOOMLOW} and
 See also: @ref{SCALE}, @ref{!SCALEMIN}, @ref{!SCALEMAX}, @ref{!ZOOMLOW},
 @ref{!ZOOMHIGH}
 
-[3.1.63]
 @c -------------------------------------
 @node SCANF, SCB, SCALERANGE, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -25098,7 +24827,6 @@ Alias: @ref{FREADF}
 
 See also: @ref{!READ_COUNT}, @ref{Input Data Formats}, @ref{READF}
 
-[3.1.1350]
 @c -------------------------------------
 @node SCB, SCCOMPLEX, SCANF, Internal Routines
 @subsection SCB
@@ -25132,7 +24860,6 @@ Reverse: @ref{SC}
 
 See also: @ref{POWER}, @ref{FFT}, @ref{HILBERT}
 
-[2.12.301]
 
 @menu
 * SCB Details::
@@ -25242,7 +24969,6 @@ deviation (@code{2.217356}) of elements @code{6, 4, 3, 8}.
 See also: @ref{HIST}, @ref{MEAN}, @ref{TOTAL}, @ref{VARIANCE},
 @ref{!LASTMEAN}, @ref{!LASTSDEV}
 
-[3.2.44]
 @c -------------------------------------
 @node SEGMENT, SEGMENTDIR, SDEV, Internal Routines
 @subsection SEGMENT
@@ -25321,7 +25047,6 @@ If @code{@var{data}} is of types @code{LONG}, @code{FLOAT}, or
 values have a magnitude exceeding @code{#MAX_LONG/2},
 @code{#MAX_FLOAT/2}, or @code{#MAX_DOUBLE/2}, respectively.
 
-[3.1.756]
 @c -------------------------------------
 @node SEGMENTDIR, SEPP, SEGMENT, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -25337,7 +25062,6 @@ positive x-axis).
 
 See also: @ref{SEGMENT}
 
-[2.12.1824]
 @c -------------------------------------
 @node SEPP, SEPS, SEGMENTDIR, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -25465,7 +25189,6 @@ open graphical LUX windows.
 See also: @ref{XPORT}, @ref{SETFOREGROUND}, @ref{SETBACKGROUND},
 @ref{TRACE}, @ref{STEP}, @ref{TV}, @ref{XCLOSE}, @ref{XOPEN}
 
-[3.2.19]
 @c -------------------------------------
 @node SETBACKGROUND, SETBG, SET, Internal Routines
 @subsection SETBACKGROUND
@@ -25483,7 +25206,6 @@ Alias: @ref{SETBG}
 
 See also: @ref{SETFOREGROUND}, @ref{Incidental Colors}
 
-[3.2.28]
 @c -------------------------------------
 @node SETBG, SETENV, SETBACKGROUND, Internal Routines
 @subsection SETBG
@@ -25501,7 +25223,6 @@ Alias: @ref{SETBACKGROUND}
 
 See also: @ref{SETFOREGROUND}, @ref{Incidental Colors}
 
-[3.2.28]
 @c -------------------------------------
 @node SETENV, SETFG, SETBG, Internal Routines
 @subsection SETENV
@@ -25516,7 +25237,6 @@ variable is displayed.  If @code{@var{string}} has the form
 @code{'VARIABLE=VALUE'}, then @code{VALUE} is assigned to environment
 variable @code{VARIABLE} (which must not have a preceding @code{$}).
 
-[2.13.232]
 @c -------------------------------------
 @node SETFG, SETFOREGROUND, SETENV, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -25535,7 +25255,6 @@ Alias: @ref{SETFOREGROUND}
 
 See also: @ref{SETBACKGROUND}, @ref{Incidental Colors}
 
-[3.2.28]
 @c -------------------------------------
 @node SETFOREGROUND, SGN, SETFG, Internal Routines
 @subsection SETFOREGROUND
@@ -25553,7 +25272,6 @@ Alias: @ref{SETFG}
 
 See also: @ref{SETBACKGROUND}, @ref{Incidental Colors}
 
-[3.2.28]
 @c -------------------------------------
 @node SGN, SHIFT, SETFOREGROUND, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -25566,7 +25284,6 @@ Returns for each element of @code{@var{data}} the sign of the element:
 @code{+1} if the element is positive, @code{-1} if the element is
 negative, and @code{0} if the element is equal to zero.
 
-[2.11.1230]
 @c -------------------------------------
 @node SHIFT, SHIFT3, SGN, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -25600,7 +25317,6 @@ The function form returns the shifted data; the subroutine form modifies
 
 See also: @ref{SWAPHALF}, @ref{FFTSHIFT}, @ref{SHIFT3}
 
-[3.2.363]
 @c -------------------------------------
 @node SHIFT3, SHOW, SHIFT, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -25616,7 +25332,6 @@ Shifts the data in one- or two-dimensional numerical array
 
 See also: @ref{SHIFT}, @ref{FFTSHIFT}
 
-[3.1.841]
 @c -------------------------------------
 @node SHOW, SHOWORBITS, SHIFT3, Internal Routines
 @subsection SHOW
@@ -25646,7 +25361,6 @@ so far through @code{READORBITS} or @code{ASTRON}.
 
 See also: @ref{ASTRON}, @ref{READORBITS}
 
-[2.11.395]
 @c -------------------------------------
 @node SHOWSTATS, SHOW_FILES, SHOWORBITS, Internal Routines
 @subsection SHOWSTATS
@@ -25784,7 +25498,6 @@ sidereal time is returned, otherwise the true sidereal time.
 
 See also: @ref{CALENDAR}
 
-[4.0.146]
 @c -------------------------------------
 @node SIEVE, SIN, SIDEREALTIME, Internal Routines
 @subsection SIEVE
@@ -25925,7 +25638,6 @@ value.
 
 See also: @ref{RUNCUM}, @ref{RUNSUM}, @ref{GSMOOTH}, @ref{ESMOOTH}
 
-[2.13.155]
 @c -------------------------------------
 @node SOLAR_B, SOLAR_L, SMOOTH, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -25941,7 +25653,6 @@ in terrestrial dynamical time TDT).
 
 See also: @ref{SOLAR_L}, @ref{SOLAR_P}, @ref{SOLAR_R}
 
-[3.1.172]
 @c -------------------------------------
 @node SOLAR_L, SOLAR_P, SOLAR_B, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -25968,7 +25679,6 @@ Carrington rotation number 1957.
 
 See also: @ref{SOLAR_B}, @ref{SOLAR_P}, @ref{SOLAR_R}
 
-[3.1.172]
 @c -------------------------------------
 @node SOLAR_P, SOLAR_R, SOLAR_L, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -25984,7 +25694,6 @@ measured from north to west(?) in degrees, at Julian Ephemeris Date
 
 See also: @ref{SOLAR_B}, @ref{SOLAR_L}, @ref{SOLAR_R}
 
-[3.1.172]
 @c -------------------------------------
 @node SOLAR_R, SORT, SOLAR_P, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -26000,7 +25709,6 @@ arcsec was adopted.
 
 See also: @ref{SOLAR_B}, @ref{SOLAR_L}, @ref{SOLAR_P}
 
-[3.1.172]
 @c -------------------------------------
 @node SORT, SP00, SOLAR_R, Internal Routines
 @subsection SORT
@@ -26069,7 +25777,6 @@ Alias: @ref{FSTRING}
 
 See also: @ref{STRING}, @ref{FPRINT}, @ref{Output Data Formats}
 
-[2.13.402]
 @c -------------------------------------
 @node SQRT, SSCANF, SPRINTF, Internal Routines
 @subsection SQRT
@@ -26104,7 +25811,6 @@ Alias: @ref{FREADS}
 See also: @ref{!READ_COUNT}, @ref{Input Data Formats}, @ref{READF},
 @ref{FREADF}
 
-[3.1.1350]
 @c -------------------------------------
 @node STARPM, STARPV, SSCANF, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -26233,7 +25939,6 @@ zero length.
 See also: @ref{ARRAY}, @ref{BYTARR}, @ref{INTARR}, @ref{FLTARR},
 @ref{DBLARR}, @ref{LONARR}, @ref{#MAX_DIMS}
 
-[3.0.390]
 @c -------------------------------------
 @node STRCOUNT, STRETCH, STRARR, Internal Routines
 @subsection STRCOUNT
@@ -26286,7 +25991,6 @@ will be made compatible with the @code{STRING} subroutine.
 See also: @ref{FSTRING}, @ref{PRINT}, @ref{!FORMAT_C}, @ref{!FORMAT_I},
 @ref{!FORMAT_F}
 
-[3.1.930]
 @c -------------------------------------
 @node STRLEN, STRLOC, STRING, Internal Routines
 @subsection STRLEN
@@ -26299,7 +26003,6 @@ the string (i.e., the number of characters in it).  If @code{@var{s}} is
 a string array, then this function returns a numerical array with the
 lengths of all strings from the string array.
 
-[5.1.549]
 @c -------------------------------------
 @node STRLOC, STRPBRK, STRLEN, Internal Routines
 @subsection STRLOC
@@ -26326,7 +26029,6 @@ character from string @code{@var{s2}}.  If none of the characters from
 
 See also: @ref{STRPOS}, @ref{STRLOC}
 
-[3.1.668]
 @c -------------------------------------
 @node STRPOS, STRR, STRPBRK, Internal Routines
 @subsection STRPOS
@@ -26414,7 +26116,6 @@ a @code{@var{target}} returns the next token from the last installed string.
 Neither of the arguments is modified by calls to @code{STRTOK}, and
 @code{@var{delimiter}} may have different values from call to call.
 
-[2.12.1288]
 @c -------------------------------------
 @node STRTOL, STRTRIM, STRTOK, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -26433,7 +26134,6 @@ Alias: @ref{ATOL}
 
 See also: @ref{EVAL}
 
-[3.1.669]
 @c -------------------------------------
 @node STRTRIM, STRUCT, STRTOL, Internal Routines
 @subsection STRTRIM
@@ -26486,7 +26186,6 @@ routine favors execution speed over algorithm symmetry.
 
 See also: @ref{GRIDMATCH}, @ref{SUBSHIFTC}
 
-[3.1.837]
 @c -------------------------------------
 @node SUBSHIFTC, SUN_B, SUBSHIFT, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -26508,7 +26207,6 @@ negative shift.
 
 See also: @ref{GRIDMATCH}, @ref{SUBSHIFT}, @ref{!MERITC}
 
-[3.1.837]
 @c -------------------------------------
 @node SUN_B, SUN_D, SUBSHIFTC, Internal Routines
 @subsection SUN_B
@@ -26721,7 +26419,6 @@ See also: @ref{FFT}, @ref{SHIFT}
 
 Switch the values of @code{@var{var1}} and @code{@var{var2}}.
 
-[2.12.1848]
 @c -------------------------------------
 @node SYMBOL, SYMCLASS, SWITCH, Internal Routines
 @subsection SYMBOL
@@ -26802,7 +26499,6 @@ Alias: @ref{PRINT}, @ref{TY}, @ref{TYPE}
 
 See also: @ref{PRINTF}, @ref{In-Line Print Formats}, @ref{#MAX_ARGS}
 
-[2.12.1602]
 @c -------------------------------------
 @node TABLE, TAITT, T, Internal Routines
 @subsection TABLE
@@ -26920,7 +26616,6 @@ arguments.
 
 Reverse: @ref{DATE_FROM_TAI}
 
-[3.1.425]
 @c -------------------------------------
 @node TAN, TANH, TAI_FROM_DATE, Internal Routines
 @subsection TAN
@@ -27167,7 +26862,6 @@ only colors from the lowest section of the color table are displayed.
 
 See also: @ref{TV3}, @ref{TVLCT}, @ref{ZOOM}
 
-[2.12.1898]
 @c -------------------------------------
 @node TOLOOKUP, TOTAL, THREECOLORS, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -27222,7 +26916,6 @@ the same as for the @code{MEAN} function.
 
 See also: @ref{HIST}, @ref{MEAN}, @ref{DSUM}, @ref{FSUM}
 
-[3.2.44]
 @c -------------------------------------
 @node TR, TRACE, TOTAL, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -27342,7 +27035,6 @@ of an integer coordinate line points to the other side of the coordinate
 line.  Any trajectory that reaches such an integer coordinate line stops
 there.
 
-[3.1.945]
 @c -------------------------------------
 @node TRANSPOSE, TREND, TRAJECTORY, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -27562,7 +27254,6 @@ See also: @ref{#MAX_PIXMAP}, @ref{#MAX_WINDOW}, @ref{!PDEV},
 @ref{!WYB}, @ref{!WYT}, @ref{XCOPY}, @ref{XOPEN}, @ref{XSETACTION},
 @ref{XTVREAD}, @ref{!ZOOMX}, @ref{!ZOOMY}, @ref{!ZOOMMAG}
 
-[3.2.28]
 @c -------------------------------------
 @node TV3, TVLAB, TV, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -27602,7 +27293,6 @@ For the remaining keywords, see at @code{TV}.
 
 See also: @ref{THREECOLORS}, @ref{TV}
 
-[2.12.1898]
 @c -------------------------------------
 @node TVLAB, TVLCT, TV3, Internal Routines
 @subsection TVLAB
@@ -27640,7 +27330,6 @@ the new values run out or all existing color ramp cells are serviced.
 
 See also: @ref{Image Display}, @ref{TV}
 
-[3.2.28]
 @c -------------------------------------
 @node TVMAP, TVPLANE, TVLCT, Internal Routines
 @subsection TVMAP
@@ -27656,7 +27345,6 @@ mapped to the appropriate pixel values and are then displayed.
 
 See also: @ref{TV}, @ref{TVRAW}
 
-[2.12.1914]
 @c -------------------------------------
 @node TVPLANE, TVRAW, TVMAP, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -27680,7 +27368,6 @@ they are dumped on the screen without further ado.
 
 See also: @ref{TV}, @ref{TVMAP}
 
-[2.12.1914]
 @c -------------------------------------
 @node TVREAD, TY, TVRAW, Internal Routines
 @subsection TVREAD
@@ -27726,7 +27413,6 @@ Alias: @ref{PRINT}, @ref{T}, @ref{TYPE}
 
 See also: @ref{PRINTF}, @ref{In-Line Print Formats}, @ref{#MAX_ARGS}
 
-[2.12.1602]
 @c -------------------------------------
 @node TYPE, TYPENAME, TY, Internal Routines
 @subsection TYPE
@@ -27743,7 +27429,6 @@ Alias: @ref{PRINT}, @ref{T}, @ref{TY}
 
 See also: @ref{PRINTF}, @ref{In-Line Print Formats}, @ref{#MAX_ARGS}
 
-[2.12.1602]
 @c -------------------------------------
 @node TYPENAME, ULIB, TYPE, Internal Routines
 @subsection TYPENAME
@@ -27914,7 +27599,6 @@ function.
 
 See also: @ref{SDEV}, @ref{!LASTSDEV}, @ref{!LASTMEAN}
 
-[3.2.44]
 @c -------------------------------------
 @node VARNAME, VERIFY, VARIANCE, Internal Routines
 @subsection VARNAME
@@ -27951,7 +27635,6 @@ Doppler width).
 
 Wait @code{@var{x}} seconds.  @code{@var{x}} may be floating-point.
 
-[3.1.997]
 @c -------------------------------------
 @node WAIT_FOR_MENU, WAIT_FOR_TAPE, WAIT, Internal Routines
 @subsection WAIT_FOR_MENU
@@ -27996,7 +27679,6 @@ variables are listed.
 
 See also: @ref{STEP}, @ref{TRACE}
 
-[3.1.501]
 @c -------------------------------------
 @node WEOF, WHERE, WATCH, Internal Routines
 @subsection WEOF
@@ -28063,7 +27745,6 @@ Alias: @ref{INT}
 
 See also: @ref{Number Conversion}
 
-[3.1.913]
 @c -------------------------------------
 @node WRITEU, WRITE_JPEG, WORD, Internal Routines
 @subsection WRITEU
@@ -28334,7 +28015,6 @@ See also: @ref{!BUTTON}, @ref{CHECKMENU}, @ref{#EVENT},
 
 @code{[@ref{motif} package]} Adds the @code{@var{filename}} to the @var{list_widget}.
 
-[2.14.2]
 @c -------------------------------------
 @node XMALIGNMENT, XMARMCOLOR, XMADDFILETOLIST, Internal Routines
 @subsection XMALIGNMENT
@@ -28347,7 +28027,6 @@ The @code{@var{mode}} (an integer) indicates the selected alignment:
 @code{0} means align with the beginning, @code{1} with the center, and
 @code{2} with the end.
 
-[2.14.2]
 @c ----------------------------
 @node XMARMCOLOR, XMARROW, XMALIGNMENT, Internal Routines
 @subsection XMARMCOLOR
@@ -28358,7 +28037,6 @@ The @code{@var{mode}} (an integer) indicates the selected alignment:
 @code{[@ref{motif} package]} Sets the arm color of the indicated @var{widget} to the
 specified @code{@var{color}} (a string).
 
-[2.14.2]
 @c -------------------------------------
 @node XMARROW, XMATTACH, XMARMCOLOR, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -28383,7 +28061,6 @@ borderColor, borderWidth, height, sensitive, width, x, y}
 
 See also: @ref{XMFRAME}
 
-[2.14.2]
 @c ----------------------------
 @node XMATTACH, XMATTACH_RELATIVE, XMARROW, Internal Routines
 @subsection XMATTACH
@@ -28408,7 +28085,6 @@ widget to the right side of the reference widget).
 
 See also: @ref{XMATTACH_RELATIVE}, @ref{XMFORM}, @ref{XMTOPLEVEL_FORM}
 
-[2.14.2]
 @c ----------------------------
 @node XMATTACH_RELATIVE, XMBACKGROUNDCOLOR, XMATTACH, Internal Routines
 @subsection XMATTACH_RELATIVE
@@ -28427,7 +28103,6 @@ in percentages.  In ordinary usage, @code{@var{right}} should exceed
 If the parent widget is subsequently resized, the attached widget will
 scale accordingly.
 
-[2.14.2]
 @c ----------------------------
 @node XMBACKGROUNDCOLOR, XMBOARD, XMATTACH_RELATIVE, Internal Routines
 @subsection XMBACKGROUNDCOLOR
@@ -28438,7 +28113,6 @@ scale accordingly.
 @code{[@ref{motif} package]} Sets the background color of the @code{@var{widget}} to
 @code{@var{color}} (a string).
 
-[2.14.2]
 @c -------------------------------------
 @node XMBOARD, XMBORDERCOLOR, XMBACKGROUNDCOLOR, Internal Routines
 @subsection XMBOARD
@@ -28454,7 +28128,6 @@ are placed in bulletin board widgets at absolute positions.
 
 See also: @ref{XMTOPLEVEL_BOARD}, @ref{XMFORM}, @ref{XMPOSITION}
 
-[2.13.541]
 @c ----------------------------
 @node XMBORDERCOLOR, XMBORDERWIDTH, XMBOARD, Internal Routines
 @subsection XMBORDERCOLOR
@@ -28465,7 +28138,6 @@ See also: @ref{XMTOPLEVEL_BOARD}, @ref{XMFORM}, @ref{XMPOSITION}
 @code{[@ref{motif} package]} Sets the border color of the @code{@var{widget}} to
 @code{@var{color}} (a string).
 
-[2.14.2]
 @c ----------------------------
 @node XMBORDERWIDTH, XMBOTTOMSHADOWCOLOR, XMBORDERCOLOR, Internal Routines
 @subsection XMBORDERWIDTH
@@ -28476,7 +28148,6 @@ See also: @ref{XMTOPLEVEL_BOARD}, @ref{XMFORM}, @ref{XMPOSITION}
 @code{[@ref{motif} package]} Sets the border width of the @code{@var{widget}} to
 @code{@var{width}}.
 
-[2.14.2]
 @c ----------------------------
 @node XMBOTTOMSHADOWCOLOR, XMBUTTON, XMBORDERWIDTH, Internal Routines
 @subsection XMBOTTOMSHADOWCOLOR
@@ -28487,7 +28158,6 @@ See also: @ref{XMTOPLEVEL_BOARD}, @ref{XMFORM}, @ref{XMPOSITION}
 @code{[@ref{motif} package]} Sets the bottom shadow color of the @code{@var{widget}} to
 @code{@var{color}} (a string).
 
-[2.14.2]
 @c -------------------------------------
 @node XMBUTTON, XMCHECKBOX, XMBOTTOMSHADOWCOLOR, Internal Routines
 @subsection XMBUTTON
@@ -28504,7 +28174,6 @@ button's label (a string), and @code{@var{callback}} the callback string
 to be executed when the button is pressed.  A @code{@var{font}} and
 @code{@var{color}} (both strings) can also be specified.
 
-[2.14.2]
 @c -------------------------------------
 @node XMCHECKBOX, XMCOLUMNS, XMBUTTON, Internal Routines
 @subsection XMCHECKBOX
@@ -28532,7 +28201,6 @@ The function returns an array of integers.  The first number is the
 widget ID of the column/row widget that contains the check boxes.  The
 remaining numbers are the IDs of the individual check boxes.
 
-[2.14.2]
 @c -------------------------------------
 @node XMCOLUMNS, XMCOMMAND, XMCHECKBOX, Internal Routines
 @subsection XMCOLUMNS
@@ -28554,7 +28222,6 @@ specified for them).
 Unless child widgets have specified sizes, they will all be scaled to
 the same width, which is the largest width among the children.
 
-[2.14.15]
 @c -------------------------------------
 @node XMCOMMAND, XMDESTROY, XMCOLUMNS, Internal Routines
 @subsection XMCOMMAND
@@ -28582,7 +28249,6 @@ lines of history are available -- with scroll bars giving access to
 those lines or those parts of lines that are available but not currently
 shown.
 
-[2.14.2]
 @c ----------------------------
 @node XMDESTROY, XMDIALOG_BOARD, XMCOMMAND, Internal Routines
 @subsection XMDESTROY
@@ -28592,7 +28258,6 @@ shown.
 
 @code{[@ref{motif} package]} Destroys the indicated @code{@var{widget}}.
 
-[2.14.2]
 @c -------------------------------------
 @node XMDIALOG_BOARD, XMDIALOG_FORM, XMDESTROY, Internal Routines
 @subsection XMDIALOG_BOARD
@@ -28605,7 +28270,6 @@ shown.
 @code{[@ref{motif} package]} Creates a dialog bulletin board widget; returns the
 widget ID.
 
-[2.14.2]
 @c -------------------------------------
 @node XMDIALOG_FORM, XMDRAWINGAREA, XMDIALOG_BOARD, Internal Routines
 @subsection XMDIALOG_FORM
@@ -28617,7 +28281,6 @@ widget ID.
 
 @code{[@ref{motif} package]} Creates a dialog form widget and returns its ID.
 
-[2.14.2]
 @c -------------------------------------
 @node XMDRAWINGAREA, XMDRAWINGLINK, XMDIALOG_FORM, Internal Routines
 @subsection XMDRAWINGAREA
@@ -28628,7 +28291,6 @@ widget ID.
 
 [MOTIF] Creates a drawing window and returns its widget ID.
 
-[2.14.2]
 @c ----------------------------
 @node XMDRAWINGLINK, XMFILEGETLIST, XMDRAWINGAREA, Internal Routines
 @subsection XMDRAWINGLINK
@@ -28638,7 +28300,6 @@ widget ID.
 
 @code{[@ref{motif} package]} Links a drawing area widget to a LUX window.
 
-[2.14.2]
 @c -------------------------------------
 @node XMFILEGETLIST, XMFILESELECT, XMDRAWINGLINK, Internal Routines
 @subsection XMFILEGETLIST
@@ -28649,7 +28310,6 @@ widget ID.
 @code{[@ref{motif} package]} Returns the files from the file selection @var{widget} in
 a string array.
 
-[2.14.2]
 @c -------------------------------------
 @node XMFILESELECT, XMFONT, XMFILEGETLIST, Internal Routines
 @subsection XMFILESELECT
@@ -28662,7 +28322,6 @@ a string array.
 @code{[@ref{motif} package]} Creates a file selection widget in the
 @code{@var{parent}} widget and returns the new widget's ID.
 
-[2.14.2]
 @c ----------------------------
 @node XMFONT, XMFOREGROUNDCOLOR, XMFILESELECT, Internal Routines
 @subsection XMFONT
@@ -28673,7 +28332,6 @@ a string array.
 @code{[@ref{motif} package]} Sets the default @code{@var{font}} for the indicated
 @code{@var{widget}}.
 
-[2.14.2]
 @c ----------------------------
 @node XMFOREGROUNDCOLOR, XMFORM, XMFONT, Internal Routines
 @subsection XMFOREGROUNDCOLOR
@@ -28684,7 +28342,6 @@ a string array.
 @code{[@ref{motif} package]} Sets the foreground color of the indicated
 @code{@var{widget}} to @code{@var{color}}.
 
-[2.14.2]
 @c -------------------------------------
 @node XMFORM, XMFRAME, XMFOREGROUNDCOLOR, Internal Routines
 @subsection XMFORM
@@ -28700,7 +28357,6 @@ routine @code{XMATTACH}.
 
 See also: @ref{XMATTACH}
 
-[2.14.2]
 @c -------------------------------------
 @node XMFRAME, XMGETOPTIONSELECTION, XMFORM, Internal Routines
 @subsection XMFRAME
@@ -28731,7 +28387,6 @@ The frame and contents appear to protrude behind the parent.
 The frame and contents appear to protrude in front of the parent.
 @end enumerate
 
-[2.14.2]
 @c -------------------------------------
 @node XMGETOPTIONSELECTION, XMGETPIXMAP, XMFRAME, Internal Routines
 @subsection XMGETOPTIONSELECTION
@@ -28742,7 +28397,6 @@ The frame and contents appear to protrude in front of the parent.
 @code{[@ref{motif} package]} @code{@var{widget}} should be a row-column widget from an
 option menu.
 
-[2.14.2]
 @c ----------------------------
 @node XMGETPIXMAP, XMGETWIDGETADDRESS, XMGETOPTIONSELECTION, Internal Routines
 @subsection XMGETPIXMAP
@@ -28753,7 +28407,6 @@ option menu.
 @code{[@ref{motif} package]} Reads the indicated @code{@var{pixmap_file}} and
 associates it with with the indicated @code{@var{id}} (an integer).
 
-[2.14.2]
 @c -------------------------------------
 @node XMGETWIDGETADDRESS, XMGETWIDGETPOSITION, XMGETPIXMAP, Internal Routines
 @subsection XMGETWIDGETADDRESS
@@ -28765,7 +28418,6 @@ associates it with with the indicated @code{@var{id}} (an integer).
 indices into an array of internal widget IDs) of the
 @code{@var{widget}}.
 
-[2.14.2]
 @c ----------------------------
 @node XMGETWIDGETPOSITION, XMGETWIDGETSIZE, XMGETWIDGETADDRESS, Internal Routines
 @subsection XMGETWIDGETPOSITION
@@ -28776,7 +28428,6 @@ indices into an array of internal widget IDs) of the
 @code{[@ref{motif} package]} Returns the position of the indicated @code{@var{widget}}
 in variables @code{@var{x}} and @code{@var{y}}.
 
-[2.14.2]
 @c ----------------------------
 @node XMGETWIDGETSIZE, XMHSCALE, XMGETWIDGETPOSITION, Internal Routines
 @subsection XMGETWIDGETSIZE
@@ -28787,7 +28438,6 @@ in variables @code{@var{x}} and @code{@var{y}}.
 @code{[@ref{motif} package]} Returns the dimensions of the indicated
 @code{@var{widget}} in variables @code{@var{dx}} and @code{@var{dy}}.
 
-[2.14.2]
 @c -------------------------------------
 @node XMHSCALE, XMHSCROLLBAR, XMGETWIDGETSIZE, Internal Routines
 @subsection XMHSCALE
@@ -28798,7 +28448,6 @@ in variables @code{@var{x}} and @code{@var{y}}.
 
 @code{[@ref{motif} package]} Creates a horizontal scale widget and returns its ID.
 
-[2.14.2]
 @c -------------------------------------
 @node XMHSCROLLBAR, XMLABEL, XMHSCALE, Internal Routines
 @subsection XMHSCROLLBAR
@@ -28820,7 +28469,6 @@ not specified), or also when the scrollbar is being dragged (if
 @code{@var{drag}} is unequal to zero).  @code{@var{callback}} is the
 callback string that gets executed.
 
-[2.14.75]
 @c -------------------------------------
 @node XMLABEL, XMLIST, XMHSCROLLBAR, Internal Routines
 @subsection XMLABEL
@@ -28831,7 +28479,6 @@ callback string that gets executed.
 
 @code{[@ref{motif} package]} Creates a label widget and returns its ID.
 
-[2.14.2]
 @c -------------------------------------
 @node XMLIST, XMLISTADDITEM, XMLABEL, Internal Routines
 @subsection XMLIST
@@ -28849,7 +28496,6 @@ policy.
 
 See also: @ref{XMLISTFROMFILE}
 
-[2.14.2]
 @c ----------------------------
 @node XMLISTADDITEM, XMLISTCOUNT, XMLIST, Internal Routines
 @subsection XMLISTADDITEM
@@ -28859,7 +28505,6 @@ See also: @ref{XMLISTFROMFILE}
 
 @code{[@ref{motif} package]} Adds a string to the list @code{@var{widget}}.
 
-[2.14.2]
 @c -------------------------------------
 @node XMLISTCOUNT, XMLISTDELETEALL, XMLISTADDITEM, Internal Routines
 @subsection XMLISTCOUNT
@@ -28869,7 +28514,6 @@ See also: @ref{XMLISTFROMFILE}
 
 @code{[@ref{motif} package]} Returns the number of entries in a list @code{@var{widget}}.
 
-[2.14.2]
 @c ----------------------------
 @node XMLISTDELETEALL, XMLISTDELETEITEM, XMLISTCOUNT, Internal Routines
 @subsection XMLISTDELETEALL
@@ -28879,7 +28523,6 @@ See also: @ref{XMLISTFROMFILE}
 
 @code{[@ref{motif} package]} Deletes all items from a list @code{@var{widget}}.
 
-[2.14.2]
 @c ----------------------------
 @node XMLISTDELETEITEM, XMLISTFROMFILE, XMLISTDELETEALL, Internal Routines
 @subsection XMLISTDELETEITEM
@@ -28890,7 +28533,6 @@ See also: @ref{XMLISTFROMFILE}
 @code{[@ref{motif} package]} Deletes the item at the indicated
 @code{@var{position}} from the list @code{@var{widget}}.
 
-[2.14.2]
 @c -------------------------------------
 @node XMLISTFROMFILE, XMLISTFUNC, XMLISTDELETEITEM, Internal Routines
 @subsection XMLISTFROMFILE
@@ -28910,7 +28552,6 @@ selected.  For more information about list widgets, see at
 
 See also: @ref{XMLIST}
 
-[2.14.2]
 @c ----------------------------
 @node XMLISTFUNC, XMLISTSELECT, XMLISTFROMFILE, Internal Routines
 @subsection XMLISTFUNC
@@ -28921,7 +28562,6 @@ See also: @ref{XMLIST}
 @code{[@ref{motif} package]} Loads the given list @code{@var{widget}} with all
 internal function names.
 
-[2.14.2]
 @c ----------------------------
 @node XMLISTSELECT, XMLISTSUBR, XMLISTFUNC, Internal Routines
 @subsection XMLISTSELECT
@@ -28938,7 +28578,6 @@ the associated callback is executed.  The selected item's index in the
 list is then returned in @code{$LIST_ITEM_POSITION} (starting counting
 at 1), and the selected item's value is returned in @code{$LIST_ITEM}.
 
-[2.14.2]
 @c ----------------------------
 @node XMLISTSUBR, XMMENUBAR, XMLISTSELECT, Internal Routines
 @subsection XMLISTSUBR
@@ -28949,7 +28588,6 @@ at 1), and the selected item's value is returned in @code{$LIST_ITEM}.
 @code{[@ref{motif} package]} Loads the list @code{@var{widget}} with all internal
 subroutine names.
 
-[2.14.2]
 @c -------------------------------------
 @node XMMENUBAR, XMMESSAGE, XMLISTSUBR, Internal Routines
 @subsection XMMENUBAR
@@ -28972,7 +28610,6 @@ pull-down menus to the buttons.
 
 See also: @ref{XMATTACH}, @ref{XMPULLDOWNMENU}
 
-[2.13.532]
 @c ----------------------------
 @node XMMESSAGE, XMOPTIONMENU, XMMENUBAR, Internal Routines
 @subsection XMMESSAGE
@@ -28995,7 +28632,6 @@ The widget only shows up when @code{XTLOOP} is running.
 
 See also: @ref{XTLOOP}, @ref{XMPROMPT}
 
-[2.14.2]
 @c -------------------------------------
 @node XMOPTIONMENU, XMPIXMAPBUTTON, XMMESSAGE, Internal Routines
 @subsection XMOPTIONMENU
@@ -29008,7 +28644,6 @@ See also: @ref{XTLOOP}, @ref{XMPROMPT}
 @code{@var{title}} and labels on the buttons.  If the last argument is
 an integer, then it indicates the default button.
 
-[2.14.2]
 @c -------------------------------------
 @node XMPIXMAPBUTTON, XMPIXMAPOPTIONMENU, XMOPTIONMENU, Internal Routines
 @subsection XMPIXMAPBUTTON
@@ -29018,7 +28653,6 @@ an integer, then it indicates the default button.
 
 @code{[@ref{motif} package]} Creates a button widget and returns the widget ID.
 
-[2.14.2]
 @c -------------------------------------
 @node XMPIXMAPOPTIONMENU, XMPOSITION, XMPIXMAPBUTTON, Internal Routines
 @subsection XMPIXMAPOPTIONMENU
@@ -29049,7 +28683,6 @@ follow at the end.
 The @code{@var{callback}} statement can inspect global variable
 @code{$OPTION_VALUE} to find out which one of the buttons was selected.
 
-[2.13.541]
 @c ----------------------------
 @node XMPOSITION, XMPROMPT, XMPIXMAPOPTIONMENU, Internal Routines
 @subsection XMPOSITION
@@ -29065,7 +28698,6 @@ position coordinates are only modified if the specified values are
 nonnegative, and have effect only on widgets contained in a visible
 bulletin board widget, or on top-level widgets.
 
-[2.14.15]
 @c ----------------------------
 @node XMPROMPT, XMPULLDOWNMENU, XMPOSITION, Internal Routines
 @subsection XMPROMPT
@@ -29089,7 +28721,6 @@ field are returned in the global variable @code{$TEXTFIELD_VALUE}, the
 
 See also: @ref{XMMESSAGE}
 
-[2.14.2]
 @c -------------------------------------
 @node XMPULLDOWNMENU, XMQUERY, XMPROMPT, Internal Routines
 @subsection XMPULLDOWNMENU
@@ -29114,7 +28745,6 @@ variable @code{$OPTION_VALUE}.
 
 See also: @ref{XMMENUBAR}
 
-[2.13.541]
 @c ----------------------------
 @node XMQUERY, XMRADIOBOX, XMPULLDOWNMENU, Internal Routines
 @subsection XMQUERY
@@ -29125,7 +28755,6 @@ See also: @ref{XMMENUBAR}
 @code{[@ref{motif} package]} Gets the pointer location in this widget and for the root
 window.
 
-[2.14.2]
 @c -------------------------------------
 @node XMRADIOBOX, XMRAISE, XMQUERY, Internal Routines
 @subsection XMRADIOBOX
@@ -29159,7 +28788,6 @@ The function returns an array of integers.  The first number is the
 widget ID of the column/row widget that contains the radio buttons.  The
 remaining numbers are the IDs of the individual radio buttons.
 
-[2.14.2]
 @c ----------------------------
 @node XMRAISE, XMRESIZEPOLICY, XMRADIOBOX, Internal Routines
 @subsection XMRAISE
@@ -29169,7 +28797,6 @@ remaining numbers are the IDs of the individual radio buttons.
 
 @code{[@ref{motif} package]} Raises the @code{@var{widget}}.
 
-[2.14.2]
 @c ----------------------------
 @node XMRESIZEPOLICY, XMROWS, XMRAISE, Internal Routines
 @subsection XMRESIZEPOLICY
@@ -29181,7 +28808,6 @@ remaining numbers are the IDs of the individual radio buttons.
 according to the value of @code{@var{flag}}: @code{0} means none,
 @code{1} means grow only, @code{2} means any.
 
-[2.14.2]
 @c -------------------------------------
 @node XMROWS, XMSCALEGETVALUE, XMRESIZEPOLICY, Internal Routines
 @subsection XMROWS
@@ -29192,7 +28818,6 @@ according to the value of @code{@var{flag}}: @code{0} means none,
 
 @code{[@ref{motif} package]} Returns the ID of the created widget.
 
-[2.14.2]
 @c -------------------------------------
 @node XMSCALEGETVALUE, XMSCALERESETLIMITS, XMROWS, Internal Routines
 @subsection XMSCALEGETVALUE
@@ -29232,7 +28857,6 @@ according to the value of @code{@var{flag}}: @code{0} means none,
 @code{[@ref{motif} package]} Changes the slider size and range (and dpage).  If a
 value is non-positive, then we assume it is not supposed to be changed.
 
-[2.14.2]
 @c -------------------------------------
 @node XMSCROLLEDWINDOW, XMSCROLLEDWINDOWAPP, XMSCROLLBARSETVALUES, Internal Routines
 @subsection XMSCROLLEDWINDOW
@@ -29242,7 +28866,6 @@ value is non-positive, then we assume it is not supposed to be changed.
 
 @code{[@ref{motif} package]} Create a scrolled window widget and return its ID.
 
-[2.14.2]
 @c -------------------------------------
 @node XMSCROLLEDWINDOWAPP, XMSELECTCOLOR, XMSCROLLEDWINDOW, Internal Routines
 @subsection XMSCROLLEDWINDOWAPP
@@ -29255,7 +28878,6 @@ value is non-positive, then we assume it is not supposed to be changed.
 application, in the widget whose ID is @code{@var{parent}}.  Returns the
 widget ID.
 
-[2.13.541]
 @c ----------------------------
 @node XMSELECTCOLOR, XMSENSITIVE, XMSCROLLEDWINDOWAPP, Internal Routines
 @subsection XMSELECTCOLOR
@@ -29266,7 +28888,6 @@ widget ID.
 @code{[@ref{motif} package]} Selects the indicated @code{@var{color}} (a string) for
 the widget with the indicated @code{@var{widgetID}}.
 
-[2.13.541]
 @c ----------------------------
 @node XMSENSITIVE, XMSEPARATOR, XMSELECTCOLOR, Internal Routines
 @subsection XMSENSITIVE
@@ -29276,7 +28897,6 @@ the widget with the indicated @code{@var{widgetID}}.
 
 @code{[@ref{motif} package]} Use to make labels or buttons sensitive or insensitive.
 
-[2.14.2]
 @c ----------------------------
 @node XMSEPARATOR, XMSETCOLORS, XMSENSITIVE, Internal Routines
 @subsection XMSEPARATOR
@@ -29291,7 +28911,6 @@ vertical.  @code{@var{margin}} is the width or height.
 space, @code{2} for a double line, @code{3} for a dotted line, @code{5}
 for an etched line.  Returns the created widget's ID.
 
-[2.14.2]
 @c ----------------------------
 @node XMSETCOLORS, XMSETDIRECTORY, XMSEPARATOR, Internal Routines
 @subsection XMSETCOLORS
@@ -29302,7 +28921,6 @@ for an etched line.  Returns the created widget's ID.
 @code{[@ref{motif} package]} Sets the background color for the @code{@var{widget}} to
 @var{color}, and an appropriate set of the other colors.
 
-[2.14.2]
 @c ----------------------------
 @node XMSETDIRECTORY, XMSETLABEL, XMSETCOLORS, Internal Routines
 @subsection XMSETDIRECTORY
@@ -29312,7 +28930,6 @@ for an etched line.  Returns the created widget's ID.
 
 @code{[@ref{motif} package]} Can only be used for file selection widgets.
 
-[2.14.2]
 @c ----------------------------
 @node XMSETLABEL, XMSETMARGINS, XMSETDIRECTORY, Internal Routines
 @subsection XMSETLABEL
@@ -29347,7 +28964,6 @@ the menu bar item title.
 
 See also: @ref{XMMENUBAR}
 
-[2.13.541]
 @c ----------------------------
 @node XMSETMODAL, XMSETOPTIONSELECTION, XMSETMNEMONIC, Internal Routines
 @subsection XMSETMODAL
@@ -29357,7 +28973,6 @@ See also: @ref{XMMENUBAR}
 
 @code{[@ref{motif} package]} @code{0} sets modeless, @code{1} makes the widget modal.
 
-[2.14.2]
 @c ----------------------------
 @node XMSETOPTIONSELECTION, XMSETPIXMAP, XMSETMODAL, Internal Routines
 @subsection XMSETOPTIONSELECTION
@@ -29368,7 +28983,6 @@ See also: @ref{XMMENUBAR}
 @code{[@ref{motif} package]} @code{@var{row_col_widget}} from an option menu and the
 @code{@var{menu_widget}} for the menu item it should be set to.
 
-[2.14.2]
 @c ----------------------------
 @node XMSETPIXMAP, XMSETTITLE, XMSETOPTIONSELECTION, Internal Routines
 @subsection XMSETPIXMAP
@@ -29388,7 +29002,6 @@ See also: @ref{XMMENUBAR}
 @code{[@ref{motif} package]} Sets the title of the widget with the indicated
 @code{@var{widgetID}} to @code{@var{title}} (a @code{STRING}).
 
-[2.13.541]
 @c ----------------------------
 @node XMSET_TEXT_OUTPUT, XMSIZE, XMSETTITLE, Internal Routines
 @subsection XMSET_TEXT_OUTPUT
@@ -29399,7 +29012,6 @@ See also: @ref{XMMENUBAR}
 @code{[@ref{motif} package]} This takes an already defined widget number in the LUX
 environment and assigns it to the text output widget used by wprint.
 
-[2.14.2]
 @c ----------------------------
 @node XMSIZE, XMTEXT, XMSET_TEXT_OUTPUT, Internal Routines
 @subsection XMSIZE
@@ -29409,7 +29021,6 @@ environment and assigns it to the text output widget used by wprint.
 
 @code{[@ref{motif} package]} Resets the dimensions of the @code{@var{widget}}.
 
-[2.14.2]
 @c -------------------------------------
 @node XMTEXT, XMTEXTAPPEND, XMSIZE, Internal Routines
 @subsection XMTEXT
@@ -29423,7 +29034,6 @@ widget ID.  Note that the text widget is returned; to position this, you
 must use the scrolled text widget which is the parent of the returned
 one.
 
-[2.14.2]
 @c ----------------------------
 @node XMTEXTAPPEND, XMTEXTBOX, XMTEXT, Internal Routines
 @subsection XMTEXTAPPEND
@@ -29435,7 +29045,6 @@ one.
 @code{@var{widget}}.  If @code{@var{line_feed}} is non-zero, then a line
 feed is included.
 
-[2.14.2]
 @c -------------------------------------
 @node XMTEXTBOX, XMTEXTERASE, XMTEXTAPPEND, Internal Routines
 @subsection XMTEXTBOX
@@ -29447,7 +29056,6 @@ feed is included.
 @code{[@ref{motif} package]} Creates an empty text widget, not scrolled, write only,
 not editable.  Returns the widget's ID.
 
-[2.14.2]
 @c ----------------------------
 @node XMTEXTERASE, XMTEXTFIELD, XMTEXTBOX, Internal Routines
 @subsection XMTEXTERASE
@@ -29457,7 +29065,6 @@ not editable.  Returns the widget's ID.
 
 @code{[@ref{motif} package]} Erases all the text in a text widget.
 
-[2.14.2]
 @c -------------------------------------
 @node XMTEXTFIELD, XMTEXTFIELDARRAY, XMTEXTERASE, Internal Routines
 @subsection XMTEXTFIELD
@@ -29469,7 +29076,6 @@ not editable.  Returns the widget's ID.
 
 @code{[@ref{motif} package]} Creates a textfield widget, returns widget ID.
 
-[2.14.2]
 @c -------------------------------------
 @node XMTEXTFIELDARRAY, XMTEXTFIELDGETSTRING, XMTEXTFIELD, Internal Routines
 @subsection XMTEXTFIELDARRAY
@@ -29484,7 +29090,6 @@ not editable.  Returns the widget's ID.
 size.  If the last argument is a scalar, then it indicates the allowed
 length of each field; otherwise 10 is used as a default.
 
-[2.14.2]
 @c -------------------------------------
 @node XMTEXTFIELDGETSTRING, XMTEXTFIELDSETEDITABLE, XMTEXTFIELDARRAY, Internal Routines
 @subsection XMTEXTFIELDGETSTRING
@@ -29559,7 +29164,6 @@ length of each field; otherwise 10 is used as a default.
 @code{[@ref{motif} package]} Returns the primary selection as a string, optionally
 returns the position.
 
-[2.14.2]
 @c -------------------------------------
 @node XMTEXTGETSTRING, XMTEXTREPLACE, XMTEXTGETSELECTION, Internal Routines
 @subsection XMTEXTGETSTRING
@@ -29569,7 +29173,6 @@ returns the position.
 
 @code{[@ref{motif} package]} Gets a copy of the text contents as a string.
 
-[2.14.2]
 @c ----------------------------
 @node XMTEXTREPLACE, XMTEXTSETEDITABLE, XMTEXTGETSTRING, Internal Routines
 @subsection XMTEXTREPLACE
@@ -29606,7 +29209,6 @@ returns the position.
 
 @code{[@ref{motif} package]} Reset the number of rows and columns for a text image.
 
-[2.14.2]
 @c ----------------------------
 @node XMTEXTSETSTRING, XMTOGGLEGETSTATE, XMTEXTSETROWCOLUMNSIZE, Internal Routines
 @subsection XMTEXTSETSTRING
@@ -29638,7 +29240,6 @@ desired state; zero and non-zero are distinguished.  @code{@var{notify}}
 determines if the callback associated with the toggle button gets
 executed.
 
-[2.13.541]
 @c -------------------------------------
 @node XMTOPLEVEL_BOARD, XMTOPLEVEL_FORM, XMTOGGLESETSTATE, Internal Routines
 @subsection XMTOPLEVEL_BOARD
@@ -29655,7 +29256,6 @@ widget, and @code{XTLOOP} to manage it.
 
 See also: @ref{XTPOPUP}, @ref{XTLOOP}
 
-[2.14.2]
 @c -------------------------------------
 @node XMTOPLEVEL_FORM, XMTOPSHADOWCOLOR, XMTOPLEVEL_BOARD, Internal Routines
 @subsection XMTOPLEVEL_FORM
@@ -29679,7 +29279,6 @@ display/undisplay this widget.
 
 See also: @ref{XTPOPUP}, @ref{XTPOPDOWN}
 
-[2.13.531]
 @c ----------------------------
 @node XMTOPSHADOWCOLOR, XMVSCALE, XMTOPLEVEL_FORM, Internal Routines
 @subsection XMTOPSHADOWCOLOR
@@ -29690,7 +29289,6 @@ See also: @ref{XTPOPUP}, @ref{XTPOPDOWN}
 @code{[@ref{motif} package]} Sets the top shadow color for the @code{@var{widget}} to
 @code{@var{color}}.
 
-[2.14.2]
 @c -------------------------------------
 @node XMVSCALE, XMVSCROLLBAR, XMTOPSHADOWCOLOR, Internal Routines
 @subsection XMVSCALE
@@ -29701,7 +29299,6 @@ See also: @ref{XTPOPUP}, @ref{XTPOPDOWN}
 
 @code{[@ref{motif} package]} Creates a vertical scale widget, returns the widget ID.
 
-[2.14.2]
 @c -------------------------------------
 @node XMVSCROLLBAR, XOPEN, XMVSCALE, Internal Routines
 @subsection XMVSCROLLBAR
@@ -29761,7 +29358,6 @@ See also: @ref{XPORT}, @ref{XQUERY}, @ref{!BUTTON}, @ref{!IX},
 @ref{!IY}, @ref{!KEYCODE}, @ref{!KEYSTATE}, @ref{!KEYSYM}, @ref{!XF},
 @ref{!YF}, @ref{Screen Coordinates}
 
-[3.2.147]
 @c -------------------------------------
 @node XPORT, XPURGE, XPLACE, Internal Routines
 @subsection XPORT
@@ -29914,7 +29510,6 @@ and then the manager exits.
 
 See also: @ref{!MOTIF}
 
-[2.13.531]
 @c -------------------------------------
 @node XTMLUXGE, XTPARENT, XTLOOP, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -29959,7 +29554,6 @@ See also: @ref{!MOTIF}
 
 See also: @ref{XTLOOP}
 
-[2.13.541]
 @c -------------------------------------
 @node XTUNMLUXGE, XTV, XTPOPUP, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -30042,7 +29636,6 @@ is merely selected, not recreated.
 
 Alias: @ref{XPORT}, @ref{XWINDOW}, @ref{!WINDOW}
 
-[2.13.402]
 @c -------------------------------------
 @node XWINDOW, XY06, XWIN, Internal Routines
 @subsection XWINDOW
@@ -30181,7 +29774,6 @@ subroutine or function.
 
 See also: @ref{DELETE}, @ref{POINTER}
 
-[2.12.13]
 @c -------------------------------------
 @node ZERO, ZEROIFNOTDEFINED, ZAP, Internal Routines
 @subsection ZERO
@@ -30197,7 +29789,6 @@ arrays (both real and complex), strings, and file maps are supported for
 both the subroutine and function forms, except that file maps are not
 supported by the function form.
 
-[2.12.827]
 @c -------------------------------------
 @node ZEROIFNOTDEFINED, ZERONANS, ZERO, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -30223,7 +29814,6 @@ copy of @code{@var{arg}} with @code{NaN}s replaced.
 
 See also: @ref{ISNAN}
 
-[3.1.295]
 @c -------------------------------------
 @node ZINV, ZOOM, ZERONANS, Internal Routines
 @subsection ZINV
@@ -30235,7 +29825,6 @@ Zero-protected inverse: returns @code{1/@var{x}} for all nonzero
 elements @code{@var{x}} of numerical @code{@var{var}}, and zero for all
 zero elements.
 
-[2.13.263]
 @c -------------------------------------
 @node ZOOM, Square Brackets, ZINV, Internal Routines
 @comment  node-name,  next,  previous,  up
@@ -30341,7 +29930,6 @@ variables are used as defaults for the next call to @code{ZOOM}.
 See also: @ref{THREECOLORS}, @ref{TV3}, @ref{!ZOOMX}, @ref{!ZOOMY},
 @ref{!ZOOMMAG}
 
-[2.12.1898]
 @c -------------------------------------
 @node  Square Brackets, Curly Braces, ZOOM, Internal Routines
 @subsection Square Brackets

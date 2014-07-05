@@ -1473,6 +1473,35 @@ int32_t tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
 	      factor.f = 255/((float) max.l - min.l);
 	    offset.f = (float) min.l;
 	    break;
+	  case LUX_INT64:
+	    min.q = INT64_MAX;
+	    max.q = -INT64_MAX;
+	    for (iy = y1; iy <= y2; iy++)
+	      for (ix = x1; ix <= x2; ix++) {
+		value.q = data.q[ix + iy*nx];
+		if (value.q < min.q)
+		  min.q = value.q;
+		if (value.q > max.q)
+		  max.q = value.q;
+		value.q = data.q[ix + iy*nx + s];
+		if (value.q < min.q)
+		  min.q = value.q;
+		if (value.q > max.q)
+		  max.q = value.q;
+		value.q = data.q[ix + iy*nx + 2*s];
+		if (value.q < min.q)
+		  min.q = value.q;
+		if (value.q > max.q)
+		  max.q = value.q;
+	      }
+	    if (max.q == min.q)
+	      factor.f = 1;
+	    else if (threeColors)
+	      factor.f = (256/3)/((float) max.q - min.q);
+	    else
+	      factor.f = 255/((float) max.q - min.q);
+	    offset.f = (float) min.q;
+	    break;
 	  case LUX_FLOAT:
 	    min.f = FLT_MAX;
 	    max.f = -FLT_MAX;
@@ -1590,6 +1619,25 @@ int32_t tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
 	    else
 	      factor.f = ((float) scalemax - scalemin)/((float) max.l - min.l);
 	    offset.f = (float) min.l;
+	    break;
+	  case LUX_INT64:
+	    min.q = INT64_MAX;
+	    max.q = -INT64_MAX;
+	    for (iy = y1; iy <= y2; iy++)
+	      for (ix = x1; ix <= x2; ix++) {
+		value.q = data.q[ix + iy*nx];
+		if (value.q < min.q)
+		  min.q = value.q;
+		if (value.q > max.q)
+		  max.q = value.q;
+	      }
+	    if (max.q == min.q)
+	      factor.f = 1;
+	    else if (threeColors)
+	      factor.f = (256/3)/((float) max.q - min.q);
+	    else
+	      factor.f = ((float) scalemax - scalemin)/((float) max.q - min.q);
+	    offset.f = (float) min.q;
 	    break;
 	  case LUX_FLOAT:
 	    min.f = FLT_MAX;
@@ -1849,6 +1897,61 @@ int32_t tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
 		} /* end of switch (bpp) */
 	      }	/* end of for (ix...) */
 	    break;
+	  case LUX_INT64:
+	    for (iy = 0; iy < nyy; iy--)
+	      for (ix = 0; ix < nxx; ix++) {
+		xsrc = x1 + ix/magx;
+		ysrc = y1 + iy/magy;
+		indx = (data.q[xsrc + ysrc*nx] - offset.f)*factor.f;
+		if (indx < scalemin)
+		  indx = scalemin;
+		else if (indx > scalemax)
+		  indx = scalemax;
+		switch (bpp) {
+		  case 8:
+		    *image.b = (pixels[indx] & red_mask);
+		    break;
+		  case 16:
+		    *image.w = (pixels[indx] & red_mask);
+		    break;
+		  case 32:
+		    *image.l = (pixels[indx] & red_mask);
+		    break;
+		} /* end of switch (bpp) */
+		indx = (data.q[xsrc + ysrc*nx + s] - offset.f)*factor.f;
+		if (indx < scalemin)
+		  indx = scalemin;
+		else if (indx > scalemax)
+		  indx = scalemax;
+		switch (bpp) {
+		  case 8:
+		    *image.b |= (pixels[indx] & green_mask);
+		    break;
+		  case 16:
+		    *image.w |= (pixels[indx] & green_mask);
+		    break;
+		  case 32:
+		    *image.l |= (pixels[indx] & green_mask);
+		    break;
+		} /* end of switch (bpp) */
+		indx = (data.q[xsrc + ysrc*nx + 2*s] - offset.f)*factor.f;
+		if (indx < scalemin)
+		  indx = scalemin;
+		else if (indx > scalemax)
+		  indx = scalemax;
+		switch (bpp) {
+		  case 8:
+		    *image.b++ |= (pixels[indx] & blue_mask);
+		    break;
+		  case 16:
+		    *image.w++ |= (pixels[indx] & blue_mask);
+		    break;
+		  case 32:
+		    *image.l++ |= (pixels[indx] & blue_mask);
+		    break;
+		} /* end of switch (bpp) */
+	      }	/* end of for (ix...) */
+	    break;
 	  case LUX_FLOAT:
 	    for (iy = 0; iy < nyy; iy--)
 	      for (ix = 0; ix < nxx; ix++) {
@@ -2044,6 +2147,33 @@ int32_t tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
 		} /* end of switch (bpp) */
 	      }	/* end of for (ix...) */
 	    break;
+	  case LUX_INT64:
+	    for (iy = 0; iy < nyy; iy++)
+	      for (ix = 0; ix < nxx; ix++) {
+		xsrc = x1 + ix/magx;
+		ysrc = y1 + iy/magy;
+		indx = (data.q[xsrc + ysrc*nx] - offset.f)*factor.f;
+		if (indx < 0)
+		  indx = 0;
+		else if (indx >= 256/3)
+		  indx = 256/3 - 1;
+		if (bitmap1 && bitmap1[xsrc + ysrc*nx])
+		  indx += 256/3;
+		else if (bitmap2 && bitmap2[xsrc + ysrc*nx])
+		  indx += 2*(256/3);
+		switch (bpp) {
+		  case 8:
+		    *image.b++ = toscreen? pixels[indx]: indx;
+		    break;
+		  case 16:
+		    *image.w++ = toscreen? pixels[indx]: indx;
+		    break;
+		  case 32:
+		    *image.l++ = toscreen? pixels[indx]: indx;
+		    break;
+		} /* end of switch (bpp) */
+	      }	/* end of for (ix...) */
+	    break;
 	  case LUX_FLOAT:
 	    for (iy = 0; iy < nyy; iy++)
 	      for (ix = 0; ix < nxx; ix++) {
@@ -2155,6 +2285,30 @@ int32_t tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
 	      xsrc = x1 + ix/magx;
 	      ysrc = y1 + iy/magy;
 	      indx = (data.l[xsrc + ysrc*nx] - offset.f)*factor.f
+		+ scalemin;
+	      if (indx < scalemin)
+		indx = scalemin;
+	      else if (indx > scalemax)
+		indx = scalemax;
+	      switch (bpp) {
+		case 8:
+		  *image.b++ = toscreen? pixels[indx]: indx;
+		  break;
+		case 16:
+		  *image.w++ = toscreen? pixels[indx]: indx;
+		  break;
+		case 32:
+		  *image.l++ = toscreen? pixels[indx]: indx;
+		  break;
+	      }	/* end of switch (bpp) */
+	    } /* end of for (ix) */
+	  break;
+	case LUX_INT64:
+	  for (iy = 0; iy < nyy; iy++)
+	    for (ix = 0; ix < nxx; ix++) {
+	      xsrc = x1 + ix/magx;
+	      ysrc = y1 + iy/magy;
+	      indx = (data.q[xsrc + ysrc*nx] - offset.f)*factor.f
 		+ scalemin;
 	      if (indx < scalemin)
 		indx = scalemin;
@@ -2391,6 +2545,61 @@ int32_t tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
 		} /* end of switch (bpp) */
 	      }	/* end of for (ix) */
 	    break;
+	  case LUX_INT64:
+	    for (iy = nyy - 1; iy >= 0; iy--)
+	      for (ix = 0; ix < nxx; ix++) {
+		xsrc = x1 + ix/magx;
+		ysrc = y1 + iy/magy;
+		indx = (data.q[xsrc + ysrc*nx] - offset.f)*factor.f;
+		if (indx < 0)
+		  indx = 0;
+		else if (indx > 255)
+		  indx = 255;
+		switch (bpp) {
+		  case 8:
+		    *image.b = (pixels[indx] & red_mask);
+		    break;
+		  case 16:
+		    *image.w = (pixels[indx] & red_mask);
+		    break;
+		  case 32:
+		    *image.l = (pixels[indx] & red_mask);
+		    break;
+		} /* end of switch (bpp) */
+		indx = (data.q[xsrc + ysrc*nx + s] - offset.f)*factor.f;
+		if (indx < 0)
+		  indx = 0;
+		else if (indx > 255)
+		  indx = 255;
+		switch (bpp) {
+		  case 8:
+		    *image.b |= (pixels[indx] & green_mask);
+		    break;
+		  case 16:
+		    *image.w |= (pixels[indx] & green_mask);
+		    break;
+		  case 32:
+		    *image.l |= (pixels[indx] & green_mask);
+		    break;
+		} /* end of switch (bpp) */
+		indx = (data.q[xsrc + ysrc*nx + 2*s] - offset.f)*factor.f;
+		if (indx < 0)
+		  indx = 0;
+		else if (indx > 255)
+		  indx = 255;
+		switch (bpp) {
+		  case 8:
+		    *image.b++ |= (pixels[indx] & blue_mask);
+		    break;
+		  case 16:
+		    *image.w++ |= (pixels[indx] & blue_mask);
+		    break;
+		  case 32:
+		    *image.l++ |= (pixels[indx] & blue_mask);
+		    break;
+		} /* end of switch (bpp) */
+	      }	/* end of for (ix) */
+	    break;
 	  case LUX_FLOAT:
 	    for (iy = nyy - 1; iy >= 0; iy--)
 	      for (ix = 0; ix < nxx; ix++) {
@@ -2586,6 +2795,33 @@ int32_t tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
 		} /* end of switch (bpp) */
 	      }	/* end of if (ix) */
 	    break;
+	  case LUX_INT64:
+	    for (iy = nyy - 1; iy >= 0; iy--)
+	      for (ix = 0; ix < nxx; ix++) {
+		xsrc = x1 + ix/magx;
+		ysrc = y1 + iy/magy;
+		indx = (data.q[xsrc + ysrc*nx] - offset.f)*factor.f;
+		if (indx < 0)
+		  indx = 0;
+		else if (indx >= 256/3)
+		  indx = 256/3 - 1;
+		if (bitmap1 && bitmap1[xsrc + ysrc*nx])
+		  indx += 256/3;
+		else if (bitmap2 && bitmap2[xsrc + ysrc*nx])
+		  indx += 2*(256/3);
+		switch (bpp) {
+		  case 8:
+		    *image.b++ = toscreen? pixels[indx]: indx;
+		    break;
+		  case 16:
+		    *image.w++ = toscreen? pixels[indx]: indx;
+		    break;
+		  case 32:
+		    *image.l++ = toscreen? pixels[indx]: indx;
+		    break;
+		} /* end of switch (bpp) */
+	      }	/* end of if (ix) */
+	    break;
 	  case LUX_FLOAT:
 	    for (iy = nyy - 1; iy >= 0; iy--)
 	      for (ix = 0; ix < nxx; ix++) {
@@ -2697,6 +2933,30 @@ int32_t tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
 	      xsrc = x1 + ix/magx;
 	      ysrc = y1 + iy/magy;
 	      indx = (data.l[xsrc + ysrc*nx] - offset.f)*factor.f
+		+ scalemin;
+	      if (indx < scalemin)
+		indx = scalemin;
+	      else if (indx > scalemax)
+		indx = scalemax;
+	      switch (bpp) {
+		case 8:
+		  *image.b++ = toscreen? pixels[indx]: indx;
+		  break;
+		case 16:
+		  *image.w++ = toscreen? pixels[indx]: indx;
+		  break;
+		case 32:
+		  *image.l++ = toscreen? pixels[indx]: indx;
+		  break;
+	      }	/* end of switch (bpp) */
+	    } /* end of for (ix) */
+	  break;
+	case LUX_INT64:
+	  for (iy = nyy - 1; iy >= 0; iy--)
+	    for (ix = 0; ix < nxx; ix++) {
+	      xsrc = x1 + ix/magx;
+	      ysrc = y1 + iy/magy;
+	      indx = (data.q[xsrc + ysrc*nx] - offset.f)*factor.f
 		+ scalemin;
 	      if (indx < scalemin)
 		indx = scalemin;
@@ -3143,6 +3403,12 @@ int32_t lux_colorpixel(int32_t narg, int32_t ps[])
 		| (pixels[(int32_t) p.l[n]] & green_mask)
 		| (pixels[(int32_t) p.l[2*n]] & blue_mask);
 	    break;
+	  case LUX_INT64:
+	    while (n--)
+	      *q.b++ = (pixels[(int32_t) *p.q] & red_mask)
+		| (pixels[(int32_t) p.q[n]] & green_mask)
+		| (pixels[(int32_t) p.q[2*n]] & blue_mask);
+	    break;
 	  case LUX_FLOAT:
 	    while (n--)
 	      *q.b++ = (pixels[(int32_t) *p.f] & red_mask)
@@ -3167,6 +3433,10 @@ int32_t lux_colorpixel(int32_t narg, int32_t ps[])
 	  case LUX_INT32:
 	    while (n--)
 	      *q.b++ = pixels[(int32_t) ((uint8_t) *p.l++)];
+	    break;
+          case LUX_INT64:
+	    while (n--)
+	      *q.b++ = pixels[(int32_t) ((uint8_t) *p.q++)];
 	    break;
 	  case LUX_FLOAT:
 	    while (n--)
@@ -3199,6 +3469,12 @@ int32_t lux_colorpixel(int32_t narg, int32_t ps[])
 		| (pixels[(int32_t) p.l[n]] & green_mask)
 		| (pixels[(int32_t) p.l[2*n]] & blue_mask);
 	    break;
+	  case LUX_INT64:
+	    while (n--)
+	      *q.w++ = (pixels[(int32_t) *p.q] & red_mask)
+		| (pixels[(int32_t) p.q[n]] & green_mask)
+		| (pixels[(int32_t) p.q[2*n]] & blue_mask);
+	    break;
 	  case LUX_FLOAT:
 	    while (n--)
 	      *q.w++ = (pixels[(int32_t) *p.f] & red_mask)
@@ -3223,6 +3499,10 @@ int32_t lux_colorpixel(int32_t narg, int32_t ps[])
 	  case LUX_INT32:
 	    while (n--)
 	      *q.w++ = pixels[(int32_t) ((uint8_t) *p.l++)];
+	    break;
+	  case LUX_INT64:
+	    while (n--)
+	      *q.w++ = pixels[(int32_t) ((uint8_t) *p.q++)];
 	    break;
 	  case LUX_FLOAT:
 	    while (n--)
@@ -3255,6 +3535,12 @@ int32_t lux_colorpixel(int32_t narg, int32_t ps[])
 		| (pixels[(int32_t) p.l[n]] & green_mask)
 		| (pixels[(int32_t) p.l[2*n]] & blue_mask);
 	    break;
+	  case LUX_INT64:
+	    while (n--)
+	      *q.l++ = (pixels[(int32_t) *p.q] & red_mask)
+		| (pixels[(int32_t) p.q[n]] & green_mask)
+		| (pixels[(int32_t) p.q[2*n]] & blue_mask);
+	    break;
 	  case LUX_FLOAT:
 	    while (n--)
 	      *q.l++ = (pixels[(int32_t) *p.f] & red_mask)
@@ -3279,6 +3565,10 @@ int32_t lux_colorpixel(int32_t narg, int32_t ps[])
 	  case LUX_INT32:
 	    while (n--)
 	      *q.l++ = pixels[(int32_t) ((uint8_t) *p.l++)];
+	    break;
+	  case LUX_INT64:
+	    while (n--)
+	      *q.l++ = pixels[(int32_t) ((uint8_t) *p.q++)];
 	    break;
 	  case LUX_FLOAT:
 	    while (n--)
@@ -3938,6 +4228,9 @@ int32_t lux_xzoom(int32_t narg, int32_t ps[])
 	  break;
 	case LUX_INT32:
 	  printf("%10d", ptr.l[i]);
+	  break;
+	case LUX_INT64:
+	  printf("%10jd", ptr.q[i]);
 	  break;
 	case LUX_FLOAT:
 	  printf("%10f", ptr.f[i]);

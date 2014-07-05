@@ -216,6 +216,16 @@ int32_t lux_iauCal2jd(int32_t narg, int32_t ps[])
       ptrs[1].l++;
     }
     break;
+  case LUX_INT64:
+    while (infos[1].nelem--) {
+      if (iauCal2jd(ptrs[0].q[0], ptrs[0].q[1], ptrs[0].q[2], &djm0, &djm))
+        *ptrs[1].q = 0;
+      else
+        *ptrs[1].q = (djm0 + 0.5) + djm;
+      ptrs[0].q += 3;
+      ptrs[1].q++;
+    }
+    break;
   case LUX_FLOAT:
     while (infos[1].nelem--) {
       int32_t day = floor(ptrs[0].f[2]);
@@ -291,6 +301,12 @@ int32_t lux_iauDat(int32_t narg, int32_t ps[])
       while (infos[1].nelem--) {
         iauDat(ptrs[0].l[0], ptrs[0].l[1], ptrs[0].l[2], 0.0, ptrs[1].d++);
         ptrs[0].l += 3;
+      }
+      break;
+    case LUX_INT64:
+      while (infos[1].nelem--) {
+        iauDat(ptrs[0].q[0], ptrs[0].q[1], ptrs[0].q[2], 0.0, ptrs[1].d++);
+        ptrs[0].q += 3;
       }
       break;
     case LUX_FLOAT:

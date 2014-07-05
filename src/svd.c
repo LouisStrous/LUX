@@ -148,6 +148,11 @@ int32_t lux_svd(int32_t narg, int32_t ps[])
 	*a++ = (double) *src.l++;
       a -= n;
       break;
+    case LUX_INT64:
+      while (n--)
+	*a++ = (double) *src.q++;
+      a -= n;
+      break;
     case LUX_FLOAT:
       while (n--)
 	*a++ = (double) *src.f++;

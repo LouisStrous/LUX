@@ -713,7 +713,7 @@ extern int32_t lux_abs(), lux_acos(), lux_arestore_f(), lux_arg(),
   lux_isarray(), lux_isnan(), lux_isscalar(), lux_isstring(),
   lux_istring(), lux_j0(), lux_j1(), lux_jd(), lux_jn(), lux_cjd(),
   lux_ksmooth(), lux_laplace2d(), lux_lmap(), lux_local_maxf(),
-  lux_local_maxloc(),
+  lux_local_maxloc(), lux_int64map(),
   lux_local_minf(), lux_local_minloc(), lux_log(), lux_log10(),
   lux_log1p(), lonarr(), lonfarr(), lux_long(), lux_lower(),
   lux_lsq(), lux_lsq2(), lux_match(), lux_max_dir(),
@@ -1028,6 +1028,7 @@ internalRoutine function_table[] = {
   { "INT64ARR", 1, MAX_DIMS, int64arr, 0 }, /* symbols.c */
   { "INT64FARR", 3, MAX_DIMS+1, int64farr, /* filemap.c */
     "%1%OFFSET:1READONLY:2SWAP" },
+  { "INT64MAP",	1, 1, lux_int64map, 0 }, /* subsc.c */
   { "INTARR",	1, MAX_DIMS, intarr, 0 }, /* symbols.c */
   { "INTFARR",	3, MAX_DIMS + 1, intfarr, /* filemap.c */
     "%1%OFFSET:1READONLY:2SWAP" },

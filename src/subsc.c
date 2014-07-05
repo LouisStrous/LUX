@@ -109,6 +109,10 @@ int32_t lux_inserter(int32_t narg, int32_t ps[])
 	    while (nelem--)
 	      *trgt.b++ = *src.l++;
 	    break;
+	  case LUX_INT64:
+	    while (nelem--)
+	      *trgt.b++ = *src.q++;
+	    break;
 	  case LUX_FLOAT:
 	    while (nelem--)
 	      *trgt.b++ = *src.f++;
@@ -135,6 +139,10 @@ int32_t lux_inserter(int32_t narg, int32_t ps[])
 	    while (nelem--)
 	      *trgt.w++ = *src.l++;
 	    break;
+	  case LUX_INT64:
+	    while (nelem--)
+	      *trgt.w++ = *src.q++;
+	    break;
 	  case LUX_FLOAT:
 	    while (nelem--)
 	      *trgt.w++ = *src.f++;
@@ -151,23 +159,57 @@ int32_t lux_inserter(int32_t narg, int32_t ps[])
 	switch (symbol_type(ps[1])) {
 	  case LUX_INT8:
 	    while (nelem--)
-	      *trgt.l++ = *src.b++;	    
+	      *trgt.l++ = *src.b++;
 	    break;
 	  case LUX_INT16:
 	    while (nelem--)
-	      *trgt.l++ = *src.w++;	    
+	      *trgt.l++ = *src.w++;
 	    break;
 	  case LUX_INT32:
 	    while (nelem--)
-	      *trgt.l++ = *src.l++;	    
+	      *trgt.l++ = *src.l++;
+	    break;
+	  case LUX_INT64:
+	    while (nelem--)
+	      *trgt.l++ = *src.q++;
 	    break;
 	  case LUX_FLOAT:
 	    while (nelem--)
-	      *trgt.l++ = *src.f++;	    
+	      *trgt.l++ = *src.f++;
 	    break;
 	  case LUX_DOUBLE:
 	    while (nelem--)
-	      *trgt.l++ = *src.d++;	    
+	      *trgt.l++ = *src.d++;
+	    break;
+	  default:
+	    return cerror(ILL_TYPE, ps[1]);
+	}
+	break;
+      case LUX_INT64:
+	switch (symbol_type(ps[1])) {
+	  case LUX_INT8:
+	    while (nelem--)
+	      *trgt.q++ = *src.b++;
+	    break;
+	  case LUX_INT16:
+	    while (nelem--)
+	      *trgt.q++ = *src.w++;
+	    break;
+	  case LUX_INT32:
+	    while (nelem--)
+	      *trgt.q++ = *src.l++;
+	    break;
+	  case LUX_INT64:
+	    while (nelem--)
+	      *trgt.q++ = *src.q++;
+	    break;
+	  case LUX_FLOAT:
+	    while (nelem--)
+	      *trgt.q++ = *src.f++;
+	    break;
+	  case LUX_DOUBLE:
+	    while (nelem--)
+	      *trgt.q++ = *src.d++;
 	    break;
 	  default:
 	    return cerror(ILL_TYPE, ps[1]);
@@ -177,23 +219,27 @@ int32_t lux_inserter(int32_t narg, int32_t ps[])
 	switch (symbol_type(ps[1])) {
 	  case LUX_INT8:
 	    while (nelem--)
-	      *trgt.f++ = *src.b++;	    
+	      *trgt.f++ = *src.b++;
 	    break;
 	  case LUX_INT16:
 	    while (nelem--)
-	      *trgt.f++ = *src.w++;	    
+	      *trgt.f++ = *src.w++;
 	    break;
 	  case LUX_INT32:
 	    while (nelem--)
-	      *trgt.f++ = *src.l++;	    
+	      *trgt.f++ = *src.l++;
+	    break;
+	  case LUX_INT64:
+	    while (nelem--)
+	      *trgt.f++ = *src.q++;
 	    break;
 	  case LUX_FLOAT:
 	    while (nelem--)
-	      *trgt.f++ = *src.f++;	    
+	      *trgt.f++ = *src.f++;
 	    break;
 	  case LUX_DOUBLE:
 	    while (nelem--)
-	      *trgt.f++ = *src.d++;	    
+	      *trgt.f++ = *src.d++;
 	    break;
 	  default:
 	    return cerror(ILL_TYPE, ps[1]);
@@ -203,23 +249,27 @@ int32_t lux_inserter(int32_t narg, int32_t ps[])
 	switch (symbol_type(ps[1])) {
 	  case LUX_INT8:
 	    while (nelem--)
-	      *trgt.d++ = *src.b++;	    
+	      *trgt.d++ = *src.b++;
 	    break;
 	  case LUX_INT16:
 	    while (nelem--)
-	      *trgt.d++ = *src.w++;	    
+	      *trgt.d++ = *src.w++;
 	    break;
 	  case LUX_INT32:
 	    while (nelem--)
-	      *trgt.d++ = *src.l++;	    
+	      *trgt.d++ = *src.l++;
+	    break;
+	  case LUX_INT64:
+	    while (nelem--)
+	      *trgt.d++ = *src.l++;
 	    break;
 	  case LUX_FLOAT:
 	    while (nelem--)
-	      *trgt.d++ = *src.f++;	    
+	      *trgt.d++ = *src.f++;
 	    break;
 	  case LUX_DOUBLE:
 	    while (nelem--)
-	      *trgt.d++ = *src.d++;	    
+	      *trgt.d++ = *src.d++;
 	    break;
 	  default:
 	    return cerror(ILL_TYPE, ps[1]);
@@ -304,6 +354,12 @@ int32_t lux_lmap(int32_t narg, int32_t ps[])
 /* convert type to long without changing memory contents */
 {
   return lux_gmap(narg, ps, LUX_INT32);
+}
+/*------------------------------------------------------------------------- */
+int32_t lux_int64map(int32_t narg, int32_t ps[])
+/* convert type to long without changing memory contents */
+{
+  return lux_gmap(narg, ps, LUX_INT64);
 }
 /*------------------------------------------------------------------------- */
 int32_t lux_fmap(int32_t narg, int32_t ps[])
@@ -1752,7 +1808,7 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
       step[0] += width;
       trgtndim -= i;
     }
-    
+
     switch (class) {
       case LUX_ARRAY: case LUX_SCALAR:
       case LUX_CARRAY: case LUX_CSCALAR:
@@ -1772,6 +1828,9 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
 		break;
 	      case LUX_INT32:
 		value.l += src.l[offset];
+		break;
+	      case LUX_INT64:
+		value.q += src.l[offset];
 		break;
 	      case LUX_FLOAT:
 		value.f += src.f[offset];
@@ -1871,6 +1930,9 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
 		break;
 	      case LUX_INT32:
 		value.l += item.l;
+		break;
+	      case LUX_INT64:
+		value.q += item.q;
 		break;
 	      case LUX_FLOAT:
 		value.f += item.f;
@@ -3036,6 +3098,22 @@ int32_t lux_subsc_subgrid(int32_t narg, int32_t ps[])
 	  value.f += cvalue.f;
 	} while (j < ndim);
 	*out.f++ = value.f;
+	break;
+      case LUX_INT64:
+	do {
+	  cvalue.d = src.q[index];
+	  for (i = 0; i < ndim; i++)
+	    cvalue.d *= d[i];
+	  for (j = 0; j < ndim; j++) {
+	    tally[j] ^= 1;
+	    d[j] = 1 - d[j];
+	    index += step[tally[j]][j];
+	    if (tally[j])
+	      break;
+	  }
+	  value.d += cvalue.d;
+	} while (j < ndim);
+	*out.f++ = value.d;
 	break;
       case LUX_FLOAT:
 	do {

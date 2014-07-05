@@ -66,6 +66,9 @@ void value_string(char *trgt, pointer image, int32_t type, int32_t indx)
     case LUX_INT32:
       sprintf(trgt, "Value:% 10d", image.l[indx]);
       break;
+    case LUX_INT64:
+      sprintf(trgt, "Value:% 10jd", image.q[indx]);
+      break;
     case LUX_FLOAT:
       sprintf(trgt, "Value:% #9.4g", image.f[indx]);
       break;
@@ -602,6 +605,10 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
 		      case LUX_INT32:
 			zoom_clo = (double) lastmin.l;
 			zoom_chi = (double) lastmax.l;
+			break;
+		      case LUX_INT64:
+			zoom_clo = (double) lastmin.q;
+			zoom_chi = (double) lastmax.q;
 			break;
 		      case LUX_FLOAT:
 			zoom_clo = (double) lastmin.f;

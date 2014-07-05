@@ -608,23 +608,37 @@ int32_t input_format_check(char *format, char **next, char **widths, int32_t *da
     while (isdigit((uint8_t) *++format));
   big = 0;			/* modifier */
   switch (*format) {
-    case 'h':
-      big = 1;
-      format++;
-      break;
-    case 'l':
-      big = 2;
-      format++;
-      break;
-    case 'L':
-      big = 3;
-      format++;
-      break;
+  case 'h':
+    big = 1;
+    format++;
+    break;
+  case 'l':
+    big = 2;
+    format++;
+    break;
+  case 'L':
+    big = 3;
+    format++;
+    break;
+  case 'j':
+    big = 4;
+    ++format;
+    break;
   }
   *formatchar = *format;
   switch (*format) {		/* data type */
     case 'd': case 'i': case 'o': case 'x': /* integer */
-      *datatype = (big == 1)? LUX_INT16: LUX_INT32;
+      switch (big) {
+      case 1:
+        *datatype = LUX_INT16;
+        break;
+      case 4:
+        *datatype = LUX_INT64;
+        break;
+      default:
+        *datatype = LUX_INT32;
+        break;
+      }
       break;
     case 'e': case 'f': case 'g': case 't': case 'T': /* floating point */
       *datatype = (big == 3)? LUX_DOUBLE: LUX_FLOAT;
@@ -1310,7 +1324,7 @@ int32_t type_formatted_ascii(int32_t narg, int32_t ps[], FILE *fp)
 	  case FMT_INTEGER:
 	    switch (symbol_type(iq)) {
 	      case LUX_INT8:
-		if (fp) 
+		if (fp)
 		  while (n--) {
 		    fprintf(fp, thefmt, (int32_t) *p.b++);
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2)))
@@ -1327,7 +1341,7 @@ int32_t type_formatted_ascii(int32_t narg, int32_t ps[], FILE *fp)
 		  }
 		break;
 	      case LUX_INT16:
-		if (fp) 
+		if (fp)
 		  while (n--) {
 		    fprintf(fp, thefmt, (int32_t) *p.w++);
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2)))
@@ -1344,7 +1358,7 @@ int32_t type_formatted_ascii(int32_t narg, int32_t ps[], FILE *fp)
 		  }
 		break;
 	      case LUX_INT32:
-		if (fp) 
+		if (fp)
 		  while (n--) {
 		    fprintf(fp, thefmt, (int32_t) *p.l++);
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2)))
@@ -1360,8 +1374,25 @@ int32_t type_formatted_ascii(int32_t narg, int32_t ps[], FILE *fp)
 		    }
 		  }
 		break;
+	      case LUX_INT64:
+		if (fp)
+		  while (n--) {
+		    fprintf(fp, thefmt, *p.q++);
+		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2)))
+		      fputs(theFormat.plain, fp);
+		  }
+		else
+		  while (n--) {
+		    sprintf(curScrat, thefmt, *p.q++);
+		    curScrat += strlen(curScrat);
+		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2))) {
+		      strcpy(curScrat, theFormat.plain);
+		      curScrat += strlen(curScrat);
+		    }
+		  }
+		break;
 	      case LUX_FLOAT:
-		if (fp) 
+		if (fp)
 		  while (n--) {
 		    fprintf(fp, thefmt, (int32_t) *p.f++);
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2)))
@@ -1378,7 +1409,7 @@ int32_t type_formatted_ascii(int32_t narg, int32_t ps[], FILE *fp)
 		  }
 		break;
 	      case LUX_DOUBLE:
-		if (fp) 
+		if (fp)
 		  while (n--) {
 		    fprintf(fp, thefmt, (int32_t) *p.d++);
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2)))
@@ -1431,7 +1462,7 @@ int32_t type_formatted_ascii(int32_t narg, int32_t ps[], FILE *fp)
 		      curScrat += strlen(curScrat);
 		    }
 		  }
-		break;		    
+		break;
 	      case LUX_STRING_ARRAY: case LUX_TEMP_STRING:
 	      case LUX_LSTRING:
 		/* string arguments with numerical formats ->
@@ -1485,6 +1516,23 @@ int32_t type_formatted_ascii(int32_t narg, int32_t ps[], FILE *fp)
 		else
 		  while (n--) {
 		    sprintf(curScrat, thefmt, (double) *p.l++);
+		    curScrat += strlen(curScrat);
+		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2))) {
+		      strcpy(curScrat, theFormat.plain);
+		      curScrat += strlen(curScrat);
+		    }
+		  }
+		break;
+	      case LUX_INT64:
+		if (fp)
+		  while (n--) {
+		    fprintf(fp, thefmt, (double) *p.q++);
+		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2)))
+		      fputs(theFormat.plain, fp);
+		  }
+		else
+		  while (n--) {
+		    sprintf(curScrat, thefmt, (double) *p.q++);
 		    curScrat += strlen(curScrat);
 		    if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2))) {
 		      strcpy(curScrat, theFormat.plain);
@@ -1563,7 +1611,7 @@ int32_t type_formatted_ascii(int32_t narg, int32_t ps[], FILE *fp)
 		      curScrat += strlen(curScrat);
 		    }
 		  }
-		break;		    
+		break;
 	      case LUX_STRING_ARRAY: case LUX_TEMP_STRING:
 	      case LUX_LSTRING:
 		/* don't print strings with numerical formats */
@@ -1609,6 +1657,23 @@ int32_t type_formatted_ascii(int32_t narg, int32_t ps[], FILE *fp)
 	      case LUX_INT32:
 		while (n--) {
 		  Sprintf(curScrat, thefmt, (double) *p.l++);
+		  if (fp)
+		    fputs(curScrat, fp);
+		  else
+		    curScrat += strlen(curScrat);
+		  if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2))) {
+		    if (fp)
+		      fputs(theFormat.plain, fp);
+		    else {
+		      strcpy(curScrat, theFormat.plain);
+		      curScrat += strlen(curScrat);
+		    }
+		  }
+		}
+		break;
+	      case LUX_INT64:
+		while (n--) {
+		  Sprintf(curScrat, thefmt, (double) *p.q++);
 		  if (fp)
 		    fputs(curScrat, fp);
 		  else
@@ -1698,6 +1763,23 @@ int32_t type_formatted_ascii(int32_t narg, int32_t ps[], FILE *fp)
 	      case LUX_INT32:
 		while (n--) {
 		  Sprintf(curScrat, thefmt, (double) *p.l++, (double) 0.0);
+		  if (fp)
+		    fputs(curScrat, fp);
+		  else
+		    curScrat += strlen(curScrat);
+		  if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2))) {
+		    if (fp)
+		      fputs(theFormat.plain, fp);
+		    else {
+		      strcpy(curScrat, theFormat.plain);
+		      curScrat += strlen(curScrat);
+		    }
+		  }
+		}
+		break;
+	      case LUX_INT64:
+		while (n--) {
+		  Sprintf(curScrat, thefmt, (double) *p.q++, (double) 0.0);
 		  if (fp)
 		    fputs(curScrat, fp);
 		  else
@@ -1819,7 +1901,7 @@ int32_t type_formatted_ascii(int32_t narg, int32_t ps[], FILE *fp)
 		  if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2))) {
 		    strcpy(curScrat, theFormat.plain);
 		    curScrat += strlen(curScrat);
-		  }		    
+		  }
 		}
 		break;
 	    }
@@ -1840,7 +1922,7 @@ int32_t type_formatted_ascii(int32_t narg, int32_t ps[], FILE *fp)
       }	/* end of while (nn--) */
     } /* end of if (theFormat.type == LUX_UNUSED) */
   } /* end of if (narg || theFormat.type == LUX_UNUSED) */
-  
+
   lux_type_ascii1:
   if (fp == stdout)
     fflush(stdout);
@@ -2204,7 +2286,8 @@ int32_t read_ascii(int32_t narg, int32_t ps[], FILE *fp, int32_t flag)
 	index_cnt++;
 	redef_scalar(iq, type, &value);
 	switch (type) {
-	  /* <iq> is returned as LUX_INT32 or LUX_DOUBLE by redef_scalar() */
+	  /* <iq> is returned as LUX_INT32, LUX_INT64, or LUX_DOUBLE
+             by redef_scalar() */
 	case LUX_INT8:
 	  scalar_value(iq).b = (uint8_t) value.l;
 	  break;
@@ -2225,6 +2308,10 @@ int32_t read_ascii(int32_t narg, int32_t ps[], FILE *fp, int32_t flag)
 	case LUX_INT8: case LUX_INT16: case LUX_INT32:
 	  *scal_ptr_pointer(iq).l = value.l;
 	  scal_ptr_type(iq) = LUX_INT32;
+	  break;
+	case LUX_INT64:
+	  *scal_ptr_pointer(iq).q = value.q;
+	  scal_ptr_type(iq) = LUX_INT64;
 	  break;
 	case LUX_FLOAT:
 	  *scal_ptr_pointer(iq).f = (float) value.d;
@@ -2253,6 +2340,9 @@ int32_t read_ascii(int32_t narg, int32_t ps[], FILE *fp, int32_t flag)
 	      case LUX_INT8: case LUX_INT16: case LUX_INT32:
 		*pp.b++ = (uint8_t) value.l;
 		break;
+	      case LUX_INT64:
+		*pp.b++ = value.q;
+		break;
 	      case LUX_FLOAT: case LUX_DOUBLE:
 		*pp.b++ = (uint8_t) value.d;
 		break;
@@ -2262,6 +2352,9 @@ int32_t read_ascii(int32_t narg, int32_t ps[], FILE *fp, int32_t flag)
 	      switch (type) {
 	      case LUX_INT8: case LUX_INT16: case LUX_INT32:
 		*pp.w++ = (int16_t) value.l;
+		break;
+	      case LUX_INT64:
+		*pp.w++ = value.q;
 		break;
 	      case LUX_FLOAT: case LUX_DOUBLE:
 		*pp.w++ = (int16_t) value.d;
@@ -2273,8 +2366,24 @@ int32_t read_ascii(int32_t narg, int32_t ps[], FILE *fp, int32_t flag)
 	      case LUX_INT8: case LUX_INT16: case LUX_INT32:
 		*pp.l++ = (int32_t) value.l;
 		break;
+	      case LUX_INT64:
+		*pp.l++ = value.q;
+		break;
 	      case LUX_FLOAT: case LUX_DOUBLE:
 		*pp.l++ = (int32_t) value.d;
+		break;
+	      }
+	      break;
+	    case LUX_INT64:
+	      switch (type) {
+	      case LUX_INT8: case LUX_INT16: case LUX_INT32:
+		*pp.q++ = value.l;
+		break;
+	      case LUX_INT64:
+		*pp.q++ = value.q;
+		break;
+	      case LUX_FLOAT: case LUX_DOUBLE:
+		*pp.q++ = value.d;
 		break;
 	      }
 	      break;
@@ -2282,6 +2391,9 @@ int32_t read_ascii(int32_t narg, int32_t ps[], FILE *fp, int32_t flag)
 	      switch (type) {
 	      case LUX_INT8: case LUX_INT16: case LUX_INT32:
 		*pp.f++ = (float) value.l;
+		break;
+	      case LUX_INT64:
+		*pp.f++ = value.q;
 		break;
 	      case LUX_FLOAT: case LUX_DOUBLE:
 		*pp.f++ = (float) value.d;
@@ -2292,6 +2404,9 @@ int32_t read_ascii(int32_t narg, int32_t ps[], FILE *fp, int32_t flag)
 	      switch (type) {
 	      case LUX_INT8: case LUX_INT16: case LUX_INT32:
 		*pp.d++ = (double) value.l;
+		break;
+	      case LUX_INT64:
+		*pp.d++ = value.q;
 		break;
 	      case LUX_FLOAT: case LUX_DOUBLE:
 		*pp.d++ = (double) value.d;
@@ -2962,6 +3077,7 @@ int32_t lux_assoc_output(int32_t iq, int32_t jq, int32_t offsym, int32_t axsym)
    { case LUX_INT8:  jq = lux_byte(1, &jq);  break;
      case LUX_INT16:  jq = lux_word(1, &jq);  break;
      case LUX_INT32:  jq = lux_long(1, &jq);  break;
+     case LUX_INT64:  jq = lux_int64(1, &jq);  break;
      case LUX_FLOAT: jq = lux_float(1, &jq); break;
      case LUX_DOUBLE: jq = lux_double(1, &jq); break; }
  }
@@ -5468,6 +5584,13 @@ void apply_bscale_bzero_blank(uint8_t *ptr, int32_t nelem, float bscale, float b
 	      p.l--;
 	    }
 	    break;
+	  case LUX_INT64:
+	    while (nelem--) {
+	      *q.b = (*p.q == blank)? targetblank: *p.q * bscale + bzero;
+	      q.b--;
+	      p.q--;
+	    }
+	    break;
 	}
 	break;
       case LUX_INT16:
@@ -5491,6 +5614,13 @@ void apply_bscale_bzero_blank(uint8_t *ptr, int32_t nelem, float bscale, float b
 	      *q.w = (*p.l == blank)? targetblank: *p.l * bscale + bzero;
 	      q.w--;
 	      p.l--;
+	    }
+	    break;
+	  case LUX_INT64:
+	    while (nelem--) {
+	      *q.w = (*p.q == blank)? targetblank: *p.q * bscale + bzero;
+	      q.w--;
+	      p.q--;
 	    }
 	    break;
 	}
@@ -5518,6 +5648,13 @@ void apply_bscale_bzero_blank(uint8_t *ptr, int32_t nelem, float bscale, float b
 	      p.l--;
 	    }
 	    break;
+	  case LUX_INT64:
+	    while (nelem--) {
+	      *q.l = (*p.q == blank)? targetblank: *p.q * bscale + bzero;
+	      q.l--;
+	      p.q--;
+	    }
+	    break;
 	}
 	break;
       case LUX_FLOAT:
@@ -5541,6 +5678,13 @@ void apply_bscale_bzero_blank(uint8_t *ptr, int32_t nelem, float bscale, float b
 	      *q.f = (*p.l == blank)? targetblank: *p.l * bscale + bzero;
 	      q.f--;
 	      p.l--;
+	    }
+	    break;
+	  case LUX_INT64:
+	    while (nelem--) {
+	      *q.f = (*p.q == blank)? targetblank: *p.q * bscale + bzero;
+	      q.f--;
+	      p.q--;
 	    }
 	    break;
 	  case LUX_FLOAT:

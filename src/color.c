@@ -234,7 +234,7 @@ int32_t setup_x_visual(int32_t desiredVisualClass)
     colorIndexType = LUX_INT8;
   else if (depth <= 8*sizeof(int32_t))
     colorIndexType = LUX_INT16;
-  else if (depth <= 8*sizeof(int64_t))
+  else
     colorIndexType = LUX_INT32;
 
   /* 5. get a colormap for the selected visual */

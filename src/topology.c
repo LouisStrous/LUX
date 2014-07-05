@@ -113,6 +113,23 @@ int32_t segment_2d(int32_t narg, int32_t ps[])
 	  src.l++;
 	}
 	break;
+      case LUX_INT64:
+	while (ny--) {		/* all rows except for bottom one */
+	  *trgt.l++ = 0;
+	  src.q++;
+	  n = nx - 2;
+	  while (n--) {
+	    value.q = *src.q * 2;
+	    *trgt.l++ = (src.q[-1] + src.q[1] < value.q
+			 && src.q[nx] + src.q[-nx] < value.q
+			 && src.q[1 + nx] + src.q[-1 - nx] < value.q
+			 && src.q[1 - nx] + src.q[-1 + nx] < value.q);
+	    src.q++;
+	  }
+	  *trgt.l++ = 0;
+	  src.q++;
+	}
+	break;
       case LUX_FLOAT:
 	while (ny--) {		/* all rows except for bottom one */
 	  *trgt.l++ = 0;
@@ -199,6 +216,23 @@ int32_t segment_2d(int32_t narg, int32_t ps[])
 	  }
 	  *trgt.l++ = 0;
 	  src.l++;
+	}
+	break;
+      case LUX_INT64:
+	while (ny--) {		/* all rows except for bottom one */
+	  *trgt.l++ = 0;
+	  src.q++;
+	  n = nx - 2;
+	  while (n--) {
+	    value.q = *src.q * 2;
+	    *trgt.l++ = (src.q[-1] + src.q[1] > value.q
+			 && src.q[nx] + src.q[-nx] > value.q
+			 && src.q[1 + nx] + src.q[-1 - nx] > value.q
+			 && src.q[1 - nx] + src.q[-1 + nx] > value.q);
+	    src.q++;
+	  }
+	  *trgt.l++ = 0;
+	  src.q++;
 	}
 	break;
       case LUX_FLOAT:
@@ -305,13 +339,13 @@ int32_t segment_general(int32_t narg, int32_t ps[])
 	      break;
 	  }
 	  *trgt.l = (j == n);
-	} while (advanceLoop(&trgtinfo, &trgt), 
+	} while (advanceLoop(&trgtinfo, &trgt),
 		 advanceLoop(&srcinfo, &src) < srcinfo.ndim);
 	break;
       case LUX_INT16:
 	do {
 	  value.l = 2 * *src.w;
-	  for (j = 0; j < n; j++) {	/* all directions */	  
+	  for (j = 0; j < n; j++) {	/* all directions */
 	    k = offset[j];
 	    srcl.w = src.w + k;
 	    srcr.w = src.w - k;
@@ -325,7 +359,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
       case LUX_INT32:
 	do {
 	  value.l = 2 * *src.l;
-	  for (j = 0; j < n; j++) {	/* all directions */	  
+	  for (j = 0; j < n; j++) {	/* all directions */
 	    k = offset[j];
 	    srcl.l = src.l + k;
 	    srcr.l = src.l - k;
@@ -336,10 +370,24 @@ int32_t segment_general(int32_t narg, int32_t ps[])
 	} while (advanceLoop(&trgtinfo, &trgt),
 		 advanceLoop(&srcinfo, &src) < srcinfo.ndim);
 	break;
+      case LUX_INT64:
+	do {
+	  value.q = 2 * *src.q;
+	  for (j = 0; j < n; j++) {	/* all directions */
+	    k = offset[j];
+	    srcl.q = src.q + k;
+	    srcr.q = src.q - k;
+	    if (value.q <= *srcl.q + *srcr.q)
+	      break;
+	  }
+	  *trgt.l = (j == n);
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.ndim);
+	break;
       case LUX_FLOAT:
 	do {
 	  value.f = 2 * *src.f;
-	  for (j = 0; j < n; j++) {	/* all directions */	  
+	  for (j = 0; j < n; j++) {	/* all directions */
 	    k = offset[j];
 	    srcl.f = src.f + k;
 	    srcr.f = src.f - k;
@@ -353,7 +401,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
       case LUX_DOUBLE:
 	do {
 	  value.d = 2 * *src.d;
-	  for (j = 0; j < n; j++) {	/* all directions */	  
+	  for (j = 0; j < n; j++) {	/* all directions */
 	    k = offset[j];
 	    srcl.d = src.d + k;
 	    srcr.d = src.d - k;
@@ -370,7 +418,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
 	  do {
 	    nok = 1 - degree;
 	    value.b = 2 * *src.b;
-	    for (j = 0; j < n; j++) { /* all directions */	  
+	    for (j = 0; j < n; j++) { /* all directions */
 	      k = offset[j];
 	      srcl.b = src.b + k;
 	      srcr.b = src.b - k;
@@ -391,7 +439,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
 	  do {
 	    nok = 1 - degree;
 	    value.w = 2 * *src.w;
-	    for (j = 0; j < n; j++) { /* all directions */	  
+	    for (j = 0; j < n; j++) { /* all directions */
 	      k = offset[j];
 	      srcl.w = src.w + k;
 	      srcr.w = src.w - k;
@@ -412,7 +460,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
 	  do {
 	    nok = 1 - degree;
 	    value.l = 2 * *src.l;
-	    for (j = 0; j < n; j++) { /* all directions */	  
+	    for (j = 0; j < n; j++) { /* all directions */
 	      k = offset[j];
 	      srcl.l = src.l + k;
 	      srcr.l = src.l - k;
@@ -429,11 +477,32 @@ int32_t segment_general(int32_t narg, int32_t ps[])
 	  } while (advanceLoop(&trgtinfo, &trgt),
 		   advanceLoop(&srcinfo, &src) < srcinfo.ndim);
 	  break;
+	case LUX_INT64:
+	  do {
+	    nok = 1 - degree;
+	    value.q = 2 * *src.q;
+	    for (j = 0; j < n; j++) { /* all directions */
+	      k = offset[j];
+	      srcl.q = src.q + k;
+	      srcr.q = src.q - k;
+	      ok = (sign && value.q > *srcl.q + *srcr.q)
+		|| (!sign && value.q < *srcl.q + *srcr.q);
+	      if (degree)
+		nok += ok;
+	      else if (!ok) {
+		nok = 0;
+		break;
+	      }
+	    }
+	    *trgt.l = nok;
+	  } while (advanceLoop(&trgtinfo, &trgt),
+		   advanceLoop(&srcinfo, &src) < srcinfo.ndim);
+	  break;
 	case LUX_FLOAT:
 	  do {
 	    nok = 1 - degree;
 	    value.f = 2 * *src.f;
-	    for (j = 0; j < n; j++) { /* all directions */	  
+	    for (j = 0; j < n; j++) { /* all directions */
 	      k = offset[j];
 	      srcl.f = src.f + k;
 	      srcr.f = src.f - k;
@@ -454,7 +523,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
 	  do {
 	    nok = 1 - degree;
 	    value.d = 2 * *src.d;
-	    for (j = 0; j < n; j++) { /* all directions */	  
+	    for (j = 0; j < n; j++) { /* all directions */
 	      k = offset[j];
 	      srcl.d = src.d + k;
 	      srcr.d = src.d - k;
@@ -472,7 +541,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
 		   advanceLoop(&srcinfo, &src) < srcinfo.ndim);
 	  break;
       }
-  
+
   free(offset);
   return result;
 }
@@ -592,6 +661,26 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
 	  angle++;
 	}
 	break;
+      case LUX_INT64:
+	while (ny--) {		/* all rows except for bottom one */
+	  *trgt.l++ = 0;
+	  angle++;
+	  src.q++;
+	  n = nx - 2;
+	  while (n--) {
+	    value.q = *src.q * (short) 2;
+	    a = *angle++ + DEG22_5;
+	    s = sin(a);
+	    c = cos(a);
+	    class = ((s*c > 0) << 1) + (s*c*(2*c*c - 1) > 0);
+	    *trgt.l++ = (src.q[off[class]] + src.q[-off[class]] < value.q);
+	    src.q++;
+	  }
+	  *trgt.l++ = 0;
+	  src.q++;
+	  angle++;
+	}
+	break;
       case LUX_FLOAT:
 	while (ny--) {		/* all rows except for bottom one */
 	  *trgt.l++ = 0;
@@ -693,6 +782,26 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
 	  *trgt.l++ = 0;
 	  angle++;
 	  src.l++;
+	}
+	break;
+      case LUX_INT64:
+	while (ny--) {		/* all rows except for bottom one */
+	  *trgt.l++ = 0;
+	  src.q++;
+	  angle++;
+	  n = nx - 2;
+	  while (n--) {
+	    value.q = *src.q * (short) 2;
+	    a = *angle++ + DEG22_5;
+	    s = sin(a);
+	    c = cos(a);
+	    class = ((s*c > 0)<<1) + (s*c*(2*c*c - 1) > 0);
+	    *trgt.l++ = (src.q[off[class]] + src.q[-off[class]] > value.q);
+	    src.q++;
+	  }
+	  *trgt.l++ = 0;
+	  angle++;
+	  src.q++;
 	}
 	break;
       case LUX_FLOAT:
@@ -849,6 +958,27 @@ int32_t lux_max_dir(int32_t narg, int32_t ps[])
 	  angle++;
 	}
 	break;
+      case LUX_INT64:
+	while (ny--) {		/* all rows except for bottom one */
+	  *trgt.b++ = 0;
+	  angle++;
+	  src.q++;
+	  n = nx - 2;
+	  while (n--) {
+	    value.q = *src.q;
+	    a = *angle++ + DEG22_5;
+	    s = sin(a);
+	    c = cos(a);
+	    class = ((s*c > 0) << 1) + (s*c*(2*c*c - 1) > 0);
+	    *trgt.b++ = (value.q > src.q[off[class]]
+			 && value.q > src.q[-off[class]]);
+	    src.q++;
+	  }
+	  *trgt.b++ = 0;
+	  src.q++;
+	  angle++;
+	}
+	break;
       case LUX_FLOAT:
 	while (ny--) {		/* all rows except for bottom one */
 	  *trgt.b++ = 0;
@@ -955,6 +1085,27 @@ int32_t lux_max_dir(int32_t narg, int32_t ps[])
 	  *trgt.b++ = 0;
 	  angle++;
 	  src.l++;
+	}
+	break;
+      case LUX_INT64:
+	while (ny--) {		/* all rows except for bottom one */
+	  *trgt.b++ = 0;
+	  src.q++;
+	  angle++;
+	  n = nx - 2;
+	  while (n--) {
+	    value.q = *src.q;
+	    a = *angle++ + DEG22_5;
+	    s = sin(a);
+	    c = cos(a);
+	    class = ((s*c > 0)<<1) + (s*c*(2*c*c - 1) > 0);
+	    *trgt.b++ = (value.q < src.q[off[class]]
+			 && value.q < src.q[-off[class]]);
+	    src.q++;
+	  }
+	  *trgt.b++ = 0;
+	  angle++;
+	  src.q++;
 	}
 	break;
       case LUX_FLOAT:
@@ -1667,6 +1818,12 @@ int32_t area2_2d(int32_t narg, int32_t ps[])
 	      dataptr2.l = dataptr.l + offset[direction];
 	    }
 	    break;
+	  case SEEK_MAXIMUM + LUX_INT64:
+	    if (dataptr.q[offset[direction]] > *dataptr2.q) {
+	      j = direction;
+	      dataptr2.q = dataptr.q + offset[direction];
+	    }
+	    break;
 	  case SEEK_MAXIMUM + LUX_FLOAT:
 	    if (dataptr.f[offset[direction]] > *dataptr2.f) {
 	      j = direction;
@@ -1697,6 +1854,12 @@ int32_t area2_2d(int32_t narg, int32_t ps[])
 	      dataptr2.l = dataptr.l + offset[direction];
 	    }
 	    break;
+	  case LUX_INT64:
+	    if (dataptr.q[offset[direction]] < *dataptr2.q) {
+	      j = direction;
+	      dataptr2.q = dataptr.q + offset[direction];
+	    }
+	    break;
 	  case LUX_FLOAT:
 	    if (dataptr.f[offset[direction]] < *dataptr2.f) {
 	      j = direction;
@@ -1709,7 +1872,7 @@ int32_t area2_2d(int32_t narg, int32_t ps[])
 	      dataptr2.d = dataptr.d + offset[direction];
 	    }
 	    break;
-	}	
+	}
       }
       if (j != -1) {		/* not yet found the extreme */
 	/* update pointers */
@@ -1740,7 +1903,7 @@ int32_t area2_2d(int32_t narg, int32_t ps[])
 	  iy2 = iy + rcoords[direction][1];
 	  if (ix2 < 0 || ix2 >= nx || iy2 < 0 || iy2 >= ny)
 	    /* across the edge: continue with next direction */
-	    continue;		
+	    continue;
 
 	  /* the current direction does not lead across an edge */
 	  ptr2 = ptr + offset[direction]; /* the neighboring position */
@@ -1757,6 +1920,10 @@ int32_t area2_2d(int32_t narg, int32_t ps[])
 	      break;
 	    case SEEK_MAXIMUM + LUX_INT32:
 	      if (dataptr.l[offset[direction]] >= *dataptr.l)
+		continue;
+	      break;
+	    case SEEK_MAXIMUM + LUX_INT64:
+	      if (dataptr.q[offset[direction]] >= *dataptr.q)
 		continue;
 	      break;
 	    case SEEK_MAXIMUM + LUX_FLOAT:
@@ -1777,6 +1944,10 @@ int32_t area2_2d(int32_t narg, int32_t ps[])
 	      break;
 	    case LUX_INT32:
 	      if (dataptr.l[offset[direction]] <= *dataptr.l)
+		continue;
+	      break;
+	    case LUX_INT64:
+	      if (dataptr.q[offset[direction]] <= *dataptr.q)
 		continue;
 	      break;
 	    case LUX_FLOAT:
@@ -1823,6 +1994,10 @@ int32_t area2_2d(int32_t narg, int32_t ps[])
 	      if (dataptr.l[offset[direction]] >= *dataptr.l)
 		continue;
 	      break;
+	    case SEEK_MAXIMUM + LUX_INT64:
+	      if (dataptr.q[offset[direction]] >= *dataptr.q)
+		continue;
+	      break;
 	    case SEEK_MAXIMUM + LUX_FLOAT:
 	      if (dataptr.f[offset[direction]] >= *dataptr.f)
 		continue;
@@ -1843,6 +2018,10 @@ int32_t area2_2d(int32_t narg, int32_t ps[])
 	      if (dataptr.l[offset[direction]] <= *dataptr.l)
 		continue;
 	      break;
+	    case LUX_INT64:
+	      if (dataptr.q[offset[direction]] <= *dataptr.q)
+		continue;
+	      break;
 	    case LUX_FLOAT:
 	      if (dataptr.f[offset[direction]] <= *dataptr.f)
 		continue;
@@ -1854,7 +2033,7 @@ int32_t area2_2d(int32_t narg, int32_t ps[])
 	  }
 
 	  /* the current position is accepted */
-	  
+
 	  *stack++ = ptr2;	/* place neighbor position on stack */
 	  if (stack == stackend) { /* need to enlarge the stack */
 	    stack0 = realloc(stack0, (nStack + STACKBLOCK)*sizeof(int32_t *));
@@ -2108,6 +2287,12 @@ int32_t area2_general(int32_t narg, int32_t ps[])
 	      dataptr2.l = dataptr.l + offset[direction];
 	    }
 	    break;
+	  case SEEK_MAXIMUM + LUX_INT64:
+	    if (dataptr.q[offset[direction]] > *dataptr2.q) {
+	      j = direction;
+	      dataptr2.q = dataptr.q + offset[direction];
+	    }
+	    break;
 	  case SEEK_MAXIMUM + LUX_FLOAT:
 	    if (dataptr.f[offset[direction]] > *dataptr2.f) {
 	      j = direction;
@@ -2138,6 +2323,12 @@ int32_t area2_general(int32_t narg, int32_t ps[])
 	      dataptr2.l = dataptr.l + offset[direction];
 	    }
 	    break;
+	  case LUX_INT64:
+	    if (dataptr.q[offset[direction]] < *dataptr2.q) {
+	      j = direction;
+	      dataptr2.q = dataptr.q + offset[direction];
+	    }
+	    break;
 	  case LUX_FLOAT:
 	    if (dataptr.f[offset[direction]] < *dataptr2.f) {
 	      j = direction;
@@ -2150,7 +2341,7 @@ int32_t area2_general(int32_t narg, int32_t ps[])
 	      dataptr2.d = dataptr.d + offset[direction];
 	    }
 	    break;
-	}	
+	}
       }
       if (j != -1) {		/* not yet found the extreme */
 	/* update pointers */
@@ -2203,6 +2394,10 @@ int32_t area2_general(int32_t narg, int32_t ps[])
 	      if (dataptr.l[offset[direction]] >= *dataptr.l)
 		continue;
 	      break;
+	    case SEEK_MAXIMUM + LUX_INT64:
+	      if (dataptr.q[offset[direction]] >= *dataptr.q)
+		continue;
+	      break;
 	    case SEEK_MAXIMUM + LUX_FLOAT:
 	      if (dataptr.f[offset[direction]] >= *dataptr.f)
 		continue;
@@ -2221,6 +2416,10 @@ int32_t area2_general(int32_t narg, int32_t ps[])
 	      break;
 	    case LUX_INT32:
 	      if (dataptr.l[offset[direction]] <= *dataptr.l)
+		continue;
+	      break;
+	    case LUX_INT64:
+	      if (dataptr.q[offset[direction]] <= *dataptr.q)
 		continue;
 	      break;
 	    case LUX_FLOAT:
@@ -2267,6 +2466,10 @@ int32_t area2_general(int32_t narg, int32_t ps[])
 	      if (dataptr.l[offset[direction]] >= *dataptr.l)
 		continue;
 	      break;
+	    case SEEK_MAXIMUM + LUX_INT64:
+	      if (dataptr.q[offset[direction]] >= *dataptr.q)
+		continue;
+	      break;
 	    case SEEK_MAXIMUM + LUX_FLOAT:
 	      if (dataptr.f[offset[direction]] >= *dataptr.f)
 		continue;
@@ -2287,6 +2490,10 @@ int32_t area2_general(int32_t narg, int32_t ps[])
 	      if (dataptr.l[offset[direction]] <= *dataptr.l)
 		continue;
 	      break;
+	    case LUX_INT64:
+	      if (dataptr.q[offset[direction]] <= *dataptr.q)
+		continue;
+	      break;
 	    case LUX_FLOAT:
 	      if (dataptr.f[offset[direction]] <= *dataptr.f)
 		continue;
@@ -2298,7 +2505,7 @@ int32_t area2_general(int32_t narg, int32_t ps[])
 	  }
 
 	  /* the current position is accepted */
-	  
+
 	  *stack++ = ptr2;	/* place neighbor position on stack */
 	  if (stack == stackend) { /* need to enlarge the stack */
 	    stack0 = realloc(stack0, (nStack + STACKBLOCK)*sizeof(int32_t *));
@@ -2967,6 +3174,121 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
       } while (advanceLoop(&trgtinfo, &trgt),
 	       advanceLoop(&srcinfo, &src) < srcinfo.rndim);
       break;
+    case LUX_INT64:
+      min[0].q = min[1].q = bounds.max.q;
+      do {
+	min[2].q = min[1].q;
+	min[1].q = min[0].q;
+	loc[2] = loc[1];
+	loc[1] = loc[0];
+	min[0].q = bounds.max.q;
+	mini++;
+	if (!srcinfo.coords[0]) {	/* at left edge */
+	  src.q--;
+	  min[2].q = min[1].q = bounds.max.q;
+	  mini = 3;
+	  edge = 0;
+	  for (i = 1; i < srcinfo.ndim; i++)
+	    if (!srcinfo.coords[i]
+		|| srcinfo.coords[i] == srcinfo.dims[i] - 1) {
+	      edge = 1;
+	      break;
+	    }
+	  if (edge)
+	    for (i = 0; i < n; i++) { /* all directions */
+	      for (j = 0; j < srcinfo.ndim - 1; j++) {
+		/* check if across edge */
+		k = srcinfo.coords[j + 1] + rcoords[(srcinfo.ndim - 1)*i + j];
+		if (k < 0 || k == srcinfo.dims[j + 1])
+		  break;
+	      }
+	      if (j == srcinfo.ndim - 1) {	/* not across any other edge */
+		if (src.q[offsets[i]] < min[0].q) { /* update */
+		  min[0].q = src.q[offsets[i]];
+		  loc[0] = i;
+		}
+	      }
+	    } else for (i = 0; i < n; i++) {
+	      if (src.q[offsets[i]] < min[0].q) { /* update */
+		min[0].q = src.q[offsets[i]];
+		loc[0] = i;
+	      }
+	    }
+	  if (mini < 3) {	/* previous lowest is now in 1 or 2 */
+	    if (min[0].q < min[mini].q)
+	      mini = 0;
+	  } else {		/* previous lowest is too far away: find new */
+	    if (min[0].q < min[1].q) {
+	      if (min[0].q < min[2].q)
+		mini = 0;
+	      else
+		mini = 2;
+	    } else {
+	      if (min[1].q < min[2].q)
+		mini = 1;
+	      else
+		mini = 2;
+	    }
+	  }
+	  src.q++;		/* back to current position */
+	  min[2].q = min[1].q;
+	  min[1].q = min[0].q;
+	  loc[2] = loc[1];
+	  loc[1] = loc[0];
+	  min[0].q = bounds.max.q;
+	  mini++;
+	}
+
+	if (srcinfo.coords[0] == srcinfo.dims[0] - 1) { /* at right edge */
+	  if (mini == 3) {
+	    if (min[1].q < min[2].q)
+	      mini = 1;
+	    else
+	      mini = 2;
+	  }
+	} else {
+	  if (edge)
+	    for (i = 0; i < n; i++) {	/* all directions */
+	      for (j = 0; j < srcinfo.ndim - 1; j++) {
+		/* check if across edge */
+		k = srcinfo.coords[j + 1] + rcoords[(srcinfo.ndim - 1)*i + j];
+		if (k < 0 || k == srcinfo.dims[j + 1])
+		  break;
+	      }
+	      if (j == srcinfo.ndim - 1) {	/* not across any edge */
+		if (src.q[offsets[i]] < min[0].q) { /* update */
+		  min[0].q = src.q[offsets[i]];
+		  loc[0] = i;
+		}
+	      }
+	    }
+	  else for (i = 0; i < n; i++)
+	    if (src.q[offsets[i]] < min[0].q) { /* update */
+	      min[0].q = src.q[offsets[i]];
+	      loc[0] = i;
+	    }
+	  if (mini < 3) {	/* previous lowest is now in 1 or 2 */
+	    if (min[0].q < min[mini].q)
+	      mini = 0;
+	  } else {		/* previous lowest is too far away: find new */
+	    if (min[0].q < min[1].q) {
+	      if (min[0].q < min[2].q)
+		mini = 0;
+	      else
+		mini = 2;
+	    } else {
+	      if (min[1].q < min[2].q)
+		mini = 1;
+	      else
+		mini = 2;
+	    }
+	  }
+	}
+	/* now min[mini].q is the lowest value */
+	*trgt.l = -loc[mini] - n*mini;
+      } while (advanceLoop(&trgtinfo, &trgt),
+	       advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+      break;
     case LUX_FLOAT:
       min[0].f = min[1].f = bounds.max.f;
       do {
@@ -3031,7 +3353,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	  min[0].f = bounds.max.f;
 	  mini++;
 	}
-	
+
 	if (srcinfo.coords[0] == srcinfo.dims[0] - 1) { /* at right edge */
 	  if (mini == 3) {
 	    if (min[1].f < min[2].f)
@@ -3543,6 +3865,121 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
       } while (advanceLoop(&trgtinfo, &trgt),
 	       advanceLoop(&srcinfo, &src) < srcinfo.rndim);
       break;
+    case LUX_INT64 | 0x20:
+      max[0].q = max[1].q = bounds.min.q;
+      do {
+	max[2].q = max[1].q;
+	max[1].q = max[0].q;
+	loc[2] = loc[1];
+	loc[1] = loc[0];
+	max[0].q = bounds.min.q;
+	maxi++;
+	if (!srcinfo.coords[0]) {	/* at left edge */
+	  src.q--;
+	  max[2].q = max[1].q = bounds.min.q;
+	  maxi = 3;
+	  edge = 0;
+	  for (i = 1; i < srcinfo.ndim; i++)
+	    if (!srcinfo.coords[i]
+		|| srcinfo.coords[i] == srcinfo.dims[i] - 1) {
+	      edge = 1;
+	      break;
+	    }
+	  if (edge)
+	    for (i = 0; i < n; i++) { /* all directions */
+	      for (j = 0; j < srcinfo.ndim - 1; j++) {
+		/* check if across edge */
+		k = srcinfo.coords[j + 1] + rcoords[(srcinfo.ndim - 1)*i + j];
+		if (k < 0 || k == srcinfo.dims[j + 1])
+		  break;
+	      }
+	      if (j == srcinfo.ndim - 1) {	/* not across any other edge */
+		if (src.q[offsets[i]] > max[0].q) { /* update */
+		  max[0].q = src.q[offsets[i]];
+		  loc[0] = i;
+		}
+	      }
+	    } else for (i = 0; i < n; i++) {
+	      if (src.q[offsets[i]] > max[0].q) { /* update */
+		max[0].q = src.q[offsets[i]];
+		loc[0] = i;
+	      }
+	    }
+	  if (maxi < 3) {	/* previous highest is now in 1 or 2 */
+	    if (max[0].q > max[maxi].q)
+	      maxi = 0;
+	  } else { /* previous highest is too far away: find new */
+	    if (max[0].q > max[1].q) {
+	      if (max[0].q > max[2].q)
+		maxi = 0;
+	      else
+		maxi = 2;
+	    } else {
+	      if (max[1].q > max[2].q)
+		maxi = 1;
+	      else
+		maxi = 2;
+	    }
+	  }
+	  src.q++;		/* back to current position */
+	  max[2].q = max[1].q;
+	  max[1].q = max[0].q;
+	  loc[2] = loc[1];
+	  loc[1] = loc[0];
+	  max[0].q = bounds.min.q;
+	  maxi++;
+	}
+
+	if (srcinfo.coords[0] == srcinfo.dims[0] - 1) { /* at right edge */
+	  if (maxi == 3) {
+	    if (max[1].q > max[2].q)
+	      maxi = 1;
+	    else
+	      maxi = 2;
+	  }
+	} else {
+	  if (edge)
+	    for (i = 0; i < n; i++) {	/* all directions */
+	      for (j = 0; j < srcinfo.ndim - 1; j++) {
+		/* check if across edge */
+		k = srcinfo.coords[j + 1] + rcoords[(srcinfo.ndim - 1)*i + j];
+		if (k < 0 || k == srcinfo.dims[j + 1])
+		  break;
+	      }
+	      if (j == srcinfo.ndim - 1) {	/* not across any edge */
+		if (src.q[offsets[i]] > max[0].q) { /* update */
+		  max[0].q = src.q[offsets[i]];
+		  loc[0] = i;
+		}
+	      }
+	    }
+	  else for (i = 0; i < n; i++)
+	    if (src.q[offsets[i]] > max[0].q) { /* update */
+	      max[0].q = src.q[offsets[i]];
+	      loc[0] = i;
+	    }
+	  if (maxi < 3) {	/* previous highest is now in 1 or 2 */
+	    if (max[0].q > max[maxi].q)
+	      maxi = 0;
+	  } else { /* previous highest is too far away: find new */
+	    if (max[0].q > max[1].q) {
+	      if (max[0].q > max[2].q)
+		maxi = 0;
+	      else
+		maxi = 2;
+	    } else {
+	      if (max[1].q > max[2].q)
+		maxi = 1;
+	      else
+		maxi = 2;
+	    }
+	  }
+	}
+	/* now max[maxi].q is the highest value */
+	*trgt.l = -loc[maxi] - n*maxi;
+      } while (advanceLoop(&trgtinfo, &trgt),
+	       advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+      break;
     case LUX_FLOAT | 0x20:
       max[0].f = max[1].f = bounds.min.f;
       do {
@@ -3607,7 +4044,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	  max[0].f = bounds.min.f;
 	  maxi++;
 	}
-	
+
 	if (srcinfo.coords[0] == srcinfo.dims[0] - 1) { /* at right edge */
 	  if (maxi == 3) {
 	    if (max[1].f > max[2].f)
@@ -4052,6 +4489,36 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 	} while (advanceLoop(&trgtinfo, &trgt),
 		 advanceLoop(&srcinfo, &src) < srcinfo.ndim);
 	break;
+      case LUX_INT64:
+	do {
+	  for (edge = srcinfo.ndim - 1; edge; edge--)
+	    if (!srcinfo.coords[edge]
+		|| srcinfo.coords[edge] == srcinfo.dims[edge] - 1)
+	      break;		/* at edge */
+	  if (edge) {
+	    zerobytes(trgt.b, nElem);
+	    trgt.b += nElem;
+	    src.q += nElem;
+	  } else {
+	    *trgt.b++ = 0;		/* left edge */
+	    src.q++;
+	    for (i = i1; i < i2; i++) { /* center data points */
+	      *trgt.b = 0;
+	      for (j = 0; j < n; j++) {	/* all directions */
+		k = offset[j];
+		srcl.q = src.q + k;
+		srcr.q = src.q - k;
+		*trgt.b += (*src.q > *srcl.q && *src.q > *srcr.q);
+	      }
+	      src.q++;
+	      trgt.b++;
+	    }
+	    *trgt.b++ = 0;		/* right edge */
+	    src.q++;
+	  }
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.ndim);
+	break;
       case LUX_FLOAT:
 	do {
 	  for (edge = srcinfo.ndim - 1; edge; edge--)
@@ -4067,7 +4534,7 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 	    src.f++;
 	    for (i = i1; i < i2; i++) { /* center data points */
 	      *trgt.b = 0;
-	      for (j = 0; j < n; j++) {	/* all directions */	  
+	      for (j = 0; j < n; j++) {	/* all directions */
 		k = offset[j];
 		srcl.f = src.f + k;
 		srcr.f = src.f - k;
@@ -4228,6 +4695,44 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 	  } while (advanceLoop(&trgtinfo, &trgt),
 		   advanceLoop(&srcinfo, &src) < srcinfo.ndim);
 	  break;
+	case LUX_INT64:
+	  do {
+	    for (edge = srcinfo.ndim - 1; edge; edge--)
+	      if ((!diagonal || diagonal[edge])
+		  && (!srcinfo.coords[edge]
+		      || srcinfo.coords[edge] == srcinfo.dims[edge] - 1))
+		break;		/* at edge */
+	    if (edge) {
+	      zerobytes(trgt.b, nElem);
+	      trgt.b += nElem;
+	      src.q += nElem;
+	    } else {
+	      if (!diagonal || diagonal[0]) {
+		*trgt.b++ = 0; /* left edge */
+		src.q++;
+	      }
+	      for (i = i1; i < i2; i++) { /* center data points */
+		*trgt.b = 0;
+		for (j = 0; j < n; j++) { /* all directions */
+		  k = offset[j];
+		  srcl.q = src.q + k;
+		  srcr.q = src.q - k;
+		  *trgt.b += ((sign && *src.q > *srcl.q + *t.q
+			       && *src.q > *srcr.q + *t.q)
+			      || (!sign && *src.q < *srcl.q - *t.q
+				  && *src.q < *srcr.q - *t.q));
+		}
+		trgt.b++;
+		src.q++;
+	      }
+	      if (!diagonal || diagonal[0]) {
+		*trgt.b++ = 0;		/* right edge */
+		src.q++;
+	      }
+	    }
+	  } while (advanceLoop(&trgtinfo, &trgt),
+		   advanceLoop(&srcinfo, &src) < srcinfo.ndim);
+	  break;
 	case LUX_FLOAT:
 	  do {
 	    for (edge = srcinfo.ndim - 1; edge; edge--)
@@ -4371,6 +4876,10 @@ int32_t lux_inpolygon(int32_t narg, int32_t ps[])
       case LUX_INT32:
 	thisx.f = (float) *x.l++;
 	thisy.f = (float) *y.l++;
+	break;
+      case LUX_INT64:
+	thisx.f = *x.q++;
+	thisy.f = *y.q++;
 	break;
       case LUX_FLOAT:
 	thisx.f = *x.f++;

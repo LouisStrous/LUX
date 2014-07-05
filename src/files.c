@@ -673,7 +673,7 @@ int32_t input_format_check(char *format, char **next, char **widths, int32_t *da
 /*------------------------------------------------------------------------- */
 int32_t lux_format_set(int32_t narg, int32_t ps[])
  /* check & set (multiple) print formats.  Allowed formats:
-     [anything] % [digits] [.] [digits] {one of diouxXeEfgGsz} 
+     [anything] % [digits] [.] [digits] {one of diouxXeEfgGsz}
     d,i,o,u,x,X-types are put in !format_i; e,E,f,g,G-types in !format_f,
     s-type in !format_s, and z-type in !format_c
     If no arguments to LUX call, then set to default values
@@ -737,7 +737,7 @@ int32_t lux_format_set(int32_t narg, int32_t ps[])
     symbol_memory(fformat) = 7;
     p = scal_ptr_pointer(iformat);
     p.s = realloc(p.s, 5);
-    strcpy(p.s, "%10d");
+    strcpy(p.s, "%10jd");
     symbol_memory(iformat) = 5;
     p = scal_ptr_pointer(sformat);
     p.s = realloc(p.s, 3);

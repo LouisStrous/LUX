@@ -3045,7 +3045,7 @@ void read_a_number(char **buf, scalar *value, Symboltype *type)
 /* reads the number at <*buf>, puts it in <*value> and its data type
    in <*type> (if <type> is not NULL), and modifies <*buf> to point
    just after the detected value.  NOTE: if the type is integer (BYTE,
-   WORD, LONG, QUAD), then the value is returned in value->q; if the
+   WORD, LONG, INT64), then the value is returned in value->q; if the
    type is floating-point (FLOAT, DOUBLE), then the value is returned
    in value->d.  if an I follows the number, then the type is complex
    (CFLOAT, CDOUBLE) and the value (transformed to real) is returned

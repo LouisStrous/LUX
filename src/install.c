@@ -3240,7 +3240,7 @@ char *typeName(int32_t type)
 /* returns the name that goes with the data type */
 {
   static char *typeNames[] = {
-    "BYTE", "WORD", "LONG", "QUAD", "FLOAT", "DOUBLE",
+    "BYTE", "WORD", "LONG", "INT64", "FLOAT", "DOUBLE",
     "STRING", "STRING", "STRING", "CFLOAT", "CDOUBLE",
     "undefined", "unknown"
   };
@@ -4377,12 +4377,12 @@ void symbolInitialization(void)
  l_fix("#MAX_BYTE",	bounds.max.b);
  l_fix("#MAX_WORD",	bounds.max.w);
  l_fix("#MAX_LONG",	bounds.max.l);
- q_fix("#MAX_QUAD",     bounds.max.q);
+ q_fix("#MAX_INT64",    bounds.max.q);
  f_fix("#MAX_FLOAT", 	bounds.max.f);
  d_fix("#MAX_DOUBLE", 	bounds.max.d);
  l_fix("#MIN_WORD",	bounds.min.w);
  l_fix("#MIN_LONG",	bounds.min.l);
- q_fix("#MIN_QUAD",     bounds.min.q);
+ q_fix("#MIN_INT64",    bounds.min.q);
  f_fix("#MIN_FLOAT", 	FLT_MIN);
  d_fix("#MIN_DOUBLE", 	DBL_MIN);
  l_fix("#MAX_DIMS",	MAX_DIMS);

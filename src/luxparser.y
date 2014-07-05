@@ -1069,21 +1069,23 @@ void Quit(int32_t result)
 }
 /*--------------------------------------------------------------*/
 /* NUMBERS
-   LUX allows specification of numbers of five types (LUX_INT8, LUX_INT16, LUX_INT32,
-   LUX_FLOAT, LUX_DOUBLE) and three bases (8, 10, 16).  Numbers must always
-   start with a decimal digit.
-   Fractional (i.e. LUX_FLOAT or LUX_DOUBLE) numbers can only be specified
-   in base 10.  In integer numbers, a base specifier (if any) precedes
-   a type specifier (if any).  By default, integers are in base 10 and
-   of type LUX_INT32.
-   Octal numbers are followed by an O.  Hexadecimal numbers are either
-   preceded by 0X or followed by an X.  A final B indicates a LUX_INT8 number,
-   a final W a LUX_INT16, and a final L a LUX_INT32 number.
-   A general LUX_FLOAT looks like this:  1.23E+4
-   Either the decimal point or the exponent indicator E must be present.
-   A plus sign is optional in the exponent.  A general LUX_DOUBLE looks like
-   a general LUX_FLOAT, except that a D is used instead of an E.  The exponent
-   indicator D must be present.
+
+   LUX allows specification of numbers of six types (LUX_INT8,
+   LUX_INT16, LUX_INT32, LUX_INT64, LUX_FLOAT, LUX_DOUBLE) and three
+   bases (8, 10, 16).  Numbers must always start with a decimal digit.
+   Fractional (i.e. LUX_FLOAT or LUX_DOUBLE) numbers can only be
+   specified in base 10.  In integer numbers, a base specifier (if
+   any) precedes a type specifier (if any).  By default, integers are
+   in base 10 and of type LUX_INT32.  Octal numbers are followed by an
+   O.  Hexadecimal numbers are either preceded by 0X or followed by an
+   X.  A final B indicates a LUX_INT8 number, a final W a LUX_INT16, a
+   final L a LUX_INT32 number, and a final Q a LUX_INT64 number.  A
+   general LUX_FLOAT looks like this: 1.23E+4 Either the decimal point
+   or the exponent indicator E must be present.  A plus sign is
+   optional in the exponent.  A general LUX_DOUBLE looks like a
+   general LUX_FLOAT, except that a D is used instead of an E.  The
+   exponent indicator D must be present.
+
    Some examples:  0X1AB = 1AXB = LUX_INT8 hex 1A = LUX_INT8 26
                    0X1ABL = 1ABXL = LUX_INT32 hex 1AB = LUX_INT32 427
                    2E = 2. = LUX_FLOAT 2

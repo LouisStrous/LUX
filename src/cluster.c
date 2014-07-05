@@ -323,7 +323,7 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
     if (!gotSample		/* no SAMPLE */
 	&& symbol_class(ps[2]) == LUX_ARRAY /* INDEX is an array */
 	&& array_size(ps[2]) == nVectors /* an index for each data point */
-	&& (int32_t) array_type(ps[2]) <= LUX_INT32) { /* integer data type */
+	&& isIntegerType(array_type(ps[2]))) { /* integer data type */
       indexType = array_type(ps[2]);	/* index data type */
       useIndex = 1;		/* default: useful indices */
       clusterNumber.b = (uint8_t *) array_data(ps[2]);
@@ -351,6 +351,16 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
 	  for (i = 0; i < nClusters; i++)
 	    if (clusterNumber.l[i] < 0 /* index too small */
 		|| clusterNumber.l[i] >= nClusters) { /* index too large */
+	      printf("CLUSTER - illegal index #%1d (%1d), ignore all\n",
+		     i, clusterNumber.l[i]);
+	      useIndex = 0;
+	      break;
+	    }
+	  break;
+	case LUX_INT64:
+	  for (i = 0; i < nClusters; i++)
+	    if (clusterNumber.q[i] < 0 /* index too small */
+		|| clusterNumber.q[i] >= nClusters) { /* index too large */
 	      printf("CLUSTER - illegal index #%1d (%1d), ignore all\n",
 		     i, clusterNumber.l[i]);
 	      useIndex = 0;
@@ -584,9 +594,15 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
 	  clusterSize[j]++;
 	}
 	break;
+      case LUX_INT64:
+	for (i = 0; i < nSample; i++) {
+	  j = clusterOtoC[clusterNumber.q[i]];
+	  clusterSize[j]++;
+	}
+	break;
     }
     recluster = 1;
-  } else 
+  } else
     recluster = 0;
 
   if (phantom) {		/* we added phantom members, so now */
@@ -655,13 +671,16 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
 	  case LUX_INT32:
 	    curO = *clusterNumber.l;
 	    break;
+	  case LUX_INT64:
+	    curO = *clusterNumber.q;
+	    break;
 	}
       if (!useIndex || changedOld[curO] || !quick) {
 	/* 6. calculate the PDGV of the current data point */
 	s = 0.0;
 	for (j = 0; j < nVectorDim; j++)
 	  s += dgv[j]*((double) dataPoint[j]); /* s = PDGV */
-	
+
 	/* 7. Find the closest cluster center according to PDGVs */
 	/* because of the sentinels at both ends of the PDGV array we
 	   don't need to worry about venturing beyond its ends. */
@@ -914,7 +933,7 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
       }	/* end if (!useIndex || changedOld[curO] || !quick) */
       else		/* if (useIndex && !changedOld[curO] && quick) */
 	newO = curO;
-      
+
       switch (indexType) {	/* save cluster number */
 	case LUX_INT8:
 	  *clusterNumber.b++ = newO;
@@ -925,10 +944,13 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
 	case LUX_INT32:
 	  *clusterNumber.l++ = newO;
 	  break;
+	case LUX_INT64:
+	  *clusterNumber.q++ = newO;
+	  break;
       }
-      
+
       k0 = clusterOtoC[newO];	/* initial cluster number for next one */
-      
+
     } /* end for (i = 0; i < nSample; i++) */
 
     if (record && iterate) {
@@ -937,7 +959,7 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
       for (i = 0; i < nClusters; i++)
 	fwrite(clusterSize + clusterOtoC[i], sizeof(int32_t), 1, file);
     }
-    
+
     /* remove phantom members, if any */
     if (!gotPhantom && phantom) {
       for (i = 0; i < nClusters; i++) {

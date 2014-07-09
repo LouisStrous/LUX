@@ -4472,7 +4472,7 @@ void symbolInitialization(void)
  nFixed++;
 
  iq = findVarName("#TYPESIZE", 0);
- i = 10;			/* lux_type_size[] # elements! */
+ i = LUX_NO_SYMBOLTYPE; /* lux_type_size[] # elements! */
  to_scratch_array(iq, LUX_INT32, 1, &i);
  memcpy(array_data(iq), lux_type_size, i*sizeof(int32_t));
 

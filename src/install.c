@@ -58,7 +58,7 @@ extern int32_t		nExecuted;
 internalRoutine *subroutine, *function;
 
 int32_t	luxerror(char *, int32_t, ...), lookForName(char *, hashTableEntry *[], int32_t),
-	newSymbol(int32_t, ...), lux_setup();
+	newSymbol(Symbolclass, ...), lux_setup();
 void	installKeys(void *keys), zerobytes(void *, int32_t);
 char	*strsave(char *), *symName(int32_t, hashTableEntry *[]), *className(int32_t),
 	*typeName(int32_t);
@@ -2043,7 +2043,7 @@ int32_t findTarget(char *name, int32_t *type, int32_t allowSubr)
   return LUX_ERROR;
 }
 /*----------------------------------------------------------------*/
-int32_t newSymbol(int32_t kind, ...)
+int32_t newSymbol(Symbolclass kind, ...)
 /* returns index to symbol table for a new symbol.
    arguments depend on kind:
      (LUX_SCALAR, type)

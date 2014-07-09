@@ -5282,7 +5282,7 @@ void printw(char *string)
   keepws = (isspace((uint8_t) *p) && *p != '\n');
   pn = strpbrk(p, "\n\r");	/* find next newline or return */
   while (n) {			/* while we have more characters to print */
-    toolong = (n + column >= uTermCol);
+    toolong = (uTermCol > 0 && n + column >= uTermCol);
     if (toolong)		/* current line is too long for screen */
       p2 = p + (uTermCol - column - 1); /* proposed break point */
     else

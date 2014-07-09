@@ -389,16 +389,19 @@ void symdumpswitch(int32_t nsym, int32_t mode)
     case LUX_STRING:
       break;
     case LUX_ARRAY: case LUX_CARRAY:
-      printwf("#elem = %1d, (", array_size(nsym));
-      ip = array_dims(nsym);
-      j = array_num_dims(nsym);
-      while (j--) {
-	printwf("%1d", *ip++);
-	if (j)
-	  printw(",");
+      if (!(mode & I_VALUE)) {
+        printwf("#elem = %1d, (", array_size(nsym));
+        ip = array_dims(nsym);
+        j = array_num_dims(nsym);
+        while (j--) {
+          printwf("%1d", *ip++);
+          if (j)
+            printw(",");
+        }
+        printw(")\n");
+        return;
       }
-      printw(")\n");
-      return;
+      break;
   case LUX_CLIST:
     printwf("#elem = %1d, ", clist_num_symbols(nsym));
     break;

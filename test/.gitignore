@@ -3,3 +3,4 @@
 *.trs
 .deps
 check-axis
+check-binop

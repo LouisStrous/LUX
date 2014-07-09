@@ -2722,8 +2722,8 @@ int32_t copyEvalSym(int32_t source)
   return target;
 }
 /*-------------------------------------------------------------------------*/
-int32_t (*lux_converts[10])(int32_t, int32_t []) = {
-  lux_byte, lux_word, lux_long, lux_float, lux_double, lux_string,
+int32_t (*lux_converts[])(int32_t, int32_t []) = {
+  lux_byte, lux_word, lux_long, lux_int64, lux_float, lux_double, lux_string,
   lux_string, lux_string, lux_cfloat, lux_cdouble
 };
 int32_t getNumerical(int32_t iq, int32_t minType, int32_t *n, pointer *src, char mode,

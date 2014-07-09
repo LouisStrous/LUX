@@ -39,7 +39,7 @@ extern int32_t		nSubroutine, nFunction, curLineNumber, compileLevel,
 			ignoreInput, curSymbol, axisTally[];
 extern unsigned int     internalMode;
 extern struct boundsStruct	bounds;
-extern int32_t	(*lux_converts[10])(int32_t, int32_t []);
+extern int32_t	(*lux_converts[])(int32_t, int32_t []);
 
 char 	*strsave(char *), *symbolIdent(int32_t, int32_t),
 	*symName(int32_t, hashTableEntry *[]), *string_arg(int32_t),

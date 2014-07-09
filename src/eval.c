@@ -837,7 +837,7 @@ void lux_pow_as(void)
     case LUX_INT64:
       re.d = *rp.q;
       while (nRepeat--)
-        *tp.f++ = pow(*lp.w++, re.d);
+        *tp.d++ = pow(*lp.w++, re.d);
       break;
     case LUX_FLOAT:
       re.f = *rp.f;
@@ -937,6 +937,7 @@ void lux_pow_as(void)
       }
       break;
     }
+    break;
   case LUX_INT64:
     switch (rhsType) {
     case LUX_INT8:
@@ -3460,7 +3461,7 @@ void lux_sub_as(void)
       break;
     case LUX_DOUBLE:
       while (nRepeat--)
-        *tp.d++ = *lp.l++ - *rp.d;
+        *tp.d++ = *lp.q++ - *rp.d;
       break;
     case LUX_CFLOAT:
       while (nRepeat--) {
@@ -6720,6 +6721,52 @@ void lux_idiv_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
+  case LUX_INT64:
+    switch (rhsType) {
+    case LUX_INT8:
+      while (nRepeat--) {
+        iqr = lldiv(*lp.q++, *rp.b);
+        if (iqr.rem < 0)
+          iqr.quot--;
+        *tp.q++ = iqr.quot;
+      }
+      break;
+    case LUX_INT16:
+      while (nRepeat--) {
+        iqr = lldiv(*lp.q++, *rp.w);
+        if (iqr.rem < 0)
+          iqr.quot--;
+        *tp.q++ = iqr.quot;
+      }
+      break;
+    case LUX_INT32:
+      while (nRepeat--) {
+        iqr = lldiv(*lp.q++, *rp.l);
+        if (iqr.rem < 0)
+          iqr.quot--;
+        *tp.q++ = iqr.quot;
+      }
+      break;
+    case LUX_INT64:
+      while (nRepeat--) {
+        iqr = lldiv(*lp.q++, *rp.q);
+        if (iqr.rem < 0)
+          iqr.quot--;
+        *tp.q++ = iqr.quot;
+      }
+      break;
+    case LUX_FLOAT:
+      while (nRepeat--)
+        *tp.d++ = floor(*lp.q++ / *rp.f);
+      break;
+    case LUX_DOUBLE:
+      while (nRepeat--)
+        *tp.d++ = floor(*lp.q++ / *rp.d);
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
   case LUX_FLOAT:
     switch (rhsType) {
     case LUX_INT8:
@@ -9432,6 +9479,60 @@ void lux_mod_as(void)
       cerror(ILL_TYPE, rhs, typeName(rhsType));
     }
     break;
+  case LUX_INT64:
+    switch (rhsType) {
+    case LUX_INT8:
+      while (nRepeat--)
+        *tp.q++ = iamod(*lp.q++, *rp.b);
+      break;
+    case LUX_INT16:
+      while (nRepeat--)
+        *tp.q++ = iamod(*lp.q++, *rp.w);
+      break;
+    case LUX_INT32:
+      while (nRepeat--)
+        *tp.q++ = iamod(*lp.q++, *rp.l);
+      break;
+    case LUX_INT64:
+      while (nRepeat--)
+        *tp.q++ = i64amod(*lp.q++, *rp.q);
+      break;
+    case LUX_FLOAT:
+      while (nRepeat--)
+        *tp.d++ = famod(*lp.q++, *rp.f);
+      break;
+    case LUX_DOUBLE:
+      while (nRepeat--)
+        *tp.d++ = famod(*lp.q++, *rp.d);
+      break;
+    case LUX_CFLOAT:
+      r.real = rp.cf->real;
+      r.imaginary = rp.cf->imaginary;
+      while (nRepeat--) {
+        l.real = *lp.q;
+        l.imaginary = 0;
+        t = zamod(l, r);
+        tp.cd->real = t.real;
+        tp.cd->imaginary = t.imaginary;
+        lp.q++; tp.cd++;
+      }
+      break;
+    case LUX_CDOUBLE:
+      r.real = rp.cd->real;
+      r.imaginary = rp.cd->imaginary;
+      while (nRepeat--) {
+        l.real = *lp.q;
+        l.imaginary = 0;
+        t = zamod(l, r);
+        tp.cd->real = t.real;
+        tp.cd->imaginary = t.imaginary;
+        lp.q++; tp.cd++;
+      }
+      break;
+    default:
+      cerror(ILL_TYPE, rhs, typeName(rhsType));
+    }
+    break;
   case LUX_FLOAT:
     switch (rhsType) {
     case LUX_INT8:
@@ -11240,7 +11341,7 @@ void lux_max_as(void)
     case LUX_FLOAT:
       value2.d = *rp.f;
       while (nRepeat--)
-        *tp.d++ = ((value1.d = *lp.q++) > value2.q)?
+        *tp.d++ = ((value1.d = *lp.q++) > value2.d)?
           value1.d:
           value2.d;
       break;
@@ -12651,7 +12752,7 @@ void lux_min_as(void)
     case LUX_FLOAT:
       value2.d = *rp.f;
       while (nRepeat--)
-        *tp.d++ = ((value1.d = *lp.q++) < value2.q)?
+        *tp.d++ = ((value1.d = *lp.q++) < value2.d)?
           value1.d:
           value2.d;
       break;
@@ -13614,7 +13715,7 @@ void lux_eq_as(void)
       break;
     case LUX_INT64:
       while (nRepeat--)
-        *tp.l++ = (*lp.q++ == *rp.q);
+        *tp.l++ = (*lp.l++ == *rp.q);
       break;
     case LUX_FLOAT:
       while (nRepeat--)
@@ -16772,7 +16873,7 @@ void lux_ne_as(void)
       break;
     case LUX_INT64:
       while (nRepeat--)
-        *tp.l++ = (*lp.q++ != *rp.q);
+        *tp.l++ = (*lp.l++ != *rp.q);
       break;
     case LUX_FLOAT:
       while (nRepeat--)
@@ -17015,11 +17116,11 @@ void lux_and(void)
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--)
-        *tp.l++ = (*lp.b++ & *rp.b++);
+        *tp.b++ = (*lp.b++ & *rp.b++);
       break;
     case LUX_INT16:
       while (nRepeat--)
-        *tp.l++ = (*lp.b++ & *rp.w++);
+        *tp.w++ = (*lp.b++ & *rp.w++);
       break;
     case LUX_INT32:
       while (nRepeat--)
@@ -17037,11 +17138,11 @@ void lux_and(void)
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--)
-        *tp.l++ = (*lp.w++ & *rp.b++);
+        *tp.w++ = (*lp.w++ & *rp.b++);
       break;
     case LUX_INT16:
       while (nRepeat--)
-        *tp.l++ = (*lp.w++ & *rp.w++);
+        *tp.w++ = (*lp.w++ & *rp.w++);
       break;
     case LUX_INT32:
       while (nRepeat--)
@@ -17112,11 +17213,11 @@ void lux_and_as(void)
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--)
-        *tp.l++ = (*lp.b++ & *rp.b);
+        *tp.b++ = (*lp.b++ & *rp.b);
       break;
     case LUX_INT16:
       while (nRepeat--)
-        *tp.l++ = (*lp.b++ & *rp.w);
+        *tp.w++ = (*lp.b++ & *rp.w);
       break;
     case LUX_INT32:
       while (nRepeat--)
@@ -17134,11 +17235,11 @@ void lux_and_as(void)
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--)
-        *tp.l++ = (*lp.w++ & *rp.b);
+        *tp.w++ = (*lp.w++ & *rp.b);
       break;
     case LUX_INT16:
       while (nRepeat--)
-        *tp.l++ = (*lp.w++ & *rp.w);
+        *tp.w++ = (*lp.w++ & *rp.w);
       break;
     case LUX_INT32:
       while (nRepeat--)
@@ -17223,11 +17324,11 @@ void lux_or(void)
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--)
-        *tp.l++ = (*lp.b++ | *rp.b++);
+        *tp.b++ = (*lp.b++ | *rp.b++);
       break;
     case LUX_INT16:
       while (nRepeat--)
-        *tp.l++ = (*lp.b++ | *rp.w++);
+        *tp.w++ = (*lp.b++ | *rp.w++);
       break;
     case LUX_INT32:
       while (nRepeat--)
@@ -17245,11 +17346,11 @@ void lux_or(void)
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--)
-        *tp.l++ = (*lp.w++ | *rp.b++);
+        *tp.w++ = (*lp.w++ | *rp.b++);
       break;
     case LUX_INT16:
       while (nRepeat--)
-        *tp.l++ = (*lp.w++ | *rp.w++);
+        *tp.w++ = (*lp.w++ | *rp.w++);
       break;
     case LUX_INT32:
       while (nRepeat--)
@@ -17320,11 +17421,11 @@ void lux_or_as(void)
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--)
-        *tp.l++ = (*lp.b++ | *rp.b);
+        *tp.b++ = (*lp.b++ | *rp.b);
       break;
     case LUX_INT16:
       while (nRepeat--)
-        *tp.l++ = (*lp.b++ | *rp.w);
+        *tp.w++ = (*lp.b++ | *rp.w);
       break;
     case LUX_INT32:
       while (nRepeat--)
@@ -17342,11 +17443,11 @@ void lux_or_as(void)
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--)
-        *tp.l++ = (*lp.w++ | *rp.b);
+        *tp.w++ = (*lp.w++ | *rp.b);
       break;
     case LUX_INT16:
       while (nRepeat--)
-        *tp.l++ = (*lp.w++ | *rp.w);
+        *tp.w++ = (*lp.w++ | *rp.w);
       break;
     case LUX_INT32:
       while (nRepeat--)
@@ -17431,11 +17532,11 @@ void lux_xor(void)
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--)
-        *tp.l++ = (*lp.b++ ^ *rp.b++);
+        *tp.b++ = (*lp.b++ ^ *rp.b++);
       break;
     case LUX_INT16:
       while (nRepeat--)
-        *tp.l++ = (*lp.b++ ^ *rp.w++);
+        *tp.w++ = (*lp.b++ ^ *rp.w++);
       break;
     case LUX_INT32:
       while (nRepeat--)
@@ -17453,11 +17554,11 @@ void lux_xor(void)
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--)
-        *tp.l++ = (*lp.w++ ^ *rp.b++);
+        *tp.w++ = (*lp.w++ ^ *rp.b++);
       break;
     case LUX_INT16:
       while (nRepeat--)
-        *tp.l++ = (*lp.w++ ^ *rp.w++);
+        *tp.w++ = (*lp.w++ ^ *rp.w++);
       break;
     case LUX_INT32:
       while (nRepeat--)
@@ -17528,11 +17629,11 @@ void lux_xor_as(void)
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--)
-        *tp.l++ = (*lp.b++ ^ *rp.b);
+        *tp.b++ = (*lp.b++ ^ *rp.b);
       break;
     case LUX_INT16:
       while (nRepeat--)
-        *tp.l++ = (*lp.b++ ^ *rp.w);
+        *tp.w++ = (*lp.b++ ^ *rp.w);
       break;
     case LUX_INT32:
       while (nRepeat--)
@@ -17550,11 +17651,11 @@ void lux_xor_as(void)
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--)
-        *tp.l++ = (*lp.w++ ^ *rp.b);
+        *tp.w++ = (*lp.w++ ^ *rp.b);
       break;
     case LUX_INT16:
       while (nRepeat--)
-        *tp.l++ = (*lp.w++ ^ *rp.w);
+        *tp.w++ = (*lp.w++ ^ *rp.w);
       break;
     case LUX_INT32:
       while (nRepeat--)
@@ -17753,7 +17854,7 @@ int32_t evalArrayBinOp(void)
     tally[MAX_DIMS], nCumulR[MAX_DIMS], nCumulL[MAX_DIMS], ndim,
     bigOne;
   extern int32_t    pipeSym, pipeExec;
-  
+
   /* the arrays must have an equal number of dimensions, except for */
   /* possible trailing dimensions of one element */
   if (array_num_dims(rhs) > array_num_dims(lhs)) {/* rhs has more dims */
@@ -18072,7 +18173,7 @@ int32_t evalScalarRangeBinOp(void)
 /* (4:*-7) rather than (4:*-13). */
 {
   int32_t   range, result;
-  
+
   range = rhs;
   result = newSymbol(LUX_RANGE, 0, 0);
   rhs = range_start(range);
@@ -18080,10 +18181,9 @@ int32_t evalScalarRangeBinOp(void)
     rhs = -rhs;         /* get proper symbol number */
     rhs = lux_neg_func(1, &rhs);
   }
-  topType = lhsType = scalar_type(lhs);
+  lhsType = scalar_type(lhs);
   rhsType = symbol_type(rhs);
-  if (rhsType > topType)
-    topType = rhsType;
+  topType = combinedType(lhsType, rhsType);
   range_start(result) = evalScalarBinOp();
   if (range_start(range) < 0) { /* restore * - expr notation */
     rhs = range_start(result);
@@ -18097,10 +18197,8 @@ int32_t evalScalarRangeBinOp(void)
     rhs = -rhs;         /* get proper symbol number */
     rhs = lux_neg_func(1, &rhs);
   }
-  topType = lhsType;
   rhsType = symbol_type(rhs);
-  if (rhsType > topType)
-    topType = rhsType;
+  topType = combinedType(lhsType, rhsType);
   range_end(result) = evalScalarBinOp();
   if (range_end(range) < 0) {   /* restore * - expr notation */
     rhs = range_end(result);
@@ -18125,10 +18223,9 @@ int32_t evalRangeScalarBinOp(void)
     lhs = -lhs;         /* get proper symbol number */
     lhs = lux_neg_func(1, &lhs);
   }
-  topType = rhsType = scalar_type(rhs);
+  rhsType = scalar_type(rhs);
   lhsType = symbol_type(lhs);
-  if (lhsType > topType)
-    topType = lhsType;
+  topType = combinedType(lhsType, lhsType);
   range_start(result) = evalScalarBinOp();
   if (range_start(range) < 0) { /* restore * - expr notation */
     lhs = range_start(result);
@@ -18142,10 +18239,8 @@ int32_t evalRangeScalarBinOp(void)
     lhs = -lhs;         /* get proper symbol number */
     lhs = lux_neg_func(1, &lhs);
   }
-  topType = rhsType;
   lhsType = symbol_type(lhs);
-  if (lhsType > topType)
-    topType = lhsType;
+  topType = combinedType(lhsType, rhsType);
   range_end(result) = evalScalarBinOp();
   if (range_end(range) < 0) {   /* restore * - expr notation */
     lhs = range_end(result);
@@ -19569,13 +19664,12 @@ int32_t eval(int32_t symbol)
       if (binOp == LUX_POW) {
         if (topType > LUX_CDOUBLE)
           return cerror(ILL_TYPE, (lhsType >= LUX_CFLOAT)? lhs: rhs);
-        if (topType < LUX_FLOAT)
-          topType = combinedType(topType, LUX_FLOAT);
+        topType = combinedType(topType, LUX_FLOAT);
       }
       /* all logical function return LUX_INT32 */
-      if (binOp >= LUX_EQ && binOp < LUX_POW)
+      if (binOp >= LUX_EQ && binOp <= LUX_NE)
         topType = LUX_INT32;
-      if (binOp >= LUX_OR && binOp < LUX_POW) {
+      if (binOp >= LUX_OR && binOp <= LUX_ORIF && binOp != LUX_POW) {
         if (!isIntegerType(lhsType)) {
           result = cerror(NO_FLT_COND, lhs, binOpName[binOp],
                           typeName(lhsType));
@@ -19846,9 +19940,9 @@ int32_t     pipeExec = 0, pipeSym = 0;
 branchInfo checkTree(int32_t lhs, int32_t rhs)
 {
   branchInfo    result;
-  
+
   checkBranch(lhs, 0);          /* initialize */
   result = checkBranch(lhs, rhs);
   return result;
-}      
+}
 /*----------------------------------------------------------*/

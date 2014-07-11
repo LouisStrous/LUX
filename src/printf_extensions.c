@@ -31,7 +31,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 static const char *const dfmts[] =
   { "%d", "%+d", "% d", "%+ d", "%-d", "%+-d", "%- d", "%+ -d",
     "%0d", "%0+d", "%0 d", "%0+ d", "%0-d", "%0+-d", "%0- d", "%0+ -d" };
-static const char *const ffmts[] = 
+static const char *const ffmts[] =
   { "%#*.*f", "%+#*.*f", "%# *.*f", "%+# *.*f", "%-#*.*f", "%+-#*.*f", "%-# *.*f", "%+# -*.*f",
      "%0#*.*f", "%0+#*.*f", "%0# *.*f", "%0+# *.*f", "%0-#*.*f", "%0+-#*.*f", "%0-# *.*f", "%0+# -*.*f" };
 
@@ -89,7 +89,7 @@ int32_t printf_sexagesimal(FILE *stream, const struct printf_info *info,
   double lastvalue;
   double value = *((const double *)(args[0]));
   struct obstack o;
-  
+
   if (info->alt)                /* %#T */
     value /= 15;                /* transform from degrees to hours */
 
@@ -151,7 +151,7 @@ static int32_t obstack_printf_date_int_left(struct obstack *o,
   int32_t year, month, ivalue, prec, size;
   double day, lastvalue;
   int32_t fmttype = 0;
-  
+
   size = obstack_object_size(o);
   if (info->showsign)
     fmttype++;
@@ -232,7 +232,7 @@ int32_t printf_date(FILE *stream, const struct printf_info *info,
   struct obstack o;
   size_t width;
   int32_t fmttype = 0;
-  
+
   if (info->showsign)
     fmttype++;
   if (info->space)
@@ -255,7 +255,7 @@ int32_t printf_date(FILE *stream, const struct printf_info *info,
     } else {
       obstack_blank(&o, -width);
       obstack_printf_date_int_left(&o, info, value, NULL, info->width - width);
-    }      
+    }
   }
   width = obstack_object_size(&o);
   obstack_1grow(&o, '\0');      /* ensure terminating \0 */

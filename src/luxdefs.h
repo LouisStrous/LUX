@@ -687,7 +687,7 @@ typedef struct {
   char  *plain;                 /* start of plain text? */
   char  *end;                   /* end of current format entry */
   char  *next;                  /* start of next format entry */
-  int32_t   type;                   /* format type */
+  fmtType   type;                   /* format type */
   int32_t   width;                  /* format width */
   int32_t   precision;              /* format precision */
   int32_t   flags;                  /* format modification flags */

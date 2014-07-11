@@ -61,63 +61,126 @@ START_TEST(binop_array)
   int64_t lv_as[2] = { 44, 11 };
   int64_t rv_as = 11;
 
+  int64_t lv_sa = 7;
+  int64_t rv_sa[2] = { 20, 7 };
+
   struct test {
     binaryOp op;
     int64_t expected_values_aa[2];
     int64_t expected_values_as[2];
+    int64_t expected_values_sa[2];
   } tests[] = {
-    { LUX_ADD, { lv_aa[0] + rv_aa[0], lv_aa[1] + rv_aa[1] },
-      { lv_as[0] + rv_as, lv_as[1] + rv_as } },
-    { LUX_SUB, { lv_aa[0] - rv_aa[0], lv_aa[1] - rv_aa[1] },
-      { lv_as[0] - rv_as, lv_as[1] - rv_as } },
-    { LUX_MUL, { lv_aa[0] * rv_aa[0], lv_aa[1] * rv_aa[1] },
-      { lv_as[0] * rv_as, lv_as[1] * rv_as } },
-    { LUX_DIV, { lv_aa[0] / rv_aa[0], lv_aa[1] / rv_aa[1] },
-      { lv_as[0] / rv_as, lv_as[1] / rv_as } },
-    { LUX_IDIV, { lv_aa[0] / rv_aa[0], lv_aa[1] / rv_aa[1] },
-      { lv_as[0] / rv_as, lv_as[1] / rv_as } },
-    { LUX_MOD,  { lv_aa[0] % rv_aa[0], lv_aa[1] % rv_aa[1] },
-      { lv_as[0] % rv_as, lv_as[1] % rv_as } },
+    { LUX_ADD,
+      { lv_aa[0] + rv_aa[0], lv_aa[1] + rv_aa[1] },
+      { lv_as[0] + rv_as, lv_as[1] + rv_as },
+      { lv_sa + rv_sa[0], lv_sa + rv_sa[1] },
+    },
+    { LUX_SUB,
+      { lv_aa[0] - rv_aa[0], lv_aa[1] - rv_aa[1] },
+      { lv_as[0] - rv_as, lv_as[1] - rv_as },
+      { lv_sa - rv_sa[0], lv_sa - rv_sa[1] },
+    },
+    { LUX_MUL,
+      { lv_aa[0] * rv_aa[0], lv_aa[1] * rv_aa[1] },
+      { lv_as[0] * rv_as, lv_as[1] * rv_as },
+      { lv_sa * rv_sa[0], lv_sa * rv_sa[1] },
+    },
+    { LUX_DIV,
+      { lv_aa[0] / rv_aa[0], lv_aa[1] / rv_aa[1] },
+      { lv_as[0] / rv_as, lv_as[1] / rv_as },
+      { lv_sa / rv_sa[0], lv_sa / rv_sa[1] },
+    },
+    { LUX_IDIV,
+      { lv_aa[0] / rv_aa[0], lv_aa[1] / rv_aa[1] },
+      { lv_as[0] / rv_as, lv_as[1] / rv_as },
+      { lv_sa / rv_sa[0], lv_sa / rv_sa[1] },
+    },
+    { LUX_MOD,
+      { lv_aa[0] % rv_aa[0], lv_aa[1] % rv_aa[1] },
+      { lv_as[0] % rv_as, lv_as[1] % rv_as },
+      { lv_sa % rv_sa[0], lv_sa % rv_sa[1] },
+    },
     /* LUX_SMOD: symmetric modulus a smod b is like a%b but between
        -b/2 and +b/2 */
-    { LUX_SMOD, { lv_aa[0] % rv_aa[0], lv_aa[1] % rv_aa[1] - rv_aa[1] },
-      { lv_as[0] % rv_as, lv_as[1] % rv_as } },
+    { LUX_SMOD,
+      { lv_aa[0] % rv_aa[0], lv_aa[1] % rv_aa[1] - rv_aa[1] },
+      { lv_as[0] % rv_as, lv_as[1] % rv_as },
+      { lv_sa % rv_sa[0], lv_sa % rv_sa[1] },
+    },
     /* LUX_MAX: greatest of the arguments */
-    { LUX_MAX, { (lv_aa[0] > rv_aa[0]? lv_aa[0]: rv_aa[0]),
-                 (lv_aa[1] > rv_aa[1]? lv_aa[1]: rv_aa[1]) },
+    { LUX_MAX,
+      { (lv_aa[0] > rv_aa[0]? lv_aa[0]: rv_aa[0]),
+        (lv_aa[1] > rv_aa[1]? lv_aa[1]: rv_aa[1]) },
       { (lv_as[0] > rv_as? lv_as[0]: rv_as),
-        (lv_as[1] > rv_as? lv_as[1]: rv_as) } },
+        (lv_as[1] > rv_as? lv_as[1]: rv_as) },
+      { (lv_sa > rv_sa[0]? lv_sa: rv_sa[0]),
+        (lv_sa > rv_sa[1]? lv_sa: rv_sa[1]) },
+    },
     /* LUX_MIN: least of the arguments */
-    { LUX_MIN, { (lv_aa[0] < rv_aa[0]? lv_aa[0]: rv_aa[0]),
-                 (lv_aa[1] < rv_aa[1]? lv_aa[1]: rv_aa[1]) },
+    { LUX_MIN,
+      { (lv_aa[0] < rv_aa[0]? lv_aa[0]: rv_aa[0]),
+        (lv_aa[1] < rv_aa[1]? lv_aa[1]: rv_aa[1]) },
       { (lv_as[0] < rv_as? lv_as[0]: rv_as),
-        (lv_as[1] < rv_as? lv_as[1]: rv_as) } },
-    { LUX_EQ, { (lv_aa[0] == rv_aa[0]), (lv_aa[1] == rv_aa[1]) },
-      { (lv_as[0] == rv_as), (lv_as[1] == rv_as) } },
-    { LUX_GT, { (lv_aa[0] > rv_aa[0]), (lv_aa[1] > rv_aa[1]) },
-      { (lv_as[0] > rv_as), (lv_as[1] > rv_as) } },
-    { LUX_GE, { (lv_aa[0] >= rv_aa[0]), (lv_aa[1] >= rv_aa[1]) },
-      { (lv_as[0] >= rv_as), (lv_as[1] >= rv_as) } },
-    { LUX_LT, { (lv_aa[0] < rv_aa[0]), (lv_aa[1] < rv_aa[1]) },
-      { (lv_as[0] < rv_as), (lv_as[1] < rv_as) } },
-    { LUX_LE, { (lv_aa[0] <= rv_aa[0]), (lv_aa[1] <= rv_aa[1]) },
-      { (lv_as[0] <= rv_as), (lv_as[1] <= rv_as) } },
-    { LUX_NE, { (lv_aa[0] != rv_aa[0]), (lv_aa[1] != rv_aa[1]) },
-      { (lv_as[0] != rv_as), (lv_as[1] != rv_as) } },
-    { LUX_OR, { (lv_aa[0] | rv_aa[0]), (lv_aa[1] | rv_aa[1]) },
-      { (lv_as[0] | rv_as), (lv_as[1] | rv_as) } },
-    { LUX_AND, { (lv_aa[0] & rv_aa[0]), (lv_aa[1] & rv_aa[1]) },
-      { (lv_as[0] & rv_as), (lv_as[1] & rv_as) } },
-    { LUX_XOR, { (lv_aa[0] ^ rv_aa[0]), (lv_aa[1] ^ rv_aa[1]) },
-      { (lv_as[0] ^ rv_as), (lv_as[1] ^ rv_as) } },
-    { LUX_POW,  { 9409, 665416609183179841 },
-      { 1196683881290399744, 285311670611 } },
+        (lv_as[1] < rv_as? lv_as[1]: rv_as) },
+      { (lv_sa < rv_sa[0]? lv_sa: rv_sa[0]),
+        (lv_sa < rv_sa[1]? lv_sa: rv_sa[1]) },
+    },
+    { LUX_EQ,
+      { (lv_aa[0] == rv_aa[0]), (lv_aa[1] == rv_aa[1]) },
+      { (lv_as[0] == rv_as), (lv_as[1] == rv_as) },
+      { (lv_sa == rv_sa[0]), (lv_sa == rv_sa[1]) },
+    },
+    { LUX_GT,
+      { (lv_aa[0] > rv_aa[0]), (lv_aa[1] > rv_aa[1]) },
+      { (lv_as[0] > rv_as), (lv_as[1] > rv_as) },
+      { (lv_sa > rv_sa[0]), (lv_sa > rv_sa[1]) },
+    },
+    { LUX_GE,
+      { (lv_aa[0] >= rv_aa[0]), (lv_aa[1] >= rv_aa[1]) },
+      { (lv_as[0] >= rv_as), (lv_as[1] >= rv_as) },
+      { (lv_sa >= rv_sa[0]), (lv_sa >= rv_sa[1]) },
+    },
+    { LUX_LT,
+      { (lv_aa[0] < rv_aa[0]), (lv_aa[1] < rv_aa[1]) },
+      { (lv_as[0] < rv_as), (lv_as[1] < rv_as) },
+      { (lv_sa < rv_sa[0]), (lv_sa < rv_sa[1]) },
+    },
+    { LUX_LE,
+      { (lv_aa[0] <= rv_aa[0]), (lv_aa[1] <= rv_aa[1]) },
+      { (lv_as[0] <= rv_as), (lv_as[1] <= rv_as) },
+      { (lv_sa <= rv_sa[0]), (lv_sa <= rv_sa[1]) },
+    },
+    { LUX_NE,
+      { (lv_aa[0] != rv_aa[0]), (lv_aa[1] != rv_aa[1]) },
+      { (lv_as[0] != rv_as), (lv_as[1] != rv_as) },
+      { (lv_sa != rv_sa[0]), (lv_sa != rv_sa[1]) },
+    },
+    { LUX_OR,
+      { (lv_aa[0] | rv_aa[0]), (lv_aa[1] | rv_aa[1]) },
+      { (lv_as[0] | rv_as), (lv_as[1] | rv_as) },
+      { (lv_sa | rv_sa[0]), (lv_sa | rv_sa[1]) },
+    },
+    { LUX_AND,
+      { (lv_aa[0] & rv_aa[0]), (lv_aa[1] & rv_aa[1]) },
+      { (lv_as[0] & rv_as), (lv_as[1] & rv_as) },
+      { (lv_sa & rv_sa[0]), (lv_sa & rv_sa[1]) },
+    },
+    { LUX_XOR,
+      { (lv_aa[0] ^ rv_aa[0]), (lv_aa[1] ^ rv_aa[1]) },
+      { (lv_as[0] ^ rv_as), (lv_as[1] ^ rv_as) },
+      { (lv_sa ^ rv_sa[0]), (lv_sa ^ rv_sa[1]) },
+    },
+    { LUX_POW,
+      { 9409, 665416609183179841 },
+      { 1196683881290399744, 285311670611 },
+      { 79792266297612001, 823543 },
+    },
   };
 
   size_t n = sizeof(lv_aa)/sizeof(*lv_aa);
 
   Symboltype types[] = { LUX_INT8, LUX_INT16, LUX_INT32, LUX_INT64,
-                         LUX_FLOAT, LUX_DOUBLE };
+                         LUX_FLOAT, LUX_DOUBLE, LUX_CFLOAT };
 
   int num_types = sizeof(types)/sizeof(*types);
 
@@ -135,6 +198,11 @@ START_TEST(binop_array)
       ck_assert_int_ne(lhs_basic_sym_as, -1);
       ck_assert_int_ne(rhs_basic_sym_as, -1);
 
+      int32_t lhs_basic_sym_sa = prepare_scalar(lv_sa);
+      int32_t rhs_basic_sym_sa = prepare_array(n, rv_sa);
+      ck_assert_int_ne(lhs_basic_sym_sa, -1);
+      ck_assert_int_ne(rhs_basic_sym_sa, -1);
+
       Symboltype lhs_type = types[lhs_itype];
 
       int32_t lhs_sym_aa = lux_converts[lhs_type](1, &lhs_basic_sym_aa);
@@ -142,6 +210,9 @@ START_TEST(binop_array)
 
       int32_t lhs_sym_as = lux_converts[lhs_type](1, &lhs_basic_sym_as);
       ck_assert_int_ne(lhs_sym_as, -1);
+
+      int32_t lhs_sym_sa = lux_converts[lhs_type](1, &lhs_basic_sym_sa);
+      ck_assert_int_ne(lhs_sym_sa, -1);
 
       Symboltype rhs_type = types[rhs_itype];
 
@@ -151,27 +222,27 @@ START_TEST(binop_array)
       int32_t op_sym_aa = newSymbol(LUX_BIN_OP, 0, lhs_sym_aa, rhs_sym_aa);
       ck_assert_int_ne(op_sym_aa, -1);
 
-      /* prevent these symbols from being deleted when op_sym_aa is
-         deleted */
-      symbol_context(lhs_sym_aa) = curContext + 1;
-      symbol_context(rhs_sym_aa) = curContext + 1;
-
       int32_t rhs_sym_as = lux_converts[rhs_type](1, &rhs_basic_sym_as);
       ck_assert_int_ne(rhs_sym_as, -1);
 
       int32_t op_sym_as = newSymbol(LUX_BIN_OP, 0, lhs_sym_as, rhs_sym_as);
       ck_assert_int_ne(op_sym_as, -1);
 
-      /* prevent these symbols from being deleted when op_sym_aa is
-         deleted */
-      symbol_context(lhs_sym_as) = curContext + 1;
-      symbol_context(rhs_sym_as) = curContext + 1;
+      int32_t rhs_sym_sa = lux_converts[rhs_type](1, &rhs_basic_sym_sa);
+      ck_assert_int_ne(rhs_sym_sa, -1);
+
+      int32_t op_sym_sa = newSymbol(LUX_BIN_OP, 0, lhs_sym_sa, rhs_sym_sa);
+      ck_assert_int_ne(op_sym_sa, -1);
 
       int32_t iop;
       for (iop = 0; iop < sizeof(tests)/sizeof(*tests); ++iop) {
         switch (tests[iop].op) {
         case LUX_OR: case LUX_AND: case LUX_XOR:
           if (!isIntegerType(lhs_type) || !isIntegerType(rhs_type))
+            continue;
+          break;
+        case LUX_IDIV:
+          if (isComplexType(lhs_type) || isComplexType(rhs_type))
             continue;
           break;
         }
@@ -181,14 +252,19 @@ START_TEST(binop_array)
 
         bin_op_type(op_sym_aa) = tests[iop].op;
         bin_op_type(op_sym_as) = tests[iop].op;
+        bin_op_type(op_sym_sa) = tests[iop].op;
 
         int32_t result_sym_aa = eval(op_sym_aa);    /* evaluate operation */
         ck_assert_int_ne(result_sym_aa, -1);
-        ck_assert_int_eq(symbol_class(result_sym_aa), LUX_ARRAY);
+        ck_assert_int_eq(symbolIsArray(result_sym_aa), 1);
 
         int32_t result_sym_as = eval(op_sym_as);    /* evaluate operation */
         ck_assert_int_ne(result_sym_as, -1);
-        ck_assert_int_eq(symbol_class(result_sym_as), LUX_ARRAY);
+        ck_assert_int_eq(symbolIsArray(result_sym_as), 1);
+
+        int32_t result_sym_sa = eval(op_sym_sa);    /* evaluate operation */
+        ck_assert_int_ne(result_sym_sa, -1);
+        ck_assert_int_eq(symbolIsArray(result_sym_sa), 1);
 
         Symboltype expected_type;
         switch (tests[iop].op) {
@@ -206,11 +282,14 @@ START_TEST(binop_array)
         }
         ck_assert_int_eq(symbol_type(result_sym_aa), expected_type);
         ck_assert_int_eq(symbol_type(result_sym_as), expected_type);
+        ck_assert_int_eq(symbol_type(result_sym_sa), expected_type);
 
         pointer result_ptr_aa;
         result_ptr_aa.v = array_data(result_sym_aa);
         pointer result_ptr_as;
         result_ptr_as.v = array_data(result_sym_as);
+        pointer result_ptr_sa;
+        result_ptr_sa.v = array_data(result_sym_sa);
 
         int32_t expected_sym_aa = prepare_array(n, tests[iop].expected_values_aa);
         expected_sym_aa = lux_converts[expected_type](1, &expected_sym_aa);
@@ -222,6 +301,11 @@ START_TEST(binop_array)
         pointer expected_ptr_as;
         expected_ptr_as.v = array_data(expected_sym_as);
 
+        int32_t expected_sym_sa = prepare_array(n, tests[iop].expected_values_sa);
+        expected_sym_sa = lux_converts[expected_type](1, &expected_sym_sa);
+        pointer expected_ptr_sa;
+        expected_ptr_sa.v = array_data(expected_sym_sa);
+
         switch (tests[iop].op) {
         case LUX_DIV:
           switch (expected_type) {
@@ -230,54 +314,394 @@ START_TEST(binop_array)
             expected_ptr_aa.f[1] = (float) lv_aa[1]/rv_aa[1];
             expected_ptr_as.f[0] = (float) lv_as[0]/rv_as;
             expected_ptr_as.f[1] = (float) lv_as[1]/rv_as;
+            expected_ptr_sa.f[0] = (float) lv_sa/rv_sa[0];
+            expected_ptr_sa.f[1] = (float) lv_sa/rv_sa[1];
             break;
           case LUX_DOUBLE:
             expected_ptr_aa.d[0] = (double) lv_aa[0]/rv_aa[0];
             expected_ptr_aa.d[1] = (double) lv_aa[1]/rv_aa[1];
             expected_ptr_as.d[0] = (double) lv_as[0]/rv_as;
             expected_ptr_as.d[1] = (double) lv_as[1]/rv_as;
+            expected_ptr_sa.d[0] = (double) lv_sa/rv_sa[0];
+            expected_ptr_sa.d[1] = (double) lv_sa/rv_sa[1];
+            break;
+          case LUX_CFLOAT:
+            expected_ptr_aa.cf[0].real = (float) lv_aa[0]/rv_aa[0];
+            expected_ptr_aa.cf[0].imaginary = 0;
+            expected_ptr_aa.cf[1].real = (float) lv_aa[1]/rv_aa[1];
+            expected_ptr_aa.cf[1].imaginary = 0;
+            expected_ptr_as.cf[0].real = (float) lv_as[0]/rv_as;
+            expected_ptr_as.cf[0].imaginary = 0;
+            expected_ptr_as.cf[1].real = (float) lv_as[1]/rv_as;
+            expected_ptr_as.cf[1].imaginary = 0;
+            expected_ptr_sa.cf[0].real = (float) lv_sa/rv_sa[0];
+            expected_ptr_sa.cf[0].imaginary = 0;
+            expected_ptr_sa.cf[1].real = (float) lv_sa/rv_sa[1];
+            expected_ptr_sa.cf[1].imaginary = 0;
+            break;
+          case LUX_CDOUBLE:
+            expected_ptr_aa.cd[0].real = (double) lv_aa[0]/rv_aa[0];
+            expected_ptr_aa.cd[0].imaginary = 0;
+            expected_ptr_aa.cd[1].real = (double) lv_aa[1]/rv_aa[1];
+            expected_ptr_aa.cd[1].imaginary = 0;
+            expected_ptr_as.cd[0].real = (double) lv_as[0]/rv_as;
+            expected_ptr_as.cd[0].imaginary = 0;
+            expected_ptr_as.cd[1].real = (double) lv_as[1]/rv_as;
+            expected_ptr_as.cd[1].imaginary = 0;
+            expected_ptr_sa.cd[0].real = (double) lv_sa/rv_sa[0];
+            expected_ptr_sa.cd[0].imaginary = 0;
+            expected_ptr_sa.cd[1].real = (double) lv_sa/rv_sa[1];
+            expected_ptr_sa.cd[1].imaginary = 0;
             break;
           }
           break;
         }
 
-        int32_t i;
-        for (i = 0; i < n*lux_type_size[expected_type]; ++i) {
-          if (result_ptr_aa.b[i] != expected_ptr_aa.b[i]) {
-            printf("Discrepancy at byte %d: expected %u but found %u\n",
-                   i, result_ptr_aa.b[i], expected_ptr_aa.b[i]);
-            printf("EXPECT: ");
-            lux_dump_one(expected_sym_aa, 2);
-            printf("GOT   : ");
-            lux_dump_one(result_sym_aa, 2);
-          }
-          ck_assert_int_eq(result_ptr_aa.b[i], expected_ptr_aa.b[i]);
+        /* if we compare the results byte-for-byte with the expected
+           results then we may get into trouble because +0 and -0 are
+           numerically equivalent but not byte-for-byte identical */
 
-          if (result_ptr_as.b[i] != expected_ptr_as.b[i]) {
-            printf("Discrepancy at byte %d: expected %u but found %u\n",
-                   i, result_ptr_as.b[i], expected_ptr_as.b[i]);
-            printf("EXPECT: ");
-            lux_dump_one(expected_sym_as, 2);
-            printf("GOT   : ");
-            lux_dump_one(result_sym_as, 2);
+        const int eps_tol = 20;
+        int32_t i;
+        switch (expected_type) {
+        case LUX_INT8:
+          for (i = 0; i < n; ++i) {
+            if (result_ptr_aa.b[i] != expected_ptr_aa.b[i]) {
+              printf("Discrepancy for aa at #%d: got %u but expected %u\n",
+                     i+1, result_ptr_aa.b[i], expected_ptr_aa.b[i]);
+              printf("EXPECT: ");
+              lux_dump_one(expected_sym_aa, 2);
+              printf("GOT   : ");
+              lux_dump_one(result_sym_aa, 2);
+              ck_assert_int_eq(result_ptr_aa.b[i], expected_ptr_aa.b[i]);
+            }
+            if (result_ptr_as.b[i] != expected_ptr_as.b[i]) {
+              printf("Discrepancy for as at #%d: got %u but expected %u\n",
+                     i+1, result_ptr_as.b[i], expected_ptr_as.b[i]);
+              printf("EXPECT: ");
+              lux_dump_one(expected_sym_as, 2);
+              printf("GOT   : ");
+              lux_dump_one(result_sym_as, 2);
+              ck_assert_int_eq(result_ptr_as.b[i], expected_ptr_as.b[i]);
+            }
+            if (result_ptr_sa.b[i] != expected_ptr_sa.b[i]) {
+              printf("Discrepancy for sa at #%d: got %u but expected %u\n",
+                     i+1, result_ptr_sa.b[i], expected_ptr_sa.b[i]);
+              printf("EXPECT: ");
+              lux_dump_one(expected_sym_sa, 2);
+              printf("GOT   : ");
+              lux_dump_one(result_sym_sa, 2);
+              ck_assert_int_eq(result_ptr_sa.b[i], expected_ptr_sa.b[i]);
+            }
           }
-          ck_assert_int_eq(result_ptr_as.b[i], expected_ptr_as.b[i]);
+          break;
+        case LUX_INT16:
+          for (i = 0; i < n; ++i) {
+            if (result_ptr_aa.w[i] != expected_ptr_aa.w[i]) {
+              printf("Discrepancy for aa at #%d: got %d but expected %d\n",
+                     i+1, result_ptr_aa.w[i], expected_ptr_aa.w[i]);
+              printf("EXPECT: ");
+              lux_dump_one(expected_sym_aa, 2);
+              printf("GOT   : ");
+              lux_dump_one(result_sym_aa, 2);
+              ck_assert_int_eq(result_ptr_aa.w[i], expected_ptr_aa.w[i]);
+            }
+            if (result_ptr_as.w[i] != expected_ptr_as.w[i]) {
+              printf("Discrepancy for as at #%d: got %d but expected %d\n",
+                     i+1, result_ptr_as.w[i], expected_ptr_as.w[i]);
+              printf("EXPECT: ");
+              lux_dump_one(expected_sym_as, 2);
+              printf("GOT   : ");
+              lux_dump_one(result_sym_as, 2);
+              ck_assert_int_eq(result_ptr_as.w[i], expected_ptr_as.w[i]);
+            }
+            if (result_ptr_sa.w[i] != expected_ptr_sa.w[i]) {
+              printf("Discrepancy for sa at #%d: got %d but expected %d\n",
+                     i+1, result_ptr_sa.w[i], expected_ptr_sa.w[i]);
+              printf("EXPECT: ");
+              lux_dump_one(expected_sym_sa, 2);
+              printf("GOT   : ");
+              lux_dump_one(result_sym_sa, 2);
+              ck_assert_int_eq(result_ptr_sa.w[i], expected_ptr_sa.w[i]);
+            }
+          }
+          break;
+        case LUX_INT32:
+          for (i = 0; i < n; ++i) {
+            if (result_ptr_aa.l[i] != expected_ptr_aa.l[i]) {
+              printf("Discrepancy for aa at #%d: got %d but expected %d\n",
+                     i+1, result_ptr_aa.l[i], expected_ptr_aa.l[i]);
+              printf("EXPECT: ");
+              lux_dump_one(expected_sym_aa, 2);
+              printf("GOT   : ");
+              lux_dump_one(result_sym_aa, 2);
+              ck_assert_uint_eq(result_ptr_aa.l[i], expected_ptr_aa.l[i]);
+            }
+            if (result_ptr_as.l[i] != expected_ptr_as.l[i]) {
+              printf("Discrepancy for as at #%d: got %d but expected %d\n",
+                     i+1, result_ptr_as.l[i], expected_ptr_as.l[i]);
+              printf("EXPECT: ");
+              lux_dump_one(expected_sym_as, 2);
+              printf("GOT   : ");
+              lux_dump_one(result_sym_as, 2);
+              ck_assert_uint_eq(result_ptr_as.l[i], expected_ptr_as.l[i]);
+            }
+            if (result_ptr_sa.l[i] != expected_ptr_sa.l[i]) {
+              printf("Discrepancy for sa at #%d: got %d but expected %d\n",
+                     i+1, result_ptr_sa.l[i], expected_ptr_sa.l[i]);
+              printf("EXPECT: ");
+              lux_dump_one(expected_sym_sa, 2);
+              printf("GOT   : ");
+              lux_dump_one(result_sym_sa, 2);
+              ck_assert_uint_eq(result_ptr_sa.l[i], expected_ptr_sa.l[i]);
+            }
+          }
+          break;
+        case LUX_INT64:
+          for (i = 0; i < n; ++i) {
+            if (result_ptr_aa.q[i] != expected_ptr_aa.q[i]) {
+              printf("Discrepancy for aa at #%d: got %d but expected %d\n",
+                     i+1, result_ptr_aa.q[i], expected_ptr_aa.q[i]);
+              printf("EXPECT: ");
+              lux_dump_one(expected_sym_aa, 2);
+              printf("GOT   : ");
+              lux_dump_one(result_sym_aa, 2);
+              ck_assert_int_eq(result_ptr_aa.q[i], expected_ptr_aa.q[i]);
+            }
+            if (result_ptr_as.q[i] != expected_ptr_as.q[i]) {
+              printf("Discrepancy for as at #%d: got %d but expected %d\n",
+                     i+1, result_ptr_as.q[i], expected_ptr_as.q[i]);
+              printf("EXPECT: ");
+              lux_dump_one(expected_sym_as, 2);
+              printf("GOT   : ");
+              lux_dump_one(result_sym_as, 2);
+              ck_assert_int_eq(result_ptr_as.q[i], expected_ptr_as.q[i]);
+            }
+            if (result_ptr_sa.q[i] != expected_ptr_sa.q[i]) {
+              printf("Discrepancy for sa at #%d: got %d but expected %d\n",
+                     i+1, result_ptr_sa.q[i], expected_ptr_sa.q[i]);
+              printf("EXPECT: ");
+              lux_dump_one(expected_sym_sa, 2);
+              printf("GOT   : ");
+              lux_dump_one(result_sym_sa, 2);
+              ck_assert_int_eq(result_ptr_sa.q[i], expected_ptr_sa.q[i]);
+            }
+          }
+          break;
+        case LUX_FLOAT:
+          for (i = 0; i < n; ++i) {
+            if (!approximately_equal_f(result_ptr_aa.f[i],
+                                       expected_ptr_aa.f[i], eps_tol)) {
+              printf("Discrepancy for aa at #%d: got %.15g "
+                     "but expected %.15g\n",
+                     i+1, result_ptr_aa.f[i], expected_ptr_aa.f[i]);
+              printf("EXPECT: ");
+              lux_dump_one(expected_sym_aa, 2);
+              printf("GOT   : ");
+              lux_dump_one(result_sym_aa, 2);
+              ck_assert(approximately_equal_f(result_ptr_aa.f[i],
+                                              expected_ptr_aa.f[i], eps_tol));
+            }
+            if (!approximately_equal_f(result_ptr_as.f[i],
+                                       expected_ptr_as.f[i], eps_tol)) {
+              printf("Discrepancy for as at #%d: got %.15g "
+                     "but expected %.15g\n",
+                     i+1, result_ptr_as.f[i], expected_ptr_as.f[i]);
+              printf("EXPECT: ");
+              lux_dump_one(expected_sym_as, 2);
+              printf("GOT   : ");
+              lux_dump_one(result_sym_as, 2);
+              ck_assert(approximately_equal_f(result_ptr_as.f[i],
+                                              expected_ptr_as.f[i], eps_tol));
+            }
+            if (!approximately_equal_f(result_ptr_sa.f[i],
+                                       expected_ptr_sa.f[i], eps_tol)) {
+              printf("Discrepancy for sa at #%d: got %.15g "
+                     "but expected %.15g\n",
+                     i+1, result_ptr_sa.f[i], expected_ptr_sa.f[i]);
+              printf("EXPECT: ");
+              lux_dump_one(expected_sym_sa, 2);
+              printf("GOT   : ");
+              lux_dump_one(result_sym_sa, 2);
+              ck_assert(approximately_equal_f(result_ptr_sa.f[i],
+                                              expected_ptr_sa.f[i], eps_tol));
+            }
+          }
+          break;
+        case LUX_DOUBLE:
+          for (i = 0; i < n; ++i) {
+            if (!approximately_equal(result_ptr_aa.d[i],
+                                     expected_ptr_aa.d[i], eps_tol)) {
+              printf("Discrepancy for aa at #%d: got %.15g "
+                     "but expected %.15g\n",
+                     i+1, result_ptr_aa.d[i], expected_ptr_aa.d[i]);
+              printf("EXPECT: ");
+              lux_dump_one(expected_sym_aa, 2);
+              printf("GOT   : ");
+              lux_dump_one(result_sym_aa, 2);
+              ck_assert(approximately_equal(result_ptr_aa.d[i],
+                                            expected_ptr_aa.d[i], eps_tol));
+            }
+            if (!approximately_equal(result_ptr_as.d[i],
+                                     expected_ptr_as.d[i], eps_tol)) {
+              printf("Discrepancy for as at #%d: got %.15g "
+                     "but expected %.15g\n",
+                     i+1, result_ptr_as.d[i], expected_ptr_as.d[i]);
+              printf("EXPECT: ");
+              lux_dump_one(expected_sym_as, 2);
+              printf("GOT   : ");
+              lux_dump_one(result_sym_as, 2);
+              ck_assert(approximately_equal(result_ptr_as.d[i],
+                                            expected_ptr_as.d[i], eps_tol));
+            }
+            if (!approximately_equal(result_ptr_sa.d[i],
+                                     expected_ptr_sa.d[i], eps_tol)) {
+              printf("Discrepancy for sa at #%d: got %.15g "
+                     "but expected %.15g\n",
+                     i+1, result_ptr_sa.d[i], expected_ptr_sa.d[i]);
+              printf("EXPECT: ");
+              lux_dump_one(expected_sym_sa, 2);
+              printf("GOT   : ");
+              lux_dump_one(result_sym_sa, 2);
+              ck_assert(approximately_equal(result_ptr_sa.d[i],
+                                            expected_ptr_sa.d[i], eps_tol));
+            }
+          }
+          break;
+        case LUX_CFLOAT:
+          for (i = 0; i < n; ++i) {
+            if (!approximately_equal_z_f(result_ptr_aa.cf[i],
+                                         expected_ptr_aa.cf[i],
+                                         eps_tol)) {
+              printf("Discrepancy for aa at #%d: got %.15g%+.15gi "
+                     "but expected %.15g%+.15gi\n",
+                     i+1, result_ptr_aa.cf[i].real,
+                     result_ptr_aa.cf[i].imaginary,
+                     expected_ptr_aa.cf[i].real,
+                     expected_ptr_aa.cf[i].imaginary);
+              printf("EXPECT: ");
+              lux_dump_one(expected_sym_aa, 2);
+              printf("GOT   : ");
+              lux_dump_one(result_sym_aa, 2);
+              ck_assert(approximately_equal_z_f(result_ptr_aa.cf[i],
+                                                expected_ptr_aa.cf[i],
+                                                eps_tol));
+            }
+            if (!approximately_equal_z_f(result_ptr_as.cf[i],
+                                         expected_ptr_as.cf[i],
+                                         eps_tol)) {
+              printf("Discrepancy for as at #%d: got %.15g%+.15gi "
+                     "but expected %.15g%+.15gi\n",
+                     i+1, result_ptr_as.cf[i].real,
+                     result_ptr_as.cf[i].imaginary,
+                     expected_ptr_as.cf[i].real,
+                     expected_ptr_as.cf[i].imaginary);
+              printf("EXPECT: ");
+              lux_dump_one(expected_sym_as, 2);
+              printf("GOT   : ");
+              lux_dump_one(result_sym_as, 2);
+              ck_assert(approximately_equal_z_f(result_ptr_as.cf[i],
+                                                expected_ptr_as.cf[i],
+                                                eps_tol));
+            }
+            if (!approximately_equal_z_f(result_ptr_sa.cf[i],
+                                         expected_ptr_sa.cf[i],
+                                         eps_tol)) {
+              printf("Discrepancy for sa at #%d: got %.15g%+.15gi "
+                     "but expected %.15g%+.15gi\n",
+                     i+1, result_ptr_sa.cf[i].real,
+                     result_ptr_sa.cf[i].imaginary,
+                     expected_ptr_sa.cf[i].real,
+                     expected_ptr_sa.cf[i].imaginary);
+              printf("EXPECT: ");
+              lux_dump_one(expected_sym_sa, 2);
+              printf("GOT   : ");
+              lux_dump_one(result_sym_sa, 2);
+              ck_assert(approximately_equal_z_f(result_ptr_sa.cf[i],
+                                                expected_ptr_sa.cf[i],
+                                                eps_tol));
+            }
+          }
+          break;
+        case LUX_CDOUBLE:
+          for (i = 0; i < n; ++i) {
+            if (!approximately_equal_z(result_ptr_aa.cd[i],
+                                       expected_ptr_aa.cd[i],
+                                       eps_tol)) {
+              printf("Discrepancy for aa at #%d: got %.15g%+.15gi "
+                     "but expected %.15g%+.15gi\n",
+                     i+1, result_ptr_aa.cd[i].real,
+                     result_ptr_aa.cd[i].imaginary,
+                     expected_ptr_aa.cd[i].real,
+                     expected_ptr_aa.cd[i].imaginary);
+              printf("EXPECT: ");
+              lux_dump_one(expected_sym_aa, 2);
+              printf("GOT   : ");
+              lux_dump_one(result_sym_aa, 2);
+              ck_assert(approximately_equal_z(result_ptr_aa.cd[i],
+                                              expected_ptr_aa.cd[i],
+                                              eps_tol));
+            }
+            if (!approximately_equal_z(result_ptr_as.cd[i],
+                                       expected_ptr_as.cd[i],
+                                       eps_tol)) {
+              printf("Discrepancy for as at #%d: got %.15g%+.15gi "
+                     "but expected %.15g%+.15gi\n",
+                     i+1, result_ptr_as.cd[i].real,
+                     result_ptr_as.cd[i].imaginary,
+                     expected_ptr_as.cd[i].real,
+                     expected_ptr_as.cd[i].imaginary);
+              printf("EXPECT: ");
+              lux_dump_one(expected_sym_as, 2);
+              printf("GOT   : ");
+              lux_dump_one(result_sym_as, 2);
+              ck_assert(approximately_equal_z(result_ptr_as.cd[i],
+                                              expected_ptr_as.cd[i],
+                                              eps_tol));
+            }
+            if (!approximately_equal_z(result_ptr_sa.cd[i],
+                                       expected_ptr_sa.cd[i],
+                                       eps_tol)) {
+              printf("Discrepancy for sa at #%d: got %.15g%+.15gi "
+                     "but expected %.15g%+.15gi\n",
+                     i+1, result_ptr_sa.cd[i].real,
+                     result_ptr_sa.cd[i].imaginary,
+                     expected_ptr_sa.cd[i].real,
+                     expected_ptr_sa.cd[i].imaginary);
+              printf("EXPECT: ");
+              lux_dump_one(expected_sym_sa, 2);
+              printf("GOT   : ");
+              lux_dump_one(result_sym_sa, 2);
+              ck_assert(approximately_equal_z(result_ptr_sa.cd[i],
+                                              expected_ptr_sa.cd[i],
+                                              eps_tol));
+            }
+          }
+          break;
         }
+
         zap(result_sym_aa);
         zap(result_sym_as);
+        zap(result_sym_sa);
         zap(expected_sym_aa);
         zap(expected_sym_as);
+        zap(expected_sym_sa);
       }
       zap(op_sym_aa);
       zap(op_sym_as);
+      zap(op_sym_sa);
       zap(rhs_sym_aa);
       zap(rhs_sym_as);
+      zap(rhs_sym_sa);
       zap(lhs_sym_aa);
       zap(lhs_sym_as);
+      zap(lhs_sym_sa);
       zap(lhs_basic_sym_aa);
       zap(rhs_basic_sym_aa);
       zap(lhs_basic_sym_as);
       zap(rhs_basic_sym_as);
+      zap(lhs_basic_sym_sa);
+      zap(rhs_basic_sym_sa);
     }
   }
 }

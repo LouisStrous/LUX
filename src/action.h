@@ -66,14 +66,24 @@ int32_t 	dereferenceScalPointer(int32_t), scalar_scratch(int32_t),
   to_scratch_array(int32_t, int32_t, int32_t, int32_t *), get_dims(int32_t *, int32_t *, int32_t *),
   listNumElements(int32_t), lux_zero(int32_t, int32_t []),
   cubic_spline_tables(void *, int32_t, int32_t, void *, int32_t, int32_t, int32_t,
-		      uint8_t, uint8_t, csplineInfo *), 
+		      uint8_t, uint8_t, csplineInfo *),
   numerical_clone(int32_t, Symboltype),
   redef_array(int32_t, int32_t, int32_t, int32_t *), string_scratch(int32_t),
   transferAll(int32_t symbol), transfer(int32_t), copySym(int32_t),
   scalar_scratch_copy(int32_t), redef_scalar(int32_t, int32_t, void *),
   redef_string(int32_t, int32_t), float_arg_stat(int32_t, float *),
-  Sprintf(char *, char *, ...), translateEscapes(char *),
+  Sprintf(char *, char *, ...), my_fprintf(FILE *, char *, ...),
+  translateEscapes(char *),
   nextchar(FILE *), unnextchar(int32_t, FILE *);
+
+int32_t approximately_equal(double, double, double),
+  approximately_equal_f(float, float, float),
+  essentially_equal(double, double, double),
+  essentially_equal_f(float, float, float);
+int32_t approximately_equal_z(doubleComplex, doubleComplex, double),
+  approximately_equal_z_f(floatComplex, floatComplex, float),
+  essentially_equal_z(doubleComplex, doubleComplex, double),
+  essentially_equal_z_f(floatComplex, floatComplex, float);
 
 int32_t	standardLoop(int32_t, int32_t, int32_t, int32_t, loopInfo *, pointer *, int32_t *,
 		     loopInfo *, pointer *),

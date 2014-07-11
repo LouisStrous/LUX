@@ -2479,3 +2479,55 @@ double hypot_stride(double *data, size_t count, size_t stride)
 }
 BIND(hypot_stride, d_sd_iDaLarDxq_000_2, f, HYPOT, 1, 2, ":AXIS");
 /*--------------------------------------------------------------------*/
+int32_t approximately_equal(double a, double b, double eps)
+{
+  return fabs(a - b) <= (fabs(a) < fabs(b)? fabs(b): fabs(a))*DBL_EPSILON*eps;
+}
+/*--------------------------------------------------------------------*/
+int32_t approximately_equal_z(doubleComplex a, doubleComplex b, double eps)
+{
+  double md = hypot(a.real - b.real, a.imaginary - b.imaginary);
+  double ma = hypot(a.real, a.imaginary);
+  double mb = hypot(b.real, b.imaginary);
+  return md <= (ma < mb? mb: ma)*DBL_EPSILON*eps;
+}
+/*--------------------------------------------------------------------*/
+int32_t essentially_equal(double a, double b, double eps)
+{
+  return fabs(a - b) <= (fabs(a) > fabs(b)? fabs(b): fabs(a))*DBL_EPSILON*eps;
+}
+/*--------------------------------------------------------------------*/
+int32_t essentially_equal_z(doubleComplex a, doubleComplex b, double eps)
+{
+  double md = hypot(a.real - b.real, a.imaginary - b.imaginary);
+  double ma = hypot(a.real, a.imaginary);
+  double mb = hypot(b.real, b.imaginary);
+  return md <= (ma > mb? mb: ma)*DBL_EPSILON*eps;
+}
+/*--------------------------------------------------------------------*/
+int32_t approximately_equal_f(float a, float b, float eps)
+{
+  return fabs(a - b) <= (fabs(a) < fabs(b)? fabs(b): fabs(a))*FLT_EPSILON*eps;
+}
+/*--------------------------------------------------------------------*/
+int32_t approximately_equal_z_f(floatComplex a, floatComplex b, float eps)
+{
+  float md = hypot(a.real - b.real, a.imaginary - b.imaginary);
+  float ma = hypot(a.real, a.imaginary);
+  float mb = hypot(b.real, b.imaginary);
+  return md <= (ma < mb? mb: ma)*FLT_EPSILON*eps;
+}
+/*--------------------------------------------------------------------*/
+int32_t essentially_equal_f(float a, float b, float eps)
+{
+  return fabs(a - b) <= (fabs(a) > fabs(b)? fabs(b): fabs(a))*FLT_EPSILON*eps;
+}
+/*--------------------------------------------------------------------*/
+int32_t essentially_equal_z_f(floatComplex a, floatComplex b, float eps)
+{
+  float md = hypot(a.real - b.real, a.imaginary - b.imaginary);
+  float ma = hypot(a.real, a.imaginary);
+  float mb = hypot(b.real, b.imaginary);
+  return md <= (ma > mb? mb: ma)*FLT_EPSILON*eps;
+}
+/*--------------------------------------------------------------------*/

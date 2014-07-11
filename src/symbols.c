@@ -68,16 +68,17 @@ Symboltype combinedType(Symboltype type1, Symboltype type2)
 {
   static Symboltype const combined[LUX_NO_SYMBOLTYPE][LUX_NO_SYMBOLTYPE] =
     {
-      {    LUX_INT8,    LUX_INT16,    LUX_INT32,    LUX_INT64,   LUX_FLOAT,  LUX_DOUBLE, 0, 0,  LUX_CFLOAT, LUX_CDOUBLE },
-      {    LUX_INT16,    LUX_INT16,    LUX_INT32,    LUX_INT64,   LUX_FLOAT,  LUX_DOUBLE, 0, 0,  LUX_CFLOAT, LUX_CDOUBLE },
-      {    LUX_INT32,    LUX_INT32,    LUX_INT32,    LUX_INT64,   LUX_FLOAT,  LUX_DOUBLE, 0, 0,  LUX_CFLOAT, LUX_CDOUBLE },
-      {    LUX_INT64,    LUX_INT64,    LUX_INT64,    LUX_INT64,  LUX_DOUBLE,  LUX_DOUBLE, 0, 0, LUX_CDOUBLE, LUX_CDOUBLE },
-      {   LUX_FLOAT,   LUX_FLOAT,   LUX_FLOAT,  LUX_DOUBLE,   LUX_FLOAT,  LUX_DOUBLE, 0, 0,  LUX_CFLOAT, LUX_CDOUBLE },
-      {  LUX_DOUBLE,  LUX_DOUBLE,  LUX_DOUBLE,  LUX_DOUBLE,  LUX_DOUBLE,  LUX_DOUBLE, 0, 0, LUX_CDOUBLE, LUX_CDOUBLE },
-      { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-      { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-      {  LUX_CFLOAT,  LUX_CFLOAT,  LUX_CFLOAT, LUX_CDOUBLE,  LUX_CFLOAT, LUX_CDOUBLE, 0, 0,  LUX_CFLOAT, LUX_CDOUBLE },
-      { LUX_CDOUBLE, LUX_CDOUBLE, LUX_CDOUBLE, LUX_CDOUBLE, LUX_CDOUBLE, LUX_CDOUBLE, 0, 0, LUX_CDOUBLE, LUX_CDOUBLE },
+      {    LUX_INT8,   LUX_INT16,    LUX_INT32,   LUX_INT64,  LUX_FLOAT,  LUX_DOUBLE, 0, 0, 0,  LUX_CFLOAT, LUX_CDOUBLE }, /* LUX_INT8 */
+      {   LUX_INT16,   LUX_INT16,    LUX_INT32,   LUX_INT64,  LUX_FLOAT,  LUX_DOUBLE, 0, 0, 0,  LUX_CFLOAT, LUX_CDOUBLE }, /* LUX_INT16 */
+      {   LUX_INT32,   LUX_INT32,    LUX_INT32,   LUX_INT64,  LUX_FLOAT,  LUX_DOUBLE, 0, 0, 0,  LUX_CFLOAT, LUX_CDOUBLE }, /* LUX_INT32 */
+      {   LUX_INT64,   LUX_INT64,    LUX_INT64,   LUX_INT64, LUX_DOUBLE,  LUX_DOUBLE, 0, 0, 0, LUX_CDOUBLE, LUX_CDOUBLE }, /* LUX_INT64 */
+      {   LUX_FLOAT,   LUX_FLOAT,   LUX_FLOAT,  LUX_DOUBLE,   LUX_FLOAT,  LUX_DOUBLE, 0, 0, 0,  LUX_CFLOAT, LUX_CDOUBLE }, /* LUX_FLOAT */
+      {  LUX_DOUBLE,  LUX_DOUBLE,  LUX_DOUBLE,  LUX_DOUBLE,  LUX_DOUBLE,  LUX_DOUBLE, 0, 0, 0, LUX_CDOUBLE, LUX_CDOUBLE }, /* LUX_DOUBLE */
+      {           0,           0,           0,           0,           0,           0, 0, 0, 0,           0,           0 }, /* not numerical */
+      {           0,           0,           0,           0,           0,           0, 0, 0, 0,           0,           0 }, /* not numerical */
+      {           0,           0,           0,           0,           0,           0, 0, 0, 0,           0,           0 }, /* not numerical */
+      {  LUX_CFLOAT,  LUX_CFLOAT,  LUX_CFLOAT, LUX_CDOUBLE,  LUX_CFLOAT, LUX_CDOUBLE, 0, 0, 0,  LUX_CFLOAT, LUX_CDOUBLE }, /* LUX_CFLOAT */
+      { LUX_CDOUBLE, LUX_CDOUBLE, LUX_CDOUBLE, LUX_CDOUBLE, LUX_CDOUBLE, LUX_CDOUBLE, 0, 0, 0, LUX_CDOUBLE, LUX_CDOUBLE }, /* LUX_CDOUBLE */
     };
   assert(type1 >= 0 && type1 < LUX_NO_SYMBOLTYPE);
   assert(type2 >= 0 && type2 < LUX_NO_SYMBOLTYPE);

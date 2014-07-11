@@ -4386,6 +4386,8 @@ void symbolInitialization(void)
  f_fix("#MIN_FLOAT", 	FLT_MIN);
  d_fix("#MIN_DOUBLE", 	DBL_MIN);
  l_fix("#MAX_DIMS",	MAX_DIMS);
+ f_fix("#EPS_FLOAT",    FLT_EPSILON);
+ d_fix("#EPS_DOUBLE",   DBL_EPSILON);
 #if HAVE_LIBX11
  l_fix("#NUM_WINDOWS",  MAXWINDOWS - 1);
  l_fix("#NUM_PIXMAPS",  MAXPIXMAPS - 1);

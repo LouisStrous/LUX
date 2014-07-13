@@ -10487,10 +10487,11 @@ void lux_max(void)
           value2.d;
           break;
     case LUX_CFLOAT:
-      /* if complex numbers are involved, then we compare the absolute
-         values.  LS 8dec98 */
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        if (fabs(*lp.b) > hypot(rp.cf->real, rp.cf->imaginary)) {
+        if (*lp.b > rp.cf->real + rp.cf->imaginary) {
           tp.cf->real = *lp.b;
           tp.cf->imaginary = 0;
         } else {
@@ -10503,8 +10504,11 @@ void lux_max(void)
       }
       break;
     case LUX_CDOUBLE:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        if (fabs(*lp.b) > hypot(rp.cd->real, rp.cd->imaginary)) {
+        if (*lp.b > rp.cd->real + rp.cd->imaginary) {
           tp.cd->real = *lp.b;
           tp.cd->imaginary = 0;
         } else {
@@ -10559,10 +10563,11 @@ void lux_max(void)
           value2.d;
           break;
     case LUX_CFLOAT:
-      /* if complex numbers are involved, then we compare the absolute
-         values.  LS 8dec98 */
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        if (fabs(*lp.w) > hypot(rp.cf->real, rp.cf->imaginary)) {
+        if (*lp.w > rp.cf->real + rp.cf->imaginary) {
           tp.cf->real = *lp.w;
           tp.cf->imaginary = 0;
         } else {
@@ -10575,8 +10580,11 @@ void lux_max(void)
       }
       break;
     case LUX_CDOUBLE:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        if (fabs(*lp.w) > hypot(rp.cd->real, rp.cd->imaginary)) {
+        if (*lp.w > rp.cd->real + rp.cd->imaginary) {
           tp.cd->real = *lp.w;
           tp.cd->imaginary = 0;
         } else {
@@ -10631,10 +10639,11 @@ void lux_max(void)
           value2.d;
           break;
     case LUX_CFLOAT:
-      /* if complex numbers are involved, then we compare the absolute
-         values.  LS 8dec98 */
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        if (fabs(*lp.l) > hypot(rp.cf->real, rp.cf->imaginary)) {
+        if (*lp.l > rp.cf->real + rp.cf->imaginary) {
           tp.cf->real = *lp.l;
           tp.cf->imaginary = 0;
         } else {
@@ -10647,8 +10656,11 @@ void lux_max(void)
       }
       break;
     case LUX_CDOUBLE:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        if (fabs(*lp.l) > hypot(rp.cd->real, rp.cd->imaginary)) {
+        if (*lp.l > rp.cd->real + rp.cd->imaginary) {
           tp.cd->real = *lp.l;
           tp.cd->imaginary = 0;
         } else {
@@ -10703,10 +10715,11 @@ void lux_max(void)
           value2.d;
           break;
     case LUX_CFLOAT:
-      /* if complex numbers are involved, then we compare the absolute
-         values.  LS 8dec98 */
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        if (fabs(*lp.q) > hypot(rp.cf->real, rp.cf->imaginary)) {
+        if (*lp.q > rp.cf->real + rp.cf->imaginary) {
           tp.cd->real = *lp.q;
           tp.cd->imaginary = 0;
         } else {
@@ -10719,8 +10732,11 @@ void lux_max(void)
       }
       break;
     case LUX_CDOUBLE:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        if (fabs(*lp.q) > hypot(rp.cd->real, rp.cd->imaginary)) {
+        if (*lp.q > rp.cd->real + rp.cd->imaginary) {
           tp.cd->real = *lp.q;
           tp.cd->imaginary = 0;
         } else {
@@ -10775,10 +10791,11 @@ void lux_max(void)
           value2.d;
           break;
     case LUX_CFLOAT:
-      /* if complex numbers are involved, then we compare the absolute
-         values.  LS 8dec98 */
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        if (fabs(*lp.f) > hypot(rp.cf->real, rp.cf->imaginary)) {
+        if (*lp.f > rp.cf->real + rp.cf->imaginary) {
           tp.cf->real = *lp.f;
           tp.cf->imaginary = 0;
         } else {
@@ -10791,8 +10808,11 @@ void lux_max(void)
       }
       break;
     case LUX_CDOUBLE:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        if (fabs(*lp.f) > hypot(rp.cd->real, rp.cd->imaginary)) {
+        if (*lp.f > rp.cd->real + rp.cd->imaginary) {
           tp.cd->real = *lp.f;
           tp.cd->imaginary = 0;
         } else {
@@ -10847,10 +10867,11 @@ void lux_max(void)
           value2.d;
           break;
     case LUX_CFLOAT:
-      /* if complex numbers are involved, then we compare the absolute
-         values.  LS 8dec98 */
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        if (fabs(*lp.d) > hypot(rp.cf->real, rp.cf->imaginary)) {
+        if (*lp.d > rp.cf->real + rp.cf->imaginary) {
           tp.cd->real = *lp.d;
           tp.cd->imaginary = 0;
         } else {
@@ -10863,8 +10884,11 @@ void lux_max(void)
       }
       break;
     case LUX_CDOUBLE:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        if (fabs(*lp.d) > hypot(rp.cd->real, rp.cd->imaginary)) {
+        if (*lp.d > rp.cd->real + rp.cd->imaginary) {
           tp.cd->real = *lp.d;
           tp.cd->imaginary = 0;
         } else {
@@ -10881,11 +10905,13 @@ void lux_max(void)
     }
     break;
   case LUX_CFLOAT:
-    /* if complex numbers are involved, then we compare absolute values */
+    /* we want +1 > -1 and also +i > -i; we get that by comparing the
+       projections onto the line in the direction of 1+i.  (a+bi) >
+       (c+di) if (a+b) > (c+d) */
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--) {
-        if (hypot(lp.cf->real, lp.cf->imaginary) > fabs(*rp.b)) {
+        if (lp.cf->real + lp.cf->imaginary > *rp.b) {
           tp.cf->real = lp.cf->real;
           tp.cf->imaginary = rp.cf->imaginary;
         } else {
@@ -10899,7 +10925,7 @@ void lux_max(void)
       break;
     case LUX_INT16:
       while (nRepeat--) {
-        if (hypot(lp.cf->real, lp.cf->imaginary) > fabs(*rp.w)) {
+        if (lp.cf->real + lp.cf->imaginary > *rp.w) {
           tp.cf->real = lp.cf->real;
           tp.cf->imaginary = rp.cf->imaginary;
         } else {
@@ -10913,7 +10939,7 @@ void lux_max(void)
       break;
     case LUX_INT32:
       while (nRepeat--) {
-        if (hypot(lp.cf->real, lp.cf->imaginary) > fabs(*rp.l)) {
+        if (lp.cf->real + lp.cf->imaginary > *rp.l) {
           tp.cf->real = lp.cf->real;
           tp.cf->imaginary = rp.cf->imaginary;
         } else {
@@ -10927,7 +10953,7 @@ void lux_max(void)
       break;
     case LUX_INT64:
       while (nRepeat--) {
-        if (hypot(lp.cf->real, lp.cf->imaginary) > fabs(*rp.q)) {
+        if (lp.cf->real + lp.cf->imaginary > *rp.q) {
           tp.cd->real = lp.cf->real;
           tp.cd->imaginary = lp.cf->imaginary;
         } else {
@@ -10941,7 +10967,7 @@ void lux_max(void)
       break;
     case LUX_FLOAT:
       while (nRepeat--) {
-        if (hypot(lp.cf->real, lp.cf->imaginary) > fabs(*rp.f)) {
+        if (lp.cf->real + lp.cf->imaginary > *rp.f) {
           tp.cf->real = lp.cf->real;
           tp.cf->imaginary = lp.cf->imaginary;
         } else {
@@ -10955,7 +10981,7 @@ void lux_max(void)
       break;
     case LUX_DOUBLE:
       while (nRepeat--) {
-        if (hypot(lp.cf->real, lp.cf->imaginary) > fabs(*rp.d)) {
+        if (lp.cf->real + lp.cf->imaginary > *rp.d) {
           tp.cd->real = lp.cf->real;
           tp.cd->imaginary = lp.cf->imaginary;
         } else {
@@ -10969,8 +10995,8 @@ void lux_max(void)
       break;
     case LUX_CFLOAT:
       while (nRepeat--) {
-        if (hypot(lp.cf->real, lp.cf->imaginary)
-            > hypot(rp.cf->real, rp.cf->imaginary)){
+        if (lp.cf->real + lp.cf->imaginary
+            > rp.cf->real + rp.cf->imaginary) {
           tp.cf->real = lp.cf->real;
           tp.cf->imaginary = lp.cf->imaginary;
         } else {
@@ -10984,8 +11010,8 @@ void lux_max(void)
       break;
     case LUX_CDOUBLE:
       while (nRepeat--) {
-        if (hypot(lp.cf->real, lp.cf->imaginary)
-            > hypot(rp.cd->real, rp.cd->imaginary)){
+        if (lp.cf->real + lp.cf->imaginary
+            > rp.cd->real + rp.cd->imaginary) {
           tp.cd->real = lp.cf->real;
           tp.cd->imaginary = lp.cf->imaginary;
         } else {
@@ -11002,11 +11028,13 @@ void lux_max(void)
     }
     break;
   case LUX_CDOUBLE:
-    /* if complex numbers are involved, then we compare absolute values */
+    /* we want +1 > -1 and also +i > -i; we get that by comparing the
+       projections onto the line in the direction of 1+i.  (a+bi) >
+       (c+di) if (a+b) > (c+d) */
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--) {
-        if (hypot(lp.cd->real, lp.cd->imaginary) > fabs(*rp.b)) {
+        if (lp.cd->real + lp.cd->imaginary > *rp.b) {
           tp.cd->real = lp.cd->real;
           tp.cd->imaginary = lp.cd->imaginary;
         } else {
@@ -11020,7 +11048,7 @@ void lux_max(void)
       break;
     case LUX_INT16:
       while (nRepeat--) {
-        if (hypot(lp.cd->real, lp.cd->imaginary) > fabs(*rp.w)) {
+        if (lp.cd->real + lp.cd->imaginary > *rp.w) {
           tp.cd->real = lp.cd->real;
           tp.cd->imaginary = lp.cd->imaginary;
         } else {
@@ -11034,7 +11062,7 @@ void lux_max(void)
       break;
     case LUX_INT32:
       while (nRepeat--) {
-        if (hypot(lp.cd->real, lp.cd->imaginary) > fabs(*rp.l)) {
+        if (lp.cd->real + lp.cd->imaginary > *rp.l) {
           tp.cd->real = lp.cd->real;
           tp.cd->imaginary = lp.cd->imaginary;
         } else {
@@ -11048,7 +11076,7 @@ void lux_max(void)
       break;
     case LUX_INT64:
       while (nRepeat--) {
-        if (hypot(lp.cd->real, lp.cd->imaginary) > fabs(*rp.q)) {
+        if (lp.cd->real + lp.cd->imaginary > *rp.q) {
           tp.cd->real = lp.cd->real;
           tp.cd->imaginary = lp.cd->imaginary;
         } else {
@@ -11062,7 +11090,7 @@ void lux_max(void)
       break;
     case LUX_FLOAT:
       while (nRepeat--) {
-        if (hypot(lp.cd->real, lp.cd->imaginary) > fabs(*rp.f)) {
+        if (lp.cd->real + lp.cd->imaginary > *rp.f) {
           tp.cd->real = lp.cd->real;
           tp.cd->imaginary = lp.cd->imaginary;
         } else {
@@ -11076,7 +11104,7 @@ void lux_max(void)
       break;
     case LUX_DOUBLE:
       while (nRepeat--) {
-        if (hypot(lp.cd->real, lp.cd->imaginary) > fabs(*rp.d)) {
+        if (lp.cd->real + lp.cd->imaginary > *rp.d) {
           tp.cd->real = lp.cd->real;
           tp.cd->imaginary = lp.cd->imaginary;
         } else {
@@ -11090,8 +11118,8 @@ void lux_max(void)
       break;
     case LUX_CFLOAT:
       while (nRepeat--) {
-        if (hypot(lp.cd->real, lp.cd->imaginary)
-            > hypot(rp.cf->real, rp.cf->imaginary)) {
+        if (lp.cd->real + lp.cd->imaginary
+            > rp.cf->real + rp.cf->imaginary) {
           tp.cd->real = lp.cd->real;
           tp.cd->imaginary = lp.cd->imaginary;
         } else {
@@ -11105,8 +11133,8 @@ void lux_max(void)
       break;
     case LUX_CDOUBLE:
       while (nRepeat--) {
-        if (hypot(lp.cd->real, lp.cd->imaginary)
-            > hypot(rp.cd->real, rp.cd->imaginary)){
+        if (lp.cd->real + lp.cd->imaginary
+            > rp.cd->real + rp.cd->imaginary) {
           tp.cd->real = lp.cd->real;
           tp.cd->imaginary = lp.cd->imaginary;
         } else {
@@ -11178,9 +11206,12 @@ void lux_max_as(void)
           value2.d;
       break;
     case LUX_CFLOAT:
-      value2.d = hypot(rp.cf->real, rp.cf->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value2.d = rp.cf->real + rp.cf->imaginary;
       while (nRepeat--) {
-        if (fabs(*lp.b) > value2.d) {
+        if (*lp.b > value2.d) {
           tp.cf->real = *lp.b;
           tp.cf->imaginary = 0;
         } else {
@@ -11192,9 +11223,12 @@ void lux_max_as(void)
       }
       break;
     case LUX_CDOUBLE:
-      value2.d = hypot(rp.cd->real, rp.cd->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value2.d = rp.cd->real + rp.cd->imaginary;
       while (nRepeat--) {
-        if (fabs(*lp.b) > value2.d) {
+        if (*lp.b > value2.d) {
           tp.cd->real = *lp.b;
           tp.cd->imaginary = 0;
         } else {
@@ -11254,9 +11288,12 @@ void lux_max_as(void)
           value2.d;
       break;
     case LUX_CFLOAT:
-      value2.d = hypot(rp.cf->real, rp.cf->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value2.d = rp.cf->real + rp.cf->imaginary;
       while (nRepeat--) {
-        if (fabs(*lp.w) > value2.d) {
+        if (*lp.w > value2.d) {
           tp.cf->real = *lp.w;
           tp.cf->imaginary = 0;
         } else {
@@ -11268,9 +11305,12 @@ void lux_max_as(void)
       }
       break;
     case LUX_CDOUBLE:
-      value2.d = hypot(rp.cd->real, rp.cd->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value2.d = rp.cd->real + rp.cd->imaginary;
       while (nRepeat--) {
-        if (fabs(*lp.w) > value2.d) {
+        if (*lp.w > value2.d) {
           tp.cd->real = *lp.w;
           tp.cd->imaginary = 0;
         } else {
@@ -11330,9 +11370,12 @@ void lux_max_as(void)
           value2.d;
       break;
     case LUX_CFLOAT:
-      value2.d = hypot(rp.cf->real, rp.cf->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value2.d = rp.cf->real + rp.cf->imaginary;
       while (nRepeat--) {
-        if (fabs(*lp.l) > value2.d) {
+        if (*lp.l > value2.d) {
           tp.cf->real = *lp.l;
           tp.cf->imaginary = 0;
         } else {
@@ -11344,9 +11387,12 @@ void lux_max_as(void)
       }
       break;
     case LUX_CDOUBLE:
-      value2.d = hypot(rp.cd->real, rp.cd->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value2.d = rp.cd->real + rp.cd->imaginary;
       while (nRepeat--) {
-        if (fabs(*lp.l) > value2.d) {
+        if (*lp.l > value2.d) {
           tp.cd->real = *lp.l;
           tp.cd->imaginary = 0;
         } else {
@@ -11406,9 +11452,12 @@ void lux_max_as(void)
           value2.d;
       break;
     case LUX_CFLOAT:
-      value2.d = hypot(rp.cf->real, rp.cf->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value2.d = rp.cf->real + rp.cf->imaginary;
       while (nRepeat--) {
-        if (fabs(*lp.q) > value2.d) {
+        if (*lp.q > value2.d) {
           tp.cd->real = *lp.q;
           tp.cd->imaginary = 0;
         } else {
@@ -11420,9 +11469,12 @@ void lux_max_as(void)
       }
       break;
     case LUX_CDOUBLE:
-      value2.d = hypot(rp.cd->real, rp.cd->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value2.d = rp.cd->real + rp.cd->imaginary;
       while (nRepeat--) {
-        if (fabs(*lp.q) > value2.d) {
+        if (*lp.q > value2.d) {
           tp.cd->real = *lp.q;
           tp.cd->imaginary = 0;
         } else {
@@ -11482,9 +11534,12 @@ void lux_max_as(void)
           value2.d;
       break;
     case LUX_CFLOAT:
-      value2.d = hypot(rp.cf->real, rp.cf->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value2.d = rp.cf->real + rp.cf->imaginary;
       while (nRepeat--) {
-        if (fabs(*lp.f) > value2.d) {
+        if (*lp.f > value2.d) {
           tp.cf->real = *lp.f;
           tp.cf->imaginary = 0;
         } else {
@@ -11496,9 +11551,12 @@ void lux_max_as(void)
       }
       break;
     case LUX_CDOUBLE:
-      value2.d = hypot(rp.cd->real, rp.cd->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value2.d = rp.cd->real + rp.cd->imaginary;
       while (nRepeat--) {
-        if (fabs(*lp.f) > value2.d) {
+        if (*lp.f > value2.d) {
           tp.cd->real = *lp.f;
           tp.cd->imaginary = 0;
         } else {
@@ -11558,9 +11616,12 @@ void lux_max_as(void)
           value2.d;
       break;
     case LUX_CFLOAT:
-      value2.d = hypot(rp.cf->real, rp.cf->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value2.d = rp.cf->real + rp.cf->imaginary;
       while (nRepeat--) {
-        if (fabs(*lp.d) > value2.d) {
+        if (*lp.d > value2.d) {
           tp.cd->real = *lp.d;
           tp.cd->imaginary = 0;
         } else {
@@ -11572,9 +11633,12 @@ void lux_max_as(void)
       }
       break;
     case LUX_CDOUBLE:
-      value2.d = hypot(rp.cd->real, rp.cd->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value2.d = rp.cd->real + rp.cd->imaginary;
       while (nRepeat--) {
-        if (fabs(*lp.d) > value2.d) {
+        if (*lp.d > value2.d) {
           tp.cd->real = *lp.d;
           tp.cd->imaginary = 0;
         } else {
@@ -11590,11 +11654,14 @@ void lux_max_as(void)
     }
     break;
   case LUX_CFLOAT:
+    /* we want +1 > -1 and also +i > -i; we get that by comparing the
+       projections onto the line in the direction of 1+i.  (a+bi) >
+       (c+di) if (a+b) > (c+d) */
     switch (rhsType) {
     case LUX_INT8:
-      value2.d = fabs(*rp.b);
+      value2.d = *rp.b;
       while (nRepeat--) {
-        if (hypot(lp.cf->real, lp.cf->imaginary) > value2.d) {
+        if (lp.cf->real + lp.cf->imaginary > value2.d) {
           tp.cf->real = lp.cf->real;
           tp.cf->imaginary = lp.cf->imaginary;
         } else {
@@ -11606,9 +11673,9 @@ void lux_max_as(void)
       }
       break;
     case LUX_INT16:
-      value2.d = fabs(*rp.w);
+      value2.d = *rp.w;
       while (nRepeat--) {
-        if (hypot(lp.cf->real, lp.cf->imaginary) > value2.d) {
+        if (lp.cf->real + lp.cf->imaginary > value2.d) {
           tp.cf->real = lp.cf->real;
           tp.cf->imaginary = lp.cf->imaginary;
         } else {
@@ -11620,9 +11687,9 @@ void lux_max_as(void)
       }
       break;
     case LUX_INT32:
-      value2.d = fabs(*rp.l);
+      value2.d = *rp.l;
       while (nRepeat--) {
-        if (hypot(lp.cf->real, lp.cf->imaginary) > value2.d) {
+        if (lp.cf->real + lp.cf->imaginary > value2.d) {
           tp.cf->real = lp.cf->real;
           tp.cf->imaginary = lp.cf->imaginary;
         } else {
@@ -11634,9 +11701,9 @@ void lux_max_as(void)
       }
       break;
     case LUX_INT64:
-      value2.d = fabs(*rp.q);
+      value2.d = *rp.q;
       while (nRepeat--) {
-        if (hypot(lp.cf->real, lp.cf->imaginary) > value2.d) {
+        if (lp.cf->real + lp.cf->imaginary > value2.d) {
           tp.cd->real = lp.cf->real;
           tp.cd->imaginary = lp.cf->imaginary;
         } else {
@@ -11648,9 +11715,9 @@ void lux_max_as(void)
       }
       break;
     case LUX_FLOAT:
-      value2.d = fabs(*rp.f);
+      value2.d = *rp.f;
       while (nRepeat--) {
-        if (hypot(lp.cf->real, lp.cf->imaginary) > value2.d) {
+        if (lp.cf->real + lp.cf->imaginary > value2.d) {
           tp.cf->real = lp.cf->real;
           tp.cf->imaginary = lp.cf->imaginary;
         } else {
@@ -11662,9 +11729,9 @@ void lux_max_as(void)
       }
       break;
     case LUX_DOUBLE:
-      value2.d = fabs(*rp.d);
+      value2.d = *rp.d;
       while (nRepeat--) {
-        if (hypot(lp.cf->real, lp.cf->imaginary) > value2.d) {
+        if (lp.cf->real + lp.cf->imaginary > value2.d) {
           tp.cd->real = lp.cf->real;
           tp.cd->imaginary = lp.cf->imaginary;
         } else {
@@ -11676,9 +11743,9 @@ void lux_max_as(void)
       }
       break;
     case LUX_CFLOAT:
-      value2.d = hypot(rp.cf->real, rp.cf->imaginary);
+      value2.d = rp.cf->real + rp.cf->imaginary;
       while (nRepeat--) {
-        if (hypot(lp.cf->real, lp.cf->imaginary) > value2.d) {
+        if (lp.cf->real + lp.cf->imaginary > value2.d) {
           tp.cf->real = lp.cf->real;
           tp.cf->imaginary = lp.cf->imaginary;
         } else {
@@ -11690,9 +11757,9 @@ void lux_max_as(void)
       }
       break;
     case LUX_CDOUBLE:
-      value2.d = hypot(rp.cd->real, rp.cd->imaginary);
+      value2.d = rp.cd->real + rp.cd->imaginary;
       while (nRepeat--) {
-        if (hypot(lp.cf->real, lp.cf->imaginary) > value2.d) {
+        if (lp.cf->real + lp.cf->imaginary > value2.d) {
           tp.cd->real = lp.cf->real;
           tp.cd->imaginary = lp.cf->imaginary;
         } else {
@@ -11708,11 +11775,14 @@ void lux_max_as(void)
     }
     break;
   case LUX_CDOUBLE:
+    /* we want +1 > -1 and also +i > -i; we get that by comparing the
+       projections onto the line in the direction of 1+i.  (a+bi) >
+       (c+di) if (a+b) > (c+d) */
     switch (rhsType) {
     case LUX_INT8:
-      value2.d = fabs(*rp.b);
+      value2.d = *rp.b;
       while (nRepeat--) {
-        if (hypot(lp.cd->real, lp.cd->imaginary) > value2.d) {
+        if (lp.cd->real + lp.cd->imaginary > value2.d) {
           tp.cd->real = lp.cd->real;
           tp.cd->imaginary = lp.cd->imaginary;
         } else {
@@ -11724,9 +11794,9 @@ void lux_max_as(void)
       }
       break;
     case LUX_INT16:
-      value2.d = fabs(*rp.w);
+      value2.d = *rp.w;
       while (nRepeat--) {
-        if (hypot(lp.cd->real, lp.cd->imaginary) > value2.d) {
+        if (lp.cd->real + lp.cd->imaginary > value2.d) {
           tp.cd->real = lp.cd->real;
           tp.cd->imaginary = lp.cd->imaginary;
         } else {
@@ -11738,9 +11808,9 @@ void lux_max_as(void)
       }
       break;
     case LUX_INT32:
-      value2.d = fabs(*rp.l);
+      value2.d = *rp.l;
       while (nRepeat--) {
-        if (hypot(lp.cd->real, lp.cd->imaginary) > value2.d) {
+        if (lp.cd->real + lp.cd->imaginary > value2.d) {
           tp.cd->real = lp.cd->real;
           tp.cd->imaginary = lp.cd->imaginary;
         } else {
@@ -11752,9 +11822,9 @@ void lux_max_as(void)
       }
       break;
     case LUX_INT64:
-      value2.d = fabs(*rp.q);
+      value2.d = *rp.q;
       while (nRepeat--) {
-        if (hypot(lp.cd->real, lp.cd->imaginary) > value2.d) {
+        if (lp.cd->real + lp.cd->imaginary > value2.d) {
           tp.cd->real = lp.cd->real;
           tp.cd->imaginary = lp.cd->imaginary;
         } else {
@@ -11766,9 +11836,9 @@ void lux_max_as(void)
       }
       break;
     case LUX_FLOAT:
-      value2.d = fabs(*rp.f);
+      value2.d = *rp.f;
       while (nRepeat--) {
-        if (hypot(lp.cd->real, lp.cd->imaginary) > value2.d) {
+        if (lp.cd->real + lp.cd->imaginary > value2.d) {
           tp.cd->real = lp.cd->real;
           tp.cd->imaginary = lp.cd->imaginary;
         } else {
@@ -11780,9 +11850,9 @@ void lux_max_as(void)
       }
       break;
     case LUX_DOUBLE:
-      value2.d = fabs(*rp.d);
+      value2.d = *rp.d;
       while (nRepeat--) {
-        if (hypot(lp.cd->real, lp.cd->imaginary) > value2.d) {
+        if (lp.cd->real + lp.cd->imaginary > value2.d) {
           tp.cd->real = lp.cd->real;
           tp.cd->imaginary = lp.cd->imaginary;
         } else {
@@ -11794,9 +11864,9 @@ void lux_max_as(void)
       }
       break;
     case LUX_CFLOAT:
-      value2.d = hypot(rp.cf->real, rp.cf->imaginary);
+      value2.d = rp.cf->real + rp.cf->imaginary;
       while (nRepeat--) {
-        if (hypot(lp.cd->real, lp.cd->imaginary) > value2.d) {
+        if (lp.cd->real + lp.cd->imaginary > value2.d) {
           tp.cd->real = lp.cd->real;
           tp.cd->imaginary = lp.cd->imaginary;
         } else {
@@ -11808,9 +11878,9 @@ void lux_max_as(void)
       }
       break;
     case LUX_CDOUBLE:
-      value2.d = hypot(rp.cd->real, rp.cd->imaginary);
+      value2.d = rp.cd->real + rp.cd->imaginary;
       while (nRepeat--) {
-        if (hypot(lp.cd->real, lp.cd->imaginary) > value2.d) {
+        if (lp.cd->real + lp.cd->imaginary > value2.d) {
           tp.cd->real = lp.cd->real;
           tp.cd->imaginary = lp.cd->imaginary;
         } else {
@@ -11898,10 +11968,11 @@ void lux_min(void)
           value2.d;
           break;
     case LUX_CFLOAT:
-      /* if complex numbers are involved, then we compare the absolute
-         values.  LS 8dec98 */
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        if (fabs(*lp.b) < hypot(rp.cf->real, rp.cf->imaginary)) {
+        if (*lp.b < rp.cf->real + rp.cf->imaginary) {
           tp.cf->real = *lp.b;
           tp.cf->imaginary = 0;
         } else {
@@ -11914,8 +11985,11 @@ void lux_min(void)
       }
       break;
     case LUX_CDOUBLE:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        if (fabs(*lp.b) < hypot(rp.cd->real, rp.cd->imaginary)) {
+        if (*lp.b < rp.cd->real + rp.cd->imaginary) {
           tp.cd->real = *lp.b;
           tp.cd->imaginary = 0;
         } else {
@@ -11970,10 +12044,11 @@ void lux_min(void)
           value2.d;
           break;
     case LUX_CFLOAT:
-      /* if complex numbers are involved, then we compare the absolute
-         values.  LS 8dec98 */
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        if (fabs(*lp.w) < hypot(rp.cf->real, rp.cf->imaginary)) {
+        if (*lp.w < rp.cf->real + rp.cf->imaginary) {
           tp.cf->real = *lp.w;
           tp.cf->imaginary = 0;
         } else {
@@ -11986,8 +12061,11 @@ void lux_min(void)
       }
       break;
     case LUX_CDOUBLE:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        if (fabs(*lp.w) < hypot(rp.cd->real, rp.cd->imaginary)) {
+        if (*lp.w < rp.cd->real + rp.cd->imaginary) {
           tp.cd->real = *lp.w;
           tp.cd->imaginary = 0;
         } else {
@@ -12042,10 +12120,11 @@ void lux_min(void)
           value2.d;
           break;
     case LUX_CFLOAT:
-      /* if complex numbers are involved, then we compare the absolute
-         values.  LS 8dec98 */
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        if (fabs(*lp.l) < hypot(rp.cf->real, rp.cf->imaginary)) {
+        if (*lp.l < rp.cf->real + rp.cf->imaginary) {
           tp.cf->real = *lp.l;
           tp.cf->imaginary = 0;
         } else {
@@ -12058,8 +12137,11 @@ void lux_min(void)
       }
       break;
     case LUX_CDOUBLE:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        if (fabs(*lp.l) < hypot(rp.cd->real, rp.cd->imaginary)) {
+        if (*lp.l < rp.cd->real + rp.cd->imaginary) {
           tp.cd->real = *lp.l;
           tp.cd->imaginary = 0;
         } else {
@@ -12114,10 +12196,11 @@ void lux_min(void)
           value2.d;
           break;
     case LUX_CFLOAT:
-      /* if complex numbers are involved, then we compare the absolute
-         values.  LS 8dec98 */
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        if (fabs(*lp.q) < hypot(rp.cf->real, rp.cf->imaginary)) {
+        if (*lp.q < rp.cf->real + rp.cf->imaginary) {
           tp.cd->real = *lp.q;
           tp.cd->imaginary = 0;
         } else {
@@ -12130,8 +12213,11 @@ void lux_min(void)
       }
       break;
     case LUX_CDOUBLE:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        if (fabs(*lp.q) < hypot(rp.cd->real, rp.cd->imaginary)) {
+        if (*lp.q < rp.cd->real + rp.cd->imaginary) {
           tp.cd->real = *lp.q;
           tp.cd->imaginary = 0;
         } else {
@@ -12186,10 +12272,11 @@ void lux_min(void)
           value2.d;
           break;
     case LUX_CFLOAT:
-      /* if complex numbers are involved, then we compare the absolute
-         values.  LS 8dec98 */
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        if (fabs(*lp.f) < hypot(rp.cf->real, rp.cf->imaginary)) {
+        if (*lp.f < rp.cf->real + rp.cf->imaginary) {
           tp.cf->real = *lp.f;
           tp.cf->imaginary = 0;
         } else {
@@ -12202,8 +12289,11 @@ void lux_min(void)
       }
       break;
     case LUX_CDOUBLE:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        if (fabs(*lp.f) < hypot(rp.cd->real, rp.cd->imaginary)) {
+        if (*lp.f < rp.cd->real + rp.cd->imaginary) {
           tp.cd->real = *lp.f;
           tp.cd->imaginary = 0;
         } else {
@@ -12258,10 +12348,11 @@ void lux_min(void)
           value2.d;
           break;
     case LUX_CFLOAT:
-      /* if complex numbers are involved, then we compare the absolute
-         values.  LS 8dec98 */
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        if (fabs(*lp.d) < hypot(rp.cf->real, rp.cf->imaginary)) {
+        if (*lp.d < rp.cf->real + rp.cf->imaginary) {
           tp.cd->real = *lp.d;
           tp.cd->imaginary = 0;
         } else {
@@ -12274,8 +12365,11 @@ void lux_min(void)
       }
       break;
     case LUX_CDOUBLE:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        if (fabs(*lp.d) < hypot(rp.cd->real, rp.cd->imaginary)) {
+        if (*lp.d < rp.cd->real + rp.cd->imaginary) {
           tp.cd->real = *lp.d;
           tp.cd->imaginary = 0;
         } else {
@@ -12292,11 +12386,13 @@ void lux_min(void)
     }
     break;
   case LUX_CFLOAT:
-    /* if complex numbers are involved, then we compare absolute values */
+    /* we want +1 > -1 and also +i > -i; we get that by comparing the
+       projections onto the line in the direction of 1+i.  (a+bi) >
+       (c+di) if (a+b) > (c+d) */
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--) {
-        if (hypot(lp.cf->real, lp.cf->imaginary) < fabs(*rp.b)) {
+        if (lp.cf->real + lp.cf->imaginary < *rp.b) {
           tp.cf->real = lp.cf->real;
           tp.cf->imaginary = lp.cf->imaginary;
         } else {
@@ -12310,7 +12406,7 @@ void lux_min(void)
       break;
     case LUX_INT16:
       while (nRepeat--) {
-        if (hypot(lp.cf->real, lp.cf->imaginary) < fabs(*rp.w)) {
+        if (lp.cf->real + lp.cf->imaginary < *rp.w) {
           tp.cf->real = lp.cf->real;
           tp.cf->imaginary = lp.cf->imaginary;
         } else {
@@ -12324,7 +12420,7 @@ void lux_min(void)
       break;
     case LUX_INT32:
       while (nRepeat--) {
-        if (hypot(lp.cf->real, lp.cf->imaginary) < fabs(*rp.l)) {
+        if (lp.cf->real + lp.cf->imaginary < *rp.l) {
           tp.cf->real = lp.cf->real;
           tp.cf->imaginary = lp.cf->imaginary;
         } else {
@@ -12338,7 +12434,7 @@ void lux_min(void)
       break;
     case LUX_INT64:
       while (nRepeat--) {
-        if (hypot(lp.cf->real, lp.cf->imaginary) < fabs(*rp.q)) {
+        if (lp.cf->real + lp.cf->imaginary < *rp.q) {
           tp.cd->real = lp.cf->real;
           tp.cd->imaginary = lp.cf->imaginary;
         } else {
@@ -12352,7 +12448,7 @@ void lux_min(void)
       break;
     case LUX_FLOAT:
       while (nRepeat--) {
-        if (hypot(lp.cf->real, lp.cf->imaginary) < fabs(*rp.f)) {
+        if (lp.cf->real + lp.cf->imaginary < *rp.f) {
           tp.cf->real = lp.cf->real;
           tp.cf->imaginary = lp.cf->imaginary;
         } else {
@@ -12366,7 +12462,7 @@ void lux_min(void)
       break;
     case LUX_DOUBLE:
       while (nRepeat--) {
-        if (hypot(lp.cf->real, lp.cf->imaginary) < fabs(*rp.d)) {
+        if (lp.cf->real + lp.cf->imaginary < *rp.d) {
           tp.cd->real = lp.cf->real;
           tp.cd->imaginary = lp.cf->imaginary;
         } else {
@@ -12380,8 +12476,8 @@ void lux_min(void)
       break;
     case LUX_CFLOAT:
       while (nRepeat--) {
-        if (hypot(lp.cf->real, lp.cf->imaginary)
-            < hypot(rp.cf->real, rp.cf->imaginary)){
+        if (lp.cf->real + lp.cf->imaginary
+            < rp.cf->real + rp.cf->imaginary) {
           tp.cf->real = lp.cf->real;
           tp.cf->imaginary = lp.cf->imaginary;
         } else {
@@ -12395,8 +12491,8 @@ void lux_min(void)
       break;
     case LUX_CDOUBLE:
       while (nRepeat--) {
-        if (hypot(lp.cf->real, lp.cf->imaginary)
-            < hypot(rp.cd->real, rp.cd->imaginary)){
+        if (lp.cf->real + lp.cf->imaginary
+            < rp.cd->real + rp.cd->imaginary) {
           tp.cd->real = lp.cf->real;
           tp.cd->imaginary = lp.cf->imaginary;
         } else {
@@ -12413,11 +12509,13 @@ void lux_min(void)
     }
     break;
   case LUX_CDOUBLE:
-    /* if complex numbers are involved, then we compare absolute values */
+    /* we want +1 > -1 and also +i > -i; we get that by comparing the
+       projections onto the line in the direction of 1+i.  (a+bi) >
+       (c+di) if (a+b) > (c+d) */
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--) {
-        if (hypot(lp.cd->real, lp.cd->imaginary) < fabs(*rp.b)) {
+        if (lp.cd->real + lp.cd->imaginary < *rp.b) {
           tp.cd->real = lp.cd->real;
           tp.cd->imaginary = lp.cd->imaginary;
         } else {
@@ -12431,7 +12529,7 @@ void lux_min(void)
       break;
     case LUX_INT16:
       while (nRepeat--) {
-        if (hypot(lp.cd->real, lp.cd->imaginary) < fabs(*rp.w)) {
+        if (lp.cd->real + lp.cd->imaginary < *rp.w) {
           tp.cd->real = lp.cd->real;
           tp.cd->imaginary = lp.cd->imaginary;
         } else {
@@ -12445,7 +12543,7 @@ void lux_min(void)
       break;
     case LUX_INT32:
       while (nRepeat--) {
-        if (hypot(lp.cd->real, lp.cd->imaginary) < fabs(*rp.l)) {
+        if (lp.cd->real + lp.cd->imaginary < *rp.l) {
           tp.cd->real = lp.cd->real;
           tp.cd->imaginary = lp.cd->imaginary;
         } else {
@@ -12459,7 +12557,7 @@ void lux_min(void)
       break;
     case LUX_INT64:
       while (nRepeat--) {
-        if (hypot(lp.cd->real, lp.cd->imaginary) < fabs(*rp.q)) {
+        if (lp.cd->real + lp.cd->imaginary < *rp.q) {
           tp.cd->real = lp.cd->real;
           tp.cd->imaginary = lp.cd->imaginary;
         } else {
@@ -12473,7 +12571,7 @@ void lux_min(void)
       break;
     case LUX_FLOAT:
       while (nRepeat--) {
-        if (hypot(lp.cd->real, lp.cd->imaginary) < fabs(*rp.f)) {
+        if (lp.cd->real + lp.cd->imaginary < *rp.f) {
           tp.cd->real = lp.cd->real;
           tp.cd->imaginary = lp.cd->imaginary;
         } else {
@@ -12487,7 +12585,7 @@ void lux_min(void)
       break;
     case LUX_DOUBLE:
       while (nRepeat--) {
-        if (hypot(lp.cd->real, lp.cd->imaginary) < fabs(*rp.d)) {
+        if (lp.cd->real + lp.cd->imaginary < *rp.d) {
           tp.cd->real = lp.cd->real;
           tp.cd->imaginary = lp.cd->imaginary;
         } else {
@@ -12501,8 +12599,8 @@ void lux_min(void)
       break;
     case LUX_CFLOAT:
       while (nRepeat--) {
-        if (hypot(lp.cd->real, lp.cd->imaginary)
-            < hypot(rp.cf->real, rp.cf->imaginary)){
+        if (lp.cd->real + lp.cd->imaginary
+            < rp.cf->real + rp.cf->imaginary) {
           tp.cd->real = lp.cd->real;
           tp.cd->imaginary = lp.cd->imaginary;
         } else {
@@ -12516,8 +12614,8 @@ void lux_min(void)
       break;
     case LUX_CDOUBLE:
       while (nRepeat--) {
-        if (hypot(lp.cd->real, lp.cd->imaginary)
-            < hypot(rp.cd->real, rp.cd->imaginary)){
+        if (lp.cd->real + lp.cd->imaginary
+            < rp.cd->real + rp.cd->imaginary) {
           tp.cd->real = lp.cd->real;
           tp.cd->imaginary = lp.cd->imaginary;
         } else {
@@ -12589,9 +12687,12 @@ void lux_min_as(void)
           value2.d;
       break;
     case LUX_CFLOAT:
-      value2.d = hypot(rp.cf->real, rp.cf->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value2.d = rp.cf->real + rp.cf->imaginary;
       while (nRepeat--) {
-        if (fabs(*lp.b) < value2.d) {
+        if (*lp.b < value2.d) {
           tp.cf->real = *lp.b;
           tp.cf->imaginary = 0;
         } else {
@@ -12603,9 +12704,12 @@ void lux_min_as(void)
       }
       break;
     case LUX_CDOUBLE:
-      value2.d = hypot(rp.cd->real, rp.cd->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value2.d = rp.cd->real + rp.cd->imaginary;
       while (nRepeat--) {
-        if (fabs(*lp.b) < value2.d) {
+        if (*lp.b < value2.d) {
           tp.cd->real = *lp.b;
           tp.cd->imaginary = 0;
         } else {
@@ -12665,9 +12769,12 @@ void lux_min_as(void)
           value2.d;
       break;
     case LUX_CFLOAT:
-      value2.d = hypot(rp.cf->real, rp.cf->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value2.d = rp.cf->real + rp.cf->imaginary;
       while (nRepeat--) {
-        if (fabs(*lp.w) < value2.d) {
+        if (*lp.w < value2.d) {
           tp.cf->real = *lp.w;
           tp.cf->imaginary = 0;
         } else {
@@ -12679,9 +12786,12 @@ void lux_min_as(void)
       }
       break;
     case LUX_CDOUBLE:
-      value2.d = hypot(rp.cd->real, rp.cd->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value2.d = rp.cd->real + rp.cd->imaginary;
       while (nRepeat--) {
-        if (fabs(*lp.w) < value2.d) {
+        if (*lp.w < value2.d) {
           tp.cd->real = *lp.w;
           tp.cd->imaginary = 0;
         } else {
@@ -12741,9 +12851,12 @@ void lux_min_as(void)
           value2.d;
       break;
     case LUX_CFLOAT:
-      value2.d = hypot(rp.cf->real, rp.cf->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value2.d = rp.cf->real + rp.cf->imaginary;
       while (nRepeat--) {
-        if (fabs(*lp.l) < value2.d) {
+        if (*lp.l < value2.d) {
           tp.cf->real = *lp.l;
           tp.cf->imaginary = 0;
         } else {
@@ -12755,9 +12868,12 @@ void lux_min_as(void)
       }
       break;
     case LUX_CDOUBLE:
-      value2.d = hypot(rp.cd->real, rp.cd->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value2.d = rp.cd->real + rp.cd->imaginary;
       while (nRepeat--) {
-        if (fabs(*lp.l) < value2.d) {
+        if (*lp.l < value2.d) {
           tp.cd->real = *lp.l;
           tp.cd->imaginary = 0;
         } else {
@@ -12817,9 +12933,12 @@ void lux_min_as(void)
           value2.d;
       break;
     case LUX_CFLOAT:
-      value2.d = hypot(rp.cf->real, rp.cf->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value2.d = rp.cf->real + rp.cf->imaginary;
       while (nRepeat--) {
-        if (fabs(*lp.q) < value2.d) {
+        if (*lp.q < value2.d) {
           tp.cd->real = *lp.q;
           tp.cd->imaginary = 0;
         } else {
@@ -12831,9 +12950,12 @@ void lux_min_as(void)
       }
       break;
     case LUX_CDOUBLE:
-      value2.d = hypot(rp.cd->real, rp.cd->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value2.d = rp.cd->real + rp.cd->imaginary;
       while (nRepeat--) {
-        if (fabs(*lp.q) < value2.d) {
+        if (*lp.q < value2.d) {
           tp.cd->real = *lp.q;
           tp.cd->imaginary = 0;
         } else {
@@ -12893,9 +13015,12 @@ void lux_min_as(void)
           value2.d;
       break;
     case LUX_CFLOAT:
-      value2.d = hypot(rp.cf->real, rp.cf->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value2.d = rp.cf->real + rp.cf->imaginary;
       while (nRepeat--) {
-        if (fabs(*lp.f) < value2.d) {
+        if (*lp.f < value2.d) {
           tp.cf->real = *lp.f;
           tp.cf->imaginary = 0;
         } else {
@@ -12907,9 +13032,12 @@ void lux_min_as(void)
       }
       break;
     case LUX_CDOUBLE:
-      value2.d = hypot(rp.cd->real, rp.cd->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value2.d = rp.cd->real + rp.cd->imaginary;
       while (nRepeat--) {
-        if (fabs(*lp.f) < value2.d) {
+        if (*lp.f < value2.d) {
           tp.cd->real = *lp.f;
           tp.cd->imaginary = 0;
         } else {
@@ -12969,9 +13097,12 @@ void lux_min_as(void)
           value2.d;
       break;
     case LUX_CFLOAT:
-      value2.d = hypot(rp.cf->real, rp.cf->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value2.d = rp.cf->real + rp.cf->imaginary;
       while (nRepeat--) {
-        if (fabs(*lp.d) < value2.d) {
+        if (*lp.d < value2.d) {
           tp.cd->real = *lp.d;
           tp.cd->imaginary = 0;
         } else {
@@ -12983,9 +13114,12 @@ void lux_min_as(void)
       }
       break;
     case LUX_CDOUBLE:
-      value2.d = hypot(rp.cd->real, rp.cd->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value2.d = rp.cd->real + rp.cd->imaginary;
       while (nRepeat--) {
-        if (fabs(*lp.d) < value2.d) {
+        if (*lp.d < value2.d) {
           tp.cd->real = *lp.d;
           tp.cd->imaginary = 0;
         } else {
@@ -13001,11 +13135,14 @@ void lux_min_as(void)
     }
     break;
   case LUX_CFLOAT:
+    /* we want +1 > -1 and also +i > -i; we get that by comparing the
+       projections onto the line in the direction of 1+i.  (a+bi) >
+       (c+di) if (a+b) > (c+d) */
     switch (rhsType) {
     case LUX_INT8:
-      value2.d = fabs(*rp.b);
+      value2.d = *rp.b;
       while (nRepeat--) {
-        if (hypot(lp.cf->real, lp.cf->imaginary) < value2.d) {
+        if (lp.cf->real + lp.cf->imaginary < value2.d) {
           tp.cf->real = lp.cf->real;
           tp.cf->imaginary = lp.cf->imaginary;
         } else {
@@ -13017,9 +13154,9 @@ void lux_min_as(void)
       }
       break;
     case LUX_INT16:
-      value2.d = fabs(*rp.w);
+      value2.d = *rp.w;
       while (nRepeat--) {
-        if (hypot(lp.cf->real, lp.cf->imaginary) < value2.d) {
+        if (lp.cf->real + lp.cf->imaginary < value2.d) {
           tp.cf->real = lp.cf->real;
           tp.cf->imaginary = lp.cf->imaginary;
         } else {
@@ -13031,9 +13168,9 @@ void lux_min_as(void)
       }
       break;
     case LUX_INT32:
-      value2.d = fabs(*rp.l);
+      value2.d = *rp.l;
       while (nRepeat--) {
-        if (hypot(lp.cf->real, lp.cf->imaginary) < value2.d) {
+        if (lp.cf->real + lp.cf->imaginary < value2.d) {
           tp.cf->real = lp.cf->real;
           tp.cf->imaginary = lp.cf->imaginary;
         } else {
@@ -13045,9 +13182,9 @@ void lux_min_as(void)
       }
       break;
     case LUX_INT64:
-      value2.d = fabs(*rp.q);
+      value2.d = *rp.q;
       while (nRepeat--) {
-        if (hypot(lp.cf->real, lp.cf->imaginary) < value2.d) {
+        if (lp.cf->real + lp.cf->imaginary < value2.d) {
           tp.cd->real = lp.cf->real;
           tp.cd->imaginary = lp.cf->imaginary;
         } else {
@@ -13059,9 +13196,9 @@ void lux_min_as(void)
       }
       break;
     case LUX_FLOAT:
-      value2.d = fabs(*rp.f);
+      value2.d = *rp.f;
       while (nRepeat--) {
-        if (hypot(lp.cf->real, lp.cf->imaginary) < value2.d) {
+        if (lp.cf->real + lp.cf->imaginary < value2.d) {
           tp.cf->real = lp.cf->real;
           tp.cf->imaginary = lp.cf->imaginary;
         } else {
@@ -13073,9 +13210,9 @@ void lux_min_as(void)
       }
       break;
     case LUX_DOUBLE:
-      value2.d = fabs(*rp.d);
+      value2.d = *rp.d;
       while (nRepeat--) {
-        if (hypot(lp.cf->real, lp.cf->imaginary) < value2.d) {
+        if (lp.cf->real + lp.cf->imaginary < value2.d) {
           tp.cd->real = lp.cf->real;
           tp.cd->imaginary = lp.cf->imaginary;
         } else {
@@ -13087,9 +13224,9 @@ void lux_min_as(void)
       }
       break;
     case LUX_CFLOAT:
-      value2.d = hypot(rp.cf->real, rp.cf->imaginary);
+      value2.d = rp.cf->real + rp.cf->imaginary;
       while (nRepeat--) {
-        if (hypot(lp.cf->real, lp.cf->imaginary) < value2.d) {
+        if (lp.cf->real + lp.cf->imaginary < value2.d) {
           tp.cf->real = lp.cf->real;
           tp.cf->imaginary = lp.cf->imaginary;
         } else {
@@ -13101,9 +13238,9 @@ void lux_min_as(void)
       }
       break;
     case LUX_CDOUBLE:
-      value2.d = hypot(rp.cd->real, rp.cd->imaginary);
+      value2.d = rp.cd->real + rp.cd->imaginary;
       while (nRepeat--) {
-        if (hypot(lp.cf->real, lp.cf->imaginary) < value2.d) {
+        if (lp.cf->real + lp.cf->imaginary < value2.d) {
           tp.cd->real = lp.cf->real;
           tp.cd->imaginary = lp.cf->imaginary;
         } else {
@@ -13119,11 +13256,14 @@ void lux_min_as(void)
     }
     break;
   case LUX_CDOUBLE:
+    /* we want +1 > -1 and also +i > -i; we get that by comparing the
+       projections onto the line in the direction of 1+i.  (a+bi) >
+       (c+di) if (a+b) > (c+d) */
     switch (rhsType) {
     case LUX_INT8:
-      value2.d = fabs(*rp.b);
+      value2.d = *rp.b;
       while (nRepeat--) {
-        if (hypot(lp.cd->real, lp.cd->imaginary) < value2.d) {
+        if (lp.cd->real + lp.cd->imaginary < value2.d) {
           tp.cd->real = lp.cd->real;
           tp.cd->imaginary = lp.cd->imaginary;
         } else {
@@ -13135,9 +13275,9 @@ void lux_min_as(void)
       }
       break;
     case LUX_INT16:
-      value2.d = fabs(*rp.w);
+      value2.d = *rp.w;
       while (nRepeat--) {
-        if (hypot(lp.cd->real, lp.cd->imaginary) < value2.d) {
+        if (lp.cd->real + lp.cd->imaginary < value2.d) {
           tp.cd->real = lp.cd->real;
           tp.cd->imaginary = lp.cd->imaginary;
         } else {
@@ -13149,9 +13289,9 @@ void lux_min_as(void)
       }
       break;
     case LUX_INT32:
-      value2.d = fabs(*rp.l);
+      value2.d = *rp.l;
       while (nRepeat--) {
-        if (hypot(lp.cd->real, lp.cd->imaginary) < value2.d) {
+        if (lp.cd->real + lp.cd->imaginary < value2.d) {
           tp.cd->real = lp.cd->real;
           tp.cd->imaginary = lp.cd->imaginary;
         } else {
@@ -13163,9 +13303,9 @@ void lux_min_as(void)
       }
       break;
     case LUX_INT64:
-      value2.d = fabs(*rp.q);
+      value2.d = *rp.q;
       while (nRepeat--) {
-        if (hypot(lp.cd->real, lp.cd->imaginary) < value2.d) {
+        if (lp.cd->real + lp.cd->imaginary < value2.d) {
           tp.cd->real = lp.cd->real;
           tp.cd->imaginary = lp.cd->imaginary;
         } else {
@@ -13177,9 +13317,9 @@ void lux_min_as(void)
       }
       break;
     case LUX_FLOAT:
-      value2.d = fabs(*rp.f);
+      value2.d = *rp.f;
       while (nRepeat--) {
-        if (hypot(lp.cd->real, lp.cd->imaginary) < value2.d) {
+        if (lp.cd->real + lp.cd->imaginary < value2.d) {
           tp.cd->real = lp.cd->real;
           tp.cd->imaginary = lp.cd->imaginary;
         } else {
@@ -13191,9 +13331,9 @@ void lux_min_as(void)
       }
       break;
     case LUX_DOUBLE:
-      value2.d = fabs(*rp.d);
+      value2.d = *rp.d;
       while (nRepeat--) {
-        if (hypot(lp.cd->real, lp.cd->imaginary) < value2.d) {
+        if (lp.cd->real + lp.cd->imaginary < value2.d) {
           tp.cd->real = lp.cd->real;
           tp.cd->imaginary = lp.cd->imaginary;
         } else {
@@ -13205,9 +13345,9 @@ void lux_min_as(void)
       }
       break;
     case LUX_CFLOAT:
-      value2.d = hypot(rp.cf->real, rp.cf->imaginary);
+      value2.d = rp.cf->real + rp.cf->imaginary;
       while (nRepeat--) {
-        if (hypot(lp.cd->real, lp.cd->imaginary) < value2.d) {
+        if (lp.cd->real + lp.cd->imaginary < value2.d) {
           tp.cd->real = lp.cd->real;
           tp.cd->imaginary = lp.cd->imaginary;
         } else {
@@ -13219,9 +13359,9 @@ void lux_min_as(void)
       }
       break;
     case LUX_CDOUBLE:
-      value2.d = hypot(rp.cd->real, rp.cd->imaginary);
+      value2.d = rp.cd->real + rp.cd->imaginary;
       while (nRepeat--) {
-        if (hypot(lp.cd->real, lp.cd->imaginary) < value2.d) {
+        if (lp.cd->real + lp.cd->imaginary < value2.d) {
           tp.cd->real = lp.cd->real;
           tp.cd->imaginary = lp.cd->imaginary;
         } else {
@@ -14074,15 +14214,21 @@ void lux_gt(void)
         *tp.l++ = (*lp.b++ > *rp.d++);
       break;
     case LUX_CFLOAT:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.b) > hypot(rp.cf->real, rp.cf->imaginary));
+        *tp.l++ = (*lp.b > rp.cf->real + rp.cf->imaginary);
         lp.b++;
         rp.cf++;
       }
       break;
     case LUX_CDOUBLE:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.b) > hypot(rp.cd->real, rp.cd->imaginary));
+        *tp.l++ = (*lp.b > rp.cd->real + rp.cd->imaginary);
         lp.b++;
         rp.cd++;
       }
@@ -14118,15 +14264,21 @@ void lux_gt(void)
         *tp.l++ = (*lp.w++ > *rp.d++);
       break;
     case LUX_CFLOAT:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.w) > hypot(rp.cf->real, rp.cf->imaginary));
+        *tp.l++ = (*lp.w > rp.cf->real + rp.cf->imaginary);
         lp.w++;
         rp.cf++;
       }
       break;
     case LUX_CDOUBLE:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.w) > hypot(rp.cd->real, rp.cd->imaginary));
+        *tp.l++ = (*lp.w > rp.cd->real + rp.cd->imaginary);
         lp.w++;
         rp.cd++;
       }
@@ -14162,15 +14314,21 @@ void lux_gt(void)
         *tp.l++ = (*lp.l++ > *rp.d++);
       break;
     case LUX_CFLOAT:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.l) > hypot(rp.cf->real, rp.cf->imaginary));
+        *tp.l++ = (*lp.l > rp.cf->real + rp.cf->imaginary);
         lp.l++;
         rp.cf++;
       }
       break;
     case LUX_CDOUBLE:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.l) > rp.cd->real*rp.cd->real);
+        *tp.l++ = (*lp.l > rp.cd->real + rp.cd->imaginary);
         lp.l++;
         rp.cd++;
       }
@@ -14206,15 +14364,21 @@ void lux_gt(void)
         *tp.l++ = (*lp.q++ > *rp.d++);
       break;
     case LUX_CFLOAT:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.q) > hypot(rp.cf->real, rp.cf->imaginary));
+        *tp.l++ = (*lp.q > rp.cf->real + rp.cf->imaginary);
         lp.q++;
         rp.cf++;
       }
       break;
     case LUX_CDOUBLE:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.q) > hypot(rp.cd->real, rp.cd->imaginary));
+        *tp.l++ = (*lp.q > rp.cd->real + rp.cd->imaginary);
         lp.q++;
         rp.cd++;
       }
@@ -14250,15 +14414,21 @@ void lux_gt(void)
         *tp.l++ = (*lp.f++ > *rp.d++);
       break;
     case LUX_CFLOAT:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.f) > hypot(rp.cf->real, rp.cf->imaginary));
+        *tp.l++ = (*lp.f > rp.cf->real + rp.cf->imaginary);
         lp.f++;
         rp.cf++;
       }
       break;
     case LUX_CDOUBLE:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.f) > hypot(rp.cd->real, rp.cd->imaginary));
+        *tp.l++ = (*lp.f > rp.cd->real + rp.cd->imaginary);
         lp.f++;
         rp.cd++;
       }
@@ -14294,15 +14464,21 @@ void lux_gt(void)
         *tp.l++ = (*lp.d++ > *rp.d++);
       break;
     case LUX_CFLOAT:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.d) > hypot(rp.cf->real, rp.cf->imaginary));
+        *tp.l++ = (*lp.d > rp.cf->real + rp.cf->imaginary);
         lp.d++;
         rp.cf++;
       }
       break;
     case LUX_CDOUBLE:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.d) > hypot(rp.cd->real, rp.cd->imaginary));
+        *tp.l++ = (*lp.d > rp.cd->real + rp.cd->imaginary);
         lp.d++;
         rp.cd++;
       }
@@ -14312,61 +14488,64 @@ void lux_gt(void)
     }
     break;
   case LUX_CFLOAT:
+    /* we want +1 > -1 and also +i > -i; we get that by comparing the
+       projections onto the line in the direction of 1+i.  (a+bi) >
+       (c+di) if (a+b) > (c+d) */
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) > fabs(*rp.b));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary > *rp.b);
         lp.cf++;
         rp.b++;
       }
       break;
     case LUX_INT16:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) > fabs(*rp.w));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary > *rp.w);
         lp.cf++;
         rp.w++;
       }
       break;
     case LUX_INT32:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) > fabs(*rp.l));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary > *rp.l);
         lp.cf++;
         rp.l++;
       }
       break;
     case LUX_INT64:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) > fabs(*rp.q));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary > *rp.q);
         lp.cf++;
         rp.q++;
       }
       break;
     case LUX_FLOAT:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) > fabs(*rp.f));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary > *rp.f);
         lp.cf++;
         rp.f++;
       }
       break;
     case LUX_DOUBLE:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) > fabs(*rp.d));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary > *rp.d);
         lp.cf++;
         rp.d++;
       }
       break;
     case LUX_CFLOAT:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) >
-                   hypot(rp.cf->real, rp.cf->imaginary));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary >
+                   rp.cf->real + rp.cf->imaginary);
         lp.cf++;
         rp.cf++;
       }
       break;
     case LUX_CDOUBLE:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary)
-                   > hypot(rp.cd->real, rp.cd->imaginary));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary
+                   > rp.cd->real + rp.cd->imaginary);
         lp.cf++;
         rp.cd++;
       }
@@ -14376,61 +14555,64 @@ void lux_gt(void)
     }
     break;
   case LUX_CDOUBLE:
+    /* we want +1 > -1 and also +i > -i; we get that by comparing the
+       projections onto the line in the direction of 1+i.  (a+bi) >
+       (c+di) if (a+b) > (c+d) */
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) > fabs(*rp.b));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary > *rp.b);
         lp.cd++;
         rp.b++;
       }
       break;
     case LUX_INT16:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) > fabs(*rp.w));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary > *rp.w);
         lp.cd++;
         rp.w++;
       }
       break;
     case LUX_INT32:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) > fabs(*rp.l));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary > *rp.l);
         lp.cd++;
         rp.l++;
       }
       break;
     case LUX_INT64:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) > fabs(*rp.q));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary > *rp.q);
         lp.cd++;
         rp.q++;
       }
       break;
     case LUX_FLOAT:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) > fabs(*rp.f));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary > *rp.f);
         lp.cd++;
         rp.f++;
       }
       break;
     case LUX_DOUBLE:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) > fabs(*rp.d));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary > *rp.d);
         lp.cd++;
         rp.d++;
       }
       break;
     case LUX_CFLOAT:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary)
-                   > hypot(rp.cf->real, rp.cf->imaginary));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary
+                   > rp.cf->real + rp.cf->imaginary);
         lp.cd++;
         rp.cf++;
       }
       break;
     case LUX_CDOUBLE:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary)
-                   > hypot(rp.cd->real, rp.cd->imaginary));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary
+                   > rp.cd->real + rp.cd->imaginary);
         lp.cd++;
         rp.cd++;
       }
@@ -14484,16 +14666,22 @@ void lux_gt_as(void)
         *tp.l++ = (*lp.b++ > *rp.d);
       break;
     case LUX_CFLOAT:
-      value = hypot(rp.cf->real, rp.cf->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value = rp.cf->real + rp.cf->imaginary;
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.b) > value);
+        *tp.l++ = (*lp.b > value);
         lp.b++;
       }
       break;
     case LUX_CDOUBLE:
-      value = hypot(rp.cd->real, rp.cd->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value = rp.cd->real + rp.cd->imaginary;
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.b) > value);
+        *tp.l++ = (*lp.b > value);
         lp.b++;
       }
       break;
@@ -14528,16 +14716,22 @@ void lux_gt_as(void)
         *tp.l++ = (*lp.w++ > *rp.d);
       break;
     case LUX_CFLOAT:
-      value = hypot(rp.cf->real, rp.cf->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value = rp.cf->real + rp.cf->imaginary;
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.w) > value);
+        *tp.l++ = (*lp.w > value);
         lp.w++;
       }
       break;
     case LUX_CDOUBLE:
-      value = hypot(rp.cd->real, rp.cd->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value = rp.cd->real + rp.cd->imaginary;
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.w) > value);
+        *tp.l++ = (*lp.w > value);
         lp.w++;
       }
       break;
@@ -14572,16 +14766,22 @@ void lux_gt_as(void)
         *tp.l++ = (*lp.l++ > *rp.d);
       break;
     case LUX_CFLOAT:
-      value = hypot(rp.cf->real, rp.cf->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value = rp.cf->real + rp.cf->imaginary;
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.l) > value);
+        *tp.l++ = (*lp.l > value);
         lp.l++;
       }
       break;
     case LUX_CDOUBLE:
-      value = hypot(rp.cd->real, rp.cd->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value = rp.cd->real + rp.cd->imaginary;
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.l) > value);
+        *tp.l++ = (*lp.l > value);
         lp.l++;
       }
       break;
@@ -14616,16 +14816,22 @@ void lux_gt_as(void)
         *tp.l++ = (*lp.q++ > *rp.d);
       break;
     case LUX_CFLOAT:
-      value = hypot(rp.cf->real, rp.cf->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value = rp.cf->real + rp.cf->imaginary;
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.q) > value);
+        *tp.l++ = (*lp.q > value);
         lp.q++;
       }
       break;
     case LUX_CDOUBLE:
-      value = hypot(rp.cd->real, rp.cd->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value = rp.cd->real + rp.cd->imaginary;
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.q) > value);
+        *tp.l++ = (*lp.q > value);
         lp.q++;
       }
       break;
@@ -14660,16 +14866,22 @@ void lux_gt_as(void)
         *tp.l++ = (*lp.f++ > *rp.d);
       break;
     case LUX_CFLOAT:
-      value = hypot(rp.cf->real, rp.cf->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value = rp.cf->real + rp.cf->imaginary;
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.f) > value);
+        *tp.l++ = (*lp.f > value);
         lp.f++;
       }
       break;
     case LUX_CDOUBLE:
-      value = hypot(rp.cd->real, rp.cd->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value = rp.cd->real + rp.cd->imaginary;
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.f) > value);
+        *tp.l++ = (*lp.f > value);
         lp.f++;
       }
       break;
@@ -14704,16 +14916,22 @@ void lux_gt_as(void)
         *tp.l++ = (*lp.d++ > *rp.d);
       break;
     case LUX_CFLOAT:
-      value = hypot(rp.cf->real, rp.cf->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value = rp.cf->real + rp.cf->imaginary;
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.d) > value);
+        *tp.l++ = (*lp.d > value);
         lp.d++;
       }
       break;
     case LUX_CDOUBLE:
-      value = hypot(rp.cd->real, rp.cd->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value = rp.cd->real + rp.cd->imaginary;
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.d) > value);
+        *tp.l++ = (*lp.d > value);
         lp.d++;
       }
       break;
@@ -14722,54 +14940,57 @@ void lux_gt_as(void)
     }
     break;
   case LUX_CFLOAT:
+    /* we want +1 > -1 and also +i > -i; we get that by comparing the
+       projections onto the line in the direction of 1+i.  (a+bi) >
+       (c+di) if (a+b) > (c+d) */
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) > fabs(*rp.b));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary > *rp.b);
         lp.cf++;
       }
       break;
     case LUX_INT16:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) > fabs(*rp.w));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary > *rp.w);
         lp.cf++;
       }
       break;
     case LUX_INT32:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) > fabs(*rp.l));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary > *rp.l);
         lp.cf++;
       }
       break;
     case LUX_INT64:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) > fabsl(*rp.q));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary > *rp.q);
         lp.cf++;
       }
       break;
     case LUX_FLOAT:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) > fabs(*rp.f));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary > *rp.f);
         lp.cf++;
       }
       break;
     case LUX_DOUBLE:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) > fabs(*rp.d));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary > *rp.d);
         lp.cf++;
       }
       break;
     case LUX_CFLOAT:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary)
-                   > hypot(rp.cf->real, rp.cf->imaginary));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary
+                   > rp.cf->real + rp.cf->imaginary);
         lp.cf++;
       }
       break;
     case LUX_CDOUBLE:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary)
-                   > hypot(rp.cd->real, rp.cd->imaginary));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary
+                   > rp.cd->real + rp.cd->imaginary);
         lp.cf++;
       }
       break;
@@ -14778,54 +14999,57 @@ void lux_gt_as(void)
     }
     break;
   case LUX_CDOUBLE:
+    /* we want +1 > -1 and also +i > -i; we get that by comparing the
+       projections onto the line in the direction of 1+i.  (a+bi) >
+       (c+di) if (a+b) > (c+d) */
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) > fabs(*rp.b));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary > *rp.b);
         lp.cd++;
       }
       break;
     case LUX_INT16:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) > fabs(*rp.w));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary > *rp.w);
         lp.cd++;
       }
       break;
     case LUX_INT32:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) > fabs(*rp.l));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary > *rp.l);
         lp.cd++;
       }
       break;
     case LUX_INT64:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) > fabsl(*rp.q));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary > *rp.q);
         lp.cd++;
       }
       break;
     case LUX_FLOAT:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) > fabs(*rp.f));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary > *rp.f);
         lp.cd++;
       }
       break;
     case LUX_DOUBLE:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) > fabs(*rp.d));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary > *rp.d);
         lp.cd++;
       }
       break;
     case LUX_CFLOAT:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary)
-                   > hypot(rp.cf->real, rp.cf->imaginary));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary
+                   > rp.cf->real + rp.cf->imaginary);
         lp.cd++;
       }
       break;
     case LUX_CDOUBLE:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary)
-                   > hypot(rp.cd->real, rp.cd->imaginary));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary
+                   > rp.cd->real + rp.cd->imaginary);
         lp.cd++;
       }
       break;
@@ -14871,16 +15095,22 @@ void lux_gt_sa(void)
         *tp.l++ = (*lp.b > *rp.d++);
       break;
     case LUX_CFLOAT:
-      value = fabs(*lp.b);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value = *lp.b;
       while (nRepeat--) {
-        *tp.l++ = (value > hypot(rp.cf->real, rp.cf->imaginary));
+        *tp.l++ = (value > rp.cf->real + rp.cf->imaginary);
         rp.cf++;
       }
       break;
     case LUX_CDOUBLE:
-      value = fabs(*lp.b);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value = *lp.b;
       while (nRepeat--) {
-        *tp.l++ = (value > hypot(rp.cd->real, rp.cd->imaginary));
+        *tp.l++ = (value > rp.cd->real + rp.cd->imaginary);
         rp.cd++;
       }
       break;
@@ -14915,16 +15145,22 @@ void lux_gt_sa(void)
         *tp.l++ = (*lp.w > *rp.d++);
       break;
     case LUX_CFLOAT:
-      value = fabs(*lp.w);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value = *lp.w;
       while (nRepeat--) {
-        *tp.l++ = (value > hypot(rp.cf->real, rp.cf->imaginary));
+        *tp.l++ = (value > rp.cf->real + rp.cf->imaginary);
         rp.cf++;
       }
       break;
     case LUX_CDOUBLE:
-      value = fabs(*lp.w);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value = *lp.w;
       while (nRepeat--) {
-        *tp.l++ = (value > hypot(rp.cd->real, rp.cd->imaginary));
+        *tp.l++ = (value > rp.cd->real + rp.cd->imaginary);
         rp.cd++;
       }
       break;
@@ -14959,16 +15195,22 @@ void lux_gt_sa(void)
         *tp.l++ = (*lp.l > *rp.d++);
       break;
     case LUX_CFLOAT:
-      value = fabs(*lp.l);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value = *lp.l;
       while (nRepeat--) {
-        *tp.l++ = (value > hypot(rp.cf->real, rp.cf->imaginary));
+        *tp.l++ = (value > rp.cf->real + rp.cf->imaginary);
         rp.cf++;
       }
       break;
     case LUX_CDOUBLE:
-      value = fabs(*lp.l);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value = *lp.l;
       while (nRepeat--) {
-        *tp.l++ = (value > hypot(rp.cd->real, rp.cd->imaginary));
+        *tp.l++ = (value > rp.cd->real + rp.cd->imaginary);
         rp.cd++;
       }
       break;
@@ -15003,16 +15245,22 @@ void lux_gt_sa(void)
         *tp.l++ = (*lp.q > *rp.d++);
       break;
     case LUX_CFLOAT:
-      value = fabs(*lp.q);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value = *lp.q;
       while (nRepeat--) {
-        *tp.l++ = (value > hypot(rp.cf->real, rp.cf->imaginary));
+        *tp.l++ = (value > rp.cf->real + rp.cf->imaginary);
         rp.cf++;
       }
       break;
     case LUX_CDOUBLE:
-      value = fabs(*lp.q);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value = *lp.q;
       while (nRepeat--) {
-        *tp.l++ = (value > hypot(rp.cd->real, rp.cd->imaginary));
+        *tp.l++ = (value > rp.cd->real + rp.cd->imaginary);
         rp.cd++;
       }
       break;
@@ -15047,16 +15295,22 @@ void lux_gt_sa(void)
         *tp.l++ = (*lp.f > *rp.d++);
       break;
     case LUX_CFLOAT:
-      value = fabs(*lp.f);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value = *lp.f;
       while (nRepeat--) {
-        *tp.l++ = (value > hypot(rp.cf->real, rp.cf->imaginary));
+        *tp.l++ = (value > rp.cf->real + rp.cf->imaginary);
         rp.cf++;
       }
       break;
     case LUX_CDOUBLE:
-      value = fabs(*lp.f);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value = *lp.f;
       while (nRepeat--) {
-        *tp.l++ = (value > hypot(rp.cd->real, rp.cd->imaginary));
+        *tp.l++ = (value > rp.cd->real + rp.cd->imaginary);
         rp.cd++;
       }
       break;
@@ -15091,16 +15345,22 @@ void lux_gt_sa(void)
         *tp.l++ = (*lp.d > *rp.d++);
       break;
     case LUX_CFLOAT:
-      value = fabs(*lp.d);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value = *lp.d;
       while (nRepeat--) {
-        *tp.l++ = (value > hypot(rp.cf->real, rp.cf->imaginary));
+        *tp.l++ = (value > rp.cf->real + rp.cf->imaginary);
         rp.cf++;
       }
       break;
     case LUX_CDOUBLE:
-      value = fabs(*lp.d);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value = *lp.d;
       while (nRepeat--) {
-        *tp.l++ = (value > hypot(rp.cd->real, rp.cd->imaginary));
+        *tp.l++ = (value > rp.cd->real + rp.cd->imaginary);
         rp.cd++;
       }
       break;
@@ -15109,42 +15369,45 @@ void lux_gt_sa(void)
     }
     break;
   case LUX_CFLOAT:
+    /* we want +1 > -1 and also +i > -i; we get that by comparing the
+       projections onto the line in the direction of 1+i.  (a+bi) >
+       (c+di) if (a+b) > (c+d) */
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--)
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) > fabs(*rp.b++));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary > *rp.b++);
       break;
     case LUX_INT16:
       while (nRepeat--)
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) > fabs(*rp.w++));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary > *rp.w++);
       break;
     case LUX_INT32:
       while (nRepeat--)
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) > fabs(*rp.l++));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary > *rp.l++);
       break;
     case LUX_INT64:
       while (nRepeat--)
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) > fabs(*rp.q++));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary > *rp.q++);
       break;
     case LUX_FLOAT:
       while (nRepeat--)
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) > fabs(*rp.f++));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary > *rp.f++);
       break;
     case LUX_DOUBLE:
       while (nRepeat--)
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) > fabs(*rp.d++));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary > *rp.d++);
       break;
     case LUX_CFLOAT:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) >
-                   hypot(rp.cf->real, rp.cf->imaginary));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary >
+                   rp.cf->real + rp.cf->imaginary);
         rp.cf++;
       }
       break;
     case LUX_CDOUBLE:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) >
-                   hypot(rp.cd->real, rp.cd->imaginary));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary >
+                   rp.cd->real + rp.cd->imaginary);
         rp.cd++;
       }
       break;
@@ -15153,42 +15416,45 @@ void lux_gt_sa(void)
     }
     break;
   case LUX_CDOUBLE:
+    /* we want +1 > -1 and also +i > -i; we get that by comparing the
+       projections onto the line in the direction of 1+i.  (a+bi) >
+       (c+di) if (a+b) > (c+d) */
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--)
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) > fabs(*rp.b++));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary > *rp.b++);
       break;
     case LUX_INT16:
       while (nRepeat--)
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) > fabs(*rp.w++));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary > *rp.w++);
       break;
     case LUX_INT32:
       while (nRepeat--)
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) > fabs(*rp.l++));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary > *rp.l++);
       break;
     case LUX_INT64:
       while (nRepeat--)
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) > fabs(*rp.q++));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary > *rp.q++);
       break;
     case LUX_FLOAT:
       while (nRepeat--)
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) > fabs(*rp.f++));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary > *rp.f++);
       break;
     case LUX_DOUBLE:
       while (nRepeat--)
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) > fabs(*rp.d++));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary > *rp.d++);
       break;
     case LUX_CFLOAT:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) >
-                   hypot(rp.cf->real, rp.cf->imaginary));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary >
+                   rp.cf->real + rp.cf->imaginary);
         rp.cf++;
       }
       break;
     case LUX_CDOUBLE:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) >
-                   hypot(rp.cd->real, rp.cd->imaginary));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary >
+                   rp.cd->real + rp.cd->imaginary);
         rp.cd++;
       }
       break;
@@ -15232,15 +15498,21 @@ void lux_ge(void)
         *tp.l++ = (*lp.b++ >= *rp.d++);
       break;
     case LUX_CFLOAT:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.b) >= hypot(rp.cf->real, rp.cf->imaginary));
+        *tp.l++ = (*lp.b >= rp.cf->real + rp.cf->imaginary);
         lp.b++;
         rp.cf++;
       }
       break;
     case LUX_CDOUBLE:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.b) >= hypot(rp.cd->real, rp.cd->imaginary));
+        *tp.l++ = (*lp.b >= rp.cd->real + rp.cd->imaginary);
         lp.b++;
         rp.cd++;
       }
@@ -15276,15 +15548,21 @@ void lux_ge(void)
         *tp.l++ = (*lp.w++ >= *rp.d++);
       break;
     case LUX_CFLOAT:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.w) >= hypot(rp.cf->real, rp.cf->imaginary));
+        *tp.l++ = (*lp.w >= rp.cf->real + rp.cf->imaginary);
         lp.w++;
         rp.cf++;
       }
       break;
     case LUX_CDOUBLE:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.w) >= hypot(rp.cd->real, rp.cd->imaginary));
+        *tp.l++ = (*lp.w >= rp.cd->real + rp.cd->imaginary);
         lp.w++;
         rp.cd++;
       }
@@ -15320,14 +15598,20 @@ void lux_ge(void)
         *tp.l++ = (*lp.l++ >= *rp.d++);
       break;
     case LUX_CFLOAT:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.l++) >= hypot(rp.cf->real, rp.cf->imaginary));
+        *tp.l++ = (*lp.l++ >= rp.cf->real + rp.cf->imaginary);
         rp.cf++;
       }
       break;
     case LUX_CDOUBLE:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.l++) >= hypot(rp.cd->real, rp.cd->imaginary));
+        *tp.l++ = (*lp.l++ >= rp.cd->real + rp.cd->imaginary);
         rp.cd++;
       }
       break;
@@ -15362,14 +15646,20 @@ void lux_ge(void)
         *tp.l++ = (*lp.q++ >= *rp.d++);
       break;
     case LUX_CFLOAT:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.q++) >= hypot(rp.cf->real, rp.cf->imaginary));
+        *tp.l++ = (*lp.q++ >= rp.cf->real + rp.cf->imaginary);
         rp.cf++;
       }
       break;
     case LUX_CDOUBLE:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.q++) >= hypot(rp.cd->real, rp.cd->imaginary));
+        *tp.l++ = (*lp.q++ >= rp.cd->real + rp.cd->imaginary);
         rp.cd++;
       }
       break;
@@ -15404,15 +15694,21 @@ void lux_ge(void)
         *tp.l++ = (*lp.f++ >= *rp.d++);
       break;
     case LUX_CFLOAT:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.f) >= hypot(rp.cf->real, rp.cf->imaginary));
+        *tp.l++ = (*lp.f >= rp.cf->real + rp.cf->imaginary);
         lp.f++;
         rp.cf++;
       }
       break;
     case LUX_CDOUBLE:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.f) >= hypot(rp.cd->real, rp.cd->imaginary));
+        *tp.l++ = (*lp.f >= rp.cd->real + rp.cd->imaginary);
         lp.f++;
         rp.cd++;
       }
@@ -15448,15 +15744,21 @@ void lux_ge(void)
         *tp.l++ = (*lp.d++ >= *rp.d++);
       break;
     case LUX_CFLOAT:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.d) >= hypot(rp.cf->real, rp.cf->imaginary));
+        *tp.l++ = (*lp.d >= rp.cf->real + rp.cf->imaginary);
         lp.d++;
         rp.cf++;
       }
       break;
     case LUX_CDOUBLE:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.d) >= hypot(rp.cd->real, rp.cd->imaginary));
+        *tp.l++ = (*lp.d >= rp.cd->real + rp.cd->imaginary);
         lp.d++;
         rp.cd++;
       }
@@ -15466,60 +15768,63 @@ void lux_ge(void)
     }
     break;
   case LUX_CFLOAT:
+    /* we want +1 > -1 and also +i > -i; we get that by comparing the
+       projections onto the line in the direction of 1+i.  (a+bi) >
+       (c+di) if (a+b) > (c+d) */
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) >= fabs(*rp.b));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary >= *rp.b);
         lp.cf++;
         rp.b++;
       }
       break;
     case LUX_INT16:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) >= fabs(*rp.w));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary >= *rp.w);
         lp.cf++;
         rp.w++;
       }
       break;
     case LUX_INT32:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) >= fabs(*rp.l));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary >= *rp.l);
         lp.cf++;
         rp.l++;
       }
       break;
     case LUX_INT64:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) >= fabs(*rp.q++));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary >= *rp.q++);
         lp.cf++;
       }
       break;
     case LUX_FLOAT:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) >= fabs(*rp.f));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary >= *rp.f);
         lp.cf++;
         rp.f++;
       }
       break;
     case LUX_DOUBLE:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) >= fabs(*rp.d));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary >= *rp.d);
         lp.cf++;
         rp.d++;
       }
       break;
     case LUX_CFLOAT:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary)
-                   >= hypot(rp.cf->real, rp.cf->imaginary));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary
+                   >= rp.cf->real + rp.cf->imaginary);
         lp.cf++;
         rp.cf++;
       }
       break;
     case LUX_CDOUBLE:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary)
-                   >= hypot(rp.cd->real, rp.cd->imaginary));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary
+                   >= rp.cd->real + rp.cd->imaginary);
         lp.cf++;
         rp.cd++;
       }
@@ -15532,57 +15837,57 @@ void lux_ge(void)
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) >= fabs(*rp.b));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary >= *rp.b);
         lp.cd++;
         rp.b++;
       }
       break;
     case LUX_INT16:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) >= fabs(*rp.w));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary >= *rp.w);
         lp.cd++;
         rp.w++;
       }
       break;
     case LUX_INT32:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) >= fabs(*rp.l));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary >= *rp.l);
         lp.cd++;
         rp.l++;
       }
       break;
     case LUX_INT64:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) >= fabs(*rp.q++));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary >= *rp.q++);
         lp.cd++;
       }
       break;
     case LUX_FLOAT:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) >= fabs(*rp.f));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary >= *rp.f);
         lp.cd++;
         rp.f++;
       }
       break;
     case LUX_DOUBLE:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) >= fabs(*rp.d));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary >= *rp.d);
         lp.cd++;
         rp.d++;
       }
       break;
     case LUX_CFLOAT:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary)
-                   >= hypot(rp.cf->real, rp.cf->imaginary));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary
+                   >= rp.cf->real + rp.cf->imaginary);
         lp.cd++;
         rp.cf++;
       }
       break;
     case LUX_CDOUBLE:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary)
-                   >= hypot(rp.cd->real, rp.cd->imaginary));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary
+                   >= rp.cd->real + rp.cd->imaginary);
         lp.cd++;
         rp.cd++;
       }
@@ -15636,16 +15941,22 @@ void lux_ge_as(void)
         *tp.l++ = (*lp.b++ >= *rp.d);
       break;
     case LUX_CFLOAT:
-      value = hypot(rp.cf->real, rp.cf->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value = rp.cf->real + rp.cf->imaginary;
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.b) >= value);
+        *tp.l++ = (*lp.b >= value);
         lp.b++;
       }
       break;
     case LUX_CDOUBLE:
-      value = hypot(rp.cd->real, rp.cd->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value = rp.cd->real + rp.cd->imaginary;
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.b) >= value);
+        *tp.l++ = (*lp.b >= value);
         lp.b++;
       }
       break;
@@ -15680,16 +15991,22 @@ void lux_ge_as(void)
         *tp.l++ = (*lp.w++ >= *rp.d);
       break;
     case LUX_CFLOAT:
-      value = hypot(rp.cf->real, rp.cf->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value = rp.cf->real + rp.cf->imaginary;
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.w) >= value);
+        *tp.l++ = (*lp.w >= value);
         lp.w++;
       }
       break;
     case LUX_CDOUBLE:
-      value = hypot(rp.cd->real, rp.cd->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value = rp.cd->real + rp.cd->imaginary;
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.w) >= value);
+        *tp.l++ = (*lp.w >= value);
         lp.w++;
       }
       break;
@@ -15724,16 +16041,22 @@ void lux_ge_as(void)
         *tp.l++ = (*lp.l++ >= *rp.d);
       break;
     case LUX_CFLOAT:
-      value = hypot(rp.cf->real, rp.cf->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value = rp.cf->real + rp.cf->imaginary;
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.l) >= value);
+        *tp.l++ = (*lp.l >= value);
         lp.l++;
       }
       break;
     case LUX_CDOUBLE:
-      value = hypot(rp.cd->real, rp.cd->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value = rp.cd->real + rp.cd->imaginary;
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.l) >= value);
+        *tp.l++ = (*lp.l >= value);
         lp.l++;
       }
       break;
@@ -15768,14 +16091,20 @@ void lux_ge_as(void)
         *tp.l++ = (*lp.q++ >= *rp.d);
       break;
     case LUX_CFLOAT:
-      value = hypot(rp.cf->real, rp.cf->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value = rp.cf->real + rp.cf->imaginary;
       while (nRepeat--)
-        *tp.l++ = (fabs(*lp.q++) >= value);
+        *tp.l++ = (*lp.q++ >= value);
       break;
     case LUX_CDOUBLE:
-      value = hypot(rp.cd->real, rp.cd->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value = rp.cd->real + rp.cd->imaginary;
       while (nRepeat--)
-        *tp.l++ = (fabs(*lp.q++) >= value);
+        *tp.l++ = (*lp.q++ >= value);
       break;
     default:
       cerror(ILL_TYPE, rhs, typeName(rhsType));
@@ -15808,16 +16137,22 @@ void lux_ge_as(void)
         *tp.l++ = (*lp.f++ >= *rp.d);
       break;
     case LUX_CFLOAT:
-      value = hypot(rp.cf->real, rp.cf->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value = rp.cf->real + rp.cf->imaginary;
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.f) >= value);
+        *tp.l++ = (*lp.f >= value);
         lp.f++;
       }
       break;
     case LUX_CDOUBLE:
-      value = hypot(rp.cd->real, rp.cd->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value = rp.cd->real + rp.cd->imaginary;
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.f) >= value);
+        *tp.l++ = (*lp.f >= value);
         lp.f++;
       }
       break;
@@ -15852,16 +16187,22 @@ void lux_ge_as(void)
         *tp.l++ = (*lp.d++ >= *rp.d);
       break;
     case LUX_CFLOAT:
-      value = hypot(rp.cf->real, rp.cf->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value = rp.cf->real + rp.cf->imaginary;
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.d) >= value);
+        *tp.l++ = (*lp.d >= value);
         lp.d++;
       }
       break;
     case LUX_CDOUBLE:
-      value = hypot(rp.cd->real, rp.cd->imaginary);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value = rp.cd->real + rp.cd->imaginary;
       while (nRepeat--) {
-        *tp.l++ = (fabs(*lp.d) >= value);
+        *tp.l++ = (*lp.d >= value);
         lp.d++;
       }
       break;
@@ -15870,56 +16211,57 @@ void lux_ge_as(void)
     }
     break;
   case LUX_CFLOAT:
+    /* we want +1 > -1 and also +i > -i; we get that by comparing the
+       projections onto the line in the direction of 1+i.  (a+bi) >
+       (c+di) if (a+b) > (c+d) */
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary)
-                    >= fabs(*rp.b));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary >= *rp.b);
         lp.cf++;
       }
       break;
     case LUX_INT16:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) >= fabs(*rp.w));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary >= *rp.w);
         lp.cf++;
       }
       break;
     case LUX_INT32:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) >= fabs(*rp.l));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary >= *rp.l);
         lp.cf++;
       }
       break;
     case LUX_INT64:
-      value = fabs(*rp.q);
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) >= value);
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary >= *rp.q);
         lp.cf++;
       }
       break;
     case LUX_FLOAT:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) >= fabs(*rp.f));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary >= *rp.f);
         lp.cf++;
       }
       break;
     case LUX_DOUBLE:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) >= fabs(*rp.d));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary >= *rp.d);
         lp.cf++;
       }
       break;
     case LUX_CFLOAT:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary)
-                   >= hypot(rp.cf->real, rp.cf->imaginary));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary
+                   >= rp.cf->real + rp.cf->imaginary);
         lp.cf++;
       }
       break;
     case LUX_CDOUBLE:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary)
-                   >= hypot(rp.cd->real, rp.cd->imaginary));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary
+                   >= rp.cd->real + rp.cd->imaginary);
         lp.cf++;
       }
       break;
@@ -15928,55 +16270,57 @@ void lux_ge_as(void)
     }
     break;
   case LUX_CDOUBLE:
+    /* we want +1 > -1 and also +i > -i; we get that by comparing the
+       projections onto the line in the direction of 1+i.  (a+bi) >
+       (c+di) if (a+b) > (c+d) */
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) >= fabs(*rp.b));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary >= *rp.b);
         lp.cd++;
       }
       break;
     case LUX_INT16:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) >= fabs(*rp.w));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary >= *rp.w);
         lp.cd++;
       }
       break;
     case LUX_INT32:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) >= fabs(*rp.l));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary >= *rp.l);
         lp.cd++;
       }
       break;
     case LUX_INT64:
-      value = fabs(*rp.q);
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) >= value);
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary >= *rp.q);
         lp.cd++;
       }
       break;
     case LUX_FLOAT:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) >= fabs(*rp.f));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary >= *rp.f);
         lp.cd++;
       }
       break;
     case LUX_DOUBLE:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) >= fabs(*rp.d));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary >= *rp.d);
         lp.cd++;
       }
       break;
     case LUX_CFLOAT:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary)
-                   >= hypot(rp.cf->real, rp.cf->imaginary));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary
+                   >= rp.cf->real + rp.cf->imaginary);
         lp.cd++;
       }
       break;
     case LUX_CDOUBLE:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary)
-                   >= hypot(rp.cd->real, rp.cd->imaginary));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary
+                   >= rp.cd->real + rp.cd->imaginary);
         lp.cd++;
       }
       break;
@@ -16022,16 +16366,22 @@ void lux_ge_sa(void)
         *tp.l++ = (*lp.b >= *rp.d++);
       break;
     case LUX_CFLOAT:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        value = hypot(rp.cf->real, rp.cf->imaginary);
-        *tp.l++ = (fabs(*lp.b) >= value);
+        value = rp.cf->real + rp.cf->imaginary;
+        *tp.l++ = (*lp.b >= value);
         rp.cf++;
       }
       break;
     case LUX_CDOUBLE:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        value = hypot(rp.cd->real, rp.cd->imaginary);
-        *tp.l++ = (fabs(*lp.b) >= value);
+        value = rp.cd->real + rp.cd->imaginary;
+        *tp.l++ = (*lp.b >= value);
         rp.cd++;
       }
       break;
@@ -16066,16 +16416,22 @@ void lux_ge_sa(void)
         *tp.l++ = (*lp.w >= *rp.d++);
       break;
     case LUX_CFLOAT:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        value = hypot(rp.cf->real, rp.cf->imaginary);
-        *tp.l++ = (fabs(*lp.w) >= value);
+        value = rp.cf->real + rp.cf->imaginary;
+        *tp.l++ = (*lp.w >= value);
         rp.cf++;
       }
       break;
     case LUX_CDOUBLE:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        value = hypot(rp.cd->real, rp.cd->imaginary);
-        *tp.l++ = (fabs(*lp.w) >= value);
+        value = rp.cd->real + rp.cd->imaginary;
+        *tp.l++ = (*lp.w >= value);
         rp.cd++;
       }
       break;
@@ -16110,16 +16466,22 @@ void lux_ge_sa(void)
         *tp.l++ = (*lp.l >= *rp.d++);
       break;
     case LUX_CFLOAT:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        value = hypot(rp.cf->real, rp.cf->imaginary);
-        *tp.l++ = (fabs(*lp.l) >= value);
+        value = rp.cf->real + rp.cf->imaginary;
+        *tp.l++ = (*lp.l >= value);
         rp.cf++;
       }
       break;
     case LUX_CDOUBLE:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        value = hypot(rp.cd->real, rp.cd->imaginary);
-        *tp.l++ = (fabs(*lp.l) >= value);
+        value = rp.cd->real + rp.cd->imaginary;
+        *tp.l++ = (*lp.l >= value);
         rp.cd++;
       }
       break;
@@ -16154,16 +16516,22 @@ void lux_ge_sa(void)
         *tp.l++ = (*lp.q >= *rp.d++);
       break;
     case LUX_CFLOAT:
-      value = fabs(*lp.q);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value = *lp.q;
       while (nRepeat--) {
-        *tp.l++ = (value >= hypot(rp.cf->real, rp.cf->imaginary));
+        *tp.l++ = (value >= rp.cf->real + rp.cf->imaginary);
         rp.cf++;
       }
       break;
     case LUX_CDOUBLE:
-      value = fabs(*lp.q);
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
+      value = *lp.q;
       while (nRepeat--) {
-        *tp.l++ = (value >= hypot(rp.cd->real, rp.cd->imaginary));
+        *tp.l++ = (value >= rp.cd->real + rp.cd->imaginary);
         rp.cd++;
       }
       break;
@@ -16198,16 +16566,22 @@ void lux_ge_sa(void)
         *tp.l++ = (*lp.f >= *rp.d++);
       break;
     case LUX_CFLOAT:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        value = hypot(rp.cf->real, rp.cf->imaginary);
-        *tp.l++ = (fabs(*lp.f) >= value);
+        value = rp.cf->real + rp.cf->imaginary;
+        *tp.l++ = (*lp.f >= value);
         rp.cf++;
       }
       break;
     case LUX_CDOUBLE:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        value = hypot(rp.cd->real, rp.cd->imaginary);
-        *tp.l++ = (fabs(*lp.f) >= value);
+        value = rp.cd->real + rp.cd->imaginary;
+        *tp.l++ = (*lp.f >= value);
         rp.cd++;
       }
       break;
@@ -16242,16 +16616,22 @@ void lux_ge_sa(void)
         *tp.l++ = (*lp.d >= *rp.d++);
       break;
     case LUX_CFLOAT:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        value = hypot(rp.cf->real, rp.cf->imaginary);
-        *tp.l++ = (fabs(*lp.d) >= value);
+        value = rp.cf->real + rp.cf->imaginary;
+        *tp.l++ = (*lp.d >= value);
         rp.cf++;
       }
       break;
     case LUX_CDOUBLE:
+      /* we want +1 > -1 and also +i > -i; we get that by comparing
+         the projections onto the line in the direction of 1+i.
+         (a+bi) > (c+di) if (a+b) > (c+d) */
       while (nRepeat--) {
-        value = hypot(rp.cd->real, rp.cd->imaginary);
-        *tp.l++ = (fabs(*lp.d) >= value);
+        value = rp.cd->real + rp.cd->imaginary;
+        *tp.l++ = (*lp.d >= value);
         rp.cd++;
       }
       break;
@@ -16260,53 +16640,56 @@ void lux_ge_sa(void)
     }
     break;
   case LUX_CFLOAT:
+    /* we want +1 > -1 and also +i > -i; we get that by comparing the
+       projections onto the line in the direction of 1+i.  (a+bi) >
+       (c+di) if (a+b) > (c+d) */
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) >= fabs(*rp.b));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary >= *rp.b);
         rp.b++;
       }
       break;
     case LUX_INT16:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) >= fabs(*rp.w));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary >= *rp.w);
         rp.w++;
       }
       break;
     case LUX_INT32:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) >= fabs(*rp.l));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary >= *rp.l);
         rp.l++;
       }
       break;
     case LUX_INT64:
-      value = hypot(lp.cf->real, lp.cf->imaginary);
+      value = lp.cf->real + lp.cf->imaginary;
       while (nRepeat--)
-        *tp.l++ = (value >= fabs(*rp.q++));
+        *tp.l++ = (value >= *rp.q++);
       break;
     case LUX_FLOAT:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) >= fabs(*rp.f));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary >= *rp.f);
         rp.f++;
       }
       break;
     case LUX_DOUBLE:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary) >= fabs(*rp.d));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary >= *rp.d);
         rp.d++;
       }
       break;
     case LUX_CFLOAT:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary)
-                   >= hypot(rp.cf->real, rp.cf->imaginary));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary
+                   >= rp.cf->real + rp.cf->imaginary);
         rp.cf++;
       }
       break;
     case LUX_CDOUBLE:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cf->real, lp.cf->imaginary)
-                   >= hypot(rp.cd->real, rp.cd->imaginary));
+        *tp.l++ = (lp.cf->real + lp.cf->imaginary
+                   >= rp.cd->real + rp.cd->imaginary);
         rp.cd++;
       }
       break;
@@ -16315,53 +16698,56 @@ void lux_ge_sa(void)
     }
     break;
   case LUX_CDOUBLE:
+    /* we want +1 > -1 and also +i > -i; we get that by comparing the
+       projections onto the line in the direction of 1+i.  (a+bi) >
+       (c+di) if (a+b) > (c+d) */
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) >= fabs(*rp.b));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary >= *rp.b);
         rp.b++;
       }
       break;
     case LUX_INT16:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) >= fabs(*rp.w));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary >= *rp.w);
         rp.w++;
       }
       break;
     case LUX_INT32:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) >= fabs(*rp.l));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary >= *rp.l);
         rp.l++;
       }
       break;
     case LUX_INT64:
-      value = hypot(lp.cd->real, lp.cd->imaginary);
+      value = lp.cd->real + lp.cd->imaginary;
       while (nRepeat--)
-        *tp.l++ = (value >= fabs(*rp.q++));
+        *tp.l++ = (value >= *rp.q++);
       break;
     case LUX_FLOAT:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) >= fabs(*rp.f));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary >= *rp.f);
         rp.f++;
       }
       break;
     case LUX_DOUBLE:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary) >= fabs(*rp.d));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary >= *rp.d);
         rp.d++;
       }
       break;
     case LUX_CFLOAT:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary)
-                   >= hypot(rp.cf->real, rp.cf->imaginary));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary
+                   >= rp.cf->real + rp.cf->imaginary);
         rp.cf++;
       }
       break;
     case LUX_CDOUBLE:
       while (nRepeat--) {
-        *tp.l++ = (hypot(lp.cd->real, lp.cd->imaginary)
-                   >= hypot(rp.cd->real, rp.cd->imaginary));
+        *tp.l++ = (lp.cd->real + lp.cd->imaginary
+                   >= rp.cd->real + rp.cd->imaginary);
         rp.cd++;
       }
       break;

@@ -53,129 +53,174 @@ START_TEST(binop_array)
      checked without needing code for each combination of types for
      the left-hand and right-hand arguments, and their power-of is
      small enough to fit in an int64_t, so that the expected results
-     can be represented exactly. */
+     can be represented exactly.  All numbers are positive integers,
+     because LUX_INT8 is an unsigned type and the current testing
+     scheme doesn't easily incorporate both unsigned and negative
+     integers. */
 
-  int64_t lv_aa[2] = { 97, 13 };
-  int64_t rv_aa[2] = { 2, 16 };
+  int64_t lv_aa[] = { 97, 13, 47 };
+  int64_t rv_aa[] = {  2, 16,  5 };
 
-  int64_t lv_as[2] = { 44, 11 };
+  int64_t lv_as[] = { 44, 11, 3 };
   int64_t rv_as = 11;
 
   int64_t lv_sa = 7;
-  int64_t rv_sa[2] = { 20, 7 };
+  int64_t rv_sa[] = { 20, 7, 5 };
 
   struct test {
     binaryOp op;
-    int64_t expected_values_aa[2];
-    int64_t expected_values_as[2];
-    int64_t expected_values_sa[2];
-  } tests[] = {
-    { LUX_ADD,
-      { lv_aa[0] + rv_aa[0], lv_aa[1] + rv_aa[1] },
-      { lv_as[0] + rv_as, lv_as[1] + rv_as },
-      { lv_sa + rv_sa[0], lv_sa + rv_sa[1] },
-    },
-    { LUX_SUB,
-      { lv_aa[0] - rv_aa[0], lv_aa[1] - rv_aa[1] },
-      { lv_as[0] - rv_as, lv_as[1] - rv_as },
-      { lv_sa - rv_sa[0], lv_sa - rv_sa[1] },
-    },
-    { LUX_MUL,
-      { lv_aa[0] * rv_aa[0], lv_aa[1] * rv_aa[1] },
-      { lv_as[0] * rv_as, lv_as[1] * rv_as },
-      { lv_sa * rv_sa[0], lv_sa * rv_sa[1] },
-    },
-    { LUX_DIV,
-      { lv_aa[0] / rv_aa[0], lv_aa[1] / rv_aa[1] },
-      { lv_as[0] / rv_as, lv_as[1] / rv_as },
-      { lv_sa / rv_sa[0], lv_sa / rv_sa[1] },
-    },
-    { LUX_IDIV,
-      { lv_aa[0] / rv_aa[0], lv_aa[1] / rv_aa[1] },
-      { lv_as[0] / rv_as, lv_as[1] / rv_as },
-      { lv_sa / rv_sa[0], lv_sa / rv_sa[1] },
-    },
-    { LUX_MOD,
-      { lv_aa[0] % rv_aa[0], lv_aa[1] % rv_aa[1] },
-      { lv_as[0] % rv_as, lv_as[1] % rv_as },
-      { lv_sa % rv_sa[0], lv_sa % rv_sa[1] },
-    },
-    /* LUX_SMOD: symmetric modulus a smod b is like a%b but between
-       -b/2 and +b/2 */
-    { LUX_SMOD,
-      { lv_aa[0] % rv_aa[0], lv_aa[1] % rv_aa[1] - rv_aa[1] },
-      { lv_as[0] % rv_as, lv_as[1] % rv_as },
-      { lv_sa % rv_sa[0], lv_sa % rv_sa[1] },
-    },
-    /* LUX_MAX: greatest of the arguments */
-    { LUX_MAX,
-      { (lv_aa[0] > rv_aa[0]? lv_aa[0]: rv_aa[0]),
-        (lv_aa[1] > rv_aa[1]? lv_aa[1]: rv_aa[1]) },
-      { (lv_as[0] > rv_as? lv_as[0]: rv_as),
-        (lv_as[1] > rv_as? lv_as[1]: rv_as) },
-      { (lv_sa > rv_sa[0]? lv_sa: rv_sa[0]),
-        (lv_sa > rv_sa[1]? lv_sa: rv_sa[1]) },
-    },
-    /* LUX_MIN: least of the arguments */
-    { LUX_MIN,
-      { (lv_aa[0] < rv_aa[0]? lv_aa[0]: rv_aa[0]),
-        (lv_aa[1] < rv_aa[1]? lv_aa[1]: rv_aa[1]) },
-      { (lv_as[0] < rv_as? lv_as[0]: rv_as),
-        (lv_as[1] < rv_as? lv_as[1]: rv_as) },
-      { (lv_sa < rv_sa[0]? lv_sa: rv_sa[0]),
-        (lv_sa < rv_sa[1]? lv_sa: rv_sa[1]) },
-    },
-    { LUX_EQ,
-      { (lv_aa[0] == rv_aa[0]), (lv_aa[1] == rv_aa[1]) },
-      { (lv_as[0] == rv_as), (lv_as[1] == rv_as) },
-      { (lv_sa == rv_sa[0]), (lv_sa == rv_sa[1]) },
-    },
-    { LUX_GT,
-      { (lv_aa[0] > rv_aa[0]), (lv_aa[1] > rv_aa[1]) },
-      { (lv_as[0] > rv_as), (lv_as[1] > rv_as) },
-      { (lv_sa > rv_sa[0]), (lv_sa > rv_sa[1]) },
-    },
-    { LUX_GE,
-      { (lv_aa[0] >= rv_aa[0]), (lv_aa[1] >= rv_aa[1]) },
-      { (lv_as[0] >= rv_as), (lv_as[1] >= rv_as) },
-      { (lv_sa >= rv_sa[0]), (lv_sa >= rv_sa[1]) },
-    },
-    { LUX_LT,
-      { (lv_aa[0] < rv_aa[0]), (lv_aa[1] < rv_aa[1]) },
-      { (lv_as[0] < rv_as), (lv_as[1] < rv_as) },
-      { (lv_sa < rv_sa[0]), (lv_sa < rv_sa[1]) },
-    },
-    { LUX_LE,
-      { (lv_aa[0] <= rv_aa[0]), (lv_aa[1] <= rv_aa[1]) },
-      { (lv_as[0] <= rv_as), (lv_as[1] <= rv_as) },
-      { (lv_sa <= rv_sa[0]), (lv_sa <= rv_sa[1]) },
-    },
-    { LUX_NE,
-      { (lv_aa[0] != rv_aa[0]), (lv_aa[1] != rv_aa[1]) },
-      { (lv_as[0] != rv_as), (lv_as[1] != rv_as) },
-      { (lv_sa != rv_sa[0]), (lv_sa != rv_sa[1]) },
-    },
-    { LUX_OR,
-      { (lv_aa[0] | rv_aa[0]), (lv_aa[1] | rv_aa[1]) },
-      { (lv_as[0] | rv_as), (lv_as[1] | rv_as) },
-      { (lv_sa | rv_sa[0]), (lv_sa | rv_sa[1]) },
-    },
-    { LUX_AND,
-      { (lv_aa[0] & rv_aa[0]), (lv_aa[1] & rv_aa[1]) },
-      { (lv_as[0] & rv_as), (lv_as[1] & rv_as) },
-      { (lv_sa & rv_sa[0]), (lv_sa & rv_sa[1]) },
-    },
-    { LUX_XOR,
-      { (lv_aa[0] ^ rv_aa[0]), (lv_aa[1] ^ rv_aa[1]) },
-      { (lv_as[0] ^ rv_as), (lv_as[1] ^ rv_as) },
-      { (lv_sa ^ rv_sa[0]), (lv_sa ^ rv_sa[1]) },
-    },
-    { LUX_POW,
-      { 9409, 665416609183179841 },
-      { 1196683881290399744, 285311670611 },
-      { 79792266297612001, 823543 },
-    },
-  };
+    int64_t expected_values_aa[3];
+    int64_t expected_values_as[3];
+    int64_t expected_values_sa[3];
+   } tests[19];
+
+  int t = 0;
+  tests[t].op = LUX_ADD;
+  int i;
+  for (i = 0; i < 3; ++i) {
+    tests[t].expected_values_aa[i] = lv_aa[i] + rv_aa[i];
+    tests[t].expected_values_as[i] = lv_as[i] + rv_as;
+    tests[t].expected_values_sa[i] = lv_sa + rv_sa[i];
+  }
+
+  tests[++t].op = LUX_SUB;
+  for (i = 0; i < 3; ++i) {
+    tests[t].expected_values_aa[i] = lv_aa[i] - rv_aa[i];
+    tests[t].expected_values_as[i] = lv_as[i] - rv_as;
+    tests[t].expected_values_sa[i] = lv_sa - rv_sa[i];
+  }
+
+  tests[++t].op = LUX_MUL;
+  for (i = 0; i < 3; ++i) {
+    tests[t].expected_values_aa[i] = lv_aa[i] * rv_aa[i];
+    tests[t].expected_values_as[i] = lv_as[i] * rv_as;
+    tests[t].expected_values_sa[i] = lv_sa * rv_sa[i];
+  }
+
+  tests[++t].op = LUX_DIV;
+  for (i = 0; i < 3; ++i) {
+    tests[t].expected_values_aa[i] = lv_aa[i] / rv_aa[i];
+    tests[t].expected_values_as[i] = lv_as[i] / rv_as;
+    tests[t].expected_values_sa[i] = lv_sa / rv_sa[i];
+  }
+
+  tests[++t].op = LUX_IDIV;
+  for (i = 0; i < 3; ++i) {
+    tests[t].expected_values_aa[i] = lv_aa[i] / rv_aa[i];
+    tests[t].expected_values_as[i] = lv_as[i] / rv_as;
+    tests[t].expected_values_sa[i] = lv_sa / rv_sa[i];
+  }
+
+  tests[++t].op = LUX_MOD;
+  for (i = 0; i < 3; ++i) {
+    tests[t].expected_values_aa[i] = lv_aa[i] % rv_aa[i];
+    tests[t].expected_values_as[i] = lv_as[i] % rv_as;
+    tests[t].expected_values_sa[i] = lv_sa % rv_sa[i];
+  }
+
+  tests[++t].op = LUX_SMOD;
+  for (i = 0; i < 3; ++i) {
+    int32_t v = lv_aa[i] % rv_aa[i];
+    if (2*v > rv_aa[i])
+      v -= rv_aa[i];
+    tests[t].expected_values_aa[i] = v;
+    v = lv_as[i] % rv_as;
+    if (2*v > rv_as)
+      v -= rv_as;
+    tests[t].expected_values_as[i] = v;
+    v = lv_sa % rv_sa[i];
+    if (2*v > rv_sa[i])
+      v -= rv_sa[i];
+    tests[t].expected_values_sa[i] = v;
+  }
+
+  tests[++t].op = LUX_MAX;
+  for (i = 0; i < 3; ++i) {
+    tests[t].expected_values_aa[i] = (lv_aa[i] > rv_aa[i]? lv_aa[i]: rv_aa[i]);
+    tests[t].expected_values_as[i] = (lv_as[i] > rv_as? lv_as[i]: rv_as);
+    tests[t].expected_values_sa[i] = (lv_sa > rv_sa[i]? lv_sa: rv_sa[i]);
+  }
+
+  tests[++t].op = LUX_MIN;
+  for (i = 0; i < 3; ++i) {
+    tests[t].expected_values_aa[i] = (lv_aa[i] < rv_aa[i]? lv_aa[i]: rv_aa[i]);
+    tests[t].expected_values_as[i] = (lv_as[i] < rv_as? lv_as[i]: rv_as);
+    tests[t].expected_values_sa[i] = (lv_sa < rv_sa[i]? lv_sa: rv_sa[i]);
+  }
+
+  tests[++t].op = LUX_EQ;
+  for (i = 0; i < 3; ++i) {
+    tests[t].expected_values_aa[i] = (lv_aa[i] == rv_aa[i]);
+    tests[t].expected_values_as[i] = (lv_as[i] == rv_as);
+    tests[t].expected_values_sa[i] = (lv_sa == rv_sa[i]);
+  }
+
+  tests[++t].op = LUX_GT;
+  for (i = 0; i < 3; ++i) {
+    tests[t].expected_values_aa[i] = (lv_aa[i] > rv_aa[i]);
+    tests[t].expected_values_as[i] = (lv_as[i] > rv_as);
+    tests[t].expected_values_sa[i] = (lv_sa > rv_sa[i]);
+  }
+
+  tests[++t].op = LUX_GE;
+  for (i = 0; i < 3; ++i) {
+    tests[t].expected_values_aa[i] = (lv_aa[i] >= rv_aa[i]);
+    tests[t].expected_values_as[i] = (lv_as[i] >= rv_as);
+    tests[t].expected_values_sa[i] = (lv_sa >= rv_sa[i]);
+  }
+
+  tests[++t].op = LUX_LT;
+  for (i = 0; i < 3; ++i) {
+    tests[t].expected_values_aa[i] = (lv_aa[i] < rv_aa[i]);
+    tests[t].expected_values_as[i] = (lv_as[i] < rv_as);
+    tests[t].expected_values_sa[i] = (lv_sa < rv_sa[i]);
+  }
+
+  tests[++t].op = LUX_LE;
+  for (i = 0; i < 3; ++i) {
+    tests[t].expected_values_aa[i] = (lv_aa[i] <= rv_aa[i]);
+    tests[t].expected_values_as[i] = (lv_as[i] <= rv_as);
+    tests[t].expected_values_sa[i] = (lv_sa <= rv_sa[i]);
+  }
+
+  tests[++t].op = LUX_NE;
+  for (i = 0; i < 3; ++i) {
+    tests[t].expected_values_aa[i] = (lv_aa[i] != rv_aa[i]);
+    tests[t].expected_values_as[i] = (lv_as[i] != rv_as);
+    tests[t].expected_values_sa[i] = (lv_sa != rv_sa[i]);
+  }
+
+  tests[++t].op = LUX_OR;
+  for (i = 0; i < 3; ++i) {
+    tests[t].expected_values_aa[i] = (lv_aa[i] | rv_aa[i]);
+    tests[t].expected_values_as[i] = (lv_as[i] | rv_as);
+    tests[t].expected_values_sa[i] = (lv_sa | rv_sa[i]);
+  }
+
+  tests[++t].op = LUX_AND;
+  for (i = 0; i < 3; ++i) {
+    tests[t].expected_values_aa[i] = (lv_aa[i] & rv_aa[i]);
+    tests[t].expected_values_as[i] = (lv_as[i] & rv_as);
+    tests[t].expected_values_sa[i] = (lv_sa & rv_sa[i]);
+  }
+
+  tests[++t].op = LUX_XOR;
+  for (i = 0; i < 3; ++i) {
+    tests[t].expected_values_aa[i] = (lv_aa[i] ^ rv_aa[i]);
+    tests[t].expected_values_as[i] = (lv_as[i] ^ rv_as);
+    tests[t].expected_values_sa[i] = (lv_sa ^ rv_sa[i]);
+  }
+
+  tests[++t].op = LUX_POW;
+  tests[t].expected_values_aa[0] = 9409;                /* 97^2 */
+  tests[t].expected_values_aa[1] = 665416609183179841;  /* 13^16 */
+  tests[t].expected_values_aa[2] = 229345007;           /* 47^5 */
+  tests[t].expected_values_as[0] = 1196683881290399744; /* 44^11 */
+  tests[t].expected_values_as[1] = 285311670611;        /* 11^11 */
+  tests[t].expected_values_as[2] = 177147;              /* 3^11 */
+  tests[t].expected_values_sa[0] = 79792266297612001;   /* 7^20 */
+  tests[t].expected_values_sa[1] = 823543;              /* 7^7 */
+  tests[t].expected_values_sa[2] = 16807;               /* 7^5 */
 
   size_t n = sizeof(lv_aa)/sizeof(*lv_aa);
 
@@ -310,48 +355,75 @@ START_TEST(binop_array)
         case LUX_DIV:
           switch (expected_type) {
           case LUX_FLOAT:
-            expected_ptr_aa.f[0] = (float) lv_aa[0]/rv_aa[0];
-            expected_ptr_aa.f[1] = (float) lv_aa[1]/rv_aa[1];
-            expected_ptr_as.f[0] = (float) lv_as[0]/rv_as;
-            expected_ptr_as.f[1] = (float) lv_as[1]/rv_as;
-            expected_ptr_sa.f[0] = (float) lv_sa/rv_sa[0];
-            expected_ptr_sa.f[1] = (float) lv_sa/rv_sa[1];
+            for (i = 0; i < 3; ++i) {
+              expected_ptr_aa.f[i] = (float) lv_aa[i]/rv_aa[i];
+              expected_ptr_as.f[i] = (float) lv_as[i]/rv_as;
+              expected_ptr_sa.f[i] = (float) lv_sa/rv_sa[i];
+            }
             break;
           case LUX_DOUBLE:
-            expected_ptr_aa.d[0] = (double) lv_aa[0]/rv_aa[0];
-            expected_ptr_aa.d[1] = (double) lv_aa[1]/rv_aa[1];
-            expected_ptr_as.d[0] = (double) lv_as[0]/rv_as;
-            expected_ptr_as.d[1] = (double) lv_as[1]/rv_as;
-            expected_ptr_sa.d[0] = (double) lv_sa/rv_sa[0];
-            expected_ptr_sa.d[1] = (double) lv_sa/rv_sa[1];
+            for (i = 0; i < 3; ++i) {
+              expected_ptr_aa.d[i] = (double) lv_aa[i]/rv_aa[i];
+              expected_ptr_as.d[i] = (double) lv_as[i]/rv_as;
+              expected_ptr_sa.d[i] = (double) lv_sa/rv_sa[i];
+            }
             break;
           case LUX_CFLOAT:
-            expected_ptr_aa.cf[0].real = (float) lv_aa[0]/rv_aa[0];
-            expected_ptr_aa.cf[0].imaginary = 0;
-            expected_ptr_aa.cf[1].real = (float) lv_aa[1]/rv_aa[1];
-            expected_ptr_aa.cf[1].imaginary = 0;
-            expected_ptr_as.cf[0].real = (float) lv_as[0]/rv_as;
-            expected_ptr_as.cf[0].imaginary = 0;
-            expected_ptr_as.cf[1].real = (float) lv_as[1]/rv_as;
-            expected_ptr_as.cf[1].imaginary = 0;
-            expected_ptr_sa.cf[0].real = (float) lv_sa/rv_sa[0];
-            expected_ptr_sa.cf[0].imaginary = 0;
-            expected_ptr_sa.cf[1].real = (float) lv_sa/rv_sa[1];
-            expected_ptr_sa.cf[1].imaginary = 0;
+            for (i = 0; i < 3; ++i) {
+              expected_ptr_aa.cf[i].real = (float) lv_aa[i]/rv_aa[i];
+              expected_ptr_aa.cf[i].imaginary = 0;
+              expected_ptr_as.cf[i].real = (float) lv_as[i]/rv_as;
+              expected_ptr_as.cf[i].imaginary = 0;
+              expected_ptr_sa.cf[i].real = (float) lv_sa/rv_sa[i];
+              expected_ptr_sa.cf[i].imaginary = 0;
+            }
             break;
           case LUX_CDOUBLE:
-            expected_ptr_aa.cd[0].real = (double) lv_aa[0]/rv_aa[0];
-            expected_ptr_aa.cd[0].imaginary = 0;
-            expected_ptr_aa.cd[1].real = (double) lv_aa[1]/rv_aa[1];
-            expected_ptr_aa.cd[1].imaginary = 0;
-            expected_ptr_as.cd[0].real = (double) lv_as[0]/rv_as;
-            expected_ptr_as.cd[0].imaginary = 0;
-            expected_ptr_as.cd[1].real = (double) lv_as[1]/rv_as;
-            expected_ptr_as.cd[1].imaginary = 0;
-            expected_ptr_sa.cd[0].real = (double) lv_sa/rv_sa[0];
-            expected_ptr_sa.cd[0].imaginary = 0;
-            expected_ptr_sa.cd[1].real = (double) lv_sa/rv_sa[1];
-            expected_ptr_sa.cd[1].imaginary = 0;
+            for (i = 0; i < 3; ++i) {
+              expected_ptr_aa.cd[i].real = (double) lv_aa[i]/rv_aa[i];
+              expected_ptr_aa.cd[i].imaginary = 0;
+              expected_ptr_as.cd[i].real = (double) lv_as[i]/rv_as;
+              expected_ptr_as.cd[i].imaginary = 0;
+              expected_ptr_sa.cd[i].real = (double) lv_sa/rv_sa[i];
+              expected_ptr_sa.cd[i].imaginary = 0;
+            }
+            break;
+          }
+          break;
+        }
+
+        switch (expected_type) {
+        case LUX_INT8:
+          switch (tests[iop].op) {
+          case LUX_DIV: case LUX_IDIV:
+            for (i = 0; i < 3; ++i) {
+              expected_ptr_aa.b[i] = (uint8_t) lv_aa[i]/(uint8_t) rv_aa[i];
+              expected_ptr_as.b[i] = (uint8_t) lv_as[i]/(uint8_t) rv_as;
+              expected_ptr_sa.b[i] = (uint8_t) lv_sa/(uint8_t) rv_sa[i];
+            }
+            break;
+          case LUX_MOD:
+            for (i = 0; i < 3; ++i) {
+              expected_ptr_aa.b[i] = (uint8_t) lv_aa[i] % (uint8_t) rv_aa[i];
+              expected_ptr_as.b[i] = (uint8_t) lv_as[i] % (uint8_t) rv_as;
+              expected_ptr_sa.b[i] = (uint8_t) lv_sa % (uint8_t) rv_sa[i];
+            }
+            break;
+          case LUX_SMOD:
+            for (i = 0; i < 3; ++i) {
+              uint8_t v = (uint8_t) lv_aa[i] % (uint8_t) rv_aa[i];
+              if (2*v > rv_aa[i])
+                v -= rv_aa[i];
+              expected_ptr_aa.b[i] = v;
+              v = (uint8_t) lv_as[i] % (uint8_t) rv_as;
+              if (2*v > rv_as)
+                v -= rv_as;
+              expected_ptr_as.b[i] = v;
+              v = (uint8_t) lv_sa % (uint8_t) rv_sa[i];
+              if (2*v > rv_sa[i])
+                v -= rv_sa[i];
+              expected_ptr_sa.b[i] = v;
+            }
             break;
           }
           break;

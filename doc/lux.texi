@@ -3620,8 +3620,38 @@ and complex double (@code{CDOUBLE}).  @code{CDOUBLE} is explicitly
 indicated by use of the @code{D} specifier (for @code{DOUBLE}) and the
 @code{I} specifier (for imaginary).
 
+Complex numbers have no natural ordering, so there is no obvious way
+to decide whether a complex number @code{x} is less than or greater
+than another complex number @code{y}.  If @code{x = a + b*#i} and
+@code{y = c + d*#i} where @code{a, b, c, d} are real (non-complex)
+numbers, then we adopt the rule that @code{x > y} if @code{a + b > c +
+d}, and @code{x < y} if @code{a + b < c + d}.  With that rule, the
+ordering of @code{CFLOAT} or @code{CDOUBLE} numbers with their
+imaginary part equal to 0 (i.e., so-called purely imaginary numbers)
+is the same as the ordering of the corresponding @code{FLOAT} or
+@code{DOUBLE} numbers (e.g., @code{1+0i GT -2+0i}, just like @code{1
+GT -2}), and the ordering of complex numbers with their real part
+equal to 0 is similar to that of real numbers (e.g., @code{1i GT
+-2i}).
+
+However, any such rule can lead to somewhat unusual results.  For real
+(non-complex) numbers, if both @code{x LT y} and @code{x GT y} are
+false, then @code{x EQ y} must be true, and vice versa.  For complex
+numbers, that relationship does not necessarily hold anymore.  For
+example, with the above rule, @code{x LT y} and @code{x GT y} and
+@code{x EQ y} are all false if @code{x = 3+2i} and @code{y = 8-3i},
+because 3+2 is equal to 8-3.  So, even though @code{x} is not less
+than @code{y}, and @code{x} is not greater than @code{y}, yet @code{x}
+is not equal to @code{y}.
+
+The abovementioned ordering rule for complex numbers is used by the
+binary relational operators @code{LT}, @code{LE}, @code{GT},
+@code{GE}, and also by the binary bounding operators @code{>},
+@code{<}.
+
 See also: @ref{#I}, @ref{ABS}, @ref{REAL}, @ref{IMAGINARY},
-@ref{CONJUGATE}, @ref{FFT}
+@ref{CONJUGATE}, @ref{FFT}, @ref{Binary Relationals}, @ref{Binary
+Bounding}
 
 @c ------------------------------------------------------------------
 @node Strings, Arrays, Scalars, Data Classes
@@ -4431,17 +4461,19 @@ if @code{ok} is not equal to 17.
 Binary relational operators are defined for (real or complex) scalars
 (@ref{Scalars}) and numerical arrays (@ref{Arrays}) and for strings
 (@ref{Strings}).  They compare the values of the operands, and return
-either a 1 or a 0, depending on whether the operands do or do not posess
-the relation implied by the operator.  For string operands, relations
-are tested based on the byte codes used internally by your computer to
-represent the characters.  Most computers nowadays use ASCII code for
-that, but some IBM mainframes use a different format.  In both of these
-formats, letters are compared based on alphabetical order.  If the
-second string is equal to the first one with some more characters
-appended, then the second string is considered to lie closer to the end
-of the alphabet than the first string.  When testing for relative order
-involving one or more complex numbers, the numbers are compared by
-magnitude.
+either a 1 or a 0, depending on whether the operands do or do not
+posess the relation implied by the operator.  For string operands,
+relations are tested based on the byte codes used internally by your
+computer to represent the characters.  Most computers nowadays use
+ASCII code for that, but some IBM mainframes use a different format.
+In both of these formats, letters are compared based on alphabetical
+order.  If the second string is equal to the first one with some more
+characters appended, then the second string is considered to lie
+closer to the end of the alphabet than the first string.  When testing
+for relative order involving one or more complex numbers, an ordering
+based on projection on 1+i is used, such that the usual ordering holds
+on the real and imaginary axes of the complex plane (e.g., @code{1 GT
+-1} and @code{#I GT -#I}; see @ref{Complex Numbers}.
 
 The following relational operators are available:
 
@@ -4457,13 +4489,13 @@ The following relational operators are available:
 @code{x GT y} returns 1 if @code{x} is greater than @code{y}.
 
 @item Greater Than Or Equal To
-@code{x GE y} returns 1 if @code{x} is greater than or equal to @code{y}. 
+@code{x GE y} returns 1 if @code{x} is greater than or equal to @code{y}.
 
 @item Less Than
 @code{x LT y} returns 1 if @code{x} is less than @code{y}.
 
 @item Less Than Or Equal To
-@code{x LE y} returns 1 if @code{x} is less than or equal to @code{y}. 
+@code{x LE y} returns 1 if @code{x} is less than or equal to @code{y}.
 @end table
 
 For example, the following relations are all true:
@@ -4495,15 +4527,17 @@ available:
 @table @asis
 
 @item Lower Bound
-@code{x < y} returns the smaller (i.e. closer to @minus{}Infinity) of
-@code{x} and @code{y}.  If any of the operands is complex, then the
-magnitudes of the operands are compared.
+@code{x < y} returns the smaller (i.e. closer to @minus{}Infinity, for
+real numbers) of @code{x} and @code{y}.
 
 @item Upper Bound
-@code{x > y} returns the larger (i.e. closer to +Infinity) of @code{x}
-and @code{y}.   If any of the operands is complex, then the
-magnitudes of the operands are compared.
+@code{x > y} returns the larger (i.e. closer to +Infinity, for real
+numbers) of @code{x} and @code{y}.
+
 @end table
+
+Comparison of complex numbers is based on their projection on 1+i; see
+@ref{Complex Numbers}.
 
 So, to restrict all elements of an array @code{x} to between the values
 of 20 and 33, use @code{x > 20 < 33}.
@@ -12625,7 +12659,7 @@ arguments.
 * ZERONANS::                    Remove NaN values
 * ZINV::                        Zero-protected inverse
 * ZOOM::                        Image inspection using the pointer
-* Square Brackets::             Concatenation into an array             
+* Square Brackets::             Concatenation into an array
 * Curly Braces::                Concatenation into a list
 @end menu
 
@@ -19798,7 +19832,7 @@ See also: @ref{Astronomical Coordinate Calculations}
 @findex GST94
 
 @code{GST94(@var{jdut})}
- 
+
 [SOFA] Returns Greenwich apparent sidereal time in radians for the
 given UT1 Julian Date @code{@var{jdut}}, consistent with IAU 1982/94
 resolutions.  The result has the same dimensions as @code{@var{jdut}}.

@@ -435,7 +435,7 @@ int32_t Sprintf_general(char *str, char *format, va_list ap)
   switch (*fmi->spec_char) {
   default:			/* let vsprintf handle it */
     n = vsprintf(str, fmi->start, ap);
-    str += strlen(str);
+    str = strchr(str, 0);
     break;
   case 'z':			/* complex number */
     /* for complex numbers, the real and imaginary parts must be specified

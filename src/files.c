@@ -892,7 +892,7 @@ void type_ascii_one(int32_t symbol, FILE *fp)
       while (j--) {
         if (!j && (theFormat.flags & FMT_MIX2))
           theFormat.spec_char[1] = '\0';
-        Sprintf_tok(curScrat, (int32_t) *ptr.b++);
+        Sprintf_tok(curScrat, (intmax_t) *ptr.b++);
         fprintw(fp, curScrat);
         if (j && (internalMode & 4))
           nextformat(NULL, 1);
@@ -903,7 +903,7 @@ void type_ascii_one(int32_t symbol, FILE *fp)
       while (j--) {
         if (!j && (theFormat.flags & FMT_MIX2))
           theFormat.spec_char[1] = '\0';
-        Sprintf_tok(curScrat, (int32_t) *ptr.w++);
+        Sprintf_tok(curScrat, (intmax_t) *ptr.w++);
         fprintw(fp, curScrat);
         if (j && (internalMode & 4))
           nextformat(NULL, 1);
@@ -914,7 +914,7 @@ void type_ascii_one(int32_t symbol, FILE *fp)
       while (j--) {
         if (!j && (theFormat.flags & FMT_MIX2))
           theFormat.spec_char[1] = '\0';
-        Sprintf_tok(curScrat, (int32_t) *ptr.l++);
+        Sprintf_tok(curScrat, (intmax_t) *ptr.l++);
         fprintw(fp, curScrat);
         if (j && (internalMode & 4))
           nextformat(NULL, 1);

@@ -3199,6 +3199,8 @@ void read_a_number(char **buf, scalar *value, Symboltype *type)
       } else
 	thetype = LUX_FLOAT;
       value->d *= sign;	/* put the sign back on it */
+      if (type)
+        *type = thetype;
       *buf = p;
       return;
     case '.': case 'D': case 'E':

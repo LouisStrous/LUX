@@ -2167,11 +2167,11 @@ int32_t lux_sort(int32_t narg, int32_t ps[])
   /* SGI cc does not accept combination of (int32_t, uint8_t *) and (int32_t, int16_t *) */
   /* functions in one array of function pointers, not even if the function */
   /* pointer array is defined as (int32_t, void *). */
-  void	sort_b(), sort_w(), sort_l(), sort_f(), sort_d(), sort_s(),
-  	shell_b(), shell_w(), shell_l(), shell_f(), shell_d(), shell_s();
+  void	sort_b(), sort_w(), sort_l(), sort_int64(), sort_f(), sort_d(), sort_s(),
+    shell_b(), shell_w(), shell_l(), shell_int64(), shell_f(), shell_d(), shell_s();
   static void (*sortFunc[])(int32_t, void *) = {
-    sort_b, sort_w, sort_l, sort_f, sort_d, sort_s, 
-    shell_b, shell_w, shell_l, shell_f, shell_d, shell_s
+    sort_b, sort_w, sort_l, sort_int64, sort_f, sort_d, sort_s,
+    shell_b, shell_w, shell_l, shell_int64, shell_f, shell_d, shell_s
   };
   int32_t	lux_replace(int32_t, int32_t);
 
@@ -2232,9 +2232,9 @@ int32_t lux_index(int32_t narg, int32_t ps[])
   /* SGI cc does not accept combination of (int32_t, uint8_t *) and (int32_t, int16_t *) */
   /* functions in one array of function pointers, not even if the function */
   /* pointer array is defined as (int32_t, void *). */
-  void	indexx_b(), indexx_w(), indexx_l(), indexx_f(), indexx_d(), indexx_s();
+  void	indexx_b(), indexx_w(), indexx_l(), indexx_int64(), indexx_f(), indexx_d(), indexx_s();
   static void	(*indexFunc[])(int32_t, void *, int32_t []) = {
-    indexx_b, indexx_w, indexx_l, indexx_f, indexx_d, indexx_s
+    indexx_b, indexx_w, indexx_l, indexx_int64, indexx_f, indexx_d, indexx_s
   };
   void invertPermutation(int32_t *, int32_t);
 

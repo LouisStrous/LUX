@@ -116,6 +116,27 @@ void shell_l(int32_t n, int32_t arr[])
  }
 }
 /*------------------------------------------------------------------------- */
+void shell_int64(int64_t n, int64_t arr[])
+{
+ int64_t	nn,m,j,i,lognb2;
+ int64_t	t;
+
+ lognb2 = (log((double) n)*ALN2I + TINY);
+ m = n;
+ for (nn = 1; nn <= lognb2; nn++) {
+   m >>= 1;
+   for (j = m; j < n; j++) {
+     i = j - m;
+     t = arr[j];
+     while (i >= 0 && arr[i] > t) {
+       arr[i + m] = arr[i];
+       i -= m;
+     }
+     arr[i + m]=t;
+   }
+ }
+}
+/*------------------------------------------------------------------------- */
 void shell_w(int32_t n, int16_t arr[])
 {
   int32_t	nn,m,j,i,lognb2;
@@ -294,7 +315,40 @@ void sort_l(int32_t n, int32_t ra[])
 {
   int32_t	l,j,ir,i;
   long	rra;
-  
+
+  l = (n/2);
+  ir = n-1;
+  for (;;) {
+    if (l > 0)
+      rra = ra[--l];
+    else {
+      rra = ra[ir];
+      ra[ir] = ra[0];
+      if (--ir == 0) {
+	ra[0] = rra;
+	return;
+      }
+    }
+    i = l;
+    j = l + l + 1;
+    while (j <= ir) {
+      if (j < ir && ra[j] < ra[j+1])
+	j++;
+      if (rra < ra[j]) {
+	ra[i] = ra[j];
+	j += (i=j) + 1;
+      } else
+	j = ir + 1;
+    }
+    ra[i] = rra;
+  }
+}
+/*------------------------------------------------------------------------- */
+void sort_int64(int64_t n, int64_t ra[])
+{
+  int64_t	l,j,ir,i;
+  long	rra;
+
   l = (n/2);
   ir = n-1;
   for (;;) {
@@ -501,6 +555,41 @@ void indexx_l(int32_t n, int32_t ra[], int32_t indx[])
   int32_t	l,j,ir,i,indxt;
   int32_t	q;
  
+  for (i = 0; i < n; i++)
+    indx[i] = i;
+  l = (n/2);
+  ir = n - 1;
+  for (;;) {
+    if (l > 0)
+      q=ra[(indxt = indx[--l])];
+    else {
+      q=ra[(indxt = indx[ir])];
+      indx[ir] = indx[0];
+      if (--ir == 0) {
+	indx[0] = indxt;
+	return;
+      }
+    }
+    i = l;
+    j = l + l + 1;
+    while (j <= ir) {
+      if (j < ir && ra[indx[j]] < ra[indx[j+1]])
+	j++;
+      if (q < ra[indx[j]]) {
+	indx[i] = indx[j];
+	j += (i = j) + 1;
+      } else
+	j = ir + 1;
+    }
+    indx[i] = indxt;
+  }
+}
+/*------------------------------------------------------------------------- */
+void indexx_int64(int64_t n, int64_t ra[], int64_t indx[])
+{
+  int64_t	l,j,ir,i,indxt;
+  int64_t	q;
+
   for (i = 0; i < n; i++)
     indx[i] = i;
   l = (n/2);

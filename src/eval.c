@@ -9536,15 +9536,15 @@ void lux_mod_as(void)
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--)
-        *tp.q++ = iamod(*lp.q++, *rp.b);
+        *tp.q++ = i64amod(*lp.q++, *rp.b);
       break;
     case LUX_INT16:
       while (nRepeat--)
-        *tp.q++ = iamod(*lp.q++, *rp.w);
+        *tp.q++ = i64amod(*lp.q++, *rp.w);
       break;
     case LUX_INT32:
       while (nRepeat--)
-        *tp.q++ = iamod(*lp.q++, *rp.l);
+        *tp.q++ = i64amod(*lp.q++, *rp.l);
       break;
     case LUX_INT64:
       while (nRepeat--)

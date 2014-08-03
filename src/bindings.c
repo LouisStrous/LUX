@@ -1166,6 +1166,34 @@ int32_t lux_v_ddp3_iD1D33_01_s_(int32_t narg, int32_t ps[], void (*f)(double, do
   return iq;
 }
 /*-----------------------------------------------------------------------*/
+/** Bind a C function \p f (with one double argument and two double
+    pointer arguments returning void) to a LUX function with one
+    scalar at-least-double input parameter and two double output
+    parameters that get the same dimensions as the input parameter.
+    The function is called once for each element of the input
+    parameter.
+
+    Standard arguments <tt>"i>D*;oD&;oD&"</tt>.
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_v_ddpdp_iDaoDqDq_012_s_(int32_t narg, int32_t ps[], void (*f)(double, double*, double*))
+{
+  pointer *ptrs;
+  loopInfo *infos;
+  int32_t iq;
+
+  if ((iq = standard_args(narg, ps, "i>D*;oD&;oD&", &ptrs, &infos)) < 0)
+    return LUX_ERROR;
+  while (infos[0].nelem--) {
+    f(*ptrs[0].d++, ptrs[1].d++, ptrs[2].d++);
+  }
+  return iq;
+}
+/*-----------------------------------------------------------------------*/
 int32_t lux_v_dT4dpdp_iDaT3oDqDq_0T2z34_s_(int32_t narg, int32_t ps[], void (*f)(double, double, double, double, double *, double *))
 {
   pointer *ptrs;

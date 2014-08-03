@@ -38,7 +38,7 @@ AC_TYPE_INT32_T
 AC_TYPE_INT64_T
 
 # Checks for library functions.
-AC_CHECK_FUNCS([clock_gettime])
+AC_CHECK_FUNCS([clock_gettime sincos])
 
 AC_CONFIG_FILES([Makefile
                  sofa/Makefile

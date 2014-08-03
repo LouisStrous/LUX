@@ -324,7 +324,7 @@ int32_t lux_i_dpiidp_iDaLrDq_00T2_f_(int32_t narg, int32_t ps[], int32_t (*f)(do
     ptrs[0].d += infos[0].rdims[0];
     ptrs[2].d += infos[0].rdims[0];
   }
-  return iq;  
+  return iq;
 }
 /*-----------------------------------------------------------------------*/
 int32_t lux_i_dpiT3dp_iDaiLiLrDq_00T3_f_(int32_t narg, int32_t ps[], int32_t (*f)(double *, int32_t, int32_t, int32_t, double *))
@@ -341,7 +341,7 @@ int32_t lux_i_dpiT3dp_iDaiLiLrDq_00T3_f_(int32_t narg, int32_t ps[], int32_t (*f
     ptrs[0].d += infos[0].rdims[0];
     ptrs[3].d += infos[0].rdims[0];
   }
-  return iq;  
+  return iq;
 }
 /*-----------------------------------------------------------------------*/
 int32_t lux_v_dp3dp3dp_iD23aD23qoDcm3q_0T2_f_(int32_t narg, int32_t ps[], void (*f)(double [2][3], double [2][3], double [2]))
@@ -354,7 +354,7 @@ int32_t lux_v_dp3dp3dp_iD23aD23qoDcm3q_0T2_f_(int32_t narg, int32_t ps[], void (
     return LUX_ERROR;
   size_t nelem = infos[0].nelem/6;
   while (nelem--) {
-    f((double (*)[3]) ptrs[0].d, (double (*)[3]) ptrs[1].d, 
+    f((double (*)[3]) ptrs[0].d, (double (*)[3]) ptrs[1].d,
       (double *) ptrs[2].d);
     ptrs[0].d += 6;
     ptrs[1].d += 6;
@@ -373,7 +373,7 @@ int32_t lux_v_dp3T3_iD23aD23qoDcq_0T2_f_(int32_t narg, int32_t ps[], void (*f)(d
     return LUX_ERROR;
   size_t nelem = infos[0].nelem/6;
   while (nelem--) {
-    f((double (*)[3]) ptrs[0].d, (double (*)[3]) ptrs[1].d, 
+    f((double (*)[3]) ptrs[0].d, (double (*)[3]) ptrs[1].d,
       (double (*)[3]) ptrs[2].d);
     ptrs[0].d += 6;
     ptrs[1].d += 6;
@@ -534,7 +534,7 @@ int32_t lux_d_dp3d_iD33aDmmarDmmq_01_2_f_(int32_t narg, int32_t ps[], double (*f
     *ptrs[2].d++ = f(rnpb, *ptrs[1].d++);
     rnpb += 3;
   }
-  return iq;  
+  return iq;
 }
 /*-----------------------------------------------------------------------*/
 int32_t lux_v_dp3dp_iD33arDm3q_01_f_(int32_t narg, int32_t ps[], void (*f)(double [3][3], double [3]))
@@ -563,7 +563,7 @@ int32_t lux_v_dp3dp3_iD33arDq_01_f_(int32_t narg, int32_t ps[], void (*f)(double
 
   if ((iq = standard_args(narg, ps, "i>D3,3*;rD&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
-  
+
   size_t nelem = infos[0].nelem/9;
   while (nelem--) {
     f((double (*)[3]) ptrs[0].d, (double (*)[3]) ptrs[1].d);
@@ -581,7 +581,7 @@ int32_t lux_v_dp3dpdp_iD33aoDm3m3qT2_0T2_s_(int32_t narg, int32_t ps[], void (*f
 
   if ((iq = standard_args(narg, ps, "i>D3,3*;oD-3,-3&;oD-3,-3&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
-  
+
   size_t nelem = infos[0].nelem/9;
   while (nelem--) {
     f((double (*)[3]) ptrs[0].d, ptrs[1].d++, ptrs[2].d++);
@@ -746,7 +746,7 @@ int32_t lux_v_dddp3dp3_iDaiDp3p3arDcq_0z12_f_(int32_t narg, int32_t ps[], void (
     r1 += 3;
     r2 += 3;
   }
-  return iq;  
+  return iq;
 }
 /*-----------------------------------------------------------------------*/
 int32_t lux_v_dT4dpT3_iDaDaoDqT3_0z1z2T4_s_(int32_t narg, int32_t ps[], void (*f)(double, double, double, double, double *, double *, double *))

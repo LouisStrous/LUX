@@ -1,0 +1,10 @@
+[?1034h*** Welcome to lux 1.0.2
+Copyright 2013 Louis Strous.
+This program comes with ABSOLUTELY NO WARRANTY; for details type
+‘info,/warranty’.  This is free software, and you are welcome to
+redistribute it under certain conditions; type ‘info,/copy’ for details.
+Type ‘help’ for assistance.
+LUX> m=dblarr(1e7)+1.3 k=keplerq(m,0.5) exit
+
+CPUtime: 6.46 seconds
+Quitting... Bye!

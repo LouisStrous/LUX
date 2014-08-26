@@ -1,4 +1,4 @@
-/* This is file vsop.h.
+/* This is file intmath.h.
 
 Copyright 2013 Louis Strous
 
@@ -17,22 +17,22 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "action.h"
+#ifndef INTMATH_H
+#define INTMATH_H
 
-struct planetIndex {
-  int16_t index;
-  int16_t nTerms;
-};
-struct VSOPdata {
-  struct planetIndex indices[6*3*8];
-  int16_t nTerms;
-  double *terms;
-};
-struct VSOPdata planetIndicesForTolerance(struct VSOPdata *data, 
-                                          double tolerance);
-struct VSOPdata VSOP87Adata;
-struct VSOPdata VSOP87Cdata;
+#include <stdlib.h>
+#include "action.hh"
 
-void XYZJ2000fromVSOPA(double T, int32_t object, double *pos, double tolerance);
-void XYZdatefromVSOPC(double T, int32_t object, double *pos, double tolerance);
+typedef struct {
+  int32_t quot;
+  int32_t rem;
+} Div_t;
 
+Div_t adiv(int32_t numerator, int32_t denominator);
+int32_t iaquot(int32_t numerator, int32_t denominator);
+int32_t iamod(int32_t numerator, int32_t denominator);
+Div_t alinediv(int32_t numerator, int32_t factor, int32_t addend, int32_t denominator);
+int32_t alinequot(int32_t numerator, int32_t factor, int32_t addend, int32_t denominator);
+int32_t alinemod(int32_t numerator, int32_t factor, int32_t addend, int32_t denominator);
+
+#endif

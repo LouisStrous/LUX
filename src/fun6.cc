@@ -20,7 +20,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 /* fun6.c */
 #include <math.h>
 #include <strings.h>		/* for bzero */
-#include "action.h"
+#include "action.hh"
 
  /*------------------------------------------------------------------------- */
 static void rdct_spike(int16_t *start, int32_t ystride, float *ws)
@@ -158,7 +158,8 @@ int32_t lux_despike(int32_t narg, int32_t ps[])
 /* despike function RAS */
 /* the call is x = despike(array, [frac, level, niter, cell_flag, rms]) */
 {
-  int32_t	iq, result_sym, type, nx, ny, n, m, level=7, sum, nc, cell_flag=0;
+  int32_t	iq, result_sym, nx, ny, n, m, level=7, sum, nc, cell_flag=0;
+  Symboltype type;
   int32_t	lognb2, cell_malloc = 0, cell_count, jj, jc;
   int32_t	nxc, nyc, cell_flag_sign, niter=1, rms_flag_sign, rms_flag;
   int32_t	sign_flag, bad_flag, bb_flag, save_niter, ntotal, dim[2];
@@ -233,11 +234,11 @@ int32_t lux_despike(int32_t narg, int32_t ps[])
   }
   bzero(cell_status, cell_count);
  }
- ptr = array_data(iq);
+ ptr = (int16_t*) array_data(iq);
  dim[0] = nx;
  dim[1] = ny;
  result_sym = array_scratch(type, 2, dim); /* for the result */
- out = array_data(result_sym);	/* output */
+ out = (int16_t*) array_data(result_sym);	/* output */
  p = (short *) ptr;		/* input  */
  cfrac = 1.0 - frac;
  nc = ntotal = 0;
@@ -251,7 +252,7 @@ int32_t lux_despike(int32_t narg, int32_t ps[])
  /* if there are 2 or more iterations, we need an extra array, we can't do the
     despike step in place because it "erodes" from the low y direction. */
  if (niter > 1) {
-   out2 = malloc(nx*ny*sizeof(int16_t));
+   out2 = (int16_t*) malloc(nx*ny*sizeof(int16_t));
    if (!out2)
      return cerror(ALLOC_ERR, 0);
  }
@@ -516,7 +517,8 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])/* reorder function */
 /* reordering is reversals and transposes of a 2-D array, there are
    8 ways to "flip" an array, the "order" ranges from 0-7 accordingly */
 {
-  int32_t  iorder, iq, result_sym, type, nx, ny, m, inc, dim[2];
+  int32_t  iorder, iq, result_sym, nx, ny, m, inc, dim[2];
+  Symboltype type;
   uint8_t   *p, *q, *ptr;
 
   if (int_arg_stat(ps[1], &iorder) != 1)
@@ -531,7 +533,7 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])/* reorder function */
     return cerror(NEED_2D_ARR, iq);
   nx = array_dims(iq)[0];
   ny = array_dims(iq)[1];
-  ptr = array_data(iq);
+  ptr = (uint8_t*) array_data(iq);
   if (iorder >= 4) {
     m = nx;
     nx = ny;
@@ -540,7 +542,7 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])/* reorder function */
   dim[0] = nx;
   dim[1] = ny;
   result_sym = array_scratch(type, 2, dim); /* for the result */
-  q = array_data(result_sym);
+  q = (uint8_t*) array_data(result_sym);
   p = (uint8_t *) ptr;
   if (iorder == 0)        /* no change, make a copy */
     bcopy(p, q, nx*ny*lux_type_size[type]);

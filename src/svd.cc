@@ -18,8 +18,8 @@ You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include <math.h>
-#include "luxdefs.h"
-#include "action.h"
+#include "luxdefs.hh"
+#include "action.hh"
 
 /* The following algorithm is due to Bryant Marks */
 /* (bryant@sioux.stanford.edu) 3 April 1993 */

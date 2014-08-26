@@ -28,7 +28,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdlib.h>
 #include <ctype.h>
 #include <limits.h>
-#include "action.h"
+#include "action.hh"
 
 #define	VSPACE	14.0
 #define	SFAC	0.70
@@ -36,7 +36,6 @@ int32_t	tkplot(float x, float y, int32_t lineStyle, int32_t symStyle), fontchang
   draw(int32_t);
 void	swapl(char *, int32_t);
 extern	float	xfac, yfac;
-extern	char	*expand_name(char *, char *);
 int32_t	hflag, penDown;
 extern int32_t	ifont;
 uint8_t	*fontbase;
@@ -108,7 +107,7 @@ void drawlatex(char **text)
 /* services a TeX-style calligraphy command.  This routine is called
  with **text == '`', or recursively by drawlatex() itself. */
 {
-  static char	*latex_codes[] = {
+  static char const* latex_codes[] = {
     "Alpha", "Beta", "Chi", "Delta", "Epsilon", "Eta", "Gamma",
     "Iota", "Kappa", "Lambda", "Mu", "Nu", "Omega", "Omicron", "Phi",
     "Pi", "Psi", "Rho", "Sigma", "Tau", "Theta", "Upsilon", "Xi",
@@ -136,9 +135,10 @@ void drawlatex(char **text)
     supset, surd, tau, theta, times, uparrow, upsilon,
     xi, zeta
   };
-  static char *fonts =  "77777777777777777777777777099799997997797999970779979799779977997790079099997799777";
-  static char *member = "ABVDEGCIJKLMXOUPWQRSHTNFab0B3vU1OodV5egEcbueii0jkl4lGmnJxodxup+cwq600rA0U02rshX7tnf";
-  char	**match, *p1, *p2;
+  static char const* fonts =  "77777777777777777777777777099799997997797999970779979799779977997790079099997799777";
+  static char const* member = "ABVDEGCIJKLMXOUPWQRSHTNFab0B3vU1OodV5egEcbueii0jkl4lGmnJxodxup+cwq600rA0U02rshX7tnf";
+  char	*p1, *p2;
+  char const** match;
   int32_t	code, oldfont, level, c;
   double	newsize;
 
@@ -267,8 +267,8 @@ void drawlatex(char **text)
 	return;
       case '`':			/* TeX-style command */
 	(*text)++;
-	match = bsearch(*text, latex_codes, sizeof(latex_codes)/sizeof(char *),
-			sizeof(char *), strpcmp);
+	match = (char const**) bsearch(*text, latex_codes, sizeof(latex_codes)/sizeof(char *),
+                                 sizeof(char *), strpcmp);
 	if (match) {
 	  code = match - latex_codes;
 	  switch (code) {
@@ -552,7 +552,7 @@ int32_t fontchange(int32_t font)
   }
   /* new font, get font file name */
   {
-    char *locations[] = {
+    char const* locations[] = {
       "$LUXFONTSDIR",
       "/usr/local/share/lux",
       "/usr/share/lux",

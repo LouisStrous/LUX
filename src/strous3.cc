@@ -29,10 +29,9 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <float.h>
 #include <math.h>
 #include <errno.h>              /* for errno */
-#include "action.h"
-#include "Bytestack.h"
+#include "action.hh"
+#include "Bytestack.hh"
 
-int32_t	to_scratch_array(int32_t, int32_t, int32_t, int32_t []);
 /*---------------------------------------------------------------------*/
 int32_t lux_bisect(int32_t narg, int32_t ps[])
 /* y = BISECT([x,] y, values [, AXIS=axis, POS=pos, WIDTH=width]) */
@@ -41,7 +40,7 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
 /* The first dimension of <y> traces profiles to be checked for */
 /* bisectors. */
 /* <values> contains the levels at which bisector positions are to be
-   returned. 
+   returned.
    <pos> contains the position (index to each profile) at which
    the search for each bisector should start.  (From such a position,
    the local minimum is sought, and bisectors are determined from there.)
@@ -86,7 +85,7 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
     if (array_size(xSym) != srcinfo.rdims[0])
       return cerror(INCMP_ARG, ySym);
     iq = lux_converts[srcinfo.type](1, &xSym);
-    x.f = array_data(iq);
+    x.f = (float*) array_data(iq);
   } else
     x.f = NULL;
 
@@ -454,7 +453,7 @@ int32_t lux_cspline_find(int32_t narg, int32_t ps[])
 
   if (!symbolIsNumericalArray(ySym))
     return cerror(NEED_NUM_ARR, ySym);
-  
+
   cspl = empty_cubic_spline();
 
   if (standardLoop(ySym, (narg > 2 && ps[2])? ps[2]: LUX_ZERO,
@@ -462,7 +461,7 @@ int32_t lux_cspline_find(int32_t narg, int32_t ps[])
 		   | SL_AXISCOORD, LUX_FLOAT,
 		   &srcinfo, &src, NULL, NULL, NULL) < 0) /* <data>, <axis> */
     return LUX_ERROR;		/* some error */
-  
+
   if (!symbolIsNumerical(vSym)) /* <levels> */
     return LUX_ERROR;
   iq = lux_converts[srcinfo.type](1, &vSym); /* ensure proper type */
@@ -476,7 +475,7 @@ int32_t lux_cspline_find(int32_t narg, int32_t ps[])
     memset(index, 0, srcinfo.ndim*sizeof(int32_t));
   } else
     index = NULL;
-    
+
   /* we don't know beforehand how many output values there will be */
   b = Bytestack_create();	/* so store them on a Byte stack */
 
@@ -490,7 +489,7 @@ int32_t lux_cspline_find(int32_t narg, int32_t ps[])
     struct c cc;
     csize = (uint8_t *) &cc.c - (uint8_t *) &cc.v + srcinfo.ndim*sizeof(int32_t);
   }
-  c = malloc(csize);
+  c = (struct c*) malloc(csize);
 
   /* now do the work */
   switch (srcinfo.type) {
@@ -606,7 +605,7 @@ int32_t lux_cspline_find(int32_t narg, int32_t ps[])
 
       d = (struct c *) Bytestack_peek(b, 0); /* beginning of data */
       qsort(d, n, csize, cmp0);
-      
+
       /* create output symbol */
       bi = Bytestack_top(NULL);
       if (srcinfo.ndim > 1)
@@ -614,7 +613,7 @@ int32_t lux_cspline_find(int32_t narg, int32_t ps[])
       Bytestack_push_var(NULL, n);
       result = array_scratch(LUX_DOUBLE, (srcinfo.ndim > 1? 2: 1),
 			     (int32_t *) Bytestack_pop(NULL, bi));
-      src.d = array_data(result);
+      src.d = (double*) array_data(result);
       q.c = d;
       for (i = 0; i < n; i++) {
 	int32_t j;
@@ -669,11 +668,12 @@ int32_t lux_fitskey(int32_t narg, int32_t ps[])
 /* in the file.  LS 4jun98 */
 {
   char	*file, *key, *key2, *scr, mustclose, ok;
-  int32_t	n, n2, i, evalString(char *, int32_t), ptr, iq, i0, type;
+  int32_t	n, n2, i, evalString(char *, int32_t), ptr, iq, i0;
+  Symboltype type;
   pointer	p;
-  scalar	value;
+  Scalar	value;
   FILE	*fp;
-  void	read_a_number(char **buf, scalar *value, int32_t *type);
+  void	read_a_number(char **buf, Scalar *value, Symboltype *type);
 
   switch (symbol_class(ps[0])) {
     case LUX_STRING:
@@ -715,7 +715,7 @@ int32_t lux_fitskey(int32_t narg, int32_t ps[])
 
   key = string_value(ps[1]);
   n2 = (n < 8)? n + 1: 8;	/* because we add a space if it fits */
-  key2 = malloc(n2 + 1);
+  key2 = (char*) malloc(n2 + 1);
   strcpy(key2, key);
   if (n2 != n) {		/* add a space at the end to prevent */
 				/* partial matches */
@@ -724,7 +724,7 @@ int32_t lux_fitskey(int32_t narg, int32_t ps[])
   }
   for (key = key2; *key; key++)	/* make all uppercase */
     *key = toupper(*key);
-  
+
   scr = curScrat;
   scr = fgets(scr, 9, fp);
 
@@ -1028,7 +1028,7 @@ LS 9nov98 */
       || array_dims(iq)[1] != ny)
     return cerror(INCMP_ARG, iq);
   iq = lux_float(1, &iq);
-  vx0 = array_data(iq);
+  vx0 = (float*) array_data(iq);
 
   iq = ps[2];			/* vy */
   if (symbol_class(iq) != LUX_ARRAY
@@ -1037,7 +1037,7 @@ LS 9nov98 */
       || array_dims(iq)[1] != ny)
     return cerror(INCMP_ARG, iq);
   iq = lux_float(1, &iq);
-  vy0 = array_data(iq);
+  vy0 = (float*) array_data(iq);
 
   if (standardLoop(iq0, 0, SL_ALLAXES | SL_SAMEDIMS | SL_EXACT | SL_EACHCOORD,
 		   LUX_FLOAT, &srcinfo, &src, &iq, &trgtinfo, &trgt) < 0)
@@ -1347,7 +1347,7 @@ int32_t lux_dir_smooth2(int32_t narg, int32_t ps[])
       || array_dims(iq)[1] != ny)
     return cerror(INCMP_ARG, iq);
   iq = lux_float(1, &iq);
-  vx0 = array_data(iq);
+  vx0 = (float*) array_data(iq);
 
   iq = ps[2];			/* vy */
   if (symbol_class(iq) != LUX_ARRAY
@@ -1356,7 +1356,7 @@ int32_t lux_dir_smooth2(int32_t narg, int32_t ps[])
       || array_dims(iq)[1] != ny)
     return cerror(INCMP_ARG, iq);
   iq = lux_float(1, &iq);
-  vy0 = array_data(iq);
+  vy0 = (float*) array_data(iq);
 
   if (standardLoop(iq0, 0, SL_ALLAXES | SL_SAMEDIMS | SL_EXACT | SL_EACHCOORD,
 		   LUX_FLOAT, &srcinfo, &src, &iq, &trgtinfo, &trgt) < 0)
@@ -1663,10 +1663,11 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
   */
 {
   int32_t	iq, nx, ny, ix, iy, c, index, di, n, i, dims[MAX_DIMS],
-    ngrid, type, dv;
+    ngrid, dv;
+  Symboltype type;
   float	x1, y1, x2, y2, vx, vy, s, s0, ds, dslimit, s1;
   pointer	gx, gy, vx0, vy0, ox, oy;
-  int32_t lux_convert(int32_t, int32_t [], int32_t, int32_t);
+  int32_t lux_convert(int32_t, int32_t [], Symboltype, int32_t);
 
   /* we treat all arguments. */
   if (!symbolIsRealArray(ps[0]))/* <gx> must be a real array */
@@ -1743,7 +1744,7 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
     to_scratch_array(ps[narg - 1], type, i, dims);
     oy.v = array_data(ps[narg - 1]);
   } else {			/* use <gx> and <gy> for <ox> and <oy> */
-    int32_t lux_convert(int32_t, int32_t [], int32_t, int32_t);
+    int32_t lux_convert(int32_t, int32_t [], Symboltype, int32_t);
     lux_convert(2, ps, type, 0);
     ox.v = array_data(ps[0]);
     oy.v = array_data(ps[1]);
@@ -2148,7 +2149,7 @@ int32_t lux_legendre(int32_t narg, int32_t ps[])
     return luxerror("Illegal maximum order %d (must be nonnegative)", ps[1], lmax);
   n = ((lmax + 1)*(lmax + 2))/2;
   out = array_scratch(LUX_DOUBLE, 1, &n);
-  values = array_data(out);
+  values = (double*) array_data(out);
   if (internalMode & 1)
     spherical_harmonics(x, lmax, values);
   else
@@ -2184,8 +2185,8 @@ int32_t lux_enhanceimage(int32_t narg, int32_t ps[])
   target = (narg > 2 && ps[2])? float_arg(ps[2]): 100.0/256;
 
   nhist = 256*dims[0];
-  hist = calloc(nhist, sizeof(*hist));
-  m = malloc(nhist*sizeof(*m));
+  hist = (int32_t*) calloc(nhist, sizeof(*hist));
+  m = (float*) malloc(nhist*sizeof(*m));
   if (!hist || !m) {
     free(hist);
     return cerror(ALLOC_ERR, 0);
@@ -2196,7 +2197,7 @@ int32_t lux_enhanceimage(int32_t narg, int32_t ps[])
     free(m);
     return result;
   }
-  tgt.b = array_data(result);
+  tgt.b = (uint8_t*) array_data(result);
   for (i = 0; i < nelem; i += dims[0]) {
     int32_t j, x = 0;
 
@@ -2204,7 +2205,7 @@ int32_t lux_enhanceimage(int32_t narg, int32_t ps[])
       x += *src.b++;
     hist[x]++;
   }
-  src.b = array_data(ps[0]);
+  src.b = (uint8_t*) array_data(ps[0]);
   for (i = 1; i < nhist; i++)	/* calculate running sum */
     hist[i] += hist[i - 1];
   a = 2 - 4*target;
@@ -2263,12 +2264,12 @@ int32_t lux_hamming(int32_t narg, int32_t ps[]) {
     nr2isarray = (nelem2 > 1);
   }
 
-  if (symbol_type(ps[0]) == LUX_SCALAR) {
+  if (symbolIsScalar(ps[0])) {
     result = scalar_scratch(LUX_INT32);
     tgt.l = &scalar_value(result).l;
   } else {
     result = array_scratch(LUX_INT32, ndim, dims);
-    tgt.l = array_data(result);
+    tgt.l = (int32_t*) array_data(result);
   }
 
   if (narg == 1) {
@@ -2392,12 +2393,12 @@ int32_t compare_doubles(const void *a, const void *b)
 int32_t runord_d(double *data, int32_t n, int32_t width, int32_t ord, double *result)
 {
   int32_t i;
-  
+
   if (n < 1 || width < 1) {
     errno = EDOM;
     return -1;
   }
-  double *temp = malloc(width*sizeof(double));
+  double *temp = (double*) malloc(width*sizeof(double));
   if (!temp) {
     errno = ENOMEM;
     return -1;

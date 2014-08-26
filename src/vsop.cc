@@ -23,8 +23,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
-#include "luxdefs.h"
-#include "vsop.h"
+#include "luxdefs.hh"
+#include "vsop.hh"
 
 #if DONOTIGNORE
 static struct VSOPdata usedVSOPdata;

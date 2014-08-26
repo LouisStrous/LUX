@@ -32,9 +32,9 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
-#include "install.h"
-#include "action.h"
-#include "editor.h"
+#include "install.hh"
+#include "action.hh"
+#include "editor.hh"
 
 #define BLACK           1
 #define WHITE           0
@@ -47,7 +47,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 int32_t	lux_replace(int32_t, int32_t), define_menu(int32_t, int32_t, int32_t, int32_t []),
   redefine_menu(int32_t, int32_t []), coordTrf(float *, float *, int32_t, int32_t),
   set_defw(int32_t);
-void	printfw(char *, ...);
+void	printfw(char const*, ...);
 
 extern Display	*display;
 extern int32_t	screen_num, black_pixel, white_pixel;
@@ -64,7 +64,8 @@ typedef        struct Menu     Menu;
 
 Menu	menu[MAXMENU];
 XFontStruct	*menu_font_info;
-char	*menu_font_name = "fixed", menu_setup_done = 0;
+char const* menu_font_name = "fixed";
+char menu_setup_done = 0;
 Window	menu_win[MAXMENU], inverted_pane = NONE;
 GC	menugc, menurgc;
 Cursor	cursor;
@@ -296,22 +297,22 @@ char getMenuChar(int32_t menu_num)
   }
 }
  /*------------------------------------------------------------------------*/
-char *readPane(int32_t menu_num, int32_t item_num, char *query)
+char *readPane(int32_t menu_num, int32_t item_num, char const* query)
 {
   extern int32_t	scrat[];
-  char	*current, *old, *answer;
+  char	*current, *old, *answer, *thequery;
   int32_t	y, c = 'x', revert_to;
   Window	focusWindow;
-  
+
   /* make item text pointer point at "current" instead of "old", */
   /* so that paint_pane finds the text that is being entered */
   current = (char *) scrat;
   old = menu[menu_num].text[item_num];
   menu[menu_num].text[item_num] = current;
   strcpy(current, query);
-  query = current;
+  thequery = current;
   current += strlen(current);
-  strcat(query, "?_");
+  strcat(thequery, "?_");
   answer = current;
   y = menu_font_info->max_bounds.ascent;
   XMapWindow(display, menu_win[menu_num]);
@@ -323,7 +324,7 @@ char *readPane(int32_t menu_num, int32_t item_num, char *query)
 			 WhitePixel(display,screen_num));
     XClearWindow(display, menu[menu_num].window[item_num - 1]);
     XDrawString(display, menu[menu_num].window[item_num - 1],
-		menugc, 2, y + 2, query, strlen(query));
+		menugc, 2, y + 2, thequery, strlen(thequery));
     XFlush(display);
     c = getMenuChar(menu_num);
     switch (c) {
@@ -569,7 +570,8 @@ int32_t redefine_menu(int32_t narg, int32_t ps[])
    ps[]:  menu_number, menu_item, ... */
 {
  int32_t	num, n_new, i;
- char	string_array = 0, *text, *zilch = "", **ptr, *title;
+ char	string_array = 0, **ptr;
+ char const* zilch = "", *text, *title;
 
  num = int_arg(ps[0]);
  if (narg == 2
@@ -653,7 +655,7 @@ int32_t define_menu(int32_t x, int32_t y, int32_t narg, int32_t ps[])
       && array_type(ps[1]) == LUX_STRING_ARRAY) {
     string_array = 1;			/* string array, one allowed */
     narg = array_size(ps[1]);
-    ptr.l = array_data(ps[1]);
+    ptr.l = (int32_t*) array_data(ps[1]);
   } else
     narg--;
   if (narg < 2) 		/* just a title */
@@ -734,7 +736,7 @@ static int32_t	eventCode[] = {
   X_KEYPRESS, X_BUTTONPRESS, X_BUTTONRELEASE,
   X_POINTERMOTION, X_ENTERWINDOW, X_LEAVEWINDOW
 };
-static char	*XEventName[] = {
+static char const* XEventName[] = {
   "key press", "mouse button press", "mouse button release",
   "mouse motion", "mouse enters window", "mouse leaves window",
 };
@@ -858,7 +860,7 @@ int32_t lux_register_event(int32_t narg, int32_t ps[])
 	nWindow = 1;
 	break;
       case LUX_ARRAY:
-	windows = array_data(iq);
+	windows = (int32_t*) array_data(iq);
 	nWindow = array_size(iq);
 	break;
       default:
@@ -874,7 +876,7 @@ int32_t lux_register_event(int32_t narg, int32_t ps[])
 	nMenu = 1;
 	break;
       case LUX_ARRAY:
-	menus = array_data(iq);
+	menus = (int32_t*) array_data(iq);
 	nMenu = array_size(iq);
 	break;
       default:
@@ -1190,7 +1192,7 @@ int32_t lux_xloop(int32_t narg, int32_t ps[])
   return LUX_OK;
 }
  /*------------------------------------------------------------------------*/
-char *eventName(int32_t type)
+char const* eventName(int32_t type)
 /* returns name of LUX X event */
 {
   static char	eventHashTable[] = {

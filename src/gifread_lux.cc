@@ -23,7 +23,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <string.h>
 #include <errno.h>
 #include <math.h>
-#include "lux_structures.h"
+#include "lux_structures.hh"
  extern struct sym_desc sym[];
  struct GIFScreen {
         char id[6];
@@ -51,7 +51,6 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #define FALSE 0
 #define TRUE 1
 
- typedef int32_t bool;
  typedef struct codestruct {
             struct codestruct *prefix;
             unsigned char first,suffix;
@@ -69,9 +68,8 @@ int32_t	lux_gifread(int32_t, int32_t []);
 void	process(int32_t, unsigned char **);
 
  /*------------------------------------------------------------------------- */
-int32_t lux_gifread_f(narg, ps)
+int32_t lux_gifread_f(int32_t narg, int32_t ps[])
  /* a function version that returns 1 if read OK */
- int32_t	narg, ps[];
  {
  if ( lux_gifread(narg, ps) == 1 ) return 1; else return 4;
  }
@@ -117,7 +115,7 @@ int32_t lux_gifread(int32_t narg, int32_t ps[])       /* gifread subroutine */
 
  /* define the output array as a Byte of the screen size */
  iq = ps[0];	dim[0] = nxs;	dim[1] = nys;
- if ( redef_array(iq, 0, 2, dim) != 1) { fclose(fin); return -1; }
+ if ( redef_array(iq, LUX_INT8, 2, dim) != 1) { fclose(fin); return -1; }
  h = (struct ahead *) sym[iq].spec.array.ptr;
  data = ((char *)h + sizeof(struct ahead));
 
@@ -212,7 +210,7 @@ void readimage(FILE *fin, int32_t cmsym, char *data)
  
  if (ix && iy) fflag = 0; else { if (nx != nxs || ny != nys) fflag = 0;
  	else fflag =1; }
- if (fflag) image = data; else { image = malloc(nx * ny);
+ if (fflag) image = data; else { image = (char*) malloc(nx * ny);
 	if (!image) { printf("malloc error in GIFREAD\n"); quit=1; status=-1;
    	return; }
  }
@@ -240,7 +238,7 @@ void loadcolortable(FILE *fin, int32_t nc, int32_t cmsym)
  ncolmap = 3*nc;
  if (cmsym) {
  dim[0] = 3;	dim[1] = nc;
- if ( redef_array(cmsym, 0, 2, dim) != 1) { status = -1;  quit = 1; return; }
+ if ( redef_array(cmsym, LUX_INT8, 2, dim) != 1) { status = -1;  quit = 1; return; }
  h = (struct ahead *) sym[cmsym].spec.array.ptr;
  colormap = ((char *)h + sizeof(struct ahead));
  if (fread(colormap, 1, ncolmap,fin) != ncolmap)
@@ -250,7 +248,7 @@ void loadcolortable(FILE *fin, int32_t nc, int32_t cmsym)
  return;
  }
  /*------------------------------------------------------------------------- */
-void fatal(char *s)
+void fatal(char const* s)
  /* well, not really, in LUX we like to stick around */
  {
         fprintf(stderr,"giftops: %s\n",s);

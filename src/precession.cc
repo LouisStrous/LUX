@@ -22,7 +22,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <math.h> /* for sin cos */
 #include <string.h> /* for memcpy */
 /* END HEADERS */
-#include "action.h"
+#include "action.hh"
 #include <gsl/gsl_poly.h>
 
 /* time in millennia since epoch 2000.0 */
@@ -95,8 +95,8 @@ void init_XYZ_eclipticPrecession(double fromequinox, double toequinox)
    for cartesian coordinates, for precession from <fromequinox> to
    <toequinox> (both measured in JDE) */
 {
-  int32_t new = (toequinox != a_toJ2000[9] || fromequinox != a_fromJ2000[9]);
-  if (!new)
+  int32_t is_new = (toequinox != a_toJ2000[9] || fromequinox != a_fromJ2000[9]);
+  if (!is_new)
     return;
   if (toequinox != a_toJ2000[9]) {
     a_toJ2000[9] = toequinox;
@@ -171,7 +171,7 @@ void init_XYZ_eclipticPrecession(double fromequinox, double toequinox)
     a_fromJ2000[5] = gsl_poly_eval(a32c, sizeof(a32c)/sizeof(a32c[0]), T);
     a_fromJ2000[8] = gsl_poly_eval(a33c, sizeof(a33c)/sizeof(a33c[0]), T);
   }
-  if (new)
+  if (is_new)
     matmul3(a_fromJ2000, a_toJ2000, a_from_to);
 }
 /*--------------------------------------------------------------------------*/

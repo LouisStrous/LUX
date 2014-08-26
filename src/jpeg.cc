@@ -25,7 +25,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <ctype.h>		/* for isprint() */
 #include <jpeglib.h>		/* for IJG JPEG v6b stuff */
 #include <string.h>		/* for memcpy() */
-#include "action.h"		/* for LUX-specific stuff */
+#include "action.hh"		/* for LUX-specific stuff */
 
 /* a structure for our own error handler */
 struct my_error_mgr {
@@ -264,7 +264,7 @@ int32_t write_jpeg6b(int32_t narg, int32_t ps[], int32_t isFunc)
   jpeg_start_compress(&cinfo, TRUE);
 
   if (header)
-    jpeg_write_marker(&cinfo, JPEG_COM, (void *) header, string_size(ps[2]));
+    jpeg_write_marker(&cinfo, JPEG_COM, (const JOCTET *) header, string_size(ps[2]));
 
   /* 6. compress each scanline */
   image = (JSAMPLE *) array_data(*ps);

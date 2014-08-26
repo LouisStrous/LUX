@@ -18,7 +18,7 @@ You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 /* stuff to make Shine's file compile in Strous LUX without modifications */
-#include "action.h"
+#include "action.hh"
 
 int32_t	execute_error(int32_t), file_open_error(void);
 #define lux_subr	subroutine

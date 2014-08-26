@@ -28,7 +28,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <string.h>
 #include <float.h>
 #include <math.h>
-#include "action.h"
+#include "action.hh"
 
 /*------------------------------------------------------------------*/
 #define SEEK_MAXIMUM	(LUX_DOUBLE + 1)
@@ -39,7 +39,7 @@ int32_t segment_2d(int32_t narg, int32_t ps[])
 {
   loopInfo	srcinfo, trgtinfo;
   pointer	src, trgt;
-  scalar	value;
+  Scalar	value;
   int32_t	nx, ny, n, result, sign;
 
   if (standardLoop(ps[0], 0, SL_ALLAXES | SL_SAMEDIMS | SL_EXACT, LUX_INT32,
@@ -285,7 +285,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
    LS 18may95 4aug97 */
 {
   int32_t	result, sign, degree, n, i, *offset, k, j, ok, *edge, nok;
-  scalar	value;
+  Scalar	value;
   pointer	src, trgt, srcl, srcr;
   loopInfo	srcinfo, trgtinfo;
 
@@ -564,9 +564,9 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
 {
   loopInfo	srcinfo, trgtinfo;
   pointer	src, trgt;
-  float	*angle, s, c, a;
-  scalar	value;
-  int32_t	nx, ny, n, result, sign, class;
+  double	*angle, s, c, a;
+  Scalar	value;
+  int32_t	nx, ny, n, result, sign, class_id;
   int32_t	off[4];
 
   if (!symbolIsNumericalArray(ps[0])
@@ -581,8 +581,8 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
 		   &srcinfo, &src, &result, &trgtinfo, &trgt) == LUX_ERROR)
     return LUX_ERROR;
 
-  n = lux_float(1, &ps[1]);
-  angle = array_data(n);
+  n = lux_double(1, &ps[1]);
+  angle = (double*) array_data(n);
 
   sign = (narg > 1 && ps[2])? int_arg(ps[2]): 1;
 
@@ -612,8 +612,8 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
 	    a = *angle++ + DEG22_5;
 	    s = sin(a);
 	    c = cos(a);
-	    class = ((s*c > 0) << 1) + (s*c*(2*c*c - 1) > 0);
-	    *trgt.l++ = (src.b[off[class]] + src.b[-off[class]] < value.b);
+	    class_id = ((s*c > 0) << 1) + (s*c*(2*c*c - 1) > 0);
+	    *trgt.l++ = (src.b[off[class_id]] + src.b[-off[class_id]] < value.b);
 	    src.b++;
 	  }
 	  *trgt.l++ = 0;
@@ -632,8 +632,8 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
 	    a = *angle++ + DEG22_5;
 	    s = sin(a);
 	    c = cos(a);
-	    class = ((s*c > 0) << 1) + (s*c*(2*c*c - 1) > 0);
-	    *trgt.l++ = (src.w[off[class]] + src.w[-off[class]] < value.w);
+	    class_id = ((s*c > 0) << 1) + (s*c*(2*c*c - 1) > 0);
+	    *trgt.l++ = (src.w[off[class_id]] + src.w[-off[class_id]] < value.w);
 	    src.w++;
 	  }
 	  *trgt.l++ = 0;
@@ -652,8 +652,8 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
 	    a = *angle++ + DEG22_5;
 	    s = sin(a);
 	    c = cos(a);
-	    class = ((s*c > 0) << 1) + (s*c*(2*c*c - 1) > 0);
-	    *trgt.l++ = (src.l[off[class]] + src.l[-off[class]] < value.l);
+	    class_id = ((s*c > 0) << 1) + (s*c*(2*c*c - 1) > 0);
+	    *trgt.l++ = (src.l[off[class_id]] + src.l[-off[class_id]] < value.l);
 	    src.l++;
 	  }
 	  *trgt.l++ = 0;
@@ -672,8 +672,8 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
 	    a = *angle++ + DEG22_5;
 	    s = sin(a);
 	    c = cos(a);
-	    class = ((s*c > 0) << 1) + (s*c*(2*c*c - 1) > 0);
-	    *trgt.l++ = (src.q[off[class]] + src.q[-off[class]] < value.q);
+	    class_id = ((s*c > 0) << 1) + (s*c*(2*c*c - 1) > 0);
+	    *trgt.l++ = (src.q[off[class_id]] + src.q[-off[class_id]] < value.q);
 	    src.q++;
 	  }
 	  *trgt.l++ = 0;
@@ -692,8 +692,8 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
 	    a = *angle++ + DEG22_5;
 	    s = sin(a);
 	    c = cos(a);
-	    class = ((s*c > 0) << 1) + (s*c*(2*c*c - 1) > 0);
-	    *trgt.l++ = (src.f[off[class]] + src.f[-off[class]] < value.f);
+	    class_id = ((s*c > 0) << 1) + (s*c*(2*c*c - 1) > 0);
+	    *trgt.l++ = (src.f[off[class_id]] + src.f[-off[class_id]] < value.f);
 	    src.f++;
 	  }
 	  *trgt.l++ = 0;
@@ -712,8 +712,8 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
 	    a = *angle++ + DEG22_5;
 	    s = sin(a);
 	    c = cos(a);
-	    class = ((s*c > 0) << 1) + (s*c*(2*c*c - 1) > 0);
-	    *trgt.l++ = (src.d[off[class]] + src.d[-off[class]] < value.d);
+	    class_id = ((s*c > 0) << 1) + (s*c*(2*c*c - 1) > 0);
+	    *trgt.l++ = (src.d[off[class_id]] + src.d[-off[class_id]] < value.d);
 	    src.d++;
 	  }
 	  *trgt.l++ = 0;
@@ -735,8 +735,8 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
 	    a = *angle++ + DEG22_5;
 	    s = sin(a);
 	    c = cos(a);
-	    class = ((s*c > 0)<<1) + (s*c*(2*c*c - 1) > 0);
-	    *trgt.l++ = (src.b[off[class]] + src.b[-off[class]] > value.b);
+	    class_id = ((s*c > 0)<<1) + (s*c*(2*c*c - 1) > 0);
+	    *trgt.l++ = (src.b[off[class_id]] + src.b[-off[class_id]] > value.b);
 	    src.b++;
 	  }
 	  *trgt.l++ = 0;
@@ -755,8 +755,8 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
 	    a = *angle++ + DEG22_5;
 	    s = sin(a);
 	    c = cos(a);
-	    class = ((s*c > 0)<<1) + (s*c*(2*c*c - 1) > 0);
-	    *trgt.l++ = (src.w[off[class]] + src.w[-off[class]] > value.w);
+	    class_id = ((s*c > 0)<<1) + (s*c*(2*c*c - 1) > 0);
+	    *trgt.l++ = (src.w[off[class_id]] + src.w[-off[class_id]] > value.w);
 	    src.w++;
 	  }
 	  *trgt.l++ = 0;
@@ -775,8 +775,8 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
 	    a = *angle++ + DEG22_5;
 	    s = sin(a);
 	    c = cos(a);
-	    class = ((s*c > 0)<<1) + (s*c*(2*c*c - 1) > 0);
-	    *trgt.l++ = (src.l[off[class]] + src.l[-off[class]] > value.l);
+	    class_id = ((s*c > 0)<<1) + (s*c*(2*c*c - 1) > 0);
+	    *trgt.l++ = (src.l[off[class_id]] + src.l[-off[class_id]] > value.l);
 	    src.l++;
 	  }
 	  *trgt.l++ = 0;
@@ -795,8 +795,8 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
 	    a = *angle++ + DEG22_5;
 	    s = sin(a);
 	    c = cos(a);
-	    class = ((s*c > 0)<<1) + (s*c*(2*c*c - 1) > 0);
-	    *trgt.l++ = (src.q[off[class]] + src.q[-off[class]] > value.q);
+	    class_id = ((s*c > 0)<<1) + (s*c*(2*c*c - 1) > 0);
+	    *trgt.l++ = (src.q[off[class_id]] + src.q[-off[class_id]] > value.q);
 	    src.q++;
 	  }
 	  *trgt.l++ = 0;
@@ -815,8 +815,8 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
 	    a = *angle++ + DEG22_5;
 	    s = sin(a);
 	    c = cos(a);
-	    class = ((s*c > 0)<<1) + (s*c*(2*c*c - 1) > 0);
-	    *trgt.l++ = (src.f[off[class]] + src.f[-off[class]] > value.f);
+	    class_id = ((s*c > 0)<<1) + (s*c*(2*c*c - 1) > 0);
+	    *trgt.l++ = (src.f[off[class_id]] + src.f[-off[class_id]] > value.f);
 	    src.f++;
 	  }
 	  *trgt.l++ = 0;
@@ -835,8 +835,8 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
 	    a = *angle++ + DEG22_5;
 	    s = sin(a);
 	    c = cos(a);
-	    class = ((s*c > 0)<<1) + (s*c*(2*c*c - 1) > 0);
-	    *trgt.l++ = (src.d[off[class]] + src.d[-off[class]] > value.d);
+	    class_id = ((s*c > 0)<<1) + (s*c*(2*c*c - 1) > 0);
+	    *trgt.l++ = (src.d[off[class_id]] + src.d[-off[class_id]] > value.d);
 	    src.d++;
 	  }
 	  *trgt.l++ = 0;
@@ -858,9 +858,9 @@ int32_t lux_max_dir(int32_t narg, int32_t ps[])
 {
   loopInfo	srcinfo, trgtinfo;
   pointer	src, trgt;
-  float	*angle, s, c, a;
-  scalar	value;
-  int32_t	nx, ny, n, result, sign, class;
+  double	*angle, s, c, a;
+  Scalar	value;
+  int32_t	nx, ny, n, result, sign, class_id;
   int32_t	off[4];
 
   if (!symbolIsNumericalArray(ps[0])
@@ -875,8 +875,8 @@ int32_t lux_max_dir(int32_t narg, int32_t ps[])
 		   &srcinfo, &src, &result, &trgtinfo, &trgt) == LUX_ERROR)
     return LUX_ERROR;
 
-  n = lux_float(1, &ps[1]);
-  angle = array_data(n);
+  n = lux_double(1, &ps[1]);
+  angle = (double*) array_data(n);
 
   sign = (narg > 1 && ps[2])? int_arg(ps[2]): 1;
 
@@ -906,9 +906,9 @@ int32_t lux_max_dir(int32_t narg, int32_t ps[])
 	    a = *angle++ + DEG22_5;
 	    s = sin(a);
 	    c = cos(a);
-	    class = ((s*c > 0) << 1) + (s*c*(2*c*c - 1) > 0);
-	    *trgt.b++ = (value.b > src.b[off[class]]
-			 && value.b > src.b[-off[class]]);
+	    class_id = ((s*c > 0) << 1) + (s*c*(2*c*c - 1) > 0);
+	    *trgt.b++ = (value.b > src.b[off[class_id]]
+			 && value.b > src.b[-off[class_id]]);
 	    src.b++;
 	  }
 	  *trgt.b++ = 0;
@@ -927,9 +927,9 @@ int32_t lux_max_dir(int32_t narg, int32_t ps[])
 	    a = *angle++ + DEG22_5;
 	    s = sin(a);
 	    c = cos(a);
-	    class = ((s*c > 0) << 1) + (s*c*(2*c*c - 1) > 0);
-	    *trgt.b++ = (value.w > src.w[off[class]]
-			 && value.w > src.w[-off[class]]);
+	    class_id = ((s*c > 0) << 1) + (s*c*(2*c*c - 1) > 0);
+	    *trgt.b++ = (value.w > src.w[off[class_id]]
+			 && value.w > src.w[-off[class_id]]);
 	    src.w++;
 	  }
 	  *trgt.b++ = 0;
@@ -948,9 +948,9 @@ int32_t lux_max_dir(int32_t narg, int32_t ps[])
 	    a = *angle++ + DEG22_5;
 	    s = sin(a);
 	    c = cos(a);
-	    class = ((s*c > 0) << 1) + (s*c*(2*c*c - 1) > 0);
-	    *trgt.b++ = (value.l > src.l[off[class]]
-			 && value.l > src.l[-off[class]]);
+	    class_id = ((s*c > 0) << 1) + (s*c*(2*c*c - 1) > 0);
+	    *trgt.b++ = (value.l > src.l[off[class_id]]
+			 && value.l > src.l[-off[class_id]]);
 	    src.l++;
 	  }
 	  *trgt.b++ = 0;
@@ -969,9 +969,9 @@ int32_t lux_max_dir(int32_t narg, int32_t ps[])
 	    a = *angle++ + DEG22_5;
 	    s = sin(a);
 	    c = cos(a);
-	    class = ((s*c > 0) << 1) + (s*c*(2*c*c - 1) > 0);
-	    *trgt.b++ = (value.q > src.q[off[class]]
-			 && value.q > src.q[-off[class]]);
+	    class_id = ((s*c > 0) << 1) + (s*c*(2*c*c - 1) > 0);
+	    *trgt.b++ = (value.q > src.q[off[class_id]]
+			 && value.q > src.q[-off[class_id]]);
 	    src.q++;
 	  }
 	  *trgt.b++ = 0;
@@ -990,9 +990,9 @@ int32_t lux_max_dir(int32_t narg, int32_t ps[])
 	    a = *angle++ + DEG22_5;
 	    s = sin(a);
 	    c = cos(a);
-	    class = ((s*c > 0) << 1) + (s*c*(2*c*c - 1) > 0);
-	    *trgt.b++ = (value.f > src.f[off[class]]
-			 && value.f > src.f[-off[class]]);
+	    class_id = ((s*c > 0) << 1) + (s*c*(2*c*c - 1) > 0);
+	    *trgt.b++ = (value.f > src.f[off[class_id]]
+			 && value.f > src.f[-off[class_id]]);
 	    src.f++;
 	  }
 	  *trgt.b++ = 0;
@@ -1011,9 +1011,9 @@ int32_t lux_max_dir(int32_t narg, int32_t ps[])
 	    a = *angle++ + DEG22_5;
 	    s = sin(a);
 	    c = cos(a);
-	    class = ((s*c > 0) << 1) + (s*c*(2*c*c - 1) > 0);
-	    *trgt.b++ = (value.d > src.d[off[class]]
-			 && value.d > src.d[-off[class]]);
+	    class_id = ((s*c > 0) << 1) + (s*c*(2*c*c - 1) > 0);
+	    *trgt.b++ = (value.d > src.d[off[class_id]]
+			 && value.d > src.d[-off[class_id]]);
 	    src.d++;
 	  }
 	  *trgt.b++ = 0;
@@ -1035,9 +1035,9 @@ int32_t lux_max_dir(int32_t narg, int32_t ps[])
 	    a = *angle++ + DEG22_5;
 	    s = sin(a);
 	    c = cos(a);
-	    class = ((s*c > 0)<<1) + (s*c*(2*c*c - 1) > 0);
-	    *trgt.b++ = (value.b < src.b[off[class]]
-			 && value.b < src.b[-off[class]]);
+	    class_id = ((s*c > 0)<<1) + (s*c*(2*c*c - 1) > 0);
+	    *trgt.b++ = (value.b < src.b[off[class_id]]
+			 && value.b < src.b[-off[class_id]]);
 	    src.b++;
 	  }
 	  *trgt.b++ = 0;
@@ -1056,9 +1056,9 @@ int32_t lux_max_dir(int32_t narg, int32_t ps[])
 	    a = *angle++ + DEG22_5;
 	    s = sin(a);
 	    c = cos(a);
-	    class = ((s*c > 0)<<1) + (s*c*(2*c*c - 1) > 0);
-	    *trgt.b++ = (value.w < src.w[off[class]]
-			 && value.w < src.w[-off[class]]);
+	    class_id = ((s*c > 0)<<1) + (s*c*(2*c*c - 1) > 0);
+	    *trgt.b++ = (value.w < src.w[off[class_id]]
+			 && value.w < src.w[-off[class_id]]);
 	    src.w++;
 	  }
 	  *trgt.b++ = 0;
@@ -1077,9 +1077,9 @@ int32_t lux_max_dir(int32_t narg, int32_t ps[])
 	    a = *angle++ + DEG22_5;
 	    s = sin(a);
 	    c = cos(a);
-	    class = ((s*c > 0)<<1) + (s*c*(2*c*c - 1) > 0);
-	    *trgt.b++ = (value.l < src.l[off[class]]
-			 && value.l < src.l[-off[class]]);
+	    class_id = ((s*c > 0)<<1) + (s*c*(2*c*c - 1) > 0);
+	    *trgt.b++ = (value.l < src.l[off[class_id]]
+			 && value.l < src.l[-off[class_id]]);
 	    src.l++;
 	  }
 	  *trgt.b++ = 0;
@@ -1098,9 +1098,9 @@ int32_t lux_max_dir(int32_t narg, int32_t ps[])
 	    a = *angle++ + DEG22_5;
 	    s = sin(a);
 	    c = cos(a);
-	    class = ((s*c > 0)<<1) + (s*c*(2*c*c - 1) > 0);
-	    *trgt.b++ = (value.q < src.q[off[class]]
-			 && value.q < src.q[-off[class]]);
+	    class_id = ((s*c > 0)<<1) + (s*c*(2*c*c - 1) > 0);
+	    *trgt.b++ = (value.q < src.q[off[class_id]]
+			 && value.q < src.q[-off[class_id]]);
 	    src.q++;
 	  }
 	  *trgt.b++ = 0;
@@ -1119,9 +1119,9 @@ int32_t lux_max_dir(int32_t narg, int32_t ps[])
 	    a = *angle++ + DEG22_5;
 	    s = sin(a);
 	    c = cos(a);
-	    class = ((s*c > 0)<<1) + (s*c*(2*c*c - 1) > 0);
-	    *trgt.b++ = (value.f < src.f[off[class]]
-			 && value.f < src.f[-off[class]]);
+	    class_id = ((s*c > 0)<<1) + (s*c*(2*c*c - 1) > 0);
+	    *trgt.b++ = (value.f < src.f[off[class_id]]
+			 && value.f < src.f[-off[class_id]]);
 	    src.f++;
 	  }
 	  *trgt.b++ = 0;
@@ -1140,9 +1140,9 @@ int32_t lux_max_dir(int32_t narg, int32_t ps[])
 	    a = *angle++ + DEG22_5;
 	    s = sin(a);
 	    c = cos(a);
-	    class = ((s*c > 0)<<1) + (s*c*(2*c*c - 1) > 0);
-	    *trgt.b++ = (value.d < src.d[off[class]]
-			 && value.d < src.d[-off[class]]);
+	    class_id = ((s*c > 0)<<1) + (s*c*(2*c*c - 1) > 0);
+	    *trgt.b++ = (value.d < src.d[off[class_id]]
+			 && value.d < src.d[-off[class_id]]);
 	    src.d++;
 	  }
 	  *trgt.b++ = 0;
@@ -1188,7 +1188,7 @@ int32_t area_2d(int32_t narg, int32_t ps[])
   offsets[6] = -nx;
   offsets[7] = -nx + 1;
 
-  ptr0 = ptr = array_data(ps[0]); /* data start */
+  ptr0 = ptr = (int32_t*) array_data(ps[0]); /* data start */
   ptrend = ptr0 + array_size(ps[0]); /* points one beyond data end */
   
   /* The numbers in the input data <image> are interpreted as follows:
@@ -1251,7 +1251,7 @@ int32_t area_2d(int32_t narg, int32_t ps[])
 
   /* prepare a stack */
   nStack = STACKBLOCK;
-  stack = stack0 = malloc(STACKBLOCK*sizeof(int32_t *));
+  stack = stack0 = (int32_t**) malloc(STACKBLOCK*sizeof(int32_t *));
   if (!stack0)			/* allocation failed */
     return cerror(ALLOC_ERR, 0);
   stackend = stack0 + nStack;	/* pointer to one beyond end of stack */
@@ -1298,14 +1298,14 @@ int32_t area_2d(int32_t narg, int32_t ps[])
 	  iy2 = iy + rcoords[direction][1];
 	  if (ix2 < 0 || ix2 >= nx || iy2 < 0 || iy2 >= ny)
 	    /* across the edge: continue with next direction */
-	    continue;		
+	    continue;
 
 	  /* the current direction does not lead across an edge */
 	  ptr2 = ptr + offsets[direction]; /* the neighboring position */
 	  if (*ptr2 == 1 || *ptr2 == EDGE) { /* neighbor must be treated */
 	    *stack++ = ptr;	/* place neighbor position on stack */
 	    if (stack == stackend) { /* need to enlarge the stack */
-	      stack0 = realloc(stack0, (nStack + STACKBLOCK)*sizeof(int32_t *));
+	      stack0 = (int32_t**) realloc(stack0, (nStack + STACKBLOCK)*sizeof(int32_t *));
 	      if (!stack0)	/* allocation failed */
 		return cerror(ALLOC_ERR, 0);
 	      /* the call to realloc() may have moved the whole stack to
@@ -1324,7 +1324,7 @@ int32_t area_2d(int32_t narg, int32_t ps[])
 	  if (*ptr2 == 1 || *ptr2 == EDGE) { /* neighbor must be treated */
 	    *stack++ = ptr2;	/* place neighbor position on stack */
 	    if (stack == stackend) { /* need to enlarge the stack */
-	      stack0 = realloc(stack0, (nStack + STACKBLOCK)*sizeof(int32_t *));
+	      stack0 = (int32_t**) realloc(stack0, (nStack + STACKBLOCK)*sizeof(int32_t *));
 	      if (!stack0)	/* allocation failed */
 		return cerror(ALLOC_ERR, 0);
 	      /* the call to realloc() may have moved the whole stack to
@@ -1398,7 +1398,7 @@ int32_t area_general(int32_t narg, int32_t ps[], int32_t isFunction)
   if (!symbolIsNumericalArray(ps[0])) /* not a numerical array */
     return cerror(NEED_NUM_ARR, ps[0]);
   iq = lux_long(1, ps);		/* ensure LONG */
-  if (standardLoop(iq, 0, SL_ALLAXES | SL_EACHCOORD, 0, &srcinfo, &src,
+  if (standardLoop(iq, 0, SL_ALLAXES | SL_EACHCOORD, LUX_INT8, &srcinfo, &src,
 		   NULL, NULL, NULL) == LUX_ERROR)
     return LUX_ERROR;
 
@@ -1408,7 +1408,7 @@ int32_t area_general(int32_t narg, int32_t ps[], int32_t isFunction)
     if (symbol_class(ps[1]) != LUX_ARRAY) /* must be ARRAY */
       return cerror(ILL_CLASS, ps[1]);
     iq = lux_long(1, &ps[1]);	/* ensure LONG */
-    seed = array_data(iq);	/* seed indices */
+    seed = (int32_t*) array_data(iq);	/* seed indices */
     nSeed = array_size(iq);	/* number of seeds */
   }
 
@@ -1421,7 +1421,7 @@ int32_t area_general(int32_t narg, int32_t ps[], int32_t isFunction)
 					  /* a single number */
       return cerror(INCMP_ARG, ps[2]);
     iq = lux_long(1, &iq);	/* ensure LONG */
-    number = array_data(iq);	/* numbers */
+    number = (int32_t*) array_data(iq);	/* numbers */
     nNumber = (nNumber == nSeed)? 1: 0;
   }
 
@@ -1556,7 +1556,7 @@ int32_t area_general(int32_t narg, int32_t ps[], int32_t isFunction)
 	  if (*ptr2 == 1 || *ptr2 == EDGE) { /* neighbor must be treated */
 	    *stack++ = ptr2;	/* place neighbor position on stack */
 	    if (stack == stackend) { /* need to enlarge the stack */
-	      stack0 = realloc(stack0, (nStack + STACKBLOCK)*sizeof(int32_t *));
+	      stack0 = (int32_t**) realloc(stack0, (nStack + STACKBLOCK)*sizeof(int32_t *));
 	      if (!stack0)	/* allocation failed */
 		return cerror(ALLOC_ERR, 0);
 	      /* the call to realloc() may have moved the whole stack to
@@ -1575,7 +1575,7 @@ int32_t area_general(int32_t narg, int32_t ps[], int32_t isFunction)
 	  if (*ptr2 == 1 || *ptr2 == EDGE) { /* neighbor must be treated */
 	    *stack++ = ptr2;	/* place neighbor position on stack */
 	    if (stack == stackend) { /* need to enlarge the stack */
-	      stack0 = realloc(stack0, (nStack + STACKBLOCK)*sizeof(int32_t *));
+	      stack0 = (int32_t**) realloc(stack0, (nStack + STACKBLOCK)*sizeof(int32_t *));
 	      if (!stack0)	/* allocation failed */
 		return cerror(ALLOC_ERR, 0);
 	      /* the call to realloc() may have moved the whole stack to
@@ -1642,10 +1642,10 @@ int32_t area2_2d(int32_t narg, int32_t ps[])
   int32_t	rcoords[8][2] = { { 1, 0 }, { -1, 1 }, { 0, 1 }, { 1, 1 },
 			  { -1, -1 }, { 0, -1 }, { 1, -1 }, { -1, 0 } };
   pointer	dataptr0, dataptr, dataptr2;
-		      
+
   nx = array_dims(ps[0])[0];	/* width */
   ny = array_dims(ps[0])[1];	/* height */
-  dataptr0.l = array_data(ps[1]);
+  dataptr0.l = (int32_t*) array_data(ps[1]);
 
   type = array_type(ps[1]);
   stride = lux_type_size[type];
@@ -1664,9 +1664,9 @@ int32_t area2_2d(int32_t narg, int32_t ps[])
   offset[6] = 1 - nx;
   offset[7] = -1;
 
-  ptr0 = ptr = array_data(ps[0]); /* bitmap start */
+  ptr0 = ptr = (int32_t*) array_data(ps[0]); /* bitmap start */
   ptrend = ptr0 + array_size(ps[0]); /* points one beyond bitmap end */
-  
+
   /* The numbers in the input <bitmap> are interpreted as follows:
      Values equal to zero or greater than one indicate positions that
      are ignored.  Ones indicate positions that are to be labeled.
@@ -1674,7 +1674,7 @@ int32_t area2_2d(int32_t narg, int32_t ps[])
      during execution of the subroutine: If negative values are
      present in <bitmap> upon entry into the routine, then unexpected
      results may be obtained.
-     
+
      Unfortunately, we cannot treat the data elements in a linear
      fashion, because the segments may not be convex in shape, so the
      intersection of a segment and any curve may have disjoint parts.
@@ -1727,7 +1727,7 @@ int32_t area2_2d(int32_t narg, int32_t ps[])
 
   /* prepare a stack */
   nStack = STACKBLOCK;
-  stack = stack0 = malloc(STACKBLOCK*sizeof(int32_t *));
+  stack = stack0 = (int32_t**) malloc(STACKBLOCK*sizeof(int32_t *));
   if (!stack0)			/* allocation failed */
     return cerror(ALLOC_ERR, 0);
   stackend = stack0 + nStack;	/* pointer to one beyond end of stack */
@@ -1964,7 +1964,7 @@ int32_t area2_2d(int32_t narg, int32_t ps[])
 
 	  *stack++ = ptr;	/* place neighbor position on stack */
 	  if (stack == stackend) { /* need to enlarge the stack */
-	    stack0 = realloc(stack0, (nStack + STACKBLOCK)*sizeof(int32_t *));
+	    stack0 = (int32_t**) realloc(stack0, (nStack + STACKBLOCK)*sizeof(int32_t *));
 	    if (!stack0)	/* allocation failed */
 	      return cerror(ALLOC_ERR, 0);
 	    /* the call to realloc() may have moved the whole stack to
@@ -2036,7 +2036,7 @@ int32_t area2_2d(int32_t narg, int32_t ps[])
 
 	  *stack++ = ptr2;	/* place neighbor position on stack */
 	  if (stack == stackend) { /* need to enlarge the stack */
-	    stack0 = realloc(stack0, (nStack + STACKBLOCK)*sizeof(int32_t *));
+	    stack0 = (int32_t**) realloc(stack0, (nStack + STACKBLOCK)*sizeof(int32_t *));
 	    if (!stack0)	/* allocation failed */
 	      return cerror(ALLOC_ERR, 0);
 	    /* the call to realloc() may have moved the whole stack to
@@ -2111,7 +2111,7 @@ int32_t area2_general(int32_t narg, int32_t ps[])
   if (!symbolIsNumericalArray(ps[0])) /* not a numerical array */
     return cerror(NEED_NUM_ARR, ps[0]);
   iq = lux_long(1, ps);		/* ensure LONG */
-  if (standardLoop(iq, 0, SL_ALLAXES | SL_EACHCOORD, 0, &srcinfo, &src,
+  if (standardLoop(iq, 0, SL_ALLAXES | SL_EACHCOORD, LUX_INT8, &srcinfo, &src,
 		   NULL, NULL, NULL) == LUX_ERROR)
     return LUX_ERROR;
 
@@ -2121,7 +2121,7 @@ int32_t area2_general(int32_t narg, int32_t ps[])
     return cerror(NEED_NUM_ARR, ps[1]);
   if (array_size(ps[1]) != array_size(iq)) /* must have same size */
     return cerror(INCMP_ARG, ps[1]);
-  dataptr0.b = array_data(ps[1]);
+  dataptr0.l = (int32_t*) array_data(ps[1]);
   type = array_type(ps[1]);
   stride = lux_type_size[type];
   maximum = (narg > 5 && ps[5])? (int_arg(ps[5]) >= 0 ? 1: 0): 1;
@@ -2133,7 +2133,7 @@ int32_t area2_general(int32_t narg, int32_t ps[])
     if (symbol_class(ps[2]) != LUX_ARRAY) /* must be ARRAY */
       return cerror(ILL_CLASS, ps[2]);
     iq = lux_long(1, &ps[2]);	/* ensure LONG */
-    seed = array_data(iq);	/* seed indices */
+    seed = (int32_t*) array_data(iq);	/* seed indices */
     nSeed = array_size(iq);	/* number of seeds */
   }
 
@@ -2154,7 +2154,7 @@ int32_t area2_general(int32_t narg, int32_t ps[])
 					  /* a single number */
       return cerror(INCMP_ARG, ps[3]);
     iq = lux_long(1, &iq);	/* ensure LONG */
-    number = array_data(iq);	/* numbers */
+    number = (int32_t*) array_data(iq);	/* numbers */
     nNumber = (nNumber == nSeed)? 1: 0;
   }
 
@@ -2179,7 +2179,7 @@ int32_t area2_general(int32_t narg, int32_t ps[])
 
   /* prepare a stack */
   nStack = STACKBLOCK;
-  stack = stack0 = malloc(STACKBLOCK*sizeof(int32_t *));
+  stack = stack0 = (int32_t**) malloc(STACKBLOCK*sizeof(int32_t *));
   if (!stack0) {
     free(offset);
     free(rcoord);
@@ -2436,7 +2436,7 @@ int32_t area2_general(int32_t narg, int32_t ps[])
 
 	  *stack++ = ptr;	/* place neighbor position on stack */
 	  if (stack == stackend) { /* need to enlarge the stack */
-	    stack0 = realloc(stack0, (nStack + STACKBLOCK)*sizeof(int32_t *));
+	    stack0 = (int32_t**) realloc(stack0, (nStack + STACKBLOCK)*sizeof(int32_t *));
 	    if (!stack0)	/* allocation failed */
 	      return cerror(ALLOC_ERR, 0);
 	    /* the call to realloc() may have moved the whole stack to
@@ -2508,7 +2508,7 @@ int32_t area2_general(int32_t narg, int32_t ps[])
 
 	  *stack++ = ptr2;	/* place neighbor position on stack */
 	  if (stack == stackend) { /* need to enlarge the stack */
-	    stack0 = realloc(stack0, (nStack + STACKBLOCK)*sizeof(int32_t *));
+	    stack0 = (int32_t**) realloc(stack0, (nStack + STACKBLOCK)*sizeof(int32_t *));
 	    if (!stack0)	/* allocation failed */
 	      return cerror(ALLOC_ERR, 0);
 	    /* the call to realloc() may have moved the whole stack to
@@ -2755,7 +2755,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
   int32_t	result, mode, n, i, j, k, *offsets, *rcoords, edge = 0,
     mini, loc[3], nel, label = 0, sign, maxi = 0;
   pointer	src, trgt, trgt0;
-  scalar	min[3], max[3];
+  Scalar	min[3], max[3];
   extern struct boundsStruct	bounds;
   loopInfo	srcinfo, trgtinfo;
 
@@ -4293,7 +4293,7 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
     if (array_size(ps[2]) != srcinfo.ndim)
       return cerror(INCMP_ARG, ps[2]);
     i = lux_long(1, &ps[2]);	/* ensure LONG */
-    diagonal = array_data(i);
+    diagonal = (int32_t*) array_data(i);
     nDiagonal = nDoDim = 0;
     for (i = 0; i < srcinfo.ndim; i++)
       if (diagonal[i]) {
@@ -4821,7 +4821,7 @@ int32_t lux_inpolygon(int32_t narg, int32_t ps[])
 {
   int32_t	n, np, result, iq, type, *trgt, temptype, i, count, *trgt0, j;
   pointer	x, y, lx, ly;
-  scalar	thisx, thisy, yc;
+  Scalar	thisx, thisy, yc;
 
   if (!symbolIsNumericalArray(ps[0]))
     return cerror(ILL_CLASS, ps[0]);
@@ -4839,7 +4839,7 @@ int32_t lux_inpolygon(int32_t narg, int32_t ps[])
   result = array_clone(ps[0], LUX_INT32);
   array_num_dims(result) = 1;
   array_dims(result)[0] = n;
-  trgt = trgt0 = array_data(result);
+  trgt = trgt0 = (int32_t*) array_data(result);
 
   type = array_type(ps[0]);
   x.v = array_data(ps[0]);
@@ -5000,12 +5000,12 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
     return luxerror("Need a LONG array", ps[0]);
   if (array_type(ps[1]) != LUX_INT32)
     return luxerror("Need a LONG array", ps[1]);
-  ptr1 = array_data(ps[0]);
-  ptr2 = array_data(ps[1]);
+  ptr1 = (int32_t*) array_data(ps[0]);
+  ptr2 = (int32_t*) array_data(ps[1]);
   n = array_size(ps[0]);
 
   /* we sort the entries by *ptr1 value and secondarily by *ptr2 value */
-  order = malloc(n*sizeof(int32_t));
+  order = (int32_t*) malloc(n*sizeof(int32_t));
   if (!order)
     return cerror(ALLOC_ERR, 0);
   for (i = 0; i < n; i++)
@@ -5039,7 +5039,7 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
     dims[0] = n2;		/* number of non-zero entries */
     dims[1] = 3;		/* three output numbers per entry */
     result = array_scratch(LUX_INT32, 2, dims);
-    ptr = ptr0 = array_data(result); /* output pointer */
+    ptr = ptr0 = (int32_t*) array_data(result); /* output pointer */
     /* we store the area numbers in both images, count the number of */
     /* pixels with that combination, and keep track of the maximum */
     /* included area numbers in both images. */
@@ -5138,7 +5138,7 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
       free(order2);
       return LUX_ERROR;
     }
-    out1 = array_data(qsplit1);
+    out1 = (int32_t*) array_data(qsplit1);
   } else {			/* no splitters to store: output scalar -1 */
     to_scalar(qsplit1, LUX_INT32);
     scalar_value(qsplit1).l = -1;
@@ -5159,7 +5159,7 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
       free(order2);
       return LUX_ERROR;
     }
-    list = array_data(qsplit2list);
+    list = (int32_t*) array_data(qsplit2list);
     v1--;			/* return to previous value */
   } else {
     to_scalar(qsplit2list, LUX_INT32);
@@ -5177,12 +5177,12 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
       free(order2);
       return LUX_ERROR;
     }
-    out2 = array_data(qsplit2);
+    out2 = (int32_t*) array_data(qsplit2);
   } else {
     to_scalar(qsplit2, LUX_INT32);
     scalar_value(qsplit2).l = -1;
   }
-    
+
   /* now write the area numbers to the output variables. */
   i = j = v1 = v2 = 0;
   while (i < n2) {		/* not yet at end */
@@ -5241,7 +5241,7 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
       free(order2);
       return LUX_ERROR;
     }
-    out1 = array_data(qmerge2);
+    out1 = (int32_t*) array_data(qmerge2);
   } else {
     to_scalar(qmerge2, LUX_INT32);
     scalar_value(qmerge2).l = -1;
@@ -5259,7 +5259,7 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
       free(order2);
       return LUX_ERROR;
     }
-    list = array_data(qmerge1list);
+    list = (int32_t*) array_data(qmerge1list);
     v1--;
   } else {
     to_scalar(qmerge1list, LUX_INT32);
@@ -5277,12 +5277,12 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
       free(order2);
       return LUX_ERROR;
     }
-    out2 = array_data(qmerge1);
+    out2 = (int32_t*) array_data(qmerge1);
   } else {
     to_scalar(qmerge1, LUX_INT32);
     scalar_value(qmerge1).l = -1;
   }
-    
+
   i = j = v1 = v2 = 0;
   /* seek the next all-non-zero connection */
   while (i < n2) {
@@ -5335,7 +5335,7 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
       free(order2);
       return LUX_ERROR;
     }
-    ptr = array_data(qapp);
+    ptr = (int32_t*) array_data(qapp);
     for (i = i0 ; i < n2 - 1; i++)
       if (ptr1[order[i]] || ptr2[order[i + 1]] == ptr2[order[i]])
 	continue;
@@ -5378,7 +5378,7 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
       free(order2);
       return LUX_ERROR;
     }
-    ptr = array_data(qdisapp);
+    ptr = (int32_t*) array_data(qdisapp);
     for (i = i0 ; i < n2 - 1; i++)
       if (ptr2[i] || ptr1[i + 1] == ptr1[i])
 	continue;
@@ -5438,7 +5438,7 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
       free(order2);
       return LUX_ERROR;
     }
-    out1 = array_data(qstay1);
+    out1 = (int32_t*) array_data(qstay1);
   } else {
     to_scalar(qstay1, LUX_INT32);
     scalar_value(qstay1).l = -1;
@@ -5456,7 +5456,7 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
       free(order2);
       return LUX_ERROR;
     }
-    out2 = array_data(qstay2);
+    out2 = (int32_t*) array_data(qstay2);
   } else {
     to_scalar(qstay2, LUX_INT32);
     scalar_value(qstay2).l = -1;
@@ -5538,7 +5538,7 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
 
     /* we keep a list of flags to indicate which image-1 numbers */
     /* have already been assigned to some image-2 areas */
-    flags = malloc(n);
+    flags = (uint8_t*) malloc(n);
     if (!flags) {
       free(order);
       free(order2);
@@ -5547,7 +5547,7 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
     zerobytes(flags, n);
 
     /* we store the replacement numbers in <ptr0> */
-    ptr0 = malloc(n2*sizeof(int32_t));
+    ptr0 = (int32_t*) malloc(n2*sizeof(int32_t));
     if (!ptr0) {
       free(order);
       free(order2);
@@ -5557,14 +5557,14 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
     zerobytes(ptr0, n2*sizeof(int32_t));
     /* we start with stayers. */
     if (symbolIsArray(qstay1)) {
-      out1 = array_data(qstay1);
-      out2 = array_data(qstay2);
+      out1 = (int32_t*) array_data(qstay1);
+      out2 = (int32_t*) array_data(qstay2);
       j = array_size(qstay1);
       while (j--) {
 	/* seek the encountered image-2 number in the list */
-	ptr = bsearch(out2++, order2, n2, sizeof(int32_t), intcmp);
+	ptr = (int32_t*) bsearch(out2++, order2, n2, sizeof(int32_t), intcmp);
 	ptr0[ptr - order2] = *out1; /* replacement number */
-	ptr = bsearch(out1++, order, n, sizeof(int32_t), intcmp);
+	ptr = (int32_t*) bsearch(out1++, order, n, sizeof(int32_t), intcmp);
 	flags[ptr - order] = 1; /* flag use of this number */
       }
     }
@@ -5572,19 +5572,19 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
     /* the first of the image-2 counterparts that does not yet have */
     /* a new assigned number. */
     if (symbolIsArray(qsplit1)) {
-      out1 = array_data(qsplit1);
-      out2 = array_data(qsplit2);
-      list = array_data(qsplit2list);
+      out1 = (int32_t*) array_data(qsplit1);
+      out2 = (int32_t*) array_data(qsplit2);
+      list = (int32_t*) array_data(qsplit2list);
       j = array_size(qsplit1);
       while (j--) {		/* all pre-split areas */
 	i = list[1] - list[0];	/* the number of post-split areas */
 	list++;
 	/* corresponding to the current pre-split */
 	while (i--) {		/* all corresponding post-split areas */
-	  ptr = bsearch(out2++, order2, n2, sizeof(int32_t), intcmp);
+	  ptr = (int32_t*) bsearch(out2++, order2, n2, sizeof(int32_t), intcmp);
 	  if (!ptr0[ptr - order2]) { /* not yet assigned */
 	    ptr0[ptr - order2] = *out1;
-	    ptr = bsearch(out1, order, n, sizeof(int32_t), intcmp);
+	    ptr = (int32_t*) bsearch(out1, order, n, sizeof(int32_t), intcmp);
 	    flags[ptr - order] = 1; /* flag use of this number */
 	    break;
 	  }
@@ -5600,25 +5600,25 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
     /* splitting and merging processes at the same time, so we must */
     /* be careful. */
     if (symbolIsArray(qmerge1)) {
-      out1 = array_data(qmerge1);
-      out2 = array_data(qmerge2);
-      list = array_data(qmerge1list);
+      out1 = (int32_t*) array_data(qmerge1);
+      out2 = (int32_t*) array_data(qmerge2);
+      list = (int32_t*) array_data(qmerge1list);
       j = array_size(qmerge2);
       while (j--) {		/* all post-merge areas */
 	i = list[1] - list[0];	/* the number of pre-merge areas */
 	list++;
 	/* corresponding to the current post-merge */
-	ptr = bsearch(out2, order2, n2, sizeof(int32_t), intcmp);
+	ptr = (int32_t*) bsearch(out2, order2, n2, sizeof(int32_t), intcmp);
 	if (ptr0[ptr - order2]) {	/* already assigned to */
 	  out2++;
 	  out1 += i;
 	  continue;
 	}
 	while (i--) {		/* all corresponding pre-merge areas */
-	  ptr = bsearch(out1, order, n, sizeof(int32_t), intcmp);
+	  ptr = (int32_t*) bsearch(out1, order, n, sizeof(int32_t), intcmp);
 	  if (!flags[ptr - order]) { /* not yet assigned */
 	    flags[ptr - order] = 1; /* flag use of this number */
-	    ptr = bsearch(out2, order2, n2, sizeof(int32_t), intcmp);
+	    ptr = (int32_t*) bsearch(out2, order2, n2, sizeof(int32_t), intcmp);
 	    ptr0[ptr - order2] = *out1;
 	    break;
 	  }
@@ -5691,7 +5691,7 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
     /* now we have the new numbers, and we modify the image-2 numbers and */
     /* relevant global variables accordingly. */
     if (symbolIsArray(ps[1])) {
-      list = array_data(ps[1]);	/* <im2> */
+      list = (int32_t*) array_data(ps[1]);	/* <im2> */
       i2 = array_size(ps[1]);
       j = -1;
       i = 0;
@@ -5701,7 +5701,7 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
 	    *list = i;
 	  else {
 	    j = *list;
-	    ptr = bsearch(list, order2, n2, sizeof(int32_t), intcmp);
+	    ptr = (int32_t*) bsearch(list, order2, n2, sizeof(int32_t), intcmp);
 	    *list = i = ptr0[ptr - order2];
 	  }
 	}
@@ -5710,13 +5710,13 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
     }
     /* modify the return value */
     if (symbolIsArray(result)) {
-      list = array_data(result);
+      list = (int32_t*) array_data(result);
       i2 = array_size(result)/3; /* we only want to change the image-2 */
 				 /* numbers, i.e. 1/3rd of the whole. */
       list += i2;		/* move to start of image-2 numbers */
       while (i2--) {
 	if (*list > 0) {
-	  ptr = bsearch(list, order2, n2, sizeof(int32_t), intcmp);
+	  ptr = (int32_t*) bsearch(list, order2, n2, sizeof(int32_t), intcmp);
 	  *list = ptr0[ptr - order2];
 	}
 	list++;
@@ -5724,11 +5724,11 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
     }
     /* modify $APP */
     if (symbolIsArray(qapp)) {
-      list = array_data(qapp);
+      list = (int32_t*) array_data(qapp);
       i2 = array_size(qapp);
       while (i2--) {
 	if (*list > 0) {
-	  ptr = bsearch(list, order2, n2, sizeof(int32_t), intcmp);
+	  ptr = (int32_t*) bsearch(list, order2, n2, sizeof(int32_t), intcmp);
 	  *list = ptr0[ptr - order2];
 	}
 	list++;
@@ -5736,11 +5736,11 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
     }
     /* modify $STAY2 */
     if (symbolIsArray(qstay2)) {
-      list = array_data(qstay2);
+      list = (int32_t*) array_data(qstay2);
       i2 = array_size(qstay2);
       while (i2--) {
 	if (*list > 0) {
-	  ptr = bsearch(list, order2, n2, sizeof(int32_t), intcmp);
+	  ptr = (int32_t*) bsearch(list, order2, n2, sizeof(int32_t), intcmp);
 	  *list = ptr0[ptr - order2];
 	}
 	list++;
@@ -5748,11 +5748,11 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
     }
     /* modify $SPLIT2 */
     if (symbolIsArray(qsplit2)) {
-      list = array_data(qsplit2);
+      list = (int32_t*) array_data(qsplit2);
       i2 = array_size(qsplit2);
       while (i2--) {
 	if (*list > 0) {
-	  ptr = bsearch(list, order2, n2, sizeof(int32_t), intcmp);
+	  ptr = (int32_t*) bsearch(list, order2, n2, sizeof(int32_t), intcmp);
 	  *list = ptr0[ptr - order2];
 	}
 	list++;
@@ -5760,11 +5760,11 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
     }
     /* modify $MERGE2 */
     if (symbolIsArray(qmerge2)) {
-      list = array_data(qmerge2);
+      list = (int32_t*) array_data(qmerge2);
       i2 = array_size(qmerge2);
       while (i2--) {
 	if (*list > 0) {
-	  ptr = bsearch(list, order2, n2, sizeof(int32_t), intcmp);
+	  ptr = (int32_t*) bsearch(list, order2, n2, sizeof(int32_t), intcmp);
 	  *list = ptr0[ptr - order2];
 	}
 	list++;

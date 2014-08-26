@@ -1,4 +1,4 @@
-/* This is file intmath.h.
+/* This is file lux_func_if.h.
 
 Copyright 2013 Louis Strous
 
@@ -17,22 +17,19 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef INTMATH_H
-#define INTMATH_H
-
-#include <stdlib.h>
-#include "action.h"
+#include <stdio.h>
+#include "action.hh"
 
 typedef struct {
-  int32_t quot;
-  int32_t rem;
-} Div_t;
+  int32_t func_sym;
+  size_t num_params;
+  int16_t *param_syms;
+  pointer *param_data;
+} lux_func_if;
 
-Div_t adiv(int32_t numerator, int32_t denominator);
-int32_t iaquot(int32_t numerator, int32_t denominator);
-int32_t iamod(int32_t numerator, int32_t denominator);
-Div_t alinediv(int32_t numerator, int32_t factor, int32_t addend, int32_t denominator);
-int32_t alinequot(int32_t numerator, int32_t factor, int32_t addend, int32_t denominator);
-int32_t alinemod(int32_t numerator, int32_t factor, int32_t addend, int32_t denominator);
-
-#endif
+lux_func_if * lux_func_if_alloc(char const * const name, size_t num_params);
+void lux_func_if_free(lux_func_if *);
+int32_t lux_func_if_set_param(lux_func_if *, size_t index, int32_t param);
+int32_t lux_func_if_get_param_sym(lux_func_if *, size_t index);
+pointer lux_func_if_get_param_data(lux_func_if *, size_t index);
+double lux_func_if_call(lux_func_if *);

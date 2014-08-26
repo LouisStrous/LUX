@@ -28,8 +28,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <float.h>
 #include <string.h>
 #include <stdlib.h>
-#include "install.h"
-#include "action.h"
+#include "install.hh"
+#include "action.hh"
 
 int32_t	tkplot(float, float, int32_t, int32_t),
   createFullProjection(float *matrix, float *perspective, float *oblique),
@@ -1158,8 +1158,8 @@ int32_t hiddenLine(float x, float y, int32_t mode)
     area[nDrawn].xmin = area[nDrawn].ymin = -FLT_MAX;
     area[nDrawn].xmax = area[nDrawn].ymax = FLT_MAX;
     area[nDrawn].nTopSegment = area[nDrawn].nBottomSegment = nDrawn;
-    area[nDrawn].top = malloc(HL_SEGMENT_BLOCK*sizeof(lineSegment));
-    area[nDrawn].bottom = malloc(HL_SEGMENT_BLOCK*sizeof(lineSegment));
+    area[nDrawn].top = (lineSegment*) malloc(HL_SEGMENT_BLOCK*sizeof(lineSegment));
+    area[nDrawn].bottom = (lineSegment*) malloc(HL_SEGMENT_BLOCK*sizeof(lineSegment));
     if (!area[nDrawn].top || !area[nDrawn].bottom)
       return cerror(ALLOC_ERR, 0);
     area[nDrawn].nTopFree = area[nDrawn].nBottomFree = HL_SEGMENT_BLOCK;

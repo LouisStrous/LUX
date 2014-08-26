@@ -23,14 +23,14 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <ctype.h>
 #include <math.h>
 #include <stdlib.h>
-#include "action.h"
+#include "action.hh"
 
 extern char	*curScrat, *binOpSign[];
 char	*fmt_integer, *fmt_float, *fmt_string, *fmt_complex, *fmt_time;
 FILE	*outputStream;
 
 /*-------------------------------------------------------------------*/
-char *symbolProperName(int32_t symbol)
+char const* symbolProperName(int32_t symbol)
 /* returns the proper name of the symbol, if any, or NULL */
 {
   hashTableEntry	**hashTable, *hp;
@@ -102,7 +102,8 @@ int32_t fmt_entry(formatInfo *fmi)
 
   */
 {
-  int32_t	type, k;
+  int32_t	k;
+  fmtType type;
   char	*p, *p2;
 
   if (!fmi->current || !*fmi->current) { /* no format */
@@ -330,7 +331,7 @@ char *fmttok(char *format)
   formatInfo	*fmi = &theFormat;
 
   if (format) {			/* we install the new format */
-    fmi->format = realloc(fmi->format, strlen(format) + 1);
+    fmi->format = (char*) realloc(fmi->format, strlen(format) + 1);
     if (!fmi->format) {
       puts("fmttok:");
       cerror(ALLOC_ERR, 0);
@@ -512,8 +513,11 @@ char *symbolIdent(int32_t symbol, int32_t mode)
   LS 23jul98
 */
 {
-  char	*save, *p, *scalarIndicator = "bw\0q\0d", *name;
-  scalar	number;
+  char* save;
+  char* p;
+  char const* scalarIndicator = "bw\0q\0d";
+  char const* name;
+  Scalar	number;
   int32_t	i, j, n, m;
   pointer	ptr;
   listElem	*sptr;
@@ -566,9 +570,9 @@ char *symbolIdent(int32_t symbol, int32_t mode)
 
   if ((mode & I_PARENT)) { /* want parent's name, too */
     if (symbol_context(symbol)) {
-      p = symbolProperName(symbol_context(symbol));
-      if (p) {
-	strcpy(curScrat, p);
+      char const* cp = symbolProperName(symbol_context(symbol));
+      if (cp) {
+	strcpy(curScrat, cp);
 	curScrat += strlen(curScrat);
 	strcpy(curScrat++, ".");
       }
@@ -592,9 +596,9 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     errorPtr = curScrat;
 
   if (i == 0) {		/* want a name, if available */
-    p = symbolProperName(symbol); /* get symbol's name at curScrat */
-    if (p) { 			/* have a name */
-      strcpy(curScrat, p);
+    char const* cp = symbolProperName(symbol); /* get symbol's name at curScrat */
+    if (cp) { 			/* have a name */
+      strcpy(curScrat, cp);
       if (symbol_class(symbol) == LUX_UNDEFINED) /* undefined symbol */
 	strcat(curScrat, "?"); /* add ? to indicate no value */
       curScrat = save;
@@ -767,7 +771,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       j = n;			/* print all */
       i = 0;			/* no truncation */
     }
-    ptr.b = array_data(symbol);
+    ptr.b = (uint8_t*) array_data(symbol);
     switch (array_type(symbol)) {
     case LUX_INT8:
       while (j--) {
@@ -870,8 +874,10 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     break;
   case LUX_POINTER: case LUX_TRANSFER:
     /* if we get here then this is a pointer to nothing */
-    p = symbolProperName(symbol);
-    strcpy(curScrat, p? p: "(unnamed)");
+    {
+      char const* p = symbolProperName(symbol);
+      strcpy(curScrat, p? p: "(unnamed)");
+    }
     break;
   case LUX_ASSOC:
     sprintf(curScrat, "ASSOC(%1d,", assoc_lun(symbol));
@@ -1152,7 +1158,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     sprintf(curScrat, "SYMBOL('%s')", string_value(meta_target(symbol)));
     break;
   case LUX_CARRAY:
-    ptr.cf = array_data(symbol);
+    ptr.cf = (floatComplex*) array_data(symbol);
     n = array_size(symbol);
     strcpy(curScrat++, "[");
     if ((mode & I_TRUNCATE)
@@ -1208,8 +1214,10 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     }
     sprintf(curScrat, " %s ", name);
     curScrat += strlen(curScrat);
-    p = symbolProperName(symbol);
-    strcpy(curScrat, p? p: "(unnamed)");
+    {
+      char const* p = symbolProperName(symbol);
+      strcpy(curScrat, p? p: "(unnamed)");
+    }
     curScrat += strlen(curScrat);
     if (symbol_class(symbol) == LUX_DEFERRED_SUBR
         || symbol_class(symbol) == LUX_DEFERRED_FUNC
@@ -1425,8 +1433,10 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     }
     break;
   case LUX_USR_FUNC:
-    p = symbolProperName(usr_func_number(symbol));
-    sprintf(curScrat, "%s(", p? p: "(unnamed)");
+    {
+      char const* p = symbolProperName(usr_func_number(symbol));
+      sprintf(curScrat, "%s(", p? p: "(unnamed)");
+    }
     curScrat += strlen(curScrat);
     n = usr_func_num_arguments(symbol);
     ptr.w = usr_func_arguments(symbol);
@@ -1611,8 +1621,10 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     case EVB_FOR:
       strcpy(curScrat, "FOR ");
       curScrat += strlen(curScrat);
-      p = symbolProperName(for_loop_symbol(symbol));
-      sprintf(curScrat, "%s=", p? p: "(unnamed)");
+      {
+        char const* p = symbolProperName(for_loop_symbol(symbol));
+        sprintf(curScrat, "%s=", p? p: "(unnamed)");
+      }
       curScrat += strlen(curScrat);
       symbolIdent(for_start(symbol), mode & I_SINGLEMODE);
       curScrat += strlen(curScrat);
@@ -1642,7 +1654,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       if (symbol_class(n) == LUX_STRING)  /* unevaluated name */
         strcpy(curScrat, string_value(n));
       else {
-        p = symbolProperName(usr_code_routine_num(symbol));
+        char const* p = symbolProperName(usr_code_routine_num(symbol));
         strcpy(curScrat, p? p: "(unnamed)");
       }
       break;
@@ -1693,7 +1705,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       if (usr_sub_is_deferred(symbol))  /* call to an LUX_DEFERRED_SUBR */
         strcpy(curScrat, string_value(usr_sub_routine_num(symbol)));
       else {
-        p = symbolProperName(usr_sub_routine_num(symbol));
+        char const* p = symbolProperName(usr_sub_routine_num(symbol));
         sprintf(curScrat, "%s", p? p: "(unnamed)");
       }
       curScrat += strlen(curScrat);
@@ -1706,8 +1718,10 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       }
       break;
     case EVB_INSERT:
-      p = symbolProperName(insert_target(symbol));
-      sprintf(curScrat, "%s(", p? p: "(unnamed)");
+      {
+        char const* p = symbolProperName(insert_target(symbol));
+        sprintf(curScrat, "%s(", p? p: "(unnamed)");
+      }
       curScrat += strlen(curScrat);
       n = insert_num_target_indices(symbol);
       ptr.w = insert_target_indices(symbol);
@@ -1938,8 +1952,10 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     }
     break;
   case LUX_UNDEFINED:
-    p = symbolProperName(symbol);
-    sprintf(curScrat, "%s?", p? p: "(unnamed)");
+    {
+      char const* p = symbolProperName(symbol);
+      sprintf(curScrat, "%s?", p? p: "(unnamed)");
+    }
     break;
   default:
     sprintf(curScrat, "[class %1d (%s)]",
@@ -1954,7 +1970,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
 int32_t identStruct(structElem *se)
 {
   int32_t	n, nelem, ndim, *dims, ndim2, *dims2;
-  char	*arrName[] = {
+  char const * arrName[] = {
     "BYTARR", "INTARR", "LONARR", "QUADARR", "FLTARR", "DBLARR", "STRARR",
     "STRARR", "STRARR", "CFLTARR", "CDBLARR"
   };
@@ -2026,7 +2042,9 @@ void dumpTree(int32_t symbol)
   int16_t	*ptr;
   static int32_t	indent = 0;
   extern char *binOpName[];
-  char	*name, noName[] = "-", **sp;
+  char** sp;
+  char const noName[] = "-";
+  char const* name;
   extractSec	*eptr;
 
   if (!indent)
@@ -2206,7 +2224,7 @@ void dumpTree(int32_t symbol)
     case LUX_FUNC_PTR:
       n = func_ptr_routine_num(symbol);
       if (n < 0) {
-	if (func_ptr_type(symbol) == LUX_FUNCTION)
+	if ((Symbolclass) func_ptr_type(symbol) == LUX_FUNCTION)
 	  printf("internal function: %s\n", function[-n].name);
 	else
 	  printf("internal subroutine: %s\n", subroutine[-n].name);

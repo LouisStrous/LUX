@@ -30,8 +30,9 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <float.h>
 #include <limits.h>             /* for LONG_MAX */
 #include <time.h>               /* for difftime */
-#include "action.h"
-#include "lux_func_if.h"
+#include "action.hh"
+#include "bindings.hh"
+#include "lux_func_if.hh"
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_multimin.h>
 #include <limits.h>
@@ -135,7 +136,7 @@ int32_t lux_generalfit(int32_t narg, int32_t ps[])
         *err, *par, qBest1, qBest2, *parBest1, *parBest2, *ran, qual, temp,
     dir, dThresh, qLast, mu, *meanShift, *weights, tThresh;
   char  vocal, onebyone, vocal_err;
-  void  randome(double *output, int32_t number);
+  void  randome(void *output, int32_t number, double limit);
   double (*fitProfiles[2])(double *, int32_t, double *, double *, double *, int32_t) =
   { gaussians, powerfunc };
   double (*fitFunc)(double *, int32_t, double *, double *, double *, int32_t);
@@ -327,7 +328,7 @@ int32_t lux_generalfit(int32_t narg, int32_t ps[])
     redef_array(ps[14], LUX_DOUBLE, 1, &i);
     err = (double *) array_data(ps[14]);
   } else {
-    err = malloc(nPar*sizeof(double));
+    err = (double*) malloc(nPar*sizeof(double));
     if (!err)
       return cerror(ALLOC_ERR, 0);
   }
@@ -422,6 +423,7 @@ int32_t lux_generalfit(int32_t narg, int32_t ps[])
   for (i = 0; i < nPar; i++)
     meanShift[i] = 0.0;
 
+  int bad = 0;
   iter = 0;
   same = 0;
   mu = 0;
@@ -432,10 +434,10 @@ int32_t lux_generalfit(int32_t narg, int32_t ps[])
     qLast = qBest2;
     nn = onebyone? nPar: nIter;
     if (onebyone)
-      randome(ran, nPar);
+      randome(ran, nPar, 0);
     for (i = 0; i < nn; i++) {
       if (!onebyone)
-        randome(ran, nPar);       /* get random numbers */
+        randome(ran, nPar, 0);  /* get random numbers */
       mu = 2 - mu/qLast;
       if (mu < 1)
         mu = 1;
@@ -449,8 +451,10 @@ int32_t lux_generalfit(int32_t narg, int32_t ps[])
       }
       if (fitSym) {
         j = eval(fitTemp);
-        if (j < 0)                      /* some error */
-          goto generalfit_1;
+        if (j < 0) {            /* some error */
+          bad = 1;
+          break;
+        }
         qual = double_arg(j);
         zapTemp(j);
       } else
@@ -463,6 +467,10 @@ int32_t lux_generalfit(int32_t narg, int32_t ps[])
 	  par[i] = parBest1[i];
       }
     } /* end for (i = 0; i < nn; i++) */
+
+    if (bad)
+      break;
+
     if (qBest1 < qBest2) {      /* this cycle yielded a better one */
       same = 0;
       for (j = 0; j < nPar; j++) {
@@ -516,117 +524,130 @@ int32_t lux_generalfit(int32_t narg, int32_t ps[])
            && (!iThresh || iter < iThresh)
            && same <= nSame
            && (!tThresh || time(NULL) - starttime < tThresh));
-  memcpy(par, parBest2, size);
-  par[nPar] = qBest2;
+  if (!bad) {
+    memcpy(par, parBest2, size);
+    par[nPar] = qBest2;
 
-  /* presumably we're close to a local minimum now; home in */
-  double qualplus, qualmin;
-  for (i = 0; i < nPar; i++) {
-    if (step[i]) {
-      double h = fabs(step[i]);
-      double r;
-      do {
-	par[i] = parBest2[i] + h;
-	if (fitSym) {
-	  j = eval(fitTemp);
-	  if (j < 0)
-	    goto generalfit_1;
-	  qualplus = double_arg(j);
-	  zapTemp(j);
-	} else
-	  qualplus = fitFunc(par, nPar, xp, yp, weights, nPoints);
-	par[i] = parBest2[i] - h;
-	if (fitSym) {
-	  j = eval(fitTemp);
-	  if (j < 0)
-	    goto generalfit_1;
-	  qualmin = double_arg(j);
-	  zapTemp(j);
-	} else
-	  qualmin = fitFunc(par, nPar, xp, yp, weights, nPoints);
-	r = qBest2? (qualplus + qualmin)/qBest2: 3.5;
-	h *= 12/(r*r - 4);
-      } while ((r > 5 || r < 3) && h < err[i]*1e6);
-      /* q² = a²(1 + ((x - b)/c)²) */
-      double psi = (qualplus*qualplus - qualmin*qualmin)/4;
-      double beta = qBest2*qBest2;
-      double delta = (qualplus*qualplus + qualmin*qualmin)/2 - beta;
-      double a2, b, c;
-      if (delta) {
-	a2 = beta - psi*psi/delta; /* a² */
-	if (a2 < 0) {
-	  a2 = 0;
-	  b = 0;
-	} else
-	  b = -h*psi/delta;
-	c = h*sqrt(a2/delta);
-      } else {
-	b = 0;
-	c = INFTY;
-      }
-      par[i] = parBest2[i] + b;
-      double q;
-      if (fitSym) {
-	j = eval(fitTemp);
-	if (j < 0)
-	  goto generalfit_1;
-	q = double_arg(j);
-	zapTemp(j);
-      } else
-	q = fitFunc(par, nPar, xp, yp, weights, nPoints);
-      if (q < qBest2) {
-	parBest2[i] = par[i];
-	qBest2 = q;
-      } else {
-	par[i] = parBest2[i];	/* restore */
-      }
-      err[i] = c*sqrt(3);
-    } else
-      err[i] = 0;
-  }
-  par[nPar] = qBest2;
+    /* presumably we're close to a local minimum now; home in */
+    double qualplus, qualmin;
+    for (i = 0; i < nPar; i++) {
+      if (step[i]) {
+        double h = fabs(step[i]);
+        double r;
+        do {
+          par[i] = parBest2[i] + h;
+          if (fitSym) {
+            j = eval(fitTemp);
+            if (j < 0) {
+              bad = 1;
+              break;
+            }
+            qualplus = double_arg(j);
+            zapTemp(j);
+          } else
+            qualplus = fitFunc(par, nPar, xp, yp, weights, nPoints);
+          par[i] = parBest2[i] - h;
+          if (fitSym) {
+            j = eval(fitTemp);
+            if (j < 0) {
+              bad = 1;
+              break;
+            }
+            qualmin = double_arg(j);
+            zapTemp(j);
+          } else
+            qualmin = fitFunc(par, nPar, xp, yp, weights, nPoints);
+          r = qBest2? (qualplus + qualmin)/qBest2: 3.5;
+          h *= 12/(r*r - 4);
+        } while ((r > 5 || r < 3) && h < err[i]*1e6);
 
-  if (vocal) {
-    iter++;
-    if (vocal) {
-      printf("\r%3d %#9.4g(%#6.2f):", iter, qBest2, qBest2? qLag*0.99/qBest2 - 1: 0);
-      n = 0;
-      for (j = 0; j < nPar; j++)
-        if (step[j]) {
-          printf("%#10.4g", parBest2[j]);
-	  if (vocal_err)
-	    printf("(%#8.2g)", err[j]);
-          n++;
-          if (n >= 14/(vocal_err? 2: 1)) /* we show at most fourteen */
-            break;
+        if (bad)
+          break;
+
+        /* q² = a²(1 + ((x - b)/c)²) */
+        double psi = (qualplus*qualplus - qualmin*qualmin)/4;
+        double beta = qBest2*qBest2;
+        double delta = (qualplus*qualplus + qualmin*qualmin)/2 - beta;
+        double a2, b, c;
+        if (delta) {
+          a2 = beta - psi*psi/delta; /* a² */
+          if (a2 < 0) {
+            a2 = 0;
+            b = 0;
+          } else
+            b = -h*psi/delta;
+          c = h*sqrt(a2/delta);
+        } else {
+          b = 0;
+          c = INFTY;
         }
+        par[i] = parBest2[i] + b;
+        double q;
+        if (fitSym) {
+          j = eval(fitTemp);
+          if (j < 0) {
+            bad = 1;
+            break;
+          }
+          q = double_arg(j);
+          zapTemp(j);
+        } else
+          q = fitFunc(par, nPar, xp, yp, weights, nPoints);
+        if (q < qBest2) {
+          parBest2[i] = par[i];
+          qBest2 = q;
+        } else {
+          par[i] = parBest2[i];	/* restore */
+        }
+        err[i] = c*sqrt(3);
+      } else
+        err[i] = 0;
     }
-    printf(" \n");
+    par[nPar] = qBest2;
+
+    if (!bad) {
+      if (vocal) {
+        iter++;
+        if (vocal) {
+          printf("\r%3d %#9.4g(%#6.2f):", iter, qBest2, qBest2? qLag*0.99/qBest2 - 1: 0);
+          n = 0;
+          for (j = 0; j < nPar; j++)
+            if (step[j]) {
+              printf("%#10.4g", parBest2[j]);
+              if (vocal_err)
+                printf("(%#8.2g)", err[j]);
+              n++;
+              if (n >= 14/(vocal_err? 2: 1)) /* we show at most fourteen */
+                break;
+            }
+        }
+        printf(" \n");
+      }
+
+      if (!xSym)
+        zap(xTemp);
+      if (fitSym) {
+        symbol_class(fitTemp) = LUX_SCALAR;
+        zap(fitTemp);
+      }
+      free(parBest1);
+      free(parBest2);
+      free(ran);
+      free(meanShift);
+      if (symbol_context(ySym) == 1)
+        symbol_context(ySym) = -compileLevel;
+      if (symbol_context(fitPar) == 1)
+        symbol_context(fitPar) = -compileLevel;
+      if (xSym && symbol_context(xSym) == 1)
+        symbol_context(xSym) = -compileLevel;
+      if (weights && symbol_context(wSym) == 1)
+        symbol_context(wSym) = -compileLevel;
+      if (narg <= 14 || !ps[14])
+        free(err);
+      return fitPar;
+    }
   }
 
-  if (!xSym)
-    zap(xTemp);
-  if (fitSym) {
-    symbol_class(fitTemp) = LUX_SCALAR;
-    zap(fitTemp);
-  }
-  free(parBest1);
-  free(parBest2);
-  free(ran);
-  free(meanShift);
-  if (symbol_context(ySym) == 1)
-    symbol_context(ySym) = -compileLevel;
-  if (symbol_context(fitPar) == 1)
-    symbol_context(fitPar) = -compileLevel;
-  if (xSym && symbol_context(xSym) == 1)
-    symbol_context(xSym) = -compileLevel;
-  if (weights && symbol_context(wSym) == 1)
-    symbol_context(wSym) = -compileLevel;
-  if (narg <= 14 || !ps[14])
-    free(err);
-  return fitPar;
-
-  generalfit_1:
   if (narg <= 14 || !ps[14])
     free(err);
   if (!xSym)
@@ -651,7 +672,7 @@ gsl_vector *gsl_vector_from_lux_symbol(int32_t iq, int32_t axis)
     return NULL;
   }
 
-  v = calloc(1, sizeof(gsl_vector));
+  v = (gsl_vector*) calloc(1, sizeof(gsl_vector));
   /* v->owner = 0 is essential! */
   if (!v) {
     errno = ENOMEM;
@@ -722,6 +743,7 @@ int32_t lux_generalfit2(int32_t narg, int32_t ps[])
   double *errors = NULL, sthresh = 0;
 
   int32_t vocal = (internalMode & 1);
+  result = 0;
 
   {
     int32_t nx, *dims, ndim, nStep;
@@ -747,160 +769,163 @@ int32_t lux_generalfit2(int32_t narg, int32_t ps[])
       --nPar;			/* assume last element of START is quality */
     if (nStep != nPar) {
       result = luxerror("Number of elements (%d) in step argument is unequal to number of elements (%d) in parameters argument", ps[3], nStep, nPar);
-      goto end;
     }
   }
-  if (!symbolIsString(ps[4])) {	/* FUNCNAME */
-    result = cerror(NEED_STR, ps[4]);
-    goto end;
-  }
-  if (narg > 5 && ps[5]) {	/* ERR */
-    redef_array(ps[5], LUX_DOUBLE, 1, &nPar);
-    errors = (double *) array_data(ps[5]);
-  }
-  if (narg > 6 && ps[6])	/* ITHRESH */
-    ithresh = int_arg(ps[6]);
-  if (ithresh <= 0)
-    ithresh = 10000;
-  if (narg > 7 && ps[7])	/* STHRESH */
-    sthresh = double_arg(ps[7]);
-  if (narg > 8 && ps[8])	/* NITHRESH */
-    nithresh = int_arg(ps[8]);
-  else
-    nithresh = sqrt(nPar)*10;
-  if (nithresh <= 0)
-    nithresh = INT32_MAX;
-
-  par_v = gsl_vector_from_lux_symbol(d_par_sym, -1);
-  step_v = gsl_vector_from_lux_symbol(d_step_sym, -1);
-
-  afif = lux_func_if_alloc(string_value(ps[4]), 3);
-  if (!afif) {
-    switch (errno) {
-    case EDOM:
-      result = luxerror("Cannot fit to internal routine", ps[4]);
-      break;
-    case ENOMEM:
-      result = cerror(ALLOC_ERR, 0);
-      break;
-    default:
-      result = luxerror("Unhandled error %d", 0, errno);
-      break;
+  if (!result) {
+    if (!symbolIsString(ps[4])) {	/* FUNCNAME */
+      result = cerror(NEED_STR, ps[4]);
     }
-    goto end;
+  }
+  if (!result) {
+    if (narg > 5 && ps[5]) {	/* ERR */
+      redef_array(ps[5], LUX_DOUBLE, 1, &nPar);
+      errors = (double *) array_data(ps[5]);
+    }
+    if (narg > 6 && ps[6])	/* ITHRESH */
+      ithresh = int_arg(ps[6]);
+    if (ithresh <= 0)
+      ithresh = 10000;
+    if (narg > 7 && ps[7])	/* STHRESH */
+      sthresh = double_arg(ps[7]);
+    if (narg > 8 && ps[8])	/* NITHRESH */
+      nithresh = int_arg(ps[8]);
+    else
+      nithresh = sqrt(nPar)*10;
+    if (nithresh <= 0)
+      nithresh = INT32_MAX;
+
+    par_v = gsl_vector_from_lux_symbol(d_par_sym, -1);
+    step_v = gsl_vector_from_lux_symbol(d_step_sym, -1);
+
+    afif = lux_func_if_alloc(string_value(ps[4]), 3);
+    if (!afif) {
+      switch (errno) {
+      case EDOM:
+        result = luxerror("Cannot fit to internal routine", ps[4]);
+        break;
+      case ENOMEM:
+        result = cerror(ALLOC_ERR, 0);
+        break;
+      default:
+        result = luxerror("Unhandled error %d", 0, errno);
+        break;
+      }
+    }
   }
 
-  lux_func_if_set_param(afif, 0, d_par_sym);		 /* par */
-  lux_func_if_set_param(afif, 1, d_x_sym);		 /* x */
-  lux_func_if_set_param(afif, 2, d_y_sym);		 /* y */
+  if (!result) {
+    lux_func_if_set_param(afif, 0, d_par_sym);		 /* par */
+    lux_func_if_set_param(afif, 1, d_x_sym);		 /* x */
+    lux_func_if_set_param(afif, 2, d_y_sym);		 /* y */
 
-  minimizer = gsl_multimin_fminimizer_alloc(gsl_multimin_fminimizer_nmsimplex2,
-					    nPar);
-  if (!minimizer) {
-    result = luxerror("Unable to allocate memory for minimizer", 0);
-    goto end;
+    minimizer = gsl_multimin_fminimizer_alloc(gsl_multimin_fminimizer_nmsimplex2,
+                                              nPar);
+    if (!minimizer) {
+      result = luxerror("Unable to allocate memory for minimizer", 0);
+    }
   }
 
   gsl_multimin_function m_func;
-  m_func.n = nPar;
-  m_func.f = &fit2_func;
-  m_func.params = (void *) afif;
+  if (!result) {
+    m_func.n = nPar;
+    m_func.f = &fit2_func;
+    m_func.params = (void *) afif;
 
-  par_v->size = nPar; /* GSL requires the par size to match the number
-			 of parameters, but we want to keep room for
-			 storing the quality */
+    par_v->size = nPar; /* GSL requires the par size to match the number
+                           of parameters, but we want to keep room for
+                           storing the quality */
 
-  if (gsl_multimin_fminimizer_set(minimizer, &m_func, par_v, step_v)) {
-    result = LUX_ERROR;
-    goto end;
+    if (gsl_multimin_fminimizer_set(minimizer, &m_func, par_v, step_v)) {
+      result = LUX_ERROR;
+    }
   }
 
-  int32_t status;
-  int32_t iter = 0;
-  int32_t show = nPar;
-  if (nPar > 9)
-    show = 9;
-  time_t report_after;
-  if (vocal)
-    report_after = time(NULL);
-  double oldqual, newqual = 0, vocal_oldqual = 0, size, vocal_oldsize = 0;
-  int32_t no_improvement_niter = 0;
-  do {
-    ++iter;
-    status = gsl_multimin_fminimizer_iterate(minimizer);
-    if (status)
-      break;
-    size = gsl_multimin_fminimizer_size(minimizer);
-    oldqual = newqual;
-    newqual = sqrt(minimizer->fval/nPoints);
-    double improvement = newqual - oldqual;
-    if (improvement)
-      no_improvement_niter = 0;
-    else
-      ++no_improvement_niter;
-    if (vocal && time(NULL) > report_after) {
-      int32_t i, j = 0;
-      double vocal_improvement = newqual - vocal_oldqual;
-      vocal_oldqual = newqual;
-      double size_improvement = size - vocal_oldsize;
-      vocal_oldsize = size;
-      printf("%d %g (%.3g) %.3g (%+.3g):", iter, newqual, vocal_improvement,
-	     size, size_improvement);
-      for (i = 0; i < nPar && j < show; i++) {
-	if (step_v->data[i]) {
-	  printf(" %g", gsl_vector_get(minimizer->x, i));
-	  j++;
-	}
+  if (!result) {
+    int32_t status;
+    int32_t iter = 0;
+    int32_t show = nPar;
+    if (nPar > 9)
+      show = 9;
+    time_t report_after;
+    if (vocal)
+      report_after = time(NULL);
+    double oldqual, newqual = 0, vocal_oldqual = 0, size, vocal_oldsize = 0;
+    int32_t no_improvement_niter = 0;
+    do {
+      ++iter;
+      status = gsl_multimin_fminimizer_iterate(minimizer);
+      if (status)
+        break;
+      size = gsl_multimin_fminimizer_size(minimizer);
+      oldqual = newqual;
+      newqual = sqrt(minimizer->fval/nPoints);
+      double improvement = newqual - oldqual;
+      if (improvement)
+        no_improvement_niter = 0;
+      else
+        ++no_improvement_niter;
+      if (vocal && time(NULL) > report_after) {
+        int32_t i, j = 0;
+        double vocal_improvement = newqual - vocal_oldqual;
+        vocal_oldqual = newqual;
+        double size_improvement = size - vocal_oldsize;
+        vocal_oldsize = size;
+        printf("%d %g (%.3g) %.3g (%+.3g):", iter, newqual, vocal_improvement,
+               size, size_improvement);
+        for (i = 0; i < nPar && j < show; i++) {
+          if (step_v->data[i]) {
+            printf(" %g", gsl_vector_get(minimizer->x, i));
+            j++;
+          }
+        }
+        putchar('\n');
+        report_after = time(NULL) + 2;
       }
-      putchar('\n');
-      report_after = time(NULL) + 2;
+    } while (iter < ithresh
+             && gsl_multimin_test_size(size, sthresh) == GSL_CONTINUE
+             && (no_improvement_niter < nithresh
+                 || no_improvement_niter == iter - 1));
+    gsl_vector *best_par = gsl_multimin_fminimizer_x(minimizer);
+
+    {
+      int32_t n = best_par->size + 1;
+      result = array_scratch(LUX_DOUBLE, 1, &n);
     }
-  } while (iter < ithresh 
-	   && gsl_multimin_test_size(size, sthresh) == GSL_CONTINUE
-	   && (no_improvement_niter < nithresh 
-	       || no_improvement_niter == iter - 1));
-  gsl_vector *best_par = gsl_multimin_fminimizer_x(minimizer);
+    double *tgt = (double*) array_data(result);
+    memcpy(tgt, best_par->data, best_par->size*sizeof(double));
+    double best_min = lux_func_if_call(afif);
+    tgt[best_par->size] = best_min;
 
-  {
-    int32_t n = best_par->size + 1;
-    result = array_scratch(LUX_DOUBLE, 1, &n);
-  }
-  double *tgt = array_data(result);
-  memcpy(tgt, best_par->data, best_par->size*sizeof(double));
-  double best_min = lux_func_if_call(afif);
-  tgt[best_par->size] = best_min;
-
-  if (errors) {
-    int32_t i;
-    for (i = 0; i < nPar; i++) {
-      if (step_v->data[i]) {
-	double h;
-	memcpy(par_v->data, best_par->data, nPar*sizeof(double));
-	h = step_v->data[i];
-	double qualplus, qualmin, r;
-	do {
-	  par_v->data[i] = best_par->data[i] + h;
-	  qualplus = lux_func_if_call(afif);
-	  par_v->data[i] = best_par->data[i] - h;
-	  qualmin = lux_func_if_call(afif);
-	  r = (qualplus + qualmin)/best_min;
-	  if (r > 4)
-	    h /= sqrt(r);
-	  else if (r < 3)
-	    h *= sqrt(r);
-	} while ((r > 4 || r < 3) && h < errors[i]*1e6);
-	double v = sqrt((qualplus + qualmin)/(2*best_min) - 1);
-	if (v)
-	  errors[i] = h/v;
-	else
-	  errors[i] = INFTY;
-	par_v->data[i] = best_par->data[i];
-      } else
-	errors[i] = 0.0;
+    if (errors) {
+      int32_t i;
+      for (i = 0; i < nPar; i++) {
+        if (step_v->data[i]) {
+          double h;
+          memcpy(par_v->data, best_par->data, nPar*sizeof(double));
+          h = step_v->data[i];
+          double qualplus, qualmin, r;
+          do {
+            par_v->data[i] = best_par->data[i] + h;
+            qualplus = lux_func_if_call(afif);
+            par_v->data[i] = best_par->data[i] - h;
+            qualmin = lux_func_if_call(afif);
+            r = (qualplus + qualmin)/best_min;
+            if (r > 4)
+              h /= sqrt(r);
+            else if (r < 3)
+              h *= sqrt(r);
+          } while ((r > 4 || r < 3) && h < errors[i]*1e6);
+          double v = sqrt((qualplus + qualmin)/(2*best_min) - 1);
+          if (v)
+            errors[i] = h/v;
+          else
+            errors[i] = INFTY;
+          par_v->data[i] = best_par->data[i];
+        } else
+          errors[i] = 0.0;
+      }
     }
   }
-
- end:
   gsl_vector_free(par_v);
   gsl_vector_free(step_v);
   gsl_multimin_fminimizer_free(minimizer);
@@ -1076,7 +1101,7 @@ void calculate_distribution(double *distr, double *deviation, int32_t *rtoi,
     if (i < nPopulation)
       distr[i] = x;
   }
-  
+
   if (sum) {
     for (i = 1; i < nPopulation; i++)
       distr[i] = distr[i - 1] + distr[i]/sum;
@@ -1102,7 +1127,8 @@ int32_t lux_geneticfit(int32_t narg, int32_t ps[])
   void  invertPermutation(int32_t *data, int32_t n),
     indexxr_f(int32_t n, float ra[], int32_t indx[]);
   int32_t   random_distributed(int32_t modulus, double *distr);
-  uint8_t  changed, elite, partype;
+  uint8_t  changed, elite;
+  Symboltype partype;
   static uint16_t mask1[] = {
     0xff, 0x7f, 0x3f, 0x1f, 0x0f, 0x07, 0x03, 0x01
   }, mask2[] = {
@@ -1234,7 +1260,7 @@ int32_t lux_geneticfit(int32_t narg, int32_t ps[])
 
   fitPar = array_scratch(partype, 1, &nPar);
   symbol_context(fitPar) = 1;   /* so it doesn't get prematurely deleted */
-  par = array_data(fitPar);
+  par = (int16_t*) array_data(fitPar);
   typesize = lux_type_size[partype];
   size = nPar*typesize;
 
@@ -1250,11 +1276,11 @@ int32_t lux_geneticfit(int32_t narg, int32_t ps[])
   usr_func_number(fitTemp) = fitSym;
 
   /* create initial population */
-  genes = malloc(nPopulation*size);
-  genes2 = malloc(nPopulation*size);
-  deviation = malloc(nPopulation*sizeof(double));
-  deviation2 = malloc(nPopulation*sizeof(double));
-  rtoi = malloc(nPopulation*sizeof(int32_t));
+  genes = (uint8_t*) malloc(nPopulation*size);
+  genes2 = (uint8_t*) malloc(nPopulation*size);
+  deviation = (double*) malloc(nPopulation*sizeof(double));
+  deviation2 = (double*) malloc(nPopulation*sizeof(double));
+  rtoi = (int32_t*) malloc(nPopulation*sizeof(int32_t));
   /* itor = malloc(nPopulation*sizeof(int32_t)); */
 
   /* we fill <genes> with random bits.  <genes> exactly spans a number */
@@ -1278,13 +1304,17 @@ int32_t lux_geneticfit(int32_t narg, int32_t ps[])
   /* DOUBLE value. */
   denan(genes, nPopulation*size, partype);
 
+  int bad = 0;
+
   /* now calculate the fitness of all members of the population.
      Less is better. */
   for (i = 0; i < nPopulation; i++) {
     memcpy(par, genes + i*size, size);
     j = eval(fitTemp);          /* get deviation ("distance from goal") */
-    if (j == LUX_ERROR)         /* some error occurred */
-      goto geneticfit_1;
+    if (j == LUX_ERROR) {       /* some error occurred */
+      bad = 1;
+      break;
+    }
     deviation[i] = fabs(double_arg(j)); /* distance from goal */
     if (vocal) {
       printf("%d/%d: ", i, nPopulation);
@@ -1293,214 +1323,20 @@ int32_t lux_geneticfit(int32_t narg, int32_t ps[])
     }
     zapTemp(j);
   }
-  internalMode = 0;             /* or we may get unexpected results */
-  indexxr_d(nPopulation, deviation, rtoi); /* get ranking */
-  /* now deviation[rtoi[i]] is the i-th largest distance from goal;
-     rtoi[0] is the worst fit, rtoi[nPopulation - 1] is the best fit */
 
-  /* calculate the distribution function for selecting members.
-     member i gets a reproduction probability equal to
-     distr[i+1] - distr[i] */
-  distr = malloc(nPopulation*sizeof(double));
-  calculate_distribution(distr, deviation, rtoi, nPopulation, mu);
+  uint8_t *child1 = NULL;
+  uint8_t *child2 = NULL;
 
-  if (vocal > 1) {
-    p.b = genes;
-    for (i = 0; i < nPopulation; i++) {
-      printf("%d/%d ", i, nPopulation);
-      printgene(p.b + rtoi[i]*size, nPar, partype, 0, &deviation[rtoi[i]]);
-      putchar('\n');
-    }
-  }
-
-  if (vocal) {
-    sum = 0.0;
-    for (i = 0; i < nPopulation; i++)
-      sum += deviation[i];
-    printf("%3d: %8.5g %8.5g %8.5g %8.5g\n", ++iter, deviation[rtoi[0]],
-           deviation[rtoi[nPopulation/2]], deviation[rtoi[nPopulation - 1]],
-           sum/nPopulation);
-  }
-
-  /* we want crossover probability equal to <pcross>
-     and mutation probability equal to <pmutate>.
-     We do crossover after <crossmark> pairs, and mutation
-     after <mutatemark> pairs */
-  crossmark = pcross? random_one()/pcross: LONG_MAX; /* bytes */
-  mutatemark = pmutate? random_one()/pmutate: LONG_MAX; /* bits */
-
-  uint8_t *child1 = malloc(size);
-  uint8_t *child2 = malloc(size);
-  crossoversites = calloc(size*8, sizeof(int32_t));
-  mutationsites = calloc(size*8, sizeof(int32_t));
-
-  int32_t mutatecount = 0;
-  int32_t crossovercount = 0;
-  int32_t offspringcount = 0;
-
-  /* TODO: implement RESOLUTION argument, which says how many bytes
-     per parameter to fit, beginning with the most significant Byte.
-     TODO: implement additional stop criteria other than just
-     "number of generations"; at least something like "stop if
-     quality unchanged for a fixed number of iterations" */
-  
-  generation = nGeneration;
-  /* iterate over the desired number of generations */
-  while (generation--) {        /* all generations */
-    if (elite) {                /* always keep the best two */
-      memcpy(genes2, genes + size*rtoi[nPopulation - 1], size);
-      genes2 += size;
-      *deviation2++ = deviation[rtoi[nPopulation - 1]];
-      memcpy(genes2, genes + size*rtoi[nPopulation - 2], size);
-      genes2 += size;
-      *deviation2++ = deviation[rtoi[nPopulation - 2]];
-    }
-    for (pair = elite; pair < nPopulation/2; pair++) { /* remaining pairs */
-      /* pick parents */
-      i1 = random_distributed(nPopulation, distr);
-      do {
-        i2 = random_distributed(nPopulation, distr);
-      } while (i1 == i2);
-      if (vocal > 1)
-        printf("parents %d (%d) %d (%d)\n", i1, rtoi[i1], i2, rtoi[i2]);
-      parent1 = genes + size*rtoi[i1];
-      parent2 = genes + size*rtoi[i2];
-      memcpy(child1, parent1, size);
-      memcpy(child2, parent2, size);
-      offspringcount += 2;
-
-      changed = 0;
-      while (crossmark < size*8) { /* do cross-over */
-        ibit = crossmark;
-        crossmark += random_one()/pcross;
-        crossoversites[ibit]++;
-        w = ibit/8;             /* Byte index */
-        k = ibit - 8*w;         /* bit index */
-        for (i = 0; i < w; i++) { /* swap before cross-over int16_t */
-          t1 = child1[i];
-          child1[i] = child2[i];
-          child2[i] = t1;
-        } /* end of for (i = 0; ...) */
-        if (k) {                /* cross-over site is not on int16_t boundary */
-          t1 = ((child1[w] & mask1[k]) | (child2[w] & mask2[k]));
-          t2 = ((child2[w] & mask1[k]) | (child1[w] & mask2[k]));
-          child1[w] = t1;
-          child2[w] = t2;
-        } /* end of if (k) */
-        if (hasnan(child1, nPar, partype)
-            || hasnan(child2, nPar, partype)) {
-          /* we generated one or two NaNs from regular numbers: */
-          /* undo the crossover */
-          for (i = 0; i < w; i++) { /* swap before cross-over int16_t */
-            t1 = child1[i];
-            child1[i] = child2[i];
-            child2[i] = t1;
-          } /* end of for (i = 0; ...) */
-          if (k) {              /* cross-over site is not on int16_t boundary */
-            t1 = ((child1[w] & mask1[k]) | (child2[w] & mask2[k]));
-            t2 = ((child2[w] & mask1[k]) | (child1[w] & mask2[k]));
-            child1[w] = t1;
-            child2[w] = t2;
-          } /* end of if (k) */
-        } else {
-          changed++;
-          crossovercount++;
-          if (vocal > 2) {
-            printf("cross-over %d %d: before = ", i1, i2);
-            printgene(parent1, nPar, partype, 1, NULL);
-            printf(" | ");
-            printgene(parent2, nPar, partype, 1, NULL);
-            printf("\ncross-over Byte %d bit %d\n", w, k);
-            printf("           %d %d after   = ", i1, i2);
-            printgene(child1, nPar, partype, 1, NULL);
-            printf(" | ");
-            printgene(child2, nPar, partype, 1, NULL);
-            putchar('\n');
-          }
-        }
-      }
-      crossmark -= size*8;
-
-      /* do mutations */
-      while (mutatemark < size*8) {
-        ibit = mutatemark;
-        mutatemark += random_one()/pmutate;
-        mutationsites[ibit]++;
-        w = ibit/8;             /* Byte index */
-        k = ibit - 8*w;         /* bit index */
-        child1[w] ^= mask3[k]; /* flip bit */
-        if (hasnan(child1, nPar, partype))
-          /* the mutation generated a NaN; undo */
-          child1[w] ^= mask3[k];
-        else {
-          changed++;
-          mutatecount++;
-          if (vocal > 2) {
-            printf("mutation #1 %d: before = ", i1);
-            printgene(parent1, nPar, partype, 1, NULL);
-            printf("\nmutate Byte %d bit %d\n", w, k);
-            printf("mutation #1 %d: after  = ", i1);
-            printgene(child1, nPar, partype, 1, NULL);
-            putchar('\n');
-          }
-        }
-      }
-      mutatemark -= size*8;
-      while (mutatemark < size*8) {
-        ibit = mutatemark;
-        mutatemark += random_one()/pmutate;
-        mutationsites[ibit]++;
-        w = ibit/8;             /* Byte index */
-        k = ibit - 8*w;         /* bit index */
-        child2[w] ^= mask3[k]; /* flip bit */
-        if (hasnan(child2, nPar, partype))
-          /* the mutation generated a NaN; undo */
-          child2[w] ^= mask3[k];
-        else {
-          changed++;
-          mutatecount++;
-          if (vocal > 2) {
-            printf("mutation #2 %d: before = ", i2);
-            printgene(parent2, nPar, partype, 1, NULL);
-            printf("\nmutate Byte %d bit %d\n", w, k);
-            printf("mutation #2 %d: after  = ", i2);
-            printgene(child2, nPar, partype, 1, NULL);
-            putchar('\n');
-          }
-        }
-      }
-      mutatemark -= size*8;
-
-      /* store processed genes in new population */
-      memcpy(genes2, child1, size);
-      genes2 += size;
-      memcpy(genes2, child2, size);
-      genes2 += size;
-      if (changed) { /* TODO: only reevaluate for the changed child, not both */
-        memcpy(par, child1, size);
-        j = eval(fitTemp);
-        if (j == LUX_ERROR)
-          goto geneticfit_3;
-        *deviation2++ = double_arg(j);
-        zapTemp(j);
-        memcpy(par, child2, size);
-        j = eval(fitTemp);
-        if (j == LUX_ERROR)
-          goto geneticfit_3;
-        *deviation2++ = double_arg(j);
-        zapTemp(j);
-      } else {
-        *deviation2++ = deviation[rtoi[i1]];
-        *deviation2++ = deviation[rtoi[i2]];
-      }
-    } /* end of for (pair = 0; ...) */
-    genes2 -= nPopulation*size;
-    deviation2 -= nPopulation;
-    
-    memcpy(genes, genes2, nPopulation*size);
-    memcpy(deviation, deviation2, nPopulation*sizeof(double));
-
+  if (!bad) {
+    internalMode = 0;             /* or we may get unexpected results */
     indexxr_d(nPopulation, deviation, rtoi); /* get ranking */
+    /* now deviation[rtoi[i]] is the i-th largest distance from goal;
+       rtoi[0] is the worst fit, rtoi[nPopulation - 1] is the best fit */
+
+    /* calculate the distribution function for selecting members.
+       member i gets a reproduction probability equal to
+       distr[i+1] - distr[i] */
+    distr = (double*) malloc(nPopulation*sizeof(double));
     calculate_distribution(distr, deviation, rtoi, nPopulation, mu);
 
     if (vocal > 1) {
@@ -1515,38 +1351,264 @@ int32_t lux_geneticfit(int32_t narg, int32_t ps[])
     if (vocal) {
       sum = 0.0;
       for (i = 0; i < nPopulation; i++)
-        sum += 1/deviation[i];
-      printf("%3d: %8.5g %8.5g %16.12g %8.5g\n", ++iter, deviation[rtoi[0]],
+        sum += deviation[i];
+      printf("%3d: %8.5g %8.5g %8.5g %8.5g\n", ++iter, deviation[rtoi[0]],
              deviation[rtoi[nPopulation/2]], deviation[rtoi[nPopulation - 1]],
              sum/nPopulation);
     }
-    /* memcpy(itor, rtoi, nPopulation*sizeof(int32_t));
-       invertPermutation(itor, nPopulation); */
-  } /* end of while (generation--) */
-  
-  result = array_scratch(partype, 1, &nPar);
-  memcpy(array_data(result), genes + nPar*rtoi[nPopulation - 1]*typesize,
-         size);
-  if (vocal) {
-    printf("%4d offspring (probability %g)\n%4d cross-overs (probability %g per gene pair)\n%4d mutations (probability %g per bit)\n",
-           offspringcount, ((double) offspringcount)/(nPopulation*nGeneration),
-           crossovercount, ((double) crossovercount)/(nPopulation*nGeneration/2),
-           mutatecount, ((double) mutatecount)/(nPopulation*nGeneration*size*8));
-    if (vocal > 1) {
-      printf("cross-over site frequencies:\n");
-      for (i = 0; i < size*8; i++)
-        printf("%d ", crossoversites[i]);
-      putchar('\n');
-      printf("mutation site frequencies:\n");
-      for (i = 0; i < size*8; i++)
-        printf("%d ", mutationsites[i]);
-      putchar('\n');
+
+    /* we want crossover probability equal to <pcross>
+       and mutation probability equal to <pmutate>.
+       We do crossover after <crossmark> pairs, and mutation
+       after <mutatemark> pairs */
+    crossmark = pcross? random_one()/pcross: LONG_MAX; /* bytes */
+    mutatemark = pmutate? random_one()/pmutate: LONG_MAX; /* bits */
+
+    child1 = (uint8_t*) malloc(size);
+    child2 = (uint8_t*) malloc(size);
+    crossoversites = (int32_t*) calloc(size*8, sizeof(int32_t));
+    mutationsites = (int32_t*) calloc(size*8, sizeof(int32_t));
+
+    int32_t mutatecount = 0;
+    int32_t crossovercount = 0;
+    int32_t offspringcount = 0;
+
+    /* TODO: implement RESOLUTION argument, which says how many bytes
+       per parameter to fit, beginning with the most significant Byte.
+       TODO: implement additional stop criteria other than just
+       "number of generations"; at least something like "stop if
+       quality unchanged for a fixed number of iterations" */
+
+    generation = nGeneration;
+    /* iterate over the desired number of generations */
+    while (generation--) {        /* all generations */
+      if (elite) {                /* always keep the best two */
+        memcpy(genes2, genes + size*rtoi[nPopulation - 1], size);
+        genes2 += size;
+        *deviation2++ = deviation[rtoi[nPopulation - 1]];
+        memcpy(genes2, genes + size*rtoi[nPopulation - 2], size);
+        genes2 += size;
+        *deviation2++ = deviation[rtoi[nPopulation - 2]];
+      }
+      for (pair = elite; pair < nPopulation/2; pair++) { /* remaining pairs */
+        /* pick parents */
+        i1 = random_distributed(nPopulation, distr);
+        do {
+          i2 = random_distributed(nPopulation, distr);
+        } while (i1 == i2);
+        if (vocal > 1)
+          printf("parents %d (%d) %d (%d)\n", i1, rtoi[i1], i2, rtoi[i2]);
+        parent1 = genes + size*rtoi[i1];
+        parent2 = genes + size*rtoi[i2];
+        memcpy(child1, parent1, size);
+        memcpy(child2, parent2, size);
+        offspringcount += 2;
+
+        changed = 0;
+        while (crossmark < size*8) { /* do cross-over */
+          ibit = crossmark;
+          crossmark += random_one()/pcross;
+          crossoversites[ibit]++;
+          w = ibit/8;             /* Byte index */
+          k = ibit - 8*w;         /* bit index */
+          for (i = 0; i < w; i++) { /* swap before cross-over int16_t */
+            t1 = child1[i];
+            child1[i] = child2[i];
+            child2[i] = t1;
+          } /* end of for (i = 0; ...) */
+          if (k) {                /* cross-over site is not on int16_t boundary */
+            t1 = ((child1[w] & mask1[k]) | (child2[w] & mask2[k]));
+            t2 = ((child2[w] & mask1[k]) | (child1[w] & mask2[k]));
+            child1[w] = t1;
+            child2[w] = t2;
+          } /* end of if (k) */
+          if (hasnan(child1, nPar, partype)
+              || hasnan(child2, nPar, partype)) {
+            /* we generated one or two NaNs from regular numbers: */
+            /* undo the crossover */
+            for (i = 0; i < w; i++) { /* swap before cross-over int16_t */
+              t1 = child1[i];
+              child1[i] = child2[i];
+              child2[i] = t1;
+            } /* end of for (i = 0; ...) */
+            if (k) {              /* cross-over site is not on int16_t boundary */
+              t1 = ((child1[w] & mask1[k]) | (child2[w] & mask2[k]));
+              t2 = ((child2[w] & mask1[k]) | (child1[w] & mask2[k]));
+              child1[w] = t1;
+              child2[w] = t2;
+            } /* end of if (k) */
+          } else {
+            changed++;
+            crossovercount++;
+            if (vocal > 2) {
+              printf("cross-over %d %d: before = ", i1, i2);
+              printgene(parent1, nPar, partype, 1, NULL);
+              printf(" | ");
+              printgene(parent2, nPar, partype, 1, NULL);
+              printf("\ncross-over Byte %d bit %d\n", w, k);
+              printf("           %d %d after   = ", i1, i2);
+              printgene(child1, nPar, partype, 1, NULL);
+              printf(" | ");
+              printgene(child2, nPar, partype, 1, NULL);
+              putchar('\n');
+            }
+          }
+        }
+        crossmark -= size*8;
+
+        /* do mutations */
+        while (mutatemark < size*8) {
+          ibit = mutatemark;
+          mutatemark += random_one()/pmutate;
+          mutationsites[ibit]++;
+          w = ibit/8;             /* Byte index */
+          k = ibit - 8*w;         /* bit index */
+          child1[w] ^= mask3[k]; /* flip bit */
+          if (hasnan(child1, nPar, partype))
+            /* the mutation generated a NaN; undo */
+            child1[w] ^= mask3[k];
+          else {
+            changed++;
+            mutatecount++;
+            if (vocal > 2) {
+              printf("mutation #1 %d: before = ", i1);
+              printgene(parent1, nPar, partype, 1, NULL);
+              printf("\nmutate Byte %d bit %d\n", w, k);
+              printf("mutation #1 %d: after  = ", i1);
+              printgene(child1, nPar, partype, 1, NULL);
+              putchar('\n');
+            }
+          }
+        }
+        mutatemark -= size*8;
+        while (mutatemark < size*8) {
+          ibit = mutatemark;
+          mutatemark += random_one()/pmutate;
+          mutationsites[ibit]++;
+          w = ibit/8;             /* Byte index */
+          k = ibit - 8*w;         /* bit index */
+          child2[w] ^= mask3[k]; /* flip bit */
+          if (hasnan(child2, nPar, partype))
+            /* the mutation generated a NaN; undo */
+            child2[w] ^= mask3[k];
+          else {
+            changed++;
+            mutatecount++;
+            if (vocal > 2) {
+              printf("mutation #2 %d: before = ", i2);
+              printgene(parent2, nPar, partype, 1, NULL);
+              printf("\nmutate Byte %d bit %d\n", w, k);
+              printf("mutation #2 %d: after  = ", i2);
+              printgene(child2, nPar, partype, 1, NULL);
+              putchar('\n');
+            }
+          }
+        }
+        mutatemark -= size*8;
+
+        /* store processed genes in new population */
+        memcpy(genes2, child1, size);
+        genes2 += size;
+        memcpy(genes2, child2, size);
+        genes2 += size;
+        if (changed) { /* TODO: only reevaluate for the changed child, not both */
+          memcpy(par, child1, size);
+          j = eval(fitTemp);
+          if (j == LUX_ERROR) {
+            bad = 3;
+            break;
+          }
+          *deviation2++ = double_arg(j);
+          zapTemp(j);
+          memcpy(par, child2, size);
+          j = eval(fitTemp);
+          if (j == LUX_ERROR) {
+            bad = 3;
+            break;
+          }
+          *deviation2++ = double_arg(j);
+          zapTemp(j);
+        } else {
+          *deviation2++ = deviation[rtoi[i1]];
+          *deviation2++ = deviation[rtoi[i2]];
+        }
+      } /* end of for (pair = 0; ...) */
+
+      if (bad)
+        break;
+
+      genes2 -= nPopulation*size;
+      deviation2 -= nPopulation;
+
+      memcpy(genes, genes2, nPopulation*size);
+      memcpy(deviation, deviation2, nPopulation*sizeof(double));
+
+      indexxr_d(nPopulation, deviation, rtoi); /* get ranking */
+      calculate_distribution(distr, deviation, rtoi, nPopulation, mu);
+
+      if (vocal > 1) {
+        p.b = genes;
+        for (i = 0; i < nPopulation; i++) {
+          printf("%d/%d ", i, nPopulation);
+          printgene(p.b + rtoi[i]*size, nPar, partype, 0, &deviation[rtoi[i]]);
+          putchar('\n');
+        }
+      }
+
+      if (vocal) {
+        sum = 0.0;
+        for (i = 0; i < nPopulation; i++)
+          sum += 1/deviation[i];
+        printf("%3d: %8.5g %8.5g %16.12g %8.5g\n", ++iter, deviation[rtoi[0]],
+               deviation[rtoi[nPopulation/2]], deviation[rtoi[nPopulation - 1]],
+               sum/nPopulation);
+      }
+      /* memcpy(itor, rtoi, nPopulation*sizeof(int32_t));
+         invertPermutation(itor, nPopulation); */
+    } /* end of while (generation--) */
+
+    if (!bad) {
+      result = array_scratch(partype, 1, &nPar);
+      memcpy(array_data(result), genes + nPar*rtoi[nPopulation - 1]*typesize,
+             size);
+      if (vocal) {
+        printf("%4d offspring (probability %g)\n%4d cross-overs (probability %g per gene pair)\n%4d mutations (probability %g per bit)\n",
+               offspringcount, ((double) offspringcount)/(nPopulation*nGeneration),
+               crossovercount, ((double) crossovercount)/(nPopulation*nGeneration/2),
+               mutatecount, ((double) mutatecount)/(nPopulation*nGeneration*size*8));
+        if (vocal > 1) {
+          printf("cross-over site frequencies:\n");
+          for (i = 0; i < size*8; i++)
+            printf("%d ", crossoversites[i]);
+          putchar('\n');
+          printf("mutation site frequencies:\n");
+          for (i = 0; i < size*8; i++)
+            printf("%d ", mutationsites[i]);
+          putchar('\n');
+        }
+      }
     }
   }
 
-  geneticfit_2:
+  if (bad == 3) {
+    genes2 -= pair*2*nPar*typesize;
+    deviation2 -= pair*2;
+
+    if (symbol_context(ySym) == 1)
+      symbol_context(ySym) = -compileLevel; /* so they'll be deleted */
+    /* when appropriate */
+    if (symbol_context(fitPar) == 1)
+      symbol_context(fitPar) = -compileLevel;
+    if (xSym && symbol_context(xSym) == 1)
+      symbol_context(xSym) = -compileLevel;
+    if (weights && symbol_context(wSym) == 1)
+      symbol_context(wSym) = -compileLevel;
+    result = LUX_ERROR;
+  }
+
   zap(fitPar);
-  symbol_class(fitTemp) = symbol_type(fitTemp) = 0;
+  symbol_class(fitTemp) = (Symbolclass) 0;
+  symbol_type(fitTemp) = (Symboltype) 0;
   if (symbol_context(xSym) == 1)
     zap(xSym);
   if (symbol_context(ySym) == 1)
@@ -1563,21 +1625,4 @@ int32_t lux_geneticfit(int32_t narg, int32_t ps[])
   free(crossoversites);
   free(mutationsites);
   return result;
-
-  geneticfit_3:
-  genes2 -= pair*2*nPar*typesize;
-  deviation2 -= pair*2;
-
-  geneticfit_1:
-  if (symbol_context(ySym) == 1)
-    symbol_context(ySym) = -compileLevel; /* so they'll be deleted */
-                                /* when appropriate */
-  if (symbol_context(fitPar) == 1)
-    symbol_context(fitPar) = -compileLevel;
-  if (xSym && symbol_context(xSym) == 1)
-    symbol_context(xSym) = -compileLevel;
-  if (weights && symbol_context(wSym) == 1)
-    symbol_context(wSym) = -compileLevel;
-  result = LUX_ERROR;
-  goto geneticfit_2;
 }

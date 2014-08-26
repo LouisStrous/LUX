@@ -24,8 +24,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef HAVE_CONFIG_H
 #include "config.h"
 #endif
-#include "action.h"
-#include "errno.h"
+#include "action.hh"
+#include <errno.h>
 #include <gsl/gsl_linalg.h>
 
 int32_t lux_matrix_product(int32_t narg, int32_t ps[])
@@ -62,13 +62,13 @@ int32_t lux_matrix_product(int32_t narg, int32_t ps[])
       return luxerror("Result would have %d dimensions, "
 		      "but at most %d are allowed",
 		      ps[1], tndim, MAX_DIMS);
-    tdims = malloc(tndim*sizeof(int32_t));
+    tdims = (int32_t*) malloc(tndim*sizeof(int32_t));
     memcpy(tdims + 2, infos[0].dims + 2, (infos[0].ndim - 2)*sizeof(int32_t));
     memcpy(tdims + 2 + infos[0].ndim - 2, infos[1].dims + 2,
 	   (infos[1].ndim - 2)*sizeof(int32_t));
   } else {			/* /INNER */
     tndim = infos[0].ndim;
-    tdims = malloc(tndim*sizeof(int32_t));
+    tdims = (int32_t*) malloc(tndim*sizeof(int32_t));
     if (infos[1].ndim != infos[0].ndim) {
       iq = luxerror("Needs the same number of dimensions as the previous argument", ps[1]);
       goto error_1;
@@ -303,7 +303,7 @@ int32_t lux_transpose_matrix(int32_t narg, int32_t ps[])
     return LUX_ERROR;
   if (infos[0].ndim < 2)
     return luxerror("Need at least 2 dimensions", ps[0]);
-  int32_t *dims = malloc(infos[0].ndim*sizeof(int32_t));
+  int32_t *dims = (int32_t*) malloc(infos[0].ndim*sizeof(int32_t));
   dims[0] = infos[0].dims[1];
   dims[1] = infos[0].dims[0];
   memcpy(dims + 2, infos[0].dims + 2, (infos[0].ndim - 2)*sizeof(int32_t));

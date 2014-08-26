@@ -46,11 +46,11 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 #include <string.h>
 #include <limits.h>
-#include "action.h"
+#include "action.hh"
 #include <obstack.h>
 #include <errno.h>
 #include <ctype.h>
-#include "axis.h"
+#include "axis.hh"
 
 #define obstack_chunk_alloc malloc
 #define obstack_chunk_free free
@@ -63,7 +63,7 @@ int32_t standardLoop(int32_t data, int32_t axisSym, int32_t mode, int32_t outTyp
 		 loopInfo *src, pointer *srcptr, int32_t *output, loopInfo *trgt,
 		 pointer *trgtptr);
 int32_t advanceLoop(loopInfo *info, pointer *ptr),
-  lux_convert(int32_t, int32_t [], int32_t, int32_t);
+  lux_convert(int32_t, int32_t [], Symboltype, int32_t);
 int32_t nextLoop(loopInfo *info), nextLoops(loopInfo *info1, loopInfo *info2);
 int32_t dimensionLoopResult(loopInfo const *sinfo, loopInfo *tinfo, int32_t type,
 			pointer *tptr);
@@ -480,11 +480,11 @@ int32_t dimensionLoopResult1(loopInfo const *sinfo,
 	if (retain[i])
 	  newIndexToOld[j++] = i;
       /* update dims[] and ndim */
-      int32_t new[MAX_DIMS];
+      int32_t newvalues[MAX_DIMS];
       if (j) {
 	for (i = 0; i < j; i++)
-	  new[i] = dims[newIndexToOld[i]];
-	memcpy(dims, new, j*sizeof(*dims));
+	  newvalues[i] = dims[newIndexToOld[i]];
+	memcpy(dims, newvalues, j*sizeof(*dims));
 	ndim = j;
       } else {
 	/* there are no dimensions left; add a dimension equal to 1 */
@@ -502,8 +502,8 @@ int32_t dimensionLoopResult1(loopInfo const *sinfo,
 	  newIndexToOld[j++] = i;
       if (j) {
 	for (i = 0; i < j; i++)
-	  new[i] = axes[newIndexToOld[i]];
-	memcpy(axes, new, j*sizeof(*axes));
+	  newvalues[i] = axes[newIndexToOld[i]];
+	memcpy(axes, newvalues, j*sizeof(*axes));
 	naxes = j;
       } else {
 	/* there are no axes left; add an axis equal to 0 */
@@ -614,7 +614,7 @@ int32_t dimensionLoopResult1(loopInfo const *sinfo,
 }
 /*-----------------------------------------------------------------------*/
 int32_t dimensionLoopResult(loopInfo const *sinfo, loopInfo *tinfo,
-                         int32_t ttype, pointer *tptr)
+                            Symboltype ttype, pointer *tptr)
 {
   return dimensionLoopResult1(sinfo, sinfo->mode, ttype,
                               0, NULL, 0, NULL, tinfo, tptr);
@@ -701,9 +701,9 @@ int32_t dimensionLoopResult(loopInfo const *sinfo, loopInfo *tinfo,
        together are considered to be a "row".  Implies \c
        SL_AXESBLOCK.
 */
-int32_t standardLoop(int32_t data, int32_t axisSym, int32_t mode, int32_t outType,
-		 loopInfo *src, pointer *srcptr, int32_t *output, 
-		 loopInfo *trgt, pointer *trgtptr)
+int32_t standardLoop(int32_t data, int32_t axisSym, int32_t mode,
+                     Symboltype outType, loopInfo *src, pointer *srcptr,
+                     int32_t *output, loopInfo *trgt, pointer *trgtptr)
 {
   int32_t i, nAxes;
   pointer axes;
@@ -750,9 +750,10 @@ int32_t standardLoopX(int32_t source, int32_t axisSym, int32_t srcMode,
   return result;
 }
 /*-----------------------------------------------------------------------*/
-int32_t standardLoop0(int32_t data, int32_t nAxes, int32_t *axes, int32_t mode, int32_t outType,
-		 loopInfo *src, pointer *srcptr, int32_t *output, 
-		 loopInfo *trgt, pointer *trgtptr)
+int32_t standardLoop0(int32_t data, int32_t nAxes, int32_t *axes,
+                      int32_t mode, Symboltype outType,
+                      loopInfo *src, pointer *srcptr, int32_t *output,
+                      loopInfo *trgt, pointer *trgtptr)
 {
   int32_t	*dims, ndim, i, temp[MAX_DIMS];
 
@@ -763,7 +764,7 @@ int32_t standardLoop0(int32_t data, int32_t nAxes, int32_t *axes, int32_t mode, 
   /* check if <data> is of proper class, and get some info about it */
   if (numerical(data, &dims, &ndim, NULL, srcptr) == LUX_ERROR)
     return LUX_ERROR;		/* some error */
-  
+
 #if DEBUG_VOCAL
   debugout("treating SL_TAKEONED, SL_ALLAXES");
 #endif
@@ -776,7 +777,7 @@ int32_t standardLoop0(int32_t data, int32_t nAxes, int32_t *axes, int32_t mode, 
 	     && nAxes == 1		/* one axis specified */
 	     && *axes < 0)	/* and it is negative */
     nAxes = 0;
-  
+
 #if DEBUG_VOCAL
   debugout("treating SL_ONEAXIS");
 #endif
@@ -801,9 +802,9 @@ int32_t standardLoop0(int32_t data, int32_t nAxes, int32_t *axes, int32_t mode, 
 			  -1, axes[i]);
     }
   }
-  
+
   /* The input is of legal classes and types. */
-    
+
 #if DEBUG_VOCAL
   debugout("treating SL_SRCUPGRADE");
 #endif
@@ -832,7 +833,7 @@ int32_t standardLoop0(int32_t data, int32_t nAxes, int32_t *axes, int32_t mode, 
       trgt->type = src->type;	/* output type equal to source type */
     else
       trgt->type = outType;	/* take specified output type */
-	
+
     *output = dimensionLoopResult(src, trgt, trgt->type, trgtptr);
     if (*output == LUX_ERROR)
       /* but didn't get one */
@@ -1160,14 +1161,14 @@ void rearrangeEdgeLoop(loopInfo *src, loopInfo *trgt, int32_t index)
   src->raxes[src->ndim - 1] = axis;
   for (i = 0; i < src->ndim; i++)
     src->iraxes[src->raxes[i]] = i;
-  
+
   /* prepare step sizes for use in advanceLoop() */
   memcpy(src->step, src->rsinglestep, src->rndim*sizeof(int32_t));
   for (i = src->rndim - 1; i; i--)
     src->step[i] -= src->step[i - 1]*src->rdims[i - 1];
-  
+
   zerobytes(src->coords, src->ndim*sizeof(int32_t));
-  src->data->b = src->data0;
+  src->data->b = (uint8_t*) src->data0;
 
   if (back) {
     /* adjust coordinate and pointer to point at back side */
@@ -1184,7 +1185,7 @@ void rearrangeEdgeLoop(loopInfo *src, loopInfo *trgt, int32_t index)
     trgt->stride = trgtstride;
     trgt->data = trgtdata;
     trgt->data0 = trgtdata0;
-    trgt->data->b = trgt->data0;
+    trgt->data->b = (uint8_t*) trgt->data0;
     if (back) {
       /* adjust coordinate and pointer to point at back side */
       trgt->coords[index] = trgt->rdims[index] - 1;
@@ -1253,7 +1254,7 @@ int32_t prepareDiagonals(int32_t symbol, loopInfo *info, int32_t part,
     if (array_size(symbol) != info->ndim)
       return cerror(INCMP_ARG, symbol);
     i = lux_long(1, &symbol);	/* ensure LONG */
-    d = array_data(i);
+    d = (int32_t*) array_data(i);
     nDiagonal = nDoDim = 0;
     for (i = 0; i < info->ndim; i++)
       if (d[i]) {
@@ -1471,7 +1472,7 @@ static int32_t numerical_or_string_choice(int32_t data, int32_t **dims, int32_t 
     if (size)
       *size = array_size(data);
     if (src)
-      (*src).l = array_data(data);
+      (*src).l = (int32_t*) array_data(data);
     break;
   }
   return 1;
@@ -1538,10 +1539,11 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
   obstack_init(&ods);
   param_index = 0;
   prev_ods_num_elem = 0;
+  int bad = 0;
   while (*fmt) {
     struct param_spec p_spec;
     memset(&p_spec, '\0', sizeof(p_spec));
-    
+
     while (*fmt && *fmt != ';') { /* every parameter specification */
       /* required parameter kind specification */
       switch (*fmt) {
@@ -1557,7 +1559,8 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
           /* already had a return parameter */
           luxerror("Specified multiple return parameters", 0);
           errno = EINVAL;
-          goto error;
+          bad = 1;
+          break;
         } else
           return_param_index = param_index;
         break;
@@ -1565,10 +1568,11 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
         /* illegal parameter kind specification */
         luxerror("Illegal parameter kind %d specified", 0, *fmt);
         errno = EINVAL;
-        goto error;
+        bad = 1;
+        break;
       } /* end of switch (*fmt) */
       fmt++;
-    
+
       /* optional data type limit specification */
       switch (*fmt) {
       case '>':
@@ -1614,7 +1618,7 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
         p_spec.data_type = LUX_NO_SYMBOLTYPE;
         break;
       } /* end of switch (*fmt) */
-      
+
       /* optional dims-specs */
       struct dims_spec d_spec;
       if (*fmt == '[') {       /* reference parameter specification */
@@ -1628,7 +1632,8 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
           luxerror("Expected a digit or minus sign after [ in"
                    " reference parameter specification but found %c", 0, *fmt);
           errno = EINVAL;
-          goto error;
+          bad = 1;
+          break;
         }
         if (*fmt == ']')
           fmt++;
@@ -1636,7 +1641,8 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
           luxerror("Expected ] instead of %c at end of reference "
                    "parameter specification", 0, *fmt);
           errno = EINVAL;
-          goto error;
+          bad = 1;
+          break;
         }
       }
       if (*fmt == '{') {   /* optional axis parameter specification */
@@ -1644,7 +1650,8 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
 	  luxerror("Axis parameter illegally specified for input parameter",
 		   0, fmt);
 	  errno = EINVAL;
-	  goto error;
+          bad = 1;
+          break;
 	}
         fmt++;
         if (*fmt++ == '-')
@@ -1656,7 +1663,8 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
           luxerror("Expected a digit or minus sign after { in"
                    " reference parameter specification but found %c", 0, *fmt);
           errno = EINVAL;
-          goto error;
+          bad = 1;
+          break;
         }
         if (*fmt == '}')
           fmt++;
@@ -1664,14 +1672,17 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
           luxerror("Expected } instead of %c at end of reference "
                    "parameter specification", 0, *fmt);
           errno = EINVAL;
-          goto error;
+          bad = 1;
+          break;
         }
       } else
 	p_spec.axis_par = -2;		     /* indicates "none" */
+      if (bad)
+        break;
       while (*fmt && !strchr("*?;&", *fmt)) { /* all dims */
         memset(&d_spec, '\0', sizeof(d_spec));
         while (*fmt && !strchr(",?*;&", *fmt)) { /* every dim */
-          int32_t type = 0;
+          dim_spec_type type = (dim_spec_type) 0;
           size_t size = 0;
           switch (*fmt) {
           case '+':
@@ -1702,21 +1713,23 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
           case DS_ADD:
             if (d_spec.type == DS_NONE || d_spec.type == DS_REMOVE) {
               d_spec.size_add = size;
-              d_spec.type |= type;
+              d_spec.type = (dim_spec_type) (d_spec.type | type);
             } else {
               luxerror("Illegal combination of multiple types for dimension; parameter specification #%d: %s", 0, param_index + 1, fmt0);
               errno = EINVAL;
-              goto error;
+              bad = 1;
+              break;
             }
             break;
           case DS_REMOVE:
             if (d_spec.type == DS_NONE || d_spec.type == DS_ADD) {
               d_spec.size_remove = size;
-              d_spec.type |= type;
+              d_spec.type = (dim_spec_type) (d_spec.type | type);
             } else {
               luxerror("Illegal combination of multiple types for dimension; parameter specification #%d: %s", 0, param_index + 1, fmt0);
               errno = EINVAL;
-              goto error;
+              bad = 1;
+              break;
             }
             break;
           default:
@@ -1726,15 +1739,20 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
             } else {
               luxerror("Illegal combination of multiple types for dimension; parameter specification #%d: %s", 0, param_index + 1, fmt0);
               errno = EINVAL;
-              goto error;
+              bad = 1;
+              break;
             }
             break;
           } /* end switch type */
         } /* end of while *fmt && !strchr(",*;&") */
+        if (bad)
+          break;
         obstack_grow(&ods, &d_spec, sizeof(d_spec));
         if (*fmt == ',')
           fmt++;
       } /* end of while *fmt && !strchr("*;&", *fmt) */
+      if (bad)
+        break;
       switch (*fmt) {
       case '*':
         p_spec.remaining_dims = PS_ARBITRARY;
@@ -1752,19 +1770,24 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
           /* return parameter cannot be optional */
           luxerror("Return parameter was illegally specified as optional", 0);
           errno = EINVAL;
-          goto error;
+          bad = 1;
+          break;
         } else
           p_spec.is_optional = 1;
         fmt++;
       } else
         p_spec.is_optional = 0;
-
+      if (bad)
+        break;
       if (*fmt && *fmt != ';') {
         luxerror("Expected ; instead of %c at end of parameter "
                  "specification", 0, *fmt);
         errno = EINVAL;
-        goto error;
+        bad = 1;
+        break;
       }
+      if (bad)
+        break;
       /* determine the number of dims_specs added to the list for this
          parameter */
       size_t n = obstack_object_size(&ods)/sizeof(struct dims_spec) - prev_ods_num_elem;
@@ -1773,6 +1796,8 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
       obstack_grow(&ops, &p_spec, sizeof(p_spec)); /* the param_spec */
       prev_ods_num_elem += n;
     } /* end of while (*fmt && *fmt != ';') */
+    if (bad)
+      break;
     if (*fmt == ';')
       fmt++;
     else if (*fmt) {
@@ -1780,74 +1805,83 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
       luxerror("Expected ; instead of %c at end of parameter specification",
                0, *fmt);
       errno = EINVAL;
-      goto error;
+      bad = 1;
+      break;
     }
     param_index++;
   }   /* end of while (*fmt) */
-  /* now we copy the information into the final allocated memory */
-  psl = malloc(sizeof(struct param_spec_list));
-  if (!psl) {                   /* malloc sets errno */
-    cerror(ALLOC_ERR, 0);
-    goto error;
-  }
-  // size_t size = param_index*sizeof(struct param_spec);
-  psl->param_specs = calloc(param_index, sizeof(struct param_spec));
-  if (!psl->param_specs) {        /* malloc sets errno */
-    cerror(ALLOC_ERR, 0);
-    goto error;
-  }
-  /* the return parameter, if any, gets moved to the end */
-  psl->num_param_specs = param_index;
-  psl->return_param_index = -1; /* default, may be updated later */
-  ps = obstack_finish(&ops);
-  ds = obstack_finish(&ods);
-
-  struct param_spec *pstgt;
-  size_t ds_ix, j;
-
-  pstgt = psl->param_specs;
-  ds_ix = 0;
-  for (i = j = 0; i < psl->num_param_specs; i++) {
-    size_t j0;
-    if (i == return_param_index) {
-      j0 = j;
-      j = psl->return_param_index = psl->num_param_specs - 1;
+  if (!bad) {
+    /* now we copy the information into the final allocated memory */
+    psl = (param_spec_list*) malloc(sizeof(struct param_spec_list));
+    if (!psl) {                   /* malloc sets errno */
+      cerror(ALLOC_ERR, 0);
+      bad = 1;
     }
-    memcpy(pstgt + j, ps + i, sizeof(struct param_spec));
-    if (pstgt[j].num_dims_spec) {
-      size_t size = pstgt[j].num_dims_spec*sizeof(struct dims_spec);
-      pstgt[j].dims_spec = malloc(size);
-      if (!pstgt[j].dims_spec) {
-        cerror(ALLOC_ERR, 0);
-        goto error;
-      }
-      memcpy(pstgt[j].dims_spec, ds + ds_ix, size);
-      ds_ix += pstgt[j].num_dims_spec;
-    } /* else pstgt[j].dims_spec == NULL */
-    if (i == return_param_index)
-      j = j0;
-    else
-      j++;
   }
-  /* check that the reference parameter does not point outside the list */
-  int32_t n = psl->num_param_specs - (psl->return_param_index >= 0);
-  if (n) {
-    for (i = 0; i < psl->num_param_specs; i++) {
-      if (psl->param_specs[i].ref_par >= n) {
-        errno = EINVAL;
-        luxerror("Reference parameter %d for parameter %d points outside of the list (size %d)", 0, psl->param_specs[i].ref_par + 1, i + 1, n);
-        goto error;
+  if (!bad) {
+    psl->param_specs = (param_spec*) calloc(param_index, sizeof(struct param_spec));
+    if (!psl->param_specs) {        /* malloc sets errno */
+      cerror(ALLOC_ERR, 0);
+      bad = 1;
+    }
+  }
+  if (!bad) {
+    /* the return parameter, if any, gets moved to the end */
+    psl->num_param_specs = param_index;
+    psl->return_param_index = -1; /* default, may be updated later */
+    ps = (param_spec*) obstack_finish(&ops);
+    ds = (dims_spec*) obstack_finish(&ods);
+
+    struct param_spec *pstgt;
+    size_t ds_ix, j;
+
+    pstgt = psl->param_specs;
+    ds_ix = 0;
+    for (i = j = 0; i < psl->num_param_specs; i++) {
+      size_t j0;
+      if (i == return_param_index) {
+        j0 = j;
+        j = psl->return_param_index = psl->num_param_specs - 1;
+      }
+      memcpy(pstgt + j, ps + i, sizeof(struct param_spec));
+      if (pstgt[j].num_dims_spec) {
+        size_t size = pstgt[j].num_dims_spec*sizeof(struct dims_spec);
+        pstgt[j].dims_spec = (dims_spec*) malloc(size);
+        if (!pstgt[j].dims_spec) {
+          cerror(ALLOC_ERR, 0);
+          bad = 1;
+          break;
+        }
+        memcpy(pstgt[j].dims_spec, ds + ds_ix, size);
+        ds_ix += pstgt[j].num_dims_spec;
+      } /* else pstgt[j].dims_spec == NULL */
+      if (i == return_param_index)
+        j = j0;
+      else
+        j++;
+    }
+  }
+  if (!bad) {
+    /* check that the reference parameter does not point outside the list */
+    int32_t n = psl->num_param_specs - (psl->return_param_index >= 0);
+    if (n) {
+      for (i = 0; i < psl->num_param_specs; i++) {
+        if (psl->param_specs[i].ref_par >= n) {
+          errno = EINVAL;
+          luxerror("Reference parameter %d for parameter %d points outside of the list (size %d)", 0, psl->param_specs[i].ref_par + 1, i + 1, n);
+          bad = 1;
+          break;
+        }
       }
     }
   }
   obstack_free(&ops, NULL);
   obstack_free(&ods, NULL);
+  if (bad) {
+    free_param_spec_list(psl);
+    psl = NULL;
+  }
   return psl;
- error:
-  obstack_free(&ops, NULL);
-  obstack_free(&ods, NULL);
-  free_param_spec_list(psl);
-  return NULL;
 }
 
 /** Prepares for looping through input and output variables based on a
@@ -2006,11 +2040,11 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, pointer **ptr
     return luxerror("Standard arguments specification asks for between %d and %d input/output arguments but %d are specified (%s)", 0, nmin, num_in_out_params, narg, fmt);
   }
   if (ptrs)
-    *ptrs = malloc(psl->num_param_specs*sizeof(pointer));
+    *ptrs = (pointer*) malloc(psl->num_param_specs*sizeof(pointer));
   if (infos)
-    *infos = malloc(psl->num_param_specs*sizeof(loopInfo));
-  final = calloc(psl->num_param_specs, sizeof(int32_t));
-  
+    *infos = (loopInfo*) malloc(psl->num_param_specs*sizeof(loopInfo));
+  final = (int32_t*) calloc(psl->num_param_specs, sizeof(int32_t));
+
   obstack_init(&o);
   /* now we treat the parameters. */
   prev_ref_param = -1; /* < 0 indicates no reference parameter set yet */

@@ -34,11 +34,12 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <limits.h>
 #include <ctype.h>
 #include <assert.h>
-#include "action.h"
-#include "install.h"
+#include "action.hh"
+#include "install.hh"
 
 extern int32_t	nFixed;
-static	int32_t	result_sym , type, detrend_flag;
+static	int32_t	result_sym, detrend_flag;
+static Symboltype type;
 static	char	templine[256];		/* a temp for output and istring */
 void	zerobytes(void *, int32_t);
 int32_t	f_decomp(float *, int32_t, int32_t), d_decomp(double *, int32_t, int32_t),
@@ -66,14 +67,14 @@ int32_t lux_runsum(int32_t narg, int32_t ps[])
  if (narg > 1) axis = int_arg(ps[1]); else axis = -1;
  iq = ps[0];
  if (iq < 0) return iq;					/* error pass-thru */
- if (sym[iq].class == LUX_SCAL_PTR) iq = dereferenceScalPointer(iq);
+ if (symbol_class(iq) == LUX_SCAL_PTR) iq = dereferenceScalPointer(iq);
 							/*float the input */
  type = sym[iq].type;
  if (axis == -1 && type < LUX_FLOAT) {
    iq = lux_float(1, ps);	/* pseudo-1D case */
    type = LUX_FLOAT;
  }
- switch (sym[iq].class)	{
+ switch (symbol_class(iq))	{
    case LUX_SCALAR:
 	/*trivial, just return value */
      return iq;
@@ -149,10 +150,11 @@ int32_t index_sdev(int32_t narg, int32_t ps[], int32_t sq)
 /* see at sdev() for more info. */
 {
   int32_t	type, offset, *indx, i, size, result, nElem, indices2,
-  	outType, haveWeights, shift;
+    haveWeights, shift;
+  Symboltype outType;
   pointer	src, trgt, sum, weights, hist;
-  scalar	temp;
-  extern scalar	lastmin, lastmax;
+  Scalar	temp;
+  extern Scalar	lastmin, lastmax;
   int32_t	minmax(int32_t *, int32_t, int32_t);
 
   if (narg > 2 && ps[2]) {	/* have <weights> */
@@ -184,14 +186,14 @@ int32_t index_sdev(int32_t narg, int32_t ps[], int32_t sq)
   /* need min and max of indices so we can create result array of */
   /* proper size */
   indices2 = lux_long(1, &ps[1]); /* force LUX_INT32 */
-  indx = array_data(indices2);	/* assumed of same size as <source>! */
+  indx = (int32_t*) array_data(indices2);	/* assumed of same size as <source>! */
   minmax(indx, nElem, LUX_INT32);
   size = lastmax.l + 1;
   offset = 0;
   if (lastmin.l < 0)
     size += (offset = -lastmin.l);
   result = array_scratch(outType, 1, &size);
-  trgt.l = array_data(result);
+  trgt.l = (int32_t*) array_data(result);
   allocate(sum.b, size*lux_type_size[outType], uint8_t);
   zerobytes(trgt.b, size*lux_type_size[outType]);
   zerobytes(sum.b, size*lux_type_size[outType]);
@@ -860,11 +862,12 @@ int32_t lux_covariance(int32_t narg, int32_t ps[])
 /*    then the result is always DOUBLE. */
 /* LS 2011-04-15 */
 {
-  int32_t	result, n, i, done, n2, save[MAX_DIMS], outtype, haveWeights;
+  int32_t	result, n, i, done, n2, save[MAX_DIMS], haveWeights;
   pointer	xsrc, ysrc, trgt, xsrc0, ysrc0, weight, weight0;
   double	xmean, ymean, xtemp, ytemp, cov, nn;
   loopInfo	xsrcinfo, ysrcinfo, trgtinfo, winfo;
-  extern scalar	lastmean;
+  Symboltype outtype;
+  extern Scalar	lastmean;
   extern int32_t	lastsdev_sym, lastmean_sym;
   
   /* return values by class? */
@@ -943,10 +946,10 @@ int32_t lux_covariance(int32_t narg, int32_t ps[])
     haveWeights = lux_converts[realType(outtype)](1, &ps[3]);
     if (standardLoop(haveWeights, ps[2],
 		     (ps[2]? 0: SL_ALLAXES) | SL_EACHCOORD | SL_AXESBLOCK,
-		     0, &winfo, &weight, NULL, NULL, NULL) < 0)
+		     LUX_INT8, &winfo, &weight, NULL, NULL, NULL) < 0)
       return LUX_ERROR;
   }
-		      
+
   if (!xsrcinfo.naxes) {
     xsrcinfo.naxes++;
     ysrcinfo.naxes++;
@@ -1478,14 +1481,15 @@ int32_t sdev(int32_t narg, int32_t ps[], int32_t sq)
 /*    then the result is always DOUBLE. */
 /* LS 19 July 2000 */
 {
-  int32_t	result, n, i, done, n2, save[MAX_DIMS], outtype, haveWeights;
+  int32_t	result, n, i, done, n2, save[MAX_DIMS], haveWeights;
   pointer	src, trgt, src0, trgt0, weight, weight0;
   double	mean, sdev, temp, nn;
   doubleComplex	cmean;
   loopInfo	srcinfo, trgtinfo, winfo;
-  extern scalar	lastsdev, lastmean;
+  Symboltype outtype;
+  extern Scalar	lastsdev, lastmean;
   extern int32_t	lastsdev_sym, lastmean_sym;
-  
+
   /* return values by class? */
   if (narg > 1 && ps[1] && symbolIsNumericalArray(ps[1])
       && symbolIsNumericalArray(ps[0])
@@ -1509,7 +1513,7 @@ int32_t sdev(int32_t narg, int32_t ps[], int32_t sq)
     haveWeights = 1;
   } else
     haveWeights = 0;
-    
+ 
   /* set up for traversing the data, and create an output symbol, too */
   if (standardLoop(ps[0], (narg > 1 && ps[1])? ps[1]: 0,
 		   SL_COMPRESSALL /* omit all axis dimensions from result */
@@ -1529,10 +1533,10 @@ int32_t sdev(int32_t narg, int32_t ps[], int32_t sq)
     haveWeights = lux_converts[realType(array_type(ps[0]))](1, &ps[2]);
     if (standardLoop(haveWeights, ps[1],
 		     (ps[1]? 0: SL_ALLAXES) | SL_EACHCOORD | SL_AXESBLOCK,
-		     0, &winfo, &weight, NULL, NULL, NULL) < 0)
+		     LUX_INT8, &winfo, &weight, NULL, NULL, NULL) < 0)
       return LUX_ERROR;
   }
-		      
+
   if (!srcinfo.naxes) {
     srcinfo.naxes++;
     if (haveWeights)
@@ -1990,7 +1994,7 @@ int32_t sdev(int32_t narg, int32_t ps[], int32_t sq)
 	break;
     }
   }
-  
+
   if (sq) { 			/* standard deviation rather than variance */
     switch (outtype) {
       case LUX_FLOAT:
@@ -2025,7 +2029,7 @@ int32_t sdev(int32_t narg, int32_t ps[], int32_t sq)
 	}
 	lastsdev.d = trgt0.d[-1];
 	break;
-    } 
+    }
   } else {			/* wanted variance */
     switch (outtype) {
       case LUX_FLOAT:
@@ -2132,7 +2136,7 @@ int32_t lux_swab(int32_t narg, int32_t ps[])
     /*check if legal to change this symbol */
     if ( iq <= nFixed ) return cerror(CST_LHS, iq);
     type = sym[iq].type;
-    switch (sym[iq].class)	{
+    switch (symbol_class(iq))	{
     case 1:						/*scalar case */
 	n = lux_type_size[type];
 	q1.l = &sym[iq].spec.scalar.l;
@@ -2175,12 +2179,13 @@ int32_t lux_esmooth(int32_t narg, int32_t ps[])
   /* Exponential Asymmetric Smoothing */
   /* Syntax: Y = ESMOOTH( X [, AXIS, ORDER] ) */
 {
-  int32_t	iq, axis, result_sym, outtype, type, m, ndim, *dims, xdims[8],
+  int32_t	iq, axis, result_sym, m, ndim, *dims, xdims[8],
   	i, tally[8], n, step[8], done;
+  Symboltype type, outtype;
   float	damping, width;
   array	*h;
   pointer	src, trgt;
-  scalar	sum, weight;
+  Scalar	sum, weight;
   extern float	float_arg(int32_t);
 
   if (narg > 2) { iq = ps[2];  axis = int_arg(ps[1]); }
@@ -2189,8 +2194,8 @@ int32_t lux_esmooth(int32_t narg, int32_t ps[])
   if (width == 0) width = 1e-10;
   iq = ps[0];
   if (iq < 0) return iq;	/* some previous error */
-  if (sym[iq].class == LUX_SCAL_PTR) iq = dereferenceScalPointer(iq);
-  switch (sym[iq].class)
+  if (symbol_class(iq) == LUX_SCAL_PTR) iq = dereferenceScalPointer(iq);
+  switch (symbol_class(iq))
   { case LUX_SCALAR:		/* just return value */
       if (isFreeTemp(iq)) result_sym = iq;
       else result_sym = scalar_scratch_copy(iq);
@@ -2415,7 +2420,7 @@ int32_t lux_gsmooth(int32_t narg, int32_t ps[])
 /* this way a smoothed version of a straight line is also a straight line. */
 /* LS 13aug97 */
 {
-  extern	int32_t scrat[NSCRAT];
+  extern	int32_t scrat[];
   float	sum, *pt3, wq, sumg, xq;
   int32_t	n, nWidth;
   pointer	src, trgt, widths, gkern, pt1;
@@ -3272,8 +3277,8 @@ int32_t lux_gsmooth(int32_t narg, int32_t ps[])
 	result = array_clone(iq, LUX_FLOAT);
 	srcinfo.stride = lux_type_size[LUX_FLOAT];
       }
-      src.b = array_data(iq);
-      trgt.b = array_data(result);
+      src.b = (uint8_t*) array_data(iq);
+      trgt.b = (uint8_t*) array_data(result);
     }
   }
   if (mem)
@@ -3281,14 +3286,13 @@ int32_t lux_gsmooth(int32_t narg, int32_t ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-int32_t lux_lower(narg,ps)					/*lower function */
+int32_t lux_lower(int32_t narg, int32_t ps[]) /*lower function */
 /* convert all letters in a string to lower case */
-int32_t narg,ps[];
 {
 register  uint8_t *p1, *p2;
 register  int32_t  mq;
 int32_t	result_sym;
-if ( sym[ ps[0] ].class != 2 ) return cerror(NEED_STR, *ps);
+if ( symbol_class( ps[0] ) != LUX_STRING ) return cerror(NEED_STR, *ps);
 mq = sym[ps[0]].spec.array.bstore - 1;
 result_sym = string_scratch(mq);		/*for resultant string */
 p1 = (uint8_t *) sym[ps[0] ].spec.array.ptr;
@@ -3299,14 +3303,13 @@ while (mq--)
 return result_sym;
 }
 /*------------------------------------------------------------------------- */
-int32_t lux_upper(narg,ps)					/*upper function */
+int32_t lux_upper(int32_t narg, int32_t ps[]) /*upper function */
 /* convert all letters in a string to upper case */
-int32_t narg,ps[];
 {
 register  uint8_t *p1, *p2;
 register  int32_t  mq;
 int32_t	result_sym;
-if ( sym[ ps[0] ].class != 2 ) return cerror(NEED_STR, *ps);
+if ( symbol_class( ps[0] ) != 2 ) return cerror(NEED_STR, *ps);
 mq = sym[ps[0]].spec.array.bstore - 1;
 result_sym = string_scratch(mq);		/*for resultant string */
 p1 = (uint8_t *) sym[ps[0] ].spec.array.ptr;
@@ -3347,15 +3350,14 @@ int32_t lux_strpos(int32_t narg, int32_t ps[]) /*STRPOS function */
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-int32_t lux_strcount(narg,ps)				/*STRCOUNT function */
+int32_t lux_strcount(int32_t narg, int32_t ps[]) /*STRCOUNT function */
 /*  count # of occurences of a substring  */
-int32_t narg,ps[];
 {
 register char *p1, *p2, *p3;
 int32_t	result_sym, n;
-if ( sym[ ps[0] ].class != 2 ) return cerror(NEED_STR, ps[0]);
-if ( sym[ ps[1] ].class != 2 ) return cerror(NEED_STR, ps[1]);
-result_sym = scalar_scratch(2);		/*for resultant position */
+if ( symbol_class( ps[0] ) != 2 ) return cerror(NEED_STR, ps[0]);
+if ( symbol_class( ps[1] ) != 2 ) return cerror(NEED_STR, ps[1]);
+ result_sym = scalar_scratch(LUX_INT32); /*for resultant position */
 n = 0;
 p1 = (char *) sym[ps[0] ].spec.array.ptr;
 p2 = (char *) sym[ps[1] ].spec.array.ptr;
@@ -3365,16 +3367,15 @@ sym[result_sym].spec.scalar.l = n;
 return result_sym;
 }
 /*------------------------------------------------------------------------- */
-int32_t lux_strreplace(narg,ps)			/*STRREPLACE function */
+int32_t lux_strreplace(int32_t narg, int32_t ps[]) /*STRREPLACE function */
 /* replace a substring nc times */
-int32_t narg,ps[];
 {
 register char *p1, *p2, *p3, *p4;
 char	*pq;
 int32_t	result_sym, n, nc, nr, mq, ns;
-if ( sym[ ps[0] ].class != 2 ) return cerror(NEED_STR, ps[0]);
-if ( sym[ ps[1] ].class != 2 ) return cerror(NEED_STR, ps[1]);
-if ( sym[ ps[2] ].class != 2 ) return cerror(NEED_STR, ps[2]);
+if ( symbol_class( ps[0] ) != 2 ) return cerror(NEED_STR, ps[0]);
+if ( symbol_class( ps[1] ) != 2 ) return cerror(NEED_STR, ps[1]);
+if ( symbol_class( ps[2] ) != 2 ) return cerror(NEED_STR, ps[2]);
 nc = 0;
 if (narg >= 4 ) nc = int_arg( ps[3] );
 p1 = (char *) sym[ps[0] ].spec.array.ptr;
@@ -3432,16 +3433,15 @@ int32_t lux_strpbrk(int32_t narg, int32_t ps[])
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-int32_t lux_strloc(narg,ps)					/*STRLOC function */
+int32_t lux_strloc(int32_t narg, int32_t ps[]) /*STRLOC function */
 /* returns rest of source starting at object string
  */
-int32_t narg,ps[];
 {
 register char *p1, *p2, *p3;
 register  int32_t  mq, off;
 int32_t	result_sym;
-if ( sym[ ps[0] ].class != 2 ) return cerror(NEED_STR, ps[0]);
-if ( sym[ ps[1] ].class != 2 ) return cerror(NEED_STR, ps[1]);
+if ( symbol_class( ps[0] ) != 2 ) return cerror(NEED_STR, ps[0]);
+if ( symbol_class( ps[1] ) != 2 ) return cerror(NEED_STR, ps[1]);
 p1 = (char *) sym[ps[0] ].spec.array.ptr;
 p2 = (char *) sym[ps[1] ].spec.array.ptr;
 p3 = strstr( p1, p2);
@@ -3454,16 +3454,15 @@ memcpy(p3, p1 + off, mq);
 return result_sym;
 }
 /*------------------------------------------------------------------------- */
-int32_t lux_strskp(narg,ps)					/*STRSKP function */
+int32_t lux_strskp(int32_t narg, int32_t ps[]) /*STRSKP function */
 /*  returns rest of source starting AFTER object string
  */
-int32_t narg,ps[];
 {
 register char *p1, *p2, *p3;
 register  int32_t  mq, off;
 int32_t	result_sym;
-if ( sym[ ps[0] ].class != 2 ) return cerror(NEED_STR, ps[0]);
-if ( sym[ ps[1] ].class != 2 ) return cerror(NEED_STR, ps[1]);
+if ( symbol_class( ps[0] ) != 2 ) return cerror(NEED_STR, ps[0]);
+if ( symbol_class( ps[1] ) != 2 ) return cerror(NEED_STR, ps[1]);
 p1 = (char *) sym[ps[0] ].spec.array.ptr;
 p2 = (char *) sym[ps[1] ].spec.array.ptr;
 p3 = strstr( p1, p2);
@@ -3478,15 +3477,14 @@ if (mq != 0)  memcpy(p3, p1 + off, mq);
 return result_sym;
 }
 /*------------------------------------------------------------------------- */
-int32_t lux_skipc(narg,ps)					/*SKIPC function */
+int32_t lux_skipc(int32_t narg, int32_t ps[]) /*SKIPC function */
 /* skip over characters */
-int32_t narg,ps[];
 {
 register char *p1, *p2, *p3;
 int32_t  mq, off;
 int32_t	result_sym;
-if ( sym[ ps[0] ].class != 2 ) return cerror(NEED_STR, ps[0]);
-if ( sym[ ps[1] ].class != 2 ) return cerror(NEED_STR, ps[1]);
+if ( symbol_class( ps[0] ) != 2 ) return cerror(NEED_STR, ps[0]);
+if ( symbol_class( ps[1] ) != 2 ) return cerror(NEED_STR, ps[1]);
 p1 = (char *) sym[ps[0] ].spec.array.ptr;
 p2 = (char *) sym[ps[1] ].spec.array.ptr;
 off = strspn( p1, p2);
@@ -3499,14 +3497,13 @@ if (mq != 0)  memcpy(p3, p1 + off, mq);
 return result_sym;
 }
 /*------------------------------------------------------------------------- */
-int32_t lux_strsub(narg,ps)				/*STRSUB function */
+int32_t lux_strsub(int32_t narg, int32_t ps[]) /*STRSUB function */
 /* return a substring */
-int32_t narg,ps[];
 {
 register char *p1, *p3;
 int32_t  mq, off, len;
 int32_t	result_sym;
-if ( sym[ ps[0] ].class != 2 ) return cerror(NEED_STR, ps[0]);
+if ( symbol_class( ps[0] ) != 2 ) return cerror(NEED_STR, ps[0]);
 p1 = (char *) sym[ps[0] ].spec.array.ptr;
 off = int_arg( ps[1] );
 len = int_arg( ps[2] );
@@ -3527,7 +3524,7 @@ int32_t lux_strtrim(int32_t narg, int32_t ps[]) /*STRTRIM function */
   register char *p1, *p2, *p3;
   int32_t  mq;
   int32_t	result_sym;
-  
+
   if (symbol_class(ps[0]) != LUX_STRING)
     return cerror(NEED_STR, *ps);
   p1 = string_value(ps[0]);
@@ -3550,15 +3547,14 @@ int32_t lux_strtrim(int32_t narg, int32_t ps[]) /*STRTRIM function */
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-int32_t lux_istring(narg,ps)				/* ISTRING function */
+int32_t lux_istring(int32_t narg, int32_t ps[]) /* ISTRING function */
 /* string in I format */
-int32_t narg,ps[];
 {
 char	s[6], *p3;
 int32_t  iq, mq, n, k, mode;
 int32_t	result_sym;
 iq = ps[0];
-switch (sym[iq].class)	{
+switch (symbol_class(iq))	{
 default: return cerror(NO_SCAL, iq);
 case 1:							/*scalar case */
 k = int_arg(iq);
@@ -3612,7 +3608,7 @@ int32_t lux_string(int32_t narg, int32_t ps[])
  /* converts to LUX_STRING
    LS 24apr93 21sep98 8sep99 */
 {
-  scalar	value;
+  Scalar	value;
   char	*p;
   int32_t	result, n, nel;
   pointer	q;
@@ -3670,7 +3666,7 @@ int32_t lux_string(int32_t narg, int32_t ps[])
 	/* everything together */
 	n = 0;
 	nel = array_size(ps[0]);
-	q.sp = array_data(ps[0]);
+	q.sp = (char**) array_data(ps[0]);
 	while (nel--)
 	  n += strlen(*q.sp++);
 	result = string_scratch(n);
@@ -3709,8 +3705,8 @@ int32_t lux_strlen(int32_t narg, int32_t ps[])/*strlen function */
       if (array_type(ps[0]) == LUX_STRING_ARRAY) {
 	result_sym = array_scratch(LUX_INT32, array_num_dims(ps[0]),
 				   array_dims(ps[0]));
-	l = array_data(result_sym);
-	p.sp = array_data(ps[0]);
+	l = (int32_t*) array_data(result_sym);
+	p.sp = (char**) array_data(ps[0]);
 	n = array_size(ps[0]);
 	while (n--)
 	  *l++ = strlen(*p.sp++);
@@ -3754,15 +3750,14 @@ case 4:
 return 1;
 }
 /*------------------------------------------------------------------------- */
-int32_t lux_dsolve(narg,ps)					/*decomp routine */
+int32_t lux_dsolve(int32_t narg, int32_t ps[]) /*decomp routine */
 		/*solves a linear system given lu decomp and rhs */
-int32_t narg,ps[];
 {
 int32_t	iq, jq, nd, nx, toptype, j, outer;
 array	*h;
 pointer q1, q2;
 if ( narg != 2 ) return cerror(WRNG_N_ARG, 0);
-iq = ps[0];				/*the lu decomp matrix */		
+iq = ps[0];				/*the lu decomp matrix */
 CK_ARR(iq, 1);
 toptype = sym[iq].type;
 h = (array *) sym[iq].spec.array.ptr;
@@ -3807,9 +3802,10 @@ int32_t lux_pit(int32_t narg, int32_t ps[])	/*pit function */
   double	*a, *fbase, *cfbase;
   pointer qxbase,qybase;
   int32_t	npow, symx, symy, nd, nxq, outer, outerx, dim[2], cfsym;
-  int32_t	j, toptype;
+  int32_t	j;
+  Symboltype toptype;
   array	*h;
-  int32_t	setxpit(int32_t, int32_t),
+  int32_t	setxpit(Symboltype, int32_t),
     clux_pit(pointer *, pointer *, int32_t, int32_t, double *, double *, double *,
 	     int32_t, int32_t);
 
@@ -3821,7 +3817,7 @@ case 3:
 symx = ps[0];	symy = ps[1];	npow = int_arg( ps[2] ); break;
 case 2:
 /* two possibilities, determined by class of ps[1] */
-if ( sym[ps[1]].class == 4 ) { 		/* the (x,y) case */
+if ( symbol_class(ps[1]) == 4 ) { 		/* the (x,y) case */
 	symx = ps[0];	symy = ps[1]; }
 	else { symy = ps[0];	npow = int_arg( ps[1] ); }
 break;
@@ -3833,7 +3829,7 @@ default: return cerror(WRNG_N_ARG, 0);
 if (npow < 1 || npow >10 ) return cerror(ILL_POWER, 0);	/*check power */
 CK_ARR(symy, -1);
 	/* if either y or x (if x specified) is double, do a double calc. */
-toptype = sym[symy].type < 3 ? 3 : sym[symy].type;
+toptype = sym[symy].type < LUX_FLOAT ? LUX_FLOAT : sym[symy].type;
 h = (array *) sym[symy].spec.array.ptr;
 	/*array may be upgraded but y dimensions will be same, get now */
 nd = h->ndim;	nxq = h->dims[0];	outer = 1;
@@ -3863,15 +3859,15 @@ h = (array *) sym[symx].spec.array.ptr;
 qxbase.l = (int32_t *) ((char *)h + sizeof(array));
 			/* get the various matrices and vectors needed */
 dim[0] = npow + 1;	dim[1] = outer;
-if (outer > 1) cfsym = array_scratch(4, 2, dim);	/*always double */		
-	else cfsym = array_scratch(4, 1, dim);
+if (outer > 1) cfsym = array_scratch(LUX_DOUBLE, 2, dim); /*always double */
+	else cfsym = array_scratch(LUX_DOUBLE, 1, dim);
 h = (array *) sym[cfsym].spec.array.ptr;
 cfbase = (double*) ((char *)h + sizeof(array));
 							/*scratch array */
 allocate(fbase, nxq, double);
 allocate(a, (npow + 1)*(npow + 1), double);
 	/*loop over the number of individual fits to do */
-while (outer--) { 
+while (outer--) {
 	/* ready to start actual calculation, all done in clux_pit */
 clux_pit( &qxbase, &qybase, nxq, npow, a, cfbase, fbase, toptype, outerx);
 cfbase += npow+1;
@@ -3940,7 +3936,7 @@ d_solve(a, cfbase, npow+1, npow+1);
 return 1;
 }
 /*------------------------------------------------------------------------- */
-int32_t setxpit(int32_t type, int32_t n)	/* used by several routines to set up
+int32_t setxpit(Symboltype type, int32_t n) /* used by several routines to set up
 				   an x array */
 			/*consisting of {0,1/n,2/n,...,(n-1)/n} */
 			/* type must be 3 or 4 */
@@ -3980,7 +3976,8 @@ int32_t lux_trend(int32_t narg, int32_t ps[]) /*trend function */
   double	*fbase, *cfbase;
   pointer qxbase,qybase,qzbase;
   int32_t	npow, symx, symy, nd, nxq, outer;
-  int32_t	toptype, result_sym;
+  int32_t	result_sym;
+  Symboltype toptype;
   int32_t	clux_poly(double *cfbase, pointer *qxbase, int32_t nxq, int32_t npow,
 		  pointer *qzbase, int32_t toptype);
 
@@ -3997,7 +3994,7 @@ int32_t lux_trend(int32_t narg, int32_t ps[]) /*trend function */
   if (npow < 1 || npow > 10)
     return cerror(ILL_POWER, ps[1]); /*check power */
   CK_ARR(symy, 1);
-  toptype = symbol_type(symy) < LUX_FLOAT ? LUX_FLOAT : symbol_type(symy);
+  toptype = combinedType(symbol_type(symy), LUX_FLOAT);
   /*array may be upgraded but y dimensions will be same, get now */
   nd = array_num_dims(symy);
   nxq = array_dims(symy)[0];
@@ -4014,12 +4011,12 @@ int32_t lux_trend(int32_t narg, int32_t ps[]) /*trend function */
       symy = lux_double(1, &symy);
       symx = lux_double(1, &symx);
       break; }
-  qybase.l = array_data(symy);
-  qxbase.l = array_data(symx);
+  qybase.l = (int32_t*) array_data(symy);
+  qxbase.l = (int32_t*) array_data(symx);
 							/*get result sym */
-  result_sym = array_clone(symy, toptype);	
+  result_sym = array_clone(symy, toptype);
 
-  qzbase.l = array_data(result_sym);
+  qzbase.l = (int32_t*) array_data(result_sym);
 			/* get the various matrices and vectors needed */
 			/*unlike pit, the coeffs. are not in a symbol */
   allocate(cfbase, npow + 1, double);
@@ -4106,7 +4103,7 @@ int32_t lux_poly(int32_t narg, int32_t ps[])
  /* c: coefficients of the polynomial */
 {
   int32_t result, ndata, ncoeff, datasym, coeffsym, i;
-  uint8_t outtype;
+  Symboltype outtype;
   pointer data, tgt, coeff;
 
   if (!symbolIsNumerical(ps[0])
@@ -4212,7 +4209,7 @@ int32_t lux_strtok(int32_t narg, int32_t ps[])
   }
 
   if (s1) { 			/* install a new string */
-    string = realloc(string, strlen(s1) + 1);
+    string = (char*) realloc(string, strlen(s1) + 1);
     if (!string)
       return cerror(ALLOC_ERR, 0);
     strcpy(string, s1);
@@ -4905,9 +4902,9 @@ int32_t lux_ksmooth(int32_t narg, int32_t ps[])
 				   the kernel, so we ignore the last one */
   if (!nkernel)
     return luxerror("Need at least 2 elements in the kernel", ps[1]);
-    
+
   iq = lux_float(1, ps + 1);	/* make sure <kernel> is FLOAT */
-  kernel = array_data(iq);
+  kernel = (float*) array_data(iq);
 
   if (standardLoop(ps[0], narg > 2? ps[2]: 0,
 		   SL_ONEAXIS | SL_SAMEDIMS | SL_EACHROW,
@@ -4917,7 +4914,7 @@ int32_t lux_ksmooth(int32_t narg, int32_t ps[])
   do {
     do {
       ksmooth(&srcinfo, &trgtinfo, kernel, nkernel);
-    } while (advanceLoop(&trgtinfo, &trgt), 
+    } while (advanceLoop(&trgtinfo, &trgt),
 	     advanceLoop(&srcinfo, &src) < srcinfo.rndim);
   } while (nextLoops(&srcinfo, &trgtinfo));
 
@@ -4931,7 +4928,8 @@ int32_t lux_crosscorr(int32_t narg, int32_t ps[])
 /* class as specified in <mode> (if an array of the same size as <x1> and */
 /* <x2>).  LS 8apr99 */
 {
-  int32_t	type, outtype, i, iq1, iq2, result, n, save[MAX_DIMS], done;
+  int32_t	i, iq1, iq2, result, n, save[MAX_DIMS], done;
+  Symboltype type, outtype;
   double	meanx, meany, kx, ky, pxy, tempx, tempy;
   doubleComplex	cmeanx, cmeany, cpxy, ctempx, ctempy;
   pointer	src1, src2, src1save, src2save, trgt;
@@ -4955,7 +4953,7 @@ int32_t lux_crosscorr(int32_t narg, int32_t ps[])
     outtype = type;
   else
     outtype = (type == LUX_DOUBLE)? LUX_DOUBLE: LUX_FLOAT;
-  
+
   iq1 = (array_type(ps[0]) == type)? ps[0]: lux_converts[type](1, ps);
   iq2 = (array_type(ps[1]) == type)? ps[1]: lux_converts[type](1, ps + 1);
 

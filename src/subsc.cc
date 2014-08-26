@@ -24,14 +24,14 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 #include <stdlib.h>
 #include <string.h>
-#include "action.h"
-#include "install.h"
+#include "action.hh"
+#include "install.hh"
 #include <limits.h>
 
 extern int32_t	redim_warn_flag, range_warn_flag;
 int32_t	lux_assoc_output(int32_t iq, int32_t jq, int32_t offsym, int32_t axsym),
   lux_file_output(int32_t iq, int32_t jq, int32_t offsym, int32_t axsym),
-  lux_gmap(int32_t narg, int32_t ps[], int32_t new), lux_assoc_input(int32_t, int32_t []),
+  lux_gmap(int32_t narg, int32_t ps[], Symboltype new_type), lux_assoc_input(int32_t, int32_t []),
   simple_reverse(int32_t *p1, int32_t *p2, int32_t n, int32_t type), getBody(int32_t),
   string_sub(int32_t, int32_t []);
 /*------------------------------------------------------------------------- */
@@ -59,8 +59,8 @@ int32_t lux_inserter(int32_t narg, int32_t ps[])
   }
 
   if (standardLoop(ps[0], 0,
-		   (narg == 3? SL_TAKEONED: SL_ALLAXES) | SL_EACHROW, 0,
-		   &trgtinfo, &trgt, NULL, NULL, NULL) == LUX_ERROR)
+		   (narg == 3? SL_TAKEONED: SL_ALLAXES) | SL_EACHROW,
+                   LUX_INT8, &trgtinfo, &trgt, NULL, NULL, NULL) == LUX_ERROR)
     return LUX_ERROR;		/* something wrong with the target */
 
   if (numerical(ps[1], &dims, &ndim, &nelem, &src) == LUX_ERROR) /* source */
@@ -321,7 +321,7 @@ int32_t lux_smap(int32_t narg, int32_t ps[])
     n = j; }
   else if (internalMode & 2 && nd > 1) /* /ARRAY */
   { result_sym = array_scratch(LUX_TEMP_STRING, nd - 1, array_dims(nsym) + 1);
-    q3.sp = array_data(result_sym);
+    q3.sp = (char**) array_data(result_sym);
     n1 = array_dims(nsym)[0]*size;
     j = n/n1;
     while (j--)
@@ -386,17 +386,18 @@ int32_t lux_cdmap(int32_t narg, int32_t ps[])
   return lux_gmap(narg, ps, LUX_CDOUBLE);
 }
 /*------------------------------------------------------------------------- */
-int32_t lux_gmap(int32_t narg, int32_t ps[], int32_t new)
+int32_t lux_gmap(int32_t narg, int32_t ps[], Symboltype new_type)
                 /* general part for map routines */
 {
   register pointer q1,q3;
   int32_t	nsym, nd, n, nn;
-  int32_t	result_sym, type;
+  int32_t	result_sym;
+  Symboltype type;
 
   nsym = ps[0];				/* only one argument */
   type = symbol_type(nsym);
   /* check if already the desired type */
-  if (type == new)
+  if (type == new_type)
     return nsym;
   nd = 0;
   /* switch on the class */
@@ -420,10 +421,10 @@ int32_t lux_gmap(int32_t narg, int32_t ps[], int32_t new)
     case LUX_ARRAY: case LUX_CARRAY:
       nd = array_num_dims(nsym);
       n = array_size(nsym)*lux_type_size[type];
-      q1.l = array_data(nsym);
+      q1.l = (int32_t*) array_data(nsym);
       /* n must be a multiple of type size or the inner dimension is not
 	 compatible */
-      if ((array_dims(nsym)[0]*lux_type_size[type]) % lux_type_size[new])
+      if ((array_dims(nsym)[0]*lux_type_size[type]) % lux_type_size[new_type])
 	return luxerror("Array dimension 0 is incompatible with desired type",
 		     ps[0]);
       break;
@@ -431,15 +432,15 @@ int32_t lux_gmap(int32_t narg, int32_t ps[], int32_t new)
       return cerror(ILL_CLASS, nsym);
   }
 
-  if (n % lux_type_size[new])	/* the new data type does not evenly divide
+  if (n % lux_type_size[new_type])	/* the new data type does not evenly divide
 				   the old data size */
     return luxerror("Data size is incompatible with desired type", ps[0]);
 
   /* n is # of bytes to transfer, get # of elements */
-  nn = n/lux_type_size[new];
+  nn = n/lux_type_size[new_type];
   if (nn <= 1) {		/* at most one, make scalar */
-    result_sym = scalar_scratch(new);
-    if (isComplexType(new)) {
+    result_sym = scalar_scratch(new_type);
+    if (isComplexType(new_type)) {
       q3.cf = complex_scalar_data(result_sym).cf;
       symbol_class(result_sym) = LUX_CSCALAR;
     } else {
@@ -449,22 +450,22 @@ int32_t lux_gmap(int32_t narg, int32_t ps[], int32_t new)
   } else {
     if (nd == 0) {		/* input was not an array; output will be */
       nd = 1;
-      result_sym = array_scratch(new, nd, &nn);
+      result_sym = array_scratch(new_type, nd, &nn);
     } else {			/* input was an array; duplicate and then
 				   modify */
       result_sym = array_clone(nsym, type);
-      array_type(result_sym) = new;
-      if (isComplexType(new))
+      array_type(result_sym) = new_type;
+      if (isComplexType(new_type))
 	symbol_class(result_sym) = LUX_CARRAY;
       else
 	symbol_class(result_sym) = LUX_ARRAY;
-      
+
          /*already know that inner dim is a proper multiple so safe to
 		 do the following */
-      array_dims(result_sym)[0] = 
-	(array_dims(result_sym)[0]*lux_type_size[type])/lux_type_size[new];
+      array_dims(result_sym)[0] =
+	(array_dims(result_sym)[0]*lux_type_size[type])/lux_type_size[new_type];
     }
-    q3.l = array_data(result_sym);
+    q3.l = (int32_t*) array_data(result_sym);
   }
   if (n > 0)
     memcpy(q3.v, q1.v, n);
@@ -492,17 +493,17 @@ int32_t lux_reverse(int32_t narg, int32_t ps[])
 {
   loopInfo	srcinfo, trgtinfo;
   pointer	src, trgt, src2, trgt2, center;
-  scalar	value;
+  Scalar	value;
   int32_t	result, stride, i, iq, w, n, inplace;
 
   if (symbolIsNumerical(ps[0])) {
-    if (standardLoop(ps[0], (narg > 1 && ps[1])? ps[1]: 0, 
+    if (standardLoop(ps[0], (narg > 1 && ps[1])? ps[1]: 0,
 		     ((narg > 1 && ps[1])? 0: SL_TAKEONED) |
 		     SL_UNIQUEAXES | SL_KEEPTYPE | SL_EACHROW,
-		     0, &srcinfo, &src, &result, &trgtinfo, &trgt)
+		     LUX_INT8, &srcinfo, &src, &result, &trgtinfo, &trgt)
 	== LUX_ERROR)
       return LUX_ERROR;
-    
+
     if (narg > 2 && ps[2]) {	/* <center> */
       if (numerical(ps[2], NULL, NULL, &i, NULL) == LUX_ERROR)
 	return LUX_ERROR;
@@ -655,7 +656,7 @@ int32_t expandListArguments(int32_t *narg, int32_t *ps[], int32_t list, int32_t 
 	*narg += n - 1;		/* minus one because the slot now occupied
 				 by <list> can be occupied by its first
 				 element instead */
-	*ps = realloc(*ps, *narg*sizeof(int32_t)); /* more memory as needed */
+	*ps = (int32_t*) realloc(*ps, *narg*sizeof(int32_t)); /* more memory as needed */
 	if (!*ps)		/* some allocation error occurred */
 	  return cerror(ALLOC_ERR, iq);
 	/* move the stuff that is after <list> to make room for the elements
@@ -683,7 +684,7 @@ int32_t expandListArguments(int32_t *narg, int32_t *ps[], int32_t list, int32_t 
       case LUX_LIST:
 	n = list_num_symbols(iq);
 	*narg += n - 1;
-	*ps = realloc(*ps, *narg*sizeof(int32_t));
+	*ps = (int32_t*) realloc(*ps, *narg*sizeof(int32_t));
 	if (!*ps)
 	  return cerror(ALLOC_ERR, iq);
 	memmove(*ps + indx + n, *ps + indx, (*narg - indx - n)*sizeof(int32_t));
@@ -817,7 +818,7 @@ int32_t expandListArguments_w(int32_t *narg, int16_t *ps[], int32_t list, int32_
 	*narg += n - 1;		/* minus one because the slot now occupied
 				 by <list> can be occupied by its first
 				 element instead */
-	*ps = realloc(*ps, *narg*sizeof(int16_t)); /* more memory as needed */
+	*ps = (int16_t*) realloc(*ps, *narg*sizeof(int16_t)); /* more memory as needed */
 	if (!*ps)		/* some allocation error occurred */
 	  return cerror(ALLOC_ERR, iq);
 	/* move the stuff that is after <list> to make room for the elements
@@ -845,7 +846,7 @@ int32_t expandListArguments_w(int32_t *narg, int16_t *ps[], int32_t list, int32_
       case LUX_LIST:
 	n = list_num_symbols(iq);
 	*narg += n - 1;
-	*ps = realloc(*ps, *narg*sizeof(int16_t));
+	*ps = (int16_t*) realloc(*ps, *narg*sizeof(int16_t));
 	if (!*ps)
 	  return cerror(ALLOC_ERR, iq);
 	memmove(*ps + indx + n, *ps + indx, (*narg - indx - n)*sizeof(int16_t));
@@ -964,11 +965,13 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
 /* strings, associated variables, file maps, and function pointers. */
 /* rewritten LS 6aug96 */
 {
-  int32_t	nsym, type, i, n, iq, ndim, *dims, start[MAX_DIMS], j, nsum,
+  int32_t	nsym, i, n, iq, ndim, *dims, start[MAX_DIMS], j, nsum,
 	size[MAX_DIMS], todim[MAX_DIMS], *index[MAX_DIMS], nelem, *iptr,
 	trgtndim, trgtdims[MAX_DIMS], fromdim[MAX_DIMS], one = 1, offset0,
 	stride[MAX_DIMS], offset, width, tally[MAX_DIMS], step[MAX_DIMS],
-	noutdim, ps2[MAX_DIMS], class, narr, combineType;
+	noutdim, ps2[MAX_DIMS], narr, combineType;
+  Symboltype type;
+  Symbolclass class_id;
   int16_t	*ap;
   pointer	src, trgt;
   wideScalar	value, item;
@@ -996,9 +999,9 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
   if (internalMode & 8)		/* /SUBGRID */
     return lux_subsc_subgrid(narg, ps);
 
-  class = symbol_class(nsym);	/* source symbol class */
+  class_id = symbol_class(nsym);	/* source symbol class */
 
-  switch (class) {		/* switch on source class */
+  switch (class_id) {		/* switch on source class */
     default:
       return cerror(SUBSC_NO_INDX, nsym);
     case LUX_CLIST: case LUX_CPLIST:
@@ -1021,41 +1024,45 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
       iq = lux_assoc_input(narg, ps);
       return iq;
     case LUX_FUNC_PTR:		/*func. ptr. case */
-      if ((iq = func_ptr_routine_num(nsym)) > 0) { /* user-defined */
-	if (symbol_class(iq) == LUX_DEFERRED_FUNC) {
-	  /* it's a deferred function, so its body has not yet been */
-	  /* compiled.  Do it now. */
-	  if (getBody(iq) < 0)	/* some error during compilation */
-	    return LUX_ERROR;
-	}
-	if (symbol_class(iq) != LUX_FUNCTION)
-	  return luxerror("Subscripted pointer to non-function!", nsym);
-	type = 1;		/* user-defined */
-      } else {			/* internal function or routine */
-	iq = -iq;		/* get function number */
-	if (iq >= nFunction)
-	  return luxerror("Pointer to non-existent internal function!", nsym);
-	type = 0;		/* internal */
-      }
-      /* now create proper symbol to handle the situation */
-      getFreeTempExecutable(n);
-      if (type) {		/* a user-defined function */
-	symbol_class(n) = LUX_USR_FUNC;
-	usr_func_number(n) = iq;
-      } else {			/* an internal function */
-	symbol_class(n) = LUX_INT_FUNC;
-	int_func_number(n) = iq;
-      }
-      symbol_memory(n) = narg*sizeof(int16_t);
-      if (narg) {		/* arguments */
-	allocate(symbol_data(n), narg, int16_t *);
-	ap = symbol_data(n);
-	while (narg--)
-	  *ap++ = *ps++;	/* ap is int16_t* and ps is int32_t*, so we cannot */
+      {
+        int32_t itype;
+
+        if ((iq = func_ptr_routine_num(nsym)) > 0) { /* user-defined */
+          if (symbol_class(iq) == LUX_DEFERRED_FUNC) {
+            /* it's a deferred function, so its body has not yet been */
+            /* compiled.  Do it now. */
+            if (getBody(iq) < 0)	/* some error during compilation */
+              return LUX_ERROR;
+          }
+          if (symbol_class(iq) != LUX_FUNCTION)
+            return luxerror("Subscripted pointer to non-function!", nsym);
+          itype = 1;		/* user-defined */
+        } else {			/* internal function or routine */
+          iq = -iq;		/* get function number */
+          if (iq >= nFunction)
+            return luxerror("Pointer to non-existent internal function!", nsym);
+          itype = 0;		/* internal */
+        }
+        /* now create proper symbol to handle the situation */
+        getFreeTempExecutable(n);
+        if (itype) {		/* a user-defined function */
+          symbol_class(n) = LUX_USR_FUNC;
+          usr_func_number(n) = iq;
+        } else {			/* an internal function */
+          symbol_class(n) = LUX_INT_FUNC;
+          int_func_number(n) = iq;
+        }
+        symbol_memory(n) = narg*sizeof(int16_t);
+        if (narg) {		/* arguments */
+          allocate(symbol_data(n), narg, int16_t *);
+          ap = (int16_t*) symbol_data(n);
+          while (narg--)
+            *ap++ = *ps++;	/* ap is int16_t* and ps is int32_t*, so we cannot */
 				/* just use memcpy(). */
+        }
+        iq = eval(n);
+        zap(n);			/* delete temp executable */
       }
-      iq = eval(n);
-      zap(n);			/* delete temp executable */
       return iq;
     case LUX_STRING:		/* string case */
       iq = string_sub(narg, ps);
@@ -1111,17 +1118,13 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
   /* only get here if source is a numerical or string array, a scalar, */
   /* a file map, or a list. */
 
-  if (class == LUX_ARRAY && type == LUX_STRING_ARRAY)
-    class = LUX_STRING_ARRAY;	/* distinguish numerical from string */
-				/* arrays */
-
   if (narg == 1			/* one subscript */
       && (internalMode & 0x60) == 0) { /* no /ALL or /SEPARATE */
 				/* -> treat source as 1D */
     dims = &nelem;
     ndim = 1;
   }
-  
+
   /* how do we combine different subscripts if they contain multiple values? */
   /* we can choose between inner-style, in which for each output element */
   /* we take the next value from all subscripts, and outer-style, in which */
@@ -1187,7 +1190,7 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
 	   know that the array is the only one, and has a number of
 	   elements not exceeding the number of dimensions of the source.
 	   LS 22jul98 */
-	  iptr = array_data(iq);
+	  iptr = (int32_t*) array_data(iq);
 	  for (i = 0; i < n; i++) {
 	    if (*iptr < 0 || *iptr >= dims[i]) { /* out of bounds */
 	      cerror(ILL_SUBSC, ps[1], *iptr, dims[i]);
@@ -1396,7 +1399,7 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
 
   /* now we are ready to start the extraction */
 
-  switch (class) {
+  switch (class_id) {
     case LUX_CLIST:
       if (size[0] == 1) 	/* want only a single element */
 	return clist_symbols(nsym)[start[0]];
@@ -1404,9 +1407,9 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
       iq = nextFreeTempVariable();
       if (iq == LUX_ERROR)
 	goto lux_subsc_1;
-      symbol_class(iq) = class;
+      symbol_class(iq) = class_id;
       n = size[0]*sizeof(int16_t);
-      ap = clist_symbols(iq) = malloc(n);
+      ap = clist_symbols(iq) = (int16_t*) malloc(n);
       if (!clist_symbols(iq)) {
 	cerror(ALLOC_ERR, iq);
 	goto lux_subsc_1;
@@ -1434,7 +1437,7 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
 	  if (iq == LUX_ERROR)
 	    goto lux_subsc_1;
 	  symbol_class(iq) = LUX_TRANSFER;
-	  transfer_is_parameter(iq) = 0;
+	  transfer_is_parameter(iq) = (Symboltype) 0;
 	  transfer_target(iq) = n;
 	} else
 	  iq = n;
@@ -1442,9 +1445,9 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
 	iq = nextFreeTempVariable();
 	if (iq == LUX_ERROR)
 	  goto lux_subsc_1;
-	symbol_class(iq) = class;
+	symbol_class(iq) = class_id;
 	n = size[0]*sizeof(int16_t);
-	ap = clist_symbols(iq) = malloc(n);
+	ap = clist_symbols(iq) = (int16_t*) malloc(n);
 	if (!clist_symbols(iq)) {
 	  cerror(ALLOC_ERR, iq);
 	  goto lux_subsc_1;
@@ -1472,7 +1475,7 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
 	goto lux_subsc_1;
       symbol_class(iq) = LUX_LIST;
       n = size[0]*sizeof(listElem);
-      le = list_symbols(iq) = malloc(n);
+      le = list_symbols(iq) = (listElem*) malloc(n);
       if (!list_symbols(iq)) {
 	cerror(ALLOC_ERR, iq);
 	goto lux_subsc_1;
@@ -1553,7 +1556,8 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
     /* for LUX_RANGE subscripts the offset is updated for each element */
     offset0 = 0;
     width = lux_type_size[type];
-    if ((nsum && class != LUX_FILEMAP) || class == LUX_STRING_ARRAY)
+    if ((nsum && class_id != LUX_FILEMAP)
+        || (class_id == LUX_ARRAY && type == LUX_STRING_ARRAY))
       n = 1;
     else
       n = width;
@@ -1564,33 +1568,34 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
       n *= dims[i];
     }
 
-    switch (class) {
+    switch (class_id) {
       case LUX_ARRAY: case LUX_SCALAR:
-	for (j = 0; j < nelem; j++) {
-	  offset = offset0;
-	  for (i = 0; i < narg; i++)
-	    if (subsc_type[i] == LUX_ARRAY)
-	      offset += index[i][j]*stride[i];
-	    else if (size[i] > 1) /* range */
-	      offset0 += stride[i];
-	  memcpy(trgt.b, src.b + offset, width);
-	  trgt.b += width;
-	}
-	break;
-      case LUX_STRING_ARRAY:			/* string array */
-	for (j = 0; j < nelem; j++) {
-	  offset = offset0;
-	  for (i = 0; i < narg; i++)
-	    if (subsc_type[i] == LUX_ARRAY)
-	      offset += index[i][j]*stride[i];
-	    else if (size[i] > 1) /* range */
-	      offset0 += stride[i];
-	  if (!(*trgt.sp = malloc(strlen(src.sp[offset]) + 1))) {
-	    cerror(ALLOC_ERR, 0);
-	    goto lux_subsc_1;
-	  }
-	  strcpy(*trgt.sp++, src.sp[offset]);
-	}
+        if (class_id == LUX_ARRAY && type == LUX_STRING_ARRAY) {
+          for (j = 0; j < nelem; j++) {
+            offset = offset0;
+            for (i = 0; i < narg; i++)
+              if (subsc_type[i] == LUX_ARRAY)
+                offset += index[i][j]*stride[i];
+              else if (size[i] > 1) /* range */
+                offset0 += stride[i];
+            if (!(*trgt.sp = (char*) malloc(strlen(src.sp[offset]) + 1))) {
+              cerror(ALLOC_ERR, 0);
+              goto lux_subsc_1;
+            }
+            strcpy(*trgt.sp++, src.sp[offset]);
+          }
+        } else {
+          for (j = 0; j < nelem; j++) {
+            offset = offset0;
+            for (i = 0; i < narg; i++)
+              if (subsc_type[i] == LUX_ARRAY)
+                offset += index[i][j]*stride[i];
+              else if (size[i] > 1) /* range */
+                offset0 += stride[i];
+            memcpy(trgt.b, src.b + offset, width);
+            trgt.b += width;
+          }
+        }
 	break;
       case LUX_FILEMAP:
 	if (file_map_has_offset(nsym))
@@ -1618,7 +1623,7 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
 	  trgt.b += width;
 	}
 	break;
-      }	
+      }
   } else {				/* generalized outer product: */
     /* x([1,2],[3,4],/outer) = x([1,2],[3,4]) = */
     /* [x(1,3),x(1,4),x(2,3),x(2,4)] */
@@ -1673,7 +1678,7 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
 	goto lux_subsc_1;
       } /* end of if (noutdim + n >= MAX_DIMS) */
     }
-    
+
     /* now create the output symbol */
     n = 0;			/* current output dimension index */
     if (noutdim) {		/* need array: collect dimensions */
@@ -1692,7 +1697,7 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
       iq = array_scratch(type, noutdim, trgtdims);
       trgt.l = (int32_t *) array_data(iq);
     } /* end of if (noutdim) */
-    else if (class == LUX_STRING_ARRAY) { /* string from string array */
+    else if (class_id == LUX_ARRAY && type == LUX_STRING_ARRAY) { /* string from string array */
       if (src.sp[start[0]]) {	/* non-null string */
 	n = strlen(src.sp[start[0]]);
 	iq = string_scratch(n);
@@ -1748,7 +1753,8 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
     /* for LUX_RANGE subscripts the offset is updated for each element */
     offset0 = 0;		/* initial offset */
     width = lux_type_size[type];
-    if ((nsum && class != LUX_FILEMAP) || class == LUX_STRING_ARRAY)
+    if ((nsum && class_id != LUX_FILEMAP)
+        || (class_id == LUX_ARRAY && type == LUX_STRING_ARRAY))
       n = 1;
     else
       n = width;
@@ -1786,7 +1792,7 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
     } /* end of if (trgtndim) */
     else			/* a scalar output */
       step[0] = width;
-    
+
     if (!nsum && step[0] == width && trgtndim && !step[1]) {
       /* we don't need to read each value in turn, but can treat blocks */
       /* of values at a time, effectively reducing the number of */
@@ -1809,17 +1815,36 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
       trgtndim -= i;
     }
 
-    switch (class) {
+    switch (class_id) {
       case LUX_ARRAY: case LUX_SCALAR:
       case LUX_CARRAY: case LUX_CSCALAR:
-	if (nsum) {		/* have summation flag(s) */
-	  zerobytes(&value.b, lux_type_size[LUX_CDOUBLE]); /* initialize */
-	  do {
-	    offset = offset0;
-	    for (i = 0; i < trgtndim; i++) /* add LUX_ARRAY indices */
-	      if (subsc_type[i] == LUX_ARRAY)
-		offset += index[fromdim[i]][tally[i]]*stride[i];
-	    switch (type) {
+        if (class_id == LUX_ARRAY && type == LUX_STRING_ARRAY) {
+          do
+            { offset = offset0;
+              for (i = 0; i < trgtndim; i++) /* add LUX_ARRAY indices */
+                if (subsc_type[i] == LUX_ARRAY)
+                  offset += index[fromdim[i]][tally[i]]*stride[i];
+              if (src.sp[offset])
+                *trgt.sp++ = strsave(src.sp[offset]);
+              else
+                *trgt.sp++ = NULL;
+              for (i = 0; i < trgtndim; i++)
+                { if (i)
+                    tally[i - 1] = 0;
+                  offset0 += step[i];	/* update for LUX_RANGE subscripts */
+                  tally[i]++;
+                  if (tally[i] != size[i])
+                    break; }
+            } while (i != trgtndim);
+        } else {
+          if (nsum) {		/* have summation flag(s) */
+            zerobytes(&value.b, lux_type_size[LUX_CDOUBLE]); /* initialize */
+            do {
+              offset = offset0;
+              for (i = 0; i < trgtndim; i++) /* add LUX_ARRAY indices */
+                if (subsc_type[i] == LUX_ARRAY)
+                  offset += index[fromdim[i]][tally[i]]*stride[i];
+              switch (type) {
 	      case LUX_INT8:
 		value.b += src.b[offset];
 		break;
@@ -1846,57 +1871,39 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
 		value.cd.real += src.cd[offset].real;
 		value.cd.imaginary += src.cd[offset].imaginary;
 		break;
-	    }
-	    for (i = 0; i < trgtndim; i++) { /* update coordinates */
-	      if (i)
-		tally[i - 1] = 0;
-	      offset0 += step[i]; /* update for LUX_RANGE subscripts */
-	      tally[i]++;
-	      if (tally[i] != size[i]) /* not yet done with this dimension */
-		break;
-	      if (i == nsum - 1) { /* done with this one */
-		memcpy(trgt.b, &value.b, width); /* store result */
-		trgt.b += width;
-		value.d = 0.0;
-	      }
-	    } /* end of for (i = 0) */
-	  } while (i != trgtndim);
-	} else			/* no summation: simple copy will do */
-	  do {
-	    offset = offset0;
-	    for (i = 0; i < trgtndim; i++) /* add LUX_ARRAY indices */
-	      if (subsc_type[i] == LUX_ARRAY)
-		offset += index[fromdim[i]][tally[i]]*stride[i];
-	    memcpy(trgt.b, src.b + offset, width);
-	    trgt.b += width;
-	    for (i = 0; i < trgtndim; i++) {
-	      if (i)
-		tally[i - 1] = 0;
-	      offset0 += step[i]; /* update for LUX_RANGE subscripts */
-	      tally[i]++;
-	      if (tally[i] != size[i])
-		break;
-	    }
-	  } while (i != trgtndim);
-	break;
-      case LUX_STRING_ARRAY:			/* string array */
-	do
-	{ offset = offset0;
-	  for (i = 0; i < trgtndim; i++) /* add LUX_ARRAY indices */
-	    if (subsc_type[i] == LUX_ARRAY)
-	      offset += index[fromdim[i]][tally[i]]*stride[i];
-	  if (src.sp[offset])
-	    *trgt.sp++ = strsave(src.sp[offset]);
-	  else
-	    *trgt.sp++ = NULL;
-	  for (i = 0; i < trgtndim; i++)
-	  { if (i)
-	      tally[i - 1] = 0;
-	    offset0 += step[i];	/* update for LUX_RANGE subscripts */
-	    tally[i]++;
-	    if (tally[i] != size[i])
-	      break; }
-	} while (i != trgtndim);
+              }
+              for (i = 0; i < trgtndim; i++) { /* update coordinates */
+                if (i)
+                  tally[i - 1] = 0;
+                offset0 += step[i]; /* update for LUX_RANGE subscripts */
+                tally[i]++;
+                if (tally[i] != size[i]) /* not yet done with this dimension */
+                  break;
+                if (i == nsum - 1) { /* done with this one */
+                  memcpy(trgt.b, &value.b, width); /* store result */
+                  trgt.b += width;
+                  value.d = 0.0;
+                }
+              } /* end of for (i = 0) */
+            } while (i != trgtndim);
+          } else			/* no summation: simple copy will do */
+            do {
+              offset = offset0;
+              for (i = 0; i < trgtndim; i++) /* add LUX_ARRAY indices */
+                if (subsc_type[i] == LUX_ARRAY)
+                  offset += index[fromdim[i]][tally[i]]*stride[i];
+              memcpy(trgt.b, src.b + offset, width);
+              trgt.b += width;
+              for (i = 0; i < trgtndim; i++) {
+                if (i)
+                  tally[i - 1] = 0;
+                offset0 += step[i]; /* update for LUX_RANGE subscripts */
+                tally[i]++;
+                if (tally[i] != size[i])
+                  break;
+              }
+            } while (i != trgtndim);
+        }
 	break;
       case LUX_FILEMAP:
 	if (file_map_has_offset(nsym))
@@ -1990,7 +1997,7 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
     }
   }
   int32_t lux_endian(int32_t, int32_t *);
-  if (class == LUX_FILEMAP && file_map_swap(nsym))
+  if (class_id == LUX_FILEMAP && file_map_swap(nsym))
     lux_endian(1, &iq);		/* Byte swap */
   return iq;
 
@@ -2112,14 +2119,13 @@ int32_t lux_symclass(int32_t narg, int32_t ps[])
   return result_sym;
 }
  /*------------------------------------------------------------------------- */
-int32_t lux_symdtype(narg,ps)
+int32_t lux_symdtype(int32_t narg, int32_t ps[])
  /*return the type of the argument symbol */
-int32_t narg,ps[];
 {
   int32_t	nsym, result_sym;
 
   nsym = ps[0];				/*the target symbol is the first */
-  result_sym = scalar_scratch(2);
+  result_sym = scalar_scratch(LUX_INT32);
   sym[result_sym].spec.scalar.l = sym[nsym].type;
   return result_sym;
 }
@@ -2137,7 +2143,7 @@ int32_t lux_num_elem(int32_t narg, int32_t ps[])
     temp = lux_long(1, ps + 1);	/* ensure LONG */
     switch (symbol_class(temp)) {
       case LUX_ARRAY:
-	axes = array_data(temp);
+	axes = (int32_t*) array_data(temp);
 	naxes = array_size(temp);
 	break;
       case LUX_SCALAR:
@@ -2199,16 +2205,15 @@ int32_t lux_num_elem(int32_t narg, int32_t ps[])
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-int32_t lux_num_dimen(narg,ps)
+int32_t lux_num_dimen(int32_t narg, int32_t ps[])
  /*return the number of dimensions in the argument symbol */
-int32_t narg,ps[];
 {
   int32_t	nsym, nd, result_sym;
 
   array	*h;
   nsym = ps[0];				/*the target symbol is the first */
-  result_sym = scalar_scratch(2);
-  switch (sym[nsym].class)	{			/*switch on class */
+  result_sym = scalar_scratch(LUX_INT32);
+  switch (symbol_class(nsym))	{			/*switch on class */
     case LUX_ARRAY: case LUX_FILEMAP:
         h = (array *) sym[nsym].spec.array.ptr;
         nd = h->ndim;
@@ -2293,7 +2298,7 @@ int32_t lux_redim_f(int32_t narg, int32_t ps[])
   int32_t	result, n, *args;
   int32_t	lux_redim(int32_t, int32_t []);
 
-  args = Malloc(narg*sizeof(int32_t));
+  args = (int32_t*) Malloc(narg*sizeof(int32_t));
   if (!args)
     return LUX_ERROR;
   result = copySym(ps[0]);
@@ -2356,7 +2361,7 @@ int32_t lux_redim(int32_t narg, int32_t ps[])
   memcpy(array_dims(nsym), dims, ndim*sizeof(int32_t));
   array_num_dims(nsym) = ndim;
   newSize = newSize*lux_type_size[array_type(nsym)] + sizeof(array);
-  data = Realloc(array_header(nsym), newSize);
+  data = (array*) Realloc(array_header(nsym), newSize);
   if (!data)
     return luxerror("Resizing of array memory failed", nsym);
   array_header(nsym) = data;
@@ -2391,16 +2396,16 @@ int32_t lux_concat_list(int32_t narg, int32_t ps[])
     }
   }
   /* we now have the number of elements of the resulting STRUCT or LIST */
-  
+
   if (isStruct) {		/* result is an LUX_LIST */
     symbol_class(result) = LUX_LIST;
-    list_symbols(result) = Malloc(nelem*sizeof(listElem));
+    list_symbols(result) = (listElem*) Malloc(nelem*sizeof(listElem));
     if (!list_symbols(result))
       return cerror(ALLOC_ERR, 0);
     symbol_memory(result) = nelem*sizeof(listElem);
   } else {
     symbol_class(result) = LUX_CLIST;
-    clist_symbols(result) = Malloc(nelem*sizeof(int16_t));
+    clist_symbols(result) = (int16_t*) Malloc(nelem*sizeof(int16_t));
     if (!clist_symbols(result))
       return cerror(ALLOC_ERR, 0);
     symbol_memory(result) = nelem*sizeof(int16_t);
@@ -2497,7 +2502,7 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
   int32_t	nd, j, i, dim[MAX_DIMS], nundef = 0;
   int32_t	iq, nsym, mq, topnd = 0, sflag = 0, n, nq;
   Symboltype toptype = LUX_INT8;
-  scalar	temp;
+  Scalar	temp;
 
   if (narg <= 0)
     return cerror(WRNG_N_ARG, 0);
@@ -2603,7 +2608,7 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
       dim[0] = mq;
       nsym = array_scratch(toptype, 1, dim);
       n = lux_type_size[toptype];
-      q2.b = array_data(nsym);
+      q2.b = (uint8_t*) array_data(nsym);
       for (i = 0; i < narg; i++) {
         iq = ps[i];
         switch (symbol_class(iq)) {
@@ -2706,7 +2711,7 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
 	  break;
         case LUX_ARRAY: case LUX_CARRAY: /* array */
 	  n = array_size(iq);
-	  q1.b = array_data(iq);
+	  q1.b = (uint8_t*) array_data(iq);
           break;
 	case LUX_CSCALAR:
 	  q1 = complex_scalar_data(iq);
@@ -2935,15 +2940,15 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
 /*------------------------------------------------------------------------- */
 int32_t lux_isscalar(int32_t narg, int32_t ps[])
 /* return 1 if symbol is a scalar, 0 otherwise */
-{ return (sym[*ps].class == LUX_SCALAR)? 1: 4; }
+{ return (symbol_class(*ps) == LUX_SCALAR)? 1: 4; }
 /*------------------------------------------------------------------------- */
 int32_t lux_isarray(int32_t narg, int32_t ps[])
 /* return 1 if symbol is an array, 0 otherwise */
-{ return (sym[*ps].class == LUX_ARRAY)? 1: 4; }
+{ return (symbol_class(*ps) == LUX_ARRAY)? 1: 4; }
 /*------------------------------------------------------------------------- */
 int32_t lux_isstring(int32_t narg, int32_t ps[])
 /* return 1 if symbol is a string, 0 otherwise */
-{ return (sym[*ps].class == LUX_STRING)? 1: 4; }
+{ return (symbol_class(*ps) == LUX_STRING)? 1: 4; }
 /*------------------------------------------------------------------------- */
 int32_t lux_subsc_subgrid(int32_t narg, int32_t ps[])
 /* like x(subsc,/inner) but with linear interpolation for fractional
@@ -2952,22 +2957,23 @@ int32_t lux_subsc_subgrid(int32_t narg, int32_t ps[])
    number of subscripts.  This is somewhat non-standard use of ps/narg!
    LS 19aug98 */
 {
-  uint8_t	class, type;
+  Symbolclass class_id;
+  uint8_t	type;
   int32_t	ndim, *dims, i, subsc[MAX_DIMS], nSubsc, iq, j, mid,
     stride[MAX_DIMS], index, tally[MAX_DIMS], step[2][MAX_DIMS];
   float	*coord[MAX_DIMS], d[MAX_DIMS];
-  scalar	value, cvalue;
+  Scalar	value, cvalue;
   pointer	src, out;
 
-  class = symbol_class(ps[narg]); /* class of target symbol */
-  switch (class) {
+  class_id = (Symbolclass) symbol_class(ps[narg]); /* class of target symbol */
+  switch (class_id) {
     default:
       return cerror(ILL_CLASS, ps[narg]);
     case LUX_ARRAY:		/* only numerical LUX_ARRAY is allowed */
       type = array_type(ps[narg]);
       if (type > LUX_DOUBLE)	/* string array */
 	return cerror(ILL_TYPE, ps[narg]);
-      src.l = array_data(ps[narg]);
+      src.l = (int32_t*) array_data(ps[narg]);
       ndim = array_num_dims(ps[narg]);
       dims = array_dims(ps[narg]);
       break;
@@ -2990,7 +2996,7 @@ int32_t lux_subsc_subgrid(int32_t narg, int32_t ps[])
 	} else
 	  nSubsc = array_size(iq);
 	subsc[i] = lux_float(1, &iq);
-	coord[i] = array_data(subsc[i]);
+	coord[i] = (float*) array_data(subsc[i]);
 	break;
       case LUX_SCALAR:
 	if (i) {
@@ -3021,7 +3027,7 @@ int32_t lux_subsc_subgrid(int32_t narg, int32_t ps[])
   if (symbol_class(subsc[0]) == LUX_ARRAY) {
     iq = array_scratch(type == LUX_DOUBLE? LUX_DOUBLE: LUX_FLOAT,
 		       array_num_dims(subsc[0]), array_dims(subsc[0]));
-    out.f = array_data(iq);
+    out.f = (float*) array_data(iq);
   } else {
     iq = scalar_scratch(type == LUX_DOUBLE? LUX_DOUBLE: LUX_FLOAT);
     out.f = &scalar_value(iq).f;
@@ -3152,14 +3158,15 @@ int32_t lux_subsc_subgrid(int32_t narg, int32_t ps[])
   return iq;
 }
 /*------------------------------------------------------------------------- */
-int32_t extractNumerical(pointer src, pointer trgt, int32_t type, int32_t ndim, int32_t *dims,
-		     int32_t *coords, int32_t nAxes, int32_t *axes)
+int32_t extractNumerical(pointer src, pointer trgt, Symboltype type,
+                         int32_t ndim, int32_t *dims, int32_t *coords,
+                         int32_t nAxes, int32_t *axes)
 {
   loopInfo	info;
 
   setupDimensionLoop(&info, ndim, dims, type, nAxes, axes, &src,
 		     SL_EACHCOORD);
-  
+
   subdataLoop(coords, &info);
 
   do {
@@ -3198,7 +3205,7 @@ int32_t lux_roll(int32_t narg, int32_t ps[])
       result -= (result/nd)*nd;
     /* we must construct an array containing the target list of dimensions */
     iq = array_scratch(LUX_INT32, 1, &nd);
-    src.l = array_data(iq);
+    src.l = (int32_t*) array_data(iq);
     for (i = 0; i < nd; i++) {
       *src.l = i + result;
       if (*src.l >= nd)
@@ -3215,7 +3222,7 @@ int32_t lux_roll(int32_t narg, int32_t ps[])
   } else
     return cerror(ILL_CLASS, ps[1]);
 
-  if (standardLoop(ps[0], iq, SL_KEEPTYPE | SL_AXESBLOCK, 0, &srcinfo,
+  if (standardLoop(ps[0], iq, SL_KEEPTYPE | SL_AXESBLOCK, LUX_INT8, &srcinfo,
 		   &src, &result, &trgtinfo, &trgt) == LUX_ERROR)
     return LUX_ERROR;
 

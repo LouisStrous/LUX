@@ -20,7 +20,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 /* LUX routines for reading IDL Save files
    Louis Strous 19sep98 */
 #include <stdio.h>
-#include "action.h"
+#include "action.hh"
 
 int32_t lux_idlrestore(int32_t narg, int32_t ps[])
 /* IDLRESTORE,<filename> restores all variables from the IDL Save file
@@ -29,11 +29,12 @@ int32_t lux_idlrestore(int32_t narg, int32_t ps[])
 {
   uint8_t	bytes[8];
   char	*p;
-  int32_t	ints[3], dims[MAX_DIMS], n, var, ndim, type, nread;
+  int32_t	ints[3], dims[MAX_DIMS], n, var, ndim, nread;
+  Symboltype type;
   FILE	*fp;
   void	endian(void *, int32_t, int32_t);
-  int32_t	installString(char *);
-  scalar	value;
+  int32_t	installString(char const*);
+  Scalar	value;
   pointer	pp, data;
 
   if (!symbol_class(ps[0]) == LUX_STRING)
@@ -43,7 +44,7 @@ int32_t lux_idlrestore(int32_t narg, int32_t ps[])
   fp = fopen(expand_name(string_value(ps[0]), NULL), "r");
   if (!fp)
     return cerror(ERR_OPEN, ps[0]);
-  
+
   fread(bytes, 1, 4, fp);
   if (ferror(fp) || feof(fp)) {
     fclose(fp);
@@ -73,7 +74,7 @@ int32_t lux_idlrestore(int32_t narg, int32_t ps[])
   fseek(fp, ints[0], SEEK_SET);	/* go to the indicated offset */
 
   nread = 0;
-  
+
   do {
     fread(ints, 4, 2, fp);	/* read 2 ints */
 #if !LITTLEENDIAN
@@ -91,12 +92,12 @@ int32_t lux_idlrestore(int32_t narg, int32_t ps[])
     }
 
     nread++;
-    
+
     fread(ints, 4, 3, fp);	/* read 3 ints */
 #if !LITTLEENDIAN
     endian(ints, 12, LUX_INT32);
 #endif
-    
+
     n = ints[2];		/* size of name */
     fread(curScrat, 1, n, fp);
     curScrat[n] = '\0';
@@ -115,7 +116,7 @@ int32_t lux_idlrestore(int32_t narg, int32_t ps[])
     endian(ints, 12, LUX_INT32);
 #endif
     if (ints[1] == 20) {	/* array */
-      type = ints[0];
+      type = (Symboltype) ints[0];
 
       fseek(fp, 12, SEEK_CUR);
       fread(ints, 4, 1, fp);
@@ -131,11 +132,11 @@ int32_t lux_idlrestore(int32_t narg, int32_t ps[])
       endian(dims, 4*ndim, LUX_INT32);
 #endif
 
-      redef_array(var, type - 1, ndim, dims);
+      redef_array(var, (Symboltype) (type - 1), ndim, dims);
       fseek(fp, 4, SEEK_CUR);
 
       n = array_size(var);
-      data.b = array_data(var);
+      data.b = (uint8_t*) array_data(var);
       switch (type) {
 	case 1:			/* bytes stored as longs (!) */
 	  fseek(fp, 4, SEEK_CUR); /* skip extra int32_t */
@@ -238,8 +239,7 @@ int32_t lux_idlread_f(int32_t narg, int32_t ps[])
   int32_t	ints[3], dims[MAX_DIMS], n, var, ndim, type;
   FILE	*fp;
   void	endian(void *, int32_t, int32_t);
-  int32_t	installString(char *);
-  scalar	value;
+  Scalar	value;
   pointer	pp, data;
 
   if (!symbol_class(ps[1]) == LUX_STRING)
@@ -249,7 +249,7 @@ int32_t lux_idlread_f(int32_t narg, int32_t ps[])
   fp = fopen(expand_name(string_value(ps[1]), NULL), "r");
   if (!fp)
     return LUX_ZERO;
-  
+
   fread(bytes, 1, 4, fp);
   if (ferror(fp) || feof(fp)) {
     fclose(fp);
@@ -327,11 +327,11 @@ int32_t lux_idlread_f(int32_t narg, int32_t ps[])
     endian(dims, 4*ndim, LUX_INT32);
 #endif
 
-    redef_array(var, type - 1, ndim, dims);
+    redef_array(var, (Symboltype) (type - 1), ndim, dims);
     fseek(fp, 4, SEEK_CUR);
 
     n = array_size(var);
-    data.b = array_data(var);
+    data.b = (uint8_t*) array_data(var);
     switch (type) {
       case 1:			/* bytes stored as longs (!) */
 	fseek(fp, 4, SEEK_CUR); /* skip extra int32_t */

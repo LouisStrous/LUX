@@ -55,7 +55,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <strings.h>		/* for bzero(), bcopy() */
 
-#include "lux_structures.h"	/* for RAS FITS stuff */
+#include "lux_structures.hh"	/* for RAS FITS stuff */
 #include <stdio.h>		/* for printf(), puts(), FILE, fopen(), */
 				/* sscanf(), vsprintf(), sprintf(), fputs(), */
 				/* fputc(), stdout, fflush(), fprintf(), */
@@ -86,10 +86,10 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #if HAVE_REGEX_H
 #include <regex.h>		/* for regcomp(), regfree(), regexec() */
 #endif
-#include "action.h"
-#include "install.h"
-#include "editor.h"		/* for BUFSIZE */
-#include "format.h"
+#include "action.hh"
+#include "install.hh"
+#include "editor.hh"		/* for BUFSIZE */
+#include "format.hh"
 #include <errno.h>
 
 #define FMT_INSTALL	1
@@ -98,7 +98,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 extern	int32_t	noioctl, iformat, fformat, sformat, cformat, tformat,
   noTrace;
 int32_t	lux_swab(int32_t, int32_t *);
-int32_t	swapl(int32_t *, int32_t);
+int32_t	swapl(void *, int32_t);
 extern uint8_t	line2[];
 extern char	expname[], batch;
 extern int32_t	nest;	/* batch flag */
@@ -106,10 +106,10 @@ extern FILE	*inputStream;
 extern int32_t	 error_extra;
 int32_t	type_ascii(int32_t, int32_t [], FILE *),
   read_ascii(int32_t, int32_t [], FILE *, int32_t),
-  getNewLine(char *, size_t, char *, char),
+  getNewLine(char *, size_t, char const *, char),
   redef_string(int32_t, int32_t);
 void	zerobytes(void *, int32_t), endian(void *, int32_t, int32_t),
-  fprintw(FILE *fp, char *string);
+  fprintw(FILE *fp, char const* string);
 extern	int32_t scrat[];				/* scratch storage, also used 
 						 in anatest.c */
 /* some tables for lun type files */
@@ -131,10 +131,10 @@ static int32_t	runlengthflag = 0;
 
 char	*fmttok(char *);
 
-int32_t	anacrunch(unsigned char *, short [], int32_t, int32_t, int32_t, int32_t),
-	anacrunch8(unsigned char *, uint8_t [], int32_t, int32_t, int32_t, int32_t);
-int32_t	anacrunchrun(unsigned char *, short [], int32_t, int32_t, int32_t, int32_t),
-	anacrunchrun8(unsigned char *, uint8_t [], int32_t, int32_t, int32_t, int32_t);
+int32_t	anacrunch(uint8_t *, int16_t [], int32_t, int32_t, int32_t, int32_t),
+	anacrunch8(uint8_t *, uint8_t [], int32_t, int32_t, int32_t, int32_t);
+int32_t	anacrunchrun(uint8_t *, int16_t [], int32_t, int32_t, int32_t, int32_t),
+	anacrunchrun8(uint8_t *, uint8_t [], int32_t, int32_t, int32_t, int32_t);
 #if SIZEOF_LONG_LONG_INT == 8	/* 64-bit integers */
 int32_t	anacrunch32(uint8_t *, int32_t [], int32_t, int32_t, int32_t, int32_t);
 #endif
@@ -142,16 +142,16 @@ int32_t	anacrunch32(uint8_t *, int32_t [], int32_t, int32_t, int32_t, int32_t);
 int32_t	byte_count;		/* also used by tape.c, which is only */
 				/* included if HAVE_SYS_MTIO_H is defined */
 
-void read_a_number_fp(FILE *, scalar *, int32_t *);
+void read_a_number_fp(FILE *, Scalar *, Symboltype *);
 
 #define ASK_MORE	0
 #define ERROR_EOF	1
 #define CONT_EOF	2
 #define TRUNCATE_EOF	3
 /*------------------------------------------------------------------------- */
-char *expand_name(char *name, char *extension)
+char *expand_name(char const* name, char const* extension)
  /* expands environment variables (preceded by $ or ~) at the start of a file
-    name, i.e. filenames like  $HOME/test.dat, $FILE, and ~/Scratch.  
+    name, i.e. filenames like  $HOME/test.dat, $FILE, and ~/Scratch.
     The environment name may have multiple / at the end; the expanded name
     will only have one at the corresponding position.  Final \n is stripped.
     If <extension> is unequal to NULL, it is appended to the file name if it
@@ -288,7 +288,7 @@ int32_t lux_spawn_f(int32_t narg, int32_t ps[])		/* execute a shell command */
   return result;
  }
 /*------------------------------------------------------------------------- */
-FILE *openPathFile(char *name, int32_t mode)
+FILE *openPathFile(char const* name, int32_t mode)
 /* If name starts with $, then expands environment variable and tries
   to open file with resulting name.  If name starts with /, then searches
   in named directory (full path name).  Else, searches for the named file in
@@ -312,7 +312,7 @@ FILE *openPathFile(char *name, int32_t mode)
   FILE	*fin;
   extern int32_t	echo, trace, step, executeLevel, traceMode;
 
-  copy = strsave(name);
+  copy = strsave((char*) name);
   if (mode & FIND_LOWER) {
     p = copy;
     while (*p) {
@@ -518,7 +518,7 @@ int32_t format_check(char *format, char **next, int32_t store)
      lux_delete(1, &iformat);
      symbol_class(iformat) = LUX_SCAL_PTR;
      scal_ptr_type(iformat) = LUX_TEMP_STRING;
-     scal_ptr_pointer(iformat).b = malloc(n + 1);
+     scal_ptr_pointer(iformat).b = (uint8_t*) malloc(n + 1);
      symbol_memory(iformat) = n + 1;
      strncpy(p = scal_ptr_pointer(iformat).s, format, n);
      p[n] = '\0';
@@ -526,7 +526,7 @@ int32_t format_check(char *format, char **next, int32_t store)
      lux_delete(1, &fformat);
      symbol_class(fformat) = LUX_SCAL_PTR;
      scal_ptr_type(fformat) = LUX_TEMP_STRING;
-     scal_ptr_pointer(fformat).b = Malloc(n + 1);
+     scal_ptr_pointer(fformat).b = (uint8_t*) Malloc(n + 1);
      symbol_memory(fformat) = n + 1;
      strncpy(p = scal_ptr_pointer(fformat).s, format, n);
      p[n] = '\0';
@@ -535,7 +535,7 @@ int32_t format_check(char *format, char **next, int32_t store)
      lux_delete(1, &sformat);
      symbol_class(sformat) = LUX_SCAL_PTR;
      scal_ptr_type(sformat) = LUX_TEMP_STRING;
-     scal_ptr_pointer(sformat).b = malloc(n + 1);
+     scal_ptr_pointer(sformat).b = (uint8_t*) malloc(n + 1);
      symbol_memory(sformat) = n + 1;
      strncpy(p = scal_ptr_pointer(sformat).s, format, n);
      p[n] = '\0';
@@ -565,7 +565,7 @@ int32_t input_format_check(char *format, char **next, char **widths, int32_t *da
    <stdlib.h>: strtol()
  */
 {
-  int32_t	big, explicit;
+  int32_t	big, is_explicit;
   char	*p, *p2;
 
   /* skip initial whitespace: not all compilers handle it the same way */
@@ -586,9 +586,9 @@ int32_t input_format_check(char *format, char **next, char **widths, int32_t *da
       break;
     format++;
   }
-  explicit = (format - p2);
-  if (explicit > 1)
-    explicit = (format - p);
+  is_explicit = (format - p2);
+  if (is_explicit > 1)
+    is_explicit = (format - p);
   if (*format == '*') {
     *suppress = 1;
     format++;
@@ -668,7 +668,7 @@ int32_t input_format_check(char *format, char **next, char **widths, int32_t *da
     *number *= strtol(format, &format, 10);
   if (next)
     *next = format;
-  return explicit;
+  return is_explicit;
 }
 /*------------------------------------------------------------------------- */
 int32_t lux_format_set(int32_t narg, int32_t ps[])
@@ -717,7 +717,7 @@ int32_t lux_format_set(int32_t narg, int32_t ps[])
 	/* else we add it to the last one */
 	p = scal_ptr_pointer(iq);
 	n = strlen(fmt) + 1;
-	p.s = realloc(p.s, strlen(p.s) + n);
+	p.s = (char*) realloc(p.s, strlen(p.s) + n);
 	strcat(p.s, fmt);
 	symbol_memory(iq) += n;
 	fmt = fmttok(NULL);
@@ -725,26 +725,26 @@ int32_t lux_format_set(int32_t narg, int32_t ps[])
       }
       p = scal_ptr_pointer(iq);
       n = strlen(fmt) + 1;
-      p.s = realloc(p.s, n);
+      p.s = (char*) realloc(p.s, n);
       strcpy(p.s, fmt);
       symbol_memory(iq) = n;
       fmt = fmttok(NULL);
     }
   } else {			/* no arguments: restore defaults */
     p = scal_ptr_pointer(fformat);
-    p.s = realloc(p.s, 7);
+    p.s = (char*) realloc(p.s, 7);
     strcpy(p.s, "%14.7g");
     symbol_memory(fformat) = 7;
     p = scal_ptr_pointer(iformat);
-    p.s = realloc(p.s, 5);
+    p.s = (char*) realloc(p.s, 5);
     strcpy(p.s, "%10jd");
     symbol_memory(iformat) = 5;
     p = scal_ptr_pointer(sformat);
-    p.s = realloc(p.s, 3);
+    p.s = (char*) realloc(p.s, 3);
     strcpy(p.s, "%s");
     symbol_memory(sformat) = 3;
     p = scal_ptr_pointer(cformat);
-    p.s = realloc(p.s, 7);
+    p.s = (char*) realloc(p.s, 7);
     strcpy(p.s, "%14.7z");
     symbol_memory(cformat) = 7;
   }
@@ -766,7 +766,7 @@ void resetPager(void)
   pager = -1;
 }
 /*------------------------------------------------------------------------- */
-void printwf(char *fmt, ...)
+void printwf(char const* fmt, ...)
 /* Like printw, but with a format string and multiple argument strings. */
 /* LS 12jul95 */
 /* Headers:
@@ -885,7 +885,7 @@ void type_ascii_one(int32_t symbol, FILE *fp)
     break;
   case LUX_ARRAY:
     j = array_size(symbol);
-    ptr.b = array_data(symbol);
+    ptr.b = (uint8_t*) array_data(symbol);
     switch (array_type(symbol)) {
     case LUX_INT8:
       fmttok(fmt_integer);
@@ -1023,7 +1023,7 @@ void type_ascii_one(int32_t symbol, FILE *fp)
     }
     break;
   case LUX_CARRAY:
-    ptr.cf = array_data(symbol);
+    ptr.cf = (floatComplex*) array_data(symbol);
     n = array_size(symbol);
     switch (array_type(symbol)) {
     case LUX_CFLOAT:
@@ -1145,7 +1145,7 @@ int32_t type_ascii(int32_t narg, int32_t ps[], FILE *fp)
   char	*fmttok(char *);
   extern formatInfo	theFormat;
 
-  theFormat.type = 0;
+  theFormat.type = (fmtType) 0;
   theFormat.start = theFormat.next = NULL;
   for (i = 0; i < narg; i++) {
     iq = ps[i];
@@ -1278,7 +1278,7 @@ int32_t type_formatted_ascii(int32_t narg, int32_t ps[], FILE *fp)
 	  break;
 	case LUX_ARRAY:
 	  n = array_size(iq);
-	  p.l = array_data(iq);
+	  p.l = (int32_t*) array_data(iq);
 	  break;
 	case LUX_CSCALAR:
 	  n = 1;
@@ -1987,7 +1987,7 @@ int32_t lux_close(int32_t narg, int32_t ps[]) /* close subroutine */
   return 1;
 }
 /*------------------------------------------------------------------------- */
-int32_t open_file(int32_t narg, int32_t ps[], char *access, char function)
+int32_t open_file(int32_t narg, int32_t ps[], char const* access, char function)
  /* generic file opening routine, called by OPENR, OPENW, OPENU routines
     and functions   LS 8jul92
     openu must open a file for reading and writing anywhere in the file.
@@ -2068,42 +2068,42 @@ int32_t lux_openr_f(int32_t narg, int32_t ps[])/* openr subroutine */
  /* associates a file (or a stream) with a lun */
  /* function version supporting environment variables LS 7jul92 */
 {
-  return open_file(narg, ps, "r", 1); 
+  return open_file(narg, ps, "r", 1);
 }
 /*------------------------------------------------------------------------- */
 int32_t lux_openw_f(int32_t narg, int32_t ps[])/* openw subroutine */
  /* like openr but for (over)writing */
 {
-  return open_file(narg, ps, "w", 1); 
+  return open_file(narg, ps, "w", 1);
 }
 /*------------------------------------------------------------------------- */
 int32_t lux_openu_f(int32_t narg, int32_t ps[])/* openu subroutine */
 /* like openr but for updating */
 {
-  return open_file(narg, ps, "u", 1); 
+  return open_file(narg, ps, "u", 1);
 }
 /*------------------------------------------------------------------------- */
-int32_t lux_openr(int32_t narg, int32_t ps[])/* openr subroutine */		
+int32_t lux_openr(int32_t narg, int32_t ps[])/* openr subroutine */
 /* intended mainly for reading ASCII files in old LUX, but may be useful
    for streams in general for UNIX version */
 /* associates a file (or a stream) with a lun */
 {
-  return open_file(narg, ps, "r", 0); 
+  return open_file(narg, ps, "r", 0);
 }
 /*------------------------------------------------------------------------- */
-int32_t lux_openw(int32_t narg, int32_t ps[])/* openw subroutine */		
+int32_t lux_openw(int32_t narg, int32_t ps[])/* openw subroutine */
 /* like openr but for output */
 {
-  return open_file(narg, ps, "w", 0); 
+  return open_file(narg, ps, "w", 0);
 }
 /*------------------------------------------------------------------------- */
-int32_t lux_openu(int32_t narg, int32_t ps[])/* openu subroutine */		
+int32_t lux_openu(int32_t narg, int32_t ps[])/* openu subroutine */
 /* like openr but for updating */
 {
-  return open_file(narg, ps, "u", 0); 
+  return open_file(narg, ps, "u", 0);
 }
 /*------------------------------------------------------------------------- */
-int32_t lux_rewindf(int32_t narg, int32_t ps[]) /*rewind file subroutine */		
+int32_t lux_rewindf(int32_t narg, int32_t ps[]) /*rewind file subroutine */
 /* Headers:
    <stdio.h>: fseek()
  */
@@ -2221,11 +2221,11 @@ int32_t read_ascii(int32_t narg, int32_t ps[], FILE *fp, int32_t flag)
    <stdlib.h>: realloc()
  */
 {
-  int32_t	i, iq, n, c, type, nelem;
+  int32_t	i, iq, n, c, nelem;
+  Symboltype type;
   char	*p;
-  scalar	value;
+  Scalar	value;
   pointer	pp;
-  void read_a_number_fp(FILE *, scalar *, int32_t *);
 
   index_cnt = 0;		/* keep track of the number of read elements */
   for (i = 0; i < narg; i++) {	/* loop over all arguments */
@@ -2325,7 +2325,7 @@ int32_t read_ascii(int32_t narg, int32_t ps[], FILE *fp, int32_t flag)
 	break;
       case LUX_ARRAY:
 	nelem = array_size(iq);
-	pp.b = array_data(iq);
+	pp.b = (uint8_t*) array_data(iq);
 	if (isNumericalType(array_type(iq))) {
 	  while (nelem--) {
 	    /* for some strange reason feof(stdin) can return non-zero */
@@ -2433,7 +2433,7 @@ int32_t read_ascii(int32_t narg, int32_t ps[], FILE *fp, int32_t flag)
 	    if (!n)		/* we ran out of room */
 	      puts("WARNING -- an input string was too large to handle.");
 	    n = p - curScrat;
-	    *pp.sp = realloc(*pp.sp, n + 1);
+	    *pp.sp = (char*) realloc(*pp.sp, n + 1);
 	    strncpy(*pp.sp, curScrat, n);
 	    (*pp.sp)[n] = '\0'; /* terminate */
 	    pp.sp++;
@@ -2446,7 +2446,7 @@ int32_t read_ascii(int32_t narg, int32_t ps[], FILE *fp, int32_t flag)
 	    n = strlen(curScrat);
 	    if (curScrat[n - 1] == '\n')
 	      curScrat[--n] = '\0'; /* suppress final \n, if any */
-	    *pp.sp = realloc(*pp.sp, n + 1);
+	    *pp.sp = (char*) realloc(*pp.sp, n + 1);
 	    strncpy(*pp.sp, curScrat, n + 1);
 	      pp.sp++;
 	  }
@@ -2459,7 +2459,7 @@ int32_t read_ascii(int32_t narg, int32_t ps[], FILE *fp, int32_t flag)
   return LUX_OK;
 }
 /*------------------------------------------------------------------------- */
-int32_t gscanf(void **source, char *format, void *arg, int32_t isString)
+int32_t gscanf(void **source, char const* format, void *arg, int32_t isString)
 /* Headers:
    <string.h>: strlen(), strcpy(), strcat()
    <stdlib.h>: realloc()
@@ -2472,7 +2472,7 @@ int32_t gscanf(void **source, char *format, void *arg, int32_t isString)
 
   i = strlen(format) + 2;
   if (i > nformat) {
-    aformat = realloc(aformat, i);
+    aformat = (char*) realloc(aformat, i);
     nformat = i;
     if (!aformat) {
       cerror(ALLOC_ERR, 0);
@@ -2530,18 +2530,19 @@ int32_t read_formatted_ascii(int32_t narg, int32_t ps[], void *ptr, int32_t show
  */
 {
   char	*fmt, *scr, *p, c, *ptr0;
-  int32_t	type, string2, pr, i, len, nout = 0;
+  int32_t	string2, pr, i, len, nout = 0;
+  Symboltype type;
   double	d, k, f, d2;
   pointer	trgt;
   void	**ptr2;
   static char	*keyboard = NULL;
   extern formatInfo	theFormat;
-  int32_t	lux_replace(int32_t, int32_t), to_scratch_array(int32_t, int32_t, int32_t, int32_t *);
+  int32_t	lux_replace(int32_t, int32_t);
 
   if (!isString) {
     if ((FILE *) ptr == stdin) { /* reading from the keyboard */
       if (!keyboard) {
-	keyboard = malloc(BUFSIZE);
+	keyboard = (char*) malloc(BUFSIZE);
 	if (!keyboard)
 	  return showerrors? cerror(ALLOC_ERR, 0): 0;
       }
@@ -2625,21 +2626,21 @@ int32_t read_formatted_ascii(int32_t narg, int32_t ps[], void *ptr, int32_t show
 	      return nout;
 	  }
 	  to_scratch_array(*ps, type, 1, &theFormat.count);
-	  trgt.l = array_data(*ps);
+	  trgt.l = (int32_t*) array_data(*ps);
 	} else {		/* only one item */
 	  if (type == LUX_TEMP_STRING) {
 	    undefine(*ps);
 	    symbol_class(*ps) = LUX_STRING;
 	    string_type(*ps) = LUX_TEMP_STRING;
 	    symbol_memory(*ps) = 1;
-	    string_value(*ps) = malloc(1);
+	    string_value(*ps) = (char*) malloc(1);
 	    trgt.s = string_value(*ps);
 	  } else if (isComplexType(type)) {
 	    undefine(*ps);
 	    symbol_class(*ps) = LUX_CSCALAR;
 	    complex_scalar_type(*ps) = type;
 	    complex_scalar_memory(*ps) = lux_type_size[type];
-	    complex_scalar_data(*ps).cf = malloc(complex_scalar_memory(*ps));
+	    complex_scalar_data(*ps).cf = (floatComplex*) malloc(complex_scalar_memory(*ps));
 	    trgt.cf = complex_scalar_data(*ps).cf;
 	  } else {
 	    undefine(*ps);
@@ -2693,13 +2694,13 @@ int32_t read_formatted_ascii(int32_t narg, int32_t ps[], void *ptr, int32_t show
 	    p = scr + strlen(scr) + 1; /* beyond specification */
 	    if (!(len = gscanf(&ptr, scr, p, isString))) /* read */
 	      return showerrors? cerror(READ_ERR, 0): nout;
-	    if (*theFormat.spec_char == 'S' 
+	    if (*theFormat.spec_char == 'S'
 		&& len < theFormat.width /* not yet at field width */
 		&& *(char *) ptr == '\n') /* and we have a \n */
 	      ptr = (void *) ((char *) ptr + 1); /* skip the \n */
-	    
+
 	    symbol_memory(*ps) = strlen(p) + 1;
-	    trgt.s = realloc(trgt.s, symbol_memory(*ps));
+	    trgt.s = (char*) realloc(trgt.s, symbol_memory(*ps));
 	    if (!trgt.s)
 	      return showerrors? cerror(ALLOC_ERR, 0): nout;
 	    string_value(*ps) = trgt.s;
@@ -2923,16 +2924,17 @@ int32_t lux_assoc_input(int32_t narg, int32_t ps[])
    <stdio.h>: FILE, puts(), printf(), fseek(), fread()
  */
 {
-  int32_t	iq, type, dfile, *file, dout = 0, lun, i, offset;
+  int32_t	iq, dfile, *file, dout = 0, lun, i, offset;
   int32_t	tally[8], ystep[8], rstep[8], *step, n, done, doff;
   int32_t	off[8], outdims[8], axes[8], *out;
   int32_t	len, nsym, baseOffset;
+  Symboltype type;
   pointer	q;
   array	*h;
   FILE	*fp;
   char	warn = 0;
   extern int32_t	range_warn_flag;
-  
+
   step = rstep;
   out = outdims;
   offset = 0;
@@ -3027,7 +3029,7 @@ int32_t lux_assoc_input(int32_t narg, int32_t ps[])
 				/* set up step sizes etc. */
   for (i = 0; i < dout; i++) tally[i] = 1;
   n = *ystep = 1; for (i = 1; i < doff; i++) ystep[i] = (n *= file[i - 1]);
-  n = lux_type_size[type]; 
+  n = lux_type_size[type];
   for (i = 0; i < doff; i++) offset += off[i]*ystep[i];  offset *= n;
   for (i = 0; i < dout; i++) step[i] = ystep[axes[i]]*n;
   for (i = dout - 1; i; i--) step[i] -= step[i - 1]*out[i - 1];
@@ -3081,7 +3083,7 @@ int32_t lux_assoc_output(int32_t iq, int32_t jq, int32_t offsym, int32_t axsym)
      case LUX_FLOAT: jq = lux_float(1, &jq); break;
      case LUX_DOUBLE: jq = lux_double(1, &jq); break; }
  }
- switch (sym[jq].class)
+ switch (symbol_class(jq))
  { case LUX_SCAL_PTR: case LUX_SCALAR:
      done = ddat = 1;
      dat = &done;
@@ -3110,7 +3112,7 @@ int32_t lux_assoc_output(int32_t iq, int32_t jq, int32_t offsym, int32_t axsym)
  if (!offsym && axsym >= 0) { offset = 0;  doff = 0; }
  else
  { if (axsym == -1)
-   { if (sym[offsym].class == LUX_ARRAY)		/* coordinate offset */
+   { if (symbol_class(offsym) == LUX_ARRAY)		/* coordinate offset */
      { h = HEAD(offsym);
        GET_SIZE(doff, h->dims, h->ndim);		/* #offset elements */
        if (doff < dfile || doff > dfile + 1)
@@ -3186,10 +3188,10 @@ FILE *fopenr_sym(int32_t nsym)	/* internal utility */
    <stdio.h>: FILE, NULL
  */
 {
-  FILE *fopen(),*fin;
+  FILE *fin;
 
   if (!symbolIsStringScalar(nsym)) {
-    cerror(NEED_STR, nsym); 
+    cerror(NEED_STR, nsym);
     return NULL;
   }
 						 /* try to open the file */
@@ -3255,7 +3257,7 @@ void fz_get_header(FILE *fin, int32_t nsym, int32_t n) /* internal utility */
   while (*q && n--)
     q++;
   symbol_memory(nsym) = (q - string_value(nsym)) + 1;
-  string_value(nsym) = realloc(string_value(nsym), symbol_memory(nsym));
+  string_value(nsym) = (char*) realloc(string_value(nsym), symbol_memory(nsym));
   if (*q)
     *q = '\0';			/* proper termination */
 }
@@ -3305,15 +3307,14 @@ int32_t lux_fzinspect(int32_t narg, int32_t ps[])		/* fzinspect subroutine */
   fzHead	*fh;
   FILE	*fin;
   struct stat statbuf;
-  int32_t	redef_array(int32_t, int32_t, int32_t, int32_t *);
 
   /* define the return variable param, a long vector with 11 elements */
   /* pre-load with error condition in case we have a problem reading the
      file */
   i = 11;
-  if (redef_array(ps[1], 2, 1, &i) != 1)
+  if (redef_array(ps[1], LUX_INT32, 1, &i) != 1)
     return -1;
-  q1 = array_data(ps[1]);
+  q1 = (int32_t*) array_data(ps[1]);
   q1[0] = -1;
   for (i = 1; i < 11; i++)
     q1[i] = 0;
@@ -3363,7 +3364,7 @@ int32_t fzhead(int32_t narg, int32_t ps[], int32_t flag) /* fzhead subroutine */
  FILE	*fin;
 
  flag = flag & !error_extra;
- if ( sym[ ps[0] ].class != 2 ) return (flag)? -1: cerror(NEED_STR, *ps);
+ if ( symbol_class( ps[0] ) != 2 ) return (flag)? -1: cerror(NEED_STR, *ps);
  name = (char *) sym[ps[0] ].spec.array.ptr;
 						 /* try to open the file */
  if ((fin = fopen(expand_name(name, NULL),"r")) == NULL) {
@@ -3403,7 +3404,8 @@ int32_t fzread(int32_t narg, int32_t ps[], int32_t flag) /* fzread subroutine */
    <stdlib.h>: malloc()
  */
 {
-  int32_t	iq, n, nb, type, i, mq, nq, sbit, nelem, wwflag=0;
+  int32_t	iq, n, nb, i, mq, nq, sbit, nelem, wwflag=0;
+  Symboltype type;
   char	*p, *name;
   fzHead	*fh;
   pointer q1;
@@ -3415,11 +3417,11 @@ int32_t fzread(int32_t narg, int32_t ps[], int32_t flag) /* fzread subroutine */
 #if SIZEOF_LONG_LONG_INT == 8	/* 64-bit integers */
   int32_t	anadecrunch32(uint8_t *, int32_t [], int32_t, int32_t, int32_t);
 #endif
- 
+
   struct compresshead {
     int32_t     tsize, nblocks, bsize;
     uint8_t    slice_size, type; } ch;
- 
+
 #if WORDS_BIGENDIAN
   union { int32_t i;  uint8_t b[4];} lmap;
 #endif
@@ -3445,7 +3447,7 @@ int32_t fzread(int32_t narg, int32_t ps[], int32_t flag) /* fzread subroutine */
   if (ck_synch_hd(fin, fh, &wwflag) < 0)
     return LUX_ERROR;
 
-  type = fh->datyp;		/* data type */
+  type = (Symboltype) fh->datyp;		/* data type */
 
   /* compute size of array */
   nelem = 1;
@@ -3468,13 +3470,13 @@ int32_t fzread(int32_t narg, int32_t ps[], int32_t flag) /* fzread subroutine */
     fclose(fin);
     return LUX_ERROR;
   }
- 
-  q1.l = array_data(iq);
+
+  q1.l = (int32_t*) array_data(iq);
 				 /* big branch on compression flag */
   if ((fh->subf & 1) == 1 ) {	/* compression case */
-    /* read in the compression header */ 
+    /* read in the compression header */
     nq = fread(&ch, 1, 14, fin);
-    if (nq != 14 && !flag) 
+    if (nq != 14 && !flag)
       perror("error reading in compression header");
 #if WORDS_BIGENDIAN
     endian(&ch.tsize, sizeof(int32_t), LUX_INT32);
@@ -3548,7 +3550,7 @@ int32_t fzread(int32_t narg, int32_t ps[], int32_t flag) /* fzread subroutine */
 	if (nq)
 	  endian(&mq, sizeof(int32_t), LUX_INT32);
 	if (mq) {
-	  *q1.sp = malloc(mq + 1);
+	  *q1.sp = (char*) malloc(mq + 1);
 	  if (!*q1.sp) {
 	    fclose(fin);
 	    return flag? LUX_ERROR: cerror(ALLOC_ERR, 0);
@@ -3592,12 +3594,13 @@ int32_t fzwrite(int32_t narg, int32_t ps[], int32_t flag) /* fzwrite subroutine 
    <stdlib.h>: malloc()
  */
 {
-  int32_t	iq, n, nd, j, type, mq, i, sz;
-  char	*name, *p, safe, *safename;
+  int32_t	iq, n, nd, j, type, mq, i, sz, safe;
+  char const	*p, *name;
+  char* safename;
   fzHead	*fh;
   pointer q1, q2;
   FILE	*fout;
-  static char	*safeFile = "Safe_file";
+  static char const* safeFile = "Safe_file";
 					 /* first arg. must be an array */
   iq = ps[0];
   if (symbol_class(iq) != LUX_ARRAY)
@@ -3614,12 +3617,13 @@ int32_t fzwrite(int32_t narg, int32_t ps[], int32_t flag) /* fzwrite subroutine 
   if (safe) {
     p = strrchr(name, '/');
     if (p) {
-      *p = '\0';		/* temporary end */
-      safename = (char *) malloc(strlen(name) + 11);
-      strcpy(safename, name);
-      strcat(safename, "/");
-      strcat(safename, safeFile);
-      *p = '/';
+      char *q;
+      q = safename = (char *) malloc(strlen(name) + 11);
+      memcpy(q, name, p - name);
+      q += p - name;
+      *q = '\0';
+      strcat(q, "/");
+      strcat(q, safeFile);
     } else
       safename = NULL;
     name = safename? safename: safeFile;
@@ -3629,7 +3633,7 @@ int32_t fzwrite(int32_t narg, int32_t ps[], int32_t flag) /* fzwrite subroutine 
     if (flag)
       return LUX_ERROR;
     else {
-      perror("System Message"); 
+      perror("System Message");
       printf("%s: ", name);
       return cerror(ERR_OPEN, ps[1]);
     }
@@ -3660,7 +3664,7 @@ int32_t fzwrite(int32_t narg, int32_t ps[], int32_t flag) /* fzwrite subroutine 
     if (symbolIsStringScalar(ps[2]))  /* the header is a string */
       mq = symbol_memory(ps[2]) - 1; /* don't count final \0 */
     else {
-      q2.sp = array_data(ps[2]);
+      q2.sp = (char**) array_data(ps[2]);
       i = array_size(ps[2]);
       mq = 0;			/* determine the total length */
       while (i--) {
@@ -3678,7 +3682,7 @@ int32_t fzwrite(int32_t narg, int32_t ps[], int32_t flag) /* fzwrite subroutine 
       if (fwrite(p, 1, mq, fout) != mq) /* write the header */
 	goto fzwrite_1;
     } else if (symbolIsStringArray(ps[2])) { /* string array */
-      q2.sp = array_data(ps[2]);
+      q2.sp = (char**) array_data(ps[2]);
       i = array_size(ps[2]);
       while (i--) {
 	sz = *q2.sp? strlen(*q2.sp): 0;
@@ -3788,12 +3792,12 @@ int32_t fcwrite(int32_t narg, int32_t ps[], int32_t flag)/* fcwrite subroutine *
  type = array_type(iq);
  if (type != LUX_INT8 && type != LUX_INT16) {
    if (!flag) {
-     puts("FCWRITE - Need I*1 or I*2 argument"); 
+     puts("FCWRITE - Need I*1 or I*2 argument");
      return cerror(ILL_TYPE, iq, typeName(symbol_type(iq)));
    } else
      return LUX_ERROR;
  }
- q1.l = array_data(iq);
+ q1.l = (int32_t*) array_data(iq);
  nd = array_num_dims(iq);
 
  if (internalMode & 1)
@@ -3887,7 +3891,7 @@ int32_t fcwrite(int32_t narg, int32_t ps[], int32_t flag)/* fcwrite subroutine *
    if (symbolIsStringScalar(ps[2]))  /* the header is a string */
      mq = symbol_memory(ps[2]) - 1; /* don't count final \0 */
    else {
-     q2.sp = array_data(ps[2]);
+     q2.sp = (char**) array_data(ps[2]);
      i = array_size(ps[2]);
      mq = 0;			/* determine the total length */
      while (i--) {
@@ -3906,7 +3910,7 @@ int32_t fcwrite(int32_t narg, int32_t ps[], int32_t flag)/* fcwrite subroutine *
      if (j != mq)
        goto fcwrite_1;
    } else if (symbolIsStringArray(ps[2])) { /* string array */
-     q2.sp = array_data(ps[2]);
+     q2.sp = (char**) array_data(ps[2]);
      i = array_size(ps[2]);
      while (i--) {
        sz = *q2.sp? strlen(*q2.sp): 0;
@@ -4012,7 +4016,7 @@ int32_t readu(int32_t narg, int32_t ps[], int32_t flag)
  while (narg--)
  { iq = *ps++;				/* next variable */
    str = 0;
-   switch (sym[iq].class)
+   switch (symbol_class(iq))
    { case LUX_SCALAR:
        n = lux_type_size[sym[iq].type];
        p.b = &sym[iq].spec.scalar.b;  break;
@@ -4068,7 +4072,7 @@ int32_t writeu(int32_t narg, int32_t ps[], int32_t flag)
  while (narg--)
  { iq = *ps++;				/* next variable */
    str = 0;
-   switch (sym[iq].class)
+   switch (symbol_class(iq))
    { case LUX_SCALAR:
        n = lux_type_size[sym[iq].type];
        p.b = &sym[iq].spec.scalar.b;  break;
@@ -4137,7 +4141,7 @@ void astore_one(FILE *fp, int32_t iq)
     fwrite(p.b, 1, n, fp);
     if (isStringType(array_type(iq))) { /* string array */
       sz = array_size(iq);	/* number of elements */
-      p.sp = array_data(iq); /* pointer to list of strings */
+      p.sp = (char**) array_data(iq); /* pointer to list of strings */
       while (sz--) {
 	n = *p.sp? strlen(*p.sp): 0; /* the length of the string */
 	fwrite(&n, sizeof(int32_t), 1, fp); /* write it */
@@ -4179,7 +4183,7 @@ int32_t astore(int32_t narg, int32_t ps[], int32_t flag)
  */
 {
   int32_t	iq, i, intro[2], n;
-  char	*file, *name;
+  char const* file, *name;
   FILE	*fp;
 
   iq = ps[narg - 1];		/* file name */
@@ -4266,7 +4270,7 @@ int32_t arestore_one(FILE* fp, int32_t iq, int32_t reverseOrder)
     }
     if (isStringType(symbol_type(iq))) { /* a string array */
       n = array_size(iq);	/* the number of strings */
-      p.sp = array_data(iq);
+      p.sp = (char**) array_data(iq);
       while (n--) {
 	/* read the size of the next string */
 	if (!fread(&j, sizeof(int32_t), 1, fp))
@@ -4274,7 +4278,7 @@ int32_t arestore_one(FILE* fp, int32_t iq, int32_t reverseOrder)
 	if (reverseOrder)
 	  endian(&j, sizeof(int32_t), LUX_INT32);
 	if (j) {
-	  *p.sp = malloc(j + 1); /* reserve space for the string */
+	  *p.sp = (char*) malloc(j + 1); /* reserve space for the string */
 	  if (!*p.sp)
 	    return 1;
 	  if (!fread(*p.sp, j, 1, fp))
@@ -4675,7 +4679,7 @@ int32_t lux_file_to_fz(int32_t narg, int32_t ps[])
     case LUX_ARRAY:
       n = lux_long(1, &ps[2]);
       nd = array_size(n);
-      dims = array_data(n);
+      dims = (int32_t*) array_data(n);
       break;
     case LUX_SCALAR:
       n = lux_long(1, &ps[2]);
@@ -4721,7 +4725,7 @@ int32_t lux_file_to_fz(int32_t narg, int32_t ps[])
   return 1;
 }
 /*------------------------------------------------------------------------- */
-char *file_find(char *sdir, char *fname)
+char* file_find(char const* sdir, char const* fname)
 /* find a file given a starting directory, checks all sub-directories */
 /* Headers:
    <regex.h>: regex_t
@@ -4750,7 +4754,7 @@ char *file_find(char *sdir, char *fname)
       continue;
     if (strcmp(dp->d_name, "..") == 0)
       continue;
-  
+
     if (!strcmp(dp->d_name, fname)) {
       closedir(dirp);  		/* got it !, make the whole name */
       mq = n + strlen(sdir) + 2;
@@ -4774,7 +4778,7 @@ char *file_find(char *sdir, char *fname)
       }
       return sq;
     }
-  
+
     /* append the file */
     mq = strlen(dp->d_name) + strlen(sdir) + 3;
     sq = (char *) malloc(mq);
@@ -4791,18 +4795,18 @@ char *file_find(char *sdir, char *fname)
     } else
       if ((statbuf.st_mode & S_IFMT) == S_IFDIR) { /* got a directory */
 	/* call ourselves for the next level */
-	s2 = file_find(sq, fname);
+	char* q = file_find(sq, fname);
 	/* did we find it down there ? */
-	if (s2) {
+	if (q) {
 	  free(sq);
 	  closedir(dirp);
-	  return s2;
+	  return q;
 	}
       }
     /* no joy, free sq */
     free(sq);
   }
-  
+
   closedir(dirp);
   return NULL;
 }
@@ -4814,7 +4818,11 @@ int32_t lux_findfile(int32_t narg, int32_t ps[])
    <stdlib.h>: free()
  */
 {
-  char	*startpath, *fname, *pq, *current_dir = ".";
+  char const* fname;
+  char const* current_dir = ".";
+  char const* startpath;
+  char* pq;
+  char const* cc;
   int32_t	ns, result_sym;
 
   /* first argment is a string with the start path */
@@ -4831,10 +4839,10 @@ int32_t lux_findfile(int32_t narg, int32_t ps[])
   fname = string_value(ps[1]);
 
   /* check if file name has any /'s in it, we want it to be simple */
-  if ((pq = strchr(fname, '/')) != 0) {
+  if ((cc = strchr(fname, '/')) != 0) {
     printf("WARNING - path stripped from file name input to findfile\n");
-    printf("input name: %s becomes %s\n", fname, pq);
-    fname = pq;
+    printf("input name: %s becomes %s\n", fname, cc);
+    fname = cc;
   }
 
   pq = file_find(startpath, fname);
@@ -5258,18 +5266,21 @@ int32_t lux_identify_file(int32_t narg, int32_t ps[])
     scalar_value(result).l = type;
     return result;
   }
-  
+
   printf("File %s has an unknown file type\n", expname);
   printf("Magic numbers: %d-%d-%d-%d\n", buf[0], buf[1], buf[2], buf[3]);
   return LUX_ZERO;
 }
 /*------------------------------------------------------------------------- */
-void printw(char *string)
+void printw(char const* string)
 /* prints the string to the screen, but tries to break the line outside
    of alphanumerical words.  Added printwLines which counts the number
    of lines (newlines) printed so far by printw.  LS 12jul95 15oct98 */
 {
-  char	*p, *pn, *p2, *p0;
+  char const* p0;
+  char const* p;
+  char const* pn;
+  char const* p2;
   int32_t	n, a, keepws, toolong;
   extern char	*cl_eos;
   extern int32_t	uTermCol;
@@ -5359,7 +5370,7 @@ void printw(char *string)
   }
 }
 /*------------------------------------------------------------------------- */
-void fprintw(FILE *fp, char *string)
+void fprintw(FILE *fp, char const* string)
 /* output to screen or file; avoiding line breaks inside words if outputting
    to the screen (when <fp> == stdout or <fp> == NULL).  LS 15oct98 */
 /* Headers:
@@ -5374,7 +5385,7 @@ void fprintw(FILE *fp, char *string)
     fputs(string, fp);
 }
 /*------------------------------------------------------------------------- */
-void vfprintfw(FILE *fp, char *format, va_list ap)
+void vfprintfw(FILE *fp, char const* format, va_list ap)
 /* send output to file fp, or to stdout (if fp is zero or equal to stdout).
    if outputting to the screen, then tries to avoid breaking lines in the
    middle of words.  LS 15oct98 */
@@ -5392,14 +5403,14 @@ void vfprintfw(FILE *fp, char *format, va_list ap)
     vfprintf(fp, format, ap);
 }
 /*------------------------------------------------------------------------- */
-void printfw(char *format, ...)
+void printfw(char const* format, ...)
 /* print to standard output, avoiding line breaks inside words.  LS 15oct98 */
 /* Headers:
    <stdarg.h>: va_list, va_start(), va_end()
  */
 {
   va_list	ap;
-  
+
   va_start(ap, format);
   vfprintfw(stdout, format, ap);
   va_end(ap);
@@ -5423,7 +5434,7 @@ int32_t lux_hex(int32_t narg, int32_t ps[])
   for (i=0;i<narg;i++) {
     iq = ps[i];
     if (iq <=0 ) return LUX_ERROR;
-    switch (sym[iq].class)	{		
+    switch (symbol_class(iq))	{		
       case LUX_UNDEFINED: return cerror(ILL_CLASS, iq);
       case LUX_SCALAR:		/*scalar case */
 	switch (sym[iq].type) {
@@ -5447,7 +5458,7 @@ int32_t lux_hex(int32_t narg, int32_t ps[])
 	  fprintf(fp, "%s",ptr); flag=1; break;
       case LUX_ARRAY:		/*array case */
     nelem = array_size(iq);
-    ptr = array_data(iq);
+    ptr = (char*) array_data(iq);
     jq = sym[iq].type;
     if (flag) fprintf(fp, "\n");	flag=0;
     /*print entire array, number per line depends on type */
@@ -5803,7 +5814,7 @@ int32_t lux_fits_xread_f(int32_t narg, int32_t ps[])/* read fits extension and h
    offsetsym = ps[4];
  }
  if (narg >= 6) {
-   mode = mode + 64; 
+   mode = mode + 64;
    if (!symbolIsStringScalar(ps[5]))
      return cerror(NEED_STR, ps[5]);
    preamble = string_value(ps[5]);
@@ -5813,8 +5824,8 @@ int32_t lux_fits_xread_f(int32_t narg, int32_t ps[])/* read fits extension and h
 /*------------------------------------------------------------------------- */
 int32_t	anadecrunchrun8(uint8_t [], uint8_t [], int32_t, int32_t, int32_t),
   anadecrunch8(uint8_t *, uint8_t [], int32_t, int32_t, int32_t),
-  anadecrunchrun(uint8_t *, short [], int32_t, int32_t, int32_t),
-  anadecrunch(uint8_t *, short [], int32_t, int32_t, int32_t),
+  anadecrunchrun(uint8_t *, int16_t [], int32_t, int32_t, int32_t),
+  anadecrunch(uint8_t *, int16_t [], int32_t, int32_t, int32_t),
   anadecrunch32(uint8_t *, int32_t [], int32_t, int32_t, int32_t);
 int32_t fits_read_compressed(int32_t mode, int32_t datasym, FILE *fp, int32_t headersym,
 			 float targetblank)
@@ -5828,8 +5839,9 @@ int32_t fits_read_compressed(int32_t mode, int32_t datasym, FILE *fp, int32_t he
    <string.h>: strncmp(), memcpy()
  */
 {
-  int32_t	ncbytes, type, ndim, dims[MAX_DIMS], i, nblock, ok, slice, nx, ny,
+  int32_t	ncbytes, ndim, dims[MAX_DIMS], i, nblock, ok, slice, nx, ny,
     type0;
+  Symboltype type;
   float	bscale = 0.0, bzero = 0.0, blank = FLT_MAX, min, max;
   char	*block, usescrat, *curblock, runlength;
   pointer	p;
@@ -5846,7 +5858,7 @@ int32_t fits_read_compressed(int32_t mode, int32_t datasym, FILE *fp, int32_t he
      UNAXIS1 =                  464 / dimension of uncompressed data
      UNAXIS2 =                  438 / dimension of uncompressed data
 
-     COMMENT = header text 
+     COMMENT = header text
 
      We assume that BITPIX = 8 and NAXIS = 1, and that the keywords up
      to and including the last UNAXIS.. occur in the order indicated
@@ -5877,10 +5889,11 @@ int32_t fits_read_compressed(int32_t mode, int32_t datasym, FILE *fp, int32_t he
   /* We read what number of bytes of compressed data there are, and
      also the type and number of dimensions of the uncompressed data */
   ncbytes = atol(block + 80*3 + 9);
-  type = atol(block + 80*5 + 9);
-  ndim = atol(block + 80*6 + 9);
-  
-  switch (type) {
+  {
+    int dtype = atol(block + 80*5 + 9);
+    ndim = atol(block + 80*6 + 9);
+
+    switch (dtype) {
     case 8:
       type = LUX_INT8;
       break;
@@ -5898,8 +5911,9 @@ int32_t fits_read_compressed(int32_t mode, int32_t datasym, FILE *fp, int32_t he
       break;
     default:
       return 0;
+    }
   }
-  
+
   if (internalMode & 1) {	/* uncompress, too */
     /* get the dimensions of the uncompressed data */
     for (i = 0; i < ndim; i++) {
@@ -5943,13 +5957,13 @@ int32_t fits_read_compressed(int32_t mode, int32_t datasym, FILE *fp, int32_t he
     else (void) (sscanf(block + i*80, "BSCALE  =%f", &bscale)
                  || sscanf(block + i*80, "BZERO   =%f", &bzero)
                  || sscanf(block + i*80, "BLANK   =%f", &blank));
-  
+
   while (i == 36) {
     nblock++;
     if (mode & 1) {		/* want the header */
       if (usescrat) {
 	if (scratSize() < 2880*nblock) { /* not enough scratch size anymore */
-	  block = malloc(2880*nblock);
+	  block = (char*) malloc(2880*nblock);
 	  if (!block) {
 	    cerror(ALLOC_ERR, 0);
 	    return 0;
@@ -5958,7 +5972,7 @@ int32_t fits_read_compressed(int32_t mode, int32_t datasym, FILE *fp, int32_t he
 	  usescrat = 0;
 	}
       } else {
-	block = realloc(block, 2880*nblock);
+	block = (char*) realloc(block, 2880*nblock);
 	if (!block) {
 	  cerror(ALLOC_ERR, 0);
 	  return 0;
@@ -5988,10 +6002,10 @@ int32_t fits_read_compressed(int32_t mode, int32_t datasym, FILE *fp, int32_t he
     nx = i;			/* number of lines */
     if (redef_array(headersym, LUX_STRING_ARRAY, 1, &nx) != LUX_OK)
       return 0;
-    p.sp = array_data(headersym);
+    p.sp = (char**) array_data(headersym);
     curblock = block;
     while (nx--) {
-      *p.sp = malloc(81);
+      *p.sp = (char*) malloc(81);
       memcpy(*p.sp, curblock, 80);
       (*p.sp)[80] = '\0';
       p.sp++;
@@ -6053,14 +6067,14 @@ int32_t fits_read_compressed(int32_t mode, int32_t datasym, FILE *fp, int32_t he
 	usescrat = 1;
       }	/* end of if (scratSize() >= ncbytes) */
       else {
-	block = malloc(ncbytes);
+	block = (char*) malloc(ncbytes);
 	if (!block)
 	  return 0;
 	usescrat = 0;
       }	/* end of if (scratSize() >= ncbytes) else */
     } /* end of if (internalMode & 1) */
     else
-      block = array_data(datasym);
+      block = (char*) array_data(datasym);
 
     if (!fread(block, 1, ncbytes, fp)) { /* read the compressed data */
       if ((mode & 2) && !usescrat)
@@ -6083,13 +6097,13 @@ int32_t fits_read_compressed(int32_t mode, int32_t datasym, FILE *fp, int32_t he
       switch (type0) {
 	case LUX_INT8:
 	  ok = runlength?
-	    anadecrunchrun8(p.b, array_data(datasym), slice, nx, ny):
-	      anadecrunch8(p.b, array_data(datasym), slice, nx, ny);
+	    anadecrunchrun8(p.b, (uint8_t*) array_data(datasym), slice, nx, ny):
+	      anadecrunch8(p.b, (uint8_t*) array_data(datasym), slice, nx, ny);
 	  break;
 	case LUX_INT16:
 	  ok = runlength?
-	    anadecrunchrun(p.b, array_data(datasym), slice, nx, ny):
-	      anadecrunch(p.b, array_data(datasym), slice, nx, ny);
+	    anadecrunchrun(p.b, (int16_t*) array_data(datasym), slice, nx, ny):
+            anadecrunch(p.b, (int16_t*) array_data(datasym), slice, nx, ny);
 	  break;
 	case LUX_INT32:
 #if SIZEOF_LONG_LONG_INT == 8	/* 64-bit integers */
@@ -6120,9 +6134,9 @@ int32_t fits_read_compressed(int32_t mode, int32_t datasym, FILE *fp, int32_t he
   else ok = 1;
 
   if (!(internalMode & 2) && (bscale || bzero))
-    apply_bscale_bzero_blank(array_data(datasym), nx*ny, bscale, bzero, blank,
+    apply_bscale_bzero_blank((uint8_t*) array_data(datasym), nx*ny, bscale, bzero, blank,
 			     targetblank, type0, type);
-  
+
   return ok;
 }
 /*------------------------------------------------------------------------- */
@@ -6144,7 +6158,8 @@ int32_t fits_read(int32_t mode, int32_t dsym, int32_t namsym, int32_t hsym, int3
   FILE	*fin;
   char	*fitshead, line[80], *lptr, c, **p, *q, *ext_ptr, *sq, *p2, *qb;
   int32_t	n, simple_flag, bitpix_flag = 0, naxis_flag = 0, naxis_count;
-  int32_t	bitpix, type, nlines, end_flag = 0, nhblks, lc, iq, id, new_sym;
+  int32_t	bitpix, nlines, end_flag = 0, nhblks, lc, iq, id, new_sym;
+  Symboltype type;
   int32_t	maxdim, i, rsym = 1, nbsize, ext_flag=0, data_offset, npreamble;
   int32_t	fits_type, ndim_var, *dim_var, n_ext_rows, nrow_bytes, m;
   int32_t	xtension_found = 0, tfields, gcount, row_bytes,
@@ -6161,7 +6176,7 @@ int32_t fits_read(int32_t mode, int32_t dsym, int32_t namsym, int32_t hsym, int3
 #if LITTLEENDIAN
   int32_t	nb;
 #endif
-  
+
   /* first arg is the variable to load, second is name of file */
   if ((fin = fopenr_sym(namsym)) == NULL)
     return LUX_ZERO;
@@ -6175,7 +6190,7 @@ int32_t fits_read(int32_t mode, int32_t dsym, int32_t namsym, int32_t hsym, int3
   }
   /* a fits header is a series of card images, 80 columns by 36 cards */
   /* must have "SIMPLE" at start */
-  
+
   /* first line is done separately, we look for SIMPLE */
   n = sscanf(fitshead, "SIMPLE  = %1s", &c);
   simple_flag = (c == 'T');
@@ -6211,7 +6226,7 @@ int32_t fits_read(int32_t mode, int32_t dsym, int32_t namsym, int32_t hsym, int3
       lptr += 80;	/* bump here so we can use continue's in each check */
       lc++;
       /* printf("%.80s\n", lptr); */
-      
+
       /* look for keywords on each line, decode ones we need */
       if (strncmp(lptr, "BITPIX  ",8) == 0) {
 	/* got a BITPIX, get value */
@@ -6224,11 +6239,12 @@ int32_t fits_read(int32_t mode, int32_t dsym, int32_t namsym, int32_t hsym, int3
 	    /*printf("found bitpix = %d\n", bitpix); */
 	    /* translate to lux type */
 	    switch (bitpix) {
-	      case 8:   type = 0;  break;
-	      case 16:  type = 1;  break;
-	      case 32:  type = 2;  break;
-	      case -32: type = 3;  break;
-	      case -64: type = 4;  break;
+	      case 8:   type = LUX_INT8;  break;
+	      case 16:  type = LUX_INT16;  break;
+	      case 32:  type = LUX_INT32;  break;
+                // NO LUX_INT64
+	      case -32: type = LUX_FLOAT;  break;
+	      case -64: type = LUX_DOUBLE;  break;
 	      default: fits_problems(2); printf("%d\n", bitpix); return fits_fatality(fin);
 	    }
 	  } else {
@@ -6283,7 +6299,7 @@ int32_t fits_read(int32_t mode, int32_t dsym, int32_t namsym, int32_t hsym, int3
 	/* printf("total lines in header = %d\n", lc);*/
 	break;		/* this ends the header read */
       }
-      
+
     }
     if (end_flag) break; else {
       /* haven't hit an END yet, so we read another header block */
@@ -6296,7 +6312,7 @@ int32_t fits_read(int32_t mode, int32_t dsym, int32_t namsym, int32_t hsym, int3
 	fits_problems(11); return fits_fatality(fin);}
       nlines = 36;  nhblks++;
     }
-    
+
   }
   /* check out */
   /* printf("nhblks = %d, maxdim = %d\n", nhblks, maxdim);*/
@@ -6314,17 +6330,17 @@ int32_t fits_read(int32_t mode, int32_t dsym, int32_t namsym, int32_t hsym, int3
   }
   /* return extension offset ? */
   if (mode & 0x8) {
-    redef_scalar(xoffsetsym, 2, &ext_flag);
+    redef_scalar(xoffsetsym, LUX_INT32, &ext_flag);
   }
-  
+
   /* check if we want the offset to data */
   if (mode & 0x4) {
-    redef_scalar(offsetsym, 2, &data_offset);
+    redef_scalar(offsetsym, LUX_INT32, &data_offset);
   }
-  
+
   /* done with reading the header, for a mode zero we are finished */
   if (mode == 0) { fclose(fin); return rsym; }
-  
+
   /* check if header is wanted */
   if (mode & 0x1) {
     lc--;			/* exclude the END record.  LS 14apr00 */
@@ -6333,7 +6349,7 @@ int32_t fits_read(int32_t mode, int32_t dsym, int32_t namsym, int32_t hsym, int3
       fits_problems(9);
       return fits_fatality(fin);
     }
-    p = array_data(hsym);
+    p = (char**) array_data(hsym);
     n = lc;
     lptr = fitshead;
     while (n--) {
@@ -6349,7 +6365,7 @@ int32_t fits_read(int32_t mode, int32_t dsym, int32_t namsym, int32_t hsym, int3
   }
   /* should be done with any malloc for a long header */
   if (fits_head_malloc_flag) free(fitshead);
-  
+
   /* now check if we want the main data array */
   type0 = type;
   if (mode & 0x2) {
@@ -6396,23 +6412,31 @@ int32_t fits_read(int32_t mode, int32_t dsym, int32_t namsym, int32_t hsym, int3
 	  else
 	  type = LUX_FLOAT;
 	}
-      } 
+      }
     }
     iq = array_scratch(type, maxdim, dim);
-    q = array_data(iq);
-    
+    q = (char*) array_data(iq);
+
     if (simple_flag == 1) {
       /* should be in position in file to just read in */
       if (fread(q, 1, nbsize, fin) != nbsize)
       { perror("fits_read in data array");
 	fits_problems(12); return fits_fatality(fin);}
-      
+
       /* fits data is supposed to always be big endian, so fix up data on
 	 little endian machines (like alpha's and pc's) */
 #if LITTLEENDIAN
-      if (type == 1)  swapb((char *) q, nbsize);
-      if (type == 2 || type ==3)  swapl((int32_t *) q, nbsize/4);
-      if (type == 4)  swapd((char *) q, nbsize/8);
+      switch (type) {
+      case LUX_INT16:           // 16 bits
+        swapb((char *) q, nbsize);
+        break;
+      case LUX_INT32: case LUX_FLOAT: // 32 bits
+        swapl((int32_t *) q, nbsize/4);
+        break;
+      case LUX_INT64: case LUX_DOUBLE: // 64 bits
+        swapd((char *) q, nbsize/8);
+        break;
+      }
 #endif
     }
     /* now correct for BZERO, BSCALE, BLANK */
@@ -6426,7 +6450,7 @@ int32_t fits_read(int32_t mode, int32_t dsym, int32_t namsym, int32_t hsym, int3
     { fits_problems(10); noTrace--; return fits_fatality(fin);}
     noTrace--;
   }
-  
+
   /* if there is an extension, process the header */
   if (ext_flag) {
     /* printf("processing the extension header\n"); */
@@ -6438,7 +6462,7 @@ int32_t fits_read(int32_t mode, int32_t dsym, int32_t namsym, int32_t hsym, int3
     lc = 0;
     zerobytes( dim, 8*sizeof(int32_t));
     maxdim = bitpix_flag = naxis_flag = end_flag = 0;
-    
+
     while (1) {
       nhblks++;
       if (nhblks > HEAD_LIMIT)
@@ -6453,13 +6477,13 @@ int32_t fits_read(int32_t mode, int32_t dsym, int32_t namsym, int32_t hsym, int3
       while (nlines--) {
 	lc++;
 	/* printf("%.80s\n", lptr); */
-	
+
 	/* look for keywords on each line, decode ones we need */
-	
+
 	if (strncmp(lptr, "XTENSION",8) == 0) {
 	  xtension_found = 1;
 	} else
-	  
+
 	  if (strncmp(lptr, "BITPIX  ",8) == 0) {
 	    /* got a BITPIX, get value */
 	    if (bitpix_flag) { /* whoops, already have this */
@@ -6470,11 +6494,12 @@ int32_t fits_read(int32_t mode, int32_t dsym, int32_t namsym, int32_t hsym, int3
 	      /* printf("found bitpix = %d\n", bitpix); */
 	      /* translate to lux type */
 	      switch (bitpix) {
-		case 8:   type = 0;  break;
-		case 16:  type = 1;  break;
-		case 32:  type = 2;  break;
-		case -32: type = 3;  break;
-		case -64: type = 4;  break;
+		case 8:   type = LUX_INT8;  break;
+		case 16:  type = LUX_INT16;  break;
+		case 32:  type = LUX_INT32;  break;
+                  // NO LUX_INT64
+		case -32: type = LUX_FLOAT;  break;
+		case -64: type = LUX_DOUBLE;  break;
 		default: fits_problems(2); printf("%d\n", bitpix); return fits_fatality(fin);
 	      }
 	      } else {
@@ -6483,7 +6508,7 @@ int32_t fits_read(int32_t mode, int32_t dsym, int32_t namsym, int32_t hsym, int3
 	      }
 	    }
 	  } else
-	    
+
 	    if (strncmp(lptr, "NAXIS   ",8) == 0) {
 	      /* got a NAXIS, get value */
 	      if (naxis_flag) { /* whoops, already have this */
@@ -6501,7 +6526,7 @@ int32_t fits_read(int32_t mode, int32_t dsym, int32_t namsym, int32_t hsym, int3
 		  return fits_fatality(fin); }
 	      }
 	    } else
-	      
+
 	      if (strncmp(lptr, "NAXIS",5) == 0) {
 		/* got a NAXISn, get value and dimension */
 		n = sscanf(lptr+5,"%d = %d", &iq, &id);
@@ -6518,28 +6543,28 @@ int32_t fits_read(int32_t mode, int32_t dsym, int32_t namsym, int32_t hsym, int3
 		{ printf("dimension count %d (NAXIS) out of range\n", maxdim);
 		  return fits_fatality(fin); }
 	      } else
-		
+
 		if (strncmp(lptr, "TFIELDS ",8) == 0) {
 		  n = sscanf(lptr+9,"%d", &tfields);
 		  if (n !=1) { fits_problems(21); }
 		} else
-		  
+
 		  if (strncmp(lptr, "GCOUNT  ",8) == 0) {
 		    n = sscanf(lptr+9,"%d", &gcount);
 		    if (n !=1) { fits_problems(22); }
 		  } else
-		    
+
 		    if (strncmp(lptr, "END     ",8) == 0) {
 		      end_flag = 1;
 		      /* printf("total lines in header = %d\n", lc); */
 		      break;		/* this ends the header read */
 		    }
 	lptr += 80;
-      }  
+      }
       if (!xtension_found) { fits_problems(17); return fits_fatality(fin); }
       if (end_flag) break;
     }
-    
+
     /* check out */
     /* printf("nhblks = %d, maxdim = %d\n", nhblks, maxdim); */
     /* for (i=0;i<maxdim;i++) printf("extension: dim%d = %d\n", i, dim[i]); */
@@ -6549,19 +6574,19 @@ int32_t fits_read(int32_t mode, int32_t dsym, int32_t namsym, int32_t hsym, int3
     /* printf("extension: nbsize = %d\n", nbsize); */
     n_ext_rows = nbsize/dim[0]/lux_type_size[type];
   }
-  
+
   /* check if we want the extension header */
   if (mode & 0x10) {
     /* if no extension, return a scalar of value 0 */
     if (ext_flag == 0) {
-      redef_scalar(xhsym, 2, &ext_flag);
-      
+      redef_scalar(xhsym, LUX_INT32, &ext_flag);
+
     } else {
       /* printf("creating extension header array\n"); */
       /* generate an lux string array for the header */
       if (to_scratch_array(xhsym, LUX_STRING_ARRAY, 1, &lc) == LUX_ERROR)
       { fits_problems(18); return fits_fatality(fin);}
-      p = array_data(xhsym);
+      p = (char**) array_data(xhsym);
       n = lc;
       lptr = fitshead;
       while (n--) {
@@ -6577,39 +6602,47 @@ int32_t fits_read(int32_t mode, int32_t dsym, int32_t namsym, int32_t hsym, int3
     }
   }
   /* don't throw the extension header away yet, may need for decoding tables */
-  
+
   /* the extension data array */
   if (mode & 0x20) {
     /* if no extension, return a scalar of value 0 */
     if (ext_flag == 0) {
-      redef_scalar(xdsym, 2, &ext_flag);
-      
+      redef_scalar(xdsym, LUX_INT32, &ext_flag);
+
     } else {
       /* all set up for the most part */
       iq = array_scratch(type, maxdim, dim);
-      q = ext_ptr = array_data(iq);
-      
+      q = ext_ptr = (char*) array_data(iq);
+
       /* should be in position in file to just read in */
       if (fread(q, 1, nbsize, fin) != nbsize)
       { perror("fits_read in data array");
 	fits_problems(20); return fits_fatality(fin);}
-      
+
       /* fits data is supposed to always be big endian, so fix up data on
 	 little endian machines (like alpha's and pc's) */
       /* note, however, that these are normally I*1 (type 0) for binary tables */
 #if LITTLEENDIAN
-      if (type == 1)  swapb(q, nbsize);
-      if (type == 2 || type ==3)  swapl((int32_t *) q, nbsize/4);
-      if (type == 4)  swapd((char *) q, nbsize/8);
+      switch (type) {
+      case LUX_INT16:           // 16 bits
+        swapb(q, nbsize);
+        break;
+      case LUX_INT32: case LUX_FLOAT: // 32 bits
+        swapl((int32_t *) q, nbsize/4);
+        break;
+      case LUX_INT64: case LUX_DOUBLE: // 64 bits
+        swapd((char *) q, nbsize/8);
+        break;
+      }
 #endif
       noTrace++;
       if ( lux_replace(xdsym, iq) != 1 )
       { fits_problems(19); noTrace--; return fits_fatality(fin);}
       noTrace--;
-      
+
     }
   }
-  
+
   /* decode the extension (for binary tables) */
   if (mode & 0x40 && ext_flag) {
     /* can't do if no extension */
@@ -6620,7 +6653,7 @@ int32_t fits_read(int32_t mode, int32_t dsym, int32_t namsym, int32_t hsym, int3
     /* since the keywords for the columns are allowed in any order, we
        run through and store everything in a structure first, hopefully we can
        assumed that TFIELDS resembles the # of columns */
-    ext_stuff = malloc( tfields * sizeof(struct ext_params));
+    ext_stuff = (struct ext_params*) malloc( tfields * sizeof(struct ext_params));
     ext_stuff_malloc_flag = 1;
     /* pre-load the zero and scale items */
     for (index=0;index<tfields;index++) {
@@ -6650,9 +6683,9 @@ int32_t fits_read(int32_t mode, int32_t dsym, int32_t namsym, int32_t hsym, int3
 	    itype = -1;}	else	itype = loc - tforms;
 	  ext_stuff[index].type = itype;
 	}
-	
+
       } else
-	
+
 	/* look for the label */
 	if (strncmp(lptr, "TTYPE",5) == 0) {
 	  /* got a TTYPE, get "column" */
@@ -6671,7 +6704,7 @@ int32_t fits_read(int32_t mode, int32_t dsym, int32_t namsym, int32_t hsym, int3
 	    ext_stuff[index].lab = strdup(line);
 	  }
 	}
-      
+
       lptr += 80;
     }
     /* for binary tables, the first dim is the # of bytes in each "row" */
@@ -6706,7 +6739,7 @@ int32_t fits_read(int32_t mode, int32_t dsym, int32_t namsym, int32_t hsym, int3
       }
     }
       /* one way or another, the entire table is now at ext_ptr */
-      
+ 
     npreamble = strlen(preamble);
     row_bytes = 0;
     lptr = ext_ptr;
@@ -6741,22 +6774,22 @@ int32_t fits_read(int32_t mode, int32_t dsym, int32_t namsym, int32_t hsym, int3
 	   longer need */
 	dim[0] = id;
       }
-      
+
       switch (fits_type) {
 	case 0:  /* I*2 array */
-	  type = 1;
+	  type = LUX_INT16;
 	  break;
 	case 1:  /* I*4 array */
-	  type = 2;
+	  type = LUX_INT32;
 	  break;
 	case 3:  /* F*4 array */
-	  type = 3;
+	  type = LUX_FLOAT;
 	  break;
 	case 4:  /* F*8 array */
-	  type = 4;
+	  type = LUX_DOUBLE;
 	  break;
 	case 5:  /* I*1 array */
-	  type = 0;
+	  type = LUX_INT8;
 	  break;
       }
       if (fits_type == 2) {
@@ -6767,13 +6800,13 @@ int32_t fits_read(int32_t mode, int32_t dsym, int32_t namsym, int32_t hsym, int3
 	    free(ext_ptr);
 	  goto fits_read_1;
 	}
-	psa = array_data(new_sym);
+	psa = (char**) array_data(new_sym);
 	nbsize = tform_sizes[fits_type] * id;
 	/* need to get a series of strings */
 	p2 = lptr;
 	m = n_ext_rows;
 	while (m--) {
-	  n = nbsize;  q = malloc(nbsize + 1);
+	  n = nbsize;  q = (char*) malloc(nbsize + 1);
 	  *psa++ = q;
 	  while (n--) *q++ = *p2++;  *q = '\0';
 	  p2 = p2 + nrow_bytes - nbsize;  }
@@ -6784,7 +6817,7 @@ int32_t fits_read(int32_t mode, int32_t dsym, int32_t namsym, int32_t hsym, int3
 	  goto fits_read_1;
 	}
 	/* and load all the columns in */
-	q = qb = array_data(new_sym);
+	q = qb = (char*) array_data(new_sym);
 	nbsize = tform_sizes[fits_type] * id;
 	p2 = lptr;
 	m = n_ext_rows;
@@ -6846,7 +6879,7 @@ int32_t lux_fits_write_general(int32_t narg, int32_t ps[], int32_t func)
 
   if (narg > 2 && ps[2]) {	/* header */
     if (symbolIsStringArray(ps[2])) {
-      header.sp = array_data(ps[2]);
+      header.sp = (char**) array_data(ps[2]);
       headertype = LUX_STRING_ARRAY;
       nheader = array_size(ps[2]);
     } else if (symbolIsStringScalar(ps[2])) {
@@ -6905,12 +6938,12 @@ int32_t lux_fits_write_general(int32_t narg, int32_t ps[], int32_t func)
   if (slice) {
     switch (type) {
       case LUX_INT8:
-	size = runlength? anacrunchrun8(out, data, slice, nx, ny, limit):
-	  anacrunch8(out, data, slice, nx, ny, limit);
+	size = runlength? anacrunchrun8((uint8_t*) out, (uint8_t*) data, slice, nx, ny, limit):
+	  anacrunch8((uint8_t*) out, (uint8_t*) data, slice, nx, ny, limit);
 	break;
       case LUX_INT16:
-	size = runlength? anacrunchrun(out, data, slice, nx, ny, limit):
-	  anacrunch(out, data, slice, nx, ny, limit);
+	size = runlength? anacrunchrun((uint8_t*) out, (int16_t*) data, slice, nx, ny, limit):
+	  anacrunch((uint8_t*) out, (int16_t*) data, slice, nx, ny, limit);
 	break;
 #if SIZEOF_LONG_LONG_INT == 8	/* 64-bit integers */
       case LUX_INT32:
@@ -7116,8 +7149,9 @@ int32_t lux_fileread(int32_t narg, int32_t ps[])
    <stdio.h>: FILE, fseek(), perror(), fread(), printf()
  */
 {
-  int32_t	iq, lun, type, j, n, start, num, nd;
-  extern void	wait_sec();
+  int32_t	iq, lun, j, n, start, num, nd;
+  Symboltype type;
+  extern void	wait_sec(float);
   extern int32_t	byte_count;
   char	*p;
   FILE	*fp;
@@ -7131,7 +7165,7 @@ int32_t lux_fileread(int32_t narg, int32_t ps[])
   fp = lux_file[lun];
   if (int_arg_stat(ps[2], &start) != LUX_OK
       || int_arg_stat(ps[3], &num) != LUX_OK
-      || int_arg_stat(ps[4], &type) != LUX_OK)
+      || int_arg_stat(ps[4], (int32_t*) &type) != LUX_OK)
     return LUX_ERROR;
   if (type < LUX_INT8 || type > LUX_DOUBLE)
     return cerror(ILL_TYPE, ps[4]);
@@ -7139,7 +7173,7 @@ int32_t lux_fileread(int32_t narg, int32_t ps[])
   nd = 1;
   if (redef_array(iq, type, nd, &num) != LUX_OK)
     return LUX_ERROR;
- 
+
   p = (char *) array_data(iq);
 
   n = lux_type_size[type];
@@ -7155,7 +7189,7 @@ int32_t lux_fileread(int32_t narg, int32_t ps[])
   /* now read the file */
   n = n * num;
   if ((j = fread(p, 1, n, fp)) != n) {
-    if ( j <= 0 ) 
+    if ( j <= 0 )
       return cerror(READ_ERR, 0);
     printf("only got %d bytes in readfile, expected %d\n",j,n);
     /* sometimes (much too often!) a network problem, so try again */

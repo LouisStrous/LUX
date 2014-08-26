@@ -18,9 +18,7 @@ You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 /* LUX routines dealing with the creation of LUX symbols. */
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,9 +27,12 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <ctype.h>
 #include <limits.h>
 #include <errno.h>
-#include "install.h"
-#include "action.h"
-#include "editor.h"		/* for BUFSIZE */
+#include "install.hh"
+#include "action.hh"
+#include "editor.hh"		/* for BUFSIZE */
+extern "C" {
+#include "visualclass.h"
+}
 #if HAVE_LIBX11
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -41,7 +42,7 @@ void	zerobytes(void *, int32_t), updateIndices(void), symdumpswitch(int32_t, int
 #if HAVE_LIBX11
 void	xsynchronize(int32_t);
 #endif
-int32_t	installString(char *), fixContext(int32_t, int32_t), lux_replace(int32_t, int32_t);
+int32_t	installString(char const*), fixContext(int32_t, int32_t), lux_replace(int32_t, int32_t);
 char *fmttok(char *);
 int32_t Sprintf_tok(char *, ...);
 /*-----------------------------------------------------*/
@@ -66,19 +67,20 @@ int32_t Sprintf_tok(char *, ...);
 */
 Symboltype combinedType(Symboltype type1, Symboltype type2)
 {
+  const Symboltype N = (Symboltype) 0;
   static Symboltype const combined[LUX_NO_SYMBOLTYPE][LUX_NO_SYMBOLTYPE] =
     {
-      {    LUX_INT8,   LUX_INT16,    LUX_INT32,   LUX_INT64,  LUX_FLOAT,  LUX_DOUBLE, 0, 0, 0,  LUX_CFLOAT, LUX_CDOUBLE }, /* LUX_INT8 */
-      {   LUX_INT16,   LUX_INT16,    LUX_INT32,   LUX_INT64,  LUX_FLOAT,  LUX_DOUBLE, 0, 0, 0,  LUX_CFLOAT, LUX_CDOUBLE }, /* LUX_INT16 */
-      {   LUX_INT32,   LUX_INT32,    LUX_INT32,   LUX_INT64,  LUX_FLOAT,  LUX_DOUBLE, 0, 0, 0,  LUX_CFLOAT, LUX_CDOUBLE }, /* LUX_INT32 */
-      {   LUX_INT64,   LUX_INT64,    LUX_INT64,   LUX_INT64, LUX_DOUBLE,  LUX_DOUBLE, 0, 0, 0, LUX_CDOUBLE, LUX_CDOUBLE }, /* LUX_INT64 */
-      {   LUX_FLOAT,   LUX_FLOAT,   LUX_FLOAT,  LUX_DOUBLE,   LUX_FLOAT,  LUX_DOUBLE, 0, 0, 0,  LUX_CFLOAT, LUX_CDOUBLE }, /* LUX_FLOAT */
-      {  LUX_DOUBLE,  LUX_DOUBLE,  LUX_DOUBLE,  LUX_DOUBLE,  LUX_DOUBLE,  LUX_DOUBLE, 0, 0, 0, LUX_CDOUBLE, LUX_CDOUBLE }, /* LUX_DOUBLE */
-      {           0,           0,           0,           0,           0,           0, 0, 0, 0,           0,           0 }, /* not numerical */
-      {           0,           0,           0,           0,           0,           0, 0, 0, 0,           0,           0 }, /* not numerical */
-      {           0,           0,           0,           0,           0,           0, 0, 0, 0,           0,           0 }, /* not numerical */
-      {  LUX_CFLOAT,  LUX_CFLOAT,  LUX_CFLOAT, LUX_CDOUBLE,  LUX_CFLOAT, LUX_CDOUBLE, 0, 0, 0,  LUX_CFLOAT, LUX_CDOUBLE }, /* LUX_CFLOAT */
-      { LUX_CDOUBLE, LUX_CDOUBLE, LUX_CDOUBLE, LUX_CDOUBLE, LUX_CDOUBLE, LUX_CDOUBLE, 0, 0, 0, LUX_CDOUBLE, LUX_CDOUBLE }, /* LUX_CDOUBLE */
+      {    LUX_INT8,   LUX_INT16,    LUX_INT32,   LUX_INT64,  LUX_FLOAT,  LUX_DOUBLE, N, N, N,  LUX_CFLOAT, LUX_CDOUBLE }, /* LUX_INT8 */
+      {   LUX_INT16,   LUX_INT16,    LUX_INT32,   LUX_INT64,  LUX_FLOAT,  LUX_DOUBLE, N, N, N,  LUX_CFLOAT, LUX_CDOUBLE }, /* LUX_INT16 */
+      {   LUX_INT32,   LUX_INT32,    LUX_INT32,   LUX_INT64,  LUX_FLOAT,  LUX_DOUBLE, N, N, N,  LUX_CFLOAT, LUX_CDOUBLE }, /* LUX_INT32 */
+      {   LUX_INT64,   LUX_INT64,    LUX_INT64,   LUX_INT64, LUX_DOUBLE,  LUX_DOUBLE, N, N, N, LUX_CDOUBLE, LUX_CDOUBLE }, /* LUX_INT64 */
+      {   LUX_FLOAT,   LUX_FLOAT,   LUX_FLOAT,  LUX_DOUBLE,   LUX_FLOAT,  LUX_DOUBLE, N, N, N,  LUX_CFLOAT, LUX_CDOUBLE }, /* LUX_FLOAT */
+      {  LUX_DOUBLE,  LUX_DOUBLE,  LUX_DOUBLE,  LUX_DOUBLE,  LUX_DOUBLE,  LUX_DOUBLE, N, N, N, LUX_CDOUBLE, LUX_CDOUBLE }, /* LUX_DOUBLE */
+      {           N,           N,           N,           N,           N,           N, N, N, N,           N,           N }, /* not numerical */
+      {           N,           N,           N,           N,           N,           N, N, N, N,           N,           N }, /* not numerical */
+      {           N,           N,           N,           N,           N,           N, N, N, N,           N,           N }, /* not numerical */
+      {  LUX_CFLOAT,  LUX_CFLOAT,  LUX_CFLOAT, LUX_CDOUBLE,  LUX_CFLOAT, LUX_CDOUBLE, N, N, N,  LUX_CFLOAT, LUX_CDOUBLE }, /* LUX_CFLOAT */
+      { LUX_CDOUBLE, LUX_CDOUBLE, LUX_CDOUBLE, LUX_CDOUBLE, LUX_CDOUBLE, LUX_CDOUBLE, N, N, N, LUX_CDOUBLE, LUX_CDOUBLE }, /* LUX_CDOUBLE */
     };
   assert(type1 >= 0 && type1 < LUX_NO_SYMBOLTYPE);
   assert(type2 >= 0 && type2 < LUX_NO_SYMBOLTYPE);
@@ -174,19 +176,20 @@ int32_t transfer(int32_t symbol)
   return symbol;
 }
 /*-----------------------------------------------------*/
-int32_t lux_convert(int32_t, int32_t [], int32_t, int32_t);
+int32_t lux_convert(int32_t, int32_t [], Symboltype, int32_t);
 int32_t lux_convertsym(int32_t narg, int32_t ps[])
      /* Y = CONVERT(X, TYPE) returns a copy of X converted to data type */
      /* TYPE (according to #TYPE).  LS 1aug97 */
 {
-  int32_t	iq, type;
+  int32_t	iq;
+  Symboltype type;
 
   iq = ps[0];
   switch (symbol_class(ps[1])) {
     case LUX_SCAL_PTR:
       iq = dereferenceScalPointer(iq);
     case LUX_SCALAR:
-      type = int_arg(iq);
+      type = (Symboltype) int_arg(iq);
       break;
     default:
       return cerror(ILL_CLASS, ps[0]);
@@ -196,7 +199,7 @@ int32_t lux_convertsym(int32_t narg, int32_t ps[])
   return lux_convert(1, ps, type, 1);
 }
 /*-----------------------------------------------------*/
-int32_t scalar_scratch(int32_t type)
+int32_t scalar_scratch(Symboltype type)
 /* returns a temporary scalar of the indicated type */
 {
  int32_t	n;
@@ -206,7 +209,7 @@ int32_t scalar_scratch(int32_t type)
  symbol_line(n) = curLineNumber;
  if (type >= LUX_CFLOAT) {
    complex_scalar_memory(n) = lux_type_size[type];
-   complex_scalar_data(n).f = malloc(complex_scalar_memory(n));
+   complex_scalar_data(n).f = (float*) malloc(complex_scalar_memory(n));
    if (!complex_scalar_data(n).f)
      return cerror(ALLOC_ERR, n);
    symbol_class(n) = LUX_CSCALAR;
@@ -221,7 +224,7 @@ int32_t scalar_scratch_copy(int32_t nsym)
  int32_t	n;
 
  getFreeTempVariable(n);
- sym[n].class = LUX_SCALAR;
+ symbol_class(n) = LUX_SCALAR;
  sym[n].type = sym[nsym].type;
  sym[n].line = curLineNumber;
  memcpy(&sym[n].spec.scalar.b, &sym[nsym].spec.scalar.b, sizeof(double));
@@ -235,7 +238,7 @@ int32_t string_scratch(int32_t size)
  int32_t	n;
 
  getFreeTempVariable(n);
- sym[n].class = LUX_STRING;
+ symbol_class(n) = LUX_STRING;
  sym[n].type = LUX_TEMP_STRING;
  sym[n].line = curLineNumber;
  if (size >= 0)
@@ -247,7 +250,7 @@ int32_t string_scratch(int32_t size)
  return n;
 }
 /*-----------------------------------------------------*/
-int32_t to_scratch_array(int32_t n, int32_t type, int32_t ndim, int32_t dims[])
+int32_t to_scratch_array(int32_t n, Symboltype type, int32_t ndim, int32_t dims[])
 /* modifies symbol <n> to an array of the specified type and dimensions */
 /* if the type is LUX_TEMP_STRING or LUX_LSTRING, then the new */
 /* array gets type LUX_STRING_ARRAY.  LS 28mar98 */
@@ -256,7 +259,7 @@ int32_t to_scratch_array(int32_t n, int32_t type, int32_t ndim, int32_t dims[])
  float	fsize;
  array	*h;
  pointer	ptr;
- 
+
  if (isStringType(type))
    type = LUX_STRING_ARRAY;
  if (!isLegalType(type))
@@ -297,23 +300,23 @@ int32_t to_scratch_array(int32_t n, int32_t type, int32_t ndim, int32_t dims[])
  h->facts = NULL;
  zerobytes(array_data(n), array_size(n)*lux_type_size[type]);
  return n;
-} 
+}
 /*-----------------------------------------------------*/
-int32_t to_scalar(int32_t nsym, int32_t type)
+int32_t to_scalar(int32_t nsym, Symboltype type)
 /* turns symbol <nsym> into a scalar or cscalar of the given <type> */
 {
   undefine(nsym);
   symbol_class(nsym) = isRealType(type)? LUX_SCALAR: LUX_CSCALAR;
   symbol_type(nsym) = type;
   if (isComplexType(type)) {
-    complex_scalar_data(nsym).cf = malloc(lux_type_size[type]);
+    complex_scalar_data(nsym).cf = (floatComplex*) malloc(lux_type_size[type]);
     if (!complex_scalar_data(nsym).cf)
       return cerror(ALLOC_ERR, 0);
   }
   return LUX_OK;
 }
 /*-----------------------------------------------------*/
-int32_t array_scratch(int32_t type, int32_t ndim, int32_t dims[])
+int32_t array_scratch(Symboltype type, int32_t ndim, int32_t dims[])
 {
   int32_t	n;
 
@@ -323,7 +326,7 @@ int32_t array_scratch(int32_t type, int32_t ndim, int32_t dims[])
   return to_scratch_array(n, type, ndim, dims);
 }
 /*-----------------------------------------------------*/
-int32_t array_clone(int32_t symbol, int32_t type)
+int32_t array_clone(int32_t symbol, Symboltype type)
 /* returns a new temporary array of the indicated type,
   with the same structure as <symbol> */
 {
@@ -344,7 +347,7 @@ int32_t array_clone(int32_t symbol, int32_t type)
      return luxerror("The number of bytes requested for the array\n(about %g) is too great", 0, fsize);
  }
  if (!pipeExec
-     && pipeSym 
+     && pipeSym
      && symbol_memory(pipeSym) == size) {
    n = pipeSym;
    pipeSym = 0;
@@ -357,8 +360,8 @@ int32_t array_clone(int32_t symbol, int32_t type)
    if (!(ptr = malloc(size))) {
      printf("requested %1d bytes in array_clone\n", size);
      return cerror(ALLOC_ERR, 0);
-   } 
-   array_header(n) = ptr;
+   }
+   array_header(n) = (array*) ptr;
    symbol_memory(n) = size;
    h = (array *) ptr;
    hOld = HEAD(symbol);
@@ -368,7 +371,7 @@ int32_t array_clone(int32_t symbol, int32_t type)
    h->facts = NULL;
  }
  array_type(n) = type;
- return n; 
+ return n;
 }
 /*-----------------------------------------------------*/
 int32_t numerical_clone(int32_t iq, Symboltype type) {
@@ -386,7 +389,8 @@ int32_t dereferenceScalPointer(int32_t nsym)
 /* returns an ordinary LUX_SCALAR for a LUX_SCAL_PTR.  NOTE: assumes that
  <nsym> is a SCAL_PTR!  LS 31jul98 */
 {
- int32_t	n, type;
+ int32_t	n;
+ Symboltype type;
  pointer	ptr;
 
  type = scal_ptr_type(nsym);
@@ -403,7 +407,7 @@ int32_t dereferenceScalPointer(int32_t nsym)
      symbol_class(n) = LUX_CSCALAR;
      complex_scalar_type(n) = type;
      complex_scalar_memory(n) = lux_type_size[type];
-     complex_scalar_data(n).f = malloc(complex_scalar_memory(n));
+     complex_scalar_data(n).f = (float*) malloc(complex_scalar_memory(n));
      if (!complex_scalar_data(n).f)
        return cerror(ALLOC_ERR, n);
      break;
@@ -449,7 +453,7 @@ int32_t dereferenceScalPointer(int32_t nsym)
  return n;
 }
 /*-----------------------------------------------------*/
-char *strsave(char *str)
+char *strsave(char const* str)
 /* saves string <str> and returns address */
 {
  char	*p;
@@ -532,8 +536,8 @@ float float_arg(int32_t nsym)
   if (nsym < 0 || nsym >= NSYM)
     { cerror(ILL_SYM, 0, nsym, "float_arg");
       return 0; }
-  if (sym[nsym].class == LUX_SCAL_PTR) nsym = dereferenceScalPointer(nsym);
-  if (sym[nsym].class != LUX_SCALAR) { cerror(NO_SCAL, nsym);  return 0.0; }
+  if (symbol_class(nsym) == LUX_SCAL_PTR) nsym = dereferenceScalPointer(nsym);
+  if (symbol_class(nsym) != LUX_SCALAR) { cerror(NO_SCAL, nsym);  return 0.0; }
   switch (scalar_type(nsym)) {
   case LUX_INT8:
     return (float) scalar_value(nsym).b;
@@ -590,8 +594,8 @@ double double_arg(int32_t nsym)
  if (nsym < 0 || nsym >= NSYM)
  { cerror(ILL_SYM, 0, nsym, "double_arg");
    return 0; }
- if (sym[nsym].class == LUX_SCAL_PTR) nsym = dereferenceScalPointer(nsym);
- if (sym[nsym].class != LUX_SCALAR) { cerror(NO_SCAL, nsym);  return 0.0; }
+ if (symbol_class(nsym) == LUX_SCAL_PTR) nsym = dereferenceScalPointer(nsym);
+ if (symbol_class(nsym) != LUX_SCALAR) { cerror(NO_SCAL, nsym);  return 0.0; }
  switch (scalar_type(nsym))
  { case LUX_INT8:
      return (double) scalar_value(nsym).b;
@@ -647,8 +651,8 @@ char *string_arg(int32_t nsym)
  if (nsym < 0 || nsym >= NSYM)
  { cerror(ILL_SYM, 0, nsym, "string_arg");
    return 0; }
- if (sym[nsym].class == LUX_SCAL_PTR) nsym = dereferenceScalPointer(nsym);
- if (sym[nsym].class != LUX_STRING) { cerror(NEED_STR, nsym);  return NULL; }
+ if (symbol_class(nsym) == LUX_SCAL_PTR) nsym = dereferenceScalPointer(nsym);
+ if (symbol_class(nsym) != LUX_STRING) { cerror(NEED_STR, nsym);  return NULL; }
  return string_value(nsym);
 }
 /*-----------------------------------------------------*/
@@ -937,7 +941,7 @@ int32_t lux_cdouble(int32_t narg, int32_t ps[])
 }
 /*-----------------------------------------------------*/
 extern int32_t	nFixed;
-int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
+int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFunc)
 /* converts ps[0] to data type <totype>. */
 /* we use this function in one of two modes: function mode (isFunc != 0)
    or subroutine mode (isFunc = 0).  In function mode, there can be
@@ -953,9 +957,9 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
   Symboltype type;
   char	do_realloc = 0;
   pointer	src, trgt;
-  scalar	value;
+  Scalar	value;
   extern char	*fmt_integer, *fmt_float, *fmt_complex;
-  void	read_a_number(char **, scalar *, Symboltype *);
+  void	read_a_number(char **, Scalar *, Symboltype *);
   char *fmttok(char *);
   int32_t Sprintf_tok(char *, ...);
 
@@ -986,7 +990,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	if (isComplexType(totype)) {
 	  value = scalar_value(iq);
 	  src.b = &value.b;
-	  complex_scalar_data(result).cf = malloc(trgtstep);
+	  complex_scalar_data(result).cf = (floatComplex*) malloc(trgtstep);
 	  symbol_memory(result) = trgtstep;
 	  if (!complex_scalar_data(result).cf)
 	    return cerror(ALLOC_ERR, 0);
@@ -1024,7 +1028,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	  symbol_memory(result) = size;
 	  symbol_class(result) = LUX_STRING;
 	  symbol_type(result) = LUX_TEMP_STRING;
-	  string_value(result) = malloc(size);
+	  string_value(result) = (char*) malloc(size);
 	  if (!string_value(result))
 	    return cerror(ALLOC_ERR, 0);
 	  memcpy(string_value(result), curScrat, size);
@@ -1054,7 +1058,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	  trgt.b = &scalar_value(result).b;
 	} else {			/* complex output */
 	  symbol_class(result) = LUX_CSCALAR;
-	  complex_scalar_data(result).cf = malloc(trgtstep);
+	  complex_scalar_data(result).cf = (floatComplex*) malloc(trgtstep);
 	  if (!complex_scalar_data(result).cf)
 	    return cerror(ALLOC_ERR, 0);
 	  symbol_memory(result) = trgtstep;
@@ -1164,7 +1168,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	  symbol_memory(result) = size;
 	  symbol_class(result) = LUX_STRING;
 	  symbol_type(result) = LUX_TEMP_STRING;
-	  string_value(result) = malloc(size);
+	  string_value(result) = (char*) malloc(size);
 	  if (!string_value(result))
 	    return cerror(ALLOC_ERR, 0);
 	  memcpy(string_value(result), curScrat, size);
@@ -1176,11 +1180,11 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	    if (trgtstep <= srcstep)
 	      do_realloc = 2;
 	    else {
-	      complex_scalar_data(result).cf =
+	      complex_scalar_data(result).cf = (floatComplex*)
 		realloc(complex_scalar_data(result).cf, trgtstep);
 	    }
 	  } else
-	    complex_scalar_data(result).cf = malloc(trgtstep);
+	    complex_scalar_data(result).cf = (floatComplex*) malloc(trgtstep);
 	  if (!do_realloc && !complex_scalar_data(result).cf)
 	    return cerror(ALLOC_ERR, 0);
 	  symbol_memory(result) = trgtstep;
@@ -1203,9 +1207,9 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	  if (size <= symbol_memory(iq))
 	    do_realloc = 1;		/* need to reallocate afterwards */
 	  else
-	    array_header(result) = realloc(array_header(result), size);
+	    array_header(result) = (array*) realloc(array_header(result), size);
 	} else
-	  array_header(result) = malloc(size);
+	  array_header(result) = (array*) malloc(size);
 	if (!do_realloc && !array_header(result))
 	  return cerror(ALLOC_ERR, 0);
 	if (iq != result)	/* copy dimensions &c */
@@ -1291,7 +1295,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	    while (n--) {
 	      Sprintf_tok(curScrat, (int32_t) *src.b);
 	      temp = strlen(curScrat) + 1;
-	      *trgt.sp = malloc(temp);
+	      *trgt.sp = (char*) malloc(temp);
 	      if (!*trgt.sp)
 		return cerror(ALLOC_ERR, 0);
 	      memcpy(*trgt.sp, curScrat, temp);
@@ -1359,7 +1363,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	    while (n--) {
 	      Sprintf_tok(curScrat, (int32_t) *src.w);
 	      temp = strlen(curScrat) + 1;
-	      *trgt.sp = malloc(temp);
+	      *trgt.sp = (char*) malloc(temp);
 	      if (!*trgt.sp)
 		return cerror(ALLOC_ERR, 0);
 	      memcpy(*trgt.sp, curScrat, temp);
@@ -1427,7 +1431,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	    while (n--) {
 	      Sprintf_tok(curScrat, (int32_t) *src.l);
 	      temp = strlen(curScrat) + 1;
-	      *trgt.sp = malloc(temp);
+	      *trgt.sp = (char*) malloc(temp);
 	      if (!*trgt.sp)
 		return cerror(ALLOC_ERR, 0);
 	      memcpy(*trgt.sp, curScrat, temp);
@@ -1495,7 +1499,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	    while (n--) {
 	      Sprintf_tok(curScrat, *src.q);
 	      temp = strlen(curScrat) + 1;
-	      *trgt.sp = malloc(temp);
+	      *trgt.sp = (char*) malloc(temp);
 	      if (!*trgt.sp)
 		return cerror(ALLOC_ERR, 0);
 	      memcpy(*trgt.sp, curScrat, temp);
@@ -1563,7 +1567,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	    while (n--) {
 	      Sprintf_tok(curScrat, (double) *src.f);
 	      temp = strlen(curScrat) + 1;
-	      *trgt.sp = malloc(temp);
+	      *trgt.sp = (char*) malloc(temp);
 	      if (!*trgt.sp)
 		return cerror(ALLOC_ERR, 0);
 	      memcpy(*trgt.sp, curScrat, temp);
@@ -1631,7 +1635,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	    while (n--) {
 	      Sprintf_tok(curScrat, (double) *src.d);
 	      temp = strlen(curScrat) + 1;
-	      *trgt.sp = malloc(temp);
+	      *trgt.sp = (char*) malloc(temp);
 	      if (!*trgt.sp)
 		return cerror(ALLOC_ERR, 0);
 	      memcpy(*trgt.sp, curScrat, temp);
@@ -1698,7 +1702,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	      Sprintf(curScrat, fmt_complex, (double) src.cf->real,
 		      (double) src.cf->imaginary);
 	      temp = strlen(curScrat) + 1;
-	      *trgt.sp = malloc(temp);
+	      *trgt.sp = (char*) malloc(temp);
 	      if (!*trgt.sp)
 		return cerror(ALLOC_ERR, 0);
 	      memcpy(*trgt.sp, curScrat, temp);
@@ -1765,7 +1769,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 	      Sprintf(curScrat, fmt_complex, (double) src.cd->real,
 		      (double) src.cd->imaginary);
 	      temp = strlen(curScrat) + 1;
-	      *trgt.sp = malloc(temp);
+	      *trgt.sp = (char*) malloc(temp);
 	      if (!*trgt.sp)
 		return cerror(ALLOC_ERR, 0);
 	      memcpy(*trgt.sp, curScrat, temp);
@@ -1877,13 +1881,13 @@ int32_t lux_convert(int32_t narg, int32_t ps[], int32_t totype, int32_t isFunc)
 
     switch (do_realloc) {
       case 1:
-	array_header(result) = realloc(array_header(result), size);
+	array_header(result) = (array*) realloc(array_header(result), size);
 	if (!array_header(result))
 	  return cerror(ALLOC_ERR, 0);
 	symbol_memory(result) = size;
 	break;
       case 2:
-	complex_scalar_data(result).cf =
+	complex_scalar_data(result).cf = (floatComplex*)
 	  realloc(complex_scalar_data(result).cf, size);
 	if (!complex_scalar_data(result).cf)
 	  return cerror(ALLOC_ERR, 0);
@@ -1965,7 +1969,7 @@ int32_t get_dims(int32_t *num, int32_t *arg, int32_t *dims)
      size = array_size(iq);
      if (size > MAX_DIMS)
        return cerror(N_DIMS_OVR, arg[-1]);
-     ptr = array_data(iq);
+     ptr = (int32_t*) array_data(iq);
      *num = size;
      memcpy(dims, ptr, size*sizeof(int32_t));
      for (i = 0; i < size; i++)
@@ -1985,14 +1989,14 @@ int32_t create_sub_ptr(int32_t nsym, char *p, int32_t index)
  int32_t	iq;
 
  getFreeTempVariable(iq);
- sym[iq].class = LUX_SCAL_PTR;
+ symbol_class(iq) = LUX_SCAL_PTR;
  sym[iq].type = sym[nsym].type;
  sym[iq].line = curLineNumber;
  sym[iq].spec.general.ptr = p + index*lux_type_size[sym[nsym].type];
  return iq;
 }
 /*-----------------------------------------------------*/
-int32_t redef_scalar(int32_t nsym, int32_t ntype, void *val)
+int32_t redef_scalar(int32_t nsym, Symboltype ntype, void *val)
 /* redefine symbol nsym to be a scalar of type ntype with value *val */
 {
   wideScalar	*value;
@@ -2023,7 +2027,7 @@ int32_t redef_scalar(int32_t nsym, int32_t ntype, void *val)
       break;
     case LUX_CFLOAT:
       complex_scalar_memory(nsym) = lux_type_size[LUX_CFLOAT];
-      complex_scalar_data(nsym).cf = malloc(complex_scalar_memory(nsym));
+      complex_scalar_data(nsym).cf = (floatComplex*) malloc(complex_scalar_memory(nsym));
       if (!complex_scalar_data(nsym).cf)
 	return cerror(ALLOC_ERR, nsym);
       symbol_class(nsym) = LUX_CSCALAR;
@@ -2032,7 +2036,7 @@ int32_t redef_scalar(int32_t nsym, int32_t ntype, void *val)
       break;
     case LUX_CDOUBLE:
       complex_scalar_memory(nsym) = lux_type_size[LUX_CDOUBLE];
-      complex_scalar_data(nsym).cd = malloc(complex_scalar_memory(nsym));
+      complex_scalar_data(nsym).cd = (doubleComplex*) malloc(complex_scalar_memory(nsym));
       if (!complex_scalar_data(nsym).cd)
 	return cerror(ALLOC_ERR, nsym);
       symbol_class(nsym) = LUX_CSCALAR;
@@ -2047,14 +2051,14 @@ int32_t redef_string(int32_t nsym, int32_t len)
 /* redefine symbol nsym to be a string with length len (excluding \0) */
 {
  undefine(nsym);
- sym[nsym].class = LUX_STRING;
+ symbol_class(nsym) = LUX_STRING;
  sym[nsym].type = LUX_TEMP_STRING;
  allocate(string_value(nsym), len + 1, char);
  sym[nsym].spec.array.bstore = len + 1;
  return 1;
 }
 /*-----------------------------------------------------*/
-int32_t redef_array(int32_t nsym, int32_t ntype, int32_t ndim, int32_t *dims)
+int32_t redef_array(int32_t nsym, Symboltype ntype, int32_t ndim, int32_t *dims)
 /* redefines symbol nsym to be an array of the given type, number of
   dimensions, and dimensions; or a scalar if <ndim> == 0 */
 {                                /*redefine a symbol i to an array */
@@ -2094,7 +2098,7 @@ int32_t redef_array(int32_t nsym, int32_t ntype, int32_t ndim, int32_t *dims)
   if (ntype == LUX_STRING_ARRAY) {
     /* a string array: set all elements to NULL */
     mq = array_size(nsym);
-    p.sp = array_data(nsym);
+    p.sp = (char**) array_data(nsym);
     while (mq--)
       *p.sp++ = NULL;
   }
@@ -2215,10 +2219,10 @@ int32_t strarr(int32_t narg, int32_t ps[])
    return LUX_ERROR;
  iq = array_scratch(LUX_STRING_ARRAY, narg, dims);
  if (size) {			/* fill with specified size of whitespace */
-   ptr = array_data(iq);
+   ptr = (char**) array_data(iq);
    n = array_size(iq);
    while (n--) {
-     *ptr = malloc(size + 1);
+     *ptr = (char*) malloc(size + 1);
      sprintf(*ptr, "%*s", size, " ");
      ptr++;
    }
@@ -2252,7 +2256,7 @@ int32_t show_routine(internalRoutine *table, int32_t tableLength, int32_t narg, 
    printf("%s %s, (%1d:%1d) arguments\n",
 	  table == subroutine? "subroutine": "function",
 	  table[i].name, table[i].minArg, table[i].maxArg);
-   keys = table[i].keys;
+   keys = (keyList*) table[i].keys;
    if (keys)
    { printf("parameters: ");
      if (keys->suppressEval)
@@ -2342,10 +2346,11 @@ int32_t lux_switch(int32_t narg, int32_t ps[])
 int32_t lux_array(int32_t narg, int32_t ps[])
 /* create an array of the specified type and dimensions */
 {
- int32_t	dims[MAX_DIMS], type;
+  int32_t	dims[MAX_DIMS];
+  Symboltype type;
 
  narg--;
- type = int_arg(*ps);
+ type = (Symboltype) int_arg(*ps);
  if (!isLegalType(type))
    return cerror(ILL_TYPE, 0, type);
  if (isStringType(type))
@@ -2366,7 +2371,7 @@ int32_t lux_assoc(int32_t narg, int32_t ps[])
  iq = ps[1];
  CK_ARR(iq, 2);
  getFreeTempVariable(result);
- sym[result].class = LUX_ASSOC;
+ symbol_class(result) = LUX_ASSOC;
  sym[result].type = sym[iq].type;
  sym[result].line = curLineNumber;
  h = HEAD(iq);
@@ -2398,7 +2403,7 @@ int32_t lux_rfix(int32_t narg, int32_t ps[])
 
  nsym = *ps;
  if ((type = sym[nsym].type) == LUX_INT32) return nsym; /* already of proper type */
- switch (sym[nsym].class)
+ switch (symbol_class(nsym))
  { case LUX_SCALAR:
      src.l = &sym[nsym].spec.scalar.l;  size = 1;
      result = scalar_scratch(LUX_INT32);  trgt = &sym[result].spec.scalar.l;  break;
@@ -2529,7 +2534,7 @@ int32_t lux_step(int32_t narg, int32_t ps[])
 int32_t lux_varname(int32_t narg, int32_t ps[])
 /* returns the name of the variable */
 {
-  char	*name;
+  char const* name;
   int32_t	iq;
 
   name = varName(*ps);
@@ -2574,7 +2579,7 @@ int32_t namevar(int32_t symbol, int32_t safe)
   return iq;
 }
 /*-------------------------------------------------------------------------*/
-char *keyName(internalRoutine *routine, int32_t number, int32_t index)
+char const* keyName(internalRoutine *routine, int32_t number, int32_t index)
 /* returns the name of the <index>th positional keyword of <routine> */
 /* #<number>.  LS 19jan95 */
 {
@@ -2611,7 +2616,7 @@ int32_t lux_set(int32_t narg, int32_t ps[])
   extern int32_t	setup;
 #if HAVE_LIBX11
   char	*string;
-  char	*visualNames[] = { "StaticGray", "StaticColor", "TrueColor",
+  char const* visualNames[] = { "StaticGray", "StaticColor", "TrueColor",
 			   "GrayScale", "PseudoColor", "DirectColor",
 			   "SG", "SC", "TC", "GS", "PC", "DC",
 			   "GSL", "CSL", "CSI", "GDL", "CDL", "CDI" };
@@ -2640,17 +2645,17 @@ int32_t lux_set(int32_t narg, int32_t ps[])
       }
       i = visualClassCode[i % 6];
       if (connect_flag) {
-	if (i == visual->class)
+	if (i == visualclass(visual))
 	  return LUX_OK;	/* already use the selected visual class */
 	else
 	  return luxerror("Already using a %s visual.", 0,
-		       visualNames[visual->class]);
+                          visualNames[visualclass(visual)]);
       }
       if (setup_x_visual(i) == LUX_ERROR)
 	return LUX_ERROR;
 #else
       return luxerror("Need X11 package to set the visual", 0);
-#endif      
+#endif
     }
   }
   if (internalMode & 1)		/* /SET: copy exactly */
@@ -2727,7 +2732,7 @@ int32_t (*lux_converts[])(int32_t, int32_t []) = {
   lux_byte, lux_word, lux_long, lux_int64, lux_float, lux_double, lux_string,
   lux_string, lux_string, lux_cfloat, lux_cdouble
 };
-int32_t getNumerical(int32_t iq, int32_t minType, int32_t *n, pointer *src, char mode,
+int32_t getNumerical(int32_t iq, Symboltype minType, int32_t *n, pointer *src, char mode,
 		 int32_t *result, pointer *trgt)
 /* gets pointer to and size of the data in numerical argument <iq>.
    returns pointer in <*src>, number of elements in <*n>.
@@ -2752,7 +2757,7 @@ int32_t getNumerical(int32_t iq, int32_t minType, int32_t *n, pointer *src, char
 
    LS 19nov98 */
 {
-  int32_t	type;
+  Symboltype	type;
 
   if (!symbolIsNumerical(iq))
     return cerror(ILL_CLASS, iq);
@@ -2816,7 +2821,7 @@ int32_t getSimpleNumerical(int32_t iq, pointer *data, int32_t *nelem)
       *nelem = 1;
       break;
     case LUX_ARRAY:
-      (*data).l = array_data(iq);
+      (*data).l = (int32_t*) array_data(iq);
       *nelem = array_size(iq);
       break;
     default:
@@ -2854,7 +2859,7 @@ int32_t lux_pointer(int32_t narg, int32_t ps[])
   if (symbol_class(ps[0]) != LUX_POINTER)
   { undefine(ps[0]);
     symbol_class(ps[0]) = LUX_POINTER;
-    transfer_is_parameter(ps[0]) = 0;
+    transfer_is_parameter(ps[0]) = (Symboltype) 0;
     transfer_temp_param(ps[0]) = 0; }
   iq = eval(ps[1]);
   if (internalMode)		/* target must be a string variable */
@@ -2887,8 +2892,9 @@ int32_t lux_pointer(int32_t narg, int32_t ps[])
 	  return LUX_ERROR;
 	symbol_class(ps[0]) = LUX_FUNC_PTR;
 	func_ptr_routine_num(ps[0]) = -iq;
-	func_ptr_type(ps[0]) = (internalMode & 1)? LUX_FUNCTION:
-	LUX_SUBROUTINE; }
+	func_ptr_type(ps[0]) = (Symboltype) ((internalMode & 1)? LUX_FUNCTION:
+                                             LUX_SUBROUTINE);
+      }
       else
       { iq = findName(name2, internalMode == 1? funcHashTable: subrHashTable,
 		      0);
@@ -3042,7 +3048,7 @@ int32_t routineContext(int32_t nsym)
 /*-------------------------------------------------------------------------*/
 #define isodigit(x) (isdigit(x) && x < '8')
 
-void read_a_number(char **buf, scalar *value, Symboltype *type)
+void read_a_number(char **buf, Scalar *value, Symboltype *type)
 /* reads the number at <*buf>, puts it in <*value> and its data type
    in <*type> (if <type> is not NULL), and modifies <*buf> to point
    just after the detected value.  NOTE: if the type is integer (BYTE,
@@ -3306,7 +3312,7 @@ void read_a_number(char **buf, scalar *value, Symboltype *type)
   *buf = p;
 }
 /*-------------------------------------------------------------------------*/
-void read_a_number_fp(FILE *fp, scalar *value, Symboltype *type)
+void read_a_number_fp(FILE *fp, Scalar *value, Symboltype *type)
 /* reads the number at <*fp>, puts it in <*value> and its data type in
    <*type> (if <type> is not NULL).  Other than the source of the
    data, exactly the same as read_a_number().  NOTE: if the type is
@@ -3672,11 +3678,11 @@ int32_t nextchar(FILE *fp) {
   /* data input buffer is used, with all command line editing except */
   /* history buffer stuff enabled.  This can be used as an alternative */
   /* for fgetc(). LS 29mar2001 */
-  int32_t getNewLine(char *, size_t, char *, char);
+  int32_t getNewLine(char *, size_t, char const *, char);
 
   if (fp == stdin) {
     if (!keyboard.ptr) {
-      keyboard.buffer = malloc(BUFSIZE);
+      keyboard.buffer = (char*) malloc(BUFSIZE);
       keyboard.ptr = keyboard.buffer;
       *keyboard.ptr = '\0';
     }

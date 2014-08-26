@@ -27,7 +27,7 @@ typedef enum {
   Vel, Vir, Vol, Vul
 } CONSTELLATION;
 
-char *constellation_names[] = {
+char const* constellation_names[] = {
   "And", "Ant", "Aps", "Aqr", "Aql", "Ara", "Ari", "Aur", "Boo",
   "Cae", "Cam", "Cnc", "CVn", "CMa", "CMi", "Cap", "Car", "Cas",
   "Cen", "Cep", "Cet", "Cha", "Cir", "Col", "Com", "CrA", "CrB",

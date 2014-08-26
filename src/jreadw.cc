@@ -19,8 +19,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 /* jreadw.c, interface with jpeg libraries based on example.c in JPEG
    distribution */
-#include "action.h"
-#include "jinclude.h"
+#include "action.hh"
+#include "jinclude.hh"
 #include <setjmp.h>
 
  /* parameters for the current image */

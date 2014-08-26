@@ -17,13 +17,15 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include <stdio.h>
 #include <printf.h>
 #include <obstack.h>
 #include <math.h>
 #include <malloc.h>
-#include "calendar.h"
+#include "calendar.hh"
 
 #define obstack_chunk_alloc malloc
 #define obstack_chunk_free free
@@ -127,7 +129,7 @@ int32_t printf_sexagesimal(FILE *stream, const struct printf_info *info,
   }
   width = obstack_object_size(&o);
   obstack_1grow(&o, '\0');      /* ensure terminating \0 */
-  char *p = obstack_finish(&o);
+  char *p = (char*) obstack_finish(&o);
   fputs(p, stream);
   obstack_free(&o, 0);
   return width;
@@ -259,7 +261,7 @@ int32_t printf_date(FILE *stream, const struct printf_info *info,
   }
   width = obstack_object_size(&o);
   obstack_1grow(&o, '\0');      /* ensure terminating \0 */
-  char *p = obstack_finish(&o);
+  char *p = (char*) obstack_finish(&o);
   fputs(p, stream);
   obstack_free(&o, 0);
   return width;

@@ -20,8 +20,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 /** \file Bytestack.c A stack of bytes whose size grows as needed
     when more data is pushed unto it. */
 
-#include "action.h"
-#include "Bytestack.h"
+#include "action.hh"
+#include "Bytestack.hh"
 /* HEADERS */
 #include <stdarg.h>
 #include <stddef.h>
@@ -117,15 +117,15 @@ Bytestack_delete(Bytestack b)
     may in fact be added.
 
     @return 0 upon success, non-zero upon error. */
-static int32_t 
-enlarge(Bytestack b, size_t n) 
+static int32_t
+enlarge(Bytestack b, size_t n)
 {
   char *p;
 
   if (!b)
     b = default_Bytestack();
   n = (((n - 1)/256) + 1)*256;
-  p = realloc(b->begin, (size_t) (b->size + n));
+  p = (char*) realloc(b->begin, (size_t) (b->size + n));
   if (p) {
     b->size += n;
     b->begin = p;
@@ -189,10 +189,10 @@ Bytestack_strcat(Bytestack b,
  * text on the Byte stack, or #BYTESTACK_INDEX_ERROR if an error
  * occurred.
  */
-Bytestack_index 
+Bytestack_index
 Bytestack_push_data(Bytestack b,
 		       const void *begin,
-		       const void *end) 
+		       const void *end)
 {
   size_t n;
   ssize_t p;
@@ -202,14 +202,14 @@ Bytestack_push_data(Bytestack b,
   if (!b)
     b = default_Bytestack();
   if (!end)
-    end = strchr(begin, '\0');
+    end = strchr((char*) begin, '\0');
   if (end < begin)
     return -1;
   if (end == begin) {
     b->begin[b->cur] = '\0';
     return b->cur;
   }
-  n = (size_t) (end - begin);
+  n = (size_t) ((char*) end - (char*) begin);
   p = -1;
   if ((b->cur + n < b->size	/* enough room */
        || enlarge(b, n + 1) == 0) /* or enlarged sufficiently */

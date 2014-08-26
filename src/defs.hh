@@ -154,9 +154,9 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 
 /* check whether symbol is an array */
 #define CK_ARR(SYM, ARGN) \
-  if (sym[SYM].class != ARRAY) return exec_n_error(66, ARGN, SYM)
+  if (symbol_class(SYM) != ARRAY) return exec_n_error(66, ARGN, SYM)
 #define CK_GHARR(SYM, ARGN)\
-  if (sym[SYM].class != ARRAY && sym[SYM].class != GHOST_ARRAY) \
+  if (symbol_class(SYM) != ARRAY && symbol_class(SYM) != GHOST_ARRAY) \
     return exec_n_error(66, ARGN, SYM)
 
 /* memory allocation */
@@ -190,7 +190,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 /* get pointer to numerical values in PTR.l, # of elements in SIZE
    (works for scalar, scalar pointer, and arrays) */
 #define GET_NUMERICAL(PTR, SIZE, ARGNUM) \
-  switch (sym[iq].class) \
+  switch (symbol_class(iq)) \
   { case SCAL_PTR:  iq = class8_to_1(iq);  \
     case SCALAR:    PTR.l = &sym[iq].spec.scalar.l;  SIZE = 1;  break;  \
     case ARRAY:     h = HEAD(iq);  PTR.l = LPTR(h);  GET_SIZE(SIZE, h->dims, h->ndim);  \

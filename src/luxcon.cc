@@ -21,7 +21,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
-#include "action.h"
+#include "action.hh"
 /* anacon.f -- translated by f2c (version of 28 March 1990  0:01:01).
    Modified by Louis Strous 27jul94
 */

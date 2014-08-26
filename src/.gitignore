@@ -7,7 +7,7 @@ Makefile.in
 TAGS
 liblux.a
 lux
-luxparser.c
-luxparser.h
+luxparser.cc
+luxparser.hh
 maybe-GITID
 version.h

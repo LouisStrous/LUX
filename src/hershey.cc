@@ -24,7 +24,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdio.h> /* for fread(5) printf(5) fclose(2) fopen(1) FILE(1) */
 #include <stdlib.h> /* for bsearch(1) */
 #include <string.h> /* for strdup(1) */
-#include "hershey.h"
+#include "hershey.hh"
 
 static uint32_t hershey_numbers_count;
 static uint16_t *hershey_numbers = NULL;
@@ -197,7 +197,7 @@ int32_t hershey_coords(hershey_handle *handle, int32_t *x, int32_t *y) {
   return result;
 }
 
-#include "unittest.h"
+#include "unittest.hh"
 int32_t test_hershey(void)
 {
   int32_t bad = 0;

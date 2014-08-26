@@ -51,7 +51,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #define complex_array_size(symbol) /* int32_t */((symbol_memory(symbol) - sizeof(array))/lux_type_size[complex_array_type(symbol)])
 #define complex_array_type(symbol) /* uint8_t */(sym[symbol].type)
 #define complex_scalar_type(symbol) /* uint8_t */(sym[symbol].type)
-#define complex_scalar_data(symbol) /* pointer */sym[symbol].spec.pointer
+#define complex_scalar_data(symbol) /* pointer */sym[symbol].spec.dpointer
 #define complex_scalar_memory(symbol) /* int32_t */(sym[symbol].spec.general.bstore)
 #define deferred_routine_filename(symbol) /* char * */(sym[symbol].spec.name.ptr)
 #define do_while_body(symbol)	/* int16_t */(sym[symbol].spec.evb.args[0])
@@ -61,7 +61,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #define enum_value(symbol,i)	/* int32_t */ (sym[symbol].spec.enumElem.ptr[i].value)
 #define enum_num_elements(symbol) /* int32_t */(sym[symbol].spec.enumElem.bstore/sizeof(enumElem))
 #define enum_type(symbol)	/* uint8_t */(sym[symbol].type)
-#define evb_type(symbol)	/* uint8_t */(sym[symbol].type)
+#define evb_type(symbol)	/* uint8_t */(EVBclass) (sym[symbol].type)
 #define evb_num_elements(symbol) /* int32_t */(sym[symbol].spec.wlist.bstore/sizeof(int16_t))
 #define evb_elements(symbol)	/* int16_t * */(sym[symbol].spec.wlist.ptr)
 #define evb_args(symbol)	/* int16_t * */(sym[symbol].spec.evb.args)
@@ -151,10 +151,10 @@ int32_t	file_map_size(int32_t symbol);
 #define routine_statements(symbol) /* int16_t * */(routine_parameters(symbol) + routine_num_parameters(symbol))
 #define routine_has_extended_param(symbol) /* uint8_t */(sym[symbol].spec.routine.extend)
 #define run_block_number(symbol) /* int16_t */(sym[symbol].xx)
-#define scal_ptr_pointer(symbol) /* pointer */(sym[symbol].spec.pointer)
+#define scal_ptr_pointer(symbol) /* pointer */(sym[symbol].spec.dpointer)
 #define scal_ptr_type(symbol)	/* uint8_t */(sym[symbol].type)
 #define scalar_type(symbol)	/* uint8_t */(sym[symbol].type)
-#define scalar_value(symbol)	/* scalar */(sym[symbol].spec.scalar)
+#define scalar_value(symbol)	/* Scalar */(sym[symbol].spec.scalar)
 #define string_size(symbol)	/* int32_t */(sym[symbol].spec.name.bstore - (int32_t) 1)
 #define string_type(symbol)	/* uint8_t */(sym[symbol].type)
 #define string_value(symbol)	/* char * */(sym[symbol].spec.name.ptr)
@@ -175,11 +175,11 @@ int32_t	file_map_size(int32_t symbol);
 #define subsc_ptr_redirect(symbol) /* int32_t */((sym[symbol].spec.intList.ptr)[3])
 #define subsc_ptr_start(symbol) /* int32_t */((sym[symbol].spec.intList.ptr)[0])
 #define subsc_ptr_sum(symbol)	/* int32_t */((sym[symbol].spec.intList.ptr)[2])
-#define symbol_class(symbol)	/* uint8_t */ (sym[symbol].class)
+#define symbol_class(symbol)	/* uint8_t */ (sym[symbol].sclass)
 #define symbol_context(symbol)	/* int16_t */(sym[symbol].context)
 #define symbol_data(symbol)	/* void * */(sym[symbol].spec.general.ptr)
 #define symbol_memory(symbol)	/* int32_t */(sym[symbol].spec.general.bstore)
-#define symbol_type(symbol)	/* uint8_t */(sym[symbol].type)
+#define symbol_type(symbol)	/* Symboltype */(sym[symbol].type)
 #define symbol_line(symbol)	/* int32_t */(sym[symbol].line)
 #define symbol_extra(symbol)	/* union specUnion */(sym[symbol].spec)
 #define transfer_is_parameter(symbol) /* uint8_t */(sym[symbol].type)
@@ -229,7 +229,7 @@ int32_t	file_map_size(int32_t symbol);
 #define isLegalType(type)	/* int32_t */ ((type) >= LUX_INT8 && (type) <= LUX_CDOUBLE)
 /* realType(type) returns <type> if it is real, or the corresponding real */
 /* type if it is complex. */
-#define realType(type)		/* int32_t */ (((type) >= LUX_CFLOAT)? (type) + (LUX_FLOAT - LUX_CFLOAT): (type))
+#define realType(type)		/* Symboltype */ (Symboltype)(((type) >= LUX_CFLOAT)? (type) + (LUX_FLOAT - LUX_CFLOAT): (type))
 #define complexMag2(x) ((x).real*(x).real + (x).imaginary*(x).imaginary)
 
 #define INFTY (1.0/0.0)

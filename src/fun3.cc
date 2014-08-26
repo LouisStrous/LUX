@@ -32,9 +32,9 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <float.h>
 #include <stdlib.h>		/* for strtol */
 #include <errno.h>
-#include "action.h"
-#include "editorcharclass.h"
-#include "luxparser.h"
+#include "action.hh"
+#include "editorcharclass.hh"
+#include "luxparser.hh"
 
 int32_t	ezffti(int32_t *, float *), fade_xsize, fade_ysize, fade_dim[2];
 int32_t rffti(int32_t *, float *);
@@ -46,13 +46,14 @@ int32_t rfftfd(int32_t *, double *, double *);
 int16_t	*fade1, *fade2;
 extern int32_t	scalemax, scalemin, lastmaxloc, lastminloc, maxhistsize,
   histmin, histmax, fftdp, lastmax_sym, lastmin_sym, errno;
-extern scalar	lastmin, lastmax;
+extern Scalar	lastmin, lastmax;
 static	int32_t	nold = 0, fftdpold, mqold;
 static pointer	work;
 int32_t	minmax(int32_t *, int32_t, int32_t), neutral(void *, int32_t);
 void	zerobytes(void *, int32_t), zap(int32_t);
 int32_t	simple_scale(void *, int32_t, int32_t, void *);
 void convertWidePointer(wideScalar *, int32_t, int32_t);
+int32_t readNumber(YYSTYPE *);
 /*------------------------------------------------------------------------- */
 int32_t evalString(char *expr, int32_t nmax)
 /* compiles and evaluates a string, interpreting it as code */
@@ -68,10 +69,11 @@ int32_t evalString(char *expr, int32_t nmax)
 /* LS 2may96 */
 {
  char	*save, *text;
- int32_t	result, readNumber(YYSTYPE *), n, type, temp, size;
- void	translateLine(void), convertScalar(scalar *, int32_t, int32_t);
+ int32_t	result, n, temp, size;
+ Symboltype type;
+ void	translateLine(void), convertScalar(Scalar *, int32_t, Symboltype);
  pointer	p;
- scalar	s;
+ Scalar	s;
  extern char	*currentChar;
  extern int32_t	tempSym;
  YYSTYPE	valp;
@@ -108,7 +110,7 @@ int32_t evalString(char *expr, int32_t nmax)
      size = lux_type_size[type];
      if (n == 1) {		/* only a single number: use LUX_SCALAR */
        result = scalar_scratch(type);
-       p.b = &scalar_value(result).b + size; 
+       p.b = &scalar_value(result).b + size;
      } else {
        result = array_scratch(type, 1, &n);
        p.b = (uint8_t *) array_data(result) + n*size;
@@ -210,7 +212,7 @@ int32_t lux_tense(int32_t narg, int32_t ps[])			/* tense function */
 					/* first 3 args must be 1-D vectors */
   for (i=0;i<3;i++) {
     iq = ps[i];
-    if ( sym[iq].class != LUX_ARRAY ) return cerror(NEED_ARR, ps[i]);
+    if ( symbol_class(iq) != LUX_ARRAY ) return cerror(NEED_ARR, ps[i]);
     h = (array *) sym[iq].spec.array.ptr;
     if ( h->ndim != 1) return cerror(NEED_1D_ARR, ps[i]); 	/* ck if 1-D */
     /* double each one */
@@ -226,7 +228,7 @@ int32_t lux_tense(int32_t narg, int32_t ps[])			/* tense function */
   /* sign of sigma is a flag, + => that slopes (der's) are input */
   if (narg > 4)  { der_left = double_arg( ps[4] );  sigma = - sigma; }
   if (narg > 5) der_right = double_arg( ps[5] );
-  result_sym = array_clone(ps[2], 4);
+  result_sym = array_clone(ps[2], LUX_DOUBLE);
   h = (array *) sym[result_sym].spec.array.ptr;
   yf = (double *) ((char *)h + sizeof(array));
   nf = len[2];
@@ -265,7 +267,7 @@ int32_t lux_tense_curve(int32_t narg, int32_t ps[])/* tense_curve function */
 				/* first 3 args must be 1-D vectors */
 for (i=0;i<3;i++) {
 iq = ps[i];
-if ( sym[iq].class != 4 ) return cerror(NEED_ARR, ps[i]);
+if ( symbol_class(iq) != 4 ) return cerror(NEED_ARR, ps[i]);
 h = (array *) sym[iq].spec.array.ptr;
 if ( h->ndim != 1) return cerror(NEED_1D_ARR, ps[i]); 	/* ck if 1-D */
 						/* double each one */
@@ -282,7 +284,7 @@ if (narg > 4) der_left = double_arg( ps[4] );
 if (narg > 5) der_right = double_arg( ps[5] );
 sigma = - sigma;
 dim[0] = nf = len[2];	dim[1] = 2;
-result_sym = array_scratch(4, 2, dim);
+result_sym = array_scratch(LUX_DOUBLE, 2, dim);
 h = (array *) sym[result_sym].spec.array.ptr;
 xf = (double *) ((char *)h + sizeof(array));
 yf = xf + nf;
@@ -318,7 +320,7 @@ int32_t lux_tense_loop(int32_t narg, int32_t ps[])/* tense_loop function */
 					/* first 3 args must be 1-D vectors */
 for (i=0;i<3;i++) {
 iq = ps[i];
-if ( sym[iq].class != 4 ) return cerror(NEED_ARR, ps[i]);
+if ( symbol_class(iq) != 4 ) return cerror(NEED_ARR, ps[i]);
 h = (array *) sym[iq].spec.array.ptr;
 if ( h->ndim != 1) return cerror(NEED_1D_ARR, ps[i]); 	/* ck if 1-D */
 						/* double each one */
@@ -333,7 +335,7 @@ sigma = 1.0;	/* defaults */
 if (narg > 3) sigma = double_arg( ps[3] );
 sigma = - sigma;
 dim[0] = nf = len[2];	dim[1] = 2;
-result_sym = array_scratch(4, 2, dim);
+result_sym = array_scratch(LUX_DOUBLE, 2, dim);
 h = (array *) sym[result_sym].spec.array.ptr;
 xf = (double *) ((char *)h + sizeof(array));
 yf = xf + nf;
@@ -346,10 +348,11 @@ free( st);
 if ( iq == 1) return result_sym; else return -1;
 }
 /*------------------------------------------------------------------------- */
-int32_t lux_sc(int32_t narg, int32_t ps[])	/* sc routine */		
+int32_t lux_sc(int32_t narg, int32_t ps[])	/* sc routine */
 /* sine-cosine style FFT --  sc, x, s, c */
 {
-  int32_t	iq, nd, outer, n, mq, dim[MAX_DIMS], type, jq, nn;
+  int32_t	iq, nd, outer, n, mq, dim[MAX_DIMS], jq, nn;
+  Symboltype type;
   pointer	q1,q2,q3;
   int32_t	ezffti(int32_t *n, float *wsave), ezfftid(int32_t *n, double *wsave),
     ezfftf(int32_t *n, float *r, float *azero, float *a, float *b, float *wsave),
@@ -365,7 +368,7 @@ int32_t lux_sc(int32_t narg, int32_t ps[])	/* sc routine */
   else				/* double precision */
     iq = lux_double(1, ps);
 
-  q1.l = array_data(iq);
+  q1.l = (int32_t*) array_data(iq);
 
   /* find inner and product of all outer dimensions */
   nd = array_num_dims(iq);
@@ -400,8 +403,8 @@ int32_t lux_sc(int32_t narg, int32_t ps[])	/* sc routine */
       || redef_array(jq, type, nd, dim) != 1)
     return LUX_ERROR;
 					/* get addresses */
-  q2.l = array_data(iq);		/* <s> */
-  q3.l = array_data(jq);		/* <c> */
+  q2.l = (int32_t*) array_data(iq);		/* <s> */
+  q3.l = (int32_t*) array_data(jq);		/* <c> */
 					/* loop over the outer dimensions */
   while (outer--) {
     switch (type) {
@@ -490,7 +493,7 @@ double *update_ffttemp(int32_t n)
 {
   if (n != nffttemp) {
     free(ffttemp);
-    ffttemp = malloc(n*sizeof(double));
+    ffttemp = (double*) malloc(n*sizeof(double));
     nffttemp = ffttemp? n: -1;
   }
   return ffttemp;
@@ -610,7 +613,7 @@ int32_t gsl_fft_expand(double *sdata, size_t scount, size_t sstride,
   } else {
     /* copy source to temporary storage, forward fft, then backward fft
        for target size, then copy to target */
-    double *temp = malloc(tcount*sizeof(double));
+    double *temp = (double*) malloc(tcount*sizeof(double));
     if (!temp) {
       errno = ENOMEM;
       return 1;
@@ -651,7 +654,7 @@ int32_t lux_fft_expand(int32_t narg, int32_t ps[])
     return luxerror("Need positive expansion factor", ps[1]);
   
   int32_t ndim = infos[0].ndim;
-  int32_t *dims = malloc(ndim*sizeof(int32_t));
+  int32_t *dims = (int32_t*) malloc(ndim*sizeof(int32_t));
   if (!dims)
     return cerror(ALLOC_ERR, 0);
   memcpy(dims, infos[0].dims, ndim*sizeof(int32_t));
@@ -679,7 +682,8 @@ REGISTER(fft_expand, f, FFTEXPAND, 2, 2, NULL);
 int32_t lux_real(int32_t narg, int32_t ps[])
 /* returns the real part of the argument.  LS 17nov98 */
 {
-  int32_t	iq, outtype, result, n;
+  int32_t	iq, result, n;
+  Symboltype outtype;
   pointer	value, trgt;
 
   if (!symbolIsNumerical(ps[0]))
@@ -688,7 +692,7 @@ int32_t lux_real(int32_t narg, int32_t ps[])
     return ps[0];		/* nothing to do */
 
   outtype = (symbol_type(ps[0]) == LUX_CFLOAT)? LUX_FLOAT: LUX_DOUBLE;
-  
+
   iq = ps[0];
   switch (symbol_class(iq)) {
     case LUX_SCAL_PTR:
@@ -727,7 +731,8 @@ int32_t lux_real(int32_t narg, int32_t ps[])
 int32_t lux_imaginary(int32_t narg, int32_t ps[])
 /* returns the imaginary part of the argument.  LS 17nov98 */
 {
-  int32_t	iq, outtype, result, n;
+  int32_t	iq, result, n;
+  Symboltype outtype;
   pointer	value, trgt;
 
   if (!symbolIsNumerical(ps[0]))
@@ -736,7 +741,7 @@ int32_t lux_imaginary(int32_t narg, int32_t ps[])
     return lux_zero(1, &ps[0]);	/* no imaginary part */
 
   outtype = (symbol_type(ps[0]) == LUX_CFLOAT)? LUX_FLOAT: LUX_DOUBLE;
-  
+
   iq = ps[0];
   switch (symbol_class(iq)) {
     case LUX_SCAL_PTR:
@@ -775,7 +780,8 @@ int32_t lux_imaginary(int32_t narg, int32_t ps[])
 int32_t lux_arg(int32_t narg, int32_t ps[])
 /* returns the complex argument of the argument.  LS 17nov98 */
 {
-  int32_t	iq, outtype, result, type, n;
+  int32_t	iq, result, type, n;
+  Symboltype outtype;
   pointer	value, trgt;
 
   if (!symbolIsNumerical(ps[0]))
@@ -784,7 +790,7 @@ int32_t lux_arg(int32_t narg, int32_t ps[])
   type = symbol_type(ps[0]);
   outtype = (type == LUX_DOUBLE || symbol_type(ps[0]) == LUX_CDOUBLE)?
     LUX_DOUBLE: LUX_FLOAT;
-  
+
   iq = ps[0];
   switch (symbol_class(iq)) {
     case LUX_SCAL_PTR:
@@ -896,10 +902,11 @@ int32_t lux_complex(int32_t narg, int32_t ps[])
 int32_t fftshift(int32_t narg, int32_t ps[], int32_t subroutine)
 /* y = FFTSHIFT(data,dist) */
 {
-  int32_t	iq, n, mq, type, j, jq, result, step, ndist;
+  int32_t	iq, n, mq, j, jq, result, step, ndist;
+  Symboltype type;
   pointer	src, trgt, work, tmp, otmp, src0, trgt0, dist,
     sines, cosines;
-  scalar	v, factor;
+  Scalar	v, factor;
   int32_t	rfftb(int32_t *, float *, float *), rfftf(int32_t *, float *, float *),
     rfftbd(int32_t *, double *, double *), rfftfd(int32_t *, double *, double *),
     rffti(int32_t *, float *), rfftid(int32_t *, double *), lux_indgen(int32_t, int32_t *);
@@ -933,7 +940,7 @@ int32_t fftshift(int32_t narg, int32_t ps[], int32_t subroutine)
   }
 
   jq = lux_indgen(1, &ps[1]);	/* axes */
-  
+
   if (subroutine) {
     if (standardLoop(iq, jq, SL_EACHROW, type,
 		     &srcinfo, &src, NULL, NULL, NULL) < 0)
@@ -969,8 +976,8 @@ int32_t fftshift(int32_t narg, int32_t ps[], int32_t subroutine)
     work.l = (int32_t *) realloc(work.l, mq);
     /* get space to store phase numbers */
     j = (n/2)*lux_type_size[type];
-    sines.f = malloc(j);
-    cosines.f = malloc(j);
+    sines.f = (float*) malloc(j);
+    cosines.f = (float*) malloc(j);
     if (!work.l || !sines.f || !cosines.f) {
       if (!subroutine) 
 	zap(result);
@@ -982,7 +989,7 @@ int32_t fftshift(int32_t narg, int32_t ps[], int32_t subroutine)
     else
       rfftid(&n, work.d);
 
-    tmp.f = otmp.f = realloc(otmp.b, n*lux_type_size[type]);
+    tmp.f = otmp.f = (float*) realloc(otmp.b, n*lux_type_size[type]);
     if (tmp.f == NULL) {
       if (!subroutine)
 	zap(result);
@@ -1109,9 +1116,10 @@ int32_t lux_fftshift_f(int32_t narg, int32_t ps[])
 int32_t lux_power(int32_t narg, int32_t ps[])
 /* power function: POWER(data [,axis, /POWER, /SHAPE]) */
 {
-  int32_t	iq, n, mq, type, j, jq, outDims[MAX_DIMS], result, step;
+  int32_t	iq, n, mq, j, jq, outDims[MAX_DIMS], result, step;
+  Symboltype type;
   pointer	src, trgt, work, tmp, otmp, src0, trgt0;
-  scalar	factor;
+  Scalar	factor;
   int32_t	rfftb(int32_t *, float *, float *), rfftf(int32_t *, float *, float *),
     rfftbd(int32_t *, double *, double *), rfftfd(int32_t *, double *, double *),
     rffti(int32_t *, float *), rfftid(int32_t *, double *);
@@ -1134,8 +1142,7 @@ int32_t lux_power(int32_t narg, int32_t ps[])
     jq = ps[1];
   else				/* take the first axis */
     jq = (internalMode & 4)? SL_TAKEONED: LUX_ZERO;
-  
-  
+
   if (standardLoop(iq, jq, SL_EACHROW | SL_ONEAXIS, type,
 		   &srcinfo, &src, NULL, NULL, NULL) < 0)
     return LUX_ERROR;
@@ -1145,7 +1152,7 @@ int32_t lux_power(int32_t narg, int32_t ps[])
   outDims[0] = srcinfo.rdims[0]/2 + 1;
   memcpy(outDims + 1, srcinfo.rdims + 1, (srcinfo.rndim - 1)*sizeof(int32_t));
   result = array_scratch(type, srcinfo.rndim, outDims);
-  trgt0.f = array_data(result);
+  trgt0.f = (float*) array_data(result);
 
   work.b = otmp.b = NULL;
   do {
@@ -1166,7 +1173,7 @@ int32_t lux_power(int32_t narg, int32_t ps[])
     else
       rfftid(&n, work.d);
 
-    tmp.f = otmp.f = realloc(otmp.b, n*lux_type_size[type]);
+    tmp.f = otmp.f = (float*) realloc(otmp.b, n*lux_type_size[type]);
     if (tmp.f == NULL) {
       zap(result);
       result = cerror(ALLOC_ERR, 0);
@@ -1250,10 +1257,11 @@ int32_t lux_power(int32_t narg, int32_t ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
-int32_t lux_scb(int32_t narg, int32_t ps[])	/* scb routine */		
+int32_t lux_scb(int32_t narg, int32_t ps[])	/* scb routine */
 /* backwards sine-cosine style FFT --  scb, x, s, c */
 {
-  int32_t	iq, nd, outer, nx, n, mq, dim[8], type, j, jq, outer2, nx2;
+  int32_t	iq, nd, outer, nx, n, mq, dim[8], j, jq, outer2, nx2;
+  Symboltype type;
   pointer	q1,q2,q3;
   int32_t	ezffti(int32_t *n, float *wsave), ezfftid(int32_t *n, double *wsave),
     ezfftb(int32_t *n, float *r, float *azero, float *a, float *b, float *wsave),
@@ -1274,12 +1282,12 @@ int32_t lux_scb(int32_t narg, int32_t ps[])	/* scb routine */
     jq = lux_double(1, &jq);
   }
 			/* s and c must have similar structures */
-  q2.l = array_data(iq);
+  q2.l = (int32_t*) array_data(iq);
   nd = array_num_dims(iq);
   nx = array_dims(iq)[0];
   outer = array_size(iq)/nx;
   memcpy(dim + 1, array_dims(iq) + 1, (nd - 1)*sizeof(int32_t));
-  q3.l = array_data(jq);
+  q3.l = (int32_t*) array_data(jq);
   nx2 = array_dims(jq)[0];
   outer2 = array_size(jq)/nx2;
 
@@ -1363,7 +1371,7 @@ int32_t lux_scb(int32_t narg, int32_t ps[])	/* scb routine */
   if (redef_array(iq, type, nd, dim) != 1)
     return LUX_ERROR;
 					/* get addresse */
-  q1.l = array_data(iq);
+  q1.l = (int32_t*) array_data(iq);
   /* loop over the outer dimensions */
   while (outer--) {
     switch (type) {
@@ -1398,7 +1406,7 @@ int32_t lux_histr(int32_t narg, int32_t ps[]) /* histr function */
 /* the returned symbol should be a long array, convert in place to a float,
 	this depends on float and long (int32_t) being 32 bits! */
 			/* check for some impossible errors */
-  if ( sym[iq].class != LUX_ARRAY ) {
+  if ( symbol_class(iq) != LUX_ARRAY ) {
     return cerror(IMPOSSIBLE, iq);}
   type = sym[iq].type;
   if (type != LUX_INT32 ) return cerror(IMPOSSIBLE, iq);
@@ -1541,8 +1549,9 @@ int32_t lux_hist(int32_t narg, int32_t ps[]) /* histogram function */
 /* LS 12jul2000: added /SILENT keyword (internalMode & 8) to suppress */
 /* warnings about negative histogram elements. */
 {
-  int32_t	iq, i, n, range, type, result_sym, *dims, nRepeat,
+  int32_t	iq, i, n, range, result_sym, *dims, nRepeat,
   	ndim, axis, one = 1, size;
+  Symboltype type;
   array	*h;
   pointer q1, q2;
   int32_t	lux_zero(int32_t, int32_t []);
@@ -1554,7 +1563,7 @@ int32_t lux_hist(int32_t narg, int32_t ps[]) /* histogram function */
   switch (symbol_class(iq))
   { case LUX_ARRAY:
       type = array_type(iq);
-      q1.l = array_data(iq);
+      q1.l = (int32_t*) array_data(iq);
       n = array_size(iq);
       dims = array_dims(iq);
       ndim = array_num_dims(iq);
@@ -1613,7 +1622,7 @@ int32_t lux_hist(int32_t narg, int32_t ps[]) /* histogram function */
   { one = range;
     size = n;
     nRepeat = 1;
-    result_sym = array_scratch(2, 1, &one);
+    result_sym = array_scratch(LUX_INT32, 1, &one);
     h = HEAD(result_sym); }
   q2.l = (int32_t *) ((char *)h + sizeof(array));
   lux_zero( 1, &result_sym);		/* need to zero initially */
@@ -1655,7 +1664,8 @@ int32_t lux_sieve(int32_t narg, int32_t ps[])
    returned.  alternate use: X=SIEVE(condition) yields the same as
    X=SIEVE(LUX_INT32(INDGEN(condition)),condition) */
 {
-  int32_t	iq, n, nc, cnt, *p, type, typec, result_sym;
+  int32_t	iq, n, nc, cnt, *p, typec, result_sym;
+  Symboltype type;
   pointer q1, q2, q3;
 
   iq = ps[0];
@@ -1740,7 +1750,7 @@ int32_t lux_sieve(int32_t narg, int32_t ps[])
     scalar_value(result_sym).l = -1;
     return result_sym; }
   result_sym = array_scratch(type, 1, &cnt); /*for the result */
-  q2.l = array_data(result_sym);
+  q2.l = (int32_t*) array_data(result_sym);
   nc = n;
   if (narg == 1)		/* one-argument case      LS 12may92 */
   { n = 0;			/* use as indgen counter */
@@ -2032,16 +2042,17 @@ int32_t lux_maxf(int32_t narg, int32_t ps[])
 /*------------------------------------------------------------------------- */
 int32_t index_maxormin(int32_t source, int32_t indices, int32_t code)
 {
-  int32_t	nIndx, type, offset, *indx, i, result, size, nElem, indices2;
+  int32_t	nIndx, offset, *indx, i, result, size, nElem, indices2;
+  Symboltype type;
   char	*any;
   pointer	src, trgt;
-  extern scalar	lastmin, lastmax;
+  extern Scalar	lastmin, lastmax;
 
-  src.l = array_data(source);
+  src.l = (int32_t*) array_data(source);
   nElem = array_size(source);
   type = array_type(source);
   indices2 = lux_long(1, &indices);
-  indx = array_data(indices2);
+  indx = (int32_t*) array_data(indices2);
   nIndx = array_size(indices2);
   if (nIndx != nElem)
     return cerror(INCMP_ARR, indices);
@@ -2437,9 +2448,9 @@ int32_t maxormin(int32_t narg, int32_t ps[], int32_t code)
   int32_t	mode, minloc, maxloc, n, result, n1;
   loopInfo	srcinfo, trgtinfo;
   pointer	src, trgt;
-  scalar	min, max;
+  Scalar	min, max;
   double	value;
-  extern scalar	lastmin, lastmax;
+  extern Scalar	lastmin, lastmax;
   extern int32_t	lastminloc, lastmaxloc;
   extern int32_t	lastmin_sym, lastmax_sym;
 
@@ -2741,16 +2752,14 @@ int32_t lux_minf(int32_t narg, int32_t ps[])
   return maxormin(narg, ps, 1);
 }
 /*------------------------------------------------------------------------- */
-int32_t lux_minloc(narg,ps)
+int32_t lux_minloc(int32_t narg, int32_t ps[])
 				/* finds the min element in an array */
-int32_t	narg, ps[];
 {
 return maxormin(narg, ps, 3);
 }
 /*------------------------------------------------------------------------- */
-int32_t lux_maxloc(narg,ps)
+int32_t lux_maxloc(int32_t narg, int32_t ps[])
 				/* finds the max element in an array */
-int32_t	narg, ps[];
 {
 return maxormin(narg, ps, 2);
 }
@@ -2772,7 +2781,7 @@ void scale(pointer data, uint8_t type, int32_t size, double datalow, double data
   int32_t	colorIndexType = LUX_INT8;
 #endif
 
-  trgt.b = dest;
+  trgt.b = (uint8_t*) dest;
   drange = datahigh - datalow;
   if (!drange) {
     neutral(trgt.b, size);
@@ -3090,7 +3099,7 @@ int32_t lux_scale(int32_t narg, int32_t ps[])
 /* cell index.  LS 30jul96 23mar99 */
 {
   int32_t	iq, type, result_sym, n, oldScalemin, oldScalemax;
-  scalar	min, max;
+  Scalar	min, max;
   register	pointer q1, q2;
   double	sd, qd;
 #if HAVE_LIBX11
@@ -3105,10 +3114,10 @@ int32_t lux_scale(int32_t narg, int32_t ps[])
   if (symbol_class(iq) != LUX_ARRAY)
     return cerror(NEED_ARR, iq);
   type = array_type(iq);
-  q1.l = array_data(iq);
+  q1.l = (int32_t*) array_data(iq);
   n = array_size(iq);
   result_sym = array_clone(iq, LUX_INT8);
-  q2.l = array_data(result_sym);
+  q2.l = (int32_t*) array_data(result_sym);
   /* if only one arg., then we scale between the min and max of array */
   if (narg == 1 && (internalMode & 2) == 0) {/* 1 arg and no /ZOOM */
     minmax(q1.l, n, type);	/* get the min and max */
@@ -3186,15 +3195,17 @@ int32_t lux_scalerange(int32_t narg, int32_t ps[])
    and <hivalue>, respectively.  LS 16oct98 */
 {
   int32_t	iq, type, result_sym, n, oldScalemin, oldScalemax;
-  scalar	min, max;
+  Scalar	min, max;
   register	pointer q1, q2;
   double	sd, qd, logrey, higrey;
 #if HAVE_LIBX11
   extern double	zoom_clo, zoom_chi;
   extern int32_t	threeColors;
-  extern int32_t	colorIndexType, display_cells;
+  extern int32_t display_cells;
+  extern Symboltype colorIndexType;
 #else
-  int32_t	colorIndexType = LUX_INT8, display_cells = 256;
+  int32_t	display_cells = 256;
+  Symboltype colorIndexType = LUX_INT8;
 #endif
 
   iq = ps[0];
@@ -3209,10 +3220,10 @@ int32_t lux_scalerange(int32_t narg, int32_t ps[])
   if (higrey > 1.0)
     higrey = 1.0;
   type = array_type(iq);
-  q1.l = array_data(iq);
+  q1.l = (int32_t*) array_data(iq);
   n = array_size(iq);
   result_sym = array_clone(iq, colorIndexType);
-  q2.l = array_data(result_sym);
+  q2.l = (int32_t*) array_data(result_sym);
   /* if only three args, then we scale between the min and max of array */
   if (narg == 3 && (internalMode & 2) == 0) {/* 3 arg and no /ZOOM */
     minmax(q1.l, n, type);	/* get the min and max */
@@ -3279,7 +3290,7 @@ int32_t minmax(int32_t *p, int32_t n, int32_t type)
 /* finds the min and max (and their locations) for an array */
 {
   pointer q;
-  scalar	min, max;
+  Scalar	min, max;
 /* pointers on OSF machines are bigger than ints, so casts from pointers */
 /* to ints must be avoided!  thus, changed  minloc, maxloc  from int32_t to */
 /* uint8_t *.  LS27jul94 */
@@ -3401,7 +3412,7 @@ int32_t simple_scale(void *p1, int32_t n, int32_t type, void *p2)
 /* assumes <p2> is of type <colorIndexType>.  LS 23mar99 */
 {
   register	pointer q1, q2;
-  register	scalar	range, min;
+  register	Scalar	range, min;
   register	int32_t	xq;
   register	float	fq;
   register	double	dq;
@@ -3415,8 +3426,8 @@ int32_t simple_scale(void *p1, int32_t n, int32_t type, void *p2)
   if (!connect_flag)
     setup_x();
 #endif
-  q1.l = p1;
-  q2.l = p2;
+  q1.l = (int32_t*) p1;
+  q2.l = (int32_t*) p2;
   switch (type) {
     case LUX_INT8:
       min.b = lastmin.b;
@@ -3585,7 +3596,7 @@ int32_t neutral(void *p, int32_t n)
   int32_t	colorIndexType = LUX_INT8;
 #endif
 
-  pp.b = p;
+  pp.b = (uint8_t*) p;
   xq = (scalemax - scalemin)/2;
   switch (colorIndexType) {
     case LUX_INT8:
@@ -3660,8 +3671,8 @@ int32_t cubic_spline_tables(void *xx, int32_t xType, int32_t xStep,
 
   cspl->acc = gsl_interp_accel_alloc();
 
-  x = cspl->x = malloc(nPoints*sizeof(double));
-  y = cspl->y = malloc(nPoints*sizeof(double));
+  x = cspl->x = (double*) malloc(nPoints*sizeof(double));
+  y = cspl->y = (double*) malloc(nPoints*sizeof(double));
   xin.b = (uint8_t *) xx;
   yin.b = (uint8_t *) yy;
 
@@ -3990,7 +4001,7 @@ int32_t lux_cubic_spline(int32_t narg, int32_t ps[])
   static csplineInfo	cspl = { NULL, NULL, NULL, NULL };
   int32_t	xNewSym, xTabSym, yTabSym, size, oldType, result_sym;
   pointer	src, trgt;
-  int32_t	lux_convert(int32_t, int32_t [], int32_t, int32_t);
+  int32_t	lux_convert(int32_t, int32_t [], Symboltype, int32_t);
 
   /* first check on all the arguments */
   if (!narg) { 			/* CSPLINE(): clean-up */
@@ -4097,8 +4108,8 @@ int32_t lux_cubic_spline_extreme(int32_t narg, int32_t ps[])
   if (array_size(ps[0]) != yinfo.rdims[0])
     return cerror(INCMP_ARG, ps[1]);
   iq = lux_converts[yinfo.type](1, &ps[0]);
-  x.f = array_data(iq);
-  
+  x.f = (float*) array_data(iq);
+
   if (narg > 3 && ps[3]) { 	/* have <pos> */
     pos = int_arg(ps[3]);
     if (pos < 0 || pos >= yinfo.rdims[0])
@@ -4125,7 +4136,7 @@ int32_t lux_cubic_spline_extreme(int32_t narg, int32_t ps[])
       return luxerror("Need named variable here", ps[4]);
     if (ndim) {
       to_scratch_array(ps[4], yinfo.type, ndim, dims);
-      minpos.f = array_data(ps[4]);
+      minpos.f = (float*) array_data(ps[4]);
     } else {
       to_scalar(ps[4], yinfo.type);
       minpos.f = &scalar_value(ps[4]).f;
@@ -4138,7 +4149,7 @@ int32_t lux_cubic_spline_extreme(int32_t narg, int32_t ps[])
       return luxerror("Need named variable here", ps[5]);
     if (ndim) {
       to_scratch_array(ps[5], yinfo.type, ndim, dims);
-      min.f = array_data(ps[5]);
+      min.f = (float*) array_data(ps[5]);
     } else {
       to_scalar(ps[5], yinfo.type);
       min.f = &scalar_value(ps[5]).f;
@@ -4151,7 +4162,7 @@ int32_t lux_cubic_spline_extreme(int32_t narg, int32_t ps[])
       return luxerror("Need named variable here", ps[6]);
     if (ndim) {
       to_scratch_array(ps[6], yinfo.type, ndim, dims);
-      maxpos.f = array_data(ps[6]);
+      maxpos.f = (float*) array_data(ps[6]);
     } else {
       to_scalar(ps[6], yinfo.type);
       maxpos.f = &scalar_value(ps[6]).f;
@@ -4164,7 +4175,7 @@ int32_t lux_cubic_spline_extreme(int32_t narg, int32_t ps[])
       return luxerror("Need named variable here", ps[7]);
     if (ndim) {
       to_scratch_array(ps[7], yinfo.type, ndim, dims);
-      max.f = array_data(ps[7]);
+      max.f = (float*) array_data(ps[7]);
     } else {
       to_scalar(ps[7], yinfo.type);
       max.f = &scalar_value(ps[7]).f;
@@ -4472,12 +4483,12 @@ int32_t lux_fade_init(int32_t narg, int32_t ps[])
     return cerror(NEED_2D_ARR, iq);
   if (array_type(iq) != LUX_INT8)
     return cerror(NEED_BYTE, iq);
-  p1 = array_data(iq);
+  p1 = (uint8_t*) array_data(iq);
   fade_xsize = array_dims(iq)[0];
   fade_ysize = array_dims(iq)[1];
   fade_dim[0] = fade_xsize;
   fade_dim[1] = fade_ysize;
-  
+
   iq = ps[1];
   if (!symbolIsNumericalArray(iq) || array_num_dims(iq) != 2)
     return cerror(NEED_2D_ARR, iq);
@@ -4486,7 +4497,7 @@ int32_t lux_fade_init(int32_t narg, int32_t ps[])
   if (array_dims(iq)[0] != fade_xsize || array_dims(iq)[1] != fade_ysize)
     return cerror(INCMP_ARG, iq);
 
-  p2 = array_data(iq);
+  p2 = (uint8_t*) array_data(iq);
   /* set up the I*2 arrays for quick fades */
   if (fade1) { free(fade1); fade1 = NULL; }
   if (fade2) { free(fade2); fade2 = NULL; }
@@ -4522,11 +4533,11 @@ int32_t lux_fade(int32_t narg, int32_t ps[])
   if (int_arg_stat(ps[0], &weight) != LUX_OK) return LUX_ERROR;
   wt = (int16_t) weight;
   iq = ps[1];
-  if (redef_array(iq, 0, 2, fade_dim) != LUX_OK) return LUX_ERROR;
+  if (redef_array(iq, LUX_INT8, 2, fade_dim) != LUX_OK) return LUX_ERROR;
 
-  p1 = array_data(iq);
+  p1 = (uint8_t*) array_data(iq);
   n = fade_xsize * fade_ysize;	q1 = fade1;	q2 = fade2;
-  while (n--) { 
+  while (n--) {
     *p1++ = (uint8_t) (( wt * *q2++ + *q1++) >> 8);
   }
   return LUX_OK;

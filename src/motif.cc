@@ -27,8 +27,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "config.h"
 #endif
 #include <stdio.h>
-#include "lux_structures.h"
-#include "install.h"
+#include "lux_structures.hh"
+#include "install.hh"
 #include <stdarg.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -65,7 +65,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <Xm/FileSB.h>
 #include <sys/stat.h>
  /*following is icon bitmap, currently same as in xport but want to change */
-#include "lux_bitmap.xbm"
+#include "lux_bitmap.xbmh"
 
  extern	struct sym_desc sym[];
 
@@ -216,7 +216,7 @@ int32_t lux_xmmessage(narg, ps) /* (string,[font,color,ix,iy]) */
  /* pops a motif message dialog with the string passed */
  if (ck_motif() != 1) return -1;
  iq = ps[0];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  parent = lux_widget_id[toplevel];
  n = 0;
@@ -284,13 +284,13 @@ int32_t lux_xmprompt(narg, ps)	/* see next line for args */
  Position	x, y;
  /* pops a motif message dialog with the string passed */
  if (ck_motif() != 1) return -1;
- iq = ps[0];	if (sym[iq].class != 2) { return execute_error(70); }
+ iq = ps[0];	if (symbol_class(iq) != 2) { return execute_error(70); }
  sm = (char *) sym[iq].spec.array.ptr;
- iq = ps[1];	if (sym[iq].class != 2) { return execute_error(70); }
+ iq = ps[1];	if (symbol_class(iq) != 2) { return execute_error(70); }
  sd = (char *) sym[iq].spec.array.ptr;
  /* get callback string */
  iq = ps[2];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
  parent = lux_widget_id[toplevel];
@@ -359,7 +359,7 @@ int32_t lux_xmcommand(narg, ps) /*see next line for args */
  if ( get_widget_id( ps[0], &parent) != 1 ) return -1;
  /* get callback string */
  iq = ps[1];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
  if (int_arg_stat(ps[2], &nvisible) != 1) return -1;
@@ -371,7 +371,7 @@ int32_t lux_xmcommand(narg, ps) /*see next line for args */
  /* the optional prompt */
  if (narg > 4) {
  iq = ps[4];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  prompt = XmStringCreateSimple( s);
  XtSetArg(wargs[n], XmNpromptString, prompt); n++;
@@ -439,7 +439,7 @@ int32_t lux_xmdialog_board(narg, ps)	/* see next line for args */
  if (int_arg_stat(ps[1], &dx) != 1) return -1;
  if (int_arg_stat(ps[2], &dy) != 1) return -1;
  iq = ps[3];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  title = XmStringCreateSimple( s);
  n = 0;
@@ -511,7 +511,7 @@ int32_t lux_xmdialog_form(narg, ps)	/* see next line for args */
  if (int_arg_stat(ps[1], &dx) != 1) return -1;
  if (int_arg_stat(ps[2], &dy) != 1) return -1;
  iq = ps[3];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  title = XmStringCreateSimple( s);
  n = 0;
@@ -558,7 +558,7 @@ int32_t lux_xmtoplevel_form(narg, ps)	/* see next line for args */
  if (int_arg_stat(ps[0], &dx) != 1) return -1;
  if (int_arg_stat(ps[1], &dy) != 1) return -1;
  iq = ps[2];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  if (narg >5 )  {if (int_arg_stat(ps[5], &mx) != 1) return -1;}
  if (narg >6 )  {if (int_arg_stat(ps[6], &my) != 1) return -1;}
@@ -591,7 +591,7 @@ int32_t lux_xmtoplevel_board(narg, ps)	/* see next line for args */
  if (int_arg_stat(ps[0], &dx) != 1) return -1;
  if (int_arg_stat(ps[1], &dy) != 1) return -1;
  iq = ps[2];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  if (narg > 3) { if (int_arg_stat(ps[3], &mx) != 1) return -1; }
  if (narg > 4) { if (int_arg_stat(ps[4], &my) != 1) return -1; }
@@ -878,7 +878,7 @@ int32_t lux_int_xmscrollbar(narg, ps, mode)  /* internal, mode = 1 for horizonta
  if (int_arg_stat(ps[3], &dpage) != 1) return -1;
  /* get callback string */
  iq = ps[4];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
  if (narg > 5) if (int_arg_stat(ps[5], &drag_flag) != 1) return -1;
@@ -967,7 +967,7 @@ int32_t lux_xmdrawingarea(narg, ps)  /*(parent,lux_win,w,h,input_cb,resize_cb,ex
  if (narg>4) {
  int32_t	*pt;
  iq = ps[4];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
  /* instead of just passing the execution symbol, we make a little
@@ -979,7 +979,7 @@ int32_t lux_xmdrawingarea(narg, ps)  /*(parent,lux_win,w,h,input_cb,resize_cb,ex
  if (narg>5) {
  int32_t	*pt;
  iq = ps[5];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
  /* instead of just passing the exection sysmbol, we make a little
@@ -991,7 +991,7 @@ int32_t lux_xmdrawingarea(narg, ps)  /*(parent,lux_win,w,h,input_cb,resize_cb,ex
  if (narg>6) {
  int32_t	*pt;
  iq = ps[6];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
  /* instead of just passing the exection sysmbol, we make a little
@@ -1078,7 +1078,7 @@ int32_t lux_xmtextfromfile(narg, ps)/*(parent, filename, [rows, cols, font,color
  if ( get_widget_id( ps[0], &parent) != 1 ) return -1;
  /* open the file */
  iq = ps[1];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  filename = (char *) sym[iq].spec.array.ptr;
  if ((fin = fopen(filename, "r")) == NULL)
  	{ printf("could not open text file\n");  return -1; }
@@ -1205,7 +1205,7 @@ int32_t lux_xmtextappend(narg, ps)	/* (widget_id, string, [lf_flag]) */
  char *s, *s2;
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
  iq = ps[1];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  i = XmTextGetLastPosition(lux_widget_id[w]);
  if (narg > 2) if (int_arg_stat(ps[2], &lflag) != 1) return -1;
@@ -1251,7 +1251,7 @@ int32_t lux_xmtextsetstring(narg, ps) /* (widget, value) */
  if (get_widget_id(ps[0], &w) != 1) return -1;
  /* get the string */
  iq = ps[1];
- if (sym[iq].class != 2) return execute_error(70);
+ if (symbol_class(iq) != 2) return execute_error(70);
  s = (char *) sym[iq].spec.array.ptr;
  
  XmTextSetString(lux_widget_id[w], s);
@@ -1341,7 +1341,7 @@ int32_t lux_xmtextreplace(narg, ps) /* (widget, i1, i2, s) */
  if (int_arg_stat(ps[2], &i2) != 1) return -1;
  if (narg > 3) {
    iq = ps[3];
-   if (sym[iq].class != 2) { return execute_error(70); }
+   if (symbol_class(iq) != 2) { return execute_error(70); }
    s = (char *) sym[iq].spec.array.ptr;
  } else s = NULL;
  XmTextReplace(lux_widget_id[w],(XmTextPosition) i1,(XmTextPosition) i2, s);
@@ -1372,12 +1372,12 @@ int32_t lux_xmtextfield(narg, ps) /* (parent, text, length, callback, ... see ne
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
  /* get label string */
  iq = ps[1];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  ls = (char *) sym[iq].spec.array.ptr;
  if (int_arg_stat(ps[2], & length) != 1) return -1;
  /* get callback string */
  iq = ps[3];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
 
@@ -1399,7 +1399,7 @@ int32_t lux_xmtextfield(narg, ps) /* (parent, text, length, callback, ... see ne
  /* check for optional callbacks */
  if (narg > 6) {
  iq = ps[6];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
  if (nsym) XtAddCallback(lux_widget_id[textfield], XmNlosingFocusCallback,
@@ -1407,7 +1407,7 @@ int32_t lux_xmtextfield(narg, ps) /* (parent, text, length, callback, ... see ne
  }
  if (narg > 7) {
  iq = ps[7];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
  if (nsym) XtAddCallback(lux_widget_id[textfield], XmNfocusCallback,
@@ -1430,7 +1430,7 @@ int32_t lux_xmtextfieldsetstring(narg, ps) /* (widget, string, [cursor]) */
  if (get_widget_id(ps[0], &w) != 1) return -1;
  /* get the string */
  iq = ps[1];
- if (sym[iq].class != 2) return execute_error(70);
+ if (symbol_class(iq) != 2) return execute_error(70);
  s = (char *) sym[iq].spec.array.ptr;
  
  XmTextFieldSetString(lux_widget_id[w], s);
@@ -1522,7 +1522,7 @@ int32_t lux_xmtextfieldarray(narg, ps)  /* lots of arguments */
  if (ck_motif() != 1) return -1;
 
  iq = ps[narg-1];	length = 10;
- if (sym[iq].class != 2) {
+ if (symbol_class(iq) != 2) {
  /* check if a scalar, otherwise an error */
  if (int_arg_stat(iq, &length) != 1) {
   printf("XMTEXTFIELDARRAY, last arg neither a string nor a scalar\n");
@@ -1541,7 +1541,7 @@ int32_t lux_xmtextfieldarray(narg, ps)  /* lots of arguments */
  /* note that callback is first here to provide for unknown # of labels */
  /* get callback string */
  iq = ps[1];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
 
@@ -1573,7 +1573,7 @@ int32_t lux_xmtextfieldarray(narg, ps)  /* lots of arguments */
  /* first the label */
  /* get label string */
  iq = ps[j++];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  ms = XmStringCreateLtoR(s, cset);
  XtSetArg(wargs[n], XmNlabelString, ms); n++;
@@ -1641,13 +1641,13 @@ int32_t lux_xmlistfromfile(narg, ps) /*(parent, callback, filename,
  if ( get_widget_id( ps[0], &parent) != 1 ) return -1;
  /* get callback string */
  iq = ps[1];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
  /* printf("nsym for call back = %d\n", nsym); */
  /* open the file */
  iq = ps[2];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  filename = (char *) sym[iq].spec.array.ptr;
  if ((fin = fopen(filename, "r")) == NULL)
  	{ printf("could not open list file\n"); fclose(fin);
@@ -1701,7 +1701,7 @@ int32_t lux_xmaddfiletolist(narg, ps) /*(list_widget, filename)*/
 
  /* open the file */
  iq = ps[1];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  filename = (char *) sym[iq].spec.array.ptr;
  if ((fin = fopen(filename, "r")) == NULL)
  	{ printf("could not open list file: %s\n", filename); fclose(fin);
@@ -1780,7 +1780,7 @@ int32_t lux_xmlist(narg, ps) /*(parent, callback, nvisible,[font,color, resize_f
  if ( get_widget_id( ps[0], &parent) != 1 ) return -1;
  /* get callback string */
  iq = ps[1];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
  /* printf("nsym for call back = %d\n", nsym);*/
@@ -1822,7 +1822,7 @@ int32_t lux_xmlistadditem(narg, ps)	/* (widget_id, string, [position]) */
  XmString	ms;
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
  iq = ps[1];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  /* get position option, default is 0 (at end) */
  i = 0;
@@ -1901,7 +1901,7 @@ int32_t lux_xmlabel(narg, ps)	/* (parent, label, [font, color, size_flag]) */
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
  /* get label string */
  iq = ps[1];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  ms = XmStringCreateLtoR(s, cset);
  n = 0;
@@ -1912,7 +1912,7 @@ int32_t lux_xmlabel(narg, ps)	/* (parent, label, [font, color, size_flag]) */
  if (narg > 3) {
   /* try to figure out the color */
   /* a string ? */
-  if ( sym[ ps[3] ].class != 2 ) return execute_error(70);
+  if ( symbol_class( ps[3] ) != 2 ) return execute_error(70);
   pc = (char *) sym[ps[3] ].spec.array.ptr;
   if ( strlen(pc) > 0 ) {
   if ( XAllocNamedColor(disp, cmap, pc, &colorcell, &rgb_def) == 0 )
@@ -1955,12 +1955,12 @@ int32_t lux_xmfileselect(narg, ps) /*(parent, title, ok_callback, (more on next 
  if ( get_widget_id( ps[0], &parent) != 1 ) return -1;
  /* get title */
  iq = ps[1];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  title = XmStringCreateSimple(s);
  /* get callback string */
  iq = ps[2];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
  n = 0;
@@ -1972,7 +1972,7 @@ int32_t lux_xmfileselect(narg, ps) /*(parent, title, ok_callback, (more on next 
  fselect = n_widgets++;
  if (narg > 9) {
  iq = ps[9];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  directory = XmStringCreateSimple(s);
  XtSetArg(wargs[n], XmNdirectory, directory); n++;
@@ -1985,7 +1985,7 @@ int32_t lux_xmfileselect(narg, ps) /*(parent, title, ok_callback, (more on next 
  /* set up the OK label, if passed */
  if (narg > 3) {
  iq = ps[3];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  ms = XmStringCreateLtoR(s, cset);
  n = 0;
@@ -1994,7 +1994,7 @@ int32_t lux_xmfileselect(narg, ps) /*(parent, title, ok_callback, (more on next 
  /* also do the help button redefine now if specified */
   if (narg > 10) {
   iq = ps[10];
-  if (sym[iq].class != 2) { return execute_error(70); }
+  if (symbol_class(iq) != 2) { return execute_error(70); }
   s = (char *) sym[iq].spec.array.ptr;
   ms = XmStringCreateLtoR(s, cset);
   n = 0;
@@ -2004,12 +2004,12 @@ int32_t lux_xmfileselect(narg, ps) /*(parent, title, ok_callback, (more on next 
  /* optional call backs, a null string indicates no call back */
  if (narg > 4) {
  iq = ps[4];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  if (strlen(s) == 0 )  nsym_help = 0; else nsym_help = lux_execute_symbol(s,1);
  if (narg > 5) {
  iq = ps[5];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  if (strlen(s) == 0) nsym_cancel = 0; else nsym_cancel=lux_execute_symbol(s,1);
  
@@ -2081,7 +2081,7 @@ int32_t set_fontlist(nsym)
  int32_t	nsym;
  {
  char    *fontname;
- if (sym[nsym].class != 2) return execute_error(70);
+ if (symbol_class(nsym) != 2) return execute_error(70);
  fontname = (char *) sym[nsym].spec.array.ptr;
  if ( strlen(fontname) <= 0 ) return 1;	/* a null, do nothing */
  /* note that font and fontlist are common and reused, may have a malloc
@@ -2098,7 +2098,7 @@ int32_t set_textfontlist(nsym)
  int32_t	nsym;
  {
  char    *fontname;
- if (sym[nsym].class != 2) return execute_error(70);
+ if (symbol_class(nsym) != 2) return execute_error(70);
  fontname = (char *) sym[nsym].spec.array.ptr;
  if ( strlen(fontname) <= 0 ) return 1;	/* a null, do nothing */
  /* note that font and fontlist are common and reused, may have a malloc
@@ -2115,7 +2115,7 @@ int32_t set_labelfontlist(nsym)
  int32_t	nsym;
  {
  char    *fontname;
- if (sym[nsym].class != 2) return execute_error(70);
+ if (symbol_class(nsym) != 2) return execute_error(70);
  fontname = (char *) sym[nsym].spec.array.ptr;
  if ( strlen(fontname) <= 0 ) return 1;
  /* note that font and fontlist are common and reused, may have a malloc
@@ -2132,7 +2132,7 @@ int32_t set_defaultfontlist(nsym)
  int32_t	nsym;
  {
  char    *fontname;
- if (sym[nsym].class != 2) return execute_error(70);
+ if (symbol_class(nsym) != 2) return execute_error(70);
  fontname = (char *) sym[nsym].spec.array.ptr;
  /* note that font and fontlist are common and reused, may have a malloc
  leak here, not sure if these should be freed after each use */
@@ -2141,14 +2141,14 @@ int32_t set_defaultfontlist(nsym)
 	  return 1; }
  fontlist = XmFontListCreate(font, cset);
  XtSetArg(wargs[n], XmNdefaultFontList, fontlist); n++;
- return 1; 
+ return 1;
  }
 /*------------------------------------------------------------------------- */
 int32_t setup_colors(int32_t nsym)
 {
   char	*pc;
   Pixel	ts, bs, fc, sc;
-  Status	anaAllocNamedColor(char *, XColor **);
+  Status	anaAllocNamedColor(char const*, XColor **);
   XColor	*color;
   void	installPixel(int32_t);
 
@@ -2196,12 +2196,12 @@ int32_t lux_xmbutton(narg, ps) /* (parent, label, callback, [font,color]) */
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
  /* get label string */
  iq = ps[1];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  ms = XmStringCreateLtoR(s, cset);
  /* get callback string */
  iq = ps[2];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
 
@@ -2241,7 +2241,7 @@ int32_t lux_xmgetpixmap(narg, ps) /* (id, pixmap_file) */
 	}
  /* get pixmap file name */
  iq = ps[1];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  /* use fg and bg from toplevel */
  XtVaGetValues (lux_widget_id[toplevel],
@@ -2265,7 +2265,7 @@ int32_t lux_xmsetpixmap(narg, ps) /* (widget, pixmap_file) */
  if (get_widget_id(ps[0], &w) != 1) return -1;
  /* get pixmap file name */
  iq = ps[1];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  /* use fg and bg from parent */
  XtVaGetValues (lux_widget_id[w],
@@ -2296,7 +2296,7 @@ int32_t lux_xmpixmapbutton(narg, ps) /* (parent, pixmap_file, callback) */
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
  /* get pixmap file name */
  iq = ps[1];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  /* use fg and bg from parent */
  XtVaGetValues (lux_widget_id[w],
@@ -2309,7 +2309,7 @@ int32_t lux_xmpixmapbutton(narg, ps) /* (parent, pixmap_file, callback) */
   
  /* get callback string */
  iq = ps[2];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
 
@@ -2346,7 +2346,7 @@ int32_t lux_xmradiobox(narg, ps) /* (parent,callback,font,color,l1,[l2, l3 ...])
  /* note that callback is first here to provide for unknown # of labels */
  /* get callback string */
  iq = ps[1];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
 
@@ -2354,7 +2354,7 @@ int32_t lux_xmradiobox(narg, ps) /* (parent,callback,font,color,l1,[l2, l3 ...])
  columns */
 
  iq = ps[narg-1];	ncolumns = 1;
- if (sym[iq].class != 2) {
+ if (symbol_class(iq) != 2) {
  /* check if a scalar, otherwise an error */
  if (int_arg_stat(iq, &ncolumns) != 1) {
   printf("XMRADIOBOX, last arg neither a string nor a scalar\n");
@@ -2390,7 +2390,7 @@ int32_t lux_xmradiobox(narg, ps) /* (parent,callback,font,color,l1,[l2, l3 ...])
  while (i--) {
  /* get label string */
  iq = ps[j++];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  if (ck_widget_count() < 0) return -1;
  radio = n_widgets++;
@@ -2479,7 +2479,7 @@ int32_t lux_xmpixmapoptionmenu(narg, ps) /* (parent,callback,font,color,s,p1,[p2
  /* note that callback is first here to provide for unknown # of labels */
  /* get callback string */
  iq = ps[1];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
 
@@ -2503,7 +2503,7 @@ int32_t lux_xmpixmapoptionmenu(narg, ps) /* (parent,callback,font,color,s,p1,[p2
  the menu item to use as the default */
 
  iq = ps[narg-1];	dmenu = 0;
- if (sym[iq].class != 2) {
+ if (symbol_class(iq) != 2) {
  /* check if a scalar, otherwise an error */
  if (int_arg_stat(iq, &dmenu) != 1) {
   printf("XMOPTIONMENU, last arg neither a string nor a scalar\n");
@@ -2527,7 +2527,7 @@ int32_t lux_xmpixmapoptionmenu(narg, ps) /* (parent,callback,font,color,s,p1,[p2
  while (i--) {
  /* get filename string */
  iq = ps[j++];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  /* setup for pixmap buttons */
  n = 0;
@@ -2558,7 +2558,7 @@ int32_t lux_xmpixmapoptionmenu(narg, ps) /* (parent,callback,font,color,s,p1,[p2
  if (set_labelfontlist( ps[2] ) != 1) return -1; /* gets fontlist from string */
  if (setup_colors (ps[3] ) != 1) return -1; /* do colors based on bg */
  iq = ps[4];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  ms = XmStringCreateLtoR(s, cset);
  XtSetArg(wargs[n], XmNlabelString, ms); n++;
@@ -2606,7 +2606,7 @@ int32_t lux_xmoptionmenu(narg, ps) /* (parent,callback,font,color,s,l1,[l2 ...])
  /* note that callback is first here to provide for unknown # of labels */
  /* get callback string */
  iq = ps[1];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
 
@@ -2624,7 +2624,7 @@ int32_t lux_xmoptionmenu(narg, ps) /* (parent,callback,font,color,s,l1,[l2 ...])
  the menu item to use as the default */
 
  iq = ps[narg-1];	dmenu = 0;
- if (sym[iq].class != 2) {
+ if (symbol_class(iq) != 2) {
  /* check if a scalar, otherwise an error */
  if (int_arg_stat(iq, &dmenu) != 1) {
   printf("XMOPTIONMENU, last arg neither a string nor a scalar\n");
@@ -2647,7 +2647,7 @@ int32_t lux_xmoptionmenu(narg, ps) /* (parent,callback,font,color,s,l1,[l2 ...])
  while (i--) {
  /* get label string */
  iq = ps[j++];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  if (ck_widget_count() < 0) return -1;
  option = n_widgets++;
@@ -2667,7 +2667,7 @@ int32_t lux_xmoptionmenu(narg, ps) /* (parent,callback,font,color,s,l1,[l2 ...])
  }
  /* get option label */
  iq = ps[4];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  ms = XmStringCreateLtoR(s, cset);
  n = 0;
@@ -2777,7 +2777,7 @@ int32_t lux_xmmenubar(narg, ps) /* (parent,font,color,l1,[l2 ...]) */
  menu = n_widgets++;
  /* get label string */
  iq = ps[j++];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  ms = XmStringCreateLtoR(s, cset);
  /* note that each of these use the font and color set above, plus label */
@@ -2824,7 +2824,7 @@ int32_t lux_xmpulldownmenu(narg, ps) /* (parent,casc,callback,font,color,l1,[l2 
  /* note that callback is here to provide for unknown # of labels */
  /* get callback string */
  iq = ps[2];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
  /* create the pulldown menu */
@@ -2861,7 +2861,7 @@ int32_t lux_xmpulldownmenu(narg, ps) /* (parent,casc,callback,font,color,l1,[l2 
  while (i--) {
  /* get label string */
  iq = ps[j++];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  /* if the string starts with a >, we interpret as a cascade that will
  (maybe) be attached to a pull right menu */
@@ -2909,7 +2909,7 @@ int32_t lux_xmarrow(narg, ps) /* (parent, direction, callback, [color]) */
  if (int_arg_stat(ps[1], &mode) != 1) return -1;
  /* get callback string */
  iq = ps[2];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
 
@@ -2965,7 +2965,7 @@ int32_t lux_int_xmscale(narg, ps, mode)	/* internal, mode = 1 for horizontal */
  if (int_arg_stat(ps[3], &dshift) != 1) return -1;
  /* get callback string */
  iq = ps[4];
- if (sym[iq].class != 2) { return execute_error(70); }
+ if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
  show = 1;	size = 0;
@@ -3221,7 +3221,7 @@ int32_t lux_xmsetdirectory(narg, ps) /* (widget, directory_path) */
  if (!XtIsSubclass(lux_widget_id[w1], xmFileSelectionBoxWidgetClass))
 	{ printf("XMSETDIRECTORY, widget not a file selection box!\n");
 	return -1;}
- if (sym[ps[1]].class != 2) { return execute_error(70); }
+ if (symbol_class(ps[1]) != 2) { return execute_error(70); }
  s = (char *) sym[ps[1]].spec.array.ptr;
  directory = XmStringCreateSimple(s);
  n = 0;
@@ -3327,7 +3327,7 @@ int32_t lux_xmfont(narg, ps) /* (widget, font_string) */
  if (get_widget_id(ps[0], &w) != 1) return -1;
  /* get the font string */
  iq = ps[1];
- if (sym[iq].class != 2) return execute_error(70);
+ if (symbol_class(iq) != 2) return execute_error(70);
  fontname = (char *) sym[iq].spec.array.ptr;
  /* note that font and fontlist are common and reused, may have a malloc
  leak here, not sure if these should be freed after each use */
@@ -3351,7 +3351,7 @@ int32_t lux_xmsetlabel(narg, ps) /* (widget, string) */
  if (get_widget_id(ps[0], &w) != 1) return -1;
  /* get the string */
  iq = ps[1];
- if (sym[iq].class != 2) return execute_error(70);
+ if (symbol_class(iq) != 2) return execute_error(70);
  s = (char *) sym[iq].spec.array.ptr;
  ms = XmStringCreateLtoR(s, cset);
  n = 0;
@@ -3371,7 +3371,7 @@ int32_t lux_xmsettitle(narg, ps) /* (widget, string) */
  if (get_widget_id(ps[0], &w) != 1) return -1;
  /* get the string */
  iq = ps[1];
- if (sym[iq].class != 2) return execute_error(70);
+ if (symbol_class(iq) != 2) return execute_error(70);
  s = (char *) sym[iq].spec.array.ptr;
  title = XmStringCreateLtoR(s, cset);
  n = 0;
@@ -3391,7 +3391,7 @@ int32_t lux_xmsetmnemonic(narg, ps) /* (widget, string) */
  if (get_widget_id(ps[0], &w) != 1) return -1;
  /* get the string */
  iq = ps[1];
- if (sym[iq].class != 2) return execute_error(70);
+ if (symbol_class(iq) != 2) return execute_error(70);
  s = (char *) sym[iq].spec.array.ptr;
  n = 0;
  XtSetArg(wargs[n], XmNmnemonic, *s); n++;
@@ -3468,10 +3468,10 @@ int32_t colorset(narg, ps, mode) /* internal routine */
  if (get_widget_id(ps[0], &w) != 1) return -1;
  /* get the color string */
  iq = ps[1];
- if (sym[iq].class != 2) return execute_error(70);
+ if (symbol_class(iq) != 2) return execute_error(70);
  /* try to figure out the color */
  /* a string ? */
- if ( sym[ ps[1] ].class != 2 ) return execute_error(70);
+ if ( symbol_class( ps[1] ) != 2 ) return execute_error(70);
  pc = (char *) sym[ps[1] ].spec.array.ptr;
  if ( strlen(pc) <= 0 ) return 1;	/* a null, do nothing */
  if ( XAllocNamedColor(disp, cmap, pc, &colorcell, &rgb_def) == 0 )

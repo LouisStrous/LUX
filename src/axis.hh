@@ -20,24 +20,30 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef HAVE_AXIS_H
 #define HAVE_AXIS_H
 
+enum dim_spec_type { DS_NONE = 0, DS_ACCEPT = (1<<0), DS_ADD = (1<<1),
+                     DS_REMOVE = (1<<2), DS_ADD_REMOVE = (DS_ADD | DS_REMOVE),
+                     DS_COPY_REF = (1<<3), DS_EXACT = (1<<4) };
+
 struct dims_spec {
-  enum dim_spec_type { DS_NONE = 0, DS_ACCEPT = (1<<0), DS_ADD = (1<<1),
-                       DS_REMOVE = (1<<2), DS_ADD_REMOVE = (DS_ADD | DS_REMOVE),
-                       DS_COPY_REF = (1<<3), DS_EXACT = (1<<4) } type;
+  enum dim_spec_type type;
   size_t size_add;
   size_t size_remove;
 };
 
+enum param_spec_type { PS_INPUT, PS_OUTPUT, PS_RETURN };
+enum type_spec_limit_type { PS_EXACT, PS_LOWER_LIMIT };
+enum remaining_dims_type { PS_ABSENT, PS_EQUAL_TO_REFERENCE, PS_ARBITRARY };
+
 struct param_spec {
-  enum param_spec_type { PS_INPUT, PS_OUTPUT, PS_RETURN } logical_type;
+  enum param_spec_type logical_type;
   int32_t is_optional;
-  enum type_spec_limit_type { PS_EXACT, PS_LOWER_LIMIT } data_type_limit;
+  enum type_spec_limit_type data_type_limit;
   Symboltype data_type;
   size_t num_dims_spec;
   struct dims_spec *dims_spec;
   int32_t ref_par;
   int32_t axis_par;
-  enum remaining_dims_type { PS_ABSENT, PS_EQUAL_TO_REFERENCE, PS_ARBITRARY } remaining_dims;
+  enum remaining_dims_type remaining_dims;
   int32_t remaining_dims_equal_to_reference;
 };
 

@@ -31,9 +31,11 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <float.h>
 #include <errno.h>
 #include <ctype.h>
-#include "install.h"
-#include "action.h"
-#include "calendar.h"
+#include "install.hh"
+#include "action.hh"
+#include "calendar.hh"
+
+void	Quit(int32_t);
 
 extern	double	cbrt(double), expm1(double), log1p(double);
 double	voigt(double, double), beta(double, double), gamma(double),
@@ -170,7 +172,6 @@ int32_t lux_quit(int32_t narg, int32_t ps[])
 /*exit routine, calls are exit,status or quit,status */
 {
  int32_t	iq, saveHistory(void);
- void	Quit(int32_t);
 
  if (narg)
    iq = int_arg(ps[0]);
@@ -180,7 +181,7 @@ int32_t lux_quit(int32_t narg, int32_t ps[])
  return LUX_OK;			/* or some compilers complain */
 }
 /*------------------------------------------------------------------------- */
-int32_t lux_cputime(void)
+int32_t lux_cputime(int32_t n, int32_t ps[])
      /*returns an cpu time in seconds */
 {
   int32_t	i;
@@ -202,7 +203,7 @@ int32_t lux_cputime(void)
   return i;
 }
 /*------------------------------------------------------------------------- */
-int32_t lux_systime(void)
+int32_t lux_systime(int32_t narg, int32_t ps[])
      /* returns the system time in LUX_DOUBLE seconds */
 {
   int32_t     i;
@@ -216,7 +217,7 @@ int32_t lux_systime(void)
   return LUX_ZERO;		/* return 0 if not available */
 }
 /*------------------------------------------------------------------------- */
-int32_t lux_ctime(void)
+int32_t lux_ctime(int32_t narg, int32_t ps[])
      /* returns current time and date in a string */
 {
   int32_t	i;
@@ -228,14 +229,14 @@ int32_t lux_ctime(void)
   return i;
 }
 /*------------------------------------------------------------------------- */
-int32_t lux_time(void)
+int32_t lux_time(int32_t narg, int32_t ps[])
      /* returns current time in a string */
      /* added \0 to result string  LS 22may94 */
 {
   int32_t	i;
   time_t	t;
   char	*p;
-  
+
   i = string_scratch(8);
   t = time(NULL);
   p = ctime(&t);
@@ -244,7 +245,7 @@ int32_t lux_time(void)
   return i;
 }
 /*------------------------------------------------------------------------- */
-int32_t lux_date(void)
+int32_t lux_date(int32_t narg, int32_t ps[])
      /* returns current date in a string */
 {
   int32_t	i;
@@ -262,7 +263,7 @@ int32_t lux_date(void)
   return i;
 }
 /*------------------------------------------------------------------------- */
-int32_t lux_jd(void)
+int32_t lux_jd(int32_t narg, int32_t ps[])
 /* returns current Julian Day (relative to UTC) in double precision */
 {
   time_t	t;
@@ -285,7 +286,7 @@ int32_t lux_jd(void)
   return result;
 }
 /*------------------------------------------------------------------------- */
-int32_t lux_cjd(void)
+int32_t lux_cjd(int32_t narg, int32_t ps[])
 /* returns current Chronological Julian Day, relative to the current
    time zone */
 {
@@ -302,7 +303,7 @@ int32_t lux_show(int32_t narg, int32_t ps[])
   int32_t	iq, i;
   char	*s, *s2;
   int32_t	lux_dump(int32_t, int32_t []);
-  
+
   if (narg == 0)
     return lux_dump(-1, ps);	/* everybody */
   /* if a number passed, show symbol with that number; if a string, find
@@ -327,8 +328,8 @@ int32_t lux_show(int32_t narg, int32_t ps[])
       }
       for (i = 0; i < NSYM; i++) {
 	/* get the name */
-	s2 = varName(i);
-	if (strstr(s2, s) != NULL) {
+	char const *cp = varName(i);
+	if (strstr(cp, s) != NULL) {
 	  if (lux_dump(1, &i) != LUX_OK)
 	    break;
 	}
@@ -347,7 +348,8 @@ int32_t lux_show(int32_t narg, int32_t ps[])
 /*------------------------------------------------------------------------- */
 void symdumpswitch(int32_t nsym, int32_t mode)
 {
-  char	*s, *typeName(int32_t), *save;
+  char	*typeName(int32_t), *save;
+  char const* s;
   int32_t	j, *ip;
   int32_t	evalListPtr(int32_t);
 
@@ -414,8 +416,8 @@ void symdumpswitch(int32_t nsym, int32_t mode)
       j = evalListPtr(nsym);
       printwf("struct pointer, points at %s\n",
 	     symbolIdent(j, I_PARENT));
-      printwf(" *%d %s ", sym[j].class? j: 0, varName(sym[j].class? j: 0));
-      symdumpswitch(sym[j].class? j: 0, mode);
+      printwf(" *%d %s ", symbol_class(j)? j: 0, varName(symbol_class(j)? j: 0));
+      symdumpswitch(symbol_class(j)? j: 0, mode);
       return;
     case LUX_SUBROUTINE: case LUX_FUNCTION:
       printwf("# arguments = %1d, # statements = %1d\n",
@@ -446,7 +448,8 @@ void symdumpswitch(int32_t nsym, int32_t mode)
 int32_t lux_dump_one(int32_t iq, int32_t full)
 {
   int32_t	j;
-  char	*s, *save;
+  char const* s;
+  char *save;
 
   if (iq < 0 || iq >= NSYM)
     return cerror(ILL_ARG, 0);
@@ -639,7 +642,7 @@ int32_t lux_zero(int32_t narg, int32_t ps[])
       case LUX_ARRAY: case LUX_CARRAY: /*array case */
 	if (isStringType(array_type(iq))) { /* string array, remove members */
 	  mq = array_size(iq);
-	  q.sp = array_data(iq);
+	  q.sp = (char**) array_data(iq);
 	  while (mq--) {
 	    if (*q.sp)
 	      free(*q.sp);
@@ -649,7 +652,7 @@ int32_t lux_zero(int32_t narg, int32_t ps[])
 	/*try to zero quickly */
 	mq = array_size(iq)*lux_type_size[array_type(iq)];
 	/*mq should now be the # of bytes in the array, get start */
-	p = array_data(iq);
+	p = (char*) array_data(iq);
 	zerobytes(p, mq);
 	break;
       case LUX_STRING:		/* string case */
@@ -695,7 +698,7 @@ int32_t lux_onef(int32_t narg, int32_t ps[])
       if (isNumericalType(array_type(iq))) {
 	if (!isFreeTemp(iq))
 	  iq = array_clone(iq, array_type(iq));
-	p.b = array_data(iq);
+	p.b = (uint8_t*) array_data(iq);
 	n = array_size(iq);
 	break;
       }
@@ -761,7 +764,7 @@ int32_t lux_one(int32_t narg, int32_t ps[])
 	break;
       case LUX_ARRAY: case LUX_CARRAY:
 	if (isNumericalType(iq)) { /* numerical type */
-	  p.b = array_data(iq);
+	  p.b = (uint8_t*) array_data(iq);
 	  n = array_size(iq);
 	  break;
 	}
@@ -865,7 +868,7 @@ int32_t lux_zerof(int32_t narg, int32_t ps[])
       /* try to zero quickly */
       mq = array_size(result_sym)*lux_type_size[array_type(iq)];
       /* mq should now be the # of bytes in the array, get start */
-      p = array_data(result_sym);
+      p = (char*) array_data(result_sym);
       zerobytes(p, mq);
       return result_sym;
     case LUX_STRING:		/* string case */
@@ -974,7 +977,7 @@ int32_t lux_neg_func(int32_t narg, int32_t ps[])
      pointer in <src>.  Also generate a garbage clone of <*ps> with
      the same data type as <*ps> and return a pointer to it in <trgt>
      and its symbol number in <result>. */
-  if (getNumerical(*ps, 0, &n, &src, 0, &result, &trgt) < 0)
+  if (getNumerical(*ps, LUX_INT8, &n, &src, 0, &result, &trgt) < 0)
     return LUX_ERROR;		/* some error */
   switch (symbol_type(*ps)) {
     case LUX_INT8:
@@ -1051,13 +1054,13 @@ int32_t lux_isnan(int32_t narg, int32_t ps[])
       n = array_size(iq);
       src.f = (float *) array_data(iq);
       result = array_clone(iq, LUX_INT32);
-      trgt = array_data(result);
+      trgt = (int32_t*) array_data(result);
       break;
     case LUX_CARRAY:
       n = array_size(iq);
-      src.f = array_data(iq);
+      src.f = (float*) array_data(iq);
       result = array_clone(iq, LUX_CFLOAT);
-      trgtc = array_data(result);
+      trgtc = (floatComplex*) array_data(result);
       break;
     default:
       return cerror(ILL_CLASS, *ps);
@@ -1095,7 +1098,7 @@ int32_t zapnan(int32_t narg, int32_t ps[], int32_t func)
 /* with 0.  LS 27apr99 */
 {
   int32_t	size, result, valueSym;
-  scalar	value;
+  Scalar	value;
   pointer	data, trgt;
 
   valueSym = ps[0];
@@ -1211,22 +1214,23 @@ int32_t lux_abs(int32_t narg, int32_t ps[])
 	result = iq;
       else
 	result = array_clone(iq, array_type(iq));
-      src.b = array_data(iq);
-      trgt.b = array_data(result);
+      src.b = (uint8_t*) array_data(iq);
+      trgt.b = (uint8_t*) array_data(result);
       n = array_size(iq);
       break;
     case LUX_CSCALAR:
-      result = scalar_scratch(complex_scalar_type(iq)
-			      - LUX_CFLOAT + LUX_FLOAT);
+      result = scalar_scratch((Symboltype) (complex_scalar_type(iq)
+                                            - LUX_CFLOAT + LUX_FLOAT));
       src.cf = complex_scalar_data(iq).cf;
       trgt.b = &scalar_value(result).b;
       n = 1;
       break;
     case LUX_CARRAY:
-      result = array_scratch(array_type(iq) - LUX_CFLOAT + LUX_FLOAT,
+      result = array_scratch((Symboltype) (array_type(iq)
+                                           - LUX_CFLOAT + LUX_FLOAT),
 			     array_num_dims(iq), array_dims(iq));
-      src.cf = array_data(iq);
-      trgt.b = array_data(result);
+      src.cf = (floatComplex*) array_data(iq);
+      trgt.b = (uint8_t*) array_data(result);
       n = array_size(iq);
       break;
     default:
@@ -1315,22 +1319,23 @@ int32_t lux_complexsquare(int32_t narg, int32_t ps[])
 	result = iq;
       else
 	result = array_clone(iq, array_type(iq));
-      src.b = array_data(iq);
-      trgt.b = array_data(result);
+      src.b = (uint8_t*) array_data(iq);
+      trgt.b = (uint8_t*) array_data(result);
       n = array_size(iq);
       break;
     case LUX_CSCALAR:
-      result = scalar_scratch(complex_scalar_type(iq)
-			      - LUX_CFLOAT + LUX_FLOAT);
+      result = scalar_scratch((Symboltype) (complex_scalar_type(iq)
+                                            - LUX_CFLOAT + LUX_FLOAT));
       src.cf = complex_scalar_data(iq).cf;
       trgt.b = &scalar_value(result).b;
       n = 1;
       break;
     case LUX_CARRAY:
-      result = array_scratch(array_type(iq) - LUX_CFLOAT + LUX_FLOAT,
+      result = array_scratch((Symboltype) (array_type(iq)
+                                           - LUX_CFLOAT + LUX_FLOAT),
 			     array_num_dims(iq), array_dims(iq));
-      src.cf = array_data(iq);
-      trgt.b = array_data(result);
+      src.cf = (floatComplex*) array_data(iq);
+      trgt.b = (uint8_t*) array_data(result);
       n = array_size(iq);
       break;
     default:
@@ -1436,12 +1441,12 @@ int32_t lux_conjugate(int32_t narg, int32_t ps[])
       n = 1;
       break;
     case LUX_CARRAY:
-      src.cf = array_data(*ps);
+      src.cf = (floatComplex*) array_data(*ps);
       if (isFreeTemp(*ps))
 	result = *ps;
       else
 	result = array_clone(*ps, symbol_type(*ps));
-      trgt.cf = array_data(result);
+      trgt.cf = (floatComplex*) array_data(result);
       n = array_size(*ps);
       break;
     default:
@@ -1469,15 +1474,16 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 /* accumulates source values by class */
 {
   int32_t	type, offset, *indx, i, size, result, nElem, indices2,
-  	outType, haveWeights, p, psign, pp, nbase, j;
+    haveWeights, p, psign, pp, nbase, j;
+  Symboltype outType;
   pointer	src, trgt, sum, weights, hist;
-  scalar	temp, value;
+  Scalar	temp, value;
   floatComplex	tempcf, valuecf;
   doubleComplex	tempcd, valuecd;
   float	temp2f;
   double	temp2d;
   uint8_t	*present;
-  extern scalar	lastmin, lastmax;
+  extern Scalar	lastmin, lastmax;
   int32_t	minmax(int32_t *, int32_t, int32_t);
 
   if (narg > 3 && ps[3]) {	/* have <weights> */
@@ -1523,7 +1529,7 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
   /* need min and max of indices so we can create result array of */
   /* proper size */
   indices2 = lux_long(1, &ps[1]); /* force LUX_INT32 */
-  indx = array_data(indices2);	/* assumed of same size as <source>! */
+  indx = (int32_t*) array_data(indices2);	/* assumed of same size as <source>! */
   minmax(indx, nElem, LUX_INT32);
   size = lastmax.l + 1;
   offset = 0;
@@ -3405,9 +3411,10 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 /* Fixed erroneous cast to (float) in (double) summations.  LS 11jul2000 */
 /* Allow LUX_INT32 output.  LS 27oct2010 */
 {
-  int32_t	result, done, p, psign, pp, outtype, type, nbase, i, haveWeights, n;
+  int32_t	result, done, p, psign, pp, nbase, i, haveWeights, n;
+  Symboltype type, outtype;
   uint8_t	*present;
-  scalar	sum, value, temp, w;
+  Scalar	sum, value, temp, w;
   floatComplex	sumcf, tempcf, valuecf;
   doubleComplex	sumcd, tempcd, valuecd;
   float	temp2f;
@@ -3511,7 +3518,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
     haveWeights = lux_converts[realType(array_type(ps[0]))](1, &ps[3]);
     if (standardLoop(haveWeights, ps[1],
 		     (ps[1]? 0: SL_ALLAXES) | SL_EACHCOORD | SL_AXESBLOCK,
-		     0, &winfo, &weights, NULL, NULL, NULL) < 0)
+		     LUX_INT8, &winfo, &weights, NULL, NULL, NULL) < 0)
       return LUX_ERROR;
   }
 
@@ -5800,7 +5807,8 @@ int32_t math_funcs_2f(int32_t nsym1, int32_t nsym2, int32_t code)
 /*messier than the 1 argument case but not as bad as binary ops routines */
 /*assumes that the function requires double arguments (most C functions) */
 {
-  int32_t	n1, n2, nelem, i, result_sym, type1, type2, out_type;
+  int32_t	n1, n2, nelem, i, result_sym, type1, type2;
+  Symboltype out_type;
   pointer	src1, src2, trgt;
   double	value;
 
@@ -5873,7 +5881,7 @@ int32_t math_funcs_2f(int32_t nsym1, int32_t nsym2, int32_t code)
       else
 	result_sym = array_clone(nsym1, out_type);
     }
-    trgt.l = array_data(result_sym);
+    trgt.l = (int32_t*) array_data(result_sym);
   } else {			/* a scalar will do */
     result_sym = scalar_scratch(out_type);
     trgt.l = &scalar_value(result_sym).l;
@@ -6208,7 +6216,8 @@ int32_t math_funcs_i_f(int32_t nsym1, int32_t nsym2, int32_t code)
 /*general program for floating point functions with int32_t and float arguments */
 /*assumes that the function requires double arguments (most C functions) */
 {
-  int32_t	n1, n2, nelem, i, result_sym, type1, type2, out_type, valuei;
+  int32_t	n1, n2, nelem, i, result_sym, type1, type2, valuei;
+  Symboltype out_type;
   pointer	src1, src2, trgt;
   double	valued;
 
@@ -6276,7 +6285,7 @@ int32_t math_funcs_i_f(int32_t nsym1, int32_t nsym2, int32_t code)
     }
     if (!result_sym)
       result_sym = array_clone(i, out_type);
-    trgt.l = array_data(result_sym);
+    trgt.l = (int32_t*) array_data(result_sym);
   } else {			/* a scalar will do */
     result_sym = scalar_scratch(out_type);
     trgt.l = &scalar_value(result_sym).l;
@@ -6616,15 +6625,16 @@ int32_t math_funcs_3f(int32_t sym1, int32_t sym2, int32_t sym3, int32_t code)
 /* the same number of elements.  The dimensional structures are not */
 /* checked.  LS 15jan96 */
 {
-  int32_t	n1, n2, n3, iq, n, type1, type2, type3, step1, step2, step3, type;
+  int32_t	n1, n2, n3, iq, n, step1, step2, step3;
+  Symboltype type1, type2, type3, type;
   pointer	src1, src2, src3, trgt;
   double	val1, val2, val3, val;
 
   errno = 0;
   /* get sizes and pointers */
-  if (getNumerical(sym1, 0, &n1, &src1, 0, NULL, NULL) < 0
-      || getNumerical(sym2, 0, &n2, &src2, 0, NULL, NULL) < 0
-      || getNumerical(sym3, 0, &n3, &src3, 0, NULL, NULL) < 0) 
+  if (getNumerical(sym1, LUX_INT8, &n1, &src1, 0, NULL, NULL) < 0
+      || getNumerical(sym2, LUX_INT8, &n2, &src2, 0, NULL, NULL) < 0
+      || getNumerical(sym3, LUX_INT8, &n3, &src3, 0, NULL, NULL) < 0) 
     return LUX_ERROR;
 				/* crude check on sizes */
   if ((n1 != n2 && n1 > 1 && n2 > 1)

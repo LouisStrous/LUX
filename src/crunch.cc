@@ -21,7 +21,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #if HAVE_CONFIG_H
 #include "config.h"
 #endif
-#include "lux_structures.h"
+#include "lux_structures.hh"
  /* 2/4/96, finished adding a 32 bit crunch/decrunch which is especially
  useful for recording darks and flats at La Palma since these are sums of
  50 or more 10 bit images and can easily exceed the positive range of
@@ -95,7 +95,7 @@ int32_t docrunch(int32_t narg, int32_t ps[], int32_t showerror)/* crunch subrout
   type = array_type(iq);
   if (type > LUX_INT32)
     return luxerror("crunch only accepts I*1,2,4 arrays", iq);
-  q1.l = array_data(iq);
+  q1.l = (int32_t*) array_data(iq);
   nx = array_dims(iq)[0];
   outer = array_size(iq)/nx;
   /* get the fixed slice width */
@@ -104,7 +104,7 @@ int32_t docrunch(int32_t narg, int32_t ps[], int32_t showerror)/* crunch subrout
   iq = ps[2];
   if (!symbolIsNumericalArray(iq))
     return cerror(NEED_ARR, iq);
-  q2.l = array_data(iq);
+  q2.l = (int32_t*) array_data(iq);
   n = array_size(iq);
   limit = n*lux_type_size[array_type(iq)]; /* use to avoid overflows */
   /* the types in the compress structure are non-inuitive for historical
@@ -161,7 +161,8 @@ int32_t lux_decrunch(int32_t narg, int32_t ps[])		/* decrunch subroutine */
  /*  decrunch, IN, OUT */
 {
   /* works only for I*2 and I*1 arrays */
-  int32_t	iq, slice, nx, outer, nd, type, ctype, dim[2];
+  int32_t	iq, slice, nx, outer, nd, ctype, dim[2];
+  Symboltype type;
 #if WORDS_BIGENDIAN
   int32_t bsize;
 #endif
@@ -169,7 +170,7 @@ int32_t lux_decrunch(int32_t narg, int32_t ps[])		/* decrunch subroutine */
   union	types_ptr q1, q2;
 
   iq = ps[0];
-  if ( sym[iq].class != 4 ) return cerror(NEED_ARR, iq);
+  if ( symbol_class(iq) != 4 ) return cerror(NEED_ARR, iq);
   /* decrunch doesn't care about input array type since it looks at bit stream*/
   h = (struct ahead *) sym[iq].spec.array.ptr;
   q1.l = (int32_t *) ((char *)h + sizeof(struct ahead));
@@ -194,9 +195,8 @@ int32_t lux_decrunch(int32_t narg, int32_t ps[])		/* decrunch subroutine */
      ctype 3		I*1 with run length imbedded
      ctype 4		I*4
   */
-  type = ctype % 2;
-  if (type == 0) type =1; else type =0; /*I*2 or I*1 */
-  if (ctype ==4) type = 2;
+  if (ctype%2 == 0) type = LUX_INT16; else type = LUX_INT8; /*I*2 or I*1 */
+  if (ctype ==4) type = LUX_INT32;
   nd = 1; if (outer > 1) nd = 2;  dim[0] = nx;   dim[1] = outer;
   if ( redef_array( iq, type, nd, dim) != 1 ) {
     printf("problem setting up result for DECRUNCH, blocksize, numblocks = %d %d",

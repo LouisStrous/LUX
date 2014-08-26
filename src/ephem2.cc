@@ -21,8 +21,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 /* Ephemerides having to do with the appearance of the Sun as seen from */
 /* Earth.  LS 1997 */
 #include <math.h>
-#include "luxdefs.h"
-#include "action.h"
+#include "luxdefs.hh"
+#include "action.hh"
 
 /* 2nd-degree polynomial evaluation */
 #define pol2(a0,a1,a2,t) (a0 + t*(a1 + t*a2))

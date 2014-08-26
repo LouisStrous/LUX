@@ -17,9 +17,7 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-extern "C" {
-  extern int do_main(int, char **);
-};
+int do_main(int, char **);
 
 int main(int argc, char **argv)
 {

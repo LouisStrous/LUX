@@ -32,13 +32,17 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
-#include "install.h"
+#include "install.hh"
 #include <time.h>
 #include <float.h>
 #include <limits.h>
-#include "action.h"
+#include "action.hh"
  /*following is icon bitmap */
 #include "lux_bitmap.xbm"
+
+extern "C" {
+#include "visualclass.h"
+}
 
 #define BITMAPDEPTH     1
 #define TOO_SMALL       0
@@ -48,7 +52,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 int32_t	coordTrf(float *, float *, int32_t, int32_t),
   checkCoordSys(int32_t mode, int32_t defaultmode);
 
-int32_t	setup_x(void), anaAllocNamedColor(char *, XColor **);
+int32_t	setup_x(void), anaAllocNamedColor(char const*, XColor **);
 
 extern  int32_t     scalemin, scalemax, setup, connect_flag, visualClass;
 extern  float   xfac, yfac, xlimit, ylimit;
@@ -85,7 +89,7 @@ extern int32_t	private_colormap, screen_num;
 extern uint32_t	display_width, display_height, display_cells, nColors;
 extern Display	*display;
 
-extern char   *strsave(char  *s), *visualNames[];
+extern char   *visualNames[];
 
 int32_t	freeCellIndex, nFreeCells;
 
@@ -268,7 +272,7 @@ int32_t lux_show_visuals(int32_t narg, int32_t ps[])
 	 "csz", "red", "green", "blue", "bpc");
   for (i = 0; i < nVisual; i++) {
     printf("%6d %11s %2d %3d %06x %06x %06x %3d\n", i + 1,
-	   visualNames[vInfo[i].class], vInfo[i].depth,
+	   visualNames[xvisualinfoclass(vInfo[i])], vInfo[i].depth,
 	   vInfo[i].colormap_size, vInfo[i].red_mask,
 	   vInfo[i].green_mask, vInfo[i].blue_mask,
 	   vInfo[i].bits_per_rgb);
@@ -698,7 +702,7 @@ int32_t lux_xcreat(int32_t wid, uint32_t height, uint32_t width, int32_t xpos,
      if (!win[wid])
        return luxerror("Could not create requested window", 0);
      icon_pixmap =
-       XCreateBitmapFromData(display, win[wid], icon_bitmap_bits,
+       XCreateBitmapFromData(display, win[wid], (const char*) icon_bitmap_bits,
 			     icon_bitmap_width, icon_bitmap_height);
      
      wm_hints.initial_state = NormalState;
@@ -799,9 +803,9 @@ int32_t lux_xcursor(int32_t narg, int32_t ps[]) /* set the cursor */
   int32_t    wid, iq;
   Cursor cursor;
   XColor	*cfore, *cback;
-  char	*cfore_default = {"red"};
-  char	*cback_default = {"black"};
-  char	*pc;
+  char const* cfore_default = {"red"};
+  char const* cback_default = {"black"};
+  char const* pc;
 
   if (ck_events() != 1
       || int_arg_stat(ps[0], &wid) != 1
@@ -866,7 +870,7 @@ int32_t lux_xsetbackground(int32_t narg, int32_t ps[])/* set the background colo
     case LUX_ARRAY:
       if (symbolIsRealArray(*ps) && array_size(*ps) == 3) {
 	iq = lux_float(1, ps);	/* ensure FLOAT */
-	value = array_data(iq);
+	value = (float*) array_data(iq);
 	sprintf(pc = curScrat, "rgbi:%g/%g/%g", value[0], value[1], value[2]);
 	if (anaAllocNamedColor(pc, &color) == 0)
 	  goto setbg_1;
@@ -924,7 +928,7 @@ int32_t lux_xsetforeground(int32_t narg, int32_t ps[])/* set the foreground colo
     case LUX_ARRAY:
       if (symbolIsRealArray(*ps) && array_size(*ps) == 3) {
 	iq = lux_float(1, ps);	/* ensure FLOAT */
-	value = array_data(iq);
+	value = (float*) array_data(iq);
 	sprintf(pc = curScrat, "rgbi:%g/%g/%g", value[0], value[1], value[2]);
 	if (anaAllocNamedColor(pc, &color) == 0)
 	  goto setfg_1;
@@ -1204,7 +1208,7 @@ int32_t tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
   pointer	image, image0;
   int32_t	hq, wq, nxx, nyy, ix, iy, xsrc, ysrc, indx, i, toscreen, maxdim,
     iq, sx, sy, bpp, s;
-  scalar	min, max, value, factor, offset;
+  Scalar	min, max, value, factor, offset;
   float	fx, fy, fx2, fy2, magx, magy, nxxf, nyyf;
   extern float	postXBot, postXTop, postYBot, postYTop,
     zoom_mag, zoom_xc, zoom_yc, zoom_clo, zoom_chi, wxb, wxt, wyb, wyt;
@@ -1369,8 +1373,8 @@ int32_t tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
   }
 
   if (mode & TV_24) {
-    if (visualPrimariesAreLinked(visual->class) && toscreen)
-      return luxerror("The %s visual that you are using is incapable\nof displaying 3-component images.\n", 0, visualNames[visual->class]);
+    if (visualPrimariesAreLinked(visualclass(visual)) && toscreen)
+      return luxerror("The %s visual that you are using is incapable\nof displaying 3-component images.\n", 0, visualNames[visualclass(visual)]);
     s = nx*ny;
   }
 
@@ -1723,10 +1727,10 @@ int32_t tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
     nxx = nx;			/* original dimensions */
     nyy = ny;
   }
-  image.b = image0.b = malloc(nxx*nyy*(bpp/8)*((mode & TV_24)? 3: 1));
+  image.b = image0.b = (uint8_t*) malloc(nxx*nyy*(bpp/8)*((mode & TV_24)? 3: 1));
   if (!image.b)
     return cerror(ALLOC_ERR, 0);
-  
+
   /* now generate the image data */
   if (!(mode & (TV_RAW | TV_MAP))) {
     if (setup & 4) {		/* "reversed" images */
@@ -3312,7 +3316,7 @@ int32_t tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
     fy2 = (float) (syf + nyyf)/maxdim;
     /* NOTE: must modify this to support 16 and 32-bit color indices */
     if (mode & TV_24)
-      iq = postcolor((void *) image0.b, nx, ny, fx, fx2, fy, fy2, 2);
+      iq = postcolor((char *) image0.b, nx, ny, fx, fx2, fy, fy2, 2);
     else
       iq = postgray((char *) image0.b, nx, ny, fx, fx2, fy, fy2, 2);
   }
@@ -3326,7 +3330,8 @@ int32_t lux_colorpixel(int32_t narg, int32_t ps[])
 /* maps color indices to pixel values */
 {
   pointer	p, q;
-  int32_t	n, iq, bpp, type;
+  int32_t	n, iq, bpp;
+  Symboltype type;
   extern int32_t	bits_per_pixel;
   extern unsigned long	red_mask, green_mask, blue_mask;
 
@@ -3365,8 +3370,8 @@ int32_t lux_colorpixel(int32_t narg, int32_t ps[])
 	else			/* need a new variable */
 	  iq = array_clone(*ps, type);
       }
-      p.l = array_data(*ps);
-      q.b = array_data(iq);
+      p.l = (int32_t*) array_data(*ps);
+      q.b = (uint8_t*) array_data(iq);
       break;
     case LUX_SCALAR:
       if (internalMode & TV_24)
@@ -3695,8 +3700,7 @@ int32_t lux_xevent(int32_t narg, int32_t ps[])
  return 1;
  }
  /*------------------------------------------------------------------------*/
-int32_t lux_xpurge(narg,ps)	/* just throw away any pending X events */
- int32_t narg, ps[];
+int32_t lux_xpurge(int32_t narg, int32_t ps[]) /* just throw away any pending X events */
  {
  XEvent  report;
  int32_t     nev, i;
@@ -3808,7 +3812,7 @@ int32_t xwindow_plot(int32_t ix, int32_t iy, int32_t mode)
  return 1;
 }
  /*------------------------------------------------------------------------*/
-int32_t lux_xflush()
+int32_t lux_xflush(int32_t narg, int32_t ps[])
  {
  XFlush(display);       return 1;
  }
@@ -3847,16 +3851,15 @@ int32_t lux_xpen(int32_t pen, float gray)
  return 1;
 }
  /*------------------------------------------------------------------------*/
-int32_t lux_xfont(narg, ps)
+int32_t lux_xfont(int32_t narg, int32_t ps[])
                                         /* set font for a window */
- int32_t     narg, ps[];
  {
  int32_t      wid, iq;
  char    *fontname;
  /* first arg is a string which should be a font name */
  ck_events();
  iq = ps[0];
- if (sym[iq].class != 2) return cerror(NEED_STR, iq);
+ if (symbol_class(iq) != 2) return cerror(NEED_STR, iq);
  fontname = (char *) sym[iq].spec.array.ptr;
  wid = last_wid;
  if (narg > 1) wid = int_arg( ps[1]);
@@ -3868,16 +3871,15 @@ int32_t lux_xfont(narg, ps)
  return 1;
  }
  /*------------------------------------------------------------------------*/
-int32_t lux_xlabel(narg, ps)
+int32_t lux_xlabel(int32_t narg, int32_t ps[])
                                         /* user labels */
- int32_t     narg, ps[];
  {
  int32_t     wid, iq, ix, iy, len;
  char    *s;
  /* first arg is a string which will be the label */
  ck_events();
  iq = ps[0];
- if (sym[iq].class != 2) return cerror(NEED_STR, iq);
+ if (symbol_class(iq) != 2) return cerror(NEED_STR, iq);
  s = (char *) sym[iq].spec.array.ptr;
  len = sym[iq].spec.array.bstore - 1;
  ix = int_arg( ps[1]);   iy = int_arg( ps[2]);
@@ -3890,21 +3892,20 @@ int32_t lux_xlabel(narg, ps)
  return 1;
  }
  /*------------------------------------------------------------------------*/
-int32_t lux_xlabelwidth(narg, ps)
+int32_t lux_xlabelwidth(int32_t narg, int32_t ps[])
                                         /* user label width */
- int32_t     narg, ps[];
  {
  int32_t     wid, iq, len, result_sym;
  char    *s;
  /* arg is a string which will be the label */
  ck_events();
  iq = ps[0];
- if (sym[iq].class != 2) return cerror(NEED_STR, iq);
+ if (symbol_class(iq) != LUX_STRING) return cerror(NEED_STR, iq);
  s = (char *) sym[iq].spec.array.ptr;
  len = sym[iq].spec.array.bstore - 1;
  wid = last_wid;
  iq = XTextWidth(font_info[wid], s, len );
- result_sym = scalar_scratch(2);
+ result_sym = scalar_scratch(LUX_INT32);
  sym[result_sym].spec.scalar.l = iq;
  return result_sym;
  }
@@ -3920,9 +3921,8 @@ int32_t xlabel(char *s, int32_t ix, int32_t iy)
   return 1;
 }
  /*------------------------------------------------------------------------*/
-int32_t xlabelwidth(s)
+int32_t xlabelwidth(char const* s)
                                         /* internal call for labels */
- char    *s;
  {
  int32_t     len, wid;
  len = strlen(s);
@@ -3935,7 +3935,8 @@ int32_t xlabelwidth(s)
 int32_t lux_xtvread(int32_t narg, int32_t ps[])
 {
  /* read from an X window or pixmap and create a uint8_t array */
- int32_t  nx, ny, ix, iy, wid, result_sym, dim[2], w, hh, type;
+  int32_t  nx, ny, ix, iy, wid, result_sym, dim[2], w, hh;
+  Symboltype type;
  pointer    ptr;
  Drawable        *src;
  int32_t	lux_zerof(int32_t, int32_t *);
@@ -3997,7 +3998,7 @@ int32_t lux_xtvread(int32_t narg, int32_t ps[])
  }
  result_sym = array_scratch(type, 2, dim);
  result_sym = lux_zerof(1, &result_sym);  /* zero it in case not filled */
- ptr.b = array_data(result_sym);
+ ptr.b = (uint8_t*) array_data(result_sym);
  /* note that we create our own image and use XGetSubImage */
  xi = XCreateImage(display, visual, depth, ZPixmap, 0, (char *) ptr.b,
 		   nx, ny, bits_per_pixel, 0);
@@ -4057,8 +4058,7 @@ Bool windowButtonPress(Display *display, XEvent *event, XPointer arg)
    False otherwise */
 {
   int32_t	i, num;
-  extern Window	win[];
-  
+
   if (event->type != ButtonPress) return False;
   if (arg) num = *((int32_t *) arg); else num = -1;
   for (i = (num < 0)? 0: num; i < (num < 0? MAXWINDOWS: num + 1); i++)
@@ -4137,7 +4137,7 @@ int32_t lux_xanimate(int32_t narg, int32_t ps[])
   if (fr1 < 0 || fr1 >= nFrame - 1)
     return luxerror("Start frame number out of range: %1d vs. (0:%1d)",
 		 ps[3], fr1, 0, nFrame - 2);
-  data.l = array_data(ps[0]);
+  data.l = (int32_t*) array_data(ps[0]);
   ix = 0;
   iy = 0;
   if (narg > 4 && ps[4])
@@ -4199,7 +4199,7 @@ int32_t lux_xzoom(int32_t narg, int32_t ps[])
     return luxerror("Cannot use ZOOM on pixmaps", 0);
   if (lux_xtv(narg, ps) < 0)	/* display image */
     return LUX_ERROR;		/* some error */
-  ptr.l = array_data(ps[0]);
+  ptr.l = (int32_t*) array_data(ps[0]);
   type = array_type(ps[0]);
   nx = *array_dims(ps[0]);	/* width */
   ny = array_dims(ps[0])[1];	/* height */
@@ -4340,9 +4340,9 @@ int32_t lux_xtvplane(int32_t narg, int32_t ps[])
        combined and the data could be re-oriented while extracting */
     uint8_t	*sub, *p;
     int32_t	m = hq, n, stride;
-    
+
     p = ptr;
-    sub = ptr = malloc(wq*hq);
+    sub = ptr = (uint8_t*) malloc(wq*hq);
     p = p + ix + iy*nx;
     stride = nx - wq;
     while (m--) {
@@ -4385,7 +4385,7 @@ int32_t lux_xtvplane(int32_t narg, int32_t ps[])
     }
     /* get pointer to this now, assume that ns and ms are the proper
        dimension */
-    ptr = array_data(zoom_sym);
+    ptr = (uint8_t*) array_data(zoom_sym);
     nx = ns;
     ny = ms;
   }
@@ -4397,7 +4397,7 @@ int32_t lux_xtvplane(int32_t narg, int32_t ps[])
   if (!subfree)
     /* we're looking at the original image, which we are not supposed
        to modify */
-    subfree = ptr2 = malloc(nx*ny);
+    subfree = ptr2 = (uint8_t*) malloc(nx*ny);
   else
     ptr2 = ptr;
 
@@ -4447,7 +4447,7 @@ int32_t lux_threecolors(int32_t narg, int32_t ps[])
     return cerror(ILL_CLASS, ps[0]);
   if (array_size(ps[0]) != 9)
     return luxerror("Need 9 elements in array", ps[0]);
-  list = array_data(lux_float(1, ps));
+  list = (float*) array_data(lux_float(1, ps));
   return threecolors(list, 9);
 }
 /*---------------------------------------------------------*/
@@ -4464,7 +4464,7 @@ int32_t lux_tv3(int32_t narg, int32_t ps[])
       || isComplexType(array_type(ps[0]))
       || array_num_dims(ps[0]) != 2)
     return cerror(NEED_2D_ARR, ps[0]);
-  data.b = array_data(ps[0]);
+  data.b = (uint8_t*) array_data(ps[0]);
   nx = array_dims(ps[0])[0];
   ny = array_dims(ps[0])[1];
 
@@ -4474,7 +4474,7 @@ int32_t lux_tv3(int32_t narg, int32_t ps[])
     else if (symbolIsNumericalArray(ps[1])
 	     && array_size(ps[1]) == array_size(ps[0])) {
       iq = lux_byte(1, &ps[1]);	/* ensure BYTE */
-      bitmap1 = array_data(iq);
+      bitmap1 = (uint8_t*) array_data(iq);
     } else
       return cerror(INCMP_ARG, ps[1]);
   } else
@@ -4486,12 +4486,12 @@ int32_t lux_tv3(int32_t narg, int32_t ps[])
     else if (symbolIsNumericalArray(ps[2])
 	     && array_size(ps[2]) == array_size(ps[0])) {
       iq = lux_byte(1, &ps[2]);
-      bitmap2 = array_data(iq);
+      bitmap2 = (uint8_t*) array_data(iq);
     } else
       return cerror(INCMP_ARG, ps[2]);
   } else
     bitmap2 = NULL;
-  
+
   if (narg > 3 && ps[3]) {	/* <x> */
     if (!symbolIsScalar(ps[3]))
       return cerror(NEED_SCAL, ps[3]);
@@ -4594,7 +4594,7 @@ int32_t lux_xdrawline(int32_t narg, int32_t ps[])
 
     iq = lux_long(1, &ps[0]);
     nx = array_size(iq);
-    px1 = array_data(iq);
+    px1 = (int32_t*) array_data(iq);
 
     if (symbol_class(ps[1]) != LUX_ARRAY)
       return cerror(NEED_ARR, ps[1]);
@@ -4602,23 +4602,23 @@ int32_t lux_xdrawline(int32_t narg, int32_t ps[])
     n = array_size(iq);
     if (n != nx)
       return cerror(INCMP_ARG, ps[1]);
-    py1 = array_data(iq);
-    
+    py1 = (int32_t*) array_data(iq);
+
     if (symbol_class(ps[2]) != LUX_ARRAY)
       return cerror(INCMP_ARG, iq);
     iq = lux_long(1, &ps[2]);
     n = array_size(iq);
     if (n != nx)
       return cerror(INCMP_ARG, ps[2]);
-    px2 = array_data(iq);;
-    
+    px2 = (int32_t*) array_data(iq);;
+
     if (symbol_class(ps[3]) != LUX_ARRAY)
       return cerror(NEED_ARR, iq);
     iq = lux_long(1, &ps[3]);
     n = array_size(iq);
     if (n != nx)
       return cerror(INCMP_ARG, ps[3]);
-    py2 = array_data(iq);
+    py2 = (int32_t*) array_data(iq);
 
     /* now just loop some xdrawline calls, we don't know if the lines
        connect */

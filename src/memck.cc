@@ -23,13 +23,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 #include <sys/types.h>
 #include <stdio.h>
-#include "action.h"
-
-#ifdef SBRK_H
-#include SBRK_H
-#else
-void	*sbrk(int32_t);
-#endif
+#include <unistd.h>
+#include "action.hh"
 
 /*-------------------------------------------------------------------*/
 int32_t lux_memstat(int32_t narg, int32_t ps[])
@@ -38,7 +33,7 @@ int32_t lux_memstat(int32_t narg, int32_t ps[])
  char		*p;
  extern char	*firstbreak;
 
- p = sbrk(0);
+ p = (char*) sbrk(0);
  printf("Break at %p, allocated %u bytes\n",
   p, p - firstbreak);
  return 1;
@@ -51,7 +46,7 @@ int32_t lux_memory(int32_t narg, int32_t ps[])
   char	*p;
   extern char	*firstbreak;
 
-  p = sbrk(0);
+  p = (char*) sbrk(0);
   result = scalar_scratch(LUX_INT32);
   sym[result].spec.scalar.l = p - firstbreak;
   return result;

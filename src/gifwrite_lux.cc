@@ -26,10 +26,10 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <errno.h>
 #include <math.h>
 #include <strings.h>		/* for bzero */
-#include "lux_structures.h"
+#include "lux_structures.hh"
  extern struct sym_desc sym[];
  struct GIFScreen {
-        char id[6];
+        char id[7];
         unsigned char width_lsb;
         unsigned char width_msb;
         unsigned char height_lsb;
@@ -54,20 +54,11 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
    cl_block(void), cl_hash(register int32_t) /*, char_init()*/;
  static void char_out(int32_t), flush_char(void);
 
-int32_t	lux_gifwrite(int32_t, int32_t []);
  /*------------------------------------------------------------------------- */
-int32_t lux_gifwrite_f(narg, ps)
- /* a function version that returns 1 if read OK */
- int32_t	narg, ps[];
- {
- if ( lux_gifwrite(narg, ps) == 1 ) return 1; else return 4;
- }
- /*------------------------------------------------------------------------- */
-int32_t lux_gifwrite(narg,ps)      /* gifwrite subroutine */
+int32_t lux_gifwrite(int32_t narg, int32_t ps[]) /* gifwrite subroutine */
  /* write a very plain gif file, 8 bit deep */
  /* call is gifwrite,array,file,[map] where map is the color map 
  and must be (3,256) I*1 in rgb triplets */
- int32_t    narg, ps[];
  {
  FILE	*fout;
  int32_t    iq, nd, type, i;
@@ -80,7 +71,7 @@ int32_t lux_gifwrite(narg,ps)      /* gifwrite subroutine */
 
                                          /* first arg. must be an array */
  iq = ps[0];
- if ( sym[iq].class != 4 ) return execute_error(66);
+ if ( symbol_class(iq) != 4 ) return execute_error(66);
  type = sym[iq].type;
  h = (struct ahead *) sym[iq].spec.array.ptr;
  data = ((char *)h + sizeof(struct ahead));
@@ -89,13 +80,13 @@ int32_t lux_gifwrite(narg,ps)      /* gifwrite subroutine */
   { printf("GIFWRITE only supports 2-D Byte arrays\n");
   return -1; }
                         /* second argument must be a string, file name */
- if ( sym[ ps[1] ].class != 2 ) return execute_error(70);
+ if ( symbol_class( ps[1] ) != 2 ) return execute_error(70);
  name = (char *) sym[ps[1] ].spec.array.ptr;
                         /* third arg. must be an array, color map */
  ncolmap = 256*3;       /* length in bytes */
  if (narg > 2) {
  iq = ps[2];
- if ( sym[iq].class != 4 ) return execute_error(66);
+ if ( symbol_class(iq) != 4 ) return execute_error(66);
  type = sym[iq].type;
  h2 = (struct ahead *) sym[iq].spec.array.ptr;
  colormap = ((char *)h2 + sizeof(struct ahead));
@@ -105,7 +96,7 @@ int32_t lux_gifwrite(narg,ps)      /* gifwrite subroutine */
   return -1; }
  } else {
  /* if no colormap passed, we provide a b/w one */
- colormap = malloc(ncolmap);
+   colormap = (char*) malloc(ncolmap);
  if (colormap == NULL) { printf("malloc error in gifwrite\n"); return -1;}
  p = colormap;
  for (i=0; i < 256; i++) { *p++ = i; *p++ = i; *p++ = i; }
@@ -143,6 +134,12 @@ int32_t lux_gifwrite(narg,ps)      /* gifwrite subroutine */
  putc(';', fout);
  fclose(fout);
  return 1;
+ }
+ /*------------------------------------------------------------------------- */
+int32_t lux_gifwrite_f(int32_t narg, int32_t ps[])
+ /* a function version that returns 1 if read OK */
+ {
+ if ( lux_gifwrite(narg, ps) == 1 ) return 1; else return 4;
  }
  /*------------------------------------------------------------------------- */
  static unsigned long cur_accum = 0;

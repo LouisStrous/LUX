@@ -1,0 +1,6 @@
+func foo(p)
+  return,(x - p(0) - 2)^2
+endfunc
+
+p = [0]
+q = optimize('foo',p)

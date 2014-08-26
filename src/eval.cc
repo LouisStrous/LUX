@@ -26,10 +26,10 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
-#include "action.h"
-#include "install.h"
+#include "action.hh"
+#include "install.hh"
 
-char *binOpName[] = {           /* name of binary operators, for messages */
+char const* binOpName[] = { /* name of binary operators, for messages */
   "addition", "subtraction", "multiplication", "division",
   "integer-division", "modulus",
  "symmetric-modulus", "highest-of-two", "lowest-of-two", "equal-to",
@@ -38,7 +38,7 @@ char *binOpName[] = {           /* name of binary operators, for messages */
  "logical-exclusive-or", "power-taking", "and-if", "or-if",
 };
 
-char *binOpSign[] = {           /* token of binary operators, for messages */
+char const* binOpSign[] = { /* token of binary operators, for messages */
   "+", "-", "*", "/", "\\", "%", "SMOD", ">", "<", "EQ", "GT", "GE", "LT", "LE",
  "NE", "OR", "AND", "XOR", "^", "ANDIF", "ORIF"
 };
@@ -58,14 +58,15 @@ int32_t     internal_routine(int32_t, internalRoutine *), /* interal routine cal
         usr_routine(int32_t);       /* user routine call */
 char    evalScalPtr = 1;        /* we need to evaluate scalar pointers, too */
 
-int32_t     newSymbol(int32_t kind, ...), nextCompileLevel(FILE *fp, char *filename),
+int32_t     newSymbol(Symbolclass kind, ...),
+  nextCompileLevel(FILE *fp, char const *filename),
   lux_neg_func(int32_t, int32_t []);
 void    embed(int32_t target, int32_t context), zap(int32_t symbol);
 /*----------------------------------------------------------*/
 void lux_bin_pow(void)
      /* power-taking with two array operands */
 {
-  scalar        mod1, arg1, mod2, arg2;
+  Scalar        mod1, arg1, mod2, arg2;
 
   switch (lhsType) {
   case LUX_INT8:
@@ -746,7 +747,7 @@ void lux_bin_pow(void)
 void lux_pow_as(void)
      /* power-taking with array LHS and scalar RHS */
 {
-  scalar        re, im, mod1, arg1, mod2, arg2;
+  Scalar        re, im, mod1, arg1, mod2, arg2;
 
   switch (lhsType) {
   case LUX_INT8:
@@ -1457,7 +1458,7 @@ void lux_pow_as(void)
 void lux_pow_sa(void)
      /* power-taking with scalar LHS and array RHS */
 {
-  scalar        re, im, arg1, mod1, mod2, arg2;
+  Scalar        re, im, arg1, mod1, mod2, arg2;
 
   switch (lhsType) {
   case LUX_INT8:
@@ -2918,8 +2919,8 @@ void lux_add_sa(void)
      /* commutative, we just swap the LHS and RHS and pass on to */
      /* lux_add_as() */
 {
- int32_t            temp;
- pointer        tempp;
+ Symboltype temp;
+ pointer tempp;
 
  temp = lhsType;
  lhsType = rhsType;
@@ -4052,7 +4053,7 @@ void lux_sub_sa(void)
 void lux_mul(void)
      /* multiplication with array operands */
 {
-  scalar        re, im;
+  Scalar        re, im;
 
   switch (lhsType) {
   case LUX_INT8:
@@ -4495,7 +4496,7 @@ void lux_mul(void)
 void lux_mul_as(void)
      /* multiplication with array LHS and scalar RHS */
 {
-  scalar        re, im;
+  Scalar        re, im;
 
   switch (lhsType) {
   case LUX_INT8:
@@ -4916,8 +4917,8 @@ void lux_mul_sa(void)
      /* is commutative, we just swap the LHS and RHS and pass on to */
      /* lux_mul_as() */
 {
-  int32_t           temp;
-  pointer       tempp;
+  Symboltype temp;
+  pointer tempp;
 
   temp = lhsType;
   lhsType = rhsType;
@@ -4938,7 +4939,7 @@ void lux_div(void)
      /* division with array operands.
         NOTE: no checking for division by zero! */
 {
-  scalar        re, im, d;
+  Scalar        re, im, d;
 
   switch (lhsType) {
   case LUX_INT8:
@@ -5403,7 +5404,7 @@ void lux_div(void)
 void lux_div_as(void)
      /* division with an array LHS and scalar RHS */
 {
-  scalar        re, im, d;
+  Scalar        re, im, d;
 
   switch (lhsType) {
   case LUX_INT8:
@@ -5862,7 +5863,7 @@ void lux_div_as(void)
 void lux_div_sa(void)
      /* division with scalar LHS and array RHS */
 {
-  scalar        re, im, d;
+  Scalar        re, im, d;
 
   switch (lhsType) {
   case LUX_INT8:
@@ -10445,7 +10446,7 @@ void lux_mod_sa(void)
 void lux_max(void)
      /* largest-taking with array operands */
 {
-  scalar        value1, value2;
+  Scalar        value1, value2;
 
   switch (lhsType) {
   case LUX_INT8:
@@ -11158,7 +11159,7 @@ void lux_max(void)
 void lux_max_as(void)
      /* largest-taking with array LHS and scalar RHS */
 {
-  scalar        value1, value2;
+  Scalar        value1, value2;
 
   switch (lhsType) {
   case LUX_INT8:
@@ -11905,8 +11906,8 @@ void lux_max_sa(void)
      /* is commutative, we just swap LHS and RHS and pass on to */
      /* lux_max_as() */
 {
-  int32_t           temp;
-  pointer       tempp;
+  Symboltype temp;
+  pointer tempp;
 
   temp = lhsType;
   lhsType = rhsType;
@@ -11926,7 +11927,7 @@ void lux_max_sa(void)
 void lux_min(void)
      /* smallest-taking with array operands */
 {
-  scalar        value1, value2;
+  Scalar        value1, value2;
 
   switch (lhsType) {
   case LUX_INT8:
@@ -12639,7 +12640,7 @@ void lux_min(void)
 void lux_min_as(void)
      /* smallest-taking with array LHS and scalar RHS */
 {
-  scalar        value1, value2;
+  Scalar        value1, value2;
 
   switch (lhsType) {
   case LUX_INT8:
@@ -13386,8 +13387,8 @@ void lux_min_sa(void)
      /* is commutative, we just swap LHS and RHS and pass on to */
      /* lux_max_as() */
 {
-  int32_t           temp;
-  pointer       tempp;
+  Symboltype temp;
+  pointer tempp;
 
   temp = lhsType;
   lhsType = rhsType;
@@ -14165,8 +14166,8 @@ void lux_eq_sa(void)
      /* equal-to with scalar LHS and array RHS; a commutative operation, */
      /* so we swap LHS and RHS and pass on to lux_eq_as() */
 {
-  int32_t           temp;
-  pointer       tempp;
+  Symboltype temp;
+  pointer tempp;
 
   temp = lhsType;
   lhsType = rhsType;
@@ -16764,8 +16765,8 @@ void lux_lt(void)
      /* less-than with array operands.  This operator is the mirror image */
      /* of greater-than, so we swap LHS and RHS and pass on to lux_gt() */
 {
-  int32_t   temp;
-  pointer       tempp;
+  Symboltype temp;
+  pointer tempp;
 
   temp = lhsType;  lhsType = rhsType;  rhsType = temp;
   tempp = lp;  lp = rp;  rp = tempp;
@@ -16778,8 +16779,8 @@ void lux_lt_as(void)
      /* less-than with array LHS and scalar RHS.  This operand is the */
      /* mirror image of lux_gt_as(), so swap LHS and RHS and use that */
 {
-  int32_t           temp;
-  pointer       tempp;
+  Symboltype temp;
+  pointer tempp;
 
   temp = lhsType;  lhsType = rhsType;  rhsType = temp;
   tempp = lp;  lp = rp;  rp = tempp;
@@ -16792,8 +16793,8 @@ void lux_lt_sa(void)
      /* less-than with scalar LHS and array RHS.  This operand is the mirror */
      /* image of lux_gt_sa() so we swap LHS and RHS and use that */
 {
-  int32_t           temp;
-  pointer       tempp;
+  Symboltype temp;
+  pointer tempp;
 
   temp = lhsType;  lhsType = rhsType;  rhsType = temp;
   tempp = lp;  lp = rp;  rp = tempp;
@@ -16806,8 +16807,8 @@ void lux_le(void)
      /* less-than with array operands.  Mirror image of lux_ge(), so */
      /* swap operands and use that */
 {
-  int32_t           temp;
-  pointer       tempp;
+  Symboltype temp;
+  pointer tempp;
 
   temp = lhsType;  lhsType = rhsType;  rhsType = temp;
   tempp = lp;  lp = rp;  rp = tempp;
@@ -16820,8 +16821,8 @@ void lux_le_as(void)
      /* less-than with array LHS and scalar RHS.  Mirror image of */
      /* lux_ge_sa() so swap operands and use that */
 {
-  int32_t           temp;
-  pointer       tempp;
+  Symboltype temp;
+  pointer tempp;
 
   temp = lhsType;  lhsType = rhsType;  rhsType = temp;
   tempp = lp;  lp = rp;  rp = tempp;
@@ -16834,8 +16835,8 @@ void lux_le_sa(void)
      /* less-than with scalar LHS and array RHS.  Mirror image of */
      /* lux_ge_sa() so swap operands and use that */
 {
-  int32_t           temp;
-  pointer       tempp;
+  Symboltype temp;
+  pointer tempp;
 
   temp = lhsType;  lhsType = rhsType;  rhsType = temp;
   tempp = lp;  lp = rp;  rp = tempp;
@@ -17601,8 +17602,8 @@ void lux_ne_sa(void)
      /* not-equal-to with scalar LHS and array RHS.  Operator is */
      /* commutative, so swap operands and use lux_ne_as() */
 {
-  int32_t           temp;
-  pointer       tempp;
+  Symboltype temp;
+  pointer tempp;
 
   temp = lhsType;  lhsType = rhsType;  rhsType = temp;
   tempp = lp;  lp = rp;  rp = tempp;
@@ -17809,8 +17810,8 @@ void lux_and_sa(void)
      /* logical-and with scalar LHS and array RHS.  Operator is commutative, */
      /* so swap operands and use lux_and_as() */
 {
-  int32_t           temp;
-  pointer       tempp;
+  Symboltype temp;
+  pointer tempp;
 
   temp = lhsType;  lhsType = rhsType;  rhsType = temp;
   tempp = lp;  lp = rp;  rp = tempp;
@@ -18017,8 +18018,8 @@ void lux_or_sa(void)
      /* logical-or with scalar LHS and array RHS.  Operator is commutative, */
      /* so swap operands and use lux_or_as() */
 {
-  int32_t           temp;
-  pointer       tempp;
+  Symboltype temp;
+  pointer tempp;
 
   temp = lhsType;  lhsType = rhsType;  rhsType = temp;
   tempp = lp;  lp = rp;  rp = tempp;
@@ -18225,8 +18226,8 @@ void lux_xor_sa(void)
      /* logical-xor with scalar LHS and array RHS.  Operator is commutative, */
      /* so swap operands and use lux_xor_as() */
 {
-  int32_t           temp;
-  pointer       tempp;
+  Symboltype temp;
+  pointer tempp;
 
   temp = lhsType;  lhsType = rhsType;  rhsType = temp;
   tempp = lp;  lp = rp;  rp = tempp;
@@ -18314,8 +18315,8 @@ int32_t evalScalarArrayBinOp(void)
     lp.cf = complex_scalar_data(lhs).cf;
   else
     lp.b = &scalar_value(lhs).b;
-  rp.l = array_data(rhs);
-  tp.l = array_data(result);
+  rp.l = (int32_t*) array_data(rhs);
+  tp.l = (int32_t*) array_data(result);
   nRepeat = array_size(rhs);
   (*binFunc_sa[binOp])();
   return result;
@@ -18338,8 +18339,8 @@ int32_t evalArrayScalarBinOp(void)
     rp.cf = complex_scalar_data(rhs).cf;
   else
     rp.b = &scalar_value(rhs).b;
-  lp.l = array_data(lhs);
-  tp.l = array_data(result);
+  lp.l = (int32_t*) array_data(lhs);
+  tp.l = (int32_t*) array_data(result);
   nRepeat = array_size(lhs);
   (*binFunc_as[binOp])();
   return result;
@@ -18385,8 +18386,8 @@ int32_t evalArrayBinOp(void)
      SCALAR_RIGHT for a dimension that is equal to 1 in the rhs and
               unequal to 1 in the lhs */
   nRepeat = 1;                  /* default number of loops */
-  lp.l = array_data(lhs);       /* lhs data */
-  rp.l = array_data(rhs);       /* rhs data */
+  lp.l = (int32_t*) array_data(lhs);       /* lhs data */
+  rp.l = (int32_t*) array_data(rhs);       /* rhs data */
   for (i = 0; i < ndim; i++) {
     if ((array_dims(rhs)[i] == 1) ^ (array_dims(lhs)[i] == 1)) {
       /* one is 1 and the other is not: implicit dimension */
@@ -18424,7 +18425,7 @@ int32_t evalArrayBinOp(void)
       result = rhs;             /* use rhs to store result */
     else if ((result = array_clone(bigOne? bigOne: lhs, topType)) < 0)
       return LUX_ERROR;         /* could not generate output symbol */
-    tp.l = array_data(result);  /* output data */
+    tp.l = (int32_t*) array_data(result);  /* output data */
     array_type(result) = topType;
     (*binFunc[binOp])();
     return result;
@@ -18462,7 +18463,7 @@ int32_t evalArrayBinOp(void)
       array_num_dims(rhs);
 
     /* the result data pointer */
-    tp.l = array_data(result);
+    tp.l = (int32_t*) array_data(result);
     /* now deduce step sizes */
     *nCumulR = rStride = lux_type_size[rhsType];
     *nCumulL = lStride = lux_type_size[lhsType];
@@ -18580,7 +18581,7 @@ int32_t evalSArrayStringBinOp(void)
 {
   int32_t   n, result;
 
-  lp.sp = array_data(lhs);
+  lp.sp = (char**) array_data(lhs);
   rp.s = string_value(rhs);
   n = array_size(lhs);
   switch (binOp) {
@@ -18591,7 +18592,7 @@ int32_t evalSArrayStringBinOp(void)
       return cerror(ILL_W_STR, lhs);
   }
   result = array_clone(lhs, LUX_INT32);
-  tp.l = array_data(result);
+  tp.l = (int32_t*) array_data(result);
 
   switch (binOp) {
     case LUX_EQ:
@@ -18627,7 +18628,7 @@ int32_t evalStringSArrayBinOp(void)
 {
   int32_t   n, result;
 
-  rp.sp = array_data(rhs);
+  rp.sp = (char**) array_data(rhs);
   lp.s = string_value(lhs);
   n = array_size(rhs);
   switch (binOp) {
@@ -18638,7 +18639,7 @@ int32_t evalStringSArrayBinOp(void)
       return cerror(ILL_W_STR, lhs);
   }
   result = array_clone(rhs, LUX_INT32);
-  tp.l = array_data(result);
+  tp.l = (int32_t*) array_data(result);
 
   switch (binOp) {
     case LUX_EQ:
@@ -18717,8 +18718,8 @@ int32_t evalRangeScalarBinOp(void)
      /* binary operation on a scalar and a scalar LUX_RANGE symbol */
 {
   int32_t   range, result;
-  int32_t   newSymbol(int32_t, ...);
-  
+  int32_t   newSymbol(Symbolclass, ...);
+
   range = lhs;
   result = newSymbol(LUX_RANGE, 0, 0);
   lhs = range_start(range);
@@ -18762,8 +18763,8 @@ int32_t extractListElem(int32_t base, int32_t index, char *key, int32_t write)
    LS 14sep98 */
 {
   int32_t   i, n;
-  int32_t   eval(int32_t), copySym(int32_t), installString(char *);
-  
+  int32_t   eval(int32_t), copySym(int32_t), installString(char const *);
+
   if (base < 0)                 /* numerical tag */
     base = -base;
   else                          /* string tag */
@@ -18999,13 +19000,13 @@ int32_t evalStructPtr(int32_t symbol)
 #endif
 }
 /*----------------------------------------------------------*/
-int32_t evalLhs(symbol)
+int32_t evalLhs(int32_t symbol)
 /* evaluate <symbol> as a left-hand side of an assignment: resolves
    TRANSFERs and finds the member of LISTs that is pointed at.
    Returns an LUX_EXTRACT symbol wherein the head is a simple variable.
    LS 7jan99 */
 {
-  int32_t   target, kind, depth, nitem, class, modified, result, n, special, j;
+  int32_t   target, kind, depth, nitem, class_id, modified, result, n, special, j;
   extractSec    *eptr, *tptr;
   char  **sptr, *name, *p;
   int32_t   findTarget(char *, int32_t *, int32_t);
@@ -19057,7 +19058,7 @@ int32_t evalLhs(symbol)
           eptr->number = eptr->number - 1;
           memmove(*eptr->ptr.sp, *eptr->ptr.sp + 1,
                   eptr->number*sizeof(char *));
-          eptr->ptr.sp = realloc(eptr->ptr.sp, eptr->number*sizeof(char *));
+          eptr->ptr.sp = (char**) realloc(eptr->ptr.sp, eptr->number*sizeof(char *));
         } else {                /* we must get rid of this whole section */
           if (extract_num_sec(symbol) > 1) {
             /* still have more sections */
@@ -19067,7 +19068,7 @@ int32_t evalLhs(symbol)
           } else {              /* just the target: no more extraction */
             symbol_class(symbol) = LUX_TRANSFER;
             transfer_target(symbol) = special;
-            transfer_is_parameter(symbol) = 0; /* not a routine parameter */
+            transfer_is_parameter(symbol) = (Symboltype) 0; /* not a routine parameter */
             return symbol;      /* all done */
           }
         }
@@ -19083,7 +19084,7 @@ int32_t evalLhs(symbol)
         free(pre_extract_name(symbol));
         v = pre_extract_ptr(symbol);
         free(symbol_data(symbol));
-        extract_ptr(symbol) = v;
+        extract_ptr(symbol) = (extractSec*) v;
         extract_num_sec(symbol) = pre_extract_num_sec(symbol);
         symbol_memory(symbol) = extract_num_sec(symbol)*sizeof(extractSec);
         extract_target(symbol) = target;
@@ -19140,7 +19141,7 @@ int32_t evalLhs(symbol)
     if (!kind)
       return luxerror("Cannot insert into an internal function", symbol);
   }
-  class = symbol_class(target);
+  class_id = symbol_class(target);
   
   while (depth--) {
     if (eptr->type == LUX_LIST) { /* tags */
@@ -19149,7 +19150,7 @@ int32_t evalLhs(symbol)
     } else
       nitem = 1;
     while (nitem--) {
-      switch (class) {
+      switch (class_id) {
         case LUX_ARRAY: case LUX_CARRAY: /* inserting into an array */
         case LUX_FILEMAP:       /* or a file map */
           switch (eptr->type) {
@@ -19163,15 +19164,15 @@ int32_t evalLhs(symbol)
                   return LUX_ERROR;
                 symbol_class(result) = LUX_EXTRACT;
                 extract_target(result) = target;
-                extract_num_sec(result) = depth + 1;
+                extract_num_sec(result) = (Symboltype) (depth + 1);
                 symbol_memory(result) = (depth + 1)*sizeof(extractSec);
-                extract_ptr(result) = tptr = malloc(symbol_memory(result));
+                extract_ptr(result) = tptr = (extractSec*) malloc(symbol_memory(result));
                 if (!tptr)
                   return cerror(ALLOC_ERR, 0);
                 for (j = 0; j <= depth; j++) {
                   tptr[j].type = eptr[j].type;
                   tptr[j].number = eptr[j].number;
-                  tptr[j].ptr.w = malloc(tptr[j].number*sizeof(int16_t));
+                  tptr[j].ptr.w = (int16_t*) malloc(tptr[j].number*sizeof(int16_t));
                   if (!tptr[j].ptr.w)
                     return cerror(ALLOC_ERR, 0);
                   memcpy(tptr[j].ptr.w, eptr[j].ptr.w,
@@ -19216,12 +19217,12 @@ int32_t evalLhs(symbol)
           break;
         default:
           return luxerror("Cannot insert into a %s [%1d]", symbol,
-                       className(class), class);
-      } /* end of switch (class) */
+                       className(class_id), class_id);
+      } /* end of switch (class_id) */
     } /* end of while (nitem--) */
     if (!depth)
       return target;
-    class = symbol_class(target);
+    class_id = symbol_class(target);
     eptr++;
   } /* end of while (depth--) */
   return luxerror("Unexpected exit from evalLhs()", symbol);
@@ -19230,7 +19231,7 @@ int32_t evalLhs(symbol)
 int32_t evalExtractRhs(int32_t symbol)
 /* evaluate LUX_EXTRACT symbol as rhs */
 {
-  int32_t   target, class, depth, result, n, nitem, i, kind, special, allowSubr,
+  int32_t   target, class_id, depth, result, n, nitem, i, kind, special, allowSubr,
     j, k, *ip;
   int32_t   findTarget(char *, int32_t *, int32_t), getBody(int32_t);
   int16_t  *wptr;
@@ -19272,7 +19273,7 @@ int32_t evalExtractRhs(int32_t symbol)
         eptr->number = eptr->number - 1;
         memmove(*eptr->ptr.sp, *eptr->ptr.sp + 1,
                 eptr->number*sizeof(char *));
-        eptr->ptr.sp = realloc(eptr->ptr.sp, eptr->number*sizeof(char *));
+        eptr->ptr.sp = (char**) realloc(eptr->ptr.sp, eptr->number*sizeof(char *));
       } else {          /* we must get rid of this whole section */
         if (extract_num_sec(symbol) > 1) {
           /* still have more sections */
@@ -19283,7 +19284,7 @@ int32_t evalExtractRhs(int32_t symbol)
           undefine(symbol);
           symbol_class(symbol) = LUX_TRANSFER; /* unconditional transfer */
           transfer_target(symbol) = special;
-          transfer_is_parameter(symbol) = 0; /* not a routine parameter */
+          transfer_is_parameter(symbol) = (Symboltype) 0; /* not a routine parameter */
           return special;       /* all done */
         } /* end of if (extract_num_sec(symbol) > 1) else */
       } /* end of if (eptr->number > 1) else */
@@ -19308,17 +19309,17 @@ int32_t evalExtractRhs(int32_t symbol)
       free(pre_extract_name(symbol));
       p.v = pre_extract_ptr(symbol);
       free(pre_extract_data(symbol));
-      extract_ptr(symbol) = p.v;
+      extract_ptr(symbol) = (extractSec*) p.v;
       extract_target(symbol) = target;
     }
   } else                        /* we assume it's an LUX_EXTRACT symbol */
     target = extract_target(symbol);
   if (target > 0) {             /* extraction from a symbol */
     target = eval(target);
-    class = symbol_class(target);
+    class_id = symbol_class(target);
   } else {                      /* call to an internal function */
     target = -target;
-    class = LUX_INT_FUNC;
+    class_id = LUX_INT_FUNC;
   }
   depth = extract_num_sec(symbol);
   eptr = extract_ptr(symbol);
@@ -19329,7 +19330,7 @@ int32_t evalExtractRhs(int32_t symbol)
      more extraction items left, or an illegal extraction is attempted. */
   if (!depth) {                 /* a function is called without any
                                    arguments */
-    switch (class) {
+    switch (class_id) {
       case LUX_INT_FUNC:
         /* we construct an internal function call symbol */
         result = nextFreeTempVariable();
@@ -19364,7 +19365,7 @@ int32_t evalExtractRhs(int32_t symbol)
     } else
       nitem = 1;
     while (nitem--) {
-      switch (class) {
+      switch (class_id) {
         case LUX_INT_FUNC:      /* call to an internal function */
           switch (eptr->type) {
             case LUX_RANGE:     /* subscripts */
@@ -19374,7 +19375,7 @@ int32_t evalExtractRhs(int32_t symbol)
                 return LUX_ERROR;
               symbol_class(result) = LUX_INT_FUNC;
               int_func_number(result) = target;
-              int_func_arguments(result) = malloc(eptr->number*sizeof(int16_t));
+              int_func_arguments(result) = (int16_t*) malloc(eptr->number*sizeof(int16_t));
               if (!int_func_arguments(result))
                 return cerror(ALLOC_ERR, 0);
               symbol_memory(result) = eptr->number*sizeof(int16_t);
@@ -19400,7 +19401,7 @@ int32_t evalExtractRhs(int32_t symbol)
               int_func_number(result) = LUX_SUBSC_FUN;
               n = eptr->number;
               symbol_memory(result) = (n + 1)*sizeof(int16_t);
-              int_func_arguments(result) = malloc(symbol_memory(result));
+              int_func_arguments(result) = (int16_t*) malloc(symbol_memory(result));
               memcpy(int_func_arguments(result), eptr->ptr.w, n*sizeof(int16_t));
               int_func_arguments(result)[n] = target;
               target = eval(result);
@@ -19425,7 +19426,7 @@ int32_t evalExtractRhs(int32_t symbol)
               symbol_class(result) = LUX_USR_FUNC;
               usr_func_number(result) = target;
               symbol_memory(result) = eptr->number*sizeof(int16_t);
-              usr_func_arguments(result) = malloc(symbol_memory(result));
+              usr_func_arguments(result) = (int16_t*) malloc(symbol_memory(result));
               memcpy(usr_func_arguments(result), eptr->ptr.w,
                      symbol_memory(result));
               target = eval(result);
@@ -19468,7 +19469,7 @@ int32_t evalExtractRhs(int32_t symbol)
                   break;
                 case LUX_ARRAY:
                   result = lux_long(1, &result); /* ensure LONG */
-                  p.l = array_data(result);
+                  p.l = (int32_t*) array_data(result);
                   n = array_size(result);
                   for (i = 0; i < n; i++)
                     if (p.l[i] < 0 || p.l[i] >= clist_num_symbols(target))
@@ -19476,7 +19477,7 @@ int32_t evalExtractRhs(int32_t symbol)
                   target = nextFreeTempVariable();
                   symbol_class(target) = LUX_LIST;
                   symbol_memory(target) = n*sizeof(int16_t);
-                  q.w = clist_symbols(target) = malloc(symbol_memory(target));
+                  q.w = clist_symbols(target) = (int16_t*) malloc(symbol_memory(target));
                   if (!q.w)
                     return cerror(ALLOC_ERR, symbol);
                   for (i = 0; i < n; i++)
@@ -19507,7 +19508,7 @@ int32_t evalExtractRhs(int32_t symbol)
                   /* NOTE: currently, the result is a CLIST; should be a
                      LIST.  LS 31dec98 */
                   result = lux_long(1, &result); /* ensure LONG */
-                  p.l = array_data(result);
+                  p.l = (int32_t*) array_data(result);
                   n = array_size(result);
                   for (i = 0; i < n; i++)
                     if (p.l[i] < 0 || p.l[i] >= list_num_symbols(target))
@@ -19515,7 +19516,7 @@ int32_t evalExtractRhs(int32_t symbol)
                   target = nextFreeTempVariable();
                   symbol_class(target) = LUX_CLIST;
                   symbol_memory(target) = n*sizeof(int16_t);
-                  q.w = clist_symbols(target) = malloc(symbol_memory(target));
+                  q.w = clist_symbols(target) = (int16_t*) malloc(symbol_memory(target));
                   if (!q.w)
                     return cerror(ALLOC_ERR, symbol);
                   for (i = 0; i < n; i++)
@@ -19576,7 +19577,7 @@ int32_t evalExtractRhs(int32_t symbol)
                   symbol_class(n) = LUX_INT_FUNC;
                   int_func_number(n) = LUX_SUBSC_FUN;
                   symbol_memory(n) = 2*sizeof(int16_t);
-                  int_func_arguments(n) = malloc(symbol_memory(result));
+                  int_func_arguments(n) = (int16_t*) malloc(symbol_memory(result));
                   *int_func_arguments(n) = result;
                   int_func_arguments(n)[1] = target;
                   target = eval(n);
@@ -19608,7 +19609,7 @@ int32_t evalExtractRhs(int32_t symbol)
                   break;
                 case LUX_ARRAY:
                   result = lux_long(1, &result); /* ensure LONG */
-                  p.l = array_data(result);
+                  p.l = (int32_t*) array_data(result);
                   n = array_size(result);
                   for (i = 0; i < n; i++)
                     if (p.l[i] < 0 || p.l[i] >= 2)
@@ -19616,7 +19617,7 @@ int32_t evalExtractRhs(int32_t symbol)
                   target = nextFreeTempVariable();
                   symbol_class(target) = LUX_CLIST;
                   symbol_memory(target) = n*sizeof(int16_t);
-                  q.w = clist_symbols(target) = malloc(symbol_memory(target));
+                  q.w = clist_symbols(target) = (int16_t*) malloc(symbol_memory(target));
                   if (!q.w)
                     return cerror(ALLOC_ERR, symbol);
                   for (i = 0; i < n; i++) {
@@ -19683,7 +19684,7 @@ int32_t evalExtractRhs(int32_t symbol)
                   break;
                 case LUX_ARRAY:
                   result = lux_long(1, &result); /* ensure LONG */
-                  p.l = array_data(result);
+                  p.l = (int32_t*) array_data(result);
                   n = array_size(result);
                   for (i = 0; i < n; i++)
                     if (p.l[i] < 0 || p.l[i] >= string_size(target))
@@ -19692,7 +19693,7 @@ int32_t evalExtractRhs(int32_t symbol)
                   target = nextFreeTempVariable();
                   symbol_class(target) = LUX_STRING;
                   symbol_memory(target) = n + 1;
-                  r.s = string_value(target) = malloc(symbol_memory(target));
+                  r.s = string_value(target) = (char*) malloc(symbol_memory(target));
                   if (!r.s)
                     return cerror(ALLOC_ERR, symbol);
                   while (n--)
@@ -19719,7 +19720,7 @@ int32_t evalExtractRhs(int32_t symbol)
                 spm = spe->member: pointer to the list of subscripts
                 spm->type: the type of the subscript; SCALAR for a scalar,
                            RANGE for a range, ARRAY for an array */
-          if (class == LUX_STRUCT) {
+          if (class_id == LUX_STRUCT) {
             result = newSymbol(LUX_STRUCT_PTR);
             struct_ptr_target(result) = target;
             target = result;
@@ -19735,7 +19736,7 @@ int32_t evalExtractRhs(int32_t symbol)
                 return luxerror("No double subscripts allowed here!", symbol);
               }
               n = spe->n_subsc = eptr->number; /* number of subscripts */
-              spm = spe->member = malloc(spe->n_subsc*sizeof(structPtrMember));
+              spm = spe->member = (structPtrMember*) malloc(spe->n_subsc*sizeof(structPtrMember));
               wptr = eptr->ptr.w;
               while (n--) {     /* treat all subscripts */
                 i = *wptr++; /* subscript symbol number */
@@ -19763,7 +19764,7 @@ int32_t evalExtractRhs(int32_t symbol)
                     /* assume the data type is real! */
                     spm->type = LUX_ARRAY;
                     k = spm->data.array.n_elem = array_size(i);
-                    ip = spm->data.array.ptr = malloc(k*sizeof(int32_t));
+                    ip = spm->data.array.ptr = (int32_t*) malloc(k*sizeof(int32_t));
                     p.v = array_data(i);
                     switch (array_type(i)) {
                       case LUX_INT8:
@@ -19810,7 +19811,7 @@ int32_t evalExtractRhs(int32_t symbol)
               /* add an entry to the STRUCT_PTR list */
               n = struct_ptr_n_elements(target);
               symbol_memory(target) += sizeof(structPtr);
-              struct_ptr_elements(target) =
+              struct_ptr_elements(target) = (structPtr*)
                 realloc(struct_ptr_elements(target), symbol_memory(target));
               spe = struct_ptr_elements(target) + n; /* point at the new one */
               spe->desc = i;
@@ -19828,7 +19829,7 @@ int32_t evalExtractRhs(int32_t symbol)
     }
     if (!depth)
       return target;
-    class = symbol_class(target);
+    class_id = symbol_class(target);
     eptr++;
   }
 
@@ -20011,7 +20012,7 @@ int32_t eval(int32_t symbol)
         symbol_context(range_redirect(result)) = result; /* proper context */
       } else
         range_redirect(result) = n; /* no redirection; just copy */
-      range_scalar(result) = isScalarRange; /* store is-scalar flag */
+      range_scalar(result) = (Symboltype) isScalarRange; /* store is-scalar flag */
       break;
     case LUX_LIST_PTR:
           /* a structure element */
@@ -20307,12 +20308,12 @@ branchInfo checkBranch(int32_t lhs, int32_t rhs)
   
   if (!rhs)                     /* initialization */
   { depth = 0;
-    if (sym[lhs].class == LUX_ARRAY)
+    if (symbol_class(lhs) == LUX_ARRAY)
       lhsSize = symbol_memory(lhs); /* piping only for arrays */
     else lhsSize = 0;
     return result; }
   depth++;
-  switch (sym[rhs].class)
+  switch (symbol_class(rhs))
   { case LUX_ARRAY:
       
       result.size = symbol_memory(rhs);

@@ -18,7 +18,7 @@ You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "sofam.h"
-#include "action.h"
+#include "action.hh"
 #include <string.h>
 #include <time.h>
 

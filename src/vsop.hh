@@ -1,4 +1,4 @@
-/* This is file lux_func_if.h.
+/* This is file vsop.h.
 
 Copyright 2013 Louis Strous
 
@@ -17,19 +17,22 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include <stdio.h>
-#include "action.h"
+#include "action.hh"
 
-typedef struct {
-  int32_t func_sym;
-  size_t num_params;
-  int16_t *param_syms;
-  pointer *param_data;
-} lux_func_if;
+struct planetIndex {
+  int16_t index;
+  int16_t nTerms;
+};
+struct VSOPdata {
+  struct planetIndex indices[6*3*8];
+  int16_t nTerms;
+  double *terms;
+};
+struct VSOPdata planetIndicesForTolerance(struct VSOPdata *data, 
+                                          double tolerance);
+extern struct VSOPdata VSOP87Adata;
+extern struct VSOPdata VSOP87Cdata;
 
-lux_func_if * lux_func_if_alloc(char const * const name, size_t num_params);
-void lux_func_if_free(lux_func_if *);
-int32_t lux_func_if_set_param(lux_func_if *, size_t index, int32_t param);
-int32_t lux_func_if_get_param_sym(lux_func_if *, size_t index);
-pointer lux_func_if_get_param_data(lux_func_if *, size_t index);
-double lux_func_if_call(lux_func_if *);
+void XYZJ2000fromVSOPA(double T, int32_t object, double *pos, double tolerance);
+void XYZdatefromVSOPC(double T, int32_t object, double *pos, double tolerance);
+

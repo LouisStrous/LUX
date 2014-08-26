@@ -25,8 +25,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 #include <math.h>
 #include <string.h>
-#include "install.h"
-#include "action.h"
+#include "install.hh"
+#include "action.hh"
 
 static double	subdx, subdy;
 static double	xoff, yoff;
@@ -98,12 +98,12 @@ int32_t lux_subshiftc(int32_t narg, int32_t ps[]) /* LCT for a cell, sym version
     if (array_dims(kq)[0] != nx - 1 || array_dims(kq)[1] != ny - 1)
       return cerror(INCMP_ARG, kq);
     kq = lux_double(1, &kq);
-    msk = array_data(kq);
+    msk = (double*) array_data(kq);
   }
   iq = lux_double(1, &iq);
   jq = lux_double(1, &jq);
-  x1 = array_data(iq);
-  x2 = array_data(jq);
+  x1 = (double*) array_data(iq);
+  x2 = (double*) array_data(jq);
 
   switch (narg) {
     case 4:
@@ -114,9 +114,9 @@ int32_t lux_subshiftc(int32_t narg, int32_t ps[]) /* LCT for a cell, sym version
       break;
   }
   /* expect result in xoff and yoff */
-  if (redef_scalar( ps[2], 4, &xoff) != LUX_OK)
+  if (redef_scalar( ps[2], LUX_DOUBLE, &xoff) != LUX_OK)
     return LUX_ERROR;
-  if (redef_scalar( ps[3], 4, &yoff) != LUX_OK)
+  if (redef_scalar( ps[3], LUX_DOUBLE, &yoff) != LUX_OK)
     return LUX_ERROR;
   return LUX_OK;
 }
@@ -134,8 +134,7 @@ double mert(double sx, double sy)
  return mq;
  }
  /*------------------------------------------------------------------------- */
-double mertc(sx,sy)
- double sx,sy;
+double mertc(double sx, double sy)
  {
  double	xq;
  xq = a1 + sx*sx*a2 + sy*sy*a3 + sx*sx*sy*sy*a4 + sx*a5 + sy*a6 + sx*sy*a7 + sx*sx*sy*a9 + sx*sy*sy*a10;
@@ -226,11 +225,9 @@ void getsxsy(void)
  return;
  }
  /*------------------------------------------------------------------------- */
-void  subshift(x, r, nx, ny)
+void  subshift(double* x, double* r, int32_t nx, int32_t ny)
  /* q is the reference cell (old m1), r is the one we interpolate (old m2) */
  /* we assume that the arrays have already been converted to F*8 */
- double	*r, *x;
- int32_t     nx, ny;
  {
  int32_t     nxs;
  double  sum, cs0, cs1, cs2, cs3, t2, t1, t0, t3;
@@ -757,10 +754,8 @@ double syvaluec(double sx)
  return xq;
  }
  /*------------------------------------------------------------------------- */
-double  subshiftc(xa, xb, nx, ny)
+double  subshiftc(double* xa, double* xb, int32_t nx, int32_t ny)
  /* we assume that the arrays have already been converted to F*8 */
- double	*xa, *xb;
- int32_t     nx, ny;
  {
  int32_t     nxs;
  double  t2, t1, t4, t3, d1, d2, d3, d4, sxz, syz;
@@ -845,12 +840,10 @@ double  subshiftc(xa, xb, nx, ny)
  return mertc(sxz, syz);
  }
 /*------------------------------------------------------------------------- */
-double  subshiftc_apod(xa, xb, gg, nx, ny)
+double  subshiftc_apod(double* xa, double* xb, double* gg, int32_t nx, int32_t ny)
  /* this version includes an apodizing function already prepared in gg
  which must be dimensioned (nx-1) by (ny-1) */
  /* we assume that the arrays have already been converted to F*8 */
- double	*xa, *xb, *gg;
- int32_t     nx, ny;
  {
  int32_t     nxs;
  double  t2, t1, t4, t3, d1, d2, d3, d4, sxz, syz;
@@ -942,7 +935,8 @@ double  subshiftc_apod(xa, xb, gg, nx, ny)
 int32_t lux_dilate(int32_t narg, int32_t ps[])
 /* dilates a 2D image.  LS 9nov98 */
 {
-  int32_t	nx, ny, result, type, n;
+  int32_t	nx, ny, n, result;
+  Symboltype type;
   pointer	data, out;
 
   if (!symbolIsNumericalArray(ps[0]) /* not a numerical array */
@@ -952,13 +946,13 @@ int32_t lux_dilate(int32_t narg, int32_t ps[])
   nx = array_dims(ps[0])[0];
   ny = array_dims(ps[0])[1];
 
-  data.b = array_data(ps[0]);
+  data.b = (uint8_t*) array_data(ps[0]);
 
   type = array_type(ps[0]);
   if (type >= LUX_FLOAT)
     type = LUX_INT32;
   result = array_clone(ps[0], type);
-  out.b = array_data(result);
+  out.b = (uint8_t*) array_data(result);
 
   switch (type) {
     case LUX_INT8:
@@ -1080,7 +1074,8 @@ int32_t lux_dilate(int32_t narg, int32_t ps[])
 int32_t lux_erode(int32_t narg, int32_t ps[])
 /* erodes a 2D image.  LS 9nov98, 9may2000 */
 {
-  int32_t	nx, ny, result, type, n;
+  int32_t	nx, ny, result, n;
+  Symboltype type;
   pointer	data, out;
   char	zeroedge;
 
@@ -1091,13 +1086,13 @@ int32_t lux_erode(int32_t narg, int32_t ps[])
   nx = array_dims(ps[0])[0];
   ny = array_dims(ps[0])[1];
 
-  data.b = array_data(ps[0]);
+  data.b = (uint8_t*) array_data(ps[0]);
 
   type = array_type(ps[0]);
   if (type >= LUX_FLOAT)
     type = LUX_INT32;
   result = array_clone(ps[0], type);
-  out.b = array_data(result);
+  out.b = (uint8_t*) array_data(result);
 
   zeroedge = (internalMode & 1); /* /ZEROEDGE */
 

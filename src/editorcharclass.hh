@@ -19,10 +19,10 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 /* editorcharclass.h */
 
-extern char class[];
+extern char eclass[];
 
 	/* character classes */
-#define charClass(c)		(class[(int32_t) c])
+#define charClass(c)		(eclass[(int32_t) c])
 #define editorCharClass(c)	(charClass(c) & 0x03)
 /* distinguishes between WHITESPACE_CHAR, SEPARATOR_CHAR, and ORDINARY_CHAR */
 #define isFirstChar(c)		(charClass(c) & 0x04)

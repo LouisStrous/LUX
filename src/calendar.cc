@@ -17,7 +17,9 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE             /* for %as format in sscanf */
+#endif
 /* HEADERS */
 #include <malloc.h> /* for free malloc */
 #include <math.h> /* for floor */
@@ -28,9 +30,9 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 /* END HEADERS */
 #include <errno.h>
 #include <ctype.h>
-#include "action.h"
-#include "calendar.h"
-#include "intmath.h"
+#include "action.hh"
+#include "calendar.hh"
+#include "intmath.hh"
 
 #define arraysize(x) sizeof((x))/sizeof(*(x))
 

@@ -27,9 +27,9 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
-#include "action.h"
+#include "action.hh"
 
-char	*errorMessages[] = {
+char const* errorMessages[] = {
 /* COND_NO_SCAL    0*/
  "Condition must be scalar",
 /* ILL_COMB  1*/
@@ -262,7 +262,7 @@ char	*errorPtr = NULL;
 static char	storedErrorMessage[256];
 
 /*-------------------------------------------------------------------*/
-char *verrorMessage(char *message, int32_t symbol, va_list ap)
+char *verrorMessage(char const* message, int32_t symbol, va_list ap)
 /* returns error messages */
 {
   char	*ptr;
@@ -292,7 +292,7 @@ char *verrorMessage(char *message, int32_t symbol, va_list ap)
   return curScrat;
 }
 /*-------------------------------------------------------------------*/
-char *errorMessage(char *message, int32_t symbol, ...)
+char *errorMessage(char const* message, int32_t symbol, ...)
 {
   char	*result;
   va_list	ap;
@@ -303,7 +303,7 @@ char *errorMessage(char *message, int32_t symbol, ...)
   return result;
 }
 /*-------------------------------------------------------------------*/
-int32_t luxerror(char *message, int32_t symbol, ...)
+int32_t luxerror(char const* message, int32_t symbol, ...)
 /* displays error messages */
 {
   va_list	ap;
@@ -365,7 +365,7 @@ int32_t lux_error(int32_t narg, int32_t ps[])
 /* allows the user to generate an error message */
 /* syntax:  error [,format,symbol] [, /store, /restore] */
 {
-  char   *format;
+  char const* format;
   int32_t    symbol;
 
   if (narg) {

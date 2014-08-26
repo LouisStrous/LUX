@@ -27,13 +27,13 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "luxdefs.h"
-#include "dmalloc.h"
-#include "editor.h"		/* for BUFSIZE */
-#include "version.h"		/* for GIT_VERSION */
+#include "luxdefs.hh"
+#include "dmalloc.hh"
+#include "editor.hh"		/* for BUFSIZE */
+#include "version.hh"		/* for GIT_VERSION */
 
 extern int32_t	internalMode;
-void	printw(char *), printwf(char *, ...);
+extern void printw(char const* string), printwf(char const* fmt, ...);
 extern char	*c_left, *k_left, *c_right, *k_right,
 	*c_up, *k_up, *c_down, *k_down, *k_delete,
 	*k_backspace, *k_insert, *cl_eos, *c_save, *c_restore;

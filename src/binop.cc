@@ -20,7 +20,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
-#include "action.h"
+#include "action.hh"
 
 #define ORDINARY	1
 #define SCALAR_LEFT	2

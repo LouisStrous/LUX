@@ -26,7 +26,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <string.h>
 #include <math.h>
 #include <float.h>
-#include "action.h"
+#include "action.hh"
 
 /* contour parameters and flags */
 extern	int32_t	current_pen, autocon, contour_mode, contour_box, 
@@ -47,7 +47,7 @@ int32_t lux_contour(int32_t narg, int32_t ps[]) /* contour routine */
   int32_t	iq, i, nc, lineStyle, symStyle;
   float	*pf, *cl, xmax, xmin, *pp, yq, xspace, xq;
   int32_t	anacon(float *, int32_t, int32_t, float *, int32_t, int32_t, float, float, float,
-	       float, float), installString(char *), lux_replace(int32_t, int32_t),
+	       float, float), installString(char const *), lux_replace(int32_t, int32_t),
 	box(void), ticks(void), fixPlotStyle(int32_t *, int32_t *);
   extern int32_t	tkCoordSys;
   extern float	theDashSize;
@@ -67,7 +67,7 @@ int32_t lux_contour(int32_t narg, int32_t ps[]) /* contour routine */
   gotLevels = 0;
   /* if scalar, then = #levels.  if array, then store in $contours */
   if (narg > 1)
-    switch (sym[ps[1]].class)
+    switch (symbol_class(ps[1]))
     { case LUX_SCALAR:
 	contour_nlev = int_arg( ps[1]);
 	break;
@@ -82,16 +82,16 @@ int32_t lux_contour(int32_t narg, int32_t ps[]) /* contour routine */
   if (contour_nlev <= 0 || contour_nlev > 50)
   { printf("invalid # of contour levels = %d\n",contour_nlev); return -1; }
   xa = wxb; xb = wxt; ya = wyb; yb = wyt; /*default window */
-  if (narg > 2 && sym[ps[2]].class) xa = float_arg( ps[2]);
-  if (narg > 3 && sym[ps[3]].class) xb = float_arg( ps[3]);
-  if (narg > 4 && sym[ps[4]].class) ya = float_arg( ps[4]);
-  if (narg > 5 && sym[ps[5]].class) yb = float_arg( ps[5]);
-  if (narg > 6 && sym[ps[6]].class) contour_style = int_arg(ps[6]);
-  if (narg > 7 && sym[ps[7]].class) theDashSize = float_arg(ps[7]);
+  if (narg > 2 && symbol_class(ps[2])) xa = float_arg( ps[2]);
+  if (narg > 3 && symbol_class(ps[3])) xb = float_arg( ps[3]);
+  if (narg > 4 && symbol_class(ps[4])) ya = float_arg( ps[4]);
+  if (narg > 5 && symbol_class(ps[5])) yb = float_arg( ps[5]);
+  if (narg > 6 && symbol_class(ps[6])) contour_style = int_arg(ps[6]);
+  if (narg > 7 && symbol_class(ps[7])) theDashSize = float_arg(ps[7]);
   else theDashSize = 1.0;
 						/* check for auto mode */
   if (!gotLevels && ((internalMode & 1) || (!internalMode && autocon)))
-  { redef_array(contour_sym, 3, 1, &contour_nlev);
+  { redef_array(contour_sym, LUX_FLOAT, 1, &contour_nlev);
     h = (array *) sym[contour_sym].spec.array.ptr;
     cl = (float *) ((char *) h + sizeof( array ));
     pp = pf;	nc = nx * ny - 1;	xmin = xmax = *pp++;
@@ -117,7 +117,7 @@ int32_t lux_contour(int32_t narg, int32_t ps[]) /* contour routine */
       while (nc--) { *pp =exp(*pp) + xmin;  pp++; } break;
     }
   } else {				/* not auto mode, check $contours */
-    if ( sym[contour_sym].class != 4 )
+    if ( symbol_class(contour_sym) != 4 )
       return cerror(BAD_CONTOURS, contour_sym);
     iq = lux_float(1, &contour_sym);
     h = (array *) sym[iq].spec.array.ptr;

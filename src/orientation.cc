@@ -24,7 +24,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
-#include "action.h"
+#include "action.hh"
 
 int32_t	lux_replace(int32_t, int32_t);
 /*--------------------------------------------------------------------*/

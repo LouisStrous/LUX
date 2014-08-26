@@ -20,7 +20,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef CALENDAR_H
 #define CALENDAR_H
 
-#include "action.h"
+#include "action.hh"
 /* HEADERS */
 #include <math.h> /* for floor */
 /* END HEADERS */

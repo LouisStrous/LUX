@@ -17,8 +17,8 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-#define CAL_CALENDAR_BASE	(0)
-#define CAL_CALENDAR_BITS	(4)
+#define CAL_CALENDAR_BASE	(Calendar)(0)
+#define CAL_CALENDAR_BITS	(Calendar)(4)
 enum Calendar { CAL_DEFAULT,             /* 0 */
                 CAL_COMMON,              /* 1 */
                 CAL_GREGORIAN,           /* 2 */

@@ -25,8 +25,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "config.h"
 #endif
 #include <math.h>
-#include "luxdefs.h"
-#include "output.h"
+#include "luxdefs.hh"
+#include "output.hh"
 
 int32_t curv1_(int32_t *n, double *x, double *y, double *slp1, double *slpn,
 	   double *yp, double *temp, double *sigma, double *xf, double *yf,

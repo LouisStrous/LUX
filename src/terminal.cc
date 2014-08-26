@@ -22,7 +22,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 #include <stdlib.h>
 #include <string.h>
-#include "action.h"
+#include "action.hh"
 
 char	*c_left, *c_right, *c_up, *c_down, *cl_eos, *k_backspace,
 	*k_delete, *k_insert, *k_up, *k_down, *k_right, *k_left, *c_save,
@@ -36,7 +36,7 @@ char	*c_left, *c_right, *c_up, *c_down, *cl_eos, *k_backspace,
 void dummyTerm(void)
 /* Use this if terminfo doesn't work. LS 12jul96 31jul97 */
 {
-  char	*termName[] = {
+  char const *termName[] = {
     "linux"
   };
   int32_t	nTerms = 1, i;
@@ -85,7 +85,7 @@ void dummyTerm(void)
 #define	nNames  (sizeof(names)/sizeof(char *))
 void manualTerm(int32_t number)
 {
-  char *names[] = {
+  char const* names[] = {
     "k_backspace", "k_delete", "k_right", "k_left", "k_up", "k_down",
     "k_insert", "c_right", "c_left", "c_up", "c_down", "c_save", "c_restore",
     "cl_eos"
@@ -95,7 +95,7 @@ void manualTerm(int32_t number)
     &k_insert, &c_right, &c_left, &c_up, &c_down, &c_save, &c_restore,
     &cl_eos
   };
-    
+
   extern char	*curScrat;
   char	*p, *name;
   FILE	*fp;
@@ -127,7 +127,7 @@ void manualTerm(int32_t number)
       p = strtok(NULL, "\n");
       if (i < nNames) {		/* found code name in list */
 	translateEscapes(p);
-	*codes[i] = realloc(*codes[i], strlen(p) + 1);
+	*codes[i] = (char*) realloc(*codes[i], strlen(p) + 1);
 	memcpy(*codes[i], p, strlen(p) + 1);
       }
     }

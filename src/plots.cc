@@ -32,7 +32,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <string.h>
 #include <math.h>
 #include <limits.h>
-#include "action.h"
+#include "action.hh"
 
 extern	int32_t	lastmin_sym, lastmax_sym;
 extern	float	callig_xb, callig_yb;
@@ -50,8 +50,8 @@ static	int32_t	xsym, ysym, xtitlesym, ytitlesym, titlesym, symStyle, nx, ny,
   exsym, eysym;
 static	int32_t	nelem, isym, nbreak, *qi, huge = INT32_MAX, dq3, dq4,
 		lineStyle;	/* lineStyle not yet fully implemented */
-char	form[20], label[25], callig_update = 1, *plotxfmt = "%1g",
-  *plotyfmt = "%1g";
+char	form[20], label[25], callig_update = 1;
+char const *plotxfmt = "%1g", *plotyfmt = "%1g";
 int32_t	landscape = 1, iorder = 0, current_pen = 3;
 float	current_gray = 1, startx, stepx, starty, stepy;
  /* contents of VMS common plots follows */
@@ -786,18 +786,18 @@ int32_t positionClassWindow(float x, float y, float **w)
 /* with #4 the plot window itself. */
 /* LS 25jun94 */
 {
-  int32_t	class;
+  int32_t	class_id;
 
   if (x < *(w[0]))
-    class = 0;
+    class_id = 0;
   else if (x > *(w[1]))
-    class = 2;
-  else class = 1;
+    class_id = 2;
+  else class_id = 1;
   if (y > *(w[3]))
-    class += 6;
+    class_id += 6;
   else if (y >= *(w[2]))
-    class += 3;
-  return class;
+    class_id += 3;
+  return class_id;
 }
  /*------------------------------------------------------------------------- */
 #define NONE_IN		0
@@ -1501,14 +1501,13 @@ int32_t lux_pencolor(int32_t narg, int32_t ps[])
   float	*pf;
 #if HAVE_LIBX11
   int32_t	getXcolor(char *colorname, XColor *color, int32_t alloc);
-  Status	anaAllocNamedColor(char *, XColor **);
   extern int32_t	connect_flag;
 #endif
   int32_t	postcolorpen(float red, float green, float blue);
 #if HAVE_LIBX11
   XColor	color;
 #endif
-  
+
   if (lunplt == 0) {
 #if HAVE_LIBX11
     if (setup_x() == LUX_ERROR)
@@ -1556,7 +1555,7 @@ int32_t lux_pencolor(int32_t narg, int32_t ps[])
 	nx = array_dims(iq)[0];
 	if (nx < 3)
 	  return luxerror("PENCOLOR requires a string naming a color\nor an array of 3 RGB values between 0.0 and 1.0", ps[0]);
-	pf = array_data(iq);
+	pf = (float*) array_data(iq);
 	/* check first */
 	n = 3;
 	while (n--) {
@@ -1565,7 +1564,7 @@ int32_t lux_pencolor(int32_t narg, int32_t ps[])
 	 pf++;
 	}
 	/* now set the values */
-	pf = array_data(iq);
+	pf = (float*) array_data(iq);
 	red = *pf++;
 	green = *pf++;
 	blue = *pf++;
@@ -2086,7 +2085,7 @@ int32_t lux_xymov(int32_t narg, int32_t ps[])			/* xymov routine */
 	  dm = 1;
 	else
 	  dm = 0;
-	mp = array_data(iq);
+	mp = (int32_t*) array_data(iq);
 	break;
       default:
 	return cerror(ILL_CLASS, iq);
@@ -2109,7 +2108,7 @@ int32_t lux_xymov(int32_t narg, int32_t ps[])			/* xymov routine */
     case LUX_ARRAY:
       iq = lux_long(1, &iq);
       nbreak = array_size(iq);
-      qi = array_data(iq);
+      qi = (int32_t*) array_data(iq);
       break;
     default:
       return cerror(ILL_CLASS, iq);
@@ -2245,7 +2244,7 @@ int32_t lux_postraw(int32_t narg, int32_t ps[])			/* postraw routine */
   int32_t	postrawout(char *);
 
   iq = ps[0];
-  if ( sym[iq].class != 2 ) return cerror(NEED_STR, 0);
+  if ( symbol_class(iq) != 2 ) return cerror(NEED_STR, 0);
   s = (char *) sym[iq].spec.array.ptr;
   return postrawout(s);
 }

@@ -513,7 +513,9 @@ wsave   contains initialization calculations which must not be
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
-#include "action.h"
+#include <math.h>
+#include "action.hh"
+
 int32_t ezfft1(int32_t *n, float *wa, float *ifac)
 {
     /* Initialized data */
@@ -525,7 +527,7 @@ int32_t ezfft1(int32_t *n, float *wa, float *ifac)
   int32_t i__1, i__2, i__3;
 
   /* Builtin functions */
-  double cos(double), sin(double);
+  //  double cos(double), sin(double);
 
   /* Local variables */
   float argh;

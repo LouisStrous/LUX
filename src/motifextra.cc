@@ -18,7 +18,7 @@ You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 /* routines that Strous needs to run Shine's Motif stuff */
-#include "action.h"
+#include "action.hh"
 #include <string.h>
 #include <stdlib.h>
 
@@ -44,15 +44,15 @@ int32_t lux_compile_file(int32_t narg, int32_t ps[])
 /* COMPILE_FILE compiles the contents of a file at the top level */
 {
   FILE	*fp;
-  int32_t	result, nextCompileLevel(FILE *, char *);
-  
+  int32_t	result, nextCompileLevel(FILE *, char const*);
+
   if (symbol_class(ps[0]) != LUX_STRING)
     return cerror(NEED_STR, ps[0]);
 
   fp = openPathFile(string_value(ps[0]), FIND_SUBR);
   if (!fp)
     return cerror(ERR_OPEN, ps[0]);
-  
+
   result = nextCompileLevel(fp, curScrat);
   fclose(fp);
   return result;

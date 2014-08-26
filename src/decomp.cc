@@ -24,14 +24,12 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "config.h"
 #endif
 #include <stdio.h>
-#include "action.h"
+#include "action.hh"
 /*--------------------------------------------------------------------------*/
-int32_t d_decomp(x, n, nd)
+int32_t d_decomp(double* x, int32_t n, int32_t nd)
 /*translated from fortran anadecomp.for which may be easier to follow since
 	it uses subscripts rather than the pointers used here */
 /*no pivoting in this version !, so diagonals must be != 0 */
-double	*x;
-int32_t	n, nd;
 {
 register	double	sum1, sum2, *p1, *p2, *p3, *p4;
 double	*qd, *q2, *q1, div;
@@ -116,9 +114,7 @@ int32_t f_solve(float *a, float *b, int32_t n, int32_t nd)
 return 1;			/* added LS 5feb97 */
 }
 /*--------------------------------------------------------------------------*/
-int32_t d_solve(a, b, n, nd)
-double	*a,*b;
-int32_t	n, nd;
+int32_t d_solve(double* a, double* b, int32_t n, int32_t nd)
 {
 register	double	sum, *p1, *p2;
 double	*qd, *q1;

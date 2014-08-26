@@ -23,23 +23,23 @@ AM_CPPFLAGS = -I$(top_srcdir)/sofa/src
 AM_YFLAGS = -d
 ACLOCAL_AMFLAGS = -I m4
 
-nonmain_sources = luxparser.y luxcon.c topology.c contour.c crunch.c decomp.c editor.c ephem.c error.c eval.c execute.c fft.c filemap.c fit.c files.c fun1.c fun2.c fun3.c fun4.c fun5.c fun6.c hersh.c ident.c install.c memck.c plots.c post.c sort.c strous.c strous2.c strous3.c subsc.c symbols.c tense.c orientation.c output.c axis.c coord.c cluster.c ephem2.c paerror.c idl.c trace_decoder_lux.c gifread_lux.c gifwrite_lux.c astron.c terminal.c regex.c vsop.c luxsofa.c intmath.c calendar.c jpeg.c tape.c terminfo.c projection.c bindings.c xport.c zoom.c menu.c color.c random.c Bytestack.c poisson.c precession.c printf_extensions.c vsop87adata.c vsop87cdata.c matrix.c lux_func_if.c site.c action.h lux_bitmap.xbm lux_func_if.h luxdefs.h luxparser.h lux_structures.h astrodat2.h astrodat3.h astron.h axis.h bindings.h Bytestack.h calendar.h constellations.h debug.h defs.h dmalloc.h editorcharclass.h editor.h error.h format.h hershey.h install.h intmath.h jconfig.h jinclude.h jpegdata.h once.h output.h symbols.h terminfo.h vsop.h version.h sincos.c
+nonmain_sources = luxparser.yy luxcon.cc topology.cc contour.cc crunch.cc decomp.cc editor.cc ephem.cc error.cc eval.cc execute.cc fft.cc filemap.cc fit.cc files.cc fun1.cc fun2.cc fun3.cc fun4.cc fun5.cc fun6.cc hersh.cc ident.cc install.cc memck.cc plots.cc post.cc sort.cc strous.cc strous2.cc strous3.cc subsc.cc symbols.cc tense.cc orientation.cc output.cc axis.cc coord.cc cluster.cc ephem2.cc paerror.cc idl.cc trace_decoder_lux.cc gifread_lux.cc gifwrite_lux.cc astron.cc terminal.cc regex.cc vsop.cc luxsofa.cc intmath.cc calendar.cc jpeg.cc tape.cc terminfo.cc projection.cc bindings.cc xport.cc zoom.cc menu.cc color.cc random.cc Bytestack.cc poisson.cc precession.cc printf_extensions.cc vsop87adata.cc vsop87cdata.cc matrix.cc lux_func_if.cc site.cc action.hh lux_bitmap.xbm lux_func_if.hh luxdefs.hh luxparser.hh lux_structures.hh astrodat2.hh astrodat3.hh astron.hh axis.hh bindings.hh Bytestack.hh calendar.hh constellations.hh debug.hh defs.hh dmalloc.hh editorcharclass.hh editor.hh error.hh format.hh hershey.hh install.hh intmath.hh jconfig.h jinclude.h jpegdata.hh once.hh output.hh symbols.hh terminfo.hh vsop.hh version.hh sincos.cc visualclass.c visualclass.h
 
 bin_PROGRAMS = lux
-lux_SOURCES = lux.cc $(nonmain_sources)
-lux_LDADD = $(top_builddir)/sofa/src/libsofa_c.a
+lux_SOURCES = lux.cc
+lux_LDADD = $(top_builddir)/sofa/src/libsofa_c.a liblux.a
 
 # build library, too; makes building test binaries easier
 noinst_LIBRARIES = liblux.a
 liblux_a_SOURCES = $(nonmain_sources)
 liblux_a_LIBADD = $(top_builddir)/sofa/src/libsofa_c.a
 
-site.o: version.h
+site.o: version.hh
 
-# store "git describe" output in version.h if the output has changed
-version.h: FORCE
+# store "git describe" output in version.hh if the output has changed
+version.hh: FORCE
 	@git describe --tags --dirty | sed 's/^\(.*\)/"\1"/' > maybe-GITID
-	@diff -q -N GITID maybe-GITID && rm maybe-GITID || { mv maybe-GITID GITID; echo -n "#define GIT_VERSION " > version.h; cat GITID >> version.h; }
+	@diff -q -N GITID maybe-GITID && rm maybe-GITID || { mv maybe-GITID GITID; echo -n "#define GIT_VERSION " > version.hh; cat GITID >> version.hh; }
 FORCE:
 
-CLEANFILES = maybe-GITID GITID version.h
+CLEANFILES = maybe-GITID GITID version.hh

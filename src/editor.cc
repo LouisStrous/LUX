@@ -26,10 +26,10 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
-#include "action.h"
+#include "action.hh"
 #include <limits.h>
 #include <unistd.h>		/* for usleep() */
-#include "editor.h"
+#include "editor.hh"
 
 #include <stdio.h>
 #include <readline/readline.h>
@@ -103,7 +103,7 @@ int32_t saveHistory(void)
   return result;
 }
 /*----------------------------------------------------*/
-int32_t getNewLine(char *buffer, size_t bufsize, char *prompt, char historyFlag)
+int32_t getNewLine(char *buffer, size_t bufsize, char const* prompt, char historyFlag)
 /* reads new line from keyboard or file into buffer; returns length
    (terminating null isn't included in count).
    includes history buffer, Word-by-Word movement, search in

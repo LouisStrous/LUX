@@ -24,8 +24,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 #include <math.h> /* for cos(2) sqrt(2) log(2) sin(1) isnan(1) */
 #include <string.h> /* for memcpy(5) */
-#include "action.h"
-#include "install.h"
+#include "action.hh"
+#include "install.hh"
 
 #include <gsl/gsl_rng.h>
 
@@ -318,7 +318,7 @@ int32_t lux_randomu(int32_t narg, int32_t ps[])
 		  *ps);
    k = lux_long(1, ps);
    narg = array_size(k);
-   pd = array_data(k);
+   pd = (int32_t*) array_data(k);
  } else {
    for (j = 0; j < narg; j++)
      dims[j] = int_arg(ps[j]); /*get the dimensions */
@@ -327,7 +327,7 @@ int32_t lux_randomu(int32_t narg, int32_t ps[])
  result_sym = array_scratch(cycle? LUX_INT32: LUX_DOUBLE, narg, pd);
  if (result_sym == LUX_ERROR)
    return LUX_ERROR;
- p = array_data(result_sym);
+ p = (double*) array_data(result_sym);
  n = array_size(result_sym);
  randomu(seed, p, n, cycle);
  return result_sym;
@@ -352,7 +352,7 @@ int32_t lux_randomd(int32_t narg, int32_t ps[])
   if (!symbolIsNumericalArray(ps[1])) /* distr */
     return cerror(NEED_ARR, ps[1]);
   result = lux_double(1, ps + 1); /* ensure DOUBLE */
-  distr = array_data(result);
+  distr = (double*) array_data(result);
   modulus = array_size(result);
   if (distr[0] < 0.0 || distr[modulus - 1] != 1.0)
     return luxerror("Illegal probability distribution specified", ps[1]);
@@ -362,7 +362,7 @@ int32_t lux_randomd(int32_t narg, int32_t ps[])
       return luxerror("Dimension list must be either all scalars or one array",
 		   ps[2]);
     result = lux_long(1, ps + 2);
-    pd = array_data(result);
+    pd = (int32_t*) array_data(result);
     n = array_size(result);
   } else {
     for (j = 2; j < narg; j++)
@@ -374,7 +374,7 @@ int32_t lux_randomd(int32_t narg, int32_t ps[])
   result = array_scratch(LUX_INT32, n, pd);
   if (result == LUX_ERROR)
     return LUX_ERROR;
-  pd = array_data(result);
+  pd = (int32_t*) array_data(result);
   n = array_size(result);
   while (n--)
     *pd++ = random_distributed(modulus, distr);
@@ -422,7 +422,7 @@ int32_t lux_randome(int32_t narg, int32_t ps[])
 		      *ps);
     k = lux_long(1, ps);
     narg = array_size(k);
-    pd = array_data(k);
+    pd = (int32_t*) array_data(k);
   } else {
     for (j = 0; j < narg; j++)
       dims[j] = int_arg(ps[j]); /*get the dimensions */
@@ -431,7 +431,7 @@ int32_t lux_randome(int32_t narg, int32_t ps[])
   result_sym = array_scratch(LUX_DOUBLE, narg, pd);
   if (result_sym == LUX_ERROR)
     return LUX_ERROR;
-  p = array_data(result_sym);
+  p = (double*) array_data(result_sym);
   n = array_size(result_sym);
   randome(p, n, scale? limit/fabs(scale): 0);
   while (n--) {
@@ -477,7 +477,7 @@ int32_t lux_randomb(int32_t narg, int32_t ps[])
   result = array_scratch((internalMode & 1)? LUX_INT32: LUX_INT8, ndim, dims);
   if (result == LUX_ERROR)	/* some error? */
     return LUX_ERROR;
-  p.l = array_data(result);	/* pointer to result data */
+  p.l = (int32_t*) array_data(result);	/* pointer to result data */
 
   n = array_size(result);	/* number of bits to get */
   if (internalMode &1)          /* /LONG: get a LONG-full of bits */
@@ -498,7 +498,7 @@ int32_t lux_randoml(int32_t narg, int32_t ps[])
 {
   int32_t	dims[MAX_DIMS], ndim, iq, result, n;
   pointer	p;
-  uint8_t	type;
+  Symboltype	type;
 
   if (*ps) 			/* seed */
     currentBitSeed = int_arg(*ps); /* install new seed */
@@ -674,7 +674,7 @@ int32_t lux_random(int32_t narg, int32_t ps[])
       if (result == LUX_ERROR)
 	return LUX_ERROR;
       iq = array_size(result);
-      p = array_data(result);
+      p = (uint8_t*) array_data(result);
       while (iq--)
 	*p++ = random_bit();
       break;

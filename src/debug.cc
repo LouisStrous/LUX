@@ -30,8 +30,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdlib.h>
 #include <stdio.h>
 #include <stddef.h>
-#include "action.h"
-#include "install.h"
+#include "action.hh"
+#include "install.hh"
 #include <signal.h>
 #include <string.h>
 #include <unistd.h>
@@ -678,7 +678,7 @@ int32_t addressToSymbol(void *address)
   pointer	ptr;
 
   for (iq = NAMED_START; iq < NAMED_END; iq++) {
-    switch (sym[iq].class) {
+    switch (symbol_class(iq)) {
       case LUX_SCALAR: case LUX_SCAL_PTR:
 	break;
       case LUX_STRING:
@@ -703,7 +703,7 @@ int32_t addressToSymbol(void *address)
       }
   }
   if (symbol < 0) for (iq = TEMPS_START; iq < TEMPS_END; iq++)
-  { switch (sym[iq].class)
+  { switch (symbol_class(iq))
     { case LUX_SCALAR: case LUX_SCAL_PTR:
 	break;
       case LUX_STRING:

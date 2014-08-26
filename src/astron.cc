@@ -81,12 +81,12 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <float.h>
 #include <assert.h>
 #include <time.h>
-#include "action.h"
-#include "astron.h"
-#include "astrodat2.h"
-#include "astrodat3.h"
-#include "calendar.h"
-#include "vsop.h"
+#include "action.hh"
+#include "astron.hh"
+#include "astrodat2.hh"
+#include "astrodat3.hh"
+#include "calendar.hh"
+#include "vsop.hh"
 
 #define extractbits(value, base, bits) (((value) >> (base)) & ((1 << (bits)) - 1))
 
@@ -121,35 +121,35 @@ int32_t	findint(int32_t, int32_t *, int32_t);
 void	UTC_to_TAI(double *), TAI_to_UTC(double *);
 void	CJDLT_to_TAI(double *), TAI_to_CJDLT(double *);
 
-char *GregorianMonths[] = {
+char const* GregorianMonths[] = {
   "January", "February", "March", "April", "May", "June", "July",
   "August", "September", "October", "November", "December"
 };
 
-char *IslamicMonths[] = {
+char const* IslamicMonths[] = {
   "Muharram", "Safar", "Rabi`a I", "Rabi`a II", "Jumada I", "Jumada II",
   "Rajab", "Sha`ban", "Ramadan", "Shawwal", "Dhu al-Q`adah",
   "Dhu al-Hijjah"
 };
 
-char *tikalVenteina[] = {
+char const* tikalVenteina[] = {
   "Imix'", "Ik'", "Ak'b'al", "K'an", "Chikchan", "Kimi", "Manik'", "Lamat",
   "Muluk", "Ok", "Chuwen", "Eb'", "B'en", "Ix", "Men", "Kib'", "Kab'an",
   "Etz'nab'", "Kawak", "Ajaw"
 };
 
-char *tikalMonth[] = {
+char const* tikalMonth[] = {
   "Pop", "Wo", "Sip", "Sotz'", "Sek", "Xul", "Yaxk'in", "Mol", "Ch'en",
   "Yax", "Sac", "Keh", "Mak", "K'ank'in", "Muwan", "Pax", "K'ayab'", "Kumk'u",
   "Wayeb'"
 };
 
-char *HebrewMonths[] = {
+char const* HebrewMonths[] = {
   "Tishri", "Heshvan", "Kislev", "Tevet", "Shevat", "Adar", "Nisan",
   "Iyar", "Sivan", "Tammuz", "Av", "Elul"
 };
 
-char *EgyptianMonths[] = {
+char const* EgyptianMonths[] = {
   "Thoth", "Phaophi", "Athyr", "Choiak", "Tybi", "Mecheir", "Phamenoth",
   "Pharmuthi", "Pachon", "Payni", "Epiphi", "Mesore", "epagomenai"
 };
@@ -159,7 +159,7 @@ int32_t	nonae[] = {
 }, idus[] = {
   13, 13, 15, 13, 15, 13, 15, 13, 13, 15, 13, 13
 };
-char *latinMonthsI[] = {
+char const* latinMonthsI[] = {
   "Ianuariis", "Februariis", "Martiis", "Aprilibus", "Maiis", "Iuniis",
   "Iuliis", "Augustis", "Septembribus", "Octobribus", "Novembribus",
   "Decembribus"
@@ -168,7 +168,7 @@ char *latinMonthsI[] = {
   "Iulias", "Augustas", "Septembres", "Octobres", "Novembres", "Decembres"
 };
 
-char **calendars[] = {
+char const** calendars[] = {
   GregorianMonths, IslamicMonths, HebrewMonths, EgyptianMonths
 };
 int32_t calendarType[] = {
@@ -208,27 +208,30 @@ double JDE(double, int32_t);
 #define esin	0.3978812030	/* sin(ecliptic2000) */
 
 static int32_t	*extraIDs;
+
+struct orbitParams {
+  double	JDE;
+  double	q;
+  double	e;
+  double	v_factor;
+  double	xfac;
+  double	yfac;
+  double	zfac;
+  double	xangle;
+  double	yangle;
+  double	zangle;
+  double	M;
+  double	n;
+};
+
 static struct extraInfo {
   int32_t		nterms;
   double	equinox;
   double	absmag;
   char		*comment;
-  struct orbitParams {
-    double	JDE;
-    double	q;
-    double	e;
-    double	v_factor;
-    double	xfac;
-    double	yfac;
-    double	zfac;
-    double	xangle;
-    double	yangle;
-    double	zangle;
-    double	M;
-    double	n;
-  } *orbits;
+  struct orbitParams *orbits;
 } *extraOrbits = NULL;
-  
+
 static int32_t	nExtraObj = 0;
 
 static double	extraElements[9];
@@ -250,8 +253,8 @@ int32_t idiv(int32_t x, int32_t y)
 void printXYZtoLBR(double *xyz);
 void printLBRtoXYZ(double *lbr);
 void printHBRtoXYZ(double *lbr);
-void showraddms(char *prefix, double x);
-void showradhms(char *prefix, double x);
+void showraddms(char const* prefix, double x);
+void showradhms(char const * prefix, double x);
 
 #define TAI_to_TT(jd)	(*(jd) += 32.184/86400)
 #define TT_to_TAI(jd)	(*(jd) -= 32.184/86400)
@@ -808,26 +811,31 @@ int32_t lux_calendar(int32_t narg, int32_t ps[])
   src.v = NULL;
   tgt.v = NULL;
 
-  fromcalendar = extractbits(internalMode, CAL_CALENDAR_BASE,
-			     CAL_CALENDAR_BITS);
-  tocalendar = extractbits(internalMode, CAL_CALENDAR_BASE + CAL_CALENDAR_BITS,
-			   CAL_CALENDAR_BITS);
-  outputkind = extractbits(internalMode, CAL_OUTPUT_BASE, CAL_OUTPUT_BITS); /* /NUMERIC, /TEXT, /ISOTEXT */
+  fromcalendar = (Calendar) extractbits(internalMode, CAL_CALENDAR_BASE,
+                                        CAL_CALENDAR_BITS);
+  tocalendar = (Calendar) extractbits(internalMode,
+                                      CAL_CALENDAR_BASE + CAL_CALENDAR_BITS,
+                                      CAL_CALENDAR_BITS);
+  outputkind = (Calendar_outputtype) extractbits(internalMode,
+                                                 CAL_OUTPUT_BASE,
+                                                 CAL_OUTPUT_BITS); /* /NUMERIC, /TEXT, /ISOTEXT */
   /*
   fromorder = extractbits(internalMode, CAL_ORDER_BASE, CAL_ORDER_BITS); / /FROMYMD, /FROMDMY /
   toorder = extractbits(internalMode, CAL_ORDER_BASE + CAL_ORDER_BITS,
 			CAL_ORDER_BITS); / /TOYMD, /TODMY /
   */
-  fromtime = extractbits(internalMode, CAL_TIME_BASE, CAL_TIME_BITS);
-  totime = extractbits(internalMode, CAL_TIME_BASE + CAL_TIME_BITS,
-		       CAL_TIME_BITS);
+  fromtime = (Calendar_timescale) extractbits(internalMode, CAL_TIME_BASE,
+                                              CAL_TIME_BITS);
+  totime = (Calendar_timescale) extractbits(internalMode,
+                                            CAL_TIME_BASE + CAL_TIME_BITS,
+                                            CAL_TIME_BITS);
 
   numerical_or_string(ps[0], &dims, &ndim, NULL, NULL);
 
   /* If no specific "from" calendar is specified, then assume the Common
      calendar if the input is a string or string array, or if the input
      has 3 elements in its first dimension.  Otherwise, assume CJD. */
-  if (fromcalendar == CAL_DEFAULT) { 
+  if (fromcalendar == CAL_DEFAULT) {
     if (symbolIsString(ps[0])
         || dims[0] == 3)
       fromcalendar = CAL_COMMON;
@@ -1045,7 +1053,7 @@ int32_t lux_calendar(int32_t narg, int32_t ps[])
 
   /* now loop over all dates to translate */
   do {
-    scalar timestamp, temp;
+    Scalar timestamp, temp;
 
     /* translate input to CJD or CJDN */
     switch (internaltype) {
@@ -1180,11 +1188,13 @@ int32_t lux_calendar_OLD(int32_t narg, int32_t ps[])
      /* "/TOCALENDAR": /TOCOMMON /TOGREGORIAN /TOISLAMIC /TOJULIAN /TOJD */
      /*                /TOCJD /TOMAYAN /TOLONGCOUNT /TOUTC /TOTAI /TOTT */
 {
-  int32_t	n, *dims, ndim, nRepeat, type, i, iq, cal, newDims[MAX_DIMS],
+  int32_t	n, *dims, ndim, nRepeat, i, iq, cal, newDims[MAX_DIMS],
     num_newDims, year, month, nd, d, t, v, m, sec, min, hour,
     fromcalendar, tocalendar, fromtime, totime, output, fromorder, toorder,
-    outtype, iday;
-  char	isFree = 0, *line, **monthNames;
+    iday;
+  Symboltype type, outtype;
+  char	isFree = 0, *line;
+  char const** monthNames;
   pointer	data, JD;
   double	day;
 
@@ -1316,7 +1326,7 @@ int32_t lux_calendar_OLD(int32_t narg, int32_t ps[])
 	char *p, *q;
 	int32_t level = 0;
 	long stride = 1;
-	long d = 0, this = 0;
+	long d = 0, this_value = 0;
 	
 	p = data.sp[i];
 	q = strchr(p,'\0');	/* end of string */
@@ -1326,8 +1336,8 @@ int32_t lux_calendar_OLD(int32_t narg, int32_t ps[])
 	  if (q > p) {
 	    while (q > p && isdigit(q[-1]))
 	      q--;
-	    this = atol(q);
-	    d += this*stride;
+	    this_value = atol(q);
+	    d += this_value*stride;
 	    stride *= (level == 1? 18: 20);
 	    level++;
 	  }
@@ -2313,7 +2323,8 @@ int32_t lux_precess(int32_t narg, int32_t ps[])
   double JDfrom, JDto, alpha, delta;
   pointer src, tgt;
   loopInfo srcinfo, tgtinfo;
-  int32_t n, outtype, result, done;
+  int32_t n, result, done;
+  Symboltype outtype;
 
   JDfrom = double_arg(ps[1]);
   JDto = double_arg(ps[2]);
@@ -2429,7 +2440,7 @@ int32_t lux_precess(int32_t narg, int32_t ps[])
   return result;
 }
 /*--------------------------------------------------------------------------*/
-#include "constellations.h"
+#include "constellations.hh"
 int32_t constellation(double alpha, double delta)
 /* returns the identity of the official constellation that the
    position is in that is indicated by right ascension <alpha> and
@@ -2630,7 +2641,7 @@ int32_t lux_constellationname(int32_t narg, int32_t ps[])
     return LUX_ERROR;
   if (n > 1) {
     result = array_clone(ps[0], LUX_STRING_ARRAY);
-    tgt = array_data(result);
+    tgt = (char**) array_data(result);
   } else {
     result = string_scratch(0);
     tgt = &string_value(result);
@@ -2744,7 +2755,7 @@ float magnitude(double d, double r, double beta, int32_t objNum)
   }
 }
 /*--------------------------------------------------------------------------*/
-const char const *objectName(int32_t objNum)
+char const *objectName(int32_t objNum)
 {
   switch (objNum) {
     default:
@@ -2963,7 +2974,7 @@ void XYZ_VSOPtoFK5(double T, double *pos)
 /*--------------------------------------------------------------------------*/
 #define EQUINOX_OF_DATE	DBL_MAX
 
-int32_t readExtra(char *file, char mode)
+int32_t readExtra(char const* file, char mode)
 /* read orbital data for extra celestial bodies from file <file>.
 
  Data format:
@@ -3000,7 +3011,8 @@ int32_t readExtra(char *file, char mode)
  and the data lines for each object in ascending order of JDE.  */
 {
   FILE	*fp;
-  char	*defaultFile = "$ANADIR/orbits", orbitLine[256], *pp;
+  char const* defaultFile = "$ANADIR/orbits";
+  char	orbitLine[256], *pp;
   int32_t	obj, id, rec, c, format, n, nmore, indx, nterm;
   double	jd, a, e, i, node, peri, m, equinox;
   double	sn, cn, si, ci, f, g, p, q, mag;
@@ -3883,7 +3895,7 @@ void galtoeq(double *pos, double equinox, char forward)
   }
 }
 /*--------------------------------------------------------------------------*/
-int32_t lux_astrf(int32_t narg, int32_t ps[], int32_t forward) {
+int32_t lux_astrf(int32_t narg, int32_t ps[]) {
 /* ASTRF(<coords>[, <equinox>, /JULIAN, /BESSELIAN]
    [, /FROMEQUATORIAL, /FROMECLIPTICAL, /FROMGALACTIC]
    [, /TOEQUATORIAL, /TOECLIPTICAL, /TOGALACTIC])
@@ -4112,12 +4124,12 @@ double meanDistance(int32_t obj1, int32_t obj2)
     return meanDistances[obj1][obj2];
 }
 /*--------------------------------------------------------------------------*/
-void showraddms(char *prefix, double x)
+void showraddms(char const* prefix, double x)
 {
   printf("%1$s%2$.10g rad = %3$.10g deg = %3$-13.2T dms\n", prefix, x, x*RAD);
 }
 /*--------------------------------------------------------------------------*/
-void showradhms(char *prefix, double x)
+void showradhms(char const * prefix, double x)
 {
   printf("%1$s%2$.10g rad = %3$.10g deg = %3$#-13.2T hms\n", prefix, x, x*RAD);
 }
@@ -4513,16 +4525,18 @@ int32_t lux_astropos(int32_t narg, int32_t ps[])
         /* pos_obs_tgt[i] now contain cartesian coordinates that
            point in the right direction but do not indicate the
            right distance, which is r_sun_obs.  correct. */
-        double f = r_obs_tgt/hypota(3, pos_obs_tgt);
-        pos_obs_tgt[0] *= f;
-        pos_obs_tgt[1] *= f;
-        pos_obs_tgt[2] *= f;
-        if (vocal) {
-          puts("ASTRON: target planetocentric ecliptic coordinates corrected for aberration:");
-          printXYZtoLBR(pos_obs_tgt);
+        {
+          double f = r_obs_tgt/hypota(3, pos_obs_tgt);
+          pos_obs_tgt[0] *= f;
+          pos_obs_tgt[1] *= f;
+          pos_obs_tgt[2] *= f;
+          if (vocal) {
+            puts("ASTRON: target planetocentric ecliptic coordinates corrected for aberration:");
+            printXYZtoLBR(pos_obs_tgt);
+          }
         }
         break;
-      case S_LIGHTTIME | S_ABERRATION: /* observer + target at jd - lighttime */
+      case (S_LIGHTTIME | S_ABERRATION): /* observer + target at jd - lighttime */
         {
           double pos_sun_obs_lt[9], r_sun_obs_lt;
           heliocentricXYZr(jd - lighttime, object0, equinox, pos_sun_obs_lt,

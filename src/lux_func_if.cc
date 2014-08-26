@@ -19,7 +19,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include <errno.h>
 #include <math.h>
-#include "lux_func_if.h"
+#include "lux_func_if.hh"
 
 /*
   An interface to allow a user-defined LUX function to be called as a
@@ -31,7 +31,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
   lux_func_if_set_param(afif, 1, par1);
   pointer p0 = lux_func_if_get_param_data(afif, 0);
   pointer p1 = lux_func_if_get_param_data(afif, 1);
-  
+
   lux_func_if_call(afif);
 
   lux_func_if_free(afif);
@@ -39,7 +39,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 
 lux_func_if * lux_func_if_alloc(char const * const name, size_t num_params)
 {
-  lux_func_if *afif = calloc(1, sizeof(lux_func_if));
+  lux_func_if *afif = (lux_func_if*) calloc(1, sizeof(lux_func_if));
   if (!afif)
     return NULL;
   int32_t func_sym = stringpointer((char *) name, SP_USER_FUNC);
@@ -49,8 +49,8 @@ lux_func_if * lux_func_if_alloc(char const * const name, size_t num_params)
   }
   afif->num_params = num_params;
   if (num_params) {
-    afif->param_syms = calloc(num_params, sizeof(int16_t));
-    afif->param_data = calloc(num_params, sizeof(pointer));
+    afif->param_syms = (int16_t*) calloc(num_params, sizeof(int16_t));
+    afif->param_data = (pointer*) calloc(num_params, sizeof(pointer));
     if (!afif->param_syms || !afif->param_data)
       goto error;
   }

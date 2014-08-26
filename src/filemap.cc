@@ -27,10 +27,10 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdlib.h>
 #include <limits.h>
 #include <string.h>
-#include "action.h"
+#include "action.hh"
 
 /*-------------------------------------------------------------------------*/
-int32_t filemap(int32_t type, int32_t narg, int32_t ps[])
+int32_t filemap(Symboltype type, int32_t narg, int32_t ps[])
 /* Create a file map symbol (file array) and stores array structure,
    file name and offset */
 {
@@ -55,8 +55,9 @@ int32_t filemap(int32_t type, int32_t narg, int32_t ps[])
 					/* memory requirement */
  mq = sizeof(array) + sizeof(int32_t)*(*ps != 0) + strlen(p) + 1;
  symbol_memory(iq) = mq;
-/* allocate((char *) file_map_header(iq), mq, char); */
- allocate(file_map_header(iq), mq, char); 
+ file_map_header(iq) = (array*) malloc(mq);
+ if (!file_map_header(iq))
+   return luxerror("Memory allocation error\n", 0);
  if (internalMode & 1)
    set_file_map_readonly(iq);	/* /READONLY */
  else
@@ -115,7 +116,7 @@ int32_t lux_i_file_output(FILE *fp, pointer q, int32_t assoctype,
 
   if (sym[offsym].type != LUX_INT32)
     offsym = lux_long(1, &offsym);
-  switch (sym[offsym].class)
+  switch (symbol_class(offsym))
   { case LUX_SCAL_PTR:
       offsym = dereferenceScalPointer(offsym);
     case LUX_SCALAR:
@@ -180,7 +181,7 @@ int32_t lux_file_output(int32_t iq, int32_t jq, int32_t offsym, int32_t axsym)
    case LUX_ARRAY:
      ddat = array_num_dims(jq);
      dat = array_dims(jq);
-     q.l = array_data(jq);
+     q.l = (int32_t*) array_data(jq);
      break;
    default:
      return cerror(ILL_CLASS, jq);
@@ -222,7 +223,7 @@ int32_t lux_file_output(int32_t iq, int32_t jq, int32_t offsym, int32_t axsym)
        puts("Offset has wrong # dimensions");
        return cerror(INCMP_DIMS, offsym);
      }
-     off = array_data(offsym);
+     off = (int32_t*) array_data(offsym);
      CK_SGN(off, doff, 1, iq);
    } else {
      offset = int_arg(offsym);
@@ -240,7 +241,7 @@ int32_t lux_file_output(int32_t iq, int32_t jq, int32_t offsym, int32_t axsym)
      puts("Wrong number of axes");
      return cerror(INCMP_DIMS, axsym);
    }
-   axes = array_data(axsym);
+   axes = (int32_t*) array_data(axsym);
    CK_SGN(axes, daxes, 2, iq);                  /* nonnegative? */
    CK_MAG(dfile, axes, daxes, 2, iq);          /* within rearrange bounds? */
  } else
@@ -311,7 +312,7 @@ int32_t lux_fzarr(int32_t narg, int32_t ps[])
   int32_t	wwflag, iq, mq;
   FILE	*fp;
   fzHead	*fh;
-  int32_t	ck_synch_hd(FILE *, fzHead *, char **, int32_t *);
+  int32_t	ck_synch_hd(FILE *, fzHead *, int32_t *);
 
   if (symbol_class(*ps) != LUX_STRING)
     return cerror(NEED_STR, *ps);
@@ -320,7 +321,7 @@ int32_t lux_fzarr(int32_t narg, int32_t ps[])
   if (!fp)			/* could not open file for reading */
     return cerror(ERR_OPEN, 0);
   fh = (fzHead *) scrat;
-  if (ck_synch_hd(fp, fh, &p, &wwflag) < 0)
+  if (ck_synch_hd(fp, fh, &wwflag) < 0)
     return LUX_ERROR;
   fclose(fp);
   if (fh->subf % 128 == 1)	/* compressed data */
@@ -328,13 +329,15 @@ int32_t lux_fzarr(int32_t narg, int32_t ps[])
 
   getFreeTempVariable(iq);
   symbol_class(iq) = LUX_FILEMAP;
-  file_map_type(iq) = fh->datyp;
+  file_map_type(iq) = (Symboltype) fh->datyp;
   symbol_context(iq) = -1;	/* ? */
   symbol_line(iq) = curLineNumber;
 					/* memory requirement */
   mq = sizeof(array) + sizeof(int32_t) + strlen(name) + 1;
   symbol_memory(iq) = mq;
-  allocate(file_map_header(iq), mq, char); 
+  file_map_header(iq) = (array*) malloc(mq);
+  if (!file_map_header(iq))
+    return luxerror("Memory allocation error\n", 0);
   if (internalMode & 1)
     set_file_map_readonly(iq);	/* /READONLY */
   file_map_num_dims(iq) = fh->ndim;

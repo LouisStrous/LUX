@@ -18,10 +18,9 @@ You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include <stdio.h>
-#include "lux_structures.h"
+#include "lux_structures.hh"
 
-int32_t execute_error(n)		/* handle errors */
- int32_t n;
+int32_t execute_error(int32_t n) /* handle errors */
  {
  printf("execution error: ");
  switch (n) {

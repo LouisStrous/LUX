@@ -27,7 +27,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
-#include "luxdefs.h"
+#include "luxdefs.hh"
 /*------------------------------------------------------------------------- */
 #define ALN2I 1.442695022
 #define TINY 1.0e-5
@@ -484,7 +484,7 @@ void indexx_b(int32_t n, uint8_t ra[], int32_t indx[])
 {
   int32_t	l,j,ir,i,indxt;
   uint8_t	q;
- 
+
   for (i = 0; i < n; i++)
     indx[i] = i;
   l = (n/2);
@@ -519,7 +519,7 @@ void indexx_w(int32_t n, int16_t ra[], int32_t indx[])
 {
   int32_t	l,j,ir,i,indxt;
   int16_t	q;
- 
+
   for (i = 0; i < n; i++)
     indx[i] = i;
   l = (n/2);
@@ -554,7 +554,7 @@ void indexx_l(int32_t n, int32_t ra[], int32_t indx[])
 {
   int32_t	l,j,ir,i,indxt;
   int32_t	q;
- 
+
   for (i = 0; i < n; i++)
     indx[i] = i;
   l = (n/2);
@@ -624,7 +624,7 @@ void indexx_f(int32_t n, float ra[], int32_t indx[])
 {
   int32_t	l,j,ir,i,indxt;
   float	q;
-  
+
   for (i = 0; i < n; i++)
     indx[i] = i;
   l = (n/2);
@@ -659,7 +659,7 @@ void indexxr_f(int32_t n, float ra[], int32_t indx[])
 {
   int32_t	l,j,ir,i,indxt;
   float	q;
-  
+
   for (i = 0; i < n; i++)
     indx[i] = i;
   l = (n/2);
@@ -694,7 +694,7 @@ void indexxr_d(int32_t n, double ra[], int32_t indx[])
 {
   int32_t	l,j,ir,i,indxt;
   double q;
-  
+
   for (i = 0; i < n; i++)
     indx[i] = i;
   l = (n/2);

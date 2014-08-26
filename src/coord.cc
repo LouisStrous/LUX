@@ -24,7 +24,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 #include <math.h>
 #include <stdio.h>
-#include "action.h"
+#include "action.hh"
 
 extern float	xfac, yfac, wxt, wxb, wyt, wyb, xmin, xmax, ymin, ymax;
 #if HAVE_LIBX11

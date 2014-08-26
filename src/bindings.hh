@@ -31,6 +31,7 @@ int32_t lux_d_dT4_iLaDaDarDq_0z12_f_(int32_t narg, int32_t ps[], double (*f)(dou
 int32_t lux_d_dT4dp3_iDaDaDp3p3arDq_00112_3_f_(int32_t narg, int32_t ps[], double (*f)(double, double, double, double, double (*)[3]));
 int32_t lux_d_dT6_iLaDaD1T3rDq_0z1T4_5_f_(int32_t narg, int32_t ps[], double (*f)(double, double, double, double, double, double));
 int32_t lux_d_d_iDarDq_0_1_f_(int32_t narg, int32_t ps[], double (*f)(double));
+int32_t lux_d_dd_iDaD1rDq_01_2_f_(int32_t narg, int32_t ps[], double (*f)(double, double));
 int32_t lux_d_dd_iDarDq_01_2_f_(int32_t narg, int32_t ps[], double (*f)(double, double));
 int32_t lux_d_dd_iDarDq_0z_1_f_(int32_t narg, int32_t ps[], double (*f)(double, double));
 int32_t lux_d_dd_iLarDq_0z_1_f_(int32_t narg, int32_t ps[], double (*f)(double, double));
@@ -82,6 +83,7 @@ int32_t lux_v_dddpT4_iDaoDqT4_0z1T4_s_(int32_t narg, int32_t ps[], void (*f)(dou
 int32_t lux_v_dddp_iDaDarDp3q_0T2_f_(int32_t narg, int32_t ps[], void (*f)(double, double, double [3]));
 int32_t lux_v_dddpdp_iDaoDqDq_0z12_s_(int32_t narg, int32_t ps[], void (*f)(double, double, double *, double *));
 int32_t lux_v_ddp3_iD1D33_01_s_(int32_t narg, int32_t ps[], void (*f)(double, double [3][3]));
+int32_t lux_v_ddpdp_iDaoDqDq_012_s_(int32_t narg, int32_t ps[], void (*f)(double, double*, double*));
 int32_t lux_v_dp3T3_iD23aD23qoDcq_0T2_f_(int32_t narg, int32_t ps[], void (*f)(double [2][3], double [2][3], double [2][3]));
 int32_t lux_v_dp3T3_iD33aDaoDc_0T2_f_(int32_t narg, int32_t ps[], void (*f)(double [3][3], double [2][3], double [2][3]));
 int32_t lux_v_dp3T3_iD33aDarDq_0T2_f_(int32_t narg, int32_t ps[], void (*f)(double (*)[3], double (*)[3], double (*)[3]));
@@ -102,10 +104,10 @@ int32_t lux_v_dpT4_iD3arD3q_0111_f_(int32_t narg, int32_t ps[], void (*f)(double
 int32_t lux_v_dpdp3_iD3arDp3q_01_f_(int32_t narg, int32_t ps[], void (*f)(double [3], double [3][3]));
 int32_t lux_v_sddsd_iDaD1rDq_012_f_(int32_t narg, int32_t ps[], void (*f)(double *, size_t, size_t, double, double *, size_t, size_t));
 
-void register_lux_f(int32_t (*f)(int32_t, int32_t []), char *name, int32_t min_arg,
-                   int32_t max_arg, char *spec);
-void register_lux_s(int32_t (*f)(int32_t, int32_t []), char *name, int32_t min_arg,
-                   int32_t max_arg, char *spec);
+void register_lux_f(int32_t (*f)(int32_t, int32_t []), char const* name, int32_t min_arg,
+                   int32_t max_arg, char const* spec);
+void register_lux_s(int32_t (*f)(int32_t, int32_t []), char const* name, int32_t min_arg,
+                   int32_t max_arg, char const* spec);
 
 #define REGISTER(func, fs, name, minarg, maxarg, fsspec)        \
 void register_lux_ ## func ## _ ## fs (void) __attribute__((constructor)); \

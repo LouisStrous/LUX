@@ -20,7 +20,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 /* File dirsmooth.c */
 /* LUX routines for directional smoothing */
 
-#include "action.h"
+#include "action.hh"
 #include <math.h>
 
 #define LEFT	0

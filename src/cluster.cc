@@ -28,7 +28,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <string.h>
 #include <limits.h>
 #include <float.h>		/* for DBL_MAX */
-#include "action.h"
+#include "action.hh"
 
 int32_t	lux_replace(int32_t, int32_t);
 void	randomu(int32_t seed, void *output, int32_t number, int32_t modulo);
@@ -136,7 +136,7 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
 /* all remaining cluster centers, calculate their distance to the data */
 /* point.  update the closest cluster center and the PDGV condition */
 /* until the closest cluster center has been found. */
-{ 
+{
   void	random_unique(int32_t seed, int32_t *output, int32_t number, int32_t modulo);
   int32_t	iq, nClusters, nVectorDim, nVectors, i, j, *index, size, dataIndex;
   float	*data, *dataPoint, n1, n2, f;
@@ -149,7 +149,7 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
   char	gotIndex, gotSize, gotSample, update, gotCenter,
 	useIndex, iterate, *changed, *changedOld, vocal, ordered,
 	gotPhantom, recluster, quick, record, curChanged;
-  uint8_t	indexType;
+  Symboltype	indexType;
   pointer	clusterNumber;
   FILE	*file;
   int32_t	nDistCal = 0, allDistCal = 0;
@@ -242,13 +242,13 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
 	gotSample = 0;		/* sample selects all */
 
       /* get nClusters numbers up to value nSample */
-      clusterOtoC = malloc(nClusters*sizeof(int32_t));
+      clusterOtoC = (int32_t*) malloc(nClusters*sizeof(int32_t));
       if (!clusterOtoC)
 	return cerror(ALLOC_ERR, 0);
       random_unique(0, clusterOtoC, nClusters, nSample);
 
       if (gotSample) {
-	index = malloc(nSample*sizeof(int32_t));
+	index = (int32_t*) malloc(nSample*sizeof(int32_t));
 	if (!index) {
 	  free(clusterOtoC);
 	  return cerror(ALLOC_ERR, 0);
@@ -299,7 +299,7 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
 	gotSample = 0;
 
       if (gotSample) {
-	index = malloc(nSample*sizeof(int32_t));
+	index = (int32_t*) malloc(nSample*sizeof(int32_t));
 	if (!index)
 	  return cerror(ALLOC_ERR, 0);
 	random_unique(0, index, nSample, nVectors); /* get a sample */
@@ -381,7 +381,7 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
       redef_array(ps[2], indexType , nDataDims - 1, dataDims + 1);
       clusterNumber.b = (uint8_t *) array_data(ps[2]);
     } else {			/* no variable, allocate */
-      clusterNumber.b = malloc(nSample*lux_type_size[indexType]*sizeof(uint8_t));
+      clusterNumber.b = (uint8_t*) malloc(nSample*lux_type_size[indexType]*sizeof(uint8_t));
       if (!clusterNumber.b)
 	return cerror(ALLOC_ERR, 0);
     }
@@ -398,17 +398,17 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
     file = fopen("cluster.out", "w");
     if (!file)
       return luxerror("Could not open file cluster.out for writing", 0); }
-  
+
 
   if (useIndex && !gotPhantom)
     phantom = 0;
 
   /* 2. Determine direction of greatest variation (DGV) */
   /* use an algorithm of my own devising; basically a 2-cluster analysis */
-  dgv = malloc(nVectorDim*sizeof(double));
+  dgv = (double*) malloc(nVectorDim*sizeof(double));
   if (!dgv)
     return cerror(ALLOC_ERR, 0);
-  center2 = malloc(nVectorDim*2*sizeof(double));
+  center2 = (double*) malloc(nVectorDim*2*sizeof(double));
   if (!center2)
     return cerror(ALLOC_ERR, 0);
   /* the first and last cluster centers form the initial centers of */
@@ -481,7 +481,7 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
   /* it is advantageous to have a sentinel on each end of the PDGV array
      with extreme values.  These extreme values must be small enough
      that their squares can be represented by a variable of type double. */
-  pdgv = malloc((nClusters + 2)*sizeof(double));
+  pdgv = (double*) malloc((nClusters + 2)*sizeof(double));
   if (!pdgv)
     return cerror(ALLOC_ERR, 0);
   pdgv[0] = -0.9*sqrt(DBL_MAX);	/* sentinel */
@@ -496,8 +496,8 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
 
   nChanged = 1;			/* non-zero to get iteration going */
   /* 4. Order cluster centers according to their PDGV */
-  findex = malloc(nClusters*sizeof(double *));
-  center2 = malloc(nClusters*nVectorDim*sizeof(double));
+  findex = (double**) malloc(nClusters*sizeof(double *));
+  center2 = (double*) malloc(nClusters*nVectorDim*sizeof(double));
   if (!findex || !center2)
     return cerror(ALLOC_ERR, 0);
   clusterSize = NULL;
@@ -521,7 +521,7 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
       for (i = 1; i < nClusters; i++)
 	if (pdgv[i] == pdgv[i - 1]) { /* we may have a double */
 	  if (!nChanged) {	/* get some random indices */
-	    clusterSize = malloc(10*sizeof(int32_t));
+	    clusterSize = (int32_t*) malloc(10*sizeof(int32_t));
 	    if (!clusterSize)
 	      return cerror(ALLOC_ERR, 0);
 	  }
@@ -547,8 +547,8 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
   /* then we need to remember the original order, so we can go from the */
   /* old to the new order and back, and can restore the original order */
   /* on exit */
-  clusterCtoO = malloc(nClusters*sizeof(int32_t));
-  clusterOtoC = malloc(nClusters*sizeof(int32_t));
+  clusterCtoO = (int32_t*) malloc(nClusters*sizeof(int32_t));
+  clusterOtoC = (int32_t*) malloc(nClusters*sizeof(int32_t));
   if (!clusterCtoO || !clusterOtoC)
     return cerror(ALLOC_ERR, 0);
   if (gotCenter)		/* save original order */
@@ -566,7 +566,7 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
     redef_array(ps[3], LUX_INT32, 1, &nClusters); /* get in shape */
     clusterSize = (int32_t *) array_data(ps[3]);
   } else {				/* no SIZE specified */
-    clusterSize = malloc(nClusters*sizeof(int32_t)); /* so allocate some space */
+    clusterSize = (int32_t*) malloc(nClusters*sizeof(int32_t)); /* so allocate some space */
     if (!clusterSize)
       return cerror(ALLOC_ERR, 0);
   }
@@ -607,7 +607,7 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
 
   if (phantom) {		/* we added phantom members, so now */
     /* we must remember their positions so we can remove them afterwards */
-    firstCenter = malloc(nClusters*nVectorDim*sizeof(double));
+    firstCenter = (double*) malloc(nClusters*nVectorDim*sizeof(double));
     if (!firstCenter)
       return cerror(ALLOC_ERR, 0);
     for (i = 0; i < nClusters; i++)
@@ -619,18 +619,18 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
   if (update)			/* we're updating, so centroid = center */
     centroid = center;
   else {			/* not updating, so separate centroids */
-    centroid = malloc(nClusters*nVectorDim*sizeof(double));
+    centroid = (double*) malloc(nClusters*nVectorDim*sizeof(double));
     if (!centroid)
       return cerror(ALLOC_ERR, 0);
     memcpy(centroid, center, nClusters*size);
   }
 
-  scrap = malloc(nVectorDim*sizeof(double)); /* scrap space */
+  scrap = (double*) malloc(nVectorDim*sizeof(double)); /* scrap space */
 
   /* we want to count the number of changed points and keep track of */
   /* which clusters change */
-  changed = malloc(nClusters*sizeof(char));
-  changedOld = malloc(nClusters*sizeof(char));
+  changed = (char*) malloc(nClusters*sizeof(char));
+  changedOld = (char*) malloc(nClusters*sizeof(char));
   if (!scrap || !changed || !changedOld)
     return cerror(ALLOC_ERR, 0);
   for (i = 0; i < nClusters; i++)
@@ -639,7 +639,7 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
 
   if (rms) {
     redef_array(rms, LUX_DOUBLE, 1, &nClusters);
-    rmsptr = array_data(rms);
+    rmsptr = (double*) array_data(rms);
   }
 
   nChanged = 1;			/* number of data points that changed */
@@ -984,13 +984,13 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
 	    k = 1; 		/* need to reorder */
 	}
 	if (k) {		/* reorder */
-	  findex = malloc(nClusters*sizeof(double *));
+	  findex = (double**) malloc(nClusters*sizeof(double *));
 	  if (!findex)
 	    return cerror(ALLOC_ERR, 0);
 	  for (i = 0; i < nClusters; i++)
 	    findex[i] = pdgv + i; /* current order */
 	  qsort(findex, nClusters, sizeof(double *), fptrCompare); /* sort */
-	  center2 = malloc(nClusters*nVectorDim*sizeof(double));
+	  center2 = (double*) malloc(nClusters*nVectorDim*sizeof(double));
 	  if (!center2)
 	    return cerror(ALLOC_ERR, 0);
 	  for (i = 0; i < nClusters; i++) /* reorder PDGVs */
@@ -1007,7 +1007,7 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
 		   centroid + (findex[i] - pdgv)*nVectorDim, size);
 	  memcpy(centroid, center2, size*nClusters);
 	  free(center2);
-	  iPtr = malloc(nClusters*sizeof(int32_t));
+	  iPtr = (int32_t*) malloc(nClusters*sizeof(int32_t));
 	  if (!iPtr)
 	    return cerror(ALLOC_ERR, 0);
 	  for (i = 0; i < nClusters; i++) /* reorder cluster sizes */
@@ -1060,12 +1060,12 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
     if (nIter == maxit)		/* reached maximum number of iterations */
       nChanged = 0;
   } /* end of while (nChanged) */
-  
+
   if (record && iterate)
     fclose(file);
 
   /* restore the centers to their original order */
-  center2 = malloc(nClusters*nVectorDim*sizeof(double));
+  center2 = (double*) malloc(nClusters*nVectorDim*sizeof(double));
   if (!center2)
     return cerror(ALLOC_ERR, 0);
   if (center != centroid && update) { /* updating */
@@ -1085,7 +1085,7 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
     free(centroid);
 
   /* reorder the sizes */
-  index = malloc(nClusters*sizeof(int32_t));
+  index = (int32_t*) malloc(nClusters*sizeof(int32_t));
   if (!index)
     return cerror(ALLOC_ERR, 0);
   memcpy(index, clusterSize, nClusters*sizeof(int32_t));

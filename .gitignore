@@ -1,4 +1,6 @@
+*.bak
 *.bck
+*.orig
 *.tar.gz
 *~
 Makefile

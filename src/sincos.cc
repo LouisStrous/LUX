@@ -21,10 +21,12 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "config.h"
 #endif
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE             /* for sincos */
+#endif
 
 #include <math.h>               /* for sincos */
-#include "action.h"             /* for BIND */
+#include "action.hh"             /* for BIND */
 
 #if !HAVE_SINCOS
 void sincos(double x, double *sinx, double *cosx)

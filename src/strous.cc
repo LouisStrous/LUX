@@ -33,14 +33,15 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <sys/stat.h>
 #include <limits.h>
 #include <stdarg.h>
-#include "action.h"
-#include "install.h"
-#include "format.h"
-#include "editor.h"		/* for BUFSIZE */
+#include "action.hh"
+#include "install.hh"
+#include "format.hh"
+#include "editor.hh"		/* for BUFSIZE */
+#include <readline/readline.h>
 
 int16_t	stack[STACKSIZE], *stackPointer = &stack[STACKSIZE];
 extern int32_t	stackSym;
-int32_t	lux_convert(int32_t, int32_t [], int32_t, int32_t), copyToSym(int32_t, int32_t),
+int32_t	lux_convert(int32_t, int32_t [], Symboltype, int32_t), copyToSym(int32_t, int32_t),
   lux_replace(int32_t, int32_t), format_check(char *, char **, int32_t),
   f_decomp(float *, int32_t, int32_t), f_solve(float *, float *, int32_t, int32_t);
 void	symdumpswitch(int32_t, int32_t);
@@ -49,7 +50,8 @@ int32_t lux_distr(int32_t narg, int32_t ps[])
 /* DISTR,target,bins,values  puts each <value> in the corresponding
    <bin> of <target>.  LS */
 {
- int32_t	iq, ntarget, i, targettype, n, *bin, nout = 0;
+ int32_t	iq, ntarget, i, n, *bin, nout = 0;
+ Symboltype targettype;
  array	*h, *h2;
  pointer	target, value;
 
@@ -133,16 +135,17 @@ int32_t lux_distr(int32_t narg, int32_t ps[])
  if (nout)
    printf("DISTR - %d elements were out of range\n", nout);
  return 1;
-} 
+}
 /*------------------------------------------------------------------------- */
 int32_t lux_distr_f(int32_t narg, int32_t ps[])
 /* y=DISTR(bins,values)  puts each <value> in the corresponding <bin> and
    returns an array containing bins 0 through max(values). LS */
 {
   extern int32_t	maxhistsize, histmin, histmax;
-  extern scalar	lastmin, lastmax;
-  int32_t	iq, i, n, nd, nd2, range, type, type2, result_sym,
+  extern Scalar	lastmin, lastmax;
+  int32_t	iq, i, n, nd, nd2, range, result_sym,
 	minmax(int32_t *, int32_t, int32_t);
+  Symboltype type, type2;
   pointer arg1, arg2, res;
   int32_t	lux_zero(int32_t, int32_t []);
   void convertWidePointer(wideScalar *, int32_t, int32_t);
@@ -151,7 +154,7 @@ int32_t lux_distr_f(int32_t narg, int32_t ps[])
   if (symbol_class(iq) != LUX_ARRAY)
     return cerror(NEED_ARR, iq);
   type = array_type(iq);
-  arg1.l = array_data(iq);
+  arg1.l = (int32_t*) array_data(iq);
   nd = array_num_dims(iq);
   n = array_size(iq);
 
@@ -163,7 +166,7 @@ int32_t lux_distr_f(int32_t narg, int32_t ps[])
   nd2 = array_num_dims(iq);
   if (nd != nd2 || n != array_size(iq))
     return cerror(INCMP_ARR, iq);
-  arg2.l = array_data(iq);
+  arg2.l = (int32_t*) array_data(iq);
   /* always need the range */
   minmax(arg1.l, n, type);
   /* get long (int32_t) versions of min and max */
@@ -189,7 +192,7 @@ int32_t lux_distr_f(int32_t narg, int32_t ps[])
     else if (!(internalMode & 2)) /* no /IGNORELIMIT or /INCREASELIMIT */
       return LUX_ERROR; }
   result_sym = array_scratch(type2, 1, &range);
-  res.l = array_data(result_sym);
+  res.l = (int32_t*) array_data(result_sym);
   lux_zero(1, &result_sym);		/* need to zero initially */
   /* now accumulate the distribution */
   switch (type2) {			/* type of result */
@@ -440,7 +443,7 @@ int32_t lux_distr_f(int32_t narg, int32_t ps[])
 int32_t readkey(int32_t mode)
 {
  int32_t	ch, result_sym;
- 
+
  ch = rl_getc(stdin);
  result_sym = scalar_scratch(LUX_INT32);
  sym[result_sym].spec.scalar.l = ch;
@@ -448,13 +451,13 @@ int32_t readkey(int32_t mode)
  return result_sym;
 }
 /*------------------------------------------------------------------------- */
-int32_t lux_readkey()
+int32_t lux_readkey(int32_t narg, int32_t ps[])
 /* returns the code for the next pressed key and echos that key */
 {
  return readkey(1);
 }
 /*------------------------------------------------------------------------- */
-int32_t lux_readkeyne()
+int32_t lux_readkeyne(int32_t narg, int32_t ps[])
 /* returns the code for the next pressed key but does not echo that key */
 /* see lux_readkey for more info */
 {
@@ -468,8 +471,9 @@ int32_t lux_readarr(int32_t narg, int32_t ps[])
  extern FILE	*inputStream;
  FILE	*tp, *is;
  char	*p, *pt, lastchar, token[32], line[BUFSIZE];
- int32_t	arrs=0, i, iq, maxtype = LUX_INT32, *iptr, 
-   getNewLine(char *, size_t, char *, char), redef_array(int32_t, int32_t, int32_t, int32_t *);
+ int32_t	arrs=0, i, iq, *iptr,
+   getNewLine(char *, size_t, char const *, char);
+ Symboltype maxtype = LUX_INT32;
  float	*fptr;
 
  iq = ps[0];						/* target */
@@ -524,10 +528,11 @@ int32_t lux_find(int32_t narg, int32_t ps[])
   array	*h, *har;
   pointer	ar, base, key, off, indx, theKey, theOff;
   char	repeat = 0;
-  int32_t	type, mode = 0, result, i, index = 0, offset, nRepeat;
-  int32_t	resulttype, iq, nar, noff, nkey, class, n, step, loop;
+  int32_t	mode = 0, result, i, index = 0, offset, nRepeat;
+  int32_t	iq, nar, noff, nkey, class_id, n, step, loop;
   int32_t   dims[MAX_DIMS], ndim;
-  
+  Symboltype type, resulttype;
+
   iq = ps[0];			/* array */
   CK_ARR(iq,1);
   har = HEAD(iq);
@@ -554,7 +559,7 @@ int32_t lux_find(int32_t narg, int32_t ps[])
       iq = lux_float(1, &iq);  break;
     case LUX_DOUBLE: 
       iq = lux_double(1, &iq);  break; }
-  class = sym[iq].class;
+  class_id = symbol_class(iq);
   GET_NUMERICAL(theKey, nkey);
   if (noff > 1 && nkey > 1 && nkey != noff) return cerror(INCMP_ARG, iq);
   if (narg >= 4) mode = int_arg(ps[3]);		/* mode */
@@ -564,7 +569,7 @@ int32_t lux_find(int32_t narg, int32_t ps[])
     if (noff > 1 && noff != nar/har->dims[0])
       return luxerror("Need offset for each individual search", ps[2]); }
   if (mode & 2) resulttype = type; else resulttype = LUX_INT32;
-  if (!repeat && class == LUX_SCALAR)
+  if (!repeat && class_id == LUX_SCALAR)
   { result = scalar_scratch(resulttype);
     indx.b = &sym[result].spec.scalar.b;
     nRepeat = 1; }
@@ -768,7 +773,7 @@ int32_t lux_find2(int32_t narg, int32_t ps[])
 #include <errno.h>
 int32_t lux_help(int32_t narg, int32_t ps[])
 {
-  char *topic = narg? string_arg(*ps): "Top";
+  char const* topic = narg? string_arg(*ps): "Top";
   char cmd[300];
   char topic2[300];
   if (strlen(topic) > 270)
@@ -810,10 +815,10 @@ int32_t lux_help(int32_t narg, int32_t ps[])
               " using Ctrl-S %s.\n", topic, topic);
     } else {
       setPager(0);
-      topic = fgets(line, 256, fp);
-      printw(topic);
-      while (fgets(topic, 256, fp) && *topic == ';')
-        printw(topic + 1);
+      fgets(line, 256, fp);
+      printw(line);
+      while (fgets(line, 256, fp) && *line == ';')
+        printw(line + 1);
       resetPager();
       fclose(fp);
       result = 0;
@@ -863,7 +868,7 @@ int32_t lux_endian(int32_t narg, int32_t ps[])
  iq = ps[0];
  switch (symbol_class(iq)) {
    case LUX_ARRAY:
-     q.l = array_data(iq);
+     q.l = (int32_t*) array_data(iq);
      type = array_type(iq);
      n = array_size(iq)*lux_type_size[type];
      break;
@@ -880,8 +885,8 @@ int32_t lux_endian(int32_t narg, int32_t ps[])
 }
 /*------------------------------------------------------------------------- */
 int32_t lux_differ(int32_t narg, int32_t ps[])
-/* running difference; reverse of running sum 
-  syntax:  y = differ(x [[,axis] ,order]) 
+/* running difference; reverse of running sum
+  syntax:  y = differ(x [[,axis] ,order])
   axis is the dimension along which differencing is performed; for each of the
   remaining coordinates differencing is started over.  If axis is not
   specified, or negative, then an uninterrupted differ is performed as if
@@ -896,7 +901,8 @@ int32_t lux_differ(int32_t narg, int32_t ps[])
 {
   pointer	src, trgt, order;
   int32_t	result, nOrder, loop, o, ww, stride, offset1, offset3,
-    w1, one = 1, iq, n, type, i, old, circular;
+    w1, one = 1, iq, n, i, old, circular;
+  Symboltype type;
   loopInfo	srcinfo, trgtinfo;
 
   if (standardLoop(ps[0], narg > 2? ps[1]: 0,
@@ -930,12 +936,12 @@ int32_t lux_differ(int32_t narg, int32_t ps[])
       trgt.l = &scalar_value(result).l;
     } else {			/* reduce size by one */
       result = array_scratch(type, 1, &ww);
-      trgt.l = array_data(result);
+      trgt.l = (int32_t*) array_data(result);
     }
     old = 1;
   } else
     old = 0;
-      
+
   if (!srcinfo.naxes)
     srcinfo.naxes++;
   for (loop = 0; loop < srcinfo.naxes; loop++) {
@@ -1178,8 +1184,8 @@ int32_t lux_differ(int32_t narg, int32_t ps[])
       else			/* need new temp for next result */
       { iq = result;
 	result = array_clone(iq, type); }
-      src.b = array_data(iq);
-      trgt.b = array_data(result); }
+      src.b = (uint8_t*) array_data(iq);
+      trgt.b = (uint8_t*) array_data(result); }
   }
   return result;
 }
@@ -1191,7 +1197,7 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
     i1, i2, i, step, widthNDim, *widthDim, axis;
   float	weight;
   pointer	src, trgt, width, width0;
-  scalar	sum;
+  Scalar	sum;
   loopInfo	srcinfo, trgtinfo;
 
   switch (narg) {
@@ -1213,14 +1219,15 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
   if (numerical(ps[0], NULL, &nDim, &nData, NULL) < 0)
     /* <data> not numerical */
     return LUX_ERROR;
-  
+
   if (widthSym) {
     if (numerical(widthSym, &widthDim, &widthNDim, &nWidth, NULL) < 0)
       /* <width> not numerical */
       return LUX_ERROR;
     done = lux_long(1, &widthSym);	/* ensure LONG */
-    width0.l = width.l = array_data(done); }
-  
+    width0.l = width.l = (int32_t*) array_data(done);
+  }
+
   if (standardLoop(ps[0], axisSym, SL_SAMEDIMS | SL_UPGRADE | SL_EACHCOORD,
 		   cumul? LUX_INT32: LUX_FLOAT,
 		   &srcinfo, &src, &result, &trgtinfo, &trgt) < 0)
@@ -1776,11 +1783,11 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
   LS 26nov92 5mar93 implement LUX_INT32, LUX_FLOAT, and LUX_DOUBLE,
   because "integer" range of floats is too small. */
 {
-  uint8_t	type;
+  Symboltype	type;
   int32_t	n, result, i, offset, stride, nWidth, w1, w2, ww, loop, three=3, norm,
     iq, jq;
   pointer	src, trgt, width;
-  scalar	value;
+  Scalar	value;
   loopInfo	srcinfo, trgtinfo;
   int32_t mode;
 
@@ -1791,7 +1798,7 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
     jq = 0;
     mode = (internalMode & 4)? SL_ALLAXES: 0;
   }
-    
+
   if (standardLoop(ps[0], jq, mode | SL_SAMEDIMS | SL_UPGRADE | SL_EACHROW,
 		   LUX_FLOAT, &srcinfo, &src, &result, &trgtinfo, &trgt) < 0)
     return LUX_ERROR;
@@ -2332,8 +2339,9 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
       srcinfo.type = type;
       srcinfo.stride = lux_type_size[type]; /* original may be < LUX_FLOAT */
       nextLoops(&srcinfo, &trgtinfo);
-      src.b = array_data(iq);
-      trgt.b = array_data(result); }
+      src.b = (uint8_t*) array_data(iq);
+      trgt.b = (uint8_t*) array_data(result);
+    }
   }
   return result;
 }
@@ -2354,7 +2362,7 @@ int32_t pcmp(const void *arg1, const void *arg2)
 {
   extern pointer	pcmp_ptr;
   extern int32_t	pcmp_type;
-  scalar	d1, d2;
+  Scalar	d1, d2;
 
   switch (pcmp_type) {
     case LUX_INT8:
@@ -2389,7 +2397,7 @@ int32_t pcmp2(const void *arg1, const void *arg2)
 {
   extern pointer	pcmp_ptr;
   extern int32_t	pcmp_type;
-  scalar	d1, d2;
+  Scalar	d1, d2;
 
   switch (pcmp_type) {
     case LUX_INT8:
@@ -2427,7 +2435,7 @@ int32_t lux_match(int32_t narg, int32_t ps[])
 {
  int32_t	nTarget, nSet, iq, step, *ptr, i, *p;
  pointer	target, set, result;
- uint8_t	maxType;
+ Symboltype	maxType;
 
  if (getSimpleNumerical(ps[0], &target, &nTarget) < 0)
    return -1;			/* some error */
@@ -2449,14 +2457,14 @@ int32_t lux_match(int32_t narg, int32_t ps[])
  /* create result array */
  if (symbol_class(ps[0]) == LUX_ARRAY) {
    iq = array_scratch(LUX_INT32, array_num_dims(ps[0]), array_dims(ps[0]));
-   result.l = array_data(iq);
+   result.l = (int32_t*) array_data(iq);
  }
  else {
    iq = scalar_scratch(LUX_INT32);
    result.l = &scalar_value(iq).l;
  }
 
- ptr = malloc(nSet*sizeof(int32_t));
+ ptr = (int32_t*) malloc(nSet*sizeof(int32_t));
  if (!ptr)
    return cerror(ALLOC_ERR, 0);
  for (i = 0; i < nSet; i++)
@@ -2467,7 +2475,7 @@ int32_t lux_match(int32_t narg, int32_t ps[])
 
  step = lux_type_size[maxType];
  while (nTarget--) {
-   p = bsearch(target.b, ptr, nSet, sizeof(int32_t), pcmp2);
+   p = (int32_t*) bsearch(target.b, ptr, nSet, sizeof(int32_t), pcmp2);
    *result.l++ = p? *p: -1;
    target.b += step;
  }
@@ -2486,7 +2494,7 @@ int32_t lux_not(int32_t narg, int32_t ps[])
  iq = ps[0];
  GET_NUMERICAL(arg, narg);
  type = sym[iq].type;
- switch (sym[iq].class)
+ switch (symbol_class(iq))
  { case LUX_ARRAY:  iq = array_clone(iq, LUX_INT8);  h = HEAD(iq);
                 result.l = LPTR(h);  break;
    case LUX_SCALAR: iq = scalar_scratch(LUX_INT8);
@@ -2517,11 +2525,12 @@ int32_t lux_table(int32_t narg, int32_t ps[])
      then the result gets dimensions [7,5,2]
 */
 {
- int32_t	symx, symy, symf, topType, nTable, nOut, nRepeat, ix, n1,
+ int32_t	symx, symy, symf, nTable, nOut, nRepeat, ix, n1,
 	symr, i, nsymx, nsymy, nsymf, nLoop, n2;
  array	*hx, *hy, *hf, *hMax, *hr;
  pointer	x, y, xf, r, ox, oy, of, nx, ny;
- scalar	grad;
+ Symboltype topType;
+ Scalar	grad;
  int32_t	lux_table2d(int32_t, int32_t []);
 
  if (narg == 4)
@@ -2563,7 +2572,7 @@ int32_t lux_table(int32_t narg, int32_t ps[])
    { GET_SIZE(nRepeat, (&hMax->dims[1]), hMax->ndim - 1); }
    else nRepeat = 1;
    GET_SIZE(nOut, hf->dims, hf->ndim);
-   nLoop = 1; }   
+   nLoop = 1; }
  else
  { for (i = 1; i < (int32_t) ((hMax->ndim > hf->ndim)? hf->ndim: hMax->ndim); i++)
      if (hMax->dims[i] != hf->dims[i])
@@ -2686,11 +2695,12 @@ int32_t lux_table2d(int32_t narg, int32_t ps[])
   LS 30aug93
 */
 {
- int32_t	symx, symy, symf, symi, topType, nTable, nIndex, nRepeat, ix,
+ int32_t	symx, symy, symf, symi, nTable, nIndex, nRepeat, ix,
 	symr, i, nsymx, nsymy, nsymf, nsymi, nx, ny, iTable;
  array	*hx, *hy, *hf, *hi;
  pointer	x, y, xf, xi, r, ox, oy, of, nf, oi, ni;
- scalar	grad, table;
+ Symboltype topType;
+ Scalar	grad, table;
 
  topType = LUX_FLOAT;
 		/* <x> and <y> must be arrays;
@@ -2733,7 +2743,7 @@ int32_t lux_table2d(int32_t narg, int32_t ps[])
    if (hx->ndim > 1)
    { GET_SIZE(nRepeat, (hx->dims + 1), hx->ndim - 1); }
  }
- if (sym[nsymf].class == LUX_ARRAY && sym[nsymi].class == LUX_ARRAY)
+ if (symbol_class(nsymf) == LUX_ARRAY && symbol_class(nsymi) == LUX_ARRAY)
  { hf = HEAD(nsymf);
    hi = HEAD(nsymi);
 	/* shared dimensions must be equal; single numbers are taken
@@ -2759,11 +2769,11 @@ int32_t lux_table2d(int32_t narg, int32_t ps[])
  }
  else
  { ix = 0;
-   if (sym[nsymf].class == LUX_ARRAY)
+   if (symbol_class(nsymf) == LUX_ARRAY)
    { hf = HEAD(nsymf);
      ix = symf;
      GET_SIZE(nIndex, hf->dims, hf->ndim); }
-   else if (sym[nsymi].class == LUX_ARRAY)
+   else if (symbol_class(nsymi) == LUX_ARRAY)
    { hi = HEAD(nsymi);
      ix = symi;
      GET_SIZE(nIndex, hi->dims, hi->ndim); }
@@ -2781,13 +2791,13 @@ int32_t lux_table2d(int32_t narg, int32_t ps[])
  nTable = hx->dims[0];		/* number of elements per table */
  ox.l = LPTR(hx);
  oy.l = LPTR(hy);
- if (sym[nsymf].class == LUX_ARRAY) 
+ if (symbol_class(nsymf) == LUX_ARRAY) 
  { of.l = xf.l = LPTR(hf);
    nf.b = of.b + sym[symf].spec.array.bstore - sizeof(array); }
  else
  { of.l = xf.l = &sym[nsymf].spec.scalar.l;
    nf.b = of.b + lux_type_size[topType]; }
- if (sym[nsymi].class == LUX_ARRAY)
+ if (symbol_class(nsymi) == LUX_ARRAY)
  { oi.l = xi.l = LPTR(hi);
    ni.b = oi.b + sym[symi].spec.array.bstore - sizeof(array); }
  else
@@ -3055,7 +3065,7 @@ int32_t lux_default(int32_t narg, int32_t ps[])
        iq = transfer_target(iq);
      n = lux_replace(*ps, ps[1]); }
    else
-     if (sym[iq].class == LUX_UNDEFINED
+     if (symbol_class(iq) == LUX_UNDEFINED
 	 && lux_replace(*ps, ps[1]) != 1)
        n = -1;
    ps += 2; }
@@ -3089,15 +3099,16 @@ int32_t local_maxormin(int32_t narg, int32_t ps[], int32_t code)
    position in !LASTMAX or !LASTMIN.   LS 9jun93 */
 /* added ghost-array support  LS 23jun93 */
 {
- int32_t		iq, *dims, ndim, type, n, i, currentIndex,
+ int32_t		iq, *dims, ndim, n, i, currentIndex,
 		comparisonIndex, nextIndex,
 		size[MAX_DIMS], typesize, max, indx[MAX_DIMS], j,
-		defaultOffset, *indexPtr, n2, trgttype, ntarget, nelem;
+		defaultOffset, *indexPtr, n2, ntarget, nelem;
+ Symboltype type, trgttype;
  extern int32_t	lastmaxloc, lastminloc, lastmin_sym, lastmax_sym;
- extern scalar	lastmax, lastmin;
+ extern Scalar	lastmax, lastmin;
  char		count[MAX_DIMS], *fname, filemap = 0, ready, edge;
  float		*grad, *grad2, *hessian, *hessian2, x, v;
- scalar		value, nextValue;
+ Scalar		value, nextValue;
  pointer	data, trgt, extr;
  FILE		*fp;
 
@@ -3114,7 +3125,7 @@ int32_t local_maxormin(int32_t narg, int32_t ps[], int32_t code)
      return cerror(ERR_OPEN, iq);
    }
  }
- data.l = array_data(iq);
+ data.l = (int32_t*) array_data(iq);
  dims = array_dims(iq);
  ndim = array_num_dims(iq);
  type = symbol_type(iq);
@@ -3131,7 +3142,7 @@ int32_t local_maxormin(int32_t narg, int32_t ps[], int32_t code)
      break;
    case LUX_ARRAY:
      ntarget = array_size(iq);
-     indexPtr = array_data(iq);
+     indexPtr = (int32_t*) array_data(iq);
      break;
    default:
      return cerror(ILL_CLASS, iq);
@@ -3159,14 +3170,14 @@ int32_t local_maxormin(int32_t narg, int32_t ps[], int32_t code)
      size[j++] = ndim;
    }
    iq = array_scratch(LUX_FLOAT, j, size);
-   trgt.l = array_data(iq);
+   trgt.l = (int32_t*) array_data(iq);
  } else {			/* not seeking subgrid position */
    if (symbol_class(iq) == LUX_SCALAR) {
      iq = scalar_scratch(trgttype);
      trgt.l = &scalar_value(iq).l;
    } else {			/* array */
      iq = array_clone(iq, trgttype);
-     trgt.l = array_data(iq);
+     trgt.l = (int32_t*) array_data(iq);
    }
  }
  defaultOffset = -1;
@@ -3915,7 +3926,8 @@ int32_t lux_zinv(int32_t narg, int32_t ps[])
    y = 1.0/x if x not equal to 0, y = 0 otherwise.
    LS 30aug93 */
 {
- int32_t	topType, result, iq, n;
+ int32_t	result, iq, n;
+ Symboltype topType;
  pointer	data, target;
  double	value;
 
@@ -3927,13 +3939,13 @@ int32_t lux_zinv(int32_t narg, int32_t ps[])
    topType = LUX_FLOAT;
  switch (symbol_class(iq)) {
    case LUX_ARRAY: case LUX_CARRAY:
-     data.l = array_data(iq);
+     data.l = (int32_t*) array_data(iq);
      if (isFreeTemp(iq)
 	 && lux_type_size[symbol_type(iq)] == lux_type_size[topType])
        result = iq;
      else
        result = array_clone(iq, topType);
-     target.l = array_data(result);
+     target.l = (int32_t*) array_data(result);
      n = array_size(iq);
      break;
    case LUX_SCALAR:
@@ -4017,131 +4029,6 @@ int32_t lux_zinv(int32_t narg, int32_t ps[])
  return result;
 }
 /*----------------------------------------------------------------------*/
-int32_t lux_find_maxloc_old(int32_t narg, int32_t ps[])
-/* Returns the indices of local maximums in a 2D image.
-   Must be maximums in 4 directions (N-S, E-W, NE-SW, NW-SE).
-   The edges are disregarded.
-   LS 18feb94 */
-{
- int32_t	nx, ny, row, column, result, indx, num = 0;
- pointer	data, data_start;
- scalar		this;
- array	*h;
- FILE	*fp;
-
- CK_ARR(*ps, 1);
- h = HEAD(*ps);
- if (h->ndim != 2) return cerror(NEED_2D_ARR, *ps);
- nx = h->dims[0];
- ny = h->dims[1];
- data_start.l = data.l = LPTR(h);
- if (!(fp = Tmpfile()))
- { puts("FIND_MAXLOC: could not open temporary file");
-   return -1; }
- switch (sym[*ps].type)
- { case LUX_INT8:
-     data.b += nx + 1;
-     row = ny - 2;
-     while (row--)
-     { column = nx - 2;
-       while (column--)
-       { if ((this.b = *data.b) >= data.b[-1] && this.b > data.b[1]
-           && this.b >= data.b[-nx] && this.b > data.b[nx]
-           && this.b >= data.b[-1-nx] && this.b > data.b[-1+nx]
-           && this.b >= data.b[1-nx] && this.b > data.b[1+nx])
-         { indx = data.b - data_start.b;
-           fwrite(&indx, sizeof(int32_t), 1, fp);  num++; }
-         data.b++; }
-       data.b += 2; }
-     break;
-   case LUX_INT16:
-     data.w += nx + 1;
-     row = ny - 2;
-     while (row--)
-     { column = nx - 2;
-       while (column--)
-       { if ((this.w = *data.w) >= data.w[-1] && this.w > data.w[1]
-           && this.w >= data.w[-nx] && this.w > data.w[nx]
-           && this.w >= data.w[-1-nx] && this.w > data.w[-1+nx]
-           && this.w >= data.w[1-nx] && this.w > data.w[1+nx])
-         { indx = data.w - data_start.w;
-           fwrite(&indx, sizeof(int32_t), 1, fp);  num++; }
-         data.w++; }
-       data.w += 2; }
-     break;
-   case LUX_INT32:
-     data.l += nx + 1;
-     row = ny - 2;
-     while (row--)
-     { column = nx - 2;
-       while (column--)
-       { if ((this.l = *data.l) >= data.l[-1] && this.l > data.l[1]
-           && this.l >= data.l[-nx] && this.l > data.l[nx]
-           && this.l >= data.l[-1-nx] && this.l > data.l[-1+nx]
-           && this.l >= data.l[1-nx] && this.l > data.l[1+nx])
-         { indx = data.l - data_start.l;
-           fwrite(&indx, sizeof(int32_t), 1, fp);  num++; }
-         data.l++; }
-       data.l += 2; }
-     break;
-   case LUX_INT64:
-     data.q += nx + 1;
-     row = ny - 2;
-     while (row--)
-     { column = nx - 2;
-       while (column--)
-       { if ((this.q = *data.q) >= data.q[-1] && this.q > data.q[1]
-           && this.q >= data.q[-nx] && this.q > data.q[nx]
-           && this.q >= data.q[-1-nx] && this.q > data.q[-1+nx]
-           && this.q >= data.q[1-nx] && this.q > data.q[1+nx])
-         { indx = data.q - data_start.q;
-           fwrite(&indx, sizeof(int32_t), 1, fp);  num++; }
-         data.q++; }
-       data.q += 2; }
-     break;
-   case LUX_FLOAT:
-     data.f += nx + 1;
-     row = ny - 2;
-     while (row--)
-     { column = nx - 2;
-       while (column--)
-       { if ((this.f = *data.f) >= data.f[-1] && this.f > data.f[1]
-           && this.f >= data.f[-nx] && this.f > data.f[nx]
-           && this.f >= data.f[-1-nx] && this.f > data.f[-1+nx]
-           && this.f >= data.f[1-nx] && this.f > data.f[1+nx])
-         { indx = data.f - data_start.f;
-           fwrite(&indx, sizeof(int32_t), 1, fp);  num++; }
-         data.f++; }
-       data.f += 2; }
-     break;
-   case LUX_DOUBLE:
-     data.d += nx + 1;
-     row = ny - 2;
-     while (row--)
-     { column = nx - 2;
-       while (column--)
-       { if ((this.d = *data.d) >= data.d[-1] && this.d > data.d[1]
-           && this.d >= data.d[-nx] && this.d > data.d[nx]
-           && this.d >= data.d[-1-nx] && this.d > data.d[-1+nx]
-           && this.d >= data.d[1-nx] && this.d > data.d[1+nx])
-         { indx = data.d - data_start.d;
-           fwrite(&indx, sizeof(int32_t), 1, fp);  num++; }
-         data.d++; }
-       data.d += 2; }
-     break;
- }
- if (num)			/* found at least one maximum */
- { result = array_scratch(LUX_INT32, 1, &num);
-   data.l = LPTR(HEAD(result));
-   rewind(fp);
-   if (num != fread(data.l, sizeof(int32_t), num, fp))
-   { puts("FIND_MAXLOC: some numbers got lost"); fclose(fp); return -1; }
- }
- else result = LUX_MINUS_ONE;	/* none found */
- fclose(fp);
- return result;
-}
-/*----------------------------------------------------------------------*/
 int32_t lux_bsmooth(int32_t narg, int32_t ps[])
 /* binary smooth.  Smooths an array by repeatedly applying two-element */
 /* (binary) averaging along dimension AXIS.  The number of repeats is */
@@ -4153,8 +4040,9 @@ int32_t lux_bsmooth(int32_t narg, int32_t ps[])
 /* division by 2 with a shift operation may speed things up for integer */
 /* data. */
 {
-  int32_t	iq, axis, outtype, type, result_sym, *dims, ndim, xdims[MAX_DIMS],
+  int32_t	iq, axis, result_sym, *dims, ndim, xdims[MAX_DIMS],
 	width, i, n, tally[MAX_DIMS], step[MAX_DIMS], m, done, j, k, stride;
+  Symboltype outtype, type;
   pointer	src, trgt, src0, trgt0;
   float	fwidth;
 
@@ -4182,7 +4070,7 @@ int32_t lux_bsmooth(int32_t narg, int32_t ps[])
       return iq;
     case LUX_ARRAY:
       outtype = type = array_type(iq);
-      if (type < LUX_FLOAT) 
+      if (type < LUX_FLOAT)
       { outtype = LUX_FLOAT;
 	iq = lux_float(1, &iq); } /*float the input */
       src0.l = (int32_t *) array_data(iq);

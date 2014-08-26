@@ -28,12 +28,14 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <math.h>
 #include <limits.h>
 #include <float.h>
-#include "action.h"
+#include "action.hh"
 #include <unistd.h>		/* for sbrk() */
 
-int32_t	minmax(int32_t *, int32_t, int32_t), lux_convert(int32_t, int32_t [], int32_t, int32_t),
-  copySym(int32_t), f_decomp(float *, int32_t, int32_t), copyToSym(int32_t, int32_t),
-  f_solve(float *, float *, int32_t, int32_t), to_scratch_array(int32_t, int32_t, int32_t, int32_t *);
+int32_t	minmax(int32_t *, int32_t, int32_t),
+  lux_convert(int32_t, int32_t [], Symboltype, int32_t),
+  copySym(int32_t), f_decomp(float *, int32_t, int32_t),
+  copyToSym(int32_t, int32_t),
+  f_solve(float *, float *, int32_t, int32_t);
 /*---------------------------------------------------------*/
 int32_t lux_noop(int32_t narg, int32_t ps[])
      /* no operation - a dummy routine that provides an entry point
@@ -55,8 +57,8 @@ int32_t lux_zap(int32_t narg, int32_t ps[])
     return luxerror("ZAP only allowed from main execution level!", 0);
   while (narg--) {
     if ((internalMode & 1) == 0
-	|| (sym[*ps].class != LUX_POINTER
-	    && sym[*ps].class != LUX_TRANSFER))
+	|| (symbol_class(*ps) != LUX_POINTER
+	    && symbol_class(*ps) != LUX_TRANSFER))
       iq = eval(*ps++);
     else
       iq = *ps++;
@@ -132,7 +134,7 @@ int32_t lux_psum(int32_t narg, int32_t ps[])
 	in[MAX_DIMS], *index, nIndex, offset;
   double	value, factor, weight, bigweight, *bigweights;
   char	haveClass = '\0';
-  extern scalar	lastmin, lastmax;
+  extern Scalar	lastmin, lastmax;
 
   iq = lux_long(1, &ps[1]);	/* integer exponents only */
   switch (symbol_class(iq)) {	/* POWERS */
@@ -209,7 +211,7 @@ int32_t lux_psum(int32_t narg, int32_t ps[])
     if (narg > 3) {		/* CLASS */
       iq = lux_long(1, &ps[3]);	/* integer classes */
       haveClass = 1;
-      index = array_data(iq);
+      index = (int32_t*) array_data(iq);
       nIndex = array_size(iq);
       if (nIndex != size)
 	return cerror(INCMP_ARR, ps[3]);
@@ -219,7 +221,7 @@ int32_t lux_psum(int32_t narg, int32_t ps[])
       if (lastmin.l < 0)
 	size += (offset = -lastmin.l);
       result_sym = array_scratch(LUX_DOUBLE, 1, &size);
-      trgt.l = array_data(result_sym);
+      trgt.l = (int32_t*) array_data(result_sym);
       zerobytes(trgt.b, size*sizeof(double));
       allocate(bigweights, size, double);
       zerobytes(bigweights, size*sizeof(double));
@@ -241,7 +243,7 @@ int32_t lux_psum(int32_t narg, int32_t ps[])
       result_sym = array_scratch(LUX_DOUBLE, 1, &n);
       array_num_dims(result_sym) = ndim - naxes;
       memcpy(array_dims(result_sym), outdims, (ndim - naxes)*sizeof(int32_t));
-      trgt.l = array_data(result_sym);
+      trgt.l = (int32_t*) array_data(result_sym);
     }
   }
 
@@ -361,7 +363,7 @@ int32_t multiCompare(const void *arg1, const void *arg2)
 /* comparison function for use with lux_tolookup.  LS 9nov95 */
 {
   int32_t	i1, i2, i;
-  scalar	d;
+  Scalar	d;
 
   i1 = *(int32_t *) arg1;
   i2 = *(int32_t *) arg2;
@@ -484,7 +486,7 @@ int32_t mcmp(const void *x1, const void *x2)
 /* auxilliary for lux_medianfilter */
 {
   extern pointer	src;
-  scalar	d1, d2;
+  Scalar	d1, d2;
 
   switch (type)
   { case LUX_INT8:
@@ -572,12 +574,12 @@ int32_t lux_orderfilter(int32_t narg, int32_t ps[])
   } else
     order = -1;			/* flag that we didn't have one */
 
-  if (standardLoop(ps[1], (narg == 4)? ps[2]: 0, 
+  if (standardLoop(ps[1], (narg == 4)? ps[2]: 0,
 		   (narg != 4? SL_ALLAXES: 0) | SL_UNIQUEAXES
-		   | SL_AXESBLOCK | SL_KEEPTYPE, 0,
+		   | SL_AXESBLOCK | SL_KEEPTYPE, LUX_INT8,
 		   &srcinfo, &src, &output, &trgtinfo, &trgt) == LUX_ERROR)
     return LUX_ERROR;
-  
+
   /* we calculate the number of elements that go into each sorting */
   nelem = 1;
   for (i = 0; i < srcinfo.naxes; i++)
@@ -627,8 +629,8 @@ int32_t lux_orderfilter(int32_t narg, int32_t ps[])
   setupDimensionLoop(&tmpinfo, srcinfo.naxes, range, LUX_INT32, srcinfo.naxes,
 		     NULL, &tmpsrc, SL_EACHCOORD);
 
-  index = malloc(nelem*sizeof(int32_t));
-  offset = malloc(nelem*sizeof(int32_t));
+  index = (int32_t*) malloc(nelem*sizeof(int32_t));
+  offset = (int32_t*) malloc(nelem*sizeof(int32_t));
   if (!index || !offset)
     return cerror(ALLOC_ERR, 0);
 
@@ -718,10 +720,10 @@ int32_t lux_quantile(int32_t narg, int32_t ps[])
 
   if (standardLoop(ps[1], (narg > 2)? ps[2]: 0,
 		   (narg <= 2? SL_ALLAXES: 0) | SL_UNIQUEAXES | SL_AXESBLOCK
-		   | SL_KEEPTYPE | SL_COMPRESSALL,
-		   0, &srcinfo, &src, &output, &trgtinfo, &trgt) == LUX_ERROR)
+		   | SL_KEEPTYPE | SL_COMPRESSALL, LUX_INT8, &srcinfo,
+                   &src, &output, &trgtinfo, &trgt) == LUX_ERROR)
     return LUX_ERROR;
-  
+
   /* we calculate the number of elements that go into each sorting */
   nelem = 1;
   for (i = 0; i < srcinfo.naxes; i++)
@@ -746,7 +748,7 @@ int32_t lux_quantile(int32_t narg, int32_t ps[])
 
   type = srcinfo.type;		/* so mcmp() knows what type it is */
 
-  tmp0.b = malloc(nelem*srcinfo.stride);
+  tmp0.b = (uint8_t*) malloc(nelem*srcinfo.stride);
   if (!tmp0.b)
     return cerror(ALLOC_ERR, 0);
 
@@ -815,11 +817,11 @@ int32_t lux_minfilter(int32_t narg, int32_t ps[])
 /* syntax:  Y = MINFILTER(X [[,AXIS], WIDTH]) */
 /* LS 31dec95 30jul97 */
 {
-  uint8_t	type;
+  Symboltype	type;
   int32_t	n, result, i, offset1, offset2, stride,	w1, j, ww, loop, iq, three=3,
     nWidth;
   pointer	src, trgt, width;
-  scalar	value;
+  Scalar	value;
   loopInfo	srcinfo, trgtinfo;
 
   if (standardLoop(ps[0], narg > 2? ps[1]: 0,
@@ -1089,8 +1091,8 @@ int32_t lux_minfilter(int32_t narg, int32_t ps[])
 	iq = result;
 	result = array_clone(iq, type);
       }
-      src.b = array_data(iq);
-      trgt.b = array_data(result);
+      src.b = (uint8_t*) array_data(iq);
+      trgt.b = (uint8_t*) array_data(result);
     }
   }
   return result;
@@ -1102,11 +1104,11 @@ int32_t lux_maxfilter(int32_t narg, int32_t ps[])
 /* syntax:  Y = MAXFILTER(X [[,AXIS], WIDTH]) */
 /* LS 31dec95 30jul97 */
 {
-  uint8_t	type;
-  int32_t	n, result, i, offset1, offset2, stride,	w1, j, ww, loop, iq, three=3,
-    nWidth;
+  Symboltype	type;
+  int32_t n, result, i, offset1, offset2, stride, w1, j, ww, loop,
+    iq, three=3, nWidth;
   pointer	src, trgt, width;
-  scalar	value;
+  Scalar	value;
   loopInfo	srcinfo, trgtinfo;
 
   if (standardLoop(ps[0], narg > 2? ps[1]: 0,
@@ -1376,8 +1378,8 @@ int32_t lux_maxfilter(int32_t narg, int32_t ps[])
 	iq = result;
 	result = array_clone(iq, type);
       }
-      src.b = array_data(iq);
-      trgt.b = array_data(result);
+      src.b = (uint8_t*) array_data(iq);
+      trgt.b = (uint8_t*) array_data(result);
     }
   }
   return result;
@@ -1484,7 +1486,7 @@ int32_t lux_multisieve(int32_t narg, int32_t ps[])
     for all j
     LS 14apr97 - 15apr97 */
 {
-  uint8_t	maxType;
+  Symboltype	maxType;
   pointer	xData, yData;
   int32_t	nx, ny, *listData, *indexData,
     n, *temp, nTemp, iq, nnTemp, noMatch, ix, i, match, *base, step,
@@ -1516,7 +1518,7 @@ int32_t lux_multisieve(int32_t narg, int32_t ps[])
   n = ny + 1;
   if (redef_array(ps[3], LUX_INT32, 1, &n) < 0) /* <indices> */
     return -1;
-  indexData = array_data(ps[3]);
+  indexData = (int32_t*) array_data(ps[3]);
   indexData[0] = 0;
   indexData++;
   zerobytes((char *) indexData, ny*sizeof(int32_t));
@@ -1617,7 +1619,7 @@ int32_t lux_multisieve(int32_t narg, int32_t ps[])
       ix++; }
     if (ix != nx)		/* more to do */
     { nTemp += 1000;
-      reallocbase = Realloc(base, nTemp*sizeof(int32_t));
+      reallocbase = (int32_t*) Realloc(base, nTemp*sizeof(int32_t));
       if (reallocbase == NULL)
       { free(base);
 	return cerror(ALLOC_ERR, 0); }
@@ -1634,8 +1636,8 @@ int32_t lux_multisieve(int32_t narg, int32_t ps[])
   else
   { if (redef_array(ps[2], LUX_INT32, 1, &nMatch) < 0) /* <list> */
       return -1;		/* some error */
-    listData = array_data(ps[2]);
-  
+    listData = (int32_t*) array_data(ps[2]);
+
     temp = indexData;
     n = 0;
     for (i = 0; i < ny; i++) {
@@ -1643,8 +1645,8 @@ int32_t lux_multisieve(int32_t narg, int32_t ps[])
       indexData[i] = n;
     }
     ix = indexData[ny - 1];
-    
-    number = Malloc(ny*sizeof(int32_t));
+
+    number = (int32_t*) Malloc(ny*sizeof(int32_t));
     if (!number) {
       free(base);
       return cerror(ALLOC_ERR, 0);
@@ -1712,7 +1714,7 @@ int32_t shift(int32_t narg, int32_t ps[], int32_t isFunction)
     /* create <dist> = DIMEN(<x>)/2 */
     iq = array_num_dims(ps[0]);
     distSym = array_scratch(LUX_INT32, 1, &iq);
-    ptr = array_data(distSym);
+    ptr = (int32_t*) array_data(distSym);
     memcpy(ptr, array_dims(ps[0]), iq*sizeof(int32_t));
     for (i = 0; i < iq; i++) {
       *ptr = *ptr/2;
@@ -1773,7 +1775,7 @@ int32_t shift(int32_t narg, int32_t ps[], int32_t isFunction)
       step = srcinfo.step[0]*srcinfo.stride;
       src = src0;
       trgt = trgt0;
-      tmp0 = realloc(tmp0, srcinfo.rdims[0]*srcinfo.stride);
+      tmp0 = (char*) realloc(tmp0, srcinfo.rdims[0]*srcinfo.stride);
       if (!tmp0)
 	return cerror(ALLOC_ERR, 0);
       if (i > 0)
@@ -1826,7 +1828,7 @@ int32_t shift(int32_t narg, int32_t ps[], int32_t isFunction)
       step = srcinfo.step[0]*srcinfo.stride;
       src = src0;
       trgt = trgt0;
-      tmp0 = realloc(tmp0, srcinfo.rdims[0]*srcinfo.stride);
+      tmp0 = (char*) realloc(tmp0, srcinfo.rdims[0]*srcinfo.stride);
       if (!tmp0)
 	return cerror(ALLOC_ERR, 0);
       do {
@@ -1886,7 +1888,7 @@ int32_t lux_swaphalf(int32_t narg, int32_t ps[])
   int32_t	i, dims[MAX_DIMS], ndim, tally[MAX_DIMS], step[MAX_DIMS],
 	n, width, jump;
   char	*src;
-  scalar	temp;
+  Scalar	temp;
 
   if (symbol_class(*ps) != LUX_ARRAY)
     return cerror(NEED_ARR, *ps);
@@ -1936,7 +1938,7 @@ int32_t lux_equivalence(int32_t narg, int32_t ps[])
 /* element of <x1> and <x2> that is in the same class as elements <x(i)> */
 /* and <y(i)>.  LS 30jul97 */
 {
-  int32_t	result, n, *x1, *x2, *class, *trgt, mx, mn, nClass, i, a1, a2;
+  int32_t	result, n, *x1, *x2, *class_id, *trgt, mx, mn, nClass, i, a1, a2;
 
   if (symbol_class(ps[0]) != LUX_ARRAY)
     return cerror(ILL_CLASS, ps[0]);
@@ -1961,30 +1963,30 @@ int32_t lux_equivalence(int32_t narg, int32_t ps[])
     else if (x2[i] > mx)
       mx = x2[i]; }
   nClass = mx - mn + 1;
-  class = (int32_t *) Malloc(nClass*sizeof(int32_t));
-  if (!class)
+  class_id = (int32_t *) Malloc(nClass*sizeof(int32_t));
+  if (!class_id)
     return cerror(ALLOC_ERR, 0);
   for (i = 0; i < nClass; i++)
-    class[i] = i;
+    class_id[i] = i;
   for (i = 0; i < n; i++)
   { a1 = x1[i] - mn;
     a2 = x2[i] - mn;
-    while (class[a1] != a1)	/* find most remote "ancestor" */
-      a1 = class[a1];
-    while (class[a2] != a2)
-      a2 = class[a2];
+    while (class_id[a1] != a1)	/* find most remote "ancestor" */
+      a1 = class_id[a1];
+    while (class_id[a2] != a2)
+      a2 = class_id[a2];
     if (a1 < a2)		/* reclassify */
-      class[a2] = a1;
+      class_id[a2] = a1;
     else
-      class[a1] = a2; }
+      class_id[a1] = a2; }
   for (i = 0; i < nClass; i++)
-  { a1 = class[i];
-    while (class[a1] != a1)
-      a1 = class[a1];
-    class[i] = a1; }
+  { a1 = class_id[i];
+    while (class_id[a1] != a1)
+      a1 = class_id[a1];
+    class_id[i] = a1; }
   for (i = 0; i < n; i++)
-    *trgt++ = class[x1[i] - mn] + mn;
-  free(class);
+    *trgt++ = class_id[x1[i] - mn] + mn;
+  free(class_id);
   return result;
 }
 /*---------------------------------------------------------*/
@@ -2555,7 +2557,7 @@ int32_t lux_replace_values(int32_t narg, int32_t ps[])
 {
   int32_t	nData, nSrc, nTrgt, type, low, mid, high, ps1, ps2;
   pointer	data, src, trgt;
-  scalar	v;
+  Scalar	v;
 
   ps1 = (symbol_type(ps[1]) == symbol_type(ps[0]))? ps[1]:
     lux_converts[symbol_type(ps[0])](1, &ps[1]);
@@ -2767,11 +2769,12 @@ Theory:
    where W is C^-1, C is the covariance matrix of <y>.
    */
 {
-  int32_t	sx, sy, sw, *dims, ndim, nPar, i, nData, type, result, j, k, dw,
+  int32_t	sx, sy, sw, *dims, ndim, nPar, i, nData, result, j, k, dw,
     newDims[MAX_DIMS];
+  Symboltype type;
   float	onef = 1.0;
   double	oned = 1.0, errv, f, chi2;
-  scalar	value;
+  Scalar	value;
   pointer	px, py, pl, pr, p1, p2, pw, pc, err, chisq;
   int32_t	f_decomp(float *, int32_t, int32_t), d_decomp(double *, int32_t, int32_t),
     f_solve(float *, float *, int32_t, int32_t),
@@ -2846,7 +2849,7 @@ Theory:
 	sw = lux_double(1, &sw);
       break;
   }
-  
+
   if (!dw) 			/* no <w>: default weights equal to 1 */
     switch (type) {
       case LUX_FLOAT:
@@ -3094,11 +3097,12 @@ Theory:
 
 /* LSQ2(x, y [, axis, w]) */
 {
-  int32_t	i, j, k, nPar, nData, type, result, dims[MAX_DIMS], ndim, dw, ncc,
+  int32_t	i, j, k, nPar, nData, result, dims[MAX_DIMS], ndim, dw, ncc,
     axisSym, nRepeat, stride, bigstride, ysym, nkernel, n, i1, i2, cc, dk;
+  Symboltype type;
   float	onef = 1.0;
   double oned = 1.0, chi2, f, errv, fwhm, norm;
-  scalar	value;
+  Scalar	value;
   pointer	px, py, pl, pr, p2, pw, pc, err, chisq, pk;
   loopInfo	xinfo, yinfo, p2info, winfo;
 
@@ -3223,7 +3227,7 @@ Theory:
 	}
 	break;
     }
-    pc.f = array_data(*ps);
+    pc.f = (float*) array_data(*ps);
   } else
     pc.f = NULL;		/* no covariance return */
 
@@ -3239,7 +3243,7 @@ Theory:
       memcpy(dims, yinfo.rdims + k, ndim*sizeof(int32_t));
       if (to_scratch_array(*ps, type, ndim, dims) == LUX_ERROR)
 	return LUX_ERROR;
-      err.b = array_data(*ps);
+      err.b = (uint8_t*) array_data(*ps);
     }
   } else
     err.f = NULL;		/* no residual error return */
@@ -3256,11 +3260,11 @@ Theory:
       memcpy(dims, yinfo.rdims + k, ndim*sizeof(int32_t));
       if (to_scratch_array(*ps, type, ndim, dims) == LUX_ERROR)
 	return LUX_ERROR;
-      chisq.b = array_data(*ps);
+      chisq.b = (uint8_t*) array_data(*ps);
     }
   } else
     chisq.f = NULL;		/* no residual error return */
-    
+
   /* prepare the return symbol */
   dims[0] = nPar;
   memcpy(dims + 1, yinfo.rdims + k,
@@ -3269,17 +3273,17 @@ Theory:
   result = array_scratch(type, ndim, dims);
   if (result == LUX_ERROR)
     return LUX_ERROR;
-  pr.f = array_data(result);
+  pr.f = (float*) array_data(result);
 
   /* prepare some scratch space */
-  pl.f = malloc(nPar*nPar*lux_type_size[type]);
+  pl.f = (float*) malloc(nPar*nPar*lux_type_size[type]);
   if (!pl.f)
     return cerror(ALLOC_ERR, 0);
 
   /* prepare smoothing kernel */
   if (fwhm) {
     nkernel = MAX(MIN(2*fwhm, nData), nPar);
-    pk.f = malloc((2*nkernel + 1)*lux_type_size[type]);
+    pk.f = (float*) malloc((2*nkernel + 1)*lux_type_size[type]);
     errv = 0.600561204/fwhm;
     f = -nkernel*errv;
     for (i = 0; i < 2*nkernel + 1; i++) {
@@ -3456,7 +3460,7 @@ int32_t lux_runprod(int32_t narg, int32_t ps[])
 /* along the indicated <axis>.  LS 13jul98 */
 {
   int32_t	n, result;
-  scalar	value;
+  Scalar	value;
   pointer	src, trgt;
   loopInfo	srcinfo, trgtinfo;
 

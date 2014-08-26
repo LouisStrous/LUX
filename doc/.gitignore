@@ -11,10 +11,9 @@
 *.toc
 *.tp
 *.vr
-Doxyfile
-doxy
 doxyfile.stamp
 latex
+lux.doxy
 lux.html
 lux.t2p
 mdate-sh

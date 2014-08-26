@@ -24,7 +24,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
     constants. */
 
 #ifndef MAX_DIMS
-#include "install.h"
+#include "install.hh"
 #endif
 
 #include <gsl/gsl_spline.h>
@@ -409,7 +409,7 @@ typedef union {
   double d;
   char *s;
   char **sp;
-} scalar;
+} Scalar;
 
 /* wideScalar is equal to scalar plus the complex data types; we have */
 /* separate scalar and wideScalars because wideScalar is wider, which is */
@@ -442,12 +442,12 @@ typedef union pointerUnion {
 } pointer;
 
 typedef struct {
-  char *key;
+  char const* key;
  int16_t value;
 } listElem;
 
 typedef struct {
-  char *key; int32_t value;
+  char const* key; int32_t value;
 } enumElem;
 
 typedef struct {
@@ -575,9 +575,14 @@ typedef struct {
 } preExtract;
 
 typedef struct symTableEntryStruct {
- uint8_t class; uint8_t type; int16_t xx; int32_t line; int16_t context; int32_t exec;
+  Symbolclass sclass;
+  Symboltype type;
+  int16_t xx;
+  int32_t line;
+  int16_t context;
+  int32_t exec;
   union specUnion
-  { scalar scalar;
+  { Scalar scalar;
     struct { array      *ptr; int32_t bstore; } array;
     struct { int16_t       *ptr; int32_t bstore; } wlist;
     struct { uint16_t      *ptr; int32_t bstore; } uwlist;
@@ -589,7 +594,7 @@ typedef struct symTableEntryStruct {
     struct { preExtract *ptr; int32_t bstore; } preExtract;
     struct { void       *ptr; int32_t bstore; } general;
     struct { structPtr  *ptr; int32_t bstore; } structPtr;
-    pointer     pointer;
+    pointer     dpointer;
     struct { int16_t args[4]; } evb;
     struct { uint16_t args[4]; } uevb;
     struct { uint8_t narg; char **keys; uint8_t extend; uint16_t nstmnt;
@@ -598,11 +603,15 @@ typedef struct symTableEntryStruct {
 } symTableEntry;
 
 typedef struct hashTableEntryStruct {
-  char *name; int32_t symNum; struct hashTableEntryStruct *next;
+  char const* name; int32_t symNum; struct hashTableEntryStruct *next;
 } hashTableEntry;
 
 typedef struct internalRoutineStruct {
-  char *name; int16_t minArg; int16_t maxArg; int32_t (*ptr)(int32_t, int32_t []); void *keys;
+  char const* name;
+  int16_t minArg;
+  int16_t maxArg;
+  int32_t (*ptr)(int32_t, int32_t []);
+  char const* keys;
 } internalRoutine;
 
 typedef struct {
@@ -721,9 +730,9 @@ typedef struct {
 int32_t     nextFreeTempVariable(void), nextFreeNamedVariable(void),
         nextFreeExecutable(void), nextFreeTempExecutable(void),
         dereferenceScalPointer(int32_t), findSym(int32_t, hashTableEntry *[], int32_t),
-        findInternalName(char *, int32_t), luxerror(char *, int32_t, ...),
-        lookForName(char *, hashTableEntry *[], int32_t), execute(int32_t);
-char    *symName(int32_t, hashTableEntry *[]);
+        findInternalName(char const *, int32_t), luxerror(char const *, int32_t, ...),
+        lookForName(char const *, hashTableEntry *[], int32_t), execute(int32_t);
+char const* symName(int32_t, hashTableEntry *[]);
 
 #define getFreeTempVariable(a)\
         { if ((a = nextFreeTempVariable()) < 0) return a; }
@@ -735,13 +744,13 @@ char    *symName(int32_t, hashTableEntry *[]);
         { if ((a = nextFreeTempExecutable()) < 0) return a; }
 #define isTemp(a)       (a >= TEMPS_START && a < TEMPS_END)
 #define isFreeTemp(a)   (isTemp(a) && symbol_context(a) == -compileLevel)
-#define scalPointer(a)  { if (sym[a].class == LUX_SCAL_PTR)\
+#define scalPointer(a)  { if (symbol_class(a) == LUX_SCAL_PTR)\
                           a = dereferenceScalPointer(a); }
 #define findVar(index, context) findSym(index, varHashTable, context)
 #define findSubr(index)         findSym(index, subrHashTable, 0)
 #define findFunc(index)         findSym(index, funcHashTable, 0)
 #define findBlock(index)        findSym(index, blockHashTable, 0)
-extern char *symbolStack[];
+extern char const* symbolStack[];
 #define findInternalSym(index, a) findInternalName(symbolStack[index], a)
 #define findInternalSubr(index) findInternalSym(index, 1)
 #define findInternalFunc(index) findInternalSym(index, 0)
@@ -775,7 +784,7 @@ extern char *symbolStack[];
 #define ABS(A)                  (((A) >= 0)? (A): -(A))
 #define HEAD(SYM)               ((array *) sym[SYM].spec.array.ptr)
 #define LPTR(HEAD)              ((int32_t *)((char *) HEAD + sizeof(array)))
-#define CK_ARR(SYM, ARGN)       if (sym[SYM].class != LUX_ARRAY)\
+#define CK_ARR(SYM, ARGN)       if (symbol_class(SYM) != LUX_ARRAY)\
                                 return cerror(NEED_ARR, SYM)
 #define CK_SGN(ARR, N, ARGN, SYM)\
         for (i = 0; i < N; i++) \
@@ -790,12 +799,12 @@ extern char *symbolStack[];
 
 #define allocate(arg, size, type)\
    if (!(size)) arg = NULL; \
-   else { if (!(arg = (void *) malloc((size)*sizeof(type))))\
+   else { if (!(arg = (type *) malloc((size)*sizeof(type))))\
    return luxerror("Memory allocation error\n", 0); }
 #define eallocate(arg, size, type)\
  (size? ((arg = (type *) Malloc((size)*sizeof(type)))? 1: 0): (arg = NULL, 0))
 #define GET_NUMERICAL(PTR, SIZE) \
-  switch (sym[iq].class) \
+  switch (symbol_class(iq)) \
   { case LUX_SCALAR:    PTR.l = &sym[iq].spec.scalar.l;  SIZE = 1;  break;  \
     case LUX_ARRAY:     h = HEAD(iq);  PTR.l = LPTR(h);  GET_SIZE(SIZE, h->dims, h->ndim);  \
       break; \
@@ -834,10 +843,10 @@ extern char *symbolStack[];
    case LUX_FLOAT:  first .f second .f third .b fourth .b fifth ; break; \
    case LUX_DOUBLE: first .d second .d third .b fourth .b fifth ; break; }
 
-#include "output.h"
+#include "output.hh"
 
 #ifndef transfer_target
-#include "symbols.h"
+#include "symbols.hh"
 #endif
 
 #endif

@@ -23,8 +23,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <stddef.h>
 #include <stdio.h>
 /* END HEADERS */
-#include "debugmalloc.h"
-#include "luxMap.h"
+#include "debugmalloc.hh"
+#include "luxMap.hh"
 
 static void *my_malloc_hook(size_t, const void *);
 static void my_free_hook(void *, const void *);

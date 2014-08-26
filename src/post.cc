@@ -26,7 +26,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
-#include "action.h"
+#include "action.hh"
 
 #if DEBUG
 #define _Xdebug			/* to get synchronous X error messages */

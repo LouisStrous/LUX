@@ -29,9 +29,9 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <time.h>
 #include <math.h>
 #include <ctype.h>
-#include "editor.h"
-#include "install.h"
-#include "action.h"
+#include "editor.hh"
+#include "install.hh"
+#include "action.hh"
 
 extern int32_t	nFixed, traceMode;
 
@@ -41,11 +41,12 @@ int32_t	nExecuted = 0, executeLevel = 0, fileLevel = 0,
 	returnSym, noTrace = 0, curRoutineNum = 0;
 char	preserveKey;
 
-char	*currentRoutineName = NULL;
+char const* currentRoutineName = NULL;
 
-int32_t	lux_convert(int32_t, int32_t *, int32_t, int32_t), convertScalar(scalar *, int32_t, int32_t),
+int32_t	lux_convert(int32_t, int32_t *, Symboltype, int32_t),
+  convertScalar(Scalar *, int32_t, Symboltype),
 	dereferenceScalPointer(int32_t), eval(int32_t),
-	nextCompileLevel(FILE *, char *);
+	nextCompileLevel(FILE *, char const *);
 void	zap(int32_t symbol), updateIndices(void);
 void pushExecutionLevel(int32_t line, int32_t target);
 void popExecutionLevel(void);
@@ -128,7 +129,7 @@ int32_t copyToSym(int32_t target, int32_t source)
 	strcpy(string_value(target), scal_ptr_pointer(source).s);
       } else {			/* numerical */
 	memcpy(&scalar_value(target), scal_ptr_pointer(source).b,
-	       sizeof(scalar));
+	       sizeof(Scalar));
 	symbol_class(target) = LUX_SCALAR;
       }
       break;
@@ -225,7 +226,7 @@ int32_t copyToSym(int32_t target, int32_t source)
       break;
     case LUX_CSCALAR: case LUX_CARRAY: /* complex scalar or array */
       size = symbol_memory(source);
-      complex_scalar_data(target).f = malloc(size);
+      complex_scalar_data(target).f = (float*) malloc(size);
       if (!complex_scalar_data(target).f)
 	return cerror(ALLOC_ERR, target);
       symbol_memory(target) = size;
@@ -235,7 +236,7 @@ int32_t copyToSym(int32_t target, int32_t source)
     case LUX_EXTRACT:
       extract_target(target) = extract_target(source);
       symbol_memory(target) = symbol_memory(source);
-      etrgt = malloc(symbol_memory(target));
+      etrgt = (extractSec*) malloc(symbol_memory(target));
       if (!etrgt)
 	return cerror(ALLOC_ERR, target);
       extract_ptr(target) = etrgt;
@@ -246,7 +247,7 @@ int32_t copyToSym(int32_t target, int32_t source)
 	etrgt->number = esrc->number;
 	switch (esrc->type) {
 	  case LUX_RANGE:
-	    etrgt->ptr.w = malloc(esrc->number*sizeof(int16_t));
+	    etrgt->ptr.w = (int16_t*) malloc(esrc->number*sizeof(int16_t));
 	    i = esrc->number;
 	    while (i--) {
 	      *etrgt->ptr.w = copySym(*esrc->ptr.w);
@@ -256,7 +257,7 @@ int32_t copyToSym(int32_t target, int32_t source)
 	    }
 	    break;
 	  case LUX_LIST:
-	    etrgt->ptr.sp = malloc(esrc->number*sizeof(char *));
+	    etrgt->ptr.sp = (char**) malloc(esrc->number*sizeof(char *));
 	    i = esrc->number;
 	    while (i--) {
 	      *etrgt->ptr.sp = strsave(*esrc->ptr.sp);
@@ -271,7 +272,7 @@ int32_t copyToSym(int32_t target, int32_t source)
       break;
     case LUX_TRANSFER:
       transfer_target(target) = transfer_target(source);
-      transfer_is_parameter(target) = 0;
+      transfer_is_parameter(target) = (Symboltype) 0;
       transfer_temp_param(target) = 0;
       break;
     case LUX_FUNC_PTR:
@@ -282,7 +283,7 @@ int32_t copyToSym(int32_t target, int32_t source)
       break;
     default:
       printf("copyToSym - Sorry, class %d (%s) not yet implemented\n",
-	     sym[source].class, className(sym[source].class));
+	     symbol_class(source), className(symbol_class(source)));
       printf("symbol #%1d (%s)\n", source, varName(source));
       target = -1;
       break;
@@ -387,7 +388,8 @@ int32_t lux_replace(int32_t lhs, int32_t rhs)
      /* replaces <lhs> with <rhs> */
 {
   int32_t	lhsSize, rhsSize, namevar(int32_t, int32_t), result, i, n;
-  char	takeOver = 0, *name;
+  char	takeOver = 0;
+  char const* name;
   extern int32_t	trace, step, nBreakpoint;
   extern breakpointInfo	breakpoint[];
   branchInfo	checkTree(int32_t, int32_t);
@@ -398,7 +400,7 @@ int32_t lux_replace(int32_t lhs, int32_t rhs)
   branchInfo	tree;
   int32_t	evalLhs(int32_t), einsert(int32_t, int32_t);
   void	updateIndices(void);
-  
+
   if (lhs == LUX_ERROR)		/* e.g., when !XX = 3 is tried */
     return luxerror("Illegal variable", 0);
   if (lhs < nFixed)
@@ -433,7 +435,7 @@ int32_t lux_replace(int32_t lhs, int32_t rhs)
     zapTemp(rhs);
     return result;
   }
-  
+
   oldPipeExec = pipeExec;	/* save because there may be nested */
 				/* invocations of lux_replace */
   oldPipeSym = pipeSym;
@@ -548,7 +550,7 @@ int32_t lux_replace(int32_t lhs, int32_t rhs)
     memcpy(&symbol_extra(lhs), &symbol_extra(rhs), sizeof(symbol_extra(rhs)));
     if (symbol_class(rhs) == LUX_TRANSFER) {
       symbol_class(lhs) = LUX_TRANSFER;
-      transfer_is_parameter(lhs) = 0;
+      transfer_is_parameter(lhs) = (Symboltype) 0;
       transfer_temp_param(lhs) = 0;
     } else
       symbol_class(lhs) = symbol_class(rhs);
@@ -657,8 +659,8 @@ int32_t matchUserKey(char *name, int32_t routineNum)
   char	**keys;
   int32_t	n, l, i;
 
-  if (sym[routineNum].class != LUX_SUBROUTINE &&
-      sym[routineNum].class != LUX_FUNCTION)
+  if (symbol_class(routineNum) != LUX_SUBROUTINE &&
+      symbol_class(routineNum) != LUX_FUNCTION)
     return luxerror("Matching keyword to non-routine??", routineNum);
   l = strlen(name);
   keys = routine_parameter_names(routineNum);
@@ -742,7 +744,7 @@ int32_t internal_routine(int32_t symbol, internalRoutine *routine)
  /* treat the arguments */
  if (nKeys? maxArg: (nArg + ordinary)) {/* arguments possible */
    i = nKeys? maxArg: (nArg + ordinary);
-   evalArgs = malloc(i*sizeof(int32_t));
+   evalArgs = (int32_t*) malloc(i*sizeof(int32_t));
    if (!evalArgs)
      return cerror(ALLOC_ERR, 0);
    if (!nKeys) {		/* default: no keys */
@@ -1001,13 +1003,13 @@ int32_t usr_routine(int32_t symbol)
  int32_t	nPar, nStmnt, i, oldContext = curContext, n, routineNum, nKeys = 0,
 	ordinary = 0, thisNArg, *evalArg, oldNArg, listSym = 0;
  int16_t	*arg, *par, *list = NULL;
- char	type, *name, msg, isError,
-   *routineTypeNames[] = { "FUNC", "SUBR", "BLOCK" };
+ char	type, *name, msg, isError;
+ char const* routineTypeNames[] = { "FUNC", "SUBR", "BLOCK" };
  symTableEntry	*oldpars;
  extern int32_t	returnSym, defined(int32_t, int32_t);
  extern char	evalScalPtr;
  void pushExecutionLevel(int32_t, int32_t), popExecutionLevel(void);
- 
+
  executeLevel++;
  fileLevel++;
  if ((traceMode & T_ROUTINE) == 0)
@@ -1115,7 +1117,7 @@ int32_t usr_routine(int32_t symbol)
      if (symbol_class(*arg++) == LUX_KEYWORD)
        nKeys++;
    arg -= thisNArg;		/* back to start of list */
-   evalArg = malloc(nPar*sizeof(int32_t)); /* room for the evaluated parameters */
+   evalArg = (int32_t*) malloc(nPar*sizeof(int32_t)); /* room for the evaluated parameters */
    if (nPar && !evalArg) {
      cerror(ALLOC_ERR, 0);
      goto usr_routine_1;
@@ -1163,7 +1165,7 @@ int32_t usr_routine(int32_t symbol)
 	     goto usr_routine_2;
 	   symbol_class(listSym) = LUX_CPLIST;
 	   symbol_memory(listSym) = (thisNArg - nPar + 1)*sizeof(int16_t);
-	   list = malloc(symbol_memory(listSym));
+	   list = (int16_t*) malloc(symbol_memory(listSym));
 	   if (!list) {
 	     cerror(ALLOC_ERR, listSym);
 	     goto usr_routine_3;
@@ -1249,7 +1251,7 @@ int32_t usr_routine(int32_t symbol)
        if (symbol_class(*par) != LUX_TRANSFER) {
 	 undefine(*par);
 	 symbol_class(*par) = LUX_TRANSFER;
-	 transfer_is_parameter(*par) = 1;
+	 transfer_is_parameter(*par) = (Symboltype) 1;
 	 transfer_temp_param(*par) = 0;
        }
        if (evalArg[i] < nFixed) { /* fixed number -> assign value to par */
@@ -1261,7 +1263,7 @@ int32_t usr_routine(int32_t symbol)
 	 transfer_target(*par++) = evalArg[i];
      } else {
        undefine(*par);
-       undefined_par(*par) = 1; /* this parameter has not been assigned */
+       undefined_par(*par) = (Symboltype) 1; /* this parameter has not been assigned */
        /* a value by the user */
        par++;
      }
@@ -1352,8 +1354,9 @@ int32_t lux_for(int32_t nsym)
 /* executes LUX FOR-statement */
 {
  pointer	counter;
- scalar		start, inc, end;
- int32_t		hiType, n, temp, action;
+ Scalar		start, inc, end;
+ int32_t	n, temp, action;
+ Symboltype hiType, st;
  int16_t		startSym, endSym, stepSym, counterSym;
  char		forward;
  extern int32_t	trace, step;
@@ -1388,8 +1391,8 @@ int32_t lux_for(int32_t nsym)
  }
  hiType = combinedType(symbol_type(startSym), symbol_type(endSym));
  if (for_step(nsym) != LUX_ONE
-     && (n = symbol_type(stepSym)) > hiType)
-   hiType = n;
+     && (st = symbol_type(stepSym)) > hiType)
+   hiType = st;
  counterSym = for_loop_symbol(nsym); /* loop counter */
  undefine(counterSym);		/* loop counter */
  symbol_type(counterSym) = hiType;	/* give loop counter proper type */
@@ -1749,13 +1752,15 @@ int32_t execute(int32_t symbol)
   extern uint8_t	disableNewline;
   extern int16_t	watchVars[];
   uint8_t	oldNL;
-  char	*name, *p, *oldRoutineName;
+  char const* name;
+  char const* p;
+  char const* oldRoutineName;
   FILE	*fp;
 #if DEBUG
   void checkTemps(void);
 #endif
   float	newCPUtime;
-  int32_t	showstats(int32_t, int32_t []), getNewLine(char *, size_t, char *, char),
+  int32_t	showstats(int32_t, int32_t []), getNewLine(char *, size_t, char const *, char),
     lux_restart(int32_t, int32_t []), showError(int32_t), insert(int32_t, int32_t []),
     nextFreeStackEntry(void);
   void showExecutionLevel(int32_t);
@@ -2042,13 +2047,17 @@ int32_t execute(int32_t symbol)
       break;
     case EVB_FILE:	/* an include file */
       name = file_name(symbol);
-      if ((p = strchr(name, ':'))) /* seek specific routine */
-	*p++ = '\0';		/* temporary string end */
-      fp = openPathFile(name, FIND_EITHER);
-      if (!fp && p) {
-	*--p = ':';
-	fp = openPathFile(name, FIND_EITHER);
+      p = strchr(name, ':');
+      if (!p)
+        p = strchr(name, '\0');
+      {
+        char *part = (char*) malloc(p - name + 1);
+        memcpy(part, name, p - name);
+        part[p - name] = '\0';
+        fp = openPathFile(part, FIND_EITHER);
       }
+      if (!fp)
+	fp = openPathFile(name, FIND_EITHER);
       if (!fp) {
 	n = luxerror("Cannot open file %s", symbol, name);
         perror("System message");
@@ -2071,7 +2080,6 @@ int32_t execute(int32_t symbol)
       if (file_include_type(symbol) == FILE_REPORT)
 	reportBody--;
       if (p) {
-	*--p = ':';
 	unlinkString(findBody);
 	findBody = 0;
       }
@@ -2285,7 +2293,7 @@ int32_t execute(int32_t symbol)
     if (temp3 < returnSym) {
       sym[temp3] = sym[returnSym];
       fixContext(temp3, temp3);
-      sym[returnSym].class = LUX_UNUSED;
+      symbol_class(returnSym) = LUX_UNUSED;
       tempVariableIndex = temp3 + 1;
       returnSym = temp3;
     }
@@ -2357,7 +2365,7 @@ int32_t insert(int32_t narg, int32_t ps[])
 {
   int32_t	target, source, i, iq, start[MAX_DIMS], width, *dims,
 	ndim, nelem, type, size[MAX_DIMS], subsc_type[MAX_DIMS],
-	*index[MAX_DIMS], *iptr, j, n, class, srcNdim, *srcDims, srcNelem,
+	*index[MAX_DIMS], *iptr, j, n, class_id, srcNdim, *srcDims, srcNelem,
 	srcType, stride[MAX_DIMS], tally[MAX_DIMS], offset0, nmult,
 	tstep[MAX_DIMS], offset, onestep, unit, combineType;
   pointer	src, trgt;
@@ -2376,7 +2384,7 @@ int32_t insert(int32_t narg, int32_t ps[])
     return cerror(CST_LHS, target);
   /* check if target is transfer symbol, and resolve if so */
   target = transfer(target);
-  class = symbol_class(target);
+  class_id = symbol_class(target);
 
   offset0 = 0;			/* so it can be updated for LUX_FILEMAPs */
 
@@ -2394,7 +2402,7 @@ int32_t insert(int32_t narg, int32_t ps[])
       return luxerror("Specified incompatible /INNER and /OUTER", 0);
   }
 
-  switch (class) {
+  switch (class_id) {
     default:
       return cerror(SUBSC_NO_INDX, target);
     case LUX_STRING:
@@ -2468,7 +2476,7 @@ int32_t insert(int32_t narg, int32_t ps[])
       break;
     case LUX_STRING:
       srcNdim = 1;
-      if (class == LUX_ARRAY)	/* insert string in string array */
+      if (class_id == LUX_ARRAY)	/* insert string in string array */
 	srcNelem = 1;
       else			/* insert string in string */
 	srcNelem = string_size(source);
@@ -2501,7 +2509,7 @@ int32_t insert(int32_t narg, int32_t ps[])
       return luxerror("Wrong subscript for /SEPARATE", ps[0]);
     iq = lux_long(1, ps);	/* ensure LONG */
     narg = array_size(iq);
-    iptr = array_data(iq);
+    iptr = (int32_t*) array_data(iq);
     for (i = 0; i < narg; i++) {
       start[i] = *iptr++;
       if (start[i] < 0 || start[i] >= dims[i]) /* illegal subscript value */
@@ -2592,7 +2600,7 @@ int32_t insert(int32_t narg, int32_t ps[])
     }
   }
 
-  switch (class) {
+  switch (class_id) {
     case LUX_ASSOC:
       /* only a list of scalars is allowed here */
       if (nmult)
@@ -2619,7 +2627,7 @@ int32_t insert(int32_t narg, int32_t ps[])
   if (isStringType(type) ^ isStringType(srcType))
     return cerror(INCMP_ARG, source);
 
-  if (class == LUX_ARRAY && isStringType(type)) /* string array */
+  if (class_id == LUX_ARRAY && isStringType(type)) /* string array */
     type = LUX_STRING_ARRAY;	/* distinguish string array from string */
   if (symbol_class(source) == LUX_ARRAY && isStringType(srcType))
     srcType = LUX_STRING_ARRAY;
@@ -2684,13 +2692,13 @@ int32_t insert(int32_t narg, int32_t ps[])
     else if (size[0] != srcNelem)
       return cerror(INCMP_ARG, source);
 
-    n = (class == LUX_FILEMAP)? unit: 1;
+    n = (class_id == LUX_FILEMAP)? unit: 1;
     for (i = 0; i < narg; i++) {
       stride[i] = n;
       n *= dims[i];
     }
 
-    switch (class) {
+    switch (class_id) {
       case LUX_ARRAY: case LUX_CARRAY:
 	for (j = 0; j < size[0]; j++) {
 	  offset = 0;
@@ -3226,13 +3234,13 @@ int32_t insert(int32_t narg, int32_t ps[])
     /* for LUX_ARRAY subscripts the offset is calculated for each index */
     /* for LUX_RANGE subscripts the offset is updated for each element */
 
-    n = (class == LUX_FILEMAP)? unit: 1;
+    n = (class_id == LUX_FILEMAP)? unit: 1;
 
     if (!j && ndim == 1 && srcNdim == 1 && type == srcType &&
 	(srcNelem > 1 || size[0] == 1)) {
 				/* in this case we do a fast insert */
       offset0 += start[0]*unit;
-      switch (class) {
+      switch (class_id) {
 	case LUX_ARRAY: case LUX_CARRAY:
 	  memcpy(trgt.b + offset0, src.b, srcNelem*unit);
 	  break;
@@ -3271,7 +3279,7 @@ int32_t insert(int32_t narg, int32_t ps[])
       tstep[i] = (subsc_type[i] == LUX_RANGE? stride[i]: 0)
 	- (subsc_type[i - 1] == LUX_RANGE? size[i - 1]*stride[i - 1]: 0);
     
-    switch (class) {
+    switch (class_id) {
       case LUX_ARRAY: case LUX_CARRAY:
 	do {
 	  offset = offset0;
@@ -3741,7 +3749,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
 {
   int32_t	target, source, i, iq, start[MAX_DIMS], width, *dims,
     ndim, nelem, type, size[MAX_DIMS], subsc_type[MAX_DIMS],
-    *index[MAX_DIMS], *iptr, j, n, class, srcNdim, *srcDims, srcNelem,
+    *index[MAX_DIMS], *iptr, j, n, class_id, srcNdim, *srcDims, srcNelem,
     srcType, stride[MAX_DIMS], tally[MAX_DIMS], offset0, nmult,
     tstep[MAX_DIMS], offset, onestep, unit, combineType, narg,
     oldInternalMode, *ps2, srcMult;
@@ -3766,7 +3774,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
   if (target <= nFixed)
     return cerror(CST_LHS, target);
   /* check if target is transfer symbol, and resolve if so */
-  class = symbol_class(target);
+  class_id = symbol_class(target);
 
   offset0 = 0;			/* so it can be updated for LUX_FILEMAPs */
 
@@ -3778,7 +3786,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
   }
   oldInternalMode = internalMode;
   internalMode = 0;
-  ps2 = malloc((narg - nelem)*sizeof(int32_t));
+  ps2 = (int32_t*) malloc((narg - nelem)*sizeof(int32_t));
   j = 0;
   if (!ps2)
     return cerror(ALLOC_ERR, 0);
@@ -3815,7 +3823,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
       return luxerror("Specified incompatible /INNER and /OUTER", 0);
   }
 
-  switch (class) {
+  switch (class_id) {
     default:
       free(ps2);
       return cerror(SUBSC_NO_INDX, target);
@@ -3896,7 +3904,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
       break;
     case LUX_STRING:
       srcNdim = 1;
-      if (class == LUX_ARRAY)	/* insert string in string array */
+      if (class_id == LUX_ARRAY)	/* insert string in string array */
 	srcNelem = 1;
       else			/* insert string in string */
 	srcNelem = string_size(source);
@@ -3940,7 +3948,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
       iq = ps2[0];
       iq = lux_long(1, &iq);	/* ensure LONG */
       narg = array_size(iq);
-      iptr = array_data(iq);
+      iptr = (int32_t*) array_data(iq);
       for (i = 0; i < narg; i++) {
 	start[i] = *iptr++;
 	if (start[i] < 0 || start[i] >= dims[i]) { /* illegal subscript value */
@@ -4064,7 +4072,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
   if (iq == LUX_ERROR)		/* some error */
     return LUX_ERROR;
 
-  switch (class) {
+  switch (class_id) {
     case LUX_ASSOC:
       /* only a list of scalars is allowed here */
       if (nmult) {
@@ -4097,7 +4105,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
     goto einsert_1;
   }
 
-  if (class == LUX_ARRAY && isStringType(type)) /* string array */
+  if (class_id == LUX_ARRAY && isStringType(type)) /* string array */
     type = LUX_STRING_ARRAY;	/* distinguish string array from string */
   if (symbol_class(source) == LUX_ARRAY && isStringType(srcType))
     srcType = LUX_STRING_ARRAY;
@@ -4171,13 +4179,13 @@ int32_t einsert(int32_t lhs, int32_t rhs)
       goto einsert_1;
     }
 
-    n = (class == LUX_FILEMAP)? unit: 1;
+    n = (class_id == LUX_FILEMAP)? unit: 1;
     for (i = 0; i < narg; i++) {
       stride[i] = n;
       n *= dims[i];
     }
 
-    switch (class) {
+    switch (class_id) {
       case LUX_ARRAY: case LUX_CARRAY:
 	for (j = 0; j < size[0]; j++) {
 	  offset = 0;
@@ -4686,13 +4694,13 @@ int32_t einsert(int32_t lhs, int32_t rhs)
     /* for LUX_ARRAY subscripts the offset is calculated for each index */
     /* for LUX_RANGE subscripts the offset is updated for each element */
 
-    n = (class == LUX_FILEMAP)? unit: 1;
+    n = (class_id == LUX_FILEMAP)? unit: 1;
 
     if (!j && ndim == 1 && srcNdim == 1 && type == srcType &&
 	!isStringType(type) && (srcNelem > 1 || size[0] == 1)) {
 				/* in this case we do a fast insert */
       offset0 += start[0]*unit;
-      switch (class) {
+      switch (class_id) {
 	case LUX_ARRAY: case LUX_CARRAY:
 	  memcpy(trgt.b + offset0, src.b, srcNelem*unit);
 	  break;
@@ -4734,7 +4742,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
       tstep[i] = (subsc_type[i] == LUX_RANGE? stride[i]: 0)
 	- (subsc_type[i - 1] == LUX_RANGE? size[i - 1]*stride[i - 1]: 0);
     
-    switch (class) {
+    switch (class_id) {
       case LUX_ARRAY: case LUX_CARRAY:
 	do {
 	  offset = offset0;
@@ -5217,8 +5225,8 @@ int32_t lux_test(int32_t narg, int32_t ps[])
 
   if (symbol_type(ps[0]) != LUX_INT32)
     return luxerror("Accepts only LONG arrays", ps[0]);
-  if (standardLoop(ps[0], 0, SL_ALLAXES | SL_EACHCOORD, 0, &info, &src, NULL,
-		   NULL, NULL) < 0)
+  if (standardLoop(ps[0], 0, SL_ALLAXES | SL_EACHCOORD, LUX_INT8, &info,
+                   &src, NULL, NULL, NULL) < 0)
     return LUX_ERROR;
   value = int_arg(ps[1]);
 
@@ -5226,7 +5234,7 @@ int32_t lux_test(int32_t narg, int32_t ps[])
 		       NULL, NULL);
   if (n == LUX_ERROR)
     return LUX_ERROR;
-  
+
   /* set the edges to zero */
   for (i = 0; i < 2*info.ndim; i++) {
     if (edge[i]) {

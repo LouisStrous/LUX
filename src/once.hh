@@ -17,7 +17,7 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "luxdefs.h"
+#include "luxdefs.hh"
 
 /* editorCharClass table */
 
@@ -32,7 +32,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
    0x40 may appear in a file name
 */
 
-char	class[] = {
+char	eclass[] = {
  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -72,9 +72,9 @@ char	class[] = {
 };
 
 /* symbol stacks */
-#include "install.h"
+#include "install.hh"
 
-char		*symbolStack[SYMBOLSTACKSIZE];
+char const* symbolStack[SYMBOLSTACKSIZE];
 hashTableEntry	*varHashTable[HASHSIZE], *subrHashTable[HASHSIZE],
 		*funcHashTable[HASHSIZE], *blockHashTable[HASHSIZE];
 symTableEntry	sym[NSYM];

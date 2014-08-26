@@ -21,7 +21,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #if HAVE_CONFIG_H
 #include "config.h"
 #endif
-#include "install.h"
+#include "install.hh"
 #include <ctype.h> /* for toupper(11) isdigit(3) */
 #include <errno.h> /* for errno(2) */
 #include <error.h> /* for luxerror(58) */
@@ -41,11 +41,11 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <obstack.h>
 /* clock() on mips-sgi-irix64-6.2 is in unistd.h rather than in ANSI time.h */
 
-#include "editor.h"
-#include "editorcharclass.h"
-#include "action.h"
+#include "editor.hh"
+#include "editorcharclass.hh"
+#include "action.hh"
 
-extern char		*symbolStack[];
+extern char const* symbolStack[];
 extern symTableEntry	sym[];
 extern hashTableEntry	*varHashTable[], *subrHashTable[], *funcHashTable[],
 			*blockHashTable[];
@@ -57,16 +57,18 @@ extern int32_t		nExecuted;
 /* extern internalRoutine	subroutine[], function[]; */
 internalRoutine *subroutine, *function;
 
-int32_t	luxerror(char *, int32_t, ...), lookForName(char *, hashTableEntry *[], int32_t),
+int32_t	luxerror(char const*, int32_t, ...),
+  lookForName(char const*, hashTableEntry *[], int32_t),
 	newSymbol(Symbolclass, ...), lux_setup();
 void	installKeys(void *keys), zerobytes(void *, int32_t);
-char	*strsave(char *), *symName(int32_t, hashTableEntry *[]), *className(int32_t),
+char	*strsave(char const *);
+char const* symName(int32_t, hashTableEntry *[]), *className(int32_t),
 	*typeName(int32_t);
-FILE	*openPathFile(char *, int32_t);
 
 int32_t	nFixed = 0, noioctl = 0, trace = 0, curTEIndex;
 
-char	batch = 0, *currentInputFile = NULL, ignoreSymbols = 0, restart = 0;
+char	batch = 0, ignoreSymbols = 0, restart = 0;
+char const* currentInputFile = NULL;
 
 int32_t	traceMode = T_FILE | T_LOOP | T_BLOCK | T_ROUTINE;
 
@@ -76,7 +78,7 @@ int32_t	symbolStackIndex = 0, tempVariableIndex = TEMPS_START,
 	nTempVariable = 0, namedVariableIndex = NAMED_START,
 	nNamedVariable = 0, nSymbolStack = 0, executableIndex = EXE_START,
 	nExecutable = 0, tempExecutableIndex = TEMP_EXE_START,
-	nTempExecutable, zapContext = 0, installString(char *),
+	nTempExecutable, zapContext = 0, installString(char const *),
 	lux_verify(int32_t, int32_t []), eval_func, insert_subr;
 
 int32_t	markStack[MSSIZE], markIndex = 0;
@@ -88,112 +90,109 @@ extern int32_t	compileLevel, curLineNumber;
 static char	installing = 1;
 
 /*----------------------------------------------------------------*/
-extern int32_t lux_area(), lux_area2(),
-  lux_atomize(), lux_batch(), lux_callig(), lux_close(),
-  lux_contour(), lux_coordmap(), lux_crunch(),
-  lux_cubic_spline_extreme(), lux_debug(), lux_decomp(),
-  lux_decrunch(), lux_default(), lux_delete(), lux_distr(),
-  lux_dsolve(), lux_dump(), lux_dump_stack(), lux_echo(),
-  lux_noecho(), lux_endian(), lux_erase(), lux_execute(),
-  lux_fcwrite(), lux_fileptr(), lux_fileread(), lux_filewrite(),
-  lux_format_set(), lux_fprint(), lux_fprintf(), lux_fzread(),
-  lux_fzwrite(), lux_fzhead(), lux_getmin9(), lux_help(), lux_hex(),
-  lux_inserter(), lux_limits(), lux_noop(), lux_openr(), lux_openu(),
-  lux_openw(), lux_oplot(), lux_pdev(), lux_pen(), lux_plot(),
-  lux_pointer(), lux_printf(), lux_pop(), lux_postimage(),
-  lux_postraw(), postrelease(), lux_push(), lux_quit(), lux_read(),
-  lux_readarr(), lux_readf(), lux_readu(), lux_record(), lux_redim(),
-  lux_redirect_diagnostic(), lux_arestore(), lux_rewindf(), lux_sc(),
-  lux_scb(), lux_setenv(), lux_show(), lux_show_func(),
-  lux_show_subr(), lux_spawn(), lux_step(), lux_swab(), lux_switch(),
-  lux_type(), lux_trace(), lux_ulib(), lux_wait(), lux_zap(),
-  lux_zero(), showstats(), lux_writeu(), lux_system(), lux_freadf(),
-  lux_orientation(), lux_error(), site(), lux_set(), lux_tolookup(),
-  lux_coordtrf(), lux_fread(), lux_dump_lun(), lux_cluster(),
-  lux_astore(), lux_fzinspect(), lux_multisieve(), lux_crunchrun(),
-  lux_swaphalf(), lux_chdir(), lux_replace_values(),
-  lux_freads(), lux_one(), lux_disableNewline(), lux_enableNewline(),
-  lux_shift(), lux_file_to_fz(), lux_zapnan(),
-  lux_pencolor(), lux_idlrestore(), lux_list(),
-  lux_extract_bits(), lux_fftshift(), lux_manualterm(), lux_watch(),
-  lux_fcrunwrite(), lux_fits_read(), lux_fits_write(), lux_subshift(),
-  lux_subshiftc(), lux_byte_inplace(), lux_word_inplace(),
-  lux_long_inplace(), lux_int64_inplace(), lux_float_inplace(),
-  lux_double_inplace(), lux_cfloat_inplace(), lux_cdouble_inplace(),
-  lux_string_inplace(), lux_fade(), lux_fade_init();
+typedef int32_t LuxRoutine(int32_t, int32_t*);
+
+extern LuxRoutine lux_area, lux_area2, lux_arestore, lux_astore,
+  lux_atomize, lux_batch, lux_byte_inplace, lux_callig,
+  lux_cdouble_inplace, lux_cfloat_inplace, lux_chdir, lux_close,
+  lux_cluster, lux_contour, lux_coordmap, lux_coordtrf, lux_crunch,
+  lux_crunchrun, lux_cubic_spline_extreme, lux_debug, lux_decomp,
+  lux_decrunch, lux_default, lux_delete, lux_disableNewline,
+  lux_distr, lux_double_inplace, lux_dsolve, lux_dump, lux_dump_lun,
+  lux_dump_stack, lux_echo, lux_enableNewline, lux_endian, lux_erase,
+  lux_error, lux_execute, lux_extract_bits, lux_fade, lux_fade_init,
+  lux_fcrunwrite, lux_fcwrite, lux_fftshift, lux_file_to_fz,
+  lux_fileptr, lux_fileread, lux_filewrite, lux_fits_read,
+  lux_fits_write, lux_float_inplace, lux_format_set, lux_fprint,
+  lux_fprintf, lux_fread, lux_freadf, lux_freads, lux_fzhead,
+  lux_fzinspect, lux_fzread, lux_fzwrite, lux_getmin9, lux_help,
+  lux_hex, lux_idlrestore, lux_inserter, lux_int64_inplace,
+  lux_limits, lux_list, lux_long_inplace, lux_manualterm,
+  lux_multisieve, lux_noecho, lux_noop, lux_one, lux_openr, lux_openu,
+  lux_openw, lux_oplot, lux_orientation, lux_pdev, lux_pen,
+  lux_pencolor, lux_plot, lux_pointer, lux_pop, lux_postimage,
+  lux_postraw, lux_printf, lux_push, lux_quit, lux_read, lux_readarr,
+  lux_readf, lux_readu, lux_record, lux_redim,
+  lux_redirect_diagnostic, lux_replace_values, lux_rewindf, lux_sc,
+  lux_scb, lux_set, lux_setenv, lux_shift, lux_show, lux_show_func,
+  lux_show_subr, lux_spawn, lux_step, lux_string_inplace,
+  lux_subshift, lux_subshiftc, lux_swab, lux_swaphalf, lux_switch,
+  lux_system, lux_tolookup, lux_trace, lux_type, lux_ulib, lux_wait,
+  lux_watch, lux_word_inplace, lux_writeu, lux_zap, lux_zapnan,
+  lux_zero, postrelease, showstats, site;
 
 int32_t	lux_name();
 
 #if DEVELOP
-extern int32_t lux_fitUnitCube(), lux_projection(), lux_plot3d(),
-  lux_trajectory(), lux_getmin2(), lux_projectmap();
+extern LuxRoutine lux_fitUnitCube, lux_projection, lux_plot3d,
+  lux_trajectory, lux_getmin2, lux_projectmap;
 #endif
 
 #if DEBUG
-extern int32_t	checkList(), lux_whereisAddress(), lux_show_temps(),
-		lux_newallocs(), show_files();
+extern LuxRoutine checkList, lux_whereisAddress, lux_show_temps,
+		lux_newallocs, show_files;
 #endif
 
 #if HAVE_LIBJPEG
-extern int32_t	lux_read_jpeg6b(), lux_write_jpeg6b();
+extern LuxRoutine lux_read_jpeg6b, lux_write_jpeg6b;
 #endif
 
 #if HAVE_SYS_MTIO_H
-extern int32_t	lux_tape_status(), lux_rewind(), lux_weof(), lux_unload(),
-  lux_skipr(), lux_skipf(), lux_taprd(), lux_tapwrt(), lux_tapebufin(),
-  lux_tapebufout(), lux_wait_for_tape();
+extern LuxRoutine lux_tape_status, lux_rewind, lux_weof, lux_unload,
+  lux_skipr, lux_skipf, lux_taprd, lux_tapwrt, lux_tapebufin,
+  lux_tapebufout, lux_wait_for_tape;
 #endif
 
-extern int32_t	lux_gifread(), lux_gifwrite();
+extern LuxRoutine lux_gifread, lux_gifwrite;
 
 #if HAVE_LIBX11
-extern int32_t lux_menu(), lux_menu_hide(), lux_menu_item(),
-  lux_menu_kill(), lux_menu_pop(), lux_menu_read(),
-  lux_register_event(), lux_window(), lux_xcopy(),
-  lux_xdelete(), lux_xdrawline(), lux_xevent(), lux_xflush(),
-  lux_xfont(),
-  lux_xlabel(), lux_xloop(), lux_xopen(), lux_xplace(),
-  lux_xport(), lux_xpurge(), lux_xquery(), lux_xsetaction(),
-  lux_xsetbackground(), lux_xsetforeground(), lux_xtv(),
-  lux_xtvlct(), lux_xtvmap(), lux_xtvraw(), lux_xtvread(),
-  lux_xymov(), lux_wait_for_menu(), lux_xclose(), lux_xraise(),
-  lux_xcursor(), lux_xanimate(), lux_xzoom(), lux_show_visuals(),
-  lux_zoom(), lux_xtvplane(), lux_threecolors(), lux_tv3(),
-  lux_xinvertline(), lux_xinvertarc(), lux_xdrawarc(), lux_colorComponents(),
-  lux_colorstogrey(), lux_pixelsto8bit();
+extern LuxRoutine lux_menu, lux_menu_hide, lux_menu_item,
+  lux_menu_kill, lux_menu_pop, lux_menu_read,
+  lux_register_event, lux_window, lux_xcopy,
+  lux_xdelete, lux_xdrawline, lux_xevent, lux_xflush,
+  lux_xfont,
+  lux_xlabel, lux_xloop, lux_xopen, lux_xplace,
+  lux_xport, lux_xpurge, lux_xquery, lux_xsetaction,
+  lux_xsetbackground, lux_xsetforeground, lux_xtv,
+  lux_xtvlct, lux_xtvmap, lux_xtvraw, lux_xtvread,
+  lux_xymov, lux_wait_for_menu, lux_xclose, lux_xraise,
+  lux_xcursor, lux_xanimate, lux_xzoom, lux_show_visuals,
+  lux_zoom, lux_xtvplane, lux_threecolors, lux_tv3,
+  lux_xinvertline, lux_xinvertarc, lux_xdrawarc, lux_colorComponents,
+  lux_colorstogrey, lux_pixelsto8bit;
 #endif
 
 #if MOTIF
-extern int32_t lux_xmalignment(), lux_xmarmcolor(), lux_xmattach(),
-  lux_xmattach_relative(), lux_xmbackgroundcolor(),
-  lux_xmbordercolor(), lux_xmborderwidth(), lux_xmbottomshadowcolor(),
-  lux_xmdestroy(), lux_xmdrawinglink(), lux_xmfont(),
-  lux_xmforegroundcolor(), lux_xmgetpixmap(), lux_xmgetwidgetsize(),
-  lux_xmlistadditem(), lux_xmlistdeleteall(), lux_xmlistdeleteitem(),
-  lux_xmlistfunc(), lux_xmlistselect(), lux_xmlistsubr(),
-  lux_xmmessage(), lux_xmposition(), lux_xmprompt(),
-  lux_xmscaleresetlimits(), lux_xmscalesetvalue(),
-  lux_xmselectcolor(), lux_xmsensitive(), lux_xmsetcolors(),
-  lux_xmsetlabel(), lux_xmsetmargins(), lux_xmsetmnemonic(),
-  lux_xmsetmodal(), lux_xmsetoptionselection(), lux_xmsetpixmap(),
-  lux_xmtextappend(), lux_xmtexterase(), lux_xmtextfieldseteditable(),
-  lux_xmtextfieldsetstring(), lux_xmtextseteditable(),
-  lux_xmtextsetposition(), lux_xmtextsetrowcolumnsize(),
-  lux_xmtextsetstring(), lux_xmtogglesetstate(),
-  lux_xmtopshadowcolor(), lux_xtloop(), lux_xtmanage(),
-  lux_xtunmanage(), lux_xmquery(), lux_xmscrollbarsetvalues(),
-  lux_xmsetdirectory(), lux_xmsettitle(), lux_xmset_text_output(),
-  lux_xmsize(), lux_xmtextfieldsetmaxlength(), lux_xtpopup(),
-  lux_xtpopdown(), lux_xmraise(), lux_xmresizepolicy(), lux_xmtextreplace(),
-  lux_xmgetwidgetposition(), lux_xminfo();
+extern LuxRoutine lux_xmalignment, lux_xmarmcolor, lux_xmattach,
+  lux_xmattach_relative, lux_xmbackgroundcolor,
+  lux_xmbordercolor, lux_xmborderwidth, lux_xmbottomshadowcolor,
+  lux_xmdestroy, lux_xmdrawinglink, lux_xmfont,
+  lux_xmforegroundcolor, lux_xmgetpixmap, lux_xmgetwidgetsize,
+  lux_xmlistadditem, lux_xmlistdeleteall, lux_xmlistdeleteitem,
+  lux_xmlistfunc, lux_xmlistselect, lux_xmlistsubr,
+  lux_xmmessage, lux_xmposition, lux_xmprompt,
+  lux_xmscaleresetlimits, lux_xmscalesetvalue,
+  lux_xmselectcolor, lux_xmsensitive, lux_xmsetcolors,
+  lux_xmsetlabel, lux_xmsetmargins, lux_xmsetmnemonic,
+  lux_xmsetmodal, lux_xmsetoptionselection, lux_xmsetpixmap,
+  lux_xmtextappend, lux_xmtexterase, lux_xmtextfieldseteditable,
+  lux_xmtextfieldsetstring, lux_xmtextseteditable,
+  lux_xmtextsetposition, lux_xmtextsetrowcolumnsize,
+  lux_xmtextsetstring, lux_xmtogglesetstate,
+  lux_xmtopshadowcolor, lux_xtloop, lux_xtmanage,
+  lux_xtunmanage, lux_xmquery, lux_xmscrollbarsetvalues,
+  lux_xmsetdirectory, lux_xmsettitle, lux_xmset_text_output,
+  lux_xmsize, lux_xmtextfieldsetmaxlength, lux_xtpopup,
+  lux_xtpopdown, lux_xmraise, lux_xmresizepolicy, lux_xmtextreplace,
+  lux_xmgetwidgetposition, lux_xminfo;
 #endif
 
-extern int32_t lux_readorbits(), lux_showorbits();
+extern LuxRoutine lux_readorbits, lux_showorbits;
 
-extern int32_t	peek();
-extern int32_t	lux_breakpoint();
-extern int32_t	insert();
-int32_t	lux_restart(int32_t, int32_t []);
+extern LuxRoutine peek;
+extern LuxRoutine lux_breakpoint;
+extern LuxRoutine insert;
+LuxRoutine lux_restart;
 
 #if MOTIF
 int32_t	lux_zeroifnotdefined(), lux_compile_file();	/* browser */
@@ -201,17 +200,17 @@ int32_t	lux_zeroifnotdefined(), lux_compile_file();	/* browser */
 
 #define MAX_ARG	100
 
-/* Each routine's entry in subroutine[] and function[] has the following 
-  elements:  name, min_arg, max_arg, function_pointer, keywords 
-   min_arg = the lowest number of non-mode arguments that is allowed 
-             with the routine 
-   max_arg = the highest number of non-mode arguments that is allowed 
-  A non-mode argument is one whose entry in the keyword list does not 
-  start with a number.  
+/* Each routine's entry in subroutine[] and function[] has the following
+  elements:  name, min_arg, max_arg, function_pointer, keywords
+   min_arg = the lowest number of non-mode arguments that is allowed
+             with the routine
+   max_arg = the highest number of non-mode arguments that is allowed
+  A non-mode argument is one whose entry in the keyword list does not
+  start with a number.
    function_pointer = pointer to the appropriate C-routine
-   keywords = a string that contains the keywords that go with the routine 
-  The keyword string syntax is:  
-   [*][+][-][|defaultMode|][%offset%][key1][:[key2]:[key3]...] 
+   keywords = a string that contains the keywords that go with the routine
+  The keyword string syntax is:
+   [*][+][-][|defaultMode|][%offset%][key1][:[key2]:[key3]...]
 
   The stuff before the keys must be in the relative order indicated above:
   for instance, -+ is an invalid specification.
@@ -232,7 +231,7 @@ int32_t	lux_zeroifnotdefined(), lux_compile_file();	/* browser */
   internal_routine() to class UNDEFINED.  Initial - indicates that such
   arguments should be removed so that it will be as if the user did
   not specify those arguments.
-  
+
   The number between vertical bars (|) is an integer which indicates
   the default value of global C variable <internalMode> before the mode
   keywords are treated.
@@ -245,7 +244,7 @@ int32_t	lux_zeroifnotdefined(), lux_compile_file();	/* browser */
   arguments, which simplifies the argument treatment.
 
   Individual keys have the following syntax:
-   [number[$]][#]name 
+   [number[$]][#]name
   Keywords without a number in front of them indicate keys by
   position; the corresponding arguments are entered into the final
   argument list at the position indicated by the position of the key
@@ -258,7 +257,7 @@ int32_t	lux_zeroifnotdefined(), lux_compile_file();	/* browser */
   routine.  The number sign # indicates that the value of the key must
   be preserved, i.e. not evaluated before the routine is actually
   executed.  The key name MODE is reserved and may not be used in the
-  below key lists. 
+  below key lists.
 
   EXAMPLES (with a fictional routine FOO)
 
@@ -680,129 +679,130 @@ internalRoutine	subroutine_table[] = {
 };
 int32_t nSubroutine = sizeof(subroutine_table)/sizeof(internalRoutine);
 
-extern int32_t lux_abs(), lux_acos(), lux_arestore_f(), lux_arg(),
-  lux_array(), lux_asin(), lux_assoc(), lux_astore_f(), lux_atan(),
-  lux_atan2(), lux_basin(), lux_basin2(), lux_beta(), lux_bisect(),
-  lux_bmap(), bytarr(), lux_byte(), bytfarr(), lux_cbrt(), cdblarr(),
-  cdblfarr(), lux_cdmap(), lux_cdouble(), lux_ceil(), lux_cfloat(),
-  lux_cfmap(), cfltarr(), cfltfarr(), lux_chi_square(),
-  lux_classname(), lux_complex(), lux_complexsquare(), lux_compress(),
-  lux_concat(), lux_conjugate(), lux_convertsym(), lux_cos(),
-  lux_cosh(), lux_cputime(), lux_crosscorr(), lux_crunch_f(),
-  lux_ctime(), lux_cubic_spline(), lux_date(), lux_date_from_tai(),
-  dblarr(), dblfarr(), lux_defined(), lux_delete(), lux_despike(),
-  lux_detrend(), lux_differ(), lux_dilate(), lux_dilate_dir(),
-  lux_dimen(), lux_dir_smooth(), lux_dir_smooth2(), lux_distarr(),
-  lux_distr_f(), lux_dmap(), lux_double(), lux_equivalence(),
-  lux_erf(), lux_erfc(), lux_erode(), lux_erode_dir(), lux_esmooth(),
-  lux_eval(), lux_exp(), lux_expand(), lux_expm1(),
-  lux_extract_bits_f(), lux_extreme_general(), lux_f_ratio(),
-  lux_fcwrite_f(), lux_fftshift_f(), lux_fileptr_f(),
-  lux_filesize(), lux_filetype_name(), lux_find(), lux_find2(), lux_findfile(),
-  lux_find_max(), lux_find_maxloc(), lux_find_min(),
-  lux_find_minloc(), lux_fitskey(), lux_fits_header_f(),
-  lux_fits_read_f(), lux_fits_xread_f(), lux_float(), lux_floor(),
-  fltarr(), fltfarr(), lux_fmap(), lux_freadf_f(), lux_freads_f(),
-  lux_fstring(), lux_fzarr(), lux_fzhead_f(), lux_fzread_f(),
-  lux_fzwrite_f(), lux_gamma(), lux_generalfit(), lux_get_lun(),
-  lux_getenv(), lux_gridmatch(), lux_gsmooth(), lux_hamming(), lux_hilbert(),
-  lux_hist(), lux_histr(), lux_identify_file(), lux_idlread_f(),
-  lux_imaginary(), lux_incomplete_beta(), lux_incomplete_gamma(),
-  lux_index(), lux_indgen(), lux_inpolygon(), intarr(), int64arr(),
-  int64farr(), intfarr(), lux_int64(),
-  lux_isarray(), lux_isnan(), lux_isscalar(), lux_isstring(),
-  lux_istring(), lux_j0(), lux_j1(), lux_jd(), lux_jn(), lux_cjd(),
-  lux_ksmooth(), lux_laplace2d(), lux_lmap(), lux_local_maxf(),
-  lux_local_maxloc(), lux_int64map(),
-  lux_local_minf(), lux_local_minloc(), lux_log(), lux_log10(),
-  lux_log1p(), lonarr(), lonfarr(), lux_long(), lux_lower(),
-  lux_lsq(), lux_lsq2(), lux_match(), lux_max_dir(),
-  lux_maxf(), lux_maxfilter(), lux_maxloc(), lux_mean(),
-  lux_medfilter(), lux_median(), lux_memory(), lux_minf(),
-  lux_minfilter(), lux_minloc(), lux_neg_func(),
-  lux_noncentral_chi_square(), lux_not(), lux_num_dimen(),
-  lux_num_elem(), lux_onef(), lux_openr_f(), lux_openu_f(),
-  lux_openw_f(), lux_orderfilter(), lux_pit(), lux_poly(), lux_pow(),
-  lux_power(), lux_printf_f(), lux_psum(), lux_quantile(), lux_quit(),
-  lux_random(), lux_randomb(), lux_randomd(), lux_randomn(),
-  lux_randomu(), lux_randoml(), lux_readf_f(), lux_readkey(),
-  lux_readkeyne(), lux_readu_f(), lux_real(), lux_redim_f(),
-  lux_regrid(), lux_regrid3(), lux_regrid3ns(), lux_reorder(),
-  lux_reverse(), lux_rfix(), lux_root3(), lux_runcum(), lux_runprod(),
-  lux_runsum(), lux_scale(), lux_scalerange(),
-  lux_sdev(), lux_segment(), lux_segment_dir(), lux_sgn(),
-  lux_shift_f(), lux_sieve(), lux_sin(), lux_sinh(), lux_skipc(),
-  lux_smap(), lux_smooth(), lux_solar_b(), lux_solar_l(),
-  lux_solar_p(), lux_solar_r(), lux_sort(), lux_spawn_f(), lux_sqrt(),
-  strarr(), lux_strcount(), lux_stretch(), lux_string(), lux_strlen(),
-  lux_strloc(), lux_strpos(), lux_strreplace(), lux_strskp(),
-  lux_strsub(), lux_strtok(), lux_strtol(), lux_strtrim(),
-  lux_struct(), lux_student(), lux_subsc_func(), lux_sun_b(),
-  lux_sun_d(), lux_sun_p(), lux_sun_r(), lux_symbol(),
-  lux_symbol_memory(), lux_symbol_number(), lux_symclass(),
-  lux_symdtype(), lux_systime(), lux_table(), lux_tai_from_date(),
-  lux_tan(), lux_tanh(), lux_temp(), lux_tense(), lux_tense_curve(),
-  lux_tense_loop(), lux_time(), lux_total(), lux_trace_decoder(),
-  lux_trend(), lux_tri_name_from_tai(), lux_typeName(), lux_upper(),
-  lux_variance(), lux_varname(), lux_voigt(), lux_wait_for_menu(),
-  lux_wmap(), lux_word(), lux_y0(), lux_y1(), lux_yn(),
-  lux_zapnan_f(), lux_zerof(), lux_zinv(), lux_fcrunwrite_f(),
-  lux_strpbrk(), lux_shift3(), lux_area_connect(), lux_legendre(),
-  lux_cartesian_to_polar(), lux_polar_to_cartesian(), lux_roll(),
-  lux_siderealtime(), lux_asinh(),
-  lux_acosh(), lux_atanh(), lux_astrf(), lux_antilaplace2d(),
-  lux_cspline_find(), lux_covariance();
+extern LuxRoutine lux_abs, lux_acos, lux_arestore_f, lux_arg,
+  lux_array, lux_asin, lux_assoc, lux_astore_f, lux_atan,
+  lux_atan2, lux_basin, lux_basin2, lux_beta, lux_bisect,
+  lux_bmap, bytarr, lux_byte, bytfarr, lux_cbrt, cdblarr,
+  cdblfarr, lux_cdmap, lux_cdouble, lux_ceil, lux_cfloat,
+  lux_cfmap, cfltarr, cfltfarr, lux_chi_square,
+  lux_classname, lux_complex, lux_complexsquare, lux_compress,
+  lux_concat, lux_conjugate, lux_convertsym, lux_cos,
+  lux_cosh, lux_cputime, lux_crosscorr, lux_crunch_f,
+  lux_ctime, lux_cubic_spline, lux_date, lux_date_from_tai,
+  dblarr, dblfarr, lux_defined, lux_delete, lux_despike,
+  lux_detrend, lux_differ, lux_dilate, lux_dilate_dir,
+  lux_dimen, lux_dir_smooth, lux_dir_smooth2, lux_distarr,
+  lux_distr_f, lux_dmap, lux_double, lux_equivalence,
+  lux_erf, lux_erfc, lux_erode, lux_erode_dir, lux_esmooth,
+  lux_eval, lux_exp, lux_expand, lux_expm1,
+  lux_extract_bits_f, lux_extreme_general, lux_f_ratio,
+  lux_fcwrite_f, lux_fftshift_f, lux_fileptr_f,
+  lux_filesize, lux_filetype_name, lux_find, lux_find2, lux_findfile,
+  lux_find_max, lux_find_maxloc, lux_find_min,
+  lux_find_minloc, lux_fitskey, lux_fits_header_f,
+  lux_fits_read_f, lux_fits_xread_f, lux_float, lux_floor,
+  fltarr, fltfarr, lux_fmap, lux_freadf_f, lux_freads_f,
+  lux_fstring, lux_fzarr, lux_fzhead_f, lux_fzread_f,
+  lux_fzwrite_f, lux_gamma, lux_generalfit, lux_get_lun,
+  lux_getenv, lux_gridmatch, lux_gsmooth, lux_hamming, lux_hilbert,
+  lux_hist, lux_histr, lux_identify_file, lux_idlread_f,
+  lux_imaginary, lux_incomplete_beta, lux_incomplete_gamma,
+  lux_index, lux_indgen, lux_inpolygon, intarr, int64arr,
+  int64farr, intfarr, lux_int64,
+  lux_isarray, lux_isnan, lux_isscalar, lux_isstring,
+  lux_istring, lux_j0, lux_j1, lux_jd, lux_jn, lux_cjd,
+  lux_ksmooth, lux_laplace2d, lux_lmap, lux_local_maxf,
+  lux_local_maxloc, lux_int64map,
+  lux_local_minf, lux_local_minloc, lux_log, lux_log10,
+  lux_log1p, lonarr, lonfarr, lux_long, lux_lower,
+  lux_lsq, lux_lsq2, lux_match, lux_max_dir,
+  lux_maxf, lux_maxfilter, lux_maxloc, lux_mean,
+  lux_medfilter, lux_median, lux_memory, lux_minf,
+  lux_minfilter, lux_minloc, lux_neg_func,
+  lux_noncentral_chi_square, lux_not, lux_num_dimen,
+  lux_num_elem, lux_onef, lux_openr_f, lux_openu_f,
+  lux_openw_f, lux_orderfilter, lux_pit, lux_poly, lux_pow,
+  lux_power, lux_printf_f, lux_psum, lux_quantile, lux_quit,
+  lux_random, lux_randomb, lux_randomd, lux_randomn,
+  lux_randomu, lux_randoml, lux_readf_f, lux_readkey,
+  lux_readkeyne, lux_readu_f, lux_real, lux_redim_f,
+  lux_regrid, lux_regrid3, lux_regrid3ns, lux_reorder,
+  lux_reverse, lux_rfix, lux_root3, lux_runcum, lux_runprod,
+  lux_runsum, lux_scale, lux_scalerange,
+  lux_sdev, lux_segment, lux_segment_dir, lux_sgn,
+  lux_shift_f, lux_sieve, lux_sin, lux_sinh, lux_skipc,
+  lux_smap, lux_smooth, lux_solar_b, lux_solar_l,
+  lux_solar_p, lux_solar_r, lux_sort, lux_spawn_f, lux_sqrt,
+  strarr, lux_strcount, lux_stretch, lux_string, lux_strlen,
+  lux_strloc, lux_strpos, lux_strreplace, lux_strskp,
+  lux_strsub, lux_strtok, lux_strtol, lux_strtrim,
+  lux_struct, lux_student, lux_subsc_func, lux_sun_b,
+  lux_sun_d, lux_sun_p, lux_sun_r, lux_symbol,
+  lux_symbol_memory, lux_symbol_number, lux_symclass,
+  lux_symdtype, lux_systime, lux_table, lux_tai_from_date,
+  lux_tan, lux_tanh, lux_temp, lux_tense, lux_tense_curve,
+  lux_tense_loop, lux_time, lux_total, lux_trace_decoder,
+  lux_trend, lux_tri_name_from_tai, lux_typeName, lux_upper,
+  lux_variance, lux_varname, lux_voigt, lux_wait_for_menu,
+  lux_wmap, lux_word, lux_y0, lux_y1, lux_yn,
+  lux_zapnan_f, lux_zerof, lux_zinv, lux_fcrunwrite_f,
+  lux_strpbrk, lux_shift3, lux_area_connect, lux_legendre,
+  lux_cartesian_to_polar, lux_polar_to_cartesian, lux_roll,
+  lux_siderealtime, lux_asinh,
+  lux_acosh, lux_atanh, lux_astrf, lux_antilaplace2d,
+  lux_cspline_find, lux_covariance;
 
 #if HAVE_REGEX_H
-extern int32_t lux_getdirectories(), lux_getfiles(), lux_getfiles_r(),
-  lux_getmatchedfiles(), lux_getmatchedfiles_r(), lux_regex();
+extern LuxRoutine lux_getdirectories, lux_getfiles, lux_getfiles_r,
+  lux_getmatchedfiles, lux_getmatchedfiles_r, lux_regex;
 #endif
 
 #if DEVELOP
-extern int32_t	lux_project(), lux_bsmooth(), lux_compile(),
-  lux_bessel_i0(), lux_bessel_i1(), lux_bessel_k0(), lux_bessel_k1(),
-  lux_bessel_kn(), lux_regridls(), lux_bigger235(),
-  lux_geneticfit();
+extern LuxRoutine lux_project, lux_bsmooth, lux_compile,
+  lux_bessel_i0, lux_bessel_i1, lux_bessel_k0, lux_bessel_k1,
+  lux_bessel_kn, lux_regridls, lux_bigger235,
+  lux_geneticfit;
 #endif
 
-extern int32_t	lux_gifread_f(), lux_gifwrite_f();
+extern LuxRoutine lux_gifread_f, lux_gifwrite_f;
 
 #if HAVE_LIBX11
-extern int32_t	lux_check_menu(), lux_check_window(), lux_colorpixel(),
-  lux_event_name(), lux_xlabelwidth(), lux_xquery_f(), lux_xexist();
+extern LuxRoutine lux_check_menu, lux_check_window, lux_colorpixel,
+  lux_event_name, lux_xlabelwidth, lux_xquery_f, lux_xexist;
 #endif
 
-extern int32_t lux_calendar(), lux_EasterDate(), /* lux_orbitalElement(), */
-  lux_astropos(), lux_precess(), lux_constellation(),
-  lux_constellationname(), lux_enhanceimage();
+extern LuxRoutine lux_calendar, lux_EasterDate, /* lux_orbitalElement, */
+  lux_astropos, lux_precess, lux_constellation,
+  lux_constellationname, lux_enhanceimage;
 
 #if MOTIF
 
-extern int32_t lux_xmarrow(), lux_xmboard(), lux_xmbutton(),
-  lux_xmcheckbox(), lux_xmcolumns(), lux_xmcommand(),
-  lux_xmdialog_board(), lux_xmdrawingarea(), lux_xmfileselect(),
-  lux_xmform(), lux_xmframe(), lux_xmgetoptionselection(),
-  lux_xmgetwidgetaddress(), lux_xmhscale(), lux_xmlabel(),
-  lux_xmlist(), lux_xmlistcount(), lux_xmlistfromfile(),
-  lux_xmmenubar(), lux_xmoptionmenu(), lux_xmpixmapbutton(),
-  lux_xmpulldownmenu(), lux_xmradiobox(), lux_xmrows(),
-  lux_xmscalegetvalue(), lux_xmscrolledwindow(), lux_xmseparator(),
-  lux_xmtext(), lux_xmtextbox(), lux_xmtextfield(),
-  lux_xmtextfieldarray(), lux_xmtextfieldgetstring(),
-  lux_xmtextfromfile(), lux_xmtextgetstring(), lux_xmtogglegetstate(),
-  lux_xmvscale(), lux_xtparent(), lux_xtwindow(), lux_xmdialog_form(),
-  lux_xmaddfiletolist(), lux_xmtoplevel_form(),
-  lux_xmtoplevel_board(), lux_xmpixmapoptionmenu(), lux_xmscrolledwindowapp(),
-  lux_xmfilegetlist(), lux_xmhscrollbar(), lux_xmtextgetinsertposition(),
-  lux_xmtextgetlastposition(), lux_xmtextgetselection(), lux_xmvscrollbar();
+extern LuxRoutine lux_xmarrow, lux_xmboard, lux_xmbutton,
+  lux_xmcheckbox, lux_xmcolumns, lux_xmcommand,
+  lux_xmdialog_board, lux_xmdrawingarea, lux_xmfileselect,
+  lux_xmform, lux_xmframe, lux_xmgetoptionselection,
+  lux_xmgetwidgetaddress, lux_xmhscale, lux_xmlabel,
+  lux_xmlist, lux_xmlistcount, lux_xmlistfromfile,
+  lux_xmmenubar, lux_xmoptionmenu, lux_xmpixmapbutton,
+  lux_xmpulldownmenu, lux_xmradiobox, lux_xmrows,
+  lux_xmscalegetvalue, lux_xmscrolledwindow, lux_xmseparator,
+  lux_xmtext, lux_xmtextbox, lux_xmtextfield,
+  lux_xmtextfieldarray, lux_xmtextfieldgetstring,
+  lux_xmtextfromfile, lux_xmtextgetstring, lux_xmtogglegetstate,
+  lux_xmvscale, lux_xtparent, lux_xtwindow, lux_xmdialog_form,
+  lux_xmaddfiletolist, lux_xmtoplevel_form,
+  lux_xmtoplevel_board, lux_xmpixmapoptionmenu, lux_xmscrolledwindowapp,
+  lux_xmfilegetlist, lux_xmhscrollbar, lux_xmtextgetinsertposition,
+  lux_xmtextgetlastposition, lux_xmtextgetselection, lux_xmvscrollbar;
 
 #endif
 
 #if HAVE_LIBJPEG
-extern int32_t lux_read_jpeg6b_f(), lux_write_jpeg6b_f();
+extern LuxRoutine lux_read_jpeg6b_f, lux_write_jpeg6b_f;
 #endif
 
-extern int32_t	vargsmooth(), lux_test();
+extern int32_t	vargsmooth;
+extern LuxRoutine lux_test;
 
 internalRoutine function_table[] = {
   { "%A_UNARY_NEGATIVE", 1, 1, lux_neg_func, "*" },	/* fun1.c */
@@ -1325,7 +1325,7 @@ void undefine(int32_t symbol)
     case LUX_ARRAY:
       if (isStringType(array_type(symbol))) { /* a string array */
 	/* must free the components' memory */
-	p2.sp = array_data(symbol);
+        p2.sp = (char**) array_data(symbol);
 	n = array_size(symbol);
 	while (n--)
 	  free(*p2.sp++);
@@ -1373,7 +1373,7 @@ void undefine(int32_t symbol)
 	    || (zapContext > 0 && symbol_context(k) == zapContext))
 	  zap(k);
 	if (p->key)
-	  free(p->key);
+	  free((void*) p->key);
 	p++;
       }
       hasMem = 1;
@@ -1490,7 +1490,7 @@ void undefine(int32_t symbol)
 	case EVB_INT_SUB: case EVB_INSERT: case LUX_INT_FUNC: case
 	LUX_USR_FUNC: case EVB_CASE: case EVB_NCASE: case EVB_BLOCK:
 	  n = symbol_memory(symbol)/sizeof(int16_t);
-	  ptr = symbol_data(symbol);
+	  ptr = (int16_t*) symbol_data(symbol);
 	  while (n--)
 	    if (symbol_context(k = *ptr++) == symbol
 		|| (zapContext > 0 && symbol_context(k) == zapContext))
@@ -1529,7 +1529,7 @@ void undefine(int32_t symbol)
     symbol_memory(symbol) = 0;
   }
   symbol_class(symbol) = LUX_UNDEFINED;
-  undefined_par(symbol) = 0;	/* used in usr_routine() (with value 1) */
+  undefined_par(symbol) = (Symboltype) 0; /* used in usr_routine() (with value 1) */
 				/* to indicate unspecified parameters */
 				/* of user-defined routines. */
 /* context must remain the same, or local variables become global */
@@ -1539,7 +1539,7 @@ void undefine(int32_t symbol)
 void zap(int32_t nsym)
 /* undefine & remove name (if any) */
 {
- char	*name, *noName = "[]";
+ char const *name, *noName = "[]";
  int32_t	context, hashValue;
  hashTableEntry	*hp, *oldHp, **hashTable;
 #if DEBUG
@@ -1578,7 +1578,7 @@ void zap(int32_t nsym)
    hp = oldHp = hashTable[hashValue];
    while (hp) {
      if (!strcmp(hp->name, name) && sym[hp->symNum].context == context) {
-       free(hp->name);		/* found name; remove */
+       free((void*) hp->name);		/* found name; remove */
        hp->name = 0;
        if (hp != oldHp)
 	 oldHp->next = hp->next;
@@ -1761,7 +1761,7 @@ int32_t nextFreeNamedVariable(void)
   int32_t	oldIndex = namedVariableIndex;
   extern int32_t	compileLevel;
 
-  while (sym[namedVariableIndex].class) {
+  while (symbol_class(namedVariableIndex)) {
     if (++namedVariableIndex == NAMED_END) namedVariableIndex = NAMED_START;
     if (namedVariableIndex == oldIndex)    /* nothing free */
       return luxerror("Too many named variables - symbol table full", 0);
@@ -1781,7 +1781,7 @@ int32_t nextFreeTempVariable(void)
  static long int count = 0;
 
  ++count;
- while (sym[tempVariableIndex].class) {
+ while (symbol_class(tempVariableIndex)) {
    if (++tempVariableIndex == TEMPS_END)
      tempVariableIndex = TEMPS_START;
    if (tempVariableIndex == oldIndex)
@@ -1801,7 +1801,7 @@ int32_t nextFreeTempExecutable(void)
   int32_t oldIndex = tempExecutableIndex;
   extern int32_t	compileLevel;
 
-  while (sym[tempExecutableIndex].class) {
+  while (symbol_class(tempExecutableIndex)) {
     if (++tempExecutableIndex == EXE_END) 
       tempExecutableIndex = EXE_START;
     if (tempExecutableIndex == oldIndex) /* nothing free */
@@ -1822,7 +1822,7 @@ int32_t nextFreeExecutable(void)
   int32_t    oldIndex = executableIndex;
   extern int32_t	compileLevel;
 
-  while (sym[executableIndex].class) {
+  while (symbol_class(executableIndex)) {
     if (++executableIndex == EXE_END)
       executableIndex = EXE_START;
     if (executableIndex == oldIndex)    /* nothing free */
@@ -1843,7 +1843,7 @@ int32_t nextFreeUndefined(void)
 
   n = nextFreeTempVariable();
   if (n < 0) return n;		/* some error */
-  sym[n].class = LUX_UNDEFINED;
+  symbol_class(n) = LUX_UNDEFINED;
   sym[n].context = -compileLevel;
   return n;
 }
@@ -1931,7 +1931,7 @@ void freeString(int32_t index)
      /* removes the string (if any) from index <index> in symbolStack[] */
      /* and updates symbolStackIndex  */
 {
-  free(symbolStack[index]);
+  free((void*) symbolStack[index]);
   unlinkString(index);
 }
 /*----------------------------------------------------------------*/
@@ -1987,7 +1987,7 @@ int32_t findTarget(char *name, int32_t *type, int32_t allowSubr)
 {
   int32_t	result;
   FILE	*fp;
-  int32_t	nextCompileLevel(FILE *, char *);
+  int32_t	nextCompileLevel(FILE *, char const *);
 
   /* seek a named variable */
   result = lookForName(name, varHashTable, curContext);
@@ -2128,18 +2128,18 @@ int32_t newSymbol(Symbolclass kind, ...)
     }
     switch (kind) {
       case LUX_SCALAR:
-	scalar_type(n) = va_arg(ap, int32_t);
+	scalar_type(n) = (Symboltype) va_arg(ap, int);
 	break;
       case LUX_FIXED_NUMBER:
 	/* same as an ordinary scalar, but in EDB symbol space, so that it */
 	/* doesn't get overwritten as "just another temp" (i.e. isFreeTemp() */
 	/* returns 0).  otherwise, get problems e.g. in a for-loop, where */
 	/* temp numbers are used more than once.  */
-	symbol_type(n) = va_arg(ap, int32_t);
+	symbol_type(n) = (Symboltype) va_arg(ap, int);
 	if (symbol_type(n) >= LUX_CFLOAT) { /* a complex scalar */
 	  symbol_class(n) = LUX_CSCALAR;
 	  complex_scalar_memory(n) = lux_type_size[symbol_type(n)];
-	  complex_scalar_data(n).f = malloc(complex_scalar_memory(n));
+	  complex_scalar_data(n).f = (float*) malloc(complex_scalar_memory(n));
 	  if (!complex_scalar_data(n).f)
 	    return cerror(ALLOC_ERR, n);
 	} else
@@ -2149,33 +2149,34 @@ int32_t newSymbol(Symbolclass kind, ...)
 	/* a literal string */
 	symbol_class(n) = LUX_STRING;
 	string_type(n) = LUX_LSTRING;
-	string_value(n) = symbolStack[i = va_arg(ap, int32_t)];
+	string_value(n) = (char*) symbolStack[i = va_arg(ap, int32_t)];
 	symbol_memory(n) = strlen(symbolStack[i]) + 1; /* count \0 */
 	unlinkString(i);		/* free position in stack */
 	break;
       case LUX_STRUCT_PTR:
 	symbol_class(n) = LUX_STRUCT_PTR;
 	symbol_memory(n) = sizeof(structPtr);
-	struct_ptr_elements(n) = malloc(symbol_memory(n));
+	struct_ptr_elements(n) = (structPtr*) malloc(symbol_memory(n));
 	break;
       case LUX_EXTRACT:
 	target = popList();
 	if (target > 0) {	/* regular symbol */
 	  extract_target(n) = target;
-	  extract_num_sec(n) = depth = popList();
+          depth = popList();
+          extract_num_sec(n) = (Symboltype) depth;
 	  symbol_memory(n) = depth*sizeof(extractSec);
-	  extract_ptr(n) = eptr = malloc(symbol_memory(n));
+	  extract_ptr(n) = eptr = (extractSec*) malloc(symbol_memory(n));
 	  embed(target, n);
 	} else {
 	  i = -target;
 	  symbol_class(n) = LUX_PRE_EXTRACT;
 	  symbol_memory(n) = sizeof(preExtract);
 	  symbol_data(n) = malloc(sizeof(preExtract));
-	  pre_extract_name(n) = symbolStack[i];
+	  pre_extract_name(n) = (char*) symbolStack[i];
 	  unlinkString(i);	/* so it does not get zapped */
-	  pre_extract_num_sec(n) = depth = popList();
-	  pre_extract_ptr(n) = eptr = depth? malloc(depth*sizeof(extractSec)):
-	    NULL;
+          depth = popList();
+          pre_extract_num_sec(n) = (Symboltype) depth;
+	  pre_extract_ptr(n) = eptr = (extractSec*) (depth? malloc(depth*sizeof(extractSec)): NULL);
 	}
 	if (!eptr && depth)
 	  return cerror(ALLOC_ERR, 0);
@@ -2193,7 +2194,7 @@ int32_t newSymbol(Symbolclass kind, ...)
 	  i = eptr->number;
 	  switch (eptr->type) {
 	    case LUX_RANGE:
-	      eptr->ptr.w = malloc(i*sizeof(int16_t));
+	      eptr->ptr.w = (int16_t*) malloc(i*sizeof(int16_t));
 	      p.w = eptr->ptr.w + i; /* start at the end */
 	      while (i--) {
 		*--p.w = popList();
@@ -2201,7 +2202,7 @@ int32_t newSymbol(Symbolclass kind, ...)
 	      }
 	      break;
 	    case LUX_LIST:
-	      eptr->ptr.sp = malloc(i*sizeof(char *));
+	      eptr->ptr.sp = (char**) malloc(i*sizeof(char *));
 	      p.sp = eptr->ptr.sp + i; /* start at the end */
 	      while (i--) {
 		j = popList();
@@ -2239,7 +2240,7 @@ int32_t newSymbol(Symbolclass kind, ...)
 	  isScalarRange = 0;
 	range_sum(n) = 0; /* default summation flag */
 	range_redirect(n) = -1; /* redirection flag */
-	range_scalar(n) = isScalarRange;
+	range_scalar(n) = (Symboltype) isScalarRange;
 	break;
       case LUX_PRE_RANGE:
 	isScalarRange = 1;
@@ -2261,12 +2262,12 @@ int32_t newSymbol(Symbolclass kind, ...)
 	  isScalarRange = 0;
 	pre_range_sum(n) = 0; /* default summation flag */
 	pre_range_redirect(n) = -1; /* redirection flag */
-	pre_range_scalar(n) = isScalarRange;
+	pre_range_scalar(n) = (Symboltype) isScalarRange;
 	break;
       case LUX_LIST_PTR:		/* pointer to a struct element */
 	list_ptr_target(n) = va_arg(ap, int32_t); /* the struct */
 	if ((i = va_arg(ap, int32_t)) >= 0) { /* non-numerical key */
-	  list_ptr_tag_string(n) = symbolStack[i]; /* key */
+	  list_ptr_tag_string(n) = (char*) symbolStack[i]; /* key */
 	 list_ptr_tag_size(n) = strlen(symbolStack[i]) + 1;
 	 unlinkString(i);	/* unlink keyword from stack */
        } else {			/* numerical key;  must be integer */
@@ -2307,7 +2308,7 @@ int32_t newSymbol(Symbolclass kind, ...)
 	    p->value = popList();
 	    embed(p->value, n);
 	    i = popList();
-	    p->key = (i >= 0)? symbolStack[i]: NULL;
+	    p->key = (char*) ((i >= 0)? symbolStack[i]: NULL);
 	    if (i >= 0)
 	      unlinkString(i);	/* unlink from symbolStack */
 	    p--;
@@ -2341,7 +2342,7 @@ int32_t newSymbol(Symbolclass kind, ...)
 	symbol_memory(n) = 4*sizeof(int32_t);
 	break;
       case LUX_POINTER:
-	transfer_is_parameter(n) = 0;	/* not a formal argument in a */
+	transfer_is_parameter(n) = (Symboltype) 0; /* not a formal argument in a */
 					/* user-defined function or routine */
 	narg = va_arg(ap, int32_t);
 	i = lookForSubr(narg);
@@ -2364,7 +2365,7 @@ int32_t newSymbol(Symbolclass kind, ...)
 	if (i >= 0) {		/* found an internal routine */
 	  symbol_class(n) = LUX_FUNC_PTR;
 	  func_ptr_routine_num(n) = -i;
-	  func_ptr_type(n) = kind;
+          func_ptr_type(n) = (Symboltype) kind;
 	  unlinkString(narg);
 	  return n;
 	}
@@ -2390,8 +2391,8 @@ int32_t newSymbol(Symbolclass kind, ...)
 	  the routine is not yet defined */
       { int16_t	nArg, nStatement;
 	int32_t	oldContext;
-	char	**key;
-	 
+	char ** key;
+
 	n = i = va_arg(ap, int32_t);
 	if (n >= 0) {		/* first pass: n = index of routine's name */
 				/* in symbolStack[] */
@@ -2475,17 +2476,17 @@ int32_t newSymbol(Symbolclass kind, ...)
 	      if (nArg &&
 		  !eallocate(routine_parameter_names(n), nArg, char *)) {
 		/* could not allocate memory to store the parameter names */
-		va_end(ap); 
+		va_end(ap);
 		return luxerror("Memory allocation error", 0);
 	      }
 	      key = routine_parameter_names(n) + nArg;
 	      while (nArg--) {
 		*--arg = findVar(popList(), n); /* parameter's symbol # */
-		*--key = varName(*arg); /* parameter's name */
+		*--key = (char*) varName(*arg); /* parameter's name */
 		symbol_class(*arg) = LUX_POINTER;
 		transfer_target(*arg) = 0;
 		transfer_temp_param(*arg) = 0;
-		transfer_is_parameter(*arg) = 1;
+		transfer_is_parameter(*arg) = (Symboltype) 1;
 	      }
 	      popList(); 		/* remove list start marker */
 	    }
@@ -2582,19 +2583,19 @@ int32_t newSymbol(Symbolclass kind, ...)
 				/* doing that */
 	  keepEVB--;		/* executables are again more temporary */
 	  symbol_context(n) = 0; /* routines always have context 0 */
-	  usr_routine_recursion(n) = 0; /* no recursion yet */
+	  usr_routine_recursion(n) = (Symboltype) 0; /* no recursion yet */
 	  return 0;
 	}
       }
       case LUX_EVB: case LUX_INT_FUNC: case LUX_USR_FUNC:
 	if (kind == LUX_EVB) {
-	  kind = va_arg(ap, int32_t);
-	  symbol_type(n) = kind;
+          kind = (Symbolclass) va_arg(ap, int);
+	  symbol_type(n) = (Symboltype) kind;
 	}
 	i = 0;			/* default: no more items to retrieve */
 	switch (kind) {
 	  case EVB_RETURN:
-	    i = 1; 
+	    i = 1;
 	    break;
 	  case EVB_REPLACE: case EVB_REPEAT: case EVB_WHILE_DO:
 	  case EVB_DO_WHILE:
@@ -2611,7 +2612,7 @@ int32_t newSymbol(Symbolclass kind, ...)
 	    break;
 	  case EVB_FILE:
 	    i = va_arg(ap, int32_t);	/* index to string */
-	    file_name(n) = symbolStack[i];
+	    file_name(n) = (char*) symbolStack[i];
 	    symbol_memory(n) = strlen(symbolStack[i]) + 1;
 	    unlinkString(i);
 	    i = va_arg(ap, int32_t);	/* include type: INCLUDE -> always,
@@ -2651,7 +2652,7 @@ int32_t newSymbol(Symbolclass kind, ...)
 	    embed(*arg, n);
 	    arg++;
 	  }
-	  if (kind == EVB_FOR) {
+	  if ((EVBclass) kind == EVB_FOR) {
 	    for_body(n) = va_arg(ap, int32_t);
 	    embed(for_body(n), n);
 	  }
@@ -2730,7 +2731,7 @@ int32_t newSymbol(Symbolclass kind, ...)
 	break;
       case LUX_EVB: case LUX_INT_FUNC: case LUX_USR_FUNC:
 	if (kind == LUX_EVB)
-	  kind = va_arg(ap, int32_t);
+	  kind = (Symbolclass) va_arg(ap, int);
 	switch (kind) {
 	  case EVB_FILE:
 	    i = va_arg(ap, int32_t);
@@ -2758,7 +2759,7 @@ int32_t newSymbol(Symbolclass kind, ...)
   return n;
 }
 /*----------------------------------------------------------------*/
-int32_t hash(char *string)
+int32_t hash(char const* string)
 {
  int32_t	i;
 
@@ -2775,7 +2776,7 @@ int32_t ircmp(const void *a, const void *b)
   return strcmp(ra->name, rb->name);
 }
 /*----------------------------------------------------------------*/
-int32_t findInternalName(char *name, int32_t isSubroutine)
+int32_t findInternalName(char const* name, int32_t isSubroutine)
 /* searches for name in the appropriate subroutine
   or function table.  if found, returns
   index, else returns -1 */
@@ -2791,7 +2792,7 @@ int32_t findInternalName(char *name, int32_t isSubroutine)
     n = nFunction;
   }
   key.name = name;
-  found = bsearch(&key, table, n, sizeof(*table), ircmp);
+  found = (internalRoutine*) bsearch(&key, table, n, sizeof(*table), ircmp);
   return found? found - table: -1;
 }
 /*----------------------------------------------------------------*/
@@ -2799,14 +2800,14 @@ static compileInfo	*c_info = NULL;
 int32_t	cur_c_info = 0, n_c_info = 0;
 compileInfo	*curCompileInfo;
 
-int32_t nextCompileLevel(FILE *fp, char *fileName)
+int32_t nextCompileLevel(FILE *fp, char const* fileName)
 /* saves the rest of the current input line and starts reading
  input from file fp.  When the file is processed, compilation
  at the current level is resumed. */
 {
  int32_t	n, oldZapContext;
- char	*name;
- extern int32_t	echo; 
+ char const* name;
+ extern int32_t	echo;
  extern char	inHistoryBuffer, tLine[], *inputString;
  extern uint8_t	disableNewline;
  int32_t	yyparse(void), getStreamChar(void), getStringChar(void);
@@ -2953,9 +2954,9 @@ int32_t newBlockSymbol(int32_t index)
     return 0;
   }
   if ((n = lookForVar(index, curContext)) >= 0) { /* blockroutine pointer? */
-    if (sym[n].class == LUX_FUNC_PTR) {
+    if (symbol_class(n) == LUX_FUNC_PTR) {
       if (func_ptr_routine_num(n) > 0) { /* user-defined */
-	if (sym[n = func_ptr_routine_num(n)].class == LUX_BLOCKROUTINE) {
+	if (symbol_class(n = func_ptr_routine_num(n)) == LUX_BLOCKROUTINE) {
 	  freeString(index);
 	  return newSymbol(LUX_EVB, EVB_USR_CODE, n);
 	}
@@ -2969,7 +2970,7 @@ int32_t newBlockSymbol(int32_t index)
     if (n < 0)
       return LUX_ERROR;
     symbol_class(n) = LUX_STRING;
-    string_value(n) = symbolStack[index];
+    string_value(n) = (char*) symbolStack[index];
     unlinkString(index);
     symbol_memory(n) = strlen(string_value(n)) + 1;
     result = newSymbol(LUX_EVB, EVB_USR_CODE, n);
@@ -3012,7 +3013,7 @@ int32_t newSubrSymbol(int32_t index)
  if (n >= 0 && symbol_class(n) == LUX_FUNC_PTR) { /* maybe subr pointer */
    freeString(index);		/* remove name from stacke */
    if (func_ptr_routine_num(n) < 0) {	/* internal routine/function */
-     if (func_ptr_type(n) == LUX_SUBROUTINE)
+     if ((Symbolclass) func_ptr_type(n) == LUX_SUBROUTINE)
        return newSymbol(LUX_EVB, EVB_INT_SUB, -sym[n].spec.evb.args[0]);
    } else {
      n = func_ptr_routine_num(n); /* user-defined routine */
@@ -3037,13 +3038,13 @@ int32_t newSubrSymbol(int32_t index)
  return newSymbol(LUX_EVB, EVB_USR_SUB, n);
 }
 /*----------------------------------------------------------------*/
-int32_t lookForName(char *name, hashTableEntry *hashTable[], int32_t context)
+int32_t lookForName(char const* name, hashTableEntry *hashTable[], int32_t context)
      /* searches name in hashTable[] for context.  if found,
 	returns symbol number, otherwise returns -1 */
 {
   int32_t		hashValue, n;
   hashTableEntry	*hp;
-  
+
   hashValue = hash(name);
   if (*name == '$' || *name == '#' || *name == '!') context = 0;
   hp = hashTable[hashValue];
@@ -3058,8 +3059,13 @@ int32_t lookForName(char *name, hashTableEntry *hashTable[], int32_t context)
   if (hashTable == funcHashTable)
   { n = strlen(name);
     if (n > 2 && name[n - 2] == '_' && name[n - 1] == 'F')
-    { name[n - 2] = '\0';
-      return lookForName(name, hashTable, context); }
+    {
+      char *t = strdup(name);
+      t[n - 2] = '\0';
+      int32_t result = lookForName(t, hashTable, context);
+      free(t);
+      return result;
+    }
   }
   return -1;
 }
@@ -3077,13 +3083,13 @@ int32_t findSym(int32_t index, hashTableEntry *hashTable[], int32_t context)
    freeString(index);
    return 0;
  }
- name = symbolStack[index];
+ name = (char*) symbolStack[index];
  n = findName(name, hashTable, context);
  freeString(index);
  return n;
 }
 /*----------------------------------------------------------------*/
-char *symName(int32_t symNum, hashTableEntry *hashTable[])
+char const* symName(int32_t symNum, hashTableEntry *hashTable[])
 /* returns the name of the symbol, if any, or "[symNum]" */
 {
  static char	name[7];
@@ -3105,7 +3111,7 @@ char *symName(int32_t symNum, hashTableEntry *hashTable[])
  return name;
 }
 /*----------------------------------------------------------------*/
-char *symbolName(int32_t symbol)
+char const* symbolName(int32_t symbol)
 /* returns the name of the symbol. */
 {
   hashTableEntry	**hashTable;
@@ -3236,10 +3242,10 @@ void exception(int32_t sig)
  return;
 }
 /*----------------------------------------------------------------*/
-char *typeName(int32_t type)
+char const* typeName(int32_t type)
 /* returns the name that goes with the data type */
 {
-  static char *typeNames[] = {
+  static char const* typeNames[] = {
     "BYTE", "WORD", "LONG", "INT64", "FLOAT", "DOUBLE",
     "STRING", "STRING", "STRING", "CFLOAT", "CDOUBLE",
     "undefined", "unknown"
@@ -3255,11 +3261,11 @@ char *typeName(int32_t type)
   return typeNames[index];
 }
 /*----------------------------------------------------------------*/
-char *className(int32_t class)
+char const* className(int32_t class_id)
 /* returns the name of the class */
 {
   static struct classInfo {
-    uint8_t number; char *name;
+    uint8_t number; char const* name;
   } classes[] = {
     { LUX_UNUSED, "not used" },
     { LUX_SCALAR, "scalar" },
@@ -3291,7 +3297,7 @@ char *className(int32_t class)
     { LUX_FUNCTION, "function" },
     { LUX_BLOCKROUTINE, "block routine" },
     { LUX_DEFERRED_SUBR, "deferred subroutine" },
-    { LUX_DEFERRED_FUNC, "deferred function" }, 
+    { LUX_DEFERRED_FUNC, "deferred function" },
     { LUX_DEFERRED_BLOCK, "deferred block routine" },
     { LUX_BIN_OP, "binary operation" },
     { LUX_INT_FUNC, "internal function call" },
@@ -3314,14 +3320,14 @@ char *className(int32_t class)
 
  int32_t	hash;
 
- if (class < 0)
+ if (class_id < 0)
    hash = 26;
  else {
-   hash = class % 76;
+   hash = class_id % 76;
    if (hash > 51)
      hash = 25;
    hash = classHashTable[hash];
-   if (class != (int32_t) classes[hash].number)
+   if (class_id != (int32_t) classes[hash].number)
      hash = 42;
  }
  return classes[hash].name;
@@ -3330,14 +3336,14 @@ char *className(int32_t class)
 int32_t lux_classname(int32_t narg, int32_t ps[])
      /* returns name associated with class number */
 {
-  int32_t	class, result;
+  int32_t	class_id, result;
   char	*name;
 
-  class = int_arg(*ps);
+  class_id = int_arg(*ps);
   getFreeTempVariable(result);
-  sym[result].class = LUX_STRING;
+  symbol_class(result) = LUX_STRING;
   string_type(result) = LUX_TEMP_STRING;
-  name = string_value(result) = strsave(className(class));
+  name = string_value(result) = strsave(className(class_id));
   symbol_memory(result) = strlen(name) + 1;
   return result;
 }
@@ -3350,17 +3356,17 @@ int32_t lux_typeName(int32_t narg, int32_t ps[])
 
   if ((type = int_arg(*ps)) < 0) return -1;
   getFreeTempVariable(result);
-  sym[result].class = LUX_STRING;
+  symbol_class(result) = LUX_STRING;
   string_type(result) = LUX_TEMP_STRING;
   name = string_value(result) = strsave(typeName(type));
   symbol_memory(result) = strlen(name) + 1;
   return result;
 }
 /*----------------------------------------------------------------*/
-char *evbName(int32_t evbType)
+char const* evbName(int32_t evbType)
      /* returns the name of an EVB type */
 {
-  static char *evbTypeNames[] = {
+  static char const* evbTypeNames[] = {
     "statement group", "replacement", "internal suboutine call",
     "for statement", "insertion", "if statement",
     "user-defined subroutine call", "while-do statement",
@@ -3371,14 +3377,14 @@ char *evbName(int32_t evbType)
 
   if (evbType < EVB_BLOCK || evbType > EVB_FILE)
     evbType = EVB_FILE + 1;
-  
+
   return evbTypeNames[evbType - 1];
 }
 /*----------------------------------------------------------------*/
-char *filetypeName(int32_t filetype)
+char const* filetypeName(int32_t filetype)
 /* returns the name associated with a file type */
 {
-  static char *filetypeNames[] = {
+  static char const* filetypeNames[] = {
     "Unknown", "LUX fz", "IDL Save", "GIF", "LUX Astore", "JPEG", "TIFF",
     "FITS", "PPM (raw)", "PPM (ascii)", "XPM", "X11 bitmap", "BMP",
     "Sun raster", "Iris RGB", "Targa (24 bit)", "PM"
@@ -3391,7 +3397,7 @@ char *filetypeName(int32_t filetype)
 /*----------------------------------------------------------------*/
 int32_t lux_filetype_name(int32_t narg, int32_t ps[])
 {
-  char	*name;
+  char const* name;
   int32_t	result;
 
   name = filetypeName(int_arg(ps[0]));
@@ -3400,7 +3406,7 @@ int32_t lux_filetype_name(int32_t narg, int32_t ps[])
   return result;
 }
 /*----------------------------------------------------------------*/
-void fixedValue(char *name, Symboltype type, ...)
+void fixedValue(char const* name, Symboltype type, ...)
 /* install a numerical constant */
 {
  int32_t	n, iq;
@@ -3418,7 +3424,7 @@ void fixedValue(char *name, Symboltype type, ...)
    symbol_memory(n) = strlen(string_value(n)) + 1;
    break;
  case LUX_CFLOAT: case LUX_CDOUBLE:
-   complex_scalar_data(n).cf = malloc(lux_type_size[type]);
+   complex_scalar_data(n).cf = (floatComplex*) malloc(lux_type_size[type]);
    if (!complex_scalar_data(n).cf)
      puts("WARNING - memory allocation error in symbol initialization");
    complex_scalar_memory(n) = lux_type_size[type];
@@ -3458,7 +3464,7 @@ void fixedValue(char *name, Symboltype type, ...)
  }
 }
 /*----------------------------------------------------------------*/
-int32_t installSysFunc(char *name, int32_t number)
+int32_t installSysFunc(char const* name, int32_t number)
 /* install a system function.  These are implemented as FUNC_PTRs to */
 /* the appropriate function */
 {
@@ -3466,24 +3472,24 @@ int32_t installSysFunc(char *name, int32_t number)
 
  iq = installString(name);
  n = findVar(iq,0);
- sym[n].class = LUX_FUNC_PTR;
+ symbol_class(n) = LUX_FUNC_PTR;
  func_ptr_routine_num(n) = -number;
- func_ptr_type(n) = LUX_FUNCTION;
+ func_ptr_type(n) = (Symboltype) LUX_FUNCTION;
  return n;
 }
 /*----------------------------------------------------------------*/
-int32_t installPointer(char *name, int32_t type, void *ptr)
+int32_t installPointer(char const* name, Symboltype type, void *ptr)
 /* install a LUX_SCAL_PTR system variable */
-{ 
+{
  int32_t	n, iq;
- 
+
  iq = installString(name);
  n = findVar(iq, 0);
- sym[n].class = LUX_SCAL_PTR;
+ symbol_class(n) = LUX_SCAL_PTR;
  scal_ptr_type(n) = type;
  scal_ptr_pointer(n).l = (int32_t *) ptr;
  if (type == LUX_TEMP_STRING)
-   symbol_memory(n) = strlen(ptr) + 1;
+   symbol_memory(n) = strlen((char*) ptr) + 1;
  return n;
 }
 /*----------------------------------------------------------------*/
@@ -3549,7 +3555,7 @@ int32_t convertRange(int32_t range)
   return subsc;
 }
 /*----------------------------------------------------------------*/
-void convertPointer(scalar *target, Symboltype inType, Symboltype outType)
+void convertPointer(Scalar *target, Symboltype inType, Symboltype outType)
 /* converts value in target from inType to outType */
 {
   switch (outType) {
@@ -3909,7 +3915,7 @@ void convertWidePointer(wideScalar *target, int32_t inType, int32_t outType)
   }
 }
 /*----------------------------------------------------------------*/
-void convertScalar(scalar *target, int32_t nsym, Symboltype type)
+void convertScalar(Scalar *target, int32_t nsym, Symboltype type)
 /* returns scalar value of nsym, converted to proper type, in target */
 {
  int32_t		n;
@@ -4053,7 +4059,7 @@ void convertScalar(scalar *target, int32_t nsym, Symboltype type)
  }
 }
 /*----------------------------------------------------------------*/
-int32_t lux_symbol_memory()
+int32_t lux_symbol_memory(int32_t narg, int32_t ps[])
 /* returns the total of the memory allocated for each LUX symbol */
 /* - which is NOT the same as the total allocated memory. */
 /* Note:  some small stuff is not included. */
@@ -4061,7 +4067,7 @@ int32_t lux_symbol_memory()
  int32_t	i, mem = 0;
 
  for (i = 0; i < NSYM; i++)
- { switch (sym[i].class)
+ { switch (symbol_class(i))
    { case LUX_EVB:
        switch (sym[i].type)
        { default:
@@ -4147,7 +4153,7 @@ int32_t lux_trace(int32_t narg, int32_t ps[])
 #define s_ptr(name, value) installPointer(name, LUX_TEMP_STRING, value)
 #define fnc_p(name, value) installSysFunc(name, value)
 
-char	*defaultRedirect = "diagnostic.lux";
+char const* defaultRedirect = "diagnostic.lux";
 
 int32_t range_warn_flag = 0, redim_warn_flag = 0, error_extra = 0,
   maxhistsize = 20000, histmin, histmax, lastmaxloc, lastminloc,
@@ -4160,7 +4166,7 @@ int32_t range_warn_flag = 0, redim_warn_flag = 0, error_extra = 0,
   d_r_sym;
 
 float	contour_dash_lev, contour_tick_fac = 0.5, *p3d;
-scalar	lastmin, lastmax, lastmean, lastsdev;
+Scalar	lastmin, lastmax, lastmean, lastsdev;
 extern int32_t	lunplt, landscape, iorder, ilabx, ilaby, irxf, iryf, ndx,
         ndxs, nd, ndys, ifz, ifzx, ier, ifont, ndlabx, ndlaby,
         ndot, ipltyp, iblank, maxregridsize, nExecuted,
@@ -4290,8 +4296,6 @@ struct boundsStruct bounds = {
 
 int32_t	LUX_MATMUL_FUN;
 
-internalRoutine *subroutine, *function;
-
 #define	FORMATSIZE	1024
 void symbolInitialization(void)
 {
@@ -4303,7 +4307,6 @@ void symbolInitialization(void)
 #if DEVELOP
  char	*p;
 #endif
- int32_t	to_scratch_array(int32_t, int32_t, int32_t, int32_t []);
  extern char	*fmt_integer, *fmt_float, *fmt_string, *fmt_complex,
   *curScrat, *printString;
  union { uint8_t b[2]; int16_t w; } whichendian;
@@ -4312,7 +4315,7 @@ void symbolInitialization(void)
  whichendian.w = 1;
  MSBfirst = (int32_t) whichendian.b[1]; /* most significant Byte first? */
 
- firstbreak = sbrk(0);		/* for memck.c */
+ firstbreak = (char*) sbrk(0);		/* for memck.c */
  curTEIndex = tempExecutableIndex;
  if (signal(SIGFPE, exception) == SIG_ERR
      || signal(SIGINT, exception) == SIG_ERR
@@ -4324,10 +4327,10 @@ void symbolInitialization(void)
  extern struct obstack *registered_subroutines;
  int32_t registered_subroutines_size
    = registered_subroutines? obstack_object_size(registered_subroutines): 0;
- subroutine = malloc(registered_subroutines_size
+ subroutine = (internalRoutine*) malloc(registered_subroutines_size
                      + nSubroutine*sizeof(internalRoutine));
  if (registered_subroutines)
-   memcpy(subroutine, obstack_finish(registered_subroutines), 
+   memcpy(subroutine, obstack_finish(registered_subroutines),
           registered_subroutines_size);
  memcpy((char *) subroutine + registered_subroutines_size,
         subroutine_table, nSubroutine*sizeof(internalRoutine));
@@ -4338,10 +4341,10 @@ void symbolInitialization(void)
  extern struct obstack *registered_functions;
  int32_t registered_functions_size
    = registered_functions? obstack_object_size(registered_functions): 0;
- function = malloc(registered_functions_size
+ function = (internalRoutine*) malloc(registered_functions_size
                      + nFunction*sizeof(internalRoutine));
  if (registered_functions)
-   memcpy(function, obstack_finish(registered_functions), 
+   memcpy(function, obstack_finish(registered_functions),
           registered_functions_size);
  memcpy((char *) function + registered_functions_size,
         function_table, nFunction*sizeof(internalRoutine));
@@ -4412,7 +4415,7 @@ void symbolInitialization(void)
 
  iq = installString("#CLASS");
  stackSym = findVar(iq, 0);	/* stackSym is a dummy variable */
- sym[stackSym].class = LUX_ENUM;
+ symbol_class(stackSym) = LUX_ENUM;
  enum_type(stackSym) = LUX_INT32;
  enum_list(stackSym) = classesStruct;
  symbol_memory(stackSym) = sizeof(classesStruct);
@@ -4428,7 +4431,7 @@ void symbolInitialization(void)
 
  iq = installString("#EVENT");
  stackSym = findVar(iq, 0);
- sym[stackSym].class = LUX_ENUM;
+ symbol_class(stackSym) = LUX_ENUM;
  enum_type(stackSym) = LUX_INT32;
  enum_list(stackSym) = eventStruct;
  symbol_memory(stackSym) = sizeof(eventStruct);
@@ -4436,7 +4439,7 @@ void symbolInitialization(void)
 
  iq = installString("#FILETYPE");
  stackSym = findVar(iq, 0);
- sym[stackSym].class = LUX_ENUM;
+ symbol_class(stackSym) = LUX_ENUM;
  enum_type(stackSym) = LUX_INT32;
  enum_list(stackSym) = filetypeStruct;
  symbol_memory(stackSym) = sizeof(filetypeStruct);
@@ -4444,7 +4447,7 @@ void symbolInitialization(void)
 
  iq = installString("#TYPE");
  stackSym = findVar(iq, 0);
- sym[stackSym].class = LUX_ENUM;
+ symbol_class(stackSym) = LUX_ENUM;
  enum_type(stackSym) = LUX_INT32;
  enum_list(stackSym) = typesStruct;
  symbol_memory(stackSym) = sizeof(typesStruct);
@@ -4453,7 +4456,7 @@ void symbolInitialization(void)
 #if DEVELOP
  iq = installString("#P3D");
  projectSym = findVar(iq, 0);
- sym[projectSym].class = LUX_ARRAY;
+ symbol_class(projectSym) = LUX_ARRAY;
  array_type(projectSym) = LUX_FLOAT;
  symbol_memory(projectSym) =
    sizeof(array) + 16*sizeof(float);
@@ -4468,7 +4471,7 @@ void symbolInitialization(void)
 
  iq = installString("#STACK");
  stackSym = findVar(iq, 0);
- sym[stackSym].class = LUX_CLIST;
+ symbol_class(stackSym) = LUX_CLIST;
  clist_symbols(stackSym) = stackPointer;
  symbol_memory(stackSym) = 0;	/* or it will get deallocated sometime */
  nFixed++;
@@ -4483,7 +4486,7 @@ void symbolInitialization(void)
  l_ptr("#ROW",		&termRow);
 
  l_ptr("#MSBFIRST",	&MSBfirst);
- s_ptr("#VERSION",	PACKAGE_VERSION);
+ s_ptr("#VERSION",	(char*) PACKAGE_VERSION);
 
  l_ptr("!AREA_DIAG",	&area_diag);
  l_ptr("!AUTOCON", 	&autocon);
@@ -4732,7 +4735,7 @@ void symbolInitialization(void)
 	   in  EVAL(string) */
  iq = installString("!TEMP");
  tempSym = findVar(iq, 0);
- sym[tempSym].class = LUX_SCALAR;
+ symbol_class(tempSym) = LUX_SCALAR;
  scalar_type(tempSym) = LUX_INT32;
  scalar_value(tempSym).l = 0;
  lastmax_sym = lookForVarName("!LASTMAX", 0);
@@ -5080,7 +5083,7 @@ int32_t lux_restart(int32_t narg, int32_t ps[])
   return 1;
 }
 /*----------------------------------------------------------------*/
-int32_t strccmp(char *s1, char *s2)
+int32_t strccmp(char const* s1, char const* s2)
 /* checks strings s1 and s2 for equality disregarding upper/lower case */
 /* distinctions */
 {
@@ -5144,8 +5147,8 @@ int32_t structSize(int32_t symbol, int32_t *nstruct, int32_t *nbyte)
   }
 }
 /*----------------------------------------------------------------*/
-int32_t makeStruct(int32_t symbol, char *tag, structElem **se, char *data,
-	       int32_t *offset, int32_t descend)
+int32_t makeStruct(int32_t symbol, char const* tag, structElem **se,
+                   char *data, int32_t *offset, int32_t descend)
 {
   int32_t	size, offset0, ndim, n;
   structElem	*se0;
@@ -5168,7 +5171,7 @@ int32_t makeStruct(int32_t symbol, char *tag, structElem **se, char *data,
       case LUX_STRING:
 	(*se)->u.regular.type = LUX_TEMP_STRING; /* data type */
 	(*se)->u.regular.spec.singular.ndim = 1; /* strings always have 1 */
-	if (!((*se)->u.regular.spec.singular.dims = malloc(sizeof(int32_t))))
+	if (!((*se)->u.regular.spec.singular.dims = (int32_t*) malloc(sizeof(int32_t))))
 	  return cerror(ALLOC_ERR, 0);
 	size = string_size(symbol); /* bytes per value */
 	(*se)->u.regular.spec.singular.dims[0] = size; /* first dimension */
@@ -5181,13 +5184,13 @@ int32_t makeStruct(int32_t symbol, char *tag, structElem **se, char *data,
 	  ndim++;		/* add one for string arrays to hold the */
 				/* length of the strings */
 	(*se)->u.regular.spec.singular.ndim = ndim;
-	if (!((*se)->u.regular.spec.singular.dims = malloc(ndim*sizeof(int32_t))))
+	if (!((*se)->u.regular.spec.singular.dims = (int32_t*) malloc(ndim*sizeof(int32_t))))
 	  return cerror(ALLOC_ERR, 0);
 	if (array_type(symbol) == LUX_STRING_ARRAY) {
 	  (*se)->u.regular.spec.singular.dims[0] =
 	    strlen(*(char **) array_data(symbol)); /* take length of first */
 						   /* one for all */
-	  memcpy((*se)->u.regular.spec.singular.dims + 1, 
+	  memcpy((*se)->u.regular.spec.singular.dims + 1,
 		 array_dims(symbol), array_num_dims(symbol)*sizeof(int32_t));
 	} else
 	  memcpy((*se)->u.regular.spec.singular.dims,
@@ -5299,18 +5302,18 @@ int32_t lux_struct(int32_t narg, int32_t ps[])
     case LUX_STRUCT:
       n = struct_num_top_elements(ps[0]);
       break;
-  }  
+  }
   se->u.first.nelem = n;
   se->u.first.size = size;
   se->u.first.ndim = ndim;
-  if (!(se->u.first.dims = malloc(ndim*sizeof(int32_t))))
+  if (!(se->u.first.dims = (int32_t*) malloc(ndim*sizeof(int32_t))))
     return cerror(ALLOC_ERR, 0);
   memcpy(se->u.first.dims, dims, ndim*sizeof(int32_t));
   se++;				/* point at the next one */
   offset = 0;
 
   /* now recursively fill in the deeper ones */
-  if (makeStruct(ps[0], NULL, &se, data.v, &offset, 0) == LUX_ERROR)
+  if (makeStruct(ps[0], NULL, &se, (char*) data.v, &offset, 0) == LUX_ERROR)
     return LUX_ERROR;
   return result;
 }
@@ -5359,7 +5362,7 @@ int32_t translateEscapes(char *p)
   return p - p0;
 }
 /*----------------------------------------------------------------*/
-int32_t installString(char *string)
+int32_t installString(char const* string)
 /* installs string in symbol stack; returns index to stack */
 {
  int32_t	index, n;
@@ -5371,15 +5374,15 @@ int32_t installString(char *string)
  if ((index = nextFreeStackEntry()) == LUX_ERROR)
    return LUX_ERROR;		/* error */
  n = strlen(string) + 1;
- p = malloc(n);
+ p = (char*) malloc(n);
  if (!p)
    return luxerror("Could not allocate %d bytes for string %s", 0, n, string);
  strcpy(p, string);
  p0 = p;
 
  if (translateEscapes(p) != n - 1) /* we shortened the string */
-   p0 = realloc(p0, n + 1);
- 
+   p0 = (char*) realloc(p0, n + 1);
+
  symbolStack[index] = p0;
 #if YYDEBUG
  if (yydebug)
@@ -5474,7 +5477,7 @@ void installKeys(void *keys)
  *(keyList **) keys = theKeyList;
 }
 /*----------------------------------------------------------------*/
-int32_t findName(char *name, hashTableEntry *hashTable[], int32_t context)
+int32_t findName(char const* name, hashTableEntry *hashTable[], int32_t context)
 /* searches for <name> in <hashTable[]> (with <context>).  if found, */
 /* returns symbol number, otherwise installs a copy of the name in */
 /* <hashTable[]> and sym[].  Returns -1 if an error occurs.  LS 6feb96 */
@@ -5602,9 +5605,9 @@ int32_t lux_verify(int32_t narg, int32_t ps[])
 		if (fp)		/* file exists */
 		  fclose(fp);
 		else {
-		  p = symbolProperName(symbol_context(i));
-		  if (p)
-		    printf("%s: ", p);
+                  char const* cp = symbolProperName(symbol_context(i));
+		  if (cp)
+		    printf("%s: ", cp);
 		  puts(symbolIdent(i, I_LINE));
 		  printf("Cannot find subroutine %s\n", name);
 		}
@@ -5617,9 +5620,9 @@ int32_t lux_verify(int32_t narg, int32_t ps[])
 	      /* routine name was not yet evaluated */
 	      name = string_value(n);
 	      if ((n = lookForName(name, blockHashTable, curContext)) < 0) {
-		p = symbolProperName(symbol_context(i));
-		if (p)
-		  printf("%s: ", p);
+		char const* cp = symbolProperName(symbol_context(i));
+		if (cp)
+		  printf("%s: ", cp);
 		puts(symbolIdent(i, I_LINE));
 		printf("Cannot find block routine %s\n", name);
 	      }
@@ -5641,7 +5644,7 @@ compileInfo *nextFreeCompileInfo(void)
 {
   if (cur_c_info >= n_c_info) { /* need more room */
     n_c_info += 16;
-    c_info = realloc(c_info, n_c_info*sizeof(compileInfo));
+    c_info = (compileInfo*) realloc(c_info, n_c_info*sizeof(compileInfo));
     if (!c_info) {
       puts("pushCompileLevel:");
 	cerror(ALLOC_ERR, 0);
@@ -5665,7 +5668,7 @@ void pushExecutionLevel(int32_t line, int32_t target)
 {
   if (cur_e_info + 1 >= n_e_info) { /* need more room */
     n_e_info += 16;
-    e_info = realloc(e_info, n_e_info*sizeof(executionLevelInfo));
+    e_info = (executionLevelInfo*) realloc(e_info, n_e_info*sizeof(executionLevelInfo));
     if (!e_info) {
       puts("pushExecutionLevel:");
       cerror(ALLOC_ERR, 0);

@@ -17,7 +17,7 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "vsop.h"
+#include "vsop.hh"
 
 double VSOP87Cterms[] = {
 0.37749277893, 4.40259139579, 26088.14695905770, 

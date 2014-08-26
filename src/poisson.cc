@@ -22,7 +22,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
-#include "action.h"
+#include "action.hh"
 #include <string.h>		/* for memcpy */
 
 typedef struct {
@@ -49,10 +49,10 @@ int32_t lux_laplace2d(int32_t narg, int32_t ps[])
     img = lux_float(1, &img);	/* get temp FLOAT version */
   nx = array_dims(img)[0];
   ny = array_dims(img)[1];
-  src.f = array_data(img);
+  src.f = (float*) array_data(img);
 
   result = array_clone(img, array_type(img)); /* create output variable */
-  tgt.f = array_data(result);
+  tgt.f = (float*) array_data(result);
 
   switch (array_type(img)) {
   case LUX_FLOAT:
@@ -140,16 +140,16 @@ int32_t lux_laplace2d(int32_t narg, int32_t ps[])
     src.d++;
     break;
   }
-  
+
   return result;
 }
-  
-int32_t gauss_seidel_2d2o(pointer b, pointer x, scalar sx, scalar sy, int32_t type,
-		      int32_t nx, int32_t ny)
+
+int32_t gauss_seidel_2d2o(pointer b, pointer x, Scalar sx, Scalar sy,
+                          int32_t type, int32_t nx, int32_t ny)
 {
   int32_t i, j;
-  scalar s;
-  
+  Scalar s;
+
   switch (type) {
   case LUX_FLOAT:
     /* initialization */
@@ -255,8 +255,8 @@ int32_t gauss_seidel_2d2o(pointer b, pointer x, scalar sx, scalar sy, int32_t ty
   return 0;
 }
 
-void restrict2(pointer b, pointer x, int32_t type, int32_t nx, int32_t ny, scalar sx, 
-	      scalar sy, int32_t do_residual, pointer tgt)
+void restrict2(pointer b, pointer x, int32_t type, int32_t nx, int32_t ny,
+               Scalar sx, Scalar sy, int32_t do_residual, pointer tgt)
 {
   int32_t i, j, nx2, ny2;
   pointer r0, r;		/* nx+2 by 3 elements */
@@ -265,7 +265,7 @@ void restrict2(pointer b, pointer x, int32_t type, int32_t nx, int32_t ny, scala
   ny2 = ny/2;
   switch (type) {
   case LUX_FLOAT:
-    r0.f = malloc(nx*3*sizeof(*r0.f));
+    r0.f = (float*) malloc(nx*3*sizeof(*r0.f));
 
     r.f = r0.f + 2*nx;		/* bottom row of r.f */
 
@@ -423,15 +423,15 @@ void restrict2(pointer b, pointer x, int32_t type, int32_t nx, int32_t ny, scala
   }
 }
 
-void restrict_residual(pointer b, pointer x, int32_t type, int32_t nx, int32_t ny,
-		      scalar sx, scalar sy, pointer tgt)
+void restrict_residual(pointer b, pointer x, int32_t type, int32_t nx,
+                       int32_t ny, Scalar sx, Scalar sy, pointer tgt)
 {
   restrict2(b, x, type, nx, ny, sx, sy, 1, tgt);
 }
 
 void restrict(pointer x, int32_t type, int32_t nx, int32_t ny, pointer tgt)
 {
-  scalar dummy;
+  Scalar dummy;
 
   dummy.d = 0;
   restrict2(x, x, type, nx, ny, dummy, dummy, 0, tgt);
@@ -439,7 +439,8 @@ void restrict(pointer x, int32_t type, int32_t nx, int32_t ny, pointer tgt)
 
 int32_t lux_antilaplace2d(int32_t narg, int32_t ps[])
 {
-  int32_t img, result = LUX_ERROR, nx, ny, type, nx2, ny2, nlevel, i, nelem;
+  int32_t img, result = LUX_ERROR, nx, ny, nx2, ny2, nlevel, i, nelem;
+  Symboltype type;
   pointer src, tgt;
   Pyramid pyramid;
 
@@ -453,7 +454,7 @@ int32_t lux_antilaplace2d(int32_t narg, int32_t ps[])
   type = array_type(img);
   nx = array_dims(img)[0];
   ny = array_dims(img)[1];
-  src.f = array_data(img);
+  src.f = (float*) array_data(img);
 
   nx2 = nx;
   ny2 = ny;
@@ -464,20 +465,20 @@ int32_t lux_antilaplace2d(int32_t narg, int32_t ps[])
     ny2 /= 2;
     nlevel++;
   }
-  ALLOCATE(pyramid, 1);
+  pyramid = (Pyramid) calloc(1, sizeof(*pyramid));
   if (!pyramid)
     return cerror(ALLOC_ERR, 0);
-  ALLOCATE(pyramid->nx, nlevel);
-  ALLOCATE(pyramid->ny, nlevel);
+  pyramid->nx = (int32_t*) calloc(nlevel, sizeof(*pyramid->nx));
+  pyramid->ny = (int32_t*) calloc(nlevel, sizeof(*pyramid->ny));
   switch (type) {
   case LUX_FLOAT:
-    ALLOCATE(pyramid->data.f, nelem);
+    pyramid->data.f = (float*) calloc(nelem, sizeof(*pyramid->data.f));
     break;
   case LUX_DOUBLE:
-    ALLOCATE(pyramid->data.d, nelem);
+    pyramid->data.d = (double*) calloc(nelem, sizeof(*pyramid->data.d));
     break;
   }
-  ALLOCATE(pyramid->levels, nlevel);
+  pyramid->levels = (pointer*) calloc(nlevel, sizeof(*pyramid->levels));
   if (!pyramid->nx || !pyramid->ny || !pyramid->data.f || !pyramid->levels) {
     result = cerror(ALLOC_ERR, 0);
     goto free_pyramid;
@@ -533,15 +534,15 @@ int32_t lux_antilaplace2d(int32_t narg, int32_t ps[])
     int32_t ndim, *dims;
 
     ndim = array_num_dims(img);
-    ALLOCATE(dims, ndim + 1);
+    dims = (int32_t*) calloc(ndim + 1, sizeof(*dims));
     memcpy(dims, array_dims(img), ndim*sizeof(*dims));
     dims[ndim] = 2;
     result = array_scratch(type, ndim + 1, dims);
     free(dims);
   }
-  memcpy(array_data(result), pyramid->levels[0].f, 
+  memcpy(array_data(result), pyramid->levels[0].f,
 	 nx*ny*2*lux_type_size[type]);
-  
+
  free_pyramid:
   free(pyramid->data.f);
   free(pyramid->levels);

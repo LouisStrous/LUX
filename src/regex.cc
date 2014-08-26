@@ -21,8 +21,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "config.h"
 #endif
 #if HAVE_REGEX_H
-#include "install.h"
-#include "action.h"
+#include "install.hh"
+#include "action.hh"
 #include <regex.h>
 #include <sys/types.h>
 #include <string.h>

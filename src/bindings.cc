@@ -67,11 +67,11 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
     example, <tt>double, double, double</tt> is encoded as ‘dT3’.
 
 */
-#include "luxdefs.h"
-#include "error.h"
+#include "luxdefs.hh"
+#include "error.hh"
 #include <math.h>
 #include <obstack.h>
-#include "bindings.h"
+#include "bindings.hh"
 #define obstack_chunk_alloc malloc
 #define obstack_chunk_free free
 
@@ -83,13 +83,13 @@ int32_t advanceLoop(loopInfo *, pointer *);
 
 struct obstack *registered_functions = NULL, *registered_subroutines = NULL;
 
-void register_lux_f(int32_t (*f)(int32_t, int32_t []), char *name, int32_t min_arg,
-                    int32_t max_arg, char *spec)
+void register_lux_f(int32_t (*f)(int32_t, int32_t []), char const* name,
+                    int32_t min_arg, int32_t max_arg, char const* spec)
 {
   internalRoutine ir;
 
   if (!registered_functions) {
-    registered_functions = malloc(sizeof(*registered_functions));
+    registered_functions = (obstack*) malloc(sizeof(*registered_functions));
     obstack_init(registered_functions);
   }
   ir.name = name;
@@ -100,13 +100,13 @@ void register_lux_f(int32_t (*f)(int32_t, int32_t []), char *name, int32_t min_a
   obstack_grow(registered_functions, &ir, sizeof(ir));
 }
 /*-----------------------------------------------------------------------*/
-void register_lux_s(int32_t (*f)(int32_t, int32_t []), char *name, int32_t min_arg,
-                    int32_t max_arg, char * spec)
+void register_lux_s(int32_t (*f)(int32_t, int32_t []), char const* name,
+                    int32_t min_arg, int32_t max_arg, char const* spec)
 {
   internalRoutine ir;
 
   if (!registered_subroutines) {
-    registered_subroutines = malloc(sizeof(*registered_subroutines));
+    registered_subroutines = (obstack*) malloc(sizeof(*registered_subroutines));
     obstack_init(registered_subroutines);
   }
   ir.name = name;
@@ -1506,7 +1506,7 @@ int32_t lux_d_sd_iDaLarDxq_000_2_f_(int32_t narg, int32_t ps[], double (*f)(doub
 
   if (internalMode & 1) {	/* /ALLAXES */
     naxes = infos[0].ndim;
-    axes = malloc(naxes*sizeof(int32_t));
+    axes = (int32_t*) malloc(naxes*sizeof(int32_t));
     allaxes = 1;
     int32_t i;
     for (i = 0; i < naxes; i++)
@@ -1571,7 +1571,7 @@ int32_t lux_ivarl_copy_eachaxis_(int32_t narg, int32_t ps[], int32_t (*f)(double
 
   if (internalMode & 1) {	/* /ALLAXES */
     naxes = infos[0].ndim;
-    axes = malloc(naxes*sizeof(int32_t));
+    axes = (int32_t*) malloc(naxes*sizeof(int32_t));
     allaxes = 1;
     int32_t i;
     for (i = 0; i < naxes; i++)

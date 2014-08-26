@@ -31,7 +31,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <sys/mtio.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include "action.h"
+#include "action.hh"
 /* ioctl() is generally defined in sys/ioctl.h or in unistd.h */
 #include <sys/ioctl.h>
 #include <unistd.h>
@@ -127,8 +127,7 @@ int32_t lux_rewind(int32_t narg, int32_t ps[])/* rewind a tape drive */
   return check_tape_io(ioctl(fd, MTIOCTOP, &rew));
 }
 /*------------------------------------------------------------------------- */
-int32_t lux_weof(narg,ps)				/* write an eof on tape drive */
-int32_t	narg, ps[];
+int32_t lux_weof(int32_t narg, int32_t ps[]) /* write an eof on tape drive */
 {
 int32_t	fd;
 if ( (fd = tape_setup(narg,ps)) < 0) return -1;;
@@ -149,8 +148,7 @@ int32_t lux_unload(int32_t narg, int32_t ps[])/* unload a tape drive */
   return 1;
 }
 /*------------------------------------------------------------------------- */
-int32_t lux_skipr(narg,ps)				/* skip records */
-int32_t	narg, ps[];
+int32_t lux_skipr(int32_t narg, int32_t ps[]) /* skip records */
 {
 int32_t	fd, nr;
 if ( (fd = tape_setup(narg,ps)) < 0) return -1;;
@@ -164,8 +162,7 @@ tape_op.mt_op = MTBSR;	tape_op.mt_count = -nr;
 return check_tape_io( ioctl(fd, MTIOCTOP, &tape_op) );
 }
 /*------------------------------------------------------------------------- */
-int32_t lux_skipf(narg,ps)				/* skip records */
-int32_t	narg, ps[];
+int32_t lux_skipf(int32_t narg, int32_t ps[]) /* skip records */
 {
 int32_t	fd, nf;
 if ( (fd = tape_setup(narg,ps)) < 0) return -1;;
@@ -220,8 +217,7 @@ int32_t lux_taprd(int32_t narg, int32_t ps[])
   return 1;
 }
  /*------------------------------------------------------------------------- */
-int32_t lux_tapwrt(narg,ps)				/* read tape record */
- int32_t	narg, ps[];
+int32_t lux_tapwrt(int32_t narg, int32_t ps[]) /* read tape record */
  {
  int32_t	fd, nbr, iq, j, nd, n, type;
  array	*h;
@@ -406,8 +402,7 @@ int32_t lux_tapebufin(int32_t narg, int32_t ps[])/* read tape record */
  return 1;
  }
  /*------------------------------------------------------------------------- */
-int32_t lux_wait_for_tape(narg,ps)				/* read tape record */
-int32_t	narg, ps[];
+int32_t lux_wait_for_tape(int32_t narg, int32_t ps[]) /* read tape record */
 {
 /* a dummy version, we'll need this when we do asynchronous tape i/o */
 return 1;

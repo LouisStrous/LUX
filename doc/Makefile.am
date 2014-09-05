@@ -37,5 +37,5 @@ CLEANFILES = doxyfile.stamp
 
 all-local: doxyfile.stamp
 clean-local:
-	rm -rf $(top_builddir)/doc/doxy
+	rm -rf $(top_builddir)/doc/lux.doxy
 endif

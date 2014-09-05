@@ -1,6 +1,5 @@
-*.log
-*.o
-*.trs
 .deps
-check-axis
-check-binop
+*.o
+*.log
+*.trs
+main

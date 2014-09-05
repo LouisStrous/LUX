@@ -17,10 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 
-TESTS = check-axis check-binop
-check_PROGRAMS = check-axis check-binop
-check_axis_SOURCES = check-axis.c
-check_binop_SOURCES = check-binop.c
-AM_CPPFLAGS = -I$(top_srcdir)/src
-AM_CFLAGS = -I$(top_builddir)/src @CHECK_CFLAGS@
-LDADD = $(top_builddir)/src/liblux.a -lm -lc -ljpeg -lX11 -lgsl @CHECK_LIBS@
+TESTS = main
+check_PROGRAMS = main
+main_SOURCES = main.cc check-axis.cc check-binop.cc
+main_CXXFLAGS = -I$(top_srcdir)/src $(CPPUNIT_CFLAGS)
+main_LDADD = $(top_builddir)/src/liblux.a -lm -lc -ljpeg -lX11 -lgsl $(CPPUNIT_LIBS)

@@ -7,7 +7,7 @@ AC_LANG([C++])
 AC_CONFIG_SRCDIR([src/lux.cc])
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE
-PKG_CHECK_MODULES([CHECK],[check >= 0.9.4])
+AM_PATH_CPPUNIT()
 
 AC_CANONICAL_HOST
 AC_DEFINE_UNQUOTED([PLATFORM], "${host}", [The canonical host type])

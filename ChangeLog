@@ -2,6 +2,27 @@
 
 Change Log of LUX
 
+- <2014-09-05 Fri> lux@quae.nl v1.1.0
+  - Add SINCOS subroutine.
+  - Fix MOD binary operator for INT64 operand.
+  - Honor sign of literal sexagesimal number.
+  - Switch code from C to C++ as far as possible.
+- <2014-07-23 Wed> lux@quae.nl v1.0.5
+  - Fix printing of negative numbers.
+- <2014-07-13 Sun> lux@quae.nl v1.0.4
+  - Report the reason if RESTART fails.
+  - Change default plot font from 6 (serif) to 3 (sans serif).
+  - Fix SCALE: make it return a BYTE result even if the color index
+    type is bigger.
+  - Fix %T input format specifier: %#T converts hours to degrees, %T
+    does not.
+  - Fix a^b for BYTE/LONG/FLOAT/DOUBLE array a and DOUBLE scalar b.
+  - Support 64-bit integers (INT64); subroutine INT64, functions
+    INT64, INT64ARR, INT64FARR, INT64MAP.
+  - Withdraw subroutine ARRAY_STATISTICS.
+  - Add #EPS_FLOAT, #EPS_DOUBLE
+- <2014-07-05 Sat> lux@quae.nl v1.0.3
+  - Was broken.
 - <2013-10-10 Thu> lux@quae.nl v1.0.2
   - Replace "ANA" bitmap by new "LUX" bitmap.
   - Make !CPUTIME return higher resolution results, if supported by

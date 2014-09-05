@@ -2,3 +2,7 @@
 2013-09-23 LUX 1.0.1 released, containing bugfixes.
 2013-10-10 LUX 1.0.2 released, with new function KEPLER, improved
                      !CPUTIME, and fixed MEDFILTER, ORDFILTER
+2014-07-13 LUX 1.0.4 released, with support for 64-bit integers
+2014-07-23 LUX 1.0.5 released, with fix for printing negative integers
+                     (broken in 1.0.4)
+2014-09-05 LUX 1.1.0 released, switch from C to C++

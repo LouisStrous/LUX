@@ -30,7 +30,6 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "luxdefs.hh"
 #include "dmalloc.hh"
 #include "editor.hh"		/* for BUFSIZE */
-#include "version.hh"		/* for GIT_VERSION */
 
 extern int32_t	internalMode;
 extern void printw(char const* string), printwf(char const* fmt, ...);
@@ -92,8 +91,7 @@ int32_t site(int32_t narg, int32_t ps[])
   if (internalMode & 64)	/* /BUGS */
     printw("****BUGS\n"
 	   "If you think you have found a bug in LUX, then please report "
-	   "it to lux@quae.nl.  Please mention the revision ID: "
-           GIT_VERSION "\n");
+	   "it to lux@quae.nl.\n");
 #ifdef __STDC__
   if (internalMode & 2) {	/* /TIME */
     printw("****COMPILATION TIME\n");

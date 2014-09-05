@@ -11,12 +11,11 @@
 *.toc
 *.tp
 *.vr
-doxyfile.stamp
-latex
-lux.doxy
-lux.html
-lux.t2p
 mdate-sh
 stamp-vti
 texinfo.tex
 version.texi
+
+# doxygen
+doxyfile.stamp
+lux.doxy

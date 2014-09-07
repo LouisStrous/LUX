@@ -1,6 +1,6 @@
-/* This is file astron.c.
+/* This is file astron.cc.
 
-Copyright 2013 Louis Strous
+Copyright 2013-2014 Louis Strous
 
 This file is part of LUX.
 
@@ -18,7 +18,8 @@ You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/** \file astron.c LUX routines for calculating various astronomical
+/** \file
+  LUX routines for calculating various astronomical
    ephemerides and for transforming dates between various calendars.
 
    Includes formulas from "Astronomical Algorithms" by Jean Meeus,

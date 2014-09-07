@@ -1,6 +1,6 @@
-/* This is file site.c.
+/* This is file site.cc.
 
-Copyright 2013 Louis Strous
+Copyright 2013-2014 Louis Strous
 
 This file is part of LUX.
 

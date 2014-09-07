@@ -1,6 +1,6 @@
-/* This is file precession.c.
+/* This is file precession.cc.
 
-Copyright 2013 Louis Strous
+Copyright 2013-2014 Louis Strous
 
 This file is part of LUX.
 

@@ -1,6 +1,6 @@
-/* This is file dummyterm.c.
+/* This is file dummyterm.cc.
 
-Copyright 2013 Louis Strous
+Copyright 2013-2014 Louis Strous
 
 This file is part of LUX.
 
@@ -17,7 +17,7 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-/* This is file dummyterm.c, part of the LUX software package. */
+/* This is file dummyterm.cc, part of the LUX software package. */
 /* LS 28apr99 */
 
 #include "action.hh"

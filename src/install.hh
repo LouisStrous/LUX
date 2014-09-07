@@ -1,6 +1,7 @@
-/* This is file install.h.
+/* This is file install.hh.
 
 Copyright 2013 Louis Strous, Richard Shine
+Copyright 2014 Louis Strous
 
 This file is part of LUX.
 

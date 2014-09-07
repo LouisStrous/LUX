@@ -1,4 +1,4 @@
-/* This is file sincos.c.
+/* This is file sincos.cc.
 
 Copyright 2014 Louis Strous
 

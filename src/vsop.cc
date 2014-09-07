@@ -1,6 +1,6 @@
-/* This is file vsop.c.
+/* This is file vsop.cc.
 
-Copyright 2013 Louis Strous
+Copyright 2013-2014 Louis Strous
 
 This file is part of LUX.
 

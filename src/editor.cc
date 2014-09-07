@@ -1,6 +1,6 @@
-/* This is file editor.c.
+/* This is file editor.cc.
 
-Copyright 2013 Louis Strous
+Copyright 2013-2014 Louis Strous
 
 This file is part of LUX.
 

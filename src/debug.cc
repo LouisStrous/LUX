@@ -1,6 +1,6 @@
-/* This is file debug.c.
+/* This is file debug.cc.
 
-Copyright 2013 Louis Strous
+Copyright 2013-2014 Louis Strous
 
 This file is part of LUX.
 

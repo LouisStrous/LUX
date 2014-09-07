@@ -1,6 +1,6 @@
-/* This is file Bytestack.c.
+/* This is file Bytestack.cc.
 
-Copyright 2013 Louis Strous
+Copyright 2013-2014 Louis Strous
 
 This file is part of LUX.
 
@@ -17,7 +17,8 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-/** \file Bytestack.c A stack of bytes whose size grows as needed
+/** \file
+  A stack of bytes whose size grows as needed
     when more data is pushed unto it. */
 
 #include "action.hh"

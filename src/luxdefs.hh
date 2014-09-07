@@ -1,6 +1,6 @@
-/* This is file luxdefs.h.
+/* This is file luxdefs.hh.
 
-Copyright 2013 Louis Strous
+Copyright 2013-2014 Louis Strous
 
 This file is part of LUX.
 
@@ -20,8 +20,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef INCLUDED_LUXDEFS_H
 #define INCLUDED_LUXDEFS_H
 
-/** \file luxdefs.h Definitions of enumerations and fixed compiler
-    constants. */
+/// \file
+/// Definitions of enumerations and fixed compiler constants.
 
 #ifndef MAX_DIMS
 #include "install.hh"
@@ -38,7 +38,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
         /* symbol classes */
 
 /** \enum LUX symbol classes. */
-typedef enum { 
+typedef enum {
   LUX_UNUSED = 0,               /*!< (0) symbol with no assigned class */
   LUX_SCALAR,                   /*!< (1) a real scalar, e.g. \c 17 */
   LUX_STRING,                   /*!< (2) a text string, e.g. \c 'x' */

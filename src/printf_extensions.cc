@@ -1,6 +1,6 @@
-/* This is file printf_extensions.c.
+/* This is file printf_extensions.cc.
 
-Copyright 2013 Louis Strous
+Copyright 2013-2014 Louis Strous
 
 This file is part of LUX.
 

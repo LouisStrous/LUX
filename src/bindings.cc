@@ -1,6 +1,6 @@
-/* This is file bindings.c.
+/* This is file bindings.cc.
 
-Copyright 2013 Louis Strous
+Copyright 2013-2014 Louis Strous
 
 This file is part of LUX.
 
@@ -18,7 +18,8 @@ You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/** \file bindings.c Functions and macros for binding LUX functions
+/** \file
+  Functions and macros for binding LUX functions
     and subroutines to C (library) functions.
 
     This file defines many binding functions.  The name of a binding

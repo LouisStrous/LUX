@@ -1,6 +1,7 @@
-/* This is file ephem.c.
+/* This is file ephem.cc.
 
 Copyright 2013 Louis Strous, Richard Shine
+Copyright 2014 Louis Strous
 
 This file is part of LUX.
 

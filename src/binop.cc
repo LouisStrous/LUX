@@ -1,6 +1,6 @@
-/* This is file binop.c.
+/* This is file binop.cc.
 
-Copyright 2013 Louis Strous
+Copyright 2013-2014 Louis Strous
 
 This file is part of LUX.
 

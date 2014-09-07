@@ -1,6 +1,6 @@
-/* This is file lux.cc.
+/* This is file lux.ccc.
 
-Copyright 2013 Louis Strous
+Copyright 2013-2014 Louis Strous
 
 This file is part of LUX.
 

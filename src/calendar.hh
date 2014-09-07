@@ -1,6 +1,6 @@
-/* This is file calendar.h.
+/* This is file calendar.hh.
 
-Copyright 2013 Louis Strous
+Copyright 2013-2014 Louis Strous
 
 This file is part of LUX.
 
@@ -25,7 +25,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <math.h> /* for floor */
 /* END HEADERS */
 
-/** \file calendar.h Calendrical calculations. 
+/** \file
+  Calendrical calculations. 
 
     The functions that work with only integer numbers express dates in
     terms of the Chronological Julian Day Number (CJDN).  Every

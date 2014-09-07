@@ -1,6 +1,7 @@
-/* This is file xport.c.
+/* This is file xport.cc.
 
 Copyright 2013 Louis Strous, Richard Shine
+Copyright 2014 Louis Strous
 
 This file is part of LUX.
 
@@ -17,7 +18,6 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-/* File xport.c */
 /* LUX routines dealing with (X window) data windows. */
 #ifdef HAVE_CONFIG_H
 #include "config.h"

@@ -1,6 +1,6 @@
-/* This is file projection.c.
+/* This is file projection.cc.
 
-Copyright 2013 Louis Strous
+Copyright 2013-2014 Louis Strous
 
 This file is part of LUX.
 
@@ -19,7 +19,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 /* File projection.c */
 /* LUX routines dealing with 2D projections of 3D objects. */
-/* This is file projection.c which contains code for 3D projections and */
+/* This is file projection.cc which contains code for 3D projections and */
 /* plots.  All projective stuff is done in homogeneous coordinates. */
 /* See "Fundamentals of Interactive Computer Graphics" by J.D. Foley */
 /* and A. van Dam, Addison Wesley Publishing Co. */

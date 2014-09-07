@@ -1,6 +1,6 @@
-/* This is file axis.c.
+/* This is file axis.cc.
 
-Copyright 2013 Louis Strous
+Copyright 2013-2014 Louis Strous
 
 This file is part of LUX.
 
@@ -18,7 +18,8 @@ You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/** \file axis.c LUX routines for dealing with individual dimensions
+/** \file
+    LUX routines for dealing with individual dimensions
     of arrays. We put all information relevant to going through a
     dimensional structure in a struct so we can have several different
     loops going at once.

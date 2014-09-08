@@ -82,21 +82,21 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
   if (xSym) {
     if (!symbolIsNumericalArray(xSym))
       return cerror(NEED_NUM_ARR, xSym);
-    if (array_size(xSym) != srcinfo.rdims[0])
+    if (array_size(xSym) != srcinfo.rdims_[0])
       return cerror(INCMP_ARG, ySym);
-    iq = lux_converts[srcinfo.type](1, &xSym);
+    iq = lux_converts[srcinfo.type_](1, &xSym);
     x.f = (float*) array_data(iq);
   } else
     x.f = NULL;
 
   if (!symbolIsNumerical(vSym)) /* <levels> */
     return LUX_ERROR;
-  iq = lux_converts[srcinfo.type](1, &vSym); /* ensure proper type */
+  iq = lux_converts[srcinfo.type_](1, &vSym); /* ensure proper type */
   numerical(iq, NULL, NULL, &nLev, &level);
 
   if (narg > 4 && ps[4]) { 	/* have <pos> */
     pos = int_arg(ps[4]);
-    if (pos < 0 || pos >= srcinfo.rdims[0])
+    if (pos < 0 || pos >= srcinfo.rdims_[0])
       return luxerror("Index out of range", ps[4]);
   } else				/* no <pos> */
     pos = -1;
@@ -104,30 +104,30 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
   /* create output symbol */
   if (nLev > 1) {
     outDims[0] = nLev;
-    memcpy(outDims + 1, srcinfo.dims, srcinfo.raxes[0]*sizeof(int32_t));
-    memcpy(outDims + srcinfo.raxes[0] + 1, srcinfo.dims + srcinfo.raxes[0] + 1,
-	   (srcinfo.ndim - srcinfo.raxes[0] - 1)*sizeof(int32_t));
-    result = array_scratch(srcinfo.type, srcinfo.ndim, outDims);
+    memcpy(outDims + 1, srcinfo.dims_, srcinfo.raxes_[0]*sizeof(int32_t));
+    memcpy(outDims + srcinfo.raxes_[0] + 1, srcinfo.dims_ + srcinfo.raxes_[0] + 1,
+	   (srcinfo.ndim_ - srcinfo.raxes_[0] - 1)*sizeof(int32_t));
+    result = array_scratch(srcinfo.type_, srcinfo.ndim_, outDims);
     if (narg > 5 && ps[5])	/* have <width> */
-      if (to_scratch_array(ps[5], srcinfo.type, srcinfo.ndim, outDims)
+      if (to_scratch_array(ps[5], srcinfo.type_, srcinfo.ndim_, outDims)
 	  == LUX_ERROR)
 	return LUX_ERROR;
   } else {
-    if (srcinfo.ndim > 1) {
-      memcpy(outDims, srcinfo.dims, srcinfo.raxes[0]*sizeof(int32_t));
-      memcpy(outDims + srcinfo.raxes[0], srcinfo.dims + srcinfo.raxes[0] + 1,
-	     (srcinfo.ndim - srcinfo.raxes[0] - 1)*sizeof(int32_t));
-      result = array_scratch(srcinfo.type, srcinfo.ndim - 1, outDims);
+    if (srcinfo.ndim_ > 1) {
+      memcpy(outDims, srcinfo.dims_, srcinfo.raxes_[0]*sizeof(int32_t));
+      memcpy(outDims + srcinfo.raxes_[0], srcinfo.dims_ + srcinfo.raxes_[0] + 1,
+	     (srcinfo.ndim_ - srcinfo.raxes_[0] - 1)*sizeof(int32_t));
+      result = array_scratch(srcinfo.type_, srcinfo.ndim_ - 1, outDims);
       if (narg > 5 && ps[5])	/* have <width> */
-	if (to_scratch_array(ps[5], srcinfo.type, srcinfo.ndim, outDims)
+	if (to_scratch_array(ps[5], srcinfo.type_, srcinfo.ndim_, outDims)
 	    == LUX_ERROR)
 	  return LUX_ERROR;
     } else {			/* only one return value */
-      result = scalar_scratch(srcinfo.type);
+      result = scalar_scratch(srcinfo.type_);
       if (narg > 5 && ps[5]) {	/* have <width> */
 	undefine(ps[5]);
 	symbol_class(ps[5]) = LUX_SCALAR;
-	scalar_type(ps[5]) = srcinfo.type;
+	scalar_type(ps[5]) = srcinfo.type_;
       }	
     }
   }
@@ -150,13 +150,13 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
       break;
   }
 
-  step = srcinfo.step[0];
+  step = srcinfo.step_[0];
   
   /* now do the work */
-  switch (srcinfo.type) {
+  switch (srcinfo.type_) {
     case LUX_FLOAT:
       do {
-	rightedge.f = src.f + step*(srcinfo.rdims[0] - 1);
+	rightedge.f = src.f + step*(srcinfo.rdims_[0] - 1);
 	if (pos >= 0) {
 	  ptr.f = src.f + pos*step; /* start position */
 	  /* now seek the local minimum */
@@ -176,9 +176,9 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
 	}
 
 	/* install table for cubic spline interpolation */
-	cubic_spline_tables(x.f, srcinfo.type, 1,
-			    src.f, srcinfo.type, step,
-			    srcinfo.rdims[0], 0, 0,
+	cubic_spline_tables(x.f, srcinfo.type_, 1,
+			    src.f, srcinfo.type_, step,
+			    srcinfo.rdims_[0], 0, 0,
 			    &cspl);
 
 	/* the cubic spline may dip below the lower of the surrounding
@@ -236,7 +236,7 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
 	      } else
 		xl = -DBL_MAX;
 
-	      if (ir < srcinfo.rdims[0]) { /* not yet at edge */
+	      if (ir < srcinfo.rdims_[0]) { /* not yet at edge */
 		do {
 		  find_cspline_extremes(x1r, x2r, NULL, NULL, &maxpos,
 					&max, &cspl);
@@ -251,8 +251,8 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
 		    }
 		  } else
 		    break;
-		} while (ir < srcinfo.rdims[0]);
-		if (ir < srcinfo.rdims[0])
+		} while (ir < srcinfo.rdims_[0]);
+		if (ir < srcinfo.rdims_[0])
 		  xr = find_cspline_value(level.f[lev], x1r, maxpos, &cspl);
 		else
 		  xr = -DBL_MAX;	/* flag: at edge */
@@ -272,12 +272,12 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
 	    trgt.f++;
 	  } /* end of if (*ptr.f > level.f[lev]) else */
 	} /* end of for (lev = 0; ...) */
-	src.f += step*srcinfo.rdims[0];
-      } while (advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+	src.f += step*srcinfo.rdims_[0];
+      } while (advanceLoop(&srcinfo, &src) < srcinfo.rndim_);
       break;
     case LUX_DOUBLE:
       do {
-	rightedge.d = src.d + step*(srcinfo.rdims[0] - 1);
+	rightedge.d = src.d + step*(srcinfo.rdims_[0] - 1);
 	if (pos >= 0) {
 	  ptr.d = src.d + pos*step; /* start position */
 	  /* now seek the local minimum */
@@ -297,9 +297,9 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
 	}
 
 	/* install table for cubic spline interpolation */
-	cubic_spline_tables(x.d, srcinfo.type, 1,
-			    src.d, srcinfo.type, step,
-			    srcinfo.rdims[0], 0, 0,
+	cubic_spline_tables(x.d, srcinfo.type_, 1,
+			    src.d, srcinfo.type_, step,
+			    srcinfo.rdims_[0], 0, 0,
 			    &cspl);
 
 	/* the cubic spline may dip below the lower of the surrounding
@@ -357,7 +357,7 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
 	      } else
 		xl = -DBL_MAX;
 
-	      if (ir < srcinfo.rdims[0]) { /* not yet at edge */
+	      if (ir < srcinfo.rdims_[0]) { /* not yet at edge */
 		do {
 		  find_cspline_extremes(x1r, x2r, NULL, NULL, &maxpos,
 					&max, &cspl);
@@ -372,8 +372,8 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
 		    }
 		  } else
 		    break;
-		} while (ir < srcinfo.rdims[0]);
-		if (ir < srcinfo.rdims[0])
+		} while (ir < srcinfo.rdims_[0]);
+		if (ir < srcinfo.rdims_[0])
 		  xr = find_cspline_value(level.d[lev], x1r, maxpos, &cspl);
 		else
 		  xr = -DBL_MAX;	/* flag: at edge */
@@ -393,8 +393,8 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
 	    trgt.d++;
 	  } /* end of if (*ptr.d > level.d[lev]) else */
 	} /* end of for (lev = 0; ...) */
-	src.d += step*srcinfo.rdims[0];
-      } while (advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+	src.d += step*srcinfo.rdims_[0];
+      } while (advanceLoop(&srcinfo, &src) < srcinfo.rndim_);
       break;
   default:
     break;
@@ -464,7 +464,7 @@ int32_t lux_cspline_find(int32_t narg, int32_t ps[])
 
   if (!symbolIsNumerical(vSym)) /* <levels> */
     return LUX_ERROR;
-  iq = lux_converts[srcinfo.type](1, &vSym); /* ensure proper type */
+  iq = lux_converts[srcinfo.type_](1, &vSym); /* ensure proper type */
 
   numerical(iq, NULL, NULL, &nLev, &level);
 
@@ -472,14 +472,14 @@ int32_t lux_cspline_find(int32_t narg, int32_t ps[])
     if (to_scratch_array(ps[3], LUX_INT32, 1, &nLev) == LUX_ERROR)
       return LUX_ERROR;
     index = (int32_t *) array_data(ps[3]);
-    memset(index, 0, srcinfo.ndim*sizeof(int32_t));
+    memset(index, 0, srcinfo.ndim_*sizeof(int32_t));
   } else
     index = NULL;
 
   /* we don't know beforehand how many output values there will be */
   b = Bytestack_create();	/* so store them on a Byte stack */
 
-  step = srcinfo.rsinglestep[0];
+  step = srcinfo.rsinglestep_[0];
 
   /* we'll store the data as follows on the Byte stack:
      1. the found location in the target dimension (double)
@@ -487,22 +487,22 @@ int32_t lux_cspline_find(int32_t narg, int32_t ps[])
      3. the (one or more) coordinates of the location (int32_t) */
   {
     struct c cc;
-    csize = (uint8_t *) &cc.c - (uint8_t *) &cc.v + srcinfo.ndim*sizeof(int32_t);
+    csize = (uint8_t *) &cc.c - (uint8_t *) &cc.v + srcinfo.ndim_*sizeof(int32_t);
   }
   c = (struct c*) malloc(csize);
 
   /* now do the work */
-  switch (srcinfo.type) {
+  switch (srcinfo.type_) {
     case LUX_FLOAT:
       do {
 	/* install table for cubic spline interpolation */
-	cubic_spline_tables(NULL, srcinfo.type, 1,
-			    src.f, srcinfo.type, step,
-			    srcinfo.rdims[0], 0, 0,
+	cubic_spline_tables(NULL, srcinfo.type_, 1,
+			    src.f, srcinfo.type_, step,
+			    srcinfo.rdims_[0], 0, 0,
 			    &cspl);
 	/* the levels are assumed to be sorted in ascending order */
 	do {
-	  if (!srcinfo.coords[0]) {
+	  if (!srcinfo.coords_[0]) {
 	    for (lev = 0; lev < nLev && *src.f > level.f[lev]; lev++) ;
 	    /* now level.f[lev - 1] <= *src.f < level.f[lev] */
 	  } else {
@@ -512,42 +512,42 @@ int32_t lux_cspline_find(int32_t narg, int32_t ps[])
 	      /* passed a target level going down: determine &
 		 remember detailed location */
 	      z = find_cspline_value(level.f[lev - 1],
-				     srcinfo.coords[0] - 1,
-				     srcinfo.coords[0],
+				     srcinfo.coords_[0] - 1,
+				     srcinfo.coords_[0],
 				     &cspl);
 	      c->v = z;		/* store the found location */
 	      c->l = --lev;	/* and the level index */
 	      /* and after that the coordinates */
-	      for (j = 0; j < srcinfo.ndim; j++)
-		(&c->c)[srcinfo.raxes[j]] = srcinfo.coords[j];
+	      for (j = 0; j < srcinfo.ndim_; j++)
+		(&c->c)[srcinfo.raxes_[j]] = srcinfo.coords_[j];
 	      Bytestack_push_data(b, c, (uint8_t *) c + csize);
 	    } else if (lev < nLev && *src.f >= level.f[lev]) {
 	      /* passed a target level going up: determine &
 		 remember detailed location */
 	      z = find_cspline_value(level.f[lev],
-				     srcinfo.coords[0] - 1,
-				     srcinfo.coords[0],
+				     srcinfo.coords_[0] - 1,
+				     srcinfo.coords_[0],
 				     &cspl);
 	      c->v = z;
 	      c->l = lev++;
-	      for (j = 0; j < srcinfo.ndim; j++)
-		(&c->c)[srcinfo.raxes[j]] = srcinfo.coords[j];
+	      for (j = 0; j < srcinfo.ndim_; j++)
+		(&c->c)[srcinfo.raxes_[j]] = srcinfo.coords_[j];
 	      Bytestack_push_data(b, c, (uint8_t *) c + csize);
 	    }
 	  }
 	} while ((i = advanceLoop(&srcinfo, &src)) == 0);
-      } while (i < srcinfo.rndim);
+      } while (i < srcinfo.rndim_);
       break;
   case LUX_DOUBLE:
       do {
 	/* install table for cubic spline interpolation */
-	cubic_spline_tables(NULL, srcinfo.type, 1,
-			    src.d, srcinfo.type, step,
-			    srcinfo.rdims[0], 0, 0,
+	cubic_spline_tables(NULL, srcinfo.type_, 1,
+			    src.d, srcinfo.type_, step,
+			    srcinfo.rdims_[0], 0, 0,
 			    &cspl);
 	/* the levels are assumed to be sorted in ascending order */
 	do {
-	  if (!srcinfo.coords[0]) {
+	  if (!srcinfo.coords_[0]) {
 	    for (lev = 0; lev < nLev && *src.d > level.d[lev]; lev++) ;
 	    /* now level.d[lev - 1] <= *src.d < level.d[lev] */
 	  } else {
@@ -557,30 +557,30 @@ int32_t lux_cspline_find(int32_t narg, int32_t ps[])
 	      /* passed a target level going down: determine &
 		 remember detailed location */
 	      z = find_cspline_value(level.d[lev - 1],
-				     srcinfo.coords[0] - 1,
-				     srcinfo.coords[0],
+				     srcinfo.coords_[0] - 1,
+				     srcinfo.coords_[0],
 				     &cspl);
 	      c->v = z;
 	      c->l = --lev;
-	      for (j = 0; j < srcinfo.ndim; j++)
-		(&c->c)[srcinfo.raxes[j]] = srcinfo.coords[j];
+	      for (j = 0; j < srcinfo.ndim_; j++)
+		(&c->c)[srcinfo.raxes_[j]] = srcinfo.coords_[j];
 	      Bytestack_push_data(b, c, (uint8_t *) c + csize);
 	    } else if (lev < nLev && *src.d >= level.d[lev]) {
 	      /* passed a target level going up: determine &
 		 remember detailed location */
 	      z = find_cspline_value(level.d[lev],
-				     srcinfo.coords[0] - 1,
-				     srcinfo.coords[0],
+				     srcinfo.coords_[0] - 1,
+				     srcinfo.coords_[0],
 				     &cspl);
 	      c->v = z;
 	      c->l = lev++;
-	      for (j = 0; j < srcinfo.ndim; j++)
-		(&c->c)[srcinfo.raxes[j]] = srcinfo.coords[j];
+	      for (j = 0; j < srcinfo.ndim_; j++)
+		(&c->c)[srcinfo.raxes_[j]] = srcinfo.coords_[j];
 	      Bytestack_push_data(b, c, (uint8_t *) c + csize);
 	    }
 	  }
 	} while ((i = advanceLoop(&srcinfo, &src)) == 0);
-      } while (i < srcinfo.rndim);
+      } while (i < srcinfo.rndim_);
     break;
   default:
     break;
@@ -608,17 +608,17 @@ int32_t lux_cspline_find(int32_t narg, int32_t ps[])
 
       /* create output symbol */
       bi = Bytestack_top(NULL);
-      if (srcinfo.ndim > 1)
-	Bytestack_push_var(NULL, srcinfo.ndim);
+      if (srcinfo.ndim_ > 1)
+	Bytestack_push_var(NULL, srcinfo.ndim_);
       Bytestack_push_var(NULL, n);
-      result = array_scratch(LUX_DOUBLE, (srcinfo.ndim > 1? 2: 1),
+      result = array_scratch(LUX_DOUBLE, (srcinfo.ndim_ > 1? 2: 1),
 			     (int32_t *) Bytestack_pop(NULL, bi));
       src.d = (double*) array_data(result);
       q.c = d;
       for (i = 0; i < n; i++) {
 	int32_t j;
-	for (j = 0; j < srcinfo.ndim; j++) {
-	  if (j == srcinfo.raxes[0])
+	for (j = 0; j < srcinfo.ndim_; j++) {
+	  if (j == srcinfo.raxes_[0])
 	    *src.d++ = q.c->v;
 	  else
 	    *src.d++ = ((&q.c->c)[j]);
@@ -1069,8 +1069,8 @@ LS 9nov98 */
       *trgt.f = 0.0;
       while (count--) {
 	rindex = 0;		/* index relative to current start location */
-	ix = srcinfo.coords[0];	/* x pixel coordinate */
-	iy = srcinfo.coords[1];	/* y pixel coordinate */
+	ix = srcinfo.coords_[0];	/* x pixel coordinate */
+	iy = srcinfo.coords_[1];	/* y pixel coordinate */
 	index = src.f - src0.f;	/* index relative to data start */
 
 	x1 = 0.5;		/* x coordinate in pixel (between 0 and 1) */
@@ -1175,7 +1175,7 @@ LS 9nov98 */
       }
       *trgt.f = value;
     } while (advanceLoop(&trgtinfo, &trgt),
-	     advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+	     advanceLoop(&srcinfo, &src) < srcinfo.rndim_);
   else				/* gaussian smoothing */
     do {
       count = twosided + 1;
@@ -1196,8 +1196,8 @@ LS 9nov98 */
       ws = 0.0;
       while (count--) {
 	rindex = 0;		/* index relative to current start location */
-	ix = srcinfo.coords[0];	/* x pixel coordinate */
-	iy = srcinfo.coords[1];	/* y pixel coordinate */
+	ix = srcinfo.coords_[0];	/* x pixel coordinate */
+	iy = srcinfo.coords_[1];	/* y pixel coordinate */
 	index = src.f - src0.f;	/* index relative to data start */
 
 	x1 = 0.5;		/* x coordinate in pixel (between 0 and 1) */
@@ -1315,7 +1315,7 @@ LS 9nov98 */
 	value /= ws;
       *trgt.f = value;
     } while (advanceLoop(&trgtinfo, &trgt), 
-	     advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+	     advanceLoop(&srcinfo, &src) < srcinfo.rndim_);
   return iq;
 }
 /*--------------------------------------------------------------------*/
@@ -1390,8 +1390,8 @@ int32_t lux_dir_smooth2(int32_t narg, int32_t ps[])
       dslimit = 1.0;		/* current weighted average of step sizes */
       while (count--) {
 	rindex = 0;		/* index relative to current start location */
-	ix = srcinfo.coords[0];	/* x pixel coordinate */
-	iy = srcinfo.coords[1];	/* y pixel coordinate */
+	ix = srcinfo.coords_[0];	/* x pixel coordinate */
+	iy = srcinfo.coords_[1];	/* y pixel coordinate */
 	index = src.f - src0.f;	/* index relative to data start */
 
 	x1 = 0.5;		/* x coordinate in pixel (between 0 and 1) */
@@ -1492,7 +1492,7 @@ int32_t lux_dir_smooth2(int32_t narg, int32_t ps[])
 	} /* end of while (s < s0) */
       } /* end of while (count--) */
     } while (advanceLoop(&trgtinfo, &trgt),
-	     advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+	     advanceLoop(&srcinfo, &src) < srcinfo.rndim_);
   } else {			/* gaussian smoothing */
     norm = 0.5*M_2_SQRTPI;
     do {
@@ -1513,8 +1513,8 @@ int32_t lux_dir_smooth2(int32_t narg, int32_t ps[])
       ws = 0.0;
       while (count--) {
 	rindex = 0;		/* index relative to current start location */
-	ix = srcinfo.coords[0];	/* x pixel coordinate */
-	iy = srcinfo.coords[1];	/* y pixel coordinate */
+	ix = srcinfo.coords_[0];	/* x pixel coordinate */
+	iy = srcinfo.coords_[1];	/* y pixel coordinate */
 	index = src.f - src0.f;	/* index relative to data start */
 
 	x1 = 0.5;		/* x coordinate in pixel (between 0 and 1) */
@@ -1632,7 +1632,7 @@ int32_t lux_dir_smooth2(int32_t narg, int32_t ps[])
 	} /* end of while (d < DONE) */
       } /* end of while (count--) */
     } while (advanceLoop(&trgtinfo, &trgt),
-	     advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+	     advanceLoop(&srcinfo, &src) < srcinfo.rndim_);
   }
   return iq;
 }

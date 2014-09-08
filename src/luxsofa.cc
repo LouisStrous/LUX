@@ -205,9 +205,9 @@ int32_t lux_iauCal2jd(int32_t narg, int32_t ps[])
     return LUX_ERROR;
 
   /* iauCal2jd(int32_t iy, int32_t im, int32_t id, double *djm0, double *djm) */
-  switch (infos[0].type) {
+  switch (infos[0].type_) {
   case LUX_INT32:
-    while (infos[1].nelem--) {
+    while (infos[1].nelem_--) {
       if (iauCal2jd(ptrs[0].l[0], ptrs[0].l[1], ptrs[0].l[2], &djm0, &djm))
         *ptrs[1].l = 0;
       else
@@ -217,7 +217,7 @@ int32_t lux_iauCal2jd(int32_t narg, int32_t ps[])
     }
     break;
   case LUX_INT64:
-    while (infos[1].nelem--) {
+    while (infos[1].nelem_--) {
       if (iauCal2jd(ptrs[0].q[0], ptrs[0].q[1], ptrs[0].q[2], &djm0, &djm))
         *ptrs[1].q = 0;
       else
@@ -227,7 +227,7 @@ int32_t lux_iauCal2jd(int32_t narg, int32_t ps[])
     }
     break;
   case LUX_FLOAT:
-    while (infos[1].nelem--) {
+    while (infos[1].nelem_--) {
       int32_t day = floor(ptrs[0].f[2]);
       double daypart = ptrs[0].f[2] - day;
       if (iauCal2jd((int32_t) ptrs[0].f[0], (int32_t) ptrs[0].f[1], day, &djm0, &djm))
@@ -239,7 +239,7 @@ int32_t lux_iauCal2jd(int32_t narg, int32_t ps[])
     }
     break;
   case LUX_DOUBLE:
-    while (infos[1].nelem--) {
+    while (infos[1].nelem_--) {
       int32_t day = floor(ptrs[0].d[2]);
       double daypart = ptrs[0].d[2] - day;
       if (iauCal2jd((int32_t) ptrs[0].d[0], (int32_t) ptrs[0].d[1], day, &djm0, &djm))
@@ -296,21 +296,21 @@ int32_t lux_iauDat(int32_t narg, int32_t ps[])
       return luxerror("Need 1 argument", 0);
     if ((iq = standard_args(narg, ps, "i>L3*;rD-3*", &ptrs, &infos)) < 0)
       return LUX_ERROR;
-    switch (infos[0].type) {
+    switch (infos[0].type_) {
     case LUX_INT32:
-      while (infos[1].nelem--) {
+      while (infos[1].nelem_--) {
         iauDat(ptrs[0].l[0], ptrs[0].l[1], ptrs[0].l[2], 0.0, ptrs[1].d++);
         ptrs[0].l += 3;
       }
       break;
     case LUX_INT64:
-      while (infos[1].nelem--) {
+      while (infos[1].nelem_--) {
         iauDat(ptrs[0].q[0], ptrs[0].q[1], ptrs[0].q[2], 0.0, ptrs[1].d++);
         ptrs[0].q += 3;
       }
       break;
     case LUX_FLOAT:
-      while (infos[1].nelem--) {
+      while (infos[1].nelem_--) {
         int32_t d = (int32_t) floor(ptrs[0].f[2]);
         double f = ptrs[0].f[2] - d;
         iauDat((int32_t) ptrs[0].f[0], (int32_t) ptrs[0].f[1], d, f, ptrs[1].d++);
@@ -318,7 +318,7 @@ int32_t lux_iauDat(int32_t narg, int32_t ps[])
       }
       break;
     case LUX_DOUBLE:
-      while (infos[1].nelem--) {
+      while (infos[1].nelem_--) {
         int32_t d = (int32_t) floor(ptrs[0].d[2]);
         double f = ptrs[0].d[2] - d;
         iauDat((int32_t) ptrs[0].d[0], (int32_t) ptrs[0].d[1], d, f, ptrs[1].d++);
@@ -411,7 +411,7 @@ int32_t lux_iauEpb2jd(int32_t narg, int32_t ps[])
 
   if ((iq = standard_args(narg, ps, "i>D*;rD&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
-  while (infos[0].nelem--) {
+  while (infos[0].nelem_--) {
     double djm0, djm;
     
     iauEpb2jd(*ptrs[0].d++, &djm0, &djm);
@@ -438,7 +438,7 @@ int32_t lux_iauEpj2jd(int32_t narg, int32_t ps[])
 
   if ((iq = standard_args(narg, ps, "i>D*;rD*", &ptrs, &infos)) < 0)
     return LUX_ERROR;
-  while (infos[0].nelem--) {
+  while (infos[0].nelem_--) {
     double djm0, djm;
     
     iauEpj2jd(*ptrs[0].d++, &djm0, &djm);

@@ -913,45 +913,45 @@ int32_t indgen(int32_t narg, int32_t ps[], int32_t isFunc)
   switch (symbol_type(ps[0])) {
     case LUX_INT8:
       do
-	*trgt.b = (uint8_t) trgtinfo.coords[0];
-      while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.rndim);
+	*trgt.b = (uint8_t) trgtinfo.coords_[0];
+      while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.rndim_);
       break;
     case LUX_INT16:
       do
-	*trgt.w = (int16_t) trgtinfo.coords[0];
-      while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.rndim);
+	*trgt.w = (int16_t) trgtinfo.coords_[0];
+      while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.rndim_);
       break;
     case LUX_INT32:
       do
-	*trgt.l = (int32_t) trgtinfo.coords[0];
-      while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.rndim);
+	*trgt.l = (int32_t) trgtinfo.coords_[0];
+      while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.rndim_);
       break;
     case LUX_INT64:
       do
-	*trgt.q = (int32_t) trgtinfo.coords[0];
-      while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.rndim);
+	*trgt.q = (int32_t) trgtinfo.coords_[0];
+      while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.rndim_);
       break;
     case LUX_FLOAT:
       do
-	*trgt.f = (float) trgtinfo.coords[0];
-      while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.rndim);
+	*trgt.f = (float) trgtinfo.coords_[0];
+      while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.rndim_);
       break;
     case LUX_DOUBLE:
       do
-	*trgt.d = (double) trgtinfo.coords[0];
-      while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.rndim);
+	*trgt.d = (double) trgtinfo.coords_[0];
+      while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.rndim_);
       break;
     case LUX_CFLOAT:
       do {
-	trgt.cf->real = trgtinfo.coords[0];
+	trgt.cf->real = trgtinfo.coords_[0];
 	trgt.cf->imaginary = 0.0;
-      } while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.rndim);
+      } while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.rndim_);
       break;
     case LUX_CDOUBLE:
       do {
-	trgt.cd->real = trgtinfo.coords[0];
+	trgt.cd->real = trgtinfo.coords_[0];
 	trgt.cd->imaginary = 0.0;
-      } while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.rndim);
+      } while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.rndim_);
       break;
   }
   return result;
@@ -3529,10 +3529,10 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
     debugout("calculating # elements per result");
 #endif
     /* calculate how many elements go into each result */
-    if (srcinfo.naxes) {	/* user specified one or more axes */
+    if (srcinfo.naxes_) {	/* user specified one or more axes */
       n = 1;
-      for (i = 0; i < srcinfo.naxes; i++)
-	n *= srcinfo.dims[srcinfo.axes[i]];
+      for (i = 0; i < srcinfo.naxes_; i++)
+	n *= srcinfo.dims_[srcinfo.axes_[i]];
     } else if (symbolIsArray(ps[0]))
       n = array_size(ps[0]);
     else
@@ -3542,16 +3542,16 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 #endif
   }
 
-  if (!srcinfo.naxes) {		/* no axes specified */
+  if (!srcinfo.naxes_) {		/* no axes specified */
 #if DEBUG_VOCAL
-    debugout("adjusting srcinfo.naxes");
+    debugout("adjusting srcinfo.naxes_");
 #endif
-    srcinfo.naxes++;		/* or no proper summing */
+    srcinfo.naxes_++;		/* or no proper summing */
     if (haveWeights) {
 #if DEBUG_VOCAL
-      debugout("adjusting winfo.naxes");
+      debugout("adjusting winfo.naxes_");
 #endif
-      winfo.naxes++;
+      winfo.naxes_++;
     }
   }
 
@@ -3572,9 +3572,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  w.l += *weights.b;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
+			 < srcinfo.naxes_);
 		*trgt.l++ = mean? (w.l? sum.l/w.l: 0): sum.l;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT16:
 	      do {
@@ -3585,9 +3585,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  w.l += *weights.w;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
+			 < srcinfo.naxes_);
 		*trgt.l++ = mean? (w.l? sum.l/w.l: 0): sum.l;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT32:
 	      do {
@@ -3598,9 +3598,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  w.l += *weights.l;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
+			 < srcinfo.naxes_);
 		*trgt.l++ = mean? (w.l? sum.l/w.l: 0): sum.l;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	  } /* end of switch (type) */
 	  break;
@@ -3615,9 +3615,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  w.q += *weights.b;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
+			 < srcinfo.naxes_);
 		*trgt.q++ = mean? (w.q? sum.q/w.q: 0): sum.q;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT16:
 	      do {
@@ -3628,9 +3628,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  w.q += *weights.w;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
+			 < srcinfo.naxes_);
 		*trgt.q++ = mean? (w.q? sum.q/w.q: 0): sum.q;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT32:
 	      do {
@@ -3641,9 +3641,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  w.q += *weights.l;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
+			 < srcinfo.naxes_);
 		*trgt.q++ = mean? (w.q? sum.q/w.q: 0): sum.q;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT64:
 	      do {
@@ -3654,9 +3654,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  w.q += *weights.q;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
+			 < srcinfo.naxes_);
 		*trgt.q++ = mean? (w.q? sum.q/w.q: 0): sum.q;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	  } /* end of switch (type) */
 	  break;
@@ -3671,9 +3671,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  w.f += *weights.b;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
+			 < srcinfo.naxes_);
 		*trgt.f++ = mean? (w.f? sum.f/w.f: 0): sum.f;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT16:
 	      do {
@@ -3684,9 +3684,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  w.f += *weights.w;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
+			 < srcinfo.naxes_);
 		*trgt.f++ = mean? (w.f? sum.f/w.f: 0): sum.f;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT32:
 	      do {
@@ -3697,9 +3697,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  w.f += *weights.l;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
+			 < srcinfo.naxes_);
 		*trgt.f++ = mean? (w.f? sum.f/w.f: 0): sum.f;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT64:
 	      do {
@@ -3710,9 +3710,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  w.f += *weights.q;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
+			 < srcinfo.naxes_);
 		*trgt.f++ = mean? (w.f? sum.f/w.f: 0): sum.f;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_FLOAT:
 	      do {
@@ -3723,9 +3723,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  w.f += *weights.f;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
+			 < srcinfo.naxes_);
 		*trgt.f++ = mean? (w.f? sum.f/w.f: 0): sum.f;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
             /* no cases LUX_DOUBLE, LUX_CFLOAT, or LUX_CDOUBLE: if <x> */
 	    /* is any of those types, then so is the output */
@@ -3742,9 +3742,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  w.d += *weights.b;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
+			 < srcinfo.naxes_);
 		*trgt.d++ = mean? (w.d? sum.d/w.d: 0): sum.d;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT16:
 	      do {
@@ -3755,9 +3755,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  w.d += *weights.w;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
+			 < srcinfo.naxes_);
 		*trgt.d++ = mean? (w.d? sum.d/w.d: 0): sum.d;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT32:
 	      do {
@@ -3768,9 +3768,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  w.d += *weights.l;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
+			 < srcinfo.naxes_);
 		*trgt.d++ = mean? (w.d? sum.d/w.d: 0): sum.d;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT64:
 	      do {
@@ -3781,9 +3781,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  w.d += *weights.q;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
+			 < srcinfo.naxes_);
 		*trgt.d++ = mean? (w.d? sum.d/w.d: 0): sum.d;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_FLOAT:
 	      do {
@@ -3794,9 +3794,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  w.d += *weights.f;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
+			 < srcinfo.naxes_);
 		*trgt.d++ = mean? (w.d? sum.d/w.d: 0): sum.d;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_DOUBLE:
 	      do {
@@ -3807,9 +3807,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  w.d += *weights.d;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
+			 < srcinfo.naxes_);
 		*trgt.d++ = mean? (w.d? sum.d/w.d: 0): sum.d;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
             /* no cases LUX_CFLOAT, or LUX_CDOUBLE: if <x> */
 	    /* is any of those types, then so is the output */
@@ -3826,7 +3826,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      w.f += *weights.f;
 	    } while ((done = (advanceLoop(&winfo, &weights),
 			      advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
+			 < srcinfo.naxes_);
 	    if (mean) {
 	      if (w.f) {
 		trgt.cf->real = sumcf.real/w.f;
@@ -3838,7 +3838,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      trgt.cf->imaginary = sumcf.imaginary;
 	    }
 	    trgt.cf++;
-	  } while (done < srcinfo.rndim);
+	  } while (done < srcinfo.rndim_);
 	  break;
 	case LUX_CDOUBLE:
 	  /* if we get here then <x> must be CFLOAT or CDOUBLE */
@@ -3853,7 +3853,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  w.d += *weights.d;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
+			 < srcinfo.naxes_);
 		if (mean) {
 		  if (w.d) {
 		    trgt.cd->real = sumcd.real/w.d;
@@ -3865,7 +3865,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  trgt.cd->imaginary = sumcd.imaginary;
 		}
 		trgt.cd++;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_CDOUBLE:
 	      do {
@@ -3877,7 +3877,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  w.d += *weights.d;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
+			 < srcinfo.naxes_);
 		if (mean) {
 		  if (w.d) {
 		    trgt.cd->real = sumcd.real/w.d;
@@ -3889,7 +3889,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  trgt.cd->imaginary = sumcd.imaginary;
 		}
 		trgt.cd++;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	  } /* end of switch (type) */
 	  break;
@@ -3906,27 +3906,27 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		sum.l = 0.0;
 		do
 		  sum.l += *src.b;
-		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes_);
 		*trgt.l++ = mean? sum.l/n: sum.l;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT16:
 	      do {
 		sum.l = 0.0;
 		do
 		  sum.l += *src.w;
-		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes_);
 		*trgt.l++ = mean? sum.l/n: sum.l;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT32:
 	      do {
 		sum.l = 0.0;
 		do
 		  sum.l += *src.l;
-		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes_);
 		*trgt.l++ = mean? sum.l/n: sum.l;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	  } /* end of switch (type) */
 	  break;
@@ -3937,36 +3937,36 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		sum.q = 0.0;
 		do
 		  sum.q += *src.b;
-		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes_);
 		*trgt.q++ = mean? sum.q/n: sum.q;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT16:
 	      do {
 		sum.q = 0.0;
 		do
 		  sum.q += *src.w;
-		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes_);
 		*trgt.q++ = mean? sum.q/n: sum.q;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT32:
 	      do {
 		sum.q = 0.0;
 		do
 		  sum.q += *src.q;
-		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes_);
 		*trgt.q++ = mean? sum.q/n: sum.q;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT64:
 	      do {
 		sum.q = 0.0;
 		do
 		  sum.q += *src.q;
-		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes_);
 		*trgt.q++ = mean? sum.q/n: sum.q;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	  } /* end of switch (type) */
 	  break;
@@ -3977,45 +3977,45 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		sum.f = 0.0;
 		do
 		  sum.f += *src.b;
-		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes_);
 		*trgt.f++ = mean? sum.f/n: sum.f;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT16:
 	      do {
 		sum.f = 0.0;
 		do
 		  sum.f += *src.w;
-		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes_);
 		*trgt.f++ = mean? sum.f/n: sum.f;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT32:
 	      do {
 		sum.f = 0.0;
 		do
 		  sum.f += *src.l;
-		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes_);
 		*trgt.f++ = mean? sum.f/n: sum.f;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT64:
 	      do {
 		sum.f = 0.0;
 		do
 		  sum.f += *src.q;
-		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes_);
 		*trgt.f++ = mean? sum.f/n: sum.f;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_FLOAT:
 	      do {
 		sum.f = 0.0;
 		do
 		  sum.f += *src.f;
-		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes_);
 		*trgt.f++ = mean? sum.f/n: sum.f;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
            /* no cases DOUBLE, CFLOAT, or CDOUBLE */
 	  } /* end of switch (type) */
@@ -4027,54 +4027,54 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		sum.d = 0.0;
 		do
 		  sum.d += *src.b;
-		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes_);
 		*trgt.d++ = mean? sum.d/n: sum.d;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT16:
 	      do {
 		sum.d = 0.0;
 		do
 		  sum.d += *src.w;
-		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes_);
 		*trgt.d++ = mean? sum.d/n: sum.d;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT32:
 	      do {
 		sum.d = 0.0;
 		do
 		  sum.d += *src.l;
-		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes_);
 		*trgt.d++ = mean? sum.d/n: sum.d;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT64:
 	      do {
 		sum.d = 0.0;
 		do
 		  sum.d += *src.q;
-		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes_);
 		*trgt.d++ = mean? sum.d/n: sum.d;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_FLOAT:
 	      do {
 		sum.d = 0.0;
 		do
 		  sum.d += *src.f;
-		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes_);
 		*trgt.d++ = mean? sum.d/n: sum.d;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_DOUBLE:
 	      do {
 		sum.d = 0.0;
 		do
 		  sum.d += *src.d;
-		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes_);
 		*trgt.d++ = mean? sum.d/n: sum.d;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
            /* no cases CFLOAT, CDOUBLE */
 	  } /* end of switch (type) */
@@ -4085,7 +4085,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	    do {
 	      sumcf.real += src.cf->real;
 	      sumcf.imaginary += src.cf->imaginary;
-	    } while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+	    } while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes_);
 	    if (mean) {
 	      trgt.cf->real = sumcf.real/n;
 	      trgt.cf++->imaginary = sumcf.imaginary/n;
@@ -4093,7 +4093,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      trgt.cf->real = sumcf.real;
 	      trgt.cf++->imaginary = sumcf.imaginary;
 	    }
-	  } while (done < srcinfo.rndim);
+	  } while (done < srcinfo.rndim_);
 	  break;
 	case LUX_CDOUBLE:
 	  switch (type) {
@@ -4103,7 +4103,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		do {
 		  sumcd.real += src.cf->real;
 		  sumcd.imaginary += src.cf->imaginary;
-		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes_);
 		if (mean) {
 		  trgt.cd->real = sumcd.real/n;
 		  trgt.cd++->imaginary = sumcd.imaginary/n;
@@ -4111,7 +4111,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  trgt.cd->real = sumcd.real;
 		  trgt.cd++->imaginary = sumcd.imaginary;
 		}
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_CDOUBLE:
 	      do {
@@ -4119,7 +4119,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		do {
 		  sumcd.real += src.cd->real;
 		  sumcd.imaginary += src.cd->imaginary;
-		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes_);
 		if (mean) {
 		  trgt.cd->real = sumcd.real/n;
 		  trgt.cd++->imaginary = sumcd.imaginary/n;
@@ -4127,7 +4127,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  trgt.cd->real = sumcd.real;
 		  trgt.cd++->imaginary = sumcd.imaginary;
 		}
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	  } /* end of switch (type) */
 	  break;
@@ -4175,9 +4175,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  w.l += *weights.b;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
+			 < srcinfo.naxes_);
 		*trgt.l++ = mean? (w.l? sum.l/w.l: 0.0): sum.l;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT16:
 	      do {
@@ -4200,9 +4200,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  w.l += *weights.w;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
+			 < srcinfo.naxes_);
 		*trgt.l++ = mean? (w.l? sum.l/w.l: 0.0): sum.l;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT32:
 	      do {
@@ -4225,9 +4225,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  w.l += *weights.l;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
+			 < srcinfo.naxes_);
 		*trgt.l++ = mean? (w.l? sum.l/w.l: 0.0): sum.l;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	  } /* end of switch (type) */
 	  break;
@@ -4254,9 +4254,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  w.q += *weights.b;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
+			 < srcinfo.naxes_);
 		*trgt.q++ = mean? (w.q? sum.q/w.q: 0.0): sum.q;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT16:
 	      do {
@@ -4279,9 +4279,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  w.q += *weights.w;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
+			 < srcinfo.naxes_);
 		*trgt.q++ = mean? (w.q? sum.q/w.q: 0.0): sum.q;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT32:
 	      do {
@@ -4304,9 +4304,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  w.q += *weights.l;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
+			 < srcinfo.naxes_);
 		*trgt.q++ = mean? (w.q? sum.q/w.q: 0.0): sum.q;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT64:
 	      do {
@@ -4329,9 +4329,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  w.q += *weights.q;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
+			 < srcinfo.naxes_);
 		*trgt.q++ = mean? (w.q? sum.q/w.q: 0.0): sum.q;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	  } /* end of switch (type) */
 	  break;
@@ -4358,9 +4358,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  w.f += *weights.b;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
+			 < srcinfo.naxes_);
 		*trgt.f++ = mean? (w.f? sum.f/w.f: 0.0): sum.f;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT16:
 	      do {
@@ -4383,9 +4383,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  w.f += *weights.w;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
+			 < srcinfo.naxes_);
 		*trgt.f++ = mean? (w.f? sum.f/w.f: 0.0): sum.f;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT32:
 	      do {
@@ -4408,9 +4408,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  w.f += *weights.l;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
+			 < srcinfo.naxes_);
 		*trgt.f++ = mean? (w.f? sum.f/w.f: 0.0): sum.f;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT64:
 	      do {
@@ -4433,9 +4433,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  w.f += *weights.q;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
+			 < srcinfo.naxes_);
 		*trgt.f++ = mean? (w.f? sum.f/w.f: 0.0): sum.f;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_FLOAT:
 	      do {
@@ -4458,9 +4458,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  w.f += *weights.f;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
+			 < srcinfo.naxes_);
 		*trgt.f++ = mean? (w.f? sum.f/w.f: 0.0): sum.f;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	  } /* end of switch (type) */
 	  break;
@@ -4487,9 +4487,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  w.d += *weights.b;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
+			 < srcinfo.naxes_);
 		*trgt.d++ = mean? (w.d? sum.d/w.d: 0.0): sum.d;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT16:
 	      do {
@@ -4512,9 +4512,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  w.d += *weights.w;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
+			 < srcinfo.naxes_);
 		*trgt.d++ = mean? (w.d? sum.d/w.d: 0.0): sum.d;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT32:
 	      do {
@@ -4537,9 +4537,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  w.d += *weights.l;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
+			 < srcinfo.naxes_);
 		*trgt.d++ = mean? (w.d? sum.d/w.d: 0.0): sum.d;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT64:
 	      do {
@@ -4562,9 +4562,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  w.d += *weights.q;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
+			 < srcinfo.naxes_);
 		*trgt.d++ = mean? (w.d? sum.d/w.d: 0.0): sum.d;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_FLOAT:
 	      do {
@@ -4587,9 +4587,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  w.d += *weights.f;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
+			 < srcinfo.naxes_);
 		*trgt.d++ = mean? (w.d? sum.d/w.d: 0.0): sum.d;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_DOUBLE:
 	      do {
@@ -4612,9 +4612,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  w.d += *weights.d;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
+			 < srcinfo.naxes_);
 		*trgt.d++ = mean? (w.d? sum.d/w.d: 0.0): sum.d;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	  } /* end of switch (type) */
 	  break;
@@ -4657,7 +4657,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      w.f += *weights.f;
 	    } while ((done = (advanceLoop(&winfo, &weights),
 			      advanceLoop(&srcinfo, &src)))
-		     < srcinfo.naxes);
+		     < srcinfo.naxes_);
 	    if (mean) {
 	      if (w.f) {
 		trgt.cf->real = sumcf.real/w.f;
@@ -4669,7 +4669,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      trgt.cf->imaginary = sumcf.imaginary;
 	    }
 	    trgt.cf++;
-	  } while (done < srcinfo.rndim);
+	  } while (done < srcinfo.rndim_);
 	  break;
 	case LUX_CDOUBLE:
 	  switch (type) {
@@ -4712,7 +4712,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  w.d += *weights.f;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
+			 < srcinfo.naxes_);
 		if (mean) {
 		  if (w.d) {
 		    trgt.cd->real = sumcd.real/w.d;
@@ -4724,7 +4724,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  trgt.cd->imaginary = sumcd.imaginary;
 		}
 		trgt.cd++;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_CDOUBLE:
 	      do {
@@ -4765,7 +4765,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  w.d += *weights.d;
 		} while ((done = (advanceLoop(&winfo, &weights),
 				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
+			 < srcinfo.naxes_);
 		if (mean) {
 		  if (w.d) {
 		    trgt.cd->real = sumcd.real/w.d;
@@ -4777,7 +4777,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  trgt.cd->imaginary = sumcd.imaginary;
 		}
 		trgt.cd++;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	  } /* end of switch (type) */
 	  break;
@@ -4805,9 +4805,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  if (psign == -1) /* negative exponent: must divide */
 		    value.l = value.l? 1.0/value.l: 0.0;
 		  sum.l += value.l;
-		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes_);
 		*trgt.l++ = mean? sum.l/n: sum.l;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT16:
 	      do {
@@ -4825,9 +4825,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  if (psign == -1) /* negative exponent: must divide */
 		    value.l = value.l? 1.0/value.l: 0.0;
 		  sum.l += value.l;
-		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes_);
 		*trgt.l++ = mean? sum.l/n: sum.l;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT32:
 	      do {
@@ -4845,9 +4845,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  if (psign == -1) /* negative exponent: must divide */
 		    value.l = value.l? 1.0/value.l: 0.0;
 		  sum.l += value.l;
-		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes_);
 		*trgt.l++ = mean? sum.l/n: sum.l;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	  } /* end of switch (type) */
 	  break;
@@ -4869,9 +4869,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  if (psign == -1) /* negative exponent: must divide */
 		    value.q = value.q? 1.0/value.q: 0.0;
 		  sum.q += value.q;
-		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes_);
 		*trgt.q++ = mean? sum.q/n: sum.q;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT16:
 	      do {
@@ -4889,9 +4889,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  if (psign == -1) /* negative exponent: must divide */
 		    value.q = value.q? 1.0/value.q: 0.0;
 		  sum.q += value.q;
-		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes_);
 		*trgt.q++ = mean? sum.q/n: sum.q;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT32:
 	      do {
@@ -4909,9 +4909,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  if (psign == -1) /* negative exponent: must divide */
 		    value.q = value.q? 1.0/value.q: 0.0;
 		  sum.q += value.q;
-		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes_);
 		*trgt.q++ = mean? sum.q/n: sum.q;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT64:
 	      do {
@@ -4929,9 +4929,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  if (psign == -1) /* negative exponent: must divide */
 		    value.q = value.q? 1.0/value.q: 0.0;
 		  sum.q += value.q;
-		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes_);
 		*trgt.q++ = mean? sum.q/n: sum.q;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	  } /* end of switch (type) */
 	  break;
@@ -4953,9 +4953,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  if (psign == -1) /* negative exponent: must divide */
 		    value.f = value.f? 1.0/value.f: 0.0;
 		  sum.f += value.f;
-		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes_);
 		*trgt.f++ = mean? sum.f/n: sum.f;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT16:
 	      do {
@@ -4973,9 +4973,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  if (psign == -1) /* negative exponent: must divide */
 		    value.f = value.f? 1.0/value.f: 0.0;
 		  sum.f += value.f;
-		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes_);
 		*trgt.f++ = mean? sum.f/n: sum.f;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT32:
 	      do {
@@ -4993,9 +4993,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  if (psign == -1) /* negative exponent: must divide */
 		    value.f = value.f? 1.0/value.f: 0.0;
 		  sum.f += value.f;
-		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes_);
 		*trgt.f++ = mean? sum.f/n: sum.f;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT64:
 	      do {
@@ -5013,9 +5013,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  if (psign == -1) /* negative exponent: must divide */
 		    value.f = value.f? 1.0/value.f: 0.0;
 		  sum.f += value.f;
-		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes_);
 		*trgt.f++ = mean? sum.f/n: sum.f;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_FLOAT:
 	      do {
@@ -5033,9 +5033,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  if (psign == -1) /* negative exponent: must divide */
 		    value.f = value.f? 1.0/value.f: 0.0;
 		  sum.f += value.f;
-		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes_);
 		*trgt.f++ = mean? sum.f/n: sum.f;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	  } /* end of switch (type) */
 	  break;
@@ -5057,9 +5057,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  if (psign == -1) /* negative exponent: must divide */
 		    value.d = value.d? 1.0/value.d: 0.0;
 		  sum.d += value.d;
-		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes_);
 		*trgt.d++ = mean? sum.d/n: sum.d;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT16:
 	      do {
@@ -5077,9 +5077,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  if (psign == -1) /* negative exponent: must divide */
 		    value.d = value.d? 1.0/value.d: 0.0;
 		  sum.d += value.d;
-		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes_);
 		*trgt.d++ = mean? sum.d/n: sum.d;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT32:
 	      do {
@@ -5097,9 +5097,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  if (psign == -1) /* negative exponent: must divide */
 		    value.d = value.d? 1.0/value.d: 0.0;
 		  sum.d += value.d;
-		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes_);
 		*trgt.d++ = mean? sum.d/n: sum.d;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_INT64:
 	      do {
@@ -5117,9 +5117,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  if (psign == -1) /* negative exponent: must divide */
 		    value.d = value.d? 1.0/value.d: 0.0;
 		  sum.d += value.d;
-		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes_);
 		*trgt.d++ = mean? sum.d/n: sum.d;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_FLOAT:
 	      do {
@@ -5137,9 +5137,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  if (psign == -1) /* negative exponent: must divide */
 		    value.d = value.d? 1.0/value.d: 0.0;
 		  sum.d += value.d;
-		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes_);
 		*trgt.d++ = mean? sum.d/n: sum.d;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_DOUBLE:
 	      do {
@@ -5157,9 +5157,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  if (psign == -1) /* negative exponent: must divide */
 		    value.d = value.d? 1.0/value.d: 0.0;
 		  sum.d += value.d;
-		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes_);
 		*trgt.d++ = mean? sum.d/n: sum.d;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	  } /* end of switch (type) */
 	  break;
@@ -5196,7 +5196,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      }
 	      sumcf.real += valuecf.real;
 	      sumcf.imaginary *= valuecf.imaginary;
-	    } while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+	    } while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes_);
 	    if (mean) {
 	      trgt.cf->real = sumcf.real/n;
 	      trgt.cf->imaginary = sumcf.imaginary/n;
@@ -5205,7 +5205,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      trgt.cf->imaginary = sumcf.imaginary;
 	    }
 	    trgt.cf++;
-	  } while (done < srcinfo.rndim);
+	  } while (done < srcinfo.rndim_);
 	  break;
 	case LUX_CDOUBLE:
 	  switch (type) {
@@ -5242,7 +5242,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  }
 		  sumcd.real += valuecd.real;
 		  sumcd.imaginary *= valuecd.imaginary;
-		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes_);
 		if (mean) {
 		  trgt.cd->real = sumcd.real/n;
 		  trgt.cd->imaginary = sumcd.imaginary/n;
@@ -5251,7 +5251,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  trgt.cd->imaginary = sumcd.imaginary;
 		}
 		trgt.cd++;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	    case LUX_CDOUBLE:
 	      do {
@@ -5286,7 +5286,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  }
 		  sumcd.real += valuecd.real;
 		  sumcd.imaginary *= valuecd.imaginary;
-		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes_);
 		if (mean) {
 		  trgt.cd->real = sumcd.real/n;
 		  trgt.cd->imaginary = sumcd.imaginary/n;
@@ -5295,7 +5295,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  trgt.cd->imaginary = sumcd.imaginary;
 		}
 		trgt.cd++;
-	      } while (done < srcinfo.rndim);
+	      } while (done < srcinfo.rndim_);
 	      break;
 	  } /* end of switch (type) */
 	  break;

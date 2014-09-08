@@ -1004,25 +1004,25 @@ int32_t lux_calendar(int32_t narg, int32_t ps[])
       return LUX_ERROR;
   }
 
-  if (srcinfo.rdims[0] != input_elem_per_date) {
+  if (srcinfo.rdims_[0] != input_elem_per_date) {
     /* we have a multiple of the expected number of input elements per
        date, but the first dimension must be exactly equal to the
        expected number else the standard loop ignores the excess
        elements.  We shift the excess to the second dimension. */
     int32_t dims[MAX_DIMS];
 
-    assert(srcinfo.dims[0] % input_elem_per_date == 0);
-    memcpy(dims, srcinfo.dims, srcinfo.ndim*sizeof(*dims));
-    if (srcinfo.ndim == 1) {    /* there is only one dimension */
+    assert(srcinfo.dims_[0] % input_elem_per_date == 0);
+    memcpy(dims, srcinfo.dims_, srcinfo.ndim_*sizeof(*dims));
+    if (srcinfo.ndim_ == 1) {    /* there is only one dimension */
       dims[1] = 1;              /* add a 2nd dimension */
-      srcinfo.ndim = 2;
+      srcinfo.ndim_ = 2;
     }
-    int32_t d = srcinfo.dims[0]/input_elem_per_date;
+    int32_t d = srcinfo.dims_[0]/input_elem_per_date;
     dims[1] *= d;
     dims[0] /= d;
-    setupDimensionLoop(&srcinfo, srcinfo.ndim, dims, srcinfo.type,
-                       srcinfo.naxes, srcinfo.axes, srcinfo.data,
-                       srcinfo.mode);
+    setupDimensionLoop(&srcinfo, srcinfo.ndim_, dims, srcinfo.type_,
+                       srcinfo.naxes_, srcinfo.axes_, srcinfo.data_,
+                       srcinfo.mode_);
   }    
 
   /* complain if the desired type of translation is not available.  We
@@ -1173,7 +1173,7 @@ int32_t lux_calendar(int32_t narg, int32_t ps[])
       break;
     }
   } while (advanceLoop(&tgtinfo, &tgt), 
-	   advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+	   advanceLoop(&srcinfo, &src) < srcinfo.rndim_);
   if (!loopIsAtStart(&tgtinfo))
     return luxerror("Source loop is finished but target loop is not!", ps[0]);
 
@@ -2342,11 +2342,11 @@ int32_t lux_precess(int32_t narg, int32_t ps[])
 		   outtype, &srcinfo, &src, &result, &tgtinfo, &tgt);
   if (n == LUX_ERROR)
     return n;
-  if (srcinfo.ndim < 1) {
+  if (srcinfo.ndim_ < 1) {
     zap(result);
     return cerror(NEED_ARR, ps[0]);
   }
-  if (srcinfo.dims[0] < 2) {
+  if (srcinfo.dims_[0] < 2) {
     zap(result);
     return luxerror("Need at least 2 elements in the first dimension", ps[0]);
   }
@@ -2367,7 +2367,7 @@ int32_t lux_precess(int32_t narg, int32_t ps[])
 	if (!done)
 	  *tgt.f = *src.b;
       } while (!done);
-    } while (done < srcinfo.rndim);
+    } while (done < srcinfo.rndim_);
     break;
   case LUX_INT16:
     do {
@@ -2384,7 +2384,7 @@ int32_t lux_precess(int32_t narg, int32_t ps[])
 	if (!done)
 	  *tgt.f = *src.w;
       } while (!done);
-    } while (done < srcinfo.rndim);
+    } while (done < srcinfo.rndim_);
     break;
   case LUX_INT32:
     do {
@@ -2401,7 +2401,7 @@ int32_t lux_precess(int32_t narg, int32_t ps[])
 	if (!done)
 	  *tgt.f = *src.l;
       } while (!done);
-    } while (done < srcinfo.rndim);
+    } while (done < srcinfo.rndim_);
     break;
   case LUX_FLOAT:
     do {
@@ -2418,7 +2418,7 @@ int32_t lux_precess(int32_t narg, int32_t ps[])
 	if (!done)
 	  *tgt.f = *src.f;
       } while (!done);
-    } while (done < srcinfo.rndim);
+    } while (done < srcinfo.rndim_);
     break;
   case LUX_DOUBLE:
     do {
@@ -2435,7 +2435,7 @@ int32_t lux_precess(int32_t narg, int32_t ps[])
 	if (!done)
 	  *tgt.d = *src.d;
       } while (!done);
-    } while (done < srcinfo.rndim);
+    } while (done < srcinfo.rndim_);
     break;
   }
   return result;
@@ -2499,11 +2499,11 @@ int32_t lux_constellation(int32_t narg, int32_t ps[])
 		   LUX_INT8, &srcinfo, &src, &result, &tgtinfo, &tgt);
   if (n == LUX_ERROR)
     return n;
-  if (srcinfo.ndim < 1) {
+  if (srcinfo.ndim_ < 1) {
     zap(result);
     return cerror(NEED_ARR, ps[0]);
   }
-  if (srcinfo.dims[0] < 2) {
+  if (srcinfo.dims_[0] < 2) {
     zap(result);
     return luxerror("Need at least 2 elements in the first dimension", ps[0]);
   }
@@ -2530,7 +2530,7 @@ int32_t lux_constellation(int32_t narg, int32_t ps[])
       }
       *tgt.b = constellation(alpha*RAD, delta*RAD);
       advanceLoop(&tgtinfo, &tgt);
-    } while (done < srcinfo.rndim);
+    } while (done < srcinfo.rndim_);
     break;
   case LUX_INT16:
     do {
@@ -2553,7 +2553,7 @@ int32_t lux_constellation(int32_t narg, int32_t ps[])
       }
       *tgt.b = constellation(alpha*RAD, delta*RAD);
       advanceLoop(&tgtinfo, &tgt);
-    } while (done < srcinfo.rndim);
+    } while (done < srcinfo.rndim_);
     break;
   case LUX_INT32:
     do {
@@ -2576,7 +2576,7 @@ int32_t lux_constellation(int32_t narg, int32_t ps[])
       }
       *tgt.b = constellation(alpha*RAD, delta*RAD);
       advanceLoop(&tgtinfo, &tgt);
-    } while (done < srcinfo.rndim);
+    } while (done < srcinfo.rndim_);
     break;
   case LUX_FLOAT:
     do {
@@ -2599,7 +2599,7 @@ int32_t lux_constellation(int32_t narg, int32_t ps[])
       }
       *tgt.b = constellation(alpha*RAD, delta*RAD);
       advanceLoop(&tgtinfo, &tgt);
-    } while (done < srcinfo.rndim);
+    } while (done < srcinfo.rndim_);
     break;
   case LUX_DOUBLE:
     do {
@@ -2622,7 +2622,7 @@ int32_t lux_constellation(int32_t narg, int32_t ps[])
       }
       *tgt.b = constellation(alpha*RAD, delta*RAD);
       advanceLoop(&tgtinfo, &tgt);
-    } while (done < srcinfo.rndim);
+    } while (done < srcinfo.rndim_);
     break;
   }
   return result;
@@ -3936,7 +3936,7 @@ int32_t lux_astrf(int32_t narg, int32_t ps[]) {
 		   LUX_FLOAT, &srcinfo, &src, &result, &tgtinfo, &tgt)
       == LUX_ERROR)
     return LUX_ERROR;
-  if (srcinfo.ndim < 1 || srcinfo.dims[0] < 2)
+  if (srcinfo.ndim_ < 1 || srcinfo.dims_[0] < 2)
     return luxerror("Need at least two elements in first dimension", -1);
   if (narg > 1) {
     equinox = double_arg(ps[1]);
@@ -3950,9 +3950,9 @@ int32_t lux_astrf(int32_t narg, int32_t ps[]) {
   ceps = cos(epsilon);
   seps = sin(epsilon);
   do {
-    switch (tgtinfo.type) {
+    switch (tgtinfo.type_) {
     case LUX_FLOAT:
-      switch (srcinfo.type) {
+      switch (srcinfo.type_) {
       case LUX_INT8:
 	pos[0] = (double) src.b[0]*DEG;
 	pos[1] = (double) src.b[1]*DEG;
@@ -3992,7 +3992,7 @@ int32_t lux_astrf(int32_t narg, int32_t ps[]) {
       tgt.f[1] = (float) pos[1]*RAD;
       break;
     case LUX_DOUBLE:
-      switch (srcinfo.type) {
+      switch (srcinfo.type_) {
       case LUX_INT8:
 	pos[0] = (double) src.b[0]*DEG;
 	pos[1] = (double) src.b[1]*DEG;
@@ -4038,9 +4038,9 @@ int32_t lux_astrf(int32_t narg, int32_t ps[]) {
     default:
       break;
     }
-    src.b += srcinfo.rdims[0]*srcinfo.stride;
-    tgt.b += tgtinfo.rdims[0]*tgtinfo.stride;
-  } while (advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+    src.b += srcinfo.rdims_[0]*srcinfo.stride_;
+    tgt.b += tgtinfo.rdims_[0]*tgtinfo.stride_;
+  } while (advanceLoop(&srcinfo, &src) < srcinfo.rndim_);
   return result;
 }
 /*--------------------------------------------------------------------------*/

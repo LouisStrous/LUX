@@ -48,9 +48,9 @@ int32_t segment_2d(int32_t narg, int32_t ps[])
 
   sign = (narg > 1 && ps[1])? int_arg(ps[1]): 1;
 
-  nx = srcinfo.dims[0];
-  ny = srcinfo.dims[1];
-  
+  nx = srcinfo.dims_[0];
+  ny = srcinfo.dims_[1];
+
   /* top row: always zero */
   zerobytes(trgt.l, nx*sizeof(int32_t));
   trgt.l += nx;
@@ -305,20 +305,20 @@ int32_t segment_general(int32_t narg, int32_t ps[])
 		       NULL);
   if (n == LUX_ERROR)
     return LUX_ERROR;
-  
+
   /* set the edges to zero */
-  for (i = 0; i < 2*srcinfo.ndim; i++) {
+  for (i = 0; i < 2*srcinfo.ndim_; i++) {
     if (edge[i]) {
       rearrangeEdgeLoop(&trgtinfo, NULL, i);
       do
 	*trgt.l = 0;
-      while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.ndim - 1);
+      while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.ndim_ - 1);
     }
   }
 
   /* set up the range of coordinates that is to be checked */
-  for (i = 0; i < srcinfo.ndim; i++)
-    edge[2*i + 1] = srcinfo.dims[i] - 1 - edge[2*i + 1];
+  for (i = 0; i < srcinfo.ndim_; i++)
+    edge[2*i + 1] = srcinfo.dims_[i] - 1 - edge[2*i + 1];
   subdataLoop(edge, &srcinfo);
   subdataLoop(edge, &trgtinfo);
 
@@ -331,7 +331,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
       case LUX_INT8:
 	do {
 	  value.w = 2 * (int16_t) *src.b;
-	  for (j = 0; j < n; j++) {	/* all directions */	  
+	  for (j = 0; j < n; j++) {	/* all directions */
 	    k = offset[j];
 	    srcl.b = src.b + k;
 	    srcr.b = src.b - k;
@@ -340,7 +340,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
 	  }
 	  *trgt.l = (j == n);
 	} while (advanceLoop(&trgtinfo, &trgt),
-		 advanceLoop(&srcinfo, &src) < srcinfo.ndim);
+		 advanceLoop(&srcinfo, &src) < srcinfo.ndim_);
 	break;
       case LUX_INT16:
 	do {
@@ -354,7 +354,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
 	  }
 	  *trgt.l = (j == n);
 	} while (advanceLoop(&trgtinfo, &trgt),
-		 advanceLoop(&srcinfo, &src) < srcinfo.ndim);
+		 advanceLoop(&srcinfo, &src) < srcinfo.ndim_);
 	break;
       case LUX_INT32:
 	do {
@@ -368,7 +368,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
 	  }
 	  *trgt.l = (j == n);
 	} while (advanceLoop(&trgtinfo, &trgt),
-		 advanceLoop(&srcinfo, &src) < srcinfo.ndim);
+		 advanceLoop(&srcinfo, &src) < srcinfo.ndim_);
 	break;
       case LUX_INT64:
 	do {
@@ -382,7 +382,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
 	  }
 	  *trgt.l = (j == n);
 	} while (advanceLoop(&trgtinfo, &trgt),
-		 advanceLoop(&srcinfo, &src) < srcinfo.ndim);
+		 advanceLoop(&srcinfo, &src) < srcinfo.ndim_);
 	break;
       case LUX_FLOAT:
 	do {
@@ -396,7 +396,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
 	  }
 	  *trgt.l = (j == n);
 	} while (advanceLoop(&trgtinfo, &trgt),
-		 advanceLoop(&srcinfo, &src) < srcinfo.ndim);
+		 advanceLoop(&srcinfo, &src) < srcinfo.ndim_);
 	break;
       case LUX_DOUBLE:
 	do {
@@ -410,7 +410,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
 	  }
 	  *trgt.l = (j == n);
 	} while (advanceLoop(&trgtinfo, &trgt),
-		 advanceLoop(&srcinfo, &src) < srcinfo.ndim);
+		 advanceLoop(&srcinfo, &src) < srcinfo.ndim_);
 	break;
     } else 				/* general case - a bit slower */
       switch (array_type(ps[0])) {
@@ -433,7 +433,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
 	    }
 	    *trgt.l = nok;
 	  } while (advanceLoop(&trgtinfo, &trgt),
-		   advanceLoop(&srcinfo, &src) < srcinfo.ndim);
+		   advanceLoop(&srcinfo, &src) < srcinfo.ndim_);
 	  break;
 	case LUX_INT16:
 	  do {
@@ -454,7 +454,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
 	    }
 	    *trgt.l = nok;
 	  } while (advanceLoop(&trgtinfo, &trgt),
-		   advanceLoop(&srcinfo, &src) < srcinfo.ndim);
+		   advanceLoop(&srcinfo, &src) < srcinfo.ndim_);
 	  break;
 	case LUX_INT32:
 	  do {
@@ -475,7 +475,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
 	    }
 	    *trgt.l = nok;
 	  } while (advanceLoop(&trgtinfo, &trgt),
-		   advanceLoop(&srcinfo, &src) < srcinfo.ndim);
+		   advanceLoop(&srcinfo, &src) < srcinfo.ndim_);
 	  break;
 	case LUX_INT64:
 	  do {
@@ -496,7 +496,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
 	    }
 	    *trgt.l = nok;
 	  } while (advanceLoop(&trgtinfo, &trgt),
-		   advanceLoop(&srcinfo, &src) < srcinfo.ndim);
+		   advanceLoop(&srcinfo, &src) < srcinfo.ndim_);
 	  break;
 	case LUX_FLOAT:
 	  do {
@@ -517,7 +517,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
 	    }
 	    *trgt.l = nok;
 	  } while (advanceLoop(&trgtinfo, &trgt),
-		   advanceLoop(&srcinfo, &src) < srcinfo.ndim);
+		   advanceLoop(&srcinfo, &src) < srcinfo.ndim_);
 	  break;
 	case LUX_DOUBLE:
 	  do {
@@ -538,7 +538,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
 	    }
 	    *trgt.l = nok;
 	  } while (advanceLoop(&trgtinfo, &trgt),
-		   advanceLoop(&srcinfo, &src) < srcinfo.ndim);
+		   advanceLoop(&srcinfo, &src) < srcinfo.ndim_);
 	  break;
       }
 
@@ -586,8 +586,8 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
 
   sign = (narg > 1 && ps[2])? int_arg(ps[2]): 1;
 
-  nx = srcinfo.dims[0];
-  ny = srcinfo.dims[1];
+  nx = srcinfo.dims_[0];
+  ny = srcinfo.dims_[1];
   off[0] = nx + 1;
   off[1] = 1;
   off[2] = nx - 1;
@@ -880,8 +880,8 @@ int32_t lux_max_dir(int32_t narg, int32_t ps[])
 
   sign = (narg > 1 && ps[2])? int_arg(ps[2]): 1;
 
-  nx = srcinfo.dims[0];
-  ny = srcinfo.dims[1];
+  nx = srcinfo.dims_[0];
+  ny = srcinfo.dims_[1];
   off[0] = nx + 1;
   off[1] = 1;
   off[2] = nx - 1;
@@ -1443,16 +1443,16 @@ int32_t area_general(int32_t narg, int32_t ps[], int32_t isFunction)
 		     seed[i], i);
       }
   }
-  
+
   /* treat all elements that are on an edge: if they are equal to 1, then
      set them to EDGE */
-  for (i = 0; i < 2*srcinfo.ndim; i++) {
+  for (i = 0; i < 2*srcinfo.ndim_; i++) {
     if (edge[i]) {
       rearrangeEdgeLoop(&srcinfo, NULL, i);
       do
 	if (*src.l == 1)
 	  *src.l = EDGE;
-      while (advanceLoop(&srcinfo, &src) < srcinfo.ndim - 1);
+      while (advanceLoop(&srcinfo, &src) < srcinfo.ndim_ - 1);
     }
   }
   free(edge);
@@ -1538,13 +1538,13 @@ int32_t area_general(int32_t narg, int32_t ps[], int32_t isFunction)
 				   we need the coordinates for edge testing */
 	ix = ptr - ptr0;	/* index */
 	for (i = 0; i < ndim; i++) {
-	  srcinfo.coords[i] = ix % srcinfo.dims[i];
-	  ix /= srcinfo.dims[i];
+	  srcinfo.coords_[i] = ix % srcinfo.dims_[i];
+	  ix /= srcinfo.dims_[i];
 	} /* end of for (i = 0,...) */
 	for (direction = 0; direction < nDirection; direction++) {
 	  /* now we must check if the neighbor is across an edge */
 	  for (i = 0; i < ndim; i++) {
-	    ix2 = srcinfo.coords[i] + rcoord[i + direction*ndim];
+	    ix2 = srcinfo.coords_[i] + rcoord[i + direction*ndim];
 	    if (ix2 < 0 || ix2 >= dims[i]) /* over the egde */
 	      break;
 	  } /* end of for (i = 0,...) */
@@ -2166,12 +2166,12 @@ int32_t area2_general(int32_t narg, int32_t ps[])
     return luxerror("No directions satisfy the requirements", ps[4]);
 
   /* we mark all data to be treated that is on an edge */
-  for (i = 0; i < 2*srcinfo.rndim; i++) {
+  for (i = 0; i < 2*srcinfo.rndim_; i++) {
     rearrangeEdgeLoop(&srcinfo, NULL, i);
     do {
       if (*src.l == 1)
 	*src.l = EDGE;
-    } while (advanceLoop(&srcinfo, &src) < srcinfo.rndim - 1);
+    } while (advanceLoop(&srcinfo, &src) < srcinfo.rndim_ - 1);
   }
   free(edge);
 
@@ -2194,12 +2194,12 @@ int32_t area2_general(int32_t narg, int32_t ps[])
     areaNumber = 2;		/* default start value */
 
   ptrend = ptr0 + array_size(ps[0]);
-  
+
   ptr = ptr0;
   stackend = stack0 + nStack;
 
-  ndim = srcinfo.rndim;
-  dims = srcinfo.dims;
+  ndim = srcinfo.rndim_;
+  dims = srcinfo.dims_;
 
   ptr1 = ptr0;
   do {				/* still more to do */
@@ -2251,8 +2251,8 @@ int32_t area2_general(int32_t narg, int32_t ps[])
 	/* now we must check if the neighbor is across an edge */
 	ix = ptr - ptr0;	/* index */
 	for (i = 0; i < ndim; i++) {
-	  srcinfo.coords[i] = ix % srcinfo.dims[i];
-	  ix /= srcinfo.dims[i];
+	  srcinfo.coords_[i] = ix % srcinfo.dims_[i];
+	  ix /= srcinfo.dims_[i];
 	}
       }
 
@@ -2262,7 +2262,7 @@ int32_t area2_general(int32_t narg, int32_t ps[])
 	  continue;
 	if (*ptr == EDGE) {
 	  for (i = 0; i < ndim; i++) {
-	    ix2 = srcinfo.coords[i] + rcoord[i + direction*ndim];
+	    ix2 = srcinfo.coords_[i] + rcoord[i + direction*ndim];
 	    if (ix2 < 0 || ix2 >= dims[i])
 	      /* across the edge: continue with next direction */
 	      continue;
@@ -2362,8 +2362,8 @@ int32_t area2_general(int32_t narg, int32_t ps[])
 				   we need the coordinates for edge testing */
       ix = ptr - ptr0;		/* index */
       for (i = 0; i < ndim; i++) {
-	srcinfo.coords[i] = ix % srcinfo.dims[i];
-	ix /= srcinfo.dims[i];
+	srcinfo.coords_[i] = ix % srcinfo.dims_[i];
+	ix /= srcinfo.dims_[i];
       }
     }
 
@@ -2372,7 +2372,7 @@ int32_t area2_general(int32_t narg, int32_t ps[])
 	for (direction = 0; direction < nDirection; direction++) {
 	  /* now we must check if the neighbor is across an edge */
 	  for (i = 0; i < ndim; i++) {
-	    ix2 = srcinfo.coords[i] + rcoord[i + direction*ndim];
+	    ix2 = srcinfo.coords_[i] + rcoord[i + direction*ndim];
 	    if (ix2 < 0 || ix2 >= dims[i]) /* over the egde */
 	      continue;
 	  }
@@ -2799,33 +2799,33 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
   /* we calculate the index offsets for all directions we want to */
   /* investigate, which means all directions with the first dimension */
   /* equal to +1. */
-  srcinfo.coords[0] = 1;		/* set first dimension equal to +1 */
+  srcinfo.coords_[0] = 1;		/* set first dimension equal to +1 */
   /* calculate the number of nearest-neighbor data points with their */
   /* first dimension equal to +1 */
   n = 1;
-  for (i = 1; i < srcinfo.ndim; i++)
+  for (i = 1; i < srcinfo.ndim_; i++)
     n *= 3;
   offsets = (int32_t *) malloc(n*sizeof(int32_t));
-  rcoords = (int32_t *) malloc(n*(srcinfo.ndim - 1)*sizeof(int32_t));
+  rcoords = (int32_t *) malloc(n*(srcinfo.ndim_ - 1)*sizeof(int32_t));
   if (!offsets || !rcoords)
     return cerror(ALLOC_ERR, 0);
   for (k = 0; k < n; k++) {
     offsets[k] = 1;
-    for (j = 1; j < srcinfo.ndim; j++)
+    for (j = 1; j < srcinfo.ndim_; j++)
 				/* calculate index offset */
-      offsets[k] += srcinfo.coords[j]*srcinfo.singlestep[srcinfo.raxes[j]];
-    memcpy(rcoords + k*(srcinfo.ndim - 1), &srcinfo.coords[1],
-	   (srcinfo.ndim - 1)*sizeof(int32_t));
-    for (j = 1; j < srcinfo.ndim; j++) { /* to next direction: don't change */
+      offsets[k] += srcinfo.coords_[j]*srcinfo.singlestep_[srcinfo.raxes_[j]];
+    memcpy(rcoords + k*(srcinfo.ndim_ - 1), &srcinfo.coords_[1],
+	   (srcinfo.ndim_ - 1)*sizeof(int32_t));
+    for (j = 1; j < srcinfo.ndim_; j++) { /* to next direction: don't change */
 				/* the first dimension */
-      srcinfo.coords[j]++;
-      if (srcinfo.coords[j] < 2)
+      srcinfo.coords_[j]++;
+      if (srcinfo.coords_[j] < 2)
 	break;
       for (i = 1; i <= j; i++)
-	srcinfo.coords[i] = -1;
+	srcinfo.coords_[i] = -1;
     }
   }
-  zerobytes(srcinfo.coords, srcinfo.ndim*sizeof(int32_t)); /* back to zeros */
+  zerobytes(srcinfo.coords_, srcinfo.ndim_*sizeof(int32_t)); /* back to zeros */
 
   mini = 2;
   switch (symbol_type(ps[0]) | sign) {
@@ -2838,26 +2838,26 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	loc[1] = loc[0];
 	min[0].b = bounds.max.b;
 	mini++;
-	if (!srcinfo.coords[0]) {	/* at left edge */
+	if (!srcinfo.coords_[0]) {	/* at left edge */
 	  src.b--;
 	  min[2].b = min[1].b = bounds.max.b;
 	  mini = 3;
 	  edge = 0;
-	  for (i = 1; i < srcinfo.ndim; i++)
-	    if (!srcinfo.coords[i]
-		|| srcinfo.coords[i] == srcinfo.dims[i] - 1) {
+	  for (i = 1; i < srcinfo.ndim_; i++)
+	    if (!srcinfo.coords_[i]
+		|| srcinfo.coords_[i] == srcinfo.dims_[i] - 1) {
 	      edge = 1;
 	      break;
 	    }
 	  if (edge)
 	    for (i = 0; i < n; i++) { /* all directions */
-	      for (j = 0; j < srcinfo.ndim - 1; j++) {
+	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
-		k = srcinfo.coords[j + 1] + rcoords[(srcinfo.ndim - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims[j + 1])
+		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
+		if (k < 0 || k == srcinfo.dims_[j + 1])
 		  break;
 	      }
-	      if (j == srcinfo.ndim - 1) {	/* not across any other edge */
+	      if (j == srcinfo.ndim_ - 1) {	/* not across any other edge */
 		if (src.b[offsets[i]] < min[0].b) { /* update */
 		  min[0].b = src.b[offsets[i]];
 		  loc[0] = i;
@@ -2893,8 +2893,8 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	  min[0].b = bounds.max.b;
 	  mini++;
 	}
-	
-	if (srcinfo.coords[0] == srcinfo.dims[0] - 1) { /* at right edge */
+
+	if (srcinfo.coords_[0] == srcinfo.dims_[0] - 1) { /* at right edge */
 	  if (mini == 3) {
 	    if (min[1].b < min[2].b)
 	      mini = 1;
@@ -2904,13 +2904,13 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	} else {
 	  if (edge)
 	    for (i = 0; i < n; i++) {	/* all directions */
-	      for (j = 0; j < srcinfo.ndim - 1; j++) {
+	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
-		k = srcinfo.coords[j + 1] + rcoords[(srcinfo.ndim - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims[j + 1])
+		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
+		if (k < 0 || k == srcinfo.dims_[j + 1])
 		  break;
 	      }
-	      if (j == srcinfo.ndim - 1) {	/* not across any edge */
+	      if (j == srcinfo.ndim_ - 1) {	/* not across any edge */
 		if (src.b[offsets[i]] < min[0].b) { /* update */
 		  min[0].b = src.b[offsets[i]];
 		  loc[0] = i;
@@ -2942,7 +2942,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	/* now min[mini].b is the lowest value */
 	*trgt.l = -loc[mini] - n*mini;
       } while (advanceLoop(&trgtinfo, &trgt),
-	       advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+	       advanceLoop(&srcinfo, &src) < srcinfo.rndim_);
       break;
     case LUX_INT16:
       min[0].w = min[1].w = bounds.max.w;
@@ -2953,26 +2953,26 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	loc[1] = loc[0];
 	min[0].w = bounds.max.w;
 	mini++;
-	if (!srcinfo.coords[0]) {	/* at left edge */
+	if (!srcinfo.coords_[0]) {	/* at left edge */
 	  src.w--;
 	  min[2].w = min[1].w = bounds.max.w;
 	  mini = 3;
 	  edge = 0;
-	  for (i = 1; i < srcinfo.ndim; i++)
-	    if (!srcinfo.coords[i]
-		|| srcinfo.coords[i] == srcinfo.dims[i] - 1) {
+	  for (i = 1; i < srcinfo.ndim_; i++)
+	    if (!srcinfo.coords_[i]
+		|| srcinfo.coords_[i] == srcinfo.dims_[i] - 1) {
 	      edge = 1;
 	      break;
 	    }
 	  if (edge)
 	    for (i = 0; i < n; i++) { /* all directions */
-	      for (j = 0; j < srcinfo.ndim - 1; j++) {
+	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
-		k = srcinfo.coords[j + 1] + rcoords[(srcinfo.ndim - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims[j + 1])
+		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
+		if (k < 0 || k == srcinfo.dims_[j + 1])
 		  break;
 	      }
-	      if (j == srcinfo.ndim - 1) {	/* not across any other edge */
+	      if (j == srcinfo.ndim_ - 1) {	/* not across any other edge */
 		if (src.w[offsets[i]] < min[0].w) { /* update */
 		  min[0].w = src.w[offsets[i]];
 		  loc[0] = i;
@@ -3009,7 +3009,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	  mini++;
 	}
 	
-	if (srcinfo.coords[0] == srcinfo.dims[0] - 1) { /* at right edge */
+	if (srcinfo.coords_[0] == srcinfo.dims_[0] - 1) { /* at right edge */
 	  if (mini == 3) {
 	    if (min[1].w < min[2].w)
 	      mini = 1;
@@ -3019,13 +3019,13 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	} else {
 	  if (edge)
 	    for (i = 0; i < n; i++) {	/* all directions */
-	      for (j = 0; j < srcinfo.ndim - 1; j++) {
+	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
-		k = srcinfo.coords[j + 1] + rcoords[(srcinfo.ndim - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims[j + 1])
+		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
+		if (k < 0 || k == srcinfo.dims_[j + 1])
 		  break;
 	      }
-	      if (j == srcinfo.ndim - 1) {	/* not across any edge */
+	      if (j == srcinfo.ndim_ - 1) {	/* not across any edge */
 		if (src.w[offsets[i]] < min[0].w) { /* update */
 		  min[0].w = src.w[offsets[i]];
 		  loc[0] = i;
@@ -3057,7 +3057,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	/* now min[mini].w is the lowest value */
 	*trgt.l = -loc[mini] - n*mini;
       } while (advanceLoop(&trgtinfo, &trgt),
-	       advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+	       advanceLoop(&srcinfo, &src) < srcinfo.rndim_);
       break;
     case LUX_INT32:
       min[0].l = min[1].l = bounds.max.l;
@@ -3068,26 +3068,26 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	loc[1] = loc[0];
 	min[0].l = bounds.max.l;
 	mini++;
-	if (!srcinfo.coords[0]) {	/* at left edge */
+	if (!srcinfo.coords_[0]) {	/* at left edge */
 	  src.l--;
 	  min[2].l = min[1].l = bounds.max.l;
 	  mini = 3;
 	  edge = 0;
-	  for (i = 1; i < srcinfo.ndim; i++)
-	    if (!srcinfo.coords[i]
-		|| srcinfo.coords[i] == srcinfo.dims[i] - 1) {
+	  for (i = 1; i < srcinfo.ndim_; i++)
+	    if (!srcinfo.coords_[i]
+		|| srcinfo.coords_[i] == srcinfo.dims_[i] - 1) {
 	      edge = 1;
 	      break;
 	    }
 	  if (edge)
 	    for (i = 0; i < n; i++) { /* all directions */
-	      for (j = 0; j < srcinfo.ndim - 1; j++) {
+	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
-		k = srcinfo.coords[j + 1] + rcoords[(srcinfo.ndim - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims[j + 1])
+		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
+		if (k < 0 || k == srcinfo.dims_[j + 1])
 		  break;
 	      }
-	      if (j == srcinfo.ndim - 1) {	/* not across any other edge */
+	      if (j == srcinfo.ndim_ - 1) {	/* not across any other edge */
 		if (src.l[offsets[i]] < min[0].l) { /* update */
 		  min[0].l = src.l[offsets[i]];
 		  loc[0] = i;
@@ -3124,7 +3124,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	  mini++;
 	}
 	
-	if (srcinfo.coords[0] == srcinfo.dims[0] - 1) { /* at right edge */
+	if (srcinfo.coords_[0] == srcinfo.dims_[0] - 1) { /* at right edge */
 	  if (mini == 3) {
 	    if (min[1].l < min[2].l)
 	      mini = 1;
@@ -3134,13 +3134,13 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	} else {
 	  if (edge)
 	    for (i = 0; i < n; i++) {	/* all directions */
-	      for (j = 0; j < srcinfo.ndim - 1; j++) {
+	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
-		k = srcinfo.coords[j + 1] + rcoords[(srcinfo.ndim - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims[j + 1])
+		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
+		if (k < 0 || k == srcinfo.dims_[j + 1])
 		  break;
 	      }
-	      if (j == srcinfo.ndim - 1) {	/* not across any edge */
+	      if (j == srcinfo.ndim_ - 1) {	/* not across any edge */
 		if (src.l[offsets[i]] < min[0].l) { /* update */
 		  min[0].l = src.l[offsets[i]];
 		  loc[0] = i;
@@ -3172,7 +3172,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	/* now min[mini].l is the lowest value */
 	*trgt.l = -loc[mini] - n*mini;
       } while (advanceLoop(&trgtinfo, &trgt),
-	       advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+	       advanceLoop(&srcinfo, &src) < srcinfo.rndim_);
       break;
     case LUX_INT64:
       min[0].q = min[1].q = bounds.max.q;
@@ -3183,26 +3183,26 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	loc[1] = loc[0];
 	min[0].q = bounds.max.q;
 	mini++;
-	if (!srcinfo.coords[0]) {	/* at left edge */
+	if (!srcinfo.coords_[0]) {	/* at left edge */
 	  src.q--;
 	  min[2].q = min[1].q = bounds.max.q;
 	  mini = 3;
 	  edge = 0;
-	  for (i = 1; i < srcinfo.ndim; i++)
-	    if (!srcinfo.coords[i]
-		|| srcinfo.coords[i] == srcinfo.dims[i] - 1) {
+	  for (i = 1; i < srcinfo.ndim_; i++)
+	    if (!srcinfo.coords_[i]
+		|| srcinfo.coords_[i] == srcinfo.dims_[i] - 1) {
 	      edge = 1;
 	      break;
 	    }
 	  if (edge)
 	    for (i = 0; i < n; i++) { /* all directions */
-	      for (j = 0; j < srcinfo.ndim - 1; j++) {
+	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
-		k = srcinfo.coords[j + 1] + rcoords[(srcinfo.ndim - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims[j + 1])
+		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
+		if (k < 0 || k == srcinfo.dims_[j + 1])
 		  break;
 	      }
-	      if (j == srcinfo.ndim - 1) {	/* not across any other edge */
+	      if (j == srcinfo.ndim_ - 1) {	/* not across any other edge */
 		if (src.q[offsets[i]] < min[0].q) { /* update */
 		  min[0].q = src.q[offsets[i]];
 		  loc[0] = i;
@@ -3239,7 +3239,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	  mini++;
 	}
 
-	if (srcinfo.coords[0] == srcinfo.dims[0] - 1) { /* at right edge */
+	if (srcinfo.coords_[0] == srcinfo.dims_[0] - 1) { /* at right edge */
 	  if (mini == 3) {
 	    if (min[1].q < min[2].q)
 	      mini = 1;
@@ -3249,13 +3249,13 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	} else {
 	  if (edge)
 	    for (i = 0; i < n; i++) {	/* all directions */
-	      for (j = 0; j < srcinfo.ndim - 1; j++) {
+	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
-		k = srcinfo.coords[j + 1] + rcoords[(srcinfo.ndim - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims[j + 1])
+		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
+		if (k < 0 || k == srcinfo.dims_[j + 1])
 		  break;
 	      }
-	      if (j == srcinfo.ndim - 1) {	/* not across any edge */
+	      if (j == srcinfo.ndim_ - 1) {	/* not across any edge */
 		if (src.q[offsets[i]] < min[0].q) { /* update */
 		  min[0].q = src.q[offsets[i]];
 		  loc[0] = i;
@@ -3287,7 +3287,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	/* now min[mini].q is the lowest value */
 	*trgt.l = -loc[mini] - n*mini;
       } while (advanceLoop(&trgtinfo, &trgt),
-	       advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+	       advanceLoop(&srcinfo, &src) < srcinfo.rndim_);
       break;
     case LUX_FLOAT:
       min[0].f = min[1].f = bounds.max.f;
@@ -3298,26 +3298,26 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	loc[1] = loc[0];
 	min[0].f = bounds.max.f;
 	mini++;
-	if (!srcinfo.coords[0]) {	/* at left edge */
+	if (!srcinfo.coords_[0]) {	/* at left edge */
 	  src.f--;
 	  min[2].f = min[1].f = bounds.max.f;
 	  mini = 3;
 	  edge = 0;
-	  for (i = 1; i < srcinfo.ndim; i++)
-	    if (!srcinfo.coords[i]
-		|| srcinfo.coords[i] == srcinfo.dims[i] - 1) {
+	  for (i = 1; i < srcinfo.ndim_; i++)
+	    if (!srcinfo.coords_[i]
+		|| srcinfo.coords_[i] == srcinfo.dims_[i] - 1) {
 	      edge = 1;
 	      break;
 	    }
 	  if (edge)
 	    for (i = 0; i < n; i++) { /* all directions */
-	      for (j = 0; j < srcinfo.ndim - 1; j++) {
+	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
-		k = srcinfo.coords[j + 1] + rcoords[(srcinfo.ndim - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims[j + 1])
+		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
+		if (k < 0 || k == srcinfo.dims_[j + 1])
 		  break;
 	      }
-	      if (j == srcinfo.ndim - 1) {	/* not across any other edge */
+	      if (j == srcinfo.ndim_ - 1) {	/* not across any other edge */
 		if (src.f[offsets[i]] < min[0].f) { /* update */
 		  min[0].f = src.f[offsets[i]];
 		  loc[0] = i;
@@ -3354,7 +3354,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	  mini++;
 	}
 
-	if (srcinfo.coords[0] == srcinfo.dims[0] - 1) { /* at right edge */
+	if (srcinfo.coords_[0] == srcinfo.dims_[0] - 1) { /* at right edge */
 	  if (mini == 3) {
 	    if (min[1].f < min[2].f)
 	      mini = 1;
@@ -3364,13 +3364,13 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	} else {
 	  if (edge)
 	    for (i = 0; i < n; i++) {	/* all directions */
-	      for (j = 0; j < srcinfo.ndim - 1; j++) {
+	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
-		k = srcinfo.coords[j + 1] + rcoords[(srcinfo.ndim - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims[j + 1])
+		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
+		if (k < 0 || k == srcinfo.dims_[j + 1])
 		  break;
 	      }
-	      if (j == srcinfo.ndim - 1) {	/* not across any edge */
+	      if (j == srcinfo.ndim_ - 1) {	/* not across any edge */
 		if (src.f[offsets[i]] < min[0].f) { /* update */
 		  min[0].f = src.f[offsets[i]];
 		  loc[0] = i;
@@ -3402,7 +3402,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	/* now min[mini].f is the lowest value */
 	*trgt.l = -loc[mini] - n*mini;
       } while (advanceLoop(&trgtinfo, &trgt),
-	       advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+	       advanceLoop(&srcinfo, &src) < srcinfo.rndim_);
       break;
     case LUX_DOUBLE:
       min[0].d = min[1].d = bounds.max.d;
@@ -3413,26 +3413,26 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	loc[1] = loc[0];
 	min[0].d = bounds.max.d;
 	mini++;
-	if (!srcinfo.coords[0]) {	/* at left edge */
+	if (!srcinfo.coords_[0]) {	/* at left edge */
 	  src.d--;
 	  min[2].d = min[1].d = bounds.max.d;
 	  mini = 3;
 	  edge = 0;
-	  for (i = 1; i < srcinfo.ndim; i++)
-	    if (!srcinfo.coords[i]
-		|| srcinfo.coords[i] == srcinfo.dims[i] - 1) {
+	  for (i = 1; i < srcinfo.ndim_; i++)
+	    if (!srcinfo.coords_[i]
+		|| srcinfo.coords_[i] == srcinfo.dims_[i] - 1) {
 	      edge = 1;
 	      break;
 	    }
 	  if (edge)
 	    for (i = 0; i < n; i++) { /* all directions */
-	      for (j = 0; j < srcinfo.ndim - 1; j++) {
+	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
-		k = srcinfo.coords[j + 1] + rcoords[(srcinfo.ndim - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims[j + 1])
+		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
+		if (k < 0 || k == srcinfo.dims_[j + 1])
 		  break;
 	      }
-	      if (j == srcinfo.ndim - 1) {	/* not across any other edge */
+	      if (j == srcinfo.ndim_ - 1) {	/* not across any other edge */
 		if (src.d[offsets[i]] < min[0].d) { /* update */
 		  min[0].d = src.d[offsets[i]];
 		  loc[0] = i;
@@ -3469,7 +3469,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	  mini++;
 	}
 	
-	if (srcinfo.coords[0] == srcinfo.dims[0] - 1) { /* at right edge */
+	if (srcinfo.coords_[0] == srcinfo.dims_[0] - 1) { /* at right edge */
 	  if (mini == 3) {
 	    if (min[1].d < min[2].d)
 	      mini = 1;
@@ -3479,13 +3479,13 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	} else {
 	  if (edge)
 	    for (i = 0; i < n; i++) {	/* all directions */
-	      for (j = 0; j < srcinfo.ndim - 1; j++) {
+	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
-		k = srcinfo.coords[j + 1] + rcoords[(srcinfo.ndim - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims[j + 1])
+		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
+		if (k < 0 || k == srcinfo.dims_[j + 1])
 		  break;
 	      }
-	      if (j == srcinfo.ndim - 1) {	/* not across any edge */
+	      if (j == srcinfo.ndim_ - 1) {	/* not across any edge */
 		if (src.d[offsets[i]] < min[0].d) { /* update */
 		  min[0].d = src.d[offsets[i]];
 		  loc[0] = i;
@@ -3517,7 +3517,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	/* now min[mini].d is the lowest value */
 	*trgt.l = -loc[mini] - n*mini;
       } while (advanceLoop(&trgtinfo, &trgt),
-	       advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+	       advanceLoop(&srcinfo, &src) < srcinfo.rndim_);
       break;
 
     case LUX_INT8 | 0x20:
@@ -3529,26 +3529,26 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	loc[1] = loc[0];
 	max[0].b = bounds.min.b;
 	maxi++;
-	if (!srcinfo.coords[0]) {	/* at left edge */
+	if (!srcinfo.coords_[0]) {	/* at left edge */
 	  src.b--;
 	  max[2].b = max[1].b = bounds.min.b;
 	  maxi = 3;
 	  edge = 0;
-	  for (i = 1; i < srcinfo.ndim; i++)
-	    if (!srcinfo.coords[i]
-		|| srcinfo.coords[i] == srcinfo.dims[i] - 1) {
+	  for (i = 1; i < srcinfo.ndim_; i++)
+	    if (!srcinfo.coords_[i]
+		|| srcinfo.coords_[i] == srcinfo.dims_[i] - 1) {
 	      edge = 1;
 	      break;
 	    }
 	  if (edge)
 	    for (i = 0; i < n; i++) { /* all directions */
-	      for (j = 0; j < srcinfo.ndim - 1; j++) {
+	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
-		k = srcinfo.coords[j + 1] + rcoords[(srcinfo.ndim - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims[j + 1])
+		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
+		if (k < 0 || k == srcinfo.dims_[j + 1])
 		  break;
 	      }
-	      if (j == srcinfo.ndim - 1) {	/* not across any other edge */
+	      if (j == srcinfo.ndim_ - 1) {	/* not across any other edge */
 		if (src.b[offsets[i]] > max[0].b) { /* update */
 		  max[0].b = src.b[offsets[i]];
 		  loc[0] = i;
@@ -3585,7 +3585,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	  maxi++;
 	}
 	
-	if (srcinfo.coords[0] == srcinfo.dims[0] - 1) { /* at right edge */
+	if (srcinfo.coords_[0] == srcinfo.dims_[0] - 1) { /* at right edge */
 	  if (maxi == 3) {
 	    if (max[1].b > max[2].b)
 	      maxi = 1;
@@ -3595,13 +3595,13 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	} else {
 	  if (edge)
 	    for (i = 0; i < n; i++) {	/* all directions */
-	      for (j = 0; j < srcinfo.ndim - 1; j++) {
+	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
-		k = srcinfo.coords[j + 1] + rcoords[(srcinfo.ndim - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims[j + 1])
+		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
+		if (k < 0 || k == srcinfo.dims_[j + 1])
 		  break;
 	      }
-	      if (j == srcinfo.ndim - 1) {	/* not across any edge */
+	      if (j == srcinfo.ndim_ - 1) {	/* not across any edge */
 		if (src.b[offsets[i]] > max[0].b) { /* update */
 		  max[0].b = src.b[offsets[i]];
 		  loc[0] = i;
@@ -3633,7 +3633,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	/* now max[maxi].b is the highest value */
 	*trgt.l = -loc[maxi] - n*maxi;
       } while (advanceLoop(&trgtinfo, &trgt),
-	       advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+	       advanceLoop(&srcinfo, &src) < srcinfo.rndim_);
       break;
     case LUX_INT16 | 0x20:
       max[0].w = max[1].w = bounds.min.w;
@@ -3644,26 +3644,26 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	loc[1] = loc[0];
 	max[0].w = bounds.min.w;
 	maxi++;
-	if (!srcinfo.coords[0]) {	/* at left edge */
+	if (!srcinfo.coords_[0]) {	/* at left edge */
 	  src.w--;
 	  max[2].w = max[1].w = bounds.min.w;
 	  maxi = 3;
 	  edge = 0;
-	  for (i = 1; i < srcinfo.ndim; i++)
-	    if (!srcinfo.coords[i]
-		|| srcinfo.coords[i] == srcinfo.dims[i] - 1) {
+	  for (i = 1; i < srcinfo.ndim_; i++)
+	    if (!srcinfo.coords_[i]
+		|| srcinfo.coords_[i] == srcinfo.dims_[i] - 1) {
 	      edge = 1;
 	      break;
 	    }
 	  if (edge)
 	    for (i = 0; i < n; i++) { /* all directions */
-	      for (j = 0; j < srcinfo.ndim - 1; j++) {
+	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
-		k = srcinfo.coords[j + 1] + rcoords[(srcinfo.ndim - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims[j + 1])
+		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
+		if (k < 0 || k == srcinfo.dims_[j + 1])
 		  break;
 	      }
-	      if (j == srcinfo.ndim - 1) {	/* not across any other edge */
+	      if (j == srcinfo.ndim_ - 1) {	/* not across any other edge */
 		if (src.w[offsets[i]] > max[0].w) { /* update */
 		  max[0].w = src.w[offsets[i]];
 		  loc[0] = i;
@@ -3700,7 +3700,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	  maxi++;
 	}
 	
-	if (srcinfo.coords[0] == srcinfo.dims[0] - 1) { /* at right edge */
+	if (srcinfo.coords_[0] == srcinfo.dims_[0] - 1) { /* at right edge */
 	  if (maxi == 3) {
 	    if (max[1].w > max[2].w)
 	      maxi = 1;
@@ -3710,13 +3710,13 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	} else {
 	  if (edge)
 	    for (i = 0; i < n; i++) {	/* all directions */
-	      for (j = 0; j < srcinfo.ndim - 1; j++) {
+	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
-		k = srcinfo.coords[j + 1] + rcoords[(srcinfo.ndim - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims[j + 1])
+		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
+		if (k < 0 || k == srcinfo.dims_[j + 1])
 		  break;
 	      }
-	      if (j == srcinfo.ndim - 1) {	/* not across any edge */
+	      if (j == srcinfo.ndim_ - 1) {	/* not across any edge */
 		if (src.w[offsets[i]] > max[0].w) { /* update */
 		  max[0].w = src.w[offsets[i]];
 		  loc[0] = i;
@@ -3748,7 +3748,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	/* now max[maxi].w is the highest value */
 	*trgt.l = -loc[maxi] - n*maxi;
       } while (advanceLoop(&trgtinfo, &trgt),
-	       advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+	       advanceLoop(&srcinfo, &src) < srcinfo.rndim_);
       break;
     case LUX_INT32 | 0x20:
       max[0].l = max[1].l = bounds.min.l;
@@ -3759,26 +3759,26 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	loc[1] = loc[0];
 	max[0].l = bounds.min.l;
 	maxi++;
-	if (!srcinfo.coords[0]) {	/* at left edge */
+	if (!srcinfo.coords_[0]) {	/* at left edge */
 	  src.l--;
 	  max[2].l = max[1].l = bounds.min.l;
 	  maxi = 3;
 	  edge = 0;
-	  for (i = 1; i < srcinfo.ndim; i++)
-	    if (!srcinfo.coords[i]
-		|| srcinfo.coords[i] == srcinfo.dims[i] - 1) {
+	  for (i = 1; i < srcinfo.ndim_; i++)
+	    if (!srcinfo.coords_[i]
+		|| srcinfo.coords_[i] == srcinfo.dims_[i] - 1) {
 	      edge = 1;
 	      break;
 	    }
 	  if (edge)
 	    for (i = 0; i < n; i++) { /* all directions */
-	      for (j = 0; j < srcinfo.ndim - 1; j++) {
+	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
-		k = srcinfo.coords[j + 1] + rcoords[(srcinfo.ndim - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims[j + 1])
+		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
+		if (k < 0 || k == srcinfo.dims_[j + 1])
 		  break;
 	      }
-	      if (j == srcinfo.ndim - 1) {	/* not across any other edge */
+	      if (j == srcinfo.ndim_ - 1) {	/* not across any other edge */
 		if (src.l[offsets[i]] > max[0].l) { /* update */
 		  max[0].l = src.l[offsets[i]];
 		  loc[0] = i;
@@ -3815,7 +3815,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	  maxi++;
 	}
 	
-	if (srcinfo.coords[0] == srcinfo.dims[0] - 1) { /* at right edge */
+	if (srcinfo.coords_[0] == srcinfo.dims_[0] - 1) { /* at right edge */
 	  if (maxi == 3) {
 	    if (max[1].l > max[2].l)
 	      maxi = 1;
@@ -3825,13 +3825,13 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	} else {
 	  if (edge)
 	    for (i = 0; i < n; i++) {	/* all directions */
-	      for (j = 0; j < srcinfo.ndim - 1; j++) {
+	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
-		k = srcinfo.coords[j + 1] + rcoords[(srcinfo.ndim - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims[j + 1])
+		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
+		if (k < 0 || k == srcinfo.dims_[j + 1])
 		  break;
 	      }
-	      if (j == srcinfo.ndim - 1) {	/* not across any edge */
+	      if (j == srcinfo.ndim_ - 1) {	/* not across any edge */
 		if (src.l[offsets[i]] > max[0].l) { /* update */
 		  max[0].l = src.l[offsets[i]];
 		  loc[0] = i;
@@ -3863,7 +3863,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	/* now max[maxi].l is the highest value */
 	*trgt.l = -loc[maxi] - n*maxi;
       } while (advanceLoop(&trgtinfo, &trgt),
-	       advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+	       advanceLoop(&srcinfo, &src) < srcinfo.rndim_);
       break;
     case LUX_INT64 | 0x20:
       max[0].q = max[1].q = bounds.min.q;
@@ -3874,26 +3874,26 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	loc[1] = loc[0];
 	max[0].q = bounds.min.q;
 	maxi++;
-	if (!srcinfo.coords[0]) {	/* at left edge */
+	if (!srcinfo.coords_[0]) {	/* at left edge */
 	  src.q--;
 	  max[2].q = max[1].q = bounds.min.q;
 	  maxi = 3;
 	  edge = 0;
-	  for (i = 1; i < srcinfo.ndim; i++)
-	    if (!srcinfo.coords[i]
-		|| srcinfo.coords[i] == srcinfo.dims[i] - 1) {
+	  for (i = 1; i < srcinfo.ndim_; i++)
+	    if (!srcinfo.coords_[i]
+		|| srcinfo.coords_[i] == srcinfo.dims_[i] - 1) {
 	      edge = 1;
 	      break;
 	    }
 	  if (edge)
 	    for (i = 0; i < n; i++) { /* all directions */
-	      for (j = 0; j < srcinfo.ndim - 1; j++) {
+	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
-		k = srcinfo.coords[j + 1] + rcoords[(srcinfo.ndim - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims[j + 1])
+		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
+		if (k < 0 || k == srcinfo.dims_[j + 1])
 		  break;
 	      }
-	      if (j == srcinfo.ndim - 1) {	/* not across any other edge */
+	      if (j == srcinfo.ndim_ - 1) {	/* not across any other edge */
 		if (src.q[offsets[i]] > max[0].q) { /* update */
 		  max[0].q = src.q[offsets[i]];
 		  loc[0] = i;
@@ -3930,7 +3930,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	  maxi++;
 	}
 
-	if (srcinfo.coords[0] == srcinfo.dims[0] - 1) { /* at right edge */
+	if (srcinfo.coords_[0] == srcinfo.dims_[0] - 1) { /* at right edge */
 	  if (maxi == 3) {
 	    if (max[1].q > max[2].q)
 	      maxi = 1;
@@ -3940,13 +3940,13 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	} else {
 	  if (edge)
 	    for (i = 0; i < n; i++) {	/* all directions */
-	      for (j = 0; j < srcinfo.ndim - 1; j++) {
+	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
-		k = srcinfo.coords[j + 1] + rcoords[(srcinfo.ndim - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims[j + 1])
+		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
+		if (k < 0 || k == srcinfo.dims_[j + 1])
 		  break;
 	      }
-	      if (j == srcinfo.ndim - 1) {	/* not across any edge */
+	      if (j == srcinfo.ndim_ - 1) {	/* not across any edge */
 		if (src.q[offsets[i]] > max[0].q) { /* update */
 		  max[0].q = src.q[offsets[i]];
 		  loc[0] = i;
@@ -3978,7 +3978,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	/* now max[maxi].q is the highest value */
 	*trgt.l = -loc[maxi] - n*maxi;
       } while (advanceLoop(&trgtinfo, &trgt),
-	       advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+	       advanceLoop(&srcinfo, &src) < srcinfo.rndim_);
       break;
     case LUX_FLOAT | 0x20:
       max[0].f = max[1].f = bounds.min.f;
@@ -3989,26 +3989,26 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	loc[1] = loc[0];
 	max[0].f = bounds.min.f;
 	maxi++;
-	if (!srcinfo.coords[0]) {	/* at left edge */
+	if (!srcinfo.coords_[0]) {	/* at left edge */
 	  src.f--;
 	  max[2].f = max[1].f = bounds.min.f;
 	  maxi = 3;
 	  edge = 0;
-	  for (i = 1; i < srcinfo.ndim; i++)
-	    if (!srcinfo.coords[i]
-		|| srcinfo.coords[i] == srcinfo.dims[i] - 1) {
+	  for (i = 1; i < srcinfo.ndim_; i++)
+	    if (!srcinfo.coords_[i]
+		|| srcinfo.coords_[i] == srcinfo.dims_[i] - 1) {
 	      edge = 1;
 	      break;
 	    }
 	  if (edge)
 	    for (i = 0; i < n; i++) { /* all directions */
-	      for (j = 0; j < srcinfo.ndim - 1; j++) {
+	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
-		k = srcinfo.coords[j + 1] + rcoords[(srcinfo.ndim - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims[j + 1])
+		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
+		if (k < 0 || k == srcinfo.dims_[j + 1])
 		  break;
 	      }
-	      if (j == srcinfo.ndim - 1) {	/* not across any other edge */
+	      if (j == srcinfo.ndim_ - 1) {	/* not across any other edge */
 		if (src.f[offsets[i]] > max[0].f) { /* update */
 		  max[0].f = src.f[offsets[i]];
 		  loc[0] = i;
@@ -4045,7 +4045,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	  maxi++;
 	}
 
-	if (srcinfo.coords[0] == srcinfo.dims[0] - 1) { /* at right edge */
+	if (srcinfo.coords_[0] == srcinfo.dims_[0] - 1) { /* at right edge */
 	  if (maxi == 3) {
 	    if (max[1].f > max[2].f)
 	      maxi = 1;
@@ -4055,13 +4055,13 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	} else {
 	  if (edge)
 	    for (i = 0; i < n; i++) {	/* all directions */
-	      for (j = 0; j < srcinfo.ndim - 1; j++) {
+	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
-		k = srcinfo.coords[j + 1] + rcoords[(srcinfo.ndim - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims[j + 1])
+		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
+		if (k < 0 || k == srcinfo.dims_[j + 1])
 		  break;
 	      }
-	      if (j == srcinfo.ndim - 1) {	/* not across any edge */
+	      if (j == srcinfo.ndim_ - 1) {	/* not across any edge */
 		if (src.f[offsets[i]] > max[0].f) { /* update */
 		  max[0].f = src.f[offsets[i]];
 		  loc[0] = i;
@@ -4093,7 +4093,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	/* now max[maxi].f is the highest value */
 	*trgt.l = -loc[maxi] - n*maxi;
       } while (advanceLoop(&trgtinfo, &trgt),
-	       advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+	       advanceLoop(&srcinfo, &src) < srcinfo.rndim_);
       break;
     case LUX_DOUBLE | 0x20:
       max[0].d = max[1].d = bounds.min.d;
@@ -4104,26 +4104,26 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	loc[1] = loc[0];
 	max[0].d = bounds.min.d;
 	maxi++;
-	if (!srcinfo.coords[0]) {	/* at left edge */
+	if (!srcinfo.coords_[0]) {	/* at left edge */
 	  src.d--;
 	  max[2].d = max[1].d = bounds.min.d;
 	  maxi = 3;
 	  edge = 0;
-	  for (i = 1; i < srcinfo.ndim; i++)
-	    if (!srcinfo.coords[i]
-		|| srcinfo.coords[i] == srcinfo.dims[i] - 1) {
+	  for (i = 1; i < srcinfo.ndim_; i++)
+	    if (!srcinfo.coords_[i]
+		|| srcinfo.coords_[i] == srcinfo.dims_[i] - 1) {
 	      edge = 1;
 	      break;
 	    }
 	  if (edge)
 	    for (i = 0; i < n; i++) { /* all directions */
-	      for (j = 0; j < srcinfo.ndim - 1; j++) {
+	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
-		k = srcinfo.coords[j + 1] + rcoords[(srcinfo.ndim - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims[j + 1])
+		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
+		if (k < 0 || k == srcinfo.dims_[j + 1])
 		  break;
 	      }
-	      if (j == srcinfo.ndim - 1) {	/* not across any other edge */
+	      if (j == srcinfo.ndim_ - 1) {	/* not across any other edge */
 		if (src.d[offsets[i]] > max[0].d) { /* update */
 		  max[0].d = src.d[offsets[i]];
 		  loc[0] = i;
@@ -4160,7 +4160,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	  maxi++;
 	}
 	
-	if (srcinfo.coords[0] == srcinfo.dims[0] - 1) { /* at right edge */
+	if (srcinfo.coords_[0] == srcinfo.dims_[0] - 1) { /* at right edge */
 	  if (maxi == 3) {
 	    if (max[1].d > max[2].d)
 	      maxi = 1;
@@ -4170,13 +4170,13 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	} else {
 	  if (edge)
 	    for (i = 0; i < n; i++) {	/* all directions */
-	      for (j = 0; j < srcinfo.ndim - 1; j++) {
+	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
-		k = srcinfo.coords[j + 1] + rcoords[(srcinfo.ndim - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims[j + 1])
+		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
+		if (k < 0 || k == srcinfo.dims_[j + 1])
 		  break;
 	      }
-	      if (j == srcinfo.ndim - 1) {	/* not across any edge */
+	      if (j == srcinfo.ndim_ - 1) {	/* not across any edge */
 		if (src.d[offsets[i]] > max[0].d) { /* update */
 		  max[0].d = src.d[offsets[i]];
 		  loc[0] = i;
@@ -4208,7 +4208,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	/* now max[maxi].d is the highest value */
 	*trgt.l = -loc[maxi] - n*maxi;
       } while (advanceLoop(&trgtinfo, &trgt),
-	       advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+	       advanceLoop(&srcinfo, &src) < srcinfo.rndim_);
       break;
   }
 
@@ -4290,12 +4290,12 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
   if (narg > 2 && ps[2]) {	/* have <diagonal> */
     if (symbol_class(ps[2]) != LUX_ARRAY)
       return cerror(NEED_ARR, ps[2]);
-    if (array_size(ps[2]) != srcinfo.ndim)
+    if (array_size(ps[2]) != srcinfo.ndim_)
       return cerror(INCMP_ARG, ps[2]);
     i = lux_long(1, &ps[2]);	/* ensure LONG */
     diagonal = (int32_t*) array_data(i);
     nDiagonal = nDoDim = 0;
-    for (i = 0; i < srcinfo.ndim; i++)
+    for (i = 0; i < srcinfo.ndim_; i++)
       if (diagonal[i]) {
 	nDoDim++;		/* # dimensions that are considered
 				 at all */
@@ -4305,7 +4305,7 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
       }
   } else {
     diagonal = NULL;
-    nDiagonal = nDoDim = srcinfo.ndim;
+    nDiagonal = nDoDim = srcinfo.ndim_;
   }
 
   if (narg > 3 && ps[3]) {	/* have threshold */
@@ -4335,17 +4335,17 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
   /* calculate offsets to elements to be investigated */
   /* we only need to treat n directions */
   /* see local_extreme() for more info */
-  for (i = 0; i < srcinfo.ndim; i++)
-    srcinfo.coords[i] = 0;
-  srcinfo.coords[0] = 1;
+  for (i = 0; i < srcinfo.ndim_; i++)
+    srcinfo.coords_[i] = 0;
+  srcinfo.coords_[0] = 1;
     
   n0 = n1 = 0;
   n2 = 1;			/* defaults for when diagonal == 0 */
   for (k = 0; k < n; ) {
     if (diagonal) {
       n0 = n1 = n2 = 0;
-      for (i = 0; i < srcinfo.ndim; i++)
-	if (srcinfo.coords[i])
+      for (i = 0; i < srcinfo.ndim_; i++)
+	if (srcinfo.coords_[i])
 	  switch (diagonal[i]) {
 	    case 0:
 	      n0++;
@@ -4361,8 +4361,8 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
     if (!n0 && ((n2 && !n1) || (n1 == 1 && !n2))) {
       /* OK: treat this direction */
       offset[k] = 0;
-      for (j = 0; j < srcinfo.ndim; j++)
-	offset[k] += srcinfo.rsinglestep[j]*srcinfo.coords[j];
+      for (j = 0; j < srcinfo.ndim_; j++)
+	offset[k] += srcinfo.rsinglestep_[j]*srcinfo.coords_[j];
       k++;
     }
     /* go to next direction.  If this algorithm were allowed to run
@@ -4376,17 +4376,17 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
      we can limit ourselves to the correct half by stopping when
      we have reached the correct number of directions: this is
      taken care of by the "for (k = 0; k < n; )" statement.  LS 19jun98 */
-    for (j = 0; j < srcinfo.ndim; j++) {
-      srcinfo.coords[j]++;
-      if (srcinfo.coords[j] <= 1)
+    for (j = 0; j < srcinfo.ndim_; j++) {
+      srcinfo.coords_[j]++;
+      if (srcinfo.coords_[j] <= 1)
 	break;
       for (i = 0; i <= j; i++)
-	srcinfo.coords[i] = -1;
+	srcinfo.coords_[i] = -1;
     }
   }
 
-  zerobytes(srcinfo.coords, srcinfo.ndim*sizeof(int32_t));
-  nElem = srcinfo.dims[0];
+  zerobytes(srcinfo.coords_, srcinfo.ndim_*sizeof(int32_t));
+  nElem = srcinfo.dims_[0];
 
   if (!diagonal || diagonal[0]) {
     i1 = 1;
@@ -4401,9 +4401,9 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
     switch (array_type(ps[0])) {
       case LUX_INT8:
 	do {
-	  for (edge = srcinfo.ndim - 1; edge; edge--)
-	    if (!srcinfo.coords[edge]
-		|| srcinfo.coords[edge] == srcinfo.dims[edge] - 1)
+	  for (edge = srcinfo.ndim_ - 1; edge; edge--)
+	    if (!srcinfo.coords_[edge]
+		|| srcinfo.coords_[edge] == srcinfo.dims_[edge] - 1)
 	      break;		/* at edge */
 	  if (edge) {
 	    zerobytes(trgt.b, nElem);
@@ -4427,13 +4427,13 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 	    src.b++;
 	  }
 	} while (advanceLoop(&trgtinfo, &trgt),
-		 advanceLoop(&srcinfo, &src) < srcinfo.ndim);
+		 advanceLoop(&srcinfo, &src) < srcinfo.ndim_);
 	break;
       case LUX_INT16:
 	do {
-	  for (edge = srcinfo.ndim - 1; edge; edge--)
-	    if (!srcinfo.coords[edge]
-		|| srcinfo.coords[edge] == srcinfo.dims[edge] - 1)
+	  for (edge = srcinfo.ndim_ - 1; edge; edge--)
+	    if (!srcinfo.coords_[edge]
+		|| srcinfo.coords_[edge] == srcinfo.dims_[edge] - 1)
 	      break;		/* at edge */
 	  if (edge) {
 	    zerobytes(trgt.b, nElem);
@@ -4457,13 +4457,13 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 	    src.w++;
 	  }
 	} while (advanceLoop(&trgtinfo, &trgt),
-		 advanceLoop(&srcinfo, &src) < srcinfo.ndim);
+		 advanceLoop(&srcinfo, &src) < srcinfo.ndim_);
 	break;
       case LUX_INT32:
 	do {
-	  for (edge = srcinfo.ndim - 1; edge; edge--)
-	    if (!srcinfo.coords[edge]
-		|| srcinfo.coords[edge] == srcinfo.dims[edge] - 1)
+	  for (edge = srcinfo.ndim_ - 1; edge; edge--)
+	    if (!srcinfo.coords_[edge]
+		|| srcinfo.coords_[edge] == srcinfo.dims_[edge] - 1)
 	      break;		/* at edge */
 	  if (edge) {
 	    zerobytes(trgt.b, nElem);
@@ -4487,13 +4487,13 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 	    src.l++;
 	  }
 	} while (advanceLoop(&trgtinfo, &trgt),
-		 advanceLoop(&srcinfo, &src) < srcinfo.ndim);
+		 advanceLoop(&srcinfo, &src) < srcinfo.ndim_);
 	break;
       case LUX_INT64:
 	do {
-	  for (edge = srcinfo.ndim - 1; edge; edge--)
-	    if (!srcinfo.coords[edge]
-		|| srcinfo.coords[edge] == srcinfo.dims[edge] - 1)
+	  for (edge = srcinfo.ndim_ - 1; edge; edge--)
+	    if (!srcinfo.coords_[edge]
+		|| srcinfo.coords_[edge] == srcinfo.dims_[edge] - 1)
 	      break;		/* at edge */
 	  if (edge) {
 	    zerobytes(trgt.b, nElem);
@@ -4517,13 +4517,13 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 	    src.q++;
 	  }
 	} while (advanceLoop(&trgtinfo, &trgt),
-		 advanceLoop(&srcinfo, &src) < srcinfo.ndim);
+		 advanceLoop(&srcinfo, &src) < srcinfo.ndim_);
 	break;
       case LUX_FLOAT:
 	do {
-	  for (edge = srcinfo.ndim - 1; edge; edge--)
-	    if (!srcinfo.coords[edge]
-		|| srcinfo.coords[edge] == srcinfo.dims[edge] - 1)
+	  for (edge = srcinfo.ndim_ - 1; edge; edge--)
+	    if (!srcinfo.coords_[edge]
+		|| srcinfo.coords_[edge] == srcinfo.dims_[edge] - 1)
 	      break;		/* at edge */
 	  if (edge) {
 	    zerobytes(trgt.b, nElem);
@@ -4547,13 +4547,13 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 	    src.f++;
 	  }
 	} while (advanceLoop(&trgtinfo, &trgt),
-		 advanceLoop(&srcinfo, &src) < srcinfo.ndim);
+		 advanceLoop(&srcinfo, &src) < srcinfo.ndim_);
 	break;
       case LUX_DOUBLE:
 	do {
-	  for (edge = srcinfo.ndim - 1; edge; edge--)
-	    if (!srcinfo.coords[edge]
-		|| srcinfo.coords[edge] == srcinfo.dims[edge] - 1)
+	  for (edge = srcinfo.ndim_ - 1; edge; edge--)
+	    if (!srcinfo.coords_[edge]
+		|| srcinfo.coords_[edge] == srcinfo.dims_[edge] - 1)
 	      break;		/* at edge */
 	  if (edge) {
 	    zerobytes(trgt.b, nElem);
@@ -4577,16 +4577,16 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 	    src.d++;
 	  }
 	} while (advanceLoop(&trgtinfo, &trgt),
-		 advanceLoop(&srcinfo, &src) < srcinfo.ndim);
+		 advanceLoop(&srcinfo, &src) < srcinfo.ndim_);
 	break;
     } else 				/* general case - a bit slower */
       switch (array_type(ps[0])) {
 	case LUX_INT8:
 	  do {
-	    for (edge = srcinfo.ndim - 1; edge; edge--)
+	    for (edge = srcinfo.ndim_ - 1; edge; edge--)
 	      if ((!diagonal || diagonal[edge])
-		  && (!srcinfo.coords[edge]
-		      || srcinfo.coords[edge] == srcinfo.dims[edge] - 1))
+		  && (!srcinfo.coords_[edge]
+		      || srcinfo.coords_[edge] == srcinfo.dims_[edge] - 1))
 		break;		/* at edge */
 	    if (edge) {
 	      zerobytes(trgt.b, nElem);
@@ -4617,14 +4617,14 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 	      }
 	    }
 	  } while (advanceLoop(&trgtinfo, &trgt),
-		   advanceLoop(&srcinfo, &src) < srcinfo.ndim);
+		   advanceLoop(&srcinfo, &src) < srcinfo.ndim_);
 	  break;
 	case LUX_INT16:
 	  do {
-	    for (edge = srcinfo.ndim - 1; edge; edge--)
+	    for (edge = srcinfo.ndim_ - 1; edge; edge--)
 	      if ((!diagonal || diagonal[edge])
-		  && (!srcinfo.coords[edge]
-		      || srcinfo.coords[edge] == srcinfo.dims[edge] - 1))
+		  && (!srcinfo.coords_[edge]
+		      || srcinfo.coords_[edge] == srcinfo.dims_[edge] - 1))
 		break;		/* at edge */
 	    if (edge) {
 	      zerobytes(trgt.b, nElem);
@@ -4655,14 +4655,14 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 	      }
 	    }
 	  } while (advanceLoop(&trgtinfo, &trgt),
-		   advanceLoop(&srcinfo, &src) < srcinfo.ndim);
+		   advanceLoop(&srcinfo, &src) < srcinfo.ndim_);
 	  break;
 	case LUX_INT32:
 	  do {
-	    for (edge = srcinfo.ndim - 1; edge; edge--)
+	    for (edge = srcinfo.ndim_ - 1; edge; edge--)
 	      if ((!diagonal || diagonal[edge])
-		  && (!srcinfo.coords[edge]
-		      || srcinfo.coords[edge] == srcinfo.dims[edge] - 1))
+		  && (!srcinfo.coords_[edge]
+		      || srcinfo.coords_[edge] == srcinfo.dims_[edge] - 1))
 		break;		/* at edge */
 	    if (edge) {
 	      zerobytes(trgt.b, nElem);
@@ -4693,14 +4693,14 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 	      }
 	    }
 	  } while (advanceLoop(&trgtinfo, &trgt),
-		   advanceLoop(&srcinfo, &src) < srcinfo.ndim);
+		   advanceLoop(&srcinfo, &src) < srcinfo.ndim_);
 	  break;
 	case LUX_INT64:
 	  do {
-	    for (edge = srcinfo.ndim - 1; edge; edge--)
+	    for (edge = srcinfo.ndim_ - 1; edge; edge--)
 	      if ((!diagonal || diagonal[edge])
-		  && (!srcinfo.coords[edge]
-		      || srcinfo.coords[edge] == srcinfo.dims[edge] - 1))
+		  && (!srcinfo.coords_[edge]
+		      || srcinfo.coords_[edge] == srcinfo.dims_[edge] - 1))
 		break;		/* at edge */
 	    if (edge) {
 	      zerobytes(trgt.b, nElem);
@@ -4731,14 +4731,14 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 	      }
 	    }
 	  } while (advanceLoop(&trgtinfo, &trgt),
-		   advanceLoop(&srcinfo, &src) < srcinfo.ndim);
+		   advanceLoop(&srcinfo, &src) < srcinfo.ndim_);
 	  break;
 	case LUX_FLOAT:
 	  do {
-	    for (edge = srcinfo.ndim - 1; edge; edge--)
+	    for (edge = srcinfo.ndim_ - 1; edge; edge--)
 	      if ((!diagonal || diagonal[edge])
-		  && (!srcinfo.coords[edge]
-		      || srcinfo.coords[edge] == srcinfo.dims[edge] - 1))
+		  && (!srcinfo.coords_[edge]
+		      || srcinfo.coords_[edge] == srcinfo.dims_[edge] - 1))
 		break;		/* at edge */
 	    if (edge) {
 	      zerobytes(trgt.b, nElem);
@@ -4769,14 +4769,14 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 	      }
 	    }
 	  } while (advanceLoop(&trgtinfo, &trgt),
-		   advanceLoop(&srcinfo, &src) < srcinfo.ndim);
+		   advanceLoop(&srcinfo, &src) < srcinfo.ndim_);
 	  break;
 	case LUX_DOUBLE:
 	  do {
-	    for (edge = srcinfo.ndim - 1; edge; edge--)
+	    for (edge = srcinfo.ndim_ - 1; edge; edge--)
 	      if ((!diagonal || diagonal[edge])
-		  && (!srcinfo.coords[edge]
-		      || srcinfo.coords[edge] == srcinfo.dims[edge] - 1))
+		  && (!srcinfo.coords_[edge]
+		      || srcinfo.coords_[edge] == srcinfo.dims_[edge] - 1))
 		break;		/* at edge */
 	    if (edge) {
 	      zerobytes(trgt.b, nElem);
@@ -4807,7 +4807,7 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 	      }
 	    }
 	  } while (advanceLoop(&trgtinfo, &trgt),
-		   advanceLoop(&srcinfo, &src) < srcinfo.ndim);
+		   advanceLoop(&srcinfo, &src) < srcinfo.ndim_);
 	  break;
       }
 

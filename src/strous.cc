@@ -915,7 +915,7 @@ int32_t lux_differ(int32_t narg, int32_t ps[])
     if (getNumerical(ps[narg - 1], LUX_INT32, &nOrder, &order,
 		     GN_UPGRADE | GN_UPDATE, NULL, NULL) < 0)
       return LUX_ERROR;
-    if (nOrder > 1 && nOrder != srcinfo.naxes)
+    if (nOrder > 1 && nOrder != srcinfo.naxes_)
       return luxerror("Number of orders must be 1 or equal to number of axes",
 		   ps[2]);
   } else {
@@ -942,9 +942,9 @@ int32_t lux_differ(int32_t narg, int32_t ps[])
   } else
     old = 0;
 
-  if (!srcinfo.naxes)
-    srcinfo.naxes++;
-  for (loop = 0; loop < srcinfo.naxes; loop++) {
+  if (!srcinfo.naxes_)
+    srcinfo.naxes_++;
+  for (loop = 0; loop < srcinfo.naxes_; loop++) {
     o = *order.l;
     if (nOrder > 1)
       order.l++;
@@ -967,11 +967,11 @@ int32_t lux_differ(int32_t narg, int32_t ps[])
       iq = result;
       continue;
     }
-    if (ww > srcinfo.rdims[0])
-      ww = srcinfo.rdims[0];
-    stride = srcinfo.step[0];
+    if (ww > srcinfo.rdims_[0])
+      ww = srcinfo.rdims_[0];
+    stride = srcinfo.step_[0];
     offset1 = -ww*stride;
-    offset3 = offset1 + srcinfo.rdims[0]*stride;
+    offset3 = offset1 + srcinfo.rdims_[0]*stride;
     w1 = (internalMode & 1)? ww/2: ww;
     switch (symbol_type(iq)) {
       default:
@@ -997,7 +997,7 @@ int32_t lux_differ(int32_t narg, int32_t ps[])
 	      trgt.b += stride;
 	      src.b += stride;
 	    }
-	  for (i = ww; i < srcinfo.rdims[0]; i++) { /* middle part */
+	  for (i = ww; i < srcinfo.rdims_[0]; i++) { /* middle part */
 	    *trgt.b = *src.b - src.b[offset1];
 	    src.b += stride;
 	    trgt.b += stride;
@@ -1007,7 +1007,7 @@ int32_t lux_differ(int32_t narg, int32_t ps[])
 	    trgt.b += stride;
 	  }
 	} while (advanceLoop(&trgtinfo, &trgt),
-		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim_);
 	break;
       case LUX_INT16:
 	do {
@@ -1030,7 +1030,7 @@ int32_t lux_differ(int32_t narg, int32_t ps[])
 	      trgt.w += stride;
 	      src.w += stride;
 	    }
-	  for (i = ww; i < srcinfo.rdims[0]; i++) { /* middle part */
+	  for (i = ww; i < srcinfo.rdims_[0]; i++) { /* middle part */
 	    *trgt.w = *src.w - src.w[offset1];
 	    src.w += stride;
 	    trgt.w += stride;
@@ -1040,7 +1040,7 @@ int32_t lux_differ(int32_t narg, int32_t ps[])
 	    trgt.w += stride;
 	  }
 	} while (advanceLoop(&trgtinfo, &trgt),
-		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim_);
 	break;
       case LUX_INT32:
 	do {
@@ -1063,7 +1063,7 @@ int32_t lux_differ(int32_t narg, int32_t ps[])
 	      trgt.l += stride;
 	      src.l += stride;
 	    }
-	  for (i = ww; i < srcinfo.rdims[0]; i++) { /* middle part */
+	  for (i = ww; i < srcinfo.rdims_[0]; i++) { /* middle part */
 	    *trgt.l = *src.l - src.l[offset1];
 	    src.l += stride;
 	    trgt.l += stride;
@@ -1073,7 +1073,7 @@ int32_t lux_differ(int32_t narg, int32_t ps[])
 	    trgt.l += stride;
 	  }
 	} while (advanceLoop(&trgtinfo, &trgt),
-		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim_);
 	break;
       case LUX_INT64:
 	do {
@@ -1096,7 +1096,7 @@ int32_t lux_differ(int32_t narg, int32_t ps[])
 	      trgt.q += stride;
 	      src.q += stride;
 	    }
-	  for (i = ww; i < srcinfo.rdims[0]; i++) { /* middle part */
+	  for (i = ww; i < srcinfo.rdims_[0]; i++) { /* middle part */
 	    *trgt.q = *src.q - src.q[offset1];
 	    src.q += stride;
 	    trgt.q += stride;
@@ -1106,7 +1106,7 @@ int32_t lux_differ(int32_t narg, int32_t ps[])
 	    trgt.q += stride;
 	  }
 	} while (advanceLoop(&trgtinfo, &trgt),
-		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim_);
 	break;
       case LUX_FLOAT:
 	do {
@@ -1129,7 +1129,7 @@ int32_t lux_differ(int32_t narg, int32_t ps[])
 	      trgt.f += stride;
 	      src.f += stride;
 	    }
-	  for (i = ww; i < srcinfo.rdims[0]; i++) { /* middle part */
+	  for (i = ww; i < srcinfo.rdims_[0]; i++) { /* middle part */
 	    *trgt.f = *src.f - src.f[offset1];
 	    src.f += stride;
 	    trgt.f += stride;
@@ -1139,7 +1139,7 @@ int32_t lux_differ(int32_t narg, int32_t ps[])
 	    trgt.f += stride;
 	  }
 	} while (advanceLoop(&trgtinfo, &trgt),
-		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim_);
 	break;
       case LUX_DOUBLE:
 	do {
@@ -1162,7 +1162,7 @@ int32_t lux_differ(int32_t narg, int32_t ps[])
 	      trgt.d += stride;
 	      src.d += stride;
 	    }
-	  for (i = ww; i < srcinfo.rdims[0]; i++) { /* middle part */
+	  for (i = ww; i < srcinfo.rdims_[0]; i++) { /* middle part */
 	    *trgt.d = *src.d - src.d[offset1];
 	    src.d += stride;
 	    trgt.d += stride;
@@ -1172,10 +1172,10 @@ int32_t lux_differ(int32_t narg, int32_t ps[])
 	    trgt.d += stride;
 	  }
 	} while (advanceLoop(&trgtinfo, &trgt),
-		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim_);
 	break;
     }
-    if (loop < srcinfo.naxes - 1)
+    if (loop < srcinfo.naxes_ - 1)
     { nextLoops(&srcinfo, &trgtinfo);
       if (isFreeTemp(iq))	/* can use iq to hold next result */
       { n = result;
@@ -1241,14 +1241,14 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
     if (widthNDim > nDim)
       return cerror(INCMP_ARG, widthSym);
     for (i = 0; i < widthNDim; i++)
-      if (widthDim[i] != srcinfo.dims[i])
+      if (widthDim[i] != srcinfo.dims_[i])
 	return cerror(INCMP_DIMS, widthSym); }
 
   outType = symbol_type(result);
   type = symbol_type(ps[0]);
   
-  axis = srcinfo.axes[0];
-  step = srcinfo.step[0];
+  axis = srcinfo.axes_[0];
+  step = srcinfo.step_[0];
 
   /* now do the real work */
   switch (outType) {
@@ -1258,14 +1258,14 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	  do {
 	    i1 = -*width.l/2;
 	    i2 = i1 + *width.l;
-	    if (i1 + srcinfo.coords[axis] < 0) {
-	      i1 = -srcinfo.coords[axis];
+	    if (i1 + srcinfo.coords_[axis] < 0) {
+	      i1 = -srcinfo.coords_[axis];
 	      if (internalMode & 1) /* /FW_EDGE_NEIGHBOR */
 		i2 = i1 + *width.l; }
-	    if (i2 + srcinfo.coords[axis] > srcinfo.dims[axis])
-	    { i2 = srcinfo.dims[axis] - srcinfo.coords[axis];
+	    if (i2 + srcinfo.coords_[axis] > srcinfo.dims_[axis])
+	    { i2 = srcinfo.dims_[axis] - srcinfo.coords_[axis];
 	      if (internalMode & 1 /* /FW_EDGE_NEIGHBOR */
-		  && *width.l <= srcinfo.dims[axis]) /* not wider than data */
+		  && *width.l <= srcinfo.dims_[axis]) /* not wider than data */
 		i1 = i2 - *width.l; }
 	    i1 *= step;
 	    i2 *= step;
@@ -1278,20 +1278,20 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	    width.l++;
 	    if (done == widthNDim)	/* done with indicated axis */
 	      width.l = width0.l;
-	  } while (done < srcinfo.rndim);
+	  } while (done < srcinfo.rndim_);
 	  break;
 	case LUX_INT16:
 	  do {
 	    i1 = -*width.l/2;
 	    i2 = i1 + *width.l;
-	    if (i1 + srcinfo.coords[axis] < 0) {
-	      i1 = -srcinfo.coords[axis];
+	    if (i1 + srcinfo.coords_[axis] < 0) {
+	      i1 = -srcinfo.coords_[axis];
 	      if (internalMode & 1) /* /FW_EDGE_NEIGHBOR */
 		i2 = i1 + *width.l; }
-	    if (i2 + srcinfo.coords[axis] > srcinfo.dims[axis])
-	    { i2 = srcinfo.dims[axis] - srcinfo.coords[axis];
+	    if (i2 + srcinfo.coords_[axis] > srcinfo.dims_[axis])
+	    { i2 = srcinfo.dims_[axis] - srcinfo.coords_[axis];
 	      if (internalMode & 1 /* /FW_EDGE_NEIGHBOR */
-		  && *width.l <= srcinfo.dims[axis]) /* not wider than data */
+		  && *width.l <= srcinfo.dims_[axis]) /* not wider than data */
 		i1 = i2 - *width.l; }
 	    i1 *= step;
 	    i2 *= step;
@@ -1304,20 +1304,20 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	    width.l++;
 	    if (done == widthNDim)	/* done with indicated axis */
 	      width.l = width0.l;
-	  } while (done < srcinfo.rndim);
+	  } while (done < srcinfo.rndim_);
 	  break;
 	case LUX_INT32:
 	  do {
 	    i1 = -*width.l/2;
 	    i2 = i1 + *width.l;
-	    if (i1 + srcinfo.coords[axis] < 0) {
-	      i1 = -srcinfo.coords[axis];
+	    if (i1 + srcinfo.coords_[axis] < 0) {
+	      i1 = -srcinfo.coords_[axis];
 	      if (internalMode & 1) /* /FW_EDGE_NEIGHBOR */
 		i2 = i1 + *width.l; }
-	    if (i2 + srcinfo.coords[axis] > srcinfo.dims[axis])
-	    { i2 = srcinfo.dims[axis] - srcinfo.coords[axis];
+	    if (i2 + srcinfo.coords_[axis] > srcinfo.dims_[axis])
+	    { i2 = srcinfo.dims_[axis] - srcinfo.coords_[axis];
 	      if (internalMode & 1 /* /FW_EDGE_NEIGHBOR */
-		  && *width.l <= srcinfo.dims[axis]) /* not wider than data */
+		  && *width.l <= srcinfo.dims_[axis]) /* not wider than data */
 		i1 = i2 - *width.l; }
 	    i1 *= step;
 	    i2 *= step;
@@ -1330,7 +1330,7 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	    width.l++;
 	    if (done == widthNDim)	/* done with indicated axis */
 	      width.l = width0.l;
-	  } while (done < srcinfo.rndim);
+	  } while (done < srcinfo.rndim_);
 	  break; }
       break;
     case LUX_INT64:
@@ -1339,14 +1339,14 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	  do {
 	    i1 = -*width.l/2;
 	    i2 = i1 + *width.l;
-	    if (i1 + srcinfo.coords[axis] < 0) {
-	      i1 = -srcinfo.coords[axis];
+	    if (i1 + srcinfo.coords_[axis] < 0) {
+	      i1 = -srcinfo.coords_[axis];
 	      if (internalMode & 1) /* /FW_EDGE_NEIGHBOR */
 		i2 = i1 + *width.l; }
-	    if (i2 + srcinfo.coords[axis] > srcinfo.dims[axis])
-	    { i2 = srcinfo.dims[axis] - srcinfo.coords[axis];
+	    if (i2 + srcinfo.coords_[axis] > srcinfo.dims_[axis])
+	    { i2 = srcinfo.dims_[axis] - srcinfo.coords_[axis];
 	      if (internalMode & 1 /* /FW_EDGE_NEIGHBOR */
-		  && *width.l <= srcinfo.dims[axis]) /* not wider than data */
+		  && *width.l <= srcinfo.dims_[axis]) /* not wider than data */
 		i1 = i2 - *width.l; }
 	    i1 *= step;
 	    i2 *= step;
@@ -1359,20 +1359,20 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	    width.l++;
 	    if (done == widthNDim)	/* done with indicated axis */
 	      width.l = width0.l;
-	  } while (done < srcinfo.rndim);
+	  } while (done < srcinfo.rndim_);
 	  break;
 	case LUX_INT16:
 	  do {
 	    i1 = -*width.l/2;
 	    i2 = i1 + *width.l;
-	    if (i1 + srcinfo.coords[axis] < 0) {
-	      i1 = -srcinfo.coords[axis];
+	    if (i1 + srcinfo.coords_[axis] < 0) {
+	      i1 = -srcinfo.coords_[axis];
 	      if (internalMode & 1) /* /FW_EDGE_NEIGHBOR */
 		i2 = i1 + *width.l; }
-	    if (i2 + srcinfo.coords[axis] > srcinfo.dims[axis])
-	    { i2 = srcinfo.dims[axis] - srcinfo.coords[axis];
+	    if (i2 + srcinfo.coords_[axis] > srcinfo.dims_[axis])
+	    { i2 = srcinfo.dims_[axis] - srcinfo.coords_[axis];
 	      if (internalMode & 1 /* /FW_EDGE_NEIGHBOR */
-		  && *width.l <= srcinfo.dims[axis]) /* not wider than data */
+		  && *width.l <= srcinfo.dims_[axis]) /* not wider than data */
 		i1 = i2 - *width.l; }
 	    i1 *= step;
 	    i2 *= step;
@@ -1385,20 +1385,20 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	    width.l++;
 	    if (done == widthNDim)	/* done with indicated axis */
 	      width.l = width0.l;
-	  } while (done < srcinfo.rndim);
+	  } while (done < srcinfo.rndim_);
 	  break;
 	case LUX_INT32:
 	  do {
 	    i1 = -*width.l/2;
 	    i2 = i1 + *width.l;
-	    if (i1 + srcinfo.coords[axis] < 0) {
-	      i1 = -srcinfo.coords[axis];
+	    if (i1 + srcinfo.coords_[axis] < 0) {
+	      i1 = -srcinfo.coords_[axis];
 	      if (internalMode & 1) /* /FW_EDGE_NEIGHBOR */
 		i2 = i1 + *width.l; }
-	    if (i2 + srcinfo.coords[axis] > srcinfo.dims[axis])
-	    { i2 = srcinfo.dims[axis] - srcinfo.coords[axis];
+	    if (i2 + srcinfo.coords_[axis] > srcinfo.dims_[axis])
+	    { i2 = srcinfo.dims_[axis] - srcinfo.coords_[axis];
 	      if (internalMode & 1 /* /FW_EDGE_NEIGHBOR */
-		  && *width.l <= srcinfo.dims[axis]) /* not wider than data */
+		  && *width.l <= srcinfo.dims_[axis]) /* not wider than data */
 		i1 = i2 - *width.l; }
 	    i1 *= step;
 	    i2 *= step;
@@ -1411,20 +1411,20 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	    width.l++;
 	    if (done == widthNDim)	/* done with indicated axis */
 	      width.l = width0.l;
-	  } while (done < srcinfo.rndim);
+	  } while (done < srcinfo.rndim_);
 	  break;
 	case LUX_INT64:
 	  do {
 	    i1 = -*width.l/2;
 	    i2 = i1 + *width.l;
-	    if (i1 + srcinfo.coords[axis] < 0) {
-	      i1 = -srcinfo.coords[axis];
+	    if (i1 + srcinfo.coords_[axis] < 0) {
+	      i1 = -srcinfo.coords_[axis];
 	      if (internalMode & 1) /* /FW_EDGE_NEIGHBOR */
 		i2 = i1 + *width.l; }
-	    if (i2 + srcinfo.coords[axis] > srcinfo.dims[axis])
-	    { i2 = srcinfo.dims[axis] - srcinfo.coords[axis];
+	    if (i2 + srcinfo.coords_[axis] > srcinfo.dims_[axis])
+	    { i2 = srcinfo.dims_[axis] - srcinfo.coords_[axis];
 	      if (internalMode & 1 /* /FW_EDGE_NEIGHBOR */
-		  && *width.l <= srcinfo.dims[axis]) /* not wider than data */
+		  && *width.l <= srcinfo.dims_[axis]) /* not wider than data */
 		i1 = i2 - *width.l; }
 	    i1 *= step;
 	    i2 *= step;
@@ -1437,7 +1437,7 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	    width.l++;
 	    if (done == widthNDim)	/* done with indicated axis */
 	      width.l = width0.l;
-	  } while (done < srcinfo.rndim);
+	  } while (done < srcinfo.rndim_);
 	  break; }
       break;
     case LUX_FLOAT:
@@ -1446,14 +1446,14 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	  do {
 	    i1 = -*width.l/2;
 	    i2 = i1 + *width.l;
-	    if (i1 + srcinfo.coords[axis] < 0) {
-	      i1 = -srcinfo.coords[axis];
+	    if (i1 + srcinfo.coords_[axis] < 0) {
+	      i1 = -srcinfo.coords_[axis];
 	      if (internalMode & 1) /* /FW_EDGE_NEIGHBOR */
 		i2 = i1 + *width.l; }
-	    if (i2 + srcinfo.coords[axis] > srcinfo.dims[axis])
-	    { i2 = srcinfo.dims[axis] - srcinfo.coords[axis];
+	    if (i2 + srcinfo.coords_[axis] > srcinfo.dims_[axis])
+	    { i2 = srcinfo.dims_[axis] - srcinfo.coords_[axis];
 	      if (internalMode & 1 /* /FW_EDGE_NEIGHBOR */
-		  && *width.l <= srcinfo.dims[axis]) /* not wider than data */
+		  && *width.l <= srcinfo.dims_[axis]) /* not wider than data */
 		i1 = i2 - *width.l; }
 	    i1 *= step;
 	    i2 *= step;
@@ -1467,20 +1467,20 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	    width.l++;
 	    if (done == widthNDim)	/* done with indicated axis */
 	      width.l = width0.l;
-	  } while (done < srcinfo.rndim);
+	  } while (done < srcinfo.rndim_);
 	  break;
 	case LUX_INT16:
 	  do {
 	    i1 = -*width.l/2;
 	    i2 = i1 + *width.l;
-	    if (i1 + srcinfo.coords[axis] < 0) {
-	      i1 = -srcinfo.coords[axis];
+	    if (i1 + srcinfo.coords_[axis] < 0) {
+	      i1 = -srcinfo.coords_[axis];
 	      if (internalMode & 1) /* /FW_EDGE_NEIGHBOR */
 		i2 = i1 + *width.l; }
-	    if (i2 + srcinfo.coords[axis] > srcinfo.dims[axis])
-	    { i2 = srcinfo.dims[axis] - srcinfo.coords[axis];
+	    if (i2 + srcinfo.coords_[axis] > srcinfo.dims_[axis])
+	    { i2 = srcinfo.dims_[axis] - srcinfo.coords_[axis];
 	      if (internalMode & 1 /* /FW_EDGE_NEIGHBOR */
-		  && *width.l <= srcinfo.dims[axis]) /* not wider than data */
+		  && *width.l <= srcinfo.dims_[axis]) /* not wider than data */
 		i1 = i2 - *width.l; }
 	    i1 *= step;
 	    i2 *= step;
@@ -1494,20 +1494,20 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	    width.l++;
 	    if (done == widthNDim)	/* done with indicated axis */
 	      width.l = width0.l;
-	  } while (done < srcinfo.rndim);
+	  } while (done < srcinfo.rndim_);
 	  break;
 	case LUX_INT32:
 	  do {
 	    i1 = -*width.l/2;
 	    i2 = i1 + *width.l;
-	    if (i1 + srcinfo.coords[axis] < 0) {
-	      i1 = -srcinfo.coords[axis];
+	    if (i1 + srcinfo.coords_[axis] < 0) {
+	      i1 = -srcinfo.coords_[axis];
 	      if (internalMode & 1) /* /FW_EDGE_NEIGHBOR */
 		i2 = i1 + *width.l; }
-	    if (i2 + srcinfo.coords[axis] > srcinfo.dims[axis])
-	    { i2 = srcinfo.dims[axis] - srcinfo.coords[axis];
+	    if (i2 + srcinfo.coords_[axis] > srcinfo.dims_[axis])
+	    { i2 = srcinfo.dims_[axis] - srcinfo.coords_[axis];
 	      if (internalMode & 1 /* /FW_EDGE_NEIGHBOR */
-		  && *width.l <= srcinfo.dims[axis]) /* not wider than data */
+		  && *width.l <= srcinfo.dims_[axis]) /* not wider than data */
 		i1 = i2 - *width.l; }
 	    i1 *= step;
 	    i2 *= step;
@@ -1521,20 +1521,20 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	    width.l++;
 	    if (done == widthNDim)	/* done with indicated axis */
 	      width.l = width0.l;
-	  } while (done < srcinfo.rndim);
+	  } while (done < srcinfo.rndim_);
 	  break;
 	case LUX_INT64:
 	  do {
 	    i1 = -*width.l/2;
 	    i2 = i1 + *width.l;
-	    if (i1 + srcinfo.coords[axis] < 0) {
-	      i1 = -srcinfo.coords[axis];
+	    if (i1 + srcinfo.coords_[axis] < 0) {
+	      i1 = -srcinfo.coords_[axis];
 	      if (internalMode & 1) /* /FW_EDGE_NEIGHBOR */
 		i2 = i1 + *width.l; }
-	    if (i2 + srcinfo.coords[axis] > srcinfo.dims[axis])
-	    { i2 = srcinfo.dims[axis] - srcinfo.coords[axis];
+	    if (i2 + srcinfo.coords_[axis] > srcinfo.dims_[axis])
+	    { i2 = srcinfo.dims_[axis] - srcinfo.coords_[axis];
 	      if (internalMode & 1 /* /FW_EDGE_NEIGHBOR */
-		  && *width.l <= srcinfo.dims[axis]) /* not wider than data */
+		  && *width.l <= srcinfo.dims_[axis]) /* not wider than data */
 		i1 = i2 - *width.l; }
 	    i1 *= step;
 	    i2 *= step;
@@ -1548,20 +1548,20 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	    width.l++;
 	    if (done == widthNDim)	/* done with indicated axis */
 	      width.l = width0.l;
-	  } while (done < srcinfo.rndim);
+	  } while (done < srcinfo.rndim_);
 	  break;
 	case LUX_FLOAT:
 	  do {
 	    i1 = -*width.l/2;
 	    i2 = i1 + *width.l;
-	    if (i1 + srcinfo.coords[axis] < 0) {
-	      i1 = -srcinfo.coords[axis];
+	    if (i1 + srcinfo.coords_[axis] < 0) {
+	      i1 = -srcinfo.coords_[axis];
 	      if (internalMode & 1) /* /FW_EDGE_NEIGHBOR */
 		i2 = i1 + *width.l; }
-	    if (i2 + srcinfo.coords[axis] > srcinfo.dims[axis])
-	    { i2 = srcinfo.dims[axis] - srcinfo.coords[axis];
+	    if (i2 + srcinfo.coords_[axis] > srcinfo.dims_[axis])
+	    { i2 = srcinfo.dims_[axis] - srcinfo.coords_[axis];
 	      if (internalMode & 1 /* /FW_EDGE_NEIGHBOR */
-		  && *width.l <= srcinfo.dims[axis]) /* not wider than data */
+		  && *width.l <= srcinfo.dims_[axis]) /* not wider than data */
 		i1 = i2 - *width.l; }
 	    i1 *= step;
 	    i2 *= step;
@@ -1575,7 +1575,7 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	    width.l++;
 	    if (done == widthNDim) /* done with indicated axes */
 	      width.l = width0.l;
-	  } while (done < srcinfo.rndim);
+	  } while (done < srcinfo.rndim_);
 	  break; }
       break;
     case LUX_DOUBLE:
@@ -1584,14 +1584,14 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	  do {
 	    i1 = -*width.l/2;
 	    i2 = i1 + *width.l;
-	    if (i1 + srcinfo.coords[axis] < 0) {
-	      i1 = -srcinfo.coords[axis];
+	    if (i1 + srcinfo.coords_[axis] < 0) {
+	      i1 = -srcinfo.coords_[axis];
 	      if (internalMode & 1) /* /FW_EDGE_NEIGHBOR */
 		i2 = i1 + *width.l; }
-	    if (i2 + srcinfo.coords[axis] > srcinfo.dims[axis])
-	    { i2 = srcinfo.dims[axis] - srcinfo.coords[axis];
+	    if (i2 + srcinfo.coords_[axis] > srcinfo.dims_[axis])
+	    { i2 = srcinfo.dims_[axis] - srcinfo.coords_[axis];
 	      if (internalMode & 1 /* /FW_EDGE_NEIGHBOR */
-		  && *width.l <= srcinfo.dims[axis]) /* not wider than data */
+		  && *width.l <= srcinfo.dims_[axis]) /* not wider than data */
 		i1 = i2 - *width.l; }
 	    i1 *= step;
 	    i2 *= step;
@@ -1605,20 +1605,20 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	    width.l++;
 	    if (done == widthNDim)	/* done with indicated axis */
 	      width.l = width0.l;
-	  } while (done < srcinfo.rndim);
+	  } while (done < srcinfo.rndim_);
 	  break;
 	case LUX_INT16:
 	  do {
 	    i1 = -*width.l/2;
 	    i2 = i1 + *width.l;
-	    if (i1 + srcinfo.coords[axis] < 0) {
-	      i1 = -srcinfo.coords[axis];
+	    if (i1 + srcinfo.coords_[axis] < 0) {
+	      i1 = -srcinfo.coords_[axis];
 	      if (internalMode & 1) /* /FW_EDGE_NEIGHBOR */
 		i2 = i1 + *width.l; }
-	    if (i2 + srcinfo.coords[axis] > srcinfo.dims[axis])
-	    { i2 = srcinfo.dims[axis] - srcinfo.coords[axis];
+	    if (i2 + srcinfo.coords_[axis] > srcinfo.dims_[axis])
+	    { i2 = srcinfo.dims_[axis] - srcinfo.coords_[axis];
 	      if (internalMode & 1 /* /FW_EDGE_NEIGHBOR */
-		  && *width.l <= srcinfo.dims[axis]) /* not wider than data */
+		  && *width.l <= srcinfo.dims_[axis]) /* not wider than data */
 		i1 = i2 - *width.l; }
 	    i1 *= step;
 	    i2 *= step;
@@ -1632,20 +1632,20 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	    width.l++;
 	    if (done == widthNDim)	/* done with indicated axis */
 	      width.l = width0.l;
-	  } while (done < srcinfo.rndim);
+	  } while (done < srcinfo.rndim_);
 	  break;
 	case LUX_INT32:
 	  do {
 	    i1 = -*width.l/2;
 	    i2 = i1 + *width.l;
-	    if (i1 + srcinfo.coords[axis] < 0) {
-	      i1 = -srcinfo.coords[axis];
+	    if (i1 + srcinfo.coords_[axis] < 0) {
+	      i1 = -srcinfo.coords_[axis];
 	      if (internalMode & 1) /* /FW_EDGE_NEIGHBOR */
 		i2 = i1 + *width.l; }
-	    if (i2 + srcinfo.coords[axis] > srcinfo.dims[axis])
-	    { i2 = srcinfo.dims[axis] - srcinfo.coords[axis];
+	    if (i2 + srcinfo.coords_[axis] > srcinfo.dims_[axis])
+	    { i2 = srcinfo.dims_[axis] - srcinfo.coords_[axis];
 	      if (internalMode & 1 /* /FW_EDGE_NEIGHBOR */
-		  && *width.l <= srcinfo.dims[axis]) /* not wider than data */
+		  && *width.l <= srcinfo.dims_[axis]) /* not wider than data */
 		i1 = i2 - *width.l; }
 	    i1 *= step;
 	    i2 *= step;
@@ -1659,20 +1659,20 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	    width.l++;
 	    if (done == widthNDim)	/* done with indicated axis */
 	      width.l = width0.l;
-	  } while (done < srcinfo.rndim);
+	  } while (done < srcinfo.rndim_);
 	  break;
 	case LUX_INT64:
 	  do {
 	    i1 = -*width.l/2;
 	    i2 = i1 + *width.l;
-	    if (i1 + srcinfo.coords[axis] < 0) {
-	      i1 = -srcinfo.coords[axis];
+	    if (i1 + srcinfo.coords_[axis] < 0) {
+	      i1 = -srcinfo.coords_[axis];
 	      if (internalMode & 1) /* /FW_EDGE_NEIGHBOR */
 		i2 = i1 + *width.l; }
-	    if (i2 + srcinfo.coords[axis] > srcinfo.dims[axis])
-	    { i2 = srcinfo.dims[axis] - srcinfo.coords[axis];
+	    if (i2 + srcinfo.coords_[axis] > srcinfo.dims_[axis])
+	    { i2 = srcinfo.dims_[axis] - srcinfo.coords_[axis];
 	      if (internalMode & 1 /* /FW_EDGE_NEIGHBOR */
-		  && *width.l <= srcinfo.dims[axis]) /* not wider than data */
+		  && *width.l <= srcinfo.dims_[axis]) /* not wider than data */
 		i1 = i2 - *width.l; }
 	    i1 *= step;
 	    i2 *= step;
@@ -1686,20 +1686,20 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	    width.l++;
 	    if (done == widthNDim)	/* done with indicated axis */
 	      width.l = width0.l;
-	  } while (done < srcinfo.rndim);
+	  } while (done < srcinfo.rndim_);
 	  break;
 	case LUX_FLOAT:
 	  do {
 	    i1 = -*width.l/2;
 	    i2 = i1 + *width.l;
-	    if (i1 + srcinfo.coords[axis] < 0) {
-	      i1 = -srcinfo.coords[axis];
+	    if (i1 + srcinfo.coords_[axis] < 0) {
+	      i1 = -srcinfo.coords_[axis];
 	      if (internalMode & 1) /* /FW_EDGE_NEIGHBOR */
 		i2 = i1 + *width.l; }
-	    if (i2 + srcinfo.coords[axis] > srcinfo.dims[axis])
-	    { i2 = srcinfo.dims[axis] - srcinfo.coords[axis];
+	    if (i2 + srcinfo.coords_[axis] > srcinfo.dims_[axis])
+	    { i2 = srcinfo.dims_[axis] - srcinfo.coords_[axis];
 	      if (internalMode & 1 /* /FW_EDGE_NEIGHBOR */
-		  && *width.l <= srcinfo.dims[axis]) /* not wider than data */
+		  && *width.l <= srcinfo.dims_[axis]) /* not wider than data */
 		i1 = i2 - *width.l; }
 	    i1 *= step;
 	    i2 *= step;
@@ -1713,20 +1713,20 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	    width.l++;
 	    if (done == widthNDim)	/* done with indicated axis */
 	      width.l = width0.l;
-	  } while (done < srcinfo.rndim);
+	  } while (done < srcinfo.rndim_);
 	  break;
 	case LUX_DOUBLE:
 	  do {
 	    i1 = -*width.l/2;
 	    i2 = i1 + *width.l;
-	    if (i1 + srcinfo.coords[axis] < 0) {
-	      i1 = -srcinfo.coords[axis];
+	    if (i1 + srcinfo.coords_[axis] < 0) {
+	      i1 = -srcinfo.coords_[axis];
 	      if (internalMode & 1) /* /FW_EDGE_NEIGHBOR */
 		i2 = i1 + *width.l; }
-	    if (i2 + srcinfo.coords[axis] > srcinfo.dims[axis])
-	    { i2 = srcinfo.dims[axis] - srcinfo.coords[axis];
+	    if (i2 + srcinfo.coords_[axis] > srcinfo.dims_[axis])
+	    { i2 = srcinfo.dims_[axis] - srcinfo.coords_[axis];
 	      if (internalMode & 1 /* /FW_EDGE_NEIGHBOR */
-		  && *width.l <= srcinfo.dims[axis]) /* not wider than data */
+		  && *width.l <= srcinfo.dims_[axis]) /* not wider than data */
 		i1 = i2 - *width.l; }
 	    i1 *= step;
 	    i2 *= step;
@@ -1740,7 +1740,7 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	    width.l++;
 	    if (done == widthNDim)	/* done with indicated axis */
 	      width.l = width0.l;
-	  } while (done < srcinfo.rndim);
+	  } while (done < srcinfo.rndim_);
 	  break; }
       break; }
   return result;
@@ -1807,7 +1807,7 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
     if (getNumerical(ps[narg - 1], LUX_INT32, &nWidth, &width,
 		     GN_EXACT | GN_UPDATE, NULL, NULL) < 0)
       return LUX_ERROR;
-    if (nWidth > 1 && nWidth != srcinfo.naxes)
+    if (nWidth > 1 && nWidth != srcinfo.naxes_)
       return luxerror("Number of widths must be 1 or equal to number of axes",
 		   ps[2]);
   } else {
@@ -1816,14 +1816,14 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
   }
   type = symbol_type(result);
   iq = ps[0];			/* data */
-  if (!srcinfo.naxes)
-    srcinfo.naxes++;
-  for (loop = 0; loop < srcinfo.naxes; loop++) {
-    ww = (*width.l > srcinfo.rdims[0])? srcinfo.rdims[0]: *width.l;
+  if (!srcinfo.naxes_)
+    srcinfo.naxes_++;
+  for (loop = 0; loop < srcinfo.naxes_; loop++) {
+    ww = (*width.l > srcinfo.rdims_[0])? srcinfo.rdims_[0]: *width.l;
     if (nWidth > 1)
       width.l++;
     norm = cumul? 1: ww;
-    stride = srcinfo.step[0];
+    stride = srcinfo.step_[0];
     offset = -stride*ww;
     /*
       n = 5 ∧ ww = 3
@@ -1870,7 +1870,7 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
       w2 = ⌊n - ww/2⌋
     */
     w1 = (ww + 1)/2;
-    w2 = srcinfo.rdims[0] - ww/2;
+    w2 = srcinfo.rdims_[0] - ww/2;
     switch (symbol_type(iq)) {
       default:
 	return cerror(ILL_TYPE, ps[0]);
@@ -1920,7 +1920,7 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
 	  }
 	  /* right-hand edge */
 	  if (internalMode & 1) { /* /PARTIAL_WIDTH */
-	    for ( ; i < srcinfo.rdims[0] - !(ww%2); i++) {
+	    for ( ; i < srcinfo.rdims_[0] - !(ww%2); i++) {
 	      value.l -= src.b[offset];
 	      offset += stride;
 	      value.l -= src.b[offset];
@@ -1940,13 +1940,13 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
 	    }
 	  } else {
 	    uint8_t v = (uint8_t) (value.l/norm);
-	    for ( ; i < srcinfo.rdims[0]; i++) { /* right edge */
+	    for ( ; i < srcinfo.rdims_[0]; i++) { /* right edge */
 	      *trgt.b = v;
 	      trgt.b += stride;
 	    }
 	  }
 	} while (advanceLoop(&trgtinfo, &trgt),
-		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim_);
 	break;
       case LUX_INT16:
 	do {
@@ -1994,7 +1994,7 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
 	  }
 	  /* right-hand edge */
 	  if (internalMode & 1) { /* /PARTIAL_WIDTH */
-	    for ( ; i < srcinfo.rdims[0] - !(ww%2); i++) {
+	    for ( ; i < srcinfo.rdims_[0] - !(ww%2); i++) {
 	      value.l -= src.w[offset];
 	      offset += stride;
 	      value.l -= src.w[offset];
@@ -2014,13 +2014,13 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
 	    }
 	  } else {
 	    int16_t v = (int16_t) (value.l/norm);
-	    for ( ; i < srcinfo.rdims[0]; i++) { /* right edge */
+	    for ( ; i < srcinfo.rdims_[0]; i++) { /* right edge */
 	      *trgt.w = v;
 	      trgt.w += stride;
 	    }
 	  }
 	} while (advanceLoop(&trgtinfo, &trgt),
-		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim_);
 	break;
       case LUX_INT32:
 	do {
@@ -2068,7 +2068,7 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
 	  }
 	  /* right-hand edge */
 	  if (internalMode & 1) { /* /PARTIAL_WIDTH */
-	    for ( ; i < srcinfo.rdims[0] - !(ww%2); i++) {
+	    for ( ; i < srcinfo.rdims_[0] - !(ww%2); i++) {
 	      value.l -= src.l[offset];
 	      offset += stride;
 	      value.l -= src.l[offset];
@@ -2088,13 +2088,13 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
 	    }
 	  } else {
 	    int32_t v = value.l/norm;
-	    for ( ; i < srcinfo.rdims[0]; i++) { /* right edge */
+	    for ( ; i < srcinfo.rdims_[0]; i++) { /* right edge */
 	      *trgt.l = v;
 	      trgt.l += stride;
 	    }
 	  }
 	} while (advanceLoop(&trgtinfo, &trgt),
-		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim_);
 	break;
       case LUX_INT64:
 	do {
@@ -2142,7 +2142,7 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
 	  }
 	  /* right-hand edge */
 	  if (internalMode & 1) { /* /PARTIAL_WIDTH */
-	    for ( ; i < srcinfo.rdims[0] - !(ww%2); i++) {
+	    for ( ; i < srcinfo.rdims_[0] - !(ww%2); i++) {
 	      value.q -= src.q[offset];
 	      offset += stride;
 	      value.q -= src.q[offset];
@@ -2162,13 +2162,13 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
 	    }
 	  } else {
 	    int32_t v = value.q/norm;
-	    for ( ; i < srcinfo.rdims[0]; i++) { /* right edge */
+	    for ( ; i < srcinfo.rdims_[0]; i++) { /* right edge */
 	      *trgt.q = v;
 	      trgt.q += stride;
 	    }
 	  }
 	} while (advanceLoop(&trgtinfo, &trgt),
-		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim_);
 	break;
       case LUX_FLOAT:
 	/* we use the Kahan algorithm to limit roundoff error */
@@ -2218,7 +2218,7 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
 	  }
 	  /* right-hand edge */
 	  if (internalMode & 1) { /* /PARTIAL_WIDTH */
-	    for ( ; i < srcinfo.rdims[0] - !(ww%2); i++) {
+	    for ( ; i < srcinfo.rdims_[0] - !(ww%2); i++) {
 	      kahan_sum_f(-src.f[offset], value.f, c);
 	      offset += stride;
 	      kahan_sum_f(-src.f[offset], value.f, c);
@@ -2238,13 +2238,13 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
 	    }
 	  } else {
 	    float v = value.f/norm;
-	    for ( ; i < srcinfo.rdims[0]; i++) { /* right edge */
+	    for ( ; i < srcinfo.rdims_[0]; i++) { /* right edge */
 	      *trgt.f = v;
 	      trgt.f += stride;
 	    }
 	  }
 	} while (advanceLoop(&trgtinfo, &trgt),
-		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim_);
 	break;
       case LUX_DOUBLE:
 	/* we use the Kahan algorithm to limit roundoff error */
@@ -2294,7 +2294,7 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
 	  }
 	  /* right-hand edge */
 	  if (internalMode & 1) { /* /PARTIAL_WIDTH */
-	    for ( ; i < srcinfo.rdims[0] - !(ww%2); i++) {
+	    for ( ; i < srcinfo.rdims_[0] - !(ww%2); i++) {
 	      kahan_sum_d(-src.d[offset], value.d, c);
 	      offset += stride;
 	      kahan_sum_d(-src.d[offset], value.d, c);
@@ -2314,16 +2314,16 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
 	    }
 	  } else {
 	    double v = value.d/norm;
-	    for ( ; i < srcinfo.rdims[0]; i++) { /* right edge */
+	    for ( ; i < srcinfo.rdims_[0]; i++) { /* right edge */
 	      *trgt.d = v;
 	      trgt.d += stride;
 	    }
 	  }
 	} while (advanceLoop(&trgtinfo, &trgt),
-		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim_);
 	break;
     }
-    if (loop < srcinfo.naxes - 1) {
+    if (loop < srcinfo.naxes_ - 1) {
       if (isFreeTemp(iq)
 	  && lux_type_size[symbol_type(iq)] == lux_type_size[type])
 				/* can use iq to hold next result */
@@ -2336,8 +2336,8 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
 	result = array_clone(iq, type); }
       if (type < LUX_DOUBLE)
 	type = LUX_FLOAT;
-      srcinfo.type = type;
-      srcinfo.stride = lux_type_size[type]; /* original may be < LUX_FLOAT */
+      srcinfo.type_ = type;
+      srcinfo.stride_ = lux_type_size[type]; /* original may be < LUX_FLOAT */
       nextLoops(&srcinfo, &trgtinfo);
       src.b = (uint8_t*) array_data(iq);
       trgt.b = (uint8_t*) array_data(result);

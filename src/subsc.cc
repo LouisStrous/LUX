@@ -68,7 +68,7 @@ int32_t lux_inserter(int32_t narg, int32_t ps[])
     return LUX_ERROR;
 
   if (narg > 3) {
-    if (trgtinfo.ndim != ndim)
+    if (trgtinfo.ndim_ != ndim)
       return cerror(INCMP_ARG, ps[1]);
     if (narg != ndim + 2)
       return luxerror("Need one offset coordinate for each target dimension",
@@ -77,7 +77,7 @@ int32_t lux_inserter(int32_t narg, int32_t ps[])
       if (symbolIsRealScalar(ps[i + 2])) {
 	offset[2*i] = int_arg(ps[i + 2]);
 	offset[2*i + 1] = offset[2*i] + dims[i] - 1;
-	if (offset[2*i] < 0 || offset[2*i + 1] >= trgtinfo.dims[i])
+	if (offset[2*i] < 0 || offset[2*i + 1] >= trgtinfo.dims_[i])
 	  return luxerror("Source extends beyond target in dimension %d",
 		       ps[i + 2], i);
       } else
@@ -86,7 +86,7 @@ int32_t lux_inserter(int32_t narg, int32_t ps[])
     if (symbolIsRealScalar(ps[2])) {
       offset[0] = int_arg(ps[2]);
       offset[1] = offset[0] + nelem - 1;
-      if (offset[0] < 0 || offset[1] >= trgtinfo.nelem)
+      if (offset[0] < 0 || offset[1] >= trgtinfo.nelem_)
 	return luxerror("Source extends beyond target", ps[2]);
     } else
       return cerror(ILL_CLASS, ps[2]);
@@ -94,8 +94,8 @@ int32_t lux_inserter(int32_t narg, int32_t ps[])
   
   subdataLoop(offset, &trgtinfo);
   do {
-    nelem = trgtinfo.rdims[0];
-    switch (trgtinfo.type) {
+    nelem = trgtinfo.rdims_[0];
+    switch (trgtinfo.type_) {
       case LUX_INT8:
 	switch (symbol_type(ps[1])) {
 	  case LUX_INT8:
@@ -279,7 +279,7 @@ int32_t lux_inserter(int32_t narg, int32_t ps[])
       default:
 	return cerror(ILL_TYPE, ps[0]);
     }
-  } while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.rndim);
+  } while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.rndim_);
   return LUX_OK;
 }
 /*------------------------------------------------------------------------- */
@@ -508,7 +508,7 @@ int32_t lux_reverse(int32_t narg, int32_t ps[])
     if (narg > 2 && ps[2]) {	/* <center> */
       if (numerical(ps[2], NULL, NULL, &i, NULL) == LUX_ERROR)
 	return LUX_ERROR;
-      if (i != srcinfo.naxes)
+      if (i != srcinfo.naxes_)
 	return cerror(INCMP_ARG, ps[2]); 
       iq = lux_float(1, ps + 2);
       numerical(iq, NULL, NULL, NULL, &center);
@@ -525,48 +525,48 @@ int32_t lux_reverse(int32_t narg, int32_t ps[])
 	w = rint(2**center.f);
 	center.f++;
       } else
-	w = srcinfo.rdims[0] - 1;
-      stride = srcinfo.rsinglestep[0]*srcinfo.stride;
-      if (w >= 0 && w < 2*(srcinfo.rdims[0] - 1)) /* it's within bounds */
+	w = srcinfo.rdims_[0] - 1;
+      stride = srcinfo.rsinglestep_[0]*srcinfo.stride_;
+      if (w >= 0 && w < 2*(srcinfo.rdims_[0] - 1)) /* it's within bounds */
 	do {
 	  src2 = src;
 	  trgt2 = trgt;
-	  n = w - srcinfo.rdims[0] + 1;
+	  n = w - srcinfo.rdims_[0] + 1;
 	  if (n >= 0) {		/* reversal at the far end */
 	    i = n;
 	    if (inplace) {	/* in-place reversal */
 	      src.b += i*stride;
 	      if (internalMode & 1) /* /ZERO */
 		while (i--) {
-		  zerobytes(trgt.b, srcinfo.stride);
+		  zerobytes(trgt.b, srcinfo.stride_);
 		  trgt.b += stride;
 		}
 	    } else {		/* target is different from source */
 	      if ((internalMode & 1) == 0)
 		while (i--) {
-		  memcpy(trgt.b, src.b, srcinfo.stride);
+		  memcpy(trgt.b, src.b, srcinfo.stride_);
 		  trgt.b += stride;
 		  src.b += stride;
 		}
 	      else {		/* /ZERO */
 		src.b += i*stride;
 		while (i--) {
-		  zerobytes(trgt.b, srcinfo.stride);
+		  zerobytes(trgt.b, srcinfo.stride_);
 		  trgt.b += stride;
 		} /* end of while (i--) */
 	      }	/* end of if ((internalMode & 1) == 0) else */
 	    } /* end of if (inplace) else */
-	    trgt.b = trgt2.b + stride*srcinfo.rdims[0];
+	    trgt.b = trgt2.b + stride*srcinfo.rdims_[0];
 	  } else {		/* n < 0 -> reversing at the near end */
-	    trgt.b += srcinfo.rdims[0]*stride;
-	    src.b += srcinfo.rdims[0]*stride;
+	    trgt.b += srcinfo.rdims_[0]*stride;
+	    src.b += srcinfo.rdims_[0]*stride;
 	    n = -n;
 	    i = n;
 	    if (inplace) {
 	      if (internalMode & 1) /* /ZERO */
 		while (i--) {
 		  trgt.b -= stride;
-		  zerobytes(trgt.b, srcinfo.stride);
+		  zerobytes(trgt.b, srcinfo.stride_);
 		} /* end of while (i--) */
 	      else
 		trgt.b -= i*stride;
@@ -575,46 +575,46 @@ int32_t lux_reverse(int32_t narg, int32_t ps[])
 		while (i--) {
 		  trgt.b -= stride;
 		  src.b -= stride;
-		  memcpy(trgt.b, src.b, srcinfo.stride);
+		  memcpy(trgt.b, src.b, srcinfo.stride_);
 		} /* end of while (i--) */
 	      else			/* /ZERO */
 		while (i--) {
 		  trgt.b -= stride;
-		  zerobytes(trgt.b, srcinfo.stride);
+		  zerobytes(trgt.b, srcinfo.stride_);
 		} /* end of while (i--) */
 	    } /* end of if (inplace) else */
 	    src.b = src2.b;
 	  } /* end of if (n >= 0) else */
-	  i = srcinfo.rdims[0] - n;
+	  i = srcinfo.rdims_[0] - n;
 	  if (inplace) {
 	    i = i/2;
 	    while (i--) {
 	      trgt.b -= stride;
-	      memcpy(&value.b, trgt.b, srcinfo.stride);
-	      memcpy(trgt.b, src.b, srcinfo.stride);
-	      memcpy(src.b, &value.b, srcinfo.stride);
+	      memcpy(&value.b, trgt.b, srcinfo.stride_);
+	      memcpy(trgt.b, src.b, srcinfo.stride_);
+	      memcpy(src.b, &value.b, srcinfo.stride_);
 	      src.b += stride;
 	    } /* end of while (i--) */
 	  } else		/* not in place */
 	    while (i--) {
 	      trgt.b -= stride;
-	      memcpy(trgt.b, src.b, srcinfo.stride);
+	      memcpy(trgt.b, src.b, srcinfo.stride_);
 	      src.b += stride;
 	    } /* end of while (i--) */
-	  src.b = src2.b + stride*srcinfo.rdims[0];
-	  trgt.b = trgt2.b + stride*srcinfo.rdims[0];
+	  src.b = src2.b + stride*srcinfo.rdims_[0];
+	  trgt.b = trgt2.b + stride*srcinfo.rdims_[0];
 	} while (advanceLoop(&trgtinfo, &trgt),
-		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim_);
       else {			/* center is out of bounds */
 	if (internalMode & 1) {	/* /ZERO */
-	  zerobytes(trgt.b, trgtinfo.nelem*trgtinfo.stride);
+	  zerobytes(trgt.b, trgtinfo.nelem_*trgtinfo.stride_);
 	  return result;
 	}
 	if (!inplace)
-	  memcpy(trgt.b, src.b, trgtinfo.nelem*trgtinfo.stride);
-      }	/* end of if (w >= 0 && w < 2*(srcinfo.rdims[0] - 1)) else */
+	  memcpy(trgt.b, src.b, trgtinfo.nelem_*trgtinfo.stride_);
+      }	/* end of if (w >= 0 && w < 2*(srcinfo.rdims_[0] - 1)) else */
       /* "source" of next cycle was "target" of previous one */
-      srcinfo.data0 = trgtinfo.data0;
+      srcinfo.data0_ = trgtinfo.data0_;
       inplace = 1;
     } while (nextLoops(&srcinfo, &trgtinfo));
   } else
@@ -3171,9 +3171,9 @@ int32_t extractNumerical(pointer src, pointer trgt, Symboltype type,
   subdataLoop(coords, &info);
 
   do {
-    memcpy(trgt.b, src.b, info.stride);
-    src.b += info.stride;
-  } while (advanceLoop(&info, &trgt) < info.rndim);
+    memcpy(trgt.b, src.b, info.stride_);
+    src.b += info.stride_;
+  } while (advanceLoop(&info, &trgt) < info.rndim_);
   return 1;
 }
 /*------------------------------------------------------------------------- */
@@ -3227,15 +3227,15 @@ int32_t lux_roll(int32_t narg, int32_t ps[])
 		   &src, &result, &trgtinfo, &trgt) == LUX_ERROR)
     return LUX_ERROR;
 
-  memcpy(array_dims(result), srcinfo.rdims, nd*sizeof(int32_t));
+  memcpy(array_dims(result), srcinfo.rdims_, nd*sizeof(int32_t));
 
   if (temp)
     zap(iq);			/* no longer needed */
 
   do {
-    memcpy(trgt.b, src.b, srcinfo.stride);
-    trgt.b += srcinfo.stride;
-  } while (advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+    memcpy(trgt.b, src.b, srcinfo.stride_);
+    trgt.b += srcinfo.stride_;
+  } while (advanceLoop(&srcinfo, &src) < srcinfo.rndim_);
 
   return result;
 }

@@ -1911,56 +1911,56 @@ int32_t lux_compress(int32_t narg, int32_t ps[])
 
   /* gather all compression factors */
   if (allAxes)
-    for (i = 0; i < srcinfo.ndim; i++)
+    for (i = 0; i < srcinfo.ndim_; i++)
       div[i] = factors[0];
   else {
-    for (i = 0; i < srcinfo.rndim; i++)
+    for (i = 0; i < srcinfo.rndim_; i++)
       div[i] = 1;
     for (i = 0; i < nFac; i++)
-      div[srcinfo.axes[i]] = factors[i];
+      div[srcinfo.axes_[i]] = factors[i];
   }
-  for (i = 0; i < srcinfo.ndim; i++)
-    if (div[i] > srcinfo.dims[i])
-      return luxerror("Compression factor %1d exceeds the %1d elements in dimension %1d", (narg > 3 && ps[2])? ps[2]: 0, div[i], srcinfo.dims[i], i);
+  for (i = 0; i < srcinfo.ndim_; i++)
+    if (div[i] > srcinfo.dims_[i])
+      return luxerror("Compression factor %1d exceeds the %1d elements in dimension %1d", (narg > 3 && ps[2])? ps[2]: 0, div[i], srcinfo.dims_[i], i);
 
   /* we treat the biggest part of the data that has dimensions that
    are multiples of the compression factors */
-  for (i = 0; i < srcinfo.ndim; i++) {
+  for (i = 0; i < srcinfo.ndim_; i++) {
     range[2*i] = 0;
-    range[2*i + 1] = srcinfo.dims[i] - (srcinfo.dims[i] % div[i]) - 1;
+    range[2*i + 1] = srcinfo.dims_[i] - (srcinfo.dims_[i] % div[i]) - 1;
   }
   subdataLoop(range, &srcinfo);	/* restrict treated part */
 
   /* create the output symbol */
-  memcpy(outDims, srcinfo.dims, srcinfo.ndim*sizeof(int32_t));
+  memcpy(outDims, srcinfo.dims_, srcinfo.ndim_*sizeof(int32_t));
   if (allAxes)
-    for (i = 0; i < srcinfo.ndim; i++) {
+    for (i = 0; i < srcinfo.ndim_; i++) {
       outDims[i] = outDims[i]/factors[0];
       if (!outDims[i])
 	outDims[i] = 1;
     }
   else
     for (i = 0; i < nFac; i++) {
-      outDims[srcinfo.axes[i]] = outDims[srcinfo.axes[i]]/factors[i];
-      if (!outDims[srcinfo.axes[i]]) /* ensure result dimension >= 1 */
-	outDims[srcinfo.axes[i]] = 1;
+      outDims[srcinfo.axes_[i]] = outDims[srcinfo.axes_[i]]/factors[i];
+      if (!outDims[srcinfo.axes_[i]]) /* ensure result dimension >= 1 */
+	outDims[srcinfo.axes_[i]] = 1;
     }
-  iq = array_scratch(symbol_type(ps[0]), srcinfo.ndim, outDims);
+  iq = array_scratch(symbol_type(ps[0]), srcinfo.ndim_, outDims);
   trgt.l = (int32_t*) array_data(iq);
   zerobytes(trgt.b, array_size(iq)*lux_type_size[array_type(iq)]);
 
-  setupDimensionLoop(&trgtinfo, srcinfo.ndim, outDims, symbol_type(ps[0]),
-		     srcinfo.naxes, srcinfo.axes, &trgt, SL_EACHCOORD);
+  setupDimensionLoop(&trgtinfo, srcinfo.ndim_, outDims, symbol_type(ps[0]),
+		     srcinfo.naxes_, srcinfo.axes_, &trgt, SL_EACHCOORD);
 
   nel = 1;
-  for (i = 0; i < srcinfo.rndim; i++)
+  for (i = 0; i < srcinfo.rndim_; i++)
     nel *= div[i];
 
   /* set up for walk through subarea that gets compressed into a single */
   /* element */
   tmpinfo = srcinfo;
-  zerobytes(range, srcinfo.ndim*2*sizeof(int32_t));
-  for (i = 0; i < srcinfo.ndim; i++)
+  zerobytes(range, srcinfo.ndim_*2*sizeof(int32_t));
+  for (i = 0; i < srcinfo.ndim_; i++)
     range[2*i + 1] = div[i] - 1;
   subdataLoop(range, &tmpinfo);
 
@@ -1971,84 +1971,84 @@ int32_t lux_compress(int32_t narg, int32_t ps[])
 	sum.l = 0;
 	do
 	  sum.l += (int32_t) src.b[offset];
-	while (advanceLoop(&tmpinfo, &src) < tmpinfo.rndim);
+	while (advanceLoop(&tmpinfo, &src) < tmpinfo.rndim_);
 	*trgt.b = sum.l/nel;
-	src.b = (uint8_t *) tmpinfo.data0;
+	src.b = (uint8_t *) tmpinfo.data0_;
 	n = advanceLoop(&trgtinfo, &trgt);
 	offset = 0;
-	for (i = 0; i < trgtinfo.ndim; i++)
-	  offset += srcinfo.rsinglestep[i]*trgtinfo.coords[i]*div[srcinfo.raxes[i]];
-      } while (n < trgtinfo.rndim);
+	for (i = 0; i < trgtinfo.ndim_; i++)
+	  offset += srcinfo.rsinglestep_[i]*trgtinfo.coords_[i]*div[srcinfo.raxes_[i]];
+      } while (n < trgtinfo.rndim_);
       break;
     case LUX_INT16:
       do {
 	sum.l = 0;
 	do
 	  sum.l += (int32_t) src.w[offset];
-	while (advanceLoop(&tmpinfo, &src) < tmpinfo.rndim);
+	while (advanceLoop(&tmpinfo, &src) < tmpinfo.rndim_);
 	*trgt.w = sum.l/nel;
-	src.w = (int16_t *) tmpinfo.data0;
+	src.w = (int16_t *) tmpinfo.data0_;
 	n = advanceLoop(&trgtinfo, &trgt);
 	offset = 0;
-	for (i = 0; i < trgtinfo.ndim; i++)
-	  offset += srcinfo.rsinglestep[i]*trgtinfo.coords[i]*div[srcinfo.raxes[i]];
-      } while (n < trgtinfo.rndim);
+	for (i = 0; i < trgtinfo.ndim_; i++)
+	  offset += srcinfo.rsinglestep_[i]*trgtinfo.coords_[i]*div[srcinfo.raxes_[i]];
+      } while (n < trgtinfo.rndim_);
       break;
     case LUX_INT32:
       do {
 	sum.l = 0;
 	do
 	  sum.l += src.l[offset];
-	while (advanceLoop(&tmpinfo, &src) < tmpinfo.rndim);
+	while (advanceLoop(&tmpinfo, &src) < tmpinfo.rndim_);
 	*trgt.l = sum.l/nel;
-	src.l = (int32_t *) tmpinfo.data0;
+	src.l = (int32_t *) tmpinfo.data0_;
 	n = advanceLoop(&trgtinfo, &trgt);
 	offset = 0;
-	for (i = 0; i < trgtinfo.ndim; i++)
-	  offset += srcinfo.rsinglestep[i]*trgtinfo.coords[i]*div[srcinfo.raxes[i]];
-      } while (n < trgtinfo.rndim);
+	for (i = 0; i < trgtinfo.ndim_; i++)
+	  offset += srcinfo.rsinglestep_[i]*trgtinfo.coords_[i]*div[srcinfo.raxes_[i]];
+      } while (n < trgtinfo.rndim_);
       break;
     case LUX_INT64:
       do {
 	sum.q = 0;
 	do
 	  sum.q += src.q[offset];
-	while (advanceLoop(&tmpinfo, &src) < tmpinfo.rndim);
+	while (advanceLoop(&tmpinfo, &src) < tmpinfo.rndim_);
 	*trgt.q = sum.q/nel;
-	src.q = (int64_t*) tmpinfo.data0;
+	src.q = (int64_t*) tmpinfo.data0_;
 	n = advanceLoop(&trgtinfo, &trgt);
 	offset = 0;
-	for (i = 0; i < trgtinfo.ndim; i++)
-	  offset += srcinfo.rsinglestep[i]*trgtinfo.coords[i]*div[srcinfo.raxes[i]];
-      } while (n < trgtinfo.rndim);
+	for (i = 0; i < trgtinfo.ndim_; i++)
+	  offset += srcinfo.rsinglestep_[i]*trgtinfo.coords_[i]*div[srcinfo.raxes_[i]];
+      } while (n < trgtinfo.rndim_);
       break;
     case LUX_FLOAT:
       do {
 	sum.d = 0;
 	do
 	  sum.d += (double) src.f[offset];
-	while (advanceLoop(&tmpinfo, &src) < tmpinfo.rndim);
+	while (advanceLoop(&tmpinfo, &src) < tmpinfo.rndim_);
 	*trgt.f = sum.d/nel;
-	src.f = (float *) tmpinfo.data0;
+	src.f = (float *) tmpinfo.data0_;
 	n = advanceLoop(&trgtinfo, &trgt);
 	offset = 0;
-	for (i = 0; i < trgtinfo.ndim; i++)
-	  offset += srcinfo.rsinglestep[i]*trgtinfo.coords[i]*div[srcinfo.raxes[i]];
-      } while (n < trgtinfo.rndim);
+	for (i = 0; i < trgtinfo.ndim_; i++)
+	  offset += srcinfo.rsinglestep_[i]*trgtinfo.coords_[i]*div[srcinfo.raxes_[i]];
+      } while (n < trgtinfo.rndim_);
       break;
     case LUX_DOUBLE:
       do {
 	sum.d = 0;
 	do
 	  sum.d += src.d[offset];
-	while (advanceLoop(&tmpinfo, &src) < tmpinfo.rndim);
+	while (advanceLoop(&tmpinfo, &src) < tmpinfo.rndim_);
 	*trgt.d = sum.d/nel;
-	src.d = (double *) tmpinfo.data0;
+	src.d = (double *) tmpinfo.data0_;
 	n = advanceLoop(&trgtinfo, &trgt);
 	offset = 0;
-	for (i = 0; i < trgtinfo.ndim; i++)
-	  offset += srcinfo.rsinglestep[i]*trgtinfo.coords[i]*div[srcinfo.raxes[i]];
-      } while (n < trgtinfo.rndim);
+	for (i = 0; i < trgtinfo.ndim_; i++)
+	  offset += srcinfo.rsinglestep_[i]*trgtinfo.coords_[i]*div[srcinfo.raxes_[i]];
+      } while (n < trgtinfo.rndim_);
       break;
   }
   return iq;

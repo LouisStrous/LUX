@@ -56,7 +56,7 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
   double	xl, xr, min, minpos, max, maxpos, x1l, x2l, x1r, x2r;
   pointer	src, trgt, level, ptr, rightedge, left, width, x;
   csplineInfo	cspl;
-  loopInfo	srcinfo;
+  LoopInfo	srcinfo;
 
   if (!symbolIsNumericalArray(ps[0]))
     return cerror(NEED_NUM_ARR, ps[0]);
@@ -443,7 +443,7 @@ int32_t lux_cspline_find(int32_t narg, int32_t ps[])
   int32_t	result, iq, nLev, lev, ySym, vSym, i, step, *index, j;
   pointer	src, level;
   csplineInfo	cspl;
-  loopInfo	srcinfo;
+  LoopInfo	srcinfo;
   Bytestack b;
   struct c { double v; int32_t l; int32_t c; } *c;
   int32_t csize;
@@ -1011,7 +1011,7 @@ LS 9nov98 */
   float	x1, y1, x2, y2, *vx0, *vy0, value, vx, vy, s, s0, ds, dslimit,
     weight, ws, s1;
   pointer	src, trgt, src0;
-  loopInfo	srcinfo, trgtinfo;
+  LoopInfo	srcinfo, trgtinfo;
 
   iq0 = ps[0];			/* data */
   if (symbol_class(iq0) != LUX_ARRAY /* not an array */
@@ -1330,7 +1330,7 @@ int32_t lux_dir_smooth2(int32_t narg, int32_t ps[])
   float	x1, y1, x2, y2, *vx0, *vy0, vx, vy, s, s0, ds, dslimit,
     weight, ws, s1, norm;
   pointer	src, trgt, src0;
-  loopInfo	srcinfo, trgtinfo;
+  LoopInfo	srcinfo, trgtinfo;
 
   iq0 = ps[0];			/* data */
   if (symbol_class(iq0) != LUX_ARRAY /* not an array */

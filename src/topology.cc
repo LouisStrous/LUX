@@ -37,7 +37,7 @@ int32_t segment_2d(int32_t narg, int32_t ps[])
    it is assumed that's what <x> is!
    Y = SEGMENT(x [, sign]) */
 {
-  loopInfo	srcinfo, trgtinfo;
+  LoopInfo	srcinfo, trgtinfo;
   pointer	src, trgt;
   Scalar	value;
   int32_t	nx, ny, n, result, sign;
@@ -287,7 +287,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
   int32_t	result, sign, degree, n, i, *offset, k, j, ok, *edge, nok;
   Scalar	value;
   pointer	src, trgt, srcl, srcr;
-  loopInfo	srcinfo, trgtinfo;
+  LoopInfo	srcinfo, trgtinfo;
 
   /* gather info about ps[0] and prepare a return symbol */
   if (standardLoop(ps[0], 0, SL_ALLAXES | SL_SAMEDIMS | SL_EXACT,
@@ -562,7 +562,7 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
    (radians measured counterclockwise from the positive x-axis).
    LS 9nov98 */
 {
-  loopInfo	srcinfo, trgtinfo;
+  LoopInfo	srcinfo, trgtinfo;
   pointer	src, trgt;
   double	*angle, s, c, a;
   Scalar	value;
@@ -856,7 +856,7 @@ int32_t lux_max_dir(int32_t narg, int32_t ps[])
    one-dimensionally in the direction <phi> (radians measured
    counterclockwise from the positive x-axis).  LS 9nov98 */
 {
-  loopInfo	srcinfo, trgtinfo;
+  LoopInfo	srcinfo, trgtinfo;
   pointer	src, trgt;
   double	*angle, s, c, a;
   Scalar	value;
@@ -1393,7 +1393,7 @@ int32_t area_general(int32_t narg, int32_t ps[], int32_t isFunction)
     direction, *edge;
   int32_t	*ptr0, *ptr, *ptrend, **stackend, *ptr1, onEdge, ix, ix2, *ptr2;
   pointer	src;
-  loopInfo	srcinfo;
+  LoopInfo	srcinfo;
 
   if (!symbolIsNumericalArray(ps[0])) /* not a numerical array */
     return cerror(NEED_NUM_ARR, ps[0]);
@@ -2106,7 +2106,7 @@ int32_t area2_general(int32_t narg, int32_t ps[])
     direction, stride, maximum, type, *edge;
   int32_t	*ptr0, *ptr, *ptrend, **stackend, *ptr1, onEdge, ix, ix2, *ptr2;
   pointer	src, dataptr0, dataptr, dataptr2;
-  loopInfo	srcinfo;
+  LoopInfo	srcinfo;
 
   if (!symbolIsNumericalArray(ps[0])) /* not a numerical array */
     return cerror(NEED_NUM_ARR, ps[0]);
@@ -2757,7 +2757,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
   pointer	src, trgt, trgt0;
   Scalar	min[3], max[3];
   extern struct boundsStruct	bounds;
-  loopInfo	srcinfo, trgtinfo;
+  LoopInfo	srcinfo, trgtinfo;
 
   if (narg == 1 && symbolIsNumericalArray(ps[0]) && array_num_dims(ps[0]) == 2)
     return lux_basin(narg, ps);	/* use old (but faster) routine */
@@ -4275,7 +4275,7 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 	*diagonal, nDiagonal, n1, n2, nDoDim, i1, i2, n0, haveThreshold;
   double	zero = 0.0;
   pointer	src, trgt, srcl, srcr, t;
-  loopInfo	srcinfo, trgtinfo;
+  LoopInfo	srcinfo, trgtinfo;
 
   /* gather info about ps[0] and prepare a return symbol */
   if (standardLoop(ps[0], 0, SL_ALLAXES | SL_SAMEDIMS | SL_EXACT | SL_EACHROW,

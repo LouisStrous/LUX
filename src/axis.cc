@@ -29,8 +29,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
     routines in this file allow the user to set up and perform such a
     traversal fairly easily.
 
-    Most of the time, the user will want to use routine
-    standardLoop(), which stores information about the array to be
+    Most of the time, the user will want to use routine standardLoop()
+    or standardLoop1(), which store information about the array to be
     traversed, arranges for its traversal along the axis or axes
     specified by the user (if any), and generates an appropriate
     output symbol, if desired.
@@ -56,29 +56,29 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #define obstack_chunk_alloc malloc
 #define obstack_chunk_free free
 
-void setupDimensionLoop(loopInfo *info, int32_t ndim, int32_t const *dims, 
+void setupDimensionLoop(LoopInfo *info, int32_t ndim, int32_t const *dims,
                         Symboltype type, int32_t naxes, int32_t const *axes,
                         pointer *data, int32_t mode);
-void rearrangeDimensionLoop(loopInfo *info);
+void rearrangeDimensionLoop(LoopInfo *info);
 int32_t standardLoop(int32_t data, int32_t axisSym, int32_t mode, int32_t outType,
-		 loopInfo *src, pointer *srcptr, int32_t *output, loopInfo *trgt,
+		 LoopInfo *src, pointer *srcptr, int32_t *output, LoopInfo *trgt,
 		 pointer *trgtptr);
-int32_t advanceLoop(loopInfo *info, pointer *ptr),
+int32_t advanceLoop(LoopInfo *info, pointer *ptr),
   lux_convert(int32_t, int32_t [], Symboltype, int32_t);
-int32_t nextLoop(loopInfo *info), nextLoops(loopInfo *info1, loopInfo *info2);
-int32_t dimensionLoopResult(loopInfo const *sinfo, loopInfo *tinfo, int32_t type,
+int32_t nextLoop(LoopInfo *info), nextLoops(LoopInfo *info1, LoopInfo *info2);
+int32_t dimensionLoopResult(LoopInfo const *sinfo, LoopInfo *tinfo, int32_t type,
 			pointer *tptr);
 int32_t standardLoop1(int32_t source,
                   int32_t nAxes, int32_t const * axes,
                   int32_t srcMode,
-                  loopInfo *srcinf, pointer *srcptr,
+                  LoopInfo *srcinf, pointer *srcptr,
                   int32_t nMore, int32_t const * more,
                   int32_t nLess, int32_t const * less,
                   Symboltype tgtType, int32_t tgtMode,
-                  int32_t *target, 
-                  loopInfo *tgtinf, pointer *tgtptr);
+                  int32_t *target,
+                  LoopInfo *tgtinf, pointer *tgtptr);
 /*-------------------------------------------------------------------------*/
-void setAxisMode(loopInfo *info, int32_t mode) {
+void setAxisMode(LoopInfo *info, int32_t mode) {
   if ((mode & SL_EACHBLOCK) == SL_EACHBLOCK)
     info->advanceaxis = info->naxes;
   else if (mode & SL_EACHROW)
@@ -92,7 +92,7 @@ void setAxisMode(loopInfo *info, int32_t mode) {
   rearrangeDimensionLoop(info);
 }
 /*-------------------------------------------------------------------------*/
-int32_t setAxes(loopInfo *info, int32_t nAxes, int32_t *axes, int32_t mode)
+int32_t setAxes(LoopInfo *info, int32_t nAxes, int32_t *axes, int32_t mode)
 {
   int32_t i;
   int32_t temp[MAX_DIMS];
@@ -106,7 +106,7 @@ int32_t setAxes(loopInfo *info, int32_t nAxes, int32_t *axes, int32_t mode)
 	     && nAxes == 1		/* one axis specified */
 	     && *axes < 0)	/* and it is negative */
     nAxes = 0;
-  
+
   if ((mode & SL_ONEAXIS)	/* only one axis allowed */
       && nAxes > 1)		/* and more than one selected */
     return luxerror("Only one axis allowed", -1);
@@ -134,7 +134,7 @@ int32_t setAxes(loopInfo *info, int32_t nAxes, int32_t *axes, int32_t mode)
 /*-------------------------------------------------------------------------*/
 /** Gather information for looping through a LUX array.
 
-    \param[in,out] info a pointer to the \c loopInfo structure in
+    \param[in,out] info a pointer to the \c LoopInfo structure in
     which the information is gathered.
     \param[in] ndim  the number of dimensions
     \param[in] dims  the array of dimensions
@@ -145,7 +145,7 @@ int32_t setAxes(loopInfo *info, int32_t nAxes, int32_t *axes, int32_t mode)
     \param[in] mode flags that indicate how to loop through the axes,
     as for \c standardLoop()
  */
-void setupDimensionLoop(loopInfo *info, int32_t ndim, int32_t const *dims, 
+void setupDimensionLoop(LoopInfo *info, int32_t ndim, int32_t const *dims,
                         Symboltype type, int32_t naxes, int32_t const *axes,
                         pointer *data, int32_t mode)
 {
@@ -208,20 +208,20 @@ void setupDimensionLoop(loopInfo *info, int32_t ndim, int32_t const *dims,
 
     \param[in,out] info the loop information
     \param[in,out] ptr  a pointer to the data
+
     \return the index of the first loop axis that is not yet
-    completely traversed.
+    completely traversed.  I.e., if the array has 4 by 5 by 6
+    elements, then advancement from element (2,0,0) (to element
+    (3,0,0)) yields 0, (3,0,0) yields 1, (3,4,0) yields 2, and (3,4,5)
+    yields 3.
  */
-int32_t advanceLoop(loopInfo *info, pointer *ptr)
-/* advance coordinates; return index of first encountered incomplete
- axis.  I.e., if the array has 4 by 5 by 6 elements, then advancement
- from element (2,0,0) (to element (3,0,0)) yields 0, (3,0,0) yields 1,
- (3,4,0) yields 2, and (3,4,5) yields 3. */
+int32_t advanceLoop(LoopInfo *info, pointer *ptr)
 {
   int32_t	i, done;
 
   /* advance pointer */
   ptr->b += info->step[info->advanceaxis]*info->stride;
-  
+
   if (info->advanceaxis >= info->rndim)	/* already done */
     done = info->rndim;
   else {
@@ -239,12 +239,15 @@ int32_t advanceLoop(loopInfo *info, pointer *ptr)
     }
   }
   return done;
-}  
+}
 /*-----------------------------------------------------------------------*/
-int32_t loopIsAtStart(loopInfo const *info)
-/* returns 1 if all coordinates are equal to 0, and 0 otherwise.
-   Can be used to test if the loop is back at the start again -- i.e.,
-   has completed.  See also advanceLoop(). */
+/// Returns 1 if all coordinates are equal to 0, and 0 otherwise.
+/// Can be used to test if the loop is back at the start again -- i.e.,
+/// has completed.  See also advanceLoop().
+///
+/// \param [in] info the loop to query
+/// \return 1 if we're at the beginning of this loop, 0 otherwise
+int32_t loopIsAtStart(LoopInfo const *info)
 {
   int32_t state = 1, i;
 
@@ -253,7 +256,7 @@ int32_t loopIsAtStart(loopInfo const *info)
   return state;
 }
 /*-----------------------------------------------------------------------*/
-void rearrangeDimensionLoop(loopInfo *info)
+void rearrangeDimensionLoop(LoopInfo *info)
 /* rearranges dimensions suitable for walking along the selected axis
    <info>: information about the loop
    <info->axisindex>: index to the position in info->axes where the axis is
@@ -334,7 +337,7 @@ void rearrangeDimensionLoop(loopInfo *info)
 	  info->raxes[j++] = axis + 1; /* smallest axis in this lump */
 	}
 	info->rndim = j;
-	
+
 	/* get step sizes */
 	for (i = 0; i < info->rndim; i++)
 	  info->rsinglestep[i] = info->singlestep[info->raxes[i]];
@@ -394,7 +397,7 @@ void rearrangeDimensionLoop(loopInfo *info)
 	info->iraxes[i] = 0;
     }
   }
-  
+
   /* prepare step sizes for use in advanceLoop() */
   memcpy(info->step, info->rsinglestep, info->rndim*sizeof(int32_t));
   for (i = info->rndim - 1; i; i--)
@@ -405,11 +408,11 @@ void rearrangeDimensionLoop(loopInfo *info)
   info->data->v = info->data0;	/* initialize pointer */
 }
 /*-----------------------------------------------------------------------*/
-int32_t dimensionLoopResult1(loopInfo const *sinfo,
+int32_t dimensionLoopResult1(LoopInfo const *sinfo,
                          int32_t tmode, Symboltype ttype,
                          int32_t nMore, int32_t const * more,
                          int32_t nLess, int32_t const * less,
-                         loopInfo *tinfo, pointer *tptr)
+                         LoopInfo *tinfo, pointer *tptr)
 /* create an appropriate result symbol
    <sinfo>: contains information about the loops through the source
    <tmode>: specifies desired result
@@ -464,7 +467,7 @@ int32_t dimensionLoopResult1(loopInfo const *sinfo,
 	omitAxes[nOmitAxes++] = i;
     }
 #endif
-    if (!(tmode & SL_ONEDIMS) && nOmitAxes) { 
+    if (!(tmode & SL_ONEDIMS) && nOmitAxes) {
       /* remove dimensions corresponding to axes mentioned in omit[] */
       int32_t retain[MAX_DIMS];
       for (i = 0; i < ndim; i++)
@@ -553,7 +556,7 @@ int32_t dimensionLoopResult1(loopInfo const *sinfo,
 	n = 1;			/* omit one axis only */
       else
 	n = sinfo->naxes;	/* omit all axes */
-      
+
       if (sinfo->axes) {	/* have specific axes */
         if (tmode & SL_ONEDIMS)  /* replace by dimension of 1 */
 	  for (i = 0; i < n; i++)
@@ -614,7 +617,7 @@ int32_t dimensionLoopResult1(loopInfo const *sinfo,
   return target;
 }
 /*-----------------------------------------------------------------------*/
-int32_t dimensionLoopResult(loopInfo const *sinfo, loopInfo *tinfo,
+int32_t dimensionLoopResult(LoopInfo const *sinfo, LoopInfo *tinfo,
                             Symboltype ttype, pointer *tptr)
 {
   return dimensionLoopResult1(sinfo, sinfo->mode, ttype,
@@ -703,8 +706,8 @@ int32_t dimensionLoopResult(loopInfo const *sinfo, loopInfo *tinfo,
        SL_AXESBLOCK.
 */
 int32_t standardLoop(int32_t data, int32_t axisSym, int32_t mode,
-                     Symboltype outType, loopInfo *src, pointer *srcptr,
-                     int32_t *output, loopInfo *trgt, pointer *trgtptr)
+                     Symboltype outType, LoopInfo *src, pointer *srcptr,
+                     int32_t *output, LoopInfo *trgt, pointer *trgtptr)
 {
   int32_t i, nAxes;
   pointer axes;
@@ -726,12 +729,12 @@ int32_t standardLoop(int32_t data, int32_t axisSym, int32_t mode,
 /* Like standardLoop but can produce a target like the source
    but with adjusted dimensions. LS 2011-07-22 */
 int32_t standardLoopX(int32_t source, int32_t axisSym, int32_t srcMode,
-                  loopInfo *srcinf, pointer *srcptr,
+                  LoopInfo *srcinf, pointer *srcptr,
                   int32_t nMore, int32_t const * more,
                   int32_t nLess, int32_t const * less,
                   Symboltype tgtType, int32_t tgtMode,
                   int32_t *target,
-                  loopInfo *tgtinf, pointer *tgtptr)
+                  LoopInfo *tgtinf, pointer *tgtptr)
 {
   int32_t i, nAxes;
   pointer axes;
@@ -753,8 +756,8 @@ int32_t standardLoopX(int32_t source, int32_t axisSym, int32_t srcMode,
 /*-----------------------------------------------------------------------*/
 int32_t standardLoop0(int32_t data, int32_t nAxes, int32_t *axes,
                       int32_t mode, Symboltype outType,
-                      loopInfo *src, pointer *srcptr, int32_t *output,
-                      loopInfo *trgt, pointer *trgtptr)
+                      LoopInfo *src, pointer *srcptr, int32_t *output,
+                      LoopInfo *trgt, pointer *trgtptr)
 {
   int32_t	*dims, ndim, i, temp[MAX_DIMS];
 
@@ -840,10 +843,10 @@ int32_t standardLoop0(int32_t data, int32_t nAxes, int32_t *axes,
       /* but didn't get one */
       return LUX_ERROR;
   }
-  
+
 #if DEBUG_VOCAL
   debugout("treating SL_TAKEONED");
-#endif 
+#endif
   if (mode & SL_TAKEONED) { /* mimic 1D array */
     src->dims[0] = src->rdims[0] = src->nelem;
     src->ndim = src->rndim = 1;
@@ -859,12 +862,12 @@ int32_t standardLoop0(int32_t data, int32_t nAxes, int32_t *axes,
 int32_t standardLoop1(int32_t source,
                   int32_t nAxes, int32_t const * axes,
                   int32_t srcMode,
-                  loopInfo *srcinf, pointer *srcptr,
+                  LoopInfo *srcinf, pointer *srcptr,
                   int32_t nMore, int32_t const * more,
                   int32_t nLess, int32_t const * less,
                   Symboltype tgtType, int32_t tgtMode,
-                  int32_t *target, 
-                  loopInfo *tgtinf, pointer *tgtptr)
+                  int32_t *target,
+                  LoopInfo *tgtinf, pointer *tgtptr)
 /* initiates a standard array loop.  advanceLoop() runs through the loop.
    <source> (in): source data symbol, must be numerical
    <nAxes> (in): the number of axes to treat
@@ -927,7 +930,7 @@ int32_t standardLoop1(int32_t source,
    If the final number of dimensions in <target> (taking into account
    <more> and <less> and <tgtMode>) would exceed MAX_DIMS, then an
    error is declared.
-    
+
    <srcMode> flags:
 
    about the axes:
@@ -962,7 +965,7 @@ int32_t standardLoop1(int32_t source,
    about the coordinate treatment:
    SL_EACHROW: the data is advanced one row at a time; the user must
 	    take care of advancing the data pointer to the beginning of
-	    the next row   
+	    the next row
    SL_EACHBLOCK: like SL_EACHROW, but all selected axes together are
 	    considered to be a "row".  Implies SL_AXESBLOCK.
 
@@ -999,7 +1002,7 @@ int32_t standardLoop1(int32_t source,
    about the coordinate treatment:
    SL_EACHROW: the data is advanced one row at a time; the user must
 	    take care of advancing the data pointer to the beginning of
-	    the next row   
+	    the next row
    SL_EACHBLOCK: like SL_EACHROW, but all selected axes together are
 	    considered to be a "row".  Implies SL_AXESBLOCK.
   */
@@ -1010,7 +1013,7 @@ int32_t standardLoop1(int32_t source,
   /* check if <source> is of proper class, and get some info about it */
   if (numerical_or_string(source, &dims, &ndim, NULL, srcptr) == LUX_ERROR)
     return LUX_ERROR;		/* some error */
-  
+
   if (srcMode & SL_TAKEONED)	/* take data as 1D */
     nAxes = 0;			/* treat as 1D */
   else if (srcMode & SL_ALLAXES) { /* select all axes */
@@ -1020,7 +1023,7 @@ int32_t standardLoop1(int32_t source,
 	     && nAxes == 1		/* one axis specified */
 	     && *axes < 0)	/* and it is negative */
     nAxes = 0;
-  
+
   if ((srcMode & SL_ONEAXIS)	/* only one axis allowed */
       && nAxes > 1)		/* and more than one selected */
     return luxerror("Only one axis allowed", -1);
@@ -1039,9 +1042,9 @@ int32_t standardLoop1(int32_t source,
 			  -1, axes[i]);
     }
   }
-  
+
   /* The input is of legal classes and types. */
-    
+
   if ((srcMode & SL_SRCUPGRADE)	/* upgrade source if necessary */
       && (symbol_type(source) < tgtType))	{ /* source needs upgrading */
     source = lux_convert(1, &source, tgtType, 1); /* upgrade */
@@ -1058,15 +1061,15 @@ int32_t standardLoop1(int32_t source,
       tgtinf->type = srcinf->type; /* output type equal to source type */
     else
       tgtinf->type = tgtType;	/* take specified output type */
-        
-    *target = dimensionLoopResult1(srcinf, tgtMode, tgtinf->type, 
+
+    *target = dimensionLoopResult1(srcinf, tgtMode, tgtinf->type,
                                    nMore, more, nLess, less, tgtinf,
                                    tgtptr);
     if (*target == LUX_ERROR)
       /* but didn't get one */
       return LUX_ERROR;
   }
-  
+
   if (srcMode & SL_TAKEONED) { /* mimic 1D array */
     srcinf->dims[0] = srcinf->rdims[0] = srcinf->nelem;
     srcinf->ndim = srcinf->rndim = 1;
@@ -1075,7 +1078,7 @@ int32_t standardLoop1(int32_t source,
   return LUX_OK;
 }
 /*-----------------------------------------------------------------------*/
-int32_t nextLoop(loopInfo *info)
+int32_t nextLoop(LoopInfo *info)
 /* rearranges dimensions for a next loop through the array; returns 1
  if OK, 0 if we're beyond the last specified axis */
 {
@@ -1085,7 +1088,7 @@ int32_t nextLoop(loopInfo *info)
   return LUX_OK;
 }
 /*-----------------------------------------------------------------------*/
-int32_t nextLoops(loopInfo *info1, loopInfo *info2)
+int32_t nextLoops(LoopInfo *info1, LoopInfo *info2)
 /* rearranges dimensions for a next loop through the arrays; returns 1
  if OK, 0 if we're beyond the last specified axis */
 {
@@ -1097,7 +1100,7 @@ int32_t nextLoops(loopInfo *info1, loopInfo *info2)
   return 1;
 }
 /*-----------------------------------------------------------------------*/
-void subdataLoop(int32_t *range, loopInfo *src)
+void subdataLoop(int32_t *range, LoopInfo *src)
 /* this routine selects less than the full source data set for treatment */
 /* by modifying src->step[] and src->rdims[] and src->data */
 /* <range> must contain the beginning and end of the range in each of
@@ -1111,7 +1114,7 @@ void subdataLoop(int32_t *range, loopInfo *src)
     offset += range[2*i]*src->singlestep[i];
     src->rdims[src->raxes[i]] = range[2*i + 1] - range[2*i] + 1;
   }
-  
+
   memcpy(src->step, src->rsinglestep, src->ndim*sizeof(int32_t));
 
   for (i = src->ndim - 1; i > 0; i--)
@@ -1120,7 +1123,7 @@ void subdataLoop(int32_t *range, loopInfo *src)
   (*src->data).b = (uint8_t *) src->data0 + offset*src->stride;
 }
 /*--------------------------------------------------------------------*/
-void rearrangeEdgeLoop(loopInfo *src, loopInfo *trgt, int32_t index)
+void rearrangeEdgeLoop(LoopInfo *src, LoopInfo *trgt, int32_t index)
 /* modifies <src> and <trgt> for walking along only the outer edges of the
    data set.  For this purpose, edge number <index> consists of all data
    points that have rearranged coordinate number <index>/2 equal to
@@ -1140,13 +1143,13 @@ void rearrangeEdgeLoop(loopInfo *src, loopInfo *trgt, int32_t index)
   back = index % 2;		/* 0 -> front edge, 1 -> back edge */
   index /= 2;			/* the target axis */
   axis = src->axes[index];
-    
+
   /* put target dimension in the back; get rearranged step sizes */
   memcpy(src->rsinglestep, src->singlestep, axis*sizeof(int32_t));
   memcpy(src->rsinglestep + axis, src->singlestep + axis + 1,
 	 (src->ndim - axis - 1)*sizeof(int32_t));
   src->rsinglestep[src->ndim - 1] = src->singlestep[axis];
-    
+
   /* get rearranged dimensions */
   src->rndim = src->ndim;
   memcpy(src->rdims, src->dims, axis*sizeof(int32_t));
@@ -1195,7 +1198,7 @@ void rearrangeEdgeLoop(loopInfo *src, loopInfo *trgt, int32_t index)
   }
 }
 /*--------------------------------------------------------------------*/
-int32_t prepareDiagonals(int32_t symbol, loopInfo *info, int32_t part,
+int32_t prepareDiagonals(int32_t symbol, LoopInfo *info, int32_t part,
 		     int32_t **offset, int32_t **edge, int32_t **rcoord, int32_t **diagonal)
 /* takes the numerical array <symbol> that specifies which connections
    to nearest neighbors to accept and calculates various associated
@@ -1235,7 +1238,7 @@ int32_t prepareDiagonals(int32_t symbol, loopInfo *info, int32_t part,
    offset expressed in the corresponding dimension.  All elements of
    <rcoord> are equal to -1, 0, or +1.  Memory for this array is
    allocated by the routine.
-   
+
    If <diagonal> is non-zero, then in it is returned a pointer to the
    start of the list of diagonal code numbers (i.e., the contents of
    <symbol>) -- or a pointer to NULL if <symbol> is equal to 0.
@@ -1281,8 +1284,9 @@ int32_t prepareDiagonals(int32_t symbol, loopInfo *info, int32_t part,
      LS 10feb99 */
 
   if (offset) {
-    *offset = (int32_t *) malloc(n*sizeof(int32_t)); /* offsets to elements to be 
-						investigated */
+    *offset = (int32_t *) malloc(n*sizeof(int32_t)); /* offsets to
+                                                        elements to be
+                                                        investigated */
     if (!*offset)
       return cerror(ALLOC_ERR, 0);
   }
@@ -1297,13 +1301,13 @@ int32_t prepareDiagonals(int32_t symbol, loopInfo *info, int32_t part,
     if (!*rcoord)
       return cerror(ALLOC_ERR, 0);
   }
-  
+
   /* calculate offsets to elements to be investigated */
   /* we need to treat n directions */
   for (i = 0; i < info->ndim; i++)
     info->coords[i] = 0;
   info->coords[0] = 1;
-  
+
   n0 = n1 = 0;
   n2 = 1;			/* defaults for when diagonal == 0 */
   for (k = 0; k < n; ) {
@@ -1361,7 +1365,7 @@ int32_t prepareDiagonals(int32_t symbol, loopInfo *info, int32_t part,
   return n;
 }
 /*--------------------------------------------------------------------*/
-int32_t moveLoop(loopInfo *info, int32_t index, int32_t distance)
+int32_t moveLoop(LoopInfo *info, int32_t index, int32_t distance)
 /* moves along rearranged axis number <index> over the indicated <distance>, */
 /* updating the coordinates and pointers in <info>.  <distance> may be
    negative and may have any magnitude.  If <index> points at a non-existent
@@ -1407,13 +1411,13 @@ int32_t moveLoop(loopInfo *info, int32_t index, int32_t distance)
   return index;
 }
 /*--------------------------------------------------------------------*/
-void returnLoop(loopInfo *info, pointer *ptr, int32_t index)
+void returnLoop(LoopInfo *info, pointer *ptr, int32_t index)
 /* moves to the start of the rearranged axis indicated by <index>, */
 /* zeroing all rearranged coordinates up to and including that one and */
 /* adjusting the pointer accordingly.  LS 9apr99 */
 {
   int32_t	i;
-  
+
   for (i = 0; i <= index; i++) {
     ptr->b -= info->coords[index]*info->rsinglestep[index]*info->stride;
     info->coords[index] = 0;
@@ -1436,7 +1440,7 @@ static int32_t numerical_or_string_choice(int32_t data, int32_t **dims, int32_t 
     data = dereferenceScalPointer(data);
     /* fall-thru */
   case LUX_SCALAR:
-    if (dims) 
+    if (dims)
       *dims = &one;
     if (nDim)
       *nDim = 1;
@@ -1500,9 +1504,9 @@ int32_t numerical_or_string(int32_t data, int32_t **dims, int32_t *nDim, int32_t
 }
 /*--------------------------------------------------------------------*/
 void standard_redef_array(int32_t iq, Symboltype type,
-			  int32_t num_dims, int32_t *dims, 
+			  int32_t num_dims, int32_t *dims,
 			  int32_t naxes, int32_t *axes,
-			  pointer *ptr, loopInfo *info)
+			  pointer *ptr, LoopInfo *info)
 {
   redef_array(iq, type, num_dims, dims);
   ptr->v = array_data(iq);
@@ -2005,7 +2009,7 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
     dimension specification \c dim_spec.
   */
 int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, pointer **ptrs,
-                  loopInfo **infos)
+                  LoopInfo **infos)
 {
   int32_t returnSym, *ref_dims, tgt_dims[MAX_DIMS], prev_ref_param, *final;
   struct param_spec *pspec;
@@ -2013,7 +2017,7 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, pointer **ptr
   struct dims_spec *dims_spec;
   struct obstack o;
   int32_t param_ix, num_ref_dims;
-  loopInfo li;
+  LoopInfo li;
   pointer p;
   Symboltype type;
 
@@ -2043,7 +2047,7 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, pointer **ptr
   if (ptrs)
     *ptrs = (pointer*) malloc(psl->num_param_specs*sizeof(pointer));
   if (infos)
-    *infos = (loopInfo*) malloc(psl->num_param_specs*sizeof(loopInfo));
+    *infos = (LoopInfo*) malloc(psl->num_param_specs*sizeof(LoopInfo));
   final = (int32_t*) calloc(psl->num_param_specs, sizeof(int32_t));
 
   obstack_init(&o);
@@ -2360,7 +2364,7 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, pointer **ptr
         (*ptrs)[param_ix] = p;
     } else {
       if (infos)
-        memset(&(*infos)[param_ix], 0, sizeof(loopInfo));
+        memset(&(*infos)[param_ix], 0, sizeof(LoopInfo));
       if (ptrs)
         (*ptrs)[param_ix].v = NULL;
     }

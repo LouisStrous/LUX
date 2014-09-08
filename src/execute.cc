@@ -5220,7 +5220,7 @@ int32_t lux_test(int32_t narg, int32_t ps[])
 /* a test function */
 {
   int32_t	n, value, *edge, i, *offset;
-  loopInfo	info;
+  LoopInfo	info;
   pointer	src;
 
   if (symbol_type(ps[0]) != LUX_INT32)

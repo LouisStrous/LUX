@@ -68,19 +68,20 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
     example, <tt>double, double, double</tt> is encoded as ‘dT3’.
 
 */
-#include "luxdefs.hh"
+#include "bindings.hh"
 #include "error.hh"
+#include "luxdefs.hh"
+#include "axis.hh"
 #include <math.h>
 #include <obstack.h>
-#include "bindings.hh"
 #define obstack_chunk_alloc malloc
 #define obstack_chunk_free free
 
 extern int32_t internalMode;
 
-int32_t standard_args(int32_t, int32_t [], char const *, pointer **, loopInfo **);
-int32_t setAxes(loopInfo *, int32_t, int32_t *, int32_t);
-int32_t advanceLoop(loopInfo *, pointer *);
+int32_t standard_args(int32_t, int32_t [], char const *, pointer **, LoopInfo **);
+int32_t setAxes(LoopInfo *, int32_t, int32_t *, int32_t);
+int32_t advanceLoop(LoopInfo *, pointer *);
 
 struct obstack *registered_functions = NULL, *registered_subroutines = NULL;
 
@@ -133,7 +134,7 @@ void register_lux_s(int32_t (*f)(int32_t, int32_t []), char const* name,
 int32_t lux_v_dT3dp3_iDT3rDp3p3_0T3_f_(int32_t narg, int32_t ps[], void (*f)(double, double, double, double (*)[3]))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D;i>D;i>D;rD+3,+3", &ptrs, &infos)) < 0)
@@ -160,7 +161,7 @@ int32_t lux_v_dT3dp3_iDT3rDp3p3_0T3_f_(int32_t narg, int32_t ps[], void (*f)(dou
 int32_t lux_i_idpT4_iL1D3arDcq_0T222_f_(int32_t narg, int32_t ps[], int32_t (*f)(int32_t, double *, double *, double *, double *))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "iL1;i>D3*;rD[-]&", &ptrs, &infos)) < 0)
@@ -177,7 +178,7 @@ int32_t lux_i_idpT4_iL1D3arDcq_0T222_f_(int32_t narg, int32_t ps[], int32_t (*f)
 int32_t lux_i_idT3dp_iD3aL1rDq_10002_f_(int32_t narg, int32_t ps[], int32_t (*f)(int32_t, double, double, double, double *))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D3*;iL1;rD&", &ptrs, &infos)) < 0)
@@ -194,7 +195,7 @@ int32_t lux_i_idT3dp_iD3aL1rDq_10002_f_(int32_t narg, int32_t ps[], int32_t (*f)
 int32_t lux_v_dT3d3_iD3aD1D1rD3q_120333_f_(int32_t narg, int32_t ps[], int32_t (*f)(double, double, double *, double *, double *, double *))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D3*;i>D1;i>D1;rD3&", &ptrs, &infos)) < 0)
@@ -212,7 +213,7 @@ int32_t lux_v_dT3d3_iD3aD1D1rD3q_120333_f_(int32_t narg, int32_t ps[], int32_t (
 int32_t lux_v_dT3d3_iD3DcqrDcq_0T2_f_(int32_t narg, int32_t ps[], void (*f)(double *, double *, double *))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D3*;i>D[-]&;rD[-]&", &ptrs, &infos)) < 0)
@@ -230,7 +231,7 @@ int32_t lux_v_dT3d3_iD3DcqrDcq_0T2_f_(int32_t narg, int32_t ps[], void (*f)(doub
 int32_t lux_d_dpdp_iD3aD3qrDm3q_01_2_f_(int32_t narg, int32_t ps[], double (*f)(double *, double *))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D3*;i>D3&;rD-3&", &ptrs, &infos)) < 0)
@@ -247,7 +248,7 @@ int32_t lux_v_dpT3_iD3arDm3p2q_011_f_(int32_t narg, int32_t ps[], void (*f)(doub
 {
   int32_t iq;
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
 
   if ((iq = standard_args(narg, ps, "i>D3*;r>D-3+2&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
@@ -264,7 +265,7 @@ int32_t lux_v_dpT3_iD3arDm3p2q_011_f_(int32_t narg, int32_t ps[], void (*f)(doub
 int32_t lux_v_dpdp3_iD3arDp3q_01_f_(int32_t narg, int32_t ps[], void (*f)(double [3], double [3][3]))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D3*;rD+3&", &ptrs, &infos)) < 0)
@@ -280,7 +281,7 @@ int32_t lux_v_dpdp3_iD3arDp3q_01_f_(int32_t narg, int32_t ps[], void (*f)(double
 int32_t lux_v_dpT4_iD3arD3q_0111_f_(int32_t narg, int32_t ps[], void (*f)(double *, double *, double *, double *))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D3*;rD3&", &ptrs, &infos)) < 0)
@@ -297,7 +298,7 @@ int32_t lux_v_dpT4_iD3arD3q_0111_f_(int32_t narg, int32_t ps[], void (*f)(double
 int32_t lux_v_dpT3_iD3aoDm3qoDq_0T2_s_(int32_t narg, int32_t ps[], void (*f)(double *, double *, double *))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D3*;oD-3&;oD&", &ptrs, &infos)) < 0)
@@ -314,7 +315,7 @@ int32_t lux_v_dpT3_iD3aoDm3qoDq_0T2_s_(int32_t narg, int32_t ps[], void (*f)(dou
 int32_t lux_i_dpiidp_iDaLrDq_00T2_f_(int32_t narg, int32_t ps[], int32_t (*f)(double *, int32_t, int32_t, double *))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;iL;rD&", &ptrs, &infos)) < 0)
@@ -331,7 +332,7 @@ int32_t lux_i_dpiidp_iDaLrDq_00T2_f_(int32_t narg, int32_t ps[], int32_t (*f)(do
 int32_t lux_i_dpiT3dp_iDaiLiLrDq_00T3_f_(int32_t narg, int32_t ps[], int32_t (*f)(double *, int32_t, int32_t, int32_t, double *))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;iL;iL;rD&", &ptrs, &infos)) < 0)
@@ -348,7 +349,7 @@ int32_t lux_i_dpiT3dp_iDaiLiLrDq_00T3_f_(int32_t narg, int32_t ps[], int32_t (*f
 int32_t lux_v_dp3dp3dp_iD23aD23qoDcm3q_0T2_f_(int32_t narg, int32_t ps[], void (*f)(double [2][3], double [2][3], double [2]))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D2,3*;i>D2,3&;oD[-],-3&", &ptrs, &infos)) < 0)
@@ -367,7 +368,7 @@ int32_t lux_v_dp3dp3dp_iD23aD23qoDcm3q_0T2_f_(int32_t narg, int32_t ps[], void (
 int32_t lux_v_dp3T3_iD23aD23qoDcq_0T2_f_(int32_t narg, int32_t ps[], void (*f)(double [2][3], double [2][3], double [2][3]))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D2,3*;i>D2,3&;oD[-]&", &ptrs, &infos)) < 0)
@@ -386,7 +387,7 @@ int32_t lux_v_dp3T3_iD23aD23qoDcq_0T2_f_(int32_t narg, int32_t ps[], void (*f)(d
 int32_t lux_v_dp3dpdp_iD23aoDm2m3qDcq_0T2_s_(int32_t narg, int32_t ps[], void (*f)(double [2][3], double *, double *))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D2,3*;oD-2-3&;oD[-]&", &ptrs, &infos)) < 0)
@@ -402,7 +403,7 @@ int32_t lux_v_dp3dpdp_iD23aoDm2m3qDcq_0T2_s_(int32_t narg, int32_t ps[], void (*
 int32_t lux_v_dp3dpT6_iD23aoDm2m3aDcT5_0T6_s_(int32_t narg, int32_t ps[], void (*f)(double [2][3], double *, double *, double *, double *, double *, double *))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D2,3*;oD-2-3*;oD[-];oD[-];oD[-];oD[-];oD[-]", &ptrs, &infos)) < 0)
@@ -419,7 +420,7 @@ int32_t lux_v_dp3dpT6_iD23aoDm2m3aDcT5_0T6_s_(int32_t narg, int32_t ps[], void (
 int32_t lux_i_dp3dpT6_iD23aoDm2m3aDcT5_0T6_s_(int32_t narg, int32_t ps[], int32_t (*f)(double [2][3], double *, double *, double *, double *, double *, double *))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D2,3*;oD-2-3*;oD[-];oD[-];oD[-];oD[-];oD[-]", &ptrs, &infos)) < 0)
@@ -436,7 +437,7 @@ int32_t lux_i_dp3dpT6_iD23aoDm2m3aDcT5_0T6_s_(int32_t narg, int32_t ps[], int32_
 int32_t lux_v_dp3dpdp_iD33aDm3arDcq_0T2_f_(int32_t narg, int32_t ps[], void (*f)(double [3][3], double [3], double [3]))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq, step;
 
   iq = LUX_ERROR;
@@ -461,7 +462,7 @@ int32_t lux_v_dp3dpdp_iD33aDm3arDcq_0T2_f_(int32_t narg, int32_t ps[], void (*f)
 int32_t lux_v_dp3T3_iD33aDaoDc_0T2_f_(int32_t narg, int32_t ps[], void (*f)(double [3][3], double [2][3], double [2][3]))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D3,3*;iD*;oD[-]", &ptrs, &infos)) < 0)
@@ -481,7 +482,7 @@ int32_t lux_v_dp3T3_iD33aDarDq_0T2_f_(int32_t narg, int32_t ps[], void (*f)(doub
 {
   int32_t iq;
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   size_t nelem;
 
   if ((iq = standard_args(narg, ps, "i>D3,3*;i>D*;rD&", &ptrs, &infos)) < 0)
@@ -503,7 +504,7 @@ int32_t lux_v_dp3ddp3dp3_iD33aDmmaDarDq_0T3_f_(int32_t narg, int32_t ps[], void 
 {
   int32_t iq;
   pointer *ptrs, era;
-  loopInfo *infos;
+  LoopInfo *infos;
   size_t nelem;
 
   if ((iq = standard_args(narg, ps, "i>D3,3*;i>D-,-*;i>D*;rD&", &ptrs, &infos)) < 0)
@@ -525,7 +526,7 @@ int32_t lux_v_dp3ddp3dp3_iD33aDmmaDarDq_0T3_f_(int32_t narg, int32_t ps[], void 
 int32_t lux_d_dp3d_iD33aDmmarDmmq_01_2_f_(int32_t narg, int32_t ps[], double (*f)(double (*)[3], double))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D3,3*;i>D-,-*;rD-,-&", &ptrs, &infos)) < 0)
@@ -541,7 +542,7 @@ int32_t lux_d_dp3d_iD33aDmmarDmmq_01_2_f_(int32_t narg, int32_t ps[], double (*f
 int32_t lux_v_dp3dp_iD33arDm3q_01_f_(int32_t narg, int32_t ps[], void (*f)(double [3][3], double [3]))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D3,3*;rD-3&", &ptrs, &infos)) < 0)
@@ -559,7 +560,7 @@ int32_t lux_v_dp3dp_iD33arDm3q_01_f_(int32_t narg, int32_t ps[], void (*f)(doubl
 int32_t lux_v_dp3dp3_iD33arDq_01_f_(int32_t narg, int32_t ps[], void (*f)(double [3][3], double [3][3]))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D3,3*;rD&", &ptrs, &infos)) < 0)
@@ -577,7 +578,7 @@ int32_t lux_v_dp3dp3_iD33arDq_01_f_(int32_t narg, int32_t ps[], void (*f)(double
 int32_t lux_v_dp3dpdp_iD33aoDm3m3qT2_0T2_s_(int32_t narg, int32_t ps[], void (*f)(double (*)[3], double *, double *))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D3,3*;oD-3,-3&;oD-3,-3&", &ptrs, &infos)) < 0)
@@ -594,7 +595,7 @@ int32_t lux_v_dp3dpdp_iD33aoDm3m3qT2_0T2_s_(int32_t narg, int32_t ps[], void (*f
 int32_t lux_v_dT8dp3_iDaT5rDp3p3q_0zzz1T5_f_(int32_t narg, int32_t ps[], void (*f)(double, double, double, double, double, double, double, double, double (*)[3]))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;i>D*;i>D*;i>D*;i>D*;rD+3,+3&",
@@ -618,7 +619,7 @@ int32_t lux_v_dT6dp3_iDaT4rDp3p3q_0z11T4_f_(int32_t narg, int32_t ps[], void (*f
 {
   int32_t iq;
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
 
   if ((iq = standard_args(narg, ps, "i>D*;i>D*;i>D*;i>D*;rD+3,+3&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
@@ -635,7 +636,7 @@ int32_t lux_v_dT6dp3_iDaT4rDp3p3q_0z11T4_f_(int32_t narg, int32_t ps[], void (*f
 int32_t lux_d_dT6_iLaDaD1T3rDq_0z1T4_5_f_(int32_t narg, int32_t ps[], double (*f)(double, double, double, double, double, double))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>L*;i>D*;i>D1;i>D1;i>D1;r>D&", &ptrs, &infos)) < 0)
@@ -671,7 +672,7 @@ int32_t lux_d_dT6_iLaDaD1T3rDq_0z1T4_5_f_(int32_t narg, int32_t ps[], double (*f
 int32_t lux_i_ddidp3_iDaL1rDp3p2q_0z12_f_(int32_t narg, int32_t ps[], int32_t (*f)(double, double, int32_t, double (*)[3]))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;iL1;rD+3,+2&", &ptrs, &infos)) < 0)
@@ -687,7 +688,7 @@ int32_t lux_i_ddidp3_iDaL1rDp3p2q_0z12_f_(int32_t narg, int32_t ps[], int32_t (*
 int32_t lux_i_dddp3dp3_iLaoDp2p3qT2_0z12_s_(int32_t narg, int32_t ps[], int32_t (*f)(double, double, double (*)[3], double (*)[3]))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>L*;oD+2,+3&;oD+2,+3&", &ptrs, &infos)) < 0)
@@ -733,7 +734,7 @@ int32_t lux_i_dddp3dp3_iLaoDp2p3qT2_0z12_s_(int32_t narg, int32_t ps[], int32_t 
 int32_t lux_v_dddp3dp3_iDaiDp3p3arDcq_0z12_f_(int32_t narg, int32_t ps[], void (*f)(double, double, double (*)[3], double (*)[3]))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;i>D+3,+3*;rD[-]&", &ptrs, &infos)) < 0)
@@ -753,7 +754,7 @@ int32_t lux_v_dddp3dp3_iDaiDp3p3arDcq_0z12_f_(int32_t narg, int32_t ps[], void (
 int32_t lux_v_dT4dpT3_iDaDaoDqT3_0z1z2T4_s_(int32_t narg, int32_t ps[], void (*f)(double, double, double, double, double *, double *, double *))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;i>D*;oD&;oD&;oD&", &ptrs, &infos)) < 0)
@@ -768,7 +769,7 @@ int32_t lux_v_dT4dp3_iDaT3rDp3p3q_0z1T3_f_(int32_t narg, int32_t ps[], void (*f)
   int32_t iq;
   double (*tgt)[3];
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
 
   if ((iq = standard_args(narg, ps, "i>D*;i>D*;i>D*;rD+3,+3&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
@@ -783,7 +784,7 @@ int32_t lux_v_dT4dp3_iDaT3rDp3p3q_0z1T3_f_(int32_t narg, int32_t ps[], void (*f)
 int32_t lux_v_dddpT3dp3T5_iDaoDqT3Dp3p3qT5_0z1T8_s_(int32_t narg, int32_t ps[], void (*f)(double, double, double *, double *, double *, double (*)[3], double (*)[3], double (*)[3], double (*)[3], double (*)[3]))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;oD&;oD&;oD&;oD+3,+3&;oD+3,+3&;oD+3,+3&;oD+3,+3&;oD+3,+3&", &ptrs, &infos)) < 0)
@@ -805,7 +806,7 @@ int32_t lux_v_dddpT3dp3T5_iDaoDqT3Dp3p3qT5_0z1T8_s_(int32_t narg, int32_t ps[], 
 int32_t lux_v_dT4dpdp3T5_iDaT3oDqDp3p3qT5_0z1T8_s_(int32_t narg, int32_t ps[], void (*f)(double, double, double, double, double *, double (*)[3], double (*)[3], double (*)[3], double (*)[3], double (*)[3]))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;i>D*;i>D*;oD&;oD+3,+3&;oD+3,+3&;oD+3,+3&;oD+3,+3&;oD+3,+3&", &ptrs, &infos)) < 0)
@@ -827,7 +828,7 @@ int32_t lux_v_dT4dpdp3T5_iDaT3oDqDp3p3qT5_0z1T8_s_(int32_t narg, int32_t ps[], v
 int32_t lux_d_dT4_iLaDaDarDq_0z12_f_(int32_t narg, int32_t ps[], double (*f)(double, double, double, double))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>L*;i>D*;i>D*;r>D&", &ptrs, &infos)) < 0)
@@ -858,7 +859,7 @@ int32_t lux_d_dT4_iLaDaDarDq_0z12_f_(int32_t narg, int32_t ps[], double (*f)(dou
 int32_t lux_i_dT3dpdp_iDaDarDq_0z122_f_(int32_t narg, int32_t ps[], int32_t (*f)(double, double, double, double *, double *))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;i>D*;rD&", &ptrs, &infos)) < 0)
@@ -874,7 +875,7 @@ int32_t lux_i_dT3dpdp_iDaDarDq_0z122_f_(int32_t narg, int32_t ps[], int32_t (*f)
 int32_t lux_v_dddp3_iDarDp3p3q_0z1_f_(int32_t narg, int32_t ps[], void (*f)(double, double, double (*)[3]))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;rD+3,+3&", &ptrs, &infos)) < 0)
@@ -891,7 +892,7 @@ int32_t lux_v_dddp3_iDarDp3p3q_0z1_f_(int32_t narg, int32_t ps[], void (*f)(doub
 int32_t lux_v_dddp3T3_iLaoD33oDp3p3qDcq_0z1T3_s_(int32_t narg, int32_t ps[], void (*f)(double, double, double (*)[3], double (*)[3], double (*)[3]))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>L*;oD3,3;oD+3,+3&;oD[-]&", &ptrs, &infos)) < 0)
@@ -939,7 +940,7 @@ int32_t lux_v_dddp3T3_iLaoD33oDp3p3qDcq_0z1T3_s_(int32_t narg, int32_t ps[], voi
 int32_t lux_i_dddpdp_iDarDq_0z11_f_(int32_t narg, int32_t ps[], int32_t (*f)(double, double, double *, double *))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;rD&", &ptrs, &infos)) < 0)
@@ -955,7 +956,7 @@ int32_t lux_i_dddpdp_iDarDq_0z11_f_(int32_t narg, int32_t ps[], int32_t (*f)(dou
 int32_t lux_v_dddpdp_iDaoDqDq_0z12_s_(int32_t narg, int32_t ps[], void (*f)(double, double, double *, double *))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;oD&;oD&", &ptrs, &infos)) < 0)
@@ -968,7 +969,7 @@ int32_t lux_v_dddpdp_iDaoDqDq_0z12_s_(int32_t narg, int32_t ps[], void (*f)(doub
 int32_t lux_v_dddpT3_iDaoDqT3_0z1T3_s_(int32_t narg, int32_t ps[], void (*f)(double, double, double *, double *, double *))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;oD&;oD&;oD&", &ptrs, &infos)) < 0)
@@ -981,7 +982,7 @@ int32_t lux_v_dddpT3_iDaoDqT3_0z1T3_s_(int32_t narg, int32_t ps[], void (*f)(dou
 int32_t lux_v_dddpT4_iDaoDqT4_0z1T4_s_(int32_t narg, int32_t ps[], void (*f)(double, double, double *, double *, double *, double *))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;oD&;oD&;oD&;oD&", &ptrs, &infos)) < 0)
@@ -994,7 +995,7 @@ int32_t lux_v_dddpT4_iDaoDqT4_0z1T4_s_(int32_t narg, int32_t ps[], void (*f)(dou
 int32_t lux_v_dddpT16_iDaoDqT16_0z1T16_s_(int32_t narg, int32_t ps[], void (*f)(double, double, double *, double *, double *, double *, double *, double *, double *, double *, double *, double *, double *, double *, double *, double *, double *, double *))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&", &ptrs, &infos)) < 0)
@@ -1010,7 +1011,7 @@ int32_t lux_v_dddpT16_iDaoDqT16_0z1T16_s_(int32_t narg, int32_t ps[], void (*f)(
 int32_t lux_iddipT3dp_iLarDp3q_0z1111_f_(int32_t narg, int32_t ps[], int32_t (*f)(double, double, int32_t *, int32_t *, int32_t *, double *))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq, y, m, d;
   double fd;
 
@@ -1083,7 +1084,7 @@ int32_t lux_iddipT3dp_iLarDp3q_0z1111_f_(int32_t narg, int32_t ps[], int32_t (*f
 int32_t lux_d_dd_iDarDq_0z_1_f_(int32_t narg, int32_t ps[], double (*f)(double, double))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;rD&", &ptrs, &infos)) < 0)
@@ -1109,7 +1110,7 @@ int32_t lux_d_dd_iDarDq_0z_1_f_(int32_t narg, int32_t ps[], double (*f)(double, 
 int32_t lux_d_dd_iDaD1rDq_01_2_f_(int32_t narg, int32_t ps[], double (*f)(double, double))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;i>D1;rD&", &ptrs, &infos)) < 0)
@@ -1122,7 +1123,7 @@ int32_t lux_d_dd_iDaD1rDq_01_2_f_(int32_t narg, int32_t ps[], double (*f)(double
 int32_t lux_i_dT5dp_iD3aD1D1rD3q_120003_f_(int32_t narg, int32_t ps[], int32_t (*f)(double, double, double, double, double, double *))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D3*;iD1;iD1;rD3&", &ptrs, &infos)) < 0)
@@ -1139,7 +1140,7 @@ int32_t lux_i_dT5dp_iD3aD1D1rD3q_120003_f_(int32_t narg, int32_t ps[], int32_t (
 int32_t lux_d_dp_iD3arDm3q_0_1_f_(int32_t narg, int32_t ps[], double (*f)(double *))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D3*;rD-3&", &ptrs, &infos)) < 0)
@@ -1155,7 +1156,7 @@ int32_t lux_d_dp_iD3arDm3q_0_1_f_(int32_t narg, int32_t ps[], double (*f)(double
 int32_t lux_v_ddp3_iD1D33_01_s_(int32_t narg, int32_t ps[], void (*f)(double, double [3][3]))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D1;i>D3,3", &ptrs, &infos)) < 0)
@@ -1184,7 +1185,7 @@ int32_t lux_v_ddp3_iD1D33_01_s_(int32_t narg, int32_t ps[], void (*f)(double, do
 int32_t lux_v_ddpdp_iDaoDqDq_012_s_(int32_t narg, int32_t ps[], void (*f)(double, double*, double*))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;oD&;oD&", &ptrs, &infos)) < 0)
@@ -1198,7 +1199,7 @@ int32_t lux_v_ddpdp_iDaoDqDq_012_s_(int32_t narg, int32_t ps[], void (*f)(double
 int32_t lux_v_dT4dpdp_iDaT3oDqDq_0T2z34_s_(int32_t narg, int32_t ps[], void (*f)(double, double, double, double, double *, double *))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;i>D*;i>D*;oD&;oD&", &ptrs, &infos)) < 0)
@@ -1211,7 +1212,7 @@ int32_t lux_v_dT4dpdp_iDaT3oDqDq_0T2z34_s_(int32_t narg, int32_t ps[], void (*f)
 int32_t lux_v_dT4dpT4_iDaDaDoDqT4_0T2z3T6_s_(int32_t narg, int32_t ps[], void (*f)(double, double, double, double, double *, double *, double *, double *))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;i>D*;i>D;oD&;oD&;oD&;oD&", &ptrs, &infos)) < 0)
@@ -1225,7 +1226,7 @@ int32_t lux_v_dT4dpT4_iDaDaDoDqT4_0T2z3T6_s_(int32_t narg, int32_t ps[], void (*
 int32_t lux_d_dT4dp3_iDaDaDp3p3arDq_00112_3_f_(int32_t narg, int32_t ps[], double (*f)(double, double, double, double, double (*)[3]))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;i>D*;i>D+3,+3*;rD&", &ptrs, &infos)) < 0)
@@ -1246,7 +1247,7 @@ int32_t lux_d_dT4dp3_iDaDaDp3p3arDq_00112_3_f_(int32_t narg, int32_t ps[], doubl
 int32_t lux_i_dT10dpT6_iDaT8oDqT6_0T6z7z8T13_s_(int32_t narg, int32_t ps[], int32_t (*f)(double, double, double, double, double, double, double, double, double, double, double *, double *, double *, double *, double *, double *))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;i>D*;i>D*;i>D*;i>D*;i>D*;i>D*;i>D*;oD&;oD&;oD&;oD&;oD&;oD&", &ptrs, &infos)) < 0)
@@ -1261,7 +1262,7 @@ int32_t lux_i_dT10dpT6_iDaT8oDqT6_0T6z7z8T13_s_(int32_t narg, int32_t ps[], int3
 int32_t lux_i_dT6dp3_iDaT6oDp2p3q_0T6_f_(int32_t narg, int32_t ps[], int32_t (*f)(double, double, double, double, double, double, double [2][3]))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;i>D*;i>D*;i>D*;i>D*;i>D*;oD+2,+3&", &ptrs, &infos)) < 0)
@@ -1277,7 +1278,7 @@ int32_t lux_i_dT6dp3_iDaT6oDp2p3q_0T6_f_(int32_t narg, int32_t ps[], int32_t (*f
 int32_t lux_v_dT6dp3_iDaT6oDp2p3q_0T6_f_(int32_t narg, int32_t ps[], void (*f)(double, double, double, double, double, double, double [2][3]))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;i>D*;i>D*;i>D*;i>D*;i>D*;oD+2,+3&", &ptrs, &infos)) < 0)
@@ -1293,7 +1294,7 @@ int32_t lux_v_dT6dp3_iDaT6oDp2p3q_0T6_f_(int32_t narg, int32_t ps[], void (*f)(d
 int32_t lux_v_dT6dpT6_iDaT6oDqT6_0T11_s_(int32_t narg, int32_t ps[], void (*f)(double, double, double, double, double, double, double *, double *, double *, double *, double *, double *))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;i>D*;i>D*;i>D*;i>D*;i>D*;oD&;oD&;oD&;oD&;oD&;oD&", &ptrs, &infos)) < 0)
@@ -1308,7 +1309,7 @@ int32_t lux_v_dT6dpT6_iDaT6oDqT6_0T11_s_(int32_t narg, int32_t ps[], void (*f)(d
 int32_t lux_v_dT4dp3_iDaT4rDp3p3q_0T4_f_(int32_t narg, int32_t ps[], void (*f)(double, double, double, double, double (*)[3]))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;i>D*;i>D*;i>D*;rD+3,+3&", &ptrs, &infos)) < 0)
@@ -1324,7 +1325,7 @@ int32_t lux_v_dT4dp3_iDaT4rDp3p3q_0T4_f_(int32_t narg, int32_t ps[], void (*f)(d
 int32_t lux_v_dT4dpdp_iDaT4oDqDq_0T5_s_(int32_t narg, int32_t ps[], void (*f)(double, double, double, double, double *, double *))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;i>D*;i>D*;i>D*;oD&;oD&", &ptrs, &infos)) < 0)
@@ -1338,7 +1339,7 @@ int32_t lux_v_dT4dpdp_iDaT4oDqDq_0T5_s_(int32_t narg, int32_t ps[], void (*f)(do
 int32_t lux_d_dT4_iDaT4rDq_0T3_4_f_(int32_t narg, int32_t ps[], double (*f)(double, double, double, double))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;i>D*;i>D*;i>D*;rD&", &ptrs, &infos)) < 0)
@@ -1351,7 +1352,7 @@ int32_t lux_d_dT4_iDaT4rDq_0T3_4_f_(int32_t narg, int32_t ps[], double (*f)(doub
 int32_t lux_d_dT4_iDaDarDq_0011_2_f_(int32_t narg, int32_t ps[], double (*f)(double, double, double, double))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;i>D*;rD&", &ptrs, &infos)) < 0)
@@ -1370,7 +1371,7 @@ int32_t lux_d_dT4_iDaDarDq_0011_2_f_(int32_t narg, int32_t ps[], double (*f)(dou
 int32_t lux_v_dT3dp_iDaT3rDp3q_0T3_f_(int32_t narg, int32_t ps[], void (*f)(double, double, double, double [3]))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;i>D*;i>D*;rD+3&", &ptrs, &infos)) < 0)
@@ -1388,7 +1389,7 @@ int32_t lux_v_dT3dp3_iDaT3rDp3p3q_0T3_f_(int32_t narg, int32_t ps[], void (*f)(d
   int32_t iq;
   double (*r)[3];
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
 
   if ((iq = standard_args(narg, ps, "i>D*;i>D*;i>D*;rD+3,+3&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
@@ -1403,7 +1404,7 @@ int32_t lux_v_dT3dp3_iDaT3rDp3p3q_0T3_f_(int32_t narg, int32_t ps[], void (*f)(d
 int32_t lux_v_dddp_iDaDarDp3q_0T2_f_(int32_t narg, int32_t ps[], void (*f)(double, double, double [3]))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;i>D*;rD+3&", &ptrs, &infos)) < 0)
@@ -1419,7 +1420,7 @@ int32_t lux_v_dddp_iDaDarDp3q_0T2_f_(int32_t narg, int32_t ps[], void (*f)(doubl
 int32_t lux_d_dd_iLarDq_0z_1_f_(int32_t narg, int32_t ps[], double (*f)(double, double))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>L*;rD&", &ptrs, &infos)) < 0)
@@ -1451,7 +1452,7 @@ int32_t lux_d_dd_iLarDq_0z_1_f_(int32_t narg, int32_t ps[], double (*f)(double, 
 int32_t lux_d_d_iDarDq_0_1_f_(int32_t narg, int32_t ps[], double (*f)(double))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;rD&", &ptrs, &infos)) < 0)
@@ -1465,7 +1466,7 @@ int32_t lux_d_d_iDarDq_0_1_f_(int32_t narg, int32_t ps[], double (*f)(double))
 int32_t lux_i_idpdp_iLarDp2q_011_f_(int32_t narg, int32_t ps[], int32_t (*f)(int32_t, double *, double *))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "iL*;rD+2&", &ptrs, &infos)) < 0)
@@ -1480,7 +1481,7 @@ int32_t lux_i_idpdp_iLarDp2q_011_f_(int32_t narg, int32_t ps[], int32_t (*f)(int
 int32_t lux_d_sd_iDaLarDxq_000_2_f_(int32_t narg, int32_t ps[], double (*f)(double *, size_t count, size_t stride))
 {
   pointer *ptrs, ptrs0, ptrsr;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq, iret;
   int32_t *axes, naxes, oneaxis[1] = { 0 }, allaxes;
 
@@ -1535,7 +1536,7 @@ int32_t lux_ivarl_copy_eachaxis_(int32_t narg, int32_t ps[], int32_t (*f)(double
 /* copy input to output, apply function to output, go through each axis separately */
 {
   pointer *ptrs, ptrs0, ptrsr;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq, iret;
   int32_t *axes, naxes, oneaxis[1] = { 0 }, allaxes;
 
@@ -1619,7 +1620,7 @@ int32_t lux_i_sdddsd_iDaLDDrDq_000T333_f_(int32_t narg, int32_t ps[], int32_t (*
 		     double *, size_t tgtcount, size_t tgtstride))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq, ipar1, ipar2, iret;
 
   switch (narg) {
@@ -1666,7 +1667,7 @@ int32_t lux_i_sdddsd_iDaLDDrDq_000T333_f_(int32_t narg, int32_t ps[], int32_t (*
 int32_t lux_v_dp3_rD33_0_f_(int32_t narg, int32_t ps[], void (*f)(double (*)[3]))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "rD3,3", &ptrs, &infos)) < 0)
@@ -1678,7 +1679,7 @@ int32_t lux_v_dp3_rD33_0_f_(int32_t narg, int32_t ps[], void (*f)(double (*)[3])
 int32_t lux_v_dp3dp_oD33D3_01_s_(int32_t narg, int32_t ps[], void (*f)(double (*)[3], double *))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "oD3,3;oD3", &ptrs, &infos)) < 0)
@@ -1701,7 +1702,7 @@ int32_t lux_v_dpT3_rD3_000_f_(int32_t narg, int32_t ps[], void (*f)(double *, do
 int32_t lux_v_sddsd_iDaD1rDq_012_f_(int32_t narg, int32_t ps[], void (*f)(double *, size_t, size_t, double, double *, size_t, size_t))
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;iD1?;rD&", &ptrs, &infos)) < 0)

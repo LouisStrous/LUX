@@ -894,7 +894,7 @@ int32_t indgen(int32_t narg, int32_t ps[], int32_t isFunc)
 {
   pointer	src, trgt;
   int32_t	result;
-  loopInfo	srcinfo, trgtinfo;
+  LoopInfo	srcinfo, trgtinfo;
 
   if (isFunc) {
     if (standardLoop(ps[0], narg > 1? ps[1]: 0,
@@ -3421,7 +3421,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
   float	temp2f;
   double	temp2d;
   pointer	src, trgt, weights;
-  loopInfo	srcinfo, trgtinfo, winfo;
+  LoopInfo	srcinfo, trgtinfo, winfo;
 
 #if DEBUG_VOCAL
   debugout1("in total(), %d arg(s)", narg);

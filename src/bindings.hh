@@ -20,6 +20,9 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef HAVE_BINDINGS_H
 #define HAVE_BINDINGS_H
 
+#include <stdint.h>             // for int32_t
+#include <stdio.h>              // for size_t
+
 /* A number of binding functions that bind a particular C function
    template to LUX and allow corresponding C functions to be quickly
    mapped to corresponding LUX function/subroutines

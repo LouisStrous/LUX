@@ -198,7 +198,7 @@ int32_t lux_iauCal2jd(int32_t narg, int32_t ps[])
 {
   double djm0, djm;
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>L3*;r>L-3*", &ptrs, &infos)) < 0)
@@ -262,7 +262,7 @@ REGISTER(iauCal2jd, f, CAL2JD, 1, 1, NULL);
 int32_t lux_iauDat(int32_t narg, int32_t ps[])
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if (internalMode & 1) {       /* /VALID */
@@ -406,7 +406,7 @@ BIND(iauEpb, d_dd_iLarDq_0z_1, f, EPB, 1, 1, NULL)
 int32_t lux_iauEpb2jd(int32_t narg, int32_t ps[])
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;rD&", &ptrs, &infos)) < 0)
@@ -433,7 +433,7 @@ BIND(iauEpj, d_dd_iLarDq_0z_1, f, EPJ, 1, 1, NULL)
 int32_t lux_iauEpj2jd(int32_t narg, int32_t ps[])
 {
   pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;rD*", &ptrs, &infos)) < 0)

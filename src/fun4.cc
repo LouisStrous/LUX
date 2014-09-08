@@ -1854,7 +1854,7 @@ int32_t lux_compress(int32_t narg, int32_t ps[])
   pointer	src, trgt;
   char	allAxes;
   Scalar	sum;
-  loopInfo	srcinfo, trgtinfo, tmpinfo;
+  LoopInfo	srcinfo, trgtinfo, tmpinfo;
   int32_t	lux_indgen(int32_t, int32_t []);
 
   if (symbol_class(ps[0]) != LUX_ARRAY)

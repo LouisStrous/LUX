@@ -44,7 +44,7 @@ int32_t lux_inserter(int32_t narg, int32_t ps[])
    INSERT,t,s,n is equivalent to t(n) = s, with <t> and <s> regarded as
    1D arrays.   LS 10nov92 16sep98 22mar99 */
 {
-  loopInfo	trgtinfo;
+  LoopInfo	trgtinfo;
   pointer	src, trgt;
   int32_t	*dims, ndim, i, offset[2*MAX_DIMS], doff, daxes, nelem;
 
@@ -492,7 +492,7 @@ int32_t lux_reverse(int32_t narg, int32_t ps[])
  set those values to zero if /ZERO is specified, or leave the original
  elements intact otherwise.  LS 11jan99 */
 {
-  loopInfo	srcinfo, trgtinfo;
+  LoopInfo	srcinfo, trgtinfo;
   pointer	src, trgt, src2, trgt2, center;
   Scalar	value;
   int32_t	result, stride, i, iq, w, n, inplace;
@@ -3163,7 +3163,7 @@ int32_t extractNumerical(pointer src, pointer trgt, Symboltype type,
                          int32_t ndim, int32_t *dims, int32_t *coords,
                          int32_t nAxes, int32_t *axes)
 {
-  loopInfo	info;
+  LoopInfo	info;
 
   setupDimensionLoop(&info, ndim, dims, type, nAxes, axes, &src,
 		     SL_EACHCOORD);
@@ -3190,7 +3190,7 @@ int32_t lux_roll(int32_t narg, int32_t ps[])
 /* DIMEN(ROLL(array,target)).  LS 12sep2000 */
 {
   int32_t	nd, result, temp, iq, i;
-  loopInfo	srcinfo, trgtinfo;
+  LoopInfo	srcinfo, trgtinfo;
   pointer	src, trgt;
 
   if (!symbolIsNumericalArray(ps[0]))

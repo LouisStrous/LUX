@@ -25,6 +25,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "error.hh"
 #include "dmalloc.hh"
 #include "bindings.hh"
+#include "axis.hh"
 
 extern char		expname[], line[], *curScrat;
 extern char const* currentRoutineName;
@@ -90,31 +91,31 @@ int32_t approximately_equal_z(doubleComplex, doubleComplex, double),
   essentially_equal_z(doubleComplex, doubleComplex, double),
   essentially_equal_z_f(floatComplex, floatComplex, float);
 
-int32_t	standardLoop(int32_t, int32_t, int32_t, Symboltype, loopInfo *,
-                     pointer *, int32_t *, loopInfo *, pointer *),
-  standardLoopX(int32_t, int32_t, int32_t, loopInfo *, pointer *, int32_t,
+int32_t	standardLoop(int32_t, int32_t, int32_t, Symboltype, LoopInfo *,
+                     pointer *, int32_t *, LoopInfo *, pointer *),
+  standardLoopX(int32_t, int32_t, int32_t, LoopInfo *, pointer *, int32_t,
                 int32_t const*, int32_t, int32_t const*, Symboltype, int32_t,
-                int32_t*, loopInfo*, pointer*),
+                int32_t*, LoopInfo*, pointer*),
   standardLoop0(int32_t, int32_t, int32_t *, int32_t, Symboltype,
-                loopInfo *, pointer *, int32_t *, loopInfo *, pointer *),
-  advanceLoop(loopInfo *, pointer *),
-  nextLoop(loopInfo *),
-  nextLoops(loopInfo *, loopInfo *),
-  prepareDiagonals(int32_t, loopInfo *, int32_t, int32_t **, int32_t **, int32_t **, int32_t **),
-  moveLoop(loopInfo *, int32_t, int32_t),
-  standardLoopX(int32_t, int32_t, int32_t, loopInfo *, pointer *, int32_t, int32_t const *,
-                int32_t, int32_t const *, Symboltype, int32_t, int32_t *, loopInfo *,
+                LoopInfo *, pointer *, int32_t *, LoopInfo *, pointer *),
+  advanceLoop(LoopInfo *, pointer *),
+  nextLoop(LoopInfo *),
+  nextLoops(LoopInfo *, LoopInfo *),
+  prepareDiagonals(int32_t, LoopInfo *, int32_t, int32_t **, int32_t **, int32_t **, int32_t **),
+  moveLoop(LoopInfo *, int32_t, int32_t),
+  standardLoopX(int32_t, int32_t, int32_t, LoopInfo *, pointer *, int32_t, int32_t const *,
+                int32_t, int32_t const *, Symboltype, int32_t, int32_t *, LoopInfo *,
                 pointer *),
-  loopIsAtStart(loopInfo const *), setAxes(loopInfo *, int32_t, int32_t *, int32_t),
-  standard_args(int32_t, int32_t [], char const *, pointer **, loopInfo **);
+  loopIsAtStart(LoopInfo const *), setAxes(LoopInfo *, int32_t, int32_t *, int32_t),
+  standard_args(int32_t, int32_t [], char const *, pointer **, LoopInfo **);
 
-void	subdataLoop(int32_t *, loopInfo *), addVerify(char *, char),
+void	subdataLoop(int32_t *, LoopInfo *), addVerify(char *, char),
   *seekFacts(int32_t symbol, int32_t type, int32_t flag),
   *setFacts(int32_t symbol, int32_t type, int32_t flag),
-  deleteFacts(int32_t symbol, int32_t type), returnLoop(loopInfo *, pointer *, int32_t),
-  setAxisMode(loopInfo *, int32_t mode),
+  deleteFacts(int32_t symbol, int32_t type), returnLoop(LoopInfo *, pointer *, int32_t),
+  setAxisMode(LoopInfo *, int32_t mode),
   standard_redef_array(int32_t, Symboltype, int32_t, int32_t *, int32_t, int32_t *, pointer *,
-		       loopInfo *);
+		       LoopInfo *);
 void convertWidePointer(wideScalar *, int32_t, int32_t);
 
 void	newStack(int32_t), push(int32_t), deleteStack(void);
@@ -140,11 +141,11 @@ void	clearToPopTempVariable(int32_t), pushTempVariable(int32_t), printw(char con
 
 const csplineInfo empty_cubic_spline(void);
 
-void setupDimensionLoop(loopInfo *info, int32_t ndim, int32_t const *dims, 
+void setupDimensionLoop(LoopInfo *info, int32_t ndim, int32_t const *dims, 
                         Symboltype type, int32_t naxes, int32_t const *axes,
                         pointer *data, int32_t mode),
-  rearrangeDimensionLoop(loopInfo *), endian(void *, int32_t, int32_t),
-  rearrangeEdgeLoop(loopInfo *, loopInfo *, int32_t);
+  rearrangeDimensionLoop(LoopInfo *), endian(void *, int32_t, int32_t),
+  rearrangeEdgeLoop(LoopInfo *, LoopInfo *, int32_t);
 
 float	float_arg(int32_t);
 double	double_arg(int32_t), cspline_value(double, csplineInfo *),

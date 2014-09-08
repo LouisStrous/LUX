@@ -17,8 +17,8 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef HAVE_AXIS_H
-#define HAVE_AXIS_H
+#ifndef HAVE_AXIS_H_
+#define HAVE_AXIS_H_
 
 enum dim_spec_type { DS_NONE = 0, DS_ACCEPT = (1<<0), DS_ADD = (1<<1),
                      DS_REMOVE = (1<<2), DS_ADD_REMOVE = (DS_ADD | DS_REMOVE),
@@ -51,6 +51,49 @@ struct param_spec_list {
   size_t num_param_specs;
   struct param_spec *param_specs;
   int32_t return_param_index;
+};
+
+/// A class representing axis loop information.
+class LoopInfo
+{
+public:
+  /// A pointer to a ::pointer to the current data element.  For
+  /// example, if the data type is LUX_DOUBLE, then the current
+  /// data element is at \code{*data->d}.  Gets updated as appropriate
+  /// when the axes are traversed.
+  pointer *data;
+
+  /// The start of the data.  Remains constant when the axes are
+  /// traversed.
+  void *data0;
+
+  /// The current (rearranged) coordinates, taking into account which
+  /// axes are traversed (and in what order), and taking into account
+  /// axis compression, if any.  \code{coords[i]} indicates the
+  /// position along axis \code{axes[i]} (for \c i < \c naxes).
+  int32_t coords[MAX_DIMS];
+
+  /// The step size (elements) per original dimension.  You have to
+  /// move the \c data pointer forward by \code{coords[i]} elements
+  /// when original dimension \c i increases by 1.
+  int32_t singlestep[MAX_DIMS];
+
+  int32_t step[MAX_DIMS];           //< combined step size for loop transfer
+  int32_t dims[MAX_DIMS];           //< original dimensions
+  int32_t nelem;                    //< number of elements
+  int32_t ndim;                     //< number of original dimensions
+  int32_t axes[MAX_DIMS];           //< selected axes
+  int32_t naxes;                    //< selected number of axes
+  int32_t rdims[MAX_DIMS];          //< compressed rearranged dimensions
+  int32_t rndim;                    //< number of compressed rearranged dims
+  int32_t rsinglestep[MAX_DIMS];    //< step size per rearranged coordinate
+  int32_t axisindex;                //< index to current axis (in axes[])
+  int32_t mode;                     //< desired treatment modes
+  int32_t stride;                   //< bytes per data element
+  Symboltype type;                  //< data type
+  int32_t advanceaxis;              //< how many axes not to advance (from start)
+  int32_t raxes[MAX_DIMS];          //< from rearranged to old axes
+  int32_t iraxes[MAX_DIMS];         //< from old to rearranged axes
 };
 
 #endif

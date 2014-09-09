@@ -1011,19 +1011,19 @@ int32_t lux_calendar(int32_t narg, int32_t ps[])
        elements.  We shift the excess to the second dimension. */
     int32_t dims[MAX_DIMS];
 
-    assert(srcinfo.dims_[0] % input_elem_per_date == 0);
-    memcpy(dims, srcinfo.dims_, srcinfo.ndim_*sizeof(*dims));
+    assert(srcinfo.get_dimension(0) % input_elem_per_date == 0);
+    srcinfo.copy_dimensions_to(dims, srcinfo.ndim_);
     if (srcinfo.ndim_ == 1) {    /* there is only one dimension */
       dims[1] = 1;              /* add a 2nd dimension */
       srcinfo.ndim_ = 2;
     }
-    int32_t d = srcinfo.dims_[0]/input_elem_per_date;
+    int32_t d = srcinfo.get_dimension(0)/input_elem_per_date;
     dims[1] *= d;
     dims[0] /= d;
-    setupDimensionLoop(&srcinfo, srcinfo.ndim_, dims, srcinfo.type_,
-                       srcinfo.naxes_, srcinfo.axes_, srcinfo.data_,
-                       srcinfo.mode_);
-  }    
+    srcinfo.setup_dimension_loop(srcinfo.ndim_, dims, srcinfo.type_,
+                                 srcinfo.naxes_, srcinfo.axes_,
+                                 srcinfo.data_, srcinfo.mode_);
+  }
 
   /* complain if the desired type of translation is not available.  We
      don't need to check for numerical types, because we demand that
@@ -2346,7 +2346,7 @@ int32_t lux_precess(int32_t narg, int32_t ps[])
     zap(result);
     return cerror(NEED_ARR, ps[0]);
   }
-  if (srcinfo.dims_[0] < 2) {
+  if (srcinfo.get_dimension(0) < 2) {
     zap(result);
     return luxerror("Need at least 2 elements in the first dimension", ps[0]);
   }
@@ -2503,7 +2503,7 @@ int32_t lux_constellation(int32_t narg, int32_t ps[])
     zap(result);
     return cerror(NEED_ARR, ps[0]);
   }
-  if (srcinfo.dims_[0] < 2) {
+  if (srcinfo.get_dimension(0) < 2) {
     zap(result);
     return luxerror("Need at least 2 elements in the first dimension", ps[0]);
   }
@@ -3936,7 +3936,7 @@ int32_t lux_astrf(int32_t narg, int32_t ps[]) {
 		   LUX_FLOAT, &srcinfo, &src, &result, &tgtinfo, &tgt)
       == LUX_ERROR)
     return LUX_ERROR;
-  if (srcinfo.ndim_ < 1 || srcinfo.dims_[0] < 2)
+  if (srcinfo.ndim_ < 1 || srcinfo.get_dimension(0) < 2)
     return luxerror("Need at least two elements in first dimension", -1);
   if (narg > 1) {
     equinox = double_arg(ps[1]);

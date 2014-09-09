@@ -2059,7 +2059,7 @@ int32_t redef_string(int32_t nsym, int32_t len)
  return 1;
 }
 /*-----------------------------------------------------*/
-int32_t redef_array(int32_t nsym, Symboltype ntype, int32_t ndim, int32_t *dims)
+int32_t redef_array(int32_t nsym, Symboltype ntype, int32_t ndim, int32_t const* dims)
 /* redefines symbol nsym to be an array of the given type, number of
   dimensions, and dimensions; or a scalar if <ndim> == 0 */
 {                                /*redefine a symbol i to an array */

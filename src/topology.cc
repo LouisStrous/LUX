@@ -48,8 +48,8 @@ int32_t segment_2d(int32_t narg, int32_t ps[])
 
   sign = (narg > 1 && ps[1])? int_arg(ps[1]): 1;
 
-  nx = srcinfo.dims_[0];
-  ny = srcinfo.dims_[1];
+  nx = srcinfo.get_dimension(0);
+  ny = srcinfo.get_dimension(1);
 
   /* top row: always zero */
   zerobytes(trgt.l, nx*sizeof(int32_t));
@@ -309,7 +309,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
   /* set the edges to zero */
   for (i = 0; i < 2*srcinfo.ndim_; i++) {
     if (edge[i]) {
-      rearrangeEdgeLoop(&trgtinfo, NULL, i);
+      trgtinfo.rearrange_edge_loop(i);
       do
 	*trgt.l = 0;
       while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.ndim_ - 1);
@@ -318,7 +318,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
 
   /* set up the range of coordinates that is to be checked */
   for (i = 0; i < srcinfo.ndim_; i++)
-    edge[2*i + 1] = srcinfo.dims_[i] - 1 - edge[2*i + 1];
+    edge[2*i + 1] = srcinfo.get_dimension(i) - 1 - edge[2*i + 1];
   subdataLoop(edge, &srcinfo);
   subdataLoop(edge, &trgtinfo);
 
@@ -586,8 +586,8 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
 
   sign = (narg > 1 && ps[2])? int_arg(ps[2]): 1;
 
-  nx = srcinfo.dims_[0];
-  ny = srcinfo.dims_[1];
+  nx = srcinfo.get_dimension(0);
+  ny = srcinfo.get_dimension(1);
   off[0] = nx + 1;
   off[1] = 1;
   off[2] = nx - 1;
@@ -880,8 +880,8 @@ int32_t lux_max_dir(int32_t narg, int32_t ps[])
 
   sign = (narg > 1 && ps[2])? int_arg(ps[2]): 1;
 
-  nx = srcinfo.dims_[0];
-  ny = srcinfo.dims_[1];
+  nx = srcinfo.get_dimension(0);
+  ny = srcinfo.get_dimension(1);
   off[0] = nx + 1;
   off[1] = 1;
   off[2] = nx - 1;
@@ -1448,7 +1448,7 @@ int32_t area_general(int32_t narg, int32_t ps[], int32_t isFunction)
      set them to EDGE */
   for (i = 0; i < 2*srcinfo.ndim_; i++) {
     if (edge[i]) {
-      rearrangeEdgeLoop(&srcinfo, NULL, i);
+      srcinfo.rearrange_edge_loop(i);
       do
 	if (*src.l == 1)
 	  *src.l = EDGE;
@@ -1457,7 +1457,7 @@ int32_t area_general(int32_t narg, int32_t ps[], int32_t isFunction)
   }
   free(edge);
 
-  rearrangeDimensionLoop(&srcinfo);
+  srcinfo.rearrange_dimension_loop();
 
   /* get space for temporary positions.  estimate how much is needed. */
   /* if this is too little, then more will be allocated on the fly. */
@@ -1538,8 +1538,8 @@ int32_t area_general(int32_t narg, int32_t ps[], int32_t isFunction)
 				   we need the coordinates for edge testing */
 	ix = ptr - ptr0;	/* index */
 	for (i = 0; i < ndim; i++) {
-	  srcinfo.coords_[i] = ix % srcinfo.dims_[i];
-	  ix /= srcinfo.dims_[i];
+	  srcinfo.coords_[i] = ix % srcinfo.get_dimension(i);
+	  ix /= srcinfo.get_dimension(i);
 	} /* end of for (i = 0,...) */
 	for (direction = 0; direction < nDirection; direction++) {
 	  /* now we must check if the neighbor is across an edge */
@@ -2101,7 +2101,7 @@ int32_t area2_general(int32_t narg, int32_t ps[])
       dimension
  LS 17jun98, 5sep98 */
 {
-  int32_t	iq, *dims, ndim, nelem, nSeed, nNumber, nDirection, *seed, *number,
+  int32_t	iq, ndim, nelem, nSeed, nNumber, nDirection, *seed, *number,
     i, *rcoord, *offset, j, nStack, **stack, **stack0, areaNumber,
     direction, stride, maximum, type, *edge;
   int32_t	*ptr0, *ptr, *ptrend, **stackend, *ptr1, onEdge, ix, ix2, *ptr2;
@@ -2167,7 +2167,7 @@ int32_t area2_general(int32_t narg, int32_t ps[])
 
   /* we mark all data to be treated that is on an edge */
   for (i = 0; i < 2*srcinfo.rndim_; i++) {
-    rearrangeEdgeLoop(&srcinfo, NULL, i);
+    srcinfo.rearrange_edge_loop(i);
     do {
       if (*src.l == 1)
 	*src.l = EDGE;
@@ -2175,7 +2175,7 @@ int32_t area2_general(int32_t narg, int32_t ps[])
   }
   free(edge);
 
-  rearrangeDimensionLoop(&srcinfo);
+  srcinfo.rearrange_dimension_loop();
 
   /* prepare a stack */
   nStack = STACKBLOCK;
@@ -2199,7 +2199,6 @@ int32_t area2_general(int32_t narg, int32_t ps[])
   stackend = stack0 + nStack;
 
   ndim = srcinfo.rndim_;
-  dims = srcinfo.dims_;
 
   ptr1 = ptr0;
   do {				/* still more to do */
@@ -2251,8 +2250,8 @@ int32_t area2_general(int32_t narg, int32_t ps[])
 	/* now we must check if the neighbor is across an edge */
 	ix = ptr - ptr0;	/* index */
 	for (i = 0; i < ndim; i++) {
-	  srcinfo.coords_[i] = ix % srcinfo.dims_[i];
-	  ix /= srcinfo.dims_[i];
+	  srcinfo.coords_[i] = ix % srcinfo.get_dimension(i);
+	  ix /= srcinfo.get_dimension(i);
 	}
       }
 
@@ -2263,7 +2262,7 @@ int32_t area2_general(int32_t narg, int32_t ps[])
 	if (*ptr == EDGE) {
 	  for (i = 0; i < ndim; i++) {
 	    ix2 = srcinfo.coords_[i] + rcoord[i + direction*ndim];
-	    if (ix2 < 0 || ix2 >= dims[i])
+	    if (ix2 < 0 || ix2 >= srcinfo.get_dimension(i))
 	      /* across the edge: continue with next direction */
 	      continue;
 	  }
@@ -2362,8 +2361,8 @@ int32_t area2_general(int32_t narg, int32_t ps[])
 				   we need the coordinates for edge testing */
       ix = ptr - ptr0;		/* index */
       for (i = 0; i < ndim; i++) {
-	srcinfo.coords_[i] = ix % srcinfo.dims_[i];
-	ix /= srcinfo.dims_[i];
+	srcinfo.coords_[i] = ix % srcinfo.get_dimension(i);
+	ix /= srcinfo.get_dimension(i);
       }
     }
 
@@ -2373,7 +2372,7 @@ int32_t area2_general(int32_t narg, int32_t ps[])
 	  /* now we must check if the neighbor is across an edge */
 	  for (i = 0; i < ndim; i++) {
 	    ix2 = srcinfo.coords_[i] + rcoord[i + direction*ndim];
-	    if (ix2 < 0 || ix2 >= dims[i]) /* over the egde */
+	    if (ix2 < 0 || ix2 >= srcinfo.get_dimension(i)) /* over the egde */
 	      continue;
 	  }
 
@@ -2845,7 +2844,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	  edge = 0;
 	  for (i = 1; i < srcinfo.ndim_; i++)
 	    if (!srcinfo.coords_[i]
-		|| srcinfo.coords_[i] == srcinfo.dims_[i] - 1) {
+		|| srcinfo.coords_[i] == srcinfo.get_dimension(i) - 1) {
 	      edge = 1;
 	      break;
 	    }
@@ -2854,7 +2853,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
 		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims_[j + 1])
+		if (k < 0 || k == srcinfo.get_dimension(j + 1))
 		  break;
 	      }
 	      if (j == srcinfo.ndim_ - 1) {	/* not across any other edge */
@@ -2894,7 +2893,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	  mini++;
 	}
 
-	if (srcinfo.coords_[0] == srcinfo.dims_[0] - 1) { /* at right edge */
+	if (srcinfo.coords_[0] == srcinfo.get_dimension(0) - 1) { /* at right edge */
 	  if (mini == 3) {
 	    if (min[1].b < min[2].b)
 	      mini = 1;
@@ -2907,7 +2906,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
 		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims_[j + 1])
+		if (k < 0 || k == srcinfo.get_dimension(j + 1))
 		  break;
 	      }
 	      if (j == srcinfo.ndim_ - 1) {	/* not across any edge */
@@ -2960,7 +2959,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	  edge = 0;
 	  for (i = 1; i < srcinfo.ndim_; i++)
 	    if (!srcinfo.coords_[i]
-		|| srcinfo.coords_[i] == srcinfo.dims_[i] - 1) {
+		|| srcinfo.coords_[i] == srcinfo.get_dimension(i) - 1) {
 	      edge = 1;
 	      break;
 	    }
@@ -2969,7 +2968,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
 		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims_[j + 1])
+		if (k < 0 || k == srcinfo.get_dimension(j + 1))
 		  break;
 	      }
 	      if (j == srcinfo.ndim_ - 1) {	/* not across any other edge */
@@ -3009,7 +3008,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	  mini++;
 	}
 	
-	if (srcinfo.coords_[0] == srcinfo.dims_[0] - 1) { /* at right edge */
+	if (srcinfo.coords_[0] == srcinfo.get_dimension(0) - 1) { /* at right edge */
 	  if (mini == 3) {
 	    if (min[1].w < min[2].w)
 	      mini = 1;
@@ -3022,7 +3021,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
 		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims_[j + 1])
+		if (k < 0 || k == srcinfo.get_dimension(j + 1))
 		  break;
 	      }
 	      if (j == srcinfo.ndim_ - 1) {	/* not across any edge */
@@ -3075,7 +3074,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	  edge = 0;
 	  for (i = 1; i < srcinfo.ndim_; i++)
 	    if (!srcinfo.coords_[i]
-		|| srcinfo.coords_[i] == srcinfo.dims_[i] - 1) {
+		|| srcinfo.coords_[i] == srcinfo.get_dimension(i) - 1) {
 	      edge = 1;
 	      break;
 	    }
@@ -3084,7 +3083,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
 		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims_[j + 1])
+		if (k < 0 || k == srcinfo.get_dimension(j + 1))
 		  break;
 	      }
 	      if (j == srcinfo.ndim_ - 1) {	/* not across any other edge */
@@ -3124,7 +3123,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	  mini++;
 	}
 	
-	if (srcinfo.coords_[0] == srcinfo.dims_[0] - 1) { /* at right edge */
+	if (srcinfo.coords_[0] == srcinfo.get_dimension(0) - 1) { /* at right edge */
 	  if (mini == 3) {
 	    if (min[1].l < min[2].l)
 	      mini = 1;
@@ -3137,7 +3136,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
 		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims_[j + 1])
+		if (k < 0 || k == srcinfo.get_dimension(j + 1))
 		  break;
 	      }
 	      if (j == srcinfo.ndim_ - 1) {	/* not across any edge */
@@ -3190,7 +3189,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	  edge = 0;
 	  for (i = 1; i < srcinfo.ndim_; i++)
 	    if (!srcinfo.coords_[i]
-		|| srcinfo.coords_[i] == srcinfo.dims_[i] - 1) {
+		|| srcinfo.coords_[i] == srcinfo.get_dimension(i) - 1) {
 	      edge = 1;
 	      break;
 	    }
@@ -3199,7 +3198,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
 		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims_[j + 1])
+		if (k < 0 || k == srcinfo.get_dimension(j + 1))
 		  break;
 	      }
 	      if (j == srcinfo.ndim_ - 1) {	/* not across any other edge */
@@ -3239,7 +3238,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	  mini++;
 	}
 
-	if (srcinfo.coords_[0] == srcinfo.dims_[0] - 1) { /* at right edge */
+	if (srcinfo.coords_[0] == srcinfo.get_dimension(0) - 1) { /* at right edge */
 	  if (mini == 3) {
 	    if (min[1].q < min[2].q)
 	      mini = 1;
@@ -3252,7 +3251,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
 		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims_[j + 1])
+		if (k < 0 || k == srcinfo.get_dimension(j + 1))
 		  break;
 	      }
 	      if (j == srcinfo.ndim_ - 1) {	/* not across any edge */
@@ -3305,7 +3304,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	  edge = 0;
 	  for (i = 1; i < srcinfo.ndim_; i++)
 	    if (!srcinfo.coords_[i]
-		|| srcinfo.coords_[i] == srcinfo.dims_[i] - 1) {
+		|| srcinfo.coords_[i] == srcinfo.get_dimension(i) - 1) {
 	      edge = 1;
 	      break;
 	    }
@@ -3314,7 +3313,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
 		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims_[j + 1])
+		if (k < 0 || k == srcinfo.get_dimension(j + 1))
 		  break;
 	      }
 	      if (j == srcinfo.ndim_ - 1) {	/* not across any other edge */
@@ -3354,7 +3353,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	  mini++;
 	}
 
-	if (srcinfo.coords_[0] == srcinfo.dims_[0] - 1) { /* at right edge */
+	if (srcinfo.coords_[0] == srcinfo.get_dimension(0) - 1) { /* at right edge */
 	  if (mini == 3) {
 	    if (min[1].f < min[2].f)
 	      mini = 1;
@@ -3367,7 +3366,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
 		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims_[j + 1])
+		if (k < 0 || k == srcinfo.get_dimension(j + 1))
 		  break;
 	      }
 	      if (j == srcinfo.ndim_ - 1) {	/* not across any edge */
@@ -3420,7 +3419,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	  edge = 0;
 	  for (i = 1; i < srcinfo.ndim_; i++)
 	    if (!srcinfo.coords_[i]
-		|| srcinfo.coords_[i] == srcinfo.dims_[i] - 1) {
+		|| srcinfo.coords_[i] == srcinfo.get_dimension(i) - 1) {
 	      edge = 1;
 	      break;
 	    }
@@ -3429,7 +3428,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
 		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims_[j + 1])
+		if (k < 0 || k == srcinfo.get_dimension(j + 1))
 		  break;
 	      }
 	      if (j == srcinfo.ndim_ - 1) {	/* not across any other edge */
@@ -3469,7 +3468,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	  mini++;
 	}
 	
-	if (srcinfo.coords_[0] == srcinfo.dims_[0] - 1) { /* at right edge */
+	if (srcinfo.coords_[0] == srcinfo.get_dimension(0) - 1) { /* at right edge */
 	  if (mini == 3) {
 	    if (min[1].d < min[2].d)
 	      mini = 1;
@@ -3482,7 +3481,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
 		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims_[j + 1])
+		if (k < 0 || k == srcinfo.get_dimension(j + 1))
 		  break;
 	      }
 	      if (j == srcinfo.ndim_ - 1) {	/* not across any edge */
@@ -3536,7 +3535,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	  edge = 0;
 	  for (i = 1; i < srcinfo.ndim_; i++)
 	    if (!srcinfo.coords_[i]
-		|| srcinfo.coords_[i] == srcinfo.dims_[i] - 1) {
+		|| srcinfo.coords_[i] == srcinfo.get_dimension(i) - 1) {
 	      edge = 1;
 	      break;
 	    }
@@ -3545,7 +3544,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
 		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims_[j + 1])
+		if (k < 0 || k == srcinfo.get_dimension(j + 1))
 		  break;
 	      }
 	      if (j == srcinfo.ndim_ - 1) {	/* not across any other edge */
@@ -3585,7 +3584,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	  maxi++;
 	}
 	
-	if (srcinfo.coords_[0] == srcinfo.dims_[0] - 1) { /* at right edge */
+	if (srcinfo.coords_[0] == srcinfo.get_dimension(0) - 1) { /* at right edge */
 	  if (maxi == 3) {
 	    if (max[1].b > max[2].b)
 	      maxi = 1;
@@ -3598,7 +3597,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
 		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims_[j + 1])
+		if (k < 0 || k == srcinfo.get_dimension(j + 1))
 		  break;
 	      }
 	      if (j == srcinfo.ndim_ - 1) {	/* not across any edge */
@@ -3651,7 +3650,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	  edge = 0;
 	  for (i = 1; i < srcinfo.ndim_; i++)
 	    if (!srcinfo.coords_[i]
-		|| srcinfo.coords_[i] == srcinfo.dims_[i] - 1) {
+		|| srcinfo.coords_[i] == srcinfo.get_dimension(i) - 1) {
 	      edge = 1;
 	      break;
 	    }
@@ -3660,7 +3659,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
 		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims_[j + 1])
+		if (k < 0 || k == srcinfo.get_dimension(j + 1))
 		  break;
 	      }
 	      if (j == srcinfo.ndim_ - 1) {	/* not across any other edge */
@@ -3700,7 +3699,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	  maxi++;
 	}
 	
-	if (srcinfo.coords_[0] == srcinfo.dims_[0] - 1) { /* at right edge */
+	if (srcinfo.coords_[0] == srcinfo.get_dimension(0) - 1) { /* at right edge */
 	  if (maxi == 3) {
 	    if (max[1].w > max[2].w)
 	      maxi = 1;
@@ -3713,7 +3712,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
 		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims_[j + 1])
+		if (k < 0 || k == srcinfo.get_dimension(j + 1))
 		  break;
 	      }
 	      if (j == srcinfo.ndim_ - 1) {	/* not across any edge */
@@ -3766,7 +3765,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	  edge = 0;
 	  for (i = 1; i < srcinfo.ndim_; i++)
 	    if (!srcinfo.coords_[i]
-		|| srcinfo.coords_[i] == srcinfo.dims_[i] - 1) {
+		|| srcinfo.coords_[i] == srcinfo.get_dimension(i) - 1) {
 	      edge = 1;
 	      break;
 	    }
@@ -3775,7 +3774,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
 		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims_[j + 1])
+		if (k < 0 || k == srcinfo.get_dimension(j + 1))
 		  break;
 	      }
 	      if (j == srcinfo.ndim_ - 1) {	/* not across any other edge */
@@ -3815,7 +3814,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	  maxi++;
 	}
 	
-	if (srcinfo.coords_[0] == srcinfo.dims_[0] - 1) { /* at right edge */
+	if (srcinfo.coords_[0] == srcinfo.get_dimension(0) - 1) { /* at right edge */
 	  if (maxi == 3) {
 	    if (max[1].l > max[2].l)
 	      maxi = 1;
@@ -3828,7 +3827,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
 		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims_[j + 1])
+		if (k < 0 || k == srcinfo.get_dimension(j + 1))
 		  break;
 	      }
 	      if (j == srcinfo.ndim_ - 1) {	/* not across any edge */
@@ -3881,7 +3880,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	  edge = 0;
 	  for (i = 1; i < srcinfo.ndim_; i++)
 	    if (!srcinfo.coords_[i]
-		|| srcinfo.coords_[i] == srcinfo.dims_[i] - 1) {
+		|| srcinfo.coords_[i] == srcinfo.get_dimension(i) - 1) {
 	      edge = 1;
 	      break;
 	    }
@@ -3890,7 +3889,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
 		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims_[j + 1])
+		if (k < 0 || k == srcinfo.get_dimension(j + 1))
 		  break;
 	      }
 	      if (j == srcinfo.ndim_ - 1) {	/* not across any other edge */
@@ -3930,7 +3929,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	  maxi++;
 	}
 
-	if (srcinfo.coords_[0] == srcinfo.dims_[0] - 1) { /* at right edge */
+	if (srcinfo.coords_[0] == srcinfo.get_dimension(0) - 1) { /* at right edge */
 	  if (maxi == 3) {
 	    if (max[1].q > max[2].q)
 	      maxi = 1;
@@ -3943,7 +3942,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
 		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims_[j + 1])
+		if (k < 0 || k == srcinfo.get_dimension(j + 1))
 		  break;
 	      }
 	      if (j == srcinfo.ndim_ - 1) {	/* not across any edge */
@@ -3996,7 +3995,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	  edge = 0;
 	  for (i = 1; i < srcinfo.ndim_; i++)
 	    if (!srcinfo.coords_[i]
-		|| srcinfo.coords_[i] == srcinfo.dims_[i] - 1) {
+		|| srcinfo.coords_[i] == srcinfo.get_dimension(i) - 1) {
 	      edge = 1;
 	      break;
 	    }
@@ -4005,7 +4004,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
 		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims_[j + 1])
+		if (k < 0 || k == srcinfo.get_dimension(j + 1))
 		  break;
 	      }
 	      if (j == srcinfo.ndim_ - 1) {	/* not across any other edge */
@@ -4045,7 +4044,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	  maxi++;
 	}
 
-	if (srcinfo.coords_[0] == srcinfo.dims_[0] - 1) { /* at right edge */
+	if (srcinfo.coords_[0] == srcinfo.get_dimension(0) - 1) { /* at right edge */
 	  if (maxi == 3) {
 	    if (max[1].f > max[2].f)
 	      maxi = 1;
@@ -4058,7 +4057,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
 		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims_[j + 1])
+		if (k < 0 || k == srcinfo.get_dimension(j + 1))
 		  break;
 	      }
 	      if (j == srcinfo.ndim_ - 1) {	/* not across any edge */
@@ -4111,7 +4110,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	  edge = 0;
 	  for (i = 1; i < srcinfo.ndim_; i++)
 	    if (!srcinfo.coords_[i]
-		|| srcinfo.coords_[i] == srcinfo.dims_[i] - 1) {
+		|| srcinfo.coords_[i] == srcinfo.get_dimension(i) - 1) {
 	      edge = 1;
 	      break;
 	    }
@@ -4120,7 +4119,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
 		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims_[j + 1])
+		if (k < 0 || k == srcinfo.get_dimension(j + 1))
 		  break;
 	      }
 	      if (j == srcinfo.ndim_ - 1) {	/* not across any other edge */
@@ -4160,7 +4159,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	  maxi++;
 	}
 	
-	if (srcinfo.coords_[0] == srcinfo.dims_[0] - 1) { /* at right edge */
+	if (srcinfo.coords_[0] == srcinfo.get_dimension(0) - 1) { /* at right edge */
 	  if (maxi == 3) {
 	    if (max[1].d > max[2].d)
 	      maxi = 1;
@@ -4173,7 +4172,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 	      for (j = 0; j < srcinfo.ndim_ - 1; j++) {
 		/* check if across edge */
 		k = srcinfo.coords_[j + 1] + rcoords[(srcinfo.ndim_ - 1)*i + j];
-		if (k < 0 || k == srcinfo.dims_[j + 1])
+		if (k < 0 || k == srcinfo.get_dimension(j + 1))
 		  break;
 	      }
 	      if (j == srcinfo.ndim_ - 1) {	/* not across any edge */
@@ -4386,7 +4385,7 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
   }
 
   zerobytes(srcinfo.coords_, srcinfo.ndim_*sizeof(int32_t));
-  nElem = srcinfo.dims_[0];
+  nElem = srcinfo.get_dimension(0);
 
   if (!diagonal || diagonal[0]) {
     i1 = 1;
@@ -4403,7 +4402,7 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 	do {
 	  for (edge = srcinfo.ndim_ - 1; edge; edge--)
 	    if (!srcinfo.coords_[edge]
-		|| srcinfo.coords_[edge] == srcinfo.dims_[edge] - 1)
+		|| srcinfo.coords_[edge] == srcinfo.get_dimension(edge) - 1)
 	      break;		/* at edge */
 	  if (edge) {
 	    zerobytes(trgt.b, nElem);
@@ -4433,7 +4432,7 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 	do {
 	  for (edge = srcinfo.ndim_ - 1; edge; edge--)
 	    if (!srcinfo.coords_[edge]
-		|| srcinfo.coords_[edge] == srcinfo.dims_[edge] - 1)
+		|| srcinfo.coords_[edge] == srcinfo.get_dimension(edge) - 1)
 	      break;		/* at edge */
 	  if (edge) {
 	    zerobytes(trgt.b, nElem);
@@ -4463,7 +4462,7 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 	do {
 	  for (edge = srcinfo.ndim_ - 1; edge; edge--)
 	    if (!srcinfo.coords_[edge]
-		|| srcinfo.coords_[edge] == srcinfo.dims_[edge] - 1)
+		|| srcinfo.coords_[edge] == srcinfo.get_dimension(edge) - 1)
 	      break;		/* at edge */
 	  if (edge) {
 	    zerobytes(trgt.b, nElem);
@@ -4493,7 +4492,7 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 	do {
 	  for (edge = srcinfo.ndim_ - 1; edge; edge--)
 	    if (!srcinfo.coords_[edge]
-		|| srcinfo.coords_[edge] == srcinfo.dims_[edge] - 1)
+		|| srcinfo.coords_[edge] == srcinfo.get_dimension(edge) - 1)
 	      break;		/* at edge */
 	  if (edge) {
 	    zerobytes(trgt.b, nElem);
@@ -4523,7 +4522,7 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 	do {
 	  for (edge = srcinfo.ndim_ - 1; edge; edge--)
 	    if (!srcinfo.coords_[edge]
-		|| srcinfo.coords_[edge] == srcinfo.dims_[edge] - 1)
+		|| srcinfo.coords_[edge] == srcinfo.get_dimension(edge) - 1)
 	      break;		/* at edge */
 	  if (edge) {
 	    zerobytes(trgt.b, nElem);
@@ -4553,7 +4552,7 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 	do {
 	  for (edge = srcinfo.ndim_ - 1; edge; edge--)
 	    if (!srcinfo.coords_[edge]
-		|| srcinfo.coords_[edge] == srcinfo.dims_[edge] - 1)
+		|| srcinfo.coords_[edge] == srcinfo.get_dimension(edge) - 1)
 	      break;		/* at edge */
 	  if (edge) {
 	    zerobytes(trgt.b, nElem);
@@ -4586,7 +4585,7 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 	    for (edge = srcinfo.ndim_ - 1; edge; edge--)
 	      if ((!diagonal || diagonal[edge])
 		  && (!srcinfo.coords_[edge]
-		      || srcinfo.coords_[edge] == srcinfo.dims_[edge] - 1))
+		      || srcinfo.coords_[edge] == srcinfo.get_dimension(edge) - 1))
 		break;		/* at edge */
 	    if (edge) {
 	      zerobytes(trgt.b, nElem);
@@ -4624,7 +4623,7 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 	    for (edge = srcinfo.ndim_ - 1; edge; edge--)
 	      if ((!diagonal || diagonal[edge])
 		  && (!srcinfo.coords_[edge]
-		      || srcinfo.coords_[edge] == srcinfo.dims_[edge] - 1))
+		      || srcinfo.coords_[edge] == srcinfo.get_dimension(edge) - 1))
 		break;		/* at edge */
 	    if (edge) {
 	      zerobytes(trgt.b, nElem);
@@ -4662,7 +4661,7 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 	    for (edge = srcinfo.ndim_ - 1; edge; edge--)
 	      if ((!diagonal || diagonal[edge])
 		  && (!srcinfo.coords_[edge]
-		      || srcinfo.coords_[edge] == srcinfo.dims_[edge] - 1))
+		      || srcinfo.coords_[edge] == srcinfo.get_dimension(edge) - 1))
 		break;		/* at edge */
 	    if (edge) {
 	      zerobytes(trgt.b, nElem);
@@ -4700,7 +4699,7 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 	    for (edge = srcinfo.ndim_ - 1; edge; edge--)
 	      if ((!diagonal || diagonal[edge])
 		  && (!srcinfo.coords_[edge]
-		      || srcinfo.coords_[edge] == srcinfo.dims_[edge] - 1))
+		      || srcinfo.coords_[edge] == srcinfo.get_dimension(edge) - 1))
 		break;		/* at edge */
 	    if (edge) {
 	      zerobytes(trgt.b, nElem);
@@ -4738,7 +4737,7 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 	    for (edge = srcinfo.ndim_ - 1; edge; edge--)
 	      if ((!diagonal || diagonal[edge])
 		  && (!srcinfo.coords_[edge]
-		      || srcinfo.coords_[edge] == srcinfo.dims_[edge] - 1))
+		      || srcinfo.coords_[edge] == srcinfo.get_dimension(edge) - 1))
 		break;		/* at edge */
 	    if (edge) {
 	      zerobytes(trgt.b, nElem);
@@ -4776,7 +4775,7 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 	    for (edge = srcinfo.ndim_ - 1; edge; edge--)
 	      if ((!diagonal || diagonal[edge])
 		  && (!srcinfo.coords_[edge]
-		      || srcinfo.coords_[edge] == srcinfo.dims_[edge] - 1))
+		      || srcinfo.coords_[edge] == srcinfo.get_dimension(edge) - 1))
 		break;		/* at edge */
 	    if (edge) {
 	      zerobytes(trgt.b, nElem);

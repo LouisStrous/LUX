@@ -1708,6 +1708,7 @@ int32_t lux_v_sddsd_iDaD1rDq_012_f_(int32_t narg, int32_t ps[], void (*f)(double
   if ((iq = standard_args(narg, ps, "i>D*;iD1?;rD&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   double width = ptrs[1].d? ptrs[1].d[0]: 3;
-  f(&ptrs[0].d[0], infos[0].dims_[0], 1, width, &ptrs[2].d[0], infos[2].dims_[0], 1);
+  f(&ptrs[0].d[0], infos[0].get_dimension(0), 1, width, &ptrs[2].d[0],
+    infos[2].get_dimension(0), 1);
   return iq;
 }

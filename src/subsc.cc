@@ -77,7 +77,7 @@ int32_t lux_inserter(int32_t narg, int32_t ps[])
       if (symbolIsRealScalar(ps[i + 2])) {
 	offset[2*i] = int_arg(ps[i + 2]);
 	offset[2*i + 1] = offset[2*i] + dims[i] - 1;
-	if (offset[2*i] < 0 || offset[2*i + 1] >= trgtinfo.dims_[i])
+	if (offset[2*i] < 0 || offset[2*i + 1] >= trgtinfo.get_dimension(i))
 	  return luxerror("Source extends beyond target in dimension %d",
 		       ps[i + 2], i);
       } else
@@ -3165,8 +3165,8 @@ int32_t extractNumerical(pointer src, pointer trgt, Symboltype type,
 {
   LoopInfo	info;
 
-  setupDimensionLoop(&info, ndim, dims, type, nAxes, axes, &src,
-		     SL_EACHCOORD);
+  info.setup_dimension_loop(ndim, dims, type, nAxes, axes, &src,
+                            SL_EACHCOORD);
 
   subdataLoop(coords, &info);
 

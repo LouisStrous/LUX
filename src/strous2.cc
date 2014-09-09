@@ -615,7 +615,8 @@ int32_t lux_orderfilter(int32_t narg, int32_t ps[])
     tmpinfo2 = trgtinfo;
     tmpinfo2.data_ = &tmptrgt;
     tmptrgt = trgt;
-    rearrangeEdgeLoop(&tmpinfo, &tmpinfo2, i); /* get ready */
+    tmpinfo.rearrange_edge_loop(i); // get ready
+    tmpinfo2.rearrange_edge_loop(i);
     do
       memcpy(tmptrgt.b, tmpsrc.b, tmpinfo.stride_); /* copy */
     while (advanceLoop(&tmpinfo2, &tmptrgt),
@@ -626,8 +627,8 @@ int32_t lux_orderfilter(int32_t narg, int32_t ps[])
   for (i = 0; i < srcinfo.naxes_; i++)
     range[i] = width;
   tmpsrc = src;			/* just to be safe */
-  setupDimensionLoop(&tmpinfo, srcinfo.naxes_, range, LUX_INT32, srcinfo.naxes_,
-		     NULL, &tmpsrc, SL_EACHCOORD);
+  tmpinfo.setup_dimension_loop(srcinfo.naxes_, range, LUX_INT32,
+                               srcinfo.naxes_, NULL, &tmpsrc, SL_EACHCOORD);
 
   index = (int32_t*) malloc(nelem*sizeof(int32_t));
   offset = (int32_t*) malloc(nelem*sizeof(int32_t));
@@ -646,7 +647,7 @@ int32_t lux_orderfilter(int32_t narg, int32_t ps[])
      we start by specifying ranges comprising the whole data set */
   for (i = 0; i < srcinfo.ndim_; i++) {
     range[2*i] = 0;
-    range[2*i + 1] = srcinfo.dims_[i] - 1;
+    range[2*i + 1] = srcinfo.get_dimension(i) - 1;
   }
   /* and then we modify those specified in <axis> */
   for (i = 0; i < srcinfo.naxes_; i++) {
@@ -1448,7 +1449,7 @@ int32_t lux_distarr(int32_t narg, int32_t ps[])
   { for (i = 0; i < ndim; i++)
       onestretch[i] = 1.0;
     stretch = onestretch; }
-  
+
 				/* check output dimensions */
   for (i = 0; i < ndim; i++)
     if (dims[i] <= 0)
@@ -1457,8 +1458,8 @@ int32_t lux_distarr(int32_t narg, int32_t ps[])
   if (result == LUX_ERROR)	/* some error */
     return LUX_ERROR;
   trgt.f = (float *) array_data(result);
-  setupDimensionLoop(&trgtinfo, ndim, dims, LUX_FLOAT, ndim, NULL, &trgt,
-		     SL_EACHCOORD);
+  trgtinfo.setup_dimension_loop(ndim, dims, LUX_FLOAT, ndim, NULL, &trgt,
+                                SL_EACHCOORD);
   /* initialize walk through array */
   temptot = 0.0;
   for (i = 1; i < ndim; i++)
@@ -2052,12 +2053,12 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
   /* we exclude the selected edges */
   for (i = 0; i < srcinfo.ndim_; i++)
     if (edge[2*i + 1])
-      edge[2*i + 1] = srcinfo.dims_[i] - 2;
+      edge[2*i + 1] = srcinfo.get_dimension(i) - 2;
   if (degree) {
     /* we set the edges to zero */
     for (i = 0; i < trgtinfo.ndim_; i++)
       if (edge[i]) {
-	rearrangeEdgeLoop(&trgtinfo, NULL, i);
+	trgtinfo.rearrange_edge_loop(i);
 	do
 	  *trgt.l = 0;
 	while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.ndim_ - 1);
@@ -2067,7 +2068,7 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
   }
   subdataLoop(edge, &srcinfo);
   free(edge);
-  
+
   /* now do the loop work */
   switch (array_type(ps[0])) {
     case LUX_INT8:
@@ -2271,8 +2272,8 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
       while (n--) {		/* all found extrema */
 	index = k = *trgt0.l++;	/* index of extremum */
 	for (i = 0; i < srcinfo.ndim_; i++) { /* calculate coordinates */
-	  srcinfo.coords_[i] = k % srcinfo.dims_[i];
-	  k /= srcinfo.dims_[i];
+	  srcinfo.coords_[i] = k % srcinfo.get_dimension(i);
+	  k /= srcinfo.get_dimension(i);
 	} /* end of for (i = 0;...) */
 	switch (symbol_type(ps[0])) {
 	  case LUX_INT8:
@@ -2483,8 +2484,8 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
 	  index = *trgt0.l++;
 	  if (internalMode & 4)	/* /COORDS */
 	    for (i = 0; i < srcinfo.ndim_; i++) {
-	      *trgt.l++ = index % srcinfo.dims_[i];
-	      index /= srcinfo.dims_[i];
+	      *trgt.l++ = index % srcinfo.get_dimension(i);
+	      index /= srcinfo.get_dimension(i);
 	    } /* end of for (i = 0;...) */
 	  else
 	    *trgt.l++ = index;
@@ -3145,14 +3146,14 @@ Theory:
   if (xinfo.ndim_ != yinfo.ndim_ && xinfo.ndim_ != yinfo.ndim_ + 1)
     return cerror(INCMP_ARG, ps[1]);
   for (i = 0; i < yinfo.ndim_; i++)
-    if (xinfo.dims_[i] != yinfo.dims_[i])
+    if (xinfo.get_dimension(i) != yinfo.get_dimension(i))
       return cerror(INCMP_ARG, ps[1]);
   
   /* find the number of parameters to fit */
   if (xinfo.ndim_ == yinfo.ndim_)
     nPar = 1;
   else
-    nPar = xinfo.dims_[xinfo.ndim_ - 1];
+    nPar = xinfo.get_dimension(xinfo.ndim_ - 1);
 
   /* determine the number of data points that go in each fit */
   nData = 1;

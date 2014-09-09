@@ -103,10 +103,10 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
 
   /* create output symbol */
   if (nLev > 1) {
+    srcinfo.copy_dimensions_to(outDims, srcinfo.ndim_);
+    // [nLev,0..(raxes_[0]-1),(raxes_[0]+1)..(ndim_-1)]
+    memmove(outDims, outDims + 1, srcinfo.raxes_[0]*sizeof(*outDims));
     outDims[0] = nLev;
-    memcpy(outDims + 1, srcinfo.dims_, srcinfo.raxes_[0]*sizeof(int32_t));
-    memcpy(outDims + srcinfo.raxes_[0] + 1, srcinfo.dims_ + srcinfo.raxes_[0] + 1,
-	   (srcinfo.ndim_ - srcinfo.raxes_[0] - 1)*sizeof(int32_t));
     result = array_scratch(srcinfo.type_, srcinfo.ndim_, outDims);
     if (narg > 5 && ps[5])	/* have <width> */
       if (to_scratch_array(ps[5], srcinfo.type_, srcinfo.ndim_, outDims)
@@ -114,8 +114,9 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
 	return LUX_ERROR;
   } else {
     if (srcinfo.ndim_ > 1) {
-      memcpy(outDims, srcinfo.dims_, srcinfo.raxes_[0]*sizeof(int32_t));
-      memcpy(outDims + srcinfo.raxes_[0], srcinfo.dims_ + srcinfo.raxes_[0] + 1,
+      // [0..(raxes_[0]-1),(raxes_[0]+1)..(ndim_-2)]
+      srcinfo.copy_dimensions_to(outDims, srcinfo.ndim_);
+      memmove(outDims + srcinfo.raxes_[0], outDims + srcinfo.raxes_[0] + 1,
 	     (srcinfo.ndim_ - srcinfo.raxes_[0] - 1)*sizeof(int32_t));
       result = array_scratch(srcinfo.type_, srcinfo.ndim_ - 1, outDims);
       if (narg > 5 && ps[5])	/* have <width> */

@@ -1920,19 +1920,19 @@ int32_t lux_compress(int32_t narg, int32_t ps[])
       div[srcinfo.axes_[i]] = factors[i];
   }
   for (i = 0; i < srcinfo.ndim_; i++)
-    if (div[i] > srcinfo.dims_[i])
-      return luxerror("Compression factor %1d exceeds the %1d elements in dimension %1d", (narg > 3 && ps[2])? ps[2]: 0, div[i], srcinfo.dims_[i], i);
+    if (div[i] > srcinfo.get_dimension(i))
+      return luxerror("Compression factor %1d exceeds the %1d elements in dimension %1d", (narg > 3 && ps[2])? ps[2]: 0, div[i], srcinfo.get_dimension(i), i);
 
   /* we treat the biggest part of the data that has dimensions that
    are multiples of the compression factors */
   for (i = 0; i < srcinfo.ndim_; i++) {
     range[2*i] = 0;
-    range[2*i + 1] = srcinfo.dims_[i] - (srcinfo.dims_[i] % div[i]) - 1;
+    range[2*i + 1] = srcinfo.get_dimension(i) - (srcinfo.get_dimension(i) % div[i]) - 1;
   }
   subdataLoop(range, &srcinfo);	/* restrict treated part */
 
   /* create the output symbol */
-  memcpy(outDims, srcinfo.dims_, srcinfo.ndim_*sizeof(int32_t));
+  srcinfo.copy_dimensions_to(outDims, srcinfo.ndim_);
   if (allAxes)
     for (i = 0; i < srcinfo.ndim_; i++) {
       outDims[i] = outDims[i]/factors[0];
@@ -1949,8 +1949,9 @@ int32_t lux_compress(int32_t narg, int32_t ps[])
   trgt.l = (int32_t*) array_data(iq);
   zerobytes(trgt.b, array_size(iq)*lux_type_size[array_type(iq)]);
 
-  setupDimensionLoop(&trgtinfo, srcinfo.ndim_, outDims, symbol_type(ps[0]),
-		     srcinfo.naxes_, srcinfo.axes_, &trgt, SL_EACHCOORD);
+  trgtinfo.setup_dimension_loop(srcinfo.ndim_, outDims, symbol_type(ps[0]),
+                                srcinfo.naxes_, srcinfo.axes_, &trgt,
+                                SL_EACHCOORD);
 
   nel = 1;
   for (i = 0; i < srcinfo.rndim_; i++)

@@ -3532,7 +3532,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
     if (srcinfo.naxes_) {	/* user specified one or more axes */
       n = 1;
       for (i = 0; i < srcinfo.naxes_; i++)
-	n *= srcinfo.dims_[srcinfo.axes_[i]];
+	n *= srcinfo.get_dimension(srcinfo.axes_[i]);
     } else if (symbolIsArray(ps[0]))
       n = array_size(ps[0]);
     else

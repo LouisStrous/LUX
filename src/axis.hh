@@ -1,3 +1,6 @@
+/// \file
+/// This file declares various enums and types of interest when
+/// traversing the dimensions of an array.
 /* This is file axis.hh.
 
 Copyright 2013-2014 Louis Strous
@@ -53,10 +56,41 @@ struct param_spec_list {
   int32_t return_param_index;
 };
 
-/// A class representing axis loop information.
+/// A class representing axis loop information.  This class allows
+/// easy iteration through various dimensions of an array.
 class LoopInfo
 {
 public:
+  size_t get_dimension(int32_t index) const;
+  int32_t const* get_dimensions() const;
+  void copy_dimensions_to(int32_t* dims, size_t max_count) const;
+  void copy_dimensions_to(int32_t* dims, int32_t index, size_t max_count) const;
+  void setup_dimension_loop(int32_t ndim, int32_t const *dims,
+                            Symboltype type,
+                            int32_t naxes, int32_t const *axes,
+                            pointer *data, int32_t mode);
+  void rearrange_dimension_loop();
+  int32_t dimension_loop_result1(int32_t tmode, Symboltype ttype,
+                                 int32_t nMore, int32_t const * more,
+                                 int32_t nLess, int32_t const * less,
+                                 LoopInfo *tinfo, pointer *tptr) const;
+  void rearrange_edge_loop(int32_t index);
+
+  friend int32_t standardLoop0(int32_t data, int32_t nAxes, int32_t *axes,
+                               int32_t mode, Symboltype outType,
+                               LoopInfo *src, pointer *srcptr,
+                               int32_t *output,
+                               LoopInfo *trgt, pointer *trgtptr);
+  friend int32_t standardLoop1(int32_t source,
+                               int32_t nAxes, int32_t const * axes,
+                               int32_t srcMode,
+                               LoopInfo *srcinf, pointer *srcptr,
+                               int32_t nMore, int32_t const * more,
+                               int32_t nLess, int32_t const * less,
+                               Symboltype tgtType, int32_t tgtMode,
+                               int32_t *target,
+                               LoopInfo *tgtinf, pointer *tgtptr);
+
   /// A pointer to a ::pointer to the current data element.  For
   /// example, if the data type is LUX_DOUBLE, then the current
   /// data element is at `*data->d`.  Gets updated as appropriate
@@ -69,8 +103,8 @@ public:
 
   /// The current (rearranged) coordinates, taking into account which
   /// axes are traversed (and in what order), and taking into account
-  /// axis compression, if any.  \code{coords[i]} indicates the
-  /// position along axis `axes[i]` (for `i < naxes`).
+  /// axis compression, if any.  `coords[i]` indicates the position
+  /// along axis `axes[i]` (for `i < naxes`).
   int32_t coords_[MAX_DIMS];
 
   /// The step size (elements) per original dimension.  You have to
@@ -79,7 +113,6 @@ public:
   int32_t singlestep_[MAX_DIMS];
 
   int32_t step_[MAX_DIMS];           //< combined step size for loop transfer
-  int32_t dims_[MAX_DIMS];           //< original dimensions
   int32_t nelem_;                    //< number of elements
   int32_t ndim_;                     //< number of original dimensions
   int32_t axes_[MAX_DIMS];           //< selected axes
@@ -94,6 +127,9 @@ public:
   int32_t advanceaxis_;              //< how many axes not to advance (from start)
   int32_t raxes_[MAX_DIMS];          //< from rearranged to old axes
   int32_t iraxes_[MAX_DIMS];         //< from old to rearranged axes
+
+private:
+  int32_t dims_[MAX_DIMS];           //< original dimensions
 };
 
 #endif

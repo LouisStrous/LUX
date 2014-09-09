@@ -1241,7 +1241,7 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
     if (widthNDim > nDim)
       return cerror(INCMP_ARG, widthSym);
     for (i = 0; i < widthNDim; i++)
-      if (widthDim[i] != srcinfo.dims_[i])
+      if (widthDim[i] != srcinfo.get_dimension(i))
 	return cerror(INCMP_DIMS, widthSym); }
 
   outType = symbol_type(result);
@@ -1262,10 +1262,10 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	      i1 = -srcinfo.coords_[axis];
 	      if (internalMode & 1) /* /FW_EDGE_NEIGHBOR */
 		i2 = i1 + *width.l; }
-	    if (i2 + srcinfo.coords_[axis] > srcinfo.dims_[axis])
-	    { i2 = srcinfo.dims_[axis] - srcinfo.coords_[axis];
+	    if (i2 + srcinfo.coords_[axis] > srcinfo.get_dimension(axis))
+	    { i2 = srcinfo.get_dimension(axis) - srcinfo.coords_[axis];
 	      if (internalMode & 1 /* /FW_EDGE_NEIGHBOR */
-		  && *width.l <= srcinfo.dims_[axis]) /* not wider than data */
+		  && *width.l <= srcinfo.get_dimension(axis)) /* not wider than data */
 		i1 = i2 - *width.l; }
 	    i1 *= step;
 	    i2 *= step;
@@ -1288,10 +1288,10 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	      i1 = -srcinfo.coords_[axis];
 	      if (internalMode & 1) /* /FW_EDGE_NEIGHBOR */
 		i2 = i1 + *width.l; }
-	    if (i2 + srcinfo.coords_[axis] > srcinfo.dims_[axis])
-	    { i2 = srcinfo.dims_[axis] - srcinfo.coords_[axis];
+	    if (i2 + srcinfo.coords_[axis] > srcinfo.get_dimension(axis))
+	    { i2 = srcinfo.get_dimension(axis) - srcinfo.coords_[axis];
 	      if (internalMode & 1 /* /FW_EDGE_NEIGHBOR */
-		  && *width.l <= srcinfo.dims_[axis]) /* not wider than data */
+		  && *width.l <= srcinfo.get_dimension(axis)) /* not wider than data */
 		i1 = i2 - *width.l; }
 	    i1 *= step;
 	    i2 *= step;
@@ -1314,10 +1314,10 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	      i1 = -srcinfo.coords_[axis];
 	      if (internalMode & 1) /* /FW_EDGE_NEIGHBOR */
 		i2 = i1 + *width.l; }
-	    if (i2 + srcinfo.coords_[axis] > srcinfo.dims_[axis])
-	    { i2 = srcinfo.dims_[axis] - srcinfo.coords_[axis];
+	    if (i2 + srcinfo.coords_[axis] > srcinfo.get_dimension(axis))
+	    { i2 = srcinfo.get_dimension(axis) - srcinfo.coords_[axis];
 	      if (internalMode & 1 /* /FW_EDGE_NEIGHBOR */
-		  && *width.l <= srcinfo.dims_[axis]) /* not wider than data */
+		  && *width.l <= srcinfo.get_dimension(axis)) /* not wider than data */
 		i1 = i2 - *width.l; }
 	    i1 *= step;
 	    i2 *= step;
@@ -1343,10 +1343,10 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	      i1 = -srcinfo.coords_[axis];
 	      if (internalMode & 1) /* /FW_EDGE_NEIGHBOR */
 		i2 = i1 + *width.l; }
-	    if (i2 + srcinfo.coords_[axis] > srcinfo.dims_[axis])
-	    { i2 = srcinfo.dims_[axis] - srcinfo.coords_[axis];
+	    if (i2 + srcinfo.coords_[axis] > srcinfo.get_dimension(axis))
+	    { i2 = srcinfo.get_dimension(axis) - srcinfo.coords_[axis];
 	      if (internalMode & 1 /* /FW_EDGE_NEIGHBOR */
-		  && *width.l <= srcinfo.dims_[axis]) /* not wider than data */
+		  && *width.l <= srcinfo.get_dimension(axis)) /* not wider than data */
 		i1 = i2 - *width.l; }
 	    i1 *= step;
 	    i2 *= step;
@@ -1369,10 +1369,10 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	      i1 = -srcinfo.coords_[axis];
 	      if (internalMode & 1) /* /FW_EDGE_NEIGHBOR */
 		i2 = i1 + *width.l; }
-	    if (i2 + srcinfo.coords_[axis] > srcinfo.dims_[axis])
-	    { i2 = srcinfo.dims_[axis] - srcinfo.coords_[axis];
+	    if (i2 + srcinfo.coords_[axis] > srcinfo.get_dimension(axis))
+	    { i2 = srcinfo.get_dimension(axis) - srcinfo.coords_[axis];
 	      if (internalMode & 1 /* /FW_EDGE_NEIGHBOR */
-		  && *width.l <= srcinfo.dims_[axis]) /* not wider than data */
+		  && *width.l <= srcinfo.get_dimension(axis)) /* not wider than data */
 		i1 = i2 - *width.l; }
 	    i1 *= step;
 	    i2 *= step;
@@ -1395,10 +1395,10 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	      i1 = -srcinfo.coords_[axis];
 	      if (internalMode & 1) /* /FW_EDGE_NEIGHBOR */
 		i2 = i1 + *width.l; }
-	    if (i2 + srcinfo.coords_[axis] > srcinfo.dims_[axis])
-	    { i2 = srcinfo.dims_[axis] - srcinfo.coords_[axis];
+	    if (i2 + srcinfo.coords_[axis] > srcinfo.get_dimension(axis))
+	    { i2 = srcinfo.get_dimension(axis) - srcinfo.coords_[axis];
 	      if (internalMode & 1 /* /FW_EDGE_NEIGHBOR */
-		  && *width.l <= srcinfo.dims_[axis]) /* not wider than data */
+		  && *width.l <= srcinfo.get_dimension(axis)) /* not wider than data */
 		i1 = i2 - *width.l; }
 	    i1 *= step;
 	    i2 *= step;
@@ -1421,10 +1421,10 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	      i1 = -srcinfo.coords_[axis];
 	      if (internalMode & 1) /* /FW_EDGE_NEIGHBOR */
 		i2 = i1 + *width.l; }
-	    if (i2 + srcinfo.coords_[axis] > srcinfo.dims_[axis])
-	    { i2 = srcinfo.dims_[axis] - srcinfo.coords_[axis];
+	    if (i2 + srcinfo.coords_[axis] > srcinfo.get_dimension(axis))
+	    { i2 = srcinfo.get_dimension(axis) - srcinfo.coords_[axis];
 	      if (internalMode & 1 /* /FW_EDGE_NEIGHBOR */
-		  && *width.l <= srcinfo.dims_[axis]) /* not wider than data */
+		  && *width.l <= srcinfo.get_dimension(axis)) /* not wider than data */
 		i1 = i2 - *width.l; }
 	    i1 *= step;
 	    i2 *= step;
@@ -1450,10 +1450,10 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	      i1 = -srcinfo.coords_[axis];
 	      if (internalMode & 1) /* /FW_EDGE_NEIGHBOR */
 		i2 = i1 + *width.l; }
-	    if (i2 + srcinfo.coords_[axis] > srcinfo.dims_[axis])
-	    { i2 = srcinfo.dims_[axis] - srcinfo.coords_[axis];
+	    if (i2 + srcinfo.coords_[axis] > srcinfo.get_dimension(axis))
+	    { i2 = srcinfo.get_dimension(axis) - srcinfo.coords_[axis];
 	      if (internalMode & 1 /* /FW_EDGE_NEIGHBOR */
-		  && *width.l <= srcinfo.dims_[axis]) /* not wider than data */
+		  && *width.l <= srcinfo.get_dimension(axis)) /* not wider than data */
 		i1 = i2 - *width.l; }
 	    i1 *= step;
 	    i2 *= step;
@@ -1477,10 +1477,10 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	      i1 = -srcinfo.coords_[axis];
 	      if (internalMode & 1) /* /FW_EDGE_NEIGHBOR */
 		i2 = i1 + *width.l; }
-	    if (i2 + srcinfo.coords_[axis] > srcinfo.dims_[axis])
-	    { i2 = srcinfo.dims_[axis] - srcinfo.coords_[axis];
+	    if (i2 + srcinfo.coords_[axis] > srcinfo.get_dimension(axis))
+	    { i2 = srcinfo.get_dimension(axis) - srcinfo.coords_[axis];
 	      if (internalMode & 1 /* /FW_EDGE_NEIGHBOR */
-		  && *width.l <= srcinfo.dims_[axis]) /* not wider than data */
+		  && *width.l <= srcinfo.get_dimension(axis)) /* not wider than data */
 		i1 = i2 - *width.l; }
 	    i1 *= step;
 	    i2 *= step;
@@ -1504,10 +1504,10 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	      i1 = -srcinfo.coords_[axis];
 	      if (internalMode & 1) /* /FW_EDGE_NEIGHBOR */
 		i2 = i1 + *width.l; }
-	    if (i2 + srcinfo.coords_[axis] > srcinfo.dims_[axis])
-	    { i2 = srcinfo.dims_[axis] - srcinfo.coords_[axis];
+	    if (i2 + srcinfo.coords_[axis] > srcinfo.get_dimension(axis))
+	    { i2 = srcinfo.get_dimension(axis) - srcinfo.coords_[axis];
 	      if (internalMode & 1 /* /FW_EDGE_NEIGHBOR */
-		  && *width.l <= srcinfo.dims_[axis]) /* not wider than data */
+		  && *width.l <= srcinfo.get_dimension(axis)) /* not wider than data */
 		i1 = i2 - *width.l; }
 	    i1 *= step;
 	    i2 *= step;
@@ -1531,10 +1531,10 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	      i1 = -srcinfo.coords_[axis];
 	      if (internalMode & 1) /* /FW_EDGE_NEIGHBOR */
 		i2 = i1 + *width.l; }
-	    if (i2 + srcinfo.coords_[axis] > srcinfo.dims_[axis])
-	    { i2 = srcinfo.dims_[axis] - srcinfo.coords_[axis];
+	    if (i2 + srcinfo.coords_[axis] > srcinfo.get_dimension(axis))
+	    { i2 = srcinfo.get_dimension(axis) - srcinfo.coords_[axis];
 	      if (internalMode & 1 /* /FW_EDGE_NEIGHBOR */
-		  && *width.l <= srcinfo.dims_[axis]) /* not wider than data */
+		  && *width.l <= srcinfo.get_dimension(axis)) /* not wider than data */
 		i1 = i2 - *width.l; }
 	    i1 *= step;
 	    i2 *= step;
@@ -1558,10 +1558,10 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	      i1 = -srcinfo.coords_[axis];
 	      if (internalMode & 1) /* /FW_EDGE_NEIGHBOR */
 		i2 = i1 + *width.l; }
-	    if (i2 + srcinfo.coords_[axis] > srcinfo.dims_[axis])
-	    { i2 = srcinfo.dims_[axis] - srcinfo.coords_[axis];
+	    if (i2 + srcinfo.coords_[axis] > srcinfo.get_dimension(axis))
+	    { i2 = srcinfo.get_dimension(axis) - srcinfo.coords_[axis];
 	      if (internalMode & 1 /* /FW_EDGE_NEIGHBOR */
-		  && *width.l <= srcinfo.dims_[axis]) /* not wider than data */
+		  && *width.l <= srcinfo.get_dimension(axis)) /* not wider than data */
 		i1 = i2 - *width.l; }
 	    i1 *= step;
 	    i2 *= step;
@@ -1588,10 +1588,10 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	      i1 = -srcinfo.coords_[axis];
 	      if (internalMode & 1) /* /FW_EDGE_NEIGHBOR */
 		i2 = i1 + *width.l; }
-	    if (i2 + srcinfo.coords_[axis] > srcinfo.dims_[axis])
-	    { i2 = srcinfo.dims_[axis] - srcinfo.coords_[axis];
+	    if (i2 + srcinfo.coords_[axis] > srcinfo.get_dimension(axis))
+	    { i2 = srcinfo.get_dimension(axis) - srcinfo.coords_[axis];
 	      if (internalMode & 1 /* /FW_EDGE_NEIGHBOR */
-		  && *width.l <= srcinfo.dims_[axis]) /* not wider than data */
+		  && *width.l <= srcinfo.get_dimension(axis)) /* not wider than data */
 		i1 = i2 - *width.l; }
 	    i1 *= step;
 	    i2 *= step;
@@ -1615,10 +1615,10 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	      i1 = -srcinfo.coords_[axis];
 	      if (internalMode & 1) /* /FW_EDGE_NEIGHBOR */
 		i2 = i1 + *width.l; }
-	    if (i2 + srcinfo.coords_[axis] > srcinfo.dims_[axis])
-	    { i2 = srcinfo.dims_[axis] - srcinfo.coords_[axis];
+	    if (i2 + srcinfo.coords_[axis] > srcinfo.get_dimension(axis))
+	    { i2 = srcinfo.get_dimension(axis) - srcinfo.coords_[axis];
 	      if (internalMode & 1 /* /FW_EDGE_NEIGHBOR */
-		  && *width.l <= srcinfo.dims_[axis]) /* not wider than data */
+		  && *width.l <= srcinfo.get_dimension(axis)) /* not wider than data */
 		i1 = i2 - *width.l; }
 	    i1 *= step;
 	    i2 *= step;
@@ -1642,10 +1642,10 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	      i1 = -srcinfo.coords_[axis];
 	      if (internalMode & 1) /* /FW_EDGE_NEIGHBOR */
 		i2 = i1 + *width.l; }
-	    if (i2 + srcinfo.coords_[axis] > srcinfo.dims_[axis])
-	    { i2 = srcinfo.dims_[axis] - srcinfo.coords_[axis];
+	    if (i2 + srcinfo.coords_[axis] > srcinfo.get_dimension(axis))
+	    { i2 = srcinfo.get_dimension(axis) - srcinfo.coords_[axis];
 	      if (internalMode & 1 /* /FW_EDGE_NEIGHBOR */
-		  && *width.l <= srcinfo.dims_[axis]) /* not wider than data */
+		  && *width.l <= srcinfo.get_dimension(axis)) /* not wider than data */
 		i1 = i2 - *width.l; }
 	    i1 *= step;
 	    i2 *= step;
@@ -1669,10 +1669,10 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	      i1 = -srcinfo.coords_[axis];
 	      if (internalMode & 1) /* /FW_EDGE_NEIGHBOR */
 		i2 = i1 + *width.l; }
-	    if (i2 + srcinfo.coords_[axis] > srcinfo.dims_[axis])
-	    { i2 = srcinfo.dims_[axis] - srcinfo.coords_[axis];
+	    if (i2 + srcinfo.coords_[axis] > srcinfo.get_dimension(axis))
+	    { i2 = srcinfo.get_dimension(axis) - srcinfo.coords_[axis];
 	      if (internalMode & 1 /* /FW_EDGE_NEIGHBOR */
-		  && *width.l <= srcinfo.dims_[axis]) /* not wider than data */
+		  && *width.l <= srcinfo.get_dimension(axis)) /* not wider than data */
 		i1 = i2 - *width.l; }
 	    i1 *= step;
 	    i2 *= step;
@@ -1696,10 +1696,10 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	      i1 = -srcinfo.coords_[axis];
 	      if (internalMode & 1) /* /FW_EDGE_NEIGHBOR */
 		i2 = i1 + *width.l; }
-	    if (i2 + srcinfo.coords_[axis] > srcinfo.dims_[axis])
-	    { i2 = srcinfo.dims_[axis] - srcinfo.coords_[axis];
+	    if (i2 + srcinfo.coords_[axis] > srcinfo.get_dimension(axis))
+	    { i2 = srcinfo.get_dimension(axis) - srcinfo.coords_[axis];
 	      if (internalMode & 1 /* /FW_EDGE_NEIGHBOR */
-		  && *width.l <= srcinfo.dims_[axis]) /* not wider than data */
+		  && *width.l <= srcinfo.get_dimension(axis)) /* not wider than data */
 		i1 = i2 - *width.l; }
 	    i1 *= step;
 	    i2 *= step;
@@ -1723,10 +1723,10 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	      i1 = -srcinfo.coords_[axis];
 	      if (internalMode & 1) /* /FW_EDGE_NEIGHBOR */
 		i2 = i1 + *width.l; }
-	    if (i2 + srcinfo.coords_[axis] > srcinfo.dims_[axis])
-	    { i2 = srcinfo.dims_[axis] - srcinfo.coords_[axis];
+	    if (i2 + srcinfo.coords_[axis] > srcinfo.get_dimension(axis))
+	    { i2 = srcinfo.get_dimension(axis) - srcinfo.coords_[axis];
 	      if (internalMode & 1 /* /FW_EDGE_NEIGHBOR */
-		  && *width.l <= srcinfo.dims_[axis]) /* not wider than data */
+		  && *width.l <= srcinfo.get_dimension(axis)) /* not wider than data */
 		i1 = i2 - *width.l; }
 	    i1 *= step;
 	    i2 *= step;

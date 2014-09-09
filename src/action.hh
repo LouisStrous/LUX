@@ -74,7 +74,7 @@ int32_t 	dereferenceScalPointer(int32_t), scalar_scratch(Symboltype),
   cubic_spline_tables(void *, int32_t, int32_t, void *, int32_t, int32_t, int32_t,
 		      uint8_t, uint8_t, csplineInfo *),
   numerical_clone(int32_t, Symboltype),
-  redef_array(int32_t, Symboltype, int32_t, int32_t *), string_scratch(int32_t),
+  redef_array(int32_t, Symboltype, int32_t, int32_t const*), string_scratch(int32_t),
   transferAll(int32_t symbol), transfer(int32_t), copySym(int32_t),
   scalar_scratch_copy(int32_t), redef_scalar(int32_t, Symboltype, void *),
   redef_string(int32_t, int32_t), float_arg_stat(int32_t, float *),
@@ -114,8 +114,8 @@ void	subdataLoop(int32_t *, LoopInfo *), addVerify(char *, char),
   *setFacts(int32_t symbol, int32_t type, int32_t flag),
   deleteFacts(int32_t symbol, int32_t type), returnLoop(LoopInfo *, pointer *, int32_t),
   setAxisMode(LoopInfo *, int32_t mode),
-  standard_redef_array(int32_t, Symboltype, int32_t, int32_t *, int32_t, int32_t *, pointer *,
-		       LoopInfo *);
+  standard_redef_array(int32_t, Symboltype, int32_t, int32_t const*,
+                       int32_t, int32_t const*, pointer *, LoopInfo *);
 void convertWidePointer(wideScalar *, int32_t, int32_t);
 
 void	newStack(int32_t), push(int32_t), deleteStack(void);

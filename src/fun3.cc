@@ -658,7 +658,7 @@ int32_t lux_fft_expand(int32_t narg, int32_t ps[])
   int32_t *dims = (int32_t*) malloc(ndim*sizeof(int32_t));
   if (!dims)
     return cerror(ALLOC_ERR, 0);
-  memcpy(dims, infos[0].dims_, ndim*sizeof(int32_t));
+  infos[0].copy_dimensions_to(dims, ndim);
   dims[0] = (int32_t) (dims[0]*factor + 0.5);
   standard_redef_array(iq, LUX_DOUBLE, ndim, dims, 0, NULL,
 		       &ptrs[2], &infos[2]);
@@ -667,8 +667,8 @@ int32_t lux_fft_expand(int32_t narg, int32_t ps[])
   setAxes(&infos[2], 1, NULL, SL_EACHBLOCK);
 
   do {
-    gsl_fft_expand(ptrs[0].d, infos[0].dims_[0], 1,
-		   ptrs[2].d, infos[2].dims_[0], 1);
+    gsl_fft_expand(ptrs[0].d, infos[0].get_dimension(0), 1,
+		   ptrs[2].d, infos[2].get_dimension(0), 1);
     ptrs[0].d += infos[0].singlestep_[1];
     ptrs[2].d += infos[2].singlestep_[2];
   } while (advanceLoop(&infos[0], &ptrs[0]),
@@ -4120,14 +4120,15 @@ int32_t lux_cubic_spline_extreme(int32_t narg, int32_t ps[])
 
   /* prepare the output variables */
   if (internalMode & 1) {
-    memcpy(dims, yinfo.dims_, yinfo.ndim_*sizeof(int32_t));
+    yinfo.copy_dimensions_to(dims, yinfo.ndim_);
     dims[yinfo.axes_[0]] = 1;
     ndim = yinfo.ndim_;
   } else if (yinfo.rndim_ == 1)
     ndim = 0;
   else {
-    memcpy(dims, yinfo.dims_, yinfo.axes_[0]*sizeof(int32_t));
-    memcpy(dims + yinfo.axes_[0], yinfo.dims_ + yinfo.axes_[0] + 1,
+    // [0..(yinfo.axes_[0]-1),(yinfo.axes_[0]+1)..(yinfo.ndim_-2)]
+    yinfo.copy_dimensions_to(dims, yinfo.ndim_);
+    memmove(dims + yinfo.axes_[0], dims + yinfo.axes_[0] + 1,
 	   (yinfo.ndim_ - yinfo.axes_[0] - 1)*sizeof(int32_t));
     ndim = yinfo.ndim_ - 1;
   }

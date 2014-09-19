@@ -38,9 +38,10 @@ static const char *const ffmts[] =
      "%0#*.*f", "%0+#*.*f", "%0# *.*f", "%0+# *.*f", "%0-#*.*f", "%0+-#*.*f", "%0-# *.*f", "%0+# -*.*f" };
 
 static int32_t obstack_printf_sexagesimal_int_left(struct obstack *o,
-                                               const struct printf_info *info,
-                                               double value, double *lastvalue,
-                                               int32_t firstwidth)
+                                                   const struct printf_info *info,
+                                                   double value,
+                                                   double *lastvalue,
+                                                   int32_t firstwidth)
 {
   int32_t ivalue, sign, size, precision;
 
@@ -85,7 +86,7 @@ static int32_t obstack_printf_sexagesimal_int_left(struct obstack *o,
 }
 
 int32_t printf_sexagesimal(FILE *stream, const struct printf_info *info,
-                       const void *const *args)
+                           const void *const *args)
 {
   int32_t width;
   double lastvalue;
@@ -136,7 +137,7 @@ int32_t printf_sexagesimal(FILE *stream, const struct printf_info *info,
 }
 
 int32_t printf_double1_arginfo(const struct printf_info *p,
-                           size_t n, int32_t *argtypes, int32_t *size)
+                               size_t n, int32_t *argtypes, int32_t *size)
 {
   if (n > 0) {
     argtypes[0] = PA_DOUBLE;
@@ -146,9 +147,9 @@ int32_t printf_double1_arginfo(const struct printf_info *p,
 }
 
 static int32_t obstack_printf_date_int_left(struct obstack *o,
-                                        const struct printf_info *info,
-                                        double value, double *last,
-                                        int32_t firstwidth)
+                                            const struct printf_info *info,
+                                            double value, double *last,
+                                            int32_t firstwidth)
 {
   int32_t year, month, ivalue, prec, size;
   double day, lastvalue;
@@ -226,7 +227,7 @@ static int32_t obstack_printf_date_int_left(struct obstack *o,
    .5 -> year-month-dayThour:minute
    .6 -> year-month-dayThour:minute:second */
 int32_t printf_date(FILE *stream, const struct printf_info *info,
-                const void *const *args)
+                    const void *const *args)
 {
   double value = *((const double *)(args[0]));
   double value2;
@@ -278,19 +279,40 @@ int32_t printf_date(FILE *stream, const struct printf_info *info,
   for extensions: B D F H J K M N O P Q R T U V W Y b k v w y
  */
 
-void constructor(void) __attribute__ ((constructor));
+// Would have liked to use __attribute__ ((constructor)) to get these
+// custom printf specifiers registered automatically (like I did
+// before when Lux was still a C-only program), but can't because
+// automake doesn't play nice.  This file (with others) is compiled
+// into a library, and the library is linked with a small object file
+// that provides a main function, to construct the main (lux)
+// executable.
+//
+// Having the library makes it easier to provide unit tests: just link
+// the unit tests with the library to get the unit test executable,
+// and link the main function object with the library to get the main
+// (lux) executable.
+//
+// However, functions marked with __attribute__ ((constructor)) are
+// not linked into the executables unless they are explicitly called
+// directly or indirectly from the main function, or unless (assuming
+// GNU ld) -Wl,-whole-library is prefixed to the library on the g++
+// linking command line, and -Wl,-no-whole-library is suffixed to the
+// library.
+//
+// Automake rejects mixing libraries and linker flags in *_LDADD,
+// reporting that the linker flags belong in *_LDFLAGS.  Putting the
+// flags and the library in *_LDFLAGS doesn't help, because then
+// changes to the library do not automatically trigger relinking the
+// executable.
+//
+// The only way out is to explicitly call the registration function
+// from the main program.  This may be for the best, because it works
+// also for non-GNU compilers.
 
-void constructor(void)
+void register_printf_extensions(void)
 {
   register_printf_specifier('T', printf_sexagesimal,
                             printf_double1_arginfo);
   register_printf_specifier('J', printf_date,
                             printf_double1_arginfo);
-}
-
-void destructor(void) __attribute__ ((destructor));
-void destructor(void)
-{
-  register_printf_specifier('T', 0, 0);
-  register_printf_specifier('J', 0, 0);
 }

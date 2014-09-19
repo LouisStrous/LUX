@@ -1597,6 +1597,9 @@ int do_main(int argc, char *argv[])
   void  pegParse(void), inHistory(char *), getTermCaps(void);
   FILE  *fp;
   int32_t       yyparse(void);
+  void register_printf_extensions();
+
+  register_printf_extensions();
 
   programName = argv[0];
   getTerminalSize();

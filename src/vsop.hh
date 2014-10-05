@@ -20,12 +20,12 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "action.hh"
 
 struct planetIndex {
-  int16_t index;
-  int16_t nTerms;
+  uint16_t index;
+  uint16_t nTerms;
 };
 struct VSOPdata {
   struct planetIndex indices[6*3*8];
-  int16_t nTerms;
+  uint16_t nTerms;
   double *terms;
 };
 VSOPdata* planetIndicesForTolerance(VSOPdata *data, double tolerance);

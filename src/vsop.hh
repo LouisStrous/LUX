@@ -28,10 +28,9 @@ struct VSOPdata {
   int16_t nTerms;
   double *terms;
 };
-struct VSOPdata planetIndicesForTolerance(struct VSOPdata *data, 
-                                          double tolerance);
-extern struct VSOPdata VSOP87Adata;
-extern struct VSOPdata VSOP87Cdata;
+VSOPdata* planetIndicesForTolerance(VSOPdata *data, double tolerance);
+extern VSOPdata VSOP87Adata;
+extern VSOPdata VSOP87Cdata;
 
 void XYZJ2000fromVSOPA(double T, int32_t object, double *pos, double tolerance);
 void XYZdatefromVSOPC(double T, int32_t object, double *pos, double tolerance);

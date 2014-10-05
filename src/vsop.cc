@@ -26,12 +26,11 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "luxdefs.hh"
 #include "vsop.hh"
 
-#if DONOTIGNORE
-static struct VSOPdata usedVSOPdata;
+#if VSOPTEST
+static VSOPdata usedVSOPdata;
 static double planetIndexTolerance = -1;
 
-struct VSOPdata *planetIndicesForTolerance(struct VSOPdata *data, 
-                                           double tolerance)
+VSOPdata *planetIndicesForTolerance(VSOPdata *data, double tolerance)
 /* returns a pointer to an array of planet indices into the VSOP model
    values, suitable for an error tolerance of nonnegative <tolerance>.
    None of the amplitudes of the VSOP planet terms represented by the

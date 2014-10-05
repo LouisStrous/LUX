@@ -17,8 +17,11 @@
 # You should have received a copy of the GNU General Public License
 # along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 
-TESTS = main
-check_PROGRAMS = main
+TESTS = main vsop
+check_PROGRAMS = main vsop
 main_SOURCES = main.cc check-axis.cc check-binop.cc
-main_CXXFLAGS = -I$(top_srcdir)/src $(CPPUNIT_CFLAGS)
+AM_CXXFLAGS = -I$(top_srcdir)/src $(CPPUNIT_CFLAGS)
 main_LDADD = $(top_builddir)/src/liblux.a -lm -lc -ljpeg -lX11 -lgsl $(CPPUNIT_LIBS)
+
+vsop_SOURCES = vsop87test.cc vsop87test.txt
+vsop_LDADD = $(top_builddir)/src/liblux.a -lm -lc

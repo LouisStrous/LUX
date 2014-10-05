@@ -2048,12 +2048,12 @@ int32_t execute(int32_t symbol)
     case EVB_FILE:	/* an include file */
       name = file_name(symbol);
       p = strchr(name, ':');
-      if (!p)
-        p = strchr(name, '\0');
+      char const* q;
+      q = p? p: strchr(name, '\0');
       {
-        char *part = (char*) malloc(p - name + 1);
-        memcpy(part, name, p - name);
-        part[p - name] = '\0';
+        char *part = (char*) malloc(q - name + 1);
+        memcpy(part, name, q - name);
+        part[q - name] = '\0';
         fp = openPathFile(part, FIND_EITHER);
       }
       if (!fp)

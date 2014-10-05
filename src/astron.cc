@@ -3655,7 +3655,8 @@ void heliocentricXYZr(double JDE, int32_t object, double equinox, double *pos,
 	  }
 	} else {
 	  if (J2000 != equinox) {
-	    printf("ASTRON: precess ecliptic coordinates from J2000.0 to JD %1$.14g = %1$-#24.6J\n", equinox);
+            if (vocal)
+              printf("ASTRON: precess ecliptic coordinates from J2000.0 to JD %1$.14g = %1$-#24.6J\n", equinox);
 	    XYZ_eclipticPrecession(pos, J2000, equinox); /* precess to desired equinox */
 	  }
 	}

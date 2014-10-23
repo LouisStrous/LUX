@@ -36,7 +36,7 @@ void getTermCaps(void)
   { puts("getTermCaps - No translation for environment variable TERM.");
     puts("Using default terminal key codes."); }
   else
-  { expand_name("$ANADIR/term/", NULL);
+  { expand_name("$LUXDIR/term/", NULL);
     strcat(expname, term);
     fp = fopen(expname, "r");
     if (!fp)

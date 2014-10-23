@@ -3012,7 +3012,7 @@ int32_t readExtra(char const* file, char mode)
  and the data lines for each object in ascending order of JDE.  */
 {
   FILE	*fp;
-  char const* defaultFile = "$ANADIR/orbits";
+  char const* defaultFile = "$LUXDIR/orbits";
   char	orbitLine[256], *pp;
   int32_t	obj, id, rec, c, format, n, nmore, indx, nterm;
   double	jd, a, e, i, node, peri, m, equinox;

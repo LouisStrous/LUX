@@ -1,8 +1,8 @@
 // -*- mode: c++ -*-
 /* LUX parser specification (bison) and auxilliary routines */
 /* This parser is re-entrant and this feature is not supported by yacc. */
-/* Therefore either use bison or use the provided anaparser.c and */
-/* anaparser.h.  LS 10nov97 */
+/* Therefore either use bison or use the provided luxparser.yy and */
+/* luxparser.hh. */
 %{
 /* This is file luxparser.c.
 
@@ -884,10 +884,10 @@ int32_t ignoreInput = 0,        /* nesting level of IGNORE-RESUME pairs */
         calculatorMode = 0;     /* nonzero if in calculator mode
                                  (see calculator.c) */
 
-char const* ANAPrompts[] =      {       /* legal LUX prompts */
+char const* LUXPrompts[] =      {       /* legal LUX prompts */
   "LUX>", "mor>", "ign>", "dbg>", "clc>"
 };
-#define N_ANAPROMPTS 5
+#define N_LUXPROMPTS 5
 
 extern char     line[],         /* raw user input */
         tLine[];                /* translated user input */
@@ -967,10 +967,10 @@ void translateLine(void)
   if (allowPromptInInput)       /* allow legal LUX prompts at the very
                                    beginning of input lines; i.e. ignore when
                                    encountered */
-    for (i = 0; i < N_ANAPROMPTS; i++)
-      if (!strncmp(p, ANAPrompts[i], strlen(ANAPrompts[i]))) {
+    for (i = 0; i < N_LUXPROMPTS; i++)
+      if (!strncmp(p, LUXPrompts[i], strlen(LUXPrompts[i]))) {
                                 /* found an LUX prompt */
-        p += strlen(ANAPrompts[i]);/* skip over it */
+        p += strlen(LUXPrompts[i]);/* skip over it */
         break;
       }
   if (!inString)
@@ -1228,15 +1228,15 @@ int32_t yylex(YYSTYPE *lvalp)
                                 /* tell the parser so. */
  /* now determine the appropriate LUX prompt to use */
  if (ignoreInput)               /* we're within a nested IGNORE-RESUME pair */
-   prompt = ANAPrompts[2];      /* ign> */
+   prompt = LUXPrompts[2];      /* ign> */
  else if (debugLine)            /* debugger line (execute()) */
-   prompt = ANAPrompts[3];      /* dbg> */
+   prompt = LUXPrompts[3];      /* dbg> */
  else if (disableNewline)       /* need more input */
-   prompt = ANAPrompts[1];      /* mor> */
+   prompt = LUXPrompts[1];      /* mor> */
  else if (calculatorMode)
-   prompt = ANAPrompts[4];      /* clc> */
+   prompt = LUXPrompts[4];      /* clc> */
  else
-   prompt = ANAPrompts[0];      /* default, LUX> */
+   prompt = LUXPrompts[0];      /* default, LUX> */
  /* now get and treat the input */
  while (1) {                    /* keep cycling */
    if (!*line) {                /* nothing more in current input line */
@@ -1269,7 +1269,7 @@ int32_t yylex(YYSTYPE *lvalp)
      if (!strncmp(currentChar, "IGNORE", 6)
          && !isNextChar((uint8_t) currentChar[6])) {
        ignoreInput++;
-       prompt = ANAPrompts[2];  /* ign> */
+       prompt = LUXPrompts[2];  /* ign> */
      } else if (!strncmp(currentChar, "RESUME", 6)
                 && !isNextChar((uint8_t) currentChar[6])) {
        if (!ignoreInput)
@@ -1278,13 +1278,13 @@ int32_t yylex(YYSTYPE *lvalp)
          ignoreInput--;
        if (!ignoreInput) {
          if (disableNewline)    /* need more input */
-           prompt = ANAPrompts[1];      /* mor> */
+           prompt = LUXPrompts[1];      /* mor> */
          else if (debugLine)    /* debugger line */
-           prompt = ANAPrompts[3];      /* dbg> */
+           prompt = LUXPrompts[3];      /* dbg> */
          else if (calculatorMode)
-           prompt = ANAPrompts[4];      /* clc> */
+           prompt = LUXPrompts[4];      /* clc> */
          else
-           prompt = ANAPrompts[0];      /* default, LUX> */
+           prompt = LUXPrompts[0];      /* default, LUX> */
        }
        currentChar += 6;
      }
@@ -1461,7 +1461,7 @@ int32_t yylex(YYSTYPE *lvalp)
   if (*currentChar == '-'
       && !currentChar[1]) {     /* continuation character */
     continuation = 1;
-    prompt = ANAPrompts[1];     /* mor> */
+    prompt = LUXPrompts[1];     /* mor> */
     *line = '\0';               /* request a new input line */
     continue;
   }
@@ -1632,7 +1632,7 @@ int do_main(int argc, char *argv[])
     p += strlen(p);
   }
   if (*line) {
-    printf("%s%s\n", ANAPrompts[0], line);
+    printf("%s%s\n", LUXPrompts[0], line);
     add_history(line + 1);
     translateLine();
     currentChar = tLine;

@@ -102,7 +102,7 @@ void manualTerm(int32_t number)
   int32_t	n, i;
 
   dummyTerm();			/* default; */
-  p = getenv("ANADIR");
+  p = getenv("LUXDIR");
   if (p) {
     strcpy(curScrat, p);
     strcat(curScrat, "/");

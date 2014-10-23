@@ -2038,7 +2038,7 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
 	  nDoDim++;
     } else
       nDoDim = srcinfo.ndim;
-    
+
     i = srcinfo.nelem;
     for (j = 0; j < nDoDim; j++)
       i /= 2;
@@ -2051,8 +2051,11 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
 
   /* we exclude the selected edges */
   for (i = 0; i < srcinfo.ndim; i++)
-    if (edge[2*i + 1])
+    if (edge[2*i + 1]) {
       edge[2*i + 1] = srcinfo.dims[i] - 2;
+      if (edge[2*i + 1] < 0)
+        edge[2*i + 1] = 0;
+    }
   if (degree) {
     /* we set the edges to zero */
     for (i = 0; i < trgtinfo.ndim; i++)
@@ -2067,7 +2070,7 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
   }
   subdataLoop(edge, &srcinfo);
   free(edge);
-  
+
   /* now do the loop work */
   switch (array_type(ps[0])) {
     case LUX_INT8:

@@ -221,7 +221,7 @@ int32_t advanceLoop(loopInfo *info, pointer *ptr)
 
   /* advance pointer */
   ptr->b += info->step[info->advanceaxis]*info->stride;
-  
+
   if (info->advanceaxis >= info->rndim)	/* already done */
     done = info->rndim;
   else {
@@ -229,7 +229,7 @@ int32_t advanceLoop(loopInfo *info, pointer *ptr)
 
     /* update coordinates */
     for (i = info->advanceaxis; i < info->rndim; i++) {
-      if (++(info->coords[i]) != info->rdims[i])
+      if (++(info->coords[i]) < info->rdims[i])
 	break;			/* not yet at end of this dimension */
       /* if we get here, we are at the end of a dimension */
       info->coords[i] = 0;	/* back to start */
@@ -239,7 +239,7 @@ int32_t advanceLoop(loopInfo *info, pointer *ptr)
     }
   }
   return done;
-}  
+}
 /*-----------------------------------------------------------------------*/
 int32_t loopIsAtStart(loopInfo const *info)
 /* returns 1 if all coordinates are equal to 0, and 0 otherwise.

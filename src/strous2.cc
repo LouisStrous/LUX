@@ -2076,12 +2076,12 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
     case LUX_INT8:
       do {
 	nok = 1 - degree;
-	for (j = 0; j < n; j++) {	/* all directions */	  
+	for (j = 0; j < n; j++) {	/* all directions */
 	  k = offset[j];
 	  srcl.b = src.b + k;
 	  srcr.b = src.b - k;
-	  ok = (sign && *src.b > *srcl.b && *src.b > *srcr.b)
-	    || (!sign && *src.b < *srcl.b && *src.b < *srcr.b);
+	  ok = (sign && *src.b >= *srcl.b && *src.b > *srcr.b)
+            || (!sign && *src.b <= *srcl.b && *src.b < *srcr.b);
 	  if (degree)
 	    nok += ok;
 	  else if (!ok) {
@@ -2101,12 +2101,12 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
     case LUX_INT16:
       do {
 	nok = 1 - degree;
-	for (j = 0; j < n; j++) {	/* all directions */	  
+	for (j = 0; j < n; j++) {	/* all directions */
 	  k = offset[j];
 	  srcl.w = src.w + k;
 	  srcr.w = src.w - k;
-	  ok = (sign && *src.w > *srcl.w && *src.w > *srcr.w)
-	    || (!sign && *src.w < *srcl.w && *src.w < *srcr.w);
+	  ok = (sign && *src.w >= *srcl.w && *src.w > *srcr.w)
+            || (!sign && *src.w <= *srcl.w && *src.w < *srcr.w);
 	  if (degree)
 	    nok += ok;
 	  else if (!ok) {
@@ -2130,8 +2130,8 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
 	  k = offset[j];
 	  srcl.l = src.l + k;
 	  srcr.l = src.l - k;
-	  ok = (sign && *src.l > *srcl.l && *src.l > *srcr.l)
-	    || (!sign && *src.l < *srcl.l && *src.l < *srcr.l);
+	  ok = (sign && *src.l >= *srcl.l && *src.l > *srcr.l)
+            || (!sign && *src.l <= *srcl.l && *src.l < *srcr.l);
 	  if (degree)
 	    nok += ok;
 	  else if (!ok) {
@@ -2155,8 +2155,8 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
 	  k = offset[j];
 	  srcl.q = src.q + k;
 	  srcr.q = src.q - k;
-	  ok = (sign && *src.q > *srcl.q && *src.q > *srcr.q)
-	    || (!sign && *src.q < *srcl.q && *src.q < *srcr.q);
+	  ok = (sign && *src.q >= *srcl.q && *src.q > *srcr.q)
+            || (!sign && *src.q <= *srcl.q && *src.q < *srcr.q);
 	  if (degree)
 	    nok += ok;
 	  else if (!ok) {
@@ -2176,12 +2176,12 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
     case LUX_FLOAT:
       do {
 	nok = 1 - degree;
-	for (j = 0; j < n; j++) {	/* all directions */	  
+	for (j = 0; j < n; j++) {	/* all directions */
 	  k = offset[j];
 	  srcl.f = src.f + k;
 	  srcr.f = src.f - k;
-	  ok = (sign && *src.f > *srcl.f && *src.f > *srcr.f)
-	    || (!sign && *src.f < *srcl.f && *src.f < *srcr.f);
+	  ok = (sign && *src.f >= *srcl.f && *src.f > *srcr.f)
+            || (!sign && *src.f <= *srcl.f && *src.f < *srcr.f);
 	  if (degree)
 	    nok += ok;
 	  else if (!ok) {
@@ -2201,12 +2201,12 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
     case LUX_DOUBLE:
       do {
 	nok = 1 - degree;
-	for (j = 0; j < n; j++) {	/* all directions */	  
+	for (j = 0; j < n; j++) {	/* all directions */
 	  k = offset[j];
 	  srcl.d = src.d + k;
 	  srcr.d = src.d - k;
-	  ok = (sign && *src.d > *srcl.d && *src.d > *srcr.d)
-	    || (!sign && *src.d < *srcl.d && *src.d < *srcr.d);
+	  ok = (sign && *src.d >= *srcl.d && *src.d > *srcr.d)
+            || (!sign && *src.d <= *srcl.d && *src.d < *srcr.d);
 	  if (degree)
 	    nok += ok;
 	  else if (!ok) {

@@ -4090,7 +4090,7 @@ int32_t lux_cubic_spline_extreme(int32_t narg, int32_t ps[])
   double	thisextpos, thisext, x1, x2;
   loopInfo	yinfo;
   pointer	y, x, minpos, min, maxpos, max, rightedge, ptr, q;
-  csplineInfo	cspl;
+  csplineInfo	cspl = { NULL, NULL, NULL, NULL };
 
   if (!symbolIsNumericalArray(ps[0]))
     return cerror(NEED_NUM_ARR, ps[0]);

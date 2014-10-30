@@ -3706,10 +3706,8 @@ void heliocentricXYZr(double JDE, int32_t object, double equinox, double *pos,
       struct moonbTerm *mbt;
       int32_t i;
 
-      Tc = T*10 + 4.069459e-10; /* convert from julian millennia to */
-      /* julian centuries and take out light-time correction which is */
-      /* implicitly included in the used lunar ephemeris (assumed */
-      /* equivalent to 385000.56 km) */
+      Tc = T*10; /* convert from julian millennia to */
+      /* julian centuries */
       lmoon = mpol4(218.3164591,481267.88134236,-0.0013268,1.0/538841,-1.0/65194000,Tc,360);
       lmoon *= DEG;
       elon = mpol4(297.8502042,445267.1115168,-0.0016300,1.0/545868,-1.0/113065000,Tc,360);
@@ -3720,11 +3718,11 @@ void heliocentricXYZr(double JDE, int32_t object, double equinox, double *pos,
       mmoon *= DEG;
       nodedist = mpol4(93.2720993,483202.0175273,-0.0034029,-1.0/3526000,1.0/863310000,Tc,360);
       nodedist *= DEG;
-      a1 = fmod(119.75 + 131.849*Tc,360);
+      a1 = famod(119.75 + 131.849*Tc,360);
       a1 *= DEG;
-      a2 = fmod(53.09 + 479264.290*Tc,360);
+      a2 = famod(53.09 + 479264.290*Tc,360);
       a2 *= DEG;
-      a3 = fmod(313.45 + 481266.484*Tc,360);
+      a3 = famod(313.45 + 481266.484*Tc,360);
       a3 *= DEG;
       suml = sumr = sumb = 0.0;
       mlrt = moonlr;
@@ -3751,7 +3749,7 @@ void heliocentricXYZr(double JDE, int32_t object, double equinox, double *pos,
       sumb += -2235*sin(lmoon) + 382*sin(a3) + 175*sin(a1 - nodedist)
 	+ 175*sin(a1 + nodedist) + 127*sin(lmoon - mmoon)
 	- 115*sin(lmoon + mmoon);
-      pos[0] = lmoon + suml*DEG/1000000; /* geocentric longitude referred */
+      pos[0] = famod(lmoon + suml*DEG/1000000,TWOPI); /* geocentric longitude referred */
 					  /* to the mean equinox of the date */
       pos[1] = sumb*DEG/1000000;	/* geocentric latitude */
       pos[2] = (385000.56 + sumr/1000)/149597870; /* AU (center-center) */
@@ -3759,9 +3757,11 @@ void heliocentricXYZr(double JDE, int32_t object, double equinox, double *pos,
         printf("ASTRON: lunar ecliptic geocentric coordinates for equinox of date:\n");
         printLBRtoXYZ(pos);
       }
-      if (vocal && JDE != equinox)
-	printf("ASTRON: precess ecliptic coordinates from JD %1$.14g = %1$-#24.6J to JD %2$.14g = %2$-#24.6J\n", JDE, equinox);
-      eclipticPrecession(pos, JDE, equinox);
+      if (JDE != equinox) {
+        if (vocal)
+          printf("ASTRON: precess ecliptic coordinates from JD %1$.14g = %1$-#24.6J to JD %2$.14g = %2$-#24.6J\n", JDE, equinox);
+        eclipticPrecession(pos, JDE, equinox);
+      }
       if (vocal) {
         printf("ASTRON: lunar ecliptic geocentric coordinates for equinox:\n");
         printLBRtoXYZ(pos);

@@ -2162,7 +2162,7 @@ int32_t execute(int32_t symbol)
 	  n = 0;
 	  continue;
 	} else if (n <= 0)
-	  break; 
+	  break;
 	temp3 = eval((int32_t) temp2);		/* condition */
 	n = int_arg(temp3);
 	if (symbol_class(temp3) != LUX_SCALAR)
@@ -2201,8 +2201,8 @@ int32_t execute(int32_t symbol)
       executeLevel--;
       if ((traceMode & T_LOOP) == 0)
 	noTrace--;
-      if (n != LUX_ERROR)
-	n = 1;
+      if (!n || n == LOOP_BREAK)
+        n = 1;
       break;
     case EVB_WHILE_DO:
       temp2 = *ptr;			/* condition */
@@ -2226,8 +2226,8 @@ int32_t execute(int32_t symbol)
       executeLevel--;
       if ((traceMode & T_LOOP) == 0)
 	noTrace--;
-      if (n != LUX_ERROR)
-	n = 1;
+      if (!n || n == LOOP_BREAK)
+        n = 1;
       break;
     case EVB_RETURN:
       n = *ptr? eval(*ptr): 0;
@@ -2258,7 +2258,7 @@ int32_t execute(int32_t symbol)
 	    if (trace > executeLevel && (traceMode & 127)) {
 	      name = symbolProperName(returnSym);
 	      printf("      ( RETURN,");
-	      if (name) 
+	      if (name)
 		printf("%s  = ", name);
 	      printf("%s )\n", symbolIdent(returnSym, I_VALUE | I_TRUNCATE));
 	    }

@@ -19,3 +19,6 @@ version.texi
 # doxygen
 doxyfile.stamp
 lux.doxy
+
+# generated from Doxyfile.in
+Doxyfile

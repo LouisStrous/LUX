@@ -22,12 +22,13 @@ AC_PROG_YACC
 AC_CHECK_PROGS([DOXYGEN], [doxygen])
 
 # Checks for libraries.
-AC_CHECK_LIB(c, printf)
-AC_CHECK_LIB(m, sin)
-AC_CHECK_LIB(jpeg, jpeg_start_decompress)
-AC_CHECK_LIB(gsl, gsl_sf_bessel_J0)
-AC_CHECK_LIB(X11, XOpenDisplay)
-AC_CHECK_LIB(readline, readline)
+AC_CHECK_LIB([c], [printf])
+AC_CHECK_LIB([m], [sin])
+AC_CHECK_LIB([jpeg], [jpeg_start_decompress])
+AC_CHECK_LIB([gslcblas], [cblas_dgemm])
+AC_CHECK_LIB([gsl], [gsl_sf_bessel_J0])
+AC_CHECK_LIB([X11], [XOpenDisplay])
+AC_CHECK_LIB([readline], [readline])
 
 # Checks for header files.
 

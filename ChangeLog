@@ -2,6 +2,17 @@
 
 Change Log of LUX
 
+- <2015-08-01 Sat> lux@quae.nl v1.1.1
+  - Re-enable %T, %J printf formats.  %J interprets the value as
+    Chronological Julian Day rather than as Julian Day; new %#J
+    interprets as Julian Day.
+  - Read ASTRON orbits file from $LUXDIR instead of $ANADIR.
+  - Fix bugs in FIND_MINLOC and similar, and in ASTRON, CSPLINE_EXTR.
+  - Minor change to calculation of heliocentric coordinates by ASTRON.
+  - Honor RETURN inside loop.
+  - Resolve GSL/BLAS linker error that showed up after recent Linux
+    upgrade.
+  - Improve parameter error estimation by FIT.
 - <2014-09-05 Fri> lux@quae.nl v1.1.0
   - Add SINCOS subroutine.
   - Fix MOD binary operator for INT64 operand.

@@ -1,5 +1,7 @@
-#include <stdio.h>
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>             // for getenv
+#include <unistd.h>             // for chdir
 #include "vsop.hh"
 
 #define NREC (80)
@@ -15,6 +17,13 @@ int main(void) {
   double pos[3];
   int i;
 
+  // test data is accessed through the "srcdir" environment variable.
+  char* srcdir = getenv("srcdir");
+  if (srcdir)
+    chdir(srcdir);
+  else {
+    puts("Environment variable srcdir was not set; it is expected to contain the location of the vsop87test.txt file.");
+  }
   fin = fopen("vsop87test.txt", "r");
   if (!fin) {
     puts("Cannot open vsop87test.txt for reading");

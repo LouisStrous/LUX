@@ -52,7 +52,7 @@ int32_t lux_tape_status(int32_t narg, int32_t ps[])/* print tape status */
   int32_t   fd, j;
 
   printf("Tape status:\n");
-  for (j = 0; j <= MAXTAPE; j++) {
+  for (j = 0; j < MAXTAPE; j++) {
     if ((fd = tape_fd[j]) > 0) {
       printf("\ndrive # %d  ",j);
       if (ioctl(fd, MTIOCGET, &ti))

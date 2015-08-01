@@ -648,7 +648,7 @@ int32_t plotxy(float xx[], float yy[], float ex[], float ey[], int32_t n, int32_
   if (ixlog) {
     x -= (floor(x - xmin) + 1)*stepx;
     for (; x <= xmax; x += stepx) {
-      for (i = 0; i < 9; i++) {
+      for (i = 0; i < 8; i++) {
 	x2 = wxb + (x - xmin + logs[i])*stepxdvi;
 	if (x2 >= wxb && x2 <= wxt) {
 	  tkplot(x2, wyb, 0, 0);
@@ -705,7 +705,7 @@ int32_t plotxy(float xx[], float yy[], float ex[], float ey[], int32_t n, int32_
   if (iylog) {
     y -= (floor(y - ymin) + 1)*stepy;
     for (; y*stepy <= ymax*stepy; y += stepy) {
-      for (i = 0; i < 9; i++) {
+      for (i = 0; i < 8; i++) {
 	y2 = wyb + (y - ymin + logs[i])*stepydvi;
 	if (y2 >= wyb && y2 <= wyt) {
 	  tkplot(wxb, y2, 0, 0);

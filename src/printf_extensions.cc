@@ -165,7 +165,7 @@ static int32_t obstack_printf_date_int_left(struct obstack *o,
   prec = info->prec;
   if (prec < 0)
     prec = 3;
-  CJDtoCommon(JDtoCJD(value), &year, &month, &day);
+  CJDtoCommon(info->alt? JDtoCJD(value): value, &year, &month, &day);
   if (info->pad == L'0') {      /* sign comes first */
     if (year < 0)
       obstack_1grow(o, '-');
@@ -186,14 +186,22 @@ static int32_t obstack_printf_date_int_left(struct obstack *o,
   }
   obstack_printf(o, "%d", year < 0? -year: year);
   if (prec == 1) {
-    double JD1 = CJDtoJD(CommontoCJD(year, 1, 1));
-    double JD2 = CJDtoJD(CommontoCJD(year + 1, 1, 1));
+    double JD1 = CommontoCJD(year, 1, 1);
+    double JD2 = CommontoCJD(year + 1, 1, 1);
+    if (info->alt) {
+      JD1 = CJDtoJD(JD1);
+      JD2 = CJDtoJD(JD2);
+    }
     lastvalue = (value - JD1)/(JD2 - JD1) + year;
   } else if (prec >= 2) {       /* month */
     obstack_printf(o, "-%02d", month);
     if (prec == 2) {
-      double JD1 = CJDtoJD(CommontoCJD(year, month, 1));
-      double JD2 = CJDtoJD(CommontoCJD(year, month + 1, 1));
+      double JD1 = CommontoCJD(year, month, 1);
+      double JD2 = CommontoCJD(year, month + 1, 1);
+      if (info->alt) {
+        JD1 = CJDtoJD(JD1);
+        JD2 = CJDtoJD(JD2);
+      }
       lastvalue = (value - JD1)/(JD2 - JD1) + month;
     } else if (prec >= 3) {     /* day */
       ivalue = (int32_t) day;

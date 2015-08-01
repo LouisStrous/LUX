@@ -2333,7 +2333,7 @@ The format specifier consists of one character from the following
 list, optionally preceded by a format type modifier (discussed below
 the table).  The C format types @code{c}, @code{n}, @code{u}, and
 @code{p} are not supported.  The format types @code{J}, @code{S},
-@code{t}, @code{T}, and @code{z} are available in LUX but not in C.
+@code{T}, and @code{z} are available in LUX but not in C.
 
 @table @code
 @item d
@@ -2379,10 +2379,12 @@ used.  On input, @code{%g} and @code{%G} work like @code{%e}.  By
 default, a trailing decimal point and trailing zeros after the decimal
 point are not printed.
 @item J
+
 refers to a date and time argument.  On output, the value (a
-@code{FLOAT} or @code{DOUBLE}) is interpreted as a Julian Day Number
-and converted to the corresponding date in the common Western
-calendar; @ref{CALENDAR} for more information about calendar
+@code{FLOAT} or @code{DOUBLE}) is interpreted as a Chronological
+Julian Day Number (for @code{%J}) or a Julian Day Number (for
+@code{%#J}) and converted to the corresponding date in the common
+Western calendar; @ref{CALENDAR} for more information about calendar
 transformations.  The specified precision determines how many
 components of the date and time are shown, starting from the year:
 @code{%.1J} provides just the year, @code{%.2J} the year and the
@@ -2394,6 +2396,7 @@ alignment is selected, then the last displayed component is shown with
 further digits after the decimal marker until the specified width has
 been filled.  @code{%.6J} yields a date and time in ISO 8601 format,
 similar to @code{2000-12-30T03:04:05}.
+
 @item s, S
 refer to a @code{STRING} argument.  On output, both formats are
 equivalent.  On input, the @code{%s} format does not accept whitespace
@@ -2658,7 +2661,7 @@ Each format entry comprises some plain text, a %-specification, or a
 of the %-specification.
 
 The main differences between the LUX format strings and the C format
-strings are that LUX but not C features the @code{%t}, @code{%T},
+strings are that LUX but not C features the @code{%J}, @code{%T},
 @code{%S}, and @code{%z} formats and @code{_} and @code{=} format
 modifiers, and that C but not LUX features @code{%n}, @code{%c}, and
 @code{%p} formats.
@@ -2700,7 +2703,7 @@ The differences between LUX input formats and C input formats are:
 @enumerate
 @item Initial whitespace in format specifications is ignored by LUX,
 while in C it usually matches any amount of initial whitespace in the
-input. 
+input.
 @item Whitespace counts against field width in LUX if the
 @code{/COUNTSPACES} keyword is specified.  In C and in LUX (in absence
 of the @code{/COUNTSPACES} keyword) whitespace does not count against
@@ -2782,7 +2785,7 @@ Matches the longest non-empty string of input characters that are not in
 the set between brackets.  If you want to include @code{]} in the set,
 then place it directly after the initial @code{[^}.  For the rest,
 similar to @code{[...]}
-@item t, T
+@item T
 A number in sexagesimal notation (e.g., times in hours, minutes, and
 seconds, or angles in degrees, minutes, and seconds).  The number
 consists of two or more numerical components separated by any amount of
@@ -2824,9 +2827,9 @@ default @code{TYPE}: with at most 6 digits after the decimal point.
 @code{3.141}
 @item %5-3f
 @code{3.141} and @code{592}
-@item %t
+@item %T
 @code{3.233333} (equivalent to @code{3:14})
-@item %.3t
+@item %.3T
 @code{3.237756} (equivalent to @code{3:14:15.92})
 @end table
 

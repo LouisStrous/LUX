@@ -109,15 +109,10 @@ void enforce_bounds(double *par, double *lowbound, double *hibound, int32_t nPar
   if (lowbound || hibound) {
     int i;
     for (i = 0; i < nPar; i++) {
-      if (lowbound && hibound
-	  && lowbound[i] > -INFTY && hibound[i] < INFTY) {
-	if (par[i] < lowbound[i] || par[i] > hibound[i])
-	  par[i] = fmod(par[i] - lowbound[i], hibound[i] - lowbound[i])
-	    + lowbound[i];
-      } else if (lowbound && lowbound[i] > -INFTY && par[i] < lowbound[i])
-	par[i] = lowbound[i];
-      else if (hibound && hibound[i] < INFTY && par[i] > hibound[i])
-	par[i] = hibound[i];
+      if (lowbound && par[i] < lowbound[i])
+        par[i] = lowbound[i];
+      else if (hibound && par[i] > hibound[i])
+        par[i] = hibound[i];
     }
   }
 }
@@ -211,7 +206,7 @@ int32_t lux_generalfit(int32_t narg, int32_t ps[])
   iq = lux_double(1, &iq);
   nPar = array_size(iq);
   start = (double *) array_data(iq);
-  
+
   iq = ps[3];                   /* STEP: initial parameter step sizes */
   if (symbol_class(iq) != LUX_ARRAY)
     return cerror(NEED_ARR, iq);
@@ -293,7 +288,7 @@ int32_t lux_generalfit(int32_t narg, int32_t ps[])
     iThresh = int_arg(ps[9]);
   else
     iThresh = 1000;
-  
+
   if (narg >= 11 && ps[10])     /* DTHRESH */
     dThresh = double_arg(ps[10]);
   else
@@ -312,7 +307,7 @@ int32_t lux_generalfit(int32_t narg, int32_t ps[])
     nIter = int_arg(ps[12]);
   else
     nIter = 10;
-  
+
   if (narg >= 14 && ps[13])     /* NSAME: threshold on constant parameters */
     nSame = int_arg(ps[13]);
   else
@@ -356,7 +351,7 @@ int32_t lux_generalfit(int32_t narg, int32_t ps[])
 
   /* copy start values into par */
   memcpy(par, start, size);
-    
+
   /* enforce upper and lower bounds */
   enforce_bounds(par, lowbound, hibound, nPar);
 
@@ -528,80 +523,76 @@ int32_t lux_generalfit(int32_t narg, int32_t ps[])
     memcpy(par, parBest2, size);
     par[nPar] = qBest2;
 
-    /* presumably we're close to a local minimum now; home in */
-    double qualplus, qualmin;
-    for (i = 0; i < nPar; i++) {
-      if (step[i]) {
-        double h = fabs(step[i]);
-        double r;
-        do {
-          par[i] = parBest2[i] + h;
-          if (fitSym) {
-            j = eval(fitTemp);
-            if (j < 0) {
-              bad = 1;
-              break;
-            }
-            qualplus = double_arg(j);
-            zapTemp(j);
-          } else
-            qualplus = fitFunc(par, nPar, xp, yp, weights, nPoints);
-          par[i] = parBest2[i] - h;
-          if (fitSym) {
-            j = eval(fitTemp);
-            if (j < 0) {
-              bad = 1;
-              break;
-            }
-            qualmin = double_arg(j);
-            zapTemp(j);
-          } else
-            qualmin = fitFunc(par, nPar, xp, yp, weights, nPoints);
-          r = qBest2? (qualplus + qualmin)/qBest2: 3.5;
-          h *= 12/(r*r - 4);
-        } while ((r > 5 || r < 3) && h < err[i]*1e6);
+    if (qBest2) {
+      /* presumably we're close to a local minimum now; home in */
+      double qualplus, qualmin;
+      for (i = 0; i < nPar; i++) {
+        if (step[i]) {
+          double h = fabs(step[i]);
+          double chi2;
+          int count = 0;
+          do {
+            ++count;
+            par[i] = parBest2[i] + h;
+            if (fitSym) {
+              j = eval(fitTemp);
+              if (j < 0) {
+                bad = 1;
+                break;
+              }
+              qualplus = double_arg(j);
+              zapTemp(j);
+            } else
+              qualplus = fitFunc(par, nPar, xp, yp, weights, nPoints);
+            par[i] = parBest2[i] - h;
+            if (fitSym) {
+              j = eval(fitTemp);
+              if (j < 0) {
+                bad = 1;
+                break;
+              }
+              qualmin = double_arg(j);
+              zapTemp(j);
+            } else
+              qualmin = fitFunc(par, nPar, xp, yp, weights, nPoints);
 
-        if (bad)
-          break;
+            double z = (qualplus - qualmin)/qBest2;
+            chi2 = (qualplus + qualmin)/qBest2 - 0.5*z*z - 2;
+            double q;
+            if (chi2 > 0) {
+              par[i] = parBest2[i] - 0.5*h*z/chi2;
+              if (fitSym) {
+                j = eval(fitTemp);
+                if (j < 0) {
+                  bad = 1;
+                  break;
+                }
+                q = double_arg(j);
+                zapTemp(j);
+              } else
+                q = fitFunc(par, nPar, xp, yp, weights, nPoints);
+              if (q < qBest2) {
+                qBest2 = q;
+                parBest2[i] = par[i];
+              }
+              h *= sqrt(2/chi2);
+            }
+            else                // step is way too small
+              h *= 10;
+          } while ((chi2 > 3 || chi2 < 1) && h < err[i]*1e6 && count < 10);
 
-        /* q² = a²(1 + ((x - b)/c)²) */
-        double psi = (qualplus*qualplus - qualmin*qualmin)/4;
-        double beta = qBest2*qBest2;
-        double delta = (qualplus*qualplus + qualmin*qualmin)/2 - beta;
-        double a2, b, c;
-        if (delta) {
-          a2 = beta - psi*psi/delta; /* a² */
-          if (a2 < 0) {
-            a2 = 0;
-            b = 0;
-          } else
-            b = -h*psi/delta;
-          c = h*sqrt(a2/delta);
-        } else {
-          b = 0;
-          c = INFTY;
-        }
-        par[i] = parBest2[i] + b;
-        double q;
-        if (fitSym) {
-          j = eval(fitTemp);
-          if (j < 0) {
-            bad = 1;
+          if (bad)
             break;
-          }
-          q = double_arg(j);
-          zapTemp(j);
-        } else
-          q = fitFunc(par, nPar, xp, yp, weights, nPoints);
-        if (q < qBest2) {
-          parBest2[i] = par[i];
-          qBest2 = q;
-        } else {
+
           par[i] = parBest2[i];	/* restore */
-        }
-        err[i] = c*sqrt(3);
-      } else
+          err[i] = h;
+        } else
+          err[i] = 0;
+      }
+    } else {                    // perfect fit
+      for (i = 0; i < nPar; i++) {
         err[i] = 0;
+      }
     }
     par[nPar] = qBest2;
 
@@ -702,7 +693,7 @@ double fit2_func(const gsl_vector *a, void *p)
 }
 
 /*
-  
+
   par = FIT3(x, y, start, step, funcname [, err, ithresh, sthresh,
   nithresh] [, /VOCAL])
 

@@ -27,6 +27,8 @@ EXTRA_DIST = lux.css
 
 if HAVE_DOXYGEN
 
+EXTRA_DIST += Doxyfile
+
 doxy: doxyfile.stamp
 
 doxyfile.stamp: $(top_builddir)/src/liblux.a

@@ -381,25 +381,25 @@ typedef enum {
 
 #define scratSize()     (NSCRAT*sizeof(int32_t) + (curScrat - (char *) scrat))
 
-/** \struct a single-precision complex number */
+/** a single-precision complex number */
 typedef struct {
   float real;
   float imaginary;
 } floatComplex;
 
-/** \struct a double-precision complex number */
+/** a double-precision complex number */
 typedef struct {
   double real;
   double imaginary;
 } doubleComplex;
 
-/** \union a union of pointers to a complex number */
+/** a union of pointers to a complex number */
 typedef union {
   floatComplex *f;
   doubleComplex *d;
 } complexPointer;
 
-/** \union a union of scalar values */
+/** a union of scalar values */
 typedef union {
   uint8_t b;
   int16_t w;

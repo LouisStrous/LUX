@@ -41,6 +41,7 @@ extern	float	callig_xb, callig_yb;
 array	*h;
 pointer q1, q2, q3, q4;
 int32_t	tkplot(float x, float y, int32_t lineStyle, int32_t symStyle),
+	tkplot_clip(float x, float y, int32_t lineStyle, int32_t symStyle),
 	callig(char *, float, float, float, float, int32_t, int32_t),
 	sform(float, float);
  /* plotting context */
@@ -1001,13 +1002,13 @@ int32_t oplotx(float x[], float y[], float ex[], float ey[], int32_t n, int32_t 
       switch (c) {
       case SECOND_IN: case PART_IN: /* need to move to 1st point */
 	if (i < *qi)
-	  tkplot(*xx, *yy, 0, 0); /* move there */
+	  tkplot_clip(*xx, *yy, 0, 0); /* move there */
 	/* then fall through to the drawing of the second point */
       case FIRST_IN: case ALL_IN: /* need to draw 2nd point */
 	if (i < *qi && (!(internalMode & 128) || c != PART_IN)) {
 	  /* /WHOLE is not set, so draw the partial line */
-	  tkplot(xx[1], yy[1], lineStyle,
-		 (c == PART_IN || c == FIRST_IN)? 0: symStyle);
+	  tkplot_clip(xx[1], yy[1], lineStyle,
+                      (c == PART_IN || c == FIRST_IN)? 0: symStyle);
 	  if (ex && (c == ALL_IN || c == SECOND_IN)) {
 	    xe = x[i] - ex[i];	/* go left first */
 	    coordMap(&xe, NULL);
@@ -1047,7 +1048,7 @@ int32_t oplotx(float x[], float y[], float ex[], float ey[], int32_t n, int32_t 
 	    tkplot(xx[1], yy[1], 0, 0); /* and then return to data point */
 	  }
 	} else {		/* plot break:  move pen to next position */
-	  tkplot(xx[1], yy[1], 0, symStyle);
+	  tkplot_clip(xx[1], yy[1], 0, symStyle);
 	  if (nbreak > 1) {
 	    nbreak--;
 	    qi++;
@@ -1474,6 +1475,16 @@ int32_t tkplot(float x, float y, int32_t lineStyle, int32_t symStyle)
       break;
   }
   return 1;
+}
+ /*------------------------------------------------------------------------*/
+// Like tkplot, but doesn't draw lines spanning more than 0.5 of the
+// plot window width
+int32_t tkplot_clip(float x, float y, int32_t lineStyle, int32_t symStyle)
+{
+  static float x_prev = 0;
+
+  tkplot(x, y, fabs(x - x_prev) < 0.5? lineStyle: 0, symStyle);
+  x_prev = x;
 }
  /*------------------------------------------------------------------------*/
 int32_t lux_pen(int32_t narg, int32_t ps[])

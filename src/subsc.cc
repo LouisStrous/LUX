@@ -2127,7 +2127,14 @@ int32_t lux_symdtype(int32_t narg, int32_t ps[])
 
   nsym = ps[0];				/*the target symbol is the first */
   result_sym = scalar_scratch(LUX_INT32);
-  sym[result_sym].spec.scalar.l = sym[nsym].type;
+  int32_t t = sym[nsym].type;
+  switch (sym[nsym].type) {
+  case LUX_LSTRING: case LUX_STRING_ARRAY:
+    t = LUX_TEMP_STRING;
+    // no break
+  default:
+    sym[result_sym].spec.scalar.l = t;
+  }
   return result_sym;
 }
  /*------------------------------------------------------------------------- */

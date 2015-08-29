@@ -17,24 +17,13 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
+#include <math.h>               // for sincos
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE             /* for sincos */
-#endif
+#include "action.hh"            // for BIND
+#include "replacements.h"       // if sincos is missing
 
-#include <math.h>               /* for sincos */
-#include "action.hh"             /* for BIND */
-
-#if !HAVE_SINCOS
-void sincos(double x, double *sinx, double *cosx)
-{
-  if (sinx)
-    *sinx = sin(x);
-  if (cosx)
-    *cosx = cos(x);
-}
-#endif
 BIND(sincos, v_ddpdp_iDaoDqDq_012, s, SINCOS, 3, 3, NULL);

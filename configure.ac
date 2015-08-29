@@ -5,6 +5,10 @@ AC_PREREQ([2.68])
 AC_INIT([lux], [1.1.1], [lux@quae.nl])
 AC_LANG([C++])
 AC_CONFIG_SRCDIR([src/lux.cc])
+
+# Location of our own implementation of missing "standard" functions.
+AC_CONFIG_LIBOBJ_DIR([lib])
+
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE
 AM_PATH_CPPUNIT()
@@ -21,7 +25,7 @@ AC_PROG_RANLIB
 AC_PROG_YACC
 AC_CHECK_PROGS([DOXYGEN], [doxygen])
 
-# Checks for libraries.
+# Checks for libraries.  The order is important!
 AC_CHECK_LIB([c], [printf])
 AC_CHECK_LIB([m], [sin])
 AC_CHECK_LIB([jpeg], [jpeg_start_decompress])
@@ -39,7 +43,10 @@ AC_TYPE_INT32_T
 AC_TYPE_INT64_T
 
 # Checks for library functions.
-AC_CHECK_FUNCS([clock_gettime sincos])
+AC_CHECK_FUNCS([clock_gettime])
+
+# Checks for library functions, with replacements if needed.
+AC_REPLACE_FUNCS([sincos])
 
 AC_CONFIG_FILES([Makefile
                  sofa/Makefile

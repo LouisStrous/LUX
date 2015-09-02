@@ -33,6 +33,7 @@ vsop_LDADD = $(top_builddir)/src/liblux.a -lm -lc
 
 cpputests_SOURCES = \
 	TestArray.hh\
+	check-Ellipsoid.cc\
 	check-Rotate3d.cc\
 	cpputests-main.cc
 cpputests_LDADD = $(top_builddir)/src/liblux.a -lm -lc $(CPPUTESTLIBS)

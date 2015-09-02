@@ -72,21 +72,26 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
    since 0 UT on 1 January 1970.
 */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+#include <assert.h>
 #include <ctype.h>
-#include <string.h>
+#include <float.h>
 #include <math.h>
 #include <stdlib.h>
-#include <float.h>
-#include <assert.h>
+#include <string.h>
 #include <time.h>
+
+#include "AstronomicalConstants.hh"
+#include "Ellipsoid.hh"
+#include "Rotate3d.hh"
 #include "action.hh"
-#include "astron.hh"
 #include "astrodat2.hh"
 #include "astrodat3.hh"
+#include "astron.hh"
 #include "calendar.hh"
+#ifdef HAVE_CONFIG_H
+#  include "config.h"
+#endif
+#include "replacements.h"       // if sincos is missing
 #include "vsop.hh"
 
 #define extractbits(value, base, bits) (((value) >> (base)) & ((1 << (bits)) - 1))
@@ -117,6 +122,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #define NOBJECTS	9
 
 #define EARTH		3
+
+const double AU_m = 149597870700.;
 
 int32_t	findint(int32_t, int32_t *, int32_t);
 void	UTC_to_TAI(double *), TAI_to_UTC(double *);
@@ -2148,97 +2155,22 @@ double JDE(double JD, int32_t direction)
   return (direction < 0)? JD - dT/86400: JD + dT/86400;
 }
 /*--------------------------------------------------------------------------*/
-void rotate(double *pos, double angle, int32_t axis)
-/* rotate X, Y, and Z (pos[0] through pos[2]) over the specified angle */
-/* (in radians) along the specified axis (X = 0, etc.) */
+void rotate(double *pos, double angle_rad, int32_t axis)
+// rotate X, Y, and Z (pos[0] through pos[2]) over the specified angle
+// (in radians) along the specified axis (X = 0, etc.)
 {
-  double	p1, p2, c, s;
-  static double	se = 0.3977771559, ce = 0.917482062; /* sine and cosine of */
-				/* angle of ecliptic at equinox 2000.0 */
-
   switch (axis)
-  { case 0:			/* around X axis */
-      c = cos(angle);
-      s = sin(angle);
-      p1 = pos[1]*c - pos[2]*s;
-      p2 = pos[1]*s + pos[2]*c;
-      pos[1] = p1;
-      pos[2] = p2;
-      c = c*c;
-      s = s*s;
-      p1 = pos[4]*c + pos[5]*s;
-      p2 = pos[4]*s + pos[5]*c;
-      pos[4] = p1;
-      pos[5] = p2;
-      break;
-    case 1:			/* around Y axis */
-      c = cos(angle);
-      s = sin(angle);
-      p1 = pos[0]*c + pos[2]*s;
-      p2 = -pos[0]*s + pos[2]*c;
-      pos[0] = p1;
-      pos[2] = p2;
-      c = c*c;
-      s = s*s;
-      p1 = pos[3]*c + pos[5]*s;
-      p2 = pos[3]*s + pos[5]*c;
-      pos[3] = p1;
-      pos[5] = p2;
-      break;
-    case 2:			/* around Z axis */
-      c = cos(angle);
-      s = sin(angle);
-      p1 = pos[0]*c - pos[1]*s;
-      p2 = pos[0]*s + pos[1]*c;
-      pos[0] = p1;
-      pos[1] = p2;
-      c = c*c;
-      s = s*s;
-      p1 = pos[3]*c + pos[4]*s;
-      p2 = pos[3]*s + pos[4]*c;
-      pos[3] = p1;
-      pos[4] = p2;
-      break;
-    case 3:			/* + e2000 */
-      p1 = pos[1]*ce + pos[2]*se;
-      p2 = -pos[1]*se + pos[2]*ce;
-      pos[1] = p1;
-      pos[2] = p2;
-      break;
-    case 4:			/* - e2000 */
-      p1 = pos[1]*ce - pos[2]*se;
-      p2 = pos[1]*se + pos[2]*ce;
-      pos[1] = p1;
-      pos[2] = p2;
-      break;
-    }
-}
-/*--------------------------------------------------------------------------*/
-void precess(double *pos, double equinox, int32_t forward)
-     /* precess the rectangular coordinates from equinox 2000.0 to */
-     /* the specified one (JDE) (forward > 0) or backward (forward <= 0) */
-     /* ES3.212 */
-{
-  static double	z_a = 0, theta_a = 0, zeta_a = 0, oldEquinox = J2000;
-  double	T;
-
-  if (equinox == J2000)
-    return;			/* already in 2000.0 */
-  if (equinox != oldEquinox)
-  { oldEquinox = equinox;
-    T = (equinox - J2000)/36525;
-    zeta_a = pol2(2306.2181, 0.30188, 0.017998, T)*T*DEG/3600;
-    z_a = pol2(2306.2181, 1.09468, 0.018203, T)*T*DEG/3600;
-    theta_a = pol2(2004.3109, -0.42665, -0.041833, T)*T*DEG/3600; }
-  if (forward > 0)
-  { rotate(pos, zeta_a, 2);
-    rotate(pos, -theta_a, 1);
-    rotate(pos, z_a, 2); }
-  else
-  { rotate(pos, -z_a, 2);
-    rotate(pos, theta_a, 1);
-    rotate(pos, -zeta_a, 2); }
-  return;
+  {
+  case 0:			/* around X axis */
+    Rotate3d::rotate_x(pos, angle_rad);
+    break;
+  case 1:			/* around Y axis */
+    Rotate3d::rotate_y(pos, angle_rad);
+    break;
+  case 2:			/* around Z axis */
+    Rotate3d::rotate_z(pos, angle_rad);
+    break;
+  }
 }
 /*--------------------------------------------------------------------------*/
 double	p_ce, p_se, p_pi, p_p;
@@ -3611,9 +3543,9 @@ void extraElementsHeliocentric(double JDE, double *equinox, double *f,
 /*--------------------------------------------------------------------------*/
 void heliocentricXYZr(double JDE, int32_t object, double equinox, double *pos,
 		      double *r, double tolerance, int32_t vocal, int32_t source)
-     /* returns in <f> the cartesian heliocentric ecliptic coordinates of
-	object <object> for the desired <equinox> at <JDE>, and in
-	<r> the heliocentric distance */
+// returns in <f> the cartesian heliocentric ecliptic coordinates of
+// object <object> for the desired <equinox> at <JDE>, and in <r> the
+// heliocentric distance
 {
   double	T, standardEquinox;
   int32_t	i;
@@ -3818,6 +3750,66 @@ void heliocentricXYZr(double JDE, int32_t object, double equinox, double *pos,
     }
     break;
   }
+}
+
+static Ellipsoid
+earth_ellipsoid(AstronomicalConstants::Earth_equatorial_radius_m
+                / AstronomicalConstants::AU_m,
+                AstronomicalConstants::Earth_flattening);
+
+/*--------------------------------------------------------------------------*/
+/// Calculates geocentric ecliptic cartesian coordinates from
+/// geographic polar ones.
+///
+/// \param[in] geograhic_latitude_rad is the geographic latitude in
+/// radians.
+///
+/// \param[in] sidereal_rad is the local sidereal time in radians.
+///
+/// \param[in] height_m is the height above sea level in meters
+///
+/// \param[in] obliquity_rad is the obliquity of the ecliptic in
+/// radians.
+///
+/// \param[out] xyz_AU is a pointer to the geocentric ecliptic
+/// cartesian coordinates (X, Y, Z) measured in Astronomical Units.
+void
+get_geocentric_ecliptic_xyz_AU(double geographic_latitude_rad,
+                               double sidereal_rad,
+                               double height_m,
+                               double obliquity_rad,
+                               double* xyz_AU)
+{
+  earth_ellipsoid.xyz(geographic_latitude_rad, sidereal_rad, height_m, xyz_AU);
+  Rotate3d::rotate_x(xyz_AU, -obliquity_rad);
+}
+/*--------------------------------------------------------------------------*/
+double
+get_geocentric_latitude_rad(double geographic_latitude_rad,
+                            double height_m)
+{
+  return earth_ellipsoid.geocentric_latitude_rad(geographic_latitude_rad, height_m);
+}
+/*--------------------------------------------------------------------------*/
+bool heliocentricXYZr_obs(double JDE, int32_t object, double equinox,
+                          double latitude_rad, double sidereal_time_rad,
+                          double height_m,
+                          double *pos, double *r, double tolerance,
+                          int32_t vocal, int32_t source)
+{
+  heliocentricXYZr(JDE, object, equinox, pos, r, tolerance, vocal, source);
+  if (latitude_rad != S_PLANETOCENTRIC
+      && object == 3) {      // Earth
+    double pos_topocentric[3];
+    double epsilon_rad = obliquity(equinox, 0);
+    get_geocentric_ecliptic_xyz_AU(latitude_rad, sidereal_time_rad, height_m,
+                                   epsilon_rad, pos_topocentric);
+    for (int i = 0; i < 3; ++i)
+      pos[i] += pos_topocentric[i];
+    *r = hypota(3, pos);
+    return true;
+  }
+  return false;
 }
 /*--------------------------------------------------------------------------*/
 void LBRtoXYZ(double *pos, double *pos2)
@@ -4045,33 +4037,8 @@ int32_t lux_astrf(int32_t narg, int32_t ps[]) {
   return result;
 }
 /*--------------------------------------------------------------------------*/
-#define s_parallax (4.263451e-5)
-void parallax(double *pos, double r0, double rcp, double rsp)
-/* corrects equatorial planetocentric coordinates for parallax, i.e. */
-/* transforms to equatorial topocentric coordinates.  Tsid is the */
-/* local sidereal time, r0 is the apparent planetocentric distance, */
-/* rcp and rsp indicate the topocentric coordinates of the observer */
-{
-  double	r, cd, ch, sd, sh, u, A, B, C, q;
-
-  r = s_parallax/r0;	/* sine of equatorial horizontal parallax */
-  cd = cos(pos[1]);		/* declination */
-  sd = sin(pos[1]);
-  sh = sin(pos[0]);		/* hour angle */
-  ch = cos(pos[0]);
-  A = cd*sh;
-  B = cd*ch - rcp*r;
-  C = sd - rsp*r;
-  u = A*A + B*B;
-  q = sqrt(u + C*C);
-  pos[0] = fmod(atan2(A, B), TWOPI);
-  if (pos[0] < 0)
-    pos[0] += TWOPI;	/* apparent hour angle */
-  pos[1] = asin(C/q);	/* apparent declination */
-}
-/*--------------------------------------------------------------------------*/
 void refract(double *pos, double height)
-/* corrects height above the horizon (pos[1]) for average 
+/* corrects height above the horizon (pos[1]) for average
    refraction - but only if the refracted height is nonnegative */
 {
   double	R, h;
@@ -4104,18 +4071,6 @@ void eqtohor(double *pos, double cphi, double sphi, char forward)
   h = asin(sphi*sd + cphi*cd*cH);
   pos[0] = A;
   pos[1] = h;
-}
-/*--------------------------------------------------------------------------*/
-#define FLAT	0.99664719
-#define R_EARTH	6378140
-void geocentricCoords(double latitude, double height, double *rcp, double *rsp)
-/* returns the geocentric quantities rho cos phi and rho sin phi */
-{ 
-  double	u;
-
-  u = atan(FLAT*tan(latitude));
-  *rcp = cos(u) + height*cos(latitude)/R_EARTH;
-  *rsp = FLAT*sin(u) + height*sin(latitude)/R_EARTH;
 }
 /*--------------------------------------------------------------------------*/
 double meanDistance(int32_t obj1, int32_t obj2)
@@ -4165,6 +4120,7 @@ void printHBRtoXYZ(double *lbr)
   printf(" R = %.10g\n", lbr[2]);
   printf(" X = %.10g, Y = %.10g, Z = %.10g\n", xyz[0], xyz[1], xyz[2]);
 }
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 int32_t lux_astropos(int32_t narg, int32_t ps[])
      /* returns the positions of a set of heavenly bodies at a specific */
@@ -4265,6 +4221,8 @@ int32_t lux_astropos(int32_t narg, int32_t ps[])
       return luxerror("Non-ecliptic/non-equatorial coordinates are only returned relative to the Earth", 0);
   }
 
+  double geocentric_latitude_rad;
+
   if (narg > 3 && ps[3]) {	/* OBSERVER */
     if (symbol_class(ps[3]) != LUX_ARRAY
 	|| array_size(ps[3]) != 3)
@@ -4279,9 +4237,8 @@ int32_t lux_astropos(int32_t narg, int32_t ps[])
       return luxerror("Illegal latitude: %14.6g; must be between -90 and +90 degrees", ps[3], latitude);
     latitude *= DEG;
     longitude *= DEG;
-    geocentricCoords(latitude, height, &rcp, &rsp);
-    clat = cos(latitude);
-    slat = sin(latitude);
+    sincos(latitude, &slat, &clat);
+    geocentric_latitude_rad = get_geocentric_latitude_rad(latitude, height);
   } else {			/* assume planetocentric */
     latitude = S_PLANETOCENTRIC;
     if (coordSystem == S_HORIZONTAL)
@@ -4290,6 +4247,7 @@ int32_t lux_astropos(int32_t narg, int32_t ps[])
     longitude = 0;
     clat = 1;
     slat = 0;
+    geocentric_latitude_rad = S_PLANETOCENTRIC;
   }
 
   if (narg > 4 && ps[4]) { 	/* EQUINOX */
@@ -4342,7 +4300,7 @@ int32_t lux_astropos(int32_t narg, int32_t ps[])
     dims[nDims++] = nJD;
   result = array_scratch(LUX_DOUBLE, nDims, dims);
   f = f0 = (double *) array_data(result);
-  
+
   tdt = internalMode & S_TDT;	/* time is specified in TDT rather than UT */
 
   tolerance = 0;
@@ -4404,17 +4362,19 @@ int32_t lux_astropos(int32_t narg, int32_t ps[])
     }
     if (vocal && !(internalMode & S_FK5))
       puts("ASTRON: coordinates relative to VSOP axes, not FK5");
-    
+
     double mean[3];
     if (internalMode & S_CONJSPREAD)
       mean[0] = mean[1] = mean[2] = 0;
 
     double pos_sun_obs[3], r_sun_obs;
-    /* calculate the position of the observer */
-    heliocentricXYZr(jd, object0, equinox, pos_sun_obs, &r_sun_obs, tolerance, 
-                     vocal, internalMode & S_VSOP);
-    /* cartesian ecliptic heliocentric coordinates of the observer
-       at target time */
+    /* calculate the position of the observer's planet */
+    bool applied_observer_planetocentric_offset
+      = heliocentricXYZr_obs(jd, object0, equinox, geocentric_latitude_rad,
+                             Tsid, height, pos_sun_obs, &r_sun_obs, tolerance,
+                             vocal, internalMode & S_VSOP);
+    /* cartesian ecliptic heliocentric coordinates of the observer's
+       planet at target time */
     /* pos_sun_obs[0] = X, pos_sun_obs[1] = Y, pos_sun_obs[2] = Z, */
     /* r_sun_obs = heliocentric distance of the observer */
     if (vocal) {
@@ -4443,7 +4403,7 @@ int32_t lux_astropos(int32_t narg, int32_t ps[])
         uint32_t count = 0;
         while (fabs(lighttime - prev_lighttime) > DBL_EPSILON*1000
                && count < 25) {
-          /* no convergence yet */ 
+          /* no convergence yet */
           prev_lighttime = lighttime; /* old estimate is previous estimate */
           double jd_lt = jd - lighttime; /* time corrected for light time */
           heliocentricXYZr(jd_lt, object[i], equinox, pos_sun_tgt, &r_sun_tgt,
@@ -4489,7 +4449,7 @@ int32_t lux_astropos(int32_t narg, int32_t ps[])
          (These procedures assume that the motion of the observer
          during the light-time period is linear.)
       */
-      
+
       switch (internalMode & (S_LIGHTTIME | S_ABERRATION)) {
       case 0:                   /* geometrical; obs + target at jd */
         heliocentricXYZr(jd, object[i], equinox, pos_sun_tgt, &r_sun_tgt,
@@ -4625,9 +4585,8 @@ int32_t lux_astropos(int32_t narg, int32_t ps[])
               printf("ASTRON: local hour angle\n");
               showradhms(" H = ", final[0]);
             }
-	    parallax(final, r_obs_tgt, rcp, rsp);
             if (vocal) {
-              puts("ASTRON: topocentric equatorial coordinates (parallax):");
+              puts("ASTRON: topocentric equatorial coordinates:");
               printHBRtoXYZ(final);
             }
 	    if (coordSystem == S_ECLIPTICAL || coordSystem == S_EQUATORIAL)

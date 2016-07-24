@@ -159,8 +159,6 @@ Symboltype combinedType(Symboltype, Symboltype);
 
 #define axisAxes(i)	(axisAxis? axisAxis[i]: i)
 
-#define round(x)	((int32_t) (floor(x + 0.5)))
-
 #define debugout(msg)	printf("DEBUG - %s [%s, line %d]\n", msg, __FILE__, __LINE__)
 #define debugout1(fmt,arg)	printf("DEBUG - "); printf(fmt, arg); printf(" [%s, line %d]\n", __FILE__, __LINE__)
 

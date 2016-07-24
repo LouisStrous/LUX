@@ -5,6 +5,7 @@ AC_PREREQ([2.68])
 AC_INIT([lux], [1.1.2-develop], [lux@quae.nl])
 AC_LANG([C++])
 AC_CONFIG_SRCDIR([src/lux.cc])
+AC_CONFIG_MACRO_DIR([m4])
 
 # Location of our own implementation of missing "standard" functions.
 AC_CONFIG_LIBOBJ_DIR([lib])
@@ -21,6 +22,7 @@ AC_DEFINE_UNQUOTED([PLATFORM], "${host}", [The canonical host type])
 # Checks for programs.
 AC_PROG_CC
 AC_PROG_CXX
+AX_CXX_COMPILE_STDCXX_11
 AC_PROG_RANLIB
 AC_PROG_YACC
 AC_CHECK_PROGS([DOXYGEN], [doxygen])

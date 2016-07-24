@@ -315,7 +315,7 @@ BinopTest::binop_array()
         }
 
         extern char* binOpName[];
-        printf("%s %s %s\n", typeName(lhs_type), binOpName[iop], typeName(rhs_type));
+        //printf("%s %s %s\n", typeName(lhs_type), binOpName[iop], typeName(rhs_type));
 
         bin_op_type(op_sym_aa) = tests[iop].op;
         bin_op_type(op_sym_as) = tests[iop].op;

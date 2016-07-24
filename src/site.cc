@@ -1,6 +1,6 @@
 /* This is file site.cc.
 
-Copyright 2013-2014 Louis Strous
+Copyright 2013-2016 Louis Strous
 
 This file is part of LUX.
 
@@ -59,11 +59,11 @@ int32_t site(int32_t narg, int32_t ps[])
 {
   char	fmt[] = " %22s %6d %6d\n", hasInclude = 0, *p, *p2;
   void	setPager(int32_t), resetPager(void);
-  
+
   setPager(0);
   if (!internalMode || internalMode == 255) {
     printw("*** Welcome to " PACKAGE_STRING "\n");
-    printw("Copyright 2013,2014 Louis Strous.\n"
+    printw("Copyright 2013-2016 Louis Strous.\n"
            "This program comes with ABSOLUTELY NO WARRANTY; "
            "for details type ‘info,/warranty’.  "
            "This is free software, and you are welcome to redistribute "

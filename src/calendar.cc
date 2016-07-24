@@ -1,6 +1,6 @@
 /* This is file calendar.cc.
 
-Copyright 2013-2014 Louis Strous
+Copyright 2013-2016 Louis Strous
 
 This file is part of LUX.
 
@@ -1176,7 +1176,7 @@ void IslamicStoCJDA(char * const *date, double *CJD)
 /* EGYPTIAN CALENDAR */
 
 /** The Chronological Julian Day Number of the epoch of the Egyptian calendar */
-#define EGYPTIAN_EPOCH (1448273)
+#define EGYPTIAN_EPOCH (1448638)
 
 static char const *Egyptian_monthnames[] = {
   "Thoth", "Phaophi", "Athyr", "Choiak", "Tybi", "Mecheir", "Phamenoth",

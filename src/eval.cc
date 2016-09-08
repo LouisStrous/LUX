@@ -19915,7 +19915,7 @@ int32_t eval(int32_t symbol)
         break;
       symbol_class(result) = LUX_LIST; /* generate LUX_LIST symbol */
       n = pre_list_num_symbols(symbol); /* number of elements */
-      allocate(list_symbols(result), n, listElem); /* get memory */
+      ALLOCATE(list_symbols(result), n, listElem); /* get memory */
       symbol_memory(result) = symbol_memory(symbol); /* is same size */
       for (i = 0; i < n; i++) { /* all elements */
         list_key(result,i) = pre_list_key(symbol,i)?
@@ -19938,7 +19938,7 @@ int32_t eval(int32_t symbol)
       symbol_class(result) = LUX_CLIST; /* generate LUX_CLIST symbol */
       symbol_context(result) = -compileLevel; /* main level */
       n = pre_clist_num_symbols(symbol); /* number of elements */
-      allocate(clist_symbols(result), n, int16_t); /* get memory */
+      ALLOCATE(clist_symbols(result), n, int16_t); /* get memory */
       symbol_memory(result) = symbol_memory(symbol); /* same size */
       for (i = 0; i < n; i++) { /* all elements */
         if ((clist_symbols(result)[i]

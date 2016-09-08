@@ -139,6 +139,8 @@ int32_t lux_v_dT3dp3_iDT3rDp3p3_0T3_f_(int32_t narg, int32_t ps[], void (*f)(dou
   if ((iq = standard_args(narg, ps, "i>D;i>D;i>D;rD+3,+3", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   f(*ptrs[0].d, *ptrs[1].d, *ptrs[2].d, (double (*)[3]) ptrs[3].d);
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -171,6 +173,8 @@ int32_t lux_i_idpT4_iL1D3arDcq_0T222_f_(int32_t narg, int32_t ps[], int32_t (*f)
     ptrs[1].d += 3;
     ptrs[2].d += 3;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -188,6 +192,8 @@ int32_t lux_i_idT3dp_iD3aL1rDq_10002_f_(int32_t narg, int32_t ps[], int32_t (*f)
     ptrs[0].d += 3;
     ptrs[2].d += 3;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -206,6 +212,8 @@ int32_t lux_v_dT3d3_iD3aD1D1rD3q_120333_f_(int32_t narg, int32_t ps[], int32_t (
     ptrs[0].d += 3;
     ptrs[3].d += 3;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -224,6 +232,8 @@ int32_t lux_v_dT3d3_iD3DcqrDcq_0T2_f_(int32_t narg, int32_t ps[], void (*f)(doub
     ptrs[1].d += 3;
     ptrs[2].d += 3;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -240,6 +250,8 @@ int32_t lux_d_dpdp_iD3aD3qrDm3q_01_2_f_(int32_t narg, int32_t ps[], double (*f)(
     ptrs[0].d += 3;
     ptrs[1].d += 3;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -258,6 +270,8 @@ int32_t lux_v_dpT3_iD3arDm3p2q_011_f_(int32_t narg, int32_t ps[], void (*f)(doub
     ptrs[0].d += 3;
     ptrs[1].d += 2;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -274,6 +288,8 @@ int32_t lux_v_dpdp3_iD3arDp3q_01_f_(int32_t narg, int32_t ps[], void (*f)(double
     ptrs[0].d += 3;
     ptrs[1].d += 9;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -291,6 +307,8 @@ int32_t lux_v_dpT4_iD3arD3q_0111_f_(int32_t narg, int32_t ps[], void (*f)(double
     ptrs[0].d += 3;
     ptrs[1].d += 3;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -308,6 +326,8 @@ int32_t lux_v_dpT3_iD3aoDm3qoDq_0T2_s_(int32_t narg, int32_t ps[], void (*f)(dou
     ptrs[0].d += 3;
     ptrs[2].d += 3;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -325,6 +345,8 @@ int32_t lux_i_dpiidp_iDaLrDq_00T2_f_(int32_t narg, int32_t ps[], int32_t (*f)(do
     ptrs[0].d += infos[0].rdims[0];
     ptrs[2].d += infos[0].rdims[0];
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -342,6 +364,8 @@ int32_t lux_i_dpiT3dp_iDaiLiLrDq_00T3_f_(int32_t narg, int32_t ps[], int32_t (*f
     ptrs[0].d += infos[0].rdims[0];
     ptrs[3].d += infos[0].rdims[0];
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -361,6 +385,8 @@ int32_t lux_v_dp3dp3dp_iD23aD23qoDcm3q_0T2_f_(int32_t narg, int32_t ps[], void (
     ptrs[1].d += 6;
     ptrs[2].d += 2;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -380,6 +406,8 @@ int32_t lux_v_dp3T3_iD23aD23qoDcq_0T2_f_(int32_t narg, int32_t ps[], void (*f)(d
     ptrs[1].d += 6;
     ptrs[2].d += 6;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -396,6 +424,8 @@ int32_t lux_v_dp3dpdp_iD23aoDm2m3qDcq_0T2_s_(int32_t narg, int32_t ps[], void (*
     f((double (*)[3]) ptrs[0].d, ptrs[1].d++, ptrs[2].d++);
     ptrs[0].d += 6;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -413,6 +443,8 @@ int32_t lux_v_dp3dpT6_iD23aoDm2m3aDcT5_0T6_s_(int32_t narg, int32_t ps[], void (
       ptrs[4].d++, ptrs[5].d++, ptrs[6].d++);
     ptrs[0].d += 6;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -430,6 +462,8 @@ int32_t lux_i_dp3dpT6_iD23aoDm2m3aDcT5_0T6_s_(int32_t narg, int32_t ps[], int32_
       ptrs[4].d++, ptrs[5].d++, ptrs[6].d++);
     ptrs[0].d += 6;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -455,6 +489,8 @@ int32_t lux_v_dp3dpdp_iD33aDm3arDcq_0T2_f_(int32_t narg, int32_t ps[], void (*f)
       ptrs[2].d += 3;
     }
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -474,6 +510,8 @@ int32_t lux_v_dp3T3_iD33aDaoDc_0T2_f_(int32_t narg, int32_t ps[], void (*f)(doub
     ptrs[1].d += 6;
     ptrs[2].d += 6;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -496,6 +534,8 @@ int32_t lux_v_dp3T3_iD33aDarDq_0T2_f_(int32_t narg, int32_t ps[], void (*f)(doub
     r2 += 3;
     r3 += 3;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -519,6 +559,8 @@ int32_t lux_v_dp3ddp3dp3_iD33aDmmaDarDq_0T3_f_(int32_t narg, int32_t ps[], void 
     rpom += 3;
     rc2t += 3;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -535,6 +577,8 @@ int32_t lux_d_dp3d_iD33aDmmarDmmq_01_2_f_(int32_t narg, int32_t ps[], double (*f
     *ptrs[2].d++ = f(rnpb, *ptrs[1].d++);
     rnpb += 3;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -553,6 +597,8 @@ int32_t lux_v_dp3dp_iD33arDm3q_01_f_(int32_t narg, int32_t ps[], void (*f)(doubl
     ptrs[0].d += 9;
     ptrs[1].d += 3;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -571,6 +617,8 @@ int32_t lux_v_dp3dp3_iD33arDq_01_f_(int32_t narg, int32_t ps[], void (*f)(double
     ptrs[0].d += 9;
     ptrs[1].d += 9;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -588,6 +636,8 @@ int32_t lux_v_dp3dpdp_iD33aoDm3m3qT2_0T2_s_(int32_t narg, int32_t ps[], void (*f
     f((double (*)[3]) ptrs[0].d, ptrs[1].d++, ptrs[2].d++);
     ptrs[0].d += 9;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -611,6 +661,8 @@ int32_t lux_v_dT8dp3_iDaT5rDp3p3q_0zzz1T5_f_(int32_t narg, int32_t ps[], void (*
     f(*jd++, 0, 0, 0, *dpsi++, *deps++, *xp++, *yp++, rc2t);
     rc2t += 3;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -629,6 +681,8 @@ int32_t lux_v_dT6dp3_iDaT4rDp3p3q_0z11T4_f_(int32_t narg, int32_t ps[], void (*f
     f(*ptrs[0].d++, 0.0, d, t, *ptrs[2].d++, *ptrs[3].d++, (double (*)[3]) ptrs[4].d);
     ptrs[4].d += 9;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -665,6 +719,8 @@ int32_t lux_d_dT6_iLaDaD1T3rDq_0z1T4_5_f_(int32_t narg, int32_t ps[], double (*f
   default:
     break;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -681,6 +737,8 @@ int32_t lux_i_ddidp3_iDaL1rDp3p2q_0z12_f_(int32_t narg, int32_t ps[], int32_t (*
     f(*ptrs[0].d++, 0.0, *ptrs[1].l, (double (*)[3]) ptrs[2].d);
     ptrs[2].d += 6;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -727,6 +785,8 @@ int32_t lux_i_dddp3dp3_iLaoDp2p3qT2_0z12_s_(int32_t narg, int32_t ps[], int32_t 
   default:
     break;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -747,6 +807,8 @@ int32_t lux_v_dddp3dp3_iDaiDp3p3arDcq_0z12_f_(int32_t narg, int32_t ps[], void (
     r1 += 3;
     r2 += 3;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -760,6 +822,8 @@ int32_t lux_v_dT4dpT3_iDaDaoDqT3_0z1z2T4_s_(int32_t narg, int32_t ps[], void (*f
     return LUX_ERROR;
   while (infos[0].nelem--)
     f(*ptrs[0].d++, 0.0, *ptrs[1].d++, 0.0, ptrs[2].d++, ptrs[3].d++, ptrs[4].d++);
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -777,6 +841,8 @@ int32_t lux_v_dT4dp3_iDaT3rDp3p3q_0z1T3_f_(int32_t narg, int32_t ps[], void (*f)
     f(*ptrs[0].d++, 0.0, *ptrs[1].d++, *ptrs[2].d++, tgt);
     tgt += 3;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -799,6 +865,8 @@ int32_t lux_v_dddpT3dp3T5_iDaoDqT3Dp3p3qT5_0z1T8_s_(int32_t narg, int32_t ps[], 
     ptrs[7].d += 9;
     ptrs[8].d += 9;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -821,6 +889,8 @@ int32_t lux_v_dT4dpdp3T5_iDaT3oDqDp3p3qT5_0z1T8_s_(int32_t narg, int32_t ps[], v
     ptrs[7].d += 9;
     ptrs[8].d += 9;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -852,6 +922,8 @@ int32_t lux_d_dT4_iLaDaDarDq_0z12_f_(int32_t narg, int32_t ps[], double (*f)(dou
   default:
     break;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -885,6 +957,8 @@ int32_t lux_v_dddp3_iDarDp3p3q_0z1_f_(int32_t narg, int32_t ps[], void (*f)(doub
     f(*ptrs[0].d++, 0.0, r);
     r += 3;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -933,6 +1007,8 @@ int32_t lux_v_dddp3T3_iLaoD33oDp3p3qDcq_0z1T3_s_(int32_t narg, int32_t ps[], voi
   default:
     break;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -949,6 +1025,8 @@ int32_t lux_i_dddpdp_iDarDq_0z11_f_(int32_t narg, int32_t ps[], int32_t (*f)(dou
     f(*ptrs[0].d++, 0.0, &tt1, &tt2);
     *ptrs[1].d++ = tt1 + tt2;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -962,6 +1040,8 @@ int32_t lux_v_dddpdp_iDaoDqDq_0z12_s_(int32_t narg, int32_t ps[], void (*f)(doub
     return LUX_ERROR;
   while (infos[0].nelem--)
     f(*ptrs[0].d++, 0.0, ptrs[1].d++, ptrs[2].d++);
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -975,6 +1055,8 @@ int32_t lux_v_dddpT3_iDaoDqT3_0z1T3_s_(int32_t narg, int32_t ps[], void (*f)(dou
     return LUX_ERROR;
   while (infos[0].nelem--)
     f(*ptrs[0].d++, 0.0, ptrs[1].d++, ptrs[2].d++, ptrs[3].d++);
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -988,6 +1070,8 @@ int32_t lux_v_dddpT4_iDaoDqT4_0z1T4_s_(int32_t narg, int32_t ps[], void (*f)(dou
     return LUX_ERROR;
   while (infos[0].nelem--)
     f(*ptrs[0].d++, 0.0, ptrs[1].d++, ptrs[2].d++, ptrs[3].d++, ptrs[4].d++);
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -1004,6 +1088,8 @@ int32_t lux_v_dddpT16_iDaoDqT16_0z1T16_s_(int32_t narg, int32_t ps[], void (*f)(
       ptrs[5].d++, ptrs[6].d++, ptrs[7].d++, ptrs[8].d++, ptrs[9].d++,
       ptrs[10].d++, ptrs[11].d++, ptrs[12].d++, ptrs[13].d++, ptrs[14].d++,
       ptrs[15].d++, ptrs[16].d++);
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -1077,6 +1163,8 @@ int32_t lux_iddipT3dp_iLarDp3q_0z1111_f_(int32_t narg, int32_t ps[], int32_t (*f
   default:
     return cerror(ILL_ARG, ps[0]);
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -1090,6 +1178,8 @@ int32_t lux_d_dd_iDarDq_0z_1_f_(int32_t narg, int32_t ps[], double (*f)(double, 
     return LUX_ERROR;
   while (infos[0].nelem--)
     *ptrs[1].d++ = f(*ptrs[0].d++, 0.0);
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -1116,6 +1206,8 @@ int32_t lux_d_dd_iDaD1rDq_01_2_f_(int32_t narg, int32_t ps[], double (*f)(double
     return LUX_ERROR;
   while (infos[0].nelem--)
     *ptrs[2].d++ = f(*ptrs[0].d++, *ptrs[1].d);
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -1133,6 +1225,8 @@ int32_t lux_i_dT5dp_iD3aD1D1rD3q_120003_f_(int32_t narg, int32_t ps[], int32_t (
     ptrs[0].d += 3;
     ptrs[3].d += 3;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -1149,6 +1243,8 @@ int32_t lux_d_dp_iD3arDm3q_0_1_f_(int32_t narg, int32_t ps[], double (*f)(double
     *ptrs[1].d++ = f(ptrs[0].d);
     ptrs[0].d += 3;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -1164,6 +1260,8 @@ int32_t lux_v_ddp3_iD1D33_01_s_(int32_t narg, int32_t ps[], void (*f)(double, do
     f(*ptrs[0].d++, (double (*)[3]) ptrs[1].d);
     ptrs[1].d += 9;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -1205,6 +1303,8 @@ int32_t lux_v_dT4dpdp_iDaT3oDqDq_0T2z34_s_(int32_t narg, int32_t ps[], void (*f)
     return LUX_ERROR;
   while (infos[0].nelem--)
     f(*ptrs[0].d++, *ptrs[1].d++, *ptrs[2].d++, 0.0, ptrs[3].d++, ptrs[4].d++);
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -1219,6 +1319,8 @@ int32_t lux_v_dT4dpT4_iDaDaDoDqT4_0T2z3T6_s_(int32_t narg, int32_t ps[], void (*
   while (infos[0].nelem--)
     f(*ptrs[0].d++, *ptrs[1].d++, *ptrs[2].d++, 0.0, ptrs[3].d++,
       ptrs[4].d++, ptrs[5].d++, ptrs[6].d++);
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -1240,6 +1342,8 @@ int32_t lux_d_dT4dp3_iDaDaDp3p3arDq_00112_3_f_(int32_t narg, int32_t ps[], doubl
     *ptrs[3].d++ = f(uta, utb, tta, ttb, rnpb);
     rnpb += 3;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -1255,6 +1359,8 @@ int32_t lux_i_dT10dpT6_iDaT8oDqT6_0T6z7z8T13_s_(int32_t narg, int32_t ps[], int3
     f(*ptrs[0].d++, *ptrs[1].d++, *ptrs[2].d++, *ptrs[3].d++, *ptrs[4].d++,
       *ptrs[5].d++, *ptrs[6].d++, 0.0, *ptrs[7].d++, 0.0, ptrs[8].d++,
       ptrs[9].d++, ptrs[10].d++, ptrs[11].d++, ptrs[12].d++, ptrs[13].d++);
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -1271,6 +1377,8 @@ int32_t lux_i_dT6dp3_iDaT6oDp2p3q_0T6_f_(int32_t narg, int32_t ps[], int32_t (*f
       *ptrs[5].d++, (double (*)[3]) ptrs[6].d);
     ptrs[6].d += 6;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -1287,6 +1395,8 @@ int32_t lux_v_dT6dp3_iDaT6oDp2p3q_0T6_f_(int32_t narg, int32_t ps[], void (*f)(d
       *ptrs[5].d++, (double (*)[3]) ptrs[6].d);
     ptrs[6].d += 6;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -1302,6 +1412,8 @@ int32_t lux_v_dT6dpT6_iDaT6oDqT6_0T11_s_(int32_t narg, int32_t ps[], void (*f)(d
     f(*ptrs[0].d++, *ptrs[1].d++, *ptrs[2].d++, *ptrs[3].d++,
       *ptrs[4].d++, *ptrs[5].d++, ptrs[6].d++, ptrs[7].d++,
       ptrs[8].d++, ptrs[9].d++, ptrs[10].d++, ptrs[11].d++);
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -1318,6 +1430,8 @@ int32_t lux_v_dT4dp3_iDaT4rDp3p3q_0T4_f_(int32_t narg, int32_t ps[], void (*f)(d
     f(*ptrs[0].d++, *ptrs[1].d++, *ptrs[2].d++, *ptrs[3].d++, r);
     r += 3;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -1332,6 +1446,8 @@ int32_t lux_v_dT4dpdp_iDaT4oDqDq_0T5_s_(int32_t narg, int32_t ps[], void (*f)(do
   while (infos[0].nelem--)
     f(*ptrs[0].d++, *ptrs[1].d++, *ptrs[2].d++, *ptrs[3].d++,
       ptrs[4].d++, ptrs[5].d++);
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -1345,6 +1461,8 @@ int32_t lux_d_dT4_iDaT4rDq_0T3_4_f_(int32_t narg, int32_t ps[], double (*f)(doub
     return LUX_ERROR;
   while (infos[0].nelem--)
     *ptrs[4].d++ = f(*ptrs[0].d++, *ptrs[1].d++, *ptrs[2].d++, *ptrs[3].d++);
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -1364,6 +1482,8 @@ int32_t lux_d_dT4_iDaDarDq_0011_2_f_(int32_t narg, int32_t ps[], double (*f)(dou
     ttb = *ptrs[1].d++ - tta;
     *ptrs[2].d++ = f(uta, utb, tta, ttb);
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -1375,11 +1495,13 @@ int32_t lux_v_dT3dp_iDaT3rDp3q_0T3_f_(int32_t narg, int32_t ps[], void (*f)(doub
 
   if ((iq = standard_args(narg, ps, "i>D*;i>D*;i>D*;rD+3&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
-  
+
   while (infos[0].nelem--) {
     f(*ptrs[0].d++, *ptrs[1].d++, *ptrs[2].d++, ptrs[3].d);
     ptrs[3].d += 3;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -1397,6 +1519,8 @@ int32_t lux_v_dT3dp3_iDaT3rDp3p3q_0T3_f_(int32_t narg, int32_t ps[], void (*f)(d
     f(*ptrs[0].d++, *ptrs[1].d++, *ptrs[2].d++, r);
     r += 3;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -1413,6 +1537,8 @@ int32_t lux_v_dddp_iDaDarDp3q_0T2_f_(int32_t narg, int32_t ps[], void (*f)(doubl
     f(*ptrs[0].d++, *ptrs[1].d++, ptrs[2].d);
     ptrs[2].d += 3;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -1445,6 +1571,8 @@ int32_t lux_d_dd_iLarDq_0z_1_f_(int32_t narg, int32_t ps[], double (*f)(double, 
   default:
     break;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -1459,6 +1587,8 @@ int32_t lux_d_d_iDarDq_0_1_f_(int32_t narg, int32_t ps[], double (*f)(double))
 
   while (infos[0].nelem--)
     *ptrs[1].d++ = f(*ptrs[0].d++);
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -1474,6 +1604,8 @@ int32_t lux_i_idpdp_iLarDp2q_011_f_(int32_t narg, int32_t ps[], int32_t (*f)(int
     f(*ptrs[0].l++, &ptrs[1].d[0], &ptrs[1].d[1]);
     ptrs[1].d += 2;
   }
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -1492,7 +1624,7 @@ int32_t lux_d_sd_iDaLarDxq_000_2_f_(int32_t narg, int32_t ps[], double (*f)(doub
     naxes = 1;
     setAxes(&infos[0], 0, NULL, SL_EACHROW);
     iret = 1;
-    break;    
+    break;
   case 2:                       /* source, axes */
     if ((iq = standard_args(narg, ps, "i>D*;iL*;rD{-}&", &ptrs, &infos)) < 0)
       return LUX_ERROR;
@@ -1528,6 +1660,8 @@ int32_t lux_d_sd_iDaLarDxq_000_2_f_(int32_t narg, int32_t ps[], double (*f)(doub
   }
   if (allaxes)
     free(axes);
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -1551,7 +1685,7 @@ int32_t lux_ivarl_copy_eachaxis_(int32_t narg, int32_t ps[], int32_t (*f)(double
       setAxes(&infos[iret], 0, NULL, SL_EACHROW);
     } else
       iret = 0;
-    break;    
+    break;
   case 2:                       /* source, axes */
     if ((iq = standard_args(narg, ps, isfunction? "i>D*;iL*;rD&": "i>D*;iL*", &ptrs, &infos)) < 0)
       return LUX_ERROR;
@@ -1600,6 +1734,8 @@ int32_t lux_ivarl_copy_eachaxis_(int32_t narg, int32_t ps[], int32_t (*f)(double
   }
   if (allaxes)
     free(axes);
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -1631,7 +1767,7 @@ int32_t lux_i_sdddsd_iDaLDDrDq_000T333_f_(int32_t narg, int32_t ps[], int32_t (*
     iret = 2;
     setAxes(&infos[0], 0, NULL, SL_EACHROW);
     setAxes(&infos[iret], 0, NULL, SL_EACHROW);
-    break;    
+    break;
   case 3:                       /* source, param1, param2 */
     if ((iq = standard_args(narg, ps, "i>D*;i>D;i>D;rD&", &ptrs, &infos)) < 0)
       return LUX_ERROR;
@@ -1640,7 +1776,7 @@ int32_t lux_i_sdddsd_iDaLDDrDq_000T333_f_(int32_t narg, int32_t ps[], int32_t (*
     iret = 3;
     setAxes(&infos[0], 0, NULL, SL_EACHROW);
     setAxes(&infos[iret], 0, NULL, SL_EACHROW);
-    break;    
+    break;
   case 4:                       /* source, axis, param1, param2 */
     if ((iq = standard_args(narg, ps, "i>D*;iL;i>D;i>D;rD&", &ptrs, &infos)) < 0)
       return LUX_ERROR;
@@ -1652,7 +1788,7 @@ int32_t lux_i_sdddsd_iDaLDDrDq_000T333_f_(int32_t narg, int32_t ps[], int32_t (*
     break;
   }
   do {
-    f(ptrs[0].d, infos[0].rdims[0], infos[0].rsinglestep[0], 
+    f(ptrs[0].d, infos[0].rdims[0], infos[0].rsinglestep[0],
       *ptrs[ipar1].d, (ipar2 >= 0? *ptrs[ipar2].d: 0.0),
       ptrs[iret].d, infos[0].rdims[0], infos[iret].rsinglestep[0]);
     ptrs[0].d += infos[0].rsinglestep[1];
@@ -1660,6 +1796,8 @@ int32_t lux_i_sdddsd_iDaLDDrDq_000T333_f_(int32_t narg, int32_t ps[], int32_t (*
   } while (advanceLoop(&infos[0], &ptrs[0]),
 	   advanceLoop(&infos[iret], &ptrs[iret])
            < infos[iret].rndim);
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -1672,6 +1810,8 @@ int32_t lux_v_dp3_rD33_0_f_(int32_t narg, int32_t ps[], void (*f)(double (*)[3])
   if ((iq = standard_args(narg, ps, "rD3,3", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   f((double (*)[3]) ptrs[0].d);
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -1684,6 +1824,8 @@ int32_t lux_v_dp3dp_oD33D3_01_s_(int32_t narg, int32_t ps[], void (*f)(double (*
   if ((iq = standard_args(narg, ps, "oD3,3;oD3", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   f((double (*)[3]) ptrs[0].d, (double *) ptrs[1].d);
+  free(ptrs);
+  free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
@@ -1708,5 +1850,7 @@ int32_t lux_v_sddsd_iDaD1rDq_012_f_(int32_t narg, int32_t ps[], void (*f)(double
     return LUX_ERROR;
   double width = ptrs[1].d? ptrs[1].d[0]: 3;
   f(&ptrs[0].d[0], infos[0].dims[0], 1, width, &ptrs[2].d[0], infos[2].dims[0], 1);
+  free(ptrs);
+  free(infos);
   return iq;
 }

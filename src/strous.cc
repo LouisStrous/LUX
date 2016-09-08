@@ -3187,10 +3187,10 @@ int32_t local_maxormin(int32_t narg, int32_t ps[], int32_t code)
    defaultOffset -= size[i];
  }
  if (code & 4) {		/* subgrid stuff */
-   allocate(grad, ndim, float);
-   allocate(grad2, ndim, float);
-   allocate(hessian, ndim*ndim, float);
-   allocate(hessian2, ndim, float);
+   ALLOCATE(grad, ndim, float);
+   ALLOCATE(grad2, ndim, float);
+   ALLOCATE(hessian, ndim*ndim, float);
+   ALLOCATE(hessian2, ndim, float);
  }
 		/* setup for search */
  n = ntarget;

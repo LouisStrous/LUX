@@ -4259,7 +4259,7 @@ int32_t arestore_one(FILE* fp, int32_t iq, int32_t reverseOrder)
     if (reverseOrder)
       endian(&symbol_memory(iq), sizeof(int32_t), LUX_INT32);
     n = symbol_memory(iq);
-    allocate(p.v, n, char);
+    ALLOCATE(p.v, n, char);
     array_header(iq) = (array *) p.v;
     if (!fread(p.b, n, 1, fp))
       return 1;
@@ -4295,7 +4295,7 @@ int32_t arestore_one(FILE* fp, int32_t iq, int32_t reverseOrder)
     n = symbol_memory(iq);
     if (reverseOrder)
       endian(&n, sizeof(int32_t), LUX_INT32);
-    allocate(p.s, n, char);
+    ALLOCATE(p.s, n, char);
     string_value(iq) = p.s;
     if (!fread(p.b, n, 1, fp))
       return 1;
@@ -4304,7 +4304,7 @@ int32_t arestore_one(FILE* fp, int32_t iq, int32_t reverseOrder)
     n = symbol_memory(iq);
     if (reverseOrder)
       endian(&n, sizeof(int32_t), LUX_INT32);
-    allocate(p.s, n, char);
+    ALLOCATE(p.s, n, char);
     file_map_header(iq) = (array *) p.s;
     if (!fread(p.b, n, 1, fp))
       return 1;
@@ -4317,7 +4317,7 @@ int32_t arestore_one(FILE* fp, int32_t iq, int32_t reverseOrder)
       return 1;
     if (reverseOrder)
       endian(&n, sizeof(int32_t), LUX_INT32);
-    allocate(p.w, n*sizeof(int16_t), int16_t);
+    ALLOCATE(p.w, n*sizeof(int16_t), int16_t);
     clist_symbols(iq) = p.w;
     for (j = 0; j < n; j++) {
       int32_t iq2 = nextFreeTempVariable();

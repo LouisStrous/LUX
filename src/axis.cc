@@ -1701,6 +1701,10 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
           case ':':
             type = DS_ACCEPT;
             break;
+          case '>':
+            type = DS_ATLEAST;
+            fmt++;
+            break;
           default:
             type = DS_EXACT;
             break;
@@ -1734,7 +1738,7 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
             }
             break;
           default:
-            if (d_spec.type == DS_NONE) {
+            if (d_spec.type == DS_NONE || d_spec.type == DS_ATLEAST) {
               d_spec.size_add = size;
               d_spec.type = type;
             } else {
@@ -1888,14 +1892,26 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
 /** Prepares for looping through input and output variables based on a
     standard arguments specification.
 
-    \param [in] narg the number of arguments in \p ps
-    \param [in] ps the array of arguments
-    \param [in] fmt the arguments specification in standard format (see below)
-    \param [out] ptrs a pointer to a list of pointers, one for each
-      argument and possibly one for the return symbol
-    \param [out] infos a pointer to a list of loop information
-      structures, one for each argument and possibly one for the
-      return symbol
+    \param [in] narg is the number of arguments in `ps`
+
+    \param [in] ps is the array of arguments
+
+    \param [in] fmt is the arguments specification in standard format
+    (see below)
+
+    \param [out] ptrs is the address of a pointer in which is returned
+    `NULL` (in case of a problem) or a pointer to a freshly allocated
+    list of pointers, one for each argument (whether mandatory or
+    optional) and possibly one for the return symbol.  Memory for the
+    list is allocated using `malloc`.  The user is responsible for
+    `free`ing the memory when it is no longer needed.
+
+    \param [out] infos is the address of a pointer in which is
+    returned `NULL` (in case of a problem) or a pointer to a list of
+    loop information structures, one for each argument (mandatory or
+    optional) and possibly one for the return symbol.  Memory for the
+    list is allocated using `malloc`.  The user is responsible for
+    `free`ing the memory when it is no longer needed.
 
     \return the return symbol, or -1 if an error occurred.
 
@@ -1908,7 +1924,7 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
 
     \verbatim
     <format> = <param-spec>[;<param-spec>]*
-    <param-spec> = {‘i’|‘o’|‘r’}[‘?’][<type-spec>][<dims-spec>]
+    <param-spec> = {‘i’|‘o’|‘r’}[<type-spec>][<dims-spec>][‘?’]
     <type-spec> = {[‘>’]{‘B’|‘W’|‘L’|‘F’|‘D’}}|‘S’
     <dims-spec> = [‘[’<ref-par>‘]’][‘{’<axis-par>‘}’]<dim-spec>[,<dim-spec>]*[‘*’|‘&’]
     <dim-spec> = [{‘+’NUMBER|‘-’|‘-’NUMBER|‘=’|‘=’NUMBER|‘:’}]*
@@ -1986,6 +2002,9 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
     - NUMBER = the current dimension has the specified size.  For
       input parameters, an error is declared if the dimension does not
       have the specified size.
+    - '>'NUMBER = the current dimension has at least the specified
+      size.  For input parameters, an error is declared if the
+      dimension does not have at least the specified size.
     - ‘+’NUMBER = for output or return parameters, a new dimension with
       the specified size is inserted here.
     - ‘=’ = for output or return parameters, the current dimension is
@@ -2109,14 +2128,24 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, pointer **ptr
         switch (dims_spec[pspec_dims_ix].type) {
         case DS_EXACT: /* an input parameter must have the exact
                           specified dimension */
-          if (pspec->logical_type == PS_INPUT
-              && src_dims[src_dims_ix]
-              != dims_spec[pspec_dims_ix].size_add) {
-            returnSym = luxerror("Expected size %d for dimension %d "
-                                 "but found %d", ps[param_ix],
-                                 dims_spec[pspec_dims_ix].size_add,
-                                 src_dims_ix, src_dims[src_dims_ix]);
-            goto error;
+        case DS_ATLEAST: // or at least the specified size
+          if (pspec->logical_type == PS_INPUT) {
+            if (dims_spec[pspec_dims_ix].type == DS_EXACT
+                && src_dims[src_dims_ix] != dims_spec[pspec_dims_ix].size_add) {
+              returnSym = luxerror("Expected size %d for dimension %d "
+                                   "but found %d", ps[param_ix],
+                                   dims_spec[pspec_dims_ix].size_add,
+                                   src_dims_ix, src_dims[src_dims_ix]);
+              goto error;
+            }
+            else if (dims_spec[pspec_dims_ix].type == DS_ATLEAST
+                && src_dims[src_dims_ix] < dims_spec[pspec_dims_ix].size_add) {
+              returnSym = luxerror("Expected at least size %d for dimension %d "
+                                   "but found %d", ps[param_ix],
+                                   dims_spec[pspec_dims_ix].size_add,
+                                   src_dims_ix, src_dims[src_dims_ix]);
+              goto error;
+            }
           }
           /* the target gets the exact specified dimension */
           tgt_dims[tgt_dims_ix++] = dims_spec[pspec_dims_ix].size_add;

@@ -149,7 +149,7 @@ int32_t lux_orientation(int32_t narg, int32_t ps[])
     if (n1 % 2 == 0)
       n1--;
   }
-  allocate(smooth1, n1, float);
+  ALLOCATE(smooth1, n1, float);
   y = w? 1./w: 0;
   x = -((int32_t) n1/2)*y;
   ptr = smooth1;
@@ -172,7 +172,7 @@ int32_t lux_orientation(int32_t narg, int32_t ps[])
     if (n2 % 2 == 0)
       n2--;
   }
-  allocate(smooth2, n2, float);
+  ALLOCATE(smooth2, n2, float);
   y = w? 1./w: 0;
   x = -(n2/2)*y;
   ptr = smooth2;
@@ -196,7 +196,7 @@ int32_t lux_orientation(int32_t narg, int32_t ps[])
       if (n3 % 2 == 0)
 	n3--;
     }
-    allocate(smooth3, n3, float);
+    ALLOCATE(smooth3, n3, float);
     y = w? 1./w: 0;
     x = -(n3/2)*y;
     ptr = smooth3;

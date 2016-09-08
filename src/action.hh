@@ -161,5 +161,3 @@ Symboltype combinedType(Symboltype, Symboltype);
 
 #define debugout(msg)	printf("DEBUG - %s [%s, line %d]\n", msg, __FILE__, __LINE__)
 #define debugout1(fmt,arg)	printf("DEBUG - "); printf(fmt, arg); printf(" [%s, line %d]\n", __FILE__, __LINE__)
-
-#define ALLOCATE(tgt, num) tgt = calloc(num, sizeof(*tgt))

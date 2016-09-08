@@ -131,7 +131,7 @@ int32_t evalString(char *expr, int32_t nmax)
  }
  /* If we get here then we're interpreting the complete line as an */
  /* LUX expression */
- allocate(text, strlen(expr) + 7, char);
+ ALLOCATE(text, strlen(expr) + 7, char);
  strcpy(text, "!TEMP=");	/* we assign the evaluation result to !TEMP */
  strcat(text, expr);
  result = compileString(text);
@@ -653,7 +653,7 @@ int32_t lux_fft_expand(int32_t narg, int32_t ps[])
   double factor = *ptrs[1].d;
   if (factor <= 0)
     return luxerror("Need positive expansion factor", ps[1]);
-  
+
   int32_t ndim = infos[0].ndim;
   int32_t *dims = (int32_t*) malloc(ndim*sizeof(int32_t));
   if (!dims)
@@ -673,6 +673,8 @@ int32_t lux_fft_expand(int32_t narg, int32_t ps[])
     ptrs[2].d += infos[2].singlestep[2];
   } while (advanceLoop(&infos[0], &ptrs[0]),
 	   advanceLoop(&infos[2], &ptrs[2]) < infos[2].ndim);
+  free(ptrs);
+  free(infos);
   return iq;
 }
 REGISTER(fft_expand, f, FFTEXPAND, 2, 2, NULL);
@@ -2072,7 +2074,7 @@ int32_t index_maxormin(int32_t source, int32_t indices, int32_t code)
   zerobytes(array_data(result), size*lux_type_size[array_type(result)]);
   /* use "any" as an array of flags indicating if any number has been */
   /* put in the corresponding result element so far */
-  allocate(any, size, char);
+  ALLOCATE(any, size, char);
   zerobytes(any, size);		/* initialize to empty */
   any += offset;		/* in case of negative indices */
   switch (type) {

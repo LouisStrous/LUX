@@ -40,28 +40,35 @@ int32_t lux_matrix_product(int32_t narg, int32_t ps[])
   int32_t *dims1, *dims2;
   if (infos[0].ndim >= 2)
     dims1 = infos[0].dims;
-  else
-    return luxerror("Need at least 2 dimensions", ps[0]);
+  else {
+    iq = luxerror("Need at least 2 dimensions", ps[0]);
+    goto error_2;
+  }
   if (infos[1].ndim >= 2)
     dims2 = infos[1].dims;
-  else
-    return luxerror("Need at least 2 dimensions", ps[1]);
-  
+  else {
+    iq = luxerror("Need at least 2 dimensions", ps[1]);
+    goto error_2;
+  }
+
   /* the elements are stored in column-major order */
   /* dimsX[0] = number of columns
      dimsX[1] = number of rows
      the number of columns of argument 1 must equal the number of rows
      of argument 2 */
-  if (dims1[0] != dims2[1])
-    return luxerror("The number of columns (now %d) of the 1st argument must equal the number of rows (now %d) of the 2nd argument", ps[1], dims1[0], dims2[1]);
+  if (dims1[0] != dims2[1]) {
+    iq = luxerror("The number of columns (now %d) of the 1st argument must equal the number of rows (now %d) of the 2nd argument", ps[1], dims1[0], dims2[1]);
+    goto error_2;
+  }
 
   int32_t i, *tdims, tndim;
   if (internalMode & 1) {	/* /OUTER */
     tndim = infos[0].ndim + infos[1].ndim - 2;
-    if (tndim > MAX_DIMS)
-      return luxerror("Result would have %d dimensions, "
-		      "but at most %d are allowed",
-		      ps[1], tndim, MAX_DIMS);
+    if (tndim > MAX_DIMS) {
+      iq = luxerror("Result would have %d dimensions, but at most %d are allowed",
+                    ps[1], tndim, MAX_DIMS);
+      goto error_2;
+    }
     tdims = (int32_t*) malloc(tndim*sizeof(int32_t));
     memcpy(tdims + 2, infos[0].dims + 2, (infos[0].ndim - 2)*sizeof(int32_t));
     memcpy(tdims + 2 + infos[0].ndim - 2, infos[1].dims + 2,
@@ -123,11 +130,16 @@ int32_t lux_matrix_product(int32_t narg, int32_t ps[])
     } while (advanceLoop(&infos[0], &ptrs[0]),
 	     advanceLoop(&infos[1], &ptrs[1]),
 	     advanceLoop(&infos[2], &ptrs[2]) < infos[2].ndim);
-  }  
+  }
+  free(ptrs);
+  free(infos);
   return iq;
 
  error_1:
   free(tdims);
+ error_2:
+  free(ptrs);
+  free(infos);
   return iq;
 }
 REGISTER(matrix_product, f, MPRODUCT, 2, 2, "0INNER:1OUTER");
@@ -239,8 +251,10 @@ int32_t lux_svd(int32_t narg, int32_t ps[])
 
   if ((iq = standard_args(narg, ps, "i>D*;oD&;oD1;oD1", &ptrs, &infos)) < 0)
     return LUX_ERROR;
-  if (infos[0].ndim < 2)
-    return luxerror("Need at least two dimensions", ps[0]);
+  if (infos[0].ndim < 2) {
+    iq = luxerror("Need at least two dimensions", ps[0]);
+    goto error_1;
+  }
   int32_t dims[MAX_DIMS];
   memcpy(dims, infos[0].dims, infos[0].ndim*sizeof(int32_t));
   if (infos[0].dims[0] <= infos[0].dims[1]) {
@@ -265,8 +279,10 @@ int32_t lux_svd(int32_t narg, int32_t ps[])
   do {
     if (singular_value_decomposition(ptrs[0].d, infos[0].dims[0], /* # cols */
 				     infos[0].dims[1],		/* # rows */
-				     ptrs[1].d, ptrs[2].d, ptrs[3].d))
-      return luxerror("SVD decomposition failed", ps[0]);
+				     ptrs[1].d, ptrs[2].d, ptrs[3].d)) {
+      iq = luxerror("SVD decomposition failed", ps[0]);
+      goto error_1;
+    }
     ptrs[0].d += infos[0].singlestep[2];
     ptrs[1].d += infos[1].singlestep[2];
     ptrs[2].d += infos[2].singlestep[1];
@@ -275,14 +291,19 @@ int32_t lux_svd(int32_t narg, int32_t ps[])
 	   advanceLoop(&infos[1], &ptrs[1]),
 	   advanceLoop(&infos[2], &ptrs[2]),
 	   advanceLoop(&infos[3], &ptrs[3]) < infos[3].ndim);
-  return LUX_OK;
+  iq = LUX_OK;
+
+ error_1:
+  free(ptrs);
+  free(infos);
+  return iq;
 }
 REGISTER(svd, s, SVD, 4, 4, NULL);
 /*--------------------------------------------------------------------*/
 int32_t matrix_transpose(double *in, double *out, size_t in_ncol, size_t in_nrow)
 {
   int32_t i, j;
-  
+
   if (!in || !out || in_ncol < 1 || in_nrow < 1) {
     errno = EDOM;
     return 1;
@@ -298,12 +319,16 @@ int32_t lux_transpose_matrix(int32_t narg, int32_t ps[])
   pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
+  int32_t n;
+  int32_t *dims;
 
   if ((iq = standard_args(narg, ps, "i>D*;rD1", &ptrs, &infos)) < 0)
     return LUX_ERROR;
-  if (infos[0].ndim < 2)
-    return luxerror("Need at least 2 dimensions", ps[0]);
-  int32_t *dims = (int32_t*) malloc(infos[0].ndim*sizeof(int32_t));
+  if (infos[0].ndim < 2) {
+    iq = luxerror("Need at least 2 dimensions", ps[0]);
+    goto error_1;
+  }
+  dims = (int32_t*) malloc(infos[0].ndim*sizeof(int32_t));
   dims[0] = infos[0].dims[1];
   dims[1] = infos[0].dims[0];
   memcpy(dims + 2, infos[0].dims + 2, (infos[0].ndim - 2)*sizeof(int32_t));
@@ -314,13 +339,16 @@ int32_t lux_transpose_matrix(int32_t narg, int32_t ps[])
   setAxes(&infos[0], 2, dims, SL_EACHBLOCK);
   setAxes(&infos[1], 2, dims, SL_EACHBLOCK);
   free(dims);
-  int32_t n = infos[0].dims[0]*infos[0].dims[1];
+  n = infos[0].dims[0]*infos[0].dims[1];
   do {
     matrix_transpose(ptrs[0].d, ptrs[1].d, infos[0].dims[0], infos[0].dims[1]);
     ptrs[0].d += n;
     ptrs[1].d += n;
   } while (advanceLoop(&infos[0], &ptrs[0]),
 	   advanceLoop(&infos[1], &ptrs[1]) < infos[1].rndim);
+ error_1:
+  free(ptrs);
+  free(infos);
   return iq;
 }
 REGISTER(transpose_matrix, f, TRANSPOSE, 1, 1, NULL);

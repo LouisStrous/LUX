@@ -408,13 +408,13 @@ int32_t lux_generalfit(int32_t narg, int32_t ps[])
     zapTemp(i);
   } else
     qBest2 = qBest1 = fitFunc(par, nPar, xp, yp, weights, nPoints);
-  allocate(parBest1, nPar, double);
-  allocate(parBest2, nPar, double);
-  allocate(ran, nPar, double);
+  ALLOCATE(parBest1, nPar, double);
+  ALLOCATE(parBest2, nPar, double);
+  ALLOCATE(ran, nPar, double);
   memcpy(parBest1, par, size);
   memcpy(parBest2, par, size);
   memcpy(err, step, size);
-  allocate(meanShift, nPar, double);
+  ALLOCATE(meanShift, nPar, double);
   for (i = 0; i < nPar; i++)
     meanShift[i] = 0.0;
 

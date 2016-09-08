@@ -108,7 +108,7 @@ void register_lux_f(int32_t (*f)(int32_t, int32_t []), char const* name, int32_t
                    int32_t max_arg, char const* spec);
 void register_lux_s(int32_t (*f)(int32_t, int32_t []), char const* name, int32_t min_arg,
                    int32_t max_arg, char const* spec);
-
+/*
 #define REGISTER(func, fs, name, minarg, maxarg, fsspec)        \
 void register_lux_ ## func ## _ ## fs (void) __attribute__((constructor)); \
 void register_lux_ ## func ## _ ## fs (void) { \
@@ -122,5 +122,7 @@ int32_t lux_ ## func ## _ ## fs(int32_t narg, int32_t ps[]) { \
  return result; \
 } \
 REGISTER(func ## _ ## fs, fs, name, minarg, maxarg, fsspec)
-
+*/
+#define REGISTER(func, fs, name, minarg, maxarg, fsspec)
+#define BIND(func, type, fs, name, minarg, maxarg, fsspec)
 #endif

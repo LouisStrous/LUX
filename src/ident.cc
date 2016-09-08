@@ -24,6 +24,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <math.h>
 #include <stdlib.h>
 #include "action.hh"
+#include "luxdefs.hh"
 
 extern char	*curScrat, *binOpSign[];
 char	*fmt_integer, *fmt_float, *fmt_string, *fmt_complex, *fmt_time;
@@ -1302,7 +1303,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     strcpy(curScrat++, "(");
     symbolIdent(bin_op_lhs(symbol), mode & I_SINGLEMODE);
     curScrat += strlen(curScrat);
-    switch (bin_op_type(symbol)) {
+    switch (static_cast<binaryOp>(bin_op_type(symbol))) {
     case LUX_ADD: case LUX_SUB: case LUX_MUL: case LUX_DIV:
     case LUX_POW: case LUX_MOD: case LUX_MAX: case LUX_MIN:
     case LUX_IDIV:

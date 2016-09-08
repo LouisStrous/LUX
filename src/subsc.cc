@@ -1055,7 +1055,7 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
         }
         symbol_memory(n) = narg*sizeof(int16_t);
         if (narg) {		/* arguments */
-          allocate(symbol_data(n), narg, int16_t *);
+          ALLOCATE(symbol_data(n), narg, int16_t *);
           ap = (int16_t*) symbol_data(n);
           while (narg--)
             *ap++ = *ps++;	/* ap is int16_t* and ps is int32_t*, so we cannot */

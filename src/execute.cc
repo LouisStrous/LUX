@@ -139,7 +139,7 @@ int32_t copyToSym(int32_t target, int32_t source)
       break;
     case LUX_STRING: case LUX_FILEMAP: case LUX_ASSOC:
       size = symbol_memory(source);
-      allocate(symbol_data(target), size, char);
+      ALLOCATE(symbol_data(target), size, char);
       memcpy(symbol_data(target), symbol_data(source), size);
       symbol_memory(target) = size;
       if (symbol_class(source) == LUX_STRING)
@@ -160,7 +160,7 @@ int32_t copyToSym(int32_t target, int32_t source)
     case LUX_CLIST:
       size = clist_num_symbols(source);
       optr.w = clist_symbols(source);
-      allocate(clist_symbols(target), size, int16_t);
+      ALLOCATE(clist_symbols(target), size, int16_t);
       symbol_memory(target) = symbol_memory(source);
       ptr.w = clist_symbols(target);
       while (size--) {
@@ -172,7 +172,7 @@ int32_t copyToSym(int32_t target, int32_t source)
     case LUX_CPLIST:
       size = clist_num_symbols(source);
       optr.w = clist_symbols(source);
-      allocate(clist_symbols(target), size, int16_t);
+      ALLOCATE(clist_symbols(target), size, int16_t);
       symbol_memory(target) = symbol_memory(source);
       ptr.w = clist_symbols(target);
       while (size--) {
@@ -183,7 +183,7 @@ int32_t copyToSym(int32_t target, int32_t source)
     case LUX_LIST:
       size = list_num_symbols(source);
       oeptr = list_symbols(source);
-      allocate(list_symbols(target), size, listElem);
+      ALLOCATE(list_symbols(target), size, listElem);
       symbol_memory(target) = symbol_memory(source);
       eptr = list_symbols(target);
       while (size--) {
@@ -784,7 +784,7 @@ int32_t internal_routine(int32_t symbol, internalRoutine *routine)
      arg -= nArg;		/* back to beginning of list */
 
      /* match the keywords with the routine's keyword list */
-     allocate(keys, nArg, int32_t);	/* storage */
+     ALLOCATE(keys, nArg, int32_t);	/* storage */
      for (i = maxArg = 0; i < nArg; i++, arg++, keys++)
        if (symbol_class(*arg) == LUX_KEYWORD) {	/* a keyword */
 	 n = matchKey(keyword_name_symbol(*arg),

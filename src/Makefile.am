@@ -50,7 +50,6 @@ nonmain_sources = \
 	crunch.cc\
 	debug.hh\
 	decomp.cc\
-	defs.hh\
 	dmalloc.hh\
 	editor.cc\
 	editor.hh\
@@ -126,6 +125,7 @@ nonmain_sources = \
 	terminal.cc\
 	terminfo.cc\
 	terminfo.hh\
+	thebindings.cc\
 	topology.cc\
 	trace_decoder_lux.cc\
 	visualclass.c\
@@ -139,9 +139,16 @@ nonmain_sources = \
 
 bin_PROGRAMS = lux
 lux_SOURCES = lux.cc
-lux_LDADD = $(top_builddir)/sofa/src/libsofa_c.a liblux.a
+lux_LDADD = liblux.a $(top_builddir)/sofa/src/libsofa_c.a
+
+thebindings.cc: $(nonmain_sources) bindings.hh bindings.pl
+	perl bindings.pl
 
 # build library, too; makes building test binaries easier
 noinst_LIBRARIES = liblux.a
 liblux_a_SOURCES = $(nonmain_sources)
-liblux_a_LIBADD = $(top_builddir)/sofa/src/libsofa_c.a
+#liblux_a_LIBADD = $(top_builddir)/sofa/src/libsofa_c.a
+
+debug:
+	$(MAKE) CPPFLAGS=-g CFLAGS= CXXFLAGS=
+

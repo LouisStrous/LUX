@@ -20,9 +20,33 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef HAVE_AXIS_H
 #define HAVE_AXIS_H
 
-enum dim_spec_type { DS_NONE = 0, DS_ACCEPT = (1<<0), DS_ADD = (1<<1),
-                     DS_REMOVE = (1<<2), DS_ADD_REMOVE = (DS_ADD | DS_REMOVE),
-                     DS_COPY_REF = (1<<3), DS_EXACT = (1<<4) };
+/// Selects how to handle a particular dimension, for use in
+/// standard_args.
+enum dim_spec_type {
+  /// No selection.
+  DS_NONE = 0,
+
+  /// Accept the dimension as is.
+  DS_ACCEPT = (1<<0),
+
+  /// Insert this dimension.
+  DS_ADD = (1<<1),
+
+  /// Remove this dimension.
+  DS_REMOVE = (1<<2),
+
+  /// Add or remove this dimension.
+  DS_ADD_REMOVE = (DS_ADD | DS_REMOVE),
+
+  /// Copy this dimension from the reference symbol.
+  DS_COPY_REF = (1<<3),
+
+  /// This dimension must have exactly the specified size.
+  DS_EXACT = (1<<4),
+
+  /// This dimension must have at least the specified size.
+  DS_ATLEAST = (1<<5),
+};
 
 struct dims_spec {
   enum dim_spec_type type;

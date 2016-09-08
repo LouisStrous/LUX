@@ -223,7 +223,7 @@ int32_t lux_psum(int32_t narg, int32_t ps[])
       result_sym = array_scratch(LUX_DOUBLE, 1, &size);
       trgt.l = (int32_t*) array_data(result_sym);
       zerobytes(trgt.b, size*sizeof(double));
-      allocate(bigweights, size, double);
+      ALLOCATE(bigweights, size, double);
       zerobytes(bigweights, size*sizeof(double));
     }
   } else {			/* no AXES, assume INDGEN(POWERS) */
@@ -445,7 +445,7 @@ int32_t lux_tolookup(int32_t narg, int32_t ps[])
   else
     multiCompNCoord = nd > 1? index[nd - 1]: 1; /* # dimensions */
   multiCompNPoints = array_size(iq)/multiCompNCoord; /* # data points */
-  allocate(order, multiCompNPoints, int32_t);
+  ALLOCATE(order, multiCompNPoints, int32_t);
   for (i = 0; i < multiCompNPoints; i++)
     order[i] = i;		/* initialize */
   qsort(order, multiCompNPoints, sizeof(int32_t), multiCompare); /* sort */
@@ -1511,7 +1511,7 @@ int32_t lux_multisieve(int32_t narg, int32_t ps[])
   
   nTemp = 1000;			/* start with 1000 elements */
   nnTemp = nTemp - 2;
-  allocate(temp, nTemp, int32_t);
+  ALLOCATE(temp, nTemp, int32_t);
   base = temp;
   step = lux_type_size[maxType];
 
@@ -2261,9 +2261,9 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
 	    nDiagonal++;
       }	/* end of if (!diagonal) else */
       if (nDiagonal) {
-	allocate(grad2, nDiagonal, float);
-	allocate(grad, nDiagonal, float);
-	allocate(hessian, nDiagonal*nDiagonal, float);
+	ALLOCATE(grad2, nDiagonal, float);
+	ALLOCATE(grad, nDiagonal, float);
+	ALLOCATE(hessian, nDiagonal*nDiagonal, float);
 	k = 0;
 	for (i = 0; i < srcinfo.ndim; i++)
 	  if (!diagonal || diagonal[i])

@@ -243,7 +243,7 @@ int32_t string_scratch(int32_t size)
  sym[n].type = LUX_TEMP_STRING;
  sym[n].line = curLineNumber;
  if (size >= 0)
- { allocate(string_value(n), size + 1, char);
+ { ALLOCATE(string_value(n), size + 1, char);
    sym[n].spec.array.bstore = size + 1; }
  else
  { string_value(n) = NULL;
@@ -2054,7 +2054,7 @@ int32_t redef_string(int32_t nsym, int32_t len)
  undefine(nsym);
  symbol_class(nsym) = LUX_STRING;
  sym[nsym].type = LUX_TEMP_STRING;
- allocate(string_value(nsym), len + 1, char);
+ ALLOCATE(string_value(nsym), len + 1, char);
  sym[nsym].spec.array.bstore = len + 1;
  return 1;
 }
@@ -2087,7 +2087,7 @@ int32_t redef_array(int32_t nsym, Symboltype ntype, int32_t ndim, int32_t *dims)
       || mq != symbol_memory(nsym)) {
     undefine(nsym);
     symbol_memory(nsym) = mq;
-    allocate(symbol_data(nsym), mq, char);
+    ALLOCATE(symbol_data(nsym), mq, char);
   }
   symbol_class(nsym) = LUX_ARRAY;
   array_type(nsym) = ntype;
@@ -2935,7 +2935,7 @@ int32_t stringpointer(char *name, int32_t type)
   int32_t	n;
   char	*p;
 
-  allocate(p, strlen(name) + 1, char);
+  ALLOCATE(p, strlen(name) + 1, char);
   strcpy(p, name);
   name = p;
   for (; *p; p++)
@@ -3332,14 +3332,23 @@ void read_a_number_fp(FILE *fp, Scalar *value, Symboltype *type)
   Symboltype thetype;
 
   thetype = LUX_INT32;		/* default */
+
+  // [^-+0-9]*[-+]?[0-8]*
+  // ^
+
   /* skip non-digits, non-signs */
-  while ((ch = nextchar(fp)) != EOF && !isdigit(ch) && !strchr("+-", ch));
+  while ((ch = nextchar(fp)) != EOF
+         && !isdigit(ch)
+         && !strchr("+-", ch));
   if (ch == EOF) {		/* end of file; return LONG 0 */
     value->q = 0;
     if (type)
       *type = thetype;
     return;
   }
+
+  // [^-+0-9]*[-+]?[0-8]*
+  //          ^
 
   /* skip sign, if any */
   if (strchr("+-", ch)) {
@@ -3353,53 +3362,80 @@ void read_a_number_fp(FILE *fp, Scalar *value, Symboltype *type)
     }
   } else sign = 1;
 
+  // [^-+0-9]*[-+]?
+  //               ^
+
   p = numstart = curScrat;
   *p++ = ch;
   do
     *p++ = nextchar(fp);
   while (isodigit((int32_t) p[-1]));
-  ch = p[-1];
-
+  ch = p[-1];                   // first char not an octal digit
   if (ch == EOF) {
     value->q = 0;
     if (type)
       *type = thetype;
     return;
   }
-  if (ch == 'O') {		/* octal integer */
+
+  if (p > numstart
+      && ch == 'O') {		/* octal integer */
+
+    // [^-+0-9]*[-+]?[0-8]+O
+    //                     ^
+
     base = 8;
-    ch = nextchar(fp);
+    ch = nextchar(fp);          // first char of next value
+
+    // [^-+0-9]*[-+]?[0-8]+O
+    //                      ^
+
     if (ch == EOF) {
       value->q = 0;
       if (type)
         *type = thetype;
       return;
     }
-  } else if (isdigit(ch)) {	/* not an octal integer */
-    /* read remaining digits, if any */
-    do
-      *p++ = nextchar(fp);
-    while (isdigit((int32_t) p[-1]));
-    ch = p[-1];
-  }
+  } else	/* not an octal integer, maybe a decimal one */
+    if (isdigit(ch)) {
+      // [^-+0-9]*[-+]?[0-9]
+      //                    ^
+
+      /* read remaining digits, if any */
+      do
+        *p++ = nextchar(fp);
+      while (isdigit((int32_t) p[-1]));
+      ch = p[-1];               // first char not a decimal digit
+
+      // [^-+0-9]*[-+]?[0-9]+
+      //                     ^
+    }
 
   switch (toupper(ch)) {
-  case 'W': case 'L': case 'B': case 'Q': case 'I': /* done with the digits */
+  case 'W': case 'L': case 'B': case 'Q': case 'I':
+    /* done with the digits */
+    // [^-+0-9]*[-+]?[0-9]+[BILQW]
+    //                        ^
     break;
   case 'X':			/* hex number? */
-    if (p == numstart + 2 && numstart[0] == '0') { /* yes, a hex number */
+    if (p == numstart + 2
+        && numstart[0] == '0') { /* yes, a hex number */
+      // [^-+0-9]*[-+]?0X
+      //                 ^
       do
         *p++ = nextchar(fp);
       while (isxdigit((int32_t) p[-1]));
       ch = p[-1];
       base = 16;
+      // [^-+0-9]*[-+]?0X[0-9A-F]*
+      //                          ^
     } /* else we're already at the end of the non-hex number */
     break;
   case 'S': case 'H':	/* sexagesimal numbers */
     /* ddd|{SH}[ddd:]*[ddd][.ddd][{DE}][I] */
     /*    ^ we are here */
     kind = ch;		/* S or H */
-    *p = '\0';		/* temporarily terminate */
+    p[-1] = '\0';		/* temporarily terminate */
     value->d = atol(numstart); /* read the first number */
     p = numstart;
     base = 0;			/* count the number of elements */
@@ -3435,26 +3471,29 @@ void read_a_number_fp(FILE *fp, Scalar *value, Symboltype *type)
         value->d *= 60;
         value->d += atol(numstart);
         base++;
-        ch = nextchar(fp);
       }
     }
     while (base--)		/* back to units */
       value->d /= 60;
     if (kind == 'H')
       value->d *= 15;	/* from hours to degrees */
-    kind = toupper(*p);
+    kind = toupper(ch);
     if (kind == 'D' || kind == 'E') {
+      ch = nextchar(fp);
       if (toupper(ch) == 'I') { /* imaginary */
+        ch = nextchar(fp);
         thetype = (kind == 'D')? LUX_CDOUBLE: LUX_CFLOAT;
       } else
         thetype = (kind == 'D')? LUX_DOUBLE: LUX_FLOAT;
     } else if (kind == 'I') {
+      ch = nextchar(fp);
       thetype = LUX_CFLOAT;
     } else
       thetype = LUX_FLOAT;
     value->d *= sign;	/* put the sign back on it */
     if (type)
       *type = thetype;
+    unnextchar(ch, fp);    // return first char beyond value to stream
     return;
   case '.': case 'D': case 'E':
     if (ch == '.') {

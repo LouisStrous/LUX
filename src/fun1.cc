@@ -1545,7 +1545,7 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
   if (p == 1) {			/* regular summation */
     if (haveWeights) {		/* have <weights> */
       if (mean) {		/* want average */
-	allocate(hist.d, size, double);
+	ALLOCATE(hist.d, size, double);
 	zerobytes(hist.d, size*sizeof(double));
 	hist.d += offset;
 	switch (outType) {
@@ -1766,7 +1766,7 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
       }	/* end of if (mean) else */
     } else {			/* no <weights>: each element counts once */
       if (mean) {		/* want average */
-	allocate(hist.l, size, int32_t);
+	ALLOCATE(hist.l, size, int32_t);
 	zerobytes(hist.l, size*sizeof(int32_t));
 	hist.l += offset;
 	switch (outType) {
@@ -1994,7 +1994,7 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
     present = (uint8_t *) curScrat;
     if (haveWeights) {		/* weighted power summation */
       if (mean) {		/* want averages */
-	allocate(hist.d, size, double);
+	ALLOCATE(hist.d, size, double);
 	zerobytes(hist.d, size*sizeof(double));
 	hist.d += offset;
 	switch (outType) {
@@ -2730,7 +2730,7 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
       }	/* end of if (mean) else */
     } else {			/* unweighted power summation */
       if (mean) {		/* want averages */
-	allocate(hist.l, size, int32_t);
+	ALLOCATE(hist.l, size, int32_t);
 	zerobytes(hist.l, size*sizeof(int32_t));
 	hist.l += offset;
 	switch (outType) {

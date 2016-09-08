@@ -953,7 +953,7 @@ int32_t scanPolygon(int32_t *x1, int32_t *x2, int32_t *y, char code)
       nVertex = *x1;		/* number of vertices */
       if (nVertex < 1)
 	return luxerror("Less than one vertex in polygon!", 0);
-      allocate(vertex, nVertex + 2, Vertex); /* room for coordinates */
+      ALLOCATE(vertex, nVertex + 2, Vertex); /* room for coordinates */
       for (i = 0; i < nVertex; i++) {
 	vertex[i + 1].x = x2[i];
 	vertex[i + 1].y = y[i];
@@ -997,13 +997,13 @@ int32_t scanPolygon(int32_t *x1, int32_t *x2, int32_t *y, char code)
       vertex[nVertex + 1].type = vertex[1].type;
       vertex[nVertex + 1].slope = vertex[1].slope;
       /* get indices to sorted y coordinates */
-      allocate(yIndex, nVertex, Vertex *);
+      ALLOCATE(yIndex, nVertex, Vertex *);
       for (i = 0; i < nVertex; i++)
 	yIndex[i] = vertex + i + 1;
       qsort(yIndex, nVertex, sizeof(Vertex *), comparePtrs);
       /* now *yIndex[0] has the lowest y value */
-      allocate(activeX, nVertex - 1, float);
-      allocate(activeVertex, nVertex - 1, Vertex *);
+      ALLOCATE(activeX, nVertex - 1, float);
+      ALLOCATE(activeVertex, nVertex - 1, Vertex *);
       currentVertex = 0;
       currentY = yIndex[currentVertex]->y;
       nActivePoints = 0;

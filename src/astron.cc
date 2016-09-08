@@ -1546,7 +1546,7 @@ int32_t lux_calendar_OLD(int32_t narg, int32_t ps[])
         iq = string_scratch(-1);
         data.sp = (char **) &string_value(iq);
       }
-      allocate(line, 80, char);
+      ALLOCATE(line, 80, char);
     } else {			/* numeric output */
       num_newDims = construct_output_dims(dims, ndim, n,
                                           newDims, MAX_DIMS, 3);
@@ -1792,7 +1792,7 @@ int32_t lux_calendar_OLD(int32_t narg, int32_t ps[])
       iq = string_scratch(-1);
       data.sp = (char **) &string_value(iq);
     }
-    allocate(line, 80, char);
+    ALLOCATE(line, 80, char);
     for (i = 0; i < nRepeat; i++) {
       if (outtype == LUX_DOUBLE)
         d = floor(JDtoCJD(JD.d[i]));
@@ -1819,7 +1819,7 @@ int32_t lux_calendar_OLD(int32_t narg, int32_t ps[])
       iq = string_scratch(-1);
       data.sp = (char **) &string_value(iq);
     }
-    allocate(line, 80, char);
+    ALLOCATE(line, 80, char);
     for (i = 0; i < nRepeat; i++) {
       int32_t n;
 
@@ -1861,7 +1861,7 @@ int32_t lux_calendar_OLD(int32_t narg, int32_t ps[])
       iq = string_scratch(-1);
       data.sp = (char **) &string_value(iq);
     }
-    allocate(line, 80, char);
+    ALLOCATE(line, 80, char);
   } else {
     num_newDims = construct_output_dims(dims, ndim, n,
                                         newDims, MAX_DIMS, 3);

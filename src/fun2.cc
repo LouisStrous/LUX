@@ -195,14 +195,14 @@ int32_t index_sdev(int32_t narg, int32_t ps[], int32_t sq)
     size += (offset = -lastmin.l);
   result = array_scratch(outType, 1, &size);
   trgt.l = (int32_t*) array_data(result);
-  allocate(sum.b, size*lux_type_size[outType], uint8_t);
+  ALLOCATE(sum.b, size*lux_type_size[outType], uint8_t);
   zerobytes(trgt.b, size*lux_type_size[outType]);
   zerobytes(sum.b, size*lux_type_size[outType]);
   trgt.b += offset*lux_type_size[outType];
   sum.b += offset*lux_type_size[outType];
   i = nElem;
   if (haveWeights) {
-    allocate(hist.d, size, double);
+    ALLOCATE(hist.d, size, double);
     zerobytes(hist.d, size*sizeof(double));
     hist.d += offset;
     switch (outType) {
@@ -519,7 +519,7 @@ int32_t index_sdev(int32_t narg, int32_t ps[], int32_t sq)
     }
     free(hist.d - offset);
   } else {			/* no <weights>: each element counts once */
-    allocate(hist.l, size, int32_t);
+    ALLOCATE(hist.l, size, int32_t);
     zerobytes(hist.l, size*sizeof(int32_t));
     hist.l += offset;
     switch (outType) {
@@ -3865,8 +3865,8 @@ if (outer > 1) cfsym = array_scratch(LUX_DOUBLE, 2, dim); /*always double */
 h = (array *) sym[cfsym].spec.array.ptr;
 cfbase = (double*) ((char *)h + sizeof(array));
 							/*scratch array */
-allocate(fbase, nxq, double);
-allocate(a, (npow + 1)*(npow + 1), double);
+ALLOCATE(fbase, nxq, double);
+ALLOCATE(a, (npow + 1)*(npow + 1), double);
 	/*loop over the number of individual fits to do */
 while (outer--) {
 	/* ready to start actual calculation, all done in clux_pit */
@@ -4020,9 +4020,9 @@ int32_t lux_trend(int32_t narg, int32_t ps[]) /*trend function */
   qzbase.l = (int32_t*) array_data(result_sym);
 			/* get the various matrices and vectors needed */
 			/*unlike pit, the coeffs. are not in a symbol */
-  allocate(cfbase, npow + 1, double);
-  allocate(fbase, nxq, double);
-  allocate(a, (npow + 1)*(npow + 1), double);
+  ALLOCATE(cfbase, npow + 1, double);
+  ALLOCATE(fbase, nxq, double);
+  ALLOCATE(a, (npow + 1)*(npow + 1), double);
 	/*loop over the number of individual fits to do */
   while (outer--)
 		/* get the poly fit coefficients, done in clux_pit */

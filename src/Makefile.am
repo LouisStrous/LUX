@@ -31,6 +31,8 @@ nonmain_sources = \
 	Ellipsoid.hh\
 	Rotate3d.cc\
 	Rotate3d.hh\
+	SSFC.cc\
+	SSFC.hh\
 	action.hh\
 	astrodat2.hh\
 	astrodat3.hh\

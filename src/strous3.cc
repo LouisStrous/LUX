@@ -31,6 +31,9 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <errno.h>              /* for errno */
 #include "action.hh"
 #include "Bytestack.hh"
+#include "SSFC.hh"
+#include <numeric>
+#include <functional>
 
 /*---------------------------------------------------------------------*/
 int32_t lux_bisect(int32_t narg, int32_t ps[])
@@ -2532,3 +2535,161 @@ int32_t essentially_equal_z_f(floatComplex a, floatComplex b, float eps)
   return md <= (ma > mb? mb: ma)*FLT_EPSILON*eps;
 }
 /*--------------------------------------------------------------------*/
+/// SSFCTOPOLAR(<x> [, <level>]) interprets each element of <x> as an
+/// SSFC (Sierpiński Surface-Filling Coordinate) and returns the
+/// corresponding latitude, longitude, and precision for it, all
+/// measured in radians.  The precision is a measure for the angular
+/// size of the area indicated by the SSFC at that level.
+///
+/// If <level> has fewer elements than <x> has, then the last element
+/// of <level> is used for the remaining elements of <x>.
+///
+/// If <x> is of an integer type, then its values are interpreted as
+/// SSFC indices at the indicated <level>, and are expected to be
+/// between 0 and 2^<level> - 1, inclusive.  If no <level> is
+/// specified, then it is taken to be the least number that
+/// accommodates the greatest <x>, such that MAX(<x>) LT 2^<level>.
+///
+/// If <x> is of a floating-point type, then its values are taken MOD
+/// 1, and are interpreted as decimal SSFCs.  If <level> is not
+/// specified, then it is taken equal to the number of bits in <x>,
+/// minus 1.
+int32_t lux_ssfc_to_polar(int32_t narg, int32_t ps[]) {
+  if (!symbolIsNumerical(ps[0]))
+    return luxerror("Need a numerical argument", ps[0]);
+  if (narg > 1 && !symbolIsInteger(ps[1]))
+    return cerror(NEED_INT_ARG, ps[1]);
+
+  pointer* ptrs;
+  loopInfo* infos;
+  int32_t iq;
+  if (symbolIsInteger(ps[0])) {
+    if ((iq = standard_args(narg, ps, "iL*;iL*?;rD+3&", &ptrs, &infos)) < 0)
+      return LUX_ERROR;
+  } else {
+    if ((iq = standard_args(narg, ps, "iD*;iL*?;rD+3&", &ptrs, &infos)) < 0)
+      return LUX_ERROR;
+  }
+
+  int32_t default_level = 8*lux_type_size[symbol_type(ps[0])] - 1;
+
+  size_t ssfc_nelem = infos[0].nelem;
+  size_t level_nelem = infos[1].nelem;
+  if (!level_nelem) {
+    switch (infos[0].type) {
+    case LUX_INT32:
+      {
+        int32_t max = std::accumulate(ptrs[0].l, ptrs[0].l + infos[0].nelem, (int32_t) 0,
+                                      [](int32_t a, int32_t b) { return std::max(a, b); });
+        default_level = ceil(log2(max));
+      }
+      break;
+    case LUX_INT64:
+      {
+        int64_t max = std::accumulate(ptrs[0].q, ptrs[0].q + infos[0].nelem, (int64_t) 0,
+                                      [](int64_t a, int64_t b) { return std::max(a, b); });
+        default_level = ceil(log2(max));
+      }
+      break;
+    case LUX_DOUBLE:
+      // accept default level
+      break;
+    }
+    ptrs[1].l = &default_level;
+    level_nelem = 1;
+  }
+
+  while (ssfc_nelem--) {
+    SSFC ssfc;
+    switch (infos[0].type) {
+    case LUX_INT32:
+      ssfc.set_ssfc(*ptrs[0].l++, *ptrs[1].l);
+      break;
+    case LUX_INT64:
+      ssfc.set_ssfc(*ptrs[0].q++, *ptrs[1].l);
+      break;
+    case LUX_DOUBLE:
+      ssfc.set_ssfc(*ptrs[0].d++, *ptrs[1].l);
+      break;
+    }
+    *ptrs[2].d++ = ssfc.get_latitude_rad();
+    *ptrs[2].d++ = ssfc.get_longitude_rad();
+    *ptrs[2].d++ = ssfc.get_precision_rad();
+    if (level_nelem > 1) {
+      --level_nelem;
+      ++ptrs[1].l;
+    }
+  }
+
+  free(ptrs);
+  free(infos);
+  return iq;
+}
+REGISTER(ssfc_to_polar, f, SSFCTOPOLAR, 1, 2, 0);
+/*--------------------------------------------------------------------*/
+//// POLARTOSSFC(<coords>, [<level>]) converts polar coordinates into
+/// SSFC (Sierpiński Surface-Filling Coordinate).  <coords> is
+/// expected to have at least 2 elements in its first dimension, which
+/// are interpreted as the latitude and longitude, measured in
+/// radians.
+///
+/// If <level> is specified, then the returned value is the SSFC index
+/// at the indicated <level>, and is a nonnegative integer less than
+/// 2^<level>.  Otherwise, the returned value is the decimal SSFC
+/// coordinate, as a nonnegative double-precision value less than 1.
+/// If <level> has fewer elements than <coords> has, then the last
+/// element of <level> is used for the remaining <coords>.
+int32_t lux_polar_to_ssfc(int32_t narg, int32_t ps[]) {
+  if (!symbolIsNumerical(ps[0]))
+    return luxerror("Need a numerical argument", ps[0]);
+  if (narg > 1 && !symbolIsInteger(ps[1]))
+    return cerror(NEED_INT_ARG, ps[1]);
+
+  pointer* ptrs;
+  loopInfo* infos;
+  int32_t iq;
+  int32_t level;
+  if (narg > 1) {
+    if ((iq = standard_args(narg, ps, "iD>2,*;iL;rL-,&", &ptrs, &infos)) < 0)
+      return LUX_ERROR;
+    level = *ptrs[1].l;
+    if (level < 3)
+      level = 3;
+    else if (level > 64)
+      level = 64;
+    if (level > 31) {
+      iq = lux_int64(1, &iq);
+      numerical(iq, NULL, NULL, NULL, &ptrs[2]);
+      infos[2].type = LUX_INT64;
+    }
+  } else {
+    if ((iq = standard_args(narg, ps, "iD>2,*;rD-&", &ptrs, &infos)) < 0)
+      return LUX_ERROR;
+    level = 54; // TODO: set level to how many bits of precision a
+                // double has
+  }
+
+  size_t points_count = infos[0].nelem/infos[0].dims[0];
+  if (narg > 1) {               // return SSFC index at indicated level
+    while (points_count--) {
+      SSFC ssfc(ptrs[0].d[0], ptrs[0].d[1], level);
+      if (level > 31) {
+        *ptrs[2].q++ = static_cast<int64_t>(ssfc.get_bits());
+      } else {
+        *ptrs[2].l++ = static_cast<int32_t>(ssfc.get_bits());
+      }
+      ptrs[0].d += infos[0].dims[0];
+    }
+  } else {                      // return decimal SSFC
+    while (points_count--) {
+      SSFC ssfc(ptrs[0].d[0], ptrs[0].d[1], level);
+      *ptrs[1].d++ = static_cast<double>(ssfc.get_bits())/pow(2,level);
+      ptrs[0].d += infos[0].dims[0];
+    }
+  }
+
+  free(ptrs);
+  free(infos);
+  return iq;
+}
+REGISTER(polar_to_ssfc, f, POLARTOSSFC, 1, 2, 0);

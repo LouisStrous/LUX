@@ -1624,11 +1624,13 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
       struct dims_spec d_spec;
       if (*fmt == '[') {       /* reference parameter specification */
         fmt++;
-        if (*fmt++ == '-')
+        if (*fmt == '-') {
           p_spec.ref_par = -1;  /* point at previous parameter */
-        else if (isdigit(*fmt)) { /* a specific parameter */
+          ++fmt;
+        } else if (isdigit(*fmt)) { /* a specific parameter */
           char *p;
           p_spec.ref_par = strtol(fmt, &p, 10);
+          fmt = p;
         } else {
           luxerror("Expected a digit or minus sign after [ in"
                    " reference parameter specification but found %c", 0, *fmt);

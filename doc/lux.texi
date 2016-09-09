@@ -1020,6 +1020,7 @@ Internal Functions and Subroutines
 * PNM06A::                      Precession-nutation matrix, IAU 2000A/2006
 * PNM80::                       Precession-nutation matrix, IAU 1976/1980
 * POINTER::                     Convert to a pointer
+* POLARTOSSFC::                 Convert polar coordinates to SSFC
 * POLATE::                      Linear interpolation
 * POLY::                        Polynomial evaluation
 * POM00::                       Polar motion matrix, IAU 2000
@@ -1149,6 +1150,7 @@ Internal Functions and Subroutines
 * SPRINTF::                     Convert to @code{STRING}
 * SQRT::                        Square root
 * SSCANF::                      Read from string
+* SSFCTOPOLAR::                 Convert SSFC to polar coordinates
 * STARPM::                      Update star catalog data for space motion
 * STARPV::                      Convert star catalog data to position/velocity vector
 * STEP::                        Step through LUX code
@@ -1409,7 +1411,7 @@ Internal Functions and Subroutines
 * ZERONANS::                    Remove NaN values
 * ZINV::                        Zero-protected inverse
 * ZOOM::                        Image inspection using the pointer
-* Square Brackets::             Concatenation into an array             
+* Square Brackets::             Concatenation into an array
 * Curly Braces::                Concatenation into a list
 
 CALENDAR
@@ -12273,6 +12275,7 @@ arguments.
 * PNM06A::                      Precession-nutation matrix, IAU 2000A/2006
 * PNM80::                       Precession-nutation matrix, IAU 1976/1980
 * POINTER::                     Convert to a pointer
+* POLARTOSSFC::                 Convert polar coordinates to SSFC
 * POLATE::                      Linear interpolation
 * POLY::                        Polynomial evaluation
 * POM00::                       Polar motion matrix, IAU 2000
@@ -12402,6 +12405,7 @@ arguments.
 * SPRINTF::                     Convert to @code{STRING}
 * SQRT::                        Square root
 * SSCANF::                      Read from string
+* SSFCTOPOLAR::                 Convert SSFC to polar coordinates
 * STARPM::                      Update star catalog data for space motion
 * STARPV::                      Convert star catalog data to position/velocity vector
 * STEP::                        Step through LUX code
@@ -23009,7 +23013,7 @@ prefixed.
 See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
-@node POINTER, POLATE, PNM80, Internal Routines
+@node POINTER, POLARTOSSFC, PNM80, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection POINTER
 @findex POINTER
@@ -23037,7 +23041,39 @@ already compiled) subroutine or function.
 See also: @ref{SYMBOL}
 
 @c -------------------------------------
-@node POLATE, POLY, POINTER, Internal Routines
+@node POLARTOSSFC, POLATE, POINTER, Internal Routines
+@subsection POLARTOSSFC
+
+@code{POLARTOSSFC(@var{coords} [, @var{level}])}
+
+Converts polar coordinates to SSFCs (Sierpiński Surface-Filling
+Coordinates).  An SSFC (@uref{http://ssfc.quae.nl}) indicates a
+position on the surface of a sphere with just one coordinate rather
+than with the usual two coordinates.
+
+The @code{@var{coords}} must contain at least two elements in its
+first dimension, which are taken to be the latitude and longitude of
+the point, measured in radians.  (Multiply by @code{#DEG} to convert
+from degrees to radians; @ref{#DEG}.)
+
+If @code{@var{level}} is specified, then the returned value for each
+point is the SSFC index at the indicated level.  The SSFC index ranges
+between 0 and @code{2^@var{level} - 1}.  The corresponding real number
+is obtained by dividing the SSFC index by @code{2^@var{level}}.  Each
+next element of @code{@var{level}} is used for each next data point
+from @code{@var{coords}}.  If @code{@var{level}} runs out of elements
+before @code{@var{coords}} runs out of points, then the last element
+of @code{@var{level}} is reused for the remaining points.
+
+If @code{@var{level}} is not specified, then the returned value for
+each point is the decimal SSFC index represented as a @code{DOUBLE}
+number between 0 and 1, to the highest precision that can be expressed
+by a @code{DOUBLE}.
+
+See also: @ref{SSFCTOPOLAR}
+
+@c -------------------------------------
+@node POLATE, POLY, POLARTOSSFC, Internal Routines
 @subsection POLATE
 @findex POLATE
 
@@ -25826,7 +25862,7 @@ Returns the square root of @code{@var{x}}.
 See also: @ref{CBRT}
 
 @c -------------------------------------
-@node SSCANF, STARPM, SQRT, Internal Routines
+@node SSCANF, SSFCTOPOLAR, SQRT, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection SSCANF
 @findex SSCANF
@@ -25849,7 +25885,39 @@ See also: @ref{!READ_COUNT}, @ref{Input Data Formats}, @ref{READF},
 @ref{FREADF}
 
 @c -------------------------------------
-@node STARPM, STARPV, SSCANF, Internal Routines
+@node SSFCTOPOLAR, STARPM, SSCANF, Internal Routines
+@subsection SSFCTOPOLAR
+
+@code{SSFCTOPOLAR(@var{ssfc} [, @var{level})}
+
+Converts SSFCs (Sierpiński Surface-Filling Coordinates) to polar
+coordinates.  An SSFC (@uref{http://ssfc.quae.nl}) indicates a
+position on the surface of a sphere with just one coordinate rather
+than with the usual two coordinates.
+
+If @code{@var{ssfc}} is of an integer type, then its values are
+interpreted as SSFC indices at the indicated @code{@var{level}}, and
+are interpreted modulo @code{2^@var{level}}.  If no @code{@var{level}}
+is indicated, then it is taken to be equal to the least number that
+accommodates the greatest value found in @code{@var{ssfc}}, such that
+@code{MAX(@var{ssfc} < 2^@var{level}}.
+
+If @code{@var{ssfc}} is of a floating-point type, then its values are
+interpreted modulo 1, as decimal SSFCs.  If @code{@var{level}} is not
+specified, then it is taken equal to the maxmimum value commensurate
+with the data type.
+
+The returned value is an array with 3 elements in its first dimension,
+and with a set of 3 values for each value of @code{@var{ssfc}}.  The 3
+values are the latitude, longitude, and angular size, all measured in
+radians.  Multiply by @code{@var{#RAD}} to get degrees (@ref{#RAD}).
+The angular size is a measure for the size of the area on the surface
+of the sphere that is indicated by the SSFC at the specified level.
+
+See also: @ref{POLARTOSSFC}
+
+@c -------------------------------------
+@node STARPM, STARPV, SSFCTOPOLAR, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection STARPM
 @findex STARPM

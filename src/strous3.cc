@@ -671,8 +671,11 @@ int32_t lux_monotone_interpolation(int32_t narg, int32_t ps[])
   case 4:
     method = MonotoneInterpolation::MonotoneMethodSelection::SQUARE;
     break;
-  default:
+  case 8:
     method = MonotoneInterpolation::MonotoneMethodSelection::WIDE;
+    break;
+  default:
+    method = MonotoneInterpolation::MonotoneMethodSelection::FULL;
     break;
   }
 
@@ -687,7 +690,7 @@ int32_t lux_monotone_interpolation(int32_t narg, int32_t ps[])
   free(infos);
   return iq;
 }
-REGISTER(monotone_interpolation, f, MONOTONEINTERPOLATE, 3, 3, "1NONE:2CIRCLE:4SQUARE:8WIDE");
+REGISTER(monotone_interpolation, f, MONOTONEINTERPOLATE, 3, 3, "1NONE:2CIRCLE:4SQUARE:8WIDE:16FULL");
 /*--------------------------------------------------------------------------*/
 #ifdef WORDS_BIGENDIAN
 #define SYNCH_OK	0xaaaa5555

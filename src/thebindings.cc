@@ -1688,7 +1688,7 @@ void register_the_bindings()
   register_lux_s(lux_iauXys06a_s, "XYS06A", 4, 4, 0);
 
   int32_t lux_monotone_interpolation(int32_t, int32_t []);
-  register_lux_f(lux_monotone_interpolation, "MONOTONEINTERPOLATE", 3, 3, "1NONE:2CIRCLE:4SQUARE:8WIDE");
+  register_lux_f(lux_monotone_interpolation, "MONOTONEINTERPOLATE", 3, 3, "1NONE:2CIRCLE:4SQUARE:8WIDE:16FULL");
 
   register_lux_f(lux_runord_d_f, "RUNORD", 3, 3, NULL);
 
@@ -1699,6 +1699,12 @@ void register_the_bindings()
   register_lux_f(lux_unmod_slice_d_f, "UNMOD", 2, 4, ":AXIS:PERIOD:AVERAGE");
 
   register_lux_f(lux_hypot_stride_f, "HYPOT", 1, 2, ":AXIS");
+
+  int32_t lux_ssfc_to_polar(int32_t, int32_t []);
+  register_lux_f(lux_ssfc_to_polar, "SSFCTOPOLAR", 1, 2, 0);
+
+  int32_t lux_polar_to_ssfc(int32_t, int32_t []);
+  register_lux_f(lux_polar_to_ssfc, "POLARTOSSFC", 1, 2, 0);
 
   register_lux_f(lux_kepler_v_f, "KEPLER", 2, 2, NULL);
 

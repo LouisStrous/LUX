@@ -207,6 +207,7 @@ MonotoneInterpolation::initialize(size_t n,
           break;
           case CIRCLE:
           case WIDE:
+          case FULL:
           {
             double r2 = alpha[i]*alpha[i] + beta[i]*beta[i];
             if (r2 > 9)
@@ -234,6 +235,39 @@ MonotoneInterpolation::initialize(size_t n,
                 {
                   rNew = 3 + 3*sqrt(3 - 2*sqrt(2))*sqrt(t);
                 }
+              }
+              else if (method == FULL)
+              {
+                // This method also invented by Louis Strous.
+
+                // t is a measure for the angle with respect to the
+                // alpha axis, as seen from the origin of the
+                // (alpha,beta) plane.  In the first quadrant of the
+                // (alpha, beta) plane, it varies between -1 on the
+                // alpha axis and +1 on the beta axis.
+                double t = (alpha[i] - beta[i])/(alpha[i] + beta[i]);
+
+                // The square of the radius (distance from origin)
+                // of the furthest (from the origin) edge of the
+                // allowed region is then given by
+                // r^2 = 18 (−t^4 + 4(sqrt(1-t^2) (1+t^2) + t^2) + 5)/(t^2 + 3)^2
+                // (derived by LS)
+
+                double tsq = t*t; // square it
+
+                // We need to calculate sqrt(1-t^2).  |t| <= 1 so
+                // 1-t^2 >= 0, but due to round-off errors it might be
+                // negative (though very small).
+                double s = 1 - tsq;
+                if (s < 0)
+                {               // neutralize round-off error
+                  s = 0;
+                }
+                double num = 18*(-tsq*tsq + 4*(sqrt(s)*(1 + tsq) + tsq) + 5);
+                double denom = (tsq + 3);
+                denom *= denom; // >= 4
+
+                rNew = sqrt(num/denom);
               }
 
               double f = rNew/sqrt(r2);

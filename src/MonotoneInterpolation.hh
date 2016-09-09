@@ -40,6 +40,10 @@ public:
     /// Monotonicity enforced using a wider area in parameter space.
     /// Covers 98% of the acceptable area in parameter space.
     WIDE,
+
+    /// Monotonicity enforced using the entire acceptable area in
+    /// parameter space.
+    FULL,
   };
 
   MonotoneInterpolation(const std::vector<double>& x, const std::vector<double>& y, MonotoneMethodSelection method = WIDE);

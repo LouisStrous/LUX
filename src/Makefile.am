@@ -29,6 +29,8 @@ nonmain_sources = \
 	Bytestack.hh\
 	Ellipsoid.cc\
 	Ellipsoid.hh\
+	MonotoneInterpolation.cc\
+	MonotoneInterpolation.hh\
 	Rotate3d.cc\
 	Rotate3d.hh\
 	action.hh\

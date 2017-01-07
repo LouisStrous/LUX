@@ -12,7 +12,7 @@ int32_t lux_gsl_fft_f(int32_t narg, int32_t ps[]) {
   int32_t gsl_fft(double *, size_t, size_t);
   int32_t result = lux_i_sd_iDaLarDq_000_f_(narg, ps, gsl_fft);
   if (result < 0)
-    luxerror("Error in FFT", 0);
+    luxerror("Error in fft", 0);
   return result;
 }
 
@@ -20,7 +20,7 @@ int32_t lux_gsl_fft_s(int32_t narg, int32_t ps[]) {
   int32_t gsl_fft(double *, size_t, size_t);
   int32_t result = lux_i_sd_iDaLa_000_s_(narg, ps, gsl_fft);
   if (result < 0)
-    luxerror("Error in FFT", 0);
+    luxerror("Error in fft", 0);
   return result;
 }
 
@@ -28,7 +28,7 @@ int32_t lux_gsl_fft_back_f(int32_t narg, int32_t ps[]) {
   int32_t gsl_fft_back(double *, size_t, size_t);
   int32_t result = lux_i_sd_iDaLarDq_000_f_(narg, ps, gsl_fft_back);
   if (result < 0)
-    luxerror("Error in FFTB", 0);
+    luxerror("Error in fftb", 0);
   return result;
 }
 
@@ -36,7 +36,7 @@ int32_t lux_gsl_fft_back_s(int32_t narg, int32_t ps[]) {
   int32_t gsl_fft_back(double *, size_t, size_t);
   int32_t result = lux_i_sd_iDaLa_000_s_(narg, ps, gsl_fft_back);
   if (result < 0)
-    luxerror("Error in FFTB", 0);
+    luxerror("Error in fftb", 0);
   return result;
 }
 
@@ -44,7 +44,7 @@ int32_t lux_hilbert_f(int32_t narg, int32_t ps[]) {
   int32_t hilbert(double *, size_t, size_t);
   int32_t result = lux_i_sd_iDaLarDq_000_f_(narg, ps, hilbert);
   if (result < 0)
-    luxerror("Error in HILBERT", 0);
+    luxerror("Error in hilbert", 0);
   return result;
 }
 
@@ -52,7 +52,7 @@ int32_t lux_hilbert_s(int32_t narg, int32_t ps[]) {
   int32_t hilbert(double *, size_t, size_t);
   int32_t result = lux_i_sd_iDaLa_000_s_(narg, ps, hilbert);
   if (result < 0)
-    luxerror("Error in HILBERT", 0);
+    luxerror("Error in hilbert", 0);
   return result;
 }
 
@@ -60,7 +60,7 @@ int32_t lux_iauBi00_f(int32_t narg, int32_t ps[]) {
   void iauBi00(double *, double *, double *);
   int32_t result = lux_v_dpT3_rD3_000_f_(narg, ps, iauBi00);
   if (result < 0)
-    luxerror("Error in BI00", 0);
+    luxerror("Error in bi00", 0);
   return result;
 }
 
@@ -68,7 +68,7 @@ int32_t lux_iauBp00_s(int32_t narg, int32_t ps[]) {
   void iauBp00(double, double, double (*)[3], double (*)[3], double (*)[3]);
   int32_t result = lux_v_dddp3T3_iLaoD33oDp3p3qDcq_0z1T3_s_(narg, ps, iauBp00);
   if (result < 0)
-    luxerror("Error in BP00", 0);
+    luxerror("Error in bp00", 0);
   return result;
 }
 
@@ -76,7 +76,7 @@ int32_t lux_iauBp06_s(int32_t narg, int32_t ps[]) {
   void iauBp06(double, double, double (*)[3], double (*)[3], double (*)[3]);
   int32_t result = lux_v_dddp3T3_iLaoD33oDp3p3qDcq_0z1T3_s_(narg, ps, iauBp06);
   if (result < 0)
-    luxerror("Error in BP06", 0);
+    luxerror("Error in bp06", 0);
   return result;
 }
 
@@ -84,7 +84,7 @@ int32_t lux_iauBpn2xy_s(int32_t narg, int32_t ps[]) {
   void iauBpn2xy(double (*)[3], double *, double *);
   int32_t result = lux_v_dp3dpdp_iD33aoDm3m3qT2_0T2_s_(narg, ps, iauBpn2xy);
   if (result < 0)
-    luxerror("Error in BPN2XY", 0);
+    luxerror("Error in bpn2xy", 0);
   return result;
 }
 
@@ -92,7 +92,7 @@ int32_t lux_iauC2i00a_f(int32_t narg, int32_t ps[]) {
   void iauC2i00a(double, double, double (*)[3]);
   int32_t result = lux_v_dddp3_iDarDp3p3q_0z1_f_(narg, ps, iauC2i00a);
   if (result < 0)
-    luxerror("Error in C2I00A", 0);
+    luxerror("Error in c2i00a", 0);
   return result;
 }
 
@@ -100,7 +100,7 @@ int32_t lux_iauC2i00b_f(int32_t narg, int32_t ps[]) {
   void iauC2i00b(double, double, double (*)[3]);
   int32_t result = lux_v_dddp3_iDarDp3p3q_0z1_f_(narg, ps, iauC2i00b);
   if (result < 0)
-    luxerror("Error in C2I00B", 0);
+    luxerror("Error in c2i00b", 0);
   return result;
 }
 
@@ -108,7 +108,7 @@ int32_t lux_iauC2i06a_f(int32_t narg, int32_t ps[]) {
   void iauC2i06a(double, double, double (*)[3]);
   int32_t result = lux_v_dddp3_iDarDp3p3q_0z1_f_(narg, ps, iauC2i06a);
   if (result < 0)
-    luxerror("Error in C2I06A", 0);
+    luxerror("Error in c2i06a", 0);
   return result;
 }
 
@@ -116,7 +116,7 @@ int32_t lux_iauC2ibpn_f(int32_t narg, int32_t ps[]) {
   void iauC2ibpn(double, double, double (*)[3], double (*)[3]);
   int32_t result = lux_v_dddp3dp3_iDaiDp3p3arDcq_0z12_f_(narg, ps, iauC2ibpn);
   if (result < 0)
-    luxerror("Error in C2IBPN", 0);
+    luxerror("Error in c2ibpn", 0);
   return result;
 }
 
@@ -124,7 +124,7 @@ int32_t lux_iauC2ixy_f(int32_t narg, int32_t ps[]) {
   void iauC2ixy(double, double, double, double, double (*)[3]);
   int32_t result = lux_v_dT4dp3_iDaT3rDp3p3q_0z1T3_f_(narg, ps, iauC2ixy);
   if (result < 0)
-    luxerror("Error in C2IXY", 0);
+    luxerror("Error in c2ixy", 0);
   return result;
 }
 
@@ -132,7 +132,7 @@ int32_t lux_iauC2ixys_f(int32_t narg, int32_t ps[]) {
   void iauC2ixys(double, double, double, double (*)[3]);
   int32_t result = lux_v_dT3dp3_iDaT3rDp3p3q_0T3_f_(narg, ps, iauC2ixys);
   if (result < 0)
-    luxerror("Error in C2IXYS", 0);
+    luxerror("Error in c2ixys", 0);
   return result;
 }
 
@@ -140,7 +140,7 @@ int32_t lux_iauC2s_f(int32_t narg, int32_t ps[]) {
   void iauC2s(double *, double *, double *);
   int32_t result = lux_v_dpT3_iD3arDm3p2q_011_f_(narg, ps, iauC2s);
   if (result < 0)
-    luxerror("Error in C2S", 0);
+    luxerror("Error in c2s", 0);
   return result;
 }
 
@@ -148,7 +148,7 @@ int32_t lux_iauC2t00a_f(int32_t narg, int32_t ps[]) {
   void iauC2t00a(double, double, double, double, double, double, double (*)[3]);
   int32_t result = lux_v_dT6dp3_iDaT4rDp3p3q_0z11T4_f_(narg, ps, iauC2t00a);
   if (result < 0)
-    luxerror("Error in C2T00A", 0);
+    luxerror("Error in c2t00a", 0);
   return result;
 }
 
@@ -156,7 +156,7 @@ int32_t lux_iauC2t00b_f(int32_t narg, int32_t ps[]) {
   void iauC2t00b(double, double, double, double, double, double, double (*)[3]);
   int32_t result = lux_v_dT6dp3_iDaT4rDp3p3q_0z11T4_f_(narg, ps, iauC2t00b);
   if (result < 0)
-    luxerror("Error in C2T00B", 0);
+    luxerror("Error in c2t00b", 0);
   return result;
 }
 
@@ -164,7 +164,7 @@ int32_t lux_iauC2t06a_f(int32_t narg, int32_t ps[]) {
   void iauC2t06a(double, double, double, double, double, double, double (*)[3]);
   int32_t result = lux_v_dT6dp3_iDaT4rDp3p3q_0z11T4_f_(narg, ps, iauC2t06a);
   if (result < 0)
-    luxerror("Error in C2T06A", 0);
+    luxerror("Error in c2t06a", 0);
   return result;
 }
 
@@ -172,7 +172,7 @@ int32_t lux_iauC2tcio_f(int32_t narg, int32_t ps[]) {
   void iauC2tcio(double (*)[3], double, double (*)[3], double (*)[3]);
   int32_t result = lux_v_dp3ddp3dp3_iD33aDmmaDarDq_0T3_f_(narg, ps, iauC2tcio);
   if (result < 0)
-    luxerror("Error in C2TCIO", 0);
+    luxerror("Error in c2tcio", 0);
   return result;
 }
 
@@ -180,7 +180,7 @@ int32_t lux_iauC2teqx_f(int32_t narg, int32_t ps[]) {
   void iauC2teqx(double (*)[3], double, double (*)[3], double (*)[3]);
   int32_t result = lux_v_dp3ddp3dp3_iD33aDmmaDarDq_0T3_f_(narg, ps, iauC2teqx);
   if (result < 0)
-    luxerror("Error in C2TEQX", 0);
+    luxerror("Error in c2teqx", 0);
   return result;
 }
 
@@ -188,7 +188,7 @@ int32_t lux_iauC2tpe_f(int32_t narg, int32_t ps[]) {
   void iauC2tpe(double, double, double, double, double, double, double, double, double (*)[3]);
   int32_t result = lux_v_dT8dp3_iDaT5rDp3p3q_0zzz1T5_f_(narg, ps, iauC2tpe);
   if (result < 0)
-    luxerror("Error in C2TPE", 0);
+    luxerror("Error in c2tpe", 0);
   return result;
 }
 
@@ -196,7 +196,7 @@ int32_t lux_iauC2txy_f(int32_t narg, int32_t ps[]) {
   void iauC2txy(double, double, double, double, double, double, double, double, double (*)[3]);
   int32_t result = lux_v_dT8dp3_iDaT5rDp3p3q_0zzz1T5_f_(narg, ps, iauC2txy);
   if (result < 0)
-    luxerror("Error in C2TXY", 0);
+    luxerror("Error in c2txy", 0);
   return result;
 }
 
@@ -204,7 +204,7 @@ int32_t lux_iauDtdb_f(int32_t narg, int32_t ps[]) {
   double iauDtdb(double, double, double, double, double, double);
   int32_t result = lux_d_dT6_iLaDaD1T3rDq_0z1T4_5_f_(narg, ps, iauDtdb);
   if (result < 0)
-    luxerror("Error in DTDB", 0);
+    luxerror("Error in dtdb", 0);
   return result;
 }
 
@@ -212,7 +212,7 @@ int32_t lux_iauEe00_f(int32_t narg, int32_t ps[]) {
   double iauEe00(double, double, double, double);
   int32_t result = lux_d_dT4_iLaDaDarDq_0z12_f_(narg, ps, iauEe00);
   if (result < 0)
-    luxerror("Error in EE00", 0);
+    luxerror("Error in ee00", 0);
   return result;
 }
 
@@ -220,7 +220,7 @@ int32_t lux_iauEe00a_f(int32_t narg, int32_t ps[]) {
   double iauEe00a(double, double);
   int32_t result = lux_d_dd_iLarDq_0z_1_f_(narg, ps, iauEe00a);
   if (result < 0)
-    luxerror("Error in EE00A", 0);
+    luxerror("Error in ee00a", 0);
   return result;
 }
 
@@ -228,7 +228,7 @@ int32_t lux_iauEe00b_f(int32_t narg, int32_t ps[]) {
   double iauEe00b(double, double);
   int32_t result = lux_d_dd_iLarDq_0z_1_f_(narg, ps, iauEe00b);
   if (result < 0)
-    luxerror("Error in EE00B", 0);
+    luxerror("Error in ee00b", 0);
   return result;
 }
 
@@ -236,7 +236,7 @@ int32_t lux_iauEe06a_f(int32_t narg, int32_t ps[]) {
   double iauEe06a(double, double);
   int32_t result = lux_d_dd_iLarDq_0z_1_f_(narg, ps, iauEe06a);
   if (result < 0)
-    luxerror("Error in EE06A", 0);
+    luxerror("Error in ee06a", 0);
   return result;
 }
 
@@ -244,7 +244,7 @@ int32_t lux_iauEect00_f(int32_t narg, int32_t ps[]) {
   double iauEect00(double, double);
   int32_t result = lux_d_dd_iLarDq_0z_1_f_(narg, ps, iauEect00);
   if (result < 0)
-    luxerror("Error in EECT00", 0);
+    luxerror("Error in eect00", 0);
   return result;
 }
 
@@ -252,7 +252,7 @@ int32_t lux_iauEform_f(int32_t narg, int32_t ps[]) {
   int32_t iauEform(int32_t, double *, double *);
   int32_t result = lux_i_idpdp_iLarDp2q_011_f_(narg, ps, iauEform);
   if (result < 0)
-    luxerror("Error in EFORM", 0);
+    luxerror("Error in eform", 0);
   return result;
 }
 
@@ -260,7 +260,7 @@ int32_t lux_iauEo06a_f(int32_t narg, int32_t ps[]) {
   double iauEo06a(double, double);
   int32_t result = lux_d_dd_iLarDq_0z_1_f_(narg, ps, iauEo06a);
   if (result < 0)
-    luxerror("Error in EO06A", 0);
+    luxerror("Error in eo06a", 0);
   return result;
 }
 
@@ -268,7 +268,7 @@ int32_t lux_iauEors_f(int32_t narg, int32_t ps[]) {
   double iauEors(double (*)[3], double);
   int32_t result = lux_d_dp3d_iD33aDmmarDmmq_01_2_f_(narg, ps, iauEors);
   if (result < 0)
-    luxerror("Error in EORS", 0);
+    luxerror("Error in eors", 0);
   return result;
 }
 
@@ -276,7 +276,7 @@ int32_t lux_iauEpb_f(int32_t narg, int32_t ps[]) {
   double iauEpb(double, double);
   int32_t result = lux_d_dd_iLarDq_0z_1_f_(narg, ps, iauEpb);
   if (result < 0)
-    luxerror("Error in EPB", 0);
+    luxerror("Error in epb", 0);
   return result;
 }
 
@@ -284,7 +284,7 @@ int32_t lux_iauEpj_f(int32_t narg, int32_t ps[]) {
   double iauEpj(double, double);
   int32_t result = lux_d_dd_iLarDq_0z_1_f_(narg, ps, iauEpj);
   if (result < 0)
-    luxerror("Error in EPJ", 0);
+    luxerror("Error in epj", 0);
   return result;
 }
 
@@ -292,7 +292,7 @@ int32_t lux_iauEpv00_s(int32_t narg, int32_t ps[]) {
   int32_t iauEpv00(double, double, double (*)[3], double (*)[3]);
   int32_t result = lux_i_dddp3dp3_iLaoDp2p3qT2_0z12_s_(narg, ps, iauEpv00);
   if (result < 0)
-    luxerror("Error in EPV00", 0);
+    luxerror("Error in epv00", 0);
   return result;
 }
 
@@ -300,7 +300,7 @@ int32_t lux_iauEqeq94_f(int32_t narg, int32_t ps[]) {
   double iauEqeq94(double, double);
   int32_t result = lux_d_dd_iLarDq_0z_1_f_(narg, ps, iauEqeq94);
   if (result < 0)
-    luxerror("Error in EQEQ94", 0);
+    luxerror("Error in eqeq94", 0);
   return result;
 }
 
@@ -308,7 +308,7 @@ int32_t lux_iauEra00_f(int32_t narg, int32_t ps[]) {
   double iauEra00(double, double);
   int32_t result = lux_d_dd_iLarDq_0z_1_f_(narg, ps, iauEra00);
   if (result < 0)
-    luxerror("Error in ERA00", 0);
+    luxerror("Error in era00", 0);
   return result;
 }
 
@@ -316,7 +316,7 @@ int32_t lux_iauFad03_f(int32_t narg, int32_t ps[]) {
   double iauFad03(double);
   int32_t result = lux_d_d_iDarDq_0_1_f_(narg, ps, iauFad03);
   if (result < 0)
-    luxerror("Error in FAD03", 0);
+    luxerror("Error in fad03", 0);
   return result;
 }
 
@@ -324,7 +324,7 @@ int32_t lux_iauFae03_f(int32_t narg, int32_t ps[]) {
   double iauFae03(double);
   int32_t result = lux_d_d_iDarDq_0_1_f_(narg, ps, iauFae03);
   if (result < 0)
-    luxerror("Error in FAE03", 0);
+    luxerror("Error in fae03", 0);
   return result;
 }
 
@@ -332,7 +332,7 @@ int32_t lux_iauFaf03_f(int32_t narg, int32_t ps[]) {
   double iauFaf03(double);
   int32_t result = lux_d_d_iDarDq_0_1_f_(narg, ps, iauFaf03);
   if (result < 0)
-    luxerror("Error in FAF03", 0);
+    luxerror("Error in faf03", 0);
   return result;
 }
 
@@ -340,7 +340,7 @@ int32_t lux_iauFaju03_f(int32_t narg, int32_t ps[]) {
   double iauFaju03(double);
   int32_t result = lux_d_d_iDarDq_0_1_f_(narg, ps, iauFaju03);
   if (result < 0)
-    luxerror("Error in FAJU03", 0);
+    luxerror("Error in faju03", 0);
   return result;
 }
 
@@ -348,7 +348,7 @@ int32_t lux_iauFal03_f(int32_t narg, int32_t ps[]) {
   double iauFal03(double);
   int32_t result = lux_d_d_iDarDq_0_1_f_(narg, ps, iauFal03);
   if (result < 0)
-    luxerror("Error in FAL03", 0);
+    luxerror("Error in fal03", 0);
   return result;
 }
 
@@ -356,7 +356,7 @@ int32_t lux_iauFalp03_f(int32_t narg, int32_t ps[]) {
   double iauFalp03(double);
   int32_t result = lux_d_d_iDarDq_0_1_f_(narg, ps, iauFalp03);
   if (result < 0)
-    luxerror("Error in FALP03", 0);
+    luxerror("Error in falp03", 0);
   return result;
 }
 
@@ -364,7 +364,7 @@ int32_t lux_iauFama03_f(int32_t narg, int32_t ps[]) {
   double iauFama03(double);
   int32_t result = lux_d_d_iDarDq_0_1_f_(narg, ps, iauFama03);
   if (result < 0)
-    luxerror("Error in FAMA03", 0);
+    luxerror("Error in fama03", 0);
   return result;
 }
 
@@ -372,7 +372,7 @@ int32_t lux_iauFame03_f(int32_t narg, int32_t ps[]) {
   double iauFame03(double);
   int32_t result = lux_d_d_iDarDq_0_1_f_(narg, ps, iauFame03);
   if (result < 0)
-    luxerror("Error in FAME03", 0);
+    luxerror("Error in fame03", 0);
   return result;
 }
 
@@ -380,7 +380,7 @@ int32_t lux_iauFane03_f(int32_t narg, int32_t ps[]) {
   double iauFane03(double);
   int32_t result = lux_d_d_iDarDq_0_1_f_(narg, ps, iauFane03);
   if (result < 0)
-    luxerror("Error in FANE03", 0);
+    luxerror("Error in fane03", 0);
   return result;
 }
 
@@ -388,7 +388,7 @@ int32_t lux_iauFaom03_f(int32_t narg, int32_t ps[]) {
   double iauFaom03(double);
   int32_t result = lux_d_d_iDarDq_0_1_f_(narg, ps, iauFaom03);
   if (result < 0)
-    luxerror("Error in FAOM03", 0);
+    luxerror("Error in faom03", 0);
   return result;
 }
 
@@ -396,7 +396,7 @@ int32_t lux_iauFapa03_f(int32_t narg, int32_t ps[]) {
   double iauFapa03(double);
   int32_t result = lux_d_d_iDarDq_0_1_f_(narg, ps, iauFapa03);
   if (result < 0)
-    luxerror("Error in FAPA03", 0);
+    luxerror("Error in fapa03", 0);
   return result;
 }
 
@@ -404,7 +404,7 @@ int32_t lux_iauFasa03_f(int32_t narg, int32_t ps[]) {
   double iauFasa03(double);
   int32_t result = lux_d_d_iDarDq_0_1_f_(narg, ps, iauFasa03);
   if (result < 0)
-    luxerror("Error in FASA03", 0);
+    luxerror("Error in fasa03", 0);
   return result;
 }
 
@@ -412,7 +412,7 @@ int32_t lux_iauFaur03_f(int32_t narg, int32_t ps[]) {
   double iauFaur03(double);
   int32_t result = lux_d_d_iDarDq_0_1_f_(narg, ps, iauFaur03);
   if (result < 0)
-    luxerror("Error in FAUR03", 0);
+    luxerror("Error in faur03", 0);
   return result;
 }
 
@@ -420,7 +420,7 @@ int32_t lux_iauFave03_f(int32_t narg, int32_t ps[]) {
   double iauFave03(double);
   int32_t result = lux_d_d_iDarDq_0_1_f_(narg, ps, iauFave03);
   if (result < 0)
-    luxerror("Error in FAVE03", 0);
+    luxerror("Error in fave03", 0);
   return result;
 }
 
@@ -428,7 +428,7 @@ int32_t lux_iauFk52h_s(int32_t narg, int32_t ps[]) {
   void iauFk52h(double, double, double, double, double, double, double *, double *, double *, double *, double *, double *);
   int32_t result = lux_v_dT6dpT6_iDaT6oDqT6_0T11_s_(narg, ps, iauFk52h);
   if (result < 0)
-    luxerror("Error in FK52H", 0);
+    luxerror("Error in fk52h", 0);
   return result;
 }
 
@@ -436,7 +436,7 @@ int32_t lux_iauFk5hip_s(int32_t narg, int32_t ps[]) {
   void iauFk5hip(double (*)[3], double *);
   int32_t result = lux_v_dp3dp_oD33D3_01_s_(narg, ps, iauFk5hip);
   if (result < 0)
-    luxerror("Error in FK5HIP", 0);
+    luxerror("Error in fk5hip", 0);
   return result;
 }
 
@@ -444,7 +444,7 @@ int32_t lux_iauFk5hz_s(int32_t narg, int32_t ps[]) {
   void iauFk5hz(double, double, double, double, double *, double *);
   int32_t result = lux_v_dT4dpdp_iDaT3oDqDq_0T2z34_s_(narg, ps, iauFk5hz);
   if (result < 0)
-    luxerror("Error in FK5HZ", 0);
+    luxerror("Error in fk5hz", 0);
   return result;
 }
 
@@ -452,7 +452,7 @@ int32_t lux_iauFw2m_f(int32_t narg, int32_t ps[]) {
   void iauFw2m(double, double, double, double, double (*)[3]);
   int32_t result = lux_v_dT4dp3_iDaT4rDp3p3q_0T4_f_(narg, ps, iauFw2m);
   if (result < 0)
-    luxerror("Error in FW2M", 0);
+    luxerror("Error in fw2m", 0);
   return result;
 }
 
@@ -460,7 +460,7 @@ int32_t lux_iauFw2xy_s(int32_t narg, int32_t ps[]) {
   void iauFw2xy(double, double, double, double, double *, double *);
   int32_t result = lux_v_dT4dpdp_iDaT4oDqDq_0T5_s_(narg, ps, iauFw2xy);
   if (result < 0)
-    luxerror("Error in FW2XY", 0);
+    luxerror("Error in fw2xy", 0);
   return result;
 }
 
@@ -468,7 +468,7 @@ int32_t lux_iauGc2gd_f(int32_t narg, int32_t ps[]) {
   int32_t iauGc2gd(int32_t, double *, double *, double *, double *);
   int32_t result = lux_i_idpT4_iL1D3arDcq_0T222_f_(narg, ps, iauGc2gd);
   if (result < 0)
-    luxerror("Error in GC2GD", 0);
+    luxerror("Error in gc2gd", 0);
   return result;
 }
 
@@ -476,7 +476,7 @@ int32_t lux_iauGc2gde_f(int32_t narg, int32_t ps[]) {
   int32_t iauGc2gde(double, double, double *, double *, double *, double *);
   int32_t result = lux_v_dT3d3_iD3aD1D1rD3q_120333_f_(narg, ps, iauGc2gde);
   if (result < 0)
-    luxerror("Error in GC2GDE", 0);
+    luxerror("Error in gc2gde", 0);
   return result;
 }
 
@@ -484,7 +484,7 @@ int32_t lux_iauGd2gc_f(int32_t narg, int32_t ps[]) {
   int32_t iauGd2gc(int32_t, double, double, double, double *);
   int32_t result = lux_i_idT3dp_iD3aL1rDq_10002_f_(narg, ps, iauGd2gc);
   if (result < 0)
-    luxerror("Error in GD2GC", 0);
+    luxerror("Error in gd2gc", 0);
   return result;
 }
 
@@ -492,7 +492,7 @@ int32_t lux_iauGd2gce_f(int32_t narg, int32_t ps[]) {
   int32_t iauGd2gce(double, double, double, double, double, double *);
   int32_t result = lux_i_dT5dp_iD3aD1D1rD3q_120003_f_(narg, ps, iauGd2gce);
   if (result < 0)
-    luxerror("Error in GD2GCE", 0);
+    luxerror("Error in gd2gce", 0);
   return result;
 }
 
@@ -500,7 +500,7 @@ int32_t lux_iauGmst00_f(int32_t narg, int32_t ps[]) {
   double iauGmst00(double, double, double, double);
   int32_t result = lux_d_dT4_iDaDarDq_0011_2_f_(narg, ps, iauGmst00);
   if (result < 0)
-    luxerror("Error in GMST00", 0);
+    luxerror("Error in gmst00", 0);
   return result;
 }
 
@@ -508,7 +508,7 @@ int32_t lux_iauGmst06_f(int32_t narg, int32_t ps[]) {
   double iauGmst06(double, double, double, double);
   int32_t result = lux_d_dT4_iDaDarDq_0011_2_f_(narg, ps, iauGmst06);
   if (result < 0)
-    luxerror("Error in GMST06", 0);
+    luxerror("Error in gmst06", 0);
   return result;
 }
 
@@ -516,7 +516,7 @@ int32_t lux_iauGmst82_f(int32_t narg, int32_t ps[]) {
   double iauGmst82(double, double);
   int32_t result = lux_d_dd_iDarDq_0z_1_f_(narg, ps, iauGmst82);
   if (result < 0)
-    luxerror("Error in GMST82", 0);
+    luxerror("Error in gmst82", 0);
   return result;
 }
 
@@ -524,7 +524,7 @@ int32_t lux_iauGst00a_f(int32_t narg, int32_t ps[]) {
   double iauGst00a(double, double, double, double);
   int32_t result = lux_d_dT4_iDaDarDq_0011_2_f_(narg, ps, iauGst00a);
   if (result < 0)
-    luxerror("Error in GST00A", 0);
+    luxerror("Error in gst00a", 0);
   return result;
 }
 
@@ -532,7 +532,7 @@ int32_t lux_iauGst00b_f(int32_t narg, int32_t ps[]) {
   double iauGst00b(double, double);
   int32_t result = lux_d_dd_iDarDq_0z_1_f_(narg, ps, iauGst00b);
   if (result < 0)
-    luxerror("Error in GST00B", 0);
+    luxerror("Error in gst00b", 0);
   return result;
 }
 
@@ -540,7 +540,7 @@ int32_t lux_iauGst06_f(int32_t narg, int32_t ps[]) {
   double iauGst06(double, double, double, double, double (*)[3]);
   int32_t result = lux_d_dT4dp3_iDaDaDp3p3arDq_00112_3_f_(narg, ps, iauGst06);
   if (result < 0)
-    luxerror("Error in GST06", 0);
+    luxerror("Error in gst06", 0);
   return result;
 }
 
@@ -548,7 +548,7 @@ int32_t lux_iauGst06a_f(int32_t narg, int32_t ps[]) {
   double iauGst06a(double, double, double, double);
   int32_t result = lux_d_dT4_iDaDarDq_0011_2_f_(narg, ps, iauGst06a);
   if (result < 0)
-    luxerror("Error in GST06A", 0);
+    luxerror("Error in gst06a", 0);
   return result;
 }
 
@@ -556,7 +556,7 @@ int32_t lux_iauGst94_f(int32_t narg, int32_t ps[]) {
   double iauGst94(double, double);
   int32_t result = lux_d_dd_iDarDq_0z_1_f_(narg, ps, iauGst94);
   if (result < 0)
-    luxerror("Error in GST94", 0);
+    luxerror("Error in gst94", 0);
   return result;
 }
 
@@ -564,7 +564,7 @@ int32_t lux_iauH2fk5_s(int32_t narg, int32_t ps[]) {
   void iauH2fk5(double, double, double, double, double, double, double *, double *, double *, double *, double *, double *);
   int32_t result = lux_v_dT6dpT6_iDaT6oDqT6_0T11_s_(narg, ps, iauH2fk5);
   if (result < 0)
-    luxerror("Error in H2FK5", 0);
+    luxerror("Error in h2fk5", 0);
   return result;
 }
 
@@ -572,7 +572,7 @@ int32_t lux_iauHfk5z_s(int32_t narg, int32_t ps[]) {
   void iauHfk5z(double, double, double, double, double *, double *, double *, double *);
   int32_t result = lux_v_dT4dpT4_iDaDaDoDqT4_0T2z3T6_s_(narg, ps, iauHfk5z);
   if (result < 0)
-    luxerror("Error in HFK5Z", 0);
+    luxerror("Error in hfk5z", 0);
   return result;
 }
 
@@ -580,7 +580,7 @@ int32_t lux_iauIr_f(int32_t narg, int32_t ps[]) {
   void iauIr(double (*)[3]);
   int32_t result = lux_v_dp3_rD33_0_f_(narg, ps, iauIr);
   if (result < 0)
-    luxerror("Error in IR", 0);
+    luxerror("Error in ir", 0);
   return result;
 }
 
@@ -588,7 +588,7 @@ int32_t lux_iauJd2cal_f(int32_t narg, int32_t ps[]) {
   int32_t iauJd2cal(double, double, int32_t *, int32_t *, int32_t *, double *);
   int32_t result = lux_iddipT3dp_iLarDp3q_0z1111_f_(narg, ps, iauJd2cal);
   if (result < 0)
-    luxerror("Error in JD2CAL", 0);
+    luxerror("Error in jd2cal", 0);
   return result;
 }
 
@@ -596,7 +596,7 @@ int32_t lux_iauNum00a_f(int32_t narg, int32_t ps[]) {
   void iauNum00a(double, double, double (*)[3]);
   int32_t result = lux_v_dddp3_iDarDp3p3q_0z1_f_(narg, ps, iauNum00a);
   if (result < 0)
-    luxerror("Error in NUM00A", 0);
+    luxerror("Error in num00a", 0);
   return result;
 }
 
@@ -604,7 +604,7 @@ int32_t lux_iauNum00b_f(int32_t narg, int32_t ps[]) {
   void iauNum00b(double, double, double (*)[3]);
   int32_t result = lux_v_dddp3_iDarDp3p3q_0z1_f_(narg, ps, iauNum00b);
   if (result < 0)
-    luxerror("Error in NUM00B", 0);
+    luxerror("Error in num00b", 0);
   return result;
 }
 
@@ -612,7 +612,7 @@ int32_t lux_iauNum06a_f(int32_t narg, int32_t ps[]) {
   void iauNum06a(double, double, double (*)[3]);
   int32_t result = lux_v_dddp3_iDarDp3p3q_0z1_f_(narg, ps, iauNum06a);
   if (result < 0)
-    luxerror("Error in NUM06A", 0);
+    luxerror("Error in num06a", 0);
   return result;
 }
 
@@ -620,7 +620,7 @@ int32_t lux_iauNumat_f(int32_t narg, int32_t ps[]) {
   void iauNumat(double, double, double, double (*)[3]);
   int32_t result = lux_v_dT3dp3_iDT3rDp3p3_0T3_f_(narg, ps, iauNumat);
   if (result < 0)
-    luxerror("Error in NUMAT", 0);
+    luxerror("Error in numat", 0);
   return result;
 }
 
@@ -628,7 +628,7 @@ int32_t lux_iauNut00a_s(int32_t narg, int32_t ps[]) {
   void iauNut00a(double, double, double *, double *);
   int32_t result = lux_v_dddpdp_iDaoDqDq_0z12_s_(narg, ps, iauNut00a);
   if (result < 0)
-    luxerror("Error in NUT00A", 0);
+    luxerror("Error in nut00a", 0);
   return result;
 }
 
@@ -636,7 +636,7 @@ int32_t lux_iauNut00b_s(int32_t narg, int32_t ps[]) {
   void iauNut00b(double, double, double *, double *);
   int32_t result = lux_v_dddpdp_iDaoDqDq_0z12_s_(narg, ps, iauNut00b);
   if (result < 0)
-    luxerror("Error in NUT00B", 0);
+    luxerror("Error in nut00b", 0);
   return result;
 }
 
@@ -644,7 +644,7 @@ int32_t lux_iauNut06a_s(int32_t narg, int32_t ps[]) {
   void iauNut06a(double, double, double *, double *);
   int32_t result = lux_v_dddpdp_iDaoDqDq_0z12_s_(narg, ps, iauNut06a);
   if (result < 0)
-    luxerror("Error in NUT06A", 0);
+    luxerror("Error in nut06a", 0);
   return result;
 }
 
@@ -652,7 +652,7 @@ int32_t lux_iauNut80_s(int32_t narg, int32_t ps[]) {
   void iauNut80(double, double, double *, double *);
   int32_t result = lux_v_dddpdp_iDaoDqDq_0z12_s_(narg, ps, iauNut80);
   if (result < 0)
-    luxerror("Error in NUT80", 0);
+    luxerror("Error in nut80", 0);
   return result;
 }
 
@@ -660,7 +660,7 @@ int32_t lux_iauNutm80_f(int32_t narg, int32_t ps[]) {
   void iauNutm80(double, double, double (*)[3]);
   int32_t result = lux_v_dddp3_iDarDp3p3q_0z1_f_(narg, ps, iauNutm80);
   if (result < 0)
-    luxerror("Error in NUTM80", 0);
+    luxerror("Error in nutm80", 0);
   return result;
 }
 
@@ -668,7 +668,7 @@ int32_t lux_iauObl06_f(int32_t narg, int32_t ps[]) {
   double iauObl06(double, double);
   int32_t result = lux_d_dd_iDarDq_0z_1_f_(narg, ps, iauObl06);
   if (result < 0)
-    luxerror("Error in OBL06", 0);
+    luxerror("Error in obl06", 0);
   return result;
 }
 
@@ -676,7 +676,7 @@ int32_t lux_iauObl80_f(int32_t narg, int32_t ps[]) {
   double iauObl80(double, double);
   int32_t result = lux_d_dd_iDarDq_0z_1_f_(narg, ps, iauObl80);
   if (result < 0)
-    luxerror("Error in OBL80", 0);
+    luxerror("Error in obl80", 0);
   return result;
 }
 
@@ -684,7 +684,7 @@ int32_t lux_iauP06e_s(int32_t narg, int32_t ps[]) {
   void iauP06e(double, double, double *, double *, double *, double *, double *, double *, double *, double *, double *, double *, double *, double *, double *, double *, double *, double *);
   int32_t result = lux_v_dddpT16_iDaoDqT16_0z1T16_s_(narg, ps, iauP06e);
   if (result < 0)
-    luxerror("Error in P06E", 0);
+    luxerror("Error in p06e", 0);
   return result;
 }
 
@@ -692,7 +692,7 @@ int32_t lux_iauP2s_f(int32_t narg, int32_t ps[]) {
   void iauP2s(double *, double *, double *, double *);
   int32_t result = lux_v_dpT4_iD3arD3q_0111_f_(narg, ps, iauP2s);
   if (result < 0)
-    luxerror("Error in P2S", 0);
+    luxerror("Error in p2s", 0);
   return result;
 }
 
@@ -700,7 +700,7 @@ int32_t lux_iauPap_f(int32_t narg, int32_t ps[]) {
   double iauPap(double *, double *);
   int32_t result = lux_d_dpdp_iD3aD3qrDm3q_01_2_f_(narg, ps, iauPap);
   if (result < 0)
-    luxerror("Error in PAP", 0);
+    luxerror("Error in pap", 0);
   return result;
 }
 
@@ -708,7 +708,7 @@ int32_t lux_iauPas_f(int32_t narg, int32_t ps[]) {
   double iauPas(double, double, double, double);
   int32_t result = lux_d_dT4_iDaT4rDq_0T3_4_f_(narg, ps, iauPas);
   if (result < 0)
-    luxerror("Error in PAS", 0);
+    luxerror("Error in pas", 0);
   return result;
 }
 
@@ -716,7 +716,7 @@ int32_t lux_iauPb06_s(int32_t narg, int32_t ps[]) {
   void iauPb06(double, double, double *, double *, double *);
   int32_t result = lux_v_dddpT3_iDaoDqT3_0z1T3_s_(narg, ps, iauPb06);
   if (result < 0)
-    luxerror("Error in PB06", 0);
+    luxerror("Error in pb06", 0);
   return result;
 }
 
@@ -724,7 +724,7 @@ int32_t lux_iauPdp_f(int32_t narg, int32_t ps[]) {
   double iauPdp(double *, double *);
   int32_t result = lux_d_dpdp_iD3aD3qrDm3q_01_2_f_(narg, ps, iauPdp);
   if (result < 0)
-    luxerror("Error in PDP", 0);
+    luxerror("Error in pdp", 0);
   return result;
 }
 
@@ -732,7 +732,7 @@ int32_t lux_iauPfw06_s(int32_t narg, int32_t ps[]) {
   void iauPfw06(double, double, double *, double *, double *, double *);
   int32_t result = lux_v_dddpT4_iDaoDqT4_0z1T4_s_(narg, ps, iauPfw06);
   if (result < 0)
-    luxerror("Error in PFW06", 0);
+    luxerror("Error in pfw06", 0);
   return result;
 }
 
@@ -740,7 +740,7 @@ int32_t lux_iauPlan94_f(int32_t narg, int32_t ps[]) {
   int32_t iauPlan94(double, double, int32_t, double (*)[3]);
   int32_t result = lux_i_ddidp3_iDaL1rDp3p2q_0z12_f_(narg, ps, iauPlan94);
   if (result < 0)
-    luxerror("Error in PLAN94", 0);
+    luxerror("Error in plan94", 0);
   return result;
 }
 
@@ -748,7 +748,7 @@ int32_t lux_iauPm_f(int32_t narg, int32_t ps[]) {
   double iauPm(double *);
   int32_t result = lux_d_dp_iD3arDm3q_0_1_f_(narg, ps, iauPm);
   if (result < 0)
-    luxerror("Error in PM", 0);
+    luxerror("Error in pm", 0);
   return result;
 }
 
@@ -756,7 +756,7 @@ int32_t lux_iauPmat00_f(int32_t narg, int32_t ps[]) {
   void iauPmat00(double, double, double (*)[3]);
   int32_t result = lux_v_dddp3_iDarDp3p3q_0z1_f_(narg, ps, iauPmat00);
   if (result < 0)
-    luxerror("Error in PMAT00", 0);
+    luxerror("Error in pmat00", 0);
   return result;
 }
 
@@ -764,7 +764,7 @@ int32_t lux_iauPmat06_f(int32_t narg, int32_t ps[]) {
   void iauPmat06(double, double, double (*)[3]);
   int32_t result = lux_v_dddp3_iDarDp3p3q_0z1_f_(narg, ps, iauPmat06);
   if (result < 0)
-    luxerror("Error in PMAT06", 0);
+    luxerror("Error in pmat06", 0);
   return result;
 }
 
@@ -772,7 +772,7 @@ int32_t lux_iauPmat76_f(int32_t narg, int32_t ps[]) {
   void iauPmat76(double, double, double (*)[3]);
   int32_t result = lux_v_dddp3_iDarDp3p3q_0z1_f_(narg, ps, iauPmat76);
   if (result < 0)
-    luxerror("Error in PMAT76", 0);
+    luxerror("Error in pmat76", 0);
   return result;
 }
 
@@ -780,7 +780,7 @@ int32_t lux_iauPn_s(int32_t narg, int32_t ps[]) {
   void iauPn(double *, double *, double *);
   int32_t result = lux_v_dpT3_iD3aoDm3qoDq_0T2_s_(narg, ps, iauPn);
   if (result < 0)
-    luxerror("Error in PN", 0);
+    luxerror("Error in pn", 0);
   return result;
 }
 
@@ -788,7 +788,7 @@ int32_t lux_iauPn00_s(int32_t narg, int32_t ps[]) {
   void iauPn00(double, double, double, double, double *, double (*)[3], double (*)[3], double (*)[3], double (*)[3], double (*)[3]);
   int32_t result = lux_v_dT4dpdp3T5_iDaT3oDqDp3p3qT5_0z1T8_s_(narg, ps, iauPn00);
   if (result < 0)
-    luxerror("Error in PN00", 0);
+    luxerror("Error in pn00", 0);
   return result;
 }
 
@@ -796,7 +796,7 @@ int32_t lux_iauPn00a_s(int32_t narg, int32_t ps[]) {
   void iauPn00a(double, double, double *, double *, double *, double (*)[3], double (*)[3], double (*)[3], double (*)[3], double (*)[3]);
   int32_t result = lux_v_dddpT3dp3T5_iDaoDqT3Dp3p3qT5_0z1T8_s_(narg, ps, iauPn00a);
   if (result < 0)
-    luxerror("Error in PN00A", 0);
+    luxerror("Error in pn00a", 0);
   return result;
 }
 
@@ -804,7 +804,7 @@ int32_t lux_iauPn00b_s(int32_t narg, int32_t ps[]) {
   void iauPn00b(double, double, double *, double *, double *, double (*)[3], double (*)[3], double (*)[3], double (*)[3], double (*)[3]);
   int32_t result = lux_v_dddpT3dp3T5_iDaoDqT3Dp3p3qT5_0z1T8_s_(narg, ps, iauPn00b);
   if (result < 0)
-    luxerror("Error in PN00B", 0);
+    luxerror("Error in pn00b", 0);
   return result;
 }
 
@@ -812,7 +812,7 @@ int32_t lux_iauPn06_s(int32_t narg, int32_t ps[]) {
   void iauPn06(double, double, double, double, double *, double (*)[3], double (*)[3], double (*)[3], double (*)[3], double (*)[3]);
   int32_t result = lux_v_dT4dpdp3T5_iDaT3oDqDp3p3qT5_0z1T8_s_(narg, ps, iauPn06);
   if (result < 0)
-    luxerror("Error in PN06", 0);
+    luxerror("Error in pn06", 0);
   return result;
 }
 
@@ -820,7 +820,7 @@ int32_t lux_iauPn06a_s(int32_t narg, int32_t ps[]) {
   void iauPn06a(double, double, double *, double *, double *, double (*)[3], double (*)[3], double (*)[3], double (*)[3], double (*)[3]);
   int32_t result = lux_v_dddpT3dp3T5_iDaoDqT3Dp3p3qT5_0z1T8_s_(narg, ps, iauPn06a);
   if (result < 0)
-    luxerror("Error in PN06A", 0);
+    luxerror("Error in pn06a", 0);
   return result;
 }
 
@@ -828,7 +828,7 @@ int32_t lux_iauPnm00a_f(int32_t narg, int32_t ps[]) {
   void iauPnm00a(double, double, double (*)[3]);
   int32_t result = lux_v_dddp3_iDarDp3p3q_0z1_f_(narg, ps, iauPnm00a);
   if (result < 0)
-    luxerror("Error in PNM00A", 0);
+    luxerror("Error in pnm00a", 0);
   return result;
 }
 
@@ -836,7 +836,7 @@ int32_t lux_iauPnm00b_f(int32_t narg, int32_t ps[]) {
   void iauPnm00b(double, double, double (*)[3]);
   int32_t result = lux_v_dddp3_iDarDp3p3q_0z1_f_(narg, ps, iauPnm00b);
   if (result < 0)
-    luxerror("Error in PNM00B", 0);
+    luxerror("Error in pnm00b", 0);
   return result;
 }
 
@@ -844,7 +844,7 @@ int32_t lux_iauPnm06a_f(int32_t narg, int32_t ps[]) {
   void iauPnm06a(double, double, double (*)[3]);
   int32_t result = lux_v_dddp3_iDarDp3p3q_0z1_f_(narg, ps, iauPnm06a);
   if (result < 0)
-    luxerror("Error in PNM06A", 0);
+    luxerror("Error in pnm06a", 0);
   return result;
 }
 
@@ -852,7 +852,7 @@ int32_t lux_iauPnm80_f(int32_t narg, int32_t ps[]) {
   void iauPnm80(double, double, double (*)[3]);
   int32_t result = lux_v_dddp3_iDarDp3p3q_0z1_f_(narg, ps, iauPnm80);
   if (result < 0)
-    luxerror("Error in PNM80", 0);
+    luxerror("Error in pnm80", 0);
   return result;
 }
 
@@ -860,7 +860,7 @@ int32_t lux_iauPom00_f(int32_t narg, int32_t ps[]) {
   void iauPom00(double, double, double, double (*)[3]);
   int32_t result = lux_v_dT3dp3_iDaT3rDp3p3q_0T3_f_(narg, ps, iauPom00);
   if (result < 0)
-    luxerror("Error in POM00", 0);
+    luxerror("Error in pom00", 0);
   return result;
 }
 
@@ -868,7 +868,7 @@ int32_t lux_iauPr00_s(int32_t narg, int32_t ps[]) {
   void iauPr00(double, double, double *, double *);
   int32_t result = lux_v_dddpdp_iDaoDqDq_0z12_s_(narg, ps, iauPr00);
   if (result < 0)
-    luxerror("Error in PR00", 0);
+    luxerror("Error in pr00", 0);
   return result;
 }
 
@@ -876,7 +876,7 @@ int32_t lux_iauPrec76_s(int32_t narg, int32_t ps[]) {
   void iauPrec76(double, double, double, double, double *, double *, double *);
   int32_t result = lux_v_dT4dpT3_iDaDaoDqT3_0z1z2T4_s_(narg, ps, iauPrec76);
   if (result < 0)
-    luxerror("Error in PREC76", 0);
+    luxerror("Error in prec76", 0);
   return result;
 }
 
@@ -884,7 +884,7 @@ int32_t lux_iauPv2s_s(int32_t narg, int32_t ps[]) {
   void iauPv2s(double [2][3], double *, double *, double *, double *, double *, double *);
   int32_t result = lux_v_dp3dpT6_iD23aoDm2m3aDcT5_0T6_s_(narg, ps, iauPv2s);
   if (result < 0)
-    luxerror("Error in PV25", 0);
+    luxerror("Error in pv25", 0);
   return result;
 }
 
@@ -892,7 +892,7 @@ int32_t lux_iauPvdpv_f(int32_t narg, int32_t ps[]) {
   void iauPvdpv(double [2][3], double [2][3], double [2]);
   int32_t result = lux_v_dp3dp3dp_iD23aD23qoDcm3q_0T2_f_(narg, ps, iauPvdpv);
   if (result < 0)
-    luxerror("Error in PVDPV", 0);
+    luxerror("Error in pvdpv", 0);
   return result;
 }
 
@@ -900,7 +900,7 @@ int32_t lux_iauPvm_s(int32_t narg, int32_t ps[]) {
   void iauPvm(double [2][3], double *, double *);
   int32_t result = lux_v_dp3dpdp_iD23aoDm2m3qDcq_0T2_s_(narg, ps, iauPvm);
   if (result < 0)
-    luxerror("Error in PVM", 0);
+    luxerror("Error in pvm", 0);
   return result;
 }
 
@@ -908,7 +908,7 @@ int32_t lux_iauPvstar_s(int32_t narg, int32_t ps[]) {
   int32_t iauPvstar(double [2][3], double *, double *, double *, double *, double *, double *);
   int32_t result = lux_i_dp3dpT6_iD23aoDm2m3aDcT5_0T6_s_(narg, ps, iauPvstar);
   if (result < 0)
-    luxerror("Error in PVSTAR", 0);
+    luxerror("Error in pvstar", 0);
   return result;
 }
 
@@ -916,7 +916,7 @@ int32_t lux_iauPvxpv_f(int32_t narg, int32_t ps[]) {
   void iauPvxpv(double [2][3], double [2][3], double [2][3]);
   int32_t result = lux_v_dp3T3_iD23aD23qoDcq_0T2_f_(narg, ps, iauPvxpv);
   if (result < 0)
-    luxerror("Error in PVXPV", 0);
+    luxerror("Error in pvxpv", 0);
   return result;
 }
 
@@ -924,7 +924,7 @@ int32_t lux_iauPxp_f(int32_t narg, int32_t ps[]) {
   void iauPxp(double *, double *, double *);
   int32_t result = lux_v_dT3d3_iD3DcqrDcq_0T2_f_(narg, ps, iauPxp);
   if (result < 0)
-    luxerror("Error in PXP", 0);
+    luxerror("Error in pxp", 0);
   return result;
 }
 
@@ -932,7 +932,7 @@ int32_t lux_iauRm2v_f(int32_t narg, int32_t ps[]) {
   void iauRm2v(double [3][3], double [3]);
   int32_t result = lux_v_dp3dp_iD33arDm3q_01_f_(narg, ps, iauRm2v);
   if (result < 0)
-    luxerror("Error in RM2V", 0);
+    luxerror("Error in rm2v", 0);
   return result;
 }
 
@@ -940,7 +940,7 @@ int32_t lux_iauRxp_f(int32_t narg, int32_t ps[]) {
   void iauRxp(double [3][3], double [3], double [3]);
   int32_t result = lux_v_dp3dpdp_iD33aDm3arDcq_0T2_f_(narg, ps, iauRxp);
   if (result < 0)
-    luxerror("Error in RXP", 0);
+    luxerror("Error in rxp", 0);
   return result;
 }
 
@@ -948,7 +948,7 @@ int32_t lux_iauRxr_f(int32_t narg, int32_t ps[]) {
   void iauRxr(double (*)[3], double (*)[3], double (*)[3]);
   int32_t result = lux_v_dp3T3_iD33aDarDq_0T2_f_(narg, ps, iauRxr);
   if (result < 0)
-    luxerror("Error in RXR", 0);
+    luxerror("Error in rxr", 0);
   return result;
 }
 
@@ -956,7 +956,7 @@ int32_t lux_iauRv2m_f(int32_t narg, int32_t ps[]) {
   void iauRv2m(double [3], double [3][3]);
   int32_t result = lux_v_dpdp3_iD3arDp3q_01_f_(narg, ps, iauRv2m);
   if (result < 0)
-    luxerror("Error in RV2M", 0);
+    luxerror("Error in rv2m", 0);
   return result;
 }
 
@@ -964,7 +964,7 @@ int32_t lux_iauRx_s(int32_t narg, int32_t ps[]) {
   void iauRx(double, double [3][3]);
   int32_t result = lux_v_ddp3_iD1D33_01_s_(narg, ps, iauRx);
   if (result < 0)
-    luxerror("Error in RX", 0);
+    luxerror("Error in rx", 0);
   return result;
 }
 
@@ -972,7 +972,7 @@ int32_t lux_iauRxpv_f(int32_t narg, int32_t ps[]) {
   void iauRxpv(double [3][3], double [2][3], double [2][3]);
   int32_t result = lux_v_dp3T3_iD33aDaoDc_0T2_f_(narg, ps, iauRxpv);
   if (result < 0)
-    luxerror("Error in RXPV", 0);
+    luxerror("Error in rxpv", 0);
   return result;
 }
 
@@ -980,7 +980,7 @@ int32_t lux_iauRy_s(int32_t narg, int32_t ps[]) {
   void iauRy(double, double [3][3]);
   int32_t result = lux_v_ddp3_iD1D33_01_s_(narg, ps, iauRy);
   if (result < 0)
-    luxerror("Error in RY", 0);
+    luxerror("Error in ry", 0);
   return result;
 }
 
@@ -988,7 +988,7 @@ int32_t lux_iauRz_s(int32_t narg, int32_t ps[]) {
   void iauRz(double, double [3][3]);
   int32_t result = lux_v_ddp3_iD1D33_01_s_(narg, ps, iauRz);
   if (result < 0)
-    luxerror("Error in RZ", 0);
+    luxerror("Error in rz", 0);
   return result;
 }
 
@@ -996,7 +996,7 @@ int32_t lux_iauS00_f(int32_t narg, int32_t ps[]) {
   double iauS00(double, double, double, double);
   int32_t result = lux_d_dT4_iLaDaDarDq_0z12_f_(narg, ps, iauS00);
   if (result < 0)
-    luxerror("Error in S00", 0);
+    luxerror("Error in s00", 0);
   return result;
 }
 
@@ -1004,7 +1004,7 @@ int32_t lux_iauS00a_f(int32_t narg, int32_t ps[]) {
   double iauS00a(double, double);
   int32_t result = lux_d_dd_iDarDq_0z_1_f_(narg, ps, iauS00a);
   if (result < 0)
-    luxerror("Error in S00A", 0);
+    luxerror("Error in s00a", 0);
   return result;
 }
 
@@ -1012,7 +1012,7 @@ int32_t lux_iauS00b_f(int32_t narg, int32_t ps[]) {
   double iauS00b(double, double);
   int32_t result = lux_d_dd_iDarDq_0z_1_f_(narg, ps, iauS00b);
   if (result < 0)
-    luxerror("Error in S00B", 0);
+    luxerror("Error in s00b", 0);
   return result;
 }
 
@@ -1020,7 +1020,7 @@ int32_t lux_iauS06_f(int32_t narg, int32_t ps[]) {
   double iauS06(double, double, double, double);
   int32_t result = lux_d_dT4_iLaDaDarDq_0z12_f_(narg, ps, iauS06);
   if (result < 0)
-    luxerror("Error in S06", 0);
+    luxerror("Error in s06", 0);
   return result;
 }
 
@@ -1028,7 +1028,7 @@ int32_t lux_iauS06a_f(int32_t narg, int32_t ps[]) {
   double iauS06a(double, double);
   int32_t result = lux_d_dd_iDarDq_0z_1_f_(narg, ps, iauS06a);
   if (result < 0)
-    luxerror("Error in S06A", 0);
+    luxerror("Error in s06a", 0);
   return result;
 }
 
@@ -1044,7 +1044,7 @@ int32_t lux_iauS2p_f(int32_t narg, int32_t ps[]) {
   void iauS2p(double, double, double, double [3]);
   int32_t result = lux_v_dT3dp_iDaT3rDp3q_0T3_f_(narg, ps, iauS2p);
   if (result < 0)
-    luxerror("Error in S2P", 0);
+    luxerror("Error in s2p", 0);
   return result;
 }
 
@@ -1052,7 +1052,7 @@ int32_t lux_iauS2pv_f(int32_t narg, int32_t ps[]) {
   void iauS2pv(double, double, double, double, double, double, double [2][3]);
   int32_t result = lux_v_dT6dp3_iDaT6oDp2p3q_0T6_f_(narg, ps, iauS2pv);
   if (result < 0)
-    luxerror("Error in S2PV", 0);
+    luxerror("Error in s2pv", 0);
   return result;
 }
 
@@ -1060,7 +1060,7 @@ int32_t lux_iauSepp_f(int32_t narg, int32_t ps[]) {
   double iauSepp(double *, double *);
   int32_t result = lux_d_dpdp_iD3aD3qrDm3q_01_2_f_(narg, ps, iauSepp);
   if (result < 0)
-    luxerror("Error in SEPP", 0);
+    luxerror("Error in sepp", 0);
   return result;
 }
 
@@ -1068,7 +1068,7 @@ int32_t lux_iauSeps_f(int32_t narg, int32_t ps[]) {
   double iauSeps(double, double, double, double);
   int32_t result = lux_d_dT4_iDaT4rDq_0T3_4_f_(narg, ps, iauSeps);
   if (result < 0)
-    luxerror("Error in SEPS", 0);
+    luxerror("Error in seps", 0);
   return result;
 }
 
@@ -1076,7 +1076,7 @@ int32_t lux_iauSp00_f(int32_t narg, int32_t ps[]) {
   double iauSp00(double, double);
   int32_t result = lux_d_dd_iDarDq_0z_1_f_(narg, ps, iauSp00);
   if (result < 0)
-    luxerror("Error in SP00", 0);
+    luxerror("Error in sp00", 0);
   return result;
 }
 
@@ -1084,7 +1084,7 @@ int32_t lux_iauStarpm_s(int32_t narg, int32_t ps[]) {
   int32_t iauStarpm(double, double, double, double, double, double, double, double, double, double, double *, double *, double *, double *, double *, double *);
   int32_t result = lux_i_dT10dpT6_iDaT8oDqT6_0T6z7z8T13_s_(narg, ps, iauStarpm);
   if (result < 0)
-    luxerror("Error in STARPM", 0);
+    luxerror("Error in starpm", 0);
   return result;
 }
 
@@ -1092,7 +1092,7 @@ int32_t lux_iauStarpv_f(int32_t narg, int32_t ps[]) {
   int32_t iauStarpv(double, double, double, double, double, double, double [2][3]);
   int32_t result = lux_i_dT6dp3_iDaT6oDp2p3q_0T6_f_(narg, ps, iauStarpv);
   if (result < 0)
-    luxerror("Error in STARPV", 0);
+    luxerror("Error in starpv", 0);
   return result;
 }
 
@@ -1100,7 +1100,7 @@ int32_t lux_iauTaitt_f(int32_t narg, int32_t ps[]) {
   int32_t iauTaitt(double, double, double *, double *);
   int32_t result = lux_i_dddpdp_iDarDq_0z11_f_(narg, ps, iauTaitt);
   if (result < 0)
-    luxerror("Error in TAITT", 0);
+    luxerror("Error in taitt", 0);
   return result;
 }
 
@@ -1108,7 +1108,7 @@ int32_t lux_iauTaiut1_f(int32_t narg, int32_t ps[]) {
   int32_t iauTaiut1(double, double, double, double *, double *);
   int32_t result = lux_i_dT3dpdp_iDaDarDq_0z122_f_(narg, ps, iauTaiut1);
   if (result < 0)
-    luxerror("Error in TAIUT1", 0);
+    luxerror("Error in taiut1", 0);
   return result;
 }
 
@@ -1116,7 +1116,7 @@ int32_t lux_iauTaiutc_f(int32_t narg, int32_t ps[]) {
   int32_t iauTaiutc(double, double, double *, double *);
   int32_t result = lux_i_dddpdp_iDarDq_0z11_f_(narg, ps, iauTaiutc);
   if (result < 0)
-    luxerror("Error in TAIUTC", 0);
+    luxerror("Error in taiutc", 0);
   return result;
 }
 
@@ -1124,7 +1124,7 @@ int32_t lux_iauTcbtdb_f(int32_t narg, int32_t ps[]) {
   int32_t iauTcbtdb(double, double, double *, double *);
   int32_t result = lux_i_dddpdp_iDarDq_0z11_f_(narg, ps, iauTcbtdb);
   if (result < 0)
-    luxerror("Error in TCBTDB", 0);
+    luxerror("Error in tcbtdb", 0);
   return result;
 }
 
@@ -1132,7 +1132,7 @@ int32_t lux_iauTcgtt_f(int32_t narg, int32_t ps[]) {
   int32_t iauTcgtt(double, double, double *, double *);
   int32_t result = lux_i_dddpdp_iDarDq_0z11_f_(narg, ps, iauTcgtt);
   if (result < 0)
-    luxerror("Error in TCGTT", 0);
+    luxerror("Error in tcgtt", 0);
   return result;
 }
 
@@ -1140,7 +1140,7 @@ int32_t lux_iauTdbtcb_f(int32_t narg, int32_t ps[]) {
   int32_t iauTdbtcb(double, double, double *, double *);
   int32_t result = lux_i_dddpdp_iDarDq_0z11_f_(narg, ps, iauTdbtcb);
   if (result < 0)
-    luxerror("Error in TDBTCB", 0);
+    luxerror("Error in tdbtcb", 0);
   return result;
 }
 
@@ -1148,7 +1148,7 @@ int32_t lux_iauTdbtt_f(int32_t narg, int32_t ps[]) {
   int32_t iauTdbtt(double, double, double, double *, double *);
   int32_t result = lux_i_dT3dpdp_iDaDarDq_0z122_f_(narg, ps, iauTdbtt);
   if (result < 0)
-    luxerror("Error in TDBTT", 0);
+    luxerror("Error in tdbtt", 0);
   return result;
 }
 
@@ -1156,7 +1156,7 @@ int32_t lux_iauTr_f(int32_t narg, int32_t ps[]) {
   void iauTr(double [3][3], double [3][3]);
   int32_t result = lux_v_dp3dp3_iD33arDq_01_f_(narg, ps, iauTr);
   if (result < 0)
-    luxerror("Error in TR", 0);
+    luxerror("Error in tr", 0);
   return result;
 }
 
@@ -1164,7 +1164,7 @@ int32_t lux_iauTrxp_f(int32_t narg, int32_t ps[]) {
   void iauTrxp(double [3][3], double [3], double [3]);
   int32_t result = lux_v_dp3dpdp_iD33aDm3arDcq_0T2_f_(narg, ps, iauTrxp);
   if (result < 0)
-    luxerror("Error in TRXP", 0);
+    luxerror("Error in trxp", 0);
   return result;
 }
 
@@ -1172,7 +1172,7 @@ int32_t lux_iauTrxpv_f(int32_t narg, int32_t ps[]) {
   void iauTrxpv(double [3][3], double [2][3], double [2][3]);
   int32_t result = lux_v_dp3T3_iD33aDaoDc_0T2_f_(narg, ps, iauTrxpv);
   if (result < 0)
-    luxerror("Error in TRXPV", 0);
+    luxerror("Error in trxpv", 0);
   return result;
 }
 
@@ -1180,7 +1180,7 @@ int32_t lux_iauTttai_f(int32_t narg, int32_t ps[]) {
   int32_t iauTttai(double, double, double *, double *);
   int32_t result = lux_i_dddpdp_iDarDq_0z11_f_(narg, ps, iauTttai);
   if (result < 0)
-    luxerror("Error in TTTAI", 0);
+    luxerror("Error in tttai", 0);
   return result;
 }
 
@@ -1188,7 +1188,7 @@ int32_t lux_iauTttcg_f(int32_t narg, int32_t ps[]) {
   int32_t iauTttcg(double, double, double *, double *);
   int32_t result = lux_i_dddpdp_iDarDq_0z11_f_(narg, ps, iauTttcg);
   if (result < 0)
-    luxerror("Error in TTTCG", 0);
+    luxerror("Error in tttcg", 0);
   return result;
 }
 
@@ -1196,7 +1196,7 @@ int32_t lux_iauTttdb_f(int32_t narg, int32_t ps[]) {
   int32_t iauTttdb(double, double, double, double *, double *);
   int32_t result = lux_i_dT3dpdp_iDaDarDq_0z122_f_(narg, ps, iauTttdb);
   if (result < 0)
-    luxerror("Error in TTTDB", 0);
+    luxerror("Error in tttdb", 0);
   return result;
 }
 
@@ -1204,7 +1204,7 @@ int32_t lux_iauTtut1_f(int32_t narg, int32_t ps[]) {
   int32_t iauTtut1(double, double, double, double *, double *);
   int32_t result = lux_i_dT3dpdp_iDaDarDq_0z122_f_(narg, ps, iauTtut1);
   if (result < 0)
-    luxerror("Error in TTUT1", 0);
+    luxerror("Error in ttut1", 0);
   return result;
 }
 
@@ -1212,7 +1212,7 @@ int32_t lux_iauUt1tai_f(int32_t narg, int32_t ps[]) {
   int32_t iauUt1tai(double, double, double, double *, double *);
   int32_t result = lux_i_dT3dpdp_iDaDarDq_0z122_f_(narg, ps, iauUt1tai);
   if (result < 0)
-    luxerror("Error in UT1TAI", 0);
+    luxerror("Error in ut1tai", 0);
   return result;
 }
 
@@ -1220,7 +1220,7 @@ int32_t lux_iauUt1tt_f(int32_t narg, int32_t ps[]) {
   int32_t iauUt1tt(double, double, double, double *, double *);
   int32_t result = lux_i_dT3dpdp_iDaDarDq_0z122_f_(narg, ps, iauUt1tt);
   if (result < 0)
-    luxerror("Error in UT1TT", 0);
+    luxerror("Error in ut1tt", 0);
   return result;
 }
 
@@ -1228,7 +1228,7 @@ int32_t lux_iauUt1utc_f(int32_t narg, int32_t ps[]) {
   int32_t iauUt1utc(double, double, double, double *, double *);
   int32_t result = lux_i_dT3dpdp_iDaDarDq_0z122_f_(narg, ps, iauUt1utc);
   if (result < 0)
-    luxerror("Error in UT1UTC", 0);
+    luxerror("Error in ut1utc", 0);
   return result;
 }
 
@@ -1236,7 +1236,7 @@ int32_t lux_iauUtctai_f(int32_t narg, int32_t ps[]) {
   int32_t iauUtctai(double, double, double *, double *);
   int32_t result = lux_i_dddpdp_iDarDq_0z11_f_(narg, ps, iauUtctai);
   if (result < 0)
-    luxerror("Error in UTCTAI", 0);
+    luxerror("Error in utctai", 0);
   return result;
 }
 
@@ -1244,7 +1244,7 @@ int32_t lux_iauUtcut1_f(int32_t narg, int32_t ps[]) {
   int32_t iauUtcut1(double, double, double, double *, double *);
   int32_t result = lux_i_dT3dpdp_iDaDarDq_0z122_f_(narg, ps, iauUtcut1);
   if (result < 0)
-    luxerror("Error in UTCUT1", 0);
+    luxerror("Error in utcut1", 0);
   return result;
 }
 
@@ -1252,7 +1252,7 @@ int32_t lux_iauXy06_s(int32_t narg, int32_t ps[]) {
   void iauXy06(double, double, double *, double *);
   int32_t result = lux_v_dddpdp_iDaoDqDq_0z12_s_(narg, ps, iauXy06);
   if (result < 0)
-    luxerror("Error in XY06", 0);
+    luxerror("Error in xy06", 0);
   return result;
 }
 
@@ -1260,7 +1260,7 @@ int32_t lux_iauXys00a_s(int32_t narg, int32_t ps[]) {
   void iauXys00a(double, double, double *, double *, double *);
   int32_t result = lux_v_dddpT3_iDaoDqT3_0z1T3_s_(narg, ps, iauXys00a);
   if (result < 0)
-    luxerror("Error in XYS00A", 0);
+    luxerror("Error in xys00a", 0);
   return result;
 }
 
@@ -1268,7 +1268,7 @@ int32_t lux_iauXys00b_s(int32_t narg, int32_t ps[]) {
   void iauXys00b(double, double, double *, double *, double *);
   int32_t result = lux_v_dddpT3_iDaoDqT3_0z1T3_s_(narg, ps, iauXys00b);
   if (result < 0)
-    luxerror("Error in XYS00B", 0);
+    luxerror("Error in xys00b", 0);
   return result;
 }
 
@@ -1276,7 +1276,7 @@ int32_t lux_iauXys06a_s(int32_t narg, int32_t ps[]) {
   void iauXys06a(double, double, double *, double *, double *);
   int32_t result = lux_v_dddpT3_iDaoDqT3_0z1T3_s_(narg, ps, iauXys06a);
   if (result < 0)
-    luxerror("Error in XYS06A", 0);
+    luxerror("Error in xys06a", 0);
   return result;
 }
 
@@ -1284,7 +1284,7 @@ int32_t lux_runord_d_f(int32_t narg, int32_t ps[]) {
   int32_t runord_d(double *, int32_t, int32_t, int32_t, double *);
   int32_t result = lux_i_dpiT3dp_iDaiLiLrDq_00T3_f_(narg, ps, runord_d);
   if (result < 0)
-    luxerror("Error in RUNORD", 0);
+    luxerror("Error in runord", 0);
   return result;
 }
 
@@ -1308,7 +1308,7 @@ int32_t lux_unmod_slice_d_f(int32_t narg, int32_t ps[]) {
   int32_t unmod_slice_d(double *, size_t, size_t, double, double, double *, size_t, size_t);
   int32_t result = lux_i_sdddsd_iDaLDDrDq_000T333_f_(narg, ps, unmod_slice_d);
   if (result < 0)
-    luxerror("Error in UNMOD", 0);
+    luxerror("Error in unmod", 0);
   return result;
 }
 
@@ -1316,7 +1316,7 @@ int32_t lux_hypot_stride_f(int32_t narg, int32_t ps[]) {
   double hypot_stride(double *, size_t count, size_t stride);
   int32_t result = lux_d_sd_iDaLarDxq_000_2_f_(narg, ps, hypot_stride);
   if (result < 0)
-    luxerror("Error in HYPOT", 0);
+    luxerror("Error in hypot", 0);
   return result;
 }
 
@@ -1324,7 +1324,7 @@ int32_t lux_kepler_v_f(int32_t narg, int32_t ps[]) {
   double kepler_v(double, double);
   int32_t result = lux_d_dd_iDaD1rDq_01_2_f_(narg, ps, kepler_v);
   if (result < 0)
-    luxerror("Error in KEPLER", 0);
+    luxerror("Error in kepler", 0);
   return result;
 }
 
@@ -1332,7 +1332,7 @@ int32_t lux_esmooth_asymmetric_f(int32_t narg, int32_t ps[]) {
   void esmooth_asymmetric(double *, size_t, size_t, double, double *, size_t, size_t);
   int32_t result = lux_v_sddsd_iDaD1rDq_012_f_(narg, ps, esmooth_asymmetric);
   if (result < 0)
-    luxerror("Error in ESMOOTH1", 0);
+    luxerror("Error in esmooth1", 0);
   return result;
 }
 
@@ -1340,7 +1340,7 @@ int32_t lux_esmooth_symmetric_f(int32_t narg, int32_t ps[]) {
   void esmooth_symmetric(double *, size_t, size_t, double, double *, size_t, size_t);
   int32_t result = lux_v_sddsd_iDaD1rDq_012_f_(narg, ps, esmooth_symmetric);
   if (result < 0)
-    luxerror("Error in ESMOOTH2", 0);
+    luxerror("Error in esmooth2", 0);
   return result;
 }
 
@@ -1348,388 +1348,388 @@ int32_t lux_sincos_s(int32_t narg, int32_t ps[]) {
   void sincos(double, double*, double*);
   int32_t result = lux_v_ddpdp_iDaoDqDq_012_s_(narg, ps, sincos);
   if (result < 0)
-    luxerror("Error in SINCOS", 0);
+    luxerror("Error in sincos", 0);
   return result;
 }
 
 void register_the_bindings()
 {
-  register_lux_f(lux_gsl_fft_f, "FFT", 1, 2, "1ALLAXES:2AMPLITUDES");
+  register_lux_f(lux_gsl_fft_f, "fft", 1, 2, "1allaxes:2amplitudes");
 
-  register_lux_s(lux_gsl_fft_s, "FFT", 1, 2, "1ALLAXES:2AMPLITUDES");
+  register_lux_s(lux_gsl_fft_s, "fft", 1, 2, "1allaxes:2amplitudes");
 
-  register_lux_f(lux_gsl_fft_back_f, "FFTB", 1, 2, "1ALLAXES:2AMPLITUDES");
+  register_lux_f(lux_gsl_fft_back_f, "fftb", 1, 2, "1allaxes:2amplitudes");
 
-  register_lux_s(lux_gsl_fft_back_s, "FFTB", 1, 2, "1ALLAXES:2AMPLITUDES");
+  register_lux_s(lux_gsl_fft_back_s, "fftb", 1, 2, "1allaxes:2amplitudes");
 
-  register_lux_f(lux_hilbert_f, "HILBERT", 1, 2, "1ALLAXES");
+  register_lux_f(lux_hilbert_f, "hilbert", 1, 2, "1allaxes");
 
-  register_lux_s(lux_hilbert_s, "HILBERT", 1, 2, "1ALLAXES");
+  register_lux_s(lux_hilbert_s, "hilbert", 1, 2, "1allaxes");
 
   int32_t lux_fft_expand(int32_t, int32_t []);
-  register_lux_f(lux_fft_expand, "FFTEXPAND", 2, 2, NULL);
+  register_lux_f(lux_fft_expand, "fftexpand", 2, 2, NULL);
 
-  register_lux_f(lux_iauBi00_f, "BI00", 0, 0, 0);
+  register_lux_f(lux_iauBi00_f, "bi00", 0, 0, 0);
 
-  register_lux_s(lux_iauBp00_s, "BP00", 4, 4, 0);
+  register_lux_s(lux_iauBp00_s, "bp00", 4, 4, 0);
 
-  register_lux_s(lux_iauBp06_s, "BP06", 4, 4, 0);
+  register_lux_s(lux_iauBp06_s, "bp06", 4, 4, 0);
 
-  register_lux_s(lux_iauBpn2xy_s, "BPN2XY", 3, 3, 0);
+  register_lux_s(lux_iauBpn2xy_s, "bpn2xy", 3, 3, 0);
 
-  register_lux_f(lux_iauC2i00a_f, "C2I00A", 1, 1, 0);
+  register_lux_f(lux_iauC2i00a_f, "c2i00a", 1, 1, 0);
 
-  register_lux_f(lux_iauC2i00b_f, "C2I00B", 1, 1, 0);
+  register_lux_f(lux_iauC2i00b_f, "c2i00b", 1, 1, 0);
 
-  register_lux_f(lux_iauC2i06a_f, "C2I06A", 1, 1, 0);
+  register_lux_f(lux_iauC2i06a_f, "c2i06a", 1, 1, 0);
 
-  register_lux_f(lux_iauC2ibpn_f, "C2IBPN", 2, 2, 0);
+  register_lux_f(lux_iauC2ibpn_f, "c2ibpn", 2, 2, 0);
 
-  register_lux_f(lux_iauC2ixy_f, "C2IXY", 3, 3, 0);
+  register_lux_f(lux_iauC2ixy_f, "c2ixy", 3, 3, 0);
 
-  register_lux_f(lux_iauC2ixys_f, "C2IXYS", 3, 3, 0);
+  register_lux_f(lux_iauC2ixys_f, "c2ixys", 3, 3, 0);
 
-  register_lux_f(lux_iauC2s_f, "C2S", 1, 1, 0);
+  register_lux_f(lux_iauC2s_f, "c2s", 1, 1, 0);
 
-  register_lux_f(lux_iauC2t00a_f, "C2T00A", 4, 4, 0);
+  register_lux_f(lux_iauC2t00a_f, "c2t00a", 4, 4, 0);
 
-  register_lux_f(lux_iauC2t00b_f, "C2T00B", 4, 4, 0);
+  register_lux_f(lux_iauC2t00b_f, "c2t00b", 4, 4, 0);
 
-  register_lux_f(lux_iauC2t06a_f, "C2T06A", 4, 4, 0);
+  register_lux_f(lux_iauC2t06a_f, "c2t06a", 4, 4, 0);
 
-  register_lux_f(lux_iauC2tcio_f, "C2TCIO", 3, 3, 0);
+  register_lux_f(lux_iauC2tcio_f, "c2tcio", 3, 3, 0);
 
-  register_lux_f(lux_iauC2teqx_f, "C2TEQX", 3, 3, 0);
+  register_lux_f(lux_iauC2teqx_f, "c2teqx", 3, 3, 0);
 
-  register_lux_f(lux_iauC2tpe_f, "C2TPE", 5, 5, 0);
+  register_lux_f(lux_iauC2tpe_f, "c2tpe", 5, 5, 0);
 
-  register_lux_f(lux_iauC2txy_f, "C2TXY", 5, 5, 0);
+  register_lux_f(lux_iauC2txy_f, "c2txy", 5, 5, 0);
 
   int32_t lux_iauCal2jd(int32_t, int32_t []);
-  register_lux_f(lux_iauCal2jd, "CAL2JD", 1, 1, 0);
+  register_lux_f(lux_iauCal2jd, "cal2jd", 1, 1, 0);
 
   int32_t lux_iauDat(int32_t, int32_t []);
-  register_lux_f(lux_iauDat, "DAT", 0, 1, "1VALID");
+  register_lux_f(lux_iauDat, "dat", 0, 1, "1valid");
 
-  register_lux_f(lux_iauDtdb_f, "DTDB", 5, 5, 0);
+  register_lux_f(lux_iauDtdb_f, "dtdb", 5, 5, 0);
 
-  register_lux_f(lux_iauEe00_f, "EE00", 3, 3, 0);
+  register_lux_f(lux_iauEe00_f, "ee00", 3, 3, 0);
 
-  register_lux_f(lux_iauEe00a_f, "EE00A", 1, 1, 0);
+  register_lux_f(lux_iauEe00a_f, "ee00a", 1, 1, 0);
 
-  register_lux_f(lux_iauEe00b_f, "EE00B", 1, 1, 0);
+  register_lux_f(lux_iauEe00b_f, "ee00b", 1, 1, 0);
 
-  register_lux_f(lux_iauEe06a_f, "EE06A", 1, 1, 0);
+  register_lux_f(lux_iauEe06a_f, "ee06a", 1, 1, 0);
 
-  register_lux_f(lux_iauEect00_f, "EECT00", 1, 1, 0);
+  register_lux_f(lux_iauEect00_f, "eect00", 1, 1, 0);
 
-  register_lux_f(lux_iauEform_f, "EFORM", 1, 1, 0);
+  register_lux_f(lux_iauEform_f, "eform", 1, 1, 0);
 
-  register_lux_f(lux_iauEo06a_f, "EO06A", 1, 1, 0);
+  register_lux_f(lux_iauEo06a_f, "eo06a", 1, 1, 0);
 
-  register_lux_f(lux_iauEors_f, "EORS", 2, 2, 0);
+  register_lux_f(lux_iauEors_f, "eors", 2, 2, 0);
 
-  register_lux_f(lux_iauEpb_f, "EPB", 1, 1, 0);
+  register_lux_f(lux_iauEpb_f, "epb", 1, 1, 0);
 
   int32_t lux_iauEpb2jd(int32_t, int32_t []);
-  register_lux_f(lux_iauEpb2jd, "EPB2JD", 1, 1, 0);
+  register_lux_f(lux_iauEpb2jd, "epb2jd", 1, 1, 0);
 
-  register_lux_f(lux_iauEpj_f, "EPJ", 1, 1, 0);
+  register_lux_f(lux_iauEpj_f, "epj", 1, 1, 0);
 
   int32_t lux_iauEpj2jd(int32_t, int32_t []);
-  register_lux_f(lux_iauEpj2jd, "EPJ2JD", 1, 1, 0);
+  register_lux_f(lux_iauEpj2jd, "epj2jd", 1, 1, 0);
 
-  register_lux_s(lux_iauEpv00_s, "EPV00", 3, 3, 0);
+  register_lux_s(lux_iauEpv00_s, "epv00", 3, 3, 0);
 
-  register_lux_f(lux_iauEqeq94_f, "EQEQ94", 1, 1, 0);
+  register_lux_f(lux_iauEqeq94_f, "eqeq94", 1, 1, 0);
 
-  register_lux_f(lux_iauEra00_f, "ERA00", 1, 1, 0);
+  register_lux_f(lux_iauEra00_f, "era00", 1, 1, 0);
 
-  register_lux_f(lux_iauFad03_f, "FAD03", 1, 1, 0);
+  register_lux_f(lux_iauFad03_f, "fad03", 1, 1, 0);
 
-  register_lux_f(lux_iauFae03_f, "FAE03", 1, 1, 0);
+  register_lux_f(lux_iauFae03_f, "fae03", 1, 1, 0);
 
-  register_lux_f(lux_iauFaf03_f, "FAF03", 1, 1, 0);
+  register_lux_f(lux_iauFaf03_f, "faf03", 1, 1, 0);
 
-  register_lux_f(lux_iauFaju03_f, "FAJU03", 1, 1, 0);
+  register_lux_f(lux_iauFaju03_f, "faju03", 1, 1, 0);
 
-  register_lux_f(lux_iauFal03_f, "FAL03", 1, 1, 0);
+  register_lux_f(lux_iauFal03_f, "fal03", 1, 1, 0);
 
-  register_lux_f(lux_iauFalp03_f, "FALP03", 1, 1, 0);
+  register_lux_f(lux_iauFalp03_f, "falp03", 1, 1, 0);
 
-  register_lux_f(lux_iauFama03_f, "FAMA03", 1, 1, 0);
+  register_lux_f(lux_iauFama03_f, "fama03", 1, 1, 0);
 
-  register_lux_f(lux_iauFame03_f, "FAME03", 1, 1, 0);
+  register_lux_f(lux_iauFame03_f, "fame03", 1, 1, 0);
 
-  register_lux_f(lux_iauFane03_f, "FANE03", 1, 1, 0);
+  register_lux_f(lux_iauFane03_f, "fane03", 1, 1, 0);
 
-  register_lux_f(lux_iauFaom03_f, "FAOM03", 1, 1, 0);
+  register_lux_f(lux_iauFaom03_f, "faom03", 1, 1, 0);
 
-  register_lux_f(lux_iauFapa03_f, "FAPA03", 1, 1, 0);
+  register_lux_f(lux_iauFapa03_f, "fapa03", 1, 1, 0);
 
-  register_lux_f(lux_iauFasa03_f, "FASA03", 1, 1, 0);
+  register_lux_f(lux_iauFasa03_f, "fasa03", 1, 1, 0);
 
-  register_lux_f(lux_iauFaur03_f, "FAUR03", 1, 1, 0);
+  register_lux_f(lux_iauFaur03_f, "faur03", 1, 1, 0);
 
-  register_lux_f(lux_iauFave03_f, "FAVE03", 1, 1, 0);
+  register_lux_f(lux_iauFave03_f, "fave03", 1, 1, 0);
 
-  register_lux_s(lux_iauFk52h_s, "FK52H", 12, 12, 0);
+  register_lux_s(lux_iauFk52h_s, "fk52h", 12, 12, 0);
 
-  register_lux_s(lux_iauFk5hip_s, "FK5HIP", 2, 2, 0);
+  register_lux_s(lux_iauFk5hip_s, "fk5hip", 2, 2, 0);
 
-  register_lux_s(lux_iauFk5hz_s, "FK5HZ", 5, 5, 0);
+  register_lux_s(lux_iauFk5hz_s, "fk5hz", 5, 5, 0);
 
-  register_lux_f(lux_iauFw2m_f, "FW2M", 4, 4, 0);
+  register_lux_f(lux_iauFw2m_f, "fw2m", 4, 4, 0);
 
-  register_lux_s(lux_iauFw2xy_s, "FW2XY", 6, 6, 0);
+  register_lux_s(lux_iauFw2xy_s, "fw2xy", 6, 6, 0);
 
-  register_lux_f(lux_iauGc2gd_f, "GC2GD", 2, 2, 0);
+  register_lux_f(lux_iauGc2gd_f, "gc2gd", 2, 2, 0);
 
-  register_lux_f(lux_iauGc2gde_f, "GC2GDE", 3, 3, 0);
+  register_lux_f(lux_iauGc2gde_f, "gc2gde", 3, 3, 0);
 
-  register_lux_f(lux_iauGd2gc_f, "GD2GC", 2, 2, 0);
+  register_lux_f(lux_iauGd2gc_f, "gd2gc", 2, 2, 0);
 
-  register_lux_f(lux_iauGd2gce_f, "GD2GCE", 3, 3, 0);
+  register_lux_f(lux_iauGd2gce_f, "gd2gce", 3, 3, 0);
 
-  register_lux_f(lux_iauGmst00_f, "GMST00", 2, 2, 0);
+  register_lux_f(lux_iauGmst00_f, "gmst00", 2, 2, 0);
 
-  register_lux_f(lux_iauGmst06_f, "GMST06", 2, 2, 0);
+  register_lux_f(lux_iauGmst06_f, "gmst06", 2, 2, 0);
 
-  register_lux_f(lux_iauGmst82_f, "GMST82", 1, 1, 0);
+  register_lux_f(lux_iauGmst82_f, "gmst82", 1, 1, 0);
 
-  register_lux_f(lux_iauGst00a_f, "GST00A", 2, 2, 0);
+  register_lux_f(lux_iauGst00a_f, "gst00a", 2, 2, 0);
 
-  register_lux_f(lux_iauGst00b_f, "GST00B", 1, 1, 0);
+  register_lux_f(lux_iauGst00b_f, "gst00b", 1, 1, 0);
 
-  register_lux_f(lux_iauGst06_f, "GST06", 3, 3, 0);
+  register_lux_f(lux_iauGst06_f, "gst06", 3, 3, 0);
 
-  register_lux_f(lux_iauGst06a_f, "GST06A", 2, 2, 0);
+  register_lux_f(lux_iauGst06a_f, "gst06a", 2, 2, 0);
 
-  register_lux_f(lux_iauGst94_f, "GST94", 1, 1, 0);
+  register_lux_f(lux_iauGst94_f, "gst94", 1, 1, 0);
 
-  register_lux_s(lux_iauH2fk5_s, "H2FK5", 12, 12, 0);
+  register_lux_s(lux_iauH2fk5_s, "h2fk5", 12, 12, 0);
 
-  register_lux_s(lux_iauHfk5z_s, "HFK5Z", 7, 7, 0);
+  register_lux_s(lux_iauHfk5z_s, "hfk5z", 7, 7, 0);
 
-  register_lux_f(lux_iauIr_f, "IR", 0, 0, 0);
+  register_lux_f(lux_iauIr_f, "ir", 0, 0, 0);
 
-  register_lux_f(lux_iauJd2cal_f, "JD2CAL", 1, 1, 0);
+  register_lux_f(lux_iauJd2cal_f, "jd2cal", 1, 1, 0);
 
-  register_lux_f(lux_iauNum00a_f, "NUM00A", 1, 1, 0);
+  register_lux_f(lux_iauNum00a_f, "num00a", 1, 1, 0);
 
-  register_lux_f(lux_iauNum00b_f, "NUM00B", 1, 1, 0);
+  register_lux_f(lux_iauNum00b_f, "num00b", 1, 1, 0);
 
-  register_lux_f(lux_iauNum06a_f, "NUM06A", 1, 1, 0);
+  register_lux_f(lux_iauNum06a_f, "num06a", 1, 1, 0);
 
-  register_lux_f(lux_iauNumat_f, "NUMAT", 3, 3, 0);
+  register_lux_f(lux_iauNumat_f, "numat", 3, 3, 0);
 
-  register_lux_s(lux_iauNut00a_s, "NUT00A", 3, 3, 0);
+  register_lux_s(lux_iauNut00a_s, "nut00a", 3, 3, 0);
 
-  register_lux_s(lux_iauNut00b_s, "NUT00B", 3, 3, 0);
+  register_lux_s(lux_iauNut00b_s, "nut00b", 3, 3, 0);
 
-  register_lux_s(lux_iauNut06a_s, "NUT06A", 3, 3, 0);
+  register_lux_s(lux_iauNut06a_s, "nut06a", 3, 3, 0);
 
-  register_lux_s(lux_iauNut80_s, "NUT80", 3, 3, 0);
+  register_lux_s(lux_iauNut80_s, "nut80", 3, 3, 0);
 
-  register_lux_f(lux_iauNutm80_f, "NUTM80", 1, 1, 0);
+  register_lux_f(lux_iauNutm80_f, "nutm80", 1, 1, 0);
 
-  register_lux_f(lux_iauObl06_f, "OBL06", 1, 1, 0);
+  register_lux_f(lux_iauObl06_f, "obl06", 1, 1, 0);
 
-  register_lux_f(lux_iauObl80_f, "OBL80", 1, 1, 0);
+  register_lux_f(lux_iauObl80_f, "obl80", 1, 1, 0);
 
-  register_lux_s(lux_iauP06e_s, "P06E", 17, 17, 0);
+  register_lux_s(lux_iauP06e_s, "p06e", 17, 17, 0);
 
-  register_lux_f(lux_iauP2s_f, "P2S", 1, 1, 0);
+  register_lux_f(lux_iauP2s_f, "p2s", 1, 1, 0);
 
-  register_lux_f(lux_iauPap_f, "PAP", 2, 2, 0);
+  register_lux_f(lux_iauPap_f, "pap", 2, 2, 0);
 
-  register_lux_f(lux_iauPas_f, "PAS", 4, 4, 0);
+  register_lux_f(lux_iauPas_f, "pas", 4, 4, 0);
 
-  register_lux_s(lux_iauPb06_s, "PB06", 4, 4, 0);
+  register_lux_s(lux_iauPb06_s, "pb06", 4, 4, 0);
 
-  register_lux_f(lux_iauPdp_f, "PDP", 2, 2, 0);
+  register_lux_f(lux_iauPdp_f, "pdp", 2, 2, 0);
 
-  register_lux_s(lux_iauPfw06_s, "PFW06", 5, 5, 0);
+  register_lux_s(lux_iauPfw06_s, "pfw06", 5, 5, 0);
 
-  register_lux_f(lux_iauPlan94_f, "PLAN94", 2, 2, 0);
+  register_lux_f(lux_iauPlan94_f, "plan94", 2, 2, 0);
 
-  register_lux_f(lux_iauPm_f, "PM", 1, 1, 0);
+  register_lux_f(lux_iauPm_f, "pm", 1, 1, 0);
 
-  register_lux_f(lux_iauPmat00_f, "PMAT00", 1, 1, 0);
+  register_lux_f(lux_iauPmat00_f, "pmat00", 1, 1, 0);
 
-  register_lux_f(lux_iauPmat06_f, "PMAT06", 1, 1, 0);
+  register_lux_f(lux_iauPmat06_f, "pmat06", 1, 1, 0);
 
-  register_lux_f(lux_iauPmat76_f, "PMAT76", 1, 1, 0);
+  register_lux_f(lux_iauPmat76_f, "pmat76", 1, 1, 0);
 
-  register_lux_s(lux_iauPn_s, "PN", 3, 3, 0);
+  register_lux_s(lux_iauPn_s, "pn", 3, 3, 0);
 
-  register_lux_s(lux_iauPn00_s, "PN00", 9, 9, 0);
+  register_lux_s(lux_iauPn00_s, "pn00", 9, 9, 0);
 
-  register_lux_s(lux_iauPn00a_s, "PN00A", 9, 9, 0);
+  register_lux_s(lux_iauPn00a_s, "pn00a", 9, 9, 0);
 
-  register_lux_s(lux_iauPn00b_s, "PN00B", 9, 9, 0);
+  register_lux_s(lux_iauPn00b_s, "pn00b", 9, 9, 0);
 
-  register_lux_s(lux_iauPn06_s, "PN06", 9, 9, 0);
+  register_lux_s(lux_iauPn06_s, "pn06", 9, 9, 0);
 
-  register_lux_s(lux_iauPn06a_s, "PN06A", 9, 9, 0);
+  register_lux_s(lux_iauPn06a_s, "pn06a", 9, 9, 0);
 
-  register_lux_f(lux_iauPnm00a_f, "PNM00A", 1, 1, 0);
+  register_lux_f(lux_iauPnm00a_f, "pnm00a", 1, 1, 0);
 
-  register_lux_f(lux_iauPnm00b_f, "PNM00B", 1, 1, 0);
+  register_lux_f(lux_iauPnm00b_f, "pnm00b", 1, 1, 0);
 
-  register_lux_f(lux_iauPnm06a_f, "PNM06A", 1, 1, 0);
+  register_lux_f(lux_iauPnm06a_f, "pnm06a", 1, 1, 0);
 
-  register_lux_f(lux_iauPnm80_f, "PNM80", 1, 1, 0);
+  register_lux_f(lux_iauPnm80_f, "pnm80", 1, 1, 0);
 
-  register_lux_f(lux_iauPom00_f, "POM00", 3, 3, 0);
+  register_lux_f(lux_iauPom00_f, "pom00", 3, 3, 0);
 
-  register_lux_s(lux_iauPr00_s, "PR00", 3, 3, 0);
+  register_lux_s(lux_iauPr00_s, "pr00", 3, 3, 0);
 
-  register_lux_s(lux_iauPrec76_s, "PREC76", 5, 5, 0);
+  register_lux_s(lux_iauPrec76_s, "prec76", 5, 5, 0);
 
-  register_lux_s(lux_iauPv2s_s, "PV25", 7, 7, 0);
+  register_lux_s(lux_iauPv2s_s, "pv25", 7, 7, 0);
 
-  register_lux_f(lux_iauPvdpv_f, "PVDPV", 2, 2, 0);
+  register_lux_f(lux_iauPvdpv_f, "pvdpv", 2, 2, 0);
 
-  register_lux_s(lux_iauPvm_s, "PVM", 3, 3, 0);
+  register_lux_s(lux_iauPvm_s, "pvm", 3, 3, 0);
 
-  register_lux_s(lux_iauPvstar_s, "PVSTAR", 7, 7, 0);
+  register_lux_s(lux_iauPvstar_s, "pvstar", 7, 7, 0);
 
-  register_lux_f(lux_iauPvxpv_f, "PVXPV", 2, 2, 0);
+  register_lux_f(lux_iauPvxpv_f, "pvxpv", 2, 2, 0);
 
-  register_lux_f(lux_iauPxp_f, "PXP", 2, 2, 0);
+  register_lux_f(lux_iauPxp_f, "pxp", 2, 2, 0);
 
-  register_lux_f(lux_iauRm2v_f, "RM2V", 1, 1, 0);
+  register_lux_f(lux_iauRm2v_f, "rm2v", 1, 1, 0);
 
-  register_lux_f(lux_iauRxp_f, "RXP", 2, 2, 0);
+  register_lux_f(lux_iauRxp_f, "rxp", 2, 2, 0);
 
-  register_lux_f(lux_iauRxr_f, "RXR", 2, 2, 0);
+  register_lux_f(lux_iauRxr_f, "rxr", 2, 2, 0);
 
-  register_lux_f(lux_iauRv2m_f, "RV2M", 1, 1, 0);
+  register_lux_f(lux_iauRv2m_f, "rv2m", 1, 1, 0);
 
-  register_lux_s(lux_iauRx_s, "RX", 2, 2, 0);
+  register_lux_s(lux_iauRx_s, "rx", 2, 2, 0);
 
-  register_lux_f(lux_iauRxpv_f, "RXPV", 2, 2, 0);
+  register_lux_f(lux_iauRxpv_f, "rxpv", 2, 2, 0);
 
-  register_lux_s(lux_iauRy_s, "RY", 2, 2, 0);
+  register_lux_s(lux_iauRy_s, "ry", 2, 2, 0);
 
-  register_lux_s(lux_iauRz_s, "RZ", 2, 2, 0);
+  register_lux_s(lux_iauRz_s, "rz", 2, 2, 0);
 
-  register_lux_f(lux_iauS00_f, "S00", 3, 3, 0);
+  register_lux_f(lux_iauS00_f, "s00", 3, 3, 0);
 
-  register_lux_f(lux_iauS00a_f, "S00A", 1, 1, 0);
+  register_lux_f(lux_iauS00a_f, "s00a", 1, 1, 0);
 
-  register_lux_f(lux_iauS00b_f, "S00B", 1, 1, 0);
+  register_lux_f(lux_iauS00b_f, "s00b", 1, 1, 0);
 
-  register_lux_f(lux_iauS06_f, "S06", 3, 3, 0);
+  register_lux_f(lux_iauS06_f, "s06", 3, 3, 0);
 
-  register_lux_f(lux_iauS06a_f, "S06A", 1, 1, 0);
+  register_lux_f(lux_iauS06a_f, "s06a", 1, 1, 0);
 
   register_lux_f(lux_iauS2c_f, "S2C", 2, 2, 0);
 
-  register_lux_f(lux_iauS2p_f, "S2P", 3, 3, 0);
+  register_lux_f(lux_iauS2p_f, "s2p", 3, 3, 0);
 
-  register_lux_f(lux_iauS2pv_f, "S2PV", 6, 6, 0);
+  register_lux_f(lux_iauS2pv_f, "s2pv", 6, 6, 0);
 
-  register_lux_f(lux_iauSepp_f, "SEPP", 2, 2, 0);
+  register_lux_f(lux_iauSepp_f, "sepp", 2, 2, 0);
 
-  register_lux_f(lux_iauSeps_f, "SEPS", 4, 4, 0);
+  register_lux_f(lux_iauSeps_f, "seps", 4, 4, 0);
 
-  register_lux_f(lux_iauSp00_f, "SP00", 1, 1, 0);
+  register_lux_f(lux_iauSp00_f, "sp00", 1, 1, 0);
 
-  register_lux_s(lux_iauStarpm_s, "STARPM", 14, 14, 0);
+  register_lux_s(lux_iauStarpm_s, "starpm", 14, 14, 0);
 
-  register_lux_f(lux_iauStarpv_f, "STARPV", 6, 6, 0);
+  register_lux_f(lux_iauStarpv_f, "starpv", 6, 6, 0);
 
-  register_lux_f(lux_iauTaitt_f, "TAITT", 1, 1, 0);
+  register_lux_f(lux_iauTaitt_f, "taitt", 1, 1, 0);
 
-  register_lux_f(lux_iauTaiut1_f, "TAIUT1", 2, 2, 0);
+  register_lux_f(lux_iauTaiut1_f, "taiut1", 2, 2, 0);
 
-  register_lux_f(lux_iauTaiutc_f, "TAIUTC", 1, 1, 0);
+  register_lux_f(lux_iauTaiutc_f, "taiutc", 1, 1, 0);
 
-  register_lux_f(lux_iauTcbtdb_f, "TCBTDB", 1, 1, 0);
+  register_lux_f(lux_iauTcbtdb_f, "tcbtdb", 1, 1, 0);
 
-  register_lux_f(lux_iauTcgtt_f, "TCGTT", 1, 1, 0);
+  register_lux_f(lux_iauTcgtt_f, "tcgtt", 1, 1, 0);
 
-  register_lux_f(lux_iauTdbtcb_f, "TDBTCB", 1, 1, 0);
+  register_lux_f(lux_iauTdbtcb_f, "tdbtcb", 1, 1, 0);
 
-  register_lux_f(lux_iauTdbtt_f, "TDBTT", 2, 2, 0);
+  register_lux_f(lux_iauTdbtt_f, "tdbtt", 2, 2, 0);
 
-  register_lux_f(lux_iauTr_f, "TR", 1, 1, 0);
+  register_lux_f(lux_iauTr_f, "tr", 1, 1, 0);
 
-  register_lux_f(lux_iauTrxp_f, "TRXP", 2, 2, 0);
+  register_lux_f(lux_iauTrxp_f, "trxp", 2, 2, 0);
 
-  register_lux_f(lux_iauTrxpv_f, "TRXPV", 2, 2, 0);
+  register_lux_f(lux_iauTrxpv_f, "trxpv", 2, 2, 0);
 
-  register_lux_f(lux_iauTttai_f, "TTTAI", 1, 1, 0);
+  register_lux_f(lux_iauTttai_f, "tttai", 1, 1, 0);
 
-  register_lux_f(lux_iauTttcg_f, "TTTCG", 1, 1, 0);
+  register_lux_f(lux_iauTttcg_f, "tttcg", 1, 1, 0);
 
-  register_lux_f(lux_iauTttdb_f, "TTTDB", 2, 2, 0);
+  register_lux_f(lux_iauTttdb_f, "tttdb", 2, 2, 0);
 
-  register_lux_f(lux_iauTtut1_f, "TTUT1", 2, 2, 0);
+  register_lux_f(lux_iauTtut1_f, "ttut1", 2, 2, 0);
 
-  register_lux_f(lux_iauUt1tai_f, "UT1TAI", 2, 2, 0);
+  register_lux_f(lux_iauUt1tai_f, "ut1tai", 2, 2, 0);
 
-  register_lux_f(lux_iauUt1tt_f, "UT1TT", 2, 2, 0);
+  register_lux_f(lux_iauUt1tt_f, "ut1tt", 2, 2, 0);
 
-  register_lux_f(lux_iauUt1utc_f, "UT1UTC", 2, 2, 0);
+  register_lux_f(lux_iauUt1utc_f, "ut1utc", 2, 2, 0);
 
-  register_lux_f(lux_iauUtctai_f, "UTCTAI", 1, 1, 0);
+  register_lux_f(lux_iauUtctai_f, "utctai", 1, 1, 0);
 
-  register_lux_f(lux_iauUtcut1_f, "UTCUT1", 2, 2, 0);
+  register_lux_f(lux_iauUtcut1_f, "utcut1", 2, 2, 0);
 
-  register_lux_s(lux_iauXy06_s, "XY06", 3, 3, 0);
+  register_lux_s(lux_iauXy06_s, "xy06", 3, 3, 0);
 
-  register_lux_s(lux_iauXys00a_s, "XYS00A", 4, 4, 0);
+  register_lux_s(lux_iauXys00a_s, "xys00a", 4, 4, 0);
 
-  register_lux_s(lux_iauXys00b_s, "XYS00B", 4, 4, 0);
+  register_lux_s(lux_iauXys00b_s, "xys00b", 4, 4, 0);
 
-  register_lux_s(lux_iauXys06a_s, "XYS06A", 4, 4, 0);
+  register_lux_s(lux_iauXys06a_s, "xys06a", 4, 4, 0);
 
-  register_lux_f(lux_runord_d_f, "RUNORD", 3, 3, NULL);
+  register_lux_f(lux_runord_d_f, "runord", 3, 3, NULL);
 
   register_lux_f(lux_runmax_d_f, "RUNMAX", 2, 2, NULL);
 
   register_lux_f(lux_runmin_d_f, "RUNMIN", 2, 2, NULL);
 
-  register_lux_f(lux_unmod_slice_d_f, "UNMOD", 2, 4, ":AXIS:PERIOD:AVERAGE");
+  register_lux_f(lux_unmod_slice_d_f, "unmod", 2, 4, ":axis:period:average");
 
-  register_lux_f(lux_hypot_stride_f, "HYPOT", 1, 2, ":AXIS");
+  register_lux_f(lux_hypot_stride_f, "hypot", 1, 2, ":axis");
 
   int32_t lux_ssfc_to_polar(int32_t, int32_t []);
-  register_lux_f(lux_ssfc_to_polar, "SSFCTOPOLAR", 1, 2, 0);
+  register_lux_f(lux_ssfc_to_polar, "ssfctopolar", 1, 2, 0);
 
   int32_t lux_polar_to_ssfc(int32_t, int32_t []);
-  register_lux_f(lux_polar_to_ssfc, "POLARTOSSFC", 1, 2, 0);
+  register_lux_f(lux_polar_to_ssfc, "polartossfc", 1, 2, 0);
 
-  register_lux_f(lux_kepler_v_f, "KEPLER", 2, 2, NULL);
+  register_lux_f(lux_kepler_v_f, "kepler", 2, 2, NULL);
 
-  register_lux_f(lux_esmooth_asymmetric_f, "ESMOOTH1", 1, 2, NULL);
+  register_lux_f(lux_esmooth_asymmetric_f, "esmooth1", 1, 2, NULL);
 
-  register_lux_f(lux_esmooth_symmetric_f, "ESMOOTH2", 1, 2, NULL);
+  register_lux_f(lux_esmooth_symmetric_f, "esmooth2", 1, 2, NULL);
 
-  register_lux_s(lux_sincos_s, "SINCOS", 3, 3, NULL);
+  register_lux_s(lux_sincos_s, "sincos", 3, 3, NULL);
 
   int32_t lux_matrix_product(int32_t, int32_t []);
-  register_lux_f(lux_matrix_product, "MPRODUCT", 2, 2, "0INNER:1OUTER");
+  register_lux_f(lux_matrix_product, "mproduct", 2, 2, "0inner:1outer");
 
   int32_t lux_svd(int32_t, int32_t []);
-  register_lux_s(lux_svd, "SVD", 4, 4, NULL);
+  register_lux_s(lux_svd, "svd", 4, 4, NULL);
 
   int32_t lux_transpose_matrix(int32_t, int32_t []);
-  register_lux_f(lux_transpose_matrix, "TRANSPOSE", 1, 1, NULL);
+  register_lux_f(lux_transpose_matrix, "transpose", 1, 1, NULL);
 
   int32_t lux_diagonal_matrix(int32_t, int32_t []);
-  register_lux_f(lux_diagonal_matrix, "MDIAGONAL", 1, 1, NULL);
+  register_lux_f(lux_diagonal_matrix, "mdiagonal", 1, 1, NULL);
 
   int32_t lux_randome(int32_t, int32_t []);
-  register_lux_f(lux_randome, "RANDOME", 3, MAX_DIMS, "%1%LIMIT:SCALE");
+  register_lux_f(lux_randome, "randome", 3, MAX_DIMS, "%1%limit:scale");
 
   int32_t lux_indgen_s(int32_t, int32_t []);
-  register_lux_s(lux_indgen_s, "INDGEN", 1, 2, "*");
+  register_lux_s(lux_indgen_s, "indgen", 1, 2, "*");
 
   int32_t lux_generalfit2(int32_t, int32_t []);
-  register_lux_f(lux_generalfit2, "FIT3", 5, 7, "X:Y:START:STEP:F:ERR:ITHRESH:1VOCAL");
+  register_lux_f(lux_generalfit2, "fit3", 5, 7, "x:y:start:step:f:err:ithresh:1vocal");
 
 }

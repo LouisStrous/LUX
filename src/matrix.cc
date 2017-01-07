@@ -142,9 +142,9 @@ int32_t lux_matrix_product(int32_t narg, int32_t ps[])
   free(infos);
   return iq;
 }
-REGISTER(matrix_product, f, MPRODUCT, 2, 2, "0INNER:1OUTER");
+REGISTER(matrix_product, f, mproduct, 2, 2, "0inner:1outer");
 /*------------------------------------------------------------------------- */
-int32_t singular_value_decomposition(double *a_in, size_t ncol, size_t nrow, 
+int32_t singular_value_decomposition(double *a_in, size_t ncol, size_t nrow,
 				 double *u_out, double *s_out,
 				 double *v_out)
 {
@@ -152,7 +152,7 @@ int32_t singular_value_decomposition(double *a_in, size_t ncol, size_t nrow,
     errno = EDOM;
     return 1;
   }
-  
+
   gsl_matrix *a;
   gsl_matrix *v;
   gsl_vector *s;
@@ -298,7 +298,7 @@ int32_t lux_svd(int32_t narg, int32_t ps[])
   free(infos);
   return iq;
 }
-REGISTER(svd, s, SVD, 4, 4, NULL);
+REGISTER(svd, s, svd, 4, 4, NULL);
 /*--------------------------------------------------------------------*/
 int32_t matrix_transpose(double *in, double *out, size_t in_ncol, size_t in_nrow)
 {
@@ -351,7 +351,7 @@ int32_t lux_transpose_matrix(int32_t narg, int32_t ps[])
   free(infos);
   return iq;
 }
-REGISTER(transpose_matrix, f, TRANSPOSE, 1, 1, NULL);
+REGISTER(transpose_matrix, f, transpose, 1, 1, NULL);
 /*--------------------------------------------------------------------*/
 int32_t lux_diagonal_matrix(int32_t narg, int32_t ps[])
 {
@@ -370,5 +370,5 @@ int32_t lux_diagonal_matrix(int32_t narg, int32_t ps[])
     ptrs[1].d[i + i*infos[0].nelem] = ptrs[0].d[i];
   return iq;
 }
-REGISTER(diagonal_matrix, f, MDIAGONAL, 1, 1, NULL);
+REGISTER(diagonal_matrix, f, mdiagonal, 1, 1, NULL);
 /*--------------------------------------------------------------------*/

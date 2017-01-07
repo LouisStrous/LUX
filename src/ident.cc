@@ -543,13 +543,13 @@ char *symbolIdent(int32_t symbol, int32_t mode)
   if (symbol < 0) {	/* some break condition */
     switch (symbol) {
       case LOOP_BREAK:
-	strcpy(curScrat, "BREAK ");
+	strcpy(curScrat, "break ");
 	return curScrat;
       case LOOP_CONTINUE:
-	strcpy(curScrat, "CONTINUE ");
+	strcpy(curScrat, "continue ");
 	return curScrat;
       case LOOP_RETALL:
-	strcpy(curScrat, "RETALL ");
+	strcpy(curScrat, "retall ");
 	return curScrat;
       default:
 	sprintf(curScrat, "[symbol %1d] ", symbol);
@@ -881,26 +881,26 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     }
     break;
   case LUX_ASSOC:
-    sprintf(curScrat, "ASSOC(%1d,", assoc_lun(symbol));
+    sprintf(curScrat, "assoc(%1d,", assoc_lun(symbol));
     curScrat += strlen(curScrat);
     switch (assoc_type(symbol)) {
     case LUX_INT8:
-      strcpy(curScrat, "BYTARR(");
+      strcpy(curScrat, "bytarr(");
       break;
     case LUX_INT16:
-      strcpy(curScrat, "INTARR(");
+      strcpy(curScrat, "intarr(");
       break;
     case LUX_INT32:
-      strcpy(curScrat, "LONARR(");
+      strcpy(curScrat, "lonarr(");
       break;
     case LUX_INT64:
-      strcpy(curScrat, "QUADARR(");
+      strcpy(curScrat, "quadarr(");
       break;
     case LUX_FLOAT:
-      strcpy(curScrat, "FLTARR(");
+      strcpy(curScrat, "fltarr(");
       break;
     case LUX_DOUBLE:
-      strcpy(curScrat, "DBLARR(");
+      strcpy(curScrat, "dblarr(");
       break;
     }
     curScrat += strlen(curScrat);
@@ -914,7 +914,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     }
     strcpy(curScrat++, ")");
     if (assoc_has_offset(symbol)) {
-      sprintf(curScrat, ",OFFSET=%1d", assoc_offset(symbol));
+      sprintf(curScrat, ",offset=%1d", assoc_offset(symbol));
       curScrat += strlen(curScrat);
     }
     strcpy(curScrat, ")");
@@ -1000,22 +1000,22 @@ char *symbolIdent(int32_t symbol, int32_t mode)
   case LUX_FILEMAP:
     switch (file_map_type(symbol)) {
     case LUX_INT8:
-      strcpy(curScrat, "BYTFARR(");
+      strcpy(curScrat, "bytfarr(");
       break;
     case LUX_INT16:
-      strcpy(curScrat, "INTFARR(");
+      strcpy(curScrat, "intfarr(");
       break;
     case LUX_INT32:
-      strcpy(curScrat, "LONFARR(");
+      strcpy(curScrat, "lonfarr(");
       break;
     case LUX_INT64:
-      strcpy(curScrat, "QUADFARR(");
+      strcpy(curScrat, "quadfarr(");
       break;
     case LUX_FLOAT:
-      strcpy(curScrat, "FLTFARR(");
+      strcpy(curScrat, "fltfarr(");
       break;
     case LUX_DOUBLE:
-      strcpy(curScrat, "DBLFARR(");
+      strcpy(curScrat, "dblfarr(");
       break;
     default:
       cerror(ILL_TYPE, symbol);
@@ -1032,11 +1032,11 @@ char *symbolIdent(int32_t symbol, int32_t mode)
         strcpy(curScrat++, ",");
     }
     if (file_map_has_offset(symbol)) {
-      sprintf(curScrat, ",OFFSET=%1d", file_map_offset(symbol));
+      sprintf(curScrat, ",offset=%1d", file_map_offset(symbol));
       curScrat += strlen(curScrat);
     }
     if (file_map_readonly(symbol)) {
-      strcpy(curScrat, ",/READONLY");
+      strcpy(curScrat, ",/readonly");
       curScrat += strlen(curScrat);
     }
     strcpy(curScrat, ")");
@@ -1156,7 +1156,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     strcpy(curScrat, "}");
     break;
   case LUX_META:
-    sprintf(curScrat, "SYMBOL('%s')", string_value(meta_target(symbol)));
+    sprintf(curScrat, "symbol('%s')", string_value(meta_target(symbol)));
     break;
   case LUX_CARRAY:
     ptr.cf = (floatComplex*) array_data(symbol);
@@ -1204,13 +1204,13 @@ char *symbolIdent(int32_t symbol, int32_t mode)
   case LUX_DEFERRED_SUBR: case LUX_DEFERRED_FUNC: case LUX_DEFERRED_BLOCK:
     switch (symbol_class(symbol)) {
     case LUX_SUBROUTINE: case LUX_DEFERRED_SUBR:
-      name = "SUBR";
+      name = "subr";
       break;
     case LUX_FUNCTION: case LUX_DEFERRED_FUNC:
-      name = "FUNC";
+      name = "func";
       break;
     case LUX_BLOCKROUTINE: case LUX_DEFERRED_BLOCK:
-      name = "BLOCK";
+      name = "block";
       break;
     }
     sprintf(curScrat, " %s ", name);
@@ -1381,37 +1381,37 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       n = 0;
       break;
     case 5:			/* ctime */
-      strcpy(curScrat, "!CTIME");
+      strcpy(curScrat, "!ctime");
       curScrat += strlen(curScrat);
       n = 0;
       break;
     case 6:			/* time */
-      strcpy(curScrat, "!TIME");
+      strcpy(curScrat, "!time");
       curScrat += strlen(curScrat);
       n = 0;
       break;
     case 7:			/* date */
-      strcpy(curScrat, "!DATE");
+      strcpy(curScrat, "!date");
       curScrat += strlen(curScrat);
       n = 0;
       break;
     case 8:			/* readkey */
-      strcpy(curScrat, "!READKEY");
+      strcpy(curScrat, "!readkey");
       curScrat += strlen(curScrat);
       n = 0;
       break;
     case 9:			/* readkeyne */
-      strcpy(curScrat, "!READKEYNE");
+      strcpy(curScrat, "!readkeyne");
       curScrat += strlen(curScrat);
       n = 0;
       break;
     case 10:		/* systime */
-      strcpy(curScrat, "!SYSTIME");
+      strcpy(curScrat, "!systime");
       curScrat += strlen(curScrat);
       n = 0;
       break;
     case 11:		/* jd */
-      strcpy(curScrat, "!JD");
+      strcpy(curScrat, "!jd");
       curScrat += strlen(curScrat);
       n = 0;
       break;
@@ -1506,7 +1506,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     ptr.w = evb_args(symbol);
     switch (evb_type(symbol)) {
     case EVB_RETURN:
-      strcpy(curScrat, "RETURN");
+      strcpy(curScrat, "return");
       curScrat += strlen(curScrat);
       if (return_value(symbol)) {
         strcpy(curScrat++, ",");
@@ -1520,7 +1520,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       symbolIdent(replace_rhs(symbol), mode & I_SINGLEMODE);
       break;
     case EVB_REPEAT:
-      strcpy(curScrat, "REPEAT ");
+      strcpy(curScrat, "repeat ");
       curScrat += strlen(curScrat);
       if (mode & I_NL) {
         indent += 2;
@@ -1536,16 +1536,16 @@ char *symbolIdent(int32_t symbol, int32_t mode)
         curScrat += strlen(curScrat);
       } else
         strcpy(curScrat++, " ");
-      strcpy(curScrat, "UNTIL ");
+      strcpy(curScrat, "until ");
       curScrat += strlen(curScrat);
       symbolIdent(repeat_condition(symbol), mode & I_SINGLEMODE);
       break;
     case EVB_WHILE_DO:
-      strcpy(curScrat, "WHILE ");
+      strcpy(curScrat, "while ");
       curScrat += strlen(curScrat);
       symbolIdent(while_do_condition(symbol), mode & I_SINGLEMODE);
       curScrat += strlen(curScrat);
-      strcpy(curScrat, " DO ");
+      strcpy(curScrat, " do ");
       curScrat += strlen(curScrat);
       if (mode & I_NL) {
         indent += 2;
@@ -1559,7 +1559,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
         indent -= 2;
       break;
     case EVB_DO_WHILE:
-      strcpy(curScrat, "DO ");
+      strcpy(curScrat, "do ");
       curScrat += strlen(curScrat);
       if (mode & I_NL) {
         indent += 2;
@@ -1575,16 +1575,16 @@ char *symbolIdent(int32_t symbol, int32_t mode)
         curScrat += strlen(curScrat);
       } else
         strcpy(curScrat++, " ");
-      strcpy(curScrat, "WHILE ");
+      strcpy(curScrat, "while ");
       curScrat += strlen(curScrat);
       symbolIdent(do_while_condition(symbol), mode & I_SINGLEMODE);
       break;
     case EVB_IF:
-      strcpy(curScrat, "IF ");
+      strcpy(curScrat, "if ");
       curScrat += strlen(curScrat);
       symbolIdent(if_condition(symbol), mode & I_SINGLEMODE);
       curScrat += strlen(curScrat);
-      strcpy(curScrat, " THEN");
+      strcpy(curScrat, " then");
       curScrat += strlen(curScrat);
       if (mode & I_NL) {
         indent += 2;
@@ -1601,7 +1601,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       } else
         strcpy(curScrat++, " ");
       if (if_false_body(symbol)) {
-        strcpy(curScrat, "ELSE");
+        strcpy(curScrat, "else");
         curScrat += strlen(curScrat);
         if (mode & I_NL) {
           indent += 2;
@@ -1620,7 +1620,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       }
       break;
     case EVB_FOR:
-      strcpy(curScrat, "FOR ");
+      strcpy(curScrat, "for ");
       curScrat += strlen(curScrat);
       {
         char const* p = symbolProperName(for_loop_symbol(symbol));
@@ -1649,7 +1649,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
         indent -= 2;
       break;
     case EVB_USR_CODE:
-      strcpy(curScrat, "RUN,");
+      strcpy(curScrat, "run,");
       curScrat += strlen(curScrat);
       n = usr_code_routine_num(symbol);
       if (symbol_class(n) == LUX_STRING)  /* unevaluated name */
@@ -1736,7 +1736,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       symbolIdent(insert_source(symbol), mode & I_SINGLEMODE);
       break;
     case EVB_CASE:
-      strcpy(curScrat, "CASE ");
+      strcpy(curScrat, "case ");
       curScrat += strlen(curScrat);
       if (mode & I_NL) {
         indent += 2;
@@ -1787,7 +1787,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
         ptr.w += n - 1;
       }
       if (*ptr.w) {		/* have an ELSE clause */
-        strcpy(curScrat, "ELSE ");
+        strcpy(curScrat, "else ");
         curScrat += strlen(curScrat);
         if (mode & I_NL) {
           indent += 2;
@@ -1804,10 +1804,10 @@ char *symbolIdent(int32_t symbol, int32_t mode)
         } else
           strcpy(curScrat++, " ");
       }
-      strcpy(curScrat, "ENDCASE");
+      strcpy(curScrat, "endcase");
       break;
     case EVB_NCASE:
-      strcpy(curScrat, "NCASE ");
+      strcpy(curScrat, "ncase ");
       curScrat += strlen(curScrat);
       symbolIdent(ncase_switch_value(symbol), mode & I_SINGLEMODE);
       curScrat += strlen(curScrat);
@@ -1847,7 +1847,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
         ptr.w += n - 1;
       }
       if (ncase_else(symbol)) {
-        strcpy(curScrat, "ELSE ");
+        strcpy(curScrat, "else ");
         curScrat += strlen(curScrat);
         if (mode & I_NL) {
           indent += 2;
@@ -1864,7 +1864,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
         } else
           strcpy(curScrat++, " ");
       }
-      strcpy(curScrat, "ENDCASE");
+      strcpy(curScrat, "endcase");
       break;
     case EVB_BLOCK:
       strcpy(curScrat, "{ ");
@@ -1972,14 +1972,14 @@ int32_t identStruct(structElem *se)
 {
   int32_t	n, nelem, ndim, *dims, ndim2, *dims2;
   char const * arrName[] = {
-    "BYTARR", "INTARR", "LONARR", "QUADARR", "FLTARR", "DBLARR", "STRARR",
-    "STRARR", "STRARR", "CFLTARR", "CDBLARR"
+    "bytarr", "intarr", "lonarr", "quadarr", "fltarr", "dblarr", "strarr",
+    "strarr", "strarr", "cfltarr", "cdblarr"
   };
 
   n = nelem = se->u.first.nelem;
   dims = se->u.first.dims;
   ndim = se->u.first.ndim;
-  sprintf(curScrat, "STRUCT(");
+  sprintf(curScrat, "struct(");
   curScrat += strlen(curScrat);
   if (nelem > 1)
     *curScrat++ = '{';
@@ -1997,11 +1997,11 @@ int32_t identStruct(structElem *se)
 	if (ndim2) {
 	  dims2 = se->u.regular.spec.singular.dims;
 	  if (se->u.regular.type == LUX_TEMP_STRING) {
-	    sprintf(curScrat, "SIZE=%1d,1", *dims2++);
+	    sprintf(curScrat, "size=%1d,1", *dims2++);
 	    curScrat += strlen(curScrat);
 	    ndim2 = 0;
 	  } else if (se->u.regular.type == LUX_STRING_ARRAY) {
-	    sprintf(curScrat, "SIZE=%1d", *dims2++);
+	    sprintf(curScrat, "size=%1d", *dims2++);
 	    curScrat += strlen(curScrat);
 	    if (ndim2 > 1)
 	      *curScrat++ = ',';

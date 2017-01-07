@@ -274,408 +274,408 @@ int32_t	lux_zeroifnotdefined(), lux_compile_file();	/* browser */
                   FOO,3,SPECIAL=1 yields 1,3 */
 
 internalRoutine	subroutine_table[] = {
-  { "%INSERT",	3, MAX_ARG, insert, /* execute.c */
-    "1INNER:2OUTER:4ONEDIM:8SKIPSPACE:16ZERO:32ALL:64SEPARATE" },
-  { "AREA",	1, 4, lux_area, ":SEED:NUMBERS:DIAGONAL" }, /* topology.c */
-  { "AREA2",	2, 6, lux_area2, /* toplogy.c */
-    "::SEED:NUMBERS:DIAGONAL:SIGN" },
-  { "ARESTORE",	1, MAX_ARG, lux_arestore, 0 }, /* files.c */
-  { "ASTORE",	2, MAX_ARG, lux_astore, 0 }, /* files.c */
-  { "ATOMIZE", 	1, 1, lux_atomize, "1TREE:2LINE" }, /* strous.c */
-  { "BATCH",	0, 1, lux_batch, "1QUIT" }, /* symbols.c */
-  { "BREAKPOINT", 0, 1, lux_breakpoint, /* install.c */
-    "0SET:1ENABLE:2DISABLE:3DELETE:4LIST:8VARIABLE" },
-  { "BYTE",	1, MAX_ARG, lux_byte_inplace, 0, }, /* symbols.c */
-  { "C",	1, 7, lux_callig, /* hersh.c */
-    "0DEP:1DVI:2DEV:3IMG:4PLT:5RIM:6RPL" },
+  { "%insert",	3, MAX_ARG, insert, /* execute.c */
+    "1inner:2outer:4onedim:8skipspace:16zero:32all:64separate" },
+  { "area",	1, 4, lux_area, ":seed:numbers:diagonal" }, /* topology.c */
+  { "area2",	2, 6, lux_area2, /* toplogy.c */
+    "::seed:numbers:diagonal:sign" },
+  { "arestore",	1, MAX_ARG, lux_arestore, 0 }, /* files.c */
+  { "astore",	2, MAX_ARG, lux_astore, 0 }, /* files.c */
+  { "atomize", 	1, 1, lux_atomize, "1tree:2line" }, /* strous.c */
+  { "batch",	0, 1, lux_batch, "1quit" }, /* symbols.c */
+  { "breakpoint", 0, 1, lux_breakpoint, /* install.c */
+    "0set:1enable:2disable:3delete:4list:8variable" },
+  { "byte",	1, MAX_ARG, lux_byte_inplace, 0, }, /* symbols.c */
+  { "c",	1, 7, lux_callig, /* hersh.c */
+    "0dep:1dvi:2dev:3img:4plt:5rim:6rpl" },
 #if CALCULATOR
-  { "CALCULATOR",	0, 0, lux_calculator, 0 }, /* calculator.c */
+  { "calculator",	0, 0, lux_calculator, 0 }, /* calculator.c */
 #endif
-  { "CALLIG",	1, 7, lux_callig, /* hersh.c */
-    "0DEP:1DVI:2DEV:3IMG:4PLT:5RIM:6RPL" },
-  { "CDOUBLE",	1, MAX_ARG, lux_cdouble_inplace, 0 }, /* symbols.c */
-  { "CFLOAT",	1, MAX_ARG, lux_cfloat_inplace, 0 }, /* symbols.c */
-  { "CHDIR",	0, 1, lux_chdir, "1SHOW" }, /* files.c */
+  { "callig",	1, 7, lux_callig, /* hersh.c */
+    "0dep:1dvi:2dev:3img:4plt:5rim:6rpl" },
+  { "cdouble",	1, MAX_ARG, lux_cdouble_inplace, 0 }, /* symbols.c */
+  { "cfloat",	1, MAX_ARG, lux_cfloat_inplace, 0 }, /* symbols.c */
+  { "chdir",	0, 1, lux_chdir, "1show" }, /* files.c */
 #if DEBUG
-  { "CHECKLIST", 0, 1, checkList, 0 }, /* debug.c */
+  { "checklist", 0, 1, checkList, 0 }, /* debug.c */
 #endif
-  { "CLOSE",	1, 1, lux_close, 0 }, /* files.c */
-  { "CLUSTER",	2, 8, lux_cluster, /* cluster.c */
-    "|32|:CENTERS:INDEX:SIZE:SAMPLE:EMPTY:MAXIT:RMS:1UPDATE:2ITERATE:4VOCAL:8QUICK:16RECORD:32ORDERED" },
+  { "close",	1, 1, lux_close, 0 }, /* files.c */
+  { "cluster",	2, 8, lux_cluster, /* cluster.c */
+    "|32|:centers:index:size:sample:empty:maxit:rms:1update:2iterate:4vocal:8quick:16record:32ordered" },
 #if HAVE_LIBX11
-  { "COLORCOMPONENTS", 4, 4, lux_colorComponents, 0 }, /* color.c */
-  { "COLORSTOGREY", 1, 1, lux_colorstogrey, 0 }, /* color.c */
+  { "colorcomponents", 4, 4, lux_colorComponents, 0 }, /* color.c */
+  { "colorstogrey", 1, 1, lux_colorstogrey, 0 }, /* color.c */
 #endif
 #if MOTIF
-  { "COMPILE_FILE", 1, 1, lux_compile_file, 0 }, /* motifextra.c */
+  { "compile_file", 1, 1, lux_compile_file, 0 }, /* motifextra.c */
 #endif
-  { "CONTOUR",	1, 6, lux_contour, /* contour.c */
-    "IMAGE:LEVELS:XMIN:XMAX:YMIN:YMAX:STYLE:DASHSIZE:1AUTOCONTOUR:2USERCONTOUR" },
-  { "COORDTRF",	2, 4, lux_coordtrf, /* coord.c */
-   "0DEP:1DVI:2DEV:3IMG:4PLT:5RIM:6RPL:7X11:8TODVI:16TODEV:24TOIMG:32TOPLT:40TORIM:48TORPL:56TOX11" },
-  { "CRUNCH",	3, 3, lux_crunch, 0 }, /* crunch.c */
-  { "CRUNCHRUN",	3, 3, lux_crunchrun, 0 }, /* crunch.c */
-  { "CSPLINE_EXTR", 5, 8, lux_cubic_spline_extreme, "1KEEPDIMS:2PERIODIC:4AKIMA::::POS:MINPOS:MINVAL:MAXPOS:MAXVAL" }, /* fun3.c */
-  { "D",	0, MAX_ARG, lux_dump, /* fun1.c */
-    "+|36|1FIXED:2SYSTEM:4ZERO:8LOCAL:24CONTEXT:32FOLLOW:64FULL" },
-  { "DECOMP",	1, 1, lux_decomp, 0 }, /* fun2.c */
-  { "DECRUNCH",	2, 2, lux_decrunch, 0 }, /* crunch.c */
-  { "DEFAULT",	2, MAX_ARG, lux_default, "+" }, /* strous.c */
-  { "DELETE", 	1, MAX_ARG, lux_delete, "+1POINTER" }, /* fun1.c */
-  { "DIAGNOSTIC", 0, 1, lux_redirect_diagnostic, 0 }, /* strous.c */
-  { "DISTR",	3, 3, lux_distr, 0 }, /* strous.c */
-  { "DOUB",	1, MAX_ARG, lux_double_inplace, 0 }, /* symbols.c */
-  { "DOUBLE",	1, MAX_ARG, lux_double_inplace, 0 }, /* symbols.c */
-  { "DSOLVE",	2, 2, lux_dsolve, 0 }, /* fun2.c */
-  { "DUMP", 	0, MAX_ARG, lux_dump, /* fun1.c */
-    "+|36|1FIXED:2SYSTEM:4ZERO:8LOCAL:24CONTEXT:32FOLLOW:64FULL" },
-  { "DUMP_LUN",	0, 0, lux_dump_lun, 0 }, /* files.c */
-  { "DUMP_STACK", 0, 0, lux_dump_stack, 0 }, /* strous.c */
-  { "ECHO",	0, 1, lux_echo, 0 }, /* symbols.c */
-  { "ENDIAN",	1, 1, lux_endian, 0 }, /* strous.c */
-  { "ERASE",	0, 5, lux_erase, /* plots.c */
-    "0DEP:1DVI:2DEV:3IMG:4PLT:5RIM:6RPL:7X11:64SCREEN:128POSTSCRIPT:192PDEV" },
-  { "ERROR",	0, 2, lux_error, "1STORE:2RESTORE" }, /* error.c */
-  { "EXECUTE",	1, 1, lux_execute, "1MAIN" }, /* execute.c */
-  { "EXIT",	0, 1, lux_quit, 0 }, /* fun1.c */
-  { "EXTRACT_BITS", 4, 4, lux_extract_bits, 0 }, /* fun3.c */
-  { "F0H",	1, 2, lux_fzhead, 0 }, /* files.c */
-  { "F0HEAD",	1, 2, lux_fzhead, 0 }, /* files.c */
-  { "F0R",	2, 3, lux_fzread, "|1|1PRINTHEADER" }, /* files.c */
-  { "F0READ",	2, 3, lux_fzread, "|1|1PRINTHEADER" }, /* files.c */
-  { "F0W",	2, 3, lux_fzwrite, 0 }, /* files.c */
-  { "F0WRITE",	2, 3, lux_fzwrite, 0 }, /* files.c */
-  { "FADE",	2, 2, lux_fade, 0 }, /* fun3.c */
-  { "FADE_INIT", 2, 2, lux_fade_init, 0 }, /* fun3.c */
-  { "FCRUNWRITE", 2, 3, lux_fcrunwrite, 0 }, /* files.c */
-  { "FCRW",	2, 3, lux_fcrunwrite, 0 }, /* files.c */
-  { "FCW",	2, 3, lux_fcwrite, "1RUNLENGTH" }, /* files.c */
-  { "FCWRITE",	2, 3, lux_fcwrite, "1RUNLENGTH" }, /* files.c */
-  { "FFTSHIFT",	2, 2, lux_fftshift, 0 }, /* fun3.c */
-  { "FILEPTR",	1, 2, lux_fileptr, "1START:2EOF:4ADVANCE" }, /* files.c */
-  { "FILEREAD", 5, 5, lux_fileread, 0 }, /* files.c */
-  { "FILETOFZ",	3, 3, lux_file_to_fz, 0 }, /* files.c */
-  { "FILEWRITE", 2, 3, lux_filewrite, 0 }, /* files.c */
+  { "contour",	1, 6, lux_contour, /* contour.c */
+    "image:levels:xmin:xmax:ymin:ymax:style:dashsize:1autocontour:2usercontour" },
+  { "coordtrf",	2, 4, lux_coordtrf, /* coord.c */
+   "0dep:1dvi:2dev:3img:4plt:5rim:6rpl:7x11:8todvi:16todev:24toimg:32toplt:40torim:48torpl:56tox11" },
+  { "crunch",	3, 3, lux_crunch, 0 }, /* crunch.c */
+  { "crunchrun",	3, 3, lux_crunchrun, 0 }, /* crunch.c */
+  { "cspline_extr", 5, 8, lux_cubic_spline_extreme, "1keepdims:2periodic:4akima::::pos:minpos:minval:maxpos:maxval" }, /* fun3.c */
+  { "d",	0, MAX_ARG, lux_dump, /* fun1.c */
+    "+|36|1fixed:2system:4zero:8local:24context:32follow:64full" },
+  { "decomp",	1, 1, lux_decomp, 0 }, /* fun2.c */
+  { "decrunch",	2, 2, lux_decrunch, 0 }, /* crunch.c */
+  { "default",	2, MAX_ARG, lux_default, "+" }, /* strous.c */
+  { "delete", 	1, MAX_ARG, lux_delete, "+1pointer" }, /* fun1.c */
+  { "diagnostic", 0, 1, lux_redirect_diagnostic, 0 }, /* strous.c */
+  { "distr",	3, 3, lux_distr, 0 }, /* strous.c */
+  { "doub",	1, MAX_ARG, lux_double_inplace, 0 }, /* symbols.c */
+  { "double",	1, MAX_ARG, lux_double_inplace, 0 }, /* symbols.c */
+  { "dsolve",	2, 2, lux_dsolve, 0 }, /* fun2.c */
+  { "dump", 	0, MAX_ARG, lux_dump, /* fun1.c */
+    "+|36|1fixed:2system:4zero:8local:24context:32follow:64full" },
+  { "dump_lun",	0, 0, lux_dump_lun, 0 }, /* files.c */
+  { "dump_stack", 0, 0, lux_dump_stack, 0 }, /* strous.c */
+  { "echo",	0, 1, lux_echo, 0 }, /* symbols.c */
+  { "endian",	1, 1, lux_endian, 0 }, /* strous.c */
+  { "erase",	0, 5, lux_erase, /* plots.c */
+    "0dep:1dvi:2dev:3img:4plt:5rim:6rpl:7x11:64screen:128postscript:192pdev" },
+  { "error",	0, 2, lux_error, "1store:2restore" }, /* error.c */
+  { "execute",	1, 1, lux_execute, "1main" }, /* execute.c */
+  { "exit",	0, 1, lux_quit, 0 }, /* fun1.c */
+  { "extract_bits", 4, 4, lux_extract_bits, 0 }, /* fun3.c */
+  { "f0h",	1, 2, lux_fzhead, 0 }, /* files.c */
+  { "f0head",	1, 2, lux_fzhead, 0 }, /* files.c */
+  { "f0r",	2, 3, lux_fzread, "|1|1printheader" }, /* files.c */
+  { "f0read",	2, 3, lux_fzread, "|1|1printheader" }, /* files.c */
+  { "f0w",	2, 3, lux_fzwrite, 0 }, /* files.c */
+  { "f0write",	2, 3, lux_fzwrite, 0 }, /* files.c */
+  { "fade",	2, 2, lux_fade, 0 }, /* fun3.c */
+  { "fade_init", 2, 2, lux_fade_init, 0 }, /* fun3.c */
+  { "fcrunwrite", 2, 3, lux_fcrunwrite, 0 }, /* files.c */
+  { "fcrw",	2, 3, lux_fcrunwrite, 0 }, /* files.c */
+  { "fcw",	2, 3, lux_fcwrite, "1runlength" }, /* files.c */
+  { "fcwrite",	2, 3, lux_fcwrite, "1runlength" }, /* files.c */
+  { "fftshift",	2, 2, lux_fftshift, 0 }, /* fun3.c */
+  { "fileptr",	1, 2, lux_fileptr, "1start:2eof:4advance" }, /* files.c */
+  { "fileread", 5, 5, lux_fileread, 0 }, /* files.c */
+  { "filetofz",	3, 3, lux_file_to_fz, 0 }, /* files.c */
+  { "filewrite", 2, 3, lux_filewrite, 0 }, /* files.c */
 #if DEVELOP
-  { "FIT3DCUBE", 0, 0, lux_fitUnitCube, 0 }, /* projection.c */
+  { "fit3dcube", 0, 0, lux_fitUnitCube, 0 }, /* projection.c */
 #endif
-  { "FITS_READ", 2, 7, lux_fits_read, "|1|1TRANSLATE:2RAWVALUES::::::BLANK" }, /* files.c */
-  { "FITS_WRITE", 2, 4, lux_fits_write, "1VOCAL" }, /* files.c */
-  { "FIX",	1, MAX_ARG, lux_long_inplace, 0 }, /* symbols.c */
-  { "FLOAT",	1, MAX_ARG, lux_float_inplace, 0 }, /* symbols.c */
-  { "FORMAT_SET", 0, 1, lux_format_set, 0 }, /* files.c */
-  { "FPRINT",	1, MAX_ARG, lux_fprint, "1ELEMENT" }, /* files.c */
-  { "FPRINTF",	2, MAX_ARG, lux_fprintf, "1ELEMENT" }, /* files.c */
-  { "FREAD",	2, MAX_ARG, lux_fread, "1COUNTSPACES" }, /* files.c */
-  { "FREADF",	3, MAX_ARG, lux_freadf, "1COUNTSPACES" }, /* files.c */
-  { "FREADS",	2, MAX_ARG, lux_freads, "1COUNTSPACES" }, /* files.c */
-  { "FZH",	1, 2, lux_fzhead, 0 }, /* files.c */
-  { "FZHEAD",	1, 2, lux_fzhead, 0 }, /* files.c */
-  { "FZINSPECT", 2, 3, lux_fzinspect, 0 }, /* files.c */
-  { "FZR",	2, 3, lux_fzread, "|1|1PRINTHEADER" }, /* files.c */
-  { "FZREAD",	2, 3, lux_fzread, "|1|1PRINTHEADER" }, /* files.c */
-  { "FZW",	2, 3, lux_fzwrite, "1SAFE" }, /* files.c */
-  { "FZWRITE",	2, 3, lux_fzwrite, "1SAFE" }, /* files.c */
-  { "GETMIN9",	3, 3, lux_getmin9, 0 }, /* fun4.c */
-  { "GIFREAD",	2, 3, lux_gifread, 0 }, /* gifread_ana.c */
-  { "GIFWRITE",	2, 3, lux_gifwrite, 0 }, /* gifwrite_ana.c */
+  { "fits_read", 2, 7, lux_fits_read, "|1|1translate:2rawvalues::::::blank" }, /* files.c */
+  { "fits_write", 2, 4, lux_fits_write, "1vocal" }, /* files.c */
+  { "fix",	1, MAX_ARG, lux_long_inplace, 0 }, /* symbols.c */
+  { "float",	1, MAX_ARG, lux_float_inplace, 0 }, /* symbols.c */
+  { "format_set", 0, 1, lux_format_set, 0 }, /* files.c */
+  { "fprint",	1, MAX_ARG, lux_fprint, "1element" }, /* files.c */
+  { "fprintf",	2, MAX_ARG, lux_fprintf, "1element" }, /* files.c */
+  { "fread",	2, MAX_ARG, lux_fread, "1countspaces" }, /* files.c */
+  { "freadf",	3, MAX_ARG, lux_freadf, "1countspaces" }, /* files.c */
+  { "freads",	2, MAX_ARG, lux_freads, "1countspaces" }, /* files.c */
+  { "fzh",	1, 2, lux_fzhead, 0 }, /* files.c */
+  { "fzhead",	1, 2, lux_fzhead, 0 }, /* files.c */
+  { "fzinspect", 2, 3, lux_fzinspect, 0 }, /* files.c */
+  { "fzr",	2, 3, lux_fzread, "|1|1printheader" }, /* files.c */
+  { "fzread",	2, 3, lux_fzread, "|1|1printheader" }, /* files.c */
+  { "fzw",	2, 3, lux_fzwrite, "1safe" }, /* files.c */
+  { "fzwrite",	2, 3, lux_fzwrite, "1safe" }, /* files.c */
+  { "getmin9",	3, 3, lux_getmin9, 0 }, /* fun4.c */
+  { "gifread",	2, 3, lux_gifread, 0 }, /* gifread_ana.c */
+  { "gifwrite",	2, 3, lux_gifwrite, 0 }, /* gifwrite_ana.c */
 #if HAVE_LIBX11
-  { "HAIRS",	0, 0, lux_xplace, 0 }, /* xport.c */
+  { "hairs",	0, 0, lux_xplace, 0 }, /* xport.c */
 #endif
-  { "HELP",	0, 1, lux_help,	/* strous.c */
-    "|30|1EXACT:2ROUTINE:4TREE:8SUBROUTINE:16FUNCTION:32LIST::PAGE" },
-  { "HEX",	1, MAX_ARG, lux_hex, 0 }, /* files.c */
-  { "IDLRESTORE", 1, 1, lux_idlrestore, 0 }, /* idl.c */
-  { "INFO",	0, 0, site, /* site.c */
-    "1TABLE:2TIME:4PLATFORM:8PACKAGES:16WARRANTY:32COPY:64BUGS:128KEYS:255ALL" },
-  { "INSERT", 	2, 4, lux_inserter, 0 }, /* subsc.c */
-  { "INT",	1, MAX_ARG, lux_word_inplace, 0 }, /* symbols.c */
-  { "INT64",    1, MAX_ARG, lux_int64_inplace, 0 }, /* symbols.c */
+  { "help",	0, 1, lux_help,	/* strous.c */
+    "|30|1exact:2routine:4tree:8subroutine:16function:32list::page" },
+  { "hex",	1, MAX_ARG, lux_hex, 0 }, /* files.c */
+  { "idlrestore", 1, 1, lux_idlrestore, 0 }, /* idl.c */
+  { "info",	0, 0, site, /* site.c */
+    "1table:2time:4platform:8packages:16warranty:32copy:64bugs:128keys:255all" },
+  { "insert", 	2, 4, lux_inserter, 0 }, /* subsc.c */
+  { "int",	1, MAX_ARG, lux_word_inplace, 0 }, /* symbols.c */
+  { "int64",    1, MAX_ARG, lux_int64_inplace, 0 }, /* symbols.c */
 #if HAVE_LIBJPEG
-  { "JPEGREAD", 2, 4, lux_read_jpeg6b, ":::SHRINK:1GREYSCALE" }, /* jpeg.c */
-  { "JPEGWRITE", 2, 4, lux_write_jpeg6b, 0 },/* jpeg.c */
+  { "jpegread", 2, 4, lux_read_jpeg6b, ":::shrink:1greyscale" }, /* jpeg.c */
+  { "jpegwrite", 2, 4, lux_write_jpeg6b, 0 },/* jpeg.c */
 #endif
-  { "LIMITS",	0, 4, lux_limits, 0 }, /* plots.c */
-  { "LIST",	1, 1, lux_list, 0 }, /* ident.c */
-  { "LONG",	1, MAX_ARG, lux_long_inplace, 0 }, /* symbols.c */
+  { "limits",	0, 4, lux_limits, 0 }, /* plots.c */
+  { "list",	1, 1, lux_list, 0 }, /* ident.c */
+  { "long",	1, MAX_ARG, lux_long_inplace, 0 }, /* symbols.c */
 #if HAVE_LIBX11
-  { "MENU",	1, MAX_ARG, lux_menu, 0 }, /* menu.c */
-  { "MENUHIDE",	1, 1, lux_menu_hide, 0 }, /* menu.c */
-  { "MENUITEM",	3, 3, lux_menu_item, 0 }, /* menu.c */
-  { "MENUPOP",	1, MAX_ARG, lux_menu_pop, 0 }, /* menu.c */
-  { "MENUREAD",	4, 4, lux_menu_read, 0 }, /* menu.c */
-  { "MENUZAP",	1, 1, lux_menu_kill, 0 }, /* menu.c */
+  { "menu",	1, MAX_ARG, lux_menu, 0 }, /* menu.c */
+  { "menuhide",	1, 1, lux_menu_hide, 0 }, /* menu.c */
+  { "menuitem",	3, 3, lux_menu_item, 0 }, /* menu.c */
+  { "menupop",	1, MAX_ARG, lux_menu_pop, 0 }, /* menu.c */
+  { "menuread",	4, 4, lux_menu_read, 0 }, /* menu.c */
+  { "menuzap",	1, 1, lux_menu_kill, 0 }, /* menu.c */
 #endif
-  { "MULTISIEVE", 4, 4, lux_multisieve, 0 }, /* strous2.c */
+  { "multisieve", 4, 4, lux_multisieve, 0 }, /* strous2.c */
 #if DEBUG
-  { "NEWALLOCS", 0, 1, lux_newallocs, "1RESET" }, /* debug.c */
+  { "newallocs", 0, 1, lux_newallocs, "1reset" }, /* debug.c */
 #endif
-  { "NOECHO",	0, 0, lux_noecho, 0 }, /* symbols.c */
-  { "NOOP",	0, 0, lux_noop, 0 }, /* strous2.c */
-  { "ONE",	1, 1, lux_one, 0 }, /* fun1.c */
-  { "OPENR",	2, 2, lux_openr, "1GET_LUN" }, /* files.c */
-  { "OPENU",	2, 2, lux_openu, "1GET_LUN" }, /* files.c */
-  { "OPENW",	2, 2, lux_openw, "1GET_LUN" }, /* files.c */
-  { "OPLOT",	1, 13, lux_oplot, /* plots.c */
-    "1DVI:2DEV:3IMG:4PLT:5RIM:6RPL:128WHOLE:256CLIPBARS:XDATA:YDATA:SYMBOL:LINE:XTITLE:YTITLE:TITLE:DASHSIZE:XERRORS:YERRORS:BREAKS:XBARSIZE:YBARSIZE" },
-  { "ORIENTATION", 3, 8, lux_orientation, /* orientation.c */
-  "1VOCAL:2GETJ:0PARALLEL:4PERPENDICULAR:::ORIENTATION:VALUES:WAVENUMBER:GRID:ASPECT:ORDER" },
-  { "PDEV",	0, 1, lux_pdev, 0 }, /* plots.c */
-  { "PEEK",	1, 2, peek, 0 }, /* strous.c */
-  { "PEN",	0, 2, lux_pen, "WIDTH:COLOR:1STANDARDGRAY" }, /* plots.c */
-  { "PENCOLOR", 0, 1, lux_pencolor, 0 }, /* plots.c */
+  { "noecho",	0, 0, lux_noecho, 0 }, /* symbols.c */
+  { "noop",	0, 0, lux_noop, 0 }, /* strous2.c */
+  { "one",	1, 1, lux_one, 0 }, /* fun1.c */
+  { "openr",	2, 2, lux_openr, "1get_lun" }, /* files.c */
+  { "openu",	2, 2, lux_openu, "1get_lun" }, /* files.c */
+  { "openw",	2, 2, lux_openw, "1get_lun" }, /* files.c */
+  { "oplot",	1, 13, lux_oplot, /* plots.c */
+    "1dvi:2dev:3img:4plt:5rim:6rpl:128whole:256clipbars:xdata:ydata:symbol:line:xtitle:ytitle:title:dashsize:xerrors:yerrors:breaks:xbarsize:ybarsize" },
+  { "orientation", 3, 8, lux_orientation, /* orientation.c */
+  "1vocal:2getj:0parallel:4perpendicular:::orientation:values:wavenumber:grid:aspect:order" },
+  { "pdev",	0, 1, lux_pdev, 0 }, /* plots.c */
+  { "peek",	1, 2, peek, 0 }, /* strous.c */
+  { "pen",	0, 2, lux_pen, "width:color:1standardgray" }, /* plots.c */
+  { "pencolor", 0, 1, lux_pencolor, 0 }, /* plots.c */
 #if HAVE_LIBX11
-  { "PIXELSTO8BIT", 3, 3, lux_pixelsto8bit, 0 }, /* color.c */
+  { "pixelsto8bit", 3, 3, lux_pixelsto8bit, 0 }, /* color.c */
 #endif
-  { "PLOT",	1, 15, lux_plot, /* plots.c */
-    "1DVI:2DEV:3IMG:4PLT:5RIM:6RPL:64KEEP:128WHOLE:256CLIPBARS:1024LII:1280LIO:1536LOI:1792LOO:XDATA:YDATA:SYMBOL:LINE:XTITLE:YTITLE:TITLE:DASHSIZE:XERRORS:YERRORS:BREAKS:XBARSIZE:YBARSIZE:XFMT:YFMT" },
+  { "plot",	1, 15, lux_plot, /* plots.c */
+    "1dvi:2dev:3img:4plt:5rim:6rpl:64keep:128whole:256clipbars:1024lii:1280lio:1536loi:1792loo:xdata:ydata:symbol:line:xtitle:ytitle:title:dashsize:xerrors:yerrors:breaks:xbarsize:ybarsize:xfmt:yfmt" },
 #if DEVELOP
-  { "PLOT3D",	1, 1, lux_plot3d, "1HIDE:2CUBE" }, /* projection.c */
+  { "plot3d",	1, 1, lux_plot3d, "1hide:2cube" }, /* projection.c */
 #endif
-  { "POINTER",	2, 2, lux_pointer, /* symbols.c */
-    "+:1FUNCTION:2SUBROUTINE:4INTERNAL:8MAIN" },
-  { "POP",	1, MAX_ARG, lux_pop, "%1%NUM" }, /* strous.c */
-  { "POSTIMAGE", 1, 5, lux_postimage, 0 }, /* plots.c */
-  { "POSTRAW",	1, 1, lux_postraw, 0 }, /* plots.c */
-  { "POSTREL",	0, 4, postrelease, 0 }, /* plots.c */
-  { "POSTRELEASE", 0, 4, postrelease, 0 }, /* plots.c */
-  { "PRINT", 	1, MAX_ARG, lux_type, "1JOIN:2RAW:4SEPARATE" }, /* files.c */
-  { "PRINTF",	1, MAX_ARG, lux_printf, "1JOIN:2RAW:4SEPARATE" }, /* files.c */
+  { "pointer",	2, 2, lux_pointer, /* symbols.c */
+    "+:1function:2subroutine:4internal:8main" },
+  { "pop",	1, MAX_ARG, lux_pop, "%1%num" }, /* strous.c */
+  { "postimage", 1, 5, lux_postimage, 0 }, /* plots.c */
+  { "postraw",	1, 1, lux_postraw, 0 }, /* plots.c */
+  { "postrel",	0, 4, postrelease, 0 }, /* plots.c */
+  { "postrelease", 0, 4, postrelease, 0 }, /* plots.c */
+  { "print", 	1, MAX_ARG, lux_type, "1join:2raw:4separate" }, /* files.c */
+  { "printf",	1, MAX_ARG, lux_printf, "1join:2raw:4separate" }, /* files.c */
 #if DEVELOP
-  { "PROJECTION", 0, MAX_ARG, lux_projection, /* projection.c */
-	"1RESET:2ORIGINAL::TRANSLATE:ROTATE:SCALE:PERSPECTIVE:OBLIQUE" },
+  { "projection", 0, MAX_ARG, lux_projection, /* projection.c */
+	"1reset:2original::translate:rotate:scale:perspective:oblique" },
 #endif
-  { "PUSH",	1, MAX_ARG, lux_push, 0 }, /* strous.c */
-  { "QUIT", 	0, 1, lux_quit, 0 }, /* fun1.c */
-  { "READ",	1, MAX_ARG, lux_read, "1ASKMORE:2WORD:4FLUSH" }, /* files.c */
-  { "READARR",	1, 1, lux_readarr, 0 }, /* strous.c */
-  { "READF",	2, MAX_ARG, lux_readf, "1ASKMORE:2WORD" }, /* files.c */
-  { "READORBITS", 0, 1, lux_readorbits, "1LIST:2REPLACE" }, /* astron.c */
-  { "READU",	2, MAX_ARG, lux_readu, 0 }, /* files.c */
+  { "push",	1, MAX_ARG, lux_push, 0 }, /* strous.c */
+  { "quit", 	0, 1, lux_quit, 0 }, /* fun1.c */
+  { "read",	1, MAX_ARG, lux_read, "1askmore:2word:4flush" }, /* files.c */
+  { "readarr",	1, 1, lux_readarr, 0 }, /* strous.c */
+  { "readf",	2, MAX_ARG, lux_readf, "1askmore:2word" }, /* files.c */
+  { "readorbits", 0, 1, lux_readorbits, "1list:2replace" }, /* astron.c */
+  { "readu",	2, MAX_ARG, lux_readu, 0 }, /* files.c */
 #if HAVE_LIBJPEG
-  { "READ_JPEG", 2, 4, lux_read_jpeg6b, ":::SHRINK:1GREYSCALE" }, /* jpeg.c */
+  { "read_jpeg", 2, 4, lux_read_jpeg6b, ":::shrink:1greyscale" }, /* jpeg.c */
 #endif
-  { "RECORD",	0, 1, lux_record, "1INPUT:2OUTPUT:4RESET" }, /* symbols.c */
-  { "REDIM", 	2, 9, lux_redim, 0 }, /* subsc.c */
-  { "REPLACE",	3, 3, lux_replace_values, 0 }, /* strous2.c */
-  { "RESTART",	0, 0, lux_restart, 0 }, /* install.c */
-  { "RESTORE",	2, 3, lux_fzread, "1PRINTHEADER" }, /* files.c */
+  { "record",	0, 1, lux_record, "1input:2output:4reset" }, /* symbols.c */
+  { "redim", 	2, 9, lux_redim, 0 }, /* subsc.c */
+  { "replace",	3, 3, lux_replace_values, 0 }, /* strous2.c */
+  { "restart",	0, 0, lux_restart, 0 }, /* install.c */
+  { "restore",	2, 3, lux_fzread, "1printheader" }, /* files.c */
 #if HAVE_SYS_MTIO_H
-  { "REWIND",	1, 1, lux_rewind, 0 }, /* tape.c */
+  { "rewind",	1, 1, lux_rewind, 0 }, /* tape.c */
 #endif
-  { "REWINDF",	1, 1, lux_rewindf, 0 }, /* files.c */
-  { "S",	0, 1, lux_show, 0 }, /* fun1.c */
-  { "SC",	3, 3, lux_sc, 0 }, /* fun3.c */
-  { "SCANF",	2, MAX_ARG, lux_freadf, "+1COUNTSPACES" }, /* files.c */
-  { "SCB",	3, 3, lux_scb, "1EVEN:2ODD" }, /* fun3.c */
-  { "SET",	0, 1, lux_set,	/* symbols.c */
-    "VISUAL:1SET:2RESET:4SHOWALLOC:8WHITEBACKGROUND:16ULIMCOORDS:32YREVERSEIMG:64OLDVERSION:128ZOOM:1024ALLOWPROMPTS:2048XSYNCHRONIZE:4096PARSESILENT" },
+  { "rewindf",	1, 1, lux_rewindf, 0 }, /* files.c */
+  { "s",	0, 1, lux_show, 0 }, /* fun1.c */
+  { "sc",	3, 3, lux_sc, 0 }, /* fun3.c */
+  { "scanf",	2, MAX_ARG, lux_freadf, "+1countspaces" }, /* files.c */
+  { "scb",	3, 3, lux_scb, "1even:2odd" }, /* fun3.c */
+  { "set",	0, 1, lux_set,	/* symbols.c */
+    "visual:1set:2reset:4showalloc:8whitebackground:16ulimcoords:32yreverseimg:64oldversion:128zoom:1024allowprompts:2048xsynchronize:4096parsesilent" },
 #if HAVE_LIBX11
-  { "SETBACKGROUND", 1, 2, lux_xsetbackground, 0 }, /* xport.c */
-  { "SETBG",	1, 2, lux_xsetbackground, 0 }, /* xport.c */
+  { "setbackground", 1, 2, lux_xsetbackground, 0 }, /* xport.c */
+  { "setbg",	1, 2, lux_xsetbackground, 0 }, /* xport.c */
 #endif
-  { "SETENV",	1, 1, lux_setenv, 0 }, /* files.c */
+  { "setenv",	1, 1, lux_setenv, 0 }, /* files.c */
 #if HAVE_LIBX11
-  { "SETFG",	1, 2, lux_xsetforeground, 0 }, /* xport.c */
-  { "SETFOREGROUND", 1, 2, lux_xsetforeground, 0 }, /* xport.c */
+  { "setfg",	1, 2, lux_xsetforeground, 0 }, /* xport.c */
+  { "setforeground", 1, 2, lux_xsetforeground, 0 }, /* xport.c */
 #endif
-  { "SHIFT",	1, 4, lux_shift, ":::BLANK:1TRANSLATE" }, /* strous2.c */
-  { "SHOW", 	0, 1, lux_show, 0 }, /* fun1.c */
-  { "SHOWORBITS", 0, 0, lux_showorbits, 0 }, /* astron.c */
-  { "SHOWSTATS", 0, 0, showstats, 0 }, /* strous2.c */
+  { "shift",	1, 4, lux_shift, ":::blank:1translate" }, /* strous2.c */
+  { "show", 	0, 1, lux_show, 0 }, /* fun1.c */
+  { "showorbits", 0, 0, lux_showorbits, 0 }, /* astron.c */
+  { "showstats", 0, 0, showstats, 0 }, /* strous2.c */
 #if DEBUG
-  { "SHOW_FILES", 0, 0, show_files, 0 }, /* debug.c */
+  { "show_files", 0, 0, show_files, 0 }, /* debug.c */
 #endif
-  { "SHOW_FUNC", 0, 1, lux_show_func, "1PARAMETERS" }, /* symbols.c */
-  { "SHOW_SUBR", 0, 1, lux_show_subr, "1PARAMETERS" }, /* symbols.c */
+  { "show_func", 0, 1, lux_show_func, "1parameters" }, /* symbols.c */
+  { "show_subr", 0, 1, lux_show_subr, "1parameters" }, /* symbols.c */
 #if DEBUG
-  { "SHOW_TEMPS", 0, 0, lux_show_temps, 0 }, /* symbols.c */
+  { "show_temps", 0, 0, lux_show_temps, 0 }, /* symbols.c */
 #endif
 #if HAVE_LIBX11
-  { "SHOW_VISUALS", 0, 0, lux_show_visuals, 0 }, /* xport.c */
+  { "show_visuals", 0, 0, lux_show_visuals, 0 }, /* xport.c */
 #endif
 #if HAVE_SYS_MTIO_H
-  { "SKIPF",	1, 2, lux_skipf, 0 }, /* tape.c */
-  { "SKIPR",	1, 2, lux_skipr, 0 }, /* tape.c */
+  { "skipf",	1, 2, lux_skipf, 0 }, /* tape.c */
+  { "skipr",	1, 2, lux_skipr, 0 }, /* tape.c */
 #endif
-  { "SPAWN", 	1, 1, lux_spawn, "1SILENT" }, /* files.c */
-  { "SSCANF",	2, MAX_ARG, lux_freads, "1COUNTSPACES" }, /* files.c */
-  { "STEP",	0, 1, lux_step, 0 }, /* symbols.c */
-  { "STORE",	2, 3, lux_fzwrite, "1SAFE" }, /* files.c */
-  { "STRING",	1, MAX_ARG, lux_string_inplace, 0 }, /* symbols.c */
-  { "SUBSHIFT",	4, 4, lux_subshift, 0 }, /* fun5.c */
-  { "SUBSHIFTC", 4, 5, lux_subshiftc, 0 }, /* fun5.c */
-  { "SWAB",	1, MAX_ARG, lux_swab, 0 }, /* fun2.c */
-  { "SWAPB",	1, MAX_ARG, lux_swab, 0 }, /* fun2.c */
-  { "SWAPHALF",	1, 1, lux_swaphalf, 0 }, /* strous2.c */
-  { "SWITCH",	2, 2, lux_switch, 0 }, /* symbols.c */
-  { "T", 	1, MAX_ARG, lux_type, "1JOIN:2RAW:4SEPARATE" }, /* files.c */
+  { "spawn", 	1, 1, lux_spawn, "1silent" }, /* files.c */
+  { "sscanf",	2, MAX_ARG, lux_freads, "1countspaces" }, /* files.c */
+  { "step",	0, 1, lux_step, 0 }, /* symbols.c */
+  { "store",	2, 3, lux_fzwrite, "1safe" }, /* files.c */
+  { "string",	1, MAX_ARG, lux_string_inplace, 0 }, /* symbols.c */
+  { "subshift",	4, 4, lux_subshift, 0 }, /* fun5.c */
+  { "subshiftc", 4, 5, lux_subshiftc, 0 }, /* fun5.c */
+  { "swab",	1, MAX_ARG, lux_swab, 0 }, /* fun2.c */
+  { "swapb",	1, MAX_ARG, lux_swab, 0 }, /* fun2.c */
+  { "swaphalf",	1, 1, lux_swaphalf, 0 }, /* strous2.c */
+  { "switch",	2, 2, lux_switch, 0 }, /* symbols.c */
+  { "t", 	1, MAX_ARG, lux_type, "1join:2raw:4separate" }, /* files.c */
 #if HAVE_SYS_MTIO_H
-  { "TAPEBUFIN", 2, 5, lux_tapebufin, 0 }, /* tape.c */
-  { "TAPEBUFOUT", 2, 5, lux_tapebufout, 0 }, /* tape.c */
-  { "TAPE_STATUS", 0, 0, lux_tape_status, 0 }, /* tape.c */
-  { "TAPRD",	2, 2, lux_taprd, 0 }, /* tape.c */
-  { "TAPWRT",	2, 2, lux_tapwrt, 0 }, /* tape.c */
+  { "tapebufin", 2, 5, lux_tapebufin, 0 }, /* tape.c */
+  { "tapebufout", 2, 5, lux_tapebufout, 0 }, /* tape.c */
+  { "tape_status", 0, 0, lux_tape_status, 0 }, /* tape.c */
+  { "taprd",	2, 2, lux_taprd, 0 }, /* tape.c */
+  { "tapwrt",	2, 2, lux_tapwrt, 0 }, /* tape.c */
 #endif
 #if HAVE_LIBX11
-  { "THREECOLORS", 0, 1, lux_threecolors, 0 }, /* xport.c */
+  { "threecolors", 0, 1, lux_threecolors, 0 }, /* xport.c */
 #endif
-  { "TOLOOKUP",	3, 3, lux_tolookup, "1ONE" }, /* strous2.c */
-  { "TRACE",	0, 1, lux_trace, /* install.c */
-    "1FILE:2LOOP:4BRACES:8ROUTINE:143ALL:16SHOWSTATS:32CPUTIME:64SHOWEXEC:128ENTER" },
+  { "tolookup",	3, 3, lux_tolookup, "1one" }, /* strous2.c */
+  { "trace",	0, 1, lux_trace, /* install.c */
+    "1file:2loop:4braces:8routine:143all:16showstats:32cputime:64showexec:128enter" },
 #if DEVELOP
-  { "TRAJECTORY", 3, 7, lux_trajectory, 0 }, /* strous3.c */
+  { "trajectory", 3, 7, lux_trajectory, 0 }, /* strous3.c */
 #endif
 #if HAVE_LIBX11
-  { "TV",	1, 5, lux_xtv,	/* xport.c */
-    ":X:Y:WINDOW:SCALE:0DEP:1DVI:2DEV:3IMG:4PLT:5RIM:6RPL:7X11:64SCREEN:128POSTSCRIPT:192PDEV:256PLOTWINDOW:512ZOOM:1024CENTER:16384BIT24" },
-  { "TV3",	1, 7, lux_tv3, /* xport.c */
-    ":TWO:THREE:X:Y:WINDOW:SCALE:0DEP:1DVI:2DEV:3IMG:4PLT:5RIM:6RPL:7X11:64SCREEN:128POSTSCRIPT:192PDEV:256PLOTWINDOW:512ZOOM:1024CENTER" },
-  { "TVLAB",	3, 4, lux_xlabel, 0 }, /* xport.c */
-  { "TVLCT",	3, 3, lux_xtvlct, "1FIXEDSIZE" }, /* xport.c */
-  { "TVMAP",	1, 5, lux_xtvmap, /* xport.c */
-    ":::WINDOW:SCALE:0DEP:1DVI:2DEV:3IMG:4PLT:5RIM:6RPL:7X11:64SCREEN:128POSTSCRIPT:192PDEV:256PLOTWINDOW:512ZOOM" },
-  { "TVPLANE",	1, 5, lux_xtvplane, 0 }, /* xport.c */
-  { "TVRAW",	1, 5, lux_xtvraw, /* xport.c */
-    ":::WINDOW:SCALE:0DEP:1DVI:2DEV:3IMG:4PLT:5RIM:6RPL:7X11:64SCREEN:128POSTSCRIPT:192PDEV:256PLOTWINDOW:512ZOOM" },
-  { "TVREAD",	0, 5, lux_xtvread, "1GREYSCALE" }, /* xport.c */
+  { "tv",	1, 5, lux_xtv,	/* xport.c */
+    ":x:y:window:scale:0dep:1dvi:2dev:3img:4plt:5rim:6rpl:7x11:64screen:128postscript:192pdev:256plotwindow:512zoom:1024center:16384bit24" },
+  { "tv3",	1, 7, lux_tv3, /* xport.c */
+    ":two:three:x:y:window:scale:0dep:1dvi:2dev:3img:4plt:5rim:6rpl:7x11:64screen:128postscript:192pdev:256plotwindow:512zoom:1024center" },
+  { "tvlab",	3, 4, lux_xlabel, 0 }, /* xport.c */
+  { "tvlct",	3, 3, lux_xtvlct, "1fixedsize" }, /* xport.c */
+  { "tvmap",	1, 5, lux_xtvmap, /* xport.c */
+    ":::window:scale:0dep:1dvi:2dev:3img:4plt:5rim:6rpl:7x11:64screen:128postscript:192pdev:256plotwindow:512zoom" },
+  { "tvplane",	1, 5, lux_xtvplane, 0 }, /* xport.c */
+  { "tvraw",	1, 5, lux_xtvraw, /* xport.c */
+    ":::window:scale:0dep:1dvi:2dev:3img:4plt:5rim:6rpl:7x11:64screen:128postscript:192pdev:256plotwindow:512zoom" },
+  { "tvread",	0, 5, lux_xtvread, "1greyscale" }, /* xport.c */
 #endif
-  { "TY",	1, MAX_ARG, lux_type, "1JOIN:2RAW:4SEPARATE" }, /* files.c */
-  { "TYPE", 	1, MAX_ARG, lux_type, "1JOIN:2RAW:4SEPARATE" }, /* files.c */
-  { "ULIB", 	0, 1, lux_ulib, 0 }, /* files.c */
+  { "ty",	1, MAX_ARG, lux_type, "1join:2raw:4separate" }, /* files.c */
+  { "type", 	1, MAX_ARG, lux_type, "1join:2raw:4separate" }, /* files.c */
+  { "ulib", 	0, 1, lux_ulib, 0 }, /* files.c */
 #if HAVE_SYS_MTIO_H
-  { "UNLOAD",	1, 1, lux_unload, 0 }, /* tape.c */
+  { "unload",	1, 1, lux_unload, 0 }, /* tape.c */
 #endif
-  { "VERIFY",	0, 1, lux_verify, 0 }, /* install.c */
-  { "WAIT",	1, 1, lux_wait, 0 }, /* fun2.c */
+  { "verify",	0, 1, lux_verify, 0 }, /* install.c */
+  { "wait",	1, 1, lux_wait, 0 }, /* fun2.c */
 #if HAVE_LIBX11
-  { "WAIT_FOR_MENU", 0, 1, lux_wait_for_menu, 0 }, /* menu.c */
+  { "wait_for_menu", 0, 1, lux_wait_for_menu, 0 }, /* menu.c */
 #endif
 #if HAVE_SYS_MTIO_H
-  { "WAIT_FOR_TAPE", 1, 1, lux_wait_for_tape, 0 }, /* tape.c */
+  { "wait_for_tape", 1, 1, lux_wait_for_tape, 0 }, /* tape.c */
 #endif
-  { "WATCH",	1, 1, lux_watch, "1DELETE:2LIST" }, /* install.c */
+  { "watch",	1, 1, lux_watch, "1delete:2list" }, /* install.c */
 #if HAVE_SYS_MTIO_H
-  { "WEOF",	1, 1, lux_weof, 0 }, /* tape.c */
+  { "weof",	1, 1, lux_weof, 0 }, /* tape.c */
 #endif
 #if DEBUG
-  { "WHERE",	1, 1, lux_whereisAddress, "1CUT" }, /* debug.c */
+  { "where",	1, 1, lux_whereisAddress, "1cut" }, /* debug.c */
 #endif
 #if HAVE_LIBX11
-  { "WINDOW",	0, 6, lux_window, 0 }, /* plots.c */
+  { "window",	0, 6, lux_window, 0 }, /* plots.c */
 #endif
-  { "WORD",	1, 1, lux_word_inplace, 0 }, /* symbols.c */
-  { "WRITEU",	2, MAX_ARG, lux_writeu, 0 }, /* files.c */
+  { "word",	1, 1, lux_word_inplace, 0 }, /* symbols.c */
+  { "writeu",	2, MAX_ARG, lux_writeu, 0 }, /* files.c */
 #if HAVE_LIBJPEG
-  { "WRITE_JPEG", 2, 4, lux_write_jpeg6b, 0 }, /* jpeg.c */
+  { "write_jpeg", 2, 4, lux_write_jpeg6b, 0 }, /* jpeg.c */
 #endif
 #if HAVE_LIBX11
-  { "XANIMATE",	1, 6, lux_xanimate, ":::FR1:FR2:FRS:1TIME" }, /* xport.c */
-  { "XCLOSE",	0, 0, lux_xclose, 0 }, /* xport.c */
-  { "XCOPY",	2, 8, lux_xcopy, 0 }, /* xport.c */
-  { "XCURSOR",	2, 4, lux_xcursor, 0 }, /* xport.c */
-  { "XDELETE",	1, 1, lux_xdelete, 0 }, /* xport.c */
-  { "XDRAWARC",	4, 7, lux_xdrawarc, 0 }, /* xport.c */
-  { "XDRAWLINE", 4, 5, lux_xdrawline, 0 }, /* xport.c */
-  { "XEVENT",	0, 0, lux_xevent, 0 }, /* xport.c */
-  { "XFLUSH",	0, 0, lux_xflush, 0 }, /* xport.c */
-  { "XFONT",	1, 2, lux_xfont, 0 }, /* xport.c */
-  { "XINVERTARC", 4, 7, lux_xinvertarc, 0 }, /* xport.c */
-  { "XINVERTLINE", 4, 5, lux_xinvertline, 0 }, /* xport.c */
-  { "XLABEL",	3, 4, lux_xlabel, 0 }, /* xport.c */
-  { "XLOOP",	0, 1, lux_xloop, 0 }, /* menu.c */
+  { "xanimate",	1, 6, lux_xanimate, ":::fr1:fr2:frs:1time" }, /* xport.c */
+  { "xclose",	0, 0, lux_xclose, 0 }, /* xport.c */
+  { "xcopy",	2, 8, lux_xcopy, 0 }, /* xport.c */
+  { "xcursor",	2, 4, lux_xcursor, 0 }, /* xport.c */
+  { "xdelete",	1, 1, lux_xdelete, 0 }, /* xport.c */
+  { "xdrawarc",	4, 7, lux_xdrawarc, 0 }, /* xport.c */
+  { "xdrawline", 4, 5, lux_xdrawline, 0 }, /* xport.c */
+  { "xevent",	0, 0, lux_xevent, 0 }, /* xport.c */
+  { "xflush",	0, 0, lux_xflush, 0 }, /* xport.c */
+  { "xfont",	1, 2, lux_xfont, 0 }, /* xport.c */
+  { "xinvertarc", 4, 7, lux_xinvertarc, 0 }, /* xport.c */
+  { "xinvertline", 4, 5, lux_xinvertline, 0 }, /* xport.c */
+  { "xlabel",	3, 4, lux_xlabel, 0 }, /* xport.c */
+  { "xloop",	0, 1, lux_xloop, 0 }, /* menu.c */
 #if MOTIF
-  { "XMALIGNMENT", 2, 2, lux_xmalignment, 0 }, /* motif.c */
-  { "XMARMCOLOR", 2, 2, lux_xmarmcolor, 0 }, /* motif.c */
-  { "XMATTACH",	6, 6, lux_xmattach, 0 }, /* motif.c */
-  { "XMATTACH_RELATIVE", 5, 5, lux_xmattach_relative, 0 }, /* motif.c */
-  { "XMBACKGROUNDCOLOR", 2, 2, lux_xmbackgroundcolor, 0 }, /* motif.c */
-  { "XMBORDERCOLOR", 2, 2, lux_xmbordercolor, 0 }, /* motif.c */
-  { "XMBORDERWIDTH", 2, 2, lux_xmborderwidth, 0 }, /* motif.c */
-  { "XMBOTTOMSHADOWCOLOR", 2, 2, lux_xmbottomshadowcolor, 0 }, /* motif.c */
-  { "XMDESTROY", 1, 1, lux_xmdestroy, 0 }, /* motif.c */
-  { "XMDRAWINGLINK", 2, 2, lux_xmdrawinglink, 0 }, /* motif.c */
-  { "XMFONT",	2, 2, lux_xmfont, 0 }, /* motif.c */
-  { "XMFOREGROUNDCOLOR", 2, 2, lux_xmforegroundcolor, 0 }, /* motif.c */
-  { "XMGETPIXMAP", 2, 2, lux_xmgetpixmap, 0 }, /* motif.c */
-  { "XMGETWIDGETPOSITION", 3, 3, lux_xmgetwidgetposition, 0 }, /* motif.c */
-  { "XMGETWIDGETSIZE", 3, 3, lux_xmgetwidgetsize, 0 }, /* motif.c */
-  { "XMINFO",	1, 1, lux_xminfo, 0 }, /* motif.c */
-  { "XMLISTADDITEM", 2, 3, lux_xmlistadditem, 0 }, /* motif.c */
-  { "XMLISTDELETEALL", 1, 1, lux_xmlistdeleteall, 0 }, /* motif.c */
-  { "XMLISTDELETEITEM", 2, 2, lux_xmlistdeleteitem, 0 }, /* motif.c */
-  { "XMLISTFUNC", 1, 1, lux_xmlistfunc, 0 }, /* motif.c */
-  { "XMLISTSELECT", 2, 3, lux_xmlistselect, 0 }, /* motif.c */
-  { "XMLISTSUBR", 1, 1, lux_xmlistsubr, 0 }, /* motif.c */
-  { "XMMESSAGE", 1, 5, lux_xmmessage, 0 }, /* motif.c */
-  { "XMPOSITION", 3, 5, lux_xmposition, 0 }, /* motif.c */
-  { "XMPROMPT",	3, 8, lux_xmprompt, 0 }, /* motif.c */
-  { "XMQUERY",	1, 1, lux_xmquery, 0 }, /* motif.c */
-  { "XMRAISE",	1, 1, lux_xmraise, 0 },  /* motif.c */
-  { "XMRESIZEPOLICY",	2, 2, lux_xmresizepolicy, 0 }, /* motif.c */
-  { "XMSCALERESETLIMITS", 3, 4, lux_xmscaleresetlimits, 0 }, /* motif.c */
-  { "XMSCALESETVALUE", 2, 2, lux_xmscalesetvalue, 0 }, /* motif.c */
-  { "XMSCROLLBARSETVALUES", 1, 5, lux_xmscrollbarsetvalues, 0 }, /* motif.c */
-  { "XMSELECTCOLOR", 2, 2, lux_xmselectcolor, 0 }, /* motif.c */
-  { "XMSENSITIVE", 2, 2, lux_xmsensitive, 0 }, /* motif.c */
-  { "XMSETCOLORS", 2, 2, lux_xmsetcolors, 0 }, /* motif.c */
-  { "XMSETDIRECTORY", 2, 2, lux_xmsetdirectory, 0 }, /* motif.c */
-  { "XMSETLABEL", 2, 2, lux_xmsetlabel, 0 }, /* motif.c */
-  { "XMSETMARGINS", 3, 3, lux_xmsetmargins, 0 }, /* motif.c */
-  { "XMSETMNEMONIC", 2, 2, lux_xmsetmnemonic, 0 }, /* motif.c */
-  { "XMSETMODAL", 2, 2, lux_xmsetmodal, 0 }, /* motif.c */
-  { "XMSETOPTIONSELECTION", 2, 2, lux_xmsetoptionselection, 0 }, /* motif.c */
-  { "XMSETPIXMAP", 2, 2, lux_xmsetpixmap, 0 }, /* motif.c */
-  { "XMSETTITLE", 2, 2, lux_xmsettitle, 0 }, /* motif.c */
-  { "XMSET_TEXT_OUTPUT", 1, 1, lux_xmset_text_output, 0 }, /* motif.c */
-  { "XMSIZE",	3, 3, lux_xmsize, 0 }, /* motif.c */
-  { "XMTEXTAPPEND", 2, 3, lux_xmtextappend, 0 }, /* motif.c */
-  { "XMTEXTERASE", 1, 1, lux_xmtexterase, 0 }, /* motif.c */
-  { "XMTEXTFIELDSETEDITABLE", 2, 2, lux_xmtextfieldseteditable, 0 }, /* motif.c */
-  { "XMTEXTFIELDSETMAXLENGTH", 2, 2, lux_xmtextfieldsetmaxlength, 0 }, /* motif.c */
-  { "XMTEXTFIELDSETSTRING", 2, 3, lux_xmtextfieldsetstring, 0 }, /* motif.c */
-  { "XMTEXTREPLACE",	3, 4, lux_xmtextreplace, 0 }, /* motif.c */
-  { "XMTEXTSETEDITABLE", 2, 2, lux_xmtextseteditable, 0 }, /* motif.c */
-  { "XMTEXTSETPOSITION", 2, 2, lux_xmtextsetposition, 0 }, /* motif.c */
-  { "XMTEXTSETROWCOLUMNSIZE", 3, 3, lux_xmtextsetrowcolumnsize, 0 }, /* motif.c */
-  { "XMTEXTSETSTRING", 2, 2, lux_xmtextsetstring, 0 }, /* motif.c */
-  { "XMTOGGLESETSTATE", 2, 3, lux_xmtogglesetstate, 0 }, /* motif.c */
-  { "XMTOPSHADOWCOLOR", 2, 2, lux_xmtopshadowcolor, 0 }, /* motif.c */
+  { "xmalignment", 2, 2, lux_xmalignment, 0 }, /* motif.c */
+  { "xmarmcolor", 2, 2, lux_xmarmcolor, 0 }, /* motif.c */
+  { "xmattach",	6, 6, lux_xmattach, 0 }, /* motif.c */
+  { "xmattach_relative", 5, 5, lux_xmattach_relative, 0 }, /* motif.c */
+  { "xmbackgroundcolor", 2, 2, lux_xmbackgroundcolor, 0 }, /* motif.c */
+  { "xmbordercolor", 2, 2, lux_xmbordercolor, 0 }, /* motif.c */
+  { "xmborderwidth", 2, 2, lux_xmborderwidth, 0 }, /* motif.c */
+  { "xmbottomshadowcolor", 2, 2, lux_xmbottomshadowcolor, 0 }, /* motif.c */
+  { "xmdestroy", 1, 1, lux_xmdestroy, 0 }, /* motif.c */
+  { "xmdrawinglink", 2, 2, lux_xmdrawinglink, 0 }, /* motif.c */
+  { "xmfont",	2, 2, lux_xmfont, 0 }, /* motif.c */
+  { "xmforegroundcolor", 2, 2, lux_xmforegroundcolor, 0 }, /* motif.c */
+  { "xmgetpixmap", 2, 2, lux_xmgetpixmap, 0 }, /* motif.c */
+  { "xmgetwidgetposition", 3, 3, lux_xmgetwidgetposition, 0 }, /* motif.c */
+  { "xmgetwidgetsize", 3, 3, lux_xmgetwidgetsize, 0 }, /* motif.c */
+  { "xminfo",	1, 1, lux_xminfo, 0 }, /* motif.c */
+  { "xmlistadditem", 2, 3, lux_xmlistadditem, 0 }, /* motif.c */
+  { "xmlistdeleteall", 1, 1, lux_xmlistdeleteall, 0 }, /* motif.c */
+  { "xmlistdeleteitem", 2, 2, lux_xmlistdeleteitem, 0 }, /* motif.c */
+  { "xmlistfunc", 1, 1, lux_xmlistfunc, 0 }, /* motif.c */
+  { "xmlistselect", 2, 3, lux_xmlistselect, 0 }, /* motif.c */
+  { "xmlistsubr", 1, 1, lux_xmlistsubr, 0 }, /* motif.c */
+  { "xmmessage", 1, 5, lux_xmmessage, 0 }, /* motif.c */
+  { "xmposition", 3, 5, lux_xmposition, 0 }, /* motif.c */
+  { "xmprompt",	3, 8, lux_xmprompt, 0 }, /* motif.c */
+  { "xmquery",	1, 1, lux_xmquery, 0 }, /* motif.c */
+  { "xmraise",	1, 1, lux_xmraise, 0 },  /* motif.c */
+  { "xmresizepolicy",	2, 2, lux_xmresizepolicy, 0 }, /* motif.c */
+  { "xmscaleresetlimits", 3, 4, lux_xmscaleresetlimits, 0 }, /* motif.c */
+  { "xmscalesetvalue", 2, 2, lux_xmscalesetvalue, 0 }, /* motif.c */
+  { "xmscrollbarsetvalues", 1, 5, lux_xmscrollbarsetvalues, 0 }, /* motif.c */
+  { "xmselectcolor", 2, 2, lux_xmselectcolor, 0 }, /* motif.c */
+  { "xmsensitive", 2, 2, lux_xmsensitive, 0 }, /* motif.c */
+  { "xmsetcolors", 2, 2, lux_xmsetcolors, 0 }, /* motif.c */
+  { "xmsetdirectory", 2, 2, lux_xmsetdirectory, 0 }, /* motif.c */
+  { "xmsetlabel", 2, 2, lux_xmsetlabel, 0 }, /* motif.c */
+  { "xmsetmargins", 3, 3, lux_xmsetmargins, 0 }, /* motif.c */
+  { "xmsetmnemonic", 2, 2, lux_xmsetmnemonic, 0 }, /* motif.c */
+  { "xmsetmodal", 2, 2, lux_xmsetmodal, 0 }, /* motif.c */
+  { "xmsetoptionselection", 2, 2, lux_xmsetoptionselection, 0 }, /* motif.c */
+  { "xmsetpixmap", 2, 2, lux_xmsetpixmap, 0 }, /* motif.c */
+  { "xmsettitle", 2, 2, lux_xmsettitle, 0 }, /* motif.c */
+  { "xmset_text_output", 1, 1, lux_xmset_text_output, 0 }, /* motif.c */
+  { "xmsize",	3, 3, lux_xmsize, 0 }, /* motif.c */
+  { "xmtextappend", 2, 3, lux_xmtextappend, 0 }, /* motif.c */
+  { "xmtexterase", 1, 1, lux_xmtexterase, 0 }, /* motif.c */
+  { "xmtextfieldseteditable", 2, 2, lux_xmtextfieldseteditable, 0 }, /* motif.c */
+  { "xmtextfieldsetmaxlength", 2, 2, lux_xmtextfieldsetmaxlength, 0 }, /* motif.c */
+  { "xmtextfieldsetstring", 2, 3, lux_xmtextfieldsetstring, 0 }, /* motif.c */
+  { "xmtextreplace",	3, 4, lux_xmtextreplace, 0 }, /* motif.c */
+  { "xmtextseteditable", 2, 2, lux_xmtextseteditable, 0 }, /* motif.c */
+  { "xmtextsetposition", 2, 2, lux_xmtextsetposition, 0 }, /* motif.c */
+  { "xmtextsetrowcolumnsize", 3, 3, lux_xmtextsetrowcolumnsize, 0 }, /* motif.c */
+  { "xmtextsetstring", 2, 2, lux_xmtextsetstring, 0 }, /* motif.c */
+  { "xmtogglesetstate", 2, 3, lux_xmtogglesetstate, 0 }, /* motif.c */
+  { "xmtopshadowcolor", 2, 2, lux_xmtopshadowcolor, 0 }, /* motif.c */
 #endif
-  { "XOPEN",	0, 1, lux_xopen, /* xport.c */
-    "1PRIVATE_COLORMAP:2DEFAULT_COLORMAP:4SELECTVISUAL" },
-  { "XPLACE",	0, 2, lux_xplace, /* xport.c */
-    "1DVI:2DEV:3IMG:4PLT:5RIM:6RPL:7X11" },
-  { "XPORT",	0, 7, lux_xport, 0 }, /* xport.c */
-  { "XPURGE",	0, 0, lux_xpurge, 0 }, /* xport.c */
-  { "XQUERY",	0, 1, lux_xquery, 0 }, /* xport.c */
-  { "XRAISE",	1, 1, lux_xraise, 0 }, /* xport.c */
-  { "XREGISTER", 0, 3, lux_register_event , /* menu.c */
-    "1KEYPRESS:4BUTTONPRESS:8BUTTONRELEASE:16POINTERMOTION:32ENTERWINDOW:64LEAVEWINDOW:127ALLEVENTS:128ALLWINDOWS:256ALLMENUS:512DESELECT::WINDOW:MENU" },
-  { "XSETACTION", 0, 2, lux_xsetaction, 0 }, /* xport.c */
+  { "xopen",	0, 1, lux_xopen, /* xport.c */
+    "1private_colormap:2default_colormap:4selectvisual" },
+  { "xplace",	0, 2, lux_xplace, /* xport.c */
+    "1dvi:2dev:3img:4plt:5rim:6rpl:7x11" },
+  { "xport",	0, 7, lux_xport, 0 }, /* xport.c */
+  { "xpurge",	0, 0, lux_xpurge, 0 }, /* xport.c */
+  { "xquery",	0, 1, lux_xquery, 0 }, /* xport.c */
+  { "xraise",	1, 1, lux_xraise, 0 }, /* xport.c */
+  { "xregister", 0, 3, lux_register_event , /* menu.c */
+    "1keypress:4buttonpress:8buttonrelease:16pointermotion:32enterwindow:64leavewindow:127allevents:128allwindows:256allmenus:512deselect::window:menu" },
+  { "xsetaction", 0, 2, lux_xsetaction, 0 }, /* xport.c */
 #if MOTIF
-  { "XTLOOP",	0, 1, lux_xtloop, 0 }, /* motif.c */
-  { "XTMANAGE",	1, 1, lux_xtmanage, 0 }, /* motif.c */
-  { "XTPOPDOWN", 1, 1, lux_xtpopdown, 0 }, /* motif.c */
-  { "XTPOPUP",	1, 1, lux_xtpopup, 0 },	/* motif.c */
-  { "XTUNMANAGE", 1, 1, lux_xtunmanage, 0 }, /* motif.c */
+  { "xtloop",	0, 1, lux_xtloop, 0 }, /* motif.c */
+  { "xtmanage",	1, 1, lux_xtmanage, 0 }, /* motif.c */
+  { "xtpopdown", 1, 1, lux_xtpopdown, 0 }, /* motif.c */
+  { "xtpopup",	1, 1, lux_xtpopup, 0 },	/* motif.c */
+  { "xtunmanage", 1, 1, lux_xtunmanage, 0 }, /* motif.c */
 #endif
-  { "XTV",	1, 4, lux_xtv,  /* xport.c */
-    ":::WINDOW:SCALE:0DEP:1DVI:2DEV:3IMG:4PLT:5RIM:6RPL:7X11:64SCREEN:128POSTSCRIPT:192PDEV:256PLOTWINDOW:512ZOOM" },
-  { "XTVREAD",	0, 5, lux_xtvread, "1GREYSCALE" }, /* xport.c */
-  { "XWIN",	0, 7, lux_xport, 0 }, /* xport.c */
-  { "XWINDOW",	0, 7, lux_xport, 0 }, /* xport.c */
-  { "XYMOV",	2, 4, lux_xymov, /* plots.c */
-    "|192|:::BREAKS:0DEP:1DVI:2DEV:3IMG:4PLT:5RIM:6RPL:7X11:64BOUNDINGBOX:128MOVEFIRST:256ALTDASH" },
+  { "xtv",	1, 4, lux_xtv,  /* xport.c */
+    ":::window:scale:0dep:1dvi:2dev:3img:4plt:5rim:6rpl:7x11:64screen:128postscript:192pdev:256plotwindow:512zoom" },
+  { "xtvread",	0, 5, lux_xtvread, "1greyscale" }, /* xport.c */
+  { "xwin",	0, 7, lux_xport, 0 }, /* xport.c */
+  { "xwindow",	0, 7, lux_xport, 0 }, /* xport.c */
+  { "xymov",	2, 4, lux_xymov, /* plots.c */
+    "|192|:::breaks:0dep:1dvi:2dev:3img:4plt:5rim:6rpl:7x11:64boundingbox:128movefirst:256altdash" },
 #endif
-  { "ZAP",	1, MAX_ARG, lux_zap, "+1POINTER" }, /* strous2.c */
-  { "ZERO", 	1, MAX_ARG, lux_zero, 0 }, /* fun1.c */
+  { "zap",	1, MAX_ARG, lux_zap, "+1pointer" }, /* strous2.c */
+  { "zero", 	1, MAX_ARG, lux_zero, 0 }, /* fun1.c */
 #if MOTIF
-  { "ZEROIFNOTDEFINED", 1, MAX_ARG, lux_zeroifnotdefined, 0}, /* motifextra.c */
+  { "zeroifnotdefined", 1, MAX_ARG, lux_zeroifnotdefined, 0}, /* motifextra.c */
 #endif
-  { "ZERONANS",	1, MAX_ARG, lux_zapnan, "*%1%VALUE" }, /* fun1.c */
+  { "zeronans",	1, MAX_ARG, lux_zapnan, "*%1%value" }, /* fun1.c */
 #if HAVE_LIBX11
-  { "ZOOM",	1, 3, lux_zoom, "1OLDCONTRAST" }, /* zoom.c */
+  { "zoom",	1, 3, lux_zoom, "1oldcontrast" }, /* zoom.c */
 #endif
 };
 int32_t nSubroutine = sizeof(subroutine_table)/sizeof(internalRoutine);
@@ -806,491 +806,491 @@ extern int32_t	vargsmooth;
 extern LuxRoutine lux_test;
 
 internalRoutine function_table[] = {
-  { "%A_UNARY_NEGATIVE", 1, 1, lux_neg_func, "*" },	/* fun1.c */
-  { "%B_SUBSCRIPT", 1, MAX_ARG, lux_subsc_func, /* subsc.c */ "1INNER:2OUTER:4ZERO:8SUBGRID:16KEEPDIMS:32ALL:64SEPARATE" },
-  { "%C_CPUTIME", 0, 0, lux_cputime, 0 }, /* fun1.c */
-  { "%D_POWER",	2, 2, lux_pow, "*" }, /* fun1.c */
-  { "%E_CONCAT", 1, MAX_ARG, lux_concat, "1SLOPPY" }, /* subsc.c */
-  { "%F_CTIME", 0, 0, lux_ctime, 0 }, /* fun1.c */
-  { "%G_TIME", 	0, 0, lux_time, 0 }, /* fun1.c */
-  { "%H_DATE", 	0, 0, lux_date, 0 }, /* fun1.c */
-  { "%I_READKEY", 0, 0, lux_readkey, 0 }, /* strous.c */
-  { "%J_READKEYNE", 0, 0, lux_readkeyne, 0 }, /* strous.c */
-  { "%K_SYSTIME", 0, 0, lux_systime, 0 }, /* fun1.c */
-  { "%L_JD",	0, 0, lux_jd, 0 }, /* fun1.c */
-  { "%M_CJD",   0, 0, lux_cjd, 0 },                /* fun1.c */
-  { "ABS",	1, 1, lux_abs, "*" }, /* fun1.c */
-  { "ACOS",	1, 1, lux_acos, "*" }, /* fun1.c */
-  { "ACOSH",	1, 1, lux_acosh, "*" }, /* fun1.c */
-  { "ALOG",	1, 1, lux_log, "*" }, /* fun1.c */
-  { "ALOG10",	1, 1, lux_log10, "*" }, /* fun1.c */
-  { "ANTILAPLACE2D", 2, 2, lux_antilaplace2d, 0 }, /* poisson.c */
-  { "AREACONNECT", 2, 3, lux_area_connect, "::COMPACT:1RAW" }, /* topology.c */
-  { "ARESTORE",	1, MAX_ARG, lux_arestore_f, 0 }, /* files.c */
-  { "ARG",	1, 1, lux_arg, 0 }, /* fun3.c */
-  { "ARRAY",	1, MAX_DIMS + 1, lux_array, 0 }, /* symbols.c */
-  { "ASIN",	1, 1, lux_asin, "*" }, /* fun1.c */
-  { "ASINH",	1, 1, lux_asinh, "*" }, /* fun1.c */
-  { "ASSOC",	2, 3, lux_assoc, "::OFFSET" }, /* symbols.c */
-  { "ASTORE",	2, MAX_ARG, lux_astore_f, 0 }, /* files.c */
-  { "ASTRF",	1, 2, lux_astrf, "1FROMEQUATORIAL:2FROMECLIPTICAL:4FROMGALACTIC:8TOEQUATORIAL:16TOECLIPTICAL:32TOGALACTIC:64JULIAN:128BESSELIAN" }, /* astron.c */
-  { "ASTRON",	2, 7, lux_astropos, /* astron.c */ ":::OBSERVER:EQUINOX:ELEMENTS:TOLERANCE:1ECLIPTICAL:2EQUATORIAL:3HORIZONTAL:4ELONGATION:8XYZ:16LIGHTTIME:32DATE:64TDT:256ABERRATION:512NUTATION:2832APPARENT:1024QELEMENTS:2048FK5:8192CONJSPREAD:16384PLANETOCENTRIC:32768KEEPDIMENSIONS:65536VOCAL:~131072VSOP87A:131072VSOP87C:262144BARE" },
-  { "ATAN",	1, 1, lux_atan, "*" }, /* fun1.c */
-  { "ATAN2",	2, 2, lux_atan2, "*" }, /* fun1.c */
-  { "ATANH",	1, 1, lux_atanh, "*" }, /* fun1.c */
-  { "ATOL",	1, 2, lux_strtol, 0 }, /* fun3.c */
-  { "BASIN",	1, 2, lux_basin2, /* strous.c */ "*1NUMBER:2SINK:4DIFFERENCE" },
+  { "%a_unary_negative", 1, 1, lux_neg_func, "*" },	/* fun1.c */
+  { "%b_subscript", 1, MAX_ARG, lux_subsc_func, /* subsc.c */ "1inner:2outer:4zero:8subgrid:16keepdims:32all:64separate" },
+  { "%c_cputime", 0, 0, lux_cputime, 0 }, /* fun1.c */
+  { "%d_power",	2, 2, lux_pow, "*" }, /* fun1.c */
+  { "%e_concat", 1, MAX_ARG, lux_concat, "1sloppy" }, /* subsc.c */
+  { "%f_ctime", 0, 0, lux_ctime, 0 }, /* fun1.c */
+  { "%g_time", 	0, 0, lux_time, 0 }, /* fun1.c */
+  { "%h_date", 	0, 0, lux_date, 0 }, /* fun1.c */
+  { "%i_readkey", 0, 0, lux_readkey, 0 }, /* strous.c */
+  { "%j_readkeyne", 0, 0, lux_readkeyne, 0 }, /* strous.c */
+  { "%k_systime", 0, 0, lux_systime, 0 }, /* fun1.c */
+  { "%l_jd",	0, 0, lux_jd, 0 }, /* fun1.c */
+  { "%m_cjd",   0, 0, lux_cjd, 0 },                /* fun1.c */
+  { "abs",	1, 1, lux_abs, "*" }, /* fun1.c */
+  { "acos",	1, 1, lux_acos, "*" }, /* fun1.c */
+  { "acosh",	1, 1, lux_acosh, "*" }, /* fun1.c */
+  { "alog",	1, 1, lux_log, "*" }, /* fun1.c */
+  { "alog10",	1, 1, lux_log10, "*" }, /* fun1.c */
+  { "antilaplace2d", 2, 2, lux_antilaplace2d, 0 }, /* poisson.c */
+  { "areaconnect", 2, 3, lux_area_connect, "::compact:1raw" }, /* topology.c */
+  { "arestore",	1, MAX_ARG, lux_arestore_f, 0 }, /* files.c */
+  { "arg",	1, 1, lux_arg, 0 }, /* fun3.c */
+  { "array",	1, MAX_DIMS + 1, lux_array, 0 }, /* symbols.c */
+  { "asin",	1, 1, lux_asin, "*" }, /* fun1.c */
+  { "asinh",	1, 1, lux_asinh, "*" }, /* fun1.c */
+  { "assoc",	2, 3, lux_assoc, "::offset" }, /* symbols.c */
+  { "astore",	2, MAX_ARG, lux_astore_f, 0 }, /* files.c */
+  { "astrf",	1, 2, lux_astrf, "1fromequatorial:2fromecliptical:4fromgalactic:8toequatorial:16toecliptical:32togalactic:64julian:128besselian" }, /* astron.c */
+  { "astron",	2, 7, lux_astropos, /* astron.c */ ":::observer:equinox:elements:tolerance:1ecliptical:2equatorial:3horizontal:4elongation:8xyz:16lighttime:32date:64tdt:256aberration:512nutation:2832apparent:1024qelements:2048fk5:8192conjspread:16384planetocentric:32768keepdimensions:65536vocal:~131072vsop87a:131072vsop87c:262144bare" },
+  { "atan",	1, 1, lux_atan, "*" }, /* fun1.c */
+  { "atan2",	2, 2, lux_atan2, "*" }, /* fun1.c */
+  { "atanh",	1, 1, lux_atanh, "*" }, /* fun1.c */
+  { "atol",	1, 2, lux_strtol, 0 }, /* fun3.c */
+  { "basin",	1, 2, lux_basin2, /* strous.c */ "*1number:2sink:4difference" },
 #if DEVELOP
-  { "BESSEL_I0",  1, 1, lux_bessel_i0, "*1DEFLATE" }, /* fun1.c */
-  { "BESSEL_I1",  1, 1, lux_bessel_i1, "*" }, /* fun1.c */
+  { "bessel_i0",  1, 1, lux_bessel_i0, "*1deflate" }, /* fun1.c */
+  { "bessel_i1",  1, 1, lux_bessel_i1, "*" }, /* fun1.c */
 #endif
-  { "BESSEL_J0", 1, 1, lux_j0, "*" }, /* fun1.c */
-  { "BESSEL_J1", 1, 1, lux_j1, "*" }, /* fun1.c */
-  { "BESSEL_JN", 2, 2, lux_jn, "*" }, /* fun1.c */
+  { "bessel_j0", 1, 1, lux_j0, "*" }, /* fun1.c */
+  { "bessel_j1", 1, 1, lux_j1, "*" }, /* fun1.c */
+  { "bessel_jn", 2, 2, lux_jn, "*" }, /* fun1.c */
 #if DEVELOP
-  { "BESSEL_K0", 1, 1, lux_bessel_k0, "*" }, /* fun1.c */
-  { "BESSEL_K1", 1, 1, lux_bessel_k1, "*" }, /* fun1.c */
-  { "BESSEL_KN", 2, 2, lux_bessel_kn, "*" }, /* fun1.c */
+  { "bessel_k0", 1, 1, lux_bessel_k0, "*" }, /* fun1.c */
+  { "bessel_k1", 1, 1, lux_bessel_k1, "*" }, /* fun1.c */
+  { "bessel_kn", 2, 2, lux_bessel_kn, "*" }, /* fun1.c */
 #endif
-  { "BESSEL_Y0", 1, 1, lux_y0, "*" }, /* fun1.c */
-  { "BESSEL_Y1", 1, 1, lux_y1, "*" }, /* fun1.c */
-  { "BESSEL_YN", 2, 2, lux_yn, "*" }, /* fun1.c */
-  { "BETA",	2, 2, lux_beta, "*1LOG" }, /* fun1.c */
+  { "bessel_y0", 1, 1, lux_y0, "*" }, /* fun1.c */
+  { "bessel_y1", 1, 1, lux_y1, "*" }, /* fun1.c */
+  { "bessel_yn", 2, 2, lux_yn, "*" }, /* fun1.c */
+  { "beta",	2, 2, lux_beta, "*1log" }, /* fun1.c */
 #if DEVELOP
-  { "BI0",	1, 1, lux_bessel_i0, "*1DEFLATE" }, /* fun1.c */
-  { "BI1",	1, 1, lux_bessel_i1, "*" }, /* fun1.c */
-  { "BIGGER235", 1, 1, lux_bigger235, "*" }, /* fun4.c */
+  { "bi0",	1, 1, lux_bessel_i0, "*1deflate" }, /* fun1.c */
+  { "bi1",	1, 1, lux_bessel_i1, "*" }, /* fun1.c */
+  { "bigger235", 1, 1, lux_bigger235, "*" }, /* fun4.c */
 #endif
-  { "BISECT",	2, 6, lux_bisect, ":::AXIS:POS:WIDTH" }, /* strous3.c */
-  { "BJ0",	1, 1, lux_j0, "*" }, /* fun1.c */
-  { "BJ1",	1, 1, lux_j1, "*" }, /* fun1.c */
-  { "BJN",	2, 2, lux_jn, "*" }, /* fun1.c */
+  { "bisect",	2, 6, lux_bisect, ":::axis:pos:width" }, /* strous3.c */
+  { "bj0",	1, 1, lux_j0, "*" }, /* fun1.c */
+  { "bj1",	1, 1, lux_j1, "*" }, /* fun1.c */
+  { "bjn",	2, 2, lux_jn, "*" }, /* fun1.c */
 #if DEVELOP
-  { "BK0",	1, 1, lux_bessel_k0, "*" }, /* fun1.c */
-  { "BK1",	1, 1, lux_bessel_k1, "*" }, /* fun1.c */
-  { "BKN",	2, 2, lux_bessel_kn, "*" }, /* fun1.c */
+  { "bk0",	1, 1, lux_bessel_k0, "*" }, /* fun1.c */
+  { "bk1",	1, 1, lux_bessel_k1, "*" }, /* fun1.c */
+  { "bkn",	2, 2, lux_bessel_kn, "*" }, /* fun1.c */
 #endif
-  { "BMAP",	1, 1, lux_bmap, "*" }, /* subsc.c */
+  { "bmap",	1, 1, lux_bmap, "*" }, /* subsc.c */
 #if DEVELOP
-  { "BSMOOTH",	1, 3, lux_bsmooth, 0 }, /* strous.c */
+  { "bsmooth",	1, 3, lux_bsmooth, 0 }, /* strous.c */
 #endif
-  { "BY0",	1, 1, lux_y0, "*" }, /* fun1.c */
-  { "BY1",	1, 1, lux_y1, "*" }, /* fun1.c */
-  { "BYN",	2, 2, lux_yn, "*" }, /* fun1.c */
-  { "BYTARR",	1, MAX_DIMS, bytarr, 0 }, /* symbols.c */
-  { "BYTE",	1, 1, lux_byte, "*" }, /* symbols.c */
-  { "BYTFARR",	3, MAX_DIMS + 1, bytfarr, "%1%OFFSET:1READONLY:2SWAP" }, /* filemap.c */
-  { "CALENDAR",	1, 1, lux_calendar, /* astron.c */ "1FROMCOMMON:2FROMGREGORIAN:3FROMISLAMIC:4FROMJULIAN:5FROMHEBREW:6FROMEGYPTIAN:7FROMJD:8FROMCJD:9FROMLUNAR:10FROMMAYAN:11FROMLONGCOUNT:12FROMLATIN:16TOCOMMON:32TOGREGORIAN:48TOISLAMIC:64TOJULIAN:80TOHEBREW:96TOEGYPTIAN:112TOJD:128TOCJD:144TOLUNAR:160TOMAYAN:176TOLONGCOUNT:192TOLATIN:0TONUMERIC:256TOLONG:512TODOUBLE:768TOTEXT:0FROMUTC:1024FROMTAI:2048FROMTT:3072FROMLT:0TOUTC:4096TOTAI:8192TOTT:12288TOLT:0FROMYMD:16384FROMDMY:0TOYMD:32768TODMY" },
-  { "CBRT",	1, 1, lux_cbrt, "*" }, /* fun1.c */
-  { "CDBLARR",	1, MAX_ARG, cdblarr, 0 }, /* symbols.c */
-  { "CDBLFARR", 3, MAX_DIMS + 1, cdblfarr, "%1%OFFSET:1READONLY:2SWAP" }, /* filemap.c */
-  { "CDMAP",	1, 1, lux_cdmap, 0 }, /* subsc.c */
-  { "CDOUBLE",	1, 1, lux_cdouble, "*" }, /* fun1.c */
-  { "CEIL",	1, 1, lux_ceil, "*" }, /* symbols.c */
-  { "CFLOAT",	1, 1, lux_cfloat, "*" }, /* fun1.c */
-  { "CFLTARR",	1, MAX_ARG, cfltarr, 0 }, /* symbols.c */
-  { "CFLTFARR", 3, MAX_DIMS + 1, cfltfarr, "%1%OFFSET:1READONLY:2SWAP" }, /* filemap.c */
-  { "CFMAP",	1, 1, lux_cfmap, 0 }, /* subsc.c */
+  { "by0",	1, 1, lux_y0, "*" }, /* fun1.c */
+  { "by1",	1, 1, lux_y1, "*" }, /* fun1.c */
+  { "byn",	2, 2, lux_yn, "*" }, /* fun1.c */
+  { "bytarr",	1, MAX_DIMS, bytarr, 0 }, /* symbols.c */
+  { "byte",	1, 1, lux_byte, "*" }, /* symbols.c */
+  { "bytfarr",	3, MAX_DIMS + 1, bytfarr, "%1%offset:1readonly:2swap" }, /* filemap.c */
+  { "calendar",	1, 1, lux_calendar, /* astron.c */ "1fromcommon:2fromgregorian:3fromislamic:4fromjulian:5fromhebrew:6fromegyptian:7fromjd:8fromcjd:9fromlunar:10frommayan:11fromlongcount:12fromlatin:16tocommon:32togregorian:48toislamic:64tojulian:80tohebrew:96toegyptian:112tojd:128tocjd:144tolunar:160tomayan:176tolongcount:192tolatin:0tonumeric:256tolong:512todouble:768totext:0fromutc:1024fromtai:2048fromtt:3072fromlt:0toutc:4096totai:8192tott:12288tolt:0fromymd:16384fromdmy:0toymd:32768todmy" },
+  { "cbrt",	1, 1, lux_cbrt, "*" }, /* fun1.c */
+  { "cdblarr",	1, MAX_ARG, cdblarr, 0 }, /* symbols.c */
+  { "cdblfarr", 3, MAX_DIMS + 1, cdblfarr, "%1%offset:1readonly:2swap" }, /* filemap.c */
+  { "cdmap",	1, 1, lux_cdmap, 0 }, /* subsc.c */
+  { "cdouble",	1, 1, lux_cdouble, "*" }, /* fun1.c */
+  { "ceil",	1, 1, lux_ceil, "*" }, /* symbols.c */
+  { "cfloat",	1, 1, lux_cfloat, "*" }, /* fun1.c */
+  { "cfltarr",	1, MAX_ARG, cfltarr, 0 }, /* symbols.c */
+  { "cfltfarr", 3, MAX_DIMS + 1, cfltfarr, "%1%offset:1readonly:2swap" }, /* filemap.c */
+  { "cfmap",	1, 1, lux_cfmap, 0 }, /* subsc.c */
 #if HAVE_LIBX11
-  { "CHECKMENU", 0, 1, lux_check_menu, 0 }, /* menu.c */
-  { "CHECKWINDOW", 0, 1, lux_check_window, 0 }, /* xport.c */
+  { "checkmenu", 0, 1, lux_check_menu, 0 }, /* menu.c */
+  { "checkwindow", 0, 1, lux_check_window, 0 }, /* xport.c */
 #endif
-  { "CHI2",	2, 2, lux_chi_square, "*1COMPLEMENT:2LOG" }, /* fun1.c */
-  { "CLASSNAME", 1, 1, lux_classname, 0 }, /* install.c */
+  { "chi2",	2, 2, lux_chi_square, "*1complement:2log" }, /* fun1.c */
+  { "classname", 1, 1, lux_classname, 0 }, /* install.c */
 #if HAVE_LIBX11
-  { "COLORPIXEL", 1, 1, lux_colorpixel, "*" }, /* xport.c */
+  { "colorpixel", 1, 1, lux_colorpixel, "*" }, /* xport.c */
 #endif
 #if DEVELOP
-  { "COMPILE",	1, 1, lux_compile, 0 }, /* install.c */
+  { "compile",	1, 1, lux_compile, 0 }, /* install.c */
 #endif
-  { "COMPLEX",	1, 1, lux_complex, 0 },	/* fun3.c */
-  { "COMPLEXSQUARE", 1, 1, lux_complexsquare, 0 }, /* fun1.c */
-  { "COMPRESS",	2, 3, lux_compress, 0 }, /* fun4.c */
-  { "CONCAT",	1, MAX_ARG, lux_concat, "1SLOPPY" }, /* subsc.c */
-  { "CONJUGATE", 1, 1, lux_conjugate, "*" }, /* fun1.c */
-  { "CONSTELLATION", 1, 2, lux_constellation, "1JULIAN:2BESSELIAN:4VOCAL" }, /* astron.c */
-  { "CONSTELLATIONNAME", 1, 1, lux_constellationname, 0 }, /* astron.c */
-  { "CONVERT",	2, 2, lux_convertsym, "*" }, /* symbols.c */
-  { "COS",	1, 1, lux_cos, "*" }, /* fun1.c */
-  { "COSH",	1, 1, lux_cosh, "*" }, /* fun1.c */
-  { "COVARIANCE", 2, 4, lux_covariance,
-    ":::WEIGHTS:*0SAMPLE:1POPULATION:2KEEPDIMS:4DOUBLE" }, /* fun2.c */
-  { "CROSSCORR", 2, 3, lux_crosscorr, 0 }, /* fun2.c */
-  { "CRUNCH",	3, 3, lux_crunch_f, 0 }, /* crunch.c */
-  { "CSPLINE",	0, 5, lux_cubic_spline, /* fun3.c */ "1KEEP:2PERIODIC:4AKIMA:8GETDERIVATIVE" },
-  { "CSPLINE_FIND", 2, 4, lux_cspline_find, ":::AXIS:INDEX" }, /* strous3.c */
-  { "CTOP",	1, 3, lux_cartesian_to_polar, 0 }, /* fun4.c */
-  { "DATE_FROM_TAI", 1, 2, lux_date_from_tai, 0 }, /* ephem.c */
-  { "DBLARR",	1, MAX_DIMS, dblarr, 0 }, /* symbols.c */
-  { "DBLFARR",	3, MAX_DIMS + 1, dblfarr, /* filemap.c */ "%1%OFFSET:1READONLY:2SWAP" },
-  { "DEFINED",	1, 1, lux_defined, "+1TARGET" }, /* fun1.c */
-  { "DESPIKE",  1, 6, lux_despike, ":FRAC:LEVEL:NITER:SPIKES:RMS" }, /* fun6.c */
-  { "DETREND",	1, 2, lux_detrend, "*" }, /* fun2.c */
-  { "DIFFER",	1, 3, lux_differ, "*1CENTRAL:2CIRCULAR" }, /* strous.c */
-  { "DILATE",	1, 1, lux_dilate, 0 }, /* fun5.c */
-  { "DIMEN",	1, 2, lux_dimen, 0 }, /* subsc.c */
-  { "DISTARR",	1, 3, lux_distarr, 0 }, /* strous2.c */
-  { "DISTR",	2, 2, lux_distr_f, /* strous.c */ "2IGNORELIMIT:4INCREASELIMIT" },
-  { "DMAP",	1, 1, lux_dmap, 0 }, /* subsc.c */
-  { "DOUB",	1, 1, lux_double, "*" }, /* symbols.c */
-  { "DOUBLE",	1, 1, lux_double, "*" }, /* symbols.c */
-  { "DSMOOTH",	3, 3, lux_dir_smooth, "0TWOSIDED:0BOXCAR:1ONESIDED:2GAUSSIAN:4TOTAL:8STRAIGHT" }, /* strous3.c */
-  { "DSUM",	1, 4, lux_total, "|1|::POWER:WEIGHTS:2KEEPDIMS" }, /* fun1.c */
-  { "EASTERDATE", 1, 1, lux_EasterDate, 0 }, /* astron.c */
-  { "ENHANCEIMAGE", 1, 3, lux_enhanceimage, ":PART:TARGET:1SYMMETRIC" }, /* strous3.c */
-  { "EQUIVALENCE", 2, 2, lux_equivalence, 0 }, /* strous2.c */
-  { "ERF",	1, 1, lux_erf, "*" }, /* fun1.c */
-  { "ERFC",	1, 1, lux_erfc, "*" }, /* fun1.c */
-  { "ERODE",	1, 1, lux_erode, "1ZEROEDGE" }, /* fun5.c */
-  { "ESEGMENT",	1, 4, lux_extreme_general, /* topology.c */ ":SIGN:DIAGONAL:THRESHOLD" },
-  { "ESMOOTH",	1, 3, lux_esmooth, 0 }, /* fun2.c */
-  { "EVAL",	1, 2, lux_eval, "1ALLNUMBER" }, /* fun3.c */
+  { "complex",	1, 1, lux_complex, 0 },	/* fun3.c */
+  { "complexsquare", 1, 1, lux_complexsquare, 0 }, /* fun1.c */
+  { "compress",	2, 3, lux_compress, 0 }, /* fun4.c */
+  { "concat",	1, MAX_ARG, lux_concat, "1sloppy" }, /* subsc.c */
+  { "conjugate", 1, 1, lux_conjugate, "*" }, /* fun1.c */
+  { "constellation", 1, 2, lux_constellation, "1julian:2besselian:4vocal" }, /* astron.c */
+  { "constellationname", 1, 1, lux_constellationname, 0 }, /* astron.c */
+  { "convert",	2, 2, lux_convertsym, "*" }, /* symbols.c */
+  { "cos",	1, 1, lux_cos, "*" }, /* fun1.c */
+  { "cosh",	1, 1, lux_cosh, "*" }, /* fun1.c */
+  { "covariance", 2, 4, lux_covariance,
+    ":::weights:*0sample:1population:2keepdims:4double" }, /* fun2.c */
+  { "crosscorr", 2, 3, lux_crosscorr, 0 }, /* fun2.c */
+  { "crunch",	3, 3, lux_crunch_f, 0 }, /* crunch.c */
+  { "cspline",	0, 5, lux_cubic_spline, /* fun3.c */ "1keep:2periodic:4akima:8getderivative" },
+  { "cspline_find", 2, 4, lux_cspline_find, ":::axis:index" }, /* strous3.c */
+  { "ctop",	1, 3, lux_cartesian_to_polar, 0 }, /* fun4.c */
+  { "date_from_tai", 1, 2, lux_date_from_tai, 0 }, /* ephem.c */
+  { "dblarr",	1, MAX_DIMS, dblarr, 0 }, /* symbols.c */
+  { "dblfarr",	3, MAX_DIMS + 1, dblfarr, /* filemap.c */ "%1%offset:1readonly:2swap" },
+  { "defined",	1, 1, lux_defined, "+1target" }, /* fun1.c */
+  { "despike",  1, 6, lux_despike, ":frac:level:niter:spikes:rms" }, /* fun6.c */
+  { "detrend",	1, 2, lux_detrend, "*" }, /* fun2.c */
+  { "differ",	1, 3, lux_differ, "*1central:2circular" }, /* strous.c */
+  { "dilate",	1, 1, lux_dilate, 0 }, /* fun5.c */
+  { "dimen",	1, 2, lux_dimen, 0 }, /* subsc.c */
+  { "distarr",	1, 3, lux_distarr, 0 }, /* strous2.c */
+  { "distr",	2, 2, lux_distr_f, /* strous.c */ "2ignorelimit:4increaselimit" },
+  { "dmap",	1, 1, lux_dmap, 0 }, /* subsc.c */
+  { "doub",	1, 1, lux_double, "*" }, /* symbols.c */
+  { "double",	1, 1, lux_double, "*" }, /* symbols.c */
+  { "dsmooth",	3, 3, lux_dir_smooth, "0twosided:0boxcar:1onesided:2gaussian:4total:8straight" }, /* strous3.c */
+  { "dsum",	1, 4, lux_total, "|1|::power:weights:2keepdims" }, /* fun1.c */
+  { "easterdate", 1, 1, lux_EasterDate, 0 }, /* astron.c */
+  { "enhanceimage", 1, 3, lux_enhanceimage, ":part:target:1symmetric" }, /* strous3.c */
+  { "equivalence", 2, 2, lux_equivalence, 0 }, /* strous2.c */
+  { "erf",	1, 1, lux_erf, "*" }, /* fun1.c */
+  { "erfc",	1, 1, lux_erfc, "*" }, /* fun1.c */
+  { "erode",	1, 1, lux_erode, "1zeroedge" }, /* fun5.c */
+  { "esegment",	1, 4, lux_extreme_general, /* topology.c */ ":sign:diagonal:threshold" },
+  { "esmooth",	1, 3, lux_esmooth, 0 }, /* fun2.c */
+  { "eval",	1, 2, lux_eval, "1allnumber" }, /* fun3.c */
 #if HAVE_LIBX11
-  { "EVENTNAME", 0, 1, lux_event_name, 0 }, /* menu.c */
+  { "eventname", 0, 1, lux_event_name, 0 }, /* menu.c */
 #endif
-  { "EXP",	1, 1, lux_exp, "*" }, /* fun1.c */
-  { "EXPAND",	2, 4, lux_expand, "1SMOOTH:2NEAREST" }, /* fun4.c */
-  { "EXPM1",	1, 1, lux_expm1, "*" }, /* fun1.c */
-  { "EXTRACT_BITS", 3, 3, lux_extract_bits_f, 0 }, /* fun3.c */
-  { "FCRUNWRITE", 2, 3, lux_fcrunwrite_f, 0 }, /* files.c */
-  { "FCRW",	2, 3, lux_fcrunwrite_f, 0 }, /* files.c */
-  { "FCW",	2, 3, lux_fcwrite_f, "1RUNLENGTH" }, /* files.c */
-  { "FCWRITE",	2, 3, lux_fcwrite_f, "1RUNLENGTH" }, /* files.c */
-  { "FFTSHIFT",	2, 2, lux_fftshift_f, 0 }, /* fun3.c */
-  { "FILEPTR",	1, 2, lux_fileptr_f, "1START:2EOF:4ADVANCE" }, /* files.c */
-  { "FILESIZE",	1, 1, lux_filesize, 0 }, /* files.c */
-  { "FILETYPE",	1, 1, lux_identify_file, 0 }, /* files.c */
-  { "FILETYPENAME", 1, 1, lux_filetype_name, 0 }, /* install.c */
-  { "FIND",	2, 4, lux_find,	/* strous.c */ "0EXACT:1INDEX_GE:2VALUE_GE:4FIRST" },
-  { "FIND2",    2, 2, lux_find2, "0EXACT" },    /* strous.c */
-  { "FINDFILE",	2, 2, lux_findfile, 0 }, /* files.c */
-  { "FIND_MAX",	1, 3, lux_find_max, /* strous2.c */ "::DIAGONAL:1DEGREE:2SUBGRID" },
-  { "FIND_MAXLOC", 1, 3, lux_find_maxloc, /* strous2.c */ "::DIAGONAL:1DEGREE:2SUBGRID:4COORDS:8OLD" },
-  { "FIND_MIN",	1, 3, lux_find_min, /* strous2.c */ "::DIAGONAL:1DEGREE:2SUBGRID" },
-  { "FIND_MINLOC", 1, 3, lux_find_minloc, /* strous2.c */ "::DIAGONAL:1DEGREE:2SUBGRID:4COORDS" },
-  { "FIT",	3, 17, lux_generalfit, /* fit.c */ "|4|::START:STEP:LOWBOUND:HIGHBOUND:WEIGHTS:QTHRESH:PTHRESH:ITHRESH:DTHRESH:FAC:NITER:NSAME:ERR:FIT:TTHRESH:1VOCAL:4DOWN:8PCHI:16GAUSSIANS:32POWERFUNC:64ONEBYONE:129VERR" },
+  { "exp",	1, 1, lux_exp, "*" }, /* fun1.c */
+  { "expand",	2, 4, lux_expand, "1smooth:2nearest" }, /* fun4.c */
+  { "expm1",	1, 1, lux_expm1, "*" }, /* fun1.c */
+  { "extract_bits", 3, 3, lux_extract_bits_f, 0 }, /* fun3.c */
+  { "fcrunwrite", 2, 3, lux_fcrunwrite_f, 0 }, /* files.c */
+  { "fcrw",	2, 3, lux_fcrunwrite_f, 0 }, /* files.c */
+  { "fcw",	2, 3, lux_fcwrite_f, "1runlength" }, /* files.c */
+  { "fcwrite",	2, 3, lux_fcwrite_f, "1runlength" }, /* files.c */
+  { "fftshift",	2, 2, lux_fftshift_f, 0 }, /* fun3.c */
+  { "fileptr",	1, 2, lux_fileptr_f, "1start:2eof:4advance" }, /* files.c */
+  { "filesize",	1, 1, lux_filesize, 0 }, /* files.c */
+  { "filetype",	1, 1, lux_identify_file, 0 }, /* files.c */
+  { "filetypename", 1, 1, lux_filetype_name, 0 }, /* install.c */
+  { "find",	2, 4, lux_find,	/* strous.c */ "0exact:1index_ge:2value_ge:4first" },
+  { "find2",    2, 2, lux_find2, "0exact" },    /* strous.c */
+  { "findfile",	2, 2, lux_findfile, 0 }, /* files.c */
+  { "find_max",	1, 3, lux_find_max, /* strous2.c */ "::diagonal:1degree:2subgrid" },
+  { "find_maxloc", 1, 3, lux_find_maxloc, /* strous2.c */ "::diagonal:1degree:2subgrid:4coords:8old" },
+  { "find_min",	1, 3, lux_find_min, /* strous2.c */ "::diagonal:1degree:2subgrid" },
+  { "find_minloc", 1, 3, lux_find_minloc, /* strous2.c */ "::diagonal:1degree:2subgrid:4coords" },
+  { "fit",	3, 17, lux_generalfit, /* fit.c */ "|4|::start:step:lowbound:highbound:weights:qthresh:pthresh:ithresh:dthresh:fac:niter:nsame:err:fit:tthresh:1vocal:4down:8pchi:16gaussians:32powerfunc:64onebyone:129verr" },
 #if DEVELOP
-  { "FIT2",	4, 11, lux_geneticfit, "X:Y:NPAR:FIT:WEIGHTS:MU:GENERATIONS:POPULATION:PCROSS:PMUTATE:VOCAL:1ELITE:2BYTE:4WORD:6LONG:8FLOAT:10DOUBLE" }, /* fit.c */
+  { "fit2",	4, 11, lux_geneticfit, "x:y:npar:fit:weights:mu:generations:population:pcross:pmutate:vocal:1elite:2byte:4word:6long:8float:10double" }, /* fit.c */
 #endif
-  { "FITS_HEADER", 1, 4, lux_fits_header_f, 0 }, /* files.c */
-  { "FITS_KEY",	2, 2, lux_fitskey, "1COMMENT" }, /* strous3.c */
-  { "FITS_READ", 2, 7, lux_fits_read_f, "|1|1TRANSLATE:2RAWVALUES::::::BLANK" }, /* files.c */
-  { "FITS_XREAD", 2, 6, lux_fits_xread_f, 0 }, /* files.c */
-  { "FIX",	1, 1, lux_long, "*" }, /* symbols.c */
-  { "FLOAT",	1, 1, lux_float, "*" }, /* symbols.c */
-  { "FLOOR",	1, 1, lux_floor, "*" }, /* symbols.c */
-  { "FLTARR",	1, MAX_DIMS, fltarr, 0 }, /* symbols.c */
-  { "FLTFARR",	3, MAX_DIMS + 1, fltfarr, /* filemap.c */ "%1%OFFSET:1READONLY:2SWAP" },
-  { "FMAP",	1, 1, lux_fmap, 0 }, /* subsc.c */
-  { "FRATIO",	3, 3, lux_f_ratio, "*1COMPLEMENT:2LOG" }, /* fun1.c */
-  { "FREADF",	2, MAX_ARG, lux_freadf_f, "|1|1EOF" }, /* files.c */
-  { "FREADS",	3, MAX_ARG, lux_freads_f, "1COUNTSPACES" }, /* files.c */
-  { "FSTRING",	1, MAX_ARG, lux_fstring, "1SKIP_UNDEFINED" }, /* fun2.c */
-  { "FSUM",	1, 4, lux_total, "::POWER:WEIGHTS:1DOUBLE:2KEEPDIMS" }, /* fun1.c */
-  { "FZARR",	1, 1, lux_fzarr, "1READONLY" }, /* filemap.c */
-  { "FZH",	1, 2, lux_fzhead_f, 0 }, /* files.c */
-  { "FZHEAD",	1, 2, lux_fzhead_f, 0 }, /* files.c */
-  { "FZR",	2, 3, lux_fzread_f, "|1|1PRINTHEADER" }, /* files.c */
-  { "FZREAD",	2, 3, lux_fzread_f, "|1|1PRINTHEADER" }, /* files.c */
-  { "FZW",	2, 3, lux_fzwrite_f, 0 }, /* files.c */
-  { "FZWRITE",	2, 3, lux_fzwrite_f, 0 }, /* files.c */
-  { "GAMMA",	1, 1, lux_gamma, "*1LOG" }, /* fun1.c */
+  { "fits_header", 1, 4, lux_fits_header_f, 0 }, /* files.c */
+  { "fits_key",	2, 2, lux_fitskey, "1comment" }, /* strous3.c */
+  { "fits_read", 2, 7, lux_fits_read_f, "|1|1translate:2rawvalues::::::blank" }, /* files.c */
+  { "fits_xread", 2, 6, lux_fits_xread_f, 0 }, /* files.c */
+  { "fix",	1, 1, lux_long, "*" }, /* symbols.c */
+  { "float",	1, 1, lux_float, "*" }, /* symbols.c */
+  { "floor",	1, 1, lux_floor, "*" }, /* symbols.c */
+  { "fltarr",	1, MAX_DIMS, fltarr, 0 }, /* symbols.c */
+  { "fltfarr",	3, MAX_DIMS + 1, fltfarr, /* filemap.c */ "%1%offset:1readonly:2swap" },
+  { "fmap",	1, 1, lux_fmap, 0 }, /* subsc.c */
+  { "fratio",	3, 3, lux_f_ratio, "*1complement:2log" }, /* fun1.c */
+  { "freadf",	2, MAX_ARG, lux_freadf_f, "|1|1eof" }, /* files.c */
+  { "freads",	3, MAX_ARG, lux_freads_f, "1countspaces" }, /* files.c */
+  { "fstring",	1, MAX_ARG, lux_fstring, "1skip_undefined" }, /* fun2.c */
+  { "fsum",	1, 4, lux_total, "::power:weights:1double:2keepdims" }, /* fun1.c */
+  { "fzarr",	1, 1, lux_fzarr, "1readonly" }, /* filemap.c */
+  { "fzh",	1, 2, lux_fzhead_f, 0 }, /* files.c */
+  { "fzhead",	1, 2, lux_fzhead_f, 0 }, /* files.c */
+  { "fzr",	2, 3, lux_fzread_f, "|1|1printheader" }, /* files.c */
+  { "fzread",	2, 3, lux_fzread_f, "|1|1printheader" }, /* files.c */
+  { "fzw",	2, 3, lux_fzwrite_f, 0 }, /* files.c */
+  { "fzwrite",	2, 3, lux_fzwrite_f, 0 }, /* files.c */
+  { "gamma",	1, 1, lux_gamma, "*1log" }, /* fun1.c */
 #if HAVE_REGEX_H
-  { "GETDIRECTORIES", 1, 2, lux_getdirectories, 0 }, /* files.c */
-  { "GETDIRECTS", 1, 2, lux_getdirectories, 0 }, /* files.c */
+  { "getdirectories", 1, 2, lux_getdirectories, 0 }, /* files.c */
+  { "getdirects", 1, 2, lux_getdirectories, 0 }, /* files.c */
 #endif
-  { "GETENV",	1, 1, lux_getenv, 0 }, /* files.c */
+  { "getenv",	1, 1, lux_getenv, 0 }, /* files.c */
 #if HAVE_REGEX_H
-  { "GETFILES", 1, 2, lux_getfiles, 0 }, /* files.c */
-  { "GETFILES_R", 1, 2, lux_getfiles_r, 0 }, /* files.c */
-  { "GETMATCHEDFILES", 2, 3, lux_getmatchedfiles, 0 }, /* files.c */
-  { "GETMATCHEDFILES_R", 2, 3, lux_getmatchedfiles_r, 0 }, /* files.c */
+  { "getfiles", 1, 2, lux_getfiles, 0 }, /* files.c */
+  { "getfiles_r", 1, 2, lux_getfiles_r, 0 }, /* files.c */
+  { "getmatchedfiles", 2, 3, lux_getmatchedfiles, 0 }, /* files.c */
+  { "getmatchedfiles_r", 2, 3, lux_getmatchedfiles_r, 0 }, /* files.c */
 #endif
-  { "GET_LUN",	0, 0, lux_get_lun, 0 }, /* files.c */
-  { "GIFREAD",	2, 3, lux_gifread_f, 0 }, /* gifread_ana.c */
-  { "GIFWRITE",	2, 3, lux_gifwrite_f, 0 }, /* gifwrite_ana.c */
-  { "GRIDMATCH", 7, 8, lux_gridmatch, "1VOCAL" }, /* fun4.c */
-  { "GSMOOTH",	1, 4, lux_gsmooth, /* fun2.c */
-    ":::KERNEL:1NORMALIZE:2FULLNORM:4BALANCED:8ALL" },
-  { "HAMMING",  1, 2, lux_hamming, 0 }, /* strous3.c */
-  { "HIST",	1, 2, lux_hist, /* fun3.c */
-    "1FIRST:2IGNORELIMIT:4INCREASELIMIT:8SILENT" },
-  { "HISTR",	1, 1, lux_histr, /* fun3.c */
-    "1FIRST:2IGNORELIMIT:4INCREASELIMIT:8SILENT" },
-  { "IBETA",	3, 3, lux_incomplete_beta, "*1COMPLEMENT:2LOG" }, /* fun1.c */
-  { "IDLREAD",	2, 2, lux_idlread_f, 0 }, /* strous3.c */
-  { "IGAMMA",	2, 2, lux_incomplete_gamma, "*1COMPLEMENT:2LOG" }, /* fun1.c */
-  { "IMAGINARY", 1, 1, lux_imaginary, 0 }, /* fun3.c */
-  { "INDEX",	1, 1, lux_index, "*1AXIS:2RANK" }, /* fun4.c */
-  { "INDGEN",	1, 2, lux_indgen, "*" }, /* fun1.c */
-  { "INPOLYGON", 4, 4, lux_inpolygon, 0 }, /* topology.c */
-  { "INT",	1, 1, lux_word, "*" }, /* symbols.c */
-  { "INT64",    1, 1, lux_int64, "*" },     /* symbols.c */
-  { "INT64ARR", 1, MAX_DIMS, int64arr, 0 }, /* symbols.c */
-  { "INT64FARR", 3, MAX_DIMS+1, int64farr, /* filemap.c */
-    "%1%OFFSET:1READONLY:2SWAP" },
-  { "INT64MAP",	1, 1, lux_int64map, 0 }, /* subsc.c */
-  { "INTARR",	1, MAX_DIMS, intarr, 0 }, /* symbols.c */
-  { "INTFARR",	3, MAX_DIMS + 1, intfarr, /* filemap.c */
-    "%1%OFFSET:1READONLY:2SWAP" },
-  { "ISARRAY",	1, 1, lux_isarray, 0 }, /* subsc.c */
-  { "ISNAN",	1, 1, lux_isnan, 0 }, /* fun1.c; needs IEEE isnan! */
-  { "ISSCALAR",	1, 1, lux_isscalar, 0 }, /* subsc.c */
-  { "ISSTRING",	1, 1, lux_isstring, 0 }, /* subsc.c */
-  { "IST",	1, 3, lux_istring, 0 }, /* fun2.c */
-  { "ISTRING",	1, 3, lux_istring, 0 }, /* fun2.c */
+  { "get_lun",	0, 0, lux_get_lun, 0 }, /* files.c */
+  { "gifread",	2, 3, lux_gifread_f, 0 }, /* gifread_ana.c */
+  { "gifwrite",	2, 3, lux_gifwrite_f, 0 }, /* gifwrite_ana.c */
+  { "gridmatch", 7, 8, lux_gridmatch, "1vocal" }, /* fun4.c */
+  { "gsmooth",	1, 4, lux_gsmooth, /* fun2.c */
+    ":::kernel:1normalize:2fullnorm:4balanced:8all" },
+  { "hamming",  1, 2, lux_hamming, 0 }, /* strous3.c */
+  { "hist",	1, 2, lux_hist, /* fun3.c */
+    "1first:2ignorelimit:4increaselimit:8silent" },
+  { "histr",	1, 1, lux_histr, /* fun3.c */
+    "1first:2ignorelimit:4increaselimit:8silent" },
+  { "ibeta",	3, 3, lux_incomplete_beta, "*1complement:2log" }, /* fun1.c */
+  { "idlread",	2, 2, lux_idlread_f, 0 }, /* strous3.c */
+  { "igamma",	2, 2, lux_incomplete_gamma, "*1complement:2log" }, /* fun1.c */
+  { "imaginary", 1, 1, lux_imaginary, 0 }, /* fun3.c */
+  { "index",	1, 1, lux_index, "*1axis:2rank" }, /* fun4.c */
+  { "indgen",	1, 2, lux_indgen, "*" }, /* fun1.c */
+  { "inpolygon", 4, 4, lux_inpolygon, 0 }, /* topology.c */
+  { "int",	1, 1, lux_word, "*" }, /* symbols.c */
+  { "int64",    1, 1, lux_int64, "*" },     /* symbols.c */
+  { "int64arr", 1, MAX_DIMS, int64arr, 0 }, /* symbols.c */
+  { "int64farr", 3, MAX_DIMS+1, int64farr, /* filemap.c */
+    "%1%offset:1readonly:2swap" },
+  { "int64map",	1, 1, lux_int64map, 0 }, /* subsc.c */
+  { "intarr",	1, MAX_DIMS, intarr, 0 }, /* symbols.c */
+  { "intfarr",	3, MAX_DIMS + 1, intfarr, /* filemap.c */
+    "%1%offset:1readonly:2swap" },
+  { "isarray",	1, 1, lux_isarray, 0 }, /* subsc.c */
+  { "isnan",	1, 1, lux_isnan, 0 }, /* fun1.c; needs IEEE isnan! */
+  { "isscalar",	1, 1, lux_isscalar, 0 }, /* subsc.c */
+  { "isstring",	1, 1, lux_isstring, 0 }, /* subsc.c */
+  { "ist",	1, 3, lux_istring, 0 }, /* fun2.c */
+  { "istring",	1, 3, lux_istring, 0 }, /* fun2.c */
 #if HAVE_LIBJPEG
-  { "JPEGREAD",	2, 4, lux_read_jpeg6b_f, ":::SHRINK:1GREYSCALE" }, /* jpeg.c */
-  { "JPEGWRITE", 2, 4, lux_write_jpeg6b_f, 0 }, /* jpeg.c */
+  { "jpegread",	2, 4, lux_read_jpeg6b_f, ":::shrink:1greyscale" }, /* jpeg.c */
+  { "jpegwrite", 2, 4, lux_write_jpeg6b_f, 0 }, /* jpeg.c */
 #endif
-  { "KSMOOTH",	2, 3, lux_ksmooth, "1BALANCED" }, /* fun2.c */
-  { "LAPLACE2D",	1, 1, lux_laplace2d, 0 }, /* poisson.c */
-  { "LEGENDRE", 2, 2, lux_legendre, "1NORMALIZE" }, /* strous3.c */
-  { "LLSQ",	2, 9, lux_lsq2,	/* strous2.c */
-    ":::FWHM:WEIGHTS:COV:ERR:CHISQ:1FORMAL:2REDUCE" },
-  { "LMAP",	1, 1, lux_lmap, 0 }, /* subsc.c */
-  { "LOCAL_MAX", 2, 2, lux_local_maxf, /* strous.c */
-    "3SUBGRID:2BOUND" },
-  { "LOCAL_MAXLOC", 2, 2, lux_local_maxloc, /* strous.c */
-    "3SUBGRID:2BOUND:4RELATIVE" },
-  { "LOCAL_MIN", 2, 2, lux_local_minf, /* strous.c */
-    "3SUBGRID:2BOUND" },
-  { "LOCAL_MINLOC", 2, 2, lux_local_minloc, /* strous.c */
-    "3SUBGRID:2BOUND:4RELATIVE" },
-  { "LOG",	1, 1, lux_log, "*" }, /* fun1.c */
-  { "LOG10",	1, 1, lux_log10, "*" }, /* fun1.c */
-  { "LOG1P",	1, 1, lux_log1p, "*" }, /* fun1.c */
-  { "LONARR",	1, MAX_DIMS, lonarr, 0 }, /* symbols.c */
-  { "LONFARR",	3, MAX_DIMS+1, lonfarr, /* filemap.c */
-    "%1%OFFSET:1READONLY:2SWAP" },
-  { "LONG",	1, 1, lux_long, "*" }, /* symbols.c */
-  { "LOWCASE",	1, 1, lux_lower, 0 }, /* fun2.c */
-  { "LOWER",	1, 1, lux_lower, 0 }, /* fun2.c */
-  { "LSMOOTH",	3, 3, lux_dir_smooth2, /* strous3.c */
-    "0TWOSIDED:0BOXCAR:1ONESIDED:2GAUSSIAN:4NORMALIZE:8STRAIGHT" },
-  { "LSQ",	2, 6, lux_lsq,	/* strous2.c */
-    "::WEIGHTS:COV:ERR:CHISQ:1FORMAL:2REDUCE" },
-  { "MATCH",	2, 2, lux_match, 0 }, /* strous.c */
-  { "MAX",	1, 2, lux_maxf, "1KEEPDIMS" }, /* fun3.c */
-  { "MAXDIR",	2, 3, lux_max_dir, 0 },	/* topology.c */
-  { "MAXFILTER", 1, 3, lux_maxfilter, 0 }, /* strous2.c */
-  { "MAXLOC",	1, 2, lux_maxloc, "1KEEPDIMS" }, /* fun3.c */
-  { "MEAN", 	1, 4, lux_mean, "::POWER:WEIGHTS:1DOUBLE:2KEEPDIMS:4FLOAT" }, /* fun1.c */
-  { "MEDFILTER", 1, 4, lux_medfilter, "%1%" }, /* strous2.c */
-  { "MEDIAN",	1, 3, lux_median, "%1%" }, /* strous2.c */
-  { "MEMORY",	0, 0, lux_memory, 0 }, /* memck.c */
-  { "MIN",	1, 2, lux_minf, "1KEEPDIMS" }, /* fun3.c */
-  { "MINFILTER", 1, 3, lux_minfilter, 0 }, /* strous2.c */
-  { "MINLOC",	1, 2, lux_minloc, "1KEEPDIMS" }, /* fun3.c */
-  { "NCCHI2",	3, 3, lux_noncentral_chi_square, 0 }, /* fun1.c */
-  { "NOT",	1, 1, lux_not, "*" }, /* strous.c */
-  { "NUM_DIM",	1, 1, lux_num_dimen, 0 }, /* subsc.c */
-  { "NUM_ELEM", 1, 2, lux_num_elem, 0 }, /* subsc.c */
-  { "ONE",	1, 1, lux_onef, 0 }, /* fun1.c */
-  { "OPENR",	2, 2, lux_openr_f, "1GET_LUN" }, /* files.c */
-  { "OPENU",	2, 2, lux_openu_f, "1GET_LUN" }, /* files.c */
-  { "OPENW",	2, 2, lux_openw_f, "1GET_LUN" }, /* files.c */
-  /* { "ORBITELEM",	3, 3, lux_orbitalElement, 0, */
-  { "ORDFILTER", 1, 4, lux_orderfilter, /* strous2.c */
-    "%1%ORDER:1MEDIAN:2MINIMUM:3MAXIMUM" },
-  { "PIT",	1, 3, lux_pit, 0 }, /* fun2.c */
-  { "POLATE",	3, 3, lux_table, 0 }, /* strous.c */
-  { "POLY",	2, 2, lux_poly, "*" }, /* fun2.c */
-  { "POWER",	1, 2, lux_power, "1POWER:2SHAPE:4ONEDIM" }, /* fun3.c */
-  { "PRECESS",	3, 3, lux_precess, "1JULIAN:2BESSELIAN" }, /* astron.c */
-  { "PRINTF",	1, MAX_ARG, lux_printf_f, 0 }, /* files.c */
+  { "ksmooth",	2, 3, lux_ksmooth, "1balanced" }, /* fun2.c */
+  { "laplace2d",	1, 1, lux_laplace2d, 0 }, /* poisson.c */
+  { "legendre", 2, 2, lux_legendre, "1normalize" }, /* strous3.c */
+  { "llsq",	2, 9, lux_lsq2,	/* strous2.c */
+    ":::fwhm:weights:cov:err:chisq:1formal:2reduce" },
+  { "lmap",	1, 1, lux_lmap, 0 }, /* subsc.c */
+  { "local_max", 2, 2, lux_local_maxf, /* strous.c */
+    "3subgrid:2bound" },
+  { "local_maxloc", 2, 2, lux_local_maxloc, /* strous.c */
+    "3subgrid:2bound:4relative" },
+  { "local_min", 2, 2, lux_local_minf, /* strous.c */
+    "3subgrid:2bound" },
+  { "local_minloc", 2, 2, lux_local_minloc, /* strous.c */
+    "3subgrid:2bound:4relative" },
+  { "log",	1, 1, lux_log, "*" }, /* fun1.c */
+  { "log10",	1, 1, lux_log10, "*" }, /* fun1.c */
+  { "log1p",	1, 1, lux_log1p, "*" }, /* fun1.c */
+  { "lonarr",	1, MAX_DIMS, lonarr, 0 }, /* symbols.c */
+  { "lonfarr",	3, MAX_DIMS+1, lonfarr, /* filemap.c */
+    "%1%offset:1readonly:2swap" },
+  { "long",	1, 1, lux_long, "*" }, /* symbols.c */
+  { "lowcase",	1, 1, lux_lower, 0 }, /* fun2.c */
+  { "lower",	1, 1, lux_lower, 0 }, /* fun2.c */
+  { "lsmooth",	3, 3, lux_dir_smooth2, /* strous3.c */
+    "0twosided:0boxcar:1onesided:2gaussian:4normalize:8straight" },
+  { "lsq",	2, 6, lux_lsq,	/* strous2.c */
+    "::weights:cov:err:chisq:1formal:2reduce" },
+  { "match",	2, 2, lux_match, 0 }, /* strous.c */
+  { "max",	1, 2, lux_maxf, "1keepdims" }, /* fun3.c */
+  { "maxdir",	2, 3, lux_max_dir, 0 },	/* topology.c */
+  { "maxfilter", 1, 3, lux_maxfilter, 0 }, /* strous2.c */
+  { "maxloc",	1, 2, lux_maxloc, "1keepdims" }, /* fun3.c */
+  { "mean", 	1, 4, lux_mean, "::power:weights:1double:2keepdims:4float" }, /* fun1.c */
+  { "medfilter", 1, 4, lux_medfilter, "%1%" }, /* strous2.c */
+  { "median",	1, 3, lux_median, "%1%" }, /* strous2.c */
+  { "memory",	0, 0, lux_memory, 0 }, /* memck.c */
+  { "min",	1, 2, lux_minf, "1keepdims" }, /* fun3.c */
+  { "minfilter", 1, 3, lux_minfilter, 0 }, /* strous2.c */
+  { "minloc",	1, 2, lux_minloc, "1keepdims" }, /* fun3.c */
+  { "ncchi2",	3, 3, lux_noncentral_chi_square, 0 }, /* fun1.c */
+  { "not",	1, 1, lux_not, "*" }, /* strous.c */
+  { "num_dim",	1, 1, lux_num_dimen, 0 }, /* subsc.c */
+  { "num_elem", 1, 2, lux_num_elem, 0 }, /* subsc.c */
+  { "one",	1, 1, lux_onef, 0 }, /* fun1.c */
+  { "openr",	2, 2, lux_openr_f, "1get_lun" }, /* files.c */
+  { "openu",	2, 2, lux_openu_f, "1get_lun" }, /* files.c */
+  { "openw",	2, 2, lux_openw_f, "1get_lun" }, /* files.c */
+  /* { "orbitelem",	3, 3, lux_orbitalElement, 0, */
+  { "ordfilter", 1, 4, lux_orderfilter, /* strous2.c */
+    "%1%order:1median:2minimum:3maximum" },
+  { "pit",	1, 3, lux_pit, 0 }, /* fun2.c */
+  { "polate",	3, 3, lux_table, 0 }, /* strous.c */
+  { "poly",	2, 2, lux_poly, "*" }, /* fun2.c */
+  { "power",	1, 2, lux_power, "1power:2shape:4onedim" }, /* fun3.c */
+  { "precess",	3, 3, lux_precess, "1julian:2besselian" }, /* astron.c */
+  { "printf",	1, MAX_ARG, lux_printf_f, 0 }, /* files.c */
 #if DEVELOP
-  { "PROJECT",	1, 1, lux_project, 0 }, /* projection.c */
-  { "PROJECTMAP", 2, 8, lux_projectmap, "::HDIST:ANGLE:MAG:XMAP:YMAP:SIZE" }, /* projection.c */
+  { "project",	1, 1, lux_project, 0 }, /* projection.c */
+  { "projectmap", 2, 8, lux_projectmap, "::hdist:angle:mag:xmap:ymap:size" }, /* projection.c */
 #endif
-  { "PSUM",	2, 4, lux_psum, /* strous2.c */
-    "1ONEDIM:2VNORMALIZE:4CNORMALIZE:8SINGLE" },
-  { "PTOC",	1, 5, lux_polar_to_cartesian, 0 }, /* fun4.c */
-  { "QUANTILE",	2, 3, lux_quantile, 0 }, /* strous2.c */
-  { "RANDOM",	1, MAX_DIMS, lux_random, /* random.c */
-    "%2%SEED:PERIOD:1UNIFORM:2NORMAL:3SAMPLE:4SHUFFLE:5BITS" },
-  { "RANDOMB",	3, MAX_DIMS, lux_randomb, "%2%SEED:1LONG" }, /* random.c */
-  { "RANDOMD",  3, MAX_DIMS, lux_randomd, "%1%SEED" }, /* random.c */
-  { "RANDOML",	3, MAX_DIMS, lux_randoml, "%2%SEED:1DOUBLE" }, /* random.c */
-  { "RANDOMN",	3, MAX_DIMS, lux_randomn, "%2%SEED" }, /* random.c */
-  { "RANDOMU",	3, MAX_DIMS, lux_randomu, "%2%SEED:PERIOD" }, /* random.c */
-  { "READF",	2, MAX_ARG, lux_readf_f, "1ASKMORE:2WORD" }, /* files.c */
-  { "READU",	2, MAX_ARG, lux_readu_f, 0 }, /* files.c */
+  { "psum",	2, 4, lux_psum, /* strous2.c */
+    "1onedim:2vnormalize:4cnormalize:8single" },
+  { "ptoc",	1, 5, lux_polar_to_cartesian, 0 }, /* fun4.c */
+  { "quantile",	2, 3, lux_quantile, 0 }, /* strous2.c */
+  { "random",	1, MAX_DIMS, lux_random, /* random.c */
+    "%2%seed:period:1uniform:2normal:3sample:4shuffle:5bits" },
+  { "randomb",	3, MAX_DIMS, lux_randomb, "%2%seed:1long" }, /* random.c */
+  { "randomd",  3, MAX_DIMS, lux_randomd, "%1%seed" }, /* random.c */
+  { "randoml",	3, MAX_DIMS, lux_randoml, "%2%seed:1double" }, /* random.c */
+  { "randomn",	3, MAX_DIMS, lux_randomn, "%2%seed" }, /* random.c */
+  { "randomu",	3, MAX_DIMS, lux_randomu, "%2%seed:period" }, /* random.c */
+  { "readf",	2, MAX_ARG, lux_readf_f, "1askmore:2word" }, /* files.c */
+  { "readu",	2, MAX_ARG, lux_readu_f, 0 }, /* files.c */
 #if HAVE_LIBJPEG
-  { "READ_JPEG", 2, 4, lux_read_jpeg6b_f, ":::SHRINK:1GREYSCALE" }, /* jpeg.c */
+  { "read_jpeg", 2, 4, lux_read_jpeg6b_f, ":::shrink:1greyscale" }, /* jpeg.c */
 #endif
-  { "REAL",	1, 1, lux_real, 0 }, /* fun3.c */
-  { "REDIM",	2, 9, lux_redim_f, 0 }, /* subsc.c */
+  { "real",	1, 1, lux_real, 0 }, /* fun3.c */
+  { "redim",	2, 9, lux_redim_f, 0 }, /* subsc.c */
 #if HAVE_REGEX_H
-  { "REGEX",	1, 2, lux_regex, "1CASE" }, /* regex.c */
+  { "regex",	1, 2, lux_regex, "1case" }, /* regex.c */
 #endif
-  { "REGRID",	5, 5, lux_regrid, 0 }, /* fun4.c */
-  { "REGRID3",	5, 5, lux_regrid3, 0 }, /* fun4.c */
-  { "REGRID3NS", 5, 5, lux_regrid3ns, 0 }, /* fun4.c */
+  { "regrid",	5, 5, lux_regrid, 0 }, /* fun4.c */
+  { "regrid3",	5, 5, lux_regrid3, 0 }, /* fun4.c */
+  { "regrid3ns", 5, 5, lux_regrid3ns, 0 }, /* fun4.c */
 #if DEVELOP
-  { "REGRIDLS", 5, 5, lux_regridls, 0 }, /* fun4.c */
+  { "regridls", 5, 5, lux_regridls, 0 }, /* fun4.c */
 #endif
-  { "REORDER",	2, 2, lux_reorder, 0 },	/* fun6.c */
-  { "RESTORE",	2, 3, lux_fzread_f, "1PRINTHEADER" }, /* files.c */
-  { "REVERSE",	1, MAX_ARG, lux_reverse, "1ZERO" }, /* subsc.c */
-  { "RFIX",	1, 1, lux_rfix, "*" }, /* symbols.c */
-  { "ROLL",	2, 2, lux_roll, 0 }, /* subsc.c */
-  { "ROOT3",	3, 3, lux_root3, 0 }, /* orientation.c */
-  { "RUNCUM",	1, 3, lux_runcum, "*1PARTIAL_WIDTH:2VARSUM" }, /* strous.c */
-  { "RUNPROD",	1, 2, lux_runprod, "*" }, /* strous2.c */
-  { "RUNSUM",	1, 3, lux_runsum, "*" }, /* fun2.c */
-  { "SCALE",	1, 3, lux_scale, "*1FULLRANGE:2ZOOM" }, /* fun3.c */
-  { "SCALERANGE", 3, 5, lux_scalerange, "*1FULLRANGE:2ZOOM" }, /* fun3.c */
-  { "SCANF",	2, MAX_ARG, lux_freadf_f, "|1|1EOF" }, /* files.c */
-  { "SDEV",	1, 3, lux_sdev, /* fun2.c */
-    "::WEIGHTS:*0SAMPLE:1POPULATION:2KEEPDIMS:4DOUBLE" },
-  { "SEGMENT",	1, 3, lux_segment, ":SIGN:DIAGONAL:1DEGREE" }, /* topology.c */
-  { "SEGMENTDIR", 2, 3, lux_segment_dir, "::SIGN" }, /* topology.c */
-  { "SGN",	1, 1, lux_sgn, "*" }, /* fun1.c */
-  { "SHIFT",	1, 4, lux_shift_f, ":::BLANK:1TRANSLATE" }, /* strous2.c */
-  { "SHIFT3",	2, 3, lux_shift3, 0 }, /* fun4.c */
-  { "SIDEREALTIME", 1, 1, lux_siderealtime, "1ATZEROTIME" }, /* astron.c */
-  { "SIEVE",	1, 2, lux_sieve, 0 }, /* fun3.c */
-  { "SIN", 	1, 1, lux_sin, "*" }, /* fun1.c */
-  { "SINH",	1, 1, lux_sinh, "*" }, /* fun1.c */
-  { "SKIPC",	2, 2, lux_skipc, 0 }, /* fun2.c */
-  { "SMAP",	1, 1, lux_smap, "1TRUNCATE:2ARRAY" }, /* subsc.c */
-  { "SMOOTH",	1, 3, lux_smooth, "1PARTIAL_WIDTH:4ALL" }, /* strous.c */
-  { "SOLAR_B",	1, 1, lux_solar_b, "*2MODERN" }, /* ephem2.c */
-  { "SOLAR_L",	1, 1, lux_solar_l, "*1FULL:2MODERN" }, /* ephem2.c */
-  { "SOLAR_P",	1, 1, lux_solar_p, "*2MODERN" }, /* ephem2.c */
-  { "SOLAR_R",	1, 1, lux_solar_r, "*" }, /* ephem2.c */
-  { "SORT",	1, 1, lux_sort, "*1HEAP:2SHELL:4AXIS" }, /* fun4.c */
-  { "SPAWN",	1, 1, lux_spawn_f, 0 }, /* files.c */
-  { "SPRINTF",	1, MAX_ARG, lux_fstring, "1SKIP_UNDEFINED" }, /* fun2.c */
-  { "SQRT",	1, 1, lux_sqrt, "*" }, /* fun1.c */
-  { "SSCANF",	3, MAX_ARG, lux_freads_f, "1COUNTSPACES" }, /* files.c */
-  { "STORE",	2, 3, lux_fzwrite_f, "1SAFE" }, /* files.c */
-  { "STR",	1, MAX_ARG, lux_string, 0 }, /* fun2.c */
-  { "STRARR",	2, 1 + MAX_DIMS, strarr, "%1%SIZE" }, /* symbols.c */
-  { "STRCOUNT",	2, 2, lux_strcount, 0 }, /* fun2.c */
-  { "STRETCH",	2, 2, lux_stretch, 0 }, /* fun4.c */
-  { "STRING",	1, MAX_ARG, lux_string, 0 }, /* fun2.c */
-  { "STRLEN",	1, 1, lux_strlen, 0 }, /* fun2.c */
-  { "STRLOC",	2, 2, lux_strloc, 0 }, /* fun2.c */
-  { "STRPBRK",	2, 2, lux_strpbrk, 0 },	/* fun2.c */
-  { "STRPOS",	2, 3, lux_strpos, 0 }, /* fun2.c */
-  { "STRR",	3, 4, lux_strreplace, 0 }, /* fun2.c */
-  { "STRREPLACE", 3, 4, lux_strreplace, 0 }, /* fun2.c */
-  { "STRSKP",	2, 2, lux_strskp, 0 }, /* fun2.c */
-  { "STRSUB",	3, 3, lux_strsub, 0 }, /* fun2.c */
-  { "STRTOK",	1, 2, lux_strtok, "1SKIP_FINAL_DELIM" }, /* fun2.c */
-  { "STRTOL",	1, 2, lux_strtol, 0 }, /* fun3.c */
-  { "STRTRIM",	1, 1, lux_strtrim, 0 }, /* fun2.c */
+  { "reorder",	2, 2, lux_reorder, 0 },	/* fun6.c */
+  { "restore",	2, 3, lux_fzread_f, "1printheader" }, /* files.c */
+  { "reverse",	1, MAX_ARG, lux_reverse, "1zero" }, /* subsc.c */
+  { "rfix",	1, 1, lux_rfix, "*" }, /* symbols.c */
+  { "roll",	2, 2, lux_roll, 0 }, /* subsc.c */
+  { "root3",	3, 3, lux_root3, 0 }, /* orientation.c */
+  { "runcum",	1, 3, lux_runcum, "*1partial_width:2varsum" }, /* strous.c */
+  { "runprod",	1, 2, lux_runprod, "*" }, /* strous2.c */
+  { "runsum",	1, 3, lux_runsum, "*" }, /* fun2.c */
+  { "scale",	1, 3, lux_scale, "*1fullrange:2zoom" }, /* fun3.c */
+  { "scalerange", 3, 5, lux_scalerange, "*1fullrange:2zoom" }, /* fun3.c */
+  { "scanf",	2, MAX_ARG, lux_freadf_f, "|1|1eof" }, /* files.c */
+  { "sdev",	1, 3, lux_sdev, /* fun2.c */
+    "::weights:*0sample:1population:2keepdims:4double" },
+  { "segment",	1, 3, lux_segment, ":sign:diagonal:1degree" }, /* topology.c */
+  { "segmentdir", 2, 3, lux_segment_dir, "::sign" }, /* topology.c */
+  { "sgn",	1, 1, lux_sgn, "*" }, /* fun1.c */
+  { "shift",	1, 4, lux_shift_f, ":::blank:1translate" }, /* strous2.c */
+  { "shift3",	2, 3, lux_shift3, 0 }, /* fun4.c */
+  { "siderealtime", 1, 1, lux_siderealtime, "1atzerotime" }, /* astron.c */
+  { "sieve",	1, 2, lux_sieve, 0 }, /* fun3.c */
+  { "sin", 	1, 1, lux_sin, "*" }, /* fun1.c */
+  { "sinh",	1, 1, lux_sinh, "*" }, /* fun1.c */
+  { "skipc",	2, 2, lux_skipc, 0 }, /* fun2.c */
+  { "smap",	1, 1, lux_smap, "1truncate:2array" }, /* subsc.c */
+  { "smooth",	1, 3, lux_smooth, "1partial_width:4all" }, /* strous.c */
+  { "solar_b",	1, 1, lux_solar_b, "*2modern" }, /* ephem2.c */
+  { "solar_l",	1, 1, lux_solar_l, "*1full:2modern" }, /* ephem2.c */
+  { "solar_p",	1, 1, lux_solar_p, "*2modern" }, /* ephem2.c */
+  { "solar_r",	1, 1, lux_solar_r, "*" }, /* ephem2.c */
+  { "sort",	1, 1, lux_sort, "*1heap:2shell:4axis" }, /* fun4.c */
+  { "spawn",	1, 1, lux_spawn_f, 0 }, /* files.c */
+  { "sprintf",	1, MAX_ARG, lux_fstring, "1skip_undefined" }, /* fun2.c */
+  { "sqrt",	1, 1, lux_sqrt, "*" }, /* fun1.c */
+  { "sscanf",	3, MAX_ARG, lux_freads_f, "1countspaces" }, /* files.c */
+  { "store",	2, 3, lux_fzwrite_f, "1safe" }, /* files.c */
+  { "str",	1, MAX_ARG, lux_string, 0 }, /* fun2.c */
+  { "strarr",	2, 1 + MAX_DIMS, strarr, "%1%size" }, /* symbols.c */
+  { "strcount",	2, 2, lux_strcount, 0 }, /* fun2.c */
+  { "stretch",	2, 2, lux_stretch, 0 }, /* fun4.c */
+  { "string",	1, MAX_ARG, lux_string, 0 }, /* fun2.c */
+  { "strlen",	1, 1, lux_strlen, 0 }, /* fun2.c */
+  { "strloc",	2, 2, lux_strloc, 0 }, /* fun2.c */
+  { "strpbrk",	2, 2, lux_strpbrk, 0 },	/* fun2.c */
+  { "strpos",	2, 3, lux_strpos, 0 }, /* fun2.c */
+  { "strr",	3, 4, lux_strreplace, 0 }, /* fun2.c */
+  { "strreplace", 3, 4, lux_strreplace, 0 }, /* fun2.c */
+  { "strskp",	2, 2, lux_strskp, 0 }, /* fun2.c */
+  { "strsub",	3, 3, lux_strsub, 0 }, /* fun2.c */
+  { "strtok",	1, 2, lux_strtok, "1skip_final_delim" }, /* fun2.c */
+  { "strtol",	1, 2, lux_strtol, 0 }, /* fun3.c */
+  { "strtrim",	1, 1, lux_strtrim, 0 }, /* fun2.c */
 #if DEVELOP
-  { "STRUCT",	2, MAX_ARG, lux_struct, 0 }, /* install.c */
+  { "struct",	2, MAX_ARG, lux_struct, 0 }, /* install.c */
 #endif
-  { "STUDENT",	2, 2, lux_student, "*1COMPLEMENT:2LOG" }, /* fun1.c */
-  { "SUN_B",	2, 2, lux_sun_b, 0 }, /* ephem.c */
-  { "SUN_D",	2, 2, lux_sun_d, 0 }, /* ephem.c */
-  { "SUN_P",	2, 2, lux_sun_p, 0 }, /* ephem.c */
-  { "SUN_R",	2, 2, lux_sun_r, 0 }, /* ephem.c */
-  { "SYMBOL",	1, 1, lux_symbol, "1MAIN" }, /* symbols.c */
-  { "SYMCLASS",	1, 1, lux_symclass, "+|1|1FOLLOW:2NUMBER" }, /* subsc.c */
-  { "SYMDTYPE",	1, 1, lux_symdtype, 0 }, /* subsc.c */
-  { "SYMMEM",	0, 0, lux_symbol_memory, 0 }, /* install.c */
-  { "SYMNUM",	1, 1, lux_symbol_number, 0 }, /* install.c */
-  { "TABLE",	3, 4, lux_table, "|2|1ALL:2MIDDLE" }, /* strous.c */
-  { "TAI_FROM_DATE", 5, 5, lux_tai_from_date, 0 }, /* ephem.c */
-  { "TAN", 	1, 1, lux_tan, "*" }, /* fun1.c */
-  { "TANH", 	1, 1, lux_tanh, "*" }, /* fun1.c */
-  { "TEMPORARY", 1, 1, lux_temp, 0 }, /* strous2.c */
-  { "TENSE",	3, 6, lux_tense, 0 }, /* fun3.c */
-  { "TENSE_CURVE", 3, 6, lux_tense_curve, 0 }, /* fun3.c */
-  { "TENSE_LOOP", 3, 4, lux_tense_loop, 0 }, /* fun3.c */
+  { "student",	2, 2, lux_student, "*1complement:2log" }, /* fun1.c */
+  { "sun_b",	2, 2, lux_sun_b, 0 }, /* ephem.c */
+  { "sun_d",	2, 2, lux_sun_d, 0 }, /* ephem.c */
+  { "sun_p",	2, 2, lux_sun_p, 0 }, /* ephem.c */
+  { "sun_r",	2, 2, lux_sun_r, 0 }, /* ephem.c */
+  { "symbol",	1, 1, lux_symbol, "1main" }, /* symbols.c */
+  { "symclass",	1, 1, lux_symclass, "+|1|1follow:2number" }, /* subsc.c */
+  { "symdtype",	1, 1, lux_symdtype, 0 }, /* subsc.c */
+  { "symmem",	0, 0, lux_symbol_memory, 0 }, /* install.c */
+  { "symnum",	1, 1, lux_symbol_number, 0 }, /* install.c */
+  { "table",	3, 4, lux_table, "|2|1all:2middle" }, /* strous.c */
+  { "tai_from_date", 5, 5, lux_tai_from_date, 0 }, /* ephem.c */
+  { "tan", 	1, 1, lux_tan, "*" }, /* fun1.c */
+  { "tanh", 	1, 1, lux_tanh, "*" }, /* fun1.c */
+  { "temporary", 1, 1, lux_temp, 0 }, /* strous2.c */
+  { "tense",	3, 6, lux_tense, 0 }, /* fun3.c */
+  { "tense_curve", 3, 6, lux_tense_curve, 0 }, /* fun3.c */
+  { "tense_loop", 3, 4, lux_tense_loop, 0 }, /* fun3.c */
 #if DEVELOP
-  { "TEST",	2, 3, lux_test, 0 }, /* execute.c */
+  { "test",	2, 3, lux_test, 0 }, /* execute.c */
 #endif
-  { "TOTAL", 	1, 4, lux_total, "::POWER:WEIGHTS:1DOUBLE:2KEEPDIMS:4FLOAT" }, /* fun1.c */
-  { "TRACE_DECODER", 3, 3, lux_trace_decoder, 0 }, /* trace_decoder_ana.c */
-  { "TREND",	1, 2, lux_trend, "*" }, /* fun2.c */
-  { "TRI_NAME_FROM_TAI", 1, 1, lux_tri_name_from_tai, 0 }, /* ephem.c */
+  { "total", 	1, 4, lux_total, "::power:weights:1double:2keepdims:4float" }, /* fun1.c */
+  { "trace_decoder", 3, 3, lux_trace_decoder, 0 }, /* trace_decoder_ana.c */
+  { "trend",	1, 2, lux_trend, "*" }, /* fun2.c */
+  { "tri_name_from_tai", 1, 1, lux_tri_name_from_tai, 0 }, /* ephem.c */
 #if HAVE_LIBX11
-  { "TVREAD",	1, 5, lux_xtvread, "1GREYSCALE" }, /* xport.c */
+  { "tvread",	1, 5, lux_xtvread, "1greyscale" }, /* xport.c */
 #endif
-  { "TYPENAME",	1, 1, lux_typeName, 0 }, /* install.c */
-  { "UPCASE",	1, 1, lux_upper, 0 }, /* fun2.c */
-  { "UPPER",	1, 1, lux_upper, 0 }, /* fun2.c */
-  { "VARIANCE", 1, 3, lux_variance, /* fun2.c */
-    "::WEIGHTS:*0SAMPLE:1POPULATION:2KEEPDIMS:4DOUBLE" },
-  { "VARNAME",	1, 1, lux_varname, 0 }, /* symbols.c */
-  { "VOIGT",	2, 2, lux_voigt, "*" }, /* fun1.c */
-  { "WMAP",	1, 1, lux_wmap, 0 }, /* subsc.c */
-  { "WORD",	1, 1, lux_word, "*" }, /* symbols.c */
-  { "WRITEU",	2, MAX_ARG, lux_writeu, 0 }, /* files.c */
+  { "typename",	1, 1, lux_typeName, 0 }, /* install.c */
+  { "upcase",	1, 1, lux_upper, 0 }, /* fun2.c */
+  { "upper",	1, 1, lux_upper, 0 }, /* fun2.c */
+  { "variance", 1, 3, lux_variance, /* fun2.c */
+    "::weights:*0sample:1population:2keepdims:4double" },
+  { "varname",	1, 1, lux_varname, 0 }, /* symbols.c */
+  { "voigt",	2, 2, lux_voigt, "*" }, /* fun1.c */
+  { "wmap",	1, 1, lux_wmap, 0 }, /* subsc.c */
+  { "word",	1, 1, lux_word, "*" }, /* symbols.c */
+  { "writeu",	2, MAX_ARG, lux_writeu, 0 }, /* files.c */
 #if HAVE_LIBJPEG
-  { "WRITE_JPEG", 2, 4, lux_write_jpeg6b_f, 0 }, /* jpeg.c */
+  { "write_jpeg", 2, 4, lux_write_jpeg6b_f, 0 }, /* jpeg.c */
 #endif
 #if HAVE_LIBX11
-  { "XEXIST",	1, 1, lux_xexist, 0 }, /* xport.c */
-  { "XLABELWIDTH", 1, 1, lux_xlabelwidth, 0 }, /* xport.c */
+  { "xexist",	1, 1, lux_xexist, 0 }, /* xport.c */
+  { "xlabelwidth", 1, 1, lux_xlabelwidth, 0 }, /* xport.c */
 #if MOTIF
-  { "XMADDFILETOLIST", 2, 2, lux_xmaddfiletolist, 0 }, /* motif.c */
-  { "XMARROW",	3, 4, lux_xmarrow, 0 }, /* motif.c */
-  { "XMBOARD",	1, 5, lux_xmboard, 0 }, /* motif.c */
-  { "XMBUTTON",	3, 5, lux_xmbutton, 0 }, /* motif.c */
-  { "XMCHECKBOX", 5, 32, lux_xmcheckbox, 0 }, /* motif.c */
-  { "XMCOLUMNS", 3, 5, lux_xmcolumns, 0 }, /* motif.c */
-  { "XMCOMMAND", 3, 7, lux_xmcommand, 0 }, /* motif.c */
-  { "XMDIALOG_BOARD", 4, 9, lux_xmdialog_board, 0 }, /* motif.c */
-  { "XMDIALOG_FORM", 4, 8, lux_xmdialog_form, 0 }, /* motif.c */
-  { "XMDRAWINGAREA", 2, 7, lux_xmdrawingarea, 0 }, /* motif.c */
-  { "XMFILEGETLIST",	1, 1, lux_xmfilegetlist, 0 }, /* motif.c */
-  { "XMFILESELECT", 3, 12, lux_xmfileselect, 0 }, /* motif.c */
-  { "XMFORM",	1, 7, lux_xmform, 0 }, /* motif.c */
-  { "XMFRAME",	1, 5, lux_xmframe, 0 }, /* motif.c */
-  { "XMGETOPTIONSELECTION", 1, 1, lux_xmgetoptionselection, 0 }, /* motif.c */
-  { "XMGETWIDGETADDRESS", 1, 1, lux_xmgetwidgetaddress, 0 }, /* motif.c */
-  { "XMHSCALE",	5, 8, lux_xmhscale, 0 }, /* motif.c */
-  { "XMHSCROLLBAR",	5, 6, lux_xmhscrollbar, 0 }, /* motif.c */
-  { "XMLABEL",	2, 5, lux_xmlabel, 0 }, /* motif.c */
-  { "XMLIST",	3, 6, lux_xmlist, 0 }, /* motif.c */
-  { "XMLISTCOUNT", 1, 1, lux_xmlistcount, 0 }, /* motif.c */
-  { "XMLISTFROMFILE", 4, 6, lux_xmlistfromfile, 0 }, /* motif.c */
-  { "XMMENUBAR", 4, 32, lux_xmmenubar, 0 }, /* motif.c */
-  { "XMOPTIONMENU", 6, 50, lux_xmoptionmenu, 0 }, /* motif.c */
-  { "XMPIXMAPBUTTON", 3, 3, lux_xmpixmapbutton, 0 }, /* motif.c */
-  { "XMPIXMAPOPTIONMENU", 6, 32, lux_xmpixmapoptionmenu, 0 }, /* motif.c */
-  { "XMPULLDOWNMENU", 6, 32, lux_xmpulldownmenu, 0 }, /* motif.c */
-  { "XMRADIOBOX", 5, 32, lux_xmradiobox, 0 }, /* motif.c */
-  { "XMROWS",	3, 5, lux_xmrows, 0 }, /* motif.c */
-  { "XMSCALEGETVALUE", 1, 1, lux_xmscalegetvalue, 0 }, /* motif.c */
-  { "XMSCROLLEDWINDOW", 3, 3, lux_xmscrolledwindow, 0 }, /* motif.c */
-  { "XMSCROLLEDWINDOWAPP", 1, 4, lux_xmscrolledwindowapp, 0 }, /* motif.c */
-  { "XMSEPARATOR", 1, 4, lux_xmseparator, 0 }, /* motif.c */
-  { "XMTEXT",	1, 5, lux_xmtext, 0 }, /* motif.c */
-  { "XMTEXTBOX", 1, 5, lux_xmtextbox, 0 }, /* motif.c */
-  { "XMTEXTFIELD", 4, 8, lux_xmtextfield, 0 }, /* motif.c */
-  { "XMTEXTFIELDARRAY", 9, 40, lux_xmtextfieldarray, 0 }, /* motif.c */
-  { "XMTEXTFIELDGETSTRING", 1, 1, lux_xmtextfieldgetstring, 0 }, /* motif.c */
-  { "XMTEXTFROMFILE", 2, 6, lux_xmtextfromfile, 0 }, /* motif.c */
-  { "XMTEXTGETINSERTPOSITION", 1, 1, lux_xmtextgetinsertposition, 0 }, /* motif.c */
-  { "XMTEXTGETLASTPOSITION",	1, 1, lux_xmtextgetlastposition, 0 }, /* motif.c */
-  { "XMTEXTGETSELECTION",	1, 3, lux_xmtextgetselection, 0 }, /* motif.c */
-  { "XMTEXTGETSTRING", 1, 1, lux_xmtextgetstring, 0 }, /* motif.c */
-  { "XMTOGGLEGETSTATE", 1, 1, lux_xmtogglegetstate, 0 }, /* motif.c */
-  { "XMTOPLEVEL_BOARD", 3, 5, lux_xmtoplevel_board, 0 }, /* motif.c */
-  { "XMTOPLEVEL_FORM", 3, 7, lux_xmtoplevel_form, 0 }, /* motif.c */
-  { "XMVSCALE",	5, 8, lux_xmvscale, 0 }, /* motif.c */
-  { "XMVSCROLLBAR",	5, 6, lux_xmvscrollbar, 0 }, /* motif.c */
+  { "xmaddfiletolist", 2, 2, lux_xmaddfiletolist, 0 }, /* motif.c */
+  { "xmarrow",	3, 4, lux_xmarrow, 0 }, /* motif.c */
+  { "xmboard",	1, 5, lux_xmboard, 0 }, /* motif.c */
+  { "xmbutton",	3, 5, lux_xmbutton, 0 }, /* motif.c */
+  { "xmcheckbox", 5, 32, lux_xmcheckbox, 0 }, /* motif.c */
+  { "xmcolumns", 3, 5, lux_xmcolumns, 0 }, /* motif.c */
+  { "xmcommand", 3, 7, lux_xmcommand, 0 }, /* motif.c */
+  { "xmdialog_board", 4, 9, lux_xmdialog_board, 0 }, /* motif.c */
+  { "xmdialog_form", 4, 8, lux_xmdialog_form, 0 }, /* motif.c */
+  { "xmdrawingarea", 2, 7, lux_xmdrawingarea, 0 }, /* motif.c */
+  { "xmfilegetlist",	1, 1, lux_xmfilegetlist, 0 }, /* motif.c */
+  { "xmfileselect", 3, 12, lux_xmfileselect, 0 }, /* motif.c */
+  { "xmform",	1, 7, lux_xmform, 0 }, /* motif.c */
+  { "xmframe",	1, 5, lux_xmframe, 0 }, /* motif.c */
+  { "xmgetoptionselection", 1, 1, lux_xmgetoptionselection, 0 }, /* motif.c */
+  { "xmgetwidgetaddress", 1, 1, lux_xmgetwidgetaddress, 0 }, /* motif.c */
+  { "xmhscale",	5, 8, lux_xmhscale, 0 }, /* motif.c */
+  { "xmhscrollbar",	5, 6, lux_xmhscrollbar, 0 }, /* motif.c */
+  { "xmlabel",	2, 5, lux_xmlabel, 0 }, /* motif.c */
+  { "xmlist",	3, 6, lux_xmlist, 0 }, /* motif.c */
+  { "xmlistcount", 1, 1, lux_xmlistcount, 0 }, /* motif.c */
+  { "xmlistfromfile", 4, 6, lux_xmlistfromfile, 0 }, /* motif.c */
+  { "xmmenubar", 4, 32, lux_xmmenubar, 0 }, /* motif.c */
+  { "xmoptionmenu", 6, 50, lux_xmoptionmenu, 0 }, /* motif.c */
+  { "xmpixmapbutton", 3, 3, lux_xmpixmapbutton, 0 }, /* motif.c */
+  { "xmpixmapoptionmenu", 6, 32, lux_xmpixmapoptionmenu, 0 }, /* motif.c */
+  { "xmpulldownmenu", 6, 32, lux_xmpulldownmenu, 0 }, /* motif.c */
+  { "xmradiobox", 5, 32, lux_xmradiobox, 0 }, /* motif.c */
+  { "xmrows",	3, 5, lux_xmrows, 0 }, /* motif.c */
+  { "xmscalegetvalue", 1, 1, lux_xmscalegetvalue, 0 }, /* motif.c */
+  { "xmscrolledwindow", 3, 3, lux_xmscrolledwindow, 0 }, /* motif.c */
+  { "xmscrolledwindowapp", 1, 4, lux_xmscrolledwindowapp, 0 }, /* motif.c */
+  { "xmseparator", 1, 4, lux_xmseparator, 0 }, /* motif.c */
+  { "xmtext",	1, 5, lux_xmtext, 0 }, /* motif.c */
+  { "xmtextbox", 1, 5, lux_xmtextbox, 0 }, /* motif.c */
+  { "xmtextfield", 4, 8, lux_xmtextfield, 0 }, /* motif.c */
+  { "xmtextfieldarray", 9, 40, lux_xmtextfieldarray, 0 }, /* motif.c */
+  { "xmtextfieldgetstring", 1, 1, lux_xmtextfieldgetstring, 0 }, /* motif.c */
+  { "xmtextfromfile", 2, 6, lux_xmtextfromfile, 0 }, /* motif.c */
+  { "xmtextgetinsertposition", 1, 1, lux_xmtextgetinsertposition, 0 }, /* motif.c */
+  { "xmtextgetlastposition",	1, 1, lux_xmtextgetlastposition, 0 }, /* motif.c */
+  { "xmtextgetselection",	1, 3, lux_xmtextgetselection, 0 }, /* motif.c */
+  { "xmtextgetstring", 1, 1, lux_xmtextgetstring, 0 }, /* motif.c */
+  { "xmtogglegetstate", 1, 1, lux_xmtogglegetstate, 0 }, /* motif.c */
+  { "xmtoplevel_board", 3, 5, lux_xmtoplevel_board, 0 }, /* motif.c */
+  { "xmtoplevel_form", 3, 7, lux_xmtoplevel_form, 0 }, /* motif.c */
+  { "xmvscale",	5, 8, lux_xmvscale, 0 }, /* motif.c */
+  { "xmvscrollbar",	5, 6, lux_xmvscrollbar, 0 }, /* motif.c */
 #endif
-  { "XQUERY",	0, 1, lux_xquery_f, 0 }, /* xport.c */
+  { "xquery",	0, 1, lux_xquery_f, 0 }, /* xport.c */
 #if MOTIF
-  { "XTPARENT",	1, 1, lux_xtparent, 0 }, /* motif.c */
+  { "xtparent",	1, 1, lux_xtparent, 0 }, /* motif.c */
 #endif
-  { "XTVREAD",	1, 5, lux_xtvread, "1GREYSCALE" }, /* xport.c */
+  { "xtvread",	1, 5, lux_xtvread, "1greyscale" }, /* xport.c */
 #if MOTIF
-  { "XTWINDOW",	1, 1, lux_xtwindow, 0 }, /* motif.c */
+  { "xtwindow",	1, 1, lux_xtwindow, 0 }, /* motif.c */
 #endif
 #endif
-  { "ZERO", 	1, 1, lux_zerof, "*" }, /* fun1.c */
-  { "ZERONANS",	1, 2, lux_zapnan_f, "*%1%VALUE" }, /* fun1.c */
-  { "ZINV",	1, 1, lux_zinv, "*" }, /* strous.c */
+  { "zero", 	1, 1, lux_zerof, "*" }, /* fun1.c */
+  { "zeronans",	1, 2, lux_zapnan_f, "*%1%value" }, /* fun1.c */
+  { "zinv",	1, 1, lux_zinv, "*" }, /* strous.c */
 };
 int32_t nFunction = sizeof(function_table)/sizeof(internalRoutine);
 /*----------------------------------------------------------------*/
@@ -4367,54 +4367,54 @@ void symbolInitialization(void)
               0, function[i].name);
    installKeys(&function[i].keys);
  }
- LUX_MATMUL_FUN = findInternalName("MPRODUCT", 0);
+ LUX_MATMUL_FUN = findInternalName("mproduct", 0);
  inputStream = stdin;
  outputStream = stdout;
- l_fix("#ZERO", 	0);
+ l_fix("#zero", 	0);
  l_fix("#1", 		1);
- l_fix("#MINUS1", 	-1);
+ l_fix("#minus1", 	-1);
  l_fix("#42", 		42);
  l_fix("#0", 		0);
- f_fix("#INFTY",	INFTY);
- cf_fix("#I",		0.0, 1.0); /* imaginary unit */
- l_fix("#MAX_ARGS",	MAX_ARG);
- l_fix("#MAX_BYTE",	bounds.max.b);
- l_fix("#MAX_WORD",	bounds.max.w);
- l_fix("#MAX_LONG",	bounds.max.l);
- q_fix("#MAX_INT64",    bounds.max.q);
- f_fix("#MAX_FLOAT", 	bounds.max.f);
- d_fix("#MAX_DOUBLE", 	bounds.max.d);
- l_fix("#MIN_WORD",	bounds.min.w);
- l_fix("#MIN_LONG",	bounds.min.l);
- q_fix("#MIN_INT64",    bounds.min.q);
- f_fix("#MIN_FLOAT", 	FLT_MIN);
- d_fix("#MIN_DOUBLE", 	DBL_MIN);
- l_fix("#MAX_DIMS",	MAX_DIMS);
- f_fix("#EPS_FLOAT",    FLT_EPSILON);
- d_fix("#EPS_DOUBLE",   DBL_EPSILON);
+ f_fix("#infty",	INFTY);
+ cf_fix("#i",		0.0, 1.0); /* imaginary unit */
+ l_fix("#max_args",	MAX_ARG);
+ l_fix("#max_byte",	bounds.max.b);
+ l_fix("#max_word",	bounds.max.w);
+ l_fix("#max_long",	bounds.max.l);
+ q_fix("#max_int64",    bounds.max.q);
+ f_fix("#max_float", 	bounds.max.f);
+ d_fix("#max_double", 	bounds.max.d);
+ l_fix("#min_word",	bounds.min.w);
+ l_fix("#min_long",	bounds.min.l);
+ q_fix("#min_int64",    bounds.min.q);
+ f_fix("#min_float", 	FLT_MIN);
+ d_fix("#min_double", 	DBL_MIN);
+ l_fix("#max_dims",	MAX_DIMS);
+ f_fix("#eps_float",    FLT_EPSILON);
+ d_fix("#eps_double",   DBL_EPSILON);
 #if HAVE_LIBX11
- l_fix("#NUM_WINDOWS",  MAXWINDOWS - 1);
- l_fix("#NUM_PIXMAPS",  MAXPIXMAPS - 1);
+ l_fix("#num_windows",  MAXWINDOWS - 1);
+ l_fix("#num_pixmaps",  MAXPIXMAPS - 1);
 #endif
- d_fix("#PI",		M_PI);
- d_fix("#2PI",		2*M_PI);
- d_fix("#E",		M_E);
- d_fix("#C",		299792458e0);
+ d_fix("#pi",		M_PI);
+ d_fix("#2pi",		2*M_PI);
+ d_fix("#e",		M_E);
+ d_fix("#c",		299792458e0);
  d_fix("#G",		6.668E-8);
- d_fix("#H",		6.6252E-27);
- d_fix("#HB",		1.0544E-27);
- d_fix("#EC",		6.6252E-27);
- d_fix("#M",		9.1084E-28);
- d_fix("#K",		1.308046E-16);
+ d_fix("#h",		6.6252E-27);
+ d_fix("#hb",		1.0544E-27);
+ d_fix("#ec",		6.6252E-27);
+ d_fix("#m",		9.1084E-28);
+ d_fix("#k",		1.308046E-16);
  d_fix("#R",		8.317E7);
- d_fix("#RAD",		RAD);
+ d_fix("#rad",		RAD);
  r_d_sym = nFixed;
- d_fix("#R.D",		RAD);
- d_fix("#DEG",		DEG);
+ d_fix("#r.d",		RAD);
+ d_fix("#deg",		DEG);
  d_r_sym = nFixed;
- d_fix("#D.R",		DEG);
+ d_fix("#d.r",		DEG);
 
- iq = installString("#CLASS");
+ iq = installString("#class");
  stackSym = findVar(iq, 0);	/* stackSym is a dummy variable */
  symbol_class(stackSym) = LUX_ENUM;
  enum_type(stackSym) = LUX_INT32;
@@ -4422,7 +4422,7 @@ void symbolInitialization(void)
  symbol_memory(stackSym) = sizeof(classesStruct);
  nFixed++;
 
- iq = installString("#COORDSYS");
+ iq = installString("#coordsys");
  stackSym = findVar(iq, 0);
  symbol_class(stackSym) = LUX_ENUM;
  enum_type(stackSym) = LUX_INT32;
@@ -4430,7 +4430,7 @@ void symbolInitialization(void)
  symbol_memory(stackSym) = sizeof(coordSysStruct);
  nFixed++;
 
- iq = installString("#EVENT");
+ iq = installString("#event");
  stackSym = findVar(iq, 0);
  symbol_class(stackSym) = LUX_ENUM;
  enum_type(stackSym) = LUX_INT32;
@@ -4438,7 +4438,7 @@ void symbolInitialization(void)
  symbol_memory(stackSym) = sizeof(eventStruct);
  nFixed++;
 
- iq = installString("#FILETYPE");
+ iq = installString("#filetype");
  stackSym = findVar(iq, 0);
  symbol_class(stackSym) = LUX_ENUM;
  enum_type(stackSym) = LUX_INT32;
@@ -4446,7 +4446,7 @@ void symbolInitialization(void)
  symbol_memory(stackSym) = sizeof(filetypeStruct);
  nFixed++;
 
- iq = installString("#TYPE");
+ iq = installString("#type");
  stackSym = findVar(iq, 0);
  symbol_class(stackSym) = LUX_ENUM;
  enum_type(stackSym) = LUX_INT32;
@@ -4455,7 +4455,7 @@ void symbolInitialization(void)
  nFixed++;
 
 #if DEVELOP
- iq = installString("#P3D");
+ iq = installString("#p3d");
  projectSym = findVar(iq, 0);
  symbol_class(projectSym) = LUX_ARRAY;
  array_type(projectSym) = LUX_FLOAT;
@@ -4470,281 +4470,281 @@ void symbolInitialization(void)
  nFixed++;
 #endif
 
- iq = installString("#STACK");
+ iq = installString("#stack");
  stackSym = findVar(iq, 0);
  symbol_class(stackSym) = LUX_CLIST;
  clist_symbols(stackSym) = stackPointer;
  symbol_memory(stackSym) = 0;	/* or it will get deallocated sometime */
  nFixed++;
 
- iq = findVarName("#TYPESIZE", 0);
+ iq = findVarName("#typesize", 0);
  i = LUX_NO_SYMBOLTYPE; /* lux_type_size[] # elements! */
  to_scratch_array(iq, LUX_INT32, 1, &i);
  memcpy(array_data(iq), lux_type_size, i*sizeof(int32_t));
 
- /* s_fix("#NL",		"\n"); */
- l_ptr("#COL",		&termCol);
- l_ptr("#ROW",		&termRow);
+ /* s_fix("#nl",		"\n"); */
+ l_ptr("#col",		&termCol);
+ l_ptr("#row",		&termRow);
 
- l_ptr("#MSBFIRST",	&MSBfirst);
- s_ptr("#VERSION",	(char*) PACKAGE_VERSION);
+ l_ptr("#msbfirst",	&MSBfirst);
+ s_ptr("#version",	(char*) PACKAGE_VERSION);
 
- l_ptr("!AREA_DIAG",	&area_diag);
- l_ptr("!AUTOCON", 	&autocon);
- l_ptr("!BADMATCH",	&badmatch);
- l_ptr("!BB_UPDATE",	&updateBoundingBox);
- l_ptr("!BC",		&byte_count);
+ l_ptr("!area_diag",	&area_diag);
+ l_ptr("!autocon", 	&autocon);
+ l_ptr("!badmatch",	&badmatch);
+ l_ptr("!bb_update",	&updateBoundingBox);
+ l_ptr("!bc",		&byte_count);
 #if HAVE_LIBX11
- l_ptr("!BUTTON",	&lux_button);
+ l_ptr("!button",	&lux_button);
 #endif
- f_ptr("!BXB",		&postXBot);
- f_ptr("!BXT",		&postXTop);
- f_ptr("!BYB",		&postYBot);
- f_ptr("!BYT",		&postYTop);
- fnc_p("!CJD",		12);
- l_ptr("!COL",		&uTermCol);
+ f_ptr("!bxb",		&postXBot);
+ f_ptr("!bxt",		&postXTop);
+ f_ptr("!byb",		&postYBot);
+ f_ptr("!byt",		&postYTop);
+ fnc_p("!cjd",		12);
+ l_ptr("!col",		&uTermCol);
 #if HAVE_LIBX11
- l_ptr("!COLORMAX",	&colormax);
- l_ptr("!COLORMIN",	&colormin);
+ l_ptr("!colormax",	&colormax);
+ l_ptr("!colormin",	&colormin);
 #endif
- l_ptr("!CONTOUR_BORDER",	&contour_border);
- l_ptr("!CONTOUR_BOX", 	&contour_box);
- f_ptr("!CONTOUR_DASH_LEV",	&contour_dash_lev);
- l_ptr("!CONTOUR_MODE",	&contour_mode);
- l_ptr("!CONTOUR_NLEV", 	&contour_nlev);
- l_ptr("!CONTOUR_STYLE",	&contour_style);
- l_ptr("!CONTOUR_TICKS", 	&contour_ticks);
- l_ptr("!CONTOUR_TICK_PEN", 	&contour_tick_pen);
- f_ptr("!CONTOUR_TICK_FAC", 	&contour_tick_fac);
- fnc_p("!CPUTIME",	2);
- f_ptr("!CRATIO",	&callig_ratio);
- l_ptr("!CRUNCH_BITS",	&crunch_bits);
- f_ptr("!CRUNCH_BPP",	&crunch_bpp);
- l_ptr("!CRUNCH_SLICE", &crunch_slice);
- fnc_p("!CTIME",	5);
- f_ptr("!DASHSIZE",	&dashsize);
- fnc_p("!DATE",		7);
- l_ptr("!DESPIKE_COUNT", &despike_count);
- l_ptr("!DLABX",	&ndlabx);
- l_ptr("!DLABY",	&ndlaby);
- l_ptr("!DOT",		&ndot);
- l_ptr("!DOTS",		&ndot);
- l_ptr("!ERASE",	&ier);
- l_ptr("!ERROR_EXTRA",	&error_extra);
- l_ptr("!ERRNO",	&errno);
+ l_ptr("!contour_border",	&contour_border);
+ l_ptr("!contour_box", 	&contour_box);
+ f_ptr("!contour_dash_lev",	&contour_dash_lev);
+ l_ptr("!contour_mode",	&contour_mode);
+ l_ptr("!contour_nlev", 	&contour_nlev);
+ l_ptr("!contour_style",	&contour_style);
+ l_ptr("!contour_ticks", 	&contour_ticks);
+ l_ptr("!contour_tick_pen", 	&contour_tick_pen);
+ f_ptr("!contour_tick_fac", 	&contour_tick_fac);
+ fnc_p("!cputime",	2);
+ f_ptr("!cratio",	&callig_ratio);
+ l_ptr("!crunch_bits",	&crunch_bits);
+ f_ptr("!crunch_bpp",	&crunch_bpp);
+ l_ptr("!crunch_slice", &crunch_slice);
+ fnc_p("!ctime",	5);
+ f_ptr("!dashsize",	&dashsize);
+ fnc_p("!date",		7);
+ l_ptr("!despike_count", &despike_count);
+ l_ptr("!dlabx",	&ndlabx);
+ l_ptr("!dlaby",	&ndlaby);
+ l_ptr("!dot",		&ndot);
+ l_ptr("!dots",		&ndot);
+ l_ptr("!erase",	&ier);
+ l_ptr("!error_extra",	&error_extra);
+ l_ptr("!errno",	&errno);
 #if HAVE_LIBX11
- l_ptr("!EVENTSOURCE",	&eventSource);
- l_ptr("!EVENTTYPE",	&lux_event);
+ l_ptr("!eventsource",	&eventSource);
+ l_ptr("!eventtype",	&lux_event);
 #endif
- l_ptr("!FFTDP", 	&fftdp);
- l_ptr("!FONT",		&ifont);
+ l_ptr("!fftdp", 	&fftdp);
+ l_ptr("!font",		&ifont);
 #if HAVE_LIBX11
- l_ptr("!FOREGROUND_COLOR",	&foreground_pixel);
+ l_ptr("!foreground_color",	&foreground_pixel);
 #endif
- fformat = s_ptr("!FORMAT_F", strsave("%14.7g"));
- iformat = s_ptr("!FORMAT_I", strsave("%10jd"));
- sformat = s_ptr("!FORMAT_S", strsave("%s"));
- cformat = s_ptr("!FORMAT_C", strsave("%28.7z"));
+ fformat = s_ptr("!format_f", strsave("%14.7g"));
+ iformat = s_ptr("!format_i", strsave("%10jd"));
+ sformat = s_ptr("!format_s", strsave("%s"));
+ cformat = s_ptr("!format_c", strsave("%28.7z"));
  fmt_integer = string_value(iformat);
  fmt_float = string_value(fformat);
  fmt_string = string_value(sformat);
  fmt_complex = string_value(cformat);
- f_ptr("!FSIZE",	&fsized);
- l_ptr("!FSTEPX",	&fstepx);
- l_ptr("!FSTEPY",	&fstepy);
+ f_ptr("!fsize",	&fsized);
+ l_ptr("!fstepx",	&fstepx);
+ l_ptr("!fstepy",	&fstepy);
 #if DEVELOP
- l_ptr("!FSTEPZ",	&fstepz);
+ l_ptr("!fstepz",	&fstepz);
 #endif
- l_ptr("!FZ",		&ifz);
- l_ptr("!FZX",		&ifzx);
+ l_ptr("!fz",		&ifz);
+ l_ptr("!fzx",		&ifzx);
 #if DEVELOP
- l_ptr("!FZZ",		&ifzz);
+ l_ptr("!fzz",		&ifzz);
 #endif
- f_ptr("!HEIGHT",	&yfac);
- l_ptr("!HISTMIN", 	&histmin);
- l_ptr("!HISTMAX", 	&histmax);
- l_ptr("!IBLANK",	&iblank);
- l_ptr("!IORDER", 	&iorder);
+ f_ptr("!height",	&yfac);
+ l_ptr("!histmin", 	&histmin);
+ l_ptr("!histmax", 	&histmax);
+ l_ptr("!iblank",	&iblank);
+ l_ptr("!iorder", 	&iorder);
 #if HAVE_LIBX11
- l_ptr("!IX",		&xcoord);
+ l_ptr("!ix",		&xcoord);
 #endif
- l_ptr("!IXHIGH",	&ixhigh);
+ l_ptr("!ixhigh",	&ixhigh);
 #if HAVE_LIBX11
- l_ptr("!IY",		&ycoord);
+ l_ptr("!iy",		&ycoord);
 #endif
- l_ptr("!IYHIGH",	&iyhigh);
- fnc_p("!JD",		11);
+ l_ptr("!iyhigh",	&iyhigh);
+ fnc_p("!jd",		11);
 #if HAVE_LIBX11			/* a non-X11 version of this is needed */
- l_ptr("!KB",		&kb);
- l_ptr("!KEYCODE",	&lux_keycode);
- l_ptr("!KEYSTATE",	&lux_keystate);
- l_ptr("!KEYSYM",	&lux_keysym);
+ l_ptr("!kb",		&kb);
+ l_ptr("!keycode",	&lux_keycode);
+ l_ptr("!keystate",	&lux_keystate);
+ l_ptr("!keysym",	&lux_keysym);
 #endif
- l_ptr("!LABX",		&ilabx);
- l_ptr("!LABY",		&ilaby);
- l_ptr("!LANDSCAPE",	&landscape);
- l_ptr("!LASTMAX", 	&lastmax);
- l_ptr("!LASTMAXLOC", 	&lastmaxloc);
- l_ptr("!LASTMEAN",	&lastmean);
- l_ptr("!LASTMIN", 	&lastmin);
- l_ptr("!LASTMINLOC", 	&lastminloc);
- l_ptr("!LASTSDEV",	&lastsdev);
+ l_ptr("!labx",		&ilabx);
+ l_ptr("!laby",		&ilaby);
+ l_ptr("!landscape",	&landscape);
+ l_ptr("!lastmax", 	&lastmax);
+ l_ptr("!lastmaxloc", 	&lastmaxloc);
+ l_ptr("!lastmean",	&lastmean);
+ l_ptr("!lastmin", 	&lastmin);
+ l_ptr("!lastminloc", 	&lastminloc);
+ l_ptr("!lastsdev",	&lastsdev);
 #if HAVE_LIBX11
- l_ptr("!LAST_MENU",	&last_menu);
- f_ptr("!LUMPX",	&lumpx);
+ l_ptr("!last_menu",	&last_menu);
+ f_ptr("!lumpx",	&lumpx);
 #endif
- l_ptr("!MAXHISTSIZE", 	&maxhistsize);
- l_ptr("!MAXREGRIDSIZE", &maxregridsize);
+ l_ptr("!maxhistsize", 	&maxhistsize);
+ l_ptr("!maxregridsize", &maxregridsize);
 #if HAVE_LIBX11
- l_ptr("!MENU_ITEM",	&menu_item);
+ l_ptr("!menu_item",	&menu_item);
 #endif
- d_ptr("!MERITC",	&meritc);
+ d_ptr("!meritc",	&meritc);
 #if MOTIF
- l_ptr("!MOTIF",	&motif_flag);
+ l_ptr("!motif",	&motif_flag);
 #endif
- f_ptr("!MXB",		&xmin);
- f_ptr("!MXT",		&xmax);
- f_ptr("!MYB",		&ymin);
- f_ptr("!MYT",		&ymax);
+ f_ptr("!mxb",		&xmin);
+ f_ptr("!mxt",		&xmax);
+ f_ptr("!myb",		&ymin);
+ f_ptr("!myt",		&ymax);
 #if DEVELOP
- f_ptr("!MZB",		&zmin);
- f_ptr("!MZT",		&zmax);
+ f_ptr("!mzb",		&zmin);
+ f_ptr("!mzt",		&zmax);
 #endif
- l_ptr("!NARG",		&nArg);
+ l_ptr("!narg",		&nArg);
 #if HAVE_LIBX11
- l_ptr("!NCOLORCELLS",	&nColors);
+ l_ptr("!ncolorcells",	&nColors);
 #endif
- l_ptr("!NEXECUTED",	&nExecuted);
+ l_ptr("!nexecuted",	&nExecuted);
 #if HAVE_LIBX11
- l_ptr("!NOEVENTFLUSH",	&preventEventFlush);
+ l_ptr("!noeventflush",	&preventEventFlush);
 #endif
- l_ptr("!PDEV", 	&lunplt);
- l_ptr("!PEN",		&current_pen);
- l_ptr("!PLTYP",	&ipltyp);
- f_ptr("!PLXERRB",	&xerrsize);
- f_ptr("!PLYERRB",	&yerrsize);
+ l_ptr("!pdev", 	&lunplt);
+ l_ptr("!pen",		&current_pen);
+ l_ptr("!pltyp",	&ipltyp);
+ f_ptr("!plxerrb",	&xerrsize);
+ f_ptr("!plyerrb",	&yerrsize);
 #if HAVE_LIBX11
- l_ptr("!PRIVATE_COLORMAP", &private_colormap);
+ l_ptr("!private_colormap", &private_colormap);
 #endif
- psfile = s_ptr("!PS_FILE", strsave("junk.eps"));
- l_ptr("!RANGE_WARN_FLAG",	&range_warn_flag);
- l_ptr("!READ_COUNT",	&index_cnt);
- fnc_p("!READKEY",	8);
- fnc_p("!READKEYNE",	9);
- l_ptr("!REDIM_WARN_FLAG",	&redim_warn_flag);
+ psfile = s_ptr("!ps_file", strsave("junk.eps"));
+ l_ptr("!range_warn_flag",	&range_warn_flag);
+ l_ptr("!read_count",	&index_cnt);
+ fnc_p("!readkey",	8);
+ fnc_p("!readkeyne",	9);
+ l_ptr("!redim_warn_flag",	&redim_warn_flag);
 #if DEVELOP
- l_ptr("!REGRID_TYPE",	&resample_type);
+ l_ptr("!regrid_type",	&resample_type);
 #endif
 #if HAVE_LIBX11
- l_ptr("!ROOT_X",	&root_x);
- l_ptr("!ROOT_Y",	&root_y);
+ l_ptr("!root_x",	&root_x);
+ l_ptr("!root_y",	&root_y);
 #endif
- l_ptr("!ROW",		&page);
- l_ptr("!RX",		&irxf);
- l_ptr("!RY",		&iryf);
+ l_ptr("!row",		&page);
+ l_ptr("!rx",		&irxf);
+ l_ptr("!ry",		&iryf);
 #if DEVELOP
- l_ptr("!RZ",		&irzf);
+ l_ptr("!rz",		&irzf);
 #endif
- l_ptr("!SCALEMAX", 	&scalemax);
- l_ptr("!SCALEMIN", 	&scalemin);
+ l_ptr("!scalemax", 	&scalemax);
+ l_ptr("!scalemin", 	&scalemin);
 #if HAVE_LIBX11
- l_ptr("!SCREEN_HEIGHT", &display_height);
- l_ptr("!SCREEN_WIDTH",	&display_width);
+ l_ptr("!screen_height", &display_height);
+ l_ptr("!screen_width",	&display_width);
 #endif
- l_ptr("!SORT_FLAG",	&sort_flag);
- f_ptr("!STARTX",	&startx);
- f_ptr("!STARTY",	&starty);
- f_ptr("!STEPX",	&stepx);
- f_ptr("!STEPY",	&stepy);
- f_ptr("!SYMRATIO",	&symratio);
- f_ptr("!SYMSIZE",	&symsize);
- fnc_p("!SYSTIME",	10);
+ l_ptr("!sort_flag",	&sort_flag);
+ f_ptr("!startx",	&startx);
+ f_ptr("!starty",	&starty);
+ f_ptr("!stepx",	&stepx);
+ f_ptr("!stepy",	&stepy);
+ f_ptr("!symratio",	&symratio);
+ f_ptr("!symsize",	&symsize);
+ fnc_p("!systime",	10);
 #if HAVE_LIBX11
- l_ptr("!TEXTMENUS",	&text_menus); /* development of text menus */
+ l_ptr("!textmenus",	&text_menus); /* development of text menus */
 #endif
- f_ptr("!TICKX",	&ticx);
- f_ptr("!TICKXR",	&ticxr);
- f_ptr("!TICKY",	&ticy);
- f_ptr("!TICKYR",	&ticyr);
+ f_ptr("!tickx",	&ticx);
+ f_ptr("!tickxr",	&ticxr);
+ f_ptr("!ticky",	&ticy);
+ f_ptr("!tickyr",	&ticyr);
 #if DEVELOP
- f_ptr("!TICKZ",	&ticz);
- f_ptr("!TICKZR",	&ticzr);
+ f_ptr("!tickz",	&ticz);
+ f_ptr("!tickzr",	&ticzr);
 #endif
- fnc_p("!TIME",		6);
+ fnc_p("!time",		6);
 #if HAVE_LIBX11
- f_ptr("!TVIX",		&tvix);
- f_ptr("!TVIXB",	&tvixb);
- f_ptr("!TVIY",		&tviy);
- f_ptr("!TVIYB",	&tviyb);
- l_ptr("!TVPLANEZOOM",	&tvplanezoom); /* browser */
+ f_ptr("!tvix",		&tvix);
+ f_ptr("!tvixb",	&tvixb);
+ f_ptr("!tviy",		&tviy);
+ f_ptr("!tviyb",	&tviyb);
+ l_ptr("!tvplanezoom",	&tvplanezoom); /* browser */
 #endif
 #if HAVE_LIBX11
- f_ptr("!TVSCALE",	&tvscale);
+ f_ptr("!tvscale",	&tvscale);
 #endif
- l_ptr("!TVSMT",	&tvsmt);
- l_ptr("!PROJECT",	&projectTk);
- f_ptr("!WIDTH",	&xfac);
+ l_ptr("!tvsmt",	&tvsmt);
+ l_ptr("!project",	&projectTk);
+ f_ptr("!width",	&xfac);
 #if HAVE_LIBX11
- l_ptr("!WINDOW",	&last_wid);
+ l_ptr("!window",	&last_wid);
 #endif
- f_ptr("!WXB", 		&wxb);
- f_ptr("!WXT", 		&wxt);
- f_ptr("!WYB", 		&wyb);
- f_ptr("!WYT", 		&wyt);
+ f_ptr("!wxb", 		&wxb);
+ f_ptr("!wxt", 		&wxt);
+ f_ptr("!wyb", 		&wyb);
+ f_ptr("!wyt", 		&wyt);
 #if DEVELOP
- f_ptr("!WZB",		&wzb);
- f_ptr("!WZT",		&wzt);
+ f_ptr("!wzb",		&wzb);
+ f_ptr("!wzt",		&wzt);
 #endif
- f_ptr("!XB",		&plims[0]);
- f_ptr("!XC",		&callig_xb);
+ f_ptr("!xb",		&plims[0]);
+ f_ptr("!xc",		&callig_xb);
 #if HAVE_LIBX11
- l_ptr("!XERRORS",	&xerrors);
- f_ptr("!XF",		&xhair);
- f_ptr("!XMENU",	&menu_x);
+ l_ptr("!xerrors",	&xerrors);
+ f_ptr("!xf",		&xhair);
+ f_ptr("!xmenu",	&menu_x);
 #endif
- f_ptr("!XT",		&plims[1]);
+ f_ptr("!xt",		&plims[1]);
 #if HAVE_LIBX11
- d_ptr("!XTIME",	&last_time);
+ d_ptr("!xtime",	&last_time);
 #endif
- f_ptr("!YB",		&plims[2]);
- f_ptr("!YC",		&callig_yb);
+ f_ptr("!yb",		&plims[2]);
+ f_ptr("!yc",		&callig_yb);
 #if HAVE_LIBX11
- f_ptr("!YF",		&yhair);
- f_ptr("!YMENU",	&menu_y);
+ f_ptr("!yf",		&yhair);
+ f_ptr("!ymenu",	&menu_y);
 #endif
- f_ptr("!YT",		&plims[3]);
+ f_ptr("!yt",		&plims[3]);
 #if YYDEBUG
- l_ptr("!YYDEBUG",	&yydebug);
+ l_ptr("!yydebug",	&yydebug);
 #endif
- f_ptr("!ZB",		&plims[4]);
+ f_ptr("!zb",		&plims[4]);
 #if HAVE_LIBX11
- l_ptr("!ZOOMFRAME",	&zoom_frame);
- d_ptr("!ZOOMHIGH",	&zoom_chi);
- d_ptr("!ZOOMLOW",	&zoom_clo);
- f_ptr("!ZOOMMAG",	&zoom_mag);
- f_ptr("!ZOOMX",	&zoom_xc);
- f_ptr("!ZOOMY",	&zoom_yc);
+ l_ptr("!zoomframe",	&zoom_frame);
+ d_ptr("!zoomhigh",	&zoom_chi);
+ d_ptr("!zoomlow",	&zoom_clo);
+ f_ptr("!zoommag",	&zoom_mag);
+ f_ptr("!zoomx",	&zoom_xc);
+ f_ptr("!zoomy",	&zoom_yc);
 #endif
- f_ptr("!ZT",		&plims[5]);
+ f_ptr("!zt",		&plims[5]);
 
 #if MOTIF
- l_ptr("$RADIO_BUTTON",	&radio_button);
- l_ptr("$RADIO_STATE",	&radio_state); /* browser */
+ l_ptr("$radio_button",	&radio_button);
+ l_ptr("$radio_state",	&radio_state); /* browser */
 #endif
 
 	/* create a "universal" variable to assign to
 	   in  EVAL(string) */
- iq = installString("!TEMP");
+ iq = installString("!temp");
  tempSym = findVar(iq, 0);
  symbol_class(tempSym) = LUX_SCALAR;
  scalar_type(tempSym) = LUX_INT32;
  scalar_value(tempSym).l = 0;
- lastmax_sym = lookForVarName("!LASTMAX", 0);
- lastmin_sym = lookForVarName("!LASTMIN", 0);
- lastsdev_sym = lookForVarName("!LASTSDEV", 0);
- lastmean_sym = lookForVarName("!LASTMEAN", 0);
- eval_func = findInternalName("EVAL", 0);
- insert_subr = findInternalName("%INSERT", 1);
+ lastmax_sym = lookForVarName("!lastmax", 0);
+ lastmin_sym = lookForVarName("!lastmin", 0);
+ lastsdev_sym = lookForVarName("!lastsdev", 0);
+ lastmean_sym = lookForVarName("!lastmean", 0);
+ eval_func = findInternalName("eval", 0);
+ insert_subr = findInternalName("%insert", 1);
  printString = curScrat + FORMATSIZE;
  installing = 0;
 }
@@ -4824,8 +4824,8 @@ int32_t lux_breakpoint(int32_t narg, int32_t ps[])
   static int32_t	curBreakpoint = 0;
   char	*s, *p;
   int32_t	n;
-  
-  if (narg) 
+
+  if (narg)
     switch (internalMode & 3) {
       case 0:
 	switch (symbol_class(ps[0])) {
@@ -5009,7 +5009,7 @@ void pegParse(void)
 void zapParseTemps(void)
 {
   int32_t	iq;
-  
+
   while (markIndex > 0 && (iq = markStack[--markIndex]) >= 0)
     zapTemp(iq);
   markIndex++;			/* retain -2 on mark stack */
@@ -5041,7 +5041,7 @@ void unMark(int32_t symbol)
 void zapMarked(void)
 {
   int32_t	iq;
-  
+
   while (markIndex > 0 && (iq = markStack[--markIndex]) >= 0)
     zapTemp(iq);
 }
@@ -5260,7 +5260,7 @@ int32_t lux_struct(int32_t narg, int32_t ps[])
   int32_t	result, size, nstruct, dims[MAX_DIMS], ndim, n, i, offset;
   pointer	data;
   structElem	*se;
-  
+
   if (structSize(ps[0], &nstruct, &size) == LUX_ERROR) /* check
 							  specification */
     return LUX_ERROR;

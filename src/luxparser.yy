@@ -73,7 +73,7 @@ int32_t yyerror(const char *), yylex(YYSTYPE *);
 int32_t installString(char const* string);
 %}
 
-%pure_parser                    /* reentrant parser, so we can compile a
+%pure-parser                    /* reentrant parser, so we can compile a
                                  new routine we encounter while we're already
                                  compiling something else */
 
@@ -952,7 +952,6 @@ void translateLine(void)
    - translate control chars to whitespace
    - replace multiple whitespace by single whitespace
    - remove comments
-   - transform the rest to upper case (except literal strings)
    Moved treatment of literal strings to yylex because sometimes
    they must be ignored (e.g. when parsing nonrelevant code from
    a @@ file)
@@ -1045,10 +1044,7 @@ void translateLine(void)
                                 /* introduce a literal quote */
         break;
       default:                  /* "ordinary" character */
-        if (inString)
-          *tp++ = *p;           /* in string, so just copy */
-        else
-          *tp++ = toupper(*p);  /* else make upper case */
+        *tp++ = *p;           /* in string, so just copy */
         break;
     }
     p++;                        /* next character */
@@ -1154,11 +1150,11 @@ int32_t isKeyWord(void)
   if so, returns the keyword's code */
 {
  static char const* keyWords[] = {
-   "AND", "ANDIF", "BEGIN", "BLOCK", "BREAK", "CASE", "CONTINUE",
-   "DO", "ELSE", "END", "ENDBLOCK", "ENDCASE", "ENDFUNC",
-   "ENDSUBR", "EQ", "FOR", "FUNC", "FUNCTION", "GE", "GT", "IF", "LE", "LT",
-   "MOD", "NCASE", "NE", "OR", "ORIF", "REPEAT", "RETALL", "RETURN",
-   "RUN", "SMOD", "SUBR", "SUBROUTINE", "THEN", "UNTIL", "WHILE", "XOR"
+   "and", "andif", "begin", "block", "break", "case", "continue",
+   "do", "else", "end", "endblock", "endcase", "endfunc",
+   "endsubr", "eq", "for", "func", "function", "ge", "gt", "if", "le", "lt",
+   "mod", "ncase", "ne", "or", "orif", "repeat", "retall", "return",
+   "run", "smod", "subr", "subroutine", "then", "until", "while", "xor"
  };
  static int32_t keyCodes[] = {
    TOK_AND, TOK_ANDIF, TOK_BEGIN, TOK_BLOCK, TOK_BREAK, TOK_CASE,
@@ -1266,14 +1262,14 @@ int32_t yylex(YYSTYPE *lvalp)
 
    /* we recognize RESUME and IGNORE only at the beginning of a line */
    if (currentChar == tLine) {
-     if (!strncmp(currentChar, "IGNORE", 6)
+     if (!strncmp(currentChar, "ignore", 6)
          && !isNextChar((uint8_t) currentChar[6])) {
        ignoreInput++;
        prompt = LUXPrompts[2];  /* ign> */
-     } else if (!strncmp(currentChar, "RESUME", 6)
+     } else if (!strncmp(currentChar, "resume", 6)
                 && !isNextChar((uint8_t) currentChar[6])) {
        if (!ignoreInput)
-         puts("Unmatched RESUME ignored");
+         puts("Unmatched resume ignored");
        else
          ignoreInput--;
        if (!ignoreInput) {
@@ -1598,8 +1594,10 @@ int do_main(int argc, char *argv[])
   FILE  *fp;
   int32_t       yyparse(void);
   void register_printf_extensions();
+  void register_the_bindings();
 
   register_printf_extensions();
+  register_the_bindings();
 
   programName = argv[0];
   getTerminalSize();

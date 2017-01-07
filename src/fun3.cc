@@ -532,8 +532,8 @@ int32_t gsl_fft(double *data, size_t n, size_t stride)
   }
   return result;
 }
-BIND(gsl_fft, i_sd_iDaLarDq_000, f, FFT, 1, 2, "1ALLAXES:2AMPLITUDES");
-BIND(gsl_fft, i_sd_iDaLa_000, s, FFT, 1, 2, "1ALLAXES:2AMPLITUDES");
+BIND(gsl_fft, i_sd_iDaLarDq_000, f, fft, 1, 2, "1allaxes:2amplitudes");
+BIND(gsl_fft, i_sd_iDaLa_000, s, fft, 1, 2, "1allaxes:2amplitudes");
 /*------------------------------------------------------------------------- */
 int32_t gsl_fft_back(double *data, size_t n, size_t stride)
 {
@@ -559,8 +559,8 @@ int32_t gsl_fft_back(double *data, size_t n, size_t stride)
   }
   return gsl_fft_halfcomplex_inverse(data, stride, n, hwave, rwork);
 }
-BIND(gsl_fft_back, i_sd_iDaLarDq_000, f, FFTB, 1, 2, "1ALLAXES:2AMPLITUDES");
-BIND(gsl_fft_back, i_sd_iDaLa_000, s, FFTB, 1, 2, "1ALLAXES:2AMPLITUDES");
+BIND(gsl_fft_back, i_sd_iDaLarDq_000, f, fftb, 1, 2, "1allaxes:2amplitudes");
+BIND(gsl_fft_back, i_sd_iDaLa_000, s, fftb, 1, 2, "1allaxes:2amplitudes");
 /*------------------------------------------------------------------------- */
 int32_t hilbert(double *data, size_t n, size_t stride)
 {
@@ -579,8 +579,8 @@ int32_t hilbert(double *data, size_t n, size_t stride)
   }
   return gsl_fft_halfcomplex_inverse(data, stride, n, hwave, rwork);
 }
-BIND(hilbert, i_sd_iDaLarDq_000, f, HILBERT, 1, 2, "1ALLAXES");
-BIND(hilbert, i_sd_iDaLa_000, s, HILBERT, 1, 2, "1ALLAXES");
+BIND(hilbert, i_sd_iDaLarDq_000, f, hilbert, 1, 2, "1allaxes");
+BIND(hilbert, i_sd_iDaLa_000, s, hilbert, 1, 2, "1allaxes");
 /*------------------------------------------------------------------------- */
 int32_t gsl_fft_expand(double *sdata, size_t scount, size_t sstride,
 		   double *tdata, size_t tcount, size_t tstride)
@@ -677,7 +677,7 @@ int32_t lux_fft_expand(int32_t narg, int32_t ps[])
   free(infos);
   return iq;
 }
-REGISTER(fft_expand, f, FFTEXPAND, 2, 2, NULL);
+REGISTER(fft_expand, f, fftexpand, 2, 2, NULL);
 /*------------------------------------------------------------------------- */
 //#define SQRTHALF	M_SQRT1_2
 //#define SQRTWO		M_SQRT2

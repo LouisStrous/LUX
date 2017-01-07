@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.68])
-AC_INIT([lux], [1.1.3], [lux@quae.nl])
+AC_INIT([lux], [1.2.0], [lux@quae.nl])
 AC_LANG([C++])
 AC_CONFIG_SRCDIR([src/lux.cc])
 AC_CONFIG_MACRO_DIR([m4])

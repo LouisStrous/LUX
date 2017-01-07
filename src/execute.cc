@@ -1004,7 +1004,7 @@ int32_t usr_routine(int32_t symbol)
 	ordinary = 0, thisNArg, *evalArg, oldNArg, listSym = 0;
  int16_t	*arg, *par, *list = NULL;
  char	type, *name, msg, isError;
- char const* routineTypeNames[] = { "FUNC", "SUBR", "BLOCK" };
+ char const* routineTypeNames[] = { "func", "subr", "block" };
  symTableEntry	*oldpars;
  extern int32_t	returnSym, defined(int32_t, int32_t);
  extern char	evalScalPtr;

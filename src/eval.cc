@@ -19028,28 +19028,28 @@ int32_t evalLhs(int32_t symbol)
     case LUX_EXTRACT:
       break;
     case LUX_PRE_EXTRACT:
-      /* #D.R and #R.D are widely used as "degrees-to-radians" and
+      /* #d.r and #r.d are widely used as "degrees-to-radians" and
          "radians-to-degrees" conversion factors, but now clash with our
          notation for structure tags; i.e., they are now interpreted
-         as "member R of list/structure #D" and "member D of list/structure
-         #R", respectively.  We must deal with these as special cases:
+         as "member r of list/structure #d" and "member d of list/structure
+         #r", respectively.  We must deal with these as special cases:
          we do not allow any new ones like it.  LS 9jan99 */
       special = 0;
-      if (!strcmp(pre_extract_name(symbol), "#D")
+      if (!strcmp(pre_extract_name(symbol), "#d")
           && pre_extract_num_sec(symbol) >= 1) {
         eptr = pre_extract_ptr(symbol);
         if (eptr->type == LUX_LIST
-            && !strcmp(*eptr->ptr.sp, "R")) /* it is #D.R */
+            && !strcmp(*eptr->ptr.sp, "r")) /* it is #d.r */
           special = d_r_sym;
-      } else if (!strcmp(pre_extract_name(symbol), "#R")
+      } else if (!strcmp(pre_extract_name(symbol), "#r")
                  && pre_extract_num_sec(symbol) >= 1) {
         eptr = pre_extract_ptr(symbol);
         if (eptr->type == LUX_LIST
-            && !strcmp(*eptr->ptr.sp, "D")) /* it is #R.D */
+            && !strcmp(*eptr->ptr.sp, "d")) /* it is #r.d */
           special = r_d_sym;
       }
       if (special) {
-        /* we replace #D .R... with (#D.R)... */
+        /* we replace #d .r... with (#d.r)... */
         symbol_class(symbol) = LUX_EXTRACT;
         free(pre_extract_name(symbol));
         extract_ptr(symbol) = pre_extract_ptr(symbol);
@@ -19244,27 +19244,27 @@ int32_t evalExtractRhs(int32_t symbol)
   structPtrMember       *spm;
 
   if (symbol_class(symbol) == LUX_PRE_EXTRACT) {
-    /* #D.R and #R.D are widely used as "degrees-to-radians" and
+    /* #d.r and #r.d are widely used as "degrees-to-radians" and
        "radians-to-degrees" conversion factors, but now clash with our
        notation for structure tags; i.e., they are now interpreted
-       as "member R of list/structure #D" and "member D of list/structure
-       #R", respectively.  We must deal with these as special cases:
+       as "member r of list/structure #d" and "member d of list/structure
+       #r", respectively.  We must deal with these as special cases:
        we do not allow any new ones like it.  LS 9jan99 */
     special = 0;
     eptr = pre_extract_ptr(symbol);
-    if (!strcmp(pre_extract_name(symbol), "#D")
+    if (!strcmp(pre_extract_name(symbol), "#d")
         && pre_extract_num_sec(symbol) >= 1) {
       if (eptr->type == LUX_LIST
-          && !strcmp(*eptr->ptr.sp, "R")) /* it is #D.R */
+          && !strcmp(*eptr->ptr.sp, "r")) /* it is #d.r */
         special = d_r_sym;
-    } else if (!strcmp(pre_extract_name(symbol), "#R")
+    } else if (!strcmp(pre_extract_name(symbol), "#r")
                && pre_extract_num_sec(symbol) >= 1) {
       if (eptr->type == LUX_LIST
-          && !strcmp(*eptr->ptr.sp, "D")) /* it is #R.D */
+          && !strcmp(*eptr->ptr.sp, "d")) /* it is #r.d */
         special = r_d_sym;
     }
-    if (special) {              /* we found #D.R or #R.D */
-      /* we replace #D .R... with (#D.R)... */
+    if (special) {              /* we found #d.r or #r.d */
+      /* we replace #d .r... with (#d.r)... */
       symbol_class(symbol) = LUX_EXTRACT;
       free(pre_extract_name(symbol));
       extract_ptr(symbol) = pre_extract_ptr(symbol);
@@ -19288,7 +19288,7 @@ int32_t evalExtractRhs(int32_t symbol)
           return special;       /* all done */
         } /* end of if (extract_num_sec(symbol) > 1) else */
       } /* end of if (eptr->number > 1) else */
-    } else {                    /* no #D.R or #R.D */
+    } else {                    /* no #d.r or #r.d */
       /* we must allow an LUX_SUBR as a target if we are extracting using
          a structure tag: then we may be referring to a variable local to
          the subroutine; if the extraction is through parentheses, then

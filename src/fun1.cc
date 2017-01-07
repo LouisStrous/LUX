@@ -966,7 +966,7 @@ int32_t lux_indgen_s(int32_t narg, int32_t ps[])
 {
   return indgen(narg, ps, 0);
 }
-REGISTER(indgen_s, s, INDGEN, 1, 2, "*");
+REGISTER(indgen_s, s, indgen, 1, 2, "*");
 /*------------------------------------------------------------------------- */
 int32_t lux_neg_func(int32_t narg, int32_t ps[])
      /*take the negative of something */

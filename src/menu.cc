@@ -750,7 +750,7 @@ extern Window	win[];
 
 int32_t lux_register_event(int32_t narg, int32_t ps[])
      /* registers event types that XLOOP must act on */
-     /* syntax:  XREGISTER,event_mask,window,menu,item */
+     /* syntax:  xregister,event_mask,window,menu,item */
      /* a negative event_mask unregisters;  a zero mask clears. */
 {
   int32_t	type, addEvent, i, j, temp, iq, *windows, *menus, nWindow, nMenu,

@@ -440,7 +440,7 @@ int32_t lux_randome(int32_t narg, int32_t ps[])
   }
   return result_sym;
 }
-REGISTER(randome, f, RANDOME, 3, MAX_DIMS, "%1%LIMIT:SCALE");
+REGISTER(randome, f, randome, 3, MAX_DIMS, "%1%limit:scale");
 /*------------------------------------------------------------------------- */
 int32_t lux_randomb(int32_t narg, int32_t ps[])
 /* RANDOMB([SEED=seed,] dimens, [/LONG]) */

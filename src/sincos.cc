@@ -26,4 +26,4 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "action.hh"            // for BIND
 #include "replacements.h"       // if sincos is missing
 
-BIND(sincos, v_ddpdp_iDaoDqDq_012, s, SINCOS, 3, 3, NULL);
+BIND(sincos, v_ddpdp_iDaoDqDq_012, s, sincos, 3, 3, NULL);

@@ -931,7 +931,7 @@ int32_t lux_generalfit2(int32_t narg, int32_t ps[])
     symbol_context(d_step_sym) = -compileLevel; /* so it is deleted when appropriate */
   return result;
 }
-REGISTER(generalfit2, f, FIT3, 5, 7, "X:Y:START:STEP:F:ERR:ITHRESH:1VOCAL");
+REGISTER(generalfit2, f, fit3, 5, 7, "x:y:start:step:f:err:ithresh:1vocal");
 /*------------------------------------------------------------*/
 typedef union {
   uint8_t  *b;

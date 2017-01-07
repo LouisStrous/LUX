@@ -2425,7 +2425,7 @@ int32_t runord_d(double *data, int32_t n, int32_t width, int32_t ord, double *re
   free(temp);
   return 0;
 }
-BIND(runord_d, i_dpiT3dp_iDaiLiLrDq_00T3, f, RUNORD, 3, 3, NULL);
+BIND(runord_d, i_dpiT3dp_iDaiLiLrDq_00T3, f, runord, 3, 3, NULL);
 /*--------------------------------------------------------------------*/
 int32_t runmax_d(double *data, int32_t n, int32_t width, double *result)
 {
@@ -2470,7 +2470,7 @@ int32_t unmod_slice_d(double *srcptr, size_t srccount, size_t srcstride,
   }
   return 0;
 }
-BIND(unmod_slice_d, i_sdddsd_iDaLDDrDq_000T333, f, UNMOD, 2, 4, ":AXIS:PERIOD:AVERAGE");
+BIND(unmod_slice_d, i_sdddsd_iDaLDDrDq_000T333, f, unmod, 2, 4, ":axis:period:average");
 /*--------------------------------------------------------------------*/
 double hypot_stride(double *data, size_t count, size_t stride)
 {
@@ -2481,7 +2481,7 @@ double hypot_stride(double *data, size_t count, size_t stride)
   }
   return result;
 }
-BIND(hypot_stride, d_sd_iDaLarDxq_000_2, f, HYPOT, 1, 2, ":AXIS");
+BIND(hypot_stride, d_sd_iDaLarDxq_000_2, f, hypot, 1, 2, ":axis");
 /*--------------------------------------------------------------------*/
 int32_t approximately_equal(double a, double b, double eps)
 {
@@ -2625,7 +2625,7 @@ int32_t lux_ssfc_to_polar(int32_t narg, int32_t ps[]) {
   free(infos);
   return iq;
 }
-REGISTER(ssfc_to_polar, f, SSFCTOPOLAR, 1, 2, 0);
+REGISTER(ssfc_to_polar, f, ssfctopolar, 1, 2, 0);
 /*--------------------------------------------------------------------*/
 //// POLARTOSSFC(<coords>, [<level>]) converts polar coordinates into
 /// SSFC (Sierpiński Surface-Filling Coordinate).  <coords> is
@@ -2665,8 +2665,7 @@ int32_t lux_polar_to_ssfc(int32_t narg, int32_t ps[]) {
   } else {
     if ((iq = standard_args(narg, ps, "iD>2,*;rD-&", &ptrs, &infos)) < 0)
       return LUX_ERROR;
-    level = 54; // TODO: set level to how many bits of precision a
-                // double has
+    level = floor(log(std::numeric_limits<double>::epsilon())/log(2));
   }
 
   size_t points_count = infos[0].nelem/infos[0].dims[0];
@@ -2692,4 +2691,4 @@ int32_t lux_polar_to_ssfc(int32_t narg, int32_t ps[]) {
   free(infos);
   return iq;
 }
-REGISTER(polar_to_ssfc, f, POLARTOSSFC, 1, 2, 0);
+REGISTER(polar_to_ssfc, f, polartossfc, 1, 2, 0);

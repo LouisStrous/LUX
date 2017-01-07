@@ -3380,7 +3380,7 @@ double kepler_v(double M, double e)
     return 2*atan(p);
   }
 }
-BIND(kepler_v, d_dd_iDaD1rDq_01_2, f, KEPLER, 2, 2, NULL);
+BIND(kepler_v, d_dd_iDaD1rDq_01_2, f, kepler, 2, 2, NULL);
 /*--------------------------------------------------------------------------*/
 double interpolate_angle(double a1, double a2, double f)
      /* interpolates between angles <a1> and <a2> (measured in

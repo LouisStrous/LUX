@@ -1007,8 +1007,8 @@ int32_t oplotx(float x[], float y[], float ex[], float ey[], int32_t n, int32_t 
       case FIRST_IN: case ALL_IN: /* need to draw 2nd point */
 	if (i < *qi && (!(internalMode & 128) || c != PART_IN)) {
 	  /* /WHOLE is not set, so draw the partial line */
-	  tkplot_clip(xx[1], yy[1], lineStyle,
-                      (c == PART_IN || c == FIRST_IN)? 0: symStyle);
+	  tkplot(xx[1], yy[1], lineStyle,
+                 (c == PART_IN || c == FIRST_IN)? 0: symStyle);
 	  if (ex && (c == ALL_IN || c == SECOND_IN)) {
 	    xe = x[i] - ex[i];	/* go left first */
 	    coordMap(&xe, NULL);

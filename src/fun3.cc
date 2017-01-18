@@ -3107,10 +3107,12 @@ int32_t lux_scale(int32_t narg, int32_t ps[])
   double	sd, qd;
 #if HAVE_LIBX11
   extern double	zoom_clo, zoom_chi;
-  extern int32_t	threeColors;
-  extern int32_t	colorIndexType, display_cells;
+  extern int32_t threeColors;
+  extern int32_t display_cells;
+  extern Symboltype colorIndexType;
 #else
-  int32_t	colorIndexType = LUX_INT8, display_cells = 256;
+  int32_t display_cells = 256;
+  Symboltype colorIndexType = LUX_INT8;
 #endif
 
   iq = ps[0];
@@ -3119,7 +3121,7 @@ int32_t lux_scale(int32_t narg, int32_t ps[])
   type = array_type(iq);
   q1.l = (int32_t*) array_data(iq);
   n = array_size(iq);
-  result_sym = array_clone(iq, LUX_INT8);
+  result_sym = array_clone(iq, colorIndexType);
   q2.l = (int32_t*) array_data(result_sym);
   /* if only one arg., then we scale between the min and max of array */
   if (narg == 1 && (internalMode & 2) == 0) {/* 1 arg and no /ZOOM */

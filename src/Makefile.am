@@ -143,6 +143,8 @@ bin_PROGRAMS = lux
 lux_SOURCES = lux.cc
 lux_LDADD = liblux.a $(top_builddir)/sofa/src/libsofa_c.a
 
+luxparser.cc: luxparser.yy
+
 thebindings.cc: $(nonmain_sources) bindings.hh bindings.pl
 	perl bindings.pl
 

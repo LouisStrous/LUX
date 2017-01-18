@@ -32,6 +32,7 @@ int32_t lux_d_dT4dp3_iDaDaDp3p3arDq_00112_3_f_(int32_t narg, int32_t ps[], doubl
 int32_t lux_d_dT6_iLaDaD1T3rDq_0z1T4_5_f_(int32_t narg, int32_t ps[], double (*f)(double, double, double, double, double, double));
 int32_t lux_d_d_iDarDq_0_1_f_(int32_t narg, int32_t ps[], double (*f)(double));
 int32_t lux_d_dd_iDaD1rDq_01_2_f_(int32_t narg, int32_t ps[], double (*f)(double, double));
+int32_t lux_d_dd_iDaDbrDq_01_2_f_(int32_t narg, int32_t ps[], double (*f)(double, double));
 int32_t lux_d_dd_iDarDq_01_2_f_(int32_t narg, int32_t ps[], double (*f)(double, double));
 int32_t lux_d_dd_iDarDq_0z_1_f_(int32_t narg, int32_t ps[], double (*f)(double, double));
 int32_t lux_d_dd_iLarDq_0z_1_f_(int32_t narg, int32_t ps[], double (*f)(double, double));

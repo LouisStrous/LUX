@@ -1680,9 +1680,9 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
 	p_spec.axis_par = -2;		     /* indicates "none" */
       if (bad)
         break;
-      while (*fmt && !strchr("*?;&", *fmt)) { /* all dims */
+      while (*fmt && !strchr("*?;&#", *fmt)) { /* all dims */
         memset(&d_spec, '\0', sizeof(d_spec));
-        while (*fmt && !strchr(",?*;&", *fmt)) { /* every dim */
+        while (*fmt && !strchr(",?*;&#", *fmt)) { /* every dim */
           dim_spec_type type = (dim_spec_type) 0;
           size_t size = 0;
           switch (*fmt) {
@@ -1749,23 +1749,29 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
             }
             break;
           } /* end switch type */
+          if (bad)
+            break;
         } /* end of while *fmt && !strchr(",*;&") */
         if (bad)
           break;
         obstack_grow(&ods, &d_spec, sizeof(d_spec));
         if (*fmt == ',')
-          fmt++;
+          ++fmt;
       } /* end of while *fmt && !strchr("*;&", *fmt) */
       if (bad)
         break;
       switch (*fmt) {
       case '*':
         p_spec.remaining_dims = PS_ARBITRARY;
-        fmt++;
+        ++fmt;
         break;
       case '&':
         p_spec.remaining_dims = PS_EQUAL_TO_REFERENCE;
-        fmt++;
+        ++fmt;
+        break;
+      case '#':
+        p_spec.remaining_dims = PS_ONE_OR_EQUAL_TO_REFERENCE;
+        ++fmt;
         break;
         /* default is PS_ABSENT */
       }
@@ -1925,8 +1931,8 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
     \verbatim
     <format> = <param-spec>[;<param-spec>]*
     <param-spec> = {‘i’|‘o’|‘r’}[<type-spec>][<dims-spec>][‘?’]
-    <type-spec> = {[‘>’]{‘B’|‘W’|‘L’|‘F’|‘D’}}|‘S’
-    <dims-spec> = [‘[’<ref-par>‘]’][‘{’<axis-par>‘}’]<dim-spec>[,<dim-spec>]*[‘*’|‘&’]
+    <type-spec> = {[‘>’]{‘B’|‘W’|‘L’|'Q'|‘F’|‘D’}}|‘S’
+    <dims-spec> = [‘[’<ref-par>‘]’][‘{’<axis-par>‘}’]<dim-spec>[,<dim-spec>]*[‘*’|‘&’|'#']
     <dim-spec> = [{‘+’NUMBER|‘-’|‘-’NUMBER|‘=’|‘=’NUMBER|‘:’}]*
     \endverbatim
 
@@ -1937,14 +1943,14 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
       optionally followed by a question mark ‘?’, followed by a type
       specification and a dimensions specification.
     - a type specification consists of an ‘S’, or else of an optional
-      greater-than sign ‘>’ followed by one of ‘B’, ‘W’, ‘L’, ‘F’, or
-      ‘D’.
+      greater-than sign ‘>’ followed by one of ‘B’, ‘W’, ‘L’, 'Q',
+      ‘F’, or ‘D’.
     - a dimensions specification consists of a optional reference
       parameter number between square brackets ‘[]’, followed by an
       optional axis parameter number between curly braces ‘{}’,
       followed by one or more dimension specifications separated by
       commas ‘,’, optionally followed by an asterisk ‘*’ or ampersand
-      ‘&’.
+      ‘&’ or hash symbol '#'.
     - a dimension specification consists of a minus sign ‘-’, an
       equals sign ‘=’, a colon ‘:’, or a number preceded by a plus
       sign ‘+’, a minus sign ‘-’, or an equals sign ‘=’; followed by
@@ -2017,6 +2023,8 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
       skipped.
     - ‘:’ = for input parameters, accept the current dimension.
     - ‘&’ = the remaining dimensions must be equal to those of the
+      reference parameter.
+    - '#' = the element count must be equal to 1 or to that of the
       reference parameter.
     - ‘*’ = the remaining dimensions are unrestricted.
 
@@ -2238,6 +2246,37 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, pointer **ptr
                 returnSym = luxerror("Expected dimension %d equal to %d "
                                      "but found %d", ps[param_ix], i + 1,
                                      ref_dims[i], src_dims[j]);
+                goto error;
+              }
+          } else {
+            returnSym = luxerror("Dimensions of parameter %d required to be "
+                                 "equal to those of the reference, but no "
+                                 "reference is available",
+                                 ps[param_ix], param_ix + 1);
+            goto error;
+          }
+          break;
+        case PS_ONE_OR_EQUAL_TO_REFERENCE:
+          if (ref_dims && ref_dims_ix < num_ref_dims) {
+	    int32_t expect = num_ref_dims + src_dims_ix - ref_dims_ix;
+            if (expect != num_src_dims) {
+              returnSym = luxerror("Expected %d dimensions but found %d",
+                                   ps[param_ix],
+                                   num_ref_dims + src_dims_ix - ref_dims_ix,
+                                   num_src_dims);
+              goto error;
+            }
+            int32_t i, j;
+            for (i = ref_dims_ix, j = src_dims_ix; i < num_ref_dims; i++, j++)
+              if (src_dims[j] != 1 && ref_dims[i] != src_dims[j]) {
+                if (ref_dims[i] == 1)
+                  returnSym = luxerror("Expected dimension %d equal to %d "
+                                       "but found %d", ps[param_ix], i + 1,
+                                       ref_dims[i], src_dims[j]);
+                else
+                  returnSym = luxerror("Expected dimension %d equal to 1 or %d "
+                                       "but found %d", ps[param_ix], i + 1,
+                                       ref_dims[i], src_dims[j]);
                 goto error;
               }
           } else {

@@ -56,7 +56,7 @@ struct dims_spec {
 
 enum param_spec_type { PS_INPUT, PS_OUTPUT, PS_RETURN };
 enum type_spec_limit_type { PS_EXACT, PS_LOWER_LIMIT };
-enum remaining_dims_type { PS_ABSENT, PS_EQUAL_TO_REFERENCE, PS_ARBITRARY };
+enum remaining_dims_type { PS_ABSENT, PS_EQUAL_TO_REFERENCE, PS_ONE_OR_EQUAL_TO_REFERENCE, PS_ARBITRARY };
 
 struct param_spec {
   enum param_spec_type logical_type;

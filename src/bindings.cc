@@ -1184,6 +1184,43 @@ int32_t lux_d_dd_iDarDq_0z_1_f_(int32_t narg, int32_t ps[], double (*f)(double, 
 }
 /*-----------------------------------------------------------------------*/
 /** Bind a C function \p f to a LUX function with one at-least-double
+    array input parameter, one input parameter that has 1 dimension or
+    the same dimensions as the first parameter and is at least double,
+    and a double array return parameter with the same dimensions as
+    the first parameter.  Function \p f is called for each element of
+    the first parameter and (if it is an array) for each element of
+    the second parameter.
+
+    Standard arguments <tt>"i>D*;i>D#;rD&"</tt>.
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_d_dd_iDaDbrDq_01_2_f_(int32_t narg, int32_t ps[], double (*f)(double, double))
+{
+  pointer *ptrs;
+  loopInfo *infos;
+  int32_t iq;
+
+  if ((iq = standard_args(narg, ps, "i>D*;i>D#;rD&", &ptrs, &infos)) < 0)
+    return LUX_ERROR;
+  if (infos[1].nelem > 1) {
+    /* same number of elements in parameters 0 and 1 */
+    while (infos[0].nelem--)
+      *ptrs[2].d++ = f(*ptrs[0].d++, *ptrs[1].d++);
+  } else {
+    /* parameter 1 is a scalar */
+    while (infos[0].nelem--)
+      *ptrs[2].d++ = f(*ptrs[0].d++, *ptrs[1].d);
+  }
+  free(ptrs);
+  free(infos);
+  return iq;
+}
+/*-----------------------------------------------------------------------*/
+/** Bind a C function \p f to a LUX function with one at-least-double
     array input parameter, one scalar at-least-double scalar input
     parameter, and a double array return parameter with the same
     dimensions as the first parameter.  Function \p f is called for

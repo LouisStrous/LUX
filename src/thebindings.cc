@@ -1280,6 +1280,38 @@ int32_t lux_iauXys06a_s(int32_t narg, int32_t ps[]) {
   return result;
 }
 
+int32_t lux_esmooth_asymmetric_f(int32_t narg, int32_t ps[]) {
+  void esmooth_asymmetric(double *, size_t, size_t, double, double *, size_t, size_t);
+  int32_t result = lux_v_sddsd_iDaD1rDq_012_f_(narg, ps, esmooth_asymmetric);
+  if (result < 0)
+    luxerror("Error in esmooth1", 0);
+  return result;
+}
+
+int32_t lux_esmooth_symmetric_f(int32_t narg, int32_t ps[]) {
+  void esmooth_symmetric(double *, size_t, size_t, double, double *, size_t, size_t);
+  int32_t result = lux_v_sddsd_iDaD1rDq_012_f_(narg, ps, esmooth_symmetric);
+  if (result < 0)
+    luxerror("Error in esmooth2", 0);
+  return result;
+}
+
+int32_t lux_kepler_v_f(int32_t narg, int32_t ps[]) {
+  double kepler_v(double, double);
+  int32_t result = lux_d_dd_iDaDbrDq_01_2_f_(narg, ps, kepler_v);
+  if (result < 0)
+    luxerror("Error in kepler", 0);
+  return result;
+}
+
+int32_t lux_kepler_q_f(int32_t narg, int32_t ps[]) {
+  double kepler_q(double, double);
+  int32_t result = lux_d_dd_iDaDbrDq_01_2_f_(narg, ps, kepler_q);
+  if (result < 0)
+    luxerror("Error in keplerq", 0);
+  return result;
+}
+
 int32_t lux_runord_d_f(int32_t narg, int32_t ps[]) {
   int32_t runord_d(double *, int32_t, int32_t, int32_t, double *);
   int32_t result = lux_i_dpiT3dp_iDaiLiLrDq_00T3_f_(narg, ps, runord_d);
@@ -1317,30 +1349,6 @@ int32_t lux_hypot_stride_f(int32_t narg, int32_t ps[]) {
   int32_t result = lux_d_sd_iDaLarDxq_000_2_f_(narg, ps, hypot_stride);
   if (result < 0)
     luxerror("Error in hypot", 0);
-  return result;
-}
-
-int32_t lux_kepler_v_f(int32_t narg, int32_t ps[]) {
-  double kepler_v(double, double);
-  int32_t result = lux_d_dd_iDaD1rDq_01_2_f_(narg, ps, kepler_v);
-  if (result < 0)
-    luxerror("Error in kepler", 0);
-  return result;
-}
-
-int32_t lux_esmooth_asymmetric_f(int32_t narg, int32_t ps[]) {
-  void esmooth_asymmetric(double *, size_t, size_t, double, double *, size_t, size_t);
-  int32_t result = lux_v_sddsd_iDaD1rDq_012_f_(narg, ps, esmooth_asymmetric);
-  if (result < 0)
-    luxerror("Error in esmooth1", 0);
-  return result;
-}
-
-int32_t lux_esmooth_symmetric_f(int32_t narg, int32_t ps[]) {
-  void esmooth_symmetric(double *, size_t, size_t, double, double *, size_t, size_t);
-  int32_t result = lux_v_sddsd_iDaD1rDq_012_f_(narg, ps, esmooth_symmetric);
-  if (result < 0)
-    luxerror("Error in esmooth2", 0);
   return result;
 }
 
@@ -1687,6 +1695,14 @@ void register_the_bindings()
 
   register_lux_s(lux_iauXys06a_s, "xys06a", 4, 4, 0);
 
+  register_lux_f(lux_esmooth_asymmetric_f, "esmooth1", 1, 2, NULL);
+
+  register_lux_f(lux_esmooth_symmetric_f, "esmooth2", 1, 2, NULL);
+
+  register_lux_f(lux_kepler_v_f, "kepler", 2, 2, NULL);
+
+  register_lux_f(lux_kepler_q_f, "keplerq", 2, 2, "");
+
   register_lux_f(lux_runord_d_f, "runord", 3, 3, NULL);
 
   register_lux_f(lux_runmax_d_f, "RUNMAX", 2, 2, NULL);
@@ -1703,11 +1719,8 @@ void register_the_bindings()
   int32_t lux_polar_to_ssfc(int32_t, int32_t []);
   register_lux_f(lux_polar_to_ssfc, "polartossfc", 1, 2, 0);
 
-  register_lux_f(lux_kepler_v_f, "kepler", 2, 2, NULL);
-
-  register_lux_f(lux_esmooth_asymmetric_f, "esmooth1", 1, 2, NULL);
-
-  register_lux_f(lux_esmooth_symmetric_f, "esmooth2", 1, 2, NULL);
+  int32_t lux_generalfit2(int32_t, int32_t []);
+  register_lux_f(lux_generalfit2, "fit3", 5, 7, "x:y:start:step:f:err:ithresh:1vocal");
 
   register_lux_s(lux_sincos_s, "sincos", 3, 3, NULL);
 
@@ -1723,13 +1736,10 @@ void register_the_bindings()
   int32_t lux_diagonal_matrix(int32_t, int32_t []);
   register_lux_f(lux_diagonal_matrix, "mdiagonal", 1, 1, NULL);
 
-  int32_t lux_randome(int32_t, int32_t []);
-  register_lux_f(lux_randome, "randome", 3, MAX_DIMS, "%1%limit:scale");
-
   int32_t lux_indgen_s(int32_t, int32_t []);
   register_lux_s(lux_indgen_s, "indgen", 1, 2, "*");
 
-  int32_t lux_generalfit2(int32_t, int32_t []);
-  register_lux_f(lux_generalfit2, "fit3", 5, 7, "x:y:start:step:f:err:ithresh:1vocal");
+  int32_t lux_randome(int32_t, int32_t []);
+  register_lux_f(lux_randome, "randome", 3, MAX_DIMS, "%1%limit:scale");
 
 }

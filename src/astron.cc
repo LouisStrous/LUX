@@ -3380,7 +3380,325 @@ double kepler_v(double M, double e)
     return 2*atan(p);
   }
 }
-BIND(kepler_v, d_dd_iDaD1rDq_01_2, f, kepler, 2, 2, NULL);
+BIND(kepler_v, d_dd_iDaDbrDq_01_2, f, kepler, 2, 2, NULL);
+/*--------------------------------------------------------------------------*/
+/** \brief Solves Kepler's equation
+
+    \param[in] Mq - the perifocal anomaly, in radians.  Its value is
+                    unrestricted.
+    \param[in] e - the eccentricity.  Its value is unrestricted
+    \return tan(nu/2) where nu is the true anomaly.
+
+    The perifocal anomaly is the mean anomaly in the circular orbit
+    that touches the real orbit in its perifocus.
+
+    Kepler's equation is usually stated in terms of the mean anomaly,
+    which is based on the angular speed averaged over the orbital
+    period, but there is no orbital period for parabolic or hyperbolic
+    orbits.  For hyperbolic orbits, one can use the same formula for
+    the mean anomaly that is also used for elliptical orbits, even
+    though an object in a hyperbolic orbit never returns to a previous
+    position in that orbit.  However, when the perifocal distance and
+    time since perifocus are kept fixed, and the eccentricity
+    approaches 1 from below or above, then the mean anomaly
+    asymptotically goes to 0 for every non-zero perifocal distance, so
+    the mean anomaly is not useful for parabolic orbits, and
+    inconvenient for near-parabolic orbits.
+
+    The perifocal anomaly is well-defined for elliptical, parabolic,
+    and hyperbolic orbits, is continuous across eccentricity 1, and
+    for near-parabolic orbits its value for a fixed time since
+    perifocus hardly depends on the eccentricity.  This fits well with
+    the observation that it is difficult to tell elliptical and
+    hyperbolic near-parabolic orbits apart.
+ */
+double kepler_q(double Mq, double e)
+{
+  double f, delta32, delta;
+  static double prev_e = 0, prev_f = 1, prev_delta32 = 1, prev_delta = 1;
+  int begin_approx_ID = (internalMode & 15);
+  int requested_return_ID = internalMode/16;
+
+  e = fabs(e);
+  if (e == prev_e) {
+    f = prev_f;
+    delta32 = prev_delta32;
+    delta = prev_delta;
+  } else {
+    if (e != 1) {
+      delta = fabs(1 - e);
+      f = sqrt((1 + e)/delta);
+      delta32 = pow(delta, 1.5);
+      prev_f = f;
+      prev_delta32 = delta32;
+      prev_delta = delta;
+    } /* else f, delta32,delta are not used so their value is immaterial */
+    prev_e = e;
+  }
+  if (e < 1) {     /* elliptical orbit */
+    /* M = √(γ/a³) = √(γ(1-e)³/q³) = (1-e)^(3/2) Mq */
+    double M = delta32*Mq;
+    M = fmod(M, TWOPI);        /* between 0 and +2π */
+    double E;
+    switch (begin_approx_ID) {
+    case 1:                     /* for small Mq */
+      E = M/delta;
+      break;
+    case 2:                     /* for medium Mq, for near-parabolic orbit */
+      E = cbrt(6*M);
+      break;
+    case 3:                     /* for large Mq */
+      E = copysign(log1p(2*fabs(M)/e), M);
+      break;
+    case 4:                     /* parabolic approximation */
+      {
+        Mq = M/delta32;
+        double W = 0.75*M_SQRT2*Mq;
+        double u = cbrt(W + sqrt(W*W + 1));
+        double t = u - 1.0/u;   /* estimate for tan ½ν */
+        E = 2*atan(t/f);        /* f*tan(½E) = tan(½ν) */
+      }
+      break;
+    case 5:                    /* near-parabolic approximation */
+      {
+        Mq = M/delta32;
+        Mq *= (1 - delta/4);
+        double W = 0.75*M_SQRT2*Mq;
+        double u = cbrt(W + sqrt(W*W + 1));
+        double t = u - 1.0/u;
+        E = 2*atan(t/f);
+      }
+      break;
+    case 6:                     /* first-order approximation, for small e */
+      E = M + e*sin(M);
+      break;
+    case 7:                     /* zeroth-order approximation, for small e */
+      E = M;
+      break;
+    case 8:                     /* Louis Strous suggestion */
+      E = M + e*(1 + e*e*0.5)*sqrt(M)*sqrt(TWOPI - M)*M_2_SQRTPI/4;
+      break;
+    case 9:                     /* Louis Strous suggestion */
+      E = M + e*(1 + e*e*0.2)*sqrt(M)*sqrt(TWOPI - M)*M_2_SQRTPI/4;
+      break;
+    case 10:
+      // invented by LS
+      {
+        if (e == 0) {
+          E = M;
+        } else {
+          double ze = 1/e;
+          double W = 3*Mq*ze;
+          double u = cbrt(W + sqrt(W*W + 8*ze*ze*ze));
+          double t = u - 2/(e*u);
+          E = sqrt(delta)*t;
+        }
+      }
+      break;
+    default:
+      {
+        double s1 = M/delta;
+        double s2 = cbrt(6*M);
+        if (fabs(s1) < fabs(s2))
+          E = s1;
+        else
+          E = s2;
+      }
+      break;
+    }
+    double prev_ad;
+    double ad = HUGE_VAL;
+    double count = 0;
+    double prev_d;
+    double d = HUGE_VAL;
+    double prev_run_sdev;
+    double run_sdev = HUGE_VAL;
+    double chaos_count = 0;
+    double prev_aE = HUGE_VAL;
+    do {
+      double p = 1 - e*cos(E);
+      prev_ad = ad;
+      prev_d = d;
+      prev_run_sdev = run_sdev;
+      prev_aE = fabs(E);
+      d = (M + e*sin(E) - E)/p;
+      E += d;
+      run_sdev = prev_d*prev_d + prev_d*d + d*d;
+      if (run_sdev > prev_run_sdev)
+        ++chaos_count;
+      ++count;
+      ad = fabs(d);
+      /* Stop if the correction == 0.  Stop if the correction exceeds
+         the previous correction in magnitude and is smaller than
+         1e-7*E.  Stop if the correction exceeds the previous correction
+         in magnitude and we've had more than 10 iterations.
+         Otherwise continue.  Stop if
+         ad == 0 ∨ (ad ≥ prev_ad && ad ≤ 1e-7) ∨ (ad ≥ prev_ad && count ≥ 10)
+         I.e., stop if
+         ad == 0 ∨ (ad ≥ prev_ad ∧ (ad ≤ 1e-7 ∨ count ≥ 10))
+         I.e., continue if
+         (ad != 0 ∧ (ad < prev_ad ∨ (ad > 1e-7 ∧ count < 10)))
+         */
+    } while (ad && (ad < prev_ad || (ad > 1e-7 && count < 10)));
+    if (ad >= 1e-7*prev_aE && count >= 10 && ad)  /* unable to solve */
+      switch (requested_return_ID) {
+      case 0:                   /* value */
+        return NAN;
+      case 1:                   /* count */
+        return INFTY;
+      case 2:                   /* chaos count */
+        return chaos_count;
+      default:                  /* E */
+        return NAN;
+      }
+    else
+      switch (requested_return_ID) {
+      case 0:                   /* value */
+        return f*tan(E/2);
+      case 1:                   /* count */
+        return count;
+      case 2:                   /* chaos count */
+        return chaos_count;
+      default:                  /* E */
+        return E;
+      }
+  } else if (e > 1) {	/* hyperbolic orbit */;
+    /* M = √(γ/|a|³) = √(γ(e-1)³/q³) = (e-1)^(3/2) Mq */
+    /* ∆H = (e sinh H - H - M)/(1 - e cosh H)
+       = (M + H - e sinh H)/(e cosh H - 1)
+       = ((M + H)/(e cosh H) - tanh H)/(1 - 1/(e cosh H)) */
+    double M = delta32*Mq;
+    double H;
+    switch (begin_approx_ID) {
+    case 1:                     /* for small Mq */
+      H = M/delta;
+      break;
+    case 2:                     /* for medium Mq, near parabolic */
+      H = cbrt(6*M);
+      break;
+    case 3:                     /* for large Mq */
+      H = copysign(log1p(2*fabs(M)/e), M);
+      break;
+    case 4:                     /* parabolic approximation */
+      {
+        double l = 4/(3*delta32);
+        if (fabs(Mq) > fabs(l))
+          Mq = l;
+        double W = 0.75*M_SQRT2*Mq;
+        double u = cbrt(W + sqrt(W*W + 1));
+        double t = u - 1.0/u;   /* tan ½ν */
+        /* for a hyperbola, |tan ½ν| cannot exceed f */
+        t /= f;
+        if (fabs(t) >= 1)
+          t = copysign(1 - DBL_EPSILON, t); /* so H is not ±∞ */
+        H = 2*atanh(t);
+      }
+      break;
+    case 5:                     /* near-parabolic approximation */
+      {
+        Mq *= (1 + delta/4);
+        double l = 4/(3*delta32);
+        if (fabs(Mq) > fabs(l))
+          Mq = l;
+        double W = 0.75*M_SQRT2*Mq;
+        double u = cbrt(W + sqrt(W*W + 1));
+        double t = u - 1.0/u;   /* tan ½ν */
+        /* for a hyperbola, |tan ½ν| cannot exceed f */
+        t /= f;
+        if (fabs(t) >= 1)
+          t = copysign(1 - DBL_EPSILON, t); /* so H is not ±∞ */
+        H = 2*atanh(t);
+      }
+      break;
+    case 6:
+      H = asinh((M + M/delta)/e);   /* first-order approximation */
+      break;
+    case 10:
+      // invented by LS
+      {
+        if (e == 0) {
+          H = M;
+        } else {
+          double ze = 1/e;
+          double W = 3*Mq*ze;
+          double u = cbrt(W + sqrt(W*W + 8*ze*ze*ze));
+          double t = u - 2/(e*u);
+          H = sqrt(delta)*t;
+        }
+      }
+      break;
+    default:
+      if (fabs(M) < 3*e) {
+        double s1 = M/delta;
+        double s2 = cbrt(6*M);
+        if (fabs(s1) < fabs(s2))
+          H = s1;
+        else
+          H = s2;
+      } else {
+        H = copysign(log1p(2*fabs(M)/e), M);
+      }
+      break;
+    }
+    double prev_ad;
+    double ad = HUGE_VAL;
+    double count = 0;
+    double prev_d;
+    double d = HUGE_VAL;
+    double prev_run_sdev;
+    double run_sdev = HUGE_VAL;
+    double prev_aH = HUGE_VAL;
+    double chaos_count = 0;
+    do {
+      double p = (M + H)/e;
+      prev_ad = ad;
+      prev_d = d;
+      prev_aH = fabs(H);
+      prev_run_sdev = run_sdev;
+      d = (asinh(p) - H)/(1 - 1/(e*sqrt(1 + p*p)));
+      H += d;
+      run_sdev = prev_d*prev_d + prev_d*d + d*d;
+      if (run_sdev > prev_run_sdev)
+        ++chaos_count;
+      ++count;
+      ad = fabs(d);
+    } while (ad && (ad < prev_ad || (ad > 1e-7 && count < 10)));
+    if (ad >= 1e-7*prev_aH && count >= 10 && ad) /* unable to solve */
+      switch (requested_return_ID) {
+      case 0:                   /* value */
+        return NAN;
+      case 1:                   /* count */
+        return INFTY;
+      case 2:                   /* chaos count */
+        return chaos_count;
+      default:                  /* H */
+        return NAN;
+      }
+    else
+      switch (requested_return_ID) {
+      case 0:                   /* value */
+        return f*tanh(H/2);
+      case 1:                   /* count */
+        return count;
+      case 2:                   /* chaos count */
+        return chaos_count;
+      case 3:                   /* H */
+        return H;
+      }
+  } else {			/* parabolic orbit */
+    double W = 0.75*M_SQRT2*Mq;
+    double u = cbrt(W + sqrt(W*W + 1));
+    switch (requested_return_ID) {
+    case 0:                     /* value */
+      return u - 1.0/u;
+    case 1:                     /* count */
+      return 1;
+    default:                    /* chaos_count, E */
+      return 0;
+    }
+  }
+}
+BIND(kepler_q, d_dd_iDaDbrDq_01_2, f, keplerq, 2, 2, "");
 /*--------------------------------------------------------------------------*/
 double interpolate_angle(double a1, double a2, double f)
      /* interpolates between angles <a1> and <a2> (measured in

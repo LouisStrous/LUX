@@ -12112,7 +12112,7 @@ arguments.
 * GD2GC::                       Geocentric from geodetic coordinates
 * GD2GCE::                      Geocentric from geodetic coordinates and ellipsoid
 * GE::                          Greater-than-or-equal-to
-* GETDIRECTORIES::              Gets a list of subdirectories  
+* GETDIRECTORIES::              Gets a list of subdirectories
 * GETDIRECTS::                  Gets a list of subdirectories
 * GETENV::                      Get the value of an environment variable
 * GETFILES::                    Gets a list of files in a directory
@@ -12126,6 +12126,7 @@ arguments.
 * GMST00::                      Greenwich mean sidereal time, IAU 2000
 * GMST06::                      Greenwich mean sidereal time, IAU 2006
 * GMST82::                      Greenwich mean sidereal time, IAU 1982
+* GNUPLOT::                     Plot through gnuplot
 * GRIDMATCH::                   Determine displacements between two images
 * GSMOOTH::                     Gaussian smoothing
 * GST00A::                      Greenwich apparent sidereal time, IAU 2000
@@ -19683,7 +19684,7 @@ dimensions, and the result has those same dimensions, too.
 See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
-@node GMST82, GRIDMATCH, GMST06, Internal Routines
+@node GMST82, GNUPLOT, GMST06, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection GMST82
 @findex GMST82
@@ -19697,7 +19698,39 @@ The result has the same dimensions as @code{@var{jdut}}.
 See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
-@node GRIDMATCH, GSMOOTH, GMST82, Internal Routines
+@node GNUPLOT, GRIDMATCH, GMST82, Internal Routines
+@subsection GNUPLOT
+@findex GNUPLOT
+
+@code{GNUPLOT[[,@var{x}],@var{y}][,command=@var{command}}
+
+Plots @code{@var{y}} versus @code{@var{x}} through the external
+"gnuplot" program, if that program is available.
+
+One gnuplot process is created for the LUX session.  All calls to the
+@code{gnuplot} command in a particular LUX session interact with that
+same gnuplot process.
+
+Each call of @code{gnuplot} sends a gnuplot command to the gnuplot
+process, followed by the relevant contents of the data variables.  The
+gnuplot command to send is taken from the optional
+@code{@var{command}}.  If it is not specified, then @code{plot '-'
+notitle with lines;} is sent.
+
+@code{@var{x}} and @code{@var{y}} are optional.  If none are specified
+but @code{@var{command}} is specified, then only that command is sent.
+This way you can send gnuplot commands that don't involve LUX
+variables.
+
+If only one of @code{@var{x}} and @code{@var{y}} are specified, then
+it is interpreted as @code{@var{y}} and provides the y coordinates of
+the data points to plot, with default x coordinates.  If both are
+specified, then they must have the same dimensional structure.  Then
+the x coordinates are taken from @code{@var{x}} and the y coordinates
+are taken from @code{@var{y}}.
+
+@c -------------------------------------
+@node GRIDMATCH, GSMOOTH, GNUPLOT, Internal Routines
 @subsection GRIDMATCH
 @findex GRIDMATCH
 

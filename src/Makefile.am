@@ -75,6 +75,7 @@ nonmain_sources = \
 	fun6.cc\
 	gifread_lux.cc\
 	gifwrite_lux.cc\
+	gnuplot_interface.cc\
 	hersh.cc\
 	hershey.hh\
 	ident.cc\

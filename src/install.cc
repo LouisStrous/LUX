@@ -122,6 +122,8 @@ extern LuxRoutine lux_area, lux_area2, lux_arestore, lux_astore,
   lux_watch, lux_word_inplace, lux_writeu, lux_zap, lux_zapnan,
   lux_zero, postrelease, showstats, site;
 
+LuxRoutine lux_gnuplot;
+
 int32_t	lux_name();
 
 #if DEVELOP
@@ -379,6 +381,7 @@ internalRoutine	subroutine_table[] = {
   { "getmin9",	3, 3, lux_getmin9, 0 }, /* fun4.c */
   { "gifread",	2, 3, lux_gifread, 0 }, /* gifread_ana.c */
   { "gifwrite",	2, 3, lux_gifwrite, 0 }, /* gifwrite_ana.c */
+  { "gnuplot",  1, 3, lux_gnuplot, "::command" },  // plots.cc
 #if HAVE_LIBX11
   { "hairs",	0, 0, lux_xplace, 0 }, /* xport.c */
 #endif

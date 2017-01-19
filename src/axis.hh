@@ -69,6 +69,7 @@ struct param_spec {
   int32_t axis_par;
   enum remaining_dims_type remaining_dims;
   int32_t remaining_dims_equal_to_reference;
+  bool common_type;
 };
 
 struct param_spec_list {

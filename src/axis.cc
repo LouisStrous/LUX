@@ -1620,6 +1620,13 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
         break;
       } /* end of switch (*fmt) */
 
+      if (*fmt == '^') {
+        p_spec.common_type = true;
+        ++fmt;
+      } else {
+        p_spec.common_type = false;
+      }
+
       /* optional dims-specs */
       struct dims_spec d_spec;
       if (*fmt == '[') {       /* reference parameter specification */
@@ -1895,6 +1902,38 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
   return psl;
 }
 
+Symboltype standard_args_common_symboltype(int32_t num_param_specs,
+                                           param_spec* param_specs,
+                                           int32_t narg,
+                                           int32_t* ps)
+{
+  Symboltype common_type = LUX_NO_SYMBOLTYPE;
+
+  for (int param_ix = 0; param_ix < num_param_specs; ++param_ix) {
+    if (param_ix >= narg)
+      break;
+    param_spec* pspec = &param_specs[param_ix];
+    if (pspec->common_type) {
+      int32_t iq = ps[param_ix];
+      Symboltype type;
+      if (pspec->logical_type == PS_INPUT)
+        type = symbol_type(iq);
+      else
+        type = LUX_NO_SYMBOLTYPE;
+      if ((pspec->data_type_limit == PS_LOWER_LIMIT
+           && (type == LUX_NO_SYMBOLTYPE || type < pspec->data_type))
+          || (pspec->data_type_limit == PS_EXACT
+              && pspec->data_type != LUX_NO_SYMBOLTYPE
+              && type != pspec->data_type))
+        type = pspec->data_type;
+      if (common_type == LUX_NO_SYMBOLTYPE
+          || type < common_type)
+        common_type = type;
+    }
+  }
+  return common_type;
+}
+
 /** Prepares for looping through input and output variables based on a
     standard arguments specification.
 
@@ -1931,8 +1970,9 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
     \verbatim
     <format> = <param-spec>[;<param-spec>]*
     <param-spec> = {‘i’|‘o’|‘r’}[<type-spec>][<dims-spec>][‘?’]
-    <type-spec> = {[‘>’]{‘B’|‘W’|‘L’|'Q'|‘F’|‘D’}}|‘S’
-    <dims-spec> = [‘[’<ref-par>‘]’][‘{’<axis-par>‘}’]<dim-spec>[,<dim-spec>]*[‘*’|‘&’|'#']
+    <type-spec> = {{[‘>’]{‘B’|‘W’|‘L’|'Q'|‘F’|‘D’}}|‘S’}['^']
+    <dims-spec> = [‘[’<ref-par>‘]’][‘{’<axis-par>‘}’]
+                  <dim-spec>[,<dim-spec>]*[‘*’|‘&’|'#']
     <dim-spec> = [{‘+’NUMBER|‘-’|‘-’NUMBER|‘=’|‘=’NUMBER|‘:’}]*
     \endverbatim
 
@@ -1942,9 +1982,9 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
     - each parameter specification begins with an ‘i’, ‘o’, or ‘r’,
       optionally followed by a question mark ‘?’, followed by a type
       specification and a dimensions specification.
-    - a type specification consists of an ‘S’, or else of an optional
+    - a type specification consists of an ‘S', or else of an optional
       greater-than sign ‘>’ followed by one of ‘B’, ‘W’, ‘L’, 'Q',
-      ‘F’, or ‘D’.
+      ‘F’, or ‘D’.  Optionally, a '^' follows.
     - a dimensions specification consists of a optional reference
       parameter number between square brackets ‘[]’, followed by an
       optional axis parameter number between curly braces ‘{}’,
@@ -1980,6 +2020,9 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
     - ‘F’ = LUX_FLOAT
     - ‘D’ = LUX_DOUBLE
     - ‘S’ = LUX_STRING
+    - '^' = all numerical parameters marked like this get the same
+      data type, which is the greatest numerical data type among them
+      that would have applied if no '^' had been specified.
 
     For input parameters, a copy is created with the indicated
     (minimum) type if the input parameter does not meet the condition,
@@ -2072,6 +2115,11 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, pointer **ptr
   if (infos)
     *infos = (loopInfo*) malloc(psl->num_param_specs*sizeof(loopInfo));
   final = (int32_t*) calloc(psl->num_param_specs, sizeof(int32_t));
+
+  Symboltype common_type
+    = standard_args_common_symboltype(psl->num_param_specs,
+                                      psl->param_specs,
+                                      narg, ps);
 
   obstack_init(&o);
   /* now we treat the parameters. */
@@ -2309,10 +2357,12 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, pointer **ptr
         }
         iq = ps[param_ix];
         type = symbol_type(iq);
-        if ((pspec->data_type_limit == PS_LOWER_LIMIT
-             && type < pspec->data_type)
-            || (pspec->data_type_limit == PS_EXACT
-                && type != pspec->data_type))
+        if (pspec->common_type)
+          type = common_type;
+        else if ((pspec->data_type_limit == PS_LOWER_LIMIT
+                  && type < pspec->data_type)
+                 || (pspec->data_type_limit == PS_EXACT
+                     && type != pspec->data_type))
           type = pspec->data_type;
         iq = lux_convert(1, &iq, type, 1);
         break;
@@ -2400,6 +2450,9 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, pointer **ptr
               type = pspec->data_type;
           } else
             type = pspec->data_type;
+          if (pspec->common_type
+              && common_type != LUX_NO_SYMBOLTYPE)
+            type = common_type;
 	  if (tgt_dims_ix)
 	    iq = returnSym = array_scratch(type, tgt_dims_ix, tgt_dims);
 	  else

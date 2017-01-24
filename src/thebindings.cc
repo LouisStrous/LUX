@@ -1742,4 +1742,16 @@ void register_the_bindings()
   int32_t lux_randome(int32_t, int32_t []);
   register_lux_f(lux_randome, "randome", 3, MAX_DIMS, "%1%limit:scale");
 
+  int32_t lux_gnuplot(int32_t, int32_t []);
+  register_lux_s(lux_gnuplot, "gplot", 1, 3, "::command");
+
+  int32_t lux_gnutv(int32_t, int32_t []);
+  register_lux_s(lux_gnutv, "gtv", 1, 1, ":command");
+
+  int32_t lux_gnuplot3d(int32_t, int32_t []);
+  register_lux_s(lux_gnuplot3d, "gplot3d", 1, 1, ":command");
+
+  int32_t lux_gnucontour(int32_t, int32_t []);
+  register_lux_s(lux_gnucontour, "gcontour", 1, 1, ":1equalxy:2image");
+
 }

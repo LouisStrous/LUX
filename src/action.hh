@@ -25,6 +25,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "error.hh"
 #include "dmalloc.hh"
 #include "bindings.hh"
+#include "StandardArguments.hh"
 
 extern char		expname[], line[], *curScrat;
 extern char const* currentRoutineName;

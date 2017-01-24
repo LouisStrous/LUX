@@ -33,6 +33,8 @@ nonbind_sources = \
 	Rotate3d.hh\
 	SSFC.cc\
 	SSFC.hh\
+	StandardArguments.cc\
+	StandardArguments.hh\
 	action.hh\
 	astrodat2.hh\
 	astrodat3.hh\

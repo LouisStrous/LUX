@@ -87,7 +87,7 @@ int32_t Puts(const char *s)
   { fputs(s, recordFile);
     fputc('\n', recordFile); }
   return puts(s);
-}  
+}
 /*----------------------------------------------------------------------*/
 int32_t Fputs(const char *s, FILE *stream)
 {

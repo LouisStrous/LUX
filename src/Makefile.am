@@ -23,7 +23,7 @@ AM_CPPFLAGS = -I$(top_srcdir)/sofa/src
 AM_YFLAGS = -d
 ACLOCAL_AMFLAGS = -I m4
 
-nonmain_sources = \
+nonbind_sources = \
 	AstronomicalConstants.hh\
 	Bytestack.cc\
 	Bytestack.hh\
@@ -128,7 +128,6 @@ nonmain_sources = \
 	terminal.cc\
 	terminfo.cc\
 	terminfo.hh\
-	thebindings.cc\
 	topology.cc\
 	trace_decoder_lux.cc\
 	visualclass.c\
@@ -146,12 +145,12 @@ lux_LDADD = liblux.a $(top_builddir)/sofa/src/libsofa_c.a
 
 luxparser.cc: luxparser.yy
 
-thebindings.cc: $(nonmain_sources) bindings.hh bindings.pl
+thebindings.cc: $(nonbind_sources) bindings.hh bindings.pl
 	perl bindings.pl
 
 # build library, too; makes building test binaries easier
 noinst_LIBRARIES = liblux.a
-liblux_a_SOURCES = $(nonmain_sources)
+liblux_a_SOURCES = $(nonbind_sources) thebindings.cc
 #liblux_a_LIBADD = $(top_builddir)/sofa/src/libsofa_c.a
 
 debug:

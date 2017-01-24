@@ -157,7 +157,8 @@ FILE	*openPathFile(char const *, int32_t);
 
 Symboltype combinedType(Symboltype, Symboltype);
 
-#define axisAxes(i)	(axisAxis? axisAxis[i]: i)
+#define axisAxes(i)	(axisAxis? axisAxis[i]: (i))
 
-#define debugout(msg)	printf("DEBUG - %s [%s, line %d]\n", msg, __FILE__, __LINE__)
-#define debugout1(fmt,arg)	printf("DEBUG - "); printf(fmt, arg); printf(" [%s, line %d]\n", __FILE__, __LINE__)
+#define debugout(msg)	printf("DEBUG - %s [%s, line %d]\n", (msg), __FILE__, __LINE__)
+#define debugout1(fmt,arg)	printf("DEBUG - "); printf((fmt), (arg)); printf(" [%s, line %d]\n", __FILE__, __LINE__)
+
